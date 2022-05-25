@@ -11,7 +11,20 @@ namespace Game3 {
 		Gtk::StyleContext::add_provider_for_display(Gdk::Display::get_default(), cssProvider,
 			GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-		set_child(drawingArea);
+		set_child(vbox);
+		vbox.append(hbox);
+		vbox.append(drawingArea);
+		hbox.append(mmx);
+		hbox.append(ppx);
+		hbox.append(mmy);
+		hbox.append(ppy);
+		drawingArea.set_hexpand(true);
+		drawingArea.set_vexpand(true);
+
+		mmx.signal_clicked().connect([this] { --drawingArea.x_; drawingArea.queue_draw(); });
+		ppx.signal_clicked().connect([this] { ++drawingArea.x_; drawingArea.queue_draw(); });
+		mmy.signal_clicked().connect([this] { --drawingArea.y_; drawingArea.queue_draw(); });
+		ppy.signal_clicked().connect([this] { ++drawingArea.y_; drawingArea.queue_draw(); });
 
 		functionQueueDispatcher.connect([this] {
 			auto lock = std::unique_lock(functionQueueMutex);
@@ -47,7 +60,7 @@ namespace Game3 {
 
 	void MainWindow::queue(std::function<void()> fn) {
 		{
-			auto lock = std::unique_lock(functionQueueMutex);
+			std::unique_lock lock(functionQueueMutex);
 			functionQueue.push_back(fn);
 		}
 		functionQueueDispatcher.emit();

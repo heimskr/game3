@@ -1,0 +1,14 @@
+READ ME
+
+single biome water tiles-
+
+-row 1-4 = frame 1-4
+
+double biomed water tiles-
+
+-row 1/2/3 = frame 1, row 4/5/6 = frame 2, row 7/8/9 = frame 3, row 10,11,12 = frame 4
+-row 1/4/7/10 have SECONDARY biome (named second in the tileset name) in the corner (top-left, top-right, bottom-right & bottom-left (going from left to right))
+-row 2/5/8/11 have SECONDARY biome (named second in the tileset name) on the edge (top, right, bottom & left (going from left to right))
+-row 3/6/9/12 have PRIMARY biome (named first in the tileset name) in the corner (bottom-right, bottom-left, top-left & top-right (going from left to right))
+
+THE BOTTOM TWO ROWS (OF TILES) IN EACH ROW (FRAMES OF WATER ANIMATION AND LAND) are for the top corners (with the top corners having a thick band of light blue/dark green/grey all the way around)

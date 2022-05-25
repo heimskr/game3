@@ -16,14 +16,14 @@ namespace Game3 {
 	}
 
 	void App::on_activate() {
-		try {
+		// try {
 			auto window = create_window();
 			window->present();
-		} catch (const Glib::Error &err) {
-			std::cerr << "App::on_activate(): " << err.what() << std::endl;
-		} catch (const std::exception &err) {
-			std::cerr << "App::on_activate(): " << err.what() << std::endl;
-		}
+		// } catch (const Glib::Error &err) {
+		// 	std::cerr << "App::on_activate(): " << err.what() << std::endl;
+		// } catch (const std::exception &err) {
+		// 	std::cerr << "App::on_activate(): " << err.what() << std::endl;
+		// }
 	}
 
 	MainWindow * App::create_window() {
