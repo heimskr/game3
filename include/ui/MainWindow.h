@@ -42,7 +42,7 @@ namespace Game3 {
 			Gtk::Box vbox {Gtk::Orientation::VERTICAL};
 			Gtk::Box hbox {Gtk::Orientation::HORIZONTAL};
 
-			Gtk::Button mmx {"--x"}, ppx {"++x"}, mmy {"--y"}, ppy {"++y"};
+			Gtk::Button mmx {"--x"}, ppx {"++x"}, mmy {"--y"}, ppy {"++y"}, draw {"Draw"};
 			DrawingArea drawingArea {*this};
 	};
 }

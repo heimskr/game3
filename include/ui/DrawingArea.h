@@ -21,7 +21,7 @@ namespace Game3 {
 			MainWindow &mainWindow;
 			Cairo::RefPtr<Cairo::ImageSurface> tiles;
 			Cairo::RefPtr<Cairo::ImageSurface> surface;
-			void renderTile(const Cairo::RefPtr<Cairo::Context> &, double canvas_x, double canvas_y, double tile_x,
-			                double tile_y, double tile_width, double tile_height = 0);
+			void renderTile(const Cairo::RefPtr<Cairo::Context> &, double canvas_x, double canvas_y, int tile_x_index,
+			                int tile_y_index, double tile_width, double tile_height = 0, const std::string &text = "");
 	};
 }

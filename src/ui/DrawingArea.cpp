@@ -5,27 +5,119 @@
 namespace Game3 {
 	DrawingArea::DrawingArea(MainWindow &main_window): mainWindow(main_window) {
 		tiles = Cairo::ImageSurface::create_from_png("resources/forest_/forest_.png");
+		// tiles = Cairo::ImageSurface::create_from_png("resources/forest2.png");
 		surface = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, tiles->get_width(), tiles->get_height());
 		set_draw_func(sigc::mem_fun(*this, &DrawingArea::on_draw));
+		auto click = Gtk::GestureClick::create();
+		click->signal_released().connect([this](int what, double x, double y) {
+			
+		});
+		add_controller(click);
 	}
 
 	void DrawingArea::renderTile(const Cairo::RefPtr<Cairo::Context> &cr, double canvas_x, double canvas_y,
-	                             double tile_x, double tile_y, double tile_width, double tile_height) {
+	                             int tile_x_index, int tile_y_index, double tile_width, double tile_height, const std::string &text) {
 		if (tile_height == 0)
 			tile_height = tile_width;
 
-		tile_x *= tile_width;
-		tile_y *= tile_height;
+		double tile_x = tile_x_index * tile_width;
+		double tile_y = tile_y_index * tile_height;
 
+		cr->save();
 		cr->translate(canvas_x - tile_x, canvas_y - tile_y);
 		cr->set_source(tiles, 0, 0);
 		cr->translate(tile_x, tile_y);
 		cr->rectangle(0., 0., tile_width, tile_height);
 		cr->clip();
 		cr->paint();
+		cr->restore();
+
+		if (!text.empty()) {
+			cr->save();
+			cr->move_to(canvas_x, canvas_y + 8);
+			cr->show_text(text);
+			cr->restore();
+		}
 	}
 
-	void DrawingArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height) {
-		renderTile(cr, x_, y_, x_, y_, 16, 16);
+	void DrawingArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int, int) {
+		// renderTile(cr, x_, y_, x_, y_, 16, 16);
+
+		constexpr static int marching[256] {
+			0, 1, 2, 2, 3, 4, 2, 2, 5, 5, 6, 6, 7, 7, 6, 6, 8, 9, 10, 10, 8, 9, 10, 10, 11, 11, 12, 12, 11, 11, 12, 12,
+			13, 14, 15, 15, 16, 17, 15, 15, 5, 5, 6, 6, 7, 7, 6, 6, 18, 19, 20, 20, 18, 19, 20, 20, 11, 11, 12, 12, 11,
+			11, 12, 12, 21, 22, 23, 23, 24, 25, 23, 23, 26, 26, 27, 27, 28, 28, 27, 27, 29, 30, 31, 31, 29, 30, 31, 31,
+			32, 32, 33, 33, 32, 32, 33, 33, 21, 22, 23, 23, 24, 25, 23, 23, 26, 26, 27, 27, 28, 28, 27, 27, 29, 30, 31,
+			31, 29, 30, 31, 31, 32, 32, 33, 33, 32, 32, 33, 33, 34, 35, 36, 36, 37, 38, 36, 36, 39, 39, 40, 40, 41, 41,
+			40, 40, 8, 9, 10, 10, 8, 9, 10, 10, 11, 11, 12, 12, 11, 11, 12, 12, 42, 43, 44, 44, 45, 46, 44, 44, 39, 39,
+			40, 40, 41, 41, 40, 40, 18, 19, 20, 20, 18, 19, 20, 20, 11, 11, 12, 12, 11, 11, 12, 12, 21, 22, 23, 23, 24,
+			25, 23, 23, 26, 26, 27, 27, 28, 28, 27, 27, 29, 30, 31, 31, 29, 30, 31, 31, 32, 32, 33, 33, 32, 32, 33, 33,
+			21, 22, 23, 23, 24, 25, 23, 23, 26, 26, 27, 27, 28, 28, 27, 27, 29, 30, 31, 31, 29, 30, 31, 31, 32, 32, 33,
+			33, 32, 32, 33, 33
+		};
+
+		// constexpr static int map[][5] = {
+		// 	{1, 0, 0, 0, 1},
+		// 	{0, 1, 0, 1, 0},
+		// 	{0, 0, 1, 0, 1},
+		// 	{1, 0, 0, 0, 1},
+		// };
+
+		constexpr static int map[][5] = {
+			{1, 1, 1, 1, 1},
+			{1, 0, 0, 0, 1},
+			{1, 0, 0, 0, 1},
+			{1, 0, 0, 0, 1},
+			{1, 1, 1, 1, 1},
+		};
+
+		constexpr static int w = sizeof(map[0]) / sizeof(map[0][0]);
+		constexpr static int h = sizeof(map) / sizeof(map[0]);
+
+		static int frame = 0;
+
+		static int r = 0;
+		static int c = 0;
+
+		auto get = [&](int x, int y) -> int {
+			x += c;
+			y += r;
+			if (x < 0 || w <= x || y < 0 || h <= y)
+				return 0;
+			return map[y][x];
+		};
+
+		for (r = 0; r < h; ++r) {
+			for (c = 0; c < w; ++c) {
+				const int sum = get(-1, -1) + (get(0, -1) << 1) + (get(1, -1) << 2) + (get(-1, 0) << 3) +
+					(get(1, 0) << 4) + (get(-1, 1) << 5) + (get(0, 1) << 6) + (get(1, 1) << 7);
+				if (r == 0 && c == 0) {
+					for (int i = -1; i <= 1; ++i) {
+						for (int j = -1; j <= 1; ++j)
+							std::cerr << get(i, j);
+						std::cerr << '\n';
+					}
+				}
+				// const int sum = get(-1,-1) + 2*get(0,-1) + 4*get(1,-1) + 8*get(-1,0) + 16*get(1,0) + 32*get(-1,1) + 64*get(0,1) + 128*get(1,1);
+				const int index = marching[sum];
+				int y = 1 + index / 13;
+				int x = 1 + index % 13;
+				// int y = index / 8;
+				// int x = index % 8;
+				std::cerr << '(' << r << ", " << c << ") -> " << sum << " -> " << index << " -> (" << x << ", " << y << ")\n";
+				int scale = 16;
+				renderTile(cr, scale * c, scale * r, x, y, scale, scale, std::to_string(sum));
+			}
+		}
+
+		// if (++c == 5) {
+		// 	c = 0;
+		// 	if (++r == 5)
+		// 		r = 0;
+		// }
+
+
+
+		frame = (frame + 1) % 4;
 	}
 }

@@ -18,6 +18,7 @@ namespace Game3 {
 		hbox.append(ppx);
 		hbox.append(mmy);
 		hbox.append(ppy);
+		hbox.append(draw);
 		drawingArea.set_hexpand(true);
 		drawingArea.set_vexpand(true);
 
@@ -25,6 +26,7 @@ namespace Game3 {
 		ppx.signal_clicked().connect([this] { ++drawingArea.x_; drawingArea.queue_draw(); });
 		mmy.signal_clicked().connect([this] { --drawingArea.y_; drawingArea.queue_draw(); });
 		ppy.signal_clicked().connect([this] { ++drawingArea.y_; drawingArea.queue_draw(); });
+		draw.signal_clicked().connect([this] { drawingArea.queue_draw(); });
 
 		functionQueueDispatcher.connect([this] {
 			auto lock = std::unique_lock(functionQueueMutex);
