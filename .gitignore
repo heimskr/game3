@@ -1,6 +1,6 @@
+*.o
+/game3
+.dep
+src/resources.cpp
+.dep.bak
 
-# Godot-specific ignores
-.import/
-addons/
-export.cfg
-export_presets.cfg
