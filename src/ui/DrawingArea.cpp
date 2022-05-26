@@ -2,10 +2,101 @@
 
 #include "ui/DrawingArea.h"
 
+constexpr static int marching[256] {
+	 0,  1,  2,  2,  3,  4,  2,  2,  5,  5,  6,  6,  7,  7,  6,  6,
+	 8,  9, 10, 10,  8,  9, 10, 10, 11, 11, 12, 12, 11, 11, 12, 12,
+	13, 14, 15, 15, 16, 17, 15, 15,  5,  5,  6,  6,  7,  7,  6,  6,
+	18, 19, 20, 20, 18, 19, 20, 20, 11, 11, 12, 12, 11, 11, 12, 12,
+	21, 22, 23, 23, 24, 25, 23, 23, 26, 26, 27, 27, 28, 28, 27, 27,
+	29, 30, 31, 31, 29, 30, 31, 31, 32, 32, 33, 33, 32, 32, 33, 33,
+	21, 22, 23, 23, 24, 25, 23, 23, 26, 26, 27, 27, 28, 28, 27, 27,
+	29, 30, 31, 31, 29, 30, 31, 31, 32, 32, 33, 33, 32, 32, 33, 33,
+	34, 35, 36, 36, 37, 38, 36, 36, 39, 39, 40, 40, 41, 41, 40, 40,
+	 8,  9, 10, 10,  8,  9, 10, 10, 11, 11, 12, 12, 11, 11, 12, 12,
+	42, 43, 44, 44, 45, 46, 44, 44, 39, 39, 40, 40, 41, 41, 40, 40,
+	18, 19, 20, 20, 18, 19, 20, 20, 11, 11, 12, 12, 11, 11, 12, 12,
+	21, 22, 23, 23, 24, 25, 23, 23, 26, 26, 27, 27, 28, 28, 27, 27,
+	29, 30, 31, 31, 29, 30, 31, 31, 32, 32, 33, 33, 32, 32, 33, 33,
+	21, 22, 23, 23, 24, 25, 23, 23, 26, 26, 27, 27, 28, 28, 27, 27,
+	29, 30, 31, 31, 29, 30, 31, 31, 32, 32, 33, 33, 32, 32, 33, 33
+};
+
+// static std::unordered_map<int, int> marching_map {
+// 	{  0, 0}, {  2, 1}, {  8, 2}, { 10, 3}, { 11, 4}, { 16, 5}, { 18, 6}, { 22, 7}, { 24, 8}, { 26, 9}, { 27, 10}, { 30, 11}, { 31, 12}, { 64, 13}, { 66, 14}, { 72, 15}, { 74, 16}, { 75, 17}, { 80, 18}, { 82, 19}, { 86, 20}, { 88, 21}, { 90, 22}, { 91, 23}, { 94, 24}, { 95, 25}, {104, 26}, {106, 27}, {107, 28}, {120, 29}, {122, 30}, {123, 31}, {126, 32}, {127, 33}, {208, 34}, {210, 35}, {214, 36}, {216, 37}, {218, 38}, {219, 39}, {222, 40}, {223, 41}, {248, 42}, {250, 43}, {251, 44}, {254, 45}, {255, 46},
+// };
+
+static std::unordered_map<int, int> marching_map {
+	{  0, 0},
+	{  2, 1},
+	{  8, 2},
+	{ 10, 3},
+	{ 11, 34},
+	{ 16, 5},
+	{ 18, 6},
+	{ 22, 40},
+	{ 24, 8},
+	{ 26, 9},
+	{ 27, 10},
+	{ 30, 11},
+	{ 31, 28},
+	{ 64, 13},
+	{ 66, 14},
+	{ 72, 15},
+	{ 74, 16},
+	{ 75, 17},
+	{ 80, 18},
+	{ 82, 19},
+	{ 86, 20},
+	{ 88, 21},
+	{ 90, 22},
+	{ 91, 23},
+	{ 94, 24},
+	{ 95, 25},
+	{104, 26},
+	{106, 27},
+	{107, 24},
+	{120, 29},
+	{122, 30},
+	{123, 31},
+	{126, 32},
+	{127, 33},
+	{208, 34},
+	{210, 35},
+	{214, 36},
+	{216, 37},
+	{218, 38},
+	{219, 39},
+	{222, 40},
+	{223, 41},
+	{248, 42},
+	{250, 43},
+	{251, 44},
+	{254, 45},
+	{255, 46},
+};
+
+// constexpr static int ints[][5] = {
+// 	{1, 0, 0, 0, 1},
+// 	{0, 1, 0, 1, 0},
+// 	{0, 0, 1, 0, 1},
+// 	{1, 0, 0, 0, 1},
+// };
+
+constexpr static int ints[][7] = {
+	{1, 1, 1, 1, 1, 1, 1},
+	{1, 1, 1, 1, 1, 1, 1},
+	{1, 1, 0, 0, 0, 1, 1},
+	{1, 1, 0, 0, 0, 1, 1},
+	{1, 1, 0, 0, 0, 1, 1},
+	{1, 1, 1, 1, 1, 1, 1},
+	{1, 1, 1, 1, 1, 1, 1},
+};
+
 namespace Game3 {
 	DrawingArea::DrawingArea(MainWindow &main_window): mainWindow(main_window) {
-		tiles = Cairo::ImageSurface::create_from_png("resources/forest_/forest_.png");
+		// tiles = Cairo::ImageSurface::create_from_png("resources/forest_/forest_.png");
 		// tiles = Cairo::ImageSurface::create_from_png("resources/forest2.png");
+		tiles = Cairo::ImageSurface::create_from_png("resources/48tileset.png");
 		surface = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, tiles->get_width(), tiles->get_height());
 		set_draw_func(sigc::mem_fun(*this, &DrawingArea::on_draw));
 		auto click = Gtk::GestureClick::create();
@@ -22,8 +113,10 @@ namespace Game3 {
 
 		double tile_x = tile_x_index * tile_width;
 		double tile_y = tile_y_index * tile_height;
+		double scale = 2;
 
 		cr->save();
+		cr->scale(scale, scale);
 		cr->translate(canvas_x - tile_x, canvas_y - tile_y);
 		cr->set_source(tiles, 0, 0);
 		cr->translate(tile_x, tile_y);
@@ -34,6 +127,8 @@ namespace Game3 {
 
 		if (!text.empty()) {
 			cr->save();
+			cr->scale(scale, scale);
+			cr->set_font_size(8);
 			cr->move_to(canvas_x, canvas_y + 8);
 			cr->show_text(text);
 			cr->restore();
@@ -42,37 +137,8 @@ namespace Game3 {
 
 	void DrawingArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int, int) {
 		// renderTile(cr, x_, y_, x_, y_, 16, 16);
-
-		constexpr static int marching[256] {
-			0, 1, 2, 2, 3, 4, 2, 2, 5, 5, 6, 6, 7, 7, 6, 6, 8, 9, 10, 10, 8, 9, 10, 10, 11, 11, 12, 12, 11, 11, 12, 12,
-			13, 14, 15, 15, 16, 17, 15, 15, 5, 5, 6, 6, 7, 7, 6, 6, 18, 19, 20, 20, 18, 19, 20, 20, 11, 11, 12, 12, 11,
-			11, 12, 12, 21, 22, 23, 23, 24, 25, 23, 23, 26, 26, 27, 27, 28, 28, 27, 27, 29, 30, 31, 31, 29, 30, 31, 31,
-			32, 32, 33, 33, 32, 32, 33, 33, 21, 22, 23, 23, 24, 25, 23, 23, 26, 26, 27, 27, 28, 28, 27, 27, 29, 30, 31,
-			31, 29, 30, 31, 31, 32, 32, 33, 33, 32, 32, 33, 33, 34, 35, 36, 36, 37, 38, 36, 36, 39, 39, 40, 40, 41, 41,
-			40, 40, 8, 9, 10, 10, 8, 9, 10, 10, 11, 11, 12, 12, 11, 11, 12, 12, 42, 43, 44, 44, 45, 46, 44, 44, 39, 39,
-			40, 40, 41, 41, 40, 40, 18, 19, 20, 20, 18, 19, 20, 20, 11, 11, 12, 12, 11, 11, 12, 12, 21, 22, 23, 23, 24,
-			25, 23, 23, 26, 26, 27, 27, 28, 28, 27, 27, 29, 30, 31, 31, 29, 30, 31, 31, 32, 32, 33, 33, 32, 32, 33, 33,
-			21, 22, 23, 23, 24, 25, 23, 23, 26, 26, 27, 27, 28, 28, 27, 27, 29, 30, 31, 31, 29, 30, 31, 31, 32, 32, 33,
-			33, 32, 32, 33, 33
-		};
-
-		// constexpr static int map[][5] = {
-		// 	{1, 0, 0, 0, 1},
-		// 	{0, 1, 0, 1, 0},
-		// 	{0, 0, 1, 0, 1},
-		// 	{1, 0, 0, 0, 1},
-		// };
-
-		constexpr static int map[][5] = {
-			{1, 1, 1, 1, 1},
-			{1, 0, 0, 0, 1},
-			{1, 0, 0, 0, 1},
-			{1, 0, 0, 0, 1},
-			{1, 1, 1, 1, 1},
-		};
-
-		constexpr static int w = sizeof(map[0]) / sizeof(map[0][0]);
-		constexpr static int h = sizeof(map) / sizeof(map[0]);
+		constexpr static int w = sizeof(ints[0]) / sizeof(ints[0][0]);
+		constexpr static int h = sizeof(ints) / sizeof(ints[0]);
 
 		static int frame = 0;
 
@@ -84,13 +150,27 @@ namespace Game3 {
 			y += r;
 			if (x < 0 || w <= x || y < 0 || h <= y)
 				return 0;
-			return map[y][x];
+			return ints[y][x];
 		};
+
+		static bool first = true;
+		if (first) {
+			first = false;
+		}
 
 		for (r = 0; r < h; ++r) {
 			for (c = 0; c < w; ++c) {
-				const int sum = get(-1, -1) + (get(0, -1) << 1) + (get(1, -1) << 2) + (get(-1, 0) << 3) +
-					(get(1, 0) << 4) + (get(-1, 1) << 5) + (get(0, 1) << 6) + (get(1, 1) << 7);
+				int topleft = get(-1, -1), top = get(0, -1), topright = get(1, -1), left = get(-1, 0),
+					right = get(1, 0), bottomleft = get(-1, 1), bottom = get(0, 1), bottomright = get(1, 1);
+				if (!top || !left) topleft = 0;
+				if (!top || !right) topright = 0;
+				if (!bottom || !left) bottomleft = 0;
+				if (!bottom || !right) bottomright = 0;
+				// const int sum = get(-1, -1) + (get(0, -1) << 1) + (get(1, -1) << 2) + (get(-1, 0) << 3) +
+				// 	(get(1, 0) << 4) + (get(-1, 1) << 5) + (get(0, 1) << 6) + (get(1, 1) << 7);
+				const int sum = topleft + (top << 1) + (topright << 2) + (left << 3) + (right << 4) + (bottomleft << 5)
+					+ (bottom << 6) + (bottomright << 7);
+
 				if (r == 0 && c == 0) {
 					for (int i = -1; i <= 1; ++i) {
 						for (int j = -1; j <= 1; ++j)
@@ -99,14 +179,15 @@ namespace Game3 {
 					}
 				}
 				// const int sum = get(-1,-1) + 2*get(0,-1) + 4*get(1,-1) + 8*get(-1,0) + 16*get(1,0) + 32*get(-1,1) + 64*get(0,1) + 128*get(1,1);
-				const int index = marching[sum];
-				int y = 1 + index / 13;
-				int x = 1 + index % 13;
-				// int y = index / 8;
-				// int x = index % 8;
+				// const int index = marching[sum];
+				const int index = marching_map.at(sum);
+				// int y = 1 + index / 13;
+				// int x = 1 + index % 13;
+				int y = index / 8;
+				int x = index % 8;
 				std::cerr << '(' << r << ", " << c << ") -> " << sum << " -> " << index << " -> (" << x << ", " << y << ")\n";
-				int scale = 16;
-				renderTile(cr, scale * c, scale * r, x, y, scale, scale, std::to_string(sum));
+				int scale = 32;
+				renderTile(cr, scale * c, scale * r, x, y, scale, scale, std::to_string(sum) + "," + std::to_string(index));
 			}
 		}
 
