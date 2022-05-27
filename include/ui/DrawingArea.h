@@ -19,9 +19,10 @@ namespace Game3 {
 
 		private:
 			MainWindow &mainWindow;
-			Cairo::RefPtr<Cairo::ImageSurface> tiles;
-			Cairo::RefPtr<Cairo::ImageSurface> surface;
-			void renderTile(const Cairo::RefPtr<Cairo::Context> &, double canvas_x, double canvas_y, int tile_x_index,
-			                int tile_y_index, double tile_width, double tile_height = 0, const std::string &text = "");
+			Cairo::RefPtr<Cairo::ImageSurface> grass;
+			Cairo::RefPtr<Cairo::ImageSurface> water;
+			void renderTile(const Cairo::RefPtr<Cairo::Context> &, Cairo::RefPtr<Cairo::ImageSurface> &,
+			                double canvas_x, double canvas_y, int tile_x_index, int tile_y_index, double tile_width,
+			                double tile_height = 0, const std::string &text = "");
 	};
 }
