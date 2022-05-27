@@ -4,7 +4,7 @@ else
 BUILDFLAGS := -g -O0
 endif
 
-DEPS       := gtk4 gtkmm-4.0
+DEPS       := gtk4 gtkmm-4.0 sfml-graphics
 OUTPUT     := game3
 COMPILER   ?= g++
 CPPFLAGS   := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude

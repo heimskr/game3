@@ -7,6 +7,7 @@
 #include <mutex>
 
 #include "ui/DrawingArea.h"
+#include "ui/SFMLArea.h"
 
 namespace Game3 {
 	class MainWindow: public Gtk::ApplicationWindow {
@@ -44,5 +45,6 @@ namespace Game3 {
 
 			Gtk::Button mmx {"--x"}, ppx {"++x"}, mmy {"--y"}, ppy {"++y"}, draw {"Draw"};
 			DrawingArea drawingArea {*this};
+			SFMLArea sfmlArea {*this};
 	};
 }

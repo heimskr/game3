@@ -13,20 +13,20 @@ namespace Game3 {
 
 		set_child(vbox);
 		vbox.append(hbox);
-		vbox.append(drawingArea);
+		vbox.append(sfmlArea);
 		hbox.append(mmx);
 		hbox.append(ppx);
 		hbox.append(mmy);
 		hbox.append(ppy);
 		hbox.append(draw);
-		drawingArea.set_hexpand(true);
-		drawingArea.set_vexpand(true);
+		sfmlArea.set_hexpand(true);
+		sfmlArea.set_vexpand(true);
 
 		mmx.signal_clicked().connect([this] { --drawingArea.x_; drawingArea.queue_draw(); });
 		ppx.signal_clicked().connect([this] { ++drawingArea.x_; drawingArea.queue_draw(); });
 		mmy.signal_clicked().connect([this] { --drawingArea.y_; drawingArea.queue_draw(); });
 		ppy.signal_clicked().connect([this] { ++drawingArea.y_; drawingArea.queue_draw(); });
-		draw.signal_clicked().connect([this] { drawingArea.queue_draw(); });
+		draw.signal_clicked().connect([this] { sfmlArea.queue_draw(); });
 
 		functionQueueDispatcher.connect([this] {
 			auto lock = std::unique_lock(functionQueueMutex);
@@ -38,6 +38,8 @@ namespace Game3 {
 		add_action("example", Gio::ActionMap::ActivateSlot([this] {
 			
 		}));
+
+		signal_realize().connect([this] { delay([this] { sfmlArea.init(); }, 2); });
 	}
 
 	MainWindow * MainWindow::create() {
