@@ -4,7 +4,7 @@ else
 BUILDFLAGS := -g -O0
 endif
 
-DEPS       := gtk4 gtkmm-4.0 sfml-graphics gl opengl x11
+DEPS       := gtk4 gtkmm-4.0 sdl2 SDL2_gfx SDL2_image SDL2_ttf x11
 OUTPUT     := game3
 COMPILER   ?= g++
 CPPFLAGS   := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude
@@ -19,7 +19,6 @@ GLIB_COMPILE_RESOURCES = $(shell pkg-config --variable=glib_compile_resources gi
 .PHONY: all clean test
 
 all: $(OUTPUT)
-	./$(OUTPUT)
 
 src/resources.cpp: $(RESXML) $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=resources --generate-dependencies $(RESXML))
 	$(GLIB_COMPILE_RESOURCES) --target=$@ --sourcedir=resources --generate-source $<

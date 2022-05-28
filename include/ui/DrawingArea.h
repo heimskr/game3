@@ -13,16 +13,12 @@ namespace Game3 {
 		public:
 			DrawingArea(MainWindow &);
 
-			void on_draw(const Cairo::RefPtr<Cairo::Context> &, int width, int height);
+			~DrawingArea();
 
-			double x_ = 1, y_ = 1;
+			void on_draw(const Cairo::RefPtr<Cairo::Context> &, int width, int height);
 
 		private:
 			MainWindow &mainWindow;
-			Cairo::RefPtr<Cairo::ImageSurface> grass;
-			Cairo::RefPtr<Cairo::ImageSurface> water;
-			void renderTile(const Cairo::RefPtr<Cairo::Context> &, Cairo::RefPtr<Cairo::ImageSurface> &,
-			                double canvas_x, double canvas_y, int tile_x_index, int tile_y_index, double tile_width,
-			                double tile_height = 0, const std::string &text = "");
+			sigc::connection renderConnection;
 	};
 }

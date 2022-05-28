@@ -7,8 +7,6 @@
 #include <mutex>
 
 #include "ui/DrawingArea.h"
-#include "ui/SFMLArea.h"
-
 namespace Game3 {
 	class MainWindow: public Gtk::ApplicationWindow {
 		public:
@@ -16,6 +14,7 @@ namespace Game3 {
 			Gtk::HeaderBar *header = nullptr;
 
 			MainWindow(BaseObjectType *, const Glib::RefPtr<Gtk::Builder> &);
+			~MainWindow();
 
 			static MainWindow * create();
 
@@ -43,8 +42,7 @@ namespace Game3 {
 			Gtk::Box vbox {Gtk::Orientation::VERTICAL};
 			Gtk::Box hbox {Gtk::Orientation::HORIZONTAL};
 
-			Gtk::Button mmx {"--x"}, ppx {"++x"}, mmy {"--y"}, ppy {"++y"}, draw {"Draw"};
+			Gtk::Button draw {"Draw"};
 			DrawingArea drawingArea {*this};
-			SFMLArea sfmlArea {*this};
 	};
 }
