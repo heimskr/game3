@@ -35,9 +35,9 @@ namespace Game3 {
 			functionQueue.clear();
 		});
 
-		add_action("example", Gio::ActionMap::ActivateSlot([this] {
+		// add_action("example", Gio::ActionMap::ActivateSlot([this] {
 			
-		}));
+		// }));
 
 		signal_realize().connect([this] { delay([this] { sfmlArea.init(); }, 2); });
 	}

@@ -20,5 +20,6 @@ namespace Game3 {
 		private:
 			MainWindow &mainWindow;
 			std::unique_ptr<sf::RenderWindow> renderWindow;
+			GdkGLContext *glContext;
 	};
 }
