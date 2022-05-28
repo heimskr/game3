@@ -4,24 +4,19 @@ else
 BUILDFLAGS := -g -O0
 endif
 
-DEPS       := gtk4 gtkmm-4.0 sdl2 SDL2_gfx SDL2_image SDL2_ttf x11 gl opengl
+DEPS       := gl opengl stb
 OUTPUT     := game3
 COMPILER   ?= g++
 CPPFLAGS   := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude
 INCLUDES   := $(shell pkg-config --cflags $(DEPS))
 LIBS       := $(shell pkg-config --libs   $(DEPS))
-LDFLAGS    := -L/lib $(LIBS) -pthread
-SOURCES    := $(shell find src -name \*.cpp) src/resources.cpp
+LDFLAGS    := -L/lib $(LIBS) -lnanogui -pthread
+SOURCES    := $(shell find src -name \*.cpp)
 OBJECTS    := $(SOURCES:.cpp=.o)
-RESXML     := $(OUTPUT).gresource.xml
-GLIB_COMPILE_RESOURCES = $(shell pkg-config --variable=glib_compile_resources gio-2.0)
 
 .PHONY: all clean test
 
 all: $(OUTPUT)
-
-src/resources.cpp: $(RESXML) $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=resources --generate-dependencies $(RESXML))
-	$(GLIB_COMPILE_RESOURCES) --target=$@ --sourcedir=resources --generate-source $<
 
 %.o: %.cpp
 	@ printf "\e[2m[\e[22;32mcc\e[39;2m]\e[22m $< \e[2m$(BUILDFLAGS)\e[22m\n"
@@ -38,8 +33,7 @@ test: $(OUTPUT)
 	./$(OUTPUT)
 
 clean:
-	@ echo rm -f $$\(OBJECTS\) $(OUTPUT) src/resources.cpp
-	@ rm -f $(OBJECTS) $(OUTPUT) src/resources.cpp
+	@ rm -f $(shell find src -name \*.o) $(OUTPUT)
 
 count:
 	cloc . --exclude-dir=.vscode
