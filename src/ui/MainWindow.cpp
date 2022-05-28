@@ -14,13 +14,14 @@ namespace Game3 {
 		Gtk::StyleContext::add_provider_for_display(Gdk::Display::get_default(), cssProvider,
 			GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-		set_child(drawingArea);
-		// vbox.append(hbox);
-		// vbox.append(drawingArea);
-		// hbox.append(draw);
+		// set_child(drawingArea);
+		set_child(vbox);
+		vbox.append(hbox);
+		vbox.append(drawingArea);
+		hbox.append(draw);
 		drawingArea.set_hexpand(true);
 		drawingArea.set_vexpand(true);
-		// draw.signal_clicked().connect([this] { drawingArea.queue_draw(); });
+		draw.signal_clicked().connect([this] { drawingArea.queue_render(); });
 
 		functionQueueDispatcher.connect([this] {
 			auto lock = std::unique_lock(functionQueueMutex);
