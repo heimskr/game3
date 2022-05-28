@@ -4,13 +4,13 @@ else
 BUILDFLAGS := -g -O0
 endif
 
-DEPS       := gtk4 gtkmm-4.0 sfml-graphics
+DEPS       := gtk4 gtkmm-4.0 sfml-graphics gl opengl x11
 OUTPUT     := game3
 COMPILER   ?= g++
 CPPFLAGS   := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude
 INCLUDES   := $(shell pkg-config --cflags $(DEPS))
 LIBS       := $(shell pkg-config --libs   $(DEPS))
-LDFLAGS    := $(LIBS) -pthread
+LDFLAGS    := -L/lib $(LIBS) -pthread
 SOURCES    := $(shell find src -name \*.cpp) src/resources.cpp
 OBJECTS    := $(SOURCES:.cpp=.o)
 RESXML     := $(OUTPUT).gresource.xml
