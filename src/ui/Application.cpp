@@ -1,14 +1,16 @@
 #include <iostream>
+
 #include "ui/Application.h"
+#include "ui/Canvas.h"
 
 namespace Game3 {
 	Application::Application(): nanogui::Screen(Eigen::Vector2i(1024, 768), "Game3") {
 		setLayout(new nanogui::BoxLayout(nanogui::Orientation::Vertical, nanogui::Alignment::Fill));
 
-		auto *button_box = new nanogui::Widget(this);
-		button_box->setLayout(new nanogui::BoxLayout(nanogui::Orientation::Horizontal, nanogui::Alignment::Minimum, -1, -1));
+		buttonBox = new nanogui::Widget(this);
+		buttonBox->setLayout(new nanogui::BoxLayout(nanogui::Orientation::Horizontal, nanogui::Alignment::Minimum, -1, -1));
 
-		auto *b = new nanogui::Button(button_box, "", ENTYPO_ICON_SAVE);
+		auto *b = new nanogui::Button(buttonBox, "", ENTYPO_ICON_SAVE);
 		auto *theme = new nanogui::Theme(*b->theme());
 		theme->mButtonCornerRadius = 0;
 		b->setTheme(theme);
@@ -16,21 +18,30 @@ namespace Game3 {
 		b->setTooltip("Save");
 		b->setEnabled(false);
 
-		auto *b2 = new nanogui::Button(button_box, "", ENTYPO_ICON_FOLDER);
+		auto *b2 = new nanogui::Button(buttonBox, "", ENTYPO_ICON_FOLDER);
 		b2->setTheme(theme);
 		b2->setTooltip("Open");
+
+		canvas = new Canvas(this);
 
 		performLayout();
 	}
 
 	bool Application::keyboardEvent(int key, int scancode, int action, int modifiers) {
 		if (Screen::keyboardEvent(key, scancode, action, modifiers))
-            return true;
-        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-            setVisible(false);
-            return true;
-        }
-        return false;
+			return true;
+		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+			setVisible(false);
+			return true;
+		}
+		return false;
+	}
+
+	bool Application::resizeEvent(const nanogui::Vector2i &new_size) {
+		Screen::resizeEvent(new_size);
+		canvas->setHeight(new_size.y() - buttonBox->height());
+		canvas->setWidth(new_size.x());
+		return true;
 	}
 
 	void Application::draw(NVGcontext *ctx) {

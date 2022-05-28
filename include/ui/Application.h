@@ -26,6 +26,7 @@
 #include <stb_image.h>
 
 #include "lib/GLTexture.h"
+#include "ui/Canvas.h"
 
 namespace Game3 {
 	class Application: public nanogui::Screen {
@@ -33,6 +34,11 @@ namespace Game3 {
 			Application();
 
 			bool keyboardEvent(int key, int scancode, int action, int modifiers) override;
+			bool resizeEvent(const nanogui::Vector2i &) override;
 			void draw(NVGcontext *) override;
+
+		private:
+			nanogui::Widget *buttonBox = nullptr;
+			Canvas *canvas = nullptr;
 	};
 }
