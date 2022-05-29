@@ -1,3 +1,4 @@
+#include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -16,7 +17,7 @@ namespace Game3 {
 
 	void TilemapRenderer::initialize(const std::shared_ptr<Tilemap> &tilemap_) {
 		tilemap = tilemap_;
-		glClipControl(GL_UPPER_LEFT, GL_NEGATIVE_ONE_TO_ONE);
+		// glClipControl(GL_UPPER_LEFT, GL_NEGATIVE_ONE_TO_ONE);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		createShader();
 		generateVertexBufferObject();
@@ -24,6 +25,7 @@ namespace Game3 {
 	}
 
 	void TilemapRenderer::render() {
+		glClearColor(0.5f, 0.f, 0.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glBindTexture(GL_TEXTURE_2D, tilemap->handle);
 		glBindVertexArray(vaoHandle);
@@ -38,6 +40,8 @@ namespace Game3 {
 	}
 
 	void TilemapRenderer::onBackBufferResized(int width, int height) {
+		if (width == backBufferWidth && height == backBufferHeight)
+			return;
 		backBufferWidth = width;
 		backBufferHeight = height;
 		// TODO: is this correct? Is this already handled by nanogui?
@@ -46,18 +50,19 @@ namespace Game3 {
 
 	void TilemapRenderer::createShader() {
 		int vert_handle = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vert_handle, 1, reinterpret_cast<const GLchar * const *>(&tilemap_vert),
-			reinterpret_cast<const GLint *>(&tilemap_vert_len));
+
+		const GLchar *vert_ptr = reinterpret_cast<const GLchar *>(tilemap_vert);
+		glShaderSource(vert_handle, 1, &vert_ptr, reinterpret_cast<const GLint *>(&tilemap_vert_len));
 		glCompileShader(vert_handle);
 
+		const GLchar *geom_ptr = reinterpret_cast<const GLchar *>(tilemap_geom);
 		int geom_handle = glCreateShader(GL_GEOMETRY_SHADER);
-		glShaderSource(geom_handle, 1, reinterpret_cast<const GLchar * const *>(&tilemap_geom),
-			reinterpret_cast<const GLint *>(&tilemap_geom_len));
+		glShaderSource(geom_handle, 1, &geom_ptr, reinterpret_cast<const GLint *>(&tilemap_geom_len));
 		glCompileShader(geom_handle);
 
+		const GLchar *frag_ptr = reinterpret_cast<const GLchar *>(tilemap_frag);
 		int frag_handle = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(frag_handle, 1, reinterpret_cast<const GLchar * const *>(&tilemap_frag),
-			reinterpret_cast<const GLint *>(&tilemap_frag_len));
+		glShaderSource(frag_handle, 1, &frag_ptr, reinterpret_cast<const GLint *>(&tilemap_frag_len));
 		glCompileShader(frag_handle);
 
 		shaderHandle = glCreateProgram();

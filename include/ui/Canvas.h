@@ -6,6 +6,7 @@
 #include <nanogui/glcanvas.h>
 
 #include "Texture.h"
+#include "ui/TilemapRenderer.h"
 
 namespace Game3 {
 	class Canvas: public nanogui::GLCanvas {
@@ -22,6 +23,8 @@ namespace Game3 {
 
 		private:
 			Texture grass;
-			nanogui::GLShader shader;
+			// nanogui::GLShader shader;
+			std::shared_ptr<Tilemap> tilemap;
+			TilemapRenderer tilemapRenderer;
 	};
 }
