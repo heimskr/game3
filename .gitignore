@@ -3,4 +3,4 @@
 .dep
 src/resources.cpp
 .dep.bak
-
+/include/resources.h

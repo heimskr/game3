@@ -26,9 +26,9 @@ namespace Game3 {
 			void onBackBufferResized(int width, int height);
 
 		private:
-			int shaderHandle = -1;
-			int vboHandle = -1;
-			int vaoHandle = -1;
+			GLuint shaderHandle = -1;
+			GLuint vboHandle = -1;
+			GLuint vaoHandle = -1;
 			int backBufferWidth = -1;
 			int backBufferHeight = -1;
 
