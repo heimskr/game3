@@ -14,12 +14,16 @@ layout (points) in;
 layout (triangle_strip, max_vertices = 4) out;
 
 void main() {
+
+	const uint T = 32u;
+	const float F = float(T);
+
 	uint tileId = gs_in[0].tileId & 255u;
-	float tileX = float(tileId & 15u) / 16.0;
-	float tileY = float((tileId >> 4u) & 15u) / 16.0;
+	float tileX = float(tileId & (T - 1)) / F;
+	float tileY = float((tileId >> log2(T)) & (T - 1)) / F;
 
 	const float B = 1 / 256.0;
-	const float S = 1 / 16.0;
+	const float S = 1 / F;
 
 	gl_Position = projection * gl_in[0].gl_Position;
 	texCoord = vec2(tileX + B, tileY + B);
