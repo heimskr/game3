@@ -28,15 +28,14 @@ namespace Game3 {
 
 		grass = Texture("resources/grass.png");
 		grass.bind();
-		int dimension = 640 / 32;
+		int dimension = 320 / 32;
 		int scale = 32;
 		tilemap = std::make_shared<Tilemap>(dimension, dimension, scale, grass.id);
 
 		int i = 0;
 		for (int x = 0; x < dimension; ++x)
 			for (int y = 0; y < dimension; ++y)
-				// (*tilemap)(x, y) = ++i % 50;
-				(*tilemap)(x, y) = rand() % 50;
+				(*tilemap)(x, y) = i++ % 50;
 
 		tilemapRenderer.initialize(tilemap);
 

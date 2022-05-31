@@ -35,7 +35,7 @@ namespace Game3 {
 		center.y() = 0.5f - 320.f / backBufferHeight;
 		projection = glm::translate(projection, {-center.x(), -center.y(), 0}) *
 					 glm::scale(projection, {tilemap->tileSize, tilemap->tileSize, 1}) *
-					 glm::scale(projection, {1.f / backBufferWidth, 1.f / backBufferHeight, 1});
+					 glm::scale(projection, {4.f / backBufferWidth, 4.f / backBufferHeight, 1});
 		if (0) for (int y = 0; y < 4; ++y) {
 			for (int x = 0; x < 4; ++x)
 				std::cerr << projection[x][y] << ' ';
