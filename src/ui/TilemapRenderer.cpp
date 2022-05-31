@@ -26,8 +26,9 @@ namespace Game3 {
 	}
 
 	void TilemapRenderer::render() {
-		glClearColor(0.5f, 0.f, 0.f, 1.f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		// glClearColor(0.5f, 0.f, 0.f, 1.f);
+		// glClear(GL_COLOR_BUFFER_BIT);
+		glUseProgram(shaderHandle);
 		std::cerr << __FILE__ << ':' << __LINE__ << ": !? " << glGetError() << '\n';
 		glBindTexture(GL_TEXTURE_2D, tilemap->handle);
 		std::cerr << __FILE__ << ':' << __LINE__ << ": !? " << glGetError() << '\n';
@@ -37,12 +38,15 @@ namespace Game3 {
 		// glm::mat4 projection;
 		// center.x() = (rand() % 1000) - 500;
 		// center.y() = (rand() % 1000) - 500;
+		// center.x() = (rand() % 1000) / 500.f - 1.0f;
+		// center.y() = (rand() % 1000) / 500.f - 1.0f;
+		center = {1.f, 1.f};
 		// center = nanogui::Vector2f(-0.5f, -0.5f);
 		// tilemap->tileSize = rand() % 100;
 		projection = glm::translate(projection, {-center.x(), -center.y(), 0}) *
 					 glm::scale(projection, {tilemap->tileSize, tilemap->tileSize, 1}) *
 					//  glm::scale(projection, {0.02f, 0.02f, 1.f});
-					 glm::scale(projection, {2.f / backBufferWidth, 2.f / backBufferHeight, 1});
+					 glm::scale(projection, {1.f / backBufferWidth, 1.f / backBufferHeight, 1});
 		auto vptr = glm::value_ptr(projection);
 		// vptr[0] = 1.f;
 		// vptr[1 * 4 + 1] = 1.f;

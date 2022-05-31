@@ -14,16 +14,17 @@ Texture grass;
 TilemapRenderer renderer;
 std::shared_ptr<Tilemap> tilemap;
 
-// #define USE_NANOGUI
+#define USE_NANOGUI
 
 int main(int argc, char *argv[]) {
 	srand(time(nullptr));
 	try {
 #ifndef USE_NANOGUI
+		constexpr int init_x = 640, init_y = 640;
 		glutInit(&argc, argv);
 		glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 		glutInitWindowPosition(2000, 1000);
-		glutInitWindowSize(400, 300);
+		glutInitWindowSize(init_x, init_y);
 		glutCreateWindow("What");
 		glEnable(GL_BLEND);
 		glEnable(GL_TEXTURE_2D);
@@ -37,10 +38,10 @@ int main(int argc, char *argv[]) {
 		int i = 0;
 		for (int x = 0; x < dimension; ++x)
 			for (int y = 0; y < dimension; ++y)
-				(*tilemap)(x, y) = ++i % 50;
-				// (*tilemap)(x, y) = rand() % 50;
+				// (*tilemap)(x, y) = ++i % 50;
+				(*tilemap)(x, y) = rand() % 50;
 		renderer.initialize(tilemap);
-		renderer.onBackBufferResized(100, 100);
+		renderer.onBackBufferResized(init_x, init_y);
 
 		glutDisplayFunc(+[] {
 			glClearColor(0.f, 0.2f, 0.f, 1.f);

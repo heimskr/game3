@@ -24,7 +24,7 @@ void main() {
 	float tileY = float(tileId / 10u) / F;
 
 	const float B = 1 / 256.0;
-	const float S = 1 / F;
+	const float S = 1 / 32.0;
 
 
 	// uint tileId = gs_in[0].tileId & 255u;
