@@ -41,6 +41,11 @@ namespace Game3 {
 		// center.x() = (rand() % 1000) / 500.f - 1.0f;
 		// center.y() = (rand() % 1000) / 500.f - 1.0f;
 		center = {1.f, 1.f};
+		// center.x() = float(backBufferWidth / 2 - 640 / 2) / backBufferWidth;
+		// center.y() = float(backBufferHeight / 2 - 640 / 2) / backBufferHeight;
+		center.x() = 0.5f - 320.f / backBufferWidth;
+		center.y() = 0.5f - 320.f / backBufferHeight;
+		std::cout << backBufferWidth << " ~ " << backBufferHeight << '\n';
 		// center = nanogui::Vector2f(-0.5f, -0.5f);
 		// tilemap->tileSize = rand() % 100;
 		projection = glm::translate(projection, {-center.x(), -center.y(), 0}) *

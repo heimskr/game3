@@ -77,7 +77,7 @@ namespace Game3 {
 		// glEnable(GL_DEPTH_TEST);
 		// grass.bind();
 		tilemapRenderer.render();
-		glFlush();
+		// glFlush();
 		// glDisable(GL_DEPTH_TEST);
 	}
 }
