@@ -31,18 +31,16 @@ int main(int argc, char *argv[]) {
 
 		grass = Texture("resources/grass.png");
 		grass.bind();
-		// renderer
 		int dimension = 640 / 32;
 		int scale = 32;
-		tilemap = std::make_shared<Tilemap>(dimension * scale, dimension * scale, scale, grass.id);
-		tilemap->tiles.resize(dimension * dimension);
+		tilemap = std::make_shared<Tilemap>(dimension, dimension, scale, grass.id);
 		int i = 0;
 		for (int x = 0; x < dimension; ++x)
 			for (int y = 0; y < dimension; ++y)
-				// (*tilemap)(x, y) = ++i % 50;
-				(*tilemap)(x, y) = rand() % 50;
+				(*tilemap)(x, y) = ++i % 50;
+				// (*tilemap)(x, y) = rand() % 50;
 		renderer.initialize(tilemap);
-		renderer.onBackBufferResized(200, 200);
+		renderer.onBackBufferResized(100, 100);
 
 		glutDisplayFunc(+[] {
 			glClearColor(0.f, 0.2f, 0.f, 1.f);
@@ -51,6 +49,11 @@ int main(int argc, char *argv[]) {
 			std::cerr << __FILE__ << ':' << __LINE__ << ": !? " << glGetError() << '\n';
 			renderer.render();
 			glFlush();
+		});
+		glutReshapeFunc(+[](int w, int h) {
+			// renderer.center.x() += 0.01f;
+			renderer.center = {1.f, 1.f};
+			renderer.onBackBufferResized(w, h);
 		});
 		glutMainLoop();
 #else

@@ -18,8 +18,10 @@ void main() {
 	const float F = float(T);
 
 	uint tileId = gs_in[0].tileId & 255u;
-	float tileX = float(tileId & (T - 1u)) / F;
-	float tileY = float((tileId >> uint(log2(F))) & (T - 1u)) / F;
+	// float tileX = float(tileId & (T - 1u)) / F;
+	// float tileY = float((tileId >> uint(log2(F))) & (T - 1u)) / F;
+	float tileX = float(tileId % 10u) / F;
+	float tileY = float(tileId / 10u) / F;
 
 	const float B = 1 / 256.0;
 	const float S = 1 / F;

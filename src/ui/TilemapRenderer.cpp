@@ -68,6 +68,7 @@ namespace Game3 {
 		glUseProgram(shaderHandle);
 		glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		std::cerr << __FILE__ << ':' << __LINE__ << ": !? " << glGetError() << '\n';
+		std::cerr << "tilemap size(" << tilemap->width << ", " << tilemap->height << ")\n";
 		glUniform2i(glGetUniformLocation(shaderHandle, "mapSize"), tilemap->width, tilemap->height);
 		GLenum err;
 		if ((err = glGetError())) {
@@ -85,7 +86,7 @@ namespace Game3 {
 		backBufferWidth = width;
 		backBufferHeight = height;
 		// TODO: is this correct? Is this already handled by nanogui?
-		// glViewport(0, 0, width, height);
+		glViewport(0, 0, width, height);
 	}
 
 	static void check(int handle, bool is_link = false) {
