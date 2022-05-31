@@ -10,7 +10,7 @@ COMPILER   ?= g++
 CPPFLAGS   := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude
 INCLUDES   := $(shell pkg-config --cflags $(DEPS)) -Inanovg/src
 LIBS       := $(shell pkg-config --libs   $(DEPS))
-LDFLAGS    := -L/lib $(LIBS) -lnanogui -pthread
+LDFLAGS    := -L/lib $(LIBS) -lnanogui -pthread -lGLU -lglut
 SOURCES    := $(shell find src -name \*.cpp)
 OBJECTS    := $(SOURCES:.cpp=.o)
 
@@ -18,7 +18,7 @@ OBJECTS    := $(SOURCES:.cpp=.o)
 
 all: $(OUTPUT)
 
-%.o: %.cpp
+%.o: %.cpp include/resources.h
 	@ printf "\e[2m[\e[22;32mcc\e[39;2m]\e[22m $< \e[2m$(BUILDFLAGS)\e[22m\n"
 	@ $(COMPILER) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
 
@@ -39,7 +39,7 @@ test: $(OUTPUT)
 	./$(OUTPUT)
 
 clean:
-	@ rm -f $(shell find src -name \*.o) $(OUTPUT)
+	@ rm -f $(shell find src -name \*.o) $(OUTPUT) include/resources.h
 
 count:
 	cloc . --exclude-dir=.vscode

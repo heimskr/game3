@@ -36,9 +36,9 @@ class GLTexture {
 			other.textureID = 0;
 		}
 
-		GLTexture& operator=(const GLTexture& other) = delete;
+		GLTexture& operator=(const GLTexture &other) = delete;
 
-		GLTexture& operator=(GLTexture&& other) noexcept {
+		GLTexture& operator=(GLTexture &&other) noexcept {
 			textureName_ = std::move(other.textureName_);
 			std::swap(textureID, other.textureID);
 			return *this;

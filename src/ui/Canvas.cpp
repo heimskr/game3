@@ -23,18 +23,25 @@ namespace Game3 {
 // 		})";
 
 	Canvas::Canvas(nanogui::Widget *parent_): GLCanvas(parent_) {
-		setBackgroundColor({255, 255, 255, 255});
+		// setBackgroundColor({255, 255, 255, 255});
+		// setBackgroundColor({0, 0, 0, 255});
 
 		grass = Texture("resources/grass.png");
 		grass.bind();
-		tilemap = std::make_shared<Tilemap>(640, 640, 32, grass.id);
+		int dimension = 640 / 32;
+		int scale = 32;
+		tilemap = std::make_shared<Tilemap>(dimension * scale, dimension * scale, scale, grass.id);
 		tilemapRenderer.initialize(tilemap);
 
-		int dimension = 640 / 32;
 		tilemap->tiles.resize(dimension * dimension);
 
 
-		
+
+
+		int i = 0;
+		for (int x = 0; x < dimension; ++x)
+			for (int y = 0; y < dimension; ++y)
+				(*tilemap)(x, y) = ++i % 50;
 
 		// shader.init("ImageShader", vertexShader, fragmentShader);
 
