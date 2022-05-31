@@ -24,7 +24,7 @@ namespace Game3 {
 
 	Canvas::Canvas(nanogui::Widget *parent_): GLCanvas(parent_) {
 		// setBackgroundColor({255, 255, 255, 255});
-		setBackgroundColor({0, 0, 50, 255});
+		setBackgroundColor({0, 0, 100, 255});
 
 		grass = Texture("resources/grass.png");
 		grass.bind();
@@ -70,14 +70,7 @@ namespace Game3 {
 	}
 
 	void Canvas::drawGL() {
-		// static int x = 0;
-		// std::cout << "drawGL(" << x++ << ")\n";
-
 		tilemapRenderer.onBackBufferResized(width(), height());
-		// glEnable(GL_DEPTH_TEST);
-		// grass.bind();
 		tilemapRenderer.render();
-		// glFlush();
-		// glDisable(GL_DEPTH_TEST);
 	}
 }

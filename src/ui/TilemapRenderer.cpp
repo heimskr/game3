@@ -26,67 +26,26 @@ namespace Game3 {
 	}
 
 	void TilemapRenderer::render() {
-		// glClearColor(0.5f, 0.f, 0.f, 1.f);
-		// glClear(GL_COLOR_BUFFER_BIT);
 		glUseProgram(shaderHandle);
-		std::cerr << __FILE__ << ':' << __LINE__ << ": !? " << glGetError() << '\n';
 		glBindTexture(GL_TEXTURE_2D, tilemap->handle);
-		std::cerr << __FILE__ << ':' << __LINE__ << ": !? " << glGetError() << '\n';
 		glBindVertexArray(vaoHandle);
-		std::cerr << __FILE__ << ':' << __LINE__ << ": !? " << glGetError() << '\n';
 		glm::mat4 projection(1.f);
-		// glm::mat4 projection;
-		// center.x() = (rand() % 1000) - 500;
-		// center.y() = (rand() % 1000) - 500;
-		// center.x() = (rand() % 1000) / 500.f - 1.0f;
-		// center.y() = (rand() % 1000) / 500.f - 1.0f;
 		center = {1.f, 1.f};
-		// center.x() = float(backBufferWidth / 2 - 640 / 2) / backBufferWidth;
-		// center.y() = float(backBufferHeight / 2 - 640 / 2) / backBufferHeight;
 		center.x() = 0.5f - 320.f / backBufferWidth;
 		center.y() = 0.5f - 320.f / backBufferHeight;
-		std::cout << backBufferWidth << " ~ " << backBufferHeight << '\n';
-		// center = nanogui::Vector2f(-0.5f, -0.5f);
-		// tilemap->tileSize = rand() % 100;
 		projection = glm::translate(projection, {-center.x(), -center.y(), 0}) *
 					 glm::scale(projection, {tilemap->tileSize, tilemap->tileSize, 1}) *
-					//  glm::scale(projection, {0.02f, 0.02f, 1.f});
 					 glm::scale(projection, {1.f / backBufferWidth, 1.f / backBufferHeight, 1});
-		auto vptr = glm::value_ptr(projection);
-		// vptr[0] = 1.f;
-		// vptr[1 * 4 + 1] = 1.f;
-		// vptr[3 * 4 + 0] = 1.f;
-		// vptr[3 * 4 + 1] = 1.f;
-		for (int y = 0; y < 4; ++y) {
-			for (int x = 0; x < 4; ++x) {
-				// projection[x][y] *= 200.f;
-				// if (projection[x][y] < 0)
-				// 	projection[x][y] = -projection[x][y];
+		if (0) for (int y = 0; y < 4; ++y) {
+			for (int x = 0; x < 4; ++x)
 				std::cerr << projection[x][y] << ' ';
-			}
 			std::cerr << '\n';
 		}
 
-
-		std::cerr << __FILE__ << ':' << __LINE__ << ": !? " << glGetError() << '\n';
-		std::cerr << "shaderHandle[" << shaderHandle << "]\n";
-		std::cerr << "projection[" << glGetUniformLocation(shaderHandle, "projection") << "]\n";
-		std::cerr << "mapSize[" << glGetUniformLocation(shaderHandle, "mapSize") << "]\n";
-		std::cerr << "texture0[" << glGetUniformLocation(shaderHandle, "texture0") << "]\n";
-		std::cerr << __FILE__ << ':' << __LINE__ << ": !? " << glGetError() << '\n';
 		glUseProgram(shaderHandle);
 		glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		std::cerr << __FILE__ << ':' << __LINE__ << ": !? " << glGetError() << '\n';
-		std::cerr << "tilemap size(" << tilemap->width << ", " << tilemap->height << ")\n";
 		glUniform2i(glGetUniformLocation(shaderHandle, "mapSize"), tilemap->width, tilemap->height);
-		GLenum err;
-		if ((err = glGetError())) {
-			std::cerr << "Error " << err << '\n' << gluErrorString(err) << '\n';
-			std::cerr << "mapSize location: " << glGetUniformLocation(shaderHandle, "mapSize") << '\n';
-		}
-		std::cerr << __FILE__ << ':' << __LINE__ << ": !? " << glGetError() << '\n';
 		glDrawArrays(GL_POINTS, 0, tilemap->tiles.size());
-		std::cerr << __FILE__ << ':' << __LINE__ << ": !? " << glGetError() << '\n';
 	}
 
 	void TilemapRenderer::onBackBufferResized(int width, int height) {
@@ -94,8 +53,7 @@ namespace Game3 {
 			return;
 		backBufferWidth = width;
 		backBufferHeight = height;
-		// TODO: is this correct? Is this already handled by nanogui?
-		glViewport(0, 0, width, height);
+		// glViewport(0, 0, width, height);
 	}
 
 	static void check(int handle, bool is_link = false) {
@@ -135,10 +93,6 @@ namespace Game3 {
 		check(frag_handle);
 
 		shaderHandle = glCreateProgram();
-		std::cerr << ":: shaderHandle[" << shaderHandle << "]\n";
-		std::cerr << ":: vert_handle[" << vert_handle << "]\n";
-		std::cerr << ":: geom_handle[" << geom_handle << "]\n";
-		std::cerr << ":: frag_handle[" << frag_handle << "]\n";
 		glAttachShader(shaderHandle, vert_handle);
 		glAttachShader(shaderHandle, geom_handle);
 		glAttachShader(shaderHandle, frag_handle);

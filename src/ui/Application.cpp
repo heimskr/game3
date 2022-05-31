@@ -15,12 +15,10 @@ namespace Game3 {
 		theme->mButtonCornerRadius = 0;
 		b->setTheme(theme);
 		b->setCallback([] { std::cout << ":)\n"; });
-		b->setTooltip("Save");
 		b->setEnabled(false);
 
 		auto *b2 = new nanogui::Button(buttonBox, "", ENTYPO_ICON_FOLDER);
 		b2->setTheme(theme);
-		b2->setTooltip("Open");
 
 		canvas = new Canvas(this);
 
