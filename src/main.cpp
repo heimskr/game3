@@ -14,9 +14,12 @@ Texture grass;
 TilemapRenderer renderer;
 std::shared_ptr<Tilemap> tilemap;
 
+// #define USE_NANOGUI
+
 int main(int argc, char *argv[]) {
 	srand(time(nullptr));
 	try {
+#ifndef USE_NANOGUI
 		glutInit(&argc, argv);
 		glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 		glutInitWindowPosition(2000, 1000);
@@ -36,9 +39,10 @@ int main(int argc, char *argv[]) {
 		int i = 0;
 		for (int x = 0; x < dimension; ++x)
 			for (int y = 0; y < dimension; ++y)
-				(*tilemap)(x, y) = ++i % 4;
+				// (*tilemap)(x, y) = ++i % 50;
+				(*tilemap)(x, y) = rand() % 50;
 		renderer.initialize(tilemap);
-		renderer.onBackBufferResized(800, 800);
+		renderer.onBackBufferResized(200, 200);
 
 		glutDisplayFunc(+[] {
 			glClearColor(0.f, 0.2f, 0.f, 1.f);
@@ -49,15 +53,16 @@ int main(int argc, char *argv[]) {
 			glFlush();
 		});
 		glutMainLoop();
-
-		// nanogui::init();
-		// {
-		// 	nanogui::ref<Game3::Application> app = new Game3::Application;
-		// 	app->drawAll();
-		// 	app->setVisible(true);
-		// 	nanogui::mainloop();
-		// }
-		// nanogui::shutdown();
+#else
+		nanogui::init();
+		{
+			nanogui::ref<Game3::Application> app = new Game3::Application;
+			app->drawAll();
+			app->setVisible(true);
+			nanogui::mainloop();
+		}
+		nanogui::shutdown();
+#endif
 		return 0;
 	} catch (const std::exception &err) {
 		std::cerr << err.what() << '\n';

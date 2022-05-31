@@ -5,6 +5,7 @@
 
 #include "resources.h"
 #include "ui/TilemapRenderer.h"
+#include <GL/glu.h>
 
 // Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Renderers/GeometryRenderer.cs
 
@@ -36,12 +37,12 @@ namespace Game3 {
 		// glm::mat4 projection;
 		// center.x() = (rand() % 1000) - 500;
 		// center.y() = (rand() % 1000) - 500;
-		center = nanogui::Vector2f(-0.5f, -0.5f);
+		// center = nanogui::Vector2f(-0.5f, -0.5f);
 		// tilemap->tileSize = rand() % 100;
 		projection = glm::translate(projection, {-center.x(), -center.y(), 0}) *
 					 glm::scale(projection, {tilemap->tileSize, tilemap->tileSize, 1}) *
-					 glm::scale(projection, {0.02f, 0.02f, 1.f});
-					//  glm::scale(projection, {2.f / backBufferWidth, 2.f / backBufferHeight, 1});
+					//  glm::scale(projection, {0.02f, 0.02f, 1.f});
+					 glm::scale(projection, {2.f / backBufferWidth, 2.f / backBufferHeight, 1});
 		auto vptr = glm::value_ptr(projection);
 		// vptr[0] = 1.f;
 		// vptr[1 * 4 + 1] = 1.f;
@@ -67,7 +68,12 @@ namespace Game3 {
 		glUseProgram(shaderHandle);
 		glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		std::cerr << __FILE__ << ':' << __LINE__ << ": !? " << glGetError() << '\n';
-		glUniform2f(glGetUniformLocation(shaderHandle, "mapSize"), float(tilemap->width), float(tilemap->height));
+		glUniform2i(glGetUniformLocation(shaderHandle, "mapSize"), tilemap->width, tilemap->height);
+		GLenum err;
+		if ((err = glGetError())) {
+			std::cerr << "Error " << err << '\n' << gluErrorString(err) << '\n';
+			std::cerr << "mapSize location: " << glGetUniformLocation(shaderHandle, "mapSize") << '\n';
+		}
 		std::cerr << __FILE__ << ':' << __LINE__ << ": !? " << glGetError() << '\n';
 		glDrawArrays(GL_POINTS, 0, tilemap->tiles.size());
 		std::cerr << __FILE__ << ':' << __LINE__ << ": !? " << glGetError() << '\n';
@@ -79,19 +85,23 @@ namespace Game3 {
 		backBufferWidth = width;
 		backBufferHeight = height;
 		// TODO: is this correct? Is this already handled by nanogui?
-		glViewport(0, 0, width, height);
+		// glViewport(0, 0, width, height);
 	}
 
 	static void check(int handle, bool is_link = false) {
 		int success;
 		char info[1024];
-		glGetShaderiv(handle, is_link? GL_LINK_STATUS : GL_COMPILE_STATUS, &success);
+		if (is_link)
+			glGetProgramiv(handle, GL_LINK_STATUS, &success);
+		else
+			glGetShaderiv(handle, GL_COMPILE_STATUS, &success);
 		if (!success) {
+			GLsizei len = 666;
 			if (is_link)
-				glGetProgramInfoLog(handle, 1024, nullptr, info);
+				glGetProgramInfoLog(handle, GL_INFO_LOG_LENGTH, &len, info);
 			else
-				glGetShaderInfoLog(handle, 1024, nullptr, info);
-			std::cerr << "Error with " << handle << ": " << info << '\n';
+				glGetShaderInfoLog(handle, 1024, &len, info);
+			std::cerr << "Error with " << handle << " (l=" << len << "): " << info << '\n';
 		}
 	}
 

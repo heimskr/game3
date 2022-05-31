@@ -24,12 +24,21 @@ void main() {
 	const float B = 1 / 256.0;
 	const float S = 1 / F;
 
+
 	// uint tileId = gs_in[0].tileId & 255u;
 	// float tileX = float(tileId & 15u) / 16.0;
 	// float tileY = float((tileId >> 4u) & 15u) / 16.0;
 
 	// const float B = 1 / 256.0;
 	// const float S = 1 / 16.0;
+
+
+	// uint tileId = gs_in[0].tileId & 255u;
+	// float tileX = float(tileId & 31u) / 32.0;
+	// float tileY = float((tileId >> 5u) & 31u) / 32.0;
+
+	// const float B = 1 / 256.0;
+	// const float S = 1 / 32.0;
 
 	gl_Position = projection * gl_in[0].gl_Position;
 	texCoord = vec2(tileX + B, tileY + B);
