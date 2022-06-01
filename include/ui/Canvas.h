@@ -31,6 +31,8 @@ namespace Game3 {
 			float & scale() { return tilemapRenderer.scale; }
 
 		private:
+			constexpr static float HEADER_HEIGHT = 56.f;
+
 			NVGcontext *context = nullptr;
 			Texture grass;
 			std::shared_ptr<Tilemap> tilemap;

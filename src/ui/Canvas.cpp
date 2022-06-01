@@ -120,7 +120,7 @@ namespace Game3 {
 		tilemapRenderer.onBackBufferResized(width(), height());
 		tilemapRenderer.render(context, font);
 		float ix = width()  / 2.f;
-		float iy = height() / 2.f;
+		float iy = (height() - HEADER_HEIGHT) / 2.f + HEADER_HEIGHT;
 		ix += center().x() * scale() * 16.f;
 		iy += center().y() * scale() * 16.f;
 		ix -= scale() * 96.f / 2.f;
