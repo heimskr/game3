@@ -66,7 +66,7 @@ namespace Game3 {
 		// 	{1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 		// };
 
-		constexpr static int ints[][9] {
+		static int ints[][9] {
 			{0, 0, 0, 0, 0, 0, 0, 0, 0},
 			{0, 0, 0, 1, 0, 0, 0, 0, 0},
 			{0, 1, 0, 1, 1, 0, 0, 0, 0},
@@ -87,6 +87,10 @@ namespace Game3 {
 
 		static int r = 0;
 		static int c = 0;
+
+		for (int i = 0; i < w; ++i)
+			for (int j = 0; j < h; ++j)
+				ints[j][i] = rand() % 2;
 
 		auto get = [&](int x, int y) -> int {
 			x += c;
