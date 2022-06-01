@@ -41,30 +41,30 @@ namespace Game3 {
 		grass = Texture("resources/grass.png");
 		grass.bind();
 
-		// constexpr static int ints[][9] = {
-		// 	{1, 1, 1, 1, 1, 1, 1, 1, 1},
-		// 	{1, 1, 1, 1, 1, 1, 1, 1, 1},
-		// 	{1, 1, 1, 1, 1, 1, 1, 1, 1},
-		// 	{1, 1, 1, 0, 0, 0, 1, 1, 1},
-		// 	{1, 1, 1, 0, 1, 0, 1, 1, 1},
-		// 	{1, 1, 1, 0, 0, 0, 1, 1, 1},
-		// 	{1, 1, 1, 1, 1, 1, 1, 1, 1},
-		// 	{1, 1, 1, 1, 1, 1, 1, 1, 1},
-		// 	{1, 1, 1, 1, 1, 1, 1, 1, 1},
-		// };
-
-		constexpr static int ints[][10] = {
-			{1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-			{1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-			{1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-			{1, 1, 1, 0, 0, 0, 0, 1, 1, 1},
-			{1, 1, 1, 0, 1, 1, 0, 1, 1, 1},
-			{1, 1, 1, 0, 1, 1, 0, 1, 1, 1},
-			{1, 1, 1, 0, 0, 0, 0, 1, 1, 1},
-			{1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-			{1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-			{1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		constexpr static int ints[][9] = {
+			{1, 1, 1, 1, 1, 1, 1, 1, 1},
+			{1, 1, 1, 1, 1, 1, 1, 1, 1},
+			{1, 1, 1, 1, 1, 1, 1, 1, 1},
+			{1, 1, 1, 0, 0, 0, 1, 1, 1},
+			{1, 1, 1, 0, 1, 0, 1, 1, 1},
+			{1, 1, 1, 0, 0, 0, 1, 1, 1},
+			{1, 1, 1, 1, 1, 1, 1, 1, 1},
+			{1, 1, 1, 1, 1, 1, 1, 1, 1},
+			{1, 1, 1, 1, 1, 1, 1, 1, 1},
 		};
+
+		// constexpr static int ints[][10] = {
+		// 	{1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		// 	{1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		// 	{1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		// 	{1, 1, 1, 0, 0, 0, 0, 1, 1, 1},
+		// 	{1, 1, 1, 0, 1, 1, 0, 1, 1, 1},
+		// 	{1, 1, 1, 0, 1, 1, 0, 1, 1, 1},
+		// 	{1, 1, 1, 0, 0, 0, 0, 1, 1, 1},
+		// 	{1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		// 	{1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		// 	{1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		// };
 
 		constexpr static int w = sizeof(ints[0]) / sizeof(ints[0][0]);
 		constexpr static int h = sizeof(ints) / sizeof(ints[0]);
@@ -93,38 +93,19 @@ namespace Game3 {
 				if (!top || !right) topright = 0;
 				if (!bottom || !left) bottomleft = 0;
 				if (!bottom || !right) bottomright = 0;
-				// const int sum = get(-1, -1) + (get(0, -1) << 1) + (get(1, -1) << 2) + (get(-1, 0) << 3) +
-				// 	(get(1, 0) << 4) + (get(-1, 1) << 5) + (get(0, 1) << 6) + (get(1, 1) << 7);
 				int sum = topleft + (top << 1) + (topright << 2) + (left << 3) + (right << 4) + (bottomleft << 5) + (bottom << 6) + (bottomright << 7);
-
-				if (r == 0 && c == 0) {
-					for (int i = -1; i <= 1; ++i) {
-						for (int j = -1; j <= 1; ++j)
-							std::cerr << get(i, j);
-						std::cerr << '\n';
-					}
-				}
-				if (get(0, 0) == 0)
+				bool center = get(0, 0) != 0;
+				if (!center)
 					sum = 0;
-				int index = 48;
-				// const int sum = get(-1,-1) + 2*get(0,-1) + 4*get(1,-1) + 8*get(-1,0) + 16*get(1,0) + 32*get(-1,1) + 64*get(0,1) + 128*get(1,1);
-				// const int index = marching[sum];
-				// int index = 48;
-				// if (sum == 255)
-				// 	index += rand() % 3;
-				// else
-				// 	index = marching_map.at(sum);
-				index = marchingMap.at(sum);
+				int index = marchingMap.at(sum);
+				if (center && sum == 0)
+					index = 15;
 				if (index == 12) {
 					constexpr static int full[] {12, 30, 41, 41, 41, 41, 41};
 					srand((r << 20) | c);
 					index = full[rand() % (sizeof(full) / sizeof(full[0]))];
 				}
-
-				// std::cerr << '(' << r << ", " << c << ") -> " << sum << " -> " << index << " -> (" << x << ", " << y << ")\n";
-				// constexpr int scale = 32;
 				(*tilemap)(c, r) = index;
-				// (*tilemap)(c, r) = rand() % 50;
 				tilemap->sums.at(c + r * tilemap->width) = sum;
 			}
 		}

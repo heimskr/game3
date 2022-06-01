@@ -38,6 +38,27 @@ namespace Game3 {
 		glUseProgram(shaderHandle);
 		glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glDrawElements(GL_TRIANGLES, tilemap->tiles.size() * 6, GL_UNSIGNED_INT, (GLvoid *) 0);
+		if (context != nullptr && font != -1) {
+			constexpr float font_size = 12.f;
+			nvgFontSize(context, font_size);
+			nvgFillColor(context, {1.f, 0.f, 0.f, 1.f});
+			nvgFontFaceId(context, font);
+			auto draw_text = [&](int x, int y, std::string_view text) {
+				float tx = center.x() * 64.f + backBufferWidth  / 2.f - (tilemap->width) * tilemap->tileSize + scale + x * tilemap->tileSize * scale / 2.f;
+				float ty = center.y() * 64.f + backBufferHeight / 2.f - (tilemap->height - 1) * tilemap->tileSize + font_size + scale + y * tilemap->tileSize * scale / 2.f;
+				nvgText(context, tx, ty, text.data(), nullptr);
+			};
+
+			for (int y = 0; y < tilemap->height; ++y) {
+				for (int x = 0; x < tilemap->width; ++x) {
+					// std::cerr << x << ' ';
+					const int sum = tilemap->sums.at(x + y * tilemap->width);
+					const int id = (*tilemap)(x, y);
+					draw_text(x, y, std::to_string(sum) + ":" + std::to_string(id));
+				}
+				// std::cerr << '\n';
+			}
+		}
 	}
 
 	void ElementBufferedRenderer::createShader() {
