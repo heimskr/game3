@@ -90,7 +90,7 @@ namespace Game3 {
 				const float *axes = glfwGetJoystickAxes(joystick, &axis_count);
 				if (axes != nullptr && 2 <= axis_count) {
 					const float x = axes[0];
-					const float divisor = 5.f;
+					const float divisor = 20.f;
 					if (x <= -0.01 || 0.01 <= x)
 						canvas->center().x() += x / divisor;
 					const float y = axes[1];
