@@ -13,7 +13,8 @@ namespace Game3 {
 				resize(width_, height_);
 			}
 
-			template <typename T>
+			SquareVector(size_t size_): SquareVector(size_, size_) {}
+
 			void resize(size_t width_, size_t height_, T value = T()) {
 				width = width_;
 				height = height_;

@@ -2,6 +2,7 @@
 
 #include "MarchingSquares.h"
 #include "resources.h"
+#include "noise/OlsenNoise.h"
 #include "ui/Canvas.h"
 
 namespace Game3 {
@@ -41,6 +42,9 @@ namespace Game3 {
 
 		static int r = 0;
 		static int c = 0;
+
+		static_assert(w == h);
+		OlsenNoise noise(time(nullptr), w, 7);
 
 		for (int i = 0; i < w; ++i)
 			for (int j = 0; j < h; ++j)
