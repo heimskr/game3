@@ -81,12 +81,22 @@ namespace Game3 {
 		auto vertex_data = std::make_unique<float[]>(float_count);
 		size_t i = 0;
 
+		const auto set_width = tilemap->setWidth / tilemap->tileSize;
+		const float divisor = float(set_width);
+		const float ty_size = 1.f / divisor - tileTexturePadding * 2;
+		// const float ty_size = 1.f / divisor;
+
+		std::cerr << "divisor[" << divisor << "]\n";
+
 		for (int x = 0; x < tilemap->width; ++x)
 			for (int y = 0; y < tilemap->height; ++y) {
-				auto tile = (*tilemap)(x, y);
-				float tx0 = (tile % tilemap->setWidth) * tileTextureSize + tileTexturePadding;
-				float ty0 = (tile / tilemap->setWidth) * tileTextureSize + tileTexturePadding;
-				float ty_size = tileTextureSize - tileTexturePadding * 2;
+				const int tile = (*tilemap)(x, y);
+				// std::cerr << "(" << tile << " % " << set_width << ") = " << (tile % set_width) << '\n';
+				// std::cerr << "(" << tile << " / " << set_width << ") = " << (tile / set_width) << '\n';
+				const float tx0 = (tile % set_width) / divisor + tileTexturePadding;
+				const float ty0 = (tile / set_width) / divisor + tileTexturePadding;
+				std::cerr << '(' << x << ", " << y << "): tile=" << tile << ", tx0=" << tx0 << ", ty0=" << ty0 << '\n';
+				std::cerr << "    txS=" << (tx0 + ty_size) << ", tyS=" << (ty0 + ty_size) << '\n';
 
 				// Vertex 0 (top left)
 				vertex_data[i + 0] = x; // position x
