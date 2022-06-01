@@ -25,18 +25,7 @@ namespace Game3 {
 // 		})";
 
 	Canvas::Canvas(nanogui::Widget *parent_): GLCanvas(parent_) {
-		// setBackgroundColor({255, 255, 255, 255});
-		setBackgroundColor({0, 0, 100, 255});
-
-		// textShader.init("text shader", text_vert, text_frag);
-
-		// if (FT_Init_FreeType(&ftLibrary) != 0)
-		// 	throw std::runtime_error("Couldn't initialize FreeType");
-
-		// if (FT_New_Face(ftLibrary, "resources/FreeSans.ttf", 0, &face))
-		// 	throw std::runtime_error("Couldn't load font");
-
-		// FT_Set_Pixel_Sizes(face, 0, 48);
+		setBackgroundColor({20, 20, 255, 255});
 
 		grass = Texture("resources/grass.png");
 		grass.bind();
