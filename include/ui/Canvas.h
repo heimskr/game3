@@ -9,7 +9,7 @@
 // #include FT_FREETYPE_H
 
 #include "Texture.h"
-#include "ui/TilemapRenderer.h"
+#include "ui/GeometryRenderer.h"
 
 namespace Game3 {
 	class Canvas: public nanogui::GLCanvas {
@@ -31,7 +31,7 @@ namespace Game3 {
 			Texture grass;
 			// nanogui::GLShader shader;
 			std::shared_ptr<Tilemap> tilemap;
-			TilemapRenderer tilemapRenderer;
+			GeometryRenderer tilemapRenderer;
 			int font = -1;
 
 			// FT_Library ftLibrary;

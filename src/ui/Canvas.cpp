@@ -112,8 +112,6 @@ namespace Game3 {
 				// constexpr int scale = 32;
 				(*tilemap)(c, r) = index;
 				tilemap->sums.at(c + r * tilemap->width) = sum;
-				// renderTile(cr, water, scale * (c - padding), scale * (r - padding), 1, 5, scale, scale);
-				// renderTile(cr, grass, scale * (c - padding), scale * (r - padding), x, y, scale, scale, std::to_string(sum) + "," + std::to_string(index) + (get(0, 0) == 1? "!" : ""));
 			}
 		}
 

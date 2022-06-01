@@ -10,12 +10,6 @@
 
 using namespace Game3;
 
-Texture grass;
-TilemapRenderer renderer;
-std::shared_ptr<Tilemap> tilemap;
-
-#define USE_NANOGUI
-
 int main(int, char **) {
 	srand(time(nullptr));
 	try {

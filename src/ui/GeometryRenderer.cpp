@@ -4,19 +4,19 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "resources.h"
-#include "ui/TilemapRenderer.h"
+#include "ui/GeometryRenderer.h"
 #include <GL/glu.h>
 
 // Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Renderers/GeometryRenderer.cs
 
 namespace Game3 {
-	TilemapRenderer::~TilemapRenderer() {
+	GeometryRenderer::~GeometryRenderer() {
 		glDeleteVertexArrays(1, &vaoHandle);
 		glDeleteBuffers(1, &vboHandle);
 		glDeleteProgram(shaderHandle);
 	}
 
-	void TilemapRenderer::initialize(const std::shared_ptr<Tilemap> &tilemap_) {
+	void GeometryRenderer::initialize(const std::shared_ptr<Tilemap> &tilemap_) {
 		tilemap = tilemap_;
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		createShader();
@@ -24,7 +24,7 @@ namespace Game3 {
 		generateVertexArrayObject();
 	}
 
-	void TilemapRenderer::render(NVGcontext *context, int font) {
+	void GeometryRenderer::render(NVGcontext *context, int font) {
 		glUseProgram(shaderHandle);
 		glBindTexture(GL_TEXTURE_2D, tilemap->handle);
 		glBindVertexArray(vaoHandle);
@@ -61,7 +61,7 @@ namespace Game3 {
 		}
 	}
 
-	void TilemapRenderer::onBackBufferResized(int width, int height) {
+	void GeometryRenderer::onBackBufferResized(int width, int height) {
 		if (width == backBufferWidth && height == backBufferHeight)
 			return;
 		backBufferWidth = width;
@@ -85,7 +85,7 @@ namespace Game3 {
 		}
 	}
 
-	void TilemapRenderer::createShader() {
+	void GeometryRenderer::createShader() {
 		const GLchar *vert_ptr = reinterpret_cast<const GLchar *>(tilemap_vert);
 		int vert_handle = glCreateShader(GL_VERTEX_SHADER);
 		glShaderSource(vert_handle, 1, &vert_ptr, reinterpret_cast<const GLint *>(&tilemap_vert_len));
@@ -121,14 +121,14 @@ namespace Game3 {
 		glDeleteShader(frag_handle);
 	}
 
-	void TilemapRenderer::generateVertexBufferObject() {
+	void GeometryRenderer::generateVertexBufferObject() {
 		glGenBuffers(1, &vboHandle);
 		glBindBuffer(GL_ARRAY_BUFFER, vboHandle);
 		glBufferData(GL_ARRAY_BUFFER, tilemap->tiles.size() * sizeof(decltype(tilemap->tiles)::value_type),
 			tilemap->tiles.data(), GL_STATIC_DRAW);
 	}
 
-	void TilemapRenderer::generateVertexArrayObject() {
+	void GeometryRenderer::generateVertexArrayObject() {
 		glGenVertexArrays(1, &vaoHandle);
 		glBindVertexArray(vaoHandle);
 		glBindBuffer(GL_ARRAY_BUFFER, vboHandle);

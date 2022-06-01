@@ -1,7 +1,5 @@
 #pragma once
 
-// Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Renderers/GeometryRenderer.cs
-
 #include <memory>
 
 #include <nanogui/opengl.h>
@@ -20,21 +18,10 @@ namespace Game3 {
 			std::shared_ptr<Tilemap> tilemap;
 
 			TilemapRenderer() = default;
-			~TilemapRenderer();
+			virtual ~TilemapRenderer() = default;
 
-			void initialize(const std::shared_ptr<Tilemap> &);
-			void render(NVGcontext * = nullptr, int font = -1);
-			void onBackBufferResized(int width, int height);
-
-		private:
-			GLuint shaderHandle = -1;
-			GLuint vboHandle = -1;
-			GLuint vaoHandle = -1;
-			int backBufferWidth = -1;
-			int backBufferHeight = -1;
-
-			void createShader();
-			void generateVertexBufferObject();
-			void generateVertexArrayObject();
+			virtual void initialize(const std::shared_ptr<Tilemap> &) = 0;
+			virtual void render(NVGcontext *, int font) = 0;
+			virtual void onBackBufferResized(int width, int height) = 0;
 	};
 }
