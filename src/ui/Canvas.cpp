@@ -29,6 +29,9 @@ namespace Game3 {
 	Canvas::Canvas(nanogui::Widget *parent_): GLCanvas(parent_) {
 		setBackgroundColor({20, 20, 255, 255});
 
+		constexpr double noise_zoom = 20.;
+		constexpr double noise_threshold = -0.5;
+
 		grass = Texture("resources/grass.png");
 		grass.bind();
 
@@ -48,7 +51,7 @@ namespace Game3 {
 
 		for (int i = 0; i < w; ++i)
 			for (int j = 0; j < h; ++j)
-				ints[j][i] = perlin.GetValue(i / 10., j / 10., 0.666) < -0.25;
+				ints[j][i] = perlin.GetValue(i / noise_zoom, j / noise_zoom, 0.666) < noise_threshold;
 
 		auto get = [&](int x, int y) -> int {
 			x += c;
