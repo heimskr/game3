@@ -8,6 +8,7 @@
 // #include <ft2build.h>
 // #include FT_FREETYPE_H
 
+#include "Image.h"
 #include "Texture.h"
 #include "ui/GeometryRenderer.h"
 #include "ui/ElementBufferedRenderer.h"
@@ -37,6 +38,7 @@ namespace Game3 {
 			ElementBufferedRenderer tilemapRenderer;
 			int font = -1;
 
+			Image testImage;
 			// FT_Library ftLibrary;
 			// FT_Face face;
 			// nanogui::GLShader textShader;

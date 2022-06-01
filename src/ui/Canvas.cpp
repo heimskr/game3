@@ -105,13 +105,17 @@ namespace Game3 {
 		nanogui::GLCanvas::draw(context_);
 		if (context_ != nullptr && context != context_) {
 			context = context_;
+			testImage.initialize(context, "resources/lpc/trunk.png");
 			font = nvgCreateFont(context, "FreeSans", "resources/FreeSans.ttf");
 		}
 	}
 
+	int N = -16;
+
 	void Canvas::drawGL() {
 		tilemapRenderer.onBackBufferResized(width(), height());
 		tilemapRenderer.render(context, font);
+		testImage.draw(100, 100, N, 0, 64, -1);
 	}
 
 	bool Canvas::scrollEvent(const nanogui::Vector2i &p, const nanogui::Vector2f &rel) {
@@ -119,9 +123,13 @@ namespace Game3 {
 			return true;
 
 		if (rel.y() == 1)
-			tilemapRenderer.scale *= 1.06f;
+			// tilemapRenderer.scale *= 1.06f;
+			++N;
 		else if (rel.y() == -1)
-			tilemapRenderer.scale /= 1.06f;
+			// tilemapRenderer.scale /= 1.06f;
+			--N;
+
+		std::cerr << N << '\n';
 
 		return true;
 	}
