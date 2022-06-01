@@ -9,12 +9,14 @@ namespace Game3 {
 		int width;
 		int height;
 		int tileSize;
+		int setWidth;
+		int setHeight;
 		std::vector<uint8_t> tiles;
 		std::vector<uint8_t> sums;
 		int handle;
 
-		Tilemap(int width_, int height_, int tile_size, int handle_):
-		width(width_), height(height_), tileSize(tile_size), handle(handle_) {
+		Tilemap(int width_, int height_, int tile_size, int set_width, int set_height, int handle_):
+		width(width_), height(height_), tileSize(tile_size), setWidth(set_width), setHeight(set_height), handle(handle_) {
 			tiles.resize(width * height);
 			sums.resize(width * height);
 		}

@@ -37,6 +37,7 @@ namespace Game3 {
 		glUseProgram(shaderHandle);
 		glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniform2i(glGetUniformLocation(shaderHandle, "mapSize"), tilemap->width, tilemap->height);
+		glUniform2i(glGetUniformLocation(shaderHandle, "setSize"), tilemap->setWidth / tilemap->tileSize, tilemap->setHeight / tilemap->tileSize);
 		glDrawArrays(GL_POINTS, 0, tilemap->tiles.size());
 		if (context != nullptr && font != -1) {
 			constexpr float font_size = 12.f;

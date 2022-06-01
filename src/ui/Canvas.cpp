@@ -58,7 +58,7 @@ namespace Game3 {
 
 		// int dimension = 320 / 32;
 		int scale = 32;
-		tilemap = std::make_shared<Tilemap>(w, h, scale, grass.id);
+		tilemap = std::make_shared<Tilemap>(w, h, scale, grass.width, grass.height, grass.id);
 
 		static int r = 0;
 		static int c = 0;

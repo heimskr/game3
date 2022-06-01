@@ -3,7 +3,8 @@
 // Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Resources/GeometryRenderer.geom
 
 uniform mat4 projection;
-uniform ivec2 mapSize;
+uniform ivec2 mapSize; // Number of tiles in the tilemap, not the tileset
+uniform ivec2 setSize; // Number of tiles in the tileset, not the tilemap
 
 in VS_OUT {
 	uint tileId;
@@ -17,10 +18,12 @@ layout (triangle_strip, max_vertices = 4) out;
 void main() {
 	float mSx = float(mapSize.x);
 	float mSy = float(mapSize.y);
+	float sSx = float(setSize.x);
+	float sSy = float(setSize.y);
 
 	uint tileId = gs_in[0].tileId & 255u;
-	float tileX = float(tileId % uint(mapSize.x)) / mSx;
-	float tileY = float(tileId / uint(mapSize.x)) / mSy;
+	float tileX = float(tileId % uint(setSize.x)) / sSx;
+	float tileY = float(tileId / uint(setSize.x)) / sSy;
 
 	const float B = 1 / 256.0;
 	float Sx = 1 / mSx;
