@@ -38,8 +38,9 @@ namespace Game3 {
 			std::shared_ptr<Tilemap> tilemap;
 			ElementBufferedRenderer tilemapRenderer;
 			int font = -1;
-
 			Image trunksImage;
 			Image treetopsImage;
+
+			void drawTree(float x, float y);
 	};
 }

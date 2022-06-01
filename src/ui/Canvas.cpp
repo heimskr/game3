@@ -119,13 +119,26 @@ namespace Game3 {
 	void Canvas::drawGL() {
 		tilemapRenderer.onBackBufferResized(width(), height());
 		tilemapRenderer.render(context, font);
-		float ix = width()  / 2.f;
+		drawTree(8, -8);
+		drawTree(10, -5);
+	}
+
+	void Canvas::drawTree(float x, float y) {
+		float ix = width() / 2.f;
 		float iy = (height() - HEADER_HEIGHT) / 2.f + HEADER_HEIGHT;
-		ix += center().x() * scale() * 16.f;
-		iy += center().y() * scale() * 16.f;
-		ix -= scale() * 96.f / 2.f;
-		iy -= scale() * 80.f / 2.f;
-		treetopsImage.draw(ix, iy, 0, 0, 96, 80, scale());
+		ix += (center().x() + x) * scale() * 16.f;
+		iy += (center().y() + y) * scale() * 16.f;
+		ix -= scale() * 96.f / 4.f;
+		iy -= scale() * (80.f + 40.f) / 4.f;
+		trunksImage.draw(ix, iy, 0, 0, 96, 80, scale() / 2.f);
+
+		ix = width() / 2.f;
+		iy = (height() - HEADER_HEIGHT) / 2.f + HEADER_HEIGHT;
+		ix += (center().x() + x) * scale() * 16.f;
+		iy += (center().y() + y) * scale() * 16.f;
+		ix -= scale() * 96.f / 4.f;
+		iy -= scale() * (80.f + 190.f) / 4.f;
+		treetopsImage.draw(ix, iy, 0, 0, 96, 80, scale() / 2.f);
 	}
 
 	bool Canvas::scrollEvent(const nanogui::Vector2i &p, const nanogui::Vector2f &rel) {
