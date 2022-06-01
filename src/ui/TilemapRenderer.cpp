@@ -31,10 +31,10 @@ namespace Game3 {
 		glBindVertexArray(vaoHandle);
 		glm::mat4 projection(1.f);
 		center = {1.f, 1.f};
-		center.x() = 0.5f - 320.f / backBufferWidth;
-		center.y() = 0.5f - 320.f / backBufferHeight;
+		center.x() = 0.5f + 320.f / backBufferWidth;
+		center.y() = -0.5f - 320.f / backBufferHeight;
 		projection = glm::translate(projection, {-center.x(), -center.y(), 0}) *
-					 glm::scale(projection, {tilemap->tileSize, tilemap->tileSize, 1}) *
+					 glm::scale(projection, {tilemap->tileSize, -tilemap->tileSize, 1}) *
 					 glm::scale(projection, {4.f / backBufferWidth, 4.f / backBufferHeight, 1});
 		if (0) for (int y = 0; y < 4; ++y) {
 			for (int x = 0; x < 4; ++x)
