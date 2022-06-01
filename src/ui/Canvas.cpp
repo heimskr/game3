@@ -98,9 +98,9 @@ namespace Game3 {
 				if (!center)
 					sum = 0;
 				int index = marchingMap.at(sum);
-				if (center && sum == 0)
+				if (center && sum == 0) {
 					index = 15;
-				if (index == 12) {
+				} else if (index == 12) {
 					constexpr static int full[] {12, 30, 41, 41, 41, 41, 41};
 					srand((r << 20) | c);
 					index = full[rand() % (sizeof(full) / sizeof(full[0]))];
