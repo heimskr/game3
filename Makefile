@@ -22,11 +22,13 @@ all: $(OUTPUT)
 	@ printf "\e[2m[\e[22;32mcc\e[39;2m]\e[22m $< \e[2m$(BUILDFLAGS)\e[22m\n"
 	@ $(COMPILER) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
 
-include/resources.h: resources/tilemap.frag resources/tilemap.geom resources/tilemap.vert
+include/resources.h: resources/tilemap.frag resources/tilemap.geom resources/tilemap.vert resources/buffered.frag resources/buffered.vert
 	echo "#include <cstdlib>" > $@
 	bin2c tilemap_frag < resources/tilemap.frag | tail -n +2 >> $@
 	bin2c tilemap_geom < resources/tilemap.geom | tail -n +2 >> $@
 	bin2c tilemap_vert < resources/tilemap.vert | tail -n +2 >> $@
+	bin2c buffered_frag < resources/buffered.frag | tail -n +2 >> $@
+	bin2c buffered_vert < resources/buffered.vert | tail -n +2 >> $@
 
 $(OUTPUT): $(OBJECTS)
 	@ printf "\e[2m[\e[22;36mld\e[39;2m]\e[22m $@\n"

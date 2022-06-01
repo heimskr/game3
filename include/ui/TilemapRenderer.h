@@ -10,7 +10,7 @@
 namespace Game3 {
 	class TilemapRenderer {
 		public:
-			constexpr static float tileTextureSize = 1 / 16.f;
+			constexpr static float tileTextureSize = 1 / 10.f;
 			constexpr static float tileTexturePadding = 1 / 256.f;
 			float scale = 4.f;
 
@@ -22,6 +22,12 @@ namespace Game3 {
 
 			virtual void initialize(const std::shared_ptr<Tilemap> &) = 0;
 			virtual void render(NVGcontext *, int font) = 0;
-			virtual void onBackBufferResized(int width, int height) = 0;
+			virtual void onBackBufferResized(int width, int height);
+
+		protected:
+			int backBufferWidth = -1;
+			int backBufferHeight = -1;
+
+			static void check(int handle, bool is_link = false);
 	};
 }

@@ -19,14 +19,11 @@ namespace Game3 {
 
 			void initialize(const std::shared_ptr<Tilemap> &) override;
 			void render(NVGcontext * = nullptr, int font = -1) override;
-			void onBackBufferResized(int width, int height) override;
 
 		private:
 			GLuint shaderHandle = -1;
 			GLuint vboHandle = -1;
 			GLuint vaoHandle = -1;
-			int backBufferWidth = -1;
-			int backBufferHeight = -1;
 
 			void createShader();
 			void generateVertexBufferObject();
