@@ -11,7 +11,6 @@ namespace Game3 {
 		unsigned char *data = stbi_load(path.c_str(), &width, &height, &channels, 0);
 		if (data == nullptr)
 			throw std::runtime_error("Couldn't load image from " + path.string());
-		std::cerr << "w[" << width << "], h[" << height << "]\n";
 		glGenTextures(1, &id);
 		glBindTexture(GL_TEXTURE_2D, id);
 		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);

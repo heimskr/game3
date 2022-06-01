@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
 			glFlush();
 		});
 		glutReshapeFunc(+[](int w, int h) {
-			renderer.center = {1.f, 1.f};
+			renderer.center = {0.f, 0.f};
 			renderer.onBackBufferResized(w, h);
 		});
 		glutMainLoop();

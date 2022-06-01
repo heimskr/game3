@@ -30,18 +30,10 @@ namespace Game3 {
 		glBindTexture(GL_TEXTURE_2D, tilemap->handle);
 		glBindVertexArray(vaoHandle);
 		glm::mat4 projection(1.f);
-		center = {1.f, 1.f};
-		center.x() = 0.5f + 320.f / backBufferWidth;
-		center.y() = -0.5f - 320.f / backBufferHeight;
-		projection = glm::translate(projection, {-center.x(), -center.y(), 0}) *
-					 glm::scale(projection, {tilemap->tileSize, -tilemap->tileSize, 1}) *
-					 glm::scale(projection, {4.f / backBufferWidth, 4.f / backBufferHeight, 1});
-		if (0) for (int y = 0; y < 4; ++y) {
-			for (int x = 0; x < 4; ++x)
-				std::cerr << projection[x][y] << ' ';
-			std::cerr << '\n';
-		}
-
+		projection = glm::scale(projection, {tilemap->tileSize, -tilemap->tileSize, 1}) *
+		             glm::scale(projection, {4.f / backBufferWidth, 4.f / backBufferHeight, 1}) *
+		             glm::translate(projection,
+		                 {-tilemap->width / 2.f - center.x(), -tilemap->height / 2.f - center.y(), 0});
 		glUseProgram(shaderHandle);
 		glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniform2i(glGetUniformLocation(shaderHandle, "mapSize"), tilemap->width, tilemap->height);
