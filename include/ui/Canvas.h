@@ -24,6 +24,7 @@ namespace Game3 {
 			void draw(NVGcontext *) override;
 			void drawGL() override;
 			bool scrollEvent(const nanogui::Vector2i &p, const nanogui::Vector2f &rel) override;
+			bool mouseDragEvent(const nanogui::Vector2i &p, const nanogui::Vector2i &rel, int button, int modifiers) override;
 
 			nanogui::Vector2f & center() { return tilemapRenderer.center; }
 

@@ -125,4 +125,17 @@ namespace Game3 {
 
 		return true;
 	}
+
+	bool Canvas::mouseDragEvent(const nanogui::Vector2i &p, const nanogui::Vector2i &rel, int button, int modifiers) {
+		if (nanogui::GLCanvas::mouseDragEvent(p, rel, button, modifiers))
+			return true;
+
+		if (button == 1) {
+			center().x() += rel.x() / (16. * tilemapRenderer.scale);
+			center().y() += rel.y() / (16. * tilemapRenderer.scale);
+			return true;
+		}
+
+		return false;
+	}
 }
