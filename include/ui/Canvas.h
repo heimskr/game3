@@ -32,8 +32,8 @@ namespace Game3 {
 			Texture grass;
 			// nanogui::GLShader shader;
 			std::shared_ptr<Tilemap> tilemap;
-			GeometryRenderer tilemapRenderer;
-			// ElementBufferedRenderer tilemapRenderer;
+			// GeometryRenderer tilemapRenderer;
+			ElementBufferedRenderer tilemapRenderer;
 			int font = -1;
 
 			// FT_Library ftLibrary;

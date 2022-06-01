@@ -1,5 +1,5 @@
 ifeq ($(BUILD),release)
-BUILDFLAGS := -O3
+BUILDFLAGS := -Ofast -march=native
 else
 BUILDFLAGS := -g -O0
 endif

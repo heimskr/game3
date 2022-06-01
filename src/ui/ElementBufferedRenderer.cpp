@@ -37,14 +37,22 @@ namespace Game3 {
 		             glm::translate(projection,
 		                 {center.x() - tilemap->width / 2.f, center.y() - tilemap->height / 2.f, 0});
 		glUseProgram(shaderHandle);
+
 		glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		if (auto err = glGetError()) std::cerr << "Error at " << (__LINE__ - 1) << ": " << gluErrorString(err) << '\n';
-		glUniform2i(glGetUniformLocation(shaderHandle, "mapSize"), tilemap->width, tilemap->height);
-		if (auto err = glGetError()) std::cerr << "Error at " << (__LINE__ - 1) << ": " << gluErrorString(err) << '\n';
-		glUniform2i(glGetUniformLocation(shaderHandle, "setSize"), tilemap->setWidth / tilemap->tileSize, tilemap->setHeight / tilemap->tileSize);
-		if (auto err = glGetError()) std::cerr << "Error at " << (__LINE__ - 1) << ": " << gluErrorString(err) << '\n';
+
+		if (auto err = glGetError()) std::cerr << "Error at " << (__LINE__ - 2) << ": " << gluErrorString(err) << '\n';
+
+		// glUniform2i(glGetUniformLocation(shaderHandle, "mapSize"), tilemap->width, tilemap->height);
+
+		if (auto err = glGetError()) std::cerr << "Error at " << (__LINE__ - 2) << ": " << gluErrorString(err) << '\n';
+
+		// glUniform2i(glGetUniformLocation(shaderHandle, "setSize"), tilemap->setWidth / tilemap->tileSize, tilemap->setHeight / tilemap->tileSize);
+
+		if (auto err = glGetError()) std::cerr << "Error at " << (__LINE__ - 2) << ": " << gluErrorString(err) << '\n';
+
 		glDrawElements(GL_TRIANGLES, tilemap->tiles.size() * 6, GL_UNSIGNED_INT, (GLvoid *) 0);
-		if (auto err = glGetError()) std::cerr << "Error at " << (__LINE__ - 1) << ": " << gluErrorString(err) << '\n';
+
+		if (auto err = glGetError()) std::cerr << "Error at " << (__LINE__ - 2) << ": " << gluErrorString(err) << '\n';
 	}
 
 	void ElementBufferedRenderer::createShader() {
@@ -82,21 +90,14 @@ namespace Game3 {
 		size_t i = 0;
 
 		const auto set_width = tilemap->setWidth / tilemap->tileSize;
-		const float divisor = float(set_width);
+		const float divisor = set_width;
 		const float ty_size = 1.f / divisor - tileTexturePadding * 2;
-		// const float ty_size = 1.f / divisor;
-
-		std::cerr << "divisor[" << divisor << "]\n";
 
 		for (int x = 0; x < tilemap->width; ++x)
 			for (int y = 0; y < tilemap->height; ++y) {
 				const int tile = (*tilemap)(x, y);
-				// std::cerr << "(" << tile << " % " << set_width << ") = " << (tile % set_width) << '\n';
-				// std::cerr << "(" << tile << " / " << set_width << ") = " << (tile / set_width) << '\n';
 				const float tx0 = (tile % set_width) / divisor + tileTexturePadding;
 				const float ty0 = (tile / set_width) / divisor + tileTexturePadding;
-				std::cerr << '(' << x << ", " << y << "): tile=" << tile << ", tx0=" << tx0 << ", ty0=" << ty0 << '\n';
-				std::cerr << "    txS=" << (tx0 + ty_size) << ", tyS=" << (ty0 + ty_size) << '\n';
 
 				// Vertex 0 (top left)
 				vertex_data[i + 0] = x; // position x
@@ -127,7 +128,7 @@ namespace Game3 {
 				i += 4;
 			}
 
-		glBufferData(GL_ARRAY_BUFFER, float_count, vertex_data.get(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, float_count * sizeof(float), vertex_data.get(), GL_STATIC_DRAW);
 	}
 
 	void ElementBufferedRenderer::generateElementBufferObject() {
