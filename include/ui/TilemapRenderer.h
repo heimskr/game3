@@ -22,7 +22,7 @@ namespace Game3 {
 			~TilemapRenderer();
 
 			void initialize(const std::shared_ptr<Tilemap> &);
-			void render();
+			void render(NVGcontext * = nullptr, int font = -1);
 			void onBackBufferResized(int width, int height);
 
 		private:

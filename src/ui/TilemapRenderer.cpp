@@ -18,26 +18,41 @@ namespace Game3 {
 
 	void TilemapRenderer::initialize(const std::shared_ptr<Tilemap> &tilemap_) {
 		tilemap = tilemap_;
-		// glClipControl(GL_UPPER_LEFT, GL_NEGATIVE_ONE_TO_ONE);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		createShader();
 		generateVertexBufferObject();
 		generateVertexArrayObject();
 	}
 
-	void TilemapRenderer::render() {
+	void TilemapRenderer::render(NVGcontext *context, int font) {
 		glUseProgram(shaderHandle);
 		glBindTexture(GL_TEXTURE_2D, tilemap->handle);
 		glBindVertexArray(vaoHandle);
 		glm::mat4 projection(1.f);
+		const float scale = 4.f;
 		projection = glm::scale(projection, {tilemap->tileSize, -tilemap->tileSize, 1}) *
-		             glm::scale(projection, {4.f / backBufferWidth, 4.f / backBufferHeight, 1}) *
+		             glm::scale(projection, {scale / backBufferWidth, scale / backBufferHeight, 1}) *
 		             glm::translate(projection,
 		                 {center.x() - tilemap->width / 2.f, center.y() - tilemap->height / 2.f, 0});
 		glUseProgram(shaderHandle);
 		glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniform2i(glGetUniformLocation(shaderHandle, "mapSize"), tilemap->width, tilemap->height);
 		glDrawArrays(GL_POINTS, 0, tilemap->tiles.size());
+		if (context != nullptr && font != -1) {
+			constexpr float font_size = 20.f;
+			nvgFontSize(context, font_size);
+			nvgFillColor(context, {1.f, 0.f, 0.f, 1.f});
+			nvgFontFaceId(context, font);
+			auto draw_text = [&](int x, int y, std::string_view text) {
+				float tx = center.x() * 64.f + backBufferWidth  / 2.f - (tilemap->width) * tilemap->tileSize + scale + x * tilemap->tileSize * scale / 2.f;
+				float ty = center.y() * 64.f + backBufferHeight / 2.f - (tilemap->height - 1) * tilemap->tileSize + font_size + scale + y * tilemap->tileSize * scale / 2.f;
+				nvgText(context, tx, ty, text.data(), nullptr);
+			};
+
+			for (int x = 0; x < 10; ++x)
+				for (int y = 0; y < 10; ++y)
+					draw_text(x, y, std::to_string(x) + "," + std::to_string(y));
+		}
 	}
 
 	void TilemapRenderer::onBackBufferResized(int width, int height) {
@@ -45,7 +60,6 @@ namespace Game3 {
 			return;
 		backBufferWidth = width;
 		backBufferHeight = height;
-		// glViewport(0, 0, width, height);
 	}
 
 	static void check(int handle, bool is_link = false) {
