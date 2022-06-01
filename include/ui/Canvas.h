@@ -28,19 +28,16 @@ namespace Game3 {
 			bool mouseDragEvent(const nanogui::Vector2i &p, const nanogui::Vector2i &rel, int button, int modifiers) override;
 
 			nanogui::Vector2f & center() { return tilemapRenderer.center; }
+			float & scale() { return tilemapRenderer.scale; }
 
 		private:
 			NVGcontext *context = nullptr;
 			Texture grass;
-			// nanogui::GLShader shader;
 			std::shared_ptr<Tilemap> tilemap;
-			// GeometryRenderer tilemapRenderer;
 			ElementBufferedRenderer tilemapRenderer;
 			int font = -1;
 
-			Image testImage;
-			// FT_Library ftLibrary;
-			// FT_Face face;
-			// nanogui::GLShader textShader;
+			Image trunksImage;
+			Image treetopsImage;
 	};
 }

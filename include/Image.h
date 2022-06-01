@@ -13,8 +13,8 @@ namespace Game3 {
 			~Image();
 
 			void initialize(NVGcontext *, const std::filesystem::path &, int flags = 0);
-			void draw(float x, float y, float angle = 0.f, float alpha = 1.f);
-			void draw(float x, float y, float x_offset, float y_offset, float size_x, float size_y, float angle = 0.f, float alpha = 1.f);
+			void draw(float x, float y, float scale = 1.f, float angle = 0.f, float alpha = 1.f);
+			void draw(float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale = 1.f, float angle = 0.f, float alpha = 1.f);
 
 			int  width() const { return width_;  }
 			int height() const { return height_; }

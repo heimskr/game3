@@ -13,6 +13,8 @@ namespace Game3 {
 			constexpr static float tileTextureSize = 1 / 10.f;
 			constexpr static float tileTexturePadding = 1 / 256.f;
 			float scale = 2.f;
+			int backBufferWidth = -1;
+			int backBufferHeight = -1;
 
 			nanogui::Vector2f center {0.f, 0.f};
 			std::shared_ptr<Tilemap> tilemap;
@@ -25,9 +27,6 @@ namespace Game3 {
 			virtual void onBackBufferResized(int width, int height);
 
 		protected:
-			int backBufferWidth = -1;
-			int backBufferHeight = -1;
-
 			static void check(int handle, bool is_link = false);
 	};
 }

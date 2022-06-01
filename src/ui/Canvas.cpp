@@ -1,6 +1,9 @@
 // Contains code from nanogui and from LearnOpenGL (https://github.com/JoeyDeVries/LearnOpenGL)
 
 #include <libnoise/noise.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "MarchingSquares.h"
 #include "resources.h"
@@ -105,7 +108,8 @@ namespace Game3 {
 		nanogui::GLCanvas::draw(context_);
 		if (context_ != nullptr && context != context_) {
 			context = context_;
-			testImage.initialize(context, "resources/lpc/trunk.png");
+			trunksImage.initialize(context, "resources/lpc/trunk.png");
+			treetopsImage.initialize(context, "resources/lpc/treetop.png");
 			font = nvgCreateFont(context, "FreeSans", "resources/FreeSans.ttf");
 		}
 	}
@@ -115,19 +119,26 @@ namespace Game3 {
 	void Canvas::drawGL() {
 		tilemapRenderer.onBackBufferResized(width(), height());
 		tilemapRenderer.render(context, font);
-		testImage.draw(100, 100, N, 0, 64, -1);
+		float ix = width()  / 2.f;
+		float iy = height() / 2.f;
+		ix += center().x() * scale() * 16.f;
+		iy += center().y() * scale() * 16.f;
+		ix -= scale() * 96.f / 2.f;
+		iy -= scale() * 80.f / 2.f;
+		treetopsImage.draw(ix, iy, 0, 0, 96, 80, scale());
 	}
 
 	bool Canvas::scrollEvent(const nanogui::Vector2i &p, const nanogui::Vector2f &rel) {
 		if (nanogui::GLCanvas::scrollEvent(p, rel))
 			return true;
 
-		if (rel.y() == 1)
-			// tilemapRenderer.scale *= 1.06f;
+		if (rel.y() == 1) {
+			tilemapRenderer.scale *= 1.06f;
 			++N;
-		else if (rel.y() == -1)
-			// tilemapRenderer.scale /= 1.06f;
+		} else if (rel.y() == -1) {
+			tilemapRenderer.scale /= 1.06f;
 			--N;
+		}
 
 		std::cerr << N << '\n';
 
