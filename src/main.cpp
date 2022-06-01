@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
 			nanogui::ref<Game3::Application> app = new Game3::Application;
 			app->drawAll();
 			app->setVisible(true);
-			nanogui::mainloop();
+			nanogui::mainloop(1000 / 144);
 		}
 		nanogui::shutdown();
 #endif

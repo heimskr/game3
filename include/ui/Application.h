@@ -33,6 +33,8 @@ namespace Game3 {
 		public:
 			Application();
 
+			~Application();
+
 			bool keyboardEvent(int key, int scancode, int action, int modifiers) override;
 			bool resizeEvent(const nanogui::Vector2i &) override;
 			void draw(NVGcontext *) override;
@@ -40,5 +42,9 @@ namespace Game3 {
 		private:
 			nanogui::Widget *buttonBox = nullptr;
 			Canvas *canvas = nullptr;
+
+			void onJoystick(int joystick_id, int event);
+
+			static Application *instance;
 	};
 }

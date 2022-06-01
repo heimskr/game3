@@ -33,7 +33,7 @@ namespace Game3 {
 		projection = glm::scale(projection, {tilemap->tileSize, -tilemap->tileSize, 1}) *
 		             glm::scale(projection, {4.f / backBufferWidth, 4.f / backBufferHeight, 1}) *
 		             glm::translate(projection,
-		                 {-tilemap->width / 2.f - center.x(), -tilemap->height / 2.f - center.y(), 0});
+		                 {center.x() - tilemap->width / 2.f, center.y() - tilemap->height / 2.f, 0});
 		glUseProgram(shaderHandle);
 		glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniform2i(glGetUniformLocation(shaderHandle, "mapSize"), tilemap->width, tilemap->height);

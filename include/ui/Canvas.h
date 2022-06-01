@@ -21,6 +21,8 @@ namespace Game3 {
 
 			void drawGL() override;
 
+			nanogui::Vector2f & center() { return tilemapRenderer.center; }
+
 		private:
 			Texture grass;
 			// nanogui::GLShader shader;
