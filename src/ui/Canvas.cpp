@@ -4,7 +4,6 @@
 
 #include "MarchingSquares.h"
 #include "resources.h"
-#include "noise/OlsenNoise.h"
 #include "ui/Canvas.h"
 
 namespace Game3 {
@@ -48,10 +47,8 @@ namespace Game3 {
 		perlin.SetSeed(666);
 
 		for (int i = 0; i < w; ++i)
-			for (int j = 0; j < h; ++j) {
-				const auto r = perlin.GetValue(i, j, 0.666);
-				ints[j][i] = r < 0.15;
-			}
+			for (int j = 0; j < h; ++j)
+				ints[j][i] = perlin.GetValue(i / 10., j / 10., 0.666) < -0.25;
 
 		auto get = [&](int x, int y) -> int {
 			x += c;
