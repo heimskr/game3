@@ -102,15 +102,16 @@ namespace Game3 {
 				// else
 				// 	index = marching_map.at(sum);
 				index = marchingMap.at(sum);
-				if (index == 12) {
-					constexpr static int full[] {12, 30, 41, 41, 41, 41, 41, 41, 41, 41};
-					srand((r << 20) | c);
-					index = full[rand() % (sizeof(full) / sizeof(full[0]))];
-				}
+				// if (index == 12) {
+				// 	constexpr static int full[] {12, 30, 41, 41, 41, 41, 41, 41, 41, 41};
+				// 	srand((r << 20) | c);
+				// 	index = full[rand() % (sizeof(full) / sizeof(full[0]))];
+				// }
 
 				// std::cerr << '(' << r << ", " << c << ") -> " << sum << " -> " << index << " -> (" << x << ", " << y << ")\n";
 				// constexpr int scale = 32;
-				(*tilemap)(r, c) = index;
+				(*tilemap)(c, r) = index;
+				tilemap->sums.at(c + r * tilemap->width) = sum;
 				// renderTile(cr, water, scale * (c - padding), scale * (r - padding), 1, 5, scale, scale);
 				// renderTile(cr, grass, scale * (c - padding), scale * (r - padding), x, y, scale, scale, std::to_string(sum) + "," + std::to_string(index) + (get(0, 0) == 1? "!" : ""));
 			}

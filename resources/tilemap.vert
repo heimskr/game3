@@ -13,8 +13,8 @@ out VS_OUT {
 
 void main() {
 	int i = gl_VertexID;
-	float x = float(i / mapSize.y);
-	float y = float(i % mapSize.y);
+	float x = float(i % mapSize.x);
+	float y = float(i / mapSize.x);
 	gl_Position = vec4(x, y, 0, 1);
 	vs_out.tileId = aTileId;
 }

@@ -39,7 +39,7 @@ namespace Game3 {
 		glUniform2i(glGetUniformLocation(shaderHandle, "mapSize"), tilemap->width, tilemap->height);
 		glDrawArrays(GL_POINTS, 0, tilemap->tiles.size());
 		if (context != nullptr && font != -1) {
-			constexpr float font_size = 20.f;
+			constexpr float font_size = 12.f;
 			nvgFontSize(context, font_size);
 			nvgFillColor(context, {1.f, 0.f, 0.f, 1.f});
 			nvgFontFaceId(context, font);
@@ -49,9 +49,15 @@ namespace Game3 {
 				nvgText(context, tx, ty, text.data(), nullptr);
 			};
 
-			for (int x = 0; x < 10; ++x)
-				for (int y = 0; y < 10; ++y)
-					draw_text(x, y, std::to_string(x) + "," + std::to_string(y));
+			for (int y = 0; y < tilemap->height; ++y) {
+				for (int x = 0; x < tilemap->width; ++x) {
+					// std::cerr << x << ' ';
+					const int sum = tilemap->sums.at(x + y * tilemap->width);
+					const int id = (*tilemap)(x, y);
+					draw_text(x, y, std::to_string(sum) + ":" + std::to_string(id));
+				}
+				// std::cerr << '\n';
+			}
 		}
 	}
 
