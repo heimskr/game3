@@ -10,9 +10,10 @@ namespace Game3 {
 		public:
 			R rng;
 			R::result_type seed;
+			size_t sideLength;
 			SquareVector<T> output;
 
-			NoiseGenerator(R::result_type seed_): rng(seed_), seed(seed_), output(0, 0) {}
+			NoiseGenerator(R::result_type seed_, size_t side_length): rng(seed_), seed(seed_), sideLength(side_length), output(side_length, side_length) {}
 
 			virtual ~NoiseGenerator() = default;
 

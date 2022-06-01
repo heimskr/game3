@@ -1,13 +1,14 @@
+#include <iostream>
+
 #include "noise/NoiseGenerator.h"
 
 namespace Game3 {
 	template <typename T = double, typename R = std::mt19937_64>
 	class OlsenNoise: public NoiseGenerator<T, R> {
 		public:
-			size_t sideLength;
 			ssize_t iterations;
 
-			OlsenNoise(R::result_type seed, size_t side_length, ssize_t iterations_): NoiseGenerator<T, R>(seed), sideLength(side_length), iterations(iterations_) {}
+			OlsenNoise(R::result_type seed, size_t side_length, ssize_t iterations_): NoiseGenerator<T, R>(seed, side_length), iterations(iterations_) {}
 
 			~OlsenNoise() override = default;
 
@@ -16,17 +17,17 @@ namespace Game3 {
 			}
 
 			decltype(NoiseGenerator<T, R>::output) & run(T x0, T y0) {
-				T x1 = x0 + sideLength;
-				T y1 = y0 + sideLength;
+				T x1 = x0 + this->sideLength;
+				T y1 = y0 + this->sideLength;
 
 				if (x1 < x0 || y1 < y0 || iterations < 0)
 					return this->output;
 
-				this->output.resize(sideLength, sideLength);
+				this->output.resize(this->sideLength, this->sideLength, 0);
 
 				if (iterations == 0)
-					for (size_t x = 0; x < sideLength; ++x)
-						for (size_t y = 0; y < sideLength; ++y)
+					for (size_t x = 0; x < this->sideLength; ++x)
+						for (size_t y = 0; y < this->sideLength; ++y)
 							this->output(x, y) = hash({size_t(x0 + x), size_t(y0 + y)});
 
 				const auto ux0 = ssize_t(std::floor(x0 / 2)) - 1;
@@ -50,7 +51,7 @@ namespace Game3 {
 
 				for (decltype(cw) x = 0; x < cw; ++x)
 					for (decltype(ch) y = 0; y < ch; ++y) {
-						auto r = hash({size_t(iterations), size_t(cx0 + x), size_t(cy0 + y)}) & (1 << (7 - iterations));
+						auto r = hash({size_t(iterations), size_t(cx0 + x), size_t(cy0 + y)}) & ((1 << 7) - iterations);
 						upsampled(x, y) = upper_map.output(std::floor(x / 2), std::floor(y / 2)) + r;
 					}
 
@@ -67,8 +68,8 @@ namespace Game3 {
 					for (decltype(cw) x = 0; x < cw; ++x)
 						upsampled(x, y) = upsampled(x, y) + upsampled(x + 1, y) + upsampled(x + 2, y);
 
-				for (decltype(sideLength) x = 0; x < sideLength; ++x)
-					for (decltype(sideLength) y = 0; y < sideLength; ++y)
+				for (decltype(this->sideLength) x = 0; x < this->sideLength; ++x)
+					for (decltype(this->sideLength) y = 0; y < this->sideLength; ++y)
 						this->output(x, y) = std::floor(upsampled(x + offset_x, y + offset_y) / 9);
 
 				return this->output;

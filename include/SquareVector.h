@@ -10,15 +10,15 @@ namespace Game3 {
 			size_t height;
 
 			SquareVector(size_t width_, size_t height_) {
-				resize(width_, height_);
+				resize(width_, height_, 0);
 			}
 
 			SquareVector(size_t size_): SquareVector(size_, size_) {}
 
-			void resize(size_t width_, size_t height_, T value = T()) {
+			void resize(size_t width_, size_t height_, T value) {
 				width = width_;
 				height = height_;
-				resize(width * height, value);
+				std::vector<T>::resize(width * height, value);
 			}
 
 			T & operator()(size_t x, size_t y) {

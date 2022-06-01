@@ -1,5 +1,7 @@
 // Contains code from nanogui and from LearnOpenGL (https://github.com/JoeyDeVries/LearnOpenGL)
 
+#include <libnoise/noise.h>
+
 #include "MarchingSquares.h"
 #include "resources.h"
 #include "noise/OlsenNoise.h"
@@ -31,24 +33,25 @@ namespace Game3 {
 		grass = Texture("resources/grass.png");
 		grass.bind();
 
-		int ints[100][100];
+		int ints[1000][1000];
 
 		constexpr static int w = sizeof(ints[0]) / sizeof(ints[0][0]);
 		constexpr static int h = sizeof(ints) / sizeof(ints[0]);
 
-		// int dimension = 320 / 32;
 		int scale = 32;
 		tilemap = std::make_shared<Tilemap>(w, h, scale, grass.width, grass.height, grass.id);
 
 		static int r = 0;
 		static int c = 0;
 
-		static_assert(w == h);
-		OlsenNoise noise(time(nullptr), w, 7);
+		noise::module::Perlin perlin;
+		perlin.SetSeed(666);
 
 		for (int i = 0; i < w; ++i)
-			for (int j = 0; j < h; ++j)
-				ints[j][i] = rand() % 2;
+			for (int j = 0; j < h; ++j) {
+				const auto r = perlin.GetValue(i, j, 0.666);
+				ints[j][i] = r < 0.15;
+			}
 
 		auto get = [&](int x, int y) -> int {
 			x += c;

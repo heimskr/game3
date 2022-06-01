@@ -10,7 +10,7 @@ COMPILER   ?= g++
 CPPFLAGS   := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude
 INCLUDES   := $(shell pkg-config --cflags $(DEPS)) -Inanovg/src
 LIBS       := $(shell pkg-config --libs   $(DEPS))
-LDFLAGS    := -L/lib $(LIBS) -lnanogui -pthread -lGLU -lglut
+LDFLAGS    := -L/lib $(LIBS) -lnanogui -pthread -lGLU -lglut -lnoise
 SOURCES    := $(shell find src -name \*.cpp)
 OBJECTS    := $(SOURCES:.cpp=.o)
 
