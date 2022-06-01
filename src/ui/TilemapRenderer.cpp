@@ -29,7 +29,6 @@ namespace Game3 {
 		glBindTexture(GL_TEXTURE_2D, tilemap->handle);
 		glBindVertexArray(vaoHandle);
 		glm::mat4 projection(1.f);
-		const float scale = 4.f;
 		projection = glm::scale(projection, {tilemap->tileSize, -tilemap->tileSize, 1}) *
 		             glm::scale(projection, {scale / backBufferWidth, scale / backBufferHeight, 1}) *
 		             glm::translate(projection,

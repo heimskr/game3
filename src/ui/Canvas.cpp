@@ -142,4 +142,16 @@ namespace Game3 {
 		tilemapRenderer.onBackBufferResized(width(), height());
 		tilemapRenderer.render(context, font);
 	}
+
+	bool Canvas::scrollEvent(const nanogui::Vector2i &p, const nanogui::Vector2f &rel) {
+		if (nanogui::GLCanvas::scrollEvent(p, rel))
+			return true;
+
+		if (rel.y() == 1)
+			tilemapRenderer.scale *= 1.04f;
+		else if (rel.y() == -1)
+			tilemapRenderer.scale /= 1.04f;
+
+		return true;
+	}
 }
