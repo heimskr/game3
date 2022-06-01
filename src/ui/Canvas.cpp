@@ -30,7 +30,7 @@ namespace Game3 {
 		setBackgroundColor({20, 20, 255, 255});
 
 		constexpr double noise_zoom = 20.;
-		constexpr double noise_threshold = -0.5;
+		constexpr double noise_threshold = -0.25;
 
 		grass = Texture("resources/grass.png");
 		grass.bind();
@@ -119,9 +119,9 @@ namespace Game3 {
 			return true;
 
 		if (rel.y() == 1)
-			tilemapRenderer.scale *= 1.04f;
+			tilemapRenderer.scale *= 1.06f;
 		else if (rel.y() == -1)
-			tilemapRenderer.scale /= 1.04f;
+			tilemapRenderer.scale /= 1.06f;
 
 		return true;
 	}
