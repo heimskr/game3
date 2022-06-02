@@ -20,7 +20,7 @@ namespace Game3 {
 		grass = Texture("resources/tileset2.png");
 		grass.bind();
 
-		int ints[1000][1000];
+		int ints[256][256];
 
 		constexpr static int w = sizeof(ints[0]) / sizeof(ints[0][0]);
 		constexpr static int h = sizeof(ints) / sizeof(ints[0]);

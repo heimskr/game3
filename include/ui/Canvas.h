@@ -39,7 +39,5 @@ namespace Game3 {
 			int font = -1;
 			Image trunksImage;
 			Image treetopsImage;
-
-			void drawTree(float x, float y);
 	};
 }
