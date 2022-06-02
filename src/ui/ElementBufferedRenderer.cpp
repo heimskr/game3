@@ -26,7 +26,7 @@ namespace Game3 {
 		generateVertexArrayObject();
 	}
 
-	void ElementBufferedRenderer::render(NVGcontext *context, int font) {
+	void ElementBufferedRenderer::render(NVGcontext *, int) {
 		glBindTexture(GL_TEXTURE_2D, tilemap->handle);
 		glBindVertexArray(vaoHandle);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboHandle);

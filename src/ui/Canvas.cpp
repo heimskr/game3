@@ -17,17 +17,16 @@ namespace Game3 {
 		constexpr double noise_zoom = 20.;
 		constexpr double noise_threshold = -0.15;
 
-		grass = Texture("resources/tileset2.png");
-		grass.bind();
+		tileset = Texture("resources/tileset2.png");
 
-		int ints[256][256];
+		int ints[20][20];
 
 		constexpr static int w = sizeof(ints[0]) / sizeof(ints[0][0]);
 		constexpr static int h = sizeof(ints) / sizeof(ints[0]);
 
 		int scale = 16;
 		magic = scale / 2;
-		tilemap = std::make_shared<Tilemap>(w, h, scale, grass.width, grass.height, grass.id);
+		tilemap = std::make_shared<Tilemap>(w, h, scale, tileset.width, tileset.height, tileset.id);
 
 		static int r = 0;
 		static int c = 0;
@@ -70,8 +69,6 @@ namespace Game3 {
 		nanogui::GLCanvas::draw(context_);
 		if (context_ != nullptr && context != context_) {
 			context = context_;
-			trunksImage.initialize(context, "resources/lpc/trunk.png");
-			treetopsImage.initialize(context, "resources/lpc/treetop.png");
 			font = nvgCreateFont(context, "FreeSans", "resources/FreeSans.ttf");
 		}
 	}
@@ -102,6 +99,32 @@ namespace Game3 {
 			center().y() += rel.y() / (magic * tilemapRenderer.scale);
 			return true;
 		}
+
+		return false;
+	}
+
+	bool Canvas::mouseButtonEvent(const nanogui::Vector2i &p, int button, bool down, int modifiers) {
+		if (nanogui::GLCanvas::mouseButtonEvent(p, button, down, modifiers))
+			return true;
+
+		if (down) {
+			float fx = p.x();
+			float fy = p.y() - HEADER_HEIGHT / 2.f;
+
+			fx -= width() / 2.f - (tilemap->width * tilemap->tileSize / 4.f) * scale() + center().x() * magic * scale();
+			fx /= tilemap->tileSize * scale() / 2.f;
+
+			fy -= height() / 2.f - (tilemap->height * tilemap->tileSize / 4.f) * scale() + center().y() * magic * scale();
+			fy /= tilemap->tileSize * scale() / 2.f;
+
+			int x = fx;
+			int y = fy;
+
+			std::cerr << x << ", " << y << '\n';
+
+			return true;
+		}
+
 
 		return false;
 	}

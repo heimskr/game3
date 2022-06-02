@@ -24,6 +24,7 @@ namespace Game3 {
 			void drawGL() override;
 			bool scrollEvent(const nanogui::Vector2i &p, const nanogui::Vector2f &rel) override;
 			bool mouseDragEvent(const nanogui::Vector2i &p, const nanogui::Vector2i &rel, int button, int modifiers) override;
+			bool mouseButtonEvent(const nanogui::Vector2i &p, int button, bool down, int modifiers) override;
 
 			nanogui::Vector2f & center() { return tilemapRenderer.center; }
 			float & scale() { return tilemapRenderer.scale; }
@@ -33,11 +34,9 @@ namespace Game3 {
 			float magic = 8.f;
 
 			NVGcontext *context = nullptr;
-			Texture grass;
+			Texture tileset;
 			std::shared_ptr<Tilemap> tilemap;
 			ElementBufferedRenderer tilemapRenderer;
 			int font = -1;
-			Image trunksImage;
-			Image treetopsImage;
 	};
 }
