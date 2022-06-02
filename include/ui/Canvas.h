@@ -18,8 +18,6 @@ namespace Game3 {
 		public:
 			Canvas(nanogui::Widget *parent);
 
-			~Canvas();
-
 			// void drawImage(const Texture &, const nanogui::Vector2f &screen_pos, const nanogui::Vector2f &image_offset = {0.f, 0.f}, const nanogui::Vector2f &image_extent = {-1.f, -1.f});
 
 			void draw(NVGcontext *) override;
