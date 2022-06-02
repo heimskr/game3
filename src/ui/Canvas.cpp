@@ -35,7 +35,7 @@ namespace Game3 {
 		constexpr double noise_zoom = 20.;
 		constexpr double noise_threshold = -0.25;
 
-		grass = Texture("resources/grass.png");
+		grass = Texture("resources/tileset2.png");
 		grass.bind();
 
 		int ints[1000][1000];
@@ -43,7 +43,8 @@ namespace Game3 {
 		constexpr static int w = sizeof(ints[0]) / sizeof(ints[0][0]);
 		constexpr static int h = sizeof(ints) / sizeof(ints[0]);
 
-		int scale = 32;
+		int scale = 16;
+		magic = scale / 2;
 		tilemap = std::make_shared<Tilemap>(w, h, scale, grass.width, grass.height, grass.id);
 
 		static int r = 0;
@@ -53,8 +54,26 @@ namespace Game3 {
 		perlin.SetSeed(666);
 
 		for (int i = 0; i < w; ++i)
-			for (int j = 0; j < h; ++j)
-				ints[j][i] = perlin.GetValue(i / noise_zoom, j / noise_zoom, 0.666) < noise_threshold;
+			for (int j = 0; j < h; ++j) {
+				double noise = perlin.GetValue(i / noise_zoom, j / noise_zoom, 0.666);
+				int &tile = ints[j][i];
+				if (noise < noise_threshold) {
+					tile = 4;
+				} else if (noise < noise_threshold + 0.1) {
+					tile = 3;
+				} else if (noise < noise_threshold + 0.2) {
+					tile = 2;
+				} else if (noise < noise_threshold + 0.3) {
+					tile = 1;
+				} else if (noise < noise_threshold + 0.4) {
+					tile = 0;
+				} else if (noise < noise_threshold + 0.4) {
+					tile = 11;
+				} else {
+					tile = 12;
+				}
+				// ints[j][i] =  < noise_threshold;
+			}
 
 		auto get = [&](int x, int y) -> int {
 			x += c;
@@ -68,25 +87,26 @@ namespace Game3 {
 
 		for (r = padding; r < h - padding; ++r) {
 			for (c = padding; c < w - padding; ++c) {
-				int topleft = get(-1, -1), top = get(0, -1), topright = get(1, -1), left = get(-1, 0), right = get(1, 0), bottomleft = get(-1, 1), bottom = get(0, 1), bottomright = get(1, 1);
-				if (!top || !left) topleft = 0;
-				if (!top || !right) topright = 0;
-				if (!bottom || !left) bottomleft = 0;
-				if (!bottom || !right) bottomright = 0;
-				int sum = topleft + (top << 1) + (topright << 2) + (left << 3) + (right << 4) + (bottomleft << 5) + (bottom << 6) + (bottomright << 7);
-				bool center = get(0, 0) != 0;
-				if (!center)
-					sum = 0;
-				int index = marchingMap.at(sum);
-				if (center && sum == 0) {
-					index = 15;
-				} else if (index == 12) {
-					constexpr static int full[] {12, 30, 41, 41, 41, 41, 41};
-					srand((r << 20) | c);
-					index = full[rand() % (sizeof(full) / sizeof(full[0]))];
-				}
-				(*tilemap)(c, r) = index;
-				tilemap->sums.at(c + r * tilemap->width) = sum;
+				// int topleft = get(-1, -1), top = get(0, -1), topright = get(1, -1), left = get(-1, 0), right = get(1, 0), bottomleft = get(-1, 1), bottom = get(0, 1), bottomright = get(1, 1);
+				// if (!top || !left) topleft = 0;
+				// if (!top || !right) topright = 0;
+				// if (!bottom || !left) bottomleft = 0;
+				// if (!bottom || !right) bottomright = 0;
+				// int sum = topleft + (top << 1) + (topright << 2) + (left << 3) + (right << 4) + (bottomleft << 5) + (bottom << 6) + (bottomright << 7);
+				// bool center = get(0, 0) != 0;
+				// if (!center)
+				// 	sum = 0;
+				// int index = marchingMap.at(sum);
+				// if (center && sum == 0) {
+				// 	index = 15;
+				// } else if (index == 12) {
+				// 	constexpr static int full[] {12, 30, 41, 41, 41, 41, 41};
+				// 	srand((r << 20) | c);
+				// 	index = full[rand() % (sizeof(full) / sizeof(full[0]))];
+				// }
+				// (*tilemap)(c, r) = index;
+				// tilemap->sums.at(c + r * tilemap->width) = sum;
+				(*tilemap)(c, r) = ints[r][c];
 			}
 		}
 
@@ -119,23 +139,23 @@ namespace Game3 {
 	void Canvas::drawGL() {
 		tilemapRenderer.onBackBufferResized(width(), height());
 		tilemapRenderer.render(context, font);
-		drawTree(8, -8);
-		drawTree(10, -5);
+		// drawTree(8, -8);
+		// drawTree(10, -5);
 	}
 
 	void Canvas::drawTree(float x, float y) {
 		float ix = width() / 2.f;
 		float iy = (height() - HEADER_HEIGHT) / 2.f + HEADER_HEIGHT;
-		ix += (center().x() + x) * scale() * 16.f;
-		iy += (center().y() + y) * scale() * 16.f;
+		ix += (center().x() + x) * scale() * magic;
+		iy += (center().y() + y) * scale() * magic;
 		ix -= scale() * 96.f / 4.f;
 		iy -= scale() * (80.f + 40.f) / 4.f;
 		trunksImage.draw(ix, iy, 0, 0, 96, 80, scale() / 2.f);
 
 		ix = width() / 2.f;
 		iy = (height() - HEADER_HEIGHT) / 2.f + HEADER_HEIGHT;
-		ix += (center().x() + x) * scale() * 16.f;
-		iy += (center().y() + y) * scale() * 16.f;
+		ix += (center().x() + x) * scale() * magic;
+		iy += (center().y() + y) * scale() * magic;
 		ix -= scale() * 96.f / 4.f;
 		iy -= scale() * (80.f + 190.f) / 4.f;
 		treetopsImage.draw(ix, iy, 0, 0, 96, 80, scale() / 2.f);
@@ -163,8 +183,8 @@ namespace Game3 {
 			return true;
 
 		if (button == 1) {
-			center().x() += rel.x() / (16. * tilemapRenderer.scale);
-			center().y() += rel.y() / (16. * tilemapRenderer.scale);
+			center().x() += rel.x() / (magic * tilemapRenderer.scale);
+			center().y() += rel.y() / (magic * tilemapRenderer.scale);
 			return true;
 		}
 

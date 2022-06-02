@@ -32,6 +32,7 @@ namespace Game3 {
 
 		private:
 			constexpr static float HEADER_HEIGHT = 56.f;
+			float magic = 8.f;
 
 			NVGcontext *context = nullptr;
 			Texture grass;
