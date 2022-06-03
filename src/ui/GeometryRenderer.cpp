@@ -3,8 +3,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#define GL_GLEXT_PROTOTYPES
-#include <GL/glew.h>
+#include <nanogui/opengl.h>
+#include <nanogui/glutil.h>
 
 #include "resources.h"
 #include "ui/GeometryRenderer.h"

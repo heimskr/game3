@@ -115,32 +115,51 @@ namespace Game3 {
 	void Application::newGameWindow() {
 		auto *window = new nanogui::Window(this, "New Game");
 		window->setLayout(new nanogui::GroupLayout());
-		window->add<nanogui::Label>("Seed");
 
-		auto *textbox = new nanogui::IntBox(window, 1024);
-		textbox->setAlignment(nanogui::TextBox::Alignment::Left);
-		textbox->setEditable(true);
+		window->add<nanogui::Label>("Seed");
+		auto *seedbox = new nanogui::IntBox(window, 1024);
+		seedbox->setAlignment(nanogui::TextBox::Alignment::Left);
+		seedbox->setEditable(true);
+
+		window->add<nanogui::Label>("Width");
+		auto *widthbox = new nanogui::IntBox(window, 256);
+		widthbox->setAlignment(nanogui::TextBox::Alignment::Left);
+		widthbox->setEditable(true);
+
+		window->add<nanogui::Label>("Height");
+		auto *heightbox = new nanogui::IntBox(window, 256);
+		heightbox->setAlignment(nanogui::TextBox::Alignment::Left);
+		heightbox->setEditable(true);
 
 		auto *panel = new Widget(window);
 		panel->setLayout(new nanogui::BoxLayout(nanogui::Orientation::Horizontal, nanogui::Alignment::Middle, 0, 15));
 
 		(new nanogui::Button(panel, "Create"))->setCallback([=, this] {
-			const auto seed = textbox->value();
+			const auto seed = seedbox->value();
+			const auto width = widthbox->value();
+			const auto height = heightbox->value();
 			window->dispose();
-			newGame(seed);
+			newGame(seed, width, height);
 		});
 
 		(new nanogui::Button(panel, "Cancel"))->setCallback([=] {
 			window->dispose();
 		});
 
-		window->setSize({300, 140});
+		window->setSize({300, 270});
 		window->performLayout(nvgContext());
 		window->center();
 		window->requestFocus();
 	}
 
-	void Application::newGame(int seed) {
-		
+	void Application::newGame(int seed, int width, int height) {
+		game = std::make_shared<Game>();
+		Texture texture("resources/tileset2.png");
+		auto tilemap = std::make_shared<Tilemap>(width, height, 16, texture);
+		auto realm = std::make_shared<Realm>(1, tilemap);
+		game->realms.emplace(realm->id, realm);
+		game->activeRealm = realm;
+		realm->generate(seed);
+		canvas->game = game;
 	}
 }

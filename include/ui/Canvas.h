@@ -2,9 +2,6 @@
 
 #include <random>
 
-#define GL_GLEXT_PROTOTYPES
-#include <GL/glew.h>
-
 #include <nanogui/opengl.h>
 #include <nanogui/glutil.h>
 #include <nanogui/screen.h>
@@ -25,7 +22,7 @@ namespace Game3 {
 	class Canvas: public nanogui::GLCanvas {
 		public:
 			std::shared_ptr<Game> game;
-			nanogui::Vector2f center;
+			nanogui::Vector2f center {0.f, 0.f};
 			float scale = 1.f;
 
 			Canvas(nanogui::Widget *parent);

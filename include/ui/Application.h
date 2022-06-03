@@ -1,8 +1,5 @@
 #pragma once
 
-#define GL_GLEXT_PROTOTYPES
-#include <GL/glew.h>
-
 #include <nanogui/opengl.h>
 #include <nanogui/glutil.h>
 #include <nanogui/screen.h>
@@ -51,7 +48,7 @@ namespace Game3 {
 
 			void onJoystick(int joystick_id, int event);
 			void newGameWindow();
-			void newGame(int seed);
+			void newGame(int seed, int width, int height);
 
 			static Application *instance;
 	};

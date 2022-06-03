@@ -1,16 +1,13 @@
+#include <nanogui/opengl.h>
+#include <nanogui/glutil.h>
+
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#define GL_GLEXT_PROTOTYPES
-#include <GL/glew.h>
-
 #include "resources.h"
 #include "ui/ElementBufferedRenderer.h"
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glext.h>
 
 // Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Renderers/ElementBufferedRenderer.cs
 

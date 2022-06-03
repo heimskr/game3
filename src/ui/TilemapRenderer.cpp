@@ -1,8 +1,7 @@
 #include <iostream>
 
-#define GL_GLEXT_PROTOTYPES
-#include <GL/glew.h>
-#include <GL/gl.h>
+#include <nanogui/opengl.h>
+#include <nanogui/glutil.h>
 
 #include "ui/TilemapRenderer.h"
 

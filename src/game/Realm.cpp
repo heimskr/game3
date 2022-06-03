@@ -12,9 +12,21 @@
 #include "Tiles.h"
 
 namespace Game3 {
+	Realm::Realm(int id_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_):
+	id(id_), tilemap1(tilemap1_), tilemap2(tilemap2_), tilemap3(tilemap3_) {
+		if (tilemap1)
+			renderer1.initialize(tilemap1);
+		if (tilemap2)
+			renderer2.initialize(tilemap2);
+		if (tilemap3)
+			renderer3.initialize(tilemap3);
+	}
+
 	Realm::Realm(int id_, const std::shared_ptr<Tilemap> &tilemap1_): Realm(id_, tilemap1_, nullptr, nullptr) {
 		tilemap2 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->texture);
 		tilemap3 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->texture);
+		renderer2.initialize(tilemap2);
+		renderer3.initialize(tilemap3);
 	}
 
 	void Realm::render(const int width, const int height, const nanogui::Vector2f &center, float scale) {
