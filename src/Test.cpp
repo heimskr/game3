@@ -18,7 +18,7 @@ namespace Game3 {
 		game.realms.emplace(realm->id, realm);
 		auto building = std::make_shared<Building>(60, 12, 12, 2);
 		realm->tileEntities.emplace(getIndex(building->row, building->column), building);
-		realm->tilemap->tiles.at(getIndex(building->row, building->column)) = building->tileID;
+		realm->tilemap1->tiles.at(getIndex(building->row, building->column)) = building->tileID;
 		nlohmann::json json = game;
 		const std::string dumped = json.dump();
 		std::cout << dumped << '\n';

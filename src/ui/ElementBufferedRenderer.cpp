@@ -3,30 +3,47 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#define GL_GLEXT_PROTOTYPES
+#include <GL/glew.h>
+
 #include "resources.h"
 #include "ui/ElementBufferedRenderer.h"
+#include <GL/gl.h>
 #include <GL/glu.h>
+#include <GL/glext.h>
 
 // Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Renderers/ElementBufferedRenderer.cs
 
 namespace Game3 {
 	ElementBufferedRenderer::~ElementBufferedRenderer() {
-		glDeleteVertexArrays(1, &vaoHandle);
-		glDeleteBuffers(1, &eboHandle);
-		glDeleteBuffers(1, &vboHandle);
-		glDeleteProgram(shaderHandle);
+		reset();
+	}
+
+	void ElementBufferedRenderer::reset() {
+		if (initialized) {
+			glDeleteVertexArrays(1, &vaoHandle);
+			glDeleteBuffers(1, &eboHandle);
+			glDeleteBuffers(1, &vboHandle);
+			glDeleteProgram(shaderHandle);
+			tilemap.reset();
+			initialized = false;
+		}
 	}
 
 	void ElementBufferedRenderer::initialize(const std::shared_ptr<Tilemap> &tilemap_) {
+		if (initialized)
+			reset();
+
 		tilemap = tilemap_;
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		createShader();
 		generateVertexBufferObject();
 		generateElementBufferObject();
 		generateVertexArrayObject();
+		initialized = true;
 	}
 
-	void ElementBufferedRenderer::render(NVGcontext *, int) {
+	void ElementBufferedRenderer::render() {
 		glBindTexture(GL_TEXTURE_2D, tilemap->texture.id);
 		glBindVertexArray(vaoHandle);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboHandle);

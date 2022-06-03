@@ -3,8 +3,19 @@
 #include <zstd.h>
 
 #include "Tilemap.h"
+#include "Tiles.h"
 
 namespace Game3 {
+	std::vector<unsigned> Tilemap::getLand(size_t right_pad, size_t bottom_pad) const {
+		std::vector<unsigned> land_tiles;
+		land_tiles.reserve(width * height);
+		for (size_t row = 0; row < height - bottom_pad; ++row)
+			for (size_t column = 0; column < width - right_pad; ++column)
+				if (isLand(tiles[row * width + column]))
+					land_tiles.push_back(row * width + column);
+		return land_tiles;
+	}
+
 	void to_json(nlohmann::json &json, const Tilemap &tilemap) {
 		json["height"] = tilemap.height;
 		json["setHeight"] = tilemap.setHeight;

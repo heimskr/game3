@@ -11,6 +11,8 @@ namespace Game3 {
 	class Game {
 		public:
 			std::unordered_map<int, std::shared_ptr<Realm>> realms;
+			std::shared_ptr<Realm> activeRealm;
+			std::pair<Index, Index> playerPosition;
 	};
 
 	void to_json(nlohmann::json &, const Game &);

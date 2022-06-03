@@ -4,10 +4,6 @@
 
 #include "ui/Application.h"
 
-#include <GL/glut.h>
-#include "Texture.h"
-#include "ui/TilemapRenderer.h"
-
 // #define CATCH
 
 namespace Game3 {

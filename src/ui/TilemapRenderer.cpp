@@ -1,5 +1,9 @@
 #include <iostream>
 
+#define GL_GLEXT_PROTOTYPES
+#include <GL/glew.h>
+#include <GL/gl.h>
+
 #include "ui/TilemapRenderer.h"
 
 namespace Game3 {

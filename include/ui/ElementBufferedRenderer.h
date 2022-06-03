@@ -8,10 +8,14 @@ namespace Game3 {
 			ElementBufferedRenderer() = default;
 			virtual ~ElementBufferedRenderer() override;
 
+			void reset();
 			void initialize(const std::shared_ptr<Tilemap> &) override;
-			void render(NVGcontext *, int font) override;
+			void render() override;
+
+			operator bool() const { return initialized; }
 
 		private:
+			bool initialized = false;
 			GLuint shaderHandle;
 			GLuint vboHandle;
 			GLuint eboHandle;

@@ -1,5 +1,8 @@
 #pragma once
 
+#define GL_GLEXT_PROTOTYPES
+#include <GL/glew.h>
+
 #include <nanogui/opengl.h>
 #include <nanogui/glutil.h>
 #include <nanogui/screen.h>
@@ -25,12 +28,15 @@
 #include <nanogui/tabwidget.h>
 #include <stb_image.h>
 
+#include "game/Game.h"
 #include "lib/GLTexture.h"
 #include "ui/Canvas.h"
 
 namespace Game3 {
 	class Application: public nanogui::Screen {
 		public:
+			std::shared_ptr<Game> game;
+
 			Application();
 
 			~Application();

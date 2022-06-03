@@ -7,6 +7,7 @@
 #include <nlohmann/json.hpp>
 
 #include "Texture.h"
+#include "Types.h"
 
 namespace Game3 {
 	struct Tilemap {
@@ -33,6 +34,8 @@ namespace Game3 {
 		decltype(tiles)::value_type & operator()(int x, int y) {
 			return tiles[x + y * width];
 		}
+
+		std::vector<Index> getLand(size_t right_pad = 0, size_t bottom_pad = 0) const;
 	};
 
 	void to_json(nlohmann::json &, const Tilemap &);

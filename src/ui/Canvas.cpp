@@ -3,13 +3,12 @@
 #include <unordered_set>
 
 #include <libnoise/noise.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+
+#include "ui/Canvas.h"
 
 #include "MarchingSquares.h"
 #include "resources.h"
-#include "ui/Canvas.h"
+#include "game/Game.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 
@@ -17,80 +16,8 @@ namespace Game3 {
 
 	Canvas::Canvas(nanogui::Widget *parent_): GLCanvas(parent_) {
 		setBackgroundColor({66, 172, 175, 255});
-
-		constexpr double noise_zoom = 100.;
-		constexpr double noise_threshold = -0.15;
-
-		tileset = Texture("resources/tileset2.png");
-
-		TileID tiles1[HEIGHT][WIDTH];
-		TileID tiles2[HEIGHT][WIDTH];
-
-		std::memset(tiles2, 0, sizeof(tiles2));
-
 		int scale = 16;
 		magic = scale / 2;
-		tilemap1 = std::make_shared<Tilemap>(WIDTH, HEIGHT, scale, tileset);
-		tilemap2 = std::make_shared<Tilemap>(WIDTH, HEIGHT, scale, tileset);
-
-		noise::module::Perlin perlin;
-		perlin.SetSeed(666);
-		static const std::vector<TileID> grasses {GRASS_ALT1, GRASS_ALT2, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS};
-
-		for (size_t i = 0; i < WIDTH; ++i)
-			for (size_t j = 0; j < HEIGHT; ++j) {
-				double noise = perlin.GetValue(i / noise_zoom, j / noise_zoom, 0.666);
-				auto &tile = tiles1[j][i];
-				if (noise < noise_threshold)
-					tile = DEEPER_WATER;
-				else if (noise < noise_threshold + 0.1)
-					tile = DEEP_WATER;
-				else if (noise < noise_threshold + 0.2)
-					tile = WATER;
-				else if (noise < noise_threshold + 0.3)
-					tile = SHALLOW_WATER;
-				else if (noise < noise_threshold + 0.4)
-					tile = SAND;
-				else if (noise < noise_threshold + 0.5)
-					tile = LIGHT_GRASS;
-				else
-					tile = choose(grasses, (i << 20) | j);
-			}
-
-		constexpr static int m = 15, n = 21, pad = 2;
-		std::vector<unsigned> starts;
-		std::vector<unsigned> candidates;
-		Timer land_timer("GetLand");
-		starts = getLand(tiles1, m + pad * 2, n + pad * 2);
-		land_timer.stop();
-		candidates.reserve(starts.size() / 16);
-		Timer candidate_timer("Candidates");
-		for (const auto index: starts) {
-			const size_t row_start = index / WIDTH + pad, row_end = row_start + m;
-			const size_t column_start = index % WIDTH + pad, column_end = column_start + n;
-			for (size_t row = row_start; row < row_end; ++row)
-				for (size_t column = column_start; column < column_end; ++column)
-					if (!isLand(tiles1[row][column]))
-						goto failed;
-			candidates.push_back(index);
-			failed:
-			continue;
-		}
-		candidate_timer.stop();
-		Timer::summary();
-
-		std::cout << "Found " << candidates.size() << " candidate" << (candidates.size() == 1? "" : "s") << ".\n";
-		if (!candidates.empty())
-			createTown(tiles1, tiles2, choose(candidates, 666) + pad * (WIDTH + 1), n, m, pad);
-
-		for (size_t r = 0; r < HEIGHT; ++r)
-			for (size_t c = 0; c < WIDTH; ++c) {
-				(*tilemap1)(c, r) = tiles1[r][c];
-				(*tilemap2)(c, r) = tiles2[r][c];
-			}
-
-		tilemapRenderer1.initialize(tilemap1);
-		tilemapRenderer2.initialize(tilemap2);
 	}
 
 	void Canvas::draw(NVGcontext *context_) {
@@ -102,10 +29,10 @@ namespace Game3 {
 	}
 
 	void Canvas::drawGL() {
-		tilemapRenderer1.onBackBufferResized(width(), height());
-		tilemapRenderer2.onBackBufferResized(width(), height());
-		tilemapRenderer1.render(context, font);
-		tilemapRenderer2.render(context, font);
+		if (game && game->activeRealm) {
+			auto &realm = *game->activeRealm;
+			realm.render(width(), height(), center, scale);
+		}
 	}
 
 	bool Canvas::scrollEvent(const nanogui::Vector2i &p, const nanogui::Vector2f &rel) {
@@ -113,9 +40,9 @@ namespace Game3 {
 			return true;
 
 		if (rel.y() == 1)
-			scale(scale() * 1.06f);
+			scale *= 1.06f;
 		else if (rel.y() == -1)
-			scale(scale() / 1.06f);
+			scale /= 1.06f;
 
 		return true;
 	}
@@ -125,10 +52,8 @@ namespace Game3 {
 			return true;
 
 		if (button == 1) {
-			auto vec = center();
-			vec.x() += rel.x() / (magic * scale());
-			vec.y() += rel.y() / (magic * scale());
-			center(vec);
+			center.x() += rel.x() / (magic * scale);
+			center.y() += rel.y() / (magic * scale);
 			return true;
 		}
 
@@ -139,15 +64,18 @@ namespace Game3 {
 		if (nanogui::GLCanvas::mouseButtonEvent(p, button, down, modifiers))
 			return true;
 
-		if (!down) {
+		if (!down && game && game->activeRealm) {
+			const auto &realm = *game->activeRealm;
+			const auto &tilemap = realm.tilemap1;
+
 			float fx = p.x();
 			float fy = p.y() - HEADER_HEIGHT / 2.f;
 
-			fx -= width() / 2.f - (WIDTH * tilemap1->tileSize / 4.f) * scale() + center().x() * magic * scale();
-			fx /= tilemap1->tileSize * scale() / 2.f;
+			fx -= width() / 2.f - (tilemap->width * tilemap->tileSize / 4.f) * scale + center.x() * magic * scale;
+			fx /= tilemap->tileSize * scale / 2.f;
 
-			fy -= height() / 2.f - (HEIGHT * tilemap1->tileSize / 4.f) * scale() + center().y() * magic * scale();
-			fy /= tilemap1->tileSize * scale() / 2.f;
+			fy -= height() / 2.f - (tilemap->height * tilemap->tileSize / 4.f) * scale + center.y() * magic * scale;
+			fy /= tilemap->tileSize * scale / 2.f;
 
 			int x = fx;
 			int y = fy;
@@ -158,109 +86,5 @@ namespace Game3 {
 		}
 
 		return false;
-	}
-
-	std::vector<unsigned> Canvas::getLand(TileID tiles[HEIGHT][WIDTH], size_t right_pad, size_t bottom_pad) const {
-		std::vector<unsigned> land_tiles;
-		land_tiles.reserve(WIDTH * HEIGHT);
-		for (size_t row = 0; row < HEIGHT - bottom_pad; ++row)
-			for (size_t column = 0; column < WIDTH - right_pad; ++column)
-				if (isLand(tiles[row][column]))
-					land_tiles.push_back(row * WIDTH + column);
-		return land_tiles;
-	}
-
-	void Canvas::createTown(TileID layer1[HEIGHT][WIDTH], TileID layer2[HEIGHT][WIDTH], size_t index, size_t width, size_t height, size_t pad) const {
-		size_t row = 0, column = 0;
-
-		auto set1 = [&](TileID tile) { layer1[row][column] = tile; };
-		auto set2 = [&](TileID tile) { layer2[row][column] = tile; };
-
-		for (size_t row = index / WIDTH; row < index / WIDTH + height; ++row) {
-			layer2[row][index % WIDTH] = TOWER_NS;
-			layer2[row][index % WIDTH + width - 1] = TOWER_NS;
-		}
-
-		for (size_t column = index % WIDTH; column < index % WIDTH + width; ++column) {
-			layer2[index / WIDTH][column] = TOWER_WE;
-			layer2[index / WIDTH + height - 1][column] = TOWER_WE;
-		}
-
-		layer2[index / WIDTH][index % WIDTH] = TOWER_NW;
-		layer2[index / WIDTH + height - 1][index % WIDTH] = TOWER_SW;
-		layer2[index / WIDTH][index % WIDTH + width - 1] = TOWER_NE;
-		layer2[index / WIDTH + height - 1][index % WIDTH + width - 1] = TOWER_SE;
-
-		std::unordered_set<unsigned> buildable_set;
-
-		for (row = index / WIDTH + 1; row < index / WIDTH + height - 1; ++row)
-			for (column = index % WIDTH + 1; column < index % WIDTH + width - 1; ++column) {
-				buildable_set.insert(row * WIDTH + column);
-				set1(DIRT);
-			}
-
-		row = index / WIDTH + height / 2;
-		for (column = index % WIDTH - pad; column < index % WIDTH + width + pad; ++column) {
-			buildable_set.erase(row * WIDTH + column);
-			set1(ROAD);
-		}
-		column = index % WIDTH;
-		set2(EMPTY);
-		--row;
-		set2(TOWER_S);
-		row += 2;
-		set2(TOWER_N);
-		--row;
-		column += width - 1;
-		set2(EMPTY);
-		--row;
-		set2(TOWER_S);
-		row += 2;
-		set2(TOWER_N);
-		--row;
-		column = index % WIDTH + width / 2;
-		for (row = index / WIDTH - pad; row < index / WIDTH + height + pad; ++row) {
-			buildable_set.erase(row * WIDTH + column);
-			set1(ROAD);
-		}
-		row = index / WIDTH;
-		set2(EMPTY);
-		--column;
-		set2(TOWER_NE);
-		column += 2;
-		set2(TOWER_NW);
-		--column;
-		row += height - 1;
-		set2(EMPTY);
-		--column;
-		set2(TOWER_NE);
-		column += 2;
-		set2(TOWER_NW);
-		--column;
-
-		std::vector<unsigned> buildable(buildable_set.cbegin(), buildable_set.cend());
-		shuffle(buildable, 666);
-		if (2 < buildable.size()) {
-			buildable.erase(buildable.begin() + buildable.size() / 10, buildable.end());
-			buildable_set = std::unordered_set<unsigned>(buildable.cbegin(), buildable.cend());
-			std::vector<TileID> houses {HOUSE1, HOUSE2, HOUSE3};
-			std::default_random_engine rng;
-			rng.seed(666);
-			while (!buildable_set.empty()) {
-				auto index = *buildable_set.begin();
-				auto house = choose(houses, rng);
-				layer2[index / WIDTH][index % WIDTH] = house;
-				buildable_set.erase(index);
-				// Some of these are sus if index happens to be at the west or east edge, but those aren't valid locations for houses anyway.
-				buildable_set.erase(index - WIDTH);
-				buildable_set.erase(index + WIDTH);
-				buildable_set.erase(index - WIDTH - 1);
-				buildable_set.erase(index + WIDTH - 1);
-				buildable_set.erase(index - WIDTH + 1);
-				buildable_set.erase(index + WIDTH + 1);
-				buildable_set.erase(index - 1);
-				buildable_set.erase(index + 1);
-			}
-		}
 	}
 }

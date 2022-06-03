@@ -2,8 +2,7 @@
 
 #include <memory>
 
-#include <nanogui/opengl.h>
-#include <nanogui/glutil.h>
+#include <nanogui/common.h>
 
 #include "Tilemap.h"
 
@@ -23,7 +22,7 @@ namespace Game3 {
 			virtual ~TilemapRenderer() = default;
 
 			virtual void initialize(const std::shared_ptr<Tilemap> &) = 0;
-			virtual void render(NVGcontext *, int font) = 0;
+			virtual void render() = 0;
 			virtual void onBackBufferResized(int width, int height);
 
 		protected:

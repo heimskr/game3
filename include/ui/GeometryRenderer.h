@@ -2,6 +2,9 @@
 
 // Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Renderers/GeometryRenderer.cs
 
+#include <GL/gl.h>
+#include <GL/glext.h>
+
 #include "ui/TilemapRenderer.h"
 
 namespace Game3 {
@@ -18,7 +21,7 @@ namespace Game3 {
 			~GeometryRenderer() override;
 
 			void initialize(const std::shared_ptr<Tilemap> &) override;
-			void render(NVGcontext * = nullptr, int font = -1) override;
+			void render() override;
 
 		private:
 			GLuint shaderHandle = -1;

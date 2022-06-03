@@ -3,6 +3,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#define GL_GLEXT_PROTOTYPES
+#include <GL/glew.h>
+
 #include "resources.h"
 #include "ui/GeometryRenderer.h"
 #include <GL/glu.h>
@@ -24,7 +27,7 @@ namespace Game3 {
 		generateVertexArrayObject();
 	}
 
-	void GeometryRenderer::render(NVGcontext *, int) {
+	void GeometryRenderer::render() {
 		glUseProgram(shaderHandle);
 		glBindTexture(GL_TEXTURE_2D, tilemap->texture.id);
 		glBindVertexArray(vaoHandle);

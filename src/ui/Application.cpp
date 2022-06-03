@@ -55,29 +55,27 @@ namespace Game3 {
 
 		if (canvas) {
 			std::cout << key << ", " << scancode << ", " << action << ", " << modifiers << '\n';
-			auto center = canvas->center();
 			switch (key) {
 				case GLFW_KEY_DOWN:
 				case GLFW_KEY_S:
-					center.y() += 0.1f;
+					canvas->center.y() += 0.1f;
 					break;
 				case GLFW_KEY_UP:
 				case GLFW_KEY_W:
-					center.y() -= 0.1f;
+					canvas->center.y() -= 0.1f;
 					break;
 				case GLFW_KEY_LEFT:
 				case GLFW_KEY_A:
-					center.x() -= 0.1f;
+					canvas->center.x() -= 0.1f;
 					break;
 				case GLFW_KEY_RIGHT:
 				case GLFW_KEY_D:
-					center.x() += 0.1f;
+					canvas->center.x() += 0.1f;
 					break;
 				default:
 					return false;
 			}
 
-			canvas->center(center);
 			return true;
 		}
 
@@ -101,13 +99,11 @@ namespace Game3 {
 				if (axes != nullptr && 2 <= axis_count) {
 					const float x = axes[0];
 					const float divisor = 20.f;
-					auto center = canvas->center();
 					if (x <= -0.01 || 0.01 <= x)
-						center.x() += x / divisor;
+						canvas->center.x() += x / divisor;
 					const float y = axes[1];
 					if (y <= -0.01 || 0.01 <= y)
-						center.y() += y / divisor;
-					canvas->center(center);
+						canvas->center.y() += y / divisor;
 				}
 			}
 	}
