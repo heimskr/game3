@@ -33,6 +33,13 @@ namespace Game3 {
 		return container.at(getRandom(seed) % container.size());
 	}
 
+	template <typename T>
+	const T::value_type & choose(const T &container, typename std::default_random_engine::result_type seed = 0) {
+		if (container.empty())
+			throw std::invalid_argument("Container is empty");
+		return container.at(getRandom(seed) % container.size());
+	}
+
 	template <typename T, typename R>
 	T::value_type & choose(T &container, R &rng) {
 		if (container.empty())

@@ -35,28 +35,26 @@ namespace Game3 {
 
 		noise::module::Perlin perlin;
 		perlin.SetSeed(666);
+		static const std::vector<Tile> grasses {GRASS_ALT1, GRASS_ALT2, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS};
 
 		for (size_t i = 0; i < WIDTH; ++i)
 			for (size_t j = 0; j < HEIGHT; ++j) {
 				double noise = perlin.GetValue(i / noise_zoom, j / noise_zoom, 0.666);
 				uint8_t &tile = tiles1[j][i];
-				if (noise < noise_threshold) {
+				if (noise < noise_threshold)
 					tile = DEEPER_WATER;
-				} else if (noise < noise_threshold + 0.1) {
+				else if (noise < noise_threshold + 0.1)
 					tile = DEEP_WATER;
-				} else if (noise < noise_threshold + 0.2) {
+				else if (noise < noise_threshold + 0.2)
 					tile = WATER;
-				} else if (noise < noise_threshold + 0.3) {
+				else if (noise < noise_threshold + 0.3)
 					tile = SHALLOW_WATER;
-				} else if (noise < noise_threshold + 0.4) {
+				else if (noise < noise_threshold + 0.4)
 					tile = SAND;
-				} else if (noise < noise_threshold + 0.5) {
+				else if (noise < noise_threshold + 0.5)
 					tile = LIGHT_GRASS;
-				} else {
-					constexpr static Tile grasses[] {GRASS_ALT1, GRASS_ALT2, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS};
-					srand((i << 20) | j);
-					tile = grasses[rand() % (sizeof(grasses) / sizeof(grasses[0]))];
-				}
+				else
+					tile = choose(grasses);
 			}
 
 		constexpr static int m = 15, n = 21, pad = 2;
