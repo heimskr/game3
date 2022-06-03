@@ -15,15 +15,17 @@ namespace Game3 {
 		buttonBox = new nanogui::Widget(this);
 		buttonBox->setLayout(new nanogui::BoxLayout(nanogui::Orientation::Horizontal, nanogui::Alignment::Minimum, -1, -1));
 
-		auto *b = new nanogui::Button(buttonBox, "", ENTYPO_ICON_SAVE);
-		auto *theme = new nanogui::Theme(*b->theme());
+		auto *new_button = new nanogui::Button(buttonBox, "", ENTYPO_ICON_CIRCLE_WITH_PLUS);
+		auto *theme = new nanogui::Theme(*new_button->theme());
 		theme->mButtonCornerRadius = 0;
-		b->setTheme(theme);
-		b->setCallback([] { std::cout << ":)\n"; });
-		b->setEnabled(false);
+		new_button->setTheme(theme);
 
-		auto *b2 = new nanogui::Button(buttonBox, "", ENTYPO_ICON_FOLDER);
-		b2->setTheme(theme);
+		auto *save_button = new nanogui::Button(buttonBox, "", ENTYPO_ICON_SAVE);
+		save_button->setTheme(theme);
+		save_button->setEnabled(false);
+
+		auto *open_button = new nanogui::Button(buttonBox, "", ENTYPO_ICON_FOLDER);
+		open_button->setTheme(theme);
 
 		glfwSetJoystickCallback(+[](int joystick_id, int event) {
 			std::cout << joystick_id << ": " << event << '\n';
