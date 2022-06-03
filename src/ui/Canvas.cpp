@@ -54,7 +54,7 @@ namespace Game3 {
 				else if (noise < noise_threshold + 0.5)
 					tile = LIGHT_GRASS;
 				else
-					tile = choose(grasses);
+					tile = choose(grasses, (i << 20) | j);
 			}
 
 		constexpr static int m = 15, n = 21, pad = 2;
