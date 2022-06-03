@@ -2,6 +2,7 @@
 
 #include "ui/Application.h"
 #include "ui/Canvas.h"
+#include "util/Util.h"
 
 namespace Game3 {
 	Application * Application::instance = nullptr;
@@ -19,6 +20,7 @@ namespace Game3 {
 		auto *theme = new nanogui::Theme(*new_button->theme());
 		theme->mButtonCornerRadius = 0;
 		new_button->setTheme(theme);
+		new_button->setCallback([this] { newGameWindow(); });
 
 		auto *save_button = new nanogui::Button(buttonBox, "", ENTYPO_ICON_SAVE);
 		save_button->setTheme(theme);
@@ -112,5 +114,37 @@ namespace Game3 {
 
 	void Application::onJoystick(int joystick_id, int event) {
 		std::cout << joystick_id << ": " << event << '\n';
+	}
+
+	void Application::newGameWindow() {
+		auto *window = new nanogui::Window(this, "New Game");
+		window->setLayout(new nanogui::GroupLayout());
+		window->add<nanogui::Label>("Seed");
+
+		auto *textbox = new nanogui::IntBox(window, 1024);
+		textbox->setAlignment(nanogui::TextBox::Alignment::Left);
+		textbox->setEditable(true);
+
+		auto *panel = new Widget(window);
+		panel->setLayout(new nanogui::BoxLayout(nanogui::Orientation::Horizontal, nanogui::Alignment::Middle, 0, 15));
+
+		(new nanogui::Button(panel, "Create"))->setCallback([=, this] {
+			const auto seed = textbox->value();
+			window->dispose();
+			newGame(seed);
+		});
+
+		(new nanogui::Button(panel, "Cancel"))->setCallback([=] {
+			window->dispose();
+		});
+
+		window->setSize({300, 140});
+		window->performLayout(nvgContext());
+		window->center();
+		window->requestFocus();
+	}
+
+	void Application::newGame(int seed) {
+		
 	}
 }

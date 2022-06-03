@@ -44,6 +44,8 @@ namespace Game3 {
 			Canvas *canvas = nullptr;
 
 			void onJoystick(int joystick_id, int event);
+			void newGameWindow();
+			void newGame(int seed);
 
 			static Application *instance;
 	};
