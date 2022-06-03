@@ -56,32 +56,22 @@ namespace Game3 {
 			}
 
 		constexpr static int m = 10, n = 10;
-		std::vector<unsigned> random_land;
+		std::vector<unsigned> starts;
 		std::vector<unsigned> good_starts;
-		{
-			Timer total("Total");
-			{
-				Timer timer("RandomLand");
-				random_land = randomLand(tiles, m, n);
-			}
-			good_starts.reserve(random_land.size() / 16);
-			{
-				Timer timer("CheckLand");
-				for (const auto index: random_land) {
-					const size_t row_start = index / WIDTH, row_end = row_start + m;
-					const size_t column_start = index % WIDTH, column_end = column_start + n;
-					for (size_t row = row_start; row < row_end; ++row)
-						for (size_t column = column_start; column < column_end; ++column)
-							if (!isLand(tiles[row][column]))
-								goto failed;
-					good_starts.push_back(index);
-					failed:
-					continue;
-				}
-			}
+		starts = getLand(tiles, m, n);
+		good_starts.reserve(starts.size() / 16);
+		for (const auto index: starts) {
+			const size_t row_start = index / WIDTH, row_end = row_start + m;
+			const size_t column_start = index % WIDTH, column_end = column_start + n;
+			for (size_t row = row_start; row < row_end; ++row)
+				for (size_t column = column_start; column < column_end; ++column)
+					if (!isLand(tiles[row][column]))
+						goto failed;
+			good_starts.push_back(index);
+			failed:
+			continue;
 		}
 
-		Timer::summary();
 		std::cout << "Found " << good_starts.size() << " candidate" << (good_starts.size() == 1? "" : "s") << ".\n";
 
 		for (int r = 0; r < h; ++r)
