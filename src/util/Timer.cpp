@@ -10,12 +10,19 @@ namespace Game3 {
 		start(std::chrono::system_clock::now()), name(name_) {}
 
 	Timer::~Timer() {
-		times[name] += difference();
-		++counts[name];
+		stop();
 	}
 
 	std::chrono::nanoseconds Timer::difference() const {
 		return std::chrono::system_clock::now() - start;
+	}
+
+	void Timer::stop() {
+		if (!stopped) {
+			times[name] += difference();
+			++counts[name];
+			stopped = true;
+		}
 	}
 
 	void Timer::summary(double threshold) {

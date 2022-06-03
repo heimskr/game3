@@ -19,8 +19,8 @@ namespace Game3 {
 	class Canvas: public nanogui::GLCanvas {
 		public:
 			using Tile = uint8_t;
-			constexpr static size_t WIDTH = 512;
-			constexpr static size_t HEIGHT = 512;
+			constexpr static size_t WIDTH = 256;
+			constexpr static size_t HEIGHT = WIDTH;
 			constexpr static Tile DEEPER_WATER = 0;
 			constexpr static Tile DEEP_WATER = 3;
 			constexpr static Tile WATER = 2;
@@ -31,6 +31,8 @@ namespace Game3 {
 			constexpr static Tile GRASS_ALT1 = 40;
 			constexpr static Tile GRASS_ALT2 = 41;
 			constexpr static Tile GRAY = 5;
+			constexpr static Tile ROAD = 15;
+			constexpr static Tile DIRT = 16;
 
 			Canvas(nanogui::Widget *parent);
 

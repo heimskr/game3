@@ -21,7 +21,7 @@ namespace Game3 {
 
 		tileset = Texture("resources/tileset2.png");
 
-		uint8_t tiles[512][512];
+		uint8_t tiles[HEIGHT][WIDTH];
 
 		constexpr int w = sizeof(tiles[0]) / sizeof(tiles[0][0]);
 		constexpr int h = sizeof(tiles) / sizeof(tiles[0]);
@@ -56,14 +56,17 @@ namespace Game3 {
 				}
 			}
 
-		constexpr static int m = 10, n = 10;
+		constexpr static int m = 19, n = 15, pad = 2;
 		std::vector<unsigned> starts;
 		std::vector<unsigned> candidates;
-		starts = getLand(tiles, m, n);
+		Timer land_timer("GetLand");
+		starts = getLand(tiles, m + pad * 2, n + pad * 2);
+		land_timer.stop();
 		candidates.reserve(starts.size() / 16);
+		Timer candidate_timer("Candidates");
 		for (const auto index: starts) {
-			const size_t row_start = index / WIDTH, row_end = row_start + m;
-			const size_t column_start = index % WIDTH, column_end = column_start + n;
+			const size_t row_start = index / WIDTH + pad, row_end = row_start + m;
+			const size_t column_start = index % WIDTH + pad, column_end = column_start + n;
 			for (size_t row = row_start; row < row_end; ++row)
 				for (size_t column = column_start; column < column_end; ++column)
 					if (!isLand(tiles[row][column]))
@@ -72,11 +75,52 @@ namespace Game3 {
 			failed:
 			continue;
 		}
+		candidate_timer.stop();
+		Timer::summary();
 
 		std::cout << "Found " << candidates.size() << " candidate" << (candidates.size() == 1? "" : "s") << ".\n";
-		const auto choice = choose(candidates, 666);
-		std::cout << "Choice: " << choice << '\n';
+		if (!candidates.empty()) {
+			const auto choice = choose(candidates, 666) + pad * (WIDTH + 1);
+			std::cout << "Choice: " << choice << '\n';
 
+			size_t row = 0, column = 0;
+
+			for (size_t row = choice / WIDTH; row < choice / WIDTH + m; ++row) {
+				tiles[row][choice % WIDTH] = GRAY;
+				tiles[row][choice % WIDTH + n - 1] = GRAY;
+			}
+
+			for (size_t column = choice % WIDTH; column < choice % WIDTH + n; ++column) {
+				tiles[choice / WIDTH][column] = GRAY;
+				tiles[choice / WIDTH + m - 1][column] = GRAY;
+			}
+
+			auto set = [&](Tile tile) { tiles[row][column] = tile; };
+
+			for (row = choice / WIDTH + 1; row < choice / WIDTH + m - 1; ++row)
+				for (column = choice % WIDTH + 1; column < choice % WIDTH + n - 1; ++column)
+					set(DIRT);
+
+			row = choice / WIDTH + m / 2;
+			for (column = choice % WIDTH - pad; column < choice % WIDTH + n + pad; ++column)
+				set(ROAD);
+			column = choice % WIDTH + n / 2;
+			for (row = choice / WIDTH - pad; row < choice / WIDTH + m + pad; ++row)
+				set(ROAD);
+			// set(ROAD);
+			// --column;
+			// set(ROAD);
+			// column += n;
+			// set(ROAD);
+			// ++column;
+			// set(ROAD);
+
+			row -= m / 2;
+			column -= n - n / 2;
+
+			// tiles[row + m / 2][column] = tiles[row + m / 2][column + n - 1] = ROAD;
+			// tiles[row][column + n / 2] = tiles[row + n - 1][column + n / 2] = ROAD;
+		}
 
 		for (int r = 0; r < h; ++r)
 			for (int c = 0; c < w; ++c)
