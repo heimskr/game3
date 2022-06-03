@@ -21,6 +21,7 @@ namespace Game3 {
 			using Tile = uint8_t;
 			constexpr static size_t WIDTH = 256;
 			constexpr static size_t HEIGHT = WIDTH;
+			constexpr static Tile EMPTY = 0;
 			constexpr static Tile DEEPER_WATER = 6;
 			constexpr static Tile DEEP_WATER = 3;
 			constexpr static Tile WATER = 2;

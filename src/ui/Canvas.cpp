@@ -199,8 +199,37 @@ namespace Game3 {
 		row = index / WIDTH + height / 2;
 		for (column = index % WIDTH - pad; column < index % WIDTH + width + pad; ++column)
 			set1(ROAD);
+		column = index % WIDTH;
+		set2(EMPTY);
+		--row;
+		set2(TOWER_S);
+		row += 2;
+		set2(TOWER_N);
+		--row;
+		column += width - 1;
+		set2(EMPTY);
+		--row;
+		set2(TOWER_S);
+		row += 2;
+		set2(TOWER_N);
+		--row;
 		column = index % WIDTH + width / 2;
 		for (row = index / WIDTH - pad; row < index / WIDTH + height + pad; ++row)
 			set1(ROAD);
+		row = index / WIDTH;
+		set2(EMPTY);
+		--column;
+		set2(TOWER_NE);
+		column += 2;
+		set2(TOWER_NW);
+		--column;
+		row += height - 1;
+		set2(EMPTY);
+		--column;
+		set2(TOWER_NE);
+		column += 2;
+		set2(TOWER_NW);
+		--column;
+
 	}
 }
