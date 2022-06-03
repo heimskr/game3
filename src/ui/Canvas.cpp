@@ -34,8 +34,8 @@ namespace Game3 {
 		noise::module::Perlin perlin;
 		perlin.SetSeed(666);
 
-		for (int i = 0; i < WIDTH; ++i)
-			for (int j = 0; j < HEIGHT; ++j) {
+		for (size_t i = 0; i < WIDTH; ++i)
+			for (size_t j = 0; j < HEIGHT; ++j) {
 				double noise = perlin.GetValue(i / noise_zoom, j / noise_zoom, 0.666);
 				uint8_t &tile = tiles1[j][i];
 				if (noise < noise_threshold) {
@@ -83,8 +83,8 @@ namespace Game3 {
 		if (!candidates.empty())
 			createTown(tiles1, tiles2, choose(candidates, 666) + pad * (WIDTH + 1), n, m, pad);
 
-		for (int r = 0; r < HEIGHT; ++r)
-			for (int c = 0; c < WIDTH; ++c) {
+		for (size_t r = 0; r < HEIGHT; ++r)
+			for (size_t c = 0; c < WIDTH; ++c) {
 				(*tilemap1)(c, r) = tiles1[r][c];
 				(*tilemap2)(c, r) = tiles2[r][c];
 			}
@@ -188,6 +188,9 @@ namespace Game3 {
 		}
 
 		layer2[index / WIDTH][index % WIDTH] = TOWER_NW;
+		layer2[index / WIDTH + height - 1][index % WIDTH] = TOWER_SW;
+		layer2[index / WIDTH][index % WIDTH + width - 1] = TOWER_NE;
+		layer2[index / WIDTH + height - 1][index % WIDTH + width - 1] = TOWER_SE;
 
 		for (row = index / WIDTH; row < index / WIDTH + height; ++row)
 			for (column = index % WIDTH; column < index % WIDTH + width; ++column)
