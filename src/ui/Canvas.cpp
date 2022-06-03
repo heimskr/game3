@@ -8,6 +8,7 @@
 #include "MarchingSquares.h"
 #include "resources.h"
 #include "ui/Canvas.h"
+#include "util/Timer.h"
 
 namespace Game3 {
 
@@ -53,6 +54,35 @@ namespace Game3 {
 					tile = grasses[rand() % (sizeof(grasses) / sizeof(grasses[0]))];
 				}
 			}
+
+		constexpr static int m = 10, n = 10;
+		std::vector<unsigned> random_land;
+		std::vector<unsigned> good_starts;
+		{
+			Timer total("Total");
+			{
+				Timer timer("RandomLand");
+				random_land = randomLand(tiles, m, n);
+			}
+			good_starts.reserve(random_land.size() / 16);
+			{
+				Timer timer("CheckLand");
+				for (const auto index: random_land) {
+					const size_t row_start = index / WIDTH, row_end = row_start + m;
+					const size_t column_start = index % WIDTH, column_end = column_start + n;
+					for (size_t row = row_start; row < row_end; ++row)
+						for (size_t column = column_start; column < column_end; ++column)
+							if (!isLand(tiles[row][column]))
+								goto failed;
+					good_starts.push_back(index);
+					failed:
+					continue;
+				}
+			}
+		}
+
+		Timer::summary();
+		std::cout << "Found " << good_starts.size() << " candidate" << (good_starts.size() == 1? "" : "s") << ".\n";
 
 		for (int r = 0; r < h; ++r)
 			for (int c = 0; c < w; ++c)
@@ -123,5 +153,23 @@ namespace Game3 {
 		}
 
 		return false;
+	}
+
+	std::vector<unsigned> Canvas::getLand(uint8_t tiles[WIDTH][HEIGHT], size_t right_pad, size_t bottom_pad) const {
+		std::vector<unsigned> land_tiles;
+		land_tiles.reserve(WIDTH * HEIGHT);
+		for (size_t row = 0; row < HEIGHT - bottom_pad; ++row)
+			for (size_t column = 0; column < WIDTH - right_pad; ++column)
+				if (isLand(tiles[row][column]))
+					land_tiles.push_back(row * WIDTH + column);
+		return land_tiles;
+	}
+
+	std::vector<unsigned> Canvas::randomLand(uint8_t tiles[WIDTH][HEIGHT], size_t right_pad, size_t bottom_pad, std::default_random_engine::result_type seed) const {
+		std::default_random_engine rng;
+		rng.seed(seed);
+		auto land_tiles = getLand(tiles, right_pad, bottom_pad);
+		std::shuffle(land_tiles.begin(), land_tiles.end(), rng);
+		return land_tiles;
 	}
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <random>
+
 #include <nanogui/opengl.h>
 #include <nanogui/glutil.h>
 #include <nanogui/screen.h>
@@ -17,15 +19,18 @@ namespace Game3 {
 	class Canvas: public nanogui::GLCanvas {
 		public:
 			using Tile = uint8_t;
-			constexpr static Tile DEEPER_WATER = 4;
+			constexpr static size_t WIDTH = 512;
+			constexpr static size_t HEIGHT = 512;
+			constexpr static Tile DEEPER_WATER = 0;
 			constexpr static Tile DEEP_WATER = 3;
 			constexpr static Tile WATER = 2;
 			constexpr static Tile SHALLOW_WATER = 1;
-			constexpr static Tile SAND = 0;
+			constexpr static Tile SAND = 4;
 			constexpr static Tile LIGHT_GRASS = 11;
 			constexpr static Tile GRASS = 12;
 			constexpr static Tile GRASS_ALT1 = 40;
 			constexpr static Tile GRASS_ALT2 = 41;
+			constexpr static Tile GRAY = 5;
 
 			Canvas(nanogui::Widget *parent);
 
@@ -49,5 +54,20 @@ namespace Game3 {
 			std::shared_ptr<Tilemap> tilemap;
 			ElementBufferedRenderer tilemapRenderer;
 			int font = -1;
+
+			std::vector<unsigned> getLand(uint8_t tiles[WIDTH][HEIGHT], size_t right_pad = 0, size_t bottom_pad = 0) const;
+			std::vector<unsigned> randomLand(uint8_t tiles[WIDTH][HEIGHT], size_t right_pad = 0, size_t bottom_pad = 0, std::default_random_engine::result_type seed = 666) const;
+			static inline bool isLand(Tile tile) {
+				switch (tile) {
+					case SAND:
+					case LIGHT_GRASS:
+					case GRASS:
+					case GRASS_ALT1:
+					case GRASS_ALT2:
+						return true;
+					default:
+						return false;
+				}
+			}
 	};
 }
