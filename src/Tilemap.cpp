@@ -1,3 +1,5 @@
+#include <deque>
+
 #include <zstd.h>
 
 #include "Tilemap.h"
@@ -16,8 +18,41 @@ namespace Game3 {
 		auto buffer = std::vector<uint8_t>(buffer_size);
 		auto result = ZSTD_compress(&buffer[0], buffer_size, tilemap.tiles.data(), tiles_size, ZSTD_maxCLevel());
 		if (ZSTD_isError(result))
-			throw std::runtime_error("Couldn't compress tileset");
+			throw std::runtime_error("Couldn't compress tiles");
 		buffer.resize(result);
 		json["tiles"] = std::move(buffer);
+	}
+
+	void from_json(const nlohmann::json &json, Tilemap &tilemap) {
+		tilemap.height = json.at("height");
+		tilemap.setHeight = json.at("setHeight");
+		tilemap.setWidth = json.at("setWidth");
+		tilemap.texture = json.at("texture");
+		tilemap.tileSize = json.at("tileSize");
+		tilemap.width = json.at("width");
+
+		tilemap.tiles.clear();
+		const size_t out_size = ZSTD_DStreamOutSize();
+		std::vector<uint8_t> out_buffer(out_size);
+		std::vector<uint8_t> bytes = json.at("tiles");
+
+		auto context = std::unique_ptr<ZSTD_DCtx, size_t(*)(ZSTD_DCtx *)>(ZSTD_createDCtx(), ZSTD_freeDCtx);
+		auto stream = std::unique_ptr<ZSTD_DStream, size_t(*)(ZSTD_DStream *)>(ZSTD_createDStream(), ZSTD_freeDStream);
+
+		ZSTD_inBuffer input(bytes.data(), bytes.size(), 0);
+
+		size_t last_result = 0;
+
+		while (input.pos < input.size) {
+			ZSTD_outBuffer output(&out_buffer[0], out_size, 0);
+			const size_t result = ZSTD_decompressStream(stream.get(), &output, &input);
+			if (ZSTD_isError(result))
+				throw std::runtime_error("Couldn't decompress tiles");
+			last_result = result;
+			tilemap.tiles.insert(tilemap.tiles.end(), out_buffer.cbegin(), out_buffer.cbegin() + output.pos);
+		}
+
+		if (last_result != 0)
+			throw std::runtime_error("Reached end of tile input without finishing decompression");
 	}
 }

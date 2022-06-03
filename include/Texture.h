@@ -27,4 +27,5 @@ namespace Game3 {
 	};
 
 	void to_json(nlohmann::json &, const Texture &);
+	void from_json(const nlohmann::json &, Texture &);
 }

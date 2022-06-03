@@ -14,4 +14,5 @@ namespace Game3 {
 	};
 
 	void to_json(nlohmann::json &, const Game &);
+	void from_json(const nlohmann::json &, Game &);
 }

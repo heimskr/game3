@@ -10,13 +10,15 @@
 
 namespace Game3 {
 	struct Tilemap {
-		int width;
-		int height;
-		int tileSize;
-		int setWidth;
-		int setHeight;
+		int width = 0;
+		int height = 0;
+		int tileSize = 0;
+		int setWidth = 0;
+		int setHeight = 0;
 		std::vector<uint8_t> tiles;
 		Texture texture;
+
+		Tilemap() = default;
 
 		Tilemap(int width_, int height_, int tile_size, int set_width, int set_height, const std::filesystem::path &path):
 		width(width_), height(height_), tileSize(tile_size), setWidth(set_width), setHeight(set_height), texture(path) {
@@ -34,4 +36,5 @@ namespace Game3 {
 	};
 
 	void to_json(nlohmann::json &, const Tilemap &);
+	void from_json(const nlohmann::json &, Tilemap &);
 }

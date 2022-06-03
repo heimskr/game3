@@ -31,4 +31,8 @@ namespace Game3 {
 		json["filter"] = texture.filter;
 		json["path"] = texture.path;
 	}
+
+	void from_json(const nlohmann::json &json, Texture &texture) {
+		texture = Texture(json.at("path"), json.at("alpha"), json.at("filter"));
+	}
 }

@@ -7,6 +7,13 @@
 namespace Game3 {
 	extern std::default_random_engine utilRNG;
 
+	long parseLong(const std::string &, int base = 10);
+	long parseLong(const char *, int base = 10);
+	long parseLong(std::string_view, int base = 10);
+	unsigned long parseUlong(const std::string &, int base = 10);
+	unsigned long parseUlong(const char *, int base = 10);
+	unsigned long parseUlong(std::string_view, int base = 10);
+
 	static inline std::default_random_engine::result_type getRandom(std::default_random_engine::result_type seed = 0) {
 		if (seed == 0)
 			return utilRNG();

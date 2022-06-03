@@ -1,4 +1,4 @@
-BUILD := release
+# BUILD := release
 ifeq ($(BUILD),release)
 BUILDFLAGS := -Ofast -march=native
 else

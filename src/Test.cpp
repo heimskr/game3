@@ -18,11 +18,13 @@ namespace Game3 {
 		game.realms.emplace(realm->id, realm);
 		auto building = std::make_shared<Building>(60, 12, 12, 2);
 		realm->tileEntities.emplace(getIndex(building->row, building->column), building);
-		realm->tilemap->tiles.at(getIndex(building->row, building->column)) = building->id;
+		realm->tilemap->tiles.at(getIndex(building->row, building->column)) = building->tileID;
 		nlohmann::json json = game;
 		const std::string dumped = json.dump();
 		std::cout << dumped << '\n';
 		std::cout << "JSON size: " << dumped.size() << '\n';
 		std::cout << "CBOR size: " << nlohmann::json::to_cbor(json).size() << '\n';
+		Game thawed = json;
+		std::cout << "Equal? " << (nlohmann::json(thawed).dump() == dumped? "yes" : "no") << '\n';
 	}
 }

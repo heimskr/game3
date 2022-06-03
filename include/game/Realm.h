@@ -15,8 +15,10 @@ namespace Game3 {
 		std::shared_ptr<Tilemap> tilemap;
 		std::unordered_map<Index, std::shared_ptr<TileEntity>> tileEntities;
 
+		Realm() = default;
 		Realm(int id_, const std::shared_ptr<Tilemap> &tilemap_): id(id_), tilemap(tilemap_) {}
 	};
 
 	void to_json(nlohmann::json &, const Realm &);
+	void from_json(const nlohmann::json &, Realm &);
 }

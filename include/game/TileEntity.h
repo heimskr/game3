@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <nlohmann/json.hpp>
 
 #include "Types.h"
@@ -7,13 +9,19 @@
 namespace Game3 {
 	class TileEntity {
 		public:
-			TileID id;
-			int row;
-			int column;
-			bool solid;
+			TileID tileID = 0;
+			int row = -1;
+			int column = -1;
+			bool solid = false;
 
-			TileEntity(TileID id_, int row_, int column_, bool solid_): id(id_), row(row_), column(column_), solid(solid_) {}
+			TileEntity() = default;
+			TileEntity(TileID tile_id, int row_, int column_, bool solid_): tileID(tile_id), row(row_), column(column_), solid(solid_) {}
 			virtual ~TileEntity() = default;
+
+			static std::shared_ptr<TileEntity> fromJSON(const nlohmann::json &);
+
+			/** Returns the TileEntity ID, not the tile ID, which corresponds to a tile in the tileset. */
+			virtual int getID() const = 0;
 
 		protected:
 			virtual void toJSON(nlohmann::json &) const;
