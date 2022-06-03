@@ -2,6 +2,7 @@
 
 #include <filesystem>
 
+#include <nlohmann/json.hpp>
 #include <GL/gl.h>
 
 namespace Game3 {
@@ -13,6 +14,7 @@ namespace Game3 {
 			int format = 0;
 			int filter = 0;
 			bool alpha = false;
+			std::filesystem::path path;
 
 			Texture() = default;
 			Texture(const std::filesystem::path &, bool alpha_ = true, int filter_ = GL_NEAREST);
@@ -23,4 +25,6 @@ namespace Game3 {
 		private:
 			bool valid_ = false;
 	};
+
+	void to_json(nlohmann::json &, const Texture &);
 }

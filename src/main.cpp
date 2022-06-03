@@ -8,11 +8,23 @@
 #include "Texture.h"
 #include "ui/TilemapRenderer.h"
 
-using namespace Game3;
+// #define CATCH
 
-int main(int, char **) {
+namespace Game3 {
+	void test();
+}
+
+int main(int argc, char **argv) {
 	srand(time(nullptr));
+
+	if (2 <= argc && strcmp(argv[1], "-t") == 0) {
+		Game3::test();
+		return 0;
+	}
+
+#ifdef CATCH
 	try {
+#endif
 		nanogui::init();
 		{
 			nanogui::ref<Game3::Application> app = new Game3::Application;
@@ -22,8 +34,10 @@ int main(int, char **) {
 		}
 		nanogui::shutdown();
 		return 0;
+#ifdef CATCH
 	} catch (const std::exception &err) {
 		std::cerr << err.what() << '\n';
 		return 1;
 	}
+#endif
 }

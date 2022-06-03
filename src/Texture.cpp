@@ -5,8 +5,8 @@
 #include "Texture.h"
 
 namespace Game3 {
-	Texture::Texture(const std::filesystem::path &path, bool alpha_, int filter_):
-	format(alpha_? GL_RGBA : GL_RGB), filter(filter_), alpha(alpha_) {
+	Texture::Texture(const std::filesystem::path &path_, bool alpha_, int filter_):
+	format(alpha_? GL_RGBA : GL_RGB), filter(filter_), alpha(alpha_), path(path_) {
 		int channels = 0;
 		unsigned char *data = stbi_load(path.c_str(), &width, &height, &channels, 0);
 		if (data == nullptr)
@@ -19,9 +19,16 @@ namespace Game3 {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
 		glBindTexture(GL_TEXTURE_2D, 0);
+		valid_ = true;
 	}
 
 	void Texture::bind() {
 		glBindTexture(GL_TEXTURE_2D, id);
+	}
+
+	void to_json(nlohmann::json &json, const Texture &texture) {
+		json["alpha"] = texture.alpha;
+		json["filter"] = texture.filter;
+		json["path"] = texture.path;
 	}
 }

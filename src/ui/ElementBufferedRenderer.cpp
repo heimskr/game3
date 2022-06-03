@@ -27,7 +27,7 @@ namespace Game3 {
 	}
 
 	void ElementBufferedRenderer::render(NVGcontext *, int) {
-		glBindTexture(GL_TEXTURE_2D, tilemap->handle);
+		glBindTexture(GL_TEXTURE_2D, tilemap->texture.id);
 		glBindVertexArray(vaoHandle);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboHandle);
 		glm::mat4 projection(1.f);

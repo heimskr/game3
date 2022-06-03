@@ -5,7 +5,7 @@ else
 BUILDFLAGS := -g -O0
 endif
 
-DEPS       := gl opengl stb eigen3 glm glfw3
+DEPS       := gl opengl stb eigen3 glm glfw3 libzstd
 OUTPUT     := game3
 COMPILER   ?= g++
 CPPFLAGS   := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude

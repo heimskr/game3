@@ -23,24 +23,24 @@ namespace Game3 {
 
 		tileset = Texture("resources/tileset2.png");
 
-		uint8_t tiles1[HEIGHT][WIDTH];
-		uint8_t tiles2[HEIGHT][WIDTH];
+		TileID tiles1[HEIGHT][WIDTH];
+		TileID tiles2[HEIGHT][WIDTH];
 
 		std::memset(tiles2, 0, sizeof(tiles2));
 
 		int scale = 16;
 		magic = scale / 2;
-		tilemap1 = std::make_shared<Tilemap>(WIDTH, HEIGHT, scale, tileset.width, tileset.height, tileset.id);
-		tilemap2 = std::make_shared<Tilemap>(WIDTH, HEIGHT, scale, tileset.width, tileset.height, tileset.id);
+		tilemap1 = std::make_shared<Tilemap>(WIDTH, HEIGHT, scale, tileset);
+		tilemap2 = std::make_shared<Tilemap>(WIDTH, HEIGHT, scale, tileset);
 
 		noise::module::Perlin perlin;
 		perlin.SetSeed(666);
-		static const std::vector<Tile> grasses {GRASS_ALT1, GRASS_ALT2, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS};
+		static const std::vector<TileID> grasses {GRASS_ALT1, GRASS_ALT2, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS};
 
 		for (size_t i = 0; i < WIDTH; ++i)
 			for (size_t j = 0; j < HEIGHT; ++j) {
 				double noise = perlin.GetValue(i / noise_zoom, j / noise_zoom, 0.666);
-				uint8_t &tile = tiles1[j][i];
+				auto &tile = tiles1[j][i];
 				if (noise < noise_threshold)
 					tile = DEEPER_WATER;
 				else if (noise < noise_threshold + 0.1)
@@ -89,7 +89,6 @@ namespace Game3 {
 				(*tilemap2)(c, r) = tiles2[r][c];
 			}
 
-		srand(time(nullptr));
 		tilemapRenderer1.initialize(tilemap1);
 		tilemapRenderer2.initialize(tilemap2);
 	}
@@ -161,7 +160,7 @@ namespace Game3 {
 		return false;
 	}
 
-	std::vector<unsigned> Canvas::getLand(uint8_t tiles[HEIGHT][WIDTH], size_t right_pad, size_t bottom_pad) const {
+	std::vector<unsigned> Canvas::getLand(TileID tiles[HEIGHT][WIDTH], size_t right_pad, size_t bottom_pad) const {
 		std::vector<unsigned> land_tiles;
 		land_tiles.reserve(WIDTH * HEIGHT);
 		for (size_t row = 0; row < HEIGHT - bottom_pad; ++row)
@@ -171,11 +170,11 @@ namespace Game3 {
 		return land_tiles;
 	}
 
-	void Canvas::createTown(uint8_t layer1[HEIGHT][WIDTH], uint8_t layer2[HEIGHT][WIDTH], size_t index, size_t width, size_t height, size_t pad) const {
+	void Canvas::createTown(TileID layer1[HEIGHT][WIDTH], TileID layer2[HEIGHT][WIDTH], size_t index, size_t width, size_t height, size_t pad) const {
 		size_t row = 0, column = 0;
 
-		auto set1 = [&](Tile tile) { layer1[row][column] = tile; };
-		auto set2 = [&](Tile tile) { layer2[row][column] = tile; };
+		auto set1 = [&](TileID tile) { layer1[row][column] = tile; };
+		auto set2 = [&](TileID tile) { layer2[row][column] = tile; };
 
 		for (size_t row = index / WIDTH; row < index / WIDTH + height; ++row) {
 			layer2[row][index % WIDTH] = TOWER_NS;
@@ -241,16 +240,16 @@ namespace Game3 {
 
 		std::vector<unsigned> buildable(buildable_set.cbegin(), buildable_set.cend());
 		shuffle(buildable, 666);
-		std::cout << "Initial size: " << buildable.size() << '\n';
 		if (2 < buildable.size()) {
 			buildable.erase(buildable.begin() + buildable.size() / 10, buildable.end());
 			buildable_set = std::unordered_set<unsigned>(buildable.cbegin(), buildable.cend());
-			std::vector<Tile> houses {HOUSE1, HOUSE2, HOUSE3};
+			std::vector<TileID> houses {HOUSE1, HOUSE2, HOUSE3};
 			std::default_random_engine rng;
 			rng.seed(666);
 			while (!buildable_set.empty()) {
 				auto index = *buildable_set.begin();
-				layer2[index / WIDTH][index % WIDTH] = choose(houses, rng);
+				auto house = choose(houses, rng);
+				layer2[index / WIDTH][index % WIDTH] = house;
 				buildable_set.erase(index);
 				// Some of these are sus if index happens to be at the west or east edge, but those aren't valid locations for houses anyway.
 				buildable_set.erase(index - WIDTH);

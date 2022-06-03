@@ -12,39 +12,39 @@
 
 #include "Image.h"
 #include "Texture.h"
+#include "Types.h"
 #include "ui/GeometryRenderer.h"
 #include "ui/ElementBufferedRenderer.h"
 
 namespace Game3 {
 	class Canvas: public nanogui::GLCanvas {
 		public:
-			using Tile = uint8_t;
 			constexpr static size_t WIDTH = 256;
 			constexpr static size_t HEIGHT = WIDTH;
-			constexpr static Tile EMPTY = 0;
-			constexpr static Tile DEEPER_WATER = 6;
-			constexpr static Tile DEEP_WATER = 3;
-			constexpr static Tile WATER = 2;
-			constexpr static Tile SHALLOW_WATER = 1;
-			constexpr static Tile SAND = 4;
-			constexpr static Tile LIGHT_GRASS = 11;
-			constexpr static Tile GRASS = 12;
-			constexpr static Tile GRASS_ALT1 = 40;
-			constexpr static Tile GRASS_ALT2 = 41;
-			constexpr static Tile GRAY = 5;
-			constexpr static Tile ROAD = 15;
-			constexpr static Tile DIRT = 16;
-			constexpr static Tile TOWER_NW = 50;
-			constexpr static Tile TOWER_NE = 51;
-			constexpr static Tile TOWER_SW = 52;
-			constexpr static Tile TOWER_SE = 53;
-			constexpr static Tile TOWER_WE = 54;
-			constexpr static Tile TOWER_NS = 55;
-			constexpr static Tile TOWER_N = 56;
-			constexpr static Tile TOWER_S = 57;
-			constexpr static Tile HOUSE1 = 60;
-			constexpr static Tile HOUSE2 = 61;
-			constexpr static Tile HOUSE3 = 62;
+			constexpr static TileID EMPTY = 0;
+			constexpr static TileID DEEPER_WATER = 6;
+			constexpr static TileID DEEP_WATER = 3;
+			constexpr static TileID WATER = 2;
+			constexpr static TileID SHALLOW_WATER = 1;
+			constexpr static TileID SAND = 4;
+			constexpr static TileID LIGHT_GRASS = 11;
+			constexpr static TileID GRASS = 12;
+			constexpr static TileID GRASS_ALT1 = 40;
+			constexpr static TileID GRASS_ALT2 = 41;
+			constexpr static TileID GRAY = 5;
+			constexpr static TileID ROAD = 15;
+			constexpr static TileID DIRT = 16;
+			constexpr static TileID TOWER_NW = 50;
+			constexpr static TileID TOWER_NE = 51;
+			constexpr static TileID TOWER_SW = 52;
+			constexpr static TileID TOWER_SE = 53;
+			constexpr static TileID TOWER_WE = 54;
+			constexpr static TileID TOWER_NS = 55;
+			constexpr static TileID TOWER_N = 56;
+			constexpr static TileID TOWER_S = 57;
+			constexpr static TileID HOUSE1 = 60;
+			constexpr static TileID HOUSE2 = 61;
+			constexpr static TileID HOUSE3 = 62;
 
 			Canvas(nanogui::Widget *parent);
 
@@ -71,10 +71,10 @@ namespace Game3 {
 			ElementBufferedRenderer tilemapRenderer1, tilemapRenderer2;
 			int font = -1;
 
-			std::vector<unsigned> getLand(uint8_t tiles[HEIGHT][WIDTH], size_t right_pad = 0, size_t bottom_pad = 0) const;
-			void createTown(uint8_t layer1[HEIGHT][WIDTH], uint8_t layer2[HEIGHT][WIDTH], size_t index, size_t width, size_t height, size_t pad) const;
+			std::vector<unsigned> getLand(TileID tiles[HEIGHT][WIDTH], size_t right_pad = 0, size_t bottom_pad = 0) const;
+			void createTown(TileID layer1[HEIGHT][WIDTH], TileID layer2[HEIGHT][WIDTH], size_t index, size_t width, size_t height, size_t pad) const;
 
-			static inline bool isLand(Tile tile) {
+			static inline bool isLand(TileID tile) {
 				switch (tile) {
 					case SAND:
 					case LIGHT_GRASS:
