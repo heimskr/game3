@@ -16,6 +16,17 @@
 namespace Game3 {
 	class Canvas: public nanogui::GLCanvas {
 		public:
+			using Tile = uint8_t;
+			constexpr static Tile DEEPER_WATER = 4;
+			constexpr static Tile DEEP_WATER = 3;
+			constexpr static Tile WATER = 2;
+			constexpr static Tile SHALLOW_WATER = 1;
+			constexpr static Tile SAND = 0;
+			constexpr static Tile LIGHT_GRASS = 11;
+			constexpr static Tile GRASS = 12;
+			constexpr static Tile GRASS_ALT1 = 40;
+			constexpr static Tile GRASS_ALT2 = 41;
+
 			Canvas(nanogui::Widget *parent);
 
 			// void drawImage(const Texture &, const nanogui::Vector2f &screen_pos, const nanogui::Vector2f &image_offset = {0.f, 0.f}, const nanogui::Vector2f &image_extent = {-1.f, -1.f});

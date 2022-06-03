@@ -12,24 +12,21 @@
 namespace Game3 {
 
 	Canvas::Canvas(nanogui::Widget *parent_): GLCanvas(parent_) {
-		setBackgroundColor({20, 20, 255, 255});
+		setBackgroundColor({66, 172, 175, 255});
 
-		constexpr double noise_zoom = 20.;
+		constexpr double noise_zoom = 100.;
 		constexpr double noise_threshold = -0.15;
 
 		tileset = Texture("resources/tileset2.png");
 
-		int ints[20][20];
+		uint8_t tiles[512][512];
 
-		constexpr static int w = sizeof(ints[0]) / sizeof(ints[0][0]);
-		constexpr static int h = sizeof(ints) / sizeof(ints[0]);
+		constexpr int w = sizeof(tiles[0]) / sizeof(tiles[0][0]);
+		constexpr int h = sizeof(tiles) / sizeof(tiles[0]);
 
 		int scale = 16;
 		magic = scale / 2;
 		tilemap = std::make_shared<Tilemap>(w, h, scale, tileset.width, tileset.height, tileset.id);
-
-		static int r = 0;
-		static int c = 0;
 
 		noise::module::Perlin perlin;
 		perlin.SetSeed(666);
@@ -37,29 +34,29 @@ namespace Game3 {
 		for (int i = 0; i < w; ++i)
 			for (int j = 0; j < h; ++j) {
 				double noise = perlin.GetValue(i / noise_zoom, j / noise_zoom, 0.666);
-				int &tile = ints[j][i];
+				uint8_t &tile = tiles[j][i];
 				if (noise < noise_threshold) {
-					tile = 4;
+					tile = DEEPER_WATER;
 				} else if (noise < noise_threshold + 0.1) {
-					tile = 3;
+					tile = DEEP_WATER;
 				} else if (noise < noise_threshold + 0.2) {
-					tile = 2;
+					tile = WATER;
 				} else if (noise < noise_threshold + 0.3) {
-					tile = 1;
+					tile = SHALLOW_WATER;
 				} else if (noise < noise_threshold + 0.4) {
-					tile = 0;
+					tile = SAND;
 				} else if (noise < noise_threshold + 0.5) {
-					tile = 11;
+					tile = LIGHT_GRASS;
 				} else {
-					constexpr static int full[] {40, 41, 12, 12, 12, 12, 12, 12, 12};
+					constexpr static Tile grasses[] {GRASS_ALT1, GRASS_ALT2, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS};
 					srand((i << 20) | j);
-					tile = full[rand() % (sizeof(full) / sizeof(full[0]))];
+					tile = grasses[rand() % (sizeof(grasses) / sizeof(grasses[0]))];
 				}
 			}
 
-		for (r = 0; r < h; ++r)
-			for (c = 0; c < w; ++c)
-				(*tilemap)(c, r) = ints[r][c];
+		for (int r = 0; r < h; ++r)
+			for (int c = 0; c < w; ++c)
+				(*tilemap)(c, r) = tiles[r][c];
 
 		srand(time(nullptr));
 		tilemapRenderer.initialize(tilemap);
@@ -107,7 +104,7 @@ namespace Game3 {
 		if (nanogui::GLCanvas::mouseButtonEvent(p, button, down, modifiers))
 			return true;
 
-		if (down) {
+		if (!down) {
 			float fx = p.x();
 			float fy = p.y() - HEADER_HEIGHT / 2.f;
 
@@ -124,7 +121,6 @@ namespace Game3 {
 
 			return true;
 		}
-
 
 		return false;
 	}
