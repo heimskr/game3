@@ -192,8 +192,8 @@ namespace Game3 {
 		layer2[index / WIDTH][index % WIDTH + width - 1] = TOWER_NE;
 		layer2[index / WIDTH + height - 1][index % WIDTH + width - 1] = TOWER_SE;
 
-		for (row = index / WIDTH; row < index / WIDTH + height; ++row)
-			for (column = index % WIDTH; column < index % WIDTH + width; ++column)
+		for (row = index / WIDTH + 1; row < index / WIDTH + height - 1; ++row)
+			for (column = index % WIDTH + 1; column < index % WIDTH + width - 1; ++column)
 				set1(DIRT);
 
 		row = index / WIDTH + height / 2;
