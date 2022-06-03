@@ -57,7 +57,9 @@ namespace Game3 {
 			ElementBufferedRenderer tilemapRenderer;
 			int font = -1;
 
-			std::vector<unsigned> getLand(uint8_t tiles[WIDTH][HEIGHT], size_t right_pad = 0, size_t bottom_pad = 0) const;
+			std::vector<unsigned> getLand(uint8_t tiles[HEIGHT][WIDTH], size_t right_pad = 0, size_t bottom_pad = 0) const;
+			void createTown(uint8_t tiles[HEIGHT][WIDTH], size_t index, size_t width, size_t height, size_t pad) const;
+
 			static inline bool isLand(Tile tile) {
 				switch (tile) {
 					case SAND:

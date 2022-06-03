@@ -56,7 +56,7 @@ namespace Game3 {
 				}
 			}
 
-		constexpr static int m = 19, n = 15, pad = 2;
+		constexpr static int m = 15, n = 21, pad = 2;
 		std::vector<unsigned> starts;
 		std::vector<unsigned> candidates;
 		Timer land_timer("GetLand");
@@ -79,48 +79,8 @@ namespace Game3 {
 		Timer::summary();
 
 		std::cout << "Found " << candidates.size() << " candidate" << (candidates.size() == 1? "" : "s") << ".\n";
-		if (!candidates.empty()) {
-			const auto choice = choose(candidates, 666) + pad * (WIDTH + 1);
-			std::cout << "Choice: " << choice << '\n';
-
-			size_t row = 0, column = 0;
-
-			for (size_t row = choice / WIDTH; row < choice / WIDTH + m; ++row) {
-				tiles[row][choice % WIDTH] = GRAY;
-				tiles[row][choice % WIDTH + n - 1] = GRAY;
-			}
-
-			for (size_t column = choice % WIDTH; column < choice % WIDTH + n; ++column) {
-				tiles[choice / WIDTH][column] = GRAY;
-				tiles[choice / WIDTH + m - 1][column] = GRAY;
-			}
-
-			auto set = [&](Tile tile) { tiles[row][column] = tile; };
-
-			for (row = choice / WIDTH + 1; row < choice / WIDTH + m - 1; ++row)
-				for (column = choice % WIDTH + 1; column < choice % WIDTH + n - 1; ++column)
-					set(DIRT);
-
-			row = choice / WIDTH + m / 2;
-			for (column = choice % WIDTH - pad; column < choice % WIDTH + n + pad; ++column)
-				set(ROAD);
-			column = choice % WIDTH + n / 2;
-			for (row = choice / WIDTH - pad; row < choice / WIDTH + m + pad; ++row)
-				set(ROAD);
-			// set(ROAD);
-			// --column;
-			// set(ROAD);
-			// column += n;
-			// set(ROAD);
-			// ++column;
-			// set(ROAD);
-
-			row -= m / 2;
-			column -= n - n / 2;
-
-			// tiles[row + m / 2][column] = tiles[row + m / 2][column + n - 1] = ROAD;
-			// tiles[row][column + n / 2] = tiles[row + n - 1][column + n / 2] = ROAD;
-		}
+		if (!candidates.empty())
+			createTown(tiles, choose(candidates, 666) + pad * (WIDTH + 1), n, m, pad);
 
 		for (int r = 0; r < h; ++r)
 			for (int c = 0; c < w; ++c)
@@ -193,7 +153,7 @@ namespace Game3 {
 		return false;
 	}
 
-	std::vector<unsigned> Canvas::getLand(uint8_t tiles[WIDTH][HEIGHT], size_t right_pad, size_t bottom_pad) const {
+	std::vector<unsigned> Canvas::getLand(uint8_t tiles[HEIGHT][WIDTH], size_t right_pad, size_t bottom_pad) const {
 		std::vector<unsigned> land_tiles;
 		land_tiles.reserve(WIDTH * HEIGHT);
 		for (size_t row = 0; row < HEIGHT - bottom_pad; ++row)
@@ -201,5 +161,32 @@ namespace Game3 {
 				if (isLand(tiles[row][column]))
 					land_tiles.push_back(row * WIDTH + column);
 		return land_tiles;
+	}
+
+	void Canvas::createTown(uint8_t tiles[HEIGHT][WIDTH], size_t index, size_t width, size_t height, size_t pad) const {
+		size_t row = 0, column = 0;
+
+		for (size_t row = index / WIDTH; row < index / WIDTH + height; ++row) {
+			tiles[row][index % WIDTH] = GRAY;
+			tiles[row][index % WIDTH + width - 1] = GRAY;
+		}
+
+		for (size_t column = index % WIDTH; column < index % WIDTH + width; ++column) {
+			tiles[index / WIDTH][column] = GRAY;
+			tiles[index / WIDTH + height - 1][column] = GRAY;
+		}
+
+		auto set = [&](Tile tile) { tiles[row][column] = tile; };
+
+		for (row = index / WIDTH + 1; row < index / WIDTH + height - 1; ++row)
+			for (column = index % WIDTH + 1; column < index % WIDTH + width - 1; ++column)
+				set(DIRT);
+
+		row = index / WIDTH + height / 2;
+		for (column = index % WIDTH - pad; column < index % WIDTH + width + pad; ++column)
+			set(ROAD);
+		column = index % WIDTH + width / 2;
+		for (row = index / WIDTH - pad; row < index / WIDTH + height + pad; ++row)
+			set(ROAD);
 	}
 }
