@@ -1,28 +1,42 @@
 #pragma once
 
 #include <random>
+#include <stdexcept>
 #include <vector>
 
 namespace Game3 {
-	template <typename T, typename R = std::default_random_engine>
-	void shuffle(T &container, typename R::result_type seed = 0) {
-		R rng;
+	extern std::default_random_engine utilRNG;
+
+	static inline std::default_random_engine::result_type getRandom(std::default_random_engine::result_type seed = 0) {
 		if (seed == 0)
-			rng.seed(time(nullptr));
-		else
-			rng.seed(seed);
-		std::shuffle(container.begin(), container.end(), rng);
+			return utilRNG();
+		std::default_random_engine rng;
+		rng.seed(seed);
+		return rng();
 	}
 
 	template <typename T, typename R = std::default_random_engine>
-	T::value_type & choose(T &container, typename R::result_type seed = 0) {
+	void shuffle(T &container, typename R::result_type seed = 0) {
+		if (seed == 0) {
+			std::shuffle(container.begin(), container.end(), utilRNG);
+		} else {
+			R rng;
+			rng.seed(seed);
+			std::shuffle(container.begin(), container.end(), rng);
+		}
+	}
+
+	template <typename T>
+	T::value_type & choose(T &container, typename std::default_random_engine::result_type seed = 0) {
 		if (container.empty())
 			throw std::invalid_argument("Container is empty");
-		R rng;
-		if (seed == 0)
-			rng.seed(time(nullptr));
-		else
-			rng.seed(seed);
+		return container.at(getRandom(seed) % container.size());
+	}
+
+	template <typename T, typename R>
+	T::value_type & choose(T &container, R &rng) {
+		if (container.empty())
+			throw std::invalid_argument("Container is empty");
 		return container.at(rng() % container.size());
 	}
 }

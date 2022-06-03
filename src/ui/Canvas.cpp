@@ -1,5 +1,7 @@
 // Contains code from nanogui and from LearnOpenGL (https://github.com/JoeyDeVries/LearnOpenGL)
 
+#include <unordered_set>
+
 #include <libnoise/noise.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -192,13 +194,19 @@ namespace Game3 {
 		layer2[index / WIDTH][index % WIDTH + width - 1] = TOWER_NE;
 		layer2[index / WIDTH + height - 1][index % WIDTH + width - 1] = TOWER_SE;
 
+		std::unordered_set<unsigned> buildable_set;
+
 		for (row = index / WIDTH + 1; row < index / WIDTH + height - 1; ++row)
-			for (column = index % WIDTH + 1; column < index % WIDTH + width - 1; ++column)
+			for (column = index % WIDTH + 1; column < index % WIDTH + width - 1; ++column) {
+				buildable_set.insert(row * WIDTH + column);
 				set1(DIRT);
+			}
 
 		row = index / WIDTH + height / 2;
-		for (column = index % WIDTH - pad; column < index % WIDTH + width + pad; ++column)
+		for (column = index % WIDTH - pad; column < index % WIDTH + width + pad; ++column) {
+			buildable_set.erase(row * WIDTH + column);
 			set1(ROAD);
+		}
 		column = index % WIDTH;
 		set2(EMPTY);
 		--row;
@@ -214,8 +222,10 @@ namespace Game3 {
 		set2(TOWER_N);
 		--row;
 		column = index % WIDTH + width / 2;
-		for (row = index / WIDTH - pad; row < index / WIDTH + height + pad; ++row)
+		for (row = index / WIDTH - pad; row < index / WIDTH + height + pad; ++row) {
+			buildable_set.erase(row * WIDTH + column);
 			set1(ROAD);
+		}
 		row = index / WIDTH;
 		set2(EMPTY);
 		--column;
@@ -231,5 +241,29 @@ namespace Game3 {
 		set2(TOWER_NW);
 		--column;
 
+		std::vector<unsigned> buildable(buildable_set.cbegin(), buildable_set.cend());
+		shuffle(buildable, 666);
+		std::cout << "Initial size: " << buildable.size() << '\n';
+		if (2 < buildable.size()) {
+			buildable.erase(buildable.begin() + buildable.size() / 10, buildable.end());
+			buildable_set = std::unordered_set<unsigned>(buildable.cbegin(), buildable.cend());
+			std::vector<Tile> houses {HOUSE1, HOUSE2, HOUSE3};
+			std::default_random_engine rng;
+			rng.seed(666);
+			while (!buildable_set.empty()) {
+				auto index = *buildable_set.begin();
+				layer2[index / WIDTH][index % WIDTH] = choose(houses, rng);
+				buildable_set.erase(index);
+				// Some of these are sus if index happens to be at the west or east edge, but those aren't valid locations for houses anyway.
+				buildable_set.erase(index - WIDTH);
+				buildable_set.erase(index + WIDTH);
+				buildable_set.erase(index - WIDTH - 1);
+				buildable_set.erase(index + WIDTH - 1);
+				buildable_set.erase(index - WIDTH + 1);
+				buildable_set.erase(index + WIDTH + 1);
+				buildable_set.erase(index - 1);
+				buildable_set.erase(index + 1);
+			}
+		}
 	}
 }

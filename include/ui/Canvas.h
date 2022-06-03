@@ -42,6 +42,9 @@ namespace Game3 {
 			constexpr static Tile TOWER_NS = 55;
 			constexpr static Tile TOWER_N = 56;
 			constexpr static Tile TOWER_S = 57;
+			constexpr static Tile HOUSE1 = 60;
+			constexpr static Tile HOUSE2 = 61;
+			constexpr static Tile HOUSE3 = 62;
 
 			Canvas(nanogui::Widget *parent);
 
