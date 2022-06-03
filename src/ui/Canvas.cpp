@@ -9,6 +9,7 @@
 #include "resources.h"
 #include "ui/Canvas.h"
 #include "util/Timer.h"
+#include "util/Util.h"
 
 namespace Game3 {
 
@@ -57,9 +58,9 @@ namespace Game3 {
 
 		constexpr static int m = 10, n = 10;
 		std::vector<unsigned> starts;
-		std::vector<unsigned> good_starts;
+		std::vector<unsigned> candidates;
 		starts = getLand(tiles, m, n);
-		good_starts.reserve(starts.size() / 16);
+		candidates.reserve(starts.size() / 16);
 		for (const auto index: starts) {
 			const size_t row_start = index / WIDTH, row_end = row_start + m;
 			const size_t column_start = index % WIDTH, column_end = column_start + n;
@@ -67,12 +68,15 @@ namespace Game3 {
 				for (size_t column = column_start; column < column_end; ++column)
 					if (!isLand(tiles[row][column]))
 						goto failed;
-			good_starts.push_back(index);
+			candidates.push_back(index);
 			failed:
 			continue;
 		}
 
-		std::cout << "Found " << good_starts.size() << " candidate" << (good_starts.size() == 1? "" : "s") << ".\n";
+		std::cout << "Found " << candidates.size() << " candidate" << (candidates.size() == 1? "" : "s") << ".\n";
+		const auto choice = choose(candidates, 666);
+		std::cout << "Choice: " << choice << '\n';
+
 
 		for (int r = 0; r < h; ++r)
 			for (int c = 0; c < w; ++c)
@@ -152,14 +156,6 @@ namespace Game3 {
 			for (size_t column = 0; column < WIDTH - right_pad; ++column)
 				if (isLand(tiles[row][column]))
 					land_tiles.push_back(row * WIDTH + column);
-		return land_tiles;
-	}
-
-	std::vector<unsigned> Canvas::randomLand(uint8_t tiles[WIDTH][HEIGHT], size_t right_pad, size_t bottom_pad, std::default_random_engine::result_type seed) const {
-		std::default_random_engine rng;
-		rng.seed(seed);
-		auto land_tiles = getLand(tiles, right_pad, bottom_pad);
-		std::shuffle(land_tiles.begin(), land_tiles.end(), rng);
 		return land_tiles;
 	}
 }

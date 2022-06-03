@@ -56,7 +56,6 @@ namespace Game3 {
 			int font = -1;
 
 			std::vector<unsigned> getLand(uint8_t tiles[WIDTH][HEIGHT], size_t right_pad = 0, size_t bottom_pad = 0) const;
-			std::vector<unsigned> randomLand(uint8_t tiles[WIDTH][HEIGHT], size_t right_pad = 0, size_t bottom_pad = 0, std::default_random_engine::result_type seed = 666) const;
 			static inline bool isLand(Tile tile) {
 				switch (tile) {
 					case SAND:
