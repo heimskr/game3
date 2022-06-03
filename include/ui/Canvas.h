@@ -21,7 +21,7 @@ namespace Game3 {
 			using Tile = uint8_t;
 			constexpr static size_t WIDTH = 256;
 			constexpr static size_t HEIGHT = WIDTH;
-			constexpr static Tile DEEPER_WATER = 0;
+			constexpr static Tile DEEPER_WATER = 6;
 			constexpr static Tile DEEP_WATER = 3;
 			constexpr static Tile WATER = 2;
 			constexpr static Tile SHALLOW_WATER = 1;
@@ -33,6 +33,14 @@ namespace Game3 {
 			constexpr static Tile GRAY = 5;
 			constexpr static Tile ROAD = 15;
 			constexpr static Tile DIRT = 16;
+			constexpr static Tile TOWER_NW = 50;
+			constexpr static Tile TOWER_NE = 51;
+			constexpr static Tile TOWER_SW = 52;
+			constexpr static Tile TOWER_SE = 53;
+			constexpr static Tile TOWER_WE = 54;
+			constexpr static Tile TOWER_NS = 55;
+			constexpr static Tile TOWER_N = 56;
+			constexpr static Tile TOWER_S = 57;
 
 			Canvas(nanogui::Widget *parent);
 
@@ -44,8 +52,10 @@ namespace Game3 {
 			bool mouseDragEvent(const nanogui::Vector2i &p, const nanogui::Vector2i &rel, int button, int modifiers) override;
 			bool mouseButtonEvent(const nanogui::Vector2i &p, int button, bool down, int modifiers) override;
 
-			nanogui::Vector2f & center() { return tilemapRenderer.center; }
-			float & scale() { return tilemapRenderer.scale; }
+			const nanogui::Vector2f & center() { return tilemapRenderer1.center; }
+			float scale() { return tilemapRenderer1.scale; }
+			void center(const nanogui::Vector2f &center_) { tilemapRenderer1.center = tilemapRenderer2.center = center_; }
+			void scale(float scale_) { tilemapRenderer1.scale = tilemapRenderer2.scale = scale_; }
 
 		private:
 			constexpr static float HEADER_HEIGHT = 56.f;
@@ -53,12 +63,12 @@ namespace Game3 {
 
 			NVGcontext *context = nullptr;
 			Texture tileset;
-			std::shared_ptr<Tilemap> tilemap;
-			ElementBufferedRenderer tilemapRenderer;
+			std::shared_ptr<Tilemap> tilemap1, tilemap2;
+			ElementBufferedRenderer tilemapRenderer1, tilemapRenderer2;
 			int font = -1;
 
 			std::vector<unsigned> getLand(uint8_t tiles[HEIGHT][WIDTH], size_t right_pad = 0, size_t bottom_pad = 0) const;
-			void createTown(uint8_t tiles[HEIGHT][WIDTH], size_t index, size_t width, size_t height, size_t pad) const;
+			void createTown(uint8_t layer1[HEIGHT][WIDTH], uint8_t layer2[HEIGHT][WIDTH], size_t index, size_t width, size_t height, size_t pad) const;
 
 			static inline bool isLand(Tile tile) {
 				switch (tile) {

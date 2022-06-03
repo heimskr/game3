@@ -11,7 +11,7 @@ namespace Game3 {
 	class TilemapRenderer {
 		public:
 			constexpr static float tileTextureSize = 1 / 10.f;
-			constexpr static float tileTexturePadding = 1 / 256.f;
+			constexpr static float tileTexturePadding = 1 / 2048.f;
 			float scale = 2.f;
 			int backBufferWidth = -1;
 			int backBufferHeight = -1;

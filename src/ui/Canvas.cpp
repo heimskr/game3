@@ -21,22 +21,23 @@ namespace Game3 {
 
 		tileset = Texture("resources/tileset2.png");
 
-		uint8_t tiles[HEIGHT][WIDTH];
+		uint8_t tiles1[HEIGHT][WIDTH];
+		uint8_t tiles2[HEIGHT][WIDTH];
 
-		constexpr int w = sizeof(tiles[0]) / sizeof(tiles[0][0]);
-		constexpr int h = sizeof(tiles) / sizeof(tiles[0]);
+		std::memset(tiles2, 0, sizeof(tiles2));
 
 		int scale = 16;
 		magic = scale / 2;
-		tilemap = std::make_shared<Tilemap>(w, h, scale, tileset.width, tileset.height, tileset.id);
+		tilemap1 = std::make_shared<Tilemap>(WIDTH, HEIGHT, scale, tileset.width, tileset.height, tileset.id);
+		tilemap2 = std::make_shared<Tilemap>(WIDTH, HEIGHT, scale, tileset.width, tileset.height, tileset.id);
 
 		noise::module::Perlin perlin;
 		perlin.SetSeed(666);
 
-		for (int i = 0; i < w; ++i)
-			for (int j = 0; j < h; ++j) {
+		for (int i = 0; i < WIDTH; ++i)
+			for (int j = 0; j < HEIGHT; ++j) {
 				double noise = perlin.GetValue(i / noise_zoom, j / noise_zoom, 0.666);
-				uint8_t &tile = tiles[j][i];
+				uint8_t &tile = tiles1[j][i];
 				if (noise < noise_threshold) {
 					tile = DEEPER_WATER;
 				} else if (noise < noise_threshold + 0.1) {
@@ -60,7 +61,7 @@ namespace Game3 {
 		std::vector<unsigned> starts;
 		std::vector<unsigned> candidates;
 		Timer land_timer("GetLand");
-		starts = getLand(tiles, m + pad * 2, n + pad * 2);
+		starts = getLand(tiles1, m + pad * 2, n + pad * 2);
 		land_timer.stop();
 		candidates.reserve(starts.size() / 16);
 		Timer candidate_timer("Candidates");
@@ -69,7 +70,7 @@ namespace Game3 {
 			const size_t column_start = index % WIDTH + pad, column_end = column_start + n;
 			for (size_t row = row_start; row < row_end; ++row)
 				for (size_t column = column_start; column < column_end; ++column)
-					if (!isLand(tiles[row][column]))
+					if (!isLand(tiles1[row][column]))
 						goto failed;
 			candidates.push_back(index);
 			failed:
@@ -80,14 +81,17 @@ namespace Game3 {
 
 		std::cout << "Found " << candidates.size() << " candidate" << (candidates.size() == 1? "" : "s") << ".\n";
 		if (!candidates.empty())
-			createTown(tiles, choose(candidates, 666) + pad * (WIDTH + 1), n, m, pad);
+			createTown(tiles1, tiles2, choose(candidates, 666) + pad * (WIDTH + 1), n, m, pad);
 
-		for (int r = 0; r < h; ++r)
-			for (int c = 0; c < w; ++c)
-				(*tilemap)(c, r) = tiles[r][c];
+		for (int r = 0; r < HEIGHT; ++r)
+			for (int c = 0; c < WIDTH; ++c) {
+				(*tilemap1)(c, r) = tiles1[r][c];
+				(*tilemap2)(c, r) = tiles2[r][c];
+			}
 
 		srand(time(nullptr));
-		tilemapRenderer.initialize(tilemap);
+		tilemapRenderer1.initialize(tilemap1);
+		tilemapRenderer2.initialize(tilemap2);
 	}
 
 	void Canvas::draw(NVGcontext *context_) {
@@ -99,8 +103,10 @@ namespace Game3 {
 	}
 
 	void Canvas::drawGL() {
-		tilemapRenderer.onBackBufferResized(width(), height());
-		tilemapRenderer.render(context, font);
+		tilemapRenderer1.onBackBufferResized(width(), height());
+		tilemapRenderer2.onBackBufferResized(width(), height());
+		tilemapRenderer1.render(context, font);
+		tilemapRenderer2.render(context, font);
 	}
 
 	bool Canvas::scrollEvent(const nanogui::Vector2i &p, const nanogui::Vector2f &rel) {
@@ -108,9 +114,9 @@ namespace Game3 {
 			return true;
 
 		if (rel.y() == 1)
-			tilemapRenderer.scale *= 1.06f;
+			scale(scale() * 1.06f);
 		else if (rel.y() == -1)
-			tilemapRenderer.scale /= 1.06f;
+			scale(scale() / 1.06f);
 
 		return true;
 	}
@@ -120,8 +126,10 @@ namespace Game3 {
 			return true;
 
 		if (button == 1) {
-			center().x() += rel.x() / (magic * tilemapRenderer.scale);
-			center().y() += rel.y() / (magic * tilemapRenderer.scale);
+			auto vec = center();
+			vec.x() += rel.x() / (magic * scale());
+			vec.y() += rel.y() / (magic * scale());
+			center(vec);
 			return true;
 		}
 
@@ -136,11 +144,11 @@ namespace Game3 {
 			float fx = p.x();
 			float fy = p.y() - HEADER_HEIGHT / 2.f;
 
-			fx -= width() / 2.f - (tilemap->width * tilemap->tileSize / 4.f) * scale() + center().x() * magic * scale();
-			fx /= tilemap->tileSize * scale() / 2.f;
+			fx -= width() / 2.f - (WIDTH * tilemap1->tileSize / 4.f) * scale() + center().x() * magic * scale();
+			fx /= tilemap1->tileSize * scale() / 2.f;
 
-			fy -= height() / 2.f - (tilemap->height * tilemap->tileSize / 4.f) * scale() + center().y() * magic * scale();
-			fy /= tilemap->tileSize * scale() / 2.f;
+			fy -= height() / 2.f - (HEIGHT * tilemap1->tileSize / 4.f) * scale() + center().y() * magic * scale();
+			fy /= tilemap1->tileSize * scale() / 2.f;
 
 			int x = fx;
 			int y = fy;
@@ -163,30 +171,33 @@ namespace Game3 {
 		return land_tiles;
 	}
 
-	void Canvas::createTown(uint8_t tiles[HEIGHT][WIDTH], size_t index, size_t width, size_t height, size_t pad) const {
+	void Canvas::createTown(uint8_t layer1[HEIGHT][WIDTH], uint8_t layer2[HEIGHT][WIDTH], size_t index, size_t width, size_t height, size_t pad) const {
 		size_t row = 0, column = 0;
 
+		auto set1 = [&](Tile tile) { layer1[row][column] = tile; };
+		auto set2 = [&](Tile tile) { layer2[row][column] = tile; };
+
 		for (size_t row = index / WIDTH; row < index / WIDTH + height; ++row) {
-			tiles[row][index % WIDTH] = GRAY;
-			tiles[row][index % WIDTH + width - 1] = GRAY;
+			layer2[row][index % WIDTH] = TOWER_NS;
+			layer2[row][index % WIDTH + width - 1] = TOWER_NS;
 		}
 
 		for (size_t column = index % WIDTH; column < index % WIDTH + width; ++column) {
-			tiles[index / WIDTH][column] = GRAY;
-			tiles[index / WIDTH + height - 1][column] = GRAY;
+			layer2[index / WIDTH][column] = TOWER_WE;
+			layer2[index / WIDTH + height - 1][column] = TOWER_WE;
 		}
 
-		auto set = [&](Tile tile) { tiles[row][column] = tile; };
+		layer2[index / WIDTH][index % WIDTH] = TOWER_NW;
 
-		for (row = index / WIDTH + 1; row < index / WIDTH + height - 1; ++row)
-			for (column = index % WIDTH + 1; column < index % WIDTH + width - 1; ++column)
-				set(DIRT);
+		for (row = index / WIDTH; row < index / WIDTH + height; ++row)
+			for (column = index % WIDTH; column < index % WIDTH + width; ++column)
+				set1(DIRT);
 
 		row = index / WIDTH + height / 2;
 		for (column = index % WIDTH - pad; column < index % WIDTH + width + pad; ++column)
-			set(ROAD);
+			set1(ROAD);
 		column = index % WIDTH + width / 2;
 		for (row = index / WIDTH - pad; row < index / WIDTH + height + pad; ++row)
-			set(ROAD);
+			set1(ROAD);
 	}
 }
