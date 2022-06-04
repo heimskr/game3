@@ -21,9 +21,11 @@ namespace Game3 {
 
 	class Canvas: public nanogui::GLCanvas {
 		public:
+			constexpr static float DEFAULT_SCALE = 2.f;
+
 			std::shared_ptr<Game> game;
 			nanogui::Vector2f center {0.f, 0.f};
-			float scale = 4.f;
+			float scale = DEFAULT_SCALE;
 
 			Canvas(nanogui::Widget *parent);
 

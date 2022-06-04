@@ -1,13 +1,9 @@
-// Contains code from nanogui and from LearnOpenGL (https://github.com/JoeyDeVries/LearnOpenGL)
-
 #include <unordered_set>
 
 #include <libnoise/noise.h>
 
 #include "ui/Canvas.h"
 
-#include "MarchingSquares.h"
-#include "resources.h"
 #include "game/Game.h"
 #include "util/Timer.h"
 #include "util/Util.h"
@@ -15,8 +11,7 @@
 namespace Game3 {
 	Canvas::Canvas(nanogui::Widget *parent_): GLCanvas(parent_) {
 		// setBackgroundColor({66, 172, 175, 255});
-		int scale = 16;
-		magic = scale / 2;
+		magic = 16 / 2;
 	}
 
 	void Canvas::draw(NVGcontext *context_) {

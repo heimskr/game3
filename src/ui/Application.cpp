@@ -6,7 +6,7 @@
 #include "util/FS.h"
 #include "util/Util.h"
 
-#define USE_CBOR
+// #define USE_CBOR
 
 namespace Game3 {
 	Application * Application::instance = nullptr;
@@ -34,6 +34,13 @@ namespace Game3 {
 		auto *open_button = new nanogui::Button(buttonBox, "", ENTYPO_ICON_FOLDER);
 		open_button->setTheme(theme);
 		open_button->setCallback([this] { loadGame(); });
+
+		auto *reset_button = new nanogui::Button(buttonBox, "", ENTYPO_ICON_MAGNIFYING_GLASS);
+		reset_button->setTheme(theme);
+		reset_button->setCallback([this] {
+			canvas->scale = Canvas::DEFAULT_SCALE;
+			canvas->center = {0.f, 0.f};
+		});
 
 		glfwSetJoystickCallback(+[](int joystick_id, int event) {
 			std::cout << joystick_id << ": " << event << '\n';
@@ -164,6 +171,7 @@ namespace Game3 {
 		auto tilemap = std::make_shared<Tilemap>(width, height, 16, texture);
 		auto realm = std::make_shared<Realm>(1, tilemap);
 		realm->generate(seed);
+		game->playerPosition = {realm->randomLand / width, realm->randomLand % width};
 		game->realms.emplace(realm->id, realm);
 		game->activeRealm = realm;
 		realm->rebind();

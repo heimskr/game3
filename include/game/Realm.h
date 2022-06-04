@@ -27,6 +27,13 @@ namespace Game3 {
 			void rebind();
 			void generate(int seed = 666, double noise_zoom = 100., double noise_threshold = -0.15);
 			void createTown(size_t index, size_t width, size_t height, size_t pad);
+			int getWidth()  const { return tilemap1->width;  }
+			int getHeight() const { return tilemap1->height; }
+
+			friend class Application;
+
+		private:
+			Index randomLand = 0;
 	};
 
 	void to_json(nlohmann::json &, const Realm &);

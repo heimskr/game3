@@ -12,6 +12,7 @@ namespace Game3 {
 		public:
 			std::unordered_map<int, std::shared_ptr<Realm>> realms;
 			std::shared_ptr<Realm> activeRealm;
+			/** (row, column) */
 			std::pair<Index, Index> playerPosition;
 	};
 

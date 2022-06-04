@@ -91,11 +91,11 @@ namespace Game3 {
 			}
 
 		constexpr static int m = 15, n = 21, pad = 2;
-		std::vector<unsigned> starts;
-		std::vector<unsigned> candidates;
 		Timer land_timer("GetLand");
-		starts = tilemap1->getLand(m + pad * 2, n + pad * 2);
+		auto starts = tilemap1->getLand(m + pad * 2, n + pad * 2);
 		land_timer.stop();
+		randomLand = choose(starts, uint_fast32_t(seed));
+		std::vector<Index> candidates;
 		candidates.reserve(starts.size() / 16);
 		Timer candidate_timer("Candidates");
 		for (const auto index: starts) {
