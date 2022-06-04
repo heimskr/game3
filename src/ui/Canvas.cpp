@@ -38,10 +38,23 @@ namespace Game3 {
 		if (nanogui::GLCanvas::scrollEvent(p, rel))
 			return true;
 
+		const auto old_scale = scale;
+
 		if (rel.y() == 1)
-			scale *= 1.06f;
+			scale *= 1.08f;
 		else if (rel.y() == -1)
-			scale /= 1.06f;
+			scale /= 1.08f;
+
+		const auto w = width();
+		const auto h = height();
+
+		const auto difference_x = w / old_scale - w / scale;
+		const auto side_ratio_x = (p.x() - w / 2.f) / w;
+		center.x() -= difference_x * side_ratio_x / 8.f;
+
+		const auto difference_y = h / old_scale - h / scale;
+		const auto side_ratio_y = (p.y() - h / 2.f) / h;
+		center.y() -= difference_y * side_ratio_y / 8.f;
 
 		return true;
 	}
