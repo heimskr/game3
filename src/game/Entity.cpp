@@ -6,6 +6,7 @@
 #include "game/Entity.h"
 #include "game/Game.h"
 #include "game/Realm.h"
+#include "ui/Canvas.h"
 #include "ui/SpriteRenderer.h"
 
 namespace Game3 {
@@ -85,6 +86,17 @@ namespace Game3 {
 			return false;
 
 		return true;
+	}
+
+	void Entity::focus(Canvas &canvas) {
+		auto realm = weakRealm.lock();
+		if (!realm)
+			return;
+
+		const auto &tilemap = *realm->tilemap1;
+		canvas.center.x() = -(column() - tilemap.width / 2.f) * canvas.scale / 2.f;
+		canvas.center.y() = -(row() - tilemap.height / 2.f) * canvas.scale / 2.f;
+		canvas.scale = 4.f;
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {

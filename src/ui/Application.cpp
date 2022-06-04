@@ -71,45 +71,33 @@ namespace Game3 {
 			if (game && game->player && action != 0) {
 				auto &player = *game->player;
 				switch (key) {
-					case GLFW_KEY_DOWN:
 					case GLFW_KEY_S:
 						player.move(Direction::Down);
-						break;
-					case GLFW_KEY_UP:
+						return true;;
 					case GLFW_KEY_W:
 						player.move(Direction::Up);
-						break;
-					case GLFW_KEY_LEFT:
+						return true;;
 					case GLFW_KEY_A:
 						player.move(Direction::Left);
-						break;
-					case GLFW_KEY_RIGHT:
+						return true;;
 					case GLFW_KEY_D:
 						player.move(Direction::Right);
-						break;
+						return true;;
 				}
-
-				return true;
 			}
-
-			return false;
 
 			const float delta = canvas->scale / 4.f;
 			switch (key) {
 				case GLFW_KEY_DOWN:
-				case GLFW_KEY_S:
 					canvas->center.y() -= delta;
 					break;
 				case GLFW_KEY_UP:
-				case GLFW_KEY_W:
 					canvas->center.y() += delta;
 					break;
 				case GLFW_KEY_LEFT:
-				case GLFW_KEY_A:
 					canvas->center.x() += delta;
 					break;
 				case GLFW_KEY_RIGHT:
-				case GLFW_KEY_D:
 					canvas->center.x() -= delta;
 					break;
 				default:
@@ -206,6 +194,7 @@ namespace Game3 {
 		realm->addEntity(game->player = std::make_shared<Player>(Entity::GANGBLANC));
 		game->player->position = {realm->randomLand / width, realm->randomLand % width};
 		game->player->init();
+		game->player->focus(*canvas);
 		canvas->game = game;
 		saveButton->setEnabled(true);
 	}
@@ -257,6 +246,7 @@ namespace Game3 {
 			}
 		realm->rebind();
 		realm->reupload();
+		game->player->focus(*canvas);
 		canvas->game = game;
 		saveButton->setEnabled(true);
 	}

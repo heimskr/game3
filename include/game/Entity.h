@@ -11,6 +11,7 @@
 #include "game/Item.h"
 
 namespace Game3 {
+	class Canvas;
 	class Game;
 	class Realm;
 	class SpriteRenderer;
@@ -31,13 +32,18 @@ namespace Game3 {
 			Entity(EntityID id__): id_(id__) {}
 
 			virtual bool isPlayer() const { return false; }
-			EntityID id() const { return id_; }
+			inline EntityID id() const { return id_; }
+			inline const Position::first_type  & row()    const { return position.first;  }
+			inline const Position::second_type & column() const { return position.second; }
+			inline Position::first_type  & row()    { return position.first;  }
+			inline Position::second_type & column() { return position.second; }
 			void id(EntityID);
 			void init();
 			void render(SpriteRenderer &) const;
 			void move(Direction);
 			void setRealm(const Game &, RealmID);
 			void setRealm(const std::shared_ptr<Realm>);
+			void focus(Canvas &);
 
 		private:
 			EntityID id_ = 0;

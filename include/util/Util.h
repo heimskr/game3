@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <random>
 #include <stdexcept>
 #include <vector>
@@ -15,6 +16,15 @@ namespace Game3 {
 	unsigned long parseUlong(const std::string &, int base = 10);
 	unsigned long parseUlong(const char *, int base = 10);
 	unsigned long parseUlong(std::string_view, int base = 10);
+
+	inline std::chrono::system_clock::time_point getTime() {
+		return std::chrono::system_clock::now();
+	}
+
+	template <typename T = std::chrono::nanoseconds>
+	inline T timeDifference(std::chrono::system_clock::time_point old_time) {
+		return std::chrono::duration_cast<T>(getTime() - old_time);
+	}
 
 	static inline std::default_random_engine::result_type getRandom(std::default_random_engine::result_type seed = 0) {
 		if (seed == 0)
