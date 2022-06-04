@@ -10,4 +10,6 @@ uniform vec4 spriteColor;
 
 void main() {
 	color = spriteColor * texture(sprite, TexCoords);
+	if (color.a < 0.01)
+		discard;
 }
