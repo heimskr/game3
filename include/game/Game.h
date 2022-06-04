@@ -14,6 +14,8 @@ namespace Game3 {
 			std::unordered_map<RealmID, std::shared_ptr<Realm>> realms;
 			std::shared_ptr<Realm> activeRealm;
 			std::shared_ptr<Player> player;
+
+			void initEntities();
 	};
 
 	void to_json(nlohmann::json &, const Game &);

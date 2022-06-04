@@ -4,6 +4,11 @@
 #include "util/Util.h"
 
 namespace Game3 {
+	void Game::initEntities() {
+		for (const auto &[realm_id, realm]: realms)
+			realm->initEntities();
+	}
+
 	void to_json(nlohmann::json &json, const Game &game) {
 		json["activeRealmID"] = game.activeRealm->id;
 		json["realms"] = std::unordered_map<std::string, nlohmann::json>();

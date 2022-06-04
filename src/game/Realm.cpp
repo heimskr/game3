@@ -221,6 +221,11 @@ namespace Game3 {
 		entities.insert(entity);
 	}
 
+	void Realm::initEntities() {
+		for (auto &entity: entities)
+			entity->setRealm(shared_from_this());
+	}
+
 	void to_json(nlohmann::json &json, const Realm &realm) {
 		json["id"] = realm.id;
 		json["tilemap1"] = *realm.tilemap1;

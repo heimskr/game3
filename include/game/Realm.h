@@ -35,6 +35,7 @@ namespace Game3 {
 			int getWidth()  const { return tilemap1->width;  }
 			int getHeight() const { return tilemap1->height; }
 			void addEntity(const std::shared_ptr<Entity> &);
+			void initEntities();
 
 			friend class Application;
 

@@ -237,6 +237,7 @@ namespace Game3 {
 			game = std::make_shared<Game>(nlohmann::json::parse(data));
 		else
 			game = std::make_shared<Game>(nlohmann::json::from_cbor(data));
+		game->initEntities();
 		auto realm = game->activeRealm;
 		for (const auto &entity: realm->entities)
 			if (entity->isPlayer()) {
