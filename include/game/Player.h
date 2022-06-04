@@ -7,6 +7,7 @@ namespace Game3 {
 		public:
 			using Entity::Entity;
 
+			nlohmann::json toJSON() const override;
 			bool isPlayer() const override { return true; }
 	};
 

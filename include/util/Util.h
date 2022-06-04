@@ -6,6 +6,8 @@
 #include <vector>
 
 #define CHECKGL do { if (auto err = glGetError()) { std::cerr << "\e[31mError at " << __FILE__ << ':' << __LINE__ << ": " << gluErrorString(err) << "\e[39m\n"; } } while(0);
+#define TRY try {
+#define CATCH } catch (std::exception &err) { std::cerr << "\e[31m" << __FILE__ << ':' << __LINE__ << ": " << err.what() << "\e[39m\n"; }
 
 namespace Game3 {
 	extern std::default_random_engine utilRNG;

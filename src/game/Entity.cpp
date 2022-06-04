@@ -14,6 +14,18 @@ namespace Game3 {
 		{Entity::GANGBLANC, Texture("resources/characters/champions/Gangblanc.png")},
 	};
 
+	std::shared_ptr<Entity> Entity::fromJSON(const nlohmann::json &json) {
+		if (json.at("isPlayer") == true)
+			return std::make_shared<Player>(json);
+		return std::make_shared<Entity>(json);
+	}
+
+	nlohmann::json Entity::toJSON() const {
+		nlohmann::json json;
+		to_json(json, *this);
+		return json;
+	}
+
 	void Entity::id(EntityID new_id) {
 		id_ = new_id;
 		texture = &textureMap.at(id_);
@@ -94,8 +106,8 @@ namespace Game3 {
 			return;
 
 		const auto &tilemap = *realm->tilemap1;
-		canvas.center.x() = -(column() - tilemap.width / 2.f) * canvas.scale / 2.f;
-		canvas.center.y() = -(row() - tilemap.height / 2.f) * canvas.scale / 2.f;
+		canvas.center.x() = -(column() - tilemap.width  / 2.f) * canvas.scale / 2.f;
+		canvas.center.y() = -(row()    - tilemap.height / 2.f) * canvas.scale / 2.f;
 		canvas.scale = 4.f;
 	}
 

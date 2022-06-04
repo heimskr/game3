@@ -231,7 +231,7 @@ namespace Game3 {
 			json["tileEntities"][std::to_string(index)] = *tile_entity;
 		json["entities"] = std::vector<nlohmann::json>();
 		for (const auto &entity: realm.entities)
-			json["entities"].push_back(*entity);
+			json["entities"].push_back(entity->toJSON());
 	}
 
 	void from_json(const nlohmann::json &json, Realm &realm) {
@@ -246,6 +246,6 @@ namespace Game3 {
 		realm.renderer3.initialize(realm.tilemap3);
 		realm.entities.clear();
 		for (const auto &entity_json: json.at("entities"))
-			realm.entities.insert(std::make_shared<Entity>(entity_json));
+			realm.entities.insert(Entity::fromJSON(entity_json));
 	}
 }

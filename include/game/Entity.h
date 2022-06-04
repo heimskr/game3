@@ -29,8 +29,12 @@ namespace Game3 {
 			Direction direction = Direction::Down;
 			std::unordered_map<Slot, ItemStack> inventory;
 
+			Entity() = default;
 			Entity(EntityID id__): id_(id__) {}
 
+			static std::shared_ptr<Entity> fromJSON(const nlohmann::json &);
+
+			virtual nlohmann::json toJSON() const;
 			virtual bool isPlayer() const { return false; }
 			inline EntityID id() const { return id_; }
 			inline const Position::first_type  & row()    const { return position.first;  }
