@@ -3,7 +3,10 @@
 
 #include "ui/Application.h"
 #include "ui/Canvas.h"
+#include "util/FS.h"
 #include "util/Util.h"
+
+#define USE_CBOR
 
 namespace Game3 {
 	Application * Application::instance = nullptr;
@@ -30,6 +33,7 @@ namespace Game3 {
 
 		auto *open_button = new nanogui::Button(buttonBox, "", ENTYPO_ICON_FOLDER);
 		open_button->setTheme(theme);
+		open_button->setCallback([this] { loadGame(); });
 
 		glfwSetJoystickCallback(+[](int joystick_id, int event) {
 			std::cout << joystick_id << ": " << event << '\n';
@@ -184,10 +188,32 @@ namespace Game3 {
 			return;
 		}
 
+#ifdef USE_CBOR
 		auto cbor = nlohmann::json::to_cbor(nlohmann::json(*game));
 		stream.write(reinterpret_cast<char *>(&cbor[0]), cbor.size());
+#else
+		stream << nlohmann::json(*game).dump();
+#endif
 		stream.close();
 
 		new nanogui::MessageDialog(this, nanogui::MessageDialog::Type::Information, "Success", "Game saved.");
+	}
+
+	void Application::loadGame() {
+		const std::string path = nanogui::file_dialog({{"g3", "Game3 save"}}, false);
+
+		if (path.empty())
+			return;
+
+		const std::string data = readFile(path);
+		if (!data.empty() && data.front() == '{')
+			game = std::make_shared<Game>(nlohmann::json::parse(data));
+		else
+			game = std::make_shared<Game>(nlohmann::json::from_cbor(data));
+		auto realm = game->activeRealm;
+		realm->rebind();
+		realm->reupload();
+		canvas->game = game;
+		saveButton->setEnabled(true);
 	}
 }

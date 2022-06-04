@@ -4,3 +4,4 @@
 src/resources.cpp
 .dep.bak
 /include/resources.h
+*.g3

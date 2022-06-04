@@ -51,6 +51,7 @@ namespace Game3 {
 			void newGameWindow();
 			void newGame(int seed, int width, int height);
 			void saveGame();
+			void loadGame();
 
 			static Application *instance;
 	};
