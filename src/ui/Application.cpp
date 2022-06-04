@@ -176,9 +176,10 @@ namespace Game3 {
 		game->activeRealm = realm;
 		realm->rebind();
 		realm->reupload();
-		canvas->game = game;
 		realm->entities.insert(game->player = std::make_shared<Player>(Entity::GANGBLANC));
 		game->player->position = {realm->randomLand / width, realm->randomLand % width};
+		game->player->init();
+		canvas->game = game;
 		saveButton->setEnabled(true);
 	}
 

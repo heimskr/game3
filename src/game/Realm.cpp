@@ -2,15 +2,12 @@
 #include <unordered_set>
 
 #include <libnoise/noise.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
+#include "Tiles.h"
 #include "game/Entity.h"
 #include "game/Realm.h"
 #include "util/Timer.h"
 #include "util/Util.h"
-#include "Tiles.h"
 
 namespace Game3 {
 	Realm::Realm(RealmID id_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_):
@@ -30,7 +27,7 @@ namespace Game3 {
 		renderer3.initialize(tilemap3);
 	}
 
-	void Realm::render(const int width, const int height, const nanogui::Vector2f &center, float scale) {
+	void Realm::render(const int width, const int height, const nanogui::Vector2f &center, float scale, SpriteRenderer &sprite_renderer) {
 		renderer1.center = center;
 		renderer1.scale  = scale;
 		renderer1.onBackBufferResized(width, height);
@@ -43,6 +40,8 @@ namespace Game3 {
 		renderer1.render();
 		renderer2.render();
 		renderer3.render();
+		for (const auto &entity: entities)
+			entity->render(sprite_renderer);
 	}
 
 	void Realm::reupload() {

@@ -13,8 +13,7 @@
 #include "Image.h"
 #include "Texture.h"
 #include "Types.h"
-#include "ui/GeometryRenderer.h"
-#include "ui/ElementBufferedRenderer.h"
+#include "ui/SpriteRenderer.h"
 
 namespace Game3 {
 	class Game;
@@ -26,6 +25,7 @@ namespace Game3 {
 			std::shared_ptr<Game> game;
 			nanogui::Vector2f center {0.f, 0.f};
 			float scale = DEFAULT_SCALE;
+			SpriteRenderer spriteRenderer;
 
 			Canvas(nanogui::Widget *parent);
 

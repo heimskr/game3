@@ -13,6 +13,7 @@
 
 namespace Game3 {
 	class Entity;
+	class SpriteRenderer;
 
 	class Realm {
 		public:
@@ -26,7 +27,7 @@ namespace Game3 {
 			Realm(RealmID id_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_);
 			Realm(RealmID id_, const std::shared_ptr<Tilemap> &tilemap1_);
 
-			void render(int width, int height, const nanogui::Vector2f &center, float scale);
+			void render(int width, int height, const nanogui::Vector2f &center, float scale, SpriteRenderer &);
 			void reupload();
 			void rebind();
 			void generate(int seed = 666, double noise_zoom = 100., double noise_threshold = -0.15);

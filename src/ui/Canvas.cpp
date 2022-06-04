@@ -25,7 +25,7 @@ namespace Game3 {
 	void Canvas::drawGL() {
 		if (game && game->activeRealm) {
 			auto &realm = *game->activeRealm;
-			realm.render(width(), height(), center, scale);
+			realm.render(width(), height(), center, scale, spriteRenderer);
 		}
 	}
 

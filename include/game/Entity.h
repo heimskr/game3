@@ -6,26 +6,36 @@
 
 #include <nlohmann/json.hpp>
 
+#include "Texture.h"
 #include "Types.h"
 #include "game/Item.h"
 
 namespace Game3 {
+	class SpriteRenderer;
+
 	class Entity {
 		public:
 			constexpr static EntityID GANGBLANC = 1;
 
-			static std::unordered_map<EntityID, std::string> textureMap;
+			static std::unordered_map<EntityID, Texture> textureMap;
 
-			EntityID id = 0;
 			/** (row, column) */
 			std::pair<Index, Index> position {0, 0};
 			RealmID realmID = 0;
 			Direction direction = Direction::Down;
 			std::unordered_map<Slot, ItemStack> inventory;
 
-			Entity(EntityID id_): id(id_) {}
+			Entity(EntityID id__): id_(id__) {}
 
 			virtual bool isPlayer() const { return false; }
+			EntityID id() const { return id_; }
+			void id(EntityID);
+			void init();
+			void render(SpriteRenderer &) const;
+
+		private:
+			EntityID id_ = 0;
+			Texture *texture = nullptr;
 	};
 
 	void to_json(nlohmann::json &, const Entity &);

@@ -4,6 +4,8 @@
 #include <stdexcept>
 #include <vector>
 
+#define CHECKGL do { if (auto err = glGetError()) { std::cerr << "\e[31mError at " << __FILE__ << ':' << __LINE__ << ": " << gluErrorString(err) << "\e[39m\n"; } } while(0);
+
 namespace Game3 {
 	extern std::default_random_engine utilRNG;
 
