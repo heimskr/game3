@@ -190,11 +190,11 @@ namespace Game3 {
 		set2(TOWER_NW);
 		--column;
 
-		std::vector<unsigned> buildable(buildable_set.cbegin(), buildable_set.cend());
+		std::vector<Index> buildable(buildable_set.cbegin(), buildable_set.cend());
 		shuffle(buildable, 666);
 		if (2 < buildable.size()) {
 			buildable.erase(buildable.begin() + buildable.size() / 10, buildable.end());
-			buildable_set = std::unordered_set<unsigned>(buildable.cbegin(), buildable.cend());
+			buildable_set = std::unordered_set<Index>(buildable.cbegin(), buildable.cend());
 			std::vector<TileID> houses {HOUSE1, HOUSE2, HOUSE3};
 			std::default_random_engine rng;
 			rng.seed(666);

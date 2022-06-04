@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "Tiles.h"
 #include "game/Entity.h"
 #include "game/Game.h"
 #include "game/Realm.h"
@@ -33,30 +34,30 @@ namespace Game3 {
 		if (!realm)
 			return;
 
+		Position new_position = position;
 		switch (move_direction) {
 			case Direction::Down:
-				if (int(position.first) < realm->tilemap1->height - 1)
-					++position.first;
+				++new_position.first;
 				direction = Direction::Down;
 				break;
 			case Direction::Up:
-				if (position.first != 0)
-					--position.first;
+				--new_position.first;
 				direction = Direction::Up;
 				break;
 			case Direction::Left:
-				if (position.second != 0)
-					--position.second;
+				--new_position.second;
 				direction = Direction::Left;
 				break;
 			case Direction::Right:
-				if (int(position.second) < realm->tilemap1->width - 1)
-					++position.second;
+				++new_position.second;
 				direction = Direction::Right;
 				break;
 			default:
 				throw std::invalid_argument("Invalid direction: " + std::to_string(int(move_direction)));
 		}
+
+		if (canMoveTo(new_position))
+			position = new_position;
 	}
 
 	void Entity::setRealm(const Game &game, RealmID realm_id) {
@@ -67,6 +68,23 @@ namespace Game3 {
 	void Entity::setRealm(const std::shared_ptr<Realm> realm) {
 		weakRealm = realm;
 		realmID = realm->id;
+	}
+
+	bool Entity::canMoveTo(const Position &new_position) const {
+		if (new_position.first < 0 || new_position.second < 0)
+			return false;
+
+		auto realm = weakRealm.lock();
+		if (!realm)
+			return false;
+
+		if (realm->getHeight() <= new_position.first || realm->getWidth() <= new_position.second)
+			return false;
+
+		if (!isLand((*realm->tilemap1)(new_position.second, new_position.first)))
+			return false;
+
+		return true;
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {

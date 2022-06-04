@@ -22,7 +22,7 @@ namespace Game3 {
 			static std::unordered_map<EntityID, Texture> textureMap;
 
 			/** (row, column) */
-			std::pair<Index, Index> position {0, 0};
+			Position position {0, 0};
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;
 			Direction direction = Direction::Down;
@@ -42,6 +42,8 @@ namespace Game3 {
 		private:
 			EntityID id_ = 0;
 			Texture *texture = nullptr;
+
+			bool canMoveTo(const Position &) const;
 	};
 
 	void to_json(nlohmann::json &, const Entity &);
