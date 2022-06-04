@@ -44,11 +44,13 @@ namespace Game3 {
 
 		private:
 			nanogui::Widget *buttonBox = nullptr;
+			nanogui::Button *saveButton = nullptr;
 			Canvas *canvas = nullptr;
 
 			void onJoystick(int joystick_id, int event);
 			void newGameWindow();
 			void newGame(int seed, int width, int height);
+			void saveGame();
 
 			static Application *instance;
 	};

@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iostream>
 
 #include "ui/Application.h"
@@ -22,9 +23,10 @@ namespace Game3 {
 		new_button->setTheme(theme);
 		new_button->setCallback([this] { newGameWindow(); });
 
-		auto *save_button = new nanogui::Button(buttonBox, "", ENTYPO_ICON_SAVE);
-		save_button->setTheme(theme);
-		save_button->setEnabled(false);
+		saveButton = new nanogui::Button(buttonBox, "", ENTYPO_ICON_SAVE);
+		saveButton->setTheme(theme);
+		saveButton->setCallback([this] { saveGame(); });
+		saveButton->setEnabled(false);
 
 		auto *open_button = new nanogui::Button(buttonBox, "", ENTYPO_ICON_FOLDER);
 		open_button->setTheme(theme);
@@ -163,5 +165,29 @@ namespace Game3 {
 		realm->rebind();
 		realm->reupload();
 		canvas->game = game;
+		saveButton->setEnabled(true);
+	}
+
+	void Application::saveGame() {
+		if (!game)
+			return;
+
+		const std::string path = nanogui::file_dialog({{"g3", "Game3 save"}}, true);
+
+		if (path.empty())
+			return;
+
+		std::ofstream stream(path);
+
+		if (!stream.is_open()) {
+			new nanogui::MessageDialog(this, nanogui::MessageDialog::Type::Warning, "Error", "Couldn't open file for writing.");
+			return;
+		}
+
+		auto cbor = nlohmann::json::to_cbor(nlohmann::json(*game));
+		stream.write(reinterpret_cast<char *>(&cbor[0]), cbor.size());
+		stream.close();
+
+		new nanogui::MessageDialog(this, nanogui::MessageDialog::Type::Information, "Success", "Game saved.");
 	}
 }
