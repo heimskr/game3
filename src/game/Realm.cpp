@@ -6,13 +6,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "game/Entity.h"
 #include "game/Realm.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 #include "Tiles.h"
 
 namespace Game3 {
-	Realm::Realm(int id_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_):
+	Realm::Realm(RealmID id_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_):
 	id(id_), tilemap1(tilemap1_), tilemap2(tilemap2_), tilemap3(tilemap3_) {
 		if (tilemap1)
 			renderer1.initialize(tilemap1);
@@ -22,7 +23,7 @@ namespace Game3 {
 			renderer3.initialize(tilemap3);
 	}
 
-	Realm::Realm(int id_, const std::shared_ptr<Tilemap> &tilemap1_): Realm(id_, tilemap1_, nullptr, nullptr) {
+	Realm::Realm(RealmID id_, const std::shared_ptr<Tilemap> &tilemap1_): Realm(id_, tilemap1_, nullptr, nullptr) {
 		tilemap2 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->texture);
 		tilemap3 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->texture);
 		renderer2.initialize(tilemap2);
@@ -224,6 +225,9 @@ namespace Game3 {
 		json["tileEntities"] = std::unordered_map<std::string, nlohmann::json>();
 		for (const auto &[index, tile_entity]: realm.tileEntities)
 			json["tileEntities"][std::to_string(index)] = *tile_entity;
+		json["entities"] = std::vector<nlohmann::json>();
+		for (const auto &entity: realm.entities)
+			json["entities"].push_back(*entity);
 	}
 
 	void from_json(const nlohmann::json &json, Realm &realm) {
@@ -236,5 +240,8 @@ namespace Game3 {
 		realm.renderer1.initialize(realm.tilemap1);
 		realm.renderer2.initialize(realm.tilemap2);
 		realm.renderer3.initialize(realm.tilemap3);
+		realm.entities.clear();
+		for (const auto &entity_json: json.at("entities"))
+			realm.entities.insert(std::make_shared<Entity>(entity_json));
 	}
 }

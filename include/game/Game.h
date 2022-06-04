@@ -5,15 +5,15 @@
 
 #include <nlohmann/json.hpp>
 
+#include "game/Player.h"
 #include "game/Realm.h"
 
 namespace Game3 {
 	class Game {
 		public:
-			std::unordered_map<int, std::shared_ptr<Realm>> realms;
+			std::unordered_map<RealmID, std::shared_ptr<Realm>> realms;
 			std::shared_ptr<Realm> activeRealm;
-			/** (row, column) */
-			std::pair<Index, Index> playerPosition;
+			std::shared_ptr<Player> player;
 	};
 
 	void to_json(nlohmann::json &, const Game &);

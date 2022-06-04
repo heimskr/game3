@@ -67,23 +67,24 @@ namespace Game3 {
 		}
 
 		if (canvas) {
-			std::cout << key << ", " << scancode << ", " << action << ", " << modifiers << '\n';
+			// std::cout << key << ", " << scancode << ", " << action << ", " << modifiers << '\n';
+			const float delta = canvas->scale / 4.f;
 			switch (key) {
 				case GLFW_KEY_DOWN:
 				case GLFW_KEY_S:
-					canvas->center.y() += 0.1f;
+					canvas->center.y() -= delta;
 					break;
 				case GLFW_KEY_UP:
 				case GLFW_KEY_W:
-					canvas->center.y() -= 0.1f;
+					canvas->center.y() += delta;
 					break;
 				case GLFW_KEY_LEFT:
 				case GLFW_KEY_A:
-					canvas->center.x() -= 0.1f;
+					canvas->center.x() += delta;
 					break;
 				case GLFW_KEY_RIGHT:
 				case GLFW_KEY_D:
-					canvas->center.x() += 0.1f;
+					canvas->center.x() -= delta;
 					break;
 				default:
 					return false;
@@ -171,12 +172,13 @@ namespace Game3 {
 		auto tilemap = std::make_shared<Tilemap>(width, height, 16, texture);
 		auto realm = std::make_shared<Realm>(1, tilemap);
 		realm->generate(seed);
-		game->playerPosition = {realm->randomLand / width, realm->randomLand % width};
 		game->realms.emplace(realm->id, realm);
 		game->activeRealm = realm;
 		realm->rebind();
 		realm->reupload();
 		canvas->game = game;
+		realm->entities.insert(game->player = std::make_shared<Player>(Entity::GANGBLANC));
+		game->player->position = {realm->randomLand / width, realm->randomLand % width};
 		saveButton->setEnabled(true);
 	}
 
@@ -219,6 +221,12 @@ namespace Game3 {
 		else
 			game = std::make_shared<Game>(nlohmann::json::from_cbor(data));
 		auto realm = game->activeRealm;
+		for (const auto &entity: realm->entities)
+			if (entity->isPlayer()) {
+				if (!(game->player = std::dynamic_pointer_cast<Player>(entity)))
+					throw std::runtime_error("Couldn't cast entity with isPlayer() == true to Player");
+				break;
+			}
 		realm->rebind();
 		realm->reupload();
 		canvas->game = game;

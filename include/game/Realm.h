@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <unordered_set>
 
 #include <nlohmann/json.hpp>
 
@@ -11,16 +12,19 @@
 #include "ui/ElementBufferedRenderer.h"
 
 namespace Game3 {
+	class Entity;
+
 	class Realm {
 		public:
-			int id;
+			RealmID id;
 			std::shared_ptr<Tilemap> tilemap1, tilemap2, tilemap3;
 			ElementBufferedRenderer renderer1, renderer2, renderer3;
 			std::unordered_map<Index, std::shared_ptr<TileEntity>> tileEntities;
+			std::unordered_set<std::shared_ptr<Entity>> entities;
 
 			Realm() = default;
-			Realm(int id_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_);
-			Realm(int id_, const std::shared_ptr<Tilemap> &tilemap1_);
+			Realm(RealmID id_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_);
+			Realm(RealmID id_, const std::shared_ptr<Tilemap> &tilemap1_);
 
 			void render(int width, int height, const nanogui::Vector2f &center, float scale);
 			void reupload();
