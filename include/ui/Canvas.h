@@ -23,7 +23,7 @@ namespace Game3 {
 		public:
 			std::shared_ptr<Game> game;
 			nanogui::Vector2f center {0.f, 0.f};
-			float scale = 1.f;
+			float scale = 4.f;
 
 			Canvas(nanogui::Widget *parent);
 

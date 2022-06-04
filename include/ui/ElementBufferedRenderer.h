@@ -11,6 +11,7 @@ namespace Game3 {
 			void reset();
 			void initialize(const std::shared_ptr<Tilemap> &) override;
 			void render() override;
+			void reupload();
 
 			operator bool() const { return initialized; }
 

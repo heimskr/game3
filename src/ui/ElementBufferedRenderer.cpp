@@ -30,7 +30,6 @@ namespace Game3 {
 	void ElementBufferedRenderer::initialize(const std::shared_ptr<Tilemap> &tilemap_) {
 		if (initialized)
 			reset();
-
 		tilemap = tilemap_;
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		createShader();
@@ -52,6 +51,13 @@ namespace Game3 {
 		glUseProgram(shaderHandle);
 		glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glDrawElements(GL_TRIANGLES, tilemap->tiles.size() * 6, GL_UNSIGNED_INT, (GLvoid *) 0);
+	}
+
+	void ElementBufferedRenderer::reupload() {
+		glDeleteVertexArrays(1, &vaoHandle);
+		glDeleteBuffers(1, &vboHandle);
+		generateVertexBufferObject();
+		generateVertexArrayObject();
 	}
 
 	void ElementBufferedRenderer::createShader() {

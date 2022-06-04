@@ -44,6 +44,18 @@ namespace Game3 {
 		renderer3.render();
 	}
 
+	void Realm::reupload() {
+		renderer1.reupload();
+		renderer2.reupload();
+		renderer3.reupload();
+	}
+
+	void Realm::rebind() {
+		renderer1.tilemap = tilemap1;
+		renderer2.tilemap = tilemap2;
+		renderer3.tilemap = tilemap3;
+	}
+
 	void Realm::generate(int seed, double noise_zoom, double noise_threshold) {
 		const auto width = tilemap1->width;
 		const auto height = tilemap1->height;
@@ -102,7 +114,7 @@ namespace Game3 {
 
 		std::cout << "Found " << candidates.size() << " candidate" << (candidates.size() == 1? "" : "s") << ".\n";
 		if (!candidates.empty())
-			createTown(choose(candidates, 666) + pad * (tilemap1->width + 1), n, m, pad);
+			createTown(choose(candidates, uint_fast32_t(seed)) + pad * (tilemap1->width + 1), n, m, pad);
 	}
 
 	void Realm::createTown(size_t index, size_t width, size_t height, size_t pad) {

@@ -157,9 +157,11 @@ namespace Game3 {
 		Texture texture("resources/tileset2.png");
 		auto tilemap = std::make_shared<Tilemap>(width, height, 16, texture);
 		auto realm = std::make_shared<Realm>(1, tilemap);
+		realm->generate(seed);
 		game->realms.emplace(realm->id, realm);
 		game->activeRealm = realm;
-		realm->generate(seed);
+		realm->rebind();
+		realm->reupload();
 		canvas->game = game;
 	}
 }

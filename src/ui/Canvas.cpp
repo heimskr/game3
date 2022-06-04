@@ -13,9 +13,8 @@
 #include "util/Util.h"
 
 namespace Game3 {
-
 	Canvas::Canvas(nanogui::Widget *parent_): GLCanvas(parent_) {
-		setBackgroundColor({66, 172, 175, 255});
+		// setBackgroundColor({66, 172, 175, 255});
 		int scale = 16;
 		magic = scale / 2;
 	}
