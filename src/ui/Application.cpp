@@ -67,7 +67,41 @@ namespace Game3 {
 		}
 
 		if (canvas) {
-			// std::cout << key << ", " << scancode << ", " << action << ", " << modifiers << '\n';
+			std::cout << key << ", " << scancode << ", " << action << ", " << modifiers << '\n';
+			if (game && game->player && action != 0) {
+				auto &player = *game->player;
+				switch (key) {
+					case GLFW_KEY_DOWN:
+					case GLFW_KEY_S:
+						if (int(player.position.second) < game->activeRealm->tilemap1->height - 1)
+							++player.position.second;
+						player.direction = Direction::Down;
+						break;
+					case GLFW_KEY_UP:
+					case GLFW_KEY_W:
+						if (player.position.second != 0)
+							--player.position.second;
+						player.direction = Direction::Up;
+						break;
+					case GLFW_KEY_LEFT:
+					case GLFW_KEY_A:
+						if (player.position.first != 0)
+							--player.position.first;
+						player.direction = Direction::Left;
+						break;
+					case GLFW_KEY_RIGHT:
+					case GLFW_KEY_D:
+						if (int(player.position.first) < game->activeRealm->tilemap1->width - 1)
+						++player.position.first;
+						player.direction = Direction::Right;
+						break;
+				}
+
+				return true;
+			}
+
+			return false;
+
 			const float delta = canvas->scale / 4.f;
 			switch (key) {
 				case GLFW_KEY_DOWN:

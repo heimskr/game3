@@ -52,7 +52,11 @@ namespace Game3 {
 		if (size_y < 0)
 			size_y = texture.height;
 
+
 		const auto &tilemap = canvas.game->activeRealm->tilemap1;
+		x *= tilemap->tileSize * canvas.scale / 2.f;
+		y *= tilemap->tileSize * canvas.scale / 2.f;
+
 		x += canvas.width() / 2.f;
 		x -= tilemap->width * tilemap->tileSize * canvas.scale / canvas.magic * 2.f; // TODO: the math here is a little sus... things might cancel out
 		x += canvas.center.x() * canvas.scale * tilemap->tileSize / 2.f;

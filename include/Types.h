@@ -11,5 +11,5 @@ namespace Game3 {
 	using ItemID = unsigned;
 	using Slot = int;
 
-	enum class Direction: uint8_t {Up, Right, Down, Left};
+	enum class Direction: uint8_t {Down = 0, Up, Right, Left};
 }

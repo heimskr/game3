@@ -23,7 +23,7 @@ namespace Game3 {
 		if (!texture)
 			return;
 
-		sprite_renderer.draw(*texture, 0.f, 0.f, 16.f, 16.f, 32.f, 32.f);
+		sprite_renderer.draw(*texture, position.first, position.second, 0.f, 0.f, 16.f, 16.f);
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {
