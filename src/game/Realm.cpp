@@ -239,6 +239,9 @@ namespace Game3 {
 		realm.tilemap1 = std::make_shared<Tilemap>(json.at("tilemap1"));
 		realm.tilemap2 = std::make_shared<Tilemap>(json.at("tilemap2"));
 		realm.tilemap3 = std::make_shared<Tilemap>(json.at("tilemap3"));
+		realm.tilemap1->texture.init();
+		realm.tilemap2->texture.init();
+		realm.tilemap3->texture.init();
 		for (const auto &[index, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>())
 			realm.tileEntities.emplace(parseUlong(index), TileEntity::fromJSON(tile_entity_json));
 		realm.renderer1.initialize(realm.tilemap1);
