@@ -23,8 +23,7 @@ namespace Game3 {
 		if (!texture)
 			return;
 
-		// std::cout << texture->id << ' ' << texture->valid() << "\n";
-		sprite_renderer.draw(*texture, 100, 100, 100.f);
+		sprite_renderer.draw(*texture, 0, 0, 2.f);
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {

@@ -169,6 +169,7 @@ namespace Game3 {
 	void Application::newGame(int seed, int width, int height) {
 		game = std::make_shared<Game>();
 		Texture texture("resources/tileset2.png");
+		texture.init();
 		auto tilemap = std::make_shared<Tilemap>(width, height, 16, texture);
 		auto realm = std::make_shared<Realm>(1, tilemap);
 		realm->generate(seed);

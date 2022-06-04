@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include "Texture.h"
+#include "game/Entity.h"
 #include "ui/SpriteRenderer.h"
 #include "util/Util.h"
 
@@ -24,6 +25,16 @@ namespace Game3 {
 		shader.free();
 		if (initialized)
 			glDeleteVertexArrays(1, &quadVAO);
+	}
+
+	void SpriteRenderer::backBufferChanged(int width, int height) {
+		if (width != backBufferWidth || height != backBufferHeight) {
+			backBufferWidth = width;
+			backBufferHeight = height;
+			glm::mat4 projection = glm::ortho(0.0f, float(width), float(height), 0.0f, -1.0f, 1.0f);
+			shader.bind();
+			glUniformMatrix4fv(shader.uniform("projection"), 1, GL_FALSE, glm::value_ptr(projection)); CHECKGL
+		}
 	}
 
 	void SpriteRenderer::draw(Texture &texture, float x, float y, float scale, float angle, float alpha) {
@@ -49,18 +60,18 @@ namespace Game3 {
 		model = glm::translate(model, glm::vec3(0.5f * size_x, 0.5f * size_y, 0.f)); // move origin of rotation to center of quad
 		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
 		model = glm::translate(model, glm::vec3(-0.5f * size_x, -0.5f * size_y, 0.f)); // move origin back
-		model = glm::scale(model, glm::vec3(size_x * scale, size_y * scale, 1.f)); // last scale
+		model = glm::scale(model, glm::vec3(size_x * scale, size_y * scale, 2.f)); // last scale
 
-		glUniformMatrix4fv(shader.uniform("model"), 1, false, glm::value_ptr(model));CHECKGL
-		// glUniform2f(shader.uniform("offset"), x_offset, y_offset);CHECKGL
-		glUniform3f(shader.uniform("spriteColor"), 1.f, 1.f, 1.f);CHECKGL
+		glUniformMatrix4fv(shader.uniform("model"), 1, GL_FALSE, glm::value_ptr(model)); CHECKGL
+		glUniform2f(shader.uniform("offset"), x_offset, y_offset); CHECKGL
+		glUniform3f(shader.uniform("spriteColor"), 1.f, 1.f, 1.f); CHECKGL
 
-		glActiveTexture(GL_TEXTURE0);CHECKGL
-		texture.bind();CHECKGL
+		glActiveTexture(GL_TEXTURE0); CHECKGL
+		texture.bind(); CHECKGL
 
-		glBindVertexArray(quadVAO);CHECKGL
-		glDrawArrays(GL_TRIANGLES, 0, 6);CHECKGL
-		glBindVertexArray(0);CHECKGL
+		glBindVertexArray(quadVAO); CHECKGL
+		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
+		glBindVertexArray(0); CHECKGL
 	}
 
 	void SpriteRenderer::initRenderData() {

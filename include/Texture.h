@@ -19,6 +19,7 @@ namespace Game3 {
 			Texture() = default;
 			Texture(const std::filesystem::path &, bool alpha_ = true, int filter_ = GL_NEAREST);
 
+			void init();
 			void bind();
 			bool valid() const { return valid_; }
 
