@@ -39,7 +39,7 @@ namespace Game3 {
 		if (!texture)
 			return;
 
-		sprite_renderer.draw(*texture, position.second, position.first, 0.f, 8.f * int(direction), 16.f, 16.f);
+		sprite_renderer.drawOnMap(*texture, position.second, position.first, 0.f, 8.f * int(direction), 16.f, 16.f);
 	}
 
 	void Entity::move(Direction move_direction) {

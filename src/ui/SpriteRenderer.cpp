@@ -39,11 +39,11 @@ namespace Game3 {
 		}
 	}
 
-	void SpriteRenderer::draw(Texture &texture, float x, float y, float scale, float angle, float alpha) {
-		draw(texture, x, y, 0, 0, texture.width, texture.height, scale, angle, alpha);
+	void SpriteRenderer::drawOnMap(Texture &texture, float x, float y, float scale, float angle, float alpha) {
+		drawOnMap(texture, x, y, 0, 0, texture.width, texture.height, scale, angle, alpha);
 	}
 
-	void SpriteRenderer::draw(Texture &texture, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale, float angle, float alpha) {
+	void SpriteRenderer::drawOnMap(Texture &texture, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale, float angle, float alpha) {
 		if (!initialized)
 			return;
 
@@ -81,7 +81,7 @@ namespace Game3 {
 		model = glm::scale(model, glm::vec3(texture.width * scale, texture.height * scale, 2.f)); // last scale
 
 		glUniformMatrix4fv(shader.uniform("model"), 1, GL_FALSE, glm::value_ptr(model)); CHECKGL
-		glUniform3f(shader.uniform("spriteColor"), 1.f, 1.f, 1.f); CHECKGL
+		glUniform4f(shader.uniform("spriteColor"), 1.f, 1.f, 1.f, alpha); CHECKGL
 
 		glActiveTexture(GL_TEXTURE0); CHECKGL
 		texture.bind(); CHECKGL
