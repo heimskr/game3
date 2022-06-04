@@ -216,6 +216,11 @@ namespace Game3 {
 		}
 	}
 
+	void Realm::addEntity(const std::shared_ptr<Entity> &entity) {
+		entity->setRealm(shared_from_this());
+		entities.insert(entity);
+	}
+
 	void to_json(nlohmann::json &json, const Realm &realm) {
 		json["id"] = realm.id;
 		json["tilemap1"] = *realm.tilemap1;

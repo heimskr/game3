@@ -67,33 +67,25 @@ namespace Game3 {
 		}
 
 		if (canvas) {
-			std::cout << key << ", " << scancode << ", " << action << ", " << modifiers << '\n';
+			// std::cout << key << ", " << scancode << ", " << action << ", " << modifiers << '\n';
 			if (game && game->player && action != 0) {
 				auto &player = *game->player;
 				switch (key) {
 					case GLFW_KEY_DOWN:
 					case GLFW_KEY_S:
-						if (int(player.position.second) < game->activeRealm->tilemap1->height - 1)
-							++player.position.second;
-						player.direction = Direction::Down;
+						player.move(Direction::Down);
 						break;
 					case GLFW_KEY_UP:
 					case GLFW_KEY_W:
-						if (player.position.second != 0)
-							--player.position.second;
-						player.direction = Direction::Up;
+						player.move(Direction::Up);
 						break;
 					case GLFW_KEY_LEFT:
 					case GLFW_KEY_A:
-						if (player.position.first != 0)
-							--player.position.first;
-						player.direction = Direction::Left;
+						player.move(Direction::Left);
 						break;
 					case GLFW_KEY_RIGHT:
 					case GLFW_KEY_D:
-						if (int(player.position.first) < game->activeRealm->tilemap1->width - 1)
-						++player.position.first;
-						player.direction = Direction::Right;
+						player.move(Direction::Right);
 						break;
 				}
 
@@ -170,12 +162,12 @@ namespace Game3 {
 		seedbox->setEditable(true);
 
 		window->add<nanogui::Label>("Width");
-		auto *widthbox = new nanogui::IntBox(window, 40);
+		auto *widthbox = new nanogui::IntBox(window, 256);
 		widthbox->setAlignment(nanogui::TextBox::Alignment::Left);
 		widthbox->setEditable(true);
 
 		window->add<nanogui::Label>("Height");
-		auto *heightbox = new nanogui::IntBox(window, 40);
+		auto *heightbox = new nanogui::IntBox(window, 256);
 		heightbox->setAlignment(nanogui::TextBox::Alignment::Left);
 		heightbox->setEditable(true);
 
@@ -211,7 +203,7 @@ namespace Game3 {
 		game->activeRealm = realm;
 		realm->rebind();
 		realm->reupload();
-		realm->entities.insert(game->player = std::make_shared<Player>(Entity::GANGBLANC));
+		realm->addEntity(game->player = std::make_shared<Player>(Entity::GANGBLANC));
 		game->player->position = {realm->randomLand / width, realm->randomLand % width};
 		game->player->init();
 		canvas->game = game;

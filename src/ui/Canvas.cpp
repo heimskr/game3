@@ -88,7 +88,9 @@ namespace Game3 {
 			int x = fx;
 			int y = fy;
 
-			std::cerr << x << ", " << y << '\n';
+			(void) x;
+			(void) y;
+			// std::cerr << x << ", " << y << '\n';
 
 			return true;
 		}

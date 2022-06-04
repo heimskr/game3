@@ -11,6 +11,8 @@
 #include "game/Item.h"
 
 namespace Game3 {
+	class Game;
+	class Realm;
 	class SpriteRenderer;
 
 	class Entity {
@@ -22,6 +24,7 @@ namespace Game3 {
 			/** (row, column) */
 			std::pair<Index, Index> position {0, 0};
 			RealmID realmID = 0;
+			std::weak_ptr<Realm> weakRealm;
 			Direction direction = Direction::Down;
 			std::unordered_map<Slot, ItemStack> inventory;
 
@@ -32,6 +35,9 @@ namespace Game3 {
 			void id(EntityID);
 			void init();
 			void render(SpriteRenderer &) const;
+			void move(Direction);
+			void setRealm(const Game &, RealmID);
+			void setRealm(const std::shared_ptr<Realm>);
 
 		private:
 			EntityID id_ = 0;

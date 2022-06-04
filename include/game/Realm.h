@@ -15,7 +15,7 @@ namespace Game3 {
 	class Entity;
 	class SpriteRenderer;
 
-	class Realm {
+	class Realm: public std::enable_shared_from_this<Realm> {
 		public:
 			RealmID id;
 			std::shared_ptr<Tilemap> tilemap1, tilemap2, tilemap3;
@@ -34,6 +34,7 @@ namespace Game3 {
 			void createTown(size_t index, size_t width, size_t height, size_t pad);
 			int getWidth()  const { return tilemap1->width;  }
 			int getHeight() const { return tilemap1->height; }
+			void addEntity(const std::shared_ptr<Entity> &);
 
 			friend class Application;
 
