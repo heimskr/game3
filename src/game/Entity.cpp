@@ -106,9 +106,9 @@ namespace Game3 {
 			return;
 
 		const auto &tilemap = *realm->tilemap1;
-		canvas.center.x() = -(column() - tilemap.width  / 2.f) * canvas.scale / 2.f;
-		canvas.center.y() = -(row()    - tilemap.height / 2.f) * canvas.scale / 2.f;
 		canvas.scale = 4.f;
+		canvas.center.x() = -(column() - tilemap.width  / 2.f);
+		canvas.center.y() = -(row()    - tilemap.height / 2.f);
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {

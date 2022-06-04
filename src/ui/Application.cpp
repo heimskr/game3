@@ -73,16 +73,16 @@ namespace Game3 {
 				switch (key) {
 					case GLFW_KEY_S:
 						player.move(Direction::Down);
-						return true;;
+						return true;
 					case GLFW_KEY_W:
 						player.move(Direction::Up);
-						return true;;
+						return true;
 					case GLFW_KEY_A:
 						player.move(Direction::Left);
-						return true;;
+						return true;
 					case GLFW_KEY_D:
 						player.move(Direction::Right);
-						return true;;
+						return true;
 				}
 			}
 
