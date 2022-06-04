@@ -11,7 +11,7 @@
 namespace Game3 {
 	Application * Application::instance = nullptr;
 
-	Application::Application(): nanogui::Screen(Eigen::Vector2i(1024, 768), "Game3") {
+	Application::Application(): nanogui::Screen(Eigen::Vector2i(1024 * 2, 768 * 2), "Game3") {
 		if (instance != nullptr)
 			throw std::runtime_error("Only one Application can exist at a time.");
 		instance = this;
@@ -157,7 +157,7 @@ namespace Game3 {
 		window->setLayout(new nanogui::GroupLayout());
 
 		window->add<nanogui::Label>("Seed");
-		auto *seedbox = new nanogui::IntBox(window, 1024);
+		auto *seedbox = new nanogui::IntBox(window, 666);
 		seedbox->setAlignment(nanogui::TextBox::Alignment::Left);
 		seedbox->setEditable(true);
 

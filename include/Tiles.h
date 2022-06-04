@@ -1,5 +1,7 @@
 #pragma once
 
+#include <unordered_set>
+
 #include "Types.h"
 
 namespace Game3 {
@@ -28,16 +30,9 @@ namespace Game3 {
 	constexpr static TileID HOUSE2 = 61;
 	constexpr static TileID HOUSE3 = 62;
 
+	extern std::unordered_set<TileID> landSet;
+
 	static inline bool isLand(TileID tile) {
-		switch (tile) {
-			case SAND:
-			case LIGHT_GRASS:
-			case GRASS:
-			case GRASS_ALT1:
-			case GRASS_ALT2:
-				return true;
-			default:
-				return false;
-		}
+		return landSet.contains(tile);
 	}
 }
