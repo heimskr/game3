@@ -23,7 +23,8 @@ namespace Game3 {
 		if (!texture)
 			return;
 
-		sprite_renderer.draw(*texture, 0, 0, 2.f);
+		float offset = 16;
+		sprite_renderer.draw(*texture, 64.f, 64.f, offset, offset, 32.f, 32.f);
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {

@@ -31,7 +31,7 @@ namespace Game3 {
 		if (width != backBufferWidth || height != backBufferHeight) {
 			backBufferWidth = width;
 			backBufferHeight = height;
-			glm::mat4 projection = glm::ortho(0.0f, float(width), float(height), 0.0f, -1.0f, 1.0f);
+			glm::mat4 projection = glm::ortho(0.f, float(width), float(height), 0.f, -1.f, 1.f);
 			shader.bind();
 			glUniformMatrix4fv(shader.uniform("projection"), 1, GL_FALSE, glm::value_ptr(projection)); CHECKGL
 		}
@@ -56,35 +56,37 @@ namespace Game3 {
 		shader.bind();
 
 		glm::mat4 model = glm::mat4(1.f);
-		model = glm::translate(model, glm::vec3(x, y, 0.f));  // first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(0.5f * size_x, 0.5f * size_y, 0.f)); // move origin of rotation to center of quad
+		model = glm::translate(model, glm::vec3(x - x_offset, y - y_offset, 0.f));  // first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
+		model = glm::translate(model, glm::vec3(0.5f * texture.width, 0.5f * texture.height, 0.f)); // move origin of rotation to center of quad
 		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
-		model = glm::translate(model, glm::vec3(-0.5f * size_x, -0.5f * size_y, 0.f)); // move origin back
-		model = glm::scale(model, glm::vec3(size_x * scale, size_y * scale, 2.f)); // last scale
+		model = glm::translate(model, glm::vec3(-0.5f * texture.width, -0.5f * texture.height, 0.f)); // move origin back
+		model = glm::scale(model, glm::vec3(texture.width * scale, texture.height * scale, 2.f)); // last scale
 
 		glUniformMatrix4fv(shader.uniform("model"), 1, GL_FALSE, glm::value_ptr(model)); CHECKGL
-		glUniform2f(shader.uniform("offset"), x_offset, y_offset); CHECKGL
 		glUniform3f(shader.uniform("spriteColor"), 1.f, 1.f, 1.f); CHECKGL
 
 		glActiveTexture(GL_TEXTURE0); CHECKGL
 		texture.bind(); CHECKGL
 
+		glEnable(GL_SCISSOR_TEST);
+		glScissor(2 * x, 2 * (backBufferHeight - y - size_y), 2 * size_x, 2 * size_y);
 		glBindVertexArray(quadVAO); CHECKGL
 		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
 		glBindVertexArray(0); CHECKGL
+		glDisable(GL_SCISSOR_TEST);
 	}
 
 	void SpriteRenderer::initRenderData() {
 		unsigned int vbo;
 		static float vertices[] {
-			// pos      // tex
-			0.0f, 1.0f, 0.0f, 1.0f,
-			1.0f, 0.0f, 1.0f, 0.0f,
-			0.0f, 0.0f, 0.0f, 0.0f,
+			// pos    // tex
+			0.f, 1.f, 0.f, 1.f,
+			1.f, 0.f, 1.f, 0.f,
+			0.f, 0.f, 0.f, 0.f,
 
-			0.0f, 1.0f, 0.0f, 1.0f,
-			1.0f, 1.0f, 1.0f, 1.0f,
-			1.0f, 0.0f, 1.0f, 0.0f
+			0.f, 1.f, 0.f, 1.f,
+			1.f, 1.f, 1.f, 1.f,
+			1.f, 0.f, 1.f, 0.f
 		};
 
 		glGenVertexArrays(1, &quadVAO);
