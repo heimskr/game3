@@ -117,7 +117,7 @@ namespace Game3 {
 			createTown(choose(candidates, uint_fast32_t(seed)) + pad * (tilemap1->width + 1), n, m, pad);
 	}
 
-	void Realm::createTown(size_t index, size_t width, size_t height, size_t pad) {
+	void Realm::createTown(const size_t index, size_t width, size_t height, size_t pad) {
 		size_t row = 0, column = 0;
 
 		auto &layer1 = tilemap1->tiles;
@@ -130,16 +130,16 @@ namespace Game3 {
 
 		for (size_t row = index / map_width; row < index / map_width + height; ++row) {
 			layer2[row * map_width + index % map_width] = TOWER_NS;
-			layer2[row * map_width + index % map_width + map_width - 1] = TOWER_NS;
+			layer2[row * map_width + index % map_width + width - 1] = TOWER_NS;
 		}
 
-		for (size_t column = index % map_width; column < index % map_width + width; ++column) {
+		for (size_t column = 0; column < width; ++column) {
 			layer2[index + column] = TOWER_WE;
 			layer2[index + map_width * (height - 1) + column] = TOWER_WE;
 		}
 
 		layer2[index] = TOWER_NW;
-		layer2[index + map_width * (height - 1) + index % map_width] = TOWER_SW;
+		layer2[index + map_width * (height - 1)] = TOWER_SW;
 		layer2[index + width - 1] = TOWER_NE;
 		layer2[index + map_width * (height - 1) + width - 1] = TOWER_SE;
 
@@ -231,8 +231,7 @@ namespace Game3 {
 		realm.tilemap1 = std::make_shared<Tilemap>(json.at("tilemap1"));
 		realm.tilemap2 = std::make_shared<Tilemap>(json.at("tilemap2"));
 		realm.tilemap3 = std::make_shared<Tilemap>(json.at("tilemap3"));
-		for (const auto &[index, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>()) {
+		for (const auto &[index, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>())
 			realm.tileEntities.emplace(parseUlong(index), TileEntity::fromJSON(tile_entity_json));
-		}
 	}
 }
