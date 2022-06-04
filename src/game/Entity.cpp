@@ -97,6 +97,9 @@ namespace Game3 {
 		if (!isLand((*realm->tilemap1)(new_position.second, new_position.first)))
 			return false;
 
+		if (isSolid((*realm->tilemap2)(new_position.second, new_position.first)))
+			return false;
+
 		return true;
 	}
 

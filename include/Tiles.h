@@ -31,8 +31,13 @@ namespace Game3 {
 	constexpr static TileID HOUSE3 = 62;
 
 	extern std::unordered_set<TileID> landSet;
+	extern std::unordered_set<TileID> solidSet;
 
 	static inline bool isLand(TileID tile) {
 		return landSet.contains(tile);
+	}
+
+	static inline bool isSolid(TileID tile) {
+		return solidSet.contains(tile);
 	}
 }
