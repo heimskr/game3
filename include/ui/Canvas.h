@@ -25,7 +25,8 @@ namespace Game3 {
 			std::shared_ptr<Game> game;
 			nanogui::Vector2f center {0.f, 0.f};
 			float scale = DEFAULT_SCALE;
-			SpriteRenderer spriteRenderer;
+			SpriteRenderer spriteRenderer {*this};
+			float magic = 8.f;
 
 			Canvas(nanogui::Widget *parent);
 
@@ -37,7 +38,6 @@ namespace Game3 {
 
 		private:
 			constexpr static float HEADER_HEIGHT = 56.f;
-			float magic = 8.f;
 
 			NVGcontext *context = nullptr;
 			int font = -1;

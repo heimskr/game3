@@ -4,18 +4,21 @@
 
 #include <nanogui/opengl.h>
 #include <nanogui/glutil.h>
+#include <nanogui/common.h>
 
 namespace Game3 {
+	class Canvas;
 	class Texture;
 
 	class SpriteRenderer {
 		public:
+			Canvas &canvas;
 			nanogui::GLShader shader;
 
-			SpriteRenderer();
+			SpriteRenderer(Canvas &);
 			~SpriteRenderer();
 
-			void backBufferChanged(int width, int height);
+			void update(int backbuffer_width, int backbuffer_height);
 			void draw(Texture &, float x, float y, float scale = 1.f, float angle = 0.f, float alpha = 1.f);
 			void draw(Texture &, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale = 1.f, float angle = 0.f, float alpha = 1.f);
 
@@ -23,7 +26,7 @@ namespace Game3 {
 			void initRenderData();
 			GLuint quadVAO = 0;
 			bool initialized = false;
-			int backBufferWidth = -1;
-			int backBufferHeight = -1;
+			int backbufferWidth = -1;
+			int backbufferHeight = -1;
 	};
 }

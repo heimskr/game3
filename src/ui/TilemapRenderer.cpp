@@ -6,11 +6,11 @@
 #include "ui/TilemapRenderer.h"
 
 namespace Game3 {
-	void TilemapRenderer::onBackBufferResized(int width, int height) {
-		if (width == backBufferWidth && height == backBufferHeight)
+	void TilemapRenderer::onBackbufferResized(int width, int height) {
+		if (width == backbufferWidth && height == backbufferHeight)
 			return;
-		backBufferWidth = width;
-		backBufferHeight = height;
+		backbufferWidth = width;
+		backbufferHeight = height;
 	}
 	
 	void TilemapRenderer::check(int handle, bool is_link) {

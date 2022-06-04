@@ -136,12 +136,12 @@ namespace Game3 {
 		seedbox->setEditable(true);
 
 		window->add<nanogui::Label>("Width");
-		auto *widthbox = new nanogui::IntBox(window, 256);
+		auto *widthbox = new nanogui::IntBox(window, 40);
 		widthbox->setAlignment(nanogui::TextBox::Alignment::Left);
 		widthbox->setEditable(true);
 
 		window->add<nanogui::Label>("Height");
-		auto *heightbox = new nanogui::IntBox(window, 256);
+		auto *heightbox = new nanogui::IntBox(window, 40);
 		heightbox->setAlignment(nanogui::TextBox::Alignment::Left);
 		heightbox->setEditable(true);
 

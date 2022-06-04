@@ -10,13 +10,15 @@
 
 #include "Texture.h"
 #include "game/Entity.h"
+#include "game/Game.h"
+#include "ui/Canvas.h"
 #include "ui/SpriteRenderer.h"
 #include "util/Util.h"
 
 #include <GL/glu.h>
 
 namespace Game3 {
-	SpriteRenderer::SpriteRenderer() {
+	SpriteRenderer::SpriteRenderer(Canvas &canvas_): canvas(canvas_) {
 		shader.initFromFiles("SpriteRenderer", "resources/sprite.vert", "resources/sprite.frag");
 		initRenderData();
 	}
@@ -27,11 +29,11 @@ namespace Game3 {
 			glDeleteVertexArrays(1, &quadVAO);
 	}
 
-	void SpriteRenderer::backBufferChanged(int width, int height) {
-		if (width != backBufferWidth || height != backBufferHeight) {
-			backBufferWidth = width;
-			backBufferHeight = height;
-			glm::mat4 projection = glm::ortho(0.f, float(width), float(height), 0.f, -1.f, 1.f);
+	void SpriteRenderer::update(int backbuffer_width, int backbuffer_height) {
+		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
+			backbufferWidth = backbuffer_width;
+			backbufferHeight = backbuffer_height;
+			glm::mat4 projection = glm::ortho(0.f, float(backbuffer_width), float(backbuffer_height), 0.f, -1.f, 1.f);
 			shader.bind();
 			glUniformMatrix4fv(shader.uniform("projection"), 1, GL_FALSE, glm::value_ptr(projection)); CHECKGL
 		}
@@ -45,13 +47,25 @@ namespace Game3 {
 		if (!initialized)
 			return;
 
-		// auto pattern = nvgImagePattern(context_, x + x_offset, y + y_offset, width_ * scale, height_ * scale, angle, nvg_, alpha);
-		// nvgRect(context_, x, y, size_x * scale, size_y * scale);
-
 		if (size_x < 0)
 			size_x = texture.width;
 		if (size_y < 0)
 			size_y = texture.height;
+
+		const auto &tilemap = canvas.game->activeRealm->tilemap1;
+		x += canvas.width() / 2.f;
+		x -= tilemap->width * tilemap->tileSize * canvas.scale / canvas.magic * 2.f; // TODO: the math here is a little sus... things might cancel out
+		x += canvas.center.x() * canvas.scale * tilemap->tileSize / 2.f;
+
+		y += canvas.height() / 2.f;
+		y -= tilemap->height * tilemap->tileSize * canvas.scale / canvas.magic * 2.f;
+		y += canvas.center.y() * canvas.scale * tilemap->tileSize / 2.f;
+
+		size_x *= canvas.scale / 2.f;
+		size_y *= canvas.scale / 2.f;
+		scale *= canvas.scale / 2.f;
+		x_offset *= canvas.scale;
+		y_offset *= canvas.scale;
 
 		shader.bind();
 
@@ -69,7 +83,7 @@ namespace Game3 {
 		texture.bind(); CHECKGL
 
 		glEnable(GL_SCISSOR_TEST);
-		glScissor(2 * x, 2 * (backBufferHeight - y - size_y), 2 * size_x, 2 * size_y);
+		glScissor(2 * x, 2 * (backbufferHeight - y - size_y), 2 * size_x, 2 * size_y);
 		glBindVertexArray(quadVAO); CHECKGL
 		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
 		glBindVertexArray(0); CHECKGL

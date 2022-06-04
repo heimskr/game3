@@ -47,7 +47,7 @@ namespace Game3 {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboHandle);
 		glm::mat4 projection(1.f);
 		projection = glm::scale(projection, {tilemap->tileSize, -tilemap->tileSize, 1}) *
-		             glm::scale(projection, {scale / backBufferWidth, scale / backBufferHeight, 1}) *
+		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1}) *
 		             glm::translate(projection, {center.x() - tilemap->width / 2.f, center.y() - tilemap->height / 2.f, 0});
 		glUseProgram(shaderHandle);
 		glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "projection"), 1, GL_FALSE, glm::value_ptr(projection));

@@ -30,13 +30,13 @@ namespace Game3 {
 	void Realm::render(const int width, const int height, const nanogui::Vector2f &center, float scale, SpriteRenderer &sprite_renderer) {
 		renderer1.center = center;
 		renderer1.scale  = scale;
-		renderer1.onBackBufferResized(width, height);
+		renderer1.onBackbufferResized(width, height);
 		renderer2.center = center;
 		renderer2.scale  = scale;
-		renderer2.onBackBufferResized(width, height);
+		renderer2.onBackbufferResized(width, height);
 		renderer3.center = center;
 		renderer3.scale  = scale;
-		renderer3.onBackBufferResized(width, height);
+		renderer3.onBackbufferResized(width, height);
 		renderer1.render();
 		renderer2.render();
 		renderer3.render();
