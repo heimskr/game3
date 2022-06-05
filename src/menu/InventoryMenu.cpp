@@ -15,26 +15,14 @@ namespace Game3 {
 		constexpr float x_fraction = 4.f;
 		constexpr float y_fraction = 6.f;
 
-		// glBegin(GL_POLYGON);
-		// glColor4f(0.91f, 0.84f, 0.58f, 0.8f); CHECKGL
-		// glRecti(width / x_fraction, height / y_fraction, width * (x_fraction - 1.f) / x_fraction, height * (y_fraction - 1.f) / y_fraction); CHECKGL
+		float pad = 10.f;
 
-		// std::cout << glGetString(GL_VERSION) << '\n';
+		const float x = width / x_fraction;
+		const float y = height / y_fraction;
+		const float w = width * (x_fraction - 2.f) / x_fraction;
+		const float h = height * (y_fraction - 2.f) / y_fraction;
 
-		canvas.rectangleRenderer({0.91f, 0.84f, 0.58f, 0.8f}, 200, 200, 100, 100);
-
-		// glRecti(0, 0, 100, 100); CHECKGL
-
-		// static Texture tex("resources/grass.png");
-		// tex.init();
-		// canvas.spriteRenderer.drawOnScreen(tex, 0, 0);
-
-
-		// throw 42;
-		// glVertex3f(width / x_fraction, height / y_fraction, 0.f);
-		// glVertex3f(width * (x_fraction - 1.f) / x_fraction, height / y_fraction, 0.f);
-		// glVertex3f(width * (x_fraction - 1.f) / x_fraction, height * (y_fraction - 1.f) / y_fraction, 0.f);
-		// glVertex3f(width / x_fraction, height * (y_fraction - 1.f) / y_fraction, 0.f);
-		// glEnd(); CHECKGL
+		canvas.rectangleRenderer({0.81f, 0.74f, 0.48f, 1.f}, x - pad, y - pad, w + 2 * pad, h + 2 * pad);
+		canvas.rectangleRenderer({0.91f, 0.84f, 0.58f, 1.f}, x, y, w, h);
 	}	
 }

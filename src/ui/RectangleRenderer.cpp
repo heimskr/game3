@@ -50,15 +50,9 @@ namespace Game3 {
 		glUniformMatrix4fv(shader.uniform("model"), 1, GL_FALSE, glm::value_ptr(model)); CHECKGL
 		glUniform4f(shader.uniform("rectColor"), color.x(), color.y(), color.z(), color.w()); CHECKGL
 
-		// glActiveTexture(GL_TEXTURE0); CHECKGL
-		// texture.bind(); CHECKGL
-
-		// glEnable(GL_SCISSOR_TEST);
-		// glScissor(2 * x, 2 * (backbufferHeight - y - height), 2 * width, 2 * height);
 		glBindVertexArray(quadVAO); CHECKGL
 		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
 		glBindVertexArray(0); CHECKGL
-		// glDisable(GL_SCISSOR_TEST);
 	}
 
 	void RectangleRenderer::operator()(const nanogui::Vector4f &color, float x, float y, float width, float height, float angle) {
@@ -74,7 +68,7 @@ namespace Game3 {
 
 			0.f, 1.f, 0.f, 1.f,
 			1.f, 1.f, 1.f, 1.f,
-			1.f, 0.f, 1.f, 0.f
+			1.f, 0.f, 1.f, 0.f,
 		};
 
 		glGenVertexArrays(1, &quadVAO); CHECKGL
