@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <utility>
 
+#include <nanogui/common.h>
 #include <nlohmann/json.hpp>
 
 #include "Texture.h"
@@ -29,6 +30,12 @@ namespace Game3 {
 			std::weak_ptr<Realm> weakRealm;
 			Direction direction = Direction::Down;
 			Inventory inventory {16};
+			/** The reciprocal of this is how many seconds it takes to move one square. */
+			float speed = 10.f;
+			/** When the entity moves a square, its position field is immediately updated but this field is set to an offset
+			 *  such that the sum of the new position and the offset is equal to the old offset. The offset is moved closer
+			 *  to zero each tick to achieve smooth movement instead of teleportation from one tile to the next. */
+			nanogui::Vector2f offset {0.f, 0.f};
 
 			Entity() = default;
 			Entity(EntityID id__): id_(id__) {}
@@ -37,6 +44,7 @@ namespace Game3 {
 
 			virtual nlohmann::json toJSON() const;
 			virtual bool isPlayer() const { return false; }
+			virtual void tick(float delta);
 			inline EntityID id() const { return id_; }
 			inline const Position::first_type  & row()    const { return position.first;  }
 			inline const Position::second_type & column() const { return position.second; }

@@ -9,6 +9,15 @@ namespace Game3 {
 			realm->initEntities();
 	}
 
+	void Game::tick() {
+		auto now = getTime();
+		auto difference = now - lastTime;
+		lastTime = now;
+		delta = std::chrono::duration_cast<std::chrono::nanoseconds>(difference).count() / 1'000'000'000.f;
+		for (auto &[id, realm]: realms)
+			realm->tick(delta);
+	}
+
 	void to_json(nlohmann::json &json, const Game &game) {
 		json["activeRealmID"] = game.activeRealm->id;
 		json["realms"] = std::unordered_map<std::string, nlohmann::json>();

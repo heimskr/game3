@@ -26,6 +26,19 @@ namespace Game3 {
 		return json;
 	}
 
+	void Entity::tick(float delta) {
+		auto &x = offset.x();
+		auto &y = offset.y();
+		if (x < 0.f)
+			x = std::min(x + delta * speed, 0.f);
+		else if (0.f < x)
+			x = std::max(x - delta * speed, 0.f);
+		if (y < 0.f)
+			y = std::min(y + delta * speed, 0.f);
+		else if (0.f < y)
+			y = std::max(y - delta * speed, 0.f);
+	}
+
 	void Entity::id(EntityID new_id) {
 		id_ = new_id;
 		texture = &textureMap.at(id_);
@@ -39,7 +52,7 @@ namespace Game3 {
 		if (!texture)
 			return;
 
-		sprite_renderer.drawOnMap(*texture, position.second, position.first, 0.f, 8.f * int(direction), 16.f, 16.f);
+		sprite_renderer.drawOnMap(*texture, position.second + offset.x(), position.first + offset.y(), 0.f, 8.f * int(direction), 16.f, 16.f);
 	}
 
 	void Entity::move(Direction move_direction) {
@@ -48,29 +61,40 @@ namespace Game3 {
 			return;
 
 		Position new_position = position;
+		float x_offset = 0.f;
+		float y_offset = 0.f;
 		switch (move_direction) {
 			case Direction::Down:
 				++new_position.first;
 				direction = Direction::Down;
+				y_offset = -1.f;
 				break;
 			case Direction::Up:
 				--new_position.first;
 				direction = Direction::Up;
+				y_offset = 1.f;
 				break;
 			case Direction::Left:
 				--new_position.second;
 				direction = Direction::Left;
+				x_offset = 1.f;
 				break;
 			case Direction::Right:
 				++new_position.second;
 				direction = Direction::Right;
+				x_offset = -1.f;
 				break;
 			default:
 				throw std::invalid_argument("Invalid direction: " + std::to_string(int(move_direction)));
 		}
 
-		if (canMoveTo(new_position))
+		if (offset.x() != 0 || offset.y() != 0)
+			return;
+
+		if (canMoveTo(new_position)) {
 			position = new_position;
+			offset = {x_offset, y_offset};
+		}
 	}
 
 	void Entity::setRealm(const Game &game, RealmID realm_id) {

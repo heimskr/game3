@@ -229,6 +229,11 @@ namespace Game3 {
 			entity->setRealm(shared_from_this());
 	}
 
+	void Realm::tick(float delta) {
+		for (auto &entity: entities)
+			entity->tick(delta);
+	}
+
 	void to_json(nlohmann::json &json, const Realm &realm) {
 		json["id"] = realm.id;
 		json["tilemap1"] = *realm.tilemap1;

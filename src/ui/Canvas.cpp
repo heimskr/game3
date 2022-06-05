@@ -25,6 +25,7 @@ namespace Game3 {
 
 	void Canvas::drawGL() {
 		if (game) {
+			game->tick();
 			spriteRenderer.update(width(), height());
 			rectangleRenderer.update(width(), height());
 
