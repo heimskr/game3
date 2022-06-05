@@ -52,7 +52,6 @@ namespace Game3 {
 		if (size_y < 0)
 			size_y = texture.height;
 
-
 		const auto &tilemap = canvas.game->activeRealm->tilemap1;
 		x *= tilemap->tileSize * canvas.scale / 2.f;
 		y *= tilemap->tileSize * canvas.scale / 2.f;
@@ -74,7 +73,45 @@ namespace Game3 {
 		shader.bind();
 
 		glm::mat4 model = glm::mat4(1.f);
-		model = glm::translate(model, glm::vec3(x - x_offset, y - y_offset, 0.f));  // first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
+		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
+		model = glm::translate(model, glm::vec3(x - x_offset, y - y_offset, 0.f));
+		model = glm::translate(model, glm::vec3(0.5f * texture.width, 0.5f * texture.height, 0.f)); // move origin of rotation to center of quad
+		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
+		model = glm::translate(model, glm::vec3(-0.5f * texture.width, -0.5f * texture.height, 0.f)); // move origin back
+		model = glm::scale(model, glm::vec3(texture.width * scale, texture.height * scale, 2.f)); // last scale
+
+		glUniformMatrix4fv(shader.uniform("model"), 1, GL_FALSE, glm::value_ptr(model)); CHECKGL
+		glUniform4f(shader.uniform("spriteColor"), 1.f, 1.f, 1.f, alpha); CHECKGL
+
+		glActiveTexture(GL_TEXTURE0); CHECKGL
+		texture.bind(); CHECKGL
+
+		glEnable(GL_SCISSOR_TEST);
+		glScissor(2 * x, 2 * (backbufferHeight - y - size_y), 2 * size_x, 2 * size_y);
+		glBindVertexArray(quadVAO); CHECKGL
+		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
+		glBindVertexArray(0); CHECKGL
+		glDisable(GL_SCISSOR_TEST);
+	}
+
+	void SpriteRenderer::drawOnScreen(Texture &texture, float x, float y, float scale, float angle, float alpha) {
+		drawOnScreen(texture, x, y, 0, 0, texture.width, texture.height, scale, angle, alpha);
+	}
+
+	void SpriteRenderer::drawOnScreen(Texture &texture, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale, float angle, float alpha) {
+		if (!initialized)
+			return;
+
+		if (size_x < 0)
+			size_x = texture.width;
+		if (size_y < 0)
+			size_y = texture.height;
+
+		shader.bind();
+
+		glm::mat4 model = glm::mat4(1.f);
+		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
+		model = glm::translate(model, glm::vec3(x - x_offset, y - y_offset, 0.f));
 		model = glm::translate(model, glm::vec3(0.5f * texture.width, 0.5f * texture.height, 0.f)); // move origin of rotation to center of quad
 		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
 		model = glm::translate(model, glm::vec3(-0.5f * texture.width, -0.5f * texture.height, 0.f)); // move origin back
@@ -115,7 +152,7 @@ namespace Game3 {
 
 		glBindVertexArray(quadVAO);
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *) 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 		initialized = true;

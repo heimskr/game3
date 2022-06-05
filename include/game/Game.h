@@ -9,11 +9,14 @@
 #include "game/Realm.h"
 
 namespace Game3 {
+	class Menu;
+
 	class Game {
 		public:
 			std::unordered_map<RealmID, std::shared_ptr<Realm>> realms;
 			std::shared_ptr<Realm> activeRealm;
 			std::shared_ptr<Player> player;
+			std::shared_ptr<Menu> menu;
 
 			void initEntities();
 	};

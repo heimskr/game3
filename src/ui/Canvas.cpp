@@ -5,6 +5,7 @@
 #include "ui/Canvas.h"
 
 #include "game/Game.h"
+#include "menu/Menu.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 
@@ -23,10 +24,16 @@ namespace Game3 {
 	}
 
 	void Canvas::drawGL() {
-		if (game && game->activeRealm) {
-			auto &realm = *game->activeRealm;
+		if (game) {
 			spriteRenderer.update(width(), height());
-			realm.render(width(), height(), center, scale, spriteRenderer);
+
+			if (game->activeRealm) {
+				auto &realm = *game->activeRealm;
+				realm.render(width(), height(), center, scale, spriteRenderer);
+			}
+
+			if (game->menu)
+				game->menu->render(*game, *this, context);
 		}
 	}
 

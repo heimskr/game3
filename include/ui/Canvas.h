@@ -7,12 +7,10 @@
 #include <nanogui/screen.h>
 #include <nanogui/glcanvas.h>
 
-// #include <ft2build.h>
-// #include FT_FREETYPE_H
-
 #include "Image.h"
 #include "Texture.h"
 #include "Types.h"
+#include "ui/RectangleRenderer.h"
 #include "ui/SpriteRenderer.h"
 
 namespace Game3 {
@@ -26,6 +24,7 @@ namespace Game3 {
 			nanogui::Vector2f center {0.f, 0.f};
 			float scale = DEFAULT_SCALE;
 			SpriteRenderer spriteRenderer {*this};
+			RectangleRenderer rectangleRenderer {*this};
 			float magic = 8.f;
 
 			Canvas(nanogui::Widget *parent);

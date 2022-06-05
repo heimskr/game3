@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 
+#include "menu/InventoryMenu.h"
 #include "ui/Application.h"
 #include "ui/Canvas.h"
 #include "util/FS.h"
@@ -84,13 +85,19 @@ namespace Game3 {
 						player.move(Direction::Right);
 						return true;
 					case GLFW_KEY_I: {
-						if (player.inventory.empty()) {
-							std::cout << "Inventory empty.\n";
+						if (game->menu && game->menu->getType() == MenuType::Inventory) {
+							game->menu.reset();
 						} else {
-							std::cout << "Inventory:\n";
-							for (const auto &[slot, stack]: player.inventory.getStorage())
-								std::cout << "  " << stack.item->name << " x " << stack.count << " in slot " << slot << '\n';
+							auto menu = std::make_shared<InventoryMenu>(game->player);
+							game->menu = menu;
 						}
+						// if (player.inventory.empty()) {
+						// 	std::cout << "Inventory empty.\n";
+						// } else {
+						// 	std::cout << "Inventory:\n";
+						// 	for (const auto &[slot, stack]: player.inventory.getStorage())
+						// 		std::cout << "  " << stack.item->name << " x " << stack.count << " in slot " << slot << '\n';
+						// }
 
 						return true;
 					}
