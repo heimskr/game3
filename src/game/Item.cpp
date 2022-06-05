@@ -2,8 +2,13 @@
 
 namespace Game3 {
 	std::map<ItemID, std::shared_ptr<Item>> Item::ITEMS {
-		{Item::SHORTSWORD, std::make_shared<Item>(Item::SHORTSWORD)},
+		{Item::SHORTSWORD, std::make_shared<Item>(Item::SHORTSWORD, "Shortsword", 1)},
 	};
+
+	bool ItemStack::canMerge(const ItemStack &other) const {
+		// To be updated when items can store data.
+		return item->id == other.item->id;
+	}
 
 	void to_json(nlohmann::json &json, const ItemStack &stack) {
 		json[0] = stack.item->id;

@@ -83,6 +83,26 @@ namespace Game3 {
 					case GLFW_KEY_D:
 						player.move(Direction::Right);
 						return true;
+					case GLFW_KEY_I: {
+						if (player.inventory.empty()) {
+							std::cout << "Inventory empty.\n";
+						} else {
+							std::cout << "Inventory:\n";
+							for (const auto &[slot, stack]: player.inventory.getStorage())
+								std::cout << "  " << stack.item->name << " x " << stack.count << " in slot " << slot << '\n';
+						}
+
+						return true;
+					}
+					case GLFW_KEY_O: {
+						ItemStack sword(Item::SHORTSWORD, 1);
+						auto leftover = player.inventory.add(sword);
+						std::cout << "Added sword. ";
+						if (leftover)
+							std::cout << "Left over: " << leftover->item->name << " x " << leftover->count << '\n';
+						else
+							std::cout << "No leftover.\n";
+					}
 				}
 			}
 

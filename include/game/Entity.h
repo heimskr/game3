@@ -8,6 +8,7 @@
 
 #include "Texture.h"
 #include "Types.h"
+#include "game/Inventory.h"
 #include "game/Item.h"
 
 namespace Game3 {
@@ -27,7 +28,7 @@ namespace Game3 {
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;
 			Direction direction = Direction::Down;
-			std::unordered_map<Slot, ItemStack> inventory;
+			Inventory inventory {16};
 
 			Entity() = default;
 			Entity(EntityID id__): id_(id__) {}

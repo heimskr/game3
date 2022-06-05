@@ -16,9 +16,11 @@ namespace Game3 {
 			constexpr static ItemID SHORTSWORD = 1;
 
 			ItemID id = 0;
+			std::string name;
+			unsigned maxCount = 64;
 
 			Item() = default;
-			Item(ItemID id_): id(id_) {}
+			Item(ItemID id_, const std::string &name_, unsigned max_count = 64): id(id_), name(name_), maxCount(max_count) {}
 	};
 
 	class ItemStack {
@@ -28,6 +30,9 @@ namespace Game3 {
 
 			ItemStack() = default;
 			ItemStack(const std::shared_ptr<Item> &item_, unsigned count_): item(item_), count(count_) {}
+			ItemStack(ItemID id, unsigned count_): item(Item::ITEMS.at(id)), count(count_) {}
+
+			bool canMerge(const ItemStack &) const;
 	};
 
 	void to_json(nlohmann::json &, const ItemStack &);
