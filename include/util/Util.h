@@ -67,4 +67,11 @@ namespace Game3 {
 			throw std::invalid_argument("Container is empty");
 		return container.at(rng() % container.size());
 	}
+
+	template <typename T, typename R>
+	const T::value_type & choose(const T &container, R &rng) {
+		if (container.empty())
+			throw std::invalid_argument("Container is empty");
+		return container.at(rng() % container.size());
+	}
 }

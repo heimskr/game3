@@ -70,6 +70,9 @@ namespace Game3 {
 
 		static const std::vector<TileID> grasses {GRASS_ALT1, GRASS_ALT2, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS};
 
+		std::default_random_engine grass_rng;
+		grass_rng.seed(seed);
+
 		for (int i = 0; i < width; ++i)
 			for (int j = 0; j < height; ++j) {
 				double noise = perlin.GetValue(i / noise_zoom, j / noise_zoom, 0.666);
@@ -87,7 +90,7 @@ namespace Game3 {
 				else if (noise < noise_threshold + 0.5)
 					tile = LIGHT_GRASS;
 				else
-					tile = choose(grasses, (i << 20) | j);
+					tile = choose(grasses, grass_rng);
 			}
 
 		constexpr static int m = 15, n = 21, pad = 2;
