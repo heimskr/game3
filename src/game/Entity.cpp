@@ -96,7 +96,10 @@ namespace Game3 {
 
 		if (canMoveTo(new_position)) {
 			position = new_position;
-			offset = {x_offset, y_offset};
+			if (horizontal)
+				offset.x() = x_offset;
+			else
+				offset.y() = y_offset;
 		}
 	}
 
