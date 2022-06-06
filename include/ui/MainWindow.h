@@ -47,6 +47,8 @@ namespace Game3 {
 			std::list<std::function<void()>> functionQueue;
 			std::recursive_mutex functionQueueMutex;
 			Glib::Dispatcher functionQueueDispatcher;
+			Gtk::Paned paned;
+			Gtk::Notebook notebook;
 			Gtk::GLArea glArea;
 			std::unique_ptr<Canvas> canvas;
 			std::shared_ptr<Game> game;

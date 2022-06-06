@@ -89,7 +89,6 @@ namespace Game3 {
 			return true;
 		});
 		glArea.set_focusable(true);
-		set_child(glArea);
 
 		auto key_controller = Gtk::EventControllerKey::create();
 		key_controller->signal_key_pressed().connect(sigc::mem_fun(*this, &MainWindow::onKeyPressed), false);
@@ -110,7 +109,7 @@ namespace Game3 {
 				canvas->center.y() += delta_y / (canvas->magic * canvas->scale);
 			}
 		});
-		add_controller(drag);
+		glArea.add_controller(drag);
 
 		auto motion = Gtk::EventControllerMotion::create();
 		motion->signal_motion().connect([this](double x, double y) {
@@ -145,12 +144,24 @@ namespace Game3 {
 
 			return true;
 		}, false);
-		add_controller(scroll);
+		glArea.add_controller(scroll);
 
 		add_tick_callback([this](const auto &) {
 			handleKeys();
 			return true;
 		});
+
+		paned.set_orientation(Gtk::Orientation::HORIZONTAL);
+		paned.set_start_child(glArea);
+		paned.set_end_child(notebook);
+		glArea.set_expand(true);
+		notebook.set_hexpand(false);
+		paned.set_resize_start_child(true);
+		paned.set_shrink_start_child(false);
+		paned.set_resize_end_child(false);
+		paned.set_shrink_end_child(false);
+		notebook.set_size_request(400, -1);
+		set_child(paned);
 	}
 
 	void MainWindow::newGame(int seed, int width, int height) {
