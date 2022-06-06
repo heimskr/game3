@@ -68,6 +68,7 @@ namespace Game3 {
 			std::map<guint, KeyInfo> keyTimes;
 
 			void newGame(int seed, int width, int height);
+			void loadGame(std::string_view path);
 			bool render(const Glib::RefPtr<Gdk::GLContext> &);
 			bool onKeyPressed(guint, guint, Gdk::ModifierType);
 			void onKeyReleased(guint, guint, Gdk::ModifierType);

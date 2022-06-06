@@ -14,6 +14,7 @@ namespace Game3 {
 
 	class Game {
 		public:
+			static constexpr const char *DEFAULT_PATH = "game.g3";
 			/** Seconds since the last tick */
 			float delta = 0.f;
 

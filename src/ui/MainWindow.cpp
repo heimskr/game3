@@ -3,6 +3,7 @@
 #include "game/Game.h"
 #include "ui/MainWindow.h"
 
+#include "util/FS.h"
 #include "util/Util.h"
 #include <GL/glu.h>
 
@@ -33,6 +34,36 @@ namespace Game3 {
 		});
 
 		add_action("new", Gio::ActionMap::ActivateSlot(sigc::mem_fun(*this, &MainWindow::onNew)));
+
+		add_action("open", Gio::ActionMap::ActivateSlot([this] {
+			auto *chooser = new Gtk::FileChooserDialog(*this, "Choose File", Gtk::FileChooser::Action::OPEN, true);
+			dialog.reset(chooser);
+			chooser->set_current_folder(Gio::File::create_for_path(std::filesystem::current_path().string()));
+			chooser->set_transient_for(*this);
+			chooser->set_modal(true);
+			chooser->add_button("_Cancel", Gtk::ResponseType::CANCEL);
+			chooser->add_button("_Open", Gtk::ResponseType::OK);
+			chooser->signal_response().connect([this, chooser](int response) {
+				chooser->hide();
+				if (response == Gtk::ResponseType::OK)
+					delay([this, chooser] {
+						try {
+							loadGame(chooser->get_file()->get_path());
+						} catch (std::exception &err) {
+							error("Error loading save: " + std::string(err.what()));
+						}
+					});
+			});
+			chooser->signal_show().connect([this, chooser] {
+				chooser->set_default_size(get_width() - 40, get_height() - 40);
+				chooser->set_size_request(get_width() - 40, get_height() - 40);
+				delay([chooser] {
+					if (std::filesystem::exists(Game::DEFAULT_PATH))
+						chooser->set_file(Gio::File::create_for_path(Game::DEFAULT_PATH));
+				});
+			});
+			chooser->show();
+		}));
 
 		glArea.set_expand(true);
 		glArea.set_required_version(3, 3);
@@ -134,6 +165,26 @@ namespace Game3 {
 		canvas->game = game;
 		realm->rebind();
 		realm->reupload();
+	}
+
+	void MainWindow::loadGame(std::string_view path) {
+		const std::string data = readFile(path);
+		if (!data.empty() && data.front() == '{')
+			game = std::make_shared<Game>(nlohmann::json::parse(data));
+		else
+			game = std::make_shared<Game>(nlohmann::json::from_cbor(data));
+		game->initEntities();
+		auto realm = game->activeRealm;
+		for (const auto &entity: realm->entities)
+			if (entity->isPlayer()) {
+				if (!(game->player = std::dynamic_pointer_cast<Player>(entity)))
+					throw std::runtime_error("Couldn't cast entity with isPlayer() == true to Player");
+				break;
+			}
+		realm->rebind();
+		realm->reupload();
+		game->player->focus(*canvas);
+		canvas->game = game;
 	}
 
 	bool MainWindow::render(const Glib::RefPtr<Gdk::GLContext> &context) {
@@ -300,32 +351,6 @@ namespace Game3 {
 		stream.close();
 
 		new nanogui::MessageDialog(this, nanogui::MessageDialog::Type::Information, "Success", "Game saved.");
-	}
-
-	void Application::loadGame() {
-		const std::string path = nanogui::file_dialog({{"g3", "Game3 save"}}, false);
-
-		if (path.empty())
-			return;
-
-		const std::string data = readFile(path);
-		if (!data.empty() && data.front() == '{')
-			game = std::make_shared<Game>(nlohmann::json::parse(data));
-		else
-			game = std::make_shared<Game>(nlohmann::json::from_cbor(data));
-		game->initEntities();
-		auto realm = game->activeRealm;
-		for (const auto &entity: realm->entities)
-			if (entity->isPlayer()) {
-				if (!(game->player = std::dynamic_pointer_cast<Player>(entity)))
-					throw std::runtime_error("Couldn't cast entity with isPlayer() == true to Player");
-				break;
-			}
-		realm->rebind();
-		realm->reupload();
-		game->player->focus(*canvas);
-		canvas->game = game;
-		saveButton->setEnabled(true);
 	}
 
 	void Application::draw(NVGcontext *ctx) {
