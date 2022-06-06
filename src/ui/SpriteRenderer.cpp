@@ -9,7 +9,6 @@
 #include <iostream>
 
 #include "Texture.h"
-#include "game/Entity.h"
 #include "game/Game.h"
 #include "ui/Canvas.h"
 #include "ui/SpriteRenderer.h"

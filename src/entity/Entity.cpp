@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "Tiles.h"
-#include "game/Entity.h"
+#include "entity/Entity.h"
 #include "game/Game.h"
 #include "game/Realm.h"
 #include "ui/Canvas.h"

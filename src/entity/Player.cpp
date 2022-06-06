@@ -1,4 +1,4 @@
-#include "game/Player.h"
+#include "entity/Player.h"
 
 namespace Game3 {
 	nlohmann::json Player::toJSON() const {

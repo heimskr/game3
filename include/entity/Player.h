@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/Entity.h"
+#include "entity/Entity.h"
 
 namespace Game3 {
 	class Player: public Entity {

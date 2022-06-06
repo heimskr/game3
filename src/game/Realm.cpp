@@ -4,7 +4,7 @@
 #include <libnoise/noise.h>
 
 #include "Tiles.h"
-#include "game/Entity.h"
+#include "entity/Entity.h"
 #include "game/Realm.h"
 #include "util/Timer.h"
 #include "util/Util.h"

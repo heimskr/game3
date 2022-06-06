@@ -6,7 +6,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include "game/Player.h"
+#include "entity/Player.h"
 #include "game/Realm.h"
 
 namespace Game3 {
