@@ -24,6 +24,7 @@ namespace Game3 {
 		public:
 			constexpr static EntityID GANGBLANC = 1;
 			constexpr static EntityID GRUM = 2;
+			constexpr static EntityID ITEM = 3;
 
 			static std::unordered_map<EntityID, Texture> textureMap;
 
