@@ -170,8 +170,8 @@ namespace Game3 {
 	}
 
 	void MainWindow::newGame(int seed, int width, int height) {
-		game = std::make_shared<Game>();
 		glArea.get_context()->make_current();
+		game = std::make_shared<Game>();
 		Texture texture("resources/tileset2.png", true);
 		texture.init();
 		auto tilemap = std::make_shared<Tilemap>(width, height, 16, texture);
@@ -186,8 +186,8 @@ namespace Game3 {
 	}
 
 	void MainWindow::loadGame(const std::filesystem::path &path) {
-		const std::string data = readFile(path);
 		glArea.get_context()->make_current();
+		const std::string data = readFile(path);
 		if (!data.empty() && data.front() == '{')
 			game = std::make_shared<Game>(nlohmann::json::parse(data));
 		else

@@ -76,12 +76,11 @@ namespace Game3 {
 		protected:
 			Entity() = delete;
 			Entity(EntityID id__): id_(id__) {}
+			Texture *texture = nullptr;
+			bool canMoveTo(const Position &) const;
 
 		private:
 			EntityID id_ = 0;
-			Texture *texture = nullptr;
-
-			bool canMoveTo(const Position &) const;
 	};
 
 	void to_json(nlohmann::json &, const Entity &);

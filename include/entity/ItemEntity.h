@@ -9,7 +9,6 @@
 namespace Game3 {
 	class ItemEntity: public Entity {
 		public:
-
 			const ItemStack & getStack() const { return stack; }
 			void setStack(const ItemStack &);
 
@@ -17,15 +16,16 @@ namespace Game3 {
 			static std::shared_ptr<ItemEntity> fromJSON(const nlohmann::json &);
 
 			nlohmann::json toJSON() const override;
-
-			// void render(SpriteRenderer &) const override;
+			void init() override;
+			void render(SpriteRenderer &) const override;
 
 		private:
 			ItemEntity(const ItemStack &);
-			static std::unordered_map<EntityID, Texture> itemTextureMap;
 
-			Texture *texture = nullptr;
 			ItemStack stack;
+
+			static std::unordered_map<ItemID, Texture> itemTextureMap;
+			static Texture missing;
 	};
 
 	void to_json(nlohmann::json &, const ItemEntity &);

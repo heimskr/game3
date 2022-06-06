@@ -45,6 +45,7 @@ namespace Game3 {
 			template <typename T, typename... Args>
 			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {
 				auto entity = T::create(std::forward<Args>(args)...);
+				entity->init();
 				entity->teleport(position);
 				addEntity(entity);
 				return entity;
