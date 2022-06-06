@@ -170,6 +170,11 @@ namespace Game3 {
 		canvas.center.y() = -(row()    - tilemap.height / 2.f);
 	}
 
+	void Entity::teleport(const Position &new_position) {
+		position = new_position;
+		offset = {0.f, 0.f};
+	}
+
 	void to_json(nlohmann::json &json, const Entity &entity) {
 		json["id"] = entity.id();
 		json["position"] = entity.position;
@@ -177,12 +182,4 @@ namespace Game3 {
 		json["direction"] = entity.direction;
 		json["inventory"] = entity.inventory;
 	}
-
-	// void from_json(const nlohmann::json &json, Entity &entity) {
-	// 	entity.id(json.at("id"));
-	// 	entity.position = json.at("position");
-	// 	entity.realmID = json.at("realmID");
-	// 	entity.direction = json.at("direction");
-	// 	entity.inventory = Inventory::fromJSON(json.at("inventory"), ;
-	// }
 }

@@ -1,4 +1,9 @@
+#include <iostream>
+
+#include "entity/Entity.h"
+#include "entity/ItemEntity.h"
 #include "game/Inventory.h"
+#include "game/Realm.h"
 
 namespace Game3 {
 	Inventory::Inventory(const std::shared_ptr<Entity> &owner_, Slot slot_count):
@@ -46,7 +51,21 @@ namespace Game3 {
 	}
 
 	void Inventory::drop(Slot slot) {
-		
+		if (!storage.contains(slot))
+			return;
+
+		auto entity = owner.lock();
+		if (!entity)
+			throw std::logic_error("Inventory is missing an owner");
+
+		auto realm = entity->weakRealm.lock();
+		if (!realm)
+			throw std::logic_error("Inventory owner has no realm");
+
+		std::cout << "Spawning ItemEntity at " << entity->position << "\n";
+
+		realm->spawn<ItemEntity>(entity->position, storage.at(slot));
+		storage.erase(slot);
 	}
 
 	Inventory Inventory::fromJSON(const nlohmann::json &json, const std::shared_ptr<Entity> &owner) {

@@ -11,3 +11,7 @@ namespace Game3 {
 		position.column = json.at(1);
 	}
 }
+
+std::ostream & operator<<(std::ostream &stream, const Game3::Position &position) {
+	return stream << '(' << position.row << ", " << position.column << ')';
+}
