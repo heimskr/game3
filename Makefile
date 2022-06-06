@@ -5,16 +5,17 @@ else
 BUILDFLAGS := -g -O0
 endif
 
-DEPS       := gl opengl stb eigen3 glm glfw3 libzstd gtk4 gtkmm-4.0
-OUTPUT     := game3
-COMPILER   ?= g++
-CPPFLAGS   := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude
-INCLUDES   := $(shell pkg-config --cflags $(DEPS)) -Inanovg/src
-LIBS       := $(shell pkg-config --libs   $(DEPS))
-LDFLAGS    := -L/lib $(LIBS) -lnanogui -pthread -lGLU -lglut -lnoise
-SOURCES    := $(shell find src -name \*.cpp) src/resources.cpp
-OBJECTS    := $(SOURCES:.cpp=.o)
-RESXML     := $(OUTPUT).gresource.xml
+DEPS         := gl opengl stb eigen3 glm glfw3 libzstd gtk4 gtkmm-4.0
+OUTPUT       := game3
+COMPILER     ?= g++
+CPPFLAGS     := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude
+INCLUDES     := $(shell pkg-config --cflags $(DEPS)) -Inanovg/src
+LIBS         := $(shell pkg-config --libs   $(DEPS))
+LDFLAGS      := -L/lib $(LIBS) -lnanogui -pthread -lGLU -lglut -lnoise
+SOURCES      := $(shell find src -name \*.cpp) src/resources.cpp
+OBJECTS      := $(SOURCES:.cpp=.o)
+RESXML       := $(OUTPUT).gresource.xml
+CLOC_OPTIONS := . --exclude-dir=.vscode,nanovg --fullpath --not-match-f='^.\/(src\/resources\.cpp|include\/resources\.h)$$'
 GLIB_COMPILE_RESOURCES = $(shell pkg-config --variable=glib_compile_resources gio-2.0)
 
 .PHONY: all clean test
@@ -50,10 +51,10 @@ clean:
 	@ rm -f $(shell find src -name \*.o) $(OUTPUT) include/resources.h src/resources.cpp
 
 count:
-	cloc . --exclude-dir=.vscode
+	cloc $(CLOC_OPTIONS)
 
 countbf:
-	cloc --by-file . --exclude-dir=.vscode
+	cloc --by-file $(CLOC_OPTIONS)
 
 DEPFILE  := .dep
 DEPTOKEN := "\# MAKEDEPENDS"
