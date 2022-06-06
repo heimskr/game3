@@ -68,14 +68,14 @@ namespace Game3 {
 			std::map<guint, KeyInfo> keyTimes;
 
 			void newGame(int seed, int width, int height);
-			void loadGame(std::string_view path);
+			void loadGame(const std::filesystem::path &);
+			void saveGame(const std::filesystem::path &);
 			bool render(const Glib::RefPtr<Gdk::GLContext> &);
 			bool onKeyPressed(guint, guint, Gdk::ModifierType);
 			void onKeyReleased(guint, guint, Gdk::ModifierType);
 			void handleKeys();
 			void handleKey(guint keyval, guint keycode, Gdk::ModifierType);
 			void onNew();
-			void onOpen();
-			void onSave();
+			void connectSave();
 	};
 }

@@ -1,11 +1,15 @@
 #include <nanogui/nanogui.h>
 
+#include <fstream>
+
 #include "game/Game.h"
 #include "ui/MainWindow.h"
 
 #include "util/FS.h"
 #include "util/Util.h"
 #include <GL/glu.h>
+
+// #define USE_CBOR
 
 namespace Game3 {
 	static std::chrono::milliseconds arrowTime {5};
@@ -165,9 +169,10 @@ namespace Game3 {
 		canvas->game = game;
 		realm->rebind();
 		realm->reupload();
+		connectSave();
 	}
 
-	void MainWindow::loadGame(std::string_view path) {
+	void MainWindow::loadGame(const std::filesystem::path &path) {
 		const std::string data = readFile(path);
 		if (!data.empty() && data.front() == '{')
 			game = std::make_shared<Game>(nlohmann::json::parse(data));
@@ -185,6 +190,24 @@ namespace Game3 {
 		realm->reupload();
 		game->player->focus(*canvas);
 		canvas->game = game;
+		connectSave();
+	}
+
+	void MainWindow::saveGame(const std::filesystem::path &path) {
+		std::ofstream stream(path);
+
+		if (!stream.is_open()) {
+			error("Couldn't open file for writing.");
+			return;
+		}
+
+#ifdef USE_CBOR
+		auto cbor = nlohmann::json::to_cbor(nlohmann::json(*game));
+		stream.write(reinterpret_cast<char *>(&cbor[0]), cbor.size());
+#else
+		stream << nlohmann::json(*game).dump();
+#endif
+		stream.close();
 	}
 
 	bool MainWindow::render(const Glib::RefPtr<Gdk::GLContext> &context) {
@@ -323,6 +346,34 @@ namespace Game3 {
 
 	void MainWindow::onNew() {
 		newGame(666, 256, 256);
+	}
+
+	void MainWindow::connectSave() {
+		add_action("save", Gio::ActionMap::ActivateSlot([this] {
+			auto *chooser = new Gtk::FileChooserDialog(*this, "Save Location", Gtk::FileChooser::Action::SAVE, true);
+			dialog.reset(chooser);
+			chooser->set_current_folder(Gio::File::create_for_path(std::filesystem::current_path().string()));
+			chooser->set_transient_for(*this);
+			chooser->set_modal(true);
+			chooser->add_button("_Cancel", Gtk::ResponseType::CANCEL);
+			chooser->add_button("_Save", Gtk::ResponseType::OK);
+			chooser->signal_response().connect([this, chooser](int response) {
+				chooser->hide();
+				if (response == Gtk::ResponseType::OK)
+					delay([this, chooser] {
+						try {
+							saveGame(chooser->get_file()->get_path());
+						} catch (std::exception &err) {
+							error("Error loading save: " + std::string(err.what()));
+						}
+					});
+			});
+			chooser->signal_show().connect([this, chooser] {
+				chooser->set_default_size(get_width() - 40, get_height() - 40);
+				chooser->set_size_request(get_width() - 40, get_height() - 40);
+			});
+			chooser->show();
+		}));
 	}
 
 /*
