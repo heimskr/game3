@@ -34,7 +34,7 @@ namespace Game3 {
 			void createTown(size_t index, size_t width, size_t height, size_t pad);
 			int getWidth()  const { return tilemap1->width;  }
 			int getHeight() const { return tilemap1->height; }
-			void addEntity(const std::shared_ptr<Entity> &);
+			std::shared_ptr<Entity> addEntity(const std::shared_ptr<Entity> &);
 			void initEntities();
 			void tick(float delta);
 

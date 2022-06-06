@@ -12,6 +12,7 @@
 namespace Game3 {
 	std::unordered_map<EntityID, Texture> Entity::textureMap {
 		{Entity::GANGBLANC, Texture("resources/characters/champions/Gangblanc.png")},
+		{Entity::GRUM,      Texture("resources/characters/champions/Grum.png")},
 	};
 
 	std::shared_ptr<Entity> Entity::fromJSON(const nlohmann::json &json) {

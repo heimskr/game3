@@ -220,9 +220,10 @@ namespace Game3 {
 		}
 	}
 
-	void Realm::addEntity(const std::shared_ptr<Entity> &entity) {
+	std::shared_ptr<Entity> Realm::addEntity(const std::shared_ptr<Entity> &entity) {
 		entity->setRealm(shared_from_this());
 		entities.insert(entity);
+		return entity;
 	}
 
 	void Realm::initEntities() {
