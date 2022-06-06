@@ -32,7 +32,6 @@ namespace Game3 {
 
 		glArea.set_expand(true);
 		glArea.set_required_version(3, 3);
-		// glArea.set_has_depth_buffer(true);
 		glArea.set_has_stencil_buffer(true);
 		glArea.signal_realize().connect([this] {
 			glArea.make_current();
@@ -49,7 +48,11 @@ namespace Game3 {
 			glArea.queue_render();
 			return true;
 		});
+		glArea.set_focusable(true);
 		set_child(glArea);
+		auto key_controller = Gtk::EventControllerKey::create();
+		key_controller->signal_key_pressed().connect(sigc::mem_fun(*this, &MainWindow::onKey), false);
+		add_controller(key_controller);
 	}
 
 	void MainWindow::newGame(int seed, int width, int height) {
@@ -120,6 +123,77 @@ namespace Game3 {
 		alert(message, Gtk::MessageType::ERROR, modal, use_markup);
 	}
 
+	bool MainWindow::onKey(guint keyval, guint keycode, Gdk::ModifierType modifier) {
+		if (canvas) {
+			if (game && game->player) {
+				auto &player = *game->player;
+				switch (keyval) {
+					case GDK_KEY_s:
+						player.move(Direction::Down);
+						return true;
+					case GDK_KEY_w:
+						player.move(Direction::Up);
+						return true;
+					case GDK_KEY_a:
+						player.move(Direction::Left);
+						return true;
+					case GDK_KEY_d:
+						player.move(Direction::Right);
+						return true;
+					case GDK_KEY_i: {
+						// if (game->menu && game->menu->getType() == MenuType::Inventory) {
+						// 	game->menu.reset();
+						// } else {
+						// 	auto menu = std::make_shared<InventoryMenu>(game->player);
+						// 	game->menu = menu;
+						// }
+						// if (player.inventory.empty()) {
+						// 	std::cout << "Inventory empty.\n";
+						// } else {
+						// 	std::cout << "Inventory:\n";
+						// 	for (const auto &[slot, stack]: player.inventory.getStorage())
+						// 		std::cout << "  " << stack.item->name << " x " << stack.count << " in slot " << slot << '\n';
+						// }
+
+						return true;
+					}
+					case GDK_KEY_O: {
+						ItemStack sword(Item::SHORTSWORD, 1);
+						auto leftover = player.inventory.add(sword);
+						std::cout << "Added sword. ";
+						if (leftover)
+							std::cout << "Left over: " << leftover->item->name << " x " << leftover->count << '\n';
+						else
+							std::cout << "No leftover.\n";
+						return true;
+					}
+				}
+			}
+
+			const float delta = canvas->scale / 4.f;
+			switch (keyval) {
+				case GDK_KEY_Down:
+					canvas->center.y() -= delta;
+					break;
+				case GDK_KEY_Up:
+					canvas->center.y() += delta;
+					break;
+				case GDK_KEY_Left:
+					canvas->center.x() += delta;
+					break;
+				case GDK_KEY_Right:
+					canvas->center.x() -= delta;
+					break;
+				default:
+					return true;
+			}
+
+			return true;
+		}
+
+
+		return true;
+	}
 /*
 	void Application::saveGame() {
 		if (!game)
@@ -191,85 +265,6 @@ namespace Game3 {
 						canvas->center.y() += y / divisor;
 				}
 			}
-	}
-
-	bool Application::keyboardEvent(int key, int scancode, int action, int modifiers) {
-		if (Screen::keyboardEvent(key, scancode, action, modifiers))
-			return true;
-
-		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-			setVisible(false);
-			return true;
-		}
-
-		if (canvas) {
-			// std::cout << key << ", " << scancode << ", " << action << ", " << modifiers << '\n';
-			if (game && game->player && action != 0) {
-				auto &player = *game->player;
-				switch (key) {
-					case GLFW_KEY_S:
-						player.move(Direction::Down);
-						return true;
-					case GLFW_KEY_W:
-						player.move(Direction::Up);
-						return true;
-					case GLFW_KEY_A:
-						player.move(Direction::Left);
-						return true;
-					case GLFW_KEY_D:
-						player.move(Direction::Right);
-						return true;
-					case GLFW_KEY_I: {
-						if (game->menu && game->menu->getType() == MenuType::Inventory) {
-							game->menu.reset();
-						} else {
-							auto menu = std::make_shared<InventoryMenu>(game->player);
-							game->menu = menu;
-						}
-						// if (player.inventory.empty()) {
-						// 	std::cout << "Inventory empty.\n";
-						// } else {
-						// 	std::cout << "Inventory:\n";
-						// 	for (const auto &[slot, stack]: player.inventory.getStorage())
-						// 		std::cout << "  " << stack.item->name << " x " << stack.count << " in slot " << slot << '\n';
-						// }
-
-						return true;
-					}
-					case GLFW_KEY_O: {
-						ItemStack sword(Item::SHORTSWORD, 1);
-						auto leftover = player.inventory.add(sword);
-						std::cout << "Added sword. ";
-						if (leftover)
-							std::cout << "Left over: " << leftover->item->name << " x " << leftover->count << '\n';
-						else
-							std::cout << "No leftover.\n";
-					}
-				}
-			}
-
-			const float delta = canvas->scale / 4.f;
-			switch (key) {
-				case GLFW_KEY_DOWN:
-					canvas->center.y() -= delta;
-					break;
-				case GLFW_KEY_UP:
-					canvas->center.y() += delta;
-					break;
-				case GLFW_KEY_LEFT:
-					canvas->center.x() += delta;
-					break;
-				case GLFW_KEY_RIGHT:
-					canvas->center.x() -= delta;
-					break;
-				default:
-					return false;
-			}
-
-			return true;
-		}
-
-		return false;
 	}
 */
 }

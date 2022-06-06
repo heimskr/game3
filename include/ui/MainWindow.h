@@ -50,7 +50,7 @@ namespace Game3 {
 			bool queueReupload = false;
 
 			void newGame(int seed, int width, int height);
-
 			bool render(const Glib::RefPtr<Gdk::GLContext> &);
+			bool onKey(guint, guint, Gdk::ModifierType);
 	};
 }
