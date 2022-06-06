@@ -50,9 +50,61 @@ namespace Game3 {
 		});
 		glArea.set_focusable(true);
 		set_child(glArea);
+
 		auto key_controller = Gtk::EventControllerKey::create();
 		key_controller->signal_key_pressed().connect(sigc::mem_fun(*this, &MainWindow::onKey), false);
 		add_controller(key_controller);
+
+		auto drag = Gtk::GestureDrag::create();
+		drag->signal_drag_begin().connect([this](double, double) {
+			lastDragX = lastDragY = 0;
+		});
+		drag->signal_drag_update().connect([this](double x, double y) {
+			double delta_x = x - lastDragX;
+			double delta_y = y - lastDragY;
+			lastDragX = x;
+			lastDragY = y;
+			if (canvas) {
+				canvas->center.x() += delta_x / (canvas->magic * canvas->scale);
+				canvas->center.y() += delta_y / (canvas->magic * canvas->scale);
+			}
+		});
+		add_controller(drag);
+
+		auto motion = Gtk::EventControllerMotion::create();
+		motion->signal_motion().connect([this](double x, double y) {
+			glAreaMouseX = x;
+			glAreaMouseY = y;
+		});
+		glArea.add_controller(motion);
+
+		auto scroll = Gtk::EventControllerScroll::create();
+		scroll->set_flags(Gtk::EventControllerScroll::Flags::VERTICAL);
+		scroll->signal_scroll().connect([this](double, double y) {
+			if (!canvas)
+				return true;
+
+			const auto old_scale = canvas->scale;
+
+			if (y == -1)
+				canvas->scale *= 1.08f;
+			else if (y == 1)
+				canvas->scale /= 1.08f;
+
+			const auto w = glArea.get_width();
+			const auto h = glArea.get_height();
+
+			const auto difference_x = w / old_scale - w / canvas->scale;
+			const auto side_ratio_x = (glAreaMouseX - w / 2.f) / w;
+			canvas->center.x() -= difference_x * side_ratio_x / 8.f;
+
+			const auto difference_y = h / old_scale - h / canvas->scale;
+			const auto side_ratio_y = (glAreaMouseY - h / 2.f) / h;
+			canvas->center.y() -= difference_y * side_ratio_y / 8.f;
+
+			return true;
+		}, false);
+		add_controller(scroll);
 	}
 
 	void MainWindow::newGame(int seed, int width, int height) {
@@ -77,7 +129,7 @@ namespace Game3 {
 	bool MainWindow::render(const Glib::RefPtr<Gdk::GLContext> &context) {
 		context->make_current();
 		glArea.throw_if_error();
-		glClearColor(0.2, 0.2, 0.2, 1.0); CHECKGL
+		glClearColor(.2f, .2f, .2f, 1.f); CHECKGL
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); CHECKGL
 		canvas->drawGL();
 		return true;
@@ -157,7 +209,7 @@ namespace Game3 {
 
 						return true;
 					}
-					case GDK_KEY_O: {
+					case GDK_KEY_o: {
 						ItemStack sword(Item::SHORTSWORD, 1);
 						auto leftover = player.inventory.add(sword);
 						std::cout << "Added sword. ";

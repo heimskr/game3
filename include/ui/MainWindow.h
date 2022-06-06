@@ -48,6 +48,10 @@ namespace Game3 {
 			int oldWidth = 0;
 			int oldHeight = 0;
 			bool queueReupload = false;
+			double lastDragX = 0.;
+			double lastDragY = 0.;
+			double glAreaMouseX = 0.;
+			double glAreaMouseY = 0.;
 
 			void newGame(int seed, int width, int height);
 			bool render(const Glib::RefPtr<Gdk::GLContext> &);

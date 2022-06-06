@@ -41,44 +41,6 @@ namespace Game3 {
 		return window.glArea.get_height();
 	}
 
-	// bool Canvas::scrollEvent(const nanogui::Vector2i &p, const nanogui::Vector2f &rel) {
-	// 	if (nanogui::GLCanvas::scrollEvent(p, rel))
-	// 		return true;
-
-	// 	const auto old_scale = scale;
-
-	// 	if (rel.y() == 1)
-	// 		scale *= 1.08f;
-	// 	else if (rel.y() == -1)
-	// 		scale /= 1.08f;
-
-	// 	const auto w = width();
-	// 	const auto h = height();
-
-	// 	const auto difference_x = w / old_scale - w / scale;
-	// 	const auto side_ratio_x = (p.x() - w / 2.f) / w;
-	// 	center.x() -= difference_x * side_ratio_x / 8.f;
-
-	// 	const auto difference_y = h / old_scale - h / scale;
-	// 	const auto side_ratio_y = (p.y() - h / 2.f) / h;
-	// 	center.y() -= difference_y * side_ratio_y / 8.f;
-
-	// 	return true;
-	// }
-
-	// bool Canvas::mouseDragEvent(const nanogui::Vector2i &p, const nanogui::Vector2i &rel, int button, int modifiers) {
-	// 	if (nanogui::GLCanvas::mouseDragEvent(p, rel, button, modifiers))
-	// 		return true;
-
-	// 	if (button == 1) {
-	// 		center.x() += rel.x() / (magic * scale);
-	// 		center.y() += rel.y() / (magic * scale);
-	// 		return true;
-	// 	}
-
-	// 	return false;
-	// }
-
 	// bool Canvas::mouseButtonEvent(const nanogui::Vector2i &p, int button, bool down, int modifiers) {
 	// 	if (nanogui::GLCanvas::mouseButtonEvent(p, button, down, modifiers))
 	// 		return true;
