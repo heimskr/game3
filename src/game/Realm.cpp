@@ -244,9 +244,24 @@ namespace Game3 {
 		return out;
 	}
 
+	std::vector<std::shared_ptr<Entity>> Realm::findEntities(const Position &position, const std::shared_ptr<Entity> &except) {
+		std::vector<std::shared_ptr<Entity>> out;
+		for (const auto &entity: entities)
+			if (entity->position == position && entity != except)
+				out.push_back(entity);
+		return out;
+	}
+
 	std::shared_ptr<Entity> Realm::findEntity(const Position &position) {
 		for (const auto &entity: entities)
 			if (entity->position == position)
+				return entity;
+		return {};
+	}
+
+	std::shared_ptr<Entity> Realm::findEntity(const Position &position, const std::shared_ptr<Entity> &except) {
+		for (const auto &entity: entities)
+			if (entity->position == position && entity != except)
 				return entity;
 		return {};
 	}

@@ -38,7 +38,9 @@ namespace Game3 {
 			void initEntities();
 			void tick(float delta);
 			std::vector<std::shared_ptr<Entity>> findEntities(const Position &position);
+			std::vector<std::shared_ptr<Entity>> findEntities(const Position &position, const std::shared_ptr<Entity> &except);
 			std::shared_ptr<Entity> findEntity(const Position &position);
+			std::shared_ptr<Entity> findEntity(const Position &position, const std::shared_ptr<Entity> &except);
 
 			friend class MainWindow;
 
