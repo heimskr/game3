@@ -21,6 +21,7 @@ namespace Game3 {
 			void stop();
 
 			static void summary(double threshold = 0.0);
+			static void clear();
 
 		private:
 			bool stopped = false;

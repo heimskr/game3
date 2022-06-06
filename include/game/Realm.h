@@ -38,7 +38,7 @@ namespace Game3 {
 			void initEntities();
 			void tick(float delta);
 
-			friend class Application;
+			friend class MainWindow;
 
 		private:
 			Index randomLand = 0;

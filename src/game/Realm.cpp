@@ -114,6 +114,7 @@ namespace Game3 {
 		}
 		candidate_timer.stop();
 		Timer::summary();
+		Timer::clear();
 
 		std::cout << "Found " << candidates.size() << " candidate" << (candidates.size() == 1? "" : "s") << ".\n";
 		if (!candidates.empty())

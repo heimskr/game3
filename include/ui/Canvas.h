@@ -15,8 +15,9 @@
 
 namespace Game3 {
 	class Game;
+	class MainWindow;
 
-	class Canvas: public nanogui::GLCanvas {
+	class Canvas {
 		public:
 			constexpr static float DEFAULT_SCALE = 2.f;
 
@@ -27,15 +28,18 @@ namespace Game3 {
 			RectangleRenderer rectangleRenderer {*this};
 			float magic = 8.f;
 
-			Canvas(nanogui::Widget *parent);
+			Canvas(MainWindow &);
 
-			void draw(NVGcontext *) override;
-			void drawGL() override;
-			bool scrollEvent(const nanogui::Vector2i &p, const nanogui::Vector2f &rel) override;
-			bool mouseDragEvent(const nanogui::Vector2i &p, const nanogui::Vector2i &rel, int button, int modifiers) override;
-			bool mouseButtonEvent(const nanogui::Vector2i &p, int button, bool down, int modifiers) override;
+			// void draw(NVGcontext *);
+			void drawGL();
+			// bool scrollEvent(const nanogui::Vector2i &p, const nanogui::Vector2f &rel) override;
+			// bool mouseDragEvent(const nanogui::Vector2i &p, const nanogui::Vector2i &rel, int button, int modifiers) override;
+			// bool mouseButtonEvent(const nanogui::Vector2i &p, int button, bool down, int modifiers) override;
+			int width();
+			int height();
 
 		private:
+			MainWindow &window;
 			constexpr static float HEADER_HEIGHT = 56.f;
 
 			NVGcontext *context = nullptr;

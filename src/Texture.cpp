@@ -1,8 +1,10 @@
 // Credit: https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/3.2d_game/0.full_source/texture.cpp
 #include <iostream>
 #include <stb_image.h>
+#include <GL/glu.h>
 
 #include "Texture.h"
+#include "util/Util.h"
 
 namespace Game3 {
 	Texture::Texture(const std::filesystem::path &path_, bool alpha_, int filter_):
@@ -28,7 +30,7 @@ namespace Game3 {
 
 	void Texture::bind() {
 		init();
-		glBindTexture(GL_TEXTURE_2D, id);
+		glBindTexture(GL_TEXTURE_2D, id); CHECKGL
 	}
 
 	void to_json(nlohmann::json &json, const Texture &texture) {
