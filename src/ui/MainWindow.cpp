@@ -7,6 +7,14 @@
 #include <GL/glu.h>
 
 namespace Game3 {
+	static std::chrono::milliseconds arrowTime {5};
+	std::unordered_map<guint, std::chrono::milliseconds> MainWindow::customKeyRepeatTimes {
+		{GDK_KEY_Up,    arrowTime},
+		{GDK_KEY_Down,  arrowTime},
+		{GDK_KEY_Left,  arrowTime},
+		{GDK_KEY_Right, arrowTime},
+	};
+
 	MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &builder_):
 	Gtk::ApplicationWindow(cobject), builder(builder_) {
 		header = builder->get_widget<Gtk::HeaderBar>("headerbar");
@@ -193,7 +201,10 @@ namespace Game3 {
 	void MainWindow::handleKeys() {
 		for (auto &[keyval, info]: keyTimes) {
 			auto &[keycode, modifiers, time] = info;
-			if (std::chrono::duration_cast<std::chrono::milliseconds>(timeDifference(time)) < keyRepeatTime)
+			auto repeat_time = keyRepeatTime;
+			if (customKeyRepeatTimes.contains(keyval))
+				repeat_time = customKeyRepeatTimes.at(keyval);
+			if (std::chrono::duration_cast<std::chrono::milliseconds>(timeDifference(time)) < repeat_time)
 				continue;
 			time = getTime();
 			handleKey(keyval, keycode, modifiers);
@@ -239,7 +250,7 @@ namespace Game3 {
 				}
 			}
 
-			const float delta = canvas->scale / 4.f;
+			const float delta = canvas->scale / 20.f;
 			switch (keyval) {
 				case GDK_KEY_Down:
 					canvas->center.y() -= delta;

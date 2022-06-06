@@ -40,6 +40,8 @@ namespace Game3 {
 
 		private:
 			constexpr static std::chrono::milliseconds keyRepeatTime {100};
+			static std::unordered_map<guint, std::chrono::milliseconds> customKeyRepeatTimes;
+
 			Glib::RefPtr<Gtk::Builder> builder;
 			Glib::RefPtr<Gtk::CssProvider> cssProvider;
 			std::list<std::function<void()>> functionQueue;
