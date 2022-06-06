@@ -3,6 +3,7 @@
 #include <fstream>
 
 #include "game/Game.h"
+#include "ui/gtk/NewGameDialog.h"
 #include "ui/MainWindow.h"
 
 #include "util/FS.h"
@@ -214,8 +215,8 @@ namespace Game3 {
 	bool MainWindow::render(const Glib::RefPtr<Gdk::GLContext> &context) {
 		context->make_current();
 		glArea.throw_if_error();
-		glClearColor(.2f, .2f, .2f, 1.f); CHECKGL
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); CHECKGL
+		glClearColor(.2f, .2f, .2f, 1.f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		canvas->drawGL();
 		return true;
 	}
@@ -346,7 +347,11 @@ namespace Game3 {
 	}
 
 	void MainWindow::onNew() {
-		newGame(666, 256, 256);
+		auto *new_dialog = new NewGameDialog(*this);
+		dialog.reset(new_dialog);
+		new_dialog->set_transient_for(*this);
+		new_dialog->signal_submit().connect(sigc::mem_fun(*this, &MainWindow::newGame));
+		new_dialog->show();
 	}
 
 	void MainWindow::connectSave() {
