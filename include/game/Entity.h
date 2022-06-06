@@ -16,6 +16,7 @@
 namespace Game3 {
 	class Canvas;
 	class Game;
+	class Player;
 	class Realm;
 	class SpriteRenderer;
 
@@ -47,6 +48,10 @@ namespace Game3 {
 			virtual nlohmann::json toJSON() const;
 			virtual bool isPlayer() const { return false; }
 			virtual void tick(float delta);
+			/** Handles when the player interacts with the tile they're on and that tile contains this entity. */
+			virtual void interactOn(const std::shared_ptr<Player> &) {}
+			/** Handles when the player interacts with the tile in front of them and that tile contains this entity. */
+			virtual void interactNextTo(const std::shared_ptr<Player> &) {}
 			inline EntityID id() const { return id_; }
 			inline const Position::value_type & row()    const { return position.row;    }
 			inline const Position::value_type & column() const { return position.column; }
