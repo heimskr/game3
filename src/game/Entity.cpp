@@ -53,7 +53,7 @@ namespace Game3 {
 		if (!texture)
 			return;
 
-		sprite_renderer.drawOnMap(*texture, position.second + offset.x(), position.first + offset.y(), 0.f, 8.f * int(direction), 16.f, 16.f);
+		sprite_renderer.drawOnMap(*texture, position.column + offset.x(), position.row + offset.y(), 0.f, 8.f * int(direction), 16.f, 16.f);
 	}
 
 	void Entity::move(Direction move_direction) {
@@ -67,23 +67,23 @@ namespace Game3 {
 		bool horizontal = false;
 		switch (move_direction) {
 			case Direction::Down:
-				++new_position.first;
+				++new_position.row;
 				direction = Direction::Down;
 				y_offset = -1.f;
 				break;
 			case Direction::Up:
-				--new_position.first;
+				--new_position.row;
 				direction = Direction::Up;
 				y_offset = 1.f;
 				break;
 			case Direction::Left:
-				--new_position.second;
+				--new_position.column;
 				direction = Direction::Left;
 				x_offset = 1.f;
 				horizontal = true;
 				break;
 			case Direction::Right:
-				++new_position.second;
+				++new_position.column;
 				direction = Direction::Right;
 				x_offset = -1.f;
 				horizontal = true;
@@ -115,20 +115,20 @@ namespace Game3 {
 	}
 
 	bool Entity::canMoveTo(const Position &new_position) const {
-		if (new_position.first < 0 || new_position.second < 0)
+		if (new_position.row < 0 || new_position.column < 0)
 			return false;
 
 		auto realm = weakRealm.lock();
 		if (!realm)
 			return false;
 
-		if (realm->getHeight() <= new_position.first || realm->getWidth() <= new_position.second)
+		if (realm->getHeight() <= new_position.row || realm->getWidth() <= new_position.column)
 			return false;
 
-		if (!isLand((*realm->tilemap1)(new_position.second, new_position.first)))
+		if (!isLand((*realm->tilemap1)(new_position.column, new_position.row)))
 			return false;
 
-		if (isSolid((*realm->tilemap2)(new_position.second, new_position.first)))
+		if (isSolid((*realm->tilemap2)(new_position.column, new_position.row)))
 			return false;
 
 		return true;

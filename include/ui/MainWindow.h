@@ -2,21 +2,25 @@
 
 #include <gtkmm.h>
 #include <chrono>
+#include <filesystem>
 #include <functional>
 #include <list>
 #include <memory>
 #include <mutex>
 #include <unordered_map>
-
-#include "ui/Canvas.h"
+#include <vector>
 
 namespace Game3 {
+	class Canvas;
 	class Game;
+	class InventoryTab;
+	class Tab;
 
 	class MainWindow: public Gtk::ApplicationWindow {
 		public:
 			std::unique_ptr<Gtk::Dialog> dialog;
 			Gtk::HeaderBar *header = nullptr;
+			std::shared_ptr<Game> game;
 
 			MainWindow(BaseObjectType *, const Glib::RefPtr<Gtk::Builder> &);
 
@@ -51,7 +55,8 @@ namespace Game3 {
 			Gtk::Notebook notebook;
 			Gtk::GLArea glArea;
 			std::unique_ptr<Canvas> canvas;
-			std::shared_ptr<Game> game;
+			std::vector<std::shared_ptr<Tab>> tabs;
+			std::shared_ptr<InventoryTab> inventoryTab;
 			double lastDragX = 0.;
 			double lastDragY = 0.;
 			double glAreaMouseX = 0.;
@@ -76,5 +81,7 @@ namespace Game3 {
 			void handleKey(guint keyval, guint keycode, Gdk::ModifierType);
 			void onNew();
 			void connectSave();
+			void addTab(std::shared_ptr<Tab>);
+			void onGameLoaded();
 	};
 }

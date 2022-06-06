@@ -11,7 +11,6 @@ namespace Game3 {
 	using RealmID = unsigned;
 	using ItemID = unsigned;
 	using Slot = int;
-	using Position = std::pair<Index, Index>;
 
 	enum class Direction: uint8_t {Down = 0, Up, Right, Left};
 }

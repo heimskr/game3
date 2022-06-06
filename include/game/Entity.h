@@ -7,6 +7,7 @@
 #include <nanogui/common.h>
 #include <nlohmann/json.hpp>
 
+#include "Position.h"
 #include "Texture.h"
 #include "Types.h"
 #include "game/Inventory.h"
@@ -47,10 +48,10 @@ namespace Game3 {
 			virtual bool isPlayer() const { return false; }
 			virtual void tick(float delta);
 			inline EntityID id() const { return id_; }
-			inline const Position::first_type  & row()    const { return position.first;  }
-			inline const Position::second_type & column() const { return position.second; }
-			inline Position::first_type  & row()    { return position.first;  }
-			inline Position::second_type & column() { return position.second; }
+			inline const Position::value_type & row()    const { return position.row;    }
+			inline const Position::value_type & column() const { return position.column; }
+			inline Position::value_type & row()    { return position.row;    }
+			inline Position::value_type & column() { return position.column; }
 			void id(EntityID);
 			void init();
 			void render(SpriteRenderer &) const;

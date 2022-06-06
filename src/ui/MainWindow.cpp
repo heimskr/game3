@@ -4,6 +4,8 @@
 
 #include "game/Game.h"
 #include "ui/gtk/NewGameDialog.h"
+#include "ui/tab/InventoryTab.h"
+#include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 
 #include "util/FS.h"
@@ -160,7 +162,10 @@ namespace Game3 {
 		paned.set_shrink_start_child(false);
 		paned.set_resize_end_child(false);
 		paned.set_shrink_end_child(false);
-		notebook.set_size_request(400, -1);
+		notebook.set_size_request(402, -1);
+
+		addTab(inventoryTab = std::make_shared<InventoryTab>(*this));
+
 		set_child(paned);
 	}
 
@@ -177,11 +182,7 @@ namespace Game3 {
 		realm->addEntity(game->player = std::make_shared<Player>(Entity::GANGBLANC));
 		game->player->position = {realm->randomLand / width, realm->randomLand % width};
 		game->player->init();
-		game->player->focus(*canvas);
-		canvas->game = game;
-		realm->rebind();
-		realm->reupload();
-		connectSave();
+		onGameLoaded();
 	}
 
 	void MainWindow::loadGame(const std::filesystem::path &path) {
@@ -199,11 +200,7 @@ namespace Game3 {
 					throw std::runtime_error("Couldn't cast entity with isPlayer() == true to Player");
 				break;
 			}
-		game->player->focus(*canvas);
-		canvas->game = game;
-		realm->rebind();
-		realm->reupload();
-		connectSave();
+		onGameLoaded();
 	}
 
 	void MainWindow::saveGame(const std::filesystem::path &path) {
@@ -322,6 +319,7 @@ namespace Game3 {
 							std::cout << "Inventory:\n";
 							for (const auto &[slot, stack]: player.inventory.getStorage())
 								std::cout << "  " << stack.item->name << " x " << stack.count << " in slot " << slot << '\n';
+							inventoryTab->reset(game);
 						}
 						return;
 					case GDK_KEY_o: {
@@ -391,6 +389,22 @@ namespace Game3 {
 			});
 			chooser->show();
 		}));
+	}
+
+	void MainWindow::addTab(std::shared_ptr<Tab> tab) {
+		notebook.append_page(tab->getWidget(), tab->getName());
+		tabs.push_back(tab);
+	}
+
+	void MainWindow::onGameLoaded() {
+		glArea.get_context()->make_current();
+		game->player->focus(*canvas);
+		canvas->game = game;
+		game->activeRealm->rebind();
+		game->activeRealm->reupload();
+		connectSave();
+		for (auto &tab: tabs)
+			tab->reset(game);
 	}
 
 /*
