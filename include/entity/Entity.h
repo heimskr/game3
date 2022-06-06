@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -20,7 +21,7 @@ namespace Game3 {
 	class Realm;
 	class SpriteRenderer;
 
-	class Entity {
+	class Entity: public std::enable_shared_from_this<Entity> {
 		public:
 			constexpr static EntityID GANGBLANC = 1;
 			constexpr static EntityID GRUM = 2;
@@ -33,7 +34,7 @@ namespace Game3 {
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;
 			Direction direction = Direction::Down;
-			Inventory inventory {16};
+			Inventory inventory {{}, 16};
 			/** The reciprocal of this is how many seconds it takes to move one square. */
 			float speed = 10.f;
 			/** When the entity moves a square, its position field is immediately updated but this field is set to an offset
@@ -41,13 +42,19 @@ namespace Game3 {
 			 *  to zero each tick to achieve smooth movement instead of teleportation from one tile to the next. */
 			nanogui::Vector2f offset {0.f, 0.f};
 
-			Entity() = default;
-			Entity(EntityID id__): id_(id__) {}
+			template <typename T>
+			static std::shared_ptr<T> create(EntityID id) {
+				auto out = std::shared_ptr<T>(new T(id));
+				out->init();
+				return out;
+			}
 
 			static std::shared_ptr<Entity> fromJSON(const nlohmann::json &);
 
+			virtual void absorbJSON(const nlohmann::json &);
 			virtual nlohmann::json toJSON() const;
 			virtual bool isPlayer() const { return false; }
+			virtual void render(SpriteRenderer &) const;
 			virtual void tick(float delta);
 			/** Handles when the player interacts with the tile they're on and that tile contains this entity. */
 			virtual void interactOn(const std::shared_ptr<Player> &) {}
@@ -59,12 +66,16 @@ namespace Game3 {
 			inline Position::value_type & row()    { return position.row;    }
 			inline Position::value_type & column() { return position.column; }
 			void id(EntityID);
-			void init();
-			void render(SpriteRenderer &) const;
+			virtual void init();
 			void move(Direction);
 			void setRealm(const Game &, RealmID);
 			void setRealm(const std::shared_ptr<Realm>);
 			void focus(Canvas &);
+			void teleport(const Position &);
+
+		protected:
+			Entity() = delete;
+			Entity(EntityID id__): id_(id__) {}
 
 		private:
 			EntityID id_ = 0;
@@ -74,5 +85,4 @@ namespace Game3 {
 	};
 
 	void to_json(nlohmann::json &, const Entity &);
-	void from_json(const nlohmann::json &, Entity &);
 }

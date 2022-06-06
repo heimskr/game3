@@ -4,6 +4,7 @@
 
 #include "Tiles.h"
 #include "entity/Entity.h"
+#include "entity/ItemEntity.h"
 #include "game/Game.h"
 #include "game/Realm.h"
 #include "ui/Canvas.h"
@@ -13,18 +14,41 @@ namespace Game3 {
 	std::unordered_map<EntityID, Texture> Entity::textureMap {
 		{Entity::GANGBLANC, Texture("resources/characters/champions/Gangblanc.png")},
 		{Entity::GRUM,      Texture("resources/characters/champions/Grum.png")},
+		{Entity::ITEM,      Texture("resources/missing.png")}, // Rendering is handled on a per-item basis by the ItemEntity class
 	};
 
 	std::shared_ptr<Entity> Entity::fromJSON(const nlohmann::json &json) {
+		std::shared_ptr<Entity> out;
+		const EntityID id = json.at("id");
+
 		if (json.at("isPlayer") == true)
-			return std::make_shared<Player>(json);
-		return std::make_shared<Entity>(json);
+			out = Entity::create<Player>(id);
+		else
+			switch (id) {
+				case Entity::ITEM:
+					out = ItemEntity::create(json.at("stack"));
+					break;
+				default:
+					out = Entity::create<Entity>(id);
+					break;
+			}
+
+		out->absorbJSON(json);
+		return out;
 	}
 
 	nlohmann::json Entity::toJSON() const {
 		nlohmann::json json;
 		to_json(json, *this);
 		return json;
+	}
+
+	void Entity::absorbJSON(const nlohmann::json &json) {
+		id(json.at("id"));
+		position = json.at("position");
+		realmID = json.at("realmID");
+		direction = json.at("direction");
+		inventory = Inventory::fromJSON(json.at("inventory"), shared_from_this());
 	}
 
 	void Entity::tick(float delta) {
@@ -47,6 +71,7 @@ namespace Game3 {
 
 	void Entity::init() {
 		texture = &textureMap.at(id_);
+		inventory.owner = shared_from_this();
 	}
 
 	void Entity::render(SpriteRenderer &sprite_renderer) const {
@@ -153,11 +178,11 @@ namespace Game3 {
 		json["inventory"] = entity.inventory;
 	}
 
-	void from_json(const nlohmann::json &json, Entity &entity) {
-		entity.id(json.at("id"));
-		entity.position = json.at("position");
-		entity.realmID = json.at("realmID");
-		entity.direction = json.at("direction");
-		entity.inventory = json.at("inventory");
-	}
+	// void from_json(const nlohmann::json &json, Entity &entity) {
+	// 	entity.id(json.at("id"));
+	// 	entity.position = json.at("position");
+	// 	entity.realmID = json.at("realmID");
+	// 	entity.direction = json.at("direction");
+	// 	entity.inventory = Inventory::fromJSON(json.at("inventory"), ;
+	// }
 }

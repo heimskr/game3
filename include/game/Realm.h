@@ -42,6 +42,14 @@ namespace Game3 {
 			std::shared_ptr<Entity> findEntity(const Position &position);
 			std::shared_ptr<Entity> findEntity(const Position &position, const std::shared_ptr<Entity> &except);
 
+			template <typename T, typename... Args>
+			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {
+				auto entity = std::make_shared<T>(std::forward<Args>(args)...);
+				entity->teleport(position);
+				addEntity(entity);
+				return entity;
+			}
+
 			friend class MainWindow;
 
 		private:

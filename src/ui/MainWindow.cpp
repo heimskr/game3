@@ -179,7 +179,7 @@ namespace Game3 {
 		realm->generate(seed);
 		game->realms.emplace(realm->id, realm);
 		game->activeRealm = realm;
-		realm->addEntity(game->player = std::make_shared<Player>(Entity::GANGBLANC));
+		realm->addEntity(game->player = Entity::create<Player>(Entity::GANGBLANC));
 		game->player->position = {realm->randomLand / width, realm->randomLand % width};
 		game->player->init();
 		onGameLoaded();

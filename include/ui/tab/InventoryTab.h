@@ -31,6 +31,10 @@ namespace Game3 {
 			Gtk::PopoverMenu popoverMenu;
 			std::vector<std::unique_ptr<Gtk::Widget>> gridWidgets;
 
+			/** We can't store state in a popover, so we have to store it here. */
+			std::shared_ptr<Game> lastGame;
+			Slot lastSlot = -1;
+
 			void leftClick(const std::shared_ptr<Game> &, Gtk::Label &, int click_count, Slot, double x, double y);
 			void rightClick(const std::shared_ptr<Game> &, Gtk::Label &, int click_count, Slot, double x, double y);
 	};

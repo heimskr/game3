@@ -18,7 +18,9 @@ namespace Game3 {
 		popoverMenu.set_menu_model(gmenu);
 
 		auto group = Gio::SimpleActionGroup::create();
-		group->add_action("drop", [this] { std::cout << "drop\n"; });
+		group->add_action("drop", [this] {
+			lastGame->player->inventory.drop(lastSlot);
+		});
 		group->add_action("discard", [this] { std::cout << "discard\n"; });
 
 		mainWindow.insert_action_group("inventory_popup", group);
@@ -77,11 +79,11 @@ namespace Game3 {
 		}
 	}
 	
-	void InventoryTab::leftClick(const std::shared_ptr<Game> &game, Gtk::Label &label, int click_count, Slot slot, double x, double y) {
+	void InventoryTab::leftClick(const std::shared_ptr<Game> &, Gtk::Label &, int, Slot, double, double) {
 		
 	}
 
-	void InventoryTab::rightClick(const std::shared_ptr<Game> &game, Gtk::Label &label, int click_count, Slot slot, double x, double y) {
+	void InventoryTab::rightClick(const std::shared_ptr<Game> &game, Gtk::Label &, int, Slot slot, double x, double y) {
 		Gtk::Widget *widget = &grid;
 
 		do {
@@ -92,7 +94,9 @@ namespace Game3 {
 		} while (widget);
 
 		popoverMenu.set_has_arrow(true);
-		popoverMenu.set_pointing_to({x, y, 1, 1});
+		popoverMenu.set_pointing_to({int(x), int(y), 1, 1});
+		lastGame = game;
+		lastSlot = slot;
 		popoverMenu.popup();
 	}
 }

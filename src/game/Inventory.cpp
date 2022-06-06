@@ -1,6 +1,9 @@
 #include "game/Inventory.h"
 
 namespace Game3 {
+	Inventory::Inventory(const std::shared_ptr<Entity> &owner_, Slot slot_count):
+		owner(owner_), slotCount(slot_count) {}
+
 	ItemStack * Inventory::operator[](size_t slot) {
 		if (storage.contains(slot))
 			return &storage.at(slot);
@@ -42,13 +45,19 @@ namespace Game3 {
 		return remaining == 0? nullptr : std::make_unique<ItemStack>(stack.item, remaining);
 	}
 
+	void Inventory::drop(Slot slot) {
+		
+	}
+
+	Inventory Inventory::fromJSON(const nlohmann::json &json, const std::shared_ptr<Entity> &owner) {
+		Inventory out(owner, 0);
+		out.storage = json.at("storage");
+		out.slotCount = json.at("slotCount");
+		return out;
+	}
+
 	void to_json(nlohmann::json &json, const Inventory &inventory) {
 		json["storage"] = inventory.storage;
 		json["slotCount"] = inventory.slotCount;
-	}
-
-	void from_json(const nlohmann::json &json, Inventory &inventory) {
-		inventory.storage = json.at("storage");
-		inventory.slotCount = json.at("slotCount");
 	}
 }

@@ -1,16 +1,19 @@
 #pragma once
 
 #include <map>
+#include <memory>
 
 #include "game/Item.h"
 
 namespace Game3 {
+	class Entity;
+
 	class Inventory {
 		public:
+			std::weak_ptr<Entity> owner;
 			Slot slotCount = 0;
 
-			Inventory() = default;
-			Inventory(Slot slot_count): slotCount(slot_count) {}
+			Inventory(const std::shared_ptr<Entity> &owner_, Slot slot_count);
 
 			ItemStack * operator[](size_t);
 			const ItemStack * operator[](size_t) const;
@@ -18,6 +21,9 @@ namespace Game3 {
 			/** If the ItemStack couldn't be inserted into the inventory, this function returns an ItemStack containing the leftovers that couldn't be inserted.
 			 *  Otherwise, this function returns a null pointer. */
 			std::unique_ptr<ItemStack> add(const ItemStack &);
+
+			/** Removes an item from the inventory and drops it at the owner's location. */
+			void drop(Slot);
 
 			inline bool empty() const { return storage.empty(); }
 
@@ -27,10 +33,10 @@ namespace Game3 {
 		public:
 			inline const decltype(storage) & getStorage() const { return storage; }
 
+			static Inventory fromJSON(const nlohmann::json &, const std::shared_ptr<Entity> &);
+
 			friend void to_json(nlohmann::json &, const Inventory &);
-			friend void from_json(const nlohmann::json &, Inventory &);
 	};
 
 	void to_json(nlohmann::json &, const Inventory &);
-	void from_json(const nlohmann::json &, Inventory &);
 }
