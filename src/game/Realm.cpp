@@ -236,6 +236,21 @@ namespace Game3 {
 			entity->tick(delta);
 	}
 
+	std::vector<std::shared_ptr<Entity>> Realm::findEntities(const Position &position) {
+		std::vector<std::shared_ptr<Entity>> out;
+		for (const auto &entity: entities)
+			if (entity->position == position)
+				out.push_back(entity);
+		return out;
+	}
+
+	std::shared_ptr<Entity> Realm::findEntity(const Position &position) {
+		for (const auto &entity: entities)
+			if (entity->position == position)
+				return entity;
+		return {};
+	}
+
 	void to_json(nlohmann::json &json, const Realm &realm) {
 		json["id"] = realm.id;
 		json["tilemap1"] = *realm.tilemap1;

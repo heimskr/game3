@@ -9,6 +9,9 @@ namespace Game3 {
 		using value_type = Index;
 		value_type row;
 		value_type column;
+
+		bool operator==(const Position &other) const { return row == other.row && column == other.column; }
+		bool operator!=(const Position &other) const { return row != other.row || column != other.column; }
 	};
 
 	void to_json(nlohmann::json &, const Position &);
