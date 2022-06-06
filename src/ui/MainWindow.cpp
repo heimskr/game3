@@ -24,11 +24,7 @@ namespace Game3 {
 			functionQueue.clear();
 		});
 
-		add_action("example", Gio::ActionMap::ActivateSlot([this] {
-			if (!canvas)
-				return;
-			newGame(666, 256, 256);
-		}));
+		add_action("new", Gio::ActionMap::ActivateSlot(sigc::mem_fun(*this, &MainWindow::onNew)));
 
 		glArea.set_expand(true);
 		glArea.set_required_version(3, 3);
@@ -52,7 +48,8 @@ namespace Game3 {
 		set_child(glArea);
 
 		auto key_controller = Gtk::EventControllerKey::create();
-		key_controller->signal_key_pressed().connect(sigc::mem_fun(*this, &MainWindow::onKey), false);
+		key_controller->signal_key_pressed().connect(sigc::mem_fun(*this, &MainWindow::onKeyPressed), false);
+		key_controller->signal_key_released().connect(sigc::mem_fun(*this, &MainWindow::onKeyReleased));
 		add_controller(key_controller);
 
 		auto drag = Gtk::GestureDrag::create();
@@ -105,6 +102,11 @@ namespace Game3 {
 			return true;
 		}, false);
 		add_controller(scroll);
+
+		add_tick_callback([this](const auto &) {
+			handleKeys();
+			return true;
+		});
 	}
 
 	void MainWindow::newGame(int seed, int width, int height) {
@@ -175,40 +177,56 @@ namespace Game3 {
 		alert(message, Gtk::MessageType::ERROR, modal, use_markup);
 	}
 
-	bool MainWindow::onKey(guint keyval, guint keycode, Gdk::ModifierType modifier) {
+	bool MainWindow::onKeyPressed(guint keyval, guint keycode, Gdk::ModifierType modifiers) {
+		if (!keyTimes.contains(keyval)) {
+			handleKey(keyval, keycode, modifiers);
+			keyTimes.try_emplace(keyval, keycode, modifiers, getTime());
+		} else
+			keyTimes.at(keyval).modifiers = modifiers;
+		return true;
+	}
+
+	void MainWindow::onKeyReleased(guint keyval, guint, Gdk::ModifierType) {
+		keyTimes.erase(keyval);
+	}
+
+	void MainWindow::handleKeys() {
+		for (auto &[keyval, info]: keyTimes) {
+			auto &[keycode, modifiers, time] = info;
+			if (std::chrono::duration_cast<std::chrono::milliseconds>(timeDifference(time)) < keyRepeatTime)
+				continue;
+			time = getTime();
+			handleKey(keyval, keycode, modifiers);
+		}
+	}
+
+	void MainWindow::handleKey(guint keyval, guint keycode, Gdk::ModifierType modifiers) {
+		std::cout << "Key[" << keyval << "]\n";
 		if (canvas) {
 			if (game && game->player) {
 				auto &player = *game->player;
 				switch (keyval) {
 					case GDK_KEY_s:
 						player.move(Direction::Down);
-						return true;
+						return;
 					case GDK_KEY_w:
 						player.move(Direction::Up);
-						return true;
+						return;
 					case GDK_KEY_a:
 						player.move(Direction::Left);
-						return true;
+						return;
 					case GDK_KEY_d:
 						player.move(Direction::Right);
-						return true;
-					case GDK_KEY_i: {
-						// if (game->menu && game->menu->getType() == MenuType::Inventory) {
-						// 	game->menu.reset();
-						// } else {
-						// 	auto menu = std::make_shared<InventoryMenu>(game->player);
-						// 	game->menu = menu;
-						// }
-						// if (player.inventory.empty()) {
-						// 	std::cout << "Inventory empty.\n";
-						// } else {
-						// 	std::cout << "Inventory:\n";
-						// 	for (const auto &[slot, stack]: player.inventory.getStorage())
-						// 		std::cout << "  " << stack.item->name << " x " << stack.count << " in slot " << slot << '\n';
-						// }
-
-						return true;
-					}
+						return;
+					case GDK_KEY_i:
+						if (player.inventory.empty()) {
+							std::cout << "Inventory empty.\n";
+						} else {
+							std::cout << "Inventory:\n";
+							for (const auto &[slot, stack]: player.inventory.getStorage())
+								std::cout << "  " << stack.item->name << " x " << stack.count << " in slot " << slot << '\n';
+						}
+						return;
 					case GDK_KEY_o: {
 						ItemStack sword(Item::SHORTSWORD, 1);
 						auto leftover = player.inventory.add(sword);
@@ -217,7 +235,7 @@ namespace Game3 {
 							std::cout << "Left over: " << leftover->item->name << " x " << leftover->count << '\n';
 						else
 							std::cout << "No leftover.\n";
-						return true;
+						return;
 					}
 				}
 			}
@@ -237,15 +255,15 @@ namespace Game3 {
 					canvas->center.x() -= delta;
 					break;
 				default:
-					return true;
+					return;
 			}
-
-			return true;
 		}
-
-
-		return true;
 	}
+
+	void MainWindow::onNew() {
+		newGame(666, 256, 256);
+	}
+
 /*
 	void Application::saveGame() {
 		if (!game)

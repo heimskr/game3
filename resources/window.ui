@@ -35,8 +35,16 @@
 	<menu id="menu">
 		<section>
 			<item>
-				<attribute name="label" translatable="yes">_Example</attribute>
-				<attribute name="action">win.example</attribute>
+				<attribute name="label" translatable="yes">_New</attribute>
+				<attribute name="action">win.new</attribute>
+			</item>
+			<item>
+				<attribute name="label" translatable="yes">_Open</attribute>
+				<attribute name="action">win.open</attribute>
+			</item>
+			<item>
+				<attribute name="label" translatable="yes">_Save</attribute>
+				<attribute name="action">win.save</attribute>
 			</item>
 		</section>
 	</menu>

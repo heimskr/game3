@@ -1,10 +1,12 @@
 #pragma once
 
 #include <gtkmm.h>
+#include <chrono>
 #include <functional>
 #include <list>
 #include <memory>
 #include <mutex>
+#include <unordered_map>
 
 #include "ui/Canvas.h"
 
@@ -37,6 +39,7 @@ namespace Game3 {
 			friend class Canvas;
 
 		private:
+			constexpr static std::chrono::milliseconds keyRepeatTime {100};
 			Glib::RefPtr<Gtk::Builder> builder;
 			Glib::RefPtr<Gtk::CssProvider> cssProvider;
 			std::list<std::function<void()>> functionQueue;
@@ -52,9 +55,24 @@ namespace Game3 {
 			double lastDragY = 0.;
 			double glAreaMouseX = 0.;
 			double glAreaMouseY = 0.;
+			/** keyval => (keycode, lastProcessed) */
+
+			struct KeyInfo {
+				guint code;
+				Gdk::ModifierType modifiers;
+				std::chrono::system_clock::time_point lastProcessed;
+			};
+
+			std::map<guint, KeyInfo> keyTimes;
 
 			void newGame(int seed, int width, int height);
 			bool render(const Glib::RefPtr<Gdk::GLContext> &);
-			bool onKey(guint, guint, Gdk::ModifierType);
+			bool onKeyPressed(guint, guint, Gdk::ModifierType);
+			void onKeyReleased(guint, guint, Gdk::ModifierType);
+			void handleKeys();
+			void handleKey(guint keyval, guint keycode, Gdk::ModifierType);
+			void onNew();
+			void onOpen();
+			void onSave();
 	};
 }

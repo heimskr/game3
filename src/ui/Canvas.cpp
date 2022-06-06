@@ -6,7 +6,7 @@
 #include "ui/MainWindow.h"
 
 #include "game/Game.h"
-#include "menu/Menu.h"
+// #include "menu/Menu.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 
@@ -28,8 +28,8 @@ namespace Game3 {
 				realm.render(width(), height(), center, scale, spriteRenderer);
 			}
 
-			if (game->menu)
-				game->menu->render(*game, *this, context);
+			// if (game->menu)
+			// 	game->menu->render(*game, *this);
 		}
 	}
 

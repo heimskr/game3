@@ -40,9 +40,5 @@ namespace Game3 {
 
 		private:
 			MainWindow &window;
-			constexpr static float HEADER_HEIGHT = 56.f;
-
-			NVGcontext *context = nullptr;
-			int font = -1;
 	};
 }

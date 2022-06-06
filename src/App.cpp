@@ -12,7 +12,9 @@ namespace Game3 {
 
 	void App::on_startup() {
 		Gtk::Application::on_startup();
-		set_accel_for_action("win.example", "<Ctrl>e");
+		set_accel_for_action("win.new", "<Ctrl>n");
+		set_accel_for_action("win.open", "<Ctrl>o");
+		set_accel_for_action("win.save", "<Ctrl>s");
 	}
 
 	void App::on_activate() {
