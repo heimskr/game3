@@ -200,8 +200,7 @@ namespace Game3 {
 		}
 	}
 
-	void MainWindow::handleKey(guint keyval, guint keycode, Gdk::ModifierType modifiers) {
-		std::cout << "Key[" << keyval << "]\n";
+	void MainWindow::handleKey(guint keyval, guint, Gdk::ModifierType) {
 		if (canvas) {
 			if (game && game->player) {
 				auto &player = *game->player;

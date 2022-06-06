@@ -63,6 +63,7 @@ namespace Game3 {
 		Position new_position = position;
 		float x_offset = 0.f;
 		float y_offset = 0.f;
+		bool horizontal = false;
 		switch (move_direction) {
 			case Direction::Down:
 				++new_position.first;
@@ -78,17 +79,19 @@ namespace Game3 {
 				--new_position.second;
 				direction = Direction::Left;
 				x_offset = 1.f;
+				horizontal = true;
 				break;
 			case Direction::Right:
 				++new_position.second;
 				direction = Direction::Right;
 				x_offset = -1.f;
+				horizontal = true;
 				break;
 			default:
 				throw std::invalid_argument("Invalid direction: " + std::to_string(int(move_direction)));
 		}
 
-		if (offset.x() != 0 || offset.y() != 0)
+		if ((horizontal && offset.x() != 0) || (!horizontal && offset.y() != 0))
 			return;
 
 		if (canMoveTo(new_position)) {
