@@ -174,6 +174,7 @@ namespace Game3 {
 
 	void MainWindow::loadGame(const std::filesystem::path &path) {
 		const std::string data = readFile(path);
+		glArea.get_context()->make_current();
 		if (!data.empty() && data.front() == '{')
 			game = std::make_shared<Game>(nlohmann::json::parse(data));
 		else
@@ -186,10 +187,10 @@ namespace Game3 {
 					throw std::runtime_error("Couldn't cast entity with isPlayer() == true to Player");
 				break;
 			}
-		realm->rebind();
-		realm->reupload();
 		game->player->focus(*canvas);
 		canvas->game = game;
+		realm->rebind();
+		realm->reupload();
 		connectSave();
 	}
 
@@ -377,33 +378,6 @@ namespace Game3 {
 	}
 
 /*
-	void Application::saveGame() {
-		if (!game)
-			return;
-
-		const std::string path = nanogui::file_dialog({{"g3", "Game3 save"}}, true);
-
-		if (path.empty())
-			return;
-
-		std::ofstream stream(path);
-
-		if (!stream.is_open()) {
-			new nanogui::MessageDialog(this, nanogui::MessageDialog::Type::Warning, "Error", "Couldn't open file for writing.");
-			return;
-		}
-
-#ifdef USE_CBOR
-		auto cbor = nlohmann::json::to_cbor(nlohmann::json(*game));
-		stream.write(reinterpret_cast<char *>(&cbor[0]), cbor.size());
-#else
-		stream << nlohmann::json(*game).dump();
-#endif
-		stream.close();
-
-		new nanogui::MessageDialog(this, nanogui::MessageDialog::Type::Information, "Success", "Game saved.");
-	}
-
 	void Application::draw(NVGcontext *ctx) {
 		Screen::draw(ctx);
 

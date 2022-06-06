@@ -50,14 +50,10 @@ namespace Game3 {
 			Gtk::GLArea glArea;
 			std::unique_ptr<Canvas> canvas;
 			std::shared_ptr<Game> game;
-			int oldWidth = 0;
-			int oldHeight = 0;
-			bool queueReupload = false;
 			double lastDragX = 0.;
 			double lastDragY = 0.;
 			double glAreaMouseX = 0.;
 			double glAreaMouseY = 0.;
-			/** keyval => (keycode, lastProcessed) */
 
 			struct KeyInfo {
 				guint code;
@@ -65,6 +61,7 @@ namespace Game3 {
 				std::chrono::system_clock::time_point lastProcessed;
 			};
 
+			/** keyval => (keycode, lastProcessed) */
 			std::map<guint, KeyInfo> keyTimes;
 
 			void newGame(int seed, int width, int height);
