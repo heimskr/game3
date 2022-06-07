@@ -196,13 +196,14 @@ namespace Game3 {
 		layer2[width * height - 4] = HouseTiles::WALL_W;
 
 		static std::array<TileID, 3> plants {HouseTiles::PLANT1, HouseTiles::PLANT2, HouseTiles::PLANT3};
+		static std::array<TileID, 2> doors  {HouseTiles::DOOR1,  HouseTiles::DOOR2};
 
 		layer2[width + 1] = choose(plants, rng);
 		layer2[2 * width - 2] = choose(plants, rng);
 		layer2[(width - 1) * height - 2] = choose(plants, rng);
 		layer2[(width - 2) * height + 1] = choose(plants, rng);
 
-		add(TileEntity::create<Teleporter>(HouseTiles::DOOR, getPosition(exit_index), parent_realm, entrance));
+		add(TileEntity::create<Teleporter>(choose(doors, rng), getPosition(exit_index), parent_realm, entrance));
 	}
 
 	void Realm::createTown(const size_t index, size_t width, size_t height, size_t pad) {
