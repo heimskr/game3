@@ -145,15 +145,19 @@ namespace Game3 {
 
 	void Realm::generateHouse(int width, int height) {
 		auto &layer1 = tilemap1->tiles;
+		auto &layer2 = tilemap2->tiles;
 
 		for (int column = 0; column < width; ++column)
-			layer1[column] = layer1[column + (height - 1) * width] = HouseTiles::WALL;
+			layer2[column] = layer2[column + (height - 1) * width] = HouseTiles::WALL;
 
-		for (int row = 1; row < height - 1; ++row)
-			for (int column = 1; column < width - 1; ++column)
+		for (int row = 0; row < height; ++row)
+			layer2[row * width] = layer2[(row + 1) * width - 1] = HouseTiles::WALL;
+
+		for (int row = 0; row < height; ++row)
+			for (int column = 0; column < width; ++column)
 				layer1[row * width + column] = HouseTiles::FLOOR;
 
-		layer1[width * height - 2] = HouseTiles::FLOOR;
+		layer2[width * height - 3] = HouseTiles::EMPTY;
 	}
 
 	void Realm::createTown(const size_t index, size_t width, size_t height, size_t pad) {
@@ -242,9 +246,9 @@ namespace Game3 {
 				const auto house = choose(houses, rng);
 				layer2[index] = house;
 				const RealmID realm_id = game->newRealmID();
-				const Index realm_width = 64;
-				const Index realm_height = 64;
-				auto building = TileEntity::create<Building>(house, Position(index / map_width, index % map_width), realm_id, realm_width * (realm_height - 1) - 2);
+				const Index realm_width = 16;
+				const Index realm_height = 16;
+				auto building = TileEntity::create<Building>(house, Position(index / map_width, index % map_width), realm_id, realm_width * (realm_height - 1) - 3);
 				auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, textureMap.at(Realm::HOUSE));
 				auto new_realm = std::make_shared<Realm>(realm_id, Realm::HOUSE, new_tilemap);
 				new_realm->game = game;
