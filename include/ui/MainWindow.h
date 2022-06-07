@@ -57,7 +57,8 @@ namespace Game3 {
 			Gtk::Notebook notebook;
 			Gtk::GLArea glArea;
 			std::unique_ptr<Canvas> canvas;
-			std::vector<std::shared_ptr<Tab>> tabs;
+			std::unordered_map<Gtk::Widget *, std::shared_ptr<Tab>> tabMap;
+			std::shared_ptr<InventoryTab> activeTab;
 			std::shared_ptr<InventoryTab> inventoryTab;
 			double lastDragX = 0.;
 			double lastDragY = 0.;

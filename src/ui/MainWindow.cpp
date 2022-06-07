@@ -169,10 +169,11 @@ namespace Game3 {
 		paned.set_shrink_end_child(false);
 		notebook.set_size_request(402, -1);
 		paned.property_position().signal_changed().connect([this] {
-			tabs.at(notebook.get_current_page())->onResize(game);
+			tabMap.at(notebook.get_nth_page(notebook.get_current_page()))->onResize(game);
 		});
 
 		addTab(inventoryTab = std::make_shared<InventoryTab>(*this));
+		activeTab = inventoryTab;
 
 		set_child(paned);
 	}
@@ -363,12 +364,10 @@ namespace Game3 {
 						game->activeRealm->reupload();
 						break;
 					case GDK_KEY_f:
-						if (unsigned(modifiers & Gdk::ModifierType::CONTROL_MASK) != 0) {
+						if (unsigned(modifiers & Gdk::ModifierType::CONTROL_MASK) != 0)
 							autoFocus = !autoFocus;
-						} else {
-							std::cout << std::hex << unsigned(modifiers) << std::dec << '\n';
+						else
 							game->player->focus(*canvas);
-						}
 						break;
 				}
 			}
@@ -431,7 +430,7 @@ namespace Game3 {
 
 	void MainWindow::addTab(std::shared_ptr<Tab> tab) {
 		notebook.append_page(tab->getWidget(), tab->getName());
-		tabs.push_back(tab);
+		tabMap.emplace(&tab->getWidget(), tab);
 	}
 
 	void MainWindow::onGameLoaded() {
@@ -441,7 +440,7 @@ namespace Game3 {
 		game->activeRealm->rebind();
 		game->activeRealm->reupload();
 		connectSave();
-		for (auto &tab: tabs)
+		for (auto &[widget, tab]: tabMap)
 			tab->reset(game);
 		for (auto &[id, realm]: game->realms)
 			realm->game = game.get();
