@@ -23,6 +23,7 @@ namespace Game3 {
 		{GDK_KEY_Down,  arrowTime},
 		{GDK_KEY_Left,  arrowTime},
 		{GDK_KEY_Right, arrowTime},
+		{GDK_KEY_f,     arrowTime},
 		{GDK_KEY_e,     interactTime},
 		{GDK_KEY_E,     interactTime},
 		{GDK_KEY_o,     interactTime},
