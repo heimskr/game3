@@ -171,6 +171,12 @@ namespace Game3 {
 		paned.property_position().signal_changed().connect([this] {
 			tabMap.at(notebook.get_nth_page(notebook.get_current_page()))->onResize(game);
 		});
+		notebook.property_page().signal_changed().connect([this] {
+			if (activeTab)
+				activeTab->onBlur();
+			activeTab = tabMap.at(notebook.get_nth_page(notebook.get_current_page()));
+			activeTab->onFocus();
+		});
 
 		addTab(inventoryTab = std::make_shared<InventoryTab>(*this));
 		activeTab = inventoryTab;
@@ -429,8 +435,8 @@ namespace Game3 {
 	}
 
 	void MainWindow::addTab(std::shared_ptr<Tab> tab) {
-		notebook.append_page(tab->getWidget(), tab->getName());
 		tabMap.emplace(&tab->getWidget(), tab);
+		notebook.append_page(tab->getWidget(), tab->getName());
 	}
 
 	void MainWindow::onGameLoaded() {
