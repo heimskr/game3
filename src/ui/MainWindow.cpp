@@ -326,10 +326,12 @@ namespace Game3 {
 						ItemStack sword(Item::SHORTSWORD, 1);
 						auto leftover = player.inventory.add(sword);
 						std::cout << "Added sword. ";
-						if (leftover)
+						if (leftover) {
 							std::cout << "Left over: " << leftover->item->name << " x " << leftover->count << '\n';
-						else
+						} else {
 							std::cout << "No leftover.\n";
+							inventoryTab->reset(game);
+						}
 						return;
 					}
 				}

@@ -83,8 +83,8 @@ namespace Game3 {
 		
 	}
 
-	void InventoryTab::rightClick(const std::shared_ptr<Game> &game, Gtk::Label &, int, Slot slot, double x, double y) {
-		Gtk::Widget *widget = &grid;
+	void InventoryTab::rightClick(const std::shared_ptr<Game> &game, Gtk::Label &label, int, Slot slot, double x, double y) {
+		Gtk::Widget *widget = &label;
 
 		do {
 			const auto allocation = widget->get_allocation();
