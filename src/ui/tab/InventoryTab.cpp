@@ -77,8 +77,8 @@ namespace Game3 {
 
 		removeChildren(grid);
 
-		const int grid_width = grid.get_width() / TILE_SIZE;
-		const int tile_size  = grid.get_width() / grid_width; // Some silliness to get things truncated. Or something.
+		const int grid_width = grid.get_width() / (TILE_SIZE + 2 * TILE_MARGIN);
+		const int tile_size  = grid.get_width() / (grid.get_width() / TILE_SIZE);
 		const auto &inventory = game->player->inventory;
 		const auto &storage = inventory.getStorage();
 		gridWidgets.clear();
@@ -89,11 +89,8 @@ namespace Game3 {
 			std::unique_ptr<Gtk::Label> label_ptr;
 
 			if (storage.contains(slot)) {
-				const auto &stack = storage.at(slot);
-				label_ptr = std::make_unique<Gtk::Label>(stack.item->name);
+				label_ptr = std::make_unique<Gtk::Label>(storage.at(slot).item->name);
 				auto &label = *label_ptr;
-				label.set_size_request(tile_size, tile_size);
-				grid.attach(label, column, row);
 				auto left_click = Gtk::GestureClick::create();
 				auto right_click = Gtk::GestureClick::create();
 				left_click->set_button(1);
@@ -102,14 +99,15 @@ namespace Game3 {
 				right_click->signal_pressed().connect([this, game, slot, &label](int n, double x, double y) { rightClick(game, label, n, slot, x, y); });
 				label.add_controller(left_click);
 				label.add_controller(right_click);
-			} else {
+			} else
 				label_ptr = std::make_unique<Gtk::Label>("");
-				label_ptr->set_size_request(tile_size, tile_size);
-				grid.attach(*label_ptr, column, row);
-			}
 
+			label_ptr->set_wrap(true);
+			label_ptr->set_wrap_mode(Pango::WrapMode::CHAR);
+			label_ptr->set_size_request(tile_size, tile_size);
 			label_ptr->add_css_class("item-slot");
 			label_ptr->set_data("slot", reinterpret_cast<void *>(slot));
+			grid.attach(*label_ptr, column, row);
 			gridWidgets.push_back(std::move(label_ptr));
 		}
 	}

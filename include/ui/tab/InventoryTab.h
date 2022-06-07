@@ -24,7 +24,8 @@ namespace Game3 {
 			void reset(const std::shared_ptr<Game> &) override;
 
 		private:
-			constexpr static int TILE_SIZE = 80;
+			constexpr static int TILE_MARGIN = 2;
+			constexpr static int TILE_SIZE = 100 - 2 * TILE_MARGIN;
 
 			Gtk::Grid grid;
 			Gtk::ScrolledWindow scrolled;
