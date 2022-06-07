@@ -281,7 +281,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void MainWindow::onKeyReleased(guint keyval, guint keycode, Gdk::ModifierType) {
+	void MainWindow::onKeyReleased(guint, guint keycode, Gdk::ModifierType) {
 		keyTimes.erase(keycode);
 	}
 

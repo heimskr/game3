@@ -22,7 +22,7 @@ namespace Game3 {
 		return nullptr;
 	}
 
-	std::unique_ptr<ItemStack> Inventory::add(const ItemStack &stack) {
+	std::optional<ItemStack> Inventory::add(const ItemStack &stack) {
 		int remaining = stack.count;
 
 		for (auto &[slot, stored]: storage) {
@@ -33,7 +33,7 @@ namespace Game3 {
 				const int to_store = std::min(remaining, storable);
 				stored.count += to_store;
 				remaining -= to_store;
-				if (remaining == 0)
+				if (remaining <= 0)
 					break;
 			}
 		}
@@ -44,11 +44,21 @@ namespace Game3 {
 			const unsigned to_store = std::min(unsigned(remaining), stack.item->maxCount);
 			storage.emplace(slot, ItemStack(stack.item, to_store));
 			remaining -= to_store;
-			if (remaining == 0)
+			if (remaining <= 0)
 				break;
 		}
 
-		return remaining == 0? nullptr : std::make_unique<ItemStack>(stack.item, remaining);
+		if (auto entity = owner.lock())
+			if (entity->isPlayer())
+				entity->getRealm()->game->signal_player_inventory_update().emit(std::dynamic_pointer_cast<Player>(entity));
+
+		if (remaining < 0)
+			throw std::logic_error("How'd we end up with " + std::to_string(remaining) + " items remaining?");
+
+		if (remaining == 0)
+			return std::nullopt;
+
+		return ItemStack(stack.item, remaining);
 	}
 
 	void Inventory::drop(Slot slot) {
@@ -59,12 +69,7 @@ namespace Game3 {
 		if (!entity)
 			throw std::logic_error("Inventory is missing an owner");
 
-		auto realm = entity->weakRealm.lock();
-		if (!realm)
-			throw std::logic_error("Inventory owner has no realm");
-
-		std::cout << "Spawning ItemEntity at " << entity->position << "\n";
-
+		auto realm = entity->getRealm();
 		realm->spawn<ItemEntity>(entity->position, storage.at(slot));
 		storage.erase(slot);
 

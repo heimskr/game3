@@ -57,6 +57,8 @@ namespace Game3 {
 			virtual bool isPlayer() const { return false; }
 			virtual void render(SpriteRenderer &) const;
 			virtual void tick(float delta);
+			/** Removes the entity from existence. */
+			virtual void remove();
 			/** Handles when the player interacts with the tile they're on and that tile contains this entity. */
 			virtual void onInteractOn(const std::shared_ptr<Player> &) {}
 			/** Handles when the player interacts with the tile in front of them and that tile contains this entity. */

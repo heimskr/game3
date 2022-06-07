@@ -65,6 +65,13 @@ namespace Game3 {
 			y = std::max(y - delta * speed, 0.f);
 	}
 
+	void Entity::remove() {
+		auto realm = getRealm();
+		// I'm assuming this has to be in its own variable to prevent the destructor from being called before this function returns.
+		auto shared = shared_from_this();
+		realm->entities.erase(shared);
+	}
+
 	void Entity::id(EntityID new_id) {
 		id_ = new_id;
 		texture = &textureMap.at(id_);

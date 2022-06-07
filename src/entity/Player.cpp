@@ -17,19 +17,21 @@ namespace Game3 {
 	}
 
 	void Player::interactOn() {
-		interact(position);
+		auto realm = getRealm();
+		auto player = std::dynamic_pointer_cast<Player>(shared_from_this());
+		auto entity = realm->findEntity(position, player);
+		if (!entity)
+			return;
+		entity->onInteractOn(player);;
 	}
 
 	void Player::interactNextTo() {
-		interact(nextTo());
-	}
-
-	void Player::interact(const Position &where) {
 		auto realm = getRealm();
-		auto entity = realm->findEntity(where, shared_from_this());
+		auto player = std::dynamic_pointer_cast<Player>(shared_from_this());
+		auto entity = realm->findEntity(nextTo(), player);
 		if (!entity)
 			return;
-		std::cout << "Interacting with entity " << entity->debug() << "\n";
+		entity->onInteractNextTo(player);
 	}
 
 	void to_json(nlohmann::json &json, const Player &player) {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <map>
-#include <memory>
+#include <optional>
 
 #include "game/Item.h"
 
@@ -19,8 +19,8 @@ namespace Game3 {
 			const ItemStack * operator[](size_t) const;
 
 			/** If the ItemStack couldn't be inserted into the inventory, this function returns an ItemStack containing the leftovers that couldn't be inserted.
-			 *  Otherwise, this function returns a null pointer. */
-			std::unique_ptr<ItemStack> add(const ItemStack &);
+			 *  Otherwise, this function returns nothing. */
+			std::optional<ItemStack> add(const ItemStack &);
 
 			/** Removes an item from the inventory and drops it at the owner's location. */
 			void drop(Slot);

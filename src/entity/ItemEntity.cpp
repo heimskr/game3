@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "entity/ItemEntity.h"
+#include "entity/Player.h"
 #include "ui/SpriteRenderer.h"
 
 namespace Game3 {
@@ -14,6 +15,11 @@ namespace Game3 {
 
 	ItemEntity::ItemEntity(const ItemStack &stack_):
 		Entity(Entity::ITEM), stack(stack_) {}
+
+	void ItemEntity::setStack(const ItemStack &stack_) {
+		stack   = stack_;
+		texture = &itemTextureMap.at(stack_.item->id);
+	}
 
 	std::shared_ptr<ItemEntity> ItemEntity::create(const ItemStack &stack) {
 		auto out = std::shared_ptr<ItemEntity>(new ItemEntity(stack));
@@ -27,14 +33,15 @@ namespace Game3 {
 		return out;
 	}
 
+	nlohmann::json ItemEntity::toJSON() const {
+		nlohmann::json json;
+		to_json(json, *this);
+		return json;
+	}
+
 	void ItemEntity::init() {
 		Entity::init();
 		texture = &itemTextureMap.at(stack.item->id);
-	}
-
-	void ItemEntity::setStack(const ItemStack &stack_) {
-		stack   = stack_;
-		texture = &itemTextureMap.at(stack_.item->id);
 	}
 
 	void ItemEntity::render(SpriteRenderer &sprite_renderer) const {
@@ -53,10 +60,12 @@ namespace Game3 {
 		}
 	}
 
-	nlohmann::json ItemEntity::toJSON() const {
-		nlohmann::json json;
-		to_json(json, *this);
-		return json;
+	void ItemEntity::interact(const std::shared_ptr<Player> &player) {
+		auto leftover = player->inventory.add(stack);
+		if (leftover)
+			stack = std::move(*leftover);
+		else
+			remove();
 	}
 
 	void to_json(nlohmann::json &json, const ItemEntity &item_entity) {

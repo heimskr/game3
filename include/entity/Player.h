@@ -9,6 +9,7 @@ namespace Game3 {
 
 			nlohmann::json toJSON() const override;
 			bool isPlayer() const override { return true; }
+			void remove() override {}
 			void interactOn();
 			void interactNextTo();
 
