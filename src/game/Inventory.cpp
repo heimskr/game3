@@ -38,15 +38,16 @@ namespace Game3 {
 			}
 		}
 
-		for (Slot slot = 0; slot < slotCount; ++slot) {
-			if (storage.contains(slot))
-				continue;
-			const unsigned to_store = std::min(unsigned(remaining), stack.item->maxCount);
-			storage.emplace(slot, ItemStack(stack.item, to_store));
-			remaining -= to_store;
-			if (remaining <= 0)
-				break;
-		}
+		if (0 < remaining)
+			for (Slot slot = 0; slot < slotCount; ++slot) {
+				if (storage.contains(slot))
+					continue;
+				const unsigned to_store = std::min(unsigned(remaining), stack.item->maxCount);
+				storage.emplace(slot, ItemStack(stack.item, to_store));
+				remaining -= to_store;
+				if (remaining <= 0)
+					break;
+			}
 
 		notifyOwner();
 

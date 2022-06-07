@@ -88,7 +88,11 @@ namespace Game3 {
 			std::unique_ptr<Gtk::Label> label_ptr;
 
 			if (storage.contains(slot)) {
-				label_ptr = std::make_unique<Gtk::Label>(storage.at(slot).item->name);
+				const auto &stack = storage.at(slot);
+				Glib::ustring label_text = stack.item->name;
+				if (stack.count != 1)
+					label_text += "\n\u00d7 " + std::to_string(stack.count);
+				label_ptr = std::make_unique<Gtk::Label>(label_text);
 				auto &label = *label_ptr;
 				auto left_click = Gtk::GestureClick::create();
 				auto right_click = Gtk::GestureClick::create();
