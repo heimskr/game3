@@ -63,7 +63,7 @@ namespace Game3 {
 			double lastDragY = 0.;
 			double glAreaMouseX = 0.;
 			double glAreaMouseY = 0.;
-			bool autoFocus = false;
+			bool autoFocus = true;
 
 			struct KeyInfo {
 				guint value;
