@@ -183,7 +183,7 @@ namespace Game3 {
 		Texture texture("resources/tileset2.png", true);
 		texture.init();
 		auto tilemap = std::make_shared<Tilemap>(width, height, 16, texture);
-		auto realm = std::make_shared<Realm>(1, Realm::OVERWORLD, tilemap);
+		auto realm = Realm::create(1, Realm::OVERWORLD, tilemap);
 		realm->game = game.get();
 		realm->generate(seed);
 		game->realms.emplace(realm->id, realm);

@@ -27,7 +27,7 @@ namespace Game3 {
 	std::shared_ptr<Game> Game::fromJSON(const nlohmann::json &json, Canvas &canvas) {
 		auto out = std::make_shared<Game>(canvas);
 		for (const auto &[string, realm_json]: json.at("realms").get<std::unordered_map<std::string, nlohmann::json>>())
-			out->realms.emplace(parseUlong(string), std::make_shared<Realm>(realm_json)).first->second->game = out.get();
+			out->realms.emplace(parseUlong(string), Realm::fromJSON(realm_json)).first->second->game = out.get();
 		out->activeRealm = out->realms.at(json.at("activeRealmID"));
 		return out;
 	}

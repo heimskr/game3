@@ -44,6 +44,30 @@ namespace Game3 {
 		renderer3.init(tilemap3);
 	}
 
+	std::shared_ptr<Realm> Realm::fromJSON(const nlohmann::json &json) {
+		auto out = Realm::create();
+		auto &realm = *out;
+		realm.id = json.at("id");
+		realm.type = json.at("type");
+		realm.tilemap1 = std::make_shared<Tilemap>(json.at("tilemap1"));
+		realm.tilemap2 = std::make_shared<Tilemap>(json.at("tilemap2"));
+		realm.tilemap3 = std::make_shared<Tilemap>(json.at("tilemap3"));
+		realm.tilemap1->texture.init();
+		realm.tilemap2->texture.init();
+		realm.tilemap3->texture.init();
+		for (const auto &[index, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>()) {
+			auto tile_entity = realm.tileEntities.emplace(parseUlong(index), TileEntity::fromJSON(tile_entity_json)).first->second;
+			tile_entity->setRealm(out);
+		}
+		realm.renderer1.init(realm.tilemap1);
+		realm.renderer2.init(realm.tilemap2);
+		realm.renderer3.init(realm.tilemap3);
+		realm.entities.clear();
+		for (const auto &entity_json: json.at("entities"))
+			realm.entities.insert(Entity::fromJSON(entity_json));
+		return out;
+	}
+
 	void Realm::render(const int width, const int height, const nanogui::Vector2f &center, float scale, SpriteRenderer &sprite_renderer) {
 		renderer1.center = center;
 		renderer1.scale  = scale;
@@ -258,7 +282,7 @@ namespace Game3 {
 				Position house_position {index / map_width, index % map_width};
 				auto building = TileEntity::create<Building>(house, house_position, realm_id, realm_width * (realm_height - 1) - 3);
 				auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, textureMap.at(Realm::HOUSE));
-				auto new_realm = std::make_shared<Realm>(realm_id, Realm::HOUSE, new_tilemap);
+				auto new_realm = Realm::create(realm_id, Realm::HOUSE, new_tilemap);
 				new_realm->game = game;
 				new_realm->generateHouse(id, house_position + Position(1, 0), realm_width, realm_height);
 				game->realms.emplace(realm_id, new_realm);
@@ -355,6 +379,7 @@ namespace Game3 {
 
 	void to_json(nlohmann::json &json, const Realm &realm) {
 		json["id"] = realm.id;
+		json["type"] = realm.type;
 		json["tilemap1"] = *realm.tilemap1;
 		json["tilemap2"] = *realm.tilemap2;
 		json["tilemap3"] = *realm.tilemap3;
@@ -364,23 +389,5 @@ namespace Game3 {
 		json["entities"] = std::vector<nlohmann::json>();
 		for (const auto &entity: realm.entities)
 			json["entities"].push_back(entity->toJSON());
-	}
-
-	void from_json(const nlohmann::json &json, Realm &realm) {
-		realm.id = json.at("id");
-		realm.tilemap1 = std::make_shared<Tilemap>(json.at("tilemap1"));
-		realm.tilemap2 = std::make_shared<Tilemap>(json.at("tilemap2"));
-		realm.tilemap3 = std::make_shared<Tilemap>(json.at("tilemap3"));
-		realm.tilemap1->texture.init();
-		realm.tilemap2->texture.init();
-		realm.tilemap3->texture.init();
-		for (const auto &[index, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>())
-			realm.tileEntities.emplace(parseUlong(index), TileEntity::fromJSON(tile_entity_json));
-		realm.renderer1.init(realm.tilemap1);
-		realm.renderer2.init(realm.tilemap2);
-		realm.renderer3.init(realm.tilemap3);
-		realm.entities.clear();
-		for (const auto &entity_json: json.at("entities"))
-			realm.entities.insert(Entity::fromJSON(entity_json));
 	}
 }

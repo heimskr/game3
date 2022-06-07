@@ -31,15 +31,19 @@ namespace Game3 {
 			std::unordered_map<Index, std::shared_ptr<TileEntity>> tileEntities;
 			std::unordered_set<std::shared_ptr<Entity>> entities;
 
-			Realm() = default;
-			Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_);
-			Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_);
-
 			Realm(const Realm &) = delete;
 			Realm(Realm &&) = default;
 
 			Realm & operator=(const Realm &) = delete;
 			Realm & operator=(Realm &&) = default;
+
+			template <typename... Args>
+			static std::shared_ptr<Realm> create(Args && ...args) {
+				auto out = std::shared_ptr<Realm>(new Realm(std::forward<Args>(args)...));
+				return out;
+			}
+
+			static std::shared_ptr<Realm> fromJSON(const nlohmann::json &);
 
 			void render(int width, int height, const nanogui::Vector2f &center, float scale, SpriteRenderer &);
 			void reupload();
@@ -73,10 +77,14 @@ namespace Game3 {
 
 			friend class MainWindow;
 
+		protected:
+			Realm() = default;
+			Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_);
+			Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_);
+
 		private:
 			Index randomLand = 0;
 	};
 
 	void to_json(nlohmann::json &, const Realm &);
-	void from_json(const nlohmann::json &, Realm &);
 }
