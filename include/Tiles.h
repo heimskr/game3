@@ -12,6 +12,7 @@ namespace Game3 {
 		virtual ~TileSet() = default;
 		virtual bool isLand(TileID) const = 0;
 		virtual bool isSolid(TileID) const = 0;
+		virtual TileID getEmpty() const { return 0; }
 		virtual const char * name() const = 0;
 	};
 
@@ -58,10 +59,12 @@ namespace Game3 {
 	};
 
 	struct HouseTiles: TileSet {
-		constexpr static TileID EMPTY    = 0;
+		constexpr static TileID EMPTY    = 175;
 		constexpr static TileID WALL_NW  = 168;
 		constexpr static TileID WALL_WEN = 169;
 		constexpr static TileID WALL_NE  = 170;
+		constexpr static TileID WALL_E   = 172;
+		constexpr static TileID WALL_W   = 174;
 		constexpr static TileID WALL_NS  = 196;
 		constexpr static TileID FLOOR    = 197;
 		constexpr static TileID WALL_SW  = 224;
@@ -78,6 +81,8 @@ namespace Game3 {
 		bool isSolid(TileID tile) const override {
 			return solidSet.contains(tile);
 		}
+
+		TileID getEmpty() const override { return EMPTY; }
 
 		const char * name() const override {
 			return "House";

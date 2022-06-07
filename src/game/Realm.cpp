@@ -189,7 +189,9 @@ namespace Game3 {
 		layer2[width * height - 1] = HouseTiles::WALL_SE;
 
 		const Index exit_index = width * height - 3;
+		layer2[width * height - 2] = HouseTiles::WALL_E;
 		layer2[width * height - 3] = HouseTiles::EMPTY;
+		layer2[width * height - 4] = HouseTiles::WALL_W;
 
 		add(TileEntity::create<Teleporter>(HouseTiles::DOOR, getPosition(exit_index), parent_realm, entrance));
 	}
@@ -282,8 +284,8 @@ namespace Game3 {
 				const auto house = choose(houses, rng);
 				layer2[index] = house;
 				const RealmID realm_id = game->newRealmID();
-				const Index realm_width = 16;
-				const Index realm_height = 16;
+				const Index realm_width = 13;
+				const Index realm_height = 13;
 				Position house_position {index / map_width, index % map_width};
 				auto building = TileEntity::create<Building>(house, house_position, realm_id, realm_width * (realm_height - 1) - 3);
 				auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, textureMap.at(Realm::HOUSE));
