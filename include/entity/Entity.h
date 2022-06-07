@@ -74,7 +74,7 @@ namespace Game3 {
 			std::shared_ptr<Realm> getRealm() const;
 			void setRealm(const Game &, RealmID);
 			void setRealm(const std::shared_ptr<Realm>);
-			void focus(Canvas &);
+			void focus(Canvas &, bool reset_scale = true);
 			void teleport(const Position &, bool clear_offset = true);
 			virtual void teleport(const Position &, const std::shared_ptr<Realm> &);
 			void teleport(Index, const std::shared_ptr<Realm> &);

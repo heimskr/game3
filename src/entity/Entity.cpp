@@ -186,15 +186,16 @@ namespace Game3 {
 		return true;
 	}
 
-	void Entity::focus(Canvas &canvas) {
+	void Entity::focus(Canvas &canvas, bool reset_scale) {
 		auto realm = weakRealm.lock();
 		if (!realm)
 			return;
 
 		const auto &tilemap = *realm->tilemap1;
-		canvas.scale = 4.f;
-		canvas.center.x() = -(column() - tilemap.width  / 2.f) - offset.x();
-		canvas.center.y() = -(row()    - tilemap.height / 2.f) - offset.y();
+		if (reset_scale)
+			canvas.scale = 4.f;
+		canvas.center.x() = -(column() - tilemap.width  / 2.f + 0.5f) - offset.x();
+		canvas.center.y() = -(row()    - tilemap.height / 2.f + 0.5f) - offset.y();
 	}
 
 	void Entity::teleport(const Position &new_position, bool clear_offset) {

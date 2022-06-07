@@ -23,7 +23,6 @@ namespace Game3 {
 		{GDK_KEY_Down,  arrowTime},
 		{GDK_KEY_Left,  arrowTime},
 		{GDK_KEY_Right, arrowTime},
-		{GDK_KEY_f,     arrowTime},
 		{GDK_KEY_e,     interactTime},
 		{GDK_KEY_E,     interactTime},
 		{GDK_KEY_o,     interactTime},
@@ -235,6 +234,8 @@ namespace Game3 {
 		glArea.throw_if_error();
 		glClearColor(.2f, .2f, .2f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		if (autoFocus && game && game->player)
+			game->player->focus(*canvas, false);
 		canvas->drawGL();
 		return true;
 	}
@@ -286,7 +287,8 @@ namespace Game3 {
 	bool MainWindow::onKeyPressed(guint keyval, guint keycode, Gdk::ModifierType modifiers) {
 		if (!keyTimes.contains(keycode)) {
 			handleKey(keyval, keycode, modifiers);
-			keyTimes.try_emplace(keycode, keyval, modifiers, getTime());
+			if (unsigned(modifiers & Gdk::ModifierType::CONTROL_MASK) == 0)
+				keyTimes.try_emplace(keycode, keyval, modifiers, getTime());
 		} else
 			keyTimes.at(keycode).modifiers = modifiers;
 		return true;
@@ -361,7 +363,12 @@ namespace Game3 {
 						game->activeRealm->reupload();
 						break;
 					case GDK_KEY_f:
-						game->player->focus(*canvas);
+						if (unsigned(modifiers & Gdk::ModifierType::CONTROL_MASK) != 0) {
+							autoFocus = !autoFocus;
+						} else {
+							std::cout << std::hex << unsigned(modifiers) << std::dec << '\n';
+							game->player->focus(*canvas);
+						}
 						break;
 				}
 			}
