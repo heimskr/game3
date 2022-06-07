@@ -1,6 +1,7 @@
 #include <nanogui/opengl.h>
 
 #include <iostream>
+#include <sstream>
 
 #include "Tiles.h"
 #include "entity/Entity.h"
@@ -129,6 +130,13 @@ namespace Game3 {
 		}
 	}
 
+	std::shared_ptr<Realm> Entity::getRealm() const {
+		auto out = weakRealm.lock();
+		if (!out)
+			throw std::runtime_error("Couldn't lock entity's realm");
+		return out;
+	}
+
 	void Entity::setRealm(const Game &game, RealmID realm_id) {
 		weakRealm = game.realms.at(realm_id);
 		realmID = realm_id;
@@ -173,6 +181,22 @@ namespace Game3 {
 	void Entity::teleport(const Position &new_position) {
 		position = new_position;
 		offset = {0.f, 0.f};
+	}
+
+	Position Entity::nextTo() const {
+		switch (direction) {
+			case Direction::Up:    return {position.row - 1, position.column};
+			case Direction::Down:  return {position.row + 1, position.column};
+			case Direction::Left:  return {position.row, position.column - 1};
+			case Direction::Right: return {position.row, position.column + 1};
+			default: throw std::invalid_argument("Invalid direction: " + std::to_string(int(direction)));
+		}
+	}
+
+	std::string Entity::debug() const {
+		std::stringstream sstream;
+		sstream << "Entity[type=" << id_ << ", position=" << position << ", realm=" << realmID << ", direction=" << direction << ']';
+		return sstream.str();
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {

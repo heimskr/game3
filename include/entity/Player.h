@@ -9,9 +9,12 @@ namespace Game3 {
 
 			nlohmann::json toJSON() const override;
 			bool isPlayer() const override { return true; }
+			void interactOn();
+			void interactNextTo();
 
 		protected:
 			using Entity::Entity;
+			void interact(const Position &);
 	};
 
 	void to_json(nlohmann::json &, const Player &);

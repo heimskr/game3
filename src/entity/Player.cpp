@@ -1,4 +1,7 @@
+#include <iostream>
+
 #include "entity/Player.h"
+#include "game/Realm.h"
 
 namespace Game3 {
 	std::shared_ptr<Player> Player::fromJSON(const nlohmann::json &json) {
@@ -11,6 +14,22 @@ namespace Game3 {
 		nlohmann::json json;
 		to_json(json, *this);
 		return json;
+	}
+
+	void Player::interactOn() {
+		interact(position);
+	}
+
+	void Player::interactNextTo() {
+		interact(nextTo());
+	}
+
+	void Player::interact(const Position &where) {
+		auto realm = getRealm();
+		auto entity = realm->findEntity(where, shared_from_this());
+		if (!entity)
+			return;
+		std::cout << "Interacting with entity " << entity->debug() << "\n";
 	}
 
 	void to_json(nlohmann::json &json, const Player &player) {

@@ -236,7 +236,7 @@ namespace Game3 {
 			entity->tick(delta);
 	}
 
-	std::vector<std::shared_ptr<Entity>> Realm::findEntities(const Position &position) {
+	std::vector<std::shared_ptr<Entity>> Realm::findEntities(const Position &position) const {
 		std::vector<std::shared_ptr<Entity>> out;
 		for (const auto &entity: entities)
 			if (entity->position == position)
@@ -244,7 +244,7 @@ namespace Game3 {
 		return out;
 	}
 
-	std::vector<std::shared_ptr<Entity>> Realm::findEntities(const Position &position, const std::shared_ptr<Entity> &except) {
+	std::vector<std::shared_ptr<Entity>> Realm::findEntities(const Position &position, const std::shared_ptr<Entity> &except) const {
 		std::vector<std::shared_ptr<Entity>> out;
 		for (const auto &entity: entities)
 			if (entity->position == position && entity != except)
@@ -252,14 +252,14 @@ namespace Game3 {
 		return out;
 	}
 
-	std::shared_ptr<Entity> Realm::findEntity(const Position &position) {
+	std::shared_ptr<Entity> Realm::findEntity(const Position &position) const {
 		for (const auto &entity: entities)
 			if (entity->position == position)
 				return entity;
 		return {};
 	}
 
-	std::shared_ptr<Entity> Realm::findEntity(const Position &position, const std::shared_ptr<Entity> &except) {
+	std::shared_ptr<Entity> Realm::findEntity(const Position &position, const std::shared_ptr<Entity> &except) const {
 		for (const auto &entity: entities)
 			if (entity->position == position && entity != except)
 				return entity;

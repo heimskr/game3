@@ -8,6 +8,7 @@
 #include <nanogui/common.h>
 #include <nlohmann/json.hpp>
 
+#include "Direction.h"
 #include "Position.h"
 #include "Texture.h"
 #include "Types.h"
@@ -57,9 +58,9 @@ namespace Game3 {
 			virtual void render(SpriteRenderer &) const;
 			virtual void tick(float delta);
 			/** Handles when the player interacts with the tile they're on and that tile contains this entity. */
-			virtual void interactOn(const std::shared_ptr<Player> &) {}
+			virtual void onInteractOn(const std::shared_ptr<Player> &) {}
 			/** Handles when the player interacts with the tile in front of them and that tile contains this entity. */
-			virtual void interactNextTo(const std::shared_ptr<Player> &) {}
+			virtual void onInteractNextTo(const std::shared_ptr<Player> &) {}
 			inline EntityID id() const { return id_; }
 			inline const Position::value_type & row()    const { return position.row;    }
 			inline const Position::value_type & column() const { return position.column; }
@@ -68,10 +69,14 @@ namespace Game3 {
 			void id(EntityID);
 			virtual void init();
 			void move(Direction);
+			std::shared_ptr<Realm> getRealm() const;
 			void setRealm(const Game &, RealmID);
 			void setRealm(const std::shared_ptr<Realm>);
 			void focus(Canvas &);
 			void teleport(const Position &);
+			/** Returns the position of the tile in front of the entity. */
+			Position nextTo() const;
+			std::string debug() const;
 
 		protected:
 			Entity() = delete;

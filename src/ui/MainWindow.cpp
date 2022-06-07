@@ -16,11 +16,14 @@
 
 namespace Game3 {
 	static std::chrono::milliseconds arrowTime {5};
+	static std::chrono::milliseconds interactTime {500};
 	std::unordered_map<guint, std::chrono::milliseconds> MainWindow::customKeyRepeatTimes {
 		{GDK_KEY_Up,    arrowTime},
 		{GDK_KEY_Down,  arrowTime},
 		{GDK_KEY_Left,  arrowTime},
 		{GDK_KEY_Right, arrowTime},
+		{GDK_KEY_e,     interactTime},
+		{GDK_KEY_E,     interactTime},
 	};
 
 	MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &builder_):
@@ -295,7 +298,7 @@ namespace Game3 {
 		}
 	}
 
-	void MainWindow::handleKey(guint keyval, guint, Gdk::ModifierType) {
+	void MainWindow::handleKey(guint keyval, guint, Gdk::ModifierType modifiers) {
 		if (canvas) {
 			if (game && game->player) {
 				auto &player = *game->player;
@@ -334,6 +337,16 @@ namespace Game3 {
 						}
 						return;
 					}
+					case GDK_KEY_r:
+						if (game && modifiers == Gdk::ModifierType::CONTROL_MASK)
+							game->player->focus(*canvas);
+						break;
+					case GDK_KEY_E:
+						game->player->interactOn();
+						break;
+					case GDK_KEY_e:
+						game->player->interactNextTo();
+						break;
 				}
 			}
 
