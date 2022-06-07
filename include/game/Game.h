@@ -26,6 +26,7 @@ namespace Game3 {
 
 			void initEntities();
 			void tick();
+			RealmID newRealmID() const;
 
 			sigc::signal<void(const std::shared_ptr<Player> &)> signal_player_inventory_update() const { return signal_player_inventory_update_; }
 

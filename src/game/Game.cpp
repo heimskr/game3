@@ -16,6 +16,14 @@ namespace Game3 {
 			realm->tick(delta);
 	}
 
+	RealmID Game::newRealmID() const {
+		// TODO: a less stupid way of doing this.
+		RealmID max = 1;
+		for (const auto &[id, realm]: realms)
+			max = std::max(max, id);
+		return max + 1;
+	}
+
 	void to_json(nlohmann::json &json, const Game &game) {
 		json["activeRealmID"] = game.activeRealm->id;
 		json["realms"] = std::unordered_map<std::string, nlohmann::json>();

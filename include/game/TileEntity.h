@@ -42,6 +42,7 @@ namespace Game3 {
 			virtual void remove();
 			/** Handles when the player interacts with the tile in front of them and that tile contains this tile entity. */
 			virtual void onInteractNextTo(const std::shared_ptr<Player> &) {}
+			void setRealm(const std::shared_ptr<Realm> &);
 
 		protected:
 			TileEntity() = default;

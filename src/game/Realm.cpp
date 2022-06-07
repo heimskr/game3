@@ -5,13 +5,15 @@
 
 #include "Tiles.h"
 #include "entity/Entity.h"
+#include "game/Building.h"
+#include "game/Game.h"
 #include "game/Realm.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 
 namespace Game3 {
-	Realm::Realm(RealmID id_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_):
-	id(id_), tilemap1(tilemap1_), tilemap2(tilemap2_), tilemap3(tilemap3_) {
+	Realm::Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_):
+	id(id_), type(type_), tilemap1(tilemap1_), tilemap2(tilemap2_), tilemap3(tilemap3_) {
 		if (tilemap1)
 			renderer1.initialize(tilemap1);
 		if (tilemap2)
@@ -20,7 +22,7 @@ namespace Game3 {
 			renderer3.initialize(tilemap3);
 	}
 
-	Realm::Realm(RealmID id_, const std::shared_ptr<Tilemap> &tilemap1_): Realm(id_, tilemap1_, nullptr, nullptr) {
+	Realm::Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_): Realm(id_, type_, tilemap1_, nullptr, nullptr) {
 		tilemap2 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->texture);
 		tilemap3 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->texture);
 		renderer2.initialize(tilemap2);
@@ -57,6 +59,9 @@ namespace Game3 {
 	}
 
 	void Realm::generate(int seed, double noise_zoom, double noise_threshold) {
+		if (game == nullptr)
+			throw std::runtime_error("Can't call Realm::generate when game is null");
+
 		const auto width = tilemap1->width;
 		const auto height = tilemap1->height;
 
@@ -203,9 +208,12 @@ namespace Game3 {
 			std::default_random_engine rng;
 			rng.seed(666);
 			while (!buildable_set.empty()) {
-				auto index = *buildable_set.begin();
-				auto house = choose(houses, rng);
+				const auto index = *buildable_set.begin();
+				const auto house = choose(houses, rng);
 				layer2[index] = house;
+				const RealmID realm_id = game->newRealmID();
+				auto building = TileEntity::create<Building>(house, Position(index / map_width, index % map_width), realm_id);
+				addTileEntity(building);
 				buildable_set.erase(index);
 				// Some of these are sus if index happens to be at the west or east edge, but those aren't valid locations for houses anyway.
 				buildable_set.erase(index - map_width);
@@ -224,6 +232,15 @@ namespace Game3 {
 		entity->setRealm(shared_from_this());
 		entities.insert(entity);
 		return entity;
+	}
+
+	std::shared_ptr<TileEntity> Realm::addTileEntity(const std::shared_ptr<TileEntity> &tile_entity) {
+		const Index index = tile_entity->position.row * tilemap1->width + tile_entity->position.column;
+		if (tileEntities.contains(index))
+			return nullptr;
+		tile_entity->setRealm(shared_from_this());
+		tileEntities.emplace(index, tile_entity);
+		return tile_entity;
 	}
 
 	void Realm::initEntities() {

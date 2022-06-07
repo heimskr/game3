@@ -1,5 +1,6 @@
-#include "game/TileEntity.h"
 #include "game/Building.h"
+#include "game/Realm.h"
+#include "game/TileEntity.h"
 
 namespace Game3 {
 	std::shared_ptr<TileEntity> TileEntity::fromJSON(const nlohmann::json &json) {
@@ -20,6 +21,11 @@ namespace Game3 {
 
 	void TileEntity::remove() {
 		auto shared = shared_from_this();
+	}
+
+	void TileEntity::setRealm(const std::shared_ptr<Realm> &realm) {
+		realmID = realm->id;
+		weakRealm = realm;
 	}
 
 	void TileEntity::absorbJSON(const nlohmann::json &json) {

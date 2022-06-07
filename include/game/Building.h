@@ -3,23 +3,24 @@
 #include "game/TileEntity.h"
 
 namespace Game3 {
-	struct Building: TileEntity {
-		static constexpr int ID = 1;
+	class Building: public TileEntity {
+		public:
+			static constexpr int ID = 1;
 
-		RealmID innerRealmID = 0;
+			RealmID innerRealmID = 0;
 
-		Building(const Building &) = delete;
-		Building(Building &&) = default;
-		~Building() override = default;
+			Building(const Building &) = delete;
+			Building(Building &&) = default;
+			~Building() override = default;
 
-		Building & operator=(const Building &) = delete;
-		Building & operator=(Building &&) = default;
+			Building & operator=(const Building &) = delete;
+			Building & operator=(Building &&) = default;
 
-		TileEntityID getID() const override { return TileEntity::BUILDING; }
+			TileEntityID getID() const override { return TileEntity::BUILDING; }
 
-		void toJSON(nlohmann::json &) const override;
-		void onInteractNextTo(const std::shared_ptr<Player> &) override;
-		void absorbJSON(const nlohmann::json &) override;
+			void toJSON(nlohmann::json &) const override;
+			void onInteractNextTo(const std::shared_ptr<Player> &) override;
+			void absorbJSON(const nlohmann::json &) override;
 
 		protected:
 			Building() = default;

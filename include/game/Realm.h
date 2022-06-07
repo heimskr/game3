@@ -18,16 +18,19 @@ namespace Game3 {
 
 	class Realm: public std::enable_shared_from_this<Realm> {
 		public:
+			constexpr static RealmType OVERWORLD = 1;
+
 			Game *game = nullptr;
 			RealmID id;
+			RealmType type;
 			std::shared_ptr<Tilemap> tilemap1, tilemap2, tilemap3;
 			ElementBufferedRenderer renderer1, renderer2, renderer3;
 			std::unordered_map<Index, std::shared_ptr<TileEntity>> tileEntities;
 			std::unordered_set<std::shared_ptr<Entity>> entities;
 
 			Realm() = default;
-			Realm(RealmID id_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_);
-			Realm(RealmID id_, const std::shared_ptr<Tilemap> &tilemap1_);
+			Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_);
+			Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_);
 
 			Realm(const Realm &) = delete;
 			Realm(Realm &&) = default;
@@ -43,6 +46,7 @@ namespace Game3 {
 			int getWidth()  const { return tilemap1->width;  }
 			int getHeight() const { return tilemap1->height; }
 			std::shared_ptr<Entity> addEntity(const std::shared_ptr<Entity> &);
+			std::shared_ptr<TileEntity> addTileEntity(const std::shared_ptr<TileEntity> &);
 			void initEntities();
 			void tick(float delta);
 			std::vector<std::shared_ptr<Entity>> findEntities(const Position &) const;

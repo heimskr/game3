@@ -22,16 +22,17 @@ namespace Game3 {
 		auto entity = realm->findEntity(position, player);
 		if (!entity)
 			return;
-		entity->onInteractOn(player);;
+		entity->onInteractOn(player);
 	}
 
 	void Player::interactNextTo() {
 		auto realm = getRealm();
 		auto player = std::dynamic_pointer_cast<Player>(shared_from_this());
 		auto entity = realm->findEntity(nextTo(), player);
-		if (!entity)
-			return;
-		entity->onInteractNextTo(player);
+		if (entity)
+			entity->onInteractNextTo(player);
+		else if (auto tileEntity = realm->tileEntityAt(nextTo()))
+			tileEntity->onInteractNextTo(player);
 	}
 
 	void to_json(nlohmann::json &json, const Player &player) {
