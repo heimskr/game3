@@ -27,7 +27,7 @@ namespace Game3 {
 		}
 	}
 
-	void ElementBufferedRenderer::initialize(const std::shared_ptr<Tilemap> &tilemap_) {
+	void ElementBufferedRenderer::init(const std::shared_ptr<Tilemap> &tilemap_) {
 		if (initialized)
 			reset();
 		tilemap = tilemap_;

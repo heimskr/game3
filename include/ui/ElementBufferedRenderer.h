@@ -9,7 +9,7 @@ namespace Game3 {
 			virtual ~ElementBufferedRenderer() override;
 
 			void reset();
-			void initialize(const std::shared_ptr<Tilemap> &) override;
+			void init(const std::shared_ptr<Tilemap> &) override;
 			void render() override;
 			void reupload();
 

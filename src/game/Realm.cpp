@@ -12,21 +12,35 @@
 #include "util/Util.h"
 
 namespace Game3 {
+	std::unordered_map<RealmType, Texture> Realm::textureMap {
+		{Realm::OVERWORLD, Texture("resources/tileset2.png")},
+		{Realm::HOUSE,     Texture("resources/house.png")},
+	};
+
 	Realm::Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_):
 	id(id_), type(type_), tilemap1(tilemap1_), tilemap2(tilemap2_), tilemap3(tilemap3_) {
-		if (tilemap1)
-			renderer1.initialize(tilemap1);
-		if (tilemap2)
-			renderer2.initialize(tilemap2);
-		if (tilemap3)
-			renderer3.initialize(tilemap3);
+		if (tilemap1) {
+			tilemap1->init();
+			renderer1.init(tilemap1);
+		}
+
+		if (tilemap2) {
+			tilemap2->init();
+			renderer2.init(tilemap2);
+		}
+
+		if (tilemap3) {
+			tilemap3->init();
+			renderer3.init(tilemap3);
+		}
 	}
 
 	Realm::Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_): Realm(id_, type_, tilemap1_, nullptr, nullptr) {
+		tilemap1->init();
 		tilemap2 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->texture);
 		tilemap3 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->texture);
-		renderer2.initialize(tilemap2);
-		renderer3.initialize(tilemap3);
+		renderer2.init(tilemap2);
+		renderer3.init(tilemap3);
 	}
 
 	void Realm::render(const int width, const int height, const nanogui::Vector2f &center, float scale, SpriteRenderer &sprite_renderer) {
@@ -73,7 +87,10 @@ namespace Game3 {
 		tilemap2->tiles.assign(tilemap2->tiles.size(), 0);
 		tilemap3->tiles.assign(tilemap3->tiles.size(), 0);
 
-		static const std::vector<TileID> grasses {GRASS_ALT1, GRASS_ALT2, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS};
+		static const std::vector<TileID> grasses {
+			OverworldTiles::GRASS_ALT1, OverworldTiles::GRASS_ALT2,
+			OverworldTiles::GRASS, OverworldTiles::GRASS, OverworldTiles::GRASS, OverworldTiles::GRASS, OverworldTiles::GRASS, OverworldTiles::GRASS, OverworldTiles::GRASS
+		};
 
 		std::default_random_engine grass_rng;
 		grass_rng.seed(seed);
@@ -83,24 +100,24 @@ namespace Game3 {
 				double noise = perlin.GetValue(i / noise_zoom, j / noise_zoom, 0.666);
 				auto &tile = tiles1[j * width + i];
 				if (noise < noise_threshold)
-					tile = DEEPER_WATER;
+					tile = OverworldTiles::DEEPER_WATER;
 				else if (noise < noise_threshold + 0.1)
-					tile = DEEP_WATER;
+					tile = OverworldTiles::DEEP_WATER;
 				else if (noise < noise_threshold + 0.2)
-					tile = WATER;
+					tile = OverworldTiles::WATER;
 				else if (noise < noise_threshold + 0.3)
-					tile = SHALLOW_WATER;
+					tile = OverworldTiles::SHALLOW_WATER;
 				else if (noise < noise_threshold + 0.4)
-					tile = SAND;
+					tile = OverworldTiles::SAND;
 				else if (noise < noise_threshold + 0.5)
-					tile = LIGHT_GRASS;
+					tile = OverworldTiles::LIGHT_GRASS;
 				else
 					tile = choose(grasses, grass_rng);
 			}
 
 		constexpr static int m = 15, n = 21, pad = 2;
 		Timer land_timer("GetLand");
-		auto starts = tilemap1->getLand(m + pad * 2, n + pad * 2);
+		auto starts = tilemap1->getLand(type, m + pad * 2, n + pad * 2);
 		land_timer.stop();
 		randomLand = choose(starts, uint_fast32_t(seed));
 		std::vector<Index> candidates;
@@ -111,7 +128,7 @@ namespace Game3 {
 			const size_t column_start = index % tilemap1->width + pad, column_end = column_start + n;
 			for (size_t row = row_start; row < row_end; ++row)
 				for (size_t column = column_start; column < column_end; ++column)
-					if (!isLand(tiles1[row * tilemap1->width + column]))
+					if (!overworldTiles.isLand(tiles1[row * tilemap1->width + column]))
 						goto failed;
 			candidates.push_back(index);
 			failed:
@@ -126,6 +143,19 @@ namespace Game3 {
 			createTown(choose(candidates, uint_fast32_t(seed)) + pad * (tilemap1->width + 1), n, m, pad);
 	}
 
+	void Realm::generateHouse(int width, int height) {
+		auto &layer1 = tilemap1->tiles;
+
+		for (int column = 0; column < width; ++column)
+			layer1[column] = layer1[column + (height - 1) * width] = HouseTiles::WALL;
+
+		for (int row = 1; row < height - 1; ++row)
+			for (int column = 1; column < width - 1; ++column)
+				layer1[row * width + column] = HouseTiles::FLOOR;
+
+		layer1[width * height - 2] = HouseTiles::FLOOR;
+	}
+
 	void Realm::createTown(const size_t index, size_t width, size_t height, size_t pad) {
 		size_t row = 0, column = 0;
 
@@ -138,65 +168,65 @@ namespace Game3 {
 		auto set2 = [&](TileID tile) { layer2[row * map_width + column] = tile; };
 
 		for (size_t row = index / map_width; row < index / map_width + height; ++row) {
-			layer2[row * map_width + index % map_width] = TOWER_NS;
-			layer2[row * map_width + index % map_width + width - 1] = TOWER_NS;
+			layer2[row * map_width + index % map_width] = OverworldTiles::TOWER_NS;
+			layer2[row * map_width + index % map_width + width - 1] = OverworldTiles::TOWER_NS;
 		}
 
 		for (size_t column = 0; column < width; ++column) {
-			layer2[index + column] = TOWER_WE;
-			layer2[index + map_width * (height - 1) + column] = TOWER_WE;
+			layer2[index + column] = OverworldTiles::TOWER_WE;
+			layer2[index + map_width * (height - 1) + column] = OverworldTiles::TOWER_WE;
 		}
 
-		layer2[index] = TOWER_NW;
-		layer2[index + map_width * (height - 1)] = TOWER_SW;
-		layer2[index + width - 1] = TOWER_NE;
-		layer2[index + map_width * (height - 1) + width - 1] = TOWER_SE;
+		layer2[index] = OverworldTiles::TOWER_NW;
+		layer2[index + map_width * (height - 1)] = OverworldTiles::TOWER_SW;
+		layer2[index + width - 1] = OverworldTiles::TOWER_NE;
+		layer2[index + map_width * (height - 1) + width - 1] = OverworldTiles::TOWER_SE;
 
 		std::unordered_set<Index> buildable_set;
 
 		for (row = index / map_width + 1; row < index / map_width + height - 1; ++row)
 			for (column = index % map_width + 1; column < index % map_width + width - 1; ++column) {
 				buildable_set.insert(row * map_width + column);
-				set1(DIRT);
+				set1(OverworldTiles::DIRT);
 			}
 
 		row = index / map_width + height / 2;
 		for (column = index % map_width - pad; column < index % map_width + width + pad; ++column) {
 			buildable_set.erase(row * map_width + column);
-			set1(ROAD);
+			set1(OverworldTiles::ROAD);
 		}
 		column = index % map_width;
-		set2(EMPTY);
+		set2(OverworldTiles::EMPTY);
 		--row;
-		set2(TOWER_S);
+		set2(OverworldTiles::TOWER_S);
 		row += 2;
-		set2(TOWER_N);
+		set2(OverworldTiles::TOWER_N);
 		--row;
 		column += width - 1;
-		set2(EMPTY);
+		set2(OverworldTiles::EMPTY);
 		--row;
-		set2(TOWER_S);
+		set2(OverworldTiles::TOWER_S);
 		row += 2;
-		set2(TOWER_N);
+		set2(OverworldTiles::TOWER_N);
 		--row;
 		column = index % map_width + width / 2;
 		for (row = index / map_width - pad; row < index / map_width + height + pad; ++row) {
 			buildable_set.erase(row * map_width + column);
-			set1(ROAD);
+			set1(OverworldTiles::ROAD);
 		}
 		row = index / map_width;
-		set2(EMPTY);
+		set2(OverworldTiles::EMPTY);
 		--column;
-		set2(TOWER_NE);
+		set2(OverworldTiles::TOWER_NE);
 		column += 2;
-		set2(TOWER_NW);
+		set2(OverworldTiles::TOWER_NW);
 		--column;
 		row += height - 1;
-		set2(EMPTY);
+		set2(OverworldTiles::EMPTY);
 		--column;
-		set2(TOWER_NE);
+		set2(OverworldTiles::TOWER_NE);
 		column += 2;
-		set2(TOWER_NW);
+		set2(OverworldTiles::TOWER_NW);
 		--column;
 
 		std::vector<Index> buildable(buildable_set.cbegin(), buildable_set.cend());
@@ -204,7 +234,7 @@ namespace Game3 {
 		if (2 < buildable.size()) {
 			buildable.erase(buildable.begin() + buildable.size() / 10, buildable.end());
 			buildable_set = std::unordered_set<Index>(buildable.cbegin(), buildable.cend());
-			std::vector<TileID> houses {HOUSE1, HOUSE2, HOUSE3};
+			std::vector<TileID> houses {OverworldTiles::HOUSE1, OverworldTiles::HOUSE2, OverworldTiles::HOUSE3};
 			std::default_random_engine rng;
 			rng.seed(666);
 			while (!buildable_set.empty()) {
@@ -212,7 +242,14 @@ namespace Game3 {
 				const auto house = choose(houses, rng);
 				layer2[index] = house;
 				const RealmID realm_id = game->newRealmID();
-				auto building = TileEntity::create<Building>(house, Position(index / map_width, index % map_width), realm_id);
+				const Index realm_width = 64;
+				const Index realm_height = 64;
+				auto building = TileEntity::create<Building>(house, Position(index / map_width, index % map_width), realm_id, realm_width * realm_height - 2);
+				auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, textureMap.at(Realm::HOUSE));
+				auto new_realm = std::make_shared<Realm>(realm_id, Realm::HOUSE, new_tilemap);
+				new_realm->game = game;
+				new_realm->generateHouse(realm_width, realm_height);
+				game->realms.emplace(realm_id, new_realm);
 				addTileEntity(building);
 				buildable_set.erase(index);
 				// Some of these are sus if index happens to be at the west or east edge, but those aren't valid locations for houses anyway.
@@ -313,9 +350,9 @@ namespace Game3 {
 		realm.tilemap3->texture.init();
 		for (const auto &[index, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>())
 			realm.tileEntities.emplace(parseUlong(index), TileEntity::fromJSON(tile_entity_json));
-		realm.renderer1.initialize(realm.tilemap1);
-		realm.renderer2.initialize(realm.tilemap2);
-		realm.renderer3.initialize(realm.tilemap3);
+		realm.renderer1.init(realm.tilemap1);
+		realm.renderer2.init(realm.tilemap2);
+		realm.renderer3.init(realm.tilemap3);
 		realm.entities.clear();
 		for (const auto &entity_json: json.at("entities"))
 			realm.entities.insert(Entity::fromJSON(entity_json));

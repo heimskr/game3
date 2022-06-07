@@ -31,11 +31,17 @@ namespace Game3 {
 			tiles.resize(width * height);
 		}
 
+		void init() {
+			texture.init();
+			setWidth = texture.width;
+			setHeight = texture.height;
+		}
+
 		decltype(tiles)::value_type & operator()(int x, int y) {
 			return tiles[x + y * width];
 		}
 
-		std::vector<Index> getLand(size_t right_pad = 0, size_t bottom_pad = 0) const;
+		std::vector<Index> getLand(RealmType type, size_t right_pad = 0, size_t bottom_pad = 0) const;
 	};
 
 	void to_json(nlohmann::json &, const Tilemap &);

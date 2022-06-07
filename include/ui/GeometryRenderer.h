@@ -20,7 +20,7 @@ namespace Game3 {
 			GeometryRenderer() = default;
 			~GeometryRenderer() override;
 
-			void initialize(const std::shared_ptr<Tilemap> &) override;
+			void init(const std::shared_ptr<Tilemap> &) override;
 			void render() override;
 
 		private:

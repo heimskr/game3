@@ -19,6 +19,9 @@ namespace Game3 {
 	class Realm: public std::enable_shared_from_this<Realm> {
 		public:
 			constexpr static RealmType OVERWORLD = 1;
+			constexpr static RealmType HOUSE = 2;
+
+			static std::unordered_map<RealmType, Texture> textureMap;
 
 			Game *game = nullptr;
 			RealmID id;
@@ -42,6 +45,7 @@ namespace Game3 {
 			void reupload();
 			void rebind();
 			void generate(int seed = 666, double noise_zoom = 100., double noise_threshold = -0.15);
+			void generateHouse(int width, int height);
 			void createTown(size_t index, size_t width, size_t height, size_t pad);
 			int getWidth()  const { return tilemap1->width;  }
 			int getHeight() const { return tilemap1->height; }

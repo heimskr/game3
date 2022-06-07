@@ -21,7 +21,7 @@ namespace Game3 {
 			TilemapRenderer() = default;
 			virtual ~TilemapRenderer() = default;
 
-			virtual void initialize(const std::shared_ptr<Tilemap> &) = 0;
+			virtual void init(const std::shared_ptr<Tilemap> &) = 0;
 			virtual void render() = 0;
 			virtual void onBackbufferResized(int width, int height);
 

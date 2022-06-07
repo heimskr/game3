@@ -6,12 +6,14 @@
 #include "Tiles.h"
 
 namespace Game3 {
-	std::vector<Index> Tilemap::getLand(size_t right_pad, size_t bottom_pad) const {
+	std::vector<Index> Tilemap::getLand(RealmType type, size_t right_pad, size_t bottom_pad) const {
 		std::vector<Index> land_tiles;
 		land_tiles.reserve(width * height);
+		const auto &tileset = *tileSets.at(type);
 		for (size_t row = 0; row < height - bottom_pad; ++row)
 			for (size_t column = 0; column < width - right_pad; ++column)
-				if (isLand(tiles[row * width + column]))
+				// TODO: support for other types of realms
+				if (tileset.isLand(tiles[row * width + column]))
 					land_tiles.push_back(row * width + column);
 		return land_tiles;
 	}

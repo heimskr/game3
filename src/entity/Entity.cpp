@@ -165,10 +165,12 @@ namespace Game3 {
 		if (realm->getHeight() <= new_position.row || realm->getWidth() <= new_position.column)
 			return false;
 
-		if (!isLand((*realm->tilemap1)(new_position.column, new_position.row)))
+		const auto &tileset = *tileSets.at(realm->type);
+
+		if (!tileset.isLand((*realm->tilemap1)(new_position.column, new_position.row)))
 			return false;
 
-		if (isSolid((*realm->tilemap2)(new_position.column, new_position.row)))
+		if (tileset.isSolid((*realm->tilemap2)(new_position.column, new_position.row)))
 			return false;
 
 		return true;

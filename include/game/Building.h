@@ -8,6 +8,7 @@ namespace Game3 {
 			static constexpr int ID = 1;
 
 			RealmID innerRealmID = 0;
+			Index entrance = 0;
 
 			Building(const Building &) = delete;
 			Building(Building &&) = default;
@@ -24,7 +25,8 @@ namespace Game3 {
 
 		protected:
 			Building() = default;
-			Building(TileID id_, const Position &position_, int inner_realm_id): TileEntity(id_, TileEntity::BUILDING, position_, true), innerRealmID(inner_realm_id) {}
+			Building(TileID id_, const Position &position_, RealmID inner_realm_id, Index entrance_):
+				TileEntity(id_, TileEntity::BUILDING, position_, true), innerRealmID(inner_realm_id), entrance(entrance_) {}
 
 			friend class TileEntity;
 	};

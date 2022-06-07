@@ -19,7 +19,7 @@ namespace Game3 {
 		glDeleteProgram(shaderHandle);
 	}
 
-	void GeometryRenderer::initialize(const std::shared_ptr<Tilemap> &tilemap_) {
+	void GeometryRenderer::init(const std::shared_ptr<Tilemap> &tilemap_) {
 		tilemap = tilemap_;
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		createShader();
