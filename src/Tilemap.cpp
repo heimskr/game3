@@ -62,7 +62,8 @@ namespace Game3 {
 			if (ZSTD_isError(result))
 				throw std::runtime_error("Couldn't decompress tiles");
 			last_result = result;
-			tilemap.tiles.insert(tilemap.tiles.end(), out_buffer.cbegin(), out_buffer.cbegin() + output.pos);
+			const TileID *raw_tiles = reinterpret_cast<const TileID *>(out_buffer.data());
+			tilemap.tiles.insert(tilemap.tiles.end(), raw_tiles, raw_tiles + output.pos / sizeof(TileID));
 		}
 
 		if (last_result != 0)
