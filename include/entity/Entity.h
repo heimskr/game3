@@ -34,7 +34,7 @@ namespace Game3 {
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;
 			Direction direction = Direction::Down;
-			Inventory inventory {{}, 16};
+			Inventory inventory {{}, 20};
 			/** The reciprocal of this is how many seconds it takes to move one square. */
 			float speed = 10.f;
 			/** When the entity moves a square, its position field is immediately updated but this field is set to an offset
