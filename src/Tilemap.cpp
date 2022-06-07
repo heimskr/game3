@@ -26,6 +26,7 @@ namespace Game3 {
 		json["tileSize"] = tilemap.tileSize;
 		json["width"] = tilemap.width;
 
+		// TODO: fix endianness issues
 		const auto tiles_size = tilemap.tiles.size() * sizeof(tilemap.tiles[0]);
 		const auto buffer_size = ZSTD_compressBound(tiles_size);
 		auto buffer = std::vector<uint8_t>(buffer_size);
@@ -44,6 +45,7 @@ namespace Game3 {
 		tilemap.tileSize = json.at("tileSize");
 		tilemap.width = json.at("width");
 
+		// TODO: fix endianness issues
 		tilemap.tiles.clear();
 		const size_t out_size = ZSTD_DStreamOutSize();
 		std::vector<uint8_t> out_buffer(out_size);
