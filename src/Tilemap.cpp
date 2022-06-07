@@ -12,7 +12,6 @@ namespace Game3 {
 		const auto &tileset = *tileSets.at(type);
 		for (size_t row = 0; row < height - bottom_pad; ++row)
 			for (size_t column = 0; column < width - right_pad; ++column)
-				// TODO: support for other types of realms
 				if (tileset.isLand(tiles[row * width + column]))
 					land_tiles.push_back(row * width + column);
 		return land_tiles;
