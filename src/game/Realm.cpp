@@ -81,6 +81,8 @@ namespace Game3 {
 		renderer3.render();
 		for (const auto &entity: entities)
 			entity->render(sprite_renderer);
+		for (const auto &[index, tile_entity]: tileEntities)
+			tile_entity->render(sprite_renderer);
 	}
 
 	void Realm::reupload() {
