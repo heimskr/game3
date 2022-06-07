@@ -75,16 +75,18 @@ namespace Game3 {
 
 	void Entity::id(EntityID new_id) {
 		id_ = new_id;
-		texture = &textureMap.at(id_);
+		if (texture == nullptr)
+			texture = &textureMap.at(id_);
 	}
 
 	void Entity::init() {
-		texture = &textureMap.at(id_);
+		if (texture == nullptr)
+			texture = &textureMap.at(id_);
 		inventory.owner = shared_from_this();
 	}
 
 	void Entity::render(SpriteRenderer &sprite_renderer) const {
-		if (!texture)
+		if (texture == nullptr)
 			return;
 
 		float x_offset = 0.f;
