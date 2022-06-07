@@ -25,6 +25,9 @@ namespace Game3 {
 			/** Removes an item from the inventory and drops it at the owner's location. */
 			void drop(Slot);
 
+			/** Swaps two slots. Returns true if at least one of the first slot contained an item and the second slot was valid. */
+			bool swap(Slot, Slot);
+
 			inline bool empty() const { return storage.empty(); }
 
 		private:

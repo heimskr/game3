@@ -25,15 +25,46 @@ namespace Game3 {
 
 		mainWindow.insert_action_group("inventory_popup", group);
 		popoverMenu.set_parent(mainWindow); // TODO: fix this silliness
+
+		auto source = Gtk::DragSource::create();
+		source->set_actions(Gdk::DragAction::MOVE);
+		source->signal_prepare().connect([this, source](double x, double y) -> Glib::RefPtr<Gdk::ContentProvider> { // Does capturing `source` cause a memory leak?
+			auto *item = grid.pick(x, y);
+			grid.set_data("dragged-item", nullptr);
+			if (auto *label = dynamic_cast<Gtk::Label *>(item)) {
+				if (label->get_text().empty())
+					return nullptr;
+			} else
+				return nullptr;
+			grid.set_data("dragged-item", item);
+			Glib::ValueBase base;
+			base.init(GTK_TYPE_WIDGET);
+			return Gdk::ContentProvider::create(base);
+		}, false);
+		grid.add_controller(source);
+
+		auto target = Gtk::DropTarget::create(GTK_TYPE_WIDGET, Gdk::DragAction::MOVE);
+		target->signal_drop().connect([this](const Glib::ValueBase &, double x, double y) {
+			auto *destination = grid.pick(x, y);
+			Gtk::Label *label = nullptr;
+
+			if (destination && destination != &grid && (label = dynamic_cast<Gtk::Label *>(destination)) != nullptr) {
+				const Slot source_slot = reinterpret_cast<intptr_t>(reinterpret_cast<Gtk::Label *>(grid.get_data("dragged-item"))->get_data("slot"));
+				const Slot destination_slot = reinterpret_cast<intptr_t>(label->get_data("slot"));
+				mainWindow.game->player->inventory.swap(source_slot, destination_slot);
+			}
+
+			return true;
+		}, false);
+		grid.add_controller(target);
 	}
 
 	void InventoryTab::onFocus() {
-		// if (!mainWindow.game)
-		// 	return;
+
 	}
 
 	void InventoryTab::onBlur() {
-		// discardButton.reset();
+
 	}
 
 	void InventoryTab::update(const std::shared_ptr<Game> &) {
@@ -55,9 +86,11 @@ namespace Game3 {
 		for (Slot slot = 0; slot < inventory.slotCount; ++slot) {
 			const int row    = slot / grid_width;
 			const int column = slot % grid_width;
+			std::unique_ptr<Gtk::Label> label_ptr;
+
 			if (storage.contains(slot)) {
 				const auto &stack = storage.at(slot);
-				auto label_ptr = std::make_unique<Gtk::Label>(stack.item->name);
+				label_ptr = std::make_unique<Gtk::Label>(stack.item->name);
 				auto &label = *label_ptr;
 				label.set_size_request(tile_size, tile_size);
 				grid.attach(label, column, row);
@@ -69,13 +102,14 @@ namespace Game3 {
 				right_click->signal_pressed().connect([this, game, slot, &label](int n, double x, double y) { rightClick(game, label, n, slot, x, y); });
 				label.add_controller(left_click);
 				label.add_controller(right_click);
-				gridWidgets.push_back(std::move(label_ptr));
 			} else {
-				auto label_ptr = std::make_unique<Gtk::Label>("");
+				label_ptr = std::make_unique<Gtk::Label>("");
 				label_ptr->set_size_request(tile_size, tile_size);
 				grid.attach(*label_ptr, column, row);
-				gridWidgets.push_back(std::move(label_ptr));
 			}
+
+			label_ptr->set_data("slot", reinterpret_cast<void *>(slot));
+			gridWidgets.push_back(std::move(label_ptr));
 		}
 	}
 	

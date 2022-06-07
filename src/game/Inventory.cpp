@@ -72,6 +72,25 @@ namespace Game3 {
 			realm->game->signal_player_inventory_update().emit(std::dynamic_pointer_cast<Player>(entity));
 	}
 
+	bool Inventory::swap(Slot source, Slot destination) {
+		if (slotCount <= source || slotCount <= destination || !storage.contains(source))
+			return false;
+
+		if (storage.contains(destination)) {
+			std::swap(storage.at(source), storage.at(destination));
+		} else {
+			storage[destination] = storage.at(source);
+			storage.erase(source);
+		}
+
+		if (auto entity = owner.lock())
+			if (entity->isPlayer())
+				if (auto realm = entity->weakRealm.lock())
+					realm->game->signal_player_inventory_update().emit(std::dynamic_pointer_cast<Player>(entity));
+
+		return true;
+	}
+
 	Inventory Inventory::fromJSON(const nlohmann::json &json, const std::shared_ptr<Entity> &owner) {
 		Inventory out(owner, 0);
 		out.storage = json.at("storage");
