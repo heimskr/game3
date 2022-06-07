@@ -22,6 +22,7 @@ namespace Game3 {
 			Canvas &canvas;
 			/** Seconds since the last tick */
 			float delta = 0.f;
+			std::chrono::system_clock::time_point startTime = std::chrono::system_clock::now();
 
 			Game() = delete;
 			Game(Canvas &canvas_): canvas(canvas_) {}
@@ -40,7 +41,7 @@ namespace Game3 {
 
 		private:
 			sigc::signal<void(const std::shared_ptr<Player> &)> signal_player_inventory_update_;
-			std::chrono::system_clock::time_point lastTime = std::chrono::system_clock::now();
+			std::chrono::system_clock::time_point lastTime  = startTime;
 	};
 
 	void to_json(nlohmann::json &, const Game &);

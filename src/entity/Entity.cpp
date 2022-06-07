@@ -10,6 +10,7 @@
 #include "game/Realm.h"
 #include "ui/Canvas.h"
 #include "ui/SpriteRenderer.h"
+#include "util/Util.h"
 
 namespace Game3 {
 	std::unordered_map<EntityID, Texture> Entity::textureMap {
@@ -86,7 +87,12 @@ namespace Game3 {
 		if (!texture)
 			return;
 
-		sprite_renderer.drawOnMap(*texture, position.column + offset.x(), position.row + offset.y(), 0.f, 8.f * int(direction), 16.f, 16.f);
+		float x_offset = 0.f;
+		if (offset.x() != 0.f || offset.y() != 0.f)
+			if (auto *game = getRealm()->game)
+				x_offset = 8.f * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - game->startTime).count() / 100) % 5);
+
+		sprite_renderer.drawOnMap(*texture, position.column + offset.x(), position.row + offset.y(), x_offset, 8.f * int(direction), 16.f, 16.f);
 	}
 
 	void Entity::move(Direction move_direction) {
@@ -172,6 +178,10 @@ namespace Game3 {
 
 		if (tileset.isSolid((*realm->tilemap2)(new_position.column, new_position.row)))
 			return false;
+
+		if (auto tile_entity = realm->tileEntityAt(new_position))
+			if (tile_entity->solid)
+				return false;
 
 		return true;
 	}

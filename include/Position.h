@@ -16,6 +16,7 @@ namespace Game3 {
 		bool operator!=(const Position &other) const { return row != other.row || column != other.column; }
 		Position operator+(const Position &other) const { return {row + other.row, column + other.column}; }
 		Position & operator+=(const Position &other) { row += other.row; column += other.column; return *this; }
+		operator bool() const { return row != 0 || column != 0; }
 	};
 
 	void to_json(nlohmann::json &, const Position &);
