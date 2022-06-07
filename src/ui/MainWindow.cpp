@@ -2,6 +2,7 @@
 
 #include <fstream>
 
+#include "entity/ItemEntity.h"
 #include "game/Game.h"
 #include "ui/gtk/NewGameDialog.h"
 #include "ui/tab/InventoryTab.h"
@@ -328,12 +329,10 @@ namespace Game3 {
 					case GDK_KEY_o: {
 						ItemStack sword(Item::SHORTSWORD, 1);
 						auto leftover = player.inventory.add(sword);
-						std::cout << "Added sword. ";
 						if (leftover) {
-							std::cout << "Left over: " << leftover->item->name << " x " << leftover->count << '\n';
-						} else {
-							std::cout << "No leftover.\n";
-							inventoryTab->reset(game);
+							auto &realm = *player.getRealm();
+							realm.spawn<ItemEntity>(player.position, *leftover);
+							realm.game->signal_player_inventory_update().emit(game->player);
 						}
 						return;
 					}
