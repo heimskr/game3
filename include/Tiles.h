@@ -58,16 +58,25 @@ namespace Game3 {
 	};
 
 	struct HouseTiles: TileSet {
-		constexpr static TileID EMPTY = 0;
-		constexpr static TileID WALL = 1;
-		constexpr static TileID FLOOR = 2;
+		constexpr static TileID EMPTY    = 0;
+		constexpr static TileID WALL_NW  = 168;
+		constexpr static TileID WALL_WEN = 169;
+		constexpr static TileID WALL_NE  = 170;
+		constexpr static TileID WALL_NS  = 196;
+		constexpr static TileID FLOOR    = 197;
+		constexpr static TileID WALL_SW  = 224;
+		constexpr static TileID WALL_WES = 225;
+		constexpr static TileID WALL_SE  = 226;
+		constexpr static TileID DOOR     = 284;
+
+		static std::unordered_set<TileID> solidSet;
 
 		bool isLand(TileID) const override {
 			return true;
 		}
 
 		bool isSolid(TileID tile) const override {
-			return tile != FLOOR && tile != EMPTY;
+			return solidSet.contains(tile);
 		}
 
 		const char * name() const override {

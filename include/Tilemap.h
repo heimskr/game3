@@ -16,7 +16,7 @@ namespace Game3 {
 		int tileSize = 0;
 		int setWidth = 0;
 		int setHeight = 0;
-		std::vector<uint8_t> tiles;
+		std::vector<TileID> tiles;
 		Texture texture;
 
 		Tilemap() = default;

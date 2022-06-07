@@ -15,7 +15,7 @@
 namespace Game3 {
 	std::unordered_map<RealmType, Texture> Realm::textureMap {
 		{Realm::OVERWORLD, Texture("resources/tileset2.png")},
-		{Realm::HOUSE,     Texture("resources/house.png")},
+		{Realm::HOUSE,     Texture("resources/house/house.png")},
 	};
 
 	Realm::Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_):
@@ -171,20 +171,27 @@ namespace Game3 {
 		auto &layer1 = tilemap1->tiles;
 		auto &layer2 = tilemap2->tiles;
 
-		for (int column = 0; column < width; ++column)
-			layer2[column] = layer2[column + (height - 1) * width] = HouseTiles::WALL;
+		for (int column = 1; column < width - 1; ++column) {
+			layer2[column] = HouseTiles::WALL_WEN;
+			layer2[column + (height - 1) * width] = HouseTiles::WALL_WES;
+		}
 
-		for (int row = 0; row < height; ++row)
-			layer2[row * width] = layer2[(row + 1) * width - 1] = HouseTiles::WALL;
+		for (int row = 1; row < height - 1; ++row)
+			layer2[row * width] = layer2[(row + 1) * width - 1] = HouseTiles::WALL_NS;
 
 		for (int row = 0; row < height; ++row)
 			for (int column = 0; column < width; ++column)
 				layer1[row * width + column] = HouseTiles::FLOOR;
 
+		layer2[0] = HouseTiles::WALL_NW;
+		layer2[width - 1] = HouseTiles::WALL_NE;
+		layer2[width * (height - 1)] = HouseTiles::WALL_SW;
+		layer2[width * height - 1] = HouseTiles::WALL_SE;
+
 		const Index exit_index = width * height - 3;
 		layer2[width * height - 3] = HouseTiles::EMPTY;
 
-		add(TileEntity::create<Teleporter>(HouseTiles::EMPTY, getPosition(exit_index), parent_realm, entrance));
+		add(TileEntity::create<Teleporter>(HouseTiles::DOOR, getPosition(exit_index), parent_realm, entrance));
 	}
 
 	void Realm::createTown(const size_t index, size_t width, size_t height, size_t pad) {

@@ -10,6 +10,10 @@ namespace Game3 {
 		TOWER_NW, TOWER_NE, TOWER_SW, TOWER_SE, TOWER_WE, TOWER_NS, TOWER_N, TOWER_S, HOUSE1, HOUSE2, HOUSE3,
 	};
 
+	std::unordered_set<TileID> HouseTiles::solidSet {
+		WALL_NW, WALL_WEN, WALL_NE, WALL_NS, WALL_SW, WALL_WES, WALL_SE,
+	};
+
 	OverworldTiles overworldTiles;
 	HouseTiles houseTiles;
 

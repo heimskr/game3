@@ -5,7 +5,7 @@
 
 namespace Game3 {
 	using Index = int;
-	using TileID = uint8_t;
+	using TileID = uint16_t;
 	using PlayerID = int;
 	using TileEntityID = unsigned;
 	using RealmType = unsigned;
