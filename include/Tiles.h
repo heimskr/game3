@@ -59,7 +59,16 @@ namespace Game3 {
 	};
 
 	struct HouseTiles: TileSet {
-		constexpr static TileID EMPTY     = 175;
+		constexpr static TileID EMPTY     = 0;
+		constexpr static TileID CARPET_NW = 1;
+		constexpr static TileID CARPET_N  = 2;
+		constexpr static TileID CARPET_NE = 3;
+		constexpr static TileID CARPET_W  = 29;
+		constexpr static TileID CARPET_C  = 30;
+		constexpr static TileID CARPET_E  = 31;
+		constexpr static TileID CARPET_SW = 57;
+		constexpr static TileID CARPET_S  = 58;
+		constexpr static TileID CARPET_SE = 59;
 		constexpr static TileID WALL_NW   = 168;
 		constexpr static TileID WALL_WEN  = 169;
 		constexpr static TileID WALL_NE   = 170;
