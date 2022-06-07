@@ -8,6 +8,7 @@
 #include "game/Building.h"
 #include "game/Game.h"
 #include "game/Realm.h"
+#include "game/Sign.h"
 #include "game/Teleporter.h"
 #include "util/Timer.h"
 #include "util/Util.h"
@@ -207,8 +208,10 @@ namespace Game3 {
 
 		switch(rng() % 2) {
 			case 0:
-				for (Index index = width + 2; index < 2 * width - 2; ++index)
+				for (Index index = width + 2; index < 2 * width - 2; ++index) {
 					layer2[index] = HouseTiles::BOOKSHELF;
+					add(TileEntity::create<Sign>(HouseTiles::EMPTY, getPosition(index), "Sample text " + std::to_string(rng())));
+				}
 				break;
 			default:
 				break;

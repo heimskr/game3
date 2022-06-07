@@ -17,6 +17,7 @@ namespace Game3 {
 		public:
 			constexpr static TileEntityID BUILDING   = 1;
 			constexpr static TileEntityID TELEPORTER = 2;
+			constexpr static TileEntityID SIGN       = 3;
 
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;
