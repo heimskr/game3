@@ -192,6 +192,18 @@ namespace Game3 {
 		offset = {0.f, 0.f};
 	}
 
+	void Entity::teleport(const Position &new_position, const std::shared_ptr<Realm> &new_realm) {
+		auto old_realm = getRealm();
+		auto shared = shared_from_this();
+		old_realm->remove(shared);
+		new_realm->add(shared);
+		teleport(new_position);
+	}
+
+	void Entity::teleport(Index index, const std::shared_ptr<Realm> &new_realm) {
+		teleport(new_realm->getPosition(index), new_realm);
+	}
+
 	Position Entity::nextTo() const {
 		switch (direction) {
 			case Direction::Up:    return {position.row - 1, position.column};

@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "entity/Player.h"
+#include "game/Game.h"
 #include "game/Realm.h"
 
 namespace Game3 {
@@ -33,6 +34,15 @@ namespace Game3 {
 			entity->onInteractNextTo(player);
 		else if (auto tileEntity = realm->tileEntityAt(nextTo()))
 			tileEntity->onInteractNextTo(player);
+	}
+
+	void Player::teleport(const Position &position, const std::shared_ptr<Realm> &new_realm) {
+		if (!new_realm->game)
+			throw std::runtime_error("Can't teleport player to realm " + std::to_string(new_realm->id) + ": game is null");
+		Entity::teleport(position, new_realm);
+		new_realm->reupload();
+		new_realm->game->activeRealm = new_realm;
+		focus(new_realm->game->canvas);
 	}
 
 	void to_json(nlohmann::json &json, const Player &player) {

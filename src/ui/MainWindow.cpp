@@ -179,7 +179,7 @@ namespace Game3 {
 
 	void MainWindow::newGame(int seed, int width, int height) {
 		glArea.get_context()->make_current();
-		game = std::make_shared<Game>();
+		game = std::make_shared<Game>(*canvas);
 		Texture texture("resources/tileset2.png", true);
 		texture.init();
 		auto tilemap = std::make_shared<Tilemap>(width, height, 16, texture);
@@ -188,7 +188,7 @@ namespace Game3 {
 		realm->generate(seed);
 		game->realms.emplace(realm->id, realm);
 		game->activeRealm = realm;
-		realm->addEntity(game->player = Entity::create<Player>(Entity::GANGBLANC));
+		realm->add(game->player = Entity::create<Player>(Entity::GANGBLANC));
 		game->player->position = {realm->randomLand / width, realm->randomLand % width};
 		game->player->init();
 		onGameLoaded();
@@ -198,9 +198,9 @@ namespace Game3 {
 		glArea.get_context()->make_current();
 		const std::string data = readFile(path);
 		if (!data.empty() && data.front() == '{')
-			game = std::make_shared<Game>(nlohmann::json::parse(data));
+			game = Game::fromJSON(nlohmann::json::parse(data), *canvas);
 		else
-			game = std::make_shared<Game>(nlohmann::json::from_cbor(data));
+			game = Game::fromJSON(nlohmann::json::from_cbor(data), *canvas);
 		game->initEntities();
 		auto realm = game->activeRealm;
 		for (const auto &entity: realm->entities)

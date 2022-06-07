@@ -12,6 +12,8 @@ namespace Game3 {
 			void remove() override {}
 			void interactOn();
 			void interactNextTo();
+			using Entity::teleport;
+			void teleport(const Position &, const std::shared_ptr<Realm> &) override;
 
 		protected:
 			using Entity::Entity;

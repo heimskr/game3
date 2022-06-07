@@ -49,8 +49,8 @@ namespace Game3 {
 			void createTown(size_t index, size_t width, size_t height, size_t pad);
 			int getWidth()  const { return tilemap1->width;  }
 			int getHeight() const { return tilemap1->height; }
-			std::shared_ptr<Entity> addEntity(const std::shared_ptr<Entity> &);
-			std::shared_ptr<TileEntity> addTileEntity(const std::shared_ptr<TileEntity> &);
+			std::shared_ptr<Entity> add(const std::shared_ptr<Entity> &);
+			std::shared_ptr<TileEntity> add(const std::shared_ptr<TileEntity> &);
 			void initEntities();
 			void tick(float delta);
 			std::vector<std::shared_ptr<Entity>> findEntities(const Position &) const;
@@ -58,13 +58,15 @@ namespace Game3 {
 			std::shared_ptr<Entity> findEntity(const Position &) const;
 			std::shared_ptr<Entity> findEntity(const Position &, const std::shared_ptr<Entity> &except) const;
 			std::shared_ptr<TileEntity> tileEntityAt(const Position &) const;
+			void remove(const std::shared_ptr<Entity> &);
+			Position getPosition(Index) const;
 
 			template <typename T, typename... Args>
 			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {
 				auto entity = T::create(std::forward<Args>(args)...);
 				entity->init();
 				entity->teleport(position);
-				addEntity(entity);
+				add(entity);
 				return entity;
 			}
 

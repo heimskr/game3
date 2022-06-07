@@ -43,6 +43,7 @@ namespace Game3 {
 			/** Handles when the player interacts with the tile in front of them and that tile contains this tile entity. */
 			virtual void onInteractNextTo(const std::shared_ptr<Player> &) {}
 			void setRealm(const std::shared_ptr<Realm> &);
+			std::shared_ptr<Realm> getRealm() const;
 
 		protected:
 			TileEntity() = default;

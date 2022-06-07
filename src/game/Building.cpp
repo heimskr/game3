@@ -2,6 +2,8 @@
 
 #include "entity/Player.h"
 #include "game/Building.h"
+#include "game/Game.h"
+#include "game/Realm.h"
 
 namespace Game3 {
 	void Building::toJSON(nlohmann::json &json) const {
@@ -12,6 +14,11 @@ namespace Game3 {
 
 	void Building::onInteractNextTo(const std::shared_ptr<Player> &player) {
 		std::cout << "Player [" << player->id() << "] interacted with Building at position " << position << "\n";
+		auto realm = getRealm();
+		auto *game = realm->game;
+		if (game == nullptr)
+			throw std::runtime_error("Realm " + std::to_string(realm->id) + " has a null game");
+		player->teleport(entrance, game->realms.at(innerRealmID));
 	}
 
 	void Building::absorbJSON(const nlohmann::json &json) {

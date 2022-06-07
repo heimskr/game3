@@ -28,6 +28,13 @@ namespace Game3 {
 		weakRealm = realm;
 	}
 
+	std::shared_ptr<Realm> TileEntity::getRealm() const {
+		auto out = weakRealm.lock();
+		if (!out)
+			throw std::runtime_error("Couldn't lock tile entity's realm");
+		return out;
+	}
+
 	void TileEntity::absorbJSON(const nlohmann::json &json) {
 		tileID = json.at("tileID");
 		position = json.at("position");

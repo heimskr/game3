@@ -244,13 +244,13 @@ namespace Game3 {
 				const RealmID realm_id = game->newRealmID();
 				const Index realm_width = 64;
 				const Index realm_height = 64;
-				auto building = TileEntity::create<Building>(house, Position(index / map_width, index % map_width), realm_id, realm_width * realm_height - 2);
+				auto building = TileEntity::create<Building>(house, Position(index / map_width, index % map_width), realm_id, realm_width * (realm_height - 1) - 2);
 				auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, textureMap.at(Realm::HOUSE));
 				auto new_realm = std::make_shared<Realm>(realm_id, Realm::HOUSE, new_tilemap);
 				new_realm->game = game;
 				new_realm->generateHouse(realm_width, realm_height);
 				game->realms.emplace(realm_id, new_realm);
-				addTileEntity(building);
+				add(building);
 				buildable_set.erase(index);
 				// Some of these are sus if index happens to be at the west or east edge, but those aren't valid locations for houses anyway.
 				buildable_set.erase(index - map_width);
@@ -265,13 +265,13 @@ namespace Game3 {
 		}
 	}
 
-	std::shared_ptr<Entity> Realm::addEntity(const std::shared_ptr<Entity> &entity) {
+	std::shared_ptr<Entity> Realm::add(const std::shared_ptr<Entity> &entity) {
 		entity->setRealm(shared_from_this());
 		entities.insert(entity);
 		return entity;
 	}
 
-	std::shared_ptr<TileEntity> Realm::addTileEntity(const std::shared_ptr<TileEntity> &tile_entity) {
+	std::shared_ptr<TileEntity> Realm::add(const std::shared_ptr<TileEntity> &tile_entity) {
 		const Index index = tile_entity->position.row * tilemap1->width + tile_entity->position.column;
 		if (tileEntities.contains(index))
 			return nullptr;
@@ -325,6 +325,14 @@ namespace Game3 {
 		if (iter == tileEntities.end())
 			return {};
 		return iter->second;
+	}
+
+	void Realm::remove(const std::shared_ptr<Entity> &entity) {
+		entities.erase(entity);
+	}
+
+	Position Realm::getPosition(Index index) const {
+		return {index / getWidth(), index % getWidth()};
 	}
 
 	void to_json(nlohmann::json &json, const Realm &realm) {
