@@ -2,6 +2,7 @@
 
 #include "entity/Entity.h"
 #include "entity/ItemEntity.h"
+#include "game/Game.h"
 #include "game/Inventory.h"
 #include "game/Realm.h"
 
@@ -66,6 +67,9 @@ namespace Game3 {
 
 		realm->spawn<ItemEntity>(entity->position, storage.at(slot));
 		storage.erase(slot);
+
+		if (entity->isPlayer())
+			realm->game->signal_player_inventory_update().emit(std::dynamic_pointer_cast<Player>(entity));
 	}
 
 	Inventory Inventory::fromJSON(const nlohmann::json &json, const std::shared_ptr<Entity> &owner) {

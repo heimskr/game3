@@ -25,7 +25,7 @@ namespace Game3 {
 
 	void from_json(const nlohmann::json &json, Game &game) {
 		for (const auto &[string, realm_json]: json.at("realms").get<std::unordered_map<std::string, nlohmann::json>>())
-			game.realms.emplace(parseUlong(string), std::make_shared<Realm>(realm_json));
+			game.realms.emplace(parseUlong(string), std::make_shared<Realm>(realm_json)).first->second->game = &game;
 		game.activeRealm = game.realms.at(json.at("activeRealmID"));
 	}
 }

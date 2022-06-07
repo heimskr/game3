@@ -13,10 +13,12 @@
 
 namespace Game3 {
 	class Entity;
+	class Game;
 	class SpriteRenderer;
 
 	class Realm: public std::enable_shared_from_this<Realm> {
 		public:
+			Game *game = nullptr;
 			RealmID id;
 			std::shared_ptr<Tilemap> tilemap1, tilemap2, tilemap3;
 			ElementBufferedRenderer renderer1, renderer2, renderer3;
@@ -26,6 +28,12 @@ namespace Game3 {
 			Realm() = default;
 			Realm(RealmID id_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_);
 			Realm(RealmID id_, const std::shared_ptr<Tilemap> &tilemap1_);
+
+			Realm(const Realm &) = delete;
+			Realm(Realm &&) = default;
+
+			Realm & operator=(const Realm &) = delete;
+			Realm & operator=(Realm &&) = default;
 
 			void render(int width, int height, const nanogui::Vector2f &center, float scale, SpriteRenderer &);
 			void reupload();

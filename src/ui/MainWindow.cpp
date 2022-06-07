@@ -405,6 +405,11 @@ namespace Game3 {
 		connectSave();
 		for (auto &tab: tabs)
 			tab->reset(game);
+		for (auto &[id, realm]: game->realms)
+			realm->game = game.get();
+		game->signal_player_inventory_update().connect([this](const auto &) {
+			inventoryTab->reset(game);
+		});
 	}
 
 /*

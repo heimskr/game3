@@ -4,6 +4,7 @@
 #include <memory>
 #include <unordered_map>
 
+#include <gtkmm.h>
 #include <nlohmann/json.hpp>
 
 #include "entity/Player.h"
@@ -11,6 +12,7 @@
 
 namespace Game3 {
 	class Menu;
+	class Player;
 
 	class Game {
 		public:
@@ -25,7 +27,10 @@ namespace Game3 {
 			void initEntities();
 			void tick();
 
+			sigc::signal<void(const std::shared_ptr<Player> &)> signal_player_inventory_update() const { return signal_player_inventory_update_; }
+
 		private:
+			sigc::signal<void(const std::shared_ptr<Player> &)> signal_player_inventory_update_;
 			std::chrono::system_clock::time_point lastTime = std::chrono::system_clock::now();
 	};
 
