@@ -351,6 +351,13 @@ namespace Game3 {
 					case GDK_KEY_e:
 						game->player->interactNextTo();
 						break;
+					case GDK_KEY_u:
+						glArea.get_context()->make_current();
+						game->activeRealm->reupload();
+						break;
+					case GDK_KEY_f:
+						game->player->focus(*canvas);
+						break;
 				}
 			}
 
