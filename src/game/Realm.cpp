@@ -55,16 +55,14 @@ namespace Game3 {
 		realm.tilemap1->texture.init();
 		realm.tilemap2->texture.init();
 		realm.tilemap3->texture.init();
-		for (const auto &[index, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>()) {
-			auto tile_entity = realm.tileEntities.emplace(parseUlong(index), TileEntity::fromJSON(tile_entity_json)).first->second;
-			tile_entity->setRealm(out);
-		}
+		for (const auto &[index, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>())
+			realm.tileEntities.emplace(parseUlong(index), TileEntity::fromJSON(tile_entity_json)).first->second->setRealm(out);
 		realm.renderer1.init(realm.tilemap1);
 		realm.renderer2.init(realm.tilemap2);
 		realm.renderer3.init(realm.tilemap3);
 		realm.entities.clear();
 		for (const auto &entity_json: json.at("entities"))
-			realm.entities.insert(Entity::fromJSON(entity_json));
+			(*realm.entities.insert(Entity::fromJSON(entity_json)).first)->setRealm(out);
 		return out;
 	}
 
