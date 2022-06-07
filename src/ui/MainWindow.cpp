@@ -25,6 +25,7 @@ namespace Game3 {
 		{GDK_KEY_Right, arrowTime},
 		{GDK_KEY_e,     interactTime},
 		{GDK_KEY_E,     interactTime},
+		{GDK_KEY_o,     interactTime},
 	};
 
 	MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &builder_):

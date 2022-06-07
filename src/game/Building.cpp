@@ -1,3 +1,6 @@
+#include <iostream>
+
+#include "entity/Player.h"
 #include "game/Building.h"
 
 namespace Game3 {
@@ -6,8 +9,12 @@ namespace Game3 {
 		json["innerRealmID"] = innerRealmID;
 	}
 
-	void from_json(const nlohmann::json &json, Building &building) {
-		from_json(json, static_cast<TileEntity &>(building));
-		building.innerRealmID = json.at("innerRealmID");
+	void Building::onInteractNextTo(const std::shared_ptr<Player> &player) {
+		std::cout << "Player [" << player->id() << "] interacted with Building at position " << position << "\n";
+	}
+
+	void Building::absorbJSON(const nlohmann::json &json) {
+		TileEntity::absorbJSON(json);
+		innerRealmID = json.at("innerRealmID");
 	}
 }

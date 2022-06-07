@@ -266,6 +266,13 @@ namespace Game3 {
 		return {};
 	}
 
+	std::shared_ptr<TileEntity> Realm::tileEntityAt(const Position &position) const {
+		const auto iter = tileEntities.find(position.row * tilemap1->width + position.column);
+		if (iter == tileEntities.end())
+			return {};
+		return iter->second;
+	}
+
 	void to_json(nlohmann::json &json, const Realm &realm) {
 		json["id"] = realm.id;
 		json["tilemap1"] = *realm.tilemap1;

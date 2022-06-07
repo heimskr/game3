@@ -6,17 +6,25 @@ namespace Game3 {
 	struct Building: TileEntity {
 		static constexpr int ID = 1;
 
-		int innerRealmID = -1;
+		RealmID innerRealmID = 0;
 
-		Building() = default;
-		Building(TileID id_, int row_, int column_, int inner_realm_id): TileEntity(id_, row_, column_, false), innerRealmID(inner_realm_id) {}
-
+		Building(const Building &) = delete;
+		Building(Building &&) = default;
 		~Building() override = default;
 
-		int getID() const override { return ID; }
+		Building & operator=(const Building &) = delete;
+		Building & operator=(Building &&) = default;
+
+		TileEntityID getID() const override { return TileEntity::BUILDING; }
 
 		void toJSON(nlohmann::json &) const override;
-	};
+		void onInteractNextTo(const std::shared_ptr<Player> &) override;
+		void absorbJSON(const nlohmann::json &) override;
 
-	void from_json(const nlohmann::json &, Building &);
+		protected:
+			Building() = default;
+			Building(TileID id_, const Position &position_, int inner_realm_id): TileEntity(id_, TileEntity::BUILDING, position_, true), innerRealmID(inner_realm_id) {}
+
+			friend class TileEntity;
+	};
 }

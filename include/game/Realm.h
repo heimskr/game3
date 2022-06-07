@@ -45,10 +45,11 @@ namespace Game3 {
 			std::shared_ptr<Entity> addEntity(const std::shared_ptr<Entity> &);
 			void initEntities();
 			void tick(float delta);
-			std::vector<std::shared_ptr<Entity>> findEntities(const Position &position) const;
-			std::vector<std::shared_ptr<Entity>> findEntities(const Position &position, const std::shared_ptr<Entity> &except) const;
-			std::shared_ptr<Entity> findEntity(const Position &position) const;
-			std::shared_ptr<Entity> findEntity(const Position &position, const std::shared_ptr<Entity> &except) const;
+			std::vector<std::shared_ptr<Entity>> findEntities(const Position &) const;
+			std::vector<std::shared_ptr<Entity>> findEntities(const Position &, const std::shared_ptr<Entity> &except) const;
+			std::shared_ptr<Entity> findEntity(const Position &) const;
+			std::shared_ptr<Entity> findEntity(const Position &, const std::shared_ptr<Entity> &except) const;
+			std::shared_ptr<TileEntity> tileEntityAt(const Position &) const;
 
 			template <typename T, typename... Args>
 			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {

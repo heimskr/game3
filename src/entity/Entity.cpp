@@ -19,8 +19,8 @@ namespace Game3 {
 	};
 
 	std::shared_ptr<Entity> Entity::fromJSON(const nlohmann::json &json) {
-		std::shared_ptr<Entity> out;
 		const EntityID id = json.at("id");
+		std::shared_ptr<Entity> out;
 
 		if (json.at("isPlayer") == true)
 			out = Entity::create<Player>(id);

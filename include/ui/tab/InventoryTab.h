@@ -17,8 +17,6 @@ namespace Game3 {
 
 			Gtk::Widget & getWidget() override { return scrolled; }
 			Glib::ustring getName() override { return "Inventory"; }
-			void onFocus() override;
-			void onBlur() override;
 			void onResize(const std::shared_ptr<Game> &) override;
 
 			void update(const std::shared_ptr<Game> &) override;

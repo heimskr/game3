@@ -61,14 +61,6 @@ namespace Game3 {
 		grid.add_controller(target);
 	}
 
-	void InventoryTab::onFocus() {
-
-	}
-
-	void InventoryTab::onBlur() {
-
-	}
-
 	void InventoryTab::onResize(const std::shared_ptr<Game> &game) {
 		if (gridWidth() != lastGridWidth)
 			reset(game);
