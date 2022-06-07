@@ -59,22 +59,23 @@ namespace Game3 {
 	};
 
 	struct HouseTiles: TileSet {
-		constexpr static TileID EMPTY    = 175;
-		constexpr static TileID WALL_NW  = 168;
-		constexpr static TileID WALL_WEN = 169;
-		constexpr static TileID WALL_NE  = 170;
-		constexpr static TileID WALL_E   = 172;
-		constexpr static TileID WALL_W   = 174;
-		constexpr static TileID WALL_NS  = 196;
-		constexpr static TileID FLOOR    = 197;
-		constexpr static TileID WALL_SW  = 224;
-		constexpr static TileID WALL_WES = 225;
-		constexpr static TileID WALL_SE  = 226;
-		constexpr static TileID DOOR1    = 282;
-		constexpr static TileID DOOR2    = 284;
-		constexpr static TileID PLANT1   = 340;
-		constexpr static TileID PLANT2   = 341;
-		constexpr static TileID PLANT3   = 342;
+		constexpr static TileID EMPTY     = 175;
+		constexpr static TileID WALL_NW   = 168;
+		constexpr static TileID WALL_WEN  = 169;
+		constexpr static TileID WALL_NE   = 170;
+		constexpr static TileID WALL_E    = 172;
+		constexpr static TileID WALL_W    = 174;
+		constexpr static TileID WALL_NS   = 196;
+		constexpr static TileID FLOOR     = 197;
+		constexpr static TileID WALL_SW   = 224;
+		constexpr static TileID WALL_WES  = 225;
+		constexpr static TileID WALL_SE   = 226;
+		constexpr static TileID DOOR1     = 282;
+		constexpr static TileID DOOR2     = 284;
+		constexpr static TileID BOOKSHELF = 311;
+		constexpr static TileID PLANT1    = 340;
+		constexpr static TileID PLANT2    = 341;
+		constexpr static TileID PLANT3    = 342;
 
 		static std::unordered_set<TileID> solidSet;
 

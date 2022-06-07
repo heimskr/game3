@@ -204,6 +204,15 @@ namespace Game3 {
 		layer2[(width - 2) * height + 1] = choose(plants, rng);
 
 		add(TileEntity::create<Teleporter>(choose(doors, rng), getPosition(exit_index), parent_realm, entrance));
+
+		switch(rng() % 2) {
+			case 0:
+				for (Index index = width + 2; index < 2 * width - 2; ++index)
+					layer2[index] = HouseTiles::BOOKSHELF;
+				break;
+			default:
+				break;
+		}
 	}
 
 	void Realm::createTown(const size_t index, size_t width, size_t height, size_t pad) {
