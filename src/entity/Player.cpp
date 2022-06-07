@@ -1,8 +1,12 @@
+#include <nanogui/opengl.h>
+
 #include <iostream>
 
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "game/Realm.h"
+#include "ui/Canvas.h"
+#include "ui/MainWindow.h"
 
 namespace Game3 {
 	std::shared_ptr<Player> Player::fromJSON(const nlohmann::json &json) {
@@ -40,6 +44,7 @@ namespace Game3 {
 		if (!new_realm->game)
 			throw std::runtime_error("Can't teleport player to realm " + std::to_string(new_realm->id) + ": game is null");
 		Entity::teleport(position, new_realm);
+		new_realm->game->canvas.window.glContext()->make_current();
 		new_realm->reupload();
 		new_realm->game->activeRealm = new_realm;
 		focus(new_realm->game->canvas);

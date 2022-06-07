@@ -278,6 +278,10 @@ namespace Game3 {
 		alert(message, Gtk::MessageType::ERROR, modal, use_markup);
 	}
 
+	Glib::RefPtr<Gdk::GLContext> MainWindow::glContext() {
+		return glArea.get_context();
+	}
+
 	bool MainWindow::onKeyPressed(guint keyval, guint keycode, Gdk::ModifierType modifiers) {
 		if (!keyTimes.contains(keycode)) {
 			handleKey(keyval, keycode, modifiers);

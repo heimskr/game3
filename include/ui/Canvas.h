@@ -21,6 +21,7 @@ namespace Game3 {
 		public:
 			constexpr static float DEFAULT_SCALE = 2.f;
 
+			MainWindow &window;
 			std::shared_ptr<Game> game;
 			nanogui::Vector2f center {0.f, 0.f};
 			float scale = DEFAULT_SCALE;
@@ -37,8 +38,5 @@ namespace Game3 {
 			// bool mouseButtonEvent(const nanogui::Vector2i &p, int button, bool down, int modifiers) override;
 			int width();
 			int height();
-
-		private:
-			MainWindow &window;
 	};
 }

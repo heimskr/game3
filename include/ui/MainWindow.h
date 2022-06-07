@@ -40,6 +40,8 @@ namespace Game3 {
 			/** Displays an error message. (See alert.) */
 			void error(const Glib::ustring &message, bool modal = true, bool use_markup = false);
 
+			Glib::RefPtr<Gdk::GLContext> glContext();
+
 			friend class Canvas;
 
 		private:
