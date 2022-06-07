@@ -108,6 +108,7 @@ namespace Game3 {
 				grid.attach(*label_ptr, column, row);
 			}
 
+			label_ptr->add_css_class("item-slot");
 			label_ptr->set_data("slot", reinterpret_cast<void *>(slot));
 			gridWidgets.push_back(std::move(label_ptr));
 		}
