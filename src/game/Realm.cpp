@@ -169,7 +169,7 @@ namespace Game3 {
 		Timer::clear();
 	}
 
-	void Realm::generateHouse(RealmID parent_realm, const Position &entrance, int width, int height) {
+	void Realm::generateHouse(RealmID parent_realm, std::default_random_engine &rng, const Position &entrance, int width, int height) {
 		auto &layer1 = tilemap1->tiles;
 		auto &layer2 = tilemap2->tiles;
 
@@ -194,6 +194,13 @@ namespace Game3 {
 		layer2[width * height - 2] = HouseTiles::WALL_E;
 		layer2[width * height - 3] = HouseTiles::EMPTY;
 		layer2[width * height - 4] = HouseTiles::WALL_W;
+
+		static std::array<TileID, 3> plants {HouseTiles::PLANT1, HouseTiles::PLANT2, HouseTiles::PLANT3};
+
+		layer2[width + 1] = choose(plants, rng);
+		layer2[2 * width - 2] = choose(plants, rng);
+		layer2[(width - 1) * height - 2] = choose(plants, rng);
+		layer2[(width - 2) * height + 1] = choose(plants, rng);
 
 		add(TileEntity::create<Teleporter>(HouseTiles::DOOR, getPosition(exit_index), parent_realm, entrance));
 	}
@@ -272,15 +279,15 @@ namespace Game3 {
 		set2(OverworldTiles::TOWER_NW);
 		--column;
 
+		std::default_random_engine rng;
+		rng.seed(666);
 		std::vector<Index> buildable(buildable_set.cbegin(), buildable_set.cend());
-		shuffle(buildable, 666);
+		std::shuffle(buildable.begin(), buildable.end(), rng);
 		Timer timer("Houses");
 		if (2 < buildable.size()) {
 			buildable.erase(buildable.begin() + buildable.size() / 10, buildable.end());
 			buildable_set = std::unordered_set<Index>(buildable.cbegin(), buildable.cend());
 			std::vector<TileID> houses {OverworldTiles::HOUSE1, OverworldTiles::HOUSE2, OverworldTiles::HOUSE3};
-			std::default_random_engine rng;
-			rng.seed(666);
 			while (!buildable_set.empty()) {
 				const auto index = *buildable_set.begin();
 				const auto house = choose(houses, rng);
@@ -293,7 +300,7 @@ namespace Game3 {
 				auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, textureMap.at(Realm::HOUSE));
 				auto new_realm = Realm::create(realm_id, Realm::HOUSE, new_tilemap);
 				new_realm->game = game;
-				new_realm->generateHouse(id, house_position + Position(1, 0), realm_width, realm_height);
+				new_realm->generateHouse(id, rng, house_position + Position(1, 0), realm_width, realm_height);
 				game->realms.emplace(realm_id, new_realm);
 				add(building);
 				buildable_set.erase(index);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <random>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -49,7 +50,7 @@ namespace Game3 {
 			void reupload();
 			void rebind();
 			void generate(int seed = 666, double noise_zoom = 100., double noise_threshold = -0.15);
-			void generateHouse(RealmID parent_realm, const Position &entrance, int width, int height);
+			void generateHouse(RealmID parent_realm, std::default_random_engine &, const Position &entrance, int width, int height);
 			void createTown(size_t index, size_t width, size_t height, size_t pad);
 			int getWidth()  const { return tilemap1->width;  }
 			int getHeight() const { return tilemap1->height; }

@@ -11,7 +11,7 @@ namespace Game3 {
 	};
 
 	std::unordered_set<TileID> HouseTiles::solidSet {
-		WALL_NW, WALL_WEN, WALL_NE, WALL_NS, WALL_SW, WALL_WES, WALL_SE, WALL_E, WALL_W,
+		WALL_NW, WALL_WEN, WALL_NE, WALL_NS, WALL_SW, WALL_WES, WALL_SE, WALL_E, WALL_W, PLANT1, PLANT2, PLANT3,
 	};
 
 	OverworldTiles overworldTiles;

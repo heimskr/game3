@@ -71,6 +71,9 @@ namespace Game3 {
 		constexpr static TileID WALL_WES = 225;
 		constexpr static TileID WALL_SE  = 226;
 		constexpr static TileID DOOR     = 284;
+		constexpr static TileID PLANT1   = 340;
+		constexpr static TileID PLANT2   = 341;
+		constexpr static TileID PLANT3   = 342;
 
 		static std::unordered_set<TileID> solidSet;
 
