@@ -23,7 +23,7 @@ namespace Game3 {
 		const EntityID id = json.at("id");
 		std::shared_ptr<Entity> out;
 
-		if (json.at("isPlayer") == true)
+		if (json.contains("isPlayer") && json.at("isPlayer") == true)
 			out = Entity::create<Player>(id);
 		else
 			switch (id) {
