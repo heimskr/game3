@@ -63,12 +63,12 @@ namespace Game3 {
 			double glAreaMouseY = 0.;
 
 			struct KeyInfo {
-				guint code;
+				guint value;
 				Gdk::ModifierType modifiers;
 				std::chrono::system_clock::time_point lastProcessed;
 			};
 
-			/** keyval => (keycode, lastProcessed) */
+			/** Keys are keycodes, not keyvals. */
 			std::map<guint, KeyInfo> keyTimes;
 
 			void newGame(int seed, int width, int height);

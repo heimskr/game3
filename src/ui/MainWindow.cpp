@@ -273,21 +273,21 @@ namespace Game3 {
 	}
 
 	bool MainWindow::onKeyPressed(guint keyval, guint keycode, Gdk::ModifierType modifiers) {
-		if (!keyTimes.contains(keyval)) {
+		if (!keyTimes.contains(keycode)) {
 			handleKey(keyval, keycode, modifiers);
-			keyTimes.try_emplace(keyval, keycode, modifiers, getTime());
+			keyTimes.try_emplace(keycode, keyval, modifiers, getTime());
 		} else
-			keyTimes.at(keyval).modifiers = modifiers;
+			keyTimes.at(keycode).modifiers = modifiers;
 		return true;
 	}
 
-	void MainWindow::onKeyReleased(guint keyval, guint, Gdk::ModifierType) {
-		keyTimes.erase(keyval);
+	void MainWindow::onKeyReleased(guint keyval, guint keycode, Gdk::ModifierType) {
+		keyTimes.erase(keycode);
 	}
 
 	void MainWindow::handleKeys() {
-		for (auto &[keyval, info]: keyTimes) {
-			auto &[keycode, modifiers, time] = info;
+		for (auto &[keycode, info]: keyTimes) {
+			auto &[keyval, modifiers, time] = info;
 			auto repeat_time = keyRepeatTime;
 			if (customKeyRepeatTimes.contains(keyval))
 				repeat_time = customKeyRepeatTimes.at(keyval);
