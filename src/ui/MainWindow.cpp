@@ -167,6 +167,9 @@ namespace Game3 {
 		paned.set_resize_end_child(false);
 		paned.set_shrink_end_child(false);
 		notebook.set_size_request(402, -1);
+		paned.property_position().signal_changed().connect([this] {
+			tabs.at(notebook.get_current_page())->onResize(game);
+		});
 
 		addTab(inventoryTab = std::make_shared<InventoryTab>(*this));
 

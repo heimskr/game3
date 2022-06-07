@@ -19,6 +19,7 @@ namespace Game3 {
 			Glib::ustring getName() override { return "Inventory"; }
 			void onFocus() override;
 			void onBlur() override;
+			void onResize(const std::shared_ptr<Game> &) override;
 
 			void update(const std::shared_ptr<Game> &) override;
 			void reset(const std::shared_ptr<Game> &) override;
@@ -31,11 +32,13 @@ namespace Game3 {
 			Gtk::ScrolledWindow scrolled;
 			Gtk::PopoverMenu popoverMenu;
 			std::vector<std::unique_ptr<Gtk::Widget>> gridWidgets;
+			int lastGridWidth = 0;
 
 			/** We can't store state in a popover, so we have to store it here. */
 			std::shared_ptr<Game> lastGame;
 			Slot lastSlot = -1;
 
+			int gridWidth() const;
 			void leftClick(const std::shared_ptr<Game> &, Gtk::Label &, int click_count, Slot, double x, double y);
 			void rightClick(const std::shared_ptr<Game> &, Gtk::Label &, int click_count, Slot, double x, double y);
 	};

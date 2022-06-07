@@ -12,6 +12,7 @@ namespace Game3 {
 			virtual Glib::ustring getName() = 0;
 			virtual void onFocus() {}
 			virtual void onBlur() {}
+			virtual void onResize(const std::shared_ptr<Game> &) {}
 			virtual void update(const std::shared_ptr<Game> &) {}
 			virtual void reset(const std::shared_ptr<Game> &) {}
 			virtual ~Tab() {}

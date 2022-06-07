@@ -69,6 +69,11 @@ namespace Game3 {
 
 	}
 
+	void InventoryTab::onResize(const std::shared_ptr<Game> &game) {
+		if (gridWidth() != lastGridWidth)
+			reset(game);
+	}
+
 	void InventoryTab::update(const std::shared_ptr<Game> &) {
 
 	}
@@ -79,7 +84,7 @@ namespace Game3 {
 
 		removeChildren(grid);
 
-		const int grid_width = grid.get_width() / (TILE_SIZE + 2 * TILE_MARGIN);
+		const int grid_width = lastGridWidth = gridWidth();
 		const int tile_size  = grid.get_width() / (grid.get_width() / TILE_SIZE);
 		const auto &inventory = game->player->inventory;
 		const auto &storage = inventory.getStorage();
@@ -113,7 +118,11 @@ namespace Game3 {
 			gridWidgets.push_back(std::move(label_ptr));
 		}
 	}
-	
+
+	int InventoryTab::gridWidth() const {
+		return scrolled.get_width() / (TILE_SIZE + 2 * TILE_MARGIN);
+	}
+
 	void InventoryTab::leftClick(const std::shared_ptr<Game> &, Gtk::Label &, int, Slot, double, double) {
 		
 	}
