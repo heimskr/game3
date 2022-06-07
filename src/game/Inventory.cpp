@@ -48,9 +48,7 @@ namespace Game3 {
 				break;
 		}
 
-		if (auto entity = owner.lock())
-			if (entity->isPlayer())
-				entity->getRealm()->game->signal_player_inventory_update().emit(std::dynamic_pointer_cast<Player>(entity));
+		notifyOwner();
 
 		if (remaining < 0)
 			throw std::logic_error("How'd we end up with " + std::to_string(remaining) + " items remaining?");
@@ -73,8 +71,7 @@ namespace Game3 {
 		realm->spawn<ItemEntity>(entity->position, storage.at(slot));
 		storage.erase(slot);
 
-		if (entity->isPlayer())
-			realm->game->signal_player_inventory_update().emit(std::dynamic_pointer_cast<Player>(entity));
+		notifyOwner();
 	}
 
 	bool Inventory::swap(Slot source, Slot destination) {
@@ -88,12 +85,20 @@ namespace Game3 {
 			storage.erase(source);
 		}
 
+		notifyOwner();
+		return true;
+	}
+
+	void Inventory::erase(Slot slot) {
+		storage.erase(slot);
+		notifyOwner();
+	}
+
+	void Inventory::notifyOwner() {
 		if (auto entity = owner.lock())
 			if (entity->isPlayer())
 				if (auto realm = entity->weakRealm.lock())
 					realm->game->signal_player_inventory_update().emit(std::dynamic_pointer_cast<Player>(entity));
-
-		return true;
 	}
 
 	Inventory Inventory::fromJSON(const nlohmann::json &json, const std::shared_ptr<Entity> &owner) {

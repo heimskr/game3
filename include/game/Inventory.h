@@ -28,6 +28,8 @@ namespace Game3 {
 			/** Swaps two slots. Returns true if at least one of the first slot contained an item and the second slot was valid. */
 			bool swap(Slot, Slot);
 
+			void erase(Slot);
+
 			inline bool empty() const { return storage.empty(); }
 
 		private:
@@ -35,6 +37,7 @@ namespace Game3 {
 
 		public:
 			inline const decltype(storage) & getStorage() const { return storage; }
+			void notifyOwner();
 
 			static Inventory fromJSON(const nlohmann::json &, const std::shared_ptr<Entity> &);
 

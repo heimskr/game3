@@ -21,7 +21,9 @@ namespace Game3 {
 		group->add_action("drop", [this] {
 			lastGame->player->inventory.drop(lastSlot);
 		});
-		group->add_action("discard", [this] { std::cout << "discard\n"; });
+		group->add_action("discard", [this] {
+			lastGame->player->inventory.erase(lastSlot);
+		});
 
 		mainWindow.insert_action_group("inventory_popup", group);
 		popoverMenu.set_parent(mainWindow); // TODO: fix this silliness
