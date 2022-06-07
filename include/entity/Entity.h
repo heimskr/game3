@@ -75,7 +75,7 @@ namespace Game3 {
 			void setRealm(const Game &, RealmID);
 			void setRealm(const std::shared_ptr<Realm>);
 			void focus(Canvas &);
-			void teleport(const Position &);
+			void teleport(const Position &, bool clear_offset = true);
 			virtual void teleport(const Position &, const std::shared_ptr<Realm> &);
 			void teleport(Index, const std::shared_ptr<Realm> &);
 			/** Returns the position of the tile in front of the entity. */

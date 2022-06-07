@@ -8,13 +8,15 @@
 #include "Types.h"
 
 namespace Game3 {
+	class Entity;
 	class Player;
 	class Realm;
 	class SpriteRenderer;
 
 	class TileEntity: public std::enable_shared_from_this<TileEntity> {
 		public:
-			constexpr static TileEntityID BUILDING = 1;
+			constexpr static TileEntityID BUILDING   = 1;
+			constexpr static TileEntityID TELEPORTER = 2;
 
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;
@@ -40,8 +42,12 @@ namespace Game3 {
 			virtual void render(SpriteRenderer &) const {}
 			/** Removes the tile entity from existence. */
 			virtual void remove();
+			/** Handles when the player interacts with the tile they're on and that tile contains this tile entity. */
+			virtual void onInteractOn(const std::shared_ptr<Player> &) {}
 			/** Handles when the player interacts with the tile in front of them and that tile contains this tile entity. */
 			virtual void onInteractNextTo(const std::shared_ptr<Player> &) {}
+			/** Handles when an entity steps on this tile entity's position. */
+			virtual void onOverlap(const std::shared_ptr<Entity> &) {}
 			void setRealm(const std::shared_ptr<Realm> &);
 			std::shared_ptr<Realm> getRealm() const;
 

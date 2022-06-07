@@ -5,8 +5,6 @@
 namespace Game3 {
 	class Building: public TileEntity {
 		public:
-			static constexpr int ID = 1;
-
 			RealmID innerRealmID = 0;
 			Index entrance = 0;
 

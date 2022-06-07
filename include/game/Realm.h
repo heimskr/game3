@@ -45,7 +45,7 @@ namespace Game3 {
 			void reupload();
 			void rebind();
 			void generate(int seed = 666, double noise_zoom = 100., double noise_threshold = -0.15);
-			void generateHouse(int width, int height);
+			void generateHouse(RealmID parent_realm, const Position &entrance, int width, int height);
 			void createTown(size_t index, size_t width, size_t height, size_t pad);
 			int getWidth()  const { return tilemap1->width;  }
 			int getHeight() const { return tilemap1->height; }
@@ -60,6 +60,7 @@ namespace Game3 {
 			std::shared_ptr<TileEntity> tileEntityAt(const Position &) const;
 			void remove(const std::shared_ptr<Entity> &);
 			Position getPosition(Index) const;
+			void onMoved(const std::shared_ptr<Entity> &, const Position &);
 
 			template <typename T, typename... Args>
 			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {

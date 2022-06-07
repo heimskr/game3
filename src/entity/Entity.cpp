@@ -129,7 +129,7 @@ namespace Game3 {
 			return;
 
 		if (canMoveTo(new_position)) {
-			position = new_position;
+			teleport(new_position, false);
 			if (horizontal)
 				offset.x() = x_offset;
 			else
@@ -187,9 +187,11 @@ namespace Game3 {
 		canvas.center.y() = -(row()    - tilemap.height / 2.f);
 	}
 
-	void Entity::teleport(const Position &new_position) {
+	void Entity::teleport(const Position &new_position, bool clear_offset) {
 		position = new_position;
-		offset = {0.f, 0.f};
+		if (clear_offset)
+			offset = {0.f, 0.f};
+		getRealm()->onMoved(shared_from_this(), new_position);
 	}
 
 	void Entity::teleport(const Position &new_position, const std::shared_ptr<Realm> &new_realm) {

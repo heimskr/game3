@@ -1,5 +1,6 @@
 #include "game/Building.h"
 #include "game/Realm.h"
+#include "game/Teleporter.h"
 #include "game/TileEntity.h"
 
 namespace Game3 {
@@ -10,6 +11,9 @@ namespace Game3 {
 		switch (id) {
 			case TileEntity::BUILDING:
 				out = TileEntity::create<Building>();
+				break;
+			case TileEntity::TELEPORTER:
+				out = TileEntity::create<Teleporter>();
 				break;
 			default:
 				throw std::invalid_argument("Unrecognized TileEntity ID: " + std::to_string(id));

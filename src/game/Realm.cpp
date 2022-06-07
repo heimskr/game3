@@ -8,6 +8,7 @@
 #include "game/Building.h"
 #include "game/Game.h"
 #include "game/Realm.h"
+#include "game/Teleporter.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 
@@ -135,15 +136,16 @@ namespace Game3 {
 			continue;
 		}
 		candidate_timer.stop();
-		Timer::summary();
-		Timer::clear();
 
 		std::cout << "Found " << candidates.size() << " candidate" << (candidates.size() == 1? "" : "s") << ".\n";
 		if (!candidates.empty())
 			createTown(choose(candidates, uint_fast32_t(seed)) + pad * (tilemap1->width + 1), n, m, pad);
+
+		Timer::summary();
+		Timer::clear();
 	}
 
-	void Realm::generateHouse(int width, int height) {
+	void Realm::generateHouse(RealmID parent_realm, const Position &entrance, int width, int height) {
 		auto &layer1 = tilemap1->tiles;
 		auto &layer2 = tilemap2->tiles;
 
@@ -157,7 +159,10 @@ namespace Game3 {
 			for (int column = 0; column < width; ++column)
 				layer1[row * width + column] = HouseTiles::FLOOR;
 
+		const Index exit_index = width * height - 3;
 		layer2[width * height - 3] = HouseTiles::EMPTY;
+
+		add(TileEntity::create<Teleporter>(HouseTiles::EMPTY, getPosition(exit_index), parent_realm, entrance));
 	}
 
 	void Realm::createTown(const size_t index, size_t width, size_t height, size_t pad) {
@@ -197,6 +202,7 @@ namespace Game3 {
 		row = index / map_width + height / 2;
 		for (column = index % map_width - pad; column < index % map_width + width + pad; ++column) {
 			buildable_set.erase(row * map_width + column);
+			buildable_set.erase((index / map_width + height - 2) * map_width + column); // Make sure no houses spawn on the bottom row of the town
 			set1(OverworldTiles::ROAD);
 		}
 		column = index % map_width;
@@ -235,6 +241,7 @@ namespace Game3 {
 
 		std::vector<Index> buildable(buildable_set.cbegin(), buildable_set.cend());
 		shuffle(buildable, 666);
+		Timer timer("Houses");
 		if (2 < buildable.size()) {
 			buildable.erase(buildable.begin() + buildable.size() / 10, buildable.end());
 			buildable_set = std::unordered_set<Index>(buildable.cbegin(), buildable.cend());
@@ -248,11 +255,12 @@ namespace Game3 {
 				const RealmID realm_id = game->newRealmID();
 				const Index realm_width = 16;
 				const Index realm_height = 16;
-				auto building = TileEntity::create<Building>(house, Position(index / map_width, index % map_width), realm_id, realm_width * (realm_height - 1) - 3);
+				Position house_position {index / map_width, index % map_width};
+				auto building = TileEntity::create<Building>(house, house_position, realm_id, realm_width * (realm_height - 1) - 3);
 				auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, textureMap.at(Realm::HOUSE));
 				auto new_realm = std::make_shared<Realm>(realm_id, Realm::HOUSE, new_tilemap);
 				new_realm->game = game;
-				new_realm->generateHouse(realm_width, realm_height);
+				new_realm->generateHouse(id, house_position + Position(1, 0), realm_width, realm_height);
 				game->realms.emplace(realm_id, new_realm);
 				add(building);
 				buildable_set.erase(index);
@@ -267,6 +275,7 @@ namespace Game3 {
 				buildable_set.erase(index + 1);
 			}
 		}
+		timer.stop();
 	}
 
 	std::shared_ptr<Entity> Realm::add(const std::shared_ptr<Entity> &entity) {
@@ -337,6 +346,11 @@ namespace Game3 {
 
 	Position Realm::getPosition(Index index) const {
 		return {index / getWidth(), index % getWidth()};
+	}
+
+	void Realm::onMoved(const std::shared_ptr<Entity> &entity, const Position &position) {
+		if (auto tile_entity = tileEntityAt(position))
+			tile_entity->onOverlap(entity);
 	}
 
 	void to_json(nlohmann::json &json, const Realm &realm) {
