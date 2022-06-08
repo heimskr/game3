@@ -178,7 +178,7 @@ namespace Game3 {
 			activeTab->onFocus();
 		});
 
-		addTab(inventoryTab = std::make_shared<InventoryTab>(*this));
+		addTab(inventoryTab, *this);
 		activeTab = inventoryTab;
 
 		set_child(paned);
@@ -432,11 +432,6 @@ namespace Game3 {
 			});
 			chooser->show();
 		}));
-	}
-
-	void MainWindow::addTab(std::shared_ptr<Tab> tab) {
-		tabMap.emplace(&tab->getWidget(), tab);
-		notebook.append_page(tab->getWidget(), tab->getName());
 	}
 
 	void MainWindow::onGameLoaded() {

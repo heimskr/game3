@@ -121,10 +121,10 @@ namespace Game3 {
 		std::default_random_engine grass_rng;
 		grass_rng.seed(seed);
 
-		for (int i = 0; i < width; ++i)
-			for (int j = 0; j < height; ++j) {
-				double noise = perlin.GetValue(i / noise_zoom, j / noise_zoom, 0.666);
-				auto &tile = tiles1[j * width + i];
+		for (int row = 0; row < width; ++row)
+			for (int column = 0; column < height; ++column) {
+				double noise = perlin.GetValue(row / noise_zoom, column / noise_zoom, 0.666);
+				auto &tile = tiles1[column * width + row];
 				if (noise < noise_threshold)
 					tile = OverworldTiles::DEEPER_WATER;
 				else if (noise < noise_threshold + 0.1)

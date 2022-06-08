@@ -9,7 +9,7 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	InventoryTab::InventoryTab(MainWindow &main_window): mainWindow(main_window) {
+	InventoryTab::InventoryTab(MainWindow &main_window): Tab(main_window.notebook), mainWindow(main_window) {
 		scrolled.set_child(grid);
 		scrolled.set_vexpand(true);
 		auto gmenu = Gio::Menu::create();

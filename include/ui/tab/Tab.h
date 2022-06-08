@@ -8,6 +8,12 @@ namespace Game3 {
 
 	class Tab {
 		public:
+			Gtk::Notebook &notebook;
+
+			Tab(Gtk::Notebook &notebook_): notebook(notebook_) {}
+
+			virtual ~Tab() = default;
+
 			virtual Gtk::Widget & getWidget() = 0;
 			virtual Glib::ustring getName() = 0;
 			virtual void onFocus() {}
@@ -15,6 +21,7 @@ namespace Game3 {
 			virtual void onResize(const std::shared_ptr<Game> &) {}
 			virtual void update(const std::shared_ptr<Game> &) {}
 			virtual void reset(const std::shared_ptr<Game> &) {}
-			virtual ~Tab() {}
+			void hide();
+			void show();
 	};
 }

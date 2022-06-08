@@ -20,6 +20,7 @@ namespace Game3 {
 		public:
 			std::unique_ptr<Gtk::Dialog> dialog;
 			Gtk::HeaderBar *header = nullptr;
+			Gtk::Notebook notebook;
 			std::shared_ptr<Game> game;
 
 			MainWindow(BaseObjectType *, const Glib::RefPtr<Gtk::Builder> &);
@@ -54,7 +55,6 @@ namespace Game3 {
 			std::recursive_mutex functionQueueMutex;
 			Glib::Dispatcher functionQueueDispatcher;
 			Gtk::Paned paned;
-			Gtk::Notebook notebook;
 			Gtk::GLArea glArea;
 			std::unique_ptr<Canvas> canvas;
 			std::unordered_map<Gtk::Widget *, std::shared_ptr<Tab>> tabMap;
@@ -85,7 +85,20 @@ namespace Game3 {
 			void handleKey(guint keyval, guint keycode, Gdk::ModifierType);
 			void onNew();
 			void connectSave();
-			void addTab(std::shared_ptr<Tab>);
 			void onGameLoaded();
+
+			template <typename T>
+			void addTab(std::shared_ptr<T> &tab) {
+				tab = std::make_shared<T>(notebook);
+				tabMap.emplace(&tab->getWidget(), tab);
+				notebook.append_page(tab->getWidget(), tab->getName());
+			}
+
+			template <typename T, typename... Args>
+			void addTab(std::shared_ptr<T> &tab, Args && ...args) {
+				tab = std::make_shared<T>(std::forward<Args>(args)...);
+				tabMap.emplace(&tab->getWidget(), tab);
+				notebook.append_page(tab->getWidget(), tab->getName());
+			}
 	};
 }
