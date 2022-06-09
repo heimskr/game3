@@ -348,22 +348,29 @@ namespace Game3 {
 		if (2 < buildable.size()) {
 			buildable.erase(buildable.begin() + buildable.size() / 10, buildable.end());
 			buildable_set = std::unordered_set<Index>(buildable.cbegin(), buildable.cend());
-			std::vector<TileID> houses {OverworldTiles::HOUSE1, OverworldTiles::HOUSE2, OverworldTiles::HOUSE3};
 			while (!buildable_set.empty()) {
 				const auto index = *buildable_set.begin();
-				const auto house = choose(houses, rng);
-				layer2[index] = house;
-				const RealmID realm_id = game->newRealmID();
-				const Index realm_width = 9;
-				const Index realm_height = 9;
-				Position house_position {index / map_width, index % map_width};
-				auto building = TileEntity::create<Building>(house, house_position, realm_id, realm_width * (realm_height - 1) - 3);
-				auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, textureMap.at(Realm::HOUSE));
-				auto new_realm = Realm::create(realm_id, Realm::HOUSE, new_tilemap);
-				new_realm->game = game;
-				new_realm->generateHouse(id, rng, house_position + Position(1, 0), realm_width, realm_height);
-				game->realms.emplace(realm_id, new_realm);
-				add(building);
+				if (rng() % 8 == 0) {
+					constexpr static std::array<TileID, 3> markets {OverworldTiles::MARKET1, OverworldTiles::MARKET2, OverworldTiles::MARKET3};
+					const auto market = choose(markets, rng);
+					layer2[index] = market;
+				} else {
+					constexpr static std::array<TileID, 3> houses {OverworldTiles::HOUSE1, OverworldTiles::HOUSE2, OverworldTiles::HOUSE3};
+					const auto house = choose(houses, rng);
+					layer2[index] = house;
+					const RealmID realm_id = game->newRealmID();
+					const Index realm_width = 9;
+					const Index realm_height = 9;
+					Position house_position {index / map_width, index % map_width};
+					auto building = TileEntity::create<Building>(house, house_position, realm_id, realm_width * (realm_height - 1) - 3);
+					auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, textureMap.at(Realm::HOUSE));
+					auto new_realm = Realm::create(realm_id, Realm::HOUSE, new_tilemap);
+					new_realm->game = game;
+					new_realm->generateHouse(id, rng, house_position + Position(1, 0), realm_width, realm_height);
+					game->realms.emplace(realm_id, new_realm);
+					add(building);
+				}
+
 				buildable_set.erase(index);
 				// Some of these are sus if index happens to be at the west or east edge, but those aren't valid locations for houses anyway.
 				buildable_set.erase(index - map_width);
