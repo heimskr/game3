@@ -7,7 +7,10 @@
 #include "game/Game.h"
 #include "game/Realm.h"
 #include "tileentity/Sign.h"
+#include "ui/Canvas.h"
+#include "ui/MainWindow.h"
 #include "ui/SpriteRenderer.h"
+#include "ui/tab/TextTab.h"
 
 namespace Game3 {
 	void Sign::toJSON(nlohmann::json &json) const {
@@ -16,8 +19,12 @@ namespace Game3 {
 		json["name"] = name;
 	}
 
-	void Sign::onInteractNextTo(const std::shared_ptr<Player> &) {
+	void Sign::onInteractNextTo(const std::shared_ptr<Player> &player) {
 		getRealm()->getGame().setText(text, name, true, true);
+		player->queueForMove([player](const auto &) {
+			player->getRealm()->getGame().canvas.window.textTab->hide();
+			return true;
+		});
 	}
 
 	void Sign::absorbJSON(const nlohmann::json &json) {
