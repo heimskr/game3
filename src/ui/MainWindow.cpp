@@ -240,7 +240,6 @@ namespace Game3 {
 
 	bool MainWindow::render(const Glib::RefPtr<Gdk::GLContext> &context) {
 		context->make_current();
-		glArea.throw_if_error();
 		glClearColor(.2f, .2f, .2f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		if (autofocus && game && game->player)
