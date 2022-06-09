@@ -141,9 +141,10 @@ namespace Game3 {
 					auto &stack = storage.at(slot);
 					Glib::ustring label_text = stack.item->name;
 					if (stack.count != 1)
-						label_text += "\n\u00d7 " + std::to_string(stack.count);
+						label_text += " \u00d7 " + std::to_string(stack.count);
 					widget_ptr = std::make_unique<Gtk::Image>(inventory.getImage(slot));
 					auto &widget = *widget_ptr;
+					widget.set_tooltip_text(label_text);
 					auto left_click = Gtk::GestureClick::create();
 					auto right_click = Gtk::GestureClick::create();
 					left_click->set_button(1);
