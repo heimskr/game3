@@ -126,6 +126,13 @@ namespace Game3 {
 		});
 		glArea.add_controller(motion);
 
+		auto click = Gtk::GestureClick::create();
+		click->signal_released().connect([this](int n, double x, double y) {
+			if (game)
+				game->click(n, x, y);
+		});
+		glArea.add_controller(click);
+
 		auto scroll = Gtk::EventControllerScroll::create();
 		scroll->set_flags(Gtk::EventControllerScroll::Flags::VERTICAL);
 		scroll->signal_scroll().connect([this](double, double y) {
