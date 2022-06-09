@@ -24,6 +24,8 @@ namespace Game3 {
 			void onBlur() override;
 			void update(const std::shared_ptr<Game> &) override;
 			void reset(const std::shared_ptr<Game> &) override;
+			Glib::ustring getText() const;
+			void setEditable(bool);
 
 		private:
 			Gtk::ScrolledWindow scrolled;

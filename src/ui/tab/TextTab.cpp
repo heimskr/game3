@@ -8,6 +8,8 @@ namespace Game3 {
 		textTagTable = Gtk::TextTagTable::create();
 		textBuffer = Gtk::TextBuffer::create(textTagTable);
 		textView.set_buffer(textBuffer);
+		textView.add_css_class("text-tab");
+		setEditable(false);
 		scrolled.set_child(textView);
 		scrolled.set_vexpand(true);
 	}
@@ -27,5 +29,14 @@ namespace Game3 {
 
 		textBuffer->set_text(text);
 		setName(name);
+	}
+
+	Glib::ustring TextTab::getText() const {
+		return textBuffer->get_text();
+	}
+
+	void TextTab::setEditable(bool editable) {
+		textView.set_editable(editable);
+		textView.set_cursor_visible(editable);
 	}
 }
