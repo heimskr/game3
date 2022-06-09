@@ -214,7 +214,14 @@ namespace Game3 {
 		position = new_position;
 		if (clear_offset)
 			offset = {0.f, 0.f};
-		getRealm()->onMoved(shared_from_this(), new_position);
+		auto shared = shared_from_this();
+		getRealm()->onMoved(shared, new_position);
+		for (auto iter = moveQueue.begin(); iter != moveQueue.end();) {
+			if ((*iter)(shared))
+				moveQueue.erase(iter++);
+			else
+				++iter;
+		}
 	}
 
 	void Entity::teleport(const Position &new_position, const std::shared_ptr<Realm> &new_realm) {
@@ -243,6 +250,10 @@ namespace Game3 {
 		std::stringstream sstream;
 		sstream << "Entity[type=" << id_ << ", position=" << position << ", realm=" << realmID << ", direction=" << direction << ']';
 		return sstream.str();
+	}
+
+	void Entity::queueForMove(const std::function<bool(const std::shared_ptr<Entity> &)> &function) {
+		moveQueue.push_back(function);
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {

@@ -177,6 +177,15 @@ namespace Game3 {
 				reset(owner->getRealm()->getGame().shared_from_this());
 	}
 
+	void InventoryTab::resetExternalInventory() {
+		auto old_inventory = externalInventory;
+		externalInventory.reset();
+		externalName.clear();
+		if (old_inventory)
+			if (auto owner = old_inventory->owner.lock())
+				reset(owner->getRealm()->getGame().shared_from_this());
+	}
+
 	int InventoryTab::gridWidth() const {
 		return scrolled.get_width() / (TILE_SIZE + 2 * TILE_MARGIN);
 	}

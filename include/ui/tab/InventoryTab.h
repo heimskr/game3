@@ -22,6 +22,7 @@ namespace Game3 {
 			void update(const std::shared_ptr<Game> &) override;
 			void reset(const std::shared_ptr<Game> &) override;
 			void setExternalInventory(const Glib::ustring &name, const std::shared_ptr<Inventory> &);
+			void resetExternalInventory();
 			std::shared_ptr<Inventory> getExternalInventory() const { return externalInventory; }
 
 		private:

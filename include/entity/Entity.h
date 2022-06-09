@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+#include <list>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -86,12 +88,15 @@ namespace Game3 {
 			/** Returns the position of the tile in front of the entity. */
 			Position nextTo() const;
 			std::string debug() const;
+			void queueForMove(const std::function<bool(const std::shared_ptr<Entity> &)> &);
 
 		protected:
 			Entity() = delete;
 			Entity(EntityID id__): id_(id__) {}
 			Texture *texture = nullptr;
 			bool canMoveTo(const Position &) const;
+			/** A list of functions to call the next time the entity moves. The functions return whether they should be removed from the queue. */
+			std::list<std::function<bool(const std::shared_ptr<Entity> &)>> moveQueue;
 
 		private:
 			EntityID id_ = 0;

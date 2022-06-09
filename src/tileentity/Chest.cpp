@@ -21,14 +21,18 @@ namespace Game3 {
 
 	void Chest::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
+		json["texture"] = texture;
 		if (inventory)
 			json["inventory"] = *inventory;
 		json["name"] = name;
 	}
 
-	void Chest::onInteractNextTo(const std::shared_ptr<Player> &) {
-		// getRealm()->getGame().setText("Wow!", "Chest", true, true);
+	void Chest::onInteractNextTo(const std::shared_ptr<Player> &player) {
 		auto &tab = *getRealm()->getGame().canvas.window.inventoryTab;
+		player->queueForMove([player, &tab](const auto &) {
+			tab.resetExternalInventory();
+			return true;
+		});
 		tab.setExternalInventory(name, inventory);
 	}
 
@@ -37,6 +41,8 @@ namespace Game3 {
 		if (json.contains("inventory"))
 			inventory = std::make_shared<Inventory>(Inventory::fromJSON(json.at("inventory"), shared_from_this()));
 		name = json.at("name");
+		texture = json.at("texture");
+		texture.init();
 	}
 
 	void Chest::render(SpriteRenderer &sprite_renderer) {
