@@ -175,7 +175,6 @@ namespace Game3 {
 		paned.set_shrink_start_child(false);
 		paned.set_resize_end_child(false);
 		paned.set_shrink_end_child(false);
-		notebook.set_size_request(402, -1);
 		paned.property_position().signal_changed().connect([this] {
 			tabMap.at(notebook.get_nth_page(notebook.get_current_page()))->onResize(game);
 		});
@@ -191,6 +190,9 @@ namespace Game3 {
 		activeTab = inventoryTab;
 
 		set_child(paned);
+		delay([this] {
+			paned.set_position(paned.get_width() - 403);
+		}, 2);
 	}
 
 	void MainWindow::newGame(int seed, int width, int height) {
