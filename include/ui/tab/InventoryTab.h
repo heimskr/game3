@@ -36,7 +36,8 @@ namespace Game3 {
 			Gtk::Box vbox {Gtk::Orientation::VERTICAL};
 			Gtk::Box hbox {Gtk::Orientation::HORIZONTAL};
 			Gtk::PopoverMenu popoverMenu;
-			std::vector<std::unique_ptr<Gtk::Widget>> gridWidgets;
+			std::vector<std::unique_ptr<Gtk::Widget>> playerWidgets;
+			std::vector<std::unique_ptr<Gtk::Widget>> externalWidgets;
 			int lastGridWidth = 0;
 			std::shared_ptr<Inventory> externalInventory;
 			Glib::ustring externalName;

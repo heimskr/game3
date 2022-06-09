@@ -119,8 +119,13 @@ namespace Game3 {
 
 		removeChildren(playerGrid);
 		removeChildren(externalGrid);
-		externalLabel.set_text(externalName);
-		gridWidgets.clear();
+		if (!externalName.empty()) {
+			externalLabel.set_text(externalName);
+			externalLabel.show();
+		}
+
+		playerWidgets.clear();
+		externalWidgets.clear();
 
 		const int grid_width = lastGridWidth = gridWidth();
 		const int tile_size  = playerGrid.get_width() / (playerGrid.get_width() / TILE_SIZE);
@@ -158,7 +163,7 @@ namespace Game3 {
 				label_ptr->set_data("slot", reinterpret_cast<void *>(slot));
 				label_ptr->set_data("external", reinterpret_cast<void *>(external));
 				grid.attach(*label_ptr, column, row);
-				gridWidgets.push_back(std::move(label_ptr));
+				(external? externalWidgets : playerWidgets).push_back(std::move(label_ptr));
 			}
 		};
 
@@ -178,12 +183,12 @@ namespace Game3 {
 	}
 
 	void InventoryTab::resetExternalInventory() {
-		auto old_inventory = externalInventory;
+		removeChildren(externalGrid);
+		externalLabel.hide();
+		externalLabel.set_text("");
+		externalWidgets.clear();
 		externalInventory.reset();
 		externalName.clear();
-		if (old_inventory)
-			if (auto owner = old_inventory->owner.lock())
-				reset(owner->getRealm()->getGame().shared_from_this());
 	}
 
 	int InventoryTab::gridWidth() const {
