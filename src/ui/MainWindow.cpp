@@ -193,7 +193,7 @@ namespace Game3 {
 
 		set_child(paned);
 		delay([this] {
-			paned.set_position(paned.get_width() - 403);
+			paned.set_position(paned.get_width() - 344);
 		}, 2);
 	}
 
@@ -370,8 +370,10 @@ namespace Game3 {
 						}
 						return;
 					case GDK_KEY_o: {
-						ItemStack potion(Item::RED_POTION, 1);
-						auto leftover = player.inventory->add(potion);
+						static std::default_random_engine item_rng;
+						static const std::array<ItemID, 2> ids {Item::SHORTSWORD, Item::RED_POTION};
+						ItemStack stack(choose(ids, item_rng), 1);
+						auto leftover = player.inventory->add(stack);
 						if (leftover) {
 							auto &realm = *player.getRealm();
 							realm.spawn<ItemEntity>(player.position, *leftover);

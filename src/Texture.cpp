@@ -13,18 +13,19 @@ namespace Game3 {
 	void Texture::init() {
 		if (!valid_) {
 			int channels = 0;
-			unsigned char *data = stbi_load(path.c_str(), &width, &height, &channels, 0);
-			if (data == nullptr)
+			uint8_t *raw = stbi_load(path.c_str(), &width, &height, &channels, 0);
+			if (raw == nullptr)
 				throw std::runtime_error("Couldn't load image from " + path.string());
 			glGenTextures(1, &id);
 			glBindTexture(GL_TEXTURE_2D, id);
-			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, raw);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
 			glBindTexture(GL_TEXTURE_2D, 0);
 			valid_ = true;
+			data = std::shared_ptr<uint8_t>(raw);
 		}
 	}
 

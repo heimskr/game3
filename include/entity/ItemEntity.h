@@ -7,13 +7,6 @@
 #include "game/Item.h"
 
 namespace Game3 {
-	struct ItemTexture {
-		float x;
-		float y;
-		Texture *texture;
-		ItemTexture() = delete;
-		ItemTexture(float x_, float y_, Texture &texture_): x(x_), y(y_), texture(&texture_) {}
-	};
 
 	class ItemEntity: public Entity {
 		public:
@@ -38,7 +31,6 @@ namespace Game3 {
 
 			void interact(const std::shared_ptr<Player> &);
 
-			static std::unordered_map<ItemID, ItemTexture> itemTextureMap;
 			static Texture missing;
 	};
 

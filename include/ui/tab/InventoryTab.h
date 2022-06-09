@@ -27,7 +27,7 @@ namespace Game3 {
 
 		private:
 			constexpr static int TILE_MARGIN = 2;
-			constexpr static int TILE_SIZE = 100 - 2 * TILE_MARGIN;
+			constexpr static int TILE_SIZE = 64;
 
 			Gtk::ScrolledWindow scrolled;
 			Gtk::Grid playerGrid;
@@ -48,8 +48,8 @@ namespace Game3 {
 			bool lastExternal = false;
 
 			int gridWidth() const;
-			void leftClick(const std::shared_ptr<Game> &, Gtk::Label &, int click_count, Slot, bool external, double x, double y);
-			void rightClick(const std::shared_ptr<Game> &, Gtk::Label &, int click_count, Slot, bool external, double x, double y);
-			Gtk::Label & getDraggedItem();
+			void leftClick(const std::shared_ptr<Game> &, Gtk::Widget *, int click_count, Slot, bool external, double x, double y);
+			void rightClick(const std::shared_ptr<Game> &, Gtk::Widget *, int click_count, Slot, bool external, double x, double y);
+			Gtk::Widget & getDraggedItem();
 	};
 }

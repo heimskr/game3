@@ -8,14 +8,6 @@
 #include "ui/SpriteRenderer.h"
 
 namespace Game3 {
-	static Texture textureShortsword  {"resources/items/SwordShort.png"};
-	static Texture textureConsumables {"resources/rpg/consumables.png"};
-	static Texture texturePotions     {"resources/rpg/potions.png"};
-
-	std::unordered_map<ItemID, ItemTexture> ItemEntity::itemTextureMap {
-		{Item::SHORTSWORD, {0.f, 0.f, textureShortsword}},
-		{Item::RED_POTION, {48.f, 176.f, texturePotions}},
-	};
 
 	Texture ItemEntity::missing = {"resources/missing.png"};
 
@@ -24,7 +16,7 @@ namespace Game3 {
 
 	void ItemEntity::setStack(const ItemStack &stack_) {
 		stack = stack_;
-		const auto &item_texture = itemTextureMap.at(stack_.item->id);
+		const auto &item_texture = Item::itemTextures.at(stack_.item->id);
 		texture = item_texture.texture;
 		xOffset = item_texture.x / 2.f;
 		yOffset = item_texture.y / 2.f;
@@ -50,7 +42,7 @@ namespace Game3 {
 
 	void ItemEntity::init() {
 		Entity::init();
-		const auto &item_texture = itemTextureMap.at(stack.item->id);
+		const auto &item_texture = Item::itemTextures.at(stack.item->id);
 		texture = item_texture.texture;
 		xOffset = item_texture.x / 2.f;
 		yOffset = item_texture.y / 2.f;
@@ -59,7 +51,6 @@ namespace Game3 {
 	void ItemEntity::render(SpriteRenderer &sprite_renderer) const {
 		if (texture == nullptr)
 			return;
-
 
 		const float x = position.column + offset.x();
 		const float y = position.row + offset.y();
