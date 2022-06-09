@@ -9,6 +9,7 @@ namespace Game3 {
 		textBuffer = Gtk::TextBuffer::create(textTagTable);
 		textView.set_buffer(textBuffer);
 		textView.add_css_class("text-tab");
+		textView.set_wrap_mode(Gtk::WrapMode::WORD_CHAR);
 		setEditable(false);
 		scrolled.set_child(textView);
 		scrolled.set_vexpand(true);
