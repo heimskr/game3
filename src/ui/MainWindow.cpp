@@ -227,6 +227,8 @@ namespace Game3 {
 					throw std::runtime_error("Couldn't cast entity with isPlayer() == true to Player");
 				break;
 			}
+		if (!game->player)
+			throw std::runtime_error("Player not found in active realm");
 		onGameLoaded();
 	}
 
