@@ -11,6 +11,7 @@ namespace Game3 {
 		TileSet() = default;
 		virtual ~TileSet() = default;
 		virtual bool isLand(TileID) const = 0;
+		virtual bool isWalkable(TileID id) const { return isLand(id); }
 		virtual bool isSolid(TileID) const = 0;
 		virtual TileID getEmpty() const { return 0; }
 		virtual const char * name() const = 0;
@@ -47,6 +48,10 @@ namespace Game3 {
 
 		bool isLand(TileID tile) const override {
 			return landSet.contains(tile);
+		}
+
+		bool isWalkable(TileID tile) const override {
+			return landSet.contains(tile) || tile == SHALLOW_WATER;
 		}
 
 		bool isSolid(TileID tile) const override {
