@@ -207,12 +207,32 @@ namespace Game3 {
 		add(TileEntity::create<Teleporter>(choose(doors, rng), getPosition(exit_index), parent_realm, entrance));
 
 		switch(rng() % 2) {
-			case 0:
+			case 0: {
+				static std::array<std::string, 13> texts {
+					"Express ideas directly in code.",
+					"Write in ISO Standard C++.",
+					"Express intent.",
+					"Ideally, a program should be statically type safe.",
+					"Prefer compile-time checking to run-time checking.",
+					"What cannot be checked at compile time should be checkable at run time.",
+					"Catch run-time errors early.",
+					"Don't leak any resources.",
+					"Don't waste time or space.",
+					"Prefer immutable data to mutable data.",
+					"Encapsulate messy constructs, rather than spreading through the code.",
+					"Use supporting tools as appropriate.",
+					"Use support libraries as appropriate."
+				};
+
+				auto shuffled_texts = texts;
+				std::shuffle(shuffled_texts.begin(), shuffled_texts.end(), rng);
+
 				for (Index index = width + 2; index < 2 * width - 2; ++index) {
 					layer2[index] = HouseTiles::BOOKSHELF;
-					add(TileEntity::create<Sign>(HouseTiles::EMPTY, getPosition(index), "Sample text " + std::to_string(rng()), "Bookshelf"));
+					add(TileEntity::create<Sign>(HouseTiles::EMPTY, getPosition(index), shuffled_texts.at((index - width - 2) % shuffled_texts.size()), "Bookshelf"));
 				}
 				break;
+			}
 			default:
 				break;
 		}
