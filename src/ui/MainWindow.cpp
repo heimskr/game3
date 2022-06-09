@@ -242,7 +242,7 @@ namespace Game3 {
 		context->make_current();
 		glArea.throw_if_error();
 		glClearColor(.2f, .2f, .2f, 1.f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT);
 		if (autofocus && game && game->player)
 			game->player->focus(*canvas, true);
 		canvas->drawGL();
