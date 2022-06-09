@@ -56,11 +56,11 @@ namespace Game3 {
 
 	void Player::teleport(const Position &position, const std::shared_ptr<Realm> &new_realm) {
 		Entity::teleport(position, new_realm);
-		auto &new_game = new_realm->getGame();
-		new_game.canvas.window.glContext()->make_current();
+		auto &game = new_realm->getGame();
+		game.activeRealm = new_realm;
+		game.canvas.window.glContext()->make_current();
 		new_realm->reupload();
-		new_game.activeRealm = new_realm;
-		focus(new_game.canvas, false);
+		focus(game.canvas, false);
 	}
 
 	void to_json(nlohmann::json &json, const Player &player) {
