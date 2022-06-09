@@ -243,8 +243,8 @@ namespace Game3 {
 		glArea.throw_if_error();
 		glClearColor(.2f, .2f, .2f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		if (autoFocus && game && game->player)
-			game->player->focus(*canvas, false);
+		if (autofocus && game && game->player)
+			game->player->focus(*canvas, true);
 		canvas->drawGL();
 		return true;
 	}
@@ -330,7 +330,7 @@ namespace Game3 {
 		}
 	}
 
-	void MainWindow::handleKey(guint keyval, guint keycode, Gdk::ModifierType modifiers) {
+	void MainWindow::handleKey(guint keyval, guint, Gdk::ModifierType modifiers) {
 		if (canvas) {
 			if (game && game->player) {
 				auto &player = *game->player;
@@ -369,7 +369,7 @@ namespace Game3 {
 					}
 					case GDK_KEY_r:
 						if (game && modifiers == Gdk::ModifierType::CONTROL_MASK)
-							game->player->focus(*canvas);
+							game->player->focus(*canvas, false);
 						return;
 					case GDK_KEY_E:
 						game->player->interactOn();
@@ -383,9 +383,9 @@ namespace Game3 {
 						return;
 					case GDK_KEY_f:
 						if (unsigned(modifiers & Gdk::ModifierType::CONTROL_MASK) != 0)
-							autoFocus = !autoFocus;
+							autofocus = !autofocus;
 						else
-							game->player->focus(*canvas);
+							game->player->focus(*canvas, false);
 						return;
 				}
 			}
@@ -448,7 +448,7 @@ namespace Game3 {
 
 	void MainWindow::onGameLoaded() {
 		glArea.get_context()->make_current();
-		game->player->focus(*canvas);
+		game->player->focus(*canvas, false);
 		canvas->game = game;
 		game->activeRealm->rebind();
 		game->activeRealm->reupload();

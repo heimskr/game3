@@ -187,14 +187,18 @@ namespace Game3 {
 		return true;
 	}
 
-	void Entity::focus(Canvas &canvas, bool reset_scale) {
+	void Entity::focus(Canvas &canvas, bool is_autofocus) {
 		auto realm = weakRealm.lock();
 		if (!realm)
 			return;
 
-		const auto &tilemap = *realm->tilemap1;
-		if (reset_scale)
+		if (!is_autofocus)
 			canvas.scale = 4.f;
+		else if (++canvas.autofocusCounter < Canvas::AUTOFOCUS_DELAY)
+			return;
+
+		canvas.autofocusCounter = 0;
+		const auto &tilemap = *realm->tilemap1;
 		canvas.center.x() = -(column() - tilemap.width  / 2.f + 0.5f) - offset.x();
 		canvas.center.y() = -(row()    - tilemap.height / 2.f + 0.5f) - offset.y();
 	}

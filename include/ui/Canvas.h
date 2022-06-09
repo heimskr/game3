@@ -20,6 +20,7 @@ namespace Game3 {
 	class Canvas {
 		public:
 			constexpr static float DEFAULT_SCALE = 2.f;
+			constexpr static int AUTOFOCUS_DELAY = 1;
 
 			MainWindow &window;
 			std::shared_ptr<Game> game;
@@ -28,13 +29,11 @@ namespace Game3 {
 			SpriteRenderer spriteRenderer {*this};
 			RectangleRenderer rectangleRenderer {*this};
 			float magic = 8.f;
+			int autofocusCounter = 0;
 
 			Canvas(MainWindow &);
 
-			// void draw(NVGcontext *);
 			void drawGL();
-			// bool scrollEvent(const nanogui::Vector2i &p, const nanogui::Vector2f &rel) override;
-			// bool mouseDragEvent(const nanogui::Vector2i &p, const nanogui::Vector2i &rel, int button, int modifiers) override;
 			// bool mouseButtonEvent(const nanogui::Vector2i &p, int button, bool down, int modifiers) override;
 			int width();
 			int height();

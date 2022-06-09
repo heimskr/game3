@@ -60,7 +60,7 @@ namespace Game3 {
 		new_game.canvas.window.glContext()->make_current();
 		new_realm->reupload();
 		new_game.activeRealm = new_realm;
-		focus(new_game.canvas);
+		focus(new_game.canvas, false);
 	}
 
 	void to_json(nlohmann::json &json, const Player &player) {
