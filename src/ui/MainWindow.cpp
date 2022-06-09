@@ -17,7 +17,7 @@
 // #define USE_CBOR
 
 namespace Game3 {
-	static std::chrono::milliseconds arrowTime {5};
+	static std::chrono::milliseconds arrowTime {100};
 	static std::chrono::milliseconds interactTime {500};
 	std::unordered_map<guint, std::chrono::milliseconds> MainWindow::customKeyRepeatTimes {
 		{GDK_KEY_Up,    arrowTime},
