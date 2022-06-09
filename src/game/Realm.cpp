@@ -208,7 +208,7 @@ namespace Game3 {
 
 		switch(rng() % 2) {
 			case 0: {
-				static std::array<std::string, 13> texts {
+				const static std::array<std::string, 13> texts {
 					"Express ideas directly in code.",
 					"Write in ISO Standard C++.",
 					"Express intent.",
@@ -344,8 +344,8 @@ namespace Game3 {
 				const auto house = choose(houses, rng);
 				layer2[index] = house;
 				const RealmID realm_id = game->newRealmID();
-				const Index realm_width = 13;
-				const Index realm_height = 13;
+				const Index realm_width = 9;
+				const Index realm_height = 9;
 				Position house_position {index / map_width, index % map_width};
 				auto building = TileEntity::create<Building>(house, house_position, realm_id, realm_width * (realm_height - 1) - 3);
 				auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, textureMap.at(Realm::HOUSE));
