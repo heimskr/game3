@@ -8,8 +8,13 @@
 #include "ui/SpriteRenderer.h"
 
 namespace Game3 {
-	std::unordered_map<ItemID, Texture> ItemEntity::itemTextureMap {
-		{Item::SHORTSWORD, Texture("resources/items/SwordShort.png")},
+	static Texture textureShortsword  {"resources/items/SwordShort.png"};
+	static Texture textureConsumables {"resources/rpg/consumables.png"};
+	static Texture texturePotions     {"resources/rpg/potions.png"};
+
+	std::unordered_map<ItemID, ItemTexture> ItemEntity::itemTextureMap {
+		{Item::SHORTSWORD, {0.f, 0.f, textureShortsword}},
+		{Item::RED_POTION, {48.f, 176.f, texturePotions}},
 	};
 
 	Texture ItemEntity::missing = {"resources/missing.png"};
@@ -18,8 +23,11 @@ namespace Game3 {
 		Entity(Entity::ITEM), stack(stack_) {}
 
 	void ItemEntity::setStack(const ItemStack &stack_) {
-		stack   = stack_;
-		texture = &itemTextureMap.at(stack_.item->id);
+		stack = stack_;
+		const auto &item_texture = itemTextureMap.at(stack_.item->id);
+		texture = item_texture.texture;
+		xOffset = item_texture.x / 2.f;
+		yOffset = item_texture.y / 2.f;
 	}
 
 	std::shared_ptr<ItemEntity> ItemEntity::create(const ItemStack &stack) {
@@ -42,19 +50,26 @@ namespace Game3 {
 
 	void ItemEntity::init() {
 		Entity::init();
-		texture = &itemTextureMap.at(stack.item->id);
+		const auto &item_texture = itemTextureMap.at(stack.item->id);
+		texture = item_texture.texture;
+		xOffset = item_texture.x / 2.f;
+		yOffset = item_texture.y / 2.f;
 	}
 
 	void ItemEntity::render(SpriteRenderer &sprite_renderer) const {
 		if (texture == nullptr)
 			return;
 
+
 		const float x = position.column + offset.x();
 		const float y = position.row + offset.y();
 
 		switch (stack.item->id) {
 			case Item::SHORTSWORD:
-				sprite_renderer.drawOnMap(*texture, x, y, 0.f, 0.f, 16.f, 16.f);
+				sprite_renderer.drawOnMap(*texture, x, y, xOffset, yOffset, 16.f, 16.f);
+				break;
+			case Item::RED_POTION:
+				sprite_renderer.drawOnMap(*texture, x + .25f, y + .25f, xOffset, yOffset, 16.f, 16.f, .5f);
 				break;
 			default:
 				sprite_renderer.drawOnMap(missing, x, y, 0.f, 0.f, 16.f, 16.f);

@@ -65,9 +65,8 @@ namespace Game3 {
 
 		size_x *= canvas.scale / 2.f;
 		size_y *= canvas.scale / 2.f;
-		scale *= canvas.scale / 2.f;
-		x_offset *= canvas.scale;
-		y_offset *= canvas.scale;
+		x_offset *= canvas.scale * scale;
+		y_offset *= canvas.scale * scale;
 
 		shader.bind();
 
@@ -77,7 +76,7 @@ namespace Game3 {
 		model = glm::translate(model, glm::vec3(0.5f * texture.width, 0.5f * texture.height, 0.f)); // move origin of rotation to center of quad
 		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
 		model = glm::translate(model, glm::vec3(-0.5f * texture.width, -0.5f * texture.height, 0.f)); // move origin back
-		model = glm::scale(model, glm::vec3(texture.width * scale, texture.height * scale, 2.f)); // last scale
+		model = glm::scale(model, glm::vec3(texture.width * scale * canvas.scale / 2.f, texture.height * scale * canvas.scale / 2.f, 2.f)); // last scale
 
 		glUniformMatrix4fv(shader.uniform("model"), 1, GL_FALSE, glm::value_ptr(model)); CHECKGL
 		glUniform4f(shader.uniform("spriteColor"), 1.f, 1.f, 1.f, alpha); CHECKGL
@@ -86,7 +85,7 @@ namespace Game3 {
 		texture.bind(); CHECKGL
 
 		glEnable(GL_SCISSOR_TEST);
-		glScissor(2 * x, 2 * (backbufferHeight - y - size_y), 2 * size_x, 2 * size_y);
+		glScissor(2 * x, 2 * (backbufferHeight - y - size_y * scale), 2 * size_x * scale, 2 * size_y * scale);
 		glBindVertexArray(quadVAO); CHECKGL
 		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
 		glBindVertexArray(0); CHECKGL

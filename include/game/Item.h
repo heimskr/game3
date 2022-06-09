@@ -10,10 +10,11 @@
 namespace Game3 {
 	class Item {
 		public:
-			static std::map<ItemID, std::shared_ptr<Item>> ITEMS;
-
 			constexpr static ItemID NOTHING = 0;
 			constexpr static ItemID SHORTSWORD = 1;
+			constexpr static ItemID RED_POTION = 2;
+
+			static std::map<ItemID, std::shared_ptr<Item>> ITEMS;
 
 			ItemID id = 0;
 			std::string name;

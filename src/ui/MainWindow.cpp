@@ -370,8 +370,8 @@ namespace Game3 {
 						}
 						return;
 					case GDK_KEY_o: {
-						ItemStack sword(Item::SHORTSWORD, 1);
-						auto leftover = player.inventory->add(sword);
+						ItemStack potion(Item::RED_POTION, 1);
+						auto leftover = player.inventory->add(potion);
 						if (leftover) {
 							auto &realm = *player.getRealm();
 							realm.spawn<ItemEntity>(player.position, *leftover);

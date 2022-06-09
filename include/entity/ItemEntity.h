@@ -7,6 +7,14 @@
 #include "game/Item.h"
 
 namespace Game3 {
+	struct ItemTexture {
+		float x;
+		float y;
+		Texture *texture;
+		ItemTexture() = delete;
+		ItemTexture(float x_, float y_, Texture &texture_): x(x_), y(y_), texture(&texture_) {}
+	};
+
 	class ItemEntity: public Entity {
 		public:
 			const ItemStack & getStack() const { return stack; }
@@ -23,12 +31,14 @@ namespace Game3 {
 
 		private:
 			ItemEntity(const ItemStack &);
+			float xOffset = 0.f;
+			float yOffset = 0.f;
 
 			ItemStack stack;
 
 			void interact(const std::shared_ptr<Player> &);
 
-			static std::unordered_map<ItemID, Texture> itemTextureMap;
+			static std::unordered_map<ItemID, ItemTexture> itemTextureMap;
 			static Texture missing;
 	};
 

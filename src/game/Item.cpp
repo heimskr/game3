@@ -3,6 +3,7 @@
 namespace Game3 {
 	std::map<ItemID, std::shared_ptr<Item>> Item::ITEMS {
 		{Item::SHORTSWORD, std::make_shared<Item>(Item::SHORTSWORD, "Shortsword", 1)},
+		{Item::RED_POTION, std::make_shared<Item>(Item::RED_POTION, "Red Potion", 8)},
 	};
 
 	bool ItemStack::canMerge(const ItemStack &other) const {
