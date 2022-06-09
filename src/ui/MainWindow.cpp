@@ -6,6 +6,7 @@
 #include "game/Game.h"
 #include "ui/gtk/NewGameDialog.h"
 #include "ui/tab/InventoryTab.h"
+#include "ui/tab/TextTab.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 
@@ -178,7 +179,8 @@ namespace Game3 {
 			activeTab->onFocus();
 		});
 
-		addTab(inventoryTab, *this);
+		initTab(inventoryTab, *this).add();
+		initTab(textTab, notebook, "", "");
 		activeTab = inventoryTab;
 
 		set_child(paned);
@@ -186,7 +188,7 @@ namespace Game3 {
 
 	void MainWindow::newGame(int seed, int width, int height) {
 		glArea.get_context()->make_current();
-		game = std::make_shared<Game>(*canvas);
+		game = Game::create(*canvas);
 		Texture texture("resources/tileset2.png", true);
 		texture.init();
 		auto tilemap = std::make_shared<Tilemap>(width, height, 16, texture);

@@ -1,4 +1,9 @@
+#include <nanogui/opengl.h>
+
 #include "game/Game.h"
+#include "ui/Canvas.h"
+#include "ui/MainWindow.h"
+#include "ui/tab/TextTab.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -24,10 +29,31 @@ namespace Game3 {
 		return max + 1;
 	}
 
+	void Game::setText(const Glib::ustring &text, const Glib::ustring &name, bool focus) {
+		if (canvas.window.textTab) {
+			auto &tab = *canvas.window.textTab;
+			tab.text = text;
+			tab.name = name;
+			if (focus)
+				tab.show();
+			tab.reset(shared_from_this());
+		}
+	}
+
+	const Glib::ustring & Game::getText() const {
+		if (canvas.window.textTab)
+			return canvas.window.textTab->text;
+		throw std::runtime_error("Can't get text: TextTab is null");
+	}
+
+	std::shared_ptr<Game> Game::create(Canvas &canvas) {
+		return std::shared_ptr<Game>(new Game(canvas));
+	}
+
 	std::shared_ptr<Game> Game::fromJSON(const nlohmann::json &json, Canvas &canvas) {
-		auto out = std::make_shared<Game>(canvas);
+		auto out = create(canvas);
 		for (const auto &[string, realm_json]: json.at("realms").get<std::unordered_map<std::string, nlohmann::json>>())
-			out->realms.emplace(parseUlong(string), Realm::fromJSON(realm_json)).first->second->game = out.get();
+			out->realms.emplace(parseUlong(string), Realm::fromJSON(realm_json)).first->second->setGame(*out);
 		out->activeRealm = out->realms.at(json.at("activeRealmID"));
 		return out;
 	}

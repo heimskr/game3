@@ -11,11 +11,7 @@ namespace Game3 {
 	}
 
 	void Building::onInteractNextTo(const std::shared_ptr<Player> &player) {
-		auto realm = getRealm();
-		auto *game = realm->game;
-		if (game == nullptr)
-			throw std::runtime_error("Realm " + std::to_string(realm->id) + " has a null game");
-		player->teleport(entrance, game->realms.at(innerRealmID));
+		player->teleport(entrance, getRealm()->getGame().realms.at(innerRealmID));
 	}
 
 	void Building::absorbJSON(const nlohmann::json &json) {

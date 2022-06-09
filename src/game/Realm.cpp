@@ -210,7 +210,7 @@ namespace Game3 {
 			case 0:
 				for (Index index = width + 2; index < 2 * width - 2; ++index) {
 					layer2[index] = HouseTiles::BOOKSHELF;
-					add(TileEntity::create<Sign>(HouseTiles::EMPTY, getPosition(index), "Sample text " + std::to_string(rng())));
+					add(TileEntity::create<Sign>(HouseTiles::EMPTY, getPosition(index), "Sample text " + std::to_string(rng()), "Bookshelf"));
 				}
 				break;
 			default:
@@ -422,6 +422,16 @@ namespace Game3 {
 	void Realm::onMoved(const std::shared_ptr<Entity> &entity, const Position &position) {
 		if (auto tile_entity = tileEntityAt(position))
 			tile_entity->onOverlap(entity);
+	}
+
+	void Realm::setGame(Game &game_) {
+		game = &game_;
+	}
+
+	Game & Realm::getGame() {
+		if (!game)
+			throw std::runtime_error("Game is null for realm " + std::to_string(id));
+		return *game;
 	}
 
 	void to_json(nlohmann::json &json, const Realm &realm) {

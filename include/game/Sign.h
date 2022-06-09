@@ -6,6 +6,7 @@ namespace Game3 {
 	class Sign: public TileEntity {
 		public:
 			std::string text;
+			std::string name;
 
 			Sign(const Sign &) = delete;
 			Sign(Sign &&) = default;
@@ -23,8 +24,8 @@ namespace Game3 {
 
 		protected:
 			Sign() = default;
-			Sign(TileID id_, const Position &position_, const std::string &text_):
-				TileEntity(id_, TileEntity::SIGN, position_, false), text(text_) {}
+			Sign(TileID id_, const Position &position_, const std::string &text_, const std::string &name_):
+				TileEntity(id_, TileEntity::SIGN, position_, false), text(text_), name(name_) {}
 
 			friend class TileEntity;
 	};

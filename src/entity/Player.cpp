@@ -41,13 +41,12 @@ namespace Game3 {
 	}
 
 	void Player::teleport(const Position &position, const std::shared_ptr<Realm> &new_realm) {
-		if (!new_realm->game)
-			throw std::runtime_error("Can't teleport player to realm " + std::to_string(new_realm->id) + ": game is null");
 		Entity::teleport(position, new_realm);
-		new_realm->game->canvas.window.glContext()->make_current();
+		auto &new_game = new_realm->getGame();
+		new_game.canvas.window.glContext()->make_current();
 		new_realm->reupload();
-		new_realm->game->activeRealm = new_realm;
-		focus(new_realm->game->canvas);
+		new_game.activeRealm = new_realm;
+		focus(new_game.canvas);
 	}
 
 	void to_json(nlohmann::json &json, const Player &player) {

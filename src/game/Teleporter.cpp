@@ -17,13 +17,8 @@ namespace Game3 {
 	}
 
 	void Teleporter::onOverlap(const std::shared_ptr<Entity> &entity) {
-		if (auto player = std::dynamic_pointer_cast<Player>(entity)) {
-			auto realm = getRealm();
-			auto *game = realm->game;
-			if (game == nullptr)
-				throw std::runtime_error("Realm " + std::to_string(realm->id) + " has a null game");
-			player->teleport(targetPosition, game->realms.at(targetRealm));
-		}
+		if (auto player = std::dynamic_pointer_cast<Player>(entity))
+			player->teleport(targetPosition, getRealm()->getGame().realms.at(targetRealm));
 	}
 
 	void Teleporter::absorbJSON(const nlohmann::json &json) {

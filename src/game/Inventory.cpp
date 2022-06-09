@@ -99,7 +99,7 @@ namespace Game3 {
 		if (auto entity = owner.lock())
 			if (entity->isPlayer())
 				if (auto realm = entity->weakRealm.lock())
-					realm->game->signal_player_inventory_update().emit(std::dynamic_pointer_cast<Player>(entity));
+					realm->getGame().signal_player_inventory_update().emit(std::dynamic_pointer_cast<Player>(entity));
 	}
 
 	Inventory Inventory::fromJSON(const nlohmann::json &json, const std::shared_ptr<Entity> &owner) {

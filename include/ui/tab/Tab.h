@@ -23,5 +23,7 @@ namespace Game3 {
 			virtual void reset(const std::shared_ptr<Game> &) {}
 			void hide();
 			void show();
+			void setName(const Glib::ustring &);
+			void add();
 	};
 }

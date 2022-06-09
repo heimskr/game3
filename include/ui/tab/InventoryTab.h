@@ -8,9 +8,10 @@ namespace Game3 {
 			MainWindow &mainWindow;
 
 			InventoryTab() = delete;
+			InventoryTab(MainWindow &);
+
 			InventoryTab(const InventoryTab &) = delete;
 			InventoryTab(InventoryTab &&) = delete;
-			InventoryTab(MainWindow &);
 
 			InventoryTab & operator=(const InventoryTab &) = delete;
 			InventoryTab & operator=(InventoryTab &&) = delete;
@@ -18,7 +19,6 @@ namespace Game3 {
 			Gtk::Widget & getWidget() override { return scrolled; }
 			Glib::ustring getName() override { return "Inventory"; }
 			void onResize(const std::shared_ptr<Game> &) override;
-
 			void update(const std::shared_ptr<Game> &) override;
 			void reset(const std::shared_ptr<Game> &) override;
 

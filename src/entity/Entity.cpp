@@ -91,8 +91,7 @@ namespace Game3 {
 
 		float x_offset = 0.f;
 		if (offset.x() != 0.f || offset.y() != 0.f)
-			if (auto *game = getRealm()->game)
-				x_offset = 8.f * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - game->startTime).count() / 100) % 5);
+			x_offset = 8.f * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - getRealm()->getGame().startTime).count() / 100) % 5);
 
 		sprite_renderer.drawOnMap(*texture, position.column + offset.x(), position.row + offset.y(), x_offset, 8.f * int(direction), 16.f, 16.f);
 	}

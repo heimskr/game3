@@ -14,6 +14,7 @@ namespace Game3 {
 	class Canvas;
 	class Game;
 	class InventoryTab;
+	class TextTab;
 	class Tab;
 
 	class MainWindow: public Gtk::ApplicationWindow {
@@ -22,6 +23,7 @@ namespace Game3 {
 			Gtk::HeaderBar *header = nullptr;
 			Gtk::Notebook notebook;
 			std::shared_ptr<Game> game;
+			std::shared_ptr<TextTab> textTab;
 
 			MainWindow(BaseObjectType *, const Glib::RefPtr<Gtk::Builder> &);
 
@@ -88,17 +90,17 @@ namespace Game3 {
 			void onGameLoaded();
 
 			template <typename T>
-			void addTab(std::shared_ptr<T> &tab) {
+			T & initTab(std::shared_ptr<T> &tab) {
 				tab = std::make_shared<T>(notebook);
 				tabMap.emplace(&tab->getWidget(), tab);
-				notebook.append_page(tab->getWidget(), tab->getName());
+				return *tab;
 			}
 
 			template <typename T, typename... Args>
-			void addTab(std::shared_ptr<T> &tab, Args && ...args) {
+			T & initTab(std::shared_ptr<T> &tab, Args && ...args) {
 				tab = std::make_shared<T>(std::forward<Args>(args)...);
 				tabMap.emplace(&tab->getWidget(), tab);
-				notebook.append_page(tab->getWidget(), tab->getName());
+				return *tab;
 			}
 	};
 }

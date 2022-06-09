@@ -15,7 +15,7 @@ namespace Game3 {
 	class Menu;
 	class Player;
 
-	class Game {
+	class Game: public std::enable_shared_from_this<Game> {
 		public:
 			static constexpr const char *DEFAULT_PATH = "game.g3";
 
@@ -25,7 +25,6 @@ namespace Game3 {
 			std::chrono::system_clock::time_point startTime = std::chrono::system_clock::now();
 
 			Game() = delete;
-			Game(Canvas &canvas_): canvas(canvas_) {}
 
 			std::unordered_map<RealmID, std::shared_ptr<Realm>> realms;
 			std::shared_ptr<Realm> activeRealm;
@@ -34,12 +33,16 @@ namespace Game3 {
 			void initEntities();
 			void tick();
 			RealmID newRealmID() const;
+			void setText(const Glib::ustring &text, const Glib::ustring &name = "", bool focus = true);
+			const Glib::ustring & getText() const;
 
 			sigc::signal<void(const std::shared_ptr<Player> &)> signal_player_inventory_update() const { return signal_player_inventory_update_; }
 
+			static std::shared_ptr<Game> create(Canvas &);
 			static std::shared_ptr<Game> fromJSON(const nlohmann::json &, Canvas &);
 
 		private:
+			Game(Canvas &canvas_): canvas(canvas_) {}
 			sigc::signal<void(const std::shared_ptr<Player> &)> signal_player_inventory_update_;
 			std::chrono::system_clock::time_point lastTime  = startTime;
 	};

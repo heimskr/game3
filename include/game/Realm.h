@@ -24,7 +24,6 @@ namespace Game3 {
 
 			static std::unordered_map<RealmType, Texture> textureMap;
 
-			Game *game = nullptr;
 			RealmID id;
 			RealmType type;
 			std::shared_ptr<Tilemap> tilemap1, tilemap2, tilemap3;
@@ -66,6 +65,8 @@ namespace Game3 {
 			void remove(const std::shared_ptr<Entity> &);
 			Position getPosition(Index) const;
 			void onMoved(const std::shared_ptr<Entity> &, const Position &);
+			void setGame(Game &);
+			Game & getGame();
 
 			template <typename T, typename... Args>
 			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {
@@ -86,6 +87,7 @@ namespace Game3 {
 
 		private:
 			Index randomLand = 0;
+			Game *game = nullptr;
 	};
 
 	void to_json(nlohmann::json &, const Realm &);
