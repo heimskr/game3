@@ -111,8 +111,9 @@ namespace Game3 {
 		perlin.SetSeed(seed);
 
 		auto &tiles1 = tilemap1->tiles;
+		auto &tiles2 = tilemap2->tiles;
 		tiles1.assign(tiles1.size(), 0);
-		tilemap2->tiles.assign(tilemap2->tiles.size(), 0);
+		tiles2.assign(tiles2.size(), 0);
 		tilemap3->tiles.assign(tilemap3->tiles.size(), 0);
 
 		static const std::vector<TileID> grasses {
@@ -120,12 +121,15 @@ namespace Game3 {
 			OverworldTiles::GRASS, OverworldTiles::GRASS, OverworldTiles::GRASS, OverworldTiles::GRASS, OverworldTiles::GRASS, OverworldTiles::GRASS, OverworldTiles::GRASS
 		};
 
-		std::default_random_engine grass_rng;
-		grass_rng.seed(seed);
+		std::default_random_engine rng;
+		rng.seed(seed);
 
-		for (int row = 0; row < width; ++row)
-			for (int column = 0; column < height; ++column) {
+		auto saved_noise = std::make_unique<double[]>(width * height);
+
+		for (int row = 0; row < height; ++row)
+			for (int column = 0; column < width; ++column) {
 				double noise = perlin.GetValue(row / noise_zoom, column / noise_zoom, 0.666);
+				saved_noise[row * width + column] = noise;
 				auto &tile = tiles1[column * width + row];
 				if (noise < noise_threshold)
 					tile = OverworldTiles::DEEPER_WATER;
@@ -140,14 +144,28 @@ namespace Game3 {
 				else if (noise < noise_threshold + 0.5)
 					tile = OverworldTiles::LIGHT_GRASS;
 				else
-					tile = choose(grasses, grass_rng);
+					tile = choose(grasses, rng);
 			}
 
 		constexpr static int m = 15, n = 21, pad = 2;
 		Timer land_timer("GetLand");
 		auto starts = tilemap1->getLand(type, m + pad * 2, n + pad * 2);
+		if (starts.empty())
+			throw std::runtime_error("Map has no land");
 		land_timer.stop();
-		randomLand = choose(starts, uint_fast32_t(seed));
+
+		Timer oil_timer("Oil");
+		auto oil_starts = tilemap1->getLand(type);
+		std::shuffle(oil_starts.begin(), oil_starts.end(), rng);
+		for (size_t i = 0, max = oil_starts.size() / 2000; i < max; ++i) {
+			const Index index = oil_starts.back();
+			if (noise_threshold + 0.6 <= saved_noise[index])
+				tiles2[index] = OverworldTiles::OIL;
+			oil_starts.pop_back();
+		}
+		oil_timer.stop();
+
+		randomLand = choose(starts, rng);
 		std::vector<Index> candidates;
 		candidates.reserve(starts.size() / 16);
 		Timer candidate_timer("Candidates");
@@ -155,9 +173,11 @@ namespace Game3 {
 			const size_t row_start = index / tilemap1->width + pad, row_end = row_start + m;
 			const size_t column_start = index % tilemap1->width + pad, column_end = column_start + n;
 			for (size_t row = row_start; row < row_end; ++row)
-				for (size_t column = column_start; column < column_end; ++column)
-					if (!overworldTiles.isLand(tiles1[row * tilemap1->width + column]))
+				for (size_t column = column_start; column < column_end; ++column) {
+					const Index index = row * tilemap1->width + column;
+					if (!overworldTiles.isLand(tiles1[index]))
 						goto failed;
+				}
 			candidates.push_back(index);
 			failed:
 			continue;
@@ -276,6 +296,10 @@ namespace Game3 {
 
 		auto set1 = [&](TileID tile) { layer1[row * map_width + column] = tile; };
 		auto set2 = [&](TileID tile) { layer2[row * map_width + column] = tile; };
+
+		for (size_t row = index / map_width - pad; row < index / map_width + height + pad; ++row)
+			for (size_t column = index % map_width - pad; column < index % map_width + width + pad; ++column)
+				layer2[row * map_width + column] = OverworldTiles::EMPTY;
 
 		for (size_t row = index / map_width; row < index / map_width + height; ++row) {
 			layer2[row * map_width + index % map_width] = OverworldTiles::TOWER_NS;
