@@ -12,6 +12,7 @@
 #include "Position.h"
 #include "Texture.h"
 #include "Types.h"
+#include "game/HasRealm.h"
 #include "game/Inventory.h"
 #include "game/Item.h"
 
@@ -22,7 +23,7 @@ namespace Game3 {
 	class Realm;
 	class SpriteRenderer;
 
-	class Entity: public std::enable_shared_from_this<Entity> {
+	class Entity: public HasRealm, public std::enable_shared_from_this<Entity> {
 		public:
 			constexpr static EntityID GANGBLANC = 1;
 			constexpr static EntityID GRUM = 2;
@@ -42,6 +43,8 @@ namespace Game3 {
 			 *  such that the sum of the new position and the offset is equal to the old offset. The offset is moved closer
 			 *  to zero each tick to achieve smooth movement instead of teleportation from one tile to the next. */
 			nanogui::Vector2f offset {0.f, 0.f};
+
+			~Entity() override = default;
 
 			template <typename T>
 			static std::shared_ptr<T> create(EntityID id) {
@@ -71,7 +74,8 @@ namespace Game3 {
 			void id(EntityID);
 			virtual void init();
 			void move(Direction);
-			std::shared_ptr<Realm> getRealm() const;
+			std::shared_ptr<Realm> getRealm() const override;
+			const Position & getPosition() const override { return position; }
 			void setRealm(const Game &, RealmID);
 			void setRealm(const std::shared_ptr<Realm>);
 			void focus(Canvas &, bool is_autofocus);

@@ -27,7 +27,7 @@ namespace Game3 {
 		targetPosition = json.at("targetPosition");
 	}
 
-	void Teleporter::render(SpriteRenderer &sprite_renderer) const {
+	void Teleporter::render(SpriteRenderer &sprite_renderer) {
 		auto realm = getRealm();
 		if (tileID != tileSets.at(realm->type)->getEmpty()) {
 			auto &tilemap = *realm->tilemap2;

@@ -20,7 +20,7 @@ namespace Game3 {
 			void toJSON(nlohmann::json &) const override;
 			void onOverlap(const std::shared_ptr<Entity> &) override;
 			void absorbJSON(const nlohmann::json &) override;
-			void render(SpriteRenderer &) const override;
+			void render(SpriteRenderer &) override;
 
 		protected:
 			Teleporter() = default;

@@ -3,11 +3,12 @@
 #include "entity/Entity.h"
 #include "entity/ItemEntity.h"
 #include "game/Game.h"
+#include "game/HasRealm.h"
 #include "game/Inventory.h"
 #include "game/Realm.h"
 
 namespace Game3 {
-	Inventory::Inventory(const std::shared_ptr<Entity> &owner_, Slot slot_count):
+	Inventory::Inventory(const std::shared_ptr<HasRealm> &owner_, Slot slot_count):
 		owner(owner_), slotCount(slot_count) {}
 
 	ItemStack * Inventory::operator[](size_t slot) {
@@ -64,12 +65,12 @@ namespace Game3 {
 		if (!storage.contains(slot))
 			return;
 
-		auto entity = owner.lock();
-		if (!entity)
+		auto locked_owner = owner.lock();
+		if (!locked_owner)
 			throw std::logic_error("Inventory is missing an owner");
 
-		auto realm = entity->getRealm();
-		realm->spawn<ItemEntity>(entity->position, storage.at(slot));
+		auto realm = locked_owner->getRealm();
+		realm->spawn<ItemEntity>(locked_owner->getPosition(), storage.at(slot));
 		storage.erase(slot);
 
 		notifyOwner();
@@ -96,13 +97,12 @@ namespace Game3 {
 	}
 
 	void Inventory::notifyOwner() {
-		if (auto entity = owner.lock())
-			if (entity->isPlayer())
-				if (auto realm = entity->weakRealm.lock())
-					realm->getGame().signal_player_inventory_update().emit(std::dynamic_pointer_cast<Player>(entity));
+		if (auto locked_owner = owner.lock())
+			if (auto player = std::dynamic_pointer_cast<Player>(locked_owner))
+				player->getRealm()->getGame().signal_player_inventory_update().emit(player);
 	}
 
-	Inventory Inventory::fromJSON(const nlohmann::json &json, const std::shared_ptr<Entity> &owner) {
+	Inventory Inventory::fromJSON(const nlohmann::json &json, const std::shared_ptr<HasRealm> &owner) {
 		Inventory out(owner, 0);
 		out.storage = json.at("storage");
 		out.slotCount = json.at("slotCount");

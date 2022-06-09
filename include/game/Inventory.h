@@ -6,14 +6,14 @@
 #include "game/Item.h"
 
 namespace Game3 {
-	class Entity;
+	struct HasRealm;
 
 	class Inventory {
 		public:
-			std::weak_ptr<Entity> owner;
+			std::weak_ptr<HasRealm> owner;
 			Slot slotCount = 0;
 
-			Inventory(const std::shared_ptr<Entity> &owner_, Slot slot_count);
+			Inventory(const std::shared_ptr<HasRealm> &owner_, Slot slot_count);
 
 			ItemStack * operator[](size_t);
 			const ItemStack * operator[](size_t) const;
@@ -39,7 +39,7 @@ namespace Game3 {
 			inline const decltype(storage) & getStorage() const { return storage; }
 			void notifyOwner();
 
-			static Inventory fromJSON(const nlohmann::json &, const std::shared_ptr<Entity> &);
+			static Inventory fromJSON(const nlohmann::json &, const std::shared_ptr<HasRealm> &);
 
 			friend void to_json(nlohmann::json &, const Inventory &);
 	};

@@ -9,6 +9,7 @@
 #include "game/Game.h"
 #include "game/Realm.h"
 #include "tileentity/Building.h"
+#include "tileentity/Chest.h"
 #include "tileentity/Sign.h"
 #include "tileentity/Teleporter.h"
 #include "util/Timer.h"
@@ -234,6 +235,14 @@ namespace Game3 {
 				}
 				break;
 			}
+
+			case 1: {
+				auto chest = TileEntity::create<Chest>(0, getPosition(width * 3 / 2));
+				chest->setInventory(4);
+				add(chest);
+				break;
+			}
+
 			default:
 				break;
 		}

@@ -6,6 +6,7 @@
 
 #include "Position.h"
 #include "Types.h"
+#include "game/HasRealm.h"
 
 namespace Game3 {
 	class Entity;
@@ -13,11 +14,12 @@ namespace Game3 {
 	class Realm;
 	class SpriteRenderer;
 
-	class TileEntity: public std::enable_shared_from_this<TileEntity> {
+	class TileEntity: public HasRealm, public std::enable_shared_from_this<TileEntity> {
 		public:
 			constexpr static TileEntityID BUILDING   = 1;
 			constexpr static TileEntityID TELEPORTER = 2;
 			constexpr static TileEntityID SIGN       = 3;
+			constexpr static TileEntityID CHEST      = 4;
 
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;
@@ -33,14 +35,14 @@ namespace Game3 {
 				return out;
 			}
 
-			virtual ~TileEntity() = default;
+			~TileEntity() override = default;
 
 			static std::shared_ptr<TileEntity> fromJSON(const nlohmann::json &);
 
 			virtual void init() {}
 			/** Returns the TileEntity ID. This is not the tile ID, which corresponds to a tile in the tileset. */
 			virtual TileEntityID getID() const = 0;
-			virtual void render(SpriteRenderer &) const {}
+			virtual void render(SpriteRenderer &) {}
 			/** Removes the tile entity from existence. */
 			virtual void remove();
 			/** Handles when the player interacts with the tile they're on and that tile contains this tile entity. */
@@ -50,7 +52,8 @@ namespace Game3 {
 			/** Handles when an entity steps on this tile entity's position. */
 			virtual void onOverlap(const std::shared_ptr<Entity> &) {}
 			void setRealm(const std::shared_ptr<Realm> &);
-			std::shared_ptr<Realm> getRealm() const;
+			std::shared_ptr<Realm> getRealm() const override;
+			const Position & getPosition() const override { return position; }
 
 		protected:
 			TileEntity() = default;
