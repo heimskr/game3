@@ -33,7 +33,7 @@ namespace Game3 {
 			void initEntities();
 			void tick();
 			RealmID newRealmID() const;
-			void setText(const Glib::ustring &text, const Glib::ustring &name = "", bool focus = true);
+			void setText(const Glib::ustring &text, const Glib::ustring &name = "", bool focus = true, bool ephemeral = false);
 			const Glib::ustring & getText() const;
 
 			sigc::signal<void(const std::shared_ptr<Player> &)> signal_player_inventory_update() const { return signal_player_inventory_update_; }

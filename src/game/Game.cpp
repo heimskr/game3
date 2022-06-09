@@ -29,11 +29,12 @@ namespace Game3 {
 		return max + 1;
 	}
 
-	void Game::setText(const Glib::ustring &text, const Glib::ustring &name, bool focus) {
+	void Game::setText(const Glib::ustring &text, const Glib::ustring &name, bool focus, bool ephemeral) {
 		if (canvas.window.textTab) {
 			auto &tab = *canvas.window.textTab;
 			tab.text = text;
 			tab.name = name;
+			tab.ephemeral = ephemeral;
 			if (focus)
 				tab.show();
 			tab.reset(shared_from_this());

@@ -12,6 +12,11 @@ namespace Game3 {
 		scrolled.set_vexpand(true);
 	}
 
+	void TextTab::onBlur() {
+		if (ephemeral)
+			hide();
+	}
+
 	void TextTab::update(const std::shared_ptr<Game> &game) {
 		update(game);
 	}

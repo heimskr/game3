@@ -17,7 +17,7 @@ namespace Game3 {
 	}
 
 	void Sign::onInteractNextTo(const std::shared_ptr<Player> &) {
-		getRealm()->getGame().setText(text, name, true);
+		getRealm()->getGame().setText(text, name, true, true);
 	}
 
 	void Sign::absorbJSON(const nlohmann::json &json) {

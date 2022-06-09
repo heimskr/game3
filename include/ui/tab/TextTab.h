@@ -7,6 +7,8 @@ namespace Game3 {
 		public:
 			Glib::ustring text;
 			Glib::ustring name;
+			/** Whether the tab will disappear on blur. */
+			bool ephemeral = false;
 
 			TextTab() = delete;
 			TextTab(Gtk::Notebook &, const Glib::ustring &text_, const Glib::ustring &name_);
@@ -19,6 +21,7 @@ namespace Game3 {
 
 			Gtk::Widget & getWidget() override { return scrolled; }
 			Glib::ustring getName() override { return name; }
+			void onBlur() override;
 			void update(const std::shared_ptr<Game> &) override;
 			void reset(const std::shared_ptr<Game> &) override;
 
