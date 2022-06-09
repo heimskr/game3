@@ -1,18 +1,17 @@
 #pragma once
 
-#include <optional>
-
 #include "Texture.h"
+#include "game/HasInventory.h"
 #include "game/Inventory.h"
 #include "tileentity/TileEntity.h"
 
 namespace Game3 {
-	class Chest: public TileEntity {
+	class Chest: public HasInventory, public TileEntity {
 		public:
 			static Texture DEFAULT_TEXTURE;
 
+			std::string name;
 			Texture texture;
-			std::optional<Inventory> inventory;
 
 			Chest(const Chest &) = delete;
 			Chest(Chest &&) = default;
@@ -31,7 +30,7 @@ namespace Game3 {
 
 		protected:
 			Chest() = default;
-			Chest(TileID id_, const Position &position_, const Texture &texture_ = DEFAULT_TEXTURE);
+			Chest(TileID id_, const Position &position_, const std::string &name_, const Texture &texture_ = DEFAULT_TEXTURE);
 
 			friend class TileEntity;
 	};

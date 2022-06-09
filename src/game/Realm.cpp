@@ -237,7 +237,7 @@ namespace Game3 {
 			}
 
 			case 1: {
-				auto chest = TileEntity::create<Chest>(0, getPosition(width * 3 / 2));
+				auto chest = TileEntity::create<Chest>(0, getPosition(width * 3 / 2), "Chest");
 				chest->setInventory(4);
 				add(chest);
 				break;

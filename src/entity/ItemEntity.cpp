@@ -4,6 +4,7 @@
 
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
+#include "game/Inventory.h"
 #include "ui/SpriteRenderer.h"
 
 namespace Game3 {
@@ -61,7 +62,7 @@ namespace Game3 {
 	}
 
 	void ItemEntity::interact(const std::shared_ptr<Player> &player) {
-		auto leftover = player->inventory.add(stack);
+		auto leftover = player->inventory->add(stack);
 		if (leftover)
 			stack = std::move(*leftover);
 		else

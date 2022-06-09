@@ -1,5 +1,6 @@
 #include "game/Realm.h"
 #include "tileentity/Building.h"
+#include "tileentity/Chest.h"
 #include "tileentity/Sign.h"
 #include "tileentity/Teleporter.h"
 #include "tileentity/TileEntity.h"
@@ -18,6 +19,9 @@ namespace Game3 {
 				break;
 			case TileEntity::SIGN:
 				out = TileEntity::create<Sign>();
+				break;
+			case TileEntity::CHEST:
+				out = TileEntity::create<Chest>();
 				break;
 			default:
 				throw std::invalid_argument("Unrecognized TileEntity ID: " + std::to_string(id));

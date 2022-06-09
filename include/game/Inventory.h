@@ -20,7 +20,9 @@ namespace Game3 {
 
 			/** If the ItemStack couldn't be inserted into the inventory, this function returns an ItemStack containing the leftovers that couldn't be inserted.
 			 *  Otherwise, this function returns nothing. */
-			std::optional<ItemStack> add(const ItemStack &);
+			std::optional<ItemStack> add(const ItemStack &, Slot start = -1);
+
+			bool canStore(const ItemStack &) const;
 
 			/** Removes an item from the inventory and drops it at the owner's location. */
 			void drop(Slot);

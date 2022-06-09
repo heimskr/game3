@@ -7,12 +7,15 @@
 #include "game/Game.h"
 #include "game/Realm.h"
 #include "tileentity/Chest.h"
+#include "ui/Canvas.h"
+#include "ui/MainWindow.h"
 #include "ui/SpriteRenderer.h"
+#include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
 	Texture Chest::DEFAULT_TEXTURE {"resources/rpg/chests.png"};
 
-	Chest::Chest(TileID id_, const Position &position_, const Texture &texture_): TileEntity(id_, TileEntity::CHEST, position_, true), texture(texture_) {
+	Chest::Chest(TileID id_, const Position &position_, const std::string &name_, const Texture &texture_): TileEntity(id_, TileEntity::CHEST, position_, true), name(name_), texture(texture_) {
 		texture.init();
 	}
 
@@ -20,16 +23,20 @@ namespace Game3 {
 		TileEntity::toJSON(json);
 		if (inventory)
 			json["inventory"] = *inventory;
+		json["name"] = name;
 	}
 
 	void Chest::onInteractNextTo(const std::shared_ptr<Player> &) {
-		getRealm()->getGame().setText("Wow!", "Chest", true, true);
+		// getRealm()->getGame().setText("Wow!", "Chest", true, true);
+		auto &tab = *getRealm()->getGame().canvas.window.inventoryTab;
+		tab.setExternalInventory(name, inventory);
 	}
 
 	void Chest::absorbJSON(const nlohmann::json &json) {
 		TileEntity::absorbJSON(json);
 		if (json.contains("inventory"))
-			inventory = Inventory::fromJSON(json.at("inventory"), shared_from_this());
+			inventory = std::make_shared<Inventory>(Inventory::fromJSON(json.at("inventory"), shared_from_this()));
+		name = json.at("name");
 	}
 
 	void Chest::render(SpriteRenderer &sprite_renderer) {
@@ -44,6 +51,6 @@ namespace Game3 {
 	}
 
 	void Chest::setInventory(Slot slot_count) {
-		inventory = Inventory(shared_from_this(), slot_count);
+		inventory = std::make_shared<Inventory>(shared_from_this(), slot_count);
 	}
 }

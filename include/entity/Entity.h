@@ -12,19 +12,21 @@
 #include "Position.h"
 #include "Texture.h"
 #include "Types.h"
+#include "game/HasInventory.h"
 #include "game/HasRealm.h"
-#include "game/Inventory.h"
 #include "game/Item.h"
 
 namespace Game3 {
 	class Canvas;
 	class Game;
+	class Inventory;
 	class Player;
 	class Realm;
 	class SpriteRenderer;
 
-	class Entity: public HasRealm, public std::enable_shared_from_this<Entity> {
+	class Entity: public HasInventory, public HasRealm, public std::enable_shared_from_this<Entity> {
 		public:
+			constexpr static Slot DEFAULT_INVENTORY_SIZE = 20;
 			constexpr static EntityID GANGBLANC = 1;
 			constexpr static EntityID GRUM = 2;
 			constexpr static EntityID ITEM = 3;
@@ -36,7 +38,6 @@ namespace Game3 {
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;
 			Direction direction = Direction::Down;
-			Inventory inventory {{}, 20};
 			/** The reciprocal of this is how many seconds it takes to move one square. */
 			float speed = 10.f;
 			/** When the entity moves a square, its position field is immediately updated but this field is set to an offset

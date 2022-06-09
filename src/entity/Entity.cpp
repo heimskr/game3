@@ -7,6 +7,7 @@
 #include "entity/Entity.h"
 #include "entity/ItemEntity.h"
 #include "game/Game.h"
+#include "game/Inventory.h"
 #include "game/Realm.h"
 #include "ui/Canvas.h"
 #include "ui/SpriteRenderer.h"
@@ -36,6 +37,7 @@ namespace Game3 {
 			}
 
 		out->absorbJSON(json);
+		out->init();
 		return out;
 	}
 
@@ -50,7 +52,8 @@ namespace Game3 {
 		position = json.at("position");
 		realmID = json.at("realmID");
 		direction = json.at("direction");
-		inventory = Inventory::fromJSON(json.at("inventory"), shared_from_this());
+		if (json.contains("inventory"))
+			inventory = std::make_shared<Inventory>(Inventory::fromJSON(json.at("inventory"), shared_from_this()));
 	}
 
 	void Entity::tick(float delta) {
@@ -82,7 +85,11 @@ namespace Game3 {
 	void Entity::init() {
 		if (texture == nullptr)
 			texture = &textureMap.at(id_);
-		inventory.owner = shared_from_this();
+
+		if (!inventory)
+			inventory = std::make_shared<Inventory>(shared_from_this(), DEFAULT_INVENTORY_SIZE);
+		else
+			inventory->owner = shared_from_this();
 	}
 
 	void Entity::render(SpriteRenderer &sprite_renderer) const {
@@ -243,6 +250,7 @@ namespace Game3 {
 		json["position"] = entity.position;
 		json["realmID"] = entity.realmID;
 		json["direction"] = entity.direction;
-		json["inventory"] = entity.inventory;
+		if (entity.inventory)
+			json["inventory"] = *entity.inventory;
 	}
 }

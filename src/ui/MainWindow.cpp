@@ -4,6 +4,8 @@
 
 #include "entity/ItemEntity.h"
 #include "game/Game.h"
+#include "game/HasInventory.h"
+#include "game/Inventory.h"
 #include "ui/gtk/NewGameDialog.h"
 #include "ui/tab/InventoryTab.h"
 #include "ui/tab/TextTab.h"
@@ -358,18 +360,18 @@ namespace Game3 {
 						player.movingRight = true;
 						return;
 					case GDK_KEY_i:
-						if (player.inventory.empty()) {
+						if (player.inventory->empty()) {
 							std::cout << "Inventory empty.\n";
 						} else {
 							std::cout << "Inventory:\n";
-							for (const auto &[slot, stack]: player.inventory.getStorage())
+							for (const auto &[slot, stack]: player.inventory->getStorage())
 								std::cout << "  " << stack.item->name << " x " << stack.count << " in slot " << slot << '\n';
 							inventoryTab->reset(game);
 						}
 						return;
 					case GDK_KEY_o: {
 						ItemStack sword(Item::SHORTSWORD, 1);
-						auto leftover = player.inventory.add(sword);
+						auto leftover = player.inventory->add(sword);
 						if (leftover) {
 							auto &realm = *player.getRealm();
 							realm.spawn<ItemEntity>(player.position, *leftover);
@@ -467,8 +469,14 @@ namespace Game3 {
 			tab->reset(game);
 		for (auto &[id, realm]: game->realms)
 			realm->game = game.get();
-		game->signal_player_inventory_update().connect([this](const auto &) {
+		game->signal_player_inventory_update().connect([this](const std::shared_ptr<Player> &) {
 			inventoryTab->reset(game);
+		});
+		game->signal_other_inventory_update().connect([this](const std::shared_ptr<HasRealm> &owner) {
+			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner)) {
+				if (has_inventory->inventory && has_inventory->inventory == inventoryTab->getExternalInventory())
+					inventoryTab->reset(game);
+			}
 		});
 	}
 
