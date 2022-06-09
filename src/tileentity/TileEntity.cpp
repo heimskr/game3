@@ -1,8 +1,8 @@
-#include "game/Building.h"
 #include "game/Realm.h"
-#include "game/Sign.h"
-#include "game/Teleporter.h"
-#include "game/TileEntity.h"
+#include "tileentity/Building.h"
+#include "tileentity/Sign.h"
+#include "tileentity/Teleporter.h"
+#include "tileentity/TileEntity.h"
 
 namespace Game3 {
 	std::shared_ptr<TileEntity> TileEntity::fromJSON(const nlohmann::json &json) {

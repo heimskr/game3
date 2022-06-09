@@ -1,7 +1,7 @@
 #include "entity/Player.h"
-#include "game/Building.h"
 #include "game/Game.h"
 #include "game/Realm.h"
+#include "tileentity/Building.h"
 
 namespace Game3 {
 	void Building::toJSON(nlohmann::json &json) const {

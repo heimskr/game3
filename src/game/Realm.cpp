@@ -6,11 +6,11 @@
 
 #include "Tiles.h"
 #include "entity/Entity.h"
-#include "game/Building.h"
 #include "game/Game.h"
 #include "game/Realm.h"
-#include "game/Sign.h"
-#include "game/Teleporter.h"
+#include "tileentity/Building.h"
+#include "tileentity/Sign.h"
+#include "tileentity/Teleporter.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 

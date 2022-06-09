@@ -9,7 +9,7 @@
 
 #include "Tilemap.h"
 #include "Types.h"
-#include "game/TileEntity.h"
+#include "tileentity/TileEntity.h"
 #include "ui/ElementBufferedRenderer.h"
 
 namespace Game3 {

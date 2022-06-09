@@ -6,7 +6,7 @@
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "game/Realm.h"
-#include "game/Teleporter.h"
+#include "tileentity/Teleporter.h"
 #include "ui/SpriteRenderer.h"
 
 namespace Game3 {

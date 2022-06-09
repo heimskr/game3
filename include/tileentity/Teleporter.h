@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/TileEntity.h"
+#include "tileentity/TileEntity.h"
 
 namespace Game3 {
 	class Teleporter: public TileEntity {

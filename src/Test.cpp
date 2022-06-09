@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "game/Building.h"
 #include "game/Game.h"
+#include "tileentity/Building.h"
 
 namespace Game3 {
 	constexpr static int WIDTH = 1000;
