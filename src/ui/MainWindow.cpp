@@ -303,8 +303,18 @@ namespace Game3 {
 		return true;
 	}
 
-	void MainWindow::onKeyReleased(guint, guint keycode, Gdk::ModifierType) {
+	void MainWindow::onKeyReleased(guint keyval, guint keycode, Gdk::ModifierType) {
 		keyTimes.erase(keycode);
+
+		if (game && game->player) {
+			auto &player = *game->player;
+			switch (keyval) {
+				case GDK_KEY_w: player.movingUp    = false; break;
+				case GDK_KEY_d: player.movingRight = false; break;
+				case GDK_KEY_s: player.movingDown  = false; break;
+				case GDK_KEY_a: player.movingLeft  = false; break;
+			}
+		}
 	}
 
 	void MainWindow::handleKeys() {
@@ -320,22 +330,22 @@ namespace Game3 {
 		}
 	}
 
-	void MainWindow::handleKey(guint keyval, guint, Gdk::ModifierType modifiers) {
+	void MainWindow::handleKey(guint keyval, guint keycode, Gdk::ModifierType modifiers) {
 		if (canvas) {
 			if (game && game->player) {
 				auto &player = *game->player;
 				switch (keyval) {
 					case GDK_KEY_s:
-						player.move(Direction::Down);
+						player.movingDown = true;
 						return;
 					case GDK_KEY_w:
-						player.move(Direction::Up);
+						player.movingUp = true;
 						return;
 					case GDK_KEY_a:
-						player.move(Direction::Left);
+						player.movingLeft = true;
 						return;
 					case GDK_KEY_d:
-						player.move(Direction::Right);
+						player.movingRight = true;
 						return;
 					case GDK_KEY_i:
 						if (player.inventory.empty()) {
@@ -360,23 +370,23 @@ namespace Game3 {
 					case GDK_KEY_r:
 						if (game && modifiers == Gdk::ModifierType::CONTROL_MASK)
 							game->player->focus(*canvas);
-						break;
+						return;
 					case GDK_KEY_E:
 						game->player->interactOn();
-						break;
+						return;
 					case GDK_KEY_e:
 						game->player->interactNextTo();
-						break;
+						return;
 					case GDK_KEY_u:
 						glArea.get_context()->make_current();
 						game->activeRealm->reupload();
-						break;
+						return;
 					case GDK_KEY_f:
 						if (unsigned(modifiers & Gdk::ModifierType::CONTROL_MASK) != 0)
 							autoFocus = !autoFocus;
 						else
 							game->player->focus(*canvas);
-						break;
+						return;
 				}
 			}
 
@@ -395,7 +405,7 @@ namespace Game3 {
 					canvas->center.x() -= delta;
 					break;
 				default:
-					return;
+					break;
 			}
 		}
 	}

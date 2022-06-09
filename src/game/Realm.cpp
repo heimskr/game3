@@ -1,4 +1,5 @@
 #include <iostream>
+#include <thread>
 #include <unordered_set>
 
 #include <libnoise/noise.h>
@@ -392,6 +393,9 @@ namespace Game3 {
 	void Realm::tick(float delta) {
 		for (auto &entity: entities)
 			entity->tick(delta);
+		for (const auto &entity: removalQueue)
+			remove(entity);
+		removalQueue.clear();
 	}
 
 	std::vector<std::shared_ptr<Entity>> Realm::findEntities(const Position &position) const {
@@ -452,6 +456,10 @@ namespace Game3 {
 		if (!game)
 			throw std::runtime_error("Game is null for realm " + std::to_string(id));
 		return *game;
+	}
+
+	void Realm::queueRemoval(const std::shared_ptr<Entity> &entity) {
+		removalQueue.push_back(entity);
 	}
 
 	void to_json(nlohmann::json &json, const Realm &realm) {

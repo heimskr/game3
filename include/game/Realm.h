@@ -67,6 +67,7 @@ namespace Game3 {
 			void onMoved(const std::shared_ptr<Entity> &, const Position &);
 			void setGame(Game &);
 			Game & getGame();
+			void queueRemoval(const std::shared_ptr<Entity> &);
 
 			template <typename T, typename... Args>
 			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {
@@ -88,6 +89,7 @@ namespace Game3 {
 		private:
 			Index randomLand = 0;
 			Game *game = nullptr;
+			std::vector<std::shared_ptr<Entity>> removalQueue;
 	};
 
 	void to_json(nlohmann::json &, const Realm &);

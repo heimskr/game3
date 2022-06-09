@@ -21,6 +21,20 @@ namespace Game3 {
 		return json;
 	}
 
+	void Player::tick(float delta) {
+		Entity::tick(delta);
+		Direction final_direction = direction;
+		if (movingLeft)
+			move(final_direction = Direction::Left);
+		if (movingRight)
+			move(final_direction = Direction::Right);
+		if (movingUp)
+			move(final_direction = Direction::Up);
+		if (movingDown)
+			move(final_direction = Direction::Down);
+		direction = final_direction;
+	}
+
 	void Player::interactOn() {
 		auto realm = getRealm();
 		auto player = std::dynamic_pointer_cast<Player>(shared_from_this());

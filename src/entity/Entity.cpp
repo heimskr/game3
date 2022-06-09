@@ -209,7 +209,7 @@ namespace Game3 {
 	void Entity::teleport(const Position &new_position, const std::shared_ptr<Realm> &new_realm) {
 		auto old_realm = getRealm();
 		auto shared = shared_from_this();
-		old_realm->remove(shared);
+		old_realm->queueRemoval(shared);
 		new_realm->add(shared);
 		teleport(new_position);
 	}
