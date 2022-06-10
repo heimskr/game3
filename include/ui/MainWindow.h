@@ -46,10 +46,13 @@ namespace Game3 {
 
 			Glib::RefPtr<Gdk::GLContext> glContext();
 
+			void setStatus(const Glib::ustring &);
+
 			friend class Canvas;
 
 		private:
 			constexpr static std::chrono::milliseconds keyRepeatTime {100};
+			constexpr static std::chrono::seconds statusbarExpirationTime {5};
 			static std::unordered_map<guint, std::chrono::milliseconds> customKeyRepeatTimes;
 
 			Glib::RefPtr<Gtk::Builder> builder;
@@ -58,7 +61,9 @@ namespace Game3 {
 			std::recursive_mutex functionQueueMutex;
 			Glib::Dispatcher functionQueueDispatcher;
 			Gtk::Paned paned;
+			Gtk::Box vbox {Gtk::Orientation::VERTICAL};
 			Gtk::GLArea glArea;
+			Gtk::Label statusbar;
 			std::unique_ptr<Canvas> canvas;
 			std::unordered_map<Gtk::Widget *, std::shared_ptr<Tab>> tabMap;
 			std::shared_ptr<Tab> activeTab;
@@ -67,6 +72,8 @@ namespace Game3 {
 			double glAreaMouseX = 0.;
 			double glAreaMouseY = 0.;
 			bool autofocus = true;
+			bool statusbarWaiting = false;
+			std::chrono::system_clock::time_point statusbarSetTime;
 
 			struct KeyInfo {
 				guint value;

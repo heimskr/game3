@@ -96,6 +96,10 @@ namespace Game3 {
 		glArea.set_auto_render(false);
 		glArea.add_tick_callback([this](const Glib::RefPtr<Gdk::FrameClock> &) {
 			glArea.queue_render();
+			if (statusbarWaiting && statusbarExpirationTime <= getTime() - statusbarSetTime) {
+				statusbarWaiting = false;
+				statusbar.set_text({});
+			}
 			return true;
 		});
 		glArea.set_focusable(true);
@@ -168,8 +172,13 @@ namespace Game3 {
 			return true;
 		});
 
+		vbox.append(glArea);
+		statusbar.set_halign(Gtk::Align::START);
+		statusbar.set_margin(5);
+		statusbar.set_margin_start(10);
+		vbox.append(statusbar);
 		paned.set_orientation(Gtk::Orientation::HORIZONTAL);
-		paned.set_start_child(glArea);
+		paned.set_start_child(vbox);
 		paned.set_end_child(notebook);
 		glArea.set_expand(true);
 		notebook.set_hexpand(false);
@@ -305,6 +314,12 @@ namespace Game3 {
 		return glArea.get_context();
 	}
 
+	void MainWindow::setStatus(const Glib::ustring &status) {
+		statusbar.set_text(status);
+		statusbarWaiting = true;
+		statusbarSetTime = getTime();
+	}
+
 	bool MainWindow::onKeyPressed(guint keyval, guint keycode, Gdk::ModifierType modifiers) {
 		if (!keyTimes.contains(keycode)) {
 			handleKey(keyval, keycode, modifiers);
@@ -400,6 +415,9 @@ namespace Game3 {
 							autofocus = !autofocus;
 						else
 							game->player->focus(*canvas, false);
+						return;
+					case GDK_KEY_x:
+						setStatus("Hello");
 						return;
 				}
 			}
