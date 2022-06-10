@@ -45,7 +45,7 @@ namespace Game3 {
 
 			static std::shared_ptr<Realm> fromJSON(const nlohmann::json &);
 
-			void render(int width, int height, const nanogui::Vector2f &center, float scale, SpriteRenderer &);
+			void render(int width, int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &);
 			void reupload();
 			void rebind();
 			void generate(int seed = 666, double noise_zoom = 100., double noise_threshold = -0.15);

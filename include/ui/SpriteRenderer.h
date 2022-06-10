@@ -2,9 +2,7 @@
 
 // Credit: https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/3.2d_game/0.full_source/sprite_renderer.h
 
-#include <nanogui/opengl.h>
-#include <nanogui/glutil.h>
-#include <nanogui/common.h>
+#include "Shader.h"
 
 namespace Game3 {
 	class Canvas;
@@ -13,7 +11,7 @@ namespace Game3 {
 	class SpriteRenderer {
 		public:
 			Canvas &canvas;
-			nanogui::GLShader shader;
+			Shader shader;
 
 			SpriteRenderer(Canvas &);
 			~SpriteRenderer();

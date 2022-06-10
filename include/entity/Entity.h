@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <utility>
 
-#include <nanogui/common.h>
+#include <Eigen/Eigen>
 #include <nlohmann/json.hpp>
 
 #include "Direction.h"
@@ -45,7 +45,7 @@ namespace Game3 {
 			/** When the entity moves a square, its position field is immediately updated but this field is set to an offset
 			 *  such that the sum of the new position and the offset is equal to the old offset. The offset is moved closer
 			 *  to zero each tick to achieve smooth movement instead of teleportation from one tile to the next. */
-			nanogui::Vector2f offset {0.f, 0.f};
+			Eigen::Vector2f offset {0.f, 0.f};
 
 			~Entity() override = default;
 

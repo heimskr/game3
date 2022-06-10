@@ -1,29 +1,28 @@
 // Credit: https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/3.2d_game/0.full_source/sprite_renderer.cpp
 
-#include <nanogui/opengl.h>
-#include <nanogui/glutil.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #include <iostream>
+
+#include "Shader.h"
+
+#include <glm/gtc/matrix_transform.hpp>
+#include <GL/glu.h>
 
 #include "Texture.h"
 #include "game/Game.h"
 #include "ui/Canvas.h"
 #include "ui/SpriteRenderer.h"
+#include "resources.h"
 #include "util/Util.h"
 
-#include <GL/glu.h>
+
 
 namespace Game3 {
-	SpriteRenderer::SpriteRenderer(Canvas &canvas_): canvas(canvas_) {
-		shader.initFromFiles("SpriteRenderer", "resources/sprite.vert", "resources/sprite.frag");
+	SpriteRenderer::SpriteRenderer(Canvas &canvas_): canvas(canvas_), shader("SpriteRenderer") {
+		shader.init(sprite_vert, sprite_frag);
 		initRenderData();
 	}
 
 	SpriteRenderer::~SpriteRenderer() {
-		shader.free();
 		if (initialized)
 			glDeleteVertexArrays(1, &quadVAO);
 	}
@@ -34,7 +33,7 @@ namespace Game3 {
 			backbufferHeight = backbuffer_height;
 			glm::mat4 projection = glm::ortho(0.f, float(backbuffer_width), float(backbuffer_height), 0.f, -1.f, 1.f);
 			shader.bind();
-			glUniformMatrix4fv(shader.uniform("projection"), 1, GL_FALSE, glm::value_ptr(projection));
+			shader.set("projection", projection);
 		}
 	}
 
@@ -74,10 +73,10 @@ namespace Game3 {
 		model = glm::translate(model, glm::vec3(-0.5f * texture.width, -0.5f * texture.height, 0.f)); // move origin back
 		model = glm::scale(model, glm::vec3(texture.width * scale * canvas.scale / 2.f, texture.height * scale * canvas.scale / 2.f, 2.f)); // last scale
 
-		glUniformMatrix4fv(shader.uniform("model"), 1, GL_FALSE, glm::value_ptr(model));
-		glUniform4f(shader.uniform("spriteColor"), 1.f, 1.f, 1.f, alpha);
+		shader.set("model", model);
+		shader.set("spriteColor", 1.f, 1.f, 1.f, alpha);
 		const float multiplier = 2.f / texture.width;
-		glUniform4f(shader.uniform("texturePosition"), x_offset * multiplier, y_offset * multiplier, size_x / texture.width, size_y / texture.width);
+		shader.set("texturePosition", x_offset * multiplier, y_offset * multiplier, size_x / texture.width, size_y / texture.width);
 
 		glActiveTexture(GL_TEXTURE0);
 		texture.bind();
@@ -110,8 +109,8 @@ namespace Game3 {
 		model = glm::translate(model, glm::vec3(-0.5f * texture.width, -0.5f * texture.height, 0.f)); // move origin back
 		model = glm::scale(model, glm::vec3(texture.width * scale, texture.height * scale, 2.f)); // last scale
 
-		glUniformMatrix4fv(shader.uniform("model"), 1, GL_FALSE, glm::value_ptr(model));
-		glUniform4f(shader.uniform("spriteColor"), 1.f, 1.f, 1.f, alpha);
+		shader.set("model", model);
+		shader.set("spriteColor", 1.f, 1.f, 1.f, alpha);
 
 		glActiveTexture(GL_TEXTURE0);
 		texture.bind();

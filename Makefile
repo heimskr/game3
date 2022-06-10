@@ -9,13 +9,13 @@ DEPS         := gl opengl stb eigen3 glm glfw3 libzstd gtk4 gtkmm-4.0
 OUTPUT       := game3
 COMPILER     ?= g++
 CPPFLAGS     := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude
-INCLUDES     := $(shell pkg-config --cflags $(DEPS)) -Inanovg/src
+INCLUDES     := $(shell pkg-config --cflags $(DEPS))
 LIBS         := $(shell pkg-config --libs   $(DEPS))
-LDFLAGS      := -L/lib $(LIBS) -lnanogui -pthread -lGLU -lglut -lnoise
+LDFLAGS      := -L/lib $(LIBS) -pthread -lGLU -lglut -lnoise
 SOURCES      := $(shell find src -name \*.cpp) src/resources.cpp
 OBJECTS      := $(SOURCES:.cpp=.o)
 RESXML       := $(OUTPUT).gresource.xml
-CLOC_OPTIONS := . --exclude-dir=.vscode,nanovg --fullpath --not-match-f='^.\/(src\/resources\.cpp|include\/resources\.h)$$'
+CLOC_OPTIONS := . --exclude-dir=.vscode --fullpath --not-match-f='^.\/(src\/resources\.cpp|include\/resources\.h)$$'
 GLIB_COMPILE_RESOURCES = $(shell pkg-config --variable=glib_compile_resources gio-2.0)
 
 .PHONY: all clean test
@@ -29,13 +29,14 @@ src/resources.cpp: $(RESXML) $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=resou
 	@ printf "\e[2m[\e[22;32mcc\e[39;2m]\e[22m $< \e[2m$(BUILDFLAGS)\e[22m\n"
 	@ $(COMPILER) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
 
-include/resources.h: resources/tilemap.frag resources/tilemap.geom resources/tilemap.vert resources/buffered.frag resources/buffered.vert
+include/resources.h: resources/buffered.frag resources/buffered.vert resources/rect.frag resources/rect.vert resources/sprite.frag resources/sprite.vert
 	echo "#include <cstdlib>" > $@
-	bin2c tilemap_frag < resources/tilemap.frag | tail -n +2 >> $@
-	bin2c tilemap_geom < resources/tilemap.geom | tail -n +2 >> $@
-	bin2c tilemap_vert < resources/tilemap.vert | tail -n +2 >> $@
 	bin2c buffered_frag < resources/buffered.frag | tail -n +2 >> $@
 	bin2c buffered_vert < resources/buffered.vert | tail -n +2 >> $@
+	bin2c rectangle_frag < resources/rect.frag | tail -n +2 >> $@
+	bin2c rectangle_vert < resources/rect.vert | tail -n +2 >> $@
+	bin2c sprite_frag < resources/sprite.frag | tail -n +2 >> $@
+	bin2c sprite_vert < resources/sprite.vert | tail -n +2 >> $@
 
 $(OUTPUT): $(OBJECTS)
 	@ printf "\e[2m[\e[22;36mld\e[39;2m]\e[22m $@\n"

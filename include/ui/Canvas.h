@@ -2,8 +2,7 @@
 
 #include <random>
 
-#include <nanogui/opengl.h>
-#include <nanogui/common.h>
+#include <Eigen/Eigen>
 
 #include "Texture.h"
 #include "Types.h"
@@ -21,7 +20,7 @@ namespace Game3 {
 
 			MainWindow &window;
 			std::shared_ptr<Game> game;
-			nanogui::Vector2f center {0.f, 0.f};
+			Eigen::Vector2f center {0.f, 0.f};
 			float scale = DEFAULT_SCALE;
 			SpriteRenderer spriteRenderer {*this};
 			RectangleRenderer rectangleRenderer {*this};
@@ -31,7 +30,7 @@ namespace Game3 {
 			Canvas(MainWindow &);
 
 			void drawGL();
-			// bool mouseButtonEvent(const nanogui::Vector2i &p, int button, bool down, int modifiers) override;
+			// bool mouseButtonEvent(const Eigen::Vector2i &p, int button, bool down, int modifiers) override;
 			int width();
 			int height();
 	};

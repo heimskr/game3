@@ -69,7 +69,7 @@ namespace Game3 {
 		return out;
 	}
 
-	void Realm::render(const int width, const int height, const nanogui::Vector2f &center, float scale, SpriteRenderer &sprite_renderer) {
+	void Realm::render(const int width, const int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &sprite_renderer) {
 		renderer1.center = center;
 		renderer1.scale  = scale;
 		renderer1.onBackbufferResized(width, height);

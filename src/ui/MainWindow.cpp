@@ -1,6 +1,7 @@
-#include <nanogui/nanogui.h>
-
 #include <fstream>
+#include <iostream>
+
+#include "Shader.h"
 
 #include "entity/ItemEntity.h"
 #include "game/Game.h"
@@ -14,6 +15,7 @@
 
 #include "util/FS.h"
 #include "util/Util.h"
+
 #include <GL/glu.h>
 
 // #define USE_CBOR

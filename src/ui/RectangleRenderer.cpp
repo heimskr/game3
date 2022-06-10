@@ -1,24 +1,21 @@
-#include <nanogui/opengl.h>
-#include <nanogui/glutil.h>
-
 #include <iostream>
 
-#include <glm/glm.hpp>
+#include "Shader.h"
+
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <GL/glu.h>
 
+#include "resources.h"
 #include "ui/RectangleRenderer.h"
 #include "util/Util.h"
 
 namespace Game3 {
-	RectangleRenderer::RectangleRenderer(Canvas &canvas_): canvas(canvas_) {
-		shader.initFromFiles("RectangleRenderer", "resources/rect.vert", "resources/rect.frag");
+	RectangleRenderer::RectangleRenderer(Canvas &canvas_): canvas(canvas_), shader("RectangleRenderer") {
+		shader.init(rectangle_vert, rectangle_frag);
 		initRenderData();
 	}
 
 	RectangleRenderer::~RectangleRenderer() {
-		shader.free();
 		if (initialized)
 			glDeleteVertexArrays(1, &quadVAO);
 	}
@@ -29,11 +26,11 @@ namespace Game3 {
 			backbufferHeight = backbuffer_height;
 			glm::mat4 projection = glm::ortho(0.f, float(backbuffer_width), float(backbuffer_height), 0.f, -1.f, 1.f);
 			shader.bind();
-			glUniformMatrix4fv(shader.uniform("projection"), 1, GL_FALSE, glm::value_ptr(projection)); CHECKGL
+			shader.set("projection", projection);
 		}
 	}
 
-	void RectangleRenderer::drawOnScreen(const nanogui::Vector4f &color, float x, float y, float width, float height, float angle) {
+	void RectangleRenderer::drawOnScreen(const Eigen::Vector4f &color, float x, float y, float width, float height, float angle) {
 		if (!initialized)
 			return;
 
@@ -47,15 +44,15 @@ namespace Game3 {
 		model = glm::translate(model, glm::vec3(-0.5f * width, -0.5f * height, 0.f)); // move origin back
 		model = glm::scale(model, glm::vec3(width, height, 2.f)); // last scale
 
-		glUniformMatrix4fv(shader.uniform("model"), 1, GL_FALSE, glm::value_ptr(model)); CHECKGL
-		glUniform4f(shader.uniform("rectColor"), color.x(), color.y(), color.z(), color.w()); CHECKGL
+		shader.set("model", model);
+		shader.set("rectColor", color);
 
 		glBindVertexArray(quadVAO); CHECKGL
 		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
 		glBindVertexArray(0); CHECKGL
 	}
 
-	void RectangleRenderer::operator()(const nanogui::Vector4f &color, float x, float y, float width, float height, float angle) {
+	void RectangleRenderer::operator()(const Eigen::Vector4f &color, float x, float y, float width, float height, float angle) {
 		drawOnScreen(color, x, y, width, height, angle);
 	}
 

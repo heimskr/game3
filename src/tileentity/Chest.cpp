@@ -1,5 +1,3 @@
-#include <nanogui/opengl.h>
-
 #include <iostream>
 
 #include "Tiles.h"

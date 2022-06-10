@@ -1,8 +1,6 @@
 #include <iostream>
 
-#include <nanogui/opengl.h>
-#include <nanogui/glutil.h>
-
+#include "Shader.h"
 #include "ui/TilemapRenderer.h"
 
 namespace Game3 {

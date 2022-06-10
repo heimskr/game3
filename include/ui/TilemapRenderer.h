@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include <nanogui/common.h>
+#include <Eigen/Eigen>
 
 #include "Tilemap.h"
 
@@ -15,7 +15,7 @@ namespace Game3 {
 			int backbufferWidth = -1;
 			int backbufferHeight = -1;
 
-			nanogui::Vector2f center {0.f, 0.f};
+			Eigen::Vector2f center {0.f, 0.f};
 			std::shared_ptr<Tilemap> tilemap;
 
 			TilemapRenderer() = default;

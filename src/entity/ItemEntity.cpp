@@ -1,5 +1,3 @@
-#include <nanogui/opengl.h>
-
 #include <iostream>
 
 #include "entity/ItemEntity.h"

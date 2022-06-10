@@ -1,5 +1,3 @@
-#include <nanogui/opengl.h>
-
 #include "game/Game.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
