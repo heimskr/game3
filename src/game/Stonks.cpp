@@ -30,7 +30,7 @@ namespace Game3 {
 		const auto &inventory = *merchant.inventory;
 		auto merchant_amount = inventory.count(stack);
 		const auto base = stack.item->basePrice;
-		MoneyCount price = 0;
+		double price = 0.;
 		MoneyCount merchant_money = merchant.money;
 		const double greed = merchant.greed;
 		bool result = true;
