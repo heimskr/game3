@@ -28,24 +28,26 @@ namespace Game3 {
 
 	void Merchant::absorbJSON(const nlohmann::json &json) {
 		Entity::absorbJSON(json);
-		priceMultiplier = json.at("priceMultiplier");
+		greed = json.at("greed");
+		money = json.at("money");
 	}
 
 	void Merchant::onInteractNextTo(const std::shared_ptr<Player> &player) {
 		auto &window = getRealm()->getGame().canvas.window;
 		auto &tab = *window.merchantTab;
 		player->queueForMove([player, &tab](const auto &) {
-			tab.resetMerchantInventory();
+			tab.hide();
 			return true;
 		});
 		tab.show();
 		window.delay([this, &tab] {
-			tab.setMerchantInventory("Merchant", inventory, priceMultiplier);
+			tab.setMerchantInventory("Merchant", inventory, greed);
 		}, 2);
 	}
 
 	void to_json(nlohmann::json &json, const Merchant &merchant) {
 		to_json(json, static_cast<const Entity &>(merchant));
-		json["priceMultiplier"] = merchant.priceMultiplier;
+		json["money"] = merchant.money;
+		json["greed"] = merchant.greed;
 	}
 }

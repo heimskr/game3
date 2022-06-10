@@ -495,11 +495,16 @@ namespace Game3 {
 			realm->game = game.get();
 		game->signal_player_inventory_update().connect([this](const std::shared_ptr<Player> &) {
 			inventoryTab->reset(game);
+			merchantTab->reset(game);
 		});
 		game->signal_other_inventory_update().connect([this](const std::shared_ptr<HasRealm> &owner) {
 			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner)) {
-				if (has_inventory->inventory && has_inventory->inventory == inventoryTab->getExternalInventory())
-					inventoryTab->reset(game);
+				if (has_inventory->inventory) {
+					if (has_inventory->inventory == inventoryTab->getExternalInventory())
+						inventoryTab->reset(game);
+					if (has_inventory->inventory == merchantTab->getMerchantInventory())
+						merchantTab->reset(game);
+				}
 			}
 		});
 	}

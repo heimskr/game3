@@ -95,15 +95,11 @@ namespace Game3 {
 		playerWidgets.clear();
 		merchantWidgets.clear();
 
-		const int grid_width = lastGridWidth = gridWidth();
-		const int tile_size = TILE_SIZE;
-		if (scrolled.get_width() == 0) {
-		// int tile_size = scrolled.get_width() / TILE_SIZE;
-		// if (tile_size == 0) {
-			std::cout << "Nope.\n";
+		if (scrolled.get_width() == 0)
 			return;
-		}
-		// tile_size  = scrolled.get_width() / tile_size;
+
+		const int grid_width = lastGridWidth = gridWidth();
+		const int tile_size = scrolled.get_width() / (scrolled.get_width() / TILE_SIZE);
 
 		auto populate = [&](Gtk::Grid &grid, Inventory &inventory, bool merchant) {
 			auto &storage = inventory.getStorage();

@@ -13,4 +13,6 @@ namespace Game3 {
 	using RealmID = unsigned;
 	using ItemID = unsigned;
 	using Slot = int;
+	using ItemCount = size_t;
+	using MoneyCount = size_t;
 }

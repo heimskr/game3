@@ -34,6 +34,12 @@ namespace Game3 {
 
 			inline bool empty() const { return storage.empty(); }
 
+			/** Counts the amount of an item in the inventory. */
+			ItemCount count(const Item &) const;
+
+			/** Counts the amount of an item in the inventory. This will take ItemStack metadata into account eventually. */
+			ItemCount count(const ItemStack &) const;
+
 		private:
 			std::map<Slot, ItemStack> storage;
 

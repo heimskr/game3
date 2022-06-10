@@ -33,10 +33,11 @@ namespace Game3 {
 
 			ItemID id = 0;
 			std::string name;
-			unsigned maxCount = 64;
+			MoneyCount basePrice = 1;
+			ItemCount maxCount = 64;
 
-			Item() = default;
-			Item(ItemID id_, const std::string &name_, unsigned max_count = 64): id(id_), name(name_), maxCount(max_count) {}
+			Item() = delete;
+			Item(ItemID id_, const std::string &name_, MoneyCount base_price, ItemCount max_count = 64): id(id_), name(name_), basePrice(base_price), maxCount(max_count) {}
 
 			Glib::RefPtr<Gdk::Pixbuf> getImage();
 
@@ -47,11 +48,11 @@ namespace Game3 {
 	class ItemStack {
 		public:
 			std::shared_ptr<Item> item;
-			unsigned count = 1;
+			ItemCount count = 1;
 
 			ItemStack() = default;
-			ItemStack(const std::shared_ptr<Item> &item_, unsigned count_): item(item_), count(count_) {}
-			ItemStack(ItemID id, unsigned count_): item(Item::items.at(id)), count(count_) {}
+			ItemStack(const std::shared_ptr<Item> &item_, ItemCount count_): item(item_), count(count_) {}
+			ItemStack(ItemID id, ItemCount count_): item(Item::items.at(id)), count(count_) {}
 
 			bool canMerge(const ItemStack &) const;
 			Glib::RefPtr<Gdk::Pixbuf> getImage();

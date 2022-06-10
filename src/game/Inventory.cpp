@@ -24,7 +24,7 @@ namespace Game3 {
 	}
 
 	std::optional<ItemStack> Inventory::add(const ItemStack &stack, Slot start) {
-		int remaining = stack.count;
+		ssize_t remaining = stack.count;
 
 		if (0 <= start) {
 			if (slotCount <= start)
@@ -32,15 +32,15 @@ namespace Game3 {
 			if (storage.contains(start)) {
 				auto &stored = storage.at(start);
 				if (stored.canMerge(stack)) {
-					const int storable = int(stored.item->maxCount) - int(stored.count);
+					const ssize_t storable = ssize_t(stored.item->maxCount) - ssize_t(stored.count);
 					if (0 < storable) {
-						const int to_store = std::min(remaining, storable);
+						const ItemCount to_store = std::min(ItemCount(remaining), ItemCount(storable));
 						stored.count += to_store;
 						remaining -= to_store;
 					}
 				}
 			} else {
-				const int to_store = std::min(int(stack.item->maxCount), remaining);
+				const ItemCount to_store = std::min(ItemCount(stack.item->maxCount), ItemCount(remaining));
 				storage.try_emplace(start, stack.item, to_store);
 				remaining -= to_store;
 			}
@@ -50,9 +50,9 @@ namespace Game3 {
 			for (auto &[slot, stored]: storage) {
 				if (slot == start || !stored.canMerge(stack))
 					continue;
-				const int storable = int(stored.item->maxCount) - int(stored.count);
+				const ssize_t storable = ssize_t(stored.item->maxCount) - ssize_t(stored.count);
 				if (0 < storable) {
-					const int to_store = std::min(remaining, storable);
+					const ItemCount to_store = std::min(ItemCount(remaining), ItemCount(storable));
 					stored.count += to_store;
 					remaining -= to_store;
 					if (remaining <= 0)
@@ -64,7 +64,7 @@ namespace Game3 {
 			for (Slot slot = 0; slot < slotCount; ++slot) {
 				if (storage.contains(slot))
 					continue;
-				const unsigned to_store = std::min(unsigned(remaining), stack.item->maxCount);
+				const ItemCount to_store = std::min(ItemCount(remaining), stack.item->maxCount);
 				storage.emplace(slot, ItemStack(stack.item, to_store));
 				remaining -= to_store;
 				if (remaining <= 0)
@@ -83,14 +83,14 @@ namespace Game3 {
 	}
 
 	bool Inventory::canStore(const ItemStack &stack) const {
-		int remaining = stack.count;
+		ssize_t remaining = stack.count;
 
 		for (const auto &[slot, stored]: storage) {
 			if (!stored.canMerge(stack))
 				continue;
-			const int storable = int(stored.item->maxCount) - int(stored.count);
+			const ssize_t storable = ssize_t(stored.item->maxCount) - ssize_t(stored.count);
 			if (0 < storable) {
-				const int to_store = std::min(remaining, storable);
+				const ItemCount to_store = std::min(ItemCount(remaining), ItemCount(storable));
 				remaining -= to_store;
 				if (remaining <= 0)
 					break;
@@ -101,7 +101,7 @@ namespace Game3 {
 			for (Slot slot = 0; slot < slotCount; ++slot) {
 				if (storage.contains(slot))
 					continue;
-				remaining -= std::min(unsigned(remaining), stack.item->maxCount);
+				remaining -= std::min(ItemCount(remaining), stack.item->maxCount);
 				if (remaining <= 0)
 					break;
 			}
@@ -145,6 +145,18 @@ namespace Game3 {
 	void Inventory::erase(Slot slot) {
 		storage.erase(slot);
 		notifyOwner();
+	}
+
+	ItemCount Inventory::count(const Item &item) const {
+		ItemCount out = 0;
+		for (const auto &[slot, stored_item]: storage)
+			if (stored_item.item->id == item.id)
+				out += stored_item.count;
+		return out;
+	}
+
+	ItemCount Inventory::count(const ItemStack &stack) const {
+		return count(*stack.item);
 	}
 
 	void Inventory::notifyOwner() {
