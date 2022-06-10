@@ -80,6 +80,12 @@ namespace Game3 {
 			chooser->show();
 		}));
 
+		debugAction = add_action_bool("debug", [this] {
+			debugAction->get_state<bool>(debugMode);
+			debugMode = !debugMode;
+			debugAction->set_state(Glib::Variant<bool>::create(debugMode));
+		}, debugMode);
+
 		glArea.set_expand(true);
 		glArea.set_required_version(3, 3);
 		glArea.set_has_stencil_buffer(true);

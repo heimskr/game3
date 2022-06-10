@@ -64,6 +64,7 @@ namespace Game3 {
 			Gtk::Box vbox {Gtk::Orientation::VERTICAL};
 			Gtk::GLArea glArea;
 			Gtk::Label statusbar;
+			Glib::RefPtr<Gio::SimpleAction> debugAction;
 			std::unique_ptr<Canvas> canvas;
 			std::unordered_map<Gtk::Widget *, std::shared_ptr<Tab>> tabMap;
 			std::shared_ptr<Tab> activeTab;
@@ -74,6 +75,7 @@ namespace Game3 {
 			bool autofocus = true;
 			bool statusbarWaiting = false;
 			std::chrono::system_clock::time_point statusbarSetTime;
+			bool debugMode = true;
 
 			struct KeyInfo {
 				guint value;
