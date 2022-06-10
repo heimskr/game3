@@ -131,6 +131,7 @@ namespace Game3 {
 
 		auto populate = [&](Gtk::Grid &grid, Inventory &inventory, bool external) {
 			auto &storage = inventory.getStorage();
+			auto &widgets = external? externalWidgets : playerWidgets;
 
 			for (Slot slot = 0; slot < inventory.slotCount; ++slot) {
 				const int row    = slot / grid_width;
@@ -142,17 +143,28 @@ namespace Game3 {
 					Glib::ustring label_text = stack.item->name;
 					if (stack.count != 1)
 						label_text += " \u00d7 " + std::to_string(stack.count);
-					widget_ptr = std::make_unique<Gtk::Image>(inventory.getImage(slot));
-					auto &widget = *widget_ptr;
-					widget.set_tooltip_text(label_text);
+					auto fixed_ptr = std::make_unique<Gtk::Fixed>();
+					auto image_ptr = std::make_unique<Gtk::Image>(inventory.getImage(slot));
+					auto label_ptr = std::make_unique<Gtk::Label>(std::to_string(stack.count));
+					label_ptr->set_xalign(1.f);
+					label_ptr->set_yalign(1.f);
+					auto &fixed = *fixed_ptr;
+					fixed.put(*image_ptr, 0, 0);
+					fixed.put(*label_ptr, 0, 0);
+					fixed.set_tooltip_text(label_text);
 					auto left_click = Gtk::GestureClick::create();
 					auto right_click = Gtk::GestureClick::create();
 					left_click->set_button(1);
 					right_click->set_button(3);
-					left_click ->signal_pressed().connect([this, game, slot, external, &widget](int n, double x, double y) { leftClick (game, &widget, n, slot, external, x, y); });
-					right_click->signal_pressed().connect([this, game, slot, external, &widget](int n, double x, double y) { rightClick(game, &widget, n, slot, external, x, y); });
-					widget.add_controller(left_click);
-					widget.add_controller(right_click);
+					left_click ->signal_pressed().connect([this, game, slot, external, &fixed](int n, double x, double y) { leftClick (game, &fixed, n, slot, external, x, y); });
+					right_click->signal_pressed().connect([this, game, slot, external, &fixed](int n, double x, double y) { rightClick(game, &fixed, n, slot, external, x, y); });
+					fixed.add_controller(left_click);
+					fixed.add_controller(right_click);
+					widget_ptr = std::move(fixed_ptr);
+					image_ptr->set_size_request(tile_size - InventoryTab::TILE_MAGIC, tile_size - InventoryTab::TILE_MAGIC);
+					label_ptr->set_size_request(tile_size - InventoryTab::TILE_MAGIC, tile_size - InventoryTab::TILE_MAGIC);
+					widgets.push_back(std::move(image_ptr));
+					widgets.push_back(std::move(label_ptr));
 				} else
 					widget_ptr = std::make_unique<Gtk::Label>("");
 
@@ -166,7 +178,7 @@ namespace Game3 {
 				widget_ptr->set_data("slot", reinterpret_cast<void *>(slot));
 				widget_ptr->set_data("external", reinterpret_cast<void *>(external));
 				grid.attach(*widget_ptr, column, row);
-				(external? externalWidgets : playerWidgets).push_back(std::move(widget_ptr));
+				widgets.push_back(std::move(widget_ptr));
 			}
 		};
 

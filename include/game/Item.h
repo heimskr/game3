@@ -23,9 +23,10 @@ namespace Game3 {
 
 	class Item {
 		public:
-			constexpr static ItemID NOTHING = 0;
+			constexpr static ItemID NOTHING    = 0;
 			constexpr static ItemID SHORTSWORD = 1;
 			constexpr static ItemID RED_POTION = 2;
+			constexpr static ItemID COINS      = 3;
 
 			static std::map<ItemID, std::shared_ptr<Item>> items;
 			static std::unordered_map<ItemID, ItemTexture> itemTextures;

@@ -386,7 +386,7 @@ namespace Game3 {
 						return;
 					case GDK_KEY_o: {
 						static std::default_random_engine item_rng;
-						static const std::array<ItemID, 2> ids {Item::SHORTSWORD, Item::RED_POTION};
+						static const std::array<ItemID, 3> ids {Item::SHORTSWORD, Item::RED_POTION, Item::COINS};
 						ItemStack stack(choose(ids, item_rng), 1);
 						auto leftover = player.inventory->add(stack);
 						if (leftover) {

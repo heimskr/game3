@@ -5,15 +5,18 @@ namespace Game3 {
 	static Texture textureShortsword  {"resources/items/SwordShort.png"};
 	static Texture textureConsumables {"resources/rpg/consumables.png"};
 	static Texture texturePotions     {"resources/rpg/potions.png"};
+	static Texture textureItems       {"resources/items/items.png"};
 
 	std::unordered_map<ItemID, ItemTexture> Item::itemTextures {
 		{Item::SHORTSWORD, {0, 0, textureShortsword}},
 		{Item::RED_POTION, {48, 176, texturePotions}},
+		{Item::COINS,      {160, 112, textureItems}},
 	};
 
 	std::map<ItemID, std::shared_ptr<Item>> Item::items {
 		{Item::SHORTSWORD, std::make_shared<Item>(Item::SHORTSWORD, "Shortsword", 1)},
 		{Item::RED_POTION, std::make_shared<Item>(Item::RED_POTION, "Red Potion", 8)},
+		{Item::COINS,      std::make_shared<Item>(Item::COINS, "Gold", 1'000'000)},
 	};
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage() {

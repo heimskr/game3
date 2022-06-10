@@ -28,6 +28,7 @@ namespace Game3 {
 		private:
 			constexpr static int TILE_MARGIN = 2;
 			constexpr static int TILE_SIZE = 64;
+			constexpr static int TILE_MAGIC = 5;
 
 			Gtk::ScrolledWindow scrolled;
 			Gtk::Grid playerGrid;

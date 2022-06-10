@@ -4,6 +4,15 @@
 	border-radius: 5px;
 	background: rgba(0, 0, 0, 0.25);
 	margin: 2px;
+	padding: 0;
+	color: white;
+}
+
+.item-slot > label {
+	text-shadow: black 1px 1px 0, black -1px -1px 0, black -1px 1px 0, black 1px -1px 0;
+	position: relative;
+	padding-right: 2px;
+	padding-bottom: 2px;
 }
 
 .text-tab {
