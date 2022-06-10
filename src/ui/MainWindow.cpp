@@ -81,10 +81,11 @@ namespace Game3 {
 		}));
 
 		debugAction = add_action_bool("debug", [this] {
-			debugAction->get_state<bool>(debugMode);
-			debugMode = !debugMode;
-			debugAction->set_state(Glib::Variant<bool>::create(debugMode));
-		}, debugMode);
+			if (game) {
+				game->debugMode = !game->debugMode;
+				debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
+			}
+		}, false);
 
 		glArea.set_expand(true);
 		glArea.set_required_version(3, 3);
@@ -380,31 +381,20 @@ namespace Game3 {
 					case GDK_KEY_d:
 						player.movingRight = true;
 						return;
-					case GDK_KEY_i:
-						if (player.inventory->empty()) {
-							std::cout << "Inventory empty.\n";
-						} else {
-							std::cout << "Inventory:\n";
-							for (const auto &[slot, stack]: player.inventory->getStorage())
-								std::cout << "  " << stack.item->name << " x " << stack.count << " in slot " << slot << '\n';
-							inventoryTab->reset(game);
-						}
-						return;
 					case GDK_KEY_o: {
-						static std::default_random_engine item_rng;
-						static const std::array<ItemID, 3> ids {Item::SHORTSWORD, Item::RED_POTION, Item::COINS};
-						ItemStack stack(choose(ids, item_rng), 1);
-						auto leftover = player.inventory->add(stack);
-						if (leftover) {
-							auto &realm = *player.getRealm();
-							realm.spawn<ItemEntity>(player.position, *leftover);
-							realm.game->signal_player_inventory_update().emit(game->player);
+						if (game && game->debugMode) {
+							static std::default_random_engine item_rng;
+							static const std::array<ItemID, 3> ids {Item::SHORTSWORD, Item::RED_POTION, Item::COINS};
+							ItemStack stack(choose(ids, item_rng), 1);
+							auto leftover = player.inventory->add(stack);
+							if (leftover) {
+								auto &realm = *player.getRealm();
+								realm.spawn<ItemEntity>(player.position, *leftover);
+								realm.game->signal_player_inventory_update().emit(game->player);
+							}
 						}
 						return;
 					}
-					case GDK_KEY_r:
-						if (game && modifiers == Gdk::ModifierType::CONTROL_MASK)
-							game->player->focus(*canvas, false);
 						return;
 					case GDK_KEY_E:
 						game->player->interactOn();
@@ -421,9 +411,6 @@ namespace Game3 {
 							autofocus = !autofocus;
 						else
 							game->player->focus(*canvas, false);
-						return;
-					case GDK_KEY_x:
-						setStatus("Hello");
 						return;
 				}
 			}
@@ -486,6 +473,7 @@ namespace Game3 {
 
 	void MainWindow::onGameLoaded() {
 		glArea.get_context()->make_current();
+		debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
 		game->player->focus(*canvas, false);
 		canvas->game = game;
 		game->activeRealm->rebind();

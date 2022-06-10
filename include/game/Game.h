@@ -23,6 +23,7 @@ namespace Game3 {
 			/** Seconds since the last tick */
 			float delta = 0.f;
 			std::chrono::system_clock::time_point startTime = std::chrono::system_clock::now();
+			bool debugMode = false;
 
 			Game() = delete;
 

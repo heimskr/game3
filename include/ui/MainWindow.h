@@ -75,7 +75,6 @@ namespace Game3 {
 			bool autofocus = true;
 			bool statusbarWaiting = false;
 			std::chrono::system_clock::time_point statusbarSetTime;
-			bool debugMode = true;
 
 			struct KeyInfo {
 				guint value;

@@ -63,7 +63,7 @@ namespace Game3 {
 		const int y = pos_y;
 
 		(void) n;
-		if (player && 0 <= x && x < tilemap->width && 0 <= y && y < tilemap->height)
+		if (debugMode && player && 0 <= x && x < tilemap->width && 0 <= y && y < tilemap->height)
 			player->teleport({y, x});
 	}
 
@@ -76,11 +76,16 @@ namespace Game3 {
 		for (const auto &[string, realm_json]: json.at("realms").get<std::unordered_map<std::string, nlohmann::json>>())
 			out->realms.emplace(parseUlong(string), Realm::fromJSON(realm_json)).first->second->setGame(*out);
 		out->activeRealm = out->realms.at(json.at("activeRealmID"));
+		if (json.contains("debugMode"))
+			out->debugMode = json.at("debugMode");
+		else
+			out->debugMode = false;
 		return out;
 	}
 
 	void to_json(nlohmann::json &json, const Game &game) {
 		json["activeRealmID"] = game.activeRealm->id;
+		json["debugMode"] = game.debugMode;
 		json["realms"] = std::unordered_map<std::string, nlohmann::json>();
 		for (const auto &[id, realm]: game.realms)
 			json["realms"][std::to_string(id)] = nlohmann::json(*realm);
