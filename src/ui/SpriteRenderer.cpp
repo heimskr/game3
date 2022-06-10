@@ -34,7 +34,7 @@ namespace Game3 {
 			backbufferHeight = backbuffer_height;
 			glm::mat4 projection = glm::ortho(0.f, float(backbuffer_width), float(backbuffer_height), 0.f, -1.f, 1.f);
 			shader.bind();
-			glUniformMatrix4fv(shader.uniform("projection"), 1, GL_FALSE, glm::value_ptr(projection)); CHECKGL
+			glUniformMatrix4fv(shader.uniform("projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		}
 	}
 
@@ -63,33 +63,28 @@ namespace Game3 {
 		y -= tilemap->height * tilemap->tileSize * canvas.scale / canvas.magic * 2.f;
 		y += canvas.center.y() * canvas.scale * tilemap->tileSize / 2.f;
 
-		size_x *= canvas.scale / 2.f;
-		size_y *= canvas.scale / 2.f;
-		x_offset *= canvas.scale * scale;
-		y_offset *= canvas.scale * scale;
 
 		shader.bind();
 
 		glm::mat4 model = glm::mat4(1.f);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(x - x_offset, y - y_offset, 0.f));
+		model = glm::translate(model, glm::vec3(x - x_offset * canvas.scale * scale, y - y_offset * canvas.scale * scale, 0.f));
 		model = glm::translate(model, glm::vec3(0.5f * texture.width, 0.5f * texture.height, 0.f)); // move origin of rotation to center of quad
 		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
 		model = glm::translate(model, glm::vec3(-0.5f * texture.width, -0.5f * texture.height, 0.f)); // move origin back
 		model = glm::scale(model, glm::vec3(texture.width * scale * canvas.scale / 2.f, texture.height * scale * canvas.scale / 2.f, 2.f)); // last scale
 
-		glUniformMatrix4fv(shader.uniform("model"), 1, GL_FALSE, glm::value_ptr(model)); CHECKGL
-		glUniform4f(shader.uniform("spriteColor"), 1.f, 1.f, 1.f, alpha); CHECKGL
+		glUniformMatrix4fv(shader.uniform("model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniform4f(shader.uniform("spriteColor"), 1.f, 1.f, 1.f, alpha);
+		const float multiplier = 2.f / texture.width;
+		glUniform4f(shader.uniform("texturePosition"), x_offset * multiplier, y_offset * multiplier, size_x / texture.width, size_y / texture.width);
 
-		glActiveTexture(GL_TEXTURE0); CHECKGL
-		texture.bind(); CHECKGL
+		glActiveTexture(GL_TEXTURE0);
+		texture.bind();
 
-		glEnable(GL_SCISSOR_TEST);
-		glScissor(2 * x, 2 * (backbufferHeight - y - size_y * scale), 2 * size_x * scale, 2 * size_y * scale);
-		glBindVertexArray(quadVAO); CHECKGL
-		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
-		glBindVertexArray(0); CHECKGL
-		glDisable(GL_SCISSOR_TEST);
+		glBindVertexArray(quadVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindVertexArray(0);
 	}
 
 	void SpriteRenderer::drawOnScreen(Texture &texture, float x, float y, float scale, float angle, float alpha) {
@@ -115,17 +110,17 @@ namespace Game3 {
 		model = glm::translate(model, glm::vec3(-0.5f * texture.width, -0.5f * texture.height, 0.f)); // move origin back
 		model = glm::scale(model, glm::vec3(texture.width * scale, texture.height * scale, 2.f)); // last scale
 
-		glUniformMatrix4fv(shader.uniform("model"), 1, GL_FALSE, glm::value_ptr(model)); CHECKGL
-		glUniform4f(shader.uniform("spriteColor"), 1.f, 1.f, 1.f, alpha); CHECKGL
+		glUniformMatrix4fv(shader.uniform("model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniform4f(shader.uniform("spriteColor"), 1.f, 1.f, 1.f, alpha);
 
-		glActiveTexture(GL_TEXTURE0); CHECKGL
-		texture.bind(); CHECKGL
+		glActiveTexture(GL_TEXTURE0);
+		texture.bind();
 
 		glEnable(GL_SCISSOR_TEST);
 		glScissor(2 * x, 2 * (backbufferHeight - y - size_y), 2 * size_x, 2 * size_y);
-		glBindVertexArray(quadVAO); CHECKGL
-		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
-		glBindVertexArray(0); CHECKGL
+		glBindVertexArray(quadVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindVertexArray(0);
 		glDisable(GL_SCISSOR_TEST);
 	}
 
