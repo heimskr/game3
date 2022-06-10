@@ -10,6 +10,7 @@
 #include "game/Inventory.h"
 #include "ui/gtk/NewGameDialog.h"
 #include "ui/tab/InventoryTab.h"
+#include "ui/tab/MerchantTab.h"
 #include "ui/tab/TextTab.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
@@ -206,6 +207,7 @@ namespace Game3 {
 
 		initTab(inventoryTab, *this).add();
 		initTab(textTab, notebook, "", "");
+		initTab(merchantTab, *this);
 		activeTab = inventoryTab;
 
 		set_child(paned);
@@ -415,7 +417,9 @@ namespace Game3 {
 						return;
 					case GDK_KEY_v:
 						if (game && game->debugMode) {
-							player.getRealm()->spawn<Merchant>(player.getPosition(), Entity::VILLAGER1);
+							auto merchant = player.getRealm()->spawn<Merchant>(player.getPosition(), Entity::VILLAGER1);
+							merchant->inventory->add(ItemStack(Item::RED_POTION, 6));
+							merchant->inventory->add(ItemStack(Item::SHORTSWORD, 1));
 						}
 						return;
 				}

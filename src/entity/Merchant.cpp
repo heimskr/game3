@@ -5,6 +5,7 @@
 #include "game/Realm.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
+#include "ui/tab/MerchantTab.h"
 
 namespace Game3 {
 	std::shared_ptr<Merchant> Merchant::create(EntityID id) {
@@ -30,13 +31,17 @@ namespace Game3 {
 		priceMultiplier = json.at("priceMultiplier");
 	}
 
-	void Merchant::tick(float delta) {
-		Entity::tick(delta);
-		accumulatedTime += delta;
-		if (1.f <= accumulatedTime) {
-			accumulatedTime = 0;
-			move(lastDirection = remapDirection(lastDirection, 0x3201));
-		}
+	void Merchant::onInteractNextTo(const std::shared_ptr<Player> &player) {
+		auto &window = getRealm()->getGame().canvas.window;
+		auto &tab = *window.merchantTab;
+		player->queueForMove([player, &tab](const auto &) {
+			tab.resetMerchantInventory();
+			return true;
+		});
+		tab.show();
+		window.delay([this, &tab] {
+			tab.setMerchantInventory("Merchant", inventory, priceMultiplier);
+		}, 2);
 	}
 
 	void to_json(nlohmann::json &json, const Merchant &merchant) {

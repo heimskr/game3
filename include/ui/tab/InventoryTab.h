@@ -1,6 +1,7 @@
 #include "ui/tab/Tab.h"
 
 namespace Game3 {
+	class Inventory;
 	class MainWindow;
 
 	class InventoryTab: public Tab {

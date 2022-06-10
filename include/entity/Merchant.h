@@ -12,7 +12,7 @@ namespace Game3 {
 
 			nlohmann::json toJSON() const override;
 			void absorbJSON(const nlohmann::json &) override;
-			void tick(float delta) override;
+			void onInteractNextTo(const std::shared_ptr<Player> &) override;
 
 		protected:
 			using Entity::Entity;

@@ -33,9 +33,9 @@ namespace Game3 {
 			tab.text = text;
 			tab.name = name;
 			tab.ephemeral = ephemeral;
-			tab.reset(shared_from_this());
 			if (focus)
 				tab.show();
+			tab.reset(shared_from_this());
 		}
 	}
 
