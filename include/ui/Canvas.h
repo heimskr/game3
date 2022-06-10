@@ -3,11 +3,8 @@
 #include <random>
 
 #include <nanogui/opengl.h>
-#include <nanogui/glutil.h>
-#include <nanogui/screen.h>
-#include <nanogui/glcanvas.h>
+#include <nanogui/common.h>
 
-#include "Image.h"
 #include "Texture.h"
 #include "Types.h"
 #include "ui/RectangleRenderer.h"
