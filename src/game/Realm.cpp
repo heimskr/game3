@@ -2,7 +2,7 @@
 #include <thread>
 #include <unordered_set>
 
-#include <noise/noise.h>
+#include <libnoise/noise.h>
 
 #include "Tiles.h"
 #include "entity/Entity.h"
@@ -500,6 +500,14 @@ namespace Game3 {
 
 	void Realm::queueRemoval(const std::shared_ptr<Entity> &entity) {
 		removalQueue.push_back(entity);
+	}
+
+	void Realm::absorb(const std::shared_ptr<Entity> &entity, const Position &position) {
+		if (auto realm = entity->weakRealm.lock())
+			realm->remove(entity);
+		entity->setRealm(shared_from_this());
+		entity->init();
+		entity->teleport(position);
 	}
 
 	void to_json(nlohmann::json &json, const Realm &realm) {

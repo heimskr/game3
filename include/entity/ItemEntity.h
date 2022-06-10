@@ -7,7 +7,6 @@
 #include "game/Item.h"
 
 namespace Game3 {
-
 	class ItemEntity: public Entity {
 		public:
 			const ItemStack & getStack() const { return stack; }

@@ -12,10 +12,11 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	std::unordered_map<EntityID, Texture> Entity::textureMap {
-		{Entity::GANGBLANC, Texture("resources/characters/champions/Gangblanc.png")},
-		{Entity::GRUM,      Texture("resources/characters/champions/Grum.png")},
-		{Entity::ITEM,      Texture("resources/missing.png")}, // Rendering is handled on a per-item basis by the ItemEntity class
+	std::unordered_map<EntityID, EntityTexture> Entity::textureMap {
+		{Entity::GANGBLANC, {Texture("resources/characters/champions/Gangblanc.png"), 1}},
+		{Entity::GRUM,      {Texture("resources/characters/champions/Grum.png"),      1}},
+		{Entity::ITEM,      {Texture("resources/missing.png"),                        0}}, // Rendering is handled on a per-item basis by the ItemEntity class
+		{Entity::VILLAGER1, {Texture("resources/characters/villager1.png"),           2}},
 	};
 
 	std::shared_ptr<Entity> Entity::fromJSON(const nlohmann::json &json) {
@@ -77,12 +78,12 @@ namespace Game3 {
 	void Entity::id(EntityID new_id) {
 		id_ = new_id;
 		if (texture == nullptr)
-			texture = &textureMap.at(id_);
+			texture = &textureMap.at(id_).texture;
 	}
 
 	void Entity::init() {
 		if (texture == nullptr)
-			texture = &textureMap.at(id_);
+			texture = &textureMap.at(id_).texture;
 
 		if (!inventory)
 			inventory = std::make_shared<Inventory>(shared_from_this(), DEFAULT_INVENTORY_SIZE);
@@ -95,10 +96,20 @@ namespace Game3 {
 			return;
 
 		float x_offset = 0.f;
+		float y_offset;
 		if (offset.x() != 0.f || offset.y() != 0.f)
 			x_offset = 8.f * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - getRealm()->getGame().startTime).count() / 100) % 5);
 
-		sprite_renderer.drawOnMap(*texture, position.column + offset.x(), position.row + offset.y(), x_offset, 8.f * int(direction), 16.f, 16.f);
+		switch (variety) {
+			case 1:
+				y_offset = 8.f * int(direction);
+				break;
+			case 2:
+				y_offset = 16.f * int(remapDirection(direction, 0x0213));
+				break;
+		}
+
+		sprite_renderer.drawOnMap(*texture, position.column + offset.x(), position.row + offset.y(), x_offset, y_offset, 16.f, 16.f);
 	}
 
 	void Entity::move(Direction move_direction) {
@@ -164,6 +175,10 @@ namespace Game3 {
 	void Entity::setRealm(const std::shared_ptr<Realm> realm) {
 		weakRealm = realm;
 		realmID = realm->id;
+	}
+
+	Entity::Entity(EntityID id__): id_(id__) {
+		variety = textureMap.at(id_).variety;
 	}
 
 	bool Entity::canMoveTo(const Position &new_position) const {

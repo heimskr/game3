@@ -68,6 +68,7 @@ namespace Game3 {
 			void setGame(Game &);
 			Game & getGame();
 			void queueRemoval(const std::shared_ptr<Entity> &);
+			void absorb(const std::shared_ptr<Entity> &, const Position &);
 
 			template <typename T, typename... Args>
 			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {

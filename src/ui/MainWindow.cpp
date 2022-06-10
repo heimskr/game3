@@ -4,6 +4,7 @@
 #include "Shader.h"
 
 #include "entity/ItemEntity.h"
+#include "entity/Merchant.h"
 #include "game/Game.h"
 #include "game/HasInventory.h"
 #include "game/Inventory.h"
@@ -411,6 +412,11 @@ namespace Game3 {
 							autofocus = !autofocus;
 						else
 							game->player->focus(*canvas, false);
+						return;
+					case GDK_KEY_v:
+						if (game && game->debugMode) {
+							player.getRealm()->spawn<Merchant>(player.getPosition(), Entity::VILLAGER1);
+						}
 						return;
 				}
 			}

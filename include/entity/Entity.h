@@ -26,14 +26,21 @@ namespace Game3 {
 	class Realm;
 	class SpriteRenderer;
 
+	struct EntityTexture {
+		Texture texture;
+		uint8_t variety;
+		EntityTexture(Texture &&texture_, uint8_t variety_): texture(std::move(texture_)), variety(variety_) {}
+	};
+
 	class Entity: public HasInventory, public HasRealm, public std::enable_shared_from_this<Entity> {
 		public:
 			constexpr static Slot DEFAULT_INVENTORY_SIZE = 20;
 			constexpr static EntityID GANGBLANC = 1;
-			constexpr static EntityID GRUM = 2;
-			constexpr static EntityID ITEM = 3;
+			constexpr static EntityID GRUM      = 2;
+			constexpr static EntityID ITEM      = 3;
+			constexpr static EntityID VILLAGER1 = 4;
 
-			static std::unordered_map<EntityID, Texture> textureMap;
+			static std::unordered_map<EntityID, EntityTexture> textureMap;
 
 			/** (row, column) */
 			Position position {0, 0};
@@ -91,9 +98,12 @@ namespace Game3 {
 			void queueForMove(const std::function<bool(const std::shared_ptr<Entity> &)> &);
 
 		protected:
-			Entity() = delete;
-			Entity(EntityID id__): id_(id__) {}
 			Texture *texture = nullptr;
+			int variety = 0;
+
+			Entity() = delete;
+			Entity(EntityID id__);
+
 			bool canMoveTo(const Position &) const;
 			/** A list of functions to call the next time the entity moves. The functions return whether they should be removed from the queue. */
 			std::list<std::function<bool(const std::shared_ptr<Entity> &)>> moveQueue;
