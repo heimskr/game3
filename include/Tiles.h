@@ -31,6 +31,7 @@ namespace Game3 {
 		constexpr static TileID GRAY = 5;
 		constexpr static TileID ROAD = 15;
 		constexpr static TileID DIRT = 16;
+		constexpr static TileID TILES = 17;
 		constexpr static TileID OIL = 34;
 		constexpr static TileID MARKET1 = 40;
 		constexpr static TileID MARKET2 = 41;

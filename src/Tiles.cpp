@@ -3,7 +3,7 @@
 
 namespace Game3 {
 	std::unordered_set<TileID> OverworldTiles::landSet {
-		SAND, LIGHT_GRASS, GRASS, GRASS_ALT1, GRASS_ALT2, ROAD, DIRT,
+		SAND, LIGHT_GRASS, GRASS, GRASS_ALT1, GRASS_ALT2, ROAD, DIRT, TILES,
 	};
 
 	std::unordered_set<TileID> OverworldTiles::solidSet {
