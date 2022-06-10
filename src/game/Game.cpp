@@ -35,9 +35,9 @@ namespace Game3 {
 			tab.text = text;
 			tab.name = name;
 			tab.ephemeral = ephemeral;
+			tab.reset(shared_from_this());
 			if (focus)
 				tab.show();
-			tab.reset(shared_from_this());
 		}
 	}
 
@@ -65,8 +65,8 @@ namespace Game3 {
 		const int y = pos_y;
 
 		(void) n;
-		(void) x;
-		(void) y;
+		if (player)
+			player->teleport({y, x});
 	}
 
 	std::shared_ptr<Game> Game::create(Canvas &canvas) {
