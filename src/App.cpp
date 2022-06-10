@@ -15,6 +15,7 @@ namespace Game3 {
 		set_accel_for_action("win.new", "<Ctrl>n");
 		set_accel_for_action("win.open", "<Ctrl>o");
 		set_accel_for_action("win.save", "<Ctrl>s");
+		set_accel_for_action("win.debug", "<Ctrl>d");
 	}
 
 	void App::on_activate() {
