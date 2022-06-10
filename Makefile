@@ -7,6 +7,8 @@ endif
 
 ifeq ($(shell uname -s), Darwin)
 LDFLAGS := -framework Cocoa -framework OpenGL -framework IOKit
+else
+LDFLAGS := -lGL
 endif
 
 DEPS         := eigen3 glm glfw3 libzstd gtk4 gtkmm-4.0 nlohmann_json
