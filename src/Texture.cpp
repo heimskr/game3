@@ -1,7 +1,8 @@
 // Credit: https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/3.2d_game/0.full_source/texture.cpp
 #include <iostream>
+
+#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-#include <GL/glu.h>
 
 #include "Texture.h"
 #include "util/Util.h"

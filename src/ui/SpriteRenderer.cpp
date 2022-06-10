@@ -5,7 +5,6 @@
 #include "Shader.h"
 
 #include <glm/gtc/matrix_transform.hpp>
-#include <GL/glu.h>
 
 #include "Texture.h"
 #include "game/Game.h"

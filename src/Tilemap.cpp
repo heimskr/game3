@@ -53,12 +53,12 @@ namespace Game3 {
 		auto context = std::unique_ptr<ZSTD_DCtx, size_t(*)(ZSTD_DCtx *)>(ZSTD_createDCtx(), ZSTD_freeDCtx);
 		auto stream = std::unique_ptr<ZSTD_DStream, size_t(*)(ZSTD_DStream *)>(ZSTD_createDStream(), ZSTD_freeDStream);
 
-		ZSTD_inBuffer input(bytes.data(), bytes.size(), 0);
+		ZSTD_inBuffer input {bytes.data(), bytes.size(), 0};
 
 		size_t last_result = 0;
 
 		while (input.pos < input.size) {
-			ZSTD_outBuffer output(&out_buffer[0], out_size, 0);
+			ZSTD_outBuffer output {&out_buffer[0], out_size, 0};
 			const size_t result = ZSTD_decompressStream(stream.get(), &output, &input);
 			if (ZSTD_isError(result))
 				throw std::runtime_error("Couldn't decompress tiles");

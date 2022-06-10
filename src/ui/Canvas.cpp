@@ -1,7 +1,5 @@
 #include <unordered_set>
 
-#include <libnoise/noise.h>
-
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 

@@ -2,7 +2,7 @@
 #include <thread>
 #include <unordered_set>
 
-#include <libnoise/noise.h>
+#include <noise/noise.h>
 
 #include "Tiles.h"
 #include "entity/Entity.h"
@@ -390,7 +390,7 @@ namespace Game3 {
 					auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, textureMap.at(Realm::HOUSE));
 					auto new_realm = Realm::create(realm_id, Realm::HOUSE, new_tilemap);
 					new_realm->game = game;
-					new_realm->generateHouse(id, rng, house_position + Position(1, 0), realm_width, realm_height);
+					new_realm->generateHouse(id, rng, house_position + Position {1, 0}, realm_width, realm_height);
 					game->realms.emplace(realm_id, new_realm);
 					add(building);
 				}

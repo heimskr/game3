@@ -6,8 +6,15 @@
 #include <GLFW/glfw3.h>
 
 #include <Eigen/Eigen>
-#include <GL/gl.h>
 #include <glm/glm.hpp>
+
+#if defined(__APPLE__)
+#include <OpenGL/gl3.h>
+#include <OpenGL/glu.h>
+#else
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif
 
 namespace Game3 {
 	class Shader {

@@ -3,7 +3,6 @@
 #include "Shader.h"
 
 #include <glm/gtc/matrix_transform.hpp>
-#include <GL/glu.h>
 
 #include "resources.h"
 #include "ui/RectangleRenderer.h"

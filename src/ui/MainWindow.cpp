@@ -16,8 +16,6 @@
 #include "util/FS.h"
 #include "util/Util.h"
 
-#include <GL/glu.h>
-
 // #define USE_CBOR
 
 namespace Game3 {
@@ -326,7 +324,7 @@ namespace Game3 {
 		if (!keyTimes.contains(keycode)) {
 			handleKey(keyval, keycode, modifiers);
 			if (unsigned(modifiers & Gdk::ModifierType::CONTROL_MASK) == 0)
-				keyTimes.try_emplace(keycode, keyval, modifiers, getTime());
+				keyTimes.emplace(keycode, KeyInfo {keyval, modifiers, getTime()});
 		} else
 			keyTimes.at(keycode).modifiers = modifiers;
 		return true;

@@ -5,13 +5,17 @@ else
 BUILDFLAGS := -g -O0
 endif
 
-DEPS         := gl opengl stb eigen3 glm glfw3 libzstd gtk4 gtkmm-4.0
+ifeq ($(shell uname -s), Darwin)
+LDFLAGS := -framework Cocoa -framework OpenGL -framework IOKit
+endif
+
+DEPS         := eigen3 glm glfw3 libzstd gtk4 gtkmm-4.0 nlohmann_json
 OUTPUT       := game3
 COMPILER     ?= g++
-CPPFLAGS     := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude
+CPPFLAGS     := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude -Ilibnoise/src -Istb -DGL_SILENCE_DEPRECATION
 INCLUDES     := $(shell pkg-config --cflags $(DEPS))
 LIBS         := $(shell pkg-config --libs   $(DEPS))
-LDFLAGS      := -L/lib $(LIBS) -pthread -lGLU -lglut -lnoise
+LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread -Llibnoise/build/src -lnoise
 SOURCES      := $(shell find src -name \*.cpp) src/resources.cpp
 OBJECTS      := $(SOURCES:.cpp=.o)
 RESXML       := $(OUTPUT).gresource.xml
