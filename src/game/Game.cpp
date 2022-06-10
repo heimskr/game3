@@ -65,7 +65,7 @@ namespace Game3 {
 		const int y = pos_y;
 
 		(void) n;
-		if (player)
+		if (player && 0 <= x && x < tilemap->width && 0 <= y && y < tilemap->height)
 			player->teleport({y, x});
 	}
 
