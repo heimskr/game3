@@ -18,25 +18,26 @@ CPPFLAGS     := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude -Istb
 INCLUDES     := $(shell pkg-config --cflags $(DEPS))
 LIBS         := $(shell pkg-config --libs   $(DEPS))
 LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread -Llibnoise/build/src -lnoise
-SOURCES      := $(shell find src -name \*.cpp) src/resources.cpp
+SOURCES      := $(shell find src -name \*.cpp) src/resources.cpp src/gtk_resources.cpp
 OBJECTS      := $(SOURCES:.cpp=.o)
 RESXML       := $(OUTPUT).gresource.xml
-CLOC_OPTIONS := . --exclude-dir=.vscode --fullpath --not-match-f='^.\/(src\/resources\.cpp|include\/resources\.h)$$'
+CLOC_OPTIONS := . --exclude-dir=.vscode --fullpath --not-match-f='^.\/(src\/(gtk_)?resources\.cpp|include\/resources\.h)$$'
 GLIB_COMPILE_RESOURCES = $(shell pkg-config --variable=glib_compile_resources gio-2.0)
 
 .PHONY: all clean test
 
 all: $(OUTPUT)
 
-src/resources.cpp: $(RESXML) $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=resources --generate-dependencies $(RESXML))
+src/gtk_resources.cpp: $(RESXML) $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=resources --generate-dependencies $(RESXML))
 	$(GLIB_COMPILE_RESOURCES) --target=$@ --sourcedir=resources --generate-source $<
 
-%.o: %.cpp include/resources.h
+%.o: %.cpp
 	@ printf "\e[2m[\e[22;32mcc\e[39;2m]\e[22m $< \e[2m$(BUILDFLAGS)\e[22m\n"
 	@ $(COMPILER) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
 
-include/resources.h: resources/buffered.frag resources/buffered.vert resources/rect.frag resources/rect.vert resources/sprite.frag resources/sprite.vert
+src/resources.cpp: resources/buffered.frag resources/buffered.vert resources/rect.frag resources/rect.vert resources/sprite.frag resources/sprite.vert
 	echo "#include <cstdlib>" > $@
+	echo "#include \"resources.h\"" > $@
 	bin2c buffered_frag < resources/buffered.frag | tail -n +2 >> $@
 	bin2c buffered_vert < resources/buffered.vert | tail -n +2 >> $@
 	bin2c rectangle_frag < resources/rect.frag | tail -n +2 >> $@
@@ -55,7 +56,7 @@ test: $(OUTPUT)
 	./$(OUTPUT)
 
 clean:
-	@ rm -f $(shell find src -name \*.o) $(OUTPUT) include/resources.h src/resources.cpp
+	@ rm -f $(shell find src -name \*.o) $(OUTPUT) src/gtk_resources.cpp src/resources.cpp 
 
 count:
 	cloc $(CLOC_OPTIONS)
