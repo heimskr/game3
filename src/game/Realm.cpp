@@ -147,7 +147,7 @@ namespace Game3 {
 					tile = choose(grasses, rng);
 			}
 
-		constexpr static int m = 15, n = 21, pad = 2;
+		constexpr static int m = 25, n = 33, pad = 2;
 		Timer land_timer("GetLand");
 		auto starts = tilemap1->getLand(type, m + pad * 2, n + pad * 2);
 		if (starts.empty())
