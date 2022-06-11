@@ -22,7 +22,7 @@ namespace Game3 {
 			virtual ~TilemapRenderer() = default;
 
 			virtual void init(const std::shared_ptr<Tilemap> &) = 0;
-			virtual void render() = 0;
+			virtual void render(float game_time) = 0;
 			virtual void onBackbufferResized(int width, int height);
 
 		protected:

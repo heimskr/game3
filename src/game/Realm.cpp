@@ -69,7 +69,7 @@ namespace Game3 {
 		return out;
 	}
 
-	void Realm::render(const int width, const int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &sprite_renderer) {
+	void Realm::render(const int width, const int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &sprite_renderer, float game_time) {
 		renderer1.center = center;
 		renderer1.scale  = scale;
 		renderer1.onBackbufferResized(width, height);
@@ -79,9 +79,9 @@ namespace Game3 {
 		renderer3.center = center;
 		renderer3.scale  = scale;
 		renderer3.onBackbufferResized(width, height);
-		renderer1.render();
-		renderer2.render();
-		renderer3.render();
+		renderer1.render(game_time);
+		renderer2.render(game_time);
+		renderer3.render(game_time);
 		for (const auto &entity: entities)
 			entity->render(sprite_renderer);
 		for (const auto &[index, tile_entity]: tileEntities)

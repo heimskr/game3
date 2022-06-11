@@ -10,7 +10,7 @@ namespace Game3 {
 
 			void reset();
 			void init(const std::shared_ptr<Tilemap> &) override;
-			void render() override;
+			void render(float game_time) override;
 			void reupload();
 
 			operator bool() const { return initialized; }
