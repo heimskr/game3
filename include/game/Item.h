@@ -56,6 +56,8 @@ namespace Game3 {
 
 			bool canMerge(const ItemStack &) const;
 			Glib::RefPtr<Gdk::Pixbuf> getImage();
+			/** Returns a copy of the ItemStack with a different count. */
+			ItemStack withCount(ItemCount) const;
 
 		private:
 			Glib::RefPtr<Gdk::Pixbuf> cachedImage;

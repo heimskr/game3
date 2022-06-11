@@ -14,9 +14,9 @@ namespace Game3 {
 	};
 
 	std::map<ItemID, std::shared_ptr<Item>> Item::items {
-		{Item::SHORTSWORD, std::make_shared<Item>(Item::SHORTSWORD, "Shortsword", 1)},
-		{Item::RED_POTION, std::make_shared<Item>(Item::RED_POTION, "Red Potion", 8)},
-		{Item::COINS,      std::make_shared<Item>(Item::COINS, "Gold", 1'000'000)},
+		{Item::SHORTSWORD, std::make_shared<Item>(Item::SHORTSWORD, "Shortsword", 100, 1)},
+		{Item::RED_POTION, std::make_shared<Item>(Item::RED_POTION, "Red Potion", 20, 8)},
+		{Item::COINS,      std::make_shared<Item>(Item::COINS, "Gold", 1, 1'000'000)},
 	};
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage() {
@@ -56,6 +56,10 @@ namespace Game3 {
 			return cachedImage = item->getImage();
 
 		return {};
+	}
+
+	ItemStack ItemStack::withCount(ItemCount new_count) const {
+		return {item, new_count};
 	}
 
 	void to_json(nlohmann::json &json, const ItemStack &stack) {

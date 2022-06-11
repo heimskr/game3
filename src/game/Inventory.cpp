@@ -159,6 +159,12 @@ namespace Game3 {
 		return count(*stack.item);
 	}
 
+	std::shared_ptr<HasRealm> Inventory::getOwner() const {
+		if (auto locked_owner = owner.lock())
+			return locked_owner;
+		throw std::runtime_error("Couldn't lock inventory owner");
+	}
+
 	void Inventory::notifyOwner() {
 		if (auto locked_owner = owner.lock()) {
 			if (auto player = std::dynamic_pointer_cast<Player>(locked_owner))

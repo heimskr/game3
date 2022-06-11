@@ -40,6 +40,8 @@ namespace Game3 {
 			/** Counts the amount of an item in the inventory. This will take ItemStack metadata into account eventually. */
 			ItemCount count(const ItemStack &) const;
 
+			std::shared_ptr<HasRealm> getOwner() const;
+
 		private:
 			std::map<Slot, ItemStack> storage;
 

@@ -1,7 +1,9 @@
 #include <iostream>
 
+#include "entity/Merchant.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
+#include "game/Stonks.h"
 #include "ui/MainWindow.h"
 #include "ui/gtk/EntryDialog.h"
 #include "ui/gtk/NumericEntry.h"
@@ -101,9 +103,9 @@ namespace Game3 {
 		const int grid_width = lastGridWidth = gridWidth();
 		const int tile_size = scrolled.get_width() / (scrolled.get_width() / TILE_SIZE);
 
-		auto populate = [&](Gtk::Grid &grid, Inventory &inventory, bool merchant) {
+		auto populate = [&](Gtk::Grid &grid, Inventory &inventory, bool is_merchant) {
 			auto &storage = inventory.getStorage();
-			auto &widgets = merchant? merchantWidgets : playerWidgets;
+			auto &widgets = is_merchant? merchantWidgets : playerWidgets;
 
 			for (Slot slot = 0; slot < inventory.slotCount; ++slot) {
 				const int row    = slot / grid_width;
@@ -115,6 +117,12 @@ namespace Game3 {
 					Glib::ustring label_text = stack.item->name;
 					if (stack.count != 1)
 						label_text += " \u00d7 " + std::to_string(stack.count);
+					if (is_merchant) {
+						const auto &merchant = *std::dynamic_pointer_cast<Merchant>(inventory.getOwner());
+						const MoneyCount for_one = totalBuyPrice(merchant, stack.withCount(1));
+						const MoneyCount for_all = totalBuyPrice(merchant, stack);
+						label_text += "\n(" + std::to_string(for_one) + " for one, " + std::to_string(for_all) + " for all)";
+					}
 					auto fixed_ptr = std::make_unique<Gtk::Fixed>();
 					auto image_ptr = std::make_unique<Gtk::Image>(inventory.getImage(slot));
 					auto label_ptr = std::make_unique<Gtk::Label>(std::to_string(stack.count));
@@ -128,8 +136,8 @@ namespace Game3 {
 					auto right_click = Gtk::GestureClick::create();
 					left_click->set_button(1);
 					right_click->set_button(3);
-					left_click ->signal_pressed().connect([this, game, slot, merchant, &fixed](int n, double x, double y) { leftClick (game, &fixed, n, slot, merchant, x, y); });
-					right_click->signal_pressed().connect([this, game, slot, merchant, &fixed](int n, double x, double y) { rightClick(game, &fixed, n, slot, merchant, x, y); });
+					left_click ->signal_pressed().connect([this, game, slot, is_merchant, &fixed](int n, double x, double y) { leftClick (game, &fixed, n, slot, is_merchant, x, y); });
+					right_click->signal_pressed().connect([this, game, slot, is_merchant, &fixed](int n, double x, double y) { rightClick(game, &fixed, n, slot, is_merchant, x, y); });
 					fixed.add_controller(left_click);
 					fixed.add_controller(right_click);
 					widget_ptr = std::move(fixed_ptr);

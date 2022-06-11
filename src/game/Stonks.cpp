@@ -52,7 +52,7 @@ namespace Game3 {
 			price += subunit_price;
 		}
 
-		const size_t discrete_price = std::floor(price);
+		const MoneyCount discrete_price = std::floor(price);
 		out = discrete_price;
 		return result? discrete_price <= merchant.money : false;
 	}
