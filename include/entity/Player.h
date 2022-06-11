@@ -10,6 +10,7 @@ namespace Game3 {
 			bool movingRight = false;
 			bool movingDown = false;
 			bool movingLeft = false;
+			bool ticked = false;
 
 			nlohmann::json toJSON() const override;
 			bool isPlayer() const override { return true; }

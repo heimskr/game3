@@ -431,8 +431,17 @@ namespace Game3 {
 	}
 
 	void Realm::tick(float delta) {
+		ticking = true;
 		for (auto &entity: entities)
-			entity->tick(delta);
+			if (entity->isPlayer()) {
+				auto player = std::dynamic_pointer_cast<Player>(entity);
+				if (!player->ticked) {
+					player->ticked = true;
+					player->tick(delta);
+				}
+			} else
+				entity->tick(delta);
+		ticking = false;
 		for (const auto &entity: removalQueue)
 			remove(entity);
 		removalQueue.clear();
@@ -499,7 +508,10 @@ namespace Game3 {
 	}
 
 	void Realm::queueRemoval(const std::shared_ptr<Entity> &entity) {
-		removalQueue.push_back(entity);
+		if (ticking)
+			removalQueue.push_back(entity);
+		else
+			remove(entity);
 	}
 
 	void Realm::absorb(const std::shared_ptr<Entity> &entity, const Position &position) {

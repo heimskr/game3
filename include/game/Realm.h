@@ -90,6 +90,7 @@ namespace Game3 {
 		private:
 			Index randomLand = 0;
 			Game *game = nullptr;
+			bool ticking = false;
 			std::vector<std::shared_ptr<Entity>> removalQueue;
 	};
 

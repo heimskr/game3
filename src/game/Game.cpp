@@ -17,6 +17,7 @@ namespace Game3 {
 		delta = std::chrono::duration_cast<std::chrono::nanoseconds>(difference).count() / 1'000'000'000.f;
 		for (auto &[id, realm]: realms)
 			realm->tick(delta);
+		player->ticked = false;
 	}
 
 	RealmID Game::newRealmID() const {
