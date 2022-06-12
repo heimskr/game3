@@ -141,12 +141,20 @@ namespace Game3 {
 		});
 		glArea.add_controller(motion);
 
-		auto click = Gtk::GestureClick::create();
-		click->signal_released().connect([this](int n, double x, double y) {
+		auto left_click  = Gtk::GestureClick::create();
+		auto right_click = Gtk::GestureClick::create();
+		left_click->set_button(1);
+		right_click->set_button(3);
+		left_click->signal_released().connect([this](int n, double x, double y) {
 			if (game)
-				game->click(n, x, y);
+				game->click(1, n, x, y);
 		});
-		glArea.add_controller(click);
+		right_click->signal_released().connect([this](int n, double x, double y) {
+			if (game)
+				game->click(3, n, x, y);
+		});
+		glArea.add_controller(left_click);
+		glArea.add_controller(right_click);
 
 		auto scroll = Gtk::EventControllerScroll::create();
 		scroll->set_flags(Gtk::EventControllerScroll::Flags::VERTICAL);

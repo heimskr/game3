@@ -30,6 +30,8 @@ namespace Game3 {
 			ElementBufferedRenderer renderer1, renderer2, renderer3;
 			std::unordered_map<Index, std::shared_ptr<TileEntity>> tileEntities;
 			std::unordered_set<std::shared_ptr<Entity>> entities;
+			/** A vector of bools (represented with uint8_t to avoid the std::vector<bool> specialization) indicating whether a given square is empty for the purposes of pathfinding. */
+			std::vector<uint8_t> pathMap;
 
 			Realm(const Realm &) = delete;
 			Realm(Realm &&) = default;
@@ -69,6 +71,14 @@ namespace Game3 {
 			Game & getGame();
 			void queueRemoval(const std::shared_ptr<Entity> &);
 			void absorb(const std::shared_ptr<Entity> &, const Position &);
+			void setLayer1(Index row, Index col, TileID);
+			void setLayer2(Index row, Index col, TileID);
+			void setLayer3(Index row, Index col, TileID);
+			void setLayer1(Index, TileID);
+			void setLayer2(Index, TileID);
+			void setLayer3(Index, TileID);
+			inline Index getIndex(const Position &position) const { return position.row * getWidth() + position.column; }
+			inline Index getIndex(Index row, Index column) const { return row * getWidth() + column; }
 
 			template <typename T, typename... Args>
 			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {
@@ -92,6 +102,9 @@ namespace Game3 {
 			Game *game = nullptr;
 			bool ticking = false;
 			std::vector<std::shared_ptr<Entity>> removalQueue;
+			void setLayerHelper(Index row, Index col);
+			void setLayerHelper(Index);
+			void resetPathMap();
 	};
 
 	void to_json(nlohmann::json &, const Realm &);

@@ -1,7 +1,11 @@
+#include <iostream>
+
 #include "game/Game.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "ui/tab/TextTab.h"
+#include "util/AStar.h"
+#include "util/Timer.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -46,7 +50,7 @@ namespace Game3 {
 		throw std::runtime_error("Can't get text: TextTab is null");
 	}
 
-	void Game::click(int n, double pos_x, double pos_y) {
+	void Game::click(int button, int n, double pos_x, double pos_y) {
 		if (!activeRealm)
 			return;
 
@@ -64,7 +68,28 @@ namespace Game3 {
 		const int y = pos_y;
 
 		(void) n;
-		if (debugMode && player && 0 <= x && x < tilemap->width && 0 <= y && y < tilemap->height)
+
+		if (debugMode && button == 1) {
+			static std::optional<Position> start;
+			if (start) {
+				std::vector<Position> path;
+				Timer timer("A*");
+				const bool success = simpleAStar(activeRealm, *start, {y, x}, path);
+				timer.stop();
+				if (success)
+					for (const auto &position: path)
+						std::cout << position << '\n';
+				else
+					std::cout << "No path found.\n";
+				start.reset();
+				Timer::summary();
+				Timer::clear();
+			} else {
+				start.emplace(y, x);
+			}
+		}
+
+		if (debugMode && button == 3 && player && 0 <= x && x < tilemap->width && 0 <= y && y < tilemap->height)
 			player->teleport({y, x});
 	}
 

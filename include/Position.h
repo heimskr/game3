@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <ostream>
 
 #include <nlohmann/json.hpp>
@@ -19,8 +20,24 @@ namespace Game3 {
 		operator bool() const { return row != 0 || column != 0; }
 	};
 
+	struct Location {
+		Position position;
+		RealmID realm;
+	};
+
 	void to_json(nlohmann::json &, const Position &);
+	void to_json(nlohmann::json &, const Location &);
 	void from_json(const nlohmann::json &, Position &);
+	void from_json(const nlohmann::json &, Location &);
 }
 
 std::ostream & operator<<(std::ostream &, const Game3::Position &);
+
+namespace std {
+	template <>
+	struct hash<Game3::Position> {
+		size_t operator()(const Game3::Position &position) const noexcept {
+			return std::hash<Game3::Position::value_type>()(position.row ^ (position.column << 16));
+		}
+	};
+}

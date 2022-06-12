@@ -59,5 +59,6 @@ namespace Game3 {
 
 	void Timer::clear() {
 		times.clear();
+		counts.clear();
 	}
 }

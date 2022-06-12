@@ -96,7 +96,7 @@ namespace Game3 {
 			return;
 
 		float x_offset = 0.f;
-		float y_offset;
+		float y_offset = 0.f;
 		if (offset.x() != 0.f || offset.y() != 0.f)
 			x_offset = 8.f * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - getRealm()->getGame().startTime).count() / 100) % 5);
 

@@ -23,28 +23,25 @@ namespace Game3 {
 
 	Realm::Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_):
 	id(id_), type(type_), tilemap1(tilemap1_), tilemap2(tilemap2_), tilemap3(tilemap3_) {
-		if (tilemap1) {
-			tilemap1->init();
-			renderer1.init(tilemap1);
-		}
-
-		if (tilemap2) {
-			tilemap2->init();
-			renderer2.init(tilemap2);
-		}
-
-		if (tilemap3) {
-			tilemap3->init();
-			renderer3.init(tilemap3);
-		}
-	}
-
-	Realm::Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_): Realm(id_, type_, tilemap1_, nullptr, nullptr) {
 		tilemap1->init();
-		tilemap2 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->texture);
-		tilemap3 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->texture);
+		tilemap2->init();
+		tilemap3->init();
+		renderer1.init(tilemap1);
 		renderer2.init(tilemap2);
 		renderer3.init(tilemap3);
+		resetPathMap();
+	}
+
+	Realm::Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_): id(id_), type(type_), tilemap1(tilemap1_) {
+		tilemap1->init();
+		renderer1.init(tilemap1);
+		tilemap2 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->texture);
+		tilemap3 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->texture);
+		tilemap2->init();
+		tilemap3->init();
+		renderer2.init(tilemap2);
+		renderer3.init(tilemap3);
+		resetPathMap();
 	}
 
 	std::shared_ptr<Realm> Realm::fromJSON(const nlohmann::json &json) {
@@ -126,26 +123,27 @@ namespace Game3 {
 
 		auto saved_noise = std::make_unique<double[]>(width * height);
 
+		Timer noise_timer("Noise");
 		for (int row = 0; row < height; ++row)
 			for (int column = 0; column < width; ++column) {
 				double noise = perlin.GetValue(row / noise_zoom, column / noise_zoom, 0.666);
 				saved_noise[row * width + column] = noise;
-				auto &tile = tiles1[column * width + row];
 				if (noise < noise_threshold)
-					tile = OverworldTiles::DEEPER_WATER;
+					setLayer1(row, column, OverworldTiles::DEEPER_WATER);
 				else if (noise < noise_threshold + 0.1)
-					tile = OverworldTiles::DEEP_WATER;
+					setLayer1(row, column, OverworldTiles::DEEP_WATER);
 				else if (noise < noise_threshold + 0.2)
-					tile = OverworldTiles::WATER;
+					setLayer1(row, column, OverworldTiles::WATER);
 				else if (noise < noise_threshold + 0.3)
-					tile = OverworldTiles::SHALLOW_WATER;
+					setLayer1(row, column, OverworldTiles::SHALLOW_WATER);
 				else if (noise < noise_threshold + 0.4)
-					tile = OverworldTiles::SAND;
+					setLayer1(row, column, OverworldTiles::SAND);
 				else if (noise < noise_threshold + 0.5)
-					tile = OverworldTiles::LIGHT_GRASS;
+					setLayer1(row, column, OverworldTiles::LIGHT_GRASS);
 				else
-					tile = choose(grasses, rng);
+					setLayer1(row, column, choose(grasses, rng));
 			}
+		noise_timer.stop();
 
 		constexpr static int m = 25, n = 33, pad = 2;
 		Timer land_timer("GetLand");
@@ -160,7 +158,7 @@ namespace Game3 {
 		for (size_t i = 0, max = oil_starts.size() / 2000; i < max; ++i) {
 			const Index index = oil_starts.back();
 			if (noise_threshold + 0.6 <= saved_noise[index])
-				tiles2[index] = OverworldTiles::OIL;
+				setLayer2(index, OverworldTiles::OIL);
 			oil_starts.pop_back();
 		}
 		oil_timer.stop();
@@ -193,38 +191,37 @@ namespace Game3 {
 	}
 
 	void Realm::generateHouse(RealmID parent_realm, std::default_random_engine &rng, const Position &entrance, int width, int height) {
-		auto &layer1 = tilemap1->tiles;
-		auto &layer2 = tilemap2->tiles;
-
 		for (int column = 1; column < width - 1; ++column) {
-			layer2[column] = HouseTiles::WALL_WEN;
-			layer2[column + (height - 1) * width] = HouseTiles::WALL_WES;
+			setLayer2(column, HouseTiles::WALL_WEN);
+			setLayer2(height - 1, column, HouseTiles::WALL_WES);
 		}
 
-		for (int row = 1; row < height - 1; ++row)
-			layer2[row * width] = layer2[(row + 1) * width - 1] = HouseTiles::WALL_NS;
+		for (int row = 1; row < height - 1; ++row) {
+			setLayer2(row, 0, HouseTiles::WALL_NS);
+			setLayer2(row, width - 1, HouseTiles::WALL_NS);
+		}
 
 		for (int row = 0; row < height; ++row)
 			for (int column = 0; column < width; ++column)
-				layer1[row * width + column] = HouseTiles::FLOOR;
+				setLayer1(row, column, HouseTiles::FLOOR);
 
-		layer2[0] = HouseTiles::WALL_NW;
-		layer2[width - 1] = HouseTiles::WALL_NE;
-		layer2[width * (height - 1)] = HouseTiles::WALL_SW;
-		layer2[width * height - 1] = HouseTiles::WALL_SE;
+		setLayer2(0, HouseTiles::WALL_NW);
+		setLayer2(width - 1, HouseTiles::WALL_NE);
+		setLayer2(width * (height - 1), HouseTiles::WALL_SW);
+		setLayer2(width * height - 1, HouseTiles::WALL_SE);
 
 		const Index exit_index = width * height - 3;
-		layer2[width * height - 2] = HouseTiles::WALL_E;
-		layer2[width * height - 3] = HouseTiles::EMPTY;
-		layer2[width * height - 4] = HouseTiles::WALL_W;
+		setLayer2(exit_index - 1, HouseTiles::WALL_W);
+		setLayer2(exit_index,     HouseTiles::EMPTY);
+		setLayer2(exit_index + 1, HouseTiles::WALL_E);
 
 		static std::array<TileID, 3> plants {HouseTiles::PLANT1, HouseTiles::PLANT2, HouseTiles::PLANT3};
 		static std::array<TileID, 2> doors  {HouseTiles::DOOR1,  HouseTiles::DOOR2};
 
-		layer2[width + 1] = choose(plants, rng);
-		layer2[2 * width - 2] = choose(plants, rng);
-		layer2[(width - 1) * height - 2] = choose(plants, rng);
-		layer2[(width - 2) * height + 1] = choose(plants, rng);
+		setLayer2(width + 1, choose(plants, rng));
+		setLayer2(2 * width - 2, choose(plants, rng));
+		setLayer2((width - 1) * height - 2, choose(plants, rng));
+		setLayer2((width - 2) * height + 1, choose(plants, rng));
 
 		add(TileEntity::create<Teleporter>(choose(doors, rng), getPosition(exit_index), parent_realm, entrance));
 
@@ -250,7 +247,7 @@ namespace Game3 {
 				std::shuffle(shuffled_texts.begin(), shuffled_texts.end(), rng);
 
 				for (Index index = width + 2; index < 2 * width - 2; ++index) {
-					layer2[index] = HouseTiles::BOOKSHELF;
+					setLayer2(index, HouseTiles::BOOKSHELF);
 					add(TileEntity::create<Sign>(HouseTiles::EMPTY, getPosition(index), shuffled_texts.at((index - width - 2) % shuffled_texts.size()), "Bookshelf"));
 				}
 				break;
@@ -271,50 +268,47 @@ namespace Game3 {
 		const int carpet_padding = (rng() % 2) + 2;
 		for (int row = carpet_padding + 1; row < height - carpet_padding - 1; ++row)
 			for (int column = carpet_padding + 1; column < width - carpet_padding - 1; ++column)
-				layer1[row * width + column] = HouseTiles::CARPET_C + carpet_offset;
+				setLayer1(row * width + column, HouseTiles::CARPET_C + carpet_offset);
 		for (int row = carpet_padding + 1; row < height - carpet_padding - 1; ++row) {
-			layer1[row * width + carpet_padding] = HouseTiles::CARPET_W + carpet_offset;
-			layer1[(row + 1) * width - carpet_padding - 1] = HouseTiles::CARPET_E + carpet_offset;
+			setLayer1(row * width + carpet_padding, HouseTiles::CARPET_W + carpet_offset);
+			setLayer1((row + 1) * width - carpet_padding - 1, HouseTiles::CARPET_E + carpet_offset);
 		}
 		for (int column = carpet_padding + 1; column < width - carpet_padding - 1; ++column) {
-			layer1[carpet_padding * width + column] = HouseTiles::CARPET_N + carpet_offset;
-			layer1[(height - carpet_padding - 1) * width + column] = HouseTiles::CARPET_S + carpet_offset;
+			setLayer1(carpet_padding * width + column, HouseTiles::CARPET_N + carpet_offset);
+			setLayer1((height - carpet_padding - 1) * width + column, HouseTiles::CARPET_S + carpet_offset);
 		}
-		layer1[carpet_padding * width + carpet_padding] = HouseTiles::CARPET_NW + carpet_offset;
-		layer1[(carpet_padding + 1) * width - carpet_padding - 1] = HouseTiles::CARPET_NE + carpet_offset;
-		layer1[(height - carpet_padding - 1) * width + carpet_padding] = HouseTiles::CARPET_SW + carpet_offset;
-		layer1[(height - carpet_padding) * width - carpet_padding - 1] = HouseTiles::CARPET_SE + carpet_offset;
+		setLayer1(carpet_padding * width + carpet_padding, HouseTiles::CARPET_NW + carpet_offset);
+		setLayer1((carpet_padding + 1) * width - carpet_padding - 1, HouseTiles::CARPET_NE + carpet_offset);
+		setLayer1((height - carpet_padding - 1) * width + carpet_padding, HouseTiles::CARPET_SW + carpet_offset);
+		setLayer1((height - carpet_padding) * width - carpet_padding - 1, HouseTiles::CARPET_SE + carpet_offset);
 	}
 
 	void Realm::createTown(const size_t index, size_t width, size_t height, size_t pad) {
 		size_t row = 0, column = 0;
 
-		auto &layer1 = tilemap1->tiles;
-		auto &layer2 = tilemap2->tiles;
-
 		auto map_width = tilemap1->width;
 
-		auto set1 = [&](TileID tile) { layer1[row * map_width + column] = tile; };
-		auto set2 = [&](TileID tile) { layer2[row * map_width + column] = tile; };
+		auto set1 = [&](TileID tile) { setLayer1(row, column, tile); };
+		auto set2 = [&](TileID tile) { setLayer2(row, column, tile); };
 
 		for (size_t row = index / map_width - pad; row < index / map_width + height + pad; ++row)
 			for (size_t column = index % map_width - pad; column < index % map_width + width + pad; ++column)
-				layer2[row * map_width + column] = OverworldTiles::EMPTY;
+				setLayer2(row * map_width + column, OverworldTiles::EMPTY);
 
 		for (size_t row = index / map_width; row < index / map_width + height; ++row) {
-			layer2[row * map_width + index % map_width] = OverworldTiles::TOWER_NS;
-			layer2[row * map_width + index % map_width + width - 1] = OverworldTiles::TOWER_NS;
+			setLayer2(row * map_width + index % map_width, OverworldTiles::TOWER_NS);
+			setLayer2(row * map_width + index % map_width + width - 1, OverworldTiles::TOWER_NS);
 		}
 
 		for (size_t column = 0; column < width; ++column) {
-			layer2[index + column] = OverworldTiles::TOWER_WE;
-			layer2[index + map_width * (height - 1) + column] = OverworldTiles::TOWER_WE;
+			setLayer2(index + column, OverworldTiles::TOWER_WE);
+			setLayer2(index + map_width * (height - 1) + column, OverworldTiles::TOWER_WE);
 		}
 
-		layer2[index] = OverworldTiles::TOWER_NW;
-		layer2[index + map_width * (height - 1)] = OverworldTiles::TOWER_SW;
-		layer2[index + width - 1] = OverworldTiles::TOWER_NE;
-		layer2[index + map_width * (height - 1) + width - 1] = OverworldTiles::TOWER_SE;
+		setLayer2(index, OverworldTiles::TOWER_NW);
+		setLayer2(index + map_width * (height - 1), OverworldTiles::TOWER_SW);
+		setLayer2(index + width - 1, OverworldTiles::TOWER_NE);
+		setLayer2(index + map_width * (height - 1) + width - 1, OverworldTiles::TOWER_SE);
 
 		std::unordered_set<Index> buildable_set;
 
@@ -377,11 +371,11 @@ namespace Game3 {
 				if (rng() % 8 == 0) {
 					constexpr static std::array<TileID, 3> markets {OverworldTiles::MARKET1, OverworldTiles::MARKET2, OverworldTiles::MARKET3};
 					const auto market = choose(markets, rng);
-					layer2[index] = market;
+					setLayer2(index, market);
 				} else {
 					constexpr static std::array<TileID, 3> houses {OverworldTiles::HOUSE1, OverworldTiles::HOUSE2, OverworldTiles::HOUSE3};
 					const auto house = choose(houses, rng);
-					layer2[index] = house;
+					setLayer2(index, house);
 					const RealmID realm_id = game->newRealmID();
 					const Index realm_width = 9;
 					const Index realm_height = 9;
@@ -520,6 +514,58 @@ namespace Game3 {
 		entity->setRealm(shared_from_this());
 		entity->init();
 		entity->teleport(position);
+	}
+
+	void Realm::setLayer1(Index row, Index column, TileID tile) {
+		(*tilemap1)(column, row) = tile;
+		setLayerHelper(row, column);
+	}
+
+	void Realm::setLayer2(Index row, Index column, TileID tile) {
+		(*tilemap2)(column, row) = tile;
+		setLayerHelper(row, column);
+	}
+
+	void Realm::setLayer3(Index row, Index column, TileID tile) {
+		(*tilemap3)(column, row) = tile;
+		setLayerHelper(row, column);
+	}
+
+	void Realm::setLayer1(Index index, TileID tile) {
+		tilemap1->tiles[index] = tile;
+		setLayerHelper(index);
+	}
+
+	void Realm::setLayer2(Index index, TileID tile) {
+		tilemap2->tiles[index] = tile;
+		setLayerHelper(index);
+	}
+
+	void Realm::setLayer3(Index index, TileID tile) {
+		tilemap3->tiles[index] = tile;
+		setLayerHelper(index);
+	}
+
+	void Realm::setLayerHelper(Index row, Index column) {
+		const auto &tileset = tileSets.at(type);
+		pathMap[getIndex(row, column)] = tileset->isWalkable((*tilemap1)(column, row)) && tileset->isWalkable((*tilemap2)(column, row)) && tileset->isWalkable((*tilemap3)(column, row));
+	}
+
+	void Realm::setLayerHelper(Index index) {
+		const auto &tileset = tileSets.at(type);
+		const auto row    = index / getWidth();
+		const auto column = index % getWidth();
+		pathMap[index] = tileset->isWalkable((*tilemap1)(column, row)) && tileset->isWalkable((*tilemap2)(column, row)) && tileset->isWalkable((*tilemap3)(column, row));
+	}
+
+	void Realm::resetPathMap() {
+		const auto width = tilemap1->width;
+		const auto height = tilemap1->height;
+		pathMap.resize(width * height);
+		const auto &tileset = tileSets.at(type);
+		for (Index row = 0; row < height; ++row)
+			for (Index column = 0; column < width; ++column)
+				pathMap[getIndex(row, column)] = tileset->isWalkable((*tilemap1)(column, row)) && tileset->isWalkable((*tilemap2)(column, row)) && tileset->isWalkable((*tilemap3)(column, row));
 	}
 
 	void to_json(nlohmann::json &json, const Realm &realm) {

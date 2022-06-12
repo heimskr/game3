@@ -36,7 +36,7 @@ namespace Game3 {
 			RealmID newRealmID() const;
 			void setText(const Glib::ustring &text, const Glib::ustring &name = "", bool focus = true, bool ephemeral = false);
 			const Glib::ustring & getText() const;
-			void click(int n, double pos_x, double pos_y);
+			void click(int button, int n, double pos_x, double pos_y);
 
 			sigc::signal<void(const std::shared_ptr<Player> &)> signal_player_inventory_update() const { return signal_player_inventory_update_; }
 			sigc::signal<void(const std::shared_ptr<HasRealm> &)> signal_other_inventory_update()  const { return signal_other_inventory_update_; }
