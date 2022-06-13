@@ -97,6 +97,10 @@ namespace Game3 {
 			bool prevRight = false;
 			bool prevRightPad = false;
 			bool prevAutofocus = true;
+			float rightPadStartX = 0.f;
+			float rightPadStartY = 0.f;
+			float rightPadStartCanvasX = 0.f;
+			float rightPadStartCanvasY = 0.f;
 
 			void newGame(int seed, int width, int height);
 			void loadGame(const std::filesystem::path &);

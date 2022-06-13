@@ -305,15 +305,22 @@ namespace Game3 {
 				int axis_count = 0;
 				const float *axes = glfwGetJoystickAxes(joystick, &axis_count);
 				if (axes != nullptr && 4 <= axis_count) {
-					if (right_pad) {
-						autofocus = false;
+					if (right_pad && canvas) {
 						const float rx = axes[2];
-						const float divisor = -5.f;
-						if (rx <= -0.01 || 0.01 <= rx)
-							canvas->center.x() += rx / divisor;
 						const float ry = axes[3];
-						if (ry <= -0.01 || 0.01 <= ry)
-							canvas->center.y() += ry / divisor;
+						if (!prevRightPad) {
+							autofocus = false;
+							rightPadStartX = rx;
+							rightPadStartY = ry;
+							rightPadStartCanvasX = canvas->center.x();
+							rightPadStartCanvasY = canvas->center.y();
+						} else {
+							const float multiplier = 10.f;
+							if (rx <= -0.01 || 0.01 <= rx)
+								canvas->center.x() = rightPadStartCanvasX + (rx - rightPadStartX) * multiplier;
+							if (ry <= -0.01 || 0.01 <= ry)
+								canvas->center.y() = rightPadStartCanvasY + (ry - rightPadStartY) * multiplier;
+						}
 					}
 
 					if (game && game->player) {
