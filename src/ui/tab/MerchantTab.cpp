@@ -46,11 +46,16 @@ namespace Game3 {
 		source->signal_prepare().connect([this, source](double x, double y) -> Glib::RefPtr<Gdk::ContentProvider> { // Does capturing `source` cause a memory leak?
 			auto *item = playerGrid.pick(x, y);
 			scrolled.set_data("dragged-item", nullptr);
+
+			if (dynamic_cast<Gtk::Fixed *>(item->get_parent()))
+				item = item->get_parent();
+
 			if (auto *label = dynamic_cast<Gtk::Label *>(item)) {
 				if (label->get_text().empty())
 					return nullptr;
-			} else if (!dynamic_cast<Gtk::Image *>(item))
+			} else if (!dynamic_cast<Gtk::Fixed *>(item))
 				return nullptr;
+
 			scrolled.set_data("dragged-item", item);
 			Glib::ValueBase base;
 			base.init(GTK_TYPE_WIDGET);
@@ -63,6 +68,8 @@ namespace Game3 {
 			auto *destination = playerGrid.pick(x, y);
 
 			if (destination != nullptr && destination != &playerGrid) {
+				if (dynamic_cast<Gtk::Fixed *>(destination->get_parent()))
+					destination = destination->get_parent();
 				auto &dragged = getDraggedItem();
 				const Slot source_slot      = reinterpret_cast<intptr_t>(dragged.get_data("slot"));
 				const Slot destination_slot = reinterpret_cast<intptr_t>(destination->get_data("slot"));
