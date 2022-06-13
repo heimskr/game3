@@ -374,6 +374,9 @@ namespace Game3 {
 					}
 				}
 
+				if (left_grip && right_grip && x)
+					get_application()->quit();
+
 				prevA = a;
 				prevB = b;
 				prevX = x;
