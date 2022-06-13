@@ -2,7 +2,7 @@
 #include "game/Item.h"
 
 namespace Game3 {
-	static Texture textureShortsword  {"resources/items/SwordShort.png"};
+	static Texture textureShortsword  {"resources/items/shortsword.png"};
 	static Texture textureConsumables {"resources/rpg/consumables.png"};
 	static Texture texturePotions     {"resources/rpg/potions.png"};
 	static Texture textureItems       {"resources/items/items.png"};

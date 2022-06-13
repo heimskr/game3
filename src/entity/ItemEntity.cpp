@@ -6,7 +6,6 @@
 #include "ui/SpriteRenderer.h"
 
 namespace Game3 {
-
 	Texture ItemEntity::missing = {"resources/missing.png"};
 
 	ItemEntity::ItemEntity(const ItemStack &stack_):
