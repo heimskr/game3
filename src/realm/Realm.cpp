@@ -103,7 +103,8 @@ namespace Game3 {
 		renderer2.render(game_time);
 		renderer3.render(game_time);
 		for (const auto &entity: entities)
-			entity->render(sprite_renderer);
+			if (!entity->isPlayer())
+				entity->render(sprite_renderer);
 		for (const auto &[index, tile_entity]: tileEntities)
 			tile_entity->render(sprite_renderer);
 	}

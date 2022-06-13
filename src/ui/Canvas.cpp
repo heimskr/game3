@@ -21,6 +21,7 @@ namespace Game3 {
 			rectangleRenderer.update(width(), height());
 			if (game->activeRealm)
 				game->activeRealm->render(width(), height(), center, scale, spriteRenderer, game->getDivisor());
+			game->player->render(spriteRenderer);
 		}
 	}
 
