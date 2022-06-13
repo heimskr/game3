@@ -37,14 +37,14 @@ namespace Game3 {
 
 			Realm(const Realm &) = delete;
 			Realm(Realm &&) = default;
+			virtual ~Realm() = default;
 
 			Realm & operator=(const Realm &) = delete;
 			Realm & operator=(Realm &&) = default;
 
-			template <typename... Args>
-			static std::shared_ptr<Realm> create(Args && ...args) {
-				auto out = std::shared_ptr<Realm>(new Realm(std::forward<Args>(args)...));
-				return out;
+			template <typename T = Realm, typename... Args>
+			static std::shared_ptr<T> create(Args && ...args) {
+				return std::shared_ptr<T>(new T(std::forward<Args>(args)...));
 			}
 
 			static std::shared_ptr<Realm> fromJSON(const nlohmann::json &);
@@ -97,11 +97,15 @@ namespace Game3 {
 			}
 
 			friend class MainWindow;
+			friend void to_json(nlohmann::json &, const Realm &);
 
 		protected:
 			Realm() = default;
-			Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_);
-			Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_);
+			Realm(RealmID, RealmType, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_);
+			Realm(RealmID, RealmType, const std::shared_ptr<Tilemap> &tilemap1_);
+
+			virtual void absorbJSON(const nlohmann::json &);
+			virtual void toJSON(nlohmann::json &) const;
 
 		private:
 			Index randomLand = 0;

@@ -19,13 +19,12 @@ namespace Game3 {
 			TileEntityID getID() const override { return TileEntity::KEEP; }
 
 			void toJSON(nlohmann::json &) const override;
-			// void onInteractNextTo(const std::shared_ptr<Player> &) override;
 			void absorbJSON(const nlohmann::json &) override;
+
+			friend class TileEntity;
 
 		protected:
 			Keep() = default;
 			Keep(TileID id_, const Position &position_, RealmID inner_realm_id, Index entrance_, const Position &origin_, Index width_, Index height_);
-
-			friend class TileEntity;
 	};
 }

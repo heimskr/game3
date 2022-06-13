@@ -2,7 +2,7 @@
 
 #include "entity/Merchant.h"
 #include "game/Game.h"
-#include "game/Realm.h"
+#include "realm/Realm.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "ui/tab/MerchantTab.h"

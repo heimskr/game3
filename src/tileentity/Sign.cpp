@@ -3,7 +3,7 @@
 #include "Tiles.h"
 #include "entity/Player.h"
 #include "game/Game.h"
-#include "game/Realm.h"
+#include "realm/Realm.h"
 #include "tileentity/Sign.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"

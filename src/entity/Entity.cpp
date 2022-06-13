@@ -6,7 +6,7 @@
 #include "entity/ItemEntity.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
-#include "game/Realm.h"
+#include "realm/Realm.h"
 #include "ui/Canvas.h"
 #include "ui/SpriteRenderer.h"
 #include "util/Util.h"

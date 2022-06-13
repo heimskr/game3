@@ -5,7 +5,7 @@
 #include "game/Game.h"
 #include "game/HasRealm.h"
 #include "game/Inventory.h"
-#include "game/Realm.h"
+#include "realm/Realm.h"
 
 namespace Game3 {
 	Inventory::Inventory(const std::shared_ptr<HasRealm> &owner_, Slot slot_count):

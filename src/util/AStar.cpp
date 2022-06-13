@@ -4,7 +4,7 @@
 #include <queue>
 #include <vector>
 
-#include "game/Realm.h"
+#include "realm/Realm.h"
 #include "util/AStar.h"
 
 namespace Game3 {
