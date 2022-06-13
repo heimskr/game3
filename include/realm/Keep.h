@@ -8,6 +8,7 @@ namespace Game3 {
 			Position parentOrigin;
 			Index parentWidth;
 			Index parentHeight;
+			MoneyCount money;
 
 			Keep(const Keep &) = delete;
 			Keep(Keep &&) = default;

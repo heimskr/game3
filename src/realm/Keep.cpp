@@ -10,15 +10,17 @@ namespace Game3 {
 
 	void Keep::absorbJSON(const nlohmann::json &json) {
 		Realm::absorbJSON(json);
-		parentOrigin = json.at("parent").at("origin");
-		parentWidth  = json.at("parent").at("width");
-		parentHeight = json.at("parent").at("height");
+		parentOrigin = json.at("town").at("origin");
+		parentWidth  = json.at("town").at("width");
+		parentHeight = json.at("town").at("height");
+		money = json.at("money");
 	}
 
 	void Keep::toJSON(nlohmann::json &json) const {
 		Realm::toJSON(json);
-		json["parent"]["origin"] = parentOrigin;
-		json["parent"]["width"]  = parentWidth;
-		json["parent"]["height"] = parentHeight;
+		json["town"]["origin"] = parentOrigin;
+		json["town"]["width"]  = parentWidth;
+		json["town"]["height"] = parentHeight;
+		json["money"] = money;
 	}
 }
