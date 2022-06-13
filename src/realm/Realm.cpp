@@ -143,15 +143,16 @@ namespace Game3 {
 
 	void Realm::tick(float delta) {
 		ticking = true;
+		Game &game = getGame();
 		for (auto &entity: entities)
 			if (entity->isPlayer()) {
 				auto player = std::dynamic_pointer_cast<Player>(entity);
 				if (!player->ticked) {
 					player->ticked = true;
-					player->tick(delta);
+					player->tick(game, delta);
 				}
 			} else
-				entity->tick(delta);
+				entity->tick(game, delta);
 		ticking = false;
 		for (const auto &entity: removalQueue)
 			remove(entity);

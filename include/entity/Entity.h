@@ -53,6 +53,7 @@ namespace Game3 {
 			 *  such that the sum of the new position and the offset is equal to the old offset. The offset is moved closer
 			 *  to zero each tick to achieve smooth movement instead of teleportation from one tile to the next. */
 			Eigen::Vector2f offset {0.f, 0.f};
+			std::list<Direction> path;
 
 			~Entity() override = default;
 
@@ -69,7 +70,7 @@ namespace Game3 {
 			virtual nlohmann::json toJSON() const;
 			virtual bool isPlayer() const { return false; }
 			virtual void render(SpriteRenderer &) const;
-			virtual void tick(float delta);
+			virtual void tick(Game &, float delta);
 			/** Removes the entity from existence. */
 			virtual void remove();
 			/** Handles when the player interacts with the tile they're on and that tile contains this entity. */
@@ -83,7 +84,8 @@ namespace Game3 {
 			inline Position::value_type & column() { return position.column; }
 			void id(EntityID);
 			virtual void init();
-			void move(Direction);
+			/** Returns whether the entity actually moved. */
+			bool move(Direction);
 			std::shared_ptr<Realm> getRealm() const override;
 			const Position & getPosition() const override { return position; }
 			void setRealm(const Game &, RealmID);
@@ -96,6 +98,8 @@ namespace Game3 {
 			Position nextTo() const;
 			std::string debug() const;
 			void queueForMove(const std::function<bool(const std::shared_ptr<Entity> &)> &);
+			bool pathfind(const Position &start, const Position &goal, std::list<Direction> &);
+			bool pathfind(const Position &goal);
 
 		protected:
 			Texture *texture = nullptr;

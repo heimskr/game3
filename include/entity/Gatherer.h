@@ -4,14 +4,19 @@
 
 namespace Game3 {
 	/** Lives in a town and gathers resources during the day. */
-	class Gatherer: public virtual Entity {
+	class Gatherer: public Entity {
 		public:
+			constexpr static Index RADIUS = 50;
+
 			static std::shared_ptr<Gatherer> create(EntityID);
 			static std::shared_ptr<Gatherer> fromJSON(const nlohmann::json &);
+			Phase phase;
+			RealmID overworldRealm;
+			Position housePosition;
 
 			nlohmann::json toJSON() const override;
 			void absorbJSON(const nlohmann::json &) override;
-			void onInteractNextTo(const std::shared_ptr<Player> &) override;
+			void tick(Game &, float delta) override;
 
 		protected:
 			using Entity::Entity;

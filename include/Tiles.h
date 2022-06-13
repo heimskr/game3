@@ -72,6 +72,10 @@ namespace Game3 {
 			return solidSet.contains(tile);
 		}
 
+		bool isResource(TileID tile) const {
+			return OIL <= tile && tile <= GOLD_ORE;
+		}
+
 		TileID getEmpty() const override { return EMPTY; }
 
 		const char * name() const override {

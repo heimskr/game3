@@ -37,7 +37,11 @@ namespace Game3 {
 			setHeight = texture.height;
 		}
 
-		decltype(tiles)::value_type & operator()(int x, int y) {
+		inline decltype(tiles)::value_type & operator()(int x, int y) {
+			return tiles[x + y * width];
+		}
+
+		inline const decltype(tiles)::value_type & operator()(int x, int y) const {
 			return tiles[x + y * width];
 		}
 

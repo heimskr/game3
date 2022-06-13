@@ -24,8 +24,8 @@ namespace Game3 {
 		money = json.contains("money")? json.at("money").get<MoneyCount>() : 0;
 	}
 
-	void Player::tick(float delta) {
-		Entity::tick(delta);
+	void Player::tick(Game &game, float delta) {
+		Entity::tick(game, delta);
 		Direction final_direction = direction;
 		if (movingLeft)
 			move(final_direction = Direction::Left);

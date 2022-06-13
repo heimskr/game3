@@ -70,23 +70,7 @@ namespace Game3 {
 		(void) n;
 
 		if (debugMode && button == 1) {
-			static std::optional<Position> start;
-			if (start) {
-				std::vector<Position> path;
-				Timer timer("A*");
-				const bool success = simpleAStar(activeRealm, *start, {y, x}, path);
-				timer.stop();
-				if (success)
-					for (const auto &position: path)
-						std::cout << position << '\n';
-				else
-					std::cout << "No path found.\n";
-				start.reset();
-				Timer::summary();
-				Timer::clear();
-			} else {
-				start.emplace(y, x);
-			}
+			player->pathfind({y, x});
 		}
 
 		if (debugMode && button == 3 && player && 0 <= x && x < tilemap->width && 0 <= y && y < tilemap->height)

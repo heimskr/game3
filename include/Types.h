@@ -4,15 +4,16 @@
 #include <utility>
 
 namespace Game3 {
-	using Index = int;
-	using TileID = uint16_t;
-	using PlayerID = int;
-	using TileEntityID = unsigned;
-	using RealmType = unsigned;
-	using EntityID = unsigned;
-	using RealmID = unsigned;
-	using ItemID = unsigned;
-	using Slot = int;
-	using ItemCount = size_t;
-	using MoneyCount = size_t;
+	using Index        =  int32_t;
+	using TileID       = uint16_t;
+	using PlayerID     =  int32_t;
+	using TileEntityID = uint32_t;
+	using RealmType    = uint32_t;
+	using EntityID     = uint32_t;
+	using RealmID      = uint32_t;
+	using ItemID       = uint32_t;
+	using Slot         =  int32_t;
+	using ItemCount    = uint64_t;
+	using MoneyCount   = uint64_t;
+	using Phase        =  uint8_t;
 }

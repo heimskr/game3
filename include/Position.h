@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <ostream>
+#include <string>
 
 #include <nlohmann/json.hpp>
 
@@ -16,7 +17,10 @@ namespace Game3 {
 		inline bool operator==(const Position &other) const { return row == other.row && column == other.column; }
 		inline bool operator!=(const Position &other) const { return row != other.row || column != other.column; }
 		inline Position operator+(const Position &other) const { return {row + other.row, column + other.column}; }
+		inline Position operator-(const Position &other) const { return {row - other.row, column - other.column}; }
 		inline Position & operator+=(const Position &other) { row += other.row; column += other.column; return *this; }
+		inline Position & operator-=(const Position &other) { row -= other.row; column -= other.column; return *this; }
+		inline operator std::string() const { return '(' + std::to_string(row) + ", " + std::to_string(column) + ')'; }
 		explicit inline operator bool() const { return row != 0 || column != 0; }
 		bool operator<(const Position &) const;
 	};

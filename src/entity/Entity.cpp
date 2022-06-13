@@ -9,6 +9,7 @@
 #include "realm/Realm.h"
 #include "ui/Canvas.h"
 #include "ui/SpriteRenderer.h"
+#include "util/AStar.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -53,9 +54,13 @@ namespace Game3 {
 		direction = json.at("direction");
 		if (json.contains("inventory"))
 			inventory = std::make_shared<Inventory>(Inventory::fromJSON(json.at("inventory"), shared_from_this()));
+		if (json.contains("path"))
+			path = json.at("path").get<std::list<Direction>>();
 	}
 
-	void Entity::tick(float delta) {
+	void Entity::tick(Game &, float delta) {
+		if (!path.empty() && move(path.front()))
+			path.pop_front();
 		auto &x = offset.x();
 		auto &y = offset.y();
 		if (x < 0.f)
@@ -112,10 +117,10 @@ namespace Game3 {
 		sprite_renderer.drawOnMap(*texture, position.column + offset.x(), position.row + offset.y(), x_offset, y_offset, 16.f, 16.f);
 	}
 
-	void Entity::move(Direction move_direction) {
+	bool Entity::move(Direction move_direction) {
 		auto realm = weakRealm.lock();
 		if (!realm)
-			return;
+			return false;
 
 		Position new_position = position;
 		float x_offset = 0.f;
@@ -149,7 +154,7 @@ namespace Game3 {
 		}
 
 		if ((horizontal && offset.x() != 0) || (!horizontal && offset.y() != 0))
-			return;
+			return false;
 
 		if (canMoveTo(new_position)) {
 			teleport(new_position, false);
@@ -157,7 +162,10 @@ namespace Game3 {
 				offset.x() = x_offset;
 			else
 				offset.y() = y_offset;
+			return true;
 		}
+
+		return false;
 	}
 
 	std::shared_ptr<Realm> Entity::getRealm() const {
@@ -269,6 +277,39 @@ namespace Game3 {
 		moveQueue.push_back(function);
 	}
 
+	bool Entity::pathfind(const Position &start, const Position &goal, std::list<Direction> &out) {
+		std::vector<Position> positions;
+
+		if (!simpleAStar(getRealm(), start, goal, positions))
+			return false;
+
+		out.clear();
+
+		if (positions.size() < 2)
+			return true;
+
+		for (auto iter = positions.cbegin() + 1, end = positions.cend(); iter != end; ++iter) {
+			const Position &prev = *(iter - 1);
+			const Position &next = *iter;
+			if (next.row == prev.row + 1)
+				out.push_back(Direction::Down);
+			else if (next.row == prev.row - 1)
+				out.push_back(Direction::Up);
+			else if (next.column == prev.column + 1)
+				out.push_back(Direction::Right);
+			else if (next.column == prev.column - 1)
+				out.push_back(Direction::Left);
+			else
+				throw std::runtime_error("Invalid path offset: " + std::string(next - prev));
+		}
+
+		return true;
+	}
+
+	bool Entity::pathfind(const Position &goal) {
+		return pathfind(position, goal, path);
+	}
+
 	void to_json(nlohmann::json &json, const Entity &entity) {
 		json["id"] = entity.id();
 		json["position"] = entity.position;
@@ -276,5 +317,7 @@ namespace Game3 {
 		json["direction"] = entity.direction;
 		if (entity.inventory)
 			json["inventory"] = *entity.inventory;
+		if (!entity.path.empty())
+			json["path"] = entity.path;
 	}
 }
