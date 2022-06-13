@@ -43,7 +43,9 @@ namespace Game3 {
 				if (auto *label = dynamic_cast<Gtk::Label *>(item)) {
 					if (label->get_text().empty())
 						return nullptr;
-				} else if (!dynamic_cast<Gtk::Image *>(item))
+					if (dynamic_cast<Gtk::Fixed *>(item->get_parent()))
+						item = item->get_parent();
+				} else if (!dynamic_cast<Gtk::Fixed *>(item))
 					return nullptr;
 				scrolled.set_data("dragged-item", item);
 				Glib::ValueBase base;
@@ -58,6 +60,9 @@ namespace Game3 {
 				auto *destination = grid.pick(x, y);
 
 				if (destination != nullptr && destination != &grid) {
+					if (dynamic_cast<Gtk::Fixed *>(destination->get_parent()))
+						destination = destination->get_parent();
+
 					auto &dragged = getDraggedItem();
 					const Slot source_slot      = reinterpret_cast<intptr_t>(dragged.get_data("slot"));
 					const Slot destination_slot = reinterpret_cast<intptr_t>(destination->get_data("slot"));
