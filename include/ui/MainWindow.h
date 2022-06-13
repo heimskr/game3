@@ -87,6 +87,17 @@ namespace Game3 {
 			/** Keys are keycodes, not keyvals. */
 			std::map<guint, KeyInfo> keyTimes;
 
+			bool prevA = false;
+			bool prevB = false;
+			bool prevX = false;
+			bool prevY = false;
+			bool prevUp    = false;
+			bool prevDown  = false;
+			bool prevLeft  = false;
+			bool prevRight = false;
+			bool prevRightPad = false;
+			bool prevAutofocus = true;
+
 			void newGame(int seed, int width, int height);
 			void loadGame(const std::filesystem::path &);
 			void saveGame(const std::filesystem::path &);

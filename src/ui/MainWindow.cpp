@@ -284,6 +284,99 @@ namespace Game3 {
 		context->make_current();
 		glClearColor(.2f, .2f, .2f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT);
+		for (int joystick = GLFW_JOYSTICK_1; joystick <= GLFW_JOYSTICK_LAST; ++joystick)
+			if (glfwJoystickPresent(joystick)) {
+				int button_count = 0;
+				const uint8_t *buttons = glfwGetJoystickButtons(joystick, &button_count);
+				// const bool left_pad = buttons[0];
+				const bool right_pad = buttons[1];
+				const bool a = buttons[2];
+				const bool b = buttons[3];
+				const bool x = buttons[4];
+				const bool y = buttons[5];
+				const bool l2Full = buttons[8];
+				const bool up    = buttons[17];
+				const bool down  = buttons[18];
+				const bool left  = buttons[19];
+				const bool right = buttons[20];
+
+				int axis_count = 0;
+				const float *axes = glfwGetJoystickAxes(joystick, &axis_count);
+				if (axes != nullptr && 4 <= axis_count) {
+					if (right_pad) {
+						autofocus = false;
+						const float rx = axes[2];
+						const float divisor = -5.f;
+						if (rx <= -0.01 || 0.01 <= rx)
+							canvas->center.x() += rx / divisor;
+						const float ry = axes[3];
+						if (ry <= -0.01 || 0.01 <= ry)
+							canvas->center.y() += ry / divisor;
+					}
+
+					if (game && game->player) {
+						const float lx = axes[0];
+						const float ly = axes[1];
+						auto &player = *game->player;
+						if (ly <= -.5f)
+							player.movingUp = true;
+						else if (-.1f < ly)
+							player.movingUp = false;
+						if (.5f <= ly)
+							player.movingDown = true;
+						else if (ly < .1f)
+							player.movingDown = false;
+						if (lx <= -.5f)
+							player.movingLeft = true;
+						else if (-.1f < lx)
+							player.movingLeft = false;
+						if (.5f <= lx)
+							player.movingRight = true;
+						else if (lx < .1f)
+							player.movingRight = false;
+					}
+				}
+
+				if (l2Full)
+					autofocus = true;
+
+				if (game && game->player) {
+					auto &player = *game->player;
+					if (!a && prevA)
+						player.interactNextTo();
+					if (!x && prevX)
+						player.interactOn();
+					if (up)
+						player.movingUp = true;
+					else if (prevUp)
+						player.movingUp = false;
+					if (down)
+						player.movingDown = true;
+					else if (prevDown)
+						player.movingDown = false;
+					if (left)
+						player.movingLeft = true;
+					else if (prevLeft)
+						player.movingLeft = false;
+					if (right)
+						player.movingRight = true;
+					else if (prevRight)
+						player.movingRight = false;
+				}
+
+				prevA = a;
+				prevB = b;
+				prevX = x;
+				prevY = y;
+				prevUp = up;
+				prevDown = down;
+				prevLeft = left;
+				prevRight = right;
+				prevRightPad = right_pad;
+
+				// for (int i = 0; i < button_count; ++i) std::cout << i << ':' << int(buttons[i]) << ' ';
+				// std::cout << '\n';
+			}
 		if (autofocus && game && game->player)
 			game->player->focus(*canvas, true);
 		canvas->drawGL();
@@ -526,25 +619,4 @@ namespace Game3 {
 			merchantTab->reset(game);
 		});
 	}
-
-/*
-	void Application::draw(NVGcontext *ctx) {
-		Screen::draw(ctx);
-
-		for (int joystick = GLFW_JOYSTICK_1; joystick <= GLFW_JOYSTICK_LAST; ++joystick)
-			if (glfwJoystickPresent(joystick)) {
-				int axis_count = 0;
-				const float *axes = glfwGetJoystickAxes(joystick, &axis_count);
-				if (axes != nullptr && 2 <= axis_count) {
-					const float x = axes[0];
-					const float divisor = 20.f;
-					if (x <= -0.01 || 0.01 <= x)
-						canvas->center.x() += x / divisor;
-					const float y = axes[1];
-					if (y <= -0.01 || 0.01 <= y)
-						canvas->center.y() += y / divisor;
-				}
-			}
-	}
-*/
 }
