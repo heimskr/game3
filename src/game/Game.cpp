@@ -98,8 +98,7 @@ namespace Game3 {
 	}
 
 	float Game::getHour() const {
-		// + 12 because the game starts at noon
-		const auto base = getTotalSeconds() / 2.f + hourOffset;
+		const auto base = getTotalSeconds() / 10.f + hourOffset;
 		return long(base) % 24 + base - long(base);
 	}
 
