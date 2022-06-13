@@ -24,8 +24,8 @@ namespace Game3 {
 		scrolled.set_child(vbox);
 		scrolled.set_vexpand(true);
 		auto gmenu = Gio::Menu::create();
-		gmenu->append("_Drop", "inventory_popup.drop");
-		gmenu->append("D_iscard", "inventory_popup.discard");
+		gmenu->append("_Drop", "merchant_popup.drop");
+		gmenu->append("D_iscard", "merchant_popup.discard");
 		popoverMenu.set_menu_model(gmenu);
 
 		auto group = Gio::SimpleActionGroup::create();
@@ -38,7 +38,7 @@ namespace Game3 {
 				lastGame->player->inventory->erase(lastSlot);
 		});
 
-		mainWindow.insert_action_group("inventory_popup", group);
+		mainWindow.insert_action_group("merchant_popup", group);
 		popoverMenu.set_parent(mainWindow); // TODO: fix this silliness
 
 		auto source = Gtk::DragSource::create();
