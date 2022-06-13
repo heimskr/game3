@@ -3,11 +3,13 @@
 
 #include "Shader.h"
 
+#include "entity/Gatherer.h"
 #include "entity/ItemEntity.h"
 #include "entity/Merchant.h"
 #include "game/Game.h"
 #include "game/HasInventory.h"
 #include "game/Inventory.h"
+#include "tileentity/Teleporter.h"
 #include "ui/gtk/NewGameDialog.h"
 #include "ui/tab/InventoryTab.h"
 #include "ui/tab/MerchantTab.h"
@@ -501,16 +503,24 @@ namespace Game3 {
 			if (game && game->player) {
 				auto &player = *game->player;
 				switch (keyval) {
+					case GDK_KEY_S:
 					case GDK_KEY_s:
+						player.path.clear();
 						player.movingDown = true;
 						return;
+					case GDK_KEY_W:
 					case GDK_KEY_w:
+						player.path.clear();
 						player.movingUp = true;
 						return;
+					case GDK_KEY_A:
 					case GDK_KEY_a:
+						player.path.clear();
 						player.movingLeft = true;
 						return;
+					case GDK_KEY_D:
 					case GDK_KEY_d:
+						player.path.clear();
 						player.movingRight = true;
 						return;
 					case GDK_KEY_o: {
@@ -554,6 +564,19 @@ namespace Game3 {
 					case GDK_KEY_t:
 						if (game)
 							std::cout << "Time: " << int(game->getHour()) << ':' << int(game->getMinute()) << '\n';
+						return;
+					case GDK_KEY_g:
+						if (game && game->debugMode) {
+							try {
+								auto house = player.getRealm();
+								auto door = house->getTileEntity<Teleporter>();
+								const auto house_pos = door->targetPosition + Position(-1, 0);
+								auto overworld = game->realms.at(door->targetRealm);
+								player.getRealm()->spawn<Gatherer>(player.getPosition(), Entity::VILLAGER1, overworld->id, house->id, house_pos);
+							} catch (const std::exception &err) {
+								std::cerr << err.what() << '\n';
+							}
+						}
 						return;
 				}
 			}
