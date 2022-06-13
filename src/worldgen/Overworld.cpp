@@ -62,16 +62,23 @@ namespace Game3::WorldGen {
 			throw std::runtime_error("Map has no land");
 		land_timer.stop();
 
-		Timer oil_timer("Oil");
-		auto oil_starts = tilemap1->getLand(realm->type);
-		std::shuffle(oil_starts.begin(), oil_starts.end(), rng);
-		for (size_t i = 0, max = oil_starts.size() / 2000; i < max; ++i) {
-			const Index index = oil_starts.back();
-			if (noise_threshold + 0.6 <= saved_noise[index])
-				realm->setLayer2(index, OverworldTiles::OIL);
-			oil_starts.pop_back();
-		}
-		oil_timer.stop();
+		Timer resource_timer("Resources");
+		auto resource_starts = tilemap1->getLand(realm->type);
+		std::shuffle(resource_starts.begin(), resource_starts.end(), rng);
+		auto add_resources = [&](double threshold, TileID tile) {
+			for (size_t i = 0, max = resource_starts.size() / 2000; i < max; ++i) {
+				const Index index = resource_starts.back();
+				if (noise_threshold + threshold <= saved_noise[index])
+					realm->setLayer2(index, tile);
+				resource_starts.pop_back();
+			}
+		};
+		add_resources(0.5, OverworldTiles::IRON_ORE);
+		add_resources(0.5, OverworldTiles::COPPER_ORE);
+		add_resources(0.5, OverworldTiles::GOLD_ORE);
+		add_resources(0.5, OverworldTiles::OIL);
+		add_resources(0.5, OverworldTiles::DIAMOND_ORE);
+		resource_timer.stop();
 
 		realm->randomLand = choose(starts, rng);
 		std::vector<Index> candidates;
