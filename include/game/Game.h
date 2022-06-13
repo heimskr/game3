@@ -46,6 +46,7 @@ namespace Game3 {
 			float getDivisor() const;
 
 			sigc::signal<void(const std::shared_ptr<Player> &)> signal_player_inventory_update() const { return signal_player_inventory_update_; }
+			sigc::signal<void(const std::shared_ptr<Player> &)> signal_player_money_update() const { return signal_player_money_update_; }
 			sigc::signal<void(const std::shared_ptr<HasRealm> &)> signal_other_inventory_update()  const { return signal_other_inventory_update_; }
 
 			static std::shared_ptr<Game> create(Canvas &);
@@ -54,6 +55,7 @@ namespace Game3 {
 		private:
 			Game(Canvas &canvas_): canvas(canvas_) {}
 			sigc::signal<void(const std::shared_ptr<Player> &)> signal_player_inventory_update_;
+			sigc::signal<void(const std::shared_ptr<Player> &)> signal_player_money_update_;
 			sigc::signal<void(const std::shared_ptr<HasRealm> &)> signal_other_inventory_update_;
 			std::chrono::system_clock::time_point lastTime = startTime;
 	};

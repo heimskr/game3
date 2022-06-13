@@ -19,6 +19,11 @@ namespace Game3 {
 		return json;
 	}
 
+	void Player::absorbJSON(const nlohmann::json &json) {
+		Entity::absorbJSON(json);
+		money = json.contains("money")? json.at("money").get<MoneyCount>() : 0;
+	}
+
 	void Player::tick(float delta) {
 		Entity::tick(delta);
 		Direction final_direction = direction;
@@ -61,8 +66,14 @@ namespace Game3 {
 		focus(game.canvas, false);
 	}
 
+	void Player::addMoney(MoneyCount to_add) {
+		money += to_add;
+		getRealm()->getGame().signal_player_money_update().emit(std::dynamic_pointer_cast<Player>(shared_from_this()));
+	}
+
 	void to_json(nlohmann::json &json, const Player &player) {
 		to_json(json, static_cast<const Entity &>(player));
 		json["isPlayer"] = true;
+		json["money"] = player.money;
 	}
 }

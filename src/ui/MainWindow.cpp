@@ -521,6 +521,10 @@ namespace Game3 {
 				}
 			}
 		});
+		game->signal_player_money_update().connect([this](const std::shared_ptr<Player> &) {
+			inventoryTab->reset(game);
+			merchantTab->reset(game);
+		});
 	}
 
 /*
