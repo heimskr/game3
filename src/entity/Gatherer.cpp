@@ -41,8 +41,10 @@ namespace Game3 {
 		houseRealm     = json.at("house").at(0);
 		housePosition  = json.at("house").at(1);
 		harvestingTime = json.at("harvestingTime");
-		if (json.contains("chosenResouce"))
+		if (json.contains("chosenResource"))
 			chosenResource = json.at("chosenResource");
+		if (json.contains("resourceAdjacentPosition"))
+			resourceAdjacentPosition = json.at("resourceAdjacentPosition");
 	}
 
 	void Gatherer::tick(Game &game, float delta) {
@@ -74,7 +76,7 @@ namespace Game3 {
 			auto chosen_position = realm.getPosition(chosenResource);
 			if (auto next = realm.getPathableAdjacent(chosen_position)) {
 				phase = 2;
-				pathfind(chosen_position);
+				pathfind(resourceAdjacentPosition = *next);
 			} else
 				phase = -1;
 		}
@@ -109,5 +111,7 @@ namespace Game3 {
 		json["harvestingTime"] = gatherer.harvestingTime;
 		if (gatherer.chosenResource != -1)
 			json["chosenResource"] = gatherer.chosenResource;
+		if (gatherer.resourceAdjacentPosition)
+			json["resourceAdjacentPosition"] = gatherer.resourceAdjacentPosition;
 	}
 }

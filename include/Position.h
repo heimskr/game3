@@ -21,7 +21,7 @@ namespace Game3 {
 		inline Position & operator+=(const Position &other) { row += other.row; column += other.column; return *this; }
 		inline Position & operator-=(const Position &other) { row -= other.row; column -= other.column; return *this; }
 		inline operator std::string() const { return '(' + std::to_string(row) + ", " + std::to_string(column) + ')'; }
-		explicit inline operator bool() const { return row != 0 || column != 0; }
+		explicit inline operator bool() const { return 0 <= row && 0 <= column; }
 		bool operator<(const Position &) const;
 	};
 

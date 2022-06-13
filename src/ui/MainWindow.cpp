@@ -25,6 +25,7 @@
 namespace Game3 {
 	static std::chrono::milliseconds arrowTime {100};
 	static std::chrono::milliseconds interactTime {500};
+	static std::chrono::milliseconds slowTime {1000};
 	std::unordered_map<guint, std::chrono::milliseconds> MainWindow::customKeyRepeatTimes {
 		{GDK_KEY_Up,    arrowTime},
 		{GDK_KEY_Down,  arrowTime},
@@ -33,6 +34,7 @@ namespace Game3 {
 		{GDK_KEY_e,     interactTime},
 		{GDK_KEY_E,     interactTime},
 		{GDK_KEY_o,     interactTime},
+		{GDK_KEY_g,     slowTime},
 	};
 
 	MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &builder_):

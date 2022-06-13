@@ -14,6 +14,7 @@ namespace Game3 {
 			RealmID houseRealm;
 			Position housePosition;
 			Index chosenResource = -1;
+			Position resourceAdjacentPosition = {-1, -1};
 			float harvestingTime;
 
 			static std::shared_ptr<Gatherer> create(EntityID, RealmID overworld_realm, RealmID house_realm, const Position &house_position);
