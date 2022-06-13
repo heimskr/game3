@@ -93,6 +93,9 @@ namespace Game3 {
 		constexpr static TileID WALL_SE   = 226;
 		constexpr static TileID DOOR1     = 282;
 		constexpr static TileID DOOR2     = 284;
+		constexpr static TileID BED1      = 308;
+		constexpr static TileID BED2      = 309;
+		constexpr static TileID BED3      = 310;
 		constexpr static TileID BOOKSHELF = 311;
 		constexpr static TileID PLANT1    = 340;
 		constexpr static TileID PLANT2    = 341;

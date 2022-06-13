@@ -32,6 +32,7 @@ namespace Game3 {
 			std::unordered_set<std::shared_ptr<Entity>> entities;
 			/** A vector of bools (represented with uint8_t to avoid the std::vector<bool> specialization) indicating whether a given square is empty for the purposes of pathfinding. */
 			std::vector<uint8_t> pathMap;
+			nlohmann::json extraData;
 
 			Realm(const Realm &) = delete;
 			Realm(Realm &&) = default;

@@ -63,6 +63,8 @@ namespace Game3 {
 		realm.entities.clear();
 		for (const auto &entity_json: json.at("entities"))
 			(*realm.entities.insert(Entity::fromJSON(entity_json)).first)->setRealm(out);
+		if (json.contains("extra"))
+			realm.extraData = json.at("extra");
 		return out;
 	}
 
@@ -216,12 +218,18 @@ namespace Game3 {
 		setLayer2(exit_index + 1, HouseTiles::WALL_E);
 
 		static std::array<TileID, 3> plants {HouseTiles::PLANT1, HouseTiles::PLANT2, HouseTiles::PLANT3};
+		static std::array<TileID, 3> beds   {HouseTiles::BED1,   HouseTiles::BED2,   HouseTiles::BED3};
 		static std::array<TileID, 2> doors  {HouseTiles::DOOR1,  HouseTiles::DOOR2};
 
 		setLayer2(width + 1, choose(plants, rng));
 		setLayer2(2 * width - 2, choose(plants, rng));
 		setLayer2((width - 1) * height - 2, choose(plants, rng));
 		setLayer2((width - 2) * height + 1, choose(plants, rng));
+
+		std::array<Index, 2> edges {1, width - 2};
+		const Position bed_position(2 + rng() % (height - 4), choose(edges, rng));
+		setLayer2(getIndex(bed_position), choose(beds, rng));
+		extraData["bed"] = bed_position;
 
 		add(TileEntity::create<Teleporter>(choose(doors, rng), getPosition(exit_index), parent_realm, entrance));
 
@@ -580,5 +588,7 @@ namespace Game3 {
 		json["entities"] = std::vector<nlohmann::json>();
 		for (const auto &entity: realm.entities)
 			json["entities"].push_back(entity->toJSON());
+		if (!realm.extraData.empty())
+			json["extra"] = realm.extraData;
 	}
 }
