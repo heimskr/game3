@@ -295,6 +295,8 @@ namespace Game3 {
 				const bool x = buttons[4];
 				const bool y = buttons[5];
 				const bool l2Full = buttons[8];
+				const bool left_grip  = buttons[15];
+				const bool right_grip = buttons[16];
 				const bool up    = buttons[17];
 				const bool down  = buttons[18];
 				const bool left  = buttons[19];
@@ -346,6 +348,7 @@ namespace Game3 {
 						player.interactNextTo();
 					if (!x && prevX)
 						player.interactOn();
+
 					if (up)
 						player.movingUp = true;
 					else if (prevUp)
@@ -362,6 +365,13 @@ namespace Game3 {
 						player.movingRight = true;
 					else if (prevRight)
 						player.movingRight = false;
+
+					if (canvas) {
+						if (left_grip)
+							canvas->scale /= 1.01f;
+						if (right_grip)
+							canvas->scale *= 1.01f;
+					}
 				}
 
 				prevA = a;
