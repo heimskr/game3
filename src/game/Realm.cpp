@@ -300,6 +300,7 @@ namespace Game3 {
 		auto set1 = [&](TileID tile) { setLayer1(row, column, tile); };
 		auto set2 = [&](TileID tile) { setLayer2(row, column, tile); };
 
+		Timer town_timer("TownLayout");
 		for (size_t row = index / map_width - pad; row < index / map_width + height + pad; ++row)
 			for (size_t column = index % map_width - pad; column < index % map_width + width + pad; ++column)
 				setLayer2(row * map_width + column, OverworldTiles::EMPTY);
@@ -388,16 +389,18 @@ namespace Game3 {
 		setLayer2(index / map_width + height / 2,     index % map_width + width / 2 - 1, OverworldTiles::KEEP_SW);
 		setLayer2(index / map_width + height / 2,     index % map_width + width / 2,     OverworldTiles::KEEP_SE);
 
+		// Prevent houses from being placed on the corners around the keep
 		buildable_set.erase(map_width * (index / map_width + height / 2 - 2) + index % map_width + width / 2 - 2);
 		buildable_set.erase(map_width * (index / map_width + height / 2 - 2) + index % map_width + width / 2 + 1);
 		buildable_set.erase(map_width * (index / map_width + height / 2 + 1) + index % map_width + width / 2 + 1);
 		buildable_set.erase(map_width * (index / map_width + height / 2 + 1) + index % map_width + width / 2 - 2);
+		town_timer.stop();
 
 		std::default_random_engine rng;
 		rng.seed(666);
 		std::vector<Index> buildable(buildable_set.cbegin(), buildable_set.cend());
 		std::shuffle(buildable.begin(), buildable.end(), rng);
-		Timer timer("Houses");
+		Timer houses_timer("Houses");
 		if (2 < buildable.size()) {
 			buildable.erase(buildable.begin() + buildable.size() / 10, buildable.end());
 			buildable_set = std::unordered_set<Index>(buildable.cbegin(), buildable.cend());
@@ -436,7 +439,7 @@ namespace Game3 {
 				buildable_set.erase(index + 1);
 			}
 		}
-		timer.stop();
+		houses_timer.stop();
 	}
 
 	std::shared_ptr<Entity> Realm::add(const std::shared_ptr<Entity> &entity) {
