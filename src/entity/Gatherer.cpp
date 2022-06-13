@@ -10,6 +10,7 @@
 #include "tileentity/Teleporter.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
+#include "ui/tab/InventoryTab.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -54,6 +55,15 @@ namespace Game3 {
 	void Gatherer::initAfterRealm() {
 		if (!(keep = std::dynamic_pointer_cast<Building>(getRealm()->tileEntityAt(keepPosition))))
 			throw std::runtime_error("Couldn't find keep for gatherer");
+	}
+
+	void Gatherer::onInteractNextTo(const std::shared_ptr<Player> &player) {
+		auto &tab = *getRealm()->getGame().canvas.window.inventoryTab;
+		player->queueForMove([player, &tab](const auto &) {
+			tab.resetExternalInventory();
+			return true;
+		});
+		tab.setExternalInventory("Gatherer", inventory);
 	}
 
 	void Gatherer::tick(Game &game, float delta) {
@@ -141,7 +151,7 @@ namespace Game3 {
 		}
 
 		if (phase == 6 && position == destination) {
-			phase = -1;
+			phase = 7;
 		}
 	}
 
