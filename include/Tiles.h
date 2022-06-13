@@ -38,6 +38,7 @@ namespace Game3 {
 		constexpr static TileID DIAMOND_ORE = 36;
 		constexpr static TileID COPPER_ORE = 37;
 		constexpr static TileID GOLD_ORE = 38;
+		constexpr static TileID COAL_ORE = 39;
 		constexpr static TileID MARKET1 = 40;
 		constexpr static TileID MARKET2 = 41;
 		constexpr static TileID MARKET3 = 42;

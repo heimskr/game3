@@ -8,7 +8,7 @@ namespace Game3 {
 
 	std::unordered_set<TileID> OverworldTiles::solidSet {
 		TOWER_NW, TOWER_NE, TOWER_SW, TOWER_SE, TOWER_WE, TOWER_NS, TOWER_N, TOWER_S, HOUSE1, HOUSE2, HOUSE3, MARKET1, MARKET2, MARKET3, KEEP_NW, KEEP_NE, KEEP_SW, KEEP_SE, IRON_ORE, DIAMOND_ORE,
-		COPPER_ORE, GOLD_ORE,
+		COPPER_ORE, GOLD_ORE, COAL_ORE,
 	};
 
 	std::unordered_set<TileID> HouseTiles::solidSet {

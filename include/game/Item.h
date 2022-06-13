@@ -23,10 +23,16 @@ namespace Game3 {
 
 	class Item {
 		public:
-			constexpr static ItemID NOTHING    = 0;
-			constexpr static ItemID SHORTSWORD = 1;
-			constexpr static ItemID RED_POTION = 2;
-			constexpr static ItemID COINS      = 3;
+			constexpr static ItemID NOTHING     = 0;
+			constexpr static ItemID SHORTSWORD  = 1;
+			constexpr static ItemID RED_POTION  = 2;
+			constexpr static ItemID COINS       = 3;
+			constexpr static ItemID IRON_ORE    = 4;
+			constexpr static ItemID COPPER_ORE  = 5;
+			constexpr static ItemID GOLD_ORE    = 6;
+			constexpr static ItemID DIAMOND_ORE = 7;
+			constexpr static ItemID DIAMOND     = 8;
+			constexpr static ItemID COAL        = 9;
 
 			static std::map<ItemID, std::shared_ptr<Item>> items;
 			static std::unordered_map<ItemID, ItemTexture> itemTextures;
@@ -40,6 +46,7 @@ namespace Game3 {
 			Item(ItemID id_, const std::string &name_, MoneyCount base_price, ItemCount max_count = 64): id(id_), name(name_), basePrice(base_price), maxCount(max_count) {}
 
 			Glib::RefPtr<Gdk::Pixbuf> getImage();
+			inline bool operator==(const Item &other) const { return id == other.id; }
 
 		private:
 			std::unique_ptr<uint8_t[]> rawImage;
@@ -58,6 +65,8 @@ namespace Game3 {
 			Glib::RefPtr<Gdk::Pixbuf> getImage();
 			/** Returns a copy of the ItemStack with a different count. */
 			ItemStack withCount(ItemCount) const;
+
+			inline bool operator==(const ItemStack &other) const { return *item == *other.item && count == other.count; }
 
 		private:
 			Glib::RefPtr<Gdk::Pixbuf> cachedImage;

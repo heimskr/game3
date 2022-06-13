@@ -8,15 +8,27 @@ namespace Game3 {
 	static Texture textureItems       {"resources/items/items.png"};
 
 	std::unordered_map<ItemID, ItemTexture> Item::itemTextures {
-		{Item::SHORTSWORD, {0, 0, textureShortsword}},
-		{Item::RED_POTION, {48, 176, texturePotions}},
-		{Item::COINS,      {160, 112, textureItems}},
+		{Item::SHORTSWORD,  {  0,   0, textureShortsword}},
+		{Item::RED_POTION,  { 48, 176, texturePotions}},
+		{Item::COINS,       {160, 112, textureItems}},
+		{Item::IRON_ORE,    {128, 272, textureItems}},
+		{Item::COPPER_ORE,  {160, 272, textureItems}},
+		{Item::GOLD_ORE,    { 80, 272, textureItems}},
+		{Item::DIAMOND_ORE, { 96, 272, textureItems}},
+		{Item::DIAMOND,     {  0, 128, textureItems}},
+		{Item::COAL,        {192, 272, textureItems}},
 	};
 
 	std::map<ItemID, std::shared_ptr<Item>> Item::items {
-		{Item::SHORTSWORD, std::make_shared<Item>(Item::SHORTSWORD, "Shortsword", 100, 1)},
-		{Item::RED_POTION, std::make_shared<Item>(Item::RED_POTION, "Red Potion", 20, 8)},
-		{Item::COINS,      std::make_shared<Item>(Item::COINS, "Gold", 1, 1'000'000)},
+		{Item::SHORTSWORD,  std::make_shared<Item>(Item::SHORTSWORD,  "Shortsword", 100, 1)},
+		{Item::RED_POTION,  std::make_shared<Item>(Item::RED_POTION,  "Red Potion",  20, 8)},
+		{Item::COINS,       std::make_shared<Item>(Item::COINS,       "Gold",         1, 1'000'000)},
+		{Item::IRON_ORE,    std::make_shared<Item>(Item::IRON_ORE,    "Iron Ore",    10, 64)},
+		{Item::COPPER_ORE,  std::make_shared<Item>(Item::COPPER_ORE,  "Copper Ore",   8, 64)},
+		{Item::GOLD_ORE,    std::make_shared<Item>(Item::GOLD_ORE,    "Gold Ore",    20, 64)},
+		{Item::DIAMOND_ORE, std::make_shared<Item>(Item::DIAMOND_ORE, "Diamond Ore", 80, 64)},
+		{Item::DIAMOND,     std::make_shared<Item>(Item::DIAMOND,     "Diamond",    100, 64)},
+		{Item::COAL,        std::make_shared<Item>(Item::COAL,        "Coal",         5, 64)},
 	};
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage() {

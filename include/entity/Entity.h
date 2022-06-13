@@ -84,12 +84,13 @@ namespace Game3 {
 			inline Position::value_type & column() { return position.column; }
 			void id(EntityID);
 			virtual void init();
+			virtual void initAfterRealm() {}
 			/** Returns whether the entity actually moved. */
 			bool move(Direction);
 			std::shared_ptr<Realm> getRealm() const override;
 			const Position & getPosition() const override { return position; }
-			void setRealm(const Game &, RealmID);
-			void setRealm(const std::shared_ptr<Realm>);
+			Entity & setRealm(const Game &, RealmID);
+			Entity & setRealm(const std::shared_ptr<Realm>);
 			void focus(Canvas &, bool is_autofocus);
 			void teleport(const Position &, bool clear_offset = true);
 			virtual void teleport(const Position &, const std::shared_ptr<Realm> &);

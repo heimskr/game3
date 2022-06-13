@@ -175,14 +175,16 @@ namespace Game3 {
 		return out;
 	}
 
-	void Entity::setRealm(const Game &game, RealmID realm_id) {
+	Entity & Entity::setRealm(const Game &game, RealmID realm_id) {
 		weakRealm = game.realms.at(realm_id);
 		realmID = realm_id;
+		return *this;
 	}
 
-	void Entity::setRealm(const std::shared_ptr<Realm> realm) {
+	Entity & Entity::setRealm(const std::shared_ptr<Realm> realm) {
 		weakRealm = realm;
 		realmID = realm->id;
+		return *this;
 	}
 
 	Entity::Entity(EntityID id__): id_(id__) {
