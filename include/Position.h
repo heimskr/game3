@@ -13,11 +13,12 @@ namespace Game3 {
 		value_type row;
 		value_type column;
 
-		bool operator==(const Position &other) const { return row == other.row && column == other.column; }
-		bool operator!=(const Position &other) const { return row != other.row || column != other.column; }
-		Position operator+(const Position &other) const { return {row + other.row, column + other.column}; }
-		Position & operator+=(const Position &other) { row += other.row; column += other.column; return *this; }
-		operator bool() const { return row != 0 || column != 0; }
+		inline bool operator==(const Position &other) const { return row == other.row && column == other.column; }
+		inline bool operator!=(const Position &other) const { return row != other.row || column != other.column; }
+		inline Position operator+(const Position &other) const { return {row + other.row, column + other.column}; }
+		inline Position & operator+=(const Position &other) { row += other.row; column += other.column; return *this; }
+		explicit inline operator bool() const { return row != 0 || column != 0; }
+		bool operator<(const Position &) const;
 	};
 
 	struct Location {

@@ -14,9 +14,9 @@
 #include "ui/tab/TextTab.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
-
 #include "util/FS.h"
 #include "util/Util.h"
+#include "worldgen/Overworld.h"
 
 // #define USE_CBOR
 
@@ -232,7 +232,9 @@ namespace Game3 {
 		auto tilemap = std::make_shared<Tilemap>(width, height, 16, texture);
 		auto realm = Realm::create(1, Realm::OVERWORLD, tilemap);
 		realm->game = game.get();
-		realm->generate(seed);
+		std::default_random_engine rng;
+		rng.seed(seed);
+		WorldGen::generateOverworld(realm, rng, seed, 100., -0.15);
 		game->realms.emplace(realm->id, realm);
 		game->activeRealm = realm;
 		realm->add(game->player = Entity::create<Player>(Entity::GANGBLANC));

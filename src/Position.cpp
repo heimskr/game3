@@ -1,6 +1,14 @@
 #include "Position.h"
 
 namespace Game3 {
+	bool Position::operator<(const Position &other) const {
+		if (row < other.row)
+			return true;
+		if (other.row < row)
+			return false;
+		return column < other.column;
+	}
+
 	void to_json(nlohmann::json &json, const Position &position) {
 		json[0] = position.row;
 		json[1] = position.column;

@@ -34,6 +34,7 @@ namespace Game3 {
 			/** A vector of bools (represented with uint8_t to avoid the std::vector<bool> specialization) indicating whether a given square is empty for the purposes of pathfinding. */
 			std::vector<uint8_t> pathMap;
 			nlohmann::json extraData;
+			Index randomLand = 0;
 
 			Realm(const Realm &) = delete;
 			Realm(Realm &&) = default;
@@ -52,10 +53,6 @@ namespace Game3 {
 			void render(int width, int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &, float game_time);
 			void reupload();
 			void rebind();
-			void generate(int seed = 666, double noise_zoom = 100., double noise_threshold = -0.15);
-			void generateHouse(RealmID parent_realm, std::default_random_engine &, const Position &entrance, int width, int height);
-			void generateKeep(RealmID parent_realm, std::default_random_engine &, const Position &entrance, int width, int height);
-			void createTown(size_t index, size_t width, size_t height, size_t pad);
 			int getWidth()  const { return tilemap1->width;  }
 			int getHeight() const { return tilemap1->height; }
 			std::shared_ptr<Entity> add(const std::shared_ptr<Entity> &);
@@ -70,7 +67,7 @@ namespace Game3 {
 			void remove(const std::shared_ptr<Entity> &);
 			Position getPosition(Index) const;
 			void onMoved(const std::shared_ptr<Entity> &, const Position &);
-			void setGame(Game &);
+			inline void setGame(Game &game_) { game = &game_; }
 			Game & getGame();
 			void queueRemoval(const std::shared_ptr<Entity> &);
 			void absorb(const std::shared_ptr<Entity> &, const Position &);
@@ -108,7 +105,6 @@ namespace Game3 {
 			virtual void toJSON(nlohmann::json &) const;
 
 		private:
-			Index randomLand = 0;
 			Game *game = nullptr;
 			bool ticking = false;
 			std::vector<std::shared_ptr<Entity>> removalQueue;
