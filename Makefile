@@ -21,7 +21,7 @@ LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread -Llibnoise/build/src -lnoise
 SOURCES      := $(shell find src -name \*.cpp) src/resources.cpp src/gtk_resources.cpp
 OBJECTS      := $(SOURCES:.cpp=.o)
 RESXML       := $(OUTPUT).gresource.xml
-CLOC_OPTIONS := . --exclude-dir=.vscode --fullpath --not-match-f='^.\/(src\/(gtk_)?resources\.cpp|include\/resources\.h)$$'
+CLOC_OPTIONS := . --exclude-dir=.vscode,libnoise,stb --fullpath --not-match-f='^.\/(src\/(gtk_)?resources\.cpp|include\/resources\.h)$$'
 GLIB_COMPILE_RESOURCES = $(shell pkg-config --variable=glib_compile_resources gio-2.0)
 
 .PHONY: all clean test
