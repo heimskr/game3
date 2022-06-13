@@ -3,7 +3,9 @@
 
 #include "Tiles.h"
 #include "entity/Entity.h"
+#include "entity/Gatherer.h"
 #include "entity/ItemEntity.h"
+#include "entity/Merchant.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "realm/Realm.h"
@@ -22,14 +24,21 @@ namespace Game3 {
 
 	std::shared_ptr<Entity> Entity::fromJSON(const nlohmann::json &json) {
 		const EntityID id = json.at("id");
+		const EntityID type = json.at("type");
 		std::shared_ptr<Entity> out;
 
 		if (json.contains("isPlayer") && json.at("isPlayer") == true)
 			out = Entity::create<Player>(id);
 		else
-			switch (id) {
+			switch (type) {
 				case Entity::ITEM:
 					out = ItemEntity::create(json.at("stack"));
+					break;
+				case Entity::GATHERER:
+					out = Entity::create<Gatherer>(id);
+					break;
+				case Entity::MERCHANT:
+					out = Entity::create<Merchant>(id);
 					break;
 				default:
 					out = Entity::create<Entity>(id);
@@ -49,6 +58,7 @@ namespace Game3 {
 
 	void Entity::absorbJSON(const nlohmann::json &json) {
 		id(json.at("id"));
+		type = json.at("type");
 		position = json.at("position");
 		realmID = json.at("realmID");
 		direction = json.at("direction");
@@ -56,6 +66,8 @@ namespace Game3 {
 			inventory = std::make_shared<Inventory>(Inventory::fromJSON(json.at("inventory"), shared_from_this()));
 		if (json.contains("path"))
 			path = json.at("path").get<std::list<Direction>>();
+		if (json.contains("money"))
+			money = json.at("money");
 	}
 
 	void Entity::tick(Game &, float delta) {
@@ -314,6 +326,7 @@ namespace Game3 {
 
 	void to_json(nlohmann::json &json, const Entity &entity) {
 		json["id"] = entity.id();
+		json["type"] = entity.type;
 		json["position"] = entity.position;
 		json["realmID"] = entity.realmID;
 		json["direction"] = entity.direction;
@@ -321,5 +334,7 @@ namespace Game3 {
 			json["inventory"] = *entity.inventory;
 		if (!entity.path.empty())
 			json["path"] = entity.path;
+		if (entity.money != 0)
+			json["money"] = entity.money;
 	}
 }

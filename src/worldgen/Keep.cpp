@@ -38,7 +38,9 @@ namespace Game3::WorldGen {
 
 		static std::array<TileID, 2> doors  {HouseTiles::DOOR1,  HouseTiles::DOOR2};
 
-		realm->add(TileEntity::create<Teleporter>(choose(doors, rng), realm->getPosition(exit_index), parent_realm, entrance));
+		auto exit_door = TileEntity::create<Teleporter>(choose(doors, rng), realm->getPosition(exit_index), parent_realm, entrance);
+		exit_door->extraData["exit"] = true;
+		realm->add(exit_door);
 
 		realm->setLayer2(Position(height - 2, 1), HouseTiles::STOCKPILE_W);
 		realm->setLayer2(Position(height - 2, 2), HouseTiles::STOCKPILE_E);

@@ -27,6 +27,7 @@ namespace Game3 {
 			TileEntityID tileEntityID = 0;
 			Position position {-1, -1};
 			bool solid = false;
+			nlohmann::json extraData;
 
 			template <typename T, typename... Args>
 			static std::shared_ptr<T> create(Args && ...args) {

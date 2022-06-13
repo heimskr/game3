@@ -4,6 +4,8 @@
 #include "entity/Gatherer.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
+#include "game/Stonks.h"
+#include "realm/Keep.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
@@ -59,6 +61,7 @@ namespace Game3 {
 
 	void Gatherer::onInteractNextTo(const std::shared_ptr<Player> &player) {
 		auto &tab = *getRealm()->getGame().canvas.window.inventoryTab;
+		std::cout << "Gatherer: money = " << money << ", phase = " << int(phase) << '\n';
 		player->queueForMove([player, &tab](const auto &) {
 			tab.resetExternalInventory();
 			return true;
@@ -95,6 +98,18 @@ namespace Game3 {
 
 		if (phase == 6 && position == destination)
 			sellInventory();
+
+		if (phase == 7 && SELLING_TIME <= (sellTime += delta))
+			leaveKeep();
+
+		if (phase == 8 && position == destination)
+			goToHouse();
+
+		if (phase == 9 && position == destination)
+			goToBed();
+
+		if (phase == 10 && position == destination)
+			phase = 0;
 	}
 
 	void Gatherer::wakeUp() {
@@ -177,6 +192,70 @@ namespace Game3 {
 
 	void Gatherer::sellInventory() {
 		phase = 7;
+		auto &keep_realm = dynamic_cast<Keep &>(*keep->getInnerRealm());
+		MoneyCount new_money = money;
+
+		for (Slot slot = 0; slot < inventory->slotCount; ++slot) {
+			if (!inventory->contains(slot))
+				continue;
+
+			auto stack = inventory->front();
+			MoneyCount sell_price = 0;
+
+			while (0 < stack.count && !totalSellPrice(keep_realm, stack, sell_price))
+				--stack.count;
+
+			if (stack.count == 0) // Couldn't sell any
+				continue;
+
+			inventory->remove(stack, slot);
+			new_money += sell_price;
+		}
+
+		setMoney(new_money);
+	}
+
+	void Gatherer::leaveKeep() {
+		phase = 8;
+		auto &keep_realm = dynamic_cast<Keep &>(*keep->getInnerRealm());
+		auto door = keep_realm.getTileEntity<Teleporter>([](const auto &door) {
+			return door->extraData.contains("exit") && door->extraData.at("exit") == true;
+		});
+		if (!pathfind(destination = door->position))
+			throw std::runtime_error("Gatherer couldn't pathfind to keep door");
+	}
+
+	void Gatherer::goToHouse() {
+		if (getRealm()->id == overworldRealm) {
+			const auto adjacent = getRealm()->getPathableAdjacent(housePosition);
+			if (!adjacent || !pathfind(destination = *adjacent))
+				throw std::runtime_error("Gatherer couldn't pathfind to house");
+			phase = 9;
+		}
+	}
+
+	void Gatherer::goToBed() {
+		auto &realm = *getRealm();
+		if (realm.id == houseRealm) {
+			std::optional<Position> bed_position;
+			auto &tilemap2 = *realm.tilemap2;
+			for (Index row = 0; row < tilemap2.height; ++row)
+				for (Index column = 0; column < tilemap2.width; ++column)
+					if (houseTiles.isBed(tilemap2(column, row))) {
+						bed_position.emplace(row, column);
+						goto found;
+					}
+
+			found:
+
+			if (!bed_position || !pathfind(destination = *bed_position))
+				throw std::runtime_error("Gatherer couldn't pathfind to bed");
+			phase = 10;
+		}
+	}
+
+	void Gatherer::setMoney(MoneyCount new_money) {
+		money = new_money;
 	}
 
 	void to_json(nlohmann::json &json, const Gatherer &gatherer) {

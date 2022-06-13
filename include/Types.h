@@ -8,6 +8,7 @@ namespace Game3 {
 	using TileID       = uint16_t;
 	using PlayerID     =  int32_t;
 	using TileEntityID = uint32_t;
+	using EntityType   = uint32_t;
 	using RealmType    = uint32_t;
 	using EntityID     = uint32_t;
 	using RealmID      = uint32_t;

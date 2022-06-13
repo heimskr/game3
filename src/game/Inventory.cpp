@@ -165,6 +165,65 @@ namespace Game3 {
 		throw std::runtime_error("Couldn't lock inventory owner");
 	}
 
+	ItemStack & Inventory::front() {
+		if (storage.empty())
+			throw std::out_of_range("Inventory empty");
+		return storage.begin()->second;
+	}
+
+	const ItemStack & Inventory::front() const {
+		if (storage.empty())
+			throw std::out_of_range("Inventory empty");
+		return storage.begin()->second;
+	}
+
+	ItemCount Inventory::remove(const ItemStack &stack_to_remove) {
+		bool retry;
+		ItemCount count_to_remove = stack_to_remove.count;
+		ItemCount removed = 0;
+		do {
+			retry = false;
+			for (auto &[slot, stack]: storage) {
+				if (stack.canMerge(stack_to_remove)) {
+					const auto to_remove = std::min(stack.count, count_to_remove);
+					stack.count -= to_remove;
+					count_to_remove -= to_remove;
+					removed += 0;
+					if (stack.count == 0) {
+						// Erasing from a map can invalidate iterators.
+						storage.erase(slot);
+						retry = true;
+						break;
+					}
+
+					if (count_to_remove == 0)
+						return removed;
+				}
+			}
+
+			if (count_to_remove == 0)
+				return removed;
+		} while (retry);
+
+		return removed;
+	}
+
+	ItemCount Inventory::remove(const ItemStack &stack_to_remove, Slot slot) {
+		auto &stack = storage.at(slot);
+		if (!stack_to_remove.canMerge(stack))
+			return 0;
+
+		const auto to_remove = std::min(stack.count, stack_to_remove.count);
+		if ((stack.count -= to_remove) == 0)
+			storage.erase(slot);
+
+		return to_remove;
+	}
+
+	bool Inventory::contains(Slot slot) const {
+		return storage.contains(slot);
+	}
+
 	void Inventory::notifyOwner() {
 		if (auto locked_owner = owner.lock()) {
 			if (auto player = std::dynamic_pointer_cast<Player>(locked_owner))

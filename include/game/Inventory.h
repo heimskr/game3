@@ -42,6 +42,17 @@ namespace Game3 {
 
 			std::shared_ptr<HasRealm> getOwner() const;
 
+			ItemStack & front();
+			const ItemStack & front() const;
+
+			/** Attempts to remove a given amount of an item from the inventory. Returns the count removed. */
+			ItemCount remove(const ItemStack &);
+
+			/** Attempts to remove a given amount of an item from a specific slot. Returns the count removed. */
+			ItemCount remove(const ItemStack &, Slot);
+
+			bool contains(Slot) const;
+
 		private:
 			std::map<Slot, ItemStack> storage;
 

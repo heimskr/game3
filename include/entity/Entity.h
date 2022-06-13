@@ -37,12 +37,16 @@ namespace Game3 {
 			constexpr static Slot DEFAULT_INVENTORY_SIZE = 20;
 			constexpr static EntityID GANGBLANC = 1;
 			constexpr static EntityID GRUM      = 2;
-			constexpr static EntityID ITEM      = 3;
-			constexpr static EntityID VILLAGER1 = 4;
+			constexpr static EntityID VILLAGER1 = 3;
+
+			constexpr static EntityType ITEM     = 1;
+			constexpr static EntityType GATHERER = 2;
+			constexpr static EntityType PLAYER   = 3;
+			constexpr static EntityType MERCHANT = 4;
 
 			static std::unordered_map<EntityID, EntityTexture> textureMap;
 
-			/** (row, column) */
+			EntityType type = 0;
 			Position position {0, 0};
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;
@@ -54,6 +58,7 @@ namespace Game3 {
 			 *  to zero each tick to achieve smooth movement instead of teleportation from one tile to the next. */
 			Eigen::Vector2f offset {0.f, 0.f};
 			std::list<Direction> path;
+			MoneyCount money = 0;
 
 			~Entity() override = default;
 

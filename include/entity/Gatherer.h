@@ -10,6 +10,7 @@ namespace Game3 {
 		public:
 			constexpr static Index RADIUS = 50;
 			constexpr static float HARVESTING_TIME = 1.f;
+			constexpr static float SELLING_TIME = 5.f;
 
 			Phase phase = 0;
 			RealmID overworldRealm;
@@ -39,7 +40,7 @@ namespace Game3 {
 
 		private:
 			Position keepPosition;
-			float accumulatedTime = 0.f;
+			float sellTime = 0.f;
 			Direction lastDirection = Direction::Down;
 
 			void wakeUp();
@@ -49,6 +50,10 @@ namespace Game3 {
 			void goToKeep();
 			void goToStockpile();
 			void sellInventory();
+			void leaveKeep();
+			void goToHouse();
+			void goToBed();
+			void setMoney(MoneyCount);
 	};
 
 	void to_json(nlohmann::json &, const Gatherer &);

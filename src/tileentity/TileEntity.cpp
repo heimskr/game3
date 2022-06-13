@@ -51,6 +51,8 @@ namespace Game3 {
 		tileID = json.at("tileID");
 		position = json.at("position");
 		solid = json.at("solid");
+		if (json.contains("extra"))
+			extraData = json.at("extra");
 	}
 
 	void TileEntity::toJSON(nlohmann::json &json) const {
@@ -58,6 +60,8 @@ namespace Game3 {
 		json["tileID"] = tileID;
 		json["position"] = position;
 		json["solid"] = solid;
+		if (!extraData.empty())
+			json["extra"] = extraData;
 	}
 
 	void to_json(nlohmann::json &json, const TileEntity &tile_entity) {

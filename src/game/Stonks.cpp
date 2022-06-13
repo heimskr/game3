@@ -4,6 +4,7 @@
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "game/Stonks.h"
+#include "realm/Keep.h"
 
 namespace Game3 {
 	double buyPriceToSellPrice(double buy_price, double greed) {
@@ -26,35 +27,40 @@ namespace Game3 {
 		return buyPriceToSellPrice(buyPrice(base_price, item_count, merchant_money), greed);
 	}
 
-	bool totalSellPrice(const Merchant &merchant, const ItemStack &stack, size_t &out) {
-		const auto &inventory = *merchant.inventory;
-		auto merchant_amount = inventory.count(stack);
+	bool totalSellPrice(const Inventory &inventory, MoneyCount money, double greed, const ItemStack &stack, MoneyCount &out) {
+		auto held_amount = inventory.count(stack);
 		const auto base = stack.item->basePrice;
 		double price = 0.;
-		MoneyCount merchant_money = merchant.money;
-		const double greed = merchant.greed;
 		bool result = true;
 		auto amount = stack.count;
 		while (1 <= amount) {
-			const double unit_price = sellPrice(base, merchant_amount++, merchant_money, greed);
-			if (merchant_money < unit_price)
+			const double unit_price = sellPrice(base, held_amount++, money, greed);
+			if (money < unit_price)
 				result = false;
-			merchant_money -= unit_price;
+			money -= unit_price;
 			price += unit_price;
 			--amount;
 		}
 
 		if (0 < amount) {
-			const double subunit_price = amount * sellPrice(base, merchant_amount, merchant_money, greed);
-			if (merchant_money < subunit_price)
+			const double subunit_price = amount * sellPrice(base, held_amount, money, greed);
+			if (money < subunit_price)
 				result = false;
-			merchant_money -= subunit_price;
+			money -= subunit_price;
 			price += subunit_price;
 		}
 
 		const MoneyCount discrete_price = std::floor(price);
 		out = discrete_price;
-		return result? discrete_price <= merchant.money : false;
+		return result? discrete_price <= money : false;
+	}
+
+	bool totalSellPrice(const Merchant &merchant, const ItemStack &stack, MoneyCount &out) {
+		return totalSellPrice(*merchant.inventory, merchant.money, merchant.greed, stack, out);
+	}
+
+	bool totalSellPrice(const Keep &keep, const ItemStack &stack, MoneyCount &out) {
+		return totalSellPrice(*keep.stockpileInventory, keep.money, keep.greed, stack, out);
 	}
 
 	size_t totalBuyPrice(const Merchant &merchant, const ItemStack &stack) {

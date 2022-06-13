@@ -129,6 +129,10 @@ namespace Game3 {
 
 		TileID getEmpty() const override { return EMPTY; }
 
+		bool isBed(TileID tile) const {
+			return tile == BED1 || tile == BED2 || tile == BED3;
+		}
+
 		const char * name() const override {
 			return "House";
 		}

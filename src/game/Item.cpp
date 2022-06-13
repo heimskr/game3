@@ -57,7 +57,7 @@ namespace Game3 {
 
 	bool ItemStack::canMerge(const ItemStack &other) const {
 		// TODO: update when items can store data.
-		return item->id == other.item->id;
+		return *item == *other.item;
 	}
 
 	Glib::RefPtr<Gdk::Pixbuf> ItemStack::getImage() {

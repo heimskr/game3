@@ -110,6 +110,22 @@ namespace Game3 {
 				return out;
 			}
 
+			template <typename T, typename P>
+			std::shared_ptr<T> getTileEntity(const P &predicate) const {
+				std::shared_ptr<T> out;
+				for (const auto &[index, tile_entity]: tileEntities)
+					if (auto cast = std::dynamic_pointer_cast<T>(tile_entity)) {
+						if (predicate(cast)) {
+							if (out)
+								throw std::runtime_error("Multiple tile entities of type " + std::string(typeid(T).name()) + " found");
+							out = cast;
+						}
+					}
+				if (!out)
+					throw std::runtime_error("No tile entities of type " + std::string(typeid(T).name()) + " found");
+				return out;
+			}
+
 			template <typename T>
 			std::shared_ptr<T> closestTileEntity(const Position &position) const {
 				double minimum_distance = INFINITY;

@@ -9,6 +9,7 @@
  *  has to pay for a resource, while the sell price is how much money the player can receive in exchange for it. */
 namespace Game3 {
 	class ItemStack;
+	class Keep;
 	class Merchant;
 
 	constexpr double E = 2.71828182845904523536;
@@ -31,6 +32,10 @@ namespace Game3 {
 	/** Determines whether the merchant can afford a given amount of a certain resource, and if so, outputs the price.
 	 *  Unfortunately, this is O(amount). */
 	bool totalSellPrice(const Merchant &, const ItemStack &, MoneyCount &out);
+
+	/** Determines whether the keep can afford a given amount of a certain resource, and if so, outputs the price.
+	 *  Unfortunately, this is O(amount). */
+	bool totalSellPrice(const Keep &, const ItemStack &, MoneyCount &out);
 
 	/** Returns the price to buy a given amount of a resource from a merchant. Like totalSellPrice, this is O(amount).
 	 *  The caller should check whether the player has enough money. */

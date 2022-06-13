@@ -3,12 +3,16 @@
 #include "realm/Realm.h"
 
 namespace Game3 {
+	class Inventory;
+
 	class Keep: public Realm {
 		public:
 			Position parentOrigin;
 			Index parentWidth;
 			Index parentHeight;
-			MoneyCount money;
+			MoneyCount money = 1'000'000;
+			double greed = .05;
+			std::shared_ptr<Inventory> stockpileInventory;
 
 			Keep(const Keep &) = delete;
 			Keep(Keep &&) = default;
