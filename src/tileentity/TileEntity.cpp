@@ -1,10 +1,10 @@
 #include "game/Realm.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
+#include "tileentity/Keep.h"
 #include "tileentity/Sign.h"
 #include "tileentity/Teleporter.h"
 #include "tileentity/TileEntity.h"
-#include "tileentity/Town.h"
 
 namespace Game3 {
 	std::shared_ptr<TileEntity> TileEntity::fromJSON(const nlohmann::json &json) {
@@ -24,8 +24,8 @@ namespace Game3 {
 			case TileEntity::CHEST:
 				out = TileEntity::create<Chest>();
 				break;
-			case TileEntity::TOWN:
-				out = TileEntity::create<Town>();
+			case TileEntity::KEEP:
+				out = TileEntity::create<Keep>();
 				break;
 			default:
 				throw std::invalid_argument("Unrecognized TileEntity ID: " + std::to_string(id));

@@ -20,7 +20,8 @@ namespace Game3 {
 	class Realm: public std::enable_shared_from_this<Realm> {
 		public:
 			constexpr static RealmType OVERWORLD = 1;
-			constexpr static RealmType HOUSE = 2;
+			constexpr static RealmType HOUSE     = 2;
+			constexpr static RealmType KEEP      = 3;
 
 			static std::unordered_map<RealmType, Texture> textureMap;
 
@@ -53,6 +54,7 @@ namespace Game3 {
 			void rebind();
 			void generate(int seed = 666, double noise_zoom = 100., double noise_threshold = -0.15);
 			void generateHouse(RealmID parent_realm, std::default_random_engine &, const Position &entrance, int width, int height);
+			void generateKeep(RealmID parent_realm, std::default_random_engine &, const Position &entrance, int width, int height);
 			void createTown(size_t index, size_t width, size_t height, size_t pad);
 			int getWidth()  const { return tilemap1->width;  }
 			int getHeight() const { return tilemap1->height; }
@@ -78,6 +80,9 @@ namespace Game3 {
 			void setLayer1(Index, TileID);
 			void setLayer2(Index, TileID);
 			void setLayer3(Index, TileID);
+			void setLayer1(const Position &, TileID);
+			void setLayer2(const Position &, TileID);
+			void setLayer3(const Position &, TileID);
 			inline Index getIndex(const Position &position) const { return position.row * getWidth() + position.column; }
 			inline Index getIndex(Index row, Index column) const { return row * getWidth() + column; }
 

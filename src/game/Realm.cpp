@@ -10,16 +10,17 @@
 #include "game/Realm.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
+#include "tileentity/Keep.h"
 #include "tileentity/Sign.h"
 #include "tileentity/Teleporter.h"
-#include "tileentity/Town.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 
 namespace Game3 {
 	std::unordered_map<RealmType, Texture> Realm::textureMap {
 		{Realm::OVERWORLD, Texture("resources/tileset2.png")},
-		{Realm::HOUSE,     Texture("resources/house/house.png")},
+		{Realm::HOUSE,     Texture("resources/house.png")},
+		{Realm::KEEP,      Texture("resources/house.png")},
 	};
 
 	Realm::Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_):
@@ -293,6 +294,58 @@ namespace Game3 {
 		setLayer1((height - carpet_padding) * width - carpet_padding - 1, HouseTiles::CARPET_SE + carpet_offset);
 	}
 
+	void Realm::generateKeep(RealmID parent_realm, std::default_random_engine &rng, const Position &entrance, int width, int height) {
+		// TODO: complete reorganization of worldgen. This function would be detached from Realm and put in /src/worldgen/Keep.cpp.
+		// Carpet generation could also be put in its own function so it could be shared between house generation and keep generation.
+
+		Timer timer("GenerateKeep");
+		for (int column = 1; column < width - 1; ++column) {
+			setLayer2(column, HouseTiles::WALL_WEN);
+			setLayer2(height - 1, column, HouseTiles::WALL_WES);
+		}
+
+		for (int row = 1; row < height - 1; ++row) {
+			setLayer2(row, 0, HouseTiles::WALL_NS);
+			setLayer2(row, width - 1, HouseTiles::WALL_NS);
+		}
+
+		for (int row = 0; row < height; ++row)
+			for (int column = 0; column < width; ++column)
+				setLayer1(row, column, HouseTiles::FLOOR);
+
+		setLayer2(0, HouseTiles::WALL_NW);
+		setLayer2(width - 1, HouseTiles::WALL_NE);
+		setLayer2(width * (height - 1), HouseTiles::WALL_SW);
+		setLayer2(width * height - 1, HouseTiles::WALL_SE);
+
+		const Index exit_index = width * height - width / 2 - 1;
+		setLayer2(exit_index - 1, HouseTiles::WALL_W);
+		setLayer2(exit_index,     HouseTiles::EMPTY);
+		setLayer2(exit_index + 1, HouseTiles::WALL_E);
+
+		static std::array<TileID, 2> doors  {HouseTiles::DOOR1,  HouseTiles::DOOR2};
+
+		add(TileEntity::create<Teleporter>(choose(doors, rng), getPosition(exit_index), parent_realm, entrance));
+
+		const int carpet_offset = 8 * (rng() % 3);
+		const int carpet_padding = (rng() % 2) + 2;
+		for (int row = carpet_padding + 1; row < height - carpet_padding - 1; ++row)
+			for (int column = carpet_padding + 1; column < width - carpet_padding - 1; ++column)
+				setLayer1(row * width + column, HouseTiles::CARPET_C + carpet_offset);
+		for (int row = carpet_padding + 1; row < height - carpet_padding - 1; ++row) {
+			setLayer1(row * width + carpet_padding, HouseTiles::CARPET_W + carpet_offset);
+			setLayer1((row + 1) * width - carpet_padding - 1, HouseTiles::CARPET_E + carpet_offset);
+		}
+		for (int column = carpet_padding + 1; column < width - carpet_padding - 1; ++column) {
+			setLayer1(carpet_padding * width + column, HouseTiles::CARPET_N + carpet_offset);
+			setLayer1((height - carpet_padding - 1) * width + column, HouseTiles::CARPET_S + carpet_offset);
+		}
+		setLayer1(carpet_padding * width + carpet_padding, HouseTiles::CARPET_NW + carpet_offset);
+		setLayer1((carpet_padding + 1) * width - carpet_padding - 1, HouseTiles::CARPET_NE + carpet_offset);
+		setLayer1((height - carpet_padding - 1) * width + carpet_padding, HouseTiles::CARPET_SW + carpet_offset);
+		setLayer1((height - carpet_padding) * width - carpet_padding - 1, HouseTiles::CARPET_SE + carpet_offset);
+	}
+
 	void Realm::createTown(const size_t index, size_t width, size_t height, size_t pad) {
 		size_t row = 0, column = 0;
 
@@ -385,10 +438,34 @@ namespace Game3 {
 		set2(OverworldTiles::TOWER_NW);
 		--column;
 
-		setLayer2(index / map_width + height / 2 - 1, index % map_width + width / 2 - 1, OverworldTiles::KEEP_NW);
-		setLayer2(index / map_width + height / 2 - 1, index % map_width + width / 2,     OverworldTiles::KEEP_NE);
-		setLayer2(index / map_width + height / 2,     index % map_width + width / 2 - 1, OverworldTiles::KEEP_SW);
-		setLayer2(index / map_width + height / 2,     index % map_width + width / 2,     OverworldTiles::KEEP_SE);
+		std::default_random_engine rng;
+		rng.seed(666);
+
+		Position keep_position(index / map_width + height / 2 - 1, index % map_width + width / 2 - 1);
+		const Position town_origin(index / map_width - pad, index % map_width - pad);
+		const RealmID keep_realm_id = game->newRealmID();
+		const Index keep_width = 15;
+		const Index keep_height = 15;
+		const Index keep_entrance = keep_width * (keep_height - 1) - keep_width / 2 - 1;
+		const Position keep_exit = keep_position + Position(2, 0);
+		auto keep_tilemap = std::make_shared<Tilemap>(keep_width, keep_height, 16, textureMap.at(Realm::KEEP));
+		auto keep_realm = Realm::create(keep_realm_id, Realm::KEEP, keep_tilemap);
+		keep_realm->game = game;
+		keep_realm->generateKeep(id, rng, keep_exit, keep_width, keep_height);
+		game->realms.emplace(keep_realm_id, keep_realm);
+
+		auto create_keep = [&](TileID tile) {
+			setLayer2(keep_position, tile);
+			add(TileEntity::create<Keep>(tile, keep_position, keep_realm_id, keep_entrance, town_origin, width, height));
+		};
+
+		create_keep(OverworldTiles::KEEP_NW);
+		++keep_position.column;
+		create_keep(OverworldTiles::KEEP_NE);
+		++keep_position.row;
+		create_keep(OverworldTiles::KEEP_SE);
+		--keep_position.column;
+		create_keep(OverworldTiles::KEEP_SW);
 
 		// Prevent houses from being placed on the corners around the keep
 		buildable_set.erase(map_width * (index / map_width + height / 2 - 2) + index % map_width + width / 2 - 2);
@@ -397,8 +474,6 @@ namespace Game3 {
 		buildable_set.erase(map_width * (index / map_width + height / 2 + 1) + index % map_width + width / 2 - 2);
 
 		town_timer.stop();
-		std::default_random_engine rng;
-		rng.seed(666);
 		std::vector<Index> buildable(buildable_set.cbegin(), buildable_set.cend());
 		std::shuffle(buildable.begin(), buildable.end(), rng);
 		Timer houses_timer("Houses");
@@ -584,6 +659,18 @@ namespace Game3 {
 	void Realm::setLayer3(Index index, TileID tile) {
 		tilemap3->tiles[index] = tile;
 		setLayerHelper(index);
+	}
+
+	void Realm::setLayer1(const Position &position, TileID tile) {
+		setLayer1(position.row, position.column, tile);
+	}
+
+	void Realm::setLayer2(const Position &position, TileID tile) {
+		setLayer2(position.row, position.column, tile);
+	}
+
+	void Realm::setLayer3(const Position &position, TileID tile) {
+		setLayer3(position.row, position.column, tile);
 	}
 
 	void Realm::setLayerHelper(Index row, Index column) {

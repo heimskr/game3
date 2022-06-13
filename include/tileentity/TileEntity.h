@@ -20,7 +20,7 @@ namespace Game3 {
 			constexpr static TileEntityID TELEPORTER = 2;
 			constexpr static TileEntityID SIGN       = 3;
 			constexpr static TileEntityID CHEST      = 4;
-			constexpr static TileEntityID TOWN       = 5;
+			constexpr static TileEntityID KEEP       = 5;
 
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;

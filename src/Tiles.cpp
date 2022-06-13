@@ -20,5 +20,6 @@ namespace Game3 {
 	std::unordered_map<RealmID, std::shared_ptr<TileSet>> tileSets {
 		{Realm::OVERWORLD, std::make_shared<OverworldTiles>()},
 		{Realm::HOUSE,     std::make_shared<HouseTiles>()},
+		{Realm::KEEP,      std::make_shared<HouseTiles>()},
 	};
 }
