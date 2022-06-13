@@ -69,90 +69,114 @@ namespace Game3 {
 	void Gatherer::tick(Game &game, float delta) {
 		Entity::tick(game, delta);
 		const auto hour = game.getHour();
-		if (8. <= hour && phase == 0) {
-			phase = 1;
-			auto &overworld = *game.realms.at(overworldRealm);
-			auto &house     = *game.realms.at(houseRealm);
-			const auto width  = overworld.getWidth();
-			const auto height = overworld.getHeight();
-			const auto &layer2 = *overworld.tilemap2;
-			// Detect all resources within a given radius of the house
-			std::vector<Index> resource_choices;
-			for (Index row = 0; row < height; ++row)
-				for (Index column = 0; column < width; ++column)
-					if (overworldTiles.isResource(layer2(column, row)) && std::sqrt(std::pow(housePosition.row - row, 2) + std::pow(housePosition.column - column, 2)) <= RADIUS)
-						resource_choices.push_back(overworld.getIndex(row, column));
-			// Choose one at random
-			chosenResource = choose(resource_choices, game.dynamicRNG);
-			// Pathfind to the door
-			pathfind(house.getTileEntity<Teleporter>()->position);
-		} else if (16. <= hour && phase == 3) {
+
+		if (8. <= hour && phase == 0)
+			wakeUp();
+		else if (16. <= hour && phase == 3)
 			phase = 4;
-		}
 
-		if (phase == 1 && realmID == overworldRealm) {
-			auto &realm = *getRealm();
-			auto chosen_position = realm.getPosition(chosenResource);
-			if (auto next = realm.getPathableAdjacent(chosen_position)) {
-				phase = 2;
-				pathfind(destination = *next);
-			} else
-				phase = -1;
-		}
+		if (phase == 1 && realmID == overworldRealm)
+			goToResource();
 
-		if (phase == 2 && position == destination) {
-			phase = 3;
-			harvestingTime = 0.f;
-		}
+		if (phase == 2 && position == destination)
+			startHarvesting();
 
 		if (phase == 3) {
-			if (HARVESTING_TIME <= harvestingTime) {
-				harvestingTime = 0.f;
-				auto &realm = *getRealm();
-				const auto resource_position = realm.getPosition(chosenResource);
-				const TileID resource_type = (*getRealm()->tilemap2)(resource_position.column, resource_position.row);
-				ItemID item_id = Item::NOTHING;
-				switch (resource_type) {
-					case OverworldTiles::IRON_ORE:    item_id = Item::IRON_ORE;    break;
-					case OverworldTiles::COPPER_ORE:  item_id = Item::COPPER_ORE;  break;
-					case OverworldTiles::GOLD_ORE:    item_id = Item::GOLD_ORE;    break;
-					case OverworldTiles::DIAMOND_ORE: item_id = Item::DIAMOND_ORE; break;
-					case OverworldTiles::COAL_ORE:    item_id = Item::COAL;        break;
-					default:
-						throw std::runtime_error("Unknown resource type: " + std::to_string(resource_type));
-				}
-
-				const ItemStack stack(item_id, 1);
-				const auto leftover = inventory->add(stack);
-				if (leftover == stack)
-					phase = 4;
-			} else
-				harvestingTime += delta;
-
+			harvest(delta);
 			if (18.f <= game.getHour())
 				phase = 4;
 		}
 
-		if (phase == 4) {
-			const auto adjacent = getRealm()->getPathableAdjacent(keep->position);
-			if (!adjacent || !pathfind(destination = *adjacent))
-				throw std::runtime_error("Gatherer couldn't pathfind to keep");
-			phase = 5;
-		}
+		if (phase == 4)
+			goToKeep();
 
-		if (phase == 5 && position == destination) {
-			keep->teleport(shared_from_this());
-			auto keep_realm = keep->getInnerRealm();
-			auto stockpile = keep_realm->getTileEntity<Chest>();
-			const auto adjacent = keep_realm->getPathableAdjacent(stockpile->position);
-			if (!adjacent || !pathfind(destination = *adjacent))
-				throw std::runtime_error("Gatherer couldn't pathfind to stockpile");
-			phase = 6;
-		}
+		if (phase == 5 && position == destination)
+			goToStockpile();
 
-		if (phase == 6 && position == destination) {
-			phase = 7;
-		}
+		if (phase == 6 && position == destination)
+			sellInventory();
+	}
+
+	void Gatherer::wakeUp() {
+		phase = 1;
+		auto &game = getRealm()->getGame();
+		auto &overworld = *game.realms.at(overworldRealm);
+		auto &house     = *game.realms.at(houseRealm);
+		const auto width  = overworld.getWidth();
+		const auto height = overworld.getHeight();
+		const auto &layer2 = *overworld.tilemap2;
+		// Detect all resources within a given radius of the house
+		std::vector<Index> resource_choices;
+		for (Index row = 0; row < height; ++row)
+			for (Index column = 0; column < width; ++column)
+				if (overworldTiles.isResource(layer2(column, row)) && std::sqrt(std::pow(housePosition.row - row, 2) + std::pow(housePosition.column - column, 2)) <= RADIUS)
+					resource_choices.push_back(overworld.getIndex(row, column));
+		// Choose one at random
+		chosenResource = choose(resource_choices, game.dynamicRNG);
+		// Pathfind to the door
+		pathfind(house.getTileEntity<Teleporter>()->position);
+	}
+
+	void Gatherer::goToResource() {
+		auto &realm = *getRealm();
+		auto chosen_position = realm.getPosition(chosenResource);
+		if (auto next = realm.getPathableAdjacent(chosen_position)) {
+			phase = 2;
+			pathfind(destination = *next);
+		} else
+			phase = -1;
+	}
+
+	void Gatherer::startHarvesting() {
+		phase = 3;
+		harvestingTime = 0.f;
+	}
+
+	void Gatherer::harvest(float delta) {
+		if (HARVESTING_TIME <= harvestingTime) {
+			harvestingTime = 0.f;
+			auto &realm = *getRealm();
+			const auto resource_position = realm.getPosition(chosenResource);
+			const TileID resource_type = (*getRealm()->tilemap2)(resource_position.column, resource_position.row);
+			ItemID item_id = Item::NOTHING;
+
+			switch (resource_type) {
+				case OverworldTiles::IRON_ORE:    item_id = Item::IRON_ORE;    break;
+				case OverworldTiles::COPPER_ORE:  item_id = Item::COPPER_ORE;  break;
+				case OverworldTiles::GOLD_ORE:    item_id = Item::GOLD_ORE;    break;
+				case OverworldTiles::DIAMOND_ORE: item_id = Item::DIAMOND_ORE; break;
+				case OverworldTiles::COAL_ORE:    item_id = Item::COAL;        break;
+				default:
+					throw std::runtime_error("Unknown resource type: " + std::to_string(resource_type));
+			}
+
+			const ItemStack stack(item_id, 1);
+			const auto leftover = inventory->add(stack);
+			if (leftover == stack)
+				phase = 4;
+		} else
+			harvestingTime += delta;
+	}
+
+	void Gatherer::goToKeep() {
+		const auto adjacent = getRealm()->getPathableAdjacent(keep->position);
+		if (!adjacent || !pathfind(destination = *adjacent))
+			throw std::runtime_error("Gatherer couldn't pathfind to keep");
+		phase = 5;
+	}
+
+	void Gatherer::goToStockpile() {
+		keep->teleport(shared_from_this());
+		auto keep_realm = keep->getInnerRealm();
+		auto stockpile = keep_realm->getTileEntity<Chest>();
+		const auto adjacent = keep_realm->getPathableAdjacent(stockpile->position);
+		if (!adjacent || !pathfind(destination = *adjacent))
+			throw std::runtime_error("Gatherer couldn't pathfind to stockpile");
+		phase = 6;
+	}
+
+	void Gatherer::sellInventory() {
+		phase = 7;
 	}
 
 	void to_json(nlohmann::json &json, const Gatherer &gatherer) {

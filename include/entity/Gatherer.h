@@ -34,12 +34,21 @@ namespace Game3 {
 		protected:
 			Gatherer(EntityID id_);
 			Gatherer(EntityID, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_);
+
 			void interact(const Position &);
 
 		private:
 			Position keepPosition;
 			float accumulatedTime = 0.f;
 			Direction lastDirection = Direction::Down;
+
+			void wakeUp();
+			void goToResource();
+			void startHarvesting();
+			void harvest(float delta);
+			void goToKeep();
+			void goToStockpile();
+			void sellInventory();
 	};
 
 	void to_json(nlohmann::json &, const Gatherer &);
