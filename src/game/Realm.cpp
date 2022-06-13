@@ -194,6 +194,7 @@ namespace Game3 {
 	}
 
 	void Realm::generateHouse(RealmID parent_realm, std::default_random_engine &rng, const Position &entrance, int width, int height) {
+		Timer timer("GenerateHouse");
 		for (int column = 1; column < width - 1; ++column) {
 			setLayer2(column, HouseTiles::WALL_WEN);
 			setLayer2(height - 1, column, HouseTiles::WALL_WES);
@@ -394,13 +395,14 @@ namespace Game3 {
 		buildable_set.erase(map_width * (index / map_width + height / 2 - 2) + index % map_width + width / 2 + 1);
 		buildable_set.erase(map_width * (index / map_width + height / 2 + 1) + index % map_width + width / 2 + 1);
 		buildable_set.erase(map_width * (index / map_width + height / 2 + 1) + index % map_width + width / 2 - 2);
-		town_timer.stop();
 
+		town_timer.stop();
 		std::default_random_engine rng;
 		rng.seed(666);
 		std::vector<Index> buildable(buildable_set.cbegin(), buildable_set.cend());
 		std::shuffle(buildable.begin(), buildable.end(), rng);
 		Timer houses_timer("Houses");
+
 		if (2 < buildable.size()) {
 			buildable.erase(buildable.begin() + buildable.size() / 10, buildable.end());
 			buildable_set = std::unordered_set<Index>(buildable.cbegin(), buildable.cend());
