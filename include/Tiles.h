@@ -24,6 +24,7 @@ namespace Game3 {
 		constexpr static TileID WATER = 2;
 		constexpr static TileID SHALLOW_WATER = 1;
 		constexpr static TileID SAND = 4;
+		constexpr static TileID STONE = 7;
 		constexpr static TileID LIGHT_GRASS = 11;
 		constexpr static TileID GRASS = 12;
 		constexpr static TileID GRASS_ALT1 = 32;

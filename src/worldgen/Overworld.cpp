@@ -50,6 +50,8 @@ namespace Game3::WorldGen {
 					realm->setLayer1(row, column, OverworldTiles::SAND);
 				else if (noise < noise_threshold + 0.5)
 					realm->setLayer1(row, column, OverworldTiles::LIGHT_GRASS);
+				else if (0.8 < noise)
+					realm->setLayer1(row, column, OverworldTiles::STONE);
 				else
 					realm->setLayer1(row, column, choose(grasses, rng));
 			}
@@ -63,10 +65,14 @@ namespace Game3::WorldGen {
 		land_timer.stop();
 
 		Timer resource_timer("Resources");
-		auto resource_starts = tilemap1->getLand(realm->type);
+		std::vector<Index> resource_starts;
+		resource_starts.reserve(width * height / 10);
+		for (Index index = 0, max = width * height; index < max; ++index)
+			if (tilemap1->tiles[index] == OverworldTiles::STONE)
+				resource_starts.push_back(index);
 		std::shuffle(resource_starts.begin(), resource_starts.end(), rng);
 		auto add_resources = [&](double threshold, TileID tile) {
-			for (size_t i = 0, max = resource_starts.size() / 2000; i < max; ++i) {
+			for (size_t i = 0, max = resource_starts.size() / 1000; i < max; ++i) {
 				const Index index = resource_starts.back();
 				if (noise_threshold + threshold <= saved_noise[index])
 					realm->setLayer2(index, tile);
