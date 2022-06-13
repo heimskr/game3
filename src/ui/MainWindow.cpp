@@ -105,6 +105,12 @@ namespace Game3 {
 		glArea.set_auto_render(false);
 		glArea.add_tick_callback([this](const Glib::RefPtr<Gdk::FrameClock> &) {
 			glArea.queue_render();
+			if (game) {
+				if (autofocus && game->player)
+					game->player->focus(*canvas, true);
+				const int minute = game->getMinute();
+				setStatus(std::to_string(int(game->getHour())) + (minute < 10? ":0" : ":") + std::to_string(minute));
+			}
 			if (statusbarWaiting && statusbarExpirationTime <= getTime() - statusbarSetTime) {
 				statusbarWaiting = false;
 				statusbar.set_text({});
