@@ -1,5 +1,6 @@
 #include "Tiles.h"
 #include "realm/Realm.h"
+#include "tileentity/Chest.h"
 #include "tileentity/Teleporter.h"
 #include "util/Timer.h"
 #include "util/Util.h"
@@ -38,6 +39,13 @@ namespace Game3::WorldGen {
 		static std::array<TileID, 2> doors  {HouseTiles::DOOR1,  HouseTiles::DOOR2};
 
 		realm->add(TileEntity::create<Teleporter>(choose(doors, rng), realm->getPosition(exit_index), parent_realm, entrance));
+
+		realm->setLayer2(Position(height - 2, 1), HouseTiles::STOCKPILE_W);
+		realm->setLayer2(Position(height - 2, 2), HouseTiles::STOCKPILE_E);
+		auto stockpile = TileEntity::create<Chest>(48, Position(height - 2, 2), "Stockpile");
+		stockpile->setInventory(40);
+		realm->add(stockpile);
+
 		WorldGen::generateCarpet(realm, rng);
 	}
 }
