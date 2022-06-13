@@ -383,7 +383,15 @@ namespace Game3 {
 		set2(OverworldTiles::TOWER_NW);
 		--column;
 
-		// setLayer2(index / map_width + height / 2, index % map_width + width / 2, 
+		setLayer2(index / map_width + height / 2 - 1, index % map_width + width / 2 - 1, OverworldTiles::KEEP_NW);
+		setLayer2(index / map_width + height / 2 - 1, index % map_width + width / 2,     OverworldTiles::KEEP_NE);
+		setLayer2(index / map_width + height / 2,     index % map_width + width / 2 - 1, OverworldTiles::KEEP_SW);
+		setLayer2(index / map_width + height / 2,     index % map_width + width / 2,     OverworldTiles::KEEP_SE);
+
+		buildable_set.erase(map_width * (index / map_width + height / 2 - 2) + index % map_width + width / 2 - 2);
+		buildable_set.erase(map_width * (index / map_width + height / 2 - 2) + index % map_width + width / 2 + 1);
+		buildable_set.erase(map_width * (index / map_width + height / 2 + 1) + index % map_width + width / 2 + 1);
+		buildable_set.erase(map_width * (index / map_width + height / 2 + 1) + index % map_width + width / 2 - 2);
 
 		std::default_random_engine rng;
 		rng.seed(666);
