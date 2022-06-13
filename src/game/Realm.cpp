@@ -12,6 +12,7 @@
 #include "tileentity/Chest.h"
 #include "tileentity/Sign.h"
 #include "tileentity/Teleporter.h"
+#include "tileentity/Town.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 
@@ -147,7 +148,7 @@ namespace Game3 {
 			}
 		noise_timer.stop();
 
-		constexpr static int m = 25, n = 33, pad = 2;
+		constexpr static int m = 26, n = 34, pad = 2;
 		Timer land_timer("GetLand");
 		auto starts = tilemap1->getLand(type, m + pad * 2, n + pad * 2);
 		if (starts.empty())
@@ -326,45 +327,63 @@ namespace Game3 {
 				set1(OverworldTiles::DIRT);
 			}
 
-		row = index / map_width + height / 2;
+		row = index / map_width + height / 2 - 1;
 		for (column = index % map_width - pad; column < index % map_width + width + pad; ++column) {
 			buildable_set.erase(row * map_width + column);
 			buildable_set.erase((index / map_width + height - 2) * map_width + column); // Make sure no houses spawn on the bottom row of the town
 			set1(OverworldTiles::ROAD);
+			++row;
+			buildable_set.erase(row * map_width + column);
+			set1(OverworldTiles::ROAD);
+			--row;
 		}
 		column = index % map_width;
 		set2(OverworldTiles::EMPTY);
 		--row;
 		set2(OverworldTiles::TOWER_S);
 		row += 2;
+		set2(OverworldTiles::EMPTY);
+		++row;
 		set2(OverworldTiles::TOWER_N);
 		--row;
 		column += width - 1;
 		set2(OverworldTiles::EMPTY);
 		--row;
+		set2(OverworldTiles::EMPTY);
+		--row;
 		set2(OverworldTiles::TOWER_S);
-		row += 2;
+		row += 3;
 		set2(OverworldTiles::TOWER_N);
 		--row;
-		column = index % map_width + width / 2;
+		column = index % map_width + width / 2 - 1;
 		for (row = index / map_width - pad; row < index / map_width + height + pad; ++row) {
 			buildable_set.erase(row * map_width + column);
 			set1(OverworldTiles::ROAD);
+			++column;
+			buildable_set.erase(row * map_width + column);
+			set1(OverworldTiles::ROAD);
+			--column;
 		}
 		row = index / map_width;
 		set2(OverworldTiles::EMPTY);
 		--column;
 		set2(OverworldTiles::TOWER_NE);
 		column += 2;
+		set2(OverworldTiles::EMPTY);
+		++column;
 		set2(OverworldTiles::TOWER_NW);
-		--column;
+		column -= 2;
 		row += height - 1;
 		set2(OverworldTiles::EMPTY);
 		--column;
 		set2(OverworldTiles::TOWER_NE);
 		column += 2;
+		set2(OverworldTiles::EMPTY);
+		++column;
 		set2(OverworldTiles::TOWER_NW);
 		--column;
+
+		// setLayer2(index / map_width + height / 2, index % map_width + width / 2, 
 
 		std::default_random_engine rng;
 		rng.seed(666);
