@@ -11,7 +11,6 @@
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
-#include "tileentity/Keep.h"
 #include "tileentity/Sign.h"
 #include "tileentity/Teleporter.h"
 #include "util/Timer.h"
@@ -468,14 +467,14 @@ namespace Game3 {
 		const Index keep_entrance = keep_width * (keep_height - 1) - keep_width / 2 - 1;
 		const Position keep_exit = keep_position + Position(2, 0);
 		auto keep_tilemap = std::make_shared<Tilemap>(keep_width, keep_height, 16, textureMap.at(Realm::KEEP));
-		auto keep_realm = Realm::create<KeepRealm>(keep_realm_id, keep_tilemap);
+		auto keep_realm = Realm::create<KeepRealm>(keep_realm_id, town_origin, width, height, keep_tilemap);
 		keep_realm->game = game;
 		keep_realm->generateKeep(id, rng, keep_exit, keep_width, keep_height);
 		game->realms.emplace(keep_realm_id, keep_realm);
 
 		auto create_keep = [&](TileID tile) {
 			setLayer2(keep_position, tile);
-			add(TileEntity::create<Keep>(tile, keep_position, keep_realm_id, keep_entrance, town_origin, width, height));
+			add(TileEntity::create<Building>(tile, keep_position, keep_realm_id, keep_entrance));
 		};
 
 		create_keep(OverworldTiles::KEEP_NW);
