@@ -93,6 +93,20 @@ namespace Game3 {
 				return entity;
 			}
 
+			template <typename T>
+			std::shared_ptr<T> getTileEntity() const {
+				std::shared_ptr<T> out;
+				for (const auto &[index, entity]: tileEntities)
+					if (auto cast = std::dynamic_pointer_cast<T>(entity)) {
+						if (out)
+							throw std::runtime_error("Multiple tile entities of type " + std::string(typeid(T).name()) + " found");
+						out = cast;
+					}
+				if (!out)
+					throw std::runtime_error("No tile entities of type " + std::string(typeid(T).name()) + " found");
+				return out;
+			}
+
 			friend class MainWindow;
 			friend void to_json(nlohmann::json &, const Realm &);
 
