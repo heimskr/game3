@@ -65,7 +65,7 @@ namespace Game3 {
 		}
 
 		bool isWalkable(TileID tile) const override {
-			return landSet.contains(tile) || tile == SHALLOW_WATER || tile == EMPTY;
+			return landSet.contains(tile) || tile == SHALLOW_WATER || tile == EMPTY || tile == OIL;
 		}
 
 		bool isSolid(TileID tile) const override {

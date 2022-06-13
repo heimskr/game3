@@ -272,6 +272,41 @@ namespace Game3 {
 		setLayer3(position.row, position.column, tile);
 	}
 
+	std::optional<Position> Realm::getPathableAdjacent(const Position &position) const {
+		const auto width  = getWidth();
+		const auto height = getHeight();
+
+		if (position.row < height - 1) {
+			const Position next(position.row + 1, position.column);
+			if (pathMap[getIndex(next)])
+				return next;
+		}
+
+		if (position.column < width - 1) {
+			const Position next(position.row, position.column + 1);
+			if (pathMap[getIndex(next)])
+				return next;
+		}
+
+		if (0 < position.row) {
+			const Position next(position.row - 1, position.column);
+			if (pathMap[getIndex(next)])
+				return next;
+		}
+
+		if (0 < position.column) {
+			const Position next(position.row, position.column - 1);
+			if (pathMap[getIndex(next)])
+				return next;
+		}
+
+		return std::nullopt;
+	}
+
+	std::optional<Position> Realm::getPathableAdjacent(Index index) const {
+		return getPathableAdjacent(getPosition(index));
+	}
+
 	void Realm::toJSON(nlohmann::json &json) const {
 		json["id"] = id;
 		json["type"] = type;

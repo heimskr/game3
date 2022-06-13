@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <random>
 #include <unordered_map>
 #include <unordered_set>
@@ -82,6 +83,8 @@ namespace Game3 {
 			void setLayer3(const Position &, TileID);
 			inline Index getIndex(const Position &position) const { return position.row * getWidth() + position.column; }
 			inline Index getIndex(Index row, Index column) const { return row * getWidth() + column; }
+			std::optional<Position> getPathableAdjacent(const Position &) const;
+			std::optional<Position> getPathableAdjacent(Index) const;
 
 			template <typename T, typename... Args>
 			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {
