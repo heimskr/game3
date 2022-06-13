@@ -6,14 +6,13 @@ out vec4 FragColor;
 in vec2 texCoord;
 
 uniform sampler2D texture0;
-uniform float time;
+uniform float divisor;
 
 void main() {
 	FragColor = texture(texture0, texCoord);
-	float mult = (1 + sin(time / 10 + 3.1415)) + 1;
-	FragColor.r /= mult;
-	FragColor.g /= mult;
-	FragColor.b /= mult;
+	FragColor.r /= divisor;
+	FragColor.g /= divisor;
+	FragColor.b /= divisor;
 	if (FragColor.a < 0.01)
 		discard;
 }

@@ -20,7 +20,7 @@ namespace Game3 {
 			spriteRenderer.update(width(), height());
 			rectangleRenderer.update(width(), height());
 			if (game->activeRealm)
-				game->activeRealm->render(width(), height(), center, scale, spriteRenderer, std::chrono::duration_cast<std::chrono::nanoseconds>(getTime() - game->startTime).count() / 1e9f);
+				game->activeRealm->render(width(), height(), center, scale, spriteRenderer, game->getDivisor());
 		}
 	}
 

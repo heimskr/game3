@@ -39,7 +39,7 @@ namespace Game3 {
 		initialized = true;
 	}
 
-	void ElementBufferedRenderer::render(float game_time) {
+	void ElementBufferedRenderer::render(float divisor) {
 		if (!initialized)
 			return;
 		glBindTexture(GL_TEXTURE_2D, tilemap->texture.id);
@@ -51,7 +51,7 @@ namespace Game3 {
 		             glm::translate(projection, {center.x() - tilemap->width / 2.f, center.y() - tilemap->height / 2.f, 0});
 		glUseProgram(shaderHandle);
 		glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		glUniform1f(glGetUniformLocation(shaderHandle, "time"), game_time);
+		glUniform1f(glGetUniformLocation(shaderHandle, "divisor"), divisor);
 		glDrawElements(GL_TRIANGLES, tilemap->tiles.size() * 6, GL_UNSIGNED_INT, (GLvoid *) 0);
 	}
 

@@ -430,6 +430,10 @@ namespace Game3 {
 							merchant->inventory->add(ItemStack(Item::SHORTSWORD, 1));
 						}
 						return;
+					case GDK_KEY_t:
+						if (game)
+							std::cout << "Time: " << int(game->getHour()) << ':' << int(game->getMinute()) << '\n';
+						return;
 				}
 			}
 

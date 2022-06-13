@@ -93,6 +93,25 @@ namespace Game3 {
 			player->teleport({y, x});
 	}
 
+	float Game::getTotalSeconds() const {
+		return std::chrono::duration_cast<std::chrono::nanoseconds>(getTime() - startTime).count() / 1e9f;
+	}
+
+	float Game::getHour() const {
+		// + 12 because the game starts at noon
+		const auto base = getTotalSeconds() / 2.f + hourOffset;
+		return long(base) % 24 + base - long(base);
+	}
+
+	float Game::getMinute() const {
+		const auto hour = getHour();
+		return 60. * (hour - long(hour));
+	}
+
+	float Game::getDivisor() const {
+		return 3.f - 2.f * sin(getHour() * 3.1415926f / 24.f);
+	}
+
 	std::shared_ptr<Game> Game::create(Canvas &canvas) {
 		return std::shared_ptr<Game>(new Game(canvas));
 	}
@@ -102,10 +121,8 @@ namespace Game3 {
 		for (const auto &[string, realm_json]: json.at("realms").get<std::unordered_map<std::string, nlohmann::json>>())
 			out->realms.emplace(parseUlong(string), Realm::fromJSON(realm_json)).first->second->setGame(*out);
 		out->activeRealm = out->realms.at(json.at("activeRealmID"));
-		if (json.contains("debugMode"))
-			out->debugMode = json.at("debugMode");
-		else
-			out->debugMode = false;
+		out->hourOffset = json.contains("hourOffset")? json.at("hourOffset").get<float>() : 0.f;
+		out->debugMode = json.contains("debugMode")? json.at("debugMode").get<bool>() : false;
 		return out;
 	}
 
@@ -115,5 +132,6 @@ namespace Game3 {
 		json["realms"] = std::unordered_map<std::string, nlohmann::json>();
 		for (const auto &[id, realm]: game.realms)
 			json["realms"][std::to_string(id)] = nlohmann::json(*realm);
+		json["hourOffset"] = game.getHour();
 	}
 }

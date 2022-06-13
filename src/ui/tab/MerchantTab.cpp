@@ -190,7 +190,7 @@ namespace Game3 {
 		return scrolled.get_width() / (TILE_SIZE + 2 * TILE_MARGIN);
 	}
 
-	void MerchantTab::leftClick(const std::shared_ptr<Game> &game, Gtk::Widget *widget, int click_count, Slot slot, bool merchant, double, double) {
+	void MerchantTab::leftClick(const std::shared_ptr<Game> &, Gtk::Widget *, int click_count, Slot slot, bool merchant, double, double) {
 		if (click_count % 2 == 0) {
 			std::cout << "Clicked on slot " << slot << " in the " << (merchant? "merchant" : "player") << "'s inventory\n";
 		}
