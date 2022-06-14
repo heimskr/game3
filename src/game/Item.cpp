@@ -6,7 +6,6 @@ namespace Game3 {
 	static Texture textureConsumables {"resources/rpg/consumables.png"};
 	static Texture texturePotions     {"resources/rpg/potions.png"};
 	static Texture textureItems       {"resources/items/items.png"};
-	static Texture textureAxe         {"resources/items/axe.png"};
 
 	std::unordered_map<ItemID, ItemTexture> Item::itemTextures {
 		{Item::SHORTSWORD,  {  0,   0, textureShortsword}},
@@ -20,7 +19,7 @@ namespace Game3 {
 		{Item::COAL,        {192, 272, textureItems}},
 		{Item::OIL,         {  0, 240, textureItems}},
 		{Item::WOOD,        {208, 336, textureItems}},
-		{Item::AXE,         { 16,   0, textureAxe}},
+		{Item::AXE,         {208, 112, textureItems}},
 	};
 
 	std::map<ItemID, std::shared_ptr<Item>> Item::items {
