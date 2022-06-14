@@ -115,7 +115,7 @@ namespace Game3 {
 				if (autofocus && game->player)
 					game->player->focus(*canvas, true);
 				const int minute = game->getMinute();
-				setStatus(std::to_string(int(game->getHour())) + (minute < 10? ":0" : ":") + std::to_string(minute));
+				timeLabel.set_text(std::to_string(int(game->getHour())) + (minute < 10? ":0" : ":") + std::to_string(minute));
 			}
 			if (statusbarWaiting && statusbarExpirationTime <= getTime() - statusbarSetTime) {
 				statusbarWaiting = false;
@@ -205,7 +205,12 @@ namespace Game3 {
 		statusbar.set_halign(Gtk::Align::START);
 		statusbar.set_margin(5);
 		statusbar.set_margin_start(10);
-		vbox.append(statusbar);
+		statusbar.set_hexpand(true);
+		statusBox.append(statusbar);
+		timeLabel.set_margin_start(10);
+		timeLabel.set_margin_end(5);
+		statusBox.append(timeLabel);
+		vbox.append(statusBox);
 		paned.set_orientation(Gtk::Orientation::HORIZONTAL);
 		paned.set_start_child(vbox);
 		paned.set_end_child(notebook);

@@ -64,8 +64,10 @@ namespace Game3 {
 			Glib::Dispatcher functionQueueDispatcher;
 			Gtk::Paned paned;
 			Gtk::Box vbox {Gtk::Orientation::VERTICAL};
+			Gtk::Box statusBox {Gtk::Orientation::HORIZONTAL};
 			Gtk::GLArea glArea;
 			Gtk::Label statusbar;
+			Gtk::Label timeLabel;
 			Glib::RefPtr<Gio::SimpleAction> debugAction;
 			std::unique_ptr<Canvas> canvas;
 			std::unordered_map<Gtk::Widget *, std::shared_ptr<Tab>> tabMap;
