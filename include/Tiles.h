@@ -78,7 +78,7 @@ namespace Game3 {
 		}
 
 		bool isResource(TileID tile) const {
-			return OIL <= tile && tile <= GOLD_ORE;
+			return OIL <= tile && tile <= COAL_ORE;
 		}
 
 		TileID getEmpty() const override { return EMPTY; }
