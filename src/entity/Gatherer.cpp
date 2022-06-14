@@ -73,10 +73,8 @@ namespace Game3 {
 		Entity::tick(game, delta);
 		const auto hour = game.getHour();
 
-		if (8. <= hour && phase == 0)
+		if (WORK_START_HOUR <= hour && phase == 0)
 			wakeUp();
-		else if (16. <= hour && phase == 3)
-			phase = 4;
 
 		if (phase == 1 && realmID == overworldRealm)
 			goToResource();
@@ -86,7 +84,7 @@ namespace Game3 {
 
 		if (phase == 3) {
 			harvest(delta);
-			if (18.f <= game.getHour())
+			if (WORK_END_HOUR <= hour)
 				phase = 4;
 		}
 
@@ -109,6 +107,9 @@ namespace Game3 {
 			goToBed();
 
 		if (phase == 10 && position == destination)
+			phase = 11;
+
+		if (phase == 11 && hour < WORK_END_HOUR)
 			phase = 0;
 	}
 
@@ -235,7 +236,6 @@ namespace Game3 {
 	}
 
 	void Gatherer::goToBed() {
-
 		auto house = std::dynamic_pointer_cast<Building>(getRealm()->tileEntityAt(housePosition));
 		if (!house)
 			throw std::runtime_error("Gatherer couldn't find house");

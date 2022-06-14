@@ -11,6 +11,8 @@ namespace Game3 {
 			constexpr static Index RADIUS = 50;
 			constexpr static float HARVESTING_TIME = 1.f;
 			constexpr static float SELLING_TIME = 5.f;
+			constexpr static float WORK_START_HOUR = 8.f;
+			constexpr static float WORK_END_HOUR = 18.f;
 
 			Phase phase = 0;
 			RealmID overworldRealm;
