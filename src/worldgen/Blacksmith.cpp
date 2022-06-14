@@ -27,5 +27,9 @@ namespace Game3::WorldGen {
 
 		realm->setLayer2({1, 3}, HouseTiles::FURNACE);
 		realm->setLayer2({1, 5}, HouseTiles::ANVIL);
+
+		realm->setLayer2({height / 2, width / 2 - 1}, HouseTiles::COUNTER_W);
+		realm->setLayer2({height / 2, width / 2},     HouseTiles::COUNTER_WE);
+		realm->setLayer2({height / 2, width / 2 + 1}, HouseTiles::COUNTER_E);
 	}
 }
