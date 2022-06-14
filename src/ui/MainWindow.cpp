@@ -259,7 +259,8 @@ namespace Game3 {
 		realm->add(game->player = Entity::create<Player>(Entity::GANGBLANC_ID));
 		game->player->position = {realm->randomLand / width, realm->randomLand % width};
 		game->player->init();
-		game->player->inventory->add(ItemStack::withDurability(Item::IRON_AXE, 64));
+		game->player->inventory->add(ItemStack::withDurability(Item::IRON_PICKAXE));
+		game->player->inventory->add(ItemStack::withDurability(Item::IRON_AXE));
 		onGameLoaded();
 	}
 

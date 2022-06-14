@@ -9,33 +9,40 @@ namespace Game3 {
 	static Texture texturePalisade    {"resources/items/palisade.png"};
 
 	std::unordered_map<ItemID, ItemTexture> Item::itemTextures {
-		{Item::SHORTSWORD,  {  0,   0, textureShortsword}},
-		{Item::RED_POTION,  { 48, 176, texturePotions}},
-		{Item::COINS,       {160, 112, textureItems}},
-		{Item::IRON_ORE,    {128, 272, textureItems}},
-		{Item::COPPER_ORE,  {160, 272, textureItems}},
-		{Item::GOLD_ORE,    { 80, 272, textureItems}},
-		{Item::DIAMOND_ORE, { 96, 272, textureItems}},
-		{Item::DIAMOND,     {  0, 128, textureItems}},
-		{Item::COAL,        {192, 272, textureItems}},
-		{Item::OIL,         {  0, 240, textureItems}},
-		{Item::WOOD,        {208, 336, textureItems}},
-		{Item::IRON_AXE,    { 16, 160, texturePalisade}},
+		{Item::SHORTSWORD,   {  0,   0, textureShortsword}},
+		{Item::RED_POTION,   { 48, 176, texturePotions}},
+		{Item::COINS,        {160, 112, textureItems}},
+		{Item::IRON_ORE,     {128, 272, textureItems}},
+		{Item::COPPER_ORE,   {160, 272, textureItems}},
+		{Item::GOLD_ORE,     { 80, 272, textureItems}},
+		{Item::DIAMOND_ORE,  { 96, 272, textureItems}},
+		{Item::DIAMOND,      {  0, 128, textureItems}},
+		{Item::COAL,         {192, 272, textureItems}},
+		{Item::OIL,          {  0, 240, textureItems}},
+		{Item::WOOD,         {208, 336, textureItems}},
+		{Item::IRON_AXE,     { 16, 160, texturePalisade}},
+		{Item::IRON_PICKAXE, {128, 160, texturePalisade}},
 	};
 
 	std::map<ItemID, std::shared_ptr<Item>> Item::items {
-		{Item::SHORTSWORD,  std::make_shared<Item>(Item::SHORTSWORD,  "Shortsword", 100,  1)},
-		{Item::RED_POTION,  std::make_shared<Item>(Item::RED_POTION,  "Red Potion",  20,  8)},
-		{Item::COINS,       std::make_shared<Item>(Item::COINS,       "Gold",         1, 1'000'000)},
-		{Item::IRON_ORE,    std::make_shared<Item>(Item::IRON_ORE,    "Iron Ore",    10, 64)},
-		{Item::COPPER_ORE,  std::make_shared<Item>(Item::COPPER_ORE,  "Copper Ore",   8, 64)},
-		{Item::GOLD_ORE,    std::make_shared<Item>(Item::GOLD_ORE,    "Gold Ore",    20, 64)},
-		{Item::DIAMOND_ORE, std::make_shared<Item>(Item::DIAMOND_ORE, "Diamond Ore", 80, 64)},
-		{Item::DIAMOND,     std::make_shared<Item>(Item::DIAMOND,     "Diamond",    100, 64)},
-		{Item::COAL,        std::make_shared<Item>(Item::COAL,        "Coal",         5, 64)},
-		{Item::OIL,         std::make_shared<Item>(Item::OIL,         "Oil",         15, 64)},
-		{Item::WOOD,        std::make_shared<Item>(Item::WOOD,        "Wood",         3, 64)},
-		{Item::IRON_AXE,    std::make_shared<Item>(Item::IRON_AXE,    "Iron Axe",    50,  1)->addAttribute(ItemAttribute::Axe)},
+		{Item::SHORTSWORD,   std::make_shared<Item>(Item::SHORTSWORD,   "Shortsword",  100,  1)},
+		{Item::RED_POTION,   std::make_shared<Item>(Item::RED_POTION,   "Red Potion",   20,  8)},
+		{Item::COINS,        std::make_shared<Item>(Item::COINS,        "Gold",          1, 1'000'000)},
+		{Item::IRON_ORE,     std::make_shared<Item>(Item::IRON_ORE,     "Iron Ore",     10, 64)},
+		{Item::COPPER_ORE,   std::make_shared<Item>(Item::COPPER_ORE,   "Copper Ore",    8, 64)},
+		{Item::GOLD_ORE,     std::make_shared<Item>(Item::GOLD_ORE,     "Gold Ore",     20, 64)},
+		{Item::DIAMOND_ORE,  std::make_shared<Item>(Item::DIAMOND_ORE,  "Diamond Ore",  80, 64)},
+		{Item::DIAMOND,      std::make_shared<Item>(Item::DIAMOND,      "Diamond",     100, 64)},
+		{Item::COAL,         std::make_shared<Item>(Item::COAL,         "Coal",          5, 64)},
+		{Item::OIL,          std::make_shared<Item>(Item::OIL,          "Oil",          15, 64)},
+		{Item::WOOD,         std::make_shared<Item>(Item::WOOD,         "Wood",          3, 64)},
+		{Item::IRON_AXE,     std::make_shared<Item>(Item::IRON_AXE,     "Iron Axe",     50,  1)->addAttribute(ItemAttribute::Axe)},
+		{Item::IRON_PICKAXE, std::make_shared<Item>(Item::IRON_PICKAXE, "Iron Pickaxe", 50,  1)->addAttribute(ItemAttribute::Pickaxe)},
+	};
+
+	std::unordered_map<ItemID, Durability> Item::durabilities {
+		{Item::IRON_AXE, 64},
+		{Item::IRON_PICKAXE, 64},
 	};
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage() {
@@ -90,6 +97,10 @@ namespace Game3 {
 		out.data["maxDurability"] = durability;
 		out.data["durability"]    = durability;
 		return out;
+	}
+
+	ItemStack ItemStack::withDurability(ItemID id) {
+		return withDurability(id, Item::durabilities.at(id));
 	}
 
 	bool ItemStack::reduceDurability(Durability amount) {

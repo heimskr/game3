@@ -26,22 +26,24 @@ namespace Game3 {
 
 	class Item: public std::enable_shared_from_this<Item> {
 		public:
-			constexpr static ItemID NOTHING     = 0;
-			constexpr static ItemID SHORTSWORD  = 1;
-			constexpr static ItemID RED_POTION  = 2;
-			constexpr static ItemID COINS       = 3;
-			constexpr static ItemID IRON_ORE    = 4;
-			constexpr static ItemID COPPER_ORE  = 5;
-			constexpr static ItemID GOLD_ORE    = 6;
-			constexpr static ItemID DIAMOND_ORE = 7;
-			constexpr static ItemID DIAMOND     = 8;
-			constexpr static ItemID COAL        = 9;
-			constexpr static ItemID OIL         = 10;
-			constexpr static ItemID WOOD        = 11;
-			constexpr static ItemID IRON_AXE    = 12;
+			constexpr static ItemID NOTHING      = 0;
+			constexpr static ItemID SHORTSWORD   = 1;
+			constexpr static ItemID RED_POTION   = 2;
+			constexpr static ItemID COINS        = 3;
+			constexpr static ItemID IRON_ORE     = 4;
+			constexpr static ItemID COPPER_ORE   = 5;
+			constexpr static ItemID GOLD_ORE     = 6;
+			constexpr static ItemID DIAMOND_ORE  = 7;
+			constexpr static ItemID DIAMOND      = 8;
+			constexpr static ItemID COAL         = 9;
+			constexpr static ItemID OIL          = 10;
+			constexpr static ItemID WOOD         = 11;
+			constexpr static ItemID IRON_AXE     = 12;
+			constexpr static ItemID IRON_PICKAXE = 13;
 
-			static std::map<ItemID, std::shared_ptr<Item>> items;
 			static std::unordered_map<ItemID, ItemTexture> itemTextures;
+			static std::map<ItemID, std::shared_ptr<Item>> items;
+			static std::unordered_map<ItemID, Durability> durabilities;
 
 			ItemID id = 0;
 			std::string name;
@@ -81,7 +83,8 @@ namespace Game3 {
 
 			inline bool operator==(const ItemStack &other) const { return *item == *other.item && count == other.count; }
 
-			static ItemStack withDurability(ItemID, Durability durability = 64);
+			static ItemStack withDurability(ItemID, Durability durability);
+			static ItemStack withDurability(ItemID);
 
 			/** Decreases the durability by a given amount if the ItemStack has durability data. Returns true if the durability was present and reduced to zero or false otherwise. */
 			bool reduceDurability(Durability = 1);
