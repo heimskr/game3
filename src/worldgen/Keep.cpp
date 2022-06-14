@@ -1,5 +1,5 @@
 #include "Tiles.h"
-#include "realm/Realm.h"
+#include "realm/Keep.h"
 #include "tileentity/Chest.h"
 #include "tileentity/Teleporter.h"
 #include "util/Timer.h"
@@ -8,7 +8,7 @@
 #include "worldgen/Keep.h"
 
 namespace Game3::WorldGen {
-	void generateKeep(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, RealmID parent_realm, const Position &entrance) {
+	void generateKeep(const std::shared_ptr<Keep> &realm, std::default_random_engine &rng, RealmID parent_realm, const Position &entrance) {
 		Timer timer("GenerateKeep");
 		const auto width  = realm->getWidth();
 		const auto height = realm->getHeight();
@@ -47,6 +47,7 @@ namespace Game3::WorldGen {
 		auto stockpile = TileEntity::create<Chest>(48, Position(height - 2, 2), "Stockpile");
 		stockpile->setInventory(40);
 		realm->add(stockpile);
+		realm->stockpileInventory = stockpile->inventory;
 
 		WorldGen::generateCarpet(realm, rng);
 	}

@@ -161,7 +161,7 @@ namespace Game3::WorldGen {
 					auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, Realm::textureMap.at(Realm::HOUSE));
 					auto new_realm = Realm::create(realm_id, Realm::HOUSE, new_tilemap);
 					new_realm->setGame(game);
-					WorldGen::generateHouse(new_realm, rng, realm->id, house_position + Position {1, 0});
+					WorldGen::generateHouse(new_realm, rng, realm, house_position + Position(1, 0));
 					game.realms.emplace(realm_id, new_realm);
 					realm->add(building);
 				}

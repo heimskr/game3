@@ -1,5 +1,8 @@
 #include "Tiles.h"
+#include "entity/Gatherer.h"
+#include "game/Game.h"
 #include "realm/Realm.h"
+#include "tileentity/Building.h"
 #include "tileentity/Chest.h"
 #include "tileentity/Sign.h"
 #include "tileentity/Teleporter.h"
@@ -9,7 +12,7 @@
 #include "worldgen/House.h"
 
 namespace Game3::WorldGen {
-	void generateHouse(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, RealmID parent_realm, const Position &entrance) {
+	void generateHouse(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const std::shared_ptr<Realm> &parent_realm, const Position &entrance) {
 		Timer timer("GenerateHouse");
 		const auto width  = realm->getWidth();
 		const auto height = realm->getHeight();
@@ -52,7 +55,12 @@ namespace Game3::WorldGen {
 		realm->setLayer2(realm->getIndex(bed_position), choose(beds, rng));
 		realm->extraData["bed"] = bed_position;
 
-		realm->add(TileEntity::create<Teleporter>(choose(doors, rng), realm->getPosition(exit_index), parent_realm, entrance));
+		auto door = TileEntity::create<Teleporter>(choose(doors, rng), realm->getPosition(exit_index), parent_realm->id, entrance);
+		realm->add(door);
+
+		const auto house_position = entrance - Position(1, 0);
+		realm->spawn<Gatherer>(realm->getPosition(exit_index - width), Entity::VILLAGER1, parent_realm->id, realm->id, house_position, parent_realm->closestTileEntity<Building>(house_position,
+			[](const auto &building) { return building->tileID == OverworldTiles::KEEP_SW; }));
 
 		switch(rng() % 2) {
 			case 0: {
