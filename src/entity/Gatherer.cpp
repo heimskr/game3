@@ -210,12 +210,21 @@ namespace Game3 {
 			if (stack.count == 0) // Couldn't sell any
 				continue;
 
-			const ItemCount removed = inventory->remove(stack, slot);
-			new_money += sell_price;
+			auto leftover = keep_realm.stockpileInventory->add(stack);
 
-			// TODO: maybe prevent the leftover from being destroyed?
-			if (keep_realm.stockpileInventory->add(stack.withCount(removed)))
+			if (leftover) {
+				stack.count -= leftover->count;
+				if (!totalSellPrice(keep_realm, stack, sell_price))
+					throw std::runtime_error("Sell price calculation failed after reducing stack");
+				new_money += sell_price;
+				inventory->remove(stack, slot);
+				keep_realm.money -= sell_price;
 				break;
+			} else {
+				new_money += sell_price;
+				inventory->remove(stack, slot);
+				keep_realm.money -= sell_price;
+			}
 		}
 
 		setMoney(new_money);
