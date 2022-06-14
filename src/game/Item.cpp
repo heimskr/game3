@@ -20,7 +20,7 @@ namespace Game3 {
 		{Item::COAL,        {192, 272, textureItems}},
 		{Item::OIL,         {  0, 240, textureItems}},
 		{Item::WOOD,        {208, 336, textureItems}},
-		{Item::IRON_AXE,    { 32,  96, texturePalisade}},
+		{Item::IRON_AXE,    { 16, 160, texturePalisade}},
 	};
 
 	std::map<ItemID, std::shared_ptr<Item>> Item::items {
