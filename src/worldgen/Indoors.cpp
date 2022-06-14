@@ -7,7 +7,7 @@
 #include "worldgen/Indoors.h"
 
 namespace Game3::WorldGen {
-	void generateIndoors(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const std::shared_ptr<Realm> &parent_realm, const Position &entrance) {
+	Index generateIndoors(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const std::shared_ptr<Realm> &parent_realm, const Position &entrance) {
 		Timer timer("GenerateIndoors");
 		const auto width  = realm->getWidth();
 		const auto height = realm->getHeight();
@@ -36,8 +36,9 @@ namespace Game3::WorldGen {
 		realm->setLayer2(exit_index,     HouseTiles::EMPTY);
 		realm->setLayer2(exit_index + 1, HouseTiles::WALL_E);
 
-		static std::array<TileID, 2> doors {HouseTiles::DOOR1, HouseTiles::DOOR2};
-		auto door = TileEntity::create<Teleporter>(choose(doors, rng), realm->getPosition(exit_index), parent_realm->id, entrance);
+		auto door = TileEntity::create<Teleporter>(choose(HouseTiles::DOORS, rng), realm->getPosition(exit_index), parent_realm->id, entrance);
 		realm->add(door);
+
+		return exit_index;
 	}
 }

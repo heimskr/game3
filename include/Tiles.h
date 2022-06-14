@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
@@ -143,6 +144,10 @@ namespace Game3 {
 		constexpr static TileID PLANT3      = 342;
 		constexpr static TileID ANVIL       = 397;
 		constexpr static TileID FURNACE     = 398;
+
+		constexpr static std::array<TileID, 3> BEDS {BED1, BED2, BED3};
+		constexpr static std::array<TileID, 3> PLANTS {PLANT1, PLANT2, PLANT3};
+		constexpr static std::array<TileID, 2> DOORS {DOOR1, DOOR2};
 
 		static std::unordered_set<TileID> landSet;
 		static std::unordered_set<TileID> solidSet;

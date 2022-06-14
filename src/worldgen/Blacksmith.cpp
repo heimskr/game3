@@ -18,10 +18,9 @@ namespace Game3::WorldGen {
 		const auto width  = realm->getWidth();
 		const auto height = realm->getHeight();
 
-		generateIndoors(realm, rng, parent_realm, entrance);
-		const Index exit_index = width * height - 3;
+		const Index exit_index = generateIndoors(realm, rng, parent_realm, entrance);
 
-		const auto house_position = entrance - Position(1, 0);
+		// const auto house_position = entrance - Position(1, 0);
 		// realm->spawn<Gatherer>(realm->getPosition(exit_index - width), Entity::VILLAGER1_ID, parent_realm->id, realm->id, house_position, parent_realm->closestTileEntity<Building>(house_position,
 		// 	[](const auto &building) { return building->tileID == OverworldTiles::KEEP_SW; }));
 
@@ -31,5 +30,10 @@ namespace Game3::WorldGen {
 		realm->setLayer2({height / 2, width / 2 - 1}, HouseTiles::COUNTER_W);
 		realm->setLayer2({height / 2, width / 2},     HouseTiles::COUNTER_WE);
 		realm->setLayer2({height / 2, width / 2 + 1}, HouseTiles::COUNTER_E);
+
+		std::array<Index, 2> edges {1, width - 2};
+		const Position bed_position(1, choose(edges, rng));
+		realm->setLayer2(realm->getIndex(bed_position), choose(HouseTiles::BEDS, rng));
+		realm->extraData["bed"] = bed_position;
 	}
 }
