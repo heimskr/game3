@@ -95,8 +95,8 @@ namespace Game3::WorldGen {
 		for (const auto index: starts) {
 			const size_t row_start = index / tilemap1->width + pad, row_end = row_start + m;
 			const size_t column_start = index % tilemap1->width + pad, column_end = column_start + n;
-			for (size_t row = row_start; row < row_end; ++row)
-				for (size_t column = column_start; column < column_end; ++column) {
+			for (size_t row = row_start; row < row_end; row += 2)
+				for (size_t column = column_start; column < column_end; column += 2) {
 					const Index index = row * tilemap1->width + column;
 					if (!overworldTiles.isLand(tiles1[index]))
 						goto failed;

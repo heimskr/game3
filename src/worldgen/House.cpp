@@ -36,7 +36,7 @@ namespace Game3::WorldGen {
 
 		switch(rng() % 2) {
 			case 0: {
-				const static std::array<std::string, 13> texts {
+				constexpr static std::array<const char *, 13> texts {
 					"Express ideas directly in code.",
 					"Write in ISO Standard C++.",
 					"Express intent.",
