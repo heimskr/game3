@@ -84,6 +84,7 @@ namespace Game3::WorldGen {
 		add_resources(0.5, OverworldTiles::GOLD_ORE);
 		add_resources(0.5, OverworldTiles::OIL);
 		add_resources(0.5, OverworldTiles::DIAMOND_ORE);
+		add_resources(0.5, OverworldTiles::COAL_ORE);
 		resource_timer.stop();
 
 		realm->randomLand = choose(starts, rng);
