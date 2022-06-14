@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "Tiles.h"
 #include "entity/Player.h"
 #include "game/Game.h"
@@ -12,9 +10,10 @@ namespace Game3 {
 	void Tree::onInteractNextTo(const std::shared_ptr<Player> &player) {
 		auto &inventory = *player->inventory;
 		if (auto slot = inventory.find(Item::AXE)) {
-			// TODO: durability
 			if (!inventory.add({Item::WOOD, 1}))
 				getRealm()->remove(shared_from_this());
+			if (inventory[*slot]->reduceDurability())
+				inventory.erase(*slot);
 		}
 	}
 

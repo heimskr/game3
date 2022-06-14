@@ -65,7 +65,7 @@ namespace Game3 {
 				if (storage.contains(slot))
 					continue;
 				const ItemCount to_store = std::min(ItemCount(remaining), stack.item->maxCount);
-				storage.emplace(slot, ItemStack(stack.item, to_store));
+				storage.emplace(slot, ItemStack(stack.item, to_store, stack.data));
 				remaining -= to_store;
 				if (remaining <= 0)
 					break;

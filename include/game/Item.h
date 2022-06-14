@@ -63,7 +63,11 @@ namespace Game3 {
 
 			ItemStack() = default;
 			ItemStack(const std::shared_ptr<Item> &item_, ItemCount count_): item(item_), count(count_) {}
+			ItemStack(const std::shared_ptr<Item> &item_, ItemCount count_, const nlohmann::json &data_): item(item_), count(count_), data(data_) {}
+			ItemStack(const std::shared_ptr<Item> &item_, ItemCount count_, nlohmann::json &&data_): item(item_), count(count_), data(std::move(data_)) {}
 			ItemStack(ItemID id, ItemCount count_): item(Item::items.at(id)), count(count_) {}
+			ItemStack(ItemID id, ItemCount count_, const nlohmann::json &data_): item(Item::items.at(id)), count(count_), data(data_) {}
+			ItemStack(ItemID id, ItemCount count_, nlohmann::json &&data_): item(Item::items.at(id)), count(count_), data(std::move(data_)) {}
 
 			bool canMerge(const ItemStack &) const;
 			Glib::RefPtr<Gdk::Pixbuf> getImage();
