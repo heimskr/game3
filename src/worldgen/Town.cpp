@@ -156,7 +156,7 @@ namespace Game3::WorldGen {
 					const RealmID realm_id = game.newRealmID();
 					const Index realm_width  = 9;
 					const Index realm_height = 9;
-					const Position blacksmith_position {index / map_width, index % map_width};
+					const Position blacksmith_position(index / map_width, index % map_width);
 					auto building = TileEntity::create<Building>(blacksmith, blacksmith_position, realm_id, realm_width * (realm_height - 1) - 3);
 					auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, Realm::textureMap.at(Realm::HOUSE));
 					auto new_realm = Realm::create(realm_id, Realm::BLACKSMITH, new_tilemap);
@@ -172,7 +172,7 @@ namespace Game3::WorldGen {
 					const RealmID realm_id = game.newRealmID();
 					const Index realm_width  = 9;
 					const Index realm_height = 9;
-					const Position house_position {index / map_width, index % map_width};
+					const Position house_position(index / map_width, index % map_width);
 					auto building = TileEntity::create<Building>(house, house_position, realm_id, realm_width * (realm_height - 1) - 3);
 					auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, Realm::textureMap.at(Realm::HOUSE));
 					auto new_realm = Realm::create(realm_id, Realm::HOUSE, new_tilemap);

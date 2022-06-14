@@ -12,9 +12,11 @@
 namespace Game3 {
 	struct Position {
 		using value_type = Index;
-		value_type row;
-		value_type column;
+		value_type row = 0;
+		value_type column = 0;
 
+		Position() = default;
+		Position(value_type row_, value_type column_): row(row_), column(column_) {}
 		inline bool operator==(const Position &other) const { return row == other.row && column == other.column; }
 		inline bool operator!=(const Position &other) const { return row != other.row || column != other.column; }
 		inline Position operator+(const Position &other) const { return {row + other.row, column + other.column}; }

@@ -18,8 +18,8 @@ namespace Game3 {
 			nlohmann::json toJSON() const override;
 			void init() override;
 			void render(SpriteRenderer &) const override;
-			virtual void onInteractOn    (const std::shared_ptr<Player> &player) { interact(player); }
-			virtual void onInteractNextTo(const std::shared_ptr<Player> &player) { interact(player); }
+			virtual void onInteractOn    (const std::shared_ptr<Player> &player) override { interact(player); }
+			virtual void onInteractNextTo(const std::shared_ptr<Player> &player) override { interact(player); }
 
 		private:
 			ItemEntity(const ItemStack &);
