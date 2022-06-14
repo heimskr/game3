@@ -15,8 +15,10 @@ namespace Game3 {
 			void absorbJSON(const nlohmann::json &) override;
 			void onInteractNextTo(const std::shared_ptr<Player> &) override;
 
+			friend class Entity;
+
 		protected:
-			using Entity::Entity;
+			Merchant(EntityID);
 			void interact(const Position &);
 
 		private:

@@ -117,10 +117,11 @@ namespace Game3 {
 		constexpr static TileID PLANT2      = 341;
 		constexpr static TileID PLANT3      = 342;
 
+		static std::unordered_set<TileID> landSet;
 		static std::unordered_set<TileID> solidSet;
 
-		bool isLand(TileID) const override {
-			return true;
+		bool isLand(TileID tile) const override {
+			return landSet.contains(tile);
 		}
 
 		bool isSolid(TileID tile) const override {

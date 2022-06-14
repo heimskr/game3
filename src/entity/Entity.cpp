@@ -41,7 +41,7 @@ namespace Game3 {
 					out = Entity::create<Merchant>(id);
 					break;
 				default:
-					out = Entity::create<Entity>(id);
+					out = Entity::create<Entity>(id, Entity::GENERIC);
 					break;
 			}
 
@@ -199,7 +199,7 @@ namespace Game3 {
 		return *this;
 	}
 
-	Entity::Entity(EntityID id__): id_(id__) {
+	Entity::Entity(EntityID id__, EntityType type_): type(type_), id_(id__) {
 		variety = textureMap.at(id_).variety;
 	}
 

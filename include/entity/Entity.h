@@ -38,11 +38,13 @@ namespace Game3 {
 			constexpr static EntityID GANGBLANC = 1;
 			constexpr static EntityID GRUM      = 2;
 			constexpr static EntityID VILLAGER1 = 3;
+			// EntityID 4 is reserved for items
 
-			constexpr static EntityType ITEM     = 1;
+			constexpr static EntityType GENERIC  = 0;
+			constexpr static EntityType PLAYER   = 1;
 			constexpr static EntityType GATHERER = 2;
-			constexpr static EntityType PLAYER   = 3;
-			constexpr static EntityType MERCHANT = 4;
+			constexpr static EntityType MERCHANT = 3;
+			constexpr static EntityType ITEM     = 4;
 
 			static std::unordered_map<EntityID, EntityTexture> textureMap;
 
@@ -62,9 +64,9 @@ namespace Game3 {
 
 			~Entity() override = default;
 
-			template <typename T>
-			static std::shared_ptr<T> create(EntityID id) {
-				auto out = std::shared_ptr<T>(new T(id));
+			template <typename T, typename... Args>
+			static std::shared_ptr<T> create(EntityID id, Args && ...args) {
+				auto out = std::shared_ptr<T>(new T(id, std::forward<Args>(args)...));
 				out->init();
 				return out;
 			}
@@ -112,7 +114,7 @@ namespace Game3 {
 			int variety = 0;
 
 			Entity() = delete;
-			Entity(EntityID id__);
+			Entity(EntityID, EntityType);
 
 			bool canMoveTo(const Position &) const;
 			/** A list of functions to call the next time the entity moves. The functions return whether they should be removed from the queue. */

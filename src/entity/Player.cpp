@@ -7,6 +7,8 @@
 #include "ui/MainWindow.h"
 
 namespace Game3 {
+	Player::Player(EntityID id__): Entity(id__, Entity::PLAYER) {}
+
 	std::shared_ptr<Player> Player::fromJSON(const nlohmann::json &json) {
 		auto out = Entity::create<Player>(json.at("id"));
 		out->absorbJSON(json);

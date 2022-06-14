@@ -26,8 +26,10 @@ namespace Game3 {
 			void teleport(const Position &, const std::shared_ptr<Realm> &) override;
 			void addMoney(MoneyCount);
 
+			friend class Entity;
+
 		protected:
-			using Entity::Entity;
+			Player(EntityID);
 			void interact(const Position &);
 	};
 

@@ -263,6 +263,8 @@ namespace Game3 {
 		else
 			game = Game::fromJSON(nlohmann::json::from_cbor(data), *canvas);
 		game->initEntities();
+		for (auto &[id, realm]: game->realms)
+			realm->resetPathMap();
 		auto realm = game->activeRealm;
 		for (const auto &entity: realm->entities)
 			if (entity->isPlayer()) {

@@ -17,10 +17,10 @@
 
 namespace Game3 {
 	Gatherer::Gatherer(EntityID id_):
-		Entity(id_) {}
+		Entity(id_, Entity::GATHERER) {}
 
 	Gatherer::Gatherer(EntityID id_, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_):
-		Entity(id_), overworldRealm(overworld_realm), houseRealm(house_realm), housePosition(house_position), keep(keep_), keepPosition(keep_->position) {}
+		Entity(id_, Entity::GATHERER), overworldRealm(overworld_realm), houseRealm(house_realm), housePosition(house_position), keep(keep_), keepPosition(keep_->position) {}
 
 	std::shared_ptr<Gatherer> Gatherer::create(EntityID id, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_) {
 		auto out = std::shared_ptr<Gatherer>(new Gatherer(id, overworld_realm, house_realm, house_position, keep_));
