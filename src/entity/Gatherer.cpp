@@ -127,6 +127,11 @@ namespace Game3 {
 			for (Index column = 0; column < width; ++column)
 				if (overworldTiles.isResource(layer2(column, row)) && std::sqrt(std::pow(housePosition.row - row, 2) + std::pow(housePosition.column - column, 2)) <= RADIUS)
 					resource_choices.push_back(overworld.getIndex(row, column));
+		// If there are no resources, get stuck forever. Seed -1998 has no resources.
+		if (resource_choices.empty()) {
+			phase = -1;
+			return;
+		}
 		// Choose one at random
 		chosenResource = choose(resource_choices, game.dynamicRNG);
 		// Pathfind to the door

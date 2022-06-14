@@ -5,6 +5,7 @@
 #include "Tiles.h"
 #include "realm/Realm.h"
 #include "tileentity/Teleporter.h"
+#include "tileentity/Tree.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 #include "worldgen/Overworld.h"
@@ -16,7 +17,9 @@ namespace Game3::WorldGen {
 		const auto height = realm->getHeight();
 
 		noise::module::Perlin perlin;
+		noise::module::Perlin forest_perlin;
 		perlin.SetSeed(noise_seed);
+		forest_perlin.SetSeed(-noise_seed * 3);
 
 		auto &tilemap1 = realm->tilemap1;
 		auto &tilemap2 = realm->tilemap2;
@@ -38,22 +41,26 @@ namespace Game3::WorldGen {
 			for (int column = 0; column < width; ++column) {
 				double noise = perlin.GetValue(row / noise_zoom, column / noise_zoom, 0.666);
 				saved_noise[row * width + column] = noise;
-				if (noise < noise_threshold)
+				if (noise < noise_threshold) {
 					realm->setLayer1(row, column, OverworldTiles::DEEPER_WATER);
-				else if (noise < noise_threshold + 0.1)
+				} else if (noise < noise_threshold + 0.1) {
 					realm->setLayer1(row, column, OverworldTiles::DEEP_WATER);
-				else if (noise < noise_threshold + 0.2)
+				} else if (noise < noise_threshold + 0.2) {
 					realm->setLayer1(row, column, OverworldTiles::WATER);
-				else if (noise < noise_threshold + 0.3)
+				} else if (noise < noise_threshold + 0.3) {
 					realm->setLayer1(row, column, OverworldTiles::SHALLOW_WATER);
-				else if (noise < noise_threshold + 0.4)
+				} else if (noise < noise_threshold + 0.4) {
 					realm->setLayer1(row, column, OverworldTiles::SAND);
-				else if (noise < noise_threshold + 0.5)
+				} else if (noise < noise_threshold + 0.5) {
 					realm->setLayer1(row, column, OverworldTiles::LIGHT_GRASS);
-				else if (0.8 < noise)
+				} else if (0.8 < noise) {
 					realm->setLayer1(row, column, OverworldTiles::STONE);
-				else
+				} else {
 					realm->setLayer1(row, column, choose(grasses, rng));
+					const double forest_noise = forest_perlin.GetValue(row / noise_zoom, column / noise_zoom, 0.5);
+					if (0.5 < forest_noise)
+						realm->add(TileEntity::create<Tree>(OverworldTiles::TREE1 + rand() % 3, Position(row, column)));
+				}
 			}
 		noise_timer.stop();
 
@@ -63,6 +70,8 @@ namespace Game3::WorldGen {
 		if (starts.empty())
 			throw std::runtime_error("Map has no land");
 		land_timer.stop();
+
+
 
 		Timer resource_timer("Resources");
 		std::vector<Index> resource_starts;
