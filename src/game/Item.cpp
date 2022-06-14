@@ -63,8 +63,7 @@ namespace Game3 {
 	}
 
 	bool ItemStack::canMerge(const ItemStack &other) const {
-		// TODO: update when items can store data.
-		return *item == *other.item;
+		return *item == *other.item && data == other.data;
 	}
 
 	Glib::RefPtr<Gdk::Pixbuf> ItemStack::getImage() {
@@ -81,13 +80,30 @@ namespace Game3 {
 		return {item, new_count};
 	}
 
+	ItemStack ItemStack::withDurability(ItemID id, Durability durability) {
+		ItemStack out(id, 1);
+		out.data["maxDurability"] = durability;
+		out.data["durability"]    = durability;
+		return out;
+	}
+
+	bool ItemStack::reduceDurability(Durability amount) {
+		if (!data.contains("durability"))
+			return false;
+		return (data["durability"] = std::max(0, data["durability"].get<Durability>() - amount)) == 0;
+	}
+
 	void to_json(nlohmann::json &json, const ItemStack &stack) {
 		json[0] = stack.item->id;
 		json[1] = stack.count;
+		if (!stack.data.empty())
+			json[2] = stack.data;
 	}
 
 	void from_json(const nlohmann::json &json, ItemStack &stack) {
 		stack.item = Item::items.at(json.at(0));
 		stack.count = json.at(1);
+		if (2 < json.size())
+			stack.data = json.at(2);
 	}
 }

@@ -59,6 +59,7 @@ namespace Game3 {
 		public:
 			std::shared_ptr<Item> item;
 			ItemCount count = 1;
+			nlohmann::json data;
 
 			ItemStack() = default;
 			ItemStack(const std::shared_ptr<Item> &item_, ItemCount count_): item(item_), count(count_) {}
@@ -70,6 +71,11 @@ namespace Game3 {
 			ItemStack withCount(ItemCount) const;
 
 			inline bool operator==(const ItemStack &other) const { return *item == *other.item && count == other.count; }
+
+			static ItemStack withDurability(ItemID, Durability durability = 64);
+
+			/** Decreases the durability by a given amount if the ItemStack has durability data. Returns true if the durability was present and reduced to zero or false otherwise. */
+			bool reduceDurability(Durability = 1);
 
 		private:
 			Glib::RefPtr<Gdk::Pixbuf> cachedImage;

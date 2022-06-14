@@ -17,4 +17,5 @@ namespace Game3 {
 	using ItemCount    = uint64_t;
 	using MoneyCount   = uint64_t;
 	using Phase        =  uint8_t;
+	using Durability   =  int32_t;
 }
