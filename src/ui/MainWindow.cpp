@@ -36,6 +36,7 @@ namespace Game3 {
 		{GDK_KEY_e,     interactTime},
 		{GDK_KEY_E,     interactTime},
 		{GDK_KEY_o,     interactTime},
+		{GDK_KEY_space, interactTime},
 		{GDK_KEY_g,     slowTime},
 	};
 
@@ -555,6 +556,7 @@ namespace Game3 {
 						game->player->interactOn();
 						return;
 					case GDK_KEY_e:
+					case GDK_KEY_space:
 						game->player->interactNextTo();
 						return;
 					case GDK_KEY_u:
