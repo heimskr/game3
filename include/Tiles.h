@@ -11,7 +11,7 @@ namespace Game3 {
 		TileSet() = default;
 		virtual ~TileSet() = default;
 		virtual bool isLand(TileID) const = 0;
-		virtual bool isWalkable(TileID id) const { return isLand(id) || id == getEmpty(); }
+		virtual bool isWalkable(TileID id) const { return isLand(id) || !isSolid(id); }
 		virtual bool isSolid(TileID) const = 0;
 		virtual TileID getEmpty() const { return 0; }
 		virtual const char * name() const = 0;
