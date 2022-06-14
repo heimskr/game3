@@ -3,6 +3,7 @@
 #include <gtkmm.h>
 #include <map>
 #include <memory>
+#include <unordered_set>
 
 #include <nlohmann/json.hpp>
 
@@ -21,7 +22,9 @@ namespace Game3 {
 		ItemTexture(int x_, int y_, Texture &texture_, int width_ = 16, int height_ = 16): x(x_), y(y_), texture(&texture_), width(width_), height(height_) {}
 	};
 
-	class Item {
+	enum class ItemAttribute {Axe, Pickaxe, Shovel};
+
+	class Item: public std::enable_shared_from_this<Item> {
 		public:
 			constexpr static ItemID NOTHING     = 0;
 			constexpr static ItemID SHORTSWORD  = 1;
@@ -44,11 +47,13 @@ namespace Game3 {
 			std::string name;
 			MoneyCount basePrice = 1;
 			ItemCount maxCount = 64;
+			std::unordered_set<ItemAttribute> attributes;
 
 			Item() = delete;
 			Item(ItemID id_, const std::string &name_, MoneyCount base_price, ItemCount max_count = 64): id(id_), name(name_), basePrice(base_price), maxCount(max_count) {}
 
 			Glib::RefPtr<Gdk::Pixbuf> getImage();
+			std::shared_ptr<Item> addAttribute(ItemAttribute);
 			inline bool operator==(const Item &other) const { return id == other.id; }
 
 		private:

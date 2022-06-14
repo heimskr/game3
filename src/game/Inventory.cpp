@@ -231,6 +231,13 @@ namespace Game3 {
 		return std::nullopt;
 	}
 
+	std::optional<Slot> Inventory::find(ItemAttribute attribute) const {
+		for (const auto &[slot, stack]: storage)
+			if (stack.item->attributes.contains(attribute))
+				return slot;
+		return std::nullopt;
+	}
+
 	bool Inventory::contains(const ItemStack &needle) const {
 		ItemCount remaining = needle.count;
 		for (const auto &[slot, stack]: storage) {

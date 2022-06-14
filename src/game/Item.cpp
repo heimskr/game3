@@ -35,7 +35,7 @@ namespace Game3 {
 		{Item::COAL,        std::make_shared<Item>(Item::COAL,        "Coal",         5, 64)},
 		{Item::OIL,         std::make_shared<Item>(Item::OIL,         "Oil",         15, 64)},
 		{Item::WOOD,        std::make_shared<Item>(Item::WOOD,        "Wood",         3, 64)},
-		{Item::IRON_AXE,    std::make_shared<Item>(Item::IRON_AXE,    "Iron Axe",    50,  1)},
+		{Item::IRON_AXE,    std::make_shared<Item>(Item::IRON_AXE,    "Iron Axe",    50,  1)->addAttribute(ItemAttribute::Axe)},
 	};
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage() {
@@ -60,6 +60,11 @@ namespace Game3 {
 		constexpr int doublings = 3;
 		return Gdk::Pixbuf::create_from_data(rawImage.get(), Gdk::Colorspace::RGB, texture.alpha, 8, width, height, row_size)
 		       ->scale_simple(width << doublings, height << doublings, Gdk::InterpType::NEAREST);
+	}
+
+	std::shared_ptr<Item> Item::addAttribute(ItemAttribute attribute) {
+		attributes.insert(attribute);
+		return shared_from_this();
 	}
 
 	bool ItemStack::canMerge(const ItemStack &other) const {
