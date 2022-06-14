@@ -39,7 +39,7 @@ namespace Game3 {
 			source->set_actions(Gdk::DragAction::MOVE);
 			source->signal_prepare().connect([this, source, external](double x, double y) -> Glib::RefPtr<Gdk::ContentProvider> { // Does capturing `source` cause a memory leak?
 				auto *item = (external? externalGrid : playerGrid).pick(x, y);
-				scrolled.set_data("dragged-item", nullptr);
+				draggedSlot = -1;
 
 				if (dynamic_cast<Gtk::Fixed *>(item->get_parent()))
 					item = item->get_parent();
@@ -50,7 +50,10 @@ namespace Game3 {
 				} else if (!dynamic_cast<Gtk::Fixed *>(item))
 					return nullptr;
 
-				scrolled.set_data("dragged-item", item);
+				const auto &pair = widgetMap.at(item);
+				draggedSlot = pair.first;
+				draggedExternal = pair.second;
+
 				Glib::ValueBase base;
 				base.init(GTK_TYPE_WIDGET);
 				return Gdk::ContentProvider::create(base);
@@ -66,11 +69,11 @@ namespace Game3 {
 					if (dynamic_cast<Gtk::Fixed *>(destination->get_parent()))
 						destination = destination->get_parent();
 
-					auto &dragged = getDraggedItem();
-					const Slot source_slot      = reinterpret_cast<intptr_t>(dragged.get_data("slot"));
-					const Slot destination_slot = reinterpret_cast<intptr_t>(destination->get_data("slot"));
-					const bool from_external    = reinterpret_cast<intptr_t>(dragged.get_data("external"));
-					const bool to_external      = reinterpret_cast<intptr_t>(destination->get_data("external"));
+					const auto &pair = widgetMap.at(destination);
+					const Slot source_slot      = draggedSlot;
+					const Slot destination_slot = pair.first;
+					const bool from_external    = draggedExternal;
+					const bool to_external      = pair.second;
 					auto &player_inventory = *mainWindow.game->player->inventory;
 
 					if (from_external) {
@@ -123,6 +126,8 @@ namespace Game3 {
 	void InventoryTab::reset(const std::shared_ptr<Game> &game) {
 		if (!game)
 			return;
+
+		widgetMap.clear();
 
 		removeChildren(playerGrid);
 		removeChildren(externalGrid);
@@ -183,8 +188,7 @@ namespace Game3 {
 
 				widget_ptr->set_size_request(tile_size, tile_size);
 				widget_ptr->add_css_class("item-slot");
-				widget_ptr->set_data("slot", reinterpret_cast<void *>(slot));
-				widget_ptr->set_data("external", reinterpret_cast<void *>(external));
+				widgetMap.try_emplace(widget_ptr.get(), slot, external);
 				grid.attach(*widget_ptr, column, row);
 				widgets.push_back(std::move(widget_ptr));
 			}
@@ -236,9 +240,5 @@ namespace Game3 {
 		lastSlot = slot;
 		lastExternal = external;
 		popoverMenu.popup();
-	}
-
-	Gtk::Widget & InventoryTab::getDraggedItem() {
-		return *reinterpret_cast<Gtk::Widget *>(scrolled.get_data("dragged-item"));
 	}
 }

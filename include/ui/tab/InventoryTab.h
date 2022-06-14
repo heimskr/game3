@@ -1,3 +1,6 @@
+#include <unordered_map>
+#include <utility>
+
 #include "ui/tab/Tab.h"
 
 namespace Game3 {
@@ -43,15 +46,18 @@ namespace Game3 {
 			int lastGridWidth = 0;
 			std::shared_ptr<Inventory> externalInventory;
 			Glib::ustring externalName;
+			std::unordered_map<Gtk::Widget *, std::pair<Slot, bool>> widgetMap;
 
 			/** We can't store state in a popover, so we have to store it here. */
 			std::shared_ptr<Game> lastGame;
 			Slot lastSlot = -1;
 			bool lastExternal = false;
 
+			Slot draggedSlot = -1;
+			bool draggedExternal = false;
+
 			int gridWidth() const;
 			void leftClick(const std::shared_ptr<Game> &, Gtk::Widget *, int click_count, Slot, bool external, double x, double y);
 			void rightClick(const std::shared_ptr<Game> &, Gtk::Widget *, int click_count, Slot, bool external, double x, double y);
-			Gtk::Widget & getDraggedItem();
 	};
 }
