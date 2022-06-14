@@ -2,6 +2,7 @@
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
 #include "tileentity/Sign.h"
+#include "tileentity/Stockpile.h"
 #include "tileentity/Teleporter.h"
 #include "tileentity/TileEntity.h"
 
@@ -22,6 +23,9 @@ namespace Game3 {
 				break;
 			case TileEntity::CHEST:
 				out = TileEntity::create<Chest>();
+				break;
+			case TileEntity::STOCKPILE:
+				out = TileEntity::create<Stockpile>();
 				break;
 			default:
 				throw std::invalid_argument("Unrecognized TileEntity ID: " + std::to_string(id));

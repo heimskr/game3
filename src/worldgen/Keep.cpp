@@ -1,6 +1,6 @@
 #include "Tiles.h"
 #include "realm/Keep.h"
-#include "tileentity/Chest.h"
+#include "tileentity/Stockpile.h"
 #include "tileentity/Teleporter.h"
 #include "util/Timer.h"
 #include "util/Util.h"
@@ -44,7 +44,7 @@ namespace Game3::WorldGen {
 
 		realm->setLayer2(Position(height - 2, 1), HouseTiles::STOCKPILE_W);
 		realm->setLayer2(Position(height - 2, 2), HouseTiles::STOCKPILE_E);
-		auto stockpile = TileEntity::create<Chest>(48, Position(height - 2, 2), "Stockpile");
+		auto stockpile = TileEntity::create<Stockpile>(48, Position(height - 2, 2));
 		stockpile->setInventory(40);
 		realm->add(stockpile);
 		realm->stockpileInventory = stockpile->inventory;
