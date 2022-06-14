@@ -78,6 +78,7 @@ namespace Game3 {
 		tilemap1->texture.init();
 		tilemap2->texture.init();
 		tilemap3->texture.init();
+		outdoors = json.at("outdoors");
 		for (const auto &[index, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>())
 			tileEntities.emplace(parseUlong(index), TileEntity::fromJSON(tile_entity_json)).first->second->setRealm(shared);
 		renderer1.init(tilemap1);
@@ -100,9 +101,9 @@ namespace Game3 {
 		renderer3.center = center;
 		renderer3.scale  = scale;
 		renderer3.onBackbufferResized(width, height);
-		renderer1.render(game_time);
-		renderer2.render(game_time);
-		renderer3.render(game_time);
+		renderer1.render(outdoors? game_time : 1);
+		renderer2.render(outdoors? game_time : 1);
+		renderer3.render(outdoors? game_time : 1);
 		for (const auto &entity: entities)
 			if (!entity->isPlayer())
 				entity->render(sprite_renderer);
@@ -314,6 +315,7 @@ namespace Game3 {
 		json["tilemap1"] = *tilemap1;
 		json["tilemap2"] = *tilemap2;
 		json["tilemap3"] = *tilemap3;
+		json["outdoors"] = outdoors;
 		json["tileEntities"] = std::unordered_map<std::string, nlohmann::json>();
 		for (const auto &[index, tile_entity]: tileEntities)
 			json["tileEntities"][std::to_string(index)] = *tile_entity;

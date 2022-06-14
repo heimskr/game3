@@ -37,6 +37,8 @@ namespace Game3 {
 			std::vector<uint8_t> pathMap;
 			nlohmann::json extraData;
 			Index randomLand = 0;
+			/** Whether the realm's rendering should be affected by the day-night cycle. */
+			bool outdoors = true;
 
 			Realm(const Realm &) = delete;
 			Realm(Realm &&) = default;

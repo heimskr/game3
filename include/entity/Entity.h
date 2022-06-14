@@ -67,7 +67,7 @@ namespace Game3 {
 
 			~Entity() override = default;
 
-			template <typename T, typename... Args>
+			template <typename T = Entity, typename... Args>
 			static std::shared_ptr<T> create(EntityID id, Args && ...args) {
 				auto out = std::shared_ptr<T>(new T(id, std::forward<Args>(args)...));
 				out->init();

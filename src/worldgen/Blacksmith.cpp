@@ -35,5 +35,7 @@ namespace Game3::WorldGen {
 		const Position bed_position(1, choose(edges, rng));
 		realm->setLayer2(realm->getIndex(bed_position), choose(HouseTiles::BEDS, rng));
 		realm->extraData["bed"] = bed_position;
+
+		realm->spawn<Entity>({height / 2 - 1, width / 2}, Entity::BLACKSMITH_ID, Entity::GENERIC_TYPE);
 	}
 }
