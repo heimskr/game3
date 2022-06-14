@@ -14,8 +14,7 @@ namespace Game3 {
 
 			TileEntityID getID() const override { return TileEntity::TREE; }
 
-			// void toJSON(nlohmann::json &) const override;
-			// void absorbJSON(const nlohmann::json &) override;
+			void onInteractNextTo(const std::shared_ptr<Player> &) override;
 			void render(SpriteRenderer &) override;
 
 		protected:

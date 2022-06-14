@@ -53,6 +53,12 @@ namespace Game3 {
 
 			bool contains(Slot) const;
 
+			/** Returns whether the inventory contains at least a minimum amount of a given item. */
+			bool contains(const ItemStack &) const;
+
+			/** Returns the slot containing a given item ID if one exists. */
+			std::optional<Slot> find(ItemID) const;
+
 		private:
 			std::map<Slot, ItemStack> storage;
 

@@ -3,18 +3,20 @@
 #include "Tiles.h"
 #include "entity/Player.h"
 #include "game/Game.h"
+#include "game/Inventory.h"
 #include "realm/Realm.h"
 #include "tileentity/Tree.h"
 #include "ui/SpriteRenderer.h"
 
 namespace Game3 {
-	// void Tree::toJSON(nlohmann::json &json) const {
-	// 	TileEntity::toJSON(json);
-	// }
-
-	// void Tree::absorbJSON(const nlohmann::json &json) {
-	// 	TileEntity::absorbJSON(json);
-	// }
+	void Tree::onInteractNextTo(const std::shared_ptr<Player> &player) {
+		auto &inventory = *player->inventory;
+		if (auto slot = inventory.find(Item::AXE)) {
+			// TODO: durability
+			if (!inventory.add({Item::WOOD, 1}))
+				getRealm()->remove(shared_from_this());
+		}
+	}
 
 	void Tree::render(SpriteRenderer &sprite_renderer) {
 		auto realm = getRealm();

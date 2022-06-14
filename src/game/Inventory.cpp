@@ -224,6 +224,26 @@ namespace Game3 {
 		return storage.contains(slot);
 	}
 
+	std::optional<Slot> Inventory::find(ItemID id) const {
+		for (const auto &[slot, stack]: storage)
+			if (stack.item->id == id)
+				return slot;
+		return std::nullopt;
+	}
+
+	bool Inventory::contains(const ItemStack &needle) const {
+		ItemCount remaining = needle.count;
+		for (const auto &[slot, stack]: storage) {
+			if (!needle.canMerge(stack))
+				continue;
+			if (remaining <= stack.count)
+				return true;
+			remaining -= stack.count;
+		}
+
+		return false;
+	}
+
 	void Inventory::notifyOwner() {
 		if (auto locked_owner = owner.lock()) {
 			if (auto player = std::dynamic_pointer_cast<Player>(locked_owner))

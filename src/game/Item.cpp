@@ -6,6 +6,7 @@ namespace Game3 {
 	static Texture textureConsumables {"resources/rpg/consumables.png"};
 	static Texture texturePotions     {"resources/rpg/potions.png"};
 	static Texture textureItems       {"resources/items/items.png"};
+	static Texture textureAxe         {"resources/items/axe.png"};
 
 	std::unordered_map<ItemID, ItemTexture> Item::itemTextures {
 		{Item::SHORTSWORD,  {  0,   0, textureShortsword}},
@@ -18,11 +19,13 @@ namespace Game3 {
 		{Item::DIAMOND,     {  0, 128, textureItems}},
 		{Item::COAL,        {192, 272, textureItems}},
 		{Item::OIL,         {  0, 240, textureItems}},
+		{Item::WOOD,        {208, 336, textureItems}},
+		{Item::AXE,         { 16,   0, textureAxe}},
 	};
 
 	std::map<ItemID, std::shared_ptr<Item>> Item::items {
-		{Item::SHORTSWORD,  std::make_shared<Item>(Item::SHORTSWORD,  "Shortsword", 100, 1)},
-		{Item::RED_POTION,  std::make_shared<Item>(Item::RED_POTION,  "Red Potion",  20, 8)},
+		{Item::SHORTSWORD,  std::make_shared<Item>(Item::SHORTSWORD,  "Shortsword", 100,  1)},
+		{Item::RED_POTION,  std::make_shared<Item>(Item::RED_POTION,  "Red Potion",  20,  8)},
 		{Item::COINS,       std::make_shared<Item>(Item::COINS,       "Gold",         1, 1'000'000)},
 		{Item::IRON_ORE,    std::make_shared<Item>(Item::IRON_ORE,    "Iron Ore",    10, 64)},
 		{Item::COPPER_ORE,  std::make_shared<Item>(Item::COPPER_ORE,  "Copper Ore",   8, 64)},
@@ -31,6 +34,8 @@ namespace Game3 {
 		{Item::DIAMOND,     std::make_shared<Item>(Item::DIAMOND,     "Diamond",    100, 64)},
 		{Item::COAL,        std::make_shared<Item>(Item::COAL,        "Coal",         5, 64)},
 		{Item::OIL,         std::make_shared<Item>(Item::OIL,         "Oil",         15, 64)},
+		{Item::WOOD,        std::make_shared<Item>(Item::WOOD,        "Wood",         3, 64)},
+		{Item::AXE,         std::make_shared<Item>(Item::AXE,         "Axe",         50,  1)},
 	};
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage() {
