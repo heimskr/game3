@@ -71,8 +71,6 @@ namespace Game3::WorldGen {
 			throw std::runtime_error("Map has no land");
 		land_timer.stop();
 
-
-
 		Timer resource_timer("Resources");
 		std::vector<Index> resource_starts;
 		resource_starts.reserve(width * height / 10);

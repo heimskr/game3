@@ -130,11 +130,13 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<TileEntity> Realm::add(const std::shared_ptr<TileEntity> &tile_entity) {
-		const Index index = tile_entity->position.row * tilemap1->width + tile_entity->position.column;
+		const Index index = getIndex(tile_entity->position);
 		if (tileEntities.contains(index))
 			return nullptr;
 		tile_entity->setRealm(shared_from_this());
 		tileEntities.emplace(index, tile_entity);
+		if (tile_entity->solid)
+			pathMap[index] = false;
 		return tile_entity;
 	}
 
@@ -326,16 +328,23 @@ namespace Game3 {
 			json["extra"] = extraData;
 	}
 
+	bool Realm::isWalkable(Index row, Index column, const TileSet &tileset) const {
+		if (!tileset.isWalkable((*tilemap1)(column, row)) || !tileset.isWalkable((*tilemap2)(column, row)) || !tileset.isWalkable((*tilemap3)(column, row)))
+			return false;
+		const Index index = getIndex(row, column);
+		if (tileEntities.contains(index) && tileEntities.at(index)->solid)
+			return false;
+		return true;
+	}
+
 	void Realm::setLayerHelper(Index row, Index column) {
 		const auto &tileset = tileSets.at(type);
-		pathMap[getIndex(row, column)] = tileset->isWalkable((*tilemap1)(column, row)) && tileset->isWalkable((*tilemap2)(column, row)) && tileset->isWalkable((*tilemap3)(column, row));
+		pathMap[getIndex(row, column)] = isWalkable(row, column, *tileset);
 	}
 
 	void Realm::setLayerHelper(Index index) {
 		const auto &tileset = tileSets.at(type);
-		const auto row    = index / getWidth();
-		const auto column = index % getWidth();
-		pathMap[index] = tileset->isWalkable((*tilemap1)(column, row)) && tileset->isWalkable((*tilemap2)(column, row)) && tileset->isWalkable((*tilemap3)(column, row));
+		pathMap[index] = isWalkable(index / getWidth(), index % getWidth(), *tileset);
 	}
 
 	void Realm::resetPathMap() {
@@ -345,7 +354,7 @@ namespace Game3 {
 		const auto &tileset = tileSets.at(type);
 		for (Index row = 0; row < height; ++row)
 			for (Index column = 0; column < width; ++column)
-				pathMap[getIndex(row, column)] = tileset->isWalkable((*tilemap1)(column, row)) && tileset->isWalkable((*tilemap2)(column, row)) && tileset->isWalkable((*tilemap3)(column, row));
+				pathMap[getIndex(row, column)] = isWalkable(row, column, *tileset);
 	}
 
 	void to_json(nlohmann::json &json, const Realm &realm) {

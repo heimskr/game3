@@ -17,6 +17,7 @@ namespace Game3 {
 	class Entity;
 	class Game;
 	class SpriteRenderer;
+	struct TileSet;
 
 	class Realm: public std::enable_shared_from_this<Realm> {
 		public:
@@ -178,6 +179,7 @@ namespace Game3 {
 			Game *game = nullptr;
 			bool ticking = false;
 			std::vector<std::shared_ptr<Entity>> removalQueue;
+			bool isWalkable(Index row, Index column, const TileSet &) const;
 			void setLayerHelper(Index row, Index col);
 			void setLayerHelper(Index);
 			void resetPathMap();
