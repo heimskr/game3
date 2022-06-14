@@ -6,6 +6,7 @@ namespace Game3 {
 	static Texture textureConsumables {"resources/rpg/consumables.png"};
 	static Texture texturePotions     {"resources/rpg/potions.png"};
 	static Texture textureItems       {"resources/items/items.png"};
+	static Texture texturePalisade    {"resources/items/palisade.png"};
 
 	std::unordered_map<ItemID, ItemTexture> Item::itemTextures {
 		{Item::SHORTSWORD,  {  0,   0, textureShortsword}},
@@ -19,7 +20,7 @@ namespace Game3 {
 		{Item::COAL,        {192, 272, textureItems}},
 		{Item::OIL,         {  0, 240, textureItems}},
 		{Item::WOOD,        {208, 336, textureItems}},
-		{Item::AXE,         {208, 112, textureItems}},
+		{Item::IRON_AXE,    { 32,  96, texturePalisade}},
 	};
 
 	std::map<ItemID, std::shared_ptr<Item>> Item::items {
@@ -34,7 +35,7 @@ namespace Game3 {
 		{Item::COAL,        std::make_shared<Item>(Item::COAL,        "Coal",         5, 64)},
 		{Item::OIL,         std::make_shared<Item>(Item::OIL,         "Oil",         15, 64)},
 		{Item::WOOD,        std::make_shared<Item>(Item::WOOD,        "Wood",         3, 64)},
-		{Item::AXE,         std::make_shared<Item>(Item::AXE,         "Axe",         50,  1)},
+		{Item::IRON_AXE,    std::make_shared<Item>(Item::IRON_AXE,    "Iron Axe",    50,  1)},
 	};
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage() {
