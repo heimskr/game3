@@ -123,6 +123,10 @@ namespace Game3 {
 		constexpr static TileID WALL_SW     = 224;
 		constexpr static TileID WALL_WES    = 225;
 		constexpr static TileID WALL_SE     = 226;
+		constexpr static TileID COUNTER     = 252;
+		constexpr static TileID COUNTER_W   = 254;
+		constexpr static TileID COUNTER_WE  = 255;
+		constexpr static TileID COUNTER_E   = 256;
 		constexpr static TileID DOOR1       = 282;
 		constexpr static TileID DOOR2       = 284;
 		constexpr static TileID STOCKPILE_W = 286;
