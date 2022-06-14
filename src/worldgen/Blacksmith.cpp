@@ -22,8 +22,8 @@ namespace Game3::WorldGen {
 		const Index exit_index = width * height - 3;
 
 		const auto house_position = entrance - Position(1, 0);
-		realm->spawn<Gatherer>(realm->getPosition(exit_index - width), Entity::VILLAGER1_ID, parent_realm->id, realm->id, house_position, parent_realm->closestTileEntity<Building>(house_position,
-			[](const auto &building) { return building->tileID == OverworldTiles::KEEP_SW; }));
+		// realm->spawn<Gatherer>(realm->getPosition(exit_index - width), Entity::VILLAGER1_ID, parent_realm->id, realm->id, house_position, parent_realm->closestTileEntity<Building>(house_position,
+		// 	[](const auto &building) { return building->tileID == OverworldTiles::KEEP_SW; }));
 
 		realm->setLayer2({1, 3}, HouseTiles::FURNACE);
 		realm->setLayer2({1, 5}, HouseTiles::ANVIL);
