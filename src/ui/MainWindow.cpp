@@ -249,7 +249,7 @@ namespace Game3 {
 		WorldGen::generateOverworld(realm, rng, seed, 100., -0.15);
 		game->realms.emplace(realm->id, realm);
 		game->activeRealm = realm;
-		realm->add(game->player = Entity::create<Player>(Entity::GANGBLANC));
+		realm->add(game->player = Entity::create<Player>(Entity::GANGBLANC_ID));
 		game->player->position = {realm->randomLand / width, realm->randomLand % width};
 		game->player->init();
 		onGameLoaded();
@@ -562,7 +562,7 @@ namespace Game3 {
 						return;
 					case GDK_KEY_v:
 						if (game && game->debugMode) {
-							auto merchant = player.getRealm()->spawn<Merchant>(player.getPosition(), Entity::VILLAGER1);
+							auto merchant = player.getRealm()->spawn<Merchant>(player.getPosition(), Entity::VILLAGER1_ID);
 							merchant->inventory->add(ItemStack(Item::RED_POTION, 6));
 							merchant->inventory->add(ItemStack(Item::SHORTSWORD, 1));
 						}
@@ -578,7 +578,7 @@ namespace Game3 {
 								auto door = house->getTileEntity<Teleporter>();
 								const auto house_pos = door->targetPosition + Position(-1, 0);
 								auto overworld = game->realms.at(door->targetRealm);
-								player.getRealm()->spawn<Gatherer>(player.getPosition(), Entity::VILLAGER1, overworld->id, house->id, house_pos, overworld->closestTileEntity<Building>(house_pos,
+								player.getRealm()->spawn<Gatherer>(player.getPosition(), Entity::VILLAGER1_ID, overworld->id, house->id, house_pos, overworld->closestTileEntity<Building>(house_pos,
 									[](const auto &building) { return building->tileID == OverworldTiles::KEEP_SW; }));
 							} catch (const std::exception &err) {
 								std::cerr << err.what() << '\n';

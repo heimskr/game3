@@ -9,7 +9,7 @@ namespace Game3 {
 	Texture ItemEntity::missing = {"resources/missing.png"};
 
 	ItemEntity::ItemEntity(const ItemStack &stack_):
-		Entity(Entity::ITEM, Entity::ITEM), stack(stack_) {}
+		Entity(Entity::ITEM_ID, Entity::ITEM_TYPE), stack(stack_) {}
 
 	void ItemEntity::setStack(const ItemStack &stack_) {
 		stack = stack_;

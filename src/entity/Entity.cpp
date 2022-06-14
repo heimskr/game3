@@ -16,10 +16,10 @@
 
 namespace Game3 {
 	std::unordered_map<EntityID, EntityTexture> Entity::textureMap {
-		{Entity::GANGBLANC, {Texture("resources/characters/champions/Gangblanc.png"), 1}},
-		{Entity::GRUM,      {Texture("resources/characters/champions/Grum.png"),      1}},
-		{Entity::ITEM,      {Texture("resources/missing.png"),                        0}}, // Rendering is handled on a per-item basis by the ItemEntity class
-		{Entity::VILLAGER1, {Texture("resources/characters/villager1.png"),           2}},
+		{Entity::GANGBLANC_ID, {Texture("resources/characters/champions/Gangblanc.png"), 1}},
+		{Entity::GRUM_ID,      {Texture("resources/characters/champions/Grum.png"),      1}},
+		{Entity::ITEM_ID,      {Texture("resources/missing.png"),                        0}}, // Rendering is handled on a per-item basis by the ItemEntity class
+		{Entity::VILLAGER1_ID, {Texture("resources/characters/villager1.png"),           2}},
 	};
 
 	std::shared_ptr<Entity> Entity::fromJSON(const nlohmann::json &json) {
@@ -31,17 +31,17 @@ namespace Game3 {
 			out = Entity::create<Player>(id);
 		else
 			switch (type) {
-				case Entity::ITEM:
+				case Entity::ITEM_TYPE:
 					out = ItemEntity::create(json.at("stack"));
 					break;
-				case Entity::GATHERER:
+				case Entity::GATHERER_TYPE:
 					out = Entity::create<Gatherer>(id);
 					break;
-				case Entity::MERCHANT:
+				case Entity::MERCHANT_TYPE:
 					out = Entity::create<Merchant>(id);
 					break;
 				default:
-					out = Entity::create<Entity>(id, Entity::GENERIC);
+					out = Entity::create<Entity>(id, Entity::GENERIC_TYPE);
 					break;
 			}
 

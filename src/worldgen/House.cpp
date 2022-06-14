@@ -59,7 +59,7 @@ namespace Game3::WorldGen {
 		realm->add(door);
 
 		const auto house_position = entrance - Position(1, 0);
-		realm->spawn<Gatherer>(realm->getPosition(exit_index - width), Entity::VILLAGER1, parent_realm->id, realm->id, house_position, parent_realm->closestTileEntity<Building>(house_position,
+		realm->spawn<Gatherer>(realm->getPosition(exit_index - width), Entity::VILLAGER1_ID, parent_realm->id, realm->id, house_position, parent_realm->closestTileEntity<Building>(house_position,
 			[](const auto &building) { return building->tileID == OverworldTiles::KEEP_SW; }));
 
 		switch(rng() % 2) {

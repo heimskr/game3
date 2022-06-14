@@ -35,16 +35,19 @@ namespace Game3 {
 	class Entity: public HasInventory, public HasRealm, public std::enable_shared_from_this<Entity> {
 		public:
 			constexpr static Slot DEFAULT_INVENTORY_SIZE = 20;
-			constexpr static EntityID GANGBLANC = 1;
-			constexpr static EntityID GRUM      = 2;
-			constexpr static EntityID VILLAGER1 = 3;
-			// EntityID 4 is reserved for items
 
-			constexpr static EntityType GENERIC  = 0;
-			constexpr static EntityType PLAYER   = 1;
-			constexpr static EntityType GATHERER = 2;
-			constexpr static EntityType MERCHANT = 3;
-			constexpr static EntityType ITEM     = 4;
+			constexpr static EntityID  GANGBLANC_ID = 1;
+			constexpr static EntityID       GRUM_ID = 2;
+			constexpr static EntityID  VILLAGER1_ID = 3;
+			constexpr static EntityID       ITEM_ID = 4;
+			constexpr static EntityID BLACKSMITH_ID = 5;
+
+			constexpr static EntityType    GENERIC_TYPE = 0;
+			constexpr static EntityType     PLAYER_TYPE = 1;
+			constexpr static EntityType   GATHERER_TYPE = 2;
+			constexpr static EntityType   MERCHANT_TYPE = 3;
+			constexpr static EntityType       ITEM_TYPE = 4;
+			constexpr static EntityType BLACKSMITH_TYPE = 5;
 
 			static std::unordered_map<EntityID, EntityTexture> textureMap;
 
