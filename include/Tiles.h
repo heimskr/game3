@@ -138,6 +138,8 @@ namespace Game3 {
 		constexpr static TileID PLANT1      = 340;
 		constexpr static TileID PLANT2      = 341;
 		constexpr static TileID PLANT3      = 342;
+		constexpr static TileID ANVIL       = 397;
+		constexpr static TileID FURNACE     = 398;
 
 		static std::unordered_set<TileID> landSet;
 		static std::unordered_set<TileID> solidSet;
