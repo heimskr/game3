@@ -17,6 +17,7 @@ namespace Game3 {
 		{Item::DIAMOND_ORE, { 96, 272, textureItems}},
 		{Item::DIAMOND,     {  0, 128, textureItems}},
 		{Item::COAL,        {192, 272, textureItems}},
+		{Item::OIL,         {  0, 240, textureItems}},
 	};
 
 	std::map<ItemID, std::shared_ptr<Item>> Item::items {
@@ -29,6 +30,7 @@ namespace Game3 {
 		{Item::DIAMOND_ORE, std::make_shared<Item>(Item::DIAMOND_ORE, "Diamond Ore", 80, 64)},
 		{Item::DIAMOND,     std::make_shared<Item>(Item::DIAMOND,     "Diamond",    100, 64)},
 		{Item::COAL,        std::make_shared<Item>(Item::COAL,        "Coal",         5, 64)},
+		{Item::OIL,         std::make_shared<Item>(Item::OIL,         "Oil",         15, 64)},
 	};
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage() {

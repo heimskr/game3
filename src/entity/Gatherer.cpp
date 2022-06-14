@@ -162,6 +162,7 @@ namespace Game3 {
 				case OverworldTiles::GOLD_ORE:    item_id = Item::GOLD_ORE;    break;
 				case OverworldTiles::DIAMOND_ORE: item_id = Item::DIAMOND_ORE; break;
 				case OverworldTiles::COAL_ORE:    item_id = Item::COAL;        break;
+				case OverworldTiles::OIL:         item_id = Item::OIL;         break;
 				default:
 					throw std::runtime_error("Unknown resource type: " + std::to_string(resource_type));
 			}
