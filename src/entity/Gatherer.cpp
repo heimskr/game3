@@ -102,7 +102,7 @@ namespace Game3 {
 		if (phase == 7 && SELLING_TIME <= (sellTime += delta))
 			leaveKeep();
 
-		if (phase == 8 && position == destination)
+		if (phase == 8 && getRealm()->id == overworldRealm)
 			goToHouse();
 
 		if (phase == 9 && position == destination)
@@ -235,23 +235,20 @@ namespace Game3 {
 	}
 
 	void Gatherer::goToBed() {
+
+		auto house = std::dynamic_pointer_cast<Building>(getRealm()->tileEntityAt(housePosition));
+		if (!house)
+			throw std::runtime_error("Gatherer couldn't find house");
+		house->teleport(shared_from_this());
+
 		auto &realm = *getRealm();
-		if (realm.id == houseRealm) {
-			std::optional<Position> bed_position;
-			auto &tilemap2 = *realm.tilemap2;
-			for (Index row = 0; row < tilemap2.height; ++row)
-				for (Index column = 0; column < tilemap2.width; ++column)
-					if (houseTiles.isBed(tilemap2(column, row))) {
-						bed_position.emplace(row, column);
-						goto found;
-					}
+		if (realm.id != houseRealm)
+			throw std::runtime_error("Gatherer couldn't teleport to house");
 
-			found:
+		if (!pathfind(destination = realm.extraData.at("bed")))
+			throw std::runtime_error("Gatherer couldn't pathfind to bed");
 
-			if (!bed_position || !pathfind(destination = *bed_position))
-				throw std::runtime_error("Gatherer couldn't pathfind to bed");
-			phase = 10;
-		}
+		phase = 10;
 	}
 
 	void Gatherer::setMoney(MoneyCount new_money) {

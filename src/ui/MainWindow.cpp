@@ -585,6 +585,16 @@ namespace Game3 {
 							}
 						}
 						return;
+					case GDK_KEY_q:
+						if (game && game->debugMode) {
+							auto &realm = *game->activeRealm;
+							for (Index row = 0; row < realm.getHeight(); ++row) {
+								for (Index column = 0; column < realm.getWidth(); ++column)
+									std::cout << (realm.pathMap[realm.getIndex(row, column)]? '1' : '0');
+								std::cout << '\n';
+							}
+						}
+						return;
 				}
 			}
 
