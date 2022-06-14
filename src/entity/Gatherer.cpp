@@ -210,8 +210,12 @@ namespace Game3 {
 			if (stack.count == 0) // Couldn't sell any
 				continue;
 
-			inventory->remove(stack, slot);
+			const ItemCount removed = inventory->remove(stack, slot);
 			new_money += sell_price;
+
+			// TODO: maybe prevent the leftover from being destroyed?
+			if (keep_realm.stockpileInventory->add(stack.withCount(removed)))
+				break;
 		}
 
 		setMoney(new_money);
