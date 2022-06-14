@@ -20,9 +20,10 @@ namespace Game3 {
 
 	class Realm: public std::enable_shared_from_this<Realm> {
 		public:
-			constexpr static RealmType OVERWORLD = 1;
-			constexpr static RealmType HOUSE     = 2;
-			constexpr static RealmType KEEP      = 3;
+			constexpr static RealmType OVERWORLD  = 1;
+			constexpr static RealmType HOUSE      = 2;
+			constexpr static RealmType KEEP       = 3;
+			constexpr static RealmType BLACKSMITH = 4;
 
 			static std::unordered_map<RealmType, Texture> textureMap;
 

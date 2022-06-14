@@ -55,6 +55,7 @@ namespace Game3 {
 		switch (type) {
 			case Realm::OVERWORLD:
 			case Realm::HOUSE:
+			case Realm::BLACKSMITH:
 				out = Realm::create();
 				break;
 			case Realm::KEEP:

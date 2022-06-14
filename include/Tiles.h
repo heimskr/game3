@@ -42,6 +42,9 @@ namespace Game3 {
 		constexpr static TileID MARKET1 = 40;
 		constexpr static TileID MARKET2 = 41;
 		constexpr static TileID MARKET3 = 42;
+		constexpr static TileID BLACKSMITH1 = 43;
+		constexpr static TileID BLACKSMITH2 = 44;
+		constexpr static TileID BLACKSMITH3 = 45;
 		constexpr static TileID TOWER_NW = 50;
 		constexpr static TileID TOWER_NE = 51;
 		constexpr static TileID TOWER_SW = 52;

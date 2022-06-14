@@ -8,7 +8,7 @@ namespace Game3 {
 
 	std::unordered_set<TileID> OverworldTiles::solidSet {
 		TOWER_NW, TOWER_NE, TOWER_SW, TOWER_SE, TOWER_WE, TOWER_NS, TOWER_N, TOWER_S, HOUSE1, HOUSE2, HOUSE3, MARKET1, MARKET2, MARKET3, KEEP_NW, KEEP_NE, KEEP_SW, KEEP_SE, IRON_ORE, DIAMOND_ORE,
-		COPPER_ORE, GOLD_ORE, COAL_ORE,
+		COPPER_ORE, GOLD_ORE, COAL_ORE, BLACKSMITH1, BLACKSMITH2, BLACKSMITH3,
 	};
 
 	std::unordered_set<TileID> HouseTiles::landSet {
@@ -27,8 +27,9 @@ namespace Game3 {
 	HouseTiles houseTiles;
 
 	std::unordered_map<RealmID, std::shared_ptr<TileSet>> tileSets {
-		{Realm::OVERWORLD, std::make_shared<OverworldTiles>()},
-		{Realm::HOUSE,     std::make_shared<HouseTiles>()},
-		{Realm::KEEP,      std::make_shared<HouseTiles>()},
+		{Realm::OVERWORLD,  std::make_shared<OverworldTiles>()},
+		{Realm::HOUSE,      std::make_shared<HouseTiles>()},
+		{Realm::KEEP,       std::make_shared<HouseTiles>()},
+		{Realm::BLACKSMITH, std::make_shared<HouseTiles>()},
 	};
 }

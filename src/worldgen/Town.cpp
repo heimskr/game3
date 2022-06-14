@@ -5,6 +5,7 @@
 #include "tileentity/Building.h"
 #include "util/Timer.h"
 #include "util/Util.h"
+#include "worldgen/Blacksmith.h"
 #include "worldgen/Keep.h"
 #include "worldgen/House.h"
 
@@ -146,17 +147,28 @@ namespace Game3::WorldGen {
 			while (!buildable_set.empty()) {
 				const auto index = *buildable_set.begin();
 				if (rng() % 8 == 0) {
-					constexpr static std::array<TileID, 3> markets {OverworldTiles::MARKET1, OverworldTiles::MARKET2, OverworldTiles::MARKET3};
-					const auto market = choose(markets, rng);
-					realm->setLayer2(index, market);
+					constexpr static std::array<TileID, 3> blacksmiths {OverworldTiles::BLACKSMITH1, OverworldTiles::BLACKSMITH2, OverworldTiles::BLACKSMITH3};
+					const auto blacksmith = choose(blacksmiths, rng);
+					realm->setLayer2(index, blacksmith);
+					const RealmID realm_id = game.newRealmID();
+					const Index realm_width  = 9;
+					const Index realm_height = 9;
+					const Position blacksmith_position {index / map_width, index % map_width};
+					auto building = TileEntity::create<Building>(blacksmith, blacksmith_position, realm_id, realm_width * (realm_height - 1) - 3);
+					auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, Realm::textureMap.at(Realm::HOUSE));
+					auto new_realm = Realm::create(realm_id, Realm::BLACKSMITH, new_tilemap);
+					new_realm->setGame(game);
+					WorldGen::generateBlacksmith(new_realm, rng, realm, blacksmith_position + Position(1, 0));
+					game.realms.emplace(realm_id, new_realm);
+					realm->add(building);
 				} else {
 					constexpr static std::array<TileID, 3> houses {OverworldTiles::HOUSE1, OverworldTiles::HOUSE2, OverworldTiles::HOUSE3};
 					const auto house = choose(houses, rng);
 					realm->setLayer2(index, house);
 					const RealmID realm_id = game.newRealmID();
-					const Index realm_width = 9;
+					const Index realm_width  = 9;
 					const Index realm_height = 9;
-					Position house_position {index / map_width, index % map_width};
+					const Position house_position {index / map_width, index % map_width};
 					auto building = TileEntity::create<Building>(house, house_position, realm_id, realm_width * (realm_height - 1) - 3);
 					auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, Realm::textureMap.at(Realm::HOUSE));
 					auto new_realm = Realm::create(realm_id, Realm::HOUSE, new_tilemap);
