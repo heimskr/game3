@@ -46,6 +46,8 @@ namespace Game3::WorldGen {
 			for (column = index % map_width + 1; column < index % map_width + width - 1; ++column) {
 				buildable_set.insert(row * map_width + column);
 				set1(OverworldTiles::DIRT);
+				if (auto tile_entity = realm->tileEntityAt({row, column}))
+					realm->remove(tile_entity);
 			}
 
 		row = index / map_width + height / 2 - 1;
