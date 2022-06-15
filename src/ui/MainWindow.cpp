@@ -13,6 +13,7 @@
 #include "tileentity/Building.h"
 #include "tileentity/Teleporter.h"
 #include "ui/gtk/NewGameDialog.h"
+#include "ui/tab/CraftingTab.h"
 #include "ui/tab/InventoryTab.h"
 #include "ui/tab/MerchantTab.h"
 #include "ui/tab/TextTab.h"
@@ -253,6 +254,7 @@ namespace Game3 {
 		});
 
 		initTab(inventoryTab, *this).add();
+		initTab(craftingTab, *this).add();
 		initTab(textTab, notebook, "", "");
 		initTab(merchantTab, *this);
 		activeTab = inventoryTab;
@@ -700,6 +702,7 @@ namespace Game3 {
 		glArea.get_context()->make_current();
 		debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
 		game->player->focus(*canvas, false);
+		game->initRecipes();
 		canvas->game = game;
 		game->activeRealm->rebind();
 		game->activeRealm->reupload();
@@ -711,6 +714,7 @@ namespace Game3 {
 		game->signal_player_inventory_update().connect([this](const std::shared_ptr<Player> &) {
 			inventoryTab->reset(game);
 			merchantTab->reset(game);
+			craftingTab->reset(game);
 		});
 		game->signal_other_inventory_update().connect([this](const std::shared_ptr<HasRealm> &owner) {
 			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner)) {

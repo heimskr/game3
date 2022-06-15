@@ -82,6 +82,8 @@ namespace Game3 {
 			/** Returns the number of times a recipe can be crafted with the inventory's items. Doesn't take the output of the recipe into account. */
 			ItemCount craftable(const CraftingRecipe &) const;
 
+			bool canCraft(const CraftingRecipe &) const;
+
 		private:
 			std::map<Slot, ItemStack> storage;
 

@@ -35,10 +35,8 @@ namespace Game3 {
 
 			/** We can't store state in a popover, so we have to store it here. */
 			std::shared_ptr<Game> lastGame;
+			size_t lastIndex = 0;
 
-			// int gridWidth() const;
-			// void leftClick(const std::shared_ptr<Game> &, Gtk::Widget *, int click_count, Slot, bool external, double x, double y);
-			// void rightClick(const std::shared_ptr<Game> &, Gtk::Widget *, int click_count, Slot, bool external, double x, double y);
-			// void updatePlayerClasses(const std::shared_ptr<Game> &);
+			void rightClick(const std::shared_ptr<Game> &, Gtk::Widget *, size_t index, double x, double y);
 	};
 }

@@ -276,6 +276,13 @@ namespace Game3 {
 		return out;
 	}
 
+	bool Inventory::canCraft(const CraftingRecipe &recipe) const {
+		for (const ItemStack &input: recipe.inputs)
+			if (count(input) < input.count)
+				return false;
+		return true;
+	}
+
 	bool Inventory::contains(const ItemStack &needle) const {
 		ItemCount remaining = needle.count;
 		for (const auto &[slot, stack]: storage) {

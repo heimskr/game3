@@ -12,6 +12,7 @@
 
 namespace Game3 {
 	class Canvas;
+	class CraftingTab;
 	class Game;
 	class InventoryTab;
 	class MerchantTab;
@@ -27,6 +28,7 @@ namespace Game3 {
 			std::shared_ptr<TextTab> textTab;
 			std::shared_ptr<InventoryTab> inventoryTab;
 			std::shared_ptr<MerchantTab> merchantTab;
+			std::shared_ptr<CraftingTab> craftingTab;
 
 			MainWindow(BaseObjectType *, const Glib::RefPtr<Gtk::Builder> &);
 
