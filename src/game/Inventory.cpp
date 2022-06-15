@@ -264,11 +264,13 @@ namespace Game3 {
 		Inventory out(owner, 0);
 		out.storage = json.at("storage");
 		out.slotCount = json.at("slotCount");
+		out.activeSlot = json.at("activeSlot");
 		return out;
 	}
 
 	void to_json(nlohmann::json &json, const Inventory &inventory) {
 		json["storage"] = inventory.storage;
 		json["slotCount"] = inventory.slotCount;
+		json["activeSlot"] = inventory.activeSlot;
 	}
 }

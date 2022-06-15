@@ -127,6 +127,8 @@ namespace Game3 {
 		if (!game)
 			return;
 
+		lastGame = game;
+
 		widgetMap.clear();
 
 		removeChildren(playerGrid);
@@ -136,6 +138,7 @@ namespace Game3 {
 			externalLabel.show();
 		}
 
+		playerWidgetsBySlot.clear();
 		playerWidgets.clear();
 		externalWidgets.clear();
 
@@ -165,14 +168,6 @@ namespace Game3 {
 					fixed.put(*image_ptr, 0, 0);
 					fixed.put(*label_ptr, 0, 0);
 					fixed.set_tooltip_text(label_text);
-					auto left_click = Gtk::GestureClick::create();
-					auto right_click = Gtk::GestureClick::create();
-					left_click->set_button(1);
-					right_click->set_button(3);
-					left_click ->signal_pressed().connect([this, game, slot, external, &fixed](int n, double x, double y) { leftClick (game, &fixed, n, slot, external, x, y); });
-					right_click->signal_pressed().connect([this, game, slot, external, &fixed](int n, double x, double y) { rightClick(game, &fixed, n, slot, external, x, y); });
-					fixed.add_controller(left_click);
-					fixed.add_controller(right_click);
 					widget_ptr = std::move(fixed_ptr);
 					image_ptr->set_size_request(tile_size - InventoryTab::TILE_MAGIC, tile_size - InventoryTab::TILE_MAGIC);
 					label_ptr->set_size_request(tile_size - InventoryTab::TILE_MAGIC, tile_size - InventoryTab::TILE_MAGIC);
@@ -188,6 +183,18 @@ namespace Game3 {
 
 				widget_ptr->set_size_request(tile_size, tile_size);
 				widget_ptr->add_css_class("item-slot");
+				if (slot == inventory.activeSlot && !external)
+					widget_ptr->add_css_class("active-slot");
+				if (!external)
+					playerWidgetsBySlot.emplace(slot, widget_ptr.get());
+				auto left_click = Gtk::GestureClick::create();
+				auto right_click = Gtk::GestureClick::create();
+				left_click->set_button(1);
+				right_click->set_button(3);
+				left_click ->signal_pressed().connect([this, game, slot, external, widget = widget_ptr.get()](int n, double x, double y) { leftClick (game, widget, n, slot, external, x, y); });
+				right_click->signal_pressed().connect([this, game, slot, external, widget = widget_ptr.get()](int n, double x, double y) { rightClick(game, widget, n, slot, external, x, y); });
+				widget_ptr->add_controller(left_click);
+				widget_ptr->add_controller(right_click);
 				widgetMap.try_emplace(widget_ptr.get(), slot, external);
 				grid.attach(*widget_ptr, column, row);
 				widgets.push_back(std::move(widget_ptr));
@@ -222,11 +229,17 @@ namespace Game3 {
 		return scrolled.get_width() / (TILE_SIZE + 2 * TILE_MARGIN);
 	}
 
-	void InventoryTab::leftClick(const std::shared_ptr<Game> &, Gtk::Widget *, int, Slot, bool, double, double) {
-		
+	void InventoryTab::leftClick(const std::shared_ptr<Game> &game, Gtk::Widget *, int, Slot slot, bool external, double, double) {
+		if (!external) {
+			game->player->inventory->activeSlot = slot;
+			updatePlayerClasses(game);
+		}
 	}
 
 	void InventoryTab::rightClick(const std::shared_ptr<Game> &game, Gtk::Widget *widget, int, Slot slot, bool external, double x, double y) {
+		if ((external && !externalInventory->contains(slot)) || (!external && !game->player->inventory->contains(slot)))
+			return;
+
 		do {
 			const auto allocation = widget->get_allocation();
 			x += allocation.get_x();
@@ -240,5 +253,14 @@ namespace Game3 {
 		lastSlot = slot;
 		lastExternal = external;
 		popoverMenu.popup();
+	}
+
+	void InventoryTab::updatePlayerClasses(const std::shared_ptr<Game> &game) {
+		const Slot active_slot = game->player->inventory->activeSlot;
+		if (playerWidgetsBySlot.contains(active_slot))
+			playerWidgetsBySlot.at(active_slot)->add_css_class("active-slot");
+		for (auto &[slot, widget]: playerWidgetsBySlot)
+			if (slot != active_slot)
+				widget->remove_css_class("active-slot");
 	}
 }

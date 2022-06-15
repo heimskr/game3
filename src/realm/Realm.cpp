@@ -280,6 +280,10 @@ namespace Game3 {
 		setLayer3(position.row, position.column, tile);
 	}
 
+	bool Realm::interactLayer2(const std::shared_ptr<Player> &player, const Position &position) {
+		return false;
+	}
+
 	std::optional<Position> Realm::getPathableAdjacent(const Position &position) const {
 		const auto width  = getWidth();
 		const auto height = getHeight();

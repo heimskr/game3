@@ -52,11 +52,16 @@ namespace Game3 {
 	void Player::interactNextTo() {
 		auto realm = getRealm();
 		auto player = std::dynamic_pointer_cast<Player>(shared_from_this());
-		auto entity = realm->findEntity(nextTo(), player);
+		const Position next_to = nextTo();
+		auto entity = realm->findEntity(next_to, player);
+		bool interesting = false;
 		if (entity)
-			entity->onInteractNextTo(player);
-		else if (auto tileEntity = realm->tileEntityAt(nextTo()))
-			tileEntity->onInteractNextTo(player);
+			interesting = entity->onInteractNextTo(player);
+		if (!interesting)
+			if (auto tileEntity = realm->tileEntityAt(next_to))
+				interesting = tileEntity->onInteractNextTo(player);
+		if (!interesting)
+			realm->interactLayer2(player, next_to);
 	}
 
 	void Player::teleport(const Position &position, const std::shared_ptr<Realm> &new_realm) {

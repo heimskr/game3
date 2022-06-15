@@ -86,6 +86,7 @@ namespace Game3 {
 			void setLayer1(const Position &, TileID);
 			void setLayer2(const Position &, TileID);
 			void setLayer3(const Position &, TileID);
+			bool interactLayer2(const std::shared_ptr<Player> &, const Position &);
 			inline Index getIndex(const Position &position) const { return position.row * getWidth() + position.column; }
 			inline Index getIndex(Index row, Index column) const { return row * getWidth() + column; }
 			std::optional<Position> getPathableAdjacent(const Position &) const;

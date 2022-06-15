@@ -47,6 +47,7 @@ namespace Game3 {
 			std::shared_ptr<Inventory> externalInventory;
 			Glib::ustring externalName;
 			std::unordered_map<Gtk::Widget *, std::pair<Slot, bool>> widgetMap;
+			std::unordered_map<Slot, Gtk::Widget *> playerWidgetsBySlot;
 
 			/** We can't store state in a popover, so we have to store it here. */
 			std::shared_ptr<Game> lastGame;
@@ -59,5 +60,6 @@ namespace Game3 {
 			int gridWidth() const;
 			void leftClick(const std::shared_ptr<Game> &, Gtk::Widget *, int click_count, Slot, bool external, double x, double y);
 			void rightClick(const std::shared_ptr<Game> &, Gtk::Widget *, int click_count, Slot, bool external, double x, double y);
+			void updatePlayerClasses(const std::shared_ptr<Game> &);
 	};
 }

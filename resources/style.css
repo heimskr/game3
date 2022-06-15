@@ -8,6 +8,10 @@
 	color: white;
 }
 
+.item-slot.active-slot {
+	background: rgba(255, 255, 255, 0.25);
+}
+
 .item-slot > label {
 	text-shadow: black 1px 1px 0, black -1px -1px 0, black -1px 1px 0, black 1px -1px 0, black 1px 0 0, black 0 1px 0, black -1px 0 0, black 0 -1px 0;
 	padding-right: 2px;

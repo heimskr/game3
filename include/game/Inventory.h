@@ -12,6 +12,7 @@ namespace Game3 {
 		public:
 			std::weak_ptr<HasRealm> owner;
 			Slot slotCount = 0;
+			Slot activeSlot = 0;
 
 			Inventory(const std::shared_ptr<HasRealm> &owner_, Slot slot_count);
 
