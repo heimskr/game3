@@ -169,6 +169,25 @@ namespace Game3 {
 		glArea.add_controller(left_click);
 		glArea.add_controller(right_click);
 
+		auto forward  = Gtk::GestureClick::create();
+		auto backward = Gtk::GestureClick::create();
+		forward->set_button(9);
+		backward->set_button(8);
+		forward->signal_pressed().connect([this](int, double, double) {
+			if (game && game->player) {
+				game->player->inventory->nextSlot();
+				inventoryTab->reset(game);
+			}
+		});
+		backward->signal_pressed().connect([this](int, double, double) {
+			if (game && game->player) {
+				game->player->inventory->prevSlot();
+				inventoryTab->reset(game);
+			}
+		});
+		glArea.add_controller(forward);
+		glArea.add_controller(backward);
+
 		auto scroll = Gtk::EventControllerScroll::create();
 		scroll->set_flags(Gtk::EventControllerScroll::Flags::VERTICAL);
 		scroll->signal_scroll().connect([this](double, double y) {

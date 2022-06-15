@@ -243,6 +243,16 @@ namespace Game3 {
 			activeSlot = new_active;
 	}
 
+	void Inventory::prevSlot() {
+		if (0 < activeSlot)
+			--activeSlot;
+	}
+
+	void Inventory::nextSlot() {
+		if (activeSlot < slotCount - 1)
+			++activeSlot;
+	}
+
 	bool Inventory::contains(const ItemStack &needle) const {
 		ItemCount remaining = needle.count;
 		for (const auto &[slot, stack]: storage) {

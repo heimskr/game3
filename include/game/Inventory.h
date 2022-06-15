@@ -65,6 +65,10 @@ namespace Game3 {
 
 			void setActive(Slot);
 
+			void prevSlot();
+
+			void nextSlot();
+
 		private:
 			std::map<Slot, ItemStack> storage;
 
