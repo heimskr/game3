@@ -260,6 +260,7 @@ namespace Game3 {
 		game->player->position = {realm->randomLand / width, realm->randomLand % width};
 		game->player->init();
 		game->player->inventory->add(ItemStack::withDurability(Item::IRON_PICKAXE));
+		game->player->inventory->add(ItemStack::withDurability(Item::IRON_SHOVEL));
 		game->player->inventory->add(ItemStack::withDurability(Item::IRON_AXE));
 		onGameLoaded();
 	}

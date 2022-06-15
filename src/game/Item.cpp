@@ -22,6 +22,8 @@ namespace Game3 {
 		{Item::WOOD,         {208, 336, textureItems}},
 		{Item::IRON_AXE,     { 16, 160, texturePalisade}},
 		{Item::IRON_PICKAXE, {128, 160, texturePalisade}},
+		{Item::IRON_SHOVEL,  {208, 160, texturePalisade}},
+		{Item::SAND,         { 16,   0, texturePalisade}},
 	};
 
 	std::map<ItemID, std::shared_ptr<Item>> Item::items {
@@ -38,11 +40,13 @@ namespace Game3 {
 		{Item::WOOD,         std::make_shared<Item>(Item::WOOD,         "Wood",          3, 64)},
 		{Item::IRON_AXE,     std::make_shared<Item>(Item::IRON_AXE,     "Iron Axe",     50,  1)->addAttribute(ItemAttribute::Axe)},
 		{Item::IRON_PICKAXE, std::make_shared<Item>(Item::IRON_PICKAXE, "Iron Pickaxe", 50,  1)->addAttribute(ItemAttribute::Pickaxe)},
+		{Item::IRON_SHOVEL,  std::make_shared<Item>(Item::IRON_SHOVEL,  "Iron Shovel",  50,  1)->addAttribute(ItemAttribute::Shovel)},
 	};
 
 	std::unordered_map<ItemID, Durability> Item::durabilities {
-		{Item::IRON_AXE, 64},
+		{Item::IRON_AXE,     64},
 		{Item::IRON_PICKAXE, 64},
+		{Item::IRON_SHOVEL,  64},
 	};
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage() {
