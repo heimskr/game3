@@ -238,6 +238,11 @@ namespace Game3 {
 		return std::nullopt;
 	}
 
+	void Inventory::setActive(Slot new_active) {
+		if (0 <= new_active && new_active < slotCount)
+			activeSlot = new_active;
+	}
+
 	bool Inventory::contains(const ItemStack &needle) const {
 		ItemCount remaining = needle.count;
 		for (const auto &[slot, stack]: storage) {

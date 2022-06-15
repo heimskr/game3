@@ -606,6 +606,16 @@ namespace Game3 {
 							}
 						}
 						return;
+					case GDK_KEY_1: if (game && game->player) { game->player->inventory->setActive(0); if (inventoryTab) inventoryTab->reset(game); } return;
+					case GDK_KEY_2: if (game && game->player) { game->player->inventory->setActive(1); if (inventoryTab) inventoryTab->reset(game); } return;
+					case GDK_KEY_3: if (game && game->player) { game->player->inventory->setActive(2); if (inventoryTab) inventoryTab->reset(game); } return;
+					case GDK_KEY_4: if (game && game->player) { game->player->inventory->setActive(3); if (inventoryTab) inventoryTab->reset(game); } return;
+					case GDK_KEY_5: if (game && game->player) { game->player->inventory->setActive(4); if (inventoryTab) inventoryTab->reset(game); } return;
+					case GDK_KEY_6: if (game && game->player) { game->player->inventory->setActive(5); if (inventoryTab) inventoryTab->reset(game); } return;
+					case GDK_KEY_7: if (game && game->player) { game->player->inventory->setActive(6); if (inventoryTab) inventoryTab->reset(game); } return;
+					case GDK_KEY_8: if (game && game->player) { game->player->inventory->setActive(7); if (inventoryTab) inventoryTab->reset(game); } return;
+					case GDK_KEY_9: if (game && game->player) { game->player->inventory->setActive(8); if (inventoryTab) inventoryTab->reset(game); } return;
+					case GDK_KEY_0: if (game && game->player) { game->player->inventory->setActive(9); if (inventoryTab) inventoryTab->reset(game); } return;
 				}
 			}
 

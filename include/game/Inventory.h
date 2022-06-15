@@ -63,6 +63,8 @@ namespace Game3 {
 			/** Returns the first slot containing an item with the given attribute if one exists. */
 			std::optional<Slot> find(ItemAttribute) const;
 
+			void setActive(Slot);
+
 		private:
 			std::map<Slot, ItemStack> storage;
 
