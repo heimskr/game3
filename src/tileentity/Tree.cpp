@@ -9,13 +9,15 @@
 namespace Game3 {
 	bool Tree::onInteractNextTo(const std::shared_ptr<Player> &player) {
 		auto &inventory = *player->inventory;
-
-		if (auto slot = inventory.find(ItemAttribute::Axe)) {
-			if (!inventory.add({Item::WOOD, 1}))
-				getRealm()->remove(shared_from_this());
-			if (inventory[*slot]->reduceDurability())
-				inventory.erase(*slot);
-			return true;
+		const Slot active_slot = inventory.activeSlot;
+		if (auto *active_stack = inventory[active_slot]) {
+			if (active_stack->has(ItemAttribute::Axe)) {
+				if (!inventory.add({Item::WOOD, 1}))
+					getRealm()->remove(shared_from_this());
+				if (active_stack->reduceDurability())
+					inventory.erase(active_slot);
+				return true;
+			}
 		}
 
 		return false;

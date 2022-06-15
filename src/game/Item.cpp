@@ -109,6 +109,10 @@ namespace Game3 {
 		return (data["durability"] = std::max(0, data["durability"].get<Durability>() - amount)) == 0;
 	}
 
+	bool ItemStack::has(ItemAttribute attribute) const {
+		return item->attributes.contains(attribute);
+	}
+
 	void to_json(nlohmann::json &json, const ItemStack &stack) {
 		json[0] = stack.item->id;
 		json[1] = stack.count;

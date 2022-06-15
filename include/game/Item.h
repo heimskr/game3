@@ -89,6 +89,8 @@ namespace Game3 {
 			/** Decreases the durability by a given amount if the ItemStack has durability data. Returns true if the durability was present and reduced to zero or false otherwise. */
 			bool reduceDurability(Durability = 1);
 
+			bool has(ItemAttribute) const;
+
 		private:
 			Glib::RefPtr<Gdk::Pixbuf> cachedImage;
 	};
