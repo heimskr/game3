@@ -280,7 +280,36 @@ namespace Game3 {
 		setLayer3(position.row, position.column, tile);
 	}
 
-	bool Realm::interactLayer2(const std::shared_ptr<Player> &player, const Position &position) {
+	bool Realm::interactGround(const std::shared_ptr<Player> &player, const Position &position) {
+		switch (type) {
+			case Realm::OVERWORLD: {
+				const TileID tile = tilemap1->tiles.at(getIndex(position));
+				std::optional<ItemID> item;
+				std::optional<ItemAttribute> attribute;
+
+				if (tile == OverworldTiles::SAND) {
+					item.emplace(Item::SAND);
+					attribute.emplace(ItemAttribute::Shovel);
+				} else if (tile == OverworldTiles::STONE) {
+					item.emplace(Item::STONE);
+					attribute.emplace(ItemAttribute::Pickaxe);
+				}
+
+				if (item && attribute) {
+					auto &inventory = *player->inventory;
+					if (auto *stack = inventory.getActive()) {
+						if (stack->has(*attribute) && !inventory.add({*item, 1})) {
+							if (stack->reduceDurability())
+								inventory.erase(inventory.activeSlot);
+							return true;
+						}
+					}
+				}
+
+				break;
+			}
+		}
+
 		return false;
 	}
 

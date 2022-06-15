@@ -17,12 +17,13 @@ namespace Game3 {
 			if (active_stack->has(ItemAttribute::Axe)) {
 				auto &realm = *getRealm();
 				auto &game = realm.getGame();
-				if (!inventory.add({Item::WOOD, 1}))
+				if (!inventory.add({Item::WOOD, 1})) {
 					realm.remove(shared_from_this());
-				if (active_stack->reduceDurability())
-					inventory.erase(active_slot);
-				game.canvas.window.inventoryTab->reset(game.shared_from_this());
-				return true;
+					if (active_stack->reduceDurability())
+						inventory.erase(active_slot);
+					game.canvas.window.inventoryTab->reset(game.shared_from_this());
+					return true;
+				}
 			}
 		}
 

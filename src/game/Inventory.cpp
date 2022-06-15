@@ -142,9 +142,14 @@ namespace Game3 {
 		return true;
 	}
 
-	void Inventory::erase(Slot slot) {
+	void Inventory::erase(Slot slot, bool suppress_notification) {
 		storage.erase(slot);
-		notifyOwner();
+		if (!suppress_notification)
+			notifyOwner();
+	}
+
+	void Inventory::erase(bool suppress_notification) {
+		erase(activeSlot, suppress_notification);
 	}
 
 	ItemCount Inventory::count(const Item &item) const {
@@ -236,6 +241,14 @@ namespace Game3 {
 			if (stack.item->attributes.contains(attribute))
 				return slot;
 		return std::nullopt;
+	}
+
+	ItemStack * Inventory::getActive() {
+		return storage.contains(activeSlot)? &storage.at(activeSlot) : nullptr;
+	}
+
+	const ItemStack * Inventory::getActive() const {
+		return storage.contains(activeSlot)? &storage.at(activeSlot) : nullptr;
 	}
 
 	void Inventory::setActive(Slot new_active) {

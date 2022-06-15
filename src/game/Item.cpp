@@ -24,6 +24,7 @@ namespace Game3 {
 		{Item::IRON_PICKAXE, {128, 160, texturePalisade}},
 		{Item::IRON_SHOVEL,  {208, 160, texturePalisade}},
 		{Item::SAND,         { 16,   0, texturePalisade}},
+		{Item::STONE,        {208, 320, textureItems}},
 	};
 
 	std::map<ItemID, std::shared_ptr<Item>> Item::items {
@@ -41,6 +42,8 @@ namespace Game3 {
 		{Item::IRON_AXE,     std::make_shared<Item>(Item::IRON_AXE,     "Iron Axe",     50,  1)->addAttribute(ItemAttribute::Axe)},
 		{Item::IRON_PICKAXE, std::make_shared<Item>(Item::IRON_PICKAXE, "Iron Pickaxe", 50,  1)->addAttribute(ItemAttribute::Pickaxe)},
 		{Item::IRON_SHOVEL,  std::make_shared<Item>(Item::IRON_SHOVEL,  "Iron Shovel",  50,  1)->addAttribute(ItemAttribute::Shovel)},
+		{Item::SAND,         std::make_shared<Item>(Item::SAND,         "Sand",          1, 64)},
+		{Item::STONE,        std::make_shared<Item>(Item::STONE,        "Stone",         1, 64)},
 	};
 
 	std::unordered_map<ItemID, Durability> Item::durabilities {

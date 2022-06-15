@@ -31,7 +31,10 @@ namespace Game3 {
 			/** Swaps two slots. Returns true if at least one of the first slot contained an item and the second slot was valid. */
 			bool swap(Slot, Slot);
 
-			void erase(Slot);
+			void erase(Slot, bool suppress_notification = false);
+
+			/** Erases the active slot. */
+			void erase(bool suppress_notification = false);
 
 			inline bool empty() const { return storage.empty(); }
 
@@ -63,11 +66,17 @@ namespace Game3 {
 			/** Returns the first slot containing an item with the given attribute if one exists. */
 			std::optional<Slot> find(ItemAttribute) const;
 
+			ItemStack * getActive();
+
+			const ItemStack * getActive() const;
+
 			void setActive(Slot);
 
 			void prevSlot();
 
 			void nextSlot();
+
+			void notifyOwner();
 
 		private:
 			std::map<Slot, ItemStack> storage;
@@ -75,7 +84,6 @@ namespace Game3 {
 		public:
 			inline const decltype(storage) & getStorage() const { return storage; }
 			inline Glib::RefPtr<Gdk::Pixbuf> getImage(Slot slot) { return storage.at(slot).getImage(); }
-			void notifyOwner();
 
 			static Inventory fromJSON(const nlohmann::json &, const std::shared_ptr<HasRealm> &);
 

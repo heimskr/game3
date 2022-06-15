@@ -61,7 +61,7 @@ namespace Game3 {
 			if (auto tileEntity = realm->tileEntityAt(next_to))
 				interesting = tileEntity->onInteractNextTo(player);
 		if (!interesting)
-			realm->interactLayer2(player, next_to);
+			realm->interactGround(player, next_to);
 	}
 
 	void Player::teleport(const Position &position, const std::shared_ptr<Realm> &new_realm) {
