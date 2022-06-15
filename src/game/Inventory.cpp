@@ -130,10 +130,19 @@ namespace Game3 {
 		if (slotCount <= source || slotCount <= destination || !storage.contains(source))
 			return false;
 
+		ItemStack &source_stack = storage.at(source);
+
 		if (storage.contains(destination)) {
-			std::swap(storage.at(source), storage.at(destination));
+			ItemStack &destination_stack = storage.at(destination);
+			if (destination_stack.canMerge(source_stack)) {
+				ItemCount to_move = std::min(source_stack.count, destination_stack.item->maxCount - destination_stack.count);
+				destination_stack.count += to_move;
+				if ((source_stack.count -= to_move) == 0)
+					storage.erase(source);
+			} else
+				std::swap(storage.at(source), storage.at(destination));
 		} else {
-			storage[destination] = storage.at(source);
+			storage.emplace(destination, std::move(source_stack));
 			storage.erase(source);
 		}
 
