@@ -25,7 +25,7 @@ namespace Game3 {
 		auto group = Gio::SimpleActionGroup::create();
 		group->add_action("craft_one", [this] { craftOne(lastGame, lastIndex); });
 		group->add_action("craft_x",   [this] { std::cout <<   "x\n"; });
-		group->add_action("craft_all", [this] { std::cout << "all\n"; });
+		group->add_action("craft_all", [this] { craftAll(lastGame, lastIndex); });
 
 		mainWindow.insert_action_group("crafting_popup", group);
 		popoverMenu.set_parent(mainWindow); // TODO: fix this silliness
@@ -119,17 +119,25 @@ namespace Game3 {
 		}
 	}
 
-	void CraftingTab::craftOne(const std::shared_ptr<Game> &game, size_t index) {
+	bool CraftingTab::craftOne(const std::shared_ptr<Game> &game, size_t index) {
 		CraftingRecipe &recipe = game->recipes.at(index);
 		Inventory &inventory = *game->player->inventory;
 		std::vector<ItemStack> leftovers;
 		if (!inventory.craft(recipe, leftovers))
-			return;
+			return false;
 		for (auto &leftover: leftovers)
 			leftover.spawn(game->player->getRealm(), game->player->position);
+		return true;
 	}
 
-	void CraftingTab::leftClick(const std::shared_ptr<Game> &game, Gtk::Widget *widget, size_t index, int n, double x, double y) {
+	size_t CraftingTab::craftAll(const std::shared_ptr<Game> &game, size_t index) {
+		size_t out = 0;
+		while (craftOne(game, index))
+			++out;
+		return out;
+	}
+
+	void CraftingTab::leftClick(const std::shared_ptr<Game> &game, Gtk::Widget *, size_t index, int n, double, double) {
 		if (n % 2 == 0)
 			craftOne(game, index);
 	}

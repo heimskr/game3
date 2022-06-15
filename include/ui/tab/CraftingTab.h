@@ -36,7 +36,11 @@ namespace Game3 {
 			std::shared_ptr<Game> lastGame;
 			size_t lastIndex = 0;
 
-			void craftOne(const std::shared_ptr<Game> &, size_t index);
+			/** Returns whether crafting was successful. */
+			bool craftOne(const std::shared_ptr<Game> &, size_t index);
+
+			size_t craftAll(const std::shared_ptr<Game> &, size_t index);
+
 			void leftClick(const std::shared_ptr<Game> &, Gtk::Widget *, size_t index, int n, double x, double y);
 			void rightClick(const std::shared_ptr<Game> &, Gtk::Widget *, size_t index, double x, double y);
 	};
