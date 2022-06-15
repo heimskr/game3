@@ -10,7 +10,9 @@
 #include "Types.h"
 
 namespace Game3 {
+	class Realm;
 	class Texture;
+	struct Position;
 
 	struct ItemTexture {
 		int x;
@@ -98,6 +100,8 @@ namespace Game3 {
 			bool hasDurability() const;
 
 			double getDurabilityFraction() const;
+
+			void spawn(const std::shared_ptr<Realm> &, const Position &) const;
 
 		private:
 			Glib::RefPtr<Gdk::Pixbuf> cachedImage;

@@ -23,7 +23,7 @@ namespace Game3 {
 		popoverMenu.set_menu_model(gmenu);
 
 		auto group = Gio::SimpleActionGroup::create();
-		group->add_action("craft_one", [this] { std::cout << "one\n"; });
+		group->add_action("craft_one", [this] { craftOne(lastGame, lastIndex); });
 		group->add_action("craft_x",   [this] { std::cout <<   "x\n"; });
 		group->add_action("craft_all", [this] { std::cout << "all\n"; });
 
@@ -94,6 +94,21 @@ namespace Game3 {
 				hbox->append(*left_vbox);
 				hbox->append(*right_vbox);
 				vbox.append(*hbox);
+
+				auto left_click = Gtk::GestureClick::create();
+				left_click->set_button(1);
+				left_click->signal_pressed().connect([this, game, hbox = hbox.get(), index](int n, double x, double y) {
+					leftClick(game, hbox, index, n, x, y);
+				});
+				hbox->add_controller(left_click);
+
+				auto right_click = Gtk::GestureClick::create();
+				right_click->set_button(3);
+				right_click->signal_pressed().connect([this, game, hbox = hbox.get(), index](int, double x, double y) {
+					rightClick(game, hbox, index, x, y);
+				});
+				hbox->add_controller(right_click);
+
 				widgets.push_back(std::move(output_label));
 				widgets.push_back(std::move(left_vbox));
 				widgets.push_back(std::move(right_vbox));
@@ -102,6 +117,21 @@ namespace Game3 {
 
 			++index;
 		}
+	}
+
+	void CraftingTab::craftOne(const std::shared_ptr<Game> &game, size_t index) {
+		CraftingRecipe &recipe = game->recipes.at(index);
+		Inventory &inventory = *game->player->inventory;
+		std::vector<ItemStack> leftovers;
+		if (!inventory.craft(recipe, leftovers))
+			return;
+		for (auto &leftover: leftovers)
+			leftover.spawn(game->player->getRealm(), game->player->position);
+	}
+
+	void CraftingTab::leftClick(const std::shared_ptr<Game> &game, Gtk::Widget *widget, size_t index, int n, double x, double y) {
+		if (n % 2 == 0)
+			craftOne(game, index);
 	}
 
 	void CraftingTab::rightClick(const std::shared_ptr<Game> &game, Gtk::Widget *widget, size_t index, double x, double y) {

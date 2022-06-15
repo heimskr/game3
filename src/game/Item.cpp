@@ -1,5 +1,7 @@
 #include "Texture.h"
+#include "entity/ItemEntity.h"
 #include "game/Item.h"
+#include "realm/Realm.h"
 
 namespace Game3 {
 	static Texture textureShortsword  {"resources/items/shortsword.png"};
@@ -131,6 +133,10 @@ namespace Game3 {
 			return 1.;
 
 		return data.at("durability").get<double>() / data.at("maxDurability").get<double>();
+	}
+
+	void ItemStack::spawn(const std::shared_ptr<Realm> &realm, const Position &position) const {
+		realm->spawn<ItemEntity>(position, *this);
 	}
 
 	void to_json(nlohmann::json &json, const ItemStack &stack) {

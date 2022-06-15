@@ -84,6 +84,9 @@ namespace Game3 {
 
 			bool canCraft(const CraftingRecipe &) const;
 
+			/** Crafts a recipe. Returns whether the recipe could be crafted. */
+			bool craft(const CraftingRecipe &, std::vector<ItemStack> &leftovers);
+
 		private:
 			std::map<Slot, ItemStack> storage;
 

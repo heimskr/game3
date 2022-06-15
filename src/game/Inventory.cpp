@@ -283,6 +283,18 @@ namespace Game3 {
 		return true;
 	}
 
+	bool Inventory::craft(const CraftingRecipe &recipe, std::vector<ItemStack> &leftovers) {
+		if (!canCraft(recipe))
+			return false;
+		leftovers.clear();
+		for (const ItemStack &input: recipe.inputs)
+			remove(input);
+		for (const ItemStack &output: recipe.outputs)
+			if (auto leftover = add(output))
+				leftovers.push_back(std::move(*leftover));
+		return true;
+	}
+
 	bool Inventory::contains(const ItemStack &needle) const {
 		ItemCount remaining = needle.count;
 		for (const auto &[slot, stack]: storage) {
