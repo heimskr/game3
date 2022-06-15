@@ -25,13 +25,14 @@ namespace Game3 {
 		json["name"] = name;
 	}
 
-	void Chest::onInteractNextTo(const std::shared_ptr<Player> &player) {
+	bool Chest::onInteractNextTo(const std::shared_ptr<Player> &player) {
 		auto &tab = *getRealm()->getGame().canvas.window.inventoryTab;
 		player->queueForMove([player, &tab](const auto &) {
 			tab.resetExternalInventory();
 			return true;
 		});
 		tab.setExternalInventory(name, inventory);
+		return true;
 	}
 
 	void Chest::absorbJSON(const nlohmann::json &json) {

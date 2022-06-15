@@ -34,7 +34,7 @@ namespace Game3 {
 		money = json.at("money");
 	}
 
-	void Merchant::onInteractNextTo(const std::shared_ptr<Player> &player) {
+	bool Merchant::onInteractNextTo(const std::shared_ptr<Player> &player) {
 		auto &window = getRealm()->getGame().canvas.window;
 		auto &tab = *window.merchantTab;
 		player->queueForMove([player, &tab](const auto &) {
@@ -45,6 +45,7 @@ namespace Game3 {
 		window.delay([this, &tab] {
 			tab.setMerchantInventory("Merchant", inventory, greed);
 		}, 2);
+		return true;
 	}
 
 	void to_json(nlohmann::json &json, const Merchant &merchant) {

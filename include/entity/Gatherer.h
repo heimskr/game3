@@ -29,7 +29,7 @@ namespace Game3 {
 			nlohmann::json toJSON() const override;
 			void absorbJSON(const nlohmann::json &) override;
 			void initAfterRealm() override;
-			void onInteractNextTo(const std::shared_ptr<Player> &) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 			void tick(Game &, float delta) override;
 
 			friend class Entity;

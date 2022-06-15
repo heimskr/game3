@@ -83,10 +83,10 @@ namespace Game3 {
 			virtual void tick(Game &, float delta);
 			/** Removes the entity from existence. */
 			virtual void remove();
-			/** Handles when the player interacts with the tile they're on and that tile contains this entity. */
-			virtual void onInteractOn(const std::shared_ptr<Player> &) {}
-			/** Handles when the player interacts with the tile in front of them and that tile contains this entity. */
-			virtual void onInteractNextTo(const std::shared_ptr<Player> &) {}
+			/** Handles when the player interacts with the tile they're on and that tile contains this entity. Returns whether anything interesting happened. */
+			virtual bool onInteractOn(const std::shared_ptr<Player> &) { return false; }
+			/** Handles when the player interacts with the tile in front of them and that tile contains this entity. Returns whether anything interesting happened. */
+			virtual bool onInteractNextTo(const std::shared_ptr<Player> &) { return false; }
 			inline EntityID id() const { return id_; }
 			inline const Position::value_type & row()    const { return position.row;    }
 			inline const Position::value_type & column() const { return position.column; }

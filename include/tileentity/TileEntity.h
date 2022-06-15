@@ -48,10 +48,10 @@ namespace Game3 {
 			virtual void render(SpriteRenderer &) {}
 			/** Removes the tile entity from existence. */
 			virtual void remove();
-			/** Handles when the player interacts with the tile they're on and that tile contains this tile entity. */
-			virtual void onInteractOn(const std::shared_ptr<Player> &) {}
-			/** Handles when the player interacts with the tile in front of them and that tile contains this tile entity. */
-			virtual void onInteractNextTo(const std::shared_ptr<Player> &) {}
+			/** Handles when the player interacts with the tile they're on and that tile contains this tile entity. Returns whether anything interesting happened. */
+			virtual bool onInteractOn(const std::shared_ptr<Player> &) { return false; }
+			/** Handles when the player interacts with the tile in front of them and that tile contains this tile entity. Returns whether anything interesting happened. */
+			virtual bool onInteractNextTo(const std::shared_ptr<Player> &) { return false; }
 			/** Handles when an entity steps on this tile entity's position. */
 			virtual void onOverlap(const std::shared_ptr<Entity> &) {}
 			void setRealm(const std::shared_ptr<Realm> &);

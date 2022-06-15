@@ -14,7 +14,7 @@ namespace Game3 {
 
 			TileEntityID getID() const override { return TileEntity::TREE; }
 
-			void onInteractNextTo(const std::shared_ptr<Player> &) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 			void render(SpriteRenderer &) override;
 
 		protected:

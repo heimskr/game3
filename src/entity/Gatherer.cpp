@@ -59,7 +59,7 @@ namespace Game3 {
 			throw std::runtime_error("Couldn't find keep for gatherer");
 	}
 
-	void Gatherer::onInteractNextTo(const std::shared_ptr<Player> &player) {
+	bool Gatherer::onInteractNextTo(const std::shared_ptr<Player> &player) {
 		auto &tab = *getRealm()->getGame().canvas.window.inventoryTab;
 		std::cout << "Gatherer: money = " << money << ", phase = " << int(phase) << '\n';
 		player->queueForMove([player, &tab](const auto &) {
@@ -67,6 +67,7 @@ namespace Game3 {
 			return true;
 		});
 		tab.setExternalInventory("Gatherer", inventory);
+		return true;
 	}
 
 	void Gatherer::tick(Game &game, float delta) {

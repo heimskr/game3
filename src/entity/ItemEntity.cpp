@@ -64,12 +64,13 @@ namespace Game3 {
 		}
 	}
 
-	void ItemEntity::interact(const std::shared_ptr<Player> &player) {
+	bool ItemEntity::interact(const std::shared_ptr<Player> &player) {
 		auto leftover = player->inventory->add(stack);
 		if (leftover)
 			stack = std::move(*leftover);
 		else
 			remove();
+		return true;
 	}
 
 	void to_json(nlohmann::json &json, const ItemEntity &item_entity) {

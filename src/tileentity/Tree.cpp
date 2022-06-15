@@ -7,14 +7,18 @@
 #include "ui/SpriteRenderer.h"
 
 namespace Game3 {
-	void Tree::onInteractNextTo(const std::shared_ptr<Player> &player) {
+	bool Tree::onInteractNextTo(const std::shared_ptr<Player> &player) {
 		auto &inventory = *player->inventory;
+
 		if (auto slot = inventory.find(ItemAttribute::Axe)) {
 			if (!inventory.add({Item::WOOD, 1}))
 				getRealm()->remove(shared_from_this());
 			if (inventory[*slot]->reduceDurability())
 				inventory.erase(*slot);
+			return true;
 		}
+
+		return false;
 	}
 
 	void Tree::render(SpriteRenderer &sprite_renderer) {

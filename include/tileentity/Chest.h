@@ -23,7 +23,7 @@ namespace Game3 {
 			TileEntityID getID() const override { return TileEntity::CHEST; }
 
 			void toJSON(nlohmann::json &) const override;
-			void onInteractNextTo(const std::shared_ptr<Player> &) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 			void absorbJSON(const nlohmann::json &) override;
 			void render(SpriteRenderer &) override;
 			void setInventory(Slot slot_count);

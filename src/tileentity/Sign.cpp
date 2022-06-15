@@ -17,12 +17,13 @@ namespace Game3 {
 		json["name"] = name;
 	}
 
-	void Sign::onInteractNextTo(const std::shared_ptr<Player> &player) {
+	bool Sign::onInteractNextTo(const std::shared_ptr<Player> &player) {
 		getRealm()->getGame().setText(text, name, true, true);
 		player->queueForMove([player](const auto &) {
 			player->getRealm()->getGame().canvas.window.textTab->hide();
 			return true;
 		});
+		return true;
 	}
 
 	void Sign::absorbJSON(const nlohmann::json &json) {

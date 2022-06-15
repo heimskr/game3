@@ -10,8 +10,9 @@ namespace Game3 {
 		json["entrance"] = entrance;
 	}
 
-	void Building::onInteractNextTo(const std::shared_ptr<Player> &player) {
+	bool Building::onInteractNextTo(const std::shared_ptr<Player> &player) {
 		teleport(player);
+		return true;
 	}
 
 	void Building::absorbJSON(const nlohmann::json &json) {
