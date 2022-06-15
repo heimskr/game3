@@ -159,6 +159,8 @@ namespace Game3 {
 					Glib::ustring label_text = stack.item->name;
 					if (stack.count != 1)
 						label_text += " \u00d7 " + std::to_string(stack.count);
+					if (stack.hasDurability())
+						label_text += "\n(" + std::to_string(stack.data.at("durability").get<int>()) + "/" + std::to_string(stack.data.at("maxDurability").get<int>()) + ")";
 					auto fixed_ptr = std::make_unique<Gtk::Fixed>();
 					auto image_ptr = std::make_unique<Gtk::Image>(inventory.getImage(slot));
 					auto label_ptr = std::make_unique<Gtk::Label>(std::to_string(stack.count));

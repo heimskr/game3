@@ -4,7 +4,10 @@
 #include "game/Inventory.h"
 #include "realm/Realm.h"
 #include "tileentity/Tree.h"
+#include "ui/Canvas.h"
+#include "ui/MainWindow.h"
 #include "ui/SpriteRenderer.h"
+#include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
 	bool Tree::onInteractNextTo(const std::shared_ptr<Player> &player) {
@@ -12,10 +15,13 @@ namespace Game3 {
 		const Slot active_slot = inventory.activeSlot;
 		if (auto *active_stack = inventory[active_slot]) {
 			if (active_stack->has(ItemAttribute::Axe)) {
+				auto &realm = *getRealm();
+				auto &game = realm.getGame();
 				if (!inventory.add({Item::WOOD, 1}))
-					getRealm()->remove(shared_from_this());
+					realm.remove(shared_from_this());
 				if (active_stack->reduceDurability())
 					inventory.erase(active_slot);
+				game.canvas.window.inventoryTab->reset(game.shared_from_this());
 				return true;
 			}
 		}
