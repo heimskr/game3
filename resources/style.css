@@ -18,6 +18,10 @@
 	padding-bottom: 2px;
 }
 
+progressbar.item-durability.horizontal > trough {
+	min-width: 10px;
+}
+
 .text-tab {
 	padding: 10px;
 }

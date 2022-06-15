@@ -104,13 +104,24 @@ namespace Game3 {
 	}
 
 	bool ItemStack::reduceDurability(Durability amount) {
-		if (!data.contains("durability"))
+		if (!hasDurability())
 			return false;
 		return (data["durability"] = std::max(0, data["durability"].get<Durability>() - amount)) == 0;
 	}
 
 	bool ItemStack::has(ItemAttribute attribute) const {
 		return item->attributes.contains(attribute);
+	}
+
+	bool ItemStack::hasDurability() const {
+		return data.contains("durability");
+	}
+
+	double ItemStack::getDurabilityFraction() const {
+		if (!hasDurability())
+			return 1.;
+
+		return data.at("durability").get<double>() / data.at("maxDurability").get<double>();
 	}
 
 	void to_json(nlohmann::json &json, const ItemStack &stack) {

@@ -91,6 +91,10 @@ namespace Game3 {
 
 			bool has(ItemAttribute) const;
 
+			bool hasDurability() const;
+
+			double getDurabilityFraction() const;
+
 		private:
 			Glib::RefPtr<Gdk::Pixbuf> cachedImage;
 	};
