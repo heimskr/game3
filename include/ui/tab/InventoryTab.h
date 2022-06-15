@@ -11,6 +11,10 @@ namespace Game3 {
 
 	class InventoryTab: public Tab {
 		public:
+			constexpr static int TILE_MARGIN = 2;
+			constexpr static int TILE_SIZE = 64;
+			constexpr static int TILE_MAGIC = 5;
+
 			MainWindow &mainWindow;
 
 			InventoryTab() = delete;
@@ -32,10 +36,6 @@ namespace Game3 {
 			std::shared_ptr<Inventory> getExternalInventory() const { return externalInventory; }
 
 		private:
-			constexpr static int TILE_MARGIN = 2;
-			constexpr static int TILE_SIZE = 64;
-			constexpr static int TILE_MAGIC = 5;
-
 			Gtk::ScrolledWindow scrolled;
 			Gtk::Grid playerGrid;
 			Gtk::Grid externalGrid;

@@ -7,12 +7,14 @@
 #include "ui/gtk/NumericEntry.h"
 #include "ui/gtk/Util.h"
 #include "ui/tab/CraftingTab.h"
+#include "ui/tab/InventoryTab.h"
 #include "util/Util.h"
 
 namespace Game3 {
 	CraftingTab::CraftingTab(MainWindow &main_window): Tab(main_window.notebook), mainWindow(main_window) {
-		scrolled.set_child(vbox);
 		scrolled.set_vexpand(true);
+		scrolled.add_css_class("crafting-tab");
+		scrolled.set_child(vbox);
 
 		auto gmenu = Gio::Menu::create();
 		gmenu->append("Craft _1", "crafting_popup.craft_one");
@@ -37,15 +39,64 @@ namespace Game3 {
 
 		lastGame = game;
 
-		removeChildren(hbox);
+		// Perhaps I ought to use a grid.
+		removeChildren(vbox);
 		widgets.clear();
 
 		size_t index = 0;
 		auto &inventory = *game->player->inventory;
-		for (const auto &recipe: game->recipes) {
+		for (auto &recipe: game->recipes) {
 			if (inventory.canCraft(recipe)) {
 				auto hbox = std::make_unique<Gtk::Box>(Gtk::Orientation::HORIZONTAL);
+				auto left_vbox = std::make_unique<Gtk::Box>(Gtk::Orientation::VERTICAL);
+				auto right_vbox = std::make_unique<Gtk::Box>(Gtk::Orientation::VERTICAL);
+				Glib::ustring output_label_text;
+				for (ItemStack &output: recipe.outputs) {
+					auto fixed = std::make_unique<Gtk::Fixed>();
+					auto image = std::make_unique<Gtk::Image>(output.getImage());
+					auto label = std::make_unique<Gtk::Label>(std::to_string(output.count));
+					if (!output_label_text.empty())
+						output_label_text += " + ";
+					if (output.count != 1)
+						output_label_text += std::to_string(output.count) + ' ';
+					output_label_text += output.item->name;
+					Glib::ustring tooltip = output.item->name;
+					if (output.count != 1)
+						tooltip += " \u00d7 " + std::to_string(output.count);
+					label->set_tooltip_text(tooltip);
+					label->set_xalign(1.f);
+					label->set_yalign(1.f);
+					image->set_size_request(InventoryTab::TILE_SIZE - InventoryTab::TILE_MAGIC, InventoryTab::TILE_SIZE - InventoryTab::TILE_MAGIC);
+					label->set_size_request(InventoryTab::TILE_SIZE - InventoryTab::TILE_MAGIC, InventoryTab::TILE_SIZE - InventoryTab::TILE_MAGIC);
+					fixed->put(*image, 0, 0);
+					fixed->put(*label, 0, 0);
+					left_vbox->append(*fixed);
+					widgets.push_back(std::move(fixed));
+					widgets.push_back(std::move(image));
+					widgets.push_back(std::move(label));
+				}
 
+				auto output_label = std::make_unique<Gtk::Label>(output_label_text);
+				output_label->set_xalign(0.f);
+				output_label->add_css_class("output-label");
+				right_vbox->append(*output_label);
+
+				for (const ItemStack &input: recipe.inputs) {
+					auto label = std::make_unique<Gtk::Label>((input.count != 1? std::to_string(input.count) + " \u00d7 " : "") + input.item->name);
+					label->set_xalign(0.f);
+					label->add_css_class("input-label");
+					right_vbox->append(*label);
+					widgets.push_back(std::move(label));
+				}
+
+				right_vbox->add_css_class("right");
+				hbox->add_css_class("recipe");
+				hbox->append(*left_vbox);
+				hbox->append(*right_vbox);
+				vbox.append(*hbox);
+				widgets.push_back(std::move(output_label));
+				widgets.push_back(std::move(left_vbox));
+				widgets.push_back(std::move(right_vbox));
 				widgets.push_back(std::move(hbox));
 			}
 

@@ -5,6 +5,7 @@
 #include "tileentity/Stockpile.h"
 #include "tileentity/Teleporter.h"
 #include "tileentity/TileEntity.h"
+#include "tileentity/Tree.h"
 
 namespace Game3 {
 	std::shared_ptr<TileEntity> TileEntity::fromJSON(const nlohmann::json &json) {
@@ -26,6 +27,9 @@ namespace Game3 {
 				break;
 			case TileEntity::STOCKPILE:
 				out = TileEntity::create<Stockpile>();
+				break;
+			case TileEntity::TREE:
+				out = TileEntity::create<Tree>();
 				break;
 			default:
 				throw std::invalid_argument("Unrecognized TileEntity ID: " + std::to_string(id));

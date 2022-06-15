@@ -25,3 +25,25 @@ progressbar.item-durability.horizontal > trough {
 .text-tab {
 	padding: 10px;
 }
+
+.crafting-tab {
+	padding: 10px;
+	padding-top: 5px;
+}
+
+.recipe {
+	padding-top: 5px;
+}
+
+.recipe .right {
+	padding-left: 10px;
+}
+
+.recipe .output-label {
+	padding-bottom: 1px;
+	font-weight: bold;
+}
+
+.recipe .input-label {
+	padding-left: 10px;
+}
