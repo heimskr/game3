@@ -159,10 +159,12 @@ namespace Game3 {
 		left_click->set_button(1);
 		right_click->set_button(3);
 		left_click->signal_released().connect([this](int n, double x, double y) {
+			glArea.grab_focus();
 			if (game)
 				game->click(1, n, x, y);
 		});
 		right_click->signal_released().connect([this](int n, double x, double y) {
+			glArea.grab_focus();
 			if (game)
 				game->click(3, n, x, y);
 		});
