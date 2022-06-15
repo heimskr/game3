@@ -201,7 +201,7 @@ namespace Game3 {
 				auto right_click = Gtk::GestureClick::create();
 				left_click->set_button(1);
 				right_click->set_button(3);
-				left_click ->signal_pressed().connect([this, game, slot, external, widget = widget_ptr.get()](int n, double x, double y) { leftClick (game, widget, n, slot, external, x, y); });
+				left_click->signal_released().connect([this, game, slot, external, widget = widget_ptr.get()](int n, double x, double y) { leftClick (game, widget, n, slot, external, x, y); });
 				right_click->signal_pressed().connect([this, game, slot, external, widget = widget_ptr.get()](int n, double x, double y) { rightClick(game, widget, n, slot, external, x, y); });
 				widget_ptr->add_controller(left_click);
 				widget_ptr->add_controller(right_click);
