@@ -14,6 +14,15 @@ namespace Game3 {
 			realm->initEntities();
 	}
 
+	void Game::initRecipes() {
+		recipes.emplace_back(std::vector<ItemStack> {{Item::IRON_BAR, 8}, {Item::WOOD, 4}}, ItemStack(Item::IRON_PICKAXE, 1));
+		recipes.emplace_back(std::vector<ItemStack> {{Item::IRON_BAR, 6}, {Item::WOOD, 4}}, ItemStack(Item::IRON_SHOVEL, 1));
+		recipes.emplace_back(std::vector<ItemStack> {{Item::IRON_BAR, 8}, {Item::WOOD, 4}}, ItemStack(Item::IRON_AXE, 1));
+
+		// Temporary recipes:
+		recipes.emplace_back(std::vector<ItemStack> {{Item::IRON_ORE, 1}, {Item::COAL, 1}}, ItemStack(Item::IRON_BAR, 1));
+	}
+
 	void Game::tick() {
 		auto now = getTime();
 		auto difference = now - lastTime;

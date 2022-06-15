@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Types.h"
 #include "ui/tab/Tab.h"
 

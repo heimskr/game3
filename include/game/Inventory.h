@@ -6,6 +6,7 @@
 #include "game/Item.h"
 
 namespace Game3 {
+	struct CraftingRecipe;
 	struct HasRealm;
 
 	class Inventory {
@@ -41,7 +42,7 @@ namespace Game3 {
 			/** Counts the amount of an item in the inventory. */
 			ItemCount count(const Item &) const;
 
-			/** Counts the amount of an item in the inventory. This will take ItemStack metadata into account eventually. */
+			/** Counts the amount of an item in the inventory. This takes ItemStack data into account but ignores the given ItemStack's count. */
 			ItemCount count(const ItemStack &) const;
 
 			std::shared_ptr<HasRealm> getOwner() const;
@@ -77,6 +78,9 @@ namespace Game3 {
 			void nextSlot();
 
 			void notifyOwner();
+
+			/** Returns the number of times a recipe can be crafted with the inventory's items. Doesn't take the output of the recipe into account. */
+			ItemCount craftable(const CraftingRecipe &) const;
 
 		private:
 			std::map<Slot, ItemStack> storage;

@@ -9,6 +9,7 @@
 #include <nlohmann/json.hpp>
 
 #include "entity/Player.h"
+#include "game/Crafting.h"
 #include "realm/Realm.h"
 
 namespace Game3 {
@@ -36,8 +37,10 @@ namespace Game3 {
 			std::unordered_map<RealmID, std::shared_ptr<Realm>> realms;
 			std::shared_ptr<Realm> activeRealm;
 			std::shared_ptr<Player> player;
+			std::vector<CraftingRecipe> recipes;
 
 			void initEntities();
+			void initRecipes();
 			void tick();
 			RealmID newRealmID() const;
 			void setText(const Glib::ustring &text, const Glib::ustring &name = "", bool focus = true, bool ephemeral = false);

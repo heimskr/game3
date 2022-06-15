@@ -1,7 +1,6 @@
-#include <iostream>
-
 #include "entity/Entity.h"
 #include "entity/ItemEntity.h"
+#include "game/Crafting.h"
 #include "game/Game.h"
 #include "game/HasRealm.h"
 #include "game/Inventory.h"
@@ -154,14 +153,18 @@ namespace Game3 {
 
 	ItemCount Inventory::count(const Item &item) const {
 		ItemCount out = 0;
-		for (const auto &[slot, stored_item]: storage)
-			if (stored_item.item->id == item.id)
-				out += stored_item.count;
+		for (const auto &[slot, stored_stack]: storage)
+			if (stored_stack.item->id == item.id)
+				out += stored_stack.count;
 		return out;
 	}
 
 	ItemCount Inventory::count(const ItemStack &stack) const {
-		return count(*stack.item);
+		ItemCount out = 0;
+		for (const auto &[slot, stored_stack]: storage)
+			if (stack.canMerge(stored_stack))
+				out += stored_stack.count;
+		return out;
 	}
 
 	std::shared_ptr<HasRealm> Inventory::getOwner() const {
@@ -264,6 +267,13 @@ namespace Game3 {
 	void Inventory::nextSlot() {
 		if (activeSlot < slotCount - 1)
 			++activeSlot;
+	}
+
+	ItemCount Inventory::craftable(const CraftingRecipe &recipe) const {
+		ItemCount out = UINT64_MAX;
+		for (const ItemStack &input: recipe.inputs)
+			out = std::min(out, count(input) / input.count);
+		return out;
 	}
 
 	bool Inventory::contains(const ItemStack &needle) const {

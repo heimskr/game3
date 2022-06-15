@@ -1,3 +1,5 @@
+#pragma once
+
 #include "ui/tab/Tab.h"
 
 namespace Game3 {

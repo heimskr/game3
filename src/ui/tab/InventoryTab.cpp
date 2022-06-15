@@ -171,7 +171,7 @@ namespace Game3 {
 						auto progress_ptr = std::make_unique<Gtk::ProgressBar>();
 						progress_ptr->set_fraction(stack.getDurabilityFraction());
 						progress_ptr->add_css_class("item-durability");
-						progress_ptr->set_size_request(tile_size - 5, -1);
+						progress_ptr->set_size_request(tile_size - TILE_MAGIC, -1);
 						fixed.put(*progress_ptr, 0, 0);
 						widgets.push_back(std::move(progress_ptr));
 					}
@@ -179,8 +179,8 @@ namespace Game3 {
 					fixed.put(*label_ptr, 0, 0);
 					fixed.set_tooltip_text(label_text);
 					widget_ptr = std::move(fixed_ptr);
-					image_ptr->set_size_request(tile_size - InventoryTab::TILE_MAGIC, tile_size - InventoryTab::TILE_MAGIC);
-					label_ptr->set_size_request(tile_size - InventoryTab::TILE_MAGIC, tile_size - InventoryTab::TILE_MAGIC);
+					image_ptr->set_size_request(tile_size - TILE_MAGIC, tile_size - TILE_MAGIC);
+					label_ptr->set_size_request(tile_size - TILE_MAGIC, tile_size - TILE_MAGIC);
 					widgets.push_back(std::move(image_ptr));
 					widgets.push_back(std::move(label_ptr));
 				} else
