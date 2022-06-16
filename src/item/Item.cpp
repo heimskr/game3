@@ -38,12 +38,12 @@ namespace Game3 {
 	};
 
 	std::unordered_map<ItemID, Durability> Item::durabilities {
-		{Item::IRON_AXE,     64},
-		{Item::IRON_PICKAXE, 64},
-		{Item::IRON_SHOVEL,  64},
-		{Item::GOLD_AXE,     32},
-		{Item::GOLD_PICKAXE, 32},
-		{Item::GOLD_SHOVEL,  32},
+		{Item::IRON_AXE,     128},
+		{Item::IRON_PICKAXE, 128},
+		{Item::IRON_SHOVEL,  128},
+		{Item::GOLD_AXE,      64},
+		{Item::GOLD_PICKAXE,  64},
+		{Item::GOLD_SHOVEL,   64},
 	};
 
 	std::map<ItemID, std::shared_ptr<Item>> Item::items {
