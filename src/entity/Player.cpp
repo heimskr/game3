@@ -57,8 +57,10 @@ namespace Game3 {
 
 	void Player::interactNextTo() {
 		auto realm = getRealm();
-		auto player = std::dynamic_pointer_cast<Player>(shared_from_this());
 		const Position next_to = nextTo();
+		if (!realm->isValid(next_to))
+			return;
+		auto player = std::dynamic_pointer_cast<Player>(shared_from_this());
 		auto entity = realm->findEntity(next_to, player);
 		bool interesting = false;
 		if (entity)

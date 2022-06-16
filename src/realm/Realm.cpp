@@ -283,7 +283,7 @@ namespace Game3 {
 	}
 
 	bool Realm::interactGround(const std::shared_ptr<Player> &player, const Position &position) {
-		if (getHeight() <= position.row || getWidth() <= position.column)
+		if (!isValid(position))
 			return false;
 
 		switch (type) {
@@ -352,6 +352,10 @@ namespace Game3 {
 
 	std::optional<Position> Realm::getPathableAdjacent(Index index) const {
 		return getPathableAdjacent(getPosition(index));
+	}
+
+	bool Realm::isValid(const Position &position) const {
+		return 0 <= position.row && position.row < getHeight() && 0 <= position.column && position.column < getWidth();
 	}
 
 	void Realm::toJSON(nlohmann::json &json) const {

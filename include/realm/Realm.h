@@ -91,6 +91,7 @@ namespace Game3 {
 			inline Index getIndex(Index row, Index column) const { return row * getWidth() + column; }
 			std::optional<Position> getPathableAdjacent(const Position &) const;
 			std::optional<Position> getPathableAdjacent(Index) const;
+			bool isValid(const Position &) const;
 
 			template <typename T, typename... Args>
 			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {
