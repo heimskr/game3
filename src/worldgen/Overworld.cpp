@@ -59,7 +59,7 @@ namespace Game3::WorldGen {
 					realm->setLayer1(row, column, choose(grasses, rng));
 					const double forest_noise = forest_perlin.GetValue(row / noise_zoom, column / noise_zoom, 0.5);
 					if (0.5 < forest_noise)
-						realm->add(TileEntity::create<Tree>(OverworldTiles::TREE1 + rand() % 3, Position(row, column)));
+						realm->add(TileEntity::create<Tree>(OverworldTiles::TREE1 + rand() % 3, OverworldTiles::TREE0, Position(row, column), Tree::MATURITY));
 				}
 			}
 		noise_timer.stop();

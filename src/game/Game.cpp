@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "game/Game.h"
+#include "game/Inventory.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "ui/tab/TextTab.h"
@@ -77,11 +78,10 @@ namespace Game3 {
 
 		(void) n;
 
-		if (debugMode && button == 1) {
-			player->pathfind({y, x});
-		}
-
-		if (debugMode && button == 3 && player && 0 <= x && x < tilemap->width && 0 <= y && y < tilemap->height)
+		if (button == 1) {
+			if (auto *stack = player->inventory->getActive())
+				stack->item->use(player->inventory->activeSlot, *stack, player, {y, x});
+		} else if (debugMode && button == 3 && player && 0 <= x && x < tilemap->width && 0 <= y && y < tilemap->height)
 			player->teleport({y, x});
 	}
 

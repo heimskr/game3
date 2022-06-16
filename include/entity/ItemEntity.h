@@ -4,7 +4,7 @@
 
 #include "Texture.h"
 #include "entity/Entity.h"
-#include "game/Item.h"
+#include "item/Item.h"
 
 namespace Game3 {
 	class ItemEntity: public Entity {

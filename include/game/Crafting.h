@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "game/Item.h"
+#include "item/Item.h"
 
 namespace Game3 {
 	struct CraftingRecipe {

@@ -1,6 +1,7 @@
 #include "Texture.h"
 #include "entity/ItemEntity.h"
-#include "game/Item.h"
+#include "item/Item.h"
+#include "item/Sapling.h"
 #include "realm/Realm.h"
 
 namespace Game3 {
@@ -32,24 +33,24 @@ namespace Game3 {
 	};
 
 	std::map<ItemID, std::shared_ptr<Item>> Item::items {
-		{Item::SHORTSWORD,   std::make_shared<Item>(Item::SHORTSWORD,   "Shortsword",   100,  1)},
-		{Item::RED_POTION,   std::make_shared<Item>(Item::RED_POTION,   "Red Potion",    20,  8)},
-		{Item::COINS,        std::make_shared<Item>(Item::COINS,        "Gold",           1, 1'000'000)},
-		{Item::IRON_ORE,     std::make_shared<Item>(Item::IRON_ORE,     "Iron Ore",      10, 64)},
-		{Item::COPPER_ORE,   std::make_shared<Item>(Item::COPPER_ORE,   "Copper Ore",     8, 64)},
-		{Item::GOLD_ORE,     std::make_shared<Item>(Item::GOLD_ORE,     "Gold Ore",      20, 64)},
-		{Item::DIAMOND_ORE,  std::make_shared<Item>(Item::DIAMOND_ORE,  "Diamond Ore",   80, 64)},
-		{Item::DIAMOND,      std::make_shared<Item>(Item::DIAMOND,      "Diamond",      100, 64)},
-		{Item::COAL,         std::make_shared<Item>(Item::COAL,         "Coal",           5, 64)},
-		{Item::OIL,          std::make_shared<Item>(Item::OIL,          "Oil",           15, 64)},
-		{Item::WOOD,         std::make_shared<Item>(Item::WOOD,         "Wood",           3, 64)},
-		{Item::IRON_AXE,     std::make_shared<Item>(Item::IRON_AXE,     "Iron Axe",     150,  1)->addAttribute(ItemAttribute::Axe)},
-		{Item::IRON_PICKAXE, std::make_shared<Item>(Item::IRON_PICKAXE, "Iron Pickaxe", 150,  1)->addAttribute(ItemAttribute::Pickaxe)},
-		{Item::IRON_SHOVEL,  std::make_shared<Item>(Item::IRON_SHOVEL,  "Iron Shovel",  120,  1)->addAttribute(ItemAttribute::Shovel)},
-		{Item::SAND,         std::make_shared<Item>(Item::SAND,         "Sand",           1, 64)},
-		{Item::STONE,        std::make_shared<Item>(Item::STONE,        "Stone",          1, 64)},
-		{Item::IRON_BAR,     std::make_shared<Item>(Item::IRON_BAR,     "Iron Bar",      16, 64)},
-		{Item::SAPLING,      std::make_shared<Item>(Item::SAPLING,      "Sapling",        2, 64)},
+		{Item::SHORTSWORD,   std::make_shared<Item>   (Item::SHORTSWORD,   "Shortsword",   100,  1)},
+		{Item::RED_POTION,   std::make_shared<Item>   (Item::RED_POTION,   "Red Potion",    20,  8)},
+		{Item::COINS,        std::make_shared<Item>   (Item::COINS,        "Gold",           1, 1'000'000)},
+		{Item::IRON_ORE,     std::make_shared<Item>   (Item::IRON_ORE,     "Iron Ore",      10, 64)},
+		{Item::COPPER_ORE,   std::make_shared<Item>   (Item::COPPER_ORE,   "Copper Ore",     8, 64)},
+		{Item::GOLD_ORE,     std::make_shared<Item>   (Item::GOLD_ORE,     "Gold Ore",      20, 64)},
+		{Item::DIAMOND_ORE,  std::make_shared<Item>   (Item::DIAMOND_ORE,  "Diamond Ore",   80, 64)},
+		{Item::DIAMOND,      std::make_shared<Item>   (Item::DIAMOND,      "Diamond",      100, 64)},
+		{Item::COAL,         std::make_shared<Item>   (Item::COAL,         "Coal",           5, 64)},
+		{Item::OIL,          std::make_shared<Item>   (Item::OIL,          "Oil",           15, 64)},
+		{Item::WOOD,         std::make_shared<Item>   (Item::WOOD,         "Wood",           3, 64)},
+		{Item::IRON_AXE,     std::make_shared<Item>   (Item::IRON_AXE,     "Iron Axe",     150,  1)->addAttribute(ItemAttribute::Axe)},
+		{Item::IRON_PICKAXE, std::make_shared<Item>   (Item::IRON_PICKAXE, "Iron Pickaxe", 150,  1)->addAttribute(ItemAttribute::Pickaxe)},
+		{Item::IRON_SHOVEL,  std::make_shared<Item>   (Item::IRON_SHOVEL,  "Iron Shovel",  120,  1)->addAttribute(ItemAttribute::Shovel)},
+		{Item::SAND,         std::make_shared<Item>   (Item::SAND,         "Sand",           1, 64)},
+		{Item::STONE,        std::make_shared<Item>   (Item::STONE,        "Stone",          1, 64)},
+		{Item::IRON_BAR,     std::make_shared<Item>   (Item::IRON_BAR,     "Iron Bar",      16, 64)},
+		{Item::SAPLING,      std::make_shared<Sapling>(Item::SAPLING,      "Sapling",        2, 64)},
 	};
 
 	std::unordered_map<ItemID, Durability> Item::durabilities {

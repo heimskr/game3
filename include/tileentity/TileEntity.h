@@ -44,6 +44,7 @@ namespace Game3 {
 			static std::shared_ptr<TileEntity> fromJSON(const nlohmann::json &);
 
 			virtual void init() {}
+			virtual void tick(float) {}
 			/** Returns the TileEntity ID. This is not the tile ID, which corresponds to a tile in the tileset. */
 			virtual TileEntityID getID() const = 0;
 			virtual void render(SpriteRenderer &) {}

@@ -60,6 +60,7 @@ namespace Game3 {
 		constexpr static TileID TREE1 = 63;
 		constexpr static TileID TREE2 = 64;
 		constexpr static TileID TREE3 = 65;
+		constexpr static TileID TREE0 = 66;
 		constexpr static TileID KEEP_NW = 70;
 		constexpr static TileID KEEP_NE = 71;
 		constexpr static TileID KEEP_SW = 80;

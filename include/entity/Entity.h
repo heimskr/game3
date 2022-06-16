@@ -16,7 +16,7 @@
 #include "Types.h"
 #include "game/HasInventory.h"
 #include "game/HasRealm.h"
-#include "game/Item.h"
+#include "item/Item.h"
 
 namespace Game3 {
 	class Canvas;

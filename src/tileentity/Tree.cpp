@@ -11,6 +11,22 @@
 #include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
+	void Tree::toJSON(nlohmann::json &json) const {
+		TileEntity::toJSON(json);
+		json[0] = immatureID;
+		json[1] = age;
+	}
+
+	void Tree::absorbJSON(const nlohmann::json &json) {
+		TileEntity::absorbJSON(json);
+		immatureID = json.at(0);
+		age = json.at(1);
+	}
+
+	void Tree::tick(float delta) {
+		age += delta;
+	}
+
 	bool Tree::onInteractNextTo(const std::shared_ptr<Player> &player) {
 		auto &inventory = *player->inventory;
 		const Slot active_slot = inventory.activeSlot;
@@ -41,8 +57,9 @@ namespace Game3 {
 		if (tileID != tileSets.at(realm->type)->getEmpty()) {
 			auto &tilemap = *realm->tilemap2;
 			const auto tilesize = tilemap.tileSize;
-			const auto x = (tileID % (tilemap.setWidth / tilesize)) * tilesize;
-			const auto y = (tileID / (tilemap.setWidth / tilesize)) * tilesize;
+			const TileID tile_id = age < MATURITY? immatureID : tileID;
+			const auto x = (tile_id % (tilemap.setWidth / tilesize)) * tilesize;
+			const auto y = (tile_id / (tilemap.setWidth / tilesize)) * tilesize;
 			sprite_renderer.drawOnMap(tilemap.texture, position.column, position.row, x / 2, y / 2, tilesize, tilesize);
 		}
 	}

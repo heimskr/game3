@@ -10,6 +10,8 @@
 #include "Types.h"
 
 namespace Game3 {
+	class ItemStack;
+	class Player;
 	class Realm;
 	class Texture;
 	struct Position;
@@ -64,6 +66,8 @@ namespace Game3 {
 			Glib::RefPtr<Gdk::Pixbuf> getImage();
 			std::shared_ptr<Item> addAttribute(ItemAttribute);
 			inline bool operator==(const Item &other) const { return id == other.id; }
+
+			virtual bool use(Slot, ItemStack &, const std::shared_ptr<Player> &, const Position &) { return false; }
 
 		private:
 			std::unique_ptr<uint8_t[]> rawImage;
