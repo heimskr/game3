@@ -31,6 +31,18 @@ namespace Game3 {
 		{Item::STONE,        {208, 320, textureItems}},
 		{Item::IRON_BAR,     { 32, 192, textureItems}},
 		{Item::SAPLING,      { 32,   0, texturePalisade}},
+		{Item::GOLD_AXE,     { 32, 160, texturePalisade}},
+		{Item::GOLD_PICKAXE, {160, 160, texturePalisade}},
+		{Item::GOLD_SHOVEL,  {224, 160, texturePalisade}},
+	};
+
+	std::unordered_map<ItemID, Durability> Item::durabilities {
+		{Item::IRON_AXE,     64},
+		{Item::IRON_PICKAXE, 64},
+		{Item::IRON_SHOVEL,  64},
+		{Item::GOLD_AXE,     32},
+		{Item::GOLD_PICKAXE, 32},
+		{Item::GOLD_SHOVEL,  32},
 	};
 
 	std::map<ItemID, std::shared_ptr<Item>> Item::items {
@@ -45,19 +57,17 @@ namespace Game3 {
 		{Item::COAL,         std::make_shared<Item>   (Item::COAL,         "Coal",           5, 64)},
 		{Item::OIL,          std::make_shared<Item>   (Item::OIL,          "Oil",           15, 64)},
 		{Item::WOOD,         std::make_shared<Item>   (Item::WOOD,         "Wood",           3, 64)},
-		{Item::IRON_AXE,     std::make_shared<Tool>   (Item::IRON_AXE,     "Iron Axe",     150, 64, 3.f, ItemAttribute::Axe)},
-		{Item::IRON_PICKAXE, std::make_shared<Tool>   (Item::IRON_PICKAXE, "Iron Pickaxe", 150, 64, 3.f, ItemAttribute::Pickaxe)},
-		{Item::IRON_SHOVEL,  std::make_shared<Tool>   (Item::IRON_SHOVEL,  "Iron Shovel",  120, 64, 3.f, ItemAttribute::Shovel)},
+		{Item::IRON_AXE,     std::make_shared<Tool>   (Item::IRON_AXE,     "Iron Axe",     150, 3.f, ItemAttribute::Axe)},
+		{Item::IRON_PICKAXE, std::make_shared<Tool>   (Item::IRON_PICKAXE, "Iron Pickaxe", 150, 3.f, ItemAttribute::Pickaxe)},
+		{Item::IRON_SHOVEL,  std::make_shared<Tool>   (Item::IRON_SHOVEL,  "Iron Shovel",  120, 3.f, ItemAttribute::Shovel)},
 		{Item::SAND,         std::make_shared<Item>   (Item::SAND,         "Sand",           1, 64)},
 		{Item::STONE,        std::make_shared<Item>   (Item::STONE,        "Stone",          1, 64)},
 		{Item::IRON_BAR,     std::make_shared<Item>   (Item::IRON_BAR,     "Iron Bar",      16, 64)},
 		{Item::SAPLING,      std::make_shared<Sapling>(Item::SAPLING,      "Sapling",        2, 64)},
-	};
-
-	std::unordered_map<ItemID, Durability> Item::durabilities {
-		{Item::IRON_AXE,     64},
-		{Item::IRON_PICKAXE, 64},
-		{Item::IRON_SHOVEL,  64},
+		{Item::GOLD_AXE,     std::make_shared<Tool>   (Item::GOLD_AXE,     "Gold Axe",     400, 0.75f, ItemAttribute::Axe)},
+		{Item::GOLD_PICKAXE, std::make_shared<Tool>   (Item::GOLD_PICKAXE, "Gold Pickaxe", 400, 0.75f, ItemAttribute::Pickaxe)},
+		{Item::GOLD_SHOVEL,  std::make_shared<Tool>   (Item::GOLD_SHOVEL,  "Gold Shovel",  300, 0.75f, ItemAttribute::Shovel)},
+		{Item::GOLD_BAR,     std::make_shared<Item>   (Item::GOLD_BAR,     "Gold Bar",      45, 64)},
 	};
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage() {
