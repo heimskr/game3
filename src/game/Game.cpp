@@ -67,7 +67,7 @@ namespace Game3 {
 		throw std::runtime_error("Can't get text: TextTab is null");
 	}
 
-	void Game::click(int button, int n, double pos_x, double pos_y) {
+	void Game::click(int button, int, double pos_x, double pos_y) {
 		if (!activeRealm)
 			return;
 
@@ -83,8 +83,6 @@ namespace Game3 {
 
 		const int x = pos_x;
 		const int y = pos_y;
-
-		(void) n;
 
 		if (button == 1) {
 			if (auto *stack = player->inventory->getActive())

@@ -283,6 +283,9 @@ namespace Game3 {
 	}
 
 	bool Realm::interactGround(const std::shared_ptr<Player> &player, const Position &position) {
+		if (getHeight() <= position.row || getWidth() <= position.column)
+			return false;
+
 		switch (type) {
 			case Realm::OVERWORLD: {
 				const Index index = getIndex(position);
