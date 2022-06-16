@@ -107,11 +107,11 @@ namespace Game3 {
 
 	unsigned OreDeposit::getMaxUses(Ore ore) {
 		switch (ore) {
-			case Ore::Coal:    return 48;
-			case Ore::Copper:  return 32;
-			case Ore::Iron:    return 32;
-			case Ore::Gold:    return 16;
-			case Ore::Diamond: return 4;
+			case Ore::Coal:    return 16;
+			case Ore::Copper:  return 16;
+			case Ore::Iron:    return 16;
+			case Ore::Gold:    return 8;
+			case Ore::Diamond: return 2;
 			default: return 1;
 		}
 	}
