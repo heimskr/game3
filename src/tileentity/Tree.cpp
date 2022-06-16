@@ -13,14 +13,14 @@
 namespace Game3 {
 	void Tree::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
-		json[0] = immatureID;
-		json[1] = age;
+		json["immatureID"] = immatureID;
+		json["age"] = age;
 	}
 
 	void Tree::absorbJSON(const nlohmann::json &json) {
 		TileEntity::absorbJSON(json);
-		immatureID = json.at(0);
-		age = json.at(1);
+		immatureID = json.at("immatureID");
+		age = json.at("age");
 	}
 
 	void Tree::tick(Game &, float delta) {
