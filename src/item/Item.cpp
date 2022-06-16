@@ -34,6 +34,7 @@ namespace Game3 {
 		{Item::GOLD_AXE,     { 32, 160, texturePalisade}},
 		{Item::GOLD_PICKAXE, {160, 160, texturePalisade}},
 		{Item::GOLD_SHOVEL,  {224, 160, texturePalisade}},
+		{Item::GOLD_BAR,     { 48, 192, textureItems}},
 	};
 
 	std::unordered_map<ItemID, Durability> Item::durabilities {
