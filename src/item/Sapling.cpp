@@ -30,8 +30,9 @@ namespace Game3 {
 			realm.add(TileEntity::create<Tree>(OverworldTiles::TREE1 + rand() % 3, OverworldTiles::TREE0, position, 0.f));
 			if (--stack.count == 0)
 				player->inventory->erase(slot);
-			return true;
+			player->inventory->notifyOwner();
 			realm.pathMap[index] = 0;
+			return true;
 		}
 
 		return false;
