@@ -1,5 +1,1 @@
 [2022/06/16 02:15:40] Add more tool tiers
-[2022/06/16 02:16:04] Add tool cooldowns (varies by tier)
-[2022/06/16 02:16:30] Turn ore deposits into tile entities
-[2022/06/16 02:17:10] Make ore deposits affect tool cooldown
-[2022/06/16 02:17:40] Make ore deposits require cooldown (rarer ores require a cooldown after fewer uses and the cooldown takes longer)
