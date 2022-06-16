@@ -13,6 +13,7 @@ namespace Game3 {
 			constexpr static float SELLING_TIME = 5.f;
 			constexpr static float WORK_START_HOUR = 8.f;
 			constexpr static float WORK_END_HOUR = 18.f;
+			constexpr static float RETRY_TIME = 30.f;
 
 			Phase phase = 0;
 			RealmID overworldRealm;
@@ -22,6 +23,8 @@ namespace Game3 {
 			Index chosenResource = -1;
 			Position destination = {-1, -1};
 			float harvestingTime;
+			bool stuck = false;
+			float stuckTime = 0.f;
 
 			static std::shared_ptr<Gatherer> create(EntityID, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_);
 			static std::shared_ptr<Gatherer> fromJSON(const nlohmann::json &);

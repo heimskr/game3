@@ -686,7 +686,7 @@ namespace Game3 {
 						try {
 							saveGame(chooser->get_file()->get_path());
 						} catch (std::exception &err) {
-							error("Error loading save: " + std::string(err.what()));
+							error("Error saving game: " + std::string(err.what()));
 						}
 					});
 			});
