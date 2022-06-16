@@ -1,4 +1,5 @@
 #include "Tiles.h"
+#include "entity/ItemEntity.h"
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
@@ -20,6 +21,12 @@ namespace Game3 {
 					realm.remove(shared_from_this());
 					if (active_stack->reduceDurability())
 						inventory.erase(active_slot);
+					ItemCount saplings = 1;
+					while (rand() % 4 == 1)
+						++saplings;
+					auto leftover = inventory.add({Item::SAPLING, saplings});
+					if (leftover)
+						realm.spawn<ItemEntity>(player->position, *leftover);
 					inventory.notifyOwner();
 					return true;
 				}

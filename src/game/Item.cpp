@@ -28,6 +28,7 @@ namespace Game3 {
 		{Item::SAND,         { 16,   0, texturePalisade}},
 		{Item::STONE,        {208, 320, textureItems}},
 		{Item::IRON_BAR,     { 32, 192, textureItems}},
+		{Item::SAPLING,      { 32,   0, texturePalisade}},
 	};
 
 	std::map<ItemID, std::shared_ptr<Item>> Item::items {
@@ -48,6 +49,7 @@ namespace Game3 {
 		{Item::SAND,         std::make_shared<Item>(Item::SAND,         "Sand",           1, 64)},
 		{Item::STONE,        std::make_shared<Item>(Item::STONE,        "Stone",          1, 64)},
 		{Item::IRON_BAR,     std::make_shared<Item>(Item::IRON_BAR,     "Iron Bar",      16, 64)},
+		{Item::SAPLING,      std::make_shared<Item>(Item::SAPLING,      "Sapling",        2, 64)},
 	};
 
 	std::unordered_map<ItemID, Durability> Item::durabilities {
