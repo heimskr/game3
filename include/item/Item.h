@@ -30,29 +30,32 @@ namespace Game3 {
 
 	class Item: public std::enable_shared_from_this<Item> {
 		public:
-			constexpr static ItemID NOTHING      = 0;
-			constexpr static ItemID SHORTSWORD   = 1;
-			constexpr static ItemID RED_POTION   = 2;
-			constexpr static ItemID COINS        = 3;
-			constexpr static ItemID IRON_ORE     = 4;
-			constexpr static ItemID COPPER_ORE   = 5;
-			constexpr static ItemID GOLD_ORE     = 6;
-			constexpr static ItemID DIAMOND_ORE  = 7;
-			constexpr static ItemID DIAMOND      = 8;
-			constexpr static ItemID COAL         = 9;
-			constexpr static ItemID OIL          = 10;
-			constexpr static ItemID WOOD         = 11;
-			constexpr static ItemID IRON_AXE     = 12;
-			constexpr static ItemID IRON_PICKAXE = 13;
-			constexpr static ItemID IRON_SHOVEL  = 14;
-			constexpr static ItemID SAND         = 15;
-			constexpr static ItemID STONE        = 16;
-			constexpr static ItemID IRON_BAR     = 17;
-			constexpr static ItemID SAPLING      = 18;
-			constexpr static ItemID GOLD_AXE     = 19;
-			constexpr static ItemID GOLD_PICKAXE = 20;
-			constexpr static ItemID GOLD_SHOVEL  = 21;
-			constexpr static ItemID GOLD_BAR     = 22;
+			constexpr static ItemID NOTHING         = 0;
+			constexpr static ItemID SHORTSWORD      = 1;
+			constexpr static ItemID RED_POTION      = 2;
+			constexpr static ItemID COINS           = 3;
+			constexpr static ItemID IRON_ORE        = 4;
+			constexpr static ItemID COPPER_ORE      = 5;
+			constexpr static ItemID GOLD_ORE        = 6;
+			constexpr static ItemID DIAMOND_ORE     = 7;
+			constexpr static ItemID DIAMOND         = 8;
+			constexpr static ItemID COAL            = 9;
+			constexpr static ItemID OIL             = 10;
+			constexpr static ItemID WOOD            = 11;
+			constexpr static ItemID IRON_AXE        = 12;
+			constexpr static ItemID IRON_PICKAXE    = 13;
+			constexpr static ItemID IRON_SHOVEL     = 14;
+			constexpr static ItemID SAND            = 15;
+			constexpr static ItemID STONE           = 16;
+			constexpr static ItemID IRON_BAR        = 17;
+			constexpr static ItemID SAPLING         = 18;
+			constexpr static ItemID GOLD_AXE        = 19;
+			constexpr static ItemID GOLD_PICKAXE    = 20;
+			constexpr static ItemID GOLD_SHOVEL     = 21;
+			constexpr static ItemID GOLD_BAR        = 22;
+			constexpr static ItemID DIAMOND_AXE     = 23;
+			constexpr static ItemID DIAMOND_PICKAXE = 24;
+			constexpr static ItemID DIAMOND_SHOVEL  = 25;
 
 			static std::unordered_map<ItemID, ItemTexture> itemTextures;
 			static std::map<ItemID, std::shared_ptr<Item>> items;
