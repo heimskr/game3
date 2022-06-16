@@ -6,7 +6,7 @@ namespace Game3 {
 	class OreDeposit: public TileEntity {
 		public:
 			Ore type;
-			float timeRemaining;
+			float timeRemaining = 0.f;
 			unsigned uses = 0;
 
 			const float tooldownMultiplier;
@@ -29,7 +29,11 @@ namespace Game3 {
 			void render(SpriteRenderer &) override;
 
 		protected:
-			OreDeposit() = default;
+			OreDeposit() = delete;
+
+			OreDeposit(Ore ore):
+				TileEntity(), type(ore), tooldownMultiplier(getTooldownMultiplier(ore)), maxUses(getMaxUses(ore)), cooldown(getCooldown(ore)) {}
+
 			OreDeposit(Ore ore, const Position &position_, float time_remaining, unsigned uses_):
 				TileEntity(getID(ore), TileEntity::OREDEPOSIT, position_, true), type(ore), timeRemaining(time_remaining), uses(uses_), tooldownMultiplier(getTooldownMultiplier(ore)),
 				maxUses(getMaxUses(ore)), cooldown(getCooldown(ore)) {}

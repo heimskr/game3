@@ -6,6 +6,8 @@ namespace Game3 {
 	class Player: public Entity {
 		public:
 			MoneyCount money;
+			float tooldown = 0.f;
+
 			std::unordered_set<CraftingStationType> stationTypes {CraftingStationType::None};
 
 			bool movingUp = false;

@@ -144,6 +144,7 @@ namespace Game3 {
 
 		const int grid_width = lastGridWidth = gridWidth();
 		const int tile_size  = playerGrid.get_width() / (playerGrid.get_width() / TILE_SIZE);
+		const bool tooldown = 0.f < game->player->tooldown;
 
 		auto populate = [&](Gtk::Grid &grid, Inventory &inventory, bool external) {
 			auto &storage = inventory.getStorage();
@@ -180,6 +181,8 @@ namespace Game3 {
 					fixed.set_tooltip_text(label_text);
 					widget_ptr = std::move(fixed_ptr);
 					image_ptr->set_size_request(tile_size - TILE_MAGIC, tile_size - TILE_MAGIC);
+					if (tooldown)
+						image_ptr->set_opacity(0.5);
 					label_ptr->set_size_request(tile_size - TILE_MAGIC, tile_size - TILE_MAGIC);
 					widgets.push_back(std::move(image_ptr));
 					widgets.push_back(std::move(label_ptr));

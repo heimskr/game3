@@ -17,8 +17,6 @@
 #include "worldgen/House.h"
 #include "worldgen/Keep.h"
 
-// Rather ugly code here.
-
 namespace Game3 {
 	std::unordered_map<RealmType, Texture> Realm::textureMap {
 		{Realm::OVERWORLD, Texture("resources/tileset2.png")},

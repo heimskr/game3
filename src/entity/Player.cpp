@@ -24,10 +24,12 @@ namespace Game3 {
 	void Player::absorbJSON(const nlohmann::json &json) {
 		Entity::absorbJSON(json);
 		money = json.contains("money")? json.at("money").get<MoneyCount>() : 0;
+		tooldown = json.contains("tooldown")? json.at("tooldown").get<float>() : 0.f;
 	}
 
 	void Player::tick(Game &game, float delta) {
 		Entity::tick(game, delta);
+		tooldown = std::max(0.f, tooldown - delta);
 		Direction final_direction = direction;
 		if (movingLeft)
 			move(final_direction = Direction::Left);
@@ -81,6 +83,9 @@ namespace Game3 {
 	void to_json(nlohmann::json &json, const Player &player) {
 		to_json(json, static_cast<const Entity &>(player));
 		json["isPlayer"] = true;
-		json["money"] = player.money;
+		if (0 < player.money)
+			json["money"] = player.money;
+		if (0.f < player.tooldown)
+			json["tooldown"] = player.tooldown;
 	}
 }

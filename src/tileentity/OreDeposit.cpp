@@ -3,6 +3,7 @@
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
+#include "item/Tool.h"
 #include "realm/Realm.h"
 #include "tileentity/OreDeposit.h"
 #include "ui/Canvas.h"
@@ -13,16 +14,18 @@
 namespace Game3 {
 	void OreDeposit::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
-		json[0] = type;
-		json[1] = timeRemaining;
-		json[2] = uses;
+		json["type"] = type;
+		if (0.f < timeRemaining)
+			json["timeRemaining"] = timeRemaining;
+		if (uses != 0)
+			json["uses"] = uses;
 	}
 
 	void OreDeposit::absorbJSON(const nlohmann::json &json) {
 		TileEntity::absorbJSON(json);
-		type = json.at(0);
-		timeRemaining = json.at(1);
-		uses = json.at(2);
+		type = json.at("type");
+		timeRemaining = json.contains("timeRemaining")? json.at("timeRemaining").get<float>() : 0.f;
+		uses = json.contains("uses")? json.at("uses").get<unsigned>() : 0;
 	}
 
 	void OreDeposit::tick(Game &, float delta) {
@@ -30,24 +33,25 @@ namespace Game3 {
 	}
 
 	bool OreDeposit::onInteractNextTo(const std::shared_ptr<Player> &player) {
-		if (0.f < timeRemaining)
+		if (0.f < timeRemaining || 0.f < player->tooldown)
 			return false;
 
 		auto &inventory = *player->inventory;
 		const Slot active_slot = inventory.activeSlot;
 		if (auto *active_stack = inventory[active_slot]) {
 			if (active_stack->has(ItemAttribute::Pickaxe)) {
-				auto &realm = *getRealm();
-				if (!inventory.add({Item::WOOD, 1})) {
-					realm.remove(shared_from_this());
+				const auto &tool = dynamic_cast<Tool &>(*active_stack->item);
+				if (!inventory.add(getOreStack())) {
+					player->tooldown = tooldownMultiplier * tool.baseCooldown;
+
+					if (maxUses <= ++uses) {
+						timeRemaining = cooldown;
+						uses = 0;
+					}
+
 					if (active_stack->reduceDurability())
 						inventory.erase(active_slot);
-					ItemCount saplings = 1;
-					while (rand() % 4 == 1)
-						++saplings;
-					auto leftover = inventory.add({Item::SAPLING, saplings});
-					if (leftover)
-						realm.spawn<ItemEntity>(player->position, *leftover);
+
 					inventory.notifyOwner();
 					return true;
 				}
@@ -58,9 +62,9 @@ namespace Game3 {
 	}
 
 	void OreDeposit::render(SpriteRenderer &sprite_renderer) {
-		auto realm = getRealm();
-		if (tileID != tileSets.at(realm->type)->getEmpty()) {
-			auto &tilemap = *realm->tilemap2;
+		auto &realm = *getRealm();
+		if (tileID != tileSets.at(realm.type)->getEmpty()) {
+			auto &tilemap = *realm.tilemap2;
 			const auto tilesize = tilemap.tileSize;
 			const TileID tile_id = 0.f < timeRemaining? getRegenID(type) : tileID;
 			const auto x = (tile_id % (tilemap.setWidth / tilesize)) * tilesize;
@@ -110,6 +114,17 @@ namespace Game3 {
 			case Ore::Gold:    return 16;
 			case Ore::Diamond: return 4;
 			default: return 1;
+		}
+	}
+
+	float OreDeposit::getCooldown(Ore ore) {
+		switch (ore) {
+			case Ore::Coal:    return 5.f;
+			case Ore::Copper:  return 5.f;
+			case Ore::Iron:    return 10.f;
+			case Ore::Gold:    return 30.f;
+			case Ore::Diamond: return 60.f;
+			default: return 0.f;
 		}
 	}
 
