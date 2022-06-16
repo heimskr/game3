@@ -1,5 +1,6 @@
 #pragma once
 
+#include "item/Item.h"
 #include "tileentity/TileEntity.h"
 
 namespace Game3 {
@@ -34,7 +35,7 @@ namespace Game3 {
 			OreDeposit(Ore ore):
 				TileEntity(), type(ore), tooldownMultiplier(getTooldownMultiplier(ore)), maxUses(getMaxUses(ore)), cooldown(getCooldown(ore)) {}
 
-			OreDeposit(Ore ore, const Position &position_, float time_remaining, unsigned uses_):
+			OreDeposit(Ore ore, const Position &position_, float time_remaining = 0.f, unsigned uses_ = 0):
 				TileEntity(getID(ore), TileEntity::OREDEPOSIT, position_, true), type(ore), timeRemaining(time_remaining), uses(uses_), tooldownMultiplier(getTooldownMultiplier(ore)),
 				maxUses(getMaxUses(ore)), cooldown(getCooldown(ore)) {}
 

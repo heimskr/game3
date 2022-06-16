@@ -2,6 +2,7 @@
 
 #include "entity/Player.h"
 #include "game/Game.h"
+#include "game/Inventory.h"
 #include "realm/Realm.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
@@ -29,7 +30,10 @@ namespace Game3 {
 
 	void Player::tick(Game &game, float delta) {
 		Entity::tick(game, delta);
-		tooldown = std::max(0.f, tooldown - delta);
+		if (0.f < tooldown && (tooldown -= delta) < 0.f) {
+			tooldown = 0;
+			inventory->notifyOwner();
+		}
 		Direction final_direction = direction;
 		if (movingLeft)
 			move(final_direction = Direction::Left);

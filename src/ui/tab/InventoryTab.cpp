@@ -2,6 +2,7 @@
 
 #include "game/Game.h"
 #include "game/Inventory.h"
+#include "item/Tool.h"
 #include "ui/MainWindow.h"
 #include "ui/gtk/EntryDialog.h"
 #include "ui/gtk/NumericEntry.h"
@@ -181,7 +182,7 @@ namespace Game3 {
 					fixed.set_tooltip_text(label_text);
 					widget_ptr = std::move(fixed_ptr);
 					image_ptr->set_size_request(tile_size - TILE_MAGIC, tile_size - TILE_MAGIC);
-					if (tooldown)
+					if (tooldown && dynamic_cast<Tool *>(stack.item.get()))
 						image_ptr->set_opacity(0.5);
 					label_ptr->set_size_request(tile_size - TILE_MAGIC, tile_size - TILE_MAGIC);
 					widgets.push_back(std::move(image_ptr));

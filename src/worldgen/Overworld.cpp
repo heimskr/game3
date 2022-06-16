@@ -4,6 +4,7 @@
 
 #include "Tiles.h"
 #include "realm/Realm.h"
+#include "tileentity/OreDeposit.h"
 #include "tileentity/Teleporter.h"
 #include "tileentity/Tree.h"
 #include "util/Timer.h"
@@ -78,20 +79,20 @@ namespace Game3::WorldGen {
 			if (tilemap1->tiles[index] == OverworldTiles::STONE)
 				resource_starts.push_back(index);
 		std::shuffle(resource_starts.begin(), resource_starts.end(), rng);
-		auto add_resources = [&](double threshold, TileID tile) {
+		auto add_resources = [&](double threshold, Ore ore) {
 			for (size_t i = 0, max = resource_starts.size() / 1000; i < max; ++i) {
 				const Index index = resource_starts.back();
 				if (noise_threshold + threshold <= saved_noise[index])
-					realm->setLayer2(index, tile);
+					realm->add(TileEntity::create<OreDeposit>(ore, realm->getPosition(index)));
 				resource_starts.pop_back();
 			}
 		};
-		add_resources(0.5, OverworldTiles::IRON_ORE);
-		add_resources(0.5, OverworldTiles::COPPER_ORE);
-		add_resources(0.5, OverworldTiles::GOLD_ORE);
-		add_resources(0.5, OverworldTiles::OIL);
-		add_resources(0.5, OverworldTiles::DIAMOND_ORE);
-		add_resources(0.5, OverworldTiles::COAL_ORE);
+		add_resources(0.5, Ore::Iron);
+		add_resources(0.5, Ore::Copper);
+		add_resources(0.5, Ore::Gold);
+		add_resources(0.5, Ore::Diamond);
+		add_resources(0.5, Ore::Coal);
+		// TODO: oil
 		resource_timer.stop();
 
 		realm->randomLand = choose(starts, rng);

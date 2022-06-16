@@ -33,12 +33,11 @@ namespace Game3 {
 	}
 
 	bool OreDeposit::onInteractNextTo(const std::shared_ptr<Player> &player) {
-		if (0.f < timeRemaining || 0.f < player->tooldown)
-			return false;
-
 		auto &inventory = *player->inventory;
 		const Slot active_slot = inventory.activeSlot;
 		if (auto *active_stack = inventory[active_slot]) {
+			if (0.f < timeRemaining || 0.f < player->tooldown)
+				return true;
 			if (active_stack->has(ItemAttribute::Pickaxe)) {
 				const auto &tool = dynamic_cast<Tool &>(*active_stack->item);
 				if (!inventory.add(getOreStack())) {
