@@ -34,7 +34,7 @@ namespace Game3 {
 
 	class Entity: public HasInventory, public HasRealm, public std::enable_shared_from_this<Entity> {
 		public:
-			constexpr static Slot DEFAULT_INVENTORY_SIZE = 20;
+			constexpr static Slot DEFAULT_INVENTORY_SIZE = 30;
 
 			constexpr static EntityID  GANGBLANC_ID = 1;
 			constexpr static EntityID       GRUM_ID = 2;
