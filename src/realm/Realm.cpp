@@ -84,7 +84,7 @@ namespace Game3 {
 		renderer3.init(tilemap3);
 		entities.clear();
 		for (const auto &entity_json: json.at("entities"))
-			(*entities.insert(Entity::fromJSON(entity_json)).first)->setRealm(shared).initAfterRealm();
+			(*entities.insert(Entity::fromJSON(entity_json)).first)->setRealm(shared);
 		if (json.contains("extra"))
 			extraData = json.at("extra");
 	}

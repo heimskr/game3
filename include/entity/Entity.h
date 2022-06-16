@@ -94,7 +94,7 @@ namespace Game3 {
 			inline Position::value_type & column() { return position.column; }
 			void id(EntityID);
 			virtual void init();
-			virtual void initAfterRealm() {}
+			virtual void initAfterLoad(Game &) {}
 			/** Returns whether the entity actually moved. */
 			bool move(Direction);
 			std::shared_ptr<Realm> getRealm() const override;

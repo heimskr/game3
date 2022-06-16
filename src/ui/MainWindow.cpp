@@ -298,8 +298,7 @@ namespace Game3 {
 		game->initEntities();
 		for (auto &[id, realm]: game->realms)
 			realm->resetPathMap();
-		auto realm = game->activeRealm;
-		for (const auto &entity: realm->entities)
+		for (const auto &entity: game->activeRealm->entities)
 			if (entity->isPlayer()) {
 				if (!(game->player = std::dynamic_pointer_cast<Player>(entity)))
 					throw std::runtime_error("Couldn't cast entity with isPlayer() == true to Player");
@@ -307,6 +306,9 @@ namespace Game3 {
 			}
 		if (!game->player)
 			throw std::runtime_error("Player not found in active realm");
+		for (const auto &[id, realm]: game->realms)
+			for (const auto &entity: realm->entities)
+				entity->initAfterLoad(*game);
 		onGameLoaded();
 	}
 

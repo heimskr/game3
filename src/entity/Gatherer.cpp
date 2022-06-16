@@ -56,8 +56,9 @@ namespace Game3 {
 			stuck = json.at("stuck");
 	}
 
-	void Gatherer::initAfterRealm() {
-		if (!(keep = std::dynamic_pointer_cast<Building>(getRealm()->tileEntityAt(keepPosition))))
+	void Gatherer::initAfterLoad(Game &game) {
+		auto &overworld = *game.realms.at(overworldRealm);
+		if (!(keep = std::dynamic_pointer_cast<Building>(overworld.tileEntityAt(keepPosition))))
 			throw std::runtime_error("Couldn't find keep for gatherer");
 	}
 
