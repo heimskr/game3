@@ -28,6 +28,9 @@ namespace Game3 {
 	}
 
 	bool Tree::onInteractNextTo(const std::shared_ptr<Player> &player) {
+		if (age < MATURITY)
+			return false;
+
 		auto &inventory = *player->inventory;
 		const Slot active_slot = inventory.activeSlot;
 		if (auto *active_stack = inventory[active_slot]) {
