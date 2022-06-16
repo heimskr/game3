@@ -52,16 +52,7 @@ namespace Game3 {
 		const float x = position.column + offset.x();
 		const float y = position.row + offset.y();
 
-		switch (stack.item->id) {
-			case Item::SHORTSWORD:
-				sprite_renderer.drawOnMap(*texture, x, y, xOffset, yOffset, 16.f, 16.f);
-				break;
-			case Item::RED_POTION:
-				sprite_renderer.drawOnMap(*texture, x + .25f, y + .25f, xOffset, yOffset, 16.f, 16.f, .5f);
-				break;
-			default:
-				sprite_renderer.drawOnMap(missing, x, y, 0.f, 0.f, 16.f, 16.f);
-		}
+		sprite_renderer.drawOnMap(*texture, x + .125f, y + .125f, xOffset, yOffset, 16.f, 16.f, .75f);
 	}
 
 	bool ItemEntity::interact(const std::shared_ptr<Player> &player) {
