@@ -20,4 +20,5 @@ namespace Game3 {
 	using Durability   =  int32_t;
 
 	enum class CraftingStationType {None, Furnace, Anvil};
+	enum class Ore {Coal, Copper, Iron, Gold, Diamond};
 }

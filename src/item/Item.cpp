@@ -2,6 +2,7 @@
 #include "entity/ItemEntity.h"
 #include "item/Item.h"
 #include "item/Sapling.h"
+#include "item/Tool.h"
 #include "realm/Realm.h"
 
 namespace Game3 {
@@ -44,9 +45,9 @@ namespace Game3 {
 		{Item::COAL,         std::make_shared<Item>   (Item::COAL,         "Coal",           5, 64)},
 		{Item::OIL,          std::make_shared<Item>   (Item::OIL,          "Oil",           15, 64)},
 		{Item::WOOD,         std::make_shared<Item>   (Item::WOOD,         "Wood",           3, 64)},
-		{Item::IRON_AXE,     std::make_shared<Item>   (Item::IRON_AXE,     "Iron Axe",     150,  1)->addAttribute(ItemAttribute::Axe)},
-		{Item::IRON_PICKAXE, std::make_shared<Item>   (Item::IRON_PICKAXE, "Iron Pickaxe", 150,  1)->addAttribute(ItemAttribute::Pickaxe)},
-		{Item::IRON_SHOVEL,  std::make_shared<Item>   (Item::IRON_SHOVEL,  "Iron Shovel",  120,  1)->addAttribute(ItemAttribute::Shovel)},
+		{Item::IRON_AXE,     std::make_shared<Tool>   (Item::IRON_AXE,     "Iron Axe",     150, 64, 3.f, ItemAttribute::Axe)},
+		{Item::IRON_PICKAXE, std::make_shared<Tool>   (Item::IRON_PICKAXE, "Iron Pickaxe", 150, 64, 3.f, ItemAttribute::Pickaxe)},
+		{Item::IRON_SHOVEL,  std::make_shared<Tool>   (Item::IRON_SHOVEL,  "Iron Shovel",  120, 64, 3.f, ItemAttribute::Shovel)},
 		{Item::SAND,         std::make_shared<Item>   (Item::SAND,         "Sand",           1, 64)},
 		{Item::STONE,        std::make_shared<Item>   (Item::STONE,        "Stone",          1, 64)},
 		{Item::IRON_BAR,     std::make_shared<Item>   (Item::IRON_BAR,     "Iron Bar",      16, 64)},

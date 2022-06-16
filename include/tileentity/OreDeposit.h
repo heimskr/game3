@@ -1,0 +1,47 @@
+#pragma once
+
+#include "tileentity/TileEntity.h"
+
+namespace Game3 {
+	class OreDeposit: public TileEntity {
+		public:
+			Ore type;
+			float timeRemaining;
+			unsigned uses = 0;
+
+			const float tooldownMultiplier;
+			const unsigned maxUses;
+			const float cooldown;
+
+			OreDeposit(const OreDeposit &) = delete;
+			OreDeposit(OreDeposit &&) = default;
+			~OreDeposit() override = default;
+
+			OreDeposit & operator=(const OreDeposit &) = delete;
+			OreDeposit & operator=(OreDeposit &&) = default;
+
+			TileEntityID getID() const override { return TileEntity::OREDEPOSIT; }
+
+			void toJSON(nlohmann::json &) const override;
+			void absorbJSON(const nlohmann::json &) override;
+			void tick(Game &, float) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
+			void render(SpriteRenderer &) override;
+
+		protected:
+			OreDeposit() = default;
+			OreDeposit(Ore ore, const Position &position_, float time_remaining, unsigned uses_):
+				TileEntity(getID(ore), TileEntity::OREDEPOSIT, position_, true), type(ore), timeRemaining(time_remaining), uses(uses_), tooldownMultiplier(getTooldownMultiplier(ore)),
+				maxUses(getMaxUses(ore)), cooldown(getCooldown(ore)) {}
+
+			friend class TileEntity;
+
+		private:
+			static TileID getID(Ore);
+			static TileID getRegenID(Ore);
+			static float getTooldownMultiplier(Ore);
+			static unsigned getMaxUses(Ore);
+			static float getCooldown(Ore);
+			ItemStack getOreStack(ItemCount count = 1);
+	};
+}
