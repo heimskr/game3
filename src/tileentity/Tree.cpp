@@ -23,7 +23,7 @@ namespace Game3 {
 		age = json.at(1);
 	}
 
-	void Tree::tick(float delta) {
+	void Tree::tick(Game &, float delta) {
 		age += delta;
 	}
 

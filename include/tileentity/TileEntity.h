@@ -10,6 +10,7 @@
 
 namespace Game3 {
 	class Entity;
+	class Game;
 	class Player;
 	class Realm;
 	class SpriteRenderer;
@@ -44,7 +45,7 @@ namespace Game3 {
 			static std::shared_ptr<TileEntity> fromJSON(const nlohmann::json &);
 
 			virtual void init() {}
-			virtual void tick(float) {}
+			virtual void tick(Game &, float) {}
 			/** Returns the TileEntity ID. This is not the tile ID, which corresponds to a tile in the tileset. */
 			virtual TileEntityID getID() const = 0;
 			virtual void render(SpriteRenderer &) {}

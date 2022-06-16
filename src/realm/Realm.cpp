@@ -157,6 +157,8 @@ namespace Game3 {
 				}
 			} else
 				entity->tick(game, delta);
+		for (auto &[index, tile_entity]: tileEntities)
+			tile_entity->tick(game, delta);
 		ticking = false;
 		for (const auto &entity: removalQueue)
 			remove(entity);
