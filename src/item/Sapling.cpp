@@ -21,6 +21,7 @@ namespace Game3 {
 			case OverworldTiles::GRASS_ALT1:
 			case OverworldTiles::GRASS_ALT2:
 			case OverworldTiles::LIGHT_GRASS:
+			case OverworldTiles::DIRT:
 				break;
 			default:
 				return false;
