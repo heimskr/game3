@@ -286,34 +286,16 @@ namespace Game3 {
 		switch (type) {
 			case Realm::OVERWORLD: {
 				const Index index = getIndex(position);
-				const TileID tile2 = tilemap2->tiles.at(index);
 				std::optional<ItemID> item;
 				std::optional<ItemAttribute> attribute;
 
-				if (tile2 == OverworldTiles::COAL_ORE) {
-					item.emplace(Item::COAL);
+				const TileID tile1 = tilemap1->tiles.at(index);
+				if (tile1 == OverworldTiles::SAND) {
+					item.emplace(Item::SAND);
+					attribute.emplace(ItemAttribute::Shovel);
+				} else if (tile1 == OverworldTiles::STONE) {
+					item.emplace(Item::STONE);
 					attribute.emplace(ItemAttribute::Pickaxe);
-				} else if (tile2 == OverworldTiles::IRON_ORE) {
-					item.emplace(Item::IRON_ORE);
-					attribute.emplace(ItemAttribute::Pickaxe);
-				} else if (tile2 == OverworldTiles::GOLD_ORE) {
-					item.emplace(Item::GOLD_ORE);
-					attribute.emplace(ItemAttribute::Pickaxe);
-				} else if (tile2 == OverworldTiles::COPPER_ORE) {
-					item.emplace(Item::COPPER_ORE);
-					attribute.emplace(ItemAttribute::Pickaxe);
-				} else if (tile2 == OverworldTiles::DIAMOND_ORE) {
-					item.emplace(Item::DIAMOND_ORE);
-					attribute.emplace(ItemAttribute::Pickaxe);
-				} else {
-					const TileID tile1 = tilemap1->tiles.at(index);
-					if (tile1 == OverworldTiles::SAND) {
-						item.emplace(Item::SAND);
-						attribute.emplace(ItemAttribute::Shovel);
-					} else if (tile1 == OverworldTiles::STONE) {
-						item.emplace(Item::STONE);
-						attribute.emplace(ItemAttribute::Pickaxe);
-					}
 				}
 
 				if (item && attribute) {
