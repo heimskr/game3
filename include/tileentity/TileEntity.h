@@ -16,12 +16,13 @@ namespace Game3 {
 
 	class TileEntity: public HasRealm, public std::enable_shared_from_this<TileEntity> {
 		public:
-			constexpr static TileEntityID BUILDING   = 1;
-			constexpr static TileEntityID TELEPORTER = 2;
-			constexpr static TileEntityID SIGN       = 3;
-			constexpr static TileEntityID CHEST      = 4;
-			constexpr static TileEntityID STOCKPILE  = 5;
-			constexpr static TileEntityID TREE       = 6;
+			constexpr static TileEntityID BUILDING        = 1;
+			constexpr static TileEntityID TELEPORTER      = 2;
+			constexpr static TileEntityID SIGN            = 3;
+			constexpr static TileEntityID CHEST           = 4;
+			constexpr static TileEntityID STOCKPILE       = 5;
+			constexpr static TileEntityID TREE            = 6;
+			constexpr static TileEntityID CRAFTINGSTATION = 7;
 
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;

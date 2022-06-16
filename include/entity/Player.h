@@ -6,6 +6,7 @@ namespace Game3 {
 	class Player: public Entity {
 		public:
 			MoneyCount money;
+			std::unordered_set<CraftingStationType> stationTypes {CraftingStationType::None};
 
 			bool movingUp = false;
 			bool movingRight = false;

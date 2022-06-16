@@ -18,4 +18,6 @@ namespace Game3 {
 	using MoneyCount   = uint64_t;
 	using Phase        =  uint8_t;
 	using Durability   =  int32_t;
+
+	enum class CraftingStationType {None, Furnace, Anvil};
 }

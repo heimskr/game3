@@ -8,10 +8,17 @@ namespace Game3 {
 	struct CraftingRecipe {
 		std::vector<ItemStack> inputs;
 		std::vector<ItemStack> outputs;
+		CraftingStationType station = CraftingStationType::None;
 
 		CraftingRecipe() = delete;
-		CraftingRecipe(const std::vector<ItemStack> &inputs_, const std::vector<ItemStack> &outputs_): inputs(inputs_), outputs(outputs_) {}
-		CraftingRecipe(std::vector<ItemStack> &&inputs_, std::vector<ItemStack> &&outputs_): inputs(std::move(inputs_)), outputs(std::move(outputs_)) {}
-		CraftingRecipe(std::vector<ItemStack> &&inputs_, ItemStack &&output): inputs(std::move(inputs_)), outputs {std::move(output)} {}
+
+		CraftingRecipe(const std::vector<ItemStack> &inputs_, const std::vector<ItemStack> &outputs_, CraftingStationType station_ = CraftingStationType::None):
+			inputs(inputs_), outputs(outputs_), station(station_) {}
+
+		CraftingRecipe(std::vector<ItemStack> &&inputs_, std::vector<ItemStack> &&outputs_, CraftingStationType station_ = CraftingStationType::None):
+			inputs(std::move(inputs_)), outputs(std::move(outputs_)), station(station_) {}
+
+		CraftingRecipe(std::vector<ItemStack> &&inputs_, ItemStack &&output, CraftingStationType station_ = CraftingStationType::None):
+			inputs(std::move(inputs_)), outputs {std::move(output)}, station(station_) {}
 	};
 }

@@ -2,10 +2,7 @@
 #include "entity/Gatherer.h"
 #include "game/Game.h"
 #include "realm/Realm.h"
-#include "tileentity/Building.h"
-#include "tileentity/Chest.h"
-#include "tileentity/Sign.h"
-#include "tileentity/Teleporter.h"
+#include "tileentity/CraftingStation.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 #include "worldgen/Blacksmith.h"
@@ -26,6 +23,8 @@ namespace Game3::WorldGen {
 
 		realm->setLayer2({1, 3}, HouseTiles::FURNACE);
 		realm->setLayer2({1, 5}, HouseTiles::ANVIL);
+		realm->add(TileEntity::create<CraftingStation>(HouseTiles::FURNACE, Position(1, 3), CraftingStationType::Furnace));
+		realm->add(TileEntity::create<CraftingStation>(HouseTiles::ANVIL,   Position(1, 5), CraftingStationType::Anvil));
 
 		realm->setLayer2({height / 2, width / 2 - 1}, HouseTiles::COUNTER_W);
 		realm->setLayer2({height / 2, width / 2},     HouseTiles::COUNTER_WE);

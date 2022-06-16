@@ -46,7 +46,7 @@ namespace Game3 {
 		size_t index = 0;
 		auto &inventory = *game->player->inventory;
 		for (auto &recipe: game->recipes) {
-			if (inventory.canCraft(recipe)) {
+			if (game->player->stationTypes.contains(recipe.station) && inventory.canCraft(recipe)) {
 				auto hbox = std::make_unique<Gtk::Box>(Gtk::Orientation::HORIZONTAL);
 				auto left_vbox = std::make_unique<Gtk::Box>(Gtk::Orientation::VERTICAL);
 				auto right_vbox = std::make_unique<Gtk::Box>(Gtk::Orientation::VERTICAL);

@@ -1,6 +1,7 @@
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
+#include "tileentity/CraftingStation.h"
 #include "tileentity/Sign.h"
 #include "tileentity/Stockpile.h"
 #include "tileentity/Teleporter.h"
@@ -30,6 +31,9 @@ namespace Game3 {
 				break;
 			case TileEntity::TREE:
 				out = TileEntity::create<Tree>();
+				break;
+			case TileEntity::CRAFTINGSTATION:
+				out = TileEntity::create<CraftingStation>();
 				break;
 			default:
 				throw std::invalid_argument("Unrecognized TileEntity ID: " + std::to_string(id));
