@@ -9,6 +9,7 @@
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
+#include "tileentity/OreDeposit.h"
 #include "tileentity/Teleporter.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
@@ -64,7 +65,7 @@ namespace Game3 {
 
 	bool Gatherer::onInteractNextTo(const std::shared_ptr<Player> &player) {
 		auto &tab = *getRealm()->getGame().canvas.window.inventoryTab;
-		std::cout << "Gatherer: money = " << money << ", phase = " << int(phase) << '\n';
+		std::cout << "Gatherer: money = " << money << ", phase = " << int(phase) << ", stuck = " << stuck << '\n';
 		player->queueForMove([player, &tab](const auto &) {
 			tab.resetExternalInventory();
 			return true;
@@ -129,15 +130,11 @@ namespace Game3 {
 		auto &game = getRealm()->getGame();
 		auto &overworld = *game.realms.at(overworldRealm);
 		auto &house     = *game.realms.at(houseRealm);
-		const auto width  = overworld.getWidth();
-		const auto height = overworld.getHeight();
-		const auto &layer2 = *overworld.tilemap2;
 		// Detect all resources within a given radius of the house
 		std::vector<Index> resource_choices;
-		for (Index row = 0; row < height; ++row)
-			for (Index column = 0; column < width; ++column)
-				if (overworldTiles.isResource(layer2(column, row)) && std::sqrt(std::pow(housePosition.row - row, 2) + std::pow(housePosition.column - column, 2)) <= RADIUS)
-					resource_choices.push_back(overworld.getIndex(row, column));
+		for (const auto &[index, tile_entity]: overworld.tileEntities)
+			if (dynamic_cast<OreDeposit *>(tile_entity.get()))
+				resource_choices.push_back(index);
 		// If there are no resources, get stuck forever. Seed -1998 has no resources.
 		if (resource_choices.empty()) {
 			phase = -1;
@@ -172,21 +169,8 @@ namespace Game3 {
 			harvestingTime = 0.f;
 			auto &realm = *getRealm();
 			const auto resource_position = realm.getPosition(chosenResource);
-			const TileID resource_type = (*getRealm()->tilemap2)(resource_position.column, resource_position.row);
-			ItemID item_id = Item::NOTHING;
-
-			switch (resource_type) {
-				case OverworldTiles::IRON_ORE:    item_id = Item::IRON_ORE;    break;
-				case OverworldTiles::COPPER_ORE:  item_id = Item::COPPER_ORE;  break;
-				case OverworldTiles::GOLD_ORE:    item_id = Item::GOLD_ORE;    break;
-				case OverworldTiles::DIAMOND_ORE: item_id = Item::DIAMOND_ORE; break;
-				case OverworldTiles::COAL_ORE:    item_id = Item::COAL;        break;
-				case OverworldTiles::OIL:         item_id = Item::OIL;         break;
-				default:
-					throw std::runtime_error("Unknown resource type: " + std::to_string(resource_type));
-			}
-
-			const ItemStack stack(item_id, 1);
+			auto &deposit = dynamic_cast<OreDeposit &>(*realm.tileEntityAt(resource_position));
+			const ItemStack stack = deposit.getOreStack();
 			const auto leftover = inventory->add(stack);
 			if (leftover == stack)
 				phase = 4;

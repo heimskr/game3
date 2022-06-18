@@ -28,6 +28,7 @@ namespace Game3 {
 			void tick(Game &, float) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 			void render(SpriteRenderer &) override;
+			ItemStack getOreStack(ItemCount count = 1);
 
 		protected:
 			OreDeposit() = delete;
@@ -47,6 +48,5 @@ namespace Game3 {
 			static float getTooldownMultiplier(Ore);
 			static unsigned getMaxUses(Ore);
 			static float getCooldown(Ore);
-			ItemStack getOreStack(ItemCount count = 1);
 	};
 }
