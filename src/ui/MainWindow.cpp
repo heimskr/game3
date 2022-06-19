@@ -532,8 +532,8 @@ namespace Game3 {
 	}
 
 	void MainWindow::handleKeys() {
-		for (auto &[keycode, info]: keyTimes) {
-			auto &[keyval, modifiers, time] = info;
+		for (auto &[keyval, info]: keyTimes) {
+			auto &[keycode, modifiers, time] = info;
 			auto repeat_time = keyRepeatTime;
 			if (customKeyRepeatTimes.contains(keyval))
 				repeat_time = customKeyRepeatTimes.at(keyval);
