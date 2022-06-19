@@ -138,11 +138,13 @@ namespace Game3 {
 	}
 
 	void CraftingTab::leftClick(const std::shared_ptr<Game> &game, Gtk::Widget *, size_t index, int n, double, double) {
+		mainWindow.onBlur();
 		if (n % 2 == 0)
 			craftOne(game, index);
 	}
 
 	void CraftingTab::rightClick(const std::shared_ptr<Game> &game, Gtk::Widget *widget, size_t index, double x, double y) {
+		mainWindow.onBlur();
 		do {
 			const auto allocation = widget->get_allocation();
 			x += allocation.get_x();

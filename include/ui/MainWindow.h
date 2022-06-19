@@ -52,6 +52,8 @@ namespace Game3 {
 
 			void setStatus(const Glib::ustring &);
 
+			void onBlur();
+
 			friend class Canvas;
 
 		private:

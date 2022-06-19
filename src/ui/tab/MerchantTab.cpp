@@ -198,12 +198,16 @@ namespace Game3 {
 	}
 
 	void MerchantTab::leftClick(const std::shared_ptr<Game> &, Gtk::Widget *, int click_count, Slot slot, bool merchant, double, double) {
+		mainWindow.onBlur();
+
 		if (click_count % 2 == 0) {
 			std::cout << "Clicked on slot " << slot << " in the " << (merchant? "merchant" : "player") << "'s inventory\n";
 		}
 	}
 
 	void MerchantTab::rightClick(const std::shared_ptr<Game> &game, Gtk::Widget *widget, int, Slot slot, bool merchant, double x, double y) {
+		mainWindow.onBlur();
+
 		do {
 			const auto allocation = widget->get_allocation();
 			x += allocation.get_x();

@@ -502,6 +502,16 @@ namespace Game3 {
 		statusbarSetTime = getTime();
 	}
 
+	void MainWindow::onBlur() {
+		if (game && game->player) {
+			keyTimes.clear();
+			game->player->movingUp    = false;
+			game->player->movingRight = false;
+			game->player->movingDown  = false;
+			game->player->movingLeft  = false;
+		}
+	}
+
 	bool MainWindow::onKeyPressed(guint keyval, guint keycode, Gdk::ModifierType modifiers) {
 		if (!keyTimes.contains(keyval)) {
 			handleKey(keyval, keycode, modifiers);

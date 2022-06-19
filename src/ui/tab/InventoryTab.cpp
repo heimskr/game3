@@ -244,6 +244,8 @@ namespace Game3 {
 	}
 
 	void InventoryTab::leftClick(const std::shared_ptr<Game> &game, Gtk::Widget *, int, Slot slot, bool external, double, double) {
+		mainWindow.onBlur();
+
 		if (!external) {
 			game->player->inventory->activeSlot = slot;
 			updatePlayerClasses(game);
@@ -251,6 +253,8 @@ namespace Game3 {
 	}
 
 	void InventoryTab::rightClick(const std::shared_ptr<Game> &game, Gtk::Widget *widget, int, Slot slot, bool external, double x, double y) {
+		mainWindow.onBlur();
+
 		if ((external && !externalInventory->contains(slot)) || (!external && !game->player->inventory->contains(slot)))
 			return;
 
