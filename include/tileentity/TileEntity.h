@@ -47,11 +47,10 @@ namespace Game3 {
 
 			virtual void init() {}
 			virtual void tick(Game &, float) {}
+			virtual void onRemove() {}
 			/** Returns the TileEntity ID. This is not the tile ID, which corresponds to a tile in the tileset. */
 			virtual TileEntityID getID() const = 0;
 			virtual void render(SpriteRenderer &) {}
-			/** Removes the tile entity from existence. */
-			virtual void remove();
 			/** Handles when the player interacts with the tile they're on and that tile contains this tile entity. Returns whether anything interesting happened. */
 			virtual bool onInteractOn(const std::shared_ptr<Player> &) { return false; }
 			/** Handles when the player interacts with the tile in front of them and that tile contains this tile entity. Returns whether anything interesting happened. */

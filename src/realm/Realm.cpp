@@ -206,6 +206,7 @@ namespace Game3 {
 
 	void Realm::remove(const std::shared_ptr<TileEntity> &tile_entity) {
 		const Index index = getIndex(tile_entity->position);
+		tileEntities.at(index)->onRemove();
 		tileEntities.erase(index);
 		setLayerHelper(index);
 	}

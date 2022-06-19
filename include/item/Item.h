@@ -56,6 +56,8 @@ namespace Game3 {
 			constexpr static ItemID DIAMOND_AXE     = 23;
 			constexpr static ItemID DIAMOND_PICKAXE = 24;
 			constexpr static ItemID DIAMOND_SHOVEL  = 25;
+			constexpr static ItemID WOODEN_WALL     = 26;
+			constexpr static ItemID PLANK           = 27;
 
 			static std::unordered_map<ItemID, ItemTexture> itemTextures;
 			static std::map<ItemID, std::shared_ptr<Item>> items;

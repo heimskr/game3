@@ -47,10 +47,6 @@ namespace Game3 {
 		return out;
 	}
 
-	void TileEntity::remove() {
-		auto shared = shared_from_this();
-	}
-
 	void TileEntity::setRealm(const std::shared_ptr<Realm> &realm) {
 		realmID = realm->id;
 		weakRealm = realm;

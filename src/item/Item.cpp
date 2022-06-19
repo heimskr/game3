@@ -1,5 +1,6 @@
 #include "Texture.h"
 #include "entity/ItemEntity.h"
+#include "item/Furniture.h"
 #include "item/Item.h"
 #include "item/Sapling.h"
 #include "item/Tool.h"
@@ -11,6 +12,7 @@ namespace Game3 {
 	static Texture texturePotions     {"resources/rpg/potions.png"};
 	static Texture textureItems       {"resources/items/items.png"};
 	static Texture texturePalisade    {"resources/items/palisade.png"};
+	static Texture textureHouse       {"resources/house.png"};
 
 	std::unordered_map<ItemID, ItemTexture> Item::itemTextures {
 		{Item::SHORTSWORD,      {  0,   0, textureShortsword}},
@@ -38,6 +40,8 @@ namespace Game3 {
 		{Item::DIAMOND_AXE,     { 48, 160, texturePalisade}},
 		{Item::DIAMOND_PICKAXE, {176, 160, texturePalisade}},
 		{Item::DIAMOND_SHOVEL,  {240, 160, texturePalisade}},
+		{Item::WOODEN_WALL,     { 16, 144, textureHouse}},
+		{Item::PLANK,           { 64, 224, textureItems}},
 	};
 
 	std::unordered_map<ItemID, Durability> Item::durabilities {
@@ -53,31 +57,33 @@ namespace Game3 {
 	};
 
 	std::map<ItemID, std::shared_ptr<Item>> Item::items {
-		{Item::SHORTSWORD,      std::make_shared<Item>   (Item::SHORTSWORD,      "Shortsword",      100,  1)},
-		{Item::RED_POTION,      std::make_shared<Item>   (Item::RED_POTION,      "Red Potion",       20,  8)},
-		{Item::COINS,           std::make_shared<Item>   (Item::COINS,           "Gold",              1, 1'000'000)},
-		{Item::IRON_ORE,        std::make_shared<Item>   (Item::IRON_ORE,        "Iron Ore",         10, 64)},
-		{Item::COPPER_ORE,      std::make_shared<Item>   (Item::COPPER_ORE,      "Copper Ore",        8, 64)},
-		{Item::GOLD_ORE,        std::make_shared<Item>   (Item::GOLD_ORE,        "Gold Ore",         20, 64)},
-		{Item::DIAMOND_ORE,     std::make_shared<Item>   (Item::DIAMOND_ORE,     "Diamond Ore",      80, 64)},
-		{Item::DIAMOND,         std::make_shared<Item>   (Item::DIAMOND,         "Diamond",         100, 64)},
-		{Item::COAL,            std::make_shared<Item>   (Item::COAL,            "Coal",              5, 64)},
-		{Item::OIL,             std::make_shared<Item>   (Item::OIL,             "Oil",              15, 64)},
-		{Item::WOOD,            std::make_shared<Item>   (Item::WOOD,            "Wood",              3, 64)},
-		{Item::IRON_AXE,        std::make_shared<Tool>   (Item::IRON_AXE,        "Iron Axe",        150, 3.f, ItemAttribute::Axe)},
-		{Item::IRON_PICKAXE,    std::make_shared<Tool>   (Item::IRON_PICKAXE,    "Iron Pickaxe",    150, 3.f, ItemAttribute::Pickaxe)},
-		{Item::IRON_SHOVEL,     std::make_shared<Tool>   (Item::IRON_SHOVEL,     "Iron Shovel",     120, 3.f, ItemAttribute::Shovel)},
-		{Item::SAND,            std::make_shared<Item>   (Item::SAND,            "Sand",              1, 64)},
-		{Item::STONE,           std::make_shared<Item>   (Item::STONE,           "Stone",             1, 64)},
-		{Item::IRON_BAR,        std::make_shared<Item>   (Item::IRON_BAR,        "Iron Bar",         16, 64)},
-		{Item::SAPLING,         std::make_shared<Sapling>(Item::SAPLING,         "Sapling",           2, 64)},
-		{Item::GOLD_AXE,        std::make_shared<Tool>   (Item::GOLD_AXE,        "Gold Axe",        400, 0.75f, ItemAttribute::Axe)},
-		{Item::GOLD_PICKAXE,    std::make_shared<Tool>   (Item::GOLD_PICKAXE,    "Gold Pickaxe",    400, 0.75f, ItemAttribute::Pickaxe)},
-		{Item::GOLD_SHOVEL,     std::make_shared<Tool>   (Item::GOLD_SHOVEL,     "Gold Shovel",     300, 0.75f, ItemAttribute::Shovel)},
-		{Item::GOLD_BAR,        std::make_shared<Item>   (Item::GOLD_BAR,        "Gold Bar",         45, 64)},
-		{Item::DIAMOND_AXE,     std::make_shared<Tool>   (Item::DIAMOND_AXE,     "Diamond Axe",     900, 1.f, ItemAttribute::Axe)},
-		{Item::DIAMOND_PICKAXE, std::make_shared<Tool>   (Item::DIAMOND_PICKAXE, "Diamond Pickaxe", 900, 1.f, ItemAttribute::Pickaxe)},
-		{Item::DIAMOND_SHOVEL,  std::make_shared<Tool>   (Item::DIAMOND_SHOVEL,  "Diamond Shovel",  700, 1.f, ItemAttribute::Shovel)},
+		{Item::SHORTSWORD,      std::make_shared<Item>     (Item::SHORTSWORD,      "Shortsword",      100,  1)},
+		{Item::RED_POTION,      std::make_shared<Item>     (Item::RED_POTION,      "Red Potion",       20,  8)},
+		{Item::COINS,           std::make_shared<Item>     (Item::COINS,           "Gold",              1, 1'000'000)},
+		{Item::IRON_ORE,        std::make_shared<Item>     (Item::IRON_ORE,        "Iron Ore",         10, 64)},
+		{Item::COPPER_ORE,      std::make_shared<Item>     (Item::COPPER_ORE,      "Copper Ore",        8, 64)},
+		{Item::GOLD_ORE,        std::make_shared<Item>     (Item::GOLD_ORE,        "Gold Ore",         20, 64)},
+		{Item::DIAMOND_ORE,     std::make_shared<Item>     (Item::DIAMOND_ORE,     "Diamond Ore",      80, 64)},
+		{Item::DIAMOND,         std::make_shared<Item>     (Item::DIAMOND,         "Diamond",         100, 64)},
+		{Item::COAL,            std::make_shared<Item>     (Item::COAL,            "Coal",              5, 64)},
+		{Item::OIL,             std::make_shared<Item>     (Item::OIL,             "Oil",              15, 64)},
+		{Item::WOOD,            std::make_shared<Item>     (Item::WOOD,            "Wood",              3, 64)},
+		{Item::IRON_AXE,        std::make_shared<Tool>     (Item::IRON_AXE,        "Iron Axe",        150, 3.f, ItemAttribute::Axe)},
+		{Item::IRON_PICKAXE,    std::make_shared<Tool>     (Item::IRON_PICKAXE,    "Iron Pickaxe",    150, 3.f, ItemAttribute::Pickaxe)},
+		{Item::IRON_SHOVEL,     std::make_shared<Tool>     (Item::IRON_SHOVEL,     "Iron Shovel",     120, 3.f, ItemAttribute::Shovel)},
+		{Item::SAND,            std::make_shared<Item>     (Item::SAND,            "Sand",              1, 64)},
+		{Item::STONE,           std::make_shared<Item>     (Item::STONE,           "Stone",             1, 64)},
+		{Item::IRON_BAR,        std::make_shared<Item>     (Item::IRON_BAR,        "Iron Bar",         16, 64)},
+		{Item::SAPLING,         std::make_shared<Sapling>  (Item::SAPLING,         "Sapling",           2, 64)},
+		{Item::GOLD_AXE,        std::make_shared<Tool>     (Item::GOLD_AXE,        "Gold Axe",        400, 0.75f, ItemAttribute::Axe)},
+		{Item::GOLD_PICKAXE,    std::make_shared<Tool>     (Item::GOLD_PICKAXE,    "Gold Pickaxe",    400, 0.75f, ItemAttribute::Pickaxe)},
+		{Item::GOLD_SHOVEL,     std::make_shared<Tool>     (Item::GOLD_SHOVEL,     "Gold Shovel",     300, 0.75f, ItemAttribute::Shovel)},
+		{Item::GOLD_BAR,        std::make_shared<Item>     (Item::GOLD_BAR,        "Gold Bar",         45, 64)},
+		{Item::DIAMOND_AXE,     std::make_shared<Tool>     (Item::DIAMOND_AXE,     "Diamond Axe",     900, 1.f, ItemAttribute::Axe)},
+		{Item::DIAMOND_PICKAXE, std::make_shared<Tool>     (Item::DIAMOND_PICKAXE, "Diamond Pickaxe", 900, 1.f, ItemAttribute::Pickaxe)},
+		{Item::DIAMOND_SHOVEL,  std::make_shared<Tool>     (Item::DIAMOND_SHOVEL,  "Diamond Shovel",  700, 1.f, ItemAttribute::Shovel)},
+		{Item::WOODEN_WALL,     std::make_shared<Furniture>(Item::WOODEN_WALL,     "Wooden Wall",       9, 64)},
+		{Item::PLANK,           std::make_shared<Item>     (Item::PLANK,           "Plank",             4, 64)},
 	};
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage() {
