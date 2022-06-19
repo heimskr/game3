@@ -503,25 +503,30 @@ namespace Game3 {
 	}
 
 	bool MainWindow::onKeyPressed(guint keyval, guint keycode, Gdk::ModifierType modifiers) {
-		if (!keyTimes.contains(keycode)) {
+		if (!keyTimes.contains(keyval)) {
 			handleKey(keyval, keycode, modifiers);
 			if (unsigned(modifiers & Gdk::ModifierType::CONTROL_MASK) == 0)
-				keyTimes.emplace(keycode, KeyInfo {keyval, modifiers, getTime()});
+				keyTimes.emplace(keyval, KeyInfo {keycode, modifiers, getTime()});
 		} else
-			keyTimes.at(keycode).modifiers = modifiers;
+			keyTimes.at(keyval).modifiers = modifiers;
 		return true;
 	}
 
 	void MainWindow::onKeyReleased(guint keyval, guint keycode, Gdk::ModifierType) {
-		keyTimes.erase(keycode);
+		keyTimes.erase(keyval);
 
 		if (game && game->player) {
 			auto &player = *game->player;
 			switch (keyval) {
-				case GDK_KEY_w: player.movingUp    = false; break;
-				case GDK_KEY_d: player.movingRight = false; break;
-				case GDK_KEY_s: player.movingDown  = false; break;
-				case GDK_KEY_a: player.movingLeft  = false; break;
+				case GDK_KEY_w: player.movingUp    = false; keyTimes.erase(GDK_KEY_W); break;
+				case GDK_KEY_d: player.movingRight = false; keyTimes.erase(GDK_KEY_D); break;
+				case GDK_KEY_s: player.movingDown  = false; keyTimes.erase(GDK_KEY_S); break;
+				case GDK_KEY_a: player.movingLeft  = false; keyTimes.erase(GDK_KEY_A); break;
+				case GDK_KEY_W: player.movingUp    = false; keyTimes.erase(GDK_KEY_w); break;
+				case GDK_KEY_D: player.movingRight = false; keyTimes.erase(GDK_KEY_d); break;
+				case GDK_KEY_S: player.movingDown  = false; keyTimes.erase(GDK_KEY_s); break;
+				case GDK_KEY_A: player.movingLeft  = false; keyTimes.erase(GDK_KEY_a); break;
+				case GDK_KEY_E: keyTimes.erase(GDK_KEY_e); break;
 			}
 		}
 	}

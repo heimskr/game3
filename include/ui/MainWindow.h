@@ -83,12 +83,12 @@ namespace Game3 {
 			std::chrono::system_clock::time_point statusbarSetTime;
 
 			struct KeyInfo {
-				guint value;
+				guint code;
 				Gdk::ModifierType modifiers;
 				std::chrono::system_clock::time_point lastProcessed;
 			};
 
-			/** Keys are keycodes, not keyvals. */
+			/** Keys are keyvals, not keycodes. */
 			std::map<guint, KeyInfo> keyTimes;
 
 			bool prevA = false;
