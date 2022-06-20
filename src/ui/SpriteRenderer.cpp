@@ -112,16 +112,17 @@ namespace Game3 {
 
 		shader.set("model", model);
 		shader.set("spriteColor", 1.f, 1.f, 1.f, alpha);
+		const float multiplier = 2.f / texture.width;
+		shader.set("texturePosition", x_offset * multiplier, y_offset * multiplier, size_x / texture.width, size_y / texture.width);
 
 		glActiveTexture(GL_TEXTURE0);
 		texture.bind();
 
-		glEnable(GL_SCISSOR_TEST);
-		glScissor(2 * x, 2 * (backbufferHeight - y - size_y), 2 * size_x, 2 * size_y);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glBindVertexArray(quadVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindVertexArray(0);
-		glDisable(GL_SCISSOR_TEST);
 	}
 
 	void SpriteRenderer::initRenderData() {

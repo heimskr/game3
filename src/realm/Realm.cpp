@@ -11,6 +11,7 @@
 #include "tileentity/Chest.h"
 #include "tileentity/Sign.h"
 #include "tileentity/Teleporter.h"
+#include "ui/SpriteRenderer.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 #include "worldgen/Carpet.h"
@@ -113,6 +114,8 @@ namespace Game3 {
 				entity->render(sprite_renderer);
 		for (const auto &[index, tile_entity]: tileEntities)
 			tile_entity->render(sprite_renderer);
+		if (0 < ghostCount)
+			sprite_renderer.drawOnScreen(cacheTexture("resources/checkmark.png"), width - 42.f, height - 42.f, 2.f);
 	}
 
 	void Realm::reupload() {
