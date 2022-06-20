@@ -17,6 +17,10 @@ namespace Game3 {
 		FURNACE,
 	};
 
+	std::unordered_set<TileID> Monomap::woodenWalls {
+		WALL_NW, WALL_WEN, WALL_NE, WALL_E, WALL_W, WALL_NS, WALL_SW, WALL_WES, WALL_SE
+	};
+
 	Monomap monomap;
 
 	std::unordered_map<RealmID, std::shared_ptr<TileSet>> tileSets {

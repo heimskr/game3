@@ -39,10 +39,10 @@ namespace Game3 {
 		const bool center = get(0, 0);
 		int sum = 0;
 		if (center) {
-			const auto top    = static_cast<uint8_t>(get( 0, -1));
-			const auto left   = static_cast<uint8_t>(get(-1,  0));
-			const auto right  = static_cast<uint8_t>(get( 1,  0));
-			const auto bottom = static_cast<uint8_t>(get( 0,  1));
+			const auto top    = static_cast<uint8_t>(get(-1,  0));
+			const auto left   = static_cast<uint8_t>(get( 0, -1));
+			const auto right  = static_cast<uint8_t>(get( 0,  1));
+			const auto bottom = static_cast<uint8_t>(get( 1,  0));
 			sum = top + (left << 1) + (right << 2) + (bottom << 3);
 		}
 

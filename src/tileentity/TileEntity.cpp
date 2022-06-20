@@ -2,6 +2,7 @@
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
 #include "tileentity/CraftingStation.h"
+#include "tileentity/Ghost.h"
 #include "tileentity/OreDeposit.h"
 #include "tileentity/Sign.h"
 #include "tileentity/Stockpile.h"
@@ -39,6 +40,9 @@ namespace Game3 {
 			case TileEntity::OREDEPOSIT:
 				out = TileEntity::create<OreDeposit>(json.at("type"));
 				break;
+			case TileEntity::GHOST:
+				out = TileEntity::create<Ghost>();
+				break;
 			default:
 				throw std::invalid_argument("Unrecognized TileEntity ID: " + std::to_string(id));
 		}
@@ -57,6 +61,10 @@ namespace Game3 {
 		if (!out)
 			throw std::runtime_error("Couldn't lock tile entity's realm");
 		return out;
+	}
+
+	void TileEntity::updateNeighbors() {
+		getRealm()->updateNeighbors(position);
 	}
 
 	void TileEntity::absorbJSON(const nlohmann::json &json) {

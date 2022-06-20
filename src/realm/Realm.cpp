@@ -78,8 +78,11 @@ namespace Game3 {
 		tilemap3->texture.init();
 		outdoors = json.at("outdoors");
 		for (const auto &[index, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>()) {
-			tileEntities.emplace(parseUlong(index), TileEntity::fromJSON(tile_entity_json)).first->second->setRealm(shared);
-			if (tile_entity_json.at("type").get<TileEntityID>() == TileEntity::GHOST)
+			auto tile_entity = TileEntity::fromJSON(tile_entity_json);
+			tileEntities.emplace(parseUlong(index), tile_entity);
+			tile_entity->setRealm(shared);
+			tile_entity->onSpawn();
+			if (tile_entity_json.at("id").get<TileEntityID>() == TileEntity::GHOST)
 				++ghostCount;
 		}
 		renderer1.init(tilemap1);
@@ -140,6 +143,7 @@ namespace Game3 {
 			pathMap[index] = false;
 		if (tile_entity->tileEntityID == TileEntity::GHOST)
 			++ghostCount;
+		tile_entity->onSpawn();
 		return tile_entity;
 	}
 
@@ -369,9 +373,13 @@ namespace Game3 {
 	void Realm::updateNeighbors(const Position &position) {
 		for (Index row_offset = -1; row_offset <= 1; ++row_offset)
 			for (Index column_offset = -1; column_offset <= 1; ++column_offset)
-				if (row_offset != 0 && column_offset != 0)
+				if (row_offset != 0 || column_offset != 0)
 					if (auto neighbor = tileEntityAt(position + Position(row_offset, column_offset)))
 						neighbor->onNeighborUpdated(-row_offset, -column_offset);
+	}
+
+	bool Realm::hasTileEntityAt(const Position &position) const {
+		return tileEntities.contains(getIndex(position));
 	}
 
 	void Realm::toJSON(nlohmann::json &json) const {

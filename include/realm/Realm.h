@@ -94,6 +94,7 @@ namespace Game3 {
 			std::optional<Position> getPathableAdjacent(Index) const;
 			bool isValid(const Position &) const;
 			void updateNeighbors(const Position &);
+			bool hasTileEntityAt(const Position &) const;
 
 			template <typename T, typename... Args>
 			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {
