@@ -38,8 +38,9 @@ namespace Game3 {
 		if (movingLeft || movingRight || movingUp || movingDown)
 			speed = std::min(15.f, 1.05f * speed);
 		else
-			speed = MAX_SPEED / 8.f;
+			speed = MIN_SPEED;
 
+		const Direction old_direction = direction;
 		Direction final_direction = direction;
 		if (movingLeft)
 			move(final_direction = Direction::Left);
@@ -50,6 +51,8 @@ namespace Game3 {
 		if (movingDown)
 			move(final_direction = Direction::Down);
 		direction = final_direction;
+		if (old_direction != final_direction)
+			speed = MIN_SPEED;
 	}
 
 	void Player::interactOn() {
