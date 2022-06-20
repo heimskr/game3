@@ -35,6 +35,8 @@ namespace Game3 {
 	class Entity: public HasInventory, public HasRealm, public std::enable_shared_from_this<Entity> {
 		public:
 			constexpr static Slot DEFAULT_INVENTORY_SIZE = 30;
+			/** The reciprocal of this is how many seconds it takes to move one square. */
+			constexpr static float MAX_SPEED = 15.f;
 
 			constexpr static EntityID  GANGBLANC_ID = 1;
 			constexpr static EntityID       GRUM_ID = 2;
@@ -56,8 +58,6 @@ namespace Game3 {
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;
 			Direction direction = Direction::Down;
-			/** The reciprocal of this is how many seconds it takes to move one square. */
-			float speed = 15.f;
 			/** When the entity moves a square, its position field is immediately updated but this field is set to an offset
 			 *  such that the sum of the new position and the offset is equal to the old offset. The offset is moved closer
 			 *  to zero each tick to achieve smooth movement instead of teleportation from one tile to the next. */
@@ -111,6 +111,7 @@ namespace Game3 {
 			void queueForMove(const std::function<bool(const std::shared_ptr<Entity> &)> &);
 			bool pathfind(const Position &start, const Position &goal, std::list<Direction> &);
 			bool pathfind(const Position &goal);
+			virtual float getSpeed() const { return MAX_SPEED; }
 
 		protected:
 			Texture *texture = nullptr;

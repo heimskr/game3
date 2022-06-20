@@ -10,6 +10,7 @@ namespace Game3 {
 
 			std::unordered_set<CraftingStationType> stationTypes {CraftingStationType::None};
 
+			float speed = 0.f;
 			bool movingUp = false;
 			bool movingRight = false;
 			bool movingDown = false;
@@ -28,6 +29,7 @@ namespace Game3 {
 			using Entity::teleport;
 			void teleport(const Position &, const std::shared_ptr<Realm> &) override;
 			void addMoney(MoneyCount);
+			float getSpeed() const override { return speed; }
 
 			friend class Entity;
 

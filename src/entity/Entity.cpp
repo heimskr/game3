@@ -76,6 +76,7 @@ namespace Game3 {
 			path.pop_front();
 		auto &x = offset.x();
 		auto &y = offset.y();
+		const float speed = getSpeed();
 		if (x < 0.f)
 			x = std::min(x + delta * speed, 0.f);
 		else if (0.f < x)

@@ -34,6 +34,12 @@ namespace Game3 {
 			tooldown = 0;
 			inventory->notifyOwner();
 		}
+
+		if (movingLeft || movingRight || movingUp || movingDown)
+			speed = std::min(15.f, 1.05f * speed);
+		else
+			speed = MAX_SPEED / 8.f;
+
 		Direction final_direction = direction;
 		if (movingLeft)
 			move(final_direction = Direction::Left);
