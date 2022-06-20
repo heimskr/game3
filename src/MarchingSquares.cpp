@@ -13,14 +13,14 @@ namespace Game3 {
 		const bool center = get(0, 0);
 		int sum = 0;
 		if (center) {
-			auto     top_left = static_cast<uint8_t>(get(position.column - 1, position.row - 1));
-			const auto    top = static_cast<uint8_t>(get(position.column,     position.row - 1));
-			auto    top_right = static_cast<uint8_t>(get(position.column + 1, position.row - 1));
-			const auto   left = static_cast<uint8_t>(get(position.column - 1, position.row    ));
-			const auto  right = static_cast<uint8_t>(get(position.column + 1, position.row    ));
-			auto  bottom_left = static_cast<uint8_t>(get(position.column - 1, position.row + 1));
-			const auto bottom = static_cast<uint8_t>(get(position.column,     position.row + 1));
-			auto bottom_right = static_cast<uint8_t>(get(position.column + 1, position.row + 1));
+			auto     top_left = static_cast<uint8_t>(get(-1, -1));
+			const auto    top = static_cast<uint8_t>(get( 0, -1));
+			auto    top_right = static_cast<uint8_t>(get( 1, -1));
+			const auto   left = static_cast<uint8_t>(get(-1,  0));
+			const auto  right = static_cast<uint8_t>(get( 1,  0));
+			auto  bottom_left = static_cast<uint8_t>(get(-1,  1));
+			const auto bottom = static_cast<uint8_t>(get( 0,  1));
+			auto bottom_right = static_cast<uint8_t>(get( 1,  1));
 			if (!top || !left)
 				top_left = 0;
 			if (!top || !right)
@@ -39,10 +39,10 @@ namespace Game3 {
 		const bool center = get(0, 0);
 		int sum = 0;
 		if (center) {
-			const auto top    = static_cast<uint8_t>(get(position.column,     position.row - 1));
-			const auto left   = static_cast<uint8_t>(get(position.column - 1, position.row    ));
-			const auto right  = static_cast<uint8_t>(get(position.column + 1, position.row    ));
-			const auto bottom = static_cast<uint8_t>(get(position.column,     position.row + 1));
+			const auto top    = static_cast<uint8_t>(get( 0, -1));
+			const auto left   = static_cast<uint8_t>(get(-1,  0));
+			const auto right  = static_cast<uint8_t>(get( 1,  0));
+			const auto bottom = static_cast<uint8_t>(get( 0,  1));
 			sum = top + (left << 1) + (right << 2) + (bottom << 3);
 		}
 

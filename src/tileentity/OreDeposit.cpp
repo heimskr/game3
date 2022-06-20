@@ -74,23 +74,23 @@ namespace Game3 {
 
 	TileID OreDeposit::getID(Ore ore) {
 		switch (ore) {
-			case Ore::Coal:    return OverworldTiles::COAL_ORE;
-			case Ore::Copper:  return OverworldTiles::COPPER_ORE;
-			case Ore::Iron:    return OverworldTiles::IRON_ORE;
-			case Ore::Gold:    return OverworldTiles::GOLD_ORE;
-			case Ore::Diamond: return OverworldTiles::DIAMOND_ORE;
-			default: return OverworldTiles::MISSING;
+			case Ore::Coal:    return Monomap::COAL_ORE;
+			case Ore::Copper:  return Monomap::COPPER_ORE;
+			case Ore::Iron:    return Monomap::IRON_ORE;
+			case Ore::Gold:    return Monomap::GOLD_ORE;
+			case Ore::Diamond: return Monomap::DIAMOND_ORE;
+			default: return Monomap::MISSING;
 		}
 	}
 
 	TileID OreDeposit::getRegenID(Ore ore) {
 		switch (ore) {
-			case Ore::Coal:    return OverworldTiles::COAL_ORE_REGEN;
-			case Ore::Copper:  return OverworldTiles::COPPER_ORE_REGEN;
-			case Ore::Iron:    return OverworldTiles::IRON_ORE_REGEN;
-			case Ore::Gold:    return OverworldTiles::GOLD_ORE_REGEN;
-			case Ore::Diamond: return OverworldTiles::DIAMOND_ORE_REGEN;
-			default: return OverworldTiles::MISSING;
+			case Ore::Coal:    return Monomap::COAL_ORE_REGEN;
+			case Ore::Copper:  return Monomap::COPPER_ORE_REGEN;
+			case Ore::Iron:    return Monomap::IRON_ORE_REGEN;
+			case Ore::Gold:    return Monomap::GOLD_ORE_REGEN;
+			case Ore::Diamond: return Monomap::DIAMOND_ORE_REGEN;
+			default: return Monomap::MISSING;
 		}
 	}
 

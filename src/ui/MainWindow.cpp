@@ -268,7 +268,7 @@ namespace Game3 {
 	void MainWindow::newGame(int seed, int width, int height) {
 		glArea.get_context()->make_current();
 		game = Game::create(*canvas);
-		Texture texture("resources/tileset2.png", true);
+		Texture texture("resources/tileset.png", true);
 		texture.init();
 		auto tilemap = std::make_shared<Tilemap>(width, height, 16, texture);
 		auto realm = Realm::create(1, Realm::OVERWORLD, tilemap);
@@ -630,7 +630,7 @@ namespace Game3 {
 								const auto house_pos = door->targetPosition + Position(-1, 0);
 								auto overworld = game->realms.at(door->targetRealm);
 								player.getRealm()->spawn<Gatherer>(player.getPosition(), Entity::VILLAGER1_ID, overworld->id, house->id, house_pos, overworld->closestTileEntity<Building>(house_pos,
-									[](const auto &building) { return building->tileID == OverworldTiles::KEEP_SW; }));
+									[](const auto &building) { return building->tileID == Monomap::KEEP_SW; }));
 							} catch (const std::exception &err) {
 								std::cerr << err.what() << '\n';
 							}

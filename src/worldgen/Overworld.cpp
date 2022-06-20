@@ -31,8 +31,8 @@ namespace Game3::WorldGen {
 		tilemap3->tiles.assign(tilemap3->tiles.size(), 0);
 
 		static const std::vector<TileID> grasses {
-			OverworldTiles::GRASS_ALT1, OverworldTiles::GRASS_ALT2,
-			OverworldTiles::GRASS, OverworldTiles::GRASS, OverworldTiles::GRASS, OverworldTiles::GRASS, OverworldTiles::GRASS, OverworldTiles::GRASS, OverworldTiles::GRASS
+			Monomap::GRASS_ALT1, Monomap::GRASS_ALT2,
+			Monomap::GRASS, Monomap::GRASS, Monomap::GRASS, Monomap::GRASS, Monomap::GRASS, Monomap::GRASS, Monomap::GRASS
 		};
 
 		auto saved_noise = std::make_unique<double[]>(width * height);
@@ -43,24 +43,24 @@ namespace Game3::WorldGen {
 				double noise = perlin.GetValue(row / noise_zoom, column / noise_zoom, 0.666);
 				saved_noise[row * width + column] = noise;
 				if (noise < noise_threshold) {
-					realm->setLayer1(row, column, OverworldTiles::DEEPER_WATER);
+					realm->setLayer1(row, column, Monomap::DEEPER_WATER);
 				} else if (noise < noise_threshold + 0.1) {
-					realm->setLayer1(row, column, OverworldTiles::DEEP_WATER);
+					realm->setLayer1(row, column, Monomap::DEEP_WATER);
 				} else if (noise < noise_threshold + 0.2) {
-					realm->setLayer1(row, column, OverworldTiles::WATER);
+					realm->setLayer1(row, column, Monomap::WATER);
 				} else if (noise < noise_threshold + 0.3) {
-					realm->setLayer1(row, column, OverworldTiles::SHALLOW_WATER);
+					realm->setLayer1(row, column, Monomap::SHALLOW_WATER);
 				} else if (noise < noise_threshold + 0.4) {
-					realm->setLayer1(row, column, OverworldTiles::SAND);
+					realm->setLayer1(row, column, Monomap::SAND);
 				} else if (noise < noise_threshold + 0.5) {
-					realm->setLayer1(row, column, OverworldTiles::LIGHT_GRASS);
+					realm->setLayer1(row, column, Monomap::LIGHT_GRASS);
 				} else if (0.8 < noise) {
-					realm->setLayer1(row, column, OverworldTiles::STONE);
+					realm->setLayer1(row, column, Monomap::STONE);
 				} else {
 					realm->setLayer1(row, column, choose(grasses, rng));
 					const double forest_noise = forest_perlin.GetValue(row / noise_zoom, column / noise_zoom, 0.5);
 					if (0.5 < forest_noise)
-						realm->add(TileEntity::create<Tree>(OverworldTiles::TREE1 + rand() % 3, OverworldTiles::TREE0, Position(row, column), Tree::MATURITY));
+						realm->add(TileEntity::create<Tree>(Monomap::TREE1 + rand() % 3, Monomap::TREE0, Position(row, column), Tree::MATURITY));
 				}
 			}
 		noise_timer.stop();
@@ -76,7 +76,7 @@ namespace Game3::WorldGen {
 		std::vector<Index> resource_starts;
 		resource_starts.reserve(width * height / 10);
 		for (Index index = 0, max = width * height; index < max; ++index)
-			if (tilemap1->tiles[index] == OverworldTiles::STONE)
+			if (tilemap1->tiles[index] == Monomap::STONE)
 				resource_starts.push_back(index);
 		std::shuffle(resource_starts.begin(), resource_starts.end(), rng);
 		auto add_resources = [&](double threshold, Ore ore) {
@@ -106,7 +106,7 @@ namespace Game3::WorldGen {
 			for (size_t row = row_start; row < row_end; row += 2)
 				for (size_t column = column_start; column < column_end; column += 2) {
 					const Index index = row * tilemap1->width + column;
-					if (!overworldTiles.isLand(tiles1[index]))
+					if (!monomap.isLand(tiles1[index]))
 						goto failed;
 				}
 			candidates.push_back(index);

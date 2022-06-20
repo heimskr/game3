@@ -40,6 +40,7 @@ namespace Game3 {
 			Index randomLand = 0;
 			/** Whether the realm's rendering should be affected by the day-night cycle. */
 			bool outdoors = true;
+			size_t ghostCount = 0;
 
 			Realm(const Realm &) = delete;
 			Realm(Realm &&) = default;
@@ -92,6 +93,7 @@ namespace Game3 {
 			std::optional<Position> getPathableAdjacent(const Position &) const;
 			std::optional<Position> getPathableAdjacent(Index) const;
 			bool isValid(const Position &) const;
+			void updateNeighbors(const Position &);
 
 			template <typename T, typename... Args>
 			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {

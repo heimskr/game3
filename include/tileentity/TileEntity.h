@@ -25,6 +25,7 @@ namespace Game3 {
 			constexpr static TileEntityID TREE            = 6;
 			constexpr static TileEntityID CRAFTINGSTATION = 7;
 			constexpr static TileEntityID OREDEPOSIT      = 8;
+			constexpr static TileEntityID GHOST           = 9;
 
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;
@@ -48,6 +49,7 @@ namespace Game3 {
 			virtual void init() {}
 			virtual void tick(Game &, float) {}
 			virtual void onRemove() {}
+			virtual void onNeighborUpdated(Index /* row_offset */, Index /* column_offset */) {}
 			/** Returns the TileEntity ID. This is not the tile ID, which corresponds to a tile in the tileset. */
 			virtual TileEntityID getID() const = 0;
 			virtual void render(SpriteRenderer &) {}

@@ -17,18 +17,17 @@ namespace Game3 {
 			return false;
 	
 		switch (realm.tilemap1->tiles[index]) {
-			case OverworldTiles::GRASS:
-			case OverworldTiles::GRASS_ALT1:
-			case OverworldTiles::GRASS_ALT2:
-			case OverworldTiles::LIGHT_GRASS:
-			case OverworldTiles::DIRT:
+			case Monomap::GRASS:
+			case Monomap::GRASS_ALT1:
+			case Monomap::GRASS_ALT2:
+			case Monomap::LIGHT_GRASS:
+			case Monomap::DIRT:
 				break;
 			default:
 				return false;
 		}
 
-		if (realm.pathMap[index]) {
-			realm.add(TileEntity::create<Tree>(OverworldTiles::TREE1 + rand() % 3, OverworldTiles::TREE0, position, 0.f));
+		if (realm.pathMap[index] && nullptr != realm.add(TileEntity::create<Tree>(Monomap::TREE1 + rand() % 3, Monomap::TREE0, position, 0.f))) {
 			if (--stack.count == 0)
 				player->inventory->erase(slot);
 			player->inventory->notifyOwner();

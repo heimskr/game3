@@ -27,8 +27,7 @@ namespace Game3 {
 		// 		return false;
 		// }
 
-		// if (realm.pathMap[index]) {
-		// 	realm.add(TileEntity::create<Tree>(OverworldTiles::TREE1 + rand() % 3, OverworldTiles::TREE0, position, 0.f));
+		// if (realm.pathMap[index] && nullptr != realm.add(TileEntity::create<Tree>(OverworldTiles::TREE1 + rand() % 3, OverworldTiles::TREE0, position, 0.f));
 		// 	if (--stack.count == 0)
 		// 		player->inventory->erase(slot);
 		// 	player->inventory->notifyOwner();

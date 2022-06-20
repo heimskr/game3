@@ -37,6 +37,8 @@ namespace Game3 {
 
 	Texture & cacheTexture(const std::filesystem::path &, bool alpha = true, int filter = GL_NEAREST);
 
+	extern Texture MISSING;
+
 	void to_json(nlohmann::json &, const Texture &);
 	void from_json(const nlohmann::json &, Texture &);
 }

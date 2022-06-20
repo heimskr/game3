@@ -20,19 +20,19 @@ namespace Game3::WorldGen {
 
 		const Index exit_index = generateIndoors(realm, rng, parent_realm, entrance);
 
-		realm->setLayer2(width + 1, choose(HouseTiles::PLANTS, rng));
-		realm->setLayer2(2 * width - 2, choose(HouseTiles::PLANTS, rng));
-		realm->setLayer2((width - 1) * height - 2, choose(HouseTiles::PLANTS, rng));
-		realm->setLayer2((width - 2) * height + 1, choose(HouseTiles::PLANTS, rng));
+		realm->setLayer2(width + 1, choose(Monomap::PLANTS, rng));
+		realm->setLayer2(2 * width - 2, choose(Monomap::PLANTS, rng));
+		realm->setLayer2((width - 1) * height - 2, choose(Monomap::PLANTS, rng));
+		realm->setLayer2((width - 2) * height + 1, choose(Monomap::PLANTS, rng));
 
 		std::array<Index, 2> edges {1, width - 2};
 		const Position bed_position(2 + rng() % (height - 4), choose(edges, rng));
-		realm->setLayer2(realm->getIndex(bed_position), choose(HouseTiles::BEDS, rng));
+		realm->setLayer2(realm->getIndex(bed_position), choose(Monomap::BEDS, rng));
 		realm->extraData["bed"] = bed_position;
 
 		const auto house_position = entrance - Position(1, 0);
 		realm->spawn<Gatherer>(realm->getPosition(exit_index - width), Entity::VILLAGER1_ID, parent_realm->id, realm->id, house_position, parent_realm->closestTileEntity<Building>(house_position,
-			[](const auto &building) { return building->tileID == OverworldTiles::KEEP_SW; }));
+			[](const auto &building) { return building->tileID == Monomap::KEEP_SW; }));
 
 		switch(rng() % 2) {
 			case 0: {
@@ -56,8 +56,8 @@ namespace Game3::WorldGen {
 				std::shuffle(shuffled_texts.begin(), shuffled_texts.end(), rng);
 
 				for (Index index = width + 2; index < 2 * width - 2; ++index) {
-					realm->setLayer2(index, HouseTiles::BOOKSHELF);
-					realm->add(TileEntity::create<Sign>(HouseTiles::EMPTY, realm->getPosition(index), shuffled_texts.at((index - width - 2) % shuffled_texts.size()), "Bookshelf"));
+					realm->setLayer2(index, Monomap::BOOKSHELF);
+					realm->add(TileEntity::create<Sign>(Monomap::EMPTY, realm->getPosition(index), shuffled_texts.at((index - width - 2) % shuffled_texts.size()), "Bookshelf"));
 				}
 				break;
 			}

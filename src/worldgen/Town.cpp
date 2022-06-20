@@ -23,29 +23,29 @@ namespace Game3::WorldGen {
 		Timer town_timer("TownLayout");
 		for (row = index / map_width - pad; row < index / map_width + height + pad; ++row)
 			for (column = index % map_width - pad; column < index % map_width + width + pad; ++column)
-				realm->setLayer2(row * map_width + column, OverworldTiles::EMPTY);
+				realm->setLayer2(row * map_width + column, Monomap::EMPTY);
 
 		for (row = index / map_width; row < index / map_width + height; ++row) {
-			realm->setLayer2(row * map_width + index % map_width, OverworldTiles::TOWER_NS);
-			realm->setLayer2(row * map_width + index % map_width + width - 1, OverworldTiles::TOWER_NS);
+			realm->setLayer2(row * map_width + index % map_width, Monomap::TOWER_NS);
+			realm->setLayer2(row * map_width + index % map_width + width - 1, Monomap::TOWER_NS);
 		}
 
 		for (column = 0; column < width; ++column) {
-			realm->setLayer2(index + column, OverworldTiles::TOWER_WE);
-			realm->setLayer2(index + map_width * (height - 1) + column, OverworldTiles::TOWER_WE);
+			realm->setLayer2(index + column, Monomap::TOWER_WE);
+			realm->setLayer2(index + map_width * (height - 1) + column, Monomap::TOWER_WE);
 		}
 
-		realm->setLayer2(index, OverworldTiles::TOWER_NW);
-		realm->setLayer2(index + map_width * (height - 1), OverworldTiles::TOWER_SW);
-		realm->setLayer2(index + width - 1, OverworldTiles::TOWER_NE);
-		realm->setLayer2(index + map_width * (height - 1) + width - 1, OverworldTiles::TOWER_SE);
+		realm->setLayer2(index, Monomap::TOWER_NW);
+		realm->setLayer2(index + map_width * (height - 1), Monomap::TOWER_SW);
+		realm->setLayer2(index + width - 1, Monomap::TOWER_NE);
+		realm->setLayer2(index + map_width * (height - 1) + width - 1, Monomap::TOWER_SE);
 
 		std::unordered_set<Index> buildable_set;
 
 		for (row = index / map_width + 1; row < index / map_width + height - 1; ++row)
 			for (column = index % map_width + 1; column < index % map_width + width - 1; ++column) {
 				buildable_set.insert(row * map_width + column);
-				set1(OverworldTiles::DIRT);
+				set1(Monomap::DIRT);
 				if (auto tile_entity = realm->tileEntityAt({row, column}))
 					realm->remove(tile_entity);
 			}
@@ -54,56 +54,56 @@ namespace Game3::WorldGen {
 		for (column = index % map_width - pad; column < index % map_width + width + pad; ++column) {
 			buildable_set.erase(row * map_width + column);
 			buildable_set.erase((index / map_width + height - 2) * map_width + column); // Make sure no houses spawn on the bottom row of the town
-			set1(OverworldTiles::ROAD);
+			set1(Monomap::ROAD);
 			++row;
 			buildable_set.erase(row * map_width + column);
-			set1(OverworldTiles::ROAD);
+			set1(Monomap::ROAD);
 			--row;
 		}
 		column = index % map_width;
-		set2(OverworldTiles::EMPTY);
+		set2(Monomap::EMPTY);
 		--row;
-		set2(OverworldTiles::TOWER_S);
+		set2(Monomap::TOWER_S);
 		row += 2;
-		set2(OverworldTiles::EMPTY);
+		set2(Monomap::EMPTY);
 		++row;
-		set2(OverworldTiles::TOWER_N);
+		set2(Monomap::TOWER_N);
 		--row;
 		column += width - 1;
-		set2(OverworldTiles::EMPTY);
+		set2(Monomap::EMPTY);
 		--row;
-		set2(OverworldTiles::EMPTY);
+		set2(Monomap::EMPTY);
 		--row;
-		set2(OverworldTiles::TOWER_S);
+		set2(Monomap::TOWER_S);
 		row += 3;
-		set2(OverworldTiles::TOWER_N);
+		set2(Monomap::TOWER_N);
 		--row;
 		column = index % map_width + width / 2 - 1;
 		for (row = index / map_width - pad; row < index / map_width + height + pad; ++row) {
 			buildable_set.erase(row * map_width + column);
-			set1(OverworldTiles::ROAD);
+			set1(Monomap::ROAD);
 			++column;
 			buildable_set.erase(row * map_width + column);
-			set1(OverworldTiles::ROAD);
+			set1(Monomap::ROAD);
 			--column;
 		}
 		row = index / map_width;
-		set2(OverworldTiles::EMPTY);
+		set2(Monomap::EMPTY);
 		--column;
-		set2(OverworldTiles::TOWER_NE);
+		set2(Monomap::TOWER_NE);
 		column += 2;
-		set2(OverworldTiles::EMPTY);
+		set2(Monomap::EMPTY);
 		++column;
-		set2(OverworldTiles::TOWER_NW);
+		set2(Monomap::TOWER_NW);
 		column -= 2;
 		row += height - 1;
-		set2(OverworldTiles::EMPTY);
+		set2(Monomap::EMPTY);
 		--column;
-		set2(OverworldTiles::TOWER_NE);
+		set2(Monomap::TOWER_NE);
 		column += 2;
-		set2(OverworldTiles::EMPTY);
+		set2(Monomap::EMPTY);
 		++column;
-		set2(OverworldTiles::TOWER_NW);
+		set2(Monomap::TOWER_NW);
 		--column;
 
 		Position keep_position(index / map_width + height / 2 - 1, index % map_width + width / 2 - 1);
@@ -125,13 +125,13 @@ namespace Game3::WorldGen {
 			realm->add(TileEntity::create<Building>(tile, keep_position, keep_realm_id, keep_entrance));
 		};
 
-		create_keep(OverworldTiles::KEEP_NW);
+		create_keep(Monomap::KEEP_NW);
 		++keep_position.column;
-		create_keep(OverworldTiles::KEEP_NE);
+		create_keep(Monomap::KEEP_NE);
 		++keep_position.row;
-		create_keep(OverworldTiles::KEEP_SE);
+		create_keep(Monomap::KEEP_SE);
 		--keep_position.column;
-		create_keep(OverworldTiles::KEEP_SW);
+		create_keep(Monomap::KEEP_SW);
 
 		// Prevent houses from being placed on the corners around the keep
 		buildable_set.erase(map_width * (index / map_width + height / 2 - 2) + index % map_width + width / 2 - 2);
@@ -150,7 +150,7 @@ namespace Game3::WorldGen {
 			while (!buildable_set.empty()) {
 				const auto index = *buildable_set.begin();
 				if (rng() % 8 == 0) {
-					constexpr static std::array<TileID, 3> blacksmiths {OverworldTiles::BLACKSMITH1, OverworldTiles::BLACKSMITH2, OverworldTiles::BLACKSMITH3};
+					constexpr static std::array<TileID, 3> blacksmiths {Monomap::BLACKSMITH1, Monomap::BLACKSMITH2, Monomap::BLACKSMITH3};
 					const auto blacksmith = choose(blacksmiths, rng);
 					realm->setLayer2(index, blacksmith);
 					const RealmID realm_id = game.newRealmID();
@@ -166,7 +166,7 @@ namespace Game3::WorldGen {
 					game.realms.emplace(realm_id, new_realm);
 					realm->add(building);
 				} else {
-					constexpr static std::array<TileID, 3> houses {OverworldTiles::HOUSE1, OverworldTiles::HOUSE2, OverworldTiles::HOUSE3};
+					constexpr static std::array<TileID, 3> houses {Monomap::HOUSE1, Monomap::HOUSE2, Monomap::HOUSE3};
 					const auto house = choose(houses, rng);
 					realm->setLayer2(index, house);
 					const RealmID realm_id = game.newRealmID();
