@@ -304,9 +304,25 @@ namespace Game3 {
 		if (!isValid(position))
 			return false;
 
+		const Index index = getIndex(position);
+		auto &inventory = *player->inventory;
+
+		if (auto *active = inventory.getActive()) {
+			if (active->has(ItemAttribute::Hammer)) {
+				auto &tileset = *tileSets.at(type);
+				const TileID tile2 = tilemap2->tiles.at(index);
+				ItemStack stack;
+				if (tileset.getItemStack(tile2, stack) && !inventory.add(stack)) {
+					if (active->reduceDurability())
+						inventory.erase(inventory.activeSlot);
+					setLayer2(position, tileset.getEmpty());
+					return true;
+				}
+			}
+		}
+
 		switch (type) {
 			case Realm::OVERWORLD: {
-				const Index index = getIndex(position);
 				std::optional<ItemID> item;
 				std::optional<ItemAttribute> attribute;
 
@@ -326,7 +342,6 @@ namespace Game3 {
 				}
 
 				if (item && attribute) {
-					auto &inventory = *player->inventory;
 					if (auto *stack = inventory.getActive()) {
 						if (stack->has(*attribute) && !inventory.add({*item, 1})) {
 							if (stack->reduceDurability())

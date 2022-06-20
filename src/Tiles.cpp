@@ -1,4 +1,5 @@
 #include "Tiles.h"
+#include "item/Item.h"
 #include "realm/Realm.h"
 
 namespace Game3 {
@@ -24,6 +25,23 @@ namespace Game3 {
 	std::unordered_set<TileID> Monomap::dirtSet {
 		LIGHT_GRASS, GRASS, GRASS_ALT1, GRASS_ALT2, DIRT,
 	};
+
+	bool Monomap::getItemStack(TileID tile, ItemStack &stack) const {
+		if (woodenWalls.contains(tile)) {
+			stack = {Item::WOODEN_WALL, 1};
+			return true;
+		}
+
+		switch (tile) {
+			case PLANT1: stack = {Item::PLANT_POT1, 1}; break;
+			case PLANT2: stack = {Item::PLANT_POT2, 1}; break;
+			case PLANT3: stack = {Item::PLANT_POT3, 1}; break;
+			default:
+				return false;
+		}
+
+		return true;
+	}
 
 	Monomap monomap;
 

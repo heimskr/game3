@@ -9,6 +9,8 @@
 #include "Types.h"
 
 namespace Game3 {
+	class ItemStack;
+
 	struct TileSet {
 		TileSet() = default;
 		virtual ~TileSet() = default;
@@ -18,6 +20,7 @@ namespace Game3 {
 		virtual TileID getEmpty() const { return 0; }
 		virtual const char * name() const = 0;
 		virtual Texture & getTexture() = 0;
+		virtual bool getItemStack(TileID, ItemStack &) const = 0;
 	};
 
 	struct Monomap: TileSet {
@@ -173,6 +176,8 @@ namespace Game3 {
 		Texture & getTexture() override {
 			return cacheTexture("resources/tileset.png");
 		}
+
+		bool getItemStack(TileID, ItemStack &) const override;
 	};
 
 	extern Monomap monomap;
