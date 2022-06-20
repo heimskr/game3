@@ -9,7 +9,7 @@ namespace Game3 {
 
 	std::array<int, 16> marchingArray4 {22 /* TODO: verify */, 17, 6, 16, 4, 14, 1, 26, 3, 10, 2, 20, 0, 18, 12, 19};
 
-	TileID march8(const Position &position, const std::function<bool(int8_t, int8_t)> &get) {
+	TileID march8(const std::function<bool(int8_t, int8_t)> &get) {
 		const bool center = get(0, 0);
 		int sum = 0;
 		if (center) {
@@ -35,7 +35,7 @@ namespace Game3 {
 		return !center || sum != 0? marchingMap8.at(sum) : 15;
 	}
 
-	TileID march4(const Position &position, const std::function<bool(int8_t, int8_t)> &get) {
+	TileID march4(const std::function<bool(int8_t, int8_t)> &get) {
 		const bool center = get(0, 0);
 		int sum = 0;
 		if (center) {

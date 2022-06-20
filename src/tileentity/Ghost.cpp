@@ -78,7 +78,7 @@ namespace Game3 {
 
 		switch (details.type) {
 			case GhostType::WoodenWall:
-				march_result = march4(position, [&](int8_t row_offset, int8_t column_offset) -> bool {
+				march_result = march4([&](int8_t row_offset, int8_t column_offset) -> bool {
 					const Position offset_position(position + Position(row_offset, column_offset));
 					if (auto tile_entity = realm->tileEntityAt(offset_position))
 						if (tile_entity->getID() == TileEntity::GHOST)
