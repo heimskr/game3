@@ -2,6 +2,7 @@
 #include <thread>
 #include <unordered_set>
 
+#include "MarchingSquares.h"
 #include "Tiles.h"
 #include "entity/Entity.h"
 #include "game/Game.h"
@@ -398,11 +399,43 @@ namespace Game3 {
 	}
 
 	void Realm::updateNeighbors(const Position &position) {
+		static size_t depth = 0;
+		static bool layer2_updated = false;
+
+		++depth;
+
 		for (Index row_offset = -1; row_offset <= 1; ++row_offset)
 			for (Index column_offset = -1; column_offset <= 1; ++column_offset)
-				if (row_offset != 0 || column_offset != 0)
-					if (auto neighbor = tileEntityAt(position + Position(row_offset, column_offset)))
+				if (row_offset != 0 || column_offset != 0) {
+					const Position offset_position = position + Position(row_offset, column_offset);
+					if (!isValid(offset_position))
+						continue;
+					if (auto neighbor = tileEntityAt(offset_position)) {
 						neighbor->onNeighborUpdated(-row_offset, -column_offset);
+					} else {
+						auto &tiles = tilemap2->tiles;
+						TileID &tile = tiles.at(getIndex(offset_position));
+						if (Monomap::woodenWalls.contains(tile)) {
+							TileID march_result = march4([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
+								const Position march_position = offset_position + Position(march_row_offset, march_column_offset);
+								if (!isValid(march_position))
+									return false;
+								return Monomap::woodenWalls.contains(tiles.at(getIndex(march_position)));
+							});
+
+							const TileID marched = (march_result / 7 + 6) * (tilemap2->setWidth / tilemap2->tileSize) + march_result % 7;
+							if (marched != tile) {
+								tile = marched;
+								layer2_updated = true;
+							}
+						}
+					}
+				}
+
+		if (--depth == 0 && layer2_updated) {
+			getGame().activateContext();
+			renderer2.reupload();
+		}
 	}
 
 	bool Realm::hasTileEntityAt(const Position &position) const {

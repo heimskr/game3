@@ -84,16 +84,19 @@ namespace Game3 {
 
 		auto realm = getRealm();
 		TileID march_result;
+		const auto &tiles = realm->tilemap2->tiles;
 
 		switch (details.type) {
 			case GhostType::WoodenWall:
 				march_result = march4([&](int8_t row_offset, int8_t column_offset) -> bool {
 					const Position offset_position(position + Position(row_offset, column_offset));
+					if (!realm->isValid(offset_position))
+						return false;
 					if (auto tile_entity = realm->tileEntityAt(offset_position))
 						if (tile_entity->getID() == TileEntity::GHOST)
 							if (*dynamic_cast<Ghost *>(tile_entity.get())->material.item == *material.item)
 								return true;
-					return monomap.woodenWalls.contains(realm->getIndex(offset_position));
+					return monomap.woodenWalls.contains(tiles.at(realm->getIndex(offset_position)));
 				});
 				break;
 			default:
