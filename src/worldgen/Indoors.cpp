@@ -13,8 +13,8 @@ namespace Game3::WorldGen {
 		const auto height = realm->getHeight();
 
 		for (int column = 1; column < width - 1; ++column) {
-			realm->setLayer2(column, Monomap::WALL_WEN);
-			realm->setLayer2(height - 1, column, Monomap::WALL_WES);
+			realm->setLayer2(column, Monomap::WALL_WE);
+			realm->setLayer2(height - 1, column, Monomap::WALL_WE);
 		}
 
 		for (int row = 1; row < height - 1; ++row) {
