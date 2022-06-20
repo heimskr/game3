@@ -26,7 +26,7 @@ namespace Game3 {
 		ItemTexture(int x_, int y_, Texture &texture_, int width_ = 16, int height_ = 16): x(x_), y(y_), texture(&texture_), width(width_), height(height_) {}
 	};
 
-	enum class ItemAttribute {Axe, Pickaxe, Shovel};
+	enum class ItemAttribute {Axe, Pickaxe, Shovel, Hammer, Saw};
 
 	class Item: public std::enable_shared_from_this<Item> {
 		public:
@@ -65,6 +65,9 @@ namespace Game3 {
 			constexpr static ItemID PLANT_POT1      = 32;
 			constexpr static ItemID PLANT_POT2      = 33;
 			constexpr static ItemID PLANT_POT3      = 34;
+			constexpr static ItemID IRON_HAMMER     = 35;
+			constexpr static ItemID GOLD_HAMMER     = 36;
+			constexpr static ItemID DIAMOND_HAMMER  = 37;
 
 			static std::unordered_map<ItemID, ItemTexture> itemTextures;
 			static std::map<ItemID, std::shared_ptr<Item>> items;

@@ -49,18 +49,24 @@ namespace Game3 {
 		{Item::PLANT_POT1,      { 64, 192, textureTileset}},
 		{Item::PLANT_POT2,      { 80, 192, textureTileset}},
 		{Item::PLANT_POT3,      { 96, 192, textureTileset}},
+		{Item::IRON_HAMMER,     { 16, 176, texturePalisade}},
+		{Item::GOLD_HAMMER,     { 32, 176, texturePalisade}},
+		{Item::DIAMOND_HAMMER,  { 48, 176, texturePalisade}},
 	};
 
 	std::unordered_map<ItemID, Durability> Item::durabilities {
 		{Item::IRON_AXE,        128},
 		{Item::IRON_PICKAXE,    128},
 		{Item::IRON_SHOVEL,     128},
+		{Item::IRON_HAMMER,     128},
 		{Item::GOLD_AXE,         64},
 		{Item::GOLD_PICKAXE,     64},
 		{Item::GOLD_SHOVEL,      64},
+		{Item::GOLD_HAMMER,      64},
 		{Item::DIAMOND_AXE,     512},
 		{Item::DIAMOND_PICKAXE, 512},
 		{Item::DIAMOND_SHOVEL,  512},
+		{Item::DIAMOND_HAMMER,  512},
 	};
 
 	std::map<ItemID, std::shared_ptr<Item>> Item::items {
@@ -82,9 +88,9 @@ namespace Game3 {
 		{Item::STONE,           std::make_shared<Item>     (Item::STONE,           "Stone",             1, 64)},
 		{Item::IRON_BAR,        std::make_shared<Item>     (Item::IRON_BAR,        "Iron Bar",         16, 64)},
 		{Item::SAPLING,         std::make_shared<Sapling>  (Item::SAPLING,         "Sapling",           5, 64)},
-		{Item::GOLD_AXE,        std::make_shared<Tool>     (Item::GOLD_AXE,        "Gold Axe",        400, 0.75f, ItemAttribute::Axe)},
-		{Item::GOLD_PICKAXE,    std::make_shared<Tool>     (Item::GOLD_PICKAXE,    "Gold Pickaxe",    400, 0.75f, ItemAttribute::Pickaxe)},
-		{Item::GOLD_SHOVEL,     std::make_shared<Tool>     (Item::GOLD_SHOVEL,     "Gold Shovel",     300, 0.75f, ItemAttribute::Shovel)},
+		{Item::GOLD_AXE,        std::make_shared<Tool>     (Item::GOLD_AXE,        "Gold Axe",        400, .75f, ItemAttribute::Axe)},
+		{Item::GOLD_PICKAXE,    std::make_shared<Tool>     (Item::GOLD_PICKAXE,    "Gold Pickaxe",    400, .75f, ItemAttribute::Pickaxe)},
+		{Item::GOLD_SHOVEL,     std::make_shared<Tool>     (Item::GOLD_SHOVEL,     "Gold Shovel",     300, .75f, ItemAttribute::Shovel)},
 		{Item::GOLD_BAR,        std::make_shared<Item>     (Item::GOLD_BAR,        "Gold Bar",         45, 64)},
 		{Item::DIAMOND_AXE,     std::make_shared<Tool>     (Item::DIAMOND_AXE,     "Diamond Axe",     900, 1.f, ItemAttribute::Axe)},
 		{Item::DIAMOND_PICKAXE, std::make_shared<Tool>     (Item::DIAMOND_PICKAXE, "Diamond Pickaxe", 900, 1.f, ItemAttribute::Pickaxe)},
@@ -98,6 +104,9 @@ namespace Game3 {
 		{Item::PLANT_POT1,      std::make_shared<Furniture>(Item::PLANT_POT1,      "Plant Pot",        32, 64)},
 		{Item::PLANT_POT2,      std::make_shared<Furniture>(Item::PLANT_POT2,      "Plant Pot",        32, 64)},
 		{Item::PLANT_POT3,      std::make_shared<Furniture>(Item::PLANT_POT3,      "Plant Pot",        32, 64)},
+		{Item::IRON_HAMMER,     std::make_shared<Tool>     (Item::IRON_HAMMER,     "Iron Hammer",     150,  3.f, ItemAttribute::Hammer)},
+		{Item::GOLD_HAMMER,     std::make_shared<Tool>     (Item::GOLD_HAMMER,     "Gold Hammer",     400, .75f, ItemAttribute::Hammer)},
+		{Item::DIAMOND_HAMMER,  std::make_shared<Tool>     (Item::DIAMOND_HAMMER,  "Diamond Hammer",  900,  1.f, ItemAttribute::Hammer)},
 	};
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage() {
