@@ -5,23 +5,23 @@
 #include "tileentity/TileEntity.h"
 
 namespace Game3 {
-	class Texture;
-
 	enum class GhostType {Invalid, Normal, WoodenWall};
 
 	struct GhostDetails {
 		GhostType type = GhostType::Invalid;
-		Texture *texture = nullptr;
 		bool useMarchingSquares = false;
 		Index columnsPerRow = 16;
 		Index rowOffset     = 0;
 		Index columnOffset  = 0;
 
 		GhostDetails() = default;
-		GhostDetails(GhostType type_, Index columns_per_row, Index row_offset, Index column_offset):
-			type(type_), useMarchingSquares(true), columnsPerRow(columns_per_row), rowOffset(row_offset), columnOffset(column_offset) {}
+		GhostDetails(GhostType type_, bool use_marching_squares, Index columns_per_row, Index row_offset, Index column_offset):
+			type(type_), useMarchingSquares(use_marching_squares), columnsPerRow(columns_per_row), rowOffset(row_offset), columnOffset(column_offset) {}
 
 		static GhostDetails WOODEN_WALL;
+		static GhostDetails PLANT_POT1;
+		static GhostDetails PLANT_POT2;
+		static GhostDetails PLANT_POT3;
 
 		static GhostDetails & get(const ItemStack &);
 	};

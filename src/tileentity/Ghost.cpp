@@ -1,3 +1,4 @@
+#include <iostream>
 #include "MarchingSquares.h"
 #include "Tiles.h"
 #include "entity/ItemEntity.h"
@@ -13,11 +14,17 @@
 #include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
-	GhostDetails GhostDetails::WOODEN_WALL {GhostType::WoodenWall, 32, 6, 0};
+	GhostDetails GhostDetails::WOODEN_WALL {GhostType::WoodenWall, true,  32,  6, 0};
+	GhostDetails GhostDetails::PLANT_POT1  {GhostType::Normal,     false, 32, 12, 4};
+	GhostDetails GhostDetails::PLANT_POT2  {GhostType::Normal,     false, 32, 12, 5};
+	GhostDetails GhostDetails::PLANT_POT3  {GhostType::Normal,     false, 32, 12, 6};
 
 	GhostDetails & GhostDetails::get(const ItemStack &stack) {
 		switch (stack.item->id) {
 			case Item::WOODEN_WALL: return WOODEN_WALL;
+			case Item::PLANT_POT1:  return PLANT_POT1;
+			case Item::PLANT_POT2:  return PLANT_POT2;
+			case Item::PLANT_POT3:  return PLANT_POT3;
 			default: throw std::runtime_error("Couldn't get GhostDetails for " + stack.item->name);
 		}
 	}
@@ -57,16 +64,17 @@ namespace Game3 {
 
 		auto &tilemap = *realm->tilemap2;
 		const auto tilesize = tilemap.tileSize;
+		const auto column_count = tilemap.setWidth / tilesize;
 
 		TileID tile_id = Monomap::MISSING;
 		
 		if (details.useMarchingSquares)
 			tile_id = marched;
 		else
-			tile_id = details.rowOffset * tilemap.width + details.columnOffset;
+			tile_id = details.rowOffset * column_count + details.columnOffset;
 
-		const auto x = (tile_id % (tilemap.setWidth / tilesize)) * tilesize;
-		const auto y = (tile_id / (tilemap.setWidth / tilesize)) * tilesize;
+		const auto x = (tile_id % column_count) * tilesize;
+		const auto y = (tile_id / column_count) * tilesize;
 		sprite_renderer.drawOnMap(tilemap.texture, position.column, position.row, x / 2, y / 2, tilesize, tilesize, 1.f, 0.f, .5f);
 	}
 
@@ -109,7 +117,7 @@ namespace Game3 {
 		if (details.useMarchingSquares)
 			tile_id = marched;
 		else
-			tile_id = details.rowOffset * tilemap.width + details.columnOffset;
+			tile_id = details.rowOffset * (tilemap.setWidth / tilemap.tileSize) + details.columnOffset;
 
 		realm->setLayer2(position, tile_id);
 	}
