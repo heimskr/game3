@@ -112,22 +112,22 @@ namespace Game3 {
 		});
 		glArea.signal_render().connect(sigc::mem_fun(*this, &MainWindow::render), false);
 		glArea.set_auto_render(false);
-		glArea.add_tick_callback([this](const Glib::RefPtr<Gdk::FrameClock> &) {
+		glArea.add_tick_callback([this](const Glib::RefPtr<Gdk::FrameClock> &clock) {
 			glArea.queue_render();
 			if (game) {
 				if (autofocus && game->player)
 					game->player->focus(*canvas, true);
 				const int minute = game->getMinute();
 				timeLabel.set_text(std::to_string(int(game->getHour())) + (minute < 10? ":0" : ":") + std::to_string(minute));
-				static std::deque<float> fpses;
-				fpses.push_back(1 / game->delta);
-				if (288 < fpses.size())
-					fpses.pop_front();
-				float sum = 0;
-				for (const float fps: fpses)
-					sum += fps;
-				statusbar.set_text(std::to_string(int(sum / fpses.size())) + " FPS");
 			}
+			static std::deque<double> fpses;
+			fpses.push_back(clock->get_fps());
+			if (36 < fpses.size())
+				fpses.pop_front();
+			double sum = 0;
+			for (const double fps: fpses)
+				sum += fps;
+			statusbar.set_text(std::to_string(int(sum / fpses.size())) + " FPS");
 			if (statusbarWaiting && statusbarExpirationTime <= getTime() - statusbarSetTime) {
 				statusbarWaiting = false;
 				statusbar.set_text({});
