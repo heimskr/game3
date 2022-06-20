@@ -44,6 +44,7 @@ namespace Game3 {
 		{Item::PLANK,           { 64, 224, textureItems}},
 		{Item::CLAY,            { 48,   0, texturePalisade}},
 		{Item::DIRT,            {128, 128, texturePalisade}},
+		{Item::BRICK,           {256, 320, textureItems}},
 	};
 
 	std::unordered_map<ItemID, Durability> Item::durabilities {
@@ -88,6 +89,7 @@ namespace Game3 {
 		{Item::PLANK,           std::make_shared<Item>     (Item::PLANK,           "Plank",             4, 64)},
 		{Item::CLAY,            std::make_shared<Item>     (Item::CLAY,            "Clay",              2, 64)},
 		{Item::DIRT,            std::make_shared<Item>     (Item::DIRT,            "Dirt",              1, 64)},
+		{Item::BRICK,           std::make_shared<Item>     (Item::BRICK,           "Brick",             3, 64)},
 	};
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage() {

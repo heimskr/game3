@@ -29,6 +29,7 @@ namespace Game3 {
 
 		recipes.emplace_back(std::vector<ItemStack> {{Item::IRON_ORE, 1}, {Item::COAL, 1}}, ItemStack(Item::IRON_BAR, 1), CraftingStationType::Furnace);
 		recipes.emplace_back(std::vector<ItemStack> {{Item::GOLD_ORE, 1}, {Item::COAL, 2}}, ItemStack(Item::GOLD_BAR, 1), CraftingStationType::Furnace);
+		recipes.emplace_back(std::vector<ItemStack> {{Item::CLAY, 1}}, ItemStack(Item::BRICK, 1), CraftingStationType::Furnace);
 
 		// Temporary recipes
 		recipes.emplace_back(std::vector<ItemStack> {{Item::WOOD,  1}}, ItemStack(Item::PLANK, 1));
