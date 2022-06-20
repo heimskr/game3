@@ -314,6 +314,12 @@ namespace Game3 {
 				if (tile1 == Monomap::SAND) {
 					item.emplace(Item::SAND);
 					attribute.emplace(ItemAttribute::Shovel);
+				} else if (tile1 == Monomap::SHALLOW_WATER) {
+					item.emplace(Item::CLAY);
+					attribute.emplace(ItemAttribute::Shovel);
+				} else if (Monomap::dirtSet.contains(tile1)) {
+					item.emplace(Item::DIRT);
+					attribute.emplace(ItemAttribute::Shovel);
 				} else if (tile1 == Monomap::STONE) {
 					item.emplace(Item::STONE);
 					attribute.emplace(ItemAttribute::Pickaxe);

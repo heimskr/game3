@@ -142,6 +142,7 @@ namespace Game3 {
 		static std::unordered_set<TileID> landSet;
 		static std::unordered_set<TileID> solidSet;
 		static std::unordered_set<TileID> woodenWalls;
+		static std::unordered_set<TileID> dirtSet;
 
 		constexpr static std::array<TileID, 3> BEDS {BED1, BED2, BED3};
 		constexpr static std::array<TileID, 3> PLANTS {PLANT1, PLANT2, PLANT3};

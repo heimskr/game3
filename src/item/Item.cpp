@@ -42,6 +42,8 @@ namespace Game3 {
 		{Item::DIAMOND_SHOVEL,  {240, 160, texturePalisade}},
 		{Item::WOODEN_WALL,     { 16, 144, textureHouse}},
 		{Item::PLANK,           { 64, 224, textureItems}},
+		{Item::CLAY,            { 48,   0, texturePalisade}},
+		{Item::DIRT,            {128, 128, texturePalisade}},
 	};
 
 	std::unordered_map<ItemID, Durability> Item::durabilities {
@@ -84,6 +86,8 @@ namespace Game3 {
 		{Item::DIAMOND_SHOVEL,  std::make_shared<Tool>     (Item::DIAMOND_SHOVEL,  "Diamond Shovel",  700, 1.f, ItemAttribute::Shovel)},
 		{Item::WOODEN_WALL,     std::make_shared<Furniture>(Item::WOODEN_WALL,     "Wooden Wall",       9, 64)},
 		{Item::PLANK,           std::make_shared<Item>     (Item::PLANK,           "Plank",             4, 64)},
+		{Item::CLAY,            std::make_shared<Item>     (Item::CLAY,            "Clay",              2, 64)},
+		{Item::DIRT,            std::make_shared<Item>     (Item::DIRT,            "Dirt",              1, 64)},
 	};
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage() {

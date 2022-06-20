@@ -21,6 +21,10 @@ namespace Game3 {
 		WALL_NW, WALL_WE, WALL_NE, WALL_E, WALL_W, WALL_NS, WALL_SW, WALL_WE3, WALL_SE, WALL_N, WALL_WE2, WALL_NS2, WALL_NS3, WALL_S, WALL_NWES, WALL_NWS, WALL_NES, WALL_WES, WALL, WALL_NWE,
 	};
 
+	std::unordered_set<TileID> Monomap::dirtSet {
+		LIGHT_GRASS, GRASS, GRASS_ALT1, GRASS_ALT2, DIRT,
+	};
+
 	Monomap monomap;
 
 	std::unordered_map<RealmID, std::shared_ptr<TileSet>> tileSets {
