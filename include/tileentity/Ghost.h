@@ -41,7 +41,7 @@ namespace Game3 {
 
 			TileEntityID getID() const override { return TileEntity::GHOST; }
 
-			void onSpawn() override { march(); }
+			void onSpawn() override { march(); updateNeighbors(); }
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(const nlohmann::json &) override;
 			void onNeighborUpdated(Index row_offset, Index column_offset) override;

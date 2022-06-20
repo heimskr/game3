@@ -90,11 +90,6 @@ namespace Game3 {
 		const TileID marched_column = march_result % 7;
 		const TileID row = marched_row + details.rowOffset;
 		const TileID column = marched_column + details.columnOffset;
-		const TileID new_marched = row * details.columnsPerRow + column;
-
-		if (marched != new_marched) {
-			marched = new_marched;
-			updateNeighbors();
-		}
+		marched = row * details.columnsPerRow + column;
 	}
 }
