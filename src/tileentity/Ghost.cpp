@@ -32,6 +32,11 @@ namespace Game3 {
 		details = GhostDetails::get(material);
 	}
 
+	void Ghost::onSpawn() {
+		march();
+		updateNeighbors();
+	}
+
 	void Ghost::onNeighborUpdated(Index row_offset, Index column_offset) {
 		if (row_offset == 0 || column_offset == 0)
 			march();

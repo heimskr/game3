@@ -219,6 +219,8 @@ namespace Game3 {
 		tileEntities.at(index)->onRemove();
 		tileEntities.erase(index);
 		setLayerHelper(index);
+		if (tile_entity->getID() == TileEntity::GHOST)
+			--ghostCount;
 		updateNeighbors(position);
 	}
 

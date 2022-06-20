@@ -7,7 +7,7 @@
 namespace Game3 {
 	class Texture;
 
-	enum class GhostType {Invalid, WoodenWall};
+	enum class GhostType {Invalid, Normal, WoodenWall};
 
 	struct GhostDetails {
 		GhostType type = GhostType::Invalid;
@@ -41,9 +41,9 @@ namespace Game3 {
 
 			TileEntityID getID() const override { return TileEntity::GHOST; }
 
-			void onSpawn() override { march(); updateNeighbors(); }
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(const nlohmann::json &) override;
+			void onSpawn();
 			void onNeighborUpdated(Index row_offset, Index column_offset) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 			void render(SpriteRenderer &) override;
