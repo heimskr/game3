@@ -47,6 +47,7 @@ namespace Game3 {
 			void onNeighborUpdated(Index row_offset, Index column_offset) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 			void render(SpriteRenderer &) override;
+			/** This method doesn't remove the tile entity or decrement the realm's ghost count by itself. */
 			void confirm();
 
 			friend class TileEntity;

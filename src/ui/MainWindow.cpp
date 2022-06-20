@@ -521,6 +521,10 @@ namespace Game3 {
 		}
 	}
 
+	void MainWindow::activateContext() {
+		glArea.get_context()->make_current();
+	}
+
 	bool MainWindow::onKeyPressed(guint keyval, guint keycode, Gdk::ModifierType modifiers) {
 		if (!keyTimes.contains(keyval)) {
 			handleKey(keyval, keycode, modifiers);

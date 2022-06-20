@@ -54,6 +54,8 @@ namespace Game3 {
 
 			void onBlur();
 
+			void activateContext();
+
 			friend class Canvas;
 
 		private:

@@ -75,9 +75,17 @@ namespace Game3 {
 		if (!activeRealm)
 			return;
 
-		const auto &realm = *activeRealm;
+		auto &realm = *activeRealm;
 		const auto &tilemap = realm.tilemap1;
 		const auto scale = canvas.scale;
+
+		const auto width  = canvas.width();
+		const auto height = canvas.height();
+
+		if (0 < realm.ghostCount && width - 42.f <= pos_x && pos_x < width - 10.f && height - 42.f <= pos_y && pos_y < height - 10.f) {
+			realm.confirmGhosts();
+			return;
+		}
 
 		pos_x -= canvas.width() / 2.f - (tilemap->width * tilemap->tileSize / 4.f) * scale + canvas.center.x() * canvas.magic * scale;
 		pos_x /= tilemap->tileSize * scale / 2.f;
@@ -111,6 +119,10 @@ namespace Game3 {
 
 	float Game::getDivisor() const {
 		return 3.f - 2.f * sin(getHour() * 3.1415926f / 24.f);
+	}
+
+	void Game::activateContext() {
+		canvas.window.activateContext();
 	}
 
 	std::shared_ptr<Game> Game::create(Canvas &canvas) {

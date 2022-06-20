@@ -95,6 +95,7 @@ namespace Game3 {
 			bool isValid(const Position &) const;
 			void updateNeighbors(const Position &);
 			bool hasTileEntityAt(const Position &) const;
+			void confirmGhosts();
 
 			template <typename T, typename... Args>
 			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {

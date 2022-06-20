@@ -6,6 +6,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include "Position.h"
 #include "Texture.h"
 #include "Types.h"
 
@@ -43,6 +44,14 @@ namespace Game3 {
 
 		inline const decltype(tiles)::value_type & operator()(int x, int y) const {
 			return tiles[x + y * width];
+		}
+
+		inline decltype(tiles)::value_type & operator()(const Position &position) {
+			return tiles[position.column + position.row * width];
+		}
+
+		inline const decltype(tiles)::value_type & operator()(const Position &position) const {
+			return tiles[position.column + position.row * width];
 		}
 
 		std::vector<Index> getLand(RealmType type, size_t right_pad = 0, size_t bottom_pad = 0) const;

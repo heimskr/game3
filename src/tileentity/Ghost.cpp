@@ -2,6 +2,7 @@
 #include "Tiles.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
+#include "error/OverlapError.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "realm/Realm.h"
@@ -96,5 +97,20 @@ namespace Game3 {
 		const TileID row = marched_row + details.rowOffset;
 		const TileID column = marched_column + details.columnOffset;
 		marched = row * details.columnsPerRow + column;
+	}
+
+	void Ghost::confirm() {
+		auto realm = getRealm();
+		auto &tilemap = *realm->tilemap2;
+		if (tilemap(position) != tileSets.at(realm->type)->getEmpty())
+			throw OverlapError("Can't confirm ghost at " + std::string(position));
+
+		TileID tile_id = Monomap::MISSING;
+		if (details.useMarchingSquares)
+			tile_id = marched;
+		else
+			tile_id = details.rowOffset * tilemap.width + details.columnOffset;
+
+		realm->setLayer2(position, tile_id);
 	}
 }

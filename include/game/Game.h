@@ -51,6 +51,7 @@ namespace Game3 {
 			float getMinute() const;
 			/** The value to divide the color values of the tilemap pixels by. Based on the time of day. */
 			float getDivisor() const;
+			void activateContext();
 
 			sigc::signal<void(const std::shared_ptr<Player> &)> signal_player_inventory_update() const { return signal_player_inventory_update_; }
 			sigc::signal<void(const std::shared_ptr<Player> &)> signal_player_money_update() const { return signal_player_money_update_; }

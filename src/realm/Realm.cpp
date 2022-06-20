@@ -9,6 +9,7 @@
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
+#include "tileentity/Ghost.h"
 #include "tileentity/Sign.h"
 #include "tileentity/Teleporter.h"
 #include "ui/SpriteRenderer.h"
@@ -385,6 +386,27 @@ namespace Game3 {
 
 	bool Realm::hasTileEntityAt(const Position &position) const {
 		return tileEntities.contains(getIndex(position));
+	}
+
+	void Realm::confirmGhosts() {
+		if (ghostCount <= 0)
+			return;
+
+		std::vector<std::shared_ptr<Ghost>> ghosts;
+
+		for (auto &[index, tile_entity]: tileEntities) {
+			if (tile_entity->getID() != TileEntity::GHOST)
+				continue;
+			auto ghost = std::dynamic_pointer_cast<Ghost>(tile_entity);
+			ghost->confirm();
+			ghosts.push_back(ghost);
+		}
+
+		for (const auto &ghost: ghosts)
+			remove(ghost);
+
+		game->activateContext();
+		renderer2.reupload();
 	}
 
 	void Realm::toJSON(nlohmann::json &json) const {
