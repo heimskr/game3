@@ -26,10 +26,10 @@ namespace Game3::WorldGen {
 			for (int column = 0; column < width; ++column)
 				realm->setLayer1(row, column, Monomap::FLOOR);
 
-		realm->setLayer2(0, Monomap::WALL_NW);
-		realm->setLayer2(width - 1, Monomap::WALL_NE);
-		realm->setLayer2(width * (height - 1), Monomap::WALL_SW);
-		realm->setLayer2(width * height - 1, Monomap::WALL_SE);
+		realm->setLayer2(0, Monomap::WALL_SE);
+		realm->setLayer2(width - 1, Monomap::WALL_SW);
+		realm->setLayer2(width * (height - 1), Monomap::WALL_NE);
+		realm->setLayer2(width * height - 1, Monomap::WALL_NW);
 
 		const Index exit_index = width * height - 3;
 		realm->setLayer2(exit_index - 1, Monomap::WALL_W);

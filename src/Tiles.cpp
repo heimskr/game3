@@ -26,6 +26,11 @@ namespace Game3 {
 		LIGHT_GRASS, GRASS, GRASS_ALT1, GRASS_ALT2, DIRT,
 	};
 
+	std::unordered_set<TileID> Monomap::towerSet {
+		TOWER_NW, TOWER_WE, TOWER_NE, TOWER_E, TOWER_W, TOWER_NS, TOWER_SW, TOWER_WE3, TOWER_SE, TOWER_N, TOWER_WE2, TOWER_NS2, TOWER_NS3, TOWER_S, TOWER_NWES, TOWER_NWS, TOWER_NES, TOWER_WES, TOWER,
+		TOWER_NWE,
+	};
+
 	bool Monomap::getItemStack(TileID tile, ItemStack &stack) const {
 		if (woodenWalls.contains(tile)) {
 			stack = {Item::WOODEN_WALL, 1};
