@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "Texture.h"
 #include "Types.h"
 
 namespace Game3 {
@@ -16,6 +17,7 @@ namespace Game3 {
 		virtual bool isSolid(TileID) const = 0;
 		virtual TileID getEmpty() const { return 0; }
 		virtual const char * name() const = 0;
+		virtual Texture & getTexture() = 0;
 	};
 
 	struct OverworldTiles: TileSet {
@@ -95,6 +97,10 @@ namespace Game3 {
 
 		const char * name() const override {
 			return "Overworld";
+		}
+
+		Texture & getTexture() override {
+			return cacheTexture("resources/tileset2.png");
 		}
 	};
 
@@ -178,6 +184,10 @@ namespace Game3 {
 
 		const char * name() const override {
 			return "House";
+		}
+
+		Texture & getTexture() override {
+			return cacheTexture("resources/house.png");
 		}
 	};
 

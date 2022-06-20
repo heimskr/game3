@@ -15,7 +15,7 @@
 namespace Game3 {
 	class Texture {
 		public:
-			GLuint id = 0;
+			std::shared_ptr<GLuint> id = std::make_shared<GLuint>(0);
 			int width = 0;
 			int height = 0;
 			int format = 0;
@@ -34,6 +34,8 @@ namespace Game3 {
 		private:
 			bool valid_ = false;
 	};
+
+	Texture & cacheTexture(const std::filesystem::path &, bool alpha = true, int filter = GL_NEAREST);
 
 	void to_json(nlohmann::json &, const Texture &);
 	void from_json(const nlohmann::json &, Texture &);

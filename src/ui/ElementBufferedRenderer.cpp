@@ -42,7 +42,7 @@ namespace Game3 {
 	void ElementBufferedRenderer::render(float divisor) {
 		if (!initialized)
 			return;
-		glBindTexture(GL_TEXTURE_2D, tilemap->texture.id);
+		tilemap->texture.bind();
 		glBindVertexArray(vaoHandle);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboHandle);
 		glm::mat4 projection(1.f);

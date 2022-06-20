@@ -1,5 +1,6 @@
 // Credit: https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/3.2d_game/0.full_source/texture.cpp
 #include <iostream>
+#include <unordered_map>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -17,8 +18,8 @@ namespace Game3 {
 			uint8_t *raw = stbi_load(path.c_str(), &width, &height, &channels, 0);
 			if (raw == nullptr)
 				throw std::runtime_error("Couldn't load image from " + path.string());
-			glGenTextures(1, &id);
-			glBindTexture(GL_TEXTURE_2D, id);
+			glGenTextures(1, id.get());
+			glBindTexture(GL_TEXTURE_2D, *id);
 			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, raw);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -32,7 +33,16 @@ namespace Game3 {
 
 	void Texture::bind() {
 		init();
-		glBindTexture(GL_TEXTURE_2D, id); CHECKGL
+		glBindTexture(GL_TEXTURE_2D, *id); CHECKGL
+	}
+
+	static std::unordered_map<std::string, Texture> textureCache;
+
+	Texture & cacheTexture(const std::filesystem::path &path, bool alpha, int filter) {
+		auto canonical = std::filesystem::canonical(path).string();
+		if (textureCache.contains(canonical))
+			return textureCache.at(canonical);
+		return textureCache.try_emplace(canonical, canonical, alpha, filter).first->second;
 	}
 
 	void to_json(nlohmann::json &json, const Texture &texture) {
@@ -42,6 +52,6 @@ namespace Game3 {
 	}
 
 	void from_json(const nlohmann::json &json, Texture &texture) {
-		texture = Texture(json.at("path"), json.at("alpha"), json.at("filter"));
+		texture = cacheTexture(json.at("path"), json.at("alpha"), json.at("filter"));
 	}
 }
