@@ -11,10 +11,6 @@ uniform vec4 texturePosition;
 
 void main() {
 	color = spriteColor * texture(sprite, TexCoords);
-	if (TexCoords.x < texturePosition.x || TexCoords.y < texturePosition.y)
-		discard;
-	else if (texturePosition.x + texturePosition.z < TexCoords.x)
-		discard;
-	else if (texturePosition.y + texturePosition.w < TexCoords.y)
+	if (TexCoords.x < texturePosition.x || TexCoords.y < texturePosition.y || texturePosition.x + texturePosition.z < TexCoords.x || texturePosition.y + texturePosition.w < TexCoords.y)
 		discard;
 }
