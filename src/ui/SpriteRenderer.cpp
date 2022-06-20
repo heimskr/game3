@@ -80,6 +80,8 @@ namespace Game3 {
 		glActiveTexture(GL_TEXTURE0);
 		texture.bind();
 
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glBindVertexArray(quadVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindVertexArray(0);

@@ -31,7 +31,6 @@ namespace Game3 {
 		if (initialized)
 			reset();
 		tilemap = tilemap_;
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		createShader();
 		generateVertexBufferObject();
 		generateElementBufferObject();

@@ -66,7 +66,7 @@ namespace Game3 {
 
 		const auto x = (tile_id % (tilemap.setWidth / tilesize)) * tilesize;
 		const auto y = (tile_id / (tilemap.setWidth / tilesize)) * tilesize;
-		sprite_renderer.drawOnMap(tilemap.texture, position.column, position.row, x / 2, y / 2, tilesize, tilesize, 1.f, 0.f, .1f);
+		sprite_renderer.drawOnMap(tilemap.texture, position.column, position.row, x / 2, y / 2, tilesize, tilesize, 1.f, 0.f, .5f);
 	}
 
 	void Ghost::march() {
