@@ -1,6 +1,5 @@
 // Credit: https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/3.2d_game/0.full_source/texture.cpp
 #include <csignal>
-#include <iostream>
 #include <unordered_map>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -15,7 +14,6 @@ namespace Game3 {
 
 	void Texture::init() {
 		if (!*valid_) {
-			std::cout << "Initializing " << path << '\n';
 			int channels = 0;
 			uint8_t *raw = stbi_load(path.c_str(), width.get(), height.get(), &channels, 0);
 			if (raw == nullptr)

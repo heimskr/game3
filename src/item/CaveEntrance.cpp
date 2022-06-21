@@ -9,6 +9,8 @@
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
 #include "tileentity/Ghost.h"
+#include "ui/Canvas.h"
+#include "ui/MainWindow.h"
 #include "worldgen/Cave.h"
 
 namespace Game3 {
@@ -23,6 +25,16 @@ namespace Game3 {
 
 		if (!realm.pathMap.at(realm.getIndex(position)) || realm.hasTileEntityAt(position))
 			return false;
+
+		// This is a horrible, ugly hack to fix a problem where entering the cave would break the sprite renderer and make all sprites invisible forever.
+		// Resetting the sprite renderer exactly one time fixes things. I'm not sure what the earliest possible time to reset it is.
+		// However, doing it here seems to work.
+		static bool hacked = false;
+		if (!hacked) {
+			game.activateContext();
+			game.canvas.spriteRenderer = SpriteRenderer(game.canvas);
+			hacked = true;
+		}
 
 		std::optional<RealmID> realm_id;
 		Index entrance = -1;
@@ -56,8 +68,7 @@ namespace Game3 {
 			emplaced = true;
 		}
 
-		if (nullptr != realm.add(TileEntity::create<Building>(Monomap::CAVE, position, *realm_id, entrance))) {
-		// if (nullptr != realm.add(TileEntity::create<Ghost>(position, ItemStack(Item::TOWER, 1)))) {
+		if (realm.add(TileEntity::create<Building>(Monomap::CAVE, position, *realm_id, entrance)) != nullptr) {
 			if (--stack.count == 0)
 				player->inventory->erase(slot);
 			player->inventory->notifyOwner();

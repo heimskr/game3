@@ -78,7 +78,6 @@ namespace Game3 {
 		y += canvas->center.y() * canvas->scale * tilemap->tileSize / 2.f;
 
 		shader.bind();
-		std::cout << shader.getHandle() << '\n';
 
 		glm::mat4 model = glm::mat4(1.f);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
