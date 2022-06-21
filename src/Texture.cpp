@@ -45,8 +45,6 @@ namespace Game3 {
 		return textureCache.try_emplace(canonical, canonical, alpha, filter).first->second;
 	}
 
-	Texture MISSING("resources/missing.png");
-
 	void to_json(nlohmann::json &json, const Texture &texture) {
 		json["alpha"]  = *texture.alpha;
 		json["filter"] = *texture.filter;

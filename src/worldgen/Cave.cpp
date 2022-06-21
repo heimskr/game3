@@ -34,9 +34,9 @@ namespace Game3::WorldGen {
 			for (Index column = 0; column < width; ++column) {
 				realm->setLayer1(row, column, Monomap::DIRT);
 				const double noise = perlin.GetValue(row / noise_zoom, column / noise_zoom, 0.1);
-				if (noise < 0.) {
+				if (noise < -.1) {
 					realm->setLayer2(row, column, Monomap::VOID);
-				} else if (noise < 0.1) {
+				} else if (noise < .1) {
 					realm->setLayer2(row, column, Monomap::CAVE_WALL);
 				} else {
 					inside.emplace_back(row, column);
