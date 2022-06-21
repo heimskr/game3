@@ -126,10 +126,10 @@ namespace Game3 {
 		if (!rawImage) {
 			rawImage = std::make_unique<uint8_t[]>(channels * width * height);
 			uint8_t *raw_pointer = rawImage.get();
-			uint8_t *texture_pointer = texture.data.get() + item_texture.y * texture.width * channels + item_texture.x * channels;
+			uint8_t *texture_pointer = texture.data.get() + item_texture.y * *texture.width * channels + item_texture.x * channels;
 			for (auto row = 0; row < height; ++row) {
 				std::memcpy(raw_pointer + row_size * row, texture_pointer, row_size);
-				texture_pointer += channels * texture.width;
+				texture_pointer += channels * *texture.width;
 			}
 		}
 

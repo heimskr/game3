@@ -1,4 +1,5 @@
 // Credit: https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/3.2d_game/0.full_source/texture.cpp
+#include <csignal>
 #include <iostream>
 #include <unordered_map>
 
@@ -13,20 +14,21 @@ namespace Game3 {
 		format(alpha_? GL_RGBA : GL_RGB), filter(filter_), alpha(alpha_), path(path_) {}
 
 	void Texture::init() {
-		if (!valid_) {
+		if (!*valid_) {
+			std::cout << "Initializing " << path << '\n';
 			int channels = 0;
-			uint8_t *raw = stbi_load(path.c_str(), &width, &height, &channels, 0);
+			uint8_t *raw = stbi_load(path.c_str(), width.get(), height.get(), &channels, 0);
 			if (raw == nullptr)
 				throw std::runtime_error("Couldn't load image from " + path.string());
 			glGenTextures(1, id.get());
 			glBindTexture(GL_TEXTURE_2D, *id);
-			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, raw);
+			glTexImage2D(GL_TEXTURE_2D, 0, format, *width, *height, 0, format, GL_UNSIGNED_BYTE, raw);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
 			glBindTexture(GL_TEXTURE_2D, 0);
-			valid_ = true;
+			*valid_ = true;
 			data = std::shared_ptr<uint8_t>(raw);
 		}
 	}

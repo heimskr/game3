@@ -15,9 +15,9 @@
 namespace Game3 {
 	class Texture {
 		public:
-			std::shared_ptr<GLuint> id = std::make_shared<GLuint>(0);
-			int width = 0;
-			int height = 0;
+			std::shared_ptr<GLuint> id  = std::make_shared<GLuint>(0);
+			std::shared_ptr<int> width  = std::make_shared<int>(0);
+			std::shared_ptr<int> height = std::make_shared<int>(0);
 			int format = 0;
 			int filter = 0;
 			bool alpha = false;
@@ -29,10 +29,10 @@ namespace Game3 {
 
 			void init();
 			void bind();
-			bool valid() const { return valid_; }
+			bool valid() const { return *valid_; }
 
 		private:
-			bool valid_ = false;
+			std::shared_ptr<bool> valid_ = std::make_shared<bool>(false);
 	};
 
 	Texture & cacheTexture(const std::filesystem::path &, bool alpha = true, int filter = GL_NEAREST);

@@ -49,8 +49,8 @@ namespace Game3 {
 			// Kinda silly to get the tilesize from the realm's second layer. Maybe it could be added as a Chest field.
 			auto &tilemap = *getRealm()->tilemap2;
 			const auto tilesize = tilemap.tileSize;
-			const auto x = (tileID % (texture.width / tilesize)) * tilesize;
-			const auto y = (tileID / (texture.width / tilesize)) * tilesize;
+			const auto x = (tileID % (*texture.width / tilesize)) * tilesize;
+			const auto y = (tileID / (*texture.width / tilesize)) * tilesize;
 			sprite_renderer.drawOnMap(texture, position.column, position.row, x / 2.f, y / 2.f, tilesize, tilesize);
 		}
 	}

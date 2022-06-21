@@ -28,14 +28,14 @@ namespace Game3 {
 		}
 
 		Tilemap(int width_, int height_, int tile_size, const Texture &texture_):
-		width(width_), height(height_), tileSize(tile_size), setWidth(texture_.width), setHeight(texture_.height), texture(texture_) {
+		width(width_), height(height_), tileSize(tile_size), setWidth(*texture_.width), setHeight(*texture_.height), texture(texture_) {
 			tiles.resize(width * height);
 		}
 
 		void init() {
 			texture.init();
-			setWidth = texture.width;
-			setHeight = texture.height;
+			setWidth = *texture.width;
+			setHeight = *texture.height;
 		}
 
 		inline decltype(tiles)::value_type & operator()(int x, int y) {

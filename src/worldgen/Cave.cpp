@@ -11,7 +11,6 @@
 
 namespace Game3::WorldGen {
 	void generateCave(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, int noise_seed, const Position &exit, Position &entrance) {
-		Timer timer("GenerateCave");
 		constexpr double noise_zoom = 20;
 
 		const auto width  = realm->getWidth();
@@ -30,8 +29,7 @@ namespace Game3::WorldGen {
 
 		std::vector<Position> inside;
 
-		for (Index row = 0; row < height; ++row) {
-			std::cout << row << " / " << height << '\n';
+		for (Index row = 0; row < height; ++row)
 			for (Index column = 0; column < width; ++column) {
 				realm->setLayer1(row, column, Monomap::DIRT);
 				const double noise = perlin.GetValue(row / noise_zoom, column / noise_zoom, 0.1);
@@ -43,15 +41,10 @@ namespace Game3::WorldGen {
 					inside.emplace_back(row, column);
 				}
 			}
-		}
 
 		if (inside.empty())
 			entrance = {0, 0};
 		else
 			entrance = choose(inside, rng);
-
-		timer.stop();
-		Timer::summary();
-		Timer::clear();
 	}
 }

@@ -280,6 +280,7 @@ namespace Game3 {
 		Texture texture("resources/tileset.png", true);
 		texture.init();
 		auto tilemap = std::make_shared<Tilemap>(width, height, 16, texture);
+		tilemap->init();
 		auto realm = Realm::create(1, Realm::OVERWORLD, tilemap, seed);
 		realm->outdoors = true;
 		realm->game = game.get();
@@ -340,6 +341,7 @@ namespace Game3 {
 
 	bool MainWindow::render(const Glib::RefPtr<Gdk::GLContext> &context) {
 		context->make_current();
+		glArea.throw_if_error();
 		glClearColor(.2f, .2f, .2f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		for (int joystick = GLFW_JOYSTICK_1; joystick <= GLFW_JOYSTICK_LAST; ++joystick)

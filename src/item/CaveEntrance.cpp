@@ -26,15 +26,13 @@ namespace Game3 {
 		std::optional<RealmID> realm_id;
 		Index entrance = -1;
 		
-		for (const auto &[index, tile_entity]: realm.tileEntities) {
-			if (tile_entity->tileID == Monomap::CAVE && tile_entity->getID() == TileEntity::BUILDING) {
+		for (const auto &[index, tile_entity]: realm.tileEntities)
+			if (tile_entity->tileID == Monomap::CAVE && tile_entity->getID() == TileEntity::BUILDING)
 				if (auto building = std::dynamic_pointer_cast<Building>(tile_entity)) {
 					realm_id = building->innerRealmID;
 					entrance = building->entrance;
 					break;
 				}
-			}
-		}
 
 		bool emplaced = false;
 
@@ -43,7 +41,7 @@ namespace Game3 {
 			const int realm_width  = 100;
 			const int realm_height = 100;
 			// TODO: perhaps let the player choose the seed
-			const int cave_seed = -2 * game.activeRealm->seed;
+			const int cave_seed = -2 * game.activeRealm->seed - 5;
 
 			auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, Realm::textureMap.at(Realm::CAVE));
 			// TODO: make a cave realm that handles updateNeighbors to convert exposed void into stone so that cave walls can be mineable
@@ -57,7 +55,7 @@ namespace Game3 {
 			emplaced = true;
 		}
 
-		if (nullptr != realm.add(TileEntity::create<Building>(Monomap::CAVE, position, *realm_id, entrance))) {
+		if (nullptr != realm.add(TileEntity::create<Building>(Monomap::MISSING, position, *realm_id, entrance))) {
 			if (--stack.count == 0)
 				player->inventory->erase(slot);
 			player->inventory->notifyOwner();
