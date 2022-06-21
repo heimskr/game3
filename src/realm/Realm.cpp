@@ -436,6 +436,7 @@ namespace Game3 {
 				}
 
 		if (--depth == 0 && layer2_updated) {
+			layer2_updated = false;
 			getGame().activateContext();
 			renderer2.reupload();
 		}
