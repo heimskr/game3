@@ -295,6 +295,7 @@ namespace Game3 {
 		game->player->inventory->add(ItemStack::withDurability(Item::IRON_PICKAXE));
 		game->player->inventory->add(ItemStack::withDurability(Item::IRON_SHOVEL));
 		game->player->inventory->add(ItemStack::withDurability(Item::IRON_AXE));
+		game->player->inventory->add(ItemStack(Item::CAVE_ENTRANCE, 4));
 		onGameLoaded();
 	}
 
@@ -619,6 +620,13 @@ namespace Game3 {
 					case GDK_KEY_u:
 						glArea.get_context()->make_current();
 						game->activeRealm->reupload();
+						return;
+					case GDK_KEY_r:
+						if (canvas) {
+							canvas->spriteRenderer = SpriteRenderer(*canvas);
+							std::cout << "Reinitialized sprite renderer.\n";
+						} else
+							std::cout << "Canvas not ready.\n";
 						return;
 					case GDK_KEY_f:
 						if (unsigned(modifiers & Gdk::ModifierType::CONTROL_MASK) != 0)

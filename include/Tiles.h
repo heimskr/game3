@@ -146,6 +146,7 @@ namespace Game3 {
 		constexpr static TileID TREE0   = 678;
 		constexpr static TileID KEEP_NW = 704;
 		constexpr static TileID KEEP_NE = 705;
+		constexpr static TileID LADDER  = 706;
 		constexpr static TileID CAVE    = 707;
 		constexpr static TileID MISSING = 708;
 		constexpr static TileID IRON_ORE_REGEN    = 709;

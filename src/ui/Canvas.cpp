@@ -20,10 +20,8 @@ namespace Game3 {
 			game->tick();
 			spriteRenderer.update(width(), height());
 			rectangleRenderer.update(width(), height());
-			game->activateContext();
 			if (game->activeRealm)
 				game->activeRealm->render(width(), height(), center, scale, spriteRenderer, game->getDivisor());
-			game->activateContext();
 			game->player->render(spriteRenderer);
 		}
 	}

@@ -8,6 +8,7 @@
 #include "item/CaveEntrance.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
+#include "tileentity/Ghost.h"
 #include "worldgen/Cave.h"
 
 namespace Game3 {
@@ -41,7 +42,7 @@ namespace Game3 {
 			const int realm_width  = 100;
 			const int realm_height = 100;
 			// TODO: perhaps let the player choose the seed
-			const int cave_seed = -2 * game.activeRealm->seed - 5;
+			const int cave_seed = -2 * realm.seed - 5;
 
 			auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, Realm::textureMap.at(Realm::CAVE));
 			// TODO: make a cave realm that handles updateNeighbors to convert exposed void into stone so that cave walls can be mineable
@@ -49,13 +50,14 @@ namespace Game3 {
 			new_realm->outdoors = false;
 			new_realm->setGame(game);
 			Position entrance_position;
-			WorldGen::generateCave(new_realm, game.dynamicRNG, cave_seed, exit, entrance_position);
+			WorldGen::generateCave(new_realm, game.dynamicRNG, cave_seed, realm.getIndex(exit), entrance_position, realm.id);
 			entrance = new_realm->getIndex(entrance_position);
 			game.realms.emplace(*realm_id, new_realm);
 			emplaced = true;
 		}
 
-		if (nullptr != realm.add(TileEntity::create<Building>(Monomap::MISSING, position, *realm_id, entrance))) {
+		if (nullptr != realm.add(TileEntity::create<Building>(Monomap::CAVE, position, *realm_id, entrance))) {
+		// if (nullptr != realm.add(TileEntity::create<Ghost>(position, ItemStack(Item::TOWER, 1)))) {
 			if (--stack.count == 0)
 				player->inventory->erase(slot);
 			player->inventory->notifyOwner();

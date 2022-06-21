@@ -5,12 +5,13 @@
 #include "Tiles.h"
 #include "game/Game.h"
 #include "realm/Realm.h"
+#include "tileentity/Building.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 #include "worldgen/Cave.h"
 
 namespace Game3::WorldGen {
-	void generateCave(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, int noise_seed, const Position &exit, Position &entrance) {
+	void generateCave(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, int noise_seed, Index exit_index, Position &entrance, RealmID parent_realm) {
 		constexpr double noise_zoom = 20;
 
 		const auto width  = realm->getWidth();
@@ -46,5 +47,7 @@ namespace Game3::WorldGen {
 			entrance = {0, 0};
 		else
 			entrance = choose(inside, rng);
+
+		realm->add(TileEntity::create<Building>(Monomap::LADDER, entrance, parent_realm, exit_index));
 	}
 }

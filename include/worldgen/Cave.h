@@ -10,6 +10,6 @@ namespace Game3 {
 	struct Position;
 
 	namespace WorldGen {
-		void generateCave(const std::shared_ptr<Realm> &, std::default_random_engine &, int noise_seed, const Position &exit, Position &entrance);
+		void generateCave(const std::shared_ptr<Realm> &, std::default_random_engine &, int noise_seed, Index exit_index, Position &entrance, RealmID parent_realm);
 	}
 }

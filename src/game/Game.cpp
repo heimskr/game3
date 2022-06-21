@@ -110,7 +110,7 @@ namespace Game3 {
 		if (button == 1) {
 			if (auto *stack = player->inventory->getActive())
 				stack->item->use(player->inventory->activeSlot, *stack, player, {y, x});
-		} else if (debugMode && button == 3 && player && 0 <= x && x < tilemap->width && 0 <= y && y < tilemap->height)
+		} else if (debugMode && button == 3 && player && realm.isValid({y, x}))
 			player->teleport({y, x});
 	}
 

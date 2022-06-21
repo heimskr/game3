@@ -6,8 +6,15 @@
 
 namespace Game3 {
 	Shader::~Shader() {
-		if (handle != 0)
-			glDeleteProgram(handle);
+		reset();
+	}
+
+	Shader & Shader::operator=(Shader &&other) {
+		reset();
+		name = std::move(other.name);
+		handle = other.handle;
+		other.handle = 0;
+		return *this;
 	}
 
 	static void check(int handle, bool is_link = false) {
@@ -84,12 +91,18 @@ namespace Game3 {
 	GLint Shader::uniform(const char *uniform_name, bool warn) const {
 		GLint id = glGetUniformLocation(handle, uniform_name);
 		if (id == -1 && warn)
-			std::cerr << "Couldn't find uniform \"" << uniform_name << "\" in shader \"" << name << "\"";
+			std::cerr << "Couldn't find uniform \"" << uniform_name << "\" in shader \"" << name << "\"\n";
 		return id;
 	}
 
 	GLint Shader::uniform(const std::string &uniform_name, bool warn) const {
 		return uniform(uniform_name.c_str(), warn);
+	}
+
+	void Shader::reset() {
+		if (handle != 0)
+			glDeleteProgram(handle);
+		handle = 0;
 	}
 
 	Shader & Shader::set(const char *uniform_name, const glm::mat4 &matrix) {

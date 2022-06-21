@@ -10,11 +10,13 @@ namespace Game3 {
 
 	class SpriteRenderer {
 		public:
-			Canvas &canvas;
+			Canvas *canvas = nullptr;
 			Shader shader;
 
 			SpriteRenderer(Canvas &);
 			~SpriteRenderer();
+
+			SpriteRenderer & operator=(SpriteRenderer &&);
 
 			void update(int backbuffer_width, int backbuffer_height);
 
@@ -23,6 +25,8 @@ namespace Game3 {
 
 			void drawOnScreen(Texture &, float x, float y, float scale = 1.f, float angle = 0.f, float alpha = 1.f);
 			void drawOnScreen(Texture &, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale = 1.f, float angle = 0.f, float alpha = 1.f);
+
+			void reset();
 
 		private:
 			void initRenderData();
