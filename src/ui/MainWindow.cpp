@@ -415,6 +415,7 @@ namespace Game3 {
 					auto &player = *game->player;
 					if (!a && prevA)
 						player.interactNextTo();
+
 					if (!x && prevX)
 						player.interactOn();
 
@@ -422,14 +423,17 @@ namespace Game3 {
 						player.movingUp = true;
 					else if (prevUp)
 						player.movingUp = false;
+
 					if (down)
 						player.movingDown = true;
 					else if (prevDown)
 						player.movingDown = false;
+
 					if (left)
 						player.movingLeft = true;
 					else if (prevLeft)
 						player.movingLeft = false;
+
 					if (right)
 						player.movingRight = true;
 					else if (prevRight)
