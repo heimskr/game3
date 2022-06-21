@@ -119,16 +119,15 @@ namespace Game3 {
 		auto &item_texture = Item::itemTextures.at(id);
 		auto &texture = *item_texture.texture;
 		texture.init();
-		const auto width  = item_texture.width;
-		const auto height = item_texture.height;
-		const int channels = texture.format == GL_RGBA? 4 : 3;
+		const int width  = item_texture.width;
+		const int height = item_texture.height;
+		const int channels = *texture.format == GL_RGBA? 4 : 3;
 		const size_t row_size = channels * width;
 
 		if (!rawImage) {
 			rawImage = std::make_unique<uint8_t[]>(channels * width * height);
 			uint8_t *raw_pointer = rawImage.get();
 			uint8_t *texture_pointer = texture.data->get() + item_texture.y * *texture.width * channels + item_texture.x * channels;
-			std::cout << "texture_pointer[" << static_cast<void *>(texture_pointer) << "]\n";
 			for (auto row = 0; row < height; ++row) {
 				std::memcpy(raw_pointer + row_size * row, texture_pointer, row_size);
 				texture_pointer += channels * *texture.width;
@@ -136,7 +135,7 @@ namespace Game3 {
 		}
 
 		constexpr int doublings = 3;
-		return Gdk::Pixbuf::create_from_data(rawImage.get(), Gdk::Colorspace::RGB, texture.alpha, 8, width, height, row_size)
+		return Gdk::Pixbuf::create_from_data(rawImage.get(), Gdk::Colorspace::RGB, *texture.alpha, 8, width, height, row_size)
 		       ->scale_simple(width << doublings, height << doublings, Gdk::InterpType::NEAREST);
 	}
 
