@@ -52,6 +52,7 @@ namespace Game3 {
 		{Item::IRON_HAMMER,     { 16, 176, texturePalisade}},
 		{Item::GOLD_HAMMER,     { 32, 176, texturePalisade}},
 		{Item::DIAMOND_HAMMER,  { 48, 176, texturePalisade}},
+		{Item::TOWER,           {128, 144, textureTileset}},
 	};
 
 	std::unordered_map<ItemID, Durability> Item::durabilities {
@@ -107,6 +108,7 @@ namespace Game3 {
 		{Item::IRON_HAMMER,     std::make_shared<Tool>     (Item::IRON_HAMMER,     "Iron Hammer",     150,  3.f, ItemAttribute::Hammer)},
 		{Item::GOLD_HAMMER,     std::make_shared<Tool>     (Item::GOLD_HAMMER,     "Gold Hammer",     400, .75f, ItemAttribute::Hammer)},
 		{Item::DIAMOND_HAMMER,  std::make_shared<Tool>     (Item::DIAMOND_HAMMER,  "Diamond Hammer",  900,  1.f, ItemAttribute::Hammer)},
+		{Item::TOWER,           std::make_shared<Furniture>(Item::TOWER,           "Tower",            10, 64)},
 	};
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage() {

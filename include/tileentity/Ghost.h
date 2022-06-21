@@ -5,7 +5,7 @@
 #include "tileentity/TileEntity.h"
 
 namespace Game3 {
-	enum class GhostType {Invalid, Normal, WoodenWall};
+	enum class GhostType {Invalid, Normal, WoodenWall, Tower};
 
 	struct GhostDetails {
 		GhostType type = GhostType::Invalid;
@@ -19,6 +19,7 @@ namespace Game3 {
 			type(type_), useMarchingSquares(use_marching_squares), columnsPerRow(columns_per_row), rowOffset(row_offset), columnOffset(column_offset) {}
 
 		static GhostDetails WOODEN_WALL;
+		static GhostDetails TOWER;
 		static GhostDetails PLANT_POT1;
 		static GhostDetails PLANT_POT2;
 		static GhostDetails PLANT_POT3;

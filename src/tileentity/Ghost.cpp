@@ -18,6 +18,7 @@ namespace Game3 {
 	GhostDetails GhostDetails::PLANT_POT1  {GhostType::Normal,     false, 32, 12, 4};
 	GhostDetails GhostDetails::PLANT_POT2  {GhostType::Normal,     false, 32, 12, 5};
 	GhostDetails GhostDetails::PLANT_POT3  {GhostType::Normal,     false, 32, 12, 6};
+	GhostDetails GhostDetails::TOWER       {GhostType::Tower,      true,  32,  6, 7};
 
 	GhostDetails & GhostDetails::get(const ItemStack &stack) {
 		switch (stack.item->id) {
@@ -25,6 +26,7 @@ namespace Game3 {
 			case Item::PLANT_POT1:  return PLANT_POT1;
 			case Item::PLANT_POT2:  return PLANT_POT2;
 			case Item::PLANT_POT3:  return PLANT_POT3;
+			case Item::TOWER:       return TOWER;
 			default: throw std::runtime_error("Couldn't get GhostDetails for " + stack.item->name);
 		}
 	}
@@ -86,17 +88,31 @@ namespace Game3 {
 		TileID march_result;
 		const auto &tiles = realm->tilemap2->tiles;
 
+		auto check = [&](const Position &offset_position) -> std::optional<bool> {
+			if (!realm->isValid(offset_position))
+				return false;
+			if (auto tile_entity = realm->tileEntityAt(offset_position))
+				if (tile_entity->getID() == TileEntity::GHOST)
+					if (*dynamic_cast<Ghost *>(tile_entity.get())->material.item == *material.item)
+						return true;
+			return std::nullopt;
+		};
+
 		switch (details.type) {
 			case GhostType::WoodenWall:
 				march_result = march4([&](int8_t row_offset, int8_t column_offset) -> bool {
 					const Position offset_position(position + Position(row_offset, column_offset));
-					if (!realm->isValid(offset_position))
-						return false;
-					if (auto tile_entity = realm->tileEntityAt(offset_position))
-						if (tile_entity->getID() == TileEntity::GHOST)
-							if (*dynamic_cast<Ghost *>(tile_entity.get())->material.item == *material.item)
-								return true;
+					if (auto value = check(offset_position))
+						return *value;
 					return monomap.woodenWalls.contains(tiles.at(realm->getIndex(offset_position)));
+				});
+				break;
+			case GhostType::Tower:
+				march_result = march4([&](int8_t row_offset, int8_t column_offset) -> bool {
+					const Position offset_position(position + Position(row_offset, column_offset));
+					if (auto value = check(offset_position))
+						return *value;
+					return monomap.towerSet.contains(tiles.at(realm->getIndex(offset_position)));
 				});
 				break;
 			default:
