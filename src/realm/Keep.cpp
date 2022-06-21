@@ -3,11 +3,11 @@
 
 namespace Game3 {
 	Keep::Keep(RealmID id_, const Position &parent_origin, Index parent_width, Index parent_height, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_,
-	           const std::shared_ptr<Tilemap> &tilemap3_):
-		Realm(id_, Realm::KEEP, tilemap1_, tilemap2_, tilemap3_), parentOrigin(parent_origin), parentWidth(parent_width), parentHeight(parent_height) {}
+	           const std::shared_ptr<Tilemap> &tilemap3_, int seed_):
+		Realm(id_, Realm::KEEP, tilemap1_, tilemap2_, tilemap3_, seed_), parentOrigin(parent_origin), parentWidth(parent_width), parentHeight(parent_height) {}
 
-	Keep::Keep(RealmID id_, const Position &parent_origin, Index parent_width, Index parent_height, const std::shared_ptr<Tilemap> &tilemap1_):
-		Realm(id_, Realm::KEEP, tilemap1_), parentOrigin(parent_origin), parentWidth(parent_width), parentHeight(parent_height) {}
+	Keep::Keep(RealmID id_, const Position &parent_origin, Index parent_width, Index parent_height, const std::shared_ptr<Tilemap> &tilemap1_, int seed_):
+		Realm(id_, Realm::KEEP, tilemap1_, seed_), parentOrigin(parent_origin), parentWidth(parent_width), parentHeight(parent_height) {}
 
 	void Keep::absorbJSON(const nlohmann::json &json) {
 		Realm::absorbJSON(json);

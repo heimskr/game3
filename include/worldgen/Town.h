@@ -10,6 +10,6 @@ namespace Game3 {
 	class Realm;
 
 	namespace WorldGen {
-		void generateTown(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, Index index, Index width, Index height, Index pad);
+		void generateTown(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, Index index, Index width, Index height, Index pad, int seed);
 	}
 }

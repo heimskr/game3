@@ -39,6 +39,7 @@ namespace Game3 {
 		recipes.emplace_back(std::vector<ItemStack> {{Item::POT, 1}, {Item::SAPLING, 1}}, ItemStack(Item::PLANT_POT2, 1));
 		recipes.emplace_back(std::vector<ItemStack> {{Item::POT, 1}, {Item::SAPLING, 1}}, ItemStack(Item::PLANT_POT3, 1));
 		recipes.emplace_back(std::vector<ItemStack> {{Item::STONE, 8}}, ItemStack(Item::TOWER, 1));
+		recipes.emplace_back(std::vector<ItemStack> {{Item::STONE, 10}, {Item::PLANK, 10}}, ItemStack(Item::CAVE_ENTRANCE, 1));
 
 		// Temporary recipes
 		recipes.emplace_back(std::vector<ItemStack> {{Item::WOOD,  1}}, ItemStack(Item::PLANK, 1));

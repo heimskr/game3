@@ -25,6 +25,7 @@ namespace Game3 {
 			constexpr static RealmType HOUSE      = 2;
 			constexpr static RealmType KEEP       = 3;
 			constexpr static RealmType BLACKSMITH = 4;
+			constexpr static RealmType CAVE       = 5;
 
 			static std::unordered_map<RealmType, Texture> textureMap;
 
@@ -41,6 +42,7 @@ namespace Game3 {
 			/** Whether the realm's rendering should be affected by the day-night cycle. */
 			bool outdoors = true;
 			size_t ghostCount = 0;
+			int seed = 0;
 
 			Realm(const Realm &) = delete;
 			Realm(Realm &&) = default;
@@ -93,7 +95,7 @@ namespace Game3 {
 			std::optional<Position> getPathableAdjacent(const Position &) const;
 			std::optional<Position> getPathableAdjacent(Index) const;
 			bool isValid(const Position &) const;
-			void updateNeighbors(const Position &);
+			virtual void updateNeighbors(const Position &);
 			bool hasTileEntityAt(const Position &) const;
 			void confirmGhosts();
 
@@ -176,8 +178,8 @@ namespace Game3 {
 
 		protected:
 			Realm() = default;
-			Realm(RealmID, RealmType, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_);
-			Realm(RealmID, RealmType, const std::shared_ptr<Tilemap> &tilemap1_);
+			Realm(RealmID, RealmType, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_, int seed_);
+			Realm(RealmID, RealmType, const std::shared_ptr<Tilemap> &tilemap1_, int seed_);
 
 			virtual void absorbJSON(const nlohmann::json &);
 			virtual void toJSON(nlohmann::json &) const;

@@ -10,7 +10,7 @@
 #include "worldgen/House.h"
 
 namespace Game3::WorldGen {
-	void generateTown(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const Index index, Index width, Index height, Index pad) {
+	void generateTown(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const Index index, Index width, Index height, Index pad, int seed) {
 		Index row = 0;
 		Index column = 0;
 
@@ -114,7 +114,7 @@ namespace Game3::WorldGen {
 		const Index keep_entrance = keep_width * (keep_height - 1) - keep_width / 2 - 1;
 		const Position keep_exit = keep_position + Position(2, 0);
 		auto keep_tilemap = std::make_shared<Tilemap>(keep_width, keep_height, 16, Realm::textureMap.at(Realm::KEEP));
-		auto keep_realm = Realm::create<Keep>(keep_realm_id, town_origin, width, height, keep_tilemap);
+		auto keep_realm = Realm::create<Keep>(keep_realm_id, town_origin, width, height, keep_tilemap, -seed);
 		keep_realm->outdoors = false;
 		keep_realm->setGame(game);
 		WorldGen::generateKeep(keep_realm, rng, realm->id, keep_exit);
@@ -159,7 +159,7 @@ namespace Game3::WorldGen {
 					const Position blacksmith_position(index / map_width, index % map_width);
 					auto building = TileEntity::create<Building>(blacksmith, blacksmith_position, realm_id, realm_width * (realm_height - 1) - 3);
 					auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, Realm::textureMap.at(Realm::HOUSE));
-					auto new_realm = Realm::create(realm_id, Realm::BLACKSMITH, new_tilemap);
+					auto new_realm = Realm::create(realm_id, Realm::BLACKSMITH, new_tilemap, -seed);
 					new_realm->outdoors = false;
 					new_realm->setGame(game);
 					WorldGen::generateBlacksmith(new_realm, rng, realm, blacksmith_position + Position(1, 0));
@@ -175,7 +175,7 @@ namespace Game3::WorldGen {
 					const Position house_position(index / map_width, index % map_width);
 					auto building = TileEntity::create<Building>(house, house_position, realm_id, realm_width * (realm_height - 1) - 3);
 					auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, Realm::textureMap.at(Realm::HOUSE));
-					auto new_realm = Realm::create(realm_id, Realm::HOUSE, new_tilemap);
+					auto new_realm = Realm::create(realm_id, Realm::HOUSE, new_tilemap, -seed);
 					new_realm->outdoors = false;
 					new_realm->setGame(game);
 					WorldGen::generateHouse(new_realm, rng, realm, house_position + Position(1, 0));

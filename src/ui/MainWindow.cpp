@@ -280,7 +280,7 @@ namespace Game3 {
 		Texture texture("resources/tileset.png", true);
 		texture.init();
 		auto tilemap = std::make_shared<Tilemap>(width, height, 16, texture);
-		auto realm = Realm::create(1, Realm::OVERWORLD, tilemap);
+		auto realm = Realm::create(1, Realm::OVERWORLD, tilemap, seed);
 		realm->outdoors = true;
 		realm->game = game.get();
 		std::default_random_engine rng;

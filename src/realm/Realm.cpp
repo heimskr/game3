@@ -22,13 +22,15 @@
 
 namespace Game3 {
 	std::unordered_map<RealmType, Texture> Realm::textureMap {
-		{Realm::OVERWORLD, Texture("resources/tileset.png")},
-		{Realm::HOUSE,     Texture("resources/tileset.png")},
-		{Realm::KEEP,      Texture("resources/tileset.png")},
+		{Realm::OVERWORLD,  Texture("resources/tileset.png")},
+		{Realm::HOUSE,      Texture("resources/tileset.png")},
+		{Realm::KEEP,       Texture("resources/tileset.png")},
+		{Realm::BLACKSMITH, Texture("resources/tileset.png")},
+		{Realm::CAVE,       Texture("resources/tileset.png")},
 	};
 
-	Realm::Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_):
-	id(id_), type(type_), tilemap1(tilemap1_), tilemap2(tilemap2_), tilemap3(tilemap3_) {
+	Realm::Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_, int seed_):
+	id(id_), type(type_), tilemap1(tilemap1_), tilemap2(tilemap2_), tilemap3(tilemap3_), seed(seed_) {
 		tilemap1->init();
 		tilemap2->init();
 		tilemap3->init();
@@ -38,7 +40,7 @@ namespace Game3 {
 		resetPathMap();
 	}
 
-	Realm::Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_): id(id_), type(type_), tilemap1(tilemap1_) {
+	Realm::Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_, int seed_): id(id_), type(type_), tilemap1(tilemap1_), seed(seed_) {
 		tilemap1->init();
 		renderer1.init(tilemap1);
 		tilemap2 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->texture);
@@ -73,6 +75,7 @@ namespace Game3 {
 		auto shared = shared_from_this();
 		id = json.at("id");
 		type = json.at("type");
+		seed = json.at("seed");
 		tilemap1 = std::make_shared<Tilemap>(json.at("tilemap1"));
 		tilemap2 = std::make_shared<Tilemap>(json.at("tilemap2"));
 		tilemap3 = std::make_shared<Tilemap>(json.at("tilemap3"));
@@ -466,6 +469,7 @@ namespace Game3 {
 	void Realm::toJSON(nlohmann::json &json) const {
 		json["id"] = id;
 		json["type"] = type;
+		json["seed"] = seed;
 		json["tilemap1"] = *tilemap1;
 		json["tilemap2"] = *tilemap2;
 		json["tilemap3"] = *tilemap3;

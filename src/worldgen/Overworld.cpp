@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <libnoise/noise.h>
 
 #include "Tiles.h"
@@ -115,9 +113,8 @@ namespace Game3::WorldGen {
 		}
 		candidate_timer.stop();
 
-		std::cout << "Found " << candidates.size() << " candidate" << (candidates.size() == 1? "" : "s") << ".\n";
 		if (!candidates.empty())
-			WorldGen::generateTown(realm, rng, choose(candidates, rng) + pad * (tilemap1->width + 1), n, m, pad);
+			WorldGen::generateTown(realm, rng, choose(candidates, rng) + pad * (tilemap1->width + 1), n, m, pad, noise_seed);
 
 		Timer::summary();
 		Timer::clear();
