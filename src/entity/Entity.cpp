@@ -16,11 +16,11 @@
 
 namespace Game3 {
 	std::unordered_map<EntityID, EntityTexture> Entity::textureMap {
-		{Entity::GANGBLANC_ID,  {Texture("resources/characters/champions/Gangblanc.png"), 1}},
-		{Entity::GRUM_ID,       {Texture("resources/characters/champions/Grum.png"),      1}},
-		{Entity::ITEM_ID,       {Texture("resources/missing.png"),                        0}}, // Rendering is handled on a per-item basis by the ItemEntity class
-		{Entity::VILLAGER1_ID,  {Texture("resources/characters/villager1.png"),           2}},
-		{Entity::BLACKSMITH_ID, {Texture("resources/characters/blacksmith.png"),          2}},
+		{Entity::GANGBLANC_ID,  {cacheTexture("resources/characters/champions/Gangblanc.png"), 1}},
+		{Entity::GRUM_ID,       {cacheTexture("resources/characters/champions/Grum.png"),      1}},
+		{Entity::ITEM_ID,       {cacheTexture("resources/missing.png"),                        0}}, // Rendering is handled on a per-item basis by the ItemEntity class
+		{Entity::VILLAGER1_ID,  {cacheTexture("resources/characters/villager1.png"),           2}},
+		{Entity::BLACKSMITH_ID, {cacheTexture("resources/characters/blacksmith.png"),          2}},
 	};
 
 	std::shared_ptr<Entity> Entity::fromJSON(const nlohmann::json &json) {

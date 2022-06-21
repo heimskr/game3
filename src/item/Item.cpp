@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Texture.h"
 #include "entity/ItemEntity.h"
 #include "item/CaveEntrance.h"
@@ -8,12 +9,12 @@
 #include "realm/Realm.h"
 
 namespace Game3 {
-	static Texture textureShortsword  {"resources/items/shortsword.png"};
-	static Texture textureConsumables {"resources/rpg/consumables.png"};
-	static Texture texturePotions     {"resources/rpg/potions.png"};
-	static Texture textureItems       {"resources/items/items.png"};
-	static Texture texturePalisade    {"resources/items/palisade.png"};
-	static Texture textureTileset     {"resources/tileset.png"};
+	static Texture textureShortsword  = cacheTexture("resources/items/shortsword.png");
+	static Texture textureConsumables = cacheTexture("resources/rpg/consumables.png");
+	static Texture texturePotions     = cacheTexture("resources/rpg/potions.png");
+	static Texture textureItems       = cacheTexture("resources/items/items.png");
+	static Texture texturePalisade    = cacheTexture("resources/items/palisade.png");
+	static Texture textureTileset     = cacheTexture("resources/tileset.png");
 
 	std::unordered_map<ItemID, ItemTexture> Item::itemTextures {
 		{Item::SHORTSWORD,      {  0,   0, textureShortsword}},
@@ -126,7 +127,8 @@ namespace Game3 {
 		if (!rawImage) {
 			rawImage = std::make_unique<uint8_t[]>(channels * width * height);
 			uint8_t *raw_pointer = rawImage.get();
-			uint8_t *texture_pointer = texture.data.get() + item_texture.y * *texture.width * channels + item_texture.x * channels;
+			uint8_t *texture_pointer = texture.data->get() + item_texture.y * *texture.width * channels + item_texture.x * channels;
+			std::cout << "texture_pointer[" << static_cast<void *>(texture_pointer) << "]\n";
 			for (auto row = 0; row < height; ++row) {
 				std::memcpy(raw_pointer + row_size * row, texture_pointer, row_size);
 				texture_pointer += channels * *texture.width;

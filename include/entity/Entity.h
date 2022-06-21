@@ -29,7 +29,7 @@ namespace Game3 {
 	struct EntityTexture {
 		Texture texture;
 		uint8_t variety;
-		EntityTexture(Texture &&texture_, uint8_t variety_): texture(std::move(texture_)), variety(variety_) {}
+		EntityTexture(const Texture &texture_, uint8_t variety_): texture(texture_), variety(variety_) {}
 	};
 
 	class Entity: public HasInventory, public HasRealm, public std::enable_shared_from_this<Entity> {

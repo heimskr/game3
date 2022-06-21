@@ -277,7 +277,7 @@ namespace Game3 {
 	void MainWindow::newGame(int seed, int width, int height) {
 		glArea.get_context()->make_current();
 		game = Game::create(*canvas);
-		Texture texture("resources/tileset.png", true);
+		Texture texture = cacheTexture("resources/tileset.png");
 		texture.init();
 		auto tilemap = std::make_shared<Tilemap>(width, height, 16, texture);
 		tilemap->init();

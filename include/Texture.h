@@ -22,7 +22,7 @@ namespace Game3 {
 			int filter = 0;
 			bool alpha = false;
 			std::filesystem::path path;
-			std::shared_ptr<uint8_t> data;
+			std::shared_ptr<std::shared_ptr<uint8_t>> data = std::make_shared<std::shared_ptr<uint8_t>>();
 
 			Texture() = default;
 			Texture(const std::filesystem::path &, bool alpha_ = true, int filter_ = GL_NEAREST);

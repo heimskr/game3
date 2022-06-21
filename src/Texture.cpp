@@ -29,7 +29,7 @@ namespace Game3 {
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
 			glBindTexture(GL_TEXTURE_2D, 0);
 			*valid_ = true;
-			data = std::shared_ptr<uint8_t>(raw);
+			*data = std::shared_ptr<uint8_t>(raw);
 		}
 	}
 
@@ -38,9 +38,9 @@ namespace Game3 {
 		glBindTexture(GL_TEXTURE_2D, *id); CHECKGL
 	}
 
-	static std::unordered_map<std::string, Texture> textureCache;
 
 	Texture & cacheTexture(const std::filesystem::path &path, bool alpha, int filter) {
+		static std::unordered_map<std::string, Texture> textureCache;
 		auto canonical = std::filesystem::canonical(path).string();
 		if (textureCache.contains(canonical))
 			return textureCache.at(canonical);

@@ -22,11 +22,11 @@
 
 namespace Game3 {
 	std::unordered_map<RealmType, Texture> Realm::textureMap {
-		{Realm::OVERWORLD,  Texture("resources/tileset.png")},
-		{Realm::HOUSE,      Texture("resources/tileset.png")},
-		{Realm::KEEP,       Texture("resources/tileset.png")},
-		{Realm::BLACKSMITH, Texture("resources/tileset.png")},
-		{Realm::CAVE,       Texture("resources/tileset.png")},
+		{Realm::OVERWORLD,  cacheTexture("resources/tileset.png")},
+		{Realm::HOUSE,      cacheTexture("resources/tileset.png")},
+		{Realm::KEEP,       cacheTexture("resources/tileset.png")},
+		{Realm::BLACKSMITH, cacheTexture("resources/tileset.png")},
+		{Realm::CAVE,       cacheTexture("resources/tileset.png")},
 	};
 
 	Realm::Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_, int seed_):
