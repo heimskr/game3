@@ -13,7 +13,7 @@ namespace Game3 {
 	}
 
 	bool Building::onInteractOn(const std::shared_ptr<Player> &player) {
-		onInteractNextTo(player);
+		return onInteractNextTo(player);
 	}
 
 	bool Building::onInteractNextTo(const std::shared_ptr<Player> &player) {
