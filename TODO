@@ -6,3 +6,4 @@
 [2022/06/20 03:48:18] Make gatherers require tools and use up their durability.
 [2022/06/20 03:48:38] Make blacksmiths purchase resources from the keep's stockpile.
 [2022/06/20 03:49:00] Make blacksmiths produce tools.
+[2022/06/21 22:36:06] Implement mining in caves.
