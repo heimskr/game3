@@ -34,11 +34,44 @@ namespace Game3::WorldGen {
 			for (Index column = 0; column < width; ++column) {
 				realm->setLayer1(row, column, Monomap::DIRT);
 				const double noise = perlin.GetValue(row / noise_zoom, column / noise_zoom, 0.1);
-				if (noise < -.1)
+				if (noise < -.95) {
+					realm->setLayer2(row, column, Monomap::CAVE_IRON);
+					realm->setLayer3(row, column, Monomap::VOID);
+				} else if (noise < -.85) {
 					realm->setLayer2(row, column, Monomap::VOID);
-				else if (noise < .1)
+				} else if (noise < -.825) {
+					realm->setLayer2(row, column, Monomap::CAVE_DIAMOND);
+					realm->setLayer3(row, column, Monomap::VOID);
+				} else if (noise < -.725) {
+					realm->setLayer2(row, column, Monomap::VOID);
+				} else if (noise < -.7) {
+					realm->setLayer2(row, column, Monomap::CAVE_GOLD);
+					realm->setLayer3(row, column, Monomap::VOID);
+				} else if (noise < -.6) {
+					realm->setLayer2(row, column, Monomap::VOID);
+				} else if (noise < -.55) {
+					realm->setLayer2(row, column, Monomap::CAVE_COPPER);
+					realm->setLayer3(row, column, Monomap::VOID);
+				} else if (noise < -.45) {
+					realm->setLayer2(row, column, Monomap::VOID);
+				} else if (noise < -.375) {
+					realm->setLayer2(row, column, Monomap::CAVE_COAL);
+					realm->setLayer3(row, column, Monomap::VOID);
+				} else if (noise < -.1) {
+					realm->setLayer2(row, column, Monomap::VOID);
+				} else if (noise < .1) {
 					realm->setLayer2(row, column, Monomap::CAVE_WALL);
-				else
+				} else if (noise < .11) {
+					realm->setLayer2(row, column, Monomap::CAVE_IRON);
+				} else if (noise < .1125) {
+					realm->setLayer2(row, column, Monomap::CAVE_DIAMOND);
+				} else if (noise < .12) {
+					realm->setLayer2(row, column, Monomap::CAVE_COPPER);
+				} else if (noise < .1225) {
+					realm->setLayer2(row, column, Monomap::CAVE_GOLD);
+				} else if (noise < .13) {
+					realm->setLayer2(row, column, Monomap::CAVE_COAL);
+				} else
 					inside.emplace_back(row, column);
 			}
 

@@ -118,6 +118,11 @@ namespace Game3 {
 		constexpr static TileID DEEPER_WATER  = 486;
 		constexpr static TileID STONE         = 487;
 		constexpr static TileID CAVE_WALL     = 488;
+		constexpr static TileID CAVE_IRON     = 489;
+		constexpr static TileID CAVE_DIAMOND  = 490;
+		constexpr static TileID CAVE_COPPER   = 491;
+		constexpr static TileID CAVE_GOLD     = 492;
+		constexpr static TileID CAVE_COAL     = 493;
 		constexpr static TileID LIGHT_GRASS   = 513;
 		constexpr static TileID GRASS         = 514;
 		constexpr static TileID ROAD          = 517;
