@@ -6,12 +6,12 @@
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "item/CaveEntrance.h"
-#include "realm/Realm.h"
+#include "realm/Cave.h"
 #include "tileentity/Building.h"
 #include "tileentity/Ghost.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
-#include "worldgen/Cave.h"
+#include "worldgen/CaveGen.h"
 
 namespace Game3 {
 	bool CaveEntrance::use(Slot slot, ItemStack &stack, const std::shared_ptr<Player> &player, const Position &position) {
@@ -43,6 +43,10 @@ namespace Game3 {
 			if (tile_entity->tileID == Monomap::CAVE && tile_entity->getID() == TileEntity::BUILDING)
 				if (auto building = std::dynamic_pointer_cast<Building>(tile_entity)) {
 					realm_id = building->innerRealmID;
+					if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game.realms.at(*realm_id)))
+						++cave_realm->entranceCount;
+					else
+						throw std::runtime_error("Cave entrance leads to realm " + std::to_string(*realm_id) + ", which isn't a cave");
 					entrance = building->entrance;
 					break;
 				}
@@ -54,17 +58,18 @@ namespace Game3 {
 			const int realm_width  = 100;
 			const int realm_height = 100;
 			// TODO: perhaps let the player choose the seed
-			const int cave_seed = -2 * realm.seed - 5;
+			const int cave_seed = -2 * realm.seed - 5 + game.cavesGenerated;
 
 			auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, Realm::textureMap.at(Realm::CAVE));
 			// TODO: make a cave realm that handles updateNeighbors to convert exposed void into stone so that cave walls can be mineable
-			auto new_realm = Realm::create(*realm_id, Realm::CAVE, new_tilemap, cave_seed);
+			auto new_realm = Realm::create<Cave>(*realm_id, Realm::CAVE, new_tilemap, cave_seed);
 			new_realm->outdoors = false;
 			new_realm->setGame(game);
 			Position entrance_position;
 			WorldGen::generateCave(new_realm, game.dynamicRNG, cave_seed, realm.getIndex(exit), entrance_position, realm.id);
 			entrance = new_realm->getIndex(entrance_position);
 			game.realms.emplace(*realm_id, new_realm);
+			++game.cavesGenerated;
 			emplaced = true;
 		}
 

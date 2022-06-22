@@ -3,6 +3,7 @@
 #include "entity/ItemEntity.h"
 #include "item/CaveEntrance.h"
 #include "item/Furniture.h"
+#include "item/Hammer.h"
 #include "item/Item.h"
 #include "item/Sapling.h"
 #include "item/Tool.h"
@@ -108,9 +109,9 @@ namespace Game3 {
 		{Item::PLANT_POT1,      std::make_shared<Furniture>   (Item::PLANT_POT1,      "Plant Pot",        32, 64)},
 		{Item::PLANT_POT2,      std::make_shared<Furniture>   (Item::PLANT_POT2,      "Plant Pot",        32, 64)},
 		{Item::PLANT_POT3,      std::make_shared<Furniture>   (Item::PLANT_POT3,      "Plant Pot",        32, 64)},
-		{Item::IRON_HAMMER,     std::make_shared<Tool>        (Item::IRON_HAMMER,     "Iron Hammer",     150,  3.f, ItemAttribute::Hammer)},
-		{Item::GOLD_HAMMER,     std::make_shared<Tool>        (Item::GOLD_HAMMER,     "Gold Hammer",     400, .75f, ItemAttribute::Hammer)},
-		{Item::DIAMOND_HAMMER,  std::make_shared<Tool>        (Item::DIAMOND_HAMMER,  "Diamond Hammer",  900,  1.f, ItemAttribute::Hammer)},
+		{Item::IRON_HAMMER,     std::make_shared<Hammer>      (Item::IRON_HAMMER,     "Iron Hammer",     150,  3.f)},
+		{Item::GOLD_HAMMER,     std::make_shared<Hammer>      (Item::GOLD_HAMMER,     "Gold Hammer",     400, .75f)},
+		{Item::DIAMOND_HAMMER,  std::make_shared<Hammer>      (Item::DIAMOND_HAMMER,  "Diamond Hammer",  900,  1.f)},
 		{Item::TOWER,           std::make_shared<Furniture>   (Item::TOWER,           "Tower",            10, 64)},
 		{Item::CAVE_ENTRANCE,   std::make_shared<CaveEntrance>(Item::CAVE_ENTRANCE,   "Cave Entrance",    50,  1)},
 	};

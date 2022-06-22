@@ -31,6 +31,7 @@ namespace Game3 {
 			/** Seeded with the time. Must not be used to determine deterministic outcomes.
 			 *  For example, a Gatherer can use this to choose a resource node to harvest from, but worldgen shouldn't use this. */
 			std::default_random_engine dynamicRNG;
+			size_t cavesGenerated = 0;
 
 			Game() = delete;
 

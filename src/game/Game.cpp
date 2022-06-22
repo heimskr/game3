@@ -147,6 +147,7 @@ namespace Game3 {
 		out->activeRealm = out->realms.at(json.at("activeRealmID"));
 		out->hourOffset = json.contains("hourOffset")? json.at("hourOffset").get<float>() : 0.f;
 		out->debugMode = json.contains("debugMode")? json.at("debugMode").get<bool>() : false;
+		out->cavesGenerated = json.contains("cavesGenerated")? json.at("cavesGenerated").get<decltype(Game::cavesGenerated)>() : 0;
 		return out;
 	}
 
@@ -157,5 +158,7 @@ namespace Game3 {
 		for (const auto &[id, realm]: game.realms)
 			json["realms"][std::to_string(id)] = nlohmann::json(*realm);
 		json["hourOffset"] = game.getHour();
+		if (0 < game.cavesGenerated)
+			json["cavesGenerated"] = game.cavesGenerated;
 	}
 }

@@ -8,7 +8,7 @@
 #include "tileentity/Building.h"
 #include "util/Timer.h"
 #include "util/Util.h"
-#include "worldgen/Cave.h"
+#include "worldgen/CaveGen.h"
 
 namespace Game3::WorldGen {
 	void generateCave(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, int noise_seed, Index exit_index, Position &entrance, RealmID parent_realm) {
