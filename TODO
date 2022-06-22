@@ -1,9 +1,7 @@
 [2022/06/19 12:05:00] Add crafting that consumes tool durability (e.g., crafting planks from wood at the cost of durability of a saw)
 [2022/06/20 01:52:06] Add tooldown for ground harvesting.
 [2022/06/20 03:41:41] Implement merchants.
-[2022/06/20 03:44:30] Add acceleration for the player.
 [2022/06/20 03:47:17] Make gatherers purchase tools from blacksmiths.
 [2022/06/20 03:48:18] Make gatherers require tools and use up their durability.
 [2022/06/20 03:48:38] Make blacksmiths purchase resources from the keep's stockpile.
 [2022/06/20 03:49:00] Make blacksmiths produce tools.
-[2022/06/21 22:36:06] Implement mining in caves.
