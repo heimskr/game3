@@ -1,4 +1,5 @@
 #include <iostream>
+
 #include "Tiles.h"
 #include "game/Game.h"
 #include "realm/Cave.h"
@@ -22,7 +23,10 @@ namespace Game3 {
 			if (tile_entity->tileID != Monomap::CAVE)
 				continue;
 			if (auto building = std::dynamic_pointer_cast<Building>(tile_entity)) {
-				std::cout << "Use count for cave " << building->innerRealmID << " is " << game.realms.at(building->innerRealmID).use_count() << '\n';
+				if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game.realms.at(building->innerRealmID)))
+					game.realms.erase(building->innerRealmID);
+				else
+					std::cerr << "Cave entrance leads to realm " + std::to_string(building->innerRealmID) + ", which isn't a cave. Not erasing.\n";
 				break;
 			}
 		}
