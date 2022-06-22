@@ -29,6 +29,7 @@ namespace Game3 {
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 			void render(SpriteRenderer &) override;
 			ItemStack getOreStack(ItemCount count = 1);
+			static ItemStack getOreStack(Ore, ItemCount count = 1);
 
 		protected:
 			OreDeposit() = delete;

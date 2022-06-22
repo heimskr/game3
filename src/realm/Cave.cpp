@@ -7,10 +7,10 @@
 
 namespace Game3 {
 	Cave::Cave(RealmID id_, RealmID parent_realm, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_, int seed_):
-		Realm(id_, Realm::KEEP, tilemap1_, tilemap2_, tilemap3_, seed_), parentRealm(parent_realm) {}
+		Realm(id_, Realm::CAVE, tilemap1_, tilemap2_, tilemap3_, seed_), parentRealm(parent_realm) {}
 
 	Cave::Cave(RealmID id_, RealmID parent_realm, const std::shared_ptr<Tilemap> &tilemap1_, int seed_):
-		Realm(id_, Realm::KEEP, tilemap1_, seed_), parentRealm(parent_realm) {}
+		Realm(id_, Realm::CAVE, tilemap1_, seed_), parentRealm(parent_realm) {}
 
 	Cave::~Cave() {
 		// Assumptions:

@@ -11,6 +11,7 @@
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
 #include "tileentity/Ghost.h"
+#include "tileentity/OreDeposit.h"
 #include "tileentity/Sign.h"
 #include "tileentity/Teleporter.h"
 #include "ui/SpriteRenderer.h"
@@ -356,6 +357,38 @@ namespace Game3 {
 				}
 
 				break;
+			}
+
+			// Oh no, repetition.
+			case Realm::CAVE: {
+				std::optional<ItemStack> ore_stack;
+
+				const TileID tile2 = tilemap2->tiles.at(index);
+				if (tile2 == Monomap::CAVE_COAL)
+					ore_stack.emplace(Item::COAL, 1);
+				else if (tile2 == Monomap::CAVE_COPPER)
+					ore_stack.emplace(Item::COPPER_ORE, 1);
+				else if (tile2 == Monomap::CAVE_DIAMOND)
+					ore_stack.emplace(Item::DIAMOND_ORE, 1);
+				else if (tile2 == Monomap::CAVE_GOLD)
+					ore_stack.emplace(Item::GOLD_ORE, 1);
+				else if (tile2 == Monomap::CAVE_IRON)
+					ore_stack.emplace(Item::IRON_ORE, 1);
+				else if (tile2 == Monomap::CAVE_WALL)
+					ore_stack.emplace(Item::STONE, 1);
+
+				if (ore_stack) {
+					if (auto *stack = inventory.getActive()) {
+						if (stack->has(ItemAttribute::Pickaxe) && !inventory.add(*ore_stack)) {
+							setLayer2(index, Monomap::EMPTY);
+							game->activateContext();
+							renderer2.reupload();
+							if (stack->reduceDurability())
+								inventory.erase(inventory.activeSlot);
+							return true;
+						}
+					}
+				}
 			}
 		}
 

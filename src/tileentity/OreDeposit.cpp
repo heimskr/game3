@@ -128,13 +128,17 @@ namespace Game3 {
 	}
 
 	ItemStack OreDeposit::getOreStack(ItemCount count) {
-		switch (type) {
+		return getOreStack(type, count);
+	}
+
+	ItemStack OreDeposit::getOreStack(Ore ore, ItemCount count) {
+		switch (ore) {
 			case Ore::Coal:    return ItemStack(Item::COAL,        count);
 			case Ore::Copper:  return ItemStack(Item::COPPER_ORE,  count);
 			case Ore::Iron:    return ItemStack(Item::IRON_ORE,    count);
 			case Ore::Gold:    return ItemStack(Item::GOLD_ORE,    count);
 			case Ore::Diamond: return ItemStack(Item::DIAMOND_ORE, count);
-			default: throw std::invalid_argument("Invalid ore type: " + std::to_string(static_cast<int>(type)));
+			default: throw std::invalid_argument("Invalid ore type: " + std::to_string(static_cast<int>(ore)));
 		}
 	}
 }
