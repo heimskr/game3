@@ -326,68 +326,30 @@ namespace Game3 {
 			}
 		}
 
-		switch (type) {
-			case Realm::OVERWORLD: {
-				std::optional<ItemID> item;
-				std::optional<ItemAttribute> attribute;
+		std::optional<ItemID> item;
+		std::optional<ItemAttribute> attribute;
 
-				const TileID tile1 = tilemap1->tiles.at(index);
-				if (tile1 == Monomap::SAND) {
-					item.emplace(Item::SAND);
-					attribute.emplace(ItemAttribute::Shovel);
-				} else if (tile1 == Monomap::SHALLOW_WATER) {
-					item.emplace(Item::CLAY);
-					attribute.emplace(ItemAttribute::Shovel);
-				} else if (Monomap::dirtSet.contains(tile1)) {
-					item.emplace(Item::DIRT);
-					attribute.emplace(ItemAttribute::Shovel);
-				} else if (tile1 == Monomap::STONE) {
-					item.emplace(Item::STONE);
-					attribute.emplace(ItemAttribute::Pickaxe);
-				}
+		const TileID tile1 = tilemap1->tiles.at(index);
+		if (tile1 == Monomap::SAND) {
+			item.emplace(Item::SAND);
+			attribute.emplace(ItemAttribute::Shovel);
+		} else if (tile1 == Monomap::SHALLOW_WATER) {
+			item.emplace(Item::CLAY);
+			attribute.emplace(ItemAttribute::Shovel);
+		} else if (Monomap::dirtSet.contains(tile1)) {
+			item.emplace(Item::DIRT);
+			attribute.emplace(ItemAttribute::Shovel);
+		} else if (tile1 == Monomap::STONE) {
+			item.emplace(Item::STONE);
+			attribute.emplace(ItemAttribute::Pickaxe);
+		}
 
-				if (item && attribute) {
-					if (auto *stack = inventory.getActive()) {
-						if (stack->has(*attribute) && !inventory.add({*item, 1})) {
-							if (stack->reduceDurability())
-								inventory.erase(inventory.activeSlot);
-							return true;
-						}
-					}
-				}
-
-				break;
-			}
-
-			// Oh no, repetition.
-			case Realm::CAVE: {
-				std::optional<ItemStack> ore_stack;
-
-				const TileID tile2 = tilemap2->tiles.at(index);
-				if (tile2 == Monomap::CAVE_COAL)
-					ore_stack.emplace(Item::COAL, 1);
-				else if (tile2 == Monomap::CAVE_COPPER)
-					ore_stack.emplace(Item::COPPER_ORE, 1);
-				else if (tile2 == Monomap::CAVE_DIAMOND)
-					ore_stack.emplace(Item::DIAMOND_ORE, 1);
-				else if (tile2 == Monomap::CAVE_GOLD)
-					ore_stack.emplace(Item::GOLD_ORE, 1);
-				else if (tile2 == Monomap::CAVE_IRON)
-					ore_stack.emplace(Item::IRON_ORE, 1);
-				else if (tile2 == Monomap::CAVE_WALL)
-					ore_stack.emplace(Item::STONE, 1);
-
-				if (ore_stack) {
-					if (auto *stack = inventory.getActive()) {
-						if (stack->has(ItemAttribute::Pickaxe) && !inventory.add(*ore_stack)) {
-							setLayer2(index, Monomap::EMPTY);
-							game->activateContext();
-							renderer2.reupload();
-							if (stack->reduceDurability())
-								inventory.erase(inventory.activeSlot);
-							return true;
-						}
-					}
+		if (item && attribute) {
+			if (auto *stack = inventory.getActive()) {
+				if (stack->has(*attribute) && !inventory.add({*item, 1})) {
+					if (stack->reduceDurability())
+						inventory.erase(inventory.activeSlot);
+					return true;
 				}
 			}
 		}

@@ -89,7 +89,6 @@ namespace Game3 {
 			void setLayer1(const Position &, TileID);
 			void setLayer2(const Position &, TileID);
 			void setLayer3(const Position &, TileID);
-			bool interactGround(const std::shared_ptr<Player> &, const Position &);
 			inline Index getIndex(const Position &position) const { return position.row * getWidth() + position.column; }
 			inline Index getIndex(Index row, Index column) const { return row * getWidth() + column; }
 			std::optional<Position> getPathableAdjacent(const Position &) const;
@@ -98,6 +97,7 @@ namespace Game3 {
 			bool hasTileEntityAt(const Position &) const;
 			void confirmGhosts();
 
+			virtual bool interactGround(const std::shared_ptr<Player> &, const Position &);
 			virtual void updateNeighbors(const Position &);
 
 			template <typename T, typename... Args>

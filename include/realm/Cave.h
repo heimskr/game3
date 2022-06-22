@@ -17,6 +17,9 @@ namespace Game3 {
 			Cave & operator=(const Cave &) = delete;
 			Cave & operator=(Cave &&) = default;
 
+			bool interactGround(const std::shared_ptr<Player> &, const Position &) override;
+			void reveal(const Position &);
+
 			friend class Realm;
 
 		protected:
