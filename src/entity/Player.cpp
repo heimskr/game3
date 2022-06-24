@@ -17,10 +17,13 @@ namespace Game3 {
 		return out;
 	}
 
-	nlohmann::json Player::toJSON() const {
-		nlohmann::json json;
-		to_json(json, *this);
-		return json;
+	void Player::toJSON(nlohmann::json &json) const {
+		Entity::toJSON(json);
+		json["isPlayer"] = true;
+		if (0 < money)
+			json["money"] = money;
+		if (0.f < tooldown)
+			json["tooldown"] = tooldown;
 	}
 
 	void Player::absorbJSON(const nlohmann::json &json) {
@@ -106,11 +109,6 @@ namespace Game3 {
 	}
 
 	void to_json(nlohmann::json &json, const Player &player) {
-		to_json(json, static_cast<const Entity &>(player));
-		json["isPlayer"] = true;
-		if (0 < player.money)
-			json["money"] = player.money;
-		if (0.f < player.tooldown)
-			json["tooldown"] = player.tooldown;
+		player.toJSON(json);
 	}
 }

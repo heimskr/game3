@@ -15,7 +15,7 @@ namespace Game3 {
 			static std::shared_ptr<ItemEntity> create(const ItemStack &);
 			static std::shared_ptr<ItemEntity> fromJSON(const nlohmann::json &);
 
-			nlohmann::json toJSON() const override;
+			void toJSON(nlohmann::json &) const override;
 			void init() override;
 			void render(SpriteRenderer &) const override;
 			virtual bool onInteractOn    (const std::shared_ptr<Player> &player) override { return interact(player); }

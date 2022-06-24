@@ -19,7 +19,7 @@ namespace Game3 {
 
 			static std::shared_ptr<Player> fromJSON(const nlohmann::json &);
 
-			nlohmann::json toJSON() const override;
+			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(const nlohmann::json &) override;
 			bool isPlayer() const override { return true; }
 			void tick(Game &, float delta) override;

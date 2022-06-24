@@ -18,10 +18,10 @@
 
 namespace Game3 {
 	Gatherer::Gatherer(EntityID id_):
-		Entity(id_, Entity::GATHERER_TYPE) {}
+		Worker(id_, Entity::GATHERER_TYPE) {}
 
 	Gatherer::Gatherer(EntityID id_, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_):
-		Entity(id_, Entity::GATHERER_TYPE), overworldRealm(overworld_realm), houseRealm(house_realm), housePosition(house_position), keep(keep_), keepPosition(keep_->position) {}
+		Worker(id_, Entity::GATHERER_TYPE, overworld_realm, house_realm, house_position, keep_) {}
 
 	std::shared_ptr<Gatherer> Gatherer::create(EntityID id, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_) {
 		auto out = std::shared_ptr<Gatherer>(new Gatherer(id, overworld_realm, house_realm, house_position, keep_));
@@ -35,32 +35,18 @@ namespace Game3 {
 		return out;
 	}
 
-	nlohmann::json Gatherer::toJSON() const {
-		nlohmann::json json;
-		to_json(json, *this);
-		return json;
+	void Gatherer::toJSON(nlohmann::json &json) const {
+		Worker::toJSON(json);
+		json["harvestingTime"] = harvestingTime;
+		if (chosenResource != -1)
+			json["chosenResource"] = chosenResource;
 	}
 
 	void Gatherer::absorbJSON(const nlohmann::json &json) {
-		Entity::absorbJSON(json);
-		phase          = json.at("phase");
-		overworldRealm = json.at("overworldRealm");
-		houseRealm     = json.at("house").at(0);
-		housePosition  = json.at("house").at(1);
+		Worker::absorbJSON(json);
 		harvestingTime = json.at("harvestingTime");
-		keepPosition   = json.at("keepPosition");
 		if (json.contains("chosenResource"))
 			chosenResource = json.at("chosenResource");
-		if (json.contains("destination"))
-			destination = json.at("destination");
-		if (json.contains("stuck"))
-			stuck = json.at("stuck");
-	}
-
-	void Gatherer::initAfterLoad(Game &game) {
-		auto &overworld = *game.realms.at(overworldRealm);
-		if (!(keep = std::dynamic_pointer_cast<Building>(overworld.tileEntityAt(keepPosition))))
-			throw std::runtime_error("Couldn't find keep for gatherer");
 	}
 
 	bool Gatherer::onInteractNextTo(const std::shared_ptr<Player> &player) {
@@ -75,15 +61,11 @@ namespace Game3 {
 	}
 
 	void Gatherer::tick(Game &game, float delta) {
-		Entity::tick(game, delta);
+		Worker::tick(game, delta);
 		const auto hour = game.getHour();
 
-		if (stuck) {
-			if ((stuckTime += delta) < RETRY_TIME)
-				return;
-			stuck = false;
-			stuckTime = (rand() % static_cast<int>(RETRY_TIME * 100)) / 100.f;
-		}
+		if (stillStuck(delta))
+			return;
 
 		if (WORK_START_HOUR <= hour && phase == 0)
 			wakeUp();
@@ -293,18 +275,6 @@ namespace Game3 {
 	}
 
 	void to_json(nlohmann::json &json, const Gatherer &gatherer) {
-		to_json(json, static_cast<const Entity &>(gatherer));
-		json["phase"] = gatherer.phase;
-		json["overworldRealm"] = gatherer.overworldRealm;
-		json["house"][0] = gatherer.houseRealm;
-		json["house"][1] = gatherer.housePosition;
-		json["harvestingTime"] = gatherer.harvestingTime;
-		if (gatherer.chosenResource != -1)
-			json["chosenResource"] = gatherer.chosenResource;
-		if (gatherer.destination)
-			json["destination"] = gatherer.destination;
-		json["keepPosition"] = gatherer.keep->position;
-		if (gatherer.stuck)
-			json["stuck"] = gatherer.stuck;
+		gatherer.toJSON(json);
 	}
 }

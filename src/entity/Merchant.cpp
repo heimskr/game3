@@ -22,10 +22,10 @@ namespace Game3 {
 		return out;
 	}
 
-	nlohmann::json Merchant::toJSON() const {
-		nlohmann::json json;
-		to_json(json, *this);
-		return json;
+	void Merchant::toJSON(nlohmann::json &json) const {
+		Entity::toJSON(json);
+		json["money"] = money;
+		json["greed"] = greed;
 	}
 
 	void Merchant::absorbJSON(const nlohmann::json &json) {
@@ -49,8 +49,6 @@ namespace Game3 {
 	}
 
 	void to_json(nlohmann::json &json, const Merchant &merchant) {
-		to_json(json, static_cast<const Entity &>(merchant));
-		json["money"] = merchant.money;
-		json["greed"] = merchant.greed;
+		merchant.toJSON(json);
 	}
 }

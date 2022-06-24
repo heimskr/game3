@@ -78,7 +78,7 @@ namespace Game3 {
 			static std::shared_ptr<Entity> fromJSON(const nlohmann::json &);
 
 			virtual void absorbJSON(const nlohmann::json &);
-			virtual nlohmann::json toJSON() const;
+			virtual void toJSON(nlohmann::json &) const;
 			virtual bool isPlayer() const { return false; }
 			virtual void render(SpriteRenderer &) const;
 			virtual void tick(Game &, float delta);

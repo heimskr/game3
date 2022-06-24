@@ -51,10 +51,18 @@ namespace Game3 {
 		return out;
 	}
 
-	nlohmann::json Entity::toJSON() const {
-		nlohmann::json json;
-		to_json(json, *this);
-		return json;
+	void Entity::toJSON(nlohmann::json &json) const {
+		json["id"] = id();
+		json["type"] = type;
+		json["position"] = position;
+		json["realmID"] = realmID;
+		json["direction"] = direction;
+		if (inventory)
+			json["inventory"] = *inventory;
+		if (!path.empty())
+			json["path"] = path;
+		if (money != 0)
+			json["money"] = money;
 	}
 
 	void Entity::absorbJSON(const nlohmann::json &json) {
@@ -327,16 +335,6 @@ namespace Game3 {
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {
-		json["id"] = entity.id();
-		json["type"] = entity.type;
-		json["position"] = entity.position;
-		json["realmID"] = entity.realmID;
-		json["direction"] = entity.direction;
-		if (entity.inventory)
-			json["inventory"] = *entity.inventory;
-		if (!entity.path.empty())
-			json["path"] = entity.path;
-		if (entity.money != 0)
-			json["money"] = entity.money;
+		entity.toJSON(json);
 	}
 }

@@ -31,10 +31,9 @@ namespace Game3 {
 		return out;
 	}
 
-	nlohmann::json ItemEntity::toJSON() const {
-		nlohmann::json json;
-		to_json(json, *this);
-		return json;
+	void ItemEntity::toJSON(nlohmann::json &json) const {
+		Entity::toJSON(json);
+		json["stack"] = getStack();
 	}
 
 	void ItemEntity::init() {
@@ -65,7 +64,6 @@ namespace Game3 {
 	}
 
 	void to_json(nlohmann::json &json, const ItemEntity &item_entity) {
-		to_json(json, static_cast<const Entity &>(item_entity));
-		json["stack"] = item_entity.getStack();
+		item_entity.toJSON(json);
 	}
 }

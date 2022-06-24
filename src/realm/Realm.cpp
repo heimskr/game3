@@ -478,8 +478,11 @@ namespace Game3 {
 		for (const auto &[index, tile_entity]: tileEntities)
 			json["tileEntities"][std::to_string(index)] = *tile_entity;
 		json["entities"] = std::vector<nlohmann::json>();
-		for (const auto &entity: entities)
-			json["entities"].push_back(entity->toJSON());
+		for (const auto &entity: entities) {
+			nlohmann::json entity_json;
+			entity->toJSON(entity_json);
+			json["entities"].push_back(std::move(entity_json));
+		}
 		if (!extraData.empty())
 			json["extra"] = extraData;
 	}

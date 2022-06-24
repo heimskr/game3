@@ -11,7 +11,7 @@ namespace Game3 {
 			MoneyCount money = 0;
 			double greed = .1;
 
-			nlohmann::json toJSON() const override;
+			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(const nlohmann::json &) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 
