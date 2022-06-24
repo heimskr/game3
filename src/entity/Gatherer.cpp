@@ -109,8 +109,10 @@ namespace Game3 {
 		if (phase == 6 && position == destination)
 			sellInventory();
 
-		if (phase == 7 && SELLING_TIME <= (sellTime += delta))
+		if (phase == 7 && SELLING_TIME <= (sellTime += delta)) {
+			sellTime = 0;
 			leaveKeep();
+		}
 
 		if (phase == 8 && getRealm()->id == overworldRealm)
 			goToHouse();
