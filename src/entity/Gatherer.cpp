@@ -62,50 +62,51 @@ namespace Game3 {
 
 	void Gatherer::tick(Game &game, float delta) {
 		Worker::tick(game, delta);
-		const auto hour = game.getHour();
 
 		if (stillStuck(delta))
 			return;
 
-		if (WORK_START_HOUR <= hour && phase == 0)
+		const auto hour = game.getHour();
+
+		if (phase == 0 && WORK_START_HOUR <= hour)
 			wakeUp();
 
-		if (phase == 1 && realmID == overworldRealm)
+		else if (phase == 1 && realmID == overworldRealm)
 			goToResource();
 
-		if (phase == 2 && position == destination)
+		else if (phase == 2 && position == destination)
 			startHarvesting();
 
-		if (phase == 3) {
+		else if (phase == 3) {
 			harvest(delta);
 			if (WORK_END_HOUR <= hour)
 				phase = 4;
 		}
 
-		if (phase == 4)
-			goToKeep();
+		else if (phase == 4)
+			goToKeep(5);
 
-		if (phase == 5 && position == destination)
-			goToStockpile();
+		else if (phase == 5 && position == destination)
+			goToStockpile(6);
 
-		if (phase == 6 && position == destination)
+		else if (phase == 6 && position == destination)
 			sellInventory();
 
-		if (phase == 7 && SELLING_TIME <= (sellTime += delta)) {
+		else if (phase == 7 && SELLING_TIME <= (sellTime += delta)) {
 			sellTime = 0;
-			leaveKeep();
+			leaveKeep(8);
 		}
 
-		if (phase == 8 && getRealm()->id == overworldRealm)
-			goToHouse();
+		else if (phase == 8 && realmID == overworldRealm)
+			goToHouse(9);
 
-		if (phase == 9 && position == destination)
-			goToBed();
+		else if (phase == 9 && position == destination)
+			goToBed(10);
 
-		if (phase == 10 && position == destination)
+		else if (phase == 10 && position == destination)
 			phase = 11;
 
-		if (phase == 11 && hour < WORK_END_HOUR)
+		else if (phase == 11 && hour < WORK_END_HOUR)
 			phase = 0;
 	}
 
@@ -162,29 +163,6 @@ namespace Game3 {
 			harvestingTime += delta;
 	}
 
-	void Gatherer::goToKeep() {
-		const auto adjacent = getRealm()->getPathableAdjacent(keep->position);
-		if (!adjacent || !pathfind(destination = *adjacent)) {
-			// throw std::runtime_error("Gatherer couldn't pathfind to keep");
-			stuck = true;
-			return;
-		}
-		phase = 5;
-	}
-
-	void Gatherer::goToStockpile() {
-		keep->teleport(shared_from_this());
-		auto keep_realm = keep->getInnerRealm();
-		auto stockpile = keep_realm->getTileEntity<Chest>();
-		const auto adjacent = keep_realm->getPathableAdjacent(stockpile->position);
-		if (!adjacent || !pathfind(destination = *adjacent)) {
-			// throw std::runtime_error("Gatherer couldn't pathfind to stockpile");
-			stuck = true;
-			return;
-		}
-		phase = 6;
-	}
-
 	void Gatherer::sellInventory() {
 		phase = 7;
 		auto &keep_realm = dynamic_cast<Keep &>(*keep->getInnerRealm());
@@ -194,7 +172,7 @@ namespace Game3 {
 			if (!inventory->contains(slot))
 				continue;
 
-			auto stack = inventory->front();
+			ItemStack stack = inventory->front();
 			MoneyCount sell_price = 0;
 
 			while (0 < stack.count && !totalSellPrice(keep_realm, stack, sell_price))
@@ -221,57 +199,6 @@ namespace Game3 {
 		}
 
 		setMoney(new_money);
-	}
-
-	void Gatherer::leaveKeep() {
-		phase = 8;
-		auto &keep_realm = dynamic_cast<Keep &>(*keep->getInnerRealm());
-		auto door = keep_realm.getTileEntity<Teleporter>([](const auto &door) {
-			return door->extraData.contains("exit") && door->extraData.at("exit") == true;
-		});
-		if (!pathfind(destination = door->position)) {
-			// throw std::runtime_error("Gatherer couldn't pathfind to keep door");
-			stuck = true;
-			return;
-		}
-	}
-
-	void Gatherer::goToHouse() {
-		if (getRealm()->id == overworldRealm) {
-			const auto adjacent = getRealm()->getPathableAdjacent(housePosition);
-			if (!adjacent || !pathfind(destination = *adjacent)) {
-				// throw std::runtime_error("Gatherer couldn't pathfind to house");
-				stuck = true;
-				return;
-			}
-			phase = 9;
-		}
-	}
-
-	void Gatherer::goToBed() {
-		auto house = std::dynamic_pointer_cast<Building>(getRealm()->tileEntityAt(housePosition));
-		if (!house)
-			throw std::runtime_error("Gatherer couldn't find house");
-		house->teleport(shared_from_this());
-
-		auto &realm = *getRealm();
-		if (realm.id != houseRealm) {
-			// throw std::runtime_error("Gatherer couldn't teleport to house");
-			stuck = true;
-			return;
-		}
-
-		if (!pathfind(destination = realm.extraData.at("bed"))) {
-			// throw std::runtime_error("Gatherer couldn't pathfind to bed");
-			stuck = true;
-			return;
-		}
-
-		phase = 10;
-	}
-
-	void Gatherer::setMoney(MoneyCount new_money) {
-		money = new_money;
 	}
 
 	void to_json(nlohmann::json &json, const Gatherer &gatherer) {

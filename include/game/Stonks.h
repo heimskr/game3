@@ -31,6 +31,10 @@ namespace Game3 {
 
 	/** Determines whether the merchant can afford a given amount of a certain resource, and if so, outputs the price.
 	 *  Unfortunately, this is O(amount). */
+	bool totalSellPrice(const Inventory &, MoneyCount, double greed, const ItemStack &, MoneyCount &out);
+
+	/** Determines whether the merchant can afford a given amount of a certain resource, and if so, outputs the price.
+	 *  Unfortunately, this is O(amount). */
 	bool totalSellPrice(const Merchant &, const ItemStack &, MoneyCount &out);
 
 	/** Determines whether the keep can afford a given amount of a certain resource, and if so, outputs the price.
@@ -39,5 +43,13 @@ namespace Game3 {
 
 	/** Returns the price to buy a given amount of a resource from a merchant. Like totalSellPrice, this is O(amount).
 	 *  The caller should check whether the player has enough money. */
+	size_t totalBuyPrice(const Inventory &, MoneyCount, const ItemStack &);
+
+	/** Returns the price to buy a given amount of a resource from a merchant. Like totalSellPrice, this is O(amount).
+	 *  The caller should check whether the player has enough money. */
 	size_t totalBuyPrice(const Merchant &, const ItemStack &);
+
+	/** Returns the price to buy a given amount of a resource from a merchant. Like totalSellPrice, this is O(amount).
+	 *  The caller should check whether the player has enough money. */
+	size_t totalBuyPrice(const Keep &, const ItemStack &);
 }

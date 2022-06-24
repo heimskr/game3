@@ -2,6 +2,7 @@
 #include <sstream>
 
 #include "Tiles.h"
+#include "entity/Blacksmith.h"
 #include "entity/Entity.h"
 #include "entity/Gatherer.h"
 #include "entity/ItemEntity.h"
@@ -40,6 +41,9 @@ namespace Game3 {
 					break;
 				case Entity::MERCHANT_TYPE:
 					out = Entity::create<Merchant>(id);
+					break;
+				case Entity::BLACKSMITH_TYPE:
+					out = Entity::create<Blacksmith>(id);
 					break;
 				default:
 					out = Entity::create<Entity>(id, Entity::GENERIC_TYPE);

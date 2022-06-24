@@ -3,8 +3,6 @@
 #include "entity/Worker.h"
 
 namespace Game3 {
-	class Building;
-
 	/** Lives in a town and gathers resources during the day. */
 	class Gatherer: public Worker {
 		public:
@@ -26,27 +24,19 @@ namespace Game3 {
 			friend class Entity;
 
 		protected:
+			float sellTime = 0.f;
+
 			Gatherer(EntityID);
 			Gatherer(EntityID, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_);
 
 			void interact(const Position &);
 
 		private:
-			Position keepPosition;
-			float sellTime = 0.f;
-			Direction lastDirection = Direction::Down;
-
 			void wakeUp();
 			void goToResource();
 			void startHarvesting();
 			void harvest(float delta);
-			void goToKeep();
-			void goToStockpile();
 			void sellInventory();
-			void leaveKeep();
-			void goToHouse();
-			void goToBed();
-			void setMoney(MoneyCount);
 	};
 
 	void to_json(nlohmann::json &, const Gatherer &);

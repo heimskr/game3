@@ -28,27 +28,20 @@ namespace Game3 {
 			friend class Entity;
 
 		protected:
+			Position keepPosition;
+			Direction lastDirection = Direction::Down;
+
 			Worker(EntityID, EntityType);
 			Worker(EntityID, EntityType, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_);
 
 			void interact(const Position &);
 			bool stillStuck(float delta);
+			void goToKeep(Phase new_phase);
+			void goToStockpile(Phase new_phase);
+			void leaveKeep(Phase new_phase);
+			void goToHouse(Phase new_phase);
+			void goToBed(Phase new_phase);
 
-		private:
-			Position keepPosition;
-			float sellTime = 0.f;
-			Direction lastDirection = Direction::Down;
-
-			void wakeUp();
-			void goToResource();
-			void startHarvesting();
-			void harvest(float delta);
-			void goToKeep();
-			void goToStockpile();
-			void sellInventory();
-			void leaveKeep();
-			void goToHouse();
-			void goToBed();
-			void setMoney(MoneyCount);
+			inline void setMoney(MoneyCount new_money) { money = new_money; }
 	};
 }

@@ -40,6 +40,9 @@ namespace Game3 {
 			inline bool empty() const { return storage.empty(); }
 
 			/** Counts the amount of an item in the inventory. */
+			ItemCount count(ItemID) const;
+
+			/** Counts the amount of an item in the inventory. */
 			ItemCount count(const Item &) const;
 
 			/** Counts the amount of an item in the inventory. This takes ItemStack data into account but ignores the given ItemStack's count. */

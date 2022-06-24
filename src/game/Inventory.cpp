@@ -160,6 +160,14 @@ namespace Game3 {
 		erase(activeSlot, suppress_notification);
 	}
 
+	ItemCount Inventory::count(ItemID id) const {
+		ItemCount out = 0;
+		for (const auto &[slot, stored_stack]: storage)
+			if (stored_stack.item->id == id)
+				out += stored_stack.count;
+		return out;
+	}
+
 	ItemCount Inventory::count(const Item &item) const {
 		ItemCount out = 0;
 		for (const auto &[slot, stored_stack]: storage)

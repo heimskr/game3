@@ -21,6 +21,8 @@ namespace Game3::WorldGen {
 		realm->setLayer2({1, 5}, Monomap::ANVIL);
 		realm->add(TileEntity::create<CraftingStation>(Monomap::FURNACE, Position(1, 3), CraftingStationType::Furnace));
 		realm->add(TileEntity::create<CraftingStation>(Monomap::ANVIL,   Position(1, 5), CraftingStationType::Anvil));
+		realm->extraData["furnace"] = Position(1, 3);
+		realm->extraData["anvil"]   = Position(1, 5);
 
 		realm->setLayer2({height / 2, width / 2 - 1}, Monomap::COUNTER_W);
 		realm->setLayer2({height / 2, width / 2},     Monomap::COUNTER_WE);

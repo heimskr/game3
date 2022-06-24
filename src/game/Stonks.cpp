@@ -63,26 +63,33 @@ namespace Game3 {
 		return totalSellPrice(*keep.stockpileInventory, keep.money, keep.greed, stack, out);
 	}
 
-	size_t totalBuyPrice(const Merchant &merchant, const ItemStack &stack) {
-		double merchant_amount = merchant.inventory->count(stack);
+	size_t totalBuyPrice(const Inventory &inventory, MoneyCount money, const ItemStack &stack) {
+		double merchant_amount = inventory.count(stack);
 		const double base = stack.item->basePrice;
 		double price = 0.;
-		double merchant_money = merchant.money;
 		auto amount = stack.count;
 		while (1 <= amount) {
-			const double unit_price = buyPrice(base, merchant_amount--, merchant_money);
-			merchant_money += unit_price;
+			const double unit_price = buyPrice(base, merchant_amount--, money);
+			money += unit_price;
 			price += unit_price;
 			--amount;
 		}
 
 		if (0 < amount) {
-			const double subunit_price = amount * buyPrice(base, merchant_amount, merchant_money);
-			merchant_money += subunit_price;
+			const double subunit_price = amount * buyPrice(base, merchant_amount, money);
+			money += subunit_price;
 			price += subunit_price;
 		}
 
 		// It's assumed the caller will check whether the player has enough money.
 		return std::ceil(price);
+	}
+
+	size_t totalBuyPrice(const Merchant &merchant, const ItemStack &stack) {
+		return totalBuyPrice(*merchant.inventory, merchant.money, stack);
+	}
+
+	size_t totalBuyPrice(const Keep &keep, const ItemStack &stack) {
+		return totalBuyPrice(*keep.stockpileInventory, keep.money, stack);
 	}
 }
