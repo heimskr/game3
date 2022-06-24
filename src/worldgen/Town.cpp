@@ -5,7 +5,7 @@
 #include "tileentity/Building.h"
 #include "util/Timer.h"
 #include "util/Util.h"
-#include "worldgen/Blacksmith.h"
+#include "worldgen/BlacksmithGen.h"
 #include "worldgen/Keep.h"
 #include "worldgen/House.h"
 
