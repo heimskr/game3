@@ -30,6 +30,8 @@ namespace Game3 {
 			void teleport(const Position &, const std::shared_ptr<Realm> &) override;
 			void addMoney(MoneyCount);
 			float getSpeed() const override { return speed; }
+			bool setTooldown(float multiplier);
+			inline bool hasTooldown() const { return 0.f < tooldown; }
 
 			friend class Entity;
 

@@ -29,7 +29,13 @@ namespace Game3 {
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 			void render(SpriteRenderer &) override;
 			ItemStack getOreStack(ItemCount count = 1);
+
 			static ItemStack getOreStack(Ore, ItemCount count = 1);
+			static TileID getID(Ore);
+			static TileID getRegenID(Ore);
+			static float getTooldownMultiplier(Ore);
+			static unsigned getMaxUses(Ore);
+			static float getCooldown(Ore);
 
 		protected:
 			OreDeposit() = delete;
@@ -42,12 +48,5 @@ namespace Game3 {
 				maxUses(getMaxUses(ore)), cooldown(getCooldown(ore)) {}
 
 			friend class TileEntity;
-
-		private:
-			static TileID getID(Ore);
-			static TileID getRegenID(Ore);
-			static float getTooldownMultiplier(Ore);
-			static unsigned getMaxUses(Ore);
-			static float getCooldown(Ore);
 	};
 }

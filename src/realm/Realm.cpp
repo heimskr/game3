@@ -344,11 +344,15 @@ namespace Game3 {
 			attribute.emplace(ItemAttribute::Pickaxe);
 		}
 
-		if (item && attribute) {
+		if (item && attribute && !player->hasTooldown()) {
 			if (auto *stack = inventory.getActive()) {
 				if (stack->has(*attribute) && !inventory.add({*item, 1})) {
+					player->setTooldown(1.f);
 					if (stack->reduceDurability())
 						inventory.erase(inventory.activeSlot);
+					else
+						// setTooldown doesn't call notifyOwner on the player's inventory, so we have to do it here.
+						player->inventory->notifyOwner();
 					return true;
 				}
 			}

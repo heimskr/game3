@@ -3,6 +3,7 @@
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
+#include "item/Tool.h"
 #include "realm/Realm.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
@@ -93,6 +94,15 @@ namespace Game3 {
 	void Player::addMoney(MoneyCount to_add) {
 		money += to_add;
 		getRealm()->getGame().signal_player_money_update().emit(std::dynamic_pointer_cast<Player>(shared_from_this()));
+	}
+
+	bool Player::setTooldown(float multiplier) {
+		if (auto *active = inventory->getActive())
+			if (auto tool = std::dynamic_pointer_cast<Tool>(active->item)) {
+				tooldown = multiplier * tool->baseCooldown;
+				return true;
+			}
+		return false;
 	}
 
 	void to_json(nlohmann::json &json, const Player &player) {
