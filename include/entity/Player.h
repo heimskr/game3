@@ -32,6 +32,7 @@ namespace Game3 {
 			float getSpeed() const override { return speed; }
 			bool setTooldown(float multiplier);
 			inline bool hasTooldown() const { return 0.f < tooldown; }
+			void showText(const Glib::ustring &text, const Glib::ustring &name);
 
 			friend class Entity;
 

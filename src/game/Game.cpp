@@ -16,34 +16,34 @@ namespace Game3 {
 	}
 
 	void Game::initRecipes() {
-		recipes.emplace_back(std::vector<ItemStack> {{Item::IRON_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::IRON_PICKAXE),    CraftingStationType::Anvil);
-		recipes.emplace_back(std::vector<ItemStack> {{Item::IRON_BAR, 6}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::IRON_SHOVEL),     CraftingStationType::Anvil);
-		recipes.emplace_back(std::vector<ItemStack> {{Item::IRON_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::IRON_AXE),        CraftingStationType::Anvil);
-		recipes.emplace_back(std::vector<ItemStack> {{Item::IRON_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::IRON_HAMMER),     CraftingStationType::Anvil);
-		recipes.emplace_back(std::vector<ItemStack> {{Item::GOLD_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::GOLD_PICKAXE),    CraftingStationType::Anvil);
-		recipes.emplace_back(std::vector<ItemStack> {{Item::GOLD_BAR, 6}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::GOLD_SHOVEL),     CraftingStationType::Anvil);
-		recipes.emplace_back(std::vector<ItemStack> {{Item::GOLD_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::GOLD_AXE),        CraftingStationType::Anvil);
-		recipes.emplace_back(std::vector<ItemStack> {{Item::GOLD_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::GOLD_HAMMER),     CraftingStationType::Anvil);
-		recipes.emplace_back(std::vector<ItemStack> {{Item::DIAMOND,  8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::DIAMOND_PICKAXE), CraftingStationType::Anvil);
-		recipes.emplace_back(std::vector<ItemStack> {{Item::DIAMOND,  6}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::DIAMOND_SHOVEL),  CraftingStationType::Anvil);
-		recipes.emplace_back(std::vector<ItemStack> {{Item::DIAMOND,  8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::DIAMOND_AXE),     CraftingStationType::Anvil);
-		recipes.emplace_back(std::vector<ItemStack> {{Item::DIAMOND,  8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::DIAMOND_HAMMER),  CraftingStationType::Anvil);
-		recipes.emplace_back(std::vector<ItemStack> {{Item::DIAMOND_ORE, 1}}, ItemStack(Item::DIAMOND, 1), CraftingStationType::Anvil);
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::IRON_PICKAXE),    CraftingStationType::Anvil);
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 6}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::IRON_SHOVEL),     CraftingStationType::Anvil);
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::IRON_AXE),        CraftingStationType::Anvil);
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::IRON_HAMMER),     CraftingStationType::Anvil);
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::GOLD_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::GOLD_PICKAXE),    CraftingStationType::Anvil);
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::GOLD_BAR, 6}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::GOLD_SHOVEL),     CraftingStationType::Anvil);
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::GOLD_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::GOLD_AXE),        CraftingStationType::Anvil);
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::GOLD_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::GOLD_HAMMER),     CraftingStationType::Anvil);
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::DIAMOND,  8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::DIAMOND_PICKAXE), CraftingStationType::Anvil);
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::DIAMOND,  6}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::DIAMOND_SHOVEL),  CraftingStationType::Anvil);
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::DIAMOND,  8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::DIAMOND_AXE),     CraftingStationType::Anvil);
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::DIAMOND,  8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::DIAMOND_HAMMER),  CraftingStationType::Anvil);
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::DIAMOND_ORE, 1}}, ItemStack(Item::DIAMOND, 1), CraftingStationType::Anvil);
 
-		recipes.emplace_back(std::vector<ItemStack> {{Item::IRON_ORE, 1}, {Item::COAL, 1}}, ItemStack(Item::IRON_BAR, 1), CraftingStationType::Furnace);
-		recipes.emplace_back(std::vector<ItemStack> {{Item::GOLD_ORE, 1}, {Item::COAL, 2}}, ItemStack(Item::GOLD_BAR, 1), CraftingStationType::Furnace);
-		recipes.emplace_back(std::vector<ItemStack> {{Item::CLAY,  1}}, ItemStack(Item::BRICK, 1), CraftingStationType::Furnace);
-		recipes.emplace_back(std::vector<ItemStack> {{Item::CLAY, 10}}, ItemStack(Item::POT,   1), CraftingStationType::Furnace);
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_ORE, 1}, {Item::COAL, 1}}, ItemStack(Item::IRON_BAR, 1), CraftingStationType::Furnace);
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::GOLD_ORE, 1}, {Item::COAL, 2}}, ItemStack(Item::GOLD_BAR, 1), CraftingStationType::Furnace);
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::CLAY,  1}}, ItemStack(Item::BRICK, 1), CraftingStationType::Furnace);
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::CLAY, 10}}, ItemStack(Item::POT,   1), CraftingStationType::Furnace);
 
-		recipes.emplace_back(std::vector<ItemStack> {{Item::POT, 1}, {Item::SAPLING, 1}}, ItemStack(Item::PLANT_POT1, 1));
-		recipes.emplace_back(std::vector<ItemStack> {{Item::POT, 1}, {Item::SAPLING, 1}}, ItemStack(Item::PLANT_POT2, 1));
-		recipes.emplace_back(std::vector<ItemStack> {{Item::POT, 1}, {Item::SAPLING, 1}}, ItemStack(Item::PLANT_POT3, 1));
-		recipes.emplace_back(std::vector<ItemStack> {{Item::STONE, 8}}, ItemStack(Item::TOWER, 1));
-		recipes.emplace_back(std::vector<ItemStack> {{Item::STONE, 10}, {Item::PLANK, 10}}, ItemStack(Item::CAVE_ENTRANCE, 1));
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::POT, 1}, {Item::SAPLING, 1}}, ItemStack(Item::PLANT_POT1, 1));
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::POT, 1}, {Item::SAPLING, 1}}, ItemStack(Item::PLANT_POT2, 1));
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::POT, 1}, {Item::SAPLING, 1}}, ItemStack(Item::PLANT_POT3, 1));
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::STONE, 8}}, ItemStack(Item::TOWER, 1));
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::STONE, 10}, {Item::PLANK, 10}}, ItemStack(Item::CAVE_ENTRANCE, 1));
 
 		// Temporary recipes
-		recipes.emplace_back(std::vector<ItemStack> {{Item::WOOD,  1}}, ItemStack(Item::PLANK, 1));
-		recipes.emplace_back(std::vector<ItemStack> {{Item::PLANK, 2}}, ItemStack(Item::WOODEN_WALL, 1));
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::WOOD,  1}}, ItemStack(Item::PLANK, 1));
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::PLANK, 2}}, ItemStack(Item::WOODEN_WALL, 1));
 	}
 
 	void Game::tick() {
@@ -149,6 +149,13 @@ namespace Game3 {
 		out->debugMode = json.contains("debugMode")? json.at("debugMode").get<bool>() : false;
 		out->cavesGenerated = json.contains("cavesGenerated")? json.at("cavesGenerated").get<decltype(Game::cavesGenerated)>() : 0;
 		return out;
+	}
+
+	void Game::registerPrimaryRecipe(std::vector<ItemStack> &&inputs, ItemStack &&output, CraftingStationType station) {
+		const ItemID id = output.item->id;
+		CraftingRecipe recipe(std::move(inputs), std::move(output), station);
+		recipes.push_back(recipe);
+		primaryRecipes.emplace(id, std::move(recipe));
 	}
 
 	void to_json(nlohmann::json &json, const Game &game) {

@@ -12,7 +12,6 @@ namespace Game3 {
 	Worker::Worker(EntityID id_, EntityType type_, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_):
 		Entity(id_, type_), overworldRealm(overworld_realm), houseRealm(house_realm), housePosition(house_position), keep(keep_), keepPosition(keep_->position) {}
 
-
 	void Worker::toJSON(nlohmann::json &json) const {
 		Entity::toJSON(json);
 		json["phase"] = phase;

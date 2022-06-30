@@ -12,7 +12,6 @@
 namespace Game3 {
 	bool Hammer::use(Slot slot, ItemStack &stack, const std::shared_ptr<Player> &player, const Position &position) {
 		Realm &realm = *player->getRealm();
-		const Index index = realm.getIndex(position);
 
 		if (auto building = std::dynamic_pointer_cast<Building>(realm.tileEntityAt(position))) {
 			if (building->tileID == Monomap::CAVE) {

@@ -7,6 +7,7 @@
 #include "realm/Realm.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
+#include "ui/tab/TextTab.h"
 
 namespace Game3 {
 	Player::Player(EntityID id__): Entity(id__, Entity::PLAYER_TYPE) {}
@@ -106,6 +107,14 @@ namespace Game3 {
 				return true;
 			}
 		return false;
+	}
+
+	void Player::showText(const Glib::ustring &text, const Glib::ustring &name) {
+		getRealm()->getGame().setText(text, name, true, true);
+		queueForMove([player = shared_from_this()](const auto &) {
+			player->getRealm()->getGame().canvas.window.textTab->hide();
+			return true;
+		});
 	}
 
 	void to_json(nlohmann::json &json, const Player &player) {

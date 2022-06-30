@@ -39,6 +39,7 @@ namespace Game3 {
 			std::shared_ptr<Realm> activeRealm;
 			std::shared_ptr<Player> player;
 			std::vector<CraftingRecipe> recipes;
+			std::unordered_map<ItemID, CraftingRecipe> primaryRecipes;
 
 			void initEntities();
 			void initRecipes();
@@ -67,6 +68,8 @@ namespace Game3 {
 			sigc::signal<void(const std::shared_ptr<Player> &)> signal_player_money_update_;
 			sigc::signal<void(const std::shared_ptr<HasRealm> &)> signal_other_inventory_update_;
 			std::chrono::system_clock::time_point lastTime = startTime;
+
+			void registerPrimaryRecipe(std::vector<ItemStack> &&inputs, ItemStack &&output, CraftingStationType = CraftingStationType::None);
 	};
 
 	void to_json(nlohmann::json &, const Game &);

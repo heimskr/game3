@@ -15,6 +15,7 @@
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "ui/tab/InventoryTab.h"
+#include "ui/tab/TextTab.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -36,14 +37,32 @@ namespace Game3 {
 		return out;
 	}
 
+	void Blacksmith::toJSON(nlohmann::json &json) const {
+		Worker::toJSON(json);
+		if (0.f < actionTime)
+			json["actionTime"] = actionTime;
+	}
+
+	void Blacksmith::absorbJSON(const nlohmann::json &json) {
+		Worker::absorbJSON(json);
+		if (json.contains("actionTime"))
+			actionTime = json.at("actionTime");
+	}
+
 	bool Blacksmith::onInteractNextTo(const std::shared_ptr<Player> &player) {
-		auto &tab = *getRealm()->getGame().canvas.window.inventoryTab;
 		std::cout << "Blacksmith: money = " << money << ", phase = " << int(phase) << ", stuck = " << stuck << '\n';
-		player->queueForMove([player, &tab](const auto &) {
-			tab.resetExternalInventory();
-			return true;
-		});
-		tab.setExternalInventory("Blacksmith", inventory);
+
+		// auto &tab = *getRealm()->getGame().canvas.window.inventoryTab;
+		// player->queueForMove([player, &tab](const auto &) {
+		// 	tab.resetExternalInventory();
+		// 	return true;
+		// });
+		// tab.setExternalInventory("Blacksmith", inventory);
+
+		if (phase != 10) {
+			player->showText("Sorry, I'm not selling anything right now.", "Blacksmith");
+		}
+
 		return true;
 	}
 
@@ -67,14 +86,32 @@ namespace Game3 {
 		else if (phase == 3 && position == destination)
 			buyResources();
 
-		else if (phase == 4 && BUYING_TIME <= (buyTime += delta))
+		else if (phase == 4 && BUYING_TIME <= (actionTime += delta))
 			leaveKeep(5);
 
 		else if (phase == 5 && realmID == overworldRealm)
 			goToHouse(6);
 
 		else if (phase == 6 && position == destination)
-			goToBed(7);
+			goToForge();
+
+		else if (phase == 7 && position == destination)
+			craftTools();
+
+		else if (phase == 8 && CRAFTING_TIME <= (actionTime += delta))
+			goToCounter();
+
+		else if (phase == 9 && position == destination)
+			startSelling();
+
+		else if (phase == 10 && WORK_END_HOUR <= hour)
+			goToBed(11);
+
+		else if (phase == 11 && position == destination)
+			phase = 12;
+
+		else if (phase == 12 && hour < WORK_END_HOUR)
+			phase = 0;
 	}
 
 	void Blacksmith::wakeUp() {
@@ -108,7 +145,7 @@ namespace Game3 {
 	void Blacksmith::buyResources() {
 		auto &keep_realm = dynamic_cast<Keep &>(*keep->getInnerRealm());
 
-		buyTime = 0.f;
+		actionTime = 0.f;
 		phase = 4;
 
 		const ItemCount iron_ore    = std::min(keep_realm.stockpileInventory->count(Item::IRON_ORE), ironOreNeeded);
@@ -150,5 +187,60 @@ namespace Game3 {
 		}
 
 		setMoney(new_money);
+	}
+
+	void Blacksmith::goToForge() {
+		auto house = std::dynamic_pointer_cast<Building>(getRealm()->tileEntityAt(housePosition));
+		if (!house)
+			throw std::runtime_error("Blacksmith couldn't find house");
+		house->teleport(shared_from_this());
+
+		auto &realm = *getRealm();
+		if (realm.id != houseRealm) {
+			// throw std::runtime_error("Blacksmith couldn't teleport to house");
+			stuck = true;
+			return;
+		}
+
+		if (!pathfind(destination = realm.extraData.at("furnace").get<Position>() + Position(1, 0))) {
+			// throw std::runtime_error("Blacksmith couldn't pathfind to forge");
+			stuck = true;
+			return;
+		}
+
+		phase = 7;
+	}
+
+	void Blacksmith::craftTools() {
+		Game &game = getRealm()->getGame();
+
+		phase = 8;
+		actionTime = 0.f;
+
+		static std::vector<std::pair<ItemID, ItemCount>> tools {
+			{Item::IRON_AXE,    1}, {Item::IRON_SHOVEL,    1}, {Item::IRON_PICKAXE,    3}, {Item::IRON_HAMMER,    1},
+			{Item::GOLD_AXE,    1}, {Item::GOLD_SHOVEL,    1}, {Item::GOLD_PICKAXE,    3}, {Item::GOLD_HAMMER,    1},
+			{Item::DIAMOND_AXE, 1}, {Item::DIAMOND_SHOVEL, 1}, {Item::DIAMOND_PICKAXE, 3}, {Item::DIAMOND_HAMMER, 1},
+		};
+
+		for (auto [item, count]: tools)
+			for (size_t i = inventory->count(item); i < count; ++i) {
+				std::vector<ItemStack> leftovers;
+				if (!inventory->craft(game.primaryRecipes.at(item), leftovers))
+					break;
+				if (!leftovers.empty())
+					return;
+			}
+	}
+
+	void Blacksmith::goToCounter() {
+		if (!pathfind(destination = getRealm()->extraData.at("counter").get<Position>()))
+			stuck = true;
+		else
+			phase = 9;
+	}
+
+	void Blacksmith::startSelling() {
+		phase = 10;
 	}
 }
