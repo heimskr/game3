@@ -8,10 +8,10 @@
 #include "ui/tab/MerchantTab.h"
 
 namespace Game3 {
-	Merchant::Merchant(EntityID id__): Entity(id__, Entity::MERCHANT_TYPE) {}
+	Merchant::Merchant(EntityID id__, EntityType type_): Entity(id__, type_) {}
 
-	std::shared_ptr<Merchant> Merchant::create(EntityID id) {
-		auto out = std::shared_ptr<Merchant>(new Merchant(id));
+	std::shared_ptr<Merchant> Merchant::create(EntityID id, EntityType type) {
+		auto out = std::shared_ptr<Merchant>(new Merchant(id, type));
 		out->init();
 		return out;
 	}

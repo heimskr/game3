@@ -46,12 +46,14 @@ namespace Game3 {
 			int lastGridWidth = 0;
 			std::shared_ptr<Inventory> merchantInventory;
 			Glib::ustring merchantName;
+			std::unordered_map<Gtk::Widget *, Slot> widgetMap;
 
 			/** We can't store state in a popover, so we have to store it here. */
 			std::shared_ptr<Game> lastGame;
 			Slot lastSlot = -1;
 			bool lastMerchant = false;
 			double priceMultiplier = 1.;
+			Slot draggedSlot = -1;
 
 			int gridWidth() const;
 			void leftClick(const std::shared_ptr<Game> &, Gtk::Widget *, int click_count, Slot, bool merchant, double x, double y);

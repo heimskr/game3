@@ -20,10 +20,10 @@
 
 namespace Game3 {
 	Blacksmith::Blacksmith(EntityID id_):
-		Worker(id_, Entity::BLACKSMITH_TYPE) {}
+		Entity(id_, Entity::BLACKSMITH_TYPE), Worker(id_, Entity::BLACKSMITH_TYPE), Merchant(id_, Entity::BLACKSMITH_TYPE) {}
 
 	Blacksmith::Blacksmith(EntityID id_, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_):
-		Worker(id_, Entity::BLACKSMITH_TYPE, overworld_realm, house_realm, house_position, keep_) {}
+		Entity(id_, Entity::BLACKSMITH_TYPE), Worker(id_, Entity::BLACKSMITH_TYPE, overworld_realm, house_realm, house_position, keep_), Merchant(id_, Entity::BLACKSMITH_TYPE) {}
 
 	std::shared_ptr<Blacksmith> Blacksmith::create(EntityID id, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_) {
 		auto out = std::shared_ptr<Blacksmith>(new Blacksmith(id, overworld_realm, house_realm, house_position, keep_));
@@ -39,12 +39,14 @@ namespace Game3 {
 
 	void Blacksmith::toJSON(nlohmann::json &json) const {
 		Worker::toJSON(json);
+		Merchant::toJSON(json);
 		if (0.f < actionTime)
 			json["actionTime"] = actionTime;
 	}
 
 	void Blacksmith::absorbJSON(const nlohmann::json &json) {
 		Worker::absorbJSON(json);
+		Merchant::absorbJSON(json);
 		if (json.contains("actionTime"))
 			actionTime = json.at("actionTime");
 	}

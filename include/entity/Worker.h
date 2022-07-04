@@ -6,7 +6,7 @@ namespace Game3 {
 	class Building;
 
 	/** Lives in a town. */
-	class Worker: public Entity {
+	class Worker: public virtual Entity {
 		public:
 			constexpr static float WORK_START_HOUR = 8.f;
 			constexpr static float WORK_END_HOUR = 18.f;

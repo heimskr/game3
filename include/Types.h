@@ -11,7 +11,7 @@ namespace Game3 {
 	using EntityType   = uint32_t;
 	using RealmType    = uint32_t;
 	using EntityID     = uint32_t;
-	using RealmID      = uint32_t;
+	using RealmID      =  int32_t;
 	using ItemID       = uint32_t;
 	using Slot         =  int32_t;
 	using ItemCount    = uint64_t;

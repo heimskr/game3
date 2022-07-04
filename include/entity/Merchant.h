@@ -5,7 +5,7 @@
 namespace Game3 {
 	class Merchant: public virtual Entity {
 		public:
-			static std::shared_ptr<Merchant> create(EntityID);
+			static std::shared_ptr<Merchant> create(EntityID, EntityType = Entity::MERCHANT_TYPE);
 			static std::shared_ptr<Merchant> fromJSON(const nlohmann::json &);
 
 			MoneyCount money = 0;
@@ -18,7 +18,9 @@ namespace Game3 {
 			friend class Entity;
 
 		protected:
-			Merchant(EntityID);
+			Merchant() = default;
+			Merchant(EntityID, EntityType = Entity::MERCHANT_TYPE);
+
 			void interact(const Position &);
 
 		private:

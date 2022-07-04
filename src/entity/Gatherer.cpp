@@ -18,10 +18,10 @@
 
 namespace Game3 {
 	Gatherer::Gatherer(EntityID id_):
-		Worker(id_, Entity::GATHERER_TYPE) {}
+		Entity(id_, Entity::GATHERER_TYPE), Worker(id_, Entity::GATHERER_TYPE) {}
 
 	Gatherer::Gatherer(EntityID id_, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_):
-		Worker(id_, Entity::GATHERER_TYPE, overworld_realm, house_realm, house_position, keep_) {}
+		Entity(id_, Entity::GATHERER_TYPE), Worker(id_, Entity::GATHERER_TYPE, overworld_realm, house_realm, house_position, keep_) {}
 
 	std::shared_ptr<Gatherer> Gatherer::create(EntityID id, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_) {
 		auto out = std::shared_ptr<Gatherer>(new Gatherer(id, overworld_realm, house_realm, house_position, keep_));

@@ -1,10 +1,11 @@
 #pragma once
 
+#include "entity/Merchant.h"
 #include "entity/Worker.h"
 
 namespace Game3 {
 	/** Lives in a town and produces tools during the day. */
-	class Blacksmith: public Worker {
+	class Blacksmith: public Worker, public Merchant {
 		public:
 			constexpr static float BUYING_TIME = 5.f;
 			constexpr static float CRAFTING_TIME = 5.f;

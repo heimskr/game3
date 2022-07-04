@@ -45,7 +45,7 @@ namespace Game3 {
 		source->set_actions(Gdk::DragAction::MOVE);
 		source->signal_prepare().connect([this, source](double x, double y) -> Glib::RefPtr<Gdk::ContentProvider> { // Does capturing `source` cause a memory leak?
 			auto *item = playerGrid.pick(x, y);
-			scrolled.set_data("dragged-item", nullptr);
+			draggedSlot = -1;
 
 			if (dynamic_cast<Gtk::Fixed *>(item->get_parent()))
 				item = item->get_parent();
@@ -56,7 +56,8 @@ namespace Game3 {
 			} else if (!dynamic_cast<Gtk::Fixed *>(item))
 				return nullptr;
 
-			scrolled.set_data("dragged-item", item);
+			draggedSlot = widgetMap.at(item);
+
 			Glib::ValueBase base;
 			base.init(GTK_TYPE_WIDGET);
 			return Gdk::ContentProvider::create(base);
@@ -68,11 +69,10 @@ namespace Game3 {
 			auto *destination = playerGrid.pick(x, y);
 
 			if (destination != nullptr && destination != &playerGrid) {
-				if (dynamic_cast<Gtk::Fixed *>(destination->get_parent()))
+				if (dynamic_cast<Gtk::Fixed *>(destination->get_parent()) != nullptr)
 					destination = destination->get_parent();
-				auto &dragged = getDraggedItem();
-				const Slot source_slot      = reinterpret_cast<intptr_t>(dragged.get_data("slot"));
-				const Slot destination_slot = reinterpret_cast<intptr_t>(destination->get_data("slot"));
+				const Slot source_slot = draggedSlot;
+				const Slot destination_slot = widgetMap.at(destination);
 				mainWindow.game->player->inventory->swap(source_slot, destination_slot);
 			}
 
@@ -93,6 +93,8 @@ namespace Game3 {
 	void MerchantTab::reset(const std::shared_ptr<Game> &game) {
 		if (!game)
 			return;
+
+		widgetMap.clear();
 
 		removeChildren(playerGrid);
 		removeChildren(merchantGrid);
@@ -164,6 +166,7 @@ namespace Game3 {
 				widget_ptr->add_css_class("item-slot");
 				widget_ptr->set_data("slot", reinterpret_cast<void *>(slot));
 				grid.attach(*widget_ptr, column, row);
+				widgetMap.emplace(widget_ptr.get(), slot);
 				widgets.push_back(std::move(widget_ptr));
 			}
 		};
