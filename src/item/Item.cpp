@@ -213,3 +213,7 @@ namespace Game3 {
 			stack.data = json.at(2);
 	}
 }
+
+std::ostream & operator<<(std::ostream &os, const Game3::ItemStack &stack) {
+	return os << stack.item->name << " x " << stack.count;
+}

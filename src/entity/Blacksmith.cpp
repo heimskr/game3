@@ -14,7 +14,7 @@
 #include "tileentity/Teleporter.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
-#include "ui/tab/InventoryTab.h"
+#include "ui/tab/MerchantTab.h"
 #include "ui/tab/TextTab.h"
 #include "util/Util.h"
 
@@ -54,15 +54,20 @@ namespace Game3 {
 	bool Blacksmith::onInteractNextTo(const std::shared_ptr<Player> &player) {
 		std::cout << "Blacksmith: money = " << money << ", phase = " << int(phase) << ", stuck = " << stuck << '\n';
 
-		// auto &tab = *getRealm()->getGame().canvas.window.inventoryTab;
-		// player->queueForMove([player, &tab](const auto &) {
-		// 	tab.resetExternalInventory();
-		// 	return true;
-		// });
-		// tab.setExternalInventory("Blacksmith", inventory);
 
 		if (phase != 10) {
 			player->showText("Sorry, I'm not selling anything right now.", "Blacksmith");
+		} else {
+			auto &window = getRealm()->getGame().canvas.window;
+			auto &tab    = *window.merchantTab;
+			player->queueForMove([player, &tab](const auto &) {
+				tab.hide();
+				return true;
+			});
+			tab.show();
+			window.delay([this, &tab] {
+				tab.setMerchantInventory("Blacksmith", inventory, greed);
+			}, 2);
 		}
 
 		return true;
@@ -106,8 +111,14 @@ namespace Game3 {
 		else if (phase == 9 && position == destination)
 			startSelling();
 
-		else if (phase == 10 && WORK_END_HOUR <= hour)
-			goToBed(11);
+		else if (phase == 10 && WORK_END_HOUR <= hour) {
+			if (!pathfind(destination = getRealm()->extraData.at("bed"))) {
+				stuck = true;
+				return;
+			}
+
+			phase = 11;
+		}
 
 		else if (phase == 11 && position == destination)
 			phase = 12;
@@ -228,11 +239,17 @@ namespace Game3 {
 		for (auto [item, count]: tools)
 			for (size_t i = inventory->count(item); i < count; ++i) {
 				std::vector<ItemStack> leftovers;
-				if (!inventory->craft(game.primaryRecipes.at(item), leftovers))
+				std::cout << "Crafting " << ItemStack(item) << '\n';
+				if (!inventory->craft(game.primaryRecipes.at(item), leftovers)) {
+					std::cout << "Couldn't craft. Breaking.\n";
 					break;
-				if (!leftovers.empty())
+				}
+				if (!leftovers.empty()) {
+					std::cout << "There were leftovers. Returning.\n";
 					return;
+				}
 			}
+		std::cout << "Done.\n";
 	}
 
 	void Blacksmith::goToCounter() {
