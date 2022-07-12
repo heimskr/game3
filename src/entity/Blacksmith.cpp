@@ -111,14 +111,8 @@ namespace Game3 {
 		else if (phase == 9 && position == destination)
 			startSelling();
 
-		else if (phase == 10 && WORK_END_HOUR <= hour) {
-			if (!pathfind(destination = getRealm()->extraData.at("bed"))) {
-				stuck = true;
-				return;
-			}
-
-			phase = 11;
-		}
+		else if (phase == 10 && WORK_END_HOUR <= hour)
+			goToBed(11);
 
 		else if (phase == 11 && position == destination)
 			phase = 12;

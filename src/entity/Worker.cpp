@@ -101,7 +101,7 @@ namespace Game3 {
 	}
 
 	void Worker::goToBed(Phase new_phase) {
-		auto house = std::dynamic_pointer_cast<Building>(getRealm()->tileEntityAt(housePosition));
+		auto house = std::dynamic_pointer_cast<Building>(getRealm()->getGame().realms.at(overworldRealm)->tileEntityAt(housePosition));
 		if (!house)
 			throw std::runtime_error("Worker of type " + std::to_string(static_cast<int>(type)) + " couldn't find house at " + std::string(housePosition));
 		house->teleport(shared_from_this());
