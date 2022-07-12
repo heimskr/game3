@@ -76,7 +76,7 @@ namespace Game3 {
 			Gtk::Label timeLabel;
 			Glib::RefPtr<Gio::SimpleAction> debugAction;
 			std::unique_ptr<Canvas> canvas;
-			std::unordered_map<Gtk::Widget *, std::shared_ptr<Tab>> tabMap;
+			std::unordered_map<const Gtk::Widget *, std::shared_ptr<Tab>> tabMap;
 			std::shared_ptr<Tab> activeTab;
 			double lastDragX = 0.;
 			double lastDragY = 0.;
@@ -121,6 +121,7 @@ namespace Game3 {
 			void onNew();
 			void connectSave();
 			void onGameLoaded();
+			bool isFocused(const std::shared_ptr<Tab> &) const;
 
 			template <typename T>
 			T & initTab(std::shared_ptr<T> &tab) {

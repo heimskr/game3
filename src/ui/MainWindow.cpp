@@ -759,7 +759,8 @@ namespace Game3 {
 			realm->game = game.get();
 		game->signal_player_inventory_update().connect([this](const std::shared_ptr<Player> &) {
 			inventoryTab->reset(game);
-			merchantTab->reset(game);
+			if (isFocused(merchantTab))
+				merchantTab->reset(game);
 			craftingTab->reset(game);
 		});
 		game->signal_other_inventory_update().connect([this](const std::shared_ptr<HasRealm> &owner) {
@@ -776,5 +777,9 @@ namespace Game3 {
 			inventoryTab->reset(game);
 			merchantTab->reset(game);
 		});
+	}
+
+	bool MainWindow::isFocused(const std::shared_ptr<Tab> &tab) const {
+		return tab == tabMap.at(notebook.get_nth_page(notebook.get_current_page()));
 	}
 }
