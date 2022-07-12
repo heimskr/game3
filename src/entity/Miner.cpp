@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "Tiles.h"
-#include "entity/Gatherer.h"
+#include "entity/Miner.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "game/Stonks.h"
@@ -17,50 +17,50 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	Gatherer::Gatherer(EntityID id_):
-		Entity(id_, Entity::GATHERER_TYPE), Worker(id_, Entity::GATHERER_TYPE) {}
+	Miner::Miner(EntityID id_):
+		Entity(id_, Entity::MINER_TYPE), Worker(id_, Entity::MINER_TYPE) {}
 
-	Gatherer::Gatherer(EntityID id_, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_):
-		Entity(id_, Entity::GATHERER_TYPE), Worker(id_, Entity::GATHERER_TYPE, overworld_realm, house_realm, house_position, keep_) {}
+	Miner::Miner(EntityID id_, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_):
+		Entity(id_, Entity::MINER_TYPE), Worker(id_, Entity::MINER_TYPE, overworld_realm, house_realm, house_position, keep_) {}
 
-	std::shared_ptr<Gatherer> Gatherer::create(EntityID id, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_) {
-		auto out = std::shared_ptr<Gatherer>(new Gatherer(id, overworld_realm, house_realm, house_position, keep_));
+	std::shared_ptr<Miner> Miner::create(EntityID id, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_) {
+		auto out = std::shared_ptr<Miner>(new Miner(id, overworld_realm, house_realm, house_position, keep_));
 		out->init();
 		return out;
 	}
 
-	std::shared_ptr<Gatherer> Gatherer::fromJSON(const nlohmann::json &json) {
-		auto out = Entity::create<Gatherer>(json.at("id"));
+	std::shared_ptr<Miner> Miner::fromJSON(const nlohmann::json &json) {
+		auto out = Entity::create<Miner>(json.at("id"));
 		out->absorbJSON(json);
 		return out;
 	}
 
-	void Gatherer::toJSON(nlohmann::json &json) const {
+	void Miner::toJSON(nlohmann::json &json) const {
 		Worker::toJSON(json);
 		json["harvestingTime"] = harvestingTime;
 		if (chosenResource != -1)
 			json["chosenResource"] = chosenResource;
 	}
 
-	void Gatherer::absorbJSON(const nlohmann::json &json) {
+	void Miner::absorbJSON(const nlohmann::json &json) {
 		Worker::absorbJSON(json);
 		harvestingTime = json.at("harvestingTime");
 		if (json.contains("chosenResource"))
 			chosenResource = json.at("chosenResource");
 	}
 
-	bool Gatherer::onInteractNextTo(const std::shared_ptr<Player> &player) {
+	bool Miner::onInteractNextTo(const std::shared_ptr<Player> &player) {
 		auto &tab = *getRealm()->getGame().canvas.window.inventoryTab;
-		std::cout << "Gatherer: money = " << money << ", phase = " << int(phase) << ", stuck = " << stuck << '\n';
+		std::cout << "Miner: money = " << money << ", phase = " << int(phase) << ", stuck = " << stuck << '\n';
 		player->queueForMove([player, &tab](const auto &) {
 			tab.resetExternalInventory();
 			return true;
 		});
-		tab.setExternalInventory("Gatherer", inventory);
+		tab.setExternalInventory("Miner", inventory);
 		return true;
 	}
 
-	void Gatherer::tick(Game &game, float delta) {
+	void Miner::tick(Game &game, float delta) {
 		Worker::tick(game, delta);
 
 		if (stillStuck(delta))
@@ -110,7 +110,7 @@ namespace Game3 {
 			phase = 0;
 	}
 
-	void Gatherer::wakeUp() {
+	void Miner::wakeUp() {
 		phase = 1;
 		auto &game = getRealm()->getGame();
 		auto &overworld = *game.realms.at(overworldRealm);
@@ -131,7 +131,7 @@ namespace Game3 {
 		pathfind(house.getTileEntity<Teleporter>()->position);
 	}
 
-	void Gatherer::goToResource() {
+	void Miner::goToResource() {
 		auto &realm = *getRealm();
 		auto chosen_position = realm.getPosition(chosenResource);
 		if (auto next = realm.getPathableAdjacent(chosen_position)) {
@@ -144,12 +144,12 @@ namespace Game3 {
 			stuck = true;
 	}
 
-	void Gatherer::startHarvesting() {
+	void Miner::startHarvesting() {
 		phase = 3;
 		harvestingTime = 0.f;
 	}
 
-	void Gatherer::harvest(float delta) {
+	void Miner::harvest(float delta) {
 		if (HARVESTING_TIME <= harvestingTime) {
 			harvestingTime = 0.f;
 			auto &realm = *getRealm();
@@ -163,7 +163,7 @@ namespace Game3 {
 			harvestingTime += delta;
 	}
 
-	void Gatherer::sellInventory() {
+	void Miner::sellInventory() {
 		phase = 7;
 		auto &keep_realm = dynamic_cast<Keep &>(*keep->getInnerRealm());
 		MoneyCount new_money = money;
@@ -201,7 +201,7 @@ namespace Game3 {
 		setMoney(new_money);
 	}
 
-	void to_json(nlohmann::json &json, const Gatherer &gatherer) {
-		gatherer.toJSON(json);
+	void to_json(nlohmann::json &json, const Miner &miner) {
+		miner.toJSON(json);
 	}
 }

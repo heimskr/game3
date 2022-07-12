@@ -3,8 +3,8 @@
 #include "entity/Worker.h"
 
 namespace Game3 {
-	/** Lives in a town and gathers resources during the day. */
-	class Gatherer: public Worker {
+	/** Lives in a town and mines ore during the day. */
+	class Miner: public Worker {
 		public:
 			constexpr static Index RADIUS = 50;
 			constexpr static float HARVESTING_TIME = 5.f;
@@ -13,8 +13,8 @@ namespace Game3 {
 			Index chosenResource = -1;
 			float harvestingTime;
 
-			static std::shared_ptr<Gatherer> create(EntityID, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_);
-			static std::shared_ptr<Gatherer> fromJSON(const nlohmann::json &);
+			static std::shared_ptr<Miner> create(EntityID, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_);
+			static std::shared_ptr<Miner> fromJSON(const nlohmann::json &);
 
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(const nlohmann::json &) override;
@@ -26,8 +26,8 @@ namespace Game3 {
 		protected:
 			float sellTime = 0.f;
 
-			Gatherer(EntityID);
-			Gatherer(EntityID, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_);
+			Miner(EntityID);
+			Miner(EntityID, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_);
 
 			void interact(const Position &);
 
@@ -39,5 +39,5 @@ namespace Game3 {
 			void sellInventory();
 	};
 
-	void to_json(nlohmann::json &, const Gatherer &);
+	void to_json(nlohmann::json &, const Miner &);
 }

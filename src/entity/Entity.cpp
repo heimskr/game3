@@ -4,7 +4,7 @@
 #include "Tiles.h"
 #include "entity/Blacksmith.h"
 #include "entity/Entity.h"
-#include "entity/Gatherer.h"
+#include "entity/Miner.h"
 #include "entity/ItemEntity.h"
 #include "entity/Merchant.h"
 #include "game/Game.h"
@@ -36,8 +36,8 @@ namespace Game3 {
 				case Entity::ITEM_TYPE:
 					out = ItemEntity::create(json.at("stack"));
 					break;
-				case Entity::GATHERER_TYPE:
-					out = Entity::create<Gatherer>(id);
+				case Entity::MINER_TYPE:
+					out = Entity::create<Miner>(id);
 					break;
 				case Entity::MERCHANT_TYPE:
 					out = Entity::create<Merchant>(id);
