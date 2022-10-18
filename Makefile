@@ -14,7 +14,7 @@ endif
 DEPS         := eigen3 glm glfw3 libzstd gtk4 gtkmm-4.0 nlohmann_json
 OUTPUT       := game3
 COMPILER     ?= g++
-CPPFLAGS     := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude -Istb
+CPPFLAGS     := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude -Istb -Ilibnoise/src
 INCLUDES     := $(shell pkg-config --cflags $(DEPS))
 LIBS         := $(shell pkg-config --libs   $(DEPS))
 LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread -Llibnoise/build/src -lnoise
@@ -47,7 +47,7 @@ src/resources.cpp: resources/buffered.frag resources/buffered.vert resources/rec
 
 $(OUTPUT): $(OBJECTS)
 	@ printf "\e[2m[\e[22;36mld\e[39;2m]\e[22m $@\n"
-	@ $(COMPILER) $^ -o $@ $(LDFLAGS)
+	$(COMPILER) $^ -o $@ $(LDFLAGS)
 ifeq ($(BUILD),release)
 	strip $@
 endif

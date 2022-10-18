@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <libnoise/noise.h>
+#include <noise/noise.h>
 
 #include "Tiles.h"
 #include "game/Game.h"

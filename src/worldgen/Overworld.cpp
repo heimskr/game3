@@ -1,4 +1,4 @@
-#include <libnoise/noise.h>
+#include <noise/noise.h>
 
 #include "Tiles.h"
 #include "realm/Realm.h"
