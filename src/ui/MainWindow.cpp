@@ -675,16 +675,21 @@ namespace Game3 {
 							}
 						}
 						return;
-					case GDK_KEY_1: if (game && game->player) { game->player->inventory->setActive(0); game->player->inventory->notifyOwner(); } return;
-					case GDK_KEY_2: if (game && game->player) { game->player->inventory->setActive(1); game->player->inventory->notifyOwner(); } return;
-					case GDK_KEY_3: if (game && game->player) { game->player->inventory->setActive(2); game->player->inventory->notifyOwner(); } return;
-					case GDK_KEY_4: if (game && game->player) { game->player->inventory->setActive(3); game->player->inventory->notifyOwner(); } return;
-					case GDK_KEY_5: if (game && game->player) { game->player->inventory->setActive(4); game->player->inventory->notifyOwner(); } return;
-					case GDK_KEY_6: if (game && game->player) { game->player->inventory->setActive(5); game->player->inventory->notifyOwner(); } return;
-					case GDK_KEY_7: if (game && game->player) { game->player->inventory->setActive(6); game->player->inventory->notifyOwner(); } return;
-					case GDK_KEY_8: if (game && game->player) { game->player->inventory->setActive(7); game->player->inventory->notifyOwner(); } return;
-					case GDK_KEY_9: if (game && game->player) { game->player->inventory->setActive(8); game->player->inventory->notifyOwner(); } return;
-					case GDK_KEY_0: if (game && game->player) { game->player->inventory->setActive(9); game->player->inventory->notifyOwner(); } return;
+					case GDK_KEY_0:
+					case GDK_KEY_1:
+					case GDK_KEY_2:
+					case GDK_KEY_3:
+					case GDK_KEY_4:
+					case GDK_KEY_5:
+					case GDK_KEY_6:
+					case GDK_KEY_7:
+					case GDK_KEY_8:
+					case GDK_KEY_9:
+						if (game && game->player) {
+							game->player->inventory->setActive(keyval == GDK_KEY_0? 9 : keyval - 0x31);
+							game->player->inventory->notifyOwner();
+						}
+						return;
 				}
 			}
 
