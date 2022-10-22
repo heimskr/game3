@@ -10,7 +10,7 @@ namespace Game3 {
 
 			std::unordered_set<CraftingStationType> stationTypes {CraftingStationType::None};
 
-			float speed = 0.f;
+			float speed = 10.f;
 			bool movingUp = false;
 			bool movingRight = false;
 			bool movingDown = false;
