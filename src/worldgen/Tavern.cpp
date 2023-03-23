@@ -1,11 +1,8 @@
 #include "Tiles.h"
-#include "entity/Miner.h"
+#include "entity/ItemEntity.h"
 #include "game/Game.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
-#include "tileentity/Chest.h"
-#include "tileentity/Sign.h"
-#include "tileentity/Teleporter.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 #include "worldgen/Carpet.h"
@@ -46,6 +43,8 @@ namespace Game3::WorldGen {
 
 			for (Index col = table_padding_x + 2; col < width - table_padding_x - 2; ++col) {
 				set(row, col, Monomap::TABLE_WE);
+				if (rng() % 3 == 0)
+					realm->spawn<ItemEntity>({row, col}, ItemStack(Item::MEAD));
 				if (2 < table_spacing)
 					set(row - 1, col, Monomap::CHAIR_N);
 				if (3 < table_spacing)
