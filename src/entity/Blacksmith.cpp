@@ -54,7 +54,6 @@ namespace Game3 {
 	bool Blacksmith::onInteractNextTo(const std::shared_ptr<Player> &player) {
 		std::cout << "Blacksmith: money = " << money << ", phase = " << int(phase) << ", stuck = " << stuck << '\n';
 
-
 		if (phase != 10) {
 			player->showText("Sorry, I'm not selling anything right now.", "Blacksmith");
 		} else {

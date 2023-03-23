@@ -658,8 +658,8 @@ namespace Game3 {
 								auto door = house->getTileEntity<Teleporter>();
 								const auto house_pos = door->targetPosition + Position(-1, 0);
 								auto overworld = game->realms.at(door->targetRealm);
-								player.getRealm()->spawn<Miner>(player.getPosition(), Entity::VILLAGER1_ID, overworld->id, house->id, house_pos, overworld->closestTileEntity<Building>(house_pos,
-									[](const auto &building) { return building->tileID == Monomap::KEEP_SW; }));
+								player.getRealm()->spawn<Miner>(player.getPosition(), Entity::VILLAGER1_ID, overworld->id, house->id, house_pos,
+									overworld->closestTileEntity<Building>(house_pos, [](const auto &building) { return building->tileID == Monomap::KEEP_SW; }));
 							} catch (const std::exception &err) {
 								std::cerr << err.what() << '\n';
 							}

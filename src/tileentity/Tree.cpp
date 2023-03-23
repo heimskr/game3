@@ -37,7 +37,7 @@ namespace Game3 {
 			if (active_stack->has(ItemAttribute::Axe)) {
 				auto &realm = *getRealm();
 				if (!inventory.add({Item::WOOD, 1})) {
-					realm.remove(shared_from_this());
+					realm.queueRemoval(shared_from_this());
 					if (active_stack->reduceDurability())
 						inventory.erase(active_slot);
 					ItemCount saplings = 1;

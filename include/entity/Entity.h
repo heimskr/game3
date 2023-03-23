@@ -44,6 +44,7 @@ namespace Game3 {
 			constexpr static EntityID  VILLAGER1_ID = 3;
 			constexpr static EntityID       ITEM_ID = 4;
 			constexpr static EntityID BLACKSMITH_ID = 5;
+			constexpr static EntityID WOODCUTTER_ID = 6;
 
 			constexpr static EntityType    GENERIC_TYPE = 0;
 			constexpr static EntityType     PLAYER_TYPE = 1;
@@ -51,6 +52,7 @@ namespace Game3 {
 			constexpr static EntityType   MERCHANT_TYPE = 3;
 			constexpr static EntityType       ITEM_TYPE = 4;
 			constexpr static EntityType BLACKSMITH_TYPE = 5;
+			constexpr static EntityType WOODCUTTER_TYPE = 6;
 
 			static std::unordered_map<EntityID, EntityTexture> textureMap;
 

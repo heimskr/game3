@@ -26,6 +26,7 @@ namespace Game3 {
 			constexpr static RealmType KEEP       = 3;
 			constexpr static RealmType BLACKSMITH = 4;
 			constexpr static RealmType CAVE       = 5;
+			constexpr static RealmType TAVERN     = 6;
 
 			static std::unordered_map<RealmType, Texture> textureMap;
 
@@ -79,6 +80,7 @@ namespace Game3 {
 			inline void setGame(Game &game_) { game = &game_; }
 			Game & getGame();
 			void queueRemoval(const std::shared_ptr<Entity> &);
+			void queueRemoval(const std::shared_ptr<TileEntity> &);
 			void absorb(const std::shared_ptr<Entity> &, const Position &);
 			void setLayer1(Index row, Index col, TileID);
 			void setLayer2(Index row, Index col, TileID);
@@ -188,7 +190,8 @@ namespace Game3 {
 		private:
 			Game *game = nullptr;
 			bool ticking = false;
-			std::vector<std::shared_ptr<Entity>> removalQueue;
+			std::vector<std::shared_ptr<Entity>> entityRemovalQueue;
+			std::vector<std::shared_ptr<TileEntity>> tileEntityRemovalQueue;
 			bool isWalkable(Index row, Index column, const TileSet &) const;
 			void setLayerHelper(Index row, Index col);
 			void setLayerHelper(Index);

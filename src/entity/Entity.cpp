@@ -4,9 +4,10 @@
 #include "Tiles.h"
 #include "entity/Blacksmith.h"
 #include "entity/Entity.h"
-#include "entity/Miner.h"
 #include "entity/ItemEntity.h"
 #include "entity/Merchant.h"
+#include "entity/Miner.h"
+#include "entity/Woodcutter.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "realm/Realm.h"
@@ -22,6 +23,7 @@ namespace Game3 {
 		{Entity::ITEM_ID,       {cacheTexture("resources/missing.png"),                        0}}, // Rendering is handled on a per-item basis by the ItemEntity class
 		{Entity::VILLAGER1_ID,  {cacheTexture("resources/characters/villager1.png"),           2}},
 		{Entity::BLACKSMITH_ID, {cacheTexture("resources/characters/blacksmith.png"),          2}},
+		{Entity::WOODCUTTER_ID, {cacheTexture("resources/characters/woodcutter.png"),          2}},
 	};
 
 	std::shared_ptr<Entity> Entity::fromJSON(const nlohmann::json &json) {
@@ -44,6 +46,9 @@ namespace Game3 {
 					break;
 				case Entity::BLACKSMITH_TYPE:
 					out = Entity::create<Blacksmith>(id);
+					break;
+				case Entity::WOODCUTTER_TYPE:
+					out = Entity::create<Woodcutter>(id);
 					break;
 				default:
 					out = Entity::create<Entity>(id, Entity::GENERIC_TYPE);

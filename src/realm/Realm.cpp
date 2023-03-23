@@ -176,9 +176,12 @@ namespace Game3 {
 		for (auto &[index, tile_entity]: tileEntities)
 			tile_entity->tick(game, delta);
 		ticking = false;
-		for (const auto &entity: removalQueue)
+		for (const auto &entity: entityRemovalQueue)
 			remove(entity);
-		removalQueue.clear();
+		entityRemovalQueue.clear();
+		for (const auto &tile_entity: tileEntityRemovalQueue)
+			remove(tile_entity);
+		tileEntityRemovalQueue.clear();
 	}
 
 	std::vector<std::shared_ptr<Entity>> Realm::findEntities(const Position &position) const {
@@ -250,9 +253,16 @@ namespace Game3 {
 
 	void Realm::queueRemoval(const std::shared_ptr<Entity> &entity) {
 		if (ticking)
-			removalQueue.push_back(entity);
+			entityRemovalQueue.push_back(entity);
 		else
 			remove(entity);
+	}
+
+	void Realm::queueRemoval(const std::shared_ptr<TileEntity> &tile_entity) {
+		if (ticking)
+			tileEntityRemovalQueue.push_back(tile_entity);
+		else
+			remove(tile_entity);
 	}
 
 	void Realm::absorb(const std::shared_ptr<Entity> &entity, const Position &position) {
