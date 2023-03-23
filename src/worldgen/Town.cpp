@@ -11,8 +11,6 @@
 #include "worldgen/Tavern.h"
 #include "worldgen/WorldGen.h"
 
-int GEN = 0;
-
 namespace Game3::WorldGen {
 	void generateTown(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const Index index, Index width, Index height, Index pad, int seed) {
 		Index row = 0;
@@ -191,8 +189,6 @@ namespace Game3::WorldGen {
 						break;
 					}
 				}
-
-				++GEN;
 
 				buildable_set.erase(building_index);
 				// Some of these are sus if building_index happens to be at the west or east edge, but those aren't valid locations for houses anyway.
