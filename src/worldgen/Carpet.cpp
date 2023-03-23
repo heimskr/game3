@@ -3,11 +3,11 @@
 #include "worldgen/Carpet.h"
 
 namespace Game3::WorldGen {
-	void generateCarpet(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng) {
+	void generateCarpet(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, int padding) {
 		const auto width  = realm->getWidth();
 		const auto height = realm->getHeight();
 		const int carpet_offset = 8 * (rng() % 3);
-		const int carpet_padding = (rng() % 2) + 2;
+		const int carpet_padding = padding == -1? (rng() % 2) + 2 : padding;
 		for (int row = carpet_padding + 1; row < height - carpet_padding - 1; ++row)
 			for (int column = carpet_padding + 1; column < width - carpet_padding - 1; ++column)
 				realm->setLayer1(row * width + column, Monomap::CARPET1_C + carpet_offset);

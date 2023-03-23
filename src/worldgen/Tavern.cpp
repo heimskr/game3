@@ -18,12 +18,15 @@ namespace Game3::WorldGen {
 		const auto width  = realm->getWidth();
 		const auto height = realm->getHeight();
 
-		const Index exit_index = generateIndoors(realm, rng, parent_realm, entrance, width / 2);
+		generateIndoors(realm, rng, parent_realm, entrance, width / 2);
 
-		realm->setLayer2(width + 1, choose(Monomap::PLANTS, rng));
-		realm->setLayer2(2 * width - 2, choose(Monomap::PLANTS, rng));
-		realm->setLayer2(width * (height - 1) - 2, choose(Monomap::PLANTS, rng));
-		realm->setLayer2(width * (height - 2) + 1, choose(Monomap::PLANTS, rng));
+		auto set = [&](auto &&...args) { realm->setLayer2(args...); };
+
+		set(width + 1, choose(Monomap::PLANTS, rng));
+		set(2 * width - 2, choose(Monomap::PLANTS, rng));
+		set(width * (height - 1) - 2, choose(Monomap::PLANTS, rng));
+		set(width * (height - 2) + 1, choose(Monomap::PLANTS, rng));
+
 
 		// std::array<Index, 2> edges {1, width - 2};
 		// const Position bed_position(2 + rng() % (height - 4), choose(edges, rng));
@@ -33,6 +36,6 @@ namespace Game3::WorldGen {
 		// realm->spawn<Miner>(realm->getPosition(exit_index - width), Entity::VILLAGER1_ID, parent_realm->id, realm->id, building_position, parent_realm->closestTileEntity<Building>(building_position,
 		// 	[](const auto &building) { return building->tileID == Monomap::KEEP_SW; }));
 
-		WorldGen::generateCarpet(realm, rng);
+		WorldGen::generateCarpet(realm, rng, 3);
 	}
 }
