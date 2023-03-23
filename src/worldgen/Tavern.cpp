@@ -31,7 +31,7 @@ namespace Game3::WorldGen {
 
 		constexpr Index table_padding_x = 4;
 		constexpr Index table_padding_y = 3;
-		constexpr Index table_spacing = 3;
+		constexpr Index table_spacing = 4;
 
 		const Index table_count = 1 + (height - table_padding_y - table_padding_y) / (table_spacing + 1);
 		const Index table_rows  = 1 + (table_count - 1) * table_spacing;
@@ -43,8 +43,14 @@ namespace Game3::WorldGen {
 			set(row, width - table_padding_x - 1, Monomap::CHAIR_E);
 			set(row, table_padding_x + 1, Monomap::TABLE_W);
 			set(row, width - table_padding_x - 2, Monomap::TABLE_E);
-			for (Index col = table_padding_x + 2; col < width - table_padding_x - 2; ++col)
+
+			for (Index col = table_padding_x + 2; col < width - table_padding_x - 2; ++col) {
 				set(row, col, Monomap::TABLE_WE);
+				if (2 < table_spacing)
+					set(row - 1, col, Monomap::CHAIR_N);
+				if (3 < table_spacing)
+					set(row + 1, col, Monomap::CHAIR_S);
+			}
 		}
 
 		// std::array<Index, 2> edges {1, width - 2};
