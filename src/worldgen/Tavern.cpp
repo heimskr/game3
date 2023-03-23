@@ -27,6 +27,25 @@ namespace Game3::WorldGen {
 		set(width * (height - 1) - 2, choose(Monomap::PLANTS, rng));
 		set(width * (height - 2) + 1, choose(Monomap::PLANTS, rng));
 
+		set(1, width / 2, Monomap::FURNACE);
+
+		constexpr Index table_padding_x = 4;
+		constexpr Index table_padding_y = 3;
+		constexpr Index table_spacing = 3;
+
+		const Index table_count = 1 + (height - table_padding_y - table_padding_y) / (table_spacing + 1);
+		const Index table_rows  = 1 + (table_count - 1) * table_spacing;
+		const Index table_start = (height - table_rows) / 2;
+
+		for (Index table = 0; table < table_count; ++table) {
+			Index row = table_start + table * table_spacing;
+			set(row, table_padding_x, Monomap::CHAIR_W);
+			set(row, width - table_padding_x - 1, Monomap::CHAIR_E);
+			set(row, table_padding_x + 1, Monomap::TABLE_W);
+			set(row, width - table_padding_x - 2, Monomap::TABLE_E);
+			for (Index col = table_padding_x + 2; col < width - table_padding_x - 2; ++col)
+				set(row, col, Monomap::TABLE_WE);
+		}
 
 		// std::array<Index, 2> edges {1, width - 2};
 		// const Position bed_position(2 + rng() % (height - 4), choose(edges, rng));
