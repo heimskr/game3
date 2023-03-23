@@ -8,6 +8,10 @@
 #include "worldgen/BlacksmithGen.h"
 #include "worldgen/Keep.h"
 #include "worldgen/House.h"
+#include "worldgen/Tavern.h"
+#include "worldgen/WorldGen.h"
+
+int GEN = 0;
 
 namespace Game3::WorldGen {
 	void generateTown(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const Index index, Index width, Index height, Index pad, int seed) {
@@ -147,52 +151,59 @@ namespace Game3::WorldGen {
 		if (2 < buildable.size()) {
 			buildable.erase(buildable.begin() + buildable.size() / 10, buildable.end());
 			buildable_set = std::unordered_set<Index>(buildable.cbegin(), buildable.cend());
+
+			Index building_index = 0;
+
+			auto gen_building = [&](TileID tile_id, Index realm_width, Index realm_height, RealmType realm_type, const BuildingGenerator &gen_fn, Index entrance = -1) {
+				realm->setLayer2(building_index, tile_id);
+				const RealmID realm_id = game.newRealmID();
+				const Position building_position(building_index / map_width, building_index % map_width);
+				auto building = TileEntity::create<Building>(tile_id, building_position, realm_id, entrance == -1? realm_width * (realm_height - 1) - 3 : entrance);
+				auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, Realm::textureMap.at(realm_type));
+				auto new_realm = Realm::create(realm_id, realm_type, new_tilemap, -seed);
+				new_realm->outdoors = false;
+				new_realm->setGame(game);
+				gen_fn(new_realm, rng, realm, building_position + Position(1, 0));
+				game.realms.emplace(realm_id, new_realm);
+				realm->add(building);
+			};
+
 			while (!buildable_set.empty()) {
-				const auto index = *buildable_set.begin();
-				if (rng() % 8 == 0) {
-					constexpr static std::array<TileID, 3> blacksmiths {Monomap::BLACKSMITH1, Monomap::BLACKSMITH2, Monomap::BLACKSMITH3};
-					const auto blacksmith = choose(blacksmiths, rng);
-					realm->setLayer2(index, blacksmith);
-					const RealmID realm_id = game.newRealmID();
-					const Index realm_width  = 9;
-					const Index realm_height = 9;
-					const Position blacksmith_position(index / map_width, index % map_width);
-					auto building = TileEntity::create<Building>(blacksmith, blacksmith_position, realm_id, realm_width * (realm_height - 1) - 3);
-					auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, Realm::textureMap.at(Realm::HOUSE));
-					auto new_realm = Realm::create(realm_id, Realm::BLACKSMITH, new_tilemap, -seed);
-					new_realm->outdoors = false;
-					new_realm->setGame(game);
-					WorldGen::generateBlacksmith(new_realm, rng, realm, blacksmith_position + Position(1, 0));
-					game.realms.emplace(realm_id, new_realm);
-					realm->add(building);
-				} else {
-					constexpr static std::array<TileID, 3> houses {Monomap::HOUSE1, Monomap::HOUSE2, Monomap::HOUSE3};
-					const auto house = choose(houses, rng);
-					realm->setLayer2(index, house);
-					const RealmID realm_id = game.newRealmID();
-					const Index realm_width  = 9;
-					const Index realm_height = 9;
-					const Position house_position(index / map_width, index % map_width);
-					auto building = TileEntity::create<Building>(house, house_position, realm_id, realm_width * (realm_height - 1) - 3);
-					auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, Realm::textureMap.at(Realm::HOUSE));
-					auto new_realm = Realm::create(realm_id, Realm::HOUSE, new_tilemap, -seed);
-					new_realm->outdoors = false;
-					new_realm->setGame(game);
-					WorldGen::generateHouse(new_realm, rng, realm, house_position + Position(1, 0));
-					game.realms.emplace(realm_id, new_realm);
-					realm->add(building);
+				building_index = *buildable_set.begin();
+				switch (rng() % 8) {
+					case 0: {
+						constexpr static std::array<TileID, 3> blacksmiths {Monomap::BLACKSMITH1, Monomap::BLACKSMITH2, Monomap::BLACKSMITH3};
+						gen_building(choose(blacksmiths), 9, 9, Realm::BLACKSMITH, WorldGen::generateBlacksmith);
+						break;
+					}
+
+					case 1: {
+						constexpr static std::array<TileID, 1> taverns {Monomap::TAVERN1};
+						constexpr size_t tavern_width  = 25;
+						constexpr size_t tavern_height = 15;
+						gen_building(choose(taverns), tavern_width, tavern_height, Realm::TAVERN, WorldGen::generateTavern, tavern_width * (tavern_height - 2) + tavern_width / 2);
+						break;
+					}
+
+					default: {
+						constexpr static std::array<TileID, 3> houses {Monomap::HOUSE1, Monomap::HOUSE2, Monomap::HOUSE3};
+						gen_building(choose(houses), 9, 9, Realm::HOUSE, WorldGen::generateHouse);
+						break;
+					}
 				}
 
-				buildable_set.erase(index);
-				// Some of these are sus if index happens to be at the west or east edge, but those aren't valid locations for houses anyway.
-				buildable_set.erase(index - map_width);
-				buildable_set.erase(index + map_width);
-				buildable_set.erase(index - map_width - 1);
-				buildable_set.erase(index + map_width - 1);
-				buildable_set.erase(index - map_width + 1);
-				buildable_set.erase(index + map_width + 1);
-				buildable_set.erase(index - 1);
-				buildable_set.erase(index + 1);
+				++GEN;
+
+				buildable_set.erase(building_index);
+				// Some of these are sus if building_index happens to be at the west or east edge, but those aren't valid locations for houses anyway.
+				buildable_set.erase(building_index - map_width);
+				buildable_set.erase(building_index + map_width);
+				buildable_set.erase(building_index - map_width - 1);
+				buildable_set.erase(building_index + map_width - 1);
+				buildable_set.erase(building_index - map_width + 1);
+				buildable_set.erase(building_index + map_width + 1);
+				buildable_set.erase(building_index - 1);
+				buildable_set.erase(building_index + 1);
 			}
 		}
 

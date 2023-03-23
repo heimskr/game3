@@ -22,8 +22,8 @@ namespace Game3::WorldGen {
 
 		realm->setLayer2(width + 1, choose(Monomap::PLANTS, rng));
 		realm->setLayer2(2 * width - 2, choose(Monomap::PLANTS, rng));
-		realm->setLayer2((width - 1) * height - 2, choose(Monomap::PLANTS, rng));
-		realm->setLayer2((width - 2) * height + 1, choose(Monomap::PLANTS, rng));
+		realm->setLayer2(width * (height - 1) - 2, choose(Monomap::PLANTS, rng));
+		realm->setLayer2(width * (height - 2) + 1, choose(Monomap::PLANTS, rng));
 
 		std::array<Index, 2> edges {1, width - 2};
 		const Position bed_position(2 + rng() % (height - 4), choose(edges, rng));

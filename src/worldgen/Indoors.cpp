@@ -7,7 +7,7 @@
 #include "worldgen/Indoors.h"
 
 namespace Game3::WorldGen {
-	Index generateIndoors(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const std::shared_ptr<Realm> &parent_realm, const Position &entrance) {
+	Index generateIndoors(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const std::shared_ptr<Realm> &parent_realm, const Position &entrance, Index door_pos) {
 		Timer timer("GenerateIndoors");
 		const auto width  = realm->getWidth();
 		const auto height = realm->getHeight();
@@ -31,7 +31,7 @@ namespace Game3::WorldGen {
 		realm->setLayer2(width * (height - 1), Monomap::WALL_NE);
 		realm->setLayer2(width * height - 1, Monomap::WALL_NW);
 
-		const Index exit_index = width * height - 3;
+		const Index exit_index = door_pos == -1? width * height - 3 : width * (height - 1) + door_pos;
 		realm->setLayer2(exit_index - 1, Monomap::WALL_W);
 		realm->setLayer2(exit_index,     Monomap::EMPTY);
 		realm->setLayer2(exit_index + 1, Monomap::WALL_E);

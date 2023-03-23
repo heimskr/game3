@@ -28,6 +28,7 @@ namespace Game3 {
 		{Realm::KEEP,       cacheTexture("resources/tileset.png")},
 		{Realm::BLACKSMITH, cacheTexture("resources/tileset.png")},
 		{Realm::CAVE,       cacheTexture("resources/tileset.png")},
+		{Realm::TAVERN,     cacheTexture("resources/tileset.png")},
 	};
 
 	Realm::Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_, int seed_):
