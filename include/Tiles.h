@@ -102,7 +102,7 @@ namespace Game3 {
 		constexpr static TileID STOCKPILE_W   = 326;
 		constexpr static TileID STOCKPILE_E   = 327;
 		constexpr static TileID TABLE_W       = 330;
-		constexpr static TileID TABLE_MID     = 331;
+		constexpr static TileID TABLE_WE      = 331;
 		constexpr static TileID TABLE_E       = 334;
 		constexpr static TileID CHAIR_W       = 337;
 		constexpr static TileID CHAIR_E       = 338;
