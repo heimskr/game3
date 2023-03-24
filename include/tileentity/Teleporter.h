@@ -17,6 +17,7 @@ namespace Game3 {
 
 			TileEntityID getID() const override { return TileEntity::TELEPORTER; }
 
+			void init() override {}
 			void toJSON(nlohmann::json &) const override;
 			void onOverlap(const std::shared_ptr<Entity> &) override;
 			void absorbJSON(const nlohmann::json &) override;

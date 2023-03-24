@@ -13,7 +13,7 @@ namespace Game3 {
 		seedLabel.set_margin(5);
 		widthLabel.set_margin(5);
 		heightLabel.set_margin(5);
-		seedEntry.set_text("666");
+		seedEntry.set_text("1621");
 		widthEntry.set_text("256");
 		heightEntry.set_text("256");
 		seedEntry.signal_activate().connect(sigc::mem_fun(*this, &NewGameDialog::submit));

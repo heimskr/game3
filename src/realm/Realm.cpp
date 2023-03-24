@@ -222,11 +222,11 @@ namespace Game3 {
 		return iter->second;
 	}
 
-	void Realm::remove(const std::shared_ptr<Entity> &entity) {
+	void Realm::remove(std::shared_ptr<Entity> entity) {
 		entities.erase(entity);
 	}
 
-	void Realm::remove(const std::shared_ptr<TileEntity> &tile_entity) {
+	void Realm::remove(std::shared_ptr<TileEntity> tile_entity) {
 		const Position position = tile_entity->position;
 		const Index index = getIndex(position);
 		tileEntities.at(index)->onRemove();

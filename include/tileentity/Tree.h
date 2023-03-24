@@ -6,9 +6,11 @@ namespace Game3 {
 	class Tree: public TileEntity {
 		public:
 			constexpr static float MATURITY = 30.f;
+			constexpr static float HIVE_MATURITY = 60.f;
 
 			TileID immatureID;
 			float age = 0.f;
+			float hiveAge = -1.f; // < 0 for no hive
 
 			Tree(const Tree &) = delete;
 			Tree(Tree &&) = default;
@@ -21,6 +23,8 @@ namespace Game3 {
 
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(const nlohmann::json &) override;
+			void init(std::default_random_engine &) override;
+			using TileEntity::init;
 			void tick(Game &, float) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 			void render(SpriteRenderer &) override;

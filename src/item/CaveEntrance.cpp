@@ -38,7 +38,7 @@ namespace Game3 {
 
 		std::optional<RealmID> realm_id;
 		Index entrance = -1;
-		
+
 		for (const auto &[index, tile_entity]: realm.tileEntities)
 			if (tile_entity->tileID == Monomap::CAVE && tile_entity->getID() == TileEntity::BUILDING)
 				if (auto building = std::dynamic_pointer_cast<Building>(tile_entity)) {

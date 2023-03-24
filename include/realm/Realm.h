@@ -73,8 +73,8 @@ namespace Game3 {
 			std::shared_ptr<Entity> findEntity(const Position &) const;
 			std::shared_ptr<Entity> findEntity(const Position &, const std::shared_ptr<Entity> &except) const;
 			std::shared_ptr<TileEntity> tileEntityAt(const Position &) const;
-			void remove(const std::shared_ptr<Entity> &);
-			void remove(const std::shared_ptr<TileEntity> &);
+			void remove(std::shared_ptr<Entity>);
+			void remove(std::shared_ptr<TileEntity>);
 			Position getPosition(Index) const;
 			void onMoved(const std::shared_ptr<Entity> &, const Position &);
 			inline void setGame(Game &game_) { game = &game_; }

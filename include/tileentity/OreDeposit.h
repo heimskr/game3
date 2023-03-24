@@ -23,6 +23,7 @@ namespace Game3 {
 
 			TileEntityID getID() const override { return TileEntity::OREDEPOSIT; }
 
+			void init() override {}
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(const nlohmann::json &) override;
 			void tick(Game &, float) override;

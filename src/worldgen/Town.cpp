@@ -19,28 +19,47 @@ namespace Game3::WorldGen {
 		Game &game = realm->getGame();
 		const auto map_width = realm->getWidth();
 
-		const auto set1 = [&](TileID tile) { realm->setLayer1(row, column, tile); };
-		const auto set2 = [&](TileID tile) { realm->setLayer2(row, column, tile); };
+		const auto cleanup = [&](Index row, Index column) {
+			static size_t count = 0;
+			if (auto tile_entity = realm->tileEntityAt({row, column}))
+				realm->remove(tile_entity);
+		};
+
+		const auto set1 = [&](TileID tile) {
+			cleanup(row, column);
+			realm->setLayer1(row, column, tile);
+		};
+
+		const auto set2 = [&](TileID tile) {
+			cleanup(row, column);
+			realm->setLayer2(row, column, tile);
+		};
+
+		const auto set2i = [&](Index index, TileID tile) {
+			auto [r, c] = realm->getPosition(index);
+			cleanup(r, c);
+			realm->setLayer2(index, tile);
+		};
 
 		Timer town_timer("TownLayout");
 		for (row = index / map_width - pad; row < index / map_width + height + pad; ++row)
 			for (column = index % map_width - pad; column < index % map_width + width + pad; ++column)
-				realm->setLayer2(row * map_width + column, Monomap::EMPTY);
+				set2i(row * map_width + column, Monomap::EMPTY);
 
 		for (row = index / map_width; row < index / map_width + height; ++row) {
-			realm->setLayer2(row * map_width + index % map_width, Monomap::TOWER_NS);
-			realm->setLayer2(row * map_width + index % map_width + width - 1, Monomap::TOWER_NS);
+			set2i(row * map_width + index % map_width, Monomap::TOWER_NS);
+			set2i(row * map_width + index % map_width + width - 1, Monomap::TOWER_NS);
 		}
 
 		for (column = 0; column < width; ++column) {
-			realm->setLayer2(index + column, Monomap::TOWER_WE);
-			realm->setLayer2(index + map_width * (height - 1) + column, Monomap::TOWER_WE);
+			set2i(index + column, Monomap::TOWER_WE);
+			set2i(index + map_width * (height - 1) + column, Monomap::TOWER_WE);
 		}
 
-		realm->setLayer2(index, Monomap::TOWER_NW);
-		realm->setLayer2(index + map_width * (height - 1), Monomap::TOWER_SW);
-		realm->setLayer2(index + width - 1, Monomap::TOWER_NE);
-		realm->setLayer2(index + map_width * (height - 1) + width - 1, Monomap::TOWER_SE);
+		set2i(index, Monomap::TOWER_NW);
+		set2i(index + map_width * (height - 1), Monomap::TOWER_SW);
+		set2i(index + width - 1, Monomap::TOWER_NE);
+		set2i(index + map_width * (height - 1) + width - 1, Monomap::TOWER_SE);
 
 		std::unordered_set<Index> buildable_set;
 
@@ -48,8 +67,6 @@ namespace Game3::WorldGen {
 			for (column = index % map_width + 1; column < index % map_width + width - 1; ++column) {
 				buildable_set.insert(row * map_width + column);
 				set1(Monomap::DIRT);
-				if (auto tile_entity = realm->tileEntityAt({row, column}))
-					realm->remove(tile_entity);
 			}
 
 		row = index / map_width + height / 2 - 1;

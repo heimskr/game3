@@ -58,6 +58,7 @@ namespace Game3 {
 		{Item::TOWER,           {128, 144, textureTileset}},
 		{Item::CAVE_ENTRANCE,   { 48, 352, textureTileset}},
 		{Item::MEAD,            { 80,  16, textureConsumables}},
+		{Item::HONEY,           { 64,  16, texturePotions}},
 	};
 
 	std::unordered_map<ItemID, Durability> Item::durabilities {
@@ -116,6 +117,7 @@ namespace Game3 {
 		{Item::TOWER,           std::make_shared<Furniture>   (Item::TOWER,           "Tower",            10, 64)},
 		{Item::CAVE_ENTRANCE,   std::make_shared<CaveEntrance>(Item::CAVE_ENTRANCE,   "Cave Entrance",    50,  1)},
 		{Item::MEAD,            std::make_shared<Item>        (Item::MEAD,            "Mead",             10, 16)},
+		{Item::HONEY,           std::make_shared<Item>        (Item::HONEY,           "Honey",             5, 64)},
 	};
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage() {

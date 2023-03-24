@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <random>
 
 #include <nlohmann/json.hpp>
 
@@ -36,6 +37,13 @@ namespace Game3 {
 			nlohmann::json extraData;
 
 			template <typename T, typename... Args>
+			static std::shared_ptr<T> create(std::default_random_engine &rng, Args && ...args) {
+				auto out = std::shared_ptr<T>(new T(std::forward<Args>(args)...));
+				out->init(rng);
+				return out;
+			}
+
+			template <typename T, typename... Args>
 			static std::shared_ptr<T> create(Args && ...args) {
 				auto out = std::shared_ptr<T>(new T(std::forward<Args>(args)...));
 				out->init();
@@ -46,7 +54,10 @@ namespace Game3 {
 
 			static std::shared_ptr<TileEntity> fromJSON(const nlohmann::json &);
 
-			virtual void init() {}
+			// At least one of the two init methods must be overridden to prevent an infinite loop!
+			virtual void init(std::default_random_engine &);
+			virtual void init();
+
 			virtual void tick(Game &, float) {}
 			virtual void onSpawn() {}
 			virtual void onRemove() {}

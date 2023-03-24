@@ -42,6 +42,7 @@ namespace Game3 {
 
 			TileEntityID getID() const override { return TileEntity::GHOST; }
 
+			void init() override {}
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(const nlohmann::json &) override;
 			void onSpawn();

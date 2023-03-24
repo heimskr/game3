@@ -15,16 +15,25 @@ namespace Game3 {
 		TileEntity::toJSON(json);
 		json["immatureID"] = immatureID;
 		json["age"] = age;
+		json["hiveAge"] = hiveAge;
 	}
 
 	void Tree::absorbJSON(const nlohmann::json &json) {
 		TileEntity::absorbJSON(json);
 		immatureID = json.at("immatureID");
 		age = json.at("age");
+		hiveAge = json.at("hiveAge");
+	}
+
+	void Tree::init(std::default_random_engine &rng) {
+		if (rng() % 10 == 0)
+			hiveAge = 0.f;
 	}
 
 	void Tree::tick(Game &, float delta) {
 		age += delta;
+		if (0.f <= hiveAge && hiveAge < HIVE_MATURITY)
+			hiveAge += delta;
 	}
 
 	bool Tree::onInteractNextTo(const std::shared_ptr<Player> &player) {
@@ -49,7 +58,14 @@ namespace Game3 {
 					inventory.notifyOwner();
 					return true;
 				}
+				return false;
 			}
+		}
+
+		if (HIVE_MATURITY <= hiveAge && !inventory.add({Item::HONEY, 1})) {
+			hiveAge = 0.f;
+			inventory.notifyOwner();
+			return true;
 		}
 
 		return false;
@@ -60,7 +76,13 @@ namespace Game3 {
 		if (tileID != tileSets.at(realm->type)->getEmpty()) {
 			auto &tilemap = *realm->tilemap2;
 			const auto tilesize = tilemap.tileSize;
-			const TileID tile_id = age < MATURITY? immatureID : tileID;
+			TileID tile_id = age < MATURITY? immatureID : tileID;
+			if (tile_id != immatureID) {
+				if (0.f <= hiveAge)
+					tile_id += 4;
+				if (HIVE_MATURITY <= hiveAge)
+					tile_id += 3;
+			}
 			const auto x = (tile_id % (tilemap.setWidth / tilesize)) * tilesize;
 			const auto y = (tile_id / (tilemap.setWidth / tilesize)) * tilesize;
 			sprite_renderer.drawOnMap(tilemap.texture, position.column, position.row, x / 2, y / 2, tilesize, tilesize);
