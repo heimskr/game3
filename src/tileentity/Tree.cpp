@@ -71,6 +71,10 @@ namespace Game3 {
 		return false;
 	}
 
+	bool Tree::hasHive() const {
+		return 0.f <= hiveAge;
+	}
+
 	void Tree::render(SpriteRenderer &sprite_renderer) {
 		if (!isVisible())
 			return;

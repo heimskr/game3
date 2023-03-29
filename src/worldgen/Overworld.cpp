@@ -128,7 +128,7 @@ namespace Game3::WorldGen {
 				constexpr double factor = 10;
 				const double noise = perlin.GetValue(row / noise_zoom * factor, column / noise_zoom * factor, 0.);
 				if (noise < -0.4)
-					if (auto tile = realm->tileEntityAt({row, column}); tile && tile->getID() == TileEntity::TREE)
+					if (auto tile = realm->tileEntityAt({row, column}); tile && tile->getID() == TileEntity::TREE && !std::dynamic_pointer_cast<Tree>(tile)->hasHive())
 						realm->remove(tile);
 			}
 		}

@@ -27,6 +27,7 @@ namespace Game3 {
 			using TileEntity::init;
 			void tick(Game &, float) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
+			bool hasHive() const;
 			void render(SpriteRenderer &) override;
 
 		protected:
