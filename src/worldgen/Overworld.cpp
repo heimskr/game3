@@ -116,6 +116,17 @@ namespace Game3::WorldGen {
 		if (!candidates.empty())
 			WorldGen::generateTown(realm, rng, choose(candidates, rng) + pad * (tilemap1->width + 1), n, m, pad, noise_seed);
 
+		Timer antiforest_timer("AntiForest");
+		for (int row = 0; row < height; ++row)
+			for (int column = 0; column < width; ++column) {
+				constexpr double factor = 10;
+				const double noise = perlin.GetValue(row / noise_zoom * factor, column / noise_zoom * factor, 0.);
+				if (noise < -0.4)
+					if (auto tile = realm->tileEntityAt({row, column}); tile && tile->getID() == TileEntity::TREE)
+						realm->remove(tile);
+			}
+		antiforest_timer.stop();
+
 		Timer::summary();
 		Timer::clear();
 	}

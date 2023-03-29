@@ -79,7 +79,7 @@ namespace Game3 {
 			return;
 
 		const auto hour = game.getHour();
-		
+
 		if (phase == 0 && WORK_START_HOUR <= hour)
 			wakeUp();
 
@@ -147,7 +147,7 @@ namespace Game3 {
 			pathfind(destination = house.extraData.at("furnace"));
 		}
 	}
-	
+
 	void Blacksmith::buyResources() {
 		auto &keep_realm = dynamic_cast<Keep &>(*keep->getInnerRealm());
 
@@ -232,17 +232,17 @@ namespace Game3 {
 		for (auto [item, count]: tools)
 			for (size_t i = inventory->count(item); i < count; ++i) {
 				std::vector<ItemStack> leftovers;
-				std::cout << "Crafting " << ItemStack(item) << '\n';
+				// std::cout << "Crafting " << ItemStack(item) << '\n';
 				if (!inventory->craft(game.primaryRecipes.at(item), leftovers)) {
-					std::cout << "Couldn't craft. Breaking.\n";
+					// std::cout << "Couldn't craft. Breaking.\n";
 					break;
 				}
 				if (!leftovers.empty()) {
-					std::cout << "There were leftovers. Returning.\n";
+					// std::cout << "There were leftovers. Returning.\n";
 					return;
 				}
 			}
-		std::cout << "Done.\n";
+		// std::cout << "Done.\n";
 	}
 
 	void Blacksmith::goToCounter() {
