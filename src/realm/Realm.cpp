@@ -62,6 +62,8 @@ namespace Game3 {
 			case Realm::OVERWORLD:
 			case Realm::HOUSE:
 			case Realm::BLACKSMITH:
+			case Realm::CAVE:
+			case Realm::TAVERN:
 				out = Realm::create();
 				break;
 			case Realm::KEEP:
