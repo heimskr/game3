@@ -20,5 +20,4 @@ std::ostream & operator<<(std::ostream &stream, Game3::Direction direction) {
 		case Game3::Direction::Right: return stream << "right";
 		default: return stream << '?';
 	}
-
 }

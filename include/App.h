@@ -8,8 +8,6 @@ namespace Game3 {
 
 	class App: public Gtk::Application {
 		public:
-			Glib::RefPtr<Gtk::Builder> builder;
-
 			static Glib::RefPtr<App> create();
 
 			void on_startup() override;

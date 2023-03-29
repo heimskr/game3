@@ -56,7 +56,7 @@ test: $(OUTPUT)
 	./$(OUTPUT)
 
 clean:
-	@ rm -f $(shell find src -name \*.o) $(OUTPUT) src/gtk_resources.cpp src/resources.cpp 
+	@ rm -f $(shell find src -name \*.o) $(OUTPUT) src/gtk_resources.cpp src/resources.cpp
 
 count:
 	cloc $(CLOC_OPTIONS)
