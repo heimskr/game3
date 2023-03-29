@@ -625,6 +625,11 @@ namespace Game3 {
 					case GDK_KEY_space:
 						game->player->interactNextTo();
 						return;
+					case GDK_KEY_b: {
+						const auto rect = game->getVisibleRealmBounds();
+						std::cout << '(' << rect.get_x() << ", " << rect.get_y() << " | " << rect.get_width() << " x " << rect.get_height() << ")\n";
+						return;
+					}
 					case GDK_KEY_u:
 						glArea.get_context()->make_current();
 						game->activeRealm->reupload();

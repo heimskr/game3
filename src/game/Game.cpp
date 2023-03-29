@@ -87,9 +87,6 @@ namespace Game3 {
 			return;
 
 		auto &realm = *activeRealm;
-		const auto &tilemap = realm.tilemap1;
-		const auto scale = canvas.scale;
-
 		const auto width  = canvas.width();
 		const auto height = canvas.height();
 
@@ -98,14 +95,7 @@ namespace Game3 {
 			return;
 		}
 
-		double new_x = pos_x - (canvas.width() / 2.f - (tilemap->width * tilemap->tileSize / 4.f) * scale + canvas.center.x() * canvas.magic * scale);
-		new_x /= tilemap->tileSize * scale / 2.f;
-
-		double new_y = pos_y - (canvas.height() / 2.f - (tilemap->height * tilemap->tileSize / 4.f) * scale + canvas.center.y() * canvas.magic * scale);
-		new_y /= tilemap->tileSize * scale / 2.f;
-
-		const int x = new_x;
-		const int y = new_y;
+		const auto [x, y] = translateCanvasCoordinates(pos_x, pos_y);
 
 		if (button == 1) {
 			if (auto *stack = player->inventory->getActive())
@@ -116,22 +106,38 @@ namespace Game3 {
 		}
 	}
 
-	float Game::getTotalSeconds() const {
-		return std::chrono::duration_cast<std::chrono::nanoseconds>(getTime() - startTime).count() / 1e9f;
+	Position Game::translateCanvasCoordinates(double x, double y) const {
+		const auto &realm   = *activeRealm;
+		const auto &tilemap = realm.tilemap1;
+		const auto scale    = canvas.scale;
+		x -= canvas.width() / 2.f - (tilemap->width * tilemap->tileSize / 4.f) * scale + canvas.center.x() * canvas.magic * scale;
+		x /= tilemap->tileSize * scale / 2.f;
+		y -= canvas.height() / 2.f - (tilemap->height * tilemap->tileSize / 4.f) * scale + canvas.center.y() * canvas.magic * scale;
+		y /= tilemap->tileSize * scale / 2.f;
+		return {static_cast<Index>(x), static_cast<Index>(y)};
 	}
 
-	float Game::getHour() const {
-		const auto base = getTotalSeconds() / 10.f + hourOffset;
-		return long(base) % 24 + base - long(base);
+	Gdk::Rectangle Game::getVisibleRealmBounds() const {
+		const auto [left,     top] = translateCanvasCoordinates(0., 0.);
+		const auto [right, bottom] = translateCanvasCoordinates(canvas.width(), canvas.height());
+		return {left, top, right - left + 1, bottom - top + 1};
 	}
 
-	float Game::getMinute() const {
-		const auto hour = getHour();
-		return 60. * (hour - long(hour));
+	double Game::getTotalSeconds() const {
+		return std::chrono::duration_cast<std::chrono::nanoseconds>(getTime() - startTime).count() / 1e9;
 	}
 
-	float Game::getDivisor() const {
-		return 3.f - 2.f * sin(getHour() * 3.1415926f / 24.f);
+	double Game::getHour() const {
+		const auto base = getTotalSeconds() / 10. + hourOffset;
+		return static_cast<long>(base) % 24 + fractional(base);
+	}
+
+	double Game::getMinute() const {
+		return 60. * fractional(getHour());
+	}
+
+	double Game::getDivisor() const {
+		return 3. - 2. * sin(getHour() * 3.1415926 / 24.);
 	}
 
 	void Game::activateContext() {

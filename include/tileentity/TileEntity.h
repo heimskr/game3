@@ -75,6 +75,7 @@ namespace Game3 {
 			std::shared_ptr<Realm> getRealm() const override;
 			const Position & getPosition() const override { return position; }
 			void updateNeighbors();
+			bool isVisible() const;
 
 		protected:
 			TileEntity() = default;

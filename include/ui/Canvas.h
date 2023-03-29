@@ -2,8 +2,10 @@
 
 #include <random>
 
+#include <gdkmm/rectangle.h>
 #include <Eigen/Eigen>
 
+#include "Position.h"
 #include "Texture.h"
 #include "Types.h"
 #include "ui/RectangleRenderer.h"
@@ -26,12 +28,17 @@ namespace Game3 {
 			RectangleRenderer rectangleRenderer {*this};
 			float magic = 8.f;
 			int autofocusCounter = 0;
+			Gdk::Rectangle realmBounds;
 
 			Canvas(MainWindow &);
 
 			void drawGL();
 			// bool mouseButtonEvent(const Eigen::Vector2i &p, int button, bool down, int modifiers) override;
-			int width();
-			int height();
+			int width() const;
+			int height() const;
+
+			/** Recalculates the visible realm bounds (see Game::getVisibleRealmBounds). */
+			void update();
+			bool inBounds(const Position &) const;
 	};
 }

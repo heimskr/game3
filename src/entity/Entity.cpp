@@ -262,6 +262,7 @@ namespace Game3 {
 		const auto &tilemap = *realm->tilemap1;
 		canvas.center.x() = -(column() - tilemap.width  / 2.f + 0.5f) - offset.x();
 		canvas.center.y() = -(row()    - tilemap.height / 2.f + 0.5f) - offset.y();
+		canvas.update();
 	}
 
 	void Entity::teleport(const Position &new_position, bool clear_offset) {

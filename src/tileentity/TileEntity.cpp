@@ -1,3 +1,4 @@
+#include "game/Game.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
@@ -9,6 +10,7 @@
 #include "tileentity/Teleporter.h"
 #include "tileentity/TileEntity.h"
 #include "tileentity/Tree.h"
+#include "ui/Canvas.h"
 
 namespace Game3 {
 	std::shared_ptr<TileEntity> TileEntity::fromJSON(const nlohmann::json &json) {
@@ -74,6 +76,10 @@ namespace Game3 {
 
 	void TileEntity::updateNeighbors() {
 		getRealm()->updateNeighbors(position);
+	}
+
+	bool TileEntity::isVisible() const {
+		return getRealm()->getGame().canvas.inBounds(getPosition());
 	}
 
 	void TileEntity::absorbJSON(const nlohmann::json &json) {

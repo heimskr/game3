@@ -45,6 +45,9 @@ namespace Game3 {
 	}
 
 	void Chest::render(SpriteRenderer &sprite_renderer) {
+		if (!isVisible())
+			return;
+
 		if (tileID != uint16_t(-1)) {
 			// Kinda silly to get the tilesize from the realm's second layer. Maybe it could be added as a Chest field.
 			auto &tilemap = *getRealm()->tilemap2;

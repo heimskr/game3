@@ -16,21 +16,32 @@ namespace Game3 {
 	}
 
 	void Canvas::drawGL() {
-		if (game) {
-			game->tick();
-			spriteRenderer.update(width(), height());
-			rectangleRenderer.update(width(), height());
-			if (game->activeRealm)
-				game->activeRealm->render(width(), height(), center, scale, spriteRenderer, game->getDivisor());
-			game->player->render(spriteRenderer);
-		}
+		if (!game)
+			return;
+		game->tick();
+		spriteRenderer.update(width(), height());
+		rectangleRenderer.update(width(), height());
+		if (game->activeRealm)
+			game->activeRealm->render(width(), height(), center, scale, spriteRenderer, game->getDivisor());
+		game->player->render(spriteRenderer);
 	}
 
-	int Canvas::width() {
+	int Canvas::width() const {
 		return window.glArea.get_width();
 	}
 
-	int Canvas::height() {
+	int Canvas::height() const {
 		return window.glArea.get_height();
+	}
+
+	void Canvas::update() {
+		if (!game)
+			return;
+		realmBounds = game->getVisibleRealmBounds();
+	}
+
+	bool Canvas::inBounds(const Position &pos) const {
+		return realmBounds.get_x() <= pos.column && pos.column < realmBounds.get_x() + realmBounds.get_width()
+		    && realmBounds.get_y() <= pos.row    && pos.row    < realmBounds.get_y() + realmBounds.get_height();
 	}
 }

@@ -72,6 +72,8 @@ namespace Game3 {
 	}
 
 	void Tree::render(SpriteRenderer &sprite_renderer) {
+		if (!isVisible())
+			return;
 		auto realm = getRealm();
 		if (tileID != tileSets.at(realm->type)->getEmpty()) {
 			auto &tilemap = *realm->tilemap2;

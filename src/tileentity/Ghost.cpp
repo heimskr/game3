@@ -62,14 +62,16 @@ namespace Game3 {
 	}
 
 	void Ghost::render(SpriteRenderer &sprite_renderer) {
-		auto realm = getRealm();
+		if (!isVisible())
+			return;
 
+		auto realm = getRealm();
 		auto &tilemap = *realm->tilemap2;
 		const auto tilesize = tilemap.tileSize;
 		const auto column_count = tilemap.setWidth / tilesize;
 
 		TileID tile_id = Monomap::MISSING;
-		
+
 		if (details.useMarchingSquares)
 			tile_id = marched;
 		else

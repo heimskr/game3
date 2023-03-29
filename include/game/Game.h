@@ -49,13 +49,16 @@ namespace Game3 {
 			void setText(const Glib::ustring &text, const Glib::ustring &name = "", bool focus = true, bool ephemeral = false);
 			const Glib::ustring & getText() const;
 			void click(int button, int n, double pos_x, double pos_y);
-			float getTotalSeconds() const;
-			float getHour() const;
-			float getMinute() const;
+			double getTotalSeconds() const;
+			double getHour() const;
+			double getMinute() const;
 			/** The value to divide the color values of the tilemap pixels by. Based on the time of day. */
-			float getDivisor() const;
+			double getDivisor() const;
 			void activateContext();
 			MainWindow & getWindow();
+			/** Translates coordinates relative to the top left corner of the canvas to realm coordinates. */
+			Position translateCanvasCoordinates(double x, double y) const;
+			Gdk::Rectangle getVisibleRealmBounds() const;
 
 			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update() const { return signal_player_inventory_update_; }
 			sigc::signal<void(const PlayerPtr &)> signal_player_money_update() const { return signal_player_money_update_; }
