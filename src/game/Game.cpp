@@ -98,20 +98,22 @@ namespace Game3 {
 			return;
 		}
 
-		pos_x -= canvas.width() / 2.f - (tilemap->width * tilemap->tileSize / 4.f) * scale + canvas.center.x() * canvas.magic * scale;
-		pos_x /= tilemap->tileSize * scale / 2.f;
+		double new_x = pos_x - (canvas.width() / 2.f - (tilemap->width * tilemap->tileSize / 4.f) * scale + canvas.center.x() * canvas.magic * scale);
+		new_x /= tilemap->tileSize * scale / 2.f;
 
-		pos_y -= canvas.height() / 2.f - (tilemap->height * tilemap->tileSize / 4.f) * scale + canvas.center.y() * canvas.magic * scale;
-		pos_y /= tilemap->tileSize * scale / 2.f;
+		double new_y = pos_y - (canvas.height() / 2.f - (tilemap->height * tilemap->tileSize / 4.f) * scale + canvas.center.y() * canvas.magic * scale);
+		new_y /= tilemap->tileSize * scale / 2.f;
 
-		const int x = pos_x;
-		const int y = pos_y;
+		const int x = new_x;
+		const int y = new_y;
 
 		if (button == 1) {
 			if (auto *stack = player->inventory->getActive())
 				stack->item->use(player->inventory->activeSlot, *stack, player, {y, x});
-		} else if (debugMode && button == 3 && player && realm.isValid({y, x}))
-			player->teleport({y, x});
+		} else if (button == 3 && player && realm.isValid({y, x})) {
+			if (!realm.rightClick({y, x}, pos_x, pos_y) && debugMode)
+				player->teleport({y, x});
+		}
 	}
 
 	float Game::getTotalSeconds() const {
@@ -136,11 +138,15 @@ namespace Game3 {
 		canvas.window.activateContext();
 	}
 
-	std::shared_ptr<Game> Game::create(Canvas &canvas) {
-		return std::shared_ptr<Game>(new Game(canvas));
+	MainWindow & Game::getWindow() {
+		return canvas.window;
 	}
 
-	std::shared_ptr<Game> Game::fromJSON(const nlohmann::json &json, Canvas &canvas) {
+	GamePtr Game::create(Canvas &canvas) {
+		return GamePtr(new Game(canvas));
+	}
+
+	GamePtr Game::fromJSON(const nlohmann::json &json, Canvas &canvas) {
 		auto out = create(canvas);
 		for (const auto &[string, realm_json]: json.at("realms").get<std::unordered_map<std::string, nlohmann::json>>())
 			out->realms.emplace(parseUlong(string), Realm::fromJSON(realm_json)).first->second->setGame(*out);

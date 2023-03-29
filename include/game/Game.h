@@ -14,6 +14,7 @@
 
 namespace Game3 {
 	class Canvas;
+	class MainWindow;
 	class Menu;
 	class Player;
 
@@ -35,9 +36,9 @@ namespace Game3 {
 
 			Game() = delete;
 
-			std::unordered_map<RealmID, std::shared_ptr<Realm>> realms;
-			std::shared_ptr<Realm> activeRealm;
-			std::shared_ptr<Player> player;
+			std::unordered_map<RealmID, RealmPtr> realms;
+			RealmPtr activeRealm;
+			PlayerPtr player;
 			std::vector<CraftingRecipe> recipes;
 			std::unordered_map<ItemID, CraftingRecipe> primaryRecipes;
 
@@ -54,9 +55,10 @@ namespace Game3 {
 			/** The value to divide the color values of the tilemap pixels by. Based on the time of day. */
 			float getDivisor() const;
 			void activateContext();
+			MainWindow & getWindow();
 
-			sigc::signal<void(const std::shared_ptr<Player> &)> signal_player_inventory_update() const { return signal_player_inventory_update_; }
-			sigc::signal<void(const std::shared_ptr<Player> &)> signal_player_money_update() const { return signal_player_money_update_; }
+			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update() const { return signal_player_inventory_update_; }
+			sigc::signal<void(const PlayerPtr &)> signal_player_money_update() const { return signal_player_money_update_; }
 			sigc::signal<void(const std::shared_ptr<HasRealm> &)> signal_other_inventory_update()  const { return signal_other_inventory_update_; }
 
 			static std::shared_ptr<Game> create(Canvas &);
@@ -64,8 +66,8 @@ namespace Game3 {
 
 		private:
 			Game(Canvas &canvas_): canvas(canvas_) { dynamicRNG.seed(time(nullptr)); }
-			sigc::signal<void(const std::shared_ptr<Player> &)> signal_player_inventory_update_;
-			sigc::signal<void(const std::shared_ptr<Player> &)> signal_player_money_update_;
+			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update_;
+			sigc::signal<void(const PlayerPtr &)> signal_player_money_update_;
 			sigc::signal<void(const std::shared_ptr<HasRealm> &)> signal_other_inventory_update_;
 			std::chrono::system_clock::time_point lastTime = startTime;
 
@@ -73,4 +75,6 @@ namespace Game3 {
 	};
 
 	void to_json(nlohmann::json &, const Game &);
+
+	using GamePtr = std::shared_ptr<Game>;
 }

@@ -20,6 +20,7 @@ namespace Game3 {
 			void render(SpriteRenderer &) const override;
 			virtual bool onInteractOn    (const std::shared_ptr<Player> &player) override { return interact(player); }
 			virtual bool onInteractNextTo(const std::shared_ptr<Player> &player) override { return interact(player); }
+			Glib::ustring getName() override;
 
 		private:
 			ItemEntity(const ItemStack &);

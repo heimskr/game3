@@ -1,6 +1,11 @@
 #include "Position.h"
 
 namespace Game3 {
+	bool Position::adjacent4(const Position &other) const {
+		const auto diff = *this - other;
+		return (diff.row == 0 && (diff.column == 1 || diff.column == -1)) || (diff.column == 0 && (diff.row == 1 || diff.row == -1));
+	}
+
 	bool Position::operator<(const Position &other) const {
 		if (row < other.row)
 			return true;

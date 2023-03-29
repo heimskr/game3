@@ -115,6 +115,7 @@ namespace Game3 {
 			bool pathfind(const Position &start, const Position &goal, std::list<Direction> &);
 			bool pathfind(const Position &goal);
 			virtual float getSpeed() const { return MAX_SPEED; }
+			virtual Glib::ustring getName() { return "Unknown Entity (" + std::to_string(type) + ')'; }
 
 		protected:
 			Texture *texture = nullptr;
@@ -132,4 +133,6 @@ namespace Game3 {
 	};
 
 	void to_json(nlohmann::json &, const Entity &);
+
+	using EntityPtr = std::shared_ptr<Entity>;
 }

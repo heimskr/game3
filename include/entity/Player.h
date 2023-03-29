@@ -33,6 +33,7 @@ namespace Game3 {
 			bool setTooldown(float multiplier);
 			inline bool hasTooldown() const { return 0.f < tooldown; }
 			void showText(const Glib::ustring &text, const Glib::ustring &name);
+			Glib::ustring getName() override { return "Player"; }
 
 			friend class Entity;
 
@@ -42,4 +43,6 @@ namespace Game3 {
 	};
 
 	void to_json(nlohmann::json &, const Player &);
+
+	using PlayerPtr = std::shared_ptr<Player>;
 }

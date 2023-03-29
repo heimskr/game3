@@ -14,6 +14,7 @@
 #include "tileentity/OreDeposit.h"
 #include "tileentity/Sign.h"
 #include "tileentity/Teleporter.h"
+#include "ui/MainWindow.h"
 #include "ui/SpriteRenderer.h"
 #include "util/Timer.h"
 #include "util/Util.h"
@@ -31,7 +32,7 @@ namespace Game3 {
 		{Realm::TAVERN,     cacheTexture("resources/tileset.png")},
 	};
 
-	Realm::Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_, int seed_):
+	Realm::Realm(RealmID id_, RealmType type_, const TilemapPtr &tilemap1_, const TilemapPtr &tilemap2_, const TilemapPtr &tilemap3_, int seed_):
 	id(id_), type(type_), tilemap1(tilemap1_), tilemap2(tilemap2_), tilemap3(tilemap3_), seed(seed_) {
 		tilemap1->init();
 		tilemap2->init();
@@ -42,7 +43,7 @@ namespace Game3 {
 		resetPathMap();
 	}
 
-	Realm::Realm(RealmID id_, RealmType type_, const std::shared_ptr<Tilemap> &tilemap1_, int seed_): id(id_), type(type_), tilemap1(tilemap1_), seed(seed_) {
+	Realm::Realm(RealmID id_, RealmType type_, const TilemapPtr &tilemap1_, int seed_): id(id_), type(type_), tilemap1(tilemap1_), seed(seed_) {
 		tilemap1->init();
 		renderer1.init(tilemap1);
 		tilemap2 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->texture);
@@ -54,8 +55,8 @@ namespace Game3 {
 		resetPathMap();
 	}
 
-	std::shared_ptr<Realm> Realm::fromJSON(const nlohmann::json &json) {
-		std::shared_ptr<Realm> out;
+	RealmPtr Realm::fromJSON(const nlohmann::json &json) {
+		RealmPtr out;
 		const RealmType type = json.at("type");
 		switch (type) {
 			case Realm::OVERWORLD:
@@ -137,13 +138,13 @@ namespace Game3 {
 		renderer3.tilemap = tilemap3;
 	}
 
-	std::shared_ptr<Entity> Realm::add(const std::shared_ptr<Entity> &entity) {
+	EntityPtr Realm::add(const EntityPtr &entity) {
 		entity->setRealm(shared_from_this());
 		entities.insert(entity);
 		return entity;
 	}
 
-	std::shared_ptr<TileEntity> Realm::add(const std::shared_ptr<TileEntity> &tile_entity) {
+	TileEntityPtr Realm::add(const TileEntityPtr &tile_entity) {
 		const Index index = getIndex(tile_entity->position);
 		if (tileEntities.contains(index))
 			return nullptr;
@@ -185,48 +186,48 @@ namespace Game3 {
 		tileEntityRemovalQueue.clear();
 	}
 
-	std::vector<std::shared_ptr<Entity>> Realm::findEntities(const Position &position) const {
-		std::vector<std::shared_ptr<Entity>> out;
+	std::vector<EntityPtr> Realm::findEntities(const Position &position) const {
+		std::vector<EntityPtr> out;
 		for (const auto &entity: entities)
 			if (entity->position == position)
 				out.push_back(entity);
 		return out;
 	}
 
-	std::vector<std::shared_ptr<Entity>> Realm::findEntities(const Position &position, const std::shared_ptr<Entity> &except) const {
-		std::vector<std::shared_ptr<Entity>> out;
+	std::vector<EntityPtr> Realm::findEntities(const Position &position, const EntityPtr &except) const {
+		std::vector<EntityPtr> out;
 		for (const auto &entity: entities)
 			if (entity->position == position && entity != except)
 				out.push_back(entity);
 		return out;
 	}
 
-	std::shared_ptr<Entity> Realm::findEntity(const Position &position) const {
+	EntityPtr Realm::findEntity(const Position &position) const {
 		for (const auto &entity: entities)
 			if (entity->position == position)
 				return entity;
 		return {};
 	}
 
-	std::shared_ptr<Entity> Realm::findEntity(const Position &position, const std::shared_ptr<Entity> &except) const {
+	EntityPtr Realm::findEntity(const Position &position, const EntityPtr &except) const {
 		for (const auto &entity: entities)
 			if (entity->position == position && entity != except)
 				return entity;
 		return {};
 	}
 
-	std::shared_ptr<TileEntity> Realm::tileEntityAt(const Position &position) const {
+	TileEntityPtr Realm::tileEntityAt(const Position &position) const {
 		const auto iter = tileEntities.find(position.row * tilemap1->width + position.column);
 		if (iter == tileEntities.end())
 			return {};
 		return iter->second;
 	}
 
-	void Realm::remove(std::shared_ptr<Entity> entity) {
+	void Realm::remove(EntityPtr entity) {
 		entities.erase(entity);
 	}
 
-	void Realm::remove(std::shared_ptr<TileEntity> tile_entity) {
+	void Realm::remove(TileEntityPtr tile_entity) {
 		const Position position = tile_entity->position;
 		const Index index = getIndex(position);
 		tileEntities.at(index)->onRemove();
@@ -241,7 +242,7 @@ namespace Game3 {
 		return {index / getWidth(), index % getWidth()};
 	}
 
-	void Realm::onMoved(const std::shared_ptr<Entity> &entity, const Position &position) {
+	void Realm::onMoved(const EntityPtr &entity, const Position &position) {
 		if (auto tile_entity = tileEntityAt(position))
 			tile_entity->onOverlap(entity);
 	}
@@ -252,21 +253,21 @@ namespace Game3 {
 		return *game;
 	}
 
-	void Realm::queueRemoval(const std::shared_ptr<Entity> &entity) {
+	void Realm::queueRemoval(const EntityPtr &entity) {
 		if (ticking)
 			entityRemovalQueue.push_back(entity);
 		else
 			remove(entity);
 	}
 
-	void Realm::queueRemoval(const std::shared_ptr<TileEntity> &tile_entity) {
+	void Realm::queueRemoval(const TileEntityPtr &tile_entity) {
 		if (ticking)
 			tileEntityRemovalQueue.push_back(tile_entity);
 		else
 			remove(tile_entity);
 	}
 
-	void Realm::absorb(const std::shared_ptr<Entity> &entity, const Position &position) {
+	void Realm::absorb(const EntityPtr &entity, const Position &position) {
 		if (auto realm = entity->weakRealm.lock())
 			realm->remove(entity);
 		entity->setRealm(shared_from_this());
@@ -316,7 +317,7 @@ namespace Game3 {
 		setLayer3(position.row, position.column, tile);
 	}
 
-	bool Realm::interactGround(const std::shared_ptr<Player> &player, const Position &position) {
+	bool Realm::interactGround(const PlayerPtr &player, const Position &position) {
 		if (!isValid(position))
 			return false;
 
@@ -529,6 +530,46 @@ namespace Game3 {
 		for (Index row = 0; row < height; ++row)
 			for (Index column = 0; column < width; ++column)
 				pathMap[getIndex(row, column)] = isWalkable(row, column, *tileset);
+	}
+
+	bool Realm::rightClick(const Position &position, double x, double y) {
+		auto entities = findEntities(position);
+
+		const auto player = getGame().player;
+		const auto player_pos = player->getPosition();
+		const bool overlap = player_pos == position;
+		const bool adjacent = position.adjacent4(player_pos);
+		if (!overlap && !adjacent)
+			return false;
+
+		if (!entities.empty()) {
+			auto gmenu = Gio::Menu::create();
+			auto group = Gio::SimpleActionGroup::create();
+			size_t i = 0;
+			for (const auto &entity: entities) {
+				// TODO: Can you escape underscores?
+				gmenu->append(entity->getName(), "entity_menu.entity" + std::to_string(i));
+				group->add_action("entity" + std::to_string(i++), [entity, overlap, player] {
+					if (overlap)
+						entity->onInteractOn(player);
+					else
+						entity->onInteractNextTo(player);
+				});
+			}
+
+			auto &window = getGame().getWindow();
+			auto &menu = window.glMenu;
+			window.remove_action_group("entity_menu");
+			window.insert_action_group("entity_menu", group);
+			menu.set_menu_model(gmenu);
+			menu.set_has_arrow(true);
+			std::cerr << "(" << x << ", " << y << ") -> (" << int(x) << ", " << int(y) << ")\n";
+			menu.set_pointing_to({int(x), int(y), 1, 1});
+			menu.popup();
+			return true;
+		}
+
+		return false;
 	}
 
 	void to_json(nlohmann::json &json, const Realm &realm) {

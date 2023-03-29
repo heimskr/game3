@@ -29,6 +29,7 @@ namespace Game3 {
 			std::shared_ptr<InventoryTab> inventoryTab;
 			std::shared_ptr<MerchantTab> merchantTab;
 			std::shared_ptr<CraftingTab> craftingTab;
+			Gtk::PopoverMenu glMenu;
 
 			MainWindow(BaseObjectType *, const Glib::RefPtr<Gtk::Builder> &);
 

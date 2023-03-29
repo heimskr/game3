@@ -19,6 +19,7 @@ namespace Game3 {
 			void absorbJSON(const nlohmann::json &) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 			void tick(Game &, float delta) override;
+			Glib::ustring getName() override { return "Blacksmith"; }
 
 			friend class Entity;
 

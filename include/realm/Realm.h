@@ -101,6 +101,8 @@ namespace Game3 {
 
 			virtual bool interactGround(const std::shared_ptr<Player> &, const Position &);
 			virtual void updateNeighbors(const Position &);
+			/** Returns true iff something was done with the right click. */
+			virtual bool rightClick(const Position &, double x, double y);
 
 			template <typename T, typename... Args>
 			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {
@@ -199,4 +201,6 @@ namespace Game3 {
 	};
 
 	void to_json(nlohmann::json &, const Realm &);
+
+	using RealmPtr = std::shared_ptr<Realm>;
 }

@@ -25,6 +25,7 @@ namespace Game3 {
 		inline Position & operator-=(const Position &other) { row -= other.row; column -= other.column; return *this; }
 		inline operator std::string() const { return '(' + std::to_string(row) + ", " + std::to_string(column) + ')'; }
 		inline double distance(const Position &other) const { return std::sqrt(std::pow(row - other.row, 2) + std::pow(column - other.column, 2)); }
+		bool adjacent4(const Position &other) const;
 		explicit inline operator bool() const { return 0 <= row && 0 <= column; }
 		bool operator<(const Position &) const;
 	};

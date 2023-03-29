@@ -20,7 +20,6 @@ namespace Game3::WorldGen {
 		const auto map_width = realm->getWidth();
 
 		const auto cleanup = [&](Index row, Index column) {
-			static size_t count = 0;
 			if (auto tile_entity = realm->tileEntityAt({row, column}))
 				realm->remove(tile_entity);
 		};

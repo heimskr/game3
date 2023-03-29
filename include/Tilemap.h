@@ -2,6 +2,7 @@
 
 // Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/TileMap.cs
 
+#include <memory>
 #include <vector>
 
 #include <nlohmann/json.hpp>
@@ -59,4 +60,6 @@ namespace Game3 {
 
 	void to_json(nlohmann::json &, const Tilemap &);
 	void from_json(const nlohmann::json &, Tilemap &);
+
+	using TilemapPtr = std::shared_ptr<Tilemap>;
 }

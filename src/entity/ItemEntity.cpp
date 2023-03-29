@@ -63,6 +63,10 @@ namespace Game3 {
 		return true;
 	}
 
+	Glib::ustring ItemEntity::getName() {
+		return stack.item->name;
+	}
+
 	void to_json(nlohmann::json &json, const ItemEntity &item_entity) {
 		item_entity.toJSON(json);
 	}

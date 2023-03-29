@@ -137,6 +137,8 @@ namespace Game3 {
 		});
 		glArea.set_focusable(true);
 
+		glMenu.set_parent(glArea);
+
 		auto key_controller = Gtk::EventControllerKey::create();
 		key_controller->signal_key_pressed().connect(sigc::mem_fun(*this, &MainWindow::onKeyPressed), false);
 		key_controller->signal_key_released().connect(sigc::mem_fun(*this, &MainWindow::onKeyReleased));
@@ -762,7 +764,7 @@ namespace Game3 {
 			tab->reset(game);
 		for (auto &[id, realm]: game->realms)
 			realm->game = game.get();
-		game->signal_player_inventory_update().connect([this](const std::shared_ptr<Player> &) {
+		game->signal_player_inventory_update().connect([this](const PlayerPtr &) {
 			inventoryTab->reset(game);
 			if (isFocused(merchantTab))
 				merchantTab->reset(game);
@@ -778,7 +780,7 @@ namespace Game3 {
 				}
 			}
 		});
-		game->signal_player_money_update().connect([this](const std::shared_ptr<Player> &) {
+		game->signal_player_money_update().connect([this](const PlayerPtr &) {
 			inventoryTab->reset(game);
 			merchantTab->reset(game);
 		});

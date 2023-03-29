@@ -86,4 +86,6 @@ namespace Game3 {
 
 			friend void to_json(nlohmann::json &, const TileEntity &);
 	};
+
+	using TileEntityPtr = std::shared_ptr<TileEntity>;
 }
