@@ -82,15 +82,24 @@ namespace Game3 {
 			void queueRemoval(const std::shared_ptr<Entity> &);
 			void queueRemoval(const std::shared_ptr<TileEntity> &);
 			void absorb(const std::shared_ptr<Entity> &, const Position &);
-			void setLayer1(Index row, Index col, TileID);
-			void setLayer2(Index row, Index col, TileID);
-			void setLayer3(Index row, Index col, TileID);
+			void setLayer1(Index row, Index column, TileID);
+			void setLayer2(Index row, Index column, TileID);
+			void setLayer3(Index row, Index column, TileID);
 			void setLayer1(Index, TileID);
 			void setLayer2(Index, TileID);
 			void setLayer3(Index, TileID);
 			void setLayer1(const Position &, TileID);
 			void setLayer2(const Position &, TileID);
 			void setLayer3(const Position &, TileID);
+			TileID getLayer1(Index row, Index column) const;
+			TileID getLayer2(Index row, Index column) const;
+			TileID getLayer3(Index row, Index column) const;
+			TileID getLayer1(Index) const;
+			TileID getLayer2(Index) const;
+			TileID getLayer3(Index) const;
+			TileID getLayer1(const Position &) const;
+			TileID getLayer2(const Position &) const;
+			TileID getLayer3(const Position &) const;
 			inline Index getIndex(const Position &position) const { return position.row * getWidth() + position.column; }
 			inline Index getIndex(Index row, Index column) const { return row * getWidth() + column; }
 			std::optional<Position> getPathableAdjacent(const Position &) const;

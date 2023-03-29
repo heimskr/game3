@@ -319,6 +319,42 @@ namespace Game3 {
 		setLayer3(position.row, position.column, tile);
 	}
 
+	TileID Realm::getLayer1(Index row, Index column) const {
+		return (*tilemap1)(column, row);
+	}
+
+	TileID Realm::getLayer2(Index row, Index column) const {
+		return (*tilemap2)(column, row);
+	}
+
+	TileID Realm::getLayer3(Index row, Index column) const {
+		return (*tilemap3)(column, row);
+	}
+
+	TileID Realm::getLayer1(Index index) const {
+		return tilemap1->tiles[index];
+	}
+
+	TileID Realm::getLayer2(Index index) const {
+		return tilemap2->tiles[index];
+	}
+
+	TileID Realm::getLayer3(Index index) const {
+		return tilemap3->tiles[index];
+	}
+
+	TileID Realm::getLayer1(const Position &position) const {
+		return (*tilemap1)(position.row, position.column);
+	}
+
+	TileID Realm::getLayer2(const Position &position) const {
+		return (*tilemap2)(position.row, position.column);
+	}
+
+	TileID Realm::getLayer3(const Position &position) const {
+		return (*tilemap3)(position.row, position.column);
+	}
+
 	bool Realm::interactGround(const PlayerPtr &player, const Position &position) {
 		if (!isValid(position))
 			return false;

@@ -33,6 +33,10 @@ namespace Game3::WorldGen {
 			Monomap::GRASS, Monomap::GRASS, Monomap::GRASS, Monomap::GRASS, Monomap::GRASS, Monomap::GRASS, Monomap::GRASS
 		};
 
+		static const std::unordered_set<TileID> grass_set {
+			Monomap::GRASS_ALT1, Monomap::GRASS_ALT2, Monomap::GRASS,
+		};
+
 		auto saved_noise = std::make_unique<double[]>(width * height);
 
 		Timer noise_timer("Noise");
@@ -57,8 +61,10 @@ namespace Game3::WorldGen {
 				} else {
 					realm->setLayer1(row, column, choose(grasses, rng));
 					const double forest_noise = forest_perlin.GetValue(row / noise_zoom, column / noise_zoom, 0.5);
-					if (0.5 < forest_noise)
+					if (0.5 < forest_noise) {
 						realm->add(TileEntity::create<Tree>(rng, Monomap::TREE1 + rand() % 3, Monomap::TREE0, Position(row, column), Tree::MATURITY));
+						realm->setLayer1(row, column, Monomap::FOREST_FLOOR);
+					}
 				}
 			}
 		noise_timer.stop();
@@ -117,7 +123,7 @@ namespace Game3::WorldGen {
 			WorldGen::generateTown(realm, rng, choose(candidates, rng) + pad * (tilemap1->width + 1), n, m, pad, noise_seed);
 
 		Timer antiforest_timer("AntiForest");
-		for (int row = 0; row < height; ++row)
+		for (int row = 0; row < height; ++row) {
 			for (int column = 0; column < width; ++column) {
 				constexpr double factor = 10;
 				const double noise = perlin.GetValue(row / noise_zoom * factor, column / noise_zoom * factor, 0.);
@@ -125,6 +131,7 @@ namespace Game3::WorldGen {
 					if (auto tile = realm->tileEntityAt({row, column}); tile && tile->getID() == TileEntity::TREE)
 						realm->remove(tile);
 			}
+		}
 		antiforest_timer.stop();
 
 		Timer::summary();
