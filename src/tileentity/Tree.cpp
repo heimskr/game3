@@ -75,6 +75,16 @@ namespace Game3 {
 		return 0.f <= hiveAge;
 	}
 
+	bool Tree::kill() {
+		auto &realm = *getRealm();
+		auto &rng = realm.getGame().dynamicRNG;
+		static std::uniform_real_distribution one(0., 1.);
+		if (one(rng) < CHAR_CHANCE)
+			realm.setLayer3(getPosition(), Monomap::CHARRED_STUMP);
+		realm.setLayer2(getPosition(), Monomap::ASH);
+		return true;
+	}
+
 	void Tree::render(SpriteRenderer &sprite_renderer) {
 		if (!isVisible())
 			return;

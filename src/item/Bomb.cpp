@@ -11,8 +11,7 @@
 
 namespace Game3 {
 	bool Bomb::use(Slot slot, ItemStack &stack, const Place &place) {
-		constexpr Index RADIUS = 4;
-		constexpr double CHAR_CHANCE = 0.314159265358979323;
+		constexpr double RADIUS = 2.5;
 
 		auto &player = *place.player;
 		auto &realm  = *place.realm;
@@ -20,19 +19,14 @@ namespace Game3 {
 
 		const auto [prow, pcol] = place.position;
 
-		std::uniform_real_distribution one(0., 1.);
 
-		for (Index row = prow - RADIUS + 1; row <= prow + RADIUS - 1; ++row) {
-			for (Index column = pcol - RADIUS + 1; column <= pcol + RADIUS - 1; ++column) {
+		for (Index row = prow - RADIUS * 2; row <= prow + RADIUS * 2; ++row) {
+			for (Index column = pcol - RADIUS * 2; column <= pcol + RADIUS * 2; ++column) {
 				const Position pos(row, column);
 				if (!realm.isValid(pos) || RADIUS < pos.distance(place.position))
 					continue;
-				if (auto tile = realm.tileEntityAt(pos); tile && tile->getID() == TileEntity::TREE) {
+				if (auto tile = realm.tileEntityAt(pos); tile && tile->kill())
 					realm.remove(tile);
-					if (one(rng) < CHAR_CHANCE)
-						realm.setLayer3(pos, Monomap::CHARRED_STUMP);
-					realm.setLayer2(pos, Monomap::ASH);
-				}
 			}
 		}
 

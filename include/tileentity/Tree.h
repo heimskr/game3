@@ -7,6 +7,7 @@ namespace Game3 {
 		public:
 			constexpr static float MATURITY = 30.f;
 			constexpr static float HIVE_MATURITY = 60.f;
+			constexpr static double CHAR_CHANCE = 0.314159265358979323;
 
 			TileID immatureID;
 			float age = 0.f;
@@ -28,6 +29,7 @@ namespace Game3 {
 			void tick(Game &, float) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 			bool hasHive() const;
+			bool kill() override;
 			void render(SpriteRenderer &) override;
 
 		protected:
