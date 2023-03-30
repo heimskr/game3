@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "game/Game.h"
+#include "game/InteractionSet.h"
 #include "game/Inventory.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
@@ -45,6 +46,13 @@ namespace Game3 {
 		registerPrimaryRecipe(std::vector<ItemStack> {{Item::WOOD,  1}}, ItemStack(Item::PLANK, 1));
 		registerPrimaryRecipe(std::vector<ItemStack> {{Item::PLANK, 2}}, ItemStack(Item::WOODEN_WALL, 1));
 		registerPrimaryRecipe(std::vector<ItemStack> {{Item::STONE, 1}}, ItemStack(Item::BOMB, 64));
+	}
+
+	void Game::initInteractionSets() {
+		interactionSets.clear();
+		auto standard = std::make_shared<StandardInteractions>();
+		for (const RealmType type: Realm::allTypes)
+			interactionSets.emplace(type, standard);
 	}
 
 	void Game::tick() {

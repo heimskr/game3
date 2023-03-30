@@ -6,6 +6,7 @@
 #include "Tiles.h"
 #include "entity/Entity.h"
 #include "game/Game.h"
+#include "game/InteractionSet.h"
 #include "realm/Keep.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
@@ -30,6 +31,10 @@ namespace Game3 {
 		{Realm::BLACKSMITH, cacheTexture("resources/tileset.png")},
 		{Realm::CAVE,       cacheTexture("resources/tileset.png")},
 		{Realm::TAVERN,     cacheTexture("resources/tileset.png")},
+	};
+
+	std::unordered_set<RealmType> Realm::allTypes {
+		Realm::OVERWORLD, Realm::HOUSE, Realm::KEEP, Realm::BLACKSMITH, Realm::CAVE, Realm::TAVERN,
 	};
 
 	Realm::Realm(RealmID id_, RealmType type_, const TilemapPtr &tilemap1_, const TilemapPtr &tilemap2_, const TilemapPtr &tilemap3_, int seed_):
@@ -359,57 +364,12 @@ namespace Game3 {
 		if (!isValid(position))
 			return false;
 
-		const Index index = getIndex(position);
-		auto &inventory = *player->inventory;
+		const Place place(position, shared_from_this(), player);
+		auto &game = getGame();
 
-		if (auto *active = inventory.getActive()) {
-			if (active->item->canUseOnWorld() && active->item->use(inventory.activeSlot, *active, {position, shared_from_this(), player}))
+		if (auto iter = game.interactionSets.find(type); iter != game.interactionSets.end())
+			if (iter->second->interact(place))
 				return true;
-
-			if (active->has(ItemAttribute::Hammer)) {
-				auto &tileset = *tileSets.at(type);
-				const TileID tile2 = tilemap2->tiles.at(index);
-				ItemStack stack;
-				if (tileset.getItemStack(tile2, stack) && !inventory.add(stack)) {
-					if (active->reduceDurability())
-						inventory.erase(inventory.activeSlot);
-					setLayer2(position, tileset.getEmpty());
-					return true;
-				}
-			}
-		}
-
-		std::optional<ItemID> item;
-		std::optional<ItemAttribute> attribute;
-
-		const TileID tile1 = tilemap1->tiles.at(index);
-		if (tile1 == Monomap::SAND) {
-			item.emplace(Item::SAND);
-			attribute.emplace(ItemAttribute::Shovel);
-		} else if (tile1 == Monomap::SHALLOW_WATER) {
-			item.emplace(Item::CLAY);
-			attribute.emplace(ItemAttribute::Shovel);
-		} else if (Monomap::dirtSet.contains(tile1)) {
-			item.emplace(Item::DIRT);
-			attribute.emplace(ItemAttribute::Shovel);
-		} else if (tile1 == Monomap::STONE) {
-			item.emplace(Item::STONE);
-			attribute.emplace(ItemAttribute::Pickaxe);
-		}
-
-		if (item && attribute && !player->hasTooldown()) {
-			if (auto *stack = inventory.getActive()) {
-				if (stack->has(*attribute) && !inventory.add({*item, 1})) {
-					player->setTooldown(1.f);
-					if (stack->reduceDurability())
-						inventory.erase(inventory.activeSlot);
-					else
-						// setTooldown doesn't call notifyOwner on the player's inventory, so we have to do it here.
-						player->inventory->notifyOwner();
-					return true;
-				}
-			}
-		}
 
 		return false;
 	}

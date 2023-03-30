@@ -15,10 +15,7 @@ namespace Game3 {
 
 		auto &player = *place.player;
 		auto &realm  = *place.realm;
-		auto &rng = realm.getGame().dynamicRNG;
-
 		const auto [prow, pcol] = place.position;
-
 
 		for (Index row = prow - RADIUS * 2; row <= prow + RADIUS * 2; ++row) {
 			for (Index column = pcol - RADIUS * 2; column <= pcol + RADIUS * 2; ++column) {

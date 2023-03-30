@@ -65,6 +65,7 @@ namespace Game3 {
 		{Item::MEAD,            { 80,  16, textureConsumables}},
 		{Item::HONEY,           { 64,  16, texturePotions}},
 		{Item::BOMB,            {256, 208, textureItems}},
+		{Item::ASH,             { 64,   0, texturePalisade}},
 	};
 
 	std::unordered_map<ItemID, Durability> Item::durabilities {
@@ -125,6 +126,7 @@ namespace Game3 {
 		{Item::MEAD,            std::make_shared<Item>        (Item::MEAD,            "Mead",             10, 16)},
 		{Item::HONEY,           std::make_shared<Item>        (Item::HONEY,           "Honey",             5, 64)},
 		{Item::BOMB,            std::make_shared<Bomb>        (Item::BOMB,            "Bomb",             32, 64)},
+		{Item::ASH,             std::make_shared<Item>        (Item::ASH,             "Ash",               1, 64)},
 	};
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage() {

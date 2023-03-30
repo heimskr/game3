@@ -34,6 +34,7 @@ namespace Game3 {
 			inline bool hasTooldown() const { return 0.f < tooldown; }
 			void showText(const Glib::ustring &text, const Glib::ustring &name);
 			Glib::ustring getName() override { return "Player"; }
+			void give(const ItemStack &, Slot start = -1);
 
 			friend class Entity;
 

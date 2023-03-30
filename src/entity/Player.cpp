@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "entity/ItemEntity.h"
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
@@ -107,6 +108,11 @@ namespace Game3 {
 			player->getRealm()->getGame().canvas.window.textTab->hide();
 			return true;
 		});
+	}
+
+	void Player::give(const ItemStack &stack, Slot start) {
+		if (auto leftover = inventory->add(stack, start))
+			getRealm()->spawn<ItemEntity>(getPosition(), *leftover);
 	}
 
 	void to_json(nlohmann::json &json, const Player &player) {

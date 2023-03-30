@@ -29,6 +29,7 @@ namespace Game3 {
 			constexpr static RealmType TAVERN     = 6;
 
 			static std::unordered_map<RealmType, Texture> textureMap;
+			static std::unordered_set<RealmType> allTypes;
 
 			RealmID id;
 			RealmType type;

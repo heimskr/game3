@@ -761,6 +761,7 @@ namespace Game3 {
 		debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
 		game->player->focus(*canvas, false);
 		game->initRecipes();
+		game->initInteractionSets();
 		canvas->game = game;
 		game->activeRealm->rebind();
 		game->activeRealm->reupload();

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <map>
 #include <memory>
 #include <random>
 #include <unordered_map>
@@ -8,6 +9,7 @@
 #include <gtkmm.h>
 #include <nlohmann/json.hpp>
 
+#include "Types.h"
 #include "entity/Player.h"
 #include "game/Crafting.h"
 #include "realm/Realm.h"
@@ -17,6 +19,7 @@ namespace Game3 {
 	class MainWindow;
 	class Menu;
 	class Player;
+	struct InteractionSet;
 
 	class Game: public std::enable_shared_from_this<Game> {
 		public:
@@ -33,6 +36,7 @@ namespace Game3 {
 			 *  For example, a Gatherer can use this to choose a resource node to harvest from, but worldgen shouldn't use this. */
 			std::default_random_engine dynamicRNG;
 			size_t cavesGenerated = 0;
+			std::map<RealmType, std::shared_ptr<InteractionSet>> interactionSets;
 
 			Game() = delete;
 
@@ -44,6 +48,7 @@ namespace Game3 {
 
 			void initEntities();
 			void initRecipes();
+			void initInteractionSets();
 			void tick();
 			RealmID newRealmID() const;
 			void setText(const Glib::ustring &text, const Glib::ustring &name = "", bool focus = true, bool ephemeral = false);
