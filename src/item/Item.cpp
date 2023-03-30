@@ -3,6 +3,7 @@
 #include "Texture.h"
 #include "Tiles.h"
 #include "entity/ItemEntity.h"
+#include "item/Bomb.h"
 #include "item/CaveEntrance.h"
 #include "item/Clay.h"
 #include "item/Furniture.h"
@@ -63,6 +64,7 @@ namespace Game3 {
 		{Item::CAVE_ENTRANCE,   { 48, 352, textureTileset}},
 		{Item::MEAD,            { 80,  16, textureConsumables}},
 		{Item::HONEY,           { 64,  16, texturePotions}},
+		{Item::BOMB,            {256, 208, textureItems}},
 	};
 
 	std::unordered_map<ItemID, Durability> Item::durabilities {
@@ -122,6 +124,7 @@ namespace Game3 {
 		{Item::CAVE_ENTRANCE,   std::make_shared<CaveEntrance>(Item::CAVE_ENTRANCE,   "Cave Entrance",    50,  1)},
 		{Item::MEAD,            std::make_shared<Item>        (Item::MEAD,            "Mead",             10, 16)},
 		{Item::HONEY,           std::make_shared<Item>        (Item::HONEY,           "Honey",             5, 64)},
+		{Item::BOMB,            std::make_shared<Bomb>        (Item::BOMB,            "Bomb",             32, 64)},
 	};
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage() {

@@ -143,6 +143,8 @@ namespace Game3 {
 		constexpr static TileID ROAD          = 517;
 		constexpr static TileID DIRT          = 518;
 		constexpr static TileID TILES         = 519;
+		constexpr static TileID SNOW          = 548;
+		constexpr static TileID ASH           = 549;
 		constexpr static TileID FOREST_FLOOR  = 552;
 		constexpr static TileID GRASS_ALT1    = 578;
 		constexpr static TileID GRASS_ALT2    = 579;
@@ -166,6 +168,12 @@ namespace Game3 {
 		constexpr static TileID TREE2         = 676;
 		constexpr static TileID TREE3         = 677;
 		constexpr static TileID TREE0         = 678;
+		constexpr static TileID TREE1_EMPTY   = 679;
+		constexpr static TileID TREE2_EMPTY   = 680;
+		constexpr static TileID TREE3_EMPTY   = 681;
+		constexpr static TileID TREE1_FULL    = 682;
+		constexpr static TileID TREE2_FULL    = 683;
+		constexpr static TileID TREE3_FULL    = 684;
 		constexpr static TileID KEEP_NW       = 704;
 		constexpr static TileID KEEP_NE       = 705;
 		constexpr static TileID LADDER        = 706;
@@ -179,6 +187,7 @@ namespace Game3 {
 		constexpr static TileID KEEP_SW       = 736;
 		constexpr static TileID KEEP_SE       = 737;
 		constexpr static TileID VOID          = 738;
+		constexpr static TileID CHARRED_STUMP = 742;
 
 		static std::unordered_set<TileID> landSet;
 		static std::unordered_set<TileID> solidSet;

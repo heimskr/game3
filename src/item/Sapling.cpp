@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "Position.h"
 #include "Tiles.h"
 #include "entity/Player.h"

@@ -44,6 +44,7 @@ namespace Game3 {
 		// Temporary recipes
 		registerPrimaryRecipe(std::vector<ItemStack> {{Item::WOOD,  1}}, ItemStack(Item::PLANK, 1));
 		registerPrimaryRecipe(std::vector<ItemStack> {{Item::PLANK, 2}}, ItemStack(Item::WOODEN_WALL, 1));
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::STONE, 1}}, ItemStack(Item::BOMB, 64));
 	}
 
 	void Game::tick() {
