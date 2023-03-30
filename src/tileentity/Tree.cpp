@@ -79,6 +79,8 @@ namespace Game3 {
 		static std::uniform_real_distribution one(0., 1.);
 		if (one(rng) < CHAR_CHANCE)
 			realm.setLayer3(getPosition(), Monomap::CHARRED_STUMP);
+		else
+			realm.spawn<ItemEntity>(getPosition(), ItemStack(Item::WOOD, 1));
 		realm.setLayer2(getPosition(), Monomap::ASH);
 		return true;
 	}

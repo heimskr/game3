@@ -479,6 +479,14 @@ namespace Game3 {
 		renderer2.reupload();
 	}
 
+	void Realm::damageGround(const Position &position) {
+		const Place place(position, shared_from_this(), nullptr);
+		auto &game = getGame();
+
+		if (auto iter = game.interactionSets.find(type); iter != game.interactionSets.end())
+			iter->second->damageGround(place);
+	}
+
 	void Realm::toJSON(nlohmann::json &json) const {
 		json["id"] = id;
 		json["type"] = type;

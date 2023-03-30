@@ -50,6 +50,15 @@ namespace Game3 {
 			move(final_direction = Direction::Up);
 		if (movingDown)
 			move(final_direction = Direction::Down);
+
+		if (continuousInteraction) {
+			Place place = getPlace();
+			if (!lastContinousInteraction || *lastContinousInteraction != place) {
+				interactOn();
+				lastContinousInteraction = std::move(place);
+			}
+		}
+
 		direction = final_direction;
 	}
 
@@ -113,6 +122,14 @@ namespace Game3 {
 	void Player::give(const ItemStack &stack, Slot start) {
 		if (auto leftover = inventory->add(stack, start))
 			getRealm()->spawn<ItemEntity>(getPosition(), *leftover);
+	}
+
+	Place Player::getPlace() {
+		return {getPosition(), getRealm(), std::dynamic_pointer_cast<Player>(shared_from_this())};
+	}
+
+	bool Player::isMoving() const {
+		return movingUp || movingRight || movingDown || movingLeft;
 	}
 
 	void to_json(nlohmann::json &json, const Player &player) {

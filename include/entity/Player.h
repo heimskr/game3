@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "entity/Entity.h"
 
 namespace Game3 {
@@ -15,7 +17,11 @@ namespace Game3 {
 			bool movingRight = false;
 			bool movingDown = false;
 			bool movingLeft = false;
+			/** When moving with shift held, the player will interact with each spot moved to. */
+			bool continuousInteraction = false;
 			bool ticked = false;
+
+			std::optional<Place> lastContinousInteraction;
 
 			static std::shared_ptr<Player> fromJSON(const nlohmann::json &);
 
@@ -35,6 +41,8 @@ namespace Game3 {
 			void showText(const Glib::ustring &text, const Glib::ustring &name);
 			Glib::ustring getName() override { return "Player"; }
 			void give(const ItemStack &, Slot start = -1);
+			Place getPlace();
+			bool isMoving() const;
 
 			friend class Entity;
 

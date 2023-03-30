@@ -8,13 +8,14 @@
 
 namespace Game3 {
 	bool StandardInteractions::interact(const Place &place) const {
+		// TODO: handle other tilemaps
+
 		const auto &position = place.position;
 		auto &player = *place.player;
 		auto &realm  = *place.realm;
 		auto &inventory = *player.inventory;
 
 		const Index index = realm.getIndex(position);
-		auto &tilemap1 = realm.tilemap1;
 		auto &tilemap2 = realm.tilemap2;
 		const TileID tile1 = place.getLayer1();
 		const TileID tile2 = place.getLayer2();
@@ -80,6 +81,19 @@ namespace Game3 {
 					return true;
 				}
 			}
+		}
+
+		return false;
+	}
+
+	bool StandardInteractions::damageGround(const Place &place) const {
+		// TODO: handle other tilemaps
+
+		const auto tile3 = place.getLayer3();
+		switch (tile3) {
+			case Monomap::CHARRED_STUMP:
+				place.realm->setLayer3(place.position, Monomap::EMPTY);
+				return true;
 		}
 
 		return false;

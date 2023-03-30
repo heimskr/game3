@@ -22,6 +22,7 @@ namespace Game3 {
 				const Position pos(row, column);
 				if (!realm.isValid(pos) || RADIUS < pos.distance(place.position))
 					continue;
+				realm.damageGround(pos);
 				if (auto tile = realm.tileEntityAt(pos); tile && tile->kill())
 					realm.remove(tile);
 			}

@@ -40,6 +40,10 @@ namespace Game3 {
 		realm->setLayer3(position, tile);
 	}
 
+	bool Place::operator==(const Place &other) const {
+		return this == &other || (position == other.position && realm == other.realm && player == other.player);
+	}
+
 	void to_json(nlohmann::json &json, const Position &position) {
 		json[0] = position.row;
 		json[1] = position.column;

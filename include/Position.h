@@ -53,6 +53,8 @@ namespace Game3 {
 		void setLayer1(TileID) const;
 		void setLayer2(TileID) const;
 		void setLayer3(TileID) const;
+
+		bool operator==(const Place &) const;
 	};
 
 	void to_json(nlohmann::json &, const Position &);
