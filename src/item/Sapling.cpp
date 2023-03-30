@@ -22,6 +22,7 @@ namespace Game3 {
 			case Monomap::GRASS_ALT2:
 			case Monomap::LIGHT_GRASS:
 			case Monomap::DIRT:
+			case Monomap::FOREST_FLOOR:
 				break;
 			default:
 				return false;

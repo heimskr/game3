@@ -52,9 +52,7 @@ namespace Game3 {
 					ItemCount saplings = 1;
 					while (rand() % 4 == 1)
 						++saplings;
-					auto leftover = inventory.add({Item::SAPLING, saplings});
-					if (leftover)
-						realm.spawn<ItemEntity>(player->position, *leftover);
+					player->give({Item::SAPLING, saplings});
 					inventory.notifyOwner();
 					return true;
 				}
