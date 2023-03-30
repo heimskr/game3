@@ -235,10 +235,13 @@ namespace Game3 {
 
 		const auto &tileset = *tileSets.at(realm->type);
 
-		if (!tileset.isWalkable((*realm->tilemap1)(new_position.column, new_position.row)))
+		if (!tileset.isWalkable((*realm->tilemap1)(new_position)))
 			return false;
 
-		if (tileset.isSolid((*realm->tilemap2)(new_position.column, new_position.row)))
+		if (tileset.isSolid((*realm->tilemap2)(new_position)))
+			return false;
+
+		if (tileset.isSolid((*realm->tilemap3)(new_position)))
 			return false;
 
 		if (auto tile_entity = realm->tileEntityAt(new_position))
