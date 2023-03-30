@@ -4,6 +4,7 @@
 #include "Tiles.h"
 #include "entity/ItemEntity.h"
 #include "item/CaveEntrance.h"
+#include "item/Clay.h"
 #include "item/Furniture.h"
 #include "item/Hammer.h"
 #include "item/Item.h"
@@ -107,7 +108,7 @@ namespace Game3 {
 		{Item::DIAMOND_SHOVEL,  std::make_shared<Tool>        (Item::DIAMOND_SHOVEL,  "Diamond Shovel",  700, 1.f, ItemAttribute::Shovel)},
 		{Item::WOODEN_WALL,     std::make_shared<Furniture>   (Item::WOODEN_WALL,     "Wooden Wall",       9, 64)},
 		{Item::PLANK,           std::make_shared<Item>        (Item::PLANK,           "Plank",             4, 64)},
-		{Item::CLAY,            std::make_shared<Item>        (Item::CLAY,            "Clay",              2, 64)},
+		{Item::CLAY,            std::make_shared<Landfill>    (Item::CLAY,            "Clay",              2, 64, clayRequirement)},
 		{Item::DIRT,            std::make_shared<Item>        (Item::DIRT,            "Dirt",              1, 64)},
 		{Item::BRICK,           std::make_shared<Item>        (Item::BRICK,           "Brick",             3, 64)},
 		{Item::POT,             std::make_shared<Item>        (Item::POT,             "Pot",              24, 64)},
