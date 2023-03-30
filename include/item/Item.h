@@ -85,13 +85,16 @@ namespace Game3 {
 			std::unordered_set<ItemAttribute> attributes;
 
 			Item() = delete;
-			Item(ItemID id_, const std::string &name_, MoneyCount base_price, ItemCount max_count = 64): id(id_), name(name_), basePrice(base_price), maxCount(max_count) {}
+			Item(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count = 64): id(id_), name(std::move(name_)), basePrice(base_price), maxCount(max_count) {}
 
 			Glib::RefPtr<Gdk::Pixbuf> getImage();
 			std::shared_ptr<Item> addAttribute(ItemAttribute);
 			inline bool operator==(const Item &other) const { return id == other.id; }
 
-			virtual bool use(Slot, ItemStack &, const std::shared_ptr<Player> &, const Position &) { return false; }
+			virtual bool use(Slot, ItemStack &, const Place &) { return false; }
+
+			/** Whether the item's use function (see Item::use) should be called when the user interacts with a floor tile and this item is selected in the inventory tab. */
+			virtual bool canUseOnWorld() const { return false; }
 
 		private:
 			std::unique_ptr<uint8_t[]> rawImage;
@@ -118,7 +121,14 @@ namespace Game3 {
 
 			inline operator std::string() const { return item->name + " x " + std::to_string(count); }
 
-			inline bool operator==(const ItemStack &other) const { return *item == *other.item && count == other.count; }
+			/** Returns true iff the other stack is mergeable with this one and has an equal count. */
+			inline bool operator==(const ItemStack &other) const { return canMerge(other) && count == other.count; }
+
+			/** Returns true iff the other stack is mergeable with this one and has a greater count. */
+			inline bool operator<(const ItemStack &other)  const { return canMerge(other) && count <  other.count; }
+
+			/** Returns true iff the other stack is mergeable with this one and has a greater or equal count. */
+			inline bool operator<=(const ItemStack &other) const { return canMerge(other) && count <= other.count; }
 
 			static ItemStack withDurability(ItemID, Durability durability);
 			static ItemStack withDurability(ItemID);

@@ -10,9 +10,10 @@
 #include "tileentity/Tree.h"
 
 namespace Game3 {
-	bool Sapling::use(Slot slot, ItemStack &stack, const std::shared_ptr<Player> &player, const Position &position) {
-		auto &realm = *player->getRealm();
-		const Index index = realm.getIndex(position);
+	bool Sapling::use(Slot slot, ItemStack &stack, const Place &place) {
+		auto &player = *place.player;
+		auto &realm  = *place.realm;
+		const auto index = realm.getIndex(place.position);
 
 		if (realm.type != Realm::OVERWORLD)
 			return false;
@@ -30,10 +31,10 @@ namespace Game3 {
 
 		auto &rng = realm.getGame().dynamicRNG;
 
-		if (realm.pathMap[index] && nullptr != realm.add(TileEntity::create<Tree>(rng, Monomap::TREE1 + rng() % 3, Monomap::TREE0, position, 0.f))) {
+		if (realm.pathMap[index] && nullptr != realm.add(TileEntity::create<Tree>(rng, Monomap::TREE1 + rng() % 3, Monomap::TREE0, place.position, 0.f))) {
 			if (--stack.count == 0)
-				player->inventory->erase(slot);
-			player->inventory->notifyOwner();
+				player.inventory->erase(slot);
+			player.inventory->notifyOwner();
 			realm.pathMap[index] = 0;
 			return true;
 		}

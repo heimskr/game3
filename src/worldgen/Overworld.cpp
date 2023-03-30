@@ -91,7 +91,7 @@ namespace Game3::WorldGen {
 				resource_starts.pop_back();
 			}
 		};
-		add_resources(0.5, Ore::Iron);
+		add_resources(1.0, Ore::Iron);
 		add_resources(0.5, Ore::Copper);
 		add_resources(0.5, Ore::Gold);
 		add_resources(0.5, Ore::Diamond);

@@ -99,10 +99,9 @@ namespace Game3 {
 
 		if (button == 1) {
 			if (auto *stack = player->inventory->getActive())
-				stack->item->use(player->inventory->activeSlot, *stack, player, {y, x});
-		} else if (button == 3 && player && realm.isValid({y, x})) {
-			if (!realm.rightClick({y, x}, pos_x, pos_y) && debugMode)
-				player->teleport({y, x});
+				stack->item->use(player->inventory->activeSlot, *stack, {{y, x}, activeRealm, player});
+		} else if (button == 3 && player && realm.isValid({y, x}) && !realm.rightClick({y, x}, pos_x, pos_y) && debugMode) {
+			player->teleport({y, x});
 		}
 	}
 

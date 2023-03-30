@@ -1,4 +1,5 @@
 #include "Position.h"
+#include "realm/Realm.h"
 
 namespace Game3 {
 	bool Position::adjacent4(const Position &other) const {
@@ -12,6 +13,31 @@ namespace Game3 {
 		if (other.row < row)
 			return false;
 		return column < other.column;
+	}
+
+
+	TileID Place::getLayer1() const {
+		return realm->getLayer1(position);
+	}
+
+	TileID Place::getLayer2() const {
+		return realm->getLayer2(position);
+	}
+
+	TileID Place::getLayer3() const {
+		return realm->getLayer3(position);
+	}
+
+	void Place::setLayer1(TileID tile) const {
+		realm->setLayer1(position, tile);
+	}
+
+	void Place::setLayer2(TileID tile) const {
+		realm->setLayer2(position, tile);
+	}
+
+	void Place::setLayer3(TileID tile) const {
+		realm->setLayer3(position, tile);
 	}
 
 	void to_json(nlohmann::json &json, const Position &position) {

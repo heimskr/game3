@@ -7,13 +7,14 @@
 #include "tileentity/Ghost.h"
 
 namespace Game3 {
-	bool Furniture::use(Slot slot, ItemStack &stack, const std::shared_ptr<Player> &player, const Position &position) {
-		auto &realm = *player->getRealm();
+	bool Furniture::use(Slot slot, ItemStack &stack, const Place &place) {
+		auto &realm = *place.realm;
+		const auto &position = place.position;
 
 		if (realm.pathMap[realm.getIndex(position)] && !realm.hasTileEntityAt(position) && nullptr != realm.add(TileEntity::create<Ghost>(position, stack.withCount(1)))) {
 			if (--stack.count == 0)
-				player->inventory->erase(slot);
-			player->inventory->notifyOwner();
+				place.player->inventory->erase(slot);
+			place.player->inventory->notifyOwner();
 			return true;
 		}
 

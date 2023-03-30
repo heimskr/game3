@@ -82,7 +82,7 @@ namespace Game3 {
 		Entity::teleport(position, new_realm);
 		auto &game = new_realm->getGame();
 		game.activeRealm = new_realm;
-		game.canvas.window.glContext()->make_current();
+		game.canvas.window.activateContext();
 		new_realm->reupload();
 		focus(game.canvas, false);
 	}

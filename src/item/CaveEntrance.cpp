@@ -14,9 +14,11 @@
 #include "worldgen/CaveGen.h"
 
 namespace Game3 {
-	bool CaveEntrance::use(Slot slot, ItemStack &stack, const std::shared_ptr<Player> &player, const Position &position) {
-		auto &realm = *player->getRealm();
-		auto &game = realm.getGame();
+	bool CaveEntrance::use(Slot slot, ItemStack &stack, const Place &place) {
+		auto &realm = *place.realm;
+		auto &game  = realm.getGame();
+		const auto &player   = place.player;
+		const auto &position = place.position;
 
 		const Position exit = position + Position(1, 0);
 

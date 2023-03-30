@@ -344,15 +344,15 @@ namespace Game3 {
 	}
 
 	TileID Realm::getLayer1(const Position &position) const {
-		return (*tilemap1)(position.row, position.column);
+		return (*tilemap1)(position);
 	}
 
 	TileID Realm::getLayer2(const Position &position) const {
-		return (*tilemap2)(position.row, position.column);
+		return (*tilemap2)(position);
 	}
 
 	TileID Realm::getLayer3(const Position &position) const {
-		return (*tilemap3)(position.row, position.column);
+		return (*tilemap3)(position);
 	}
 
 	bool Realm::interactGround(const PlayerPtr &player, const Position &position) {
@@ -363,6 +363,9 @@ namespace Game3 {
 		auto &inventory = *player->inventory;
 
 		if (auto *active = inventory.getActive()) {
+			if (active->item->canUseOnWorld() && active->item->use(inventory.activeSlot, *active, {position, shared_from_this(), player}))
+				return true;
+
 			if (active->has(ItemAttribute::Hammer)) {
 				auto &tileset = *tileSets.at(type);
 				const TileID tile2 = tilemap2->tiles.at(index);

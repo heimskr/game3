@@ -21,4 +21,10 @@ namespace Game3 {
 
 	enum class CraftingStationType {None, Furnace, Anvil};
 	enum class Ore {Coal, Copper, Iron, Gold, Diamond};
+
+	class Player;
+	using PlayerPtr = std::shared_ptr<Player>;
+
+	struct Place;
+	using PlacePtr = std::shared_ptr<Place>;
 }

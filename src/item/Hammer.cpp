@@ -10,10 +10,11 @@
 #include "tileentity/Building.h"
 
 namespace Game3 {
-	bool Hammer::use(Slot slot, ItemStack &stack, const std::shared_ptr<Player> &player, const Position &position) {
-		Realm &realm = *player->getRealm();
+	bool Hammer::use(Slot slot, ItemStack &stack, const Place &place) {
+		auto &realm  = *place.realm;
+		auto &player = *place.player;
 
-		if (auto building = std::dynamic_pointer_cast<Building>(realm.tileEntityAt(position))) {
+		if (auto building = std::dynamic_pointer_cast<Building>(realm.tileEntityAt(place.position))) {
 			if (building->tileID == Monomap::CAVE) {
 				Game &game = realm.getGame();
 				const RealmID realm_id = building->innerRealmID;
@@ -22,7 +23,7 @@ namespace Game3 {
 						game.realms.erase(realm_id);
 					realm.remove(building);
 					if (stack.reduceDurability())
-						player->inventory->erase(slot);
+						player.inventory->erase(slot);
 				} else
 					throw std::runtime_error("Cave entrance leads to realm " + std::to_string(realm_id) + ", which isn't a cave");
 			}
