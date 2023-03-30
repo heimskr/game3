@@ -10,6 +10,8 @@
 namespace Game3 {
 	class Landfill: public Item {
 		public:
+			constexpr static ItemCount DEFAULT_COUNT = 2;
+
 			struct Result {
 				ItemStack required;
 				TileID newTile;

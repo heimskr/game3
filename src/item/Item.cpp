@@ -95,7 +95,7 @@ namespace Game3 {
 		{Item::IRON_AXE,        std::make_shared<Tool>        (Item::IRON_AXE,        "Iron Axe",        150, 3.f, ItemAttribute::Axe)},
 		{Item::IRON_PICKAXE,    std::make_shared<Tool>        (Item::IRON_PICKAXE,    "Iron Pickaxe",    150, 3.f, ItemAttribute::Pickaxe)},
 		{Item::IRON_SHOVEL,     std::make_shared<Tool>        (Item::IRON_SHOVEL,     "Iron Shovel",     120, 3.f, ItemAttribute::Shovel)},
-		{Item::SAND,            std::make_shared<Landfill>    (Item::SAND,            "Sand",              1, 64, Monomap::SHALLOW_WATER, 10, Monomap::SAND)},
+		{Item::SAND,            std::make_shared<Landfill>    (Item::SAND,            "Sand",              1, 64, Monomap::SHALLOW_WATER, Landfill::DEFAULT_COUNT, Monomap::SAND)},
 		{Item::STONE,           std::make_shared<Item>        (Item::STONE,           "Stone",             1, 64)},
 		{Item::IRON_BAR,        std::make_shared<Item>        (Item::IRON_BAR,        "Iron Bar",         16, 64)},
 		{Item::SAPLING,         std::make_shared<Sapling>     (Item::SAPLING,         "Sapling",           5, 64)},
