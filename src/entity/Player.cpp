@@ -55,6 +55,7 @@ namespace Game3 {
 			Place place = getPlace();
 			if (!lastContinousInteraction || *lastContinousInteraction != place) {
 				interactOn();
+				getRealm()->interactGround(std::dynamic_pointer_cast<Player>(shared_from_this()), position);
 				lastContinousInteraction = std::move(place);
 			}
 		}
@@ -62,13 +63,13 @@ namespace Game3 {
 		direction = final_direction;
 	}
 
-	void Player::interactOn() {
+	bool Player::interactOn() {
 		auto realm = getRealm();
 		auto player = std::dynamic_pointer_cast<Player>(shared_from_this());
 		auto entity = realm->findEntity(position, player);
 		if (!entity)
-			return;
-		entity->onInteractOn(player);
+			return false;
+		return entity->onInteractOn(player);
 	}
 
 	void Player::interactNextTo() {

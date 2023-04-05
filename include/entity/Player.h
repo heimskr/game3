@@ -30,7 +30,7 @@ namespace Game3 {
 			bool isPlayer() const override { return true; }
 			void tick(Game &, float delta) override;
 			void remove() override {}
-			void interactOn();
+			bool interactOn();
 			void interactNextTo();
 			using Entity::teleport;
 			void teleport(const Position &, const std::shared_ptr<Realm> &) override;
