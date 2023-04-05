@@ -63,7 +63,10 @@ namespace Game3 {
 					static const std::vector<ItemStack> mushrooms {
 						{Item::SAFFRON_MILKCAP},
 						{Item::SAFFRON_MILKCAP},
+						{Item::SAFFRON_MILKCAP},
 						{Item::HONEY_FUNGUS},
+						{Item::HONEY_FUNGUS},
+						{Item::BRITTLEGILL},
 					};
 
 					realm.add(TileEntity::create<ItemSpawner>(Position(row, column), 0.00025f, mushrooms));
