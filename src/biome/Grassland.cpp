@@ -59,7 +59,6 @@ namespace Game3 {
 			if (auto tile = realm.tileEntityAt({row, column}); tile && tile->getID() == TileEntity::TREE && !std::dynamic_pointer_cast<Tree>(tile)->hasHive()) {
 				realm.remove(tile);
 				if (distribution(rng) < 3) {
-					// TODO: add mushroom spawner
 					static const std::vector<ItemStack> mushrooms {
 						{Item::SAFFRON_MILKCAP},
 						{Item::SAFFRON_MILKCAP},
