@@ -78,6 +78,9 @@ namespace Game3 {
 			constexpr static ItemID SAFFRON_MILKCAP = 44;
 			constexpr static ItemID HONEY_FUNGUS    = 45;
 			constexpr static ItemID BRITTLEGILL     = 46;
+			constexpr static ItemID INDIGO_MILKCAP  = 47;
+			constexpr static ItemID BLACK_TRUMPET   = 48;
+			constexpr static ItemID GREY_KNIGHT     = 49;
 
 			static std::unordered_map<ItemID, ItemTexture> itemTextures;
 			static std::map<ItemID, std::shared_ptr<Item>> items;

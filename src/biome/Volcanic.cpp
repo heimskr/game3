@@ -1,8 +1,9 @@
 #include "Tiles.h"
 #include "biome/Volcanic.h"
+#include "item/Item.h"
 #include "lib/noise.h"
 #include "realm/Realm.h"
-#include "tileentity/Tree.h"
+#include "tileentity/ItemSpawner.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 
@@ -34,7 +35,23 @@ namespace Game3 {
 		}
 	}
 
-	void Volcanic::postgen(Index row, Index column, std::default_random_engine &, const noise::module::Perlin &) {
-		(void) row; (void) column;
+	void Volcanic::postgen(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &perlin) {
+		Realm &realm = *getRealm();
+		constexpr double factor = 10;
+		static std::uniform_int_distribution distribution(0, 99);
+
+		if (-0.4 > perlin.GetValue(row / Biome::NOISE_ZOOM * factor, column / Biome::NOISE_ZOOM * factor, 0.)) {
+			if (realm.getLayer1(row, column) == Monomap::VOLCANIC_SAND) {
+				if (distribution(rng) < 2) {
+					static const std::vector<ItemStack> mushrooms {
+						{Item::INDIGO_MILKCAP},
+						{Item::BLACK_TRUMPET},
+						{Item::GREY_KNIGHT},
+					};
+
+					realm.add(TileEntity::create<ItemSpawner>(Position(row, column), 0.0002f, mushrooms));
+				}
+			}
+		}
 	}
 }

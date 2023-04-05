@@ -131,6 +131,9 @@ namespace Game3 {
 		{Item::SAFFRON_MILKCAP, std::make_shared<Mushroom>(Item::SAFFRON_MILKCAP, "Saffron Milkcap",    10, 1 )},
 		{Item::HONEY_FUNGUS,    std::make_shared<Mushroom>(Item::HONEY_FUNGUS,    "Honey Fungus",       15, 18)},
 		{Item::BRITTLEGILL,     std::make_shared<Mushroom>(Item::BRITTLEGILL,     "Golden Brittlegill", 20, 7 )},
+		{Item::INDIGO_MILKCAP,  std::make_shared<Mushroom>(Item::INDIGO_MILKCAP,  "Indigo Milkcap",     20, 11)},
+		{Item::BLACK_TRUMPET,   std::make_shared<Mushroom>(Item::BLACK_TRUMPET,   "Black Trumpet",      20, 29)},
+		{Item::GREY_KNIGHT,     std::make_shared<Mushroom>(Item::GREY_KNIGHT,     "Grey Knight",        20, 12)},
 	};
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage() {

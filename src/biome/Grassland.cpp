@@ -55,7 +55,7 @@ namespace Game3 {
 		constexpr double factor = 10;
 		static std::uniform_int_distribution distribution(0, 99);
 
-		if (-0.4 > perlin.GetValue(row / Biome::NOISE_ZOOM * factor, column / Biome::NOISE_ZOOM * factor, 0.))
+		if (-0.4 > perlin.GetValue(row / Biome::NOISE_ZOOM * factor, column / Biome::NOISE_ZOOM * factor, 0.)) {
 			if (auto tile = realm.tileEntityAt({row, column}); tile && tile->getID() == TileEntity::TREE && !std::dynamic_pointer_cast<Tree>(tile)->hasHive()) {
 				realm.remove(tile);
 				if (distribution(rng) < 3) {
@@ -71,5 +71,6 @@ namespace Game3 {
 					realm.add(TileEntity::create<ItemSpawner>(Position(row, column), 0.00025f, mushrooms));
 				}
 			}
+		}
 	}
 }
