@@ -61,7 +61,9 @@ namespace Game3 {
 				if (distribution(rng) < 3) {
 					// TODO: add mushroom spawner
 					static const std::vector<ItemStack> mushrooms {
-						{Item::SAFFRON_MILKCAP}
+						{Item::SAFFRON_MILKCAP},
+						{Item::SAFFRON_MILKCAP},
+						{Item::HONEY_FUNGUS},
 					};
 
 					realm.add(TileEntity::create<ItemSpawner>(Position(row, column), 0.00025f, mushrooms));
