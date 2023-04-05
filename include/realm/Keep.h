@@ -26,10 +26,9 @@ namespace Game3 {
 		protected:
 			Keep() = default;
 
-			Keep(RealmID, const Position &parent_origin, Index parent_width, Index parent_height, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_,
-			     const std::shared_ptr<Tilemap> &tilemap3_, int seed_);
+			Keep(RealmID, const Position &parent_origin, Index parent_width, Index parent_height, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr, int seed_);
 
-			Keep(RealmID, const Position &parent_origin, Index parent_width, Index parent_height, const std::shared_ptr<Tilemap> &tilemap1_, int seed_);
+			Keep(RealmID, const Position &parent_origin, Index parent_width, Index parent_height, TilemapPtr tilemap1_, BiomeMapPtr, int seed_);
 
 			void absorbJSON(const nlohmann::json &) override;
 			void toJSON(nlohmann::json &) const override;

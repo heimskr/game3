@@ -27,7 +27,7 @@ namespace Game3 {
 		}
 	}
 
-	void ElementBufferedRenderer::init(const std::shared_ptr<Tilemap> &tilemap_) {
+	void ElementBufferedRenderer::init(const TilemapPtr &tilemap_) {
 		if (initialized)
 			reset();
 		tilemap = tilemap_;
@@ -159,7 +159,7 @@ namespace Game3 {
 
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned), indices.get(), GL_STATIC_DRAW);
 	}
-	
+
 	void ElementBufferedRenderer::generateVertexArrayObject() {
 		glGenVertexArrays(1, &vaoHandle);
 

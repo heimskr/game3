@@ -10,6 +10,7 @@
 
 #include "Tilemap.h"
 #include "Types.h"
+#include "game/BiomeMap.h"
 #include "tileentity/TileEntity.h"
 #include "ui/ElementBufferedRenderer.h"
 
@@ -33,7 +34,8 @@ namespace Game3 {
 
 			RealmID id;
 			RealmType type;
-			std::shared_ptr<Tilemap> tilemap1, tilemap2, tilemap3;
+			TilemapPtr tilemap1, tilemap2, tilemap3;
+			BiomeMapPtr biomeMap;
 			ElementBufferedRenderer renderer1, renderer2, renderer3;
 			std::unordered_map<Index, std::shared_ptr<TileEntity>> tileEntities;
 			std::unordered_set<std::shared_ptr<Entity>> entities;
@@ -44,7 +46,7 @@ namespace Game3 {
 			/** Whether the realm's rendering should be affected by the day-night cycle. */
 			bool outdoors = true;
 			size_t ghostCount = 0;
-			int seed = 0;
+			uint32_t seed = 0;
 
 			Realm(const Realm &) = delete;
 			Realm(Realm &&) = default;
@@ -194,8 +196,8 @@ namespace Game3 {
 
 		protected:
 			Realm() = default;
-			Realm(RealmID, RealmType, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_, const std::shared_ptr<Tilemap> &tilemap3_, int seed_);
-			Realm(RealmID, RealmType, const std::shared_ptr<Tilemap> &tilemap1_, int seed_);
+			Realm(RealmID, RealmType, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr, int seed_);
+			Realm(RealmID, RealmType, TilemapPtr tilemap1_, BiomeMapPtr, int seed_);
 
 			virtual void absorbJSON(const nlohmann::json &);
 			virtual void toJSON(nlohmann::json &) const;
@@ -209,6 +211,7 @@ namespace Game3 {
 			void setLayerHelper(Index row, Index col);
 			void setLayerHelper(Index);
 			void resetPathMap();
+			static BiomeType getBiome(uint32_t seed);
 	};
 
 	void to_json(nlohmann::json &, const Realm &);

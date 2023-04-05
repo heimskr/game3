@@ -16,12 +16,12 @@ namespace Game3 {
 			int backbufferHeight = -1;
 
 			Eigen::Vector2f center {0.f, 0.f};
-			std::shared_ptr<Tilemap> tilemap;
+			TilemapPtr tilemap;
 
 			TilemapRenderer() = default;
 			virtual ~TilemapRenderer() = default;
 
-			virtual void init(const std::shared_ptr<Tilemap> &) = 0;
+			virtual void init(const TilemapPtr &) = 0;
 			virtual void render(float divisor) = 0;
 			virtual void onBackbufferResized(int width, int height);
 

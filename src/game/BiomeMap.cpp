@@ -1,27 +1,11 @@
 #include <zstd.h>
 
-#include "Tilemap.h"
-#include "Tiles.h"
+#include "game/BiomeMap.h"
 
 namespace Game3 {
-	std::vector<Index> Tilemap::getLand(RealmType type, size_t right_pad, size_t bottom_pad) const {
-		std::vector<Index> land_tiles;
-		land_tiles.reserve(width * height);
-		const auto &tileset = *tileSets.at(type);
-		for (size_t row = 0; row < height - bottom_pad; ++row)
-			for (size_t column = 0; column < width - right_pad; ++column)
-				if (tileset.isLand(tiles[row * width + column]))
-					land_tiles.push_back(row * width + column);
-		return land_tiles;
-	}
-
-	void to_json(nlohmann::json &json, const Tilemap &tilemap) {
+	void to_json(nlohmann::json &json, const BiomeMap &tilemap) {
 		json["height"] = tilemap.height;
-		json["setHeight"] = tilemap.setHeight;
-		json["setWidth"] = tilemap.setWidth;
-		json["texture"] = tilemap.texture;
-		json["tileSize"] = tilemap.tileSize;
-		json["width"] = tilemap.width;
+		json["width"]  = tilemap.width;
 
 		// TODO: fix endianness issues
 		const auto tiles_size = tilemap.tiles.size() * sizeof(tilemap.tiles[0]);
@@ -34,13 +18,9 @@ namespace Game3 {
 		json["tiles"] = std::move(buffer);
 	}
 
-	void from_json(const nlohmann::json &json, Tilemap &tilemap) {
+	void from_json(const nlohmann::json &json, BiomeMap &tilemap) {
 		tilemap.height = json.at("height");
-		tilemap.setHeight = json.at("setHeight");
-		tilemap.setWidth = json.at("setWidth");
-		tilemap.texture = json.at("texture");
-		tilemap.tileSize = json.at("tileSize");
-		tilemap.width = json.at("width");
+		tilemap.width  = json.at("width");
 
 		// TODO: fix endianness issues
 		tilemap.tiles.clear();

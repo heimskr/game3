@@ -24,7 +24,7 @@
 #include "util/Util.h"
 #include "worldgen/Overworld.h"
 
-// #define USE_CBOR
+#define USE_CBOR
 
 namespace Game3 {
 	static std::chrono::milliseconds arrowTime {100};
@@ -284,7 +284,8 @@ namespace Game3 {
 		texture.init();
 		auto tilemap = std::make_shared<Tilemap>(width, height, 16, texture);
 		tilemap->init();
-		auto realm = Realm::create(1, Realm::OVERWORLD, tilemap, seed);
+		auto biomemap = std::make_shared<BiomeMap>(width, height);
+		auto realm = Realm::create(1, Realm::OVERWORLD, tilemap, biomemap, seed);
 		realm->outdoors = true;
 		realm->game = game.get();
 		std::default_random_engine rng;

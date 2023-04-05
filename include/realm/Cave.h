@@ -25,10 +25,9 @@ namespace Game3 {
 		protected:
 			Cave() = default;
 
-			Cave(RealmID, RealmID parent_realm, const std::shared_ptr<Tilemap> &tilemap1_, const std::shared_ptr<Tilemap> &tilemap2_,
-			     const std::shared_ptr<Tilemap> &tilemap3_, int seed_);
+			Cave(RealmID, RealmID parent_realm, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr, int seed_);
 
-			Cave(RealmID, RealmID parent_realm, const std::shared_ptr<Tilemap> &tilemap1_, int seed_);
+			Cave(RealmID, RealmID parent_realm, TilemapPtr tilemap1_, BiomeMapPtr, int seed_);
 
 			void absorbJSON(const nlohmann::json &) override;
 			void toJSON(nlohmann::json &) const override;

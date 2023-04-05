@@ -132,7 +132,8 @@ namespace Game3::WorldGen {
 		const Index keep_entrance = keep_width * (keep_height - 1) - keep_width / 2 - 1;
 		const Position keep_exit = keep_position + Position(2, 0);
 		auto keep_tilemap = std::make_shared<Tilemap>(keep_width, keep_height, 16, Realm::textureMap.at(Realm::KEEP));
-		auto keep_realm = Realm::create<Keep>(keep_realm_id, town_origin, width, height, keep_tilemap, -seed);
+		auto keep_biomemap = std::make_shared<BiomeMap>(keep_width, keep_height);
+		auto keep_realm = Realm::create<Keep>(keep_realm_id, town_origin, width, height, keep_tilemap, keep_biomemap, -seed);
 		keep_realm->outdoors = false;
 		keep_realm->setGame(game);
 		WorldGen::generateKeep(keep_realm, rng, realm->id, keep_exit);
@@ -174,7 +175,8 @@ namespace Game3::WorldGen {
 				const Position building_position(building_index / map_width, building_index % map_width);
 				auto building = TileEntity::create<Building>(tile_id, building_position, realm_id, entrance == -1? realm_width * (realm_height - 1) - 3 : entrance);
 				auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, Realm::textureMap.at(realm_type));
-				auto new_realm = Realm::create(realm_id, realm_type, new_tilemap, -seed);
+				auto new_biomemap = std::make_shared<BiomeMap>(realm_width, realm_height);
+				auto new_realm = Realm::create(realm_id, realm_type, new_tilemap, new_biomemap, -seed);
 				new_realm->outdoors = false;
 				new_realm->setGame(game);
 				gen_fn(new_realm, rng, realm, building_position + Position(1, 0));

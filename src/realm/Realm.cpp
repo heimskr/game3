@@ -5,6 +5,7 @@
 #include "MarchingSquares.h"
 #include "Tiles.h"
 #include "entity/Entity.h"
+#include "game/Biome.h"
 #include "game/Game.h"
 #include "game/InteractionSet.h"
 #include "realm/Keep.h"
@@ -37,8 +38,8 @@ namespace Game3 {
 		Realm::OVERWORLD, Realm::HOUSE, Realm::KEEP, Realm::BLACKSMITH, Realm::CAVE, Realm::TAVERN,
 	};
 
-	Realm::Realm(RealmID id_, RealmType type_, const TilemapPtr &tilemap1_, const TilemapPtr &tilemap2_, const TilemapPtr &tilemap3_, int seed_):
-	id(id_), type(type_), tilemap1(tilemap1_), tilemap2(tilemap2_), tilemap3(tilemap3_), seed(seed_) {
+	Realm::Realm(RealmID id_, RealmType type_, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr biome_map, int seed_):
+	id(id_), type(type_), tilemap1(std::move(tilemap1_)), tilemap2(std::move(tilemap2_)), tilemap3(std::move(tilemap3_)), biomeMap(std::move(biome_map)), seed(seed_) {
 		tilemap1->init();
 		tilemap2->init();
 		tilemap3->init();
@@ -48,7 +49,8 @@ namespace Game3 {
 		resetPathMap();
 	}
 
-	Realm::Realm(RealmID id_, RealmType type_, const TilemapPtr &tilemap1_, int seed_): id(id_), type(type_), tilemap1(tilemap1_), seed(seed_) {
+	Realm::Realm(RealmID id_, RealmType type_, TilemapPtr tilemap1_, BiomeMapPtr biome_map, int seed_):
+	id(id_), type(type_), tilemap1(std::move(tilemap1_)), biomeMap(std::move(biome_map)), seed(seed_) {
 		tilemap1->init();
 		renderer1.init(tilemap1);
 		tilemap2 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->texture);
@@ -86,12 +88,14 @@ namespace Game3 {
 		id = json.at("id");
 		type = json.at("type");
 		seed = json.at("seed");
+		// biome = json.at("biome");
 		tilemap1 = std::make_shared<Tilemap>(json.at("tilemap1"));
 		tilemap2 = std::make_shared<Tilemap>(json.at("tilemap2"));
 		tilemap3 = std::make_shared<Tilemap>(json.at("tilemap3"));
 		tilemap1->texture.init();
 		tilemap2->texture.init();
 		tilemap3->texture.init();
+		biomeMap = std::make_shared<BiomeMap>(json.at("biomeMap"));
 		outdoors = json.at("outdoors");
 		for (const auto &[index, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>()) {
 			auto tile_entity = TileEntity::fromJSON(tile_entity_json);
@@ -494,6 +498,7 @@ namespace Game3 {
 		json["tilemap1"] = *tilemap1;
 		json["tilemap2"] = *tilemap2;
 		json["tilemap3"] = *tilemap3;
+		json["biomeMap"] = *biomeMap;
 		json["outdoors"] = outdoors;
 		json["tileEntities"] = std::unordered_map<std::string, nlohmann::json>();
 		for (const auto &[index, tile_entity]: tileEntities)
@@ -579,6 +584,12 @@ namespace Game3 {
 		}
 
 		return false;
+	}
+
+	BiomeType Realm::getBiome(uint32_t seed) {
+		std::default_random_engine rng;
+		rng.seed(seed * 79);
+		return std::uniform_int_distribution(0, 100)(rng) % Biome::COUNT + 1;
 	}
 
 	void to_json(nlohmann::json &json, const Realm &realm) {

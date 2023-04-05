@@ -3,6 +3,7 @@
 #include "Position.h"
 #include "Tiles.h"
 #include "entity/Player.h"
+#include "game/Biome.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "item/CaveEntrance.h"
@@ -63,8 +64,8 @@ namespace Game3 {
 			const int cave_seed = -2 * realm.seed - 5 + game.cavesGenerated;
 
 			auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, Realm::textureMap.at(Realm::CAVE));
-			// TODO: make a cave realm that handles updateNeighbors to convert exposed void into stone so that cave walls can be mineable
-			auto new_realm = Realm::create<Cave>(*realm_id, Realm::CAVE, new_tilemap, cave_seed);
+			auto new_biomemap = std::make_shared<BiomeMap>(realm_width, realm_height, Biome::CAVE_ID);
+			auto new_realm = Realm::create<Cave>(*realm_id, Realm::CAVE, new_tilemap, new_biomemap, cave_seed);
 			new_realm->outdoors = false;
 			new_realm->setGame(game);
 			Position entrance_position;
