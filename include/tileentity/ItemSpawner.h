@@ -5,6 +5,8 @@
 namespace Game3 {
 	class ItemSpawner: public TileEntity {
 		public:
+			// TODO: different chance per spawnable
+			// TODO: spawn time chosen between upper bound and lower bound
 			float chancePerTenth;
 			std::vector<ItemStack> spawnables;
 
@@ -26,8 +28,7 @@ namespace Game3 {
 
 		protected:
 			ItemSpawner() = default;
-			ItemSpawner(TileID id_, const Position &position_):
-				TileEntity(id_, TileEntity::ITEM_SPAWNER, position_, false) {}
+			ItemSpawner(Position position_, float chance_per_tenth, std::vector<ItemStack> spawnables_);
 
 			friend class TileEntity;
 	};

@@ -1,7 +1,9 @@
 #include "Tiles.h"
 #include "biome/Grassland.h"
+#include "item/Item.h"
 #include "lib/noise.h"
 #include "realm/Realm.h"
+#include "tileentity/ItemSpawner.h"
 #include "tileentity/Tree.h"
 #include "util/Timer.h"
 #include "util/Util.h"
@@ -51,13 +53,18 @@ namespace Game3 {
 	void Grassland::postgen(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &perlin) {
 		Realm &realm = *getRealm();
 		constexpr double factor = 10;
-		static std::uniform_int_distribution distribution(1, 100);
+		static std::uniform_int_distribution distribution(0, 99);
 
 		if (-0.4 > perlin.GetValue(row / Biome::NOISE_ZOOM * factor, column / Biome::NOISE_ZOOM * factor, 0.))
 			if (auto tile = realm.tileEntityAt({row, column}); tile && tile->getID() == TileEntity::TREE && !std::dynamic_pointer_cast<Tree>(tile)->hasHive()) {
 				realm.remove(tile);
-				if (distribution(rng) < 5) {
+				if (distribution(rng) < 3) {
 					// TODO: add mushroom spawner
+					static const std::vector<ItemStack> mushrooms {
+						{Item::SAFFRON_MILKCAP}
+					};
+
+					realm.add(TileEntity::create<ItemSpawner>(Position(row, column), 0.00025f, mushrooms));
 				}
 			}
 	}

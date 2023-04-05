@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "Tiles.h"
 #include "entity/Player.h"
 #include "game/Game.h"

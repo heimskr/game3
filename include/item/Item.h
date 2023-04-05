@@ -75,6 +75,7 @@ namespace Game3 {
 			constexpr static ItemID HONEY           = 41;
 			constexpr static ItemID BOMB            = 42;
 			constexpr static ItemID ASH             = 43;
+			constexpr static ItemID SAFFRON_MILKCAP = 44;
 
 			static std::unordered_map<ItemID, ItemTexture> itemTextures;
 			static std::map<ItemID, std::shared_ptr<Item>> items;
@@ -87,9 +88,17 @@ namespace Game3 {
 			std::unordered_set<ItemAttribute> attributes;
 
 			Item() = delete;
+			Item(const Item &) = delete;
+			Item(Item &&) = default;
+
+			Item & operator=(const Item &) = delete;
+			Item & operator=(Item &&) = default;
+
 			Item(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count = 64): id(id_), name(std::move(name_)), basePrice(base_price), maxCount(max_count) {}
 
-			Glib::RefPtr<Gdk::Pixbuf> getImage();
+			virtual Glib::RefPtr<Gdk::Pixbuf> getImage();
+			virtual Glib::RefPtr<Gdk::Pixbuf> makeImage();
+			virtual void getOffsets(Texture *&, float &x_offset, float &y_offset);
 			std::shared_ptr<Item> addAttribute(ItemAttribute);
 			inline bool operator==(const Item &other) const { return id == other.id; }
 
@@ -98,8 +107,9 @@ namespace Game3 {
 			/** Whether the item's use function (see Item::use) should be called when the user interacts with a floor tile and this item is selected in the inventory tab. */
 			virtual bool canUseOnWorld() const { return false; }
 
-		private:
+		protected:
 			std::unique_ptr<uint8_t[]> rawImage;
+			Glib::RefPtr<Gdk::Pixbuf> cachedImage;
 	};
 
 	class ItemStack {

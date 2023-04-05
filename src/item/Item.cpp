@@ -10,6 +10,7 @@
 #include "item/Hammer.h"
 #include "item/Item.h"
 #include "item/Landfill.h"
+#include "item/Mushroom.h"
 #include "item/Sapling.h"
 #include "item/Tool.h"
 #include "realm/Realm.h"
@@ -127,9 +128,16 @@ namespace Game3 {
 		{Item::HONEY,           std::make_shared<Item>        (Item::HONEY,           "Honey",             5, 64)},
 		{Item::BOMB,            std::make_shared<Bomb>        (Item::BOMB,            "Bomb",             32, 64)},
 		{Item::ASH,             std::make_shared<Item>        (Item::ASH,             "Ash",               1, 64)},
+		{Item::SAFFRON_MILKCAP, std::make_shared<Mushroom>(Item::SAFFRON_MILKCAP, "Saffron Milkcap", 10, 1)},
 	};
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage() {
+		if (!cachedImage)
+			cachedImage = makeImage();
+		return cachedImage;
+	}
+
+	Glib::RefPtr<Gdk::Pixbuf> Item::makeImage() {
 		auto &item_texture = Item::itemTextures.at(id);
 		auto &texture = *item_texture.texture;
 		texture.init();
@@ -151,6 +159,13 @@ namespace Game3 {
 		constexpr int doublings = 3;
 		return Gdk::Pixbuf::create_from_data(rawImage.get(), Gdk::Colorspace::RGB, *texture.alpha, 8, width, height, row_size)
 		       ->scale_simple(width << doublings, height << doublings, Gdk::InterpType::NEAREST);
+	}
+
+	void Item::getOffsets(Texture *&texture, float &x_offset, float &y_offset) {
+		auto &item_texture = Item::itemTextures.at(id);
+		texture  = item_texture.texture;
+		x_offset = item_texture.x / 2.f;
+		y_offset = item_texture.y / 2.f;
 	}
 
 	std::shared_ptr<Item> Item::addAttribute(ItemAttribute attribute) {

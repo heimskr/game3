@@ -38,10 +38,7 @@ namespace Game3 {
 
 	void ItemEntity::init() {
 		Entity::init();
-		const auto &item_texture = Item::itemTextures.at(stack.item->id);
-		texture = item_texture.texture;
-		xOffset = item_texture.x / 2.f;
-		yOffset = item_texture.y / 2.f;
+		stack.item->getOffsets(texture, xOffset, yOffset);
 	}
 
 	void ItemEntity::render(SpriteRenderer &sprite_renderer) const {

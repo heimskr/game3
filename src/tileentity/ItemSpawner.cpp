@@ -12,6 +12,11 @@
 #include "util/Util.h"
 
 namespace Game3 {
+	ItemSpawner::ItemSpawner(Position position_, float chance_per_tenth, std::vector<ItemStack> spawnables_):
+		TileEntity(Monomap::VOID, TileEntity::ITEM_SPAWNER, std::move(position_), false),
+		chancePerTenth(chance_per_tenth),
+		spawnables(std::move(spawnables_)) {}
+
 	void ItemSpawner::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
 		json["chance"] = chancePerTenth;
