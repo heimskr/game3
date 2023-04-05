@@ -25,7 +25,7 @@ namespace Game3 {
 
 			virtual void init(const TilemapPtr &, const TileSet &) = 0;
 			virtual void render(float divisor) = 0;
-			virtual void onBackbufferResized(int width, int height);
+			virtual bool onBackbufferResized(int width, int height);
 
 		protected:
 			static void check(int handle, bool is_link = false);

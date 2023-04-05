@@ -4,13 +4,14 @@
 #include "ui/TilemapRenderer.h"
 
 namespace Game3 {
-	void TilemapRenderer::onBackbufferResized(int width, int height) {
+	bool TilemapRenderer::onBackbufferResized(int width, int height) {
 		if (width == backbufferWidth && height == backbufferHeight)
-			return;
+			return false;
 		backbufferWidth = width;
 		backbufferHeight = height;
+		return true;
 	}
-	
+
 	void TilemapRenderer::check(int handle, bool is_link) {
 		int success;
 		char info[1024];

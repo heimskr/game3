@@ -5,14 +5,12 @@
 #include "Shader.h"
 
 namespace Game3 {
-	class Canvas;
 
 	class RectangleRenderer {
 		public:
-			Canvas &canvas;
 			Shader shader;
 
-			RectangleRenderer(Canvas &);
+			RectangleRenderer();
 			~RectangleRenderer();
 
 			void update(int backbuffer_width, int backbuffer_height);

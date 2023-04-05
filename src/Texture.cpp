@@ -33,7 +33,7 @@ namespace Game3 {
 
 	void Texture::bind() {
 		init();
-		glBindTexture(GL_TEXTURE_2D, *id); CHECKGL
+		glBindTexture(GL_TEXTURE_2D, *id); //CHECKGL
 	}
 
 

@@ -9,6 +9,7 @@
 #include "resources.h"
 #include "Tiles.h"
 #include "ui/ElementBufferedRenderer.h"
+#include "util/Util.h"
 
 // Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Renderers/ElementBufferedRenderer.cs
 
@@ -23,6 +24,8 @@ namespace Game3 {
 			glDeleteBuffers(1, &eboHandle);
 			glDeleteBuffers(1, &vboHandle);
 			glDeleteProgram(shaderHandle);
+			glDeleteTextures(1, &lfbTexture);
+			glDeleteSamplers(1, &sampler);
 			tilemap.reset();
 			initialized = false;
 		}
@@ -36,6 +39,8 @@ namespace Game3 {
 		generateVertexBufferObject();
 		generateElementBufferObject();
 		generateVertexArrayObject();
+		generateLightingFrameBuffer();
+		generateSampler();
 		const auto bright_shorts = tileset.getBright();
 		brightTiles.assign(bright_shorts.begin(), bright_shorts.end());
 		brightTiles.resize(8, -1);
@@ -46,6 +51,35 @@ namespace Game3 {
 		if (!initialized)
 			return;
 		tilemap->texture.bind();
+
+
+		CHECKGL
+
+
+		std::cout << lfbHandle << " ~ " << lfbTexture << std::endl;
+		GLint gtk_buffer = 0;
+		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &gtk_buffer); CHECKGL
+		glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle); CHECKGL
+		// GLenum bufs[] {GL_NONE};
+		// glDrawBuffers(1, bufs);
+		glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); CHECKGL
+		glClearColor(0.0f, 1.0f, 0.0f, 1.0f); CHECKGL
+		// glDisable(GL_DEPTH_TEST); CHECKGL
+		// glEnable(GL_DEPTH_TEST); CHECKGL
+		// glColor4f(1.f, 0.f, 0.f, 1.f); CHECKGL
+		// glRecti(100, 100, 200, 200); CHECKGL
+
+		rectangle.drawOnScreen({1.f, 0.f, 0.f, 1.f}, 10.f, 10.f, 20.f, 10.f); CHECKGL
+
+
+		glBindFramebuffer(GL_FRAMEBUFFER, gtk_buffer); CHECKGL
+		// glDrawBuffer(GL_BACK); CHECKGL
+
+		glActiveTexture(GL_TEXTURE1); CHECKGL
+		glBindTexture(GL_TEXTURE_2D, lfbTexture); CHECKGL
+
 		glBindVertexArray(vaoHandle);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboHandle);
 		glm::mat4 projection(1.f);
@@ -53,6 +87,13 @@ namespace Game3 {
 		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1}) *
 		             glm::translate(projection, {center.x() - tilemap->width / 2.f, center.y() - tilemap->height / 2.f, 0});
 		glUseProgram(shaderHandle);
+
+
+
+
+
+		glUniform1i(glGetUniformLocation(shaderHandle, "texture0"), 0);
+		glUniform1i(glGetUniformLocation(shaderHandle, "texture1"), 1);
 		glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniform1f(glGetUniformLocation(shaderHandle,  "divisor"), divisor);
 		glUniform1iv(glGetUniformLocation(shaderHandle, "bright_tiles"), brightTiles.size(), brightTiles.data());
@@ -66,6 +107,14 @@ namespace Game3 {
 		glDeleteBuffers(1, &vboHandle);
 		generateVertexBufferObject();
 		generateVertexArrayObject();
+	}
+
+	bool ElementBufferedRenderer::onBackbufferResized(int width, int height) {
+		if (TilemapRenderer::onBackbufferResized(width, height)) {
+			generateLightingTexture();
+			return true;
+		}
+		return false;
 	}
 
 	void ElementBufferedRenderer::createShader() {
@@ -152,7 +201,7 @@ namespace Game3 {
 		auto indices = std::make_unique<unsigned[]>(index_count);
 
 		unsigned i = 0, j = 0;
-		for (int x = 0; x < tilemap->width; ++x)
+		for (int x = 0; x < tilemap->width; ++x) {
 			for (int y = 0; y < tilemap->height; ++y) {
 				indices[i + 0] = j;
 				indices[i + 1] = j + 1;
@@ -163,6 +212,7 @@ namespace Game3 {
 				i += 6;
 				j += 4;
 			}
+		}
 
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned), indices.get(), GL_STATIC_DRAW);
 	}
@@ -178,5 +228,29 @@ namespace Game3 {
 
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (GLvoid *) (sizeof(float) * 2));
+	}
+
+	void ElementBufferedRenderer::generateLightingFrameBuffer() {
+		glGenFramebuffers(1, &lfbHandle);
+		generateLightingTexture();
+	}
+
+	void ElementBufferedRenderer::generateLightingTexture() {
+		if (lfbTexture != 0)
+			glDeleteTextures(1, &lfbTexture);
+
+		glGenTextures(1, &lfbTexture);
+		glBindTexture(GL_TEXTURE_2D, lfbTexture);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, backbufferWidth, backbufferHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	}
+
+	void ElementBufferedRenderer::generateSampler() {
+		if (sampler != 0)
+			glDeleteSamplers(1, &sampler);
+		glGenSamplers(1, &sampler);
 	}
 }

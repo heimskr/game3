@@ -9,7 +9,7 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	RectangleRenderer::RectangleRenderer(Canvas &canvas_): canvas(canvas_), shader("RectangleRenderer") {
+	RectangleRenderer::RectangleRenderer(): shader("RectangleRenderer") {
 		shader.init(rectangle_vert, rectangle_frag);
 		initRenderData();
 	}
@@ -66,6 +66,8 @@ namespace Game3 {
 			1.f, 1.f, 1.f, 1.f,
 			1.f, 0.f, 1.f, 0.f,
 		};
+
+		CHECKGL
 
 		glGenVertexArrays(1, &quadVAO); CHECKGL
 		glGenBuffers(1, &vbo); CHECKGL

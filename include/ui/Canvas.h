@@ -25,7 +25,7 @@ namespace Game3 {
 			Eigen::Vector2f center {0.f, 0.f};
 			float scale = DEFAULT_SCALE;
 			SpriteRenderer spriteRenderer {*this};
-			RectangleRenderer rectangleRenderer {*this};
+			RectangleRenderer rectangleRenderer;
 			float magic = 8.f;
 			int autofocusCounter = 0;
 			Gdk::Rectangle realmBounds;

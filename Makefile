@@ -11,7 +11,7 @@ else
 LDFLAGS := -lGL
 endif
 
-DEPS         := eigen3 glm glfw3 libzstd gtk4 gtkmm-4.0 nlohmann_json
+DEPS         := eigen3 glm glfw3 libzstd gtk4 gtkmm-4.0 nlohmann_json glu
 OUTPUT       := game3
 COMPILER     ?= g++
 CPPFLAGS     := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude -Istb -Ilibnoise/src
