@@ -19,6 +19,8 @@ namespace Game3 {
 	using Phase        =  uint8_t;
 	using Durability   =  int32_t;
 	using BiomeType    = uint32_t;
+	/** Number of quarter-hearts. */
+	using HitPoints    = uint32_t;
 
 	enum class CraftingStationType {None, Furnace, Anvil};
 	enum class Ore {Coal, Copper, Iron, Gold, Diamond};

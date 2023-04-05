@@ -11,6 +11,7 @@ namespace Game3 {
 			constexpr static float WORK_START_HOUR = 8.f;
 			constexpr static float WORK_END_HOUR = 18.f;
 			constexpr static float RETRY_TIME = 30.f;
+			constexpr static HitPoints MAX_HEALTH = 40;
 
 			Phase phase = 0;
 			RealmID overworldRealm;
@@ -34,6 +35,7 @@ namespace Game3 {
 			Worker(EntityID, EntityType);
 			Worker(EntityID, EntityType, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_);
 
+			HitPoints maxHealth() const override { return MAX_HEALTH; }
 			void interact(const Position &);
 			bool stillStuck(float delta);
 			void goToKeep(Phase new_phase);

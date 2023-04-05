@@ -67,12 +67,14 @@ namespace Game3 {
 			Eigen::Vector2f offset {0.f, 0.f};
 			std::list<Direction> path;
 			MoneyCount money = 0;
+			HitPoints health = 0;
 
 			~Entity() override = default;
 
 			template <typename T = Entity, typename... Args>
 			static std::shared_ptr<T> create(EntityID id, Args && ...args) {
 				auto out = std::shared_ptr<T>(new T(id, std::forward<Args>(args)...));
+				out->health = out->maxHealth();
 				out->init();
 				return out;
 			}
@@ -82,6 +84,9 @@ namespace Game3 {
 			virtual void absorbJSON(const nlohmann::json &);
 			virtual void toJSON(nlohmann::json &) const;
 			virtual bool isPlayer() const { return false; }
+			/** Returns the maximum number of hitpoints this entity can have. If 0, the entity is invincible. */
+			virtual HitPoints maxHealth() const { return 0; }
+			bool isInvincible() const { return maxHealth() == 0; }
 			virtual void render(SpriteRenderer &) const;
 			virtual void tick(Game &, float delta);
 			/** Removes the entity from existence. */

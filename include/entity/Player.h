@@ -7,6 +7,8 @@
 namespace Game3 {
 	class Player: public Entity {
 		public:
+			constexpr static HitPoints MAX_HEALTH = 64;
+
 			MoneyCount money;
 			float tooldown = 0.f;
 
@@ -25,6 +27,7 @@ namespace Game3 {
 
 			static std::shared_ptr<Player> fromJSON(const nlohmann::json &);
 
+			HitPoints maxHealth() const override { return MAX_HEALTH; }
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(const nlohmann::json &) override;
 			bool isPlayer() const override { return true; }

@@ -61,11 +61,12 @@ namespace Game3 {
 	}
 
 	void Entity::toJSON(nlohmann::json &json) const {
-		json["id"] = id();
-		json["type"] = type;
-		json["position"] = position;
-		json["realmID"] = realmID;
+		json["id"]        = id();
+		json["type"]      = type;
+		json["position"]  = position;
+		json["realmID"]   = realmID;
 		json["direction"] = direction;
+		json["health"]    = health;
 		if (inventory)
 			json["inventory"] = *inventory;
 		if (!path.empty())
@@ -76,10 +77,11 @@ namespace Game3 {
 
 	void Entity::absorbJSON(const nlohmann::json &json) {
 		id(json.at("id"));
-		type = json.at("type");
-		position = json.at("position");
-		realmID = json.at("realmID");
+		type      = json.at("type");
+		position  = json.at("position");
+		realmID   = json.at("realmID");
 		direction = json.at("direction");
+		health    = json.at("health");
 		if (json.contains("inventory"))
 			inventory = std::make_shared<Inventory>(Inventory::fromJSON(json.at("inventory"), shared_from_this()));
 		if (json.contains("path"))
