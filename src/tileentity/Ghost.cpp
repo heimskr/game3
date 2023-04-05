@@ -7,6 +7,7 @@
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "realm/Realm.h"
+#include "tileentity/CraftingStation.h"
 #include "tileentity/Ghost.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
@@ -14,11 +15,17 @@
 #include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
+	static void spawnCauldron(const Place &place) {
+		place.realm->add(TileEntity::create<CraftingStation>(Monomap::CAULDRON_RED_FULL, place.position, CraftingStationType::Cauldron));
+		place.realm->setLayer2(place.position, Monomap::CAULDRON_RED_FULL);
+	}
+
 	GhostDetails GhostDetails::WOODEN_WALL {GhostType::WoodenWall, true,  32,  6, 0};
 	GhostDetails GhostDetails::PLANT_POT1  {GhostType::Normal,     false, 32, 12, 4};
 	GhostDetails GhostDetails::PLANT_POT2  {GhostType::Normal,     false, 32, 12, 5};
 	GhostDetails GhostDetails::PLANT_POT3  {GhostType::Normal,     false, 32, 12, 6};
 	GhostDetails GhostDetails::TOWER       {GhostType::Tower,      true,  32,  6, 7};
+	GhostDetails GhostDetails::CAULDRON    {spawnCauldron, Monomap::CAULDRON_RED_FULL};
 
 	GhostDetails & GhostDetails::get(const ItemStack &stack) {
 		switch (stack.item->id) {
@@ -27,6 +34,7 @@ namespace Game3 {
 			case Item::PLANT_POT2:  return PLANT_POT2;
 			case Item::PLANT_POT3:  return PLANT_POT3;
 			case Item::TOWER:       return TOWER;
+			case Item::CAULDRON:    return CAULDRON;
 			default: throw std::runtime_error("Couldn't get GhostDetails for " + stack.item->name);
 		}
 	}
@@ -72,7 +80,9 @@ namespace Game3 {
 
 		TileID tile_id = Monomap::MISSING;
 
-		if (details.useMarchingSquares)
+		if (details.customFn)
+			tile_id = details.customTileID;
+		else if (details.useMarchingSquares)
 			tile_id = marched;
 		else
 			tile_id = details.rowOffset * column_count + details.columnOffset;
@@ -130,16 +140,20 @@ namespace Game3 {
 
 	void Ghost::confirm() {
 		auto realm = getRealm();
-		auto &tilemap = *realm->tilemap2;
-		if (tilemap(position) != tileSets.at(realm->type)->getEmpty())
+		auto &tilemap2 = *realm->tilemap2;
+		if (tilemap2(position) != tileSets.at(realm->type)->getEmpty())
 			throw OverlapError("Can't confirm ghost at " + std::string(position));
 
-		TileID tile_id = Monomap::MISSING;
-		if (details.useMarchingSquares)
-			tile_id = marched;
-		else
-			tile_id = details.rowOffset * (tilemap.setWidth / tilemap.tileSize) + details.columnOffset;
+		if (details.customFn) {
+			details.customFn({position, realm, nullptr});
+		} else {
+			TileID tile_id = Monomap::MISSING;
+			if (details.useMarchingSquares)
+				tile_id = marched;
+			else
+				tile_id = details.rowOffset * (tilemap2.setWidth / tilemap2.tileSize) + details.columnOffset;
 
-		realm->setLayer2(position, tile_id);
+			realm->setLayer2(position, tile_id);
+		}
 	}
 }

@@ -1,28 +1,44 @@
 #pragma once
 
+#include <functional>
+
 #include "Tiles.h"
 #include "item/Item.h"
 #include "tileentity/TileEntity.h"
 
 namespace Game3 {
-	enum class GhostType {Invalid, Normal, WoodenWall, Tower};
+	enum class GhostType {Invalid, Normal, WoodenWall, Tower, Custom};
 
 	struct GhostDetails {
+		/** Note: the player field of the Place will be null! */
+		using CustomFn = std::function<void(const Place &)>;
+
 		GhostType type = GhostType::Invalid;
 		bool useMarchingSquares = false;
 		Index columnsPerRow = 16;
 		Index rowOffset     = 0;
 		Index columnOffset  = 0;
+		CustomFn customFn;
+		TileID customTileID = 0;
 
 		GhostDetails() = default;
 		GhostDetails(GhostType type_, bool use_marching_squares, Index columns_per_row, Index row_offset, Index column_offset):
-			type(type_), useMarchingSquares(use_marching_squares), columnsPerRow(columns_per_row), rowOffset(row_offset), columnOffset(column_offset) {}
+			type(type_),
+			useMarchingSquares(use_marching_squares),
+			columnsPerRow(columns_per_row),
+			rowOffset(row_offset),
+			columnOffset(column_offset) {}
+
+		GhostDetails(CustomFn custom_fn, TileID custom_tile_id):
+			customFn(std::move(custom_fn)),
+			customTileID(custom_tile_id) {}
 
 		static GhostDetails WOODEN_WALL;
 		static GhostDetails TOWER;
 		static GhostDetails PLANT_POT1;
 		static GhostDetails PLANT_POT2;
 		static GhostDetails PLANT_POT3;
+		static GhostDetails CAULDRON;
 
 		static GhostDetails & get(const ItemStack &);
 	};

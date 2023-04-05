@@ -67,6 +67,7 @@ namespace Game3 {
 		{Item::HONEY,           { 64,  16, texturePotions}},
 		{Item::BOMB,            {256, 208, textureItems}},
 		{Item::ASH,             { 64,   0, texturePalisade}},
+		{Item::CAULDRON,        {144, 208, textureTileset}},
 	};
 
 	std::unordered_map<ItemID, Durability> Item::durabilities {
@@ -128,6 +129,7 @@ namespace Game3 {
 		{Item::HONEY,           std::make_shared<Item>        (Item::HONEY,           "Honey",             5, 64)},
 		{Item::BOMB,            std::make_shared<Bomb>        (Item::BOMB,            "Bomb",             32, 64)},
 		{Item::ASH,             std::make_shared<Item>        (Item::ASH,             "Ash",               1, 64)},
+		{Item::CAULDRON,        std::make_shared<Furniture>   (Item::CAULDRON,        "Cauldron",        175,  1)},
 		{Item::SAFFRON_MILKCAP, std::make_shared<Mushroom>(Item::SAFFRON_MILKCAP, "Saffron Milkcap",    10, 1 )},
 		{Item::HONEY_FUNGUS,    std::make_shared<Mushroom>(Item::HONEY_FUNGUS,    "Honey Fungus",       15, 18)},
 		{Item::BRITTLEGILL,     std::make_shared<Mushroom>(Item::BRITTLEGILL,     "Golden Brittlegill", 20, 7 )},

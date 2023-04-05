@@ -41,6 +41,7 @@ namespace Game3 {
 		registerPrimaryRecipe(std::vector<ItemStack> {{Item::POT, 1}, {Item::SAPLING, 1}}, ItemStack(Item::PLANT_POT3, 1));
 		registerPrimaryRecipe(std::vector<ItemStack> {{Item::STONE, 8}}, ItemStack(Item::TOWER, 1));
 		registerPrimaryRecipe(std::vector<ItemStack> {{Item::STONE, 10}, {Item::PLANK, 10}}, ItemStack(Item::CAVE_ENTRANCE, 1));
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 10}}, ItemStack(Item::CAULDRON, 1));
 
 		// Temporary recipes
 		registerPrimaryRecipe(std::vector<ItemStack> {{Item::WOOD,  1}}, ItemStack(Item::PLANK, 1));

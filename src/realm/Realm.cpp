@@ -231,7 +231,7 @@ namespace Game3 {
 	}
 
 	TileEntityPtr Realm::tileEntityAt(const Position &position) const {
-		const auto iter = tileEntities.find(position.row * tilemap1->width + position.column);
+		const auto iter = tileEntities.find(getIndex(position));
 		if (iter == tileEntities.end())
 			return {};
 		return iter->second;
@@ -474,13 +474,13 @@ namespace Game3 {
 		for (auto &[index, tile_entity]: tileEntities) {
 			if (tile_entity->getID() != TileEntity::GHOST)
 				continue;
-			auto ghost = std::dynamic_pointer_cast<Ghost>(tile_entity);
-			ghost->confirm();
-			ghosts.push_back(ghost);
+			ghosts.push_back(std::dynamic_pointer_cast<Ghost>(tile_entity));
 		}
 
-		for (const auto &ghost: ghosts)
+		for (const auto &ghost: ghosts) {
 			remove(ghost);
+			ghost->confirm();
+		}
 
 		game->activateContext();
 		renderer2.reupload();
