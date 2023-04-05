@@ -3,7 +3,7 @@
 #include "Position.h"
 #include "Tiles.h"
 #include "entity/Player.h"
-#include "game/Biome.h"
+#include "biome/Biome.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "item/CaveEntrance.h"

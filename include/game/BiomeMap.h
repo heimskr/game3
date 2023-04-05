@@ -27,6 +27,10 @@ namespace Game3 {
 			tiles.resize(width * height, fill);
 		}
 
+		inline void fill(BiomeType value) {
+			tiles.assign(tiles.size(), value);
+		}
+
 		inline decltype(tiles)::value_type & operator()(int x, int y) {
 			return tiles[x + y * width];
 		}

@@ -1,4 +1,6 @@
 #include "Tiles.h"
+#include "biome/Biome.h"
+#include "biome/Grassland.h"
 #include "lib/noise.h"
 #include "realm/Realm.h"
 #include "tileentity/OreDeposit.h"
@@ -10,14 +12,21 @@
 #include "worldgen/Town.h"
 
 namespace Game3::WorldGen {
-	void generateOverworld(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, int noise_seed, double noise_zoom, double noise_threshold) {
+	void generateOverworld(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, int noise_seed) {
 		const auto width  = realm->getWidth();
 		const auto height = realm->getHeight();
 
+		auto &biome_map = realm->biomeMap;
+
+		// TODO: choose biomes via noise
+		biome_map->fill(Biome::GRASSLAND_ID);
+
+		auto saved_noise = std::make_shared<double[]>(width * height);
+
+		auto biomes = Biome::getMap(*realm, noise_seed, saved_noise);
+
 		noise::module::Perlin perlin;
-		noise::module::Perlin forest_perlin;
 		perlin.SetSeed(noise_seed);
-		forest_perlin.SetSeed(-noise_seed * 3);
 
 		auto &tilemap1 = realm->tilemap1;
 		auto &tilemap2 = realm->tilemap2;
@@ -27,45 +36,14 @@ namespace Game3::WorldGen {
 		tilemap2->tiles.assign(tilemap2->tiles.size(), 0);
 		tilemap3->tiles.assign(tilemap3->tiles.size(), 0);
 
-		static const std::vector<TileID> grasses {
-			Monomap::GRASS_ALT1, Monomap::GRASS_ALT2,
-			Monomap::GRASS, Monomap::GRASS, Monomap::GRASS, Monomap::GRASS, Monomap::GRASS, Monomap::GRASS, Monomap::GRASS
+		auto get_biome = [&](Index row, Index column) -> Biome & {
+			return *biomes.at((*biome_map)(column, row));
 		};
 
-		static const std::unordered_set<TileID> grass_set {
-			Monomap::GRASS_ALT1, Monomap::GRASS_ALT2, Monomap::GRASS,
-		};
-
-		auto saved_noise = std::make_unique<double[]>(width * height);
-
-		Timer noise_timer("Noise");
-		for (int row = 0; row < height; ++row)
-			for (int column = 0; column < width; ++column) {
-				double noise = perlin.GetValue(row / noise_zoom, column / noise_zoom, 0.666);
-				saved_noise[row * width + column] = noise;
-				if (noise < noise_threshold) {
-					realm->setLayer1(row, column, Monomap::DEEPER_WATER);
-				} else if (noise < noise_threshold + 0.1) {
-					realm->setLayer1(row, column, Monomap::DEEP_WATER);
-				} else if (noise < noise_threshold + 0.2) {
-					realm->setLayer1(row, column, Monomap::WATER);
-				} else if (noise < noise_threshold + 0.3) {
-					realm->setLayer1(row, column, Monomap::SHALLOW_WATER);
-				} else if (noise < noise_threshold + 0.4) {
-					realm->setLayer1(row, column, Monomap::SAND);
-				} else if (noise < noise_threshold + 0.5) {
-					realm->setLayer1(row, column, Monomap::LIGHT_GRASS);
-				} else if (0.8 < noise) {
-					realm->setLayer1(row, column, Monomap::STONE);
-				} else {
-					realm->setLayer1(row, column, choose(grasses, rng));
-					const double forest_noise = forest_perlin.GetValue(row / noise_zoom, column / noise_zoom, 0.5);
-					if (0.5 < forest_noise) {
-						realm->add(TileEntity::create<Tree>(rng, Monomap::TREE1 + rand() % 3, Monomap::TREE0, Position(row, column), Tree::MATURITY));
-						realm->setLayer1(row, column, Monomap::FOREST_FLOOR);
-					}
-				}
-			}
+		Timer noise_timer("BiomeGeneration");
+		for (Index row = 0; row < height; ++row)
+			for (Index column = 0; column < width; ++column)
+				get_biome(row, column).generate(row, column, rng, perlin);
 		noise_timer.stop();
 
 		constexpr static int m = 26, n = 34, pad = 2;
@@ -85,7 +63,7 @@ namespace Game3::WorldGen {
 		auto add_resources = [&](double threshold, Ore ore) {
 			for (size_t i = 0, max = resource_starts.size() / 1000; i < max; ++i) {
 				const Index index = resource_starts.back();
-				if (noise_threshold + threshold <= saved_noise[index])
+				if (Grassland::THRESHOLD + threshold <= saved_noise[index])
 					realm->add(TileEntity::create<OreDeposit>(ore, realm->getPosition(index)));
 				resource_starts.pop_back();
 			}
@@ -121,17 +99,11 @@ namespace Game3::WorldGen {
 		if (!candidates.empty())
 			WorldGen::generateTown(realm, rng, choose(candidates, rng) + pad * (tilemap1->width + 1), n, m, pad, noise_seed);
 
-		Timer antiforest_timer("AntiForest");
-		for (int row = 0; row < height; ++row) {
-			for (int column = 0; column < width; ++column) {
-				constexpr double factor = 10;
-				const double noise = perlin.GetValue(row / noise_zoom * factor, column / noise_zoom * factor, 0.);
-				if (noise < -0.4)
-					if (auto tile = realm->tileEntityAt({row, column}); tile && tile->getID() == TileEntity::TREE && !std::dynamic_pointer_cast<Tree>(tile)->hasHive())
-						realm->remove(tile);
-			}
-		}
-		antiforest_timer.stop();
+		Timer postgen_timer("Postgen");
+		for (Index row = 0; row < height; ++row)
+			for (Index column = 0; column < width; ++column)
+				get_biome(row, column).postgen(row, column, rng, perlin);
+		postgen_timer.stop();
 
 		Timer::summary();
 		Timer::clear();

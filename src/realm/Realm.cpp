@@ -5,7 +5,7 @@
 #include "MarchingSquares.h"
 #include "Tiles.h"
 #include "entity/Entity.h"
-#include "game/Biome.h"
+#include "biome/Biome.h"
 #include "game/Game.h"
 #include "game/InteractionSet.h"
 #include "realm/Keep.h"

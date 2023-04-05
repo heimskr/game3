@@ -290,7 +290,7 @@ namespace Game3 {
 		realm->game = game.get();
 		std::default_random_engine rng;
 		rng.seed(seed);
-		WorldGen::generateOverworld(realm, rng, seed, 100., -0.15);
+		WorldGen::generateOverworld(realm, rng, seed);
 		game->realms.emplace(realm->id, realm);
 		game->activeRealm = realm;
 		realm->add(game->player = Entity::create<Player>(Entity::GANGBLANC_ID));
