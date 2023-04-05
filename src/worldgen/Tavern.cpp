@@ -3,6 +3,7 @@
 #include "game/Game.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
+#include "tileentity/ItemSpawner.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 #include "worldgen/Carpet.h"
@@ -48,8 +49,12 @@ namespace Game3::WorldGen {
 			// Table interior + chairs above/below tables
 			for (Index col = table_padding_x + 2; col < width - table_padding_x - 2; ++col) {
 				set(row, col, Monomap::TABLE_WE);
-				if (rng() % 3 == 0)
+				if (rng() % 3 == 0) {
 					realm->spawn<ItemEntity>({row, col}, ItemStack(Item::MEAD));
+					static const std::vector<ItemStack> spawnables {{Item::MEAD}};
+					realm->add(TileEntity::create<ItemSpawner>(Position(row, col), 0.0001f, spawnables));
+				}
+
 				if (2 < table_spacing)
 					set(row - 1, col, Monomap::CHAIR_N);
 				if (3 < table_spacing)
