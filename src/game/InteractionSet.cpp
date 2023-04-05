@@ -47,7 +47,7 @@ namespace Game3 {
 					}
 
 					default:
-						return false;
+						break;
 				}
 			}
 		}
