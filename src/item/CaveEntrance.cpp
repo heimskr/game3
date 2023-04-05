@@ -64,7 +64,7 @@ namespace Game3 {
 			const int cave_seed = -2 * realm.seed - 5 + game.cavesGenerated;
 
 			auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, Realm::textureMap.at(Realm::CAVE));
-			auto new_biomemap = std::make_shared<BiomeMap>(realm_width, realm_height, Biome::CAVE_ID);
+			auto new_biomemap = std::make_shared<BiomeMap>(realm_width, realm_height, Biome::CAVE);
 			auto new_realm = Realm::create<Cave>(*realm_id, Realm::CAVE, new_tilemap, new_biomemap, cave_seed);
 			new_realm->outdoors = false;
 			new_realm->setGame(game);
