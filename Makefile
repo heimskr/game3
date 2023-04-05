@@ -64,9 +64,13 @@ count:
 countbf:
 	cloc --by-file $(CLOC_OPTIONS)
 
-DEPFILE := .dep
+DEPFILE  := .dep
+DEPTOKEN := "\# MAKEDEPENDS"
 
 depend:
-	$(COMPILER) $(CPPFLAGS) -MM $(SOURCES) > $(DEPFILE)
+	@ echo $(DEPTOKEN) > $(DEPFILE)
+	makedepend -f $(DEPFILE) -s $(DEPTOKEN) -Y -- $(COMPILER) $(CPPFLAGS) -- $(SOURCES) 2>/dev/null
+	@ rm $(DEPFILE).bak
 
 sinclude $(DEPFILE)
+
