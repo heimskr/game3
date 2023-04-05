@@ -120,8 +120,10 @@ namespace Game3 {
 			reset(game);
 	}
 
-	void InventoryTab::update(const std::shared_ptr<Game> &) {
-
+	void InventoryTab::update(const std::shared_ptr<Game> &game) {
+		if (!game)
+			return;
+		// TODO: implement update
 	}
 
 	void InventoryTab::reset(const std::shared_ptr<Game> &game) {

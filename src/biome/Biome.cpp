@@ -1,14 +1,15 @@
 #include "biome/Biome.h"
 #include "biome/Grassland.h"
+#include "biome/Volcanic.h"
 
 namespace Game3 {
 	std::map<BiomeType, std::shared_ptr<const Biome>> Biome::map {
-		{Biome::VOID_ID,      std::make_shared<Biome>(VOID_ID)},
-		{Biome::GRASSLAND_ID, std::make_shared<Grassland>()},
-		{Biome::VOLCANIC_ID,  std::make_shared<Biome>(VOLCANIC_ID)},
-		{Biome::SNOWY_ID,     std::make_shared<Biome>(SNOWY_ID)},
-		{Biome::DESERT_ID,    std::make_shared<Biome>(DESERT_ID)},
-		{Biome::CAVE_ID,      std::make_shared<Biome>(CAVE_ID)},
+		{Biome::VOID,      std::make_shared<Biome>(VOID)},
+		{Biome::GRASSLAND, std::make_shared<Grassland>()},
+		{Biome::VOLCANIC,  std::make_shared<Volcanic>()},
+		{Biome::SNOWY,     std::make_shared<Biome>(SNOWY)},
+		{Biome::DESERT,    std::make_shared<Biome>(DESERT)},
+		{Biome::CAVE,      std::make_shared<Biome>(CAVE)},
 	};
 
 	void Biome::init(Realm &realm_, int, const std::shared_ptr<double[]> &saved_noise) {

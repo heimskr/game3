@@ -146,6 +146,9 @@ namespace Game3 {
 		constexpr static TileID SNOW          = 548;
 		constexpr static TileID ASH           = 549;
 		constexpr static TileID FOREST_FLOOR  = 552;
+		constexpr static TileID VOLCANIC_SAND = 553;
+		constexpr static TileID VOLCANIC_ROCK = 554;
+		constexpr static TileID LAVA          = 555;
 		constexpr static TileID GRASS_ALT1    = 578;
 		constexpr static TileID GRASS_ALT2    = 579;
 		constexpr static TileID OIL           = 580;
@@ -189,11 +192,12 @@ namespace Game3 {
 		constexpr static TileID VOID          = 738;
 		constexpr static TileID CHARRED_STUMP = 742;
 
-		static std::unordered_set<TileID> landSet;
-		static std::unordered_set<TileID> solidSet;
-		static std::unordered_set<TileID> woodenWalls;
-		static std::unordered_set<TileID> dirtSet;
-		static std::unordered_set<TileID> towerSet;
+		static const std::unordered_set<TileID> landSet;
+		static const std::unordered_set<TileID> solidSet;
+		static const std::unordered_set<TileID> woodenWalls;
+		static const std::unordered_set<TileID> dirtSet;
+		static const std::unordered_set<TileID> towerSet;
+		static const std::unordered_set<TileID> oreSpawnSet;
 
 		constexpr static std::array<TileID, 3> BEDS   {BED1,   BED2,   BED3};
 		constexpr static std::array<TileID, 3> PLANTS {PLANT1, PLANT2, PLANT3};

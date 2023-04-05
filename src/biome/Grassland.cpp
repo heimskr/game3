@@ -21,10 +21,6 @@ namespace Game3 {
 			Monomap::GRASS, Monomap::GRASS, Monomap::GRASS, Monomap::GRASS, Monomap::GRASS, Monomap::GRASS, Monomap::GRASS
 		};
 
-		static const std::unordered_set<TileID> grass_set {
-			Monomap::GRASS_ALT1, Monomap::GRASS_ALT2, Monomap::GRASS,
-		};
-
 		const double noise = perlin.GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.666);
 		savedNoise[row * realm.getWidth() + column] = noise;
 
