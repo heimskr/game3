@@ -1,9 +1,8 @@
 #include <iostream>
 
-#include <noise/noise.h>
-
 #include "Tiles.h"
 #include "game/Game.h"
+#include "lib/noise.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
 #include "util/Timer.h"

@@ -1,6 +1,5 @@
-#include <noise/noise.h>
-
 #include "Tiles.h"
+#include "lib/noise.h"
 #include "realm/Realm.h"
 #include "tileentity/OreDeposit.h"
 #include "tileentity/Teleporter.h"
