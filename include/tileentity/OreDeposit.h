@@ -21,7 +21,7 @@ namespace Game3 {
 			OreDeposit & operator=(const OreDeposit &) = delete;
 			OreDeposit & operator=(OreDeposit &&) = default;
 
-			TileEntityID getID() const override { return TileEntity::OREDEPOSIT; }
+			TileEntityID getID() const override { return TileEntity::ORE_DEPOSIT; }
 
 			void init() override {}
 			void toJSON(nlohmann::json &) const override;
@@ -45,7 +45,7 @@ namespace Game3 {
 				TileEntity(), type(ore), tooldownMultiplier(getTooldownMultiplier(ore)), maxUses(getMaxUses(ore)), cooldown(getCooldown(ore)) {}
 
 			OreDeposit(Ore ore, const Position &position_, float time_remaining = 0.f, unsigned uses_ = 0):
-				TileEntity(getID(ore), TileEntity::OREDEPOSIT, position_, true), type(ore), timeRemaining(time_remaining), uses(uses_), tooldownMultiplier(getTooldownMultiplier(ore)),
+				TileEntity(getID(ore), TileEntity::ORE_DEPOSIT, position_, true), type(ore), timeRemaining(time_remaining), uses(uses_), tooldownMultiplier(getTooldownMultiplier(ore)),
 				maxUses(getMaxUses(ore)), cooldown(getCooldown(ore)) {}
 
 			friend class TileEntity;

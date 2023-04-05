@@ -48,11 +48,17 @@ namespace Game3 {
 		}
 	}
 
-	void Grassland::postgen(Index row, Index column, std::default_random_engine &, const noise::module::Perlin &perlin) {
+	void Grassland::postgen(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &perlin) {
 		Realm &realm = *getRealm();
 		constexpr double factor = 10;
+		static std::uniform_int_distribution distribution(1, 100);
+
 		if (-0.4 > perlin.GetValue(row / Biome::NOISE_ZOOM * factor, column / Biome::NOISE_ZOOM * factor, 0.))
-			if (auto tile = realm.tileEntityAt({row, column}); tile && tile->getID() == TileEntity::TREE && !std::dynamic_pointer_cast<Tree>(tile)->hasHive())
+			if (auto tile = realm.tileEntityAt({row, column}); tile && tile->getID() == TileEntity::TREE && !std::dynamic_pointer_cast<Tree>(tile)->hasHive()) {
 				realm.remove(tile);
+				if (distribution(rng) < 5) {
+					// TODO: add mushroom spawner
+				}
+			}
 	}
 }

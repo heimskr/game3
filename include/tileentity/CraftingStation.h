@@ -14,7 +14,7 @@ namespace Game3 {
 			CraftingStation & operator=(const CraftingStation &) = delete;
 			CraftingStation & operator=(CraftingStation &&) = default;
 
-			TileEntityID getID() const override { return TileEntity::CRAFTINGSTATION; }
+			TileEntityID getID() const override { return TileEntity::CRAFTING_STATION; }
 
 			void init() override {}
 			void toJSON(nlohmann::json &) const override;

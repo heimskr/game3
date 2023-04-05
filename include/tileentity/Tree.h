@@ -27,7 +27,7 @@ namespace Game3 {
 			void init(std::default_random_engine &) override;
 			using TileEntity::init;
 			void tick(Game &, float) override;
-			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
+			bool onInteractNextTo(const PlayerPtr &) override;
 			bool hasHive() const;
 			bool kill() override;
 			void render(SpriteRenderer &) override;

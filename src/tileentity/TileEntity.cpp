@@ -4,6 +4,7 @@
 #include "tileentity/Chest.h"
 #include "tileentity/CraftingStation.h"
 #include "tileentity/Ghost.h"
+#include "tileentity/ItemSpawner.h"
 #include "tileentity/OreDeposit.h"
 #include "tileentity/Sign.h"
 #include "tileentity/Stockpile.h"
@@ -36,14 +37,17 @@ namespace Game3 {
 			case TileEntity::TREE:
 				out = TileEntity::create<Tree>();
 				break;
-			case TileEntity::CRAFTINGSTATION:
+			case TileEntity::CRAFTING_STATION:
 				out = TileEntity::create<CraftingStation>();
 				break;
-			case TileEntity::OREDEPOSIT:
+			case TileEntity::ORE_DEPOSIT:
 				out = TileEntity::create<OreDeposit>(json.at("type"));
 				break;
 			case TileEntity::GHOST:
 				out = TileEntity::create<Ghost>();
+				break;
+			case TileEntity::ITEM_SPAWNER:
+				out = TileEntity::create<ItemSpawner>();
 				break;
 			default:
 				throw std::invalid_argument("Unrecognized TileEntity ID: " + std::to_string(id));
