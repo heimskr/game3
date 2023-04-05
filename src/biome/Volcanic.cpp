@@ -35,22 +35,19 @@ namespace Game3 {
 		}
 	}
 
-	void Volcanic::postgen(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &perlin) {
+	void Volcanic::postgen(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &) {
 		Realm &realm = *getRealm();
-		constexpr double factor = 10;
-		static std::uniform_int_distribution distribution(0, 99);
+		static std::uniform_int_distribution distribution(0, 199);
 
-		if (-0.4 > perlin.GetValue(row / Biome::NOISE_ZOOM * factor, column / Biome::NOISE_ZOOM * factor, 0.)) {
-			if (realm.getLayer1(row, column) == Monomap::VOLCANIC_SAND) {
-				if (distribution(rng) < 2) {
-					static const std::vector<ItemStack> mushrooms {
-						{Item::INDIGO_MILKCAP},
-						{Item::BLACK_TRUMPET},
-						{Item::GREY_KNIGHT},
-					};
+		if (realm.getLayer1(row, column) == Monomap::VOLCANIC_SAND) {
+			if (distribution(rng) < 1) {
+				static const std::vector<ItemStack> mushrooms {
+					{Item::INDIGO_MILKCAP},
+					{Item::BLACK_TRUMPET},
+					{Item::GREY_KNIGHT},
+				};
 
-					realm.add(TileEntity::create<ItemSpawner>(Position(row, column), 0.0002f, mushrooms));
-				}
+				realm.add(TileEntity::create<ItemSpawner>(Position(row, column), 0.0002f, mushrooms));
 			}
 		}
 	}
