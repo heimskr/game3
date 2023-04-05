@@ -111,6 +111,7 @@ namespace Game3 {
 			bool hasTileEntityAt(const Position &) const;
 			void confirmGhosts();
 			void damageGround(const Position &);
+			const TileSet & getTileSet() const;
 
 			virtual bool interactGround(const std::shared_ptr<Player> &, const Position &);
 			virtual void updateNeighbors(const Position &);

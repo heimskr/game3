@@ -18,6 +18,7 @@ namespace Game3 {
 		virtual bool isWalkable(TileID id) const { return isLand(id) || !isSolid(id); }
 		virtual bool isSolid(TileID) const = 0;
 		virtual TileID getEmpty() const { return 0; }
+		virtual std::vector<TileID> getBright() const { return {}; }
 		virtual const char * name() const = 0;
 		virtual Texture & getTexture() = 0;
 		virtual bool getItemStack(TileID, ItemStack &) const = 0;
@@ -221,6 +222,10 @@ namespace Game3 {
 
 		TileID getEmpty() const override { return EMPTY; }
 
+		std::vector<TileID> getBright() const override {
+			return {LAVA};
+		}
+
 		const char * name() const override {
 			return "Monomap";
 		}
@@ -233,5 +238,5 @@ namespace Game3 {
 	};
 
 	extern Monomap monomap;
-	extern std::unordered_map<RealmID, std::shared_ptr<TileSet>> tileSets;
+	extern std::unordered_map<RealmType, std::shared_ptr<TileSet>> tileSets;
 }

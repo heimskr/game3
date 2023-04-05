@@ -7,12 +7,21 @@ in vec2 texCoord;
 
 uniform sampler2D texture0;
 uniform float divisor;
+uniform int tile_size;
+uniform int tileset_width;
+uniform int bright_tiles[8];
 
 void main() {
 	FragColor = texture(texture0, texCoord);
-	FragColor.r /= divisor;
-	FragColor.g /= divisor;
-	FragColor.b /= divisor;
+	int index_x = int((texCoord.x - 1.0 / 2048.0) * float(tileset_width / tile_size));
+	int index_y = int((texCoord.y - 1.0 / 2048.0) * float(tileset_width / tile_size));
+	int index = index_y * tileset_width / tile_size + index_x;
+	// Silly.
+	if (bright_tiles[0] != index && bright_tiles[1] != index && bright_tiles[2] != index && bright_tiles[3] != index && bright_tiles[4] != index && bright_tiles[5] != index && bright_tiles[6] != index && bright_tiles[7] != index) {
+		FragColor.r /= divisor;
+		FragColor.g /= divisor;
+		FragColor.b /= divisor;
+	}
 	if (FragColor.a < 0.01)
 		discard;
 }

@@ -9,7 +9,7 @@ namespace Game3 {
 			virtual ~ElementBufferedRenderer() override;
 
 			void reset();
-			void init(const TilemapPtr &) override;
+			void init(const TilemapPtr &, const TileSet &) override;
 			void render(float divisor) override;
 			void reupload();
 
@@ -21,6 +21,7 @@ namespace Game3 {
 			GLuint vboHandle;
 			GLuint eboHandle;
 			GLuint vaoHandle;
+			std::vector<GLint> brightTiles;
 
 			void createShader();
 			void generateVertexBufferObject();

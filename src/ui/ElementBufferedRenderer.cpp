@@ -7,6 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "resources.h"
+#include "Tiles.h"
 #include "ui/ElementBufferedRenderer.h"
 
 // Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Renderers/ElementBufferedRenderer.cs
@@ -27,7 +28,7 @@ namespace Game3 {
 		}
 	}
 
-	void ElementBufferedRenderer::init(const TilemapPtr &tilemap_) {
+	void ElementBufferedRenderer::init(const TilemapPtr &tilemap_, const TileSet &tileset) {
 		if (initialized)
 			reset();
 		tilemap = tilemap_;
@@ -35,6 +36,9 @@ namespace Game3 {
 		generateVertexBufferObject();
 		generateElementBufferObject();
 		generateVertexArrayObject();
+		const auto bright_shorts = tileset.getBright();
+		brightTiles.assign(bright_shorts.begin(), bright_shorts.end());
+		brightTiles.resize(8, -1);
 		initialized = true;
 	}
 
@@ -50,7 +54,10 @@ namespace Game3 {
 		             glm::translate(projection, {center.x() - tilemap->width / 2.f, center.y() - tilemap->height / 2.f, 0});
 		glUseProgram(shaderHandle);
 		glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		glUniform1f(glGetUniformLocation(shaderHandle, "divisor"), divisor);
+		glUniform1f(glGetUniformLocation(shaderHandle,  "divisor"), divisor);
+		glUniform1iv(glGetUniformLocation(shaderHandle, "bright_tiles"), brightTiles.size(), brightTiles.data());
+		glUniform1i(glGetUniformLocation(shaderHandle,  "tile_size"), static_cast<GLint>(tilemap->tileSize));
+		glUniform1i(glGetUniformLocation(shaderHandle,  "tileset_width"), static_cast<GLint>(tilemap->setWidth));
 		glDrawElements(GL_TRIANGLES, tilemap->tiles.size() * 6, GL_UNSIGNED_INT, (GLvoid *) 0);
 	}
 

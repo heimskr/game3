@@ -7,6 +7,8 @@
 #include "Tilemap.h"
 
 namespace Game3 {
+	struct TileSet;
+
 	class TilemapRenderer {
 		public:
 			constexpr static float tileTextureSize = 1 / 10.f;
@@ -21,7 +23,7 @@ namespace Game3 {
 			TilemapRenderer() = default;
 			virtual ~TilemapRenderer() = default;
 
-			virtual void init(const TilemapPtr &) = 0;
+			virtual void init(const TilemapPtr &, const TileSet &) = 0;
 			virtual void render(float divisor) = 0;
 			virtual void onBackbufferResized(int width, int height);
 

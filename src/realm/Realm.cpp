@@ -43,22 +43,24 @@ namespace Game3 {
 		tilemap1->init();
 		tilemap2->init();
 		tilemap3->init();
-		renderer1.init(tilemap1);
-		renderer2.init(tilemap2);
-		renderer3.init(tilemap3);
+		const auto &tileset = getTileSet();
+		renderer1.init(tilemap1, tileset);
+		renderer2.init(tilemap2, tileset);
+		renderer3.init(tilemap3, tileset);
 		resetPathMap();
 	}
 
 	Realm::Realm(RealmID id_, RealmType type_, TilemapPtr tilemap1_, BiomeMapPtr biome_map, int seed_):
 	id(id_), type(type_), tilemap1(std::move(tilemap1_)), biomeMap(std::move(biome_map)), seed(seed_) {
 		tilemap1->init();
-		renderer1.init(tilemap1);
+		const auto &tileset = getTileSet();
+		renderer1.init(tilemap1, tileset);
 		tilemap2 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->texture);
 		tilemap3 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->texture);
 		tilemap2->init();
 		tilemap3->init();
-		renderer2.init(tilemap2);
-		renderer3.init(tilemap3);
+		renderer2.init(tilemap2, tileset);
+		renderer3.init(tilemap3, tileset);
 		resetPathMap();
 	}
 
@@ -105,9 +107,10 @@ namespace Game3 {
 			if (tile_entity_json.at("id").get<TileEntityID>() == TileEntity::GHOST)
 				++ghostCount;
 		}
-		renderer1.init(tilemap1);
-		renderer2.init(tilemap2);
-		renderer3.init(tilemap3);
+		const auto &tileset = getTileSet();
+		renderer1.init(tilemap1, tileset);
+		renderer2.init(tilemap2, tileset);
+		renderer3.init(tilemap3, tileset);
 		entities.clear();
 		for (const auto &entity_json: json.at("entities"))
 			(*entities.insert(Entity::fromJSON(entity_json)).first)->setRealm(shared);
@@ -489,6 +492,10 @@ namespace Game3 {
 
 		if (auto iter = game.interactionSets.find(type); iter != game.interactionSets.end())
 			iter->second->damageGround(place);
+	}
+
+	const TileSet & Realm::getTileSet() const {
+		return *tileSets.at(type);
 	}
 
 	void Realm::toJSON(nlohmann::json &json) const {

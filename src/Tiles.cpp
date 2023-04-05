@@ -62,7 +62,7 @@ namespace Game3 {
 	Monomap monomap;
 
 	// A little vestigial.
-	std::unordered_map<RealmID, std::shared_ptr<TileSet>> tileSets {
+	std::unordered_map<RealmType, std::shared_ptr<TileSet>> tileSets {
 		{Realm::OVERWORLD,  std::make_shared<Monomap>()},
 		{Realm::HOUSE,      std::make_shared<Monomap>()},
 		{Realm::KEEP,       std::make_shared<Monomap>()},
