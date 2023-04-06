@@ -61,6 +61,9 @@ namespace Game3 {
 		} else if (tile1 == Monomap::SHALLOW_WATER) {
 			item.emplace(Item::CLAY);
 			attribute.emplace(ItemAttribute::Shovel);
+		} else if (tile1 == Monomap::VOLCANIC_SAND) {
+			item.emplace(Item::VOLCANIC_SAND);
+			attribute.emplace(ItemAttribute::Shovel);
 		} else if (Monomap::dirtSet.contains(tile1)) {
 			item.emplace(Item::DIRT);
 			attribute.emplace(ItemAttribute::Shovel);

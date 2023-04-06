@@ -5,11 +5,11 @@
 #include "entity/ItemEntity.h"
 #include "item/Bomb.h"
 #include "item/CaveEntrance.h"
-#include "item/Clay.h"
 #include "item/Furniture.h"
 #include "item/Hammer.h"
 #include "item/Item.h"
 #include "item/Landfill.h"
+#include "item/Landfills.h"
 #include "item/Mushroom.h"
 #include "item/Sapling.h"
 #include "item/Tool.h"
@@ -68,6 +68,7 @@ namespace Game3 {
 		{Item::BOMB,            {256, 208, textureItems}},
 		{Item::ASH,             { 64,   0, texturePalisade}},
 		{Item::CAULDRON,        {144, 208, textureTileset}},
+		{Item::VOLCANIC_SAND,   { 80,   0, texturePalisade}},
 	};
 
 	std::unordered_map<ItemID, Durability> Item::durabilities {
@@ -130,6 +131,7 @@ namespace Game3 {
 		{Item::BOMB,            std::make_shared<Bomb>        (Item::BOMB,            "Bomb",             32, 64)},
 		{Item::ASH,             std::make_shared<Item>        (Item::ASH,             "Ash",               1, 64)},
 		{Item::CAULDRON,        std::make_shared<Furniture>   (Item::CAULDRON,        "Cauldron",        175,  1)},
+		{Item::VOLCANIC_SAND,   std::make_shared<Landfill>    (Item::VOLCANIC_SAND,   "Volcanic Sand",     3, 64, Monomap::SHALLOW_WATER, Landfill::DEFAULT_COUNT, Monomap::VOLCANIC_SAND)},
 		{Item::SAFFRON_MILKCAP, std::make_shared<Mushroom>(Item::SAFFRON_MILKCAP, "Saffron Milkcap",    10, 1 )},
 		{Item::HONEY_FUNGUS,    std::make_shared<Mushroom>(Item::HONEY_FUNGUS,    "Honey Fungus",       15, 18)},
 		{Item::BRITTLEGILL,     std::make_shared<Mushroom>(Item::BRITTLEGILL,     "Golden Brittlegill", 20, 7 )},
