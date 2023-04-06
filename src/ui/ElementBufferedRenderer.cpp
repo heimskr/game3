@@ -278,7 +278,6 @@ namespace Game3 {
 
 		// Clearing to half-white because the color in the lightmap will be multiplied by two
 		glClearColor(.5f, .5f, .5f, 1.f); CHECKGL
-
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); CHECKGL
 
 		for (Index row = 0; row < tilemap->height; ++row) {
@@ -294,21 +293,25 @@ namespace Game3 {
 			}
 		}
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbBlurredTexture, 0); CHECKGL
-
 		reshader.set("xs", static_cast<float>(width));
 		reshader.set("ys", static_cast<float>(height));
-		// reshader.set("r", 5.f);
+		reshader.set("r", 5.f);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle2); CHECKGL
+		glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbBlurredTexture, 0); CHECKGL
+
 		reshader.set("axis", 0);
 		reshader(lfbTexture);
-		reshader.set("axis", 1);
 
-		// glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle2); CHECKGL
+		glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle1); CHECKGL
 		glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
+
 		glClearColor(0.f, 1.f, 0.f, 1.f); CHECKGL
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); CHECKGL
 
+		reshader.set("axis", 1);
 		reshader(lfbBlurredTexture);
 		// reshader(lfbTexture);
 

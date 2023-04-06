@@ -4,7 +4,7 @@
 
 precision highp float;
 
-in vec2 pos;           // screen position [-1, +1]
+// in vec2 pos;           // screen position [-1, +1]
 out vec4 FragColor;    // fragment output color
 uniform sampler2D txr; // texture to blur
 uniform float xs, ys;  // texture resolution
@@ -24,7 +24,10 @@ vec4 blur9(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
 }
 
 void main() {
-	FragColor = blur9(txr, pos, vec2(xs, ys), axis == 0? vec2(5.0, 0.0) : vec2(0.0, 5.0));
+	vec2 resolution = vec2(xs, ys);
+	vec2 uv = vec2(gl_FragCoord.xy / resolution.xy);
+	// uv.y = 1.0 - uv.y;
+	FragColor = blur9(txr, uv, resolution, axis == 0? vec2(r, 0.0) : vec2(0.0, r));
 	// FragColor = vec4(1.0, 0.0, 1.0, 1.0);
 	// FragColor = texture(txr, pos);
 }
