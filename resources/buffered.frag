@@ -4,6 +4,7 @@
 
 out vec4 FragColor;
 in vec2 texCoord;
+in vec2 lightCoord;
 
 uniform sampler2D texture0;
 uniform sampler2D texture1;
@@ -15,7 +16,7 @@ uniform int bright_tiles[8];
 void main() {
 	FragColor = texture(texture0, texCoord);
 
-	vec4 lightColor = texture(texture1, texCoord);
+	vec4 lightColor = texture(texture1, lightCoord);
 
 
 	int index_x = int((texCoord.x - 1.0 / 2048.0) * float(tileset_width / tile_size));

@@ -67,11 +67,11 @@ namespace Game3 {
 		glClearColor(0.0f, 1.0f, 1.0f, 1.0f); CHECKGL
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); CHECKGL
 
-		glEnable(GL_SCISSOR_TEST); CHECKGL
-		glScissor(10, 10, 50, 50); CHECKGL
-		glClearColor(1.f, 0.f, 0.f, 1.f); CHECKGL
-		glClear(GL_COLOR_BUFFER_BIT); CHECKGL
-		glDisable(GL_SCISSOR_TEST); CHECKGL
+		// glEnable(GL_SCISSOR_TEST); CHECKGL
+		// glScissor(0, 0, 64, 64); CHECKGL
+		// glClearColor(1.f, 0.f, 0.f, 1.f); CHECKGL
+		// glClear(GL_COLOR_BUFFER_BIT); CHECKGL
+		// glDisable(GL_SCISSOR_TEST); CHECKGL
 
 		// glDisable(GL_DEPTH_TEST); CHECKGL
 		// glEnable(GL_DEPTH_TEST); CHECKGL
@@ -81,7 +81,7 @@ namespace Game3 {
 		// rectangle.drawOnScreen({1.f, 1.f, 0.f, 1.f}, 10.f, 10.f, 50.f, 50.f); CHECKGL
 		// rectangle.drawOnScreen({1.f, 1.f, 0.f, 1.f}, -100.f, -100.f, 200.f, 200.f);
 		rectangle.drawOnScreen({1.f, 1.f, 0.f, 1.f}, 10, 10, 50, 50);
-		rectangle.drawOnScreen({1.f, 1.f, 0.f, 1.f}, 0, 0, 10, 10);
+		rectangle.drawOnScreen({1.f, 0.f, 0.f, 1.f}, 0, 0, 64, 64);
 
 
 		glBindFramebuffer(GL_FRAMEBUFFER, gtk_buffer); CHECKGL
@@ -92,23 +92,24 @@ namespace Game3 {
 
 		// rectangle.drawOnScreen({1.f, 0.f, 1.f, 1.f}, 20.f, 20.f, 5.f, 10.f); CHECKGL
 
-		glBindVertexArray(vaoHandle);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboHandle);
+		glBindVertexArray(vaoHandle); CHECKGL
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboHandle); CHECKGL
 		glm::mat4 projection(1.f);
 		projection = glm::scale(projection, {tilemap->tileSize, -tilemap->tileSize, 1}) *
 		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1}) *
 		             glm::translate(projection, {center.x() - tilemap->width / 2.f, center.y() - tilemap->height / 2.f, 0});
 
-		glUseProgram(shaderHandle);
+		glUseProgram(shaderHandle); CHECKGL
 
-		glUniform1i(glGetUniformLocation(shaderHandle, "texture0"), 0);
-		glUniform1i(glGetUniformLocation(shaderHandle, "texture1"), 1);
-		glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		glUniform1f(glGetUniformLocation(shaderHandle,  "divisor"), divisor);
-		glUniform1iv(glGetUniformLocation(shaderHandle, "bright_tiles"), brightTiles.size(), brightTiles.data());
-		glUniform1i(glGetUniformLocation(shaderHandle,  "tile_size"), static_cast<GLint>(tilemap->tileSize));
-		glUniform1i(glGetUniformLocation(shaderHandle,  "tileset_width"), static_cast<GLint>(tilemap->setWidth));
-		glDrawElements(GL_TRIANGLES, tilemap->tiles.size() * 6, GL_UNSIGNED_INT, (GLvoid *) 0);
+		glUniform1i(glGetUniformLocation(shaderHandle, "texture0"), 0); CHECKGL
+		glUniform1i(glGetUniformLocation(shaderHandle, "texture1"), 1); CHECKGL
+		glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "projection"), 1, GL_FALSE, glm::value_ptr(projection)); CHECKGL
+		glUniform1f(glGetUniformLocation(shaderHandle,  "divisor"), divisor); CHECKGL
+		glUniform1iv(glGetUniformLocation(shaderHandle, "bright_tiles"), brightTiles.size(), brightTiles.data()); CHECKGL
+		glUniform1i(glGetUniformLocation(shaderHandle,  "tile_size"), static_cast<GLint>(tilemap->tileSize)); CHECKGL
+		glUniform1i(glGetUniformLocation(shaderHandle,  "tileset_size"), static_cast<GLint>(tilemap->setWidth)); CHECKGL
+		glUniform2f(glGetUniformLocation(shaderHandle,  "map_size"), static_cast<GLfloat>(tilemap->width), static_cast<GLfloat>(tilemap->height)); CHECKGL
+		glDrawElements(GL_TRIANGLES, tilemap->tiles.size() * 6, GL_UNSIGNED_INT, (GLvoid *) 0); CHECKGL
 	}
 
 	void ElementBufferedRenderer::reupload() {
