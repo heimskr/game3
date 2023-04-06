@@ -52,9 +52,6 @@ namespace Game3 {
 			return;
 		tilemap->texture.bind();
 
-
-		CHECKGL
-
 		GLint gtk_buffer = 0;
 		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &gtk_buffer); CHECKGL
 		glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle); CHECKGL
@@ -74,7 +71,7 @@ namespace Game3 {
 		glClear(GL_COLOR_BUFFER_BIT); CHECKGL
 		glDisable(GL_SCISSOR_TEST); CHECKGL
 
-		rectangle.drawOnScreen({1.f, 0.f, 0.f, 1.f}, 0, 0, 128*16, 128*16);
+		rectangle.drawOnScreen({1.f, 0.f, 0.f, 1.f}, 0, 0, 128*16/2, 128*16);
 
 		glViewport(saved_viewport[0], saved_viewport[1], static_cast<GLsizei>(saved_viewport[2]), static_cast<GLsizei>(saved_viewport[3]));
 
