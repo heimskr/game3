@@ -3,6 +3,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Shader.h"
+#include "util/Util.h"
 
 namespace Game3 {
 	Shader::~Shader() {
@@ -39,57 +40,59 @@ namespace Game3 {
 			glDeleteProgram(handle);
 
 		const GLchar *vert_ptr = reinterpret_cast<const GLchar *>(vertex.c_str());
-		const GLuint vert_handle = glCreateShader(GL_VERTEX_SHADER);
+		const GLuint vert_handle = glCreateShader(GL_VERTEX_SHADER); CHECKGL
 		const GLint vertex_size = vertex.size();
-		glShaderSource(vert_handle, 1, &vert_ptr, &vertex_size);
-		glCompileShader(vert_handle);
-		check(vert_handle);
+		glShaderSource(vert_handle, 1, &vert_ptr, &vertex_size); CHECKGL
+		glCompileShader(vert_handle); CHECKGL
+		check(vert_handle); CHECKGL
 
 		const GLchar *frag_ptr = reinterpret_cast<const GLchar *>(fragment.c_str());
-		const GLuint frag_handle = glCreateShader(GL_FRAGMENT_SHADER);
+		const GLuint frag_handle = glCreateShader(GL_FRAGMENT_SHADER); CHECKGL
 		const GLint frag_size = fragment.size();
-		glShaderSource(frag_handle, 1, &frag_ptr, &frag_size);
-		glCompileShader(frag_handle);
-		check(frag_handle);
+		glShaderSource(frag_handle, 1, &frag_ptr, &frag_size); CHECKGL
+		glCompileShader(frag_handle); CHECKGL
+		check(frag_handle); CHECKGL
 
 		GLuint geom_handle = 0;
 
 		if (!geometry.empty()) {
 			const GLchar *geom_ptr = reinterpret_cast<const GLchar *>(geometry.c_str());
-			geom_handle = glCreateShader(GL_GEOMETRY_SHADER);
+			geom_handle = glCreateShader(GL_GEOMETRY_SHADER); CHECKGL
 			const GLint geom_size = geometry.size();
-			glShaderSource(geom_handle, 1, &geom_ptr, &geom_size);
-			glCompileShader(geom_handle);
-			check(geom_handle);
+			glShaderSource(geom_handle, 1, &geom_ptr, &geom_size); CHECKGL
+			glCompileShader(geom_handle); CHECKGL
+			check(geom_handle); CHECKGL
 		}
 
-		handle = glCreateProgram();
-		glAttachShader(handle, vert_handle);
-		glAttachShader(handle, frag_handle);
-		glAttachShader(handle, geom_handle);
-		glLinkProgram(handle);
-		check(handle, true);
+		handle = glCreateProgram(); CHECKGL
+		glAttachShader(handle, vert_handle); CHECKGL
+		glAttachShader(handle, frag_handle); CHECKGL
+		if (geom_handle != 0) {
+			glAttachShader(handle, geom_handle); CHECKGL
+		}
+		glLinkProgram(handle); CHECKGL
+		check(handle, true); CHECKGL
 
-		glDetachShader(handle, vert_handle);
-		glDeleteShader(vert_handle);
+		glDetachShader(handle, vert_handle); CHECKGL
+		glDeleteShader(vert_handle); CHECKGL
 
-		glDetachShader(handle, frag_handle);
-		glDeleteShader(frag_handle);
+		glDetachShader(handle, frag_handle); CHECKGL
+		glDeleteShader(frag_handle); CHECKGL
 
 		if (geom_handle != 0) {
-			glDetachShader(handle, geom_handle);
-			glDeleteShader(geom_handle);
+			glDetachShader(handle, geom_handle); CHECKGL
+			glDeleteShader(geom_handle); CHECKGL
 		}
 	}
 
 	void Shader::bind() {
 		if (handle == 0)
 			throw std::runtime_error("Can't bind uninitialized shader");
-		glUseProgram(handle);
+		glUseProgram(handle); CHECKGL
 	}
 
 	GLint Shader::uniform(const char *uniform_name, bool warn) const {
-		GLint id = glGetUniformLocation(handle, uniform_name);
+		GLint id = glGetUniformLocation(handle, uniform_name); CHECKGL
 		if (id == -1 && warn)
 			std::cerr << "Couldn't find uniform \"" << uniform_name << "\" in shader \"" << name << "\"\n";
 		return id;
@@ -100,23 +103,24 @@ namespace Game3 {
 	}
 
 	void Shader::reset() {
-		if (handle != 0)
-			glDeleteProgram(handle);
+		if (handle != 0) {
+			glDeleteProgram(handle); CHECKGL
+		}
 		handle = 0;
 	}
 
 	Shader & Shader::set(const char *uniform_name, const glm::mat4 &matrix) {
-		glUniformMatrix4fv(uniform(uniform_name), 1, GL_FALSE, glm::value_ptr(matrix));
+		glUniformMatrix4fv(uniform(uniform_name), 1, GL_FALSE, glm::value_ptr(matrix)); CHECKGL
 		return *this;
 	}
 
 	Shader & Shader::set(const char *uniform_name, const Eigen::Vector4f &vector) {
-		glUniform4f(uniform(uniform_name), vector.x(), vector.y(), vector.z(), vector.w());
+		glUniform4f(uniform(uniform_name), vector.x(), vector.y(), vector.z(), vector.w()); CHECKGL
 		return *this;
 	}
 
 	Shader & Shader::set(const char *uniform_name, float x, float y, float z, float w) {
-		glUniform4f(uniform(uniform_name), x, y, z, w);
+		glUniform4f(uniform(uniform_name), x, y, z, w); CHECKGL
 		return *this;
 	}
 }

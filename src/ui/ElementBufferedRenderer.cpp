@@ -56,7 +56,7 @@ namespace Game3 {
 		CHECKGL
 
 
-		std::cout << lfbHandle << " ~ " << lfbTexture << std::endl;
+		// std::cout << lfbHandle << " ~ " << lfbTexture << std::endl;
 		GLint gtk_buffer = 0;
 		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &gtk_buffer); CHECKGL
 		glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle); CHECKGL
@@ -64,14 +64,24 @@ namespace Game3 {
 		// glDrawBuffers(1, bufs);
 		glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
+		glClearColor(0.0f, 1.0f, 1.0f, 1.0f); CHECKGL
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); CHECKGL
-		glClearColor(0.0f, 1.0f, 0.0f, 1.0f); CHECKGL
+
+		glEnable(GL_SCISSOR_TEST); CHECKGL
+		glScissor(10, 10, 50, 50); CHECKGL
+		glClearColor(1.f, 0.f, 0.f, 1.f); CHECKGL
+		glClear(GL_COLOR_BUFFER_BIT); CHECKGL
+		glDisable(GL_SCISSOR_TEST); CHECKGL
+
 		// glDisable(GL_DEPTH_TEST); CHECKGL
 		// glEnable(GL_DEPTH_TEST); CHECKGL
 		// glColor4f(1.f, 0.f, 0.f, 1.f); CHECKGL
 		// glRecti(100, 100, 200, 200); CHECKGL
 
-		rectangle.drawOnScreen({1.f, 0.f, 0.f, 1.f}, 10.f, 10.f, 20.f, 10.f); CHECKGL
+		// rectangle.drawOnScreen({1.f, 1.f, 0.f, 1.f}, 10.f, 10.f, 50.f, 50.f); CHECKGL
+		// rectangle.drawOnScreen({1.f, 1.f, 0.f, 1.f}, -100.f, -100.f, 200.f, 200.f);
+		rectangle.drawOnScreen({1.f, 1.f, 0.f, 1.f}, 10, 10, 50, 50);
+		rectangle.drawOnScreen({1.f, 1.f, 0.f, 1.f}, 0, 0, 10, 10);
 
 
 		glBindFramebuffer(GL_FRAMEBUFFER, gtk_buffer); CHECKGL
@@ -80,17 +90,16 @@ namespace Game3 {
 		glActiveTexture(GL_TEXTURE1); CHECKGL
 		glBindTexture(GL_TEXTURE_2D, lfbTexture); CHECKGL
 
+		// rectangle.drawOnScreen({1.f, 0.f, 1.f, 1.f}, 20.f, 20.f, 5.f, 10.f); CHECKGL
+
 		glBindVertexArray(vaoHandle);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboHandle);
 		glm::mat4 projection(1.f);
 		projection = glm::scale(projection, {tilemap->tileSize, -tilemap->tileSize, 1}) *
 		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1}) *
 		             glm::translate(projection, {center.x() - tilemap->width / 2.f, center.y() - tilemap->height / 2.f, 0});
+
 		glUseProgram(shaderHandle);
-
-
-
-
 
 		glUniform1i(glGetUniformLocation(shaderHandle, "texture0"), 0);
 		glUniform1i(glGetUniformLocation(shaderHandle, "texture1"), 1);
@@ -242,10 +251,14 @@ namespace Game3 {
 		glGenTextures(1, &lfbTexture);
 		glBindTexture(GL_TEXTURE_2D, lfbTexture);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, backbufferWidth, backbufferHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tilemap->width * tilemap->tileSize, tilemap->height * tilemap->tileSize, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+		rectangle.update(tilemap->width * tilemap->tileSize, tilemap->height * tilemap->tileSize);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	}
 
 	void ElementBufferedRenderer::generateSampler() {

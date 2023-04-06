@@ -10,13 +10,14 @@
 
 namespace Game3 {
 	RectangleRenderer::RectangleRenderer(): shader("RectangleRenderer") {
-		shader.init(rectangle_vert, rectangle_frag);
-		initRenderData();
+		shader.init(rectangle_vert, rectangle_frag); CHECKGL
+		initRenderData(); CHECKGL
 	}
 
 	RectangleRenderer::~RectangleRenderer() {
-		if (initialized)
-			glDeleteVertexArrays(1, &quadVAO);
+		if (initialized) {
+			glDeleteVertexArrays(1, &quadVAO); CHECKGL
+		}
 	}
 
 	void RectangleRenderer::update(int backbuffer_width, int backbuffer_height) {
@@ -24,8 +25,8 @@ namespace Game3 {
 			backbufferWidth = backbuffer_width;
 			backbufferHeight = backbuffer_height;
 			glm::mat4 projection = glm::ortho(0.f, float(backbuffer_width), float(backbuffer_height), 0.f, -1.f, 1.f);
-			shader.bind();
-			shader.set("projection", projection);
+			shader.bind(); CHECKGL
+			shader.set("projection", projection); CHECKGL
 		}
 	}
 
@@ -33,7 +34,7 @@ namespace Game3 {
 		if (!initialized)
 			return;
 
-		shader.bind();
+		shader.bind(); CHECKGL
 
 		glm::mat4 model = glm::mat4(1.f);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
@@ -43,8 +44,8 @@ namespace Game3 {
 		model = glm::translate(model, glm::vec3(-0.5f * width, -0.5f * height, 0.f)); // move origin back
 		model = glm::scale(model, glm::vec3(width, height, 2.f)); // last scale
 
-		shader.set("model", model);
-		shader.set("rectColor", color);
+		shader.set("model", model); CHECKGL
+		shader.set("rectColor", color); CHECKGL
 
 		glBindVertexArray(quadVAO); CHECKGL
 		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
@@ -72,13 +73,16 @@ namespace Game3 {
 		glGenVertexArrays(1, &quadVAO); CHECKGL
 		glGenBuffers(1, &vbo); CHECKGL
 
+		GLint old_abb = 0;
+		glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &old_abb); CHECKGL
+
 		glBindBuffer(GL_ARRAY_BUFFER, vbo); CHECKGL
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); CHECKGL
 
 		glBindVertexArray(quadVAO); CHECKGL
 		glEnableVertexAttribArray(0); CHECKGL
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *) 0); CHECKGL
-		glBindBuffer(GL_ARRAY_BUFFER, 0); CHECKGL
+		glBindBuffer(GL_ARRAY_BUFFER, old_abb); CHECKGL
 		glBindVertexArray(0); CHECKGL
 		initialized = true;
 	}
