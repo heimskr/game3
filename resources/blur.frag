@@ -30,6 +30,7 @@ void main() {
 
 	FragColor = col;
 
+	// FragColor = texture(txr, pos);
 
-	// FragColor = texture(txr, p);
+	// FragColor = vec4(1.0, 0.0, 1.0, 1.0);
 }
