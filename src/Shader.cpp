@@ -35,18 +35,18 @@ namespace Game3 {
 		}
 	}
 
-	void Shader::init(const std::string &vertex, const std::string &fragment, const std::string &geometry) {
+	void Shader::init(std::string_view vertex, std::string_view fragment, std::string_view geometry) {
 		if (handle != 0)
 			glDeleteProgram(handle);
 
-		const GLchar *vert_ptr = reinterpret_cast<const GLchar *>(vertex.c_str());
+		const GLchar *vert_ptr = reinterpret_cast<const GLchar *>(vertex.begin());
 		const GLuint vert_handle = glCreateShader(GL_VERTEX_SHADER); CHECKGL
 		const GLint vertex_size = vertex.size();
 		glShaderSource(vert_handle, 1, &vert_ptr, &vertex_size); CHECKGL
 		glCompileShader(vert_handle); CHECKGL
 		check(vert_handle); CHECKGL
 
-		const GLchar *frag_ptr = reinterpret_cast<const GLchar *>(fragment.c_str());
+		const GLchar *frag_ptr = reinterpret_cast<const GLchar *>(fragment.begin());
 		const GLuint frag_handle = glCreateShader(GL_FRAGMENT_SHADER); CHECKGL
 		const GLint frag_size = fragment.size();
 		glShaderSource(frag_handle, 1, &frag_ptr, &frag_size); CHECKGL
@@ -56,7 +56,7 @@ namespace Game3 {
 		GLuint geom_handle = 0;
 
 		if (!geometry.empty()) {
-			const GLchar *geom_ptr = reinterpret_cast<const GLchar *>(geometry.c_str());
+			const GLchar *geom_ptr = reinterpret_cast<const GLchar *>(geometry.begin());
 			geom_handle = glCreateShader(GL_GEOMETRY_SHADER); CHECKGL
 			const GLint geom_size = geometry.size();
 			glShaderSource(geom_handle, 1, &geom_ptr, &geom_size); CHECKGL
@@ -107,6 +107,11 @@ namespace Game3 {
 			glDeleteProgram(handle); CHECKGL
 		}
 		handle = 0;
+	}
+
+	Shader & Shader::set(const char *uniform_name, GLint value) {
+		glUniform1i(uniform(uniform_name), value); CHECKGL
+		return *this;
 	}
 
 	Shader & Shader::set(const char *uniform_name, const glm::mat4 &matrix) {

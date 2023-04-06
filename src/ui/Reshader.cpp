@@ -1,26 +1,25 @@
 #include <iostream>
 
-#include "Shader.h"
-
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "resources.h"
-#include "ui/RectangleRenderer.h"
+#include "Shader.h"
+#include "ui/Reshader.h"
 #include "util/Util.h"
 
 namespace Game3 {
-	RectangleRenderer::RectangleRenderer(): shader("RectangleRenderer") {
-		shader.init(rectangle_vert, rectangle_frag); CHECKGL
+	Reshader::Reshader(std::string_view fragment): shader("reshader") {
+		shader.init(reshader_vert, fragment); CHECKGL
 		initRenderData(); CHECKGL
 	}
 
-	RectangleRenderer::~RectangleRenderer() {
+	Reshader::~Reshader() {
 		if (initialized) {
 			glDeleteVertexArrays(1, &quadVAO); CHECKGL
 		}
 	}
 
-	void RectangleRenderer::update(int backbuffer_width, int backbuffer_height) {
+	void Reshader::update(int backbuffer_width, int backbuffer_height) {
 		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
 			backbufferWidth = backbuffer_width;
 			backbufferHeight = backbuffer_height;
@@ -30,35 +29,37 @@ namespace Game3 {
 		}
 	}
 
-	void RectangleRenderer::drawOnScreen(const Eigen::Vector4f &color, float x, float y, float width, float height, float angle) {
+	void Reshader::operator()(GLuint texture) {
 		if (!initialized)
 			return;
 
-		y = backbufferHeight - y - height;
-
 		shader.bind(); CHECKGL
+
+		constexpr float x = 0.f;
+		constexpr float y = 0.f;
+		const float width  = backbufferWidth;
+		const float height = backbufferHeight;
 
 		glm::mat4 model = glm::mat4(1.f);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
 		model = glm::translate(model, glm::vec3(x, y, 0.f));
 		model = glm::translate(model, glm::vec3(0.5f * width, 0.5f * height, 0.f)); // move origin of rotation to center of quad
-		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
+		model = glm::rotate(model, glm::radians(0.f), glm::vec3(0.f, 0.f, 1.f)); // then rotate
 		model = glm::translate(model, glm::vec3(-0.5f * width, -0.5f * height, 0.f)); // move origin back
 		model = glm::scale(model, glm::vec3(width, height, 1.f)); // last scale
 
 		shader.set("model", model); CHECKGL
-		shader.set("rectColor", color); CHECKGL
+
+		glActiveTexture(GL_TEXTURE4); CHECKGL
+		glBindTexture(GL_TEXTURE_2D, texture); CHECKGL
+		shader.set("txr", 4); CHECKGL
 
 		glBindVertexArray(quadVAO); CHECKGL
 		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
 		glBindVertexArray(0); CHECKGL
 	}
 
-	void RectangleRenderer::operator()(const Eigen::Vector4f &color, float x, float y, float width, float height, float angle) {
-		drawOnScreen(color, x, y, width, height, angle);
-	}
-
-	void RectangleRenderer::initRenderData() {
+	void Reshader::initRenderData() {
 		GLuint vbo;
 
 		static const float vertices[] {

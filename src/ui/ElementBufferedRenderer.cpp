@@ -14,6 +14,8 @@
 // Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Renderers/ElementBufferedRenderer.cs
 
 namespace Game3 {
+	ElementBufferedRenderer::ElementBufferedRenderer(): reshader(blur_frag) {}
+
 	ElementBufferedRenderer::~ElementBufferedRenderer() {
 		reset();
 	}
@@ -224,6 +226,7 @@ namespace Game3 {
 		const auto height = tilemap->height * tilemap->tileSize;
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 		rectangle.update(width, height);
+		reshader.update(width, height);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -247,14 +250,17 @@ namespace Game3 {
 
 		GLint saved_viewport[4];
 		glGetIntegerv(GL_VIEWPORT, saved_viewport);
-		glViewport(0, 0, tilemap->width * tilemap->tileSize, tilemap->height * tilemap->tileSize); CHECKGL
+		const auto tilesize = tilemap->tileSize;
+		const auto width    = tilesize * tilemap->width;
+		const auto height   = tilesize * tilemap->height;
+		glViewport(0, 0, width, height); CHECKGL
 
 		glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
+		// glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbBlurredTexture, 0); CHECKGL
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
 		glClearColor(.5f, .5f, .5f, 1.f); CHECKGL
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); CHECKGL
 
-		const auto tilesize = tilemap->tileSize;
 
 		for (Index row = 0; row < tilemap->height; ++row) {
 			for (Index column = 0; column < tilemap->width; ++column) {
@@ -268,6 +274,16 @@ namespace Game3 {
 				}
 			}
 		}
+
+		reshader.set("xs", static_cast<float>(width));
+		reshader.set("ys", static_cast<float>(height));
+		reshader.set("r", 10.f);
+		reshader.set("axis", 0);
+		reshader(lfbTexture);
+		// reshader.set("axis", 1);
+		// glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
+		// reshader(lfbBlurredTexture);
+		// reshader(lfbTexture);
 
 		for (Index row = 0; row < tilemap->height; ++row) {
 			for (Index column = 0; column < tilemap->width; ++column) {

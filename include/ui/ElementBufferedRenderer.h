@@ -1,12 +1,14 @@
 #pragma once
 
+#include "Shader.h"
 #include "ui/RectangleRenderer.h"
+#include "ui/Reshader.h"
 #include "ui/TilemapRenderer.h"
 
 namespace Game3 {
 	class ElementBufferedRenderer: public TilemapRenderer {
 		public:
-			ElementBufferedRenderer() = default;
+			ElementBufferedRenderer();
 			virtual ~ElementBufferedRenderer() override;
 
 			void reset();
@@ -28,9 +30,11 @@ namespace Game3 {
 			GLuint vaoHandle = 0;
 			GLuint lfbHandle = 0;
 			GLuint lfbTexture = 0;
+			GLuint lfbBlurredTexture = 0;
 			GLuint sampler = 0;
 			std::vector<GLint> brightTiles;
 			RectangleRenderer rectangle;
+			Reshader reshader;
 
 			void createShader();
 			void generateVertexBufferObject();

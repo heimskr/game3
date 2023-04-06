@@ -35,7 +35,7 @@ src/gtk_resources.cpp: $(RESXML) $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=r
 	@ printf "\e[2m[\e[22;32mcc\e[39;2m]\e[22m $< \e[2m$(BUILDFLAGS)\e[22m\n"
 	@ $(COMPILER) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
 
-src/resources.cpp: resources/buffered.frag resources/buffered.vert resources/rect.frag resources/rect.vert resources/sprite.frag resources/sprite.vert
+src/resources.cpp: resources/buffered.frag resources/buffered.vert resources/rect.frag resources/rect.vert resources/sprite.frag resources/sprite.vert resources/blur.frag resources/blur.vert resources/reshader.vert
 	echo "#include <cstdlib>" > $@
 	echo "#include \"resources.h\"" > $@
 	bin2c buffered_frag < resources/buffered.frag | tail -n +2 >> $@
@@ -44,6 +44,9 @@ src/resources.cpp: resources/buffered.frag resources/buffered.vert resources/rec
 	bin2c rectangle_vert < resources/rect.vert | tail -n +2 >> $@
 	bin2c sprite_frag < resources/sprite.frag | tail -n +2 >> $@
 	bin2c sprite_vert < resources/sprite.vert | tail -n +2 >> $@
+	bin2c blur_frag < resources/blur.frag | tail -n +2 >> $@
+	bin2c blur_vert < resources/blur.vert | tail -n +2 >> $@
+	bin2c reshader_vert < resources/reshader.vert | tail -n +2 >> $@
 
 $(OUTPUT): $(OBJECTS)
 	@ printf "\e[2m[\e[22;36mld\e[39;2m]\e[22m $@\n"
