@@ -263,7 +263,7 @@ namespace Game3 {
 				if (tile == Monomap::LAVA) {
 					const float x = column * tilesize;
 					const float y = row * tilesize;
-					const float radius = 2.f;
+					const float radius = 1.5f;
 					rectangle.drawOnScreen({1.f, .5f, 0.f, .5f}, x - radius * tilesize, y - radius * tilesize, (2.f * radius + 1.f) * tilesize, (2.f * radius + 1.f) * tilesize);
 				}
 			}
