@@ -15,9 +15,7 @@ uniform int bright_tiles[8];
 
 void main() {
 	FragColor = texture(texture0, texCoord);
-
 	vec4 lightColor = texture(texture1, lightCoord);
-
 
 	int index_x = int((texCoord.x - 1.0 / 2048.0) * float(tileset_width / tile_size));
 	int index_y = int((texCoord.y - 1.0 / 2048.0) * float(tileset_width / tile_size));
@@ -29,7 +27,7 @@ void main() {
 		FragColor.b /= divisor;
 	}
 
-	FragColor *= lightColor;
+	FragColor *= 2.0 * lightColor;
 
 	if (FragColor.a < 0.01)
 		discard;

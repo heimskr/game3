@@ -14,11 +14,14 @@ namespace Game3 {
 			void render(float divisor) override;
 			void reupload();
 			bool onBackbufferResized(int width, int height) override;
+			inline void markDirty() { dirty = true; }
 
 			operator bool() const { return initialized; }
 
 		private:
 			bool initialized = false;
+			/** Whether lighting needs to be recomputed. */
+			bool dirty = true;
 			GLuint shaderHandle = 0;
 			GLuint vboHandle = 0;
 			GLuint eboHandle = 0;
@@ -36,5 +39,7 @@ namespace Game3 {
 			void generateLightingFrameBuffer();
 			void generateLightingTexture();
 			void generateSampler();
+
+			void recomputeLighting();
 	};
 }

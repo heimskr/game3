@@ -34,7 +34,7 @@ namespace Game3 {
 		if (!initialized)
 			return;
 
-		y += backbufferHeight - height;
+		y = backbufferHeight - y - height;
 
 		shader.bind(); CHECKGL
 

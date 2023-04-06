@@ -52,30 +52,11 @@ namespace Game3 {
 			return;
 		tilemap->texture.bind();
 
-		GLint gtk_buffer = 0;
-		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &gtk_buffer); CHECKGL
-		glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle); CHECKGL
+		if (dirty) {
+			recomputeLighting();
+			dirty = false;
+		}
 
-		GLint saved_viewport[4];
-		glGetIntegerv(GL_VIEWPORT, saved_viewport);
-		glViewport(0, 0, tilemap->width * tilemap->tileSize, tilemap->height * tilemap->tileSize); CHECKGL
-
-		glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
-		glClearColor(0.0f, 1.0f, 1.0f, 1.0f); CHECKGL
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); CHECKGL
-
-		glEnable(GL_SCISSOR_TEST); CHECKGL
-		glScissor(0, 0, 128 * 16, 128 * 16); CHECKGL
-		glClearColor(1.f, 1.f, 0.f, 1.f); CHECKGL
-		glClear(GL_COLOR_BUFFER_BIT); CHECKGL
-		glDisable(GL_SCISSOR_TEST); CHECKGL
-
-		rectangle.drawOnScreen({1.f, 0.f, 0.f, 1.f}, 0, 0, 128*16/2, 128*16);
-
-		glViewport(saved_viewport[0], saved_viewport[1], static_cast<GLsizei>(saved_viewport[2]), static_cast<GLsizei>(saved_viewport[3]));
-
-		glBindFramebuffer(GL_FRAMEBUFFER, gtk_buffer); CHECKGL
 		glActiveTexture(GL_TEXTURE1); CHECKGL
 		glBindTexture(GL_TEXTURE_2D, lfbTexture); CHECKGL
 
@@ -254,5 +235,53 @@ namespace Game3 {
 		if (sampler != 0)
 			glDeleteSamplers(1, &sampler);
 		glGenSamplers(1, &sampler);
+	}
+
+	void ElementBufferedRenderer::recomputeLighting() {
+		if (!tilemap)
+			return;
+
+		GLint gtk_buffer = 0;
+		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &gtk_buffer); CHECKGL
+		glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle); CHECKGL
+
+		GLint saved_viewport[4];
+		glGetIntegerv(GL_VIEWPORT, saved_viewport);
+		glViewport(0, 0, tilemap->width * tilemap->tileSize, tilemap->height * tilemap->tileSize); CHECKGL
+
+		glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
+		glClearColor(.5f, .5f, .5f, 1.f); CHECKGL
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); CHECKGL
+
+		const auto tilesize = tilemap->tileSize;
+
+		for (Index row = 0; row < tilemap->height; ++row) {
+			for (Index column = 0; column < tilemap->width; ++column) {
+				const Position pos(row, column);
+				const auto tile = (*tilemap)(pos);
+				if (tile == Monomap::LAVA) {
+					const float x = column * tilesize;
+					const float y = row * tilesize;
+					const float radius = 2.f;
+					rectangle.drawOnScreen({1.f, .5f, 0.f, .5f}, x - radius * tilesize, y - radius * tilesize, (2.f * radius + 1.f) * tilesize, (2.f * radius + 1.f) * tilesize);
+				}
+			}
+		}
+
+		for (Index row = 0; row < tilemap->height; ++row) {
+			for (Index column = 0; column < tilemap->width; ++column) {
+				const Position pos(row, column);
+				const auto tile = (*tilemap)(pos);
+				if (tile == Monomap::LAVA) {
+					const float x = column * tilesize;
+					const float y = row * tilesize;
+					rectangle.drawOnScreen({.666f, .666f, .666f, 1.f}, x, y, tilesize, tilesize);
+				}
+			}
+		}
+
+		glViewport(saved_viewport[0], saved_viewport[1], static_cast<GLsizei>(saved_viewport[2]), static_cast<GLsizei>(saved_viewport[3]));
+		glBindFramebuffer(GL_FRAMEBUFFER, gtk_buffer); CHECKGL
 	}
 }

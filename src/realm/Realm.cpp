@@ -534,6 +534,9 @@ namespace Game3 {
 		const Position position(row, column);
 		pathMap[getIndex(position)] = isWalkable(row, column, *tileset);
 		updateNeighbors(position);
+		renderer1.markDirty();
+		renderer2.markDirty();
+		renderer3.markDirty();
 	}
 
 	void Realm::setLayerHelper(Index index) {
@@ -541,6 +544,9 @@ namespace Game3 {
 		const Position position = getPosition(index);
 		pathMap[index] = isWalkable(position.row, position.column, *tileset);
 		updateNeighbors(position);
+		renderer1.markDirty();
+		renderer2.markDirty();
+		renderer3.markDirty();
 	}
 
 	void Realm::resetPathMap() {
