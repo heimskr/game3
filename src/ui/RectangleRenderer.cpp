@@ -34,16 +34,12 @@ namespace Game3 {
 		if (!initialized)
 			return;
 
+		y += backbufferHeight - height;
+
 		shader.bind(); CHECKGL
 
 		glm::mat4 model = glm::mat4(1.f);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		// model = glm::translate(model, glm::vec3(x, y, 0.f));
-		// model = glm::translate(model, glm::vec3(0.5f * width, 0.5f * height, 0.f)); // move origin of rotation to center of quad
-		// model = glm::rotate(model, glm::radians(angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
-		// model = glm::translate(model, glm::vec3(-0.5f * width, -0.5f * height, 0.f)); // move origin back
-		// model = glm::scale(model, glm::vec3(width, height, 2.f)); // last scale
-
 		model = glm::translate(model, glm::vec3(x, y, 0.f));
 		model = glm::translate(model, glm::vec3(0.5f * width, 0.5f * height, 0.f)); // move origin of rotation to center of quad
 		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
