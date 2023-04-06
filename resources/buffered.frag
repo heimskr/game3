@@ -27,7 +27,8 @@ void main() {
 		FragColor.b /= divisor;
 	}
 
-	FragColor *= 2.0 * lightColor;
+	// FragColor *= 2.0 * lightColor;
+	FragColor = lightColor;
 
 	if (FragColor.a < 0.01)
 		discard;

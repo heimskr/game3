@@ -288,32 +288,47 @@ namespace Game3 {
 					const float x = column * tilesize;
 					const float y = row * tilesize;
 					const float radius = 1.5f;
-					rectangle.drawOnScreen({1.f, .5f, 0.f, .5f}, x - radius * tilesize, y - radius * tilesize, (2.f * radius + 1.f) * tilesize, (2.f * radius + 1.f) * tilesize);
+					// rectangle.drawOnScreen({1.f, .5f, 0.f, .5f}, x - radius * tilesize, y - radius * tilesize, (2.f * radius + 1.f) * tilesize, (2.f * radius + 1.f) * tilesize);
+					rectangle.drawOnScreen({1.f, 0.f, 0.f, 1.f}, x - radius * tilesize, y - radius * tilesize, (2.f * radius + 1.f) * tilesize, (2.f * radius + 1.f) * tilesize);
 				}
 			}
 		}
 
-		reshader.set("xs", static_cast<float>(width));
-		reshader.set("ys", static_cast<float>(height));
-		reshader.set("r", 5.f);
+		rectangle.drawOnScreen({1.0f, 0.f, 0.f, 1.f}, 0, 0, 128 * 16 * 0.5, 128 * 16 * 0.5);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle2); CHECKGL
-		glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
+		const float thing = 4096;
+		reshader.set("xs", static_cast<float>(thing));
+		reshader.set("ys", static_cast<float>(thing));
+		// std::cout << "(" << width << ", " << height << ")\n";
+		reshader.set("r", 1.0f);
+
+		// glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle2); CHECKGL
+		// glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbBlurredTexture, 0); CHECKGL
 
 		reshader.set("axis", 0);
 		reshader(lfbTexture);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle1); CHECKGL
-		glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
+		// glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle1); CHECKGL
+		// glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
 
-		glClearColor(0.f, 1.f, 0.f, 1.f); CHECKGL
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); CHECKGL
+		// glClearColor(0.f, 1.f, 0.f, 1.f); CHECKGL
+		// glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); CHECKGL
 
 		reshader.set("axis", 1);
 		reshader(lfbBlurredTexture);
 		// reshader(lfbTexture);
+
+		for (int i = 0; i < 1; ++i) {
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbBlurredTexture, 0); CHECKGL
+			reshader.set("axis", 0);
+			reshader(lfbTexture);
+
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
+			reshader.set("axis", 1);
+			reshader(lfbBlurredTexture);
+		}
 
 		for (Index row = 0; row < tilemap->height; ++row) {
 			for (Index column = 0; column < tilemap->width; ++column) {
