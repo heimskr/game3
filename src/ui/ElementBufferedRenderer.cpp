@@ -233,8 +233,8 @@ namespace Game3 {
 
 		glBindTexture(GL_TEXTURE_2D, lfbBlurredTexture); CHECKGL
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); CHECKGL
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); CHECKGL
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); CHECKGL
 
@@ -243,8 +243,8 @@ namespace Game3 {
 		rectangle.update(width, height);
 		reshader.update(width, height);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); CHECKGL
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); CHECKGL
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); CHECKGL
 
@@ -298,13 +298,13 @@ namespace Game3 {
 
 		reshader.set("xs", static_cast<float>(width));
 		reshader.set("ys", static_cast<float>(height));
-		reshader.set("r", 5.f);
+		// reshader.set("r", 5.f);
 		reshader.set("axis", 0);
 		reshader(lfbTexture);
 		reshader.set("axis", 1);
 
 		// glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle2); CHECKGL
-		// glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
+		glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
 		glClearColor(0.f, 1.f, 0.f, 1.f); CHECKGL
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); CHECKGL
