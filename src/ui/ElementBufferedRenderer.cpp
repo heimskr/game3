@@ -55,42 +55,32 @@ namespace Game3 {
 
 		CHECKGL
 
-
-		// std::cout << lfbHandle << " ~ " << lfbTexture << std::endl;
 		GLint gtk_buffer = 0;
 		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &gtk_buffer); CHECKGL
 		glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle); CHECKGL
-		// GLenum bufs[] {GL_NONE};
-		// glDrawBuffers(1, bufs);
+
+		GLint saved_viewport[4];
+		glGetIntegerv(GL_VIEWPORT, saved_viewport);
+		glViewport(0, 0, tilemap->width * tilemap->tileSize, tilemap->height * tilemap->tileSize); CHECKGL
+
 		glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
 		glClearColor(0.0f, 1.0f, 1.0f, 1.0f); CHECKGL
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); CHECKGL
 
-		// glEnable(GL_SCISSOR_TEST); CHECKGL
-		// glScissor(0, 0, 64, 64); CHECKGL
-		// glClearColor(1.f, 0.f, 0.f, 1.f); CHECKGL
-		// glClear(GL_COLOR_BUFFER_BIT); CHECKGL
-		// glDisable(GL_SCISSOR_TEST); CHECKGL
+		glEnable(GL_SCISSOR_TEST); CHECKGL
+		glScissor(0, 0, 128 * 16, 128 * 16); CHECKGL
+		glClearColor(1.f, 1.f, 0.f, 1.f); CHECKGL
+		glClear(GL_COLOR_BUFFER_BIT); CHECKGL
+		glDisable(GL_SCISSOR_TEST); CHECKGL
 
-		// glDisable(GL_DEPTH_TEST); CHECKGL
-		// glEnable(GL_DEPTH_TEST); CHECKGL
-		// glColor4f(1.f, 0.f, 0.f, 1.f); CHECKGL
-		// glRecti(100, 100, 200, 200); CHECKGL
+		rectangle.drawOnScreen({1.f, 0.f, 0.f, 1.f}, 0, 0, 128*16, 128*16);
 
-		// rectangle.drawOnScreen({1.f, 1.f, 0.f, 1.f}, 10.f, 10.f, 50.f, 50.f); CHECKGL
-		// rectangle.drawOnScreen({1.f, 1.f, 0.f, 1.f}, -100.f, -100.f, 200.f, 200.f);
-		rectangle.drawOnScreen({1.f, 1.f, 0.f, 1.f}, 10, 10, 50, 50);
-		rectangle.drawOnScreen({1.f, 0.f, 0.f, 1.f}, 0, 0, 64, 64);
-
+		glViewport(saved_viewport[0], saved_viewport[1], static_cast<GLsizei>(saved_viewport[2]), static_cast<GLsizei>(saved_viewport[3]));
 
 		glBindFramebuffer(GL_FRAMEBUFFER, gtk_buffer); CHECKGL
-		// glDrawBuffer(GL_BACK); CHECKGL
-
 		glActiveTexture(GL_TEXTURE1); CHECKGL
 		glBindTexture(GL_TEXTURE_2D, lfbTexture); CHECKGL
-
-		// rectangle.drawOnScreen({1.f, 0.f, 1.f, 1.f}, 20.f, 20.f, 5.f, 10.f); CHECKGL
 
 		glBindVertexArray(vaoHandle); CHECKGL
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboHandle); CHECKGL
@@ -252,9 +242,10 @@ namespace Game3 {
 		glGenTextures(1, &lfbTexture);
 		glBindTexture(GL_TEXTURE_2D, lfbTexture);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tilemap->width * tilemap->tileSize, tilemap->height * tilemap->tileSize, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-
-		rectangle.update(tilemap->width * tilemap->tileSize, tilemap->height * tilemap->tileSize);
+		const auto width = tilemap->width * tilemap->tileSize;
+		const auto height = tilemap->height * tilemap->tileSize;
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		rectangle.update(width, height);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
