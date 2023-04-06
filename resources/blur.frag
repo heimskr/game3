@@ -25,8 +25,8 @@ vec4 blur9(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
 
 void main() {
 	vec2 resolution = vec2(xs, ys);
-	vec2 uv = vec2(gl_FragCoord.xy / resolution.xy);
-	// vec2 uv = vec2(pos / resolution);
+	// vec2 uv = vec2(gl_FragCoord.xy / resolution.xy);
+	vec2 uv = vec2(pos / resolution);
 	// vec2 uv = vec2(1, 1);
 	// uv.y = 1.0 - uv.y;
 	FragColor = blur9(txr, uv, resolution, axis == 0? vec2(r, 0.0) : vec2(0.0, r));

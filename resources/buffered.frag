@@ -28,7 +28,7 @@ void main() {
 	}
 
 	// FragColor *= 2.0 * lightColor;
-	FragColor = lightColor;
+	// FragColor = lightColor;
 
 	if (FragColor.a < 0.01)
 		discard;
