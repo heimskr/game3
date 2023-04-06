@@ -27,7 +27,10 @@ namespace Game3 {
 			glDeleteBuffers(1, &vboHandle);
 			glDeleteProgram(shaderHandle);
 			glDeleteTextures(1, &lfbTexture);
+			glDeleteTextures(1, &lfbBlurredTexture);
 			glDeleteSamplers(1, &sampler);
+			glDeleteFramebuffers(1, &lfbHandle1);
+			glDeleteFramebuffers(1, &lfbHandle2);
 			tilemap.reset();
 			initialized = false;
 		}
@@ -211,7 +214,8 @@ namespace Game3 {
 	}
 
 	void ElementBufferedRenderer::generateLightingFrameBuffer() {
-		glGenFramebuffers(1, &lfbHandle);
+		glGenFramebuffers(1, &lfbHandle1);
+		glGenFramebuffers(1, &lfbHandle2);
 		generateLightingTexture();
 	}
 
@@ -219,19 +223,31 @@ namespace Game3 {
 		if (lfbTexture != 0)
 			glDeleteTextures(1, &lfbTexture);
 
-		glGenTextures(1, &lfbTexture);
-		glBindTexture(GL_TEXTURE_2D, lfbTexture);
+		if (lfbBlurredTexture != 0)
+			glDeleteTextures(1, &lfbBlurredTexture);
 
-		const auto width = tilemap->width * tilemap->tileSize;
-		const auto height = tilemap->height * tilemap->tileSize;
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glGenTextures(1, &lfbTexture); CHECKGL
+		glGenTextures(1, &lfbBlurredTexture); CHECKGL
+		const auto width  = tilemap->tileSize * tilemap->width;
+		const auto height = tilemap->tileSize * tilemap->height;
+
+		glBindTexture(GL_TEXTURE_2D, lfbBlurredTexture); CHECKGL
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); CHECKGL
+
+		glBindTexture(GL_TEXTURE_2D, lfbTexture); CHECKGL
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr); CHECKGL
 		rectangle.update(width, height);
 		reshader.update(width, height);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); CHECKGL
+
 	}
 
 	void ElementBufferedRenderer::generateSampler() {
@@ -246,7 +262,7 @@ namespace Game3 {
 
 		GLint gtk_buffer = 0;
 		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &gtk_buffer); CHECKGL
-		glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle); CHECKGL
+		glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle1); CHECKGL
 
 		GLint saved_viewport[4];
 		glGetIntegerv(GL_VIEWPORT, saved_viewport);
@@ -256,8 +272,8 @@ namespace Game3 {
 		glViewport(0, 0, width, height); CHECKGL
 
 		glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
-		// glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbBlurredTexture, 0); CHECKGL
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbBlurredTexture, 0); CHECKGL
+		// glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
 		glClearColor(.5f, .5f, .5f, 1.f); CHECKGL
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); CHECKGL
 
@@ -277,12 +293,19 @@ namespace Game3 {
 
 		reshader.set("xs", static_cast<float>(width));
 		reshader.set("ys", static_cast<float>(height));
-		reshader.set("r", 10.f);
+		reshader.set("r", 5.f);
 		reshader.set("axis", 0);
 		reshader(lfbTexture);
-		// reshader.set("axis", 1);
-		// glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
-		// reshader(lfbBlurredTexture);
+		reshader.set("axis", 1);
+
+
+		glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle2); CHECKGL
+		glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
+		glClearColor(0.f, 1.f, 0.f, 1.f); CHECKGL
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); CHECKGL
+
+		reshader(lfbBlurredTexture);
 		// reshader(lfbTexture);
 
 		for (Index row = 0; row < tilemap->height; ++row) {

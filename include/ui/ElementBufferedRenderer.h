@@ -28,7 +28,8 @@ namespace Game3 {
 			GLuint vboHandle = 0;
 			GLuint eboHandle = 0;
 			GLuint vaoHandle = 0;
-			GLuint lfbHandle = 0;
+			GLuint lfbHandle1 = 0;
+			GLuint lfbHandle2 = 0;
 			GLuint lfbTexture = 0;
 			GLuint lfbBlurredTexture = 0;
 			GLuint sampler = 0;

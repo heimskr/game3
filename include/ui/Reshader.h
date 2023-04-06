@@ -26,6 +26,7 @@ namespace Game3 {
 
 		private:
 			void initRenderData();
+			GLuint vbo = 0;
 			GLuint quadVAO = 0;
 			bool initialized = false;
 			int backbufferWidth = -1;

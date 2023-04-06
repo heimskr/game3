@@ -28,8 +28,8 @@ void main() {
 		}
 	}
 
-	// FragColor = col;
+	FragColor = col;
 
 
-	FragColor = texture(txr, p);
+	// FragColor = texture(txr, p);
 }

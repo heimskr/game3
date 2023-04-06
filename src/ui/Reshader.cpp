@@ -15,6 +15,7 @@ namespace Game3 {
 
 	Reshader::~Reshader() {
 		if (initialized) {
+			glDeleteBuffers(1, &vbo);
 			glDeleteVertexArrays(1, &quadVAO); CHECKGL
 		}
 	}
@@ -60,8 +61,6 @@ namespace Game3 {
 	}
 
 	void Reshader::initRenderData() {
-		GLuint vbo;
-
 		static const float vertices[] {
 			0.f, 1.f, 0.f, 1.f,
 			1.f, 0.f, 1.f, 0.f,
