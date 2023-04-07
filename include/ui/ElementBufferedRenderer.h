@@ -16,7 +16,7 @@ namespace Game3 {
 			void render(float divisor) override;
 			void reupload();
 			bool onBackbufferResized(int width, int height) override;
-			inline void markDirty() { dirty = true; }
+			inline void markDirty(Realm *realm_) { dirty = true; realm = realm_; }
 
 			operator bool() const { return initialized; }
 
@@ -36,6 +36,7 @@ namespace Game3 {
 			std::vector<GLint> brightTiles;
 			RectangleRenderer rectangle;
 			Reshader reshader;
+			Realm *realm = nullptr;
 
 			void createShader();
 			void generateVertexBufferObject();

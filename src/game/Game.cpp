@@ -36,12 +36,23 @@ namespace Game3 {
 		registerPrimaryRecipe(std::vector<ItemStack> {{Item::CLAY,  1}}, ItemStack(Item::BRICK, 1), CraftingStationType::Furnace);
 		registerPrimaryRecipe(std::vector<ItemStack> {{Item::CLAY, 10}}, ItemStack(Item::POT,   1), CraftingStationType::Furnace);
 
+		// Early-game low-yield silicon
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::SAND, 10}}, ItemStack(Item::SILICON, 1), CraftingStationType::Cauldron);
+
+		// High-yield silicon
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::SAND, 2}}, ItemStack(Item::SILICON, 1), CraftingStationType::Purifier);
+
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 1}, {Item::SILICON, 4}, {Item::COAL, 1}}, ItemStack(Item::ELECTRONICS, 1), CraftingStationType::Furnace);
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::ELECTRONICS, 4}, {Item::IRON_BAR, 8}}, ItemStack(Item::PURIFIER, 1), CraftingStationType::Anvil);
+
 		registerPrimaryRecipe(std::vector<ItemStack> {{Item::POT, 1}, {Item::SAPLING, 1}}, ItemStack(Item::PLANT_POT1, 1));
 		registerPrimaryRecipe(std::vector<ItemStack> {{Item::POT, 1}, {Item::SAPLING, 1}}, ItemStack(Item::PLANT_POT2, 1));
 		registerPrimaryRecipe(std::vector<ItemStack> {{Item::POT, 1}, {Item::SAPLING, 1}}, ItemStack(Item::PLANT_POT3, 1));
 		registerPrimaryRecipe(std::vector<ItemStack> {{Item::STONE, 8}}, ItemStack(Item::TOWER, 1));
 		registerPrimaryRecipe(std::vector<ItemStack> {{Item::STONE, 10}, {Item::PLANK, 10}}, ItemStack(Item::CAVE_ENTRANCE, 1));
 		registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 10}}, ItemStack(Item::CAULDRON, 1));
+
+		registerPrimaryRecipe(std::vector<ItemStack> {{Item::VOLCANIC_SAND, 4}}, ItemStack(Item::SULFUR, 1), CraftingStationType::Purifier);
 
 		// Temporary recipes
 		registerPrimaryRecipe(std::vector<ItemStack> {{Item::WOOD,  1}}, ItemStack(Item::PLANK, 1));

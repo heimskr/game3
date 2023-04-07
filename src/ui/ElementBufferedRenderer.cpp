@@ -8,6 +8,7 @@
 
 #include "resources.h"
 #include "Tiles.h"
+#include "realm/Realm.h"
 #include "ui/ElementBufferedRenderer.h"
 #include "util/Util.h"
 
@@ -58,7 +59,7 @@ namespace Game3 {
 		tilemap->texture.bind();
 
 		if (dirty) {
-			// recomputeLighting();
+			recomputeLighting();
 			dirty = false;
 		}
 
@@ -232,21 +233,24 @@ namespace Game3 {
 		const auto height = tilemap->tileSize * tilemap->height;
 
 		glBindTexture(GL_TEXTURE_2D, lfbBlurredTexture); CHECKGL
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); CHECKGL
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr); CHECKGL
+		constexpr GLint filter = GL_LINEAR;
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter); CHECKGL
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); CHECKGL
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); CHECKGL
+		glGenerateMipmap(GL_TEXTURE_2D);
 
 		glBindTexture(GL_TEXTURE_2D, lfbTexture); CHECKGL
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr); CHECKGL
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr); CHECKGL
 		rectangle.update(width, height);
 		reshader.update(width, height);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter); CHECKGL
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); CHECKGL
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); CHECKGL
+		glGenerateMipmap(GL_TEXTURE_2D);
 
 	}
 
@@ -260,9 +264,13 @@ namespace Game3 {
 		if (!tilemap)
 			return;
 
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
+
 		GLint gtk_buffer = 0;
 		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &gtk_buffer); CHECKGL
 		glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle1); CHECKGL
+
+		generateLightingTexture();
 
 		GLint saved_viewport[4];
 		glGetIntegerv(GL_VIEWPORT, saved_viewport);
@@ -273,6 +281,7 @@ namespace Game3 {
 
 		glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
 
+
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
 
 		// Clearing to half-white because the color in the lightmap will be multiplied by two
@@ -282,44 +291,52 @@ namespace Game3 {
 		for (Index row = 0; row < tilemap->height; ++row) {
 			for (Index column = 0; column < tilemap->width; ++column) {
 				const Position pos(row, column);
-				const auto tile = (*tilemap)(pos);
+				const auto tile = (*realm->tilemap1)(pos);
 				if (tile == Monomap::LAVA) {
 					const float x = column * tilesize;
 					const float y = row * tilesize;
 					const float radius = 1.5f;
-					// rectangle.drawOnScreen({1.f, .5f, 0.f, .5f}, x - radius * tilesize, y - radius * tilesize, (2.f * radius + 1.f) * tilesize, (2.f * radius + 1.f) * tilesize);
-					rectangle.drawOnScreen({1.f, 0.f, 0.f, 1.f}, x - radius * tilesize, y - radius * tilesize, (2.f * radius + 1.f) * tilesize, (2.f * radius + 1.f) * tilesize);
+					rectangle.drawOnScreen({1.f, .5f, 0.f, .5f}, x - radius * tilesize, y - radius * tilesize, (2.f * radius + 1.f) * tilesize, (2.f * radius + 1.f) * tilesize);
+					// rectangle.drawOnScreen({1.f, 0.f, 0.f, 1.f}, x - radius * tilesize, y - radius * tilesize, (2.f * radius + 1.f) * tilesize, (2.f * radius + 1.f) * tilesize); CHECKGL
 				}
 			}
 		}
 
-		rectangle.drawOnScreen({1.0f, 0.f, 0.f, 1.f}, 0, 0, 128 * 16 * 0.5, 128 * 16 * 0.5);
+		rectangle.drawOnScreen({1.0f, 1.f, 0.f, 1.f}, 0, 0, 128 * 16 * 0.5, 128 * 16 * 0.5);
 
 		reshader.set("xs", static_cast<float>(width));
 		reshader.set("ys", static_cast<float>(height));
-		reshader.set("r", 1.0f);
+		reshader.set("r", 0.1f);
+
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
 		for (int i = 0; i < 1; ++i) {
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbBlurredTexture, 0); CHECKGL
+			glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
 			reshader.set("axis", 0);
 			reshader(lfbTexture);
 
+			glMemoryBarrier(GL_ALL_BARRIER_BITS);
+
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
+			glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
 			reshader.set("axis", 1);
 			reshader(lfbBlurredTexture);
 		}
 
-		for (Index row = 0; row < tilemap->height; ++row) {
-			for (Index column = 0; column < tilemap->width; ++column) {
-				const Position pos(row, column);
-				const auto tile = (*tilemap)(pos);
-				if (tile == Monomap::LAVA) {
-					const float x = column * tilesize;
-					const float y = row * tilesize;
-					rectangle.drawOnScreen({.666f, .666f, .666f, 1.f}, x, y, tilesize, tilesize);
-				}
-			}
-		}
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
+
+		// for (Index row = 0; row < tilemap->height; ++row) {
+		// 	for (Index column = 0; column < tilemap->width; ++column) {
+		// 		const Position pos(row, column);
+		// 		const auto tile = (*tilemap)(pos);
+		// 		if (tile == Monomap::LAVA) {
+		// 			const float x = column * tilesize;
+		// 			const float y = row * tilesize;
+		// 			rectangle.drawOnScreen({.666f, .666f, .666f, 1.f}, x, y, tilesize, tilesize);
+		// 		}
+		// 	}
+		// }
 
 		glViewport(saved_viewport[0], saved_viewport[1], static_cast<GLsizei>(saved_viewport[2]), static_cast<GLsizei>(saved_viewport[3]));
 		glBindFramebuffer(GL_FRAMEBUFFER, gtk_buffer); CHECKGL

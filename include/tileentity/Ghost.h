@@ -39,6 +39,7 @@ namespace Game3 {
 		static GhostDetails PLANT_POT2;
 		static GhostDetails PLANT_POT3;
 		static GhostDetails CAULDRON;
+		static GhostDetails PURIFIER;
 
 		static GhostDetails & get(const ItemStack &);
 	};

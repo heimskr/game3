@@ -51,9 +51,9 @@ namespace Game3 {
 
 		shader.set("model", model); CHECKGL
 
-		glActiveTexture(GL_TEXTURE0); CHECKGL
+		glActiveTexture(GL_TEXTURE4); CHECKGL
 		glBindTexture(GL_TEXTURE_2D, texture); CHECKGL
-		shader.set("txr", 0); CHECKGL
+		shader.set("txr", 4); CHECKGL
 
 		glBindVertexArray(quadVAO); CHECKGL
 		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL

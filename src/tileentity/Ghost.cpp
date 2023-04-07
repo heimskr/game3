@@ -20,12 +20,18 @@ namespace Game3 {
 		place.realm->setLayer2(place.position, Monomap::CAULDRON_RED_FULL);
 	}
 
+	static void spawnPurifier(const Place &place) {
+		place.realm->add(TileEntity::create<CraftingStation>(Monomap::PURIFIER, place.position, CraftingStationType::Purifier));
+		place.realm->setLayer2(place.position, Monomap::PURIFIER);
+	}
+
 	GhostDetails GhostDetails::WOODEN_WALL {GhostType::WoodenWall, true,  32,  6, 0};
 	GhostDetails GhostDetails::PLANT_POT1  {GhostType::Normal,     false, 32, 12, 4};
 	GhostDetails GhostDetails::PLANT_POT2  {GhostType::Normal,     false, 32, 12, 5};
 	GhostDetails GhostDetails::PLANT_POT3  {GhostType::Normal,     false, 32, 12, 6};
 	GhostDetails GhostDetails::TOWER       {GhostType::Tower,      true,  32,  6, 7};
 	GhostDetails GhostDetails::CAULDRON    {spawnCauldron, Monomap::CAULDRON_RED_FULL};
+	GhostDetails GhostDetails::PURIFIER    {spawnPurifier, Monomap::PURIFIER};
 
 	GhostDetails & GhostDetails::get(const ItemStack &stack) {
 		switch (stack.item->id) {
@@ -35,6 +41,7 @@ namespace Game3 {
 			case Item::PLANT_POT3:  return PLANT_POT3;
 			case Item::TOWER:       return TOWER;
 			case Item::CAULDRON:    return CAULDRON;
+			case Item::PURIFIER:    return PURIFIER;
 			default: throw std::runtime_error("Couldn't get GhostDetails for " + stack.item->name);
 		}
 	}

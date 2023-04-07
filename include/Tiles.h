@@ -126,6 +126,7 @@ namespace Game3 {
 		constexpr static TileID CAULDRON_GREEN_FULL  = 427;
 		constexpr static TileID ANVIL         = 453;
 		constexpr static TileID FURNACE       = 454;
+		constexpr static TileID PURIFIER      = 455;
 		constexpr static TileID SHALLOW_WATER = 481;
 		constexpr static TileID WATER         = 482;
 		constexpr static TileID DEEP_WATER    = 483;
