@@ -264,8 +264,6 @@ namespace Game3 {
 		if (!tilemap)
 			return;
 
-		glMemoryBarrier(GL_ALL_BARRIER_BITS);
-
 		GLint gtk_buffer = 0;
 		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &gtk_buffer); CHECKGL
 		glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle1); CHECKGL
@@ -308,23 +306,17 @@ namespace Game3 {
 		reshader.set("ys", static_cast<float>(height));
 		reshader.set("r", 0.1f);
 
-		glMemoryBarrier(GL_ALL_BARRIER_BITS);
-
 		for (int i = 0; i < 1; ++i) {
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbBlurredTexture, 0); CHECKGL
 			glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
 			reshader.set("axis", 0);
 			reshader(lfbTexture);
 
-			glMemoryBarrier(GL_ALL_BARRIER_BITS);
-
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
 			glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
 			reshader.set("axis", 1);
 			reshader(lfbBlurredTexture);
 		}
-
-		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
 		// for (Index row = 0; row < tilemap->height; ++row) {
 		// 	for (Index column = 0; column < tilemap->width; ++column) {

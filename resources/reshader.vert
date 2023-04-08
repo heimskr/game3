@@ -18,7 +18,7 @@ void main() {
 	gl_Position = projection * model * vec4(vertex.xy, 0.0, 1.0) + vec4(0.25, 0.25, 0.0, 0.0);
 	gl_Position = vec4(vertex.xy, 0.0, 1.0) - vec4(0.5, 0.5, 0.0, 0.0);
 	// gl_Position = projection * model * vertex;
-    TexCoord = gl_Position.xy;
+	TexCoord = gl_Position.xy;
 }
 //*/
 
