@@ -1,9 +1,23 @@
+#include <fstream>
 #include <iostream>
+#include <sstream>
+
+#include <nlohmann/json.hpp>
 
 #include "game/Game.h"
 #include "game/InteractionSet.h"
 #include "game/Inventory.h"
-#include "registry/RecipeRegistry.h"
+#include "item/Bomb.h"
+#include "item/CaveEntrance.h"
+#include "item/Furniture.h"
+#include "item/Hammer.h"
+#include "item/Item.h"
+#include "item/Landfill.h"
+#include "item/Landfills.h"
+#include "item/Mushroom.h"
+#include "item/Sapling.h"
+#include "item/Tool.h"
+#include "registry/Registries.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "ui/tab/TextTab.h"
@@ -15,6 +29,70 @@ namespace Game3 {
 	void Game::initRegistries() {
 		registries.clear();
 		registries.add<CraftingRecipeRegistry>();
+		registries.add<ItemRegistry>();
+		registries.add<DurabilityRegistry>();
+		registries.add<ItemTextureRegistry>();
+		registries.add<TextureRegistry>();
+		registries.add<EntityTextureRegistry>();
+		// TODO: plugins
+	}
+
+	void Game::initItems() {
+		add(std::make_shared<Item>        ("base:shortsword",      "Shortsword",      100,  1));
+		add(std::make_shared<Item>        ("base:red_potion",      "Red Potion",       20,  8));
+		add(std::make_shared<Item>        ("base:coins",           "Gold",              1, 1'000'000));
+		add(std::make_shared<Item>        ("base:iron_ore",        "Iron Ore",         10, 64));
+		add(std::make_shared<Item>        ("base:copper_ore",      "Copper Ore",        8, 64));
+		add(std::make_shared<Item>        ("base:gold_ore",        "Gold Ore",         20, 64));
+		add(std::make_shared<Item>        ("base:diamond_ore",     "Diamond Ore",      80, 64));
+		add(std::make_shared<Item>        ("base:diamond",         "Diamond",         100, 64));
+		add(std::make_shared<Item>        ("base:coal",            "Coal",              5, 64));
+		add(std::make_shared<Item>        ("base:oil",             "Oil",              15, 64));
+		add(std::make_shared<Item>        ("base:wood",            "Wood",              3, 64));
+		add(std::make_shared<Item>        ("base:stone",           "Stone",             1, 64));
+		add(std::make_shared<Item>        ("base:iron_bar",        "Iron Bar",         16, 64));
+		add(std::make_shared<Sapling>     ("base:sapling",         "Sapling",           5, 64));
+		add(std::make_shared<Item>        ("base:gold_bar",        "Gold Bar",         45, 64));
+		add(std::make_shared<Furniture>   ("base:wooden_wall",     "Wooden Wall",       9, 64));
+		add(std::make_shared<Item>        ("base:plank",           "Plank",             4, 64));
+		add(std::make_shared<Item>        ("base:dirt",            "Dirt",              1, 64));
+		add(std::make_shared<Item>        ("base:brick",           "Brick",             3, 64));
+		add(std::make_shared<Item>        ("base:pot",             "Pot",              24, 64));
+		add(std::make_shared<Furniture>   ("base:plant_pot1",      "Plant Pot",        32, 64));
+		add(std::make_shared<Furniture>   ("base:plant_pot2",      "Plant Pot",        32, 64));
+		add(std::make_shared<Furniture>   ("base:plant_pot3",      "Plant Pot",        32, 64));
+		add(std::make_shared<Furniture>   ("base:tower",           "Tower",            10, 64));
+		add(std::make_shared<CaveEntrance>("base:cave_entrance",   "Cave Entrance",    50,  1));
+		add(std::make_shared<Item>        ("base:mead",            "Mead",             10, 16));
+		add(std::make_shared<Item>        ("base:honey",           "Honey",             5, 64));
+		add(std::make_shared<Bomb>        ("base:bomb",            "Bomb",             32, 64));
+		add(std::make_shared<Item>        ("base:ash",             "Ash",               1, 64));
+		add(std::make_shared<Item>        ("base:silicon",         "Silicon",           2, 64));
+		add(std::make_shared<Item>        ("base:electronics",     "Electronics",      32, 64));
+		add(std::make_shared<Item>        ("base:sulfur",          "Sulfur",           15, 64));
+		add(std::make_shared<Furniture>   ("base:cauldron",        "Cauldron",        175,  1));
+		add(std::make_shared<Furniture>   ("base:purifier",        "Purifier",        300,  1));
+		add(std::make_shared<Hammer>      ("base:iron_hammer",     "Iron Hammer",     150,  3.f));
+		add(std::make_shared<Hammer>      ("base:gold_hammer",     "Gold Hammer",     400, .75f));
+		add(std::make_shared<Hammer>      ("base:diamond_hammer",  "Diamond Hammer",  900,  1.f));
+		add(std::make_shared<Tool>        ("base:iron_axe",        "Iron Axe",        150,  3.f, ItemAttribute::Axe));
+		add(std::make_shared<Tool>        ("base:iron_pickaxe",    "Iron Pickaxe",    150,  3.f, ItemAttribute::Pickaxe));
+		add(std::make_shared<Tool>        ("base:iron_shovel",     "Iron Shovel",     120,  3.f, ItemAttribute::Shovel));
+		add(std::make_shared<Tool>        ("base:gold_axe",        "Gold Axe",        400, .75f, ItemAttribute::Axe));
+		add(std::make_shared<Tool>        ("base:gold_pickaxe",    "Gold Pickaxe",    400, .75f, ItemAttribute::Pickaxe));
+		add(std::make_shared<Tool>        ("base:gold_shovel",     "Gold Shovel",     300, .75f, ItemAttribute::Shovel));
+		add(std::make_shared<Tool>        ("base:diamond_axe",     "Diamond Axe",     900,  1.f, ItemAttribute::Axe));
+		add(std::make_shared<Tool>        ("base:diamond_pickaxe", "Diamond Pickaxe", 900,  1.f, ItemAttribute::Pickaxe));
+		add(std::make_shared<Tool>        ("base:diamond_shovel",  "Diamond Shovel",  700,  1.f, ItemAttribute::Shovel));
+		add(std::make_shared<Landfill>    ("base:sand",            "Sand",              1, 64, Monomap::SHALLOW_WATER, Landfill::DEFAULT_COUNT, Monomap::SAND));
+		add(std::make_shared<Landfill>    ("base:volcanic_sand",   "Volcanic Sand",     3, 64, Monomap::SHALLOW_WATER, Landfill::DEFAULT_COUNT, Monomap::VOLCANIC_SAND));
+		add(std::make_shared<Landfill>    ("base:clay",            "Clay",              2, 64, clayRequirement));
+		add(std::make_shared<Mushroom>("base:saffron_milkcap", "Saffron Milkcap",    10, 1 ));
+		add(std::make_shared<Mushroom>("base:honey_fungus",    "Honey Fungus",       15, 18));
+		add(std::make_shared<Mushroom>("base:brittlegill",     "Golden Brittlegill", 20, 7 ));
+		add(std::make_shared<Mushroom>("base:indigo_milkcap",  "Indigo Milkcap",     20, 11));
+		add(std::make_shared<Mushroom>("base:black_trumpet",   "Black Trumpet",      20, 29));
+		add(std::make_shared<Mushroom>("base:grey_knight",     "Grey Knight",        20, 12));
 	}
 
 	void Game::initEntities() {
@@ -22,55 +100,46 @@ namespace Game3 {
 			realm->initEntities();
 	}
 
-	void Game::initRecipes() {
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::IRON_PICKAXE),    CraftingStationType::Anvil);
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 6}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::IRON_SHOVEL),     CraftingStationType::Anvil);
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::IRON_AXE),        CraftingStationType::Anvil);
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::IRON_HAMMER),     CraftingStationType::Anvil);
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::GOLD_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::GOLD_PICKAXE),    CraftingStationType::Anvil);
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::GOLD_BAR, 6}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::GOLD_SHOVEL),     CraftingStationType::Anvil);
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::GOLD_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::GOLD_AXE),        CraftingStationType::Anvil);
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::GOLD_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::GOLD_HAMMER),     CraftingStationType::Anvil);
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::DIAMOND,  8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::DIAMOND_PICKAXE), CraftingStationType::Anvil);
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::DIAMOND,  6}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::DIAMOND_SHOVEL),  CraftingStationType::Anvil);
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::DIAMOND,  8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::DIAMOND_AXE),     CraftingStationType::Anvil);
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::DIAMOND,  8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::DIAMOND_HAMMER),  CraftingStationType::Anvil);
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::DIAMOND_ORE, 1}}, ItemStack(Item::DIAMOND, 1), CraftingStationType::Anvil);
-
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_ORE, 1}, {Item::COAL, 1}}, ItemStack(Item::IRON_BAR, 1), CraftingStationType::Furnace);
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::GOLD_ORE, 1}, {Item::COAL, 2}}, ItemStack(Item::GOLD_BAR, 1), CraftingStationType::Furnace);
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::CLAY,  1}}, ItemStack(Item::BRICK, 1), CraftingStationType::Furnace);
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::CLAY, 10}}, ItemStack(Item::POT,   1), CraftingStationType::Furnace);
-
-		// // Early-game low-yield silicon
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::SAND, 10}}, ItemStack(Item::SILICON, 1), CraftingStationType::Cauldron);
-
-		// // High-yield silicon
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::SAND, 2}}, ItemStack(Item::SILICON, 1), CraftingStationType::Purifier);
-
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 1}, {Item::SILICON, 4}, {Item::COAL, 1}}, ItemStack(Item::ELECTRONICS, 1), CraftingStationType::Furnace);
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::ELECTRONICS, 4}, {Item::IRON_BAR, 8}}, ItemStack(Item::PURIFIER, 1), CraftingStationType::Anvil);
-
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::POT, 1}, {Item::SAPLING, 1}}, ItemStack(Item::PLANT_POT1, 1));
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::POT, 1}, {Item::SAPLING, 1}}, ItemStack(Item::PLANT_POT2, 1));
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::POT, 1}, {Item::SAPLING, 1}}, ItemStack(Item::PLANT_POT3, 1));
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::STONE, 8}}, ItemStack(Item::TOWER, 1));
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::STONE, 10}, {Item::PLANK, 10}}, ItemStack(Item::CAVE_ENTRANCE, 1));
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 10}}, ItemStack(Item::CAULDRON, 1));
-
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::VOLCANIC_SAND, 4}}, ItemStack(Item::SULFUR, 1), CraftingStationType::Purifier);
-
-		// // Temporary recipes
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::WOOD,  1}}, ItemStack(Item::PLANK, 1));
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::PLANK, 2}}, ItemStack(Item::WOODEN_WALL, 1));
-		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::STONE, 1}}, ItemStack(Item::BOMB, 64));
-	}
-
 	void Game::initInteractionSets() {
 		interactionSets.clear();
 		auto standard = std::make_shared<StandardInteractions>();
 		for (const RealmType type: Realm::allTypes)
 			interactionSets.emplace(type, standard);
+	}
+
+	void Game::add(std::shared_ptr<Item> item) {
+		registry<ItemRegistry>().add(item->id, item);
+	}
+
+	void Game::traverseData(const std::filesystem::path &dir) {
+		for (const auto &entry: std::filesystem::directory_iterator(dir)) {
+			if (entry.is_directory()) {
+				traverseData(entry.path());
+			} else if (entry.is_regular_file()) {
+				if (auto path = entry.path(); path.extension() == ".json")
+					loadDataFile(path);
+			}
+		}
+	}
+
+	void Game::loadDataFile(const std::filesystem::path &file) {
+		std::ifstream ifs(file);
+		std::stringstream ss;
+		ss << ifs.rdbuf();
+		std::string raw = ss.str();
+		nlohmann::json json = nlohmann::json::parse(raw);
+		Identifier type = json.at(0);
+		// TODO: make a map of handlers for different types instead of if-elsing here
+		if (type == "base:recipe_list") {
+			for (const auto &recipe_json: json.at(1))
+				addRecipe(recipe_json);
+		} else {
+			throw std::runtime_error("Unknown data file type: " + type.str());
+		}
+	}
+
+	void Game::addRecipe(const nlohmann::json &json) {
+		registries.at(json.at(0).get<Identifier>())->toUnnamed()->add(json.at(1));
 	}
 
 	void Game::tick() {

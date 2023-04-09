@@ -1,0 +1,148 @@
+["base:recipe_list", [
+	["base:crafting_recipe", {
+		"input": [["base:iron_bar", 8], ["base:wood", 4]],
+		"output": [["base:iron_pickaxe", 1, "with_durability"]],
+		"station": "base:anvil"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:iron_bar", 6], ["base:wood", 4]],
+		"output": [["base:iron_shovel", 1, "with_durability"]],
+		"station": "base:anvil"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:iron_bar", 8], ["base:wood", 4]],
+		"output": [["base:iron_axe", 1, "with_durability"]],
+		"station": "base:anvil"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:iron_bar", 8], ["base:wood", 4]],
+		"output": [["base:iron_hammer", 1, "with_durability"]],
+		"station": "base:anvil"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:gold_bar", 8], ["base:wood", 4]],
+		"output": [["base:gold_pickaxe", 1, "with_durability"]],
+		"station": "base:anvil"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:gold_bar", 6], ["base:wood", 4]],
+		"output": [["base:gold_shovel", 1, "with_durability"]],
+		"station": "base:anvil"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:gold_bar", 8], ["base:wood", 4]],
+		"output": [["base:gold_axe", 1, "with_durability"]],
+		"station": "base:anvil"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:gold_bar", 8], ["base:wood", 4]],
+		"output": [["base:gold_hammer", 1, "with_durability"]],
+		"station": "base:anvil"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:diamond",  8], ["base:wood", 4]],
+		"output": [["base:diamond_pickaxe", 1, "with_durability"]],
+		"station": "base:anvil"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:diamond",  6], ["base:wood", 4]],
+		"output": [["base:diamond_shovel", 1, "with_durability"]],
+		"station": "base:anvil"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:diamond",  8], ["base:wood", 4]],
+		"output": [["base:diamond_axe", 1, "with_durability"]],
+		"station": "base:anvil"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:diamond",  8], ["base:wood", 4]],
+		"output": [["base:diamond_hammer", 1, "with_durability"]],
+		"station": "base:anvil"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:diamond_ore", 1]],
+		"output": [["base:diamond", 1]],
+		"station": "base:anvil"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:iron_ore", 1], ["base:coal", 1]],
+		"output": [["base:iron_bar", 1]],
+		"station": "base:furnace"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:gold_ore", 1], ["base:coal", 2]],
+		"output": [["base:gold_bar", 1]],
+		"station": "base:furnace"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:clay",  1]],
+		"output": [["base:brick", 1]],
+		"station": "base:furnace"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:clay", 10]],
+		"output": [["base:pot",   1]],
+		"station": "base:furnace"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:sand", 10]],
+		"output": [["base:silicon", 1]],
+		"station": "base:cauldron"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:sand", 2]],
+		"output": [["base:silicon", 1]],
+		"station": "base:purifier"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:iron_bar", 1], ["base:silicon", 4], ["base:coal", 1]],
+		"output": [["base:electronics", 1]],
+		"station": "base:furnace"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:electronics", 4], ["base:iron_bar", 8]],
+		"output": [["base:purifier", 1]],
+		"station": "base:anvil"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:pot", 1], ["base:sapling", 1]],
+		"output": [["base:plant_pot1", 1]]
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:pot", 1], ["base:sapling", 1]],
+		"output": [["base:plant_pot2", 1]]
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:pot", 1], ["base:sapling", 1]],
+		"output": [["base:plant_pot3", 1]]
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:stone", 8]],
+		"output": [["base:tower", 1]]
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:stone", 10], ["base:plank", 10]],
+		"output": [["base:cave_entrance", 1]]
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:iron_bar", 10]],
+		"output": [["base:cauldron", 1]]
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:volcanic_sand", 4]],
+		"output": [["base:sulfur", 1]],
+		"station": "base:purifier"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:wood",  1]],
+		"output": [["base:plank", 1]]
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:plank", 2]],
+		"output": [["base:wooden_wall", 1]]
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:stone", 1]],
+		"output": [["base:bomb", 64]]
+	}]
+]]

@@ -13,6 +13,8 @@ namespace Game3 {
 
 		Identifier() = default;
 		Identifier(const char *space_, const char *name_): space(space_), name(name_) {}
+		Identifier(std::string_view);
+		Identifier(const char *);
 
 		operator bool() const {
 			if (space.empty() != name.empty())
@@ -34,6 +36,8 @@ namespace Game3 {
 		}
 
 		auto operator<=>(const Identifier &) const = default;
+
+		bool operator==(std::string_view) const;
 	};
 
 	void from_json(const nlohmann::json &, Identifier &);

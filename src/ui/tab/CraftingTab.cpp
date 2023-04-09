@@ -2,7 +2,7 @@
 
 #include "game/Game.h"
 #include "game/Inventory.h"
-#include "registry/RecipeRegistry.h"
+#include "registry/Registries.h"
 #include "ui/MainWindow.h"
 #include "ui/gtk/EntryDialog.h"
 #include "ui/gtk/NumericEntry.h"
@@ -54,7 +54,7 @@ namespace Game3 {
 				Glib::ustring output_label_text;
 				for (ItemStack &output: recipe->output) {
 					auto fixed = std::make_unique<Gtk::Fixed>();
-					auto image = std::make_unique<Gtk::Image>(output.getImage());
+					auto image = std::make_unique<Gtk::Image>(output.getImage(*game));
 					auto label = std::make_unique<Gtk::Label>(std::to_string(output.count));
 					if (!output_label_text.empty())
 						output_label_text += " + ";

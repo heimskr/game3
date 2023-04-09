@@ -17,16 +17,7 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	std::unordered_map<EntityID, EntityTexture> Entity::textureMap {
-		{Entity::GANGBLANC_ID,  {cacheTexture("resources/characters/champions/Gangblanc.png"), 1}},
-		{Entity::GRUM_ID,       {cacheTexture("resources/characters/champions/Grum.png"),      1}},
-		{Entity::ITEM_ID,       {cacheTexture("resources/missing.png"),                        0}}, // Rendering is handled on a per-item basis by the ItemEntity class
-		{Entity::VILLAGER1_ID,  {cacheTexture("resources/characters/villager1.png"),           2}},
-		{Entity::BLACKSMITH_ID, {cacheTexture("resources/characters/blacksmith.png"),          2}},
-		{Entity::WOODCUTTER_ID, {cacheTexture("resources/characters/woodcutter.png"),          2}},
-	};
-
-	std::shared_ptr<Entity> Entity::fromJSON(const nlohmann::json &json) {
+	std::shared_ptr<Entity> Entity::fromJSON(Game &, const nlohmann::json &json) {
 		const EntityID id = json.at("id");
 		const EntityID type = json.at("type");
 		std::shared_ptr<Entity> out;
@@ -36,7 +27,7 @@ namespace Game3 {
 		else
 			switch (type) {
 				case Entity::ITEM_TYPE:
-					out = ItemEntity::create(json.at("stack"));
+					out = ItemEntity::create(ItemStack::fromJSON(game, json.at("stack")));
 					break;
 				case Entity::MINER_TYPE:
 					out = Entity::create<Miner>(id);
@@ -119,7 +110,7 @@ namespace Game3 {
 			texture = &textureMap.at(id_).texture;
 	}
 
-	void Entity::init() {
+	void Entity::init(Game &game) {
 		if (texture == nullptr)
 			texture = &textureMap.at(id_).texture;
 
@@ -347,6 +338,14 @@ namespace Game3 {
 
 	bool Entity::pathfind(const Position &goal) {
 		return pathfind(position, goal, path);
+	}
+
+	Game & Entity::getGame() {
+		return getRealm()->getGame();
+	}
+
+	const Game & Entity::getGame() const {
+		return getRealm()->getGame();
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {

@@ -133,7 +133,7 @@ namespace Game3 {
 						label_text += "\n(" + std::to_string(for_one) + " for one, " + std::to_string(for_all) + " for all)";
 					}
 					auto fixed_ptr = std::make_unique<Gtk::Fixed>();
-					auto image_ptr = std::make_unique<Gtk::Image>(inventory.getImage(slot));
+					auto image_ptr = std::make_unique<Gtk::Image>(inventory.getImage(*game, slot));
 					auto label_ptr = std::make_unique<Gtk::Label>(std::to_string(stack.count));
 					label_ptr->set_xalign(1.f);
 					label_ptr->set_yalign(1.f);

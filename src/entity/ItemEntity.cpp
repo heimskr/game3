@@ -2,7 +2,10 @@
 
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
+#include "game/Game.h"
 #include "game/Inventory.h"
+#include "realm/Realm.h"
+#include "registry/Registries.h"
 #include "ui/SpriteRenderer.h"
 
 namespace Game3 {
@@ -13,20 +16,23 @@ namespace Game3 {
 
 	void ItemEntity::setStack(const ItemStack &stack_) {
 		stack = stack_;
-		const auto &item_texture = Item::itemTextures.at(stack_.item->id);
-		texture = item_texture.texture;
-		xOffset = item_texture.x / 2.f;
-		yOffset = item_texture.y / 2.f;
+		const Game &game = getRealm()->getGame();
+		auto item_texture = game.registry<ItemTextureRegistry>().at(stack_.item->id);
+		texture = item_texture->texture.lock().get();
+		xOffset = item_texture->x / 2.f;
+		yOffset = item_texture->y / 2.f;
 	}
 
-	std::shared_ptr<ItemEntity> ItemEntity::create(const ItemStack &stack) {
-		auto out = std::shared_ptr<ItemEntity>(new ItemEntity(stack));
-		out->init();
+	std::shared_ptr<ItemEntity> ItemEntity::create(Game &game, const ItemStack &stack) {
+		auto out = std::shared_ptr<ItemEntity>(std::unique_ptr<ItemEntity>(new ItemEntity(stack)));
+		out->init(game);
 		return out;
 	}
 
-	std::shared_ptr<ItemEntity> ItemEntity::fromJSON(const nlohmann::json &json) {
-		auto out = create(json.at("stack"));
+	std::shared_ptr<ItemEntity> ItemEntity::fromJSON(Game &game, const nlohmann::json &json) {
+		ItemStack stack;
+		ItemStack::fromJSON(game, json.at("stack"), stack);
+		auto out = create(game, stack);
 		out->absorbJSON(json);
 		return out;
 	}
@@ -36,9 +42,9 @@ namespace Game3 {
 		json["stack"] = getStack();
 	}
 
-	void ItemEntity::init() {
-		Entity::init();
-		stack.item->getOffsets(texture, xOffset, yOffset);
+	void ItemEntity::init(Game &game) {
+		Entity::init(game);
+		stack.item->getOffsets(game, texture, xOffset, yOffset);
 	}
 
 	void ItemEntity::render(SpriteRenderer &sprite_renderer) const {

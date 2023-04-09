@@ -91,7 +91,7 @@ namespace Game3 {
 
 		public:
 			inline const decltype(storage) & getStorage() const { return storage; }
-			inline Glib::RefPtr<Gdk::Pixbuf> getImage(Slot slot) { return storage.at(slot).getImage(); }
+			inline Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &game, Slot slot) { return storage.at(slot).getImage(game); }
 
 			static Inventory fromJSON(const nlohmann::json &, const std::shared_ptr<Agent> &);
 

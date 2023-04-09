@@ -29,7 +29,8 @@ namespace Game3 {
 	struct EntityTexture {
 		Texture texture;
 		uint8_t variety;
-		EntityTexture(const Texture &texture_, uint8_t variety_): texture(texture_), variety(variety_) {}
+		EntityTexture(Texture texture_, uint8_t variety_):
+			texture(std::move(texture_)), variety(variety_) {}
 	};
 
 	class Entity: public Agent, public HasInventory, public std::enable_shared_from_this<Entity> {
@@ -101,7 +102,7 @@ namespace Game3 {
 			inline Position::value_type & row()    { return position.row;    }
 			inline Position::value_type & column() { return position.column; }
 			void id(EntityID);
-			virtual void init();
+			virtual void init(Game &);
 			virtual void initAfterLoad(Game &) {}
 			/** Returns whether the entity actually moved. */
 			bool move(Direction);
@@ -121,6 +122,8 @@ namespace Game3 {
 			bool pathfind(const Position &goal);
 			virtual float getSpeed() const { return MAX_SPEED; }
 			virtual Glib::ustring getName() { return "Unknown Entity (" + std::to_string(type) + ')'; }
+			Game & getGame();
+			const Game & getGame() const;
 
 		protected:
 			Texture *texture = nullptr;

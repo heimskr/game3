@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <utility>
 
+#include "data/Identifier.h"
+
 namespace Game3 {
 	using Index        =  int32_t;
 	using TileID       = uint16_t;
@@ -13,7 +15,6 @@ namespace Game3 {
 	using RealmType    = uint32_t;
 	using EntityID     = uint32_t;
 	using RealmID      =  int32_t;
-	using ItemID       = uint32_t;
 	using Slot         =  int32_t;
 	using ItemCount    = uint64_t;
 	using MoneyCount   = uint64_t;
@@ -25,6 +26,8 @@ namespace Game3 {
 
 	enum class CraftingStationType {None, Furnace, Anvil, Cauldron, Purifier};
 	enum class Ore {Coal, Copper, Iron, Gold, Diamond};
+
+	using ItemID       = Identifier;
 
 	class Player;
 	using PlayerPtr = std::shared_ptr<Player>;

@@ -1,13 +1,29 @@
 #include "data/Identifier.h"
 
 namespace Game3 {
+	Identifier::Identifier(std::string_view combined) {
+		const size_t colon = combined.find(':');
+		if (colon == std::string_view::npos)
+			throw std::invalid_argument("Not a valid identifier: " + std::string(combined));
+		space = std::string(combined.substr(0, colon));
+		name  = std::string(combined.substr(colon + 1));
+	}
+
+	Identifier::Identifier(const char *combined):
+		Identifier(std::string_view(combined)) {}
+
+	bool Identifier::operator==(std::string_view combined) const {
+		const size_t colon = combined.find(':');
+		if (colon == std::string_view::npos)
+			return false;
+		return space == combined.substr(0, colon) && name == combined.substr(colon + 1);
+	}
+
 	void from_json(const nlohmann::json &json, Identifier &identifier) {
-		identifier.space = json.at(0);
-		identifier.name  = json.at(1);
+		identifier = std::string_view(json.get<std::string>());
 	}
 
 	void to_json(nlohmann::json &json, const Identifier &identifier) {
-		json[0] = identifier.space;
-		json[1] = identifier.name;
+		json = identifier.str();
 	}
 }

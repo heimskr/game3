@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <filesystem>
 #include <map>
 #include <memory>
 #include <random>
@@ -45,16 +46,26 @@ namespace Game3 {
 			RealmPtr activeRealm;
 			PlayerPtr player;
 
-			// TODO: remove
-			// std::vector<CraftingRecipe> recipes;
-			// std::unordered_map<ItemID, CraftingRecipe> primaryRecipes;
-
 			RegistryRegistry registries;
 
+			template <typename T>
+			T & registry() {
+				return registries.get<T>();
+			}
+
+			template <typename T>
+			const T & registry() const {
+				return registries.get<const T>();
+			}
+
 			void initRegistries();
+			void initItems();
 			void initEntities();
-			void initRecipes();
 			void initInteractionSets();
+			void add(std::shared_ptr<Item>);
+			void traverseData(const std::filesystem::path &);
+			void loadDataFile(const std::filesystem::path &);
+			void addRecipe(const nlohmann::json &);
 			void tick();
 			RealmID newRealmID() const;
 			void setText(const Glib::ustring &text, const Glib::ustring &name = "", bool focus = true, bool ephemeral = false);

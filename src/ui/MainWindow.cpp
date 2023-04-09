@@ -280,6 +280,9 @@ namespace Game3 {
 	void MainWindow::newGame(int seed, int width, int height) {
 		glArea.get_context()->make_current();
 		game = Game::create(*canvas);
+		game->initRegistries();
+		game->initItems();
+		game->initEntities();
 		Texture texture = cacheTexture("resources/tileset.png");
 		texture.init();
 		auto tilemap = std::make_shared<Tilemap>(width, height, 16, texture);
@@ -295,13 +298,13 @@ namespace Game3 {
 		game->activeRealm = realm;
 		realm->add(game->player = Entity::create<Player>(Entity::GANGBLANC_ID));
 		game->player->position = {realm->randomLand / width, realm->randomLand % width};
-		game->player->init();
-		game->player->inventory->add(ItemStack::withDurability(Item::IRON_PICKAXE));
-		game->player->inventory->add(ItemStack::withDurability(Item::IRON_SHOVEL));
-		game->player->inventory->add(ItemStack::withDurability(Item::IRON_AXE));
-		game->player->inventory->add(ItemStack::withDurability(Item::IRON_HAMMER));
-		game->player->inventory->add(ItemStack(Item::CAVE_ENTRANCE, 4));
+		game->player->init(*game);
 		onGameLoaded();
+		game->player->inventory->add(ItemStack::withDurability(*game, "base:iron_pickaxe"));
+		game->player->inventory->add(ItemStack::withDurability(*game, "base:iron_shovel"));
+		game->player->inventory->add(ItemStack::withDurability(*game, "base:iron_axe"));
+		game->player->inventory->add(ItemStack::withDurability(*game, "base:iron_hammer"));
+		game->player->inventory->add(ItemStack(*game, "base:cave_entrance", 4));
 	}
 
 	void MainWindow::loadGame(const std::filesystem::path &path) {
@@ -312,6 +315,7 @@ namespace Game3 {
 		else
 			game = Game::fromJSON(nlohmann::json::from_cbor(data), *canvas);
 		game->initRegistries();
+		game->initItems();
 		game->initEntities();
 		for (auto &[id, realm]: game->realms)
 			realm->resetPathMap();
@@ -327,6 +331,42 @@ namespace Game3 {
 			for (const auto &entity: realm->entities)
 				entity->initAfterLoad(*game);
 		onGameLoaded();
+	}
+
+	void MainWindow::onGameLoaded() {
+		glArea.get_context()->make_current();
+		debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
+		game->player->focus(*canvas, false);
+		game->traverseData("data");
+		game->initInteractionSets();
+		canvas->game = game;
+		game->activeRealm->rebind();
+		game->activeRealm->reupload();
+		connectSave();
+		for (auto &[widget, tab]: tabMap)
+			tab->reset(game);
+		for (auto &[id, realm]: game->realms)
+			realm->game = game.get();
+		game->signal_player_inventory_update().connect([this](const PlayerPtr &) {
+			inventoryTab->reset(game);
+			if (isFocused(merchantTab))
+				merchantTab->reset(game);
+			craftingTab->reset(game);
+		});
+		game->signal_other_inventory_update().connect([this](const std::shared_ptr<HasRealm> &owner) {
+			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner)) {
+				if (has_inventory->inventory) {
+					if (has_inventory->inventory == inventoryTab->getExternalInventory())
+						inventoryTab->reset(game);
+					if (has_inventory->inventory == merchantTab->getMerchantInventory())
+						merchantTab->reset(game);
+				}
+			}
+		});
+		game->signal_player_money_update().connect([this](const PlayerPtr &) {
+			inventoryTab->reset(game);
+			merchantTab->reset(game);
+		});
 	}
 
 	void MainWindow::saveGame(const std::filesystem::path &path) {
@@ -627,8 +667,8 @@ namespace Game3 {
 					case GDK_KEY_o: {
 						if (game && game->debugMode) {
 							static std::default_random_engine item_rng;
-							static const std::array<ItemID, 3> ids {Item::SHORTSWORD, Item::RED_POTION, Item::COINS};
-							ItemStack stack(choose(ids, item_rng), 1);
+							static const std::array<ItemID, 3> ids {"base:shortsword", "base:red_potion", "base:coins"};
+							ItemStack stack(*game, choose(ids, item_rng), 1);
 							auto leftover = player.inventory->add(stack);
 							if (leftover) {
 								auto &realm = *player.getRealm();
@@ -671,8 +711,8 @@ namespace Game3 {
 					case GDK_KEY_v:
 						if (game && game->debugMode) {
 							auto merchant = player.getRealm()->spawn<Merchant>(player.getPosition(), Entity::VILLAGER1_ID);
-							merchant->inventory->add(ItemStack(Item::RED_POTION, 6));
-							merchant->inventory->add(ItemStack(Item::SHORTSWORD, 1));
+							merchant->inventory->add(ItemStack(*game, "base:red_potion", 6));
+							merchant->inventory->add(ItemStack(*game, "base:shortsword", 1));
 						}
 						return;
 					case GDK_KEY_t:
@@ -775,43 +815,6 @@ namespace Game3 {
 			});
 			chooser->show();
 		}));
-	}
-
-	void MainWindow::onGameLoaded() {
-		glArea.get_context()->make_current();
-		debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
-		game->player->focus(*canvas, false);
-		game->initRegistries();
-		game->initRecipes();
-		game->initInteractionSets();
-		canvas->game = game;
-		game->activeRealm->rebind();
-		game->activeRealm->reupload();
-		connectSave();
-		for (auto &[widget, tab]: tabMap)
-			tab->reset(game);
-		for (auto &[id, realm]: game->realms)
-			realm->game = game.get();
-		game->signal_player_inventory_update().connect([this](const PlayerPtr &) {
-			inventoryTab->reset(game);
-			if (isFocused(merchantTab))
-				merchantTab->reset(game);
-			craftingTab->reset(game);
-		});
-		game->signal_other_inventory_update().connect([this](const std::shared_ptr<HasRealm> &owner) {
-			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner)) {
-				if (has_inventory->inventory) {
-					if (has_inventory->inventory == inventoryTab->getExternalInventory())
-						inventoryTab->reset(game);
-					if (has_inventory->inventory == merchantTab->getMerchantInventory())
-						merchantTab->reset(game);
-				}
-			}
-		});
-		game->signal_player_money_update().connect([this](const PlayerPtr &) {
-			inventoryTab->reset(game);
-			merchantTab->reset(game);
-		});
 	}
 
 	bool MainWindow::isFocused(const std::shared_ptr<Tab> &tab) const {
