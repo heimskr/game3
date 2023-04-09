@@ -25,7 +25,7 @@ namespace Game3 {
 	void ElementBufferedRenderer::reset() {
 		if (initialized) {
 			vao.reset();
-			glDeleteBuffers(1, &eboHandle);
+			ebo.reset();
 			glDeleteBuffers(1, &vboHandle);
 			shader.reset();
 			glDeleteTextures(1, &lfbTexture);
@@ -64,7 +64,7 @@ namespace Game3 {
 
 		GL::bindTexture(1, lfbTexture);
 		vao.bind();
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboHandle); CHECKGL
+		ebo.bind();
 
 		glm::mat4 projection(1.f);
 		projection = glm::scale(projection, {tilemap->tileSize, -tilemap->tileSize, 1}) *
@@ -79,7 +79,7 @@ namespace Game3 {
 		shader.set("bright_tiles", brightTiles);
 		shader.set("map_size", static_cast<GLfloat>(tilemap->width), static_cast<GLfloat>(tilemap->height));
 
-		glDrawElements(GL_TRIANGLES, tilemap->size() * 6, GL_UNSIGNED_INT, (GLvoid *) 0); CHECKGL
+		GL::triangles(tilemap->size());
 	}
 
 	void ElementBufferedRenderer::reupload() {
@@ -117,7 +117,7 @@ namespace Game3 {
 
 	void ElementBufferedRenderer::generateElementBufferObject() {
 		uint32_t i = 0;
-		eboHandle = GL::genEBO2D<uint32_t, 6>(tilemap->width, tilemap->height, GL_STATIC_DRAW, [this, &i](size_t, size_t) {
+		ebo.init<uint32_t, 6>(tilemap->width, tilemap->height, GL_STATIC_DRAW, [this, &i](size_t, size_t) {
 			std::array out {i, i + 1, i + 2, i + 1, i + 2, i + 3};
 			i += 4;
 			return out;

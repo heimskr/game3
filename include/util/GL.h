@@ -158,6 +158,10 @@ namespace GL {
 		glBindTexture(target, texture); CHECKGL
 	}
 
+	inline void triangles(GLsizei count) {
+		glDrawElements(GL_TRIANGLES, count * 6, GL_UNSIGNED_INT, nullptr); CHECKGL
+	}
+
 	class VAO {
 		public:
 			~VAO() {
@@ -182,6 +186,12 @@ namespace GL {
 		protected:
 			GLuint handle = 0;
 			VAO(GLuint handle_ = 0): handle(handle_) {}
+
+			VAO(const VAO &) = delete;
+			VAO(VAO &&) = delete;
+
+			VAO & operator=(const VAO &) = delete;
+			VAO & operator=(VAO &&) = delete;
 	};
 
 	class FloatVAO: public VAO {
@@ -193,6 +203,50 @@ namespace GL {
 				reset();
 				handle = makeFloatVAO(vbo, sizes);
 			}
+	};
+
+	class EBO {
+		public:
+			EBO(GLuint handle_ = 0): handle(handle_) {}
+
+			template <typename... Args>
+			EBO(Args &&...args) {
+				init(std::forward<Args>(args)...);
+			}
+
+			EBO(const EBO &) = delete;
+			EBO(EBO &&) = delete;
+
+			EBO & operator=(const EBO &) = delete;
+			EBO & operator=(EBO &&) = delete;
+
+			~EBO() {
+				reset();
+			}
+
+			inline bool reset() {
+				if (handle == 0)
+					return false;
+				glDeleteBuffers(1, &handle); CHECKGL
+				handle = 0;
+				return true;
+			}
+
+			inline bool bind() {
+				if (handle == 0)
+					return false;
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle); CHECKGL
+				return true;
+			}
+
+			template <typename T, size_t N>
+			inline void init(size_t width, size_t height, GLenum usage, const std::function<std::array<T, N>(size_t, size_t)> &fn) {
+				reset();
+				handle = genEBO2D(width, height, usage, fn);
+			}
+
+		private:
+			GLuint handle = 0;
 	};
 
 	struct Viewport {
