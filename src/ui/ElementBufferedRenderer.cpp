@@ -10,6 +10,7 @@
 #include "Tiles.h"
 #include "realm/Realm.h"
 #include "ui/ElementBufferedRenderer.h"
+#include "util/GL.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 
@@ -30,7 +31,6 @@ namespace Game3 {
 			glDeleteProgram(shaderHandle);
 			glDeleteTextures(1, &lfbTexture);
 			glDeleteTextures(1, &lfbBlurredTexture);
-			glDeleteSamplers(1, &sampler);
 			glDeleteFramebuffers(1, &lfbHandle);
 			tilemap.reset();
 			initialized = false;
@@ -46,7 +46,6 @@ namespace Game3 {
 		generateElementBufferObject();
 		generateVertexArrayObject();
 		generateLightingFrameBuffer();
-		generateSampler();
 		const auto bright_shorts = tileset.getBright();
 		brightTiles.assign(bright_shorts.begin(), bright_shorts.end());
 		brightTiles.resize(8, -1);
@@ -129,69 +128,29 @@ namespace Game3 {
 	}
 
 	void ElementBufferedRenderer::generateVertexBufferObject() {
-		glGenBuffers(1, &vboHandle);
-		glBindBuffer(GL_ARRAY_BUFFER, vboHandle);
-
-		const size_t float_count = tilemap->size() * 20;
-		auto vertex_data = std::make_unique<float[]>(float_count);
-		size_t i = 0;
-
 		const auto set_width = tilemap->setWidth / tilemap->tileSize;
 		const float divisor = set_width;
-		const float ty_size = 1.f / divisor - tileTexturePadding * 2;
+		const float t_size = 1.f / divisor - tileTexturePadding * 2;
 
-		for (int x = 0; x < tilemap->width; ++x)
-			for (int y = 0; y < tilemap->height; ++y) {
-				const auto tile = (*tilemap)(x, y);
-				const float tx0 = (tile % set_width) / divisor + tileTexturePadding;
-				const float ty0 = (tile / set_width) / divisor + tileTexturePadding;
-
-				constexpr int to_add = 5;
-
-				// Vertex 0 (top left)
-				vertex_data[i + 0] = x; // position x
-				vertex_data[i + 1] = y; // position y
-				vertex_data[i + 2] = tx0; // texcoord x
-				vertex_data[i + 3] = ty0; // texcoord y
-				vertex_data[i + 4] = static_cast<float>(tile);
-				i += to_add;
-
-				// Vertex 1 (top right)
-				vertex_data[i + 0] = x + 1; // position x
-				vertex_data[i + 1] = y;     // position y
-				vertex_data[i + 2] = tx0 + ty_size; // texcoord x
-				vertex_data[i + 3] = ty0;           // texcoord y
-				vertex_data[i + 4] = static_cast<float>(tile);
-				i += to_add;
-
-				// Vertex 2 (bottom left)
-				vertex_data[i + 0] = x;     // position x
-				vertex_data[i + 1] = y + 1; // position y
-				vertex_data[i + 2] = tx0;           // texcoord x
-				vertex_data[i + 3] = ty0 + ty_size; // texcoord y
-				vertex_data[i + 4] = static_cast<float>(tile);
-				i += to_add;
-
-				// Vertex 3 (bottom right)
-				vertex_data[i + 0] = x + 1; // position x
-				vertex_data[i + 1] = y + 1; // position y
-				vertex_data[i + 2] = tx0 + ty_size; // texcoord x
-				vertex_data[i + 3] = ty0 + ty_size; // texcoord y
-				vertex_data[i + 4] = static_cast<float>(tile);
-				i += to_add;
-			}
-
-		glBufferData(GL_ARRAY_BUFFER, float_count * sizeof(float), vertex_data.get(), GL_STATIC_DRAW);
+		vboHandle = GL::makeSquareVBO<float, 3>(size_t(tilemap->width), size_t(tilemap->height), GL_STATIC_DRAW, [this, set_width, divisor, t_size](size_t x, size_t y) -> std::array<std::array<float, 3>, 4> {
+			const auto tile = (*tilemap)(x, y);
+			const float tx0 = (tile % set_width) / divisor + tileTexturePadding;
+			const float ty0 = (tile / set_width) / divisor + tileTexturePadding;
+			const float tile_f = static_cast<float>(tile);
+			return std::array {
+				std::array {tx0,          ty0,          tile_f},
+				std::array {tx0 + t_size, ty0,          tile_f},
+				std::array {tx0,          ty0 + t_size, tile_f},
+				std::array {tx0 + t_size, ty0 + t_size, tile_f},
+			};
+		});
 	}
 
 	void ElementBufferedRenderer::generateElementBufferObject() {
-		glGenBuffers(1, &eboHandle);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboHandle);
-
 		size_t index_count = tilemap->size() * 6;
-		auto indices = std::make_unique<unsigned[]>(index_count);
+		auto indices = std::make_unique<uint32_t[]>(index_count);
 
-		unsigned i = 0, j = 0;
+		uint32_t i = 0, j = 0;
 		for (int x = 0; x < tilemap->width; ++x) {
 			for (int y = 0; y < tilemap->height; ++y) {
 				indices[i + 0] = j;
@@ -205,68 +164,31 @@ namespace Game3 {
 			}
 		}
 
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned), indices.get(), GL_STATIC_DRAW);
+		eboHandle = GL::makeEBO(indices.get(), index_count, GL_STATIC_DRAW);
 	}
 
 	void ElementBufferedRenderer::generateVertexArrayObject() {
-		glGenVertexArrays(1, &vaoHandle);
-
-		glBindVertexArray(vaoHandle);
-		glBindBuffer(GL_ARRAY_BUFFER, vboHandle);
-
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (GLvoid *) 0);
-
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (GLvoid *) (sizeof(float) * 2));
-
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (GLvoid *) (sizeof(float) * 4));
+		vaoHandle = GL::makeFloatVAO<3>(vboHandle, {2, 2, 1});
 	}
 
 	void ElementBufferedRenderer::generateLightingFrameBuffer() {
-		glGenFramebuffers(1, &lfbHandle);
+		lfbHandle = GL::makeFBO();
 		generateLightingTexture();
 	}
 
 	void ElementBufferedRenderer::generateLightingTexture() {
-		if (lfbTexture != 0)
-			glDeleteTextures(1, &lfbTexture);
+		GL::deleteTexture(lfbTexture);
+		GL::deleteTexture(lfbBlurredTexture);
 
-		if (lfbBlurredTexture != 0)
-			glDeleteTextures(1, &lfbBlurredTexture);
-
-		glGenTextures(1, &lfbTexture); CHECKGL
-		glGenTextures(1, &lfbBlurredTexture); CHECKGL
 		const auto width  = tilemap->tileSize * tilemap->width;
 		const auto height = tilemap->tileSize * tilemap->height;
-
-		glBindTexture(GL_TEXTURE_2D, lfbBlurredTexture); CHECKGL
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr); CHECKGL
 		constexpr GLint filter = GL_NEAREST;
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); CHECKGL
-		glGenerateMipmap(GL_TEXTURE_2D);
 
-		glBindTexture(GL_TEXTURE_2D, lfbTexture); CHECKGL
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr); CHECKGL
+		lfbTexture = GL::makeFloatTexture(width, height, filter);
+		lfbBlurredTexture = GL::makeFloatTexture(width, height, filter);
+
 		rectangle.update(width, height);
 		reshader.update(width, height);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); CHECKGL
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-	}
-
-	void ElementBufferedRenderer::generateSampler() {
-		if (sampler != 0)
-			glDeleteSamplers(1, &sampler);
-		glGenSamplers(1, &sampler);
 	}
 
 	void ElementBufferedRenderer::recomputeLighting() {
@@ -292,24 +214,20 @@ namespace Game3 {
 		}
 
 		if (recomputation_needed) {
-			GLint gtk_buffer = 0;
-			glGetIntegerv(GL_FRAMEBUFFER_BINDING, &gtk_buffer); CHECKGL
-			glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle); CHECKGL
+			const auto gtk_buffer = GL::getFB();
+			GL::bindFB(lfbHandle);
 
 			generateLightingTexture();
 
-			GLint saved_viewport[4];
-			glGetIntegerv(GL_VIEWPORT, saved_viewport);
 			const auto tilesize = tilemap->tileSize;
 			const auto width    = tilesize * tilemap->width;
 			const auto height   = tilesize * tilemap->height;
-			glViewport(0, 0, width, height); CHECKGL
+			GL::Viewport viewport(0, 0, width, height);
 
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
+			GL::useTextureInFB(lfbTexture);
 
 			// Clearing to half-white because the color in the lightmap will be multiplied by two
-			glClearColor(.5f, .5f, .5f, 0.f); CHECKGL
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); CHECKGL
+			GL::clear(.5f, .5f, .5f, 0.f);
 
 			Timer lava1("Lava1");
 			for (Index row = 0; row < tilemap->height; ++row) {
@@ -333,11 +251,11 @@ namespace Game3 {
 
 			Timer blur("Blur");
 			for (int i = 0; i < 8; ++i) {
-				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbBlurredTexture, 0); CHECKGL
+				GL::useTextureInFB(lfbBlurredTexture);
 				reshader.set("axis", 0);
 				reshader(lfbTexture);
 
-				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
+				GL::useTextureInFB(lfbTexture);
 				reshader.set("axis", 1);
 				reshader(lfbBlurredTexture);
 			}
@@ -358,8 +276,8 @@ namespace Game3 {
 			}
 			lava2.stop();
 
-			glViewport(saved_viewport[0], saved_viewport[1], static_cast<GLsizei>(saved_viewport[2]), static_cast<GLsizei>(saved_viewport[3]));
-			glBindFramebuffer(GL_FRAMEBUFFER, gtk_buffer); CHECKGL
+			viewport.reset();
+			GL::bindFB(gtk_buffer);
 		}
 
 		timer.stop();

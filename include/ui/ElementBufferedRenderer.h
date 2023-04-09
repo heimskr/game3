@@ -31,7 +31,6 @@ namespace Game3 {
 			GLuint lfbHandle = 0;
 			GLuint lfbTexture = 0;
 			GLuint lfbBlurredTexture = 0;
-			GLuint sampler = 0;
 			std::vector<GLint> brightTiles;
 			std::unordered_set<TileID> brightSet;
 			RectangleRenderer rectangle;

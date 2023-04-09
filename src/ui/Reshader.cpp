@@ -5,6 +5,7 @@
 #include "resources.h"
 #include "Shader.h"
 #include "ui/Reshader.h"
+#include "util/GL.h"
 #include "util/Util.h"
 
 namespace Game3 {

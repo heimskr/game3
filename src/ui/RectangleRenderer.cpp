@@ -6,6 +6,7 @@
 
 #include "resources.h"
 #include "ui/RectangleRenderer.h"
+#include "util/GL.h"
 #include "util/Util.h"
 
 namespace Game3 {
