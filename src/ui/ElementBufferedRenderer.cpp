@@ -132,7 +132,7 @@ namespace Game3 {
 		const float divisor = set_width;
 		const float t_size = 1.f / divisor - tileTexturePadding * 2;
 
-		vboHandle = GL::makeSquareVBO<float, 3>(size_t(tilemap->width), size_t(tilemap->height), GL_STATIC_DRAW, [this, set_width, divisor, t_size](size_t x, size_t y) -> std::array<std::array<float, 3>, 4> {
+		vboHandle = GL::genSquareVBO<float, 3>(tilemap->width, tilemap->height, GL_STATIC_DRAW, [this, set_width, divisor, t_size](size_t x, size_t y) {
 			const auto tile = (*tilemap)(x, y);
 			const float tx0 = (tile % set_width) / divisor + tileTexturePadding;
 			const float ty0 = (tile / set_width) / divisor + tileTexturePadding;
@@ -147,24 +147,12 @@ namespace Game3 {
 	}
 
 	void ElementBufferedRenderer::generateElementBufferObject() {
-		size_t index_count = tilemap->size() * 6;
-		auto indices = std::make_unique<uint32_t[]>(index_count);
-
-		uint32_t i = 0, j = 0;
-		for (int x = 0; x < tilemap->width; ++x) {
-			for (int y = 0; y < tilemap->height; ++y) {
-				indices[i + 0] = j;
-				indices[i + 1] = j + 1;
-				indices[i + 2] = j + 2;
-				indices[i + 3] = j + 1;
-				indices[i + 4] = j + 2;
-				indices[i + 5] = j + 3;
-				i += 6;
-				j += 4;
-			}
-		}
-
-		eboHandle = GL::makeEBO(indices.get(), index_count, GL_STATIC_DRAW);
+		uint32_t i = 0;
+		eboHandle = GL::genEBO2D<uint32_t, 6>(tilemap->width, tilemap->height, GL_STATIC_DRAW, [this, &i](size_t, size_t) {
+			std::array out {i, i + 1, i + 2, i + 1, i + 2, i + 3};
+			i += 4;
+			return out;
+		});
 	}
 
 	void ElementBufferedRenderer::generateVertexArrayObject() {

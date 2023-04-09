@@ -6,8 +6,8 @@
 
 #include <GL/gl.h>
 
-// #define CHECKGL do { if (auto err = glGetError()) { std::cerr << "\e[31mError at " << __FILE__ << ':' << __LINE__ << ": " << gluErrorString(err) << "\e[39m\n"; } } while(0);
-#define CHECKGL
+#define CHECKGL do { if (auto err = glGetError()) { std::cerr << "\e[31mError at " << __FILE__ << ':' << __LINE__ << ": " << gluErrorString(err) << "\e[39m\n"; } } while(0);
+// #define CHECKGL
 
 namespace GL {
 	inline void useTextureInFB(GLuint texture) {
@@ -104,37 +104,50 @@ namespace GL {
 	}
 
 	template <typename T, size_t N>
-	inline GLuint makeSquareVBO(size_t first, size_t second, GLenum usage, const std::function<std::array<std::array<T, N>, 4>(size_t, size_t)> &fn) {
+	inline GLuint genSquareVBO(size_t width, size_t height, GLenum usage, const std::function<std::array<std::array<T, N>, 4>(size_t, size_t)> &fn) {
 		std::vector<T> vertex_data;
-		vertex_data.reserve(first * second * (2 + N));
+		vertex_data.reserve(width * height * (2 + N));
 
-		for (size_t i = 0; i < first; ++i) {
-			for (size_t j = 0; j < second; ++j) {
-				const auto generated = fn(i, j);
+		for (size_t x = 0; x < width; ++x) {
+			for (size_t y = 0; y < height; ++y) {
+				const auto generated = fn(x, y);
 
-				vertex_data.push_back(i);
-				vertex_data.push_back(j);
-				for (const auto &item: generated[0])
+				vertex_data.push_back(x);
+				vertex_data.push_back(y);
+				for (const T item: generated[0])
 					vertex_data.push_back(item);
 
-				vertex_data.push_back(i + 1);
-				vertex_data.push_back(j);
-				for (const auto &item: generated[1])
+				vertex_data.push_back(x + 1);
+				vertex_data.push_back(y);
+				for (const T item: generated[1])
 					vertex_data.push_back(item);
 
-				vertex_data.push_back(i);
-				vertex_data.push_back(j + 1);
-				for (const auto &item: generated[2])
+				vertex_data.push_back(x);
+				vertex_data.push_back(y + 1);
+				for (const T item: generated[2])
 					vertex_data.push_back(item);
 
-				vertex_data.push_back(i + 1);
-				vertex_data.push_back(j + 1);
-				for (const auto &item: generated[3])
+				vertex_data.push_back(x + 1);
+				vertex_data.push_back(y + 1);
+				for (const T item: generated[3])
 					vertex_data.push_back(item);
 			}
 		}
 
 		return GL::makeVBO(vertex_data.data(), vertex_data.size(), usage);
+	}
+
+	template <typename T, size_t N>
+	inline GLuint genEBO2D(size_t width, size_t height, GLenum usage, const std::function<std::array<T, N>(size_t, size_t)> &fn) {
+		std::vector<T> element_data;
+		element_data.reserve(width * height * N);
+
+		for (size_t x = 0; x < width; ++x)
+			for (size_t y = 0; y < height; ++y)
+				for (const T item: fn(x, y))
+					element_data.push_back(item);
+
+		return GL::makeEBO(element_data.data(), element_data.size(), usage);
 	}
 
 	struct Viewport {
