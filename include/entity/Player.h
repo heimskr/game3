@@ -2,6 +2,7 @@
 
 #include <optional>
 
+#include "data/Identifier.h"
 #include "entity/Entity.h"
 
 namespace Game3 {
@@ -12,7 +13,7 @@ namespace Game3 {
 			MoneyCount money;
 			float tooldown = 0.f;
 
-			std::unordered_set<CraftingStationType> stationTypes {CraftingStationType::None};
+			std::unordered_set<Identifier> stationTypes {{}};
 
 			float speed = 10.f;
 			bool movingUp = false;

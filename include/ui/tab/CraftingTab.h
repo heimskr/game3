@@ -34,14 +34,14 @@ namespace Game3 {
 
 			/** We can't store state in a popover, so we have to store it here. */
 			std::shared_ptr<Game> lastGame;
-			size_t lastIndex = 0;
+			size_t lastRegistryID = 0;
 
 			/** Returns whether crafting was successful. */
-			bool craftOne(const std::shared_ptr<Game> &, size_t index);
+			bool craftOne(const std::shared_ptr<Game> &, size_t registry_id);
 
-			size_t craftAll(const std::shared_ptr<Game> &, size_t index);
+			size_t craftAll(const std::shared_ptr<Game> &, size_t registry_id);
 
-			void leftClick(const std::shared_ptr<Game> &, Gtk::Widget *, size_t index, int n, double x, double y);
-			void rightClick(const std::shared_ptr<Game> &, Gtk::Widget *, size_t index, double x, double y);
+			void leftClick(const std::shared_ptr<Game> &, Gtk::Widget *, size_t registry_id, int n, double x, double y);
+			void rightClick(const std::shared_ptr<Game> &, Gtk::Widget *, size_t registry_id, double x, double y);
 	};
 }

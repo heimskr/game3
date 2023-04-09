@@ -3,6 +3,7 @@
 #include "game/Game.h"
 #include "game/InteractionSet.h"
 #include "game/Inventory.h"
+#include "registry/RecipeRegistry.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "ui/tab/TextTab.h"
@@ -11,53 +12,57 @@
 #include "util/Util.h"
 
 namespace Game3 {
+	void Game::initRegistries() {
+		registries.add<CraftingRecipeRegistry>();
+	}
+
 	void Game::initEntities() {
 		for (const auto &[realm_id, realm]: realms)
 			realm->initEntities();
 	}
 
 	void Game::initRecipes() {
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::IRON_PICKAXE),    CraftingStationType::Anvil);
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 6}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::IRON_SHOVEL),     CraftingStationType::Anvil);
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::IRON_AXE),        CraftingStationType::Anvil);
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::IRON_HAMMER),     CraftingStationType::Anvil);
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::GOLD_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::GOLD_PICKAXE),    CraftingStationType::Anvil);
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::GOLD_BAR, 6}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::GOLD_SHOVEL),     CraftingStationType::Anvil);
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::GOLD_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::GOLD_AXE),        CraftingStationType::Anvil);
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::GOLD_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::GOLD_HAMMER),     CraftingStationType::Anvil);
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::DIAMOND,  8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::DIAMOND_PICKAXE), CraftingStationType::Anvil);
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::DIAMOND,  6}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::DIAMOND_SHOVEL),  CraftingStationType::Anvil);
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::DIAMOND,  8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::DIAMOND_AXE),     CraftingStationType::Anvil);
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::DIAMOND,  8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::DIAMOND_HAMMER),  CraftingStationType::Anvil);
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::DIAMOND_ORE, 1}}, ItemStack(Item::DIAMOND, 1), CraftingStationType::Anvil);
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::IRON_PICKAXE),    CraftingStationType::Anvil);
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 6}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::IRON_SHOVEL),     CraftingStationType::Anvil);
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::IRON_AXE),        CraftingStationType::Anvil);
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::IRON_HAMMER),     CraftingStationType::Anvil);
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::GOLD_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::GOLD_PICKAXE),    CraftingStationType::Anvil);
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::GOLD_BAR, 6}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::GOLD_SHOVEL),     CraftingStationType::Anvil);
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::GOLD_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::GOLD_AXE),        CraftingStationType::Anvil);
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::GOLD_BAR, 8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::GOLD_HAMMER),     CraftingStationType::Anvil);
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::DIAMOND,  8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::DIAMOND_PICKAXE), CraftingStationType::Anvil);
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::DIAMOND,  6}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::DIAMOND_SHOVEL),  CraftingStationType::Anvil);
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::DIAMOND,  8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::DIAMOND_AXE),     CraftingStationType::Anvil);
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::DIAMOND,  8}, {Item::WOOD, 4}}, ItemStack::withDurability(Item::DIAMOND_HAMMER),  CraftingStationType::Anvil);
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::DIAMOND_ORE, 1}}, ItemStack(Item::DIAMOND, 1), CraftingStationType::Anvil);
 
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_ORE, 1}, {Item::COAL, 1}}, ItemStack(Item::IRON_BAR, 1), CraftingStationType::Furnace);
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::GOLD_ORE, 1}, {Item::COAL, 2}}, ItemStack(Item::GOLD_BAR, 1), CraftingStationType::Furnace);
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::CLAY,  1}}, ItemStack(Item::BRICK, 1), CraftingStationType::Furnace);
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::CLAY, 10}}, ItemStack(Item::POT,   1), CraftingStationType::Furnace);
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_ORE, 1}, {Item::COAL, 1}}, ItemStack(Item::IRON_BAR, 1), CraftingStationType::Furnace);
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::GOLD_ORE, 1}, {Item::COAL, 2}}, ItemStack(Item::GOLD_BAR, 1), CraftingStationType::Furnace);
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::CLAY,  1}}, ItemStack(Item::BRICK, 1), CraftingStationType::Furnace);
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::CLAY, 10}}, ItemStack(Item::POT,   1), CraftingStationType::Furnace);
 
-		// Early-game low-yield silicon
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::SAND, 10}}, ItemStack(Item::SILICON, 1), CraftingStationType::Cauldron);
+		// // Early-game low-yield silicon
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::SAND, 10}}, ItemStack(Item::SILICON, 1), CraftingStationType::Cauldron);
 
-		// High-yield silicon
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::SAND, 2}}, ItemStack(Item::SILICON, 1), CraftingStationType::Purifier);
+		// // High-yield silicon
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::SAND, 2}}, ItemStack(Item::SILICON, 1), CraftingStationType::Purifier);
 
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 1}, {Item::SILICON, 4}, {Item::COAL, 1}}, ItemStack(Item::ELECTRONICS, 1), CraftingStationType::Furnace);
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::ELECTRONICS, 4}, {Item::IRON_BAR, 8}}, ItemStack(Item::PURIFIER, 1), CraftingStationType::Anvil);
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 1}, {Item::SILICON, 4}, {Item::COAL, 1}}, ItemStack(Item::ELECTRONICS, 1), CraftingStationType::Furnace);
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::ELECTRONICS, 4}, {Item::IRON_BAR, 8}}, ItemStack(Item::PURIFIER, 1), CraftingStationType::Anvil);
 
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::POT, 1}, {Item::SAPLING, 1}}, ItemStack(Item::PLANT_POT1, 1));
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::POT, 1}, {Item::SAPLING, 1}}, ItemStack(Item::PLANT_POT2, 1));
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::POT, 1}, {Item::SAPLING, 1}}, ItemStack(Item::PLANT_POT3, 1));
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::STONE, 8}}, ItemStack(Item::TOWER, 1));
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::STONE, 10}, {Item::PLANK, 10}}, ItemStack(Item::CAVE_ENTRANCE, 1));
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 10}}, ItemStack(Item::CAULDRON, 1));
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::POT, 1}, {Item::SAPLING, 1}}, ItemStack(Item::PLANT_POT1, 1));
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::POT, 1}, {Item::SAPLING, 1}}, ItemStack(Item::PLANT_POT2, 1));
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::POT, 1}, {Item::SAPLING, 1}}, ItemStack(Item::PLANT_POT3, 1));
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::STONE, 8}}, ItemStack(Item::TOWER, 1));
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::STONE, 10}, {Item::PLANK, 10}}, ItemStack(Item::CAVE_ENTRANCE, 1));
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::IRON_BAR, 10}}, ItemStack(Item::CAULDRON, 1));
 
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::VOLCANIC_SAND, 4}}, ItemStack(Item::SULFUR, 1), CraftingStationType::Purifier);
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::VOLCANIC_SAND, 4}}, ItemStack(Item::SULFUR, 1), CraftingStationType::Purifier);
 
-		// Temporary recipes
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::WOOD,  1}}, ItemStack(Item::PLANK, 1));
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::PLANK, 2}}, ItemStack(Item::WOODEN_WALL, 1));
-		registerPrimaryRecipe(std::vector<ItemStack> {{Item::STONE, 1}}, ItemStack(Item::BOMB, 64));
+		// // Temporary recipes
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::WOOD,  1}}, ItemStack(Item::PLANK, 1));
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::PLANK, 2}}, ItemStack(Item::WOODEN_WALL, 1));
+		// registerPrimaryRecipe(std::vector<ItemStack> {{Item::STONE, 1}}, ItemStack(Item::BOMB, 64));
 	}
 
 	void Game::initInteractionSets() {
@@ -181,13 +186,6 @@ namespace Game3 {
 		out->debugMode = json.contains("debugMode")? json.at("debugMode").get<bool>() : false;
 		out->cavesGenerated = json.contains("cavesGenerated")? json.at("cavesGenerated").get<decltype(Game::cavesGenerated)>() : 0;
 		return out;
-	}
-
-	void Game::registerPrimaryRecipe(std::vector<ItemStack> &&inputs, ItemStack &&output, CraftingStationType station) {
-		const ItemID id = output.item->id;
-		CraftingRecipe recipe(std::move(inputs), std::move(output), station);
-		recipes.push_back(recipe);
-		primaryRecipes.emplace(id, std::move(recipe));
 	}
 
 	void to_json(nlohmann::json &json, const Game &game) {

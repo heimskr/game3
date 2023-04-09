@@ -3,43 +3,95 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <type_traits>
 #include <unordered_set>
 #include <utility>
+#include <vector>
+
+#include "data/Identifier.h"
+#include "registry/Registerable.h"
 
 namespace Game3 {
-	class Registry {
+	class Registry: public NamedRegisterable, public std::enable_shared_from_this<Registry> {
 		public:
-			std::string name;
-
-			Registry(std::string name_): name(std::move(name_)) {}
+			Registry(Identifier identifier_): NamedRegisterable(std::move(identifier_)) {}
 
 			virtual ~Registry() = 0;
+
+			template <typename T>
+			std::shared_ptr<T> cast() {
+				return std::dynamic_pointer_cast<T>(shared_from_this());
+			}
+
+			template <typename T>
+			std::shared_ptr<const T> cast() const {
+				return std::dynamic_pointer_cast<const T>(shared_from_this());
+			}
+
+		protected:
+			size_t nextCounter = 0;
 	};
 
 	template <typename T>
 	class NamedRegistry: public Registry {
+		static_assert(std::is_base_of_v<NamedRegisterable, T>);
+
 		public:
-			std::map<std::string, std::shared_ptr<T>> items;
+			std::map<Identifier, std::shared_ptr<T>> items;
+			std::vector<std::shared_ptr<T>> byCounter;
 
 			using Registry::Registry;
 			~NamedRegistry() override = default;
+
+			NamedRegistry & operator+=(std::shared_ptr<T> item) {
+				add(item);
+				return *this;
+			}
 
 			NamedRegistry & operator+=(const std::pair<std::string, std::shared_ptr<T>> &pair) {
 				add(pair.first, pair.second);
 				return *this;
 			}
 
-			void add(std::string new_name, std::shared_ptr<T> new_item) {
-				if (items.contains(new_name))
-					throw std::runtime_error("NamedRegistry " + name + " already contains an item with name \"" + new_name + '"');
-				items.try_emplace(std::move(new_name), std::move(new_item));
+			template <typename S>
+			void add() {
+				add(S::ID, std::make_shared<S>());
+			}
+
+			void add(Identifier new_name, std::shared_ptr<T> new_item) {
+				if (auto [iter, inserted] = items.try_emplace(std::move(new_name), std::move(new_item)); inserted) {
+					iter->second->registryID = nextCounter++;
+					byCounter.push_back(iter->second);
+				} else
+					throw std::runtime_error("NamedRegistry " + identifier.str() + " already contains an item with name \"" + new_name.str() + '"');
+			}
+
+			template <typename S>
+			S & get() {
+				return *items.at(S::ID)->template cast<S>();
+			}
+
+			template <typename S>
+			const S & get() const {
+				return *items.at(S::ID)->template cast<S>();
+			}
+
+			std::shared_ptr<T> operator[](size_t counter) const {
+				return byCounter[counter];
+			}
+
+			std::shared_ptr<T> at(size_t counter) const {
+				return byCounter.at(counter);
 			}
 	};
 
 	template <typename T>
 	class UnnamedRegistry: public Registry {
+		static_assert(std::is_base_of_v<Registerable, T>);
+
 		public:
 			std::unordered_set<std::shared_ptr<T>> items;
+			std::vector<std::shared_ptr<T>> byCounter;
 
 			using Registry::Registry;
 			~UnnamedRegistry() override = default;
@@ -50,15 +102,34 @@ namespace Game3 {
 			}
 
 			void add(std::shared_ptr<T> item) {
-				items.insert(std::move(item));
+				if (auto [iter, inserted] = items.insert(std::move(item)); inserted) {
+					iter.second->registryID = nextCounter++;
+					byCounter.push_back(iter.second);
+				}
 			}
 
 			bool addCarefully(std::shared_ptr<T> item) {
 				for (const auto &existing: items)
 					if (*existing == *item)
 						return false;
-				items.insert(std::move(item));
-				return true;
+				if (auto [iter, inserted] = items.insert(std::move(item)); inserted) {
+					iter.second->registryID = nextCounter++;
+					byCounter.push_back(iter.second);
+					return true;
+				}
+				return false;
 			}
+
+			std::shared_ptr<T> operator[](size_t counter) const {
+				return byCounter[counter];
+			}
+
+			std::shared_ptr<T> at(size_t counter) const {
+				return byCounter.at(counter);
+			}
+	};
+
+	struct RegistryRegistry: NamedRegistry<Registry> {
+		RegistryRegistry(): NamedRegistry({"base", "registry_registry"}) {}
 	};
 }

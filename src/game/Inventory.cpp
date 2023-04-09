@@ -5,6 +5,7 @@
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "realm/Realm.h"
+#include "recipe/CraftingRecipe.h"
 
 namespace Game3 {
 	Inventory::Inventory(const std::shared_ptr<Agent> &owner_, Slot slot_count):
@@ -288,7 +289,7 @@ namespace Game3 {
 
 	ItemCount Inventory::craftable(const CraftingRecipe &recipe) const {
 		ItemCount out = UINT64_MAX;
-		for (const ItemStack &input: recipe.inputs)
+		for (const ItemStack &input: recipe.input)
 			out = std::min(out, count(input) / input.count);
 		return out;
 	}

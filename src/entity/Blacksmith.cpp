@@ -229,6 +229,8 @@ namespace Game3 {
 			{Item::DIAMOND_AXE, 1}, {Item::DIAMOND_SHOVEL, 1}, {Item::DIAMOND_PICKAXE, 3}, {Item::DIAMOND_HAMMER, 1},
 		};
 
+		// TODO: resurrect
+		/*
 		for (auto [item, count]: tools)
 			for (size_t i = inventory->count(item); i < count; ++i) {
 				std::vector<ItemStack> leftovers;
@@ -243,6 +245,7 @@ namespace Game3 {
 				}
 			}
 		// std::cout << "Done.\n";
+		//*/
 	}
 
 	void Blacksmith::goToCounter() {

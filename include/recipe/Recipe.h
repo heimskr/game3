@@ -3,6 +3,8 @@
 #include <memory>
 #include <optional>
 
+#include "registry/Registerable.h"
+
 namespace Game3 {
 	class Container;
 
@@ -11,7 +13,7 @@ namespace Game3 {
 	};
 
 	template <typename I, typename O>
-	struct Recipe {
+	struct Recipe: Registerable {
 		using Input  = I;
 		using Output = O;
 

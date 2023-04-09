@@ -10,6 +10,8 @@ namespace Game3 {
 		Output output;
 		Identifier stationType;
 
+		CraftingRecipe(Input, Output, Identifier);
+
 		Input getInput() override;
 		Output getOutput() override;
 		bool canCraft(const std::shared_ptr<Container> &) override;

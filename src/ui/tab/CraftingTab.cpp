@@ -2,6 +2,7 @@
 
 #include "game/Game.h"
 #include "game/Inventory.h"
+#include "registry/RecipeRegistry.h"
 #include "ui/MainWindow.h"
 #include "ui/gtk/EntryDialog.h"
 #include "ui/gtk/NumericEntry.h"
@@ -23,9 +24,9 @@ namespace Game3 {
 		popoverMenu.set_menu_model(gmenu);
 
 		auto group = Gio::SimpleActionGroup::create();
-		group->add_action("craft_one", [this] { craftOne(lastGame, lastIndex); });
+		group->add_action("craft_one", [this] { craftOne(lastGame, lastRegistryID); });
 		group->add_action("craft_x",   [this] { std::cout << "x\n"; });
-		group->add_action("craft_all", [this] { craftAll(lastGame, lastIndex); });
+		group->add_action("craft_all", [this] { craftAll(lastGame, lastRegistryID); });
 
 		mainWindow.insert_action_group("crafting_popup", group);
 		popoverMenu.set_parent(mainWindow); // TODO: fix this silliness
@@ -43,15 +44,15 @@ namespace Game3 {
 		removeChildren(vbox);
 		widgets.clear();
 
-		size_t index = 0;
-		auto &inventory = *game->player->inventory;
-		for (auto &recipe: game->recipes) {
-			if (game->player->stationTypes.contains(recipe.station) && inventory.canCraft(recipe)) {
+		// size_t index = 0;
+		auto inventory = game->player->inventory;
+		for (const auto &recipe: game->registries.get<CraftingRecipeRegistry>().items) {
+			if (game->player->stationTypes.contains(recipe->stationType) && recipe->canCraft(inventory)) {
 				auto hbox = std::make_unique<Gtk::Box>(Gtk::Orientation::HORIZONTAL);
 				auto left_vbox = std::make_unique<Gtk::Box>(Gtk::Orientation::VERTICAL);
 				auto right_vbox = std::make_unique<Gtk::Box>(Gtk::Orientation::VERTICAL);
 				Glib::ustring output_label_text;
-				for (ItemStack &output: recipe.outputs) {
+				for (ItemStack &output: recipe->output) {
 					auto fixed = std::make_unique<Gtk::Fixed>();
 					auto image = std::make_unique<Gtk::Image>(output.getImage());
 					auto label = std::make_unique<Gtk::Label>(std::to_string(output.count));
@@ -81,7 +82,7 @@ namespace Game3 {
 				output_label->add_css_class("output-label");
 				right_vbox->append(*output_label);
 
-				for (const ItemStack &input: recipe.inputs) {
+				for (const ItemStack &input: recipe->input) {
 					auto label = std::make_unique<Gtk::Label>((input.count != 1? std::to_string(input.count) + " \u00d7 " : "") + input.item->name);
 					label->set_xalign(0.f);
 					label->add_css_class("input-label");
@@ -97,15 +98,15 @@ namespace Game3 {
 
 				auto left_click = Gtk::GestureClick::create();
 				left_click->set_button(1);
-				left_click->signal_pressed().connect([this, game, hbox = hbox.get(), index](int n, double x, double y) {
-					leftClick(game, hbox, index, n, x, y);
+				left_click->signal_pressed().connect([this, game, hbox = hbox.get(), id = recipe->registryID](int n, double x, double y) {
+					leftClick(game, hbox, id, n, x, y);
 				});
 				hbox->add_controller(left_click);
 
 				auto right_click = Gtk::GestureClick::create();
 				right_click->set_button(3);
-				right_click->signal_pressed().connect([this, game, hbox = hbox.get(), index](int, double x, double y) {
-					rightClick(game, hbox, index, x, y);
+				right_click->signal_pressed().connect([this, game, hbox = hbox.get(), id = recipe->registryID](int, double x, double y) {
+					rightClick(game, hbox, id, x, y);
 				});
 				hbox->add_controller(right_click);
 
@@ -114,36 +115,34 @@ namespace Game3 {
 				widgets.push_back(std::move(right_vbox));
 				widgets.push_back(std::move(hbox));
 			}
-
-			++index;
 		}
 	}
 
-	bool CraftingTab::craftOne(const std::shared_ptr<Game> &game, size_t index) {
-		CraftingRecipe &recipe = game->recipes.at(index);
-		Inventory &inventory = *game->player->inventory;
+	bool CraftingTab::craftOne(const std::shared_ptr<Game> &game, size_t registry_id) {
+		auto recipe = game->registries.get<CraftingRecipeRegistry>()[registry_id];
+		auto inventory = game->player->inventory;
 		std::vector<ItemStack> leftovers;
-		if (!inventory.craft(recipe, leftovers))
+		if (!recipe->craft(inventory, leftovers))
 			return false;
 		for (auto &leftover: leftovers)
 			leftover.spawn(game->player->getRealm(), game->player->position);
 		return true;
 	}
 
-	size_t CraftingTab::craftAll(const std::shared_ptr<Game> &game, size_t index) {
+	size_t CraftingTab::craftAll(const std::shared_ptr<Game> &game, size_t registry_id) {
 		size_t out = 0;
-		while (craftOne(game, index))
+		while (craftOne(game, registry_id))
 			++out;
 		return out;
 	}
 
-	void CraftingTab::leftClick(const std::shared_ptr<Game> &game, Gtk::Widget *, size_t index, int n, double, double) {
+	void CraftingTab::leftClick(const std::shared_ptr<Game> &game, Gtk::Widget *, size_t registry_id, int n, double, double) {
 		mainWindow.onBlur();
 		if (n % 2 == 0)
-			craftOne(game, index);
+			craftOne(game, registry_id);
 	}
 
-	void CraftingTab::rightClick(const std::shared_ptr<Game> &game, Gtk::Widget *widget, size_t index, double x, double y) {
+	void CraftingTab::rightClick(const std::shared_ptr<Game> &game, Gtk::Widget *widget, size_t registry_id, double x, double y) {
 		mainWindow.onBlur();
 		do {
 			const auto allocation = widget->get_allocation();
@@ -155,7 +154,7 @@ namespace Game3 {
 		popoverMenu.set_has_arrow(true);
 		popoverMenu.set_pointing_to({int(x), int(y), 1, 1});
 		lastGame = game;
-		lastIndex = index;
+		lastRegistryID = registry_id;
 		popoverMenu.popup();
 	}
 }

@@ -2,6 +2,9 @@
 #include "recipe/CraftingRecipe.h"
 
 namespace Game3 {
+	CraftingRecipe::CraftingRecipe(Input input_, Output output_, Identifier station_type):
+		input(std::move(input_)), output(std::move(output_)), stationType(std::move(station_type)) {}
+
 	CraftingRecipe::Input CraftingRecipe::getInput() {
 		return input;
 	}
@@ -13,7 +16,7 @@ namespace Game3 {
 	bool CraftingRecipe::canCraft(const std::shared_ptr<Container> &container) {
 		auto inventory = std::dynamic_pointer_cast<Inventory>(container);
 		if (!inventory)
-			return;
+			return false;
 
 		for (const auto &stack: input)
 			if (inventory->count(stack) < stack.count)

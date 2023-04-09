@@ -13,6 +13,7 @@
 #include "entity/Player.h"
 #include "game/Crafting.h"
 #include "realm/Realm.h"
+#include "registry/Registry.h"
 
 namespace Game3 {
 	class Canvas;
@@ -43,9 +44,14 @@ namespace Game3 {
 			std::unordered_map<RealmID, RealmPtr> realms;
 			RealmPtr activeRealm;
 			PlayerPtr player;
-			std::vector<CraftingRecipe> recipes;
-			std::unordered_map<ItemID, CraftingRecipe> primaryRecipes;
 
+			// TODO: remove
+			// std::vector<CraftingRecipe> recipes;
+			// std::unordered_map<ItemID, CraftingRecipe> primaryRecipes;
+
+			RegistryRegistry registries;
+
+			void initRegistries();
 			void initEntities();
 			void initRecipes();
 			void initInteractionSets();
@@ -78,8 +84,6 @@ namespace Game3 {
 			sigc::signal<void(const PlayerPtr &)> signal_player_money_update_;
 			sigc::signal<void(const std::shared_ptr<HasRealm> &)> signal_other_inventory_update_;
 			std::chrono::system_clock::time_point lastTime = startTime;
-
-			void registerPrimaryRecipe(std::vector<ItemStack> &&inputs, ItemStack &&output, CraftingStationType = CraftingStationType::None);
 	};
 
 	void to_json(nlohmann::json &, const Game &);
