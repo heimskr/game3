@@ -452,7 +452,7 @@ namespace Game3 {
 		return out;
 	}
 
-	std::vector<Node *> Graph::topoSort() {
+	std::vector<Node *> Graph::reverseTopoSort() {
 		if (empty())
 			return {};
 
@@ -480,6 +480,11 @@ namespace Game3 {
 		while (!nonpermanent.empty())
 			visit(*nonpermanent.begin());
 
+		return out;
+	}
+
+	std::vector<Node *> Graph::topoSort() {
+		auto out = reverseTopoSort();
 		std::reverse(out.begin(), out.end());
 		return out;
 	}

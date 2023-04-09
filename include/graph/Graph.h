@@ -163,6 +163,7 @@ namespace Game3 {
 			/** Returns a vectors of all edges represented as a pair of the start node and the end node. */
 			std::vector<std::pair<Node *, Node *>> allEdges() const;
 
+			std::vector<Node *> reverseTopoSort();
 			std::vector<Node *> topoSort();
 
 			/** Returns a representation of the graph in graphviz dot syntax. */
