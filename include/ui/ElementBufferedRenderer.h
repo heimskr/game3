@@ -1,5 +1,8 @@
 #pragma once
 
+#include <unordered_set>
+#include <vector>
+
 #include "Shader.h"
 #include "ui/RectangleRenderer.h"
 #include "ui/Reshader.h"
@@ -42,9 +45,7 @@ namespace Game3 {
 			void generateVertexBufferObject();
 			void generateElementBufferObject();
 			void generateVertexArrayObject();
-			void generateLightingFrameBuffer();
 			void generateLightingTexture();
-			void generateSampler();
 
 			void recomputeLighting();
 	};

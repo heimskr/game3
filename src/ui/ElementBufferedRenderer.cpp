@@ -44,7 +44,8 @@ namespace Game3 {
 		generateVertexBufferObject();
 		generateElementBufferObject();
 		generateVertexArrayObject();
-		generateLightingFrameBuffer();
+		lightFBO.init();
+		generateLightingTexture();
 		const auto bright_shorts = tileset.getBright();
 		brightTiles.assign(bright_shorts.begin(), bright_shorts.end());
 		brightTiles.resize(8, -1);
@@ -117,20 +118,14 @@ namespace Game3 {
 	void ElementBufferedRenderer::generateElementBufferObject() {
 		uint32_t i = 0;
 		ebo.init<uint32_t, 6>(tilemap->width, tilemap->height, GL_STATIC_DRAW, [this, &i](size_t, size_t) {
-			std::array out {i, i + 1, i + 2, i + 1, i + 2, i + 3};
 			i += 4;
-			return out;
+			return std::array {i - 4, i - 3, i - 2, i - 3, i - 2, i - 1};
 		});
 	}
 
 	void ElementBufferedRenderer::generateVertexArrayObject() {
 		assert(vbo.getHandle() != 0);
 		vao.init(vbo, {2, 2, 1});
-	}
-
-	void ElementBufferedRenderer::generateLightingFrameBuffer() {
-		lightFBO.init();
-		generateLightingTexture();
 	}
 
 	void ElementBufferedRenderer::generateLightingTexture() {
@@ -192,7 +187,7 @@ namespace Game3 {
 						const float x = column * tilesize;
 						const float y = row * tilesize;
 						constexpr float radius = 1.5f;
-						rectangle.drawOnScreen({1.f, .5f, 0.f, .5f}, x - radius * tilesize, y - radius * tilesize, (2.f * radius + 1.f) * tilesize, (2.f * radius + 1.f) * tilesize);
+						rectangle({1.f, .5f, 0.f, .5f}, x - radius * tilesize, y - radius * tilesize, (2.f * radius + 1.f) * tilesize, (2.f * radius + 1.f) * tilesize);
 					}
 				}
 			}
@@ -224,7 +219,7 @@ namespace Game3 {
 						const float x = column * tilesize;
 						const float y = row * tilesize;
 						const float margin = .0f * tilesize;
-						rectangle.drawOnScreen({1.f, 1.f, 1.f, 1.f}, x + margin, y + margin, tilesize - 2 * margin, tilesize - 2 * margin);
+						rectangle({1.f, 1.f, 1.f, 1.f}, x + margin, y + margin, tilesize - 2 * margin, tilesize - 2 * margin);
 					}
 				}
 			}
