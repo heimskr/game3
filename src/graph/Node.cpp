@@ -76,7 +76,7 @@ namespace Game3 {
 		if (index_ != -1)
 			return index_;
 
-		for (const Node *node: owner->nodes()) {
+		for (const Node *node: owner->getNodes()) {
 			++index_;
 			if (node == this)
 				return index_;

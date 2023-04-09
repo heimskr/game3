@@ -16,7 +16,7 @@ namespace Game3 {
 			using Label = std::string;
 
 		private:
-			std::list<Node *> nodes_;
+			std::list<Node *> nodes;
 			std::unordered_map<std::string, Node *> labelMap;
 
 			void bridgeTraverse(const Node &node, std::unordered_map<const Node *, bool> &visited,
@@ -66,7 +66,7 @@ namespace Game3 {
 			bool empty() const;
 
 			/** Returns a constant reference to the list of nodes. */
-			const std::list<Node *> & nodes() const;
+			const std::list<Node *> & getNodes() const;
 
 			/** Returns the node at a given index. Throws an exception if no node exists at the index. */
 			Node & operator[](size_t) const;
@@ -162,6 +162,8 @@ namespace Game3 {
 
 			/** Returns a vectors of all edges represented as a pair of the start node and the end node. */
 			std::vector<std::pair<Node *, Node *>> allEdges() const;
+
+			std::vector<Node *> topoSort();
 
 			/** Returns a representation of the graph in graphviz dot syntax. */
 			virtual std::string toDot(const std::string &direction = "TB");

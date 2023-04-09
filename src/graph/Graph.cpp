@@ -27,11 +27,11 @@ namespace Game3 {
 	}
 
 	Graph::Graph(Graph &&other) {
-		nodes_ = std::move(other.nodes_);
+		nodes = std::move(other.nodes);
 		labelMap = std::move(other.labelMap);
 		name = std::move(other.name);
 		colors = std::move(other.colors);
-		for (Node *node: nodes_)
+		for (Node *node: nodes)
 			node->owner = this;
 	}
 
@@ -50,11 +50,11 @@ namespace Game3 {
 
 	Graph & Graph::operator=(Graph &&other) {
 		clear();
-		nodes_ = std::move(other.nodes_);
+		nodes = std::move(other.nodes);
 		labelMap = std::move(other.labelMap);
 		name = std::move(other.name);
 		colors = std::move(other.colors);
-		for (Node *node: nodes_)
+		for (Node *node: nodes)
 			node->owner = this;
 		return *this;
 	}
@@ -74,15 +74,15 @@ namespace Game3 {
 	Graph::~Graph() {
 		// We could just call clear(), but all we need to do is delete the pointers.
 		// The compiler-generated part of the destructor will handle the rest.
-		for (Node *node: nodes_)
+		for (Node *node: nodes)
 			delete node;
 	}
 
 	void Graph::clear() {
 		labelMap.clear();
-		for (Node *node: nodes_)
+		for (Node *node: nodes)
 			delete node;
-		nodes_.clear();
+		nodes.clear();
 	}
 
 	bool Graph::hasLabel(const std::string &label) const {
@@ -90,21 +90,21 @@ namespace Game3 {
 	}
 
 	size_t Graph::size() const {
-		return nodes_.size();
+		return nodes.size();
 	}
 
 	bool Graph::empty() const {
-		return nodes_.empty();
+		return nodes.empty();
 	}
 
-	const std::list<Node *> & Graph::nodes() const {
-		return nodes_;
+	const std::list<Node *> & Graph::getNodes() const {
+		return nodes;
 	}
 
 	Node & Graph::operator[](size_t index) const {
-		if (nodes_.size() <= index)
+		if (nodes.size() <= index)
 			throw std::out_of_range("Invalid node index: " + std::to_string(index));
-		Node *node = *std::next(nodes_.begin(), index);
+		Node *node = *std::next(nodes.begin(), index);
 		if (!node)
 			throw std::runtime_error("Node at index " + std::to_string(index) + " is null");
 		return *node;
@@ -139,22 +139,22 @@ namespace Game3 {
 	}
 
 	Graph & Graph::operator-=(Node *to_remove) {
-		auto iter = std::find(nodes_.begin(), nodes_.end(), to_remove);
-		if (iter == nodes_.end())
+		auto iter = std::find(nodes.begin(), nodes.end(), to_remove);
+		if (iter == nodes.end())
 			throw std::out_of_range("Can't remove: node is not in graph");
-		for (Node *node: nodes_) {
+		for (Node *node: nodes) {
 			node->unlink(to_remove, true);
 			node->dirty();
 		}
 
-		nodes_.erase(iter);
+		nodes.erase(iter);
 		labelMap.erase(to_remove->label);
 		delete to_remove;
 		return *this;
 	}
 
 	Graph & Graph::operator-=(const std::string &label) {
-		for (Node *node: nodes_)
+		for (Node *node: nodes)
 			if (node->getLabel() == label)
 				return *this -= node;
 		throw std::out_of_range("Can't remove: no node with label \"" + label + "\" found");
@@ -165,13 +165,13 @@ namespace Game3 {
 			throw std::runtime_error("Can't add: a node with label \"" + label + "\" already exists");
 		Node *node = new Node(this, label);
 		labelMap.insert({label, node});
-		nodes_.push_back(node);
+		nodes.push_back(node);
 		return *node;
 	}
 
 	Node & Graph::addNode(Node *node) {
 		labelMap.insert({node->getLabel(), node});
-		nodes_.push_back(node);
+		nodes.push_back(node);
 		return *node;
 	}
 
@@ -214,10 +214,10 @@ namespace Game3 {
 
 		// Maps old nodes to new nodes.
 		std::unordered_map<Node *, Node *> node_map {};
-		for (Node *node: nodes_) {
+		for (Node *node: nodes) {
 			Node *new_node = new Node(&out, node->getLabel());
 			node_map.insert({node, new_node});
-			out.nodes_.push_back(new_node);
+			out.nodes.push_back(new_node);
 			out.labelMap.insert({node->getLabel(), new_node});
 		}
 
@@ -251,12 +251,12 @@ namespace Game3 {
 	}
 
 	void Graph::reset() {
-		while (!nodes_.empty())
-			*this -= nodes_.front();
+		while (!nodes.empty())
+			*this -= nodes.front();
 	}
 
 	Node * Graph::find(std::function<bool(Node &)> predicate) {
-		for (Node *node: nodes_)
+		for (Node *node: nodes)
 			if (predicate(*node))
 				return node;
 		return nullptr;
@@ -367,13 +367,13 @@ namespace Game3 {
 		std::unordered_map<const Node *, size_t> discovered;
 		std::unordered_map<const Node *, size_t> low;
 		std::unordered_map<const Node *, const Node *> parent;
-		bridgeTraverse(*nodes_.front(), visited, discovered, low, parent, out);
+		bridgeTraverse(*nodes.front(), visited, discovered, low, parent, out);
 		return out;
 	}
 
 	std::list<Graph> Graph::components() const {
 		std::list<Graph> out_list;
-		std::unordered_set<Node *> remaining(nodes_.begin(), nodes_.end());
+		std::unordered_set<Node *> remaining(nodes.begin(), nodes.end());
 
 		while (!remaining.empty()) {
 			Graph component_graph;
@@ -400,7 +400,7 @@ namespace Game3 {
 
 	std::unordered_map<Node *, std::unordered_set<Node *>> Graph::predecessors() const {
 		std::unordered_map<Node *, std::unordered_set<Node *>> out;
-		for (const Node *node: nodes())
+		for (const Node *node: nodes)
 			for (Node *successor: node->out)
 				out[successor].insert(const_cast<Node *>(node));
 		return out;
@@ -409,10 +409,10 @@ namespace Game3 {
 	void Graph::color(Graph::ColoringAlgorithm algo, int color_min, int color_max) {
 		const int total_colors = color_max != -1? color_max - color_min + 1 : -1;
 		if (algo == Graph::ColoringAlgorithm::Bad) {
-			if (color_max != -1 && total_colors < static_cast<int>(nodes_.size()))
+			if (color_max != -1 && total_colors < static_cast<int>(nodes.size()))
 				throw UncolorableError();
 			int color = color_min - 1;
-			for (Node *node: nodes_) {
+			for (Node *node: nodes) {
 				node->colors.clear();
 				for (int i = 0; i < node->colorsNeeded; ++i)
 					node->colors.insert(++color);
@@ -423,7 +423,7 @@ namespace Game3 {
 			for (int i = color_min; i <= max; ++i)
 				all_colors.insert(i);
 
-			for (Node *node: nodes_) {
+			for (Node *node: nodes) {
 				std::set<int> available = all_colors;
 				for (Node *neighbor: node->out)
 					for (const int color: neighbor->colors)
@@ -446,15 +446,47 @@ namespace Game3 {
 
 	std::vector<std::pair<Node *, Node *>> Graph::allEdges() const {
 		std::vector<std::pair<Node *, Node *>> out;
-		for (Node *node: nodes_)
+		for (Node *node: nodes)
 			for (Node *successor: *node)
 				out.push_back({node, successor});
 		return out;
 	}
 
+	std::vector<Node *> Graph::topoSort() {
+		if (empty())
+			return {};
+
+		std::vector<Node *> out;
+		out.reserve(size());
+
+		std::unordered_set<Node *> permanent;
+		std::unordered_set<Node *> temporary;
+		std::unordered_set<Node *> nonpermanent(nodes.begin(), nodes.end());
+
+		std::function<void(Node *)> visit = [&](Node *node) {
+			if (permanent.contains(node))
+				return;
+			if (temporary.contains(node))
+				throw std::runtime_error("Can't topologically sort a cyclic graph");
+			temporary.insert(node);
+			for (Node *out_node: node->out)
+				visit(out_node);
+			temporary.erase(node);
+			permanent.insert(node);
+			nonpermanent.erase(node);
+			out.push_back(node);
+		};
+
+		while (!nonpermanent.empty())
+			visit(*nonpermanent.begin());
+
+		std::reverse(out.begin(), out.end());
+		return out;
+	}
+
 	std::string Graph::toDot(const std::string &direction) {
 		std::list<Node *> reflexives;
-		for (Node *node: nodes_) {
+		for (Node *node: nodes) {
 			// node->rename("\"" + node->getLabel() + "_i" + std::to_string(node->in.size()) + "_o" +
 			// 	std::to_string(node->out.size()) + "\"");
 			if (node->reflexive())
@@ -476,7 +508,7 @@ namespace Game3 {
 
 		out << "\tnode [shape = circle];";
 		bool any_added = false;
-		for (Node *node: nodes_)
+		for (Node *node: nodes)
 			if (node->isolated()) {
 				out << " " << node->getLabel();
 				any_added = true;
@@ -486,11 +518,11 @@ namespace Game3 {
 			out << ";";
 		out << "\n";
 
-		for (const Node *node: nodes_)
+		for (const Node *node: nodes)
 			if (node->colors.size() == 1 && static_cast<size_t>(*node->colors.begin()) < colors.size())
 				out << "\t" << node->getLabel() << " [fillcolor=" << colors.at(*node->colors.begin()) << "];\n";
 
-		for (const Node *node: nodes_)
+		for (const Node *node: nodes)
 			for (const Node *neighbor: node->out)
 				if (neighbor != node)
 					out << "\t" << node->getLabel() << " -> " << neighbor->getLabel() << ";\n";
