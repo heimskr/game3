@@ -12,8 +12,8 @@
 #include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
-	CraftingStation::CraftingStation(TileID id_, const Position &position_, CraftingStationType station_type):
-		TileEntity(id_, TileEntity::CRAFTING_STATION, position_, true), stationType(station_type) {}
+	CraftingStation::CraftingStation(TileID id_, const Position &position_, Identifier station_type):
+		TileEntity(id_, TileEntity::CRAFTING_STATION, position_, true), stationType(std::move(station_type)) {}
 
 	void CraftingStation::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);

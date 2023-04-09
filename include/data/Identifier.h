@@ -3,39 +3,41 @@
 #include <stdexcept>
 #include <string>
 
+#include <nlohmann/json.hpp>
+
 namespace Game3 {
-	static constexpr bool empty(const char *str) {
-		return str == nullptr || str[0] == '\0';
-	}
 
 	struct Identifier {
-		const char *space = nullptr;
-		const char *name = nullptr;
+		std::string space;
+		std::string name;
 
-		constexpr Identifier() = default;
-		constexpr Identifier(const char *space_, const char *name_): space(space_), name(name_) {}
+		Identifier() = default;
+		Identifier(const char *space_, const char *name_): space(space_), name(name_) {}
 
-		constexpr operator bool() const {
-			if (empty(space) != empty(name))
+		operator bool() const {
+			if (space.empty() != name.empty())
 				throw std::runtime_error("Partially empty identifier");
 
-			return empty(space);
+			return space.empty();
 		}
 
 		explicit inline operator std::string() const {
-			return std::string(space) + ':' + std::string(name);
+			return space + ':' + name;
 		}
 
 		inline std::string str() const {
 			return static_cast<std::string>(*this);
 		}
 
-		inline constexpr bool inSpace(std::string_view check) const {
+		inline bool inSpace(std::string_view check) const {
 			return std::string_view(space) == check;
 		}
 
-		constexpr auto operator<=>(const Identifier &) const = default;
+		auto operator<=>(const Identifier &) const = default;
 	};
+
+	void from_json(const nlohmann::json &, Identifier &);
+	void to_json(nlohmann::json &, const Identifier &);
 }
 
 namespace std {

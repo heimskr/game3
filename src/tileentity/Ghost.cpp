@@ -16,12 +16,12 @@
 
 namespace Game3 {
 	static void spawnCauldron(const Place &place) {
-		place.realm->add(TileEntity::create<CraftingStation>(Monomap::CAULDRON_RED_FULL, place.position, CraftingStationType::Cauldron));
+		place.realm->add(TileEntity::create<CraftingStation>(Monomap::CAULDRON_RED_FULL, place.position, Identifier("base", "cauldron_station")));
 		place.realm->setLayer2(place.position, Monomap::CAULDRON_RED_FULL);
 	}
 
 	static void spawnPurifier(const Place &place) {
-		place.realm->add(TileEntity::create<CraftingStation>(Monomap::PURIFIER, place.position, CraftingStationType::Purifier));
+		place.realm->add(TileEntity::create<CraftingStation>(Monomap::PURIFIER, place.position, Identifier("base", "purifier_station")));
 		place.realm->setLayer2(place.position, Monomap::PURIFIER);
 	}
 

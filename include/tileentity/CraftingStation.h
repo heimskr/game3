@@ -5,7 +5,7 @@
 namespace Game3 {
 	class CraftingStation: public TileEntity {
 		public:
-			CraftingStationType stationType = CraftingStationType::None;
+			Identifier stationType;
 
 			CraftingStation(const CraftingStation &) = delete;
 			CraftingStation(CraftingStation &&) = default;
@@ -25,6 +25,6 @@ namespace Game3 {
 
 		protected:
 			CraftingStation() = default;
-			CraftingStation(TileID, const Position &, CraftingStationType);
+			CraftingStation(TileID, const Position &, Identifier);
 	};
 }

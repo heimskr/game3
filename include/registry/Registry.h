@@ -13,10 +13,11 @@
 
 namespace Game3 {
 	class Registry: public NamedRegisterable, public std::enable_shared_from_this<Registry> {
-		public:
+		protected:
 			Registry(Identifier identifier_): NamedRegisterable(std::move(identifier_)) {}
 
-			virtual ~Registry() = 0;
+		public:
+			virtual ~Registry() = default;
 
 			template <typename T>
 			std::shared_ptr<T> cast() {
@@ -55,7 +56,7 @@ namespace Game3 {
 
 			template <typename S>
 			void add() {
-				add(S::ID, std::make_shared<S>());
+				add(S::ID(), std::make_shared<S>());
 			}
 
 			void add(Identifier new_name, std::shared_ptr<T> new_item) {
@@ -68,12 +69,12 @@ namespace Game3 {
 
 			template <typename S>
 			S & get() {
-				return *items.at(S::ID)->template cast<S>();
+				return *items.at(S::ID())->template cast<S>();
 			}
 
 			template <typename S>
 			const S & get() const {
-				return *items.at(S::ID)->template cast<S>();
+				return *items.at(S::ID())->template cast<S>();
 			}
 
 			std::shared_ptr<T> operator[](size_t counter) const {

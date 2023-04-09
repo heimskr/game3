@@ -218,6 +218,8 @@ namespace Game3 {
 	}
 
 	void Blacksmith::craftTools() {
+		// TODO: resurrect
+		/*
 		Game &game = getRealm()->getGame();
 
 		phase = 8;
@@ -229,8 +231,6 @@ namespace Game3 {
 			{Item::DIAMOND_AXE, 1}, {Item::DIAMOND_SHOVEL, 1}, {Item::DIAMOND_PICKAXE, 3}, {Item::DIAMOND_HAMMER, 1},
 		};
 
-		// TODO: resurrect
-		/*
 		for (auto [item, count]: tools)
 			for (size_t i = inventory->count(item); i < count; ++i) {
 				std::vector<ItemStack> leftovers;
