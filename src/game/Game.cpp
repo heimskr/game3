@@ -18,6 +18,7 @@
 #include "item/Sapling.h"
 #include "item/Tool.h"
 #include "registry/Registries.h"
+#include "tileentity/Ghost.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "ui/tab/TextTab.h"
@@ -86,8 +87,8 @@ namespace Game3 {
 		add(std::make_shared<Tool>        ("base:diamond_axe",     "Diamond Axe",     900,  1.f, ItemAttribute::Axe));
 		add(std::make_shared<Tool>        ("base:diamond_pickaxe", "Diamond Pickaxe", 900,  1.f, ItemAttribute::Pickaxe));
 		add(std::make_shared<Tool>        ("base:diamond_shovel",  "Diamond Shovel",  700,  1.f, ItemAttribute::Shovel));
-		add(std::make_shared<Landfill>    ("base:sand",            "Sand",              1, 64, Monomap::SHALLOW_WATER, Landfill::DEFAULT_COUNT, Monomap::SAND));
-		add(std::make_shared<Landfill>    ("base:volcanic_sand",   "Volcanic Sand",     3, 64, Monomap::SHALLOW_WATER, Landfill::DEFAULT_COUNT, Monomap::VOLCANIC_SAND));
+		add(std::make_shared<Landfill>    ("base:sand",            "Sand",              1, 64, "base:monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/sand"));
+		add(std::make_shared<Landfill>    ("base:volcanic_sand",   "Volcanic Sand",     3, 64, "base:monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/volcanic_sand"));
 		add(std::make_shared<Landfill>    ("base:clay",            "Clay",              2, 64, clayRequirement));
 		add(std::make_shared<Mushroom>("base:saffron_milkcap", "Saffron Milkcap",    10, 1 ));
 		add(std::make_shared<Mushroom>("base:honey_fungus",    "Honey Fungus",       15, 18));
@@ -95,6 +96,10 @@ namespace Game3 {
 		add(std::make_shared<Mushroom>("base:indigo_milkcap",  "Indigo Milkcap",     20, 11));
 		add(std::make_shared<Mushroom>("base:black_trumpet",   "Black Trumpet",      20, 29));
 		add(std::make_shared<Mushroom>("base:grey_knight",     "Grey Knight",        20, 12));
+	}
+
+	void Game::initGhosts() {
+		Game3::initGhosts(*this);
 	}
 
 	void Game::initEntities() {

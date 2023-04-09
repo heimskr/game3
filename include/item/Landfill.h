@@ -14,7 +14,7 @@ namespace Game3 {
 
 			struct Result {
 				ItemStack required;
-				TileID newTile;
+				Identifier newTile;
 			};
 
 			using RequirementFn = std::function<std::optional<Result>(const Place &)>;
@@ -24,10 +24,10 @@ namespace Game3 {
 			Landfill(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count, RequirementFn);
 
 			// TODO: support tilemap predicates (in case other realms end up not using the monomap)
-			Landfill(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count, TileID required_tile, ItemStack requirement, TileID new_tile);
+			Landfill(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count, Identifier tileset_name, Identifier required_tile, ItemStack requirement, Identifier new_tile);
 
 			/** Like the other function-creating instruction, but using this item as a requirement */
-			Landfill(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count, TileID required_tile, ItemCount required_count, TileID new_tile);
+			Landfill(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count, Identifier tileset_name, Identifier required_tile, ItemCount required_count, Identifier new_tile);
 
 			bool use(Slot, ItemStack &, const Place &) override;
 
@@ -36,9 +36,10 @@ namespace Game3 {
 			bool canUseOnWorld() const override { return true; }
 
 		private:
-			TileID requiredTile = -1;
+			Identifier tilesetName;
+			Identifier requiredTile;
 			ItemCount requiredCount = -1;
-			TileID newTile = -1;
+			Identifier newTile;
 
 			bool fixRequirement();
 	};

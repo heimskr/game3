@@ -21,6 +21,7 @@ namespace Game3 {
 	class MainWindow;
 	class Menu;
 	class Player;
+	struct GhostDetails;
 	struct InteractionSet;
 
 	class Game: public std::enable_shared_from_this<Game> {
@@ -60,9 +61,11 @@ namespace Game3 {
 
 			void initRegistries();
 			void initItems();
+			void initGhosts();
 			void initEntities();
 			void initInteractionSets();
 			void add(std::shared_ptr<Item>);
+			void add(std::shared_ptr<GhostDetails>);
 			void traverseData(const std::filesystem::path &);
 			void loadDataFile(const std::filesystem::path &);
 			void addRecipe(const nlohmann::json &);

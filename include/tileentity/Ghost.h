@@ -19,7 +19,8 @@ namespace Game3 {
 		Index rowOffset     = 0;
 		Index columnOffset  = 0;
 		CustomFn customFn;
-		TileID customTileID = 0;
+		Identifier tilsetName;
+		Identifier customTileName;
 
 		GhostDetails() = default;
 		GhostDetails(GhostType type_, bool use_marching_squares, Index columns_per_row, Index row_offset, Index column_offset):
@@ -29,9 +30,9 @@ namespace Game3 {
 			rowOffset(row_offset),
 			columnOffset(column_offset) {}
 
-		GhostDetails(CustomFn custom_fn, TileID custom_tile_id):
+		GhostDetails(CustomFn custom_fn, Identifier custom_tile_name):
 			customFn(std::move(custom_fn)),
-			customTileID(custom_tile_id) {}
+			customTileName(std::move(custom_tile_name)) {}
 
 		static GhostDetails WOODEN_WALL;
 		static GhostDetails TOWER;
@@ -43,6 +44,8 @@ namespace Game3 {
 
 		static GhostDetails & get(const ItemStack &);
 	};
+
+	void initGhosts(Game &);
 
 	class Ghost: public TileEntity {
 		public:
