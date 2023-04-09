@@ -1,4 +1,4 @@
-#version 330 core
+#version 430 core
 
 // Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Resources/BufferedRenderer.frag
 
@@ -23,11 +23,10 @@ void main() {
 		FragColor.b /= divisor;
 	}
 
-
 	if (FragColor.a < 0.01) {
 		discard;
 	} else if (0.01 <= lightColor.a) {
-		FragColor = FragColor * 2.0 * lightColor;
+		FragColor = FragColor * (2.0 + lightColor.a * divisor) * lightColor;
 		FragColor.a = 1.0;
 	}
 }
