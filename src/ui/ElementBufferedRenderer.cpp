@@ -26,7 +26,7 @@ namespace Game3 {
 		if (initialized) {
 			vao.reset();
 			ebo.reset();
-			glDeleteBuffers(1, &vboHandle);
+			vbo.reset();
 			shader.reset();
 			glDeleteTextures(1, &lfbTexture);
 			glDeleteTextures(1, &lfbBlurredTexture);
@@ -83,7 +83,6 @@ namespace Game3 {
 	}
 
 	void ElementBufferedRenderer::reupload() {
-		glDeleteBuffers(1, &vboHandle);
 		generateVertexBufferObject();
 		generateVertexArrayObject();
 	}
@@ -101,7 +100,7 @@ namespace Game3 {
 		const float divisor = set_width;
 		const float t_size = 1.f / divisor - tileTexturePadding * 2;
 
-		vboHandle = GL::genSquareVBO<float, 3>(tilemap->width, tilemap->height, GL_STATIC_DRAW, [this, set_width, divisor, t_size](size_t x, size_t y) {
+		vbo.init<float, 3>(tilemap->width, tilemap->height, GL_STATIC_DRAW, [this, set_width, divisor, t_size](size_t x, size_t y) {
 			const auto tile = (*tilemap)(x, y);
 			const float tx0 = (tile % set_width) / divisor + tileTexturePadding;
 			const float ty0 = (tile / set_width) / divisor + tileTexturePadding;
@@ -125,7 +124,8 @@ namespace Game3 {
 	}
 
 	void ElementBufferedRenderer::generateVertexArrayObject() {
-		vao.init(vboHandle, {2, 2, 1});
+		assert(vbo.getHandle() != 0);
+		vao.init(vbo, {2, 2, 1});
 	}
 
 	void ElementBufferedRenderer::generateLightingFrameBuffer() {

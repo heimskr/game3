@@ -27,7 +27,7 @@ namespace Game3 {
 			bool dirty = true;
 			Shader shader {"terrain"};
 			GL::FloatVAO vao;
-			GLuint vboHandle = 0;
+			GL::VBO vbo;
 			GL::EBO ebo;
 			GLuint lfbHandle = 0;
 			GLuint lfbTexture = 0;

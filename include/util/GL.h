@@ -162,6 +162,58 @@ namespace GL {
 		glDrawElements(GL_TRIANGLES, count * 6, GL_UNSIGNED_INT, nullptr); CHECKGL
 	}
 
+	class VBO {
+		public:
+			VBO(GLuint handle_ = 0): handle(handle_) {}
+
+			template <typename... Args>
+			VBO(Args &&...args) {
+				init(std::forward<Args>(args)...);
+			}
+
+			VBO(const VBO &) = delete;
+			VBO(VBO &&) = delete;
+
+			VBO & operator=(const VBO &) = delete;
+			VBO & operator=(VBO &&) = delete;
+
+			template <typename T>
+			void init(const T *data, size_t count, GLenum usage) {
+				reset();
+				handle = makeBufferObject(GL_ARRAY_BUFFER, data, count, usage);
+			}
+
+			template <typename T, size_t N>
+			void init(size_t width, size_t height, GLenum usage, const std::function<std::array<std::array<T, N>, 4>(size_t, size_t)> &fn) {
+				reset();
+				handle = genSquareVBO<T, N>(width, height, usage, fn);
+			}
+
+			~VBO() {
+				reset();
+			}
+
+			inline bool reset() {
+				if (handle == 0)
+					return false;
+				glDeleteBuffers(1, &handle); CHECKGL
+				handle = 0;
+				return true;
+			}
+
+			inline bool bind() {
+				if (handle == 0)
+					return false;
+				glBindBuffer(GL_ARRAY_BUFFER, handle); CHECKGL
+				return true;
+			}
+
+			inline auto getHandle() const { return handle; }
+
+		protected:
+			GLuint handle = 0;
+	};
+
 	class VAO {
 		public:
 			~VAO() {
@@ -183,6 +235,8 @@ namespace GL {
 				return true;
 			}
 
+			inline auto getHandle() const { return handle; }
+
 		protected:
 			GLuint handle = 0;
 			VAO(GLuint handle_ = 0): handle(handle_) {}
@@ -198,10 +252,15 @@ namespace GL {
 		public:
 			FloatVAO(): VAO() {}
 			FloatVAO(GLuint vbo, std::initializer_list<int> sizes): VAO(makeFloatVAO(vbo, sizes)) {}
+			FloatVAO(const VBO &vbo, std::initializer_list<int> sizes): FloatVAO(vbo.getHandle(), sizes) {}
 
 			inline void init(GLuint vbo, std::initializer_list<int> sizes) {
 				reset();
 				handle = makeFloatVAO(vbo, sizes);
+			}
+
+			inline void init(const VBO &vbo, std::initializer_list<int> sizes) {
+				init(vbo.getHandle(), sizes);
 			}
 	};
 
@@ -244,6 +303,8 @@ namespace GL {
 				reset();
 				handle = genEBO2D(width, height, usage, fn);
 			}
+
+			inline auto getHandle() const { return handle; }
 
 		private:
 			GLuint handle = 0;
