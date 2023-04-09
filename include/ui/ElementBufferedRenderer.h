@@ -4,6 +4,7 @@
 #include "ui/RectangleRenderer.h"
 #include "ui/Reshader.h"
 #include "ui/TilemapRenderer.h"
+#include "util/GL.h"
 
 namespace Game3 {
 	class ElementBufferedRenderer: public TilemapRenderer {
@@ -24,10 +25,10 @@ namespace Game3 {
 			bool initialized = false;
 			/** Whether lighting needs to be recomputed. */
 			bool dirty = true;
-			GLuint shaderHandle = 0;
+			Shader shader {"terrain"};
+			GL::FloatVAO vao;
 			GLuint vboHandle = 0;
 			GLuint eboHandle = 0;
-			GLuint vaoHandle = 0;
 			GLuint lfbHandle = 0;
 			GLuint lfbTexture = 0;
 			GLuint lfbBlurredTexture = 0;
@@ -38,7 +39,6 @@ namespace Game3 {
 			Realm *realm = nullptr;
 			std::vector<TileID> tileCache;
 
-			void createShader();
 			void generateVertexBufferObject();
 			void generateElementBufferObject();
 			void generateVertexArrayObject();

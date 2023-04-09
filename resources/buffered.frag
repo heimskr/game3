@@ -10,8 +10,6 @@ flat in int index;
 uniform sampler2D texture0;
 uniform sampler2D texture1;
 uniform float divisor;
-uniform int tile_size;
-uniform int tileset_width;
 uniform int bright_tiles[8];
 
 void main() {

@@ -2,9 +2,13 @@
 
 #include <array>
 #include <functional>
+#include <iostream>
 #include <numeric>
 
+#define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
+#include <GL/glu.h>
+#include <GLFW/glfw3.h>
 
 #define CHECKGL do { if (auto err = glGetError()) { std::cerr << "\e[31mError at " << __FILE__ << ':' << __LINE__ << ": " << gluErrorString(err) << "\e[39m\n"; } } while(0);
 // #define CHECKGL
@@ -18,9 +22,9 @@ namespace GL {
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer); CHECKGL
 	}
 
-	inline void clear(float r, float g, float b, float a = 1.f) {
+	inline void clear(float r, float g, float b, float a = 1.f, GLbitfield field = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) {
 		glClearColor(r, g, b, a); CHECKGL
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); CHECKGL
+		glClear(field); CHECKGL
 	}
 
 	inline GLint getFB() {
@@ -59,8 +63,7 @@ namespace GL {
 		return fb;
 	}
 
-	template <size_t N>
-	inline GLuint makeFloatVAO(GLuint vbo, const std::array<int, N> &sizes) {
+	inline GLuint makeFloatVAO(GLuint vbo, std::initializer_list<int> sizes) {
 		GLuint vao = -1;
 
 		glGenVertexArrays(1, &vao); CHECKGL
@@ -73,10 +76,10 @@ namespace GL {
 		int offset = 0;
 		const auto stride = static_cast<GLsizei>(sizeof(float) * std::accumulate(sizes.begin(), sizes.end(), 0));
 
-		for (size_t i = 0; i < N; ++i)  {
+		for (size_t i = 0, n = sizes.size(); i < n; ++i)  {
 			glEnableVertexAttribArray(i); CHECKGL
-			glVertexAttribPointer(i, N, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLvoid *>(sizeof(float) * offset)); CHECKGL
-			offset += sizes[i];
+			glVertexAttribPointer(i, n, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLvoid *>(sizeof(float) * offset)); CHECKGL
+			offset += sizes.begin()[i];
 		}
 
 		return vao;
@@ -149,6 +152,48 @@ namespace GL {
 
 		return GL::makeEBO(element_data.data(), element_data.size(), usage);
 	}
+
+	inline void bindTexture(uint8_t index, GLuint texture, GLenum target = GL_TEXTURE_2D) {
+		glActiveTexture(GL_TEXTURE0 + index); CHECKGL
+		glBindTexture(target, texture); CHECKGL
+	}
+
+	class VAO {
+		public:
+			~VAO() {
+				reset();
+			}
+
+			inline bool reset() {
+				if (handle == 0)
+					return false;
+				glDeleteVertexArrays(1, &handle); CHECKGL
+				handle = 0;
+				return true;
+			}
+
+			inline bool bind() {
+				if (handle == 0)
+					return false;
+				glBindVertexArray(handle); CHECKGL
+				return true;
+			}
+
+		protected:
+			GLuint handle = 0;
+			VAO(GLuint handle_ = 0): handle(handle_) {}
+	};
+
+	class FloatVAO: public VAO {
+		public:
+			FloatVAO(): VAO() {}
+			FloatVAO(GLuint vbo, std::initializer_list<int> sizes): VAO(makeFloatVAO(vbo, sizes)) {}
+
+			inline void init(GLuint vbo, std::initializer_list<int> sizes) {
+				reset();
+				handle = makeFloatVAO(vbo, sizes);
+			}
+	};
 
 	struct Viewport {
 		GLint saved[4];

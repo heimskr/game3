@@ -49,11 +49,12 @@ namespace Game3 {
 			uint32_t seed = 0;
 
 			Realm(const Realm &) = delete;
-			Realm(Realm &&) = default;
+			Realm(Realm &&) = delete;
+
 			virtual ~Realm() = default;
 
 			Realm & operator=(const Realm &) = delete;
-			Realm & operator=(Realm &&) = default;
+			Realm & operator=(Realm &&) = delete;
 
 			template <typename T = Realm, typename... Args>
 			static std::shared_ptr<T> create(Args && ...args) {

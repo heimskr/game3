@@ -10,7 +10,6 @@
 #include "Tiles.h"
 #include "realm/Realm.h"
 #include "ui/ElementBufferedRenderer.h"
-#include "util/GL.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 
@@ -25,10 +24,10 @@ namespace Game3 {
 
 	void ElementBufferedRenderer::reset() {
 		if (initialized) {
-			glDeleteVertexArrays(1, &vaoHandle);
+			vao.reset();
 			glDeleteBuffers(1, &eboHandle);
 			glDeleteBuffers(1, &vboHandle);
-			glDeleteProgram(shaderHandle);
+			shader.reset();
 			glDeleteTextures(1, &lfbTexture);
 			glDeleteTextures(1, &lfbBlurredTexture);
 			glDeleteFramebuffers(1, &lfbHandle);
@@ -41,7 +40,7 @@ namespace Game3 {
 		if (initialized)
 			reset();
 		tilemap = std::move(tilemap_);
-		createShader();
+		shader.init(buffered_vert, buffered_frag);
 		generateVertexBufferObject();
 		generateElementBufferObject();
 		generateVertexArrayObject();
@@ -63,9 +62,8 @@ namespace Game3 {
 			dirty = false;
 		}
 
-		glActiveTexture(GL_TEXTURE1); CHECKGL
-		glBindTexture(GL_TEXTURE_2D, lfbTexture); CHECKGL
-		glBindVertexArray(vaoHandle); CHECKGL
+		GL::bindTexture(1, lfbTexture);
+		vao.bind();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboHandle); CHECKGL
 
 		glm::mat4 projection(1.f);
@@ -73,21 +71,18 @@ namespace Game3 {
 		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1}) *
 		             glm::translate(projection, {center.x() - tilemap->width / 2.f, center.y() - tilemap->height / 2.f, 0});
 
-		glUseProgram(shaderHandle); CHECKGL
+		shader.bind();
+		shader.set("texture0", 0);
+		shader.set("texture1", 1);
+		shader.set("projection", projection);
+		shader.set("divisor", divisor);
+		shader.set("bright_tiles", brightTiles);
+		shader.set("map_size", static_cast<GLfloat>(tilemap->width), static_cast<GLfloat>(tilemap->height));
 
-		glUniform1i(glGetUniformLocation(shaderHandle, "texture0"), 0); CHECKGL
-		glUniform1i(glGetUniformLocation(shaderHandle, "texture1"), 1); CHECKGL
-		glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "projection"), 1, GL_FALSE, glm::value_ptr(projection)); CHECKGL
-		glUniform1f(glGetUniformLocation(shaderHandle,  "divisor"), divisor); CHECKGL
-		glUniform1iv(glGetUniformLocation(shaderHandle, "bright_tiles"), brightTiles.size(), brightTiles.data()); CHECKGL
-		glUniform1i(glGetUniformLocation(shaderHandle,  "tile_size"), static_cast<GLint>(tilemap->tileSize)); CHECKGL
-		glUniform1i(glGetUniformLocation(shaderHandle,  "tileset_size"), static_cast<GLint>(tilemap->setWidth)); CHECKGL
-		glUniform2f(glGetUniformLocation(shaderHandle,  "map_size"), static_cast<GLfloat>(tilemap->width), static_cast<GLfloat>(tilemap->height)); CHECKGL
 		glDrawElements(GL_TRIANGLES, tilemap->size() * 6, GL_UNSIGNED_INT, (GLvoid *) 0); CHECKGL
 	}
 
 	void ElementBufferedRenderer::reupload() {
-		glDeleteVertexArrays(1, &vaoHandle);
 		glDeleteBuffers(1, &vboHandle);
 		generateVertexBufferObject();
 		generateVertexArrayObject();
@@ -99,32 +94,6 @@ namespace Game3 {
 			return true;
 		}
 		return false;
-	}
-
-	void ElementBufferedRenderer::createShader() {
-		const GLchar *vert_ptr = reinterpret_cast<const GLchar *>(buffered_vert);
-		int vert_handle = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vert_handle, 1, &vert_ptr, reinterpret_cast<const GLint *>(&buffered_vert_len));
-		glCompileShader(vert_handle);
-		check(vert_handle);
-
-		const GLchar *frag_ptr = reinterpret_cast<const GLchar *>(buffered_frag);
-		int frag_handle = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(frag_handle, 1, &frag_ptr, reinterpret_cast<const GLint *>(&buffered_frag_len));
-		glCompileShader(frag_handle);
-		check(frag_handle);
-
-		shaderHandle = glCreateProgram();
-		glAttachShader(shaderHandle, vert_handle);
-		glAttachShader(shaderHandle, frag_handle);
-		glLinkProgram(shaderHandle);
-		check(shaderHandle, true);
-
-		glDetachShader(shaderHandle, vert_handle);
-		glDeleteShader(vert_handle);
-
-		glDetachShader(shaderHandle, frag_handle);
-		glDeleteShader(frag_handle);
 	}
 
 	void ElementBufferedRenderer::generateVertexBufferObject() {
@@ -156,7 +125,7 @@ namespace Game3 {
 	}
 
 	void ElementBufferedRenderer::generateVertexArrayObject() {
-		vaoHandle = GL::makeFloatVAO<3>(vboHandle, {2, 2, 1});
+		vao.init(vboHandle, {2, 2, 1});
 	}
 
 	void ElementBufferedRenderer::generateLightingFrameBuffer() {

@@ -24,9 +24,16 @@ RESXML       := $(OUTPUT).gresource.xml
 CLOC_OPTIONS := . --exclude-dir=.vscode,libnoise,stb --fullpath --not-match-f='^.\/(src\/(gtk_)?resources\.cpp|include\/resources\.h)$$'
 GLIB_COMPILE_RESOURCES = $(shell pkg-config --variable=glib_compile_resources gio-2.0)
 
-.PHONY: all clean test
+.PHONY: all clean flags test
 
 all: $(OUTPUT)
+
+flags:
+	@ echo "COMPILER: $(COMPILER)"
+	@ echo
+	@ echo "CFLAGS:   $(CFLAGS)"
+	@ echo
+	@ echo "LDFLAGS:  $(LDFLAGS)"
 
 src/gtk_resources.cpp: $(RESXML) $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=resources --generate-dependencies $(RESXML))
 	$(GLIB_COMPILE_RESOURCES) --target=$@ --sourcedir=resources --generate-source $<
