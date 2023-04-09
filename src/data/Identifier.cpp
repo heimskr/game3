@@ -12,6 +12,20 @@ namespace Game3 {
 	Identifier::Identifier(const char *combined):
 		Identifier(std::string_view(combined)) {}
 
+	std::string Identifier::getPath() const {
+		const auto slash = name.find_last_of('/');
+		if (slash == name.npos)
+			return "";
+		return name.substr(0, slash);
+	}
+
+	std::string Identifier::getPathStart() const {
+		const auto slash = name.find('/');
+		if (slash == name.npos)
+			return "";
+		return name.substr(0, slash);
+	}
+
 	bool Identifier::operator==(std::string_view combined) const {
 		const size_t colon = combined.find(':');
 		if (colon == std::string_view::npos)

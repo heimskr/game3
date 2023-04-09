@@ -2,14 +2,14 @@
 
 #include <functional>
 
-#include "Tiles.h"
+#include "Tileset.h"
 #include "item/Item.h"
 #include "tileentity/TileEntity.h"
 
 namespace Game3 {
 	enum class GhostType {Invalid, Normal, WoodenWall, Tower, Custom};
 
-	struct GhostDetails {
+	struct GhostDetails: Registerable {
 		/** Note: the player field of the Place will be null! */
 		using CustomFn = std::function<void(const Place &)>;
 

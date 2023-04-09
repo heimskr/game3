@@ -35,6 +35,12 @@ namespace Game3 {
 			return std::string_view(space) == check;
 		}
 
+		/** Returns "foo/bar" for "base:foo/bar/baz". */
+		std::string getPath() const;
+
+		/** Returns "foo" for "base:foo/bar/baz". */
+		std::string getPathStart() const;
+
 		auto operator<=>(const Identifier &) const = default;
 
 		bool operator==(std::string_view) const;

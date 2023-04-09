@@ -6,7 +6,9 @@
 namespace Game3 {
 	class Item;
 	class Texture;
+	class Tileset;
 	struct CraftingRecipe;
+	struct EntityFactory;
 	struct EntityTexture;
 	struct ItemTexture;
 
@@ -38,5 +40,15 @@ namespace Game3 {
 	struct EntityTextureRegistry: NamedRegistry<EntityTexture> {
 		static Identifier ID() { return {"base", "entity_texture"}; }
 		EntityTextureRegistry(): NamedRegistry(ID()) {}
+	};
+
+	struct EntityFactoryRegistry: NamedRegistry<EntityFactory> {
+		static Identifier ID() { return {"base", "entity_factory"}; }
+		EntityFactoryRegistry(): NamedRegistry(ID()) {}
+	};
+
+	struct TilesetRegistry: NamedRegistry<Tileset> {
+		static Identifier ID() { return {"base", "tileset"}; }
+		TilesetRegistry(): NamedRegistry(ID()) {}
 	};
 }

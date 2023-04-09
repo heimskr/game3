@@ -7,7 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "resources.h"
-#include "Tiles.h"
+#include "Tileset.h"
 #include "realm/Realm.h"
 #include "ui/ElementBufferedRenderer.h"
 #include "util/Timer.h"

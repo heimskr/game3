@@ -3,7 +3,7 @@
 #include <unordered_set>
 
 #include "MarchingSquares.h"
-#include "Tiles.h"
+#include "Tileset.h"
 #include "entity/Entity.h"
 #include "biome/Biome.h"
 #include "game/Game.h"

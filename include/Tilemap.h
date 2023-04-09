@@ -12,26 +12,23 @@
 #include "Types.h"
 
 namespace Game3 {
+	class Tileset;
+
 	struct Tilemap {
 		int width = 0;
 		int height = 0;
 		int tileSize = 0;
+		Texture texture;
 		int setWidth = 0;
 		int setHeight = 0;
 		std::vector<TileID> tiles;
-		Texture texture;
+		std::shared_ptr<Tileset> tileset;
 
 		Tilemap() = default;
 
-		Tilemap(int width_, int height_, int tile_size, int set_width, int set_height, const std::filesystem::path &path):
-		width(width_), height(height_), tileSize(tile_size), setWidth(set_width), setHeight(set_height), texture(path) {
-			tiles.resize(width * height);
-		}
+		Tilemap(int width_, int height_, int tile_size, int set_width, int set_height, std::shared_ptr<Tileset>);
 
-		Tilemap(int width_, int height_, int tile_size, const Texture &texture_):
-		width(width_), height(height_), tileSize(tile_size), setWidth(*texture_.width), setHeight(*texture_.height), texture(texture_) {
-			tiles.resize(width * height);
-		}
+		Tilemap(int width_, int height_, int tile_size, std::shared_ptr<Tileset>);
 
 		void init() {
 			texture.init();

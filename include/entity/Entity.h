@@ -40,24 +40,7 @@ namespace Game3 {
 			constexpr static float MAX_SPEED = 15.f;
 			constexpr static float MIN_SPEED = MAX_SPEED / 6.f;
 
-			constexpr static EntityID  GANGBLANC_ID = 1;
-			constexpr static EntityID       GRUM_ID = 2;
-			constexpr static EntityID  VILLAGER1_ID = 3;
-			constexpr static EntityID       ITEM_ID = 4;
-			constexpr static EntityID BLACKSMITH_ID = 5;
-			constexpr static EntityID WOODCUTTER_ID = 6;
-
-			constexpr static EntityType    GENERIC_TYPE = 0;
-			constexpr static EntityType     PLAYER_TYPE = 1;
-			constexpr static EntityType      MINER_TYPE = 2;
-			constexpr static EntityType   MERCHANT_TYPE = 3;
-			constexpr static EntityType       ITEM_TYPE = 4;
-			constexpr static EntityType BLACKSMITH_TYPE = 5;
-			constexpr static EntityType WOODCUTTER_TYPE = 6;
-
-			static std::unordered_map<EntityID, EntityTexture> textureMap;
-
-			EntityType type = 0;
+			EntityType type;
 			Position position {0, 0};
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;
@@ -73,14 +56,14 @@ namespace Game3 {
 			~Entity() override = default;
 
 			template <typename T = Entity, typename... Args>
-			static std::shared_ptr<T> create(EntityID id, Args && ...args) {
-				auto out = std::shared_ptr<T>(new T(id, std::forward<Args>(args)...));
+			static std::shared_ptr<T> create(Game &game, Args && ...args) {
+				auto out = std::shared_ptr<T>(new T(game, std::forward<Args>(args)...));
 				out->health = out->maxHealth();
-				out->init();
+				out->init(game);
 				return out;
 			}
 
-			static std::shared_ptr<Entity> fromJSON(const nlohmann::json &);
+			static std::shared_ptr<Entity> fromJSON(Game &, const nlohmann::json &);
 
 			virtual void absorbJSON(const nlohmann::json &);
 			virtual void toJSON(nlohmann::json &) const;
@@ -96,12 +79,10 @@ namespace Game3 {
 			virtual bool onInteractOn(const std::shared_ptr<Player> &) { return false; }
 			/** Handles when the player interacts with the tile in front of them and that tile contains this entity. Returns whether anything interesting happened. */
 			virtual bool onInteractNextTo(const std::shared_ptr<Player> &) { return false; }
-			inline EntityID id() const { return id_; }
 			inline const Position::value_type & row()    const { return position.row;    }
 			inline const Position::value_type & column() const { return position.column; }
 			inline Position::value_type & row()    { return position.row;    }
 			inline Position::value_type & column() { return position.column; }
-			void id(EntityID);
 			virtual void init(Game &);
 			virtual void initAfterLoad(Game &) {}
 			/** Returns whether the entity actually moved. */
@@ -130,14 +111,11 @@ namespace Game3 {
 			int variety = 0;
 
 			Entity() = delete;
-			Entity(EntityID, EntityType);
+			Entity(EntityType);
 
 			bool canMoveTo(const Position &) const;
 			/** A list of functions to call the next time the entity moves. The functions return whether they should be removed from the queue. */
 			std::list<std::function<bool(const std::shared_ptr<Entity> &)>> moveQueue;
-
-		private:
-			EntityID id_ = 0;
 	};
 
 	void to_json(nlohmann::json &, const Entity &);

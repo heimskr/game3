@@ -11,10 +11,10 @@
 #include "ui/tab/TextTab.h"
 
 namespace Game3 {
-	Player::Player(EntityID id__): Entity(id__, Entity::PLAYER_TYPE) {}
+	Player::Player(Game &): Entity(ID()) {}
 
-	std::shared_ptr<Player> Player::fromJSON(const nlohmann::json &json) {
-		auto out = Entity::create<Player>(json.at("id"));
+	std::shared_ptr<Player> Player::fromJSON(Game &game, const nlohmann::json &json) {
+		auto out = Entity::create<Player>(game);
 		out->absorbJSON(json);
 		return out;
 	}

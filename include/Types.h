@@ -11,9 +11,7 @@ namespace Game3 {
 	using TileID       = uint16_t;
 	using PlayerID     =  int32_t;
 	using TileEntityID = uint32_t;
-	using EntityType   = uint32_t;
 	using RealmType    = uint32_t;
-	using EntityID     = uint32_t;
 	using RealmID      =  int32_t;
 	using Slot         =  int32_t;
 	using ItemCount    = uint64_t;
@@ -27,7 +25,8 @@ namespace Game3 {
 	enum class CraftingStationType {None, Furnace, Anvil, Cauldron, Purifier};
 	enum class Ore {Coal, Copper, Iron, Gold, Diamond};
 
-	using ItemID       = Identifier;
+	using ItemID     = Identifier;
+	using EntityType = Identifier;
 
 	class Player;
 	using PlayerPtr = std::shared_ptr<Player>;

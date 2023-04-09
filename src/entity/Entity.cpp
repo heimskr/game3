@@ -1,9 +1,10 @@
 #include <iostream>
 #include <sstream>
 
-#include "Tiles.h"
+#include "Tileset.h"
 #include "entity/Blacksmith.h"
 #include "entity/Entity.h"
+#include "entity/EntityFactory.h"
 #include "entity/ItemEntity.h"
 #include "entity/Merchant.h"
 #include "entity/Miner.h"
@@ -11,48 +12,27 @@
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "realm/Realm.h"
+#include "registry/Registries.h"
 #include "ui/Canvas.h"
 #include "ui/SpriteRenderer.h"
 #include "util/AStar.h"
 #include "util/Util.h"
 
 namespace Game3 {
-	std::shared_ptr<Entity> Entity::fromJSON(Game &, const nlohmann::json &json) {
-		const EntityID id = json.at("id");
-		const EntityID type = json.at("type");
+	std::shared_ptr<Entity> Entity::fromJSON(Game &game, const nlohmann::json &json) {
+		// const EntityID id = json.at("id");
+		EntityType type = json.at("type");
 		std::shared_ptr<Entity> out;
 
-		if (json.contains("isPlayer") && json.at("isPlayer") == true)
-			out = Entity::create<Player>(id);
-		else
-			switch (type) {
-				case Entity::ITEM_TYPE:
-					out = ItemEntity::create(ItemStack::fromJSON(game, json.at("stack")));
-					break;
-				case Entity::MINER_TYPE:
-					out = Entity::create<Miner>(id);
-					break;
-				case Entity::MERCHANT_TYPE:
-					out = Entity::create<Merchant>(id);
-					break;
-				case Entity::BLACKSMITH_TYPE:
-					out = Entity::create<Blacksmith>(id);
-					break;
-				case Entity::WOODCUTTER_TYPE:
-					out = Entity::create<Woodcutter>(id);
-					break;
-				default:
-					out = Entity::create<Entity>(id, Entity::GENERIC_TYPE);
-					break;
-			}
-
+		auto factory = game.registry<EntityFactoryRegistry>().at(type);
+		assert(factory);
+		out = (*factory)(game, json);
 		out->absorbJSON(json);
-		out->init();
+		out->init(game);
 		return out;
 	}
 
 	void Entity::toJSON(nlohmann::json &json) const {
-		json["id"]        = id();
 		json["type"]      = type;
 		json["position"]  = position;
 		json["realmID"]   = realmID;
@@ -67,7 +47,6 @@ namespace Game3 {
 	}
 
 	void Entity::absorbJSON(const nlohmann::json &json) {
-		id(json.at("id"));
 		type      = json.at("type");
 		position  = json.at("position");
 		realmID   = json.at("realmID");
@@ -211,7 +190,7 @@ namespace Game3 {
 		return *this;
 	}
 
-	Entity::Entity(EntityID id__, EntityType type_): type(type_), id_(id__) {
+	Entity::Entity(EntityType type_): type(type_), id_(id__) {
 		variety = textureMap.at(id_).variety;
 	}
 

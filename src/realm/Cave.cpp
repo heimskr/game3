@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "Tiles.h"
+#include "Tileset.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "realm/Cave.h"

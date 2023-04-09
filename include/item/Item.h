@@ -121,6 +121,7 @@ namespace Game3 {
 			void spawn(const std::shared_ptr<Realm> &, const Position &) const;
 
 			static void fromJSON(Game &, const nlohmann::json &, ItemStack &);
+			static ItemStack fromJSON(Game &, const nlohmann::json &);
 
 		private:
 			Glib::RefPtr<Gdk::Pixbuf> cachedImage;

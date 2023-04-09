@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "Tiles.h"
+#include "Tileset.h"
 #include "entity/Blacksmith.h"
 #include "entity/Merchant.h"
 #include "game/Game.h"

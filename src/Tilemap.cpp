@@ -1,16 +1,25 @@
 #include <zstd.h>
 
 #include "Tilemap.h"
-#include "Tiles.h"
+#include "Tileset.h"
 
 namespace Game3 {
+	Tilemap::Tilemap(int width_, int height_, int tile_size, int set_width, int set_height, std::shared_ptr<Tileset> tileset_):
+	width(width_), height(height_), tileSize(tile_size), texture(tileset_->getTexture()), setWidth(set_width), setHeight(set_height), tileset(std::move(tileset_)) {
+		tiles.resize(width * height);
+	}
+
+	Tilemap::Tilemap(int width_, int height_, int tile_size, std::shared_ptr<Tileset> tileset_):
+	width(width_), height(height_), tileSize(tile_size), texture(tileset_->getTexture()), setWidth(*texture.width), setHeight(*texture.height), tileset(std::move(tileset_)) {
+		tiles.resize(width * height);
+	}
+
 	std::vector<Index> Tilemap::getLand(RealmType type, Index right_pad, Index bottom_pad) const {
 		std::vector<Index> land_tiles;
 		land_tiles.reserve(width * height);
-		const auto &tileset = *tileSets.at(type);
 		for (Index row = 0; row < height - bottom_pad; ++row)
 			for (Index column = 0; column < width - right_pad; ++column)
-				if (tileset.isLand(tiles[row * width + column]))
+				if (tileset->isLand(tiles[row * width + column]))
 					land_tiles.push_back(row * width + column);
 		return land_tiles;
 	}

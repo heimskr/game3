@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "Shader.h"
-#include "Tiles.h"
+#include "Tileset.h"
 
 #include "entity/ItemEntity.h"
 #include "entity/Merchant.h"

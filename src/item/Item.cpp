@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "Texture.h"
-#include "Tiles.h"
+#include "Tileset.h"
 #include "entity/ItemEntity.h"
 #include "game/Game.h"
 #include "item/Item.h"
@@ -164,6 +164,12 @@ namespace Game3 {
 				stack.data = extra;
 			}
 		}
+	}
+
+	ItemStack ItemStack::fromJSON(Game &game, const nlohmann::json &json) {
+		ItemStack out;
+		fromJSON(game, json, out);
+		return out;
 	}
 
 	void to_json(nlohmann::json &json, const ItemStack &stack) {

@@ -6,6 +6,7 @@
 #include "game/Inventory.h"
 #include "realm/Realm.h"
 #include "recipe/CraftingRecipe.h"
+#include "util/Util.h"
 
 namespace Game3 {
 	Inventory::Inventory(const std::shared_ptr<Agent> &owner_, Slot slot_count):
@@ -317,16 +318,19 @@ namespace Game3 {
 	}
 
 	Inventory Inventory::fromJSON(const nlohmann::json &json, const std::shared_ptr<Agent> &owner) {
+		Game &game = owner->getRealm()->getGame();
 		Inventory out(owner, 0);
-		out.storage = json.at("storage");
-		out.slotCount = json.at("slotCount");
+
+		for (const auto &[key, val]: json.at("storage").items())
+			out.storage.at(parseUlong(key)) = ItemStack::fromJSON(game, val);
+		out.slotCount  = json.at("slotCount");
 		out.activeSlot = json.at("activeSlot");
 		return out;
 	}
 
 	void to_json(nlohmann::json &json, const Inventory &inventory) {
-		json["storage"] = inventory.storage;
-		json["slotCount"] = inventory.slotCount;
+		json["storage"]    = inventory.storage;
+		json["slotCount"]  = inventory.slotCount;
 		json["activeSlot"] = inventory.activeSlot;
 	}
 }

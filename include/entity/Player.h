@@ -8,6 +8,7 @@
 namespace Game3 {
 	class Player: public Entity {
 		public:
+			static Identifier ID() { return {"base", "player_entity"}; }
 			constexpr static HitPoints MAX_HEALTH = 64;
 
 			MoneyCount money;
@@ -26,7 +27,7 @@ namespace Game3 {
 
 			std::optional<Place> lastContinousInteraction;
 
-			static std::shared_ptr<Player> fromJSON(const nlohmann::json &);
+			static std::shared_ptr<Player> fromJSON(Game &, const nlohmann::json &);
 
 			HitPoints maxHealth() const override { return MAX_HEALTH; }
 			void toJSON(nlohmann::json &) const override;
@@ -51,7 +52,7 @@ namespace Game3 {
 			friend class Entity;
 
 		protected:
-			Player(EntityID);
+			Player(Game &);
 			void interact(const Position &);
 	};
 

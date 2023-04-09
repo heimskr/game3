@@ -2,6 +2,7 @@
 
 #include "game/Game.h"
 #include "game/Inventory.h"
+#include "recipe/CraftingRecipe.h"
 #include "registry/Registries.h"
 #include "ui/MainWindow.h"
 #include "ui/gtk/EntryDialog.h"

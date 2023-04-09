@@ -11,6 +11,7 @@
 #include "Types.h"
 
 namespace Game3 {
+	class Game;
 	class Realm;
 
 	struct Position {
@@ -50,9 +51,18 @@ namespace Game3 {
 		TileID getLayer1() const;
 		TileID getLayer2() const;
 		TileID getLayer3() const;
+		const Identifier & getLayer1Name() const;
+		const Identifier & getLayer2Name() const;
+		const Identifier & getLayer3Name() const;
 		void setLayer1(TileID) const;
 		void setLayer2(TileID) const;
 		void setLayer3(TileID) const;
+		void setLayer1(const Identifier &) const;
+		void setLayer2(const Identifier &) const;
+		void setLayer3(const Identifier &) const;
+
+		Game & getGame();
+		const Game & getGame() const;
 
 		bool operator==(const Place &) const;
 	};

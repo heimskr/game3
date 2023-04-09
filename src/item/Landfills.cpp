@@ -3,15 +3,19 @@
 
 namespace Game3 {
 	std::optional<Landfill::Result> clayRequirement(const Place &place) {
-		switch (place.getLayer1()) {
-			case Monomap::WATER:
-				return Landfill::Result{ItemStack(Item::CLAY, Landfill::DEFAULT_COUNT), Monomap::SHALLOW_WATER};
-			case Monomap::DEEP_WATER:
-				return Landfill::Result{ItemStack(Item::CLAY, Landfill::DEFAULT_COUNT), Monomap::WATER};
-			case Monomap::DEEPER_WATER:
-				return Landfill::Result{ItemStack(Item::CLAY, Landfill::DEFAULT_COUNT), Monomap::DEEP_WATER};
-			default:
-				return std::nullopt;
-		}
+		const Game &game = place.getGame();
+
+		const auto &tilename = place.getLayer1Name();
+
+		if (tilename == "base:tile/water")
+			return Landfill::Result{ItemStack(game, "base:clay", Landfill::DEFAULT_COUNT), "base:tile/shallow_water"};
+
+		if (tilename == "base:tile/deep_water")
+			return Landfill::Result{ItemStack(game, "base:clay", Landfill::DEFAULT_COUNT), "base:tile/water"};
+
+		if (tilename == "base:tile/deeper_water")
+			return Landfill::Result{ItemStack(game, "base:clay", Landfill::DEFAULT_COUNT), "base:tile/deep_water"};
+
+		return std::nullopt;
 	}
 }
