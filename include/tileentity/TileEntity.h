@@ -7,7 +7,7 @@
 
 #include "Position.h"
 #include "Types.h"
-#include "game/HasRealm.h"
+#include "game/Agent.h"
 
 namespace Game3 {
 	class Entity;
@@ -16,7 +16,7 @@ namespace Game3 {
 	class Realm;
 	class SpriteRenderer;
 
-	class TileEntity: public HasRealm, public std::enable_shared_from_this<TileEntity> {
+	class TileEntity: public Agent, public std::enable_shared_from_this<TileEntity> {
 		public:
 			constexpr static TileEntityID BUILDING         = 1;
 			constexpr static TileEntityID TELEPORTER       = 2;

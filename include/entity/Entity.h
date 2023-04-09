@@ -14,8 +14,8 @@
 #include "Position.h"
 #include "Texture.h"
 #include "Types.h"
+#include "game/Agent.h"
 #include "game/HasInventory.h"
-#include "game/HasRealm.h"
 #include "item/Item.h"
 
 namespace Game3 {
@@ -32,7 +32,7 @@ namespace Game3 {
 		EntityTexture(const Texture &texture_, uint8_t variety_): texture(texture_), variety(variety_) {}
 	};
 
-	class Entity: public HasInventory, public HasRealm, public std::enable_shared_from_this<Entity> {
+	class Entity: public Agent, public HasInventory, public std::enable_shared_from_this<Entity> {
 		public:
 			constexpr static Slot DEFAULT_INVENTORY_SIZE = 30;
 			/** The reciprocal of this is how many seconds it takes to move one square. */

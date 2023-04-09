@@ -44,7 +44,7 @@ namespace Game3 {
 			void showText(const Glib::ustring &text, const Glib::ustring &name);
 			Glib::ustring getName() override { return "Player"; }
 			void give(const ItemStack &, Slot start = -1);
-			Place getPlace();
+			Place getPlace() override;
 			bool isMoving() const;
 
 			friend class Entity;
