@@ -17,7 +17,7 @@ namespace Game3 {
 		public:
 			struct Node_less {
 				bool operator()(Node *left, Node *right) const {
-					return left->index() < right->index();
+					return left->getIndex() < right->getIndex();
 				}
 			};
 
@@ -28,7 +28,7 @@ namespace Game3 {
 			std::string label;
 			Set out;
 			Set in;
-			int index_ = -1;
+			int index = -1;
 			std::unordered_map<Node *, bool> reachability;
 
 		public:
@@ -90,7 +90,7 @@ namespace Game3 {
 			void dirty();
 
 			/** Returns the node's index in the parent graph. */
-			int index();
+			int getIndex();
 
 			/** Returns a const set of the node's outward edges. */
 			const Set & getOut() const;

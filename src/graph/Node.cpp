@@ -69,17 +69,17 @@ namespace Game3 {
 	}
 
 	void Node::dirty() {
-		index_ = -1;
+		index = -1;
 	}
 
-	int Node::index() {
-		if (index_ != -1)
-			return index_;
+	int Node::getIndex() {
+		if (index != -1)
+			return index;
 
 		for (const Node *node: owner->getNodes()) {
-			++index_;
+			++index;
 			if (node == this)
-				return index_;
+				return index;
 		}
 
 		throw std::runtime_error("Node not found in parent graph");
