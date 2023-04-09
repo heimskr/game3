@@ -28,8 +28,8 @@ namespace Game3 {
 			ebo.reset();
 			vbo.reset();
 			shader.reset();
-			glDeleteTextures(1, &lfbTexture);
-			glDeleteTextures(1, &lfbBlurredTexture);
+			lightTexture.reset();
+			blurredLightTexture.reset();
 			lightFBO.reset();
 			tilemap.reset();
 			initialized = false;
@@ -62,7 +62,7 @@ namespace Game3 {
 			dirty = false;
 		}
 
-		GL::bindTexture(1, lfbTexture);
+		lightTexture.bind(1);
 		vao.bind();
 		ebo.bind();
 
@@ -134,15 +134,12 @@ namespace Game3 {
 	}
 
 	void ElementBufferedRenderer::generateLightingTexture() {
-		GL::deleteTexture(lfbTexture);
-		GL::deleteTexture(lfbBlurredTexture);
-
 		const auto width  = tilemap->tileSize * tilemap->width;
 		const auto height = tilemap->tileSize * tilemap->height;
 		constexpr GLint filter = GL_NEAREST;
 
-		lfbTexture = GL::makeFloatTexture(width, height, filter);
-		lfbBlurredTexture = GL::makeFloatTexture(width, height, filter);
+		lightTexture.initFloat(width, height, filter);
+		blurredLightTexture.initFloat(width, height, filter);
 
 		rectangle.update(width, height);
 		reshader.update(width, height);
@@ -181,7 +178,7 @@ namespace Game3 {
 			const auto height   = tilesize * tilemap->height;
 			GL::Viewport viewport(0, 0, width, height);
 
-			GL::useTextureInFB(lfbTexture);
+			lightTexture.useInFB();
 
 			// Clearing to half-white because the color in the lightmap will be multiplied by two
 			GL::clear(.5f, .5f, .5f, 0.f);
@@ -208,13 +205,13 @@ namespace Game3 {
 
 			Timer blur("Blur");
 			for (int i = 0; i < 8; ++i) {
-				GL::useTextureInFB(lfbBlurredTexture);
+				blurredLightTexture.useInFB();
 				reshader.set("axis", 0);
-				reshader(lfbTexture);
+				reshader(lightTexture);
 
-				GL::useTextureInFB(lfbTexture);
+				lightTexture.useInFB();
 				reshader.set("axis", 1);
-				reshader(lfbBlurredTexture);
+				reshader(blurredLightTexture);
 			}
 			blur.stop();
 

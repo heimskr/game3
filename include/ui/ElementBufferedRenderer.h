@@ -30,8 +30,8 @@ namespace Game3 {
 			GL::VBO vbo;
 			GL::EBO ebo;
 			GL::FBO lightFBO;
-			GLuint lfbTexture = 0;
-			GLuint lfbBlurredTexture = 0;
+			GL::Texture lightTexture;
+			GL::Texture blurredLightTexture;
 			std::vector<GLint> brightTiles;
 			std::unordered_set<TileID> brightSet;
 			RectangleRenderer rectangle;

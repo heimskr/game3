@@ -13,7 +13,11 @@
 #define CHECKGL do { if (auto err = glGetError()) { std::cerr << "\e[31mError at " << __FILE__ << ':' << __LINE__ << ": " << gluErrorString(err) << "\e[39m\n"; } } while(0);
 // #define CHECKGL
 
+
 namespace GL {
+	// TODO: makeRGBTexture
+	// TODO: makeRGBATexture
+
 	inline void useTextureInFB(GLuint texture) {
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0); CHECKGL
 	}
@@ -345,6 +349,45 @@ namespace GL {
 
 		private:
 			GLuint handle = 0;
+	};
+
+	class Texture {
+		public:
+			Texture() = default;
+
+			inline bool reset() {
+				if (handle == 0)
+					return false;
+				glDeleteTextures(1, &handle);
+				return true;
+			}
+
+			inline bool bind(uint8_t index, GLenum target = GL_TEXTURE_2D) {
+				if (handle == 0)
+					return false;
+				GL::bindTexture(index, handle, target);
+				return true;
+			}
+
+			inline bool initFloat(GLsizei width, GLsizei height, GLint filter = GL_LINEAR, bool force = false) {
+				if (handle != 0 && !force)
+					return false;
+				handle = GL::makeFloatTexture(width, height, filter);
+				return true;
+			}
+
+			inline bool useInFB() {
+				if (handle == 0)
+					return false;
+				GL::useTextureInFB(handle);
+				return true;
+			}
+
+			inline auto getHandle() const { return handle; }
+
+		private:
+			GLuint handle = 0;
+
 	};
 
 	struct Viewport {

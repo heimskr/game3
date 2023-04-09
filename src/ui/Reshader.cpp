@@ -54,7 +54,7 @@ namespace Game3 {
 		model = glm::translate(model, glm::vec3(-0.5f * width, -0.5f * height, 0.f)); // move origin back
 		model = glm::scale(model, glm::vec3(width, height, 1.f)); // last scale
 
-		shader.set("model", model); CHECKGL
+		shader.set("model", model);
 
 		glActiveTexture(GL_TEXTURE4); CHECKGL
 		glBindTexture(GL_TEXTURE_2D, texture); CHECKGL
@@ -63,6 +63,11 @@ namespace Game3 {
 		glBindVertexArray(quadVAO); CHECKGL
 		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
 		glBindVertexArray(0); CHECKGL
+	}
+
+	void Reshader::operator()(const GL::Texture &texture) {
+		assert(texture.getHandle() != 0);
+		(*this)(texture.getHandle());
 	}
 
 	void Reshader::initRenderData() {

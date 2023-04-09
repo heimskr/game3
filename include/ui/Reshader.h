@@ -2,7 +2,7 @@
 
 #include <Eigen/Eigen>
 
-#include "Shader.h"
+#include "util/GL.h"
 
 namespace Game3 {
 
@@ -20,6 +20,7 @@ namespace Game3 {
 			void bind();
 
 			void operator()(GLuint texture);
+			void operator()(const GL::Texture &);
 
 			template <typename... Args>
 			void set(const char *uniform, Args &&...args) {
