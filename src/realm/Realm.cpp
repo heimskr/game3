@@ -246,7 +246,7 @@ namespace Game3 {
 		const Index index = getIndex(position);
 		tileEntities.at(index)->onRemove();
 		tileEntities.erase(index);
-		setLayerHelper(index);
+		setLayerHelper(index, false);
 		if (tile_entity->getID() == TileEntity::GHOST)
 			--ghostCount;
 		updateNeighbors(position);
@@ -529,24 +529,28 @@ namespace Game3 {
 		return true;
 	}
 
-	void Realm::setLayerHelper(Index row, Index column) {
+	void Realm::setLayerHelper(Index row, Index column, bool should_mark_dirty) {
 		const auto &tileset = tileSets.at(type);
 		const Position position(row, column);
 		pathMap[getIndex(position)] = isWalkable(row, column, *tileset);
 		updateNeighbors(position);
-		renderer1.markDirty(this);
-		renderer2.markDirty(this);
-		renderer3.markDirty(this);
+		if (should_mark_dirty) {
+			renderer1.markDirty(this);
+			renderer2.markDirty(this);
+			renderer3.markDirty(this);
+		}
 	}
 
-	void Realm::setLayerHelper(Index index) {
+	void Realm::setLayerHelper(Index index, bool should_mark_dirty) {
 		const auto &tileset = tileSets.at(type);
 		const Position position = getPosition(index);
 		pathMap[index] = isWalkable(position.row, position.column, *tileset);
 		updateNeighbors(position);
-		renderer1.markDirty(this);
-		renderer2.markDirty(this);
-		renderer3.markDirty(this);
+		if (should_mark_dirty) {
+			renderer1.markDirty(this);
+			renderer2.markDirty(this);
+			renderer3.markDirty(this);
+		}
 	}
 
 	void Realm::resetPathMap() {

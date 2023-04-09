@@ -209,8 +209,8 @@ namespace Game3 {
 			std::vector<std::shared_ptr<Entity>> entityRemovalQueue;
 			std::vector<std::shared_ptr<TileEntity>> tileEntityRemovalQueue;
 			bool isWalkable(Index row, Index column, const TileSet &) const;
-			void setLayerHelper(Index row, Index col);
-			void setLayerHelper(Index);
+			void setLayerHelper(Index row, Index col, bool should_mark_dirty = true);
+			void setLayerHelper(Index, bool should_mark_dirty = true);
 			void resetPathMap();
 			static BiomeType getBiome(uint32_t seed);
 	};

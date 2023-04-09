@@ -30,8 +30,7 @@ namespace Game3 {
 			glDeleteTextures(1, &lfbTexture);
 			glDeleteTextures(1, &lfbBlurredTexture);
 			glDeleteSamplers(1, &sampler);
-			glDeleteFramebuffers(1, &lfbHandle1);
-			glDeleteFramebuffers(1, &lfbHandle2);
+			glDeleteFramebuffers(1, &lfbHandle);
 			tilemap.reset();
 			initialized = false;
 		}
@@ -224,8 +223,7 @@ namespace Game3 {
 	}
 
 	void ElementBufferedRenderer::generateLightingFrameBuffer() {
-		glGenFramebuffers(1, &lfbHandle1);
-		glGenFramebuffers(1, &lfbHandle2);
+		glGenFramebuffers(1, &lfbHandle);
 		generateLightingTexture();
 	}
 
@@ -275,7 +273,7 @@ namespace Game3 {
 
 		GLint gtk_buffer = 0;
 		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &gtk_buffer); CHECKGL
-		glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle1); CHECKGL
+		glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle); CHECKGL
 
 		generateLightingTexture();
 
@@ -317,6 +315,7 @@ namespace Game3 {
 			glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
 			reshader.set("axis", 0);
 			reshader(lfbTexture);
+
 
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
 			glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
