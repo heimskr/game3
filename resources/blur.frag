@@ -2,9 +2,8 @@
 
 #version 420 core
 
-precision highp float;
+precision mediump float;
 
-in vec2 TexCoord;      // screen position [-1, +1] maybe?
 out vec4 FragColor;    // fragment output color
 uniform sampler2D txr; // texture to blur
 uniform float xs, ys;  // texture resolution

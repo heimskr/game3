@@ -312,7 +312,7 @@ namespace Game3 {
 		reshader.set("ys", static_cast<float>(height));
 		reshader.set("r", 5.f);
 
-		for (int i = 0; i < 4; ++i) {
+		for (int i = 0; i < 16; ++i) {
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbBlurredTexture, 0); CHECKGL
 			glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
 			reshader.set("axis", 0);
