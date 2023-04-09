@@ -33,6 +33,7 @@ namespace Game3 {
 			void reset();
 
 			Shader & set(const char *, GLint);
+			Shader & set(const char *, GLfloat);
 			Shader & set(const char *, const glm::mat4 &);
 			Shader & set(const char *, const Eigen::Vector4f &);
 			Shader & set(const char *, float x, float y, float z, float w);

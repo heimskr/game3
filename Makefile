@@ -50,7 +50,7 @@ src/resources.cpp: resources/buffered.frag resources/buffered.vert resources/rec
 
 $(OUTPUT): $(OBJECTS)
 	@ printf "\e[2m[\e[22;36mld\e[39;2m]\e[22m $@\n"
-	$(COMPILER) $^ -o $@ $(LDFLAGS)
+	@ $(COMPILER) $^ -o $@ $(LDFLAGS)
 ifeq ($(BUILD),release)
 	strip $@
 endif

@@ -30,6 +30,10 @@ namespace Game3 {
 		}
 	}
 
+	void Reshader::bind() {
+		shader.bind(); CHECKGL
+	}
+
 	void Reshader::operator()(GLuint texture) {
 		if (!initialized)
 			return;

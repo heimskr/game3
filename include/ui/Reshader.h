@@ -17,6 +17,8 @@ namespace Game3 {
 
 			void update(int backbuffer_width, int backbuffer_height);
 
+			void bind();
+
 			void operator()(GLuint texture);
 
 			template <typename... Args>

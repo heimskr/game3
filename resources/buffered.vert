@@ -10,6 +10,7 @@ uniform vec2 map_size;
 
 out vec2 texCoord;
 out vec2 lightCoord;
+out int tileIndex;
 
 void main() {
 	gl_Position = projection * vec4(aPosition, 0.0, 1.0);

@@ -26,10 +26,5 @@ vec4 blur9(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
 void main() {
 	vec2 resolution = vec2(xs, ys);
 	vec2 uv = vec2(gl_FragCoord.xy / resolution);
-	// vec2 uv = vec2(TexCoord / resolution);
-	// vec2 uv = vec2(1, 1);
-	// uv.y = 1.0 - uv.y;
 	FragColor = blur9(txr, uv, resolution, axis == 0? vec2(r, 0.0) : vec2(0.0, r));
-	// FragColor = vec4(1.0, 0.0, 1.0, 1.0);
-	// FragColor = texture(txr, TexCoord);
 }

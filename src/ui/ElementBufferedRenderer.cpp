@@ -65,9 +65,9 @@ namespace Game3 {
 
 		glActiveTexture(GL_TEXTURE1); CHECKGL
 		glBindTexture(GL_TEXTURE_2D, lfbTexture); CHECKGL
-
 		glBindVertexArray(vaoHandle); CHECKGL
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboHandle); CHECKGL
+
 		glm::mat4 projection(1.f);
 		projection = glm::scale(projection, {tilemap->tileSize, -tilemap->tileSize, 1}) *
 		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1}) *
@@ -131,7 +131,7 @@ namespace Game3 {
 		glGenBuffers(1, &vboHandle);
 		glBindBuffer(GL_ARRAY_BUFFER, vboHandle);
 
-		const size_t float_count = tilemap->tiles.size() << 4;
+		const size_t float_count = tilemap->tiles.size() * 16;
 		auto vertex_data = std::make_unique<float[]>(float_count);
 		size_t i = 0;
 
@@ -145,33 +145,35 @@ namespace Game3 {
 				const float tx0 = (tile % set_width) / divisor + tileTexturePadding;
 				const float ty0 = (tile / set_width) / divisor + tileTexturePadding;
 
+				constexpr int to_add = 4;
+
 				// Vertex 0 (top left)
 				vertex_data[i + 0] = x; // position x
 				vertex_data[i + 1] = y; // position y
 				vertex_data[i + 2] = tx0; // texcoord x
 				vertex_data[i + 3] = ty0; // texcoord y
-				i += 4;
+				i += to_add;
 
 				// Vertex 1 (top right)
 				vertex_data[i + 0] = x + 1; // position x
 				vertex_data[i + 1] = y;     // position y
 				vertex_data[i + 2] = tx0 + ty_size; // texcoord x
 				vertex_data[i + 3] = ty0;           // texcoord y
-				i += 4;
+				i += to_add;
 
 				// Vertex 2 (bottom left)
 				vertex_data[i + 0] = x;     // position x
 				vertex_data[i + 1] = y + 1; // position y
 				vertex_data[i + 2] = tx0;           // texcoord x
 				vertex_data[i + 3] = ty0 + ty_size; // texcoord y
-				i += 4;
+				i += to_add;
 
 				// Vertex 3 (bottom right)
 				vertex_data[i + 0] = x + 1; // position x
 				vertex_data[i + 1] = y + 1; // position y
 				vertex_data[i + 2] = tx0 + ty_size; // texcoord x
 				vertex_data[i + 3] = ty0 + ty_size; // texcoord y
-				i += 4;
+				i += to_add;
 			}
 
 		glBufferData(GL_ARRAY_BUFFER, float_count * sizeof(float), vertex_data.get(), GL_STATIC_DRAW);
@@ -234,7 +236,7 @@ namespace Game3 {
 
 		glBindTexture(GL_TEXTURE_2D, lfbBlurredTexture); CHECKGL
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr); CHECKGL
-		constexpr GLint filter = GL_LINEAR;
+		constexpr GLint filter = GL_NEAREST;
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter); CHECKGL
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter); CHECKGL
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); CHECKGL
@@ -289,24 +291,22 @@ namespace Game3 {
 		for (Index row = 0; row < tilemap->height; ++row) {
 			for (Index column = 0; column < tilemap->width; ++column) {
 				const Position pos(row, column);
-				const auto tile = (*realm->tilemap1)(pos);
+				const auto tile = (*tilemap)(pos);
 				if (tile == Monomap::LAVA) {
 					const float x = column * tilesize;
 					const float y = row * tilesize;
 					const float radius = 1.5f;
 					rectangle.drawOnScreen({1.f, .5f, 0.f, .5f}, x - radius * tilesize, y - radius * tilesize, (2.f * radius + 1.f) * tilesize, (2.f * radius + 1.f) * tilesize);
-					// rectangle.drawOnScreen({1.f, 0.f, 0.f, 1.f}, x - radius * tilesize, y - radius * tilesize, (2.f * radius + 1.f) * tilesize, (2.f * radius + 1.f) * tilesize); CHECKGL
 				}
 			}
 		}
 
-		rectangle.drawOnScreen({1.0f, 1.f, 0.f, 1.f}, 0, 0, 128 * 16 * 0.5, 128 * 16 * 0.5);
-
+		reshader.bind();
 		reshader.set("xs", static_cast<float>(width));
 		reshader.set("ys", static_cast<float>(height));
-		reshader.set("r", 0.1f);
+		reshader.set("r", 5.f);
 
-		for (int i = 0; i < 1; ++i) {
+		for (int i = 0; i < 4; ++i) {
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbBlurredTexture, 0); CHECKGL
 			glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
 			reshader.set("axis", 0);
@@ -318,17 +318,17 @@ namespace Game3 {
 			reshader(lfbBlurredTexture);
 		}
 
-		// for (Index row = 0; row < tilemap->height; ++row) {
-		// 	for (Index column = 0; column < tilemap->width; ++column) {
-		// 		const Position pos(row, column);
-		// 		const auto tile = (*tilemap)(pos);
-		// 		if (tile == Monomap::LAVA) {
-		// 			const float x = column * tilesize;
-		// 			const float y = row * tilesize;
-		// 			rectangle.drawOnScreen({.666f, .666f, .666f, 1.f}, x, y, tilesize, tilesize);
-		// 		}
-		// 	}
-		// }
+		for (Index row = 0; row < tilemap->height; ++row) {
+			for (Index column = 0; column < tilemap->width; ++column) {
+				const Position pos(row, column);
+				const auto tile = (*tilemap)(pos);
+				if (tile == Monomap::LAVA) {
+					const float x = column * tilesize;
+					const float y = row * tilesize;
+					rectangle.drawOnScreen({1.f, 1.f, 1.f, 1.f}, x, y, tilesize, tilesize);
+				}
+			}
+		}
 
 		glViewport(saved_viewport[0], saved_viewport[1], static_cast<GLsizei>(saved_viewport[2]), static_cast<GLsizei>(saved_viewport[3]));
 		glBindFramebuffer(GL_FRAMEBUFFER, gtk_buffer); CHECKGL
