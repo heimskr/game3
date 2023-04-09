@@ -10,6 +10,7 @@
 #include "Tiles.h"
 #include "realm/Realm.h"
 #include "ui/ElementBufferedRenderer.h"
+#include "util/Timer.h"
 #include "util/Util.h"
 
 // Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Renderers/ElementBufferedRenderer.cs
@@ -36,10 +37,10 @@ namespace Game3 {
 		}
 	}
 
-	void ElementBufferedRenderer::init(const TilemapPtr &tilemap_, const TileSet &tileset) {
+	void ElementBufferedRenderer::init(TilemapPtr tilemap_, const TileSet &tileset) {
 		if (initialized)
 			reset();
-		tilemap = tilemap_;
+		tilemap = std::move(tilemap_);
 		createShader();
 		generateVertexBufferObject();
 		generateElementBufferObject();
@@ -49,6 +50,7 @@ namespace Game3 {
 		const auto bright_shorts = tileset.getBright();
 		brightTiles.assign(bright_shorts.begin(), bright_shorts.end());
 		brightTiles.resize(8, -1);
+		brightSet = {bright_shorts.begin(), bright_shorts.end()};
 		initialized = true;
 	}
 
@@ -82,7 +84,7 @@ namespace Game3 {
 		glUniform1i(glGetUniformLocation(shaderHandle,  "tile_size"), static_cast<GLint>(tilemap->tileSize)); CHECKGL
 		glUniform1i(glGetUniformLocation(shaderHandle,  "tileset_size"), static_cast<GLint>(tilemap->setWidth)); CHECKGL
 		glUniform2f(glGetUniformLocation(shaderHandle,  "map_size"), static_cast<GLfloat>(tilemap->width), static_cast<GLfloat>(tilemap->height)); CHECKGL
-		glDrawElements(GL_TRIANGLES, tilemap->tiles.size() * 6, GL_UNSIGNED_INT, (GLvoid *) 0); CHECKGL
+		glDrawElements(GL_TRIANGLES, tilemap->size() * 6, GL_UNSIGNED_INT, (GLvoid *) 0); CHECKGL
 	}
 
 	void ElementBufferedRenderer::reupload() {
@@ -130,7 +132,7 @@ namespace Game3 {
 		glGenBuffers(1, &vboHandle);
 		glBindBuffer(GL_ARRAY_BUFFER, vboHandle);
 
-		const size_t float_count = tilemap->tiles.size() * 20;
+		const size_t float_count = tilemap->size() * 20;
 		auto vertex_data = std::make_unique<float[]>(float_count);
 		size_t i = 0;
 
@@ -186,7 +188,7 @@ namespace Game3 {
 		glGenBuffers(1, &eboHandle);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboHandle);
 
-		size_t index_count = tilemap->tiles.size() * 6;
+		size_t index_count = tilemap->size() * 6;
 		auto indices = std::make_unique<unsigned[]>(index_count);
 
 		unsigned i = 0, j = 0;
@@ -271,71 +273,96 @@ namespace Game3 {
 		if (!tilemap)
 			return;
 
-		GLint gtk_buffer = 0;
-		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &gtk_buffer); CHECKGL
-		glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle); CHECKGL
+		Timer::clear();
+		Timer timer("RecomputeLighting");
 
-		generateLightingTexture();
-
-		GLint saved_viewport[4];
-		glGetIntegerv(GL_VIEWPORT, saved_viewport);
-		const auto tilesize = tilemap->tileSize;
-		const auto width    = tilesize * tilemap->width;
-		const auto height   = tilesize * tilemap->height;
-		glViewport(0, 0, width, height); CHECKGL
-
-		glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
-
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
-
-		// Clearing to half-white because the color in the lightmap will be multiplied by two
-		glClearColor(.5f, .5f, .5f, 0.f); CHECKGL
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); CHECKGL
-
-		for (Index row = 0; row < tilemap->height; ++row) {
-			for (Index column = 0; column < tilemap->width; ++column) {
-				const Position pos(row, column);
-				const auto tile = (*tilemap)(pos);
-				if (tile == Monomap::LAVA) {
-					const float x = column * tilesize;
-					const float y = row * tilesize;
-					const float radius = 1.5f;
-					rectangle.drawOnScreen({1.f, .5f, 0.f, .5f}, x - radius * tilesize, y - radius * tilesize, (2.f * radius + 1.f) * tilesize, (2.f * radius + 1.f) * tilesize);
+		bool recomputation_needed = false;
+		if (tileCache.empty()) {
+			tileCache = tilemap->tiles;
+			recomputation_needed = true;
+		} else {
+			assert(tileCache.size() == tilemap->size());
+			for (size_t i = 0, max = tileCache.size(); i < max; ++i) {
+				if (brightSet.contains(tileCache[i]) != brightSet.contains(tilemap->tiles[i])) {
+					tileCache = tilemap->tiles;
+					recomputation_needed = true;
+					break;
 				}
 			}
 		}
 
-		reshader.bind();
-		reshader.set("xs", static_cast<float>(width));
-		reshader.set("ys", static_cast<float>(height));
-		reshader.set("r", 5.f);
+		if (recomputation_needed) {
+			GLint gtk_buffer = 0;
+			glGetIntegerv(GL_FRAMEBUFFER_BINDING, &gtk_buffer); CHECKGL
+			glBindFramebuffer(GL_FRAMEBUFFER, lfbHandle); CHECKGL
 
-		for (int i = 0; i < 16; ++i) {
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbBlurredTexture, 0); CHECKGL
-			glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
-			reshader.set("axis", 0);
-			reshader(lfbTexture);
+			generateLightingTexture();
 
+			GLint saved_viewport[4];
+			glGetIntegerv(GL_VIEWPORT, saved_viewport);
+			const auto tilesize = tilemap->tileSize;
+			const auto width    = tilesize * tilemap->width;
+			const auto height   = tilesize * tilemap->height;
+			glViewport(0, 0, width, height); CHECKGL
 
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
-			glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
-			reshader.set("axis", 1);
-			reshader(lfbBlurredTexture);
-		}
 
-		for (Index row = 0; row < tilemap->height; ++row) {
-			for (Index column = 0; column < tilemap->width; ++column) {
-				const Position pos(row, column);
-				const auto tile = (*tilemap)(pos);
-				if (tile == Monomap::LAVA) {
-					const float x = column * tilesize;
-					const float y = row * tilesize;
-					rectangle.drawOnScreen({1.f, 1.f, 1.f, 1.f}, x, y, tilesize, tilesize);
+			// Clearing to half-white because the color in the lightmap will be multiplied by two
+			glClearColor(.5f, .5f, .5f, 0.f); CHECKGL
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); CHECKGL
+
+			Timer lava1("Lava1");
+			for (Index row = 0; row < tilemap->height; ++row) {
+				for (Index column = 0; column < tilemap->width; ++column) {
+					const Position pos(row, column);
+					const auto tile = (*tilemap)(pos);
+					if (tile == Monomap::LAVA) {
+						const float x = column * tilesize;
+						const float y = row * tilesize;
+						constexpr float radius = 1.5f;
+						rectangle.drawOnScreen({1.f, .5f, 0.f, .5f}, x - radius * tilesize, y - radius * tilesize, (2.f * radius + 1.f) * tilesize, (2.f * radius + 1.f) * tilesize);
+					}
 				}
 			}
+			lava1.stop();
+
+			reshader.bind();
+			reshader.set("xs", static_cast<float>(width));
+			reshader.set("ys", static_cast<float>(height));
+			reshader.set("r", 5.f);
+
+			Timer blur("Blur");
+			for (int i = 0; i < 8; ++i) {
+				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbBlurredTexture, 0); CHECKGL
+				reshader.set("axis", 0);
+				reshader(lfbTexture);
+
+				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
+				reshader.set("axis", 1);
+				reshader(lfbBlurredTexture);
+			}
+			blur.stop();
+
+			Timer lava2("Lava2");
+			for (Index row = 0; row < tilemap->height; ++row) {
+				for (Index column = 0; column < tilemap->width; ++column) {
+					const Position pos(row, column);
+					const auto tile = (*tilemap)(pos);
+					if (tile == Monomap::LAVA) {
+						const float x = column * tilesize;
+						const float y = row * tilesize;
+						const float margin = .0f * tilesize;
+						rectangle.drawOnScreen({1.f, 1.f, 1.f, 1.f}, x + margin, y + margin, tilesize - 2 * margin, tilesize - 2 * margin);
+					}
+				}
+			}
+			lava2.stop();
+
+			glViewport(saved_viewport[0], saved_viewport[1], static_cast<GLsizei>(saved_viewport[2]), static_cast<GLsizei>(saved_viewport[3]));
+			glBindFramebuffer(GL_FRAMEBUFFER, gtk_buffer); CHECKGL
 		}
 
-		glViewport(saved_viewport[0], saved_viewport[1], static_cast<GLsizei>(saved_viewport[2]), static_cast<GLsizei>(saved_viewport[3]));
-		glBindFramebuffer(GL_FRAMEBUFFER, gtk_buffer); CHECKGL
+		timer.stop();
+		Timer::summary();
 	}
 }

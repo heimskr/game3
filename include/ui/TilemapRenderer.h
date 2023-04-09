@@ -23,7 +23,7 @@ namespace Game3 {
 			TilemapRenderer() = default;
 			virtual ~TilemapRenderer() = default;
 
-			virtual void init(const TilemapPtr &, const TileSet &) = 0;
+			virtual void init(TilemapPtr, const TileSet &) = 0;
 			virtual void render(float divisor) = 0;
 			virtual bool onBackbufferResized(int width, int height);
 

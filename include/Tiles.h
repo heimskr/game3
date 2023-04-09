@@ -240,4 +240,6 @@ namespace Game3 {
 
 	extern Monomap monomap;
 	extern std::unordered_map<RealmType, std::shared_ptr<TileSet>> tileSets;
+
+	using TileSetPtr = std::shared_ptr<TileSet>;
 }

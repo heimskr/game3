@@ -55,6 +55,8 @@ namespace Game3 {
 			return tiles[position.column + position.row * width];
 		}
 
+		inline size_t size() const { return tiles.size(); }
+
 		std::vector<Index> getLand(RealmType type, Index right_pad = 0, Index bottom_pad = 0) const;
 	};
 

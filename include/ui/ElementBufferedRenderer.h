@@ -12,7 +12,7 @@ namespace Game3 {
 			virtual ~ElementBufferedRenderer() override;
 
 			void reset();
-			void init(const TilemapPtr &, const TileSet &) override;
+			void init(TilemapPtr, const TileSet &) override;
 			void render(float divisor) override;
 			void reupload();
 			bool onBackbufferResized(int width, int height) override;
@@ -33,9 +33,11 @@ namespace Game3 {
 			GLuint lfbBlurredTexture = 0;
 			GLuint sampler = 0;
 			std::vector<GLint> brightTiles;
+			std::unordered_set<TileID> brightSet;
 			RectangleRenderer rectangle;
 			Reshader reshader;
 			Realm *realm = nullptr;
+			std::vector<TileID> tileCache;
 
 			void createShader();
 			void generateVertexBufferObject();
