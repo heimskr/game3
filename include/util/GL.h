@@ -310,6 +310,43 @@ namespace GL {
 			GLuint handle = 0;
 	};
 
+	class FBO {
+		public:
+			FBO(): handle(makeFBO()) {}
+			FBO(GLuint handle_): handle(handle_) {}
+
+			~FBO() {
+				reset();
+			}
+
+			inline bool reset() {
+				if (handle == 0)
+					return false;
+				glDeleteFramebuffers(1, &handle); CHECKGL
+				handle = 0;
+				return true;
+			}
+
+			inline bool bind() {
+				if (handle == 0)
+					return false;
+				bindFB(handle);
+				return true;
+			}
+
+			inline bool init(bool force = false) {
+				if (handle == 0 && !force)
+					return false;
+				handle = makeFBO();
+				return true;
+			}
+
+			inline auto getHandle() const { return handle; }
+
+		private:
+			GLuint handle = 0;
+	};
+
 	struct Viewport {
 		GLint saved[4];
 

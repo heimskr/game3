@@ -30,7 +30,7 @@ namespace Game3 {
 			shader.reset();
 			glDeleteTextures(1, &lfbTexture);
 			glDeleteTextures(1, &lfbBlurredTexture);
-			glDeleteFramebuffers(1, &lfbHandle);
+			lightFBO.reset();
 			tilemap.reset();
 			initialized = false;
 		}
@@ -129,7 +129,7 @@ namespace Game3 {
 	}
 
 	void ElementBufferedRenderer::generateLightingFrameBuffer() {
-		lfbHandle = GL::makeFBO();
+		lightFBO.init();
 		generateLightingTexture();
 	}
 
@@ -172,8 +172,8 @@ namespace Game3 {
 
 		if (recomputation_needed) {
 			const auto gtk_buffer = GL::getFB();
-			GL::bindFB(lfbHandle);
 
+			lightFBO.bind();
 			generateLightingTexture();
 
 			const auto tilesize = tilemap->tileSize;

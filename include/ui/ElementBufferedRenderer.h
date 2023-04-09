@@ -29,7 +29,7 @@ namespace Game3 {
 			GL::FloatVAO vao;
 			GL::VBO vbo;
 			GL::EBO ebo;
-			GLuint lfbHandle = 0;
+			GL::FBO lightFBO;
 			GLuint lfbTexture = 0;
 			GLuint lfbBlurredTexture = 0;
 			std::vector<GLint> brightTiles;
