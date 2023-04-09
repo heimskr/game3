@@ -311,6 +311,7 @@ namespace Game3 {
 			game = Game::fromJSON(nlohmann::json::parse(data), *canvas);
 		else
 			game = Game::fromJSON(nlohmann::json::from_cbor(data), *canvas);
+		game->initRegistries();
 		game->initEntities();
 		for (auto &[id, realm]: game->realms)
 			realm->resetPathMap();
@@ -780,6 +781,7 @@ namespace Game3 {
 		glArea.get_context()->make_current();
 		debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
 		game->player->focus(*canvas, false);
+		game->initRegistries();
 		game->initRecipes();
 		game->initInteractionSets();
 		canvas->game = game;

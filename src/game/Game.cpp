@@ -13,6 +13,7 @@
 
 namespace Game3 {
 	void Game::initRegistries() {
+		registries.clear();
 		registries.add<CraftingRecipeRegistry>();
 	}
 

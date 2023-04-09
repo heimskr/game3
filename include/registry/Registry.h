@@ -84,6 +84,16 @@ namespace Game3 {
 			std::shared_ptr<T> at(size_t counter) const {
 				return byCounter.at(counter);
 			}
+
+			inline void clear() {
+				items.clear();
+				byCounter.clear();
+				nextCounter = 0;
+			}
+
+			inline size_t size() const {
+				return items.size();
+			}
 	};
 
 	template <typename T>
@@ -127,6 +137,16 @@ namespace Game3 {
 
 			std::shared_ptr<T> at(size_t counter) const {
 				return byCounter.at(counter);
+			}
+
+			inline void clear() {
+				items.clear();
+				byCounter.clear();
+				nextCounter = 0;
+			}
+
+			inline size_t size() const {
+				return items.size();
 			}
 	};
 
