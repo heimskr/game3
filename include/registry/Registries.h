@@ -10,6 +10,7 @@ namespace Game3 {
 	struct CraftingRecipe;
 	struct EntityFactory;
 	struct EntityTexture;
+	struct GhostDetails;
 	struct ItemTexture;
 
 	struct DurabilityRegistry: NamedRegistry<Durability> {
@@ -50,5 +51,10 @@ namespace Game3 {
 	struct TilesetRegistry: NamedRegistry<Tileset> {
 		static Identifier ID() { return {"base", "tileset"}; }
 		TilesetRegistry(): NamedRegistry(ID()) {}
+	};
+
+	struct GhostDetailsRegistry: NamedRegistry<GhostDetails> {
+		static Identifier ID() { return {"base", "ghost_details"}; }
+		GhostDetailsRegistry(): NamedRegistry(ID()) {}
 	};
 }

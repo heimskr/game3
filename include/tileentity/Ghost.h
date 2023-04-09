@@ -7,6 +7,8 @@
 #include "tileentity/TileEntity.h"
 
 namespace Game3 {
+	class Game;
+
 	enum class GhostType {Invalid, Normal, WoodenWall, Tower, Custom};
 
 	struct GhostDetails: Registerable {
@@ -42,7 +44,7 @@ namespace Game3 {
 		static GhostDetails CAULDRON;
 		static GhostDetails PURIFIER;
 
-		static GhostDetails & get(const ItemStack &);
+		static GhostDetails & get(const Game &, const ItemStack &);
 	};
 
 	void initGhosts(Game &);
@@ -64,7 +66,7 @@ namespace Game3 {
 
 			void init() override {}
 			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(const nlohmann::json &) override;
+			void absorbJSON(const Game &, const nlohmann::json &) override;
 			void onSpawn();
 			void onNeighborUpdated(Index row_offset, Index column_offset) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;

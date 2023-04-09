@@ -7,6 +7,7 @@
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "realm/Realm.h"
+#include "registry/Registries.h"
 #include "tileentity/CraftingStation.h"
 #include "tileentity/Ghost.h"
 #include "ui/Canvas.h"
@@ -16,34 +17,25 @@
 
 namespace Game3 {
 	static void spawnCauldron(const Place &place) {
-		place.realm->add(TileEntity::create<CraftingStation>(Monomap::CAULDRON_RED_FULL, place.position, Identifier("base", "cauldron_station")));
-		place.realm->setLayer2(place.position, Monomap::CAULDRON_RED_FULL);
+		// place.realm->add(TileEntity::create<CraftingStation>(Monomap::CAULDRON_RED_FULL, place.position, Identifier("base", "cauldron_station")));
+		// place.realm->setLayer2(place.position, Monomap::CAULDRON_RED_FULL);
 	}
 
 	static void spawnPurifier(const Place &place) {
-		place.realm->add(TileEntity::create<CraftingStation>(Monomap::PURIFIER, place.position, Identifier("base", "purifier_station")));
-		place.realm->setLayer2(place.position, Monomap::PURIFIER);
+		// place.realm->add(TileEntity::create<CraftingStation>(Monomap::PURIFIER, place.position, Identifier("base", "purifier_station")));
+		// place.realm->setLayer2(place.position, Monomap::PURIFIER);
 	}
 
-	GhostDetails GhostDetails::WOODEN_WALL {GhostType::WoodenWall, true,  32,  6, 0};
-	GhostDetails GhostDetails::PLANT_POT1  {GhostType::Normal,     false, 32, 12, 4};
-	GhostDetails GhostDetails::PLANT_POT2  {GhostType::Normal,     false, 32, 12, 5};
-	GhostDetails GhostDetails::PLANT_POT3  {GhostType::Normal,     false, 32, 12, 6};
-	GhostDetails GhostDetails::TOWER       {GhostType::Tower,      true,  32,  6, 7};
-	GhostDetails GhostDetails::CAULDRON    {spawnCauldron, Monomap::CAULDRON_RED_FULL};
-	GhostDetails GhostDetails::PURIFIER    {spawnPurifier, Monomap::PURIFIER};
+	void initGhosts(Game &game) {
+		game.add(std::make_shared<GhostDetails>(spawnCauldron, "base:tile/cauldron_red_full"));
+		game.add(std::make_shared<GhostDetails>(spawnPurifier, "base:tile/purifier"));
+	}
 
-	GhostDetails & GhostDetails::get(const ItemStack &stack) {
-		switch (stack.item->id) {
-			case Item::WOODEN_WALL: return WOODEN_WALL;
-			case Item::PLANT_POT1:  return PLANT_POT1;
-			case Item::PLANT_POT2:  return PLANT_POT2;
-			case Item::PLANT_POT3:  return PLANT_POT3;
-			case Item::TOWER:       return TOWER;
-			case Item::CAULDRON:    return CAULDRON;
-			case Item::PURIFIER:    return PURIFIER;
-			default: throw std::runtime_error("Couldn't get GhostDetails for " + stack.item->name);
-		}
+	GhostDetails & GhostDetails::get(const Game &game, const ItemStack &stack) {
+		const auto &registry = game.registry<GhostDetailsRegistry>();
+		if (auto iter = registry.items.find(stack.item->id); iter != registry.items.end())
+			return *iter->second;
+		throw std::runtime_error("Couldn't get GhostDetails for " + stack.item->name);
 	}
 
 	void Ghost::toJSON(nlohmann::json &json) const {
@@ -51,10 +43,10 @@ namespace Game3 {
 		json["material"] = material;
 	}
 
-	void Ghost::absorbJSON(const nlohmann::json &json) {
+	void Ghost::absorbJSON(const Game &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(json);
 		material = json.at("material");
-		details = GhostDetails::get(material);
+		details = GhostDetails::get(game, material);
 	}
 
 	void Ghost::onSpawn() {
