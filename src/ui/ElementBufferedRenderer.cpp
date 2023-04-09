@@ -131,7 +131,7 @@ namespace Game3 {
 		glGenBuffers(1, &vboHandle);
 		glBindBuffer(GL_ARRAY_BUFFER, vboHandle);
 
-		const size_t float_count = tilemap->tiles.size() * 16;
+		const size_t float_count = tilemap->tiles.size() * 20;
 		auto vertex_data = std::make_unique<float[]>(float_count);
 		size_t i = 0;
 
@@ -141,17 +141,18 @@ namespace Game3 {
 
 		for (int x = 0; x < tilemap->width; ++x)
 			for (int y = 0; y < tilemap->height; ++y) {
-				const int tile = (*tilemap)(x, y);
+				const auto tile = (*tilemap)(x, y);
 				const float tx0 = (tile % set_width) / divisor + tileTexturePadding;
 				const float ty0 = (tile / set_width) / divisor + tileTexturePadding;
 
-				constexpr int to_add = 4;
+				constexpr int to_add = 5;
 
 				// Vertex 0 (top left)
 				vertex_data[i + 0] = x; // position x
 				vertex_data[i + 1] = y; // position y
 				vertex_data[i + 2] = tx0; // texcoord x
 				vertex_data[i + 3] = ty0; // texcoord y
+				vertex_data[i + 4] = static_cast<float>(tile);
 				i += to_add;
 
 				// Vertex 1 (top right)
@@ -159,6 +160,7 @@ namespace Game3 {
 				vertex_data[i + 1] = y;     // position y
 				vertex_data[i + 2] = tx0 + ty_size; // texcoord x
 				vertex_data[i + 3] = ty0;           // texcoord y
+				vertex_data[i + 4] = static_cast<float>(tile);
 				i += to_add;
 
 				// Vertex 2 (bottom left)
@@ -166,6 +168,7 @@ namespace Game3 {
 				vertex_data[i + 1] = y + 1; // position y
 				vertex_data[i + 2] = tx0;           // texcoord x
 				vertex_data[i + 3] = ty0 + ty_size; // texcoord y
+				vertex_data[i + 4] = static_cast<float>(tile);
 				i += to_add;
 
 				// Vertex 3 (bottom right)
@@ -173,6 +176,7 @@ namespace Game3 {
 				vertex_data[i + 1] = y + 1; // position y
 				vertex_data[i + 2] = tx0 + ty_size; // texcoord x
 				vertex_data[i + 3] = ty0 + ty_size; // texcoord y
+				vertex_data[i + 4] = static_cast<float>(tile);
 				i += to_add;
 			}
 
@@ -210,10 +214,13 @@ namespace Game3 {
 		glBindBuffer(GL_ARRAY_BUFFER, vboHandle);
 
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (GLvoid *) 0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (GLvoid *) 0);
 
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (GLvoid *) (sizeof(float) * 2));
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (GLvoid *) (sizeof(float) * 2));
+
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (GLvoid *) (sizeof(float) * 4));
 	}
 
 	void ElementBufferedRenderer::generateLightingFrameBuffer() {
@@ -281,11 +288,10 @@ namespace Game3 {
 
 		glDrawBuffer(GL_COLOR_ATTACHMENT0); CHECKGL
 
-
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lfbTexture, 0); CHECKGL
 
 		// Clearing to half-white because the color in the lightmap will be multiplied by two
-		glClearColor(.5f, .5f, .5f, 1.f); CHECKGL
+		glClearColor(.5f, .5f, .5f, 0.f); CHECKGL
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); CHECKGL
 
 		for (Index row = 0; row < tilemap->height; ++row) {
