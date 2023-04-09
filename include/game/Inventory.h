@@ -3,19 +3,20 @@
 #include <map>
 #include <optional>
 
+#include "game/Container.h"
 #include "item/Item.h"
 
 namespace Game3 {
 	struct CraftingRecipe;
-	struct HasRealm;
+	struct Agent;
 
-	class Inventory {
+	class Inventory: public Container {
 		public:
-			std::weak_ptr<HasRealm> owner;
+			std::weak_ptr<Agent> owner;
 			Slot slotCount = 0;
 			Slot activeSlot = 0;
 
-			Inventory(const std::shared_ptr<HasRealm> &owner_, Slot slot_count);
+			Inventory(const std::shared_ptr<Agent> &owner_, Slot slot_count);
 
 			ItemStack * operator[](size_t);
 			const ItemStack * operator[](size_t) const;
@@ -48,7 +49,7 @@ namespace Game3 {
 			/** Counts the amount of an item in the inventory. This takes ItemStack data into account but ignores the given ItemStack's count. */
 			ItemCount count(const ItemStack &) const;
 
-			std::shared_ptr<HasRealm> getOwner() const;
+			std::shared_ptr<Agent> getOwner() const;
 
 			ItemStack & front();
 			const ItemStack & front() const;
@@ -85,11 +86,6 @@ namespace Game3 {
 			/** Returns the number of times a recipe can be crafted with the inventory's items. Doesn't take the output of the recipe into account. */
 			ItemCount craftable(const CraftingRecipe &) const;
 
-			bool canCraft(const CraftingRecipe &) const;
-
-			/** Crafts a recipe. Returns whether the recipe could be crafted. */
-			bool craft(const CraftingRecipe &, std::vector<ItemStack> &leftovers);
-
 		private:
 			std::map<Slot, ItemStack> storage;
 
@@ -97,7 +93,7 @@ namespace Game3 {
 			inline const decltype(storage) & getStorage() const { return storage; }
 			inline Glib::RefPtr<Gdk::Pixbuf> getImage(Slot slot) { return storage.at(slot).getImage(); }
 
-			static Inventory fromJSON(const nlohmann::json &, const std::shared_ptr<HasRealm> &);
+			static Inventory fromJSON(const nlohmann::json &, const std::shared_ptr<Agent> &);
 
 			friend void to_json(nlohmann::json &, const Inventory &);
 	};

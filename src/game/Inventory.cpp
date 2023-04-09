@@ -1,13 +1,13 @@
 #include "entity/Entity.h"
 #include "entity/ItemEntity.h"
+#include "game/Agent.h"
 #include "game/Crafting.h"
 #include "game/Game.h"
-#include "game/HasRealm.h"
 #include "game/Inventory.h"
 #include "realm/Realm.h"
 
 namespace Game3 {
-	Inventory::Inventory(const std::shared_ptr<HasRealm> &owner_, Slot slot_count):
+	Inventory::Inventory(const std::shared_ptr<Agent> &owner_, Slot slot_count):
 		owner(owner_), slotCount(slot_count) {}
 
 	ItemStack * Inventory::operator[](size_t slot) {
@@ -184,7 +184,7 @@ namespace Game3 {
 		return out;
 	}
 
-	std::shared_ptr<HasRealm> Inventory::getOwner() const {
+	std::shared_ptr<Agent> Inventory::getOwner() const {
 		if (auto locked_owner = owner.lock())
 			return locked_owner;
 		throw std::runtime_error("Couldn't lock inventory owner");
@@ -293,25 +293,6 @@ namespace Game3 {
 		return out;
 	}
 
-	bool Inventory::canCraft(const CraftingRecipe &recipe) const {
-		for (const ItemStack &input: recipe.inputs)
-			if (count(input) < input.count)
-				return false;
-		return true;
-	}
-
-	bool Inventory::craft(const CraftingRecipe &recipe, std::vector<ItemStack> &leftovers) {
-		if (!canCraft(recipe))
-			return false;
-		leftovers.clear();
-		for (const ItemStack &input: recipe.inputs)
-			remove(input);
-		for (const ItemStack &output: recipe.outputs)
-			if (auto leftover = add(output))
-				leftovers.push_back(std::move(*leftover));
-		return true;
-	}
-
 	bool Inventory::contains(const ItemStack &needle) const {
 		ItemCount remaining = needle.count;
 		for (const auto &[slot, stack]: storage) {
@@ -334,7 +315,7 @@ namespace Game3 {
 		}
 	}
 
-	Inventory Inventory::fromJSON(const nlohmann::json &json, const std::shared_ptr<HasRealm> &owner) {
+	Inventory Inventory::fromJSON(const nlohmann::json &json, const std::shared_ptr<Agent> &owner) {
 		Inventory out(owner, 0);
 		out.storage = json.at("storage");
 		out.slotCount = json.at("slotCount");

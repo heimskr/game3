@@ -25,10 +25,14 @@ namespace Game3 {
 			~NamedRegistry() override = default;
 
 			NamedRegistry & operator+=(const std::pair<std::string, std::shared_ptr<T>> &pair) {
-				if (items.contains(pair.first))
-					throw std::runtime_error("NamedRegistry " + name + " already contains an item with name \"" + pair.first + '"');
-				items.emplace(pair);
+				add(pair.first, pair.second);
 				return *this;
+			}
+
+			void add(std::string new_name, std::shared_ptr<T> new_item) {
+				if (items.contains(new_name))
+					throw std::runtime_error("NamedRegistry " + name + " already contains an item with name \"" + new_name + '"');
+				items.try_emplace(std::move(new_name), std::move(new_item));
 			}
 	};
 
@@ -41,10 +45,15 @@ namespace Game3 {
 			~UnnamedRegistry() override = default;
 
 			UnnamedRegistry & operator+=(std::shared_ptr<T> item) {
+				add(std::move(item));
+				return *this;
+			}
+
+			void add(std::shared_ptr<T> item) {
 				items.insert(std::move(item));
 			}
 
-			bool insertCarefully(std::shared_ptr<T> item) {
+			bool addCarefully(std::shared_ptr<T> item) {
 				for (const auto &existing: items)
 					if (*existing == *item)
 						return false;

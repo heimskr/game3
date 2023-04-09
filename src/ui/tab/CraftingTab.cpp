@@ -24,7 +24,7 @@ namespace Game3 {
 
 		auto group = Gio::SimpleActionGroup::create();
 		group->add_action("craft_one", [this] { craftOne(lastGame, lastIndex); });
-		group->add_action("craft_x",   [this] { std::cout <<   "x\n"; });
+		group->add_action("craft_x",   [this] { std::cout << "x\n"; });
 		group->add_action("craft_all", [this] { craftAll(lastGame, lastIndex); });
 
 		mainWindow.insert_action_group("crafting_popup", group);
