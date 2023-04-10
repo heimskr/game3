@@ -1,7 +1,6 @@
 *.o
 /game3
 .dep
-src/resources.cpp
 src/gtk_resources.cpp
 .dep.bak
 *.g3
