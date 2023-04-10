@@ -87,6 +87,6 @@ namespace Game3 {
 	const T & choose(const std::set<T> &set, R &rng) {
 		if (set.empty())
 			throw std::invalid_argument("Set is empty");
-		return *std::advance(set.begin(), std::uniform_int_distribution(0, set.size() - 1)(rng));
+		return *std::next(set.begin(), std::uniform_int_distribution(static_cast<size_t>(0), set.size() - 1)(rng));
 	}
 }

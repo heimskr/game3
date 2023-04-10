@@ -34,6 +34,7 @@ namespace Game3 {
 			bool isCategoryMarchable(const Identifier &category) const;
 			void clearCache();
 			const std::set<Identifier> getCategories(const Identifier &) const;
+			const std::set<TileID> getCategoryIDs(const Identifier &) const;
 			const std::set<Identifier> getTilesByCategory(const Identifier &) const;
 			bool isInCategory(const Identifier &tilename, const Identifier &category) const;
 			const TileID & operator[](const Identifier &) const;

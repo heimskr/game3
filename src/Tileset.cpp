@@ -115,6 +115,13 @@ namespace Game3 {
 		return inverseCategories.at(tilename);
 	}
 
+	const std::set<TileID> Tileset::getCategoryIDs(const Identifier &category) const {
+		std::set<TileID> out;
+		for (const auto &tilename: categories.at(category))
+			out.insert((*this)[tilename]);
+		return out;
+	}
+
 	const std::set<Identifier> Tileset::getTilesByCategory(const Identifier &category) const {
 		return categories.at(category);
 	}
