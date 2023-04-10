@@ -7,14 +7,14 @@ namespace Game3 {
 
 		const auto &tilename = place.getLayer1Name();
 
-		if (tilename == "base:tile/water")
-			return Landfill::Result{ItemStack(game, "base:clay", Landfill::DEFAULT_COUNT), "base:tile/shallow_water"};
+		if (tilename == "base:tile/water"_id)
+			return Landfill::Result{ItemStack(game, "base:clay"_id, Landfill::DEFAULT_COUNT), "base:tile/shallow_water"_id};
 
-		if (tilename == "base:tile/deep_water")
-			return Landfill::Result{ItemStack(game, "base:clay", Landfill::DEFAULT_COUNT), "base:tile/water"};
+		if (tilename == "base:tile/deep_water"_id)
+			return Landfill::Result{ItemStack(game, "base:clay"_id, Landfill::DEFAULT_COUNT), "base:tile/water"_id};
 
-		if (tilename == "base:tile/deeper_water")
-			return Landfill::Result{ItemStack(game, "base:clay", Landfill::DEFAULT_COUNT), "base:tile/deep_water"};
+		if (tilename == "base:tile/deeper_water"_id)
+			return Landfill::Result{ItemStack(game, "base:clay"_id, Landfill::DEFAULT_COUNT), "base:tile/deep_water"_id};
 
 		return std::nullopt;
 	}

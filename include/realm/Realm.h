@@ -81,6 +81,9 @@ namespace Game3 {
 			void setLayer1(Index, TileID);
 			void setLayer2(Index, TileID);
 			void setLayer3(Index, TileID);
+			void setLayer1(Index, const Identifier &);
+			void setLayer2(Index, const Identifier &);
+			void setLayer3(Index, const Identifier &);
 			void setLayer1(const Position &, TileID);
 			void setLayer2(const Position &, TileID);
 			void setLayer3(const Position &, TileID);

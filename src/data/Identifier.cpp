@@ -33,6 +33,10 @@ namespace Game3 {
 		return space == combined.substr(0, colon) && name == combined.substr(colon + 1);
 	}
 
+	bool Identifier::operator==(const Identifier &other) const {
+		return this == &other || (space == other.space && name == other.name);
+	}
+
 	void from_json(const nlohmann::json &json, Identifier &identifier) {
 		identifier = std::string_view(json.get<std::string>());
 	}

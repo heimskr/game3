@@ -102,7 +102,7 @@ namespace Game3 {
 		const auto tilesize = tilemap.tileSize;
 		const auto column_count = tilemap.setWidth / tilesize;
 
-		TileID tile_id = tileset.getEmpty();
+		TileID tile_id = tileset.getEmptyID();
 
 		if (details.customFn)
 			tile_id = tileset[details.customTileName];
@@ -156,13 +156,13 @@ namespace Game3 {
 		auto &tilemap2 = *realm->tilemap2;
 		const auto &tileset = *tilemap2.tileset;
 
-		if (tilemap2(position) != tileset.getEmpty())
+		if (tilemap2(position) != tileset.getEmptyID())
 			throw OverlapError("Can't confirm ghost at " + std::string(position));
 
 		if (details.customFn) {
 			details.customFn({position, realm, nullptr});
 		} else {
-			TileID tile_id = tileset.getMissing();
+			TileID tile_id = tileset[tileset.getMissing()];
 			if (details.useMarchingSquares)
 				tile_id = marched;
 			else

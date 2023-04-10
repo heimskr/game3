@@ -291,6 +291,21 @@ namespace Game3 {
 		setLayerHelper(index);
 	}
 
+	void Realm::setLayer1(Index index, const Identifier &tilename) {
+		tilemap1->tiles[index] = (*tilemap1->tileset)[tilename];
+		setLayerHelper(index);
+	}
+
+	void Realm::setLayer2(Index index, const Identifier &tilename) {
+		tilemap2->tiles[index] = (*tilemap2->tileset)[tilename];
+		setLayerHelper(index);
+	}
+
+	void Realm::setLayer3(Index index, const Identifier &tilename) {
+		tilemap3->tiles[index] = (*tilemap3->tileset)[tilename];
+		setLayerHelper(index);
+	}
+
 	void Realm::setLayer1(const Position &position, TileID tile) {
 		setLayer1(position.row, position.column, tile);
 	}

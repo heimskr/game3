@@ -16,7 +16,7 @@ namespace Game3 {
 		Identifier(std::string_view);
 		Identifier(const char *);
 
-		operator bool() const {
+		explicit operator bool() const {
 			if (space.empty() != name.empty())
 				throw std::runtime_error("Partially empty identifier");
 
@@ -44,6 +44,7 @@ namespace Game3 {
 		auto operator<=>(const Identifier &) const = default;
 
 		bool operator==(std::string_view) const;
+		bool operator==(const Identifier &) const;
 	};
 
 	void from_json(const nlohmann::json &, Identifier &);
