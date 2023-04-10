@@ -23,6 +23,6 @@ namespace Game3 {
 
 		protected:
 			CraftingStation() = default;
-			CraftingStation(TileID, const Position &, Identifier);
+			CraftingStation(Identifier, const Position &, Identifier station_type);
 	};
 }

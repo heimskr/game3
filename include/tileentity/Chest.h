@@ -23,13 +23,13 @@ namespace Game3 {
 			void init() override {}
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
-			void absorbJSON(const nlohmann::json &) override;
+			void absorbJSON(const Game &, const nlohmann::json &) override;
 			void render(SpriteRenderer &) override;
 			void setInventory(Slot slot_count);
 
 		protected:
 			Chest() = default;
-			Chest(TileID id_, const Position &position_, const std::string &name_, const Texture &texture_ = DEFAULT_TEXTURE);
+			Chest(Identifier tile_id, const Position &, std::string name_, Texture = DEFAULT_TEXTURE);
 
 			friend class TileEntity;
 	};

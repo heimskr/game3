@@ -6,6 +6,7 @@ namespace Game3 {
 	/** Lives in a town and mines ore during the day. */
 	class Miner: public Worker {
 		public:
+			static Identifier ID() { return {"base", "entity/miner"}; }
 			constexpr static Index RADIUS = 50;
 			constexpr static float HARVESTING_TIME = 5.f;
 			constexpr static float SELLING_TIME = 5.f;

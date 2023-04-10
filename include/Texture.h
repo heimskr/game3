@@ -19,8 +19,14 @@ namespace Game3 {
 			std::filesystem::path path;
 			std::shared_ptr<std::shared_ptr<uint8_t>> data = std::make_shared<std::shared_ptr<uint8_t>>();
 
-			Texture() = default;
+			Texture();
 			Texture(const std::filesystem::path &, bool alpha_ = true, int filter_ = GL_NEAREST);
+
+			Texture(const Texture &) = default;
+			Texture(Texture &&) = default;
+
+			Texture & operator=(const Texture &) = default;
+			Texture & operator=(Texture &&) = default;
 
 			void init();
 			void bind();

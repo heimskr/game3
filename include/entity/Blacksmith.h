@@ -7,6 +7,7 @@ namespace Game3 {
 	/** Lives in a town and produces tools during the day. */
 	class Blacksmith: public Worker, public Merchant {
 		public:
+			static Identifier ID() { return {"base", "entity/blacksmith"}; }
 			constexpr static float BUYING_TIME = 5.f;
 			constexpr static float CRAFTING_TIME = 5.f;
 			/** The number of iron bars, gold bars and diamonds that the blacksmith will try to maintain. */

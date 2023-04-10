@@ -10,7 +10,6 @@
 #include "registry/Registerable.h"
 
 namespace Game3 {
-	class Entity;
 	class Game;
 
 	class EntityFactory: NamedRegisterable {
@@ -21,6 +20,8 @@ namespace Game3 {
 			EntityFactory(Identifier, decltype(function));
 
 			std::shared_ptr<Entity> operator()(Game &, const nlohmann::json &);
+
+			inline const Identifier & getIdentifier() const { return identifier; }
 
 			template <typename T>
 			static EntityFactory create() {

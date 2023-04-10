@@ -5,6 +5,7 @@
 namespace Game3 {
 	class Merchant: public virtual Entity {
 		public:
+			static Identifier ID() { return {"base", "entity/merchant"}; }
 			static std::shared_ptr<Merchant> create(EntityID, EntityType = Entity::MERCHANT_TYPE);
 			static std::shared_ptr<Merchant> fromJSON(const nlohmann::json &);
 

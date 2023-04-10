@@ -6,6 +6,7 @@ namespace Game3 {
 	/** Lives in a town and chops wood during the day. */
 	class Woodcutter: public Worker {
 		public:
+			static Identifier ID() { return {"base", "entity/woodcutter"}; }
 			constexpr static Index RADIUS = 50;
 			constexpr static float HARVESTING_TIME = 5.f;
 			constexpr static float SELLING_TIME = 5.f;

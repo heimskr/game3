@@ -11,6 +11,7 @@ namespace Game3 {
 
 	class ItemEntity: public Entity {
 		public:
+			static Identifier ID() { return {"base", "entity/item"}; }
 			const ItemStack & getStack() const { return stack; }
 			void setStack(const ItemStack &);
 

@@ -61,12 +61,16 @@ namespace Game3 {
 			}
 
 			void initRegistries();
-			void initItems();
-			void initGhosts();
+			void addItems();
+			void addGhosts();
+			void addEntityFactories();
+			void addTileEntityFactories();
 			void initEntities();
 			void initInteractionSets();
 			void add(std::shared_ptr<Item>);
 			void add(std::shared_ptr<GhostDetails>);
+			void add(EntityFactory &&);
+			void add(TileEntityFactory &&);
 			void traverseData(const std::filesystem::path &);
 			void loadDataFile(const std::filesystem::path &);
 			void addRecipe(const nlohmann::json &);

@@ -20,13 +20,9 @@
 
 namespace Game3 {
 	std::shared_ptr<Entity> Entity::fromJSON(Game &game, const nlohmann::json &json) {
-		// const EntityID id = json.at("id");
-		EntityType type = json.at("type");
-		std::shared_ptr<Entity> out;
-
-		auto factory = game.registry<EntityFactoryRegistry>().at(type);
+		auto factory = game.registry<EntityFactoryRegistry>().at(json.at("type").get<EntityType>());
 		assert(factory);
-		out = (*factory)(game, json);
+		auto out = (*factory)(game, json);
 		out->absorbJSON(json);
 		out->init(game);
 		return out;
