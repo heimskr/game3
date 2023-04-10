@@ -57,17 +57,17 @@ namespace Game3 {
 
 			~Entity() override = default;
 
+			/** This won't call init() on the Entity. You need to do that yourself. */
 			template <typename T = Entity, typename... Args>
-			static std::shared_ptr<T> create(Game &game, Args && ...args) {
-				auto out = std::shared_ptr<T>(new T(game, std::forward<Args>(args)...));
+			static std::shared_ptr<T> create(Args && ...args) {
+				auto out = std::shared_ptr<T>(new T(std::forward<Args>(args)...));
 				out->health = out->maxHealth();
-				out->init(game);
 				return out;
 			}
 
 			static std::shared_ptr<Entity> fromJSON(Game &, const nlohmann::json &);
 
-			virtual void absorbJSON(const nlohmann::json &);
+			virtual void absorbJSON(Game &, const nlohmann::json &);
 			virtual void toJSON(nlohmann::json &) const;
 			virtual bool isPlayer() const { return false; }
 			/** Returns the maximum number of hitpoints this entity can have. If 0, the entity is invincible. */

@@ -11,11 +11,13 @@
 #include "ui/tab/TextTab.h"
 
 namespace Game3 {
-	Player::Player(Game &): Entity(ID()) {}
+	Player::Player():
+		Entity(ID()) {}
 
 	std::shared_ptr<Player> Player::fromJSON(Game &game, const nlohmann::json &json) {
 		auto out = Entity::create<Player>(game);
-		out->absorbJSON(json);
+		out->absorbJSON(game, json);
+		out->init(game);
 		return out;
 	}
 
@@ -28,8 +30,8 @@ namespace Game3 {
 			json["tooldown"] = tooldown;
 	}
 
-	void Player::absorbJSON(const nlohmann::json &json) {
-		Entity::absorbJSON(json);
+	void Player::absorbJSON(Game &game, const nlohmann::json &json) {
+		Entity::absorbJSON(game, json);
 		money = json.contains("money")? json.at("money").get<MoneyCount>() : 0;
 		tooldown = json.contains("tooldown")? json.at("tooldown").get<float>() : 0.f;
 	}

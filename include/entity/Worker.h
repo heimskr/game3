@@ -24,7 +24,7 @@ namespace Game3 {
 			float stuckTime = 0.f;
 
 			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(const nlohmann::json &) override;
+			void absorbJSON(Game &, const nlohmann::json &) override;
 			void initAfterLoad(Game &) override;
 
 			friend class Entity;
@@ -33,8 +33,8 @@ namespace Game3 {
 			Position keepPosition;
 			Direction lastDirection = Direction::Down;
 
-			Worker(EntityID, EntityType);
-			Worker(EntityID, EntityType, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_);
+			Worker(EntityType);
+			Worker(EntityType, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_);
 
 			HitPoints maxHealth() const override { return MAX_HEALTH; }
 			void interact(const Position &);

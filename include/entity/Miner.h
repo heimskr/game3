@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Types.h"
 #include "entity/Worker.h"
 
 namespace Game3 {
@@ -14,11 +15,11 @@ namespace Game3 {
 			Index chosenResource = -1;
 			float harvestingTime;
 
-			static std::shared_ptr<Miner> create(EntityID, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_);
-			static std::shared_ptr<Miner> fromJSON(const nlohmann::json &);
+			static std::shared_ptr<Miner> create(Game &, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_);
+			static std::shared_ptr<Miner> fromJSON(Game &, const nlohmann::json &);
 
 			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(const nlohmann::json &) override;
+			void absorbJSON(Game &, const nlohmann::json &) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 			void tick(Game &, float delta) override;
 			Glib::ustring getName() override { return "Miner"; }
@@ -28,8 +29,8 @@ namespace Game3 {
 		protected:
 			float sellTime = 0.f;
 
-			Miner(EntityID);
-			Miner(EntityID, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_);
+			Miner();
+			Miner(RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_);
 
 			void interact(const Position &);
 

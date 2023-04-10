@@ -12,14 +12,14 @@ namespace Game3 {
 			Stockpile & operator=(const Stockpile &) = delete;
 			Stockpile & operator=(Stockpile &&) = default;
 
-			void init() override {}
+			void init(Game &) override {}
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
-			void absorbJSON(const nlohmann::json &) override;
+			void absorbJSON(Game &, const nlohmann::json &) override;
 
 		protected:
 			Stockpile() = default;
-			Stockpile(TileID id_, const Position &position_, const Texture &texture_ = Chest::DEFAULT_TEXTURE);
+			Stockpile(Identifier tilename, Position position_, const Texture &texture_ = Chest::DEFAULT_TEXTURE);
 
 			friend class TileEntity;
 	};

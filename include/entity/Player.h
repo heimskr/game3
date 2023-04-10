@@ -31,7 +31,7 @@ namespace Game3 {
 
 			HitPoints maxHealth() const override { return MAX_HEALTH; }
 			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(const nlohmann::json &) override;
+			void absorbJSON(Game &, const nlohmann::json &) override;
 			bool isPlayer() const override { return true; }
 			void tick(Game &, float delta) override;
 			void remove() override {}
@@ -52,7 +52,7 @@ namespace Game3 {
 			friend class Entity;
 
 		protected:
-			Player(Game &);
+			Player();
 			void interact(const Position &);
 	};
 

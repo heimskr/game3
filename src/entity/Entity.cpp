@@ -23,7 +23,7 @@ namespace Game3 {
 		auto factory = game.registry<EntityFactoryRegistry>().at(json.at("type").get<EntityType>());
 		assert(factory);
 		auto out = (*factory)(game, json);
-		out->absorbJSON(json);
+		out->absorbJSON(game, json);
 		out->init(game);
 		return out;
 	}
@@ -42,7 +42,7 @@ namespace Game3 {
 			json["money"] = money;
 	}
 
-	void Entity::absorbJSON(const nlohmann::json &json) {
+	void Entity::absorbJSON(Game &, const nlohmann::json &json) {
 		type      = json.at("type");
 		position  = json.at("position");
 		realmID   = json.at("realmID");

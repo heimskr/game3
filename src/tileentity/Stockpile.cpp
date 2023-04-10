@@ -10,8 +10,9 @@
 #include "ui/MainWindow.h"
 
 namespace Game3 {
-	Stockpile::Stockpile(TileID id_, const Position &position_, const Texture &texture_): Chest(id_, position_, "Stockpile", texture_) {
-		tileEntityID = TileEntity::STOCKPILE;
+	Stockpile::Stockpile(Identifier tilename, Position position_, const Texture &texture_):
+	Chest(std::move(tilename), std::move(position_), "Stockpile", texture_) {
+		tileEntityID = "base:te/stockpile";
 	}
 
 	void Stockpile::toJSON(nlohmann::json &json) const {
@@ -27,7 +28,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Stockpile::absorbJSON(const nlohmann::json &json) {
-		Chest::absorbJSON(json);
+	void Stockpile::absorbJSON(Game &game, const nlohmann::json &json) {
+		Chest::absorbJSON(game, json);
 	}
 }

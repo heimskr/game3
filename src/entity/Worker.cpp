@@ -6,11 +6,16 @@
 #include "tileentity/Teleporter.h"
 
 namespace Game3 {
-	Worker::Worker(EntityID id_, EntityType type_):
-		Entity(id_, type_) {}
+	Worker::Worker(EntityType type_):
+		Entity(std::move(type_)) {}
 
-	Worker::Worker(EntityID id_, EntityType type_, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_):
-		Entity(id_, type_), overworldRealm(overworld_realm), houseRealm(house_realm), housePosition(house_position), keep(keep_), keepPosition(keep_->position) {}
+	Worker::Worker(EntityType type_, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_):
+		Entity(std::move(type_)),
+		overworldRealm(overworld_realm),
+		houseRealm(house_realm),
+		housePosition(std::move(house_position)),
+		keep(std::move(keep_)),
+		keepPosition(keep->position) {}
 
 	void Worker::toJSON(nlohmann::json &json) const {
 		Entity::toJSON(json);
@@ -25,8 +30,8 @@ namespace Game3 {
 			json["destination"] = destination;
 	}
 
-	void Worker::absorbJSON(const nlohmann::json &json) {
-		Entity::absorbJSON(json);
+	void Worker::absorbJSON(Game &game, const nlohmann::json &json) {
+		Entity::absorbJSON(game, json);
 		phase          = json.at("phase");
 		overworldRealm = json.at("overworldRealm");
 		houseRealm     = json.at("house").at(0);
@@ -42,7 +47,7 @@ namespace Game3 {
 		if (!(keep = std::dynamic_pointer_cast<Building>(game.realms.at(overworldRealm)->tileEntityAt(keepPosition))))
 			throw std::runtime_error("Couldn't find keep for worker");
 	}
-	
+
 	bool Worker::stillStuck(float delta) {
 		if (stuck) {
 			if ((stuckTime += delta) < RETRY_TIME)
