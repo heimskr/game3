@@ -34,7 +34,7 @@ namespace Game3 {
 	}
 
 	OreDeposit::OreDeposit(const Ore &ore, const Position &position_, float time_remaining, uint32_t uses_):
-		TileEntity(ore.tilename, "base:te/ore_deposit", position_, true),
+		TileEntity(ore.tilename, ID(), position_, true),
 		oreType(ore.identifier),
 		timeRemaining(time_remaining),
 		uses(uses_) {}

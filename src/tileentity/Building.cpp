@@ -7,7 +7,7 @@
 
 namespace Game3 {
 	Building::Building(Identifier id_, const Position &position_, RealmID inner_realm_id, Index entrance_):
-		TileEntity(std::move(id_), "base:te/building", position_, true),
+		TileEntity(std::move(id_), ID(), position_, true),
 		innerRealmID(inner_realm_id),
 		entrance(entrance_) {}
 

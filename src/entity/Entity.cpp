@@ -2,13 +2,8 @@
 #include <sstream>
 
 #include "Tileset.h"
-#include "entity/Blacksmith.h"
 #include "entity/Entity.h"
 #include "entity/EntityFactory.h"
-#include "entity/ItemEntity.h"
-#include "entity/Merchant.h"
-#include "entity/Miner.h"
-#include "entity/Woodcutter.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "realm/Realm.h"
@@ -79,15 +74,9 @@ namespace Game3 {
 		realm->entities.erase(shared);
 	}
 
-	void Entity::id(EntityID new_id) {
-		id_ = new_id;
-		if (texture == nullptr)
-			texture = &textureMap.at(id_).texture;
-	}
-
 	void Entity::init(Game &game) {
 		if (texture == nullptr)
-			texture = &textureMap.at(id_).texture;
+			texture = getTexture();
 
 		if (!inventory)
 			inventory = std::make_shared<Inventory>(shared_from_this(), DEFAULT_INVENTORY_SIZE);
@@ -321,6 +310,10 @@ namespace Game3 {
 
 	const Game & Entity::getGame() const {
 		return getRealm()->getGame();
+	}
+
+	std::shared_ptr<Texture> Entity::getTexture() {
+		return getGame().registry<TextureRegistry>().at(type);
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {

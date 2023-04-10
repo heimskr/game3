@@ -15,7 +15,7 @@ namespace Game3 {
 	Texture Chest::DEFAULT_TEXTURE = cacheTexture("resources/rpg/chests.png");
 
 	Chest::Chest(Identifier tile_id, const Position &position_, std::string name_, Texture texture_):
-	TileEntity(std::move(tile_id), "base:te/chest", position_, true), name(std::move(name_)), texture(std::move(texture_)) {
+	TileEntity(std::move(tile_id), ID(), position_, true), name(std::move(name_)), texture(std::move(texture_)) {
 		texture.init();
 	}
 

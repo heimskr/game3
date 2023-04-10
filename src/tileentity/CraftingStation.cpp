@@ -13,7 +13,7 @@
 
 namespace Game3 {
 	CraftingStation::CraftingStation(Identifier tile_id, const Position &position_, Identifier station_type):
-		TileEntity(std::move(tile_id), "base:te/crafting_station", position_, true), stationType(std::move(station_type)) {}
+		TileEntity(std::move(tile_id), ID(), position_, true), stationType(std::move(station_type)) {}
 
 	void CraftingStation::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);

@@ -8,17 +8,18 @@
 #include "ui/tab/MerchantTab.h"
 
 namespace Game3 {
-	Merchant::Merchant(EntityID id__, EntityType type_): Entity(id__, type_) {}
+	Merchant::Merchant(EntityType type_):
+		Entity(std::move(type_)) {}
 
-	std::shared_ptr<Merchant> Merchant::create(EntityID id, EntityType type) {
-		auto out = std::shared_ptr<Merchant>(new Merchant(id, type));
-		out->init();
+	std::shared_ptr<Merchant> Merchant::create(Game &game, EntityType type) {
+		auto out = Entity::create<Merchant>(std::move(type));
+		out->init(game);
 		return out;
 	}
 
-	std::shared_ptr<Merchant> Merchant::fromJSON(const nlohmann::json &json) {
+	std::shared_ptr<Merchant> Merchant::fromJSON(Game &game, const nlohmann::json &json) {
 		auto out = Entity::create<Merchant>(json.at("id"));
-		out->absorbJSON(json);
+		out->absorbJSON(game, json);
 		return out;
 	}
 
@@ -28,8 +29,8 @@ namespace Game3 {
 		json["greed"] = greed;
 	}
 
-	void Merchant::absorbJSON(const nlohmann::json &json) {
-		Entity::absorbJSON(json);
+	void Merchant::absorbJSON(Game &game, const nlohmann::json &json) {
+		Entity::absorbJSON(game, json);
 		greed = json.at("greed");
 		money = json.at("money");
 	}

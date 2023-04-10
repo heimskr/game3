@@ -11,13 +11,13 @@
 namespace Game3 {
 	Texture ItemEntity::missing = {"resources/missing.png"};
 
-	ItemEntity::ItemEntity(const ItemStack &stack_):
-		Entity(Entity::ITEM_ID, Entity::ITEM_TYPE), stack(stack_) {}
+	ItemEntity::ItemEntity(ItemStack stack_):
+		Entity(ID()), stack(std::move(stack_)) {}
 
-	void ItemEntity::setStack(const ItemStack &stack_) {
-		stack = stack_;
+	void ItemEntity::setStack(ItemStack stack_) {
+		stack = std::move(stack_);
 		const Game &game = getRealm()->getGame();
-		auto item_texture = game.registry<ItemTextureRegistry>().at(stack_.item->id);
+		auto item_texture = game.registry<ItemTextureRegistry>().at(stack.item->identifier);
 		texture = item_texture->texture.lock().get();
 		xOffset = item_texture->x / 2.f;
 		yOffset = item_texture->y / 2.f;
@@ -30,10 +30,8 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<ItemEntity> ItemEntity::fromJSON(Game &game, const nlohmann::json &json) {
-		ItemStack stack;
-		ItemStack::fromJSON(game, json.at("stack"), stack);
-		auto out = create(game, stack);
-		out->absorbJSON(json);
+		auto out = create(game, ItemStack::fromJSON(game, json.at("stack")));
+		out->absorbJSON(game, json);
 		return out;
 	}
 

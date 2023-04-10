@@ -15,7 +15,7 @@ namespace Game3 {
 		Entity(ID()) {}
 
 	std::shared_ptr<Player> Player::fromJSON(Game &game, const nlohmann::json &json) {
-		auto out = Entity::create<Player>(game);
+		auto out = Entity::create<Player>();
 		out->absorbJSON(game, json);
 		out->init(game);
 		return out;

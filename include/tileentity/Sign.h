@@ -5,6 +5,7 @@
 namespace Game3 {
 	class Sign: public TileEntity {
 		public:
+			static Identifier ID() { return {"base", "te/sign"}; }
 			std::string text;
 			std::string name;
 

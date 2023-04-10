@@ -110,7 +110,7 @@ namespace Game3 {
 			inline bool is(const Identifier &check) const { return type == check; }
 
 		protected:
-			Texture *texture = nullptr;
+			std::shared_ptr<Texture> texture;
 			int variety = 0;
 
 			Entity() = delete;
@@ -119,6 +119,7 @@ namespace Game3 {
 			bool canMoveTo(const Position &) const;
 			/** A list of functions to call the next time the entity moves. The functions return whether they should be removed from the queue. */
 			std::list<std::function<bool(const std::shared_ptr<Entity> &)>> moveQueue;
+			std::shared_ptr<Texture> getTexture();
 	};
 
 	void to_json(nlohmann::json &, const Entity &);

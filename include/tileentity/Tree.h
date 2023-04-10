@@ -7,6 +7,7 @@
 namespace Game3 {
 	class Tree: public TileEntity {
 		public:
+			static Identifier ID() { return {"base", "te/tree"}; }
 			constexpr static float MATURITY = 30.f;
 			constexpr static float HIVE_MATURITY = 60.f;
 			constexpr static double CHAR_CHANCE = 0.314159265358979323;

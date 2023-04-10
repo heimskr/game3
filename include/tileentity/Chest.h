@@ -8,6 +8,7 @@
 namespace Game3 {
 	class Chest: public HasInventory, public TileEntity {
 		public:
+			static Identifier ID() { return {"base", "te/chest"}; }
 			static Texture DEFAULT_TEXTURE;
 
 			std::string name;

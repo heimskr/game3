@@ -12,7 +12,7 @@
 
 namespace Game3 {
 	Tree::Tree(Identifier tilename, Identifier immature_tilename, Position position_, float age_):
-		TileEntity(std::move(tilename), "base:te/tree", std::move(position_), true),
+		TileEntity(std::move(tilename), ID(), std::move(position_), true),
 		age(age_),
 		immatureTilename(std::move(immature_tilename)) {}
 

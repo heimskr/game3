@@ -5,6 +5,7 @@
 namespace Game3 {
 	class CraftingStation: public TileEntity {
 		public:
+			static Identifier ID() { return {"base", "te/crafting_station"}; }
 			Identifier stationType;
 
 			CraftingStation(const CraftingStation &) = delete;

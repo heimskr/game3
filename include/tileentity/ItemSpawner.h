@@ -5,6 +5,7 @@
 namespace Game3 {
 	class ItemSpawner: public TileEntity {
 		public:
+			static Identifier ID() { return {"base", "te/item_spawner"}; }
 			// TODO: different chance per spawnable
 			// TODO: spawn time chosen between upper bound and lower bound
 			float chancePerTenth;

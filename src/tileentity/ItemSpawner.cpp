@@ -13,7 +13,7 @@
 
 namespace Game3 {
 	ItemSpawner::ItemSpawner(Position position_, float chance_per_tenth, std::vector<ItemStack> spawnables_):
-		TileEntity("base:tile/empty", "base:te/item_spawner", std::move(position_), false),
+		TileEntity("base:tile/empty", ID(), std::move(position_), false),
 		chancePerTenth(chance_per_tenth),
 		spawnables(std::move(spawnables_)) {}
 

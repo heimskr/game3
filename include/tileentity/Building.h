@@ -5,6 +5,7 @@
 namespace Game3 {
 	class Building: public TileEntity {
 		public:
+			static Identifier ID() { return {"base", "te/building"}; }
 			RealmID innerRealmID = 0;
 			Index entrance = 0;
 

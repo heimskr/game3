@@ -12,7 +12,7 @@
 namespace Game3 {
 	Stockpile::Stockpile(Identifier tilename, Position position_, const Texture &texture_):
 	Chest(std::move(tilename), std::move(position_), "Stockpile", texture_) {
-		tileEntityID = "base:te/stockpile";
+		tileEntityID = ID();
 	}
 
 	void Stockpile::toJSON(nlohmann::json &json) const {

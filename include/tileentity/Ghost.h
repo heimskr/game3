@@ -58,6 +58,7 @@ namespace Game3 {
 
 	class Ghost: public TileEntity {
 		public:
+			static Identifier ID() { return {"base", "te/ghost"}; }
 			GhostDetails details;
 			ItemStack material;
 			TileID marched = 0;

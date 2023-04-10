@@ -9,7 +9,7 @@
 
 namespace Game3 {
 	Teleporter::Teleporter(Identifier tilename, Position position_, RealmID target_realm, Position target_position):
-		TileEntity(std::move(tilename), "base:te/teleporter", std::move(position_), false),
+		TileEntity(std::move(tilename), ID(), std::move(position_), false),
 		targetRealm(target_realm),
 		targetPosition(std::move(target_position)) {}
 

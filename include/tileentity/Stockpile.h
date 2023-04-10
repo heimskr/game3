@@ -5,6 +5,7 @@
 namespace Game3 {
 	class Stockpile: public Chest {
 		public:
+			static Identifier ID() { return {"base", "te/stockpile"}; }
 			Stockpile(const Stockpile &) = delete;
 			Stockpile(Stockpile &&) = default;
 			~Stockpile() override = default;

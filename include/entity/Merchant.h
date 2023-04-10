@@ -6,14 +6,14 @@ namespace Game3 {
 	class Merchant: public virtual Entity {
 		public:
 			static Identifier ID() { return {"base", "entity/merchant"}; }
-			static std::shared_ptr<Merchant> create(EntityID, EntityType = Entity::MERCHANT_TYPE);
-			static std::shared_ptr<Merchant> fromJSON(const nlohmann::json &);
+			static std::shared_ptr<Merchant> create(Game &, EntityType = ID());
+			static std::shared_ptr<Merchant> fromJSON(Game &, const nlohmann::json &);
 
 			MoneyCount money = 0;
 			double greed = .1;
 
 			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(const nlohmann::json &) override;
+			void absorbJSON(Game &, const nlohmann::json &) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 			Glib::ustring getName() override { return "Blacksmith"; }
 
@@ -21,7 +21,7 @@ namespace Game3 {
 
 		protected:
 			Merchant() = default;
-			Merchant(EntityID, EntityType = Entity::MERCHANT_TYPE);
+			Merchant(EntityType = ID());
 
 			void interact(const Position &);
 

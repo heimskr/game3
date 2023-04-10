@@ -58,7 +58,7 @@ namespace Game3 {
 	}
 
 	Ghost::Ghost(const Place &place, ItemStack material_):
-		TileEntity("base:tile/missing", "base:te/ghost", place.position, true),
+		TileEntity("base:tile/missing", ID(), place.position, true),
 		details(GhostDetails::get(place.getGame(), material_)),
 		material(std::move(material_)) {}
 

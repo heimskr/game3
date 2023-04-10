@@ -5,6 +5,7 @@
 namespace Game3 {
 	class Teleporter: public TileEntity {
 		public:
+			static Identifier ID() { return {"base", "te/teleporter"}; }
 			RealmID targetRealm;
 			Position targetPosition;
 

@@ -13,7 +13,7 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "entity/item"}; }
 			const ItemStack & getStack() const { return stack; }
-			void setStack(const ItemStack &);
+			void setStack(ItemStack);
 
 			static std::shared_ptr<ItemEntity> create(Game &, const ItemStack &);
 			static std::shared_ptr<ItemEntity> fromJSON(Game &, const nlohmann::json &);
@@ -26,7 +26,7 @@ namespace Game3 {
 			Glib::ustring getName() override;
 
 		private:
-			ItemEntity(const ItemStack &);
+			ItemEntity(ItemStack);
 			float xOffset = 0.f;
 			float yOffset = 0.f;
 
