@@ -36,15 +36,10 @@ namespace Game3 {
 			void tick(Game &, float) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 			void render(SpriteRenderer &) override;
-			// ItemStack getOreStack(ItemCount count = 1);
 			const Ore & getOre(const Game &) const;
 
 		protected:
 			OreDeposit() = delete;
-
-			// OreDeposit(Identifier ore):
-			// 	TileEntity(), oreType(ore), tooldownMultiplier(getTooldownMultiplier(ore)), maxUses(getMaxUses(ore)), cooldown(getCooldown(ore)) {}
-
 			OreDeposit(const Ore &ore, const Position &position_, float time_remaining = 0.f, uint32_t uses_ = 0);
 
 			friend class TileEntity;

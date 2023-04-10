@@ -107,6 +107,7 @@ namespace Game3 {
 			virtual Glib::ustring getName() { return "Unknown Entity (" + std::to_string(type) + ')'; }
 			Game & getGame();
 			const Game & getGame() const;
+			inline bool is(const Identifier &check) const { return type == check; }
 
 		protected:
 			Texture *texture = nullptr;

@@ -13,7 +13,7 @@
 
 namespace Game3 {
 	ItemSpawner::ItemSpawner(Position position_, float chance_per_tenth, std::vector<ItemStack> spawnables_):
-		TileEntity(Monomap::VOID, TileEntity::ITEM_SPAWNER, std::move(position_), false),
+		TileEntity("base:tile/empty", "base:te/item_spawner", std::move(position_), false),
 		chancePerTenth(chance_per_tenth),
 		spawnables(std::move(spawnables_)) {}
 
@@ -23,20 +23,21 @@ namespace Game3 {
 		json["spawnables"] = spawnables;
 	}
 
-	void ItemSpawner::absorbJSON(const nlohmann::json &json) {
-		TileEntity::absorbJSON(json);
+	void ItemSpawner::absorbJSON(Game &game, const nlohmann::json &json) {
+		TileEntity::absorbJSON(game, json);
 		chancePerTenth = json.at("chance");
-		spawnables = json.at("spawnables");
+		for (const auto &spawnable: json.at("spawnables"))
+			spawnables.push_back(ItemStack::fromJSON(game, spawnable));
 	}
 
-	void ItemSpawner::init(std::default_random_engine &) {}
+	void ItemSpawner::init(Game &, std::default_random_engine &) {}
 
 	void ItemSpawner::tick(Game &game, float delta) {
 		static std::uniform_real_distribution distribution(0., 1.);
 		for (float i = 0; i < delta; i += 0.1) {
 			if (distribution(game.dynamicRNG) < chancePerTenth) {
 				for (const auto &entity: getRealm()->findEntities(getPosition()))
-					if (entity->type == Entity::ITEM_TYPE)
+					if (entity->is("base:entity/item"))
 						return;
 				choose(spawnables).spawn(getRealm(), getPosition());
 				return;

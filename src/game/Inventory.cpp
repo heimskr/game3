@@ -1,7 +1,6 @@
 #include "entity/Entity.h"
 #include "entity/ItemEntity.h"
 #include "game/Agent.h"
-#include "game/Crafting.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "realm/Realm.h"
@@ -165,7 +164,7 @@ namespace Game3 {
 	ItemCount Inventory::count(ItemID id) const {
 		ItemCount out = 0;
 		for (const auto &[slot, stored_stack]: storage)
-			if (stored_stack.item->id == id)
+			if (stored_stack.item->identifier == id)
 				out += stored_stack.count;
 		return out;
 	}
@@ -173,7 +172,7 @@ namespace Game3 {
 	ItemCount Inventory::count(const Item &item) const {
 		ItemCount out = 0;
 		for (const auto &[slot, stored_stack]: storage)
-			if (stored_stack.item->id == item.id)
+			if (stored_stack.item->identifier == item.identifier)
 				out += stored_stack.count;
 		return out;
 	}

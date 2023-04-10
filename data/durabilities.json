@@ -1,14 +1,14 @@
 ["base:durability_list", [
-	["base:iron_axe",        128],
-	["base:iron_pickaxe",    128],
-	["base:iron_shovel",     128],
-	["base:iron_hammer",     128],
-	["base:gold_axe",         64],
-	["base:gold_pickaxe",     64],
-	["base:gold_shovel",      64],
-	["base:gold_hammer",      64],
-	["base:diamond_axe",     512],
-	["base:diamond_pickaxe", 512],
-	["base:diamond_shovel",  512],
-	["base:diamond_hammer",  512]
+	["base:item/iron_axe",        128],
+	["base:item/iron_pickaxe",    128],
+	["base:item/iron_shovel",     128],
+	["base:item/iron_hammer",     128],
+	["base:item/gold_axe",         64],
+	["base:item/gold_pickaxe",     64],
+	["base:item/gold_shovel",      64],
+	["base:item/gold_hammer",      64],
+	["base:item/diamond_axe",     512],
+	["base:item/diamond_pickaxe", 512],
+	["base:item/diamond_shovel",  512],
+	["base:item/diamond_hammer",  512]
 ]]
