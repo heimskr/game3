@@ -13,38 +13,40 @@ namespace Game3::WorldGen {
 		const auto width  = realm->getWidth();
 		const auto height = realm->getHeight();
 		for (int column = 1; column < width - 1; ++column) {
-			realm->setLayer2(column, Monomap::WALL_WE);
-			realm->setLayer2(height - 1, column, Monomap::WALL_WE);
+			realm->setLayer2(column, "base:tile/wall_we"_id);
+			realm->setLayer2(height - 1, column, "base:tile/wall_we"_id);
 		}
 
 		for (int row = 1; row < height - 1; ++row) {
-			realm->setLayer2(row, 0, Monomap::WALL_NS);
-			realm->setLayer2(row, width - 1, Monomap::WALL_NS);
+			realm->setLayer2(row, 0, "base:tile/wall_ns"_id);
+			realm->setLayer2(row, width - 1, "base:tile/wall_ns"_id);
 		}
 
 		for (int row = 0; row < height; ++row)
 			for (int column = 0; column < width; ++column)
-				realm->setLayer1(row, column, Monomap::FLOOR);
+				realm->setLayer1(row, column, "base:tile/floor"_id);
 
-		realm->setLayer2(0, Monomap::WALL_SE);
-		realm->setLayer2(width - 1, Monomap::WALL_SW);
-		realm->setLayer2(width * (height - 1), Monomap::WALL_NE);
-		realm->setLayer2(width * height - 1, Monomap::WALL_NW);
+		realm->setLayer2(0, "base:tile/wall_se"_id);
+		realm->setLayer2(width - 1, "base:tile/wall_sw"_id);
+		realm->setLayer2(width * (height - 1), "base:tile/wall_ne"_id);
+		realm->setLayer2(width * height - 1, "base:tile/wall_nw"_id);
 
 		const Index exit_index = width * height - width / 2 - 1;
-		realm->setLayer2(exit_index - 1, Monomap::WALL_W);
-		realm->setLayer2(exit_index,     Monomap::EMPTY);
-		realm->setLayer2(exit_index + 1, Monomap::WALL_E);
+		realm->setLayer2(exit_index - 1, "base:tile/wall_w"_id);
+		realm->setLayer2(exit_index,     "base:tile/empty"_id);
+		realm->setLayer2(exit_index + 1, "base:tile/wall_e"_id);
 
-		static std::array<TileID, 2> doors  {Monomap::DOOR1,  Monomap::DOOR2};
+		const auto &doors = realm->tilemap2->tileset->getTilesByCategory("base:category/doors");
 
-		auto exit_door = TileEntity::create<Teleporter>(choose(doors, rng), realm->getPosition(exit_index), parent_realm, entrance);
+		Game &game = realm->getGame();
+		auto exit_door = TileEntity::create<Teleporter>(game, choose(doors, rng), realm->getPosition(exit_index), parent_realm, entrance);
 		exit_door->extraData["exit"] = true;
 		realm->add(exit_door);
 
-		realm->setLayer2(Position(height - 2, 1), Monomap::STOCKPILE_W);
-		realm->setLayer2(Position(height - 2, 2), Monomap::STOCKPILE_E);
-		auto stockpile = TileEntity::create<Stockpile>(48, Position(height - 2, 2));
+		realm->setLayer2(Position(height - 2, 1), "base:tile/stockpile_w"_id);
+		realm->setLayer2(Position(height - 2, 2), "base:tile/stockpile_e"_id);
+		// TODO: the identifier here used to inexplicably be 48 so I'm putting in a silly tile temporarily to see whether it does anything.
+		auto stockpile = TileEntity::create<Stockpile>(game, "base:tile/furnace"_id, Position(height - 2, 2));
 		stockpile->setInventory(40);
 		realm->add(stockpile);
 		realm->stockpileInventory = stockpile->inventory;
