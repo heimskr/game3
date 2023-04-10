@@ -9,13 +9,23 @@
 namespace Game3 {
 	class Game;
 
-	enum class GhostType {Invalid, Normal, WoodenWall, Tower, Custom};
+	// enum class GhostType {Invalid, Normal, WoodenWall, Tower, Custom};
 
-	struct GhostDetails: Registerable {
+	class GhostFunction: public NamedRegisterable {
+		private:
+			std::function<bool(const Identifier &, const Place &)> function;
+
+		public:
+			GhostFunction(Identifier, decltype(function));
+			bool operator()(const Identifier &tilename, const Place &) const;
+	};
+
+	struct GhostDetails: NamedRegisterable {
 		/** Note: the player field of the Place will be null! */
 		using CustomFn = std::function<void(const Place &)>;
 
-		GhostType type = GhostType::Invalid;
+		// GhostType type = GhostType::Invalid;
+		Identifier type;
 		bool useMarchingSquares = false;
 		Index columnsPerRow = 16;
 		Index rowOffset     = 0;
@@ -25,27 +35,24 @@ namespace Game3 {
 		Identifier customTileName;
 
 		GhostDetails() = default;
-		GhostDetails(GhostType type_, bool use_marching_squares, Index columns_per_row, Index row_offset, Index column_offset):
-			type(type_),
+		GhostDetails(Identifier identifier_, Identifier type_, bool use_marching_squares, Index columns_per_row, Index row_offset, Index column_offset):
+			NamedRegisterable(std::move(identifier_)),
+			type(std::move(type_)),
 			useMarchingSquares(use_marching_squares),
 			columnsPerRow(columns_per_row),
 			rowOffset(row_offset),
 			columnOffset(column_offset) {}
 
-		GhostDetails(CustomFn custom_fn, Identifier custom_tile_name):
+		GhostDetails(Identifier identifier_, CustomFn custom_fn, Identifier custom_tile_name):
+			NamedRegisterable(std::move(identifier_)),
+			type("base:ghost/custom"),
 			customFn(std::move(custom_fn)),
 			customTileName(std::move(custom_tile_name)) {}
 
-		static GhostDetails WOODEN_WALL;
-		static GhostDetails TOWER;
-		static GhostDetails PLANT_POT1;
-		static GhostDetails PLANT_POT2;
-		static GhostDetails PLANT_POT3;
-		static GhostDetails CAULDRON;
-		static GhostDetails PURIFIER;
-
 		static GhostDetails & get(const Game &, const ItemStack &);
 	};
+
+	void from_json(const nlohmann::json &, GhostDetails &);
 
 	void initGhosts(Game &);
 
@@ -62,11 +69,9 @@ namespace Game3 {
 			Ghost & operator=(const Ghost &) = delete;
 			Ghost & operator=(Ghost &&) = default;
 
-			TileEntityID getID() const override { return TileEntity::GHOST; }
-
-			void init() override {}
+			void init(Game &) override {}
 			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(const Game &, const nlohmann::json &) override;
+			void absorbJSON(Game &, const nlohmann::json &) override;
 			void onSpawn();
 			void onNeighborUpdated(Index row_offset, Index column_offset) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
@@ -79,8 +84,7 @@ namespace Game3 {
 		protected:
 			Ghost() = default;
 
-			Ghost(const Position &position_, const ItemStack &material_):
-				TileEntity(Monomap::MISSING, TileEntity::GHOST, position_, true), details(GhostDetails::get(material_)), material(material_) {}
+			Ghost(const Place &place, ItemStack material_);
 
 		private:
 			void march();

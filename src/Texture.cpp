@@ -9,8 +9,15 @@
 #include "util/Util.h"
 
 namespace Game3 {
+	Texture::Texture():
+		NamedRegisterable(Identifier()) {}
+
 	Texture::Texture(const std::filesystem::path &path_, bool alpha_, int filter_):
-		format(std::make_shared<int>(alpha_? GL_RGBA : GL_RGB)), filter(std::make_shared<int>(filter_)), alpha(std::make_shared<bool>(alpha_)), path(path_) {}
+		NamedRegisterable(Identifier()),
+		format(std::make_shared<int>(alpha_? GL_RGBA : GL_RGB)),
+		filter(std::make_shared<int>(filter_)),
+		alpha(std::make_shared<bool>(alpha_)),
+		path(path_) {}
 
 	void Texture::init() {
 		if (!*valid_) {
@@ -35,7 +42,6 @@ namespace Game3 {
 		init();
 		glBindTexture(GL_TEXTURE_2D, *id); //CHECKGL
 	}
-
 
 	Texture & cacheTexture(const std::filesystem::path &path, bool alpha, int filter) {
 		static std::unordered_map<std::string, Texture> textureCache;

@@ -18,7 +18,6 @@ namespace Game3 {
 	class Entity;
 	class Game;
 	class SpriteRenderer;
-	struct TileSet;
 
 	class Realm: public std::enable_shared_from_this<Realm> {
 		public:
@@ -95,6 +94,9 @@ namespace Game3 {
 			void setLayer1(const Position &, TileID);
 			void setLayer2(const Position &, TileID);
 			void setLayer3(const Position &, TileID);
+			void setLayer1(const Position &, const Identifier &);
+			void setLayer2(const Position &, const Identifier &);
+			void setLayer3(const Position &, const Identifier &);
 			TileID getLayer1(Index row, Index column) const;
 			TileID getLayer2(Index row, Index column) const;
 			TileID getLayer3(Index row, Index column) const;
@@ -112,7 +114,7 @@ namespace Game3 {
 			bool hasTileEntityAt(const Position &) const;
 			void confirmGhosts();
 			void damageGround(const Position &);
-			const TileSet & getTileSet() const;
+			const Tileset & getTileset() const;
 
 			virtual bool interactGround(const std::shared_ptr<Player> &, const Position &);
 			virtual void updateNeighbors(const Position &);
@@ -121,9 +123,10 @@ namespace Game3 {
 
 			template <typename T, typename... Args>
 			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {
-				auto entity = T::create(std::forward<Args>(args)...);
+				Game &game_ref = getGame();
+				auto entity = T::create(game_ref, std::forward<Args>(args)...);
 				entity->setRealm(shared_from_this());
-				entity->init();
+				entity->init(game_ref);
 				entity->teleport(position);
 				add(entity);
 				return entity;
@@ -209,7 +212,7 @@ namespace Game3 {
 			bool ticking = false;
 			std::vector<std::shared_ptr<Entity>> entityRemovalQueue;
 			std::vector<std::shared_ptr<TileEntity>> tileEntityRemovalQueue;
-			bool isWalkable(Index row, Index column, const TileSet &) const;
+			bool isWalkable(Index row, Index column, const Tileset &) const;
 			void setLayerHelper(Index row, Index col, bool should_mark_dirty = true);
 			void setLayerHelper(Index, bool should_mark_dirty = true);
 			void resetPathMap();

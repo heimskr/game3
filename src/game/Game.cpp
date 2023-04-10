@@ -4,6 +4,14 @@
 
 #include <nlohmann/json.hpp>
 
+#include "entity/Blacksmith.h"
+#include "entity/EntityFactory.h"
+#include "entity/ItemEntity.h"
+#include "entity/Merchant.h"
+#include "entity/Miner.h"
+#include "entity/Player.h"
+#include "entity/Woodcutter.h"
+#include "entity/Worker.h"
 #include "game/Game.h"
 #include "game/InteractionSet.h"
 #include "game/Inventory.h"
@@ -18,7 +26,18 @@
 #include "item/Sapling.h"
 #include "item/Tool.h"
 #include "registry/Registries.h"
+#include "tileentity/Building.h"
+#include "tileentity/Chest.h"
+#include "tileentity/CraftingStation.h"
 #include "tileentity/Ghost.h"
+#include "tileentity/ItemSpawner.h"
+#include "tileentity/OreDeposit.h"
+#include "tileentity/Sign.h"
+#include "tileentity/Stockpile.h"
+#include "tileentity/Teleporter.h"
+#include "tileentity/TileEntity.h"
+#include "tileentity/TileEntityFactory.h"
+#include "tileentity/Tree.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "ui/tab/TextTab.h"
@@ -37,10 +56,14 @@ namespace Game3 {
 		registries.add<EntityTextureRegistry>();
 		registries.add<EntityFactoryRegistry>();
 		registries.add<TilesetRegistry>();
+		registries.add<GhostDetailsRegistry>();
+		registries.add<GhostFunctionRegistry>();
+		registries.add<TileEntityFactoryRegistry>();
+		registries.add<OreRegistry>();
 		// TODO: plugins
 	}
 
-	void Game::initItems() {
+	void Game::addItems() {
 		add(std::make_shared<Item>        ("base:shortsword",      "Shortsword",      100,  1));
 		add(std::make_shared<Item>        ("base:red_potion",      "Red Potion",       20,  8));
 		add(std::make_shared<Item>        ("base:coins",           "Gold",              1, 1'000'000));
@@ -98,8 +121,31 @@ namespace Game3 {
 		add(std::make_shared<Mushroom>("base:grey_knight",     "Grey Knight",        20, 12));
 	}
 
-	void Game::initGhosts() {
+	void Game::addGhosts() {
 		Game3::initGhosts(*this);
+	}
+
+	void Game::addEntityFactories() {
+		add(EntityFactory::create<Blacksmith>());
+		add(EntityFactory::create<ItemEntity>());
+		add(EntityFactory::create<Merchant>());
+		add(EntityFactory::create<Miner>());
+		add(EntityFactory::create<Player>());
+		add(EntityFactory::create<Woodcutter>());
+		add(EntityFactory::create<Worker>()); // TODO: verify whether adding this base class is necessary
+	}
+
+	void Game::addTileEntityFactories() {
+		add(TileEntityFactory::create<Building>());
+		add(TileEntityFactory::create<Chest>());
+		add(TileEntityFactory::create<CraftingStation>());
+		add(TileEntityFactory::create<Ghost>());
+		add(TileEntityFactory::create<ItemSpawner>());
+		add(TileEntityFactory::create<OreDeposit>());
+		add(TileEntityFactory::create<Sign>());
+		add(TileEntityFactory::create<Stockpile>());
+		add(TileEntityFactory::create<Teleporter>());
+		add(TileEntityFactory::create<Tree>());
 	}
 
 	void Game::initEntities() {
@@ -115,7 +161,19 @@ namespace Game3 {
 	}
 
 	void Game::add(std::shared_ptr<Item> item) {
-		registry<ItemRegistry>().add(item->id, item);
+		registry<ItemRegistry>().add(item->identifier, item);
+	}
+
+	void Game::add(std::shared_ptr<GhostDetails> details) {
+		registry<GhostDetailsRegistry>().add(details->identifier, details);
+	}
+
+	void Game::add(EntityFactory &&factory) {
+		registry<EntityFactoryRegistry>().add(factory.getIdentifier(), std::make_shared<EntityFactory>(std::move(factory)));
+	}
+
+	void Game::add(TileEntityFactory &&factory) {
+		registry<TileEntityFactoryRegistry>().add(factory.getIdentifier(), std::make_shared<TileEntityFactory>(std::move(factory)));
 	}
 
 	void Game::traverseData(const std::filesystem::path &dir) {

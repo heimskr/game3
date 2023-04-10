@@ -10,12 +10,7 @@
 #include "game/InteractionSet.h"
 #include "realm/Keep.h"
 #include "realm/Realm.h"
-#include "tileentity/Building.h"
-#include "tileentity/Chest.h"
 #include "tileentity/Ghost.h"
-#include "tileentity/OreDeposit.h"
-#include "tileentity/Sign.h"
-#include "tileentity/Teleporter.h"
 #include "ui/MainWindow.h"
 #include "ui/SpriteRenderer.h"
 #include "util/Timer.h"
@@ -43,7 +38,7 @@ namespace Game3 {
 		tilemap1->init();
 		tilemap2->init();
 		tilemap3->init();
-		const auto &tileset = getTileSet();
+		const auto &tileset = getTileset();
 		renderer1.init(tilemap1, tileset);
 		renderer2.init(tilemap2, tileset);
 		renderer3.init(tilemap3, tileset);
@@ -53,10 +48,10 @@ namespace Game3 {
 	Realm::Realm(RealmID id_, RealmType type_, TilemapPtr tilemap1_, BiomeMapPtr biome_map, int seed_):
 	id(id_), type(type_), tilemap1(std::move(tilemap1_)), biomeMap(std::move(biome_map)), seed(seed_) {
 		tilemap1->init();
-		const auto &tileset = getTileSet();
+		const auto &tileset = getTileset();
 		renderer1.init(tilemap1, tileset);
-		tilemap2 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->texture);
-		tilemap3 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->texture);
+		tilemap2 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->tileset);
+		tilemap3 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->tileset);
 		tilemap2->init();
 		tilemap3->init();
 		renderer2.init(tilemap2, tileset);
@@ -99,21 +94,22 @@ namespace Game3 {
 		tilemap3->texture.init();
 		biomeMap = std::make_shared<BiomeMap>(json.at("biomeMap"));
 		outdoors = json.at("outdoors");
+		Game &game = getGame();
 		for (const auto &[index, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>()) {
-			auto tile_entity = TileEntity::fromJSON(tile_entity_json);
+			auto tile_entity = TileEntity::fromJSON(game, tile_entity_json);
 			tileEntities.emplace(parseUlong(index), tile_entity);
 			tile_entity->setRealm(shared);
 			tile_entity->onSpawn();
-			if (tile_entity_json.at("id").get<TileEntityID>() == TileEntity::GHOST)
+			if (tile_entity_json.at("id").get<Identifier>() == "base:te/ghost")
 				++ghostCount;
 		}
-		const auto &tileset = getTileSet();
+		const auto &tileset = getTileset();
 		renderer1.init(tilemap1, tileset);
 		renderer2.init(tilemap2, tileset);
 		renderer3.init(tilemap3, tileset);
 		entities.clear();
 		for (const auto &entity_json: json.at("entities"))
-			(*entities.insert(Entity::fromJSON(entity_json)).first)->setRealm(shared);
+			(*entities.insert(Entity::fromJSON(game, entity_json)).first)->setRealm(shared);
 		if (json.contains("extra"))
 			extraData = json.at("extra");
 	}
@@ -166,7 +162,7 @@ namespace Game3 {
 		tileEntities.emplace(index, tile_entity);
 		if (tile_entity->solid)
 			pathMap[index] = false;
-		if (tile_entity->tileEntityID == TileEntity::GHOST)
+		if (tile_entity->is("base:te/ghost"))
 			++ghostCount;
 		tile_entity->onSpawn();
 		return tile_entity;
@@ -247,7 +243,7 @@ namespace Game3 {
 		tileEntities.at(index)->onRemove();
 		tileEntities.erase(index);
 		setLayerHelper(index, false);
-		if (tile_entity->getID() == TileEntity::GHOST)
+		if (tile_entity->is("base:te/ghost"))
 			--ghostCount;
 		updateNeighbors(position);
 	}
@@ -285,7 +281,7 @@ namespace Game3 {
 		if (auto realm = entity->weakRealm.lock())
 			realm->remove(entity);
 		entity->setRealm(shared_from_this());
-		entity->init();
+		entity->init(getGame());
 		entity->teleport(position);
 	}
 
@@ -329,6 +325,18 @@ namespace Game3 {
 
 	void Realm::setLayer3(const Position &position, TileID tile) {
 		setLayer3(position.row, position.column, tile);
+	}
+
+	void Realm::setLayer1(const Position &position, const Identifier &tile) {
+		setLayer1(position.row, position.column, (*tilemap1->tileset)[tile]);
+	}
+
+	void Realm::setLayer2(const Position &position, const Identifier &tile) {
+		setLayer2(position.row, position.column, (*tilemap2->tileset)[tile]);
+	}
+
+	void Realm::setLayer3(const Position &position, const Identifier &tile) {
+		setLayer3(position.row, position.column, (*tilemap3->tileset)[tile]);
 	}
 
 	TileID Realm::getLayer1(Index row, Index column) const {
@@ -426,6 +434,9 @@ namespace Game3 {
 
 		++depth;
 
+		auto &tiles = tilemap2->tiles;
+		const auto &tileset = *tilemap2->tileset;
+
 		for (Index row_offset = -1; row_offset <= 1; ++row_offset)
 			for (Index column_offset = -1; column_offset <= 1; ++column_offset)
 				if (row_offset != 0 || column_offset != 0) {
@@ -435,20 +446,24 @@ namespace Game3 {
 					if (auto neighbor = tileEntityAt(offset_position)) {
 						neighbor->onNeighborUpdated(-row_offset, -column_offset);
 					} else {
-						auto &tiles = tilemap2->tiles;
 						TileID &tile = tiles.at(getIndex(offset_position));
-						if (Monomap::woodenWalls.contains(tile)) {
-							TileID march_result = march4([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
-								const Position march_position = offset_position + Position(march_row_offset, march_column_offset);
-								if (!isValid(march_position))
-									return false;
-								return Monomap::woodenWalls.contains(tiles.at(getIndex(march_position)));
-							});
+						const auto &tilename = tileset[tile];
 
-							const TileID marched = (march_result / 7 + 6) * (tilemap2->setWidth / tilemap2->tileSize) + march_result % 7;
-							if (marched != tile) {
-								tile = marched;
-								layer2_updated = true;
+						for (const auto &category: tileset.getCategories(tilename)) {
+							if (tileset.isCategoryMarchable(category)) {
+								TileID march_result = march4([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
+									const Position march_position = offset_position + Position(march_row_offset, march_column_offset);
+									if (!isValid(march_position))
+										return false;
+									return tileset.isInCategory(tileset[tiles.at(getIndex(march_position))], category);
+								});
+
+								// ???
+								const TileID marched = (march_result / 7 + 6) * (tilemap2->setWidth / tilemap2->tileSize) + march_result % 7;
+								if (marched != tile) {
+									tile = marched;
+									layer2_updated = true;
+								}
 							}
 						}
 					}
@@ -471,11 +486,9 @@ namespace Game3 {
 
 		std::vector<std::shared_ptr<Ghost>> ghosts;
 
-		for (auto &[index, tile_entity]: tileEntities) {
-			if (tile_entity->getID() != TileEntity::GHOST)
-				continue;
-			ghosts.push_back(std::dynamic_pointer_cast<Ghost>(tile_entity));
-		}
+		for (auto &[index, tile_entity]: tileEntities)
+			if (tile_entity->is("base:te/ghost"))
+				ghosts.push_back(std::dynamic_pointer_cast<Ghost>(tile_entity));
 
 		for (const auto &ghost: ghosts) {
 			remove(ghost);
@@ -494,8 +507,8 @@ namespace Game3 {
 			iter->second->damageGround(place);
 	}
 
-	const TileSet & Realm::getTileSet() const {
-		return *tileSets.at(type);
+	const Tileset & Realm::getTileset() const {
+		return *tilemap1->tileset;
 	}
 
 	void Realm::toJSON(nlohmann::json &json) const {
@@ -520,7 +533,7 @@ namespace Game3 {
 			json["extra"] = extraData;
 	}
 
-	bool Realm::isWalkable(Index row, Index column, const TileSet &tileset) const {
+	bool Realm::isWalkable(Index row, Index column, const Tileset &tileset) const {
 		if (!tileset.isWalkable((*tilemap1)(column, row)) || !tileset.isWalkable((*tilemap2)(column, row)) || !tileset.isWalkable((*tilemap3)(column, row)))
 			return false;
 		const Index index = getIndex(row, column);
@@ -530,9 +543,9 @@ namespace Game3 {
 	}
 
 	void Realm::setLayerHelper(Index row, Index column, bool should_mark_dirty) {
-		const auto &tileset = tileSets.at(type);
+		const auto &tileset = getTileset();
 		const Position position(row, column);
-		pathMap[getIndex(position)] = isWalkable(row, column, *tileset);
+		pathMap[getIndex(position)] = isWalkable(row, column, tileset);
 		updateNeighbors(position);
 		if (should_mark_dirty) {
 			renderer1.markDirty(this);
@@ -542,9 +555,9 @@ namespace Game3 {
 	}
 
 	void Realm::setLayerHelper(Index index, bool should_mark_dirty) {
-		const auto &tileset = tileSets.at(type);
+		const auto &tileset = getTileset();
 		const Position position = getPosition(index);
-		pathMap[index] = isWalkable(position.row, position.column, *tileset);
+		pathMap[index] = isWalkable(position.row, position.column, tileset);
 		updateNeighbors(position);
 		if (should_mark_dirty) {
 			renderer1.markDirty(this);
@@ -557,10 +570,10 @@ namespace Game3 {
 		const auto width = tilemap1->width;
 		const auto height = tilemap1->height;
 		pathMap.resize(width * height);
-		const auto &tileset = tileSets.at(type);
+		const auto &tileset = getTileset();
 		for (Index row = 0; row < height; ++row)
 			for (Index column = 0; column < width; ++column)
-				pathMap[getIndex(row, column)] = isWalkable(row, column, *tileset);
+				pathMap[getIndex(row, column)] = isWalkable(row, column, tileset);
 	}
 
 	bool Realm::rightClick(const Position &position, double x, double y) {

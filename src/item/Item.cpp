@@ -12,6 +12,9 @@ namespace Game3 {
 
 // ItemTexture
 
+	ItemTexture::ItemTexture(int x_, int y_, std::shared_ptr<Texture> texture_, int width_, int height_):
+		NamedRegisterable(texture_->identifier), x(x_), y(y_), texture(std::move(texture_)), width(width_), height(height_) {}
+
 	ItemTexture::operator bool() const {
 		return x != -1 && y != -1 && texture.lock() && width != -1 && height != -1;
 	}
@@ -44,7 +47,7 @@ namespace Game3 {
 // Item
 
 	Item::Item(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count):
-		id(std::move(id_)), name(std::move(name_)), basePrice(base_price), maxCount(max_count) {}
+		NamedRegisterable(std::move(id_)), name(std::move(name_)), basePrice(base_price), maxCount(max_count) {}
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage(const Game &game) {
 		if (!cachedImage)
@@ -53,7 +56,7 @@ namespace Game3 {
 	}
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::makeImage(const Game &game) {
-		auto item_texture = game.registry<ItemTextureRegistry>().at(id);
+		auto item_texture = game.registry<ItemTextureRegistry>().at(identifier);
 		auto &texture = *item_texture->texture.lock();
 		texture.init();
 		const int width  = item_texture->width;
@@ -77,7 +80,7 @@ namespace Game3 {
 	}
 
 	void Item::getOffsets(const Game &game, Texture *&texture, float &x_offset, float &y_offset) {
-		auto item_texture = game.registry<ItemTextureRegistry>().at(id);
+		auto item_texture = game.registry<ItemTextureRegistry>().at(identifier);
 		texture  = item_texture->texture.lock().get();
 		x_offset = item_texture->x / 2.f;
 		y_offset = item_texture->y / 2.f;
@@ -151,7 +154,7 @@ namespace Game3 {
 		realm->spawn<ItemEntity>(position, *this);
 	}
 
-	void ItemStack::fromJSON(Game &game, const nlohmann::json &json, ItemStack &stack) {
+	void ItemStack::fromJSON(const Game &game, const nlohmann::json &json, ItemStack &stack) {
 		Identifier id = json.at(0);
 		stack.item = game.registries.get<ItemRegistry>().at(id);
 		stack.count = json.at(1);
@@ -166,14 +169,14 @@ namespace Game3 {
 		}
 	}
 
-	ItemStack ItemStack::fromJSON(Game &game, const nlohmann::json &json) {
+	ItemStack ItemStack::fromJSON(const Game &game, const nlohmann::json &json) {
 		ItemStack out;
 		fromJSON(game, json, out);
 		return out;
 	}
 
 	void to_json(nlohmann::json &json, const ItemStack &stack) {
-		json[0] = stack.item->id;
+		json[0] = stack.item->identifier;
 		json[1] = stack.count;
 		if (!stack.data.empty())
 			json[2] = stack.data;

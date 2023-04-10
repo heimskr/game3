@@ -6,6 +6,11 @@
 #include "ui/SpriteRenderer.h"
 
 namespace Game3 {
+	Building::Building(Identifier id_, const Position &position_, RealmID inner_realm_id, Index entrance_):
+		TileEntity(std::move(id_), "base:te/building", position_, true),
+		innerRealmID(inner_realm_id),
+		entrance(entrance_) {}
+
 	void Building::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
 		json["innerRealmID"] = innerRealmID;
@@ -21,8 +26,8 @@ namespace Game3 {
 		return true;
 	}
 
-	void Building::absorbJSON(const nlohmann::json &json) {
-		TileEntity::absorbJSON(json);
+	void Building::absorbJSON(Game &game, const nlohmann::json &json) {
+		TileEntity::absorbJSON(game, json);
 		innerRealmID = json.at("innerRealmID");
 		entrance = json.at("entrance");
 	}
@@ -40,8 +45,9 @@ namespace Game3 {
 			return;
 
 		auto realm = getRealm();
-		if (tileID != tileSets.at(realm->type)->getEmpty()) {
-			auto &tilemap = *realm->tilemap2;
+		auto &tilemap = *realm->tilemap2;
+
+		if (tileID != tilemap.tileset->getEmpty()) {
 			const auto tilesize = tilemap.tileSize;
 			const auto x = (tileID % (tilemap.setWidth / tilesize)) * tilesize;
 			const auto y = (tileID / (tilemap.setWidth / tilesize)) * tilesize;

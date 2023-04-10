@@ -3,6 +3,7 @@
 		"name": "Monomap",
 		"texture": "resources/tileset.png",
 		"empty": "base:tile/empty",
+		"missing": "base:tile/missing",
 		"land": [
 			"base:tile/shallow_water",
 			"base:tile/sand",
@@ -341,6 +342,9 @@
 			"base:tile/plant2": "base:plant_pot2",
 			"base:tile/plant3": "base:plant_pot3"
 		},
+		"marchable": [
+			"base:category/wooden_walls"
+		],
 		"categories": {
 			"base:category/wooden_walls": [
 				"base:tile/wall_nw",

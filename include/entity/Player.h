@@ -8,7 +8,7 @@
 namespace Game3 {
 	class Player: public Entity {
 		public:
-			static Identifier ID() { return {"base", "player_entity"}; }
+			static Identifier ID() { return {"base", "entity/player"}; }
 			constexpr static HitPoints MAX_HEALTH = 64;
 
 			MoneyCount money;

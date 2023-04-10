@@ -18,53 +18,42 @@ namespace Game3 {
 
 	class TileEntity: public Agent, public std::enable_shared_from_this<TileEntity> {
 		public:
-			constexpr static TileEntityID BUILDING         = 1;
-			constexpr static TileEntityID TELEPORTER       = 2;
-			constexpr static TileEntityID SIGN             = 3;
-			constexpr static TileEntityID CHEST            = 4;
-			constexpr static TileEntityID STOCKPILE        = 5;
-			constexpr static TileEntityID TREE             = 6;
-			constexpr static TileEntityID CRAFTING_STATION = 7;
-			constexpr static TileEntityID ORE_DEPOSIT      = 8;
-			constexpr static TileEntityID GHOST            = 9;
-			constexpr static TileEntityID ITEM_SPAWNER     = 10;
-
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;
-			TileID tileID = 0;
-			TileEntityID tileEntityID = 0;
+			Identifier tileID;
+			Identifier tileEntityID;
 			Position position {-1, -1};
 			bool solid = false;
 			nlohmann::json extraData;
 
 			template <typename T, typename... Args>
-			static std::shared_ptr<T> create(std::default_random_engine &rng, Args && ...args) {
+			static std::shared_ptr<T> create(Game &game, std::default_random_engine &rng, Args && ...args) {
 				auto out = std::shared_ptr<T>(new T(std::forward<Args>(args)...));
-				out->init(rng);
+				out->init(game, rng);
 				return out;
 			}
 
 			template <typename T, typename... Args>
-			static std::shared_ptr<T> create(Args && ...args) {
+			static std::shared_ptr<T> create(Game &game, Args && ...args) {
 				auto out = std::shared_ptr<T>(new T(std::forward<Args>(args)...));
-				out->init();
+				out->init(game);
 				return out;
 			}
 
 			~TileEntity() override = default;
 
-			static std::shared_ptr<TileEntity> fromJSON(const nlohmann::json &);
+			static std::shared_ptr<TileEntity> fromJSON(Game &, const nlohmann::json &);
 
 			// At least one of the two init methods must be overridden to prevent an infinite loop!
-			virtual void init(std::default_random_engine &);
-			virtual void init();
+			virtual void init(Game &, std::default_random_engine &);
+			virtual void init(Game &);
 
 			virtual void tick(Game &, float) {}
 			virtual void onSpawn() {}
 			virtual void onRemove() {}
 			virtual void onNeighborUpdated(Index /* row_offset */, Index /* column_offset */) {}
 			/** Returns the TileEntity ID. This is not the tile ID, which corresponds to a tile in the tileset. */
-			virtual TileEntityID getID() const = 0;
+			inline Identifier getID() const { return tileEntityID; }
 			virtual void render(SpriteRenderer &) {}
 			/** Handles when the player interacts with the tile they're on and that tile contains this tile entity. Returns whether anything interesting happened. */
 			virtual bool onInteractOn(const std::shared_ptr<Player> &) { return false; }
@@ -79,13 +68,14 @@ namespace Game3 {
 			bool isVisible() const;
 			/** Called when the TileEntity is destroyed violently, e.g. by a bomb. Returns false if the TileEntity should survive the destruction. */
 			virtual bool kill() { return false; }
+			inline bool is(const Identifier &check) const { return getID() == check; }
 
 		protected:
 			TileEntity() = default;
-			TileEntity(TileID tile_id, TileEntityID tile_entity_id, const Position &position_, bool solid_):
-				tileID(tile_id), tileEntityID(tile_entity_id), position(position_), solid(solid_) {}
+			TileEntity(Identifier tile_id, Identifier tile_entity_id, Position position_, bool solid_):
+				tileID(std::move(tile_id)), tileEntityID(std::move(tile_entity_id)), position(std::move(position_)), solid(solid_) {}
 
-			virtual void absorbJSON(const nlohmann::json &);
+			virtual void absorbJSON(Game &, const nlohmann::json &);
 			virtual void toJSON(nlohmann::json &) const;
 
 			friend void to_json(nlohmann::json &, const TileEntity &);

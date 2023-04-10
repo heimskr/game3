@@ -4,10 +4,11 @@
 
 #include <nlohmann/json.hpp>
 
+#include "registry/Registerable.h"
 #include "util/GL.h"
 
 namespace Game3 {
-	class Texture {
+	class Texture: public NamedRegisterable {
 		public:
 			std::shared_ptr<GLuint> id  = std::make_shared<GLuint>(0);
 			std::shared_ptr<int> width  = std::make_shared<int>(0);
@@ -18,8 +19,14 @@ namespace Game3 {
 			std::filesystem::path path;
 			std::shared_ptr<std::shared_ptr<uint8_t>> data = std::make_shared<std::shared_ptr<uint8_t>>();
 
-			Texture() = default;
+			Texture();
 			Texture(const std::filesystem::path &, bool alpha_ = true, int filter_ = GL_NEAREST);
+
+			Texture(const Texture &) = default;
+			Texture(Texture &&) = default;
+
+			Texture & operator=(const Texture &) = default;
+			Texture & operator=(Texture &&) = default;
 
 			void init();
 			void bind();

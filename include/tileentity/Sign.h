@@ -15,18 +15,15 @@ namespace Game3 {
 			Sign & operator=(const Sign &) = delete;
 			Sign & operator=(Sign &&) = default;
 
-			TileEntityID getID() const override { return TileEntity::SIGN; }
-
-			void init() override {}
+			void init(Game &) override {}
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
-			void absorbJSON(const nlohmann::json &) override;
+			void absorbJSON(Game &, const nlohmann::json &) override;
 			// void render(SpriteRenderer &) const override;
 
 		protected:
 			Sign() = default;
-			Sign(TileID id_, const Position &position_, const std::string &text_, const std::string &name_):
-				TileEntity(id_, TileEntity::SIGN, position_, false), text(text_), name(name_) {}
+			Sign(Identifier tilename, Position position_, std::string text_, std::string name_);
 
 			friend class TileEntity;
 	};

@@ -10,6 +10,7 @@
 
 #include "Types.h"
 #include "data/Identifier.h"
+#include "registry/Registerable.h"
 
 namespace Game3 {
 	class Game;
@@ -19,7 +20,7 @@ namespace Game3 {
 	class Texture;
 	struct Position;
 
-	struct ItemTexture {
+	struct ItemTexture: NamedRegisterable {
 		static constexpr int DEFAULT_WIDTH = 16;
 		static constexpr int DEFAULT_HEIGHT = 16;
 
@@ -32,8 +33,7 @@ namespace Game3 {
 
 		explicit ItemTexture() = default;
 
-		ItemTexture(int x_, int y_, const std::shared_ptr<Texture> &texture_, int width_ = DEFAULT_WIDTH, int height_ = DEFAULT_HEIGHT):
-			x(x_), y(y_), texture(texture_), width(width_), height(height_) {}
+		ItemTexture(int x_, int y_, std::shared_ptr<Texture>, int width_ = DEFAULT_WIDTH, int height_ = DEFAULT_HEIGHT);
 
 		operator bool() const;
 
@@ -44,9 +44,8 @@ namespace Game3 {
 
 	enum class ItemAttribute {Axe, Pickaxe, Shovel, Hammer, Saw};
 
-	class Item: public std::enable_shared_from_this<Item> {
+	class Item: public NamedRegisterable, public std::enable_shared_from_this<Item> {
 		public:
-			ItemID id;
 			std::string name;
 			MoneyCount basePrice = 1;
 			ItemCount maxCount = 64;
@@ -65,7 +64,7 @@ namespace Game3 {
 			virtual Glib::RefPtr<Gdk::Pixbuf> makeImage(const Game &);
 			virtual void getOffsets(const Game &, Texture *&, float &x_offset, float &y_offset);
 			std::shared_ptr<Item> addAttribute(ItemAttribute);
-			inline bool operator==(const Item &other) const { return id == other.id; }
+			inline bool operator==(const Item &other) const { return identifier == other.identifier; }
 
 			virtual bool use(Slot, ItemStack &, const Place &) { return false; }
 
@@ -120,8 +119,8 @@ namespace Game3 {
 
 			void spawn(const std::shared_ptr<Realm> &, const Position &) const;
 
-			static void fromJSON(Game &, const nlohmann::json &, ItemStack &);
-			static ItemStack fromJSON(Game &, const nlohmann::json &);
+			static void fromJSON(const Game &, const nlohmann::json &, ItemStack &);
+			static ItemStack fromJSON(const Game &, const nlohmann::json &);
 
 		private:
 			Glib::RefPtr<Gdk::Pixbuf> cachedImage;

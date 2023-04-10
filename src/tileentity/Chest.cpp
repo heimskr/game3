@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "Texture.h"
 #include "Tileset.h"
 #include "entity/Player.h"
 #include "game/Game.h"
@@ -13,7 +14,8 @@
 namespace Game3 {
 	Texture Chest::DEFAULT_TEXTURE = cacheTexture("resources/rpg/chests.png");
 
-	Chest::Chest(TileID id_, const Position &position_, const std::string &name_, const Texture &texture_): TileEntity(id_, TileEntity::CHEST, position_, true), name(name_), texture(texture_) {
+	Chest::Chest(Identifier tile_id, const Position &position_, std::string name_, Texture texture_):
+	TileEntity(std::move(tile_id), "base:te/chest", position_, true), name(std::move(name_)), texture(std::move(texture_)) {
 		texture.init();
 	}
 
@@ -35,8 +37,8 @@ namespace Game3 {
 		return true;
 	}
 
-	void Chest::absorbJSON(const nlohmann::json &json) {
-		TileEntity::absorbJSON(json);
+	void Chest::absorbJSON(Game &game, const nlohmann::json &json) {
+		TileEntity::absorbJSON(game, json);
 		if (json.contains("inventory"))
 			inventory = std::make_shared<Inventory>(Inventory::fromJSON(json.at("inventory"), shared_from_this()));
 		name = json.at("name");

@@ -12,27 +12,54 @@
 #include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
+	Ore::Ore(Identifier identifier_, ItemStack stack_, Identifier tilename_, Identifier regen_tilename, float tooldown_multiplier, uint32_t max_uses, float cooldown_):
+		NamedRegisterable(std::move(identifier_)),
+		stack(std::move(stack_)),
+		tilename(std::move(tilename_)),
+		regenTilename(std::move(regen_tilename)),
+		tooldownMultiplier(tooldown_multiplier),
+		maxUses(max_uses),
+		cooldown(cooldown_) {}
+
+	Ore Ore::fromJSON(const Game &game, const nlohmann::json &json) {
+		return {
+			Identifier(), // Should be filled in later by the registry add methods
+			ItemStack::fromJSON(game, json.at(0)),
+			json.at(1),
+			json.at(2),
+			json.at(3),
+			json.at(4),
+			json.at(5)
+		};
+	}
+
+	OreDeposit::OreDeposit(const Ore &ore, const Position &position_, float time_remaining, uint32_t uses_):
+		TileEntity(ore.tilename, "base:te/ore_deposit", position_, true),
+		oreType(ore.identifier),
+		timeRemaining(time_remaining),
+		uses(uses_) {}
+
 	void OreDeposit::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
-		json["type"] = type;
+		json["oreType"] = oreType;
 		if (0.f < timeRemaining)
 			json["timeRemaining"] = timeRemaining;
 		if (uses != 0)
 			json["uses"] = uses;
 	}
 
-	void OreDeposit::absorbJSON(const nlohmann::json &json) {
-		TileEntity::absorbJSON(json);
-		type = json.at("type");
+	void OreDeposit::absorbJSON(Game &game, const nlohmann::json &json) {
+		TileEntity::absorbJSON(game, json);
+		oreType = json.at("oreType");
 		timeRemaining = json.contains("timeRemaining")? json.at("timeRemaining").get<float>() : 0.f;
-		uses = json.contains("uses")? json.at("uses").get<unsigned>() : 0;
+		uses = json.contains("uses")? json.at("uses").get<uint32_t>() : 0;
 	}
 
 	void OreDeposit::tick(Game &, float delta) {
 		timeRemaining = std::max(timeRemaining - delta, 0.f);
 	}
 
-	bool OreDeposit::onInteractNextTo(const std::shared_ptr<Player> &player) {
+	bool OreDeposit::onInteractNextTo(const PlayerPtr &player) {
 		auto &inventory = *player->inventory;
 		const Slot active_slot = inventory.activeSlot;
 		if (auto *active_stack = inventory[active_slot]) {
@@ -40,11 +67,13 @@ namespace Game3 {
 				return true;
 			if (active_stack->has(ItemAttribute::Pickaxe)) {
 				const auto &tool = dynamic_cast<Tool &>(*active_stack->item);
-				if (!inventory.add(getOreStack())) {
-					player->tooldown = tooldownMultiplier * tool.baseCooldown;
+				const Ore &ore = getOre(player->getGame());
 
-					if (maxUses <= ++uses) {
-						timeRemaining = cooldown;
+				if (!inventory.add(ore.stack)) {
+					player->tooldown = ore.tooldownMultiplier * tool.baseCooldown;
+
+					if (ore.maxUses <= ++uses) {
+						timeRemaining = ore.cooldown;
 						uses = 0;
 					}
 
@@ -65,83 +94,18 @@ namespace Game3 {
 			return;
 
 		auto &realm = *getRealm();
-		if (tileID != tileSets.at(realm.type)->getEmpty()) {
-			auto &tilemap = *realm.tilemap2;
+		auto &tilemap = *realm.tilemap2;
+		if (tileID != tilemap.tileset->getEmpty()) {
+			const Ore &ore = getOre(realm.getGame());
 			const auto tilesize = tilemap.tileSize;
-			const TileID tile_id = 0.f < timeRemaining? getRegenID(type) : tileID;
+			const TileID tile_id = 0.f < timeRemaining? (*tilemap.tileset)[ore.regenTilename] : tileID;
 			const auto x = (tile_id % (tilemap.setWidth / tilesize)) * tilesize;
 			const auto y = (tile_id / (tilemap.setWidth / tilesize)) * tilesize;
 			sprite_renderer.drawOnMap(tilemap.texture, position.column, position.row, x / 2, y / 2, tilesize, tilesize);
 		}
 	}
 
-	TileID OreDeposit::getID(Ore ore) {
-		switch (ore) {
-			case Ore::Coal:    return Monomap::COAL_ORE;
-			case Ore::Copper:  return Monomap::COPPER_ORE;
-			case Ore::Iron:    return Monomap::IRON_ORE;
-			case Ore::Gold:    return Monomap::GOLD_ORE;
-			case Ore::Diamond: return Monomap::DIAMOND_ORE;
-			default: return Monomap::MISSING;
-		}
-	}
-
-	TileID OreDeposit::getRegenID(Ore ore) {
-		switch (ore) {
-			case Ore::Coal:    return Monomap::COAL_ORE_REGEN;
-			case Ore::Copper:  return Monomap::COPPER_ORE_REGEN;
-			case Ore::Iron:    return Monomap::IRON_ORE_REGEN;
-			case Ore::Gold:    return Monomap::GOLD_ORE_REGEN;
-			case Ore::Diamond: return Monomap::DIAMOND_ORE_REGEN;
-			default: return Monomap::MISSING;
-		}
-	}
-
-	float OreDeposit::getTooldownMultiplier(Ore ore) {
-		switch (ore) {
-			case Ore::Coal:    return 1.f;
-			case Ore::Copper:  return 1.f;
-			case Ore::Iron:    return 1.25f;
-			case Ore::Gold:    return 3.f;
-			case Ore::Diamond: return 5.f;
-			default: return 1.f;
-		}
-	}
-
-	unsigned OreDeposit::getMaxUses(Ore ore) {
-		switch (ore) {
-			case Ore::Coal:    return 16;
-			case Ore::Copper:  return 16;
-			case Ore::Iron:    return 16;
-			case Ore::Gold:    return 8;
-			case Ore::Diamond: return 2;
-			default: return 1;
-		}
-	}
-
-	float OreDeposit::getCooldown(Ore ore) {
-		switch (ore) {
-			case Ore::Coal:    return 5.f;
-			case Ore::Copper:  return 5.f;
-			case Ore::Iron:    return 10.f;
-			case Ore::Gold:    return 30.f;
-			case Ore::Diamond: return 60.f;
-			default: return 0.f;
-		}
-	}
-
-	ItemStack OreDeposit::getOreStack(ItemCount count) {
-		return getOreStack(type, count);
-	}
-
-	ItemStack OreDeposit::getOreStack(Ore ore, ItemCount count) {
-		switch (ore) {
-			case Ore::Coal:    return ItemStack(Item::COAL,        count);
-			case Ore::Copper:  return ItemStack(Item::COPPER_ORE,  count);
-			case Ore::Iron:    return ItemStack(Item::IRON_ORE,    count);
-			case Ore::Gold:    return ItemStack(Item::GOLD_ORE,    count);
-			case Ore::Diamond: return ItemStack(Item::DIAMOND_ORE, count);
-			default: throw std::invalid_argument("Invalid ore type: " + std::to_string(static_cast<int>(ore)));
-		}
+	const Ore & OreDeposit::getOre(const Game &game) const {
+		return *game.registry<OreRegistry>().at(oreType);
 	}
 }

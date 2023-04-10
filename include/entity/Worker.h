@@ -8,6 +8,7 @@ namespace Game3 {
 	/** Lives in a town. */
 	class Worker: public virtual Entity {
 		public:
+			static Identifier ID() { return {"base", "entity/worker"}; }
 			constexpr static float WORK_START_HOUR = 8.f;
 			constexpr static float WORK_END_HOUR = 18.f;
 			constexpr static float RETRY_TIME = 30.f;

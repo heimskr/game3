@@ -8,6 +8,11 @@
 #include "ui/SpriteRenderer.h"
 
 namespace Game3 {
+	Teleporter::Teleporter(Identifier tilename, Position position_, RealmID target_realm, Position target_position):
+		TileEntity(std::move(tilename), "base:te/teleporter", std::move(position_), false),
+		targetRealm(target_realm),
+		targetPosition(std::move(target_position)) {}
+
 	void Teleporter::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
 		json["targetRealm"] = targetRealm;
@@ -18,8 +23,8 @@ namespace Game3 {
 		entity->teleport(targetPosition, getRealm()->getGame().realms.at(targetRealm));
 	}
 
-	void Teleporter::absorbJSON(const nlohmann::json &json) {
-		TileEntity::absorbJSON(json);
+	void Teleporter::absorbJSON(Game &game, const nlohmann::json &json) {
+		TileEntity::absorbJSON(game, json);
 		targetRealm = json.at("targetRealm");
 		targetPosition = json.at("targetPosition");
 	}
@@ -28,8 +33,8 @@ namespace Game3 {
 		if (!isVisible())
 			return;
 		auto realm = getRealm();
-		if (tileID != tileSets.at(realm->type)->getEmpty()) {
-			auto &tilemap = *realm->tilemap2;
+		auto &tilemap = *realm->tilemap2;
+		if (tileID != tilemap.tileset->getEmpty()) {
 			const auto tilesize = tilemap.tileSize;
 			const auto x = (tileID % (tilemap.setWidth / tilesize)) * tilesize;
 			const auto y = (tileID / (tilemap.setWidth / tilesize)) * tilesize;
