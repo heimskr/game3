@@ -54,7 +54,7 @@ namespace Game3 {
 
 		inline size_t size() const { return tiles.size(); }
 
-		std::vector<Index> getLand(RealmType type, Index right_pad = 0, Index bottom_pad = 0) const;
+		std::vector<Index> getLand(Index right_pad = 0, Index bottom_pad = 0) const;
 	};
 
 	void to_json(nlohmann::json &, const Tilemap &);

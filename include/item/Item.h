@@ -62,7 +62,7 @@ namespace Game3 {
 
 			virtual Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &);
 			virtual Glib::RefPtr<Gdk::Pixbuf> makeImage(const Game &);
-			virtual void getOffsets(const Game &, Texture *&, float &x_offset, float &y_offset);
+			virtual void getOffsets(const Game &, std::shared_ptr<Texture> &, float &x_offset, float &y_offset);
 			std::shared_ptr<Item> addAttribute(ItemAttribute);
 			inline bool operator==(const Item &other) const { return identifier == other.identifier; }
 

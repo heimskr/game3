@@ -43,21 +43,53 @@ namespace Game3 {
 		glBindTexture(GL_TEXTURE_2D, *id); //CHECKGL
 	}
 
-	Texture & cacheTexture(const std::filesystem::path &path, bool alpha, int filter) {
-		static std::unordered_map<std::string, Texture> textureCache;
+	static std::unordered_map<std::string, std::shared_ptr<Texture>> textureCache;
+
+	std::shared_ptr<Texture> cacheTexture(const std::filesystem::path &path, bool alpha, int filter) {
 		auto canonical = std::filesystem::canonical(path).string();
 		if (textureCache.contains(canonical))
 			return textureCache.at(canonical);
-		return textureCache.try_emplace(canonical, canonical, alpha, filter).first->second;
+		return textureCache.try_emplace(canonical, std::make_shared<Texture>(canonical, alpha, filter)).first->second;
+	}
+
+	std::shared_ptr<Texture> cacheTexture(const char *path, bool alpha, int filter) {
+		return cacheTexture(std::filesystem::path(path), alpha, filter);
+	}
+
+	std::shared_ptr<Texture> cacheTexture(const nlohmann::json &json) {
+		const std::string path = json.at(0);
+		if (auto iter = textureCache.find(path); iter != textureCache.end())
+			return iter->second;
+		return textureCache.try_emplace(path, std::make_shared<Texture>(json.get<Texture>())).first->second;
+	}
+
+	static std::string filterToString(int filter) {
+		switch (filter) {
+			case GL_NEAREST: return "nearest";
+			case GL_LINEAR:  return "linear";
+			default: throw std::runtime_error("Unrecognized filter: " + std::to_string(filter));
+		}
+	}
+
+	static int stringToFilter(const std::string &string) {
+		if (string == "nearest")
+			return GL_NEAREST;
+
+		if (string == "linear")
+			return GL_LINEAR;
+
+		throw std::runtime_error("Unrecognized filter: " + string);
 	}
 
 	void to_json(nlohmann::json &json, const Texture &texture) {
-		json["alpha"]  = *texture.alpha;
-		json["filter"] = *texture.filter;
-		json["path"]   = texture.path;
+		json.at(0) = texture.path;
+		json.at(1) = *texture.alpha;
+		json.at(2) = filterToString(*texture.filter);
 	}
 
 	void from_json(const nlohmann::json &json, Texture &texture) {
-		texture = cacheTexture(json.at("path"), json.at("alpha"), json.at("filter"));
+		bool alpha = 1 < json.size()? json.at(1).get<bool>() : true;
+		int filter = 2 < json.size()? stringToFilter(json.at(2)) : GL_NEAREST;
+		texture = *cacheTexture(json.at(0), alpha, filter);
 	}
 }

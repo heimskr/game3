@@ -20,7 +20,7 @@ namespace Game3 {
 
 		protected:
 			Stockpile() = default;
-			Stockpile(Identifier tilename, Position position_, const Texture &texture_ = Chest::DEFAULT_TEXTURE);
+			Stockpile(Identifier tilename, Position position_, std::shared_ptr<Texture> texture_ = Chest::DEFAULT_TEXTURE);
 
 			friend class TileEntity;
 	};

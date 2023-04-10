@@ -79,9 +79,9 @@ namespace Game3 {
 		       ->scale_simple(width << doublings, height << doublings, Gdk::InterpType::NEAREST);
 	}
 
-	void Item::getOffsets(const Game &game, Texture *&texture, float &x_offset, float &y_offset) {
+	void Item::getOffsets(const Game &game, std::shared_ptr<Texture> &texture, float &x_offset, float &y_offset) {
 		auto item_texture = game.registry<ItemTextureRegistry>().at(identifier);
-		texture  = item_texture->texture.lock().get();
+		texture  = item_texture->texture.lock();
 		x_offset = item_texture->x / 2.f;
 		y_offset = item_texture->y / 2.f;
 	}

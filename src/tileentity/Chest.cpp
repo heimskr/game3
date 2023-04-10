@@ -12,16 +12,16 @@
 #include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
-	Texture Chest::DEFAULT_TEXTURE = cacheTexture("resources/rpg/chests.png");
+	std::shared_ptr<Texture> Chest::DEFAULT_TEXTURE = cacheTexture("resources/rpg/chests.png");
 
-	Chest::Chest(Identifier tile_id, const Position &position_, std::string name_, Texture texture_):
+	Chest::Chest(Identifier tile_id, const Position &position_, std::string name_, std::shared_ptr<Texture> texture_):
 	TileEntity(std::move(tile_id), ID(), position_, true), name(std::move(name_)), texture(std::move(texture_)) {
-		texture.init();
+		texture->init();
 	}
 
 	void Chest::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
-		json["texture"] = texture;
+		json["texture"] = *texture;
 		if (inventory)
 			json["inventory"] = *inventory;
 		json["name"] = name;
@@ -42,8 +42,8 @@ namespace Game3 {
 		if (json.contains("inventory"))
 			inventory = std::make_shared<Inventory>(Inventory::fromJSON(json.at("inventory"), shared_from_this()));
 		name = json.at("name");
-		texture = json.at("texture");
-		texture.init();
+		texture = cacheTexture(json.at("texture"));
+		texture->init();
 	}
 
 	void Chest::render(SpriteRenderer &sprite_renderer) {
@@ -54,9 +54,9 @@ namespace Game3 {
 			// Kinda silly to get the tilesize from the realm's second layer. Maybe it could be added as a Chest field.
 			auto &tilemap = *getRealm()->tilemap2;
 			const auto tilesize = tilemap.tileSize;
-			const auto x = (tileID % (*texture.width / tilesize)) * tilesize;
-			const auto y = (tileID / (*texture.width / tilesize)) * tilesize;
-			sprite_renderer.drawOnMap(texture, position.column, position.row, x / 2.f, y / 2.f, tilesize, tilesize);
+			const auto x = (tileID % (*texture->width / tilesize)) * tilesize;
+			const auto y = (tileID / (*texture->width / tilesize)) * tilesize;
+			sprite_renderer.drawOnMap(*texture, position.column, position.row, x / 2.f, y / 2.f, tilesize, tilesize);
 		}
 	}
 

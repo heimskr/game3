@@ -19,21 +19,22 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	Blacksmith::Blacksmith(EntityID id_):
-		Entity(id_, Entity::BLACKSMITH_TYPE), Worker(id_, Entity::BLACKSMITH_TYPE), Merchant(id_, Entity::BLACKSMITH_TYPE) {}
+	Blacksmith::Blacksmith():
+		Entity(ID()), Worker(ID()), Merchant(ID()) {}
 
-	Blacksmith::Blacksmith(EntityID id_, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_):
-		Entity(id_, Entity::BLACKSMITH_TYPE), Worker(id_, Entity::BLACKSMITH_TYPE, overworld_realm, house_realm, house_position, keep_), Merchant(id_, Entity::BLACKSMITH_TYPE) {}
+	Blacksmith::Blacksmith(RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_):
+		Entity(ID()), Worker(ID(), overworld_realm, house_realm, std::move(house_position), std::move(keep_)), Merchant(ID()) {}
 
-	std::shared_ptr<Blacksmith> Blacksmith::create(EntityID id, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_) {
-		auto out = std::shared_ptr<Blacksmith>(new Blacksmith(id, overworld_realm, house_realm, house_position, keep_));
-		out->init();
+	std::shared_ptr<Blacksmith> Blacksmith::create(Game &game, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_) {
+		auto out = std::shared_ptr<Blacksmith>(new Blacksmith(overworld_realm, house_realm, std::move(house_position), std::move(keep_)));
+		out->init(game);
 		return out;
 	}
 
-	std::shared_ptr<Blacksmith> Blacksmith::fromJSON(const nlohmann::json &json) {
-		auto out = Entity::create<Blacksmith>(json.at("id"));
-		out->absorbJSON(json);
+	std::shared_ptr<Blacksmith> Blacksmith::fromJSON(Game &game, const nlohmann::json &json) {
+		auto out = Entity::create<Blacksmith>();
+		out->absorbJSON(game, json);
+		out->init(game);
 		return out;
 	}
 
@@ -44,9 +45,9 @@ namespace Game3 {
 			json["actionTime"] = actionTime;
 	}
 
-	void Blacksmith::absorbJSON(const nlohmann::json &json) {
-		Worker::absorbJSON(json);
-		Merchant::absorbJSON(json);
+	void Blacksmith::absorbJSON(Game &game, const nlohmann::json &json) {
+		Worker::absorbJSON(game, json);
+		Merchant::absorbJSON(game, json);
 		if (json.contains("actionTime"))
 			actionTime = json.at("actionTime");
 	}
@@ -121,10 +122,10 @@ namespace Game3 {
 	}
 
 	void Blacksmith::wakeUp() {
-		const ItemCount iron_bars = inventory->count(Item::IRON_BAR);
-		const ItemCount gold_bars = inventory->count(Item::GOLD_BAR);
-		const ItemCount diamonds  = inventory->count(Item::DIAMOND);
-		const ItemCount coal      = inventory->count(Item::COAL);
+		const ItemCount iron_bars = inventory->count(Identifier("base", "item/iron_bar"));
+		const ItemCount gold_bars = inventory->count(Identifier("base", "item/gold_bar"));
+		const ItemCount diamonds  = inventory->count(Identifier("base", "item/diamond"));
+		const ItemCount coal      = inventory->count(Identifier("base", "item/coal"));
 
 		ironOreNeeded = RESOURCE_TARGET - std::min(RESOURCE_TARGET, iron_bars);
 		goldOreNeeded = RESOURCE_TARGET - std::min(RESOURCE_TARGET, gold_bars);
@@ -154,16 +155,17 @@ namespace Game3 {
 		actionTime = 0.f;
 		phase = 4;
 
-		const ItemCount iron_ore    = std::min(keep_realm.stockpileInventory->count(Item::IRON_ORE), ironOreNeeded);
-		const ItemCount gold_ore    = std::min(keep_realm.stockpileInventory->count(Item::GOLD_ORE), goldOreNeeded);
-		const ItemCount diamond_ore = std::min(keep_realm.stockpileInventory->count(Item::GOLD_ORE), diamondOreNeeded);
-		const ItemCount coal        = std::min(keep_realm.stockpileInventory->count(Item::COAL),     coalNeeded);
+		const ItemCount iron_ore    = std::min(keep_realm.stockpileInventory->count(Identifier("base", "item/iron_ore")), ironOreNeeded);
+		const ItemCount gold_ore    = std::min(keep_realm.stockpileInventory->count(Identifier("base", "item/gold_ore")), goldOreNeeded);
+		const ItemCount diamond_ore = std::min(keep_realm.stockpileInventory->count(Identifier("base", "item/gold_ore")), diamondOreNeeded);
+		const ItemCount coal        = std::min(keep_realm.stockpileInventory->count(Identifier("base", "item/coal")),     coalNeeded);
 
+		Game &game = getGame();
 		std::array<ItemStack, 4> stacks {
-			ItemStack(Item::IRON_ORE, iron_ore),
-			ItemStack(Item::GOLD_ORE, gold_ore),
-			ItemStack(Item::GOLD_ORE, diamond_ore),
-			ItemStack(Item::COAL,     coal),
+			ItemStack(game, "base:item/iron_ore", iron_ore),
+			ItemStack(game, "base:item/gold_ore", gold_ore),
+			ItemStack(game, "base:item/gold_ore", diamond_ore),
+			ItemStack(game, "base:item/coal",     coal),
 		};
 
 		MoneyCount new_money = money;

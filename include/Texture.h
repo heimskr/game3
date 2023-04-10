@@ -36,7 +36,9 @@ namespace Game3 {
 			std::shared_ptr<bool> valid_ = std::make_shared<bool>(false);
 	};
 
-	Texture & cacheTexture(const std::filesystem::path &, bool alpha = true, int filter = GL_NEAREST);
+	std::shared_ptr<Texture> cacheTexture(const std::filesystem::path &, bool alpha = true, int filter = GL_NEAREST);
+	std::shared_ptr<Texture> cacheTexture(const char *, bool alpha = true, int filter = GL_NEAREST);
+	std::shared_ptr<Texture> cacheTexture(const nlohmann::json &);
 
 	void to_json(nlohmann::json &, const Texture &);
 	void from_json(const nlohmann::json &, Texture &);

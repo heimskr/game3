@@ -1,8 +1,7 @@
 ["base:entity_texture_list", [
-	["base:gangblanc",  "resources/characters/champions/Gangblanc.png", 1],
-	["base:grum",       "resources/characters/champions/Grum.png",      1],
-	["base:item",       "resources/missing.png",                        0],
-	["base:villager1",  "resources/characters/villager1.png",           2],
-	["base:blacksmith", "resources/characters/blacksmith.png",          2],
-	["base:woodcutter", "resources/characters/woodcutter.png",          2]
+	["base:entity/player",     "base:texture/gangblanc",  1],
+	["base:entity/item",       "base:texture/item",       0],
+	["base:entity/miner",      "base:texture/villager1",  2],
+	["base:entity/blacksmith", "base:texture/blacksmith", 2],
+	["base:entity/woodcutter", "base:texture/woodcutter", 2]
 ]]

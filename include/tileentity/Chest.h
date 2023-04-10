@@ -9,10 +9,10 @@ namespace Game3 {
 	class Chest: public HasInventory, public TileEntity {
 		public:
 			static Identifier ID() { return {"base", "te/chest"}; }
-			static Texture DEFAULT_TEXTURE;
+			static std::shared_ptr<Texture> DEFAULT_TEXTURE;
 
 			std::string name;
-			Texture texture;
+			std::shared_ptr<Texture> texture;
 
 			Chest(const Chest &) = delete;
 			Chest(Chest &&) = default;
@@ -30,7 +30,7 @@ namespace Game3 {
 
 		protected:
 			Chest() = default;
-			Chest(Identifier tile_id, const Position &, std::string name_, Texture = DEFAULT_TEXTURE);
+			Chest(Identifier tile_id, const Position &, std::string name_, std::shared_ptr<Texture> = DEFAULT_TEXTURE);
 
 			friend class TileEntity;
 	};

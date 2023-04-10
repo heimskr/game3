@@ -14,7 +14,7 @@ namespace Game3 {
 		tiles.resize(width * height);
 	}
 
-	std::vector<Index> Tilemap::getLand(RealmType type, Index right_pad, Index bottom_pad) const {
+	std::vector<Index> Tilemap::getLand(Index right_pad, Index bottom_pad) const {
 		std::vector<Index> land_tiles;
 		land_tiles.reserve(width * height);
 		for (Index row = 0; row < height - bottom_pad; ++row)

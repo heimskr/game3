@@ -27,11 +27,11 @@ namespace Game3 {
 	class SpriteRenderer;
 
 	struct EntityTexture: NamedRegisterable {
-		Texture texture;
+		Identifier textureID;
 		uint8_t variety;
-		EntityTexture(Texture texture_, uint8_t variety_):
-			NamedRegisterable(texture_.identifier),
-			texture(std::move(texture_)),
+		EntityTexture(Identifier texture_id, uint8_t variety_):
+			NamedRegisterable(Identifier()),
+			textureID(std::move(texture_id)),
 			variety(variety_) {}
 	};
 

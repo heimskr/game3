@@ -17,21 +17,22 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	Woodcutter::Woodcutter(EntityID id_):
-		Entity(id_, Entity::MINER_TYPE), Worker(id_, Entity::MINER_TYPE) {}
+	Woodcutter::Woodcutter():
+		Entity(ID()), Worker(ID()) {}
 
-	Woodcutter::Woodcutter(EntityID id_, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_):
-		Entity(id_, Entity::MINER_TYPE), Worker(id_, Entity::MINER_TYPE, overworld_realm, house_realm, house_position, keep_) {}
+	Woodcutter::Woodcutter(RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_):
+		Entity(ID()), Worker(ID(), overworld_realm, house_realm, std::move(house_position), std::move(keep_)) {}
 
-	std::shared_ptr<Woodcutter> Woodcutter::create(EntityID id, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_) {
-		auto out = std::shared_ptr<Woodcutter>(new Woodcutter(id, overworld_realm, house_realm, house_position, keep_));
-		out->init();
+	std::shared_ptr<Woodcutter> Woodcutter::create(Game &game, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_) {
+		auto out = std::shared_ptr<Woodcutter>(new Woodcutter(overworld_realm, house_realm, std::move(house_position), std::move(keep_)));
+		out->init(game);
 		return out;
 	}
 
-	std::shared_ptr<Woodcutter> Woodcutter::fromJSON(const nlohmann::json &json) {
-		auto out = Entity::create<Woodcutter>(json.at("id"));
-		out->absorbJSON(json);
+	std::shared_ptr<Woodcutter> Woodcutter::fromJSON(Game &game, const nlohmann::json &json) {
+		auto out = Entity::create<Woodcutter>();
+		out->absorbJSON(game, json);
+		out->init(game);
 		return out;
 	}
 
@@ -42,8 +43,8 @@ namespace Game3 {
 			json["chosenResource"] = chosenResource;
 	}
 
-	void Woodcutter::absorbJSON(const nlohmann::json &json) {
-		Worker::absorbJSON(json);
+	void Woodcutter::absorbJSON(Game &game, const nlohmann::json &json) {
+		Worker::absorbJSON(game, json);
 		harvestingTime = json.at("harvestingTime");
 		if (json.contains("chosenResource"))
 			chosenResource = json.at("chosenResource");
@@ -155,7 +156,7 @@ namespace Game3 {
 			auto &realm = *getRealm();
 			const auto resource_position = realm.getPosition(chosenResource);
 			auto &deposit = dynamic_cast<OreDeposit &>(*realm.tileEntityAt(resource_position));
-			const ItemStack stack = deposit.getOreStack();
+			const ItemStack stack = deposit.getOre(getGame()).stack;
 			const auto leftover = inventory->add(stack);
 			if (leftover == stack)
 				phase = 4;

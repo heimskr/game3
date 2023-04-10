@@ -18,7 +18,7 @@ namespace Game3 {
 		stack = std::move(stack_);
 		const Game &game = getRealm()->getGame();
 		auto item_texture = game.registry<ItemTextureRegistry>().at(stack.item->identifier);
-		texture = item_texture->texture.lock().get();
+		texture = item_texture->texture.lock();
 		xOffset = item_texture->x / 2.f;
 		yOffset = item_texture->y / 2.f;
 	}

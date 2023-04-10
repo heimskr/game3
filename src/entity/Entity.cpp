@@ -175,9 +175,8 @@ namespace Game3 {
 		return *this;
 	}
 
-	Entity::Entity(EntityType type_): type(type_), id_(id__) {
-		variety = textureMap.at(id_).variety;
-	}
+	Entity::Entity(EntityType type_):
+		type(type_) {}
 
 	bool Entity::canMoveTo(const Position &new_position) const {
 		if (new_position.row < 0 || new_position.column < 0)
@@ -190,7 +189,7 @@ namespace Game3 {
 		if (realm->getHeight() <= new_position.row || realm->getWidth() <= new_position.column)
 			return false;
 
-		const auto &tileset = *tileSets.at(realm->type);
+		const auto &tileset = *realm->tilemap1->tileset;
 
 		if (!tileset.isWalkable((*realm->tilemap1)(new_position)))
 			return false;
@@ -263,7 +262,7 @@ namespace Game3 {
 
 	std::string Entity::debug() const {
 		std::stringstream sstream;
-		sstream << "Entity[type=" << id_ << ", position=" << position << ", realm=" << realmID << ", direction=" << direction << ']';
+		sstream << "Entity[type=" << type << ", position=" << position << ", realm=" << realmID << ", direction=" << direction << ']';
 		return sstream.str();
 	}
 
@@ -313,7 +312,9 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Texture> Entity::getTexture() {
-		return getGame().registry<TextureRegistry>().at(type);
+		Game &game = getGame();
+		auto entity_texture = game.registry<EntityTextureRegistry>().at(type);
+		return game.registry<TextureRegistry>().at(entity_texture->textureID);
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {
