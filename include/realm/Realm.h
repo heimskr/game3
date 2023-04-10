@@ -18,7 +18,6 @@ namespace Game3 {
 	class Entity;
 	class Game;
 	class SpriteRenderer;
-	struct TileSet;
 
 	class Realm: public std::enable_shared_from_this<Realm> {
 		public:
@@ -115,7 +114,7 @@ namespace Game3 {
 			bool hasTileEntityAt(const Position &) const;
 			void confirmGhosts();
 			void damageGround(const Position &);
-			const TileSet & getTileSet() const;
+			const Tileset & getTileset() const;
 
 			virtual bool interactGround(const std::shared_ptr<Player> &, const Position &);
 			virtual void updateNeighbors(const Position &);
@@ -212,7 +211,7 @@ namespace Game3 {
 			bool ticking = false;
 			std::vector<std::shared_ptr<Entity>> entityRemovalQueue;
 			std::vector<std::shared_ptr<TileEntity>> tileEntityRemovalQueue;
-			bool isWalkable(Index row, Index column, const TileSet &) const;
+			bool isWalkable(Index row, Index column, const Tileset &) const;
 			void setLayerHelper(Index row, Index col, bool should_mark_dirty = true);
 			void setLayerHelper(Index, bool should_mark_dirty = true);
 			void resetPathMap();

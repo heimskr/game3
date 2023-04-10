@@ -36,7 +36,7 @@ namespace Game3 {
 		}
 	}
 
-	void ElementBufferedRenderer::init(TilemapPtr tilemap_, const TileSet &tileset) {
+	void ElementBufferedRenderer::init(TilemapPtr tilemap_, const Tileset &tileset) {
 		if (initialized)
 			reset();
 		tilemap = std::move(tilemap_);
@@ -46,7 +46,7 @@ namespace Game3 {
 		generateVertexArrayObject();
 		lightFBO.init();
 		generateLightingTexture();
-		const auto bright_shorts = tileset.getBright();
+		const auto bright_shorts = tileset.getBrightIDs();
 		brightTiles.assign(bright_shorts.begin(), bright_shorts.end());
 		brightTiles.resize(8, -1);
 		brightSet = {bright_shorts.begin(), bright_shorts.end()};
@@ -178,12 +178,14 @@ namespace Game3 {
 			// Clearing to half-white because the color in the lightmap will be multiplied by two
 			GL::clear(.5f, .5f, .5f, 0.f);
 
+			const TileID lava = (*tilemap->tileset)["base:tile/lava"];
+
 			Timer lava1("Lava1");
 			for (Index row = 0; row < tilemap->height; ++row) {
 				for (Index column = 0; column < tilemap->width; ++column) {
 					const Position pos(row, column);
 					const auto tile = (*tilemap)(pos);
-					if (tile == Monomap::LAVA) {
+					if (tile == lava) {
 						const float x = column * tilesize;
 						const float y = row * tilesize;
 						constexpr float radius = 1.5f;
@@ -215,7 +217,7 @@ namespace Game3 {
 				for (Index column = 0; column < tilemap->width; ++column) {
 					const Position pos(row, column);
 					const auto tile = (*tilemap)(pos);
-					if (tile == Monomap::LAVA) {
+					if (tile == lava) {
 						const float x = column * tilesize;
 						const float y = row * tilesize;
 						const float margin = .0f * tilesize;

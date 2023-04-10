@@ -16,7 +16,7 @@ namespace Game3 {
 			virtual ~ElementBufferedRenderer() override;
 
 			void reset();
-			void init(TilemapPtr, const TileSet &) override;
+			void init(TilemapPtr, const Tileset &) override;
 			void render(float divisor) override;
 			void reupload();
 			bool onBackbufferResized(int width, int height) override;
