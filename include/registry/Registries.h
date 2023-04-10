@@ -11,9 +11,15 @@ namespace Game3 {
 	struct EntityFactory;
 	struct EntityTexture;
 	struct GhostDetails;
+	struct GhostFunction;
 	struct ItemTexture;
 
-	struct DurabilityRegistry: NamedRegistry<Durability> {
+	struct RegistryRegistry: NamedRegistry<Registry> {
+		static Identifier ID() { return {"base", "registry"}; }
+		RegistryRegistry(): NamedRegistry(ID()) {}
+	};
+
+	struct DurabilityRegistry: NamedRegistry<NamedDurability> {
 		static Identifier ID() { return {"base", "durability"}; }
 		DurabilityRegistry(): NamedRegistry(ID()) {}
 	};
@@ -56,5 +62,10 @@ namespace Game3 {
 	struct GhostDetailsRegistry: NamedRegistry<GhostDetails> {
 		static Identifier ID() { return {"base", "ghost_details"}; }
 		GhostDetailsRegistry(): NamedRegistry(ID()) {}
+	};
+
+	struct GhostFunctionRegistry: NamedRegistry<GhostFunction> {
+		static Identifier ID() { return {"base", "ghost_function"}; }
+		GhostFunctionRegistry(): NamedRegistry(ID()) {}
 	};
 }

@@ -14,6 +14,7 @@
 #include "entity/Player.h"
 #include "game/Crafting.h"
 #include "realm/Realm.h"
+#include "registry/Registries.h"
 #include "registry/Registry.h"
 
 namespace Game3 {

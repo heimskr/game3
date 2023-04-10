@@ -31,8 +31,8 @@ namespace Game3 {
 
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;
-			TileID tileID = 0;
-			TileEntityID tileEntityID = 0;
+			Identifier tileID;
+			Identifier tileEntityID;
 			Position position {-1, -1};
 			bool solid = false;
 			nlohmann::json extraData;
@@ -64,7 +64,7 @@ namespace Game3 {
 			virtual void onRemove() {}
 			virtual void onNeighborUpdated(Index /* row_offset */, Index /* column_offset */) {}
 			/** Returns the TileEntity ID. This is not the tile ID, which corresponds to a tile in the tileset. */
-			virtual TileEntityID getID() const = 0;
+			inline TileEntityID getID() const { return tileEntityID; }
 			virtual void render(SpriteRenderer &) {}
 			/** Handles when the player interacts with the tile they're on and that tile contains this tile entity. Returns whether anything interesting happened. */
 			virtual bool onInteractOn(const std::shared_ptr<Player> &) { return false; }
@@ -82,10 +82,10 @@ namespace Game3 {
 
 		protected:
 			TileEntity() = default;
-			TileEntity(TileID tile_id, TileEntityID tile_entity_id, const Position &position_, bool solid_):
-				tileID(tile_id), tileEntityID(tile_entity_id), position(position_), solid(solid_) {}
+			TileEntity(Identifier tile_id, Identifier tile_entity_id, const Position &position_, bool solid_):
+				tileID(std::move(tile_id)), tileEntityID(std::move(tile_entity_id)), position(position_), solid(solid_) {}
 
-			virtual void absorbJSON(const nlohmann::json &);
+			virtual void absorbJSON(const Game &, const nlohmann::json &);
 			virtual void toJSON(nlohmann::json &) const;
 
 			friend void to_json(nlohmann::json &, const TileEntity &);

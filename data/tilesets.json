@@ -3,6 +3,7 @@
 		"name": "Monomap",
 		"texture": "resources/tileset.png",
 		"empty": "base:tile/empty",
+		"missing": "base:tile/missing",
 		"land": [
 			"base:tile/shallow_water",
 			"base:tile/sand",

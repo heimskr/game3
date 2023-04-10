@@ -26,11 +26,13 @@ namespace Game3 {
 	class Realm;
 	class SpriteRenderer;
 
-	struct EntityTexture {
+	struct EntityTexture: NamedRegisterable {
 		Texture texture;
 		uint8_t variety;
 		EntityTexture(Texture texture_, uint8_t variety_):
-			texture(std::move(texture_)), variety(variety_) {}
+			NamedRegisterable(texture_.identifier),
+			texture(std::move(texture_)),
+			variety(variety_) {}
 	};
 
 	class Entity: public Agent, public HasInventory, public std::enable_shared_from_this<Entity> {

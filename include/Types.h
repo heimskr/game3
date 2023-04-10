@@ -5,6 +5,7 @@
 #include <utility>
 
 #include "data/Identifier.h"
+#include "registry/Registerable.h"
 
 namespace Game3 {
 	using Index        =  int32_t;
@@ -33,4 +34,21 @@ namespace Game3 {
 
 	struct Place;
 	using PlacePtr = std::shared_ptr<Place>;
+
+	template <typename T>
+	class NamedNumeric: NamedRegisterable {
+		public:
+			NamedNumeric(Identifier identifier_, T value_):
+				NamedRegisterable(std::move(identifier_)),
+				value(value_) {}
+
+			operator T() const { return value; }
+
+		private:
+			T value;
+	};
+
+	struct NamedDurability: NamedNumeric<Durability> {
+		using NamedNumeric::NamedNumeric;
+	};
 }

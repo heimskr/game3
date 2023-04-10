@@ -20,8 +20,6 @@ namespace Game3 {
 			Chest & operator=(const Chest &) = delete;
 			Chest & operator=(Chest &&) = default;
 
-			TileEntityID getID() const override { return TileEntity::CHEST; }
-
 			void init() override {}
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;

@@ -15,8 +15,6 @@ namespace Game3 {
 			Teleporter & operator=(const Teleporter &) = delete;
 			Teleporter & operator=(Teleporter &&) = default;
 
-			TileEntityID getID() const override { return TileEntity::TELEPORTER; }
-
 			void init() override {}
 			void toJSON(nlohmann::json &) const override;
 			void onOverlap(const std::shared_ptr<Entity> &) override;

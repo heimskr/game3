@@ -1,11 +1,12 @@
 #include <iostream>
 
+// #include "registry/RegistriesFull.h"
 #include "game/Game.h"
 #include "tileentity/Building.h"
 
 namespace Game3 {
 	constexpr static int WIDTH = 1000;
-	
+
 	int getIndex(int r, int c) {
 		return r * WIDTH + c;
 	}

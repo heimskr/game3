@@ -52,12 +52,16 @@ namespace Game3 {
 	struct NamedRegistryBase: Registry {
 		using Registry::Registry;
 
-		virtual void add(Identifier, const nlohmann::json &) = 0;
+		virtual void add(Identifier, const nlohmann::json &) {
+			throw std::runtime_error("Adding from JSON unimplemented in NamedRegistryBase");
+		}
 	};
 
 	template <typename T>
 	class NamedRegistry: public NamedRegistryBase {
+#ifdef REGISTRY_ASSERTS
 		static_assert(std::is_base_of_v<NamedRegisterable, T>);
+#endif
 
 		public:
 			std::map<Identifier, std::shared_ptr<T>> items;
@@ -82,15 +86,12 @@ namespace Game3 {
 			}
 
 			void add(Identifier new_name, std::shared_ptr<T> new_item) {
-				if (auto [iter, inserted] = items.try_emplace(std::move(new_name), std::move(new_item)); inserted) {
+				if (auto [iter, inserted] = items.try_emplace(new_name, std::move(new_item)); inserted) {
+					iter->second->identifier = std::move(new_name);
 					iter->second->registryID = nextCounter++;
 					byCounter.push_back(iter->second);
 				} else
 					throw std::runtime_error("NamedRegistry " + identifier.str() + " already contains an item with name \"" + new_name.str() + '"');
-			}
-
-			void add(Identifier new_name, const nlohmann::json &json) override {
-				add(std::move(new_name), std::make_shared<T>(json.get<T>()));
 			}
 
 			template <typename S>
@@ -133,12 +134,16 @@ namespace Game3 {
 	struct UnnamedRegistryBase: Registry {
 		using Registry::Registry;
 
-		virtual void add(const nlohmann::json &) = 0;
+		virtual void add(const nlohmann::json &) {
+			throw std::runtime_error("Adding from JSON unimplemented in UnnamedRegistryBase");
+		}
 	};
 
 	template <typename T>
 	class UnnamedRegistry: public UnnamedRegistryBase {
+#ifdef REGISTRY_ASSERTS
 		static_assert(std::is_base_of_v<Registerable, T>);
+#endif
 
 		public:
 			std::unordered_set<std::shared_ptr<T>> items;
@@ -157,10 +162,6 @@ namespace Game3 {
 					(*iter)->registryID = nextCounter++;
 					byCounter.push_back(*iter);
 				}
-			}
-
-			void add(const nlohmann::json &json) override {
-				add(std::make_shared<T>(json));
 			}
 
 			bool addCarefully(std::shared_ptr<T> item) {
@@ -192,10 +193,5 @@ namespace Game3 {
 			inline size_t size() const {
 				return items.size();
 			}
-	};
-
-	struct RegistryRegistry: NamedRegistry<Registry> {
-		static Identifier ID() { return {"base", "registry"}; }
-		RegistryRegistry(): NamedRegistry(ID()) {}
 	};
 }

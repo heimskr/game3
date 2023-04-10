@@ -22,7 +22,8 @@ namespace Game3 {
 			bool isWalkable(TileID) const;
 			bool isSolid(const Identifier &) const;
 			bool isSolid(TileID) const;
-			Identifier getEmpty() const;
+			const Identifier & getEmpty() const;
+			const Identifier & getMissing() const;
 			std::vector<Identifier> getBrightNames() const;
 			std::vector<TileID> getBrightIDs() const;
 			std::string getName() const;
@@ -34,6 +35,7 @@ namespace Game3 {
 		private:
 			std::string name;
 			Identifier empty;
+			Identifier missing;
 			std::string texture;
 			// TODO: consider making the sets store TileIDs instead, for performance perhaps
 			std::set<Identifier> land;

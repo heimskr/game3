@@ -27,8 +27,12 @@ namespace Game3 {
 		return isSolid(names.at(id));
 	}
 
-	Identifier Tileset::getEmpty() const {
+	const Identifier & Tileset::getEmpty() const {
 		return empty;
+	}
+
+	const Identifier & Tileset::getMissing() const {
+		return missing;
 	}
 
 	std::vector<Identifier> Tileset::getBrightNames() const {

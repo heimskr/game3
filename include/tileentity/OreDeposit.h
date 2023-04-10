@@ -21,8 +21,6 @@ namespace Game3 {
 			OreDeposit & operator=(const OreDeposit &) = delete;
 			OreDeposit & operator=(OreDeposit &&) = default;
 
-			TileEntityID getID() const override { return TileEntity::ORE_DEPOSIT; }
-
 			void init() override {}
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(const nlohmann::json &) override;

@@ -37,6 +37,8 @@ namespace Game3 {
 		registries.add<EntityTextureRegistry>();
 		registries.add<EntityFactoryRegistry>();
 		registries.add<TilesetRegistry>();
+		registries.add<GhostDetailsRegistry>();
+		registries.add<GhostFunctionRegistry>();
 		// TODO: plugins
 	}
 

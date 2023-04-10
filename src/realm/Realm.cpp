@@ -331,6 +331,18 @@ namespace Game3 {
 		setLayer3(position.row, position.column, tile);
 	}
 
+	void Realm::setLayer1(const Position &position, const Identifier &tile) {
+		setLayer1(position.row, position.column, (*tilemap1->tileset)[tile]);
+	}
+
+	void Realm::setLayer2(const Position &position, const Identifier &tile) {
+		setLayer2(position.row, position.column, (*tilemap2->tileset)[tile]);
+	}
+
+	void Realm::setLayer3(const Position &position, const Identifier &tile) {
+		setLayer3(position.row, position.column, (*tilemap3->tileset)[tile]);
+	}
+
 	TileID Realm::getLayer1(Index row, Index column) const {
 		return (*tilemap1)(column, row);
 	}

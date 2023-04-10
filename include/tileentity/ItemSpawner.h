@@ -17,8 +17,6 @@ namespace Game3 {
 			ItemSpawner & operator=(const ItemSpawner &) = delete;
 			ItemSpawner & operator=(ItemSpawner &&) = default;
 
-			TileEntityID getID() const override { return TileEntity::ITEM_SPAWNER; }
-
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(const nlohmann::json &) override;
 			void init(std::default_random_engine &) override;

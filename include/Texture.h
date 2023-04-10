@@ -4,10 +4,11 @@
 
 #include <nlohmann/json.hpp>
 
+#include "registry/Registerable.h"
 #include "util/GL.h"
 
 namespace Game3 {
-	class Texture {
+	class Texture: public NamedRegisterable {
 		public:
 			std::shared_ptr<GLuint> id  = std::make_shared<GLuint>(0);
 			std::shared_ptr<int> width  = std::make_shared<int>(0);

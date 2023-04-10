@@ -20,8 +20,6 @@ namespace Game3 {
 			Tree & operator=(const Tree &) = delete;
 			Tree & operator=(Tree &&) = default;
 
-			TileEntityID getID() const override { return TileEntity::TREE; }
-
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(const nlohmann::json &) override;
 			void init(std::default_random_engine &) override;

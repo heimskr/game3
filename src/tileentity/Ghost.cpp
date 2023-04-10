@@ -1,13 +1,14 @@
 #include <iostream>
 #include "MarchingSquares.h"
 #include "Tileset.h"
+#include "entity/EntityFactory.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
 #include "error/OverlapError.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "realm/Realm.h"
-#include "registry/Registries.h"
+#include "recipe/CraftingRecipe.h"
 #include "tileentity/CraftingStation.h"
 #include "tileentity/Ghost.h"
 #include "ui/Canvas.h"
@@ -15,28 +16,51 @@
 #include "ui/SpriteRenderer.h"
 #include "ui/tab/InventoryTab.h"
 
+#include "registry/Registries.h"
+
 namespace Game3 {
+	GhostFunction::GhostFunction(Identifier identifier_, decltype(function) function_):
+		NamedRegisterable(std::move(identifier_)),
+		function(function_) {}
+
+	bool GhostFunction::operator()(const Identifier &tilename, const Place &place) const {
+		return function(tilename, place);
+	}
+
 	static void spawnCauldron(const Place &place) {
 		// place.realm->add(TileEntity::create<CraftingStation>(Monomap::CAULDRON_RED_FULL, place.position, Identifier("base", "cauldron_station")));
-		// place.realm->setLayer2(place.position, Monomap::CAULDRON_RED_FULL);
+		place.realm->setLayer2(place.position, "base:tile/cauldron_red_full");
 	}
 
 	static void spawnPurifier(const Place &place) {
 		// place.realm->add(TileEntity::create<CraftingStation>(Monomap::PURIFIER, place.position, Identifier("base", "purifier_station")));
-		// place.realm->setLayer2(place.position, Monomap::PURIFIER);
+		place.realm->setLayer2(place.position, "base:tile/purifier");
 	}
 
 	void initGhosts(Game &game) {
-		game.add(std::make_shared<GhostDetails>(spawnCauldron, "base:tile/cauldron_red_full"));
-		game.add(std::make_shared<GhostDetails>(spawnPurifier, "base:tile/purifier"));
+		game.add(std::make_shared<GhostDetails>("base:cauldron", spawnCauldron, "base:tile/cauldron_red_full"));
+		game.add(std::make_shared<GhostDetails>("base:purifier", spawnPurifier, "base:tile/purifier"));
 	}
 
 	GhostDetails & GhostDetails::get(const Game &game, const ItemStack &stack) {
 		const auto &registry = game.registry<GhostDetailsRegistry>();
-		if (auto iter = registry.items.find(stack.item->id); iter != registry.items.end())
+		if (auto iter = registry.items.find(stack.item->identifier); iter != registry.items.end())
 			return *iter->second;
 		throw std::runtime_error("Couldn't get GhostDetails for " + stack.item->name);
 	}
+
+	void from_json(const nlohmann::json &json, GhostDetails &details) {
+		details.type = json.at(0);
+		details.useMarchingSquares = json.at(1);
+		details.columnsPerRow = json.at(2);
+		details.rowOffset = json.at(3);
+		details.columnOffset = json.at(4);
+	}
+
+	Ghost::Ghost(const Place &place, ItemStack material_):
+		TileEntity("base:tile/missing", "base:te/ghost", place.position, true),
+		details(GhostDetails::get(place.getGame(), material_)),
+		material(std::move(material_)) {}
 
 	void Ghost::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
@@ -44,9 +68,9 @@ namespace Game3 {
 	}
 
 	void Ghost::absorbJSON(const Game &game, const nlohmann::json &json) {
-		TileEntity::absorbJSON(json);
-		material = json.at("material");
-		details = GhostDetails::get(game, material);
+		TileEntity::absorbJSON(game, json);
+		material = ItemStack::fromJSON(game, json.at("material"));
+		details  = GhostDetails::get(game, material);
 	}
 
 	void Ghost::onSpawn() {
@@ -74,13 +98,14 @@ namespace Game3 {
 
 		auto realm = getRealm();
 		auto &tilemap = *realm->tilemap2;
+		const auto &tileset = *tilemap.tileset;
 		const auto tilesize = tilemap.tileSize;
 		const auto column_count = tilemap.setWidth / tilesize;
 
-		TileID tile_id = Monomap::MISSING;
+		TileID tile_id = tileset.getEmpty();
 
 		if (details.customFn)
-			tile_id = details.customTileID;
+			tile_id = tileset[details.customTileName];
 		else if (details.useMarchingSquares)
 			tile_id = marched;
 		else
@@ -109,26 +134,16 @@ namespace Game3 {
 			return std::nullopt;
 		};
 
-		switch (details.type) {
-			case GhostType::WoodenWall:
-				march_result = march4([&](int8_t row_offset, int8_t column_offset) -> bool {
-					const Position offset_position(position + Position(row_offset, column_offset));
-					if (auto value = check(offset_position))
-						return *value;
-					return monomap.woodenWalls.contains(tiles.at(realm->getIndex(offset_position)));
-				});
-				break;
-			case GhostType::Tower:
-				march_result = march4([&](int8_t row_offset, int8_t column_offset) -> bool {
-					const Position offset_position(position + Position(row_offset, column_offset));
-					if (auto value = check(offset_position))
-						return *value;
-					return monomap.towerSet.contains(tiles.at(realm->getIndex(offset_position)));
-				});
-				break;
-			default:
-				throw std::runtime_error("Unhandled GhostType in Ghost::march(): " + std::to_string(static_cast<int>(details.type)));
-		};
+		const auto &registry = realm->getGame().registry<GhostFunctionRegistry>();
+		const auto &fn = *registry[details.type];
+		const auto &tileset = *realm->tilemap2->tileset;
+
+		march_result = march4([&](int8_t row_offset, int8_t column_offset) -> bool {
+			const Position offset_position(position + Position(row_offset, column_offset));
+			if (auto value = check(offset_position))
+				return *value;
+			return fn(tileset[tiles.at(realm->getIndex(offset_position))], Place(offset_position, realm, nullptr));
+		});
 
 		const TileID marched_row = march_result / 7;
 		const TileID marched_column = march_result % 7;
@@ -140,13 +155,15 @@ namespace Game3 {
 	void Ghost::confirm() {
 		auto realm = getRealm();
 		auto &tilemap2 = *realm->tilemap2;
-		if (tilemap2(position) != tileSets.at(realm->type)->getEmpty())
+		const auto &tileset = *tilemap2.tileset;
+
+		if (tilemap2(position) != tileset.getEmpty())
 			throw OverlapError("Can't confirm ghost at " + std::string(position));
 
 		if (details.customFn) {
 			details.customFn({position, realm, nullptr});
 		} else {
-			TileID tile_id = Monomap::MISSING;
+			TileID tile_id = tileset.getMissing();
 			if (details.useMarchingSquares)
 				tile_id = marched;
 			else
