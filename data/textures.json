@@ -9,5 +9,6 @@
 	"base:texture/items":       ["resources/items/items.png"],
 	"base:texture/palisade":    ["resources/items/palisade.png"],
 	"base:texture/tileset":     ["resources/tileset.png"],
-	"base:texture/consumables": ["resources/rpg/consumables.png"]
+	"base:texture/consumables": ["resources/rpg/consumables.png"],
+	"base:texture/mushrooms":   ["resources/items/mushrooms.png"]
 }]

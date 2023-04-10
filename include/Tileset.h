@@ -23,11 +23,12 @@ namespace Game3 {
 			bool isSolid(const Identifier &) const;
 			bool isSolid(TileID) const;
 			const Identifier & getEmpty() const;
+			TileID getEmptyID() const;
 			const Identifier & getMissing() const;
 			const std::set<Identifier> & getBrightNames() const;
 			std::vector<TileID> getBrightIDs() const;
 			std::string getName() const;
-			Texture & getTexture();
+			std::shared_ptr<Texture> getTexture();
 			bool getItemStack(Game &, const Identifier &, ItemStack &) const;
 			bool isMarchable(TileID);
 			bool isCategoryMarchable(const Identifier &category) const;

@@ -7,6 +7,7 @@ namespace Game3 {
 
 	class Cave: public Realm {
 		public:
+			static Identifier ID() { return {"base", "realm/cave"}; }
 			RealmID parentRealm;
 			size_t entranceCount = 1;
 

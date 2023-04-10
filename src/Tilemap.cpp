@@ -10,8 +10,14 @@ namespace Game3 {
 	}
 
 	Tilemap::Tilemap(int width_, int height_, int tile_size, std::shared_ptr<Tileset> tileset_):
-	width(width_), height(height_), tileSize(tile_size), texture(tileset_->getTexture()), setWidth(*texture.width), setHeight(*texture.height), tileset(std::move(tileset_)) {
+	width(width_), height(height_), tileSize(tile_size), texture(tileset_->getTexture()), setWidth(*texture->width), setHeight(*texture->height), tileset(std::move(tileset_)) {
 		tiles.resize(width * height);
+	}
+
+	void Tilemap::init() {
+		texture->init();
+		setWidth = *texture->width;
+		setHeight = *texture->height;
 	}
 
 	std::vector<Index> Tilemap::getLand(Index right_pad, Index bottom_pad) const {
@@ -28,7 +34,7 @@ namespace Game3 {
 		json["height"] = tilemap.height;
 		json["setHeight"] = tilemap.setHeight;
 		json["setWidth"] = tilemap.setWidth;
-		json["texture"] = tilemap.texture;
+		json["texture"] = *tilemap.texture;
 		json["tileSize"] = tilemap.tileSize;
 		json["width"] = tilemap.width;
 
@@ -47,7 +53,7 @@ namespace Game3 {
 		tilemap.height = json.at("height");
 		tilemap.setHeight = json.at("setHeight");
 		tilemap.setWidth = json.at("setWidth");
-		tilemap.texture = json.at("texture");
+		tilemap.texture = cacheTexture(json.at("texture"));
 		tilemap.tileSize = json.at("tileSize");
 		tilemap.width = json.at("width");
 

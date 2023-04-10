@@ -9,7 +9,8 @@
 #include "ui/SpriteRenderer.h"
 
 namespace Game3 {
-	Texture ItemEntity::missing = {"resources/missing.png"};
+	ItemEntity::ItemEntity(const Game &game, const nlohmann::json &json):
+		Entity(ID()) {}
 
 	ItemEntity::ItemEntity(ItemStack stack_):
 		Entity(ID()), stack(std::move(stack_)) {}

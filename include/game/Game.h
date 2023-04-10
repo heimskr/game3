@@ -64,12 +64,14 @@ namespace Game3 {
 			void addGhosts();
 			void addEntityFactories();
 			void addTileEntityFactories();
+			void addRealmTypes();
 			void initEntities();
 			void initInteractionSets();
 			void add(std::shared_ptr<Item>);
 			void add(std::shared_ptr<GhostDetails>);
 			void add(EntityFactory &&);
 			void add(TileEntityFactory &&);
+			void add(RealmFactory &&);
 			void traverseData(const std::filesystem::path &);
 			void loadDataFile(const std::filesystem::path &);
 			void addRecipe(const nlohmann::json &);

@@ -7,6 +7,7 @@ namespace Game3 {
 
 	class Keep: public Realm {
 		public:
+			static Identifier ID() { return {"base", "realm/keep"}; }
 			Position parentOrigin;
 			Index parentWidth;
 			Index parentHeight;

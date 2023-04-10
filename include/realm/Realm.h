@@ -21,13 +21,6 @@ namespace Game3 {
 
 	class Realm: public std::enable_shared_from_this<Realm> {
 		public:
-			constexpr static RealmType OVERWORLD  = 1;
-			constexpr static RealmType HOUSE      = 2;
-			constexpr static RealmType KEEP       = 3;
-			constexpr static RealmType BLACKSMITH = 4;
-			constexpr static RealmType CAVE       = 5;
-			constexpr static RealmType TAVERN     = 6;
-
 			RealmID id;
 			RealmType type;
 			TilemapPtr tilemap1, tilemap2, tilemap3;
@@ -57,7 +50,7 @@ namespace Game3 {
 				return std::shared_ptr<T>(new T(std::forward<Args>(args)...));
 			}
 
-			static std::shared_ptr<Realm> fromJSON(const nlohmann::json &);
+			static std::shared_ptr<Realm> fromJSON(Game &, const nlohmann::json &);
 
 			void render(int width, int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &, float game_time);
 			void reupload();

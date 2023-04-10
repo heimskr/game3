@@ -25,6 +25,8 @@
 #include "item/Mushroom.h"
 #include "item/Sapling.h"
 #include "item/Tool.h"
+#include "realm/Keep.h"
+#include "realm/RealmFactory.h"
 #include "registry/Registries.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
@@ -60,6 +62,8 @@ namespace Game3 {
 		registries.add<GhostFunctionRegistry>();
 		registries.add<TileEntityFactoryRegistry>();
 		registries.add<OreRegistry>();
+		registries.add<RealmFactoryRegistry>();
+		registries.add<RealmTypeRegistry>();
 		// TODO: plugins
 	}
 
@@ -148,6 +152,24 @@ namespace Game3 {
 		add(TileEntityFactory::create<Tree>());
 	}
 
+	void Game::addRealmTypes() {
+		auto &types = registry<RealmTypeRegistry>();
+		auto &factories = registry<RealmFactoryRegistry>();
+
+		auto addRealm = [&]<typename T>(const Identifier &id) {
+			types.add(id);
+			factories.add(id, std::make_shared<RealmFactory>(RealmFactory::create<T>(id)));
+		};
+
+		// ...
+		addRealm.operator()<Realm>("base:realm/overworld");
+		addRealm.operator()<Realm>("base:realm/house");
+		addRealm.operator()<Realm>("base:realm/blacksmith");
+		addRealm.operator()<Realm>("base:realm/cave");
+		addRealm.operator()<Realm>("base:realm/tavern");
+		addRealm.operator()<Keep>(Keep::ID());
+	}
+
 	void Game::initEntities() {
 		for (const auto &[realm_id, realm]: realms)
 			realm->initEntities();
@@ -156,7 +178,7 @@ namespace Game3 {
 	void Game::initInteractionSets() {
 		interactionSets.clear();
 		auto standard = std::make_shared<StandardInteractions>();
-		for (const RealmType type: Realm::allTypes)
+		for (const auto &type: registry<RealmTypeRegistry>().items)
 			interactionSets.emplace(type, standard);
 	}
 
@@ -169,11 +191,15 @@ namespace Game3 {
 	}
 
 	void Game::add(EntityFactory &&factory) {
-		registry<EntityFactoryRegistry>().add(factory.getIdentifier(), std::make_shared<EntityFactory>(std::move(factory)));
+		registry<EntityFactoryRegistry>().add(factory.identifier, std::make_shared<EntityFactory>(std::move(factory)));
 	}
 
 	void Game::add(TileEntityFactory &&factory) {
-		registry<TileEntityFactoryRegistry>().add(factory.getIdentifier(), std::make_shared<TileEntityFactory>(std::move(factory)));
+		registry<TileEntityFactoryRegistry>().add(factory.identifier, std::make_shared<TileEntityFactory>(std::move(factory)));
+	}
+
+	void Game::add(RealmFactory &&factory) {
+		registry<RealmFactoryRegistry>().add(factory.identifier, std::make_shared<RealmFactory>(std::move(factory)));
 	}
 
 	void Game::traverseData(const std::filesystem::path &dir) {
@@ -315,7 +341,7 @@ namespace Game3 {
 	GamePtr Game::fromJSON(const nlohmann::json &json, Canvas &canvas) {
 		auto out = create(canvas);
 		for (const auto &[string, realm_json]: json.at("realms").get<std::unordered_map<std::string, nlohmann::json>>())
-			out->realms.emplace(parseUlong(string), Realm::fromJSON(realm_json)).first->second->setGame(*out);
+			out->realms.emplace(parseUlong(string), Realm::fromJSON(*out, realm_json)).first->second->setGame(*out);
 		out->activeRealm = out->realms.at(json.at("activeRealmID"));
 		out->hourOffset = json.contains("hourOffset")? json.at("hourOffset").get<float>() : 0.f;
 		out->debugMode = json.contains("debugMode")? json.at("debugMode").get<bool>() : false;

@@ -18,7 +18,7 @@ namespace Game3 {
 		int width = 0;
 		int height = 0;
 		int tileSize = 0;
-		Texture texture;
+		std::shared_ptr<Texture> texture;
 		int setWidth = 0;
 		int setHeight = 0;
 		std::vector<TileID> tiles;
@@ -30,11 +30,7 @@ namespace Game3 {
 
 		Tilemap(int width_, int height_, int tile_size, std::shared_ptr<Tileset>);
 
-		void init() {
-			texture.init();
-			setWidth = *texture.width;
-			setHeight = *texture.height;
-		}
+		void init();
 
 		inline decltype(tiles)::value_type & operator()(int x, int y) {
 			return tiles[x + y * width];

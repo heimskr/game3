@@ -38,7 +38,7 @@ namespace Game3 {
 			const auto tilesize = tilemap.tileSize;
 			const auto x = (tileID % (tilemap.setWidth / tilesize)) * tilesize;
 			const auto y = (tileID / (tilemap.setWidth / tilesize)) * tilesize;
-			sprite_renderer.drawOnMap(tilemap.texture, position.column, position.row, x / 2, y / 2, tilesize, tilesize);
+			sprite_renderer.drawOnMap(*tilemap.texture, position.column, position.row, x / 2, y / 2, tilesize, tilesize);
 		}
 	}
 }

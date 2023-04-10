@@ -10,6 +10,7 @@
 #include "game/InteractionSet.h"
 #include "realm/Keep.h"
 #include "realm/Realm.h"
+#include "realm/RealmFactory.h"
 #include "tileentity/Ghost.h"
 #include "ui/MainWindow.h"
 #include "ui/SpriteRenderer.h"
@@ -46,23 +47,11 @@ namespace Game3 {
 		resetPathMap();
 	}
 
-	RealmPtr Realm::fromJSON(const nlohmann::json &json) {
-		RealmPtr out;
+	RealmPtr Realm::fromJSON(Game &game, const nlohmann::json &json) {
 		const RealmType type = json.at("type");
-		switch (type) {
-			case Realm::OVERWORLD:
-			case Realm::HOUSE:
-			case Realm::BLACKSMITH:
-			case Realm::CAVE:
-			case Realm::TAVERN:
-				out = Realm::create();
-				break;
-			case Realm::KEEP:
-				out = Realm::create<Keep>();
-				break;
-			default:
-				throw std::invalid_argument("Invalid realm type: " + std::to_string(int(type)));
-		}
+		auto factory = game.registry<RealmFactoryRegistry>().at(type);
+		assert(factory);
+		auto out = (*factory)(game, json);
 		out->absorbJSON(json);
 		return out;
 	}
@@ -120,7 +109,7 @@ namespace Game3 {
 		for (const auto &[index, tile_entity]: tileEntities)
 			tile_entity->render(sprite_renderer);
 		if (0 < ghostCount)
-			sprite_renderer.drawOnScreen(cacheTexture("resources/checkmark.png"), width - 42.f, height - 42.f, 2.f);
+			sprite_renderer.drawOnScreen(*cacheTexture("resources/checkmark.png"), width - 42.f, height - 42.f, 2.f);
 	}
 
 	void Realm::reupload() {

@@ -8,10 +8,10 @@
 
 namespace Game3 {
 	Cave::Cave(RealmID id_, RealmID parent_realm, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr biome_map, int seed_):
-		Realm(id_, Realm::CAVE, std::move(tilemap1_), std::move(tilemap2_), std::move(tilemap3_), std::move(biome_map), seed_), parentRealm(parent_realm) {}
+		Realm(id_, ID(), std::move(tilemap1_), std::move(tilemap2_), std::move(tilemap3_), std::move(biome_map), seed_), parentRealm(parent_realm) {}
 
 	Cave::Cave(RealmID id_, RealmID parent_realm, TilemapPtr tilemap1_, BiomeMapPtr biome_map, int seed_):
-		Realm(id_, Realm::CAVE, std::move(tilemap1_), std::move(biome_map), seed_), parentRealm(parent_realm) {}
+		Realm(id_, ID(), std::move(tilemap1_), std::move(biome_map), seed_), parentRealm(parent_realm) {}
 
 	Cave::~Cave() {
 		// Assumptions:
@@ -21,7 +21,7 @@ namespace Game3 {
 		//    -> If we find one cave entrance in a realm, we can stop after destroying its linked cave and we don't have to look for more entrances.
 		auto &game = getGame();
 		for (const auto &[index, tile_entity]: tileEntities) {
-			if (tile_entity->tileID != Monomap::CAVE)
+			if (tile_entity->tileID != "base:tile/cave")
 				continue;
 			if (auto building = std::dynamic_pointer_cast<Building>(tile_entity)) {
 				if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game.realms.at(building->innerRealmID)))
@@ -42,24 +42,28 @@ namespace Game3 {
 		std::optional<ItemStack> ore_stack;
 
 		const TileID tile2 = tilemap2->tiles.at(index);
-		if (tile2 == Monomap::CAVE_COAL)
-			ore_stack.emplace(Item::COAL, 1);
-		else if (tile2 == Monomap::CAVE_COPPER)
-			ore_stack.emplace(Item::COPPER_ORE, 1);
-		else if (tile2 == Monomap::CAVE_DIAMOND)
-			ore_stack.emplace(Item::DIAMOND_ORE, 1);
-		else if (tile2 == Monomap::CAVE_GOLD)
-			ore_stack.emplace(Item::GOLD_ORE, 1);
-		else if (tile2 == Monomap::CAVE_IRON)
-			ore_stack.emplace(Item::IRON_ORE, 1);
-		else if (tile2 == Monomap::CAVE_WALL)
-			ore_stack.emplace(Item::STONE, 1);
+		const auto &tile_id = (*tilemap2->tileset)[tile2];
+
+		Game &game = getGame();
+
+		if (tile_id == "base:tile/cave_coal")
+			ore_stack.emplace(game, "base:item/coal", 1);
+		else if (tile_id == "base:tile/cave_copper")
+			ore_stack.emplace(game, "base:item/copper_ore", 1);
+		else if (tile_id == "base:tile/cave_diamond")
+			ore_stack.emplace(game, "base:item/diamond_ore", 1);
+		else if (tile_id == "base:tile/cave_gold")
+			ore_stack.emplace(game, "base:item/gold_ore", 1);
+		else if (tile_id == "base:tile/cave_iron")
+			ore_stack.emplace(game, "base:item/iron_ore", 1);
+		else if (tile_id == "base:tile/cave_wall")
+			ore_stack.emplace(game, "base:item/stone", 1);
 
 		if (ore_stack) {
 			Inventory &inventory = *player->inventory;
 			if (auto *stack = inventory.getActive()) {
 				if (stack->has(ItemAttribute::Pickaxe) && !inventory.add(*ore_stack)) {
-					setLayer2(index, Monomap::EMPTY);
+					setLayer2(index, tilemap2->tileset->getEmpty());
 					getGame().activateContext();
 					renderer2.reupload();
 					reveal(position);
@@ -77,20 +81,24 @@ namespace Game3 {
 		if (!isValid(position))
 			return;
 
-		if (tilemap2->tiles.at(getIndex(position)) == Monomap::EMPTY) {
+		if (tilemap2->tiles.at(getIndex(position)) == tilemap2->tileset->getEmptyID()) {
 			bool changed = false;
-			for (Index row_offset = -1; row_offset <= 1; ++row_offset)
-				for (Index column_offset = -1; column_offset <= 1; ++column_offset)
+			const TileID void3 = (*tilemap3->tileset)["base:tile/void"];
+			const TileID empty3 = tilemap3->tileset->getEmptyID();
+			for (Index row_offset = -1; row_offset <= 1; ++row_offset) {
+				for (Index column_offset = -1; column_offset <= 1; ++column_offset) {
 					if (row_offset != 0 || column_offset != 0) {
 						const Position offset_position = position + Position(row_offset, column_offset);
 						if (!isValid(offset_position))
 							continue;
-						TileID &tile3 = tilemap3->tiles.at(getIndex(offset_position));
-						if (tile3 == Monomap::VOID) {
-							tile3 = Monomap::EMPTY;
+						auto &tile3 = tilemap3->tiles.at(getIndex(offset_position));
+						if (tile3 == void3) {
+							tile3 = empty3;
 							changed = true;
 						}
 					}
+				}
+			}
 			if (changed) {
 				getGame().activateContext();
 				renderer3.reupload();

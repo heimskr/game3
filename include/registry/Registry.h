@@ -2,6 +2,7 @@
 
 #include <map>
 #include <memory>
+#include <set>
 #include <string>
 #include <type_traits>
 #include <unordered_set>
@@ -48,6 +49,44 @@ namespace Game3 {
 	};
 
 	void from_json(const nlohmann::json &, Registry &);
+
+	class IdentifierRegistry: public Registry {
+		public:
+			using Registry::Registry;
+
+			std::set<Identifier> items;
+
+			IdentifierRegistry & operator+=(Identifier item) {
+				add(std::move(item));
+				return *this;
+			}
+
+			template <typename S>
+			void add() {
+				add(S::ID());
+			}
+
+			void add(Identifier item) {
+				items.insert(std::move(item));
+			}
+
+			template <typename S>
+			const Identifier & contains() const {
+				return items.contains(S::ID());
+			}
+
+			inline bool contains(const Identifier &id) {
+				return items.contains(id);
+			}
+
+			inline void clear() {
+				items.clear();
+			}
+
+			inline size_t size() const {
+				return items.size();
+			}
+	};
 
 	struct NamedRegistryBase: Registry {
 		using Registry::Registry;
@@ -162,6 +201,10 @@ namespace Game3 {
 					(*iter)->registryID = nextCounter++;
 					byCounter.push_back(*iter);
 				}
+			}
+
+			void add(T &&item) {
+				add(std::make_shared<T>(std::move(item)));
 			}
 
 			bool addCarefully(std::shared_ptr<T> item) {

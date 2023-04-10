@@ -3,13 +3,13 @@
 
 namespace Game3 {
 	Keep::Keep(RealmID id_, const Position &parent_origin, Index parent_width, Index parent_height, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr biome_map, int seed_):
-		Realm(id_, Realm::KEEP, std::move(tilemap1_), std::move(tilemap2_), std::move(tilemap3_), std::move(biome_map), seed_),
+		Realm(id_, ID(), std::move(tilemap1_), std::move(tilemap2_), std::move(tilemap3_), std::move(biome_map), seed_),
 		parentOrigin(parent_origin),
 		parentWidth(parent_width),
 		parentHeight(parent_height) {}
 
 	Keep::Keep(RealmID id_, const Position &parent_origin, Index parent_width, Index parent_height, TilemapPtr tilemap1_, BiomeMapPtr biome_map, int seed_):
-		Realm(id_, Realm::KEEP, std::move(tilemap1_), std::move(biome_map), seed_),
+		Realm(id_, ID(), std::move(tilemap1_), std::move(biome_map), seed_),
 		parentOrigin(parent_origin),
 		parentWidth(parent_width),
 		parentHeight(parent_height) {}

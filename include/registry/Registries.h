@@ -14,6 +14,7 @@ namespace Game3 {
 	struct GhostFunction;
 	struct ItemTexture;
 	struct Ore;
+	struct RealmFactory;
 	struct TileEntityFactory;
 
 	struct RegistryRegistry: NamedRegistry<Registry> {
@@ -79,5 +80,15 @@ namespace Game3 {
 	struct OreRegistry: NamedRegistry<Ore> {
 		static Identifier ID() { return {"base", "ore"}; }
 		OreRegistry(): NamedRegistry(ID()) {}
+	};
+
+	struct RealmFactoryRegistry: NamedRegistry<RealmFactory> {
+		static Identifier ID() { return {"base", "realm_factory"}; }
+		RealmFactoryRegistry(): NamedRegistry(ID()) {}
+	};
+
+	struct RealmTypeRegistry: IdentifierRegistry {
+		static Identifier ID() { return {"base", "realm_type"}; }
+		RealmTypeRegistry(): IdentifierRegistry(ID()) {}
 	};
 }

@@ -12,7 +12,7 @@
 namespace Game3 {
 	class Game;
 
-	class EntityFactory: NamedRegisterable {
+	class EntityFactory: public NamedRegisterable {
 		private:
 			std::function<std::shared_ptr<Entity>(Game &, const nlohmann::json &)> function;
 
@@ -21,15 +21,11 @@ namespace Game3 {
 
 			std::shared_ptr<Entity> operator()(Game &, const nlohmann::json &);
 
-			inline const Identifier & getIdentifier() const { return identifier; }
-
 			template <typename T>
-			static EntityFactory create() {
-				EntityFactory out(T::ID());
-				out.function = [](Game &game, const nlohmann::json &json) {
-					return Entity::create<T>(game, json);
-				};
-				return out;
+			static EntityFactory create(const Identifier &id = T::ID()) {
+				return {id, [](Game &game, const nlohmann::json &json) {
+					return T::fromJSON(game, json);
+				}};
 			}
 	};
 }

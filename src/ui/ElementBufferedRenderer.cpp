@@ -56,7 +56,8 @@ namespace Game3 {
 	void ElementBufferedRenderer::render(float divisor) {
 		if (!initialized)
 			return;
-		tilemap->texture.bind();
+
+		tilemap->texture->bind();
 
 		if (dirty) {
 			recomputeLighting();

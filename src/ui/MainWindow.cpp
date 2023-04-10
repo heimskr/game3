@@ -315,7 +315,7 @@ namespace Game3 {
 		else
 			game = Game::fromJSON(nlohmann::json::from_cbor(data), *canvas);
 		game->initRegistries();
-		game->initItems();
+		game->addItems();
 		game->initEntities();
 		for (auto &[id, realm]: game->realms)
 			realm->resetPathMap();
@@ -334,6 +334,10 @@ namespace Game3 {
 	}
 
 	void MainWindow::onGameLoaded() {
+		game->addGhosts();
+		game->addRealmTypes();
+		game->addEntityFactories();
+		game->addTileEntityFactories();
 		glArea.get_context()->make_current();
 		debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
 		game->player->focus(*canvas, false);

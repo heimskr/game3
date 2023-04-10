@@ -48,6 +48,8 @@ namespace Game3 {
 
 	void from_json(const nlohmann::json &, Identifier &);
 	void to_json(nlohmann::json &, const Identifier &);
+
+	Identifier operator""_id(const char *string, size_t);
 }
 
 namespace std {

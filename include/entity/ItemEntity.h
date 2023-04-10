@@ -26,6 +26,7 @@ namespace Game3 {
 			Glib::ustring getName() override;
 
 		private:
+			ItemEntity(const Game &, const nlohmann::json &);
 			ItemEntity(ItemStack);
 			float xOffset = 0.f;
 			float yOffset = 0.f;

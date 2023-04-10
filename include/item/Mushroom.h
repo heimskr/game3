@@ -16,7 +16,7 @@ namespace Game3 {
 
 			Mushroom(ItemID id_, std::string name_, MoneyCount base_price, ID sub_id);
 
-			void getOffsets(Texture *&, float &x_offset, float &y_offset) override;
-			Glib::RefPtr<Gdk::Pixbuf> makeImage() override;
+			void getOffsets(const Game &, std::shared_ptr<Texture> &, float &x_offset, float &y_offset) override;
+			Glib::RefPtr<Gdk::Pixbuf> makeImage(const Game &) override;
 	};
 }

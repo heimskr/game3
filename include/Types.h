@@ -11,7 +11,6 @@ namespace Game3 {
 	using Index        =  int32_t;
 	using TileID       = uint16_t;
 	using PlayerID     =  int32_t;
-	using RealmType    = uint32_t;
 	using RealmID      =  int32_t;
 	using Slot         =  int32_t;
 	using ItemCount    = uint64_t;
@@ -27,6 +26,7 @@ namespace Game3 {
 
 	using ItemID     = Identifier;
 	using EntityType = Identifier;
+	using RealmType  = Identifier;
 
 	class Player;
 	using PlayerPtr = std::shared_ptr<Player>;

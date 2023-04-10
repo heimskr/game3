@@ -31,6 +31,10 @@ namespace Game3 {
 		return empty;
 	}
 
+	TileID Tileset::getEmptyID() const {
+		return (*this)[empty];
+	}
+
 	const Identifier & Tileset::getMissing() const {
 		return missing;
 	}
@@ -51,8 +55,8 @@ namespace Game3 {
 		return name;
 	}
 
-	Texture & Tileset::getTexture() {
-		return cacheTexture(texture);
+	std::shared_ptr<Texture> Tileset::getTexture() {
+		return cacheTexture(std::filesystem::path(texture));
 	}
 
 	bool Tileset::getItemStack(Game &game, const Identifier &id, ItemStack &stack) const {
