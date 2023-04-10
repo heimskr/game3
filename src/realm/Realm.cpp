@@ -10,12 +10,7 @@
 #include "game/InteractionSet.h"
 #include "realm/Keep.h"
 #include "realm/Realm.h"
-#include "tileentity/Building.h"
-#include "tileentity/Chest.h"
 #include "tileentity/Ghost.h"
-#include "tileentity/OreDeposit.h"
-#include "tileentity/Sign.h"
-#include "tileentity/Teleporter.h"
 #include "ui/MainWindow.h"
 #include "ui/SpriteRenderer.h"
 #include "util/Timer.h"
@@ -55,8 +50,8 @@ namespace Game3 {
 		tilemap1->init();
 		const auto &tileset = getTileset();
 		renderer1.init(tilemap1, tileset);
-		tilemap2 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->texture);
-		tilemap3 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->texture);
+		tilemap2 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->tileset);
+		tilemap3 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->tileset);
 		tilemap2->init();
 		tilemap3->init();
 		renderer2.init(tilemap2, tileset);
@@ -439,6 +434,9 @@ namespace Game3 {
 
 		++depth;
 
+		auto &tiles = tilemap2->tiles;
+		const auto &tileset = *tilemap2->tileset;
+
 		for (Index row_offset = -1; row_offset <= 1; ++row_offset)
 			for (Index column_offset = -1; column_offset <= 1; ++column_offset)
 				if (row_offset != 0 || column_offset != 0) {
@@ -448,20 +446,24 @@ namespace Game3 {
 					if (auto neighbor = tileEntityAt(offset_position)) {
 						neighbor->onNeighborUpdated(-row_offset, -column_offset);
 					} else {
-						auto &tiles = tilemap2->tiles;
 						TileID &tile = tiles.at(getIndex(offset_position));
-						if (Monomap::woodenWalls.contains(tile)) {
-							TileID march_result = march4([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
-								const Position march_position = offset_position + Position(march_row_offset, march_column_offset);
-								if (!isValid(march_position))
-									return false;
-								return Monomap::woodenWalls.contains(tiles.at(getIndex(march_position)));
-							});
+						const auto &tilename = tileset[tile];
 
-							const TileID marched = (march_result / 7 + 6) * (tilemap2->setWidth / tilemap2->tileSize) + march_result % 7;
-							if (marched != tile) {
-								tile = marched;
-								layer2_updated = true;
+						for (const auto &category: tileset.getCategories(tilename)) {
+							if (tileset.isCategoryMarchable(category)) {
+								TileID march_result = march4([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
+									const Position march_position = offset_position + Position(march_row_offset, march_column_offset);
+									if (!isValid(march_position))
+										return false;
+									return tileset.isInCategory(tileset[tiles.at(getIndex(march_position))], category);
+								});
+
+								// ???
+								const TileID marched = (march_result / 7 + 6) * (tilemap2->setWidth / tilemap2->tileSize) + march_result % 7;
+								if (marched != tile) {
+									tile = marched;
+									layer2_updated = true;
+								}
 							}
 						}
 					}

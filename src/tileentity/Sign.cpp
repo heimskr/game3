@@ -11,6 +11,9 @@
 #include "ui/tab/TextTab.h"
 
 namespace Game3 {
+	Sign::Sign(Identifier tilename, Position position_, std::string text_, std::string name_):
+		TileEntity(std::move(tilename), "base:te/sign", std::move(position_), false), text(std::move(text_)), name(std::move(name_)) {}
+
 	void Sign::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
 		json["text"] = text;
@@ -26,8 +29,8 @@ namespace Game3 {
 		return true;
 	}
 
-	void Sign::absorbJSON(const nlohmann::json &json) {
-		TileEntity::absorbJSON(json);
+	void Sign::absorbJSON(Game &game, const nlohmann::json &json) {
+		TileEntity::absorbJSON(game, json);
 		text = json.at("text");
 		name = json.at("name");
 	}

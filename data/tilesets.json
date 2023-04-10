@@ -342,6 +342,9 @@
 			"base:tile/plant2": "base:plant_pot2",
 			"base:tile/plant3": "base:plant_pot3"
 		},
+		"marchable": [
+			"base:category/wooden_walls"
+		],
 		"categories": {
 			"base:category/wooden_walls": [
 				"base:tile/wall_nw",

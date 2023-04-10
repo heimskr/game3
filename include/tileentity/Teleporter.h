@@ -15,16 +15,15 @@ namespace Game3 {
 			Teleporter & operator=(const Teleporter &) = delete;
 			Teleporter & operator=(Teleporter &&) = default;
 
-			void init() override {}
+			void init(Game &) override {}
 			void toJSON(nlohmann::json &) const override;
 			void onOverlap(const std::shared_ptr<Entity> &) override;
-			void absorbJSON(const nlohmann::json &) override;
+			void absorbJSON(Game &, const nlohmann::json &) override;
 			void render(SpriteRenderer &) override;
 
 		protected:
 			Teleporter() = default;
-			Teleporter(TileID id_, const Position &position_, RealmID target_realm, const Position &target_position):
-				TileEntity(id_, TileEntity::TELEPORTER, position_, false), targetRealm(target_realm), targetPosition(target_position) {}
+			Teleporter(Identifier tilename, Position position_, RealmID target_realm, Position target_position);
 
 			friend class TileEntity;
 	};

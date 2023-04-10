@@ -11,21 +11,26 @@
 #include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
+	Tree::Tree(Identifier tilename, Identifier immature_tilename, Position position_, float age_):
+		TileEntity(std::move(tilename), "base:te/tree", std::move(position_), true),
+		age(age_),
+		immatureTilename(std::move(immature_tilename)) {}
+
 	void Tree::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
-		json["immatureID"] = immatureID;
+		json["immatureTilename"] = immatureTilename;
 		json["age"] = age;
 		json["hiveAge"] = hiveAge;
 	}
 
-	void Tree::absorbJSON(const nlohmann::json &json) {
-		TileEntity::absorbJSON(json);
-		immatureID = json.at("immatureID");
+	void Tree::absorbJSON(Game &game, const nlohmann::json &json) {
+		TileEntity::absorbJSON(game, json);
+		immatureTilename = json.at("immatureTilename");
 		age = json.at("age");
 		hiveAge = json.at("hiveAge");
 	}
 
-	void Tree::init(std::default_random_engine &rng) {
+	void Tree::init(Game &, std::default_random_engine &rng) {
 		if (rng() % 10 == 0)
 			hiveAge = 0.f;
 	}
@@ -40,19 +45,21 @@ namespace Game3 {
 		if (age < MATURITY)
 			return false;
 
+		auto &realm = *getRealm();
+		auto &game = realm.getGame();
 		auto &inventory = *player->inventory;
 		const Slot active_slot = inventory.activeSlot;
+
 		if (auto *active_stack = inventory[active_slot]) {
 			if (active_stack->has(ItemAttribute::Axe)) {
-				auto &realm = *getRealm();
-				if (!inventory.add({Item::WOOD, 1})) {
+				if (!inventory.add({game, "base:item/wood", 1})) {
 					realm.queueRemoval(shared_from_this());
 					if (active_stack->reduceDurability())
 						inventory.erase(active_slot);
 					ItemCount saplings = 1;
 					while (rand() % 4 == 1)
 						++saplings;
-					player->give({Item::SAPLING, saplings});
+					player->give({game, "base:item/sapling", saplings});
 					inventory.notifyOwner();
 					return true;
 				}
@@ -60,7 +67,7 @@ namespace Game3 {
 			}
 		}
 
-		if (HIVE_MATURITY <= hiveAge && !inventory.add({Item::HONEY, 1})) {
+		if (HIVE_MATURITY <= hiveAge && !inventory.add({game, "base:item/honey", 1})) {
 			hiveAge = 0.f;
 			inventory.notifyOwner();
 			return true;
@@ -75,13 +82,21 @@ namespace Game3 {
 
 	bool Tree::kill() {
 		auto &realm = *getRealm();
-		auto &rng = realm.getGame().dynamicRNG;
+
+		static const Identifier expected("base", "te/monomap");
+		if (realm.tilemap2->tileset->identifier != expected || realm.tilemap3->tileset->identifier != expected)
+			return true;
+
+		auto &game = realm.getGame();
+		auto &rng = game.dynamicRNG;
 		static std::uniform_real_distribution one(0., 1.);
+
 		if (one(rng) < CHAR_CHANCE)
-			realm.setLayer3(getPosition(), Monomap::CHARRED_STUMP);
+			realm.setLayer3(getPosition(), "base:tile/charred_stump");
 		else
-			realm.spawn<ItemEntity>(getPosition(), ItemStack(Item::WOOD, 1));
-		realm.setLayer2(getPosition(), Monomap::ASH);
+			realm.spawn<ItemEntity>(getPosition(), ItemStack(realm.getGame(), "base:item/wood", 1));
+
+		realm.setLayer2(getPosition(), "base:tile/ash");
 		return true;
 	}
 
@@ -89,11 +104,12 @@ namespace Game3 {
 		if (!isVisible())
 			return;
 		auto realm = getRealm();
-		if (tileID != tileSets.at(realm->type)->getEmpty()) {
+		const auto &tileset = *realm->tilemap2->tileset;
+		if (tileID != tileset.getEmpty()) {
 			auto &tilemap = *realm->tilemap2;
 			const auto tilesize = tilemap.tileSize;
-			TileID tile_id = age < MATURITY? immatureID : tileID;
-			if (tile_id != immatureID) {
+			TileID tile_id = tileset[age < MATURITY? immatureTilename : tileID];
+			if (tile_id != getImmatureTileID(tileset)) {
 				if (0.f <= hiveAge)
 					tile_id += 4;
 				if (HIVE_MATURITY <= hiveAge)
@@ -103,5 +119,9 @@ namespace Game3 {
 			const auto y = (tile_id / (tilemap.setWidth / tilesize)) * tilesize;
 			sprite_renderer.drawOnMap(tilemap.texture, position.column, position.row, x / 2, y / 2, tilesize, tilesize);
 		}
+	}
+
+	TileID Tree::getImmatureTileID(const Tileset &tileset) {
+		return immatureTileID? *immatureTileID : *(immatureTileID = tileset[immatureTilename]);
 	}
 }

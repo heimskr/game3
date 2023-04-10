@@ -72,8 +72,8 @@ namespace Game3 {
 
 		protected:
 			TileEntity() = default;
-			TileEntity(Identifier tile_id, Identifier tile_entity_id, const Position &position_, bool solid_):
-				tileID(std::move(tile_id)), tileEntityID(std::move(tile_entity_id)), position(position_), solid(solid_) {}
+			TileEntity(Identifier tile_id, Identifier tile_entity_id, Position position_, bool solid_):
+				tileID(std::move(tile_id)), tileEntityID(std::move(tile_entity_id)), position(std::move(position_)), solid(solid_) {}
 
 			virtual void absorbJSON(Game &, const nlohmann::json &);
 			virtual void toJSON(nlohmann::json &) const;

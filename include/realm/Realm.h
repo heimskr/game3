@@ -123,9 +123,10 @@ namespace Game3 {
 
 			template <typename T, typename... Args>
 			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {
-				auto entity = T::create(std::forward<Args>(args)...);
+				Game &game_ref = getGame();
+				auto entity = T::create(game_ref, std::forward<Args>(args)...);
 				entity->setRealm(shared_from_this());
-				entity->init();
+				entity->init(game_ref);
 				entity->teleport(position);
 				add(entity);
 				return entity;

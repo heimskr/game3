@@ -35,8 +35,8 @@ namespace Game3 {
 		return missing;
 	}
 
-	std::vector<Identifier> Tileset::getBrightNames() const {
-		return {bright.begin(), bright.end()};
+	const std::set<Identifier> & Tileset::getBrightNames() const {
+		return bright;
 	}
 
 	std::vector<TileID> Tileset::getBrightIDs() const {
@@ -73,6 +73,52 @@ namespace Game3 {
 		return false;
 	}
 
+	bool Tileset::isMarchable(TileID id) {
+		if (marchableCache.contains(id))
+			return true;
+
+		if (unmarchableCache.contains(id))
+			return false;
+
+		const auto &tilename = names.at(id);
+
+		if (marchable.contains(tilename)) {
+			marchableCache.insert(id);
+			return true;
+		}
+
+		for (const auto &category: inverseCategories.at(tilename)) {
+			if (marchable.contains(category)) {
+				marchableCache.insert(id);
+				return true;
+			}
+		}
+
+		unmarchableCache.insert(id);
+		return false;
+	}
+
+	bool Tileset::isCategoryMarchable(const Identifier &category) const {
+		return marchable.contains(category);
+	}
+
+	void Tileset::clearCache() {
+		marchableCache.clear();
+		unmarchableCache.clear();
+	}
+
+	const std::set<Identifier> Tileset::getCategories(const Identifier &tilename) const {
+		return inverseCategories.at(tilename);
+	}
+
+	const std::set<Identifier> Tileset::getTilesByCategory(const Identifier &category) const {
+		return categories.at(category);
+	}
+
+	bool Tileset::isInCategory(const Identifier &tilename, const Identifier &category) const {
+		return inverseCategories.at(tilename).contains(category);
+	}
+
 	const TileID & Tileset::operator[](const Identifier &tilename) const {
 		return ids.at(tilename);
 	}
@@ -91,6 +137,7 @@ namespace Game3 {
 		tileset.ids = json.at("ids");
 		tileset.categories = json.at("categories");
 		tileset.texture = json.at("texture");
+		tileset.marchable = json.at("marchable");
 
 		std::map<Identifier, Identifier> stacks = json.at("stacks");
 		for (const auto &[key, val]: stacks) {
@@ -100,8 +147,10 @@ namespace Game3 {
 				tileset.stackNames.emplace(key, val);
 		}
 
-		for (const auto &[key, val]: tileset.ids)
+		for (const auto &[key, val]: tileset.ids) {
 			tileset.names.emplace(val, key);
+			tileset.inverseCategories.try_emplace(key);
+		}
 
 		for (const auto &[category, set]: tileset.categories)
 			for (const auto &tilename: set)
