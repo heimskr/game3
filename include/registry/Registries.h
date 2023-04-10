@@ -13,6 +13,7 @@ namespace Game3 {
 	struct GhostDetails;
 	struct GhostFunction;
 	struct ItemTexture;
+	struct Ore;
 	struct TileEntityFactory;
 
 	struct RegistryRegistry: NamedRegistry<Registry> {
@@ -73,5 +74,10 @@ namespace Game3 {
 	struct TileEntityFactoryRegistry: NamedRegistry<TileEntityFactory> {
 		static Identifier ID() { return {"base", "tile_entity_factory"}; }
 		TileEntityFactoryRegistry(): NamedRegistry(ID()) {}
+	};
+
+	struct OreRegistry: NamedRegistry<Ore> {
+		static Identifier ID() { return {"base", "ore"}; }
+		OreRegistry(): NamedRegistry(ID()) {}
 	};
 }

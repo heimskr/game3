@@ -59,6 +59,7 @@ namespace Game3 {
 		registries.add<GhostDetailsRegistry>();
 		registries.add<GhostFunctionRegistry>();
 		registries.add<TileEntityFactoryRegistry>();
+		registries.add<OreRegistry>();
 		// TODO: plugins
 	}
 

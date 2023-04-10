@@ -67,7 +67,7 @@ namespace Game3 {
 		json["material"] = material;
 	}
 
-	void Ghost::absorbJSON(const Game &game, const nlohmann::json &json) {
+	void Ghost::absorbJSON(Game &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		material = ItemStack::fromJSON(game, json.at("material"));
 		details  = GhostDetails::get(game, material);
@@ -128,9 +128,8 @@ namespace Game3 {
 			if (!realm->isValid(offset_position))
 				return false;
 			if (auto tile_entity = realm->tileEntityAt(offset_position))
-				if (tile_entity->getID() == TileEntity::GHOST)
-					if (*dynamic_cast<Ghost *>(tile_entity.get())->material.item == *material.item)
-						return true;
+				if (auto *ghost = dynamic_cast<Ghost *>(tile_entity.get()); ghost && *ghost->material.item == *material.item)
+					return true;
 			return std::nullopt;
 		};
 

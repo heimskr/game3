@@ -68,6 +68,7 @@ namespace Game3 {
 			bool isVisible() const;
 			/** Called when the TileEntity is destroyed violently, e.g. by a bomb. Returns false if the TileEntity should survive the destruction. */
 			virtual bool kill() { return false; }
+			inline bool is(const Identifier &check) const { return getID() == check; }
 
 		protected:
 			TileEntity() = default;

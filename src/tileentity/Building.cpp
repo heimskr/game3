@@ -26,7 +26,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Building::absorbJSON(const Game &game, const nlohmann::json &json) {
+	void Building::absorbJSON(Game &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		innerRealmID = json.at("innerRealmID");
 		entrance = json.at("entrance");

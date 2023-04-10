@@ -69,9 +69,9 @@ namespace Game3 {
 			Ghost & operator=(const Ghost &) = delete;
 			Ghost & operator=(Ghost &&) = default;
 
-			void init() override {}
+			void init(Game &) override {}
 			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(const Game &, const nlohmann::json &) override;
+			void absorbJSON(Game &, const nlohmann::json &) override;
 			void onSpawn();
 			void onNeighborUpdated(Index row_offset, Index column_offset) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;

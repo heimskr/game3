@@ -20,10 +20,10 @@ namespace Game3 {
 			Chest & operator=(const Chest &) = delete;
 			Chest & operator=(Chest &&) = default;
 
-			void init() override {}
+			void init(Game &) override {}
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
-			void absorbJSON(const Game &, const nlohmann::json &) override;
+			void absorbJSON(Game &, const nlohmann::json &) override;
 			void render(SpriteRenderer &) override;
 			void setInventory(Slot slot_count);
 

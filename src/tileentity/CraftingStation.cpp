@@ -34,7 +34,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void CraftingStation::absorbJSON(const Game &game, const nlohmann::json &json) {
+	void CraftingStation::absorbJSON(Game &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		stationType = json.at("stationType");
 	}
