@@ -5,6 +5,7 @@
 #include <csignal>
 #include <iostream>
 #include <random>
+#include <set>
 #include <stdexcept>
 #include <vector>
 
@@ -80,5 +81,12 @@ namespace Game3 {
 		if (container.empty())
 			throw std::invalid_argument("Container is empty");
 		return container.at(rng() % container.size());
+	}
+
+	template <typename T, typename R>
+	const T & choose(const std::set<T> &set, R &rng) {
+		if (set.empty())
+			throw std::invalid_argument("Set is empty");
+		return *std::advance(set.begin(), std::uniform_int_distribution(0, set.size() - 1)(rng));
 	}
 }

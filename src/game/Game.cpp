@@ -114,8 +114,8 @@ namespace Game3 {
 		add(std::make_shared<Tool>        ("base:diamond_axe",     "Diamond Axe",     900,  1.f, ItemAttribute::Axe));
 		add(std::make_shared<Tool>        ("base:diamond_pickaxe", "Diamond Pickaxe", 900,  1.f, ItemAttribute::Pickaxe));
 		add(std::make_shared<Tool>        ("base:diamond_shovel",  "Diamond Shovel",  700,  1.f, ItemAttribute::Shovel));
-		add(std::make_shared<Landfill>    ("base:sand",            "Sand",              1, 64, "base:monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/sand"));
-		add(std::make_shared<Landfill>    ("base:volcanic_sand",   "Volcanic Sand",     3, 64, "base:monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/volcanic_sand"));
+		add(std::make_shared<Landfill>    ("base:sand",            "Sand",              1, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/sand"));
+		add(std::make_shared<Landfill>    ("base:volcanic_sand",   "Volcanic Sand",     3, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/volcanic_sand"));
 		add(std::make_shared<Landfill>    ("base:clay",            "Clay",              2, 64, clayRequirement));
 		add(std::make_shared<Mushroom>("base:saffron_milkcap", "Saffron Milkcap",    10, 1 ));
 		add(std::make_shared<Mushroom>("base:honey_fungus",    "Honey Fungus",       15, 18));

@@ -277,18 +277,25 @@ namespace Game3 {
 		}, 2);
 	}
 
+	void MainWindow::initialSetup(Game &game) {
+		game.initRegistries();
+		game.addItems();
+		game.addGhosts();
+		game.addRealmTypes();
+		game.addEntityFactories();
+		game.addTileEntityFactories();
+		game.initEntities();
+	}
+
 	void MainWindow::newGame(int seed, int width, int height) {
 		glArea.get_context()->make_current();
 		game = Game::create(*canvas);
-		game->initRegistries();
-		game->initItems();
-		game->initEntities();
-		Texture texture = cacheTexture("resources/tileset.png");
-		texture.init();
-		auto tilemap = std::make_shared<Tilemap>(width, height, 16, texture);
+		initialSetup(*game);
+		auto tileset = game->registry<TilesetRegistry>().at("base:tileset/monomap");
+		auto tilemap = std::make_shared<Tilemap>(width, height, 16, tileset);
 		tilemap->init();
 		auto biomemap = std::make_shared<BiomeMap>(width, height);
-		auto realm = Realm::create(1, Realm::OVERWORLD, tilemap, biomemap, seed);
+		auto realm = Realm::create(1, "base:realm/overworld"_id, tilemap, biomemap, seed);
 		realm->outdoors = true;
 		realm->game = game.get();
 		std::default_random_engine rng;
@@ -296,7 +303,7 @@ namespace Game3 {
 		WorldGen::generateOverworld(realm, rng, seed);
 		game->realms.emplace(realm->id, realm);
 		game->activeRealm = realm;
-		realm->add(game->player = Entity::create<Player>(Entity::GANGBLANC_ID));
+		realm->add(game->player = Entity::create<Player>());
 		game->player->position = {realm->randomLand / width, realm->randomLand % width};
 		game->player->init(*game);
 		onGameLoaded();
@@ -314,9 +321,7 @@ namespace Game3 {
 			game = Game::fromJSON(nlohmann::json::parse(data), *canvas);
 		else
 			game = Game::fromJSON(nlohmann::json::from_cbor(data), *canvas);
-		game->initRegistries();
-		game->addItems();
-		game->initEntities();
+		initialSetup(*game);
 		for (auto &[id, realm]: game->realms)
 			realm->resetPathMap();
 		for (const auto &entity: game->activeRealm->entities)
@@ -334,10 +339,6 @@ namespace Game3 {
 	}
 
 	void MainWindow::onGameLoaded() {
-		game->addGhosts();
-		game->addRealmTypes();
-		game->addEntityFactories();
-		game->addTileEntityFactories();
 		glArea.get_context()->make_current();
 		debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
 		game->player->focus(*canvas, false);
@@ -714,7 +715,7 @@ namespace Game3 {
 						return;
 					case GDK_KEY_v:
 						if (game && game->debugMode) {
-							auto merchant = player.getRealm()->spawn<Merchant>(player.getPosition(), Entity::VILLAGER1_ID);
+							auto merchant = player.getRealm()->spawn<Merchant>(player.getPosition(), "base:entity/merchant");
 							merchant->inventory->add(ItemStack(*game, "base:red_potion", 6));
 							merchant->inventory->add(ItemStack(*game, "base:shortsword", 1));
 						}
@@ -730,8 +731,10 @@ namespace Game3 {
 								auto door = house->getTileEntity<Teleporter>();
 								const auto house_pos = door->targetPosition + Position(-1, 0);
 								auto overworld = game->realms.at(door->targetRealm);
-								player.getRealm()->spawn<Miner>(player.getPosition(), Entity::VILLAGER1_ID, overworld->id, house->id, house_pos,
-									overworld->closestTileEntity<Building>(house_pos, [](const auto &building) { return building->tileID == Monomap::KEEP_SW; }));
+								player.getRealm()->spawn<Miner>(player.getPosition(), overworld->id, house->id, house_pos,
+									overworld->closestTileEntity<Building>(house_pos, [](const auto &building) {
+										return building->tileID == "base:tile/keep_sw"_id;
+									}));
 							} catch (const std::exception &err) {
 								std::cerr << err.what() << '\n';
 							}

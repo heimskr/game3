@@ -123,6 +123,7 @@ namespace Game3 {
 			void connectSave();
 			void onGameLoaded();
 			bool isFocused(const std::shared_ptr<Tab> &) const;
+			void initialSetup(Game &);
 
 			template <typename T>
 			T & initTab(std::shared_ptr<T> &tab) {

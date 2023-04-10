@@ -65,9 +65,9 @@ namespace Game3 {
 		tilemap1 = std::make_shared<Tilemap>(json.at("tilemap1"));
 		tilemap2 = std::make_shared<Tilemap>(json.at("tilemap2"));
 		tilemap3 = std::make_shared<Tilemap>(json.at("tilemap3"));
-		tilemap1->texture.init();
-		tilemap2->texture.init();
-		tilemap3->texture.init();
+		tilemap1->texture->init();
+		tilemap2->texture->init();
+		tilemap3->texture->init();
 		biomeMap = std::make_shared<BiomeMap>(json.at("biomeMap"));
 		outdoors = json.at("outdoors");
 		Game &game = getGame();
