@@ -20,19 +20,6 @@
 #include "worldgen/Keep.h"
 
 namespace Game3 {
-	std::unordered_map<RealmType, Texture> Realm::textureMap {
-		{Realm::OVERWORLD,  cacheTexture("resources/tileset.png")},
-		{Realm::HOUSE,      cacheTexture("resources/tileset.png")},
-		{Realm::KEEP,       cacheTexture("resources/tileset.png")},
-		{Realm::BLACKSMITH, cacheTexture("resources/tileset.png")},
-		{Realm::CAVE,       cacheTexture("resources/tileset.png")},
-		{Realm::TAVERN,     cacheTexture("resources/tileset.png")},
-	};
-
-	std::unordered_set<RealmType> Realm::allTypes {
-		Realm::OVERWORLD, Realm::HOUSE, Realm::KEEP, Realm::BLACKSMITH, Realm::CAVE, Realm::TAVERN,
-	};
-
 	Realm::Realm(RealmID id_, RealmType type_, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr biome_map, int seed_):
 	id(id_), type(type_), tilemap1(std::move(tilemap1_)), tilemap2(std::move(tilemap2_)), tilemap3(std::move(tilemap3_)), biomeMap(std::move(biome_map)), seed(seed_) {
 		tilemap1->init();
