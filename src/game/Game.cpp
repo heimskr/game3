@@ -192,15 +192,18 @@ namespace Game3 {
 	}
 
 	void Game::add(EntityFactory &&factory) {
-		registry<EntityFactoryRegistry>().add(factory.identifier, std::make_shared<EntityFactory>(std::move(factory)));
+		auto shared = std::make_shared<EntityFactory>(std::move(factory));
+		registry<EntityFactoryRegistry>().add(shared->identifier, shared);
 	}
 
 	void Game::add(TileEntityFactory &&factory) {
-		registry<TileEntityFactoryRegistry>().add(factory.identifier, std::make_shared<TileEntityFactory>(std::move(factory)));
+		auto shared = std::make_shared<TileEntityFactory>(std::move(factory));
+		registry<TileEntityFactoryRegistry>().add(shared->identifier, shared);
 	}
 
 	void Game::add(RealmFactory &&factory) {
-		registry<RealmFactoryRegistry>().add(factory.identifier, std::make_shared<RealmFactory>(std::move(factory)));
+		auto shared = std::make_shared<RealmFactory>(std::move(factory));
+		registry<RealmFactoryRegistry>().add(shared->identifier, shared);
 	}
 
 	void Game::traverseData(const std::filesystem::path &dir) {
@@ -221,13 +224,33 @@ namespace Game3 {
 		std::string raw = ss.str();
 		nlohmann::json json = nlohmann::json::parse(raw);
 		Identifier type = json.at(0);
+
 		// TODO: make a map of handlers for different types instead of if-elsing here
-		if (type == "base:recipe_list"_id) {
+		if (type == "base:durability_map"_id) {
+
+			auto &durabilities = registry<DurabilityRegistry>();
+			for (const auto &[key, value]: json.at(1).items())
+				durabilities.add(Identifier(key), NamedDurability(Identifier(key), value.get<Durability>()));
+
+		} else if (type == "base:entity_texture_map"_id) {
+
+			auto &textures = registry<EntityTextureRegistry>();
+			for (const auto &[key, value]: json.at(1).items())
+				textures.add(Identifier(key), EntityTexture(Identifier(key), value.at(0), value.at(1)));
+
+		} else if (type == "base:ghost_details_map"_id) {
+
+			auto &details = registry<GhostDetailsRegistry>();
+			for (const auto &[key, value]: json.at(1).items())
+				details.add(Identifier(key), GhostDetails(Identifier(key), value.at(0), value.at(1), value.at(2), value.at(3), value.at(4), value.at(5)));
+
+		} else if (type == "base:recipe_list"_id) {
+
 			for (const auto &recipe_json: json.at(1))
 				addRecipe(recipe_json);
-		} else {
+
+		} else
 			throw std::runtime_error("Unknown data file type: " + type.str());
-		}
 	}
 
 	void Game::addRecipe(const nlohmann::json &json) {

@@ -38,8 +38,8 @@ namespace Game3 {
 	}
 
 	void initGhosts(Game &game) {
-		game.add(std::make_shared<GhostDetails>("base:cauldron", spawnCauldron, "base:tile/cauldron_red_full"));
-		game.add(std::make_shared<GhostDetails>("base:purifier", spawnPurifier, "base:tile/purifier"));
+		game.add(std::make_shared<GhostDetails>("base:cauldron"_id, "base:tileset/monomap"_id, spawnCauldron, "base:tile/cauldron_red_full"_id));
+		game.add(std::make_shared<GhostDetails>("base:purifier"_id, "base:tileset/monomap"_id, spawnPurifier, "base:tile/purifier"_id));
 	}
 
 	GhostDetails & GhostDetails::get(const Game &game, const ItemStack &stack) {

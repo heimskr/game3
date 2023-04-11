@@ -29,10 +29,7 @@ namespace Game3 {
 	struct EntityTexture: NamedRegisterable {
 		Identifier textureID;
 		uint8_t variety;
-		EntityTexture(Identifier texture_id, uint8_t variety_):
-			NamedRegisterable(Identifier()),
-			textureID(std::move(texture_id)),
-			variety(variety_) {}
+		EntityTexture(Identifier identifier_, Identifier texture_id, uint8_t variety_);
 	};
 
 	class Entity: public Agent, public HasInventory, public std::enable_shared_from_this<Entity> {

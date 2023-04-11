@@ -2,6 +2,8 @@
 
 #include <cstddef>
 
+#include <nlohmann/json.hpp>
+
 #include "data/Identifier.h"
 
 namespace Game3 {

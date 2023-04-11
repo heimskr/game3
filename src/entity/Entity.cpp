@@ -15,6 +15,11 @@
 #include "util/Util.h"
 
 namespace Game3 {
+	EntityTexture::EntityTexture(Identifier identifier_, Identifier texture_id, uint8_t variety_):
+		NamedRegisterable(std::move(identifier_)),
+		textureID(std::move(texture_id)),
+		variety(variety_) {}
+
 	std::shared_ptr<Entity> Entity::fromJSON(Game &game, const nlohmann::json &json) {
 		auto factory = game.registry<EntityFactoryRegistry>().at(json.at("type").get<EntityType>());
 		assert(factory);

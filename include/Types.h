@@ -35,7 +35,7 @@ namespace Game3 {
 	using PlacePtr = std::shared_ptr<Place>;
 
 	template <typename T>
-	class NamedNumeric: NamedRegisterable {
+	class NamedNumeric: public NamedRegisterable {
 		public:
 			NamedNumeric(Identifier identifier_, T value_):
 				NamedRegisterable(std::move(identifier_)),

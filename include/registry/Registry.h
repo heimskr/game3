@@ -109,22 +109,22 @@ namespace Game3 {
 			using NamedRegistryBase::NamedRegistryBase;
 			~NamedRegistry() override = default;
 
-			NamedRegistry & operator+=(std::shared_ptr<T> item) {
+			inline NamedRegistry & operator+=(std::shared_ptr<T> item) {
 				add(item);
 				return *this;
 			}
 
-			NamedRegistry & operator+=(const std::pair<std::string, std::shared_ptr<T>> &pair) {
+			inline NamedRegistry & operator+=(const std::pair<std::string, std::shared_ptr<T>> &pair) {
 				add(pair.first, pair.second);
 				return *this;
 			}
 
 			template <typename S>
-			void add() {
+			inline void add() {
 				add(S::ID(), std::make_shared<S>());
 			}
 
-			void add(Identifier new_name, std::shared_ptr<T> new_item) {
+			inline void add(Identifier new_name, std::shared_ptr<T> new_item) {
 				if (auto [iter, inserted] = items.try_emplace(new_name, std::move(new_item)); inserted) {
 					iter->second->identifier = std::move(new_name);
 					iter->second->registryID = nextCounter++;
@@ -133,30 +133,38 @@ namespace Game3 {
 					throw std::runtime_error("NamedRegistry " + identifier.str() + " already contains an item with name \"" + new_name.str() + '"');
 			}
 
+			inline void add(Identifier new_name, T &&new_item) {
+				add(std::move(new_name), std::make_shared<T>(std::move(new_item)));
+			}
+
 			template <typename S>
-			S & get() {
+			inline S & get() {
 				return *items.at(S::ID())->template cast<S>();
 			}
 
 			template <typename S>
-			const S & get() const {
+			inline const S & get() const {
 				return *items.at(S::ID())->template cast<const S>();
 			}
 
-			std::shared_ptr<T> operator[](size_t counter) const {
-				return byCounter[counter];
+			inline std::shared_ptr<T> operator[](size_t counter) const {
+				return at(counter);
 			}
 
-			std::shared_ptr<T> at(size_t counter) const {
+			inline std::shared_ptr<T> at(size_t counter) const {
 				return byCounter.at(counter);
 			}
 
-			std::shared_ptr<T> operator[](const Identifier &id) const {
-				return items.at(id);
+			inline std::shared_ptr<T> operator[](const Identifier &id) const {
+				return at(id);
 			}
 
-			std::shared_ptr<T> at(const Identifier &id) const {
-				return items.at(id);
+			inline std::shared_ptr<T> at(const Identifier &id) const {
+				try {
+					return items.at(id);
+				} catch (const std::out_of_range &) {
+					throw std::out_of_range("Couldn't find \"" + id.str() + "\" in registry " + identifier.str());
+				}
 			}
 
 			inline void clear() {
@@ -191,19 +199,19 @@ namespace Game3 {
 			using UnnamedRegistryBase::UnnamedRegistryBase;
 			~UnnamedRegistry() override = default;
 
-			UnnamedRegistry & operator+=(std::shared_ptr<T> item) {
+			inline UnnamedRegistry & operator+=(std::shared_ptr<T> item) {
 				add(std::move(item));
 				return *this;
 			}
 
-			void add(std::shared_ptr<T> item) {
+			inline void add(std::shared_ptr<T> item) {
 				if (auto [iter, inserted] = items.insert(std::move(item)); inserted) {
 					(*iter)->registryID = nextCounter++;
 					byCounter.push_back(*iter);
 				}
 			}
 
-			void add(T &&item) {
+			inline void add(T &&item) {
 				add(std::make_shared<T>(std::move(item)));
 			}
 
@@ -219,11 +227,11 @@ namespace Game3 {
 				return false;
 			}
 
-			std::shared_ptr<T> operator[](size_t counter) const {
-				return byCounter[counter];
+			inline std::shared_ptr<T> operator[](size_t counter) const {
+				return at(counter);
 			}
 
-			std::shared_ptr<T> at(size_t counter) const {
+			inline std::shared_ptr<T> at(size_t counter) const {
 				return byCounter.at(counter);
 			}
 

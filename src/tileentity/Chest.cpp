@@ -12,8 +12,6 @@
 #include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
-	std::shared_ptr<Texture> Chest::DEFAULT_TEXTURE = cacheTexture("resources/rpg/chests.png");
-
 	Chest::Chest(Identifier tile_id, const Position &position_, std::string name_, std::shared_ptr<Texture> texture_):
 	TileEntity(std::move(tile_id), ID(), position_, true), name(std::move(name_)), texture(std::move(texture_)) {
 		texture->init();

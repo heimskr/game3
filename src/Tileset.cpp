@@ -62,7 +62,7 @@ namespace Game3 {
 	bool Tileset::getItemStack(Game &game, const Identifier &id, ItemStack &stack) const {
 		if (auto iter = inverseCategories.find(id); iter != inverseCategories.end()) {
 			for (const auto &category: iter->second) {
-				if (auto subiter = stackCategories.find(id); subiter != stackCategories.end()) {
+				if (auto subiter = stackCategories.find(category); subiter != stackCategories.end()) {
 					stack = ItemStack(game, subiter->second);
 					return true;
 				}

@@ -26,26 +26,28 @@ namespace Game3 {
 
 		// GhostType type = GhostType::Invalid;
 		Identifier type;
+		Identifier tilesetName;
 		bool useMarchingSquares = false;
 		Index columnsPerRow = 16;
 		Index rowOffset     = 0;
 		Index columnOffset  = 0;
 		CustomFn customFn;
-		Identifier tilsetName;
 		Identifier customTileName;
 
 		GhostDetails() = default;
-		GhostDetails(Identifier identifier_, Identifier type_, bool use_marching_squares, Index columns_per_row, Index row_offset, Index column_offset):
+		GhostDetails(Identifier identifier_, Identifier type_, Identifier tileset_name, bool use_marching_squares, Index columns_per_row, Index row_offset, Index column_offset):
 			NamedRegisterable(std::move(identifier_)),
 			type(std::move(type_)),
+			tilesetName(std::move(tileset_name)),
 			useMarchingSquares(use_marching_squares),
 			columnsPerRow(columns_per_row),
 			rowOffset(row_offset),
 			columnOffset(column_offset) {}
 
-		GhostDetails(Identifier identifier_, CustomFn custom_fn, Identifier custom_tile_name):
+		GhostDetails(Identifier identifier_, Identifier tileset_name, CustomFn custom_fn, Identifier custom_tile_name):
 			NamedRegisterable(std::move(identifier_)),
 			type("base:ghost/custom"),
+			tilesetName(std::move(tileset_name)),
 			customFn(std::move(custom_fn)),
 			customTileName(std::move(custom_tile_name)) {}
 

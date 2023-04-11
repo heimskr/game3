@@ -9,7 +9,7 @@
 #include "ui/SpriteRenderer.h"
 
 namespace Game3 {
-	ItemEntity::ItemEntity(const Game &game, const nlohmann::json &json):
+	ItemEntity::ItemEntity(const Game &, const nlohmann::json &):
 		Entity(ID()) {}
 
 	ItemEntity::ItemEntity(ItemStack stack_):
