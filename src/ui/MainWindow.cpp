@@ -292,8 +292,9 @@ namespace Game3 {
 		glArea.get_context()->make_current();
 		game = Game::create(*canvas);
 		initialSetup(*game);
-		auto tileset = game->registry<TilesetRegistry>().at("base:tileset/monomap");
-		auto tilemap = std::make_shared<Tilemap>(width, height, 16, tileset);
+		auto tileset = game->registry<TilesetRegistry>().at("base:tileset/monomap"_id);
+		auto tileset_texture = tileset->getTexture(*game);
+		auto tilemap = std::make_shared<Tilemap>(width, height, 16, *tileset_texture->width, *tileset_texture->height, tileset);
 		tilemap->init(*game);
 		auto biomemap = std::make_shared<BiomeMap>(width, height);
 		auto realm = Realm::create(*game, 1, "base:realm/overworld"_id, tilemap, biomemap, seed);

@@ -11,7 +11,7 @@ namespace Game3 {
 	}
 
 	Tilemap::Tilemap(int width_, int height_, int tile_size, std::shared_ptr<Tileset> tileset_):
-	width(width_), height(height_), tileSize(tile_size), textureName(tileset_->getTextureName()), setWidth(*texture->width), setHeight(*texture->height), tileset(std::move(tileset_)) {
+	width(width_), height(height_), tileSize(tile_size), textureName(tileset_->getTextureName()), tileset(std::move(tileset_)) {
 		tiles.resize(width * height);
 	}
 

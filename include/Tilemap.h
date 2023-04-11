@@ -20,8 +20,8 @@ namespace Game3 {
 			int height = 0;
 			int tileSize = 0;
 			Identifier textureName;
-			int setWidth = 0;
-			int setHeight = 0;
+			int setWidth = -1;
+			int setHeight = -1;
 			std::vector<TileID> tiles;
 			std::shared_ptr<Tileset> tileset;
 
