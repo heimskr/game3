@@ -203,7 +203,7 @@ namespace Game3 {
 			friend void to_json(nlohmann::json &, const Realm &);
 
 		protected:
-			Realm() = default;
+			Realm(Game &);
 			Realm(Game &, RealmID, RealmType, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr, int seed_);
 			Realm(Game &, RealmID, RealmType, TilemapPtr tilemap1_, BiomeMapPtr, int seed_);
 

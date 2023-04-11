@@ -25,6 +25,8 @@ namespace Game3 {
 		details.tilesetName = json.at("tileset");
 	}
 
+	Realm::Realm(Game &game_): game(game_) {}
+
 	Realm::Realm(Game &game_, RealmID id_, RealmType type_, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr biome_map, int seed_):
 	id(id_), type(type_), tilemap1(std::move(tilemap1_)), tilemap2(std::move(tilemap2_)), tilemap3(std::move(tilemap3_)), biomeMap(std::move(biome_map)), seed(seed_), game(game_) {
 		tilemap1->init(game);
@@ -55,7 +57,7 @@ namespace Game3 {
 		const RealmType type = json.at("type");
 		auto factory = game.registry<RealmFactoryRegistry>().at(type);
 		assert(factory);
-		auto out = (*factory)(game, json);
+		auto out = (*factory)(game);
 		out->absorbJSON(json);
 		return out;
 	}

@@ -14,17 +14,17 @@ namespace Game3 {
 
 	class RealmFactory: public NamedRegisterable {
 		private:
-			std::function<std::shared_ptr<Realm>(Game &, const nlohmann::json &)> function;
+			std::function<std::shared_ptr<Realm>(Game &)> function;
 
 		public:
 			RealmFactory(Identifier, decltype(function));
 
-			std::shared_ptr<Realm> operator()(Game &, const nlohmann::json &);
+			std::shared_ptr<Realm> operator()(Game &);
 
 			template <typename T>
 			static RealmFactory create(const Identifier &id = T::ID()) {
-				return {id, [](Game &game, const nlohmann::json &json) {
-					return T::fromJSON(game, json);
+				return {id, [](Game &game) {
+					return T::create(game);
 				}};
 			}
 	};

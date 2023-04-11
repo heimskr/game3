@@ -65,6 +65,7 @@ namespace Game3 {
 			void addEntityFactories();
 			void addTileEntityFactories();
 			void addRealms();
+			void initialSetup(const std::filesystem::path &dir = "data");
 			void initEntities();
 			void initInteractionSets();
 			void add(std::shared_ptr<Item>);

@@ -277,21 +277,10 @@ namespace Game3 {
 		}, 2);
 	}
 
-	void MainWindow::initialSetup(Game &game) {
-		game.initRegistries();
-		game.addItems();
-		game.traverseData("data");
-		game.addGhosts();
-		game.addRealms();
-		game.addEntityFactories();
-		game.addTileEntityFactories();
-		game.initEntities();
-	}
-
 	void MainWindow::newGame(int seed, int width, int height) {
 		glArea.get_context()->make_current();
 		game = Game::create(*canvas);
-		initialSetup(*game);
+		game->initEntities();
 		auto tileset = game->registry<TilesetRegistry>().at("base:tileset/monomap"_id);
 		auto tileset_texture = tileset->getTexture(*game);
 		auto tilemap = std::make_shared<Tilemap>(width, height, 16, *tileset_texture->width, *tileset_texture->height, tileset);
@@ -322,7 +311,7 @@ namespace Game3 {
 			game = Game::fromJSON(nlohmann::json::parse(data), *canvas);
 		else
 			game = Game::fromJSON(nlohmann::json::from_cbor(data), *canvas);
-		initialSetup(*game);
+		game->initEntities();
 		for (auto &[id, realm]: game->realms)
 			realm->resetPathMap();
 		for (const auto &entity: game->activeRealm->entities)

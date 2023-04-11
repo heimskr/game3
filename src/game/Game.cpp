@@ -171,6 +171,16 @@ namespace Game3 {
 		addRealm.operator()<Keep>(Keep::ID());
 	}
 
+	void Game::initialSetup(const std::filesystem::path &dir) {
+		initRegistries();
+		addItems();
+		traverseData(dir);
+		addGhosts();
+		addRealms();
+		addEntityFactories();
+		addTileEntityFactories();
+	}
+
 	void Game::initEntities() {
 		for (const auto &[realm_id, realm]: realms)
 			realm->initEntities();
@@ -397,11 +407,14 @@ namespace Game3 {
 	}
 
 	GamePtr Game::create(Canvas &canvas) {
-		return GamePtr(new Game(canvas));
+		auto out = GamePtr(new Game(canvas));
+		out->initialSetup();
+		return out;
 	}
 
 	GamePtr Game::fromJSON(const nlohmann::json &json, Canvas &canvas) {
 		auto out = create(canvas);
+		out->initialSetup();
 		for (const auto &[string, realm_json]: json.at("realms").get<std::unordered_map<std::string, nlohmann::json>>())
 			out->realms.emplace(parseUlong(string), Realm::fromJSON(*out, realm_json));
 		out->activeRealm = out->realms.at(json.at("activeRealmID"));
