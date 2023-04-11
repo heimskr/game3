@@ -82,9 +82,9 @@ namespace Game3 {
 	}
 
 	void to_json(nlohmann::json &json, const Texture &texture) {
-		json.at(0) = texture.path;
-		json.at(1) = *texture.alpha;
-		json.at(2) = Texture::filterToString(*texture.filter);
+		json[0] = texture.path;
+		json[1] = *texture.alpha;
+		json[2] = Texture::filterToString(*texture.filter);
 	}
 
 	void from_json(const nlohmann::json &json, Texture &texture) {
