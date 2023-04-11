@@ -51,6 +51,7 @@ namespace Game3 {
 	void OreDeposit::absorbJSON(Game &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		oreType = json.at("oreType");
+		tileID = getOre(game).tilename;
 		timeRemaining = json.contains("timeRemaining")? json.at("timeRemaining").get<float>() : 0.f;
 		uses = json.contains("uses")? json.at("uses").get<uint32_t>() : 0;
 	}

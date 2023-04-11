@@ -34,7 +34,9 @@ namespace Game3 {
 		CustomFn customFn;
 		Identifier customTileName;
 
-		GhostDetails() = default;
+		GhostDetails(Identifier identifier_ = {}):
+			NamedRegisterable(std::move(identifier_)) {}
+
 		GhostDetails(Identifier identifier_, Identifier type_, Identifier tileset_name, bool use_marching_squares, Index columns_per_row, Index row_offset, Index column_offset):
 			NamedRegisterable(std::move(identifier_)),
 			type(std::move(type_)),
@@ -86,7 +88,6 @@ namespace Game3 {
 
 		protected:
 			Ghost() = default;
-
 			Ghost(const Place &place, ItemStack material_);
 
 		private:

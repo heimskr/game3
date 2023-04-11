@@ -25,7 +25,7 @@ namespace Game3 {
 			std::vector<TileID> tiles;
 			std::shared_ptr<Tileset> tileset;
 
-			Tilemap() = default;
+			Tilemap() = delete;
 
 			Tilemap(int width_, int height_, int tile_size, int set_width, int set_height, std::shared_ptr<Tileset>);
 

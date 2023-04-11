@@ -40,7 +40,7 @@ namespace Game3 {
 			const Ore & getOre(const Game &) const;
 
 		protected:
-			OreDeposit() = delete;
+			OreDeposit() = default;
 			OreDeposit(const Ore &ore, const Position &position_, float time_remaining = 0.f, uint32_t uses_ = 0);
 
 			friend class TileEntity;

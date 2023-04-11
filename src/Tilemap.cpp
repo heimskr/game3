@@ -42,9 +42,9 @@ namespace Game3 {
 		json["height"] = height;
 		json["setHeight"] = setHeight;
 		json["setWidth"] = setWidth;
-		json["texture"] = *getTexture(game);
 		json["tileSize"] = tileSize;
 		json["width"] = width;
+		json["tileset"] = tileset->identifier;
 
 		// TODO: fix endianness issues
 		const auto tiles_size = tiles.size() * sizeof(tiles[0]);
@@ -59,14 +59,8 @@ namespace Game3 {
 	}
 
 	Tilemap Tilemap::fromJSON(const Game &game, const nlohmann::json &json) {
-		Tilemap tilemap;
-
-		tilemap.height = json.at("height");
-		tilemap.setHeight = json.at("setHeight");
-		tilemap.setWidth = json.at("setWidth");
-		tilemap.texture = game.registry<TextureRegistry>()[json.at("texture").get<Identifier>()];
-		tilemap.tileSize = json.at("tileSize");
-		tilemap.width = json.at("width");
+		auto tileset = game.registry<TilesetRegistry>()[json.at("tileset").get<Identifier>()];
+		Tilemap tilemap(json.at("height"), json.at("width"), json.at("tileSize"), json.at("setWidth"), json.at("setHeight"), tileset);
 
 		// TODO: fix endianness issues
 		tilemap.tiles.clear();

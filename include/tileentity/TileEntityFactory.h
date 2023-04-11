@@ -14,17 +14,17 @@ namespace Game3 {
 
 	class TileEntityFactory: public NamedRegisterable {
 		private:
-			std::function<std::shared_ptr<TileEntity>(Game &, const nlohmann::json &)> function;
+			std::function<std::shared_ptr<TileEntity>(Game &)> function;
 
 		public:
 			TileEntityFactory(Identifier, decltype(function));
 
-			std::shared_ptr<TileEntity> operator()(Game &, const nlohmann::json &);
+			std::shared_ptr<TileEntity> operator()(Game &);
 
 			template <typename T>
 			static TileEntityFactory create(const Identifier &id = T::ID()) {
-				return {id, [](Game &game, const nlohmann::json &json) {
-					return T::fromJSON(game, json);
+				return {id, [](Game &game) {
+					return TileEntity::create<T>(game);
 				}};
 			}
 	};

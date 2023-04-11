@@ -8,7 +8,7 @@ namespace Game3 {
 	std::shared_ptr<TileEntity> TileEntity::fromJSON(Game &game, const nlohmann::json &json) {
 		auto factory = game.registry<TileEntityFactoryRegistry>().at(json.at("id").get<Identifier>());
 		assert(factory);
-		auto out = (*factory)(game, json);
+		auto out = (*factory)(game);
 		out->absorbJSON(game, json);
 		return out;
 	}
