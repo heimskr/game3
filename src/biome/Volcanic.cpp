@@ -19,19 +19,19 @@ namespace Game3 {
 		savedNoise[row * realm.getWidth() + column] = noise;
 
 		if (noise < THRESHOLD) {
-			realm.setLayer1(row, column, Monomap::DEEPER_WATER);
+			realm.setLayer1({row, column}, "base:tile/deeper_water"_id);
 		} else if (noise < THRESHOLD + 0.1) {
-			realm.setLayer1(row, column, Monomap::DEEP_WATER);
+			realm.setLayer1({row, column}, "base:tile/deep_water"_id);
 		} else if (noise < THRESHOLD + 0.2) {
-			realm.setLayer1(row, column, Monomap::WATER);
+			realm.setLayer1({row, column}, "base:tile/water"_id);
 		} else if (noise < THRESHOLD + 0.3) {
-			realm.setLayer1(row, column, Monomap::SHALLOW_WATER);
+			realm.setLayer1({row, column}, "base:tile/shallow_water"_id);
 		} else if (noise < THRESHOLD + 0.4) {
-			realm.setLayer1(row, column, Monomap::VOLCANIC_SAND);
+			realm.setLayer1({row, column}, "base:tile/volcanic_sand"_id);
 		} else if (0.85 < noise) {
-			realm.setLayer1(row, column, Monomap::LAVA);
+			realm.setLayer1({row, column}, "base:tile/lava"_id);
 		} else {
-			realm.setLayer1(row, column, Monomap::VOLCANIC_ROCK);
+			realm.setLayer1({row, column}, "base:tile/volcanic_rock"_id);
 		}
 	}
 
@@ -39,15 +39,16 @@ namespace Game3 {
 		Realm &realm = *getRealm();
 		static std::uniform_int_distribution distribution(0, 199);
 
-		if (realm.getLayer1(row, column) == Monomap::VOLCANIC_SAND) {
+		if (realm.getLayer1(row, column) == realm.getTileset()["base:tile/volcanic_sand"]) {
 			if (distribution(rng) < 1) {
-				static const std::vector<ItemStack> mushrooms {
-					{Item::INDIGO_MILKCAP},
-					{Item::BLACK_TRUMPET},
-					{Item::GREY_KNIGHT},
+				Game &game = realm.getGame();
+				std::vector<ItemStack> mushrooms {
+					{game, "base:item/indigo_milkcap"_id},
+					{game, "base:item/black_trumpet"_id},
+					{game, "base:item/grey_knight"_id},
 				};
 
-				realm.add(TileEntity::create<ItemSpawner>(Position(row, column), 0.0002f, mushrooms));
+				realm.add(TileEntity::create<ItemSpawner>(game, Position(row, column), 0.0002f, std::move(mushrooms)));
 			}
 		}
 	}

@@ -156,7 +156,7 @@ namespace Game3 {
 		auto &tilemap2 = *realm->tilemap2;
 		const auto &tileset = *tilemap2.tileset;
 
-		if (tilemap2(position) != tileset.getEmptyID())
+		if (tilemap2[position] != tileset.getEmptyID())
 			throw OverlapError("Can't confirm ghost at " + std::string(position));
 
 		if (details.customFn) {

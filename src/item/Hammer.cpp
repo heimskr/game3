@@ -15,7 +15,7 @@ namespace Game3 {
 		auto &player = *place.player;
 
 		if (auto building = std::dynamic_pointer_cast<Building>(realm.tileEntityAt(place.position))) {
-			if (building->tileID == Monomap::CAVE) {
+			if (building->tileID == "base:tile/cave"_id) {
 				Game &game = realm.getGame();
 				const RealmID realm_id = building->innerRealmID;
 				if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game.realms.at(realm_id))) {

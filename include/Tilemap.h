@@ -40,12 +40,20 @@ namespace Game3 {
 			return tiles[x + y * width];
 		}
 
-		inline decltype(tiles)::value_type & operator()(const Position &position) {
+		inline decltype(tiles)::value_type & operator[](const Position &position) {
 			return tiles[position.column + position.row * width];
 		}
 
-		inline const decltype(tiles)::value_type & operator()(const Position &position) const {
+		inline const decltype(tiles)::value_type & operator[](const Position &position) const {
 			return tiles[position.column + position.row * width];
+		}
+
+		inline decltype(tiles)::value_type & operator[](Index index) {
+			return tiles[index];
+		}
+
+		inline const decltype(tiles)::value_type & operator[](Index index) const {
+			return tiles[index];
 		}
 
 		inline size_t size() const { return tiles.size(); }

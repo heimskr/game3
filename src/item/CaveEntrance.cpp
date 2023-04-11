@@ -43,7 +43,7 @@ namespace Game3 {
 		Index entrance = -1;
 
 		for (const auto &[index, tile_entity]: realm.tileEntities)
-			if (tile_entity->tileID == Monomap::CAVE && tile_entity->getID() == TileEntity::BUILDING)
+			if (tile_entity->tileID == "base:tile/cave"_id && tile_entity->is("base:te/building"_id))
 				if (auto building = std::dynamic_pointer_cast<Building>(tile_entity)) {
 					realm_id = building->innerRealmID;
 					if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game.realms.at(*realm_id)))
@@ -63,9 +63,10 @@ namespace Game3 {
 			// TODO: perhaps let the player choose the seed
 			const int cave_seed = -2 * realm.seed - 5 + game.cavesGenerated;
 
-			auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, Realm::textureMap.at(Realm::CAVE));
+			auto new_tileset = game.registry<TilesetRegistry>()["base:realm/cave"];
+			auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, new_tileset);
 			auto new_biomemap = std::make_shared<BiomeMap>(realm_width, realm_height, Biome::CAVE);
-			auto new_realm = Realm::create<Cave>(*realm_id, Realm::CAVE, new_tilemap, new_biomemap, cave_seed);
+			auto new_realm = Realm::create<Cave>(*realm_id, realm.id, new_tilemap, new_biomemap, cave_seed);
 			new_realm->outdoors = false;
 			new_realm->setGame(game);
 			Position entrance_position;
@@ -76,7 +77,7 @@ namespace Game3 {
 			emplaced = true;
 		}
 
-		if (realm.add(TileEntity::create<Building>(Monomap::CAVE, position, *realm_id, entrance)) != nullptr) {
+		if (realm.add(TileEntity::create<Building>(game, "base:tile/cave"_id, position, *realm_id, entrance)) != nullptr) {
 			if (--stack.count == 0)
 				player->inventory->erase(slot);
 			player->inventory->notifyOwner();

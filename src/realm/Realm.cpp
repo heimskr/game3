@@ -359,15 +359,15 @@ namespace Game3 {
 	}
 
 	TileID Realm::getLayer1(const Position &position) const {
-		return (*tilemap1)(position);
+		return (*tilemap1)[position];
 	}
 
 	TileID Realm::getLayer2(const Position &position) const {
-		return (*tilemap2)(position);
+		return (*tilemap2)[position];
 	}
 
 	TileID Realm::getLayer3(const Position &position) const {
-		return (*tilemap3)(position);
+		return (*tilemap3)[position];
 	}
 
 	bool Realm::interactGround(const PlayerPtr &player, const Position &position) {

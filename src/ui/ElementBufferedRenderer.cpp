@@ -185,7 +185,7 @@ namespace Game3 {
 			for (Index row = 0; row < tilemap->height; ++row) {
 				for (Index column = 0; column < tilemap->width; ++column) {
 					const Position pos(row, column);
-					const auto tile = (*tilemap)(pos);
+					const auto tile = (*tilemap)[pos];
 					if (tile == lava) {
 						const float x = column * tilesize;
 						const float y = row * tilesize;
@@ -217,7 +217,7 @@ namespace Game3 {
 			for (Index row = 0; row < tilemap->height; ++row) {
 				for (Index column = 0; column < tilemap->width; ++column) {
 					const Position pos(row, column);
-					const auto tile = (*tilemap)(pos);
+					const auto tile = (*tilemap)[pos];
 					if (tile == lava) {
 						const float x = column * tilesize;
 						const float y = row * tilesize;

@@ -222,7 +222,7 @@ namespace Game3 {
 		nlohmann::json json = nlohmann::json::parse(raw);
 		Identifier type = json.at(0);
 		// TODO: make a map of handlers for different types instead of if-elsing here
-		if (type == "base:recipe_list") {
+		if (type == "base:recipe_list"_id) {
 			for (const auto &recipe_json: json.at(1))
 				addRecipe(recipe_json);
 		} else {

@@ -6,6 +6,7 @@
 #include "item/Sapling.h"
 #include "realm/Realm.h"
 #include "tileentity/Tree.h"
+#include "util/Util.h"
 
 namespace Game3 {
 	bool Sapling::use(Slot slot, ItemStack &stack, const Place &place) {
@@ -13,24 +14,19 @@ namespace Game3 {
 		auto &realm  = *place.realm;
 		const auto index = realm.getIndex(place.position);
 
-		if (realm.type != Realm::OVERWORLD)
+		if (realm.type != "data:realm/overworld"_id)
 			return false;
 
-		switch (realm.tilemap1->tiles[index]) {
-			case Monomap::GRASS:
-			case Monomap::GRASS_ALT1:
-			case Monomap::GRASS_ALT2:
-			case Monomap::LIGHT_GRASS:
-			case Monomap::DIRT:
-			case Monomap::FOREST_FLOOR:
-				break;
-			default:
-				return false;
-		}
+		const auto &tilemap = *realm.tilemap1;
+		const auto &tileset = *tilemap.tileset;
+
+		if (!realm.tilemap1->tileset->isInCategory(tileset[tilemap[index]], "base:category/tree_soil"_id))
+			return false;
 
 		auto &rng = realm.getGame().dynamicRNG;
+		static const std::vector<Identifier> trees {"base:tile/tree1"_id, "base:tile/tree2"_id, "base:tile/tree3"_id};
+		if (realm.pathMap[index] && nullptr != realm.add(TileEntity::create<Tree>(realm.getGame(), rng, choose(trees), "base:tile/tree0"_id, place.position, 0.f))) {
 
-		if (realm.pathMap[index] && nullptr != realm.add(TileEntity::create<Tree>(rng, Monomap::TREE1 + rng() % 3, Monomap::TREE0, place.position, 0.f))) {
 			if (--stack.count == 0)
 				player.inventory->erase(slot);
 			player.inventory->notifyOwner();

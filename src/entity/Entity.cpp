@@ -75,7 +75,7 @@ namespace Game3 {
 		realm->entities.erase(shared);
 	}
 
-	void Entity::init(Game &game) {
+	void Entity::init(Game &) {
 		if (texture == nullptr)
 			texture = getTexture();
 
@@ -192,13 +192,13 @@ namespace Game3 {
 
 		const auto &tileset = *realm->tilemap1->tileset;
 
-		if (!tileset.isWalkable((*realm->tilemap1)(new_position)))
+		if (!tileset.isWalkable((*realm->tilemap1)[new_position]))
 			return false;
 
-		if (tileset.isSolid((*realm->tilemap2)(new_position)))
+		if (tileset.isSolid((*realm->tilemap2)[new_position]))
 			return false;
 
-		if (tileset.isSolid((*realm->tilemap3)(new_position)))
+		if (tileset.isSolid((*realm->tilemap3)[new_position]))
 			return false;
 
 		if (auto tile_entity = realm->tileEntityAt(new_position))

@@ -46,7 +46,7 @@ namespace Game3 {
 			if (0.5 < forest_noise) {
 				static const std::vector<Identifier> trees {"base:tile/tree1"_id, "base:tile/tree2"_id, "base:tile/tree3"_id};
 				realm.add(TileEntity::create<Tree>(realm.getGame(), rng, choose(trees), "base:tile/tree0"_id, Position(row, column), Tree::MATURITY));
-				realm.setLayer1(row, column, "base:tile/forest_floor"_id);
+				realm.setLayer1({row, column}, "base:tile/forest_floor"_id);
 			}
 		}
 	}

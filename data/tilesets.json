@@ -414,6 +414,14 @@
 			"base:category/doors": [
 				"base:tile/door1",
 				"base:tile/door2"
+			],
+			"base:category/tree_soil": [
+				"base:tile/grass",
+				"base:tile/grass_alt1",
+				"base:tile/grass_alt2",
+				"base:tile/light_grass",
+				"base:tile/dirt",
+				"base:tile/forest_floor"
 			]
 		}
 	}
