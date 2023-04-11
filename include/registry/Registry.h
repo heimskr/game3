@@ -15,6 +15,7 @@
 #include "registry/Registerable.h"
 
 namespace Game3 {
+	class Game;
 	struct NamedRegistryBase;
 	struct UnnamedRegistryBase;
 
@@ -90,10 +91,6 @@ namespace Game3 {
 
 	struct NamedRegistryBase: Registry {
 		using Registry::Registry;
-
-		virtual void add(Identifier, const nlohmann::json &) {
-			throw std::runtime_error("Adding from JSON unimplemented in NamedRegistryBase");
-		}
 	};
 
 	template <typename T>
@@ -181,9 +178,7 @@ namespace Game3 {
 	struct UnnamedRegistryBase: Registry {
 		using Registry::Registry;
 
-		virtual void add(const nlohmann::json &) {
-			throw std::runtime_error("Adding from JSON unimplemented in UnnamedRegistryBase");
-		}
+		virtual void add(const Game &, const nlohmann::json &) = 0;
 	};
 
 	template <typename T>
@@ -227,6 +222,10 @@ namespace Game3 {
 				return false;
 			}
 
+			void add(const Game &, const nlohmann::json &) override {
+				throw std::runtime_error("Adding from JSON unimplemented");
+			}
+
 			inline std::shared_ptr<T> operator[](size_t counter) const {
 				return at(counter);
 			}
@@ -243,6 +242,17 @@ namespace Game3 {
 
 			inline size_t size() const {
 				return items.size();
+			}
+	};
+
+	template <typename T>
+	class UnnamedJSONRegistry: public UnnamedRegistry<T> {
+		public:
+			using UnnamedRegistry<T>::UnnamedRegistry;
+
+			void add(const Game &game, const nlohmann::json &json) override {
+				// Why.
+				static_cast<UnnamedRegistry<T> *>(this)->add(T::fromJSON(game, json));
 			}
 	};
 }

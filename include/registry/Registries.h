@@ -33,11 +33,6 @@ namespace Game3 {
 		ItemRegistry(): NamedRegistry(ID()) {}
 	};
 
-	struct CraftingRecipeRegistry: UnnamedRegistry<CraftingRecipe> {
-		static Identifier ID() { return {"base", "crafting_recipe"}; }
-		CraftingRecipeRegistry(): UnnamedRegistry(ID()) {}
-	};
-
 	struct ItemTextureRegistry: NamedRegistry<ItemTexture> {
 		static Identifier ID() { return {"base", "item_texture"}; }
 		ItemTextureRegistry(): NamedRegistry(ID()) {}

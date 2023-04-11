@@ -27,6 +27,7 @@
 #include "item/Tool.h"
 #include "realm/Keep.h"
 #include "realm/RealmFactory.h"
+#include "recipe/CraftingRecipe.h"
 #include "registry/Registries.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
@@ -69,61 +70,61 @@ namespace Game3 {
 	}
 
 	void Game::addItems() {
-		add(std::make_shared<Item>        ("base:shortsword",      "Shortsword",      100,  1));
-		add(std::make_shared<Item>        ("base:red_potion",      "Red Potion",       20,  8));
-		add(std::make_shared<Item>        ("base:coins",           "Gold",              1, 1'000'000));
-		add(std::make_shared<Item>        ("base:iron_ore",        "Iron Ore",         10, 64));
-		add(std::make_shared<Item>        ("base:copper_ore",      "Copper Ore",        8, 64));
-		add(std::make_shared<Item>        ("base:gold_ore",        "Gold Ore",         20, 64));
-		add(std::make_shared<Item>        ("base:diamond_ore",     "Diamond Ore",      80, 64));
-		add(std::make_shared<Item>        ("base:diamond",         "Diamond",         100, 64));
-		add(std::make_shared<Item>        ("base:coal",            "Coal",              5, 64));
-		add(std::make_shared<Item>        ("base:oil",             "Oil",              15, 64));
-		add(std::make_shared<Item>        ("base:wood",            "Wood",              3, 64));
-		add(std::make_shared<Item>        ("base:stone",           "Stone",             1, 64));
-		add(std::make_shared<Item>        ("base:iron_bar",        "Iron Bar",         16, 64));
-		add(std::make_shared<Sapling>     ("base:sapling",         "Sapling",           5, 64));
-		add(std::make_shared<Item>        ("base:gold_bar",        "Gold Bar",         45, 64));
-		add(std::make_shared<Furniture>   ("base:wooden_wall",     "Wooden Wall",       9, 64));
-		add(std::make_shared<Item>        ("base:plank",           "Plank",             4, 64));
-		add(std::make_shared<Item>        ("base:dirt",            "Dirt",              1, 64));
-		add(std::make_shared<Item>        ("base:brick",           "Brick",             3, 64));
-		add(std::make_shared<Item>        ("base:pot",             "Pot",              24, 64));
-		add(std::make_shared<Furniture>   ("base:plant_pot1",      "Plant Pot",        32, 64));
-		add(std::make_shared<Furniture>   ("base:plant_pot2",      "Plant Pot",        32, 64));
-		add(std::make_shared<Furniture>   ("base:plant_pot3",      "Plant Pot",        32, 64));
-		add(std::make_shared<Furniture>   ("base:tower",           "Tower",            10, 64));
-		add(std::make_shared<CaveEntrance>("base:cave_entrance",   "Cave Entrance",    50,  1));
-		add(std::make_shared<Item>        ("base:mead",            "Mead",             10, 16));
-		add(std::make_shared<Item>        ("base:honey",           "Honey",             5, 64));
-		add(std::make_shared<Bomb>        ("base:bomb",            "Bomb",             32, 64));
-		add(std::make_shared<Item>        ("base:ash",             "Ash",               1, 64));
-		add(std::make_shared<Item>        ("base:silicon",         "Silicon",           2, 64));
-		add(std::make_shared<Item>        ("base:electronics",     "Electronics",      32, 64));
-		add(std::make_shared<Item>        ("base:sulfur",          "Sulfur",           15, 64));
-		add(std::make_shared<Furniture>   ("base:cauldron",        "Cauldron",        175,  1));
-		add(std::make_shared<Furniture>   ("base:purifier",        "Purifier",        300,  1));
-		add(std::make_shared<Hammer>      ("base:iron_hammer",     "Iron Hammer",     150,  3.f));
-		add(std::make_shared<Hammer>      ("base:gold_hammer",     "Gold Hammer",     400, .75f));
-		add(std::make_shared<Hammer>      ("base:diamond_hammer",  "Diamond Hammer",  900,  1.f));
-		add(std::make_shared<Tool>        ("base:iron_axe",        "Iron Axe",        150,  3.f, ItemAttribute::Axe));
-		add(std::make_shared<Tool>        ("base:iron_pickaxe",    "Iron Pickaxe",    150,  3.f, ItemAttribute::Pickaxe));
-		add(std::make_shared<Tool>        ("base:iron_shovel",     "Iron Shovel",     120,  3.f, ItemAttribute::Shovel));
-		add(std::make_shared<Tool>        ("base:gold_axe",        "Gold Axe",        400, .75f, ItemAttribute::Axe));
-		add(std::make_shared<Tool>        ("base:gold_pickaxe",    "Gold Pickaxe",    400, .75f, ItemAttribute::Pickaxe));
-		add(std::make_shared<Tool>        ("base:gold_shovel",     "Gold Shovel",     300, .75f, ItemAttribute::Shovel));
-		add(std::make_shared<Tool>        ("base:diamond_axe",     "Diamond Axe",     900,  1.f, ItemAttribute::Axe));
-		add(std::make_shared<Tool>        ("base:diamond_pickaxe", "Diamond Pickaxe", 900,  1.f, ItemAttribute::Pickaxe));
-		add(std::make_shared<Tool>        ("base:diamond_shovel",  "Diamond Shovel",  700,  1.f, ItemAttribute::Shovel));
-		add(std::make_shared<Landfill>    ("base:sand",            "Sand",              1, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/sand"));
-		add(std::make_shared<Landfill>    ("base:volcanic_sand",   "Volcanic Sand",     3, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/volcanic_sand"));
-		add(std::make_shared<Landfill>    ("base:clay",            "Clay",              2, 64, clayRequirement));
-		add(std::make_shared<Mushroom>("base:saffron_milkcap", "Saffron Milkcap",    10, 1 ));
-		add(std::make_shared<Mushroom>("base:honey_fungus",    "Honey Fungus",       15, 18));
-		add(std::make_shared<Mushroom>("base:brittlegill",     "Golden Brittlegill", 20, 7 ));
-		add(std::make_shared<Mushroom>("base:indigo_milkcap",  "Indigo Milkcap",     20, 11));
-		add(std::make_shared<Mushroom>("base:black_trumpet",   "Black Trumpet",      20, 29));
-		add(std::make_shared<Mushroom>("base:grey_knight",     "Grey Knight",        20, 12));
+		add(std::make_shared<Item>        ("base:item/shortsword",      "Shortsword",      100,  1));
+		add(std::make_shared<Item>        ("base:item/red_potion",      "Red Potion",       20,  8));
+		add(std::make_shared<Item>        ("base:item/coins",           "Gold",              1, 1'000'000));
+		add(std::make_shared<Item>        ("base:item/iron_ore",        "Iron Ore",         10, 64));
+		add(std::make_shared<Item>        ("base:item/copper_ore",      "Copper Ore",        8, 64));
+		add(std::make_shared<Item>        ("base:item/gold_ore",        "Gold Ore",         20, 64));
+		add(std::make_shared<Item>        ("base:item/diamond_ore",     "Diamond Ore",      80, 64));
+		add(std::make_shared<Item>        ("base:item/diamond",         "Diamond",         100, 64));
+		add(std::make_shared<Item>        ("base:item/coal",            "Coal",              5, 64));
+		add(std::make_shared<Item>        ("base:item/oil",             "Oil",              15, 64));
+		add(std::make_shared<Item>        ("base:item/wood",            "Wood",              3, 64));
+		add(std::make_shared<Item>        ("base:item/stone",           "Stone",             1, 64));
+		add(std::make_shared<Item>        ("base:item/iron_bar",        "Iron Bar",         16, 64));
+		add(std::make_shared<Sapling>     ("base:item/sapling",         "Sapling",           5, 64));
+		add(std::make_shared<Item>        ("base:item/gold_bar",        "Gold Bar",         45, 64));
+		add(std::make_shared<Furniture>   ("base:item/wooden_wall",     "Wooden Wall",       9, 64));
+		add(std::make_shared<Item>        ("base:item/plank",           "Plank",             4, 64));
+		add(std::make_shared<Item>        ("base:item/dirt",            "Dirt",              1, 64));
+		add(std::make_shared<Item>        ("base:item/brick",           "Brick",             3, 64));
+		add(std::make_shared<Item>        ("base:item/pot",             "Pot",              24, 64));
+		add(std::make_shared<Furniture>   ("base:item/plant_pot1",      "Plant Pot",        32, 64));
+		add(std::make_shared<Furniture>   ("base:item/plant_pot2",      "Plant Pot",        32, 64));
+		add(std::make_shared<Furniture>   ("base:item/plant_pot3",      "Plant Pot",        32, 64));
+		add(std::make_shared<Furniture>   ("base:item/tower",           "Tower",            10, 64));
+		add(std::make_shared<CaveEntrance>("base:item/cave_entrance",   "Cave Entrance",    50,  1));
+		add(std::make_shared<Item>        ("base:item/mead",            "Mead",             10, 16));
+		add(std::make_shared<Item>        ("base:item/honey",           "Honey",             5, 64));
+		add(std::make_shared<Bomb>        ("base:item/bomb",            "Bomb",             32, 64));
+		add(std::make_shared<Item>        ("base:item/ash",             "Ash",               1, 64));
+		add(std::make_shared<Item>        ("base:item/silicon",         "Silicon",           2, 64));
+		add(std::make_shared<Item>        ("base:item/electronics",     "Electronics",      32, 64));
+		add(std::make_shared<Item>        ("base:item/sulfur",          "Sulfur",           15, 64));
+		add(std::make_shared<Furniture>   ("base:item/cauldron",        "Cauldron",        175,  1));
+		add(std::make_shared<Furniture>   ("base:item/purifier",        "Purifier",        300,  1));
+		add(std::make_shared<Hammer>      ("base:item/iron_hammer",     "Iron Hammer",     150,  3.f, 128));
+		add(std::make_shared<Hammer>      ("base:item/gold_hammer",     "Gold Hammer",     400, .75f, 128));
+		add(std::make_shared<Hammer>      ("base:item/diamond_hammer",  "Diamond Hammer",  900,  1.f, 128));
+		add(std::make_shared<Tool>        ("base:item/iron_axe",        "Iron Axe",        150,  3.f, 128, ItemAttribute::Axe));
+		add(std::make_shared<Tool>        ("base:item/iron_pickaxe",    "Iron Pickaxe",    150,  3.f,  64, ItemAttribute::Pickaxe));
+		add(std::make_shared<Tool>        ("base:item/iron_shovel",     "Iron Shovel",     120,  3.f,  64, ItemAttribute::Shovel));
+		add(std::make_shared<Tool>        ("base:item/gold_axe",        "Gold Axe",        400, .75f,  64, ItemAttribute::Axe));
+		add(std::make_shared<Tool>        ("base:item/gold_pickaxe",    "Gold Pickaxe",    400, .75f,  64, ItemAttribute::Pickaxe));
+		add(std::make_shared<Tool>        ("base:item/gold_shovel",     "Gold Shovel",     300, .75f, 512, ItemAttribute::Shovel));
+		add(std::make_shared<Tool>        ("base:item/diamond_axe",     "Diamond Axe",     900,  1.f, 512, ItemAttribute::Axe));
+		add(std::make_shared<Tool>        ("base:item/diamond_pickaxe", "Diamond Pickaxe", 900,  1.f, 512, ItemAttribute::Pickaxe));
+		add(std::make_shared<Tool>        ("base:item/diamond_shovel",  "Diamond Shovel",  700,  1.f, 512, ItemAttribute::Shovel));
+		add(std::make_shared<Landfill>    ("base:item/sand",            "Sand",              1, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/sand"));
+		add(std::make_shared<Landfill>    ("base:item/volcanic_sand",   "Volcanic Sand",     3, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/volcanic_sand"));
+		add(std::make_shared<Landfill>    ("base:item/clay",            "Clay",              2, 64, clayRequirement));
+		add(std::make_shared<Mushroom>("base:item/saffron_milkcap", "Saffron Milkcap",    10, 1 ));
+		add(std::make_shared<Mushroom>("base:item/honey_fungus",    "Honey Fungus",       15, 18));
+		add(std::make_shared<Mushroom>("base:item/brittlegill",     "Golden Brittlegill", 20, 7 ));
+		add(std::make_shared<Mushroom>("base:item/indigo_milkcap",  "Indigo Milkcap",     20, 11));
+		add(std::make_shared<Mushroom>("base:item/black_trumpet",   "Black Trumpet",      20, 29));
+		add(std::make_shared<Mushroom>("base:item/grey_knight",     "Grey Knight",        20, 12));
 	}
 
 	void Game::addGhosts() {
@@ -298,7 +299,7 @@ namespace Game3 {
 	}
 
 	void Game::addRecipe(const nlohmann::json &json) {
-		registries.at(json.at(0).get<Identifier>())->toUnnamed()->add(json.at(1));
+		registries.at(json.at(0).get<Identifier>())->toUnnamed()->add(*this, json.at(1));
 	}
 
 	void Game::tick() {

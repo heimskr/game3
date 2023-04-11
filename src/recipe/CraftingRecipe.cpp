@@ -43,12 +43,14 @@ namespace Game3 {
 		return true;
 	}
 
-	// void from_json(const nlohmann::json &json, CraftingRecipe &recipe) {
-	// 	recipe.input = json.at("input");
-	// 	recipe.output = json.at("output");
-	// 	if (auto iter = json.find("station"); iter != json.end())
-	// 		recipe.stationType = *iter;
-	// }
+	CraftingRecipe CraftingRecipe::fromJSON(const Game &game, const nlohmann::json &json) {
+		CraftingRecipe recipe;
+		recipe.input  = ItemStack::manyFromJSON(game, json.at("input"));
+		recipe.output = ItemStack::manyFromJSON(game, json.at("output"));
+		if (auto iter = json.find("station"); iter != json.end())
+			recipe.stationType = *iter;
+		return recipe;
+	}
 
 	void to_json(nlohmann::json &json, const CraftingRecipe &recipe) {
 		json["input"] = recipe.input;

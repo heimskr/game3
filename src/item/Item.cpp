@@ -12,7 +12,7 @@ namespace Game3 {
 
 // ItemTexture
 
-	ItemTexture::ItemTexture(Identifier identifier_, int x_, int y_, Identifier texture_name, int width_, int height_):
+	ItemTexture::ItemTexture(Identifier identifier_, Identifier texture_name, int x_, int y_, int width_, int height_):
 		NamedRegisterable(std::move(identifier_)),
 		x(x_),
 		y(y_),
@@ -169,6 +169,13 @@ namespace Game3 {
 	ItemStack ItemStack::fromJSON(const Game &game, const nlohmann::json &json) {
 		ItemStack out;
 		fromJSON(game, json, out);
+		return out;
+	}
+
+	std::vector<ItemStack> ItemStack::manyFromJSON(const Game &game, const nlohmann::json &json) {
+		std::vector<ItemStack> out;
+		for (const auto &item: json)
+			out.push_back(fromJSON(game, item));
 		return out;
 	}
 

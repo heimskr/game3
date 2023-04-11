@@ -4,8 +4,8 @@
 
 namespace Game3 {
 	struct Hammer: Tool {
-		Hammer(ItemID id_, const std::string &name_, MoneyCount base_price, float base_cooldown):
-			Tool(id_, name_, base_price, base_cooldown, ItemAttribute::Hammer) {}
+		Hammer(ItemID id_, const std::string &name_, MoneyCount base_price, float base_cooldown, Durability max_durability):
+			Tool(id_, name_, base_price, base_cooldown, max_durability, ItemAttribute::Hammer) {}
 
 		bool use(Slot, ItemStack &, const Place &) override;
 	};

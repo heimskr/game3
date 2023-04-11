@@ -33,7 +33,7 @@ namespace Game3 {
 
 		explicit ItemTexture() = default;
 
-		ItemTexture(Identifier, int x_, int y_, Identifier texture_name, int width_ = DEFAULT_WIDTH, int height_ = DEFAULT_HEIGHT);
+		ItemTexture(Identifier, Identifier texture_name, int x_, int y_, int width_ = DEFAULT_WIDTH, int height_ = DEFAULT_HEIGHT);
 
 		std::shared_ptr<Texture> getTexture(const Game &);
 
@@ -121,6 +121,7 @@ namespace Game3 {
 
 			static void fromJSON(const Game &, const nlohmann::json &, ItemStack &);
 			static ItemStack fromJSON(const Game &, const nlohmann::json &);
+			static std::vector<ItemStack> manyFromJSON(const Game &, const nlohmann::json &);
 
 		private:
 			Glib::RefPtr<Gdk::Pixbuf> cachedImage;

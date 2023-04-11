@@ -280,6 +280,7 @@ namespace Game3 {
 	void MainWindow::initialSetup(Game &game) {
 		game.initRegistries();
 		game.addItems();
+		game.traverseData("data");
 		game.addGhosts();
 		game.addRealms();
 		game.addEntityFactories();
@@ -306,11 +307,11 @@ namespace Game3 {
 		game->player->position = {realm->randomLand / width, realm->randomLand % width};
 		game->player->init(*game);
 		onGameLoaded();
-		game->player->inventory->add(ItemStack::withDurability(*game, "base:iron_pickaxe"));
-		game->player->inventory->add(ItemStack::withDurability(*game, "base:iron_shovel"));
-		game->player->inventory->add(ItemStack::withDurability(*game, "base:iron_axe"));
-		game->player->inventory->add(ItemStack::withDurability(*game, "base:iron_hammer"));
-		game->player->inventory->add(ItemStack(*game, "base:cave_entrance", 4));
+		game->player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_pickaxe"));
+		game->player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_shovel"));
+		game->player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_axe"));
+		game->player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_hammer"));
+		game->player->inventory->add(ItemStack(*game, "base:item/cave_entrance", 4));
 	}
 
 	void MainWindow::loadGame(const std::filesystem::path &path) {
@@ -341,7 +342,6 @@ namespace Game3 {
 		glArea.get_context()->make_current();
 		debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
 		game->player->focus(*canvas, false);
-		game->traverseData("data");
 		game->initInteractionSets();
 		canvas->game = game;
 		game->activeRealm->rebind();

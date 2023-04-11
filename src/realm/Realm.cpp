@@ -73,7 +73,6 @@ namespace Game3 {
 		tilemap3->getTexture(game)->init();
 		biomeMap = std::make_shared<BiomeMap>(json.at("biomeMap"));
 		outdoors = json.at("outdoors");
-		Game &game = getGame();
 		for (const auto &[index, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>()) {
 			auto tile_entity = TileEntity::fromJSON(game, tile_entity_json);
 			tileEntities.emplace(parseUlong(index), tile_entity);
@@ -154,7 +153,6 @@ namespace Game3 {
 
 	void Realm::tick(float delta) {
 		ticking = true;
-		Game &game = getGame();
 		for (auto &entity: entities)
 			if (entity->isPlayer()) {
 				auto player = std::dynamic_pointer_cast<Player>(entity);
