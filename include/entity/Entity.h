@@ -107,6 +107,7 @@ namespace Game3 {
 			inline bool is(const Identifier &check) const { return type == check; }
 
 		protected:
+			Game *game = nullptr;
 			std::shared_ptr<Texture> texture;
 			int variety = 0;
 

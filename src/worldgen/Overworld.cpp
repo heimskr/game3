@@ -14,6 +14,7 @@
 
 namespace Game3::WorldGen {
 	void generateOverworld(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, int noise_seed) {
+		Timer overworld_timer("GenOverworld");
 		const auto width  = realm->getWidth();
 		const auto height = realm->getHeight();
 
@@ -128,6 +129,7 @@ namespace Game3::WorldGen {
 				get_biome(row, column).postgen(row, column, rng, perlin);
 		postgen_timer.stop();
 
+		overworld_timer.stop();
 		Timer::summary();
 		Timer::clear();
 	}

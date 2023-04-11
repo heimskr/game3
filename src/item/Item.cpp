@@ -55,25 +55,25 @@ namespace Game3 {
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::makeImage(const Game &game) {
 		auto item_texture = game.registry<ItemTextureRegistry>().at(identifier);
-		auto &texture = *item_texture->texture.lock();
-		texture.init();
+		auto texture = item_texture->getTexture(game);
+		texture->init();
 		const int width  = item_texture->width;
 		const int height = item_texture->height;
-		const int channels = *texture.format == GL_RGBA? 4 : 3;
+		const int channels = *texture->format == GL_RGBA? 4 : 3;
 		const size_t row_size = channels * width;
 
 		if (!rawImage) {
 			rawImage = std::make_unique<uint8_t[]>(channels * width * height);
 			uint8_t *raw_pointer = rawImage.get();
-			uint8_t *texture_pointer = texture.data->get() + item_texture->y * *texture.width * channels + item_texture->x * channels;
+			uint8_t *texture_pointer = texture->data->get() + item_texture->y * *texture->width * channels + item_texture->x * channels;
 			for (int row = 0; row < height; ++row) {
 				std::memcpy(raw_pointer + row_size * row, texture_pointer, row_size);
-				texture_pointer += channels * *texture.width;
+				texture_pointer += channels * *texture->width;
 			}
 		}
 
 		constexpr int doublings = 3;
-		return Gdk::Pixbuf::create_from_data(rawImage.get(), Gdk::Colorspace::RGB, *texture.alpha, 8, width, height, row_size)
+		return Gdk::Pixbuf::create_from_data(rawImage.get(), Gdk::Colorspace::RGB, *texture->alpha, 8, width, height, row_size)
 		       ->scale_simple(width << doublings, height << doublings, Gdk::InterpType::NEAREST);
 	}
 
@@ -117,8 +117,7 @@ namespace Game3 {
 
 	ItemStack ItemStack::withDurability(const Game &game, const ItemID &id, Durability durability) {
 		ItemStack out(game, id, 1);
-		out.data["maxDurability"] = durability;
-		out.data["durability"]    = durability;
+		out.data["durability"] = std::make_pair(durability, durability);
 		return out;
 	}
 

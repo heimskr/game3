@@ -1,7 +1,7 @@
 ["base:texture_map", {
 	"base:texture/gangblanc":   ["resources/characters/champions/Gangblanc.png"],
 	"base:texture/item":        ["resources/missing.png"],
-	"base:texture/miner":       ["resources/characters/villager1.png"],
+	"base:texture/villager1":   ["resources/characters/villager1.png"],
 	"base:texture/blacksmith":  ["resources/characters/blacksmith.png"],
 	"base:texture/woodcutter":  ["resources/characters/woodcutter.png"],
 	"base:texture/shortsword":  ["resources/items/shortsword.png"],

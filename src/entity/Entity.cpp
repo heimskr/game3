@@ -80,7 +80,9 @@ namespace Game3 {
 		realm->entities.erase(shared);
 	}
 
-	void Entity::init(Game &) {
+	void Entity::init(Game &game_) {
+		game = &game_;
+
 		if (texture == nullptr)
 			texture = getTexture();
 
@@ -310,6 +312,9 @@ namespace Game3 {
 	}
 
 	Game & Entity::getGame() {
+		if (game != nullptr)
+			return *game;
+
 		return getRealm()->getGame();
 	}
 
@@ -318,9 +323,9 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Texture> Entity::getTexture() {
-		Game &game = getGame();
-		auto entity_texture = game.registry<EntityTextureRegistry>().at(type);
-		return game.registry<TextureRegistry>().at(entity_texture->textureID);
+		Game &game_ref = getGame();
+		auto entity_texture = game_ref.registry<EntityTextureRegistry>().at(type);
+		return game_ref.registry<TextureRegistry>().at(entity_texture->textureID);
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {
