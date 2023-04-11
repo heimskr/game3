@@ -23,11 +23,6 @@ namespace Game3 {
 		RegistryRegistry(): NamedRegistry(ID()) {}
 	};
 
-	struct DurabilityRegistry: NamedRegistry<NamedDurability> {
-		static Identifier ID() { return {"base", "durability"}; }
-		DurabilityRegistry(): NamedRegistry(ID()) {}
-	};
-
 	struct ItemRegistry: NamedRegistry<Item> {
 		static Identifier ID() { return {"base", "item"}; }
 		ItemRegistry(): NamedRegistry(ID()) {}

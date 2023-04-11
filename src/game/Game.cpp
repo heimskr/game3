@@ -53,7 +53,6 @@ namespace Game3 {
 		registries.clear();
 		registries.add<CraftingRecipeRegistry>();
 		registries.add<ItemRegistry>();
-		registries.add<DurabilityRegistry>();
 		registries.add<ItemTextureRegistry>();
 		registries.add<TextureRegistry>();
 		registries.add<EntityTextureRegistry>();
@@ -227,13 +226,7 @@ namespace Game3 {
 		Identifier type = json.at(0);
 
 		// TODO: make a map of handlers for different types instead of if-elsing here
-		if (type == "base:durability_map"_id) {
-
-			auto &durabilities = registry<DurabilityRegistry>();
-			for (const auto &[key, value]: json.at(1).items())
-				durabilities.add(Identifier(key), NamedDurability(Identifier(key), value.get<Durability>()));
-
-		} else if (type == "base:entity_texture_map"_id) {
+		if (type == "base:entity_texture_map"_id) {
 
 			auto &textures = registry<EntityTextureRegistry>();
 			for (const auto &[key, value]: json.at(1).items())
@@ -261,7 +254,7 @@ namespace Game3 {
 
 			auto &ores = registry<OreRegistry>();
 			for (const auto &[key, value]: json.at(1).items())
-				ores.add(Identifier(key), Ore(Identifier(key), ItemStack::fromJSON(*this, json.at(0)), json.at(1), json.at(2), json.at(3), json.at(4), json.at(5)));
+				ores.add(Identifier(key), Ore(Identifier(key), ItemStack::fromJSON(*this, value.at(0)), value.at(1), value.at(2), value.at(3), value.at(4), value.at(5)));
 
 		} else if (type == "base:realm_details_map"_id) {
 

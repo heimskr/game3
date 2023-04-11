@@ -1,14 +1,15 @@
 #pragma once
 
 #include "item/Item.h"
+#include "item/HasMaxDurability.h"
 
 namespace Game3 {
-	struct Tool: Item {
+	struct Tool: Item, HasMaxDurability {
 		float baseCooldown;
 		Durability maxDurability;
 
 		Tool(ItemID id_, const std::string &name_, MoneyCount base_price, float base_cooldown, Durability max_durability, ItemAttribute attribute):
-		Item(id_, name_, base_price, 1), baseCooldown(base_cooldown), maxDurability(max_durability) {
+		Item(id_, name_, base_price, 1), HasMaxDurability(max_durability), baseCooldown(base_cooldown) {
 			attributes.insert(attribute);
 		}
 	};

@@ -4,6 +4,7 @@
 #include "Tileset.h"
 #include "entity/ItemEntity.h"
 #include "game/Game.h"
+#include "item/HasMaxDurability.h"
 #include "item/Item.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
@@ -122,7 +123,7 @@ namespace Game3 {
 	}
 
 	ItemStack ItemStack::withDurability(const Game &game, const ItemID &id) {
-		return withDurability(game, id, *game.registry<DurabilityRegistry>().at(id));
+		return withDurability(game, id, dynamic_cast<HasMaxDurability &>(*game.registry<ItemRegistry>()[id]).maxDurability);
 	}
 
 	bool ItemStack::reduceDurability(Durability amount) {
@@ -158,7 +159,7 @@ namespace Game3 {
 		if (2 < json.size()) {
 			const auto &extra = json.at(2);
 			if (extra.is_string() && extra == "with_durability") {
-				const Durability durability = *game.registry<DurabilityRegistry>().at(id);
+				const Durability durability = dynamic_cast<HasMaxDurability &>(*stack.item).maxDurability;
 				stack.data["durability"] = std::make_pair(durability, durability);
 			} else {
 				stack.data = extra;

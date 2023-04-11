@@ -1,5 +1,5 @@
 ["base:ore_map", {
-	"base:ore/coal":    [["base:item/coal_ore",    1], "base:tile/coal_ore",    "base:tile/coal_ore_regen",    1.0,  16,  5.0],
+	"base:ore/coal":    [["base:item/coal",        1], "base:tile/coal_ore",    "base:tile/coal_ore_regen",    1.0,  16,  5.0],
 	"base:ore/copper":  [["base:item/copper_ore",  1], "base:tile/copper_ore",  "base:tile/copper_ore_regen",  1.0,  16,  5.0],
 	"base:ore/iron":    [["base:item/iron_ore",    1], "base:tile/iron_ore",    "base:tile/iron_ore_regen",    1.25, 16, 10.0],
 	"base:ore/gold":    [["base:item/gold_ore",    1], "base:tile/gold_ore",    "base:tile/gold_ore_regen",    3.0,   8, 30.0],
