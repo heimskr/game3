@@ -81,7 +81,6 @@ namespace Game3 {
 			void remove(std::shared_ptr<TileEntity>);
 			Position getPosition(Index) const;
 			void onMoved(const std::shared_ptr<Entity> &, const Position &);
-			inline void setGame(Game &game_) { game = &game_; }
 			Game & getGame();
 			void queueRemoval(const std::shared_ptr<Entity> &);
 			void queueRemoval(const std::shared_ptr<TileEntity> &);
@@ -205,21 +204,23 @@ namespace Game3 {
 
 		protected:
 			Realm() = default;
-			Realm(RealmID, RealmType, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr, int seed_);
-			Realm(RealmID, RealmType, TilemapPtr tilemap1_, BiomeMapPtr, int seed_);
+			Realm(Game &, RealmID, RealmType, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr, int seed_);
+			Realm(Game &, RealmID, RealmType, TilemapPtr tilemap1_, BiomeMapPtr, int seed_);
 
 			virtual void absorbJSON(const nlohmann::json &);
 			virtual void toJSON(nlohmann::json &) const;
 
 		private:
-			Game *game = nullptr;
+			Game &game;
 			bool ticking = false;
 			std::vector<std::shared_ptr<Entity>> entityRemovalQueue;
 			std::vector<std::shared_ptr<TileEntity>> tileEntityRemovalQueue;
+
 			bool isWalkable(Index row, Index column, const Tileset &) const;
 			void setLayerHelper(Index row, Index col, bool should_mark_dirty = true);
 			void setLayerHelper(Index, bool should_mark_dirty = true);
 			void resetPathMap();
+
 			static BiomeType getBiome(uint32_t seed);
 	};
 

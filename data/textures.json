@@ -1,4 +1,4 @@
-["base/texture_map", {
+["base:texture_map", {
 	"base:texture/gangblanc":   ["resources/characters/champions/Gangblanc.png"],
 	"base:texture/item":        ["resources/missing.png"],
 	"base:texture/miner":       ["resources/characters/villager1.png"],

@@ -244,6 +244,50 @@ namespace Game3 {
 			for (const auto &[key, value]: json.at(1).items())
 				details.add(Identifier(key), GhostDetails(Identifier(key), value.at(0), value.at(1), value.at(2), value.at(3), value.at(4), value.at(5)));
 
+		} else if (type == "base:item_texture_map"_id) {
+
+			auto &textures = registry<ItemTextureRegistry>();
+			for (const auto &[key, value]: json.at(1).items()) {
+				if (value.size() == 3)
+					textures.add(Identifier(key), ItemTexture(Identifier(key), value.at(0), value.at(1), value.at(2)));
+				else if (value.size() == 5)
+					textures.add(Identifier(key), ItemTexture(Identifier(key), value.at(0), value.at(1), value.at(2), value.at(3), value.at(4)));
+				else
+					throw std::invalid_argument("Expected ItemTexture JSON size to be 3 or 5, not " + std::to_string(value.size()));
+			}
+
+		} else if (type == "base:ore_map"_id) {
+
+			auto &ores = registry<OreRegistry>();
+			for (const auto &[key, value]: json.at(1).items())
+				ores.add(Identifier(key), Ore(Identifier(key), ItemStack::fromJSON(*this, json.at(0)), json.at(1), json.at(2), json.at(3), json.at(4), json.at(5)));
+
+		} else if (type == "base:realm_details_map"_id) {
+
+			auto &details = registry<RealmDetailsRegistry>();
+			for (const auto &[key, value]: json.at(1).items())
+				details.add(Identifier(key), RealmDetails(Identifier(key), value.at("tileset")));
+
+		} else if (type == "base:texture_map"_id) {
+
+			auto &textures = registry<TextureRegistry>();
+			for (const auto &[key, value]: json.at(1).items()) {
+				if (value.size() == 1)
+					textures.add(Identifier(key), Texture(Identifier(key), value.at(0)));
+				else if (value.size() == 2)
+					textures.add(Identifier(key), Texture(Identifier(key), value.at(0), value.at(1)));
+				else if (value.size() == 3)
+					textures.add(Identifier(key), Texture(Identifier(key), value.at(0), value.at(1), value.at(2)));
+				else
+					throw std::invalid_argument("Expected Texture JSON size to be 1, 2 or 3, not " + std::to_string(value.size()));
+			}
+
+		} else if (type == "base:tileset_map"_id) {
+
+			auto &tilesets = registry<TilesetRegistry>();
+			for (const auto &[key, value]: json.at(1).items())
+				tilesets.add(Identifier(key), Tileset::fromJSON(Identifier(key), value));
+
 		} else if (type == "base:recipe_list"_id) {
 
 			for (const auto &recipe_json: json.at(1))
@@ -365,7 +409,7 @@ namespace Game3 {
 	GamePtr Game::fromJSON(const nlohmann::json &json, Canvas &canvas) {
 		auto out = create(canvas);
 		for (const auto &[string, realm_json]: json.at("realms").get<std::unordered_map<std::string, nlohmann::json>>())
-			out->realms.emplace(parseUlong(string), Realm::fromJSON(*out, realm_json)).first->second->setGame(*out);
+			out->realms.emplace(parseUlong(string), Realm::fromJSON(*out, realm_json));
 		out->activeRealm = out->realms.at(json.at("activeRealmID"));
 		out->hourOffset = json.contains("hourOffset")? json.at("hourOffset").get<float>() : 0.f;
 		out->debugMode = json.contains("debugMode")? json.at("debugMode").get<bool>() : false;

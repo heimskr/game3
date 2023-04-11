@@ -2,22 +2,29 @@
 
 #include "Tilemap.h"
 #include "Tileset.h"
+#include "game/Game.h"
 
 namespace Game3 {
 	Tilemap::Tilemap(int width_, int height_, int tile_size, int set_width, int set_height, std::shared_ptr<Tileset> tileset_):
-	width(width_), height(height_), tileSize(tile_size), texture(tileset_->getTexture()), setWidth(set_width), setHeight(set_height), tileset(std::move(tileset_)) {
+	width(width_), height(height_), tileSize(tile_size), textureName(tileset_->getTextureName()), setWidth(set_width), setHeight(set_height), tileset(std::move(tileset_)) {
 		tiles.resize(width * height);
 	}
 
 	Tilemap::Tilemap(int width_, int height_, int tile_size, std::shared_ptr<Tileset> tileset_):
-	width(width_), height(height_), tileSize(tile_size), texture(tileset_->getTexture()), setWidth(*texture->width), setHeight(*texture->height), tileset(std::move(tileset_)) {
+	width(width_), height(height_), tileSize(tile_size), textureName(tileset_->getTextureName()), setWidth(*texture->width), setHeight(*texture->height), tileset(std::move(tileset_)) {
 		tiles.resize(width * height);
 	}
 
-	void Tilemap::init() {
-		texture->init();
+	void Tilemap::init(const Game &game) {
+		getTexture(game)->init();
 		setWidth = *texture->width;
 		setHeight = *texture->height;
+	}
+
+	std::shared_ptr<Texture> Tilemap::getTexture(const Game &game) {
+		if (texture)
+			return texture;
+		return texture = game.registry<TextureRegistry>()[textureName];
 	}
 
 	std::vector<Index> Tilemap::getLand(Index right_pad, Index bottom_pad) const {
@@ -30,30 +37,34 @@ namespace Game3 {
 		return land_tiles;
 	}
 
-	void to_json(nlohmann::json &json, const Tilemap &tilemap) {
-		json["height"] = tilemap.height;
-		json["setHeight"] = tilemap.setHeight;
-		json["setWidth"] = tilemap.setWidth;
-		json["texture"] = *tilemap.texture;
-		json["tileSize"] = tilemap.tileSize;
-		json["width"] = tilemap.width;
+	nlohmann::json Tilemap::toJSON(const Game &game) {
+		nlohmann::json json;
+		json["height"] = height;
+		json["setHeight"] = setHeight;
+		json["setWidth"] = setWidth;
+		json["texture"] = *getTexture(game);
+		json["tileSize"] = tileSize;
+		json["width"] = width;
 
 		// TODO: fix endianness issues
-		const auto tiles_size = tilemap.tiles.size() * sizeof(tilemap.tiles[0]);
+		const auto tiles_size = tiles.size() * sizeof(tiles[0]);
 		const auto buffer_size = ZSTD_compressBound(tiles_size);
 		auto buffer = std::vector<uint8_t>(buffer_size);
-		auto result = ZSTD_compress(&buffer[0], buffer_size, tilemap.tiles.data(), tiles_size, ZSTD_maxCLevel());
+		auto result = ZSTD_compress(&buffer[0], buffer_size, tiles.data(), tiles_size, ZSTD_maxCLevel());
 		if (ZSTD_isError(result))
 			throw std::runtime_error("Couldn't compress tiles");
 		buffer.resize(result);
 		json["tiles"] = std::move(buffer);
+		return json;
 	}
 
-	void from_json(const nlohmann::json &json, Tilemap &tilemap) {
+	Tilemap Tilemap::fromJSON(const Game &game, const nlohmann::json &json) {
+		Tilemap tilemap;
+
 		tilemap.height = json.at("height");
 		tilemap.setHeight = json.at("setHeight");
 		tilemap.setWidth = json.at("setWidth");
-		tilemap.texture = cacheTexture(json.at("texture"));
+		tilemap.texture = game.registry<TextureRegistry>()[json.at("texture").get<Identifier>()];
 		tilemap.tileSize = json.at("tileSize");
 		tilemap.width = json.at("width");
 
@@ -82,5 +93,7 @@ namespace Game3 {
 
 		if (last_result != 0)
 			throw std::runtime_error("Reached end of tile input without finishing decompression");
+
+		return tilemap;
 	}
 }

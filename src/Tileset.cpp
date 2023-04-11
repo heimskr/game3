@@ -1,8 +1,12 @@
 #include "Tileset.h"
+#include "game/Game.h"
 #include "item/Item.h"
 #include "realm/Realm.h"
 
 namespace Game3 {
+	Tileset::Tileset(Identifier identifier_):
+		NamedRegisterable(std::move(identifier_)) {}
+
 	bool Tileset::isLand(const Identifier &id) const {
 		return land.contains(id);
 	}
@@ -55,8 +59,8 @@ namespace Game3 {
 		return name;
 	}
 
-	std::shared_ptr<Texture> Tileset::getTexture() {
-		return cacheTexture(std::filesystem::path(texture));
+	std::shared_ptr<Texture> Tileset::getTexture(const Game &game) {
+		return game.registry<TextureRegistry>()[textureName];
 	}
 
 	bool Tileset::getItemStack(Game &game, const Identifier &id, ItemStack &stack) const {
@@ -138,7 +142,8 @@ namespace Game3 {
 		return names.at(id);
 	}
 
-	void from_json(const nlohmann::json &json, Tileset &tileset) {
+	Tileset Tileset::fromJSON(Identifier identifier, const nlohmann::json &json) {
+		Tileset tileset(identifier);
 		tileset.name = json.at("name");
 		tileset.empty = json.at("empty");
 		tileset.land = json.at("land");
@@ -147,7 +152,7 @@ namespace Game3 {
 		tileset.bright = json.at("bright");
 		tileset.ids = json.at("ids");
 		tileset.categories = json.at("categories");
-		tileset.texture = json.at("texture");
+		tileset.textureName = json.at("texture");
 		tileset.marchable = json.at("marchable");
 
 		std::map<Identifier, Identifier> stacks = json.at("stacks");
@@ -166,5 +171,7 @@ namespace Game3 {
 		for (const auto &[category, set]: tileset.categories)
 			for (const auto &tilename: set)
 				tileset.inverseCategories[tilename].insert(category);
+
+		return tileset;
 	}
 }

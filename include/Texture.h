@@ -20,7 +20,7 @@ namespace Game3 {
 			std::shared_ptr<std::shared_ptr<uint8_t>> data = std::make_shared<std::shared_ptr<uint8_t>>();
 
 			Texture();
-			Texture(const std::filesystem::path &, bool alpha_ = true, int filter_ = GL_NEAREST);
+			Texture(Identifier, const std::filesystem::path &, bool alpha_ = true, int filter_ = GL_NEAREST);
 
 			Texture(const Texture &) = default;
 			Texture(Texture &&) = default;
@@ -31,6 +31,9 @@ namespace Game3 {
 			void init();
 			void bind();
 			bool valid() const { return *valid_; }
+
+			static std::string filterToString(int);
+			static int stringToFilter(const std::string &);
 
 		private:
 			std::shared_ptr<bool> valid_ = std::make_shared<bool>(false);

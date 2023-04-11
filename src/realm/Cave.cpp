@@ -7,11 +7,11 @@
 #include "tileentity/Building.h"
 
 namespace Game3 {
-	Cave::Cave(RealmID id_, RealmID parent_realm, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr biome_map, int seed_):
-		Realm(id_, ID(), std::move(tilemap1_), std::move(tilemap2_), std::move(tilemap3_), std::move(biome_map), seed_), parentRealm(parent_realm) {}
+	Cave::Cave(Game &game_, RealmID id_, RealmID parent_realm, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr biome_map, int seed_):
+		Realm(game_, id_, ID(), std::move(tilemap1_), std::move(tilemap2_), std::move(tilemap3_), std::move(biome_map), seed_), parentRealm(parent_realm) {}
 
-	Cave::Cave(RealmID id_, RealmID parent_realm, TilemapPtr tilemap1_, BiomeMapPtr biome_map, int seed_):
-		Realm(id_, ID(), std::move(tilemap1_), std::move(biome_map), seed_), parentRealm(parent_realm) {}
+	Cave::Cave(Game &game_, RealmID id_, RealmID parent_realm, TilemapPtr tilemap1_, BiomeMapPtr biome_map, int seed_):
+		Realm(game_, id_, ID(), std::move(tilemap1_), std::move(biome_map), seed_), parentRealm(parent_realm) {}
 
 	Cave::~Cave() {
 		// Assumptions:

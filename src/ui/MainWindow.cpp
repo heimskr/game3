@@ -293,11 +293,10 @@ namespace Game3 {
 		initialSetup(*game);
 		auto tileset = game->registry<TilesetRegistry>().at("base:tileset/monomap");
 		auto tilemap = std::make_shared<Tilemap>(width, height, 16, tileset);
-		tilemap->init();
+		tilemap->init(*game);
 		auto biomemap = std::make_shared<BiomeMap>(width, height);
-		auto realm = Realm::create(1, "base:realm/overworld"_id, tilemap, biomemap, seed);
+		auto realm = Realm::create(*game, 1, "base:realm/overworld"_id, tilemap, biomemap, seed);
 		realm->outdoors = true;
-		realm->game = game.get();
 		std::default_random_engine rng;
 		rng.seed(seed);
 		WorldGen::generateOverworld(realm, rng, seed);
@@ -350,8 +349,6 @@ namespace Game3 {
 		connectSave();
 		for (auto &[widget, tab]: tabMap)
 			tab->reset(game);
-		for (auto &[id, realm]: game->realms)
-			realm->game = game.get();
 		game->signal_player_inventory_update().connect([this](const PlayerPtr &) {
 			inventoryTab->reset(game);
 			if (isFocused(merchantTab))
@@ -678,7 +675,7 @@ namespace Game3 {
 							if (leftover) {
 								auto &realm = *player.getRealm();
 								realm.spawn<ItemEntity>(player.position, *leftover);
-								realm.game->signal_player_inventory_update().emit(game->player);
+								realm.getGame().signal_player_inventory_update().emit(game->player);
 							}
 						}
 						return;

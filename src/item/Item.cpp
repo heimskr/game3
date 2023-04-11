@@ -12,28 +12,25 @@ namespace Game3 {
 
 // ItemTexture
 
-	ItemTexture::ItemTexture(int x_, int y_, std::shared_ptr<Texture> texture_, int width_, int height_):
-		NamedRegisterable(texture_->identifier), x(x_), y(y_), texture(std::move(texture_)), width(width_), height(height_) {}
+	ItemTexture::ItemTexture(Identifier identifier_, int x_, int y_, Identifier texture_name, int width_, int height_):
+		NamedRegisterable(std::move(identifier_)),
+		x(x_),
+		y(y_),
+		textureName(std::move(texture_name)),
+		width(width_),
+		height(height_) {}
+
+	std::shared_ptr<Texture> ItemTexture::getTexture(const Game &game) {
+		if (auto locked = texture.lock())
+			return locked;
+
+		auto new_texture = game.registry<TextureRegistry>()[textureName];
+		texture = new_texture;
+		return new_texture;
+	}
 
 	ItemTexture::operator bool() const {
 		return x != -1 && y != -1 && texture.lock() && width != -1 && height != -1;
-	}
-
-	void ItemTexture::fromJSON(Game &game, const nlohmann::json &json, ItemTexture &item_texture) {
-		item_texture.textureName = json.at(0);
-		item_texture.texture = game.registry<TextureRegistry>().at(item_texture.textureName);
-		item_texture.x = json.at(1);
-		item_texture.y = json.at(2);
-
-		if (3 < json.size())
-			item_texture.width = json.at(3);
-		else
-			item_texture.width = DEFAULT_WIDTH;
-
-		if (4 < json.size())
-			item_texture.height = json.at(4);
-		else
-			item_texture.height = DEFAULT_HEIGHT;
 	}
 
 	void to_json(nlohmann::json &json, const ItemTexture &item_texture) {

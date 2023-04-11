@@ -134,9 +134,8 @@ namespace Game3::WorldGen {
 		auto keep_tileset = game.registry<TilesetRegistry>().at("base:tileset/monomap");
 		auto keep_tilemap = std::make_shared<Tilemap>(keep_width, keep_height, 16, keep_tileset);
 		auto keep_biomemap = std::make_shared<BiomeMap>(keep_width, keep_height);
-		auto keep_realm = Realm::create<Keep>(keep_realm_id, town_origin, width, height, keep_tilemap, keep_biomemap, -seed);
+		auto keep_realm = Realm::create<Keep>(game, keep_realm_id, town_origin, width, height, keep_tilemap, keep_biomemap, -seed);
 		keep_realm->outdoors = false;
-		keep_realm->setGame(game);
 		WorldGen::generateKeep(keep_realm, rng, realm->id, keep_exit);
 		game.realms.emplace(keep_realm_id, keep_realm);
 
@@ -179,9 +178,8 @@ namespace Game3::WorldGen {
 				auto new_tileset = game.registry<TilesetRegistry>()[details->tilesetName];
 				auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, new_tileset);
 				auto new_biomemap = std::make_shared<BiomeMap>(realm_width, realm_height);
-				auto new_realm = Realm::create(realm_id, realm_type, new_tilemap, new_biomemap, -seed);
+				auto new_realm = Realm::create(game, realm_id, realm_type, new_tilemap, new_biomemap, -seed);
 				new_realm->outdoors = false;
-				new_realm->setGame(game);
 				gen_fn(new_realm, rng, realm, building_position + Position(1, 0));
 				game.realms.emplace(realm_id, new_realm);
 				realm->add(building);

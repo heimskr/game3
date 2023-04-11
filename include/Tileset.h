@@ -14,8 +14,6 @@ namespace Game3 {
 
 	class Tileset: public NamedRegisterable {
 		public:
-			using NamedRegisterable::NamedRegisterable;
-
 			bool isLand(const Identifier &) const;
 			bool isLand(TileID) const;
 			bool isWalkable(const Identifier &) const;
@@ -28,7 +26,8 @@ namespace Game3 {
 			const std::set<Identifier> & getBrightNames() const;
 			std::vector<TileID> getBrightIDs() const;
 			std::string getName() const;
-			std::shared_ptr<Texture> getTexture();
+			std::shared_ptr<Texture> getTexture(const Game &);
+			const Identifier & getTextureName() const { return textureName; }
 			bool getItemStack(Game &, const Identifier &, ItemStack &) const;
 			bool isMarchable(TileID);
 			bool isCategoryMarchable(const Identifier &category) const;
@@ -40,11 +39,14 @@ namespace Game3 {
 			const TileID & operator[](const Identifier &) const;
 			const Identifier & operator[](TileID) const;
 
+			static Tileset fromJSON(Identifier, const nlohmann::json &);
+
 		private:
+			Tileset(Identifier identifier_);
 			std::string name;
 			Identifier empty;
 			Identifier missing;
-			std::string texture;
+			Identifier textureName;
 			// TODO: consider making the sets store TileIDs instead, for performance perhaps
 			std::set<Identifier> land;
 			std::set<Identifier> walkable;
@@ -61,11 +63,7 @@ namespace Game3 {
 			std::map<Identifier, std::set<Identifier>> inverseCategories;
 			std::set<TileID> marchableCache;
 			std::set<TileID> unmarchableCache;
-
-			friend void from_json(const nlohmann::json &, Tileset &);
 	};
 
 	using TilesetPtr = std::shared_ptr<Tileset>;
-
-	void from_json(const nlohmann::json &, Tileset &);
 }

@@ -33,11 +33,11 @@ namespace Game3 {
 
 		explicit ItemTexture() = default;
 
-		ItemTexture(int x_, int y_, std::shared_ptr<Texture>, int width_ = DEFAULT_WIDTH, int height_ = DEFAULT_HEIGHT);
+		ItemTexture(Identifier, int x_, int y_, Identifier texture_name, int width_ = DEFAULT_WIDTH, int height_ = DEFAULT_HEIGHT);
 
-		operator bool() const;
+		std::shared_ptr<Texture> getTexture(const Game &);
 
-		static void fromJSON(Game &, const nlohmann::json &, ItemTexture &);
+		explicit operator bool() const;
 	};
 
 	void to_json(nlohmann::json &, const ItemTexture &);

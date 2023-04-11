@@ -66,9 +66,8 @@ namespace Game3 {
 			auto new_tileset = game.registry<TilesetRegistry>()["base:realm/cave"];
 			auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, new_tileset);
 			auto new_biomemap = std::make_shared<BiomeMap>(realm_width, realm_height, Biome::CAVE);
-			auto new_realm = Realm::create<Cave>(*realm_id, realm.id, new_tilemap, new_biomemap, cave_seed);
+			auto new_realm = Realm::create<Cave>(game, *realm_id, realm.id, new_tilemap, new_biomemap, cave_seed);
 			new_realm->outdoors = false;
-			new_realm->setGame(game);
 			Position entrance_position;
 			WorldGen::generateCave(new_realm, game.dynamicRNG, cave_seed, realm.getIndex(exit), entrance_position, realm.id);
 			entrance = new_realm->getIndex(entrance_position);
