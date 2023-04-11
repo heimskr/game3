@@ -316,19 +316,20 @@ namespace Game3 {
 		}
 	}
 
-	Inventory Inventory::fromJSON(const nlohmann::json &json, const std::shared_ptr<Agent> &owner) {
-		Game &game = owner->getRealm()->getGame();
+	Inventory Inventory::fromJSON(Game &game, const nlohmann::json &json, const std::shared_ptr<Agent> &owner) {
 		Inventory out(owner, 0);
 
-		for (const auto &[key, val]: json.at("storage").items())
-			out.storage.at(parseUlong(key)) = ItemStack::fromJSON(game, val);
+		if (auto iter = json.find("storage"); iter != json.end())
+			for (const auto &[key, val]: iter->items())
+				out.storage.at(parseUlong(key)) = ItemStack::fromJSON(game, val);
 		out.slotCount  = json.at("slotCount");
 		out.activeSlot = json.at("activeSlot");
 		return out;
 	}
 
 	void to_json(nlohmann::json &json, const Inventory &inventory) {
-		json["storage"]    = inventory.storage;
+		for (const auto &[key, val]: inventory.storage)
+			json["storage"][std::to_string(key)] = val;
 		json["slotCount"]  = inventory.slotCount;
 		json["activeSlot"] = inventory.activeSlot;
 	}

@@ -61,12 +61,14 @@ namespace Game3 {
 
 			inline size_t size() const { return tiles.size(); }
 
-			nlohmann::json toJSON(const Game &);
+
 			static Tilemap fromJSON(const Game &, const nlohmann::json &);
 
 		private:
 			std::shared_ptr<Texture> texture;
 	};
+
+	void to_json(nlohmann::json &, const Tilemap &);
 
 	using TilemapPtr = std::shared_ptr<Tilemap>;
 }

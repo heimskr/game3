@@ -37,25 +37,23 @@ namespace Game3 {
 		return land_tiles;
 	}
 
-	nlohmann::json Tilemap::toJSON(const Game &game) {
-		nlohmann::json json;
-		json["height"] = height;
-		json["setHeight"] = setHeight;
-		json["setWidth"] = setWidth;
-		json["tileSize"] = tileSize;
-		json["width"] = width;
-		json["tileset"] = tileset->identifier;
+	void to_json(nlohmann::json &json, const Tilemap &tilemap) {
+		json["height"] = tilemap.height;
+		json["setHeight"] = tilemap.setHeight;
+		json["setWidth"] = tilemap.setWidth;
+		json["tileSize"] = tilemap.tileSize;
+		json["width"] = tilemap.width;
+		json["tileset"] = tilemap.tileset->identifier;
 
 		// TODO: fix endianness issues
-		const auto tiles_size = tiles.size() * sizeof(tiles[0]);
+		const auto tiles_size = tilemap.tiles.size() * sizeof(tilemap.tiles[0]);
 		const auto buffer_size = ZSTD_compressBound(tiles_size);
 		auto buffer = std::vector<uint8_t>(buffer_size);
-		auto result = ZSTD_compress(&buffer[0], buffer_size, tiles.data(), tiles_size, ZSTD_maxCLevel());
+		auto result = ZSTD_compress(&buffer[0], buffer_size, tilemap.tiles.data(), tiles_size, ZSTD_maxCLevel());
 		if (ZSTD_isError(result))
 			throw std::runtime_error("Couldn't compress tiles");
 		buffer.resize(result);
 		json["tiles"] = std::move(buffer);
-		return json;
 	}
 
 	Tilemap Tilemap::fromJSON(const Game &game, const nlohmann::json &json) {

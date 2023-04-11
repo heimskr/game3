@@ -24,7 +24,7 @@
 #include "util/Util.h"
 #include "worldgen/Overworld.h"
 
-#define USE_CBOR
+// #define USE_CBOR
 
 namespace Game3 {
 	static std::chrono::milliseconds arrowTime {100};

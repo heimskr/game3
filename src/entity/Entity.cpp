@@ -43,14 +43,14 @@ namespace Game3 {
 			json["money"] = money;
 	}
 
-	void Entity::absorbJSON(Game &, const nlohmann::json &json) {
+	void Entity::absorbJSON(Game &game, const nlohmann::json &json) {
 		type      = json.at("type");
 		position  = json.at("position");
 		realmID   = json.at("realmID");
 		direction = json.at("direction");
 		health    = json.at("health");
 		if (json.contains("inventory"))
-			inventory = std::make_shared<Inventory>(Inventory::fromJSON(json.at("inventory"), shared_from_this()));
+			inventory = std::make_shared<Inventory>(Inventory::fromJSON(game, json.at("inventory"), shared_from_this()));
 		if (json.contains("path"))
 			path = json.at("path").get<std::list<Direction>>();
 		if (json.contains("money"))

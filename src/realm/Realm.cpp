@@ -507,9 +507,9 @@ namespace Game3 {
 		json["id"] = id;
 		json["type"] = type;
 		json["seed"] = seed;
-		json["tilemap1"] = tilemap1->toJSON(game);
-		json["tilemap2"] = tilemap2->toJSON(game);
-		json["tilemap3"] = tilemap3->toJSON(game);
+		json["tilemap1"] = *tilemap1;
+		json["tilemap2"] = *tilemap2;
+		json["tilemap3"] = *tilemap3;
 		json["biomeMap"] = *biomeMap;
 		json["outdoors"] = outdoors;
 		json["tileEntities"] = std::unordered_map<std::string, nlohmann::json>();
