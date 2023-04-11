@@ -14,17 +14,17 @@ namespace Game3::WorldGen {
 
 		for (int column = 1; column < width - 1; ++column) {
 			realm->setLayer2(column, "base:tile/wall_we"_id);
-			realm->setLayer2(height - 1, column, "base:tile/wall_we"_id);
+			realm->setLayer2({height - 1, column}, "base:tile/wall_we"_id);
 		}
 
 		for (int row = 1; row < height - 1; ++row) {
-			realm->setLayer2(row, 0, "base:tile/wall_ns"_id);
-			realm->setLayer2(row, width - 1, "base:tile/wall_ns"_id);
+			realm->setLayer2({row, 0}, "base:tile/wall_ns"_id);
+			realm->setLayer2({row, width - 1}, "base:tile/wall_ns"_id);
 		}
 
 		for (int row = 0; row < height; ++row)
 			for (int column = 0; column < width; ++column)
-				realm->setLayer1(row, column, "base:tile/floor"_id);
+				realm->setLayer1({row, column}, "base:tile/floor"_id);
 
 		realm->setLayer2(0, "base:tile/wall_se"_id);
 		realm->setLayer2(width - 1, "base:tile/wall_sw"_id);

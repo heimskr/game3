@@ -20,12 +20,14 @@ namespace Game3::WorldGen {
 
 		auto set = [&](auto &&...args) { realm->setLayer2(std::forward<decltype(args)>(args)...); };
 
-		set(width + 1, choose(Monomap::PLANTS, rng));
-		set(2 * width - 2, choose(Monomap::PLANTS, rng));
-		set(width * (height - 1) - 2, choose(Monomap::PLANTS, rng));
-		set(width * (height - 2) + 1, choose(Monomap::PLANTS, rng));
+		const auto &tileset = realm->getTileset();
+		const auto &plants = tileset.getTilesByCategory("base:category/plants"_id);
+		set(width + 1, choose(plants, rng));
+		set(2 * width - 2, choose(plants, rng));
+		set(width * (height - 1) - 2, choose(plants, rng));
+		set(width * (height - 2) + 1, choose(plants, rng));
 
-		set(1, width / 2, Monomap::FURNACE);
+		set(Position(1, width / 2), "base:tile/furnace"_id);
 
 		constexpr Index table_padding_x = 4;
 		constexpr Index table_padding_y = 3;
@@ -39,26 +41,27 @@ namespace Game3::WorldGen {
 			Index row = table_start + table * table_spacing;
 
 			// Chairs at the left/right edges of the table
-			set(row, table_padding_x, Monomap::CHAIR_W);
-			set(row, width - table_padding_x - 1, Monomap::CHAIR_E);
+			set(Position(row, table_padding_x), "base:tile/chair_w"_id);
+			set(Position(row, width - table_padding_x - 1), "base:tile/chair_e"_id);
 
 			// Left/right edges of the table
-			set(row, table_padding_x + 1, Monomap::TABLE_W);
-			set(row, width - table_padding_x - 2, Monomap::TABLE_E);
+			set(Position(row, table_padding_x + 1), "base:tile/table_w"_id);
+			set(Position(row, width - table_padding_x - 2), "base:tile/table_e"_id);
 
 			// Table interior + chairs above/below tables
 			for (Index col = table_padding_x + 2; col < width - table_padding_x - 2; ++col) {
-				set(row, col, Monomap::TABLE_WE);
+				set(Position(row, col), "base:tile/table_we"_id);
 				if (rng() % 3 == 0) {
-					realm->spawn<ItemEntity>({row, col}, ItemStack(Item::MEAD));
-					static const std::vector<ItemStack> spawnables {{Item::MEAD}};
-					realm->add(TileEntity::create<ItemSpawner>(Position(row, col), 0.0001f, spawnables));
+					Game &game = realm->getGame();
+					realm->spawn<ItemEntity>({row, col}, ItemStack(game, "base:item/mead"_id));
+					static const std::vector<ItemStack> spawnables {{game, "base:item/mead"_id}};
+					realm->add(TileEntity::create<ItemSpawner>(game, Position(row, col), 0.0001f, spawnables));
 				}
 
 				if (2 < table_spacing)
-					set(row - 1, col, Monomap::CHAIR_N);
+					set(Position(row - 1, col), "base:tile/chair_n"_id);
 				if (3 < table_spacing)
-					set(row + 1, col, Monomap::CHAIR_S);
+					set(Position(row + 1, col), "base:tile/chair_s"_id);
 			}
 		}
 

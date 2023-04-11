@@ -49,3 +49,7 @@ namespace Game3 {
 		return Identifier(string);
 	}
 }
+
+std::ostream & operator<<(std::ostream &os, const Game3::Identifier &id) {
+	return os << id.str();
+}

@@ -21,7 +21,7 @@ namespace Game3 {
 		//    -> If we find one cave entrance in a realm, we can stop after destroying its linked cave and we don't have to look for more entrances.
 		auto &game = getGame();
 		for (const auto &[index, tile_entity]: tileEntities) {
-			if (tile_entity->tileID != "base:tile/cave")
+			if (tile_entity->tileID != "base:tile/cave"_id)
 				continue;
 			if (auto building = std::dynamic_pointer_cast<Building>(tile_entity)) {
 				if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game.realms.at(building->innerRealmID)))
@@ -46,18 +46,18 @@ namespace Game3 {
 
 		Game &game = getGame();
 
-		if (tile_id == "base:tile/cave_coal")
-			ore_stack.emplace(game, "base:item/coal", 1);
-		else if (tile_id == "base:tile/cave_copper")
-			ore_stack.emplace(game, "base:item/copper_ore", 1);
-		else if (tile_id == "base:tile/cave_diamond")
-			ore_stack.emplace(game, "base:item/diamond_ore", 1);
-		else if (tile_id == "base:tile/cave_gold")
-			ore_stack.emplace(game, "base:item/gold_ore", 1);
-		else if (tile_id == "base:tile/cave_iron")
-			ore_stack.emplace(game, "base:item/iron_ore", 1);
-		else if (tile_id == "base:tile/cave_wall")
-			ore_stack.emplace(game, "base:item/stone", 1);
+		if (tile_id == "base:tile/cave_coal"_id)
+			ore_stack.emplace(game, "base:item/coal"_id, 1);
+		else if (tile_id == "base:tile/cave_copper"_id)
+			ore_stack.emplace(game, "base:item/copper_ore"_id, 1);
+		else if (tile_id == "base:tile/cave_diamond"_id)
+			ore_stack.emplace(game, "base:item/diamond_ore"_id, 1);
+		else if (tile_id == "base:tile/cave_gold"_id)
+			ore_stack.emplace(game, "base:item/gold_ore"_id, 1);
+		else if (tile_id == "base:tile/cave_iron"_id)
+			ore_stack.emplace(game, "base:item/iron_ore"_id, 1);
+		else if (tile_id == "base:tile/cave_wall"_id)
+			ore_stack.emplace(game, "base:item/stone"_id, 1);
 
 		if (ore_stack) {
 			Inventory &inventory = *player->inventory;

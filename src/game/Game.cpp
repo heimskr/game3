@@ -64,6 +64,7 @@ namespace Game3 {
 		registries.add<OreRegistry>();
 		registries.add<RealmFactoryRegistry>();
 		registries.add<RealmTypeRegistry>();
+		registries.add<RealmDetailsRegistry>();
 		// TODO: plugins
 	}
 
@@ -152,7 +153,7 @@ namespace Game3 {
 		add(TileEntityFactory::create<Tree>());
 	}
 
-	void Game::addRealmTypes() {
+	void Game::addRealms() {
 		auto &types = registry<RealmTypeRegistry>();
 		auto &factories = registry<RealmFactoryRegistry>();
 
@@ -162,11 +163,11 @@ namespace Game3 {
 		};
 
 		// ...
-		addRealm.operator()<Realm>("base:realm/overworld");
-		addRealm.operator()<Realm>("base:realm/house");
-		addRealm.operator()<Realm>("base:realm/blacksmith");
-		addRealm.operator()<Realm>("base:realm/cave");
-		addRealm.operator()<Realm>("base:realm/tavern");
+		addRealm.operator()<Realm>("base:realm/overworld"_id);
+		addRealm.operator()<Realm>("base:realm/house"_id);
+		addRealm.operator()<Realm>("base:realm/blacksmith"_id);
+		addRealm.operator()<Realm>("base:realm/cave"_id);
+		addRealm.operator()<Realm>("base:realm/tavern"_id);
 		addRealm.operator()<Keep>(Keep::ID());
 	}
 

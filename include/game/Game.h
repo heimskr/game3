@@ -64,7 +64,7 @@ namespace Game3 {
 			void addGhosts();
 			void addEntityFactories();
 			void addTileEntityFactories();
-			void addRealmTypes();
+			void addRealms();
 			void initEntities();
 			void initInteractionSets();
 			void add(std::shared_ptr<Item>);

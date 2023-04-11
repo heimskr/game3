@@ -1,0 +1,8 @@
+["base:realm_details_map", {
+	"base:realm/overworld":  {"tileset": "base:tileset/monomap"},
+	"base:realm/house":      {"tileset": "base:tileset/monomap"},
+	"base:realm/blacksmith": {"tileset": "base:tileset/monomap"},
+	"base:realm/cave":       {"tileset": "base:tileset/monomap"},
+	"base:realm/tavern":     {"tileset": "base:tileset/monomap"},
+	"base:realm/keep":       {"tileset": "base:tileset/keep"   }
+}]

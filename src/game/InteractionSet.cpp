@@ -13,22 +13,24 @@ namespace Game3 {
 		const auto &position = place.position;
 		auto &player = *place.player;
 		auto &realm  = *place.realm;
+		auto &game   = realm.getGame();
 		auto &inventory = *player.inventory;
 
 		const Index index = realm.getIndex(position);
+		auto &tileset = realm.getTileset();
 		auto &tilemap2 = realm.tilemap2;
-		const TileID tile1 = place.getLayer1();
-		const TileID tile2 = place.getLayer2();
+		const auto &tile1 = tileset[place.getLayer1()];
+		const auto &tile2 = tileset[place.getLayer2()];
 
 		if (auto *active = inventory.getActive()) {
 			if (active->item->canUseOnWorld() && active->item->use(inventory.activeSlot, *active, place))
 				return true;
 
+
 			if (active->has(ItemAttribute::Hammer)) {
-				auto &tileset = *tileSets.at(realm.type);
 				const TileID tile2 = tilemap2->tiles.at(index);
 				ItemStack stack;
-				if (tileset.getItemStack(tile2, stack) && !inventory.add(stack)) {
+				if (tileset.getItemStack(game, tileset[tile2], stack) && !inventory.add(stack)) {
 					if (active->reduceDurability())
 						inventory.erase(inventory.activeSlot);
 					realm.setLayer2(position, tileset.getEmpty());
@@ -37,44 +39,39 @@ namespace Game3 {
 			}
 
 			if (active->has(ItemAttribute::Shovel)) {
-				switch (tile2) {
-					case Monomap::ASH: {
-						realm.setLayer2(position, Monomap::EMPTY);
-						player.give({Item::ASH, 1});
-						realm.getGame().activateContext();
-						realm.reupload();
-						return true;
-					}
-
-					default:
-						break;
+				if (tile2 == "base:tile/ash"_id) {
+					realm.setLayer2(position, "base:tile/empty"_id);
+					player.give({game, "base:item/ash"_id, 1});
+					realm.getGame().activateContext();
+					realm.reupload();
+					return true;
 				}
 			}
 		}
 
-		std::optional<ItemID> item;
+		std::optional<Identifier> item;
 		std::optional<ItemAttribute> attribute;
 
-		if (tile1 == Monomap::SAND) {
-			item.emplace(Item::SAND);
+		if (tile1 == "base:tile/sand"_id) {
+			item.emplace("base:item/sand"_id);
 			attribute.emplace(ItemAttribute::Shovel);
-		} else if (tile1 == Monomap::SHALLOW_WATER) {
-			item.emplace(Item::CLAY);
+		} else if (tile1 == "base:tile/shallow_water"_id) {
+			item.emplace("base:item/clay"_id);
 			attribute.emplace(ItemAttribute::Shovel);
-		} else if (tile1 == Monomap::VOLCANIC_SAND) {
-			item.emplace(Item::VOLCANIC_SAND);
+		} else if (tile1 == "base:tile/volcanic_sand"_id) {
+			item.emplace("base:item/volcanic_sand"_id);
 			attribute.emplace(ItemAttribute::Shovel);
-		} else if (Monomap::dirtSet.contains(tile1)) {
-			item.emplace(Item::DIRT);
+		} else if (tileset.isInCategory(tile1, "base:category/dirt")) {
+			item.emplace("base:item/dirt"_id);
 			attribute.emplace(ItemAttribute::Shovel);
-		} else if (tile1 == Monomap::STONE) {
-			item.emplace(Item::STONE);
+		} else if (tile1 == "base:tile/stone"_id) {
+			item.emplace("base:item/stone"_id);
 			attribute.emplace(ItemAttribute::Pickaxe);
 		}
 
 		if (item && attribute && !player.hasTooldown()) {
 			if (auto *stack = inventory.getActive()) {
-				if (stack->has(*attribute) && !inventory.add({*item, 1})) {
+				if (stack->has(*attribute) && !inventory.add({game, *item, 1})) {
 					player.setTooldown(1.f);
 					if (stack->reduceDurability())
 						inventory.erase(inventory.activeSlot);
@@ -92,11 +89,10 @@ namespace Game3 {
 	bool StandardInteractions::damageGround(const Place &place) const {
 		// TODO: handle other tilemaps
 
-		const auto tile3 = place.getLayer3();
-		switch (tile3) {
-			case Monomap::CHARRED_STUMP:
-				place.realm->setLayer3(place.position, Monomap::EMPTY);
-				return true;
+		const auto &tile3 = place.realm->getTileset()[place.getLayer3()];
+		if (tile3 == "base:tile/charred_stump"_id) {
+			place.realm->setLayer3(place.position, "base:tile/empty"_id);
+			return true;
 		}
 
 		return false;

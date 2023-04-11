@@ -41,7 +41,7 @@ namespace Game3 {
 		} else if (0.8 < noise) {
 			realm.setLayer1({row, column}, "base:tile/stone"_id);
 		} else {
-			realm.setLayer1(row, column, choose(grasses, rng));
+			realm.setLayer1({row, column}, choose(grasses, rng));
 			const double forest_noise = forestPerlin->GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.5);
 			if (0.5 < forest_noise) {
 				static const std::vector<Identifier> trees {"base:tile/tree1"_id, "base:tile/tree2"_id, "base:tile/tree3"_id};

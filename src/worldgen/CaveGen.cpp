@@ -32,50 +32,50 @@ namespace Game3::WorldGen {
 
 		for (Index row = 0; row < height; ++row)
 			for (Index column = 0; column < width; ++column) {
-				realm->setLayer1(row, column, "base:tile/dirt"_id);
+				realm->setLayer1({row, column}, "base:tile/dirt"_id);
 				const double noise = perlin.GetValue(row / noise_zoom, column / noise_zoom, 0.1);
 				if (noise < -.95) {
-					realm->setLayer2(row, column, "base:tile/cave_iron"_id);
-					realm->setLayer3(row, column, "base:tile/void"_id);
+					realm->setLayer2({row, column}, "base:tile/cave_iron"_id);
+					realm->setLayer3({row, column}, "base:tile/void"_id);
 				} else if (noise < -.85) {
-					realm->setLayer2(row, column, "base:tile/cave_wall"_id);
-					realm->setLayer3(row, column, "base:tile/void"_id);
+					realm->setLayer2({row, column}, "base:tile/cave_wall"_id);
+					realm->setLayer3({row, column}, "base:tile/void"_id);
 				} else if (noise < -.825) {
-					realm->setLayer2(row, column, "base:tile/cave_diamond"_id);
-					realm->setLayer3(row, column, "base:tile/void"_id);
+					realm->setLayer2({row, column}, "base:tile/cave_diamond"_id);
+					realm->setLayer3({row, column}, "base:tile/void"_id);
 				} else if (noise < -.725) {
-					realm->setLayer2(row, column, "base:tile/cave_wall"_id);
-					realm->setLayer3(row, column, "base:tile/void"_id);
+					realm->setLayer2({row, column}, "base:tile/cave_wall"_id);
+					realm->setLayer3({row, column}, "base:tile/void"_id);
 				} else if (noise < -.7) {
-					realm->setLayer2(row, column, "base:tile/cave_gold"_id);
-					realm->setLayer3(row, column, "base:tile/void"_id);
+					realm->setLayer2({row, column}, "base:tile/cave_gold"_id);
+					realm->setLayer3({row, column}, "base:tile/void"_id);
 				} else if (noise < -.6) {
-					realm->setLayer2(row, column, "base:tile/cave_wall"_id);
-					realm->setLayer3(row, column, "base:tile/void"_id);
+					realm->setLayer2({row, column}, "base:tile/cave_wall"_id);
+					realm->setLayer3({row, column}, "base:tile/void"_id);
 				} else if (noise < -.55) {
-					realm->setLayer2(row, column, "base:tile/cave_copper"_id);
-					realm->setLayer3(row, column, "base:tile/void"_id);
+					realm->setLayer2({row, column}, "base:tile/cave_copper"_id);
+					realm->setLayer3({row, column}, "base:tile/void"_id);
 				} else if (noise < -.45) {
-					realm->setLayer2(row, column, "base:tile/cave_wall"_id);
-					realm->setLayer3(row, column, "base:tile/void"_id);
+					realm->setLayer2({row, column}, "base:tile/cave_wall"_id);
+					realm->setLayer3({row, column}, "base:tile/void"_id);
 				} else if (noise < -.375) {
-					realm->setLayer2(row, column, "base:tile/cave_coal"_id);
-					realm->setLayer3(row, column, "base:tile/void"_id);
+					realm->setLayer2({row, column}, "base:tile/cave_coal"_id);
+					realm->setLayer3({row, column}, "base:tile/void"_id);
 				} else if (noise < -.1) {
-					realm->setLayer2(row, column, "base:tile/cave_wall"_id);
-					realm->setLayer3(row, column, "base:tile/void"_id);
+					realm->setLayer2({row, column}, "base:tile/cave_wall"_id);
+					realm->setLayer3({row, column}, "base:tile/void"_id);
 				} else if (noise < .1) {
-					realm->setLayer2(row, column, "base:tile/cave_wall"_id);
+					realm->setLayer2({row, column}, "base:tile/cave_wall"_id);
 				} else if (noise < .11) {
-					realm->setLayer2(row, column, "base:tile/cave_iron"_id);
+					realm->setLayer2({row, column}, "base:tile/cave_iron"_id);
 				} else if (noise < .1125) {
-					realm->setLayer2(row, column, "base:tile/cave_diamond"_id);
+					realm->setLayer2({row, column}, "base:tile/cave_diamond"_id);
 				} else if (noise < .12) {
-					realm->setLayer2(row, column, "base:tile/cave_copper"_id);
+					realm->setLayer2({row, column}, "base:tile/cave_copper"_id);
 				} else if (noise < .1225) {
-					realm->setLayer2(row, column, "base:tile/cave_gold"_id);
+					realm->setLayer2({row, column}, "base:tile/cave_gold"_id);
 				} else if (noise < .13) {
-					realm->setLayer2(row, column, "base:tile/cave_coal"_id);
+					realm->setLayer2({row, column}, "base:tile/cave_coal"_id);
 				} else
 					inside.emplace_back(row, column);
 			}

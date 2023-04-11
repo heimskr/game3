@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ostream>
 #include <stdexcept>
 #include <string>
 
@@ -52,6 +53,8 @@ namespace Game3 {
 
 	Identifier operator""_id(const char *string, size_t);
 }
+
+std::ostream & operator<<(std::ostream &, const Game3::Identifier &);
 
 namespace std {
 	template <>

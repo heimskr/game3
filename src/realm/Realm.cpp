@@ -21,6 +21,10 @@
 #include "worldgen/Keep.h"
 
 namespace Game3 {
+	void from_json(const nlohmann::json &json, RealmDetails &details) {
+		details.tilesetName = json.at("tileset");
+	}
+
 	Realm::Realm(RealmID id_, RealmType type_, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr biome_map, int seed_):
 	id(id_), type(type_), tilemap1(std::move(tilemap1_)), tilemap2(std::move(tilemap2_)), tilemap3(std::move(tilemap3_)), biomeMap(std::move(biome_map)), seed(seed_) {
 		tilemap1->init();
@@ -76,7 +80,7 @@ namespace Game3 {
 			tileEntities.emplace(parseUlong(index), tile_entity);
 			tile_entity->setRealm(shared);
 			tile_entity->onSpawn();
-			if (tile_entity_json.at("id").get<Identifier>() == "base:te/ghost")
+			if (tile_entity_json.at("id").get<Identifier>() == "base:te/ghost"_id)
 				++ghostCount;
 		}
 		const auto &tileset = getTileset();

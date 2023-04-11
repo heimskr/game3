@@ -252,7 +252,7 @@ namespace Game3 {
 
 	std::optional<Slot> Inventory::find(ItemID id) const {
 		for (const auto &[slot, stack]: storage)
-			if (stack.item->id == id)
+			if (stack.item->identifier == id)
 				return slot;
 		return std::nullopt;
 	}

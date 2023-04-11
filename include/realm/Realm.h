@@ -19,6 +19,17 @@ namespace Game3 {
 	class Game;
 	class SpriteRenderer;
 
+	struct RealmDetails: NamedRegisterable {
+		Identifier tilesetName;
+		RealmDetails():
+			NamedRegisterable(Identifier()) {}
+		RealmDetails(Identifier identifier_, Identifier tileset_name):
+			NamedRegisterable(std::move(identifier_)),
+			tilesetName(std::move(tileset_name)) {}
+	};
+
+	void from_json(const nlohmann::json &, RealmDetails &);
+
 	class Realm: public std::enable_shared_from_this<Realm> {
 		public:
 			RealmID id;

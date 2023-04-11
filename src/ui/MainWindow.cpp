@@ -281,7 +281,7 @@ namespace Game3 {
 		game.initRegistries();
 		game.addItems();
 		game.addGhosts();
-		game.addRealmTypes();
+		game.addRealms();
 		game.addEntityFactories();
 		game.addTileEntityFactories();
 		game.initEntities();

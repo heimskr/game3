@@ -21,14 +21,14 @@ namespace Game3::WorldGen {
 		const Index exit_index = generateIndoors(realm, rng, parent_realm, entrance);
 
 		const auto &tileset2 = *realm->tilemap2->tileset;
-		const auto &plants = tileset2.getTilesByCategory("base:category/plants");
+		const auto &plants = tileset2.getTilesByCategory("base:category/plants"_id);
 
 		realm->setLayer2(width + 1, choose(plants, rng));
 		realm->setLayer2(2 * width - 2, choose(plants, rng));
 		realm->setLayer2(width * (height - 1) - 2, choose(plants, rng));
 		realm->setLayer2(width * (height - 2) + 1, choose(plants, rng));
 
-		const auto &beds = tileset2.getTilesByCategory("base:category/beds");
+		const auto &beds = tileset2.getTilesByCategory("base:category/beds"_id);
 		std::array<Index, 2> edges {1, width - 2};
 		const Position bed_position(2 + rng() % (height - 4), choose(edges, rng));
 		realm->setLayer2(realm->getIndex(bed_position), choose(beds, rng));
@@ -36,7 +36,7 @@ namespace Game3::WorldGen {
 
 		const auto house_position = entrance - Position(1, 0);
 		realm->spawn<Miner>(realm->getPosition(exit_index - width), parent_realm->id, realm->id, house_position, parent_realm->closestTileEntity<Building>(house_position,
-			[](const auto &building) { return building->tileID == Monomap::KEEP_SW; }));
+			[](const auto &building) { return building->tileID == "base:tile/keep_sw"_id; }));
 
 		switch(rng() % 2) {
 			case 0: {
@@ -67,7 +67,8 @@ namespace Game3::WorldGen {
 			}
 
 			case 1: {
-				auto chest = TileEntity::create<Chest>(0, realm->getPosition(width * 3 / 2), "Chest");
+				// Tile identifier here used to be 0.
+				auto chest = TileEntity::create<Chest>(realm->getGame(), "base:tile/empty"_id, realm->getPosition(width * 3 / 2), "Chest");
 				chest->setInventory(4);
 				realm->add(chest);
 				break;

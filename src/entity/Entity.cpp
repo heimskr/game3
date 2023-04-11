@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "Position.h"
 #include "Tileset.h"
 #include "entity/Entity.h"
 #include "entity/EntityFactory.h"

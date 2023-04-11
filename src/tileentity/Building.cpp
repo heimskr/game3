@@ -45,12 +45,14 @@ namespace Game3 {
 			return;
 
 		auto realm = getRealm();
-		auto &tilemap = *realm->tilemap2;
+		const auto &tilemap = *realm->tilemap2;
+		const auto &tileset = *tilemap.tileset;
 
 		if (tileID != tilemap.tileset->getEmpty()) {
 			const auto tilesize = tilemap.tileSize;
-			const auto x = (tileID % (tilemap.setWidth / tilesize)) * tilesize;
-			const auto y = (tileID / (tilemap.setWidth / tilesize)) * tilesize;
+			const auto tile_num = tileset[tileID];
+			const auto x = (tile_num % (tilemap.setWidth / tilesize)) * tilesize;
+			const auto y = (tile_num / (tilemap.setWidth / tilesize)) * tilesize;
 			sprite_renderer.drawOnMap(*tilemap.texture, position.column, position.row, x / 2, y / 2, tilesize, tilesize);
 		}
 	}
