@@ -13,6 +13,7 @@ namespace Game3 {
 			RectangleRenderer();
 			~RectangleRenderer();
 
+			void reset();
 			void update(int backbuffer_width, int backbuffer_height);
 
 			void drawOnScreen(const Eigen::Vector4f &color, float x, float y, float width, float height, float angle = 0.f);
@@ -21,6 +22,7 @@ namespace Game3 {
 
 		private:
 			void initRenderData();
+			glm::mat4 projection;
 			GLuint quadVAO = 0;
 			bool initialized = false;
 			int backbufferWidth = -1;

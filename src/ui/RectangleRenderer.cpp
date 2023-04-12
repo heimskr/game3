@@ -16,8 +16,14 @@ namespace Game3 {
 	}
 
 	RectangleRenderer::~RectangleRenderer() {
+		reset();
+	}
+
+	void RectangleRenderer::reset() {
 		if (initialized) {
 			glDeleteVertexArrays(1, &quadVAO); CHECKGL
+			quadVAO = 0;
+			initialized = false;
 		}
 	}
 
@@ -25,9 +31,8 @@ namespace Game3 {
 		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
 			backbufferWidth = backbuffer_width;
 			backbufferHeight = backbuffer_height;
-			glm::mat4 projection = glm::ortho(0.f, float(backbuffer_width), float(backbuffer_height), 0.f, -1.f, 1.f);
-			shader.bind(); CHECKGL
-			shader.set("projection", projection); CHECKGL
+			projection = glm::ortho(0.f, float(backbuffer_width), float(backbuffer_height), 0.f, -1.f, 1.f);
+			// shader.bind(); CHECKGL
 		}
 	}
 
@@ -47,6 +52,7 @@ namespace Game3 {
 		model = glm::translate(model, glm::vec3(-0.5f * width, -0.5f * height, 0.f)); // move origin back
 		model = glm::scale(model, glm::vec3(width, height, 1.f)); // last scale
 
+		shader.set("projection", projection); CHECKGL
 		shader.set("model", model); CHECKGL
 		shader.set("rectColor", color); CHECKGL
 

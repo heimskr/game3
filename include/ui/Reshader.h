@@ -2,6 +2,7 @@
 
 #include <Eigen/Eigen>
 
+#include "Shader.h"
 #include "util/GL.h"
 
 namespace Game3 {

@@ -11,9 +11,8 @@
 #include "ui/Canvas.h"
 #include "ui/SpriteRenderer.h"
 #include "resources.h"
+#include "util/GL.h"
 #include "util/Util.h"
-
-
 
 namespace Game3 {
 	SpriteRenderer::SpriteRenderer(Canvas &canvas_): canvas(&canvas_), shader("SpriteRenderer") {
@@ -22,8 +21,15 @@ namespace Game3 {
 	}
 
 	SpriteRenderer::~SpriteRenderer() {
-		if (initialized)
+		remove();
+	}
+
+	void SpriteRenderer::remove() {
+		if (initialized) {
 			glDeleteVertexArrays(1, &quadVAO);
+			quadVAO = 0;
+			initialized = false;
+		}
 	}
 
 	SpriteRenderer & SpriteRenderer::operator=(SpriteRenderer &&other) {
@@ -94,6 +100,54 @@ namespace Game3 {
 
 		glActiveTexture(GL_TEXTURE0);
 		texture.bind();
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBindVertexArray(quadVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindVertexArray(0);
+	}
+
+	void SpriteRenderer::drawOnMap(GL::Texture &texture, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale, float angle, float alpha) {
+		if (!initialized)
+			return;
+
+		const auto twidth = texture.getWidth();
+		const auto theight = texture.getHeight();
+
+		if (size_x < 0)
+			size_x = twidth;
+		if (size_y < 0)
+			size_y = theight;
+
+		const auto &tilemap = canvas->game->activeRealm->tilemap1;
+		x *= tilemap->tileSize * canvas->scale / 2.f;
+		y *= tilemap->tileSize * canvas->scale / 2.f;
+
+		x += canvas->width() / 2.f;
+		x -= tilemap->width * tilemap->tileSize * canvas->scale / canvas->magic * 2.f; // TODO: the math here is a little sus... things might cancel out
+		x += canvas->center.x() * canvas->scale * tilemap->tileSize / 2.f;
+
+		y += canvas->height() / 2.f;
+		y -= tilemap->height * tilemap->tileSize * canvas->scale / canvas->magic * 2.f;
+		y += canvas->center.y() * canvas->scale * tilemap->tileSize / 2.f;
+
+		shader.bind();
+
+		glm::mat4 model = glm::mat4(1.f);
+		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
+		model = glm::translate(model, glm::vec3(x - x_offset * canvas->scale * scale, y - y_offset * canvas->scale * scale, 0.f));
+		model = glm::translate(model, glm::vec3(0.5f * twidth, 0.5f * theight, 0.f)); // move origin of rotation to center of quad
+		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
+		model = glm::translate(model, glm::vec3(-0.5f * twidth, -0.5f * theight, 0.f)); // move origin back
+		model = glm::scale(model, glm::vec3(twidth * scale * canvas->scale / 2.f, theight * scale * canvas->scale / 2.f, 2.f)); // last scale
+
+		shader.set("model", model);
+		shader.set("spriteColor", 1.f, 1.f, 1.f, alpha);
+		const float multiplier = 2.f / twidth;
+		shader.set("texturePosition", x_offset * multiplier, y_offset * multiplier, size_x / twidth, size_y / twidth);
+
+		texture.bind(0);
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

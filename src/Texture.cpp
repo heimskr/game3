@@ -38,8 +38,10 @@ namespace Game3 {
 		}
 	}
 
-	void Texture::bind() {
+	void Texture::bind(int bind_id) {
 		init();
+		if (0 <= bind_id)
+			glActiveTexture(GL_TEXTURE0 + bind_id);
 		glBindTexture(GL_TEXTURE_2D, *id); //CHECKGL
 	}
 

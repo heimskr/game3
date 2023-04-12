@@ -32,24 +32,22 @@ namespace Game3 {
 		tilemap1->init(game);
 		tilemap2->init(game);
 		tilemap3->init(game);
-		const auto &tileset = getTileset();
-		renderer1.init(tilemap1, tileset);
-		renderer2.init(tilemap2, tileset);
-		renderer3.init(tilemap3, tileset);
+		renderer1.init(tilemap1);
+		renderer2.init(tilemap2);
+		renderer3.init(tilemap3);
 		resetPathMap();
 	}
 
 	Realm::Realm(Game &game_, RealmID id_, RealmType type_, TilemapPtr tilemap1_, BiomeMapPtr biome_map, int seed_):
 	id(id_), type(type_), tilemap1(std::move(tilemap1_)), biomeMap(std::move(biome_map)), seed(seed_), game(game_) {
 		tilemap1->init(game);
-		const auto &tileset = getTileset();
-		renderer1.init(tilemap1, tileset);
+		renderer1.init(tilemap1);
 		tilemap2 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->tileset);
 		tilemap3 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->tileset);
 		tilemap2->init(game);
 		tilemap3->init(game);
-		renderer2.init(tilemap2, tileset);
-		renderer3.init(tilemap3, tileset);
+		renderer2.init(tilemap2);
+		renderer3.init(tilemap3);
 		resetPathMap();
 	}
 
@@ -83,10 +81,9 @@ namespace Game3 {
 			if (tile_entity_json.at("id").get<Identifier>() == "base:te/ghost"_id)
 				++ghostCount;
 		}
-		const auto &tileset = getTileset();
-		renderer1.init(tilemap1, tileset);
-		renderer2.init(tilemap2, tileset);
-		renderer3.init(tilemap3, tileset);
+		renderer1.init(tilemap1);
+		renderer2.init(tilemap2);
+		renderer3.init(tilemap3);
 		entities.clear();
 		for (const auto &entity_json: json.at("entities"))
 			(*entities.insert(Entity::fromJSON(game, entity_json)).first)->setRealm(shared);
@@ -108,10 +105,12 @@ namespace Game3 {
 		renderer2.render(outdoors? game_time : 1);
 		renderer3.render(outdoors? game_time : 1);
 		for (const auto &entity: entities)
-			if (!entity->isPlayer())
-				entity->render(sprite_renderer);
+			entity->render(sprite_renderer);
 		for (const auto &[index, tile_entity]: tileEntities)
 			tile_entity->render(sprite_renderer);
+		sprite_renderer.drawOnMap(renderer1.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
+		sprite_renderer.drawOnMap(renderer2.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
+		sprite_renderer.drawOnMap(renderer3.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
 		if (0 < ghostCount)
 			sprite_renderer.drawOnScreen(*cacheTexture("resources/checkmark.png"), width - 42.f, height - 42.f, 2.f);
 	}
@@ -120,7 +119,7 @@ namespace Game3 {
 		renderer1.reupload();
 		renderer2.reupload();
 		renderer3.reupload();
-	}
+}
 
 	void Realm::rebind() {
 		renderer1.tilemap = tilemap1;

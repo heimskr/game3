@@ -34,11 +34,12 @@ namespace Game3 {
 			lightFBO.reset();
 			reshader.reset();
 			tilemap.reset();
+			rectangle.reset();
 			initialized = false;
 		}
 	}
 
-	void ElementBufferedRenderer::init(TilemapPtr tilemap_, const Tileset &tileset) {
+	void ElementBufferedRenderer::init(TilemapPtr tilemap_) {
 		if (initialized)
 			reset();
 		tilemap = std::move(tilemap_);
@@ -48,7 +49,7 @@ namespace Game3 {
 		generateVertexArrayObject();
 		lightFBO.init();
 		generateLightingTexture();
-		const auto bright_shorts = tileset.getBrightIDs();
+		const auto bright_shorts = tilemap->tileset->getBrightIDs();
 		brightTiles.assign(bright_shorts.begin(), bright_shorts.end());
 		brightTiles.resize(8, -1);
 		brightSet = {bright_shorts.begin(), bright_shorts.end()};
@@ -59,16 +60,12 @@ namespace Game3 {
 		if (!initialized)
 			return;
 
-		tilemap->getTexture(realm.getGame())->bind();
+		tilemap->getTexture(realm.getGame())->bind(0);
 
 		if (dirty) {
 			recomputeLighting();
 			dirty = false;
 		}
-
-		lightTexture.bind(1);
-		vao.bind();
-		ebo.bind();
 
 		glm::mat4 projection(1.f);
 		projection = glm::scale(projection, {tilemap->tileSize, -tilemap->tileSize, 1}) *
@@ -76,12 +73,13 @@ namespace Game3 {
 		             glm::translate(projection, {center.x() - tilemap->width / 2.f, center.y() - tilemap->height / 2.f, 0});
 
 		shader.bind();
+		vao.bind();
+		vbo.bind();
+		ebo.bind();
 		shader.set("texture0", 0);
-		shader.set("texture1", 1);
 		shader.set("projection", projection);
 		shader.set("divisor", divisor);
 		shader.set("bright_tiles", brightTiles);
-		shader.set("map_size", static_cast<GLfloat>(tilemap->width), static_cast<GLfloat>(tilemap->height));
 
 		GL::triangles(tilemap->size());
 	}
@@ -183,7 +181,7 @@ namespace Game3 {
 
 			const TileID lava = (*tilemap->tileset)["base:tile/lava"];
 
-			Timer lava1("Lava1");
+			Timer lava_timer("Lava");
 			for (Index row = 0; row < tilemap->height; ++row) {
 				for (Index column = 0; column < tilemap->width; ++column) {
 					const Position pos(row, column);
@@ -196,7 +194,7 @@ namespace Game3 {
 					}
 				}
 			}
-			lava1.stop();
+			lava_timer.stop();
 
 			reshader.bind();
 			reshader.set("xs", static_cast<float>(width));
@@ -214,21 +212,6 @@ namespace Game3 {
 				reshader(blurredLightTexture);
 			}
 			blur.stop();
-
-			Timer lava2("Lava2");
-			for (Index row = 0; row < tilemap->height; ++row) {
-				for (Index column = 0; column < tilemap->width; ++column) {
-					const Position pos(row, column);
-					const auto tile = (*tilemap)[pos];
-					if (tile == lava) {
-						const float x = column * tilesize;
-						const float y = row * tilesize;
-						const float margin = .0f * tilesize;
-						rectangle({1.f, 1.f, 1.f, 1.f}, x + margin, y + margin, tilesize - 2 * margin, tilesize - 2 * margin);
-					}
-				}
-			}
-			lava2.stop();
 
 			viewport.reset();
 			GL::bindFB(gtk_buffer);

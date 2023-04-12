@@ -29,7 +29,7 @@ namespace Game3 {
 			Texture & operator=(Texture &&) = default;
 
 			void init();
-			void bind();
+			void bind(int bind_id = -1);
 			bool valid() const { return *valid_; }
 
 			static std::string filterToString(int);

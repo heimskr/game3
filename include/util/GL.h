@@ -369,10 +369,12 @@ namespace GL {
 				return true;
 			}
 
-			inline bool initFloat(GLsizei width, GLsizei height, GLint filter = GL_LINEAR, bool force = false) {
+			inline bool initFloat(GLsizei width_, GLsizei height_, GLint filter = GL_LINEAR, bool force = false) {
 				if (handle != 0 && !force)
 					return false;
-				handle = GL::makeFloatTexture(width, height, filter);
+				handle = GL::makeFloatTexture(width_, height_, filter);
+				width = width_;
+				height = height_;
 				return true;
 			}
 
@@ -384,10 +386,13 @@ namespace GL {
 			}
 
 			inline auto getHandle() const { return handle; }
+			inline auto getWidth()  const { return width;  }
+			inline auto getHeight() const { return height; }
 
 		private:
 			GLuint handle = 0;
-
+			GLsizei width = 0;
+			GLsizei height = 0;
 	};
 
 	struct Viewport {

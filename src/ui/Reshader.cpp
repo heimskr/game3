@@ -22,6 +22,9 @@ namespace Game3 {
 		if (initialized) {
 			glDeleteBuffers(1, &vbo);
 			glDeleteVertexArrays(1, &quadVAO); CHECKGL
+			vbo = 0;
+			quadVAO = 0;
+			shader.reset();
 			initialized = false;
 		}
 	}
@@ -97,7 +100,7 @@ namespace Game3 {
 
 		glBindVertexArray(quadVAO); CHECKGL
 		glEnableVertexAttribArray(0); CHECKGL
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *) 0); CHECKGL
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr); CHECKGL
 		glBindBuffer(GL_ARRAY_BUFFER, old_abb); CHECKGL
 		glBindVertexArray(0); CHECKGL
 		initialized = true;

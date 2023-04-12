@@ -12,14 +12,16 @@
 namespace Game3 {
 	class ElementBufferedRenderer: public TilemapRenderer {
 		public:
+			GL::Texture lightTexture;
+
 			ElementBufferedRenderer(Realm &);
-			virtual ~ElementBufferedRenderer() override;
+			virtual ~ElementBufferedRenderer() override final;
 
 			void reset();
-			void init(TilemapPtr, const Tileset &) override;
-			void render(float divisor) override;
+			void init(TilemapPtr) override final;
+			void render(float divisor) override final;
 			void reupload();
-			bool onBackbufferResized(int width, int height) override;
+			bool onBackbufferResized(int width, int height) override final;
 			inline void markDirty() { dirty = true; }
 
 			operator bool() const { return initialized; }
@@ -33,7 +35,6 @@ namespace Game3 {
 			GL::VBO vbo;
 			GL::EBO ebo;
 			GL::FBO lightFBO;
-			GL::Texture lightTexture;
 			GL::Texture blurredLightTexture;
 			std::vector<GLint> brightTiles;
 			std::unordered_set<TileID> brightSet;
