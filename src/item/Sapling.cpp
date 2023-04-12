@@ -12,11 +12,10 @@ namespace Game3 {
 	bool Sapling::use(Slot slot, ItemStack &stack, const Place &place) {
 		auto &player = *place.player;
 		auto &realm  = *place.realm;
-		const auto index = realm.getIndex(place.position);
-
-		if (realm.type != "data:realm/overworld"_id)
+		if (realm.type != "base:realm/overworld"_id)
 			return false;
 
+		const auto index = realm.getIndex(place.position);
 		const auto &tilemap = *realm.tilemap1;
 		const auto &tileset = *tilemap.tileset;
 

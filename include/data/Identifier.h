@@ -21,7 +21,7 @@ namespace Game3 {
 			if (space.empty() != name.empty())
 				throw std::runtime_error("Partially empty identifier");
 
-			return space.empty();
+			return !space.empty();
 		}
 
 		explicit inline operator std::string() const {

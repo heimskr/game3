@@ -56,9 +56,9 @@ namespace Game3 {
 
 	bool Landfill::fixRequirement() {
 		if (!requirement && requiredTile && requiredCount != static_cast<ItemCount>(-1) && newTile) {
-			requirement = [this, stack = ItemStack(shared_from_this(), requiredCount)](const Place &place) -> std::optional<Result> {
-				if (place.realm->getTileset()[place.getLayer1()] == requiredTile)
-					return Result(stack, newTile);
+			requirement = [this](const Place &place) -> std::optional<Result> {
+				if (place.getLayer1Name() == requiredTile)
+					return Result(ItemStack(shared_from_this(), requiredCount), newTile);
 				return std::nullopt;
 			};
 		}
