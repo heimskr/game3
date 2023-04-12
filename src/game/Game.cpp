@@ -305,6 +305,15 @@ namespace Game3 {
 		registries.at(json.at(0).get<Identifier>())->toUnnamed()->add(*this, json.at(1));
 	}
 
+	bool Game::runCommand(const Glib::ustring &command) {
+		if (command.empty())
+			return false;
+
+		const auto words = Glib::Regex::split_simple(" ", command);
+
+		return false;
+	}
+
 	void Game::tick() {
 		auto now = getTime();
 		auto difference = now - lastTime;

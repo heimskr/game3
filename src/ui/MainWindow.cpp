@@ -13,6 +13,7 @@
 #include "game/Inventory.h"
 #include "tileentity/Building.h"
 #include "tileentity/Teleporter.h"
+#include "ui/gtk/CommandDialog.h"
 #include "ui/gtk/NewGameDialog.h"
 #include "ui/tab/CraftingTab.h"
 #include "ui/tab/InventoryTab.h"
@@ -619,159 +620,171 @@ namespace Game3 {
 	}
 
 	void MainWindow::handleKey(guint keyval, guint, Gdk::ModifierType modifiers) {
-		if (canvas) {
-			if (game && game->player) {
-				auto &player = *game->player;
-				switch (keyval) {
-					case GDK_KEY_S:
-					case GDK_KEY_s:
-						player.path.clear();
-						if (!player.isMoving())
-							player.continuousInteraction = keyval == GDK_KEY_S;
-						player.movingDown = true;
-						return;
-					case GDK_KEY_W:
-					case GDK_KEY_w:
-						player.path.clear();
-						if (!player.isMoving())
-							player.continuousInteraction = keyval == GDK_KEY_W;
-						player.movingUp = true;
-						return;
-					case GDK_KEY_A:
-					case GDK_KEY_a:
-						player.path.clear();
-						if (!player.isMoving())
-							player.continuousInteraction = keyval == GDK_KEY_A;
-						player.movingLeft = true;
-						return;
-					case GDK_KEY_D:
-					case GDK_KEY_d:
-						player.path.clear();
-						if (!player.isMoving())
-							player.continuousInteraction = keyval == GDK_KEY_D;
-						player.movingRight = true;
-						return;
-					case GDK_KEY_Shift_L:
-					case GDK_KEY_Shift_R:
-						if (player.isMoving())
-							player.continuousInteraction = true;
-						break;
-					case GDK_KEY_o: {
-						if (game && game->debugMode) {
-							static std::default_random_engine item_rng;
-							static const std::array<ItemID, 3> ids {"base:shortsword", "base:red_potion", "base:coins"};
-							ItemStack stack(*game, choose(ids, item_rng), 1);
-							auto leftover = player.inventory->add(stack);
-							if (leftover) {
-								auto &realm = *player.getRealm();
-								realm.spawn<ItemEntity>(player.position, *leftover);
-								realm.getGame().signal_player_inventory_update().emit(game->player);
-							}
-						}
-						return;
-					}
-						return;
-					case GDK_KEY_E:
-						game->player->interactOn();
-						return;
-					case GDK_KEY_e:
-					case GDK_KEY_space:
-						game->player->interactNextTo();
-						return;
-					case GDK_KEY_b: {
-						const auto rect = game->getVisibleRealmBounds();
-						std::cout << '(' << rect.get_x() << ", " << rect.get_y() << " | " << rect.get_width() << " x " << rect.get_height() << ")\n";
-						return;
-					}
-					case GDK_KEY_u:
-						glArea.get_context()->make_current();
-						game->activeRealm->reupload();
-						return;
-					case GDK_KEY_r:
-						if (canvas) {
-							canvas->spriteRenderer = SpriteRenderer(*canvas);
-							std::cout << "Reinitialized sprite renderer.\n";
-						} else
-							std::cout << "Canvas not ready.\n";
-						return;
-					case GDK_KEY_f:
-						if (unsigned(modifiers & Gdk::ModifierType::CONTROL_MASK) != 0)
-							autofocus = !autofocus;
-						else
-							game->player->focus(*canvas, false);
-						return;
-					case GDK_KEY_v:
-						if (game && game->debugMode) {
-							auto merchant = player.getRealm()->spawn<Merchant>(player.getPosition(), "base:entity/merchant");
-							merchant->inventory->add(ItemStack(*game, "base:red_potion", 6));
-							merchant->inventory->add(ItemStack(*game, "base:shortsword", 1));
-						}
-						return;
-					case GDK_KEY_t:
-						if (game)
-							std::cout << "Time: " << int(game->getHour()) << ':' << int(game->getMinute()) << '\n';
-						return;
-					case GDK_KEY_g:
-						if (game && game->debugMode) {
-							try {
-								auto house = player.getRealm();
-								auto door = house->getTileEntity<Teleporter>();
-								const auto house_pos = door->targetPosition + Position(-1, 0);
-								auto overworld = game->realms.at(door->targetRealm);
-								player.getRealm()->spawn<Miner>(player.getPosition(), overworld->id, house->id, house_pos,
-									overworld->closestTileEntity<Building>(house_pos, [](const auto &building) {
-										return building->tileID == "base:tile/keep_sw"_id;
-									}));
-							} catch (const std::exception &err) {
-								std::cerr << err.what() << '\n';
-							}
-						}
-						return;
-					case GDK_KEY_q:
-						if (game && game->debugMode) {
-							auto &realm = *game->activeRealm;
-							for (Index row = 0; row < realm.getHeight(); ++row) {
-								for (Index column = 0; column < realm.getWidth(); ++column)
-									std::cout << (realm.pathMap[realm.getIndex(row, column)]? '1' : '0');
-								std::cout << '\n';
-							}
-						}
-						return;
-					case GDK_KEY_0:
-					case GDK_KEY_1:
-					case GDK_KEY_2:
-					case GDK_KEY_3:
-					case GDK_KEY_4:
-					case GDK_KEY_5:
-					case GDK_KEY_6:
-					case GDK_KEY_7:
-					case GDK_KEY_8:
-					case GDK_KEY_9:
-						if (game && game->player) {
-							game->player->inventory->setActive(keyval == GDK_KEY_0? 9 : keyval - 0x31);
-							game->player->inventory->notifyOwner();
-						}
-						return;
-				}
-			}
+		if (!canvas)
+			return;
 
-			const float delta = canvas->scale / 20.f;
+		if (game && game->player) {
+			auto &player = *game->player;
+			const bool control = (modifiers & static_cast<Gdk::ModifierType>(GDK_MODIFIER_MASK)) == Gdk::ModifierType::CONTROL_MASK;
+
 			switch (keyval) {
-				case GDK_KEY_Down:
-					canvas->center.y() -= delta;
+				case GDK_KEY_S:
+				case GDK_KEY_s:
+					player.path.clear();
+					if (!player.isMoving())
+						player.continuousInteraction = keyval == GDK_KEY_S;
+					player.movingDown = true;
+					return;
+				case GDK_KEY_W:
+				case GDK_KEY_w:
+					player.path.clear();
+					if (!player.isMoving())
+						player.continuousInteraction = keyval == GDK_KEY_W;
+					player.movingUp = true;
+					return;
+				case GDK_KEY_A:
+				case GDK_KEY_a:
+					player.path.clear();
+					if (!player.isMoving())
+						player.continuousInteraction = keyval == GDK_KEY_A;
+					player.movingLeft = true;
+					return;
+				case GDK_KEY_D:
+				case GDK_KEY_d:
+					player.path.clear();
+					if (!player.isMoving())
+						player.continuousInteraction = keyval == GDK_KEY_D;
+					player.movingRight = true;
+					return;
+				case GDK_KEY_Shift_L:
+				case GDK_KEY_Shift_R:
+					if (player.isMoving())
+						player.continuousInteraction = true;
 					break;
-				case GDK_KEY_Up:
-					canvas->center.y() += delta;
-					break;
-				case GDK_KEY_Left:
-					canvas->center.x() += delta;
-					break;
-				case GDK_KEY_Right:
-					canvas->center.x() -= delta;
-					break;
-				default:
-					break;
+				case GDK_KEY_o: {
+					if (game->debugMode) {
+						static std::default_random_engine item_rng;
+						static const std::array<ItemID, 3> ids {"base:shortsword", "base:red_potion", "base:coins"};
+						ItemStack stack(*game, choose(ids, item_rng), 1);
+						auto leftover = player.inventory->add(stack);
+						if (leftover) {
+							auto &realm = *player.getRealm();
+							realm.spawn<ItemEntity>(player.position, *leftover);
+							realm.getGame().signal_player_inventory_update().emit(game->player);
+						}
+					}
+					return;
+				}
+					return;
+				case GDK_KEY_E:
+					game->player->interactOn();
+					return;
+				case GDK_KEY_e:
+				case GDK_KEY_space:
+					game->player->interactNextTo();
+					return;
+				case GDK_KEY_b: {
+					const auto rect = game->getVisibleRealmBounds();
+					std::cout << '(' << rect.get_x() << ", " << rect.get_y() << " | " << rect.get_width() << " x " << rect.get_height() << ")\n";
+					return;
+				}
+				case GDK_KEY_u:
+					glArea.get_context()->make_current();
+					game->activeRealm->reupload();
+					return;
+				case GDK_KEY_r:
+					if (canvas) {
+						canvas->spriteRenderer = SpriteRenderer(*canvas);
+						std::cout << "Reinitialized sprite renderer.\n";
+					} else
+						std::cout << "Canvas not ready.\n";
+					return;
+				case GDK_KEY_f:
+					if (control)
+						autofocus = !autofocus;
+					else
+						game->player->focus(*canvas, false);
+					return;
+				case GDK_KEY_v:
+					if (game->debugMode) {
+						auto merchant = player.getRealm()->spawn<Merchant>(player.getPosition(), "base:entity/merchant");
+						merchant->inventory->add(ItemStack(*game, "base:red_potion", 6));
+						merchant->inventory->add(ItemStack(*game, "base:shortsword", 1));
+					}
+					return;
+				case GDK_KEY_t:
+					std::cout << "Time: " << int(game->getHour()) << ':' << int(game->getMinute()) << '\n';
+					return;
+				case GDK_KEY_g:
+					if (game->debugMode) {
+						try {
+							auto house = player.getRealm();
+							auto door = house->getTileEntity<Teleporter>();
+							const auto house_pos = door->targetPosition + Position(-1, 0);
+							auto overworld = game->realms.at(door->targetRealm);
+							player.getRealm()->spawn<Miner>(player.getPosition(), overworld->id, house->id, house_pos,
+								overworld->closestTileEntity<Building>(house_pos, [](const auto &building) {
+									return building->tileID == "base:tile/keep_sw"_id;
+								}));
+						} catch (const std::exception &err) {
+							std::cerr << err.what() << '\n';
+						}
+					}
+					return;
+				case GDK_KEY_q:
+					if (game->debugMode) {
+						auto &realm = *game->activeRealm;
+						for (Index row = 0; row < realm.getHeight(); ++row) {
+							for (Index column = 0; column < realm.getWidth(); ++column)
+								std::cout << (realm.pathMap[realm.getIndex(row, column)]? '1' : '0');
+							std::cout << '\n';
+						}
+					}
+					return;
+				case GDK_KEY_c:
+					if (control) {
+						auto *command_dialog = new CommandDialog(*this);
+						dialog.reset(command_dialog);
+						command_dialog->signal_submit().connect([this](const Glib::ustring &command) {
+							game->runCommand(command);
+						});
+						command_dialog->show();
+					}
+					return;
+				case GDK_KEY_0:
+				case GDK_KEY_1:
+				case GDK_KEY_2:
+				case GDK_KEY_3:
+				case GDK_KEY_4:
+				case GDK_KEY_5:
+				case GDK_KEY_6:
+				case GDK_KEY_7:
+				case GDK_KEY_8:
+				case GDK_KEY_9:
+					if (game && game->player) {
+						game->player->inventory->setActive(keyval == GDK_KEY_0? 9 : keyval - 0x31);
+						game->player->inventory->notifyOwner();
+					}
+					return;
 			}
+		}
+
+		const float delta = canvas->scale / 20.f;
+		switch (keyval) {
+			case GDK_KEY_Down:
+				canvas->center.y() -= delta;
+				break;
+			case GDK_KEY_Up:
+				canvas->center.y() += delta;
+				break;
+			case GDK_KEY_Left:
+				canvas->center.x() += delta;
+				break;
+			case GDK_KEY_Right:
+				canvas->center.x() -= delta;
+				break;
+			default:
+				break;
 		}
 	}
 

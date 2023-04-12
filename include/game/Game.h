@@ -76,6 +76,8 @@ namespace Game3 {
 			void traverseData(const std::filesystem::path &);
 			void loadDataFile(const std::filesystem::path &);
 			void addRecipe(const nlohmann::json &);
+			// Returns whether the command executed successfully.
+			bool runCommand(const Glib::ustring &);
 			void tick();
 			RealmID newRealmID() const;
 			void setText(const Glib::ustring &text, const Glib::ustring &name = "", bool focus = true, bool ephemeral = false);
