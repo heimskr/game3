@@ -1,26 +1,22 @@
-export const buffered_frag = @embedFile("../resources/buffered.frag").*;
-export const buffered_frag_len = @embedFile("../resources/buffered.frag").len;
+const std = @import("std");
 
-export const buffered_vert = @embedFile("../resources/buffered.vert").*;
-export const buffered_vert_len = @embedFile("../resources/buffered.vert").len;
+comptime {
+    for (.{ "buffered", "rectangle", "sprite", "blur", "reshader" }) |shader_name| {
+        const types = if (std.mem.eql(u8, shader_name, "reshader"))
+            .{"vert"}
+        else
+            .{ "frag", "vert" };
+        for (types) |shader_type| {
+            const path = if (std.mem.eql(u8, shader_name, "rectangle"))
+                "../resources/rect." ++ shader_type
+            else
+                "../resources/" ++ shader_name ++ "." ++ shader_type;
 
-export const rectangle_frag = @embedFile("../resources/rect.frag").*;
-export const rectangle_frag_len = @embedFile("../resources/rect.frag").len;
-
-export const rectangle_vert = @embedFile("../resources/rect.vert").*;
-export const rectangle_vert_len = @embedFile("../resources/rect.vert").len;
-
-export const sprite_frag = @embedFile("../resources/sprite.frag").*;
-export const sprite_frag_len = @embedFile("../resources/sprite.frag").len;
-
-export const sprite_vert = @embedFile("../resources/sprite.vert").*;
-export const sprite_vert_len = @embedFile("../resources/sprite.vert").len;
-
-export const blur_frag = @embedFile("../resources/blur.frag").*;
-export const blur_frag_len = @embedFile("../resources/blur.frag").len;
-
-export const blur_vert = @embedFile("../resources/blur.vert").*;
-export const blur_vert_len = @embedFile("../resources/blur.vert").len;
-
-export const reshader_vert = @embedFile("../resources/reshader.vert").*;
-export const reshader_vert_len = @embedFile("../resources/reshader.vert").len;
+            const shader_data_pointer = @embedFile(path);
+            const shader_data = shader_data_pointer.*;
+            const shader_len = shader_data_pointer.len;
+            @export(shader_data, .{ .name = shader_name ++ "_" ++ shader_type });
+            @export(shader_len, .{ .name = shader_name ++ "_" ++ shader_type ++ "_len" });
+        }
+    }
+}
