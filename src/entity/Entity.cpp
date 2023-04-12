@@ -325,6 +325,7 @@ namespace Game3 {
 	std::shared_ptr<Texture> Entity::getTexture() {
 		Game &game_ref = getGame();
 		auto entity_texture = game_ref.registry<EntityTextureRegistry>().at(type);
+		variety = entity_texture->variety;
 		return game_ref.registry<TextureRegistry>().at(entity_texture->textureID);
 	}
 
