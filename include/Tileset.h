@@ -24,7 +24,7 @@ namespace Game3 {
 			TileID getEmptyID() const;
 			const Identifier & getMissing() const;
 			const std::set<Identifier> & getBrightNames() const;
-			std::vector<TileID> getBrightIDs() const;
+			std::vector<TileID> getBrightIDs();
 			std::string getName() const;
 			std::shared_ptr<Texture> getTexture(const Game &);
 			const Identifier & getTextureName() const { return textureName; }
@@ -63,6 +63,7 @@ namespace Game3 {
 			std::map<Identifier, std::set<Identifier>> inverseCategories;
 			std::set<TileID> marchableCache;
 			std::set<TileID> unmarchableCache;
+			std::optional<std::vector<TileID>> brightCache;
 	};
 
 	using TilesetPtr = std::shared_ptr<Tileset>;

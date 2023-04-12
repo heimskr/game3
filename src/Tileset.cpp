@@ -47,11 +47,15 @@ namespace Game3 {
 		return bright;
 	}
 
-	std::vector<TileID> Tileset::getBrightIDs() const {
+	std::vector<TileID> Tileset::getBrightIDs() {
+		if (brightCache)
+			return *brightCache;
+
 		std::vector<TileID> out;
 		out.reserve(bright.size());
 		for (const auto &tilename: bright)
 			out.push_back(ids.at(tilename));
+		brightCache = out;
 		return out;
 	}
 
@@ -113,6 +117,7 @@ namespace Game3 {
 	void Tileset::clearCache() {
 		marchableCache.clear();
 		unmarchableCache.clear();
+		brightCache.reset();
 	}
 
 	const std::set<Identifier> Tileset::getCategories(const Identifier &tilename) const {

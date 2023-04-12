@@ -135,7 +135,7 @@ namespace Game3 {
 	void ElementBufferedRenderer::generateLightingTexture() {
 		const auto width  = tilemap->tileSize * tilemap->width;
 		const auto height = tilemap->tileSize * tilemap->height;
-		constexpr GLint filter = GL_NEAREST;
+		constexpr GLint filter = GL_LINEAR;
 
 		lightTexture.initFloat(width, height, filter);
 		blurredLightTexture.initFloat(width, height, filter);
