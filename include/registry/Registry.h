@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <map>
 #include <memory>
 #include <set>
@@ -160,7 +161,8 @@ namespace Game3 {
 				try {
 					return items.at(id);
 				} catch (const std::out_of_range &) {
-					throw std::out_of_range("Couldn't find \"" + id.str() + "\" in registry " + identifier.str());
+					std::cerr << "\e[31mCouldn't find \"" + id.str() + "\" in registry " + identifier.str() << "\e[39m\n";
+					return {};
 				}
 			}
 

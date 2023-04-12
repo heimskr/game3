@@ -66,7 +66,7 @@ namespace Game3 {
 			std::shared_ptr<Item> addAttribute(ItemAttribute);
 			inline bool operator==(const Item &other) const { return identifier == other.identifier; }
 
-			virtual bool use(Slot, ItemStack &, const Place &) { return false; }
+			virtual bool use(Slot, ItemStack &, const Place &);
 
 			/** Whether the item's use function (see Item::use) should be called when the user interacts with a floor tile and this item is selected in the inventory tab. */
 			virtual bool canUseOnWorld() const { return false; }

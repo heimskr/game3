@@ -305,13 +305,44 @@ namespace Game3 {
 		registries.at(json.at(0).get<Identifier>())->toUnnamed()->add(*this, json.at(1));
 	}
 
-	bool Game::runCommand(const Glib::ustring &command) {
+	std::tuple<bool, Glib::ustring> Game::runCommand(const Glib::ustring &command) {
 		if (command.empty())
-			return false;
+			return {false, "Command is empty."};
 
 		const auto words = Glib::Regex::split_simple(" ", command);
+		const auto &first = words.at(0);
 
-		return false;
+		// TODO: command registry...?
+
+		try {
+			if (first == "give") {
+				if (words.size() < 2)
+					return {false, "Not enough arguments."};
+				if (3 < words.size())
+					return {false, "Too many arguments."};
+				long count = 1;
+				if (words.size() == 3) {
+					try {
+						count = parseLong(words.at(2));
+					} catch (const std::invalid_argument &) {
+						return {false, "Invalid count."};
+					}
+				}
+				Glib::ustring item_name = words.at(1);
+				size_t colon = item_name.find(':');
+				if (colon == item_name.npos)
+					item_name = "base:item/" + item_name;
+				if (auto item = registry<ItemRegistry>()[Identifier(item_name.raw())]) {
+					player->give(ItemStack(item, count));
+					return {true, "Gave " + std::to_string(count) + " x " + item->name};
+				}
+				return {false, "Unknown item: " + item_name};
+			}
+		} catch (const std::exception &err) {
+			return {false, err.what()};
+		}
+
+		return {false, "Unknown command."};
 	}
 
 	void Game::tick() {

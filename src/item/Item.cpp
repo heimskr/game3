@@ -89,6 +89,10 @@ namespace Game3 {
 		return shared_from_this();
 	}
 
+	bool Item::use(Slot, ItemStack &, const Place &) {
+		return false;
+	}
+
 // ItemStack
 
 	ItemStack::ItemStack(const Game &game, const ItemID &id, ItemCount count_):

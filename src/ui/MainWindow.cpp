@@ -746,7 +746,8 @@ namespace Game3 {
 						auto *command_dialog = new CommandDialog(*this);
 						dialog.reset(command_dialog);
 						command_dialog->signal_submit().connect([this](const Glib::ustring &command) {
-							game->runCommand(command);
+							auto [success, message] = game->runCommand(command);
+							std::cout << "\e[3" << (success? '2' : '1') << "m" <<  message << "\e[39m\n";
 						});
 						command_dialog->show();
 					}
