@@ -19,8 +19,8 @@ namespace Game3 {
 		Realm &realm = *getRealm();
 
 		static const std::vector<Identifier> grasses {
-			"base:tile/grass_alt1", "base:tile/grass_alt2",
-			"base:tile/grass", "base:tile/grass", "base:tile/grass", "base:tile/grass", "base:tile/grass", "base:tile/grass", "base:tile/grass"
+			"base:tile/grass_alt1"_id, "base:tile/grass_alt2"_id,
+			"base:tile/grass"_id, "base:tile/grass"_id, "base:tile/grass"_id, "base:tile/grass"_id,
 		};
 
 		const double noise = perlin.GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.666);
