@@ -113,7 +113,7 @@ namespace Game3 {
 
 		const auto x = (tile_id % column_count) * tilesize;
 		const auto y = (tile_id / column_count) * tilesize;
-		sprite_renderer.drawOnMap(*tilemap.getTexture(realm->getGame()), position.column, position.row, x / 2, y / 2, tilesize, tilesize, 1.f, 0.f, .5f);
+		sprite_renderer(*tilemap.getTexture(realm->getGame()), position.column, position.row, x / 2, y / 2, tilesize, tilesize, 1.f, 0.f, .5f);
 	}
 
 	void Ghost::march() {

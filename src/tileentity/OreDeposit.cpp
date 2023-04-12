@@ -102,7 +102,7 @@ namespace Game3 {
 			const TileID tile_id = (*tilemap.tileset)[0.f < timeRemaining? ore.regenTilename : tileID];
 			const auto x = (tile_id % (tilemap.setWidth / tilesize)) * tilesize;
 			const auto y = (tile_id / (tilemap.setWidth / tilesize)) * tilesize;
-			sprite_renderer.drawOnMap(*tilemap.getTexture(realm.getGame()), position.column, position.row, x / 2, y / 2, tilesize, tilesize);
+			sprite_renderer(*tilemap.getTexture(realm.getGame()), position.column, position.row, x / 2, y / 2, tilesize, tilesize);
 		}
 	}
 

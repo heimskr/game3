@@ -316,8 +316,11 @@ namespace GL {
 
 	class FBO {
 		public:
-			FBO(): handle(makeFBO()) {}
-			FBO(GLuint handle_): handle(handle_) {}
+			FBO():
+				handle(makeFBO()) {}
+
+			FBO(GLuint handle_):
+				handle(handle_) {}
 
 			~FBO() {
 				reset();
@@ -334,7 +337,16 @@ namespace GL {
 			inline bool bind() {
 				if (handle == 0)
 					return false;
+				oldBuffer = getFB();
 				bindFB(handle);
+				return true;
+			}
+
+			inline bool undo() {
+				if (handle == 0 || oldBuffer < 0)
+					return false;
+				bindFB(oldBuffer);
+				oldBuffer = -1;
 				return true;
 			}
 
@@ -348,6 +360,7 @@ namespace GL {
 			inline auto getHandle() const { return handle; }
 
 		private:
+			GLint oldBuffer = -1;
 			GLuint handle = 0;
 	};
 
@@ -355,10 +368,37 @@ namespace GL {
 		public:
 			Texture() = default;
 
+			Texture(const Texture &) = delete;
+			Texture(Texture &&other) {
+				handle = other.handle;
+				width  = other.width;
+				height = other.height;
+				other.handle = 0;
+				other.width  = 0;
+				other.height = 0;
+			}
+
+			Texture & operator=(const Texture &) = delete;
+			Texture & operator=(Texture &&other) {
+				reset();
+				handle = other.handle;
+				width  = other.width;
+				height = other.height;
+				other.handle = 0;
+				other.width  = 0;
+				other.height = 0;
+				return *this;
+			}
+
+			~Texture() {
+				reset();
+			}
+
 			inline bool reset() {
 				if (handle == 0)
 					return false;
-				glDeleteTextures(1, &handle);
+				glDeleteTextures(1, &handle); CHECKGL
+				handle = 0;
 				return true;
 			}
 
@@ -369,9 +409,8 @@ namespace GL {
 				return true;
 			}
 
-			inline bool initFloat(GLsizei width_, GLsizei height_, GLint filter = GL_LINEAR, bool force = false) {
-				if (handle != 0 && !force)
-					return false;
+			inline bool initFloat(GLsizei width_, GLsizei height_, GLint filter = GL_LINEAR) {
+				reset();
 				handle = GL::makeFloatTexture(width_, height_, filter);
 				width = width_;
 				height = height_;
@@ -388,6 +427,13 @@ namespace GL {
 			inline auto getHandle() const { return handle; }
 			inline auto getWidth()  const { return width;  }
 			inline auto getHeight() const { return height; }
+
+			template <typename... Args>
+			static Texture makeFloat(Args &&...args) {
+				Texture out;
+				out.initFloat(std::forward<Args>(args)...);
+				return out;
+			}
 
 		private:
 			GLuint handle = 0;

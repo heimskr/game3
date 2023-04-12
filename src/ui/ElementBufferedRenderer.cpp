@@ -31,6 +31,7 @@ namespace Game3 {
 			shader.reset();
 			lightTexture.reset();
 			blurredLightTexture.reset();
+			mainFBO.reset();
 			lightFBO.reset();
 			reshader.reset();
 			tilemap.reset();
@@ -47,6 +48,7 @@ namespace Game3 {
 		generateVertexBufferObject();
 		generateElementBufferObject();
 		generateVertexArrayObject();
+		mainFBO.init();
 		lightFBO.init();
 		generateLightingTexture();
 		const auto bright_shorts = tilemap->tileset->getBrightIDs();
@@ -56,10 +58,11 @@ namespace Game3 {
 		initialized = true;
 	}
 
-	void ElementBufferedRenderer::render(float divisor) {
+	void ElementBufferedRenderer::render(GLuint target_texture, float divisor) {
 		if (!initialized)
 			return;
 
+		// GL::useTextureInFB(target_texture);
 		tilemap->getTexture(realm.getGame())->bind(0);
 
 		if (dirty) {
@@ -67,10 +70,15 @@ namespace Game3 {
 			dirty = false;
 		}
 
+		constexpr float center_scale = 0.f;
+		constexpr float size_scale = -1.f;
+
 		glm::mat4 projection(1.f);
-		projection = glm::scale(projection, {tilemap->tileSize, -tilemap->tileSize, 1}) *
-		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1}) *
-		             glm::translate(projection, {center.x() - tilemap->width / 2.f, center.y() - tilemap->height / 2.f, 0});
+		projection = //glm::scale(projection, {tilemap->tileSize, -tilemap->tileSize, 1.f}) *
+		            //  glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1.f}) *
+		             glm::scale(projection, {32.f / backbufferWidth, 32.f / backbufferHeight, 1.f}) *
+		             glm::translate(projection, {center.x() * center_scale + tilemap->width * size_scale, center.y() * center_scale + tilemap->height * size_scale, 0});
+		            //  glm::translate(projection, {0 - tilemap->width / 2.f, 0 - tilemap->height / 2.f, 0.f});
 
 		shader.bind();
 		vao.bind();
@@ -165,8 +173,6 @@ namespace Game3 {
 		}
 
 		if (recomputation_needed) {
-			const auto gtk_buffer = GL::getFB();
-
 			lightFBO.bind();
 			generateLightingTexture();
 
@@ -214,7 +220,7 @@ namespace Game3 {
 			blur.stop();
 
 			viewport.reset();
-			GL::bindFB(gtk_buffer);
+			lightFBO.undo();
 		}
 
 		timer.stop();

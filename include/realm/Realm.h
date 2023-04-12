@@ -13,6 +13,7 @@
 #include "game/BiomeMap.h"
 #include "tileentity/TileEntity.h"
 #include "ui/ElementBufferedRenderer.h"
+#include "util/GL.h"
 
 namespace Game3 {
 	class Entity;
@@ -32,6 +33,8 @@ namespace Game3 {
 
 	class Realm: public std::enable_shared_from_this<Realm> {
 		public:
+			GL::Texture texture;
+			GL::FBO fbo;
 			RealmID id;
 			RealmType type;
 			TilemapPtr tilemap1;
@@ -211,6 +214,7 @@ namespace Game3 {
 			Realm(Game &, RealmID, RealmType, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr, int seed_);
 			Realm(Game &, RealmID, RealmType, TilemapPtr tilemap1_, BiomeMapPtr, int seed_);
 
+			void initTexture();
 			virtual void absorbJSON(const nlohmann::json &);
 			virtual void toJSON(nlohmann::json &) const;
 

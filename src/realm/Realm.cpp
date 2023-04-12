@@ -35,6 +35,7 @@ namespace Game3 {
 		renderer1.init(tilemap1);
 		renderer2.init(tilemap2);
 		renderer3.init(tilemap3);
+		initTexture();
 		resetPathMap();
 	}
 
@@ -44,11 +45,18 @@ namespace Game3 {
 		renderer1.init(tilemap1);
 		tilemap2 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->tileset);
 		tilemap3 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->tileset);
+		initTexture();
 		tilemap2->init(game);
 		tilemap3->init(game);
 		renderer2.init(tilemap2);
 		renderer3.init(tilemap3);
 		resetPathMap();
+	}
+
+	void Realm::initTexture() {
+		constexpr float factor = 2.f;
+		texture.initFloat(tilemap1->width * tilemap1->tileSize * factor, tilemap1->height * tilemap1->tileSize * factor, GL_NEAREST);
+		fbo.init();
 	}
 
 	RealmPtr Realm::fromJSON(Game &game, const nlohmann::json &json) {
@@ -71,6 +79,7 @@ namespace Game3 {
 		tilemap1->init(game);
 		tilemap2->init(game);
 		tilemap3->init(game);
+		initTexture();
 		biomeMap = std::make_shared<BiomeMap>(json.at("biomeMap"));
 		outdoors = json.at("outdoors");
 		for (const auto &[index, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>()) {
@@ -92,22 +101,39 @@ namespace Game3 {
 	}
 
 	void Realm::render(const int width, const int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &sprite_renderer, float game_time) {
+		fbo.bind();
+		texture.useInFB();
+		GL::Viewport viewport(0, 0, texture.getWidth(), texture.getHeight());
+		const auto bb_width = texture.getWidth();
+		const auto bb_height = texture.getHeight();
 		renderer1.center = center;
 		renderer1.scale  = scale;
-		renderer1.onBackbufferResized(width, height);
+		renderer1.onBackbufferResized(bb_width, bb_height);
 		renderer2.center = center;
 		renderer2.scale  = scale;
-		renderer2.onBackbufferResized(width, height);
+		renderer2.onBackbufferResized(bb_width, bb_height);
 		renderer3.center = center;
 		renderer3.scale  = scale;
-		renderer3.onBackbufferResized(width, height);
-		renderer1.render(outdoors? game_time : 1);
-		renderer2.render(outdoors? game_time : 1);
-		renderer3.render(outdoors? game_time : 1);
+		renderer3.onBackbufferResized(bb_width, bb_height);
+		const auto texture_handle = texture.getHandle();
+		renderer1.render(texture_handle, outdoors? game_time : 1);
+		renderer2.render(texture_handle, outdoors? game_time : 1);
+		renderer3.render(texture_handle, outdoors? game_time : 1);
+		sprite_renderer.ignoreCanvas = true;
+		sprite_renderer.update(bb_width / 1.f, bb_height / 1.f);
+
 		for (const auto &entity: entities)
 			entity->render(sprite_renderer);
 		for (const auto &[index, tile_entity]: tileEntities)
 			tile_entity->render(sprite_renderer);
+		viewport.reset();
+		fbo.undo();
+
+		// const auto w = texture.getWidth();
+		// const auto h = texture.getHeight();
+		sprite_renderer.ignoreCanvas = false;
+		sprite_renderer.update(width, height);
+		sprite_renderer.drawOnMap(texture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
 		sprite_renderer.drawOnMap(renderer1.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
 		sprite_renderer.drawOnMap(renderer2.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
 		sprite_renderer.drawOnMap(renderer3.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
@@ -288,18 +314,18 @@ namespace Game3 {
 
 	void Realm::setLayer3(Index index, TileID tile) {
 		tilemap3->tiles[index] = tile;
-		setLayerHelper(index)
-;	}
+		setLayerHelper(index);
+	}
 
 	void Realm::setLayer1(Index index, const Identifier &tilename) {
 		tilemap1->tiles[index] = (*tilemap1->tileset)[tilename];
-		setLayerHelper(index)
-;	}
+		setLayerHelper(index);
+	}
 
 	void Realm::setLayer2(Index index, const Identifier &tilename) {
 		tilemap2->tiles[index] = (*tilemap2->tileset)[tilename];
-		setLayerHelper(index)
-;	}
+		setLayerHelper(index);
+	}
 
 	void Realm::setLayer3(Index index, const Identifier &tilename) {
 		tilemap3->tiles[index] = (*tilemap3->tileset)[tilename];

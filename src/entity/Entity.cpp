@@ -110,7 +110,7 @@ namespace Game3 {
 				break;
 		}
 
-		sprite_renderer.drawOnMap(*texture, position.column + offset.x(), position.row + offset.y(), x_offset, y_offset, 16.f, 16.f);
+		sprite_renderer(*texture, position.column + offset.x(), position.row + offset.y(), x_offset, y_offset, 16.f, 16.f);
 	}
 
 	bool Entity::move(Direction move_direction) {

@@ -6,16 +6,19 @@
 #include <stb_image.h>
 
 #include "Texture.h"
+#include "util/GL.h"
 #include "util/Util.h"
 
 namespace Game3 {
+	static constexpr GLint DEFAULT_FILTER = GL_NEAREST;
+
 	Texture::Texture():
 		NamedRegisterable(Identifier()) {}
 
 	Texture::Texture(Identifier identifier_, const std::filesystem::path &path_, bool alpha_, int filter_):
 		NamedRegisterable(std::move(identifier_)),
 		format(std::make_shared<int>(alpha_? GL_RGBA : GL_RGB)),
-		filter(std::make_shared<int>(filter_)),
+		filter(std::make_shared<int>(filter_ == -1? DEFAULT_FILTER : filter_)),
 		alpha(std::make_shared<bool>(alpha_)),
 		path(path_) {}
 
@@ -51,11 +54,11 @@ namespace Game3 {
 		auto canonical = std::filesystem::canonical(path).string();
 		if (textureCache.contains(canonical))
 			return textureCache.at(canonical);
-		return textureCache.try_emplace(canonical, std::make_shared<Texture>(Identifier(), canonical, alpha, filter)).first->second;
+		return textureCache.try_emplace(canonical, std::make_shared<Texture>(Identifier(), canonical, alpha, filter == -1? DEFAULT_FILTER : filter)).first->second;
 	}
 
 	std::shared_ptr<Texture> cacheTexture(const char *path, bool alpha, int filter) {
-		return cacheTexture(std::filesystem::path(path), alpha, filter);
+		return cacheTexture(std::filesystem::path(path), alpha, filter == -1? DEFAULT_FILTER : filter);
 	}
 
 	std::shared_ptr<Texture> cacheTexture(const nlohmann::json &json) {
@@ -66,6 +69,7 @@ namespace Game3 {
 	}
 
 	std::string Texture::filterToString(int filter) {
+		filter = filter == -1? DEFAULT_FILTER : filter;
 		switch (filter) {
 			case GL_NEAREST: return "nearest";
 			case GL_LINEAR:  return "linear";

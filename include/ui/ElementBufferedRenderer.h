@@ -11,9 +11,8 @@
 namespace Game3 {
 	class ElementBufferedRenderer {
 		public:
-			constexpr static float tileTextureSize = 1 / 10.f;
-			constexpr static float tileTexturePadding = 1 / 2048.f;
-			float scale = 2.f;
+			constexpr static float tileTexturePadding = 1.f / 2048.f;
+			float scale = 1.f;
 			int backbufferWidth = -1;
 			int backbufferHeight = -1;
 
@@ -26,7 +25,7 @@ namespace Game3 {
 
 			void reset();
 			void init(TilemapPtr);
-			void render(float divisor);
+			void render(GLuint target_texture, float divisor);
 			void reupload();
 			bool onBackbufferResized(int width, int height);
 			inline void markDirty() { dirty = true; }
@@ -41,6 +40,7 @@ namespace Game3 {
 			GL::FloatVAO vao;
 			GL::VBO vbo;
 			GL::EBO ebo;
+			GL::FBO mainFBO;
 			GL::FBO lightFBO;
 			GL::Texture blurredLightTexture;
 			std::vector<GLint> brightTiles;

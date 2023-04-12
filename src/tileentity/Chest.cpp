@@ -55,7 +55,7 @@ namespace Game3 {
 			const auto tile_index = (*tilemap.tileset)[tileID];
 			const auto x = (tile_index % (*texture->width / tilesize)) * tilesize;
 			const auto y = (tile_index / (*texture->width / tilesize)) * tilesize;
-			sprite_renderer.drawOnMap(*texture, position.column, position.row, x / 2.f, y / 2.f, tilesize, tilesize);
+			sprite_renderer(*texture, position.column, position.row, x / 2.f, y / 2.f, tilesize, tilesize);
 		}
 	}
 
