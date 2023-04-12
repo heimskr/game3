@@ -57,7 +57,9 @@ namespace Game3 {
 		if (!initialized)
 			return;
 
-		assert(realm);
+		if (!realm)
+			return;
+
 		tilemap->getTexture(realm->getGame())->bind();
 
 		if (dirty) {

@@ -321,7 +321,7 @@ namespace Game3 {
 
 		if (auto iter = json.find("storage"); iter != json.end())
 			for (const auto &[key, val]: iter->items())
-				out.storage.at(parseUlong(key)) = ItemStack::fromJSON(game, val);
+				out.storage[parseUlong(key)] = ItemStack::fromJSON(game, val);
 		out.slotCount  = json.at("slotCount");
 		out.activeSlot = json.at("activeSlot");
 		return out;

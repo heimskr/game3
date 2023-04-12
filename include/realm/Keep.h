@@ -25,7 +25,7 @@ namespace Game3 {
 			friend class Realm;
 
 		protected:
-			Keep() = default;
+			Keep(Game &);
 
 			Keep(Game &, RealmID, const Position &parent_origin, Index parent_width, Index parent_height, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr, int seed_);
 

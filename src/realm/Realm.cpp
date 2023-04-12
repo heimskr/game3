@@ -70,9 +70,9 @@ namespace Game3 {
 		tilemap1 = std::make_shared<Tilemap>(Tilemap::fromJSON(game, json.at("tilemap1")));
 		tilemap2 = std::make_shared<Tilemap>(Tilemap::fromJSON(game, json.at("tilemap2")));
 		tilemap3 = std::make_shared<Tilemap>(Tilemap::fromJSON(game, json.at("tilemap3")));
-		tilemap1->getTexture(game)->init();
-		tilemap2->getTexture(game)->init();
-		tilemap3->getTexture(game)->init();
+		tilemap1->init(game);
+		tilemap2->init(game);
+		tilemap3->init(game);
 		biomeMap = std::make_shared<BiomeMap>(json.at("biomeMap"));
 		outdoors = json.at("outdoors");
 		for (const auto &[index, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>()) {

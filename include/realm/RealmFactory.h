@@ -24,7 +24,7 @@ namespace Game3 {
 			template <typename T>
 			static RealmFactory create(const Identifier &id = T::ID()) {
 				return {id, [](Game &game) {
-					return T::create(game);
+					return Realm::create<T>(game);
 				}};
 			}
 	};
