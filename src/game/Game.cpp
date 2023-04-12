@@ -333,7 +333,7 @@ namespace Game3 {
 				if (colon == item_name.npos)
 					item_name = "base:item/" + item_name;
 				if (auto item = registry<ItemRegistry>()[Identifier(item_name.raw())]) {
-					player->give(ItemStack(item, count));
+					player->give(ItemStack(*this, item, count));
 					return {true, "Gave " + std::to_string(count) + " x " + item->name};
 				}
 				return {false, "Unknown item: " + item_name};

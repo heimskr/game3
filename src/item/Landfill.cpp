@@ -58,7 +58,7 @@ namespace Game3 {
 		if (!requirement && requiredTile && requiredCount != static_cast<ItemCount>(-1) && newTile) {
 			requirement = [this](const Place &place) -> std::optional<Result> {
 				if (place.getLayer1Name() == requiredTile)
-					return Result(ItemStack(shared_from_this(), requiredCount), newTile);
+					return Result(ItemStack(place.getGame(), shared_from_this(), requiredCount), newTile);
 				return std::nullopt;
 			};
 		}

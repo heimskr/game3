@@ -26,10 +26,9 @@ namespace Game3 {
 			if (active->item->canUseOnWorld() && active->item->use(inventory.activeSlot, *active, place))
 				return true;
 
-
 			if (active->has(ItemAttribute::Hammer)) {
 				const TileID tile2 = tilemap2->tiles.at(index);
-				ItemStack stack;
+				ItemStack stack(game);
 				if (tileset.getItemStack(game, tileset[tile2], stack) && !inventory.add(stack)) {
 					if (active->reduceDurability())
 						inventory.erase(inventory.activeSlot);

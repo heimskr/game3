@@ -66,6 +66,8 @@ namespace Game3 {
 			std::shared_ptr<Item> addAttribute(ItemAttribute);
 			inline bool operator==(const Item &other) const { return identifier == other.identifier; }
 
+			virtual void initStack(const Game &, ItemStack &) {}
+
 			virtual bool use(Slot, ItemStack &, const Place &);
 
 			/** Whether the item's use function (see Item::use) should be called when the user interacts with a floor tile and this item is selected in the inventory tab. */
@@ -83,9 +85,9 @@ namespace Game3 {
 			nlohmann::json data;
 
 			ItemStack() = default;
-			ItemStack(const std::shared_ptr<Item> &item_, ItemCount count_ = 1): item(item_), count(count_) {}
-			ItemStack(const std::shared_ptr<Item> &item_, ItemCount count_, const nlohmann::json &data_): item(item_), count(count_), data(data_) {}
-			ItemStack(const std::shared_ptr<Item> &item_, ItemCount count_, nlohmann::json &&data_): item(item_), count(count_), data(std::move(data_)) {}
+			ItemStack(const Game &);
+			ItemStack(const Game &, std::shared_ptr<Item> item_, ItemCount count_ = 1);
+			ItemStack(const Game &, std::shared_ptr<Item> item_, ItemCount count_, nlohmann::json data_);
 			ItemStack(const Game &, const ItemID &, ItemCount = 1);
 			ItemStack(const Game &, const ItemID &, ItemCount, nlohmann::json data_);
 
@@ -124,6 +126,7 @@ namespace Game3 {
 			static std::vector<ItemStack> manyFromJSON(const Game &, const nlohmann::json &);
 
 		private:
+			const Game *game = nullptr;
 			Glib::RefPtr<Gdk::Pixbuf> cachedImage;
 	};
 

@@ -95,11 +95,32 @@ namespace Game3 {
 
 // ItemStack
 
-	ItemStack::ItemStack(const Game &game, const ItemID &id, ItemCount count_):
-		item(game.registry<ItemRegistry>().at(id)), count(count_) {}
+	ItemStack::ItemStack(const Game &game_):
+		game(&game_) {}
 
-	ItemStack::ItemStack(const Game &game, const ItemID &id, ItemCount count_, nlohmann::json data_):
-		item(game.registry<ItemRegistry>().at(id)), count(count_), data(data_) {}
+	ItemStack::ItemStack(const Game &game_, std::shared_ptr<Item> item_, ItemCount count_):
+	item(std::move(item_)), count(count_), game(&game_) {
+		assert(item);
+		item->initStack(game_, *this);
+	}
+
+	ItemStack::ItemStack(const Game &game_, std::shared_ptr<Item> item_, ItemCount count_, nlohmann::json data_):
+	item(std::move(item_)), count(count_), data(std::move(data_)), game(&game_) {
+		assert(item);
+		item->initStack(game_, *this);
+	}
+
+	ItemStack::ItemStack(const Game &game_, const ItemID &id, ItemCount count_):
+	item(game_.registry<ItemRegistry>().at(id)), count(count_), game(&game_) {
+		assert(item);
+		item->initStack(game_, *this);
+	}
+
+	ItemStack::ItemStack(const Game &game_, const ItemID &id, ItemCount count_, nlohmann::json data_):
+	item(game_.registry<ItemRegistry>().at(id)), count(count_), data(std::move(data_)), game(&game_) {
+		assert(item);
+		item->initStack(game_, *this);
+	}
 
 	bool ItemStack::canMerge(const ItemStack &other) const {
 		return *item == *other.item && data == other.data;
@@ -116,7 +137,8 @@ namespace Game3 {
 	}
 
 	ItemStack ItemStack::withCount(ItemCount new_count) const {
-		return {item, new_count};
+		assert(game);
+		return {*game, item, new_count};
 	}
 
 	ItemStack ItemStack::withDurability(const Game &game, const ItemID &id, Durability durability) {
@@ -168,10 +190,11 @@ namespace Game3 {
 				stack.data = extra;
 			}
 		}
+		stack.item->initStack(game, stack);
 	}
 
 	ItemStack ItemStack::fromJSON(const Game &game, const nlohmann::json &json) {
-		ItemStack out;
+		ItemStack out(game);
 		fromJSON(game, json, out);
 		return out;
 	}

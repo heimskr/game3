@@ -41,7 +41,7 @@ namespace Game3 {
 				}
 			} else {
 				const ItemCount to_store = std::min(ItemCount(stack.item->maxCount), ItemCount(remaining));
-				storage.try_emplace(start, stack.item, to_store);
+				storage.try_emplace(start, getOwner()->getRealm()->getGame(), stack.item, to_store);
 				remaining -= to_store;
 			}
 		}
@@ -60,16 +60,18 @@ namespace Game3 {
 				}
 			}
 
-		if (0 < remaining)
+		if (0 < remaining) {
+			const Game &game = getOwner()->getRealm()->getGame();
 			for (Slot slot = 0; slot < slotCount; ++slot) {
 				if (storage.contains(slot))
 					continue;
 				const ItemCount to_store = std::min(ItemCount(remaining), stack.item->maxCount);
-				storage.emplace(slot, ItemStack(stack.item, to_store, stack.data));
+				storage.emplace(slot, ItemStack(game, stack.item, to_store, stack.data));
 				remaining -= to_store;
 				if (remaining <= 0)
 					break;
 			}
+		}
 
 		notifyOwner();
 
@@ -79,7 +81,7 @@ namespace Game3 {
 		if (remaining == 0)
 			return std::nullopt;
 
-		return ItemStack(stack.item, remaining);
+		return ItemStack(getOwner()->getRealm()->getGame(), stack.item, remaining);
 	}
 
 	bool Inventory::canStore(const ItemStack &stack) const {
@@ -321,7 +323,7 @@ namespace Game3 {
 
 		if (auto iter = json.find("storage"); iter != json.end())
 			for (const auto &[key, val]: iter->items())
-				out.storage[parseUlong(key)] = ItemStack::fromJSON(game, val);
+				out.storage.emplace(parseUlong(key), ItemStack::fromJSON(game, val));
 		out.slotCount  = json.at("slotCount");
 		out.activeSlot = json.at("activeSlot");
 		return out;
