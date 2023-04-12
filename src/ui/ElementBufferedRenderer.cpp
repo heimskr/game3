@@ -177,8 +177,7 @@ namespace Game3 {
 
 			lightTexture.useInFB();
 
-			// Clearing to half-white because the color in the lightmap will be multiplied by two
-			GL::clear(.5f, .5f, .5f, 0.f);
+			GL::clear(.0f, .0f, .0f, 0.f);
 
 			const TileID lava = (*tilemap->tileset)["base:tile/lava"];
 
