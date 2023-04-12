@@ -16,7 +16,6 @@ namespace Game3 {
 		public:
 			Canvas *canvas = nullptr;
 			Shader shader;
-			bool ignoreCanvas = false;
 
 			SpriteRenderer(Canvas &);
 			~SpriteRenderer();

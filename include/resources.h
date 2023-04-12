@@ -17,3 +17,5 @@ extern const char blur_vert[];
 extern const size_t blur_vert_len;
 extern const char reshader_vert[];
 extern const size_t reshader_vert_len;
+extern const char multiplier_frag[];
+extern const size_t multiplier_frag_len;

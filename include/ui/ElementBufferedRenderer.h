@@ -25,7 +25,7 @@ namespace Game3 {
 
 			void reset();
 			void init(TilemapPtr);
-			void render(GLuint target_texture, float divisor);
+			void render(float divisor);
 			void reupload();
 			bool onBackbufferResized(int width, int height);
 			inline void markDirty() { dirty = true; }

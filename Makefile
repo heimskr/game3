@@ -42,7 +42,7 @@ src/gtk_resources.cpp: $(RESXML) $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=r
 	@ printf "\e[2m[\e[22;32mcc\e[39;2m]\e[22m $< \e[2m$(BUILDFLAGS)\e[22m\n"
 	@ $(COMPILER) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
 
-src/resources.o: src/resources.zig resources/buffered.frag resources/buffered.vert resources/rect.frag resources/rect.vert resources/sprite.frag resources/sprite.vert resources/blur.frag resources/blur.vert resources/reshader.vert
+src/resources.o: src/resources.zig resources/buffered.frag resources/buffered.vert resources/rectangle.frag resources/rectangle.vert resources/sprite.frag resources/sprite.vert resources/blur.frag resources/blur.vert resources/reshader.vert resources/multiplier.frag
 	@ printf "\e[2m[\e[22;32mzig\e[39;2m]\e[22m $<\n"
 	@ zig build-obj $< --main-pkg-path . -femit-bin=$@ -O ReleaseSmall
 

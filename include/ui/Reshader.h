@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Eigen/Eigen>
+#include <string_view>
 
 #include "Shader.h"
 #include "util/GL.h"

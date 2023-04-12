@@ -115,11 +115,9 @@ namespace Game3 {
 		renderer3.center = center;
 		renderer3.scale  = scale;
 		renderer3.onBackbufferResized(bb_width, bb_height);
-		const auto texture_handle = texture.getHandle();
-		renderer1.render(texture_handle, outdoors? game_time : 1);
-		renderer2.render(texture_handle, outdoors? game_time : 1);
-		renderer3.render(texture_handle, outdoors? game_time : 1);
-		sprite_renderer.ignoreCanvas = true;
+		renderer1.render(outdoors? game_time : 1);
+		renderer2.render(outdoors? game_time : 1);
+		renderer3.render(outdoors? game_time : 1);
 		sprite_renderer.update(bb_width / 1.f, bb_height / 1.f);
 
 		for (const auto &entity: entities)
@@ -129,9 +127,6 @@ namespace Game3 {
 		viewport.reset();
 		fbo.undo();
 
-		// const auto w = texture.getWidth();
-		// const auto h = texture.getHeight();
-		sprite_renderer.ignoreCanvas = false;
 		sprite_renderer.update(width, height);
 		sprite_renderer.drawOnMap(texture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
 		sprite_renderer.drawOnMap(renderer1.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);

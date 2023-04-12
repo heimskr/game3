@@ -58,11 +58,10 @@ namespace Game3 {
 		initialized = true;
 	}
 
-	void ElementBufferedRenderer::render(GLuint target_texture, float divisor) {
+	void ElementBufferedRenderer::render(float divisor) {
 		if (!initialized)
 			return;
 
-		// GL::useTextureInFB(target_texture);
 		tilemap->getTexture(realm.getGame())->bind(0);
 
 		if (dirty) {
@@ -70,15 +69,10 @@ namespace Game3 {
 			dirty = false;
 		}
 
-		constexpr float center_scale = 0.f;
-		constexpr float size_scale = -1.f;
-
 		glm::mat4 projection(1.f);
-		projection = //glm::scale(projection, {tilemap->tileSize, -tilemap->tileSize, 1.f}) *
-		            //  glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1.f}) *
-		             glm::scale(projection, {32.f / backbufferWidth, 32.f / backbufferHeight, 1.f}) *
-		             glm::translate(projection, {center.x() * center_scale + tilemap->width * size_scale, center.y() * center_scale + tilemap->height * size_scale, 0});
-		            //  glm::translate(projection, {0 - tilemap->width / 2.f, 0 - tilemap->height / 2.f, 0.f});
+		projection = glm::scale(projection, {tilemap->tileSize, tilemap->tileSize, 1.f}) *
+		             glm::scale(projection, {2.f / backbufferWidth, 2.f / backbufferHeight, 1.f}) *
+		             glm::translate(projection, {-tilemap->width, -tilemap->height, 0.f});
 
 		shader.bind();
 		vao.bind();
