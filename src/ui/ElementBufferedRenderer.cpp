@@ -32,6 +32,7 @@ namespace Game3 {
 			lightTexture.reset();
 			blurredLightTexture.reset();
 			lightFBO.reset();
+			reshader.reset();
 			tilemap.reset();
 			initialized = false;
 		}

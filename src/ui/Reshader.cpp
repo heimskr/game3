@@ -15,9 +15,14 @@ namespace Game3 {
 	}
 
 	Reshader::~Reshader() {
+		reset();
+	}
+
+	void Reshader::reset() {
 		if (initialized) {
 			glDeleteBuffers(1, &vbo);
 			glDeleteVertexArrays(1, &quadVAO); CHECKGL
+			initialized = false;
 		}
 	}
 

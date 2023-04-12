@@ -5,7 +5,6 @@
 #include "util/GL.h"
 
 namespace Game3 {
-
 	/** For drawing a texture with a fragment shader applied. */
 	class Reshader {
 		public:
@@ -15,8 +14,8 @@ namespace Game3 {
 			Reshader(std::string_view fragment_shader);
 			~Reshader();
 
+			void reset();
 			void update(int backbuffer_width, int backbuffer_height);
-
 			void bind();
 
 			void operator()(GLuint texture);
