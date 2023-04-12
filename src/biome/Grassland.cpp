@@ -61,7 +61,7 @@ namespace Game3 {
 				Game &game = realm.getGame();
 				realm.remove(tile);
 				if (distribution(rng) < 3) {
-					const std::vector<ItemStack> mushrooms {
+					std::vector<ItemStack> mushrooms {
 						{game, "base:item/saffron_milkcap"},
 						{game, "base:item/saffron_milkcap"},
 						{game, "base:item/saffron_milkcap"},
@@ -70,7 +70,7 @@ namespace Game3 {
 						{game, "base:item/brittlegill"},
 					};
 
-					realm.add(TileEntity::create<ItemSpawner>(game, Position(row, column), 0.00025f, mushrooms));
+					realm.add(TileEntity::create<ItemSpawner>(game, Position(row, column), 0.00025f, std::move(mushrooms)));
 				}
 			}
 		}
