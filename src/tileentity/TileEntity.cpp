@@ -43,9 +43,10 @@ namespace Game3 {
 	}
 
 	void TileEntity::absorbJSON(Game &, const nlohmann::json &json) {
-		tileID   = json.at("tileID");
-		position = json.at("position");
-		solid    = json.at("solid");
+		tileEntityID = json.at("id");
+		tileID       = json.at("tileID");
+		position     = json.at("position");
+		solid        = json.at("solid");
 		if (json.contains("extra"))
 			extraData = json.at("extra");
 	}
