@@ -47,8 +47,7 @@ namespace Game3 {
 		try {
 			seed = parseLong(seedEntry.get_text());
 		} catch (const std::invalid_argument &) {
-			show_error("Invalid seed.");
-			return;
+			seed = std::hash<std::string>()(seedEntry.get_text().raw());
 		}
 
 		try {
