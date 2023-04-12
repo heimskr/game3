@@ -540,9 +540,9 @@ namespace Game3 {
 		pathMap[getIndex(position)] = isWalkable(row, column, tileset);
 		updateNeighbors(position);
 		if (should_mark_dirty) {
-			renderer1.markDirty(this);
-			renderer2.markDirty(this);
-			renderer3.markDirty(this);
+			renderer1.markDirty();
+			renderer2.markDirty();
+			renderer3.markDirty();
 		}
 	}
 
@@ -552,9 +552,9 @@ namespace Game3 {
 		pathMap[index] = isWalkable(position.row, position.column, tileset);
 		updateNeighbors(position);
 		if (should_mark_dirty) {
-			renderer1.markDirty(this);
-			renderer2.markDirty(this);
-			renderer3.markDirty(this);
+			renderer1.markDirty();
+			renderer2.markDirty();
+			renderer3.markDirty();
 		}
 	}
 

@@ -16,7 +16,8 @@
 // Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Renderers/ElementBufferedRenderer.cs
 
 namespace Game3 {
-	ElementBufferedRenderer::ElementBufferedRenderer(): reshader(blur_frag) {}
+	ElementBufferedRenderer::ElementBufferedRenderer(Realm &realm_):
+		reshader(blur_frag), realm(realm_) {}
 
 	ElementBufferedRenderer::~ElementBufferedRenderer() {
 		reset();
@@ -57,10 +58,7 @@ namespace Game3 {
 		if (!initialized)
 			return;
 
-		if (!realm)
-			return;
-
-		tilemap->getTexture(realm->getGame())->bind();
+		tilemap->getTexture(realm.getGame())->bind();
 
 		if (dirty) {
 			recomputeLighting();

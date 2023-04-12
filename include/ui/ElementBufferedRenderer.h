@@ -12,7 +12,7 @@
 namespace Game3 {
 	class ElementBufferedRenderer: public TilemapRenderer {
 		public:
-			ElementBufferedRenderer();
+			ElementBufferedRenderer(Realm &);
 			virtual ~ElementBufferedRenderer() override;
 
 			void reset();
@@ -20,7 +20,7 @@ namespace Game3 {
 			void render(float divisor) override;
 			void reupload();
 			bool onBackbufferResized(int width, int height) override;
-			inline void markDirty(Realm *realm_) { dirty = true; realm = realm_; }
+			inline void markDirty() { dirty = true; }
 
 			operator bool() const { return initialized; }
 
@@ -39,7 +39,7 @@ namespace Game3 {
 			std::unordered_set<TileID> brightSet;
 			RectangleRenderer rectangle;
 			Reshader reshader;
-			Realm *realm = nullptr;
+			Realm &realm;
 			std::vector<TileID> tileCache;
 
 			void generateVertexBufferObject();

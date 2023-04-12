@@ -34,9 +34,13 @@ namespace Game3 {
 		public:
 			RealmID id;
 			RealmType type;
-			TilemapPtr tilemap1, tilemap2, tilemap3;
+			TilemapPtr tilemap1;
+			TilemapPtr tilemap2;
+			TilemapPtr tilemap3;
 			BiomeMapPtr biomeMap;
-			ElementBufferedRenderer renderer1, renderer2, renderer3;
+			ElementBufferedRenderer renderer1 {*this};
+			ElementBufferedRenderer renderer2 {*this};
+			ElementBufferedRenderer renderer3 {*this};
 			std::unordered_map<Index, std::shared_ptr<TileEntity>> tileEntities;
 			std::unordered_set<std::shared_ptr<Entity>> entities;
 			/** A vector of bools (represented with uint8_t to avoid the std::vector<bool> specialization) indicating whether a given square is empty for the purposes of pathfinding. */
