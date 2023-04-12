@@ -174,16 +174,16 @@ namespace Game3 {
 
 		shader.bind();
 
-		y = backbufferHeight / 16.f - y + y_offset / 4.f; // Four?!
+		y = backbufferHeight / 16.f - y + y_offset / 4.f * scale; // Four?!
 
 		glm::mat4 model = glm::mat4(1.f);
 		// // first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
 		model = glm::translate(model, glm::vec3(x * 16.f - x_offset * 2.f * scale, y * 16.f - y_offset * 2.f * scale, 0.0f));
-		model = glm::scale(model, glm::vec3(1.f, -1.f, 1.f));
+		model = glm::scale    (model, glm::vec3(1.f, -1.f, 1.f));
 		model = glm::translate(model, glm::vec3(0.5f * twidth, 0.5f * theight, 0.0f));
-		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate   (model, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::translate(model, glm::vec3(-0.5f * twidth, -0.5f * theight, 0.0f));
-		model = glm::scale(model, glm::vec3(twidth * 1.f * scale, theight * 1.f * scale, 1.0f));
+		model = glm::scale    (model, glm::vec3(twidth * scale, theight * scale, 1.0f));
 
 		shader.set("model", model);
 		shader.set("spriteColor", 1.f, 1.f, 1.f, alpha);
