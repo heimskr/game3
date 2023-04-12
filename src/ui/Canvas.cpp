@@ -24,6 +24,7 @@ namespace Game3 {
 		if (game->activeRealm)
 			game->activeRealm->render(width(), height(), center, scale, spriteRenderer, game->getDivisor());
 		game->player->render(spriteRenderer);
+		realmBounds = game->getVisibleRealmBounds();
 	}
 
 	int Canvas::width() const {
@@ -32,12 +33,6 @@ namespace Game3 {
 
 	int Canvas::height() const {
 		return window.glArea.get_height();
-	}
-
-	void Canvas::update() {
-		if (!game)
-			return;
-		realmBounds = game->getVisibleRealmBounds();
 	}
 
 	bool Canvas::inBounds(const Position &pos) const {

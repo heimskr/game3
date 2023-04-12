@@ -38,7 +38,11 @@ namespace Game3 {
 		hide();
 
 		long seed = 0, width = 0, height = 0;
-		auto show_error = [this](const std::string &message) { mainWindow.queue([this, message] { mainWindow.error(message); }); };
+		auto show_error = [this](const std::string &message) {
+			mainWindow.queue([this, message] {
+				mainWindow.error(message);
+			});
+		};
 
 		try {
 			seed = parseLong(seedEntry.get_text());

@@ -37,8 +37,6 @@ namespace Game3 {
 			int width() const;
 			int height() const;
 
-			/** Recalculates the visible realm bounds (see Game::getVisibleRealmBounds). */
-			void update();
 			bool inBounds(const Position &) const;
 	};
 }

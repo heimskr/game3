@@ -41,10 +41,8 @@ namespace Game3 {
 			/** Queues a function to be executed in the GTK thread. Thread-safe. Can be used from any thread. */
 			void queue(std::function<void()>);
 
-			/** Displays an alert. This will reset the dialog pointer. If you need to use this inside a dialog's code,
-			 *  use delay(). */
-			void alert(const Glib::ustring &message, Gtk::MessageType = Gtk::MessageType::INFO, bool modal = true,
-			           bool use_markup = false);
+			/** Displays an alert. This will reset the dialog pointer. If you need to use this inside a dialog's code, use delay(). */
+			void alert(const Glib::ustring &message, Gtk::MessageType = Gtk::MessageType::INFO, bool modal = true, bool use_markup = false);
 
 			/** Displays an error message. (See alert.) */
 			void error(const Glib::ustring &message, bool modal = true, bool use_markup = false);

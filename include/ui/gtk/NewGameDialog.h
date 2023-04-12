@@ -11,7 +11,7 @@ namespace Game3 {
 		public:
 			NewGameDialog(MainWindow &parent_);
 
-			sigc::signal<void(long, long, long)> signal_submit() const { return signal_submit_; }
+			inline sigc::signal<void(long, long, long)> signal_submit() const { return signal_submit_; }
 
 		private:
 			MainWindow &mainWindow;
