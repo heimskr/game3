@@ -6,22 +6,29 @@
 #include "Shader.h"
 #include "ui/RectangleRenderer.h"
 #include "ui/Reshader.h"
-#include "ui/TilemapRenderer.h"
 #include "util/GL.h"
 
 namespace Game3 {
-	class ElementBufferedRenderer: public TilemapRenderer {
+	class ElementBufferedRenderer {
 		public:
+			constexpr static float tileTextureSize = 1 / 10.f;
+			constexpr static float tileTexturePadding = 1 / 2048.f;
+			float scale = 2.f;
+			int backbufferWidth = -1;
+			int backbufferHeight = -1;
+
+			Eigen::Vector2f center {0.f, 0.f};
+			TilemapPtr tilemap;
 			GL::Texture lightTexture;
 
 			ElementBufferedRenderer(Realm &);
-			virtual ~ElementBufferedRenderer() override final;
+			~ElementBufferedRenderer();
 
 			void reset();
-			void init(TilemapPtr) override final;
-			void render(float divisor) override final;
+			void init(TilemapPtr);
+			void render(float divisor);
 			void reupload();
-			bool onBackbufferResized(int width, int height) override final;
+			bool onBackbufferResized(int width, int height);
 			inline void markDirty() { dirty = true; }
 
 			operator bool() const { return initialized; }
@@ -49,5 +56,7 @@ namespace Game3 {
 			void generateLightingTexture();
 
 			void recomputeLighting();
+
+			static void check(int handle, bool is_link = false);
 	};
 }
