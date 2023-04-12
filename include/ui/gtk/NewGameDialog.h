@@ -7,7 +7,7 @@
 namespace Game3 {
 	class MainWindow;
 
-	class NewGameDialog: public Gtk::Dialog {
+	class NewGameDialog: public Gtk::MessageDialog {
 		public:
 			NewGameDialog(MainWindow &parent_);
 

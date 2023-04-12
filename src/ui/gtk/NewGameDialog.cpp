@@ -3,16 +3,11 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	NewGameDialog::NewGameDialog(MainWindow &parent_): Gtk::Dialog("New Game", parent_), mainWindow(parent_) {
-		auto *area = get_content_area();
+	NewGameDialog::NewGameDialog(MainWindow &parent_): Gtk::MessageDialog(parent_, "New Game", false, Gtk::MessageType::OTHER, Gtk::ButtonsType::CANCEL, true), mainWindow(parent_) {
+		auto *area = get_message_area();
 		seedLabel.set_halign(Gtk::Align::START);
 		widthLabel.set_halign(Gtk::Align::START);
 		heightLabel.set_halign(Gtk::Align::START);
-		area->set_orientation(Gtk::Orientation::VERTICAL);
-		area->set_margin(5);
-		seedLabel.set_margin(5);
-		widthLabel.set_margin(5);
-		heightLabel.set_margin(5);
 		seedEntry.set_text("1621");
 		widthEntry.set_text("256");
 		heightEntry.set_text("256");
@@ -25,12 +20,11 @@ namespace Game3 {
 		area->append(widthEntry);
 		area->append(heightLabel);
 		area->append(heightEntry);
-		add_button("_Cancel", Gtk::ResponseType::CANCEL);
 		add_button("Cr_eate", Gtk::ResponseType::OK);
 		int width, height;
-		set_modal(true);
 		get_default_size(width, height);
-		set_default_size(300, height);
+		if (width < 300)
+			set_default_size(300, height);
 		signal_response().connect([this](int response) {
 			if (response == Gtk::ResponseType::OK)
 				submit();
