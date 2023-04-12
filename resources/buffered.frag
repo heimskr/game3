@@ -18,8 +18,4 @@ void main() {
 		FragColor.g /= divisor;
 		FragColor.b /= divisor;
 	}
-
-	if (FragColor.a < 0.01) {
-		discard;
-	}
 }
