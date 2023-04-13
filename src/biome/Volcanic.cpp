@@ -6,6 +6,7 @@
 #include "tileentity/ItemSpawner.h"
 #include "util/Timer.h"
 #include "util/Util.h"
+#include "worldgen/WorldGen.h"
 
 namespace Game3 {
 	void Volcanic::init(Realm &realm, int noise_seed, const std::shared_ptr<double[]> &saved_noise) {
@@ -18,15 +19,17 @@ namespace Game3 {
 		const double noise = perlin.GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.666);
 		savedNoise[row * realm.getWidth() + column] = noise;
 
-		if (noise < THRESHOLD) {
+		const auto wetness = params.wetness;
+
+		if (noise < wetness) {
 			realm.setLayer1({row, column}, "base:tile/deeper_water"_id);
-		} else if (noise < THRESHOLD + 0.1) {
+		} else if (noise < wetness + 0.1) {
 			realm.setLayer1({row, column}, "base:tile/deep_water"_id);
-		} else if (noise < THRESHOLD + 0.2) {
+		} else if (noise < wetness + 0.2) {
 			realm.setLayer1({row, column}, "base:tile/water"_id);
-		} else if (noise < THRESHOLD + 0.3) {
+		} else if (noise < wetness + 0.3) {
 			realm.setLayer1({row, column}, "base:tile/shallow_water"_id);
-		} else if (noise < THRESHOLD + 0.4) {
+		} else if (noise < wetness + 0.4) {
 			realm.setLayer1({row, column}, "base:tile/volcanic_sand"_id);
 		} else if (0.85 < noise) {
 			realm.setLayer1({row, column}, "base:tile/lava"_id);

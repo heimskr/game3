@@ -27,19 +27,19 @@ namespace Game3 {
 		const double noise = perlin.GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.666);
 		savedNoise[row * realm.getWidth() + column] = noise;
 
-		const auto threshold = params.wetness;
+		const auto wetness = params.wetness;
 
-		if (noise < threshold) {
+		if (noise < wetness) {
 			realm.setLayer1({row, column}, "base:tile/deeper_water"_id);
-		} else if (noise < threshold + 0.1) {
+		} else if (noise < wetness + 0.1) {
 			realm.setLayer1({row, column}, "base:tile/deep_water"_id);
-		} else if (noise < threshold + 0.2) {
+		} else if (noise < wetness + 0.2) {
 			realm.setLayer1({row, column}, "base:tile/water"_id);
-		} else if (noise < threshold + 0.3) {
+		} else if (noise < wetness + 0.3) {
 			realm.setLayer1({row, column}, "base:tile/shallow_water"_id);
-		} else if (noise < threshold + 0.4) {
+		} else if (noise < wetness + 0.4) {
 			realm.setLayer1({row, column}, "base:tile/sand"_id);
-		} else if (noise < threshold + 0.5) {
+		} else if (noise < wetness + 0.5) {
 			realm.setLayer1({row, column}, "base:tile/light_grass"_id);
 		} else if (0.8 < noise) {
 			realm.setLayer1({row, column}, "base:tile/stone"_id);
