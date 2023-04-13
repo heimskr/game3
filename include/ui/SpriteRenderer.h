@@ -41,10 +41,13 @@ namespace Game3 {
 			void reset();
 
 		private:
-			void initRenderData();
 			GLuint quadVAO = 0;
 			bool initialized = false;
 			int backbufferWidth = -1;
 			int backbufferHeight = -1;
+
+			void initRenderData();
+			void setupShader(int texture_width, int texture_height, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale, float angle, float alpha);
+			void hackY(float &y, float y_offset, float scale);
 	};
 }

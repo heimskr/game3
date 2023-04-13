@@ -9,4 +9,8 @@ namespace Game3 {
 	struct Position;
 
 	using BuildingGenerator = std::function<void(const std::shared_ptr<Realm> &, std::default_random_engine &, const std::shared_ptr<Realm> &, const Position &)>;
+
+	struct WorldGenParams {
+		double wetness = 0.0;
+	};
 }

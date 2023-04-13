@@ -24,6 +24,7 @@
 #include "util/FS.h"
 #include "util/Util.h"
 #include "worldgen/Overworld.h"
+#include "worldgen/WorldGen.h"
 
 // #define USE_CBOR
 
@@ -278,7 +279,7 @@ namespace Game3 {
 		}, 2);
 	}
 
-	void MainWindow::newGame(int seed, int width, int height) {
+	void MainWindow::newGame(int seed, int width, int height, double wetness) {
 		glArea.get_context()->make_current();
 		game = Game::create(*canvas);
 		game->initEntities();
@@ -291,7 +292,9 @@ namespace Game3 {
 		realm->outdoors = true;
 		std::default_random_engine rng;
 		rng.seed(seed);
-		WorldGen::generateOverworld(realm, rng, seed);
+		WorldGen::generateOverworld(realm, rng, seed, {
+			.wetness = wetness
+		});
 		game->realms.emplace(realm->id, realm);
 		game->activeRealm = realm;
 		realm->add(game->player = Entity::create<Player>());

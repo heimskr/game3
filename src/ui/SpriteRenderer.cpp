@@ -112,13 +112,13 @@ namespace Game3 {
 		if (!initialized)
 			return;
 
-		const auto twidth = texture.getWidth();
-		const auto theight = texture.getHeight();
+		const auto texture_width = texture.getWidth();
+		const auto texture_height = texture.getHeight();
 
 		if (size_x < 0)
-			size_x = twidth;
+			size_x = texture_width;
 		if (size_y < 0)
-			size_y = theight;
+			size_y = texture_height;
 
 		const auto &tilemap = canvas->game->activeRealm->tilemap1;
 		x *= tilemap->tileSize * canvas->scale / 2.f;
@@ -137,15 +137,15 @@ namespace Game3 {
 		glm::mat4 model = glm::mat4(1.f);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
 		model = glm::translate(model, glm::vec3(x - x_offset * canvas->scale * scale, y - y_offset * canvas->scale * scale, 0.f));
-		model = glm::translate(model, glm::vec3(0.5f * twidth, 0.5f * theight, 0.f)); // move origin of rotation to center of quad
+		model = glm::translate(model, glm::vec3(0.5f * texture_width, 0.5f * texture_height, 0.f)); // move origin of rotation to center of quad
 		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
-		model = glm::translate(model, glm::vec3(-0.5f * twidth, -0.5f * theight, 0.f)); // move origin back
-		model = glm::scale(model, glm::vec3(twidth * scale * canvas->scale / 2.f, theight * scale * canvas->scale / 2.f, 2.f)); // last scale
+		model = glm::translate(model, glm::vec3(-0.5f * texture_width, -0.5f * texture_height, 0.f)); // move origin back
+		model = glm::scale(model, glm::vec3(texture_width * scale * canvas->scale / 2.f, texture_height * scale * canvas->scale / 2.f, 2.f)); // last scale
 
 		shader.set("model", model);
 		shader.set("spriteColor", 1.f, 1.f, 1.f, alpha);
-		const float multiplier = 2.f / twidth;
-		shader.set("texturePosition", x_offset * multiplier, y_offset * multiplier, size_x / twidth, size_y / twidth);
+		const float multiplier = 2.f / texture_width;
+		shader.set("texturePosition", x_offset * multiplier, y_offset * multiplier, size_x / texture_width, size_y / texture_width);
 
 		texture.bind(0);
 
@@ -164,33 +164,16 @@ namespace Game3 {
 		if (!initialized)
 			return;
 
-		const auto twidth  = *texture.width;
-		const auto theight = *texture.height;
+		const auto texture_width  = *texture.width;
+		const auto texture_height = *texture.height;
+		hackY(y, y_offset, scale);
 
 		if (size_x < 0)
-			size_x = twidth;
+			size_x = texture_width;
 		if (size_y < 0)
-			size_y = theight;
+			size_y = texture_height;
 
-		shader.bind();
-
-		y = backbufferHeight / 16.f - y + y_offset / 4.f * scale; // Four?!
-
-		glm::mat4 model = glm::mat4(1.f);
-		// // first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(x * 16.f - x_offset * 2.f * scale, y * 16.f - y_offset * 2.f * scale, 0.0f));
-		model = glm::scale    (model, glm::vec3(1.f, -1.f, 1.f));
-		model = glm::translate(model, glm::vec3(0.5f * twidth, 0.5f * theight, 0.0f));
-		model = glm::rotate   (model, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::translate(model, glm::vec3(-0.5f * twidth, -0.5f * theight, 0.0f));
-		model = glm::scale    (model, glm::vec3(twidth * scale, theight * scale, 1.0f));
-
-		shader.set("model", model);
-		shader.set("spriteColor", 1.f, 1.f, 1.f, alpha);
-		const float multiplier = 2.f;
-		const float multiplier_x = multiplier / twidth;
-		const float multiplier_y = multiplier / theight;
-		shader.set("texturePosition", x_offset * multiplier_x, y_offset * multiplier_y, size_x / twidth, size_y / theight);
+		setupShader(texture_width, texture_height, x, y, x_offset, y_offset, size_x, size_y, scale, angle, alpha);
 
 		glActiveTexture(GL_TEXTURE0);
 		texture.bind();
@@ -205,33 +188,16 @@ namespace Game3 {
 		if (!initialized)
 			return;
 
-		const auto twidth  = texture.getWidth();
-		const auto theight = texture.getHeight();
+		const auto texture_width  = texture.getWidth();
+		const auto texture_height = texture.getHeight();
+		hackY(y, y_offset, scale);
 
 		if (size_x < 0)
-			size_x = twidth;
+			size_x = texture_width;
 		if (size_y < 0)
-			size_y = theight;
+			size_y = texture_height;
 
-		shader.bind();
-
-		y = backbufferHeight / 16.f - y + y_offset / 4.f * scale; // Four?!
-
-		glm::mat4 model = glm::mat4(1.f);
-		// // first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(x * 16.f - x_offset * 2.f * scale, y * 16.f - y_offset * 2.f * scale, 0.0f));
-		model = glm::scale    (model, glm::vec3(1.f, -1.f, 1.f));
-		model = glm::translate(model, glm::vec3(0.5f * twidth, 0.5f * theight, 0.0f));
-		model = glm::rotate   (model, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::translate(model, glm::vec3(-0.5f * twidth, -0.5f * theight, 0.0f));
-		model = glm::scale    (model, glm::vec3(twidth * scale, theight * scale, 1.0f));
-
-		shader.set("model", model);
-		shader.set("spriteColor", 1.f, 1.f, 1.f, alpha);
-		const float multiplier = 2.f;
-		const float multiplier_x = multiplier / twidth;
-		const float multiplier_y = multiplier / theight;
-		shader.set("texturePosition", x_offset * multiplier_x, y_offset * multiplier_y, size_x / twidth, size_y / theight);
+		setupShader(texture_width, texture_height, x, y, x_offset, y_offset, size_x, size_y, scale, angle, alpha);
 
 		texture.bind(0);
 
@@ -275,5 +241,28 @@ namespace Game3 {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 		initialized = true;
+	}
+
+	void SpriteRenderer::setupShader(int texture_width, int texture_height, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale, float angle, float alpha) {
+		glm::mat4 model = glm::mat4(1.f);
+		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
+		model = glm::translate(model, glm::vec3(x * 16.f - x_offset * 2.f * scale, y * 16.f - y_offset * 2.f * scale, 0.0f));
+		model = glm::scale    (model, glm::vec3(1.f, -1.f, 1.f));
+		model = glm::translate(model, glm::vec3(0.5f * texture_width, 0.5f * texture_height, 0.0f));
+		model = glm::rotate   (model, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, glm::vec3(-0.5f * texture_width, -0.5f * texture_height, 0.0f));
+		model = glm::scale    (model, glm::vec3(texture_width * scale, texture_height * scale, 1.0f));
+
+		shader.bind();
+		shader.set("model", model);
+		shader.set("spriteColor", 1.f, 1.f, 1.f, alpha);
+		const float multiplier = 2.f;
+		const float multiplier_x = multiplier / texture_width;
+		const float multiplier_y = multiplier / texture_height;
+		shader.set("texturePosition", x_offset * multiplier_x, y_offset * multiplier_y, size_x / texture_width, size_y / texture_height);
+	}
+
+	void SpriteRenderer::hackY(float &y, float y_offset, float scale) {
+		y = backbufferHeight / 16.f - y + y_offset / 4.f * scale; // Four?!
 	}
 }

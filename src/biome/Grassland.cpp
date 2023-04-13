@@ -7,6 +7,7 @@
 #include "tileentity/Tree.h"
 #include "util/Timer.h"
 #include "util/Util.h"
+#include "worldgen/WorldGen.h"
 
 namespace Game3 {
 	void Grassland::init(Realm &realm, int noise_seed, const std::shared_ptr<double[]> &saved_noise) {
@@ -15,7 +16,7 @@ namespace Game3 {
 		forestPerlin->SetSeed(-noise_seed * 3);
 	}
 
-	void Grassland::generate(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &perlin) {
+	void Grassland::generate(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &perlin, const WorldGenParams &params) {
 		Realm &realm = *getRealm();
 
 		static const std::vector<Identifier> grasses {
@@ -26,17 +27,19 @@ namespace Game3 {
 		const double noise = perlin.GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.666);
 		savedNoise[row * realm.getWidth() + column] = noise;
 
-		if (noise < THRESHOLD) {
+		const auto threshold = params.wetness;
+
+		if (noise < threshold) {
 			realm.setLayer1({row, column}, "base:tile/deeper_water"_id);
-		} else if (noise < THRESHOLD + 0.1) {
+		} else if (noise < threshold + 0.1) {
 			realm.setLayer1({row, column}, "base:tile/deep_water"_id);
-		} else if (noise < THRESHOLD + 0.2) {
+		} else if (noise < threshold + 0.2) {
 			realm.setLayer1({row, column}, "base:tile/water"_id);
-		} else if (noise < THRESHOLD + 0.3) {
+		} else if (noise < threshold + 0.3) {
 			realm.setLayer1({row, column}, "base:tile/shallow_water"_id);
-		} else if (noise < THRESHOLD + 0.4) {
+		} else if (noise < threshold + 0.4) {
 			realm.setLayer1({row, column}, "base:tile/sand"_id);
-		} else if (noise < THRESHOLD + 0.5) {
+		} else if (noise < threshold + 0.5) {
 			realm.setLayer1({row, column}, "base:tile/light_grass"_id);
 		} else if (0.8 < noise) {
 			realm.setLayer1({row, column}, "base:tile/stone"_id);

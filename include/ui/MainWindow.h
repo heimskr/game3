@@ -109,7 +109,7 @@ namespace Game3 {
 			float rightPadStartCanvasX = 0.f;
 			float rightPadStartCanvasY = 0.f;
 
-			void newGame(int seed, int width, int height);
+			void newGame(int seed, int width, int height, double wetness);
 			void loadGame(const std::filesystem::path &);
 			void saveGame(const std::filesystem::path &);
 			bool render(const Glib::RefPtr<Gdk::GLContext> &);

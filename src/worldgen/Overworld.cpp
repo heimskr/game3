@@ -13,7 +13,7 @@
 #include "worldgen/Town.h"
 
 namespace Game3::WorldGen {
-	void generateOverworld(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, int noise_seed) {
+	void generateOverworld(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, int noise_seed, const WorldGenParams &params) {
 		Timer overworld_timer("GenOverworld");
 		const auto width  = realm->getWidth();
 		const auto height = realm->getHeight();
@@ -56,7 +56,7 @@ namespace Game3::WorldGen {
 		Timer noise_timer("BiomeGeneration");
 		for (Index row = 0; row < height; ++row)
 			for (Index column = 0; column < width; ++column)
-				get_biome(row, column).generate(row, column, rng, perlin);
+				get_biome(row, column).generate(row, column, rng, perlin, params);
 		noise_timer.stop();
 
 		constexpr static int m = 26, n = 34, pad = 2;

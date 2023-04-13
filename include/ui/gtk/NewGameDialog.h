@@ -11,13 +11,14 @@ namespace Game3 {
 		public:
 			NewGameDialog(MainWindow &parent_);
 
-			inline sigc::signal<void(long, long, long)> signal_submit() const { return signal_submit_; }
+			inline auto signal_submit() const { return signal_submit_; }
 
 		private:
 			MainWindow &mainWindow;
-			sigc::signal<void(long, long, long)> signal_submit_;
-			Gtk::Label seedLabel {"Seed"}, widthLabel {"Width"}, heightLabel {"Height"};
+			sigc::signal<void(long, long, long, double)> signal_submit_;
+			Gtk::Label seedLabel {"Seed"}, widthLabel {"Width"}, heightLabel {"Height"}, wetnessLabel {"Wetness"};
 			Gtk::Entry seedEntry;
+			Gtk::Scale wetnessSlider;
 			NumericEntry widthEntry, heightEntry;
 
 			void submit();

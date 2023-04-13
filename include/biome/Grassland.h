@@ -11,7 +11,7 @@ namespace Game3 {
 			Grassland(): Biome(Biome::GRASSLAND) {}
 
 			void init(Realm &, int noise_seed, const std::shared_ptr<double[]> &shared_noise) override;
-			void generate(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &) override;
+			void generate(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &, const WorldGenParams &) override;
 			void postgen(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &) override;
 
 		protected:

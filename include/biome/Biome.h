@@ -12,6 +12,7 @@ namespace noise::module {
 
 namespace Game3 {
 	class Realm;
+	struct WorldGenParams;
 
 	class Biome {
 		public:
@@ -32,7 +33,7 @@ namespace Game3 {
 
 			virtual void init(Realm &realm_, int noise_seed, const std::shared_ptr<double[]> &saved_noise);
 
-			virtual void generate(Index row, Index column, std::default_random_engine &, const noise::module::Perlin &) {
+			virtual void generate(Index row, Index column, std::default_random_engine &, const noise::module::Perlin &, const WorldGenParams &) {
 				(void) row; (void) column;
 			}
 

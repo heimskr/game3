@@ -8,18 +8,26 @@ namespace Game3 {
 		seedLabel.set_halign(Gtk::Align::START);
 		widthLabel.set_halign(Gtk::Align::START);
 		heightLabel.set_halign(Gtk::Align::START);
+		wetnessLabel.set_halign(Gtk::Align::START);
 		seedEntry.set_text("1621");
 		widthEntry.set_text("256");
 		heightEntry.set_text("256");
 		seedEntry.signal_activate().connect(sigc::mem_fun(*this, &NewGameDialog::submit));
 		widthEntry.signal_activate().connect(sigc::mem_fun(*this, &NewGameDialog::submit));
 		heightEntry.signal_activate().connect(sigc::mem_fun(*this, &NewGameDialog::submit));
+		wetnessSlider.set_digits(2);
+		wetnessSlider.set_value_pos(Gtk::PositionType::RIGHT);
+		wetnessSlider.set_range(-1.0, 1.0);
+		wetnessSlider.set_value(-0.15);
+		wetnessSlider.set_draw_value();
 		area->append(seedLabel);
 		area->append(seedEntry);
 		area->append(widthLabel);
 		area->append(widthEntry);
 		area->append(heightLabel);
 		area->append(heightEntry);
+		area->append(wetnessLabel);
+		area->append(wetnessSlider);
 		add_button("Cr_eate", Gtk::ResponseType::OK);
 		int width, height;
 		get_default_size(width, height);
@@ -65,6 +73,6 @@ namespace Game3 {
 			return;
 		}
 
-		signal_submit_.emit(seed, width, height);
+		signal_submit_.emit(seed, width, height, wetnessSlider.get_value());
 	}
 }

@@ -12,7 +12,7 @@ namespace Game3 {
 		Biome::init(realm, noise_seed, saved_noise);
 	}
 
-	void Volcanic::generate(Index row, Index column, std::default_random_engine &, const noise::module::Perlin &perlin) {
+	void Volcanic::generate(Index row, Index column, std::default_random_engine &, const noise::module::Perlin &perlin, const WorldGenParams &params) {
 		Realm &realm = *getRealm();
 
 		const double noise = perlin.GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.666);
