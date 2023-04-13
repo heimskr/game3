@@ -15,6 +15,9 @@ DEPS         := eigen3 glm glfw3 libzstd gtk4 gtkmm-4.0 nlohmann_json glu
 OUTPUT       := game3
 COMPILER     ?= g++
 CPPFLAGS     := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude -Istb -Ilibnoise/src
+ZIG          ?= zig
+# --main-pkg-path is needed as otherwise it wouldn't let you embed any file outside of src/
+ZIGFLAGS     := -O ReleaseSmall --main-pkg-path .
 INCLUDES     := $(shell pkg-config --cflags $(DEPS))
 LIBS         := $(shell pkg-config --libs   $(DEPS))
 LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread -Llibnoise/build/src -lnoise
@@ -23,6 +26,7 @@ OBJECTS      := $(SOURCES:.cpp=.o) src/resources.o
 RESXML       := $(OUTPUT).gresource.xml
 CLOC_OPTIONS := . --exclude-dir=.vscode,libnoise,stb --fullpath --not-match-f='^.\/(src\/(gtk_)?resources\.cpp|include\/resources\.h)$$'
 GLIB_COMPILE_RESOURCES = $(shell pkg-config --variable=glib_compile_resources gio-2.0)
+RESGEN       := ./resgen
 
 .PHONY: all clean flags test
 
@@ -42,9 +46,16 @@ src/gtk_resources.cpp: $(RESXML) $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=r
 	@ printf "\e[2m[\e[22;32mcc\e[39;2m]\e[22m $< \e[2m$(BUILDFLAGS)\e[22m\n"
 	@ $(COMPILER) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
 
-src/resources.o: src/resources.zig resources/buffered.frag resources/buffered.vert resources/rectangle.frag resources/rectangle.vert resources/sprite.frag resources/sprite.vert resources/blur.frag resources/blur.vert resources/reshader.vert resources/multiplier.frag
-	@ printf "\e[2m[\e[22;32mzig\e[39;2m]\e[22m $<\n"
-	@ zig build-obj $< --main-pkg-path . -femit-bin=$@ -O ReleaseSmall
+src/resources.o: src/resources.zig
+	@ printf "\e[2m[\e[22;32mzig\e[39;2m]\e[22m $< \e[2m$(ZIGFLAGS)\e[22m\n"
+	@ $(ZIG) build-obj $(ZIGFLAGS) $<  -femit-bin=$@
+
+$(RESGEN): src/resgen.zig src/resources.zig
+	@ printf "\e[2m[\e[22;32mzig\e[39;2m]\e[22m $< \e[2m$(ZIGFLAGS)\e[22m\n"
+	@ $(ZIG) build-exe $(ZIGFLAGS) $<
+
+include/resources.h: $(RESGEN)
+	$(RESGEN) -h > $@
 
 $(OUTPUT): $(OBJECTS)
 	@ printf "\e[2m[\e[22;36mld\e[39;2m]\e[22m $@\n"
@@ -57,7 +68,7 @@ test: $(OUTPUT)
 	./$(OUTPUT)
 
 clean:
-	@ rm -f $(shell find src -name \*.o) $(OUTPUT) src/gtk_resources.cpp
+	@ rm -f $(shell find src -name \*.o) $(OUTPUT) src/gtk_resources.cpp include/resources.h $(RESGEN) $(RESGEN).o
 
 count:
 	cloc $(CLOC_OPTIONS)
@@ -68,9 +79,10 @@ countbf:
 DEPFILE  := .dep
 DEPTOKEN := "\# MAKEDEPENDS"
 
-depend:
+depend: $(RESGEN) include/resources.h
 	@ echo $(DEPTOKEN) > $(DEPFILE)
 	makedepend -f $(DEPFILE) -s $(DEPTOKEN) -Y -- $(COMPILER) $(CPPFLAGS) -- $(SOURCES) 2>/dev/null
+	$(RESGEN) -d >> $(DEPFILE)
 	@ rm $(DEPFILE).bak
 
 sinclude $(DEPFILE)

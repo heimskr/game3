@@ -4,3 +4,5 @@
 src/gtk_resources.cpp
 .dep.bak
 *.g3
+/resgen
+include/resources.h
