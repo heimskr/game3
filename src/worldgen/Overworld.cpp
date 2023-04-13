@@ -130,7 +130,7 @@ namespace Game3::WorldGen {
 		postgen_timer.stop();
 
 		overworld_timer.stop();
-		Timer::summary();
+		// Timer::summary();
 		Timer::clear();
 	}
 }

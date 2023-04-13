@@ -34,6 +34,7 @@ namespace Game3 {
 	class Realm: public std::enable_shared_from_this<Realm> {
 		public:
 			GL::Texture texture;
+			GL::Texture otherTexture;
 			GL::FBO fbo;
 			RealmID id;
 			RealmType type;

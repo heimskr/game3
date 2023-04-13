@@ -4,23 +4,24 @@
 
 #include "resources.h"
 #include "Shader.h"
-#include "ui/Reshader.h"
+#include "Texture.h"
+#include "ui/Combiner.h"
 #include "util/GL.h"
 #include "util/Util.h"
 
 namespace Game3 {
-	Reshader::Reshader(std::string_view fragment): shader("reshader") {
+	Combiner::Combiner(std::string_view fragment): shader("combiner") {
 		shader.init(reshader_vert, fragment); CHECKGL
 		initRenderData(); CHECKGL
 	}
 
-	Reshader::~Reshader() {
+	Combiner::~Combiner() {
 		reset();
 	}
 
-	void Reshader::reset() {
+	void Combiner::reset() {
 		if (initialized) {
-			glDeleteBuffers(1, &vbo);
+			glDeleteBuffers(1, &vbo); CHECKGL
 			glDeleteVertexArrays(1, &quadVAO); CHECKGL
 			vbo = 0;
 			quadVAO = 0;
@@ -29,7 +30,7 @@ namespace Game3 {
 		}
 	}
 
-	void Reshader::update(int backbuffer_width, int backbuffer_height) {
+	void Combiner::update(int backbuffer_width, int backbuffer_height) {
 		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
 			backbufferWidth = backbuffer_width;
 			backbufferHeight = backbuffer_height;
@@ -39,38 +40,51 @@ namespace Game3 {
 		}
 	}
 
-	void Reshader::bind() {
+	void Combiner::bind() {
 		shader.bind(); CHECKGL
 	}
 
-	void Reshader::operator()(GLuint texture) {
+	void Combiner::operator()(GLuint texture0, GLuint texture1) {
 		if (!initialized)
 			return;
 
+		assert(texture0 != 0);
+		assert(texture1 != 0);
 		shader.bind(); CHECKGL
 
+		constexpr float x = 0.f;
+		constexpr float y = 0.f;
 		const float width  = backbufferWidth;
 		const float height = backbufferHeight;
 
-		glm::mat4 model = glm::scale(glm::mat4(1.f), glm::vec3(width, height, 1.f));
+		glm::mat4 model = glm::mat4(1.f);
+		model = glm::translate(model, glm::vec3(x, y, 0.f));
+		model = glm::scale(model, glm::vec3(width, height, 1.f));
 
 		shader.set("model", model);
 
-		glActiveTexture(GL_TEXTURE4); CHECKGL
-		glBindTexture(GL_TEXTURE_2D, texture); CHECKGL
-		shader.set("txr", 4); CHECKGL
+		glActiveTexture(GL_TEXTURE5); CHECKGL
+		glBindTexture(GL_TEXTURE_2D, texture0); CHECKGL
+		shader.set("texture0", 5); CHECKGL
+
+		glActiveTexture(GL_TEXTURE6); CHECKGL
+		glBindTexture(GL_TEXTURE_2D, texture1); CHECKGL
+		shader.set("texture1", 6); CHECKGL
 
 		glBindVertexArray(quadVAO); CHECKGL
 		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
 		glBindVertexArray(0); CHECKGL
 	}
 
-	void Reshader::operator()(const GL::Texture &texture) {
-		assert(texture.getHandle() != 0);
-		(*this)(texture.getHandle());
+	void Combiner::operator()(const GL::Texture &texture0, const GL::Texture &texture1) {
+		(*this)(texture0.getHandle(), texture1.getHandle());
 	}
 
-	void Reshader::initRenderData() {
+	void Combiner::operator()(const Texture &texture0, const Texture &texture1) {
+		(*this)(*texture0.id, *texture1.id);
+	}
+
+	void Combiner::initRenderData() {
 		static const float vertices[] {
 			0.f, 1.f, 0.f, 1.f,
 			1.f, 0.f, 1.f, 0.f,

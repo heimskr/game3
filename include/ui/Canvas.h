@@ -10,7 +10,7 @@
 #include "Texture.h"
 #include "Types.h"
 #include "ui/RectangleRenderer.h"
-#include "ui/Reshader.h"
+#include "ui/Combiner.h"
 #include "ui/SpriteRenderer.h"
 
 namespace Game3 {
@@ -28,7 +28,7 @@ namespace Game3 {
 			float scale = DEFAULT_SCALE;
 			SpriteRenderer spriteRenderer {*this};
 			RectangleRenderer rectangleRenderer;
-			Reshader multiplyShader = {std::string_view(multiplier_frag, multiplier_frag_len)};
+			Combiner multiplier = {std::string_view(multiplier_frag, multiplier_frag_len)};
 			float magic = 8.f;
 			int autofocusCounter = 0;
 			Gdk::Rectangle realmBounds;

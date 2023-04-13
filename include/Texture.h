@@ -9,12 +9,12 @@
 namespace Game3 {
 	class Texture: public NamedRegisterable {
 		public:
-			std::shared_ptr<unsigned> id  = std::make_shared<unsigned>(0);
-			std::shared_ptr<int> width  = std::make_shared<int>(0);
-			std::shared_ptr<int> height = std::make_shared<int>(0);
-			std::shared_ptr<int> format = std::make_shared<int>(0);
-			std::shared_ptr<int> filter = std::make_shared<int>(0);
-			std::shared_ptr<bool> alpha = std::make_shared<bool>(false);
+			std::shared_ptr<unsigned> id = std::make_shared<unsigned>(0);
+			std::shared_ptr<int> width   = std::make_shared<int>(0);
+			std::shared_ptr<int> height  = std::make_shared<int>(0);
+			std::shared_ptr<int> format  = std::make_shared<int>(0);
+			std::shared_ptr<int> filter  = std::make_shared<int>(0);
+			std::shared_ptr<bool> alpha  = std::make_shared<bool>(false);
 			std::filesystem::path path;
 			std::shared_ptr<std::shared_ptr<uint8_t>> data = std::make_shared<std::shared_ptr<uint8_t>>();
 

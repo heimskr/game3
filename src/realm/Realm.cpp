@@ -12,6 +12,7 @@
 #include "realm/Realm.h"
 #include "realm/RealmFactory.h"
 #include "tileentity/Ghost.h"
+#include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "ui/SpriteRenderer.h"
 #include "util/Timer.h"
@@ -56,6 +57,7 @@ namespace Game3 {
 	void Realm::initTexture() {
 		constexpr float factor = 2.f;
 		texture.initFloat(tilemap1->width * tilemap1->tileSize * factor, tilemap1->height * tilemap1->tileSize * factor, GL_NEAREST);
+		otherTexture.initFloat(tilemap1->width * tilemap1->tileSize * factor, tilemap1->height * tilemap1->tileSize * factor, GL_NEAREST);
 		fbo.init();
 	}
 
@@ -118,20 +120,28 @@ namespace Game3 {
 		renderer1.render(outdoors? game_time : 1);
 		renderer2.render(outdoors? game_time : 1);
 		renderer3.render(outdoors? game_time : 1);
-		sprite_renderer.update(bb_width / 1.f, bb_height / 1.f);
+		sprite_renderer.update(bb_width, bb_height);
 
 		for (const auto &entity: entities)
 			entity->render(sprite_renderer);
 		for (const auto &[index, tile_entity]: tileEntities)
 			tile_entity->render(sprite_renderer);
-		viewport.reset();
-		fbo.undo();
 
+		// sprite_renderer.drawOnMap(texture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
+		otherTexture.useInFB();
+		game.canvas.multiplier(texture, renderer1.lightTexture);
+		// game.canvas.multiplier(texture, renderer2.lightTexture);
+		// game.canvas.multiplier(texture, renderer3.lightTexture);
+		// sprite_renderer.drawOnScreen(renderer1.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
+		// sprite_renderer.drawOnScreen(renderer2.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
+		// sprite_renderer.drawOnScreen(renderer3.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
+
+		fbo.undo();
+		viewport.reset();
 		sprite_renderer.update(width, height);
-		sprite_renderer.drawOnMap(texture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
-		sprite_renderer.drawOnMap(renderer1.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
-		sprite_renderer.drawOnMap(renderer2.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
-		sprite_renderer.drawOnMap(renderer3.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
+		sprite_renderer.drawOnMap(otherTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
+		// sprite_renderer.drawOnMap(texture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
+
 		if (0 < ghostCount)
 			sprite_renderer.drawOnScreen(*cacheTexture("resources/checkmark.png"), width - 42.f, height - 42.f, 2.f);
 	}

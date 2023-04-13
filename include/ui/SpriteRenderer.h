@@ -31,6 +31,7 @@ namespace Game3 {
 
 			void drawOnScreen(Texture &, float x, float y, float scale = 1.f, float angle = 0.f, float alpha = 1.f);
 			void drawOnScreen(Texture &, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale = 1.f, float angle = 0.f, float alpha = 1.f);
+			void drawOnScreen(GL::Texture &, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale = 1.f, float angle = 0.f, float alpha = 1.f);
 
 			template <typename... Args>
 			void operator()(Args &&...args) {

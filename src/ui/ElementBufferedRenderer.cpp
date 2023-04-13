@@ -218,7 +218,7 @@ namespace Game3 {
 		}
 
 		timer.stop();
-		Timer::summary();
+		// Timer::summary();
 	}
 
 	void ElementBufferedRenderer::check(int handle, bool is_link) {

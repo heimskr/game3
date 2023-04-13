@@ -201,6 +201,46 @@ namespace Game3 {
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindVertexArray(0);
 	}
+	void SpriteRenderer::drawOnScreen(GL::Texture &texture, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale, float angle, float alpha) {
+		if (!initialized)
+			return;
+
+		const auto twidth  = texture.getWidth();
+		const auto theight = texture.getHeight();
+
+		if (size_x < 0)
+			size_x = twidth;
+		if (size_y < 0)
+			size_y = theight;
+
+		shader.bind();
+
+		y = backbufferHeight / 16.f - y + y_offset / 4.f * scale; // Four?!
+
+		glm::mat4 model = glm::mat4(1.f);
+		// // first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
+		model = glm::translate(model, glm::vec3(x * 16.f - x_offset * 2.f * scale, y * 16.f - y_offset * 2.f * scale, 0.0f));
+		model = glm::scale    (model, glm::vec3(1.f, -1.f, 1.f));
+		model = glm::translate(model, glm::vec3(0.5f * twidth, 0.5f * theight, 0.0f));
+		model = glm::rotate   (model, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, glm::vec3(-0.5f * twidth, -0.5f * theight, 0.0f));
+		model = glm::scale    (model, glm::vec3(twidth * scale, theight * scale, 1.0f));
+
+		shader.set("model", model);
+		shader.set("spriteColor", 1.f, 1.f, 1.f, alpha);
+		const float multiplier = 2.f;
+		const float multiplier_x = multiplier / twidth;
+		const float multiplier_y = multiplier / theight;
+		shader.set("texturePosition", x_offset * multiplier_x, y_offset * multiplier_y, size_x / twidth, size_y / theight);
+
+		texture.bind(0);
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBindVertexArray(quadVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindVertexArray(0);
+	}
 
 	void SpriteRenderer::reset() {
 		shader.init(sprite_vert, sprite_frag);
