@@ -21,7 +21,7 @@ namespace Game3 {
 			void update(int backbuffer_width, int backbuffer_height);
 			void bind();
 
-			void operator()(GLuint, GLuint);
+			void operator()(GLuint, GLuint, float width, float height);
 			void operator()(const GL::Texture &, const GL::Texture &);
 			void operator()(const Texture &, const Texture &);
 

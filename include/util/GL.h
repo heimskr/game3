@@ -10,8 +10,8 @@
 #include <GL/glu.h>
 #include <GLFW/glfw3.h>
 
-#define CHECKGL do { if (auto err = glGetError()) { std::cerr << "\e[31mError at " << __FILE__ << ':' << __LINE__ << ": " << gluErrorString(err) << "\e[39m\n"; } } while(0);
-// #define CHECKGL
+// #define CHECKGL do { if (auto err = glGetError()) { std::cerr << "\e[31mError at " << __FILE__ << ':' << __LINE__ << ": " << gluErrorString(err) << "\e[39m\n"; } } while(0);
+#define CHECKGL
 
 
 namespace GL {
@@ -316,8 +316,7 @@ namespace GL {
 
 	class FBO {
 		public:
-			FBO():
-				handle(makeFBO()) {}
+			FBO() = default;
 
 			FBO(GLuint handle_):
 				handle(handle_) {}
@@ -351,7 +350,7 @@ namespace GL {
 			}
 
 			inline bool init(bool force = false) {
-				if (handle == 0 && !force)
+				if (handle != 0 && !force)
 					return false;
 				handle = makeFBO();
 				return true;
@@ -411,8 +410,9 @@ namespace GL {
 
 			inline bool initFloat(GLsizei width_, GLsizei height_, GLint filter = GL_LINEAR) {
 				reset();
+				std::cout << "Texture::initFloat(" << width_ << ", " << height_ << ")\n";
 				handle = GL::makeFloatTexture(width_, height_, filter);
-				width = width_;
+				width  = width_;
 				height = height_;
 				return true;
 			}

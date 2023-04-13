@@ -13,6 +13,7 @@
 namespace Game3 {
 	Canvas::Canvas(MainWindow &window_): window(window_) {
 		magic = 16 / 2;
+		fbo.init();
 	}
 
 	void Canvas::drawGL() {

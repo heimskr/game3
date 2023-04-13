@@ -54,12 +54,7 @@ namespace Game3 {
 		resetPathMap();
 	}
 
-	void Realm::initTexture() {
-		constexpr float factor = 2.f;
-		texture.initFloat(tilemap1->width * tilemap1->tileSize * factor, tilemap1->height * tilemap1->tileSize * factor, GL_NEAREST);
-		otherTexture.initFloat(tilemap1->width * tilemap1->tileSize * factor, tilemap1->height * tilemap1->tileSize * factor, GL_NEAREST);
-		fbo.init();
-	}
+	void Realm::initTexture() {}
 
 	RealmPtr Realm::fromJSON(Game &game, const nlohmann::json &json) {
 		const RealmType type = json.at("type");
@@ -103,11 +98,28 @@ namespace Game3 {
 	}
 
 	void Realm::render(const int width, const int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &sprite_renderer, float game_time) {
+		Canvas &canvas = game.canvas;
+		auto &textureA = canvas.textureA;
+		auto &textureB = canvas.textureB;
+		auto &fbo = canvas.fbo;
+		auto &multiplier = canvas.multiplier;
+
+		if (canvas.lastRealm != this) {
+			constexpr float factor = ElementBufferedRenderer::TEXTURE_SCALE;
+			const auto texture_width  = tilemap1->width  * tilemap1->tileSize * factor;
+			const auto texture_height = tilemap1->height * tilemap1->tileSize * factor;
+			if (textureA.getWidth() != texture_width || textureA.getHeight() != texture_height) {
+				textureA.initFloat(texture_width, texture_height, GL_NEAREST);
+				textureB.initFloat(texture_width, texture_height, GL_NEAREST);
+			}
+			canvas.lastRealm = this;
+		}
+
 		fbo.bind();
-		texture.useInFB();
-		GL::Viewport viewport(0, 0, texture.getWidth(), texture.getHeight());
-		const auto bb_width = texture.getWidth();
-		const auto bb_height = texture.getHeight();
+		textureA.useInFB();
+		const auto bb_width  = textureA.getWidth();
+		const auto bb_height = textureA.getHeight();
+		GL::Viewport viewport(0, 0, bb_width, bb_height);
 		renderer1.center = center;
 		renderer1.scale  = scale;
 		renderer1.onBackbufferResized(bb_width, bb_height);
@@ -127,10 +139,13 @@ namespace Game3 {
 		for (const auto &[index, tile_entity]: tileEntities)
 			tile_entity->render(sprite_renderer);
 
+		multiplier.update(bb_width, bb_height);
+
 		// sprite_renderer.drawOnMap(texture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
-		otherTexture.useInFB();
-		game.canvas.multiplier(texture, renderer1.lightTexture);
-		// game.canvas.multiplier(texture, renderer2.lightTexture);
+		// textureB.useInFB();
+		// game.canvas.multiplier(textureA, renderer1.lightTexture);
+		// textureA.useInFB();
+		// game.canvas.multiplier(textureB, renderer2.lightTexture);
 		// game.canvas.multiplier(texture, renderer3.lightTexture);
 		// sprite_renderer.drawOnScreen(renderer1.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
 		// sprite_renderer.drawOnScreen(renderer2.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
@@ -139,8 +154,8 @@ namespace Game3 {
 		fbo.undo();
 		viewport.reset();
 		sprite_renderer.update(width, height);
-		sprite_renderer.drawOnMap(otherTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
-		// sprite_renderer.drawOnMap(texture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
+		// sprite_renderer.drawOnMap(textureB, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
+		sprite_renderer.drawOnMap(textureA, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
 
 		if (0 < ghostCount)
 			sprite_renderer.drawOnScreen(*cacheTexture("resources/checkmark.png"), width - 42.f, height - 42.f, 2.f);

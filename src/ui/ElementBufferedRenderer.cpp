@@ -96,19 +96,18 @@ namespace Game3 {
 			return false;
 		backbufferWidth = width;
 		backbufferHeight = height;
-		generateLightingTexture();
 		return true;
 	}
 
 	void ElementBufferedRenderer::generateVertexBufferObject() {
 		const auto set_width = tilemap->setWidth / tilemap->tileSize;
 		const float divisor = set_width;
-		const float t_size = 1.f / divisor - tileTexturePadding * 2;
+		const float t_size = 1.f / divisor - TILE_TEXTURE_PADDING * 2;
 
 		vbo.init<float, 3>(tilemap->width, tilemap->height, GL_STATIC_DRAW, [this, set_width, divisor, t_size](size_t x, size_t y) {
 			const auto tile = (*tilemap)(x, y);
-			const float tx0 = (tile % set_width) / divisor + tileTexturePadding;
-			const float ty0 = (tile / set_width) / divisor + tileTexturePadding;
+			const float tx0 = (tile % set_width) / divisor + TILE_TEXTURE_PADDING;
+			const float ty0 = (tile / set_width) / divisor + TILE_TEXTURE_PADDING;
 			const float tile_f = static_cast<float>(tile);
 			return std::array {
 				std::array {tx0,          ty0,          tile_f},
@@ -133,8 +132,8 @@ namespace Game3 {
 	}
 
 	void ElementBufferedRenderer::generateLightingTexture() {
-		const auto width  = tilemap->tileSize * tilemap->width;
-		const auto height = tilemap->tileSize * tilemap->height;
+		const auto width  = tilemap->tileSize * TEXTURE_SCALE * tilemap->width;
+		const auto height = tilemap->tileSize * TEXTURE_SCALE * tilemap->height;
 		constexpr GLint filter = GL_LINEAR;
 
 		lightTexture.initFloat(width, height, filter);
@@ -168,7 +167,6 @@ namespace Game3 {
 
 		if (recomputation_needed) {
 			lightFBO.bind();
-			generateLightingTexture();
 
 			const auto tilesize = tilemap->tileSize;
 			const auto width    = tilesize * tilemap->width;
@@ -218,7 +216,7 @@ namespace Game3 {
 		}
 
 		timer.stop();
-		// Timer::summary();
+		Timer::summary();
 	}
 
 	void ElementBufferedRenderer::check(int handle, bool is_link) {

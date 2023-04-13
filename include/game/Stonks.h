@@ -8,6 +8,7 @@
  *  functions to transform prices through various steps of modification. A buy price is the amount of money the player
  *  has to pay for a resource, while the sell price is how much money the player can receive in exchange for it. */
 namespace Game3 {
+	class Inventory;
 	class ItemStack;
 	class Keep;
 	class Merchant;

@@ -44,7 +44,7 @@ namespace Game3 {
 		shader.bind(); CHECKGL
 	}
 
-	void Combiner::operator()(GLuint texture0, GLuint texture1) {
+	void Combiner::operator()(GLuint texture0, GLuint texture1, float width, float height) {
 		if (!initialized)
 			return;
 
@@ -54,12 +54,12 @@ namespace Game3 {
 
 		constexpr float x = 0.f;
 		constexpr float y = 0.f;
-		const float width  = backbufferWidth;
-		const float height = backbufferHeight;
+		const float bb_width  = backbufferWidth;
+		const float bb_height = backbufferHeight;
 
 		glm::mat4 model = glm::mat4(1.f);
 		model = glm::translate(model, glm::vec3(x, y, 0.f));
-		model = glm::scale(model, glm::vec3(width, height, 1.f));
+		model = glm::scale(model, glm::vec3(bb_width, bb_height, 1.f));
 
 		shader.set("model", model);
 
@@ -77,11 +77,15 @@ namespace Game3 {
 	}
 
 	void Combiner::operator()(const GL::Texture &texture0, const GL::Texture &texture1) {
-		(*this)(texture0.getHandle(), texture1.getHandle());
+		// assert(texture0.getWidth() == texture1.getWidth());
+		// assert(texture0.getHeight() == texture1.getHeight());
+		(*this)(texture0.getHandle(), texture1.getHandle(), texture0.getWidth(), texture0.getHeight());
 	}
 
 	void Combiner::operator()(const Texture &texture0, const Texture &texture1) {
-		(*this)(*texture0.id, *texture1.id);
+		// assert(*texture0.width == *texture1.width);
+		// assert(*texture0.height == *texture1.height);
+		(*this)(*texture0.id, *texture1.id, *texture0.width, *texture0.height);
 	}
 
 	void Combiner::initRenderData() {

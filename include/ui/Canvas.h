@@ -12,10 +12,12 @@
 #include "ui/RectangleRenderer.h"
 #include "ui/Combiner.h"
 #include "ui/SpriteRenderer.h"
+#include "util/GL.h"
 
 namespace Game3 {
 	class Game;
 	class MainWindow;
+	class Realm;
 
 	class Canvas {
 		public:
@@ -28,10 +30,14 @@ namespace Game3 {
 			float scale = DEFAULT_SCALE;
 			SpriteRenderer spriteRenderer {*this};
 			RectangleRenderer rectangleRenderer;
+			GL::Texture textureA;
+			GL::Texture textureB;
+			GL::FBO fbo;
 			Combiner multiplier = {std::string_view(multiplier_frag, multiplier_frag_len)};
 			float magic = 8.f;
 			int autofocusCounter = 0;
 			Gdk::Rectangle realmBounds;
+			const Realm *lastRealm = nullptr;
 
 			Canvas(MainWindow &);
 

@@ -11,7 +11,8 @@
 namespace Game3 {
 	class ElementBufferedRenderer {
 		public:
-			constexpr static float tileTexturePadding = 1.f / 2048.f;
+			constexpr static float TEXTURE_SCALE = 2.f;
+			constexpr static float TILE_TEXTURE_PADDING = 1.f / 2048.f;
 			float scale = 1.f;
 			int backbufferWidth = -1;
 			int backbufferHeight = -1;
