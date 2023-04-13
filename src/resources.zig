@@ -1,37 +1,32 @@
 const std = @import("std");
 
+const ShaderType = enum { frag, vert };
+
 const Shader = struct {
 	name: []const u8,
-	has_frag: bool = true,
-	has_vert: bool = true,
+	types: []const ShaderType = &.{ .frag, .vert },
 };
 
-const shaders = [_]Shader{
+/// public so that resources_generator can access this
+pub const shaders = [_]Shader{
 	.{ .name = "buffered" },
 	.{ .name = "rectangle" },
 	.{ .name = "sprite" },
 	.{ .name = "blur" },
-	.{ .name = "reshader", .has_frag = false },
-	.{ .name = "multiplier", .has_vert = false },
+	.{ .name = "reshader", .types = &.{.vert} },
+	.{ .name = "multiplier", .types = &.{.frag} },
 };
 
 comptime {
 	for (shaders) |shader| {
-		var types: []const []const u8 = &[_][]const u8{};
-		if (shader.has_frag) {
-			types = types ++ [_][]const u8{"frag"};
-		}
-		if (shader.has_vert) {
-			types = types ++ [_][]const u8{"vert"};
-		}
-		for (types) |shader_type| {
-			const path = "../resources/" ++ shader.name ++ "." ++ shader_type;
+		for (shader.types) |shader_type| {
+			const path = "../resources/" ++ shader.name ++ "." ++ @tagName(shader_type);
 
 			const shader_data_pointer = @embedFile(path);
 			const shader_data = shader_data_pointer.*;
 			const shader_len = shader_data_pointer.len;
-			@export(shader_data, .{ .name = shader.name ++ "_" ++ shader_type });
-			@export(shader_len, .{ .name = shader.name ++ "_" ++ shader_type ++ "_len" });
+			@export(shader_data, .{ .name = shader.name ++ "_" ++ @tagName(shader_type) });
+			@export(shader_len, .{ .name = shader.name ++ "_" ++ @tagName(shader_type) ++ "_len" });
 		}
 	}
 }
