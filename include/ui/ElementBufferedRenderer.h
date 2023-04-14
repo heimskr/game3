@@ -41,8 +41,6 @@ namespace Game3 {
 			GL::FloatVAO vao;
 			GL::VBO vbo;
 			GL::EBO ebo;
-			GL::FBO mainFBO;
-			GL::FBO lightFBO;
 			GL::Texture blurredLightTexture;
 			std::vector<GLint> brightTiles;
 			std::unordered_set<TileID> brightSet;

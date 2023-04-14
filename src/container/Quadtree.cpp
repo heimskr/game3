@@ -119,7 +119,10 @@ namespace Game3 {
 		return root.contains(row, column);
 	}
 
-	void Quadtree::absorb() {
+	void Quadtree::absorb(bool do_reset) {
+		if (do_reset)
+			reset();
+
 		for (Index row = 0; row < root.height; ++row)
 			for (Index column = 0; column < root.width; ++column)
 				if (predicate(row, column))

@@ -41,8 +41,8 @@ namespace Game3 {
 
 		std::optional<ItemStack> ore_stack;
 
-		const TileID tile2 = tilemap2->tiles.at(index);
-		const auto &tile_id = (*tilemap2->tileset)[tile2];
+		const TileID tile2 = (*tilemap2)[index];
+		const Identifier &tile_id = (*tilemap2->tileset)[tile2];
 
 		Game &game = getGame();
 
@@ -81,7 +81,7 @@ namespace Game3 {
 		if (!isValid(position))
 			return;
 
-		if (tilemap2->tiles.at(getIndex(position)) == tilemap2->tileset->getEmptyID()) {
+		if ((*tilemap2)[getIndex(position)] == tilemap2->tileset->getEmptyID()) {
 			bool changed = false;
 			const TileID void3 = (*tilemap3->tileset)["base:tile/void"];
 			const TileID empty3 = tilemap3->tileset->getEmptyID();
@@ -91,9 +91,10 @@ namespace Game3 {
 						const Position offset_position = position + Position(row_offset, column_offset);
 						if (!isValid(offset_position))
 							continue;
-						auto &tile3 = tilemap3->tiles.at(getIndex(offset_position));
+						const Index index = getIndex(offset_position);
+						const auto tile3 = (*tilemap3)[index];
 						if (tile3 == void3) {
-							tile3 = empty3;
+							tilemap3->set(index, empty3);
 							changed = true;
 						}
 					}

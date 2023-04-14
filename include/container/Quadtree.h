@@ -51,8 +51,6 @@ namespace Game3 {
 			Box root;
 			std::function<bool(Index, Index)> predicate;
 
-			void absorb();
-
 		public:
 			/** If this returns true, iteration will end. */
 			using Visitor = std::function<bool(const Box &)>;
@@ -63,10 +61,12 @@ namespace Game3 {
 
 			inline bool add(Index row, Index column) { return root.add(row, column); }
 			inline bool remove(Index row, Index column) { return root.remove(row, column); }
+			inline void reset() { root.reset(); }
 
 			inline const Box & getRoot() const { return root; }
 			bool contains(Index row, Index column) const;
 			/** Iterates over each full box and returns true if iteration was canceled. */
 			bool iterateFull(const Visitor &) const;
+			void absorb(bool do_reset = true);
 	};
 }

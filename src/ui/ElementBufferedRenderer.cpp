@@ -10,6 +10,7 @@
 
 #include "resources.h"
 #include "Tileset.h"
+#include "container/Quadtree.h"
 #include "realm/Realm.h"
 #include "ui/ElementBufferedRenderer.h"
 #include "util/Timer.h"
@@ -31,8 +32,6 @@ namespace Game3 {
 			shader.reset();
 			lightTexture.reset();
 			blurredLightTexture.reset();
-			mainFBO.reset();
-			lightFBO.reset();
 			reshader.reset();
 			tilemap.reset();
 			rectangle.reset();
@@ -48,8 +47,6 @@ namespace Game3 {
 		generateVertexBufferObject();
 		generateElementBufferObject();
 		generateVertexArrayObject();
-		mainFBO.init();
-		lightFBO.init();
 		generateLightingTexture();
 		const auto bright_shorts = tilemap->tileset->getBrightIDs();
 		brightTiles.assign(bright_shorts.begin(), bright_shorts.end());
@@ -153,13 +150,13 @@ namespace Game3 {
 
 		bool recomputation_needed = false;
 		if (tileCache.empty()) {
-			tileCache = tilemap->tiles;
+			tileCache = tilemap->getTiles();
 			recomputation_needed = true;
 		} else {
 			assert(tileCache.size() == tilemap->size());
 			for (size_t i = 0, max = tileCache.size(); i < max; ++i) {
-				if (brightSet.contains(tileCache[i]) != brightSet.contains(tilemap->tiles[i])) {
-					tileCache = tilemap->tiles;
+				if (brightSet.contains(tileCache[i]) != brightSet.contains((*tilemap)[i])) {
+					tileCache = tilemap->getTiles();
 					recomputation_needed = true;
 					break;
 				}
@@ -167,36 +164,46 @@ namespace Game3 {
 		}
 
 		if (recomputation_needed) {
-			lightFBO.bind();
-
+			GL::globalFBO.bind();
 			const auto tilesize = tilemap->tileSize;
 			const auto width    = tilesize * tilemap->width;
 			const auto height   = tilesize * tilemap->height;
 			GL::Viewport viewport(0, 0, width, height);
-
+			std::cout << lightTexture.getWidth() << " x " << lightTexture.getHeight() << '\n';
+			Timer misc1("Misc1");
 			lightTexture.useInFB();
-
+			misc1.stop();
 			GL::clear(.0f, .0f, .0f, 0.f);
 
-			const TileID lava = (*tilemap->tileset)["base:tile/lava"];
+			if (tilemap->lavaQuadtree) {
+				Timer lava_timer("Lava");
+				tilemap->lavaQuadtree->iterateFull([&](const Box &box) {
+					const float x = box.left * tilesize;
+					const float y = box.top  * tilesize;
+					constexpr float bleed = 1.5f;
+					rectangle({1.f, .5f, 0.f, .5f}, x - bleed * tilesize, y - bleed * tilesize, (2.f * bleed + box.width) * tilesize, (2.f * bleed + box.height) * tilesize);
+					return false;
+				});
 
-			Timer lava_timer("Lava");
-			for (Index row = 0; row < tilemap->height; ++row) {
-				for (Index column = 0; column < tilemap->width; ++column) {
-					if ((*tilemap)(column, row) == lava) {
-						const float x = column * tilesize;
-						const float y = row * tilesize;
-						constexpr float radius = 1.5f;
-						rectangle({1.f, .5f, 0.f, .5f}, x - radius * tilesize, y - radius * tilesize, (2.f * radius + 1.f) * tilesize, (2.f * radius + 1.f) * tilesize);
-					}
-				}
+				// const TileID lava = (*tilemap->tileset)["base:tile/lava"];
+				// for (Index row = 0; row < tilemap->height; ++row) {
+				// 	for (Index column = 0; column < tilemap->width; ++column) {
+				// 		if ((*tilemap)(column, row) == lava) {
+				// 			const float x = column * tilesize;
+				// 			const float y = row * tilesize;
+				// 			constexpr float radius = 1.5f;
+				// 			rectangle({1.f, .5f, 0.f, .5f}, x - radius * tilesize, y - radius * tilesize, (2.f * radius + 1.f) * tilesize, (2.f * radius + 1.f) * tilesize);
+				// 		}
+				// 	}
+				// }
 			}
-			lava_timer.stop();
 
+			Timer misc2("Misc2");
 			reshader.bind();
 			reshader.set("xs", static_cast<float>(width));
 			reshader.set("ys", static_cast<float>(height));
 			reshader.set("r", 5.f);
+			misc2.stop();
 
 			Timer blur("Blur");
 			for (int i = 0; i < 8; ++i) {
@@ -210,8 +217,11 @@ namespace Game3 {
 			}
 			blur.stop();
 
+			Timer misc3("Misc3");
 			viewport.reset();
-			lightFBO.undo();
+			GL::unbindFBTexture();
+			GL::globalFBO.undo();
+			misc3.stop();
 		}
 
 		timer.stop();

@@ -308,47 +308,47 @@ namespace Game3 {
 	}
 
 	void Realm::setLayer1(Index row, Index column, TileID tile) {
-		(*tilemap1)(column, row) = tile;
+		tilemap1->set(column, row, tile);
 		setLayerHelper(row, column);
 	}
 
 	void Realm::setLayer2(Index row, Index column, TileID tile) {
-		(*tilemap2)(column, row) = tile;
+		tilemap2->set(column, row, tile);
 		setLayerHelper(row, column);
 	}
 
 	void Realm::setLayer3(Index row, Index column, TileID tile) {
-		(*tilemap3)(column, row) = tile;
+		tilemap3->set(column, row, tile);
 		setLayerHelper(row, column);
 	}
 
 	void Realm::setLayer1(Index index, TileID tile) {
-		tilemap1->tiles[index] = tile;
+		tilemap1->set(index, tile);
 		setLayerHelper(index);
 	}
 
 	void Realm::setLayer2(Index index, TileID tile) {
-		tilemap2->tiles[index] = tile;
+		tilemap2->set(index, tile);
 		setLayerHelper(index);
 	}
 
 	void Realm::setLayer3(Index index, TileID tile) {
-		tilemap3->tiles[index] = tile;
+		tilemap3->set(index, tile);
 		setLayerHelper(index);
 	}
 
 	void Realm::setLayer1(Index index, const Identifier &tilename) {
-		tilemap1->tiles[index] = (*tilemap1->tileset)[tilename];
+		tilemap1->set(index, (*tilemap1->tileset)[tilename]);
 		setLayerHelper(index);
 	}
 
 	void Realm::setLayer2(Index index, const Identifier &tilename) {
-		tilemap2->tiles[index] = (*tilemap2->tileset)[tilename];
+		tilemap2->set(index, (*tilemap2->tileset)[tilename]);
 		setLayerHelper(index);
 	}
 
 	void Realm::setLayer3(Index index, const Identifier &tilename) {
-		tilemap3->tiles[index] = (*tilemap3->tileset)[tilename];
+		tilemap3->set(index, (*tilemap3->tileset)[tilename]);
 		setLayerHelper(index);
 	}
 
@@ -389,15 +389,15 @@ namespace Game3 {
 	}
 
 	TileID Realm::getLayer1(Index index) const {
-		return tilemap1->tiles[index];
+		return (*tilemap1)[index];
 	}
 
 	TileID Realm::getLayer2(Index index) const {
-		return tilemap2->tiles[index];
+		return (*tilemap2)[index];
 	}
 
 	TileID Realm::getLayer3(Index index) const {
-		return tilemap3->tiles[index];
+		return (*tilemap3)[index];
 	}
 
 	TileID Realm::getLayer1(const Position &position) const {
@@ -471,7 +471,7 @@ namespace Game3 {
 
 		++depth;
 
-		auto &tiles = tilemap2->tiles;
+		const auto &tiles = tilemap2->getTiles();
 		const auto &tileset = *tilemap2->tileset;
 
 		for (Index row_offset = -1; row_offset <= 1; ++row_offset)
@@ -483,7 +483,7 @@ namespace Game3 {
 					if (auto neighbor = tileEntityAt(offset_position)) {
 						neighbor->onNeighborUpdated(-row_offset, -column_offset);
 					} else {
-						TileID &tile = tiles.at(getIndex(offset_position));
+						const TileID tile = tiles.at(getIndex(offset_position));
 						const auto &tilename = tileset[tile];
 
 						for (const auto &category: tileset.getCategories(tilename)) {
@@ -498,7 +498,7 @@ namespace Game3 {
 								// ???
 								const TileID marched = (march_result / 7 + 6) * (tilemap2->setWidth / tilemap2->tileSize) + march_result % 7;
 								if (marched != tile) {
-									tile = marched;
+									tilemap2->set(offset_position, marched);
 									layer2_updated = true;
 								}
 							}

@@ -22,6 +22,10 @@ namespace GL {
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0); CHECKGL
 	}
 
+	inline void unbindFBTexture() {
+		useTextureInFB(0);
+	}
+
 	inline void bindFB(GLuint framebuffer) {
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer); CHECKGL
 	}
@@ -350,8 +354,11 @@ namespace GL {
 			}
 
 			inline bool init(bool force = false) {
-				if (handle != 0 && !force)
-					return false;
+				if (handle != 0) {
+					if (!force)
+						return false;
+					reset();
+				}
 				handle = makeFBO();
 				return true;
 			}
@@ -410,7 +417,7 @@ namespace GL {
 
 			inline bool initFloat(GLsizei width_, GLsizei height_, GLint filter = GL_LINEAR) {
 				reset();
-				std::cout << "Texture::initFloat(" << width_ << ", " << height_ << ")\n";
+				// std::cout << "Texture::initFloat(" << width_ << ", " << height_ << ")\n";
 				handle = GL::makeFloatTexture(width_, height_, filter);
 				width  = width_;
 				height = height_;
@@ -453,4 +460,6 @@ namespace GL {
 			glViewport(saved[0], saved[1], static_cast<GLsizei>(saved[2]), static_cast<GLsizei>(saved[3])); CHECKGL
 		}
 	};
+
+	extern FBO globalFBO;
 }

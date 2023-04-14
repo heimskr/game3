@@ -24,9 +24,9 @@ namespace Game3::WorldGen {
 		auto &tilemap2 = realm->tilemap2;
 		auto &tilemap3 = realm->tilemap3;
 
-		tilemap1->tiles.assign(tilemap1->tiles.size(), 0);
-		tilemap2->tiles.assign(tilemap2->tiles.size(), 0);
-		tilemap3->tiles.assign(tilemap3->tiles.size(), 0);
+		tilemap1->reset();
+		tilemap2->reset();
+		tilemap3->reset();
 
 		std::vector<Position> inside;
 

@@ -122,7 +122,7 @@ namespace Game3 {
 
 		auto realm = getRealm();
 		TileID march_result;
-		const auto &tiles = realm->tilemap2->tiles;
+		const auto &tiles = realm->tilemap2->getTiles();
 
 		auto check = [&](const Position &offset_position) -> std::optional<bool> {
 			if (!realm->isValid(offset_position))

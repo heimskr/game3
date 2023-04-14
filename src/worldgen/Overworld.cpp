@@ -45,9 +45,9 @@ namespace Game3::WorldGen {
 		auto &tilemap2 = realm->tilemap2;
 		auto &tilemap3 = realm->tilemap3;
 
-		tilemap1->tiles.assign(tilemap1->tiles.size(), 0);
-		tilemap2->tiles.assign(tilemap2->tiles.size(), 0);
-		tilemap3->tiles.assign(tilemap3->tiles.size(), 0);
+		tilemap1->reset();
+		tilemap2->reset();
+		tilemap3->reset();
 
 		auto get_biome = [&](Index row, Index column) -> Biome & {
 			return *biomes.at((*biome_map)(column, row));
@@ -73,7 +73,7 @@ namespace Game3::WorldGen {
 		const auto ore_set = tileset.getCategoryIDs("base:category/orespawns"_id);
 
 		for (Index index = 0, max = width * height; index < max; ++index)
-			if (ore_set.contains(tilemap1->tiles[index]))
+			if (ore_set.contains((*tilemap1)[index]))
 				resource_starts.push_back(index);
 
 		std::shuffle(resource_starts.begin(), resource_starts.end(), rng);
@@ -103,7 +103,7 @@ namespace Game3::WorldGen {
 			std::vector<Index> candidates;
 			candidates.reserve(starts.size() / 16);
 			Timer candidate_timer("Candidates");
-			auto &tiles1 = tilemap1->tiles;
+			const auto &tiles1 = tilemap1->getTiles();
 			for (const auto index: starts) {
 				const size_t row_start = index / tilemap1->width + pad, row_end = row_start + m;
 				const size_t column_start = index % tilemap1->width + pad, column_end = column_start + n;

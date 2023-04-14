@@ -108,6 +108,7 @@ namespace Game3 {
 			glArea.make_current();
 			glArea.throw_if_error();
 			canvas = std::make_unique<Canvas>(*this);
+			GL::globalFBO.init(true);
 		});
 		glArea.signal_unrealize().connect([this] {
 			glArea.make_current();

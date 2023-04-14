@@ -21,7 +21,7 @@ namespace Game3 {
 		setWidth = *texture->width;
 		setHeight = *texture->height;
 		if (tileset && tileset->hasName("base:tile/lava"_id)) {
-			const auto lava_id = (*tileset)["base:tile/lava"_id];
+			const auto lava_id = lavaID = (*tileset)["base:tile/lava"_id];
 			lavaQuadtree = std::make_shared<Quadtree>(width, height, [this, lava_id](Index row, Index column) {
 				return (*this)(column, row) == lava_id;
 			});
@@ -34,6 +34,34 @@ namespace Game3 {
 		if (texture)
 			return texture;
 		return texture = game.registry<TextureRegistry>()[textureName];
+	}
+
+	void Tilemap::set(Index x, Index y, TileID value) {
+		set(x + y * width, value);
+	}
+
+	void Tilemap::set(const Position &position, TileID value) {
+		set(position.column + position.row * width, value);
+	}
+
+	void Tilemap::set(Index index, TileID value) {
+		auto &tile = tiles[index];
+		if (lavaQuadtree) {
+			if (value == lavaID && tile != lavaID)
+				lavaQuadtree->add(index / width, index % width);
+			else if (value != lavaID && tile == lavaID)
+				lavaQuadtree->remove(index / width, index % width);
+		}
+		tile = value;
+	}
+
+	void Tilemap::reset(TileID value) {
+		tiles.assign(tiles.size(), value);
+		if (lavaQuadtree) {
+			lavaQuadtree->reset();
+			if (lavaID && *lavaID == value)
+				lavaQuadtree->absorb(false);
+		}
 	}
 
 	std::vector<Index> Tilemap::getLand(Index right_pad, Index bottom_pad) const {
@@ -55,10 +83,10 @@ namespace Game3 {
 		json["tileset"] = tilemap.tileset->identifier;
 
 		// TODO: fix endianness issues
-		const auto tiles_size = tilemap.tiles.size() * sizeof(tilemap.tiles[0]);
+		const auto tiles_size = tilemap.size() * sizeof(tilemap[0]);
 		const auto buffer_size = ZSTD_compressBound(tiles_size);
 		auto buffer = std::vector<uint8_t>(buffer_size);
-		auto result = ZSTD_compress(&buffer[0], buffer_size, tilemap.tiles.data(), tiles_size, ZSTD_maxCLevel());
+		auto result = ZSTD_compress(&buffer[0], buffer_size, tilemap.data(), tiles_size, ZSTD_maxCLevel());
 		if (ZSTD_isError(result))
 			throw std::runtime_error("Couldn't compress tiles");
 		buffer.resize(result);
@@ -94,6 +122,9 @@ namespace Game3 {
 
 		if (last_result != 0)
 			throw std::runtime_error("Reached end of tile input without finishing decompression");
+
+		if (tilemap.lavaQuadtree)
+			tilemap.lavaQuadtree->absorb();
 
 		return tilemap;
 	}

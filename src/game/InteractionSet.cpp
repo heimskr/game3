@@ -27,7 +27,7 @@ namespace Game3 {
 				return true;
 
 			if (active->has(ItemAttribute::Hammer)) {
-				const TileID tile2 = tilemap2->tiles.at(index);
+				const TileID tile2 = (*tilemap2)[index];
 				ItemStack stack(game);
 				if (tileset.getItemStack(game, tileset[tile2], stack) && !inventory.add(stack)) {
 					if (active->reduceDurability())
