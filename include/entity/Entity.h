@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <utility>
 
-#include <Eigen/Eigen>
+#include "lib/Eigen.h"
 #include <nlohmann/json.hpp>
 
 #include "Direction.h"

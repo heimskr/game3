@@ -1,7 +1,8 @@
 # BUILD := release
 LTO :=
 ifeq ($(BUILD),release)
-BUILDFLAGS := -Ofast -march=native -flto
+BUILDFLAGS := -Ofast -march=native
+LTO := -flto
 else
 BUILDFLAGS := -g -O0
 endif
@@ -44,7 +45,7 @@ src/gtk_resources.cpp: $(RESXML) $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=r
 	$(GLIB_COMPILE_RESOURCES) --target=$@ --sourcedir=resources --generate-source $<
 
 %.o: %.cpp
-	@ printf "\e[2m[\e[22;32mcc\e[39;2m]\e[22m $< \e[2m$(BUILDFLAGS)\e[22m\n"
+	@ printf "\e[2m[\e[22;32mc++\e[39;2m]\e[22m $< \e[2m$(strip $(BUILDFLAGS) $(LTO))\e[22m\n"
 	@ $(COMPILER) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
 
 src/resources.o: src/resources.zig

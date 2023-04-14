@@ -21,7 +21,7 @@ namespace Game3 {
 	}
 
 	void TextTab::update(const std::shared_ptr<Game> &game) {
-		update(game);
+		Tab::update(game);
 	}
 
 	void TextTab::reset(const std::shared_ptr<Game> &game) {

@@ -6,7 +6,7 @@
 #include "registry/Registerable.h"
 
 namespace Game3 {
-	class Container;
+	struct Container;
 
 	struct RecipeBase {
 		virtual ~RecipeBase() = default;

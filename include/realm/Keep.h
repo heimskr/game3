@@ -16,11 +16,11 @@ namespace Game3 {
 			std::shared_ptr<Inventory> stockpileInventory;
 
 			Keep(const Keep &) = delete;
-			Keep(Keep &&) = default;
+			Keep(Keep &&) = delete;
 			~Keep() override = default;
 
 			Keep & operator=(const Keep &) = delete;
-			Keep & operator=(Keep &&) = default;
+			Keep & operator=(Keep &&) = delete;
 
 			friend class Realm;
 

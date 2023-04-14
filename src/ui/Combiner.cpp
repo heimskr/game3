@@ -45,6 +45,9 @@ namespace Game3 {
 	}
 
 	void Combiner::operator()(GLuint texture0, GLuint texture1, float width, float height) {
+		(void) width;
+		(void) height;
+
 		if (!initialized)
 			return;
 

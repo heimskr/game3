@@ -28,8 +28,8 @@ namespace Game3::WorldGen {
 
 		realm->setLayer2(0, "base:tile/wall_se"_id);
 		realm->setLayer2(width - 1, "base:tile/wall_sw"_id);
-		realm->setLayer2({width * (height - 1)}, "base:tile/wall_ne"_id);
-		realm->setLayer2({width * height - 1}, "base:tile/wall_nw"_id);
+		realm->setLayer2(width * (height - 1), "base:tile/wall_ne"_id);
+		realm->setLayer2(width * height - 1, "base:tile/wall_nw"_id);
 
 		const Index exit_index = width * height - width / 2 - 1;
 		realm->setLayer2(exit_index - 1, "base:tile/wall_w"_id);

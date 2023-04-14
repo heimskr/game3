@@ -20,7 +20,7 @@ namespace Game3 {
 			friend class Entity;
 
 		protected:
-			Merchant() = default;
+			Merchant() = delete;
 			Merchant(EntityType = ID());
 
 			void interact(const Position &);

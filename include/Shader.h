@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include <Eigen/Eigen>
+#include "lib/Eigen.h"
 #include <glm/glm.hpp>
 #include "util/GL.h"
 

@@ -77,7 +77,7 @@ namespace Game3 {
 			void init(Game &) override {}
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
-			void onSpawn();
+			void onSpawn() override;
 			void onNeighborUpdated(Index row_offset, Index column_offset) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 			void render(SpriteRenderer &) override;

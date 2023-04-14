@@ -119,7 +119,7 @@ namespace Game3 {
 
 	void ElementBufferedRenderer::generateElementBufferObject() {
 		uint32_t i = 0;
-		ebo.init<uint32_t, 6>(tilemap->width, tilemap->height, GL_STATIC_DRAW, [this, &i](size_t, size_t) {
+		ebo.init<uint32_t, 6>(tilemap->width, tilemap->height, GL_STATIC_DRAW, [&i](size_t, size_t) {
 			i += 4;
 			return std::array {i - 4, i - 3, i - 2, i - 3, i - 2, i - 1};
 		});

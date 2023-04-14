@@ -15,7 +15,7 @@ namespace Game3 {
 	Landfill::Landfill(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count, Identifier tileset_name, Identifier required_tile, ItemStack requirement, Identifier new_tile):
 		Landfill(std::move(id_), std::move(name_), base_price, max_count, [=](const Place &place) -> std::optional<Result> {
 			if (place.realm->tilemap1->tileset->identifier == tileset_name && place.getLayer1Name() == required_tile)
-				return Result(requirement, new_tile);
+				return Result{requirement, new_tile};
 			return std::nullopt;
 		}) {}
 
@@ -58,7 +58,7 @@ namespace Game3 {
 		if (!requirement && requiredTile && requiredCount != static_cast<ItemCount>(-1) && newTile) {
 			requirement = [this](const Place &place) -> std::optional<Result> {
 				if (place.getLayer1Name() == requiredTile)
-					return Result(ItemStack(place.getGame(), shared_from_this(), requiredCount), newTile);
+					return Result{ItemStack(place.getGame(), shared_from_this(), requiredCount), newTile};
 				return std::nullopt;
 			};
 		}

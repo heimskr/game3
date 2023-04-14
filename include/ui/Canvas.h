@@ -3,7 +3,7 @@
 #include <random>
 
 #include <gdkmm/rectangle.h>
-#include <Eigen/Eigen>
+#include "lib/Eigen.h"
 
 #include "resources.h"
 #include "Position.h"

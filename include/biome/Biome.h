@@ -30,6 +30,7 @@ namespace Game3 {
 
 			Biome() = delete;
 			Biome(BiomeType type_): type(type_) {}
+			virtual ~Biome() = default;
 
 			virtual void init(Realm &realm_, int noise_seed, const std::shared_ptr<double[]> &saved_noise);
 

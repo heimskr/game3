@@ -31,8 +31,7 @@ namespace Game3 {
 		int width = -1;
 		int height = -1;
 
-		explicit ItemTexture() = default;
-
+		ItemTexture() = delete;
 		ItemTexture(Identifier, Identifier texture_name, int x_, int y_, int width_ = DEFAULT_WIDTH, int height_ = DEFAULT_HEIGHT);
 
 		std::shared_ptr<Texture> getTexture(const Game &);
@@ -53,6 +52,7 @@ namespace Game3 {
 
 			Item() = delete;
 			Item(ItemID, std::string name_, MoneyCount base_price, ItemCount max_count = 64);
+			virtual ~Item() = default;
 
 			Item(const Item &) = delete;
 			Item(Item &&) = default;

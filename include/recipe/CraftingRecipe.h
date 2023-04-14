@@ -15,6 +15,7 @@ namespace Game3 {
 
 		CraftingRecipe() = default;
 		CraftingRecipe(Input, Output, Identifier);
+		virtual ~CraftingRecipe() = default;
 
 		Input getInput() override;
 		Output getOutput() override;

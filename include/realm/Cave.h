@@ -12,11 +12,11 @@ namespace Game3 {
 			size_t entranceCount = 1;
 
 			Cave(const Cave &) = delete;
-			Cave(Cave &&) = default;
+			Cave(Cave &&) = delete;
 			~Cave() override;
 
 			Cave & operator=(const Cave &) = delete;
-			Cave & operator=(Cave &&) = default;
+			Cave & operator=(Cave &&) = delete;
 
 			bool interactGround(const std::shared_ptr<Player> &, const Position &) override;
 			void reveal(const Position &);
@@ -24,10 +24,8 @@ namespace Game3 {
 			friend class Realm;
 
 		protected:
-			Cave() = default;
-
+			Cave() = delete;
 			Cave(Game &, RealmID, RealmID parent_realm, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr, int seed_);
-
 			Cave(Game &, RealmID, RealmID parent_realm, TilemapPtr tilemap1_, BiomeMapPtr, int seed_);
 
 			void absorbJSON(const nlohmann::json &) override;
