@@ -23,8 +23,8 @@ namespace Game3 {
 
 			/** Returns false if this is a leaf or if the given coordinate isn't in this box's bounds, or if the position is already present. */
 			bool add(Index row, Index column);
-
 			bool remove(Index row, Index column);
+			void reset();
 
 			inline std::optional<Box> topLeft()     const { if (isLeaf()) return std::nullopt; return Box{left,             top,              half(width), half(height)}; }
 			inline std::optional<Box> topRight()    const { if (isLeaf()) return std::nullopt; return Box{left + width / 2, top,              width / 2,   half(height)}; }
@@ -42,6 +42,8 @@ namespace Game3 {
 			std::shared_ptr<Tilemap> tilemap;
 			Box root;
 			std::function<bool(const Tilemap &, Index, Index)> predicate;
+
+			void absorb();
 
 		public:
 			Quadtree() = delete;

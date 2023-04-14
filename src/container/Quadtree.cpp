@@ -71,6 +71,13 @@ namespace Game3 {
 		return false;
 	}
 
+	void Box::reset() {
+		children[0].reset();
+		children[1].reset();
+		children[2].reset();
+		children[3].reset();
+	}
+
 	bool Box::contains(Index row, Index column) const {
 		if (isLeaf() && top == row && left == column)
 			return true;
@@ -93,13 +100,23 @@ namespace Game3 {
 		root{0, 0, width, height} {}
 
 	Quadtree::Quadtree(std::shared_ptr<Tilemap> tilemap_, decltype(predicate) predicate_):
-		tilemap(std::move(tilemap_)),
-		root{tilemap->width, tilemap->height},
-		predicate(std::move(predicate_)) {}
+	tilemap(std::move(tilemap_)),
+	root{tilemap->width, tilemap->height},
+	predicate(std::move(predicate_)) {
+		absorb();
+	}
 
 	bool Quadtree::contains(Index row, Index column) const {
 		if (tilemap && predicate)
 			return predicate(*tilemap, row, column);
 		return root.contains(row, column);
+	}
+
+	void Quadtree::absorb() {
+		const Tilemap &map = *tilemap;
+		for (size_t row = 0; row < root.height; ++row)
+			for (size_t column = 0; column < root.width; ++column)
+				if (predicate(map, row, column))
+					add(row, column);
 	}
 }
