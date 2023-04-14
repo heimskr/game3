@@ -39,6 +39,38 @@ namespace Game3 {
 		return child->add(row, column) || was_false;
 	}
 
+	bool Box::remove(Index row, Index column) {
+		// isLeaf() shouldn't return true here unless the quadtree is 1x1, so we can return false instead of throwing an exception. */
+		if (isLeaf() || !inBounds(row, column))
+			return false;
+
+		const bool in_top  = row    < top  + height / 2;
+		const bool in_left = column < left + width  / 2;
+
+		if (in_top) {
+			if (in_left)
+				return remove(children[0], row, column);
+			return remove(children[1], row, column);
+		}
+
+		if (in_left)
+			return remove(children[2], row, column);
+		return remove(children[3], row, column);
+	}
+
+	bool Box::remove(std::unique_ptr<Box> &child, Index row, Index column) {
+		if (child) {
+			if (child->is(row, column)) {
+				child.reset();
+				return true;
+			}
+
+			return child->remove(row, column);
+		}
+
+		return false;
+	}
+
 	bool Box::contains(Index row, Index column) const {
 		if (isLeaf() && top == row && left == column)
 			return true;
@@ -60,10 +92,14 @@ namespace Game3 {
 	Quadtree::Quadtree(Index width, Index height):
 		root{0, 0, width, height} {}
 
-	Quadtree::Quadtree(const Tilemap &tilemap):
-		Quadtree(tilemap.width, tilemap.height) {}
+	Quadtree::Quadtree(std::shared_ptr<Tilemap> tilemap_, decltype(predicate) predicate_):
+		tilemap(std::move(tilemap_)),
+		root{tilemap->width, tilemap->height},
+		predicate(std::move(predicate_)) {}
 
-	void Quadtree::add(Index row, Index column) {
-		root.add(row, column);
+	bool Quadtree::contains(Index row, Index column) const {
+		if (tilemap && predicate)
+			return predicate(*tilemap, row, column);
+		return root.contains(row, column);
 	}
 }
