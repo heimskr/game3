@@ -36,6 +36,7 @@ namespace Game3 {
 			const std::set<TileID> getCategoryIDs(const Identifier &) const;
 			const std::set<Identifier> getTilesByCategory(const Identifier &) const;
 			bool isInCategory(const Identifier &tilename, const Identifier &category) const;
+			bool hasName(const Identifier &) const;
 			const TileID & operator[](const Identifier &) const;
 			const Identifier & operator[](TileID) const;
 

@@ -4,19 +4,19 @@
 #include "registry/Registry.h"
 
 namespace Game3 {
+	class EntityFactory;
+	class GhostFunction;
 	class Item;
+	class RealmFactory;
 	class Texture;
 	class Tileset;
+	class TileEntityFactory;
 	struct CraftingRecipe;
-	struct EntityFactory;
 	struct EntityTexture;
 	struct GhostDetails;
-	struct GhostFunction;
 	struct ItemTexture;
 	struct Ore;
 	struct RealmDetails;
-	struct RealmFactory;
-	struct TileEntityFactory;
 
 	struct RegistryRegistry: NamedRegistry<Registry> {
 		static Identifier ID() { return {"base", "registry"}; }

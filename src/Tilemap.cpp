@@ -2,6 +2,7 @@
 
 #include "Tilemap.h"
 #include "Tileset.h"
+#include "container/Quadtree.h"
 #include "game/Game.h"
 
 namespace Game3 {
@@ -19,7 +20,15 @@ namespace Game3 {
 		getTexture(game)->init();
 		setWidth = *texture->width;
 		setHeight = *texture->height;
+		if (tileset && tileset->hasName("base:tile/lava"_id)) {
+			const auto lava_id = (*tileset)["base:tile/lava"_id];
+			lavaQuadtree = std::make_shared<Quadtree>(width, height, [this, lava_id](Index row, Index column) {
+				return (*this)(column, row) == lava_id;
+			});
+		}
 	}
+
+	Tilemap::~Tilemap() = default;
 
 	std::shared_ptr<Texture> Tilemap::getTexture(const Game &game) {
 		if (texture)

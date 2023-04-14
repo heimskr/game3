@@ -4,8 +4,8 @@
 
 #include "MarchingSquares.h"
 #include "Tileset.h"
-#include "entity/Entity.h"
 #include "biome/Biome.h"
+#include "entity/Entity.h"
 #include "game/Game.h"
 #include "game/InteractionSet.h"
 #include "realm/Keep.h"

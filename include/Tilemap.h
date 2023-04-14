@@ -12,6 +12,7 @@
 #include "Types.h"
 
 namespace Game3 {
+	class Quadtree;
 	class Tileset;
 
 	class Tilemap {
@@ -24,12 +25,14 @@ namespace Game3 {
 			int setHeight = -1;
 			std::vector<TileID> tiles;
 			std::shared_ptr<Tileset> tileset;
+			/** This is a shared pointer for the sake of the copy constructor so that fromJSON can work.
+			 *  Please be sure not to let the lifetime of lavaQuadtree exceed the lifetime of this Tilemap. */
+			std::shared_ptr<Quadtree> lavaQuadtree;
 
 			Tilemap() = delete;
-
 			Tilemap(int width_, int height_, int tile_size, int set_width, int set_height, std::shared_ptr<Tileset>);
-
 			Tilemap(int width_, int height_, int tile_size, std::shared_ptr<Tileset>);
+			~Tilemap();
 
 			void init(const Game &);
 			std::vector<Index> getLand(Index right_pad = 0, Index bottom_pad = 0) const;

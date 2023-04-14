@@ -25,5 +25,21 @@ namespace Game3 {
 
 		constexpr size_t W = tiles.size();
 		constexpr size_t H = tiles[0].size();
+
+		Quadtree tree(W, H, [&tiles](Index row, Index column) {
+			return tiles[row][column];
+		});
+
+		auto visit = [](const Box &box) {
+			std::cout << box << '\n';
+			return false;
+		};
+
+		tree.iterateFull(visit);
+
+		tree.remove(0, 0);
+		std::cout << '\n';
+
+		tree.iterateFull(visit);
 	}
 }

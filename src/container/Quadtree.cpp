@@ -96,27 +96,53 @@ namespace Game3 {
 		return children[3] && children[3]->contains(row, column);
 	}
 
+	Box::operator std::string() const {
+		return "Box[(" + std::to_string(top) + ", " + std::to_string(left) + "), " + std::to_string(height) + "h x " + std::to_string(width) + "w]";
+	}
+
+	std::ostream & operator<<(std::ostream &os, const Box &box) {
+		return os << static_cast<std::string>(box);
+	}
+
 	Quadtree::Quadtree(Index width, Index height):
 		root{0, 0, width, height} {}
 
-	Quadtree::Quadtree(std::shared_ptr<Tilemap> tilemap_, decltype(predicate) predicate_):
-	tilemap(std::move(tilemap_)),
-	root{tilemap->width, tilemap->height},
+	Quadtree::Quadtree(Index width, Index height, decltype(predicate) predicate_):
+	root{0, 0, width, height},
 	predicate(std::move(predicate_)) {
 		absorb();
 	}
 
 	bool Quadtree::contains(Index row, Index column) const {
-		if (tilemap && predicate)
-			return predicate(*tilemap, row, column);
+		if (predicate)
+			return predicate(row, column);
 		return root.contains(row, column);
 	}
 
 	void Quadtree::absorb() {
-		const Tilemap &map = *tilemap;
-		for (size_t row = 0; row < root.height; ++row)
-			for (size_t column = 0; column < root.width; ++column)
-				if (predicate(map, row, column))
+		for (Index row = 0; row < root.height; ++row)
+			for (Index column = 0; column < root.width; ++column)
+				if (predicate(row, column))
 					add(row, column);
+	}
+
+	bool Quadtree::iterateFull(const Visitor &visitor) const {
+		std::vector<const Box *> boxes {&root};
+		while (!boxes.empty()) {
+			const Box *box = boxes.back();
+			boxes.pop_back();
+
+			if (box->full()) {
+				if (visitor(*box))
+					return true;
+			} else {
+				for (size_t i = 0; i < 4; ++i) {
+					if (auto child = box->children[i].get())
+						boxes.push_back(child);
+				}
+			}
+		}
+
+		return false;
 	}
 }

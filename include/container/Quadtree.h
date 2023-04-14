@@ -1,7 +1,10 @@
 #pragma once
 
 #include <array>
+#include <functional>
 #include <memory>
+#include <ostream>
+#include <string>
 
 #include "Tilemap.h"
 
@@ -31,29 +34,39 @@ namespace Game3 {
 			inline std::optional<Box> bottomLeft()  const { if (isLeaf()) return std::nullopt; return Box{left,             top + height / 2, half(width), height / 2  }; }
 			inline std::optional<Box> bottomRight() const { if (isLeaf()) return std::nullopt; return Box{left + width / 2, top + height / 2, width / 2,   height / 2  }; }
 
+			operator std::string() const;
+
 		private:
 			static inline Index half(Index value) { return 1 < value? value / 2 : 1; }
 			inline bool full(size_t index) const { return children[index] && children[index]->full(); }
 			bool remove(std::unique_ptr<Box> &, Index row, Index column);
+
+			friend class Quadtree;
 	};
+
+	std::ostream & operator<<(std::ostream &, const Box &);
 
 	class Quadtree {
 		private:
-			std::shared_ptr<Tilemap> tilemap;
 			Box root;
-			std::function<bool(const Tilemap &, Index, Index)> predicate;
+			std::function<bool(Index, Index)> predicate;
 
 			void absorb();
 
 		public:
+			/** If this returns true, iteration will end. */
+			using Visitor = std::function<bool(const Box &)>;
+
 			Quadtree() = delete;
 			Quadtree(Index width, Index height);
-			Quadtree(std::shared_ptr<Tilemap>, decltype(predicate));
+			Quadtree(Index width, Index height, decltype(predicate));
 
 			inline bool add(Index row, Index column) { return root.add(row, column); }
 			inline bool remove(Index row, Index column) { return root.remove(row, column); }
 
 			inline const Box & getRoot() const { return root; }
 			bool contains(Index row, Index column) const;
+			/** Iterates over each full box and returns true if iteration was canceled. */
+			bool iterateFull(const Visitor &) const;
 	};
 }
