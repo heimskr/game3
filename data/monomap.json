@@ -336,11 +336,11 @@
 			"base:tile/charred_stump":        742
 		},
 		"stacks": {
-			"base:category/wooden_walls": "base:wooden_wall",
-			"base:category/towers": "base:tower",
-			"base:tile/plant1": "base:plant_pot1",
-			"base:tile/plant2": "base:plant_pot2",
-			"base:tile/plant3": "base:plant_pot3"
+			"base:category/wooden_walls": "base:item/wooden_wall",
+			"base:category/towers": "base:item/tower",
+			"base:tile/plant1": "base:item/plant_pot1",
+			"base:tile/plant2": "base:item/plant_pot2",
+			"base:tile/plant3": "base:item/plant_pot3"
 		},
 		"marchable": [
 			"base:category/wooden_walls"

@@ -28,18 +28,27 @@ namespace Game3 {
 	}
 
 	static void spawnCauldron(const Place &place) {
-		// place.realm->add(TileEntity::create<CraftingStation>(Monomap::CAULDRON_RED_FULL, place.position, Identifier("base", "cauldron_station")));
+		place.realm->add(TileEntity::create<CraftingStation>(place.realm->getGame(), "base:tile/cauldron_red_full"_id, place.position, "base:station/cauldron"_id));
 		place.realm->setLayer2(place.position, "base:tile/cauldron_red_full");
 	}
 
 	static void spawnPurifier(const Place &place) {
-		// place.realm->add(TileEntity::create<CraftingStation>(Monomap::PURIFIER, place.position, Identifier("base", "purifier_station")));
+		place.realm->add(TileEntity::create<CraftingStation>(place.realm->getGame(), "base:tile/purifier"_id, place.position, "base:station/purifier"_id));
 		place.realm->setLayer2(place.position, "base:tile/purifier");
 	}
 
 	void initGhosts(Game &game) {
-		game.add(std::make_shared<GhostDetails>("base:cauldron"_id, "base:tileset/monomap"_id, spawnCauldron, "base:tile/cauldron_red_full"_id));
-		game.add(std::make_shared<GhostDetails>("base:purifier"_id, "base:tileset/monomap"_id, spawnPurifier, "base:tile/purifier"_id));
+		game.add(std::make_shared<GhostDetails>("base:item/cauldron"_id, "base:tileset/monomap"_id, spawnCauldron, "base:tile/cauldron_red_full"_id));
+		game.add(std::make_shared<GhostDetails>("base:item/purifier"_id, "base:tileset/monomap"_id, spawnPurifier, "base:tile/purifier"_id));
+		game.add(GhostFunction("base:ghost/normal", [&](const Identifier &, const Place &) -> bool {
+			throw std::logic_error("Attempted to march base:ghost/normal");
+		}));
+		game.add(GhostFunction("base:ghost/wooden_wall", [&](const Identifier &id, const Place &place) -> bool {
+			return place.realm->tilemap2->tileset->isInCategory(id, "base:category/wooden_walls");
+		}));
+		game.add(GhostFunction("base:ghost/tower", [&](const Identifier &id, const Place &place) -> bool {
+			return place.realm->tilemap2->tileset->isInCategory(id, "base:category/towers");
+		}));
 	}
 
 	GhostDetails & GhostDetails::get(const Game &game, const ItemStack &stack) {
@@ -105,7 +114,7 @@ namespace Game3 {
 		TileID tile_id = tileset.getEmptyID();
 
 		if (details.customFn)
-			tile_id = tileset[details.customTileName];
+			tile_id = tileset[details.customTilename];
 		else if (details.useMarchingSquares)
 			tile_id = marched;
 		else
@@ -134,8 +143,8 @@ namespace Game3 {
 		};
 
 		const auto &registry = realm->getGame().registry<GhostFunctionRegistry>();
-		const auto &fn = *registry[details.type];
-		const auto &tileset = *realm->tilemap2->tileset;
+		const auto &fn       = *registry[details.type];
+		const auto &tileset  = *realm->tilemap2->tileset;
 
 		march_result = march4([&](int8_t row_offset, int8_t column_offset) -> bool {
 			const Position offset_position(position + Position(row_offset, column_offset));

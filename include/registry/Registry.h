@@ -135,6 +135,10 @@ namespace Game3 {
 				add(std::move(new_name), std::make_shared<T>(std::move(new_item)));
 			}
 
+			inline bool contains(const Identifier &id) const {
+				return items.contains(id);
+			}
+
 			template <typename S>
 			inline S & get() {
 				return *items.at(S::ID())->template cast<S>();

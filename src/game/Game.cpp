@@ -216,6 +216,11 @@ namespace Game3 {
 		registry<RealmFactoryRegistry>().add(shared->identifier, shared);
 	}
 
+	void Game::add(GhostFunction &&function) {
+		auto shared = std::make_shared<GhostFunction>(std::move(function));
+		registry<GhostFunctionRegistry>().add(shared->identifier, shared);
+	}
+
 	void Game::traverseData(const std::filesystem::path &dir) {
 		for (const auto &entry: std::filesystem::directory_iterator(dir)) {
 			if (entry.is_directory()) {

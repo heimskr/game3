@@ -163,6 +163,7 @@ namespace Game3 {
 		tileset.categories = json.at("categories");
 		tileset.textureName = json.at("texture");
 		tileset.marchable = json.at("marchable");
+		tileset.missing = json.at("missing");
 
 		std::map<Identifier, Identifier> stacks = json.at("stacks");
 		for (const auto &[key, val]: stacks) {

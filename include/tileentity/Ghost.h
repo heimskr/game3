@@ -8,6 +8,7 @@
 
 namespace Game3 {
 	class Game;
+	struct GhostDetails;
 
 	// enum class GhostType {Invalid, Normal, WoodenWall, Tower, Custom};
 
@@ -32,7 +33,7 @@ namespace Game3 {
 		Index rowOffset     = 0;
 		Index columnOffset  = 0;
 		CustomFn customFn;
-		Identifier customTileName;
+		Identifier customTilename;
 
 		GhostDetails(Identifier identifier_ = {}):
 			NamedRegisterable(std::move(identifier_)) {}
@@ -51,7 +52,7 @@ namespace Game3 {
 			type("base:ghost/custom"),
 			tilesetName(std::move(tileset_name)),
 			customFn(std::move(custom_fn)),
-			customTileName(std::move(custom_tile_name)) {}
+			customTilename(std::move(custom_tile_name)) {}
 
 		static GhostDetails & get(const Game &, const ItemStack &);
 	};
