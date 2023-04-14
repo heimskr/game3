@@ -18,6 +18,7 @@ namespace Game3 {
 	class MerchantTab;
 	class TextTab;
 	class Tab;
+	struct WorldGenParams;
 
 	class MainWindow: public Gtk::ApplicationWindow {
 		public:
@@ -109,7 +110,7 @@ namespace Game3 {
 			float rightPadStartCanvasX = 0.f;
 			float rightPadStartCanvasY = 0.f;
 
-			void newGame(int seed, int width, int height, double wetness);
+			void newGame(int seed, int width, int height, const WorldGenParams &);
 			void loadGame(const std::filesystem::path &);
 			void saveGame(const std::filesystem::path &);
 			bool render(const Glib::RefPtr<Gdk::GLContext> &);

@@ -6,6 +6,7 @@
 
 namespace Game3 {
 	class MainWindow;
+	struct WorldGenParams;
 
 	class NewGameDialog: public Gtk::MessageDialog {
 		public:
@@ -15,10 +16,15 @@ namespace Game3 {
 
 		private:
 			MainWindow &mainWindow;
-			sigc::signal<void(long, long, long, double)> signal_submit_;
-			Gtk::Label seedLabel {"Seed"}, widthLabel {"Width"}, heightLabel {"Height"}, wetnessLabel {"Wetness"};
+			sigc::signal<void(long, long, long, const WorldGenParams &)> signal_submit_;
+			Gtk::Label seedLabel {"Seed"};
+			Gtk::Label widthLabel {"Width"};
+			Gtk::Label heightLabel {"Height"};
+			Gtk::Label wetnessLabel {"Wetness"};
+			Gtk::Label stoneLevelLabel {"Stone Level"};
 			Gtk::Entry seedEntry;
 			Gtk::Scale wetnessSlider;
+			Gtk::Scale stoneLevelSlider;
 			NumericEntry widthEntry, heightEntry;
 
 			void submit();

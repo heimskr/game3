@@ -1,6 +1,7 @@
 #include "ui/gtk/NewGameDialog.h"
 #include "ui/MainWindow.h"
 #include "util/Util.h"
+#include "worldgen/WorldGen.h"
 
 namespace Game3 {
 	NewGameDialog::NewGameDialog(MainWindow &parent_): Gtk::MessageDialog(parent_, "New Game", false, Gtk::MessageType::OTHER, Gtk::ButtonsType::CANCEL, true), mainWindow(parent_) {
@@ -9,17 +10,24 @@ namespace Game3 {
 		widthLabel.set_halign(Gtk::Align::START);
 		heightLabel.set_halign(Gtk::Align::START);
 		wetnessLabel.set_halign(Gtk::Align::START);
+		stoneLevelLabel.set_halign(Gtk::Align::START);
 		seedEntry.set_text("1621");
 		widthEntry.set_text("256");
 		heightEntry.set_text("256");
 		seedEntry.signal_activate().connect(sigc::mem_fun(*this, &NewGameDialog::submit));
 		widthEntry.signal_activate().connect(sigc::mem_fun(*this, &NewGameDialog::submit));
 		heightEntry.signal_activate().connect(sigc::mem_fun(*this, &NewGameDialog::submit));
+		const WorldGenParams params;
 		wetnessSlider.set_digits(2);
 		wetnessSlider.set_value_pos(Gtk::PositionType::RIGHT);
-		wetnessSlider.set_range(-1.0, 1.0);
-		wetnessSlider.set_value(-0.15);
+		wetnessSlider.set_range(-2.0, 2.0);
+		wetnessSlider.set_value(params.wetness);
 		wetnessSlider.set_draw_value();
+		stoneLevelSlider.set_digits(2);
+		stoneLevelSlider.set_value_pos(Gtk::PositionType::RIGHT);
+		stoneLevelSlider.set_range(-2.0, 2.0);
+		stoneLevelSlider.set_value(params.stoneLevel);
+		stoneLevelSlider.set_draw_value();
 		area->append(seedLabel);
 		area->append(seedEntry);
 		area->append(widthLabel);
@@ -28,6 +36,8 @@ namespace Game3 {
 		area->append(heightEntry);
 		area->append(wetnessLabel);
 		area->append(wetnessSlider);
+		area->append(stoneLevelLabel);
+		area->append(stoneLevelSlider);
 		add_button("Cr_eate", Gtk::ResponseType::OK);
 		int width, height;
 		get_default_size(width, height);
@@ -73,6 +83,9 @@ namespace Game3 {
 			return;
 		}
 
-		signal_submit_.emit(seed, width, height, wetnessSlider.get_value());
+		signal_submit_.emit(seed, width, height, {
+			.wetness = wetnessSlider.get_value(),
+			.stoneLevel = stoneLevelSlider.get_value(),
+		});
 	}
 }

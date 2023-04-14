@@ -27,7 +27,8 @@ namespace Game3 {
 		const double noise = perlin.GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.666);
 		savedNoise[row * realm.getWidth() + column] = noise;
 
-		const auto wetness = params.wetness;
+		const auto wetness    = params.wetness;
+		const auto stoneLevel = params.stoneLevel;
 
 		if (noise < wetness) {
 			realm.setLayer1({row, column}, "base:tile/deeper_water"_id);
@@ -41,7 +42,7 @@ namespace Game3 {
 			realm.setLayer1({row, column}, "base:tile/sand"_id);
 		} else if (noise < wetness + 0.5) {
 			realm.setLayer1({row, column}, "base:tile/light_grass"_id);
-		} else if (0.8 < noise) {
+		} else if (stoneLevel < noise) {
 			realm.setLayer1({row, column}, "base:tile/stone"_id);
 		} else {
 			realm.setLayer1({row, column}, choose(grasses, rng));
