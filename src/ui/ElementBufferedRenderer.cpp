@@ -1,3 +1,5 @@
+// Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Renderers/ElementBufferedRenderer.cs
+
 #include <iostream>
 
 #include "Shader.h"
@@ -12,8 +14,6 @@
 #include "ui/ElementBufferedRenderer.h"
 #include "util/Timer.h"
 #include "util/Util.h"
-
-// Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Renderers/ElementBufferedRenderer.cs
 
 namespace Game3 {
 	ElementBufferedRenderer::ElementBufferedRenderer(Realm &realm_):
@@ -149,6 +149,7 @@ namespace Game3 {
 
 		Timer::clear();
 		Timer timer("RecomputeLighting");
+		std::cout << "start...\n";
 
 		bool recomputation_needed = false;
 		if (tileCache.empty()) {
@@ -182,9 +183,7 @@ namespace Game3 {
 			Timer lava_timer("Lava");
 			for (Index row = 0; row < tilemap->height; ++row) {
 				for (Index column = 0; column < tilemap->width; ++column) {
-					const Position pos(row, column);
-					const auto tile = (*tilemap)[pos];
-					if (tile == lava) {
+					if ((*tilemap)(column, row) == lava) {
 						const float x = column * tilesize;
 						const float y = row * tilesize;
 						constexpr float radius = 1.5f;
