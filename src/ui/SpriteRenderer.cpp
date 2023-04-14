@@ -169,9 +169,9 @@ namespace Game3 {
 		hackY(y, y_offset, scale);
 
 		if (size_x < 0)
-			size_x = texture_width;
+			size_x = -size_x * texture_width;
 		if (size_y < 0)
-			size_y = texture_height;
+			size_y = -size_y * texture_height;
 
 		setupShader(texture_width, texture_height, x, y, x_offset, y_offset, size_x, size_y, scale, angle, alpha);
 
@@ -184,6 +184,7 @@ namespace Game3 {
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindVertexArray(0);
 	}
+
 	void SpriteRenderer::drawOnScreen(GL::Texture &texture, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale, float angle, float alpha) {
 		if (!initialized)
 			return;
@@ -193,9 +194,9 @@ namespace Game3 {
 		hackY(y, y_offset, scale);
 
 		if (size_x < 0)
-			size_x = texture_width;
+			size_x = -size_x * texture_width;
 		if (size_y < 0)
-			size_y = texture_height;
+			size_y = -size_y * texture_height;
 
 		setupShader(texture_width, texture_height, x, y, x_offset, y_offset, size_x, size_y, scale, angle, alpha);
 
@@ -218,7 +219,7 @@ namespace Game3 {
 			glDeleteVertexArrays(1, &quadVAO);
 
 		unsigned int vbo;
-		static float vertices[] {
+		static const float vertices[] {
 			// pos    // tex
 			0.f, 1.f, 0.f, 1.f,
 			1.f, 0.f, 1.f, 0.f,
@@ -237,7 +238,7 @@ namespace Game3 {
 
 		glBindVertexArray(quadVAO);
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *) 0);
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 		initialized = true;

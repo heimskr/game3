@@ -349,6 +349,7 @@ namespace GL {
 			inline bool undo() {
 				if (handle == 0 || oldBuffer < 0)
 					return false;
+				// unbindFBTexture();
 				bindFB(oldBuffer);
 				oldBuffer = -1;
 				return true;

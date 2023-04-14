@@ -146,16 +146,19 @@ namespace Game3 {
 		// game.canvas.multiplier(textureA, renderer1.lightTexture);
 		// textureA.useInFB();
 		// game.canvas.multiplier(textureB, renderer2.lightTexture);
-		// game.canvas.multiplier(texture, renderer3.lightTexture);
+		// textureB.useInFB();
+		// game.canvas.multiplier(textureA, renderer3.lightTexture);
 		// sprite_renderer.drawOnScreen(renderer1.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
 		// sprite_renderer.drawOnScreen(renderer2.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
 		// sprite_renderer.drawOnScreen(renderer3.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
 
 		fbo.undo();
 		viewport.reset();
+
 		sprite_renderer.update(width, height);
 		// sprite_renderer.drawOnMap(textureB, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
 		sprite_renderer.drawOnMap(textureA, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
+
 
 		if (0 < ghostCount)
 			sprite_renderer.drawOnScreen(*cacheTexture("resources/checkmark.png"), width - 42.f, height - 42.f, 2.f);

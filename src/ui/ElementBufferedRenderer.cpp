@@ -131,15 +131,6 @@ namespace Game3 {
 	}
 
 	void ElementBufferedRenderer::generateLightingTexture() {
-		const auto width  = tilemap->tileSize * TEXTURE_SCALE * tilemap->width;
-		const auto height = tilemap->tileSize * TEXTURE_SCALE * tilemap->height;
-		constexpr GLint filter = GL_LINEAR;
-
-		lightTexture.initFloat(width, height, filter);
-		blurredLightTexture.initFloat(width, height, filter);
-
-		rectangle.update(width, height);
-		reshader.update(width, height);
 	}
 
 	void ElementBufferedRenderer::recomputeLighting() {
@@ -165,12 +156,18 @@ namespace Game3 {
 
 		if (recomputation_needed) {
 			fbo.bind();
+			constexpr float texture_scale = 2.f;
+			constexpr GLint filter = GL_LINEAR;
 			const auto tilesize = tilemap->tileSize;
-			const auto width    = tilesize * tilemap->width;
-			const auto height   = tilesize * tilemap->height;
+			const auto width  = tilesize * texture_scale * tilemap->width;
+			const auto height = tilesize * texture_scale * tilemap->height;
+			rectangle.update(width, height);
+			reshader.update(width, height);
 			GL::Viewport viewport(0, 0, width, height);
-			lightTexture.initFloat(width, height);
+			lightTexture.initFloat(width, height, filter);
+			blurredLightTexture.initFloat(width, height, filter);
 			lightTexture.useInFB();
+			GL::clear(.5f, .5f, .5f, 1.f);
 
 			if (tilemap->lavaQuadtree) {
 				Timer lava_timer("Lava");
@@ -178,7 +175,7 @@ namespace Game3 {
 					const float x = box.left * tilesize;
 					const float y = box.top  * tilesize;
 					constexpr float bleed = 1.5f;
-					rectangle({1.f, .5f, 0.f, .5f}, x - bleed * tilesize, y - bleed * tilesize, (2.f * bleed + box.width) * tilesize, (2.f * bleed + box.height) * tilesize);
+					rectangle({1.f, .5f, 0.f, 1.f}, x - bleed * tilesize, y - bleed * tilesize, (2.f * bleed + box.width) * tilesize, (2.f * bleed + box.height) * tilesize);
 					return false;
 				});
 			}
@@ -188,9 +185,12 @@ namespace Game3 {
 			reshader.set("ys", static_cast<float>(height));
 			reshader.set("r", 5.f);
 
+			blurredLightTexture.useInFB();
+
 			Timer blur("Blur");
 			for (int i = 0; i < 8; ++i) {
-				blurredLightTexture.useInFB();
+				if (i != 0)
+					blurredLightTexture.useInFB();
 				reshader.set("axis", 0);
 				reshader(lightTexture);
 
