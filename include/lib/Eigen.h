@@ -9,7 +9,6 @@
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-#pragma GCC diagnostic ignored "-Wdefaulted-function-deleted"
 #endif
 
 #include <Eigen/Eigen>
