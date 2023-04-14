@@ -19,11 +19,12 @@ namespace GL {
 	// TODO: makeRGBATexture
 
 	inline void useTextureInFB(GLuint texture) {
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0); CHECKGL
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0); CHECKGL
 	}
 
 	inline void unbindFBTexture() {
-		useTextureInFB(0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0); CHECKGL
 	}
 
 	inline void bindFB(GLuint framebuffer) {
@@ -460,6 +461,4 @@ namespace GL {
 			glViewport(saved[0], saved[1], static_cast<GLsizei>(saved[2]), static_cast<GLsizei>(saved[3])); CHECKGL
 		}
 	};
-
-	extern FBO globalFBO;
 }

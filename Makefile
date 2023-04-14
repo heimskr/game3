@@ -1,6 +1,7 @@
 # BUILD := release
+LTO :=
 ifeq ($(BUILD),release)
-BUILDFLAGS := -Ofast -march=native
+BUILDFLAGS := -Ofast -march=native -flto
 else
 BUILDFLAGS := -g -O0
 endif
@@ -14,13 +15,13 @@ endif
 DEPS         := eigen3 glm glfw3 libzstd gtk4 gtkmm-4.0 nlohmann_json glu
 OUTPUT       := game3
 COMPILER     ?= g++
-CPPFLAGS     := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude -Istb -Ilibnoise/src
+CPPFLAGS     := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude -Istb -Ilibnoise/src $(LTO)
 ZIG          ?= zig
 # --main-pkg-path is needed as otherwise it wouldn't let you embed any file outside of src/
 ZIGFLAGS     := -O ReleaseSmall --main-pkg-path .
 INCLUDES     := $(shell pkg-config --cflags $(DEPS))
 LIBS         := $(shell pkg-config --libs   $(DEPS))
-LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread -Llibnoise/build/src -lnoise
+LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread -Llibnoise/build/src -lnoise $(LTO)
 SOURCES      := $(shell find src -name \*.cpp) src/gtk_resources.cpp
 OBJECTS      := $(SOURCES:.cpp=.o) src/resources.o
 RESXML       := $(OUTPUT).gresource.xml

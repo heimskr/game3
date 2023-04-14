@@ -22,6 +22,7 @@
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "util/FS.h"
+#include "util/Timer.h"
 #include "util/Util.h"
 #include "worldgen/Overworld.h"
 #include "worldgen/WorldGen.h"
@@ -108,7 +109,6 @@ namespace Game3 {
 			glArea.make_current();
 			glArea.throw_if_error();
 			canvas = std::make_unique<Canvas>(*this);
-			GL::globalFBO.init(true);
 		});
 		glArea.signal_unrealize().connect([this] {
 			glArea.make_current();
@@ -281,6 +281,7 @@ namespace Game3 {
 	}
 
 	void MainWindow::newGame(int seed, int width, int height, const WorldGenParams &params) {
+		Timer timer("NewGame");
 		glArea.get_context()->make_current();
 		game = Game::create(*canvas);
 		game->initEntities();
@@ -305,6 +306,9 @@ namespace Game3 {
 		game->player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_axe"));
 		game->player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_hammer"));
 		game->player->inventory->add(ItemStack(*game, "base:item/cave_entrance", 4));
+		timer.stop();
+		Timer::summary();
+		Timer::clear();
 	}
 
 	void MainWindow::loadGame(const std::filesystem::path &path) {

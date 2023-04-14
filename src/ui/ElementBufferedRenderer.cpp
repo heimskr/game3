@@ -35,6 +35,7 @@ namespace Game3 {
 			reshader.reset();
 			tilemap.reset();
 			rectangle.reset();
+			fbo.reset();
 			initialized = false;
 		}
 	}
@@ -48,6 +49,7 @@ namespace Game3 {
 		generateElementBufferObject();
 		generateVertexArrayObject();
 		generateLightingTexture();
+		fbo.init();
 		const auto bright_shorts = tilemap->tileset->getBrightIDs();
 		brightTiles.assign(bright_shorts.begin(), bright_shorts.end());
 		brightTiles.resize(8, -1);
@@ -144,9 +146,7 @@ namespace Game3 {
 		if (!tilemap)
 			return;
 
-		Timer::clear();
 		Timer timer("RecomputeLighting");
-		std::cout << "start...\n";
 
 		bool recomputation_needed = false;
 		if (tileCache.empty()) {
@@ -164,16 +164,13 @@ namespace Game3 {
 		}
 
 		if (recomputation_needed) {
-			GL::globalFBO.bind();
+			fbo.bind();
 			const auto tilesize = tilemap->tileSize;
 			const auto width    = tilesize * tilemap->width;
 			const auto height   = tilesize * tilemap->height;
 			GL::Viewport viewport(0, 0, width, height);
-			std::cout << lightTexture.getWidth() << " x " << lightTexture.getHeight() << '\n';
-			Timer misc1("Misc1");
+			lightTexture.initFloat(width, height);
 			lightTexture.useInFB();
-			misc1.stop();
-			GL::clear(.0f, .0f, .0f, 0.f);
 
 			if (tilemap->lavaQuadtree) {
 				Timer lava_timer("Lava");
@@ -184,26 +181,12 @@ namespace Game3 {
 					rectangle({1.f, .5f, 0.f, .5f}, x - bleed * tilesize, y - bleed * tilesize, (2.f * bleed + box.width) * tilesize, (2.f * bleed + box.height) * tilesize);
 					return false;
 				});
-
-				// const TileID lava = (*tilemap->tileset)["base:tile/lava"];
-				// for (Index row = 0; row < tilemap->height; ++row) {
-				// 	for (Index column = 0; column < tilemap->width; ++column) {
-				// 		if ((*tilemap)(column, row) == lava) {
-				// 			const float x = column * tilesize;
-				// 			const float y = row * tilesize;
-				// 			constexpr float radius = 1.5f;
-				// 			rectangle({1.f, .5f, 0.f, .5f}, x - radius * tilesize, y - radius * tilesize, (2.f * radius + 1.f) * tilesize, (2.f * radius + 1.f) * tilesize);
-				// 		}
-				// 	}
-				// }
 			}
 
-			Timer misc2("Misc2");
 			reshader.bind();
 			reshader.set("xs", static_cast<float>(width));
 			reshader.set("ys", static_cast<float>(height));
 			reshader.set("r", 5.f);
-			misc2.stop();
 
 			Timer blur("Blur");
 			for (int i = 0; i < 8; ++i) {
@@ -217,15 +200,12 @@ namespace Game3 {
 			}
 			blur.stop();
 
-			Timer misc3("Misc3");
 			viewport.reset();
 			GL::unbindFBTexture();
-			GL::globalFBO.undo();
-			misc3.stop();
+			fbo.undo();
 		}
 
 		timer.stop();
-		Timer::summary();
 	}
 
 	void ElementBufferedRenderer::check(int handle, bool is_link) {
