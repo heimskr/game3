@@ -101,7 +101,7 @@ namespace Game3 {
 		Canvas &canvas = game.canvas;
 		auto &textureA = canvas.textureA;
 		auto &textureB = canvas.textureB;
-		auto &fbo = canvas.fbo;
+		// auto &fbo = canvas.fbo;
 		auto &multiplier = canvas.multiplier;
 
 		if (canvas.lastRealm != this) {

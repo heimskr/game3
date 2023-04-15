@@ -6,3 +6,4 @@
 [2022/06/20 03:49:00] Make blacksmiths produce tools.
 [2023/04/09 00:59:59] Fix lighting issues on the second+ time creating/opening a game without quitting.
 [2023/04/10 08:06:26] Remove the overload for TileEntity::init that takes a std::default_random_engine now that a Game is given whose dynamicRNG can be accessed.
+[2023/04/14 21:10:36] Reimplement render-to-texture, but with textures that match the window size.

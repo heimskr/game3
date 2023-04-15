@@ -53,8 +53,6 @@ namespace Game3 {
 		assert(texture1 != 0);
 		shader.bind(); CHECKGL
 
-		float x = 0.f;
-		float y = 0.f;
 		const float bb_width  = backbufferWidth;
 		const float bb_height = backbufferHeight;
 
@@ -62,7 +60,7 @@ namespace Game3 {
 
 		glm::mat4 model = glm::mat4(1.f);
 		model = glm::scale(model, glm::vec3(1.f, -1.f, 1.f));
-		model = glm::translate(model, glm::vec3(x, -bb_height, 0.f));
+		model = glm::translate(model, glm::vec3(0, -bb_height, 0.f));
 		model = glm::scale(model, glm::vec3(bb_width, bb_height, 1.f));
 
 		shader.set("projection", projection);
