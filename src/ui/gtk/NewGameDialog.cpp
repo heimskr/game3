@@ -11,6 +11,8 @@ namespace Game3 {
 		heightLabel.set_halign(Gtk::Align::START);
 		wetnessLabel.set_halign(Gtk::Align::START);
 		stoneLevelLabel.set_halign(Gtk::Align::START);
+		forestLabel.set_halign(Gtk::Align::START);
+		antiforestLabel.set_halign(Gtk::Align::START);
 		seedEntry.set_text("1621");
 		widthEntry.set_text("256");
 		heightEntry.set_text("256");
@@ -28,6 +30,16 @@ namespace Game3 {
 		stoneLevelSlider.set_range(-2.0, 2.0);
 		stoneLevelSlider.set_value(params.stoneLevel);
 		stoneLevelSlider.set_draw_value();
+		forestSlider.set_digits(2);
+		forestSlider.set_value_pos(Gtk::PositionType::RIGHT);
+		forestSlider.set_range(-1.0, 1.0);
+		forestSlider.set_value(params.forestThreshold);
+		forestSlider.set_draw_value();
+		antiforestSlider.set_digits(2);
+		antiforestSlider.set_value_pos(Gtk::PositionType::RIGHT);
+		antiforestSlider.set_range(-1.0, 1.0);
+		antiforestSlider.set_value(params.antiforestThreshold);
+		antiforestSlider.set_draw_value();
 		area->append(seedLabel);
 		area->append(seedEntry);
 		area->append(widthLabel);
@@ -38,6 +50,10 @@ namespace Game3 {
 		area->append(wetnessSlider);
 		area->append(stoneLevelLabel);
 		area->append(stoneLevelSlider);
+		area->append(forestLabel);
+		area->append(forestSlider);
+		area->append(antiforestLabel);
+		area->append(antiforestSlider);
 		add_button("Cr_eate", Gtk::ResponseType::OK);
 		int width, height;
 		get_default_size(width, height);
@@ -86,6 +102,8 @@ namespace Game3 {
 		signal_submit_.emit(seed, width, height, {
 			.wetness = wetnessSlider.get_value(),
 			.stoneLevel = stoneLevelSlider.get_value(),
+			.forestThreshold = forestSlider.get_value(),
+			.antiforestThreshold = antiforestSlider.get_value(),
 		});
 	}
 }

@@ -38,7 +38,7 @@ namespace Game3 {
 				(void) row; (void) column;
 			}
 
-			virtual void postgen(Index row, Index column, std::default_random_engine &, const noise::module::Perlin &) {
+			virtual void postgen(Index row, Index column, std::default_random_engine &, const noise::module::Perlin &, const WorldGenParams &) {
 				(void) row; (void) column;
 			}
 

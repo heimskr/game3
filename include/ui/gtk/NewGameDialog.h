@@ -22,9 +22,13 @@ namespace Game3 {
 			Gtk::Label heightLabel {"Height"};
 			Gtk::Label wetnessLabel {"Wetness"};
 			Gtk::Label stoneLevelLabel {"Stone Level"};
+			Gtk::Label forestLabel {"Forest Threshold"};
+			Gtk::Label antiforestLabel {"Antiforest Threshold"};
 			Gtk::Entry seedEntry;
 			Gtk::Scale wetnessSlider;
 			Gtk::Scale stoneLevelSlider;
+			Gtk::Scale forestSlider;
+			Gtk::Scale antiforestSlider;
 			NumericEntry widthEntry, heightEntry;
 
 			void submit();

@@ -126,7 +126,7 @@ namespace Game3::WorldGen {
 		Timer postgen_timer("Postgen");
 		for (Index row = 0; row < height; ++row)
 			for (Index column = 0; column < width; ++column)
-				get_biome(row, column).postgen(row, column, rng, perlin);
+				get_biome(row, column).postgen(row, column, rng, perlin, params);
 		postgen_timer.stop();
 
 		overworld_timer.stop();

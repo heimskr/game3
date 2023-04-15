@@ -47,7 +47,7 @@ namespace Game3 {
 		} else {
 			realm.setLayer1({row, column}, choose(grasses, rng));
 			const double forest_noise = forestPerlin->GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.5);
-			if (0.5 < forest_noise) {
+			if (params.forestThreshold < forest_noise) {
 				static const std::vector<Identifier> trees {"base:tile/tree1"_id, "base:tile/tree2"_id, "base:tile/tree3"_id};
 				realm.add(TileEntity::create<Tree>(realm.getGame(), rng, choose(trees), "base:tile/tree0"_id, Position(row, column), Tree::MATURITY));
 				realm.setLayer1({row, column}, "base:tile/forest_floor"_id);
@@ -55,12 +55,12 @@ namespace Game3 {
 		}
 	}
 
-	void Grassland::postgen(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &perlin) {
+	void Grassland::postgen(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &perlin, const WorldGenParams &params) {
 		Realm &realm = *getRealm();
 		constexpr double factor = 10;
 		static std::uniform_int_distribution distribution(0, 99);
 
-		if (-0.4 > perlin.GetValue(row / Biome::NOISE_ZOOM * factor, column / Biome::NOISE_ZOOM * factor, 0.)) {
+		if (params.antiforestThreshold > perlin.GetValue(row / Biome::NOISE_ZOOM * factor, column / Biome::NOISE_ZOOM * factor, 0.)) {
 			if (auto tile = realm.tileEntityAt({row, column}); tile && tile->is("base:te/tree"_id) && !std::dynamic_pointer_cast<Tree>(tile)->hasHive()) {
 				Game &game = realm.getGame();
 				realm.remove(tile);

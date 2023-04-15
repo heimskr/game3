@@ -13,5 +13,7 @@ namespace Game3 {
 	struct WorldGenParams {
 		double wetness    = -.15;
 		double stoneLevel =  0.8;
+		double forestThreshold = 0.5;
+		double antiforestThreshold = -0.4;
 	};
 }
