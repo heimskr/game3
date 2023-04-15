@@ -13,7 +13,6 @@ namespace Game3 {
 		public:
 			constexpr static float TEXTURE_SCALE = 2.f;
 			constexpr static float TILE_TEXTURE_PADDING = 1.f / 2048.f;
-			float scale = 1.f;
 			int backbufferWidth = -1;
 			int backbufferHeight = -1;
 
@@ -26,6 +25,7 @@ namespace Game3 {
 
 			void reset();
 			void init(TilemapPtr);
+			void render(float divisor, float scale, float center_x, float center_y);
 			void render(float divisor);
 			void reupload();
 			bool onBackbufferResized(int width, int height);

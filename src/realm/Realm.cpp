@@ -115,23 +115,19 @@ namespace Game3 {
 			canvas.lastRealm = this;
 		}
 
-		fbo.bind();
-		textureA.useInFB();
-		const auto bb_width  = textureA.getWidth();
-		const auto bb_height = textureA.getHeight();
-		GL::Viewport viewport(0, 0, bb_width, bb_height);
-		renderer1.center = center;
-		renderer1.scale  = scale;
+		// const auto bb_width  = textureA.getWidth();
+		// const auto bb_height = textureA.getHeight();
+		// fbo.bind();
+		// textureA.useInFB();
+		// GL::Viewport viewport(0, 0, bb_width, bb_height);
+		const auto bb_width  = width;
+		const auto bb_height = height;
 		renderer1.onBackbufferResized(bb_width, bb_height);
-		renderer2.center = center;
-		renderer2.scale  = scale;
 		renderer2.onBackbufferResized(bb_width, bb_height);
-		renderer3.center = center;
-		renderer3.scale  = scale;
 		renderer3.onBackbufferResized(bb_width, bb_height);
-		renderer1.render(outdoors? game_time : 1);
-		renderer2.render(outdoors? game_time : 1);
-		renderer3.render(outdoors? game_time : 1);
+		renderer1.render(outdoors? game_time : 1, scale, center.x(), center.y());
+		renderer2.render(outdoors? game_time : 1, scale, center.x(), center.y());
+		renderer3.render(outdoors? game_time : 1, scale, center.x(), center.y());
 		sprite_renderer.update(bb_width, bb_height);
 
 		std::shared_ptr<Entity> player;
@@ -158,23 +154,21 @@ namespace Game3 {
 		// sprite_renderer.drawOnScreen(renderer2.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
 		// sprite_renderer.drawOnScreen(renderer3.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
 
-		fbo.undo();
-		viewport.reset();
+		// fbo.undo();
+		// viewport.reset();
 
-		sprite_renderer.update(width, height);
+		// sprite_renderer.update(width, height);
 		// sprite_renderer.drawOnMap(textureB, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
-		sprite_renderer.drawOnMap(textureA, {
-			.size_x = -1.f,
-			.size_y = -1.f,
-		});
+		// sprite_renderer.drawOnMap(textureA, {
+		// 	.size_x = -1.f,
+		// 	.size_y = -1.f,
+		// });
 
 		if (0 < ghostCount) {
-
 			static auto checkmark = cacheTexture("resources/checkmark.png");
-
 			sprite_renderer.drawOnScreen(*checkmark, {
-				.x = float(width) / *checkmark->width - 3.f,
-				.y = float(height) / *checkmark->height - 3.f,
+				.x = static_cast<float>(width)  / *checkmark->width  - 3.f,
+				.y = static_cast<float>(height) / *checkmark->height - 3.f,
 				.scale = 2.f,
 				.hackY = false,
 				.invertY = false,

@@ -57,6 +57,29 @@ namespace Game3 {
 		initialized = true;
 	}
 
+	void ElementBufferedRenderer::render(float divisor, float scale, float center_x, float center_y) {
+		if (!initialized)
+			return;
+
+		glm::mat4 projection(1.f);
+		projection = glm::scale(projection, {tilemap->tileSize, -tilemap->tileSize, 1.f}) *
+		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1.f}) *
+		             glm::translate(projection, {center_x - tilemap->width / 2.f, center_y - tilemap->height / 2.f, 0.f});
+
+		shader.bind();
+		vao.bind();
+		vbo.bind();
+		ebo.bind();
+		// Try commenting this out, it's kinda funny
+		tilemap->getTexture(realm.getGame())->bind(0);
+		shader.set("texture0", 0);
+		shader.set("projection", projection);
+		shader.set("divisor", divisor);
+		shader.set("bright_tiles", brightTiles);
+
+		GL::triangles(tilemap->size());
+	}
+
 	void ElementBufferedRenderer::render(float divisor) {
 		if (!initialized)
 			return;

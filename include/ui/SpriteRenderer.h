@@ -54,7 +54,7 @@ namespace Game3 {
 
 			template <typename T>
 			void operator()(T &texture, RenderOptions &&options) {
-				drawOnScreen(texture, std::forward<RenderOptions>(options));
+				drawOnMap(texture, std::forward<RenderOptions>(options));
 			}
 
 			void reset();
