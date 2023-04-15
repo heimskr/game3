@@ -53,7 +53,15 @@ namespace Game3 {
 		const float x = position.column + offset.x();
 		const float y = position.row + offset.y();
 
-		sprite_renderer(*texture, x + .125f, y + .125f, xOffset, yOffset, 16.f, 16.f, .75f);
+		sprite_renderer(*texture, {
+			.x = x + .125f,
+			.y = y + .125f,
+			.x_offset = xOffset,
+			.y_offset = yOffset,
+			.size_x = 16.f,
+			.size_y = 16.f,
+			.scale = .75f
+		});
 	}
 
 	bool ItemEntity::interact(const std::shared_ptr<Player> &player) {

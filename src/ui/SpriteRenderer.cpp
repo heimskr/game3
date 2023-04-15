@@ -59,44 +59,52 @@ namespace Game3 {
 	}
 
 	void SpriteRenderer::drawOnMap(Texture &texture, float x, float y, float scale, float angle, float alpha) {
-		drawOnMap(texture, x, y, 0, 0, *texture.width, *texture.height, scale, angle, alpha);
+		drawOnMap(texture, RenderOptions {
+			.x = x,
+			.y = y,
+			.size_x = static_cast<float>(*texture.width),
+			.size_y = static_cast<float>(*texture.height),
+			.scale = scale,
+			.angle = angle,
+			.alpha = alpha
+		});
 	}
 
-	void SpriteRenderer::drawOnMap(Texture &texture, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale, float angle, float alpha) {
+	void SpriteRenderer::drawOnMap(Texture &texture, RenderOptions options) {
 		if (!initialized)
 			return;
 
-		if (size_x < 0)
-			size_x = *texture.width;
-		if (size_y < 0)
-			size_y = *texture.height;
+		if (options.size_x < 0)
+			options.size_x = *texture.width;
+		if (options.size_y < 0)
+			options.size_y = *texture.height;
 
 		const auto &tilemap = canvas->game->activeRealm->tilemap1;
-		x *= tilemap->tileSize * canvas->scale / 2.f;
-		y *= tilemap->tileSize * canvas->scale / 2.f;
+		options.x *= tilemap->tileSize * canvas->scale / 2.f;
+		options.y *= tilemap->tileSize * canvas->scale / 2.f;
 
-		x += canvas->width() / 2.f;
-		x -= tilemap->width * tilemap->tileSize * canvas->scale / canvas->magic * 2.f; // TODO: the math here is a little sus... things might cancel out
-		x += canvas->center.x() * canvas->scale * tilemap->tileSize / 2.f;
+		options.x += canvas->width() / 2.f;
+		options.x -= tilemap->width * tilemap->tileSize * canvas->scale / canvas->magic * 2.f; // TODO: the math here is a little sus... things might cancel out
+		options.x += canvas->center.x() * canvas->scale * tilemap->tileSize / 2.f;
 
-		y += canvas->height() / 2.f;
-		y -= tilemap->height * tilemap->tileSize * canvas->scale / canvas->magic * 2.f;
-		y += canvas->center.y() * canvas->scale * tilemap->tileSize / 2.f;
+		options.y += canvas->height() / 2.f;
+		options.y -= tilemap->height * tilemap->tileSize * canvas->scale / canvas->magic * 2.f;
+		options.y += canvas->center.y() * canvas->scale * tilemap->tileSize / 2.f;
 
 		shader.bind();
 
 		glm::mat4 model = glm::mat4(1.f);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(x - x_offset * canvas->scale * scale, y - y_offset * canvas->scale * scale, 0.f));
+		model = glm::translate(model, glm::vec3(options.x - options.x_offset * canvas->scale * options.scale, options.y - options.y_offset * canvas->scale * options.scale, 0.f));
 		model = glm::translate(model, glm::vec3(0.5f * *texture.width, 0.5f * *texture.height, 0.f)); // move origin of rotation to center of quad
-		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
+		model = glm::rotate(model, glm::radians(options.angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
 		model = glm::translate(model, glm::vec3(-0.5f * *texture.width, -0.5f * *texture.height, 0.f)); // move origin back
-		model = glm::scale(model, glm::vec3(*texture.width * scale * canvas->scale / 2.f, *texture.height * scale * canvas->scale / 2.f, 2.f)); // last scale
+		model = glm::scale(model, glm::vec3(*texture.width * options.scale * canvas->scale / 2.f, *texture.height * options.scale * canvas->scale / 2.f, 2.f)); // last scale
 
 		shader.set("model", model);
-		shader.set("spriteColor", 1.f, 1.f, 1.f, alpha);
+		shader.set("spriteColor", 1.f, 1.f, 1.f, options.alpha);
 		const float multiplier = 2.f / *texture.width;
-		shader.set("texturePosition", x_offset * multiplier, y_offset * multiplier, size_x / *texture.width, size_y / *texture.width);
+		shader.set("texturePosition", options.x_offset * multiplier, options.y_offset * multiplier, options.size_x / *texture.width, options.size_y / *texture.width);
 
 		glActiveTexture(GL_TEXTURE0);
 		texture.bind();
@@ -108,44 +116,44 @@ namespace Game3 {
 		glBindVertexArray(0);
 	}
 
-	void SpriteRenderer::drawOnMap(GL::Texture &texture, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale, float angle, float alpha) {
+	void SpriteRenderer::drawOnMap(GL::Texture &texture, RenderOptions options) {
 		if (!initialized)
 			return;
 
 		const auto texture_width = texture.getWidth();
 		const auto texture_height = texture.getHeight();
 
-		if (size_x < 0)
-			size_x = texture_width;
-		if (size_y < 0)
-			size_y = texture_height;
+		if (options.size_x < 0)
+			options.size_x = texture_width;
+		if (options.size_y < 0)
+			options.size_y = texture_height;
 
 		const auto &tilemap = canvas->game->activeRealm->tilemap1;
-		x *= tilemap->tileSize * canvas->scale / 2.f;
-		y *= tilemap->tileSize * canvas->scale / 2.f;
+		options.x *= tilemap->tileSize * canvas->scale / 2.f;
+		options.y *= tilemap->tileSize * canvas->scale / 2.f;
 
-		x += canvas->width() / 2.f;
-		x -= tilemap->width * tilemap->tileSize * canvas->scale / canvas->magic * 2.f; // TODO: the math here is a little sus... things might cancel out
-		x += canvas->center.x() * canvas->scale * tilemap->tileSize / 2.f;
+		options.x += canvas->width() / 2.f;
+		options.x -= tilemap->width * tilemap->tileSize * canvas->scale / canvas->magic * 2.f; // TODO: the math here is a little sus... things might cancel out
+		options.x += canvas->center.x() * canvas->scale * tilemap->tileSize / 2.f;
 
-		y += canvas->height() / 2.f;
-		y -= tilemap->height * tilemap->tileSize * canvas->scale / canvas->magic * 2.f;
-		y += canvas->center.y() * canvas->scale * tilemap->tileSize / 2.f;
+		options.y += canvas->height() / 2.f;
+		options.y -= tilemap->height * tilemap->tileSize * canvas->scale / canvas->magic * 2.f;
+		options.y += canvas->center.y() * canvas->scale * tilemap->tileSize / 2.f;
 
 		shader.bind();
 
 		glm::mat4 model = glm::mat4(1.f);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(x - x_offset * canvas->scale * scale, y - y_offset * canvas->scale * scale, 0.f));
+		model = glm::translate(model, glm::vec3(options.x - options.x_offset * canvas->scale * options.scale, options.y - options.y_offset * canvas->scale * options.scale, 0.f));
 		model = glm::translate(model, glm::vec3(0.5f * texture_width, 0.5f * texture_height, 0.f)); // move origin of rotation to center of quad
-		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
+		model = glm::rotate(model, glm::radians(options.angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
 		model = glm::translate(model, glm::vec3(-0.5f * texture_width, -0.5f * texture_height, 0.f)); // move origin back
-		model = glm::scale(model, glm::vec3(texture_width * scale * canvas->scale / 2.f, texture_height * scale * canvas->scale / 2.f, 2.f)); // last scale
+		model = glm::scale(model, glm::vec3(texture_width * options.scale * canvas->scale / 2.f, texture_height * options.scale * canvas->scale / 2.f, 2.f)); // last scale
 
 		shader.set("model", model);
-		shader.set("spriteColor", 1.f, 1.f, 1.f, alpha);
+		shader.set("spriteColor", 1.f, 1.f, 1.f, options.alpha);
 		const float multiplier = 2.f / texture_width;
-		shader.set("texturePosition", x_offset * multiplier, y_offset * multiplier, size_x / texture_width, size_y / texture_width);
+		shader.set("texturePosition", options.x_offset * multiplier, options.y_offset * multiplier, options.size_x / texture_width, options.size_y / texture_width);
 
 		texture.bind(0);
 
@@ -157,23 +165,29 @@ namespace Game3 {
 	}
 
 	void SpriteRenderer::drawOnScreen(Texture &texture, float x, float y, float scale, float angle, float alpha) {
-		drawOnScreen(texture, x, y, 0, 0, *texture.width, *texture.height, scale, angle, alpha);
+		drawOnScreen(texture, RenderOptions {
+			.x = x,
+			.y = y,
+			.size_x = static_cast<float>(*texture.width),
+			.size_y = static_cast<float>(*texture.height),
+			.scale = scale,
+			.angle = angle,
+			.alpha = alpha
+		});
 	}
 
-	void SpriteRenderer::drawOnScreen(Texture &texture, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale, float angle, float alpha) {
+	void SpriteRenderer::drawOnScreen(Texture &texture, RenderOptions options) {
 		if (!initialized)
 			return;
 
 		const auto texture_width  = *texture.width;
 		const auto texture_height = *texture.height;
-		hackY(y, y_offset, scale);
+		if (options.hackY)
+			hackY(options.y, options.y_offset, options.scale);
 
-		if (size_x < 0)
-			size_x = -size_x * texture_width;
-		if (size_y < 0)
-			size_y = -size_y * texture_height;
-
-		setupShader(texture_width, texture_height, x, y, x_offset, y_offset, size_x, size_y, scale, angle, alpha);
+		options.size_x = options.size_x < 0.f? -options.size_x * texture_width  : options.size_x;
+		options.size_y = options.size_y < 0.f? -options.size_y * texture_height : options.size_y;
+		setupShader(texture_width, texture_height, options);
 
 		glActiveTexture(GL_TEXTURE0);
 		texture.bind();
@@ -185,20 +199,18 @@ namespace Game3 {
 		glBindVertexArray(0);
 	}
 
-	void SpriteRenderer::drawOnScreen(GL::Texture &texture, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale, float angle, float alpha) {
+	void SpriteRenderer::drawOnScreen(GL::Texture &texture, RenderOptions options) {
 		if (!initialized)
 			return;
 
 		const auto texture_width  = texture.getWidth();
 		const auto texture_height = texture.getHeight();
-		hackY(y, y_offset, scale);
+		if (options.hackY)
+			hackY(options.y, options.y_offset, options.scale);
 
-		if (size_x < 0)
-			size_x = -size_x * texture_width;
-		if (size_y < 0)
-			size_y = -size_y * texture_height;
-
-		setupShader(texture_width, texture_height, x, y, x_offset, y_offset, size_x, size_y, scale, angle, alpha);
+		options.size_x = options.size_x < 0.f? -options.size_x * texture_width  : options.size_x;
+		options.size_y = options.size_y < 0.f? -options.size_y * texture_height : options.size_y;
+		setupShader(texture_width, texture_height, options);
 
 		texture.bind(0);
 
@@ -244,23 +256,24 @@ namespace Game3 {
 		initialized = true;
 	}
 
-	void SpriteRenderer::setupShader(int texture_width, int texture_height, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale, float angle, float alpha) {
+	void SpriteRenderer::setupShader(int texture_width, int texture_height, const RenderOptions &options) {
 		glm::mat4 model = glm::mat4(1.f);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(x * 16.f - x_offset * 2.f * scale, y * 16.f - y_offset * 2.f * scale, 0.0f));
-		model = glm::scale    (model, glm::vec3(1.f, -1.f, 1.f));
+		model = glm::translate(model, glm::vec3(options.x * 16.f - options.x_offset * 2.f * options.scale, options.y * 16.f - options.y_offset * 2.f * options.scale, 0.0f));
+		if (options.invertY)
+			model = glm::scale(model, glm::vec3(1.f, -1.f, 1.f));
 		model = glm::translate(model, glm::vec3(0.5f * texture_width, 0.5f * texture_height, 0.0f));
-		model = glm::rotate   (model, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate   (model, glm::radians(options.angle), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::translate(model, glm::vec3(-0.5f * texture_width, -0.5f * texture_height, 0.0f));
-		model = glm::scale    (model, glm::vec3(texture_width * scale, texture_height * scale, 1.0f));
+		model = glm::scale    (model, glm::vec3(texture_width * options.scale, texture_height * options.scale, 1.0f));
 
 		shader.bind();
 		shader.set("model", model);
-		shader.set("spriteColor", 1.f, 1.f, 1.f, alpha);
+		shader.set("spriteColor", 1.f, 1.f, 1.f, options.alpha);
 		const float multiplier = 2.f;
 		const float multiplier_x = multiplier / texture_width;
 		const float multiplier_y = multiplier / texture_height;
-		shader.set("texturePosition", x_offset * multiplier_x, y_offset * multiplier_y, size_x / texture_width, size_y / texture_height);
+		shader.set("texturePosition", options.x_offset * multiplier_x, options.y_offset * multiplier_y, options.size_x / texture_width, options.size_y / texture_height);
 	}
 
 	void SpriteRenderer::hackY(float &y, float y_offset, float scale) {

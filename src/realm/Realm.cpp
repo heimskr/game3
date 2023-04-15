@@ -134,13 +134,19 @@ namespace Game3 {
 		renderer3.render(outdoors? game_time : 1);
 		sprite_renderer.update(bb_width, bb_height);
 
+		std::shared_ptr<Entity> player;
 		for (const auto &entity: entities)
-			entity->render(sprite_renderer);
+			if (entity->isPlayer())
+				player = entity;
+			else
+				entity->render(sprite_renderer);
 		for (const auto &[index, tile_entity]: tileEntities)
 			tile_entity->render(sprite_renderer);
 
-		multiplier.update(bb_width, bb_height);
+		if (player)
+			player->render(sprite_renderer);
 
+		multiplier.update(bb_width, bb_height);
 		// sprite_renderer.drawOnMap(texture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
 		// textureB.useInFB();
 		// game.canvas.multiplier(textureA, renderer1.lightTexture);
@@ -157,11 +163,23 @@ namespace Game3 {
 
 		sprite_renderer.update(width, height);
 		// sprite_renderer.drawOnMap(textureB, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
-		sprite_renderer.drawOnMap(textureA, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
+		sprite_renderer.drawOnMap(textureA, {
+			.size_x = -1.f,
+			.size_y = -1.f,
+		});
 
+		if (0 < ghostCount) {
 
-		if (0 < ghostCount)
-			sprite_renderer.drawOnScreen(*cacheTexture("resources/checkmark.png"), width - 42.f, height - 42.f, 2.f);
+			static auto checkmark = cacheTexture("resources/checkmark.png");
+
+			sprite_renderer.drawOnScreen(*checkmark, {
+				.x = float(width) / *checkmark->width - 3.f,
+				.y = float(height) / *checkmark->height - 3.f,
+				.scale = 2.f,
+				.hackY = false,
+				.invertY = false,
+			});
+		}
 	}
 
 	void Realm::reupload() {

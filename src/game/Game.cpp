@@ -394,7 +394,8 @@ namespace Game3 {
 		const auto width  = canvas.width();
 		const auto height = canvas.height();
 
-		if (0 < realm.ghostCount && width - 42.f <= pos_x && pos_x < width - 10.f && height - 42.f <= pos_y && pos_y < height - 10.f) {
+		// Lovingly chosen by trial and error.
+		if (0 < realm.ghostCount && width - 40.f <= pos_x && pos_x < width - 16.f && height - 40.f <= pos_y && pos_y < height - 16.f) {
 			realm.confirmGhosts();
 			return;
 		}

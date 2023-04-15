@@ -55,7 +55,14 @@ namespace Game3 {
 			const auto tile_index = (*tilemap.tileset)[tileID];
 			const auto x = (tile_index % (*texture->width / tilesize)) * tilesize;
 			const auto y = (tile_index / (*texture->width / tilesize)) * tilesize;
-			sprite_renderer(*texture, position.column, position.row, x / 2.f, y / 2.f, tilesize, tilesize);
+			sprite_renderer(*texture, {
+				.x = static_cast<float>(position.column),
+				.y = static_cast<float>(position.row),
+				.x_offset = x / 2.f,
+				.y_offset = y / 2.f,
+				.size_x = static_cast<float>(tilesize),
+				.size_y = static_cast<float>(tilesize),
+			});
 		}
 	}
 

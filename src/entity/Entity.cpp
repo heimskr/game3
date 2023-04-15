@@ -103,14 +103,21 @@ namespace Game3 {
 
 		switch (variety) {
 			case 1:
-				y_offset = 8.f * int(direction);
+				y_offset = 8.f * static_cast<int>(direction);
 				break;
 			case 2:
-				y_offset = 16.f * int(remapDirection(direction, 0x0213));
+				y_offset = 16.f * static_cast<int>(remapDirection(direction, 0x0213));
 				break;
 		}
 
-		sprite_renderer(*texture, position.column + offset.x(), position.row + offset.y(), x_offset, y_offset, 16.f, 16.f);
+		sprite_renderer(*texture, {
+			.x = position.column + offset.x(),
+			.y = position.row + offset.y(),
+			.x_offset = x_offset,
+			.y_offset = y_offset,
+			.size_x = 16.f,
+			.size_y = 16.f,
+		});
 	}
 
 	bool Entity::move(Direction move_direction) {
