@@ -6,3 +6,4 @@ src/gtk_resources.cpp
 *.g3
 /resgen
 include/resources.h
+*.zst
