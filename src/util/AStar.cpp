@@ -8,16 +8,16 @@
 #include "util/AStar.h"
 
 namespace Game3 {
-	template<typename T, typename priority_t>
+	template<typename T, typename Priority>
 	struct PriorityQueue {
-		using Element = std::pair<priority_t, T>;
+		using Element = std::pair<Priority, T>;
 		std::priority_queue<Element, std::vector<Element>, std::greater<Element>> elements;
 
 		inline bool empty() const {
 			return elements.empty();
 		}
 
-		inline void put(T item, priority_t priority) {
+		inline void put(T item, Priority priority) {
 			elements.emplace(priority, item);
 		}
 

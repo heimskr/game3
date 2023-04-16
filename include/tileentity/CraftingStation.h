@@ -15,7 +15,6 @@ namespace Game3 {
 			CraftingStation & operator=(const CraftingStation &) = delete;
 			CraftingStation & operator=(CraftingStation &&) = default;
 
-			void init(Game &) override {}
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 			void absorbJSON(Game &, const nlohmann::json &) override;

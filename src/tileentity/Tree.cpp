@@ -30,8 +30,8 @@ namespace Game3 {
 		hiveAge = json.at("hiveAge");
 	}
 
-	void Tree::init(Game &, std::default_random_engine &rng) {
-		if (rng() % 10 == 0)
+	void Tree::init(Game &game) {
+		if (game.random(0, 10) == 0)
 			hiveAge = 0.f;
 	}
 
@@ -83,7 +83,7 @@ namespace Game3 {
 	bool Tree::kill() {
 		auto &realm = *getRealm();
 
-		static const Identifier expected("base", "te/monomap");
+		static const Identifier expected("base", "tileset/monomap");
 		if (realm.tilemap2->tileset->identifier != expected || realm.tilemap3->tileset->identifier != expected)
 			return true;
 

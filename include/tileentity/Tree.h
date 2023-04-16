@@ -24,7 +24,7 @@ namespace Game3 {
 
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
-			void init(Game &, std::default_random_engine &) override;
+			void init(Game &) override;
 			using TileEntity::init;
 			void tick(Game &, float) override;
 			bool onInteractNextTo(const PlayerPtr &) override;

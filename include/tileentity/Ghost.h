@@ -75,7 +75,6 @@ namespace Game3 {
 			Ghost & operator=(const Ghost &) = delete;
 			Ghost & operator=(Ghost &&) = default;
 
-			void init(Game &) override {}
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			void onSpawn() override;

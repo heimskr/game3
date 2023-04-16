@@ -27,13 +27,6 @@ namespace Game3 {
 			nlohmann::json extraData;
 
 			template <typename T, typename... Args>
-			static std::shared_ptr<T> create(Game &game, std::default_random_engine &rng, Args && ...args) {
-				auto out = std::shared_ptr<T>(new T(std::forward<Args>(args)...));
-				out->init(game, rng);
-				return out;
-			}
-
-			template <typename T, typename... Args>
 			static std::shared_ptr<T> create(Game &game, Args && ...args) {
 				auto out = std::shared_ptr<T>(new T(std::forward<Args>(args)...));
 				out->init(game);
@@ -44,10 +37,7 @@ namespace Game3 {
 
 			static std::shared_ptr<TileEntity> fromJSON(Game &, const nlohmann::json &);
 
-			// At least one of the two init methods must be overridden to prevent an infinite loop!
-			virtual void init(Game &, std::default_random_engine &);
-			virtual void init(Game &);
-
+			virtual void init(Game &) {}
 			virtual void tick(Game &, float) {}
 			virtual void onSpawn() {}
 			virtual void onRemove() {}

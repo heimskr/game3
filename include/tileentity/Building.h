@@ -16,7 +16,6 @@ namespace Game3 {
 			Building & operator=(const Building &) = delete;
 			Building & operator=(Building &&) = default;
 
-			void init(Game &) override {}
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractOn(const std::shared_ptr<Player> &) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;

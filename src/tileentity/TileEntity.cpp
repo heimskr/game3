@@ -13,15 +13,6 @@ namespace Game3 {
 		return out;
 	}
 
-	void TileEntity::init(Game &game, std::default_random_engine &) {
-		init(game);
-	}
-
-	void TileEntity::init(Game &game) {
-		std::default_random_engine fakeRNG;
-		init(game, fakeRNG);
-	}
-
 	void TileEntity::setRealm(const std::shared_ptr<Realm> &realm) {
 		realmID = realm->id;
 		weakRealm = realm;

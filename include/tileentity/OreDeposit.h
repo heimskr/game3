@@ -31,7 +31,6 @@ namespace Game3 {
 			OreDeposit & operator=(const OreDeposit &) = delete;
 			OreDeposit & operator=(OreDeposit &&) = default;
 
-			void init(Game &) override {}
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			void tick(Game &, float) override;

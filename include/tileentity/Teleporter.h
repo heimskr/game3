@@ -16,7 +16,6 @@ namespace Game3 {
 			Teleporter & operator=(const Teleporter &) = delete;
 			Teleporter & operator=(Teleporter &&) = default;
 
-			void init(Game &) override {}
 			void toJSON(nlohmann::json &) const override;
 			void onOverlap(const std::shared_ptr<Entity> &) override;
 			void absorbJSON(Game &, const nlohmann::json &) override;

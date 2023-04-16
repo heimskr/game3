@@ -22,9 +22,8 @@ namespace Game3 {
 		if (!realm.tilemap1->tileset->isInCategory(tileset[tilemap[index]], "base:category/tree_soil"_id))
 			return false;
 
-		auto &rng = realm.getGame().dynamicRNG;
-		static const std::vector<Identifier> trees {"base:tile/tree1"_id, "base:tile/tree2"_id, "base:tile/tree3"_id};
-		if (realm.pathMap[index] && nullptr != realm.add(TileEntity::create<Tree>(realm.getGame(), rng, choose(trees), "base:tile/tree0"_id, place.position, 0.f))) {
+		static const std::array<Identifier, 3> trees {"base:tile/tree1"_id, "base:tile/tree2"_id, "base:tile/tree3"_id};
+		if (realm.pathMap[index] && nullptr != realm.add(TileEntity::create<Tree>(realm.getGame(), choose(trees), "base:tile/tree0"_id, place.position, 0.f))) {
 
 			if (--stack.count == 0)
 				player.inventory->erase(slot);

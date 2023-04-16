@@ -30,8 +30,6 @@ namespace Game3 {
 			spawnables.push_back(ItemStack::fromJSON(game, spawnable));
 	}
 
-	void ItemSpawner::init(Game &, std::default_random_engine &) {}
-
 	void ItemSpawner::tick(Game &game, float delta) {
 		static std::uniform_real_distribution distribution(0., 1.);
 		for (float i = 0; i < delta; i += 0.1) {

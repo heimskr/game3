@@ -427,6 +427,10 @@ namespace Game3 {
 		return {left, top, right - left + 1, bottom - top + 1};
 	}
 
+	int Game::random(int min, int max) {
+		return std::uniform_int_distribution(min, max)(dynamicRNG);
+	}
+
 	double Game::getTotalSeconds() const {
 		return std::chrono::duration_cast<std::chrono::nanoseconds>(getTime() - startTime).count() / 1e9;
 	}
