@@ -1,20 +1,16 @@
 # BUILD := release
 LTO :=
-LDFLAGS :=
 ifeq ($(BUILD),release)
 BUILDFLAGS := -Ofast -march=native
 LTO := -flto
-else ifeq ($(BUILD),tsan)
-BUILDFLAGS := -g -O1 -fsanitize=thread
-LDFLAGS := -fsanitize=thread
 else
 BUILDFLAGS := -g -O0
 endif
 
 ifeq ($(shell uname -s), Darwin)
-LDFLAGS := $(LDFLAGS) -framework Cocoa -framework OpenGL -framework IOKit
+LDFLAGS := -framework Cocoa -framework OpenGL -framework IOKit
 else
-LDFLAGS := $(LDFLAGS) -lGL
+LDFLAGS := -lGL
 endif
 
 DEPS         := eigen3 glm glfw3 libzstd gtk4 gtkmm-4.0 nlohmann_json glu

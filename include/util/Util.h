@@ -23,11 +23,6 @@ namespace Game3 {
 	unsigned long parseUlong(const char *, int base = 10);
 	unsigned long parseUlong(std::string_view, int base = 10);
 
-	template <typename T>
-	inline T updiv(T n, T d) {
-		return n / d + (n % d? 1 : 0);
-	}
-
 	inline double fractional(double d) {
 		return std::modf(d, &d);
 	}
