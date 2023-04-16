@@ -36,7 +36,7 @@ namespace Game3::WorldGen {
 		realm->setLayer2(exit_index,     "base:tile/empty"_id);
 		realm->setLayer2(exit_index + 1, "base:tile/wall_e"_id);
 
-		const auto &door_name = choose(realm->tilemap2->tileset->getTilesByCategory("base:category/doors"), rng);
+		const auto door_name = choose(realm->tilemap2->tileset->getTilesByCategory("base:category/doors"), rng);
 		auto door = TileEntity::create<Teleporter>(realm->getGame(), door_name, realm->getPosition(exit_index), parent_realm->id, entrance);
 		realm->add(door);
 

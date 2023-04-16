@@ -31,26 +31,26 @@ namespace Game3 {
 		const auto stoneLevel = params.stoneLevel;
 
 		if (noise < wetness) {
-			realm.setLayer1({row, column}, "base:tile/deeper_water"_id);
+			realm.setLayer1({row, column}, "base:tile/deeper_water"_id, false);
 		} else if (noise < wetness + 0.1) {
-			realm.setLayer1({row, column}, "base:tile/deep_water"_id);
+			realm.setLayer1({row, column}, "base:tile/deep_water"_id, false);
 		} else if (noise < wetness + 0.2) {
-			realm.setLayer1({row, column}, "base:tile/water"_id);
+			realm.setLayer1({row, column}, "base:tile/water"_id, false);
 		} else if (noise < wetness + 0.3) {
-			realm.setLayer1({row, column}, "base:tile/shallow_water"_id);
+			realm.setLayer1({row, column}, "base:tile/shallow_water"_id, false);
 		} else if (noise < wetness + 0.4) {
-			realm.setLayer1({row, column}, "base:tile/sand"_id);
+			realm.setLayer1({row, column}, "base:tile/sand"_id, false);
 		} else if (noise < wetness + 0.5) {
-			realm.setLayer1({row, column}, "base:tile/light_grass"_id);
+			realm.setLayer1({row, column}, "base:tile/light_grass"_id, false);
 		} else if (stoneLevel < noise) {
-			realm.setLayer1({row, column}, "base:tile/stone"_id);
+			realm.setLayer1({row, column}, "base:tile/stone"_id, false);
 		} else {
-			realm.setLayer1({row, column}, choose(grasses, rng));
+			realm.setLayer1({row, column}, choose(grasses, rng), false);
 			const double forest_noise = forestPerlin->GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.5);
 			if (params.forestThreshold < forest_noise) {
 				static const std::vector<Identifier> trees {"base:tile/tree1"_id, "base:tile/tree2"_id, "base:tile/tree3"_id};
-				realm.add(TileEntity::create<Tree>(realm.getGame(), choose(trees), "base:tile/tree0"_id, Position(row, column), Tree::MATURITY));
-				realm.setLayer1({row, column}, "base:tile/forest_floor"_id);
+				realm.addSafe(TileEntity::create<Tree>(realm.getGame(), choose(trees), "base:tile/tree0"_id, Position(row, column), Tree::MATURITY));
+				realm.setLayer1({row, column}, "base:tile/forest_floor"_id, false);
 			}
 		}
 	}
@@ -63,7 +63,7 @@ namespace Game3 {
 		if (params.antiforestThreshold > perlin.GetValue(row / Biome::NOISE_ZOOM * factor, column / Biome::NOISE_ZOOM * factor, 0.)) {
 			if (auto tile = realm.tileEntityAt({row, column}); tile && tile->is("base:te/tree"_id) && !std::dynamic_pointer_cast<Tree>(tile)->hasHive()) {
 				Game &game = realm.getGame();
-				realm.remove(tile);
+				realm.removeSafe(tile);
 				if (distribution(rng) < 3) {
 					std::vector<ItemStack> mushrooms {
 						{game, "base:item/saffron_milkcap"},
@@ -74,7 +74,7 @@ namespace Game3 {
 						{game, "base:item/brittlegill"},
 					};
 
-					realm.add(TileEntity::create<ItemSpawner>(game, Position(row, column), 0.00025f, std::move(mushrooms)));
+					realm.addSafe(TileEntity::create<ItemSpawner>(game, Position(row, column), 0.00025f, std::move(mushrooms)));
 				}
 			}
 		}

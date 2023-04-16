@@ -15,5 +15,7 @@ namespace Game3 {
 		double stoneLevel =  0.8;
 		double forestThreshold = 0.5;
 		double antiforestThreshold = -0.4;
+		/** The number of threads spawned by worldgen will be the realm height divided by this number. */
+		size_t threadSize = 64;
 	};
 }
