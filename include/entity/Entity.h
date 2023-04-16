@@ -70,7 +70,7 @@ namespace Game3 {
 			/** Returns the maximum number of hitpoints this entity can have. If 0, the entity is invincible. */
 			virtual HitPoints maxHealth() const { return 0; }
 			bool isInvincible() const { return maxHealth() == 0; }
-			virtual void render(SpriteRenderer &) const;
+			virtual void render(SpriteRenderer &);
 			virtual void tick(Game &, float delta);
 			/** Removes the entity from existence. */
 			virtual void remove();

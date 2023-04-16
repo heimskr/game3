@@ -20,7 +20,7 @@ namespace Game3 {
 
 			void toJSON(nlohmann::json &) const override;
 			void init(Game &) override;
-			void render(SpriteRenderer &) const override;
+			void render(SpriteRenderer &) override;
 			virtual bool onInteractOn    (const std::shared_ptr<Player> &player) override { return interact(player); }
 			virtual bool onInteractNextTo(const std::shared_ptr<Player> &player) override { return interact(player); }
 			Glib::ustring getName() override;
@@ -30,9 +30,11 @@ namespace Game3 {
 			ItemEntity(ItemStack);
 			float xOffset = 0.f;
 			float yOffset = 0.f;
+			bool needsTexture = false;
 
 			ItemStack stack;
 
+			void setTexture(const Game &);
 			bool interact(const std::shared_ptr<Player> &);
 
 			static Texture missing;

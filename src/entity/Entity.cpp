@@ -92,7 +92,7 @@ namespace Game3 {
 			inventory->owner = shared_from_this();
 	}
 
-	void Entity::render(SpriteRenderer &sprite_renderer) const {
+	void Entity::render(SpriteRenderer &sprite_renderer) {
 		if (texture == nullptr)
 			return;
 

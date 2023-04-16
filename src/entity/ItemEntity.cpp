@@ -6,6 +6,7 @@
 #include "game/Inventory.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
+#include "ui/Canvas.h"
 #include "ui/SpriteRenderer.h"
 
 namespace Game3 {
@@ -13,13 +14,18 @@ namespace Game3 {
 		Entity(ID()), stack(game) {}
 
 	ItemEntity::ItemEntity(ItemStack stack_):
-		Entity(ID()), stack(std::move(stack_)) {}
+	Entity(ID()), stack(std::move(stack_)) {
+		needsTexture = true;
+	}
 
 	void ItemEntity::setStack(ItemStack stack_) {
 		stack = std::move(stack_);
-		const Game &game = getRealm()->getGame();
+		setTexture(getRealm()->getGame());
+	}
+
+	void ItemEntity::setTexture(const Game &game) {
 		auto item_texture = game.registry<ItemTextureRegistry>().at(stack.item->identifier);
-		texture = item_texture->texture.lock();
+		texture = item_texture->getTexture(game);
 		xOffset = item_texture->x / 2.f;
 		yOffset = item_texture->y / 2.f;
 	}
@@ -46,9 +52,15 @@ namespace Game3 {
 		stack.item->getOffsets(game, texture, xOffset, yOffset);
 	}
 
-	void ItemEntity::render(SpriteRenderer &sprite_renderer) const {
-		if (texture == nullptr)
-			return;
+	void ItemEntity::render(SpriteRenderer &sprite_renderer) {
+		if (texture == nullptr) {
+			if (needsTexture) {
+				setTexture(*sprite_renderer.canvas->game);
+				std::cout << "x] " << texture << "\n";
+				needsTexture = false;
+			} else
+				return;
+		}
 
 		const float x = position.column + offset.x();
 		const float y = position.row + offset.y();
