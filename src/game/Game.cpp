@@ -354,7 +354,7 @@ namespace Game3 {
 		auto now = getTime();
 		auto difference = now - lastTime;
 		lastTime = now;
-		delta = std::chrono::duration_cast<std::chrono::nanoseconds>(difference).count() / 1'000'000'000.0;
+		delta = std::chrono::duration_cast<std::chrono::nanoseconds>(difference).count() / 1'000'000'000.;
 		for (auto &[id, realm]: realms)
 			realm->tick(delta);
 		player->ticked = false;

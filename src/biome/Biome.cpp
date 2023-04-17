@@ -1,5 +1,6 @@
 #include "biome/Biome.h"
 #include "biome/Grassland.h"
+#include "biome/Snowy.h"
 #include "biome/Volcanic.h"
 
 namespace Game3 {
@@ -7,7 +8,7 @@ namespace Game3 {
 		{Biome::VOID,      std::make_shared<Biome>(VOID)},
 		{Biome::GRASSLAND, std::make_shared<Grassland>()},
 		{Biome::VOLCANIC,  std::make_shared<Volcanic>()},
-		{Biome::SNOWY,     std::make_shared<Biome>(SNOWY)},
+		{Biome::SNOWY,     std::make_shared<Snowy>()},
 		{Biome::DESERT,    std::make_shared<Biome>(DESERT)},
 		{Biome::CAVE,      std::make_shared<Biome>(CAVE)},
 	};
