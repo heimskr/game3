@@ -50,25 +50,20 @@ namespace Game3::WorldGen {
 			return *biomes.at((*biome_map)(column, row));
 		};
 
-		double min_noise = 1.0;
-		double max_noise = -1.0;
+		p2.SetNoiseQuality(noise::NoiseQuality::QUALITY_BEST);
+		p2.SetFrequency(0.8);
 
 		for (Index row = 0; row < height; ++row) {
 			for (Index column = 0; column < width; ++column) {
-				const double noise = p2.GetValue(row / params.biomeZoom, column / params.biomeZoom, 0.0);
-				min_noise = std::min(noise, min_noise);
-				max_noise = std::max(noise, max_noise);
-				if (noise < -0.1)
+				const double noise = std::min(1., std::max(-1., p2.GetValue(row / params.biomeZoom, column / params.biomeZoom, 0.0) * 5.));
+				if (noise < -0.7)
 					biome_map->tiles.at(realm->getIndex(row, column)) = Biome::VOLCANIC;
-				else if (0.2 < noise)
+				else if (0.7 < noise)
 					biome_map->tiles.at(realm->getIndex(row, column)) = Biome::SNOWY;
 				else
 					biome_map->tiles.at(realm->getIndex(row, column)) = Biome::GRASSLAND;
 			}
 		}
-
-		std::cout << "min_noise[" << min_noise << "]\n";
-		std::cout << "max_noise[" << max_noise << "]\n";
 
 		noise::module::Perlin perlin;
 		perlin.SetSeed(noise_seed);
