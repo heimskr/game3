@@ -60,7 +60,11 @@ namespace Game3 {
 			layer1[index] = tileset[choose(grasses, rng)];
 			const double forest_noise = forestPerlin->GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.5);
 			if (params.forestThreshold < forest_noise) {
-				if ((row % 2) == (column % 2)) {
+				uint8_t mod = column % 2;
+				std::default_random_engine tree_rng(static_cast<uint_fast32_t>(forest_noise * 1'000'000'000.));
+				if (std::uniform_int_distribution(0, 99)(tree_rng) < 10)
+					mod = 1 - mod;
+				if ((row % 2) == mod) {
 					static const std::vector<Identifier> trees {"base:tile/tree1"_id, "base:tile/tree2"_id, "base:tile/tree3"_id};
 					realm.add(TileEntity::create<Tree>(realm.getGame(), choose(trees, rng), "base:tile/tree0"_id, Position(row, column), Tree::MATURITY));
 				}
