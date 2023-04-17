@@ -133,7 +133,6 @@ namespace Game3::WorldGen {
 
 			// Timer land_timer("GetLand");
 			// land_timer.stop();
-
 		}
 
 		for (std::thread &thread: threads)
@@ -172,7 +171,6 @@ namespace Game3::WorldGen {
 
 		Timer postgen_timer("Postgen");
 
-
 		for (size_t thread_row = 0; thread_row < regions_y; ++thread_row) {
 			const size_t row_min = thread_row * params.regionSize;
 			const size_t row_max = std::min(static_cast<size_t>(height), (thread_row + 1) * params.regionSize);
@@ -183,11 +181,11 @@ namespace Game3::WorldGen {
 				const auto col_max_index = static_cast<Index>(col_max);
 				const auto row_min_index = static_cast<Index>(row_min);
 				const auto row_max_index = static_cast<Index>(row_max);
-				threads.emplace_back([&get_biome, &perlin, &params, noise_seed, row_min, col_min, row_min_index, row_max_index, col_min_index, col_max_index] {
-					std::default_random_engine rng(noise_seed - 1'000'000ul * row_min + col_min);
+				threads.emplace_back([realm, &get_biome, &perlin, &params, noise_seed, row_min, col_min, row_min_index, row_max_index, col_min_index, col_max_index] {
+					threadContext = {realm->getGame().shared_from_this(), noise_seed - 1'000'000ul * row_min_index + col_min_index, row_min_index, row_max_index, col_min_index, col_max_index};
 					for (Index row = row_min_index; row < row_max_index; ++row)
 						for (Index column = col_min_index; column < col_max_index; ++column)
-							get_biome(row, column).postgen(row, column, rng, perlin, params);
+							get_biome(row, column).postgen(row, column, threadContext.rng, perlin, params);
 				});
 			}
 		}

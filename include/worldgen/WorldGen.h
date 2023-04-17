@@ -16,6 +16,6 @@ namespace Game3 {
 		double forestThreshold = 0.5;
 		double antiforestThreshold = -0.4;
 		/** Determines how large the piece of land handled by each thread is. */
-		size_t regionSize = 64;
+		size_t regionSize = 128;
 	};
 }

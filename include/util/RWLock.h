@@ -19,5 +19,6 @@ namespace Game3 {
 			std::mutex conditionMutex;
 			std::condition_variable conditionVariable;
 			std::mutex writerMutex;
+			std::thread::id writerOwner;
 	};
 }
