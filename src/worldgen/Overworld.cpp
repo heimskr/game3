@@ -142,27 +142,62 @@ namespace Game3::WorldGen {
 
 		std::default_random_engine rng(noise_seed);
 
+		std::mutex candidates_mutex;
+
 		constexpr int m = 26, n = 34, pad = 2;
+		Timer land_timer("GetLand");
 		const auto starts = tilemap1->getLand(m + pad * 2, n + pad * 2);
+		land_timer.stop();
+		constexpr size_t chunk_size = 1024;
+
 		if (!starts.empty()) {
-			realm->randomLand = choose(starts, rng);
+			Timer candidate_timer("Candidates");
+
 			std::vector<Index> candidates;
 			candidates.reserve(starts.size() / 16);
-			Timer candidate_timer("Candidates");
+			std::vector<std::thread> candidate_threads;
+			const size_t chunk_max = updiv(starts.size(), chunk_size);
+			candidate_threads.reserve(chunk_max);
 			const auto &tiles1 = tilemap1->getTiles();
-			for (const auto index: starts) {
-				const size_t row_start = index / tilemap1->width + pad, row_end = row_start + m;
-				const size_t column_start = index % tilemap1->width + pad, column_end = column_start + n;
-				for (size_t row = row_start; row < row_end; row += 2)
-					for (size_t column = column_start; column < column_end; column += 2) {
-						const Index index = row * tilemap1->width + column;
-						if (!tileset.isLand(tiles1[index]))
-							goto failed;
+
+			std::mutex candidates_mutex;
+
+			for (size_t chunk = 0; chunk < chunk_max; ++chunk) {
+				realm->randomLand = choose(starts, rng);
+
+				candidate_threads.emplace_back([&, chunk] {
+					std::vector<Index> thread_candidates;
+
+					for (size_t i = chunk * chunk_size, max = std::min((chunk + 1) * chunk_size, starts.size()); i < max; ++i) {
+						const auto index = starts[i];
+						const size_t row_start = index / tilemap1->width + pad;
+						const size_t row_end = row_start + m;
+						const size_t column_start = index % tilemap1->width + pad;
+						const size_t column_end = column_start + n;
+
+						// Prevent towns from spawning at the right edge and wrapping to the left
+						if (static_cast<size_t>(width) <= column_end)
+							continue;
+
+						for (size_t row = row_start; row < row_end; row += 2) {
+							for (size_t column = column_start; column < column_end; column += 2) {
+								const Index index = row * tilemap1->width + column;
+								if (!tileset.isLand(tiles1[index]))
+									goto failed;
+							}
+						}
+						thread_candidates.push_back(index);
+						failed: continue;
 					}
-				candidates.push_back(index);
-				failed:
-				continue;
+
+					std::unique_lock lock(candidates_mutex);
+					candidates.insert(candidates.end(), thread_candidates.begin(), thread_candidates.end());
+				});
 			}
+
+			for (std::thread &thread: candidate_threads)
+				thread.join();
+
 			candidate_timer.stop();
 
 			if (!candidates.empty())
