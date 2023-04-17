@@ -4,6 +4,7 @@
 #include <chrono>
 #include <csignal>
 #include <iostream>
+#include <list>
 #include <random>
 #include <set>
 #include <stdexcept>
@@ -82,10 +83,24 @@ namespace Game3 {
 	}
 
 	template <typename T, typename R>
+	T & choose(std::list<T> &container, R &rng) {
+		if (container.empty())
+			throw std::invalid_argument("Container is empty");
+		return *std::next(container.begin(), std::uniform_int_distribution(static_cast<size_t>(0), container.size() - 1)(rng));
+	}
+
+	template <typename T, typename R>
 	const typename T::value_type & choose(const T &container, R &rng) {
 		if (container.empty())
 			throw std::invalid_argument("Container is empty");
 		return container.at(std::uniform_int_distribution(static_cast<size_t>(0), container.size() - 1)(rng));
+	}
+
+	template <typename T, typename R>
+	const T & choose(const std::list<T> &container, R &rng) {
+		if (container.empty())
+			throw std::invalid_argument("Container is empty");
+		return *std::next(container.begin(), std::uniform_int_distribution(static_cast<size_t>(0), container.size() - 1)(rng));
 	}
 
 	template <typename T, typename R>
