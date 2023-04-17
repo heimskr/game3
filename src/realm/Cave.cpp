@@ -62,7 +62,7 @@ namespace Game3 {
 		if (ore_stack) {
 			Inventory &inventory = *player->inventory;
 			if (auto *stack = inventory.getActive()) {
-				if (stack->has(ItemAttribute::Pickaxe) && !inventory.add(*ore_stack)) {
+				if (stack->hasAttribute("base:attribute/pickaxe"_id) && !inventory.add(*ore_stack)) {
 					setLayer2(index, tilemap2->tileset->getEmpty());
 					getGame().activateContext();
 					renderer2.reupload();

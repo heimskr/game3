@@ -26,7 +26,7 @@ namespace Game3 {
 			if (active->item->canUseOnWorld() && active->item->use(inventory.activeSlot, *active, place))
 				return true;
 
-			if (active->has(ItemAttribute::Hammer)) {
+			if (active->hasAttribute("base:attribute/hammer"_id)) {
 				const TileID tile2 = (*tilemap2)[index];
 				ItemStack stack(game);
 				if (tileset.getItemStack(game, tileset[tile2], stack) && !inventory.add(stack)) {
@@ -37,7 +37,7 @@ namespace Game3 {
 				}
 			}
 
-			if (active->has(ItemAttribute::Shovel)) {
+			if (active->hasAttribute("base:attribute/shovel"_id)) {
 				if (tile2 == "base:tile/ash"_id) {
 					realm.setLayer2(position, "base:tile/empty"_id);
 					player.give({game, "base:item/ash"_id, 1});
@@ -49,28 +49,28 @@ namespace Game3 {
 		}
 
 		std::optional<Identifier> item;
-		std::optional<ItemAttribute> attribute;
+		std::optional<Identifier> attribute;
 
 		if (tile1 == "base:tile/sand"_id) {
 			item.emplace("base:item/sand"_id);
-			attribute.emplace(ItemAttribute::Shovel);
+			attribute.emplace("base:attribute/shovel"_id);
 		} else if (tile1 == "base:tile/shallow_water"_id) {
 			item.emplace("base:item/clay"_id);
-			attribute.emplace(ItemAttribute::Shovel);
+			attribute.emplace("base:attribute/shovel"_id);
 		} else if (tile1 == "base:tile/volcanic_sand"_id) {
 			item.emplace("base:item/volcanic_sand"_id);
-			attribute.emplace(ItemAttribute::Shovel);
+			attribute.emplace("base:attribute/shovel"_id);
 		} else if (tileset.isInCategory(tile1, "base:category/dirt")) {
 			item.emplace("base:item/dirt"_id);
-			attribute.emplace(ItemAttribute::Shovel);
+			attribute.emplace("base:attribute/shovel"_id);
 		} else if (tile1 == "base:tile/stone"_id) {
 			item.emplace("base:item/stone"_id);
-			attribute.emplace(ItemAttribute::Pickaxe);
+			attribute.emplace("base:attribute/pickaxe"_id);
 		}
 
 		if (item && attribute && !player.hasTooldown()) {
 			if (auto *stack = inventory.getActive()) {
-				if (stack->has(*attribute) && !inventory.add({game, *item, 1})) {
+				if (stack->hasAttribute(*attribute) && !inventory.add({game, *item, 1})) {
 					player.setTooldown(1.f);
 					if (stack->reduceDurability())
 						inventory.erase(inventory.activeSlot);

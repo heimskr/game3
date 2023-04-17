@@ -84,8 +84,8 @@ namespace Game3 {
 		y_offset = item_texture->y / 2.f;
 	}
 
-	std::shared_ptr<Item> Item::addAttribute(ItemAttribute attribute) {
-		attributes.insert(attribute);
+	std::shared_ptr<Item> Item::addAttribute(Identifier attribute) {
+		attributes.insert(std::move(attribute));
 		return shared_from_this();
 	}
 
@@ -162,7 +162,7 @@ namespace Game3 {
 		return (data["durability"].at(0) = std::max(0, data["durability"].at(0).get<Durability>() - amount)) == 0;
 	}
 
-	bool ItemStack::has(ItemAttribute attribute) const {
+	bool ItemStack::hasAttribute(const Identifier &attribute) const {
 		return item->attributes.contains(attribute);
 	}
 

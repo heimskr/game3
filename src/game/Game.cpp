@@ -106,15 +106,15 @@ namespace Game3 {
 		add(std::make_shared<Hammer>      ("base:item/iron_hammer",     "Iron Hammer",     150,  3.f, 128));
 		add(std::make_shared<Hammer>      ("base:item/gold_hammer",     "Gold Hammer",     400, .75f, 128));
 		add(std::make_shared<Hammer>      ("base:item/diamond_hammer",  "Diamond Hammer",  900,  1.f, 128));
-		add(std::make_shared<Tool>        ("base:item/iron_axe",        "Iron Axe",        150,  3.f, 128, ItemAttribute::Axe));
-		add(std::make_shared<Tool>        ("base:item/iron_pickaxe",    "Iron Pickaxe",    150,  3.f,  64, ItemAttribute::Pickaxe));
-		add(std::make_shared<Tool>        ("base:item/iron_shovel",     "Iron Shovel",     120,  3.f,  64, ItemAttribute::Shovel));
-		add(std::make_shared<Tool>        ("base:item/gold_axe",        "Gold Axe",        400, .75f,  64, ItemAttribute::Axe));
-		add(std::make_shared<Tool>        ("base:item/gold_pickaxe",    "Gold Pickaxe",    400, .75f,  64, ItemAttribute::Pickaxe));
-		add(std::make_shared<Tool>        ("base:item/gold_shovel",     "Gold Shovel",     300, .75f, 512, ItemAttribute::Shovel));
-		add(std::make_shared<Tool>        ("base:item/diamond_axe",     "Diamond Axe",     900,  1.f, 512, ItemAttribute::Axe));
-		add(std::make_shared<Tool>        ("base:item/diamond_pickaxe", "Diamond Pickaxe", 900,  1.f, 512, ItemAttribute::Pickaxe));
-		add(std::make_shared<Tool>        ("base:item/diamond_shovel",  "Diamond Shovel",  700,  1.f, 512, ItemAttribute::Shovel));
+		add(std::make_shared<Tool>        ("base:item/iron_axe",        "Iron Axe",        150,  3.f, 128, "base:attribute/axe"_id));
+		add(std::make_shared<Tool>        ("base:item/iron_pickaxe",    "Iron Pickaxe",    150,  3.f,  64, "base:attribute/pickaxe"_id));
+		add(std::make_shared<Tool>        ("base:item/iron_shovel",     "Iron Shovel",     120,  3.f,  64, "base:attribute/shovel"_id));
+		add(std::make_shared<Tool>        ("base:item/gold_axe",        "Gold Axe",        400, .75f,  64, "base:attribute/axe"_id));
+		add(std::make_shared<Tool>        ("base:item/gold_pickaxe",    "Gold Pickaxe",    400, .75f,  64, "base:attribute/pickaxe"_id));
+		add(std::make_shared<Tool>        ("base:item/gold_shovel",     "Gold Shovel",     300, .75f, 512, "base:attribute/shovel"_id));
+		add(std::make_shared<Tool>        ("base:item/diamond_axe",     "Diamond Axe",     900,  1.f, 512, "base:attribute/axe"_id));
+		add(std::make_shared<Tool>        ("base:item/diamond_pickaxe", "Diamond Pickaxe", 900,  1.f, 512, "base:attribute/pickaxe"_id));
+		add(std::make_shared<Tool>        ("base:item/diamond_shovel",  "Diamond Shovel",  700,  1.f, 512, "base:attribute/shovel"_id));
 		add(std::make_shared<Landfill>    ("base:item/sand",            "Sand",              1, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/sand"));
 		add(std::make_shared<Landfill>    ("base:item/volcanic_sand",   "Volcanic Sand",     3, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/volcanic_sand"));
 		add(std::make_shared<Landfill>    ("base:item/clay",            "Clay",              2, 64, clayRequirement));
@@ -424,7 +424,12 @@ namespace Game3 {
 	Gdk::Rectangle Game::getVisibleRealmBounds() const {
 		const auto [left,     top] = translateCanvasCoordinates(0., 0.);
 		const auto [right, bottom] = translateCanvasCoordinates(canvas.width(), canvas.height());
-		return {left, top, right - left + 1, bottom - top + 1};
+		return {
+			static_cast<int>(left),
+			static_cast<int>(top),
+			static_cast<int>(right - left + 1),
+			static_cast<int>(bottom - top + 1),
+		};
 	}
 
 	double Game::getTotalSeconds() const {

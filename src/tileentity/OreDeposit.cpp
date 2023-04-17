@@ -66,7 +66,7 @@ namespace Game3 {
 		if (auto *active_stack = inventory[active_slot]) {
 			if (0.f < timeRemaining || 0.f < player->tooldown)
 				return true;
-			if (active_stack->has(ItemAttribute::Pickaxe)) {
+			if (active_stack->hasAttribute("base:attribute/pickaxe"_id)) {
 				const auto &tool = dynamic_cast<Tool &>(*active_stack->item);
 				const Ore &ore = getOre(player->getGame());
 

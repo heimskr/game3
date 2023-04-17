@@ -252,14 +252,14 @@ namespace Game3 {
 		return storage.contains(slot);
 	}
 
-	std::optional<Slot> Inventory::find(ItemID id) const {
+	std::optional<Slot> Inventory::find(const ItemID &id) const {
 		for (const auto &[slot, stack]: storage)
 			if (stack.item->identifier == id)
 				return slot;
 		return std::nullopt;
 	}
 
-	std::optional<Slot> Inventory::find(ItemAttribute attribute) const {
+	std::optional<Slot> Inventory::findAttribute(const Identifier &attribute) const {
 		for (const auto &[slot, stack]: storage)
 			if (stack.item->attributes.contains(attribute))
 				return slot;

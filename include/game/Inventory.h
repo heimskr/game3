@@ -66,10 +66,10 @@ namespace Game3 {
 			bool contains(const ItemStack &) const;
 
 			/** Returns the slot containing a given item ID if one exists. */
-			std::optional<Slot> find(ItemID) const;
+			std::optional<Slot> find(const ItemID &) const;
 
 			/** Returns the first slot containing an item with the given attribute if one exists. */
-			std::optional<Slot> find(ItemAttribute) const;
+			std::optional<Slot> findAttribute(const Identifier &) const;
 
 			ItemStack * getActive();
 

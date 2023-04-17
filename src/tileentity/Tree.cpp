@@ -52,15 +52,15 @@ namespace Game3 {
 		const Slot active_slot = inventory.activeSlot;
 
 		if (auto *active_stack = inventory[active_slot]) {
-			if (active_stack->has(ItemAttribute::Axe)) {
-				if (!inventory.add({game, "base:item/wood", 1})) {
+			if (active_stack->hasAttribute("base:attribute/axe"_id)) {
+				if (!inventory.add({game, "base:item/wood"_id, 1})) {
 					realm.queueRemoval(shared_from_this());
 					if (active_stack->reduceDurability())
 						inventory.erase(active_slot);
 					ItemCount saplings = 1;
 					while (rand() % 4 == 1)
 						++saplings;
-					player->give({game, "base:item/sapling", saplings});
+					player->give({game, "base:item/sapling"_id, saplings});
 					inventory.notifyOwner();
 					return true;
 				}
@@ -68,7 +68,7 @@ namespace Game3 {
 			}
 		}
 
-		if (HIVE_MATURITY <= hiveAge && !inventory.add({game, "base:item/honey", 1})) {
+		if (HIVE_MATURITY <= hiveAge && !inventory.add({game, "base:item/honey"_id, 1})) {
 			hiveAge = 0.f;
 			inventory.notifyOwner();
 			return true;
@@ -91,11 +91,11 @@ namespace Game3 {
 		static std::uniform_real_distribution one(0., 1.);
 
 		if (one(threadContext.rng) < CHAR_CHANCE)
-			realm.setLayer3(getPosition(), "base:tile/charred_stump");
+			realm.setLayer3(getPosition(), "base:tile/charred_stump"_id);
 		else
-			realm.spawn<ItemEntity>(getPosition(), ItemStack(realm.getGame(), "base:item/wood", 1));
+			realm.spawn<ItemEntity>(getPosition(), ItemStack(realm.getGame(), "base:item/wood"_id, 1));
 
-		realm.setLayer2(getPosition(), "base:tile/ash");
+		realm.setLayer2(getPosition(), "base:tile/ash"_id);
 		return true;
 	}
 

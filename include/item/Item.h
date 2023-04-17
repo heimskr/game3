@@ -41,14 +41,12 @@ namespace Game3 {
 
 	void to_json(nlohmann::json &, const ItemTexture &);
 
-	enum class ItemAttribute {Axe, Pickaxe, Shovel, Hammer, Saw};
-
 	class Item: public NamedRegisterable, public std::enable_shared_from_this<Item> {
 		public:
 			std::string name;
 			MoneyCount basePrice = 1;
 			ItemCount maxCount = 64;
-			std::unordered_set<ItemAttribute> attributes;
+			std::unordered_set<Identifier> attributes;
 
 			Item() = delete;
 			Item(ItemID, std::string name_, MoneyCount base_price, ItemCount max_count = 64);
@@ -63,7 +61,7 @@ namespace Game3 {
 			virtual Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &);
 			virtual Glib::RefPtr<Gdk::Pixbuf> makeImage(const Game &);
 			virtual void getOffsets(const Game &, std::shared_ptr<Texture> &, float &x_offset, float &y_offset);
-			std::shared_ptr<Item> addAttribute(ItemAttribute);
+			std::shared_ptr<Item> addAttribute(Identifier);
 			inline bool operator==(const Item &other) const { return identifier == other.identifier; }
 
 			virtual void initStack(const Game &, ItemStack &) {}
@@ -114,7 +112,7 @@ namespace Game3 {
 			/** Decreases the durability by a given amount if the ItemStack has durability data. Returns true if the durability was present and reduced to zero or false otherwise. */
 			bool reduceDurability(Durability = 1);
 
-			bool has(ItemAttribute) const;
+			bool hasAttribute(const Identifier &) const;
 
 			bool hasDurability() const;
 
