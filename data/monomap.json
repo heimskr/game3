@@ -162,7 +162,11 @@
 			"base:tile/cauldron_full",
 			"base:tile/cauldron_red_full",
 			"base:tile/cauldron_blue_full",
-			"base:tile/cauldron_green_full"
+			"base:tile/cauldron_green_full",
+			"base:tile/winter_tree1",
+			"base:tile/winter_tree2",
+			"base:tile/winter_tree3",
+			"base:tile/winter_stump"
 		],
 		"bright": [
 			"base:tile/lava"
@@ -337,7 +341,11 @@
 			"base:tile/keep_sw":              736,
 			"base:tile/keep_se":              737,
 			"base:tile/void":                 738,
-			"base:tile/charred_stump":        742
+			"base:tile/winter_tree1":         739,
+			"base:tile/winter_tree2":         740,
+			"base:tile/winter_tree3":         741,
+			"base:tile/charred_stump":        742,
+			"base:tile/winter_stump":         743
 		},
 		"stacks": {
 			"base:category/wooden_walls": "base:item/wooden_wall",
@@ -414,6 +422,11 @@
 				"base:tile/plant1",
 				"base:tile/plant2",
 				"base:tile/plant3"
+			],
+			"base:category/honey_trees": [
+				"base:tile/tree1",
+				"base:tile/tree2",
+				"base:tile/tree3"
 			],
 			"base:category/doors": [
 				"base:tile/door1",

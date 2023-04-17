@@ -37,7 +37,6 @@ namespace Game3 {
 		static const Identifier light_ice     = "base:tile/light_ice"_id;
 		static const Identifier snow          = "base:tile/snow"_id;
 		static const Identifier stone         = "base:tile/stone"_id;
-		static const Identifier forest_floor  = "base:tile/forest_floor"_id;
 
 		if (noise < wetness) {
 			layer1[index] = tileset[deeper_water];
@@ -57,28 +56,26 @@ namespace Game3 {
 			layer1[index] = tileset[stone];
 		} else {
 			layer1[index] = tileset[snow];
-			// const double forest_noise = forestPerlin->GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.5);
-			// if (params.forestThreshold < forest_noise) {
-			// 	uint8_t mod = column % 2;
-			// 	std::default_random_engine tree_rng(static_cast<uint_fast32_t>(forest_noise * 1'000'000'000.));
-			// 	if (std::uniform_int_distribution(0, 99)(tree_rng) < 50)
-			// 		mod = 1 - mod;
-			// 	if ((row % 2) == mod) {
-			// 		static const std::vector<Identifier> trees {"base:tile/tree1"_id, "base:tile/tree2"_id, "base:tile/tree3"_id};
-			// 		realm.add(TileEntity::create<Tree>(realm.getGame(), choose(trees, rng), "base:tile/tree0"_id, Position(row, column), Tree::MATURITY));
-			// 	}
-			// 	layer1[index] = tileset[forest_floor];
-			// }
+			const double forest_noise = forestPerlin->GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.5);
+			if (params.forestThreshold < forest_noise) {
+				uint8_t mod = column % 2;
+				std::default_random_engine tree_rng(static_cast<uint_fast32_t>(forest_noise * 1'000'000'000.));
+				if (std::uniform_int_distribution(0, 99)(tree_rng) < 50)
+					mod = 1 - mod;
+				if ((row % 2) == mod) {
+					static const std::vector<Identifier> trees {"base:tile/winter_tree1"_id, "base:tile/winter_tree2"_id, "base:tile/winter_tree3"_id};
+					realm.add(TileEntity::create<Tree>(realm.getGame(), choose(trees, rng), "base:tile/winter_stump"_id, Position(row, column), Tree::MATURITY));
+				}
+			}
 		}
 	}
 
-	void Snowy::postgen(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &perlin, const WorldGenParams &params) {
+	void Snowy::postgen(Index row, Index column, std::default_random_engine &, const noise::module::Perlin &perlin, const WorldGenParams &params) {
 		Realm &realm = *getRealm();
 		constexpr double factor = 10;
 
 		if (params.antiforestThreshold > perlin.GetValue(row / Biome::NOISE_ZOOM * factor, column / Biome::NOISE_ZOOM * factor, 0.)) {
 			if (auto tile = realm.tileEntityAt({row, column}); tile && tile->is("base:te/tree"_id) && !std::dynamic_pointer_cast<Tree>(tile)->hasHive()) {
-				Game &game = realm.getGame();
 				realm.removeSafe(tile);
 			}
 		}

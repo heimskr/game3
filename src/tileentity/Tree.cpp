@@ -31,7 +31,12 @@ namespace Game3 {
 		hiveAge = json.at("hiveAge");
 	}
 
-	void Tree::init(Game &) {
+	void Tree::onSpawn() {
+		auto &tileset = getRealm()->getTileset();
+
+		if (!tileset.isInCategory(tileID, "base:category/honey_trees"_id))
+			return;
+
 		if (threadContext.random(0, 10) == 0)
 			hiveAge = 0.f;
 	}
