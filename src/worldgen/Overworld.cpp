@@ -153,8 +153,8 @@ namespace Game3::WorldGen {
 		if (!starts.empty()) {
 			Timer candidate_timer("Candidates");
 
-			std::list<Index> candidates;
-			// candidates.reserve(starts.size() / 16);
+			std::vector<Index> candidates;
+			candidates.reserve(starts.size() / 16);
 			std::vector<std::thread> candidate_threads;
 			const size_t chunk_max = updiv(starts.size(), chunk_size);
 			candidate_threads.reserve(chunk_max);
@@ -166,7 +166,7 @@ namespace Game3::WorldGen {
 				realm->randomLand = choose(starts, rng);
 
 				candidate_threads.emplace_back([&, chunk] {
-					std::list<Index> thread_candidates;
+					std::vector<Index> thread_candidates;
 
 					for (size_t i = chunk * chunk_size, max = std::min((chunk + 1) * chunk_size, starts.size()); i < max; ++i) {
 						const auto index = starts[i];
@@ -191,8 +191,7 @@ namespace Game3::WorldGen {
 					}
 
 					std::unique_lock lock(candidates_mutex);
-					// candidates.insert(candidates.end(), thread_candidates.begin(), thread_candidates.end());
-					candidates.splice(candidates.end(), thread_candidates);
+					candidates.insert(candidates.end(), thread_candidates.begin(), thread_candidates.end());
 				});
 			}
 
