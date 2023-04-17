@@ -17,14 +17,13 @@ namespace Game3 {
 		Identifier(std::string_view);
 		Identifier(const char *);
 
-		explicit operator bool() const {
+		inline explicit operator bool() const {
 			if (space.empty() != name.empty())
 				throw std::runtime_error("Partially empty identifier");
-
 			return !space.empty();
 		}
 
-		explicit inline operator std::string() const {
+		inline explicit operator std::string() const {
 			return space + ':' + name;
 		}
 

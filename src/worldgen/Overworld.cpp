@@ -230,6 +230,10 @@ namespace Game3::WorldGen {
 
 		postgen_timer.stop();
 
+		Timer pathmap_timer("RemakePathmap");
+		realm->remakePathMap();
+		pathmap_timer.stop();
+
 		overworld_timer.stop();
 		Timer::summary();
 		Timer::clear();

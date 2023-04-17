@@ -37,7 +37,7 @@ namespace Game3 {
 		renderer2.init(tilemap2);
 		renderer3.init(tilemap3);
 		initTexture();
-		resetPathMap();
+		remakePathMap();
 	}
 
 	Realm::Realm(Game &game_, RealmID id_, RealmType type_, TilemapPtr tilemap1_, BiomeMapPtr biome_map, int seed_):
@@ -51,7 +51,7 @@ namespace Game3 {
 		tilemap3->init(game);
 		renderer2.init(tilemap2);
 		renderer3.init(tilemap3);
-		resetPathMap();
+		remakePathMap();
 	}
 
 	void Realm::initTexture() {}
@@ -273,10 +273,9 @@ namespace Game3 {
 
 	TileEntityPtr Realm::tileEntityAt(const Position &position) {
 		auto lock = tileEntityLock.lockRead();
-		const auto iter = tileEntities.find(getIndex(position));
-		if (iter == tileEntities.end())
-			return {};
-		return iter->second;
+		if (auto iter = tileEntities.find(getIndex(position)); iter != tileEntities.end())
+			return iter->second;
+		return {};
 	}
 
 	void Realm::remove(EntityPtr entity) {
@@ -640,7 +639,7 @@ namespace Game3 {
 		}
 	}
 
-	void Realm::resetPathMap() {
+	void Realm::remakePathMap() {
 		const auto width = tilemap1->width;
 		const auto height = tilemap1->height;
 		pathMap.resize(width * height);

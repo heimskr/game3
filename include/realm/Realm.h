@@ -127,6 +127,7 @@ namespace Game3 {
 			void confirmGhosts();
 			void damageGround(const Position &);
 			const Tileset & getTileset() const;
+			void remakePathMap();
 
 			virtual bool interactGround(const std::shared_ptr<Player> &, const Position &);
 			virtual void updateNeighbors(const Position &);
@@ -231,7 +232,6 @@ namespace Game3 {
 			bool isWalkable(Index row, Index column, const Tileset &) const;
 			void setLayerHelper(Index row, Index col, bool should_mark_dirty = true);
 			void setLayerHelper(Index, bool should_mark_dirty = true);
-			void resetPathMap();
 
 			static BiomeType getBiome(uint32_t seed);
 	};

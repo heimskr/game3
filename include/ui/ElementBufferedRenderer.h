@@ -4,34 +4,43 @@
 #include <vector>
 
 #include "Shader.h"
+#include "Types.h"
 #include "ui/RectangleRenderer.h"
 #include "ui/Reshader.h"
 #include "util/GL.h"
 
 namespace Game3 {
+	class Realm;
+	class Tilemap;
+
+	/** Start corresponds to left or top, End corresponds to right or bottom. */
+	enum class Alignment {Start, Middle, End};
+
 	class ElementBufferedRenderer {
 		public:
 			constexpr static float TEXTURE_SCALE = 2.f;
 			constexpr static float TILE_TEXTURE_PADDING = 1.f / 2048.f;
 			int backbufferWidth = -1;
 			int backbufferHeight = -1;
+			Alignment horizontal;
+			Alignment vertical;
 
 			Eigen::Vector2f center {0.f, 0.f};
-			TilemapPtr tilemap;
+			std::shared_ptr<Tilemap> tilemap;
 			GL::Texture lightTexture;
 
 			ElementBufferedRenderer(Realm &);
 			~ElementBufferedRenderer();
 
 			void reset();
-			void init(TilemapPtr);
+			void init(std::shared_ptr<Tilemap>);
 			void render(float divisor, float scale, float center_x, float center_y);
 			void render(float divisor);
 			void reupload();
 			bool onBackbufferResized(int width, int height);
 			inline void markDirty() { dirty = true; }
 
-			operator bool() const { return initialized; }
+			inline explicit operator bool() const { return initialized; }
 
 		private:
 			bool initialized = false;
