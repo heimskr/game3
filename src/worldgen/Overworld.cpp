@@ -58,6 +58,8 @@ namespace Game3::WorldGen {
 				const double noise = std::min(1., std::max(-1., p2.GetValue(row / params.biomeZoom, column / params.biomeZoom, 0.0) * 5.));
 				if (noise < -0.7)
 					biome_map->tiles.at(realm->getIndex(row, column)) = Biome::VOLCANIC;
+				else if (noise < -0.5)
+					biome_map->tiles.at(realm->getIndex(row, column)) = Biome::DESERT;
 				else if (0.7 < noise)
 					biome_map->tiles.at(realm->getIndex(row, column)) = Biome::SNOWY;
 				else

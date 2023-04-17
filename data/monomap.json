@@ -166,7 +166,15 @@
 			"base:tile/winter_tree1",
 			"base:tile/winter_tree2",
 			"base:tile/winter_tree3",
-			"base:tile/winter_stump"
+			"base:tile/winter_stump",
+			"base:tile/cactus1",
+			"base:tile/cactus2",
+			"base:tile/cactus3",
+			"base:tile/cactus4",
+			"base:tile/cactus5",
+			"base:tile/cactus6",
+			"base:tile/cactus7",
+			"base:tile/cactus8"
 		],
 		"bright": [
 			"base:tile/lava"
@@ -338,6 +346,14 @@
 			"base:tile/copper_ore_regen":     711,
 			"base:tile/gold_ore_regen":       712,
 			"base:tile/coal_ore_regen":       713,
+			"base:tile/cactus1":              714,
+			"base:tile/cactus2":              715,
+			"base:tile/cactus3":              716,
+			"base:tile/cactus4":              717,
+			"base:tile/cactus5":              718,
+			"base:tile/cactus6":              719,
+			"base:tile/cactus7":              720,
+			"base:tile/cactus8":              721,
 			"base:tile/keep_sw":              736,
 			"base:tile/keep_se":              737,
 			"base:tile/void":                 738,
@@ -427,6 +443,16 @@
 				"base:tile/tree1",
 				"base:tile/tree2",
 				"base:tile/tree3"
+			],
+			"base:category/cactuses": [
+				"base:tile/cactus1",
+				"base:tile/cactus2",
+				"base:tile/cactus3",
+				"base:tile/cactus4",
+				"base:tile/cactus5",
+				"base:tile/cactus6",
+				"base:tile/cactus7",
+				"base:tile/cactus8"
 			],
 			"base:category/doors": [
 				"base:tile/door1",
