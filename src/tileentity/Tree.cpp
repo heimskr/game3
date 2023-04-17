@@ -1,3 +1,4 @@
+#include "ThreadContext.h"
 #include "Tileset.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
@@ -30,8 +31,8 @@ namespace Game3 {
 		hiveAge = json.at("hiveAge");
 	}
 
-	void Tree::init(Game &game) {
-		if (game.random(0, 10) == 0)
+	void Tree::init(Game &) {
+		if (threadContext.random(0, 10) == 0)
 			hiveAge = 0.f;
 	}
 
@@ -87,11 +88,9 @@ namespace Game3 {
 		if (realm.tilemap2->tileset->identifier != expected || realm.tilemap3->tileset->identifier != expected)
 			return true;
 
-		auto &game = realm.getGame();
-		auto &rng = game.dynamicRNG;
 		static std::uniform_real_distribution one(0., 1.);
 
-		if (one(rng) < CHAR_CHANCE)
+		if (one(threadContext.rng) < CHAR_CHANCE)
 			realm.setLayer3(getPosition(), "base:tile/charred_stump");
 		else
 			realm.spawn<ItemEntity>(getPosition(), ItemStack(realm.getGame(), "base:item/wood", 1));

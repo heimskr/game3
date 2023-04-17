@@ -280,7 +280,7 @@ namespace Game3 {
 		}, 2);
 	}
 
-	void MainWindow::newGame(int seed, int width, int height, const WorldGenParams &params) {
+	void MainWindow::newGame(size_t seed, int width, int height, const WorldGenParams &params) {
 		Timer timer("NewGame");
 		glArea.get_context()->make_current();
 		game = Game::create(*canvas);
@@ -294,7 +294,7 @@ namespace Game3 {
 		realm->outdoors = true;
 		std::default_random_engine rng;
 		rng.seed(seed);
-		WorldGen::generateOverworld(realm, rng, seed, params);
+		WorldGen::generateOverworld(realm, seed, params);
 		game->realms.emplace(realm->id, realm);
 		game->activeRealm = realm;
 		realm->add(game->player = Entity::create<Player>());

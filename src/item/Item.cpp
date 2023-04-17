@@ -126,12 +126,17 @@ namespace Game3 {
 		return *item == *other.item && data == other.data;
 	}
 
-	Glib::RefPtr<Gdk::Pixbuf> ItemStack::getImage(const Game &game) {
+	Glib::RefPtr<Gdk::Pixbuf> ItemStack::getImage() {
+		assert(game);
+		return getImage(*game);
+	}
+
+	Glib::RefPtr<Gdk::Pixbuf> ItemStack::getImage(const Game &game_) {
 		if (cachedImage)
 			return cachedImage;
 
 		if (item)
-			return cachedImage = item->getImage(game);
+			return cachedImage = item->getImage(game_);
 
 		return {};
 	}

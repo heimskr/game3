@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <random>
 #include <unordered_map>
@@ -14,6 +15,7 @@
 #include "tileentity/TileEntity.h"
 #include "ui/ElementBufferedRenderer.h"
 #include "util/GL.h"
+#include "util/RWLock.h"
 
 namespace Game3 {
 	class Entity;
@@ -75,36 +77,38 @@ namespace Game3 {
 			int getHeight() const { return tilemap1->height; }
 			std::shared_ptr<Entity> add(const std::shared_ptr<Entity> &);
 			std::shared_ptr<TileEntity> add(const std::shared_ptr<TileEntity> &);
+			std::shared_ptr<TileEntity> addUnsafe(const std::shared_ptr<TileEntity> &);
 			void initEntities();
 			void tick(float delta);
 			std::vector<std::shared_ptr<Entity>> findEntities(const Position &) const;
 			std::vector<std::shared_ptr<Entity>> findEntities(const Position &, const std::shared_ptr<Entity> &except) const;
 			std::shared_ptr<Entity> findEntity(const Position &) const;
 			std::shared_ptr<Entity> findEntity(const Position &, const std::shared_ptr<Entity> &except) const;
-			std::shared_ptr<TileEntity> tileEntityAt(const Position &) const;
+			std::shared_ptr<TileEntity> tileEntityAt(const Position &);
 			void remove(std::shared_ptr<Entity>);
-			void remove(std::shared_ptr<TileEntity>);
+			void remove(const std::shared_ptr<TileEntity> &, bool run_helper = true);
+			void removeSafe(const std::shared_ptr<TileEntity> &);
 			Position getPosition(Index) const;
 			void onMoved(const std::shared_ptr<Entity> &, const Position &);
 			Game & getGame();
 			void queueRemoval(const std::shared_ptr<Entity> &);
 			void queueRemoval(const std::shared_ptr<TileEntity> &);
 			void absorb(const std::shared_ptr<Entity> &, const Position &);
-			void setLayer1(Index row, Index column, TileID);
-			void setLayer2(Index row, Index column, TileID);
-			void setLayer3(Index row, Index column, TileID);
-			void setLayer1(Index, TileID);
-			void setLayer2(Index, TileID);
-			void setLayer3(Index, TileID);
-			void setLayer1(Index, const Identifier &);
-			void setLayer2(Index, const Identifier &);
-			void setLayer3(Index, const Identifier &);
-			void setLayer1(const Position &, TileID);
-			void setLayer2(const Position &, TileID);
-			void setLayer3(const Position &, TileID);
-			void setLayer1(const Position &, const Identifier &);
-			void setLayer2(const Position &, const Identifier &);
-			void setLayer3(const Position &, const Identifier &);
+			void setLayer1(Index row, Index column, TileID, bool run_helper = true);
+			void setLayer2(Index row, Index column, TileID, bool run_helper = true);
+			void setLayer3(Index row, Index column, TileID, bool run_helper = true);
+			void setLayer1(Index, TileID, bool run_helper = true);
+			void setLayer2(Index, TileID, bool run_helper = true);
+			void setLayer3(Index, TileID, bool run_helper = true);
+			void setLayer1(Index, const Identifier &, bool run_helper = true);
+			void setLayer2(Index, const Identifier &, bool run_helper = true);
+			void setLayer3(Index, const Identifier &, bool run_helper = true);
+			void setLayer1(const Position &, TileID, bool run_helper = true);
+			void setLayer2(const Position &, TileID, bool run_helper = true);
+			void setLayer3(const Position &, TileID, bool run_helper = true);
+			void setLayer1(const Position &, const Identifier &, bool run_helper = true);
+			void setLayer2(const Position &, const Identifier &, bool run_helper = true);
+			void setLayer3(const Position &, const Identifier &, bool run_helper = true);
 			TileID getLayer1(Index row, Index column) const;
 			TileID getLayer2(Index row, Index column) const;
 			TileID getLayer3(Index row, Index column) const;
@@ -221,6 +225,8 @@ namespace Game3 {
 			bool ticking = false;
 			std::vector<std::shared_ptr<Entity>> entityRemovalQueue;
 			std::vector<std::shared_ptr<TileEntity>> tileEntityRemovalQueue;
+			RWLock tileEntityLock;
+			std::mutex thing;
 
 			bool isWalkable(Index row, Index column, const Tileset &) const;
 			void setLayerHelper(Index row, Index col, bool should_mark_dirty = true);

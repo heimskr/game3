@@ -1,4 +1,3 @@
-#include <iostream>
 #include "MarchingSquares.h"
 #include "Tileset.h"
 #include "entity/EntityFactory.h"

@@ -92,6 +92,7 @@ namespace Game3 {
 			ItemStack(const Game &, const ItemID &, ItemCount, nlohmann::json data_);
 
 			bool canMerge(const ItemStack &) const;
+			Glib::RefPtr<Gdk::Pixbuf> getImage();
 			Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &);
 			/** Returns a copy of the ItemStack with a different count. */
 			ItemStack withCount(ItemCount) const;

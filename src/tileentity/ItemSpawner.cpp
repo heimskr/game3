@@ -1,3 +1,4 @@
+#include "ThreadContext.h"
 #include "Tileset.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
@@ -30,10 +31,10 @@ namespace Game3 {
 			spawnables.push_back(ItemStack::fromJSON(game, spawnable));
 	}
 
-	void ItemSpawner::tick(Game &game, float delta) {
+	void ItemSpawner::tick(Game &, float delta) {
 		static std::uniform_real_distribution distribution(0., 1.);
-		for (float i = 0; i < delta; i += 0.1) {
-			if (distribution(game.dynamicRNG) < chancePerTenth) {
+		for (float i = 0.f; i < delta; i += .1f) {
+			if (distribution(threadContext.rng) < chancePerTenth) {
 				for (const auto &entity: getRealm()->findEntities(getPosition()))
 					if (entity->is("base:entity/item"))
 						return;

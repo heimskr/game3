@@ -10,6 +10,6 @@ namespace Game3 {
 	struct WorldGenParams;
 
 	namespace WorldGen {
-		void generateOverworld(const std::shared_ptr<Realm> &, std::default_random_engine &, int noise_seed, const WorldGenParams &);
+		void generateOverworld(const std::shared_ptr<Realm> &, size_t noise_seed, const WorldGenParams &);
 	}
 }

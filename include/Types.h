@@ -8,7 +8,7 @@
 #include "registry/Registerable.h"
 
 namespace Game3 {
-	using Index        =  int32_t;
+	using Index        =  int64_t;
 	using TileID       = uint16_t;
 	using PlayerID     =  int32_t;
 	using RealmID      =  int32_t;

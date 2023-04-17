@@ -1,3 +1,6 @@
+#include <thread>
+
+#include "ThreadContext.h"
 #include "Tileset.h"
 #include "biome/Biome.h"
 #include "biome/Grassland.h"
@@ -11,18 +14,42 @@
 #include "util/Util.h"
 #include "worldgen/Overworld.h"
 #include "worldgen/Town.h"
+#include "worldgen/WorldGen.h"
 
 namespace Game3::WorldGen {
-	void generateOverworld(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, int noise_seed, const WorldGenParams &params) {
+	void generateOverworld(const std::shared_ptr<Realm> &realm, size_t noise_seed, const WorldGenParams &params) {
 		Timer overworld_timer("GenOverworld");
 		const auto width  = realm->getWidth();
 		const auto height = realm->getHeight();
 
+		const size_t regions_x = updiv(static_cast<size_t>(width), params.regionSize);
+		const size_t regions_y = updiv(static_cast<size_t>(height), params.regionSize);
+		const size_t thread_count = regions_x * regions_y;
+
 		auto &biome_map = realm->biomeMap;
 		biome_map->fill(Biome::GRASSLAND);
 
+		std::vector<std::thread> threads;
+		threads.reserve(thread_count);
+
 		noise::module::Perlin p2;
 		p2.SetSeed(noise_seed * 3 - 1);
+
+		auto saved_noise = std::make_shared<double[]>(width * height);
+		auto &tilemap1 = realm->tilemap1;
+		auto &tilemap2 = realm->tilemap2;
+		auto &tilemap3 = realm->tilemap3;
+		const auto &tileset = realm->getTileset();
+
+		tilemap1->reset();
+		tilemap2->reset();
+		tilemap3->reset();
+
+		auto biomes = Biome::getMap(*realm, noise_seed, saved_noise);
+		auto get_biome = [&](Index row, Index column) -> Biome & {
+			return *biomes.at((*biome_map)(column, row));
+		};
+
 		for (Index row = 0; row < height; ++row) {
 			for (Index column = 0; column < width; ++column) {
 				constexpr double zoom = 1000;
@@ -34,70 +61,90 @@ namespace Game3::WorldGen {
 			}
 		}
 
-		auto saved_noise = std::make_shared<double[]>(width * height);
-
-		auto biomes = Biome::getMap(*realm, noise_seed, saved_noise);
-
 		noise::module::Perlin perlin;
 		perlin.SetSeed(noise_seed);
 
-		auto &tilemap1 = realm->tilemap1;
-		auto &tilemap2 = realm->tilemap2;
-		auto &tilemap3 = realm->tilemap3;
+		for (size_t thread_row = 0; thread_row < regions_y; ++thread_row) {
+			const size_t row_min_long = thread_row * params.regionSize;
+			const size_t row_max_long = std::min(static_cast<size_t>(height), (thread_row + 1) * params.regionSize);
 
-		tilemap1->reset();
-		tilemap2->reset();
-		tilemap3->reset();
+			if (INT_MAX < row_min_long)
+				throw std::runtime_error("Not going to generate an impossibly large world");
 
-		auto get_biome = [&](Index row, Index column) -> Biome & {
-			return *biomes.at((*biome_map)(column, row));
-		};
+			for (size_t thread_col = 0; thread_col < regions_x; ++thread_col) {
+				const size_t col_min_long = thread_col * params.regionSize;
+				const size_t col_max_long = std::min(static_cast<size_t>(width), (thread_col + 1) * params.regionSize);
 
-		Timer noise_timer("BiomeGeneration");
-		for (Index row = 0; row < height; ++row)
-			for (Index column = 0; column < width; ++column)
-				get_biome(row, column).generate(row, column, rng, perlin, params);
-		noise_timer.stop();
+				if (INT_MAX < col_min_long)
+					throw std::runtime_error("Not going to generate an impossibly large world");
 
-		constexpr static int m = 26, n = 34, pad = 2;
-		Timer land_timer("GetLand");
-		const auto starts = tilemap1->getLand(m + pad * 2, n + pad * 2);
-		land_timer.stop();
+				const auto col_min = static_cast<Index>(col_min_long);
+				const auto col_max = static_cast<Index>(col_max_long);
+				const auto row_min = static_cast<Index>(row_min_long);
+				const auto row_max = static_cast<Index>(row_max_long);
 
-		Timer resource_timer("Resources");
+				threads.emplace_back([&, row_min, row_max, col_min, col_max] {
+					threadContext = {realm->getGame().shared_from_this(), noise_seed - 1'000'000ul * row_min + col_min, row_min, row_max, col_min, col_max};
 
-		std::vector<Index> resource_starts;
-		resource_starts.reserve(width * height / 10);
+					// Timer noise_timer("BiomeGeneration");
+					for (auto row = row_min; row < row_max; ++row)
+						for (auto column = col_min; column < col_max; ++column)
+							get_biome(row, column).generate(row, column, threadContext.rng, perlin, params);
+					// noise_timer.stop();
 
-		const auto &tileset = *tilemap1->tileset;
-		const auto ore_set = tileset.getCategoryIDs("base:category/orespawns"_id);
+					// Timer resource_timer("Resources");
+					std::vector<Index> resource_starts;
+					resource_starts.reserve(width * height / 10);
 
-		for (Index index = 0, max = width * height; index < max; ++index)
-			if (ore_set.contains((*tilemap1)[index]))
-				resource_starts.push_back(index);
+					const auto ore_set = tileset.getCategoryIDs("base:category/orespawns"_id);
 
-		std::shuffle(resource_starts.begin(), resource_starts.end(), rng);
-		Game &game = realm->getGame();
-		auto &ores = game.registry<OreRegistry>();
+					// for (Index index = width * row_min, max = width * row_max; index < max; ++index)
+					for (auto row = row_min; row < row_max; ++row) {
+						for (auto column = col_min; column < col_max; ++column) {
+							const Index index = realm->getIndex(row, column);
+							if (ore_set.contains((*tilemap1)[index]))
+								resource_starts.push_back(index);
+						}
+					}
 
-		auto add_resources = [&](double threshold, const Identifier &ore_name) {
-			auto ore = ores.at(ore_name);
-			for (size_t i = 0, max = resource_starts.size() / 1000; i < max; ++i) {
-				const Index index = resource_starts.back();
-				if (Grassland::THRESHOLD + threshold <= saved_noise[index])
-					realm->add(TileEntity::create<OreDeposit>(game, *ore, realm->getPosition(index)));
-				resource_starts.pop_back();
+					std::shuffle(resource_starts.begin(), resource_starts.end(), threadContext.rng);
+					Game &game = realm->getGame();
+					auto &ores = game.registry<OreRegistry>();
+
+					auto add_resources = [&](double threshold, const Identifier &ore_name) {
+						auto ore = ores.at(ore_name);
+						for (size_t i = 0, max = resource_starts.size() / 1000; i < max; ++i) {
+							const Index index = resource_starts.back();
+							if (Grassland::THRESHOLD + threshold <= saved_noise[index])
+								realm->add(TileEntity::create<OreDeposit>(game, *ore, realm->getPosition(index)));
+							resource_starts.pop_back();
+						}
+					};
+
+					add_resources(1.0, "base:ore/iron");
+					add_resources(0.5, "base:ore/copper");
+					add_resources(0.5, "base:ore/gold");
+					add_resources(0.5, "base:ore/diamond");
+					add_resources(0.5, "base:ore/coal");
+					// TODO: oil
+					// resource_timer.stop();
+				});
 			}
-		};
 
-		add_resources(1.0, "base:ore/iron");
-		add_resources(0.5, "base:ore/copper");
-		add_resources(0.5, "base:ore/gold");
-		add_resources(0.5, "base:ore/diamond");
-		add_resources(0.5, "base:ore/coal");
-		// TODO: oil
-		resource_timer.stop();
+			// Timer land_timer("GetLand");
+			// land_timer.stop();
 
+		}
+
+		for (std::thread &thread: threads)
+			thread.join();
+
+		threads.clear();
+
+		std::default_random_engine rng(noise_seed);
+
+		constexpr int m = 26, n = 34, pad = 2;
+		const auto starts = tilemap1->getLand(m + pad * 2, n + pad * 2);
 		if (!starts.empty()) {
 			realm->randomLand = choose(starts, rng);
 			std::vector<Index> candidates;
@@ -124,13 +171,34 @@ namespace Game3::WorldGen {
 		}
 
 		Timer postgen_timer("Postgen");
-		for (Index row = 0; row < height; ++row)
-			for (Index column = 0; column < width; ++column)
-				get_biome(row, column).postgen(row, column, rng, perlin, params);
+
+
+		for (size_t thread_row = 0; thread_row < regions_y; ++thread_row) {
+			const size_t row_min = thread_row * params.regionSize;
+			const size_t row_max = std::min(static_cast<size_t>(height), (thread_row + 1) * params.regionSize);
+			for (size_t thread_col = 0; thread_col < regions_y; ++thread_col) {
+				const size_t col_min = thread_col * params.regionSize;
+				const size_t col_max = std::min(static_cast<size_t>(width), (thread_col + 1) * params.regionSize);
+				const auto col_min_index = static_cast<Index>(col_min);
+				const auto col_max_index = static_cast<Index>(col_max);
+				const auto row_min_index = static_cast<Index>(row_min);
+				const auto row_max_index = static_cast<Index>(row_max);
+				threads.emplace_back([&get_biome, &perlin, &params, noise_seed, row_min, col_min, row_min_index, row_max_index, col_min_index, col_max_index] {
+					std::default_random_engine rng(noise_seed - 1'000'000ul * row_min + col_min);
+					for (Index row = row_min_index; row < row_max_index; ++row)
+						for (Index column = col_min_index; column < col_max_index; ++column)
+							get_biome(row, column).postgen(row, column, rng, perlin, params);
+				});
+			}
+		}
+
+		for (std::thread &thread: threads)
+			thread.join();
+
 		postgen_timer.stop();
 
 		overworld_timer.stop();
-		// Timer::summary();
+		Timer::summary();
 		Timer::clear();
 	}
 }

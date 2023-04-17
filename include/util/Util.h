@@ -23,6 +23,11 @@ namespace Game3 {
 	unsigned long parseUlong(const char *, int base = 10);
 	unsigned long parseUlong(std::string_view, int base = 10);
 
+	template <typename T>
+	inline T updiv(T n, T d) {
+		return n / d + (n % d? 1 : 0);
+	}
+
 	inline double fractional(double d) {
 		return std::modf(d, &d);
 	}
@@ -73,14 +78,14 @@ namespace Game3 {
 	typename T::value_type & choose(T &container, R &rng) {
 		if (container.empty())
 			throw std::invalid_argument("Container is empty");
-		return container.at(rng() % container.size());
+		return container.at(std::uniform_int_distribution(static_cast<size_t>(0), container.size() - 1)(rng));
 	}
 
 	template <typename T, typename R>
 	const typename T::value_type & choose(const T &container, R &rng) {
 		if (container.empty())
 			throw std::invalid_argument("Container is empty");
-		return container.at(rng() % container.size());
+		return container.at(std::uniform_int_distribution(static_cast<size_t>(0), container.size() - 1)(rng));
 	}
 
 	template <typename T, typename R>

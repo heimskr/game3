@@ -36,9 +36,6 @@ namespace Game3 {
 			bool debugMode = true;
 			/** 12 because the game starts at noon */
 			float hourOffset = 12.;
-			/** Seeded with the time. Must not be used to determine deterministic outcomes.
-			 *  For example, a Gatherer can use this to choose a resource node to harvest from, but worldgen shouldn't use this. */
-			std::default_random_engine dynamicRNG;
 			size_t cavesGenerated = 0;
 			std::map<RealmType, std::shared_ptr<InteractionSet>> interactionSets;
 
@@ -95,8 +92,6 @@ namespace Game3 {
 			/** Translates coordinates relative to the top left corner of the canvas to realm coordinates. */
 			Position translateCanvasCoordinates(double x, double y) const;
 			Gdk::Rectangle getVisibleRealmBounds() const;
-			/** [min, max) */
-			int random(int min, int max);
 
 			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update() const { return signal_player_inventory_update_; }
 			sigc::signal<void(const PlayerPtr &)> signal_player_money_update() const { return signal_player_money_update_; }
@@ -106,7 +101,7 @@ namespace Game3 {
 			static std::shared_ptr<Game> fromJSON(const nlohmann::json &, Canvas &);
 
 		private:
-			Game(Canvas &canvas_): canvas(canvas_) { dynamicRNG.seed(time(nullptr)); }
+			Game(Canvas &canvas_): canvas(canvas_) {}
 			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update_;
 			sigc::signal<void(const PlayerPtr &)> signal_player_money_update_;
 			sigc::signal<void(const std::shared_ptr<HasRealm> &)> signal_other_inventory_update_;

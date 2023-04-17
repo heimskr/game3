@@ -194,7 +194,7 @@ namespace Game3 {
 		return entity;
 	}
 
-	TileEntityPtr Realm::add(const TileEntityPtr &tile_entity) {
+	TileEntityPtr Realm::addUnsafe(const TileEntityPtr &tile_entity) {
 		const Index index = getIndex(tile_entity->position);
 		if (tileEntities.contains(index))
 			return nullptr;
@@ -206,6 +206,12 @@ namespace Game3 {
 			++ghostCount;
 		tile_entity->onSpawn();
 		return tile_entity;
+	}
+
+	TileEntityPtr Realm::add(const TileEntityPtr &tile_entity) {
+		// auto lock = tileEntityLock.lockWrite(std::chrono::milliseconds(1));
+		std::unique_lock lock(thing);
+		return addUnsafe(tile_entity);
 	}
 
 	void Realm::initEntities() {
@@ -265,7 +271,8 @@ namespace Game3 {
 		return {};
 	}
 
-	TileEntityPtr Realm::tileEntityAt(const Position &position) const {
+	TileEntityPtr Realm::tileEntityAt(const Position &position) {
+		auto lock = tileEntityLock.lockRead();
 		const auto iter = tileEntities.find(getIndex(position));
 		if (iter == tileEntities.end())
 			return {};
@@ -276,15 +283,21 @@ namespace Game3 {
 		entities.erase(entity);
 	}
 
-	void Realm::remove(TileEntityPtr tile_entity) {
+	void Realm::remove(const TileEntityPtr &tile_entity, bool run_helper) {
 		const Position position = tile_entity->position;
 		const Index index = getIndex(position);
 		tileEntities.at(index)->onRemove();
 		tileEntities.erase(index);
-		setLayerHelper(index, false);
+		if (run_helper)
+			setLayerHelper(index, false);
 		if (tile_entity->is("base:te/ghost"))
 			--ghostCount;
 		updateNeighbors(position);
+	}
+
+	void Realm::removeSafe(const TileEntityPtr &tile_entity) {
+		auto lock = tileEntityLock.lockWrite(std::chrono::milliseconds(1));
+		remove(tile_entity, false);
 	}
 
 	Position Realm::getPosition(Index index) const {
@@ -322,73 +335,82 @@ namespace Game3 {
 		entity->teleport(position);
 	}
 
-	void Realm::setLayer1(Index row, Index column, TileID tile) {
+	void Realm::setLayer1(Index row, Index column, TileID tile, bool run_helper) {
 		tilemap1->set(column, row, tile);
-		setLayerHelper(row, column);
+		if (run_helper)
+			setLayerHelper(row, column);
 	}
 
-	void Realm::setLayer2(Index row, Index column, TileID tile) {
+	void Realm::setLayer2(Index row, Index column, TileID tile, bool run_helper) {
 		tilemap2->set(column, row, tile);
-		setLayerHelper(row, column);
+		if (run_helper)
+			setLayerHelper(row, column);
 	}
 
-	void Realm::setLayer3(Index row, Index column, TileID tile) {
+	void Realm::setLayer3(Index row, Index column, TileID tile, bool run_helper) {
 		tilemap3->set(column, row, tile);
-		setLayerHelper(row, column);
+		if (run_helper)
+			setLayerHelper(row, column);
 	}
 
-	void Realm::setLayer1(Index index, TileID tile) {
+	void Realm::setLayer1(Index index, TileID tile, bool run_helper) {
 		tilemap1->set(index, tile);
-		setLayerHelper(index);
+		if (run_helper)
+			setLayerHelper(index);
 	}
 
-	void Realm::setLayer2(Index index, TileID tile) {
+	void Realm::setLayer2(Index index, TileID tile, bool run_helper) {
 		tilemap2->set(index, tile);
-		setLayerHelper(index);
+		if (run_helper)
+			setLayerHelper(index);
 	}
 
-	void Realm::setLayer3(Index index, TileID tile) {
+	void Realm::setLayer3(Index index, TileID tile, bool run_helper) {
 		tilemap3->set(index, tile);
-		setLayerHelper(index);
+		if (run_helper)
+			setLayerHelper(index);
 	}
 
-	void Realm::setLayer1(Index index, const Identifier &tilename) {
+	void Realm::setLayer1(Index index, const Identifier &tilename, bool run_helper) {
 		tilemap1->set(index, (*tilemap1->tileset)[tilename]);
-		setLayerHelper(index);
+		if (run_helper)
+			setLayerHelper(index);
 	}
 
-	void Realm::setLayer2(Index index, const Identifier &tilename) {
+	void Realm::setLayer2(Index index, const Identifier &tilename, bool run_helper) {
 		tilemap2->set(index, (*tilemap2->tileset)[tilename]);
-		setLayerHelper(index);
+		if (run_helper)
+			setLayerHelper(index);
 	}
 
-	void Realm::setLayer3(Index index, const Identifier &tilename) {
+	void Realm::setLayer3(Index index, const Identifier &tilename, bool run_helper) {
 		tilemap3->set(index, (*tilemap3->tileset)[tilename]);
-		setLayerHelper(index);
+		if (run_helper)
+			setLayerHelper(index);
 	}
 
-	void Realm::setLayer1(const Position &position, TileID tile) {
-		setLayer1(position.row, position.column, tile);
+	void Realm::setLayer1(const Position &position, TileID tile, bool run_helper) {
+		setLayer1(position.row, position.column, tile, run_helper);
 	}
 
-	void Realm::setLayer2(const Position &position, TileID tile) {
-		setLayer2(position.row, position.column, tile);
+	void Realm::setLayer2(const Position &position, TileID tile, bool run_helper) {
+		setLayer2(position.row, position.column, tile, run_helper);
 	}
 
-	void Realm::setLayer3(const Position &position, TileID tile) {
-		setLayer3(position.row, position.column, tile);
+	void Realm::setLayer3(const Position &position, TileID tile, bool run_helper) {
+		setLayer3(position.row, position.column, tile, run_helper);
 	}
 
-	void Realm::setLayer1(const Position &position, const Identifier &tile) {
-		setLayer1(position.row, position.column, (*tilemap1->tileset)[tile]);
+	void Realm::setLayer1(const Position &position, const Identifier &tile, bool run_helper) {
+		setLayer1(position.row, position.column, (*tilemap1->tileset)[tile], run_helper);
 	}
 
-	void Realm::setLayer2(const Position &position, const Identifier &tile) {
-		setLayer2(position.row, position.column, (*tilemap2->tileset)[tile]);
+	void Realm::setLayer2(const Position &position, const Identifier &tile, bool run_helper) {
+		setLayer2(position.row, position.column, (*tilemap2->tileset)[tile], run_helper);
 	}
 
-	void Realm::setLayer3(const Position &position, const Identifier &tile) {
-		setLayer3(position.row, position.column, (*tilemap3->tileset)[tile]);
+	void Realm::setLayer3(const Position &position, const Identifier &tile, bool run_helper) {
+		setLayer3(position.row, position.column, (*tilemap3->tileset)[tile], run_helper);
 	}
 
 	TileID Realm::getLayer1(Index row, Index column) const {

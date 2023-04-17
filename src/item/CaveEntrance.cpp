@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "Position.h"
+#include "ThreadContext.h"
 #include "Tileset.h"
 #include "entity/Player.h"
 #include "biome/Biome.h"
@@ -69,7 +70,7 @@ namespace Game3 {
 			auto new_realm = Realm::create<Cave>(game, *realm_id, realm.id, new_tilemap, new_biomemap, cave_seed);
 			new_realm->outdoors = false;
 			Position entrance_position;
-			WorldGen::generateCave(new_realm, game.dynamicRNG, cave_seed, realm.getIndex(exit), entrance_position, realm.id);
+			WorldGen::generateCave(new_realm, threadContext.rng, cave_seed, realm.getIndex(exit), entrance_position, realm.id);
 			entrance = new_realm->getIndex(entrance_position);
 			game.realms.emplace(*realm_id, new_realm);
 			++game.cavesGenerated;

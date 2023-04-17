@@ -15,26 +15,37 @@ namespace Game3 {
 
 	void Volcanic::generate(Index row, Index column, std::default_random_engine &, const noise::module::Perlin &perlin, const WorldGenParams &params) {
 		Realm &realm = *getRealm();
-
-		const double noise = perlin.GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.666);
-		savedNoise[row * realm.getWidth() + column] = noise;
-
 		const auto wetness = params.wetness;
 
+		auto &layer1  = realm.tilemap1->getTilesUnsafe();
+		auto &tileset = *realm.tilemap1->tileset;
+		const Index index = realm.getIndex(row, column);
+
+		const double noise = perlin.GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.666);
+		savedNoise[index] = noise;
+
+		static const Identifier deeper_water  = "base:tile/deeper_water"_id;
+		static const Identifier deep_water    = "base:tile/deep_water"_id;
+		static const Identifier water         = "base:tile/water"_id;
+		static const Identifier shallow_water = "base:tile/shallow_water"_id;
+		static const Identifier volcanic_sand = "base:tile/volcanic_sand"_id;
+		static const Identifier lava          = "base:tile/lava"_id;
+		static const Identifier volcanic_rock = "base:tile/volcanic_rock"_id;
+
 		if (noise < wetness) {
-			realm.setLayer1({row, column}, "base:tile/deeper_water"_id);
+			layer1[index] = tileset[deeper_water];
 		} else if (noise < wetness + 0.1) {
-			realm.setLayer1({row, column}, "base:tile/deep_water"_id);
+			layer1[index] = tileset[deep_water];
 		} else if (noise < wetness + 0.2) {
-			realm.setLayer1({row, column}, "base:tile/water"_id);
+			layer1[index] = tileset[water];
 		} else if (noise < wetness + 0.3) {
-			realm.setLayer1({row, column}, "base:tile/shallow_water"_id);
+			layer1[index] = tileset[shallow_water];
 		} else if (noise < wetness + 0.4) {
-			realm.setLayer1({row, column}, "base:tile/volcanic_sand"_id);
+			layer1[index] = tileset[volcanic_sand];
 		} else if (0.85 < noise) {
-			realm.setLayer1({row, column}, "base:tile/lava"_id);
+			layer1[index] = tileset[lava];
 		} else {
-			realm.setLayer1({row, column}, "base:tile/volcanic_rock"_id);
+			layer1[index] = tileset[volcanic_rock];
 		}
 	}
 

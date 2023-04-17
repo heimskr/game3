@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "ThreadContext.h"
 #include "Tileset.h"
 #include "entity/Woodcutter.h"
 #include "game/Game.h"
@@ -127,7 +128,7 @@ namespace Game3 {
 			return;
 		}
 		// Choose one at random
-		chosenResource = choose(resource_choices, game.dynamicRNG);
+		chosenResource = choose(resource_choices, threadContext.rng);
 		// Pathfind to the door
 		pathfind(house.getTileEntity<Teleporter>()->position);
 	}

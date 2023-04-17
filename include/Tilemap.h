@@ -59,6 +59,7 @@ namespace Game3 {
 			void reset(TileID = 0);
 
 			inline const auto & getTiles() { return tiles; }
+			inline auto & getTilesUnsafe() { return tiles; }
 			inline size_t size() const { return tiles.size(); }
 			inline const TileID * data() const { return tiles.data(); }
 
