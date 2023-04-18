@@ -56,7 +56,6 @@ namespace Game3 {
 		if (texture == nullptr) {
 			if (needsTexture) {
 				setTexture(*sprite_renderer.canvas->game);
-				std::cout << "x] " << texture << "\n";
 				needsTexture = false;
 			} else
 				return;
