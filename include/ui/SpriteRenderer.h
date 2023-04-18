@@ -30,6 +30,7 @@ namespace Game3 {
 		public:
 			Canvas *canvas = nullptr;
 			Shader shader;
+			float divisor = 1.f;
 
 			SpriteRenderer(Canvas &);
 			~SpriteRenderer();

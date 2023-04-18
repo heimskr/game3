@@ -129,6 +129,7 @@ namespace Game3 {
 		renderer2.render(outdoors? game_time : 1, scale, center.x(), center.y());
 		renderer3.render(outdoors? game_time : 1, scale, center.x(), center.y());
 		sprite_renderer.update(bb_width, bb_height);
+		sprite_renderer.divisor = outdoors? game_time : 1;
 
 		std::shared_ptr<Entity> player;
 		for (const auto &entity: entities)
