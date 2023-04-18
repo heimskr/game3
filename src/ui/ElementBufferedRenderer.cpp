@@ -239,7 +239,7 @@ namespace Game3 {
 
 	void ElementBufferedRenderer::check(int handle, bool is_link) {
 		int success;
-		char info[1024];
+		std::array<char, 1024> info {};
 		if (is_link)
 			glGetProgramiv(handle, GL_LINK_STATUS, &success);
 		else
@@ -247,10 +247,10 @@ namespace Game3 {
 		if (!success) {
 			GLsizei len = 666;
 			if (is_link)
-				glGetProgramInfoLog(handle, GL_INFO_LOG_LENGTH, &len, info);
+				glGetProgramInfoLog(handle, GL_INFO_LOG_LENGTH, &len, info.data());
 			else
-				glGetShaderInfoLog(handle, 1024, &len, info);
-			std::cerr << "Error with " << handle << " (l=" << len << "): " << info << '\n';
+				glGetShaderInfoLog(handle, 1024, &len, info.data());
+			std::cerr << "Error with " << handle << " (l=" << len << "): " << info.data() << '\n';
 		}
 	}
 }
