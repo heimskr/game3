@@ -31,6 +31,8 @@ namespace Game3 {
 			Canvas *canvas = nullptr;
 			Shader shader;
 			float divisor = 1.f;
+			float centerX = 0.f;
+			float centerY = 0.f;
 
 			SpriteRenderer(Canvas &);
 			~SpriteRenderer();

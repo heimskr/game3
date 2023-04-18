@@ -433,6 +433,10 @@ namespace GL {
 				return true;
 			}
 
+			inline explicit operator bool() const {
+				return handle != 0;
+			}
+
 			inline auto getHandle() const { return handle; }
 			inline auto getWidth()  const { return width;  }
 			inline auto getHeight() const { return height; }

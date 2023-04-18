@@ -10,7 +10,7 @@
 #include "Texture.h"
 #include "Types.h"
 #include "ui/RectangleRenderer.h"
-#include "ui/Combiner.h"
+#include "ui/Multiplier.h"
 #include "ui/SpriteRenderer.h"
 #include "util/GL.h"
 
@@ -33,7 +33,7 @@ namespace Game3 {
 			GL::Texture textureA;
 			GL::Texture textureB;
 			GL::FBO fbo;
-			Combiner multiplier = {std::string_view(multiplier_frag, multiplier_frag_len)};
+			Multiplier multiplier;
 			float magic = 8.f;
 			int autofocusCounter = 0;
 			Gdk::Rectangle realmBounds;

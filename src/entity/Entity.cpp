@@ -234,8 +234,13 @@ namespace Game3 {
 
 		canvas.autofocusCounter = 0;
 		const auto &tilemap = *realm->tilemap1;
+		constexpr bool adjust = false; // Render-to-texture silliness
 		canvas.center.x() = -(column() - tilemap.width  / 2.f + 0.5f) - offset.x();
 		canvas.center.y() = -(row()    - tilemap.height / 2.f + 0.5f) - offset.y();
+		if (adjust) {
+			canvas.center.x() -= canvas.width()  / 32.f / canvas.scale;
+			canvas.center.y() += canvas.height() / 32.f / canvas.scale;
+		}
 	}
 
 	void Entity::teleport(const Position &new_position, bool clear_offset) {

@@ -9,13 +9,12 @@
 namespace Game3 {
 	class Texture;
 
-	class Combiner {
+	class Multiplier {
 		public:
 			Shader shader;
 
-			Combiner() = delete;
-			Combiner(std::string_view fragment_shader);
-			~Combiner();
+			Multiplier();
+			~Multiplier();
 
 			void reset();
 			void update(int backbuffer_width, int backbuffer_height);

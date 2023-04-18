@@ -61,6 +61,11 @@ namespace Game3 {
 		if (!initialized)
 			return;
 
+		if (dirty) {
+			recomputeLighting();
+			dirty = false;
+		}
+
 		glm::mat4 projection(1.f);
 		projection = glm::scale(projection, {tilemap->tileSize, -tilemap->tileSize, 1.f}) *
 		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1.f}) *
@@ -83,8 +88,6 @@ namespace Game3 {
 	void ElementBufferedRenderer::render(float divisor) {
 		if (!initialized)
 			return;
-
-		tilemap->getTexture(realm.getGame())->bind(0);
 
 		if (dirty) {
 			recomputeLighting();
@@ -157,6 +160,8 @@ namespace Game3 {
 	}
 
 	void ElementBufferedRenderer::recomputeLighting() {
+		return;
+
 		if (!tilemap)
 			return;
 
@@ -194,6 +199,7 @@ namespace Game3 {
 
 			if (tilemap->lavaQuadtree) {
 				Timer lava_timer("Lava");
+				tilemap->lavaQuadtree->absorb();
 				tilemap->lavaQuadtree->iterateFull([&](const Box &box) {
 					const float x = box.left * tilesize;
 					const float y = box.top  * tilesize;

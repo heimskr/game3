@@ -5,21 +5,21 @@
 #include "resources.h"
 #include "Shader.h"
 #include "Texture.h"
-#include "ui/Combiner.h"
+#include "ui/Multiplier.h"
 #include "util/GL.h"
 #include "util/Util.h"
 
 namespace Game3 {
-	Combiner::Combiner(std::string_view fragment): shader("combiner") {
-		shader.init(sprite_vert, fragment); CHECKGL
+	Multiplier::Multiplier(): shader("multiplier") {
+		shader.init({multiplier_vert, multiplier_vert_len}, {multiplier_frag, multiplier_frag_len}); CHECKGL
 		initRenderData(); CHECKGL
 	}
 
-	Combiner::~Combiner() {
+	Multiplier::~Multiplier() {
 		reset();
 	}
 
-	void Combiner::reset() {
+	void Multiplier::reset() {
 		if (initialized) {
 			glDeleteBuffers(1, &vbo); CHECKGL
 			glDeleteVertexArrays(1, &quadVAO); CHECKGL
@@ -30,7 +30,7 @@ namespace Game3 {
 		}
 	}
 
-	void Combiner::update(int backbuffer_width, int backbuffer_height) {
+	void Multiplier::update(int backbuffer_width, int backbuffer_height) {
 		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
 			backbufferWidth = backbuffer_width;
 			backbufferHeight = backbuffer_height;
@@ -38,11 +38,11 @@ namespace Game3 {
 		}
 	}
 
-	void Combiner::bind() {
+	void Multiplier::bind() {
 		shader.bind(); CHECKGL
 	}
 
-	void Combiner::operator()(GLuint texture0, GLuint texture1, float width, float height) {
+	void Multiplier::operator()(GLuint texture0, GLuint texture1, float width, float height) {
 		(void) width;
 		(void) height;
 
@@ -74,26 +74,26 @@ namespace Game3 {
 		glBindTexture(GL_TEXTURE_2D, texture1); CHECKGL
 		shader.set("texture1", 6);
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		// glEnable(GL_BLEND);
+		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glBindVertexArray(quadVAO); CHECKGL
 		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
 		glBindVertexArray(0); CHECKGL
 	}
 
-	void Combiner::operator()(const GL::Texture &texture0, const GL::Texture &texture1) {
+	void Multiplier::operator()(const GL::Texture &texture0, const GL::Texture &texture1) {
 		// assert(texture0.getWidth() == texture1.getWidth());
 		// assert(texture0.getHeight() == texture1.getHeight());
 		(*this)(texture0.getHandle(), texture1.getHandle(), texture0.getWidth(), texture0.getHeight());
 	}
 
-	void Combiner::operator()(const Texture &texture0, const Texture &texture1) {
+	void Multiplier::operator()(const Texture &texture0, const Texture &texture1) {
 		// assert(*texture0.width == *texture1.width);
 		// assert(*texture0.height == *texture1.height);
 		(*this)(*texture0.id, *texture1.id, *texture0.width, *texture0.height);
 	}
 
-	void Combiner::initRenderData() {
+	void Multiplier::initRenderData() {
 		static const float vertices[] {
 			0.f, 1.f, 0.f, 1.f,
 			1.f, 0.f, 1.f, 0.f,

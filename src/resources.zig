@@ -14,7 +14,7 @@ pub const shaders = [_]Shader{
 	.{ .name = "sprite" },
 	.{ .name = "blur" },
 	.{ .name = "reshader", .types = &.{.vert} },
-	.{ .name = "multiplier", .types = &.{.frag} },
+	.{ .name = "multiplier" },
 };
 
 comptime {

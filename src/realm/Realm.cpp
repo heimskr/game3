@@ -101,19 +101,28 @@ namespace Game3 {
 		Canvas &canvas = game.canvas;
 		auto &textureA = canvas.textureA;
 		auto &textureB = canvas.textureB;
-		// auto &fbo = canvas.fbo;
+		auto &fbo = canvas.fbo;
 		auto &multiplier = canvas.multiplier;
 
-		if (canvas.lastRealm != this) {
-			constexpr float factor = ElementBufferedRenderer::TEXTURE_SCALE;
-			const auto texture_width  = tilemap1->width  * tilemap1->tileSize * factor;
-			const auto texture_height = tilemap1->height * tilemap1->tileSize * factor;
-			if (textureA.getWidth() != texture_width || textureA.getHeight() != texture_height) {
-				textureA.initFloat(texture_width, texture_height, GL_NEAREST);
-				textureB.initFloat(texture_width, texture_height, GL_NEAREST);
-			}
-			canvas.lastRealm = this;
-		}
+		// if (canvas.lastRealm != this) {
+		// 	constexpr float factor = ElementBufferedRenderer::TEXTURE_SCALE;
+		// 	const auto texture_width  = tilemap1->width  * tilemap1->tileSize * factor;
+		// 	const auto texture_height = tilemap1->height * tilemap1->tileSize * factor;
+		// 	canvas.lastRealm = this;
+		// }
+
+		// if (textureA.getWidth() != width || textureA.getHeight() != height) {
+			// textureA.initFloat(width, height, GL_NEAREST);
+			// textureB.initFloat(width, height, GL_NEAREST);
+		// }
+
+		// static float last_scale = -1.f;
+		// if (scale != last_scale) {
+		// 	last_scale = scale;
+		// 	renderer1.markDirty();
+		// 	renderer2.markDirty();
+		// 	renderer3.markDirty();
+		// }
 
 		// const auto bb_width  = textureA.getWidth();
 		// const auto bb_height = textureA.getHeight();
@@ -125,9 +134,13 @@ namespace Game3 {
 		renderer1.onBackbufferResized(bb_width, bb_height);
 		renderer2.onBackbufferResized(bb_width, bb_height);
 		renderer3.onBackbufferResized(bb_width, bb_height);
-		renderer1.render(outdoors? game_time : 1, scale, center.x(), center.y());
-		renderer2.render(outdoors? game_time : 1, scale, center.x(), center.y());
-		renderer3.render(outdoors? game_time : 1, scale, center.x(), center.y());
+		const float cx = center.x();
+		const float cy = center.y();
+		renderer1.render(outdoors? game_time : 1, scale, cx, cy);
+		renderer2.render(outdoors? game_time : 1, scale, cx, cy);
+		renderer3.render(outdoors? game_time : 1, scale, cx, cy);
+		sprite_renderer.centerX = cx;
+		sprite_renderer.centerY = cy;
 		sprite_renderer.update(bb_width, bb_height);
 		sprite_renderer.divisor = outdoors? game_time : 1;
 
@@ -145,10 +158,12 @@ namespace Game3 {
 
 		multiplier.update(bb_width, bb_height);
 		// sprite_renderer.drawOnMap(texture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
-		// textureB.useInFB();
-		// game.canvas.multiplier(textureA, renderer1.lightTexture);
-		// textureA.useInFB();
-		// game.canvas.multiplier(textureB, renderer2.lightTexture);
+		// if (renderer1.lightTexture) {
+			// textureB.useInFB();
+			// multiplier(textureA, renderer1.lightTexture);
+			// textureA.useInFB();
+			// game.canvas.multiplier(textureB, renderer2.lightTexture);
+		// }
 		// textureB.useInFB();
 		// game.canvas.multiplier(textureA, renderer3.lightTexture);
 		// sprite_renderer.drawOnScreen(renderer1.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
@@ -158,9 +173,14 @@ namespace Game3 {
 		// fbo.undo();
 		// viewport.reset();
 
-		// sprite_renderer.update(width, height);
-		// sprite_renderer.drawOnMap(textureB, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
-		// sprite_renderer.drawOnMap(textureA, {
+		// GL::clear(1.f, 0.f, 1.f, 0.f);
+
+		// // sprite_renderer.update(width, height);
+		// // sprite_renderer.drawOnMap(textureB, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
+		// sprite_renderer.drawOnScreen(textureA, {
+		// 	// .x = -center.x() / 2.f,
+		// 	// .y = -0.5f,
+		// 	// .y = -center.y() / 2.f,
 		// 	.size_x = -1.f,
 		// 	.size_y = -1.f,
 		// });

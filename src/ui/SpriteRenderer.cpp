@@ -85,11 +85,11 @@ namespace Game3 {
 
 		options.x += canvas->width() / 2.f;
 		options.x -= tilemap->width * tilemap->tileSize * canvas->scale / canvas->magic * 2.f; // TODO: the math here is a little sus... things might cancel out
-		options.x += canvas->center.x() * canvas->scale * tilemap->tileSize / 2.f;
+		options.x += centerX * canvas->scale * tilemap->tileSize / 2.f;
 
 		options.y += canvas->height() / 2.f;
 		options.y -= tilemap->height * tilemap->tileSize * canvas->scale / canvas->magic * 2.f;
-		options.y += canvas->center.y() * canvas->scale * tilemap->tileSize / 2.f;
+		options.y += centerY * canvas->scale * tilemap->tileSize / 2.f;
 
 		shader.bind();
 
@@ -135,11 +135,11 @@ namespace Game3 {
 
 		options.x += canvas->width() / 2.f;
 		options.x -= tilemap->width * tilemap->tileSize * canvas->scale / canvas->magic * 2.f; // TODO: the math here is a little sus... things might cancel out
-		options.x += canvas->center.x() * canvas->scale * tilemap->tileSize / 2.f;
+		options.x += centerX * canvas->scale * tilemap->tileSize / 2.f;
 
 		options.y += canvas->height() / 2.f;
 		options.y -= tilemap->height * tilemap->tileSize * canvas->scale / canvas->magic * 2.f;
-		options.y += canvas->center.y() * canvas->scale * tilemap->tileSize / 2.f;
+		options.y += centerY * canvas->scale * tilemap->tileSize / 2.f;
 
 		shader.bind();
 

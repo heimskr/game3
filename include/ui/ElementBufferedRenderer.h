@@ -35,6 +35,7 @@ namespace Game3 {
 			void reset();
 			void init(std::shared_ptr<Tilemap>);
 			void render(float divisor, float scale, float center_x, float center_y);
+			/** Doesn't bind any texture—the caller must bind a texture before calling this. */
 			void render(float divisor);
 			void reupload();
 			bool onBackbufferResized(int width, int height);
