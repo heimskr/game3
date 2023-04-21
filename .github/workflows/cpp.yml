@@ -9,6 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - uses: awalsh128/cache-apt-pkgs-action@latest
+      with:
+        packages: libglu1-mesa-dev libglm-dev libglfw3-dev libzstd-dev libgtk-4-dev
+        version: 1.0
     - uses: actions/checkout@v3
     - name: make
       run: make -j
