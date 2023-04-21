@@ -7,4 +7,4 @@ which features heavily in this project, and for creating custom anvil and furnac
 
 Thanks to Tilation for their [indoor tileset](https://tilation.itch.io/16x16-small-indoor-tileset).
 
-Thanks to [Vadim](https://github.com/Vadimuh) and [Fayabella](https://github.com/Fayabella) for their flower sprites.
+Thanks to [Vadim](https://github.com/Vadimuh), [Fayabella](https://github.com/Fayabella) and [Bamboozle.jpg](https://github.com/Bamboozle-jpg) for their flower sprites.
