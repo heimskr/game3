@@ -4,6 +4,7 @@
 #include "game/Game.h"
 #include "game/InteractionSet.h"
 #include "game/Inventory.h"
+#include "item/Plantable.h"
 #include "realm/Realm.h"
 
 namespace Game3 {
@@ -78,6 +79,20 @@ namespace Game3 {
 						// setTooldown doesn't call notifyOwner on the player's inventory, so we have to do it here.
 						player.inventory->notifyOwner();
 					return true;
+				}
+			}
+		}
+
+		if (tileset.isInCategory(tile2, "base:category/plantable"_id)) {
+			if (auto iter = game.itemsByAttribute.find("base:attribute/plantable"_id); iter != game.itemsByAttribute.end()) {
+				for (const auto &item: iter->second) {
+					if (auto cast = std::dynamic_pointer_cast<Plantable>(item); cast && cast->tilename == tile2) {
+						player.give({game, item});
+						realm.setLayer2(position, tileset.getEmptyID());
+						game.activateContext();
+						realm.renderer2.reupload();
+						return true;
+					}
 				}
 			}
 		}

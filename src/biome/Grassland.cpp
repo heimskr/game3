@@ -61,7 +61,10 @@ namespace Game3 {
 		} else if (stoneLevel < noise) {
 			layer1[index] = tileset[stone];
 		} else {
-			layer1[index] = tileset[choose(grasses, rng)];
+			if (std::uniform_int_distribution(0, 15)(rng) == 0)
+				layer1[index] = tileset[choose(tileset.getTilesByCategory("base:category/small_flowers"), rng)];
+			else
+				layer1[index] = tileset[choose(grasses, rng)];
 			const double forest_noise = forestPerlin->GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.5);
 			if (params.forestThreshold < forest_noise) {
 				uint8_t mod = column % 2;

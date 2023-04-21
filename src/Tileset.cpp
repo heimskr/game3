@@ -136,11 +136,17 @@ namespace Game3 {
 	}
 
 	bool Tileset::isInCategory(const Identifier &tilename, const Identifier &category) const {
-		return inverseCategories.at(tilename).contains(category);
+		if (auto iter = inverseCategories.find(tilename); iter != inverseCategories.end())
+			return iter->second.contains(category);
+		return false;
 	}
 
 	bool Tileset::hasName(const Identifier &tilename) const {
 		return ids.contains(tilename);
+	}
+
+	bool Tileset::hasCategory(const Identifier &tilename) const {
+		return categories.contains(tilename);
 	}
 
 	const TileID & Tileset::operator[](const Identifier &tilename) const {

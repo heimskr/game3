@@ -23,6 +23,7 @@
 #include "item/Landfill.h"
 #include "item/Landfills.h"
 #include "item/Mushroom.h"
+#include "item/Plantable.h"
 #include "item/Sapling.h"
 #include "item/Tool.h"
 #include "realm/Keep.h"
@@ -124,6 +125,36 @@ namespace Game3 {
 		add(std::make_shared<Mushroom>("base:item/indigo_milkcap",  "Indigo Milkcap",     20, 11));
 		add(std::make_shared<Mushroom>("base:item/black_trumpet",   "Black Trumpet",      20, 29));
 		add(std::make_shared<Mushroom>("base:item/grey_knight",     "Grey Knight",        20, 12));
+		add(std::make_shared<Plantable>("base:item/flower1_red",    "Red Flower",    "base:tile/flower1_red",    10));
+		add(std::make_shared<Plantable>("base:item/flower1_orange", "Orange Flower", "base:tile/flower1_orange", 10));
+		add(std::make_shared<Plantable>("base:item/flower1_yellow", "Yellow Flower", "base:tile/flower1_yellow", 10));
+		add(std::make_shared<Plantable>("base:item/flower1_green",  "Green Flower",  "base:tile/flower1_green",  10));
+		add(std::make_shared<Plantable>("base:item/flower1_blue",   "Blue Flower",   "base:tile/flower1_blue",   10));
+		add(std::make_shared<Plantable>("base:item/flower1_purple", "Purple Flower", "base:tile/flower1_purple", 10));
+		add(std::make_shared<Plantable>("base:item/flower2_red",    "Red Flower",    "base:tile/flower2_red",    10));
+		add(std::make_shared<Plantable>("base:item/flower2_orange", "Orange Flower", "base:tile/flower2_orange", 10));
+		add(std::make_shared<Plantable>("base:item/flower2_yellow", "Yellow Flower", "base:tile/flower2_yellow", 10));
+		add(std::make_shared<Plantable>("base:item/flower2_green",  "Green Flower",  "base:tile/flower2_green",  10));
+		add(std::make_shared<Plantable>("base:item/flower2_blue",   "Blue Flower",   "base:tile/flower2_blue",   10));
+		add(std::make_shared<Plantable>("base:item/flower2_purple", "Purple Flower", "base:tile/flower2_purple", 10));
+		add(std::make_shared<Plantable>("base:item/flower3_red",    "Red Flower",    "base:tile/flower3_red",    10));
+		add(std::make_shared<Plantable>("base:item/flower3_orange", "Orange Flower", "base:tile/flower3_orange", 10));
+		add(std::make_shared<Plantable>("base:item/flower3_yellow", "Yellow Flower", "base:tile/flower3_yellow", 10));
+		add(std::make_shared<Plantable>("base:item/flower3_green",  "Green Flower",  "base:tile/flower3_green",  10));
+		add(std::make_shared<Plantable>("base:item/flower3_blue",   "Blue Flower",   "base:tile/flower3_blue",   10));
+		add(std::make_shared<Plantable>("base:item/flower3_purple", "Purple Flower", "base:tile/flower3_purple", 10));
+		add(std::make_shared<Plantable>("base:item/flower4_red",    "Red Flower",    "base:tile/flower4_red",    10));
+		add(std::make_shared<Plantable>("base:item/flower4_orange", "Orange Flower", "base:tile/flower4_orange", 10));
+		add(std::make_shared<Plantable>("base:item/flower4_yellow", "Yellow Flower", "base:tile/flower4_yellow", 10));
+		add(std::make_shared<Plantable>("base:item/flower4_green",  "Green Flower",  "base:tile/flower4_green",  10));
+		add(std::make_shared<Plantable>("base:item/flower4_blue",   "Blue Flower",   "base:tile/flower4_blue",   10));
+		add(std::make_shared<Plantable>("base:item/flower4_purple", "Purple Flower", "base:tile/flower4_purple", 10));
+		add(std::make_shared<Plantable>("base:item/flower5_red",    "Red Flower",    "base:tile/flower5_red",    10));
+		add(std::make_shared<Plantable>("base:item/flower5_orange", "Orange Flower", "base:tile/flower5_orange", 10));
+		add(std::make_shared<Plantable>("base:item/flower5_yellow", "Yellow Flower", "base:tile/flower5_yellow", 10));
+		add(std::make_shared<Plantable>("base:item/flower5_green",  "Green Flower",  "base:tile/flower5_green",  10));
+		add(std::make_shared<Plantable>("base:item/flower5_blue",   "Blue Flower",   "base:tile/flower5_blue",   10));
+		add(std::make_shared<Plantable>("base:item/flower5_purple", "Purple Flower", "base:tile/flower5_purple", 10));
 	}
 
 	void Game::addGhosts() {
@@ -195,6 +226,8 @@ namespace Game3 {
 
 	void Game::add(std::shared_ptr<Item> item) {
 		registry<ItemRegistry>().add(item->identifier, item);
+		for (const auto &attribute: item->attributes)
+			itemsByAttribute[attribute].insert(item);
 	}
 
 	void Game::add(std::shared_ptr<GhostDetails> details) {

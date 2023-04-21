@@ -24,6 +24,7 @@ namespace Game3 {
 	class Player;
 	struct GhostDetails;
 	struct InteractionSet;
+	struct Plantable;
 
 	class Game: public std::enable_shared_from_this<Game> {
 		public:
@@ -38,6 +39,7 @@ namespace Game3 {
 			float hourOffset = 12.;
 			size_t cavesGenerated = 0;
 			std::map<RealmType, std::shared_ptr<InteractionSet>> interactionSets;
+			std::map<Identifier, std::unordered_set<std::shared_ptr<Item>>> itemsByAttribute;
 
 			Game() = delete;
 
