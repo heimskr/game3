@@ -20,10 +20,10 @@ else
 LDFLAGS := $(LDFLAGS) -lGL
 endif
 
-DEPS         := eigen3 glm glfw3 libzstd gtk4 gtkmm-4.0 nlohmann_json glu
+DEPS         := eigen3 glm glfw3 libzstd gtk4 gtkmm-4.0 glu
 OUTPUT       := game3
 COMPILER     ?= g++
-CPPFLAGS     := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude -Istb -Ilibnoise/src $(LTO)
+CPPFLAGS     := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude -Ijson/include -Istb -Ilibnoise/src $(LTO)
 ZIG          ?= zig
 # --main-pkg-path is needed as otherwise it wouldn't let you embed any file outside of src/
 ZIGFLAGS     := -O ReleaseSmall --main-pkg-path .
