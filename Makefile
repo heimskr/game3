@@ -29,17 +29,21 @@ ZIG          ?= zig
 ZIGFLAGS     := -O ReleaseSmall --main-pkg-path .
 INCLUDES     := $(shell pkg-config --cflags $(DEPS))
 LIBS         := $(shell pkg-config --libs   $(DEPS))
-LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread -Llibnoise/build/src -lnoise $(LTO)
+LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread $(LTO)
 SOURCES      := $(shell find src -name \*.cpp) src/gtk_resources.cpp
 OBJECTS      := $(SOURCES:.cpp=.o) src/resources.o
 RESXML       := $(OUTPUT).gresource.xml
 CLOC_OPTIONS := . --exclude-dir=.vscode,libnoise,stb --fullpath --not-match-f='^.\/(src\/(gtk_)?resources\.cpp|include\/resources\.h)$$'
 GLIB_COMPILE_RESOURCES = $(shell pkg-config --variable=glib_compile_resources gio-2.0)
 RESGEN       := ./resgen
+NOISE_OBJ    := libnoise/src/libnoise.a
 
 .PHONY: all clean flags test
 
 all: $(OUTPUT)
+
+$(NOISE_OBJ):
+	cd libnoise && cmake . && make
 
 flags:
 	@ echo "COMPILER: $(COMPILER)"
@@ -66,7 +70,7 @@ $(RESGEN): src/resgen.zig src/resources.zig
 include/resources.h: $(RESGEN)
 	$(RESGEN) -h > $@
 
-$(OUTPUT): $(OBJECTS)
+$(OUTPUT): $(OBJECTS) $(NOISE_OBJ)
 	@ printf "\e[2m[\e[22;36mld\e[39;2m]\e[22m $@\n"
 	@ $(COMPILER) $^ -o $@ $(LDFLAGS)
 ifeq ($(BUILD),release)
