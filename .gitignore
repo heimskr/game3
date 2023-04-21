@@ -9,3 +9,4 @@ include/resources.h
 *.zst
 /.github-deps
 /game3.zip
+*.o.tmp

@@ -22,7 +22,7 @@ endif
 
 DEPS         := glm glfw3 libzstd gtk4 gtkmm-4.0 glu
 OUTPUT       := game3
-COMPILER     ?= g++
+COMPILER     ?= clang++
 CPPFLAGS     := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude -Ijson/include -Ieigen -Istb -Ilibnoise/src $(LTO)
 ZIG          ?= zig
 # --main-pkg-path is needed as otherwise it wouldn't let you embed any file outside of src/
@@ -31,6 +31,7 @@ ifeq ($(GITHUB),true)
 INCLUDES     := $(shell PKG_CONFIG_PATH=.github-deps/prefix/lib/pkgconfig pkg-config --cflags $(DEPS))
 LIBS         := $(shell PKG_CONFIG_PATH=.github-deps/prefix/lib/pkgconfig pkg-config --libs   $(DEPS))
 ZIG          := .zig/zig
+COMPILER     := clang++-14
 else
 INCLUDES     := $(shell pkg-config --cflags $(DEPS))
 LIBS         := $(shell pkg-config --libs   $(DEPS))
