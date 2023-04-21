@@ -6,10 +6,11 @@ cd .github-deps
 wget https://download.gnome.org/sources/glib/2.76/glib-2.76.1.tar.xz
 tar xf glib-2.76.1.tar.xz
 cd glib-2.76.1
-meson setup --libdir lib -Dtests=false meson_build .
+meson setup --prefix $(realpath ../prefix) --libdir lib -Dtests=false meson_build .
 cd meson_build
 sudo ninja install
 cd ../..
+sudo cp -r prefix/* /usr/
 
 wget https://download.gnome.org/sources/gtkmm/4.10/gtkmm-4.10.0.tar.xz
 tar xf gtkmm-4.10.0.tar.xz
