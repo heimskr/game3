@@ -17,7 +17,7 @@ jobs:
 
     - uses: awalsh128/cache-apt-pkgs-action@latest
       with:
-        packages: libglu1-mesa-dev libglm-dev libglfw3-dev libzstd-dev meson cmake libxml2-dev doxygen graphviz xsltproc libstdc++-12-dev libboost-all-dev docbook-xsl libxkbcommon-dev libxi-dev
+        packages: libglu1-mesa-dev libglm-dev libglfw3-dev libzstd-dev meson cmake libxml2-dev doxygen graphviz xsltproc libstdc++-12-dev libboost-all-dev docbook-xsl libxkbcommon-dev libxi-dev libxcursor-dev libxdamage-dev libxfixes-dev libfontconfig-dev
         version: 1.0
 
     - uses: actions/checkout@v3
