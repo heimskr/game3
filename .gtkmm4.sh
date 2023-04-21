@@ -8,7 +8,7 @@ tar xf glib-2.76.1.tar.xz
 cd glib-2.76.1
 meson setup --prefix $(realpath ../prefix) --libdir lib -Dtests=false meson_build .
 cd meson_build
-sudo ninja install
+ninja install
 cd ../..
 sudo cp -r prefix/* /usr/
 
