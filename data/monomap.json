@@ -561,13 +561,19 @@
 				"base:tile/door1",
 				"base:tile/door2"
 			],
-			"base:category/tree_soil": [
+			"base:category/plant_soil": [
 				"base:tile/grass",
 				"base:tile/grass_alt1",
 				"base:tile/grass_alt2",
 				"base:tile/light_grass",
 				"base:tile/dirt",
-				"base:tile/forest_floor"
+				"base:tile/forest_floor",
+				"base:tile/small_flowers_red",
+				"base:tile/small_flowers_orange",
+				"base:tile/small_flowers_yellow",
+				"base:tile/small_flowers_green",
+				"base:tile/small_flowers_blue",
+				"base:tile/small_flowers_purple"
 			],
 			"base:category/flowers": [
 				"base:tile/flower1_red",
