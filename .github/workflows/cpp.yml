@@ -11,11 +11,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Setup upterm session
-      uses: lhotari/action-upterm@v1
-      with:
-        limit-access-to-actor: true
-        limit-access-to-users: heimskr
+    # - name: Setup upterm session
+    #   uses: lhotari/action-upterm@v1
+    #   with:
+    #     limit-access-to-actor: true
+    #     limit-access-to-users: heimskr
 
     - name: Cache gtkmm4
       id: cache-gtkmm4
