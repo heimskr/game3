@@ -9,16 +9,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-
-    - name: Setup upterm session
-      uses: lhotari/action-upterm@v1
-      with:
-        limit-access-to-actor: true
-        limit-access-to-users: heimskr
-
     - uses: awalsh128/cache-apt-pkgs-action@latest
       with:
-        packages: libglu1-mesa-dev libglm-dev libglfw3-dev libzstd-dev meson cmake libxml2-dev doxygen graphviz xsltproc libstdc++-12-dev libboost-all-dev docbook-xsl adwaita-icon-theme at-spi2-core dbus dh-sequence-translations docbook-xml docbook-xsl dpkg-dev fonts-cantarell fonts-dejavu-core gnome-pkg-tools gobject-introspection gsettings-desktop-schemas iso-codes libavcodec-dev libavfilter-dev libavformat-dev libavutil-dev libcairo2-dev libcloudproviders-dev libcolord-dev libcups2-dev libegl1-mesa-dev libepoxy-dev libfontconfig1-dev libfribidi-dev libgdk-pixbuf-2.0-dev libgirepository1.0-dev libglib2.0-dev libgraphene-1.0-dev libgstreamer-plugins-bad1.0-dev libgstreamer1.0-dev libharfbuzz-dev libjpeg-dev libjson-glib-dev libpango1.0-dev libpng-dev libpolkit-gobject-1-dev librsvg2-common librsvg2-dev libswscale-dev libsysprof-capture-4-dev libtiff-dev libvulkan-dev libwayland-dev libx11-dev libxcomposite-dev libxcursor-dev libxdamage-dev libxext-dev libxfixes-dev libxi-dev libxinerama-dev libxkbcommon-dev libxkbfile-dev libxml2-utils libxrandr-dev locales locales-all meson pkg-config python3-docutils python3-gi sassc ttf-bitstream-vera wayland-protocols weston xauth xsltproc xvfb
+        packages: libglu1-mesa-dev libglm-dev libglfw3-dev libzstd-dev meson cmake libxml2-dev doxygen graphviz xsltproc libstdc++-12-dev libboost-all-dev docbook-xsl adwaita-icon-theme at-spi2-core dbus dh-sequence-translations docbook-xml docbook-xsl dpkg-dev fonts-cantarell fonts-dejavu-core gnome-pkg-tools gobject-introspection gsettings-desktop-schemas iso-codes libavcodec-dev libavfilter-dev libavformat-dev libavutil-dev libcairo2-dev libcloudproviders-dev libcolord-dev libcups2-dev libegl1-mesa-dev libepoxy-dev libfontconfig1-dev libfribidi-dev libgdk-pixbuf-2.0-dev libgirepository1.0-dev libglib2.0-dev libgraphene-1.0-dev libharfbuzz-dev libjpeg-dev libjson-glib-dev libpango1.0-dev libpng-dev libpolkit-gobject-1-dev librsvg2-common librsvg2-dev libswscale-dev libsysprof-capture-4-dev libtiff-dev libvulkan-dev libwayland-dev libx11-dev libxcomposite-dev libxcursor-dev libxdamage-dev libxext-dev libxfixes-dev libxi-dev libxinerama-dev libxkbcommon-dev libxkbfile-dev libxml2-utils libxrandr-dev locales locales-all meson pkg-config python3-docutils python3-gi sassc ttf-bitstream-vera wayland-protocols weston xauth xsltproc xvfb
         version: 1.0
 
     - uses: actions/checkout@v3
