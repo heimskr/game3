@@ -10,7 +10,7 @@ meson setup --prefix /usr --libdir lib -Dtests=false meson_build .
 cd meson_build
 ninja
 sudo ninja install
-meson reconfigure --prefix $(realpath ../prefix) .
+meson configure --prefix $(realpath ../prefix) .
 ninja install
 cd ../..
 
