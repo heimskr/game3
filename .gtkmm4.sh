@@ -6,7 +6,7 @@ cd .github-deps
 wget https://download.gnome.org/sources/glib/2.76/glib-2.76.1.tar.xz
 tar xf glib-2.76.1.tar.xz
 cd glib-2.76.1
-meson setup --prefix /usr --libdir lib -Dtests=false meson_build .
+meson setup --libdir lib -Dtests=false meson_build .
 cd meson_build
 sudo ninja install
 cd ..
