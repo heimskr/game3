@@ -48,7 +48,7 @@ flags:
 src/gtk_resources.cpp: $(RESXML) $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=resources --generate-dependencies $(RESXML))
 	$(GLIB_COMPILE_RESOURCES) --target=$@ --sourcedir=resources --generate-source $<
 
-%.o: %.cpp
+%.o: %.cpp include/resources.h
 	@ printf "\e[2m[\e[22;32mc++\e[39;2m]\e[22m $< \e[2m$(strip $(BUILDFLAGS) $(LTO))\e[22m\n"
 	@ $(COMPILER) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
 
@@ -63,7 +63,7 @@ $(RESGEN): src/resgen.zig src/resources.zig
 include/resources.h: $(RESGEN)
 	$(RESGEN) -h > $@
 
-$(OUTPUT): $(OBJECTS) include/resources.h
+$(OUTPUT): $(OBJECTS)
 	@ printf "\e[2m[\e[22;36mld\e[39;2m]\e[22m $@\n"
 	@ $(COMPILER) $^ -o $@ $(LDFLAGS)
 ifeq ($(BUILD),release)
