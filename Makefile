@@ -6,6 +6,9 @@ BUILDFLAGS := -g -O0
 else ifeq ($(BUILD),tsan)
 BUILDFLAGS := -g -O1 -fsanitize=thread
 LDFLAGS    := -fsanitize=thread
+else ifeq ($(BUILD),nonnative)
+BUILDFLAGS := -Ofast
+LTO        := -flto
 else
 BUILDFLAGS := -Ofast -march=native
 LTO        := -flto
