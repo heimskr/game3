@@ -63,7 +63,7 @@ $(RESGEN): src/resgen.zig src/resources.zig
 include/resources.h: $(RESGEN)
 	$(RESGEN) -h > $@
 
-$(OUTPUT): $(OBJECTS)
+$(OUTPUT): $(OBJECTS) include/resources.h
 	@ printf "\e[2m[\e[22;36mld\e[39;2m]\e[22m $@\n"
 	@ $(COMPILER) $^ -o $@ $(LDFLAGS)
 ifeq ($(BUILD),release)
