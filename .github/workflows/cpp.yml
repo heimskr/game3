@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: awalsh128/cache-apt-pkgs-action@latest
       with:
-        packages: libglu1-mesa-dev libglm-dev libglfw3-dev libzstd-dev meson cmake libxml2-dev doxygen graphviz xsltproc libstdc++-12-dev libboost-all-dev docbook-xsl
+        packages: libglu1-mesa-dev libglm-dev libglfw3-dev libzstd-dev meson cmake libxml2-dev doxygen graphviz xsltproc libstdc++-12-dev libboost-all-dev docbook-xsl libxkbcommon-dev libgstreamer-plugins-bad1.0-dev
         version: 1.0
 
     - uses: actions/checkout@v3
@@ -20,13 +20,12 @@ jobs:
       id: cache-gtkmm4
       uses: actions/cache@v3
       with:
-        path: /usr/local/include/gtkmm-4.0
+        path: .github-deps/prefix
         key: ${{ runner.os }}-gtkmm4
-        lookup-only: true
 
     - name: Build Gtkmm4
       if: steps.cache-gtkmm4.outputs.cache-hit != 'true'
       run: ./.gtkmm4.sh
 
     - name: make
-      run: make -j
+      run: make -j GITHUB=true

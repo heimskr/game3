@@ -7,3 +7,4 @@ src/gtk_resources.cpp
 /resgen
 include/resources.h
 *.zst
+/.github-deps
