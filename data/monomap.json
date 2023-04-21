@@ -51,7 +51,13 @@
 			"base:tile/volcanic_rock"
 		],
 		"walkable": [
-			"base:tile/oil"
+			"base:tile/oil",
+			"base:tile/flower_red",
+			"base:tile/flower_orange",
+			"base:tile/flower_yellow",
+			"base:tile/flower_green",
+			"base:tile/flower_blue",
+			"base:tile/flower_purple"
 		],
 		"solid": [
 			"base:tile/tower_nw",
@@ -361,7 +367,14 @@
 			"base:tile/winter_tree2":         740,
 			"base:tile/winter_tree3":         741,
 			"base:tile/charred_stump":        742,
-			"base:tile/winter_stump":         743
+			"base:tile/winter_stump":         743,
+			"base:tile/pride_flag":           744,
+			"base:tile/flower_red":           745,
+			"base:tile/flower_orange":        746,
+			"base:tile/flower_yellow":        747,
+			"base:tile/flower_green":         748,
+			"base:tile/flower_blue":          749,
+			"base:tile/flower_purple":        750
 		},
 		"stacks": {
 			"base:category/wooden_walls": "base:item/wooden_wall",
@@ -465,6 +478,14 @@
 				"base:tile/light_grass",
 				"base:tile/dirt",
 				"base:tile/forest_floor"
+			],
+			"base:category/flowers": [
+				"base:tile/flower_red",
+				"base:tile/flower_orange",
+				"base:tile/flower_yellow",
+				"base:tile/flower_green",
+				"base:tile/flower_blue",
+				"base:tile/flower_purple"
 			]
 		}
 	}

@@ -1,3 +1,5 @@
+#include <unordered_set>
+
 #include "Tileset.h"
 #include "biome/Grassland.h"
 #include "item/Item.h"
@@ -10,6 +12,13 @@
 #include "worldgen/WorldGen.h"
 
 namespace Game3 {
+	static const std::vector<Identifier> grasses {
+		"base:tile/grass_alt1"_id, "base:tile/grass_alt2"_id,
+		"base:tile/grass"_id, "base:tile/grass"_id, "base:tile/grass"_id, "base:tile/grass"_id,
+	};
+
+	static const std::unordered_set<Identifier> grassSet {grasses.begin(), grasses.end()};
+
 	void Grassland::init(Realm &realm, int noise_seed, const std::shared_ptr<double[]> &saved_noise) {
 		Biome::init(realm, noise_seed, saved_noise);
 		forestPerlin = std::make_shared<noise::module::Perlin>();
@@ -20,11 +29,6 @@ namespace Game3 {
 		Realm &realm = *getRealm();
 		const auto wetness    = params.wetness;
 		const auto stoneLevel = params.stoneLevel;
-
-		static const std::vector<Identifier> grasses {
-			"base:tile/grass_alt1"_id, "base:tile/grass_alt2"_id,
-			"base:tile/grass"_id, "base:tile/grass"_id, "base:tile/grass"_id, "base:tile/grass"_id,
-		};
 
 		auto &layer1  = realm.tilemap1->getTilesUnsafe();
 		auto &tileset = *realm.tilemap1->tileset;
@@ -95,6 +99,16 @@ namespace Game3 {
 					realm.add(TileEntity::create<ItemSpawner>(game, Position(row, column), 0.00025f, std::move(mushrooms)));
 				}
 			}
+		}
+
+		const auto &tileset = realm.getTileset();
+
+		if (grassSet.contains(tileset[realm.getLayer1(row, column)]) && distribution(rng) < 1) {
+			static const std::array<Identifier, 6> flowers {
+				"base:tile/flower_red", "base:tile/flower_orange", "base:tile/flower_yellow", "base:tile/flower_green", "base:tile/flower_blue", "base:tile/flower_purple",
+			};
+
+			realm.setLayer2({row, column}, choose(flowers), false);
 		}
 	}
 }
