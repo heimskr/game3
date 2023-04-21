@@ -48,10 +48,7 @@ NOISE_OBJ    := libnoise/src/libnoise.a
 
 all: $(NOISE_OBJ) $(OUTPUT)
 
-submodules:
-	git submodule update --init --recursive
-
-$(NOISE_OBJ): submodules
+$(NOISE_OBJ):
 	cd libnoise && cmake . && make
 
 flags:
@@ -108,49 +105,3 @@ depend: $(RESGEN) include/resources.h
 	@ rm $(DEPFILE).bak
 
 sinclude $(DEPFILE)
-
-libnoise/src/noise/basictypes.h: submodules
-libnoise/src/noise/vectortable.h: submodules
-libnoise/src/noise/noisegen.h: submodules
-libnoise/src/noise/mathconsts.h: submodules
-libnoise/src/noise/model/line.h: submodules
-libnoise/src/noise/model/plane.h: submodules
-libnoise/src/noise/model/cylinder.h: submodules
-libnoise/src/noise/model/sphere.h: submodules
-libnoise/src/noise/model/model.h: submodules
-libnoise/src/noise/module/module.h: submodules
-libnoise/src/noise/module/curve.h: submodules
-libnoise/src/noise/module/min.h: submodules
-libnoise/src/noise/module/invert.h: submodules
-libnoise/src/noise/module/max.h: submodules
-libnoise/src/noise/module/rotatepoint.h: submodules
-libnoise/src/noise/module/spheres.h: submodules
-libnoise/src/noise/module/ridgedmulti.h: submodules
-libnoise/src/noise/module/clamp.h: submodules
-libnoise/src/noise/module/const.h: submodules
-libnoise/src/noise/module/power.h: submodules
-libnoise/src/noise/module/cache.h: submodules
-libnoise/src/noise/module/add.h: submodules
-libnoise/src/noise/module/modulebase.h: submodules
-libnoise/src/noise/module/abs.h: submodules
-libnoise/src/noise/module/select.h: submodules
-libnoise/src/noise/module/blend.h: submodules
-libnoise/src/noise/module/billow.h: submodules
-libnoise/src/noise/module/multiply.h: submodules
-libnoise/src/noise/module/scalebias.h: submodules
-libnoise/src/noise/module/cylinders.h: submodules
-libnoise/src/noise/module/voronoi.h: submodules
-libnoise/src/noise/module/terrace.h: submodules
-libnoise/src/noise/module/exponent.h: submodules
-libnoise/src/noise/module/displace.h: submodules
-libnoise/src/noise/module/perlin.h: submodules
-libnoise/src/noise/module/checkerboard.h: submodules
-libnoise/src/noise/module/scalepoint.h: submodules
-libnoise/src/noise/module/translatepoint.h: submodules
-libnoise/src/noise/module/turbulence.h: submodules
-libnoise/src/noise/latlon.h: submodules
-libnoise/src/noise/interp.h: submodules
-libnoise/src/noise/misc.h: submodules
-libnoise/src/noise/exception.h: submodules
-libnoise/src/noise/noise.h: submodules
-libnoise/noiseutils/noiseutils.h: submodules
