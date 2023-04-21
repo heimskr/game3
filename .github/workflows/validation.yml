@@ -1,8 +1,7 @@
-name: C++ CI
+name: C++ CI (Validation)
 on:
-  push:
+  pull_request:
     branches: [ "master" ]
-  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -47,31 +46,3 @@ jobs:
 
     - name: Compile
       run: make -j2 zip GITHUB=true BUILD=nonnative
-
-    - name: Create Draft Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: release-${{github.sha}}
-        release_name: Game3
-        draft: true
-        prerelease: false
-
-    - name: Upload game3.zip
-      uses: actions/upload-release-asset@v1.0.1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./game3.zip
-        asset_name: game3.zip
-        asset_content_type: application/zip
-
-    - name: Publish Release
-      uses: eregon/publish-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        release_id: ${{ steps.create_release.outputs.id }}
