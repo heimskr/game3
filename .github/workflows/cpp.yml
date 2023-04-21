@@ -41,8 +41,8 @@ jobs:
         packages: libglu1-mesa-dev libglm-dev libglfw3-dev libzstd-dev libpango1.0-dev libgraphene-1.0-dev
         version: 1.0
 
-    - name: Copy Prefix
-      run: sudo cp -r .github-deps/prefix/* /usr/
+    # - name: Copy Prefix
+    #   run: sudo cp -r .github-deps/prefix/* /usr/
 
     - name: Build gtkmm4
       if: steps.cache-gtkmm4.outputs.cache-hit != 'true'
