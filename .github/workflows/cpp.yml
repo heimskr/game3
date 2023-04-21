@@ -38,7 +38,7 @@ jobs:
       if: steps.cache-gtkmm4.outputs.cache-hit == 'true'
       uses: awalsh128/cache-apt-pkgs-action@latest
       with:
-        packages: libglu1-mesa-dev libglm-dev libglfw3-dev libzstd-dev
+        packages: libglu1-mesa-dev libglm-dev libglfw3-dev libzstd-dev libpango1.0-dev
         version: 1.0
 
     - name: Build gtkmm4
