@@ -9,6 +9,7 @@ cd glib-2.76.1
 meson setup --prefix /usr --libdir lib -Dtests=false meson_build .
 cd meson_build
 sudo ninja install
+cd ..
 meson setup --prefix $(realpath ../prefix) --libdir lib -Dtests=false meson_build_prefix .
 cd meson_build_prefix
 ninja install
