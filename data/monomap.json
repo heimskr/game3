@@ -558,6 +558,48 @@
 				"base:tile/flower5_green",
 				"base:tile/flower5_blue",
 				"base:tile/flower5_purple"
+			],
+			"base:category/red_flowers": [
+				"base:tile/flower1_red",
+				"base:tile/flower2_red",
+				"base:tile/flower3_red",
+				"base:tile/flower4_red",
+				"base:tile/flower5_red"
+			],
+			"base:category/orange_flowers": [
+				"base:tile/flower1_orange",
+				"base:tile/flower2_orange",
+				"base:tile/flower3_orange",
+				"base:tile/flower4_orange",
+				"base:tile/flower5_orange"
+			],
+			"base:category/yellow_flowers": [
+				"base:tile/flower1_yellow",
+				"base:tile/flower2_yellow",
+				"base:tile/flower3_yellow",
+				"base:tile/flower4_yellow",
+				"base:tile/flower5_yellow"
+			],
+			"base:category/green_flowers": [
+				"base:tile/flower1_green",
+				"base:tile/flower2_green",
+				"base:tile/flower3_green",
+				"base:tile/flower4_green",
+				"base:tile/flower5_green"
+			],
+			"base:category/blue_flowers": [
+				"base:tile/flower1_blue",
+				"base:tile/flower2_blue",
+				"base:tile/flower3_blue",
+				"base:tile/flower4_blue",
+				"base:tile/flower5_blue"
+			],
+			"base:category/purple_flowers": [
+				"base:tile/flower1_purple",
+				"base:tile/flower2_purple",
+				"base:tile/flower3_purple",
+				"base:tile/flower4_purple",
+				"base:tile/flower5_purple"
 			]
 		}
 	}
