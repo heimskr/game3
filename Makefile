@@ -46,10 +46,12 @@ NOISE_OBJ    := libnoise/src/libnoise.a
 
 .PHONY: all clean flags test
 
-all: $(OUTPUT)
+all: submodules $(OUTPUT)
 
-$(NOISE_OBJ):
+submodules:
 	git submodule update --init --recursive
+
+$(NOISE_OBJ): submodules
 	cd libnoise && cmake . && make
 
 flags:
