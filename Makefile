@@ -30,13 +30,12 @@ ZIGFLAGS     := -O ReleaseSmall --main-pkg-path .
 ifeq ($(GITHUB),true)
 INCLUDES     := $(shell PKG_CONFIG_PATH=.github-deps/prefix/lib/pkgconfig pkg-config --cflags $(DEPS))
 LIBS         := $(shell PKG_CONFIG_PATH=.github-deps/prefix/lib/pkgconfig pkg-config --libs   $(DEPS))
-GLIB_COMPILE_RESOURCES = $(shell PKG_CONFIG_PATH=.github-deps/prefix/lib/pkgconfig pkg-config --variable=glib_compile_resources gio-2.0)
 ZIG          := .zig/zig
 else
 INCLUDES     := $(shell pkg-config --cflags $(DEPS))
 LIBS         := $(shell pkg-config --libs   $(DEPS))
-GLIB_COMPILE_RESOURCES = $(shell pkg-config --variable=glib_compile_resources gio-2.0)
 endif
+GLIB_COMPILE_RESOURCES = $(shell pkg-config --variable=glib_compile_resources gio-2.0)
 LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread $(LTO)
 SOURCES      := $(shell find src -name \*.cpp) src/gtk_resources.cpp
 OBJECTS      := $(SOURCES:.cpp=.o) src/resources.o
