@@ -105,3 +105,12 @@ depend: $(RESGEN) include/resources.h
 	@ rm $(DEPFILE).bak
 
 sinclude $(DEPFILE)
+
+zip: $(OUTPUT)
+	rm -f game3.zip
+	mkdir Game3
+	cp -r resources Game3/resources
+	cp -r data Game3/data
+	cp $(OUTPUT) Game3/$(OUTPUT)
+	zip -r game3.zip Game3
+	rm -r Game3

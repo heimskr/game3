@@ -8,3 +8,4 @@ src/gtk_resources.cpp
 include/resources.h
 *.zst
 /.github-deps
+/game3.zip

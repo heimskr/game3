@@ -13,12 +13,6 @@ jobs:
       with:
         submodules: recursive
 
-    # - name: Setup upterm session
-    #   uses: lhotari/action-upterm@v1
-    #   with:
-    #     limit-access-to-actor: true
-    #     limit-access-to-users: heimskr
-
     - name: Cache gtkmm4
       id: cache-gtkmm4
       uses: actions/cache@v3
@@ -50,5 +44,37 @@ jobs:
       if: steps.cache-gtkmm4.outputs.cache-hit != 'true'
       run: ./.gtkmm4.sh
 
-    - name: Compile game3
-      run: make -j2 GITHUB=true
+    - name: Setup upterm session
+      uses: lhotari/action-upterm@v1
+      with:
+        limit-access-to-actor: true
+        limit-access-to-users: heimskr
+
+    - name: Compile
+      run: make -j2 zip GITHUB=true
+
+    # - name: Create Draft Release
+    #   id: create_release
+    #   uses: actions/create-release@v1
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #   with:
+    #     tag_name: release-${{github.sha}}
+    #     release_name: Game3
+    #     draft: true
+    #     prerelease: false
+
+    # - uses: actions/upload-release-asset@v1.0.1
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #   with:
+    #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+    #     asset_path: ./game3.zip
+    #     asset_name: game3.zip
+    #     asset_content_type: application/zip
+
+    # - uses: eregon/publish-release@v1
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #   with:
+    #     release_id: ${{ steps.create_release.outputs.id }}
