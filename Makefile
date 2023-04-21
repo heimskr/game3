@@ -1,14 +1,14 @@
-# BUILD := release
-LTO :=
+LTO     :=
 LDFLAGS :=
-ifeq ($(BUILD),release)
-BUILDFLAGS := -Ofast -march=native
-LTO := -flto
+
+ifeq ($(BUILD),debug)
+BUILDFLAGS := -g -O0
 else ifeq ($(BUILD),tsan)
 BUILDFLAGS := -g -O1 -fsanitize=thread
-LDFLAGS := -fsanitize=thread
+LDFLAGS    := -fsanitize=thread
 else
-BUILDFLAGS := -g -O0
+BUILDFLAGS := -Ofast -march=native
+LTO        := -flto
 endif
 
 ifeq ($(shell uname -s), Darwin)
