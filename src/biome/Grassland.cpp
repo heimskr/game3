@@ -103,12 +103,8 @@ namespace Game3 {
 
 		const auto &tileset = realm.getTileset();
 
-		if (grassSet.contains(tileset[realm.getLayer1(row, column)]) && distribution(rng) < 1) {
-			static const std::array<Identifier, 6> flowers {
-				"base:tile/flower_red", "base:tile/flower_orange", "base:tile/flower_yellow", "base:tile/flower_green", "base:tile/flower_blue", "base:tile/flower_purple",
-			};
-
-			realm.setLayer2({row, column}, choose(flowers), false);
+		if (grassSet.contains(tileset[realm.getLayer1(row, column)]) && distribution(rng) < 2) {
+			realm.setLayer2({row, column}, choose(tileset.getCategoryIDs("base:category/flowers"), rng), false);
 		}
 	}
 }

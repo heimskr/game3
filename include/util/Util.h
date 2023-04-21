@@ -8,6 +8,7 @@
 #include <random>
 #include <set>
 #include <stdexcept>
+#include <unordered_set>
 #include <vector>
 
 #define TRY try {
@@ -82,11 +83,27 @@ namespace Game3 {
 		return container.at(std::uniform_int_distribution(static_cast<size_t>(0), container.size() - 1)(rng));
 	}
 
+	// Here be ugly duplication
+
 	template <typename T, typename R>
 	T & choose(std::list<T> &container, R &rng) {
 		if (container.empty())
 			throw std::invalid_argument("Container is empty");
 		return *std::next(container.begin(), std::uniform_int_distribution(static_cast<size_t>(0), container.size() - 1)(rng));
+	}
+
+	template <typename T, typename R>
+	T & choose(std::set<T> &set, R &rng) {
+		if (set.empty())
+			throw std::invalid_argument("Set is empty");
+		return *std::next(set.begin(), std::uniform_int_distribution(static_cast<size_t>(0), set.size() - 1)(rng));
+	}
+
+	template <typename T, typename R>
+	T & choose(std::unordered_set<T> &set, R &rng) {
+		if (set.empty())
+			throw std::invalid_argument("Set is empty");
+		return *std::next(set.begin(), std::uniform_int_distribution(static_cast<size_t>(0), set.size() - 1)(rng));
 	}
 
 	template <typename T, typename R>
@@ -101,6 +118,13 @@ namespace Game3 {
 		if (container.empty())
 			throw std::invalid_argument("Container is empty");
 		return *std::next(container.begin(), std::uniform_int_distribution(static_cast<size_t>(0), container.size() - 1)(rng));
+	}
+
+	template <typename T, typename R>
+	const T & choose(const std::unordered_set<T> &set, R &rng) {
+		if (set.empty())
+			throw std::invalid_argument("Set is empty");
+		return *std::next(set.begin(), std::uniform_int_distribution(static_cast<size_t>(0), set.size() - 1)(rng));
 	}
 
 	template <typename T, typename R>
