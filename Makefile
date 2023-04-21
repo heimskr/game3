@@ -49,6 +49,7 @@ NOISE_OBJ    := libnoise/src/libnoise.a
 all: $(OUTPUT)
 
 $(NOISE_OBJ):
+	git submodule update --init --recursive
 	cd libnoise && cmake . && make
 
 flags:
