@@ -18,6 +18,9 @@ jobs:
         path: .github-deps/prefix
         key: ${{ runner.os }}-gtkmm4
 
+    - name: Install zig
+      run: ./.zig.sh
+
     - name: Install Packages
       if: steps.cache-gtkmm4.outputs.cache-hit != 'true'
       uses: awalsh128/cache-apt-pkgs-action@latest
@@ -29,5 +32,5 @@ jobs:
       if: steps.cache-gtkmm4.outputs.cache-hit != 'true'
       run: ./.gtkmm4.sh
 
-    - name: make
-      run: make -j GITHUB=true
+    - name: Compile game3
+      run: make -j2 GITHUB=true
