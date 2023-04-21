@@ -99,9 +99,9 @@ namespace Game3 {
 
 	void Realm::render(const int width, const int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &sprite_renderer, float game_time) {
 		Canvas &canvas = game.canvas;
-		auto &textureA = canvas.textureA;
-		auto &textureB = canvas.textureB;
-		auto &fbo = canvas.fbo;
+		// auto &textureA = canvas.textureA;
+		// auto &textureB = canvas.textureB;
+		// auto &fbo = canvas.fbo;
 		auto &multiplier = canvas.multiplier;
 
 		// if (canvas.lastRealm != this) {

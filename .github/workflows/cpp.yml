@@ -44,14 +44,14 @@ jobs:
       if: steps.cache-gtkmm4.outputs.cache-hit != 'true'
       run: ./.gtkmm4.sh
 
-    - name: Setup upterm session
-      uses: lhotari/action-upterm@v1
-      with:
-        limit-access-to-actor: true
-        limit-access-to-users: heimskr
+    # - name: Setup upterm session
+    #   uses: lhotari/action-upterm@v1
+    #   with:
+    #     limit-access-to-actor: true
+    #     limit-access-to-users: heimskr
 
     - name: Compile
-      run: make -j2 zip GITHUB=true
+      run: make -j2 zip GITHUB=true BUILD=nonnative
 
     - name: Create Draft Release
       id: create_release

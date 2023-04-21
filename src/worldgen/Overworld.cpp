@@ -148,8 +148,6 @@ namespace Game3::WorldGen {
 
 		std::default_random_engine rng(noise_seed);
 
-		std::mutex candidates_mutex;
-
 		constexpr int m = 26, n = 34, pad = 2;
 		Timer land_timer("GetLand");
 		const auto starts = tilemap1->getLand(m + pad * 2, n + pad * 2);
@@ -222,7 +220,7 @@ namespace Game3::WorldGen {
 				const auto col_max_index = static_cast<Index>(col_max);
 				const auto row_min_index = static_cast<Index>(row_min);
 				const auto row_max_index = static_cast<Index>(row_max);
-				threads.emplace_back([realm, &get_biome, &perlin, &params, noise_seed, row_min, col_min, row_min_index, row_max_index, col_min_index, col_max_index] {
+				threads.emplace_back([realm, &get_biome, &perlin, &params, noise_seed, row_min_index, row_max_index, col_min_index, col_max_index] {
 					threadContext = {realm->getGame().shared_from_this(), noise_seed - 1'000'000ul * row_min_index + col_min_index, row_min_index, row_max_index, col_min_index, col_max_index};
 					for (Index row = row_min_index; row < row_max_index; ++row)
 						for (Index column = col_min_index; column < col_max_index; ++column)
