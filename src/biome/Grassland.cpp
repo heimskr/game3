@@ -111,7 +111,7 @@ namespace Game3 {
 		const auto &tileset = realm.getTileset();
 		const auto tile1 = tileset[realm.getLayer1(row, column)];
 
-		if (grassSet.contains(tile1)) {
+		if (grassSet.contains(tile1) && realm.getLayer2(row, column) == tileset.getEmptyID()) {
 			if (distribution(rng) < 2)
 				realm.setLayer2({row, column}, choose(tileset.getCategoryIDs("base:category/flowers"), rng), false);
 
