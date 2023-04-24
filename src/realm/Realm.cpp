@@ -198,6 +198,7 @@ namespace Game3 {
 	}
 
 	void Realm::reupload() {
+		getGame().activateContext();
 		renderer1.reupload();
 		renderer2.reupload();
 		renderer3.reupload();

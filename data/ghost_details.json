@@ -1,7 +1,8 @@
 ["base:ghost_details_map", {
-	"base:item/wooden_wall": ["base:ghost/wooden_wall", "base:tileset/monomap", true,  32,  6, 0],
-	"base:item/plant_pot1":  ["base:ghost/normal",      "base:tileset/monomap", false, 32, 12, 4],
-	"base:item/plant_pot2":  ["base:ghost/normal",      "base:tileset/monomap", false, 32, 12, 5],
-	"base:item/plant_pot3":  ["base:ghost/normal",      "base:tileset/monomap", false, 32, 12, 6],
-	"base:item/tower":       ["base:ghost/tower",       "base:tileset/monomap", true,  32,  6, 7]
+	"base:item/wooden_wall": ["base:ghost/wooden_wall", "base:tileset/monomap", true,  32,  6, 0, 2],
+	"base:item/plant_pot1":  ["base:ghost/normal",      "base:tileset/monomap", false, 32, 12, 4, 2],
+	"base:item/plant_pot2":  ["base:ghost/normal",      "base:tileset/monomap", false, 32, 12, 5, 2],
+	"base:item/plant_pot3":  ["base:ghost/normal",      "base:tileset/monomap", false, 32, 12, 6, 2],
+	"base:item/tower":       ["base:ghost/tower",       "base:tileset/monomap", true,  32,  6, 7, 2],
+	"base:item/pride_flag":  ["base:ghost/normal",      "base:tileset/monomap", false, 32, 23, 8, 3]
 }]

@@ -43,10 +43,10 @@ namespace Game3 {
 			throw std::logic_error("Attempted to march base:ghost/normal");
 		}));
 		game.add(GhostFunction("base:ghost/wooden_wall", [&](const Identifier &id, const Place &place) -> bool {
-			return place.realm->tilemap2->tileset->isInCategory(id, "base:category/wooden_walls");
+			return place.realm->getTileset().isInCategory(id, "base:category/wooden_walls");
 		}));
 		game.add(GhostFunction("base:ghost/tower", [&](const Identifier &id, const Place &place) -> bool {
-			return place.realm->tilemap2->tileset->isInCategory(id, "base:category/towers");
+			return place.realm->getTileset().isInCategory(id, "base:category/towers");
 		}));
 	}
 
@@ -55,14 +55,6 @@ namespace Game3 {
 		if (auto iter = registry.items.find(stack.item->identifier); iter != registry.items.end())
 			return *iter->second;
 		throw std::runtime_error("Couldn't get GhostDetails for " + stack.item->name);
-	}
-
-	void from_json(const nlohmann::json &json, GhostDetails &details) {
-		details.type = json.at(0);
-		details.useMarchingSquares = json.at(1);
-		details.columnsPerRow = json.at(2);
-		details.rowOffset = json.at(3);
-		details.columnOffset = json.at(4);
 	}
 
 	Ghost::Ghost(const Place &place, ItemStack material_):
@@ -169,11 +161,27 @@ namespace Game3 {
 
 	void Ghost::confirm() {
 		auto realm = getRealm();
+		auto &tilemap1 = *realm->tilemap1;
 		auto &tilemap2 = *realm->tilemap2;
+		auto &tilemap3 = *realm->tilemap3;
 		const auto &tileset = *tilemap2.tileset;
 
-		if (tilemap2[position] != tileset.getEmptyID())
-			throw OverlapError("Can't confirm ghost at " + std::string(position));
+		switch (details.layer) {
+			case 1:
+				if (tilemap1[position] != tileset.getEmptyID())
+					throw OverlapError("Can't confirm ghost at " + std::string(position));
+				break;
+			case 2:
+				if (tilemap2[position] != tileset.getEmptyID())
+					throw OverlapError("Can't confirm ghost at " + std::string(position));
+				break;
+			case 3:
+				if (tilemap3[position] != tileset.getEmptyID())
+					throw OverlapError("Can't confirm ghost at " + std::string(position));
+				break;
+			default:
+				throw std::invalid_argument("Invalid layer for Ghost: " + std::to_string(details.layer));
+		}
 
 		if (details.customFn) {
 			details.customFn({position, realm, nullptr});
@@ -184,7 +192,21 @@ namespace Game3 {
 			else
 				tile_id = details.rowOffset * (tilemap2.setWidth / tilemap2.tileSize) + details.columnOffset;
 
-			realm->setLayer2(position, tile_id);
+			switch (details.layer) {
+				case 1:
+					realm->setLayer1(position, tile_id);
+					break;
+				case 2:
+					realm->setLayer2(position, tile_id);
+					break;
+				case 3:
+					realm->setLayer3(position, tile_id);
+					break;
+				default:
+					throw std::invalid_argument("Invalid layer for Ghost: " + std::to_string(details.layer));
+			}
+
+			realm->reupload();
 		}
 	}
 }

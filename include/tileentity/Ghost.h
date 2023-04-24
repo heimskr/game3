@@ -32,20 +32,22 @@ namespace Game3 {
 		Index columnsPerRow = 16;
 		Index rowOffset     = 0;
 		Index columnOffset  = 0;
+		Index layer = 2;
 		CustomFn customFn;
 		Identifier customTilename;
 
 		GhostDetails(Identifier identifier_ = {}):
 			NamedRegisterable(std::move(identifier_)) {}
 
-		GhostDetails(Identifier identifier_, Identifier type_, Identifier tileset_name, bool use_marching_squares, Index columns_per_row, Index row_offset, Index column_offset):
+		GhostDetails(Identifier identifier_, Identifier type_, Identifier tileset_name, bool use_marching_squares, Index columns_per_row, Index row_offset, Index column_offset, Index layer_):
 			NamedRegisterable(std::move(identifier_)),
 			type(std::move(type_)),
 			tilesetName(std::move(tileset_name)),
 			useMarchingSquares(use_marching_squares),
 			columnsPerRow(columns_per_row),
 			rowOffset(row_offset),
-			columnOffset(column_offset) {}
+			columnOffset(column_offset),
+			layer(layer_) {}
 
 		GhostDetails(Identifier identifier_, Identifier tileset_name, CustomFn custom_fn, Identifier custom_tile_name):
 			NamedRegisterable(std::move(identifier_)),
@@ -56,8 +58,6 @@ namespace Game3 {
 
 		static GhostDetails & get(const Game &, const ItemStack &);
 	};
-
-	void from_json(const nlohmann::json &, GhostDetails &);
 
 	void initGhosts(Game &);
 

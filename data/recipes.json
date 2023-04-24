@@ -150,5 +150,16 @@
 	["base:crafting_recipe", {"input": [["base:attribute/flower_yellow", 1]], "output": [["base:item/yellow_dye", 1]]}],
 	["base:crafting_recipe", {"input": [["base:attribute/flower_green",  1]], "output": [["base:item/green_dye",  1]]}],
 	["base:crafting_recipe", {"input": [["base:attribute/flower_blue",   1]], "output": [["base:item/blue_dye",   1]]}],
-	["base:crafting_recipe", {"input": [["base:attribute/flower_purple", 1]], "output": [["base:item/purple_dye", 1]]}]
+	["base:crafting_recipe", {"input": [["base:attribute/flower_purple", 1]], "output": [["base:item/purple_dye", 1]]}],
+	["base:crafting_recipe", {
+		"input": [
+			["base:item/red_dye", 1],
+			["base:item/orange_dye", 1],
+			["base:item/yellow_dye", 1],
+			["base:item/green_dye", 1],
+			["base:item/blue_dye", 1],
+			["base:item/purple_dye", 1]
+		],
+		"output": [["base:item/pride_flag", 1]]
+	}]
 ]]

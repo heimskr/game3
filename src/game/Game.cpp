@@ -94,6 +94,7 @@ namespace Game3 {
 		add(std::make_shared<Furniture>   ("base:item/plant_pot2",      "Plant Pot",        32, 64));
 		add(std::make_shared<Furniture>   ("base:item/plant_pot3",      "Plant Pot",        32, 64));
 		add(std::make_shared<Furniture>   ("base:item/tower",           "Tower",            10, 64));
+		add(std::make_shared<Furniture>   ("base:item/pride_flag",      "Pride Flag",       80, 64));
 		add(std::make_shared<CaveEntrance>("base:item/cave_entrance",   "Cave Entrance",    50,  1));
 		add(std::make_shared<Item>        ("base:item/mead",            "Mead",             10, 16));
 		add(std::make_shared<Item>        ("base:item/honey",           "Honey",             5, 64));
@@ -290,7 +291,7 @@ namespace Game3 {
 
 			auto &details = registry<GhostDetailsRegistry>();
 			for (const auto &[key, value]: json.at(1).items())
-				details.add(Identifier(key), GhostDetails(Identifier(key), value.at(0), value.at(1), value.at(2), value.at(3), value.at(4), value.at(5)));
+				details.add(Identifier(key), GhostDetails(Identifier(key), value.at(0), value.at(1), value.at(2), value.at(3), value.at(4), value.at(5), value.at(6)));
 
 		} else if (type == "base:item_texture_map"_id) {
 
