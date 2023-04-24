@@ -1,5 +1,5 @@
 # Game3
-A 2D game made in OpenGL. Game engines are for cowards.
+A 2D game made in OpenGL. Made without an engine because I'd prefer to do things my own way.
 
 ## Credits
 Huge thanks to [Shade](https://merchant-shade.itch.io/) for creating [Mini World Sprites](https://merchant-shade.itch.io/16x16-mini-world-sprites),
