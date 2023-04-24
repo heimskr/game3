@@ -292,6 +292,9 @@ namespace Game3 {
 	bool Entity::pathfind(const Position &start, const Position &goal, std::list<Direction> &out) {
 		std::vector<Position> positions;
 
+		if (start == goal)
+			return true;
+
 		if (!simpleAStar(getRealm(), start, goal, positions))
 			return false;
 

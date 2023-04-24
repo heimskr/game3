@@ -1,4 +1,5 @@
 #include "Direction.h"
+#include "ThreadContext.h"
 
 namespace Game3 {
 	Direction remapDirection(Direction direction, uint16_t configuration) {
@@ -9,6 +10,10 @@ namespace Game3 {
 			case Direction::Left:  return Direction((configuration >>  0) & 0xf);
 			default: return Direction::Up; // Could throw, but that might waste a few cycles.
 		}
+	}
+
+	Direction randomDirection() {
+		return static_cast<Direction>(std::uniform_int_distribution(0, 3)(threadContext.rng));
 	}
 }
 

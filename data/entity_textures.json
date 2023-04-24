@@ -4,5 +4,6 @@
 	"base:entity/miner":      ["base:texture/villager1",  2],
 	"base:entity/merchant":   ["base:texture/villager1",  2],
 	"base:entity/blacksmith": ["base:texture/blacksmith", 2],
-	"base:entity/woodcutter": ["base:texture/woodcutter", 2]
+	"base:entity/woodcutter": ["base:texture/woodcutter", 2],
+	"base:entity/sheep":      ["base:texture/sheep",      1]
 }]

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <random>
+
 #include "entity/Entity.h"
 
 namespace Game3 {
@@ -12,12 +14,12 @@ namespace Game3 {
 			constexpr static float RETRY_TIME = 30.f;
 
 			static inline auto getWanderDistribution() {
-				return std::uniform_real_distribution(15.f, 30.f);
+				return std::uniform_real_distribution(10.f, 20.f);
 			}
 
 			Position destination = {-1, -1};
-			float timeUntilWander = 15.f;
-			Index wanderRadius = 5;
+			float timeUntilWander = 0.f;
+			Index wanderRadius = 8;
 
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
