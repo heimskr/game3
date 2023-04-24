@@ -231,8 +231,7 @@ namespace Game3 {
 	}
 
 	TileEntityPtr Realm::add(const TileEntityPtr &tile_entity) {
-		// auto lock = tileEntityLock.lockWrite(std::chrono::milliseconds(1));
-		std::unique_lock lock(thing);
+		auto lock = tileEntityLock.lockWrite(std::chrono::milliseconds(1));
 		return addUnsafe(tile_entity);
 	}
 

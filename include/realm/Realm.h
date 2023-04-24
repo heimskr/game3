@@ -227,7 +227,6 @@ namespace Game3 {
 			std::vector<std::shared_ptr<Entity>> entityRemovalQueue;
 			std::vector<std::shared_ptr<TileEntity>> tileEntityRemovalQueue;
 			RWLock tileEntityLock;
-			std::mutex thing;
 
 			bool isWalkable(Index row, Index column, const Tileset &) const;
 			void setLayerHelper(Index row, Index col, bool should_mark_dirty = true);
