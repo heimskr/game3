@@ -163,5 +163,33 @@
 			["base:item/purple_dye", 1]
 		],
 		"output": [["base:item/pride_flag", 1]]
+	}],
+	["base:crafting_recipe", {
+		"input": [
+			["base:item/black_dye", 1],
+			["base:item/orange_dye", 1]
+		],
+		"output": [["base:item/brown_dye", 2]]
+	}],
+	["base:crafting_recipe", {
+		"input": [
+			["base:item/white_dye", 1],
+			["base:item/red_dye", 1]
+		],
+		"output": [["base:item/pink_dye", 2]]
+	}],
+	["base:crafting_recipe", {
+		"input": [
+			["base:item/white_dye", 1],
+			["base:item/blue_dye", 1]
+		],
+		"output": [["base:item/light_blue_dye", 2]]
+	}],
+	["base:crafting_recipe", {
+		"input": [
+			["base:item/white_dye", 1],
+			["base:item/black_dye", 1]
+		],
+		"output": [["base:item/gray_dye", 2]]
 	}]
 ]]

@@ -166,14 +166,18 @@ namespace Game3 {
 		add(std::make_shared<Plantable>("base:item/flower5_purple", "Purple Flower", "base:tile/flower5_purple", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_purple"));
 		add(std::make_shared<Plantable>("base:item/flower5_white",  "White Flower",  "base:tile/flower5_white",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_white"));
 		add(std::make_shared<Plantable>("base:item/flower5_black",  "Black Flower",  "base:tile/flower5_black",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_black"));
-		add(std::make_shared<Item>("base:item/red_dye",    "Red Dye",    12, 64));
-		add(std::make_shared<Item>("base:item/orange_dye", "Orange Dye", 12, 64));
-		add(std::make_shared<Item>("base:item/yellow_dye", "Yellow Dye", 12, 64));
-		add(std::make_shared<Item>("base:item/green_dye",  "Green Dye",  12, 64));
-		add(std::make_shared<Item>("base:item/blue_dye",   "Blue Dye",   12, 64));
-		add(std::make_shared<Item>("base:item/purple_dye", "Purple Dye", 12, 64));
-		add(std::make_shared<Item>("base:item/white_dye",  "White Dye",  12, 64));
-		add(std::make_shared<Item>("base:item/black_dye",  "Black Dye",  12, 64));
+		add(std::make_shared<Item>("base:item/red_dye",        "Red Dye",        12, 64));
+		add(std::make_shared<Item>("base:item/orange_dye",     "Orange Dye",     12, 64));
+		add(std::make_shared<Item>("base:item/yellow_dye",     "Yellow Dye",     12, 64));
+		add(std::make_shared<Item>("base:item/green_dye",      "Green Dye",      12, 64));
+		add(std::make_shared<Item>("base:item/blue_dye",       "Blue Dye",       12, 64));
+		add(std::make_shared<Item>("base:item/purple_dye",     "Purple Dye",     12, 64));
+		add(std::make_shared<Item>("base:item/white_dye",      "White Dye",      12, 64));
+		add(std::make_shared<Item>("base:item/black_dye",      "Black Dye",      12, 64));
+		add(std::make_shared<Item>("base:item/brown_dye",      "Brown Dye",      12, 64));
+		add(std::make_shared<Item>("base:item/pink_dye",       "Pink Dye",       12, 64));
+		add(std::make_shared<Item>("base:item/light_blue_dye", "Light Blue Dye", 12, 64));
+		add(std::make_shared<Item>("base:item/gray_dye",       "Gray Dye",       12, 64));
 	}
 
 	void Game::addGhosts() {

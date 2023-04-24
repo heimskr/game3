@@ -96,5 +96,9 @@
 	"base:item/purple_dye":      ["base:texture/potions",     208, 208],
 	"base:item/white_dye":       ["base:texture/potions",     320, 208],
 	"base:item/black_dye":       ["base:texture/potions",      32, 208],
+	"base:item/brown_dye":       ["base:texture/potions",     304, 208],
+	"base:item/pink_dye":        ["base:texture/potions",     256, 208],
+	"base:item/light_blue_dye":  ["base:texture/potions",     176, 208],
+	"base:item/gray_dye":        ["base:texture/potions",      16, 208],
 	"base:item/pride_flag":      ["base:texture/tileset",     128, 368]
 }]
