@@ -151,6 +151,8 @@
 	["base:crafting_recipe", {"input": [["base:attribute/flower_green",  1]], "output": [["base:item/green_dye",  1]]}],
 	["base:crafting_recipe", {"input": [["base:attribute/flower_blue",   1]], "output": [["base:item/blue_dye",   1]]}],
 	["base:crafting_recipe", {"input": [["base:attribute/flower_purple", 1]], "output": [["base:item/purple_dye", 1]]}],
+	["base:crafting_recipe", {"input": [["base:attribute/flower_white", 1]],  "output": [["base:item/white_dye",  1]]}],
+	["base:crafting_recipe", {"input": [["base:attribute/flower_black", 1]],  "output": [["base:item/black_dye",  1]]}],
 	["base:crafting_recipe", {
 		"input": [
 			["base:item/red_dye", 1],
