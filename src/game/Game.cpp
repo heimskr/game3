@@ -9,6 +9,7 @@
 #include "entity/ItemEntity.h"
 #include "entity/Merchant.h"
 #include "entity/Miner.h"
+#include "entity/Pig.h"
 #include "entity/Player.h"
 #include "entity/Sheep.h"
 #include "entity/Woodcutter.h"
@@ -195,6 +196,7 @@ namespace Game3 {
 		add(EntityFactory::create<Woodcutter>());
 		add(EntityFactory::create<Worker>()); // TODO: verify whether adding this base class is necessary
 		add(EntityFactory::create<Sheep>());
+		add(EntityFactory::create<Pig>());
 	}
 
 	void Game::addTileEntityFactories() {

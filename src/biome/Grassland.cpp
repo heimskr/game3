@@ -2,6 +2,7 @@
 
 #include "Tileset.h"
 #include "biome/Grassland.h"
+#include "entity/Pig.h"
 #include "entity/Sheep.h"
 #include "game/Game.h"
 #include "item/Item.h"
@@ -112,10 +113,20 @@ namespace Game3 {
 		if (grassSet.contains(tile1)) {
 			if (distribution(rng) < 2)
 				realm.setLayer2({row, column}, choose(tileset.getCategoryIDs("base:category/flowers"), rng), false);
-			if (std::uniform_int_distribution(0, 1000)(rng) < 5) {
-				auto sheep = realm.spawn<Sheep>(Position(row, column));
-				sheep->direction = randomDirection();
+
+			std::shared_ptr<Animal> animal;
+
+			switch (std::uniform_int_distribution(0, 199)(rng)) {
+				case 0:
+					animal = realm.spawn<Sheep>({row, column});
+					break;
+				case 1:
+					animal = realm.spawn<Pig>({row, column});
+					break;
 			}
+
+			if (animal)
+				animal->direction = randomDirection();
 		}
 	}
 }
