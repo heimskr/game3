@@ -77,5 +77,11 @@
 	"base:item/flower5_yellow":  ["base:texture/tileset",     176, 432],
 	"base:item/flower5_green":   ["base:texture/tileset",     192, 432],
 	"base:item/flower5_blue":    ["base:texture/tileset",     208, 432],
-	"base:item/flower5_purple":  ["base:texture/tileset",     224, 432]
+	"base:item/flower5_purple":  ["base:texture/tileset",     224, 432],
+	"base:item/red_dye":         ["base:texture/potions",      48, 208],
+	"base:item/orange_dye":      ["base:texture/potions",      80, 208],
+	"base:item/yellow_dye":      ["base:texture/potions",      96, 208],
+	"base:item/green_dye":       ["base:texture/potions",     128, 208],
+	"base:item/blue_dye":        ["base:texture/potions",     192, 208],
+	"base:item/purple_dye":      ["base:texture/potions",     208, 208]
 }]

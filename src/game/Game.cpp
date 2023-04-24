@@ -155,6 +155,12 @@ namespace Game3 {
 		add(std::make_shared<Plantable>("base:item/flower5_green",  "Green Flower",  "base:tile/flower5_green",  "base:category/plant_soil", 10));
 		add(std::make_shared<Plantable>("base:item/flower5_blue",   "Blue Flower",   "base:tile/flower5_blue",   "base:category/plant_soil", 10));
 		add(std::make_shared<Plantable>("base:item/flower5_purple", "Purple Flower", "base:tile/flower5_purple", "base:category/plant_soil", 10));
+		add(std::make_shared<Item>("base:item/red_dye",    "Red Dye",    12, 64));
+		add(std::make_shared<Item>("base:item/orange_dye", "Orange Dye", 12, 64));
+		add(std::make_shared<Item>("base:item/yellow_dye", "Yellow Dye", 12, 64));
+		add(std::make_shared<Item>("base:item/green_dye",  "Green Dye",  12, 64));
+		add(std::make_shared<Item>("base:item/blue_dye",   "Blue Dye",   12, 64));
+		add(std::make_shared<Item>("base:item/purple_dye", "Purple Dye", 12, 64));
 	}
 
 	void Game::addGhosts() {
