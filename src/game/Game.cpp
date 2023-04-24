@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 
 #include "entity/Blacksmith.h"
+#include "entity/Chicken.h"
 #include "entity/EntityFactory.h"
 #include "entity/ItemEntity.h"
 #include "entity/Merchant.h"
@@ -197,6 +198,7 @@ namespace Game3 {
 		add(EntityFactory::create<Worker>()); // TODO: verify whether adding this base class is necessary
 		add(EntityFactory::create<Sheep>());
 		add(EntityFactory::create<Pig>());
+		add(EntityFactory::create<Chicken>());
 	}
 
 	void Game::addTileEntityFactories() {
