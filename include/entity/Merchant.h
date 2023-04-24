@@ -27,7 +27,6 @@ namespace Game3 {
 
 		private:
 			float accumulatedTime = 0.f;
-			Direction lastDirection = Direction::Down;
 	};
 
 	void to_json(nlohmann::json &, const Merchant &);

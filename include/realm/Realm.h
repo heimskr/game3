@@ -73,8 +73,8 @@ namespace Game3 {
 			void render(int width, int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &, float game_time);
 			void reupload();
 			void rebind();
-			int getWidth()  const { return tilemap1->width;  }
-			int getHeight() const { return tilemap1->height; }
+			inline Index getWidth()  const { return tilemap1->width;  }
+			inline Index getHeight() const { return tilemap1->height; }
 			std::shared_ptr<Entity> add(const std::shared_ptr<Entity> &);
 			std::shared_ptr<TileEntity> add(const std::shared_ptr<TileEntity> &);
 			std::shared_ptr<TileEntity> addUnsafe(const std::shared_ptr<TileEntity> &);

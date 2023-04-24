@@ -50,4 +50,6 @@ namespace Game3 {
 	struct NamedDurability: NamedNumeric<Durability> {
 		using NamedNumeric::NamedNumeric;
 	};
+
+	Index operator""_idx(unsigned long long);
 }

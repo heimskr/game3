@@ -1,3 +1,4 @@
+#include "ThreadContext.h"
 #include "entity/Worker.h"
 #include "game/Game.h"
 #include "realm/Keep.h"
@@ -53,7 +54,7 @@ namespace Game3 {
 			if ((stuckTime += delta) < RETRY_TIME)
 				return true;
 			stuck = false;
-			stuckTime = (rand() % static_cast<int>(RETRY_TIME * 100)) / 100.f;
+			stuckTime = std::uniform_real_distribution(0.f, RETRY_TIME * .8f)(threadContext.rng);
 		}
 
 		return false;

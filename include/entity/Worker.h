@@ -31,13 +31,11 @@ namespace Game3 {
 
 		protected:
 			Position keepPosition;
-			Direction lastDirection = Direction::Down;
 
 			Worker(EntityType);
 			Worker(EntityType, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_);
 
 			HitPoints maxHealth() const override { return MAX_HEALTH; }
-			void interact(const Position &);
 			bool stillStuck(float delta);
 			void goToKeep(Phase new_phase);
 			void goToStockpile(Phase new_phase);

@@ -78,16 +78,16 @@ namespace Game3 {
 			virtual bool onInteractOn(const std::shared_ptr<Player> &) { return false; }
 			/** Handles when the player interacts with the tile in front of them and that tile contains this entity. Returns whether anything interesting happened. */
 			virtual bool onInteractNextTo(const std::shared_ptr<Player> &) { return false; }
-			inline const Position::value_type & row()    const { return position.row;    }
-			inline const Position::value_type & column() const { return position.column; }
-			inline Position::value_type & row()    { return position.row;    }
-			inline Position::value_type & column() { return position.column; }
+			inline const Position::value_type & getRow()    const { return position.row;    }
+			inline const Position::value_type & getColumn() const { return position.column; }
+			inline Position::value_type & getRow()    { return position.row;    }
+			inline Position::value_type & getColumn() { return position.column; }
 			virtual void init(Game &);
 			virtual void initAfterLoad(Game &) {}
 			/** Returns whether the entity actually moved. */
 			bool move(Direction);
 			std::shared_ptr<Realm> getRealm() const override;
-			const Position & getPosition() const override { return position; }
+			inline const Position & getPosition() const override { return position; }
 			Entity & setRealm(const Game &, RealmID);
 			Entity & setRealm(const std::shared_ptr<Realm>);
 			void focus(Canvas &, bool is_autofocus);
