@@ -178,6 +178,7 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/pink_dye",       "Pink Dye",       12, 64));
 		add(std::make_shared<Item>("base:item/light_blue_dye", "Light Blue Dye", 12, 64));
 		add(std::make_shared<Item>("base:item/gray_dye",       "Gray Dye",       12, 64));
+		add(std::make_shared<Item>("base:item/lime_dye",       "Lime Dye",       12, 64));
 	}
 
 	void Game::addGhosts() {
