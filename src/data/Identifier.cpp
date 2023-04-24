@@ -26,6 +26,13 @@ namespace Game3 {
 		return name.substr(0, slash);
 	}
 
+	std::string Identifier::getPostPath() const {
+		const auto slash = name.find_last_of('/');
+		if (slash == name.npos)
+			return name;
+		return name.substr(slash + 1);
+	}
+
 	bool Identifier::operator==(std::string_view combined) const {
 		const size_t colon = combined.find(':');
 		if (colon == std::string_view::npos)

@@ -163,27 +163,46 @@ namespace Game3 {
 		erase(activeSlot, suppress_notification);
 	}
 
-	ItemCount Inventory::count(ItemID id) const {
+	ItemCount Inventory::count(const ItemID &id) const {
+		if (id.getPath() == "attribute")
+			return countAttribute(id);
+
 		ItemCount out = 0;
+
 		for (const auto &[slot, stored_stack]: storage)
 			if (stored_stack.item->identifier == id)
 				out += stored_stack.count;
+
 		return out;
 	}
 
 	ItemCount Inventory::count(const Item &item) const {
 		ItemCount out = 0;
+
 		for (const auto &[slot, stored_stack]: storage)
 			if (stored_stack.item->identifier == item.identifier)
 				out += stored_stack.count;
+
 		return out;
 	}
 
 	ItemCount Inventory::count(const ItemStack &stack) const {
 		ItemCount out = 0;
+
 		for (const auto &[slot, stored_stack]: storage)
 			if (stack.canMerge(stored_stack))
 				out += stored_stack.count;
+
+		return out;
+	}
+
+	ItemCount Inventory::countAttribute(const Identifier &attribute) const {
+		ItemCount out = 0;
+
+		for (const auto &[slot, stack]: storage)
+			if (stack.hasAttribute(attribute))
+				out += stack.count;
+
 		return out;
 	}
 
@@ -248,6 +267,31 @@ namespace Game3 {
 		return to_remove;
 	}
 
+	ItemCount Inventory::remove(const CraftingRequirement &requirement) {
+		if (requirement.is<ItemStack>())
+			return remove(requirement.get<ItemStack>());
+		return remove(requirement.get<AttributeRequirement>());
+	}
+
+	ItemCount Inventory::remove(const AttributeRequirement &requirement) {
+		const Identifier &attribute = requirement.attribute;
+		ItemCount count_remaining = requirement.count;
+		ItemCount count_removed = 0;
+
+		for (Slot slot = 0; slot < slotCount && 0 < count_remaining; ++slot) {
+			if (auto *stack = (*this)[slot]; stack && stack->hasAttribute(attribute)) {
+				const ItemCount to_remove = std::min(stack->count, count_remaining);
+				stack->count  -= to_remove;
+				count_removed += to_remove;
+				if (0 == (count_remaining -= to_remove))
+					break;
+			}
+		}
+
+		compact();
+		return count_removed;
+	}
+
 	bool Inventory::contains(Slot slot) const {
 		return storage.contains(slot);
 	}
@@ -291,8 +335,17 @@ namespace Game3 {
 
 	ItemCount Inventory::craftable(const CraftingRecipe &recipe) const {
 		ItemCount out = UINT64_MAX;
-		for (const ItemStack &input: recipe.input)
-			out = std::min(out, count(input) / input.count);
+
+		for (const auto &input: recipe.input) {
+			if (input.is<ItemStack>()) {
+				const ItemStack &stack = input.get<ItemStack>();
+				out = std::min(out, count(stack) / stack.count);
+			} else {
+				const auto &[attribute, attribute_count] = input.get<AttributeRequirement>();
+				out = std::min(out, countAttribute(attribute) / attribute_count);
+			}
+		}
+
 		return out;
 	}
 
@@ -316,6 +369,14 @@ namespace Game3 {
 			else
 				locked_owner->getRealm()->getGame().signal_other_inventory_update().emit(locked_owner);
 		}
+	}
+
+	void Inventory::compact() {
+		for (auto iter = storage.begin(); iter != storage.end();)
+			if (iter->second.count == 0)
+				storage.erase(iter++);
+			else
+				++iter;
 	}
 
 	Inventory Inventory::fromJSON(Game &game, const nlohmann::json &json, const std::shared_ptr<Agent> &owner) {

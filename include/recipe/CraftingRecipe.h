@@ -4,11 +4,12 @@
 
 #include "data/Identifier.h"
 #include "item/Item.h"
+#include "recipe/CraftingRequirement.h"
 #include "recipe/Recipe.h"
 #include "registry/Registries.h"
 
 namespace Game3 {
-	struct CraftingRecipe: Recipe<std::vector<ItemStack>, std::vector<ItemStack>> {
+	struct CraftingRecipe: Recipe<std::vector<CraftingRequirement>, std::vector<ItemStack>> {
 		Input input;
 		Output output;
 		Identifier stationType;

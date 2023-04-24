@@ -7,7 +7,6 @@
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
-
 	struct Identifier {
 		std::string space;
 		std::string name;
@@ -40,6 +39,9 @@ namespace Game3 {
 
 		/** Returns "foo" for "base:foo/bar/baz". */
 		std::string getPathStart() const;
+
+		/** Returns "baz" for "base:foo/bar/baz". */
+		std::string getPostPath() const;
 
 		auto operator<=>(const Identifier &) const = default;
 

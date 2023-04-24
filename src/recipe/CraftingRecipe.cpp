@@ -18,9 +18,17 @@ namespace Game3 {
 		if (!inventory)
 			return false;
 
-		for (const auto &stack: input)
-			if (inventory->count(stack) < stack.count)
-				return false;
+		for (const auto &requirement: input) {
+			if (requirement.is<ItemStack>()) {
+				const auto &stack = requirement.get<ItemStack>();
+				if (inventory->count(stack) < stack.count)
+					return false;
+			} else {
+				const auto &[attribute, count] = requirement.get<AttributeRequirement>();
+				if (inventory->countAttribute(attribute) < count)
+					return false;
+			}
+		}
 
 		return true;
 	}
@@ -33,8 +41,8 @@ namespace Game3 {
 
 		leftovers.clear();
 
-		for (const auto &stack: input)
-			inventory->remove(stack);
+		for (const auto &requirement: input)
+			inventory->remove(requirement);
 
 		for (const auto &stack: output)
 			if (auto leftover = inventory->add(stack))
@@ -45,10 +53,15 @@ namespace Game3 {
 
 	CraftingRecipe CraftingRecipe::fromJSON(const Game &game, const nlohmann::json &json) {
 		CraftingRecipe recipe;
-		recipe.input  = ItemStack::manyFromJSON(game, json.at("input"));
+
+		for (const auto &item: json.at("input"))
+			recipe.input.push_back(CraftingRequirement::fromJSON(game, item));
+
 		recipe.output = ItemStack::manyFromJSON(game, json.at("output"));
+
 		if (auto iter = json.find("station"); iter != json.end())
 			recipe.stationType = *iter;
+
 		return recipe;
 	}
 

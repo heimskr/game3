@@ -5,10 +5,11 @@
 
 #include "game/Container.h"
 #include "item/Item.h"
+#include "recipe/CraftingRequirement.h"
 
 namespace Game3 {
-	struct CraftingRecipe;
 	struct Agent;
+	struct CraftingRecipe;
 
 	class Inventory: public Container {
 		public:
@@ -40,14 +41,17 @@ namespace Game3 {
 
 			inline bool empty() const { return storage.empty(); }
 
-			/** Counts the amount of an item in the inventory. */
-			ItemCount count(ItemID) const;
+			/** Counts the number of an item in the inventory. */
+			ItemCount count(const ItemID &) const;
 
-			/** Counts the amount of an item in the inventory. */
+			/** Counts the number of an item in the inventory. */
 			ItemCount count(const Item &) const;
 
-			/** Counts the amount of an item in the inventory. This takes ItemStack data into account but ignores the given ItemStack's count. */
+			/** Counts the number of an item in the inventory. This takes ItemStack data into account but ignores the given ItemStack's count. */
 			ItemCount count(const ItemStack &) const;
+
+			/** Counts the number of items with a given attribute in the inventory. */
+			ItemCount countAttribute(const Identifier &) const;
 
 			std::shared_ptr<Agent> getOwner() const;
 
@@ -59,6 +63,10 @@ namespace Game3 {
 
 			/** Attempts to remove a given amount of an item from a specific slot. Returns the count removed. */
 			ItemCount remove(const ItemStack &, Slot);
+
+			ItemCount remove(const CraftingRequirement &);
+
+			ItemCount remove(const AttributeRequirement &);
 
 			bool contains(Slot) const;
 
@@ -88,6 +96,9 @@ namespace Game3 {
 
 		private:
 			std::map<Slot, ItemStack> storage;
+
+			/** Removes every slot whose item count is zero from the storage map. */
+			void compact();
 
 		public:
 			inline const decltype(storage) & getStorage() const { return storage; }

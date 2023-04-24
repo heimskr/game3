@@ -83,8 +83,15 @@ namespace Game3 {
 				output_label->add_css_class("output-label");
 				right_vbox->append(*output_label);
 
-				for (const ItemStack &input: recipe->input) {
-					auto label = std::make_unique<Gtk::Label>((input.count != 1? std::to_string(input.count) + " \u00d7 " : "") + input.item->name);
+				for (const auto &input: recipe->input) {
+					std::unique_ptr<Gtk::Label> label;
+					if (input.is<ItemStack>()) {
+						const auto &stack = input.get<ItemStack>();
+						label = std::make_unique<Gtk::Label>((stack.count != 1? std::to_string(stack.count) + " \u00d7 " : "") + stack.item->name);
+					} else {
+						const auto &[attribute, count] = input.get<AttributeRequirement>();
+						label = std::make_unique<Gtk::Label>((count != 1? std::to_string(count) + " \u00d7 " : "") + "any " + attribute.getPostPath());
+					}
 					label->set_xalign(0.f);
 					label->add_css_class("input-label");
 					right_vbox->append(*label);
