@@ -80,7 +80,7 @@ include/resources.h: $(RESGEN)
 $(OUTPUT): $(OBJECTS) $(NOISE_OBJ)
 	@ printf "\e[2m[\e[22;36mld\e[39;2m]\e[22m $@\n"
 	@ $(COMPILER) $^ -o $@ $(LDFLAGS)
-ifeq ($(BUILD),)
+ifeq ($(BUILD),debug)
 else ifeq ($(BUILD),tsan)
 else
 	strip $@
