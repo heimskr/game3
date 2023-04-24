@@ -9,6 +9,8 @@ Thanks to Tilation for their [indoor tileset](https://tilation.itch.io/16x16-sma
 
 Thanks to [Vadim](https://github.com/Vadimuh), [Fayabella](https://github.com/Fayabella) and [Bamboozle.jpg](https://github.com/Bamboozle-jpg) for their flower sprites. Fayabella has also contributed many ideas over the course of the game's development.
 
+Thanks to [190n](https://github.com/190n) for their work on the resource embedding system.
+
 ## Contribution Ideas
 If you'd like to contribute, here are some ideas, ordered roughly from easiest to hardest.
 
