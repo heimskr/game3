@@ -36,8 +36,7 @@ namespace Game3 {
 		public:
 			constexpr static Slot DEFAULT_INVENTORY_SIZE = 30;
 			/** The reciprocal of this is how many seconds it takes to move one square. */
-			constexpr static float MAX_SPEED = 15.f;
-			constexpr static float MIN_SPEED = MAX_SPEED / 6.f;
+			constexpr static float MAX_SPEED = 10.f;
 
 			EntityType type;
 			Position position {0, 0};

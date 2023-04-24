@@ -98,11 +98,19 @@ namespace Game3 {
 
 		float x_offset = 0.f;
 		float y_offset = 0.f;
-		if (offset.x() != 0.f || offset.y() != 0.f)
-			x_offset = 8.f * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - getRealm()->getGame().startTime).count() / 100) % 5);
+		if (offset.x() != 0.f || offset.y() != 0.f) {
+			switch (variety) {
+				case 3:
+					x_offset = 8.f * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - getRealm()->getGame().startTime).count() / 200) % 4);
+					break;
+				default:
+					x_offset = 8.f * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - getRealm()->getGame().startTime).count() / 100) % 5);
+			}
+		}
 
 		switch (variety) {
 			case 1:
+			case 3:
 				y_offset = 8.f * static_cast<int>(direction);
 				break;
 			case 2:

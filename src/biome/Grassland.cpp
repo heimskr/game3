@@ -107,14 +107,15 @@ namespace Game3 {
 		}
 
 		const auto &tileset = realm.getTileset();
+		const auto tile1 = tileset[realm.getLayer1(row, column)];
 
-		if (grassSet.contains(tileset[realm.getLayer1(row, column)]) && distribution(rng) < 2) {
-			realm.setLayer2({row, column}, choose(tileset.getCategoryIDs("base:category/flowers"), rng), false);
-		}
-
-		if (std::uniform_int_distribution(0, 1000)(rng) < 5) {
-			auto sheep = realm.spawn<Sheep>(Position(row, column));
-			sheep->direction = randomDirection();
+		if (grassSet.contains(tile1)) {
+			if (distribution(rng) < 2)
+				realm.setLayer2({row, column}, choose(tileset.getCategoryIDs("base:category/flowers"), rng), false);
+			if (std::uniform_int_distribution(0, 1000)(rng) < 5) {
+				auto sheep = realm.spawn<Sheep>(Position(row, column));
+				sheep->direction = randomDirection();
+			}
 		}
 	}
 }

@@ -24,6 +24,7 @@ namespace Game3 {
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			virtual void tick(Game &, float) override;
+			float getSpeed() const override { return 5.f; }
 			bool wander();
 
 			friend class Entity;
