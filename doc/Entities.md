@@ -1,6 +1,6 @@
 # Entities
 
-Entities are things like players, NPCs and animals that can move around inside/among realms.
+Entities are things like players, NPCs and animals that can move around inside/among realms. Unlike tile entities, multiple entities can occupy the same position.
 
 ## Implementing a New Entity
 
@@ -10,7 +10,7 @@ Create a public static method like this:
 ```c++
 static Identifier ID() { return {"base", "entity/my_entity"}; }
 ```
-Replace the `my_entity` in that example with the ID of your entity and `base` with your plugin ID if you're making the entity as part of a plugin, but keep the `entity/` at the beginning of the second component of the identifier.
+Replace the `my_entity` in that example with the ID of your entity and `base` with your plugin ID if you're adding the entity from a plugin, but keep the `entity/` at the beginning of the second component of the identifier.
 
 ### Serialization
 
