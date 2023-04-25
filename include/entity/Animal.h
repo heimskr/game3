@@ -25,14 +25,12 @@ namespace Game3 {
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			virtual void tick(Game &, float) override;
 			float getSpeed() const override { return 5.f; }
+			HitPoints maxHealth() const override { return MAX_HEALTH; }
 			bool wander();
-
-			friend class Entity;
 
 		protected:
 			Animal(EntityType);
 
-			HitPoints maxHealth() const override { return MAX_HEALTH; }
 			bool stillStuck(float delta);
 	};
 }

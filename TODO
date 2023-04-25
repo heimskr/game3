@@ -8,3 +8,4 @@
 [2023/04/14 21:10:36] Reimplement render-to-texture, but with textures that match the window size.
 [2023/04/18 17:14:46] Fix saplings for cactuses and snowy trees
 [2023/04/24 00:35:56] Towns can generate with flowers where their walls should be.
+[2023/04/24 20:20:58] Add a plugin system.
