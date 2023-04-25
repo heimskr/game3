@@ -1,5 +1,5 @@
 # Game3
-A 2D game made in OpenGL. Made without an engine because I'd prefer to do things my own way.
+A 2D game made with OpenGL. No engine because I'd prefer to do things my own way.
 
 ## Credits
 Huge thanks to [Shade](https://merchant-shade.itch.io/) for creating [Mini World Sprites](https://merchant-shade.itch.io/16x16-mini-world-sprites),
@@ -31,4 +31,4 @@ If you'd like to contribute, here are some ideas, ordered roughly from easiest t
   [Graph::topoSort](https://github.com/heimskr/game3/blob/master/include/graph/Graph.h) may help with that.
 	- Bonus points if you can get interop with other languages (e.g., Rust or Zig) working. This will likely be difficult because plugins will typically need to extend classes like Entity, TileEntity or Realm that have virtual methods.
 - Redo the UI to be done in OpenGL or an OpenGL-based framework instead of GTK.
-- Rewrite the engine to be based on Vulkan or SDL2 instead of OpenGL.
+- Rewrite the "engine" to be based on Vulkan or SDL2 instead of OpenGL.
