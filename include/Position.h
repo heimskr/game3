@@ -34,11 +34,6 @@ namespace Game3 {
 		bool operator<(const Position &) const;
 	};
 
-	struct Location {
-		Position position;
-		RealmID realm;
-	};
-
 	/** Silly naming, but easier than PointedLocation or LocationButWithARealmPtrInsteadOfARealmID. */
 	struct Place {
 		Position position;
@@ -68,9 +63,7 @@ namespace Game3 {
 	};
 
 	void to_json(nlohmann::json &, const Position &);
-	void to_json(nlohmann::json &, const Location &);
 	void from_json(const nlohmann::json &, Position &);
-	void from_json(const nlohmann::json &, Location &);
 }
 
 std::ostream & operator<<(std::ostream &, const Game3::Position &);
