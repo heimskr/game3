@@ -30,5 +30,7 @@ If you'd like to contribute, here are some ideas, ordered roughly from easiest t
 	- You will need to implement dependency checking to make sure plugins are loaded in the right order and that there are no cycles;
   [Graph::topoSort](https://github.com/heimskr/game3/blob/master/include/graph/Graph.h) may help with that.
 	- Bonus points if you can get interop with other languages (e.g., Rust or Zig) working. This will likely be difficult because plugins will typically need to extend classes like Entity, TileEntity or Realm that have virtual methods.
+- Add multiplayer support.
 - Redo the UI to be done in OpenGL or an OpenGL-based framework instead of GTK.
 - Rewrite the "engine" to be based on Vulkan or SDL2 instead of OpenGL.
+- Make realms seamlessly infinite.
