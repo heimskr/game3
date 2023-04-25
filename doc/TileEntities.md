@@ -1,7 +1,7 @@
 # Tile Entities
 
 <!-- TODO: update when Tree is updated so mature trees become regular tiles -->
-Tile entities are ways of associating extra data and code with a tile. For example, trees are tile entities because they have age data associated with them and doors are tile entities because they have code to teleport the player on contact.
+Tile entities are ways of associating extra data and code with a tile. For example, trees are tile entities because they have age data associated with them and doors are tile entities because they have code to teleport the player on contact. A given tile can hold only one tile entity.
 
 ## Implementing a New Tile Entity
 
