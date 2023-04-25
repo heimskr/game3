@@ -10,11 +10,11 @@ Create a public static method like this:
 ```c++
 static Identifier ID() { return {"base", "entity/my_entity"}; }
 ```
-Replace the `my_entity` in that example with the ID of your entity and `base` with your plugin ID if you're adding the entity from a plugin, but keep the `entity/` at the beginning of the second component of the identifier.
+Replace `my_entity` in that example with the ID of your entity and `base` with your plugin ID if you're adding the entity from a plugin, but keep the `entity/` at the beginning of the second component of the identifier.
 
 ### Serialization
 
-Next, you need to create serialization methods so that the entity's data can be included in the save file. Add these overridden methods publicly:
+Next, you need to override the serialization methods so that the entity's data can be included in the save file. Add these overridden methods publicly:
 ```c++
 void toJSON(nlohmann::json &json) const override;
 void absorbJSON(Game &game, const nlohmann::json &json) override;
