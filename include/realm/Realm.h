@@ -134,9 +134,6 @@ namespace Game3 {
 			/** Returns true iff something was done with the right click. */
 			virtual bool rightClick(const Position &, double x, double y);
 
-			inline auto lockMapRead() { return mapLock.lockRead(); }
-			inline auto lockMapWrite(std::chrono::milliseconds patience) { return mapLock.lockWrite(patience); }
-
 			template <typename T, typename... Args>
 			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {
 				Game &game_ref = getGame();
@@ -230,7 +227,6 @@ namespace Game3 {
 			std::vector<std::shared_ptr<Entity>> entityRemovalQueue;
 			std::vector<std::shared_ptr<TileEntity>> tileEntityRemovalQueue;
 			RWLock tileEntityLock;
-			RWLock mapLock;
 
 			bool isWalkable(Index row, Index column, const Tileset &) const;
 			void setLayerHelper(Index row, Index col, bool should_mark_dirty = true);

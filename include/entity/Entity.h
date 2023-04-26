@@ -4,7 +4,6 @@
 #include <list>
 #include <memory>
 #include <string>
-#include <thread>
 #include <unordered_map>
 #include <utility>
 
@@ -35,8 +34,6 @@ namespace Game3 {
 
 	class Entity: public Agent, public HasInventory, public std::enable_shared_from_this<Entity> {
 		public:
-			using PathfindCallback = std::function<void(bool, const std::list<Direction> &)>;
-
 			constexpr static Slot DEFAULT_INVENTORY_SIZE = 30;
 			/** The reciprocal of this is how many seconds it takes to move one square. */
 			constexpr static float MAX_SPEED = 10.f;
@@ -101,8 +98,8 @@ namespace Game3 {
 			Position nextTo() const;
 			std::string debug() const;
 			void queueForMove(const std::function<bool(const std::shared_ptr<Entity> &)> &);
-			std::thread pathfind(const Position &start, const Position &goal, const PathfindCallback &);
-			std::thread pathfind(const Position &goal, const PathfindCallback & = {});
+			bool pathfind(const Position &start, const Position &goal, std::list<Direction> &);
+			bool pathfind(const Position &goal);
 			virtual float getSpeed() const { return MAX_SPEED; }
 			virtual Glib::ustring getName() { return "Unknown Entity (" + std::string(type) + ')'; }
 			Game & getGame();

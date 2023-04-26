@@ -297,60 +297,40 @@ namespace Game3 {
 		moveQueue.push_back(function);
 	}
 
-	std::thread Entity::pathfind(const Position &start, const Position &goal, const PathfindCallback &callback) {
-		if (start == goal) {
-			callback(true, {});
-			return std::thread([] {});
+	bool Entity::pathfind(const Position &start, const Position &goal, std::list<Direction> &out) {
+		std::vector<Position> positions;
+
+		if (start == goal)
+			return true;
+
+		if (!simpleAStar(getRealm(), start, goal, positions))
+			return false;
+
+		out.clear();
+
+		if (positions.size() < 2)
+			return true;
+
+		for (auto iter = positions.cbegin() + 1, end = positions.cend(); iter != end; ++iter) {
+			const Position &prev = *(iter - 1);
+			const Position &next = *iter;
+			if (next.row == prev.row + 1)
+				out.push_back(Direction::Down);
+			else if (next.row == prev.row - 1)
+				out.push_back(Direction::Up);
+			else if (next.column == prev.column + 1)
+				out.push_back(Direction::Right);
+			else if (next.column == prev.column - 1)
+				out.push_back(Direction::Left);
+			else
+				throw std::runtime_error("Invalid path offset: " + std::string(next - prev));
 		}
 
-		return std::thread([this, start, goal, callback] {
-			std::vector<Position> positions;
-
-			auto realm = getRealm();
-
-			auto lock = realm->lockMapRead();
-			if (!simpleAStar(realm, start, goal, positions)) {
-				lock.unlock();
-				callback(false, {});
-				return;
-			}
-
-			lock.unlock();
-
-			if (positions.size() < 2) {
-				callback(true, {});
-				return;
-			}
-
-			std::list<Direction> out;
-
-			for (auto iter = positions.cbegin() + 1, end = positions.cend(); iter != end; ++iter) {
-				const Position &prev = *(iter - 1);
-				const Position &next = *iter;
-				if (next.row == prev.row + 1)
-					out.push_back(Direction::Down);
-				else if (next.row == prev.row - 1)
-					out.push_back(Direction::Up);
-				else if (next.column == prev.column + 1)
-					out.push_back(Direction::Right);
-				else if (next.column == prev.column - 1)
-					out.push_back(Direction::Left);
-				else
-					throw std::runtime_error("Invalid path offset: " + std::string(next - prev));
-			}
-
-			callback(true, out);
-		});
+		return true;
 	}
 
-	std::thread Entity::pathfind(const Position &goal, const PathfindCallback &callback) {
-		return pathfind(position, goal, [this, callback](bool success, const auto &result) {
-			if (success)
-				path = result;
-
-			if (callback)
-				callback(success, result);
-		});
+	bool Entity::pathfind(const Position &goal) {
+		return pathfind(position, goal, path);
 	}
 
 	Game & Entity::getGame() {

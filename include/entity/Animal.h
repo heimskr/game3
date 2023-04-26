@@ -26,7 +26,7 @@ namespace Game3 {
 			virtual void tick(Game &, float) override;
 			float getSpeed() const override { return 5.f; }
 			HitPoints maxHealth() const override { return MAX_HEALTH; }
-			void wander();
+			bool wander();
 
 		protected:
 			Animal(EntityType);

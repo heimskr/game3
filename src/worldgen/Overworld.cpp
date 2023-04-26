@@ -19,9 +19,6 @@
 namespace Game3::WorldGen {
 	void generateOverworld(const std::shared_ptr<Realm> &realm, size_t noise_seed, const WorldGenParams &params) {
 		Timer overworld_timer("GenOverworld");
-
-		auto write_lock = realm->lockMapWrite(std::chrono::milliseconds(10));
-
 		const auto width  = realm->getWidth();
 		const auto height = realm->getHeight();
 

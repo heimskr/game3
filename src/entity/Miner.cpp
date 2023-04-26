@@ -130,22 +130,18 @@ namespace Game3 {
 		// Choose one at random
 		chosenResource = choose(resource_choices, threadContext.rng);
 		// Pathfind to the door
-		pathfind(house.getTileEntity<Teleporter>()->position, [this](bool success, const auto &) {
-			if (!success)
-				stuck = true;
-		}).detach();
+		pathfind(house.getTileEntity<Teleporter>()->position);
 	}
 
 	void Miner::goToResource() {
 		auto &realm = *getRealm();
 		auto chosen_position = realm.getPosition(chosenResource);
 		if (auto next = realm.getPathableAdjacent(chosen_position)) {
-			pathfind(destination = *next, [this](bool success, const auto &) {
-				if (success)
-					phase = 2;
-				else
-					stuck = true;
-			}).detach();
+			if (!pathfind(destination = *next)) {
+				stuck = true;
+				return;
+			}
+			phase = 2;
 		} else
 			stuck = true;
 	}
