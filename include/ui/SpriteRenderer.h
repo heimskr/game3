@@ -19,7 +19,8 @@ namespace Game3 {
 		float y_offset = 0.f;
 		float size_x = 16.f;
 		float size_y = 16.f;
-		float scale = 1.f;
+		float scaleX = 1.f;
+		float scaleY = 1.f;
 		float angle = 0.f;
 		float alpha = 1.f;
 		bool hackY = true;
@@ -56,8 +57,8 @@ namespace Game3 {
 			// void drawOnScreen(GL::Texture &, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale = 1.f, float angle = 0.f, float alpha = 1.f);
 
 			template <typename T>
-			void operator()(T &texture, RenderOptions &&options) {
-				drawOnMap(texture, std::forward<RenderOptions>(options));
+			void operator()(T &texture, RenderOptions options) {
+				drawOnMap(texture, std::move(options));
 			}
 
 			void reset();

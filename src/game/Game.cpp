@@ -407,6 +407,23 @@ namespace Game3 {
 					return {true, "Gave " + std::to_string(count) + " x " + item->name};
 				}
 				return {false, "Unknown item: " + item_name};
+			} else if (first == "heldL" || first == "heldR") {
+				if (words.size() != 2)
+					return {false, "Invalid number of arguments."};
+				long slot = -1;
+				try {
+					slot = parseLong(words.at(1));
+				} catch (const std::invalid_argument &) {
+					return {false, "Invalid slot."};
+				}
+				if (first == "heldL")
+					player->setHeldLeft(slot);
+				else
+					player->setHeldRight(slot);
+				return {true, "Set held slot to " + std::to_string(slot)};
+			} else if (first == "h") {
+				runCommand("heldL 0");
+				runCommand("heldR 1");
 			}
 		} catch (const std::exception &err) {
 			return {false, err.what()};

@@ -62,6 +62,7 @@ namespace Game3 {
 			virtual Glib::RefPtr<Gdk::Pixbuf> makeImage(const Game &);
 			virtual void getOffsets(const Game &, std::shared_ptr<Texture> &, float &x_offset, float &y_offset);
 			std::shared_ptr<Item> addAttribute(Identifier);
+			virtual std::shared_ptr<Texture> getTexture(const Game &);
 			inline bool operator==(const Item &other) const { return identifier == other.identifier; }
 
 			virtual void initStack(const Game &, ItemStack &) {}
@@ -74,6 +75,7 @@ namespace Game3 {
 		protected:
 			std::unique_ptr<uint8_t[]> rawImage;
 			Glib::RefPtr<Gdk::Pixbuf> cachedImage;
+			std::shared_ptr<Texture> cachedTexture;
 	};
 
 	class ItemStack {
@@ -111,14 +113,13 @@ namespace Game3 {
 
 			/** Decreases the durability by a given amount if the ItemStack has durability data. Returns true if the durability was present and reduced to zero or false otherwise. */
 			bool reduceDurability(Durability = 1);
-
 			bool hasAttribute(const Identifier &) const;
-
 			bool hasDurability() const;
-
 			double getDurabilityFraction() const;
 
 			void spawn(const std::shared_ptr<Realm> &, const Position &) const;
+
+			std::shared_ptr<Texture> getTexture(const Game &) const;
 
 			static void fromJSON(const Game &, const nlohmann::json &, ItemStack &);
 			static ItemStack fromJSON(const Game &, const nlohmann::json &);

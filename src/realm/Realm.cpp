@@ -190,7 +190,8 @@ namespace Game3 {
 			sprite_renderer.drawOnScreen(*checkmark, {
 				.x = static_cast<float>(width)  / *checkmark->width  - 3.f,
 				.y = static_cast<float>(height) / *checkmark->height - 3.f,
-				.scale = 2.f,
+				.scaleX = 2.f,
+				.scaleY = 2.f,
 				.hackY = false,
 				.invertY = false,
 			});

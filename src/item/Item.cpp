@@ -89,6 +89,13 @@ namespace Game3 {
 		return shared_from_this();
 	}
 
+	std::shared_ptr<Texture> Item::getTexture(const Game &game) {
+		if (cachedTexture)
+			return cachedTexture;
+
+		return cachedTexture = game.registry<ItemTextureRegistry>().at(identifier)->getTexture(game);
+	}
+
 	bool Item::use(Slot, ItemStack &, const Place &) {
 		return false;
 	}
@@ -180,6 +187,10 @@ namespace Game3 {
 
 	void ItemStack::spawn(const std::shared_ptr<Realm> &realm, const Position &position) const {
 		realm->spawn<ItemEntity>(position, *this);
+	}
+
+	std::shared_ptr<Texture> ItemStack::getTexture(const Game &game) const {
+		return item->getTexture(game);
 	}
 
 	void ItemStack::fromJSON(const Game &game, const nlohmann::json &json, ItemStack &stack) {

@@ -64,7 +64,8 @@ namespace Game3 {
 			.y = y,
 			.size_x = static_cast<float>(*texture.width),
 			.size_y = static_cast<float>(*texture.height),
-			.scale = scale,
+			.scaleX = scale,
+			.scaleY = scale,
 			.angle = angle,
 			.alpha = alpha
 		});
@@ -95,11 +96,11 @@ namespace Game3 {
 
 		glm::mat4 model = glm::mat4(1.f);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(options.x - options.x_offset * canvas->scale * options.scale, options.y - options.y_offset * canvas->scale * options.scale, 0.f));
+		model = glm::translate(model, glm::vec3(options.x - options.x_offset * canvas->scale * options.scaleX, options.y - options.y_offset * canvas->scale * options.scaleY, 0.f));
 		model = glm::translate(model, glm::vec3(0.5f * *texture.width, 0.5f * *texture.height, 0.f)); // move origin of rotation to center of quad
 		model = glm::rotate(model, glm::radians(options.angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
 		model = glm::translate(model, glm::vec3(-0.5f * *texture.width, -0.5f * *texture.height, 0.f)); // move origin back
-		model = glm::scale(model, glm::vec3(*texture.width * options.scale * canvas->scale / 2.f, *texture.height * options.scale * canvas->scale / 2.f, 2.f)); // last scale
+		model = glm::scale(model, glm::vec3(*texture.width * options.scaleX * canvas->scale / 2.f, *texture.height * options.scaleY * canvas->scale / 2.f, 2.f)); // last scale
 
 		shader.set("model", model);
 		shader.set("spriteColor", 1.f, 1.f, 1.f, options.alpha);
@@ -145,11 +146,11 @@ namespace Game3 {
 
 		glm::mat4 model = glm::mat4(1.f);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(options.x - options.x_offset * canvas->scale * options.scale, options.y - options.y_offset * canvas->scale * options.scale, 0.f));
+		model = glm::translate(model, glm::vec3(options.x - options.x_offset * canvas->scale * options.scaleX, options.y - options.y_offset * canvas->scale * options.scaleY, 0.f));
 		model = glm::translate(model, glm::vec3(0.5f * texture_width, 0.5f * texture_height, 0.f)); // move origin of rotation to center of quad
 		model = glm::rotate(model, glm::radians(options.angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
 		model = glm::translate(model, glm::vec3(-0.5f * texture_width, -0.5f * texture_height, 0.f)); // move origin back
-		model = glm::scale(model, glm::vec3(texture_width * options.scale * canvas->scale / 2.f, texture_height * options.scale * canvas->scale / 2.f, 2.f)); // last scale
+		model = glm::scale(model, glm::vec3(texture_width * options.scaleX * canvas->scale / 2.f, texture_height * options.scaleY * canvas->scale / 2.f, 2.f)); // last scale
 
 		shader.set("model", model);
 		shader.set("spriteColor", 1.f, 1.f, 1.f, options.alpha);
@@ -172,7 +173,8 @@ namespace Game3 {
 			.y = y,
 			.size_x = static_cast<float>(*texture.width),
 			.size_y = static_cast<float>(*texture.height),
-			.scale = scale,
+			.scaleX = scale,
+			.scaleY = scale,
 			.angle = angle,
 			.alpha = alpha
 		});
@@ -185,7 +187,7 @@ namespace Game3 {
 		const auto texture_width  = *texture.width;
 		const auto texture_height = *texture.height;
 		if (options.hackY)
-			hackY(options.y, options.y_offset, options.scale);
+			hackY(options.y, options.y_offset, options.scaleY);
 
 		options.size_x = options.size_x < 0.f? -options.size_x * texture_width  : options.size_x;
 		options.size_y = options.size_y < 0.f? -options.size_y * texture_height : options.size_y;
@@ -208,7 +210,7 @@ namespace Game3 {
 		const auto texture_width  = texture.getWidth();
 		const auto texture_height = texture.getHeight();
 		if (options.hackY)
-			hackY(options.y, options.y_offset, options.scale);
+			hackY(options.y, options.y_offset, options.scaleY);
 
 		options.size_x = options.size_x < 0.f? -options.size_x * texture_width  : options.size_x;
 		options.size_y = options.size_y < 0.f? -options.size_y * texture_height : options.size_y;
@@ -261,13 +263,13 @@ namespace Game3 {
 	void SpriteRenderer::setupShader(int texture_width, int texture_height, const RenderOptions &options) {
 		glm::mat4 model = glm::mat4(1.f);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(options.x * 16.f - options.x_offset * 2.f * options.scale, options.y * 16.f - options.y_offset * 2.f * options.scale, 0.0f));
+		model = glm::translate(model, glm::vec3(options.x * 16.f - options.x_offset * 2.f * options.scaleX, options.y * 16.f - options.y_offset * 2.f * options.scaleY, 0.0f));
 		if (options.invertY)
 			model = glm::scale(model, glm::vec3(1.f, -1.f, 1.f));
 		model = glm::translate(model, glm::vec3(0.5f * texture_width, 0.5f * texture_height, 0.0f));
 		model = glm::rotate   (model, glm::radians(options.angle), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::translate(model, glm::vec3(-0.5f * texture_width, -0.5f * texture_height, 0.0f));
-		model = glm::scale    (model, glm::vec3(texture_width * options.scale, texture_height * options.scale, 1.0f));
+		model = glm::scale    (model, glm::vec3(texture_width * options.scaleX, texture_height * options.scaleY, 1.0f));
 
 		shader.bind();
 		shader.set("model", model);

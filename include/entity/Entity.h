@@ -105,12 +105,18 @@ namespace Game3 {
 			Game & getGame();
 			const Game & getGame() const;
 			bool isVisible() const;
+			void setHeldLeft(Slot);
+			void setHeldRight(Slot);
 			inline bool is(const Identifier &check) const { return type == check; }
+			inline auto getHeldLeft()  const { return heldLeft.slot;  }
+			inline auto getHeldRight() const { return heldRight.slot; }
 
 		protected:
 			Game *game = nullptr;
 			std::shared_ptr<Texture> texture;
 			int variety = 0;
+			inline auto getHeldLeftTexture()  const { return heldLeft.texture;  }
+			inline auto getHeldRightTexture() const { return heldRight.texture; }
 
 			Entity() = delete;
 			Entity(EntityType);
@@ -119,6 +125,20 @@ namespace Game3 {
 			/** A list of functions to call the next time the entity moves. The functions return whether they should be removed from the queue. */
 			std::list<std::function<bool(const std::shared_ptr<Entity> &)>> moveQueue;
 			std::shared_ptr<Texture> getTexture();
+
+		private:
+			struct Held {
+				Slot slot = -1;
+				std::shared_ptr<Texture> texture;
+				float xOffset = 0.f;
+				float yOffset = 0.f;
+				inline explicit operator bool() const { return texture != nullptr; }
+			};
+
+			Held heldLeft;
+			Held heldRight;
+
+			void setHeld(Slot, Held &);
 	};
 
 	void to_json(nlohmann::json &, const Entity &);

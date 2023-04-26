@@ -41,6 +41,10 @@ namespace Game3 {
 			json["path"] = path;
 		if (money != 0)
 			json["money"] = money;
+		if (0 <= heldLeft.slot)
+			json["heldLeft"] = heldLeft.slot;
+		if (0 <= heldRight.slot)
+			json["heldRight"] = heldRight.slot;
 	}
 
 	void Entity::absorbJSON(Game &game, const nlohmann::json &json) {
@@ -55,6 +59,10 @@ namespace Game3 {
 			path = json.at("path").get<std::list<Direction>>();
 		if (json.contains("money"))
 			money = json.at("money");
+		if (json.contains("heldLeft"))
+			heldLeft.slot = json.at("heldLeft");
+		if (json.contains("heldRight"))
+			heldRight.slot = json.at("heldRight");
 	}
 
 	void Entity::tick(Game &, float delta) {
@@ -118,14 +126,71 @@ namespace Game3 {
 				break;
 		}
 
-		sprite_renderer(*texture, {
-			.x = position.column + offset.x(),
-			.y = position.row + offset.y(),
+		const auto x = position.column + offset.x();
+		const auto y = position.row    + offset.y();
+		RenderOptions main_options {
+			.x = x,
+			.y = y,
 			.x_offset = x_offset,
 			.y_offset = y_offset,
 			.size_x = 16.f,
 			.size_y = 16.f,
-		});
+		};
+
+		if (!heldLeft && !heldRight) {
+			sprite_renderer(*texture, main_options);
+			return;
+		}
+
+		auto render_held = [&](const Held &held, float x_o, float y_o, bool flip = false, float degrees = 0.f) {
+			if (held)
+				sprite_renderer(*held.texture, {
+					.x = x + x_o,
+					.y = y + y_o,
+					.x_offset = held.xOffset,
+					.y_offset = held.yOffset,
+					.size_x = 16.f,
+					.size_y = 16.f,
+					.scaleX = .5f * (flip? -1 : 1),
+					.scaleY = .5f,
+					.angle = degrees,
+				});
+		};
+
+		// constexpr float rotation = 45.f;
+		constexpr float rotation = 0.f;
+
+		switch (direction) {
+			case Direction::Up:
+				render_held(heldLeft,  -.1f, .4f, false, -rotation);
+				render_held(heldRight, 1.1f, .4f, true,   rotation);
+				break;
+			case Direction::Left:
+				render_held(heldRight, 0.f, .5f);
+				break;
+			case Direction::Right:
+				render_held(heldLeft, .5f, .5f);
+				break;
+			default:
+				break;
+		}
+
+		sprite_renderer(*texture, main_options);
+
+		switch (direction) {
+			case Direction::Down:
+				render_held(heldRight, -.1f, .5f, false, -rotation);
+				render_held(heldLeft,  1.1f, .5f, true,   rotation);
+				break;
+			case Direction::Left:
+				render_held(heldLeft, .5f, .5f, true);
+				break;
+			case Direction::Right:
+				render_held(heldRight, 1.f, .5f, true);
+				break;
+			default:
+				break;
+		}
 	}
 
 	bool Entity::move(Direction move_direction) {
@@ -346,6 +411,30 @@ namespace Game3 {
 
 	bool Entity::isVisible() const {
 		return getRealm()->getGame().canvas.inBounds(getPosition());
+	}
+
+	void Entity::setHeldLeft(Slot new_value) {
+		setHeld(new_value, heldLeft);
+	}
+
+	void Entity::setHeldRight(Slot new_value) {
+		setHeld(new_value, heldRight);
+	}
+
+	void Entity::setHeld(Slot new_value, Held &held) {
+		if (new_value < 0) {
+			held.slot = -1;
+			held.texture.reset();
+			return;
+		}
+
+		if (!inventory->contains(new_value))
+			throw std::invalid_argument("Can't equip slot " + std::to_string(new_value) + ": no item in inventory");
+		held.slot = new_value;
+		auto item_texture = getGame().registry<ItemTextureRegistry>().at((*inventory)[held.slot]->item->identifier);
+		held.texture = item_texture->getTexture(getGame());
+		held.xOffset = item_texture->x / 2.f;
+		held.yOffset = item_texture->y / 2.f;
 	}
 
 	std::shared_ptr<Texture> Entity::getTexture() {

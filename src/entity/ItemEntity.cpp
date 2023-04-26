@@ -74,7 +74,8 @@ namespace Game3 {
 			.y_offset = yOffset,
 			.size_x = 16.f,
 			.size_y = 16.f,
-			.scale = .75f
+			.scaleX = .75f,
+			.scaleY = .75f,
 		});
 	}
 
