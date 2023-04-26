@@ -6,6 +6,7 @@
 
 #include "entity/Blacksmith.h"
 #include "entity/Chicken.h"
+#include "entity/Dog.h"
 #include "entity/EntityFactory.h"
 #include "entity/ItemEntity.h"
 #include "entity/Merchant.h"
@@ -199,6 +200,7 @@ namespace Game3 {
 		add(EntityFactory::create<Sheep>());
 		add(EntityFactory::create<Pig>());
 		add(EntityFactory::create<Chicken>());
+		add(EntityFactory::create<Dog>());
 	}
 
 	void Game::addTileEntityFactories() {

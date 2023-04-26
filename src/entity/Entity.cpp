@@ -93,7 +93,7 @@ namespace Game3 {
 	}
 
 	void Entity::render(SpriteRenderer &sprite_renderer) {
-		if (texture == nullptr)
+		if (texture == nullptr || !isVisible())
 			return;
 
 		float x_offset = 0.f;
@@ -342,6 +342,10 @@ namespace Game3 {
 
 	const Game & Entity::getGame() const {
 		return getRealm()->getGame();
+	}
+
+	bool Entity::isVisible() const {
+		return getRealm()->getGame().canvas.inBounds(getPosition());
 	}
 
 	std::shared_ptr<Texture> Entity::getTexture() {

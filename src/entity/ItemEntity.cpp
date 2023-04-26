@@ -53,6 +53,9 @@ namespace Game3 {
 	}
 
 	void ItemEntity::render(SpriteRenderer &sprite_renderer) {
+		if (!isVisible())
+			return;
+
 		if (texture == nullptr) {
 			if (needsTexture) {
 				setTexture(*sprite_renderer.canvas->game);

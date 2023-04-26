@@ -3,6 +3,7 @@
 #include "Tileset.h"
 #include "biome/Grassland.h"
 #include "entity/Chicken.h"
+#include "entity/Dog.h"
 #include "entity/Pig.h"
 #include "entity/Sheep.h"
 #include "game/Game.h"
@@ -117,15 +118,21 @@ namespace Game3 {
 
 			std::shared_ptr<Animal> animal;
 
-			switch (std::uniform_int_distribution(1, 300)(rng)) {
+			switch (std::uniform_int_distribution(1, 600)(rng)) {
 				case 1:
+				case 2:
 					animal = realm.spawn<Sheep>({row, column});
 					break;
-				case 2:
+				case 3:
+				case 4:
 					animal = realm.spawn<Pig>({row, column});
 					break;
-				case 3:
+				case 5:
+				case 6:
 					animal = realm.spawn<Chicken>({row, column});
+					break;
+				case 7:
+					animal = realm.spawn<Dog>({row, column});
 					break;
 			}
 

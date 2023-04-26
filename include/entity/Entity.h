@@ -37,6 +37,7 @@ namespace Game3 {
 			constexpr static Slot DEFAULT_INVENTORY_SIZE = 30;
 			/** The reciprocal of this is how many seconds it takes to move one square. */
 			constexpr static float MAX_SPEED = 10.f;
+			constexpr static HitPoints INVINCIBLE = 0;
 
 			EntityType type;
 			Position position {0, 0};
@@ -68,7 +69,7 @@ namespace Game3 {
 			virtual bool isPlayer() const { return false; }
 			/** Returns the maximum number of hitpoints this entity can have. If 0, the entity is invincible. */
 			virtual HitPoints maxHealth() const { return 0; }
-			bool isInvincible() const { return maxHealth() == 0; }
+			bool isInvincible() const { return maxHealth() == INVINCIBLE; }
 			virtual void render(SpriteRenderer &);
 			virtual void tick(Game &, float delta);
 			/** Removes the entity from existence. */
@@ -103,6 +104,7 @@ namespace Game3 {
 			virtual Glib::ustring getName() { return "Unknown Entity (" + std::string(type) + ')'; }
 			Game & getGame();
 			const Game & getGame() const;
+			bool isVisible() const;
 			inline bool is(const Identifier &check) const { return type == check; }
 
 		protected:
