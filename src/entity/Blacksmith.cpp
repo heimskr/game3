@@ -141,11 +141,19 @@ namespace Game3 {
 		Realm &house = *game.realms.at(houseRealm);
 
 		if (0 < coalNeeded || diamonds < RESOURCE_TARGET) {
-			phase = 1;
-			pathfind(house.getTileEntity<Teleporter>()->position);
+			pathfind(house.getTileEntity<Teleporter>()->position, [this](bool success, const auto &) {
+				if (success)
+					phase = 1;
+				else
+					stuck = true;
+			}).detach();
 		} else {
-			phase = 8;
-			pathfind(destination = house.extraData.at("furnace"));
+			pathfind(destination = house.extraData.at("furnace"), [this](bool success, const auto &) {
+				if (success)
+					phase = 8;
+				else
+					stuck = true;
+			}).detach();
 		}
 	}
 
@@ -210,13 +218,12 @@ namespace Game3 {
 			return;
 		}
 
-		if (!pathfind(destination = realm.extraData.at("furnace").get<Position>() + Position(1, 0))) {
-			// throw std::runtime_error("Blacksmith couldn't pathfind to forge");
-			stuck = true;
-			return;
-		}
-
-		phase = 7;
+		pathfind(destination = realm.extraData.at("furnace").get<Position>() + Position(1, 0), [this](bool success, const auto &) {
+			if (success)
+				phase = 7;
+			else
+				stuck = true;
+		}).detach();
 	}
 
 	void Blacksmith::craftTools() {
@@ -251,10 +258,12 @@ namespace Game3 {
 	}
 
 	void Blacksmith::goToCounter() {
-		if (!pathfind(destination = getRealm()->extraData.at("counter").get<Position>()))
-			stuck = true;
-		else
-			phase = 9;
+		pathfind(destination = getRealm()->extraData.at("counter"), [this](bool success, const auto &) {
+			if (success)
+				phase = 9;
+			else
+				stuck = true;
+		}).detach();
 	}
 
 	void Blacksmith::startSelling() {

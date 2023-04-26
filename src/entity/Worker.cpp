@@ -62,11 +62,17 @@ namespace Game3 {
 
 	void Worker::goToKeep(Phase new_phase) {
 		const auto adjacent = getRealm()->getPathableAdjacent(keep->position);
-		if (!adjacent || !pathfind(destination = *adjacent))
-			// throw std::runtime_error("Worker couldn't pathfind to keep");
+		if (!adjacent) {
 			stuck = true;
-		else
-			phase = new_phase;
+			return;
+		}
+
+		pathfind(destination = *adjacent, [this, new_phase](bool success, const auto &) {
+			if (success)
+				phase = new_phase;
+			else
+				stuck = true;
+		}).detach();
 	}
 
 	void Worker::goToStockpile(Phase new_phase) {
@@ -74,11 +80,17 @@ namespace Game3 {
 		auto keep_realm = keep->getInnerRealm();
 		auto stockpile = keep_realm->getTileEntity<Chest>();
 		const auto adjacent = keep_realm->getPathableAdjacent(stockpile->position);
-		if (!adjacent || !pathfind(destination = *adjacent))
-			// throw std::runtime_error("Worker couldn't pathfind to stockpile");
+		if (!adjacent) {
 			stuck = true;
-		else
-			phase = new_phase;
+			return;
+		}
+
+		pathfind(destination = *adjacent, [this, new_phase](bool success, const auto &) {
+			if (success)
+				phase = new_phase;
+			else
+				stuck = true;
+		}).detach();
 	}
 
 	void Worker::leaveKeep(Phase new_phase) {
@@ -87,22 +99,27 @@ namespace Game3 {
 		auto door = keep_realm.getTileEntity<Teleporter>([](const auto &door) {
 			return door->extraData.contains("exit") && door->extraData.at("exit") == true;
 		});
-		if (!pathfind(destination = door->position)) {
-			// throw std::runtime_error("Worker couldn't pathfind to keep door");
-			stuck = true;
-			return;
-		}
+
+		pathfind(destination = door->position, [this](bool success, const auto &) {
+			if (!success)
+				stuck = true;
+		}).detach();
 	}
 
 	void Worker::goToHouse(Phase new_phase) {
 		if (getRealm()->id == overworldRealm) {
 			const auto adjacent = getRealm()->getPathableAdjacent(housePosition);
-			if (!adjacent || !pathfind(destination = *adjacent)) {
-				// throw std::runtime_error("Worker couldn't pathfind to house");
+			if (!adjacent) {
 				stuck = true;
 				return;
 			}
-			phase = new_phase;
+
+			pathfind(destination = *adjacent, [this, new_phase](bool success, const auto &) {
+				if (success)
+					phase = new_phase;
+				else
+					stuck = true;
+			}).detach();
 		}
 	}
 
@@ -119,12 +136,11 @@ namespace Game3 {
 			return;
 		}
 
-		if (!pathfind(destination = realm.extraData.at("bed"))) {
-			// throw std::runtime_error("Worker couldn't pathfind to bed");
-			stuck = true;
-			return;
-		}
-
-		phase = new_phase;
+		pathfind(destination = realm.extraData.at("bed"), [this, new_phase](bool success, const auto &) {
+			if (success)
+				phase = new_phase;
+			else
+				stuck = true;
+		}).detach();
 	}
 }
