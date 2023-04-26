@@ -552,8 +552,7 @@ namespace Game3 {
 									return tileset.isInCategory(tileset[tiles.at(getIndex(march_position))], category);
 								});
 
-								// ???
-								const TileID marched = (march_result / 7 + 6) * (tilemap2->setWidth / tilemap2->tileSize) + march_result % 7;
+								const TileID marched = tileset[tileset.getMarchBase(category)] + (march_result / 7) * (tilemap2->setWidth / tilemap2->tileSize) + march_result % 7;
 								if (marched != tile) {
 									tilemap2->set(offset_position, marched);
 									layer2_updated = true;

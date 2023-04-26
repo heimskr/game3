@@ -493,9 +493,10 @@
 			"base:tile/flower5_white": "base:item/flower5_white",
 			"base:tile/flower5_black": "base:item/flower5_black"
 		},
-		"marchable": [
-			"base:category/wooden_walls"
-		],
+		"marchable": {
+			"base:category/wooden_walls": "base:tile/wall_se",
+			"base:category/towers": "base:tile/tower_se"
+		},
 		"categories": {
 			"base:category/wooden_walls": [
 				"base:tile/wall_nw",

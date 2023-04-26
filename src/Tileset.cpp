@@ -114,6 +114,10 @@ namespace Game3 {
 		return marchable.contains(category);
 	}
 
+	const Identifier & Tileset::getMarchBase(const Identifier &category) const {
+		return marchableMap.at(category);
+	}
+
 	void Tileset::clearCache() {
 		marchableCache.clear();
 		unmarchableCache.clear();
@@ -168,7 +172,11 @@ namespace Game3 {
 		tileset.ids = json.at("ids");
 		tileset.categories = json.at("categories");
 		tileset.textureName = json.at("texture");
-		tileset.marchable = json.at("marchable");
+		for (const auto &[key, value]: json.at("marchable").items()) {
+			tileset.marchable.emplace(key);
+			tileset.marchableMap.emplace(Identifier(key), Identifier(value));
+		}
+
 		tileset.missing = json.at("missing");
 
 		std::map<Identifier, Identifier> stacks = json.at("stacks");

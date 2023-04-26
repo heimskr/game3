@@ -34,6 +34,8 @@ namespace Game3 {
 					if (active->reduceDurability())
 						inventory.erase(inventory.activeSlot);
 					realm.setLayer2(position, tileset.getEmpty());
+					game.activateContext();
+					realm.renderer2.reupload();
 					return true;
 				}
 			}
@@ -103,7 +105,7 @@ namespace Game3 {
 	bool StandardInteractions::damageGround(const Place &place) const {
 		// TODO: handle other tilemaps
 
-		const auto &tile3 = place.realm->getTileset()[place.getLayer3()];
+		const auto &tile3 = place.getLayer3Name();
 		if (tile3 == "base:tile/charred_stump"_id) {
 			place.realm->setLayer3(place.position, "base:tile/empty"_id);
 			return true;

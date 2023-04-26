@@ -31,6 +31,7 @@ namespace Game3 {
 			bool getItemStack(Game &, const Identifier &, ItemStack &) const;
 			bool isMarchable(TileID);
 			bool isCategoryMarchable(const Identifier &category) const;
+			const Identifier & getMarchBase(const Identifier &category) const;
 			void clearCache();
 			const std::set<Identifier> getCategories(const Identifier &) const;
 			const std::set<TileID> getCategoryIDs(const Identifier &) const;
@@ -55,6 +56,7 @@ namespace Game3 {
 			std::set<Identifier> solid;
 			std::set<Identifier> bright;
 			std::set<Identifier> marchable;
+			std::map<Identifier, Identifier> marchableMap;
 			std::map<Identifier, TileID> ids;
 			std::map<TileID, Identifier> names;
 			std::map<Identifier, Identifier> stackNames;
