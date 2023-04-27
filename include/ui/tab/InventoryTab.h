@@ -50,6 +50,8 @@ namespace Game3 {
 			Glib::ustring externalName;
 			std::unordered_map<Gtk::Widget *, std::pair<Slot, bool>> widgetMap;
 			std::unordered_map<Slot, Gtk::Widget *> playerWidgetsBySlot;
+			Glib::RefPtr<Gio::Menu> gmenuSelf;
+			Glib::RefPtr<Gio::Menu> gmenuExternal;
 
 			/** We can't store state in a popover, so we have to store it here. */
 			std::shared_ptr<Game> lastGame;

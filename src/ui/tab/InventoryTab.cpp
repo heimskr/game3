@@ -19,12 +19,28 @@ namespace Game3 {
 		externalLabel.set_hexpand(true);
 		scrolled.set_child(vbox);
 		scrolled.set_vexpand(true);
-		auto gmenu = Gio::Menu::create();
-		gmenu->append("_Drop", "inventory_popup.drop");
-		gmenu->append("D_iscard", "inventory_popup.discard");
-		popoverMenu.set_menu_model(gmenu);
+
+		gmenuSelf = Gio::Menu::create();
+		gmenuSelf->append("Hold (_Left)", "inventory_popup.hold_left");
+		gmenuSelf->append("Hold (_Right)", "inventory_popup.hold_right");
+		gmenuSelf->append("_Drop", "inventory_popup.drop");
+		gmenuSelf->append("D_iscard", "inventory_popup.discard");
+
+		gmenuExternal = Gio::Menu::create();
+		gmenuExternal->append("_Drop", "inventory_popup.drop");
+		gmenuExternal->append("D_iscard", "inventory_popup.discard");
 
 		auto group = Gio::SimpleActionGroup::create();
+		group->add_action("hold_left", [this] {
+			if (!lastExternal)
+				lastGame->player->setHeldLeft(lastSlot);
+		});
+
+		group->add_action("hold_right", [this] {
+			if (!lastExternal)
+				lastGame->player->setHeldRight(lastSlot);
+		});
+
 		group->add_action("drop", [this] {
 			(lastExternal? externalInventory : lastGame->player->inventory)->drop(lastSlot);
 		});
@@ -269,6 +285,10 @@ namespace Game3 {
 
 		popoverMenu.set_has_arrow(true);
 		popoverMenu.set_pointing_to({int(x), int(y), 1, 1});
+		if (external)
+			popoverMenu.set_menu_model(gmenuExternal);
+		else
+			popoverMenu.set_menu_model(gmenuSelf);
 		lastGame = game;
 		lastSlot = slot;
 		lastExternal = external;

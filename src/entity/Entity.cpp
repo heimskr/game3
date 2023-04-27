@@ -414,10 +414,14 @@ namespace Game3 {
 	}
 
 	void Entity::setHeldLeft(Slot new_value) {
+		if (0 <= new_value && heldRight.slot == new_value)
+			setHeld(-1, heldRight);
 		setHeld(new_value, heldLeft);
 	}
 
 	void Entity::setHeldRight(Slot new_value) {
+		if (0 <= new_value && heldLeft.slot == new_value)
+			setHeld(-1, heldLeft);
 		setHeld(new_value, heldRight);
 	}
 
