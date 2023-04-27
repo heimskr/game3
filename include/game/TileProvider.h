@@ -2,6 +2,7 @@
 
 #include <array>
 #include <unordered_map>
+#include <vector>
 
 #include <nlohmann/json.hpp>
 
@@ -9,23 +10,10 @@
 #include "game/ChunkPosition.h"
 
 namespace Game3 {
-	constexpr size_t CHUNK_SIZE = 32;
+	constexpr size_t CHUNK_SIZE = 64;
 	constexpr size_t LAYER_COUNT = 3;
 
-	struct Chunk: std::array<TileID, CHUNK_SIZE * CHUNK_SIZE> {
-		using std::array<TileID, CHUNK_SIZE * CHUNK_SIZE>::array;
-
-		TileID operator()(size_t row, size_t column) const;
-		TileID & operator()(size_t row, size_t column);
-
-		inline operator std::span<TileID>() {
-			return {data(), size() * sizeof(TileID)};
-		}
-
-		inline operator std::span<const TileID>() const {
-			return {data(), size() * sizeof(TileID)};
-		}
-	};
+	using Chunk = std::vector<TileID>;
 
 	class TileProvider {
 		public:
