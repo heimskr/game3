@@ -15,6 +15,14 @@ namespace Game3 {
 				return out;
 			}
 
+			static std::shared_ptr<Chicken> fromJSON(Game &game, const nlohmann::json &json) {
+				auto out = Entity::create<Chicken>();
+				out->absorbJSON(game, json);
+				return out;
+			}
+
+			friend class Entity;
+
 		protected:
 			Chicken(): Animal(ID()) {}
 	};

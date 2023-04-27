@@ -4,7 +4,7 @@ Entities are things like players, NPCs and animals that can move around inside/a
 
 ## Implementing a New Entity
 
-First, include `"entity/Entity.h"` and create a class that extends `Game3::Entity` (or just `Entity` if you're in the `Game3` namespace already).
+There's a bit of boilerplate involved. First, include `"entity/Entity.h"` and create a class that extends `Game3::Entity` (or just `Entity` if you're in the `Game3` namespace already).
 
 Create a public static method like this:
 ```c++
@@ -38,6 +38,20 @@ static std::shared_ptr<MyEntity> create(Game &game) {
 	out->init(game);
 	return out;
 }
+```
+
+### `fromJSON`
+
+If you add a `create` method, you'll need a static `fromJSON` method too. Add this code, making sure to add `Entity` as a friend class.
+
+```c++
+static std::shared_ptr<MyEntity> fromJSON(Game &game, const nlohmann::json &json) {
+	auto out = Entity::create<MyEntity>();
+	out->absorbJSON(game, json);
+	return out;
+}
+
+friend class Entity;
 ```
 
 ### Constructors
