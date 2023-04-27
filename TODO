@@ -9,5 +9,3 @@
 [2023/04/18 17:14:46] Fix saplings for cactuses and snowy trees
 [2023/04/24 00:35:56] Towns can generate with flowers where their walls should be.
 [2023/04/24 20:20:58] Add a plugin system.
-[2023/04/25 21:31:21] Allow entities to hold items.
-[2023/04/26 14:43:48] Fix loading.
