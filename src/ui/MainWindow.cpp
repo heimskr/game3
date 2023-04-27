@@ -698,13 +698,6 @@ namespace Game3 {
 					glArea.get_context()->make_current();
 					game->activeRealm->reupload();
 					return;
-				case GDK_KEY_r:
-					if (canvas) {
-						canvas->spriteRenderer = SpriteRenderer(*canvas);
-						std::cout << "Reinitialized sprite renderer.\n";
-					} else
-						std::cout << "Canvas not ready.\n";
-					return;
 				case GDK_KEY_f:
 					if (control)
 						autofocus = !autofocus;
