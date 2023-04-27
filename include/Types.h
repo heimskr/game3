@@ -20,6 +20,8 @@ namespace Game3 {
 	using BiomeType    = uint32_t;
 	/** Number of quarter-hearts. */
 	using HitPoints    = uint32_t;
+	/** 1-based. */
+	using Layer        = uint8_t;
 
 	// enum class CraftingStationType {None, Furnace, Anvil, Cauldron, Purifier};
 	// enum class Ore {Coal, Copper, Iron, Gold, Diamond};

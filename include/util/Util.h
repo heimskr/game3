@@ -133,4 +133,15 @@ namespace Game3 {
 			throw std::invalid_argument("Set is empty");
 		return *std::next(set.begin(), std::uniform_int_distribution(static_cast<size_t>(0), set.size() - 1)(rng));
 	}
+
+	template <typename T>
+	struct Hash {
+		size_t operator()(const T &data) const {
+			size_t out = 0xcbf29ce484222325ul;
+			const auto *base = reinterpret_cast<const uint8_t *>(&data);
+			for (size_t i = 0; i < sizeof(T); ++i)
+				out = (out * 0x00000100000001b3) ^ base[i];
+			return out;
+		}
+	};
 }
