@@ -23,9 +23,6 @@ namespace Game3 {
 	/** 1-based. */
 	using Layer        = uint8_t;
 
-	// enum class CraftingStationType {None, Furnace, Anvil, Cauldron, Purifier};
-	// enum class Ore {Coal, Copper, Iron, Gold, Diamond};
-
 	using ItemID     = Identifier;
 	using EntityType = Identifier;
 	using RealmType  = Identifier;
