@@ -1,5 +1,6 @@
 #include "game/TileProvider.h"
 #include "util/Util.h"
+#include "util/Zstd.h"
 
 namespace Game3 {
 	TileID Chunk::operator()(size_t row, size_t column) const {
@@ -100,5 +101,21 @@ namespace Game3 {
 	void TileProvider::validateLayer(Layer layer) const {
 		if (layer == 0 || LAYER_COUNT < layer)
 			throw std::out_of_range("Invalid layer: " + std::to_string(layer));
+	}
+
+	void to_json(nlohmann::json &json, const TileProvider &provider) {
+		for (Layer layer = 0; layer < LAYER_COUNT; ++layer)
+			for (const auto &[position, chunk]: provider.chunkMaps[layer])
+				json.push_back(std::make_pair(std::make_tuple(layer, position.x, position.y), compress(std::span(chunk))));
+	}
+
+	void from_json(const nlohmann::json &json, TileProvider &provider) {
+		for (const auto &item: json) {
+			const auto [layer, x, y] = item.at(0).get<std::tuple<Layer, int32_t, int32_t>>();
+			const auto compressed = item.at(1).get<std::vector<uint8_t>>();
+			auto decompressed = decompress16(std::span(compressed.data(), compressed.size() * sizeof(decltype(compressed)::value_type)));
+			auto &array = provider.chunkMaps[layer][ChunkPosition{x, y}];
+			std::copy_n(decompressed.begin(), decompressed.size(), array.begin());
+		}
 	}
 }

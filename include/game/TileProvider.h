@@ -3,6 +3,8 @@
 #include <array>
 #include <unordered_map>
 
+#include <nlohmann/json.hpp>
+
 #include "Types.h"
 #include "game/ChunkPosition.h"
 
@@ -12,8 +14,17 @@ namespace Game3 {
 
 	struct Chunk: std::array<TileID, CHUNK_SIZE * CHUNK_SIZE> {
 		using std::array<TileID, CHUNK_SIZE * CHUNK_SIZE>::array;
+
 		TileID operator()(size_t row, size_t column) const;
 		TileID & operator()(size_t row, size_t column);
+
+		inline operator std::span<TileID>() {
+			return {data(), size() * sizeof(TileID)};
+		}
+
+		inline operator std::span<const TileID>() const {
+			return {data(), size() * sizeof(TileID)};
+		}
 	};
 
 	class TileProvider {
@@ -49,5 +60,11 @@ namespace Game3 {
 			std::array<ChunkMap, LAYER_COUNT> chunkMaps {};
 
 			void validateLayer(Layer) const;
+
+			friend void to_json(nlohmann::json &, const TileProvider &);
+			friend void from_json(const nlohmann::json &, TileProvider &);
 	};
+
+	void to_json(nlohmann::json &, const TileProvider &);
+	void from_json(const nlohmann::json &, TileProvider &);
 }
