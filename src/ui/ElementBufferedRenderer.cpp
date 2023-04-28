@@ -17,8 +17,11 @@
 #include "util/Util.h"
 
 namespace Game3 {
+	ElementBufferedRenderer::ElementBufferedRenderer():
+		reshader(blur_frag) {}
+
 	ElementBufferedRenderer::ElementBufferedRenderer(Realm &realm_):
-		reshader(blur_frag), realm(realm_) {}
+		reshader(blur_frag), realm(&realm_) {}
 
 	ElementBufferedRenderer::~ElementBufferedRenderer() {
 		reset();
@@ -40,17 +43,18 @@ namespace Game3 {
 		}
 	}
 
-	void ElementBufferedRenderer::init(TilemapPtr tilemap_) {
+	void ElementBufferedRenderer::init(TileProvider &provider_) {
 		if (initialized)
 			reset();
-		tilemap = std::move(tilemap_);
+		assert(realm);
+		provider = &provider_;
 		shader.init(buffered_vert, buffered_frag);
 		generateVertexBufferObject();
 		generateElementBufferObject();
 		generateVertexArrayObject();
 		generateLightingTexture();
 		fbo.init();
-		const auto bright_shorts = tilemap->tileset->getBrightIDs();
+		const auto bright_shorts = provider->getTileset(realm->getGame())->getBrightIDs();
 		brightTiles.assign(bright_shorts.begin(), bright_shorts.end());
 		brightTiles.resize(8, -1);
 		brightSet = {bright_shorts.begin(), bright_shorts.end()};
@@ -60,6 +64,8 @@ namespace Game3 {
 	void ElementBufferedRenderer::render(float divisor, float scale, float center_x, float center_y) {
 		if (!initialized)
 			return;
+
+		assert(realm);
 
 		if (dirty) {
 			recomputeLighting();
@@ -76,7 +82,7 @@ namespace Game3 {
 		vbo.bind();
 		ebo.bind();
 		// Try commenting this out, it's kinda funny
-		tilemap->getTexture(realm.getGame())->bind(0);
+		tilemap->getTexture(realm->getGame())->bind(0);
 		shader.set("texture0", 0);
 		shader.set("projection", projection);
 		shader.set("divisor", divisor);
@@ -124,6 +130,14 @@ namespace Game3 {
 		return true;
 	}
 
+	void ElementBufferedRenderer::setChunk(Chunk<TileID> &new_chunk, bool can_reupload) {
+		if (&new_chunk == chunk)
+			return;
+		chunk = &new_chunk;
+		if (can_reupload)
+			reupload();
+	}
+
 	void ElementBufferedRenderer::generateVertexBufferObject() {
 		const auto set_width = tilemap->setWidth / tilemap->tileSize;
 		const float divisor = set_width;
@@ -156,8 +170,7 @@ namespace Game3 {
 		vao.init(vbo, {2, 2, 1});
 	}
 
-	void ElementBufferedRenderer::generateLightingTexture() {
-	}
+	void ElementBufferedRenderer::generateLightingTexture() {}
 
 	void ElementBufferedRenderer::recomputeLighting() {
 		return;

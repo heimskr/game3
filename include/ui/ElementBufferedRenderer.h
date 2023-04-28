@@ -11,7 +11,7 @@
 
 namespace Game3 {
 	class Realm;
-	class Tilemap;
+	class TileProvider;
 
 	/** Start corresponds to left or top, End corresponds to right or bottom. */
 	enum class Alignment {Start, Middle, End};
@@ -29,17 +29,20 @@ namespace Game3 {
 			std::shared_ptr<Tilemap> tilemap;
 			GL::Texture lightTexture;
 
+			ElementBufferedRenderer();
 			ElementBufferedRenderer(Realm &);
 			~ElementBufferedRenderer();
 
 			void reset();
-			void init(std::shared_ptr<Tilemap>);
+			void init(TileProvider &);
 			void render(float divisor, float scale, float center_x, float center_y);
 			/** Doesn't bind any texture—the caller must bind a texture before calling this. */
 			void render(float divisor);
 			void reupload();
 			bool onBackbufferResized(int width, int height);
+			void setChunk(Chunk<TileID> &, bool can_reupload = true);
 			inline void markDirty() { dirty = true; }
+			inline void setRealm(Realm &new_realm) { realm = &new_realm; }
 
 			inline explicit operator bool() const { return initialized; }
 
@@ -57,7 +60,9 @@ namespace Game3 {
 			std::unordered_set<TileID> brightSet;
 			RectangleRenderer rectangle;
 			Reshader reshader;
-			Realm &realm;
+			Realm *realm = nullptr;
+			Chunk<TileID> *chunk = nullptr;
+			TileProvider *provider = nullptr;
 			std::vector<TileID> tileCache;
 
 			void generateVertexBufferObject();

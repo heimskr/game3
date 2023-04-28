@@ -28,30 +28,18 @@ namespace Game3 {
 
 	Realm::Realm(Game &game_): game(game_) {}
 
-	Realm::Realm(Game &game_, RealmID id_, RealmType type_, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr biome_map, int seed_):
-	id(id_), type(type_), tilemap1(std::move(tilemap1_)), tilemap2(std::move(tilemap2_)), tilemap3(std::move(tilemap3_)), biomeMap(std::move(biome_map)), seed(seed_), game(game_) {
-		tilemap1->init(game);
-		tilemap2->init(game);
-		tilemap3->init(game);
-		renderer1.init(tilemap1);
-		renderer2.init(tilemap2);
-		renderer3.init(tilemap3);
+	Realm::Realm(Game &game_, RealmID id_, RealmType type_, int seed_):
+	id(id_), type(type_), seed(seed_), game(game_) {
+		initRenderers();
 		initTexture();
 		remakePathMap();
 	}
 
-	Realm::Realm(Game &game_, RealmID id_, RealmType type_, TilemapPtr tilemap1_, BiomeMapPtr biome_map, int seed_):
-	id(id_), type(type_), tilemap1(std::move(tilemap1_)), biomeMap(std::move(biome_map)), seed(seed_), game(game_) {
-		tilemap1->init(game);
-		renderer1.init(tilemap1);
-		tilemap2 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->tileset);
-		tilemap3 = std::make_shared<Tilemap>(tilemap1->width, tilemap1->height, tilemap1->tileSize, tilemap1->tileset);
-		initTexture();
-		tilemap2->init(game);
-		tilemap3->init(game);
-		renderer2.init(tilemap2);
-		renderer3.init(tilemap3);
-		remakePathMap();
+	void Realm::initRenderers() {
+		for (auto &row: renderers)
+			for (auto &layers: row)
+				for (auto &renderer: layers)
+					renderer.setRealm(*this);
 	}
 
 	void Realm::initTexture() {}
@@ -70,12 +58,8 @@ namespace Game3 {
 		id = json.at("id");
 		type = json.at("type");
 		seed = json.at("seed");
-		tilemap1 = std::make_shared<Tilemap>(Tilemap::fromJSON(game, json.at("tilemap1")));
-		tilemap2 = std::make_shared<Tilemap>(Tilemap::fromJSON(game, json.at("tilemap2")));
-		tilemap3 = std::make_shared<Tilemap>(Tilemap::fromJSON(game, json.at("tilemap3")));
-		tilemap1->init(game);
-		tilemap2->init(game);
-		tilemap3->init(game);
+		tileProvider.clear();
+		from_json(json.at("tilemap"), tileProvider);
 		initTexture();
 		biomeMap = std::make_shared<BiomeMap>(json.at("biomeMap"));
 		outdoors = json.at("outdoors");

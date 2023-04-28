@@ -12,6 +12,7 @@
 #include "Tilemap.h"
 #include "Types.h"
 #include "game/BiomeMap.h"
+#include "game/TileProvider.h"
 #include "tileentity/TileEntity.h"
 #include "ui/ElementBufferedRenderer.h"
 #include "util/GL.h"
@@ -21,6 +22,8 @@ namespace Game3 {
 	class Entity;
 	class Game;
 	class SpriteRenderer;
+
+	using EntityPtr = std::shared_ptr<Entity>;
 
 	struct RealmDetails: NamedRegisterable {
 		Identifier tilesetName;
@@ -37,15 +40,11 @@ namespace Game3 {
 		public:
 			RealmID id;
 			RealmType type;
-			TilemapPtr tilemap1;
-			TilemapPtr tilemap2;
-			TilemapPtr tilemap3;
+			TileProvider tileProvider;
 			BiomeMapPtr biomeMap;
-			ElementBufferedRenderer renderer1 {*this};
-			ElementBufferedRenderer renderer2 {*this};
-			ElementBufferedRenderer renderer3 {*this};
+			std::array<std::array<std::array<ElementBufferedRenderer, LAYER_COUNT>, 3>, 3> renderers {};
 			std::unordered_map<Index, std::shared_ptr<TileEntity>> tileEntities;
-			std::unordered_set<std::shared_ptr<Entity>> entities;
+			std::unordered_set<EntityPtr> entities;
 			/** A vector of bools (represented with uint8_t to avoid the std::vector<bool> specialization) indicating whether a given square is empty for the purposes of pathfinding. */
 			std::vector<uint8_t> pathMap;
 			nlohmann::json extraData;
@@ -73,53 +72,33 @@ namespace Game3 {
 			void render(int width, int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &, float game_time);
 			void reupload();
 			void rebind();
-			inline Index getWidth()  const { return tilemap1->width;  }
-			inline Index getHeight() const { return tilemap1->height; }
-			std::shared_ptr<Entity> add(const std::shared_ptr<Entity> &);
+			EntityPtr add(const EntityPtr &);
 			std::shared_ptr<TileEntity> add(const std::shared_ptr<TileEntity> &);
 			std::shared_ptr<TileEntity> addUnsafe(const std::shared_ptr<TileEntity> &);
 			void initEntities();
 			void tick(float delta);
-			std::vector<std::shared_ptr<Entity>> findEntities(const Position &) const;
-			std::vector<std::shared_ptr<Entity>> findEntities(const Position &, const std::shared_ptr<Entity> &except) const;
-			std::shared_ptr<Entity> findEntity(const Position &) const;
-			std::shared_ptr<Entity> findEntity(const Position &, const std::shared_ptr<Entity> &except) const;
+			std::vector<EntityPtr> findEntities(const Position &) const;
+			std::vector<EntityPtr> findEntities(const Position &, const EntityPtr &except) const;
+			EntityPtr findEntity(const Position &) const;
+			EntityPtr findEntity(const Position &, const EntityPtr &except) const;
 			std::shared_ptr<TileEntity> tileEntityAt(const Position &);
-			void remove(std::shared_ptr<Entity>);
+			void remove(EntityPtr);
 			void remove(const std::shared_ptr<TileEntity> &, bool run_helper = true);
 			void removeSafe(const std::shared_ptr<TileEntity> &);
 			Position getPosition(Index) const;
-			void onMoved(const std::shared_ptr<Entity> &, const Position &);
+			void onMoved(const EntityPtr &, const Position &);
 			Game & getGame();
-			void queueRemoval(const std::shared_ptr<Entity> &);
+			void queueRemoval(const EntityPtr &);
 			void queueRemoval(const std::shared_ptr<TileEntity> &);
-			void absorb(const std::shared_ptr<Entity> &, const Position &);
-			void setLayer1(Index row, Index column, TileID, bool run_helper = true);
-			void setLayer2(Index row, Index column, TileID, bool run_helper = true);
-			void setLayer3(Index row, Index column, TileID, bool run_helper = true);
-			void setLayer1(Index, TileID, bool run_helper = true);
-			void setLayer2(Index, TileID, bool run_helper = true);
-			void setLayer3(Index, TileID, bool run_helper = true);
-			void setLayer1(Index, const Identifier &, bool run_helper = true);
-			void setLayer2(Index, const Identifier &, bool run_helper = true);
-			void setLayer3(Index, const Identifier &, bool run_helper = true);
-			void setLayer1(const Position &, TileID, bool run_helper = true);
-			void setLayer2(const Position &, TileID, bool run_helper = true);
-			void setLayer3(const Position &, TileID, bool run_helper = true);
-			void setLayer1(const Position &, const Identifier &, bool run_helper = true);
-			void setLayer2(const Position &, const Identifier &, bool run_helper = true);
-			void setLayer3(const Position &, const Identifier &, bool run_helper = true);
-			TileID getLayer1(Index row, Index column) const;
-			TileID getLayer2(Index row, Index column) const;
-			TileID getLayer3(Index row, Index column) const;
-			TileID getLayer1(Index) const;
-			TileID getLayer2(Index) const;
-			TileID getLayer3(Index) const;
-			TileID getLayer1(const Position &) const;
-			TileID getLayer2(const Position &) const;
-			TileID getLayer3(const Position &) const;
-			inline Index getIndex(const Position &position) const { return position.row * getWidth() + position.column; }
-			inline Index getIndex(Index row, Index column) const { return row * getWidth() + column; }
+			void absorb(const EntityPtr &, const Position &);
+			void setTile(Layer, Index row, Index column, TileID, bool run_helper = true);
+			void setTile(Layer, Index, TileID, bool run_helper = true);
+			void setTile(Layer, Index, const Identifier &, bool run_helper = true);
+			void setTile(Layer, const Position &, TileID, bool run_helper = true);
+			void setTile(Layer, const Position &, const Identifier &, bool run_helper = true);
+			TileID getTile(Layer, Index row, Index column) const;
+			TileID getTile(Layer, Index) const;
+			TileID getTile(Layer, const Position &) const;
 			std::optional<Position> getPathableAdjacent(const Position &) const;
 			std::optional<Position> getPathableAdjacent(Index) const;
 			bool isValid(const Position &) const;
@@ -214,8 +193,7 @@ namespace Game3 {
 
 		protected:
 			Realm(Game &);
-			Realm(Game &, RealmID, RealmType, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr, int seed_);
-			Realm(Game &, RealmID, RealmType, TilemapPtr tilemap1_, BiomeMapPtr, int seed_);
+			Realm(Game &, RealmID, RealmType, int seed_);
 
 			void initTexture();
 			virtual void absorbJSON(const nlohmann::json &);
@@ -224,9 +202,11 @@ namespace Game3 {
 		private:
 			Game &game;
 			bool ticking = false;
-			std::vector<std::shared_ptr<Entity>> entityRemovalQueue;
+			std::vector<EntityPtr> entityRemovalQueue;
 			std::vector<std::shared_ptr<TileEntity>> tileEntityRemovalQueue;
 			RWLock tileEntityLock;
+
+			void initRenderers();
 
 			bool isWalkable(Index row, Index column, const Tileset &) const;
 			void setLayerHelper(Index row, Index col, bool should_mark_dirty = true);
