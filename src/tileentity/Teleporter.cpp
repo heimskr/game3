@@ -32,15 +32,17 @@ namespace Game3 {
 	void Teleporter::render(SpriteRenderer &sprite_renderer) {
 		if (!isVisible())
 			return;
-		auto realm = getRealm();
-		auto &tilemap = *realm->tilemap2;
-		const auto &tileset = *tilemap.tileset;
-		if (tileID != tilemap.tileset->getEmpty()) {
-			const auto tilesize = tilemap.tileSize;
+
+		auto &realm = *getRealm();
+		auto &tileset = realm.getTileset();
+
+		if (tileID != tileset.getEmpty()) {
+			const auto tilesize = tileset.getTileSize();
 			const auto tile_num = tileset[tileID];
-			const auto x = (tile_num % (tilemap.setWidth / tilesize)) * tilesize;
-			const auto y = (tile_num / (tilemap.setWidth / tilesize)) * tilesize;
-			sprite_renderer(*tilemap.getTexture(realm->getGame()), {
+			const auto texture  = tileset.getTexture(realm.getGame());
+			const auto x = (tile_num % (*texture->width / tilesize)) * tilesize;
+			const auto y = (tile_num / (*texture->width / tilesize)) * tilesize;
+			sprite_renderer(*texture, {
 				.x = static_cast<float>(position.column),
 				.y = static_cast<float>(position.row),
 				.x_offset = x / 2.f,
