@@ -16,52 +16,20 @@ namespace Game3 {
 		return column < other.column;
 	}
 
-	TileID Place::getLayer1() const {
-		return realm->getLayer1(position);
+	TileID Place::get(Layer layer) const {
+		return realm->getTile(layer, position);
 	}
 
-	TileID Place::getLayer2() const {
-		return realm->getLayer2(position);
+	const Identifier & Place::getName(Layer layer) const {
+		return realm->getTileset()[realm->getTile(layer, position)];
 	}
 
-	TileID Place::getLayer3() const {
-		return realm->getLayer3(position);
+	void Place::set(Layer layer, TileID tile) const {
+		realm->setTile(layer, position, tile);
 	}
 
-	const Identifier & Place::getLayer1Name() const {
-		return (*realm->tilemap1->tileset)[realm->getLayer1(position)];
-	}
-
-	const Identifier & Place::getLayer2Name() const {
-		return (*realm->tilemap2->tileset)[realm->getLayer2(position)];
-	}
-
-	const Identifier & Place::getLayer3Name() const {
-		return (*realm->tilemap3->tileset)[realm->getLayer3(position)];
-	}
-
-	void Place::setLayer1(TileID tile) const {
-		realm->setLayer1(position, tile);
-	}
-
-	void Place::setLayer2(TileID tile) const {
-		realm->setLayer2(position, tile);
-	}
-
-	void Place::setLayer3(TileID tile) const {
-		realm->setLayer3(position, tile);
-	}
-
-	void Place::setLayer1(const Identifier &tilename) const {
-		realm->setLayer1(position, (*realm->tilemap1->tileset)[tilename]);
-	}
-
-	void Place::setLayer2(const Identifier &tilename) const {
-		realm->setLayer2(position, (*realm->tilemap2->tileset)[tilename]);
-	}
-
-	void Place::setLayer3(const Identifier &tilename) const {
-		realm->setLayer3(position, (*realm->tilemap3->tileset)[tilename]);
+	void Place::set(Layer layer, const Identifier &tilename) const {
+		realm->setTile(layer, position, tilename);
 	}
 
 	Game & Place::getGame() {

@@ -43,18 +43,10 @@ namespace Game3 {
 		Place(Position position_, std::shared_ptr<Realm> realm_, std::shared_ptr<Player> player_):
 			position(std::move(position_)), realm(std::move(realm_)), player(std::move(player_)) {}
 
-		TileID getLayer1() const;
-		TileID getLayer2() const;
-		TileID getLayer3() const;
-		const Identifier & getLayer1Name() const;
-		const Identifier & getLayer2Name() const;
-		const Identifier & getLayer3Name() const;
-		void setLayer1(TileID) const;
-		void setLayer2(TileID) const;
-		void setLayer3(TileID) const;
-		void setLayer1(const Identifier &) const;
-		void setLayer2(const Identifier &) const;
-		void setLayer3(const Identifier &) const;
+		TileID get(Layer) const;
+		const Identifier & getName(Layer) const;
+		void set(Layer, TileID) const;
+		void set(Layer, const Identifier &) const;
 
 		Game & getGame();
 		const Game & getGame() const;
