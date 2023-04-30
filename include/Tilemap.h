@@ -37,7 +37,7 @@ namespace Game3 {
 			~Tilemap();
 
 			void init(const Game &);
-			std::vector<Index> getLand(Index right_pad = 0, Index bottom_pad = 0) const;
+			std::vector<Position> getLand(Index right_pad = 0, Index bottom_pad = 0) const;
 			std::shared_ptr<Texture> getTexture(const Game &);
 
 			inline const decltype(tiles)::value_type & operator()(Index x, Index y) const {

@@ -64,7 +64,7 @@ namespace Game3 {
 		}
 	}
 
-	std::vector<Index> Tilemap::getLand(Index right_pad, Index bottom_pad) const {
+	std::vector<Position> Tilemap::getLand(Index right_pad, Index bottom_pad) const {
 		std::vector<Index> land_tiles;
 		land_tiles.reserve(width * height);
 		for (Index row = 0; row < height - bottom_pad; ++row)

@@ -4,6 +4,8 @@
 #include <memory>
 #include <random>
 
+#include "game/ChunkPosition.h"
+
 namespace Game3 {
 	class Realm;
 	struct Position;
@@ -17,6 +19,8 @@ namespace Game3 {
 		double antiforestThreshold = -0.4;
 		double biomeZoom = 1000.;
 		/** Determines how large the piece of land handled by each thread is. */
-		size_t regionSize = 32;
+		size_t regionSize = 64;
+		ChunkPosition topLeft;
+		ChunkPosition topRight;
 	};
 }

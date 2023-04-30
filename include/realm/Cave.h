@@ -25,8 +25,7 @@ namespace Game3 {
 
 		protected:
 			Cave() = delete;
-			Cave(Game &, RealmID, RealmID parent_realm, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr, int seed_);
-			Cave(Game &, RealmID, RealmID parent_realm, TilemapPtr tilemap1_, BiomeMapPtr, int seed_);
+			Cave(Game &, RealmID, RealmID parent_realm, int seed_);
 
 			void absorbJSON(const nlohmann::json &) override;
 			void toJSON(nlohmann::json &) const override;

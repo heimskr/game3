@@ -7,10 +7,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Texture.h"
+#include "Tileset.h"
+#include "resources.h"
 #include "game/Game.h"
 #include "ui/Canvas.h"
 #include "ui/SpriteRenderer.h"
-#include "resources.h"
 #include "util/GL.h"
 #include "util/Util.h"
 
@@ -80,17 +81,21 @@ namespace Game3 {
 		if (options.size_y < 0)
 			options.size_y = *texture.height;
 
-		const auto &tilemap = canvas->game->activeRealm->tilemap1;
-		options.x *= tilemap->tileSize * canvas->scale / 2.f;
-		options.y *= tilemap->tileSize * canvas->scale / 2.f;
+		const auto &provider  = canvas->game->activeRealm->tileProvider;
+		const auto &tileset   = provider.getTileset(*canvas->game);
+		const auto tile_size  = tileset->getTileSize();
+		const auto map_length = CHUNK_SIZE * REALM_DIAMETER;
+
+		options.x *= tile_size * canvas->scale / 2.f;
+		options.y *= tile_size * canvas->scale / 2.f;
 
 		options.x += canvas->width() / 2.f;
-		options.x -= tilemap->width * tilemap->tileSize * canvas->scale / canvas->magic * 2.f; // TODO: the math here is a little sus... things might cancel out
-		options.x += centerX * canvas->scale * tilemap->tileSize / 2.f;
+		options.x -= map_length * tile_size * canvas->scale / canvas->magic * 2.f; // TODO: the math here is a little sus... things might cancel out
+		options.x += centerX * canvas->scale * tile_size / 2.f;
 
 		options.y += canvas->height() / 2.f;
-		options.y -= tilemap->height * tilemap->tileSize * canvas->scale / canvas->magic * 2.f;
-		options.y += centerY * canvas->scale * tilemap->tileSize / 2.f;
+		options.y -= map_length * tile_size * canvas->scale / canvas->magic * 2.f;
+		options.y += centerY * canvas->scale * tile_size / 2.f;
 
 		shader.bind();
 
@@ -130,17 +135,21 @@ namespace Game3 {
 		if (options.size_y < 0)
 			options.size_y = texture_height;
 
-		const auto &tilemap = canvas->game->activeRealm->tilemap1;
-		options.x *= tilemap->tileSize * canvas->scale / 2.f;
-		options.y *= tilemap->tileSize * canvas->scale / 2.f;
+		const auto &provider  = canvas->game->activeRealm->tileProvider;
+		const auto &tileset   = provider.getTileset(*canvas->game);
+		const auto tile_size  = tileset->getTileSize();
+		const auto map_length = CHUNK_SIZE * REALM_DIAMETER;
+
+		options.x *= tile_size * canvas->scale / 2.f;
+		options.y *= tile_size * canvas->scale / 2.f;
 
 		options.x += canvas->width() / 2.f;
-		options.x -= tilemap->width * tilemap->tileSize * canvas->scale / canvas->magic * 2.f; // TODO: the math here is a little sus... things might cancel out
-		options.x += centerX * canvas->scale * tilemap->tileSize / 2.f;
+		options.x -= map_length * tile_size * canvas->scale / canvas->magic * 2.f; // TODO: the math here is a little sus... things might cancel out
+		options.x += centerX * canvas->scale * tile_size / 2.f;
 
 		options.y += canvas->height() / 2.f;
-		options.y -= tilemap->height * tilemap->tileSize * canvas->scale / canvas->magic * 2.f;
-		options.y += centerY * canvas->scale * tilemap->tileSize / 2.f;
+		options.y -= map_length * tile_size * canvas->scale / canvas->magic * 2.f;
+		options.y += centerY * canvas->scale * tile_size / 2.f;
 
 		shader.bind();
 

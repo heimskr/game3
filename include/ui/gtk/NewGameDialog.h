@@ -2,8 +2,6 @@
 
 #include <gtkmm.h>
 
-#include "ui/gtk/NumericEntry.h"
-
 namespace Game3 {
 	class MainWindow;
 	struct WorldGenParams;
@@ -16,10 +14,8 @@ namespace Game3 {
 
 		private:
 			MainWindow &mainWindow;
-			sigc::signal<void(long, long, long, const WorldGenParams &)> signal_submit_;
+			sigc::signal<void(long, const WorldGenParams &)> signal_submit_;
 			Gtk::Label seedLabel {"Seed"};
-			Gtk::Label widthLabel {"Width"};
-			Gtk::Label heightLabel {"Height"};
 			Gtk::Label wetnessLabel {"Wetness"};
 			Gtk::Label stoneLevelLabel {"Stone Level"};
 			Gtk::Label forestLabel {"Forest Threshold"};
@@ -29,7 +25,6 @@ namespace Game3 {
 			Gtk::Scale stoneLevelSlider;
 			Gtk::Scale forestSlider;
 			Gtk::Scale antiforestSlider;
-			NumericEntry widthEntry, heightEntry;
 
 			void submit();
 	};

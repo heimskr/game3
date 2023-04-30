@@ -48,7 +48,7 @@ namespace Game3 {
 			std::unordered_map<Position, std::shared_ptr<TileEntity>> tileEntities;
 			std::unordered_set<EntityPtr> entities;
 			nlohmann::json extraData;
-			Index randomLand = 0;
+			Position randomLand;
 			/** Whether the realm's rendering should be affected by the day-night cycle. */
 			bool outdoors = true;
 			size_t ghostCount = 0;

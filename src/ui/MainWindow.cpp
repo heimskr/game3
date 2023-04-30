@@ -280,17 +280,14 @@ namespace Game3 {
 		}, 2);
 	}
 
-	void MainWindow::newGame(size_t seed, int width, int height, const WorldGenParams &params) {
+	void MainWindow::newGame(size_t seed, const WorldGenParams &params) {
 		Timer timer("NewGame");
 		glArea.get_context()->make_current();
 		game = Game::create(*canvas);
 		game->initEntities();
 		auto tileset = game->registry<TilesetRegistry>().at("base:tileset/monomap"_id);
 		auto tileset_texture = tileset->getTexture(*game);
-		auto tilemap = std::make_shared<Tilemap>(width, height, 16, *tileset_texture->width, *tileset_texture->height, tileset);
-		tilemap->init(*game);
-		auto biomemap = std::make_shared<BiomeMap>(width, height);
-		auto realm = Realm::create(*game, 1, "base:realm/overworld"_id, tilemap, biomemap, seed);
+		auto realm = Realm::create(*game, 1, "base:realm/overworld"_id, seed);
 		realm->outdoors = true;
 		std::default_random_engine rng;
 		rng.seed(seed);
@@ -298,7 +295,7 @@ namespace Game3 {
 		game->realms.emplace(realm->id, realm);
 		game->activeRealm = realm;
 		realm->add(game->player = Entity::create<Player>());
-		game->player->position = {realm->randomLand / width, realm->randomLand % width};
+		game->player->position = realm->randomLand;
 		game->player->init(*game);
 		onGameLoaded();
 		game->player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_pickaxe"));
@@ -727,16 +724,6 @@ namespace Game3 {
 								}));
 						} catch (const std::exception &err) {
 							std::cerr << err.what() << '\n';
-						}
-					}
-					return;
-				case GDK_KEY_q:
-					if (game->debugMode) {
-						auto &realm = *game->activeRealm;
-						for (Index row = 0; row < realm.getHeight(); ++row) {
-							for (Index column = 0; column < realm.getWidth(); ++column)
-								std::cout << (realm.pathMap[realm.getIndex(row, column)]? '1' : '0');
-							std::cout << '\n';
 						}
 					}
 					return;
