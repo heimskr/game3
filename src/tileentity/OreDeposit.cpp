@@ -95,14 +95,16 @@ namespace Game3 {
 			return;
 
 		auto &realm = *getRealm();
-		auto &tilemap = *realm.tilemap2;
-		if (tileID != tilemap.tileset->getEmpty()) {
+		auto &tileset = realm.getTileset();
+
+		if (tileID != tileset.getEmpty()) {
 			const Ore &ore = getOre(realm.getGame());
-			const auto tilesize = tilemap.tileSize;
-			const TileID tile_id = (*tilemap.tileset)[0.f < timeRemaining? ore.regenTilename : tileID];
-			const auto x = (tile_id % (tilemap.setWidth / tilesize)) * tilesize;
-			const auto y = (tile_id / (tilemap.setWidth / tilesize)) * tilesize;
-			sprite_renderer(*tilemap.getTexture(realm.getGame()), {
+			const auto tilesize = tileset.getTileSize();
+			const TileID tile_id = tileset[0.f < timeRemaining? ore.regenTilename : tileID];
+			const auto texture = tileset.getTexture(realm.getGame());
+			const auto x = (tile_id % (*texture->width / tilesize)) * tilesize;
+			const auto y = (tile_id / (*texture->width / tilesize)) * tilesize;
+			sprite_renderer(*texture, {
 				.x = static_cast<float>(position.column),
 				.y = static_cast<float>(position.row),
 				.x_offset = x / 2.f,
