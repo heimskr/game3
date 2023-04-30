@@ -50,9 +50,10 @@ namespace Game3 {
 
 		if (tileID) {
 			// Kinda silly to get the tilesize from the realm's second layer. Maybe it could be added as a Chest field.
-			auto &tilemap = *getRealm()->tilemap2;
-			const auto tilesize = tilemap.tileSize;
-			const auto tile_index = (*tilemap.tileset)[tileID];
+			auto &realm = *getRealm();
+			auto &tileset = realm.getTileset();
+			const auto tilesize = tileset.getTileSize();
+			const auto tile_index = tileset[tileID];
 			const auto x = (tile_index % (*texture->width / tilesize)) * tilesize;
 			const auto y = (tile_index / (*texture->width / tilesize)) * tilesize;
 			sprite_renderer(*texture, {
