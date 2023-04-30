@@ -90,17 +90,18 @@ namespace Game3 {
 		auto &realm = *getRealm();
 
 		static const Identifier expected("base", "tileset/monomap");
-		if (realm.tilemap2->tileset->identifier != expected || realm.tilemap3->tileset->identifier != expected)
+
+		if (realm.getTileset().identifier != expected)
 			return true;
 
 		static std::uniform_real_distribution one(0., 1.);
 
 		if (one(threadContext.rng) < CHAR_CHANCE)
-			realm.setLayer3(getPosition(), "base:tile/charred_stump"_id);
+			realm.setTile(3, getPosition(), "base:tile/charred_stump"_id);
 		else
 			realm.spawn<ItemEntity>(getPosition(), ItemStack(realm.getGame(), "base:item/wood"_id, 1));
 
-		realm.setLayer2(getPosition(), "base:tile/ash"_id);
+		realm.setTile(2, getPosition(), "base:tile/ash"_id);
 		return true;
 	}
 
@@ -108,10 +109,10 @@ namespace Game3 {
 		if (!isVisible())
 			return;
 		auto realm = getRealm();
-		const auto &tileset = *realm->tilemap2->tileset;
+		auto &tileset = realm->getTileset();
 		if (tileID != tileset.getEmpty()) {
-			auto &tilemap = *realm->tilemap2;
-			const auto tilesize = tilemap.tileSize;
+			// auto &tilemap = *realm->tilemap2;
+			const auto tilesize = tileset.getTileSize();
 			TileID tile_id = tileset[age < MATURITY? immatureTilename : tileID];
 			if (tile_id != getImmatureTileID(tileset)) {
 				if (0.f <= hiveAge)
@@ -119,9 +120,10 @@ namespace Game3 {
 				if (HIVE_MATURITY <= hiveAge)
 					tile_id += 3;
 			}
-			const auto x = (tile_id % (tilemap.setWidth / tilesize)) * tilesize;
-			const auto y = (tile_id / (tilemap.setWidth / tilesize)) * tilesize;
-			sprite_renderer(*tilemap.getTexture(realm->getGame()), {
+			const auto texture = tileset.getTexture(realm->getGame());
+			const auto x = (tile_id % (*texture->width / tilesize)) * tilesize;
+			const auto y = (tile_id / (*texture->width / tilesize)) * tilesize;
+			sprite_renderer(*texture, {
 				.x = static_cast<float>(position.column),
 				.y = static_cast<float>(position.row),
 				.x_offset = x / 2.f,
