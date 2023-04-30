@@ -7,7 +7,7 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "te/building"}; }
 			RealmID innerRealmID = 0;
-			Index entrance = 0;
+			Position entrance;
 
 			Building(const Building &) = delete;
 			Building(Building &&) = default;
@@ -26,7 +26,7 @@ namespace Game3 {
 
 		protected:
 			Building() = default;
-			Building(Identifier, const Position &, RealmID inner_realm_id, Index entrance_);
+			Building(Identifier, Position, RealmID inner_realm_id, Position entrance_);
 
 			friend class TileEntity;
 	};

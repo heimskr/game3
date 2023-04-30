@@ -337,10 +337,6 @@ namespace Game3 {
 		teleport(new_position);
 	}
 
-	void Entity::teleport(Index index, const std::shared_ptr<Realm> &new_realm) {
-		teleport(new_realm->getPosition(index), new_realm);
-	}
-
 	Position Entity::nextTo() const {
 		switch (direction) {
 			case Direction::Up:    return {position.row - 1, position.column};

@@ -11,7 +11,7 @@ namespace Game3 {
 			constexpr static float HARVESTING_TIME = 5.f;
 			constexpr static float SELLING_TIME = 5.f;
 
-			Index chosenResource = -1;
+			std::optional<Position> chosenResource;
 			float harvestingTime;
 
 			static std::shared_ptr<Woodcutter> create(Game &, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_);

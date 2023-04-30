@@ -6,10 +6,10 @@
 #include "ui/SpriteRenderer.h"
 
 namespace Game3 {
-	Building::Building(Identifier id_, const Position &position_, RealmID inner_realm_id, Index entrance_):
-		TileEntity(std::move(id_), ID(), position_, true),
+	Building::Building(Identifier id_, Position position_, RealmID inner_realm_id, Position entrance_):
+		TileEntity(std::move(id_), ID(), std::move(position_), true),
 		innerRealmID(inner_realm_id),
-		entrance(entrance_) {}
+		entrance(std::move(entrance_)) {}
 
 	void Building::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);

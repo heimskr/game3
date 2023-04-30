@@ -133,8 +133,6 @@ namespace Game3 {
 		// const auto &tiles = realm->tilemap2->getTiles();
 
 		auto check = [&](const Position &offset_position) -> std::optional<bool> {
-			if (!realm->isValid(offset_position))
-				return false;
 			if (auto tile_entity = realm->tileEntityAt(offset_position))
 				if (auto *ghost = dynamic_cast<Ghost *>(tile_entity.get()); ghost && *ghost->material.item == *material.item)
 					return true;

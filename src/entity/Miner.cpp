@@ -40,8 +40,8 @@ namespace Game3 {
 	void Miner::toJSON(nlohmann::json &json) const {
 		Worker::toJSON(json);
 		json["harvestingTime"] = harvestingTime;
-		if (chosenResource != -1)
-			json["chosenResource"] = chosenResource;
+		if (chosenResource)
+			json["chosenResource"] = *chosenResource;
 	}
 
 	void Miner::absorbJSON(Game &game, const nlohmann::json &json) {
@@ -118,10 +118,10 @@ namespace Game3 {
 		auto &overworld = *game.realms.at(overworldRealm);
 		auto &house     = *game.realms.at(houseRealm);
 		// Detect all resources within a given radius of the house
-		std::vector<Index> resource_choices;
-		for (const auto &[index, tile_entity]: overworld.tileEntities)
+		std::vector<Position> resource_choices;
+		for (const auto &[te_position, tile_entity]: overworld.tileEntities)
 			if (dynamic_cast<OreDeposit *>(tile_entity.get()))
-				resource_choices.push_back(index);
+				resource_choices.push_back(te_position);
 		// If there are no resources, get stuck forever. Seed -1998 has no resources.
 		if (resource_choices.empty()) {
 			phase = -1;
@@ -135,8 +135,10 @@ namespace Game3 {
 
 	void Miner::goToResource() {
 		auto &realm = *getRealm();
-		auto chosen_position = realm.getPosition(chosenResource);
-		if (auto next = realm.getPathableAdjacent(chosen_position)) {
+		if (!chosenResource)
+			return;
+
+		if (auto next = realm.getPathableAdjacent(*chosenResource)) {
 			if (!pathfind(destination = *next)) {
 				stuck = true;
 				return;
@@ -155,8 +157,7 @@ namespace Game3 {
 		if (HARVESTING_TIME <= harvestingTime) {
 			harvestingTime = 0.f;
 			auto &realm = *getRealm();
-			const auto resource_position = realm.getPosition(chosenResource);
-			auto &deposit = dynamic_cast<OreDeposit &>(*realm.tileEntityAt(resource_position));
+			auto &deposit = dynamic_cast<OreDeposit &>(*realm.tileEntityAt(*chosenResource));
 			const ItemStack &stack = deposit.getOre(realm.getGame()).stack;
 			const auto leftover = inventory->add(stack);
 			if (leftover == stack)

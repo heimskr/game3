@@ -93,7 +93,6 @@ namespace Game3 {
 			void focus(Canvas &, bool is_autofocus);
 			void teleport(const Position &, bool clear_offset = true);
 			virtual void teleport(const Position &, const std::shared_ptr<Realm> &);
-			void teleport(Index, const std::shared_ptr<Realm> &);
 			/** Returns the position of the tile in front of the entity. */
 			Position nextTo() const;
 			std::string debug() const;

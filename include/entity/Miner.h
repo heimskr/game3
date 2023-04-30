@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "Types.h"
 #include "entity/Worker.h"
 
@@ -12,7 +14,7 @@ namespace Game3 {
 			constexpr static float HARVESTING_TIME = 5.f;
 			constexpr static float SELLING_TIME = 5.f;
 
-			Index chosenResource = -1;
+			std::optional<Position> chosenResource;
 			float harvestingTime;
 
 			static std::shared_ptr<Miner> create(Game &, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_);
