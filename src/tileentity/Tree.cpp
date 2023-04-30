@@ -111,7 +111,6 @@ namespace Game3 {
 		auto realm = getRealm();
 		auto &tileset = realm->getTileset();
 		if (tileID != tileset.getEmpty()) {
-			// auto &tilemap = *realm->tilemap2;
 			const auto tilesize = tileset.getTileSize();
 			TileID tile_id = tileset[age < MATURITY? immatureTilename : tileID];
 			if (tile_id != getImmatureTileID(tileset)) {
