@@ -5,14 +5,8 @@ namespace Game3 {
 	Keep::Keep(Game &game_):
 		Realm(game_) {}
 
-	Keep::Keep(Game &game_, RealmID id_, const Position &parent_origin, Index parent_width, Index parent_height, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr biome_map, int seed_):
-		Realm(game_, id_, ID(), std::move(tilemap1_), std::move(tilemap2_), std::move(tilemap3_), std::move(biome_map), seed_),
-		parentOrigin(parent_origin),
-		parentWidth(parent_width),
-		parentHeight(parent_height) {}
-
-	Keep::Keep(Game &game_, RealmID id_, const Position &parent_origin, Index parent_width, Index parent_height, TilemapPtr tilemap1_, BiomeMapPtr biome_map, int seed_):
-		Realm(game_, id_, ID(), std::move(tilemap1_), std::move(biome_map), seed_),
+	Keep::Keep(Game &game_, RealmID id_, const Position &parent_origin, Index parent_width, Index parent_height, int seed_):
+		Realm(game_, id_, ID(), seed_),
 		parentOrigin(parent_origin),
 		parentWidth(parent_width),
 		parentHeight(parent_height) {}

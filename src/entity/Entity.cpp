@@ -274,18 +274,15 @@ namespace Game3 {
 		if (!realm)
 			return false;
 
-		if (realm->getHeight() <= new_position.row || realm->getWidth() <= new_position.column)
+		const auto &tileset = realm->getTileset();
+
+		if (!tileset.isWalkable(realm->getTile(1, new_position)))
 			return false;
 
-		const auto &tileset = *realm->tilemap1->tileset;
-
-		if (!tileset.isWalkable((*realm->tilemap1)[new_position]))
+		if (tileset.isSolid(realm->getTile(2, new_position)))
 			return false;
 
-		if (tileset.isSolid((*realm->tilemap2)[new_position]))
-			return false;
-
-		if (tileset.isSolid((*realm->tilemap3)[new_position]))
+		if (tileset.isSolid(realm->getTile(3, new_position)))
 			return false;
 
 		if (auto tile_entity = realm->tileEntityAt(new_position))
@@ -306,14 +303,16 @@ namespace Game3 {
 			return;
 
 		canvas.autofocusCounter = 0;
-		const auto &tilemap = *realm->tilemap1;
-		constexpr bool adjust = false; // Render-to-texture silliness
-		canvas.center.x() = -(getColumn() - tilemap.width  / 2.f + 0.5f) - offset.x();
-		canvas.center.y() = -(getRow()    - tilemap.height / 2.f + 0.5f) - offset.y();
-		if (adjust) {
-			canvas.center.x() -= canvas.width()  / 32.f / canvas.scale;
-			canvas.center.y() += canvas.height() / 32.f / canvas.scale;
-		}
+		auto &tileset = realm->getTileset();
+		const auto texture = tileset.getTexture(realm->getGame());
+		// TODO!: fix
+		// constexpr bool adjust = false; // Render-to-texture silliness
+		// canvas.center.x() = -(getColumn() - tilemap.width  / 2.f + 0.5f) - offset.x();
+		// canvas.center.y() = -(getRow()    - tilemap.height / 2.f + 0.5f) - offset.y();
+		// if (adjust) {
+		// 	canvas.center.x() -= canvas.width()  / 32.f / canvas.scale;
+		// 	canvas.center.y() += canvas.height() / 32.f / canvas.scale;
+		// }
 	}
 
 	void Entity::teleport(const Position &new_position, bool clear_offset) {

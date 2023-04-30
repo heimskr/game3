@@ -26,10 +26,7 @@ namespace Game3 {
 
 		protected:
 			Keep(Game &);
-
-			Keep(Game &, RealmID, const Position &parent_origin, Index parent_width, Index parent_height, TilemapPtr tilemap1_, TilemapPtr tilemap2_, TilemapPtr tilemap3_, BiomeMapPtr, int seed_);
-
-			Keep(Game &, RealmID, const Position &parent_origin, Index parent_width, Index parent_height, TilemapPtr tilemap1_, BiomeMapPtr, int seed_);
+			Keep(Game &, RealmID, const Position &parent_origin, Index parent_width, Index parent_height, int seed_);
 
 			void absorbJSON(const nlohmann::json &) override;
 			void toJSON(nlohmann::json &) const override;

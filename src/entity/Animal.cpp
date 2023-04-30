@@ -33,11 +33,10 @@ namespace Game3 {
 
 	bool Animal::wander() {
 		timeUntilWander = getWanderDistribution()(threadContext.rng);
-		Realm &realm = *getRealm();
 		const auto [row, column] = position;
 		return pathfind({
-			std::uniform_int_distribution(std::max(0_idx, row    - wanderRadius), std::min(realm.getHeight() - 1, row    + wanderRadius))(threadContext.rng),
-			std::uniform_int_distribution(std::max(0_idx, column - wanderRadius), std::min(realm.getWidth()  - 1, column + wanderRadius))(threadContext.rng)
+			std::uniform_int_distribution(row    - wanderRadius, row    + wanderRadius)(threadContext.rng),
+			std::uniform_int_distribution(column - wanderRadius, column + wanderRadius)(threadContext.rng)
 		});
 	}
 }
