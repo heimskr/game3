@@ -28,12 +28,12 @@ namespace Game3 {
 
 	static void spawnCauldron(const Place &place) {
 		place.realm->add(TileEntity::create<CraftingStation>(place.realm->getGame(), "base:tile/cauldron_red_full"_id, place.position, "base:station/cauldron"_id));
-		place.realm->setLayer2(place.position, "base:tile/cauldron_red_full");
+		place.realm->setTile(2, place.position, "base:tile/cauldron_red_full");
 	}
 
 	static void spawnPurifier(const Place &place) {
 		place.realm->add(TileEntity::create<CraftingStation>(place.realm->getGame(), "base:tile/purifier"_id, place.position, "base:station/purifier"_id));
-		place.realm->setLayer2(place.position, "base:tile/purifier");
+		place.realm->setTile(2, place.position, "base:tile/purifier");
 	}
 
 	void initGhosts(Game &game) {
@@ -96,11 +96,11 @@ namespace Game3 {
 		if (!isVisible())
 			return;
 
-		auto realm = getRealm();
-		auto &tilemap = *realm->tilemap2;
-		const auto &tileset = *tilemap.tileset;
-		const auto tilesize = tilemap.tileSize;
-		const auto column_count = tilemap.setWidth / tilesize;
+		auto &realm = *getRealm();
+		auto &tileset = realm.getTileset();
+		const auto tilesize = tileset.getTileSize();
+		auto texture = tileset.getTexture(realm.getGame());
+		const auto column_count = *texture->width / tilesize;
 
 		TileID tile_id = tileset.getEmptyID();
 
@@ -113,7 +113,7 @@ namespace Game3 {
 
 		const auto x = (tile_id % column_count) * tilesize;
 		const auto y = (tile_id / column_count) * tilesize;
-		sprite_renderer(*tilemap.getTexture(realm->getGame()), {
+		sprite_renderer(*texture, {
 			.x = static_cast<float>(position.column),
 			.y = static_cast<float>(position.row),
 			.x_offset = x / 2.f,
@@ -130,7 +130,7 @@ namespace Game3 {
 
 		auto realm = getRealm();
 		TileID march_result;
-		const auto &tiles = realm->tilemap2->getTiles();
+		// const auto &tiles = realm->tilemap2->getTiles();
 
 		auto check = [&](const Position &offset_position) -> std::optional<bool> {
 			if (!realm->isValid(offset_position))
@@ -143,13 +143,13 @@ namespace Game3 {
 
 		const auto &registry = realm->getGame().registry<GhostFunctionRegistry>();
 		const auto &fn       = *registry[details.type];
-		const auto &tileset  = *realm->tilemap2->tileset;
+		const auto &tileset  = realm->getTileset();
 
 		march_result = march4([&](int8_t row_offset, int8_t column_offset) -> bool {
 			const Position offset_position(position + Position(row_offset, column_offset));
 			if (auto value = check(offset_position))
 				return *value;
-			return fn(tileset[tiles.at(realm->getIndex(offset_position))], Place(offset_position, realm, nullptr));
+			return fn(tileset[realm->getTile(2, offset_position)], Place(offset_position, realm, nullptr));
 		});
 
 		const TileID marched_row = march_result / 7;
@@ -161,51 +161,27 @@ namespace Game3 {
 
 	void Ghost::confirm() {
 		auto realm = getRealm();
-		auto &tilemap1 = *realm->tilemap1;
-		auto &tilemap2 = *realm->tilemap2;
-		auto &tilemap3 = *realm->tilemap3;
-		const auto &tileset = *tilemap2.tileset;
+		auto &tileset = realm->getTileset();
 
-		switch (details.layer) {
-			case 1:
-				if (tilemap1[position] != tileset.getEmptyID())
-					throw OverlapError("Can't confirm ghost at " + std::string(position));
-				break;
-			case 2:
-				if (tilemap2[position] != tileset.getEmptyID())
-					throw OverlapError("Can't confirm ghost at " + std::string(position));
-				break;
-			case 3:
-				if (tilemap3[position] != tileset.getEmptyID())
-					throw OverlapError("Can't confirm ghost at " + std::string(position));
-				break;
-			default:
-				throw std::invalid_argument("Invalid layer for Ghost: " + std::to_string(details.layer));
-		}
+		auto &tiles = realm->tileProvider;
+
+		if (tiles.copyTile(details.layer, position) != tileset.getEmptyID())
+			throw OverlapError("Can't confirm ghost at " + std::string(position));
 
 		if (details.customFn) {
 			details.customFn({position, realm, nullptr});
 		} else {
 			TileID tile_id = tileset[tileset.getMissing()];
-			if (details.useMarchingSquares)
+			if (details.useMarchingSquares) {
 				tile_id = marched;
-			else
-				tile_id = details.rowOffset * (tilemap2.setWidth / tilemap2.tileSize) + details.columnOffset;
-
-			switch (details.layer) {
-				case 1:
-					realm->setLayer1(position, tile_id);
-					break;
-				case 2:
-					realm->setLayer2(position, tile_id);
-					break;
-				case 3:
-					realm->setLayer3(position, tile_id);
-					break;
-				default:
-					throw std::invalid_argument("Invalid layer for Ghost: " + std::to_string(details.layer));
+			} else {
+				const auto tilesize = tileset.getTileSize();
+				const auto texture = tileset.getTexture(realm->getGame());
+				const auto column_count = *texture->width / tilesize;
+				tile_id = details.rowOffset * column_count + details.columnOffset;
 			}
 
+			realm->setTile(details.layer, position, tile_id);
 			realm->reupload();
 		}
 	}

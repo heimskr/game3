@@ -30,16 +30,23 @@ namespace Game3 {
 
 	Realm::Realm(Game &game_, RealmID id_, RealmType type_, int seed_):
 	id(id_), type(type_), seed(seed_), game(game_) {
-		initRenderers();
+		initRendererRealms();
 		initTexture();
 		remakePathMap();
 	}
 
-	void Realm::initRenderers() {
+	void Realm::initRendererRealms() {
 		for (auto &row: renderers)
 			for (auto &layers: row)
 				for (auto &renderer: layers)
 					renderer.setRealm(*this);
+	}
+
+	void Realm::initRendererTileProviders() {
+		for (auto &row: renderers)
+			for (auto &layers: row)
+				for (auto &renderer: layers)
+					renderer.init(tileProvider);
 	}
 
 	void Realm::initTexture() {}
@@ -71,9 +78,6 @@ namespace Game3 {
 			if (tile_entity_json.at("id").get<Identifier>() == "base:te/ghost"_id)
 				++ghostCount;
 		}
-		renderer1.init(tilemap1);
-		renderer2.init(tilemap2);
-		renderer3.init(tilemap3);
 		entities.clear();
 		for (const auto &entity_json: json.at("entities"))
 			(*entities.insert(Entity::fromJSON(game, entity_json)).first)->setRealm(shared);
@@ -83,48 +87,29 @@ namespace Game3 {
 
 	void Realm::render(const int width, const int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &sprite_renderer, float game_time) {
 		Canvas &canvas = game.canvas;
-		// auto &textureA = canvas.textureA;
-		// auto &textureB = canvas.textureB;
-		// auto &fbo = canvas.fbo;
 		auto &multiplier = canvas.multiplier;
 
-		// if (canvas.lastRealm != this) {
-		// 	constexpr float factor = ElementBufferedRenderer::TEXTURE_SCALE;
-		// 	const auto texture_width  = tilemap1->width  * tilemap1->tileSize * factor;
-		// 	const auto texture_height = tilemap1->height * tilemap1->tileSize * factor;
-		// 	canvas.lastRealm = this;
-		// }
-
-		// if (textureA.getWidth() != width || textureA.getHeight() != height) {
-			// textureA.initFloat(width, height, GL_NEAREST);
-			// textureB.initFloat(width, height, GL_NEAREST);
-		// }
-
-		// static float last_scale = -1.f;
-		// if (scale != last_scale) {
-		// 	last_scale = scale;
-		// 	renderer1.markDirty();
-		// 	renderer2.markDirty();
-		// 	renderer3.markDirty();
-		// }
-
-		// const auto bb_width  = textureA.getWidth();
-		// const auto bb_height = textureA.getHeight();
-		// fbo.bind();
-		// textureA.useInFB();
-		// GL::Viewport viewport(0, 0, bb_width, bb_height);
 		const auto bb_width  = width;
 		const auto bb_height = height;
-		renderer1.onBackbufferResized(bb_width, bb_height);
-		renderer2.onBackbufferResized(bb_width, bb_height);
-		renderer3.onBackbufferResized(bb_width, bb_height);
-		const float cx = center.x();
-		const float cy = center.y();
-		renderer1.render(outdoors? game_time : 1, scale, cx, cy);
-		renderer2.render(outdoors? game_time : 1, scale, cx, cy);
-		renderer3.render(outdoors? game_time : 1, scale, cx, cy);
-		sprite_renderer.centerX = cx;
-		sprite_renderer.centerY = cy;
+
+		float cy = center.y() - (renderers.size() - 1) / 2 * CHUNK_SIZE;
+		for (auto &row: renderers) {
+			float cx = center.x() - (renderers[0].size() - 1) / 2 * CHUNK_SIZE;
+
+			for (auto &layers: row) {
+				for (auto &renderer: layers) {
+					renderer.onBackbufferResized(bb_width, bb_height);
+					renderer.render(outdoors? game_time : 1, scale, cx, cy);
+				}
+
+				cx += CHUNK_SIZE;
+			}
+
+			cy += CHUNK_SIZE;
+		}
+
+		sprite_renderer.centerX = center.x();
+		sprite_renderer.centerY = center.y();
 		sprite_renderer.update(bb_width, bb_height);
 		sprite_renderer.divisor = outdoors? game_time : 1;
 
@@ -184,15 +169,10 @@ namespace Game3 {
 
 	void Realm::reupload() {
 		getGame().activateContext();
-		renderer1.reupload();
-		renderer2.reupload();
-		renderer3.reupload();
-}
-
-	void Realm::rebind() {
-		renderer1.tilemap = tilemap1;
-		renderer2.tilemap = tilemap2;
-		renderer3.tilemap = tilemap3;
+		for (auto &row: renderers)
+			for (auto &layers: row)
+				for (auto &renderer: layers)
+					renderer.reupload();
 	}
 
 	EntityPtr Realm::add(const EntityPtr &entity) {
@@ -583,6 +563,10 @@ namespace Game3 {
 
 		if (auto iter = game.interactionSets.find(type); iter != game.interactionSets.end())
 			iter->second->damageGround(place);
+	}
+
+	Tileset & Realm::getTileset() {
+		return *tilemap1->tileset;
 	}
 
 	const Tileset & Realm::getTileset() const {

@@ -39,6 +39,8 @@ namespace Game3 {
 			bool isInCategory(const Identifier &tilename, const Identifier &category) const;
 			bool hasName(const Identifier &) const;
 			bool hasCategory(const Identifier &) const;
+			inline auto getTileSize() const { return tileSize; }
+
 			const TileID & operator[](const Identifier &) const;
 			const Identifier & operator[](TileID) const;
 
@@ -47,6 +49,7 @@ namespace Game3 {
 		private:
 			Tileset(Identifier identifier_);
 			std::string name;
+			size_t tileSize = 0;
 			Identifier empty;
 			Identifier missing;
 			Identifier textureName;

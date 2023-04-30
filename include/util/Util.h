@@ -11,6 +11,8 @@
 #include <unordered_set>
 #include <vector>
 
+#include "util/Math.h"
+
 #define TRY try {
 #define CATCH } catch (std::exception &err) { std::cerr << "\e[31m" << __FILE__ << ':' << __LINE__ << ": " << err.what() << "\e[39m\n"; }
 #define PRINTMAT4(m) do { std::cerr << "[[[\n"; for (int r = 0; r < 4; ++r) { for (int c = 0; c < 4; ++c) std::cerr << (m)[c][r] << ' '; std::cerr << '\n'; } std::cerr << "]]]\n"; } while (0)
@@ -24,15 +26,6 @@ namespace Game3 {
 	unsigned long parseUlong(const std::string &, int base = 10);
 	unsigned long parseUlong(const char *, int base = 10);
 	unsigned long parseUlong(std::string_view, int base = 10);
-
-	template <typename T>
-	inline T updiv(T n, T d) {
-		return n / d + (n % d? 1 : 0);
-	}
-
-	inline double fractional(double d) {
-		return std::modf(d, &d);
-	}
 
 	inline std::chrono::system_clock::time_point getTime() {
 		return std::chrono::system_clock::now();

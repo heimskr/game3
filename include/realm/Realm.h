@@ -19,6 +19,8 @@
 #include "util/RWLock.h"
 
 namespace Game3 {
+	constexpr size_t REALM_DIAMETER = 3;
+
 	class Entity;
 	class Game;
 	class SpriteRenderer;
@@ -42,11 +44,9 @@ namespace Game3 {
 			RealmType type;
 			TileProvider tileProvider;
 			BiomeMapPtr biomeMap;
-			std::array<std::array<std::array<ElementBufferedRenderer, LAYER_COUNT>, 3>, 3> renderers {};
+			std::array<std::array<std::array<ElementBufferedRenderer, LAYER_COUNT>, REALM_DIAMETER>, REALM_DIAMETER> renderers {};
 			std::unordered_map<Index, std::shared_ptr<TileEntity>> tileEntities;
 			std::unordered_set<EntityPtr> entities;
-			/** A vector of bools (represented with uint8_t to avoid the std::vector<bool> specialization) indicating whether a given square is empty for the purposes of pathfinding. */
-			std::vector<uint8_t> pathMap;
 			nlohmann::json extraData;
 			Index randomLand = 0;
 			/** Whether the realm's rendering should be affected by the day-night cycle. */
@@ -105,6 +105,7 @@ namespace Game3 {
 			bool hasTileEntityAt(const Position &) const;
 			void confirmGhosts();
 			void damageGround(const Position &);
+			Tileset & getTileset();
 			const Tileset & getTileset() const;
 			void remakePathMap();
 
@@ -206,7 +207,8 @@ namespace Game3 {
 			std::vector<std::shared_ptr<TileEntity>> tileEntityRemovalQueue;
 			RWLock tileEntityLock;
 
-			void initRenderers();
+			void initRendererRealms();
+			void initRendererTileProviders();
 
 			bool isWalkable(Index row, Index column, const Tileset &) const;
 			void setLayerHelper(Index row, Index col, bool should_mark_dirty = true);

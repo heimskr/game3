@@ -163,6 +163,7 @@ namespace Game3 {
 
 	Tileset Tileset::fromJSON(Identifier identifier, const nlohmann::json &json) {
 		Tileset tileset(identifier);
+		tileset.tileSize = json.at("tileSize");
 		tileset.name = json.at("name");
 		tileset.empty = json.at("empty");
 		tileset.land = json.at("land");

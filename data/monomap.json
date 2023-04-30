@@ -1,5 +1,6 @@
 ["base:tileset_map", {
 	"base:tileset/monomap": {
+		"tileSize": 16,
 		"name": "Monomap",
 		"texture": "base:texture/tileset",
 		"empty": "base:tile/empty",
