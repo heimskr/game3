@@ -32,6 +32,9 @@ namespace Game3 {
 			enum class BiomeMode {Throw, Create};
 			enum class PathMode  {Throw, Create};
 
+			std::array<ChunkMap, LAYER_COUNT> chunkMaps;
+			BiomeMap biomeMap;
+			PathMap pathMap;
 			Identifier tilesetID;
 
 			TileProvider() = default;
@@ -167,10 +170,6 @@ namespace Game3 {
 			}
 
 		private:
-			std::array<ChunkMap, LAYER_COUNT> chunkMaps {};
-			BiomeMap biomeMap;
-			PathMap pathMap;
-
 			void validateLayer(Layer) const;
 
 			friend void to_json(nlohmann::json &, const TileProvider &);

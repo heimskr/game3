@@ -319,8 +319,8 @@ namespace Game3 {
 		else
 			game = Game::fromJSON(nlohmann::json::from_cbor(data), *canvas);
 		game->initEntities();
-		for (auto &[id, realm]: game->realms)
-			realm->remakePathMap();
+		// for (auto &[id, realm]: game->realms)
+		// 	realm->remakePathMap();
 		for (const auto &entity: game->activeRealm->entities)
 			if (entity->isPlayer()) {
 				if (!(game->player = std::dynamic_pointer_cast<Player>(entity)))

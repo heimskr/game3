@@ -1,8 +1,15 @@
 #include "Position.h"
 #include "Tileset.h"
 #include "realm/Realm.h"
+#include "util/Util.h"
 
 namespace Game3 {
+	Position::Position(std::string_view string) {
+		const auto comma = string.find(',');
+		row = parseLong(string.substr(0, comma));
+		column = parseLong(string.substr(comma + 1));
+	}
+
 	bool Position::adjacent4(const Position &other) const {
 		const auto diff = *this - other;
 		return (diff.row == 0 && (diff.column == 1 || diff.column == -1)) || (diff.column == 0 && (diff.row == 1 || diff.row == -1));

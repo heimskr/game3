@@ -40,6 +40,8 @@ namespace Game3 {
 			bool hasName(const Identifier &) const;
 			bool hasCategory(const Identifier &) const;
 			inline auto getTileSize() const { return tileSize; }
+			size_t columnCount(const Game &);
+			size_t rowCount(const Game &);
 
 			const TileID & operator[](const Identifier &) const;
 			const Identifier & operator[](TileID) const;

@@ -21,6 +21,8 @@ namespace Game3 {
 
 		Position() = default;
 		Position(value_type row_, value_type column_): row(row_), column(column_) {}
+		Position(std::string_view);
+
 		inline bool operator==(const Position &other) const { return row == other.row && column == other.column; }
 		inline bool operator!=(const Position &other) const { return row != other.row || column != other.column; }
 		inline Position operator+(const Position &other) const { return {row + other.row, column + other.column}; }
@@ -32,6 +34,7 @@ namespace Game3 {
 		bool adjacent4(const Position &other) const;
 		explicit inline operator bool() const { return 0 <= row && 0 <= column; }
 		bool operator<(const Position &) const;
+		std::string simpleString() const { return std::to_string(row) + "," + std::to_string(column); }
 	};
 
 	/** Silly naming, but easier than PointedLocation or LocationButWithARealmPtrInsteadOfARealmID. */

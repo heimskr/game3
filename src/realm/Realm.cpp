@@ -32,7 +32,7 @@ namespace Game3 {
 	id(id_), type(type_), seed(seed_), game(game_) {
 		initRendererRealms();
 		initTexture();
-		remakePathMap();
+		// remakePathMap();
 	}
 
 	void Realm::initRendererRealms() {
@@ -70,9 +70,9 @@ namespace Game3 {
 		initTexture();
 		biomeMap = std::make_shared<BiomeMap>(json.at("biomeMap"));
 		outdoors = json.at("outdoors");
-		for (const auto &[index, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>()) {
+		for (const auto &[position_string, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>()) {
 			auto tile_entity = TileEntity::fromJSON(game, tile_entity_json);
-			tileEntities.emplace(parseUlong(index), tile_entity);
+			tileEntities.emplace(Position(position_string), tile_entity);
 			tile_entity->setRealm(shared);
 			tile_entity->onSpawn();
 			if (tile_entity_json.at("id").get<Identifier>() == "base:te/ghost"_id)
@@ -175,6 +175,13 @@ namespace Game3 {
 					renderer.reupload();
 	}
 
+	void Realm::reupload(Layer layer) {
+		getGame().activateContext();
+		for (auto &row: renderers)
+			for (auto &layers: row)
+				layers[layer - 1].reupload();
+	}
+
 	EntityPtr Realm::add(const EntityPtr &entity) {
 		entity->setRealm(shared_from_this());
 		entities.insert(entity);
@@ -182,13 +189,12 @@ namespace Game3 {
 	}
 
 	TileEntityPtr Realm::addUnsafe(const TileEntityPtr &tile_entity) {
-		const Index index = getIndex(tile_entity->position);
-		if (tileEntities.contains(index))
+		if (tileEntities.contains(tile_entity->position))
 			return nullptr;
 		tile_entity->setRealm(shared_from_this());
-		tileEntities.emplace(index, tile_entity);
+		tileEntities.emplace(tile_entity->position, tile_entity);
 		if (tile_entity->solid)
-			pathMap[index] = false;
+			tileProvider.findPathState(tile_entity->position) = false;
 		if (tile_entity->is("base:te/ghost"))
 			++ghostCount;
 		tile_entity->onSpawn();
@@ -259,7 +265,7 @@ namespace Game3 {
 
 	TileEntityPtr Realm::tileEntityAt(const Position &position) {
 		auto lock = tileEntityLock.lockRead();
-		if (auto iter = tileEntities.find(getIndex(position)); iter != tileEntities.end())
+		if (auto iter = tileEntities.find(position); iter != tileEntities.end())
 			return iter->second;
 		return {};
 	}
@@ -270,11 +276,10 @@ namespace Game3 {
 
 	void Realm::remove(const TileEntityPtr &tile_entity, bool run_helper) {
 		const Position position = tile_entity->position;
-		const Index index = getIndex(position);
-		tileEntities.at(index)->onRemove();
-		tileEntities.erase(index);
+		tileEntities.at(position)->onRemove();
+		tileEntities.erase(position);
 		if (run_helper)
-			setLayerHelper(index, false);
+			setLayerHelper(position.row, position.column, false);
 		if (tile_entity->is("base:te/ghost"))
 			--ghostCount;
 		updateNeighbors(position);
@@ -283,10 +288,6 @@ namespace Game3 {
 	void Realm::removeSafe(const TileEntityPtr &tile_entity) {
 		auto lock = tileEntityLock.lockWrite(std::chrono::milliseconds(1));
 		remove(tile_entity, false);
-	}
-
-	Position Realm::getPosition(Index index) const {
-		return {index / getWidth(), index % getWidth()};
 	}
 
 	void Realm::onMoved(const EntityPtr &entity, const Position &position) {
@@ -320,124 +321,31 @@ namespace Game3 {
 		entity->teleport(position);
 	}
 
-	void Realm::setLayer1(Index row, Index column, TileID tile, bool run_helper) {
-		tilemap1->set(column, row, tile);
+	void Realm::setTile(Layer layer, Index row, Index column, TileID tile_id, bool run_helper) {
+		tileProvider.findTile(layer, row, column, TileProvider::TileMode::Create) = tile_id;
 		if (run_helper)
 			setLayerHelper(row, column);
 	}
 
-	void Realm::setLayer2(Index row, Index column, TileID tile, bool run_helper) {
-		tilemap2->set(column, row, tile);
+	void Realm::setTile(Layer layer, const Position &position, TileID tile_id, bool run_helper) {
+		tileProvider.findTile(layer, position.row, position.column, TileProvider::TileMode::Create) = tile_id;
 		if (run_helper)
-			setLayerHelper(row, column);
+			setLayerHelper(position.row, position.column);
 	}
 
-	void Realm::setLayer3(Index row, Index column, TileID tile, bool run_helper) {
-		tilemap3->set(column, row, tile);
-		if (run_helper)
-			setLayerHelper(row, column);
+	void Realm::setTile(Layer layer, const Position &position, const Identifier &tilename, bool run_helper) {
+		setTile(layer, position, getTileset()[tilename], run_helper);
 	}
 
-	void Realm::setLayer1(Index index, TileID tile, bool run_helper) {
-		tilemap1->set(index, tile);
-		if (run_helper)
-			setLayerHelper(index);
+	TileID Realm::getTile(Layer layer, Index row, Index column) const {
+		return tileProvider.copyTile(layer, row, column, TileProvider::TileMode::Throw);
 	}
 
-	void Realm::setLayer2(Index index, TileID tile, bool run_helper) {
-		tilemap2->set(index, tile);
-		if (run_helper)
-			setLayerHelper(index);
-	}
-
-	void Realm::setLayer3(Index index, TileID tile, bool run_helper) {
-		tilemap3->set(index, tile);
-		if (run_helper)
-			setLayerHelper(index);
-	}
-
-	void Realm::setLayer1(Index index, const Identifier &tilename, bool run_helper) {
-		tilemap1->set(index, (*tilemap1->tileset)[tilename]);
-		if (run_helper)
-			setLayerHelper(index);
-	}
-
-	void Realm::setLayer2(Index index, const Identifier &tilename, bool run_helper) {
-		tilemap2->set(index, (*tilemap2->tileset)[tilename]);
-		if (run_helper)
-			setLayerHelper(index);
-	}
-
-	void Realm::setLayer3(Index index, const Identifier &tilename, bool run_helper) {
-		tilemap3->set(index, (*tilemap3->tileset)[tilename]);
-		if (run_helper)
-			setLayerHelper(index);
-	}
-
-	void Realm::setLayer1(const Position &position, TileID tile, bool run_helper) {
-		setLayer1(position.row, position.column, tile, run_helper);
-	}
-
-	void Realm::setLayer2(const Position &position, TileID tile, bool run_helper) {
-		setLayer2(position.row, position.column, tile, run_helper);
-	}
-
-	void Realm::setLayer3(const Position &position, TileID tile, bool run_helper) {
-		setLayer3(position.row, position.column, tile, run_helper);
-	}
-
-	void Realm::setLayer1(const Position &position, const Identifier &tile, bool run_helper) {
-		setLayer1(position.row, position.column, (*tilemap1->tileset)[tile], run_helper);
-	}
-
-	void Realm::setLayer2(const Position &position, const Identifier &tile, bool run_helper) {
-		setLayer2(position.row, position.column, (*tilemap2->tileset)[tile], run_helper);
-	}
-
-	void Realm::setLayer3(const Position &position, const Identifier &tile, bool run_helper) {
-		setLayer3(position.row, position.column, (*tilemap3->tileset)[tile], run_helper);
-	}
-
-	TileID Realm::getLayer1(Index row, Index column) const {
-		return (*tilemap1)(column, row);
-	}
-
-	TileID Realm::getLayer2(Index row, Index column) const {
-		return (*tilemap2)(column, row);
-	}
-
-	TileID Realm::getLayer3(Index row, Index column) const {
-		return (*tilemap3)(column, row);
-	}
-
-	TileID Realm::getLayer1(Index index) const {
-		return (*tilemap1)[index];
-	}
-
-	TileID Realm::getLayer2(Index index) const {
-		return (*tilemap2)[index];
-	}
-
-	TileID Realm::getLayer3(Index index) const {
-		return (*tilemap3)[index];
-	}
-
-	TileID Realm::getLayer1(const Position &position) const {
-		return (*tilemap1)[position];
-	}
-
-	TileID Realm::getLayer2(const Position &position) const {
-		return (*tilemap2)[position];
-	}
-
-	TileID Realm::getLayer3(const Position &position) const {
-		return (*tilemap3)[position];
+	TileID Realm::getTile(Layer layer, const Position &position) const {
+		return getTile(layer, position.row, position.column);
 	}
 
 	bool Realm::interactGround(const PlayerPtr &player, const Position &position) {
-		if (!isValid(position))
-			return false;
-
 		const Place place(position, shared_from_this(), player);
 		auto &game = getGame();
 
@@ -449,42 +357,19 @@ namespace Game3 {
 	}
 
 	std::optional<Position> Realm::getPathableAdjacent(const Position &position) const {
-		const auto width  = getWidth();
-		const auto height = getHeight();
+		if (const Position next(position.row + 1, position.column); tileProvider.copyPathState(next))
+			return next;
 
-		if (position.row < height - 1) {
-			const Position next(position.row + 1, position.column);
-			if (pathMap[getIndex(next)])
-				return next;
-		}
+		if (const Position next(position.row, position.column + 1); tileProvider.copyPathState(next))
+			return next;
 
-		if (position.column < width - 1) {
-			const Position next(position.row, position.column + 1);
-			if (pathMap[getIndex(next)])
-				return next;
-		}
+		if (const Position next(position.row - 1, position.column); tileProvider.copyPathState(next))
+			return next;
 
-		if (0 < position.row) {
-			const Position next(position.row - 1, position.column);
-			if (pathMap[getIndex(next)])
-				return next;
-		}
-
-		if (0 < position.column) {
-			const Position next(position.row, position.column - 1);
-			if (pathMap[getIndex(next)])
-				return next;
-		}
+		if (const Position next(position.row, position.column - 1); tileProvider.copyPathState(next))
+			return next;
 
 		return std::nullopt;
-	}
-
-	std::optional<Position> Realm::getPathableAdjacent(Index index) const {
-		return getPathableAdjacent(getPosition(index));
-	}
-
-	bool Realm::isValid(const Position &position) const {
-		return 0 <= position.row && position.row < getHeight() && 0 <= position.column && position.column < getWidth();
 	}
 
 	void Realm::updateNeighbors(const Position &position) {
@@ -493,33 +378,28 @@ namespace Game3 {
 
 		++depth;
 
-		const auto &tiles = tilemap2->getTiles();
-		const auto &tileset = *tilemap2->tileset;
+		auto &tileset = getTileset();
 
 		for (Index row_offset = -1; row_offset <= 1; ++row_offset)
 			for (Index column_offset = -1; column_offset <= 1; ++column_offset)
 				if (row_offset != 0 || column_offset != 0) {
 					const Position offset_position = position + Position(row_offset, column_offset);
-					if (!isValid(offset_position))
-						continue;
 					if (auto neighbor = tileEntityAt(offset_position)) {
 						neighbor->onNeighborUpdated(-row_offset, -column_offset);
 					} else {
-						const TileID tile = tiles.at(getIndex(offset_position));
+						const TileID tile = tileProvider.copyTile(2, offset_position, TileProvider::TileMode::ReturnEmpty);
 						const auto &tilename = tileset[tile];
 
 						for (const auto &category: tileset.getCategories(tilename)) {
 							if (tileset.isCategoryMarchable(category)) {
 								TileID march_result = march4([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
 									const Position march_position = offset_position + Position(march_row_offset, march_column_offset);
-									if (!isValid(march_position))
-										return false;
-									return tileset.isInCategory(tileset[tiles.at(getIndex(march_position))], category);
+									return tileset.isInCategory(tileset[tileProvider.copyTile(2, march_position, TileProvider::TileMode::ReturnEmpty)], category);
 								});
 
-								const TileID marched = tileset[tileset.getMarchBase(category)] + (march_result / 7) * (tilemap2->setWidth / tilemap2->tileSize) + march_result % 7;
+								const TileID marched = tileset[tileset.getMarchBase(category)] + (march_result / 7) * tileset.columnCount(getGame()) + march_result % 7;
 								if (marched != tile) {
-									tilemap2->set(offset_position, marched);
+									setTile(2, offset_position, marched);
 									layer2_updated = true;
 								}
 							}
@@ -530,12 +410,12 @@ namespace Game3 {
 		if (--depth == 0 && layer2_updated) {
 			layer2_updated = false;
 			getGame().activateContext();
-			renderer2.reupload();
+			reupload(2);
 		}
 	}
 
 	bool Realm::hasTileEntityAt(const Position &position) const {
-		return tileEntities.contains(getIndex(position));
+		return tileEntities.contains(position);
 	}
 
 	void Realm::confirmGhosts() {
@@ -554,7 +434,7 @@ namespace Game3 {
 		}
 
 		game.activateContext();
-		renderer2.reupload();
+		reupload(2);
 	}
 
 	void Realm::damageGround(const Position &position) {
@@ -566,25 +446,19 @@ namespace Game3 {
 	}
 
 	Tileset & Realm::getTileset() {
-		return *tilemap1->tileset;
-	}
-
-	const Tileset & Realm::getTileset() const {
-		return *tilemap1->tileset;
+		return *tileProvider.getTileset(getGame());
 	}
 
 	void Realm::toJSON(nlohmann::json &json) const {
 		json["id"] = id;
 		json["type"] = type;
 		json["seed"] = seed;
-		json["tilemap1"] = *tilemap1;
-		json["tilemap2"] = *tilemap2;
-		json["tilemap3"] = *tilemap3;
+		json["provider"] = tileProvider;
 		json["biomeMap"] = *biomeMap;
 		json["outdoors"] = outdoors;
 		json["tileEntities"] = std::unordered_map<std::string, nlohmann::json>();
-		for (const auto &[index, tile_entity]: tileEntities)
-			json["tileEntities"][std::to_string(index)] = *tile_entity;
+		for (const auto &[position, tile_entity]: tileEntities)
+			json["tileEntities"][position.simpleString()] = *tile_entity;
 		json["entities"] = std::vector<nlohmann::json>();
 		for (const auto &entity: entities) {
 			nlohmann::json entity_json;
@@ -596,10 +470,10 @@ namespace Game3 {
 	}
 
 	bool Realm::isWalkable(Index row, Index column, const Tileset &tileset) const {
-		if (!tileset.isWalkable((*tilemap1)(column, row)) || !tileset.isWalkable((*tilemap2)(column, row)) || !tileset.isWalkable((*tilemap3)(column, row)))
-			return false;
-		const Index index = getIndex(row, column);
-		if (tileEntities.contains(index) && tileEntities.at(index)->solid)
+		for (Layer layer = 1; layer <= LAYER_COUNT; ++layer)
+			if (!tileset.isWalkable(getTile(layer, row, column)))
+				return false;
+		if (auto iter = tileEntities.find({row, column}); iter != tileEntities.end() && iter->second->solid)
 			return false;
 		return true;
 	}
@@ -607,35 +481,22 @@ namespace Game3 {
 	void Realm::setLayerHelper(Index row, Index column, bool should_mark_dirty) {
 		const auto &tileset = getTileset();
 		const Position position(row, column);
-		pathMap[getIndex(position)] = isWalkable(row, column, tileset);
-		updateNeighbors(position);
-		if (should_mark_dirty) {
-			renderer1.markDirty();
-			renderer2.markDirty();
-			renderer3.markDirty();
-		}
-	}
+		tileProvider.findPathState(position) = isWalkable(row, column, tileset);
 
-	void Realm::setLayerHelper(Index index, bool should_mark_dirty) {
-		const auto &tileset = getTileset();
-		const Position position = getPosition(index);
-		pathMap[index] = isWalkable(position.row, position.column, tileset);
 		updateNeighbors(position);
-		if (should_mark_dirty) {
-			renderer1.markDirty();
-			renderer2.markDirty();
-			renderer3.markDirty();
-		}
+		if (should_mark_dirty)
+			for (auto &row: renderers)
+				for (auto &layers: row)
+					for (auto &renderer: layers)
+						renderer.markDirty();
 	}
 
 	void Realm::remakePathMap() {
-		const auto width = tilemap1->width;
-		const auto height = tilemap1->height;
-		pathMap.resize(width * height);
 		const auto &tileset = getTileset();
-		for (Index row = 0; row < height; ++row)
-			for (Index column = 0; column < width; ++column)
-				pathMap[getIndex(row, column)] = isWalkable(row, column, tileset);
+		for (auto &[chunk_position, path_chunk]: tileProvider.pathMap)
+			for (size_t row = 0; row < CHUNK_SIZE; ++row)
+				for (size_t column = 0; column < CHUNK_SIZE; ++column)
+					path_chunk[row * CHUNK_SIZE + column] = isWalkable(row, column, tileset);
 	}
 
 	bool Realm::rightClick(const Position &position, double x, double y) {

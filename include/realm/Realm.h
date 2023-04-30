@@ -45,7 +45,7 @@ namespace Game3 {
 			TileProvider tileProvider;
 			BiomeMapPtr biomeMap;
 			std::array<std::array<std::array<ElementBufferedRenderer, LAYER_COUNT>, REALM_DIAMETER>, REALM_DIAMETER> renderers {};
-			std::unordered_map<Index, std::shared_ptr<TileEntity>> tileEntities;
+			std::unordered_map<Position, std::shared_ptr<TileEntity>> tileEntities;
 			std::unordered_set<EntityPtr> entities;
 			nlohmann::json extraData;
 			Index randomLand = 0;
@@ -71,6 +71,8 @@ namespace Game3 {
 
 			void render(int width, int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &, float game_time);
 			void reupload();
+			/** The Layer argument is 1-based. */
+			void reupload(Layer);
 			void rebind();
 			EntityPtr add(const EntityPtr &);
 			std::shared_ptr<TileEntity> add(const std::shared_ptr<TileEntity> &);
@@ -85,28 +87,22 @@ namespace Game3 {
 			void remove(EntityPtr);
 			void remove(const std::shared_ptr<TileEntity> &, bool run_helper = true);
 			void removeSafe(const std::shared_ptr<TileEntity> &);
-			Position getPosition(Index) const;
 			void onMoved(const EntityPtr &, const Position &);
 			Game & getGame();
 			void queueRemoval(const EntityPtr &);
 			void queueRemoval(const std::shared_ptr<TileEntity> &);
 			void absorb(const EntityPtr &, const Position &);
 			void setTile(Layer, Index row, Index column, TileID, bool run_helper = true);
-			void setTile(Layer, Index, TileID, bool run_helper = true);
-			void setTile(Layer, Index, const Identifier &, bool run_helper = true);
 			void setTile(Layer, const Position &, TileID, bool run_helper = true);
 			void setTile(Layer, const Position &, const Identifier &, bool run_helper = true);
 			TileID getTile(Layer, Index row, Index column) const;
-			TileID getTile(Layer, Index) const;
 			TileID getTile(Layer, const Position &) const;
 			std::optional<Position> getPathableAdjacent(const Position &) const;
-			std::optional<Position> getPathableAdjacent(Index) const;
-			bool isValid(const Position &) const;
 			bool hasTileEntityAt(const Position &) const;
 			void confirmGhosts();
 			void damageGround(const Position &);
 			Tileset & getTileset();
-			const Tileset & getTileset() const;
+			/** Redoes the pathmap for the entire stored map, not just the visible ones! Can be very expensive. */
 			void remakePathMap();
 
 			virtual bool interactGround(const std::shared_ptr<Player> &, const Position &);
@@ -212,7 +208,6 @@ namespace Game3 {
 
 			bool isWalkable(Index row, Index column, const Tileset &) const;
 			void setLayerHelper(Index row, Index col, bool should_mark_dirty = true);
-			void setLayerHelper(Index, bool should_mark_dirty = true);
 
 			static BiomeType getBiome(uint32_t seed);
 	};

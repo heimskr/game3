@@ -153,6 +153,14 @@ namespace Game3 {
 		return categories.contains(tilename);
 	}
 
+	size_t Tileset::columnCount(const Game &game) {
+		return *getTexture(game)->width / getTileSize();
+	}
+
+	size_t Tileset::rowCount(const Game &game) {
+		return *getTexture(game)->height / getTileSize();
+	}
+
 	const TileID & Tileset::operator[](const Identifier &tilename) const {
 		return ids.at(tilename);
 	}
