@@ -18,9 +18,6 @@ namespace Game3 {
 		double forestThreshold = 0.5;
 		double antiforestThreshold = -0.4;
 		double biomeZoom = 1000.;
-		/** Determines how large the piece of land handled by each thread is. */
-		size_t regionSize = 64;
-		ChunkPosition topLeft;
-		ChunkPosition topRight;
+		ChunkRange range;
 	};
 }

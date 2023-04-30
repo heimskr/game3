@@ -14,17 +14,16 @@ namespace Game3 {
 		{Biome::CAVE,      std::make_shared<Biome>(CAVE)},
 	};
 
-	void Biome::init(Realm &realm_, int, const std::shared_ptr<double[]> &saved_noise) {
+	void Biome::init(Realm &realm_, int) {
 		setRealm(realm_);
-		savedNoise = saved_noise;
 	}
 
-	std::map<BiomeType, BiomePtr> Biome::getMap(Realm &realm, int noise_seed, const std::shared_ptr<double[]> &saved_noise) {
+	std::map<BiomeType, BiomePtr> Biome::getMap(Realm &realm, int noise_seed) {
 		std::map<BiomeType, BiomePtr> out;
 
 		for (const auto &[type, ptr]: map) {
 			auto biome = ptr->clone();
-			biome->init(realm, noise_seed, saved_noise);
+			biome->init(realm, noise_seed);
 			out.emplace(type, biome);
 		}
 

@@ -32,23 +32,24 @@ namespace Game3 {
 			Biome(BiomeType type_): type(type_) {}
 			virtual ~Biome() = default;
 
-			virtual void init(Realm &realm_, int noise_seed, const std::shared_ptr<double[]> &saved_noise);
+			virtual void init(Realm &realm_, int noise_seed);
 
-			virtual void generate(Index row, Index column, std::default_random_engine &, const noise::module::Perlin &, const WorldGenParams &) {
+			/** Returns the noise value generated for the position. */
+			virtual double generate(Index row, Index column, std::default_random_engine &, const noise::module::Perlin &, const WorldGenParams &) {
 				(void) row; (void) column;
+				return 0.;
 			}
 
 			virtual void postgen(Index row, Index column, std::default_random_engine &, const noise::module::Perlin &, const WorldGenParams &) {
 				(void) row; (void) column;
 			}
 
-			static std::map<BiomeType, std::shared_ptr<Biome>> getMap(Realm &, int noise_seed, const std::shared_ptr<double[]> &saved_noise);
+			static std::map<BiomeType, std::shared_ptr<Biome>> getMap(Realm &, int noise_seed);
 
 		protected:
 			inline Realm * getRealm() { return realm; }
 			inline void setRealm(Realm &realm_) { realm = &realm_; }
 			virtual std::shared_ptr<Biome> clone() const { return std::make_shared<Biome>(*this); }
-			std::shared_ptr<double[]> savedNoise;
 
 		private:
 			Realm *realm = nullptr;

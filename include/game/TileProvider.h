@@ -6,14 +6,12 @@
 
 #include <nlohmann/json.hpp>
 
+#include "Constants.h"
 #include "Types.h"
 #include "game/ChunkPosition.h"
 #include "util/Math.h"
 
 namespace Game3 {
-	constexpr size_t CHUNK_SIZE = 64;
-	constexpr size_t LAYER_COUNT = 3;
-
 	class Game;
 	class Tileset;
 
@@ -41,7 +39,9 @@ namespace Game3 {
 
 			void clear();
 
-			std::shared_ptr<Tileset> getTileset(const Game &) const;
+			std::shared_ptr<Tileset> getTileset(const Game &);
+
+			std::vector<Position> getLand(const Game &, const ChunkRange &, Index right_pad, Index bottom_pad);
 
 			/** Returns a copy of the given tile. The Create mode will be treated as Throw. */
 			TileID copyTile(Layer, Index row, Index column, bool &was_empty, TileMode = TileMode::Throw) const;
@@ -170,6 +170,8 @@ namespace Game3 {
 			}
 
 		private:
+			std::shared_ptr<Tileset> cachedTileset;
+
 			void validateLayer(Layer) const;
 
 			friend void to_json(nlohmann::json &, const TileProvider &);

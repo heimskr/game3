@@ -1,3 +1,4 @@
+#include "Tileset.h"
 #include "game/Game.h"
 #include "game/TileProvider.h"
 #include "util/Util.h"
@@ -11,10 +12,26 @@ namespace Game3 {
 		biomeMap.clear();
 	}
 
-	std::shared_ptr<Tileset> TileProvider::getTileset(const Game &game) const {
+	std::shared_ptr<Tileset> TileProvider::getTileset(const Game &game) {
+		if (cachedTileset)
+			return cachedTileset;
+
 		if (!tilesetID)
 			throw std::runtime_error("Can't get empty tileset from TileProvider");
-		return game.registry<TilesetRegistry>().at(tilesetID);
+
+		return cachedTileset = game.registry<TilesetRegistry>().at(tilesetID);
+	}
+
+	std::vector<Position> TileProvider::getLand(const Game &game, const ChunkRange &range, Index right_pad, Index bottom_pad) {
+		const auto &tileset = *getTileset(game);
+		std::vector<Position> land_tiles;
+		land_tiles.resize((range.tileWidth() - right_pad) * (range.tileHeight() - bottom_pad));
+		size_t i = 0;
+		for (Index row = range.rowMin(); row <= range.rowMax() - bottom_pad; ++row)
+			for (Index column = range.columnMin(); column < range.columnMax() - right_pad; ++column)
+				if (tileset.isLand(copyTile(1, {row, column})))
+					land_tiles[i++] = {row, column};
+		return land_tiles;
 	}
 
 	TileID TileProvider::copyTile(Layer layer, Index row, Index column, bool &was_empty, TileMode mode) const {
