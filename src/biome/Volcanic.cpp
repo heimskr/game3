@@ -9,18 +9,13 @@
 #include "worldgen/WorldGen.h"
 
 namespace Game3 {
-	void Volcanic::init(Realm &realm, int noise_seed, const std::shared_ptr<double[]> &saved_noise) {
-		Biome::init(realm, noise_seed, saved_noise);
+	void Volcanic::init(Realm &realm, int noise_seed) {
+		Biome::init(realm, noise_seed);
 	}
 
 	double Volcanic::generate(Index row, Index column, std::default_random_engine &, const noise::module::Perlin &perlin, const WorldGenParams &params) {
 		Realm &realm = *getRealm();
 		const auto wetness = params.wetness;
-
-		auto &layer1  = realm.tilemap1->getTilesUnsafe();
-		auto &tileset = *realm.tilemap1->tileset;
-		const Index index = realm.getIndex(row, column);
-
 		const double noise = perlin.GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.666);
 
 		static const Identifier deeper_water  = "base:tile/deeper_water"_id;
@@ -31,21 +26,20 @@ namespace Game3 {
 		static const Identifier lava          = "base:tile/lava"_id;
 		static const Identifier volcanic_rock = "base:tile/volcanic_rock"_id;
 
-		if (noise < wetness) {
-			layer1[index] = tileset[deeper_water];
-		} else if (noise < wetness + 0.1) {
-			layer1[index] = tileset[deep_water];
-		} else if (noise < wetness + 0.2) {
-			layer1[index] = tileset[water];
-		} else if (noise < wetness + 0.3) {
-			layer1[index] = tileset[shallow_water];
-		} else if (noise < wetness + 0.4) {
-			layer1[index] = tileset[volcanic_sand];
-		} else if (0.85 < noise) {
-			layer1[index] = tileset[lava];
-		} else {
-			layer1[index] = tileset[volcanic_rock];
-		}
+		if (noise < wetness)
+			realm.setTile(1, {row, column}, deeper_water);
+		else if (noise < wetness + 0.1)
+			realm.setTile(1, {row, column}, deep_water);
+		else if (noise < wetness + 0.2)
+			realm.setTile(1, {row, column}, water);
+		else if (noise < wetness + 0.3)
+			realm.setTile(1, {row, column}, shallow_water);
+		else if (noise < wetness + 0.4)
+			realm.setTile(1, {row, column}, volcanic_sand);
+		else if (0.85 < noise)
+			realm.setTile(1, {row, column}, lava);
+		else
+			realm.setTile(1, {row, column}, volcanic_rock);
 
 		return noise;
 	}
@@ -54,7 +48,7 @@ namespace Game3 {
 		Realm &realm = *getRealm();
 		static std::uniform_int_distribution distribution(0, 199);
 
-		if (realm.getLayer1(row, column) == realm.getTileset()["base:tile/volcanic_sand"]) {
+		if (realm.getTile(1, {row, column}) == realm.getTileset()["base:tile/volcanic_sand"_id]) {
 			if (distribution(rng) < 1) {
 				Game &game = realm.getGame();
 				std::vector<ItemStack> mushrooms {

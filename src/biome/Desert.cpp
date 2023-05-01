@@ -10,8 +10,8 @@
 #include "worldgen/WorldGen.h"
 
 namespace Game3 {
-	void Desert::init(Realm &realm, int noise_seed, const std::shared_ptr<double[]> &saved_noise) {
-		Biome::init(realm, noise_seed, saved_noise);
+	void Desert::init(Realm &realm, int noise_seed) {
+		Biome::init(realm, noise_seed);
 		forestPerlin = std::make_shared<noise::module::Perlin>();
 		forestPerlin->SetSeed(-noise_seed * 3);
 	}
@@ -20,9 +20,6 @@ namespace Game3 {
 		Realm &realm = *getRealm();
 		const auto wetness    = params.wetness;
 		const auto stoneLevel = params.stoneLevel;
-
-		auto &tileset = realm.getTileset();
-
 		const double noise = perlin.GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.666);
 
 		static const Identifier deeper_water  = "base:tile/deeper_water"_id;
@@ -51,7 +48,7 @@ namespace Game3 {
 				std::default_random_engine tree_rng(static_cast<uint_fast32_t>(forest_noise * 1'000'000'000.));
 				static std::uniform_int_distribution hundred(0, 99);
 				if (hundred(tree_rng) < 75)
-					return;
+					return noise;
 				uint8_t mod = column % 2;
 				if (hundred(tree_rng) < 50)
 					mod = 1 - mod;

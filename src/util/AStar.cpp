@@ -35,29 +35,17 @@ namespace Game3 {
 	static inline void getNeighbors(const std::shared_ptr<Realm> &realm, const Position &position, std::vector<Position> &next) {
 		next.clear();
 
-		if (0 < position.row) {
-			const Position next_pos(position.row - 1, position.column);
-			if (realm->pathMap[realm->getIndex(next_pos)] != 0)
-				next.emplace_back(next_pos);
-		}
+		if (Position next_pos(position.row - 1, position.column); realm->tileProvider.copyPathState(next_pos) != 0)
+			next.emplace_back(next_pos);
 
-		if (0 < position.column) {
-			const Position next_pos(position.row, position.column - 1);
-			if (realm->pathMap[realm->getIndex(next_pos)] != 0)
-				next.emplace_back(next_pos);
-		}
+		if (Position next_pos(position.row, position.column - 1); realm->tileProvider.copyPathState(next_pos) != 0)
+			next.emplace_back(next_pos);
 
-		if (position.row < realm->getHeight() - 1) {
-			const Position next_pos(position.row + 1, position.column);
-			if (realm->pathMap[realm->getIndex(next_pos)] != 0)
-				next.emplace_back(next_pos);
-		}
+		if (Position next_pos(position.row + 1, position.column); realm->tileProvider.copyPathState(next_pos) != 0)
+			next.emplace_back(next_pos);
 
-		if (position.column < realm->getWidth() - 1) {
-			const Position next_pos(position.row, position.column + 1);
-			if (realm->pathMap[realm->getIndex(next_pos)] != 0)
-				next.emplace_back(next_pos);
-		}
+		if (Position next_pos(position.row, position.column + 1); realm->tileProvider.copyPathState(next_pos) != 0)
+			next.emplace_back(next_pos);
 	}
 
 	// Credit: https://www.redblobgames.com/pathfinding/a-star/implementation.html#cplusplus

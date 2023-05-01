@@ -10,23 +10,18 @@
 #include "worldgen/WorldGen.h"
 
 namespace Game3 {
-	void Snowy::init(Realm &realm, int noise_seed, const std::shared_ptr<double[]> &saved_noise) {
-		Biome::init(realm, noise_seed, saved_noise);
+	void Snowy::init(Realm &realm, int noise_seed) {
+		Biome::init(realm, noise_seed);
 		forestPerlin = std::make_shared<noise::module::Perlin>();
 		forestPerlin->SetSeed(-noise_seed * 3);
 	}
 
-	void Snowy::generate(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &perlin, const WorldGenParams &params) {
+	double Snowy::generate(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &perlin, const WorldGenParams &params) {
 		Realm &realm = *getRealm();
 		const auto wetness    = params.wetness;
 		const auto stoneLevel = params.stoneLevel;
 
-		auto &layer1  = realm.tilemap1->getTilesUnsafe();
-		auto &tileset = *realm.tilemap1->tileset;
-		const Index index = realm.getIndex(row, column);
-
 		const double noise = perlin.GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.666);
-		savedNoise[index] = noise;
 
 		static const Identifier deeper_water  = "base:tile/deeper_water"_id;
 		static const Identifier deep_water    = "base:tile/deep_water"_id;
@@ -39,23 +34,23 @@ namespace Game3 {
 		static const Identifier stone         = "base:tile/stone"_id;
 
 		if (noise < wetness) {
-			layer1[index] = tileset[deeper_water];
+			realm.setTile(1, {row, column}, deeper_water);
 		} else if (noise < wetness + 0.1) {
-			layer1[index] = tileset[deep_water];
+			realm.setTile(1, {row, column}, deep_water);
 		} else if (noise < wetness + 0.2) {
-			layer1[index] = tileset[water];
+			realm.setTile(1, {row, column}, water);
 		} else if (noise < wetness + 0.3) {
-			layer1[index] = tileset[shallow_water];
+			realm.setTile(1, {row, column}, shallow_water);
 		} else if (noise < wetness + 0.39) {
-			layer1[index] = tileset[sand];
+			realm.setTile(1, {row, column}, sand);
 		} else if (noise < wetness + 0.42) {
-			layer1[index] = tileset[dark_ice];
+			realm.setTile(1, {row, column}, dark_ice);
 		} else if (noise < wetness + 0.5) {
-			layer1[index] = tileset[light_ice];
+			realm.setTile(1, {row, column}, light_ice);
 		} else if (stoneLevel < noise) {
-			layer1[index] = tileset[stone];
+			realm.setTile(1, {row, column}, stone);
 		} else {
-			layer1[index] = tileset[snow];
+			realm.setTile(1, {row, column}, snow);
 			const double forest_noise = forestPerlin->GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.5);
 			if (params.forestThreshold < forest_noise) {
 				uint8_t mod = column % 2;
@@ -68,6 +63,8 @@ namespace Game3 {
 				}
 			}
 		}
+
+		return noise;
 	}
 
 	void Snowy::postgen(Index row, Index column, std::default_random_engine &, const noise::module::Perlin &perlin, const WorldGenParams &params) {
