@@ -11,6 +11,7 @@
 #include "resources.h"
 #include "Tileset.h"
 #include "container/Quadtree.h"
+#include "game/Game.h"
 #include "realm/Realm.h"
 #include "ui/ElementBufferedRenderer.h"
 #include "util/Timer.h"
@@ -82,9 +83,20 @@ namespace Game3 {
 		auto texture = tileset.getTexture(realm->getGame());
 
 		glm::mat4 projection(1.f);
-		projection = glm::scale(projection, {tilesize, -tilesize, 1.f}) *
+		projection = glm::translate(projection, {
+		                 chunkPosition.x * scale / 2.f,
+		                 chunkPosition.y * scale / 2.f,
+		                 0.f
+		             }) *
+		             glm::scale(projection, {tilesize, -tilesize, 1.f}) *
 		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1.f}) *
-		             glm::translate(projection, {center_x - CHUNK_SIZE / 2.f, center_y - CHUNK_SIZE / 2.f, 0.f});
+		             glm::translate(projection, {
+		                 center_x - CHUNK_SIZE / 2.f,
+		                 center_y - CHUNK_SIZE / 2.f,
+		                 0.f
+		             });
+
+		std::cout << '(' << chunkPosition.x << ", " << chunkPosition.y << ")\n";
 
 		shader.bind();
 		vao.bind();
@@ -173,7 +185,10 @@ namespace Game3 {
 
 		try {
 			vbo.init<float, 3>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, set_width, divisor, t_size](size_t x, size_t y) {
-				const auto tile = realm->getTile(layer, Position(static_cast<Index>(y), static_cast<Index>(x)));
+				const auto tile = realm->getTile(layer, Position(
+					static_cast<Index>(y) + CHUNK_SIZE * chunkPosition.y,
+					static_cast<Index>(x) + CHUNK_SIZE * chunkPosition.x
+				));
 				const float tx0 = (tile % set_width) / divisor + TILE_TEXTURE_PADDING;
 				const float ty0 = (tile / set_width) / divisor + TILE_TEXTURE_PADDING;
 				const float tile_f = static_cast<float>(tile);

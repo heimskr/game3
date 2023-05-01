@@ -10,8 +10,8 @@
 #include <GL/glu.h>
 #include <GLFW/glfw3.h>
 
-// #define CHECKGL do { if (auto err = glGetError()) { std::cerr << "\e[31mError at " << __FILE__ << ':' << __LINE__ << ": " << gluErrorString(err) << "\e[39m\n"; } } while(0);
-#define CHECKGL
+#define CHECKGL do { if (auto err = glGetError()) { std::cerr << "\e[31mError at " << __FILE__ << ':' << __LINE__ << ": " << gluErrorString(err) << "\e[39m\n"; } } while(0);
+// #define CHECKGL
 
 
 namespace GL {

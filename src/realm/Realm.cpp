@@ -276,8 +276,8 @@ namespace Game3 {
 			for (auto &layers: row) {
 				for (auto &renderer: layers) {
 					renderer.chunkPosition = {
-						static_cast<int32_t>(player_cpos.x + col_index - REALM_DIAMETER / 2),
-						static_cast<int32_t>(player_cpos.y + row_index - REALM_DIAMETER / 2),
+						static_cast<int32_t>(player_cpos.x + col_index) - static_cast<int32_t>(REALM_DIAMETER / 2),
+						static_cast<int32_t>(player_cpos.y + row_index) - static_cast<int32_t>(REALM_DIAMETER / 2),
 					};
 				}
 				++col_index;
@@ -427,16 +427,21 @@ namespace Game3 {
 	}
 
 	std::optional<Position> Realm::getPathableAdjacent(const Position &position) const {
-		if (const Position next(position.row + 1, position.column); tileProvider.copyPathState(next))
+		Position next = {position.row + 1, position.column};
+
+		if (auto state = tileProvider.copyPathState(next); state && *state)
 			return next;
 
-		if (const Position next(position.row, position.column + 1); tileProvider.copyPathState(next))
+		next = {position.row, position.column + 1};
+		if (auto state = tileProvider.copyPathState(next); state && *state)
 			return next;
 
-		if (const Position next(position.row - 1, position.column); tileProvider.copyPathState(next))
+		next = {position.row - 1, position.column};
+		if (auto state = tileProvider.copyPathState(next); state && *state)
 			return next;
 
-		if (const Position next(position.row, position.column - 1); tileProvider.copyPathState(next))
+		next = {position.row, position.column - 1};
+		if (auto state = tileProvider.copyPathState(next); state && *state)
 			return next;
 
 		return std::nullopt;

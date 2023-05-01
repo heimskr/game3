@@ -66,7 +66,6 @@ namespace Game3 {
 	std::shared_ptr<Texture> Tileset::getTexture(const Game &game) {
 		if (cachedTexture)
 			return cachedTexture;
-		std::cout << "\e[32mTEXTURE NAME: " << textureName << "\e[39m\n";
 		return cachedTexture = game.registry<TextureRegistry>()[textureName];
 	}
 
