@@ -5,6 +5,9 @@
 #include "util/Zstd.h"
 
 namespace Game3 {
+	TileProvider::TileProvider(Identifier tileset_id):
+		tilesetID(std::move(tileset_id)) {}
+
 	void TileProvider::clear() {
 		tilesetID = {};
 		for (auto &map: chunkMaps)

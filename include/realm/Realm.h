@@ -43,7 +43,6 @@ namespace Game3 {
 			RealmID id;
 			RealmType type;
 			TileProvider tileProvider;
-			BiomeMapPtr biomeMap;
 			std::array<std::array<std::array<ElementBufferedRenderer, LAYER_COUNT>, REALM_DIAMETER>, REALM_DIAMETER> renderers {};
 			std::unordered_map<Position, std::shared_ptr<TileEntity>> tileEntities;
 			std::unordered_set<EntityPtr> entities;
@@ -190,7 +189,7 @@ namespace Game3 {
 
 		protected:
 			Realm(Game &);
-			Realm(Game &, RealmID, RealmType, int seed_);
+			Realm(Game &, RealmID, RealmType, Identifier tileset_id, int seed_);
 
 			void initTexture();
 			virtual void absorbJSON(const nlohmann::json &);

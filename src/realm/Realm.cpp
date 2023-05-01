@@ -28,8 +28,8 @@ namespace Game3 {
 
 	Realm::Realm(Game &game_): game(game_) {}
 
-	Realm::Realm(Game &game_, RealmID id_, RealmType type_, int seed_):
-	id(id_), type(type_), seed(seed_), game(game_) {
+	Realm::Realm(Game &game_, RealmID id_, RealmType type_, Identifier tileset_id, int seed_):
+	id(id_), type(type_), tileProvider(std::move(tileset_id)), seed(seed_), game(game_) {
 		initRendererRealms();
 		initTexture();
 		// remakePathMap();
@@ -68,7 +68,6 @@ namespace Game3 {
 		tileProvider.clear();
 		from_json(json.at("tilemap"), tileProvider);
 		initTexture();
-		biomeMap = std::make_shared<BiomeMap>(json.at("biomeMap"));
 		outdoors = json.at("outdoors");
 		for (const auto &[position_string, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>()) {
 			auto tile_entity = TileEntity::fromJSON(game, tile_entity_json);
@@ -454,7 +453,6 @@ namespace Game3 {
 		json["type"] = type;
 		json["seed"] = seed;
 		json["provider"] = tileProvider;
-		json["biomeMap"] = *biomeMap;
 		json["outdoors"] = outdoors;
 		json["tileEntities"] = std::unordered_map<std::string, nlohmann::json>();
 		for (const auto &[position, tile_entity]: tileEntities)

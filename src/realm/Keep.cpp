@@ -5,9 +5,9 @@ namespace Game3 {
 	Keep::Keep(Game &game_):
 		Realm(game_) {}
 
-	Keep::Keep(Game &game_, RealmID id_, const Position &parent_origin, Index parent_width, Index parent_height, int seed_):
+	Keep::Keep(Game &game_, RealmID id_, Position parent_origin, Index parent_width, Index parent_height, int seed_):
 		Realm(game_, id_, ID(), seed_),
-		parentOrigin(parent_origin),
+		parentOrigin(std::move(parent_origin)),
 		parentWidth(parent_width),
 		parentHeight(parent_height) {}
 

@@ -36,6 +36,7 @@ namespace Game3 {
 			Identifier tilesetID;
 
 			TileProvider() = default;
+			TileProvider(Identifier tileset_id);
 
 			void clear();
 
