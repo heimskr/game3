@@ -27,9 +27,6 @@ namespace Game3::WorldGen {
 		const size_t regions_y = updiv(height, CHUNK_SIZE);
 		const size_t thread_count = regions_x * regions_y;
 
-		auto &biome_map = realm->biomeMap;
-		biome_map->fill(Biome::GRASSLAND);
-
 		std::vector<std::thread> threads;
 		threads.reserve(thread_count);
 
@@ -40,7 +37,9 @@ namespace Game3::WorldGen {
 
 		auto biomes = Biome::getMap(*realm, noise_seed);
 		auto get_biome = [&](Index row, Index column) -> Biome & {
-			return *biomes.at((*biome_map)(column, row));
+			if (auto biome_type = realm->tileProvider.copyBiomeType(row, column))
+				return *biomes.at(*biome_type);
+			throw std::runtime_error("Couldn't get biome type at (" + std::to_string(row) + ", " + std::to_string(column) + ')');
 		};
 
 		p2.SetNoiseQuality(noise::NoiseQuality::QUALITY_BEST);
@@ -168,13 +167,13 @@ namespace Game3::WorldGen {
 
 					for (size_t i = chunk * chunk_size, max = std::min((chunk + 1) * chunk_size, starts.size()); i < max; ++i) {
 						const auto position = starts[i];
-						const size_t row_start = position.row + pad;
-						const size_t row_end = row_start + m;
-						const size_t column_start = position.column + pad;
-						const size_t column_end = column_start + n;
+						const Index row_start = position.row + pad;
+						const Index row_end = row_start + m;
+						const Index column_start = position.column + pad;
+						const Index column_end = column_start + n;
 
-						for (size_t row = row_start; row < row_end; row += 2) {
-							for (size_t column = column_start; column < column_end; column += 2) {
+						for (Index row = row_start; row < row_end; row += 2) {
+							for (Index column = column_start; column < column_end; column += 2) {
 								// const Index index = row * tilemap1->width + column;
 								if (!tileset.isLand(provider.copyTile(1, {row, column})))
 									goto failed;

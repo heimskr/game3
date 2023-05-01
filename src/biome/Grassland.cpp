@@ -24,13 +24,13 @@ namespace Game3 {
 
 	static const std::unordered_set<Identifier> grassSet {grasses.begin(), grasses.end()};
 
-	void Grassland::init(Realm &realm, int noise_seed, const std::shared_ptr<double[]> &saved_noise) {
-		Biome::init(realm, noise_seed, saved_noise);
+	void Grassland::init(Realm &realm, int noise_seed) {
+		Biome::init(realm, noise_seed);
 		forestPerlin = std::make_shared<noise::module::Perlin>();
 		forestPerlin->SetSeed(-noise_seed * 3);
 	}
 
-	void Grassland::generate(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &perlin, const WorldGenParams &params) {
+	double Grassland::generate(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &perlin, const WorldGenParams &params) {
 		Realm &realm = *getRealm();
 		const auto wetness    = params.wetness;
 		const auto stoneLevel = params.stoneLevel;
@@ -40,7 +40,6 @@ namespace Game3 {
 		const Index index = realm.getIndex(row, column);
 
 		const double noise = perlin.GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.666);
-		savedNoise[index] = noise;
 
 		static const Identifier deeper_water  = "base:tile/deeper_water"_id;
 		static const Identifier deep_water    = "base:tile/deep_water"_id;
@@ -83,6 +82,8 @@ namespace Game3 {
 				layer1[index] = tileset[forest_floor];
 			}
 		}
+
+		return noise;
 	}
 
 	void Grassland::postgen(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &perlin, const WorldGenParams &params) {

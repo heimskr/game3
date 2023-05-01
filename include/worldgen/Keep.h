@@ -9,6 +9,6 @@ namespace Game3 {
 	class Keep;
 
 	namespace WorldGen {
-		void generateKeep(const std::shared_ptr<Keep> &, std::default_random_engine &, RealmID parent_realm, const Position &entrance);
+		void generateKeep(const std::shared_ptr<Keep> &, std::default_random_engine &, RealmID parent_realm, Index width, Index height, const Position &entrance);
 	}
 }

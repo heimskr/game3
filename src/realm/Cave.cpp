@@ -8,7 +8,7 @@
 
 namespace Game3 {
 	Cave::Cave(Game &game_, RealmID id_, RealmID parent_realm, int seed_):
-		Realm(game_, id_, ID(), seed_), parentRealm(parent_realm) {}
+		Realm(game_, id_, ID(), "base:tileset/monomap"_id, seed_), parentRealm(parent_realm) {}
 
 	Cave::~Cave() {
 		// Assumptions:

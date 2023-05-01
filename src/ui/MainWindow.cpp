@@ -285,9 +285,7 @@ namespace Game3 {
 		glArea.get_context()->make_current();
 		game = Game::create(*canvas);
 		game->initEntities();
-		auto tileset = game->registry<TilesetRegistry>().at("base:tileset/monomap"_id);
-		auto tileset_texture = tileset->getTexture(*game);
-		auto realm = Realm::create(*game, 1, "base:realm/overworld"_id, seed);
+		auto realm = Realm::create(*game, 1, "base:realm/overworld"_id, "base:tileset/monomap"_id, seed);
 		realm->outdoors = true;
 		std::default_random_engine rng;
 		rng.seed(seed);
