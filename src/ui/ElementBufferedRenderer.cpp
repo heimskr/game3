@@ -116,9 +116,11 @@ namespace Game3 {
 
 		assert(realm);
 
-		if (vbo.getHandle() == 0)
+		if (vbo.getHandle() == 0 || positionDirty) {
 			if (!reupload())
 				return;
+			positionDirty = false;
+		}
 
 		if (dirty) {
 			recomputeLighting();
@@ -164,6 +166,13 @@ namespace Game3 {
 		chunk = &new_chunk;
 		if (can_reupload)
 			reupload();
+	}
+
+	void ElementBufferedRenderer::setChunkPosition(const ChunkPosition &new_pos) {
+		if (new_pos != chunkPosition) {
+			chunkPosition = new_pos;
+			positionDirty = true;
+		}
 	}
 
 	bool ElementBufferedRenderer::generateVertexBufferObject() {

@@ -275,10 +275,10 @@ namespace Game3 {
 			Index col_index = 0;
 			for (auto &layers: row) {
 				for (auto &renderer: layers) {
-					renderer.chunkPosition = {
+					renderer.setChunkPosition({
 						static_cast<int32_t>(player_cpos.x + col_index - REALM_DIAMETER / 2),
 						static_cast<int32_t>(player_cpos.y + row_index - REALM_DIAMETER / 2),
-					};
+					});
 					renderer.offset = {
 						col_index - REALM_DIAMETER / 2,
 						row_index - REALM_DIAMETER / 2,

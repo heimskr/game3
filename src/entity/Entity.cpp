@@ -276,13 +276,13 @@ namespace Game3 {
 
 		const auto &tileset = realm->getTileset();
 
-		if (!tileset.isWalkable(realm->getTile(1, new_position)))
+		if (auto tile = realm->tryTile(1, new_position); !tile || !tileset.isWalkable(*tile))
 			return false;
 
-		if (tileset.isSolid(realm->getTile(2, new_position)))
+		if (auto tile = realm->tryTile(2, new_position); !tile || tileset.isSolid(*tile))
 			return false;
 
-		if (tileset.isSolid(realm->getTile(3, new_position)))
+		if (auto tile = realm->tryTile(3, new_position); !tile || tileset.isSolid(*tile))
 			return false;
 
 		if (auto tile_entity = realm->tileEntityAt(new_position))

@@ -25,7 +25,6 @@ namespace Game3 {
 			int backbufferHeight = -1;
 			Alignment horizontal;
 			Alignment vertical;
-			ChunkPosition chunkPosition;
 			/** Top left might have {-1, -1}, top right might have {1, -1}, etc. */
 			std::pair<int32_t, int32_t> offset {};
 
@@ -45,6 +44,7 @@ namespace Game3 {
 			bool reupload();
 			bool onBackbufferResized(int width, int height);
 			void setChunk(Chunk<TileID> &, bool can_reupload = true);
+			void setChunkPosition(const ChunkPosition &);
 			inline void markDirty() { dirty = true; }
 			inline void setRealm(Realm &new_realm) { realm = &new_realm; }
 
@@ -70,6 +70,8 @@ namespace Game3 {
 			TileProvider *provider = nullptr;
 			std::vector<TileID> tileCache;
 			bool vboIsWeird = false;
+			bool positionDirty = false;
+			ChunkPosition chunkPosition;
 
 			bool generateVertexBufferObject();
 			bool generateElementBufferObject();
