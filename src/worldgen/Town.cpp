@@ -12,7 +12,7 @@
 #include "worldgen/WorldGen.h"
 
 namespace Game3::WorldGen {
-	void generateTown(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const Index index, Index width, Index height, Index pad, int seed) {
+	void generateTown(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const Position &position, Index width, Index height, Index pad, int seed) {
 		Index row = 0;
 		Index column = 0;
 

@@ -64,16 +64,6 @@ namespace Game3 {
 		}
 	}
 
-	std::vector<Position> Tilemap::getLand(Index right_pad, Index bottom_pad) const {
-		std::vector<Index> land_tiles;
-		land_tiles.reserve(width * height);
-		for (Index row = 0; row < height - bottom_pad; ++row)
-			for (Index column = 0; column < width - right_pad; ++column)
-				if (tileset->isLand(tiles[row * width + column]))
-					land_tiles.push_back(row * width + column);
-		return land_tiles;
-	}
-
 	void to_json(nlohmann::json &json, const Tilemap &tilemap) {
 		json["height"] = tilemap.height;
 		json["setHeight"] = tilemap.setHeight;
