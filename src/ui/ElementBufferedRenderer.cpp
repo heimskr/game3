@@ -184,7 +184,9 @@ namespace Game3 {
 
 		vboIsWeird = false;
 
-		vbo.init<float, 3>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, set_width, divisor, t_size](size_t x, size_t y) {
+		const TileID missing = tileset[tileset.getMissing()];
+
+		vbo.init<float, 3>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, set_width, divisor, t_size, missing](size_t x, size_t y) {
 			const auto tile_opt = realm->tryTile(layer, Position(
 				static_cast<Index>(y) + CHUNK_SIZE * chunkPosition.y,
 				static_cast<Index>(x) + CHUNK_SIZE * chunkPosition.x
@@ -192,7 +194,7 @@ namespace Game3 {
 			TileID tile;
 			if (!tile_opt) {
 				vboIsWeird = true;
-				tile = realm->getTileset()["base:tile/missing"];
+				tile = missing;
 			} else
 				tile = *tile_opt;
 			const float tx0 = (tile % set_width) / divisor + TILE_TEXTURE_PADDING;
