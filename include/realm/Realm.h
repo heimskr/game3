@@ -20,7 +20,7 @@
 #include "util/SharedRecursiveMutex.h"
 
 namespace Game3 {
-	constexpr size_t REALM_DIAMETER = 3;
+	constexpr int64_t REALM_DIAMETER = 3;
 
 	class Entity;
 	class Game;

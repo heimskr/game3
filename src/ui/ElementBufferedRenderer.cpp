@@ -83,9 +83,10 @@ namespace Game3 {
 		auto texture = tileset.getTexture(realm->getGame());
 
 		glm::mat4 projection(1.f);
+
 		projection = glm::translate(projection, {
-		                 chunkPosition.x * scale / 2.f,
-		                 chunkPosition.y * scale / 2.f,
+		                 offset.first  * scale,
+		                 offset.second * scale,
 		                 0.f
 		             }) *
 		             glm::scale(projection, {tilesize, -tilesize, 1.f}) *
@@ -95,8 +96,6 @@ namespace Game3 {
 		                 center_y - CHUNK_SIZE / 2.f,
 		                 0.f
 		             });
-
-		std::cout << '(' << chunkPosition.x << ", " << chunkPosition.y << ")\n";
 
 		shader.bind();
 		vao.bind();

@@ -104,7 +104,7 @@ namespace Game3 {
 			for (auto &layers: row) {
 				for (auto &renderer: layers) {
 					renderer.onBackbufferResized(bb_width, bb_height);
-					renderer.render(outdoors? game_time : 1, scale, cx, cy);
+					renderer.render(outdoors? game_time : 1, scale, center.x(), center.y());
 				}
 
 				cx += CHUNK_SIZE;
@@ -270,14 +270,18 @@ namespace Game3 {
 			generalQueue.clear();
 		}
 
-		size_t row_index = 0;
+		Index row_index = 0;
 		for (auto &row: renderers) {
-			size_t col_index = 0;
+			Index col_index = 0;
 			for (auto &layers: row) {
 				for (auto &renderer: layers) {
 					renderer.chunkPosition = {
-						static_cast<int32_t>(player_cpos.x + col_index) - static_cast<int32_t>(REALM_DIAMETER / 2),
-						static_cast<int32_t>(player_cpos.y + row_index) - static_cast<int32_t>(REALM_DIAMETER / 2),
+						static_cast<int32_t>(player_cpos.x + col_index - REALM_DIAMETER / 2),
+						static_cast<int32_t>(player_cpos.y + row_index - REALM_DIAMETER / 2),
+					};
+					renderer.offset = {
+						col_index - REALM_DIAMETER / 2,
+						row_index - REALM_DIAMETER / 2,
 					};
 				}
 				++col_index;
