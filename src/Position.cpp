@@ -39,6 +39,10 @@ namespace Game3 {
 		realm->setTile(layer, position, tilename);
 	}
 
+	bool Place::isPathable() const {
+		return realm->isPathable(position);
+	}
+
 	Game & Place::getGame() {
 		return realm->getGame();
 	}

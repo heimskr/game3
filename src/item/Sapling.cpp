@@ -15,20 +15,17 @@ namespace Game3 {
 		if (realm.type != "base:realm/overworld"_id)
 			return false;
 
-		const auto index = realm.getIndex(place.position);
-		const auto &tilemap = *realm.tilemap1;
-		const auto &tileset = *tilemap.tileset;
+		auto &tileset = realm.getTileset();
 
-		if (!realm.tilemap1->tileset->isInCategory(tileset[tilemap[index]], "base:category/plant_soil"_id))
+		if (!tileset.isInCategory(place.getName(1), "base:category/plant_soil"_id))
 			return false;
 
 		static const std::array<Identifier, 3> trees {"base:tile/tree1"_id, "base:tile/tree2"_id, "base:tile/tree3"_id};
-		if (realm.pathMap[index] && nullptr != realm.add(TileEntity::create<Tree>(realm.getGame(), choose(trees), "base:tile/tree0"_id, place.position, 0.f))) {
-
+		if (place.isPathable() && nullptr != realm.add(TileEntity::create<Tree>(realm.getGame(), choose(trees), "base:tile/tree0"_id, place.position, 0.f))) {
 			if (--stack.count == 0)
 				player.inventory->erase(slot);
 			player.inventory->notifyOwner();
-			realm.pathMap[index] = 0;
+			realm.tileProvider.findPathState(place.position) = 0;
 			return true;
 		}
 

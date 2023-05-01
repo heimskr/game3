@@ -5,7 +5,7 @@ namespace Game3 {
 	std::optional<Landfill::Result> clayRequirement(const Place &place) {
 		const Game &game = place.getGame();
 
-		const auto &tilename = place.getLayer1Name();
+		const auto &tilename = place.getName(1);
 
 		if (tilename == "base:tile/water"_id)
 			return Landfill::Result{ItemStack(game, "base:item/clay"_id, Landfill::DEFAULT_COUNT), "base:tile/shallow_water"_id};

@@ -371,6 +371,12 @@ namespace Game3 {
 		return std::nullopt;
 	}
 
+	bool Realm::isPathable(const Position &position) const {
+		if (auto result = tileProvider.copyPathState(position))
+			return *result;
+		return false;
+	}
+
 	void Realm::updateNeighbors(const Position &position) {
 		static size_t depth = 0;
 		static bool layer2_updated = false;

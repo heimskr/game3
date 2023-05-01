@@ -50,6 +50,7 @@ namespace Game3 {
 		const Identifier & getName(Layer) const;
 		void set(Layer, TileID) const;
 		void set(Layer, const Identifier &) const;
+		bool isPathable() const;
 
 		Game & getGame();
 		const Game & getGame() const;

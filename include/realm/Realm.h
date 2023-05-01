@@ -97,6 +97,7 @@ namespace Game3 {
 			TileID getTile(Layer, Index row, Index column) const;
 			TileID getTile(Layer, const Position &) const;
 			std::optional<Position> getPathableAdjacent(const Position &) const;
+			bool isPathable(const Position &) const;
 			bool hasTileEntityAt(const Position &) const;
 			void confirmGhosts();
 			void damageGround(const Position &);

@@ -19,7 +19,7 @@ namespace Game3 {
 		for (Index row = prow - RADIUS * 2; row <= prow + RADIUS * 2; ++row) {
 			for (Index column = pcol - RADIUS * 2; column <= pcol + RADIUS * 2; ++column) {
 				const Position pos(row, column);
-				if (!realm.isValid(pos) || RADIUS < pos.distance(place.position))
+				if (RADIUS < pos.distance(place.position))
 					continue;
 				realm.damageGround(pos);
 				if (auto tile = realm.tileEntityAt(pos); tile && tile->kill())

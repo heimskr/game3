@@ -22,12 +22,9 @@ namespace Game3 {
 		const auto &player   = place.player;
 		const auto &position = place.position;
 
-		const Position exit = position + Position(1, 0);
+		const Position exit_position = position + Position(1, 0);
 
-		if (!realm.isValid(exit) || !realm.pathMap.at(realm.getIndex(exit)))
-			return false;
-
-		if (!realm.pathMap.at(realm.getIndex(position)) || realm.hasTileEntityAt(position))
+		if (!realm.isPathable(exit_position) || !realm.isPathable(position) || realm.hasTileEntityAt(position))
 			return false;
 
 		// This is a horrible, ugly hack to fix a problem where entering the cave would break the sprite renderer and make all sprites invisible forever.
@@ -41,7 +38,7 @@ namespace Game3 {
 		}
 
 		std::optional<RealmID> realm_id;
-		Index entrance = -1;
+		Position entrance;
 
 		for (const auto &[index, tile_entity]: realm.tileEntities)
 			if (tile_entity->tileID == "base:tile/cave"_id && tile_entity->is("base:te/building"_id))
@@ -64,14 +61,11 @@ namespace Game3 {
 			// TODO: perhaps let the player choose the seed
 			const int cave_seed = -2 * realm.seed - 5 + game.cavesGenerated;
 
-			auto new_tileset = game.registry<TilesetRegistry>()["base:tileset/monomap"];
-			auto new_tilemap = std::make_shared<Tilemap>(realm_width, realm_height, 16, new_tileset);
-			auto new_biomemap = std::make_shared<BiomeMap>(realm_width, realm_height, Biome::CAVE);
-			auto new_realm = Realm::create<Cave>(game, *realm_id, realm.id, new_tilemap, new_biomemap, cave_seed);
+			auto new_realm = Realm::create<Cave>(game, *realm_id, realm.id, cave_seed);
 			new_realm->outdoors = false;
 			Position entrance_position;
-			WorldGen::generateCave(new_realm, threadContext.rng, cave_seed, realm.getIndex(exit), entrance_position, realm.id);
-			entrance = new_realm->getIndex(entrance_position);
+			WorldGen::generateCave(new_realm, threadContext.rng, cave_seed, exit_position, entrance_position, realm.id, {{-1, -1}, {1, 1}});
+			entrance = entrance_position;
 			game.realms.emplace(*realm_id, new_realm);
 			++game.cavesGenerated;
 			emplaced = true;
