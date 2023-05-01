@@ -134,7 +134,7 @@ namespace Game3::WorldGen {
 		auto keep_biomemap = std::make_shared<BiomeMap>(keep_width, keep_height);
 		auto keep_realm = Realm::create<Keep>(game, keep_realm_id, town_origin, width, height, -seed);
 		keep_realm->outdoors = false;
-		WorldGen::generateKeep(keep_realm, rng, realm->id, keep_exit);
+		WorldGen::generateKeep(keep_realm, rng, realm->id, width, height, keep_exit);
 		game.realms.emplace(keep_realm_id, keep_realm);
 
 		auto create_keep = [&](const Identifier &tilename) {
@@ -175,7 +175,7 @@ namespace Game3::WorldGen {
 				auto details = game.registry<RealmDetailsRegistry>()[realm_type];
 				auto new_realm = Realm::create(game, realm_id, realm_type, details->tilesetName, -seed);
 				new_realm->outdoors = false;
-				gen_fn(new_realm, rng, realm, building_position + Position(1, 0));
+				gen_fn(new_realm, rng, realm, realm_width, realm_height, building_position + Position(1, 0));
 				game.realms.emplace(realm_id, new_realm);
 				realm->add(building);
 			};

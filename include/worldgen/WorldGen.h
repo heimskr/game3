@@ -4,13 +4,14 @@
 #include <memory>
 #include <random>
 
+#include "Types.h"
 #include "game/ChunkPosition.h"
 
 namespace Game3 {
 	class Realm;
 	struct Position;
 
-	using BuildingGenerator = std::function<void(const std::shared_ptr<Realm> &, std::default_random_engine &, const std::shared_ptr<Realm> &, const Position &)>;
+	using BuildingGenerator = std::function<void(const std::shared_ptr<Realm> &, std::default_random_engine &, const std::shared_ptr<Realm> &, Index width, Index height, const Position &)>;
 
 	struct WorldGenParams {
 		double wetness = -.15;

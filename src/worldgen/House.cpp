@@ -13,29 +13,26 @@
 #include "worldgen/Indoors.h"
 
 namespace Game3::WorldGen {
-	void generateHouse(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const std::shared_ptr<Realm> &parent_realm, const Position &entrance) {
+	void generateHouse(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const std::shared_ptr<Realm> &parent_realm, Index width, Index height, const Position &entrance) {
 		Timer timer("GenerateHouse");
-		const auto width  = realm->getWidth();
-		const auto height = realm->getHeight();
+		const Position exit_position = generateIndoors(realm, rng, parent_realm, width, height, entrance);
 
-		const Index exit_index = generateIndoors(realm, rng, parent_realm, entrance);
-
-		const auto &tileset2 = *realm->tilemap2->tileset;
+		const auto &tileset2 = realm->getTileset();
 		const auto &plants = tileset2.getTilesByCategory("base:category/plants"_id);
 
-		realm->setLayer2(width + 1, choose(plants, rng));
-		realm->setLayer2(2 * width - 2, choose(plants, rng));
-		realm->setLayer2(width * (height - 1) - 2, choose(plants, rng));
-		realm->setLayer2(width * (height - 2) + 1, choose(plants, rng));
+		realm->setTile(2, {1, 1}, choose(plants, rng));
+		realm->setTile(2, {1, width - 2}, choose(plants, rng));
+		realm->setTile(2, {height - 1, 1}, choose(plants, rng));
+		realm->setTile(2, {height - 1, width - 2}, choose(plants, rng));
 
 		const auto &beds = tileset2.getTilesByCategory("base:category/beds"_id);
 		std::array<Index, 2> edges {1, width - 2};
 		const Position bed_position(2 + rng() % (height - 4), choose(edges, rng));
-		realm->setLayer2(realm->getIndex(bed_position), choose(beds, rng));
+		realm->setTile(2, bed_position, choose(beds, rng));
 		realm->extraData["bed"] = bed_position;
 
 		const auto house_position = entrance - Position(1, 0);
-		realm->spawn<Miner>(realm->getPosition(exit_index - width), parent_realm->id, realm->id, house_position, parent_realm->closestTileEntity<Building>(house_position,
+		realm->spawn<Miner>({exit_position.row - 1, exit_position.column}, parent_realm->id, realm->id, house_position, parent_realm->closestTileEntity<Building>(house_position,
 			[](const auto &building) { return building->tileID == "base:tile/keep_sw"_id; }));
 
 		switch(rng() % 2) {
@@ -59,16 +56,16 @@ namespace Game3::WorldGen {
 				auto shuffled_texts = texts;
 				std::shuffle(shuffled_texts.begin(), shuffled_texts.end(), rng);
 
-				for (Index index = width + 2; index < 2 * width - 2; ++index) {
-					realm->setLayer2(index, "base:tile/bookshelf"_id);
-					realm->add(TileEntity::create<Sign>(realm->getGame(), "base:tile/empty"_id, realm->getPosition(index), shuffled_texts.at((index - width - 2) % shuffled_texts.size()), "Bookshelf"));
+				// for (Index index = width + 2; index < 2 * width - 2; ++index) {
+				for (Index column = 2; column < width - 2; ++column) {
+					realm->setTile(2, {1, column}, "base:tile/bookshelf"_id);
+					realm->add(TileEntity::create<Sign>(realm->getGame(), "base:tile/empty"_id, Position(1, column), shuffled_texts.at((column - 2) % shuffled_texts.size()), "Bookshelf"));
 				}
 				break;
 			}
 
 			case 1: {
-				// Tile identifier here used to be 0.
-				auto chest = TileEntity::create<Chest>(realm->getGame(), "base:tile/empty"_id, realm->getPosition(width * 3 / 2), "Chest");
+				auto chest = TileEntity::create<Chest>(realm->getGame(), "base:tile/empty"_id, Position(1, width / 2), "Chest");
 				chest->setInventory(4);
 				realm->add(chest);
 				break;

@@ -11,21 +11,19 @@
 #include "worldgen/Indoors.h"
 
 namespace Game3::WorldGen {
-	void generateTavern(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const std::shared_ptr<Realm> &parent_realm, const Position &entrance) {
+	void generateTavern(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const std::shared_ptr<Realm> &parent_realm, Index width, Index height, const Position &entrance) {
 		Timer timer("GenerateTavern");
-		const auto width  = realm->getWidth();
-		const auto height = realm->getHeight();
 
-		generateIndoors(realm, rng, parent_realm, entrance, width / 2);
+		generateIndoors(realm, rng, parent_realm, width, height, entrance, width / 2);
 
-		auto set = [&](auto &&...args) { realm->setLayer2(std::forward<decltype(args)>(args)...); };
+		auto set = [&](auto &&...args) { realm->setTile(2, std::forward<decltype(args)>(args)...); };
 
 		const auto &tileset = realm->getTileset();
 		const auto &plants = tileset.getTilesByCategory("base:category/plants"_id);
-		set(width + 1, choose(plants, rng));
-		set(2 * width - 2, choose(plants, rng));
-		set(width * (height - 1) - 2, choose(plants, rng));
-		set(width * (height - 2) + 1, choose(plants, rng));
+		set(Position(1, 1), choose(plants, rng));
+		set(Position(1, width - 2), choose(plants, rng));
+		set(Position(height - 2, width - 2), choose(plants, rng));
+		set(Position(height - 2, 1), choose(plants, rng));
 
 		set(Position(1, width / 2), "base:tile/furnace"_id);
 
