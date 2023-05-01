@@ -61,12 +61,7 @@ namespace Game3 {
 	void NewGameDialog::submit() {
 		hide();
 
-		long seed = 0, width = 0, height = 0;
-		auto show_error = [this](const std::string &message) {
-			mainWindow.queue([this, message] {
-				mainWindow.error(message);
-			});
-		};
+		long seed = 0;
 
 		try {
 			seed = parseLong(seedEntry.get_text());

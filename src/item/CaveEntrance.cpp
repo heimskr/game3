@@ -56,8 +56,6 @@ namespace Game3 {
 
 		if (!realm_id) {
 			realm_id = game.newRealmID();
-			const int realm_width  = 100;
-			const int realm_height = 100;
 			// TODO: perhaps let the player choose the seed
 			const int cave_seed = -2 * realm.seed - 5 + game.cavesGenerated;
 

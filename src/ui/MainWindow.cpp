@@ -336,7 +336,6 @@ namespace Game3 {
 		game->player->focus(*canvas, false);
 		game->initInteractionSets();
 		canvas->game = game;
-		game->activeRealm->rebind();
 		game->activeRealm->reupload();
 		connectSave();
 		for (auto &[widget, tab]: tabMap)

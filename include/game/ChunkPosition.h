@@ -5,6 +5,7 @@
 #include <string>
 
 #include "Constants.h"
+#include "Types.h"
 
 namespace Game3 {
 	struct ChunkPosition {
@@ -19,15 +20,15 @@ namespace Game3 {
 		ChunkPosition topLeft;
 		ChunkPosition bottomRight;
 
-		inline auto tileWidth() const  { return (bottomRight.x - topLeft.x + 1) * CHUNK_SIZE; }
-		inline auto tileHeight() const { return (bottomRight.y - topLeft.y + 1) * CHUNK_SIZE; }
+		inline Index tileWidth() const  { return (bottomRight.x - topLeft.x + 1) * CHUNK_SIZE; }
+		inline Index tileHeight() const { return (bottomRight.y - topLeft.y + 1) * CHUNK_SIZE; }
 
-		inline auto rowMin() const { return topLeft.y * CHUNK_SIZE; }
+		inline Index rowMin() const { return topLeft.y * CHUNK_SIZE; }
 		/** Compare with <=, not <. */
-		inline auto rowMax() const { return (bottomRight.y + 1) * CHUNK_SIZE - 1; }
-		inline auto columnMin() const { return topLeft.x * CHUNK_SIZE; }
+		inline Index rowMax() const { return (bottomRight.y + 1) * CHUNK_SIZE - 1; }
+		inline Index columnMin() const { return topLeft.x * CHUNK_SIZE; }
 		/** Compare with <=, not <. */
-		inline auto columnMax() const { return (bottomRight.x + 1) * CHUNK_SIZE - 1; }
+		inline Index columnMax() const { return (bottomRight.x + 1) * CHUNK_SIZE - 1; }
 	};
 }
 

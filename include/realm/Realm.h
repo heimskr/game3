@@ -72,7 +72,6 @@ namespace Game3 {
 			void reupload();
 			/** The Layer argument is 1-based. */
 			void reupload(Layer);
-			void rebind();
 			EntityPtr add(const EntityPtr &);
 			std::shared_ptr<TileEntity> add(const std::shared_ptr<TileEntity> &);
 			std::shared_ptr<TileEntity> addUnsafe(const std::shared_ptr<TileEntity> &);
