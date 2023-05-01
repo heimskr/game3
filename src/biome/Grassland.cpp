@@ -90,7 +90,8 @@ namespace Game3 {
 		if (params.antiforestThreshold > perlin.GetValue(row / Biome::NOISE_ZOOM * factor, column / Biome::NOISE_ZOOM * factor, 0.)) {
 			if (auto tile = realm.tileEntityAt({row, column}); tile && tile->is("base:te/tree"_id) && !std::dynamic_pointer_cast<Tree>(tile)->hasHive()) {
 				Game &game = realm.getGame();
-				realm.removeSafe(tile);
+				// realm.removeSafe(tile);
+				realm.queueRemoval(tile);
 				if (distribution(rng) < 3) {
 					std::vector<ItemStack> mushrooms {
 						{game, "base:item/saffron_milkcap"},
@@ -101,7 +102,9 @@ namespace Game3 {
 						{game, "base:item/brittlegill"},
 					};
 
-					realm.add(TileEntity::create<ItemSpawner>(game, Position(row, column), 0.00025f, std::move(mushrooms)));
+					realm.queue([&game, &realm, row, column, mushrooms = std::move(mushrooms)] {
+						realm.add(TileEntity::create<ItemSpawner>(game, Position(row, column), 0.00025f, std::move(mushrooms)));
+					});
 				}
 			}
 		}

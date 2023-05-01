@@ -3,6 +3,7 @@
 #include <unordered_set>
 
 #include "MarchingSquares.h"
+#include "ThreadContext.h"
 #include "Tileset.h"
 #include "biome/Biome.h"
 #include "entity/Entity.h"
@@ -186,10 +187,15 @@ namespace Game3 {
 				layers[layer - 1].reupload();
 	}
 
-	EntityPtr Realm::add(const EntityPtr &entity) {
+	EntityPtr Realm::addUnsafe(const EntityPtr &entity) {
 		entity->setRealm(shared_from_this());
 		entities.insert(entity);
 		return entity;
+	}
+
+	EntityPtr Realm::add(const EntityPtr &entity) {
+		std::unique_lock lock(entityMutex);
+		return addUnsafe(entity);
 	}
 
 	TileEntityPtr Realm::addUnsafe(const TileEntityPtr &tile_entity) {
@@ -233,20 +239,33 @@ namespace Game3 {
 		for (auto &[index, tile_entity]: tileEntities)
 			tile_entity->tick(game, delta);
 		ticking = false;
-		for (const auto &entity: entityRemovalQueue)
-			remove(entity);
-		entityRemovalQueue.clear();
-		for (const auto &tile_entity: tileEntityRemovalQueue)
-			remove(tile_entity);
-		tileEntityRemovalQueue.clear();
+
+		{
+			std::unique_lock lock(entityRemovalQueueMutex);
+			for (const auto &entity: entityRemovalQueue)
+				remove(entity);
+			entityRemovalQueue.clear();
+		}
+
+		{
+			std::unique_lock lock(tileEntityRemovalQueueMutex);
+			for (const auto &tile_entity: tileEntityRemovalQueue)
+				remove(tile_entity);
+			tileEntityRemovalQueue.clear();
+		}
+
+		{
+			std::unique_lock lock(generalQueueMutex);
+			for (const auto &fn: generalQueue)
+				fn();
+			generalQueue.clear();
+		}
 
 		size_t row_index = 0;
 		for (auto &row: renderers) {
 			size_t col_index = 0;
 			for (auto &layers: row) {
-				Layer layer = 0;
 				for (auto &renderer: layers) {
-					// renderer.layer = ++layer;
 					renderer.chunkPosition = {
 						static_cast<int32_t>(player_cpos.x + col_index - REALM_DIAMETER / 2),
 						static_cast<int32_t>(player_cpos.y + row_index - REALM_DIAMETER / 2),
@@ -327,17 +346,24 @@ namespace Game3 {
 	}
 
 	void Realm::queueRemoval(const EntityPtr &entity) {
-		if (ticking)
+		if (true || ticking) {
+			std::unique_lock lock(entityRemovalQueueMutex);
 			entityRemovalQueue.push_back(entity);
-		else
+		} else
 			remove(entity);
 	}
 
 	void Realm::queueRemoval(const TileEntityPtr &tile_entity) {
-		if (ticking)
+		if (true || ticking) {
+			std::unique_lock lock(tileEntityRemovalQueueMutex);
 			tileEntityRemovalQueue.push_back(tile_entity);
-		else
+		} else
 			remove(tile_entity);
+	}
+
+	void Realm::queue(std::function<void()> fn) {
+		std::unique_lock lock(generalQueueMutex);
+		generalQueue.push_back(std::move(fn));
 	}
 
 	void Realm::absorb(const EntityPtr &entity, const Position &position) {
@@ -406,12 +432,7 @@ namespace Game3 {
 	}
 
 	void Realm::updateNeighbors(const Position &position) {
-		std::unique_lock lock(neighborUpdateMutex);
-		static size_t depth = 0;
-		static bool layer2_updated = false;
-
-		++depth;
-
+		++threadContext.updateNeighborsDepth;
 		auto &tileset = getTileset();
 
 		for (Index row_offset = -1; row_offset <= 1; ++row_offset)
@@ -434,15 +455,15 @@ namespace Game3 {
 								const TileID marched = tileset[tileset.getMarchBase(category)] + (march_result / 7) * tileset.columnCount(getGame()) + march_result % 7;
 								if (marched != tile) {
 									setTile(2, offset_position, marched);
-									layer2_updated = true;
+									threadContext.layer2Updated = true;
 								}
 							}
 						}
 					}
 				}
 
-		if (--depth == 0 && layer2_updated) {
-			layer2_updated = false;
+		if (--threadContext.updateNeighborsDepth == 0 && threadContext.layer2Updated) {
+			threadContext.layer2Updated = false;
 			reupload(2);
 		}
 	}

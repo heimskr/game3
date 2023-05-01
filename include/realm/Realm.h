@@ -17,6 +17,7 @@
 #include "ui/ElementBufferedRenderer.h"
 #include "util/GL.h"
 #include "util/RWLock.h"
+#include "util/SharedRecursiveMutex.h"
 
 namespace Game3 {
 	constexpr size_t REALM_DIAMETER = 3;
@@ -72,6 +73,7 @@ namespace Game3 {
 			void reupload();
 			/** The Layer argument is 1-based. */
 			void reupload(Layer);
+			EntityPtr addUnsafe(const EntityPtr &);
 			EntityPtr add(const EntityPtr &);
 			std::shared_ptr<TileEntity> add(const std::shared_ptr<TileEntity> &);
 			std::shared_ptr<TileEntity> addUnsafe(const std::shared_ptr<TileEntity> &);
@@ -89,6 +91,7 @@ namespace Game3 {
 			Game & getGame();
 			void queueRemoval(const EntityPtr &);
 			void queueRemoval(const std::shared_ptr<TileEntity> &);
+			void queue(std::function<void()>);
 			void absorb(const EntityPtr &, const Position &);
 			void setTile(Layer, Index row, Index column, TileID, bool run_helper = true);
 			void setTile(Layer, const Position &, TileID, bool run_helper = true);
@@ -200,8 +203,13 @@ namespace Game3 {
 			bool ticking = false;
 			std::vector<EntityPtr> entityRemovalQueue;
 			std::vector<std::shared_ptr<TileEntity>> tileEntityRemovalQueue;
-			std::shared_mutex tileEntityMutex;
-			std::recursive_mutex neighborUpdateMutex;
+			std::vector<std::function<void()>> generalQueue;
+			SharedRecursiveMutex entityMutex;
+			SharedRecursiveMutex tileEntityMutex;
+
+			std::mutex entityRemovalQueueMutex;
+			std::mutex tileEntityRemovalQueueMutex;
+			std::mutex generalQueueMutex;
 
 			void initRendererRealms();
 			void initRendererTileProviders();

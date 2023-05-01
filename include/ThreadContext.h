@@ -18,6 +18,8 @@ namespace Game3 {
 			Index rowMax = -1;
 			Index colMin = -1;
 			Index colMax = -1;
+			size_t updateNeighborsDepth = 0;
+			bool layer2Updated = false;
 			bool valid = false;
 
 			ThreadContext():
