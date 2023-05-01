@@ -190,4 +190,5 @@ namespace Game3 {
 	void from_json(const nlohmann::json &, TileProvider &);
 
 	ChunkPosition getChunkPosition(Index row, Index column);
+	ChunkPosition getChunkPosition(const Position &);
 }

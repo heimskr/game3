@@ -25,9 +25,10 @@ namespace Game3 {
 			int backbufferHeight = -1;
 			Alignment horizontal;
 			Alignment vertical;
+			ChunkPosition chunkPosition;
 
 			Eigen::Vector2f center {0.f, 0.f};
-			std::shared_ptr<Tilemap> tilemap;
+			std::shared_ptr<Tileset> tileset;
 			GL::Texture lightTexture;
 
 			ElementBufferedRenderer();
@@ -35,7 +36,7 @@ namespace Game3 {
 			~ElementBufferedRenderer();
 
 			void reset();
-			void init(TileProvider &);
+			void init(TileProvider &, Layer);
 			void render(float divisor, float scale, float center_x, float center_y);
 			/** Doesn't bind any texture—the caller must bind a texture before calling this. */
 			void render(float divisor);
@@ -51,6 +52,7 @@ namespace Game3 {
 			bool initialized = false;
 			/** Whether lighting needs to be recomputed. */
 			std::atomic_bool dirty = true;
+			Layer layer = -1;
 			Shader shader {"terrain"};
 			GL::FloatVAO vao;
 			GL::VBO vbo;

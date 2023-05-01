@@ -32,6 +32,7 @@ namespace Game3 {
 	id(id_), type(type_), tileProvider(std::move(tileset_id)), seed(seed_), game(game_) {
 		initRendererRealms();
 		initTexture();
+		initRendererTileProviders();
 		// remakePathMap();
 	}
 
@@ -43,10 +44,13 @@ namespace Game3 {
 	}
 
 	void Realm::initRendererTileProviders() {
-		for (auto &row: renderers)
-			for (auto &layers: row)
+		for (auto &row: renderers) {
+			for (auto &layers: row) {
+				Layer layer = 0;
 				for (auto &renderer: layers)
-					renderer.init(tileProvider);
+					renderer.init(tileProvider, ++layer);
+			}
+		}
 	}
 
 	void Realm::initTexture() {}
@@ -67,6 +71,7 @@ namespace Game3 {
 		seed = json.at("seed");
 		tileProvider.clear();
 		from_json(json.at("tilemap"), tileProvider);
+		initRendererTileProviders();
 		initTexture();
 		outdoors = json.at("outdoors");
 		for (const auto &[position_string, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>()) {
@@ -212,10 +217,13 @@ namespace Game3 {
 	}
 
 	void Realm::tick(float delta) {
+		ChunkPosition player_cpos {};
+
 		ticking = true;
 		for (auto &entity: entities)
 			if (entity->isPlayer()) {
 				auto player = std::dynamic_pointer_cast<Player>(entity);
+				player_cpos = getChunkPosition(player->getPosition());
 				if (!player->ticked) {
 					player->ticked = true;
 					player->tick(game, delta);
@@ -231,6 +239,23 @@ namespace Game3 {
 		for (const auto &tile_entity: tileEntityRemovalQueue)
 			remove(tile_entity);
 		tileEntityRemovalQueue.clear();
+
+		size_t row_index = 0;
+		for (auto &row: renderers) {
+			size_t col_index = 0;
+			for (auto &layers: row) {
+				Layer layer = 0;
+				for (auto &renderer: layers) {
+					// renderer.layer = ++layer;
+					renderer.chunkPosition = {
+						static_cast<int32_t>(player_cpos.x + col_index - REALM_DIAMETER / 2),
+						static_cast<int32_t>(player_cpos.y + row_index - REALM_DIAMETER / 2),
+					};
+				}
+				++col_index;
+			}
+			++row_index;
+		}
 	}
 
 	std::vector<EntityPtr> Realm::findEntities(const Position &position) const {

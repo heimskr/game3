@@ -36,17 +36,18 @@ namespace Game3 {
 			lightTexture.reset();
 			blurredLightTexture.reset();
 			reshader.reset();
-			tilemap.reset();
+			tileset.reset();
 			rectangle.reset();
 			fbo.reset();
 			initialized = false;
 		}
 	}
 
-	void ElementBufferedRenderer::init(TileProvider &provider_) {
+	void ElementBufferedRenderer::init(TileProvider &provider_, Layer layer_) {
 		if (initialized)
 			reset();
 		assert(realm);
+		layer = layer_;
 		provider = &provider_;
 		shader.init(buffered_vert, buffered_frag);
 		generateVertexBufferObject();
@@ -72,38 +73,46 @@ namespace Game3 {
 			dirty = false;
 		}
 
+		auto &tileset = realm->getTileset();
+		const auto tilesize = tileset.getTileSize();
+
 		glm::mat4 projection(1.f);
-		projection = glm::scale(projection, {tilemap->tileSize, -tilemap->tileSize, 1.f}) *
+		projection = glm::scale(projection, {tilesize, -tilesize, 1.f}) *
 		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1.f}) *
-		             glm::translate(projection, {center_x - tilemap->width / 2.f, center_y - tilemap->height / 2.f, 0.f});
+		             glm::translate(projection, {center_x - CHUNK_SIZE / 2.f, center_y - CHUNK_SIZE / 2.f, 0.f});
 
 		shader.bind();
 		vao.bind();
 		vbo.bind();
 		ebo.bind();
 		// Try commenting this out, it's kinda funny
-		tilemap->getTexture(realm->getGame())->bind(0);
+		tileset.getTexture(realm->getGame())->bind(0);
 		shader.set("texture0", 0);
 		shader.set("projection", projection);
 		shader.set("divisor", divisor);
 		shader.set("bright_tiles", brightTiles);
 
-		GL::triangles(tilemap->size());
+		GL::triangles(CHUNK_SIZE * CHUNK_SIZE);
 	}
 
 	void ElementBufferedRenderer::render(float divisor) {
 		if (!initialized)
 			return;
 
+		assert(realm);
+
 		if (dirty) {
 			recomputeLighting();
 			dirty = false;
 		}
 
+		auto &tileset = realm->getTileset();
+		const auto tilesize = tileset.getTileSize();
+
 		glm::mat4 projection(1.f);
-		projection = glm::scale(projection, {tilemap->tileSize, tilemap->tileSize, 1.f}) *
+		projection = glm::scale(projection, {tilesize, tilesize, 1.f}) *
 		             glm::scale(projection, {2.f / backbufferWidth, 2.f / backbufferHeight, 1.f}) *
-		             glm::translate(projection, {-tilemap->width, -tilemap->height, 0.f});
+		             glm::translate(projection, {-CHUNK_SIZE, -CHUNK_SIZE, 0.f});
 
 		shader.bind();
 		vao.bind();
@@ -114,7 +123,7 @@ namespace Game3 {
 		shader.set("divisor", divisor);
 		shader.set("bright_tiles", brightTiles);
 
-		GL::triangles(tilemap->size());
+		GL::triangles(CHUNK_SIZE * CHUNK_SIZE);
 	}
 
 	void ElementBufferedRenderer::reupload() {
@@ -139,12 +148,18 @@ namespace Game3 {
 	}
 
 	void ElementBufferedRenderer::generateVertexBufferObject() {
-		const auto set_width = tilemap->setWidth / tilemap->tileSize;
+		assert(realm);
+
+		auto &tileset = realm->getTileset();
+		const auto tilesize = tileset.getTileSize();
+		const auto tileset_width = *tileset.getTexture(realm->getGame())->width;
+
+		const auto set_width = tileset_width / tilesize;
 		const float divisor = set_width;
 		const float t_size = 1.f / divisor - TILE_TEXTURE_PADDING * 2;
 
-		vbo.init<float, 3>(tilemap->width, tilemap->height, GL_STATIC_DRAW, [this, set_width, divisor, t_size](size_t x, size_t y) {
-			const auto tile = (*tilemap)(x, y);
+		vbo.init<float, 3>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, set_width, divisor, t_size](size_t x, size_t y) {
+			const auto tile = realm->getTile(layer, Position(static_cast<Index>(y), static_cast<Index>(x)));
 			const float tx0 = (tile % set_width) / divisor + TILE_TEXTURE_PADDING;
 			const float ty0 = (tile / set_width) / divisor + TILE_TEXTURE_PADDING;
 			const float tile_f = static_cast<float>(tile);
@@ -159,7 +174,7 @@ namespace Game3 {
 
 	void ElementBufferedRenderer::generateElementBufferObject() {
 		uint32_t i = 0;
-		ebo.init<uint32_t, 6>(tilemap->width, tilemap->height, GL_STATIC_DRAW, [&i](size_t, size_t) {
+		ebo.init<uint32_t, 6>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [&i](size_t, size_t) {
 			i += 4;
 			return std::array {i - 4, i - 3, i - 2, i - 3, i - 2, i - 1};
 		});
@@ -175,20 +190,18 @@ namespace Game3 {
 	void ElementBufferedRenderer::recomputeLighting() {
 		return;
 
-		if (!tilemap)
-			return;
-
 		Timer timer("RecomputeLighting");
 
 		bool recomputation_needed = false;
 		if (tileCache.empty()) {
-			tileCache = tilemap->getTiles();
+			tileCache = realm->tileProvider.getTileChunk(layer, chunkPosition);
 			recomputation_needed = true;
 		} else {
-			assert(tileCache.size() == tilemap->size());
+			assert(tileCache.size() == CHUNK_SIZE * CHUNK_SIZE);
+			const auto &chunk = realm->tileProvider.getTileChunk(layer, chunkPosition);
 			for (size_t i = 0, max = tileCache.size(); i < max; ++i) {
-				if (brightSet.contains(tileCache[i]) != brightSet.contains((*tilemap)[i])) {
-					tileCache = tilemap->getTiles();
+				if (brightSet.contains(tileCache[i]) != brightSet.contains(chunk[i])) {
+					tileCache = chunk;
 					recomputation_needed = true;
 					break;
 				}
@@ -199,9 +212,9 @@ namespace Game3 {
 			fbo.bind();
 			constexpr float texture_scale = 2.f;
 			constexpr GLint filter = GL_LINEAR;
-			const auto tilesize = tilemap->tileSize;
-			const auto width  = tilesize * texture_scale * tilemap->width;
-			const auto height = tilesize * texture_scale * tilemap->height;
+			const auto tilesize = tileset->getTileSize();
+			const auto width  = tilesize * texture_scale * CHUNK_SIZE;
+			const auto height = tilesize * texture_scale * CHUNK_SIZE;
 			rectangle.update(width, height);
 			reshader.update(width, height);
 			GL::Viewport viewport(0, 0, width, height);
@@ -210,17 +223,19 @@ namespace Game3 {
 			lightTexture.useInFB();
 			GL::clear(.5f, .5f, .5f, 1.f);
 
-			if (tilemap->lavaQuadtree) {
-				Timer lava_timer("Lava");
-				tilemap->lavaQuadtree->absorb();
-				tilemap->lavaQuadtree->iterateFull([&](const Box &box) {
-					const float x = box.left * tilesize;
-					const float y = box.top  * tilesize;
-					constexpr float bleed = 1.5f;
-					rectangle({1.f, .5f, 0.f, 1.f}, x - bleed * tilesize, y - bleed * tilesize, (2.f * bleed + box.width) * tilesize, (2.f * bleed + box.height) * tilesize);
-					return false;
-				});
-			}
+			// TODO: lava quadtrees in TileProvider
+
+			// if (tilemap->lavaQuadtree) {
+			// 	Timer lava_timer("Lava");
+			// 	tilemap->lavaQuadtree->absorb();
+			// 	tilemap->lavaQuadtree->iterateFull([&](const Box &box) {
+			// 		const float x = box.left * tilesize;
+			// 		const float y = box.top  * tilesize;
+			// 		constexpr float bleed = 1.5f;
+			// 		rectangle({1.f, .5f, 0.f, 1.f}, x - bleed * tilesize, y - bleed * tilesize, (2.f * bleed + box.width) * tilesize, (2.f * bleed + box.height) * tilesize);
+			// 		return false;
+			// 	});
+			// }
 
 			reshader.bind();
 			reshader.set("xs", static_cast<float>(width));

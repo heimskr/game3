@@ -284,4 +284,8 @@ namespace Game3 {
 	ChunkPosition getChunkPosition(Index row, Index column) {
 		return {TileProvider::divide(column), TileProvider::divide(row)};
 	}
+
+	ChunkPosition getChunkPosition(const Position &position) {
+		return getChunkPosition(position.row, position.column);
+	}
 }
