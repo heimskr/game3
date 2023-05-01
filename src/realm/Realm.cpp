@@ -201,7 +201,8 @@ namespace Game3 {
 	}
 
 	TileEntityPtr Realm::add(const TileEntityPtr &tile_entity) {
-		auto lock = tileEntityLock.lockWrite(std::chrono::milliseconds(1));
+		// auto lock = tileEntityLock.lockWrite(std::chrono::milliseconds(1));
+		std::unique_lock lock(tileEntityMutex);
 		return addUnsafe(tile_entity);
 	}
 
@@ -263,7 +264,8 @@ namespace Game3 {
 	}
 
 	TileEntityPtr Realm::tileEntityAt(const Position &position) {
-		auto lock = tileEntityLock.lockRead();
+		// auto lock = tileEntityLock.lockRead();
+		std::shared_lock lock(tileEntityMutex);
 		if (auto iter = tileEntities.find(position); iter != tileEntities.end())
 			return iter->second;
 		return {};
@@ -285,7 +287,8 @@ namespace Game3 {
 	}
 
 	void Realm::removeSafe(const TileEntityPtr &tile_entity) {
-		auto lock = tileEntityLock.lockWrite(std::chrono::milliseconds(1));
+		// auto lock = tileEntityLock.lockWrite(std::chrono::milliseconds(1));
+		std::unique_lock lock(tileEntityMutex);
 		remove(tile_entity, false);
 	}
 
@@ -378,6 +381,7 @@ namespace Game3 {
 	}
 
 	void Realm::updateNeighbors(const Position &position) {
+		std::unique_lock lock(neighborUpdateMutex);
 		static size_t depth = 0;
 		static bool layer2_updated = false;
 
@@ -414,7 +418,6 @@ namespace Game3 {
 
 		if (--depth == 0 && layer2_updated) {
 			layer2_updated = false;
-			getGame().activateContext();
 			reupload(2);
 		}
 	}
@@ -473,10 +476,15 @@ namespace Game3 {
 			json["extra"] = extraData;
 	}
 
-	bool Realm::isWalkable(Index row, Index column, const Tileset &tileset) const {
-		for (Layer layer = 1; layer <= LAYER_COUNT; ++layer)
-			if (!tileset.isWalkable(getTile(layer, row, column)))
-				return false;
+	bool Realm::isWalkable(Index row, Index column, const Tileset &tileset) {
+		try {
+			for (Layer layer = 1; layer <= LAYER_COUNT; ++layer)
+				if (!tileset.isWalkable(getTile(layer, row, column)))
+					return false;
+		} catch (const std::out_of_range &) {
+			return false;
+		}
+		std::shared_lock lock(tileEntityMutex);
 		if (auto iter = tileEntities.find({row, column}); iter != tileEntities.end() && iter->second->solid)
 			return false;
 		return true;

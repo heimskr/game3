@@ -200,12 +200,13 @@ namespace Game3 {
 			bool ticking = false;
 			std::vector<EntityPtr> entityRemovalQueue;
 			std::vector<std::shared_ptr<TileEntity>> tileEntityRemovalQueue;
-			RWLock tileEntityLock;
+			std::shared_mutex tileEntityMutex;
+			std::recursive_mutex neighborUpdateMutex;
 
 			void initRendererRealms();
 			void initRendererTileProviders();
 
-			bool isWalkable(Index row, Index column, const Tileset &) const;
+			bool isWalkable(Index row, Index column, const Tileset &);
 			void setLayerHelper(Index row, Index col, bool should_mark_dirty = true);
 
 			static BiomeType getBiome(uint32_t seed);

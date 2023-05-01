@@ -23,8 +23,8 @@ namespace Game3 {
 		Position(value_type row_, value_type column_): row(row_), column(column_) {}
 		Position(std::string_view);
 
-		inline bool operator==(const Position &other) const { return row == other.row && column == other.column; }
-		inline bool operator!=(const Position &other) const { return row != other.row || column != other.column; }
+		inline bool operator==(const Position &other) const { return this == &other || (row == other.row && column == other.column); }
+		inline bool operator!=(const Position &other) const { return this != &other && (row != other.row || column != other.column); }
 		inline Position operator+(const Position &other) const { return {row + other.row, column + other.column}; }
 		inline Position operator-(const Position &other) const { return {row - other.row, column - other.column}; }
 		inline Position & operator+=(const Position &other) { row += other.row; column += other.column; return *this; }

@@ -9,7 +9,6 @@ namespace Game3 {
 		tilesetID(std::move(tileset_id)) {}
 
 	void TileProvider::clear() {
-		tilesetID = {};
 		for (auto &map: chunkMaps)
 			map.clear();
 		biomeMap.clear();
@@ -52,7 +51,7 @@ namespace Game3 {
 			return 0;
 		}
 
-		throw std::out_of_range("Couldn't copy tile at (" + std::to_string(column) + ", " + std::to_string(row) + ')');
+		throw std::out_of_range("Couldn't copy tile at (" + std::to_string(row) + ", " + std::to_string(column) + ')');
 	}
 
 	TileID TileProvider::copyTile(Layer layer, Index row, Index column, TileMode mode) const {
@@ -66,7 +65,7 @@ namespace Game3 {
 		if (auto iter = biomeMap.find(chunk_position); iter != biomeMap.end())
 			return access(iter->second, remainder(row), remainder(column));
 
-		throw std::out_of_range("Couldn't copy biome type at (" + std::to_string(column) + ", " + std::to_string(row) + ')');
+		throw std::out_of_range("Couldn't copy biome type at (" + std::to_string(row) + ", " + std::to_string(column) + ')');
 	}
 
 	std::optional<uint8_t> TileProvider::copyPathState(Index row, Index column) const {
@@ -75,7 +74,7 @@ namespace Game3 {
 		if (auto iter = pathMap.find(chunk_position); iter != pathMap.end())
 			return access(iter->second, remainder(row), remainder(column));
 
-		throw std::out_of_range("Couldn't copy path state at (" + std::to_string(column) + ", " + std::to_string(row) + ')');
+		throw std::out_of_range("Couldn't copy path state at (" + std::to_string(row) + ", " + std::to_string(column) + ')');
 	}
 
 	TileID & TileProvider::findTile(Layer layer, Index row, Index column, bool &created, TileMode mode) {
@@ -90,10 +89,12 @@ namespace Game3 {
 
 		if (mode == TileMode::Create) {
 			created = true;
-			return access(map[chunk_position], remainder(row), remainder(column)) = 0;
+			auto &chunk = map[chunk_position];
+			initTileChunk(layer, chunk, chunk_position);
+			return access(chunk, remainder(row), remainder(column)) = 0;
 		}
 
-		throw std::out_of_range("Couldn't find tile at (" + std::to_string(column) + ", " + std::to_string(row) + ')');
+		throw std::out_of_range("Couldn't find tile at (" + std::to_string(row) + ", " + std::to_string(column) + ')');
 	}
 
 	TileID & TileProvider::findTile(Layer layer, Index row, Index column, TileMode mode) {
@@ -111,10 +112,12 @@ namespace Game3 {
 
 		if (mode == BiomeMode::Create) {
 			created = true;
-			return access(biomeMap[chunk_position], remainder(row), remainder(column)) = 0;
+			auto &chunk = biomeMap[chunk_position];
+			initBiomeChunk(chunk, chunk_position);
+			return access(chunk, remainder(row), remainder(column)) = 0;
 		}
 
-		throw std::out_of_range("Couldn't find biome type at (" + std::to_string(column) + ", " + std::to_string(row) + ')');
+		throw std::out_of_range("Couldn't find biome type at (" + std::to_string(row) + ", " + std::to_string(column) + ')');
 	}
 
 	BiomeType & TileProvider::findBiomeType(Index row, Index column, BiomeMode mode) {
@@ -132,10 +135,12 @@ namespace Game3 {
 
 		if (mode == PathMode::Create) {
 			created = true;
-			return access(pathMap[chunk_position], remainder(row), remainder(column)) = 0;
+			auto &chunk = pathMap[chunk_position];
+			initPathChunk(chunk, chunk_position);
+			return access(chunk, remainder(row), remainder(column)) = 0;
 		}
 
-		throw std::out_of_range("Couldn't find biome type at (" + std::to_string(column) + ", " + std::to_string(row) + ')');
+		throw std::out_of_range("Couldn't find biome type at (" + std::to_string(row) + ", " + std::to_string(column) + ')');
 	}
 
 	uint8_t & TileProvider::findPathState(Index row, Index column, PathMode mode) {
@@ -184,26 +189,54 @@ namespace Game3 {
 
 	void TileProvider::ensureTileChunk(const ChunkPosition &chunk_position) {
 		for (Layer layer = 0; layer < LAYER_COUNT; ++layer)
-			chunkMaps[layer].try_emplace(chunk_position);
+			if (auto [iter, inserted] = chunkMaps[layer].try_emplace(chunk_position); inserted)
+				initTileChunk(layer, iter->second, chunk_position);
 	}
 
 	void TileProvider::ensureTileChunk(const ChunkPosition &chunk_position, Layer except) {
 		for (Layer layer = 0; layer < LAYER_COUNT; ++layer)
 			if (layer != except - 1)
-				chunkMaps[layer].try_emplace(chunk_position);
+				if (auto [iter, inserted] = chunkMaps[layer].try_emplace(chunk_position); inserted)
+					initTileChunk(layer, iter->second, chunk_position);
 	}
 
 	void TileProvider::ensureBiomeChunk(const ChunkPosition &chunk_position) {
-		biomeMap.try_emplace(chunk_position);
+		if (auto [iter, inserted] = biomeMap.try_emplace(chunk_position); inserted)
+			initBiomeChunk(iter->second, chunk_position);
 	}
 
 	void TileProvider::ensurePathChunk(const ChunkPosition &chunk_position) {
-		pathMap.try_emplace(chunk_position);
+		if (auto [iter, inserted] = pathMap.try_emplace(chunk_position); inserted)
+			initPathChunk(iter->second, chunk_position);
+	}
+
+	void TileProvider::ensureAllChunks(const ChunkPosition &chunk_position) {
+		ensureTileChunk(chunk_position);
+		ensureBiomeChunk(chunk_position);
+		ensurePathChunk(chunk_position);
+	}
+
+	void TileProvider::ensureAllChunks(const Position &position) {
+		ensureAllChunks(getChunkPosition(position.row, position.column));
 	}
 
 	void TileProvider::validateLayer(Layer layer) const {
 		if (layer == 0 || LAYER_COUNT < layer)
 			throw std::out_of_range("Invalid layer: " + std::to_string(layer));
+	}
+
+	void TileProvider::initTileChunk(Layer, Chunk<TileID> &chunk, const ChunkPosition &chunk_position) {
+		// TODO!: worldgen
+		chunk.resize(CHUNK_SIZE * CHUNK_SIZE, 0);
+	}
+
+	void TileProvider::initBiomeChunk(Chunk<BiomeType> &chunk, const ChunkPosition &chunk_position) {
+		chunk.resize(CHUNK_SIZE * CHUNK_SIZE, 0);
+	}
+
+	void TileProvider::initPathChunk(Chunk<uint8_t> &chunk, const ChunkPosition &chunk_position) {
+		// TODO!: worldgen?
+		chunk.resize(CHUNK_SIZE * CHUNK_SIZE, 0);
 	}
 
 	void to_json(nlohmann::json &json, const TileProvider &provider) {

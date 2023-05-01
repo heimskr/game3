@@ -145,6 +145,10 @@ namespace Game3 {
 			/** Creates a missing path chunk. */
 			void ensurePathChunk(const ChunkPosition &);
 
+			void ensureAllChunks(const ChunkPosition &);
+
+			void ensureAllChunks(const Position &);
+
 			template <typename T>
 			static T access(const Chunk<T> &chunk, size_t row, size_t column) {
 				return chunk[row * CHUNK_SIZE + column];
@@ -174,6 +178,9 @@ namespace Game3 {
 			std::shared_ptr<Tileset> cachedTileset;
 
 			void validateLayer(Layer) const;
+			void initTileChunk(Layer, Chunk<TileID> &, const ChunkPosition &);
+			void initBiomeChunk(Chunk<BiomeType> &, const ChunkPosition &);
+			void initPathChunk(Chunk<uint8_t> &, const ChunkPosition &);
 
 			friend void to_json(nlohmann::json &, const TileProvider &);
 			friend void from_json(const nlohmann::json &, TileProvider &);

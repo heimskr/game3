@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <unordered_set>
 #include <vector>
 
@@ -49,7 +50,7 @@ namespace Game3 {
 		private:
 			bool initialized = false;
 			/** Whether lighting needs to be recomputed. */
-			bool dirty = true;
+			std::atomic_bool dirty = true;
 			Shader shader {"terrain"};
 			GL::FloatVAO vao;
 			GL::VBO vbo;
