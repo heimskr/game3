@@ -55,6 +55,7 @@ namespace Game3 {
 			Identifier empty;
 			Identifier missing;
 			Identifier textureName;
+			std::shared_ptr<Texture> cachedTexture;
 			// TODO: consider making the sets store TileIDs instead, for performance perhaps
 			std::set<Identifier> land;
 			std::set<Identifier> walkable;

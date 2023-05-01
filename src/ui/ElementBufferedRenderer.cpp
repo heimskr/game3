@@ -68,6 +68,10 @@ namespace Game3 {
 
 		assert(realm);
 
+		if (vbo.getHandle() == 0)
+			if (!reupload())
+				return;
+
 		if (dirty) {
 			recomputeLighting();
 			dirty = false;
@@ -75,6 +79,7 @@ namespace Game3 {
 
 		auto &tileset = realm->getTileset();
 		const auto tilesize = tileset.getTileSize();
+		auto texture = tileset.getTexture(realm->getGame());
 
 		glm::mat4 projection(1.f);
 		projection = glm::scale(projection, {tilesize, -tilesize, 1.f}) *
@@ -86,7 +91,7 @@ namespace Game3 {
 		vbo.bind();
 		ebo.bind();
 		// Try commenting this out, it's kinda funny
-		tileset.getTexture(realm->getGame())->bind(0);
+		texture->bind(0);
 		shader.set("texture0", 0);
 		shader.set("projection", projection);
 		shader.set("divisor", divisor);
@@ -102,7 +107,8 @@ namespace Game3 {
 		assert(realm);
 
 		if (vbo.getHandle() == 0)
-			reupload();
+			if (!reupload())
+				return;
 
 		if (dirty) {
 			recomputeLighting();
@@ -121,6 +127,7 @@ namespace Game3 {
 		vao.bind();
 		vbo.bind();
 		ebo.bind();
+		tileset.getTexture(realm->getGame())->bind(0);
 		shader.set("texture0", 0);
 		shader.set("projection", projection);
 		shader.set("divisor", divisor);
@@ -129,9 +136,8 @@ namespace Game3 {
 		GL::triangles(CHUNK_SIZE * CHUNK_SIZE);
 	}
 
-	void ElementBufferedRenderer::reupload() {
-		generateVertexBufferObject();
-		generateVertexArrayObject();
+	bool ElementBufferedRenderer::reupload() {
+		return generateVertexBufferObject() && generateVertexArrayObject();
 	}
 
 	bool ElementBufferedRenderer::onBackbufferResized(int width, int height) {
@@ -150,7 +156,7 @@ namespace Game3 {
 			reupload();
 	}
 
-	void ElementBufferedRenderer::generateVertexBufferObject() {
+	bool ElementBufferedRenderer::generateVertexBufferObject() {
 		assert(realm);
 
 		auto &tileset = realm->getTileset();
@@ -160,7 +166,7 @@ namespace Game3 {
 		const auto set_width = tileset_width / tilesize;
 
 		if (set_width == 0)
-			return;
+			return false;
 
 		const float divisor = set_width;
 		const float t_size = 1.f / divisor - TILE_TEXTURE_PADDING * 2;
@@ -178,23 +184,31 @@ namespace Game3 {
 					std::array {tx0 + t_size, ty0 + t_size, tile_f},
 				};
 			});
-		} catch (const std::out_of_range &) {}
+		} catch (const std::out_of_range &) {
+			return false;
+		}
+
+		return vbo.getHandle() != 0;
 	}
 
-	void ElementBufferedRenderer::generateElementBufferObject() {
+	bool ElementBufferedRenderer::generateElementBufferObject() {
 		uint32_t i = 0;
 		ebo.init<uint32_t, 6>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [&i](size_t, size_t) {
 			i += 4;
 			return std::array {i - 4, i - 3, i - 2, i - 3, i - 2, i - 1};
 		});
+		return ebo.getHandle() != 0;
 	}
 
-	void ElementBufferedRenderer::generateVertexArrayObject() {
+	bool ElementBufferedRenderer::generateVertexArrayObject() {
 		if (vbo.getHandle() != 0)
 			vao.init(vbo, {2, 2, 1});
+		return vao.getHandle() != 0;
 	}
 
-	void ElementBufferedRenderer::generateLightingTexture() {}
+	bool ElementBufferedRenderer::generateLightingTexture() {
+		return true;
+	}
 
 	void ElementBufferedRenderer::recomputeLighting() {
 		return;

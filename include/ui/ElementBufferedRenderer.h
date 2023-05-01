@@ -40,7 +40,7 @@ namespace Game3 {
 			void render(float divisor, float scale, float center_x, float center_y);
 			/** Doesn't bind any texture—the caller must bind a texture before calling this. */
 			void render(float divisor);
-			void reupload();
+			bool reupload();
 			bool onBackbufferResized(int width, int height);
 			void setChunk(Chunk<TileID> &, bool can_reupload = true);
 			inline void markDirty() { dirty = true; }
@@ -68,10 +68,10 @@ namespace Game3 {
 			TileProvider *provider = nullptr;
 			std::vector<TileID> tileCache;
 
-			void generateVertexBufferObject();
-			void generateElementBufferObject();
-			void generateVertexArrayObject();
-			void generateLightingTexture();
+			bool generateVertexBufferObject();
+			bool generateElementBufferObject();
+			bool generateVertexArrayObject();
+			bool generateLightingTexture();
 
 			void recomputeLighting();
 

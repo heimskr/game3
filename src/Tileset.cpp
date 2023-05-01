@@ -64,7 +64,10 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Texture> Tileset::getTexture(const Game &game) {
-		return game.registry<TextureRegistry>()[textureName];
+		if (cachedTexture)
+			return cachedTexture;
+		std::cout << "\e[32mTEXTURE NAME: " << textureName << "\e[39m\n";
+		return cachedTexture = game.registry<TextureRegistry>()[textureName];
 	}
 
 	bool Tileset::getItemStack(Game &game, const Identifier &id, ItemStack &stack) const {
