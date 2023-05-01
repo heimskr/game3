@@ -3,12 +3,10 @@
 #include "worldgen/Carpet.h"
 
 namespace Game3::WorldGen {
-	void generateCarpet(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, int padding) {
-		const auto width  = realm->getWidth();
-		const auto height = realm->getHeight();
+	void generateCarpet(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, Index width, Index height, int padding) {
 		const int carpet_offset = 8 * (rng() % 3);
 		const int carpet_padding = padding == -1? (rng() % 2) + 2 : padding;
-		const auto &tileset = *realm->tilemap1->tileset;
+		const auto &tileset = realm->getTileset();
 
 		const TileID carpet1c  = tileset["base:tile/carpet1_c"];
 		const TileID carpet1w  = tileset["base:tile/carpet1_w"];
@@ -22,21 +20,21 @@ namespace Game3::WorldGen {
 
 		for (int row = carpet_padding + 1; row < height - carpet_padding - 1; ++row)
 			for (int column = carpet_padding + 1; column < width - carpet_padding - 1; ++column)
-				realm->setLayer1(row * width + column, carpet1c + carpet_offset);
+				realm->setTile(1, {row, column}, carpet1c + carpet_offset);
 
 		for (int row = carpet_padding + 1; row < height - carpet_padding - 1; ++row) {
-			realm->setLayer1(row * width + carpet_padding, carpet1w + carpet_offset);
-			realm->setLayer1((row + 1) * width - carpet_padding - 1, carpet1e + carpet_offset);
+			realm->setTile(1, {row, carpet_padding}, carpet1w + carpet_offset);
+			realm->setTile(1, {row, width - carpet_padding - 1}, carpet1e + carpet_offset); // TODO!: verify `- 1`
 		}
 
 		for (int column = carpet_padding + 1; column < width - carpet_padding - 1; ++column) {
-			realm->setLayer1(carpet_padding * width + column, carpet1n + carpet_offset);
-			realm->setLayer1((height - carpet_padding - 1) * width + column, carpet1s + carpet_offset);
+			realm->setTile(1, {carpet_padding, column}, carpet1n + carpet_offset);
+			realm->setTile(1, {height - carpet_padding - 1, column}, carpet1s + carpet_offset);
 		}
 
-		realm->setLayer1(carpet_padding * width + carpet_padding, carpet1nw + carpet_offset);
-		realm->setLayer1((carpet_padding + 1) * width - carpet_padding - 1, carpet1ne + carpet_offset);
-		realm->setLayer1((height - carpet_padding - 1) * width + carpet_padding, carpet1sw + carpet_offset);
-		realm->setLayer1((height - carpet_padding) * width - carpet_padding - 1, carpet1se + carpet_offset);
+		realm->setTile(1, {carpet_padding, carpet_padding}, carpet1nw + carpet_offset);
+		realm->setTile(1, {carpet_padding, width - carpet_padding - 1}, carpet1ne + carpet_offset); // TODO!: verify `- 1`
+		realm->setTile(1, {height - carpet_padding - 1, carpet_padding}, carpet1sw + carpet_offset);
+		realm->setTile(1, {height - carpet_padding - 1, width - carpet_padding - 1}, carpet1se + carpet_offset); // TODO!: verify `- 1`
 	}
 }

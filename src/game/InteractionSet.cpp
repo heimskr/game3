@@ -17,32 +17,29 @@ namespace Game3 {
 		auto &game   = realm.getGame();
 		auto &inventory = *player.inventory;
 
-		const Index index = realm.getIndex(position);
 		auto &tileset = realm.getTileset();
-		auto &tilemap2 = realm.tilemap2;
-		const auto &tile1 = tileset[place.getLayer1()];
-		const auto &tile2 = tileset[place.getLayer2()];
+		const auto &tile1 = tileset[place.get(1)];
+		const auto &tile2 = tileset[place.get(2)];
 
 		if (auto *active = inventory.getActive()) {
 			if (active->item->canUseOnWorld() && active->item->use(inventory.activeSlot, *active, place))
 				return true;
 
 			if (active->hasAttribute("base:attribute/hammer"_id)) {
-				const TileID tile2 = (*tilemap2)[index];
+				const TileID tile2 = realm.getTile(2, position);
 				ItemStack stack(game);
 				if (tileset.getItemStack(game, tileset[tile2], stack) && !inventory.add(stack)) {
 					if (active->reduceDurability())
 						inventory.erase(inventory.activeSlot);
-					realm.setLayer2(position, tileset.getEmpty());
-					game.activateContext();
-					realm.renderer2.reupload();
+					realm.setTile(2, position, tileset.getEmpty());
+					realm.reupload(2);
 					return true;
 				}
 			}
 
 			if (active->hasAttribute("base:attribute/shovel"_id)) {
 				if (tile2 == "base:tile/ash"_id) {
-					realm.setLayer2(position, "base:tile/empty"_id);
+					realm.setTile(2, position, "base:tile/empty"_id);
 					player.give({game, "base:item/ash"_id, 1});
 					realm.getGame().activateContext();
 					realm.reupload();
@@ -90,9 +87,8 @@ namespace Game3 {
 				for (const auto &item: iter->second) {
 					if (auto cast = std::dynamic_pointer_cast<Plantable>(item); cast && cast->tilename == tile2) {
 						player.give({game, item});
-						realm.setLayer2(position, tileset.getEmptyID());
-						game.activateContext();
-						realm.renderer2.reupload();
+						realm.setTile(2, position, tileset.getEmptyID());
+						realm.reupload(2);
 						return true;
 					}
 				}
@@ -105,9 +101,9 @@ namespace Game3 {
 	bool StandardInteractions::damageGround(const Place &place) const {
 		// TODO: handle other tilemaps
 
-		const auto &tile3 = place.getLayer3Name();
+		const auto &tile3 = place.getName(3);
 		if (tile3 == "base:tile/charred_stump"_id) {
-			place.realm->setLayer3(place.position, "base:tile/empty"_id);
+			place.realm->setTile(3, place.position, "base:tile/empty"_id);
 			return true;
 		}
 

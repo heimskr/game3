@@ -49,6 +49,6 @@ namespace Game3::WorldGen {
 		realm->add(stockpile);
 		realm->stockpileInventory = stockpile->inventory;
 
-		WorldGen::generateCarpet(realm, rng);
+		WorldGen::generateCarpet(realm, rng, width, height);
 	}
 }

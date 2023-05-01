@@ -75,6 +75,6 @@ namespace Game3::WorldGen {
 				break;
 		}
 
-		WorldGen::generateCarpet(realm, rng);
+		WorldGen::generateCarpet(realm, rng, width, height);
 	}
 }

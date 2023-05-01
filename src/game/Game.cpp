@@ -487,19 +487,20 @@ namespace Game3 {
 		if (button == 1) {
 			if (auto *stack = player->inventory->getActive())
 				stack->item->use(player->inventory->activeSlot, *stack, {{y, x}, activeRealm, player});
-		} else if (button == 3 && player && realm.isValid({y, x}) && !realm.rightClick({y, x}, pos_x, pos_y) && debugMode) {
+		} else if (button == 3 && player && !realm.rightClick({y, x}, pos_x, pos_y) && debugMode) {
 			player->teleport({y, x});
 		}
 	}
 
 	Position Game::translateCanvasCoordinates(double x, double y) const {
-		const auto &realm   = *activeRealm;
-		const auto &tilemap = realm.tilemap1;
-		const auto scale    = canvas.scale;
-		x -= canvas.width() / 2.f - (tilemap->width * tilemap->tileSize / 4.f) * scale + canvas.center.x() * canvas.magic * scale;
-		x /= tilemap->tileSize * scale / 2.f;
-		y -= canvas.height() / 2.f - (tilemap->height * tilemap->tileSize / 4.f) * scale + canvas.center.y() * canvas.magic * scale;
-		y /= tilemap->tileSize * scale / 2.f;
+		auto &realm = *activeRealm;
+		const auto scale = canvas.scale;
+		const auto tile_size  = realm.getTileset().getTileSize();
+		const auto map_length = CHUNK_SIZE * REALM_DIAMETER;
+		x -= canvas.width() / 2.f - (map_length * tile_size / 4.f) * scale + canvas.center.x() * canvas.magic * scale;
+		x /= tile_size * scale / 2.f;
+		y -= canvas.height() / 2.f - (map_length * tile_size / 4.f) * scale + canvas.center.y() * canvas.magic * scale;
+		y /= tile_size * scale / 2.f;
 		return {static_cast<Index>(x), static_cast<Index>(y)};
 	}
 

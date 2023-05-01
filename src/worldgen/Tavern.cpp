@@ -63,6 +63,6 @@ namespace Game3::WorldGen {
 			}
 		}
 
-		WorldGen::generateCarpet(realm, rng, 3);
+		WorldGen::generateCarpet(realm, rng, width, height, 3);
 	}
 }
