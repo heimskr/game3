@@ -79,10 +79,10 @@ namespace Game3 {
 			std::shared_ptr<TileEntity> addUnsafe(const std::shared_ptr<TileEntity> &);
 			void initEntities();
 			void tick(float delta);
-			std::vector<EntityPtr> findEntities(const Position &) const;
-			std::vector<EntityPtr> findEntities(const Position &, const EntityPtr &except) const;
-			EntityPtr findEntity(const Position &) const;
-			EntityPtr findEntity(const Position &, const EntityPtr &except) const;
+			std::vector<EntityPtr> findEntities(const Position &);
+			std::vector<EntityPtr> findEntities(const Position &, const EntityPtr &except);
+			EntityPtr findEntity(const Position &);
+			EntityPtr findEntity(const Position &, const EntityPtr &except);
 			std::shared_ptr<TileEntity> tileEntityAt(const Position &);
 			void remove(EntityPtr);
 			void remove(const std::shared_ptr<TileEntity> &, bool run_helper = true);
@@ -98,6 +98,7 @@ namespace Game3 {
 			void setTile(Layer, const Position &, const Identifier &, bool run_helper = true);
 			TileID getTile(Layer, Index row, Index column) const;
 			TileID getTile(Layer, const Position &) const;
+			std::optional<TileID> tryTile(Layer, const Position &) const;
 			std::optional<Position> getPathableAdjacent(const Position &) const;
 			bool isPathable(const Position &) const;
 			bool hasTileEntityAt(const Position &) const;

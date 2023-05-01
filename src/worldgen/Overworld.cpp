@@ -179,12 +179,8 @@ namespace Game3::WorldGen {
 						for (Index row = row_start; row < row_end; row += 2) {
 							for (Index column = column_start; column < column_end; column += 2) {
 								// const Index index = row * tilemap1->width + column;
-								try {
-									if (!tileset.isLand(provider.copyTile(1, {row, column})))
-										goto failed;
-								} catch (const std::out_of_range &) {
+								if (auto tile = provider.tryTile(1, {row, column}); !tile || !tileset.isLand(*tile))
 									goto failed;
-								}
 							}
 						}
 						thread_candidates.push_back(position);

@@ -35,16 +35,24 @@ namespace Game3 {
 	static inline void getNeighbors(const std::shared_ptr<Realm> &realm, const Position &position, std::vector<Position> &next) {
 		next.clear();
 
-		if (Position next_pos(position.row - 1, position.column); realm->tileProvider.copyPathState(next_pos) != 0)
+		Position next_pos(position.row - 1, position.column);
+
+		if (auto state = realm->tileProvider.copyPathState(next_pos); state && *state != 0)
 			next.emplace_back(next_pos);
 
-		if (Position next_pos(position.row, position.column - 1); realm->tileProvider.copyPathState(next_pos) != 0)
+		next_pos = {position.row, position.column - 1};
+
+		if (auto state = realm->tileProvider.copyPathState(next_pos); state && *state != 0)
 			next.emplace_back(next_pos);
 
-		if (Position next_pos(position.row + 1, position.column); realm->tileProvider.copyPathState(next_pos) != 0)
+		next_pos = {position.row + 1, position.column};
+
+		if (auto state = realm->tileProvider.copyPathState(next_pos); state && *state != 0)
 			next.emplace_back(next_pos);
 
-		if (Position next_pos(position.row, position.column + 1); realm->tileProvider.copyPathState(next_pos) != 0)
+		next_pos = {position.row, position.column + 1};
+
+		if (auto state = realm->tileProvider.copyPathState(next_pos); state && *state != 0)
 			next.emplace_back(next_pos);
 	}
 

@@ -59,13 +59,25 @@ namespace Game3 {
 		return copyTile(layer, row, column, was_empty, mode);
 	}
 
+	std::optional<TileID> TileProvider::tryTile(Layer layer, const Position &position) const {
+		validateLayer(layer);
+
+		const auto &map = chunkMaps[layer - 1];
+		const ChunkPosition chunk_position {divide(position.column), divide(position.row)};
+
+		if (auto iter = map.find(chunk_position); iter != map.end())
+			return access(iter->second, remainder(position.row), remainder(position.column));
+
+		return std::nullopt;
+	}
+
 	std::optional<BiomeType> TileProvider::copyBiomeType(Index row, Index column) const {
 		const ChunkPosition chunk_position {divide(column), divide(row)};
 
 		if (auto iter = biomeMap.find(chunk_position); iter != biomeMap.end())
 			return access(iter->second, remainder(row), remainder(column));
 
-		throw std::out_of_range("Couldn't copy biome type at (" + std::to_string(row) + ", " + std::to_string(column) + ')');
+		return std::nullopt;
 	}
 
 	std::optional<uint8_t> TileProvider::copyPathState(Index row, Index column) const {
@@ -74,7 +86,7 @@ namespace Game3 {
 		if (auto iter = pathMap.find(chunk_position); iter != pathMap.end())
 			return access(iter->second, remainder(row), remainder(column));
 
-		throw std::out_of_range("Couldn't copy path state at (" + std::to_string(row) + ", " + std::to_string(column) + ')');
+		return std::nullopt;
 	}
 
 	TileID & TileProvider::findTile(Layer layer, Index row, Index column, bool &created, TileMode mode) {

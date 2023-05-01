@@ -226,18 +226,27 @@ namespace Game3 {
 		ChunkPosition player_cpos {};
 
 		ticking = true;
-		for (auto &entity: entities)
-			if (entity->isPlayer()) {
-				auto player = std::dynamic_pointer_cast<Player>(entity);
-				player_cpos = getChunkPosition(player->getPosition());
-				if (!player->ticked) {
-					player->ticked = true;
-					player->tick(game, delta);
-				}
-			} else
-				entity->tick(game, delta);
-		for (auto &[index, tile_entity]: tileEntities)
-			tile_entity->tick(game, delta);
+
+		{
+			std::shared_lock lock(entityMutex);
+			for (auto &entity: entities)
+				if (entity->isPlayer()) {
+					auto player = std::dynamic_pointer_cast<Player>(entity);
+					player_cpos = getChunkPosition(player->getPosition());
+					if (!player->ticked) {
+						player->ticked = true;
+						player->tick(game, delta);
+					}
+				} else
+					entity->tick(game, delta);
+		}
+
+		{
+			std::shared_lock lock(tileEntityMutex);
+			for (auto &[index, tile_entity]: tileEntities)
+				tile_entity->tick(game, delta);
+		}
+
 		ticking = false;
 
 		{
@@ -277,7 +286,8 @@ namespace Game3 {
 		}
 	}
 
-	std::vector<EntityPtr> Realm::findEntities(const Position &position) const {
+	std::vector<EntityPtr> Realm::findEntities(const Position &position) {
+		std::shared_lock lock(entityMutex);
 		std::vector<EntityPtr> out;
 		for (const auto &entity: entities)
 			if (entity->position == position)
@@ -285,22 +295,25 @@ namespace Game3 {
 		return out;
 	}
 
-	std::vector<EntityPtr> Realm::findEntities(const Position &position, const EntityPtr &except) const {
+	std::vector<EntityPtr> Realm::findEntities(const Position &position, const EntityPtr &except) {
 		std::vector<EntityPtr> out;
+		std::shared_lock lock(entityMutex);
 		for (const auto &entity: entities)
 			if (entity->position == position && entity != except)
 				out.push_back(entity);
 		return out;
 	}
 
-	EntityPtr Realm::findEntity(const Position &position) const {
+	EntityPtr Realm::findEntity(const Position &position) {
+		std::shared_lock lock(entityMutex);
 		for (const auto &entity: entities)
 			if (entity->position == position)
 				return entity;
 		return {};
 	}
 
-	EntityPtr Realm::findEntity(const Position &position, const EntityPtr &except) const {
+	EntityPtr Realm::findEntity(const Position &position, const EntityPtr &except) {
+		std::shared_lock lock(entityMutex);
 		for (const auto &entity: entities)
 			if (entity->position == position && entity != except)
 				return entity;
@@ -396,6 +409,10 @@ namespace Game3 {
 
 	TileID Realm::getTile(Layer layer, const Position &position) const {
 		return getTile(layer, position.row, position.column);
+	}
+
+	std::optional<TileID> Realm::tryTile(Layer layer, const Position &position) const {
+		return tileProvider.tryTile(layer, position);
 	}
 
 	bool Realm::interactGround(const PlayerPtr &player, const Position &position) {
@@ -523,13 +540,9 @@ namespace Game3 {
 	}
 
 	bool Realm::isWalkable(Index row, Index column, const Tileset &tileset) {
-		try {
-			for (Layer layer = 1; layer <= LAYER_COUNT; ++layer)
-				if (!tileset.isWalkable(getTile(layer, row, column)))
-					return false;
-		} catch (const std::out_of_range &) {
-			return false;
-		}
+		for (Layer layer = 1; layer <= LAYER_COUNT; ++layer)
+			if (auto tile = tryTile(layer, {row, column}); !tile || !tileset.isWalkable(*tile))
+				return false;
 		std::shared_lock lock(tileEntityMutex);
 		if (auto iter = tileEntities.find({row, column}); iter != tileEntities.end() && iter->second->solid)
 			return false;

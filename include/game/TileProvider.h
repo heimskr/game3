@@ -60,6 +60,8 @@ namespace Game3 {
 				return copyTile(layer, position.row, position.column, mode);
 			}
 
+			std::optional<TileID> tryTile(Layer layer, const Position &position) const;
+
 			/** Returns a copy of the biome type at a given tile position. */
 			std::optional<BiomeType> copyBiomeType(Index row, Index column) const;
 
