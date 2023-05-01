@@ -83,13 +83,12 @@ namespace Game3 {
 		auto texture = tileset.getTexture(realm->getGame());
 
 		glm::mat4 projection(1.f);
-
 		projection = glm::translate(projection, {
 		                 offset.first  * scale,
 		                 offset.second * scale,
 		                 0.f
 		             }) *
-		             glm::scale(projection, {tilesize, -tilesize, 1.f}) *
+		             glm::scale(projection, {static_cast<float>(tilesize), -static_cast<float>(tilesize), 1.f}) *
 		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1.f}) *
 		             glm::translate(projection, {
 		                 center_x - CHUNK_SIZE / 2.f,
