@@ -69,6 +69,7 @@ namespace Game3 {
 			Chunk<TileID> *chunk = nullptr;
 			TileProvider *provider = nullptr;
 			std::vector<TileID> tileCache;
+			bool vboIsWeird = false;
 
 			bool generateVertexBufferObject();
 			bool generateElementBufferObject();

@@ -182,25 +182,29 @@ namespace Game3 {
 		const float divisor = set_width;
 		const float t_size = 1.f / divisor - TILE_TEXTURE_PADDING * 2;
 
-		try {
-			vbo.init<float, 3>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, set_width, divisor, t_size](size_t x, size_t y) {
-				const auto tile = realm->getTile(layer, Position(
-					static_cast<Index>(y) + CHUNK_SIZE * chunkPosition.y,
-					static_cast<Index>(x) + CHUNK_SIZE * chunkPosition.x
-				));
-				const float tx0 = (tile % set_width) / divisor + TILE_TEXTURE_PADDING;
-				const float ty0 = (tile / set_width) / divisor + TILE_TEXTURE_PADDING;
-				const float tile_f = static_cast<float>(tile);
-				return std::array {
-					std::array {tx0,          ty0,          tile_f},
-					std::array {tx0 + t_size, ty0,          tile_f},
-					std::array {tx0,          ty0 + t_size, tile_f},
-					std::array {tx0 + t_size, ty0 + t_size, tile_f},
-				};
-			});
-		} catch (const std::out_of_range &) {
-			return false;
-		}
+		vboIsWeird = false;
+
+		vbo.init<float, 3>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, set_width, divisor, t_size](size_t x, size_t y) {
+			const auto tile_opt = realm->tryTile(layer, Position(
+				static_cast<Index>(y) + CHUNK_SIZE * chunkPosition.y,
+				static_cast<Index>(x) + CHUNK_SIZE * chunkPosition.x
+			));
+			TileID tile;
+			if (!tile_opt) {
+				vboIsWeird = true;
+				tile = realm->getTileset()["base:tile/missing"];
+			} else
+				tile = *tile_opt;
+			const float tx0 = (tile % set_width) / divisor + TILE_TEXTURE_PADDING;
+			const float ty0 = (tile / set_width) / divisor + TILE_TEXTURE_PADDING;
+			const float tile_f = static_cast<float>(tile);
+			return std::array {
+				std::array {tx0,          ty0,          tile_f},
+				std::array {tx0 + t_size, ty0,          tile_f},
+				std::array {tx0,          ty0 + t_size, tile_f},
+				std::array {tx0 + t_size, ty0 + t_size, tile_f},
+			};
+		});
 
 		return vbo.getHandle() != 0;
 	}
