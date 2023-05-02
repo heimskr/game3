@@ -12,7 +12,10 @@ namespace Game3 {
 		int32_t x = 0;
 		int32_t y = 0;
 
-		bool operator==(const ChunkPosition &) const;
+		inline bool operator==(const ChunkPosition &other) const {
+			return this == &other || (x == other.x && y == other.y);
+		}
+
 		explicit operator std::string() const;
 	};
 
@@ -29,6 +32,10 @@ namespace Game3 {
 		inline Index columnMin() const { return topLeft.x * CHUNK_SIZE; }
 		/** Compare with <=, not <. */
 		inline Index columnMax() const { return (bottomRight.x + 1) * CHUNK_SIZE - 1; }
+
+		inline bool operator==(const ChunkRange &other) const {
+			return this == &other || (topLeft == other.topLeft && bottomRight == other.bottomRight);
+		}
 	};
 }
 

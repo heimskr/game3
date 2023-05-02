@@ -16,6 +16,7 @@
 #include "tileentity/TileEntity.h"
 #include "ui/ElementBufferedRenderer.h"
 #include "util/GL.h"
+#include "util/MTQueue.h"
 #include "util/RWLock.h"
 #include "util/SharedRecursiveMutex.h"
 
@@ -202,15 +203,16 @@ namespace Game3 {
 		private:
 			Game &game;
 			bool ticking = false;
-			std::vector<EntityPtr> entityRemovalQueue;
-			std::vector<std::shared_ptr<TileEntity>> tileEntityRemovalQueue;
-			std::vector<std::function<void()>> generalQueue;
+			MTQueue<EntityPtr> entityRemovalQueue;
+			MTQueue<std::shared_ptr<TileEntity>> tileEntityRemovalQueue;
+			MTQueue<std::function<void()>> generalQueue;
+
 			SharedRecursiveMutex entityMutex;
 			SharedRecursiveMutex tileEntityMutex;
 
-			std::mutex entityRemovalQueueMutex;
-			std::mutex tileEntityRemovalQueueMutex;
-			std::mutex generalQueueMutex;
+			// std::mutex entityRemovalQueueMutex;
+			// std::mutex tileEntityRemovalQueueMutex;
+			// std::mutex generalQueueMutex;
 
 			void initRendererRealms();
 			void initRendererTileProviders();

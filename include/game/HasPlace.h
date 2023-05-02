@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Position.h"
+#include "game/ChunkPosition.h"
 #include "game/HasRealm.h"
 
 namespace Game3 {
@@ -10,5 +11,7 @@ namespace Game3 {
 		virtual Place getPlace() {
 			return {getPosition(), getRealm(), {}};
 		}
+
+		virtual ChunkRange getRange() const;
 	};
 }

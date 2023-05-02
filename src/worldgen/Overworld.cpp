@@ -76,6 +76,10 @@ namespace Game3::WorldGen {
 
 		const GamePtr game_ptr = realm->getGame().shared_from_this();
 
+		for (int32_t y = params.range.topLeft.y; y <= params.range.bottomRight.y; ++y)
+			for (int32_t x = params.range.topLeft.x; x <= params.range.bottomRight.x; ++x)
+				provider.ensureAllChunks(ChunkPosition{x, y});
+
 		for (size_t thread_row = 0; thread_row < regions_y; ++thread_row) {
 			const Index row_min = range_row_min + thread_row * CHUNK_SIZE;
 			// Compare with <, not <=

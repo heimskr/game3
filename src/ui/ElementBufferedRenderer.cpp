@@ -193,8 +193,8 @@ namespace Game3 {
 
 		vbo.init<float, 3>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, set_width, divisor, t_size, missing](size_t x, size_t y) {
 			const auto tile_opt = realm->tryTile(layer, Position(
-				static_cast<Index>(y) + CHUNK_SIZE * chunkPosition.y,
-				static_cast<Index>(x) + CHUNK_SIZE * chunkPosition.x
+				static_cast<Index>(y) + CHUNK_SIZE * (chunkPosition.y + 1), // why `+ 1`?
+				static_cast<Index>(x) + CHUNK_SIZE * (chunkPosition.x + 1)  // why `+ 1`?
 			));
 			TileID tile;
 			if (!tile_opt) {

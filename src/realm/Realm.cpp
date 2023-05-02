@@ -242,26 +242,14 @@ namespace Game3 {
 
 		ticking = false;
 
-		{
-			std::unique_lock lock(entityRemovalQueueMutex);
-			for (const auto &entity: entityRemovalQueue)
-				remove(entity);
-			entityRemovalQueue.clear();
-		}
+		for (const auto &stolen: entityRemovalQueue.steal())
+			remove(stolen);
 
-		{
-			std::unique_lock lock(tileEntityRemovalQueueMutex);
-			for (const auto &tile_entity: tileEntityRemovalQueue)
-				remove(tile_entity);
-			tileEntityRemovalQueue.clear();
-		}
+		for (const auto &stolen: tileEntityRemovalQueue.steal())
+			remove(stolen);
 
-		{
-			std::unique_lock lock(generalQueueMutex);
-			for (const auto &fn: generalQueue)
-				fn();
-			generalQueue.clear();
-		}
+		for (const auto &stolen: generalQueue.steal())
+			stolen();
 
 		Index row_index = 0;
 		for (auto &row: renderers) {
@@ -352,24 +340,21 @@ namespace Game3 {
 	}
 
 	void Realm::queueRemoval(const EntityPtr &entity) {
-		if (true || ticking) {
-			std::unique_lock lock(entityRemovalQueueMutex);
-			entityRemovalQueue.push_back(entity);
-		} else
+		if (ticking)
+			entityRemovalQueue.push(entity);
+		else
 			remove(entity);
 	}
 
 	void Realm::queueRemoval(const TileEntityPtr &tile_entity) {
-		if (true || ticking) {
-			std::unique_lock lock(tileEntityRemovalQueueMutex);
-			tileEntityRemovalQueue.push_back(tile_entity);
-		} else
+		if (ticking)
+			tileEntityRemovalQueue.push(tile_entity);
+		else
 			remove(tile_entity);
 	}
 
 	void Realm::queue(std::function<void()> fn) {
-		std::unique_lock lock(generalQueueMutex);
-		generalQueue.push_back(std::move(fn));
+		generalQueue.push(std::move(fn));
 	}
 
 	void Realm::absorb(const EntityPtr &entity, const Position &position) {

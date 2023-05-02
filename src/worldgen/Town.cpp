@@ -25,17 +25,17 @@ namespace Game3::WorldGen {
 
 		const auto set1 = [&](const Identifier &tilename) {
 			cleanup(row, column);
-			realm->setTile(1, {row, column}, tilename);
+			realm->setTile(1, {row, column}, tilename, false);
 		};
 
 		const auto set2 = [&](const Identifier &tilename) {
 			cleanup(row, column);
-			realm->setTile(2, {row, column}, tilename);
+			realm->setTile(2, {row, column}, tilename, false);
 		};
 
 		const auto set2p = [&](const Position &position, const Identifier &tilename) {
 			cleanup(position.row, position.column);
-			realm->setTile(2, position, tilename);
+			realm->setTile(2, position, tilename, false);
 		};
 
 		Timer town_timer("TownLayout");
