@@ -46,8 +46,8 @@ namespace Game3 {
 		Place(Position position_, std::shared_ptr<Realm> realm_, std::shared_ptr<Player> player_):
 			position(std::move(position_)), realm(std::move(realm_)), player(std::move(player_)) {}
 
-		TileID get(Layer) const;
-		const Identifier & getName(Layer) const;
+		std::optional<TileID> get(Layer) const;
+		std::optional<std::reference_wrapper<const Identifier>> getName(Layer) const;
 		void set(Layer, TileID) const;
 		void set(Layer, const Identifier &) const;
 		bool isPathable() const;

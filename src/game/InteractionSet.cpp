@@ -18,17 +18,19 @@ namespace Game3 {
 		auto &inventory = *player.inventory;
 
 		auto &tileset = realm.getTileset();
-		const auto &tile1 = tileset[place.get(1)];
-		const auto &tile2 = tileset[place.get(2)];
+		const auto tile1 = place.getName(1);
+		const auto tile2 = place.getName(2);
+
+		if (!tile1 || !tile2)
+			return false;
 
 		if (auto *active = inventory.getActive()) {
 			if (active->item->canUseOnWorld() && active->item->use(inventory.activeSlot, *active, place))
 				return true;
 
 			if (active->hasAttribute("base:attribute/hammer"_id)) {
-				const TileID tile2 = realm.getTile(2, position);
 				ItemStack stack(game);
-				if (tileset.getItemStack(game, tileset[tile2], stack) && !inventory.add(stack)) {
+				if (tileset.getItemStack(game, *tile2, stack) && !inventory.add(stack)) {
 					if (active->reduceDurability())
 						inventory.erase(inventory.activeSlot);
 					realm.setTile(2, position, tileset.getEmpty());
@@ -38,7 +40,7 @@ namespace Game3 {
 			}
 
 			if (active->hasAttribute("base:attribute/shovel"_id)) {
-				if (tile2 == "base:tile/ash"_id) {
+				if (*tile2 == "base:tile/ash"_id) {
 					realm.setTile(2, position, "base:tile/empty"_id);
 					player.give({game, "base:item/ash"_id, 1});
 					realm.getGame().activateContext();
@@ -51,19 +53,19 @@ namespace Game3 {
 		std::optional<Identifier> item;
 		std::optional<Identifier> attribute;
 
-		if (tile1 == "base:tile/sand"_id) {
+		if (*tile1 == "base:tile/sand"_id) {
 			item.emplace("base:item/sand"_id);
 			attribute.emplace("base:attribute/shovel"_id);
-		} else if (tile1 == "base:tile/shallow_water"_id) {
+		} else if (*tile1 == "base:tile/shallow_water"_id) {
 			item.emplace("base:item/clay"_id);
 			attribute.emplace("base:attribute/shovel"_id);
-		} else if (tile1 == "base:tile/volcanic_sand"_id) {
+		} else if (*tile1 == "base:tile/volcanic_sand"_id) {
 			item.emplace("base:item/volcanic_sand"_id);
 			attribute.emplace("base:attribute/shovel"_id);
-		} else if (tileset.isInCategory(tile1, "base:category/dirt")) {
+		} else if (tileset.isInCategory(*tile1, "base:category/dirt")) {
 			item.emplace("base:item/dirt"_id);
 			attribute.emplace("base:attribute/shovel"_id);
-		} else if (tile1 == "base:tile/stone"_id) {
+		} else if (*tile1 == "base:tile/stone"_id) {
 			item.emplace("base:item/stone"_id);
 			attribute.emplace("base:attribute/pickaxe"_id);
 		}
@@ -82,10 +84,10 @@ namespace Game3 {
 			}
 		}
 
-		if (tileset.isInCategory(tile2, "base:category/plantable"_id)) {
+		if (tileset.isInCategory(*tile2, "base:category/plantable"_id)) {
 			if (auto iter = game.itemsByAttribute.find("base:attribute/plantable"_id); iter != game.itemsByAttribute.end()) {
 				for (const auto &item: iter->second) {
-					if (auto cast = std::dynamic_pointer_cast<Plantable>(item); cast && cast->tilename == tile2) {
+					if (auto cast = std::dynamic_pointer_cast<Plantable>(item); cast && cast->tilename == *tile2) {
 						player.give({game, item});
 						realm.setTile(2, position, tileset.getEmptyID());
 						realm.reupload(2);

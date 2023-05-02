@@ -23,12 +23,14 @@ namespace Game3 {
 		return column < other.column;
 	}
 
-	TileID Place::get(Layer layer) const {
-		return realm->getTile(layer, position);
+	std::optional<TileID> Place::get(Layer layer) const {
+		return realm->tryTile(layer, position);
 	}
 
-	const Identifier & Place::getName(Layer layer) const {
-		return realm->getTileset()[realm->getTile(layer, position)];
+	std::optional<std::reference_wrapper<const Identifier>> Place::getName(Layer layer) const {
+		if (auto tile = realm->tryTile(layer, position))
+			return realm->getTileset()[*tile];
+		return std::nullopt;
 	}
 
 	void Place::set(Layer layer, TileID tile) const {
