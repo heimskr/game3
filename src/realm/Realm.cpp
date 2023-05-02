@@ -34,7 +34,6 @@ namespace Game3 {
 		initRendererRealms();
 		initTexture();
 		initRendererTileProviders();
-		// remakePathMap();
 	}
 
 	void Realm::initRendererRealms() {
@@ -187,7 +186,7 @@ namespace Game3 {
 	}
 
 	EntityPtr Realm::add(const EntityPtr &entity) {
-		std::unique_lock lock(entityMutex);
+		auto lock = lockEntitiesUnique();
 		return addUnsafe(entity);
 	}
 
@@ -205,8 +204,7 @@ namespace Game3 {
 	}
 
 	TileEntityPtr Realm::add(const TileEntityPtr &tile_entity) {
-		// auto lock = tileEntityLock.lockWrite(std::chrono::milliseconds(1));
-		std::unique_lock lock(tileEntityMutex);
+		auto lock = lockTileEntitiesUnique();
 		return addUnsafe(tile_entity);
 	}
 
@@ -221,7 +219,7 @@ namespace Game3 {
 		ticking = true;
 
 		{
-			std::shared_lock KKlock(entityMutex);
+			auto lock = lockEntitiesShared();
 			for (auto &entity: entities)
 				if (entity->isPlayer()) {
 					auto player = std::dynamic_pointer_cast<Player>(entity);
@@ -235,7 +233,7 @@ namespace Game3 {
 		}
 
 		{
-			std::shared_lock lock(tileEntityMutex);
+			auto lock = lockTileEntitiesShared();
 			for (auto &[index, tile_entity]: tileEntities)
 				tile_entity->tick(game, delta);
 		}
@@ -268,7 +266,7 @@ namespace Game3 {
 	}
 
 	std::vector<EntityPtr> Realm::findEntities(const Position &position) {
-		std::shared_lock lock(entityMutex);
+		auto lock = lockEntitiesShared();
 		std::vector<EntityPtr> out;
 		for (const auto &entity: entities)
 			if (entity->position == position)
@@ -278,7 +276,7 @@ namespace Game3 {
 
 	std::vector<EntityPtr> Realm::findEntities(const Position &position, const EntityPtr &except) {
 		std::vector<EntityPtr> out;
-		std::shared_lock lock(entityMutex);
+		auto lock = lockEntitiesShared();
 		for (const auto &entity: entities)
 			if (entity->position == position && entity != except)
 				out.push_back(entity);
@@ -286,7 +284,7 @@ namespace Game3 {
 	}
 
 	EntityPtr Realm::findEntity(const Position &position) {
-		std::shared_lock lock(entityMutex);
+		auto lock = lockEntitiesShared();
 		for (const auto &entity: entities)
 			if (entity->position == position)
 				return entity;
@@ -294,7 +292,7 @@ namespace Game3 {
 	}
 
 	EntityPtr Realm::findEntity(const Position &position, const EntityPtr &except) {
-		std::shared_lock lock(entityMutex);
+		auto lock = lockEntitiesShared();
 		for (const auto &entity: entities)
 			if (entity->position == position && entity != except)
 				return entity;
@@ -302,8 +300,7 @@ namespace Game3 {
 	}
 
 	TileEntityPtr Realm::tileEntityAt(const Position &position) {
-		// auto lock = tileEntityLock.lockRead();
-		std::shared_lock lock(tileEntityMutex);
+		auto lock = lockTileEntitiesShared();
 		if (auto iter = tileEntities.find(position); iter != tileEntities.end())
 			return iter->second;
 		return {};
@@ -314,7 +311,7 @@ namespace Game3 {
 	}
 
 	void Realm::removeSafe(const EntityPtr &entity) {
-		std::unique_lock lock(entityMutex);
+		auto lock = lockEntitiesUnique();
 		remove(entity);
 	}
 
@@ -330,7 +327,7 @@ namespace Game3 {
 	}
 
 	void Realm::removeSafe(const TileEntityPtr &tile_entity) {
-		std::unique_lock lock(tileEntityMutex);
+		auto lock = lockTileEntitiesUnique();
 		remove(tile_entity, false);
 	}
 
@@ -344,17 +341,11 @@ namespace Game3 {
 	}
 
 	void Realm::queueRemoval(const EntityPtr &entity) {
-		if (ticking)
-			entityRemovalQueue.push(entity);
-		else
-			removeSafe(entity);
+		entityRemovalQueue.push(entity);
 	}
 
 	void Realm::queueRemoval(const TileEntityPtr &tile_entity) {
-		if (ticking)
-			tileEntityRemovalQueue.push(tile_entity);
-		else
-			removeSafe(tile_entity);
+		tileEntityRemovalQueue.push(tile_entity);
 	}
 
 	void Realm::queue(std::function<void()> fn) {
@@ -530,7 +521,7 @@ namespace Game3 {
 		for (Layer layer = 1; layer <= LAYER_COUNT; ++layer)
 			if (auto tile = tryTile(layer, {row, column}); !tile || !tileset.isWalkable(*tile))
 				return false;
-		std::shared_lock lock(tileEntityMutex);
+		auto lock = lockTileEntitiesShared();
 		if (auto iter = tileEntities.find({row, column}); iter != tileEntities.end() && iter->second->solid)
 			return false;
 		return true;

@@ -4,6 +4,7 @@
 #include <mutex>
 #include <optional>
 #include <random>
+#include <thread>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -222,6 +223,37 @@ namespace Game3 {
 			void setLayerHelper(Index row, Index col, bool should_mark_dirty = true);
 
 			static BiomeType getBiome(uint32_t seed);
+
+
+			std::thread::id entityOwner;
+			inline auto lockEntitiesUnique() {
+				entityOwner = std::this_thread::get_id();
+				return std::unique_lock(entityMutex);
+			}
+
+			std::thread::id tileEntityOwner;
+			inline auto lockTileEntitiesUnique() {
+				tileEntityOwner = std::this_thread::get_id();
+				return std::unique_lock(tileEntityMutex);
+			}
+
+			inline auto lockEntitiesShared() {
+				try {
+					return std::shared_lock(entityMutex);
+				} catch (const std::system_error &) {
+					std::cerr << "\e[31mThread " << std::this_thread::get_id() << " can't lock entity mutex held by " << entityOwner << "!\e[39m\n";
+					throw;
+				}
+			}
+
+			inline auto lockTileEntitiesShared() {
+				try {
+					return std::shared_lock(tileEntityMutex);
+				} catch (const std::system_error &) {
+					std::cerr << "\e[31mThread " << std::this_thread::get_id() << " can't lock tile entity mutex held by " << tileEntityOwner << "!\e[39m\n";
+					throw;
+				}
+			}
 	};
 
 	void to_json(nlohmann::json &, const Realm &);
