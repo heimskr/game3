@@ -85,7 +85,8 @@ namespace Game3 {
 			EntityPtr findEntity(const Position &);
 			EntityPtr findEntity(const Position &, const EntityPtr &except);
 			std::shared_ptr<TileEntity> tileEntityAt(const Position &);
-			void remove(EntityPtr);
+			void remove(const EntityPtr &);
+			void removeSafe(const EntityPtr &);
 			void remove(const std::shared_ptr<TileEntity> &, bool run_helper = true);
 			void removeSafe(const std::shared_ptr<TileEntity> &);
 			void onMoved(const EntityPtr &, const Position &);

@@ -221,7 +221,7 @@ namespace Game3 {
 		ticking = true;
 
 		{
-			std::shared_lock lock(entityMutex);
+			std::shared_lock KKlock(entityMutex);
 			for (auto &entity: entities)
 				if (entity->isPlayer()) {
 					auto player = std::dynamic_pointer_cast<Player>(entity);
@@ -309,8 +309,13 @@ namespace Game3 {
 		return {};
 	}
 
-	void Realm::remove(EntityPtr entity) {
+	void Realm::remove(const EntityPtr &entity) {
 		entities.erase(entity);
+	}
+
+	void Realm::removeSafe(const EntityPtr &entity) {
+		std::unique_lock lock(entityMutex);
+		remove(entity);
 	}
 
 	void Realm::remove(const TileEntityPtr &tile_entity, bool run_helper) {
@@ -325,7 +330,6 @@ namespace Game3 {
 	}
 
 	void Realm::removeSafe(const TileEntityPtr &tile_entity) {
-		// auto lock = tileEntityLock.lockWrite(std::chrono::milliseconds(1));
 		std::unique_lock lock(tileEntityMutex);
 		remove(tile_entity, false);
 	}
@@ -343,14 +347,14 @@ namespace Game3 {
 		if (ticking)
 			entityRemovalQueue.push(entity);
 		else
-			remove(entity);
+			removeSafe(entity);
 	}
 
 	void Realm::queueRemoval(const TileEntityPtr &tile_entity) {
 		if (ticking)
 			tileEntityRemovalQueue.push(tile_entity);
 		else
-			remove(tile_entity);
+			removeSafe(tile_entity);
 	}
 
 	void Realm::queue(std::function<void()> fn) {
