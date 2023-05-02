@@ -224,17 +224,18 @@ namespace Game3 {
 
 			static BiomeType getBiome(uint32_t seed);
 
-
-			std::thread::id entityOwner;
+			std::atomic<std::thread::id> entityOwner;
 			inline auto lockEntitiesUnique() {
+				std::unique_lock lock(entityMutex);
 				entityOwner = std::this_thread::get_id();
-				return std::unique_lock(entityMutex);
+				return lock;
 			}
 
-			std::thread::id tileEntityOwner;
+			std::atomic<std::thread::id> tileEntityOwner;
 			inline auto lockTileEntitiesUnique() {
+				std::unique_lock lock(tileEntityMutex);
 				tileEntityOwner = std::this_thread::get_id();
-				return std::unique_lock(tileEntityMutex);
+				return lock;
 			}
 
 			inline auto lockEntitiesShared() {

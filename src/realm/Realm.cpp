@@ -579,7 +579,6 @@ namespace Game3 {
 			window.insert_action_group("entity_menu", group);
 			menu.set_menu_model(gmenu);
 			menu.set_has_arrow(true);
-			std::cerr << "(" << x << ", " << y << ") -> (" << int(x) << ", " << int(y) << ")\n";
 			menu.set_pointing_to({int(x), int(y), 1, 1});
 			menu.popup();
 			return true;
