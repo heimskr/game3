@@ -22,11 +22,13 @@ namespace Game3 {
 			}
 
 			void lock_shared() {
+				// This is not ideal!
 				if (owner != std::this_thread::get_id())
 					std::shared_mutex::lock_shared();
 			}
 
 			void unlock_shared() {
+				// This is not ideal either.
 				if (owner != std::this_thread::get_id())
 					std::shared_mutex::unlock_shared();
 			}
