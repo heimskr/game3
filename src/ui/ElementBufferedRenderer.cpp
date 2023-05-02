@@ -69,9 +69,11 @@ namespace Game3 {
 
 		assert(realm);
 
-		if (vbo.getHandle() == 0)
+		if (vbo.getHandle() == 0 || positionDirty) {
 			if (!reupload())
 				return;
+			positionDirty = false;
+		}
 
 		if (dirty) {
 			recomputeLighting();
@@ -86,8 +88,8 @@ namespace Game3 {
 		projection = glm::scale(projection, {static_cast<float>(tilesize), -static_cast<float>(tilesize), 1.f}) *
 		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1.f}) *
 		             glm::translate(projection, {
-		                 center_x - CHUNK_SIZE / 2.f + offset.first * CHUNK_SIZE,
-		                 center_y - CHUNK_SIZE / 2.f + offset.second * CHUNK_SIZE,
+		                 center_x - CHUNK_SIZE / 2.f + chunkPosition.x * CHUNK_SIZE,
+		                 center_y - CHUNK_SIZE / 2.f + chunkPosition.y * CHUNK_SIZE,
 		                 0.f
 		             });
 

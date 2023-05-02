@@ -97,20 +97,13 @@ namespace Game3 {
 		const auto bb_width  = width;
 		const auto bb_height = height;
 
-		float cy = center.y() - (renderers.size() - 1) / 2 * CHUNK_SIZE;
 		for (auto &row: renderers) {
-			float cx = center.x() - (renderers[0].size() - 1) / 2 * CHUNK_SIZE;
-
 			for (auto &layers: row) {
 				for (auto &renderer: layers) {
 					renderer.onBackbufferResized(bb_width, bb_height);
 					renderer.render(outdoors? game_time : 1, scale, center.x(), center.y());
 				}
-
-				cx += CHUNK_SIZE;
 			}
-
-			cy += CHUNK_SIZE;
 		}
 
 		sprite_renderer.centerX = center.x();
@@ -276,13 +269,9 @@ namespace Game3 {
 			for (auto &layers: row) {
 				for (auto &renderer: layers) {
 					renderer.setChunkPosition({
-						static_cast<int32_t>(player_cpos.x + col_index - REALM_DIAMETER / 2),
-						static_cast<int32_t>(player_cpos.y + row_index - REALM_DIAMETER / 2),
+						static_cast<int32_t>(player_cpos.x + col_index - REALM_DIAMETER / 2 - 1),
+						static_cast<int32_t>(player_cpos.y + row_index - REALM_DIAMETER / 2 - 1),
 					});
-					renderer.offset = {
-						col_index - REALM_DIAMETER / 2,
-						row_index - REALM_DIAMETER / 2,
-					};
 				}
 				++col_index;
 			}

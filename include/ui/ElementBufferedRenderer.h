@@ -25,8 +25,6 @@ namespace Game3 {
 			int backbufferHeight = -1;
 			Alignment horizontal;
 			Alignment vertical;
-			/** Top left might have {-1, -1}, top right might have {1, -1}, etc. */
-			std::pair<int32_t, int32_t> offset {};
 
 			Eigen::Vector2f center {0.f, 0.f};
 			std::shared_ptr<Tileset> tileset;
