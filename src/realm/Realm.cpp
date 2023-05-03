@@ -474,8 +474,8 @@ namespace Game3 {
 		++threadContext.updateNeighborsDepth;
 		auto &tileset = getTileset();
 
-		for (Index row_offset = -1; row_offset <= 1; ++row_offset)
-			for (Index column_offset = -1; column_offset <= 1; ++column_offset)
+		for (Index row_offset = -1; row_offset <= 1; ++row_offset) {
+			for (Index column_offset = -1; column_offset <= 1; ++column_offset) {
 				if (row_offset != 0 || column_offset != 0) {
 					const Position offset_position = position + Position(row_offset, column_offset);
 					if (auto neighbor = tileEntityAt(offset_position)) {
@@ -500,6 +500,8 @@ namespace Game3 {
 						}
 					}
 				}
+			}
+		}
 
 		if (--threadContext.updateNeighborsDepth == 0 && threadContext.layer2Updated) {
 			threadContext.layer2Updated = false;

@@ -235,7 +235,8 @@ namespace Game3::WorldGen {
 		}
 
 		overworld_timer.stop();
-		Timer::summary();
+		if (initial_generation)
+			Timer::summary();
 		Timer::clear();
 	}
 }

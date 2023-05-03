@@ -21,7 +21,15 @@ namespace Game3 {
 			return this == &other || (x == other.x && y == other.y);
 		}
 
-		auto operator<=>(const ChunkPosition &) const = default;
+		// auto operator<=>(const ChunkPosition &) const = default;
+		inline bool operator<(const ChunkPosition &other) const {
+			if (this == &other || x > other.x)
+				return false;
+			if (x < other.x)
+				return true;
+			return y < other.x;
+		}
+
 
 		explicit operator std::string() const;
 	};

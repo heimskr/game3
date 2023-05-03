@@ -710,6 +710,11 @@ namespace Game3 {
 				case GDK_KEY_t:
 					std::cout << "Time: " << int(game->getHour()) << ':' << int(game->getMinute()) << '\n';
 					return;
+				case GDK_KEY_p: {
+					std::cout << "Position: " << game->player->getPosition() << '\n';
+					std::cout << "Chunk position: " << std::string(getChunkPosition(game->player->getPosition())) << '\n';
+					return;
+				}
 				case GDK_KEY_g:
 					if (game->debugMode) {
 						try {
