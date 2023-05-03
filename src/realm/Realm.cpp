@@ -288,6 +288,7 @@ namespace Game3 {
 				std::cout << "generating " << std::string(chunk_position) << " in " << this->id << '\n';
 				generateChunk(chunk_position);
 				generatedChunks.insert(chunk_position);
+				remakePathMap(chunk_position);
 				reupload();
 			}
 		}
@@ -591,6 +592,20 @@ namespace Game3 {
 			for (size_t row = 0; row < CHUNK_SIZE; ++row)
 				for (size_t column = 0; column < CHUNK_SIZE; ++column)
 					path_chunk[row * CHUNK_SIZE + column] = isWalkable(row, column, tileset);
+	}
+
+	void Realm::remakePathMap(const ChunkRange &range) {
+		for (auto y = range.topLeft.y; y <= range.bottomRight.y; ++y)
+			for (auto x = range.topLeft.x; x <= range.bottomRight.x; ++x)
+				remakePathMap(ChunkPosition{x, y});
+	}
+
+	void Realm::remakePathMap(const ChunkPosition &position) {
+		const auto &tileset = getTileset();
+		auto &path_chunk = tileProvider.getPathChunk(position);
+		for (size_t row = 0; row < CHUNK_SIZE; ++row)
+			for (size_t column = 0; column < CHUNK_SIZE; ++column)
+				path_chunk[row * CHUNK_SIZE + column] = isWalkable(row, column, tileset);
 	}
 
 	void Realm::markGenerated(const ChunkRange &range) {
