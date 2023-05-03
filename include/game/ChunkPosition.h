@@ -21,6 +21,8 @@ namespace Game3 {
 			return this == &other || (x == other.x && y == other.y);
 		}
 
+		auto operator<=>(const ChunkPosition &) const = default;
+
 		explicit operator std::string() const;
 	};
 

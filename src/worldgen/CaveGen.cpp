@@ -13,6 +13,7 @@ namespace Game3::WorldGen {
 	constexpr static double noise_zoom = 20.;
 
 	void generateCave(const std::shared_ptr<Realm> &realm, std::default_random_engine &, int noise_seed, const ChunkRange &range) {
+		realm->markGenerated(range);
 		noise::module::Perlin perlin;
 		perlin.SetSeed(noise_seed);
 
@@ -77,6 +78,7 @@ namespace Game3::WorldGen {
 	}
 
 	void generateCaveFull(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, int noise_seed, const Position &exit_position, Position &entrance, RealmID parent_realm, const ChunkRange &range) {
+		realm->markGenerated(range);
 		noise::module::Perlin perlin;
 		perlin.SetSeed(noise_seed);
 

@@ -19,6 +19,7 @@
 
 namespace Game3::WorldGen {
 	void generateOverworld(const std::shared_ptr<Realm> &realm, size_t noise_seed, const WorldGenParams &params, const ChunkRange &range, bool initial_generation) {
+		realm->markGenerated(range);
 		Timer overworld_timer("GenOverworld");
 
 		const auto width  = range.tileWidth();

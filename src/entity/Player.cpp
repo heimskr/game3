@@ -92,6 +92,7 @@ namespace Game3 {
 	void Player::teleport(const Position &position, const std::shared_ptr<Realm> &new_realm) {
 		Entity::teleport(position, new_realm);
 		auto &game = new_realm->getGame();
+		game.activeRealm->onBlur();
 		game.activeRealm = new_realm;
 		game.canvas.window.activateContext();
 		new_realm->reupload();

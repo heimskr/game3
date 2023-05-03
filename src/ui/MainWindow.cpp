@@ -293,6 +293,7 @@ namespace Game3 {
 		WorldGen::generateOverworld(realm, seed, params, {{-1, -1}, {1, 1}}, true);
 		game->realms.emplace(realm->id, realm);
 		game->activeRealm = realm;
+		realm->onFocus();
 		realm->add(game->player = Entity::create<Player>());
 		game->player->position = realm->randomLand;
 		game->player->init(*game);

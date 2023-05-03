@@ -35,7 +35,8 @@ namespace Game3 {
 			~ElementBufferedRenderer();
 
 			void reset();
-			void init(TileProvider &, Layer);
+			void init();
+			void setup(TileProvider &, Layer);
 			void render(float divisor, float scale, float center_x, float center_y);
 			/** Doesn't bind any texture—the caller must bind a texture before calling this. */
 			void render(float divisor);
@@ -45,6 +46,9 @@ namespace Game3 {
 			void setChunkPosition(const ChunkPosition &);
 			inline void markDirty() { dirty = true; }
 			inline void setRealm(Realm &new_realm) { realm = &new_realm; }
+
+			void snooze();
+			void wakeUp();
 
 			inline explicit operator bool() const { return initialized; }
 

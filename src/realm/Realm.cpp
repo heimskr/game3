@@ -48,7 +48,7 @@ namespace Game3 {
 			for (auto &layers: row) {
 				Layer layer = 0;
 				for (auto &renderer: layers)
-					renderer.init(tileProvider, ++layer);
+					renderer.setup(tileProvider, ++layer);
 			}
 		}
 	}
@@ -69,6 +69,7 @@ namespace Game3 {
 		id = json.at("id");
 		type = json.at("type");
 		seed = json.at("seed");
+		generatedChunks = json.at("generatedChunks");
 		tileProvider.clear();
 		from_json(json.at("tilemap"), tileProvider);
 		initRendererTileProviders();
@@ -89,7 +90,27 @@ namespace Game3 {
 			extraData = json.at("extra");
 	}
 
+	void Realm::onFocus() {
+		focused = true;
+		for (auto &row: renderers)
+			for (auto &layers: row)
+				for (auto &renderer: layers)
+					renderer.wakeUp();
+		reupload();
+	}
+
+	void Realm::onBlur() {
+		focused = false;
+		for (auto &row: renderers)
+			for (auto &layers: row)
+				for (auto &renderer: layers)
+					renderer.snooze();
+	}
+
 	void Realm::render(const int width, const int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &sprite_renderer, float game_time) {
+		if (!focused)
+			onFocus();
+
 		Canvas &canvas = game.canvas;
 		auto &multiplier = canvas.multiplier;
 
@@ -112,9 +133,17 @@ namespace Game3 {
 
 		std::shared_ptr<Entity> player;
 		for (const auto &entity: entities)
-			if (entity->isPlayer())
+			if (entity->isPlayer()) {
 				player = entity;
-			else
+				const auto [x, y] = getChunkPosition(player->getPosition());
+				for (int32_t x_offset = -REALM_DIAMETER / 2; x_offset <= REALM_DIAMETER / 2; ++x_offset) {
+					for (int32_t y_offset = -REALM_DIAMETER / 2; y_offset <= REALM_DIAMETER / 2; ++y_offset) {
+						ChunkPosition chunk_position{x + x_offset, y + y_offset};
+						if (!generatedChunks.contains(chunk_position))
+							tileProvider.generationQueue.push_back(chunk_position);
+					}
+				}
+			} else
 				entity->render(sprite_renderer);
 		for (const auto &[index, tile_entity]: tileEntities)
 			tile_entity->render(sprite_renderer);
@@ -252,7 +281,12 @@ namespace Game3 {
 		if (!tileProvider.generationQueue.empty()) {
 			const auto chunk_position = std::move(tileProvider.generationQueue.back());
 			tileProvider.generationQueue.pop_back();
-			generateChunk(chunk_position);
+			if (!generatedChunks.contains(chunk_position)) {
+				std::cout << "generating " << std::string(chunk_position) << " in " << this->id << '\n';
+				generateChunk(chunk_position);
+				generatedChunks.insert(chunk_position);
+				reupload();
+			}
 		}
 
 		Index row_index = 0;
@@ -510,6 +544,7 @@ namespace Game3 {
 		json["seed"] = seed;
 		json["provider"] = tileProvider;
 		json["outdoors"] = outdoors;
+		json["generatedChunks"] = generatedChunks;
 		json["tileEntities"] = std::unordered_map<std::string, nlohmann::json>();
 		for (const auto &[position, tile_entity]: tileEntities)
 			json["tileEntities"][position.simpleString()] = *tile_entity;
@@ -552,6 +587,16 @@ namespace Game3 {
 			for (size_t row = 0; row < CHUNK_SIZE; ++row)
 				for (size_t column = 0; column < CHUNK_SIZE; ++column)
 					path_chunk[row * CHUNK_SIZE + column] = isWalkable(row, column, tileset);
+	}
+
+	void Realm::markGenerated(const ChunkRange &range) {
+		for (auto y = range.topLeft.y; y <= range.bottomRight.y; ++y)
+			for (auto x = range.topLeft.x; x <= range.bottomRight.x; ++x)
+				generatedChunks.insert(ChunkPosition{x, y});
+	}
+
+	void Realm::markGenerated(ChunkPosition chunk_position) {
+		generatedChunks.insert(std::move(chunk_position));
 	}
 
 	bool Realm::rightClick(const Position &position, double x, double y) {

@@ -44,12 +44,10 @@ namespace Game3 {
 		}
 	}
 
-	void ElementBufferedRenderer::init(TileProvider &provider_, Layer layer_) {
+	void ElementBufferedRenderer::init() {
 		if (initialized)
 			reset();
 		assert(realm);
-		layer = layer_;
-		provider = &provider_;
 		shader.init(buffered_vert, buffered_frag);
 		generateVertexBufferObject();
 		generateElementBufferObject();
@@ -61,6 +59,11 @@ namespace Game3 {
 		brightTiles.resize(8, -1);
 		brightSet = {bright_shorts.begin(), bright_shorts.end()};
 		initialized = true;
+	}
+
+	void ElementBufferedRenderer::setup(TileProvider &provider_, Layer layer_) {
+		layer = layer_;
+		provider = &provider_;
 	}
 
 	void ElementBufferedRenderer::render(float divisor, float scale, float center_x, float center_y) {
@@ -170,6 +173,14 @@ namespace Game3 {
 			chunkPosition = new_pos;
 			positionDirty = true;
 		}
+	}
+
+	void ElementBufferedRenderer::snooze() {
+		reset();
+	}
+
+	void ElementBufferedRenderer::wakeUp() {
+		init();
 	}
 
 	bool ElementBufferedRenderer::generateVertexBufferObject() {

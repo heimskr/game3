@@ -4,6 +4,7 @@
 #include <mutex>
 #include <optional>
 #include <random>
+#include <set>
 #include <thread>
 #include <unordered_map>
 #include <unordered_set>
@@ -55,6 +56,7 @@ namespace Game3 {
 			bool outdoors = true;
 			size_t ghostCount = 0;
 			int seed = 0;
+			std::set<ChunkPosition> generatedChunks;
 
 			Realm(const Realm &) = delete;
 			Realm(Realm &&) = delete;
@@ -71,6 +73,8 @@ namespace Game3 {
 
 			static std::shared_ptr<Realm> fromJSON(Game &, const nlohmann::json &);
 
+			virtual void onFocus();
+			virtual void onBlur();
 			void render(int width, int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &, float game_time);
 			void reupload();
 			/** The Layer argument is 1-based. */
@@ -110,6 +114,9 @@ namespace Game3 {
 			Tileset & getTileset();
 			/** Redoes the pathmap for the entire stored map, not just the visible ones! Can be very expensive. */
 			void remakePathMap();
+			void markGenerated(const ChunkRange &);
+			void markGenerated(ChunkPosition);
+			inline void markGenerated(auto x, auto y) { generatedChunks.insert(ChunkPosition{x, y}); }
 
 			virtual bool interactGround(const std::shared_ptr<Player> &, const Position &);
 			virtual void updateNeighbors(const Position &);
@@ -197,6 +204,8 @@ namespace Game3 {
 			friend void to_json(nlohmann::json &, const Realm &);
 
 		protected:
+			bool focused = false;
+
 			Realm(Game &);
 			Realm(Game &, RealmID, RealmType, Identifier tileset_id, int seed_);
 
