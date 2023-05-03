@@ -140,9 +140,6 @@ namespace Game3::WorldGen {
 					// resource_timer.stop();
 				});
 			}
-
-			// Timer land_timer("GetLand");
-			// land_timer.stop();
 		}
 
 		for (std::thread &thread: threads)
@@ -183,13 +180,11 @@ namespace Game3::WorldGen {
 							const Index column_start = position.column + pad;
 							const Index column_end = column_start + n;
 
-							for (Index row = row_start; row < row_end; row += 2) {
-								for (Index column = column_start; column < column_end; column += 2) {
-									// const Index index = row * tilemap1->width + column;
+							for (Index row = row_start; row < row_end; row += 2)
+								for (Index column = column_start; column < column_end; column += 2)
 									if (auto tile = provider.tryTile(1, {row, column}); !tile || !tileset.isLand(*tile))
 										goto failed;
-								}
-							}
+
 							thread_candidates.push_back(position);
 							failed: continue;
 						}

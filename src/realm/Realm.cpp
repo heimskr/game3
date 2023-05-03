@@ -605,7 +605,7 @@ namespace Game3 {
 		auto &path_chunk = tileProvider.getPathChunk(position);
 		for (size_t row = 0; row < CHUNK_SIZE; ++row)
 			for (size_t column = 0; column < CHUNK_SIZE; ++column)
-				path_chunk[row * CHUNK_SIZE + column] = isWalkable(row, column, tileset);
+				path_chunk[row * CHUNK_SIZE + column] = isWalkable(position.y * CHUNK_SIZE + row, position.x * CHUNK_SIZE + column, tileset);
 	}
 
 	void Realm::markGenerated(const ChunkRange &range) {
