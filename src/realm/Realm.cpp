@@ -27,7 +27,10 @@ namespace Game3 {
 		details.tilesetName = json.at("tileset");
 	}
 
-	Realm::Realm(Game &game_): game(game_) {}
+	Realm::Realm(Game &game_): game(game_) {
+		initRendererRealms();
+		initRendererTileProviders();
+	}
 
 	Realm::Realm(Game &game_, RealmID id_, RealmType type_, Identifier tileset_id, int seed_):
 	id(id_), type(type_), tileProvider(std::move(tileset_id)), seed(seed_), game(game_) {
@@ -546,6 +549,7 @@ namespace Game3 {
 		json["outdoors"] = outdoors;
 		json["generatedChunks"] = generatedChunks;
 		json["tileEntities"] = std::unordered_map<std::string, nlohmann::json>();
+		json["tilemap"] = tileProvider;
 		for (const auto &[position, tile_entity]: tileEntities)
 			json["tileEntities"][position.simpleString()] = *tile_entity;
 		json["entities"] = std::vector<nlohmann::json>();
