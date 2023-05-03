@@ -30,7 +30,10 @@
 #include "item/Plantable.h"
 #include "item/Sapling.h"
 #include "item/Tool.h"
+#include "realm/Cave.h"
+#include "realm/House.h"
 #include "realm/Keep.h"
+#include "realm/Overworld.h"
 #include "realm/RealmFactory.h"
 #include "recipe/CraftingRecipe.h"
 #include "registry/Registries.h"
@@ -226,10 +229,10 @@ namespace Game3 {
 		};
 
 		// ...
-		addRealm.operator()<Realm>("base:realm/overworld"_id);
-		addRealm.operator()<Realm>("base:realm/house"_id);
+		addRealm.operator()<Overworld>(Overworld::ID());
+		addRealm.operator()<House>(House::ID());
 		addRealm.operator()<Realm>("base:realm/blacksmith"_id);
-		addRealm.operator()<Realm>("base:realm/cave"_id);
+		addRealm.operator()<Cave>(Cave::ID());
 		addRealm.operator()<Realm>("base:realm/tavern"_id);
 		addRealm.operator()<Keep>(Keep::ID());
 	}

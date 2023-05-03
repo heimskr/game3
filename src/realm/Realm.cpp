@@ -249,6 +249,12 @@ namespace Game3 {
 		for (const auto &stolen: generalQueue.steal())
 			stolen();
 
+		if (!tileProvider.generationQueue.empty()) {
+			const auto chunk_position = std::move(tileProvider.generationQueue.back());
+			tileProvider.generationQueue.pop_back();
+			generateChunk(chunk_position);
+		}
+
 		Index row_index = 0;
 		for (auto &row: renderers) {
 			Index col_index = 0;
@@ -549,16 +555,15 @@ namespace Game3 {
 	}
 
 	bool Realm::rightClick(const Position &position, double x, double y) {
-		auto entities = findEntities(position);
-
-		const auto player = getGame().player;
+		const auto player     = getGame().player;
 		const auto player_pos = player->getPosition();
-		const bool overlap = player_pos == position;
-		const bool adjacent = position.adjacent4(player_pos);
+		const bool overlap    = player_pos == position;
+		const bool adjacent   = position.adjacent4(player_pos);
+
 		if (!overlap && !adjacent)
 			return false;
 
-		if (!entities.empty()) {
+		if (const auto entities = findEntities(position); !entities.empty()) {
 			auto gmenu = Gio::Menu::create();
 			auto group = Gio::SimpleActionGroup::create();
 			size_t i = 0;

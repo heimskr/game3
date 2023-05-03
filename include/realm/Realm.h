@@ -54,7 +54,7 @@ namespace Game3 {
 			/** Whether the realm's rendering should be affected by the day-night cycle. */
 			bool outdoors = true;
 			size_t ghostCount = 0;
-			uint32_t seed = 0;
+			int seed = 0;
 
 			Realm(const Realm &) = delete;
 			Realm(Realm &&) = delete;
@@ -115,6 +115,8 @@ namespace Game3 {
 			virtual void updateNeighbors(const Position &);
 			/** Returns true iff something was done with the right click. */
 			virtual bool rightClick(const Position &, double x, double y);
+			/** Generates additional chunks for the infinite map after the initial worldgen of the realm. */
+			virtual void generateChunk(const ChunkPosition &) {}
 
 			template <typename T, typename... Args>
 			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {

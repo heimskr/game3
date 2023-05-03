@@ -20,10 +20,13 @@ namespace Game3 {
 
 			bool interactGround(const std::shared_ptr<Player> &, const Position &) override;
 			void reveal(const Position &);
+			void generateChunk(const ChunkPosition &) override;
 
 			friend class Realm;
 
 		protected:
+			using Realm::Realm;
+
 			Cave() = delete;
 			Cave(Game &, RealmID, RealmID parent_realm, int seed_);
 

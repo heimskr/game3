@@ -4,6 +4,8 @@
 #include <memory>
 #include <random>
 
+#include <nlohmann/json.hpp>
+
 #include "Types.h"
 #include "game/ChunkPosition.h"
 
@@ -19,6 +21,8 @@ namespace Game3 {
 		double forestThreshold = 0.5;
 		double antiforestThreshold = -0.4;
 		double biomeZoom = 1000.;
-		ChunkRange range;
 	};
+
+	void from_json(const nlohmann::json &, WorldGenParams &);
+	void to_json(nlohmann::json &, const WorldGenParams &);
 }

@@ -6,6 +6,7 @@
 #include "biome/Grassland.h"
 #include "game/Game.h"
 #include "lib/noise.h"
+#include "realm/Overworld.h"
 #include "realm/Realm.h"
 #include "tileentity/OreDeposit.h"
 #include "tileentity/Teleporter.h"
@@ -17,16 +18,16 @@
 #include "worldgen/WorldGen.h"
 
 namespace Game3::WorldGen {
-	void generateOverworld(const std::shared_ptr<Realm> &realm, size_t noise_seed, const WorldGenParams &params) {
+	void generateOverworld(const std::shared_ptr<Realm> &realm, size_t noise_seed, const WorldGenParams &params, const ChunkRange &range, bool initial_generation) {
 		Timer overworld_timer("GenOverworld");
 
-		const auto width  = params.range.tileWidth();
-		const auto height = params.range.tileHeight();
+		const auto width  = range.tileWidth();
+		const auto height = range.tileHeight();
 
 		auto &provider = realm->tileProvider;
 
-		for (auto y = params.range.topLeft.y; y <= params.range.bottomRight.y; ++y)
-			for (auto x = params.range.topLeft.x; x <= params.range.bottomRight.x; ++x)
+		for (auto y = range.topLeft.y; y <= range.bottomRight.y; ++y)
+			for (auto x = range.topLeft.x; x <= range.bottomRight.x; ++x)
 				provider.ensureAllChunks(ChunkPosition{x, y});
 
 		const size_t regions_x = updiv(width,  CHUNK_SIZE);
@@ -51,10 +52,10 @@ namespace Game3::WorldGen {
 		p2.SetNoiseQuality(noise::NoiseQuality::QUALITY_BEST);
 		p2.SetFrequency(0.8);
 
-		const Index range_row_min = params.range.rowMin();
-		const Index range_row_max = params.range.rowMax();
-		const Index range_column_min = params.range.columnMin();
-		const Index range_column_max = params.range.columnMax();
+		const Index range_row_min = range.rowMin();
+		const Index range_row_max = range.rowMax();
+		const Index range_column_min = range.columnMin();
+		const Index range_column_max = range.columnMax();
 
 		for (Index row = range_row_min; row <= range_row_max; ++row) {
 			for (Index column = range_column_min; column < range_column_max; ++column) {
@@ -76,8 +77,8 @@ namespace Game3::WorldGen {
 
 		const GamePtr game_ptr = realm->getGame().shared_from_this();
 
-		for (int32_t y = params.range.topLeft.y; y <= params.range.bottomRight.y; ++y)
-			for (int32_t x = params.range.topLeft.x; x <= params.range.bottomRight.x; ++x)
+		for (int32_t y = range.topLeft.y; y <= range.bottomRight.y; ++y)
+			for (int32_t x = range.topLeft.x; x <= range.bottomRight.x; ++x)
 				provider.ensureAllChunks(ChunkPosition{x, y});
 
 		for (size_t thread_row = 0; thread_row < regions_y; ++thread_row) {
@@ -150,59 +151,61 @@ namespace Game3::WorldGen {
 
 		std::default_random_engine rng(noise_seed);
 
-		constexpr int m = 26, n = 34, pad = 2;
-		Timer land_timer("GetLand");
-		const auto starts = provider.getLand(*game_ptr, params.range, m + pad * 2, n + pad * 2);
-		land_timer.stop();
-		constexpr size_t chunk_size = 512;
+		if (initial_generation) {
+			constexpr int m = 26, n = 34, pad = 2;
+			Timer land_timer("GetLand");
+			const auto starts = provider.getLand(*game_ptr, range, m + pad * 2, n + pad * 2);
+			land_timer.stop();
+			constexpr size_t chunk_size = 512;
 
-		if (!starts.empty()) {
-			Timer candidate_timer("Candidates");
+			if (!starts.empty()) {
+				Timer candidate_timer("Candidates");
 
-			std::vector<Position> candidates;
-			candidates.reserve(starts.size() / 16);
-			std::vector<std::thread> candidate_threads;
-			const size_t chunk_max = updiv(starts.size(), chunk_size);
-			candidate_threads.reserve(chunk_max);
+				std::vector<Position> candidates;
+				candidates.reserve(starts.size() / 16);
+				std::vector<std::thread> candidate_threads;
+				const size_t chunk_max = updiv(starts.size(), chunk_size);
+				candidate_threads.reserve(chunk_max);
 
-			std::mutex candidates_mutex;
+				std::mutex candidates_mutex;
 
-			for (size_t chunk = 0; chunk < chunk_max; ++chunk) {
-				realm->randomLand = choose(starts, rng);
+				for (size_t chunk = 0; chunk < chunk_max; ++chunk) {
+					realm->randomLand = choose(starts, rng);
 
-				candidate_threads.emplace_back([&, chunk] {
-					std::vector<Position> thread_candidates;
+					candidate_threads.emplace_back([&, chunk] {
+						std::vector<Position> thread_candidates;
 
-					for (size_t i = chunk * chunk_size, max = std::min((chunk + 1) * chunk_size, starts.size()); i < max; ++i) {
-						const auto position = starts[i];
-						const Index row_start = position.row + pad;
-						const Index row_end = row_start + m;
-						const Index column_start = position.column + pad;
-						const Index column_end = column_start + n;
+						for (size_t i = chunk * chunk_size, max = std::min((chunk + 1) * chunk_size, starts.size()); i < max; ++i) {
+							const auto position = starts[i];
+							const Index row_start = position.row + pad;
+							const Index row_end = row_start + m;
+							const Index column_start = position.column + pad;
+							const Index column_end = column_start + n;
 
-						for (Index row = row_start; row < row_end; row += 2) {
-							for (Index column = column_start; column < column_end; column += 2) {
-								// const Index index = row * tilemap1->width + column;
-								if (auto tile = provider.tryTile(1, {row, column}); !tile || !tileset.isLand(*tile))
-									goto failed;
+							for (Index row = row_start; row < row_end; row += 2) {
+								for (Index column = column_start; column < column_end; column += 2) {
+									// const Index index = row * tilemap1->width + column;
+									if (auto tile = provider.tryTile(1, {row, column}); !tile || !tileset.isLand(*tile))
+										goto failed;
+								}
 							}
+							thread_candidates.push_back(position);
+							failed: continue;
 						}
-						thread_candidates.push_back(position);
-						failed: continue;
-					}
 
-					std::unique_lock lock(candidates_mutex);
-					candidates.insert(candidates.end(), thread_candidates.begin(), thread_candidates.end());
-				});
+						std::unique_lock lock(candidates_mutex);
+						candidates.insert(candidates.end(), thread_candidates.begin(), thread_candidates.end());
+					});
+				}
+
+				for (std::thread &thread: candidate_threads)
+					thread.join();
+
+				candidate_timer.stop();
+
+				if (!candidates.empty())
+					WorldGen::generateTown(realm, rng, choose(candidates, rng) + Position(pad + 1, 0), n, m, pad, noise_seed);
 			}
-
-			for (std::thread &thread: candidate_threads)
-				thread.join();
-
-			candidate_timer.stop();
-
-			if (!candidates.empty())
-				WorldGen::generateTown(realm, rng, choose(candidates, rng) + Position(pad + 1, 0), n, m, pad, noise_seed);
 		}
 
 		Timer postgen_timer("Postgen");
@@ -229,9 +232,11 @@ namespace Game3::WorldGen {
 
 		postgen_timer.stop();
 
-		Timer pathmap_timer("RemakePathmap");
-		realm->remakePathMap();
-		pathmap_timer.stop();
+		if (initial_generation) {
+			std::dynamic_pointer_cast<Overworld>(realm)->worldgenParams = params;
+			Timer pathmap_timer("RemakePathmap");
+			realm->remakePathMap();
+		}
 
 		overworld_timer.stop();
 		Timer::summary();

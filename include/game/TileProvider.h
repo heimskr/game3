@@ -34,11 +34,13 @@ namespace Game3 {
 			BiomeMap biomeMap;
 			PathMap pathMap;
 			Identifier tilesetID;
+			std::vector<ChunkPosition> generationQueue;
 
 			TileProvider() = default;
 			TileProvider(Identifier tileset_id);
 
 			void clear();
+			bool contains(const ChunkPosition &) const;
 
 			std::shared_ptr<Tileset> getTileset(const Game &);
 

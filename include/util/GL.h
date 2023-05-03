@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <csignal>
 #include <functional>
 #include <iostream>
 #include <numeric>
@@ -102,6 +103,8 @@ namespace GL {
 			throw std::runtime_error("Couldn't generate buffer object");
 		glBindBuffer(target, bo); CHECKGL
 		glBufferData(target, count * sizeof(T), data, usage); CHECKGL
+		if (bo == 3800)
+			raise(SIGTRAP);
 		return bo;
 	}
 

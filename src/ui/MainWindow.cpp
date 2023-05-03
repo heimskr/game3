@@ -11,6 +11,7 @@
 #include "game/Game.h"
 #include "game/HasInventory.h"
 #include "game/Inventory.h"
+#include "realm/Overworld.h"
 #include "tileentity/Building.h"
 #include "tileentity/Teleporter.h"
 #include "ui/gtk/CommandDialog.h"
@@ -285,11 +286,11 @@ namespace Game3 {
 		glArea.get_context()->make_current();
 		game = Game::create(*canvas);
 		game->initEntities();
-		auto realm = Realm::create(*game, 1, "base:realm/overworld"_id, "base:tileset/monomap"_id, seed);
+		auto realm = Realm::create<Overworld>(*game, 1, Overworld::ID(), "base:tileset/monomap"_id, seed);
 		realm->outdoors = true;
 		std::default_random_engine rng;
 		rng.seed(seed);
-		WorldGen::generateOverworld(realm, seed, params);
+		WorldGen::generateOverworld(realm, seed, params, {{-1, -1}, {1, 1}}, true);
 		game->realms.emplace(realm->id, realm);
 		game->activeRealm = realm;
 		realm->add(game->player = Entity::create<Player>());

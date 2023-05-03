@@ -2,7 +2,10 @@
 
 #include <cstdint>
 #include <functional>
+#include <random>
 #include <string>
+
+#include <nlohmann/json.hpp>
 
 #include "Constants.h"
 #include "Types.h"
@@ -12,12 +15,17 @@ namespace Game3 {
 		int32_t x = 0;
 		int32_t y = 0;
 
+		std::default_random_engine getRNG() const;
+
 		inline bool operator==(const ChunkPosition &other) const {
 			return this == &other || (x == other.x && y == other.y);
 		}
 
 		explicit operator std::string() const;
 	};
+
+	void from_json(const nlohmann::json &, ChunkPosition &);
+	void to_json(nlohmann::json &, const ChunkPosition &);
 
 	struct ChunkRange {
 		ChunkPosition topLeft;
@@ -37,6 +45,9 @@ namespace Game3 {
 			return this == &other || (topLeft == other.topLeft && bottomRight == other.bottomRight);
 		}
 	};
+
+	void from_json(const nlohmann::json &, ChunkRange &);
+	void to_json(nlohmann::json &, const ChunkRange &);
 }
 
 namespace std {

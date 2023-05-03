@@ -5,6 +5,7 @@
 #include "game/Inventory.h"
 #include "realm/Cave.h"
 #include "tileentity/Building.h"
+#include "worldgen/CaveGen.h"
 
 namespace Game3 {
 	Cave::Cave(Game &game_, RealmID id_, RealmID parent_realm, int seed_):
@@ -92,10 +93,15 @@ namespace Game3 {
 					}
 				}
 			}
-			if (changed) {
+
+			if (changed)
 				reupload(3);
-			}
 		}
+	}
+
+	void Cave::generateChunk(const ChunkPosition &chunk_position) {
+		auto rng = chunk_position.getRNG();
+		WorldGen::generateCave(shared_from_this(), rng, seed, {chunk_position, chunk_position});
 	}
 
 	void Cave::absorbJSON(const nlohmann::json &json) {

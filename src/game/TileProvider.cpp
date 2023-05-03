@@ -14,6 +14,15 @@ namespace Game3 {
 		biomeMap.clear();
 	}
 
+	bool TileProvider::contains(const ChunkPosition &chunk_position) const {
+		if (!pathMap.contains(chunk_position) || !biomeMap.contains(chunk_position))
+			return false;
+		for (const auto &map: chunkMaps)
+			if (!map.contains(chunk_position))
+				return false;
+		return true;
+	}
+
 	std::shared_ptr<Tileset> TileProvider::getTileset(const Game &game) {
 		if (cachedTileset)
 			return cachedTileset;
@@ -239,14 +248,15 @@ namespace Game3 {
 
 	void TileProvider::initTileChunk(Layer, Chunk<TileID> &chunk, const ChunkPosition &chunk_position) {
 		// TODO!: worldgen
+		generationQueue.push_back(chunk_position);
 		chunk.resize(CHUNK_SIZE * CHUNK_SIZE, 0);
 	}
 
-	void TileProvider::initBiomeChunk(Chunk<BiomeType> &chunk, const ChunkPosition &chunk_position) {
+	void TileProvider::initBiomeChunk(Chunk<BiomeType> &chunk, const ChunkPosition &) {
 		chunk.resize(CHUNK_SIZE * CHUNK_SIZE, 0);
 	}
 
-	void TileProvider::initPathChunk(Chunk<uint8_t> &chunk, const ChunkPosition &chunk_position) {
+	void TileProvider::initPathChunk(Chunk<uint8_t> &chunk, const ChunkPosition &) {
 		// TODO!: worldgen?
 		chunk.resize(CHUNK_SIZE * CHUNK_SIZE, 0);
 	}

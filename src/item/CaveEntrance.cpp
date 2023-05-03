@@ -62,7 +62,7 @@ namespace Game3 {
 			auto new_realm = Realm::create<Cave>(game, *realm_id, realm.id, cave_seed);
 			new_realm->outdoors = false;
 			Position entrance_position;
-			WorldGen::generateCave(new_realm, threadContext.rng, cave_seed, exit_position, entrance_position, realm.id, {{-1, -1}, {1, 1}});
+			WorldGen::generateCaveFull(new_realm, threadContext.rng, cave_seed, exit_position, entrance_position, realm.id, {{-1, -1}, {1, 1}});
 			entrance = entrance_position;
 			game.realms.emplace(*realm_id, new_realm);
 			++game.cavesGenerated;

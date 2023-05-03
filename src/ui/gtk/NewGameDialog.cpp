@@ -75,7 +75,6 @@ namespace Game3 {
 			.stoneLevel = stoneLevelSlider.get_value(),
 			.forestThreshold = forestSlider.get_value(),
 			.antiforestThreshold = antiforestSlider.get_value(),
-			.range = {{-1, -1}, {1, 1}},
 		});
 	}
 }
