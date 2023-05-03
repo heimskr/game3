@@ -59,7 +59,7 @@ namespace Game3::WorldGen {
 		const Index range_column_max = range.columnMax();
 
 		for (Index row = range_row_min; row <= range_row_max; ++row) {
-			for (Index column = range_column_min; column < range_column_max; ++column) {
+			for (Index column = range_column_min; column <= range_column_max; ++column) {
 				const double noise = std::min(1., std::max(-1., p2.GetValue(row / params.biomeZoom, column / params.biomeZoom, 0.0) * 5.));
 				auto &type = provider.findBiomeType({row, column});
 				if (noise < -0.8)
