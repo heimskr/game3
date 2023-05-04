@@ -16,6 +16,7 @@ namespace Game3::WorldGen {
 		Index row = 0;
 		Index column = 0;
 
+		auto pauser = realm->pauseUpdates();
 		Game &game = realm->getGame();
 
 		const auto cleanup = [&](Index row, Index column) {
