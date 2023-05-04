@@ -16,6 +16,7 @@ namespace Game3::WorldGen {
 
 		realm->markGenerated(0, 0);
 		realm->tileProvider.ensureAllChunks(ChunkPosition{0, 0});
+		auto pauser = realm->pauseUpdates();
 		generateIndoors(realm, rng, parent_realm, width, height, entrance);
 		Game &game = realm->getGame();
 

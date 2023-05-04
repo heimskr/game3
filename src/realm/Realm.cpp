@@ -470,6 +470,9 @@ namespace Game3 {
 	}
 
 	void Realm::updateNeighbors(const Position &position) {
+		if (updatesPaused)
+			return;
+
 		++threadContext.updateNeighborsDepth;
 		auto &tileset = getTileset();
 

@@ -43,6 +43,13 @@ namespace Game3 {
 	void from_json(const nlohmann::json &, RealmDetails &);
 
 	class Realm: public std::enable_shared_from_this<Realm> {
+		private:
+			struct Pauser {
+				std::shared_ptr<Realm> realm;
+				Pauser(std::shared_ptr<Realm> realm_): realm(realm_) { realm->updatesPaused = true; }
+				~Pauser() { realm->updatesPaused = false; }
+			};
+
 		public:
 			RealmID id;
 			RealmType type;
@@ -119,6 +126,7 @@ namespace Game3 {
 			void markGenerated(const ChunkRange &);
 			void markGenerated(ChunkPosition);
 			inline void markGenerated(auto x, auto y) { generatedChunks.insert(ChunkPosition{x, y}); }
+			inline auto pauseUpdates() { return Pauser(shared_from_this()); }
 
 			virtual bool interactGround(const std::shared_ptr<Player> &, const Position &);
 			virtual void updateNeighbors(const Position &);
@@ -207,6 +215,8 @@ namespace Game3 {
 
 		protected:
 			bool focused = false;
+			/** Whether to prevent updateNeighbors from running. */
+			bool updatesPaused = false;
 
 			Realm(Game &);
 			Realm(Game &, RealmID, RealmType, Identifier tileset_id, int seed_);
