@@ -33,4 +33,3 @@ If you'd like to contribute, here are some ideas, ordered roughly from easiest t
 - Add multiplayer support.
 - Redo the UI to be done in OpenGL or an OpenGL-based framework instead of GTK.
 - Rewrite the "engine" to be based on Vulkan or SDL2 instead of OpenGL.
-- Make overworld realms seamlessly infinite.
