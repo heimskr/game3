@@ -46,6 +46,6 @@ namespace Game3 {
 
 	void test() {
 		for (int i = -128; i <= 64; ++i)
-			std::cout << "(" << i << ", " << j << ") -> " << TileProvider::divide(i) << ", " << TileProvider::remainder(i) << "\n";
+			std::cout << i << " -> " << TileProvider::divide(i) << ", " << TileProvider::remainder(i) << "\n";
 	}
 }
