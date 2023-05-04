@@ -49,10 +49,10 @@ namespace Game3 {
 				static std::uniform_int_distribution hundred(0, 99);
 				if (hundred(tree_rng) < 75)
 					return noise;
-				uint8_t mod = column % 2;
+				uint8_t mod = abs(column) % 2;
 				if (hundred(tree_rng) < 50)
 					mod = 1 - mod;
-				if ((row % 2) == mod) {
+				if ((abs(row) % 2) == mod) {
 					static const std::vector<Identifier> cactuses {
 						"base:tile/cactus1"_id,
 						"base:tile/cactus2"_id,

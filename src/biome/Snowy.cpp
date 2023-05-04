@@ -53,11 +53,11 @@ namespace Game3 {
 			realm.setTile(1, {row, column}, snow);
 			const double forest_noise = forestPerlin->GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.5);
 			if (params.forestThreshold < forest_noise) {
-				uint8_t mod = column % 2;
+				uint8_t mod = abs(column) % 2;
 				std::default_random_engine tree_rng(static_cast<uint_fast32_t>(forest_noise * 1'000'000'000.));
 				if (std::uniform_int_distribution(0, 99)(tree_rng) < 50)
 					mod = 1 - mod;
-				if ((row % 2) == mod) {
+				if ((abs(row) % 2) == mod) {
 					static const std::vector<Identifier> trees {"base:tile/winter_tree1"_id, "base:tile/winter_tree2"_id, "base:tile/winter_tree3"_id};
 					realm.add(TileEntity::create<Tree>(realm.getGame(), choose(trees, rng), "base:tile/winter_stump"_id, Position(row, column), Tree::MATURITY));
 				}
