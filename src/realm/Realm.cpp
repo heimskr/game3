@@ -285,7 +285,6 @@ namespace Game3 {
 			const auto chunk_position = std::move(tileProvider.generationQueue.back());
 			tileProvider.generationQueue.pop_back();
 			if (!generatedChunks.contains(chunk_position)) {
-				std::cout << "generating " << std::string(chunk_position) << " in " << this->id << '\n';
 				generateChunk(chunk_position);
 				generatedChunks.insert(chunk_position);
 				remakePathMap(chunk_position);
@@ -591,8 +590,8 @@ namespace Game3 {
 	void Realm::remakePathMap() {
 		const auto &tileset = getTileset();
 		for (auto &[chunk_position, path_chunk]: tileProvider.pathMap)
-			for (size_t row = 0; row < CHUNK_SIZE; ++row)
-				for (size_t column = 0; column < CHUNK_SIZE; ++column)
+			for (int64_t row = 0; row < CHUNK_SIZE; ++row)
+				for (int64_t column = 0; column < CHUNK_SIZE; ++column)
 					path_chunk[row * CHUNK_SIZE + column] = isWalkable(row, column, tileset);
 	}
 
@@ -605,8 +604,8 @@ namespace Game3 {
 	void Realm::remakePathMap(const ChunkPosition &position) {
 		const auto &tileset = getTileset();
 		auto &path_chunk = tileProvider.getPathChunk(position);
-		for (size_t row = 0; row < CHUNK_SIZE; ++row)
-			for (size_t column = 0; column < CHUNK_SIZE; ++column)
+		for (int64_t row = 0; row < CHUNK_SIZE; ++row)
+			for (int64_t column = 0; column < CHUNK_SIZE; ++column)
 				path_chunk[row * CHUNK_SIZE + column] = isWalkable(position.y * CHUNK_SIZE + row, position.x * CHUNK_SIZE + column, tileset);
 	}
 

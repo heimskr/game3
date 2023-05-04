@@ -6,6 +6,9 @@ BUILDFLAGS := -g -O0
 else ifeq ($(BUILD),tsan)
 BUILDFLAGS := -g -O1 -fsanitize=thread
 LDFLAGS    := -fsanitize=thread
+else ifeq ($(BUILD),asan)
+BUILDFLAGS := -g -O1 -fsanitize=address -fno-omit-frame-pointer
+LDFLAGS    := -fsanitize=address
 else ifeq ($(BUILD),nonnative)
 BUILDFLAGS := -Ofast -march=x86-64-v3
 LTO        := -flto

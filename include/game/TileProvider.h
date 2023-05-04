@@ -155,12 +155,16 @@ namespace Game3 {
 			void ensureAllChunks(const Position &);
 
 			template <typename T>
-			static T access(const Chunk<T> &chunk, size_t row, size_t column) {
+			static T access(const Chunk<T> &chunk, int64_t row, int64_t column) {
+				assert(0 <= row);
+				assert(0 <= column);
 				return chunk[row * CHUNK_SIZE + column];
 			}
 
 			template <typename T>
-			static T & access(Chunk<T> &chunk, size_t row, size_t column) {
+			static T & access(Chunk<T> &chunk, int64_t row, int64_t column) {
+				assert(0 <= row);
+				assert(0 <= column);
 				return chunk[row * CHUNK_SIZE + column];
 			}
 

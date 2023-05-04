@@ -232,9 +232,9 @@ namespace Game3 {
 	}
 
 	void TileProvider::ensureAllChunks(const ChunkPosition &chunk_position) {
-		ensureTileChunk(chunk_position);
-		ensureBiomeChunk(chunk_position);
 		ensurePathChunk(chunk_position);
+		ensureBiomeChunk(chunk_position);
+		ensureTileChunk(chunk_position);
 	}
 
 	void TileProvider::ensureAllChunks(const Position &position) {
@@ -247,7 +247,6 @@ namespace Game3 {
 	}
 
 	void TileProvider::initTileChunk(Layer, Chunk<TileID> &chunk, const ChunkPosition &chunk_position) {
-		// TODO!: worldgen
 		generationQueue.push_back(chunk_position);
 		chunk.resize(CHUNK_SIZE * CHUNK_SIZE, 0);
 	}
@@ -257,7 +256,6 @@ namespace Game3 {
 	}
 
 	void TileProvider::initPathChunk(Chunk<uint8_t> &chunk, const ChunkPosition &) {
-		// TODO!: worldgen?
 		chunk.resize(CHUNK_SIZE * CHUNK_SIZE, 0);
 	}
 
