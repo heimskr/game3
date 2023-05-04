@@ -9,8 +9,11 @@
 
 namespace Game3::WorldGen {
 	void generateKeep(const std::shared_ptr<Keep> &realm, std::default_random_engine &rng, RealmID parent_realm, Index width, Index height, const Position &entrance) {
-		realm->markGenerated(0, 0);
 		Timer timer("GenerateKeep");
+		realm->markGenerated(0, 0);
+		realm->tileProvider.ensureAllChunks(ChunkPosition{0, 0});
+		auto pauser = realm->pauseUpdates();
+
 		for (int column = 1; column < width - 1; ++column) {
 			realm->setTile(2, {0, column}, "base:tile/wall_we"_id);
 			realm->setTile(2, {height - 1, column}, "base:tile/wall_we"_id);
