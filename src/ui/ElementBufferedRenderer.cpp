@@ -200,7 +200,7 @@ namespace Game3 {
 
 		vboIsWeird = false;
 
-		const TileID missing = tileset[tileset.getMissing()];
+		const TileID missing = tileset["base:tile/void"];
 
 		vbo.init<float, 3>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, set_width, divisor, t_size, missing](size_t x, size_t y) {
 			const auto tile_opt = realm->tryTile(layer, Position(
