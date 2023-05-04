@@ -16,6 +16,8 @@ namespace Game3::WorldGen {
 	void generateHouse(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const std::shared_ptr<Realm> &parent_realm, Index width, Index height, const Position &entrance) {
 		realm->markGenerated(0, 0);
 		Timer timer("GenerateHouse");
+
+		realm->tileProvider.ensureAllChunks(ChunkPosition{0, 0});
 		const Position exit_position = generateIndoors(realm, rng, parent_realm, width, height, entrance);
 
 		const auto &tileset2 = realm->getTileset();
@@ -23,8 +25,8 @@ namespace Game3::WorldGen {
 
 		realm->setTile(2, {1, 1}, choose(plants, rng));
 		realm->setTile(2, {1, width - 2}, choose(plants, rng));
-		realm->setTile(2, {height - 1, 1}, choose(plants, rng));
-		realm->setTile(2, {height - 1, width - 2}, choose(plants, rng));
+		realm->setTile(2, {height - 2, 1}, choose(plants, rng));
+		realm->setTile(2, {height - 2, width - 2}, choose(plants, rng));
 
 		const auto &beds = tileset2.getTilesByCategory("base:category/beds"_id);
 		std::array<Index, 2> edges {1, width - 2};

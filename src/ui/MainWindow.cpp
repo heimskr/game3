@@ -44,7 +44,6 @@ namespace Game3 {
 		{GDK_KEY_o,     interactTime},
 		{GDK_KEY_space, interactTime},
 		{GDK_KEY_g,     slowTime},
-		{GDK_KEY_r,     slowTime},
 	};
 
 	MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &builder_):

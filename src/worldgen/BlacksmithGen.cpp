@@ -14,6 +14,8 @@ namespace Game3::WorldGen {
 	void generateBlacksmith(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const std::shared_ptr<Realm> &parent_realm, Index width, Index height, const Position &entrance) {
 		Timer timer("GenerateBlacksmith");
 
+		realm->markGenerated(0, 0);
+		realm->tileProvider.ensureAllChunks(ChunkPosition{0, 0});
 		generateIndoors(realm, rng, parent_realm, width, height, entrance);
 		Game &game = realm->getGame();
 
