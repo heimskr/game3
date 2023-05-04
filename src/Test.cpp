@@ -3,6 +3,7 @@
 
 // #include "game/Game.h"
 #include "container/Quadtree.h"
+#include "game/TileProvider.h"
 
 namespace Game3 {
 	constexpr static int WIDTH = 1000;
@@ -11,7 +12,7 @@ namespace Game3 {
 		return r * WIDTH + c;
 	}
 
-	void test() {
+	void testQuadtree() {
 		std::array<std::array<bool, 8>, 8> tiles {
 			std::array<bool, 8> {1, 1, 0, 0, 1, 1, 0, 0},
 			std::array<bool, 8> {1, 1, 0, 0, 1, 1, 0, 0},
@@ -41,5 +42,10 @@ namespace Game3 {
 		std::cout << '\n';
 
 		tree.iterateFull(visit);
+	}
+
+	void test() {
+		for (int i = -128; i <= 64; ++i)
+			std::cout << "(" << i << ", " << j << ") -> " << TileProvider::divide(i) << ", " << TileProvider::remainder(i) << "\n";
 	}
 }

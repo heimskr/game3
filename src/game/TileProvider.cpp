@@ -50,7 +50,7 @@ namespace Game3 {
 		validateLayer(layer);
 
 		const auto &map = chunkMaps[layer - 1];
-		const ChunkPosition chunk_position {divide(column), divide(row)};
+		const ChunkPosition chunk_position {divide<int32_t>(column), divide<int32_t>(row)};
 
 		if (auto iter = map.find(chunk_position); iter != map.end())
 			return access(iter->second, remainder(row), remainder(column));
@@ -161,7 +161,7 @@ namespace Game3 {
 			return access(chunk, remainder(row), remainder(column)) = 0;
 		}
 
-		throw std::out_of_range("Couldn't find biome type at (" + std::to_string(row) + ", " + std::to_string(column) + ')');
+		throw std::out_of_range("Couldn't find path state at (" + std::to_string(row) + ", " + std::to_string(column) + ')');
 	}
 
 	uint8_t & TileProvider::findPathState(Index row, Index column, PathMode mode) {

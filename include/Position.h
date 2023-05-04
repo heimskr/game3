@@ -37,7 +37,7 @@ namespace Game3 {
 		std::string simpleString() const { return std::to_string(row) + "," + std::to_string(column); }
 	};
 
-	/** Silly naming, but easier than PointedLocation or LocationButWithARealmPtrInsteadOfARealmID. */
+	/** Silly naming, perhaps. */
 	struct Place {
 		Position position;
 		std::shared_ptr<Realm> realm;
@@ -68,7 +68,7 @@ namespace std {
 	template <>
 	struct hash<Game3::Position> {
 		size_t operator()(const Game3::Position &position) const noexcept {
-			return std::hash<Game3::Position::value_type>()(position.row ^ (position.column << 16));
+			return (static_cast<size_t>(position.row) * 1298758219ul) ^ static_cast<size_t>(position.column);
 		}
 	};
 }

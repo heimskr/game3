@@ -7,6 +7,7 @@
 #include <nlohmann/json.hpp>
 
 #include "Constants.h"
+#include "Position.h"
 #include "Types.h"
 #include "game/ChunkPosition.h"
 #include "util/Math.h"
@@ -164,14 +165,14 @@ namespace Game3 {
 			}
 
 			/** Given chunk_size = 32: [0, 32) -> 0, [32, 64) -> 1, [-32, 0) -> -1 */
-			template <typename I, typename O = int32_t>
+			template <typename O = int32_t, typename I>
 			static O divide(I value, I chunk_size = static_cast<I>(CHUNK_SIZE)) {
 				if (0 <= value)
 					return static_cast<O>(value / chunk_size);
 				return static_cast<O>(-updiv(-value, chunk_size));
 			}
 
-			template <typename I, typename O = int32_t>
+			template <typename O = int32_t, typename I>
 			static O remainder(I value, I chunk_size = static_cast<I>(CHUNK_SIZE)) {
 				if (0 <= value)
 					return static_cast<O>(value % chunk_size);

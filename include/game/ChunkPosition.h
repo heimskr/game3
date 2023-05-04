@@ -21,15 +21,7 @@ namespace Game3 {
 			return this == &other || (x == other.x && y == other.y);
 		}
 
-		// auto operator<=>(const ChunkPosition &) const = default;
-		inline bool operator<(const ChunkPosition &other) const {
-			if (this == &other || x > other.x)
-				return false;
-			if (x < other.x)
-				return true;
-			return y < other.x;
-		}
-
+		auto operator<=>(const ChunkPosition &) const = default;
 
 		explicit operator std::string() const;
 	};
@@ -51,9 +43,7 @@ namespace Game3 {
 		/** Compare with <=, not <. */
 		inline Index columnMax() const { return (bottomRight.x + 1) * CHUNK_SIZE - 1; }
 
-		inline bool operator==(const ChunkRange &other) const {
-			return this == &other || (topLeft == other.topLeft && bottomRight == other.bottomRight);
-		}
+		auto operator<=>(const ChunkRange &) const = default;
 	};
 
 	void from_json(const nlohmann::json &, ChunkRange &);
