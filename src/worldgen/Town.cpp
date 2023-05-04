@@ -171,7 +171,7 @@ namespace Game3::WorldGen {
 				realm->setTile(2, building_position, tilename);
 				const RealmID realm_id = game.newRealmID();
 				// auto building = TileEntity::create<Building>(game, tilename, building_position, realm_id, entrance == -1? realm_width * (realm_height - 1) - 3 : entrance);
-				auto building = TileEntity::create<Building>(game, tilename, building_position, realm_id, entrance? *entrance : Position(realm_height - 1, realm_width - 3)); // TODO!: verify
+				auto building = TileEntity::create<Building>(game, tilename, building_position, realm_id, entrance? *entrance : Position(realm_height - 2, realm_width - 3)); // TODO!: verify
 				auto details = game.registry<RealmDetailsRegistry>()[realm_type];
 				auto new_realm = Realm::create(game, realm_id, realm_type, details->tilesetName, -seed);
 				new_realm->outdoors = false;
@@ -193,7 +193,7 @@ namespace Game3::WorldGen {
 						static std::array<Identifier, 1> taverns {"base:tile/tavern1"_id};
 						constexpr size_t tavern_width  = 25;
 						constexpr size_t tavern_height = 15;
-						gen_building(choose(taverns), tavern_width, tavern_height, "base:realm/tavern"_id, WorldGen::generateTavern, Position(tavern_height - 1, tavern_width / 2)); // TODO!: verify
+						gen_building(choose(taverns), tavern_width, tavern_height, "base:realm/tavern"_id, WorldGen::generateTavern, Position(tavern_height - 2, tavern_width / 2)); // TODO!: verify
 						//tavern_width * (tavern_height - 2) + tavern_width / 2);
 						break;
 					}
