@@ -251,10 +251,10 @@ namespace Game3 {
 		ticking = true;
 
 		for (const auto &stolen: entityAdditionQueue.steal())
-			add(stolen); // TODO: switch to safe addition?
+			add(stolen);
 
 		for (const auto &stolen: tileEntityAdditionQueue.steal())
-			add(stolen); // Here too.
+			add(stolen);
 
 		for (auto &entity: entities) {
 			if (entity->isPlayer()) {
