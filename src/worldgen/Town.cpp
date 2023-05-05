@@ -128,7 +128,7 @@ namespace Game3::WorldGen {
 		const RealmID keep_realm_id = game.newRealmID();
 		const Index keep_width = 15;
 		const Index keep_height = 15;
-		const Position keep_entrance(keep_height - 1, keep_width / 2);
+		const Position keep_entrance(keep_height - 2, keep_width / 2);
 		const Position keep_exit = keep_position + Position(2, 0);
 		auto keep_tileset = game.registry<TilesetRegistry>().at("base:tileset/monomap");
 		auto keep_tilemap = std::make_shared<Tilemap>(keep_width, keep_height, 16, keep_tileset);
