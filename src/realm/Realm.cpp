@@ -250,25 +250,26 @@ namespace Game3 {
 
 		ticking = true;
 
-		{
-			auto lock = lockEntitiesShared();
-			for (auto &entity: entities)
-				if (entity->isPlayer()) {
-					auto player = std::dynamic_pointer_cast<Player>(entity);
-					player_cpos = getChunkPosition(player->getPosition());
-					if (!player->ticked) {
-						player->ticked = true;
-						player->tick(game, delta);
-					}
-				} else
-					entity->tick(game, delta);
+		for (const auto &stolen: entityAdditionQueue.steal())
+			add(stolen); // TODO: switch to safe addition?
+
+		for (const auto &stolen: tileEntityAdditionQueue.steal())
+			add(stolen); // Here too.
+
+		for (auto &entity: entities) {
+			if (entity->isPlayer()) {
+				auto player = std::dynamic_pointer_cast<Player>(entity);
+				player_cpos = getChunkPosition(player->getPosition());
+				if (!player->ticked) {
+					player->ticked = true;
+					player->tick(game, delta);
+				}
+			} else
+				entity->tick(game, delta);
 		}
 
-		{
-			auto lock = lockTileEntitiesShared();
-			for (auto &[index, tile_entity]: tileEntities)
-				tile_entity->tick(game, delta);
-		}
+		for (auto &[index, tile_entity]: tileEntities)
+			tile_entity->tick(game, delta);
 
 		ticking = false;
 
@@ -389,6 +390,14 @@ namespace Game3 {
 
 	void Realm::queueRemoval(const TileEntityPtr &tile_entity) {
 		tileEntityRemovalQueue.push(tile_entity);
+	}
+
+	void Realm::queueAddition(const EntityPtr &entity) {
+		entityAdditionQueue.push(entity);
+	}
+
+	void Realm::queueAddition(const TileEntityPtr &tile_entity) {
+		tileEntityAdditionQueue.push(tile_entity);
 	}
 
 	void Realm::queue(std::function<void()> fn) {

@@ -105,6 +105,8 @@ namespace Game3 {
 			Game & getGame();
 			void queueRemoval(const EntityPtr &);
 			void queueRemoval(const std::shared_ptr<TileEntity> &);
+			void queueAddition(const EntityPtr &);
+			void queueAddition(const std::shared_ptr<TileEntity> &);
 			void queue(std::function<void()>);
 			void absorb(const EntityPtr &, const Position &);
 			void setTile(Layer, Index row, Index column, TileID, bool run_helper = true);
@@ -229,7 +231,9 @@ namespace Game3 {
 			Game &game;
 			bool ticking = false;
 			MTQueue<EntityPtr> entityRemovalQueue;
+			MTQueue<EntityPtr> entityAdditionQueue;
 			MTQueue<std::shared_ptr<TileEntity>> tileEntityRemovalQueue;
+			MTQueue<std::shared_ptr<TileEntity>> tileEntityAdditionQueue;
 			MTQueue<std::function<void()>> generalQueue;
 
 			SharedRecursiveMutex entityMutex;
