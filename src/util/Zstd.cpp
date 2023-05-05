@@ -41,10 +41,10 @@ namespace Game3 {
 		out.reserve(decompressed.size() / 2);
 
 		if constexpr (std::endian::native == std::endian::little) {
-			for (size_t i = 0, max = decompressed.size() / 2; i < max; i += 2)
+			for (size_t i = 0, max = decompressed.size(); i < max; i += 2)
 				out.emplace_back(*reinterpret_cast<const uint16_t *>(&decompressed[i]));
 		} else {
-			for (size_t i = 0, max = decompressed.size() / 2; i < max; i += 2)
+			for (size_t i = 0, max = decompressed.size(); i < max; i += 2)
 				out.emplace_back(decompressed[i] | (static_cast<uint16_t>(decompressed[i + 1]) << 8));
 		}
 
@@ -57,10 +57,10 @@ namespace Game3 {
 		out.reserve(decompressed.size() / 2);
 
 		if constexpr (std::endian::native == std::endian::little) {
-			for (size_t i = 0, max = decompressed.size() / 2; i < max; i += 2)
+			for (size_t i = 0, max = decompressed.size(); i < max; i += 4)
 				out.emplace_back(*reinterpret_cast<const uint32_t *>(&decompressed[i]));
 		} else {
-			for (size_t i = 0, max = decompressed.size() / 2; i < max; i += 2)
+			for (size_t i = 0, max = decompressed.size(); i < max; i += 4)
 				out.emplace_back(decompressed[i] | (static_cast<uint32_t>(decompressed[i + 1]) <<  8)
 				                                 | (static_cast<uint32_t>(decompressed[i + 2]) << 16)
 				                                 | (static_cast<uint32_t>(decompressed[i + 3]) << 24));

@@ -289,13 +289,13 @@ namespace Game3 {
 		}
 
 		for (const auto &item: json.at(2)) {
-			const auto [x, y] = item.at(1).get<std::pair<int32_t, int32_t>>();
+			const auto [x, y] = item.at(0).get<std::pair<int32_t, int32_t>>();
 			const auto compressed = item.at(1).get<std::vector<uint8_t>>();
 			provider.biomeMap[ChunkPosition{x, y}] = decompress32(std::span(compressed.data(), compressed.size()));
 		}
 
-		for (const auto &item: json.at(2)) {
-			const auto [x, y] = item.at(1).get<std::pair<int32_t, int32_t>>();
+		for (const auto &item: json.at(3)) {
+			const auto [x, y] = item.at(0).get<std::pair<int32_t, int32_t>>();
 			const auto compressed = item.at(1).get<std::vector<uint8_t>>();
 			provider.pathMap[ChunkPosition{x, y}] = decompress8(std::span(compressed.data(), compressed.size()));
 		}
