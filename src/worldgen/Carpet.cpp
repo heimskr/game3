@@ -24,7 +24,7 @@ namespace Game3::WorldGen {
 
 		for (int row = carpet_padding + 1; row < height - carpet_padding - 1; ++row) {
 			realm->setTile(1, {row, carpet_padding}, carpet1w + carpet_offset);
-			realm->setTile(1, {row, width - carpet_padding - 1}, carpet1e + carpet_offset); // TODO!: verify `- 1`
+			realm->setTile(1, {row, width - carpet_padding - 1}, carpet1e + carpet_offset);
 		}
 
 		for (int column = carpet_padding + 1; column < width - carpet_padding - 1; ++column) {
@@ -33,8 +33,8 @@ namespace Game3::WorldGen {
 		}
 
 		realm->setTile(1, {carpet_padding, carpet_padding}, carpet1nw + carpet_offset);
-		realm->setTile(1, {carpet_padding, width - carpet_padding - 1}, carpet1ne + carpet_offset); // TODO!: verify `- 1`
+		realm->setTile(1, {carpet_padding, width - carpet_padding - 1}, carpet1ne + carpet_offset);
 		realm->setTile(1, {height - carpet_padding - 1, carpet_padding}, carpet1sw + carpet_offset);
-		realm->setTile(1, {height - carpet_padding - 1, width - carpet_padding - 1}, carpet1se + carpet_offset); // TODO!: verify `- 1`
+		realm->setTile(1, {height - carpet_padding - 1, width - carpet_padding - 1}, carpet1se + carpet_offset);
 	}
 }

@@ -51,7 +51,7 @@ namespace Game3::WorldGen {
 
 		for (column = position.column; column < position.column + width; ++column) {
 			set2p({position.row, column}, "base:tile/tower_we"_id);
-			set2p({position.row + height - 1, column}, "base:tile/tower_we"_id); // TODO!: verify
+			set2p({position.row + height - 1, column}, "base:tile/tower_we"_id);
 		}
 
 		set2p(position, "base:tile/tower_nw"_id);
@@ -130,8 +130,6 @@ namespace Game3::WorldGen {
 		const Index keep_height = 15;
 		const Position keep_entrance(keep_height - 2, keep_width / 2);
 		const Position keep_exit = keep_position + Position(2, 0);
-		auto keep_tileset = game.registry<TilesetRegistry>().at("base:tileset/monomap");
-		auto keep_tilemap = std::make_shared<Tilemap>(keep_width, keep_height, 16, keep_tileset);
 		auto keep_biomemap = std::make_shared<BiomeMap>(keep_width, keep_height);
 		auto keep_realm = Realm::create<Keep>(game, keep_realm_id, town_origin, width, height, -seed);
 		keep_realm->outdoors = false;
