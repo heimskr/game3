@@ -38,8 +38,8 @@ namespace Game3::WorldGen {
 		realm->setTile(2, bed_position, choose(beds, rng));
 		realm->extraData["bed"] = bed_position;
 
-		const Position building_position = entrance - Position(1, 0);
-		realm->spawn<Blacksmith>(bed_position, parent_realm->id, realm->id, building_position, parent_realm->closestTileEntity<Building>(building_position,
-			[](const auto &building) { return building->tileID == "base:tile/keep_sw"_id; }));
+		// const Position building_position = entrance - Position(1, 0);
+		// realm->spawn<Blacksmith>(bed_position, parent_realm->id, realm->id, building_position, parent_realm->closestTileEntity<Building>(building_position,
+		// 	[](const auto &building) { return building->tileID == "base:tile/keep_sw"_id; }));
 	}
 }

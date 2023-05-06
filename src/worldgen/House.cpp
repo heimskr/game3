@@ -19,7 +19,7 @@ namespace Game3::WorldGen {
 
 		realm->tileProvider.ensureAllChunks(ChunkPosition{0, 0});
 		auto pauser = realm->pauseUpdates();
-		const Position exit_position = generateIndoors(realm, rng, parent_realm, width, height, entrance);
+		// const Position exit_position = generateIndoors(realm, rng, parent_realm, width, height, entrance);
 
 		const auto &tileset2 = realm->getTileset();
 		const auto &plants = tileset2.getTilesByCategory("base:category/plants"_id);
@@ -35,9 +35,9 @@ namespace Game3::WorldGen {
 		realm->setTile(2, bed_position, choose(beds, rng));
 		realm->extraData["bed"] = bed_position;
 
-		const auto house_position = entrance - Position(1, 0);
-		realm->spawn<Miner>({exit_position.row - 1, exit_position.column}, parent_realm->id, realm->id, house_position, parent_realm->closestTileEntity<Building>(house_position,
-			[](const auto &building) { return building->tileID == "base:tile/keep_sw"_id; }));
+		// const auto house_position = entrance - Position(1, 0);
+		// realm->spawn<Miner>({exit_position.row - 1, exit_position.column}, parent_realm->id, realm->id, house_position, parent_realm->closestTileEntity<Building>(house_position,
+		// 	[](const auto &building) { return building->tileID == "base:tile/keep_sw"_id; }));
 
 		switch(rng() % 2) {
 			case 0: {
