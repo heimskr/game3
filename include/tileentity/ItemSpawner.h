@@ -1,5 +1,6 @@
 #pragma once
 
+#include "item/Item.h"
 #include "tileentity/TileEntity.h"
 
 namespace Game3 {

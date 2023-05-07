@@ -404,7 +404,9 @@ namespace Game3 {
 	}
 
 	bool Entity::isVisible() const {
-		return getRealm()->getGame().canvas.inBounds(getPosition());
+		const auto pos = getPosition();
+		auto &realm = *getRealm();
+		return realm.getGame().canvas.inBounds(pos) && realm.isVisible(pos);
 	}
 
 	void Entity::setHeldLeft(Slot new_value) {

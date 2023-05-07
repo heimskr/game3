@@ -54,8 +54,12 @@ namespace Game3 {
 			RealmType type;
 			TileProvider tileProvider;
 			std::array<std::array<std::array<ElementBufferedRenderer, LAYER_COUNT>, REALM_DIAMETER>, REALM_DIAMETER> renderers {};
+			/** Governed by tileEntityMutex. */
 			std::unordered_map<Position, std::shared_ptr<TileEntity>> tileEntities;
+			/** Governed by entityMutex. */
 			std::unordered_set<EntityPtr> entities;
+			/** Governed by entityMutex. */
+			std::unordered_set<PlayerPtr> players;
 			nlohmann::json extraData;
 			Position randomLand;
 			/** Whether the realm's rendering should be affected by the day-night cycle. */
@@ -126,6 +130,7 @@ namespace Game3 {
 			void remakePathMap(const ChunkPosition &);
 			void markGenerated(const ChunkRange &);
 			void markGenerated(ChunkPosition);
+			bool isVisible(const Position &) const;
 			inline void markGenerated(auto x, auto y) { generatedChunks.insert(ChunkPosition{x, y}); }
 			inline auto pauseUpdates() { return Pauser(shared_from_this()); }
 

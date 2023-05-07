@@ -30,7 +30,9 @@ namespace Game3 {
 	}
 
 	bool TileEntity::isVisible() const {
-		return getRealm()->getGame().canvas.inBounds(getPosition());
+		const auto pos = getPosition();
+		auto &realm = *getRealm();
+		return realm.getGame().canvas.inBounds(pos) && realm.isVisible(pos);
 	}
 
 	void TileEntity::absorbJSON(Game &, const nlohmann::json &json) {
@@ -38,8 +40,8 @@ namespace Game3 {
 		tileID       = json.at("tileID");
 		position     = json.at("position");
 		solid        = json.at("solid");
-		if (json.contains("extra"))
-			extraData = json.at("extra");
+		if (auto iter = json.find("extra"); iter != json.end())
+			extraData = *iter;
 	}
 
 	void TileEntity::toJSON(nlohmann::json &json) const {

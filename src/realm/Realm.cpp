@@ -214,6 +214,8 @@ namespace Game3 {
 	EntityPtr Realm::addUnsafe(const EntityPtr &entity) {
 		entity->setRealm(shared_from_this());
 		entities.insert(entity);
+		if (entity->isPlayer())
+			players.insert(std::dynamic_pointer_cast<Player>(entity));
 		return entity;
 	}
 
@@ -352,6 +354,8 @@ namespace Game3 {
 
 	void Realm::remove(const EntityPtr &entity) {
 		entities.erase(entity);
+		if (auto player = std::dynamic_pointer_cast<Player>(entity))
+			entities.erase(player);
 	}
 
 	void Realm::removeSafe(const EntityPtr &entity) {
@@ -629,6 +633,19 @@ namespace Game3 {
 
 	void Realm::markGenerated(ChunkPosition chunk_position) {
 		generatedChunks.insert(std::move(chunk_position));
+	}
+
+	bool Realm::isVisible(const Position &position) const {
+		const auto chunk_pos = getChunkPosition(position);
+
+		for (const auto &player: players) {
+			const auto player_chunk_pos = getChunkPosition(player->getPosition());
+			if (player_chunk_pos.x - REALM_DIAMETER / 2 <= chunk_pos.x && chunk_pos.x <= player_chunk_pos.x + REALM_DIAMETER / 2)
+				if (player_chunk_pos.y - REALM_DIAMETER / 2 <= chunk_pos.y && chunk_pos.y <= player_chunk_pos.y + REALM_DIAMETER / 2)
+					return true;
+		}
+
+		return false;
 	}
 
 	bool Realm::rightClick(const Position &position, double x, double y) {
