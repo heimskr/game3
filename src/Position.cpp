@@ -45,11 +45,7 @@ namespace Game3 {
 		return realm->isPathable(position);
 	}
 
-	Game & Place::getGame() {
-		return realm->getGame();
-	}
-
-	const Game & Place::getGame() const {
+	Game & Place::getGame() const {
 		return realm->getGame();
 	}
 

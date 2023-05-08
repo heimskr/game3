@@ -10,7 +10,7 @@
 #include "tileentity/Tree.h"
 
 namespace Game3 {
-	bool Bomb::use(Slot, ItemStack &, const Place &place) {
+	bool Bomb::use(Slot, ItemStack &, const Place &place, Modifiers) {
 		constexpr double RADIUS = 2.5;
 
 		auto &realm  = *place.realm;

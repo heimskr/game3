@@ -4,6 +4,7 @@
 
 #include "data/Identifier.h"
 #include "entity/Entity.h"
+#include "ui/Modifiers.h"
 
 namespace Game3 {
 	class Player: public Entity {
@@ -26,6 +27,7 @@ namespace Game3 {
 			bool ticked = false;
 
 			std::optional<Place> lastContinousInteraction;
+			Modifiers continuousInteractionModifiers;
 
 			static std::shared_ptr<Player> fromJSON(Game &, const nlohmann::json &);
 
@@ -36,7 +38,7 @@ namespace Game3 {
 			void tick(Game &, float delta) override;
 			void remove() override {}
 			bool interactOn();
-			void interactNextTo();
+			void interactNextTo(Modifiers);
 			using Entity::teleport;
 			void teleport(const Position &, const std::shared_ptr<Realm> &) override;
 			void addMoney(MoneyCount);

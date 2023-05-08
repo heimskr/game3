@@ -9,7 +9,7 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	bool Sapling::use(Slot slot, ItemStack &stack, const Place &place) {
+	bool Sapling::use(Slot slot, ItemStack &stack, const Place &place, Modifiers) {
 		auto &player = *place.player;
 		auto &realm  = *place.realm;
 		if (realm.type != "base:realm/overworld"_id)

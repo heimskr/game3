@@ -22,6 +22,7 @@
 #include "ui/tab/TextTab.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
+#include "ui/Modifiers.h"
 #include "util/FS.h"
 #include "util/Timer.h"
 #include "util/Util.h"
@@ -453,7 +454,7 @@ namespace Game3 {
 				if (game && game->player) {
 					auto &player = *game->player;
 					if (!a && prevA)
-						player.interactNextTo();
+						player.interactNextTo(Modifiers());
 
 					if (!x && prevX)
 						player.interactOn();
@@ -559,8 +560,9 @@ namespace Game3 {
 	}
 
 	void MainWindow::onBlur() {
+		keyTimes.clear();
+
 		if (game && game->player) {
-			keyTimes.clear();
 			game->player->movingUp    = false;
 			game->player->movingRight = false;
 			game->player->movingDown  = false;
@@ -632,29 +634,29 @@ namespace Game3 {
 				case GDK_KEY_S:
 				case GDK_KEY_s:
 					player.path.clear();
-					if (!player.isMoving())
-						player.continuousInteraction = keyval == GDK_KEY_S;
+					if (!player.isMoving() && (player.continuousInteraction = keyval == GDK_KEY_S))
+						player.continuousInteractionModifiers = Modifiers(modifiers);
 					player.movingDown = true;
 					return;
 				case GDK_KEY_W:
 				case GDK_KEY_w:
 					player.path.clear();
-					if (!player.isMoving())
-						player.continuousInteraction = keyval == GDK_KEY_W;
+					if (!player.isMoving() && (player.continuousInteraction = keyval == GDK_KEY_W))
+						player.continuousInteractionModifiers = Modifiers(modifiers);
 					player.movingUp = true;
 					return;
 				case GDK_KEY_A:
 				case GDK_KEY_a:
 					player.path.clear();
-					if (!player.isMoving())
-						player.continuousInteraction = keyval == GDK_KEY_A;
+					if (!player.isMoving() && (player.continuousInteraction = keyval == GDK_KEY_A))
+						player.continuousInteractionModifiers = Modifiers(modifiers);
 					player.movingLeft = true;
 					return;
 				case GDK_KEY_D:
 				case GDK_KEY_d:
 					player.path.clear();
-					if (!player.isMoving())
-						player.continuousInteraction = keyval == GDK_KEY_D;
+					if (!player.isMoving() && (player.continuousInteraction = keyval == GDK_KEY_D))
+						player.continuousInteractionModifiers = Modifiers(modifiers);
 					player.movingRight = true;
 					return;
 				case GDK_KEY_Shift_L:
@@ -682,7 +684,7 @@ namespace Game3 {
 					return;
 				case GDK_KEY_e:
 				case GDK_KEY_space:
-					game->player->interactNextTo();
+					game->player->interactNextTo(Modifiers(modifiers));
 					return;
 				case GDK_KEY_b: {
 					const auto rect = game->getVisibleRealmBounds();

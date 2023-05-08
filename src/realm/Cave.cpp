@@ -31,8 +31,8 @@ namespace Game3 {
 		}
 	}
 
-	bool Cave::interactGround(const std::shared_ptr<Player> &player, const Position &position) {
-		if (Realm::interactGround(player, position))
+	bool Cave::interactGround(const std::shared_ptr<Player> &player, const Position &position, Modifiers modifiers) {
+		if (Realm::interactGround(player, position, modifiers))
 			return true;
 
 		// const Index index = getIndex(position);

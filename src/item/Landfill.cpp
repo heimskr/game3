@@ -26,7 +26,7 @@ namespace Game3 {
 		requiredCount(required_count),
 		newTile(std::move(new_tile)) {}
 
-	bool Landfill::use(Slot slot, ItemStack &stack, const Place &place) {
+	bool Landfill::use(Slot slot, ItemStack &stack, const Place &place, Modifiers) {
 		if (!fixRequirement())
 			return false;
 

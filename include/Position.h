@@ -52,8 +52,7 @@ namespace Game3 {
 		void set(Layer, const Identifier &) const;
 		bool isPathable() const;
 
-		Game & getGame();
-		const Game & getGame() const;
+		Game & getGame() const;
 
 		bool operator==(const Place &) const;
 	};

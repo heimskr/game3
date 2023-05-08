@@ -29,7 +29,7 @@ namespace Game3 {
 			/** Like the other function-creating instruction, but using this item as a requirement */
 			Landfill(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count, Identifier tileset_name, Identifier required_tile, ItemCount required_count, Identifier new_tile);
 
-			bool use(Slot, ItemStack &, const Place &) override;
+			bool use(Slot, ItemStack &, const Place &, Modifiers) override;
 
 			virtual std::optional<Result> callRequirement(const Place &);
 

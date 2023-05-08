@@ -101,5 +101,6 @@
 	"base:item/light_blue_dye":  ["base:texture/potions",     176, 208],
 	"base:item/gray_dye":        ["base:texture/potions",      16, 208],
 	"base:item/lime_dye":        ["base:texture/potions",     112, 208],
-	"base:item/pride_flag":      ["base:texture/tileset",     128, 368]
+	"base:item/pride_flag":      ["base:texture/tileset",     128, 368],
+	"base:item/floor":           ["base:texture/tileset",      16, 112]
 }]

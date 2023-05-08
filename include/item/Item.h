@@ -11,6 +11,7 @@
 #include "Types.h"
 #include "data/Identifier.h"
 #include "registry/Registerable.h"
+#include "ui/Modifiers.h"
 
 namespace Game3 {
 	class Game;
@@ -67,7 +68,7 @@ namespace Game3 {
 
 			virtual void initStack(const Game &, ItemStack &) {}
 
-			virtual bool use(Slot, ItemStack &, const Place &);
+			virtual bool use(Slot, ItemStack &, const Place &, Modifiers);
 
 			/** Whether the item's use function (see Item::use) should be called when the user interacts with a floor tile and this item is selected in the inventory tab. */
 			virtual bool canUseOnWorld() const { return false; }

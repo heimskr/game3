@@ -8,7 +8,7 @@
 #include "realm/Realm.h"
 
 namespace Game3 {
-	bool StandardInteractions::interact(const Place &place) const {
+	bool StandardInteractions::interact(const Place &place, Modifiers modifiers) const {
 		// TODO: handle other tilemaps
 
 		const auto &position = place.position;
@@ -25,19 +25,19 @@ namespace Game3 {
 			return false;
 
 		if (auto *active = inventory.getActive()) {
-			if (active->item->canUseOnWorld() && active->item->use(inventory.activeSlot, *active, place))
+			if (active->item->canUseOnWorld() && active->item->use(inventory.activeSlot, *active, place, modifiers))
 				return true;
 
-			if (active->hasAttribute("base:attribute/hammer"_id)) {
-				ItemStack stack(game);
-				if (tileset.getItemStack(game, *tile2, stack) && !inventory.add(stack)) {
-					if (active->reduceDurability())
-						inventory.erase(inventory.activeSlot);
-					realm.setTile(2, position, tileset.getEmpty());
-					realm.reupload(2);
-					return true;
-				}
-			}
+			// if (active->hasAttribute("base:attribute/hammer"_id)) {
+			// 	ItemStack stack(game);
+			// 	if (tileset.getItemStack(game, *tile2, stack) && !inventory.add(stack)) {
+			// 		if (active->reduceDurability())
+			// 			inventory.erase(inventory.activeSlot);
+			// 		realm.setTile(2, position, tileset.getEmpty());
+			// 		realm.reupload(2);
+			// 		return true;
+			// 	}
+			// }
 
 			if (active->hasAttribute("base:attribute/shovel"_id)) {
 				if (*tile2 == "base:tile/ash"_id) {
@@ -65,9 +65,6 @@ namespace Game3 {
 		} else if (tileset.isInCategory(*tile1, "base:category/dirt")) {
 			item.emplace("base:item/dirt"_id);
 			attribute.emplace("base:attribute/shovel"_id);
-		} else if (*tile1 == "base:tile/stone"_id) {
-			item.emplace("base:item/stone"_id);
-			attribute.emplace("base:attribute/pickaxe"_id);
 		}
 
 		if (item && attribute && !player.hasTooldown()) {

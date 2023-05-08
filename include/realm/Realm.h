@@ -16,6 +16,7 @@
 #include "game/TileProvider.h"
 #include "tileentity/TileEntity.h"
 #include "ui/ElementBufferedRenderer.h"
+#include "ui/Modifiers.h"
 #include "util/GL.h"
 #include "util/MTQueue.h"
 #include "util/RWLock.h"
@@ -134,7 +135,7 @@ namespace Game3 {
 			inline void markGenerated(auto x, auto y) { generatedChunks.insert(ChunkPosition{x, y}); }
 			inline auto pauseUpdates() { return Pauser(shared_from_this()); }
 
-			virtual bool interactGround(const std::shared_ptr<Player> &, const Position &);
+			virtual bool interactGround(const std::shared_ptr<Player> &, const Position &, Modifiers);
 			virtual void updateNeighbors(const Position &);
 			/** Returns true iff something was done with the right click. */
 			virtual bool rightClick(const Position &, double x, double y);

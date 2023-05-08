@@ -69,7 +69,7 @@ namespace Game3 {
 		return cachedTexture = game.registry<TextureRegistry>()[textureName];
 	}
 
-	bool Tileset::getItemStack(Game &game, const Identifier &id, ItemStack &stack) const {
+	bool Tileset::getItemStack(const Game &game, const Identifier &id, ItemStack &stack) const {
 		if (auto iter = inverseCategories.find(id); iter != inverseCategories.end()) {
 			for (const auto &category: iter->second) {
 				if (auto subiter = stackCategories.find(category); subiter != stackCategories.end()) {

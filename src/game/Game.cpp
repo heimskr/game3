@@ -27,6 +27,7 @@
 #include "item/Landfill.h"
 #include "item/Landfills.h"
 #include "item/Mushroom.h"
+#include "item/Pickaxe.h"
 #include "item/Plantable.h"
 #include "item/Sapling.h"
 #include "item/Tool.h"
@@ -116,13 +117,13 @@ namespace Game3 {
 		add(std::make_shared<Hammer>      ("base:item/gold_hammer",     "Gold Hammer",     400, .75f, 128));
 		add(std::make_shared<Hammer>      ("base:item/diamond_hammer",  "Diamond Hammer",  900,  1.f, 128));
 		add(std::make_shared<Tool>        ("base:item/iron_axe",        "Iron Axe",        150,  3.f, 128, "base:attribute/axe"_id));
-		add(std::make_shared<Tool>        ("base:item/iron_pickaxe",    "Iron Pickaxe",    150,  3.f,  64, "base:attribute/pickaxe"_id));
+		add(std::make_shared<Pickaxe>     ("base:item/iron_pickaxe",    "Iron Pickaxe",    150,  3.f,  64, "base:attribute/pickaxe"_id));
 		add(std::make_shared<Tool>        ("base:item/iron_shovel",     "Iron Shovel",     120,  3.f,  64, "base:attribute/shovel"_id));
 		add(std::make_shared<Tool>        ("base:item/gold_axe",        "Gold Axe",        400, .75f,  64, "base:attribute/axe"_id));
-		add(std::make_shared<Tool>        ("base:item/gold_pickaxe",    "Gold Pickaxe",    400, .75f,  64, "base:attribute/pickaxe"_id));
+		add(std::make_shared<Pickaxe>     ("base:item/gold_pickaxe",    "Gold Pickaxe",    400, .75f,  64, "base:attribute/pickaxe"_id));
 		add(std::make_shared<Tool>        ("base:item/gold_shovel",     "Gold Shovel",     300, .75f, 512, "base:attribute/shovel"_id));
 		add(std::make_shared<Tool>        ("base:item/diamond_axe",     "Diamond Axe",     900,  1.f, 512, "base:attribute/axe"_id));
-		add(std::make_shared<Tool>        ("base:item/diamond_pickaxe", "Diamond Pickaxe", 900,  1.f, 512, "base:attribute/pickaxe"_id));
+		add(std::make_shared<Pickaxe>     ("base:item/diamond_pickaxe", "Diamond Pickaxe", 900,  1.f, 512, "base:attribute/pickaxe"_id));
 		add(std::make_shared<Tool>        ("base:item/diamond_shovel",  "Diamond Shovel",  700,  1.f, 512, "base:attribute/shovel"_id));
 		add(std::make_shared<Landfill>    ("base:item/sand",            "Sand",              1, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/sand"));
 		add(std::make_shared<Landfill>    ("base:item/volcanic_sand",   "Volcanic Sand",     3, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/volcanic_sand"));
@@ -186,6 +187,7 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/light_blue_dye", "Light Blue Dye", 12, 64));
 		add(std::make_shared<Item>("base:item/gray_dye",       "Gray Dye",       12, 64));
 		add(std::make_shared<Item>("base:item/lime_dye",       "Lime Dye",       12, 64));
+		add(std::make_shared<Item>("base:item/floor",          "Floor",           4, 64));
 	}
 
 	void Game::addGhosts() {
@@ -489,7 +491,7 @@ namespace Game3 {
 
 		if (button == 1) {
 			if (auto *stack = player->inventory->getActive())
-				stack->item->use(player->inventory->activeSlot, *stack, {{y, x}, activeRealm, player});
+				stack->item->use(player->inventory->activeSlot, *stack, {{y, x}, activeRealm, player}, {});
 		} else if (button == 3 && player && !realm.rightClick({y, x}, pos_x, pos_y) && debugMode) {
 			player->teleport({y, x});
 		}

@@ -28,7 +28,7 @@ namespace Game3 {
 			std::string getName() const;
 			std::shared_ptr<Texture> getTexture(const Game &);
 			const Identifier & getTextureName() const { return textureName; }
-			bool getItemStack(Game &, const Identifier &, ItemStack &) const;
+			bool getItemStack(const Game &, const Identifier &, ItemStack &) const;
 			bool isMarchable(TileID);
 			bool isCategoryMarchable(const Identifier &category) const;
 			const Identifier & getMarchBase(const Identifier &category) const;

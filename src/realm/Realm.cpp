@@ -243,8 +243,11 @@ namespace Game3 {
 	}
 
 	void Realm::initEntities() {
-		for (auto &entity: entities)
+		for (auto &entity: entities) {
 			entity->setRealm(shared_from_this());
+			if (auto player = std::dynamic_pointer_cast<Player>(entity))
+				players.insert(player);
+		}
 	}
 
 	void Realm::tick(float delta) {
@@ -444,12 +447,12 @@ namespace Game3 {
 		return tileProvider.tryTile(layer, position);
 	}
 
-	bool Realm::interactGround(const PlayerPtr &player, const Position &position) {
+	bool Realm::interactGround(const PlayerPtr &player, const Position &position, Modifiers modifiers) {
 		const Place place(position, shared_from_this(), player);
 		auto &game = getGame();
 
 		if (auto iter = game.interactionSets.find(type); iter != game.interactionSets.end())
-			if (iter->second->interact(place))
+			if (iter->second->interact(place, modifiers))
 				return true;
 
 		return false;

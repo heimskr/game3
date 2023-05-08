@@ -16,7 +16,7 @@
 #include "worldgen/CaveGen.h"
 
 namespace Game3 {
-	bool CaveEntrance::use(Slot slot, ItemStack &stack, const Place &place) {
+	bool CaveEntrance::use(Slot slot, ItemStack &stack, const Place &place, Modifiers) {
 		auto &realm = *place.realm;
 		auto &game  = realm.getGame();
 		const auto &player   = place.player;
