@@ -198,5 +198,9 @@
 			["base:item/green_dye", 1]
 		],
 		"output": [["base:item/lime_dye", 2]]
+	}],
+	["base:crafting_recipe", {
+		"input":  [["base:item/stone", 1]],
+		"output": [["base:item/floor", 2]]
 	}]
 ]]

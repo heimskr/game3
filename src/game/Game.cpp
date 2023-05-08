@@ -21,6 +21,7 @@
 #include "game/Inventory.h"
 #include "item/Bomb.h"
 #include "item/CaveEntrance.h"
+#include "item/Floor.h"
 #include "item/Furniture.h"
 #include "item/Hammer.h"
 #include "item/Item.h"
@@ -187,7 +188,7 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/light_blue_dye", "Light Blue Dye", 12, 64));
 		add(std::make_shared<Item>("base:item/gray_dye",       "Gray Dye",       12, 64));
 		add(std::make_shared<Item>("base:item/lime_dye",       "Lime Dye",       12, 64));
-		add(std::make_shared<Item>("base:item/floor",          "Floor",           4, 64));
+		add(std::make_shared<Floor>("base:item/floor", "Floor", "base:tile/floor", 4, 64));
 	}
 
 	void Game::addGhosts() {
