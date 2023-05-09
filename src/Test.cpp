@@ -53,12 +53,12 @@ namespace Game3 {
 			{"Hello", {100, 65535, 0x42}}
 		};
 
-		buffer << test_vector << test_map;
+		std::string test_string = "Test!";
+
+		buffer << test_vector << test_map << test_string;
 
 		std::cout << buffer << '\n';
-
 		const auto popped_vector = buffer.pop<decltype(test_vector)>();
-
 		std::cout << buffer << '\n';
 
 		std::cout << '{';
@@ -67,7 +67,6 @@ namespace Game3 {
 		std::cout << " }\n";
 
 		const auto popped_map = buffer.pop<decltype(test_map)>();
-
 		std::cout << buffer << '\n';
 
 		for (const auto &[key, value]: popped_map) {
@@ -76,6 +75,10 @@ namespace Game3 {
 				std::cout << ' ' << std::hex << item << std::dec;
 			std::cout << " }\n";
 		}
+
+		const auto popped_string = buffer.pop<decltype(test_string)>();
+		std::cout << buffer << '\n';
+		std::cout << popped_string << '\n';
 	}
 
 	void test() {

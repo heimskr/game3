@@ -72,6 +72,8 @@ namespace Game3 {
 				return static_cast<T2>(popRaw<T1>());
 			}
 
+			static bool typesMatch(std::string_view, std::string_view);
+
 		public:
 			Buffer() = default;
 
@@ -119,23 +121,21 @@ namespace Game3 {
 			M popRaw() {
 				const auto size = popRaw<uint32_t>();
 				M out;
-
 				for (uint32_t i = 0; i < size; ++i)
 					out.emplace(popRaw<typename M::key_type>(), popRaw<typename M::mapped_type>());
-
 				return out;
 			}
 
 			template <LinearContainer C>
 			C pop() {
-				if (popType() != getType(C()))
+				if (!typesMatch(popType(), getType(C())))
 					throw std::invalid_argument("Invalid type in buffer");
 				return popRaw<C>();
 			}
 
 			template <Map M>
 			M pop() {
-				if (popType() != getType(M()))
+				if (!typesMatch(popType(), getType(M())))
 					throw std::invalid_argument("Invalid type in buffer");
 				return popRaw<M>();
 			}

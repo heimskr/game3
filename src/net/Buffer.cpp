@@ -157,6 +157,14 @@ namespace Game3 {
 		throw std::invalid_argument("Invalid type byte: " + std::to_string(first));
 	}
 
+	bool Buffer::typesMatch(std::string_view one, std::string_view two) {
+		assert(!one.empty());
+		assert(!two.empty());
+		if (const auto one0 = one[0], two0 = two[0]; ('\x10' <= one0 && one0 <= '\x1f') && ('\x10' <= two0 && two0 <= '\x1f'))
+			return true;
+		return one == two;
+	}
+
 	Buffer & Buffer::operator<<(uint8_t item) {
 		return appendType(item).append(item);
 	}
