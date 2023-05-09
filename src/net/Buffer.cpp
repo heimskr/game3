@@ -5,10 +5,6 @@
 #include "net/Buffer.h"
 
 namespace Game3 {
-	std::span<const uint8_t> Buffer::getSpan() const {
-		return {bytes.cbegin(), bytes.size()};
-	}
-
 	template <> Buffer & Buffer::appendType<uint8_t> (const uint8_t &)  { return append('\x01'); }
 	template <> Buffer & Buffer::appendType<uint16_t>(const uint16_t &) { return append('\x02'); }
 	template <> Buffer & Buffer::appendType<uint32_t>(const uint32_t &) { return append('\x03'); }
