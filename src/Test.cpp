@@ -55,8 +55,9 @@ namespace Game3 {
 
 		std::string test_string1 = "Test!";
 		std::string test_string2 = "A bit of a longer test.";
+		std::string test_string3;
 
-		buffer << test_vector << test_map << test_string1 << test_string2;
+		buffer << test_vector << test_map << test_string1 << test_string2 << test_string3;
 
 		std::cout << buffer << '\n';
 		const auto popped_vector = buffer.pop<decltype(test_vector)>();
@@ -84,6 +85,10 @@ namespace Game3 {
 		const auto popped_string2 = buffer.pop<decltype(test_string2)>();
 		std::cout << buffer << '\n';
 		std::cout << popped_string2 << '\n';
+
+		const auto popped_string3 = buffer.pop<decltype(test_string3)>();
+		std::cout << buffer << '\n';
+		std::cout << '[' << popped_string3 << "]\n";
 	}
 
 	void test() {
