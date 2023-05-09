@@ -1,5 +1,6 @@
 #include <cassert>
 #include <cstring>
+#include <iomanip>
 
 #include "net/Buffer.h"
 
@@ -8,7 +9,18 @@ namespace Game3 {
 		return {bytes.cbegin(), bytes.size()};
 	}
 
-	Buffer & Buffer::appendType(std::string_view string) {
+	template <> Buffer & Buffer::appendType<uint8_t> (const uint8_t &)  { return append('\x01'); }
+	template <> Buffer & Buffer::appendType<uint16_t>(const uint16_t &) { return append('\x02'); }
+	template <> Buffer & Buffer::appendType<uint32_t>(const uint32_t &) { return append('\x03'); }
+	template <> Buffer & Buffer::appendType<uint64_t>(const uint64_t &) { return append('\x04'); }
+	template <> Buffer & Buffer::appendType<char>    (const char &)     { return append('\x05'); }
+	template <> Buffer & Buffer::appendType<int8_t>  (const int8_t &)   { return append('\x05'); }
+	template <> Buffer & Buffer::appendType<int16_t> (const int16_t &)  { return append('\x06'); }
+	template <> Buffer & Buffer::appendType<int32_t> (const int32_t &)  { return append('\x07'); }
+	template <> Buffer & Buffer::appendType<int64_t> (const int64_t &)  { return append('\x08'); }
+
+	template <>
+	Buffer & Buffer::appendType<std::string_view>(const std::string_view &string) {
 		if (string.size() == 0)
 			return append('\x10');
 
@@ -17,6 +29,11 @@ namespace Game3 {
 
 		assert(string.size() <= UINT32_MAX);
 		return append('\x1f').append(static_cast<uint32_t>(string.size()));
+	}
+
+	template <>
+	Buffer & Buffer::appendType<std::string>(const std::string &string) {
+		return appendType(std::string_view(string));
 	}
 
 	Buffer & Buffer::append(char item) {
@@ -105,5 +122,19 @@ namespace Game3 {
 
 	Buffer & Buffer::operator<<(std::string_view string) {
 		return appendType(string).append(string);
+	}
+
+	std::ostream & operator<<(std::ostream &os, const Buffer &buffer) {
+		os << "Buffer<";
+
+		for (bool first = true; const uint16_t byte: buffer.bytes) {
+			if (first)
+				first = false;
+			else
+				os << ' ';
+			os << std::hex << std::setw(2) << std::setfill('0') << std::right << byte;
+		}
+
+		return os << '>';
 	}
 }

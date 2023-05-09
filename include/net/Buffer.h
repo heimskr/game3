@@ -3,6 +3,8 @@
 #include <bit>
 #include <concepts>
 #include <cstdint>
+#include <list>
+#include <ostream>
 #include <ranges>
 #include <span>
 #include <vector>
@@ -14,26 +16,25 @@ namespace Game3 {
 		private:
 			std::vector<uint8_t> bytes;
 
-			Buffer & appendType(uint8_t)  { return append('\x01'); }
-			Buffer & appendType(uint16_t) { return append('\x02'); }
-			Buffer & appendType(uint32_t) { return append('\x03'); }
-			Buffer & appendType(uint64_t) { return append('\x04'); }
-			Buffer & appendType(int8_t)   { return append('\x05'); }
-			Buffer & appendType(int16_t)  { return append('\x06'); }
-			Buffer & appendType(int32_t)  { return append('\x07'); }
-			Buffer & appendType(int64_t)  { return append('\x08'); }
-			Buffer & appendType(std::string_view);
+			template <typename T>
+			Buffer & appendType(const T &);
 
 			// Inelegant how it requires an instance of the type as an argument.
 			template <map_type M>
 			Buffer & appendType(const M &) {
-				return append('\x21').appendType(M::key_type()).appendType(M::mapped_type());
+				return append('\x21').appendType(typename M::key_type()).appendType(typename M::mapped_type());
 			}
 
 			// Same here.
-			template <std::ranges::range R>
-			Buffer & appendType(const R &) {
-				return append('\x20').appendType(R::value_type());
+			template <typename T>
+			Buffer & appendType(const std::vector<T> &) {
+				return append('\x20').appendType(T());
+			}
+
+			// And here.
+			template <typename T>
+			Buffer & appendType(const std::list<T> &) {
+				return append('\x20').appendType(T());
 			}
 
 			Buffer & append(char);
@@ -47,6 +48,20 @@ namespace Game3 {
 			Buffer & append(const M &map) {
 				for (const auto &[key, value]: map)
 					append(key).append(value);
+				return *this;
+			}
+
+			template <typename T>
+			Buffer & append(const std::vector<T> &vector) {
+				for (const auto &item: vector)
+					append(item);
+				return *this;
+			}
+
+			template <typename T>
+			Buffer & append(const std::list<T> &list) {
+				for (const auto &item: list)
+					append(item);
 				return *this;
 			}
 
@@ -71,9 +86,18 @@ namespace Game3 {
 				return appendType(map).append(map);
 			}
 
-			template <std::ranges::range R>
-			Buffer & operator<<(const R &range) {
-				return appendType(range).append(range);
+			template <typename T>
+			Buffer & operator<<(const std::vector<T> &vector) {
+				return appendType(vector).append(vector);
 			}
+
+			template <typename T>
+			Buffer & operator<<(const std::list<T> &list) {
+				return appendType(list).append(list);
+			}
+
+			friend std::ostream & operator<<(std::ostream &, const Buffer &);
 	};
+
+	std::ostream & operator<<(std::ostream &, const Buffer &);
 }
