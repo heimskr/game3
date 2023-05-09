@@ -58,6 +58,8 @@ namespace Game3 {
 		std::string test_string3;
 
 		buffer << test_vector << test_map << test_string1 << test_string2 << test_string3;
+		buffer << static_cast<uint8_t>(0x10) << static_cast<uint16_t>(0x2030) << static_cast<uint32_t>(0x40506070) << static_cast<uint64_t>(0x8090a0b0c0d0e0f0);
+		buffer << -100000;
 
 		std::cout << buffer << '\n';
 		const auto popped_vector = buffer.pop<decltype(test_vector)>();
@@ -89,6 +91,26 @@ namespace Game3 {
 		const auto popped_string3 = buffer.pop<decltype(test_string3)>();
 		std::cout << buffer << '\n';
 		std::cout << '[' << popped_string3 << "]\n";
+
+		const auto popped8 = buffer.pop<uint8_t>();
+		std::cout << buffer << '\n';
+		std::cout << "0x" << std::hex << popped8 << std::dec << '\n';
+
+		const auto popped16 = buffer.pop<uint16_t>();
+		std::cout << buffer << '\n';
+		std::cout << "0x" << std::hex << popped16 << std::dec << '\n';
+
+		const auto popped32 = buffer.pop<uint32_t>();
+		std::cout << buffer << '\n';
+		std::cout << "0x" << std::hex << popped32 << std::dec << '\n';
+
+		const auto popped64 = buffer.pop<uint64_t>();
+		std::cout << buffer << '\n';
+		std::cout << "0x" << std::hex << popped64 << std::dec << '\n';
+
+		const auto popped32i = buffer.pop<int32_t>();
+		std::cout << buffer << '\n';
+		std::cout << popped32i << '\n';
 	}
 
 	void test() {

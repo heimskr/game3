@@ -143,6 +143,13 @@ namespace Game3 {
 					throw std::invalid_argument("Invalid type in buffer");
 				return popRaw<M>();
 			}
+
+			template <std::integral T>
+			T pop() {
+				if (!typesMatch(popType(), getType(T())))
+					throw std::invalid_argument("Invalid type in buffer");
+				return popRaw<T>();
+			}
 	};
 
 	std::ostream & operator<<(std::ostream &, const Buffer &);
