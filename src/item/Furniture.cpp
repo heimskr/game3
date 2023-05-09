@@ -11,10 +11,12 @@ namespace Game3 {
 		auto &realm = *place.realm;
 		Game &game = realm.getGame();
 		const auto &position = place.position;
-
 		const auto &details = GhostDetails::get(game, stack);
 
-		if ((details.layer == 3 || place.isPathable()) && !realm.hasTileEntityAt(position) && nullptr != realm.add(TileEntity::create<Ghost>(game, place, stack.withCount(1)))) {
+		if (auto id = place.get(details.layer); !id || *id != realm.getTileset().getEmptyID())
+			return false;
+
+		if (!realm.hasTileEntityAt(position) && nullptr != realm.add(TileEntity::create<Ghost>(game, place, stack.withCount(1)))) {
 			if (--stack.count == 0)
 				place.player->inventory->erase(slot);
 			place.player->inventory->notifyOwner();
