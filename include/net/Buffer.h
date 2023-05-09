@@ -4,6 +4,7 @@
 #include <concepts>
 #include <cstdint>
 #include <deque>
+#include <iostream>
 #include <list>
 #include <ostream>
 #include <ranges>
@@ -18,18 +19,25 @@ namespace Game3 {
 			std::deque<uint8_t> bytes;
 
 			template <typename T>
-			Buffer & appendType(const T &);
+			Buffer & appendType(const T &t) {
+				const auto type = getType(t);
+				bytes.insert(bytes.end(), type.begin(), type.end());
+				return *this;
+			}
+
+			template <typename T>
+			std::string getType(const T &);
 
 			// Inelegant how it requires an instance of the type as an argument.
 			template <Map M>
-			Buffer & appendType(const M &) {
-				return append('\x21').appendType(typename M::key_type()).appendType(typename M::mapped_type());
+			std::string getType(const M &) {
+				return '\x21' + getType(typename M::key_type()) + getType(typename M::mapped_type());
 			}
 
 			// Same here.
 			template <LinearContainer T>
-			Buffer & appendType(const T &) {
-				return append('\x20').appendType(typename T::value_type());
+			std::string getType(const T &) {
+				return '\x20' + getType(typename T::value_type());
 			}
 
 			Buffer & append(char);
@@ -41,6 +49,8 @@ namespace Game3 {
 
 			template <Map M>
 			Buffer & append(const M &map) {
+				assert(map.size() <= UINT32_MAX);
+				append(static_cast<uint32_t>(map.size()));
 				for (const auto &[key, value]: map)
 					append(key).append(value);
 				return *this;
@@ -48,13 +58,24 @@ namespace Game3 {
 
 			template <LinearContainer T>
 			Buffer & append(const T &container) {
+				assert(container.size() <= UINT32_MAX);
+				append(static_cast<uint32_t>(container.size()));
 				for (const auto &item: container)
 					append(item);
 				return *this;
 			}
 
+			std::string popType();
+
+			template <typename T1, typename T2>
+			inline T2 popConv() {
+				return static_cast<T2>(popRaw<T1>());
+			}
+
 		public:
 			Buffer() = default;
+
+			inline auto size() const { return bytes.size(); }
 
 			Buffer & operator<<(uint8_t);
 			Buffer & operator<<(uint16_t);
@@ -77,6 +98,47 @@ namespace Game3 {
 			}
 
 			friend std::ostream & operator<<(std::ostream &, const Buffer &);
+
+			template <typename T>
+			T popRaw();
+
+			template <LinearContainer C>
+			C popRaw() {
+				const auto size = popRaw<uint32_t>();
+				C out;
+				if constexpr (Reservable<C>)
+					out.reserve(size);
+
+				for (uint32_t i = 0; i < size; ++i)
+					out.push_back(popRaw<typename C::value_type>());
+
+				return out;
+			}
+
+			template <Map M>
+			M popRaw() {
+				const auto size = popRaw<uint32_t>();
+				M out;
+
+				for (uint32_t i = 0; i < size; ++i)
+					out.emplace(popRaw<typename M::key_type>(), popRaw<typename M::mapped_type>());
+
+				return out;
+			}
+
+			template <LinearContainer C>
+			C pop() {
+				if (popType() != getType(C()))
+					throw std::invalid_argument("Invalid type in buffer");
+				return popRaw<C>();
+			}
+
+			template <Map M>
+			M pop() {
+				if (popType() != getType(M()))
+					throw std::invalid_argument("Invalid type in buffer");
+				return popRaw<M>();
+			}
 	};
 
 	std::ostream & operator<<(std::ostream &, const Buffer &);

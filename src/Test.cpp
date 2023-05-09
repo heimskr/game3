@@ -46,10 +46,36 @@ namespace Game3 {
 
 	void testBuffer() {
 		Buffer buffer;
-		buffer << std::map<std::string, std::vector<uint16_t>> {
+
+		std::vector<uint8_t> test_vector {0x01, 0x02, 0x03, 0x04};
+
+		std::map<std::string, std::vector<uint16_t>> test_map {
 			{"Hello", {100, 65535, 0x42}}
 		};
+
+		buffer << test_vector << test_map;
+
 		std::cout << buffer << '\n';
+
+		const auto popped_vector = buffer.pop<decltype(test_vector)>();
+
+		std::cout << buffer << '\n';
+
+		std::cout << '{';
+		for (const size_t item: popped_vector)
+			std::cout << ' ' << std::hex << item << std::dec;
+		std::cout << " }\n";
+
+		const auto popped_map = buffer.pop<decltype(test_map)>();
+
+		std::cout << buffer << '\n';
+
+		for (const auto &[key, value]: popped_map) {
+			std::cout << "- " << key << " => {";
+			for (const auto &item: value)
+				std::cout << ' ' << std::hex << item << std::dec;
+			std::cout << " }\n";
+		}
 	}
 
 	void test() {

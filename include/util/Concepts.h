@@ -1,5 +1,6 @@
 #pragma once
 
+#include <climits>
 #include <deque>
 #include <list>
 #include <map>
@@ -16,5 +17,10 @@ namespace Game3 {
 	concept LinearContainer = requires(T t) {
 		typename T::value_type;
 		requires !Map<T>;
+	};
+
+	template <typename T>
+	concept Reservable = requires(T t) {
+		t.reserve(static_cast<size_t>(UINT32_MAX));
 	};
 }

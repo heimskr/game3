@@ -5,31 +5,33 @@
 #include "net/Buffer.h"
 
 namespace Game3 {
-	template <> Buffer & Buffer::appendType<uint8_t> (const uint8_t &)  { return append('\x01'); }
-	template <> Buffer & Buffer::appendType<uint16_t>(const uint16_t &) { return append('\x02'); }
-	template <> Buffer & Buffer::appendType<uint32_t>(const uint32_t &) { return append('\x03'); }
-	template <> Buffer & Buffer::appendType<uint64_t>(const uint64_t &) { return append('\x04'); }
-	template <> Buffer & Buffer::appendType<char>    (const char &)     { return append('\x05'); }
-	template <> Buffer & Buffer::appendType<int8_t>  (const int8_t &)   { return append('\x05'); }
-	template <> Buffer & Buffer::appendType<int16_t> (const int16_t &)  { return append('\x06'); }
-	template <> Buffer & Buffer::appendType<int32_t> (const int32_t &)  { return append('\x07'); }
-	template <> Buffer & Buffer::appendType<int64_t> (const int64_t &)  { return append('\x08'); }
+	template <> std::string Buffer::getType<uint8_t> (const uint8_t &)  { return {'\x01'}; }
+	template <> std::string Buffer::getType<uint16_t>(const uint16_t &) { return {'\x02'}; }
+	template <> std::string Buffer::getType<uint32_t>(const uint32_t &) { return {'\x03'}; }
+	template <> std::string Buffer::getType<uint64_t>(const uint64_t &) { return {'\x04'}; }
+	template <> std::string Buffer::getType<char>    (const char &)     { return {'\x05'}; }
+	template <> std::string Buffer::getType<int8_t>  (const int8_t &)   { return {'\x05'}; }
+	template <> std::string Buffer::getType<int16_t> (const int16_t &)  { return {'\x06'}; }
+	template <> std::string Buffer::getType<int32_t> (const int32_t &)  { return {'\x07'}; }
+	template <> std::string Buffer::getType<int64_t> (const int64_t &)  { return {'\x08'}; }
 
 	template <>
-	Buffer & Buffer::appendType<std::string_view>(const std::string_view &string) {
-		if (string.size() == 0)
-			return append('\x10');
+	std::string Buffer::getType<std::string_view>(const std::string_view &string) {
+		const auto size = string.size();
 
-		if (string.size() < 0xf)
-			return append(static_cast<char>('\x10' + string.size()));
+		if (size == 0)
+			return {'\x10'};
 
-		assert(string.size() <= UINT32_MAX);
-		return append('\x1f').append(static_cast<uint32_t>(string.size()));
+		if (size < 0xf)
+			return {static_cast<char>('\x10' + size)};
+
+		assert(size <= UINT32_MAX);
+		return {'\x1f', static_cast<char>(size & 0xff), static_cast<char>((size >> 8) & 0xff), static_cast<char>((size >> 16) & 0xff), static_cast<char>((size >> 24) & 0xff)};
 	}
 
 	template <>
-	Buffer & Buffer::appendType<std::string>(const std::string &string) {
-		return appendType(std::string_view(string));
+	std::string Buffer::getType<std::string>(const std::string &string) {
+		return getType(std::string_view(string));
 	}
 
 	Buffer & Buffer::append(char item) {
@@ -84,6 +86,77 @@ namespace Game3 {
 		return *this;
 	}
 
+	template <>
+	char Buffer::popRaw<char>() {
+		if (bytes.empty())
+			throw std::out_of_range("Buffer is empty");
+		const auto out = bytes.front();
+		bytes.pop_front();
+		return out;
+	}
+
+	template <>
+	uint8_t Buffer::popRaw<uint8_t>() {
+		return static_cast<uint8_t>(popRaw<char>());
+	}
+
+	template <>
+	uint16_t Buffer::popRaw<uint16_t>() {
+		if (bytes.size() < sizeof(uint16_t))
+			throw std::out_of_range("Buffer is too empty");
+		return popRaw<uint8_t>() | (popConv<uint8_t, uint16_t>() << 8);
+	}
+
+	template <>
+	uint32_t Buffer::popRaw<uint32_t>() {
+		if (bytes.size() < sizeof(uint16_t))
+			throw std::out_of_range("Buffer is too empty");
+		return popRaw<uint8_t>() | (popConv<uint8_t, uint32_t>() << 8) | (popConv<uint8_t, uint32_t>() << 16) | (popConv<uint8_t, uint32_t>() << 24);
+	}
+
+	template <>
+	uint64_t Buffer::popRaw<uint64_t>() {
+		if (bytes.size() < sizeof(uint16_t))
+			throw std::out_of_range("Buffer is too empty");
+		return popRaw<uint8_t>() | (popConv<uint8_t, uint64_t>() << 8) | (popConv<uint8_t, uint64_t>() << 16) | (popConv<uint8_t, uint64_t>() << 24)
+		     | (popConv<uint8_t, uint64_t>() << 32) | (popConv<uint8_t, uint64_t>() << 40) | (popConv<uint8_t, uint64_t>() << 48) | (popConv<uint8_t, uint64_t>() << 56);
+	}
+
+	template <>
+	int8_t Buffer::popRaw<int8_t>() {
+		return static_cast<int8_t>(popRaw<uint8_t>());
+	}
+
+	template <>
+	int16_t Buffer::popRaw<int16_t>() {
+		return static_cast<int16_t>(popRaw<uint16_t>());
+	}
+
+	template <>
+	int32_t Buffer::popRaw<int32_t>() {
+		return static_cast<int32_t>(popRaw<uint32_t>());
+	}
+
+	template <>
+	int64_t Buffer::popRaw<int64_t>() {
+		return static_cast<int64_t>(popRaw<uint64_t>());
+	}
+
+	std::string Buffer::popType() {
+		const char first = popRaw<char>();
+		if ((1 <= first && first <= 8) || ('\x10' <= first && first < '\x1f'))
+			return {first};
+		if (first == '\x1f') {
+			const auto length = popRaw<uint32_t>();
+			return {first, static_cast<char>(length & 0xff), static_cast<char>((length >> 8) & 0xff), static_cast<char>((length >> 16) & 0xff), static_cast<char>((length >> 24) & 0xff)};
+		}
+		if (first == '\x20')
+			return first + popType();
+		if (first == '\x21')
+			return first + popType() + popType();
+		throw std::invalid_argument("Invalid type byte: " + std::to_string(first));
+	}
+
 	Buffer & Buffer::operator<<(uint8_t item) {
 		return appendType(item).append(item);
 	}
@@ -128,9 +201,9 @@ namespace Game3 {
 				first = false;
 			else
 				os << ' ';
-			os << std::hex << std::setw(2) << std::setfill('0') << std::right << byte;
+			os << std::hex << std::setw(2) << std::setfill('0') << std::right << byte << std::dec;
 		}
 
-		return os << '>';
+		return os << ">[" << buffer.size() << ']';
 	}
 }
