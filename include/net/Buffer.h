@@ -88,6 +88,7 @@ namespace Game3 {
 			Buffer & operator<<(int32_t);
 			Buffer & operator<<(int64_t);
 			Buffer & operator<<(std::string_view);
+			Buffer & operator<<(const std::string &);
 
 			template <Map M>
 			Buffer & operator<<(const M &map) {
@@ -125,6 +126,9 @@ namespace Game3 {
 					out.emplace(popRaw<typename M::key_type>(), popRaw<typename M::mapped_type>());
 				return out;
 			}
+
+			template <typename T>
+			T pop();
 
 			template <LinearContainer C>
 			C pop() {

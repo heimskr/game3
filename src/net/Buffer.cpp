@@ -198,7 +198,26 @@ namespace Game3 {
 	}
 
 	Buffer & Buffer::operator<<(std::string_view string) {
-		return appendType(string).append(string);
+		const auto type = getType(string);
+		std::cout << "type[" << type << "] " << type.size() << '\n';
+		bytes.insert(bytes.end(), type.begin(), type.end());
+		const auto first = type[0];
+		if (first == '\x10')
+			return *this;
+
+		if ('\x11' <= first && first < '\x1f') {
+			bytes.insert(bytes.end(), string.begin(), string.end());
+			return *this;
+		}
+
+		assert(string.size() <= UINT32_MAX);
+		append(static_cast<uint32_t>(string.size()));
+		bytes.insert(bytes.end(), string.begin(), string.end());
+		return *this;
+	}
+
+	Buffer & Buffer::operator<<(const std::string &string) {
+		return *this << std::string_view(string);
 	}
 
 	std::ostream & operator<<(std::ostream &os, const Buffer &buffer) {
@@ -213,5 +232,23 @@ namespace Game3 {
 		}
 
 		return os << ">[" << buffer.size() << ']';
+	}
+
+	template <>
+	std::string Buffer::pop<std::string>() {
+		const auto type = popType();
+		const auto front = type.front();
+		uint32_t size;
+		if (front == '\x1f')
+			size = popRaw<uint32_t>();
+		else if ('\x10' <= front && front < '\x1f')
+			size = front - '\x10';
+		else
+			throw std::invalid_argument("Invalid type in buffer");
+		std::string out;
+		out.reserve(size);
+		for (uint32_t i = 0; i < size; ++i)
+			out.push_back(popRaw<char>());
+		return out;
 	}
 }
