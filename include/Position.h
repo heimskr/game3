@@ -11,6 +11,7 @@
 #include "Types.h"
 
 namespace Game3 {
+	class Buffer;
 	class Game;
 	class Realm;
 
@@ -59,9 +60,11 @@ namespace Game3 {
 
 	void to_json(nlohmann::json &, const Position &);
 	void from_json(const nlohmann::json &, Position &);
-}
 
-std::ostream & operator<<(std::ostream &, const Game3::Position &);
+	std::ostream & operator<<(std::ostream &, const Position &);
+	Buffer & operator<<(Buffer &, const Position &);
+	Buffer & operator>>(Buffer &, Position &);
+}
 
 namespace std {
 	template <>

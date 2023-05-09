@@ -3,6 +3,7 @@
 
 #include "Position.h"
 #include "Tileset.h"
+#include "data/Identifier.h"
 #include "entity/Entity.h"
 #include "entity/EntityFactory.h"
 #include "game/Game.h"

@@ -128,27 +128,30 @@ namespace Game3 {
 			}
 
 			template <typename T>
-			T pop();
+			Buffer & operator>>(T &);
 
 			template <LinearContainer C>
-			C pop() {
+			Buffer & operator>>(C &out) {
 				if (!typesMatch(popType(), getType(C())))
 					throw std::invalid_argument("Invalid type in buffer");
-				return popRaw<C>();
+				out = popRaw<C>();
+				return *this;
 			}
 
 			template <Map M>
-			M pop() {
+			Buffer & operator>>(M &out) {
 				if (!typesMatch(popType(), getType(M())))
 					throw std::invalid_argument("Invalid type in buffer");
-				return popRaw<M>();
+				out = popRaw<M>();
+				return *this;
 			}
 
 			template <std::integral T>
-			T pop() {
+			Buffer & operator>>(T &out) {
 				if (!typesMatch(popType(), getType(T())))
 					throw std::invalid_argument("Invalid type in buffer");
-				return popRaw<T>();
+				out = popRaw<T>();
+				return *this;
 			}
 	};
 

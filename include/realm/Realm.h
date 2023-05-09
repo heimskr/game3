@@ -57,6 +57,8 @@ namespace Game3 {
 			std::array<std::array<std::array<ElementBufferedRenderer, LAYER_COUNT>, REALM_DIAMETER>, REALM_DIAMETER> renderers {};
 			/** Governed by tileEntityMutex. */
 			std::unordered_map<Position, std::shared_ptr<TileEntity>> tileEntities;
+			/** Governed by tileEntityMutex. */
+			std::unordered_map<GlobalID, std::shared_ptr<TileEntity>> tileEntitiesByGID;
 			/** Governed by entityMutex. */
 			std::unordered_set<EntityPtr> entities;
 			/** Governed by entityMutex. */
@@ -92,8 +94,8 @@ namespace Game3 {
 			void reupload(Layer);
 			EntityPtr addUnsafe(const EntityPtr &);
 			EntityPtr add(const EntityPtr &);
-			std::shared_ptr<TileEntity> add(const std::shared_ptr<TileEntity> &);
-			std::shared_ptr<TileEntity> addUnsafe(const std::shared_ptr<TileEntity> &);
+			std::shared_ptr<TileEntity> add(const TileEntityPtr &);
+			std::shared_ptr<TileEntity> addUnsafe(const TileEntityPtr &);
 			void initEntities();
 			void tick(float delta);
 			std::vector<EntityPtr> findEntities(const Position &);
@@ -103,14 +105,14 @@ namespace Game3 {
 			std::shared_ptr<TileEntity> tileEntityAt(const Position &);
 			void remove(const EntityPtr &);
 			void removeSafe(const EntityPtr &);
-			void remove(const std::shared_ptr<TileEntity> &, bool run_helper = true);
-			void removeSafe(const std::shared_ptr<TileEntity> &);
+			void remove(TileEntityPtr, bool run_helper = true);
+			void removeSafe(const TileEntityPtr &);
 			void onMoved(const EntityPtr &, const Position &);
 			Game & getGame();
 			void queueRemoval(const EntityPtr &);
-			void queueRemoval(const std::shared_ptr<TileEntity> &);
+			void queueRemoval(const TileEntityPtr &);
 			void queueAddition(const EntityPtr &);
-			void queueAddition(const std::shared_ptr<TileEntity> &);
+			void queueAddition(const TileEntityPtr &);
 			void queue(std::function<void()>);
 			void absorb(const EntityPtr &, const Position &);
 			void setTile(Layer, Index row, Index column, TileID, bool run_helper = true);
@@ -132,10 +134,11 @@ namespace Game3 {
 			void markGenerated(const ChunkRange &);
 			void markGenerated(ChunkPosition);
 			bool isVisible(const Position &) const;
+			bool hasTileEntity(GlobalID);
 			inline void markGenerated(auto x, auto y) { generatedChunks.insert(ChunkPosition{x, y}); }
 			inline auto pauseUpdates() { return Pauser(shared_from_this()); }
 
-			virtual bool interactGround(const std::shared_ptr<Player> &, const Position &, Modifiers);
+			virtual bool interactGround(const PlayerPtr &, const Position &, Modifiers);
 			virtual void updateNeighbors(const Position &);
 			/** Returns true iff something was done with the right click. */
 			virtual bool rightClick(const Position &, double x, double y);

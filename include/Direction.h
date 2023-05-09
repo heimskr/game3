@@ -8,6 +8,6 @@ namespace Game3 {
 
 	Direction remapDirection(Direction, uint16_t configuration);
 	Direction randomDirection();
-}
 
-std::ostream & operator<<(std::ostream &, Game3::Direction);
+	std::ostream & operator<<(std::ostream &, Direction);
+}

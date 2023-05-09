@@ -1,5 +1,6 @@
 #include "Position.h"
 #include "Tileset.h"
+#include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "util/Util.h"
 
@@ -62,8 +63,16 @@ namespace Game3 {
 		position.row = json.at(0);
 		position.column = json.at(1);
 	}
-}
 
-std::ostream & operator<<(std::ostream &stream, const Game3::Position &position) {
-	return stream << '(' << position.row << ", " << position.column << ')';
+	std::ostream & operator<<(std::ostream &stream, const Position &position) {
+		return stream << '(' << position.row << ", " << position.column << ')';
+	}
+
+	Buffer & operator<<(Buffer &buffer, const Position &position) {
+		return buffer << position.row << position.column;
+	}
+
+	Buffer & operator>>(Buffer &buffer, Position &position) {
+		return buffer >> position.row >> position.column;
+	}
 }

@@ -81,6 +81,7 @@ namespace Game3 {
 		for (const auto &[position_string, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>()) {
 			auto tile_entity = TileEntity::fromJSON(game, tile_entity_json);
 			tileEntities.emplace(Position(position_string), tile_entity);
+			tileEntitiesByGID.emplace(tile_entity->globalID, tile_entity);
 			tile_entity->setRealm(shared);
 			tile_entity->onSpawn();
 			if (tile_entity_json.at("id").get<Identifier>() == "base:te/ghost"_id)
@@ -229,6 +230,7 @@ namespace Game3 {
 			return nullptr;
 		tile_entity->setRealm(shared_from_this());
 		tileEntities.emplace(tile_entity->position, tile_entity);
+		tileEntitiesByGID.emplace(tile_entity->globalID, tile_entity);
 		if (tile_entity->solid)
 			tileProvider.findPathState(tile_entity->position) = false;
 		if (tile_entity->is("base:te/ghost"))
@@ -366,10 +368,11 @@ namespace Game3 {
 		remove(entity);
 	}
 
-	void Realm::remove(const TileEntityPtr &tile_entity, bool run_helper) {
+	void Realm::remove(TileEntityPtr tile_entity, bool run_helper) {
 		const Position position = tile_entity->position;
 		tileEntities.at(position)->onRemove();
 		tileEntities.erase(position);
+		tileEntitiesByGID.erase(tile_entity->globalID);
 		if (run_helper)
 			setLayerHelper(position.row, position.column, false);
 		if (tile_entity->is("base:te/ghost"))
@@ -649,6 +652,11 @@ namespace Game3 {
 		}
 
 		return false;
+	}
+
+	bool Realm::hasTileEntity(GlobalID tile_entity_gid) {
+		auto lock = lockTileEntitiesShared();
+		return tileEntitiesByGID.contains(tile_entity_gid);
 	}
 
 	bool Realm::rightClick(const Position &position, double x, double y) {

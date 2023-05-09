@@ -7,6 +7,8 @@
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
+	class Buffer;
+
 	struct Identifier {
 		std::string space;
 		std::string name;
@@ -53,9 +55,11 @@ namespace Game3 {
 	void to_json(nlohmann::json &, const Identifier &);
 
 	Identifier operator""_id(const char *string, size_t);
+	Buffer & operator<<(Buffer &, const Identifier &);
+	Buffer & operator>>(Buffer &, Identifier &);
+	std::ostream & operator<<(std::ostream &, const Game3::Identifier &);
 }
 
-std::ostream & operator<<(std::ostream &, const Game3::Identifier &);
 
 namespace std {
 	template <>

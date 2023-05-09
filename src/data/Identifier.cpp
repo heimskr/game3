@@ -1,4 +1,5 @@
 #include "data/Identifier.h"
+#include "net/Buffer.h"
 
 namespace Game3 {
 	Identifier::Identifier(std::string_view combined) {
@@ -55,8 +56,20 @@ namespace Game3 {
 	Identifier operator""_id(const char *string, size_t) {
 		return Identifier(string);
 	}
+
+	Buffer & operator<<(Buffer &buffer, const Identifier &id) {
+		return buffer << id.str();
+	}
+
+	Buffer & operator>>(Buffer &buffer, Identifier &id) {
+		std::string str;
+		buffer >> str;
+		id = std::string_view(str);
+		return buffer;
+	}
+
+	std::ostream & operator<<(std::ostream &os, const Identifier &id) {
+		return os << id.str();
+	}
 }
 
-std::ostream & operator<<(std::ostream &os, const Game3::Identifier &id) {
-	return os << id.str();
-}

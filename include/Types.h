@@ -22,6 +22,9 @@ namespace Game3 {
 	using HitPoints    = uint32_t;
 	/** 1-based. */
 	using Layer        = uint8_t;
+	using PacketID     = uint32_t;
+	using Version      = uint32_t;
+	using GlobalID     = uint64_t;
 
 	using ItemID     = Identifier;
 	using EntityType = Identifier;

@@ -199,7 +199,6 @@ namespace Game3 {
 
 	Buffer & Buffer::operator<<(std::string_view string) {
 		const auto type = getType(string);
-		std::cout << "type[" << type << "] " << type.size() << '\n';
 		bytes.insert(bytes.end(), type.begin(), type.end());
 		const auto first = type[0];
 		if (first == '\x10')
@@ -235,7 +234,7 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::pop<std::string>() {
+	Buffer & Buffer::operator>><std::string>(std::string &out) {
 		const auto type = popType();
 		const auto front = type.front();
 		uint32_t size;
@@ -245,10 +244,10 @@ namespace Game3 {
 			size = front - '\x10';
 		else
 			throw std::invalid_argument("Invalid type in buffer");
-		std::string out;
+		out.clear();
 		out.reserve(size);
 		for (uint32_t i = 0; i < size; ++i)
 			out.push_back(popRaw<char>());
-		return out;
+		return *this;
 	}
 }

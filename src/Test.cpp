@@ -1,10 +1,13 @@
 #include <array>
 #include <iostream>
+#include <unordered_map>
+#include <unordered_set>
 
 // #include "game/Game.h"
 #include "container/Quadtree.h"
 #include "game/TileProvider.h"
 #include "net/Buffer.h"
+#include "util/Timer.h"
 
 namespace Game3 {
 	void testQuadtree() {
@@ -62,7 +65,8 @@ namespace Game3 {
 		buffer << -100000;
 
 		std::cout << buffer << '\n';
-		const auto popped_vector = buffer.pop<decltype(test_vector)>();
+		decltype(test_vector) popped_vector;
+		buffer >> popped_vector;
 		std::cout << buffer << '\n';
 
 		std::cout << '{';
@@ -70,7 +74,8 @@ namespace Game3 {
 			std::cout << ' ' << std::hex << item << std::dec;
 		std::cout << " }\n";
 
-		const auto popped_map = buffer.pop<decltype(test_map)>();
+		decltype(test_map) popped_map;
+		buffer >> popped_map;
 		std::cout << buffer << '\n';
 
 		for (const auto &[key, value]: popped_map) {
@@ -80,40 +85,79 @@ namespace Game3 {
 			std::cout << " }\n";
 		}
 
-		const auto popped_string1 = buffer.pop<decltype(test_string1)>();
+		decltype(test_string1) popped_string1;
+		buffer >> popped_string1;
 		std::cout << buffer << '\n';
 		std::cout << popped_string1 << '\n';
 
-		const auto popped_string2 = buffer.pop<decltype(test_string2)>();
+		decltype(test_string2) popped_string2;
+		buffer >> popped_string2;
 		std::cout << buffer << '\n';
 		std::cout << popped_string2 << '\n';
 
-		const auto popped_string3 = buffer.pop<decltype(test_string3)>();
+		decltype(test_string3) popped_string3;
+		buffer >> popped_string3;
 		std::cout << buffer << '\n';
 		std::cout << '[' << popped_string3 << "]\n";
 
-		const auto popped8 = buffer.pop<uint8_t>();
+		uint8_t popped8;
+		buffer >> popped8;
 		std::cout << buffer << '\n';
 		std::cout << "0x" << std::hex << popped8 << std::dec << '\n';
 
-		const auto popped16 = buffer.pop<uint16_t>();
+		uint16_t popped16;
+		buffer >> popped16;
 		std::cout << buffer << '\n';
 		std::cout << "0x" << std::hex << popped16 << std::dec << '\n';
 
-		const auto popped32 = buffer.pop<uint32_t>();
+		uint32_t popped32;
+		buffer >> popped32;
 		std::cout << buffer << '\n';
 		std::cout << "0x" << std::hex << popped32 << std::dec << '\n';
 
-		const auto popped64 = buffer.pop<uint64_t>();
+		uint64_t popped64;
+		buffer >> popped64;
 		std::cout << buffer << '\n';
 		std::cout << "0x" << std::hex << popped64 << std::dec << '\n';
 
-		const auto popped32i = buffer.pop<int32_t>();
+		int32_t popped32i;
+		buffer >> popped32i;
 		std::cout << buffer << '\n';
 		std::cout << popped32i << '\n';
 	}
 
+	void testIteration() {
+		Timer::clear();
+
+		std::unordered_set<size_t> set;
+		for (size_t i = 0; i < 100'000'000; ++i)
+			set.insert(i);
+
+		size_t sum = 0;
+
+		Timer set_timer("std::unordered_set");
+		for (const auto &item: set)
+			sum += item;
+		set_timer.stop();
+
+		std::cout << "Set sum: " << sum << '\n';
+		sum = 0;
+
+		std::unordered_map<size_t, size_t> map;
+		for (size_t i = 0; i < 100'000'000; ++i)
+			map.emplace(i, i);
+
+		Timer map_timer("std::unordered_map");
+		for (const auto &[key, value]: map)
+			sum += value;
+		map_timer.stop();
+
+		std::cout << "Map sum: " << sum << '\n';
+
+		Timer::summary();
+	}
+
 	void test() {
-		testBuffer();
+		testIteration();
 	}
 }

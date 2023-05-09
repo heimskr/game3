@@ -10,6 +10,7 @@
 #include "game/Agent.h"
 
 namespace Game3 {
+	class Buffer;
 	class Entity;
 	class Game;
 	class Player;
@@ -18,6 +19,7 @@ namespace Game3 {
 
 	class TileEntity: public Agent, public std::enable_shared_from_this<TileEntity> {
 		public:
+			GlobalID globalID = -1;
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;
 			Identifier tileID;
@@ -59,6 +61,10 @@ namespace Game3 {
 			/** Called when the TileEntity is destroyed violently, e.g. by a bomb. Returns false if the TileEntity should survive the destruction. */
 			virtual bool kill() { return false; }
 			inline bool is(const Identifier &check) const { return getID() == check; }
+
+			virtual void encode(Game &, Buffer &);
+			/** More work needs to be done after this to initialize weakRealm. */
+			virtual void decode(Game &, Buffer &);
 
 		protected:
 			TileEntity() = default;

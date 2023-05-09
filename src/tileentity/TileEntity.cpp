@@ -1,4 +1,5 @@
 #include "game/Game.h"
+#include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "tileentity/TileEntity.h"
 #include "tileentity/TileEntityFactory.h"
@@ -35,8 +36,19 @@ namespace Game3 {
 		return realm.getGame().canvas.inBounds(pos) && realm.isVisible(pos);
 	}
 
+	void TileEntity::encode(Game &, Buffer &buffer) {
+		buffer << tileID;
+		buffer << position;
+	}
+
+	void TileEntity::decode(Game &, Buffer &buffer) {
+		buffer >> tileID;
+		buffer >> position;
+	}
+
 	void TileEntity::absorbJSON(Game &, const nlohmann::json &json) {
 		tileEntityID = json.at("id");
+		globalID     = json.at("gid");
 		tileID       = json.at("tileID");
 		position     = json.at("position");
 		solid        = json.at("solid");
@@ -46,6 +58,7 @@ namespace Game3 {
 
 	void TileEntity::toJSON(nlohmann::json &json) const {
 		json["id"]       = getID();
+		json["gid"]      = globalID;
 		json["tileID"]   = tileID;
 		json["position"] = position;
 		json["solid"]    = solid;
