@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bit>
 #include <cmath>
 #include <type_traits>
 
@@ -11,6 +12,10 @@ namespace Game3 {
 
 	inline double fractional(double d) {
 		return std::modf(d, &d);
+	}
+
+	inline uint16_t swapBytes(uint16_t in) {
+		return ((in >> 8) & 0xff) | ((in & 0xff) << 8);
 	}
 
 	inline uint32_t swapBytes(uint32_t in) {
@@ -26,5 +31,12 @@ namespace Game3 {
 		     | (((in >> 16) & 0xff) << 40)
 		     | (((in >>  8) & 0xff) << 48)
 		     |  ((in        & 0xff) << 56);
+	}
+
+	template <typename T>
+	inline T toLittle(T in) {
+		if constexpr (std::endian::native == std::endian::little)
+			return in;
+		return swapBytes(in);
 	}
 }

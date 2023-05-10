@@ -7,6 +7,7 @@
 #include "net/GameServer.h"
 #include "net/Server.h"
 #include "net/SSLServer.h"
+#include "packet/ProtocolVersionPacket.h"
 #include "util/FS.h"
 #include "util/Util.h"
 
@@ -22,8 +23,11 @@ namespace Game3 {
 			INFO("Closing " << client_id);
 		};
 
-		server->messageHandler = [](GenericClient &client, std::string_view message) {
-			INFO(client.id << " sent [" << message << ']');
+		server->messageHandler = [](GenericClient &generic_client, std::string_view message) {
+			INFO(generic_client.id << " sent [" << message << ']');
+			GameClient &client = dynamic_cast<GameClient &>(generic_client);
+			ProtocolVersionPacket packet;
+			client.send(packet);
 		};
 	}
 
@@ -41,9 +45,17 @@ namespace Game3 {
 		server->stop();
 	}
 
+	void GameServer::send(const GenericClient &client, std::string_view string) {
+		send(client.id, string);
+	}
+
+	void GameServer::send(int id, std::string_view string) {
+		server->send(id, string);
+	}
+
 	static std::shared_ptr<Server> global_server;
 
-	int GameServer::main(int argc, char **argv) {
+	int GameServer::main(int, char **) {
 		evthread_use_pthreads();
 		global_server = std::make_shared<SSLServer>(AF_INET6, "::0", 12255, "private.crt", "private.key", 2);
 

@@ -13,7 +13,7 @@ namespace Game3 {
 
 		PacketID getID() const override { return 1; }
 
-		void encode(Buffer &buffer) override { buffer << version; }
-		void decode(Buffer &buffer) override { buffer >> version; }
+		void encode(Game &, Buffer &buffer) override { buffer << version; }
+		void decode(Game &, Buffer &buffer) override { buffer >> version; }
 	};
 }

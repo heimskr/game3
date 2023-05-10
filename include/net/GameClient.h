@@ -1,6 +1,7 @@
 #pragma once
 
 #include "net/GenericClient.h"
+#include "packet/Packet.h"
 
 namespace Game3 {
 	class GameServer;
@@ -16,5 +17,10 @@ namespace Game3 {
 			~GameClient() override = default;
 
 			void handleInput(std::string_view) override;
+			void send(Packet &);
+
+			template <typename T>
+			requires (!std::derived_from<T, Packet>)
+			void send(const T &value);
 	};
 }

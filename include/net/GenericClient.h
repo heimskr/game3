@@ -4,6 +4,8 @@
 #include <string>
 
 namespace Game3 {
+	class Packet;
+
 	struct GenericClient {
 		int id = -1;
 		std::string ip;

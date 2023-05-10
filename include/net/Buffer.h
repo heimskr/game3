@@ -230,6 +230,10 @@ namespace Game3 {
 				return out;
 			}
 
+			inline auto str() const {
+				return std::string(bytes.begin(), bytes.end());
+			}
+
 			template <typename T>
 			friend T popBuffer(Buffer &);
 	};
