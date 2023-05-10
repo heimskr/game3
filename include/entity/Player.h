@@ -12,11 +12,8 @@ namespace Game3 {
 			static Identifier ID() { return {"base", "entity/player"}; }
 			constexpr static HitPoints MAX_HEALTH = 64;
 
-			MoneyCount money;
 			float tooldown = 0.f;
-
 			std::unordered_set<Identifier> stationTypes {{}};
-
 			float speed = 10.f;
 			bool movingUp = false;
 			bool movingRight = false;
@@ -50,12 +47,16 @@ namespace Game3 {
 			void give(const ItemStack &, Slot start = -1);
 			Place getPlace() override;
 			bool isMoving() const;
+			void encode(Game &, Buffer &) override;
+			void decode(Game &, Buffer &) override;
 
 			friend class Entity;
 
 		protected:
 			Player();
-			void interact(const Position &);
+
+			/** Resets client-side things like movingUp and the continous interaction fields that aren't transferred over the network. */
+			void resetEphemeral();
 	};
 
 	void to_json(nlohmann::json &, const Player &);

@@ -57,14 +57,27 @@ namespace Game3 {
 		return Identifier(string);
 	}
 
-	Buffer & operator<<(Buffer &buffer, const Identifier &id) {
-		return buffer << id.str();
+	// template <>
+	// Identifier popRaw<Identifier>(Buffer &buffer) {
+	// 	return Identifier(buffer.popRaw<std::string>());
+	// }
+
+	Identifier popExternal(Identifier, Buffer &buffer) {
+		return Identifier(buffer.popRaw<std::string>());
 	}
 
-	Buffer & operator>>(Buffer &buffer, Identifier &id) {
+	Buffer & operator+=(Buffer &buffer, const Identifier &identifier) {
+		return buffer += identifier.str();
+	}
+
+	Buffer & operator<<(Buffer &buffer, const Identifier &identifier) {
+		return buffer << identifier.str();
+	}
+
+	Buffer & operator>>(Buffer &buffer, Identifier &identifier) {
 		std::string str;
 		buffer >> str;
-		id = std::string_view(str);
+		identifier = std::string_view(str);
 		return buffer;
 	}
 

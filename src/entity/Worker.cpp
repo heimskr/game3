@@ -1,6 +1,7 @@
 #include "ThreadContext.h"
 #include "entity/Worker.h"
 #include "game/Game.h"
+#include "net/Buffer.h"
 #include "realm/Keep.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
@@ -47,6 +48,26 @@ namespace Game3 {
 	void Worker::initAfterLoad(Game &game) {
 		if (!(keep = std::dynamic_pointer_cast<Building>(game.realms.at(overworldRealm)->tileEntityAt(keepPosition))))
 			throw std::runtime_error("Couldn't find keep for worker");
+	}
+
+	void Worker::encode(Game &, Buffer &buffer) {
+		buffer << phase;
+		buffer << overworldRealm;
+		buffer << houseRealm;
+		buffer << keepPosition;
+		buffer << destination;
+		buffer << stuck;
+		buffer << stuckTime;
+	}
+
+	void Worker::decode(Game &, Buffer &buffer) {
+		buffer >> phase;
+		buffer >> overworldRealm;
+		buffer >> houseRealm;
+		buffer >> keepPosition;
+		buffer >> destination;
+		buffer >> stuck;
+		buffer >> stuckTime;
 	}
 
 	bool Worker::stillStuck(float delta) {

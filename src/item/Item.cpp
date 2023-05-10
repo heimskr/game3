@@ -6,6 +6,7 @@
 #include "game/Game.h"
 #include "item/HasMaxDurability.h"
 #include "item/Item.h"
+#include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
 
@@ -195,7 +196,7 @@ namespace Game3 {
 
 	void ItemStack::fromJSON(const Game &game, const nlohmann::json &json, ItemStack &stack) {
 		Identifier id = json.at(0);
-		stack.item = game.registries.get<ItemRegistry>().at(id);
+		stack.item = game.registry<ItemRegistry>()[id];
 		stack.count = json.at(1);
 		if (2 < json.size()) {
 			const auto &extra = json.at(2);
@@ -220,6 +221,27 @@ namespace Game3 {
 		for (const auto &item: json)
 			out.push_back(fromJSON(game, item));
 		return out;
+	}
+
+	void ItemStack::encode(Game &game_, Buffer &buffer) {
+		absorbGame(game_);
+		buffer << item->identifier;
+		buffer << count;
+		buffer << data.dump();
+	}
+
+	void ItemStack::decode(Game &game_, Buffer &buffer) {
+		absorbGame(game_);
+		item = game->registry<ItemRegistry>()[buffer.take<Identifier>()];
+		buffer >> count;
+		data = nlohmann::json::parse(buffer.take<std::string>());
+	}
+
+	void ItemStack::absorbGame(const Game &game_) {
+		if (game == nullptr)
+			game = &game_;
+		else
+			assert(game == &game_);
 	}
 
 	void to_json(nlohmann::json &json, const ItemStack &stack) {

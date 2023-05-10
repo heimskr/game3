@@ -4,6 +4,7 @@
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
+#include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
 #include "ui/Canvas.h"
@@ -91,6 +92,23 @@ namespace Game3 {
 	Glib::ustring ItemEntity::getName() {
 		return stack.item->name;
 	}
+
+	void ItemEntity::encode(Game &game, Buffer &buffer) {
+		Entity::encode(game, buffer);
+		buffer << xOffset;
+		buffer << yOffset;
+		buffer << needsTexture;
+		stack.encode(game, buffer);
+	}
+
+	void ItemEntity::decode(Game &game, Buffer &buffer) {
+		Entity::decode(game, buffer);
+		buffer >> xOffset;
+		buffer >> yOffset;
+		buffer >> needsTexture;
+		stack.decode(game, buffer);
+	}
+
 
 	void to_json(nlohmann::json &json, const ItemEntity &item_entity) {
 		item_entity.toJSON(json);

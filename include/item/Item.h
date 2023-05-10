@@ -126,9 +126,13 @@ namespace Game3 {
 			static ItemStack fromJSON(const Game &, const nlohmann::json &);
 			static std::vector<ItemStack> manyFromJSON(const Game &, const nlohmann::json &);
 
+			void encode(Game &, Buffer &);
+			void decode(Game &, Buffer &);
+
 		private:
 			const Game *game = nullptr;
 			Glib::RefPtr<Gdk::Pixbuf> cachedImage;
+			void absorbGame(const Game &);
 	};
 
 	void to_json(nlohmann::json &, const ItemStack &);

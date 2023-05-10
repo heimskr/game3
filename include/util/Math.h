@@ -12,4 +12,19 @@ namespace Game3 {
 	inline double fractional(double d) {
 		return std::modf(d, &d);
 	}
+
+	inline uint32_t swapBytes(uint32_t in) {
+		return ((in >> 24) & 0xff) | (((in >> 16) & 0xff) << 8) | (((in >> 8) & 0xff) << 16) | ((in & 0xff) << 24);
+	}
+
+	inline uint64_t swapBytes(uint64_t in) {
+		return  ((in >> 56) & 0xff)
+		     | (((in >> 48) & 0xff) <<  8)
+		     | (((in >> 40) & 0xff) << 16)
+		     | (((in >> 32) & 0xff) << 24)
+		     | (((in >> 24) & 0xff) << 32)
+		     | (((in >> 16) & 0xff) << 40)
+		     | (((in >>  8) & 0xff) << 48)
+		     |  ((in        & 0xff) << 56);
+	}
 }

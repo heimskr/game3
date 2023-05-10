@@ -68,6 +68,10 @@ namespace Game3 {
 		return stream << '(' << position.row << ", " << position.column << ')';
 	}
 
+	Buffer & operator+=(Buffer &buffer, const Position &position) {
+		return (buffer += position.row) += position.column;
+	}
+
 	Buffer & operator<<(Buffer &buffer, const Position &position) {
 		return buffer << position.row << position.column;
 	}

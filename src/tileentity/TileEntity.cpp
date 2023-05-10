@@ -39,11 +39,17 @@ namespace Game3 {
 	void TileEntity::encode(Game &, Buffer &buffer) {
 		buffer << tileID;
 		buffer << position;
+		buffer << solid;
+		buffer << extraData.dump();
 	}
 
 	void TileEntity::decode(Game &, Buffer &buffer) {
 		buffer >> tileID;
 		buffer >> position;
+		buffer >> solid;
+		std::string extra_json;
+		buffer >> extra_json;
+		extraData = nlohmann::json::parse(extra_json);
 	}
 
 	void TileEntity::absorbJSON(Game &, const nlohmann::json &json) {

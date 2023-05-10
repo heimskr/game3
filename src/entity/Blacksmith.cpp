@@ -6,6 +6,7 @@
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "game/Stonks.h"
+#include "net/Buffer.h"
 #include "realm/Keep.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
@@ -119,6 +120,28 @@ namespace Game3 {
 
 		else if (phase == 12 && hour < WORK_END_HOUR)
 			phase = 0;
+	}
+
+	void Blacksmith::encode(Game &game, Buffer &buffer) {
+		Entity::encode(game, buffer);
+		Worker::encode(game, buffer);
+		Merchant::encode(game, buffer);
+		buffer << actionTime;
+		buffer << coalNeeded;
+		buffer << ironOreNeeded;
+		buffer << goldOreNeeded;
+		buffer << diamondOreNeeded;
+	}
+
+	void Blacksmith::decode(Game &game, Buffer &buffer) {
+		Entity::decode(game, buffer);
+		Worker::decode(game, buffer);
+		Merchant::decode(game, buffer);
+		buffer >> actionTime;
+		buffer >> coalNeeded;
+		buffer >> ironOreNeeded;
+		buffer >> goldOreNeeded;
+		buffer >> diamondOreNeeded;
 	}
 
 	void Blacksmith::wakeUp() {

@@ -111,6 +111,10 @@ namespace Game3 {
 			inline auto getHeldLeft()  const { return heldLeft.slot;  }
 			inline auto getHeldRight() const { return heldRight.slot; }
 
+			virtual void encode(Game &, Buffer &);
+			/** More work needs to be done after this to initialize weakRealm. */
+			virtual void decode(Game &, Buffer &);
+
 		protected:
 			Game *game = nullptr;
 			std::shared_ptr<Texture> texture;

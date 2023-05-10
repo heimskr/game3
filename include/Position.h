@@ -62,6 +62,7 @@ namespace Game3 {
 	void from_json(const nlohmann::json &, Position &);
 
 	std::ostream & operator<<(std::ostream &, const Position &);
+	Buffer & operator+=(Buffer &, const Position &);
 	Buffer & operator<<(Buffer &, const Position &);
 	Buffer & operator>>(Buffer &, Position &);
 }

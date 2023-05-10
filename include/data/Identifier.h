@@ -55,6 +55,10 @@ namespace Game3 {
 	void to_json(nlohmann::json &, const Identifier &);
 
 	Identifier operator""_id(const char *string, size_t);
+	// template <typename T> T popRaw(Buffer &);
+	// template <> Identifier popRaw<Identifier>(Buffer &);
+	Identifier popExternal(Identifier, Buffer &);
+	Buffer & operator+=(Buffer &, const Identifier &);
 	Buffer & operator<<(Buffer &, const Identifier &);
 	Buffer & operator>>(Buffer &, Identifier &);
 	std::ostream & operator<<(std::ostream &, const Game3::Identifier &);

@@ -8,6 +8,7 @@
 #include "entity/EntityFactory.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
+#include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
 #include "ui/Canvas.h"
@@ -420,6 +421,26 @@ namespace Game3 {
 		if (0 <= new_value && heldLeft.slot == new_value)
 			setHeld(-1, heldLeft);
 		setHeld(new_value, heldRight);
+	}
+
+	void Entity::encode(Game &, Buffer &buffer) {
+		buffer << position;
+		buffer << direction;
+		buffer << offset.x();
+		buffer << offset.y();
+		buffer << path;
+		buffer << money;
+		buffer << health;
+	}
+
+	void Entity::decode(Game &, Buffer &buffer) {
+		buffer >> position;
+		buffer >> direction;
+		buffer >> offset.x();
+		buffer >> offset.y();
+		buffer >> path;
+		buffer >> money;
+		buffer >> health;
 	}
 
 	void Entity::setHeld(Slot new_value, Held &held) {

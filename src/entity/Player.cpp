@@ -5,6 +5,7 @@
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "item/Tool.h"
+#include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
@@ -24,15 +25,12 @@ namespace Game3 {
 	void Player::toJSON(nlohmann::json &json) const {
 		Entity::toJSON(json);
 		json["isPlayer"] = true;
-		if (0 < money)
-			json["money"] = money;
 		if (0.f < tooldown)
 			json["tooldown"] = tooldown;
 	}
 
 	void Player::absorbJSON(Game &game, const nlohmann::json &json) {
 		Entity::absorbJSON(game, json);
-		money = json.contains("money")? json.at("money").get<MoneyCount>() : 0;
 		tooldown = json.contains("tooldown")? json.at("tooldown").get<float>() : 0.f;
 	}
 
@@ -132,6 +130,32 @@ namespace Game3 {
 
 	bool Player::isMoving() const {
 		return movingUp || movingRight || movingDown || movingLeft;
+	}
+
+	void Player::encode(Game &game, Buffer &buffer) {
+		Entity::encode(game, buffer);
+		buffer << tooldown;
+		buffer << stationTypes;
+		buffer << speed;
+	}
+
+	void Player::decode(Game &game, Buffer &buffer) {
+		Entity::decode(game, buffer);
+		buffer >> tooldown;
+		buffer >> stationTypes;
+		buffer >> speed;
+		resetEphemeral();
+	}
+
+	void Player::resetEphemeral() {
+		movingUp = false;
+		movingRight = false;
+		movingDown = false;
+		movingLeft = false;
+		continuousInteraction = false;
+		// `ticked` excluded intentionally. Probably.
+		lastContinousInteraction.reset();
+		continuousInteractionModifiers = {};
 	}
 
 	void to_json(nlohmann::json &json, const Player &player) {

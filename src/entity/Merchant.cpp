@@ -2,6 +2,7 @@
 
 #include "entity/Merchant.h"
 #include "game/Game.h"
+#include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
@@ -47,6 +48,16 @@ namespace Game3 {
 			tab.setMerchantInventory("Merchant", inventory, greed);
 		}, 2);
 		return true;
+	}
+
+	void Merchant::encode(Game &, Buffer &buffer) {
+		buffer << money;
+		buffer << greed;
+	}
+
+	void Merchant::decode(Game &, Buffer &buffer) {
+		buffer >> money;
+		buffer >> greed;
 	}
 
 	void to_json(nlohmann::json &json, const Merchant &merchant) {

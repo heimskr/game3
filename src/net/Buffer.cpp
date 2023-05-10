@@ -5,6 +5,7 @@
 #include "net/Buffer.h"
 
 namespace Game3 {
+	template <> std::string Buffer::getType<bool>    (const bool &)     { return {'\x01'}; }
 	template <> std::string Buffer::getType<uint8_t> (const uint8_t &)  { return {'\x01'}; }
 	template <> std::string Buffer::getType<uint16_t>(const uint16_t &) { return {'\x02'}; }
 	template <> std::string Buffer::getType<uint32_t>(const uint32_t &) { return {'\x03'}; }
@@ -14,6 +15,8 @@ namespace Game3 {
 	template <> std::string Buffer::getType<int16_t> (const int16_t &)  { return {'\x06'}; }
 	template <> std::string Buffer::getType<int32_t> (const int32_t &)  { return {'\x07'}; }
 	template <> std::string Buffer::getType<int64_t> (const int64_t &)  { return {'\x08'}; }
+	template <> std::string Buffer::getType<float>   (const float &)    { return {'\x09'}; }
+	template <> std::string Buffer::getType<double>  (const double &)   { return {'\x0a'}; }
 
 	template <>
 	std::string Buffer::getType<std::string_view>(const std::string_view &string) {
@@ -34,18 +37,18 @@ namespace Game3 {
 		return getType(std::string_view(string));
 	}
 
-	Buffer & Buffer::append(char item) {
+	Buffer & Buffer::operator+=(char item) {
 		bytes.insert(bytes.end(), static_cast<uint8_t>(item));
 		return *this;
 	}
 
-	Buffer & Buffer::append(uint8_t item) {
+	Buffer & Buffer::operator+=(uint8_t item) {
 		bytes.insert(bytes.end(), item);
 		return *this;
 	}
 
-	Buffer & Buffer::append(uint16_t item) {
-		if (std::endian::native == std::endian::little) {
+	Buffer & Buffer::operator+=(uint16_t item) {
+		if constexpr (std::endian::native == std::endian::little) {
 			const auto *raw = reinterpret_cast<const uint8_t *>(&item);
 			bytes.insert(bytes.end(), raw, raw + sizeof(item));
 		} else
@@ -53,8 +56,8 @@ namespace Game3 {
 		return *this;
 	}
 
-	Buffer & Buffer::append(uint32_t item) {
-		if (std::endian::native == std::endian::little) {
+	Buffer & Buffer::operator+=(uint32_t item) {
+		if constexpr (std::endian::native == std::endian::little) {
 			const auto *raw = reinterpret_cast<const uint8_t *>(&item);
 			bytes.insert(bytes.end(), raw, raw + sizeof(item));
 		} else
@@ -62,8 +65,8 @@ namespace Game3 {
 		return *this;
 	}
 
-	Buffer & Buffer::append(uint64_t item) {
-		if (std::endian::native == std::endian::little) {
+	Buffer & Buffer::operator+=(uint64_t item) {
+		if constexpr (std::endian::native == std::endian::little) {
 			const auto *raw = reinterpret_cast<const uint8_t *>(&item);
 			bytes.insert(bytes.end(), raw, raw + sizeof(item));
 		} else {
@@ -81,7 +84,17 @@ namespace Game3 {
 		return *this;
 	}
 
-	Buffer & Buffer::append(std::string_view string) {
+	Buffer & Buffer::operator+=(float item) {
+		static_assert(sizeof(item) == 4);
+		return *this += *reinterpret_cast<const uint32_t *>(&item);
+	}
+
+	Buffer & Buffer::operator+=(double item) {
+		static_assert(sizeof(item) == 8);
+		return *this += *reinterpret_cast<const uint64_t *>(&item);
+	}
+
+	Buffer & Buffer::operator+=(std::string_view string) {
 		bytes.insert(bytes.end(), string.begin(), string.end());
 		return *this;
 	}
@@ -93,6 +106,11 @@ namespace Game3 {
 		const auto out = bytes.front();
 		bytes.pop_front();
 		return out;
+	}
+
+	template <>
+	bool Buffer::popRaw<bool>() {
+		return static_cast<bool>(popRaw<char>());
 	}
 
 	template <>
@@ -142,9 +160,21 @@ namespace Game3 {
 		return static_cast<int64_t>(popRaw<uint64_t>());
 	}
 
+	template <>
+	float Buffer::popRaw<float>() {
+		const auto raw = popRaw<uint32_t>();
+		return *reinterpret_cast<const float *>(&raw);
+	}
+
+	template <>
+	double Buffer::popRaw<double>() {
+		const auto raw = popRaw<uint64_t>();
+		return *reinterpret_cast<const double *>(&raw);
+	}
+
 	std::string Buffer::popType() {
 		const char first = popRaw<char>();
-		if ((1 <= first && first <= 8) || ('\x10' <= first && first < '\x1f'))
+		if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first < '\x1f'))
 			return {first};
 		if (first == '\x1f') {
 			const auto length = popRaw<uint32_t>();
@@ -160,47 +190,60 @@ namespace Game3 {
 	bool Buffer::typesMatch(std::string_view one, std::string_view two) {
 		assert(!one.empty());
 		assert(!two.empty());
-		if (const auto one0 = one[0], two0 = two[0]; ('\x10' <= one0 && one0 <= '\x1f') && ('\x10' <= two0 && two0 <= '\x1f'))
+		const auto one0 = one[0];
+		const auto two0 = two[0];
+		if (('\x10' <= one0 && one0 <= '\x1f') && ('\x10' <= two0 && two0 <= '\x1f'))
+			return true;
+		if ((one0 == '\x0b' && two0 == '\x0c') || (one0 == '\x0c' && two0 == '\x0b'))
 			return true;
 		return one == two;
 	}
 
 	Buffer & Buffer::operator<<(uint8_t item) {
-		return appendType(item).append(item);
+		return appendType(item) += item;
 	}
 
 	Buffer & Buffer::operator<<(uint16_t item) {
-		return appendType(item).append(item);
+		return appendType(item) += item;
 	}
 
 	Buffer & Buffer::operator<<(uint32_t item) {
-		return appendType(item).append(item);
+		return appendType(item) += item;
 	}
 
 	Buffer & Buffer::operator<<(uint64_t item) {
-		return appendType(item).append(item);
+		return appendType(item) += item;
 	}
 
 	Buffer & Buffer::operator<<(int8_t item) {
-		return appendType(item).append(static_cast<uint8_t>(item));
+		return appendType(item) += static_cast<uint8_t>(item);
 	}
 
 	Buffer & Buffer::operator<<(int16_t item) {
-		return appendType(item).append(static_cast<uint16_t>(item));
+		return appendType(item) += static_cast<uint16_t>(item);
 	}
 
 	Buffer & Buffer::operator<<(int32_t item) {
-		return appendType(item).append(static_cast<uint32_t>(item));
+		return appendType(item) += static_cast<uint32_t>(item);
 	}
 
 	Buffer & Buffer::operator<<(int64_t item) {
-		return appendType(item).append(static_cast<uint64_t>(item));
+		return appendType(item) += static_cast<uint64_t>(item);
+	}
+
+	Buffer & Buffer::operator<<(float item) {
+		return appendType(item) += item;
+	}
+
+	Buffer & Buffer::operator<<(double item) {
+		return appendType(item) += item;
 	}
 
 	Buffer & Buffer::operator<<(std::string_view string) {
 		const auto type = getType(string);
 		bytes.insert(bytes.end(), type.begin(), type.end());
 		const auto first = type[0];
+
 		if (first == '\x10')
 			return *this;
 
@@ -210,7 +253,7 @@ namespace Game3 {
 		}
 
 		assert(string.size() <= UINT32_MAX);
-		append(static_cast<uint32_t>(string.size()));
+		*this += static_cast<uint32_t>(string.size());
 		bytes.insert(bytes.end(), string.begin(), string.end());
 		return *this;
 	}

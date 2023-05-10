@@ -1,6 +1,7 @@
 #include "ThreadContext.h"
 #include "entity/Animal.h"
 #include "game/Game.h"
+#include "net/Buffer.h"
 #include "realm/Keep.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
@@ -39,4 +40,19 @@ namespace Game3 {
 			std::uniform_int_distribution(column - wanderRadius, column + wanderRadius)(threadContext.rng)
 		});
 	}
+
+	void Animal::encode(Game &game, Buffer &buffer) {
+		Entity::encode(game, buffer);
+		buffer << destination;
+		buffer << timeUntilWander;
+		buffer << wanderRadius;
+	}
+
+	void Animal::decode(Game &game, Buffer &buffer) {
+		Entity::decode(game, buffer);
+		buffer >> destination;
+		buffer >> timeUntilWander;
+		buffer >> wanderRadius;
+	}
+
 }

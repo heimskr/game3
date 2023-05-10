@@ -1,5 +1,6 @@
 #include "Direction.h"
 #include "ThreadContext.h"
+#include "net/Buffer.h"
 
 namespace Game3 {
 	Direction remapDirection(Direction direction, uint16_t configuration) {
@@ -24,5 +25,20 @@ namespace Game3 {
 			case Game3::Direction::Right: return stream << "right";
 			default: return stream << '?';
 		}
+	}
+
+	Buffer & operator+=(Buffer &buffer, Direction direction) {
+		return buffer += static_cast<uint8_t>(direction);
+	}
+
+	Buffer & operator<<(Buffer &buffer, Direction direction) {
+		return buffer << static_cast<uint8_t>(direction);
+	}
+
+	Buffer & operator>>(Buffer &buffer, Direction &direction) {
+		uint8_t raw;
+		buffer >> raw;
+		direction = static_cast<Direction>(raw);
+		return buffer;
 	}
 }

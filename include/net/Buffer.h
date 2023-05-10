@@ -6,6 +6,7 @@
 #include <deque>
 #include <iostream>
 #include <list>
+#include <optional>
 #include <ostream>
 #include <ranges>
 #include <span>
@@ -14,10 +15,21 @@
 #include "util/Concepts.h"
 
 namespace Game3 {
+	class Buffer;
+
+	template <typename T>
+	concept Poppable = requires(T t) {
+		t = popExternal(t, *reinterpret_cast<Buffer *>(0));
+	};
+
+	template <typename T>
+	concept Unpoppable = !Poppable<T>;
+
 	class Buffer {
 		private:
 			std::deque<uint8_t> bytes;
 
+		public:
 			template <typename T>
 			Buffer & appendType(const T &t) {
 				const auto type = getType(t);
@@ -25,6 +37,24 @@ namespace Game3 {
 				return *this;
 			}
 
+			/**
+			 * 0x01 -> bool / uint8_t
+			 * 0x02 -> uint16_t
+			 * 0x03 -> uint32_t
+			 * 0x04 -> uint64_t
+			 * 0x05 -> int8_t
+			 * 0x06 -> int16_t
+			 * 0x07 -> int32_t
+			 * 0x08 -> int64_t
+			 * 0x09 -> float
+			 * 0x0a -> double
+			 * 0x0b . type -> optional
+			 * 0x0c -> optional (empty)
+			 * 0x10 -> empty string
+			 * [0x11, 0x1f) -> string of length [0x1, 0xf)
+			 * 0x20 . type -> linear container
+			 * 0x21 . type[key] . type[value] -> map container
+			 */
 			template <typename T>
 			std::string getType(const T &);
 
@@ -35,33 +65,60 @@ namespace Game3 {
 			}
 
 			// Same here.
-			template <LinearContainer T>
+			template <LinearOrSet T>
 			std::string getType(const T &) {
 				return '\x20' + getType(typename T::value_type());
 			}
 
-			Buffer & append(char);
-			Buffer & append(uint8_t);
-			Buffer & append(uint16_t);
-			Buffer & append(uint32_t);
-			Buffer & append(uint64_t);
-			Buffer & append(std::string_view);
+			template <typename T>
+			requires std::is_enum_v<T>
+			std::string getType(const T &) {
+				return getType(std::underlying_type_t<T>());
+			}
 
-			template <Map M>
-			Buffer & append(const M &map) {
-				assert(map.size() <= UINT32_MAX);
-				append(static_cast<uint32_t>(map.size()));
-				for (const auto &[key, value]: map)
-					append(key).append(value);
+			template <typename T>
+			std::string getType(const std::optional<T> &item) {
+				return item.has_value()? "\x0b" : "\x0c";
+			}
+
+			Buffer & operator+=(bool);
+			Buffer & operator+=(char);
+			Buffer & operator+=(uint8_t);
+			Buffer & operator+=(uint16_t);
+			Buffer & operator+=(uint32_t);
+			Buffer & operator+=(uint64_t);
+			Buffer & operator+=(float);
+			Buffer & operator+=(double);
+			Buffer & operator+=(std::string_view);
+
+			template <std::signed_integral T>
+			Buffer & operator+=(T item) {
+				return *this += static_cast<std::make_unsigned_t<T>>(item);
+			}
+
+			template <typename T>
+			requires std::is_enum_v<T>
+			Buffer & operator+=(T item) {
+				return *this += static_cast<std::underlying_type_t<T>>(item);
+			}
+
+			template <LinearOrSet T>
+			Buffer & operator+=(const T &container) {
+				assert(container.size() <= UINT32_MAX);
+				*this += static_cast<uint32_t>(container.size());
+				for (const auto &item: container)
+					*this += item;
 				return *this;
 			}
 
-			template <LinearContainer T>
-			Buffer & append(const T &container) {
-				assert(container.size() <= UINT32_MAX);
-				append(static_cast<uint32_t>(container.size()));
-				for (const auto &item: container)
-					append(item);
+			template <Map M>
+			Buffer & operator+=(const M &map) {
+				assert(map.size() <= UINT32_MAX);
+				*this += static_cast<uint32_t>(map.size());
+				for (const auto &[key, value]: map) {
+					*this += key;
+					*this += value;
+				}
 				return *this;
 			}
 
@@ -87,25 +144,51 @@ namespace Game3 {
 			Buffer & operator<<(int16_t);
 			Buffer & operator<<(int32_t);
 			Buffer & operator<<(int64_t);
+			Buffer & operator<<(float);
+			Buffer & operator<<(double);
 			Buffer & operator<<(std::string_view);
 			Buffer & operator<<(const std::string &);
 
-			template <Map M>
-			Buffer & operator<<(const M &map) {
-				return appendType(map).append(map);
+			template <LinearOrSet T>
+			Buffer & operator<<(const T &container) {
+				return appendType(container) += container;
 			}
 
-			template <LinearContainer T>
-			Buffer & operator<<(const T &container) {
-				return appendType(container).append(container);
+			template <Set S>
+			Buffer & operator<<(const S &set) {
+				return appendType(set) += set;
+			}
+
+			template <Map M>
+			Buffer & operator<<(const M &map) {
+				return appendType(map) += map;
+			}
+
+			template <typename T>
+			requires std::is_enum_v<T>
+			Buffer & operator<<(T item) {
+				using underlying = std::underlying_type_t<T>;
+				return appendType(underlying{}) += static_cast<underlying>(item);
+			}
+
+			template <typename T>
+			Buffer & operator<<(const std::optional<T> &item) {
+				if (item.has_value())
+					return (*this += '\x0b') << *item;
+				return *this += '\x0c';
 			}
 
 			friend std::ostream & operator<<(std::ostream &, const Buffer &);
 
-			template <typename T>
-			T popRaw();
+			template <Unpoppable U>
+			U popRaw();
 
-			template <LinearContainer C>
+			template <Poppable P>
+			P popRaw() {
+				return popRaw<P>(*this);
+			}
+
+			template <Linear C>
 			C popRaw() {
 				const auto size = popRaw<uint32_t>();
 				C out;
@@ -115,6 +198,15 @@ namespace Game3 {
 				for (uint32_t i = 0; i < size; ++i)
 					out.push_back(popRaw<typename C::value_type>());
 
+				return out;
+			}
+
+			template <Set S>
+			S popRaw() {
+				const auto size = popRaw<uint32_t>();
+				S out;
+				for (uint32_t i = 0; i < size; ++i)
+					out.insert(popRaw<typename S::value_type>());
 				return out;
 			}
 
@@ -128,13 +220,19 @@ namespace Game3 {
 			}
 
 			template <typename T>
+			requires std::is_enum_v<T>
+			T popRaw() {
+				return static_cast<T>(popRaw<std::underlying_type_t<T>>());
+			}
+
+			template <typename T>
 			Buffer & operator>>(T &);
 
-			template <LinearContainer C>
-			Buffer & operator>>(C &out) {
-				if (!typesMatch(popType(), getType(C())))
+			template <LinearOrSet T>
+			Buffer & operator>>(T &out) {
+				if (!typesMatch(popType(), getType(T())))
 					throw std::invalid_argument("Invalid type in buffer");
-				out = popRaw<C>();
+				out = popRaw<T>();
 				return *this;
 			}
 
@@ -146,12 +244,40 @@ namespace Game3 {
 				return *this;
 			}
 
-			template <std::integral T>
+			template <Numeric T>
 			Buffer & operator>>(T &out) {
 				if (!typesMatch(popType(), getType(T())))
 					throw std::invalid_argument("Invalid type in buffer");
 				out = popRaw<T>();
 				return *this;
+			}
+
+			template <typename T>
+			requires std::is_enum_v<T>
+			Buffer & operator>>(T &out) {
+				std::underlying_type_t<T> raw;
+				*this >> raw;
+				out = static_cast<T>(raw);
+				return *this;
+			}
+
+			template <typename T>
+			Buffer & operator>>(std::optional<T> &out) {
+				const auto type = popType();
+				if (!typesMatch(type, getType(std::make_optional<T>())))
+					throw std::invalid_argument("Invalid type in buffer");
+				if (type == "\x0c")
+					out = std::nullopt;
+				else
+					out = take<T>();
+				return *this;
+			}
+
+			template <typename T>
+			T take() {
+				T out;
+				*this >> out;
+				return out;
 			}
 	};
 
