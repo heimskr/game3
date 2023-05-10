@@ -261,4 +261,71 @@ namespace Game3 {
 				static_cast<UnnamedRegistry<T> *>(this)->add(T::fromJSON(game, json));
 			}
 	};
+
+	struct NumericRegistryBase: Registry {
+		using Registry::Registry;
+	};
+
+	template <typename T>
+	class NumericRegistry: public NumericRegistryBase {
+#ifdef REGISTRY_ASSERTS
+		static_assert(std::is_base_of_v<NumericRegisterable, T>);
+#endif
+
+		public:
+			std::map<NumericRegisterable::Type, std::shared_ptr<T>> items;
+
+			using NumericRegistryBase::NumericRegistryBase;
+			~NumericRegistry() override = default;
+
+			inline NumericRegistry & operator+=(std::shared_ptr<T> item) {
+				add(item);
+				return *this;
+			}
+
+			inline NumericRegistry & operator+=(const std::pair<NumericRegisterable::Type, std::shared_ptr<T>> &pair) {
+				add(pair.first, pair.second);
+				return *this;
+			}
+
+			inline void add(NumericRegisterable::Type new_number, std::shared_ptr<T> new_item) {
+				if (auto [iter, inserted] = items.try_emplace(new_number, std::move(new_item)); inserted) {
+					iter->second->number = new_number;
+				} else
+					throw std::runtime_error("NumericRegistry " + identifier.str() + " already contains an item with number " + std::to_string(new_number));
+			}
+
+			inline void add(const std::shared_ptr<T> &new_item) {
+				add(new_item->number, new_item);
+			}
+
+			inline void add(NumericRegisterable::Type new_number, T &&new_item) {
+				add(new_number, std::make_shared<T>(std::move(new_item)));
+			}
+
+			inline bool contains(NumericRegisterable::Type number) const {
+				return items.contains(number);
+			}
+
+			inline std::shared_ptr<T> operator[](NumericRegisterable::Type number) const {
+				return at(number);
+			}
+
+			inline std::shared_ptr<T> at(NumericRegisterable::Type number) const {
+				try {
+					return items.at(number);
+				} catch (const std::out_of_range &) {
+					std::cerr << "\e[31mCouldn't find \"" + std::to_string(number) + "\" in registry " + identifier.str() << "\e[39m\n";
+					return {};
+				}
+			}
+
+			inline void clear() {
+				items.clear();
+			}
+
+			inline size_t size() const {
+				return items.size();
+			}
+	};
 }

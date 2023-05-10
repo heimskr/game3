@@ -9,6 +9,7 @@ namespace Game3 {
 	class Packet {
 		public:
 			Packet() = default;
+			virtual ~Packet() = default;
 
 			virtual void encode(Game &, Buffer &) = 0;
 			virtual void decode(Game &, Buffer &) = 0;

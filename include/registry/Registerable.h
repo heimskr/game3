@@ -2,8 +2,6 @@
 
 #include <cstddef>
 
-#include <nlohmann/json.hpp>
-
 #include "data/Identifier.h"
 
 namespace Game3 {
@@ -16,5 +14,14 @@ namespace Game3 {
 
 		NamedRegisterable() = delete;
 		NamedRegisterable(Identifier identifier_): identifier(std::move(identifier_)) {}
+	};
+
+	struct NumericRegisterable: Registerable {
+		using Type = size_t;
+
+		Type number;
+
+		NumericRegisterable() = delete;
+		NumericRegisterable(Type number_): number(number_) {}
 	};
 }

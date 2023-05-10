@@ -32,6 +32,9 @@
 #include "item/Plantable.h"
 #include "item/Sapling.h"
 #include "item/Tool.h"
+#include "packet/PacketFactory.h"
+#include "packet/ProtocolVersionPacket.h"
+#include "packet/TileEntityPacket.h"
 #include "realm/Cave.h"
 #include "realm/House.h"
 #include "realm/Keep.h"
@@ -240,6 +243,11 @@ namespace Game3 {
 		addRealm.operator()<Keep>(Keep::ID());
 	}
 
+	void Game::addPacketFactories() {
+		add(PacketFactory::create<ProtocolVersionPacket>());
+		add(PacketFactory::create<TileEntityPacket>());
+	}
+
 	void Game::initialSetup(const std::filesystem::path &dir) {
 		initRegistries();
 		addItems();
@@ -285,6 +293,11 @@ namespace Game3 {
 	void Game::add(RealmFactory &&factory) {
 		auto shared = std::make_shared<RealmFactory>(std::move(factory));
 		registry<RealmFactoryRegistry>().add(shared->identifier, shared);
+	}
+
+	void Game::add(PacketFactory &&factory) {
+		auto shared = std::make_shared<PacketFactory>(std::move(factory));
+		registry<PacketFactoryRegistry>().add(shared->number, shared);
 	}
 
 	void Game::add(GhostFunction &&function) {

@@ -66,6 +66,7 @@ namespace Game3 {
 			void addEntityFactories();
 			void addTileEntityFactories();
 			void addRealms();
+			void addPacketFactories();
 			void initialSetup(const std::filesystem::path &dir = "data");
 			void initEntities();
 			void initInteractionSets();
@@ -74,6 +75,7 @@ namespace Game3 {
 			void add(EntityFactory &&);
 			void add(TileEntityFactory &&);
 			void add(RealmFactory &&);
+			void add(PacketFactory &&);
 			void add(GhostFunction &&);
 			void traverseData(const std::filesystem::path &);
 			void loadDataFile(const std::filesystem::path &);
