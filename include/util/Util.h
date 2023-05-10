@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <csignal>
 #include <iostream>
@@ -137,4 +138,13 @@ namespace Game3 {
 			return out;
 		}
 	};
+
+	template <size_t BL = 128>
+	std::string formatTime(const char *format, std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now())) {
+		tm now_tm;
+		localtime_r(&now, &now_tm);
+		std::array<char, BL> buffer;
+		strftime(buffer.data(), buffer.size() * sizeof(buffer[0]), format, &now_tm);
+		return buffer.data();
+	}
 }

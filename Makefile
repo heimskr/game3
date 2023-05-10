@@ -23,7 +23,7 @@ else
 LDFLAGS := $(LDFLAGS) -lGL
 endif
 
-DEPS         := glm glfw3 libzstd gtk4 gtkmm-4.0 glu
+DEPS         := glm glfw3 libzstd gtk4 gtkmm-4.0 glu libevent_openssl openssl libevent_pthreads
 OUTPUT       := game3
 COMPILER     ?= clang++
 CPPFLAGS     := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude -Ijson/include -Ieigen -Istb -Ilibnoise/src $(LTO)
@@ -91,6 +91,9 @@ endif
 
 test: $(OUTPUT)
 	./$(OUTPUT)
+
+servertest: $(OUTPUT)
+	./$(OUTPUT) -s
 
 clean:
 	@ rm -f $(shell find src -name \*.o) $(OUTPUT) src/gtk_resources.cpp include/resources.h $(RESGEN) $(RESGEN).o

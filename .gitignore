@@ -10,3 +10,5 @@ include/resources.h
 /.github-deps
 /game3.zip
 *.o.tmp
+*.crt
+*.key
