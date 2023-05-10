@@ -18,12 +18,7 @@ namespace Game3 {
 	class Buffer;
 
 	template <typename T>
-	concept Poppable = requires(T t) {
-		t = popExternal(t, *reinterpret_cast<Buffer *>(0));
-	};
-
-	template <typename T>
-	concept Unpoppable = !Poppable<T>;
+	T popBuffer(Buffer &);
 
 	class Buffer {
 		private:
@@ -126,7 +121,7 @@ namespace Game3 {
 
 			template <typename T1, typename T2>
 			inline T2 popConv() {
-				return static_cast<T2>(popRaw<T1>());
+				return static_cast<T2>(popBuffer<T1>(*this));
 			}
 
 			static bool typesMatch(std::string_view, std::string_view);
@@ -180,51 +175,6 @@ namespace Game3 {
 
 			friend std::ostream & operator<<(std::ostream &, const Buffer &);
 
-			template <Unpoppable U>
-			U popRaw();
-
-			template <Poppable P>
-			P popRaw() {
-				return popRaw<P>(*this);
-			}
-
-			template <Linear C>
-			C popRaw() {
-				const auto size = popRaw<uint32_t>();
-				C out;
-				if constexpr (Reservable<C>)
-					out.reserve(size);
-
-				for (uint32_t i = 0; i < size; ++i)
-					out.push_back(popRaw<typename C::value_type>());
-
-				return out;
-			}
-
-			template <Set S>
-			S popRaw() {
-				const auto size = popRaw<uint32_t>();
-				S out;
-				for (uint32_t i = 0; i < size; ++i)
-					out.insert(popRaw<typename S::value_type>());
-				return out;
-			}
-
-			template <Map M>
-			M popRaw() {
-				const auto size = popRaw<uint32_t>();
-				M out;
-				for (uint32_t i = 0; i < size; ++i)
-					out.emplace(popRaw<typename M::key_type>(), popRaw<typename M::mapped_type>());
-				return out;
-			}
-
-			template <typename T>
-			requires std::is_enum_v<T>
-			T popRaw() {
-				return static_cast<T>(popRaw<std::underlying_type_t<T>>());
-			}
-
 			template <typename T>
 			Buffer & operator>>(T &);
 
@@ -232,7 +182,7 @@ namespace Game3 {
 			Buffer & operator>>(T &out) {
 				if (!typesMatch(popType(), getType(T())))
 					throw std::invalid_argument("Invalid type in buffer");
-				out = popRaw<T>();
+				out = popBuffer<T>(*this);
 				return *this;
 			}
 
@@ -240,7 +190,7 @@ namespace Game3 {
 			Buffer & operator>>(M &out) {
 				if (!typesMatch(popType(), getType(M())))
 					throw std::invalid_argument("Invalid type in buffer");
-				out = popRaw<M>();
+				out = popBuffer<M>(*this);
 				return *this;
 			}
 
@@ -248,7 +198,7 @@ namespace Game3 {
 			Buffer & operator>>(T &out) {
 				if (!typesMatch(popType(), getType(T())))
 					throw std::invalid_argument("Invalid type in buffer");
-				out = popRaw<T>();
+				out = popBuffer<T>(*this);
 				return *this;
 			}
 
@@ -279,7 +229,47 @@ namespace Game3 {
 				*this >> out;
 				return out;
 			}
+
+			template <typename T>
+			friend T popBuffer(Buffer &);
 	};
+
+	template <Linear C>
+	C popBuffer(Buffer &buffer) {
+		const auto size = popBuffer<uint32_t>(buffer);
+		C out;
+		if constexpr (Reservable<C>)
+			out.reserve(size);
+
+		for (uint32_t i = 0; i < size; ++i)
+			out.push_back(popBuffer<typename C::value_type>(buffer));
+
+		return out;
+	}
+
+	template <Set S>
+	S popBuffer(Buffer &buffer) {
+		const auto size = popBuffer<uint32_t>(buffer);
+		S out;
+		for (uint32_t i = 0; i < size; ++i)
+			out.insert(popBuffer<typename S::value_type>(buffer));
+		return out;
+	}
+
+	template <Map M>
+	M popBuffer(Buffer &buffer) {
+		const auto size = popBuffer<uint32_t>(buffer);
+		M out;
+		for (uint32_t i = 0; i < size; ++i)
+			out.emplace(popBuffer<typename M::key_type>(buffer), popBuffer<typename M::mapped_type>(buffer));
+		return out;
+	}
+
+	template <typename T>
+	requires std::is_enum_v<T>
+	T popBuffer(Buffer &buffer) {
+		return static_cast<T>(popBuffer<std::underlying_type_t<T>>(buffer));
+	}
 
 	std::ostream & operator<<(std::ostream &, const Buffer &);
 }

@@ -100,84 +100,84 @@ namespace Game3 {
 	}
 
 	template <>
-	char Buffer::popRaw<char>() {
-		if (bytes.empty())
+	char popBuffer<char>(Buffer &buffer) {
+		if (buffer.bytes.empty())
 			throw std::out_of_range("Buffer is empty");
-		const auto out = bytes.front();
-		bytes.pop_front();
+		const auto out = buffer.bytes.front();
+		buffer.bytes.pop_front();
 		return out;
 	}
 
 	template <>
-	bool Buffer::popRaw<bool>() {
-		return static_cast<bool>(popRaw<char>());
+	bool popBuffer<bool>(Buffer &buffer) {
+		return static_cast<bool>(popBuffer<char>(buffer));
 	}
 
 	template <>
-	uint8_t Buffer::popRaw<uint8_t>() {
-		return static_cast<uint8_t>(popRaw<char>());
+	uint8_t popBuffer<uint8_t>(Buffer &buffer) {
+		return static_cast<uint8_t>(popBuffer<char>(buffer));
 	}
 
 	template <>
-	uint16_t Buffer::popRaw<uint16_t>() {
-		if (bytes.size() < sizeof(uint16_t))
+	uint16_t popBuffer<uint16_t>(Buffer &buffer) {
+		if (buffer.bytes.size() < sizeof(uint16_t))
 			throw std::out_of_range("Buffer is too empty");
-		return popRaw<uint8_t>() | (popConv<uint8_t, uint16_t>() << 8);
+		return popBuffer<uint8_t>(buffer) | (buffer.popConv<uint8_t, uint16_t>() << 8);
 	}
 
 	template <>
-	uint32_t Buffer::popRaw<uint32_t>() {
-		if (bytes.size() < sizeof(uint16_t))
+	uint32_t popBuffer<uint32_t>(Buffer &buffer) {
+		if (buffer.bytes.size() < sizeof(uint16_t))
 			throw std::out_of_range("Buffer is too empty");
-		return popRaw<uint8_t>() | (popConv<uint8_t, uint32_t>() << 8) | (popConv<uint8_t, uint32_t>() << 16) | (popConv<uint8_t, uint32_t>() << 24);
+		return popBuffer<uint8_t>(buffer) | (buffer.popConv<uint8_t, uint32_t>() << 8) | (buffer.popConv<uint8_t, uint32_t>() << 16) | (buffer.popConv<uint8_t, uint32_t>() << 24);
 	}
 
 	template <>
-	uint64_t Buffer::popRaw<uint64_t>() {
-		if (bytes.size() < sizeof(uint16_t))
+	uint64_t popBuffer<uint64_t>(Buffer &buffer) {
+		if (buffer.bytes.size() < sizeof(uint16_t))
 			throw std::out_of_range("Buffer is too empty");
-		return popRaw<uint8_t>() | (popConv<uint8_t, uint64_t>() << 8) | (popConv<uint8_t, uint64_t>() << 16) | (popConv<uint8_t, uint64_t>() << 24)
-		     | (popConv<uint8_t, uint64_t>() << 32) | (popConv<uint8_t, uint64_t>() << 40) | (popConv<uint8_t, uint64_t>() << 48) | (popConv<uint8_t, uint64_t>() << 56);
+		return popBuffer<uint8_t>(buffer) | (buffer.popConv<uint8_t, uint64_t>() << 8) | (buffer.popConv<uint8_t, uint64_t>() << 16) | (buffer.popConv<uint8_t, uint64_t>() << 24)
+		     | (buffer.popConv<uint8_t, uint64_t>() << 32) | (buffer.popConv<uint8_t, uint64_t>() << 40) | (buffer.popConv<uint8_t, uint64_t>() << 48) | (buffer.popConv<uint8_t, uint64_t>() << 56);
 	}
 
 	template <>
-	int8_t Buffer::popRaw<int8_t>() {
-		return static_cast<int8_t>(popRaw<uint8_t>());
+	int8_t popBuffer<int8_t>(Buffer &buffer) {
+		return static_cast<int8_t>(popBuffer<uint8_t>(buffer));
 	}
 
 	template <>
-	int16_t Buffer::popRaw<int16_t>() {
-		return static_cast<int16_t>(popRaw<uint16_t>());
+	int16_t popBuffer<int16_t>(Buffer &buffer) {
+		return static_cast<int16_t>(popBuffer<uint16_t>(buffer));
 	}
 
 	template <>
-	int32_t Buffer::popRaw<int32_t>() {
-		return static_cast<int32_t>(popRaw<uint32_t>());
+	int32_t popBuffer<int32_t>(Buffer &buffer) {
+		return static_cast<int32_t>(popBuffer<uint32_t>(buffer));
 	}
 
 	template <>
-	int64_t Buffer::popRaw<int64_t>() {
-		return static_cast<int64_t>(popRaw<uint64_t>());
+	int64_t popBuffer<int64_t>(Buffer &buffer) {
+		return static_cast<int64_t>(popBuffer<uint64_t>(buffer));
 	}
 
 	template <>
-	float Buffer::popRaw<float>() {
-		const auto raw = popRaw<uint32_t>();
+	float popBuffer<float>(Buffer &buffer) {
+		const auto raw = popBuffer<uint32_t>(buffer);
 		return *reinterpret_cast<const float *>(&raw);
 	}
 
 	template <>
-	double Buffer::popRaw<double>() {
-		const auto raw = popRaw<uint64_t>();
+	double popBuffer<double>(Buffer &buffer) {
+		const auto raw = popBuffer<uint64_t>(buffer);
 		return *reinterpret_cast<const double *>(&raw);
 	}
 
 	std::string Buffer::popType() {
-		const char first = popRaw<char>();
+		const char first = popBuffer<char>(*this);
 		if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first < '\x1f'))
 			return {first};
 		if (first == '\x1f') {
-			const auto length = popRaw<uint32_t>();
+			const auto length = popBuffer<uint32_t>(*this);
 			return {first, static_cast<char>(length & 0xff), static_cast<char>((length >> 8) & 0xff), static_cast<char>((length >> 16) & 0xff), static_cast<char>((length >> 24) & 0xff)};
 		}
 		if (first == '\x20')
@@ -282,7 +282,7 @@ namespace Game3 {
 		const auto front = type.front();
 		uint32_t size;
 		if (front == '\x1f')
-			size = popRaw<uint32_t>();
+			size = popBuffer<uint32_t>(*this);
 		else if ('\x10' <= front && front < '\x1f')
 			size = front - '\x10';
 		else
@@ -290,7 +290,7 @@ namespace Game3 {
 		out.clear();
 		out.reserve(size);
 		for (uint32_t i = 0; i < size; ++i)
-			out.push_back(popRaw<char>());
+			out.push_back(popBuffer<char>(*this));
 		return *this;
 	}
 }

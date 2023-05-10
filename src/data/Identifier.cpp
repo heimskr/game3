@@ -57,13 +57,14 @@ namespace Game3 {
 		return Identifier(string);
 	}
 
-	// template <>
-	// Identifier popRaw<Identifier>(Buffer &buffer) {
-	// 	return Identifier(buffer.popRaw<std::string>());
-	// }
+	template <>
+	Identifier popBuffer<Identifier>(Buffer &buffer) {
+		return Identifier(popBuffer<std::string>(buffer));
+	}
 
-	Identifier popExternal(Identifier, Buffer &buffer) {
-		return Identifier(buffer.popRaw<std::string>());
+	template <>
+	std::string Buffer::getType<Identifier>(const Identifier &) {
+		return getType(std::string{});
 	}
 
 	Buffer & operator+=(Buffer &buffer, const Identifier &identifier) {
