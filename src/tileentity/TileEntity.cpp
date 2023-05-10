@@ -33,7 +33,13 @@ namespace Game3 {
 	bool TileEntity::isVisible() const {
 		const auto pos = getPosition();
 		auto &realm = *getRealm();
-		return realm.getGame().canvas.inBounds(pos) && realm.isVisible(pos);
+		if (getSide() == Side::Client)
+			return realm.getGame().canvas->inBounds(pos) && realm.isVisible(pos);
+		return realm.isVisible(pos);
+	}
+
+	Side TileEntity::getSide() const {
+		return getRealm()->getGame().side;
 	}
 
 	void TileEntity::encode(Game &, Buffer &buffer) {

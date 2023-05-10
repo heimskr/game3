@@ -36,6 +36,8 @@ namespace Game3 {
 	struct Place;
 	using PlacePtr = std::shared_ptr<Place>;
 
+	enum class Side {Invalid, Server, Client};
+
 	template <typename T>
 	class NamedNumeric: public NamedRegisterable {
 		public:

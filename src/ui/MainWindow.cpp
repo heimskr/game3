@@ -284,7 +284,7 @@ namespace Game3 {
 	void MainWindow::newGame(size_t seed, const WorldGenParams &params) {
 		Timer timer("NewGame");
 		glArea.get_context()->make_current();
-		game = Game::create(*canvas);
+		game = Game::create(Side::Client, canvas.get());
 		game->initEntities();
 		auto realm = Realm::create<Overworld>(*game, 1, Overworld::ID(), "base:tileset/monomap"_id, seed);
 		realm->outdoors = true;
@@ -312,12 +312,10 @@ namespace Game3 {
 		glArea.get_context()->make_current();
 		const std::string data = readFile(path);
 		if (!data.empty() && data.front() == '{')
-			game = Game::fromJSON(nlohmann::json::parse(data), *canvas);
+			game = Game::fromJSON(Side::Client, nlohmann::json::parse(data), canvas.get());
 		else
-			game = Game::fromJSON(nlohmann::json::from_cbor(data), *canvas);
+			game = Game::fromJSON(Side::Client, nlohmann::json::from_cbor(data), canvas.get());
 		game->initEntities();
-		// for (auto &[id, realm]: game->realms)
-		// 	realm->remakePathMap();
 		for (const auto &entity: game->activeRealm->entities)
 			if (entity->isPlayer()) {
 				if (!(game->player = std::dynamic_pointer_cast<Player>(entity)))

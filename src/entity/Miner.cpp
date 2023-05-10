@@ -53,13 +53,17 @@ namespace Game3 {
 	}
 
 	bool Miner::onInteractNextTo(const std::shared_ptr<Player> &player) {
-		auto &tab = *getRealm()->getGame().canvas.window.inventoryTab;
 		std::cout << "Miner: money = " << money << ", phase = " << int(phase) << ", stuck = " << stuck << '\n';
-		player->queueForMove([player, &tab](const auto &) {
-			tab.resetExternalInventory();
-			return true;
-		});
-		tab.setExternalInventory("Miner", inventory);
+
+		if (getSide() == Side::Client) {
+			auto &tab = *getRealm()->getGame().canvas->window.inventoryTab;
+			player->queueForMove([player, &tab](const auto &) {
+				tab.resetExternalInventory();
+				return true;
+			});
+			tab.setExternalInventory("Miner", inventory);
+		}
+
 		return true;
 	}
 

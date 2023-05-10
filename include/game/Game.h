@@ -31,7 +31,7 @@ namespace Game3 {
 			static constexpr const char *DEFAULT_PATH = "game.g3";
 			static constexpr Version PROTOCOL_VERSION = 1;
 
-			Canvas &canvas;
+			Canvas *canvas = nullptr;
 			/** Seconds since the last tick */
 			float delta = 0.f;
 			std::chrono::system_clock::time_point startTime = std::chrono::system_clock::now();
@@ -48,6 +48,7 @@ namespace Game3 {
 			RealmPtr activeRealm;
 			PlayerPtr player;
 
+			const Side side;
 			RegistryRegistry registries;
 
 			template <typename T>
@@ -102,11 +103,11 @@ namespace Game3 {
 			sigc::signal<void(const PlayerPtr &)> signal_player_money_update() const { return signal_player_money_update_; }
 			sigc::signal<void(const std::shared_ptr<HasRealm> &)> signal_other_inventory_update()  const { return signal_other_inventory_update_; }
 
-			static std::shared_ptr<Game> create(Canvas &);
-			static std::shared_ptr<Game> fromJSON(const nlohmann::json &, Canvas &);
+			static std::shared_ptr<Game> create(Side, Canvas * = nullptr);
+			static std::shared_ptr<Game> fromJSON(Side, const nlohmann::json &, Canvas * = nullptr);
 
 		private:
-			Game(Canvas &canvas_): canvas(canvas_) {}
+			Game(Side side_, Canvas *canvas_ = nullptr): canvas(canvas_), side(side_) {}
 			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update_;
 			sigc::signal<void(const PlayerPtr &)> signal_player_money_update_;
 			sigc::signal<void(const std::shared_ptr<HasRealm> &)> signal_other_inventory_update_;

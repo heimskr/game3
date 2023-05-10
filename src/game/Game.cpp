@@ -470,8 +470,9 @@ namespace Game3 {
 	}
 
 	void Game::setText(const Glib::ustring &text, const Glib::ustring &name, bool focus, bool ephemeral) {
-		if (canvas.window.textTab) {
-			auto &tab = *canvas.window.textTab;
+		assert(canvas);
+		if (canvas->window.textTab) {
+			auto &tab = *canvas->window.textTab;
 			tab.text = text;
 			tab.name = name;
 			tab.ephemeral = ephemeral;
@@ -482,8 +483,9 @@ namespace Game3 {
 	}
 
 	const Glib::ustring & Game::getText() const {
-		if (canvas.window.textTab)
-			return canvas.window.textTab->text;
+		assert(canvas);
+		if (canvas->window.textTab)
+			return canvas->window.textTab->text;
 		throw std::runtime_error("Can't get text: TextTab is null");
 	}
 
@@ -491,9 +493,10 @@ namespace Game3 {
 		if (!activeRealm)
 			return;
 
+		assert(canvas);
 		auto &realm = *activeRealm;
-		const auto width  = canvas.width();
-		const auto height = canvas.height();
+		const auto width  = canvas->width();
+		const auto height = canvas->height();
 
 		// Lovingly chosen by trial and error.
 		if (0 < realm.ghostCount && width - 40.f <= pos_x && pos_x < width - 16.f && height - 40.f <= pos_y && pos_y < height - 16.f) {
@@ -513,11 +516,12 @@ namespace Game3 {
 
 	Position Game::translateCanvasCoordinates(double x, double y) const {
 		auto &realm = *activeRealm;
-		const auto scale = canvas.scale;
+		assert(canvas);
+		const auto scale = canvas->scale;
 		const auto tile_size  = realm.getTileset().getTileSize();
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
-		x -= canvas.width() / 2.f - (map_length * tile_size / 4.f) * scale + canvas.center.x() * canvas.magic * scale;
-		y -= canvas.height() / 2.f - (map_length * tile_size / 4.f) * scale + canvas.center.y() * canvas.magic * scale;
+		x -= canvas->width() / 2.f - (map_length * tile_size / 4.f) * scale + canvas->center.x() * canvas->magic * scale;
+		y -= canvas->height() / 2.f - (map_length * tile_size / 4.f) * scale + canvas->center.y() * canvas->magic * scale;
 		const double sub_x = x < 0.? 1. : 0.;
 		const double sub_y = y < 0.? 1. : 0.;
 		x /= tile_size * scale / 2.f;
@@ -526,8 +530,9 @@ namespace Game3 {
 	}
 
 	Gdk::Rectangle Game::getVisibleRealmBounds() const {
+		assert(canvas);
 		const auto [left,     top] = translateCanvasCoordinates(0., 0.);
-		const auto [right, bottom] = translateCanvasCoordinates(canvas.width(), canvas.height());
+		const auto [right, bottom] = translateCanvasCoordinates(canvas->width(), canvas->height());
 		return {
 			static_cast<int>(left),
 			static_cast<int>(top),
@@ -554,21 +559,25 @@ namespace Game3 {
 	}
 
 	void Game::activateContext() {
-		canvas.window.activateContext();
+		if (side == Side::Client) {
+			assert(canvas);
+			canvas->window.activateContext();
+		}
 	}
 
 	MainWindow & Game::getWindow() {
-		return canvas.window;
+		assert(canvas);
+		return canvas->window;
 	}
 
-	GamePtr Game::create(Canvas &canvas) {
-		auto out = GamePtr(new Game(canvas));
+	GamePtr Game::create(Side side, Canvas *canvas) {
+		auto out = GamePtr(new Game(side, canvas));
 		out->initialSetup();
 		return out;
 	}
 
-	GamePtr Game::fromJSON(const nlohmann::json &json, Canvas &canvas) {
-		auto out = create(canvas);
+	GamePtr Game::fromJSON(Side side, const nlohmann::json &json, Canvas *canvas) {
+		auto out = create(side, canvas);
 		out->initialSetup();
 		for (const auto &[string, realm_json]: json.at("realms").get<std::unordered_map<std::string, nlohmann::json>>())
 			out->realms.emplace(parseUlong(string), Realm::fromJSON(*out, realm_json));

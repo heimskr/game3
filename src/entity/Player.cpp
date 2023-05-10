@@ -92,9 +92,10 @@ namespace Game3 {
 		auto &game = new_realm->getGame();
 		game.activeRealm->onBlur();
 		game.activeRealm = new_realm;
-		game.canvas.window.activateContext();
-		new_realm->reupload();
-		focus(game.canvas, false);
+		if (getSide() == Side::Client) {
+			new_realm->reupload();
+			focus(*game.canvas, false);
+		}
 	}
 
 	void Player::addMoney(MoneyCount to_add) {
@@ -112,11 +113,13 @@ namespace Game3 {
 	}
 
 	void Player::showText(const Glib::ustring &text, const Glib::ustring &name) {
-		getRealm()->getGame().setText(text, name, true, true);
-		queueForMove([player = shared_from_this()](const auto &) {
-			player->getRealm()->getGame().canvas.window.textTab->hide();
-			return true;
-		});
+		if (getSide() == Side::Client) {
+			getRealm()->getGame().setText(text, name, true, true);
+			queueForMove([player = shared_from_this()](const auto &) {
+				player->getRealm()->getGame().canvas->window.textTab->hide();
+				return true;
+			});
+		}
 	}
 
 	void Player::give(const ItemStack &stack, Slot start) {

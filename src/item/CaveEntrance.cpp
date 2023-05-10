@@ -31,9 +31,9 @@ namespace Game3 {
 		// Resetting the sprite renderer exactly one time fixes things. I'm not sure what the earliest possible time to reset it is.
 		// However, doing it here seems to work.
 		static bool hacked = false;
-		if (!hacked) {
+		if (!hacked && game.canvas != nullptr) {
 			game.activateContext();
-			game.canvas.spriteRenderer = SpriteRenderer(game.canvas);
+			game.canvas->spriteRenderer = SpriteRenderer(*game.canvas);
 			hacked = true;
 		}
 

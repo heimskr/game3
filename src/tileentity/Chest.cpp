@@ -26,12 +26,15 @@ namespace Game3 {
 	}
 
 	bool Chest::onInteractNextTo(const std::shared_ptr<Player> &player) {
-		auto &tab = *getRealm()->getGame().canvas.window.inventoryTab;
-		player->queueForMove([player, &tab](const auto &) {
-			tab.resetExternalInventory();
-			return true;
-		});
-		tab.setExternalInventory(name, inventory);
+		if (player->getSide() == Side::Client) {
+			auto &tab = *getRealm()->getGame().canvas->window.inventoryTab;
+			player->queueForMove([player, &tab](const auto &) {
+				tab.resetExternalInventory();
+				return true;
+			});
+			tab.setExternalInventory(name, inventory);
+		}
+
 		return true;
 	}
 

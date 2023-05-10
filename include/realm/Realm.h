@@ -109,6 +109,7 @@ namespace Game3 {
 			void removeSafe(const TileEntityPtr &);
 			void onMoved(const EntityPtr &, const Position &);
 			Game & getGame();
+			const Game & getGame() const;
 			void queueRemoval(const EntityPtr &);
 			void queueRemoval(const TileEntityPtr &);
 			void queueAddition(const EntityPtr &);
@@ -135,6 +136,7 @@ namespace Game3 {
 			void markGenerated(ChunkPosition);
 			bool isVisible(const Position &) const;
 			bool hasTileEntity(GlobalID);
+			Side getSide() const;
 			inline void markGenerated(auto x, auto y) { generatedChunks.insert(ChunkPosition{x, y}); }
 			inline auto pauseUpdates() { return Pauser(shared_from_this()); }
 

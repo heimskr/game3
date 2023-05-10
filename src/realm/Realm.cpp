@@ -112,10 +112,13 @@ namespace Game3 {
 	}
 
 	void Realm::render(const int width, const int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &sprite_renderer, float game_time) {
+		if (getSide() != Side::Client)
+			return;
+
 		if (!focused)
 			onFocus();
 
-		Canvas &canvas = game.canvas;
+		Canvas &canvas = *game.canvas;
 		auto &multiplier = canvas.multiplier;
 
 		const auto bb_width  = width;
@@ -198,6 +201,9 @@ namespace Game3 {
 	}
 
 	void Realm::reupload() {
+		if (getSide() != Side::Client)
+			return;
+
 		getGame().activateContext();
 		for (auto &row: renderers)
 			for (auto &layers: row)
@@ -206,6 +212,9 @@ namespace Game3 {
 	}
 
 	void Realm::reupload(Layer layer) {
+		if (getSide() != Side::Client)
+			return;
+
 		getGame().activateContext();
 		for (auto &row: renderers)
 			for (auto &layers: row)
@@ -391,6 +400,10 @@ namespace Game3 {
 	}
 
 	Game & Realm::getGame() {
+		return game;
+	}
+
+	const Game & Realm::getGame() const {
 		return game;
 	}
 
@@ -657,6 +670,10 @@ namespace Game3 {
 	bool Realm::hasTileEntity(GlobalID tile_entity_gid) {
 		auto lock = lockTileEntitiesShared();
 		return tileEntitiesByGID.contains(tile_entity_gid);
+	}
+
+	Side Realm::getSide() const {
+		return getGame().side;
 	}
 
 	bool Realm::rightClick(const Position &position, double x, double y) {

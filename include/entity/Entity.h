@@ -102,14 +102,14 @@ namespace Game3 {
 			bool pathfind(const Position &goal);
 			virtual float getSpeed() const { return MAX_SPEED; }
 			virtual Glib::ustring getName() { return "Unknown Entity (" + std::string(type) + ')'; }
-			Game & getGame();
-			const Game & getGame() const;
+			Game & getGame() const;
 			bool isVisible() const;
 			void setHeldLeft(Slot);
 			void setHeldRight(Slot);
 			inline bool is(const Identifier &check) const { return type == check; }
 			inline auto getHeldLeft()  const { return heldLeft.slot;  }
 			inline auto getHeldRight() const { return heldRight.slot; }
+			Side getSide() const;
 
 			virtual void encode(Game &, Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */

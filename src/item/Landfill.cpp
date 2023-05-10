@@ -38,7 +38,6 @@ namespace Game3 {
 				if ((stack.count -= result->required.count) == 0)
 					player.inventory->erase(slot);
 				realm.setTile(1, place.position, result->newTile);
-				realm.getGame().canvas.window.activateContext();
 				realm.reupload();
 				player.inventory->notifyOwner();
 				return true;

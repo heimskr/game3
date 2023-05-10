@@ -67,6 +67,9 @@ namespace Game3 {
 
 		GameServer game_server(global_server);
 
+		auto game = Game::create(Side::Server);
+
+
 		game_server.run();
 
 		return 0;

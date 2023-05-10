@@ -58,8 +58,8 @@ namespace Game3 {
 
 		if (phase != 10) {
 			player->showText("Sorry, I'm not selling anything right now.", "Blacksmith");
-		} else {
-			auto &window = getRealm()->getGame().canvas.window;
+		} else if (getSide() == Side::Client) {
+			auto &window = getRealm()->getGame().canvas->window;
 			auto &tab    = *window.merchantTab;
 			player->queueForMove([player, &tab](const auto &) {
 				tab.hide();

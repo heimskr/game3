@@ -37,16 +37,18 @@ namespace Game3 {
 	}
 
 	bool Merchant::onInteractNextTo(const std::shared_ptr<Player> &player) {
-		auto &window = getRealm()->getGame().canvas.window;
-		auto &tab = *window.merchantTab;
-		player->queueForMove([player, &tab](const auto &) {
-			tab.hide();
-			return true;
-		});
-		tab.show();
-		window.delay([this, &tab] {
-			tab.setMerchantInventory("Merchant", inventory, greed);
-		}, 2);
+		if (getSide() == Side::Client) {
+			auto &window = getRealm()->getGame().canvas->window;
+			auto &tab = *window.merchantTab;
+			player->queueForMove([player, &tab](const auto &) {
+				tab.hide();
+				return true;
+			});
+			tab.show();
+			window.delay([this, &tab] {
+				tab.setMerchantInventory("Merchant", inventory, greed);
+			}, 2);
+		}
 		return true;
 	}
 

@@ -52,13 +52,15 @@ namespace Game3 {
 	}
 
 	bool Woodcutter::onInteractNextTo(const std::shared_ptr<Player> &player) {
-		auto &tab = *getRealm()->getGame().canvas.window.inventoryTab;
-		std::cout << "Woodcutter: money = " << money << ", phase = " << int(phase) << ", stuck = " << stuck << '\n';
-		player->queueForMove([player, &tab](const auto &) {
-			tab.resetExternalInventory();
-			return true;
-		});
-		tab.setExternalInventory("Woodcutter", inventory);
+		if (getSide() == Side::Client) {
+			auto &tab = *getRealm()->getGame().canvas->window.inventoryTab;
+			std::cout << "Woodcutter: money = " << money << ", phase = " << int(phase) << ", stuck = " << stuck << '\n';
+			player->queueForMove([player, &tab](const auto &) {
+				tab.resetExternalInventory();
+				return true;
+			});
+			tab.setExternalInventory("Woodcutter", inventory);
+		}
 		return true;
 	}
 

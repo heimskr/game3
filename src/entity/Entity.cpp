@@ -394,21 +394,19 @@ namespace Game3 {
 		return pathfind(position, goal, path);
 	}
 
-	Game & Entity::getGame() {
+	Game & Entity::getGame() const {
 		if (game != nullptr)
 			return *game;
 
 		return getRealm()->getGame();
 	}
 
-	const Game & Entity::getGame() const {
-		return getRealm()->getGame();
-	}
-
 	bool Entity::isVisible() const {
 		const auto pos = getPosition();
 		auto &realm = *getRealm();
-		return realm.getGame().canvas.inBounds(pos) && realm.isVisible(pos);
+		if (getSide() == Side::Client)
+			return realm.getGame().canvas->inBounds(pos) && realm.isVisible(pos);
+		return realm.isVisible(pos);
 	}
 
 	void Entity::setHeldLeft(Slot new_value) {
@@ -421,6 +419,10 @@ namespace Game3 {
 		if (0 <= new_value && heldLeft.slot == new_value)
 			setHeld(-1, heldLeft);
 		setHeld(new_value, heldRight);
+	}
+
+	Side Entity::getSide() const {
+		return getGame().side;
 	}
 
 	void Entity::encode(Game &, Buffer &buffer) {
