@@ -427,6 +427,9 @@ namespace Game3 {
 	}
 
 	void Entity::encode(Game &, Buffer &buffer) {
+		buffer << type;
+		buffer << globalID;
+		buffer << realmID;
 		buffer << position;
 		buffer << direction;
 		buffer << offset.x();
@@ -437,6 +440,9 @@ namespace Game3 {
 	}
 
 	void Entity::decode(Game &, Buffer &buffer) {
+		buffer >> type;
+		buffer >> globalID;
+		buffer >> realmID;
 		buffer >> position;
 		buffer >> direction;
 		buffer >> offset.x();
