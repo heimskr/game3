@@ -3,7 +3,7 @@
 #include "Texture.h"
 #include "Tileset.h"
 #include "entity/Player.h"
-#include "game/Game.h"
+#include "game/ClientGame.h"
 #include "realm/Realm.h"
 #include "tileentity/Chest.h"
 #include "ui/Canvas.h"
@@ -27,7 +27,7 @@ namespace Game3 {
 
 	bool Chest::onInteractNextTo(const std::shared_ptr<Player> &player) {
 		if (player->getSide() == Side::Client) {
-			auto &tab = *getRealm()->getGame().canvas->window.inventoryTab;
+			auto &tab = *getRealm()->getGame().toClient().canvas.window.inventoryTab;
 			player->queueForMove([player, &tab](const auto &) {
 				tab.resetExternalInventory();
 				return true;

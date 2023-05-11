@@ -28,8 +28,7 @@ namespace Game3 {
 	}
 
 	Server::Worker::Worker(Server &server_, size_t buffer_size, size_t id_):
-	server(server_), bufferSize(buffer_size), buffer(std::make_unique<char[]>(buffer_size)), base(event_base_new()),
-	id(id_) {
+	server(server_), bufferSize(buffer_size), buffer(std::make_unique<char[]>(buffer_size)), base(event_base_new()), id(id_) {
 		if (base == nullptr)
 			throw std::runtime_error("Couldn't allocate a new event_base");
 
@@ -59,8 +58,7 @@ namespace Game3 {
 
 	void Server::makeName() {
 		name4 = {.sin_family  = AF_INET,  .sin_port  = htons(port), .sin_addr = {}, .sin_zero = {0}};
-		name6 = {.sin6_family = AF_INET6, .sin6_port = htons(port), .sin6_flowinfo = {}, .sin6_addr = {},
-			.sin6_scope_id = 0};
+		name6 = {.sin6_family = AF_INET6, .sin6_port = htons(port), .sin6_flowinfo = {}, .sin6_addr = {}, .sin6_scope_id = 0};
 
 		int status;
 
@@ -208,8 +206,7 @@ namespace Game3 {
 			throw std::runtime_error("Couldn't initialize libevent: " + std::string(error));
 		}
 
-		evconnlistener *listener = evconnlistener_new_bind(base, listener_cb, this,
-			LEV_OPT_REUSEABLE | LEV_OPT_CLOSE_ON_FREE | LEV_OPT_CLOSE_ON_EXEC | LEV_OPT_THREADSAFE, -1, name, nameSize);
+		evconnlistener *listener = evconnlistener_new_bind(base, listener_cb, this, LEV_OPT_REUSEABLE | LEV_OPT_CLOSE_ON_FREE | LEV_OPT_CLOSE_ON_EXEC | LEV_OPT_THREADSAFE, -1, name, nameSize);
 
 		if (listener == nullptr) {
 			event_base_free(base);

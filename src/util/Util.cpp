@@ -6,6 +6,31 @@
 namespace Game3 {
 	std::default_random_engine utilRNG;
 
+	std::vector<std::string_view> split(const std::string_view &str, const std::string &delimiter, bool condense) {
+		if (str.empty())
+			return {};
+
+		size_t next = str.find(delimiter);
+		if (next == std::string::npos)
+			return {str};
+
+		std::vector<std::string_view> out;
+		const size_t delimiter_length = delimiter.size();
+		size_t last = 0;
+
+		out.push_back(str.substr(0, next));
+
+		while (next != std::string::npos) {
+			last = next;
+			next = str.find(delimiter, last + delimiter_length);
+			std::string_view sub = str.substr(last + delimiter_length, next - last - delimiter_length);
+			if (!sub.empty() || !condense)
+				out.push_back(sub);
+		}
+
+		return out;
+	}
+
 	long parseLong(const std::string &str, int base) {
 		const char *c_str = str.c_str();
 		char *end = nullptr;

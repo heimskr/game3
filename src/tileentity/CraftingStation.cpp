@@ -2,7 +2,7 @@
 
 #include "Tileset.h"
 #include "entity/Player.h"
-#include "game/Game.h"
+#include "game/ClientGame.h"
 #include "realm/Realm.h"
 #include "tileentity/CraftingStation.h"
 #include "ui/Canvas.h"
@@ -24,13 +24,14 @@ namespace Game3 {
 		player->stationTypes.insert(stationType);
 
 		if (player->getSide() == Side::Client) {
-			auto &tab = *getRealm()->getGame().canvas->window.craftingTab;
-			tab.reset(player->getRealm()->getGame().shared_from_this());
+			auto &game = getRealm()->getGame().toClient();
+			auto &tab = *game.canvas.window.craftingTab;
+			tab.reset(game.shared_from_this());
 			tab.show();
-			player->queueForMove([player, station_type = stationType, &tab](const auto &) {
+			player->queueForMove([&game, player, station_type = stationType, &tab](const auto &) {
 				player->stationTypes.erase(station_type);
-				tab.reset(player->getRealm()->getGame().shared_from_this());
-				player->getRealm()->getGame().canvas->window.inventoryTab->show();
+				tab.reset(game.shared_from_this());
+				game.getWindow().inventoryTab->show();
 				return true;
 			});
 		} else {

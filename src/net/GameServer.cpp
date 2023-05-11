@@ -3,6 +3,7 @@
 #include <event2/thread.h>
 
 #include "Log.h"
+#include "game/ServerGame.h"
 #include "net/GameClient.h"
 #include "net/GameServer.h"
 #include "net/Server.h"
@@ -54,6 +55,7 @@ namespace Game3 {
 	}
 
 	static std::shared_ptr<Server> global_server;
+	static bool running = true;
 
 	int GameServer::main(int, char **) {
 		evthread_use_pthreads();
@@ -62,15 +64,24 @@ namespace Game3 {
 		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
 			throw std::runtime_error("Couldn't register SIGPIPE handler");
 
-		if (signal(SIGINT, +[](int) { global_server->stop(); }) == SIG_ERR)
+		if (signal(SIGINT, +[](int) { running = false; global_server->stop(); }) == SIG_ERR)
 			throw std::runtime_error("Couldn't register SIGINT handler");
 
 		GameServer game_server(global_server);
 
-		auto game = Game::create(Side::Server);
+		auto game = std::make_shared<ServerGame>();
 
+		std::thread tick_thread = std::thread([&] {
+			while (running) {
+				game->tick();
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			}
+
+			std::cout << "bye lol\n";
+		});
 
 		game_server.run();
+		tick_thread.join();
 
 		return 0;
 	}

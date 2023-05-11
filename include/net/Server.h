@@ -147,13 +147,11 @@ namespace Game3 {
 			[[nodiscard]] auto lockWorkerMap() { return std::unique_lock(workerMapMutex); }
 			[[nodiscard]] auto lockDescriptors() { return std::unique_lock(descriptorsMutex); }
 
-			/** (int client, std::string_view message) */
-			std::function<void(GenericClient &, std::string_view)> messageHandler;
+			std::function<void(GenericClient &, std::string_view message)> messageHandler;
 			/** clientsMutex will be locked while this is called. */
-			std::function<void(int)> closeHandler;
-			/** clientsMutex will be locked while this is called.
-			 *  Arguments: (worker, client_id, ip) */
-			std::function<void(Worker &, int, std::string_view)> addClient;
+			std::function<void(int client)> closeHandler;
+			/** clientsMutex will be locked while this is called. */
+			std::function<void(Worker &, int client, std::string_view ip)> addClient;
 
 			Server(int af_, const std::string &ip_, uint16_t port_, size_t thread_count, size_t chunk_size = 1024);
 			Server(const Server &) = delete;

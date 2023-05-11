@@ -16,9 +16,11 @@
 #include "entity/Sheep.h"
 #include "entity/Woodcutter.h"
 #include "entity/Worker.h"
+#include "game/ClientGame.h"
 #include "game/Game.h"
 #include "game/InteractionSet.h"
 #include "game/Inventory.h"
+#include "game/ServerGame.h"
 #include "item/Bomb.h"
 #include "item/CaveEntrance.h"
 #include "item/Floor.h"
@@ -394,11 +396,11 @@ namespace Game3 {
 		registries.at(json.at(0).get<Identifier>())->toUnnamed()->add(*this, json.at(1));
 	}
 
-	std::tuple<bool, Glib::ustring> Game::runCommand(const Glib::ustring &command) {
+	std::tuple<bool, std::string> Game::runCommand(const PlayerPtr &player, const std::string &command) {
 		if (command.empty())
 			return {false, "Command is empty."};
 
-		const auto words = Glib::Regex::split_simple(" ", command);
+		const auto words = split(command, " ", false);
 		const auto &first = words.at(0);
 
 		// TODO: command registry...?
@@ -417,15 +419,15 @@ namespace Game3 {
 						return {false, "Invalid count."};
 					}
 				}
-				Glib::ustring item_name = words.at(1);
+				std::string_view item_name = words.at(1);
 				size_t colon = item_name.find(':');
 				if (colon == item_name.npos)
-					item_name = "base:item/" + item_name;
-				if (auto item = registry<ItemRegistry>()[Identifier(item_name.raw())]) {
+					item_name = "base:item/" + std::string(item_name);
+				if (auto item = registry<ItemRegistry>()[Identifier(item_name)]) {
 					player->give(ItemStack(*this, item, count));
 					return {true, "Gave " + std::to_string(count) + " x " + item->name};
 				}
-				return {false, "Unknown item: " + item_name};
+				return {false, "Unknown item: " + std::string(item_name)};
 			} else if (first == "heldL" || first == "heldR") {
 				if (words.size() != 2)
 					return {false, "Invalid number of arguments."};
@@ -441,8 +443,8 @@ namespace Game3 {
 					player->setHeldRight(slot);
 				return {true, "Set held slot to " + std::to_string(slot)};
 			} else if (first == "h") {
-				runCommand("heldL 0");
-				runCommand("heldR 1");
+				runCommand(player, "heldL 0");
+				runCommand(player, "heldR 1");
 			}
 		} catch (const std::exception &err) {
 			return {false, err.what()};
@@ -451,94 +453,12 @@ namespace Game3 {
 		return {false, "Unknown command."};
 	}
 
-	void Game::tick() {
-		auto now = getTime();
-		auto difference = now - lastTime;
-		lastTime = now;
-		delta = std::chrono::duration_cast<std::chrono::nanoseconds>(difference).count() / 1'000'000'000.;
-		for (auto &[id, realm]: realms)
-			realm->tick(delta);
-		player->ticked = false;
-	}
-
 	RealmID Game::newRealmID() const {
 		// TODO: a less stupid way of doing this.
 		RealmID max = 1;
 		for (const auto &[id, realm]: realms)
 			max = std::max(max, id);
 		return max + 1;
-	}
-
-	void Game::setText(const Glib::ustring &text, const Glib::ustring &name, bool focus, bool ephemeral) {
-		assert(canvas);
-		if (canvas->window.textTab) {
-			auto &tab = *canvas->window.textTab;
-			tab.text = text;
-			tab.name = name;
-			tab.ephemeral = ephemeral;
-			if (focus)
-				tab.show();
-			tab.reset(shared_from_this());
-		}
-	}
-
-	const Glib::ustring & Game::getText() const {
-		assert(canvas);
-		if (canvas->window.textTab)
-			return canvas->window.textTab->text;
-		throw std::runtime_error("Can't get text: TextTab is null");
-	}
-
-	void Game::click(int button, int, double pos_x, double pos_y) {
-		if (!activeRealm)
-			return;
-
-		assert(canvas);
-		auto &realm = *activeRealm;
-		const auto width  = canvas->width();
-		const auto height = canvas->height();
-
-		// Lovingly chosen by trial and error.
-		if (0 < realm.ghostCount && width - 40.f <= pos_x && pos_x < width - 16.f && height - 40.f <= pos_y && pos_y < height - 16.f) {
-			realm.confirmGhosts();
-			return;
-		}
-
-		const auto [x, y] = translateCanvasCoordinates(pos_x, pos_y);
-
-		if (button == 1) {
-			if (auto *stack = player->inventory->getActive())
-				stack->item->use(player->inventory->activeSlot, *stack, {{y, x}, activeRealm, player}, {});
-		} else if (button == 3 && player && !realm.rightClick({y, x}, pos_x, pos_y) && debugMode) {
-			player->teleport({y, x});
-		}
-	}
-
-	Position Game::translateCanvasCoordinates(double x, double y) const {
-		auto &realm = *activeRealm;
-		assert(canvas);
-		const auto scale = canvas->scale;
-		const auto tile_size  = realm.getTileset().getTileSize();
-		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
-		x -= canvas->width() / 2.f - (map_length * tile_size / 4.f) * scale + canvas->center.x() * canvas->magic * scale;
-		y -= canvas->height() / 2.f - (map_length * tile_size / 4.f) * scale + canvas->center.y() * canvas->magic * scale;
-		const double sub_x = x < 0.? 1. : 0.;
-		const double sub_y = y < 0.? 1. : 0.;
-		x /= tile_size * scale / 2.f;
-		y /= tile_size * scale / 2.f;
-		return {static_cast<Index>(x - sub_x), static_cast<Index>(y - sub_y)};
-	}
-
-	Gdk::Rectangle Game::getVisibleRealmBounds() const {
-		assert(canvas);
-		const auto [left,     top] = translateCanvasCoordinates(0., 0.);
-		const auto [right, bottom] = translateCanvasCoordinates(canvas->width(), canvas->height());
-		return {
-			static_cast<int>(left),
-			static_cast<int>(top),
-			static_cast<int>(right - left + 1),
-			static_cast<int>(bottom - top + 1),
-		};
 	}
 
 	double Game::getTotalSeconds() const {
@@ -558,20 +478,12 @@ namespace Game3 {
 		return 3. - 2. * sin(getHour() * 3.1415926 / 24.);
 	}
 
-	void Game::activateContext() {
-		if (side == Side::Client) {
-			assert(canvas);
-			canvas->window.activateContext();
-		}
-	}
-
-	MainWindow & Game::getWindow() {
-		assert(canvas);
-		return canvas->window;
-	}
-
 	GamePtr Game::create(Side side, Canvas *canvas) {
-		auto out = GamePtr(new Game(side, canvas));
+		GamePtr out;
+		if (side == Side::Client)
+			out = GamePtr(new ClientGame(*canvas));
+		else
+			out = GamePtr(new ServerGame);
 		out->initialSetup();
 		return out;
 	}
@@ -586,6 +498,22 @@ namespace Game3 {
 		out->debugMode = json.contains("debugMode")? json.at("debugMode").get<bool>() : false;
 		out->cavesGenerated = json.contains("cavesGenerated")? json.at("cavesGenerated").get<decltype(Game::cavesGenerated)>() : 0;
 		return out;
+	}
+
+	ClientGame & Game::toClient() {
+		return dynamic_cast<ClientGame &>(*this);
+	}
+
+	const ClientGame & Game::toClient() const {
+		return dynamic_cast<const ClientGame &>(*this);
+	}
+
+	ServerGame & Game::toServer() {
+		return dynamic_cast<ServerGame &>(*this);
+	}
+
+	const ServerGame & Game::toServer() const {
+		return dynamic_cast<const ServerGame &>(*this);
 	}
 
 	void to_json(nlohmann::json &json, const Game &game) {
