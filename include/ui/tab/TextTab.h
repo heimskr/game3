@@ -24,8 +24,8 @@ namespace Game3 {
 			Gtk::Widget & getWidget() override { return scrolled; }
 			Glib::ustring getName() override { return name; }
 			void onBlur() override;
-			void update(const std::shared_ptr<Game> &) override;
-			void reset(const std::shared_ptr<Game> &) override;
+			void update(const std::shared_ptr<ClientGame> &) override;
+			void reset(const std::shared_ptr<ClientGame> &) override;
 			Glib::ustring getText() const;
 			void setEditable(bool);
 

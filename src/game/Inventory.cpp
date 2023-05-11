@@ -1,7 +1,7 @@
 #include "entity/Entity.h"
 #include "entity/ItemEntity.h"
 #include "game/Agent.h"
-#include "game/Game.h"
+#include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "realm/Realm.h"
 #include "recipe/CraftingRecipe.h"
@@ -365,9 +365,9 @@ namespace Game3 {
 	void Inventory::notifyOwner() {
 		if (auto locked_owner = owner.lock()) {
 			if (auto player = std::dynamic_pointer_cast<Player>(locked_owner))
-				player->getRealm()->getGame().signal_player_inventory_update().emit(player);
+				player->getRealm()->getGame().toClient().signal_player_inventory_update().emit(player);
 			else
-				locked_owner->getRealm()->getGame().signal_other_inventory_update().emit(locked_owner);
+				locked_owner->getRealm()->getGame().toClient().signal_other_inventory_update().emit(locked_owner);
 		}
 	}
 

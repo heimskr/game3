@@ -15,7 +15,7 @@
 #include "util/GL.h"
 
 namespace Game3 {
-	class Game;
+	class ClientGame;
 	class MainWindow;
 	class Realm;
 
@@ -25,7 +25,7 @@ namespace Game3 {
 			constexpr static int AUTOFOCUS_DELAY = 1;
 
 			MainWindow &window;
-			std::shared_ptr<Game> game;
+			std::shared_ptr<ClientGame> game;
 			Eigen::Vector2f center {0.f, 0.f};
 			float scale = DEFAULT_SCALE;
 			SpriteRenderer spriteRenderer {*this};

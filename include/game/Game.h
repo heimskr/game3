@@ -20,6 +20,7 @@
 namespace Game3 {
 	class Canvas;
 	class ClientGame;
+	class LocalServer;
 	class MainWindow;
 	class Menu;
 	class Player;
@@ -47,6 +48,8 @@ namespace Game3 {
 			RealmPtr activeRealm;
 
 			RegistryRegistry registries;
+
+			virtual ~Game() = default;
 
 			template <typename T>
 			T & registry() {
@@ -78,8 +81,6 @@ namespace Game3 {
 			void traverseData(const std::filesystem::path &);
 			void loadDataFile(const std::filesystem::path &);
 			void addRecipe(const nlohmann::json &);
-			// Returns whether the command executed successfully and a message.
-			std::tuple<bool, std::string> runCommand(const PlayerPtr &, const std::string &);
 			RealmID newRealmID() const;
 			double getTotalSeconds() const;
 			double getHour() const;
@@ -89,14 +90,18 @@ namespace Game3 {
 
 			virtual Side getSide() const = 0;
 
-			static std::shared_ptr<Game> create(Side, Canvas * = nullptr);
-			static std::shared_ptr<Game> fromJSON(Side, const nlohmann::json &, Canvas * = nullptr);
+			using ServerArgument = std::variant<Canvas *, std::shared_ptr<LocalServer>>;
+
+			static std::shared_ptr<Game> create(Side, const ServerArgument &);
+			static std::shared_ptr<Game> fromJSON(Side, const nlohmann::json &, const ServerArgument &);
 
 			ClientGame & toClient();
 			const ClientGame & toClient() const;
+			std::shared_ptr<ClientGame> toClientPointer();
 
 			ServerGame & toServer();
 			const ServerGame & toServer() const;
+			std::shared_ptr<ServerGame> toServerPointer();
 
 		protected:
 			Game() = default;

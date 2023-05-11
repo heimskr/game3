@@ -1,8 +1,12 @@
+#include "ThreadContext.h"
 #include "Tileset.h"
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
+#include "net/LocalClient.h"
+#include "packet/CommandPacket.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
+#include "ui/tab/TextTab.h"
 
 namespace Game3 {
 	void ClientGame::click(int button, int, double pos_x, double pos_y) {
@@ -70,7 +74,7 @@ namespace Game3 {
 			tab.ephemeral = ephemeral;
 			if (focus)
 				tab.show();
-			tab.reset(shared_from_this());
+			tab.reset(toClientPointer());
 		}
 	}
 
@@ -78,5 +82,10 @@ namespace Game3 {
 		if (canvas.window.textTab)
 			return canvas.window.textTab->text;
 		throw std::runtime_error("Can't get text: TextTab is null");
+	}
+
+	void ClientGame::runCommand(const std::string &command) {
+		CommandPacket packet(threadContext.rng(), command);
+		client->send(packet);
 	}
 }

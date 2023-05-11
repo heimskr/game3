@@ -22,9 +22,9 @@ namespace Game3 {
 
 			Gtk::Widget & getWidget() override { return scrolled; }
 			Glib::ustring getName() override { return merchantName.empty()? "Merchant" : merchantName; }
-			void onResize(const std::shared_ptr<Game> &) override;
-			void update(const std::shared_ptr<Game> &) override;
-			void reset(const std::shared_ptr<Game> &) override;
+			void onResize(const std::shared_ptr<ClientGame> &) override;
+			void update(const std::shared_ptr<ClientGame> &) override;
+			void reset(const std::shared_ptr<ClientGame> &) override;
 			void setMerchantInventory(const Glib::ustring &name, const std::shared_ptr<Inventory> &, double price_multiplier);
 			void resetMerchantInventory();
 			std::shared_ptr<Inventory> getMerchantInventory() const { return merchantInventory; }
@@ -49,15 +49,15 @@ namespace Game3 {
 			std::unordered_map<Gtk::Widget *, Slot> widgetMap;
 
 			/** We can't store state in a popover, so we have to store it here. */
-			std::shared_ptr<Game> lastGame;
+			std::shared_ptr<ClientGame> lastGame;
 			Slot lastSlot = -1;
 			bool lastMerchant = false;
 			double priceMultiplier = 1.;
 			Slot draggedSlot = -1;
 
 			int gridWidth() const;
-			void leftClick(const std::shared_ptr<Game> &, Gtk::Widget *, int click_count, Slot, bool merchant, double x, double y);
-			void rightClick(const std::shared_ptr<Game> &, Gtk::Widget *, int click_count, Slot, bool merchant, double x, double y);
+			void leftClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, bool merchant, double x, double y);
+			void rightClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, bool merchant, double x, double y);
 			Gtk::Widget & getDraggedItem();
 	};
 }

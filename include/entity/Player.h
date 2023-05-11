@@ -7,7 +7,7 @@
 #include "ui/Modifiers.h"
 
 namespace Game3 {
-	class GameClient;
+	class RemoteClient;
 
 	class Player: public Entity {
 		public:
@@ -25,7 +25,7 @@ namespace Game3 {
 			bool continuousInteraction = false;
 			bool ticked = false;
 			/** Server-side only. */
-			std::shared_ptr<GameClient> client;
+			std::shared_ptr<RemoteClient> client;
 
 			std::optional<Place> lastContinousInteraction;
 			Modifiers continuousInteractionModifiers;

@@ -28,9 +28,9 @@ namespace Game3 {
 		explicit operator std::string() const;
 	};
 
-	Buffer & operator+=(Buffer &, const Position &);
-	Buffer & operator<<(Buffer &, const Position &);
-	Buffer & operator>>(Buffer &, Position &);
+	Buffer & operator+=(Buffer &, const ChunkPosition &);
+	Buffer & operator<<(Buffer &, const ChunkPosition &);
+	Buffer & operator>>(Buffer &, ChunkPosition &);
 
 	void from_json(const nlohmann::json &, ChunkPosition &);
 	void to_json(nlohmann::json &, const ChunkPosition &);

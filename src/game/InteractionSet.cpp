@@ -43,7 +43,6 @@ namespace Game3 {
 				if (*tile2 == "base:tile/ash"_id) {
 					realm.setTile(2, position, "base:tile/empty"_id);
 					player.give({game, "base:item/ash"_id, 1});
-					realm.getGame().activateContext();
 					realm.reupload();
 					return true;
 				}

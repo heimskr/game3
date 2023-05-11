@@ -10,6 +10,7 @@
 #include "game/ClientGame.h"
 #include "game/Game.h"
 #include "game/InteractionSet.h"
+#include "game/ServerGame.h"
 #include "realm/Keep.h"
 #include "realm/Realm.h"
 #include "realm/RealmFactory.h"

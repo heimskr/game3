@@ -23,8 +23,8 @@ namespace Game3 {
 
 			Gtk::Widget & getWidget() override { return scrolled; }
 			Glib::ustring getName() override { return "Crafting"; }
-			void update(const std::shared_ptr<Game> &) override;
-			void reset(const std::shared_ptr<Game> &) override;
+			void update(const std::shared_ptr<ClientGame> &) override;
+			void reset(const std::shared_ptr<ClientGame> &) override;
 
 		private:
 			Gtk::ScrolledWindow scrolled;
@@ -33,15 +33,15 @@ namespace Game3 {
 			std::vector<std::unique_ptr<Gtk::Widget>> widgets;
 
 			/** We can't store state in a popover, so we have to store it here. */
-			std::shared_ptr<Game> lastGame;
+			std::shared_ptr<ClientGame> lastGame;
 			size_t lastRegistryID = 0;
 
 			/** Returns whether crafting was successful. */
-			bool craftOne(const std::shared_ptr<Game> &, size_t registry_id);
+			bool craftOne(const std::shared_ptr<ClientGame> &, size_t registry_id);
 
-			size_t craftAll(const std::shared_ptr<Game> &, size_t registry_id);
+			size_t craftAll(const std::shared_ptr<ClientGame> &, size_t registry_id);
 
-			void leftClick(const std::shared_ptr<Game> &, Gtk::Widget *, size_t registry_id, int n, double x, double y);
-			void rightClick(const std::shared_ptr<Game> &, Gtk::Widget *, size_t registry_id, double x, double y);
+			void leftClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, size_t registry_id, int n, double x, double y);
+			void rightClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, size_t registry_id, double x, double y);
 	};
 }

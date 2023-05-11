@@ -4,7 +4,7 @@
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 
-#include "game/Game.h"
+#include "game/ClientGame.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 
@@ -19,7 +19,6 @@ namespace Game3 {
 	void Canvas::drawGL() {
 		if (!game)
 			return;
-		game->tick();
 		spriteRenderer.update(width(), height());
 		rectangleRenderer.update(width(), height());
 		if (game->activeRealm)

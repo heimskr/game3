@@ -4,7 +4,7 @@
 #include <random>
 
 #include "App.h"
-#include "net/GameServer.h"
+#include "net/LocalServer.h"
 
 namespace Game3 {
 	void test();
@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
 
 	if (2 <= argc) {
 		if (strcmp(argv[1], "-s") == 0)
-			return Game3::GameServer::main(argc, argv);
+			return Game3::LocalServer::main(argc, argv);
 
 		if (strcmp(argv[1], "-t") == 0) {
 			Game3::test();

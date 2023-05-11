@@ -9,7 +9,7 @@
 #include "Texture.h"
 #include "Tileset.h"
 #include "resources.h"
-#include "game/Game.h"
+#include "game/ClientGame.h"
 #include "ui/Canvas.h"
 #include "ui/SpriteRenderer.h"
 #include "util/GL.h"

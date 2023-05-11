@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "game/Game.h"
+#include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "item/Tool.h"
 #include "ui/MainWindow.h"
@@ -131,18 +131,18 @@ namespace Game3 {
 		}
 	}
 
-	void InventoryTab::onResize(const std::shared_ptr<Game> &game) {
+	void InventoryTab::onResize(const std::shared_ptr<ClientGame> &game) {
 		if (gridWidth() != lastGridWidth)
 			reset(game);
 	}
 
-	void InventoryTab::update(const std::shared_ptr<Game> &game) {
+	void InventoryTab::update(const std::shared_ptr<ClientGame> &game) {
 		if (!game)
 			return;
 		// TODO: implement update
 	}
 
-	void InventoryTab::reset(const std::shared_ptr<Game> &game) {
+	void InventoryTab::reset(const std::shared_ptr<ClientGame> &game) {
 		if (!game)
 			return;
 
@@ -245,7 +245,7 @@ namespace Game3 {
 		externalName = name;
 		if (inventory)
 			if (auto owner = inventory->owner.lock())
-				reset(owner->getRealm()->getGame().shared_from_this());
+				reset(owner->getRealm()->getGame().toClientPointer());
 	}
 
 	void InventoryTab::resetExternalInventory() {
@@ -261,7 +261,7 @@ namespace Game3 {
 		return scrolled.get_width() / (TILE_SIZE + 2 * TILE_MARGIN);
 	}
 
-	void InventoryTab::leftClick(const std::shared_ptr<Game> &game, Gtk::Widget *, int, Slot slot, bool external, double, double) {
+	void InventoryTab::leftClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *, int, Slot slot, bool external, double, double) {
 		mainWindow.onBlur();
 
 		if (!external) {
@@ -270,7 +270,7 @@ namespace Game3 {
 		}
 	}
 
-	void InventoryTab::rightClick(const std::shared_ptr<Game> &game, Gtk::Widget *widget, int, Slot slot, bool external, double x, double y) {
+	void InventoryTab::rightClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *widget, int, Slot slot, bool external, double x, double y) {
 		mainWindow.onBlur();
 
 		if ((external && !externalInventory->contains(slot)) || (!external && !game->player->inventory->contains(slot)))
@@ -295,7 +295,7 @@ namespace Game3 {
 		popoverMenu.popup();
 	}
 
-	void InventoryTab::updatePlayerClasses(const std::shared_ptr<Game> &game) {
+	void InventoryTab::updatePlayerClasses(const std::shared_ptr<ClientGame> &game) {
 		const Slot active_slot = game->player->inventory->activeSlot;
 		if (playerWidgetsBySlot.contains(active_slot))
 			playerWidgetsBySlot.at(active_slot)->add_css_class("active-slot");

@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "game/Game.h"
+#include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "recipe/CraftingRecipe.h"
 #include "registry/Registries.h"
@@ -33,9 +33,9 @@ namespace Game3 {
 		popoverMenu.set_parent(mainWindow); // TODO: fix this silliness
 	}
 
-	void CraftingTab::update(const std::shared_ptr<Game> &) {}
+	void CraftingTab::update(const std::shared_ptr<ClientGame> &) {}
 
-	void CraftingTab::reset(const std::shared_ptr<Game> &game) {
+	void CraftingTab::reset(const std::shared_ptr<ClientGame> &game) {
 		if (!game)
 			return;
 
@@ -126,7 +126,7 @@ namespace Game3 {
 		}
 	}
 
-	bool CraftingTab::craftOne(const std::shared_ptr<Game> &game, size_t registry_id) {
+	bool CraftingTab::craftOne(const std::shared_ptr<ClientGame> &game, size_t registry_id) {
 		auto recipe = game->registries.get<CraftingRecipeRegistry>()[registry_id];
 		auto inventory = game->player->inventory;
 		std::vector<ItemStack> leftovers;
@@ -137,20 +137,20 @@ namespace Game3 {
 		return true;
 	}
 
-	size_t CraftingTab::craftAll(const std::shared_ptr<Game> &game, size_t registry_id) {
+	size_t CraftingTab::craftAll(const std::shared_ptr<ClientGame> &game, size_t registry_id) {
 		size_t out = 0;
 		while (craftOne(game, registry_id))
 			++out;
 		return out;
 	}
 
-	void CraftingTab::leftClick(const std::shared_ptr<Game> &game, Gtk::Widget *, size_t registry_id, int n, double, double) {
+	void CraftingTab::leftClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *, size_t registry_id, int n, double, double) {
 		mainWindow.onBlur();
 		if (n % 2 == 0)
 			craftOne(game, registry_id);
 	}
 
-	void CraftingTab::rightClick(const std::shared_ptr<Game> &game, Gtk::Widget *widget, size_t registry_id, double x, double y) {
+	void CraftingTab::rightClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *widget, size_t registry_id, double x, double y) {
 		mainWindow.onBlur();
 		do {
 			const auto allocation = widget->get_allocation();

@@ -20,11 +20,11 @@ namespace Game3 {
 			hide();
 	}
 
-	void TextTab::update(const std::shared_ptr<Game> &game) {
+	void TextTab::update(const std::shared_ptr<ClientGame> &game) {
 		Tab::update(game);
 	}
 
-	void TextTab::reset(const std::shared_ptr<Game> &game) {
+	void TextTab::reset(const std::shared_ptr<ClientGame> &game) {
 		if (!game)
 			return;
 

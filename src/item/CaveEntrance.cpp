@@ -5,7 +5,7 @@
 #include "Tileset.h"
 #include "entity/Player.h"
 #include "biome/Biome.h"
-#include "game/Game.h"
+#include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "item/CaveEntrance.h"
 #include "realm/Cave.h"
@@ -31,9 +31,9 @@ namespace Game3 {
 		// Resetting the sprite renderer exactly one time fixes things. I'm not sure what the earliest possible time to reset it is.
 		// However, doing it here seems to work.
 		static bool hacked = false;
-		if (!hacked && game.canvas != nullptr) {
-			game.activateContext();
-			game.canvas->spriteRenderer = SpriteRenderer(*game.canvas);
+		if (!hacked && game.getSide() == Side::Client) {
+			auto &client_game = game.toClient();
+			client_game.canvas.spriteRenderer = SpriteRenderer(client_game.canvas);
 			hacked = true;
 		}
 

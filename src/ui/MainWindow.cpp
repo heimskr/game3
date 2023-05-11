@@ -8,7 +8,7 @@
 #include "entity/ItemEntity.h"
 #include "entity/Merchant.h"
 #include "entity/Miner.h"
-#include "game/Game.h"
+#include "game/ClientGame.h"
 #include "game/HasInventory.h"
 #include "game/Inventory.h"
 #include "realm/Overworld.h"
@@ -284,7 +284,7 @@ namespace Game3 {
 	void MainWindow::newGame(size_t seed, const WorldGenParams &params) {
 		Timer timer("NewGame");
 		glArea.get_context()->make_current();
-		game = Game::create(Side::Client, canvas.get());
+		game = std::make_shared<ClientGame>(*canvas);
 		game->initEntities();
 		auto realm = Realm::create<Overworld>(*game, 1, Overworld::ID(), "base:tileset/monomap"_id, seed);
 		realm->outdoors = true;
@@ -312,9 +312,9 @@ namespace Game3 {
 		glArea.get_context()->make_current();
 		const std::string data = readFile(path);
 		if (!data.empty() && data.front() == '{')
-			game = Game::fromJSON(Side::Client, nlohmann::json::parse(data), canvas.get());
+			game = std::dynamic_pointer_cast<ClientGame>(Game::fromJSON(Side::Client, nlohmann::json::parse(data), canvas.get()));
 		else
-			game = Game::fromJSON(Side::Client, nlohmann::json::from_cbor(data), canvas.get());
+			game = std::dynamic_pointer_cast<ClientGame>(Game::fromJSON(Side::Client, nlohmann::json::from_cbor(data), canvas.get()));
 		game->initEntities();
 		for (const auto &entity: game->activeRealm->entities)
 			if (entity->isPlayer()) {
@@ -671,7 +671,7 @@ namespace Game3 {
 						if (leftover) {
 							auto &realm = *player.getRealm();
 							realm.spawn<ItemEntity>(player.position, *leftover);
-							realm.getGame().signal_player_inventory_update().emit(game->player);
+							game->signal_player_inventory_update().emit(game->player);
 						}
 					}
 					return;
@@ -735,8 +735,7 @@ namespace Game3 {
 						auto *command_dialog = new CommandDialog(*this);
 						dialog.reset(command_dialog);
 						command_dialog->signal_submit().connect([this](const Glib::ustring &command) {
-							auto [success, message] = game->runCommand(command);
-							std::cout << "\e[3" << (success? '2' : '1') << "m" <<  message << "\e[39m\n";
+							game->runCommand(command);
 						});
 						command_dialog->show();
 					}

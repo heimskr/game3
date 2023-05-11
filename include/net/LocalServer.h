@@ -13,22 +13,23 @@
 #include "util/Math.h"
 
 namespace Game3 {
-	class Game;
+	class ServerGame;
 
-	class GameServer: public ApplicationServer {
+	/** Used by servers to represent themselves. */
+	class LocalServer: public ApplicationServer {
 		public:
 			std::shared_ptr<Server> server;
-			std::shared_ptr<Game> game;
+			std::shared_ptr<ServerGame> game;
 
-			GameServer() = delete;
-			GameServer(const GameServer &) = delete;
-			GameServer(GameServer &&) = delete;
-			GameServer(std::shared_ptr<Server>);
+			LocalServer() = delete;
+			LocalServer(const LocalServer &) = delete;
+			LocalServer(LocalServer &&) = delete;
+			LocalServer(std::shared_ptr<Server>);
 
-			~GameServer() override;
+			~LocalServer() override;
 
-			GameServer & operator=(const GameServer &) = delete;
-			GameServer & operator=(GameServer &&) = delete;
+			LocalServer & operator=(const LocalServer &) = delete;
+			LocalServer & operator=(LocalServer &&) = delete;
 
 			void run() override;
 			void stop() override;

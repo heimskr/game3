@@ -26,11 +26,11 @@ namespace Game3 {
 		if (player->getSide() == Side::Client) {
 			auto &game = getRealm()->getGame().toClient();
 			auto &tab = *game.canvas.window.craftingTab;
-			tab.reset(game.shared_from_this());
+			tab.reset(game.toClientPointer());
 			tab.show();
 			player->queueForMove([&game, player, station_type = stationType, &tab](const auto &) {
 				player->stationTypes.erase(station_type);
-				tab.reset(game.shared_from_this());
+				tab.reset(game.toClientPointer());
 				game.getWindow().inventoryTab->show();
 				return true;
 			});

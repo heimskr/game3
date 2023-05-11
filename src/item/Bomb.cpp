@@ -27,7 +27,6 @@ namespace Game3 {
 			}
 		}
 
-		realm.getGame().activateContext();
 		realm.reupload();
 
 		return true;

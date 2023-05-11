@@ -4,7 +4,7 @@
 #include <memory>
 
 namespace Game3 {
-	class Game;
+	class ClientGame;
 
 	class Tab {
 		public:
@@ -18,9 +18,9 @@ namespace Game3 {
 			virtual Glib::ustring getName() = 0;
 			virtual void onFocus() {}
 			virtual void onBlur() {}
-			virtual void onResize(const std::shared_ptr<Game> &) {}
-			virtual void update(const std::shared_ptr<Game> &) {}
-			virtual void reset(const std::shared_ptr<Game> &) {}
+			virtual void onResize(const std::shared_ptr<ClientGame> &) {}
+			virtual void update(const std::shared_ptr<ClientGame> &) {}
+			virtual void reset(const std::shared_ptr<ClientGame> &) {}
 			void hide();
 			void show();
 			void setName(const Glib::ustring &);

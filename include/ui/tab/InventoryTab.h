@@ -6,6 +6,7 @@
 #include "ui/tab/Tab.h"
 
 namespace Game3 {
+	class ClientGame;
 	class Inventory;
 	class MainWindow;
 
@@ -28,9 +29,9 @@ namespace Game3 {
 
 			Gtk::Widget & getWidget() override { return scrolled; }
 			Glib::ustring getName() override { return "Inventory"; }
-			void onResize(const std::shared_ptr<Game> &) override;
-			void update(const std::shared_ptr<Game> &) override;
-			void reset(const std::shared_ptr<Game> &) override;
+			void onResize(const std::shared_ptr<ClientGame> &) override;
+			void update(const std::shared_ptr<ClientGame> &) override;
+			void reset(const std::shared_ptr<ClientGame> &) override;
 			void setExternalInventory(const Glib::ustring &name, const std::shared_ptr<Inventory> &);
 			void resetExternalInventory();
 			std::shared_ptr<Inventory> getExternalInventory() const { return externalInventory; }
@@ -54,7 +55,7 @@ namespace Game3 {
 			Glib::RefPtr<Gio::Menu> gmenuExternal;
 
 			/** We can't store state in a popover, so we have to store it here. */
-			std::shared_ptr<Game> lastGame;
+			std::shared_ptr<ClientGame> lastGame;
 			Slot lastSlot = -1;
 			bool lastExternal = false;
 
@@ -62,8 +63,8 @@ namespace Game3 {
 			bool draggedExternal = false;
 
 			int gridWidth() const;
-			void leftClick(const std::shared_ptr<Game> &, Gtk::Widget *, int click_count, Slot, bool external, double x, double y);
-			void rightClick(const std::shared_ptr<Game> &, Gtk::Widget *, int click_count, Slot, bool external, double x, double y);
-			void updatePlayerClasses(const std::shared_ptr<Game> &);
+			void leftClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, bool external, double x, double y);
+			void rightClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, bool external, double x, double y);
+			void updatePlayerClasses(const std::shared_ptr<ClientGame> &);
 	};
 }

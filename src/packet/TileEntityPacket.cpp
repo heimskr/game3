@@ -26,7 +26,7 @@ namespace Game3 {
 		}
 	}
 
-	void TileEntityPacket::encode(Game &game, Buffer &buffer) {
+	void TileEntityPacket::encode(Game &game, Buffer &buffer) const {
 		assert(tileEntity);
 		buffer << globalID << identifier << realmID;
 		tileEntity->encode(game, buffer);

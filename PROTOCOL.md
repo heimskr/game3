@@ -8,3 +8,5 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 2. Tile Entity
 3. Chunk Request
 4. Tile Update
+5. Command Result
+6. Command

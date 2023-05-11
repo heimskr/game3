@@ -17,7 +17,7 @@ namespace Game3 {
 
 		PacketID getID() const override { return ID(); }
 
-		void encode(Game &, Buffer &buffer) override { buffer << realmID << chunkPosition; }
+		void encode(Game &, Buffer &buffer) const override { buffer << realmID << chunkPosition; }
 		void decode(Game &, Buffer &buffer) override { buffer >> realmID >> chunkPosition; }
 	};
 }

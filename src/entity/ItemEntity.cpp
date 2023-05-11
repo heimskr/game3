@@ -2,7 +2,7 @@
 
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
-#include "game/Game.h"
+#include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
@@ -108,7 +108,6 @@ namespace Game3 {
 		buffer >> needsTexture;
 		stack.decode(game, buffer);
 	}
-
 
 	void to_json(nlohmann::json &json, const ItemEntity &item_entity) {
 		item_entity.toJSON(json);

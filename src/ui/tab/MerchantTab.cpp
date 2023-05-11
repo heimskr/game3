@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "entity/Merchant.h"
-#include "game/Game.h"
+#include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "game/Stonks.h"
 #include "ui/MainWindow.h"
@@ -81,16 +81,16 @@ namespace Game3 {
 		playerGrid.add_controller(target);
 	}
 
-	void MerchantTab::onResize(const std::shared_ptr<Game> &game) {
+	void MerchantTab::onResize(const std::shared_ptr<ClientGame> &game) {
 		if (gridWidth() != lastGridWidth)
 			reset(game);
 	}
 
-	void MerchantTab::update(const std::shared_ptr<Game> &) {
+	void MerchantTab::update(const std::shared_ptr<ClientGame> &) {
 
 	}
 
-	void MerchantTab::reset(const std::shared_ptr<Game> &game) {
+	void MerchantTab::reset(const std::shared_ptr<ClientGame> &game) {
 		if (!game)
 			return;
 
@@ -184,7 +184,7 @@ namespace Game3 {
 		priceMultiplier = price_multiplier;
 		if (inventory)
 			if (auto owner = inventory->owner.lock())
-				reset(owner->getRealm()->getGame().shared_from_this());
+				reset(owner->getRealm()->getGame().toClientPointer());
 	}
 
 	void MerchantTab::resetMerchantInventory() {
@@ -200,7 +200,7 @@ namespace Game3 {
 		return scrolled.get_width() / (TILE_SIZE + 2 * TILE_MARGIN);
 	}
 
-	void MerchantTab::leftClick(const std::shared_ptr<Game> &, Gtk::Widget *, int click_count, Slot slot, bool merchant, double, double) {
+	void MerchantTab::leftClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot slot, bool merchant, double, double) {
 		mainWindow.onBlur();
 
 		if (click_count % 2 == 0) {
@@ -208,7 +208,7 @@ namespace Game3 {
 		}
 	}
 
-	void MerchantTab::rightClick(const std::shared_ptr<Game> &game, Gtk::Widget *widget, int, Slot slot, bool merchant, double x, double y) {
+	void MerchantTab::rightClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *widget, int, Slot slot, bool merchant, double x, double y) {
 		mainWindow.onBlur();
 
 		do {

@@ -12,8 +12,8 @@
 
 namespace Game3 {
 	class Canvas;
+	class ClientGame;
 	class CraftingTab;
-	class Game;
 	class InventoryTab;
 	class MerchantTab;
 	class TextTab;
@@ -25,7 +25,7 @@ namespace Game3 {
 			std::unique_ptr<Gtk::Dialog> dialog;
 			Gtk::HeaderBar *header = nullptr;
 			Gtk::Notebook notebook;
-			std::shared_ptr<Game> game;
+			std::shared_ptr<ClientGame> game;
 			std::shared_ptr<TextTab> textTab;
 			std::shared_ptr<InventoryTab> inventoryTab;
 			std::shared_ptr<MerchantTab> merchantTab;
