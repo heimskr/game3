@@ -9,15 +9,15 @@ namespace Game3 {
 		static PacketID ID() { return 3; }
 
 		RealmID realmID;
-		ChunkPosition chunkPosition;
+		std::set<ChunkPosition> chunkPositions;
 
 		ChunkRequestPacket() = default;
-		ChunkRequestPacket(RealmID realm_id, ChunkPosition chunk_position):
-			realmID(realm_id), chunkPosition(chunk_position) {}
+		ChunkRequestPacket(RealmID realm_id, std::set<ChunkPosition> chunk_positions):
+			realmID(realm_id), chunkPositions(std::move(chunk_positions)) {}
 
 		PacketID getID() const override { return ID(); }
 
-		void encode(Game &, Buffer &buffer) const override { buffer << realmID << chunkPosition; }
-		void decode(Game &, Buffer &buffer)       override { buffer >> realmID >> chunkPosition; }
+		void encode(Game &, Buffer &buffer) const override;
+		void decode(Game &, Buffer &buffer)       override;
 	};
 }

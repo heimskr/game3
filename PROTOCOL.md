@@ -20,13 +20,15 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 3. Chunk Request
 
 	- `i32` Realm ID
-	- `[i32,i32]` Chunk Position
+	- `i32[]` Chunk Positions
+
+	The chunk positions will be sent as interlaced (x, y) pairs.
 
 4. Tile Update
 
 	- `i32` Realm ID
 	- `u8` Layer
-	- `[i64,i64]` Position
+	- `{i64,i64}` Position
 	- `u16` Tile ID
 
 5. Command Result
@@ -43,4 +45,4 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 7. Self Teleported
 
 	- `i32` Realm ID
-	- `[i64,i64]` Position
+	- `{i64,i64}` Position

@@ -35,5 +35,7 @@ namespace Game3 {
 			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update_;
 			sigc::signal<void(const PlayerPtr &)> signal_player_money_update_;
 			sigc::signal<void(const std::shared_ptr<HasRealm> &)> signal_other_inventory_update_;
+
+			size_t chunksAwaited = 0;
 	};
 }

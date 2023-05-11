@@ -1,9 +1,11 @@
+#include "Log.h"
 #include "ThreadContext.h"
 #include "Tileset.h"
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "net/LocalClient.h"
 #include "packet/CommandPacket.h"
+#include "packet/ChunkRequestPacket.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "ui/tab/TextTab.h"
@@ -90,6 +92,23 @@ namespace Game3 {
 	}
 
 	void ClientGame::tick() {
+		if (!player) {
+			WARN("No player");
+			return;
+		}
 
+		if (auto realm = player->getRealm()) {
+			if (chunksAwaited == 0) {
+				auto missing = realm->getMissingChunks();
+				// SPAM("missing: " << missing.size());
+				if (!missing.empty()) {
+					SPAM("Sending chunk request");
+					chunksAwaited = missing.size();
+					client->send(ChunkRequestPacket(realm->id, std::move(missing)));
+				}
+			}
+		} else {
+			WARN("No realm");
+		}
 	}
 }

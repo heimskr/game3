@@ -28,6 +28,7 @@ namespace Game3 {
 		explicit operator std::string() const;
 	};
 
+
 	Buffer & operator+=(Buffer &, const ChunkPosition &);
 	Buffer & operator<<(Buffer &, const ChunkPosition &);
 	Buffer & operator>>(Buffer &, ChunkPosition &);

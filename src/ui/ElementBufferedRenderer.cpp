@@ -198,7 +198,7 @@ namespace Game3 {
 		const float divisor = set_width;
 		const float t_size = 1.f / divisor - TILE_TEXTURE_PADDING * 2;
 
-		vboIsWeird = false;
+		isMissing = false;
 
 		const TileID missing = tileset["base:tile/void"];
 
@@ -209,7 +209,7 @@ namespace Game3 {
 			));
 			TileID tile;
 			if (!tile_opt) {
-				vboIsWeird = true;
+				isMissing = true;
 				tile = missing;
 			} else
 				tile = *tile_opt;

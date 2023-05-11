@@ -25,6 +25,7 @@ namespace Game3 {
 			int backbufferHeight = -1;
 			Alignment horizontal;
 			Alignment vertical;
+			bool isMissing = false;
 
 			Eigen::Vector2f center {0.f, 0.f};
 			std::shared_ptr<Tileset> tileset;
@@ -71,7 +72,6 @@ namespace Game3 {
 			Chunk<TileID> *chunk = nullptr;
 			TileProvider *provider = nullptr;
 			std::vector<TileID> tileCache;
-			bool vboIsWeird = false;
 			bool positionDirty = false;
 			ChunkPosition chunkPosition;
 

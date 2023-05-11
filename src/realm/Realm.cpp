@@ -683,6 +683,33 @@ namespace Game3 {
 		return getGame().getSide();
 	}
 
+	std::set<ChunkPosition> Realm::getMissingChunks() const {
+		assert(getSide() == Side::Client);
+		std::set<ChunkPosition> out;
+		auto &player = getGame().toClient().player;
+
+		auto chunk_pos = getChunkPosition(player->getPosition());
+		chunk_pos.y -= REALM_DIAMETER / 2;
+		chunk_pos.x -= REALM_DIAMETER / 2;
+
+		const auto original_x = chunk_pos.x;
+
+		for (const auto &row: renderers) {
+			chunk_pos.x = original_x;
+
+			for (const auto &layers: row) {
+				for (const auto &renderer: layers)
+					if (renderer.isMissing)
+						out.insert(chunk_pos);
+				++chunk_pos.x;
+			}
+
+			++chunk_pos.y;
+		}
+
+		return out;
+	}
+
 	bool Realm::rightClick(const Position &position, double x, double y) {
 		if (getSide() != Side::Client)
 			return false;
