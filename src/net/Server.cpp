@@ -211,7 +211,7 @@ namespace Game3 {
 		if (listener == nullptr) {
 			event_base_free(base);
 			char error[64] = "?";
-			if (!strerror_r(errno, error, sizeof(error)))
+			if (!strerror_r(errno, error, sizeof(error)) || strcmp(error, "?") == 0)
 				throw std::runtime_error("Couldn't initialize libevent listener (" + std::to_string(errno) + ')');
 			throw std::runtime_error("Couldn't initialize libevent listener: " + std::string(error));
 		}
