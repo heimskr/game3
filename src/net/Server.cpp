@@ -312,33 +312,31 @@ namespace Game3 {
 			auto clients_lock = server.lockClients();
 			const int client_id = clients.at(descriptor);
 
-			GenericClient *client_pointer;
+			std::shared_ptr<GenericClient> client;
 			try {
-				client_pointer = server.allClients.at(client_id).get();
+				client = server.allClients.at(client_id);
 			} catch (const std::out_of_range &) {
 				// Seems the client isn't ready for reading yet.
 				ERROR("Client " << client_id << " doesn't have an instance yet");
 				return;
 			}
 
-			auto &client = *client_pointer;
-
 			while (0 < readable) {
 				size_t to_read = std::min(bufferSize, readable);
-				const bool use_max_read = 0 < client.maxRead;
+				const bool use_max_read = 0 < client->maxRead;
 
 				if (use_max_read)
-					to_read = std::min(to_read, client.maxRead);
+					to_read = std::min(to_read, client->maxRead);
 
 				const int byte_count = evbuffer_remove(input, buffer.get(), to_read);
 
 				if (use_max_read)
-					client.maxRead -= byte_count;
+					client->maxRead -= byte_count;
 
 				if (byte_count < 0)
 					throw NetError("Reading", errno);
 
-				server.handleMessage(client, {buffer.get(), static_cast<size_t>(byte_count)});
+				server.handleMessage(*client, {buffer.get(), static_cast<size_t>(byte_count)});
 				readable = evbuffer_get_length(input);
 			}
 		} catch (const std::runtime_error &err) {

@@ -3,7 +3,7 @@
 #include "ThreadContext.h"
 #include "Tileset.h"
 #include "entity/Miner.h"
-#include "game/Game.h"
+#include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "game/Stonks.h"
 #include "net/Buffer.h"
@@ -56,7 +56,7 @@ namespace Game3 {
 		std::cout << "Miner: money = " << money << ", phase = " << int(phase) << ", stuck = " << stuck << '\n';
 
 		if (getSide() == Side::Client) {
-			auto &tab = *getRealm()->getGame().canvas->window.inventoryTab;
+			auto &tab = *getRealm()->getGame().toClient().canvas.window.inventoryTab;
 			player->queueForMove([player, &tab](const auto &) {
 				tab.resetExternalInventory();
 				return true;

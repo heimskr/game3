@@ -127,7 +127,7 @@ namespace Game3 {
 			std::map<int, int> descriptors;
 
 			/** Maps client IDs to client instances. Lock clientsMutex before using. */
-			std::map<int, std::unique_ptr<GenericClient>> allClients;
+			std::map<int, std::shared_ptr<GenericClient>> allClients;
 
 			/** Maps descriptors to bufferevents. Lock descriptorsMutex before using. */
 			std::map<int, bufferevent *> bufferEvents;

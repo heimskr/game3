@@ -2,7 +2,7 @@
 
 #include "Tileset.h"
 #include "entity/Player.h"
-#include "game/Game.h"
+#include "game/ClientGame.h"
 #include "realm/Realm.h"
 #include "tileentity/Sign.h"
 #include "ui/Canvas.h"
@@ -21,12 +21,14 @@ namespace Game3 {
 	}
 
 	bool Sign::onInteractNextTo(const std::shared_ptr<Player> &player) {
-		getRealm()->getGame().setText(text, name, true, true);
-		if (getSide() == Side::Client)
-			player->queueForMove([player](const auto &) {
-				player->getRealm()->getGame().canvas->window.textTab->hide();
+		if (getSide() == Side::Client) {
+			auto &game = getRealm()->getGame().toClient();
+			game.setText(text, name, true, true);
+			player->queueForMove([&game, player](const auto &) {
+				game.canvas.window.textTab->hide();
 				return true;
 			});
+		}
 		return true;
 	}
 

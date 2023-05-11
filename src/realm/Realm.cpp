@@ -7,6 +7,7 @@
 #include "Tileset.h"
 #include "biome/Biome.h"
 #include "entity/Entity.h"
+#include "game/ClientGame.h"
 #include "game/Game.h"
 #include "game/InteractionSet.h"
 #include "realm/Keep.h"
@@ -118,7 +119,7 @@ namespace Game3 {
 		if (!focused)
 			onFocus();
 
-		Canvas &canvas = *game.canvas;
+		Canvas &canvas = game.toClient().canvas;
 		auto &multiplier = canvas.multiplier;
 
 		const auto bb_width  = width;
@@ -204,7 +205,7 @@ namespace Game3 {
 		if (getSide() != Side::Client)
 			return;
 
-		getGame().activateContext();
+		getGame().toClient().activateContext();
 		for (auto &row: renderers)
 			for (auto &layers: row)
 				for (auto &renderer: layers)
@@ -215,7 +216,7 @@ namespace Game3 {
 		if (getSide() != Side::Client)
 			return;
 
-		getGame().activateContext();
+		getGame().toClient().activateContext();
 		for (auto &row: renderers)
 			for (auto &layers: row)
 				layers[layer - 1].reupload();
@@ -443,8 +444,11 @@ namespace Game3 {
 
 	void Realm::setTile(Layer layer, const Position &position, TileID tile_id, bool run_helper) {
 		tileProvider.findTile(layer, position.row, position.column, TileProvider::TileMode::Create) = tile_id;
-		if (run_helper)
-			setLayerHelper(position.row, position.column);
+		if (isServer()) {
+			if (run_helper)
+				setLayerHelper(position.row, position.column);
+			getGame().toServer().broadcastTileUpdate(id, layer, position, tile_id);
+		}
 	}
 
 	void Realm::setTile(Layer layer, const Position &position, const Identifier &tilename, bool run_helper) {
@@ -562,8 +566,10 @@ namespace Game3 {
 			ghost->confirm();
 		}
 
-		game.activateContext();
-		reupload(2);
+		if (getSide() == Side::Client) {
+			game.toClient().activateContext();
+			reupload(2);
+		}
 	}
 
 	void Realm::damageGround(const Position &position) {
@@ -673,11 +679,15 @@ namespace Game3 {
 	}
 
 	Side Realm::getSide() const {
-		return getGame().side;
+		return getGame().getSide();
 	}
 
 	bool Realm::rightClick(const Position &position, double x, double y) {
-		const auto player     = getGame().player;
+		if (getSide() != Side::Client)
+			return false;
+
+		auto &game = getGame().toClient();
+		const auto player     = game.player;
 		const auto player_pos = player->getPosition();
 		const bool overlap    = player_pos == position;
 		const bool adjacent   = position.adjacent4(player_pos);
@@ -700,7 +710,7 @@ namespace Game3 {
 				});
 			}
 
-			auto &window = getGame().getWindow();
+			auto &window = game.getWindow();
 			auto &menu = window.glMenu;
 			window.remove_action_group("entity_menu");
 			window.insert_action_group("entity_menu", group);

@@ -3,6 +3,7 @@
 #include "ThreadContext.h"
 #include "Tileset.h"
 #include "entity/Woodcutter.h"
+#include "game/ClientGame.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "game/Stonks.h"
@@ -53,7 +54,7 @@ namespace Game3 {
 
 	bool Woodcutter::onInteractNextTo(const std::shared_ptr<Player> &player) {
 		if (getSide() == Side::Client) {
-			auto &tab = *getRealm()->getGame().canvas->window.inventoryTab;
+			auto &tab = *getRealm()->getGame().toClient().getWindow().inventoryTab;
 			std::cout << "Woodcutter: money = " << money << ", phase = " << int(phase) << ", stuck = " << stuck << '\n';
 			player->queueForMove([player, &tab](const auto &) {
 				tab.resetExternalInventory();

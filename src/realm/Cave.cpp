@@ -63,7 +63,6 @@ namespace Game3 {
 			if (auto *stack = inventory.getActive()) {
 				if (stack->hasAttribute("base:attribute/pickaxe"_id) && !inventory.add(*ore_stack)) {
 					setTile(2, position, tileset.getEmpty());
-					getGame().activateContext();
 					reupload(2);
 					reveal(position);
 					if (stack->reduceDurability())

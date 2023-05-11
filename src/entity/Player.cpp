@@ -2,7 +2,7 @@
 
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
-#include "game/Game.h"
+#include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "item/Tool.h"
 #include "net/Buffer.h"
@@ -94,13 +94,15 @@ namespace Game3 {
 		game.activeRealm = new_realm;
 		if (getSide() == Side::Client) {
 			new_realm->reupload();
-			focus(*game.canvas, false);
+			focus(game.toClient().canvas, false);
 		}
 	}
 
 	void Player::addMoney(MoneyCount to_add) {
 		money += to_add;
-		getRealm()->getGame().signal_player_money_update().emit(std::dynamic_pointer_cast<Player>(shared_from_this()));
+		auto &game = getRealm()->getGame();
+		if (game.getSide() == Side::Client)
+			game.toClient().signal_player_money_update().emit(std::dynamic_pointer_cast<Player>(shared_from_this()));
 	}
 
 	bool Player::setTooldown(float multiplier) {
@@ -114,9 +116,9 @@ namespace Game3 {
 
 	void Player::showText(const Glib::ustring &text, const Glib::ustring &name) {
 		if (getSide() == Side::Client) {
-			getRealm()->getGame().setText(text, name, true, true);
+			getRealm()->getGame().toClient().setText(text, name, true, true);
 			queueForMove([player = shared_from_this()](const auto &) {
-				player->getRealm()->getGame().canvas->window.textTab->hide();
+				player->getRealm()->getGame().toClient().canvas.window.textTab->hide();
 				return true;
 			});
 		}
@@ -133,6 +135,11 @@ namespace Game3 {
 
 	bool Player::isMoving() const {
 		return movingUp || movingRight || movingDown || movingLeft;
+	}
+
+	bool Player::canSee(RealmID realm_id, const Position &pos) {
+		const auto &realm = *getRealm();
+		return realm.id == realm_id && realm.isVisible(pos);
 	}
 
 	void Player::encode(Game &game, Buffer &buffer) {

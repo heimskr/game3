@@ -7,6 +7,8 @@
 #include "ui/Modifiers.h"
 
 namespace Game3 {
+	class GameClient;
+
 	class Player: public Entity {
 		public:
 			static Identifier ID() { return {"base", "entity/player"}; }
@@ -22,6 +24,8 @@ namespace Game3 {
 			/** When moving with shift held, the player will interact with each spot moved to. */
 			bool continuousInteraction = false;
 			bool ticked = false;
+			/** Server-side only. */
+			std::shared_ptr<GameClient> client;
 
 			std::optional<Place> lastContinousInteraction;
 			Modifiers continuousInteractionModifiers;
@@ -47,6 +51,7 @@ namespace Game3 {
 			void give(const ItemStack &, Slot start = -1);
 			Place getPlace() override;
 			bool isMoving() const;
+			bool canSee(RealmID, const Position &);
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
 

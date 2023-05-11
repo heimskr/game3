@@ -11,6 +11,8 @@
 #include "Types.h"
 
 namespace Game3 {
+	class Buffer;
+
 	struct ChunkPosition {
 		int32_t x = 0;
 		int32_t y = 0;
@@ -25,6 +27,10 @@ namespace Game3 {
 
 		explicit operator std::string() const;
 	};
+
+	Buffer & operator+=(Buffer &, const Position &);
+	Buffer & operator<<(Buffer &, const Position &);
+	Buffer & operator>>(Buffer &, Position &);
 
 	void from_json(const nlohmann::json &, ChunkPosition &);
 	void to_json(nlohmann::json &, const ChunkPosition &);

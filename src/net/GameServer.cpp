@@ -15,7 +15,7 @@
 namespace Game3 {
 	GameServer::GameServer(std::shared_ptr<Server> server_): server(std::move(server_)) {
 		server->addClient = [this](auto &, int new_client, std::string_view ip) {
-			auto game_client = std::make_unique<GameClient>(*this, new_client, ip);
+			auto game_client = std::make_shared<GameClient>(*this, new_client, ip);
 			server->getClients().try_emplace(new_client, std::move(game_client));
 			INFO("Adding " << new_client << " from " << ip);
 		};

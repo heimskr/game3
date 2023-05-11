@@ -6,6 +6,7 @@
 #include "data/Identifier.h"
 #include "entity/Entity.h"
 #include "entity/EntityFactory.h"
+#include "game/ClientGame.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "net/Buffer.h"
@@ -405,7 +406,7 @@ namespace Game3 {
 		const auto pos = getPosition();
 		auto &realm = *getRealm();
 		if (getSide() == Side::Client)
-			return realm.getGame().canvas->inBounds(pos) && realm.isVisible(pos);
+			return realm.getGame().toClient().canvas.inBounds(pos) && realm.isVisible(pos);
 		return realm.isVisible(pos);
 	}
 
@@ -422,7 +423,7 @@ namespace Game3 {
 	}
 
 	Side Entity::getSide() const {
-		return getGame().side;
+		return getGame().getSide();
 	}
 
 	void Entity::encode(Game &, Buffer &buffer) {

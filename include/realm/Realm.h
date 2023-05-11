@@ -139,6 +139,8 @@ namespace Game3 {
 			Side getSide() const;
 			inline void markGenerated(auto x, auto y) { generatedChunks.insert(ChunkPosition{x, y}); }
 			inline auto pauseUpdates() { return Pauser(shared_from_this()); }
+			inline bool isClient() const { return getSide() == Side::Client; }
+			inline bool isServer() const { return getSide() == Side::Server; }
 
 			virtual bool interactGround(const PlayerPtr &, const Position &, Modifiers);
 			virtual void updateNeighbors(const Position &);

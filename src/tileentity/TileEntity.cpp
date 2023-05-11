@@ -1,4 +1,4 @@
-#include "game/Game.h"
+#include "game/ClientGame.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "tileentity/TileEntity.h"
@@ -34,12 +34,12 @@ namespace Game3 {
 		const auto pos = getPosition();
 		auto &realm = *getRealm();
 		if (getSide() == Side::Client)
-			return realm.getGame().canvas->inBounds(pos) && realm.isVisible(pos);
+			return realm.getGame().toClient().canvas.inBounds(pos) && realm.isVisible(pos);
 		return realm.isVisible(pos);
 	}
 
 	Side TileEntity::getSide() const {
-		return getRealm()->getGame().side;
+		return getRealm()->getGame().getSide();
 	}
 
 	void TileEntity::encode(Game &, Buffer &buffer) {

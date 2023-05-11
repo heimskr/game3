@@ -1,4 +1,8 @@
 #include "game/ServerGame.h"
+#include "net/GameClient.h"
+#include "net/GameServer.h"
+#include "packet/TileUpdatePacket.h"
+#include "util/Util.h"
 
 namespace Game3 {
 	void ServerGame::tick() {
@@ -10,5 +14,15 @@ namespace Game3 {
 			realm->tick(delta);
 		for (const auto &player: players)
 			player->ticked = false;
+	}
+
+	void ServerGame::broadcastTileUpdate(RealmID realm_id, Layer layer, const Position &position, TileID tile_id) {
+		auto lock = lockPlayersShared();
+		for (const auto &player: players) {
+			if (player->canSee(realm_id, position)) {
+				TileUpdatePacket packet(realm_id, layer, position, tile_id);
+				player->client->send(packet);
+			}
+		}
 	}
 }

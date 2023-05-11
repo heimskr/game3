@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "entity/Merchant.h"
-#include "game/Game.h"
+#include "game/ClientGame.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "ui/Canvas.h"
@@ -38,7 +38,7 @@ namespace Game3 {
 
 	bool Merchant::onInteractNextTo(const std::shared_ptr<Player> &player) {
 		if (getSide() == Side::Client) {
-			auto &window = getRealm()->getGame().canvas->window;
+			auto &window = getRealm()->getGame().toClient().canvas.window;
 			auto &tab = *window.merchantTab;
 			player->queueForMove([player, &tab](const auto &) {
 				tab.hide();

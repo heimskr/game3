@@ -3,6 +3,7 @@
 #include "Tileset.h"
 #include "entity/Blacksmith.h"
 #include "entity/Merchant.h"
+#include "game/ClientGame.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "game/Stonks.h"
@@ -59,7 +60,7 @@ namespace Game3 {
 		if (phase != 10) {
 			player->showText("Sorry, I'm not selling anything right now.", "Blacksmith");
 		} else if (getSide() == Side::Client) {
-			auto &window = getRealm()->getGame().canvas->window;
+			auto &window = getRealm()->getGame().toClient().getWindow();
 			auto &tab    = *window.merchantTab;
 			player->queueForMove([player, &tab](const auto &) {
 				tab.hide();
