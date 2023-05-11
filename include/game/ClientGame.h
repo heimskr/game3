@@ -23,6 +23,7 @@ namespace Game3 {
 			void setText(const Glib::ustring &text, const Glib::ustring &name = "", bool focus = true, bool ephemeral = false);
 			const Glib::ustring & getText() const;
 			void runCommand(const std::string &);
+			void tick();
 
 			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update() const { return signal_player_inventory_update_; }
 			sigc::signal<void(const PlayerPtr &)> signal_player_money_update() const { return signal_player_money_update_; }

@@ -11,6 +11,7 @@
 #include "game/ClientGame.h"
 #include "game/HasInventory.h"
 #include "game/Inventory.h"
+#include "net/LocalClient.h"
 #include "realm/Overworld.h"
 #include "tileentity/Building.h"
 #include "tileentity/Teleporter.h"
@@ -284,7 +285,9 @@ namespace Game3 {
 	void MainWindow::newGame(size_t seed, const WorldGenParams &params) {
 		Timer timer("NewGame");
 		glArea.get_context()->make_current();
-		game = std::make_shared<ClientGame>(*canvas);
+		game = std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, canvas.get()));
+		game->client = std::make_shared<LocalClient>();
+		game->client->connect("::1", 12255);
 		game->initEntities();
 		auto realm = Realm::create<Overworld>(*game, 1, Overworld::ID(), "base:tileset/monomap"_id, seed);
 		realm->outdoors = true;

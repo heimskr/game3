@@ -19,6 +19,7 @@ namespace Game3 {
 	void Canvas::drawGL() {
 		if (!game)
 			return;
+		game->tick();
 		spriteRenderer.update(width(), height());
 		rectangleRenderer.update(width(), height());
 		if (game->activeRealm)

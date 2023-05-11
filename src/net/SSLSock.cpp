@@ -1,5 +1,7 @@
 #include <fcntl.h>
+#include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 
 #include "Log.h"
@@ -19,10 +21,13 @@ namespace Game3 {
 		const int status = SSL_write_ex(ssl, data, bytes, &written);
 		if (status == 1) {
 			SPAM("SSLSock::send(status == 1): bytes[" << bytes << "], written[" << written << "]");
-			std::string str = static_cast<const char *>(data);
+			std::stringstream ss;
+			std::string str(static_cast<const char *>(data), written);
+			for (const uint8_t byte: str)
+				ss << ' ' << std::hex << std::setfill('0') << std::setw(2) << std::right << static_cast<uint16_t>(byte) << std::dec;
 			while (!str.empty() && (str.back() == '\r' || str.back() == '\n'))
 				str.pop_back();
-			SPAM("    \"" << str << "\"");
+			SPAM("    \"" << str << "\":" << ss.str());
 			return static_cast<ssize_t>(written);
 		}
 

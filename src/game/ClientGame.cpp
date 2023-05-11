@@ -88,4 +88,8 @@ namespace Game3 {
 		CommandPacket packet(threadContext.rng(), command);
 		client->send(packet);
 	}
+
+	void ClientGame::tick() {
+
+	}
 }
