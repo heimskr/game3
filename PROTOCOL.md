@@ -149,4 +149,4 @@ To send a chunk request in realm 42 for chunks (-1, -2), (0, 0) and (40, 64), th
 - `0x28 0x00 0x00 0x00`: x-coordinate of third chunk position (40)
 - `0x40 0x00 0x00 0x00`: y-coordinate of third chunk position (64)
 
-Concatenated: `030023000000032a000000200703000000fffffffffeffffff00000000000000002a00000040000000`.
+Concatenated: `03 00 23 00 00 00 03 2a 00 00 00 20 07 03 00 00 00 ff ff ff ff fe ff ff ff 00 00 00 00 00 00 00 00 2a 00 00 00 40 00 00 00`.
