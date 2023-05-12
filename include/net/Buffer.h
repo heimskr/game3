@@ -130,6 +130,14 @@ namespace Game3 {
 			Buffer() = default;
 
 			inline auto size() const { return bytes.size(); }
+			inline void clear() { bytes.clear(); }
+
+			template <typename It>
+			void appendRaw(It first, It last) {
+				bytes.insert(bytes.end(), first, last);
+			}
+
+			void popMany(size_t);
 
 			Buffer & operator<<(uint8_t);
 			Buffer & operator<<(uint16_t);

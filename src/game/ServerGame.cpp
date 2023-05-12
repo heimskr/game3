@@ -34,6 +34,10 @@ namespace Game3 {
 		player->client->send(packet);
 	}
 
+	void ServerGame::handlePacket(RemoteClient &client, const Packet &packet) {
+		packet.handle(*this, client);
+	}
+
 	std::tuple<bool, std::string> ServerGame::commandHelper(const PlayerPtr &player, const std::string &command) {
 		if (command.empty())
 			return {false, "Command is empty."};

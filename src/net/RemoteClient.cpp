@@ -6,20 +6,53 @@
 #include "net/LocalServer.h"
 #include "net/RemoteClient.h"
 #include "packet/Packet.h"
+#include "packet/PacketError.h"
+#include "packet/PacketFactory.h"
 #include "util/Math.h"
 
 namespace Game3 {
 	void RemoteClient::handleInput(std::string_view string) {
-		INFO("Handle[" << string << ']');
+		if (string.empty())
+			return;
+
+		if (state == State::Begin) {
+			buffer.clear();
+			headerBytes.insert(headerBytes.end(), string.begin(), string.end());
+			packetType = 0;
+			packetSize = 0;
+
+			if (6 <= headerBytes.size()) {
+				packetType = headerBytes[0] | (static_cast<uint16_t>(headerBytes[1]) << 8);
+				packetSize = headerBytes[2] | (static_cast<uint32_t>(headerBytes[3]) << 8) | (static_cast<uint32_t>(headerBytes[4]) << 16) | (static_cast<uint32_t>(headerBytes[5]) << 24);
+				headerBytes.erase(headerBytes.begin(), headerBytes.begin() + 6);
+				state = State::Data;
+			}
+		}
+
+		if (state == State::Data) {
+			if (MAX_PACKET_SIZE < buffer.size() + headerBytes.size())
+				throw PacketError("Packet too large");
+			buffer.appendRaw(headerBytes.begin(), headerBytes.end());
+
+			if (packetSize <= buffer.size()) {
+				if (packetSize < buffer.size())
+					buffer.popMany(buffer.size() - packetSize);
+
+				auto packet = (*server.game->registry<PacketFactoryRegistry>()[packetType])();
+				packet->decode(*server.game, buffer);
+				buffer.clear();
+				server.game->handlePacket(*this, *packet);
+			}
+		}
 	}
 
 	void RemoteClient::send(const Packet &packet) {
-		Buffer buffer;
-		packet.encode(*server.game, buffer);
-		assert(buffer.size() < UINT32_MAX);
+		Buffer send_buffer;
+		packet.encode(*server.game, send_buffer);
+		assert(send_buffer.size() < UINT32_MAX);
 		send(packet.getID());
-		send(static_cast<uint32_t>(buffer.size()));
-		send(buffer.str());
+		send(static_cast<uint32_t>(send_buffer.size()));
+		send(send_buffer.str());
 	}
 
 	template <typename T>

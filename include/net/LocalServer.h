@@ -24,7 +24,7 @@ namespace Game3 {
 			LocalServer() = delete;
 			LocalServer(const LocalServer &) = delete;
 			LocalServer(LocalServer &&) = delete;
-			LocalServer(std::shared_ptr<Server>);
+			LocalServer(std::shared_ptr<Server>, std::string_view secret_);
 
 			~LocalServer() override;
 
@@ -49,6 +49,9 @@ namespace Game3 {
 				const T little = toLittle(value);
 				server->send(id, std::string_view(reinterpret_cast<const char *>(&little), sizeof(T)));
 			}
+
+		private:
+			std::string secret;
 	};
 
 }

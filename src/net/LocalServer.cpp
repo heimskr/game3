@@ -19,7 +19,8 @@
 #include "worldgen/WorldGen.h"
 
 namespace Game3 {
-	LocalServer::LocalServer(std::shared_ptr<Server> server_): server(std::move(server_)) {
+	LocalServer::LocalServer(std::shared_ptr<Server> server_, std::string_view secret_):
+	server(std::move(server_)), secret(secret_) {
 		server->addClient = [this](auto &, int new_client, std::string_view ip) {
 			auto game_client = std::make_shared<RemoteClient>(*this, new_client, ip);
 			server->getClients().try_emplace(new_client, std::move(game_client));
@@ -31,10 +32,7 @@ namespace Game3 {
 		};
 
 		server->messageHandler = [](GenericClient &generic_client, std::string_view message) {
-			INFO(generic_client.id << " sent [" << message << ']');
-			RemoteClient &client = dynamic_cast<RemoteClient &>(generic_client);
-			ProtocolVersionPacket packet;
-			client.send(packet);
+			generic_client.handleInput(message);
 		};
 	}
 
@@ -76,8 +74,6 @@ namespace Game3 {
 			ofs << secret;
 		}
 
-		std::cout << "Secret: " << secret << '\n';
-
 		global_server = std::make_shared<SSLServer>(AF_INET6, "::0", 12255, "private.crt", "private.key", 2);
 
 		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
@@ -86,7 +82,7 @@ namespace Game3 {
 		if (signal(SIGINT, +[](int) { running = false; global_server->stop(); }) == SIG_ERR)
 			throw std::runtime_error("Couldn't register SIGINT handler");
 
-		auto game_server = std::make_shared<LocalServer>(global_server);
+		auto game_server = std::make_shared<LocalServer>(global_server, secret);
 		auto game = std::dynamic_pointer_cast<ServerGame>(Game::create(Side::Server, game_server));
 		game->initEntities();
 

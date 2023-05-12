@@ -6,6 +6,7 @@
 
 namespace Game3 {
 	class LocalServer;
+	class Packet;
 
 	class ServerGame: public Game {
 		public:
@@ -20,6 +21,7 @@ namespace Game3 {
 
 			Side getSide() const override { return Side::Server; }
 			void runCommand(const PlayerPtr &, const std::string &, GlobalID);
+			void handlePacket(RemoteClient &, const Packet &);
 
 		private:
 			std::shared_mutex playersMutex;

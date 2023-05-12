@@ -199,6 +199,11 @@ namespace Game3 {
 		return one == two;
 	}
 
+	void Buffer::popMany(size_t count) {
+		assert(count <= size());
+		bytes.erase(bytes.begin() + (size() - count), bytes.end());
+	}
+
 	Buffer & Buffer::operator<<(uint8_t item) {
 		return appendType(item) += item;
 	}
