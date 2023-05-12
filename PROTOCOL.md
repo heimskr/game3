@@ -19,7 +19,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i32` Realm ID
 	- `...` Tile Entity Data
 
-3. **Chunk Request**: asks the server to send a Chunk Tiles packet for a given list of chunks.
+3. **Chunk Request**: asks the server to send Chunk Tiles packets for a given list of chunks.
 
 	- `i32` Realm ID
 	- `i32[]` Chunk Positions
