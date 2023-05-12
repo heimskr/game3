@@ -18,6 +18,6 @@ namespace Game3 {
 		PacketID getID() const override { return ID(); }
 
 		void encode(Game &, Buffer &buffer) const override { buffer << commandID << command; }
-		void decode(Game &, Buffer &buffer) override { buffer >> commandID >> command; }
+		void decode(Game &, Buffer &buffer)       override { buffer >> commandID >> command; }
 	};
 }
