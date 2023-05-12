@@ -28,13 +28,13 @@ namespace Game3 {
 		if (state == State::Begin) {
 			buffer.clear();
 			packetType = 0;
-			packetSize = 0;
+			payloadSize = 0;
 
 			SPAM("HeaderBytes<" << headerBytes.size() << '>');
 
 			if (6 <= headerBytes.size()) {
 				packetType = headerBytes[0] | (static_cast<uint16_t>(headerBytes[1]) << 8);
-				packetSize = headerBytes[2] | (static_cast<uint32_t>(headerBytes[3]) << 8) | (static_cast<uint32_t>(headerBytes[4]) << 16) | (static_cast<uint32_t>(headerBytes[5]) << 24);
+				payloadSize = headerBytes[2] | (static_cast<uint32_t>(headerBytes[3]) << 8) | (static_cast<uint32_t>(headerBytes[4]) << 16) | (static_cast<uint32_t>(headerBytes[5]) << 24);
 				headerBytes.erase(headerBytes.begin(), headerBytes.begin() + 6);
 				state = State::Data;
 			}
@@ -43,16 +43,25 @@ namespace Game3 {
 		if (state == State::Data) {
 			if (MAX_PACKET_SIZE < buffer.size() + headerBytes.size())
 				throw PacketError("Packet too large");
-			buffer.append(headerBytes.begin(), headerBytes.end());
 
-			if (packetSize <= buffer.size()) {
-				if (packetSize < buffer.size())
-					buffer.limitTo(packetSize);
 
+			const size_t to_append = std::min(payloadSize - buffer.size(), headerBytes.size());
+
+			buffer.append(headerBytes.begin(), headerBytes.begin() + to_append);
+			if (to_append == headerBytes.size())
+				headerBytes.clear();
+			else
+				headerBytes.erase(headerBytes.begin(), headerBytes.begin() + to_append);
+
+			if (payloadSize < buffer.size())
+				throw std::logic_error("Buffer grew too large");
+
+			if (payloadSize == buffer.size()) {
 				auto packet = (*server.game->registry<PacketFactoryRegistry>()[packetType])();
 				packet->decode(*server.game, buffer);
 				buffer.clear();
 				server.game->queuePacket(shared_from_this(), packet);
+				state = State::Begin;
 			}
 		}
 	}

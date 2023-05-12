@@ -364,6 +364,8 @@ namespace Game3 {
 
 	void Inventory::notifyOwner() {
 		if (auto locked_owner = owner.lock()) {
+			if (locked_owner->getRealm()->getSide() != Side::Client)
+				return;
 			if (auto player = std::dynamic_pointer_cast<Player>(locked_owner))
 				player->getRealm()->getGame().toClient().signal_player_inventory_update().emit(player);
 			else

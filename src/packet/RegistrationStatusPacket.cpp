@@ -11,6 +11,6 @@ namespace Game3 {
 		if (token == 0)
 			throw AuthenticationError("Registration failed");
 
-		std::cout << "Registration succeeded\n";
+		std::cout << "Registration succeeded: token = " << token << '\n';
 	}
 }
