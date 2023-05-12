@@ -29,7 +29,7 @@ namespace Game3 {
 			return {static_cast<char>('\x10' + size)};
 
 		assert(size <= UINT32_MAX);
-		return {'\x1f', static_cast<char>(size & 0xff), static_cast<char>((size >> 8) & 0xff), static_cast<char>((size >> 16) & 0xff), static_cast<char>((size >> 24) & 0xff)};
+		return {'\x1f'};
 	}
 
 	template <>
@@ -95,6 +95,20 @@ namespace Game3 {
 	}
 
 	Buffer & Buffer::operator+=(std::string_view string) {
+		const auto type = getType(string);
+		bytes.insert(bytes.end(), type.begin(), type.end());
+		const auto first = type[0];
+
+		if (first == '\x10')
+			return *this;
+
+		if ('\x11' <= first && first < '\x1f') {
+			bytes.insert(bytes.end(), string.begin(), string.end());
+			return *this;
+		}
+
+		assert(string.size() <= UINT32_MAX);
+		*this += static_cast<uint32_t>(string.size());
 		bytes.insert(bytes.end(), string.begin(), string.end());
 		return *this;
 	}
@@ -174,12 +188,8 @@ namespace Game3 {
 
 	std::string Buffer::popType() {
 		const char first = popBuffer<char>(*this);
-		if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first < '\x1f'))
+		if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first <= '\x1f'))
 			return {first};
-		if (first == '\x1f') {
-			const auto length = popBuffer<uint32_t>(*this);
-			return {first, static_cast<char>(length & 0xff), static_cast<char>((length >> 8) & 0xff), static_cast<char>((length >> 16) & 0xff), static_cast<char>((length >> 24) & 0xff)};
-		}
 		if (first == '\x20')
 			return first + popType();
 		if (first == '\x21')
@@ -251,22 +261,7 @@ namespace Game3 {
 	}
 
 	Buffer & Buffer::operator<<(std::string_view string) {
-		const auto type = getType(string);
-		bytes.insert(bytes.end(), type.begin(), type.end());
-		const auto first = type[0];
-
-		if (first == '\x10')
-			return *this;
-
-		if ('\x11' <= first && first < '\x1f') {
-			bytes.insert(bytes.end(), string.begin(), string.end());
-			return *this;
-		}
-
-		assert(string.size() <= UINT32_MAX);
-		*this += static_cast<uint32_t>(string.size());
-		bytes.insert(bytes.end(), string.begin(), string.end());
-		return *this;
+		return *this += string;
 	}
 
 	Buffer & Buffer::operator<<(const std::string &string) {

@@ -627,9 +627,28 @@ namespace Game3 {
 		if (!canvas)
 			return;
 
+		const bool control = (modifiers & static_cast<Gdk::ModifierType>(GDK_MODIFIER_MASK)) == Gdk::ModifierType::CONTROL_MASK;
+
+		if (game) {
+			switch (keyval) {
+				case GDK_KEY_c:
+					if (control) {
+						auto *command_dialog = new CommandDialog(*this);
+						dialog.reset(command_dialog);
+						command_dialog->signal_submit().connect([this](const Glib::ustring &command) {
+							game->runCommand(command);
+						});
+						command_dialog->show();
+						return;
+					}
+					break;
+				default:
+					break;
+			}
+		}
+
 		if (game && game->player) {
 			auto &player = *game->player;
-			const bool control = (modifiers & static_cast<Gdk::ModifierType>(GDK_MODIFIER_MASK)) == Gdk::ModifierType::CONTROL_MASK;
 
 			switch (keyval) {
 				case GDK_KEY_S:
@@ -731,16 +750,6 @@ namespace Game3 {
 						} catch (const std::exception &err) {
 							std::cerr << err.what() << '\n';
 						}
-					}
-					return;
-				case GDK_KEY_c:
-					if (control) {
-						auto *command_dialog = new CommandDialog(*this);
-						dialog.reset(command_dialog);
-						command_dialog->signal_submit().connect([this](const Glib::ustring &command) {
-							game->runCommand(command);
-						});
-						command_dialog->show();
 					}
 					return;
 				case GDK_KEY_0:

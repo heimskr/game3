@@ -12,8 +12,13 @@ namespace Game3 {
 		auto difference = now - lastTime;
 		lastTime = now;
 		delta = std::chrono::duration_cast<std::chrono::nanoseconds>(difference).count() / 1'000'000'000.;
+
+		for (const auto &[client, packet]: packetQueue.steal())
+			handlePacket(*client, *packet);
+
 		for (auto &[id, realm]: realms)
 			realm->tick(delta);
+
 		for (const auto &player: players)
 			player->ticked = false;
 	}
@@ -26,6 +31,10 @@ namespace Game3 {
 				player->client->send(packet);
 			}
 		}
+	}
+
+	void ServerGame::queuePacket(std::shared_ptr<RemoteClient> client, std::shared_ptr<Packet> packet) {
+		packetQueue.emplace(std::move(client), std::move(packet));
 	}
 
 	void ServerGame::runCommand(const PlayerPtr &player, const std::string &command, GlobalID command_id) {

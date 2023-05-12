@@ -1,3 +1,4 @@
+#include <atomic>
 #include <cctype>
 #include <filesystem>
 #include <fstream>
@@ -118,7 +119,7 @@ namespace Game3 {
 	}
 
 	static std::shared_ptr<Server> global_server;
-	static bool running = true;
+	static std::atomic_bool running = true;
 
 	bool LocalServer::validateUsername(std::string_view username) {
 		if (username.empty())
@@ -154,7 +155,7 @@ namespace Game3 {
 		} else
 			std::filesystem::create_directory("world/users");
 
-		global_server = std::make_shared<SSLServer>(AF_INET6, "::0", 12255, "private.crt", "private.key", 2);
+		global_server = std::make_shared<SSLServer>(AF_INET6, "::0", 12255, "private.crt", "private.key", 2, 1024);
 
 		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
 			throw std::runtime_error("Couldn't register SIGPIPE handler");
@@ -179,6 +180,7 @@ namespace Game3 {
 		game->realms.emplace(realm->id, realm);
 		game->activeRealm = realm;
 		game->initInteractionSets();
+		game_server->game = game;
 
 		std::thread tick_thread = std::thread([&] {
 			while (running) {

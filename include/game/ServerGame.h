@@ -3,6 +3,7 @@
 #include <mutex>
 
 #include "game/Game.h"
+#include "util/MTQueue.h"
 
 namespace Game3 {
 	class LocalServer;
@@ -20,15 +21,17 @@ namespace Game3 {
 			void broadcastTileUpdate(RealmID, Layer, const Position &, TileID);
 
 			Side getSide() const override { return Side::Server; }
+			void queuePacket(std::shared_ptr<RemoteClient>, std::shared_ptr<Packet>);
 			void runCommand(const PlayerPtr &, const std::string &, GlobalID);
-			void handlePacket(RemoteClient &, const Packet &);
 
 		private:
 			std::shared_mutex playersMutex;
+			MTQueue<std::pair<std::shared_ptr<RemoteClient>, std::shared_ptr<Packet>>> packetQueue;
 
 			inline auto lockPlayersShared() { return std::shared_lock(playersMutex); }
 			inline auto lockPlayersUnique() { return std::unique_lock(playersMutex); }
 
+			void handlePacket(RemoteClient &, const Packet &);
 			std::tuple<bool, std::string> commandHelper(const PlayerPtr &, const std::string &);
 	};
 }

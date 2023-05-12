@@ -37,6 +37,17 @@
 #include "packet/PacketFactory.h"
 #include "packet/ProtocolVersionPacket.h"
 #include "packet/TileEntityPacket.h"
+#include "packet/ChunkRequestPacket.h"
+#include "packet/TileUpdatePacket.h"
+#include "packet/CommandResultPacket.h"
+#include "packet/CommandPacket.h"
+#include "packet/SelfTeleportedPacket.h"
+#include "packet/ChunkTilesPacket.h"
+#include "packet/RealmNoticePacket.h"
+#include "packet/LoginPacket.h"
+#include "packet/LoginStatusPacket.h"
+#include "packet/RegisterPlayerPacket.h"
+#include "packet/RegistrationStatusPacket.h"
 #include "realm/Cave.h"
 #include "realm/House.h"
 #include "realm/Keep.h"
@@ -77,6 +88,7 @@ namespace Game3 {
 		registries.add<RealmFactoryRegistry>();
 		registries.add<RealmTypeRegistry>();
 		registries.add<RealmDetailsRegistry>();
+		registries.add<PacketFactoryRegistry>();
 		// TODO: plugins
 	}
 
@@ -245,6 +257,17 @@ namespace Game3 {
 	void Game::addPacketFactories() {
 		add(PacketFactory::create<ProtocolVersionPacket>());
 		add(PacketFactory::create<TileEntityPacket>());
+		add(PacketFactory::create<ChunkRequestPacket>());
+		add(PacketFactory::create<TileUpdatePacket>());
+		add(PacketFactory::create<CommandResultPacket>());
+		add(PacketFactory::create<CommandPacket>());
+		add(PacketFactory::create<SelfTeleportedPacket>());
+		add(PacketFactory::create<ChunkTilesPacket>());
+		add(PacketFactory::create<RealmNoticePacket>());
+		add(PacketFactory::create<LoginPacket>());
+		add(PacketFactory::create<LoginStatusPacket>());
+		add(PacketFactory::create<RegisterPlayerPacket>());
+		add(PacketFactory::create<RegistrationStatusPacket>());
 	}
 
 	void Game::initialSetup(const std::filesystem::path &dir) {
@@ -255,6 +278,7 @@ namespace Game3 {
 		addRealms();
 		addEntityFactories();
 		addTileEntityFactories();
+		addPacketFactories();
 	}
 
 	void Game::initEntities() {

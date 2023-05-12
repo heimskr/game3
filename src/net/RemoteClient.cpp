@@ -15,11 +15,22 @@ namespace Game3 {
 		if (string.empty())
 			return;
 
+		std::stringstream ss;
+		for (const uint8_t byte: string)
+			ss << ' ' << std::hex << std::setfill('0') << std::setw(2) << std::right << static_cast<uint16_t>(byte) << std::dec;
+		auto str = std::string(string);
+		while (!str.empty() && (str.back() == '\r' || str.back() == '\n'))
+			str.pop_back();
+		SPAM("HandleInput: \"" << str << "\":" << ss.str());
+
+		headerBytes.insert(headerBytes.end(), string.begin(), string.end());
+
 		if (state == State::Begin) {
 			buffer.clear();
-			headerBytes.insert(headerBytes.end(), string.begin(), string.end());
 			packetType = 0;
 			packetSize = 0;
+
+			SPAM("HeaderBytes<" << headerBytes.size() << '>');
 
 			if (6 <= headerBytes.size()) {
 				packetType = headerBytes[0] | (static_cast<uint16_t>(headerBytes[1]) << 8);
@@ -41,7 +52,7 @@ namespace Game3 {
 				auto packet = (*server.game->registry<PacketFactoryRegistry>()[packetType])();
 				packet->decode(*server.game, buffer);
 				buffer.clear();
-				server.game->handlePacket(*this, *packet);
+				server.game->queuePacket(shared_from_this(), packet);
 			}
 		}
 	}

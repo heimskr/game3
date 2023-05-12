@@ -11,7 +11,7 @@ namespace Game3 {
 	class Player;
 
 	/** Used by servers to represent a remote client. */
-	class RemoteClient: public GenericClient {
+	class RemoteClient: public GenericClient, public std::enable_shared_from_this<RemoteClient> {
 		public:
 			constexpr static size_t MAX_PACKET_SIZE = 1 << 24;
 

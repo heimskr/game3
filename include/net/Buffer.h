@@ -47,6 +47,7 @@ namespace Game3 {
 			 * 0x0c -> optional (empty)
 			 * 0x10 -> empty string
 			 * [0x11, 0x1f) -> string of length [0x1, 0xf)
+			 * 0x1f . (u32) length -> string of arbitrary length
 			 * 0x20 . type -> linear container
 			 * 0x21 . type[key] . type[value] -> map container
 			 */
@@ -117,6 +118,13 @@ namespace Game3 {
 				return *this;
 			}
 
+			template <typename T>
+			Buffer & operator+=(const std::optional<T> &item) {
+				if (item.has_value())
+					return (*this += '\x0b') << *item;
+				return *this += '\x0c';
+			}
+
 			std::string popType();
 
 			template <typename T1, typename T2>
@@ -178,9 +186,7 @@ namespace Game3 {
 
 			template <typename T>
 			Buffer & operator<<(const std::optional<T> &item) {
-				if (item.has_value())
-					return (*this += '\x0b') << *item;
-				return *this += '\x0c';
+				return *this += item;
 			}
 
 			friend std::ostream & operator<<(std::ostream &, const Buffer &);
