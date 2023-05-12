@@ -37,7 +37,7 @@ namespace Game3 {
 			throw std::runtime_error("Couldn't allocate acceptEvent");
 		if (event_add(acceptEvent, nullptr) < 0) {
 			char error[64] = "?";
-			if (!strerror_r(errno, error, sizeof(error)))
+			if (!strerror_r(errno, error, sizeof(error)) || strcmp(error, "?") == 0)
 				throw std::runtime_error("Couldn't add acceptEvent (" + std::to_string(errno) + ')');
 			throw std::runtime_error("Couldn't add acceptEvent: " + std::string(error));
 		}
@@ -201,7 +201,7 @@ namespace Game3 {
 		base = event_base_new();
 		if (base == nullptr) {
 			char error[64] = "?";
-			if (!strerror_r(errno, error, sizeof(error)))
+			if (!strerror_r(errno, error, sizeof(error)) || strcmp(error, "?") == 0)
 				throw std::runtime_error("Couldn't initialize libevent (" + std::to_string(errno) + ')');
 			throw std::runtime_error("Couldn't initialize libevent: " + std::string(error));
 		}

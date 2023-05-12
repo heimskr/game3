@@ -54,7 +54,7 @@ namespace Game3 {
 			RealmID id;
 			RealmType type;
 			TileProvider tileProvider;
-			std::array<std::array<std::array<ElementBufferedRenderer, LAYER_COUNT>, REALM_DIAMETER>, REALM_DIAMETER> renderers {};
+			std::optional<std::array<std::array<std::array<ElementBufferedRenderer, LAYER_COUNT>, REALM_DIAMETER>, REALM_DIAMETER>> renderers;
 			/** Governed by tileEntityMutex. */
 			std::unordered_map<Position, std::shared_ptr<TileEntity>> tileEntities;
 			/** Governed by tileEntityMutex. */
@@ -88,6 +88,7 @@ namespace Game3 {
 
 			virtual void onFocus();
 			virtual void onBlur();
+			void createRenderers();
 			void render(int width, int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &, float game_time);
 			void reupload();
 			/** The Layer argument is 1-based. */

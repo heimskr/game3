@@ -54,5 +54,4 @@ namespace Game3 {
 		buffer >> timeUntilWander;
 		buffer >> wanderRadius;
 	}
-
 }

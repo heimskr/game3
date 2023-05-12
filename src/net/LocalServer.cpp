@@ -1,4 +1,6 @@
 #include <cctype>
+#include <filesystem>
+#include <fstream>
 
 #include <event2/thread.h>
 
@@ -9,8 +11,12 @@
 #include "net/Server.h"
 #include "net/SSLServer.h"
 #include "packet/ProtocolVersionPacket.h"
+#include "realm/Overworld.h"
+#include "util/Crypto.h"
 #include "util/FS.h"
 #include "util/Util.h"
+#include "worldgen/Overworld.h"
+#include "worldgen/WorldGen.h"
 
 namespace Game3 {
 	LocalServer::LocalServer(std::shared_ptr<Server> server_): server(std::move(server_)) {
@@ -59,6 +65,19 @@ namespace Game3 {
 
 	int LocalServer::main(int, char **) {
 		evthread_use_pthreads();
+
+		std::string secret;
+
+		if (std::filesystem::exists(".secret")) {
+			secret = readFile(".secret");
+		} else {
+			secret = generateSecret(8);
+			std::ofstream ofs(".secret");
+			ofs << secret;
+		}
+
+		std::cout << "Secret: " << secret << '\n';
+
 		global_server = std::make_shared<SSLServer>(AF_INET6, "::0", 12255, "private.crt", "private.key", 2);
 
 		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
@@ -68,7 +87,18 @@ namespace Game3 {
 			throw std::runtime_error("Couldn't register SIGINT handler");
 
 		auto game_server = std::make_shared<LocalServer>(global_server);
-		auto game = std::make_shared<ServerGame>(game_server);
+		auto game = std::dynamic_pointer_cast<ServerGame>(Game::create(Side::Server, game_server));
+		game->initEntities();
+
+		constexpr size_t seed = 1621;
+		auto realm = Realm::create<Overworld>(*game, 1, Overworld::ID(), "base:tileset/monomap"_id, seed);
+		realm->outdoors = true;
+		std::default_random_engine rng;
+		rng.seed(seed);
+		WorldGen::generateOverworld(realm, seed, {}, {{-1, -1}, {1, 1}}, true);
+		game->realms.emplace(realm->id, realm);
+		game->activeRealm = realm;
+		game->initInteractionSets();
 
 		std::thread tick_thread = std::thread([&] {
 			while (running) {

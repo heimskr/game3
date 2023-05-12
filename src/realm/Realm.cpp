@@ -30,26 +30,32 @@ namespace Game3 {
 	}
 
 	Realm::Realm(Game &game_): game(game_) {
-		initRendererRealms();
-		initRendererTileProviders();
+		if (game.getSide() == Side::Client) {
+			createRenderers();
+			initRendererRealms();
+			initRendererTileProviders();
+		}
 	}
 
 	Realm::Realm(Game &game_, RealmID id_, RealmType type_, Identifier tileset_id, int seed_):
 	id(id_), type(type_), tileProvider(std::move(tileset_id)), seed(seed_), game(game_) {
-		initRendererRealms();
-		initTexture();
-		initRendererTileProviders();
+		if (game.getSide() == Side::Client) {
+			createRenderers();
+			initRendererRealms();
+			initTexture();
+			initRendererTileProviders();
+		}
 	}
 
 	void Realm::initRendererRealms() {
-		for (auto &row: renderers)
+		for (auto &row: *renderers)
 			for (auto &layers: row)
 				for (auto &renderer: layers)
 					renderer.setRealm(*this);
 	}
 
 	void Realm::initRendererTileProviders() {
-		for (auto &row: renderers) {
+		for (auto &row: *renderers) {
 			for (auto &layers: row) {
 				Layer layer = 0;
 				for (auto &renderer: layers)
@@ -97,8 +103,11 @@ namespace Game3 {
 	}
 
 	void Realm::onFocus() {
+		if (getSide() != Side::Client)
+			return;
+
 		focused = true;
-		for (auto &row: renderers)
+		for (auto &row: *renderers)
 			for (auto &layers: row)
 				for (auto &renderer: layers)
 					renderer.wakeUp();
@@ -106,11 +115,21 @@ namespace Game3 {
 	}
 
 	void Realm::onBlur() {
+		if (getSide() != Side::Client)
+			return;
+
 		focused = false;
-		for (auto &row: renderers)
+		for (auto &row: *renderers)
 			for (auto &layers: row)
 				for (auto &renderer: layers)
 					renderer.snooze();
+	}
+
+	void Realm::createRenderers() {
+		if (getSide() != Side::Client)
+			return;
+
+		renderers.emplace();
 	}
 
 	void Realm::render(const int width, const int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &sprite_renderer, float game_time) {
@@ -126,7 +145,7 @@ namespace Game3 {
 		const auto bb_width  = width;
 		const auto bb_height = height;
 
-		for (auto &row: renderers) {
+		for (auto &row: *renderers) {
 			for (auto &layers: row) {
 				for (auto &renderer: layers) {
 					renderer.onBackbufferResized(bb_width, bb_height);
@@ -207,7 +226,7 @@ namespace Game3 {
 			return;
 
 		getGame().toClient().activateContext();
-		for (auto &row: renderers)
+		for (auto &row: *renderers)
 			for (auto &layers: row)
 				for (auto &renderer: layers)
 					renderer.reupload();
@@ -218,7 +237,7 @@ namespace Game3 {
 			return;
 
 		getGame().toClient().activateContext();
-		for (auto &row: renderers)
+		for (auto &row: *renderers)
 			for (auto &layers: row)
 				layers[layer - 1].reupload();
 	}
@@ -312,7 +331,7 @@ namespace Game3 {
 		}
 
 		Index row_index = 0;
-		for (auto &row: renderers) {
+		for (auto &row: *renderers) {
 			Index col_index = 0;
 			for (auto &layers: row) {
 				for (auto &renderer: layers) {
@@ -623,7 +642,7 @@ namespace Game3 {
 
 		updateNeighbors(position);
 		if (should_mark_dirty)
-			for (auto &row: renderers)
+			for (auto &row: *renderers)
 				for (auto &layers: row)
 					for (auto &renderer: layers)
 						renderer.markDirty();
@@ -694,7 +713,7 @@ namespace Game3 {
 
 		const auto original_x = chunk_pos.x;
 
-		for (const auto &row: renderers) {
+		for (const auto &row: *renderers) {
 			chunk_pos.x = original_x;
 
 			for (const auto &layers: row) {
