@@ -93,20 +93,20 @@ namespace Game3 {
 		return stack.item->name;
 	}
 
-	void ItemEntity::encode(Game &game, Buffer &buffer) {
-		Entity::encode(game, buffer);
+	void ItemEntity::encode(Buffer &buffer) {
+		Entity::encode(buffer);
 		buffer << xOffset;
 		buffer << yOffset;
 		buffer << needsTexture;
-		stack.encode(game, buffer);
+		stack.encode(getGame(), buffer);
 	}
 
-	void ItemEntity::decode(Game &game, Buffer &buffer) {
-		Entity::decode(game, buffer);
+	void ItemEntity::decode(Buffer &buffer) {
+		Entity::decode(buffer);
 		buffer >> xOffset;
 		buffer >> yOffset;
 		buffer >> needsTexture;
-		stack.decode(game, buffer);
+		stack.decode(getGame(), buffer);
 	}
 
 	void to_json(nlohmann::json &json, const ItemEntity &item_entity) {

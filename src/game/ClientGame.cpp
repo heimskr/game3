@@ -6,6 +6,7 @@
 #include "net/LocalClient.h"
 #include "packet/CommandPacket.h"
 #include "packet/ChunkRequestPacket.h"
+#include "packet/RegisterPlayerPacket.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "ui/tab/TextTab.h"
@@ -87,8 +88,11 @@ namespace Game3 {
 	}
 
 	void ClientGame::runCommand(const std::string &command) {
-		CommandPacket packet(threadContext.rng(), command);
-		client->send(packet);
+		if (command == "reg") {
+			client->send(RegisterPlayerPacket("username", "Display Name"));
+		} else {
+			client->send(CommandPacket(threadContext.rng(), command));
+		}
 	}
 
 	void ClientGame::tick() {

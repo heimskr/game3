@@ -123,10 +123,10 @@ namespace Game3 {
 			phase = 0;
 	}
 
-	void Blacksmith::encode(Game &game, Buffer &buffer) {
-		Entity::encode(game, buffer);
-		Worker::encode(game, buffer);
-		Merchant::encode(game, buffer);
+	void Blacksmith::encode(Buffer &buffer) {
+		Entity::encode(buffer);
+		Worker::encode(buffer);
+		Merchant::encode(buffer);
 		buffer << actionTime;
 		buffer << coalNeeded;
 		buffer << ironOreNeeded;
@@ -134,10 +134,10 @@ namespace Game3 {
 		buffer << diamondOreNeeded;
 	}
 
-	void Blacksmith::decode(Game &game, Buffer &buffer) {
-		Entity::decode(game, buffer);
-		Worker::decode(game, buffer);
-		Merchant::decode(game, buffer);
+	void Blacksmith::decode(Buffer &buffer) {
+		Entity::decode(buffer);
+		Worker::decode(buffer);
+		Merchant::decode(buffer);
 		buffer >> actionTime;
 		buffer >> coalNeeded;
 		buffer >> ironOreNeeded;

@@ -111,9 +111,9 @@ namespace Game3 {
 			inline auto getHeldRight() const { return heldRight.slot; }
 			Side getSide() const;
 
-			virtual void encode(Game &, Buffer &);
+			virtual void encode(Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */
-			virtual void decode(Game &, Buffer &);
+			virtual void decode(Buffer &);
 
 		protected:
 			Game *game = nullptr;

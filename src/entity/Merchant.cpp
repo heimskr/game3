@@ -52,12 +52,12 @@ namespace Game3 {
 		return true;
 	}
 
-	void Merchant::encode(Game &, Buffer &buffer) {
+	void Merchant::encode(Buffer &buffer) {
 		buffer << money;
 		buffer << greed;
 	}
 
-	void Merchant::decode(Game &, Buffer &buffer) {
+	void Merchant::decode(Buffer &buffer) {
 		buffer >> money;
 		buffer >> greed;
 	}

@@ -7,6 +7,7 @@
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "game/Stonks.h"
+#include "net/Buffer.h"
 #include "realm/Keep.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
@@ -113,6 +114,16 @@ namespace Game3 {
 
 		else if (phase == 11 && hour < WORK_END_HOUR)
 			phase = 0;
+	}
+
+	void Woodcutter::encode(Buffer &buffer) {
+		Worker::encode(buffer);
+		buffer << chosenResource << harvestingTime;
+	}
+
+	void Woodcutter::decode(Buffer &buffer) {
+		Worker::decode(buffer);
+		buffer >> chosenResource << harvestingTime;
 	}
 
 	void Woodcutter::wakeUp() {

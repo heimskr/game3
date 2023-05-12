@@ -14,3 +14,5 @@
 *.key
 /.secret
 /users.json
+/tokens.json
+/world

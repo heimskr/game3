@@ -27,8 +27,8 @@ namespace Game3 {
 			float getSpeed() const override { return 5.f; }
 			HitPoints maxHealth() const override { return MAX_HEALTH; }
 			bool wander();
-			void encode(Game &, Buffer &) override;
-			void decode(Game &, Buffer &) override;
+			void encode(Buffer &) override;
+			void decode(Buffer &) override;
 
 		protected:
 			Animal(EntityType);

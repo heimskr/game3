@@ -25,8 +25,8 @@ namespace Game3 {
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 			void tick(Game &, float delta) override;
 			Glib::ustring getName() override { return "Miner"; }
-			void encode(Game &, Buffer &) override;
-			void decode(Game &, Buffer &) override;
+			void encode(Buffer &) override;
+			void decode(Buffer &) override;
 
 			friend class Entity;
 

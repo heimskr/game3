@@ -14,6 +14,11 @@ namespace Game3 {
 			static Identifier ID() { return {"base", "entity/player"}; }
 			constexpr static HitPoints MAX_HEALTH = 64;
 
+			/** Not encoded. */
+			std::string username;
+			/** Definitely not encoded. */
+			Token token = -1;
+			std::string displayName;
 			float tooldown = 0.f;
 			std::unordered_set<Identifier> stationTypes {{}};
 			float speed = 10.f;
@@ -52,8 +57,8 @@ namespace Game3 {
 			Place getPlace() override;
 			bool isMoving() const;
 			bool canSee(RealmID, const Position &);
-			void encode(Game &, Buffer &) override;
-			void decode(Game &, Buffer &) override;
+			void encode(Buffer &) override;
+			void decode(Buffer &) override;
 
 			friend class Entity;
 

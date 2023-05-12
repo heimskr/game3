@@ -32,7 +32,7 @@ namespace Game3 {
 		if (state == State::Data) {
 			if (MAX_PACKET_SIZE < buffer.size() + headerBytes.size())
 				throw PacketError("Packet too large");
-			buffer.appendRaw(headerBytes.begin(), headerBytes.end());
+			buffer.append(headerBytes.begin(), headerBytes.end());
 
 			if (packetSize <= buffer.size()) {
 				if (packetSize < buffer.size())

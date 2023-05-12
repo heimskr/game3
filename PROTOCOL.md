@@ -73,6 +73,9 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `bool` Success
 	- `string` Display Name
+	- `...` Player Data
+
+	Player data sent only if successful.
 
 12. **Register Player**: sent by a client to register a new player account.
 

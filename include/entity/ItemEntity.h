@@ -24,8 +24,8 @@ namespace Game3 {
 			virtual bool onInteractOn    (const std::shared_ptr<Player> &player) override { return interact(player); }
 			virtual bool onInteractNextTo(const std::shared_ptr<Player> &player) override { return interact(player); }
 			Glib::ustring getName() override;
-			void encode(Game &, Buffer &) override;
-			void decode(Game &, Buffer &) override;
+			void encode(Buffer &) override;
+			void decode(Buffer &) override;
 
 		private:
 			ItemEntity(const Game &, const nlohmann::json &);

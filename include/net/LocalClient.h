@@ -17,6 +17,7 @@ namespace Game3 {
 
 			void connect(std::string_view hostname, uint16_t port);
 			void send(const Packet &);
+			void send(std::string_view);
 			bool isConnected() const;
 
 		private:
@@ -25,7 +26,8 @@ namespace Game3 {
 			std::shared_ptr<SocketBuffer> buffer;
 			std::shared_ptr<std::iostream> stream;
 
-			template <typename T>
+
+			template <std::integral T>
 			void sendRaw(T value) {
 				T little = toLittle(value);
 				*stream << std::string_view(reinterpret_cast<const char *>(&little), sizeof(T));

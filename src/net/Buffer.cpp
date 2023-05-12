@@ -273,6 +273,11 @@ namespace Game3 {
 		return *this << std::string_view(string);
 	}
 
+	Buffer & Buffer::operator<<(const Buffer &other) {
+		append(other.bytes.begin(), other.bytes.end());
+		return *this;
+	}
+
 	std::ostream & operator<<(std::ostream &os, const Buffer &buffer) {
 		os << "Buffer<";
 
@@ -302,6 +307,13 @@ namespace Game3 {
 		out.reserve(size);
 		for (uint32_t i = 0; i < size; ++i)
 			out.push_back(popBuffer<char>(*this));
+		return *this;
+	}
+
+	template <>
+	Buffer & Buffer::operator>>(Buffer &other) {
+		other.append(bytes.begin(), bytes.end());
+		bytes.clear();
 		return *this;
 	}
 }

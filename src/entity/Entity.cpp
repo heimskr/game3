@@ -94,7 +94,7 @@ namespace Game3 {
 	void Entity::init(Game &game_) {
 		game = &game_;
 
-		if (texture == nullptr)
+		if (getSide() == Side::Client && texture == nullptr)
 			texture = getTexture();
 
 		if (!inventory)
@@ -426,7 +426,7 @@ namespace Game3 {
 		return getGame().getSide();
 	}
 
-	void Entity::encode(Game &, Buffer &buffer) {
+	void Entity::encode(Buffer &buffer) {
 		buffer << type;
 		buffer << globalID;
 		buffer << realmID;
@@ -439,7 +439,7 @@ namespace Game3 {
 		buffer << health;
 	}
 
-	void Entity::decode(Game &, Buffer &buffer) {
+	void Entity::decode(Buffer &buffer) {
 		buffer >> type;
 		buffer >> globalID;
 		buffer >> realmID;

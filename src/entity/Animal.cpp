@@ -41,15 +41,15 @@ namespace Game3 {
 		});
 	}
 
-	void Animal::encode(Game &game, Buffer &buffer) {
-		Entity::encode(game, buffer);
+	void Animal::encode(Buffer &buffer) {
+		Entity::encode(buffer);
 		buffer << destination;
 		buffer << timeUntilWander;
 		buffer << wanderRadius;
 	}
 
-	void Animal::decode(Game &game, Buffer &buffer) {
-		Entity::decode(game, buffer);
+	void Animal::decode(Buffer &buffer) {
+		Entity::decode(buffer);
 		buffer >> destination;
 		buffer >> timeUntilWander;
 		buffer >> wanderRadius;

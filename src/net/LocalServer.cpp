@@ -5,6 +5,7 @@
 #include <event2/thread.h>
 
 #include "Log.h"
+#include "game/Inventory.h"
 #include "game/ServerGame.h"
 #include "net/LocalServer.h"
 #include "net/RemoteClient.h"
@@ -58,8 +59,75 @@ namespace Game3 {
 		server->send(id, string);
 	}
 
+	void LocalServer::readUsers(const std::filesystem::path &path) {
+		userDatabase = nlohmann::json::parse(readFile(path));
+		displayNames.clear();
+		for (const auto &[username, user_info]: userDatabase)
+			displayNames.insert(user_info.displayName);
+	}
+
+	void LocalServer::saveUsers(const std::filesystem::path &path) {
+		std::ofstream(path) << nlohmann::json(userDatabase).dump();
+	}
+
+	std::optional<std::string> LocalServer::authenticate(const std::string &username, Token token) const {
+		if (validateUsername(username))
+			if (auto iter = userDatabase.find(username); iter != userDatabase.end() && iter->second.token == token)
+				return iter->second.displayName;
+		return std::nullopt;
+	}
+
+	PlayerPtr LocalServer::loadPlayer(std::string_view username, std::string_view display_name) {
+		if (!validateUsername(username))
+			return nullptr;
+
+		const std::filesystem::path path = "world/users/" + std::string(username);
+
+		if (std::filesystem::exists(path))
+			return Player::fromJSON(*game, nlohmann::json::parse(readFile(path)));
+
+		auto overworld = game->realms.at(1);
+
+		auto player = Entity::create<Player>();
+		player->username = username;
+		player->displayName = display_name;
+		player->token = generateToken(player->username);
+		overworld->add(player);
+		player->position = overworld->randomLand;
+		player->init(*game);
+		player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_pickaxe"));
+		player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_shovel"));
+		player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_axe"));
+		player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_hammer"));
+		player->inventory->add(ItemStack(*game, "base:item/cave_entrance"));
+		game->players.insert(player);
+		userDatabase.try_emplace(player->username, player->username, player->displayName, player->token);
+		return player;
+	}
+
+	bool LocalServer::hasUsername(const std::string &username) const {
+		return userDatabase.contains(username);
+	}
+
+	bool LocalServer::hasDisplayName(const std::string &display_name) const {
+		return displayNames.contains(display_name);
+	}
+
+	Token LocalServer::generateToken(const std::string &username) const {
+		return computeSHA3<Token>(secret + '/' + username);
+	}
+
 	static std::shared_ptr<Server> global_server;
 	static bool running = true;
+
+	bool LocalServer::validateUsername(std::string_view username) {
+		if (username.empty())
+			return false;
+		for (const char ch: username)
+			if (!std::isalnum(ch) && ch != '_')
+				return false;
+		return true;
+	}
 
 	int LocalServer::main(int, char **) {
 		evthread_use_pthreads();
@@ -74,6 +142,18 @@ namespace Game3 {
 			ofs << secret;
 		}
 
+		if (std::filesystem::exists("world")) {
+			if (!std::filesystem::is_directory("world"))
+				throw std::runtime_error("Path \"world\" exists but isn't a directory");
+		} else
+			std::filesystem::create_directory("world");
+
+		if (std::filesystem::exists("world/users")) {
+			if (!std::filesystem::is_directory("world/users"))
+				throw std::runtime_error("Path \"world/users\" exists but isn't a directory");
+		} else
+			std::filesystem::create_directory("world/users");
+
 		global_server = std::make_shared<SSLServer>(AF_INET6, "::0", 12255, "private.crt", "private.key", 2);
 
 		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
@@ -83,6 +163,10 @@ namespace Game3 {
 			throw std::runtime_error("Couldn't register SIGINT handler");
 
 		auto game_server = std::make_shared<LocalServer>(global_server, secret);
+
+		if (std::filesystem::exists("users.json"))
+			game_server->readUsers("users.json");
+
 		auto game = std::dynamic_pointer_cast<ServerGame>(Game::create(Side::Server, game_server));
 		game->initEntities();
 

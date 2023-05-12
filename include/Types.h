@@ -25,6 +25,7 @@ namespace Game3 {
 	using PacketID     = uint16_t;
 	using Version      = uint32_t;
 	using GlobalID     = uint64_t;
+	using Token        = uint64_t;
 
 	using ItemID     = Identifier;
 	using EntityType = Identifier;

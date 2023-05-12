@@ -16,6 +16,10 @@ namespace Game3 {
 		stream = std::make_shared<std::iostream>(buffer.get());
 	}
 
+	void LocalClient::send(std::string_view string) {
+		*stream << string;
+	}
+
 	void LocalClient::send(const Packet &packet) {
 		Buffer buffer;
 		packet.encode(*game, buffer);

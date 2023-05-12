@@ -50,7 +50,7 @@ namespace Game3 {
 			throw std::runtime_error("Couldn't find keep for worker");
 	}
 
-	void Worker::encode(Game &, Buffer &buffer) {
+	void Worker::encode(Buffer &buffer) {
 		buffer << phase;
 		buffer << overworldRealm;
 		buffer << houseRealm;
@@ -60,7 +60,7 @@ namespace Game3 {
 		buffer << stuckTime;
 	}
 
-	void Worker::decode(Game &, Buffer &buffer) {
+	void Worker::decode(Buffer &buffer) {
 		buffer >> phase;
 		buffer >> overworldRealm;
 		buffer >> houseRealm;

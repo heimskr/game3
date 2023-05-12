@@ -142,15 +142,17 @@ namespace Game3 {
 		return realm.id == realm_id && realm.isVisible(pos);
 	}
 
-	void Player::encode(Game &game, Buffer &buffer) {
-		Entity::encode(game, buffer);
+	void Player::encode(Buffer &buffer) {
+		Entity::encode(buffer);
+		buffer << displayName;
 		buffer << tooldown;
 		buffer << stationTypes;
 		buffer << speed;
 	}
 
-	void Player::decode(Game &game, Buffer &buffer) {
-		Entity::decode(game, buffer);
+	void Player::decode(Buffer &buffer) {
+		Entity::decode(buffer);
+		buffer >> displayName;
 		buffer >> tooldown;
 		buffer >> stationTypes;
 		buffer >> speed;

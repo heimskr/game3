@@ -26,8 +26,8 @@ namespace Game3 {
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			void initAfterLoad(Game &) override;
-			void encode(Game &, Buffer &) override;
-			void decode(Game &, Buffer &) override;
+			void encode(Buffer &) override;
+			void decode(Buffer &) override;
 
 			friend class Entity;
 

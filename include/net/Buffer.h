@@ -133,7 +133,7 @@ namespace Game3 {
 			inline void clear() { bytes.clear(); }
 
 			template <typename It>
-			void appendRaw(It first, It last) {
+			void append(It first, It last) {
 				bytes.insert(bytes.end(), first, last);
 			}
 
@@ -152,6 +152,7 @@ namespace Game3 {
 			Buffer & operator<<(double);
 			Buffer & operator<<(std::string_view);
 			Buffer & operator<<(const std::string &);
+			Buffer & operator<<(const Buffer &);
 
 			template <LinearOrSet T>
 			Buffer & operator<<(const T &container) {

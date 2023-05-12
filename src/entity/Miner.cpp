@@ -119,17 +119,17 @@ namespace Game3 {
 
 
 
-	void Miner::encode(Game &game, Buffer &buffer) {
-		Entity::encode(game, buffer);
-		Worker::encode(game, buffer);
+	void Miner::encode(Buffer &buffer) {
+		Entity::encode(buffer);
+		Worker::encode(buffer);
 		buffer << chosenResource;
 		buffer << harvestingTime;
 		buffer << sellTime;
 	}
 
-	void Miner::decode(Game &game, Buffer &buffer) {
-		Entity::decode(game, buffer);
-		Worker::decode(game, buffer);
+	void Miner::decode(Buffer &buffer) {
+		Entity::decode(buffer);
+		Worker::decode(buffer);
 		buffer >> chosenResource;
 		buffer >> harvestingTime;
 		buffer >> sellTime;

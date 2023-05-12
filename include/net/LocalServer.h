@@ -5,8 +5,10 @@
 #include <functional>
 #include <map>
 #include <optional>
+#include <set>
 #include <string>
 
+#include "data/UserInfo.h"
 #include "net/ApplicationServer.h"
 #include "net/GenericClient.h"
 #include "net/Server.h"
@@ -35,7 +37,16 @@ namespace Game3 {
 			void stop() override;
 			void send(const GenericClient &, std::string_view);
 			void send(int, std::string_view);
+			void readUsers(const std::filesystem::path &);
+			void saveUsers(const std::filesystem::path &);
+			/** Returns the display name if authentication was successful. */
+			std::optional<std::string> authenticate(const std::string &username, Token) const;
+			PlayerPtr loadPlayer(std::string_view username, std::string_view display_name);
+			bool hasUsername(const std::string &) const;
+			bool hasDisplayName(const std::string &) const;
+			Token generateToken(const std::string &username) const;
 
+			static bool validateUsername(std::string_view);
 			static int main(int argc, char **argv);
 
 			template <std::integral T>
@@ -52,6 +63,8 @@ namespace Game3 {
 
 		private:
 			std::string secret;
+			std::map<std::string, UserInfo> userDatabase;
+			std::set<std::string> displayNames;
 	};
 
 }
