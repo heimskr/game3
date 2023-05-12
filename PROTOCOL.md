@@ -1,6 +1,6 @@
 # Packets
 
-Packets are encoded as a little-endian 2-byte integer representing the packet type, followed by a little-endian 4-byte integer representing the packet length.
+Packets are encoded as a little-endian 2-byte integer representing the packet type, followed by a little-endian 4-byte integer representing the payload length.
 
 <!-- TODO: message encoding -->
 
@@ -142,11 +142,11 @@ To send a chunk request in realm 42 for chunks (-1, -2), (0, 0) and (40, 64), th
 - `0x2a 0x00 0x00 0x00`: realm ID (42)
 - `0x20 0x07`: type indicator (`list<i32>`)
 - `0x03 0x00 0x00 0x00`: list length (3)
-- `0xff 0xff 0xff 0xff` x-coordinate of first chunk position (-1)
-- `0xfe 0xff 0xff 0xff` y-coordinate of first chunk position (-2)
-- `0x00 0x00 0x00 0x00` x-coordinate of second chunk position (0)
-- `0x00 0x00 0x00 0x00` y-coordinate of second chunk position (0)
-- `0x28 0x00 0x00 0x00` x-coordinate of third chunk position (40)
-- `0x40 0x00 0x00 0x00` y-coordinate of third chunk position (64)
+- `0xff 0xff 0xff 0xff`: x-coordinate of first chunk position (-1)
+- `0xfe 0xff 0xff 0xff`: y-coordinate of first chunk position (-2)
+- `0x00 0x00 0x00 0x00`: x-coordinate of second chunk position (0)
+- `0x00 0x00 0x00 0x00`: y-coordinate of second chunk position (0)
+- `0x28 0x00 0x00 0x00`: x-coordinate of third chunk position (40)
+- `0x40 0x00 0x00 0x00`: y-coordinate of third chunk position (64)
 
 Concatenated: `030023000000032a000000200703000000fffffffffeffffff00000000000000002a00000040000000`.
