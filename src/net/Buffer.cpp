@@ -204,6 +204,12 @@ namespace Game3 {
 		bytes.erase(bytes.begin() + (size() - count), bytes.end());
 	}
 
+	void Buffer::limitTo(size_t count) {
+		if (bytes.size() <= count)
+			return;
+		bytes.erase(bytes.begin() + count, bytes.end());
+	}
+
 	Buffer & Buffer::operator<<(uint8_t item) {
 		return appendType(item) += item;
 	}

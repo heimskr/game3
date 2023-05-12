@@ -138,6 +138,7 @@ namespace Game3 {
 			}
 
 			void popMany(size_t);
+			void limitTo(size_t);
 
 			Buffer & operator<<(uint8_t);
 			Buffer & operator<<(uint16_t);

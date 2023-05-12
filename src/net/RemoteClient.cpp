@@ -36,7 +36,7 @@ namespace Game3 {
 
 			if (packetSize <= buffer.size()) {
 				if (packetSize < buffer.size())
-					buffer.popMany(buffer.size() - packetSize);
+					buffer.limitTo(packetSize);
 
 				auto packet = (*server.game->registry<PacketFactoryRegistry>()[packetType])();
 				packet->decode(*server.game, buffer);
