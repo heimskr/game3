@@ -1,3 +1,4 @@
+#include "Log.h"
 #include "game/ClientGame.h"
 #include "net/Buffer.h"
 #include "net/LocalClient.h"
@@ -12,8 +13,23 @@ namespace Game3 {
 		sock.reset();
 		sock = std::make_shared<SSLSock>(hostname, port);
 		sock->connect();
-		buffer = std::make_shared<SocketBuffer>(sock.get());
+		buffer = std::make_shared<SocketBuffer>(sock);
 		stream = std::make_shared<std::iostream>(buffer.get());
+	}
+
+	void LocalClient::read() {
+		assert(stream);
+		std::string input;
+
+		if (!*stream)
+			return;
+
+		*stream >> input;
+
+		if (input.empty())
+			return;
+
+		std::cout << '[' << input.size() << "]: \"" << input << "\"\n";
 	}
 
 	void LocalClient::send(std::string_view string) {

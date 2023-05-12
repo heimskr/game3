@@ -143,7 +143,7 @@ namespace Game3 {
 	}
 
 	void InventoryTab::reset(const std::shared_ptr<ClientGame> &game) {
-		if (!game)
+		if (!game || !game->player)
 			return;
 
 		lastGame = game;

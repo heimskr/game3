@@ -36,7 +36,7 @@ namespace Game3 {
 	void CraftingTab::update(const std::shared_ptr<ClientGame> &) {}
 
 	void CraftingTab::reset(const std::shared_ptr<ClientGame> &game) {
-		if (!game)
+		if (!game || !game->player)
 			return;
 
 		lastGame = game;
@@ -47,6 +47,9 @@ namespace Game3 {
 
 		// size_t index = 0;
 		auto inventory = game->player->inventory;
+		if (!inventory)
+			return;
+
 		for (const auto &recipe: game->registries.get<CraftingRecipeRegistry>().items) {
 			if (game->player->stationTypes.contains(recipe->stationType) && recipe->canCraft(inventory)) {
 				auto hbox = std::make_unique<Gtk::Box>(Gtk::Orientation::HORIZONTAL);

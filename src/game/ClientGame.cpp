@@ -52,9 +52,12 @@ namespace Game3 {
 	}
 
 	Position ClientGame::translateCanvasCoordinates(double x, double y) const {
+		if (!activeRealm)
+			return {};
+
 		auto &realm = *activeRealm;
 		const auto scale = canvas.scale;
-		const auto tile_size  = realm.getTileset().getTileSize();
+		const auto tile_size = realm.getTileset().getTileSize();
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
 		x -= canvas.width() / 2.f - (map_length * tile_size / 4.f) * scale + canvas.center.x() * canvas.magic * scale;
 		y -= canvas.height() / 2.f - (map_length * tile_size / 4.f) * scale + canvas.center.y() * canvas.magic * scale;
@@ -96,8 +99,10 @@ namespace Game3 {
 	}
 
 	void ClientGame::tick() {
+		client->read();
+
 		if (!player) {
-			WARN("No player");
+			// WARN("No player");
 			return;
 		}
 

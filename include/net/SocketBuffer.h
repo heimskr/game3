@@ -1,13 +1,14 @@
 #pragma once
 
 #include <iostream>
-
-#include "net/Sock.h"
+#include <memory>
 
 namespace Game3 {
+	class Sock;
+
 	class SocketBuffer: public std::streambuf {
 		private:
-			Sock *source;
+			std::shared_ptr<Sock> source;
 			char *buffer;
 			size_t bufferSize;
 			size_t putbackSize;
@@ -18,7 +19,7 @@ namespace Game3 {
 			virtual std::streambuf::int_type underflow()                              override;
 
 		public:
-			SocketBuffer(Sock *source_, size_t buffer_size = 64, size_t putback_size = 4);
+			SocketBuffer(std::shared_ptr<Sock>, size_t buffer_size = 64, size_t putback_size = 4);
 			~SocketBuffer();
 
 			/** Closes the underlying socket connection. */

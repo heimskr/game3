@@ -60,7 +60,7 @@ namespace Game3 {
 				else
 					bytes -= bytes_read;
 
-				if (status == 0)
+				if (status == 0) {
 					switch (ssl_error = SSL_get_error(ssl, status)) {
 						case SSL_ERROR_NONE:
 							ERROR("SSL_ERROR_NONE");
@@ -91,7 +91,7 @@ namespace Game3 {
 							close();
 							break;
 					}
-				else {
+				} else {
 					std::string read_str((const char *) data, bytes_read);
 					while (!read_str.empty() && (read_str.back() == '\r' || read_str.back() == '\n'))
 						read_str.pop_back();

@@ -1,14 +1,17 @@
 #pragma once
 
-#include <gtkmm.h>
+#include <atomic>
 #include <chrono>
 #include <filesystem>
 #include <functional>
 #include <list>
 #include <memory>
 #include <mutex>
+#include <thread>
 #include <unordered_map>
 #include <vector>
+
+#include <gtkmm.h>
 
 namespace Game3 {
 	class Canvas;
@@ -33,6 +36,7 @@ namespace Game3 {
 			Gtk::PopoverMenu glMenu;
 
 			MainWindow(BaseObjectType *, const Glib::RefPtr<Gtk::Builder> &);
+			~MainWindow() override;
 
 			static MainWindow * create();
 
@@ -85,6 +89,8 @@ namespace Game3 {
 			bool autofocus = true;
 			bool statusbarWaiting = false;
 			std::chrono::system_clock::time_point statusbarSetTime;
+			std::thread networkThread;
+			std::atomic_bool networkRunning = false;
 
 			struct KeyInfo {
 				guint code;

@@ -16,6 +16,7 @@ namespace Game3 {
 			LocalClient() = default;
 
 			void connect(std::string_view hostname, uint16_t port);
+			void read();
 			void send(const Packet &);
 			void send(std::string_view);
 			bool isConnected() const;
@@ -25,7 +26,6 @@ namespace Game3 {
 			std::shared_ptr<Sock> sock;
 			std::shared_ptr<SocketBuffer> buffer;
 			std::shared_ptr<std::iostream> stream;
-
 
 			template <std::integral T>
 			void sendRaw(T value) {

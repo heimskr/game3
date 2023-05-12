@@ -5,12 +5,13 @@
 #include <string>
 
 #include "Log.h"
-#include "net/SocketBuffer.h"
 #include "net/NetError.h"
+#include "net/Sock.h"
+#include "net/SocketBuffer.h"
 
 namespace Game3 {
-	SocketBuffer::SocketBuffer(Sock *source_, size_t buffer_size, size_t putback_size):
-	source(source_), bufferSize(buffer_size), putbackSize(putback_size) {
+	SocketBuffer::SocketBuffer(std::shared_ptr<Sock> source_, size_t buffer_size, size_t putback_size):
+	source(std::move(source_)), bufferSize(buffer_size), putbackSize(putback_size) {
 		buffer = new char[bufferSize];
 		setg(buffer + putbackSize, buffer + putbackSize, buffer + putbackSize);
 	}

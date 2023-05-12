@@ -282,33 +282,25 @@ namespace Game3 {
 		}, 2);
 	}
 
+	MainWindow::~MainWindow() {
+		networkRunning = false;
+		networkThread.join();
+	}
+
 	void MainWindow::newGame(size_t seed, const WorldGenParams &params) {
-		Timer timer("NewGame");
 		glArea.get_context()->make_current();
 		game = std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, canvas.get()));
 		game->client = std::make_shared<LocalClient>();
 		game->client->connect("::1", 12255);
 		game->initEntities();
-		// auto realm = Realm::create<Overworld>(*game, 1, Overworld::ID(), "base:tileset/monomap"_id, seed);
-		// realm->outdoors = true;
-		// std::default_random_engine rng;
-		// rng.seed(seed);
-		// WorldGen::generateOverworld(realm, seed, params, {{-1, -1}, {1, 1}}, true);
-		// game->realms.emplace(realm->id, realm);
-		// game->activeRealm = realm;
-		// realm->onFocus();
-		// realm->add(game->player = Entity::create<Player>());
-		// game->player->position = realm->randomLand;
-		// game->player->init(*game);
-		// onGameLoaded();
-		// game->player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_pickaxe"));
-		// game->player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_shovel"));
-		// game->player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_axe"));
-		// game->player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_hammer"));
-		// game->player->inventory->add(ItemStack(*game, "base:item/cave_entrance", 4));
-		timer.stop();
-		Timer::summary();
-		Timer::clear();
+		// networkRunning = true;
+		// networkThread = std::thread([this] {
+		// 	while (networkRunning) {
+		// 		game->tick();
+		// 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		// 	}
+		// });
+		onGameLoaded();
 	}
 
 	void MainWindow::loadGame(const std::filesystem::path &path) {
@@ -336,10 +328,10 @@ namespace Game3 {
 	void MainWindow::onGameLoaded() {
 		glArea.get_context()->make_current();
 		debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
-		game->player->focus(*canvas, false);
+		// game->player->focus(*canvas, false);
 		game->initInteractionSets();
 		canvas->game = game;
-		game->activeRealm->reupload();
+		// game->activeRealm->reupload();
 		connectSave();
 		for (auto &[widget, tab]: tabMap)
 			tab->reset(game);
