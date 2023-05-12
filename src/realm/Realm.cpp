@@ -37,7 +37,7 @@ namespace Game3 {
 		}
 	}
 
-	Realm::Realm(Game &game_, RealmID id_, RealmType type_, Identifier tileset_id, int seed_):
+	Realm::Realm(Game &game_, RealmID id_, RealmType type_, Identifier tileset_id, int64_t seed_):
 	id(id_), type(type_), tileProvider(std::move(tileset_id)), seed(seed_), game(game_) {
 		if (game.getSide() == Side::Client) {
 			createRenderers();
@@ -771,7 +771,7 @@ namespace Game3 {
 		return false;
 	}
 
-	BiomeType Realm::getBiome(uint32_t seed) {
+	BiomeType Realm::getBiome(int64_t seed) {
 		std::default_random_engine rng;
 		rng.seed(seed * 79);
 		return std::uniform_int_distribution(0, 100)(rng) % Biome::COUNT + 1;

@@ -68,7 +68,7 @@ namespace Game3 {
 			/** Whether the realm's rendering should be affected by the day-night cycle. */
 			bool outdoors = true;
 			size_t ghostCount = 0;
-			int seed = 0;
+			int64_t seed = 0;
 			std::set<ChunkPosition> generatedChunks;
 
 			Realm(const Realm &) = delete;
@@ -236,7 +236,7 @@ namespace Game3 {
 			bool updatesPaused = false;
 
 			Realm(Game &);
-			Realm(Game &, RealmID, RealmType, Identifier tileset_id, int seed_);
+			Realm(Game &, RealmID, RealmType, Identifier tileset_id, int64_t seed_);
 
 			void initTexture();
 			virtual void absorbJSON(const nlohmann::json &);
@@ -264,7 +264,7 @@ namespace Game3 {
 			bool isWalkable(Index row, Index column, const Tileset &);
 			void setLayerHelper(Index row, Index col, bool should_mark_dirty = true);
 
-			static BiomeType getBiome(uint32_t seed);
+			static BiomeType getBiome(int64_t seed);
 
 			std::atomic<std::thread::id> entityOwner;
 			inline auto lockEntitiesUnique() {

@@ -61,6 +61,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `i32` Realm ID
 	- `string` Realm Type
+	- `string` Tileset Identifier
 	- `bool` Outdoors
 
 10. **Login**: sent by a client to log into the server.
