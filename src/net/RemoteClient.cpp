@@ -9,6 +9,7 @@
 #include "packet/PacketError.h"
 #include "packet/PacketFactory.h"
 #include "util/Math.h"
+#include "util/Util.h"
 
 namespace Game3 {
 	void RemoteClient::handleInput(std::string_view string) {
@@ -21,7 +22,6 @@ namespace Game3 {
 		auto str = std::string(string);
 		while (!str.empty() && (str.back() == '\r' || str.back() == '\n'))
 			str.pop_back();
-		SPAM("HandleInput: \"" << str << "\":" << ss.str());
 
 		headerBytes.insert(headerBytes.end(), string.begin(), string.end());
 
@@ -29,8 +29,6 @@ namespace Game3 {
 			buffer.clear();
 			packetType = 0;
 			payloadSize = 0;
-
-			SPAM("HeaderBytes<" << headerBytes.size() << '>');
 
 			if (6 <= headerBytes.size()) {
 				packetType = headerBytes[0] | (static_cast<uint16_t>(headerBytes[1]) << 8);
@@ -43,7 +41,6 @@ namespace Game3 {
 		if (state == State::Data) {
 			if (MAX_PACKET_SIZE < buffer.size() + headerBytes.size())
 				throw PacketError("Packet too large");
-
 
 			const size_t to_append = std::min(payloadSize - buffer.size(), headerBytes.size());
 

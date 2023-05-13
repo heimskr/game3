@@ -101,10 +101,11 @@ namespace Game3 {
 	void ClientGame::tick() {
 		client->read();
 
-		if (!player) {
-			// WARN("No player");
+		for (const auto &packet: packetQueue.steal())
+			packet->handle(*this);
+
+		if (!player)
 			return;
-		}
 
 		if (auto realm = player->getRealm()) {
 			if (chunksAwaited == 0) {
@@ -119,5 +120,9 @@ namespace Game3 {
 		} else {
 			WARN("No realm");
 		}
+	}
+
+	void ClientGame::queuePacket(std::shared_ptr<Packet> packet) {
+		packetQueue.push(std::move(packet));
 	}
 }

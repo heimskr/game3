@@ -8,6 +8,7 @@
 #include <list>
 #include <random>
 #include <set>
+#include <span>
 #include <stdexcept>
 #include <unordered_set>
 #include <vector>
@@ -23,6 +24,8 @@ namespace Game3 {
 
 	/** Splits a string by a given delimiter. If condense is true, empty strings won't be included in the output. */
 	std::vector<std::string_view> split(const std::string_view &str, const std::string &delimiter, bool condense = true);
+
+	std::string hexString(std::span<uint8_t>);
 
 	long parseLong(const std::string &, int base = 10);
 	long parseLong(const char *, int base = 10);

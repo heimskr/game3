@@ -3,34 +3,40 @@
 #include <iostream>
 #include <memory>
 
+#include "net/Buffer.h"
+#include "net/Sock.h"
 #include "util/Math.h"
 
 namespace Game3 {
 	class ClientGame;
 	class Packet;
-	class Sock;
-	class SocketBuffer;
 
-	class LocalClient {
+	class LocalClient: public std::enable_shared_from_this<LocalClient> {
 		public:
+			constexpr static size_t MAX_PACKET_SIZE = 1 << 24;
+
+			std::shared_ptr<ClientGame> game;
+
 			LocalClient() = default;
 
 			void connect(std::string_view hostname, uint16_t port);
 			void read();
 			void send(const Packet &);
-			void send(std::string_view);
 			bool isConnected() const;
 
 		private:
-			std::shared_ptr<ClientGame> game;
+			enum class State {Begin, Data};
+			State state = State::Begin;
+			Buffer buffer;
+			uint16_t packetType = 0;
+			uint32_t payloadSize = 0;
 			std::shared_ptr<Sock> sock;
-			std::shared_ptr<SocketBuffer> buffer;
-			std::shared_ptr<std::iostream> stream;
+			std::vector<uint8_t> headerBytes;
 
 			template <std::integral T>
 			void sendRaw(T value) {
 				T little = toLittle(value);
-				*stream << std::string_view(reinterpret_cast<const char *>(&little), sizeof(T));
+				sock->send(&little, sizeof(little));
 			}
 	};
 }

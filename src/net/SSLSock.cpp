@@ -9,16 +9,18 @@
 #include "net/NetError.h"
 
 namespace Game3 {
-	void SSLSock::connect() {
-		Sock::connect();
-		connectSSL();
+	void SSLSock::connect(bool blocking) {
+		Sock::connect(blocking);
+		connectSSL(blocking);
 	}
 
 	ssize_t SSLSock::send(const void *data, size_t bytes) {
 		if (!connected)
 			throw std::invalid_argument("Socket not connected");
+
 		size_t written = 0;
 		const int status = SSL_write_ex(ssl, data, bytes, &written);
+
 		if (status == 1) {
 			SPAM("SSLSock::send(status == 1): bytes[" << bytes << "], written[" << written << "]");
 			std::stringstream ss;
@@ -40,16 +42,18 @@ namespace Game3 {
 			throw std::invalid_argument("Socket not connected");
 
 		fd_set fds_copy = fds;
-		int status = select(FD_SETSIZE, &fds_copy, NULL, NULL, NULL);
+		timeval timeout {.tv_sec = 0, .tv_usec = 100};
+		int status = select(FD_SETSIZE, &fds_copy, nullptr, nullptr, &timeout);
 		if (status < 0) {
 			ERROR("select status: " << strerror(status));
 			throw NetError(errno);
 		}
 
 		if (FD_ISSET(netFD, &fds_copy)) {
-			bool read_blocked;
-			size_t bytes_read, total_bytes_read = 0;
-			int ssl_error;
+			bool read_blocked = false;
+			size_t bytes_read = 0;
+			size_t total_bytes_read = 0;
+			int ssl_error = 0;
 			do {
 				read_blocked = false;
 				status = SSL_read_ex(ssl, data, bytes, &bytes_read);
@@ -100,7 +104,9 @@ namespace Game3 {
 			} while (SSL_pending(ssl) && !read_blocked && 0 < bytes);
 
 			return total_bytes_read;
-		} else if (FD_ISSET(controlRead, &fds_copy)) {
+		}
+
+		if (FD_ISSET(controlRead, &fds_copy)) {
 			ControlMessage message;
 			status = ::read(controlRead, &message, 1);
 			if (status < 0) {
@@ -116,14 +122,12 @@ namespace Game3 {
 			::close(netFD);
 			SSL_CTX_free(sslContext);
 			return 0;
-		} else {
-			SPAM("No file descriptor is ready.");
 		}
 
 		return -1;
 	}
 
-	void SSLSock::connectSSL() {
+	void SSLSock::connectSSL(bool blocking) {
 		const SSL_METHOD *method = TLS_client_method();
 		sslContext = SSL_CTX_new(method);
 
@@ -148,7 +152,10 @@ namespace Game3 {
 		int flags = fcntl(netFD, F_GETFL, 0);
 		if (flags < 0)
 			throw std::runtime_error("fcntl(F_GETFL) returned " + std::to_string(flags));
-		flags |= O_NONBLOCK;
+		if (blocking)
+			flags &= ~O_NONBLOCK;
+		else
+			flags |= O_NONBLOCK;
 		status = fcntl(netFD, F_SETFL, flags);
 		if (status < 0)
 			throw std::runtime_error("fcntl(F_SETFL) returned " + std::to_string(status));

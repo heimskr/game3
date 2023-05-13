@@ -15,7 +15,7 @@ namespace Game3 {
 		public:
 			using Sock::Sock;
 
-			void connect() override;
+			void connect(bool blocking) override;
 			ssize_t send(const void *, size_t) override;
 			ssize_t recv(void *, size_t) override;
 
@@ -23,6 +23,6 @@ namespace Game3 {
 			SSL_CTX *sslContext = nullptr;
 			SSL *ssl = nullptr;
 
-			void connectSSL();
+			void connectSSL(bool blocking);
 	};
 }

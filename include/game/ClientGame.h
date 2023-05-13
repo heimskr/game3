@@ -4,6 +4,7 @@
 
 namespace Game3 {
 	class LocalClient;
+	class Packet;
 
 	class ClientGame: public Game {
 		public:
@@ -24,6 +25,7 @@ namespace Game3 {
 			const Glib::ustring & getText() const;
 			void runCommand(const std::string &);
 			void tick();
+			void queuePacket(std::shared_ptr<Packet>);
 
 			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update() const { return signal_player_inventory_update_; }
 			sigc::signal<void(const PlayerPtr &)> signal_player_money_update() const { return signal_player_money_update_; }
@@ -31,11 +33,13 @@ namespace Game3 {
 
 			Side getSide() const override { return Side::Client; }
 
+
 		private:
 			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update_;
 			sigc::signal<void(const PlayerPtr &)> signal_player_money_update_;
 			sigc::signal<void(const std::shared_ptr<HasRealm> &)> signal_other_inventory_update_;
 
+			MTQueue<std::shared_ptr<Packet>> packetQueue;
 			size_t chunksAwaited = 0;
 	};
 }

@@ -1,5 +1,6 @@
 #include <cstring>
 #include <cerrno>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/select.h>
 #include <sys/socket.h>
@@ -31,11 +32,24 @@ namespace Game3 {
 		freeaddrinfo(info);
 	}
 
-	void Sock::connect() {
+	void Sock::connect(bool blocking) {
 		netFD = socket(info->ai_family, info->ai_socktype, info->ai_protocol);
 		int status = ::connect(netFD, info->ai_addr, info->ai_addrlen);
+
 		if (status != 0) {
 			ERROR("connect(): " << strerror(errno));
+			throw NetError(errno);
+		}
+
+		int flags = fcntl(netFD, F_GETFL, 0);
+		if (flags == -1) {
+			ERROR("fcntl (get): " << strerror(errno));
+			throw NetError(errno);
+		}
+
+		flags = fcntl(netFD, F_SETFL, blocking? (flags & ~O_NONBLOCK) : (flags | O_NONBLOCK));
+		if (flags == -1) {
+			ERROR("fcntl (set): " << strerror(errno));
 			throw NetError(errno);
 		}
 
@@ -87,7 +101,9 @@ namespace Game3 {
 				close();
 
 			return bytes_read;
-		} else if (FD_ISSET(controlRead, &fds_copy)) {
+		}
+
+		if (FD_ISSET(controlRead, &fds_copy)) {
 			ControlMessage message;
 			status = ::read(controlRead, &message, 1);
 			if (status < 0) {
@@ -100,10 +116,9 @@ namespace Game3 {
 			}
 
 			return 0;
-		} else {
-			SPAM("No file descriptor is ready.");
 		}
 
+		SPAM("No file descriptor is ready.");
 		return -1;
 	}
 }

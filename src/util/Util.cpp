@@ -1,5 +1,6 @@
 #include <charconv>
 #include <cstring>
+#include <sstream>
 
 #include "util/Util.h"
 
@@ -29,6 +30,19 @@ namespace Game3 {
 		}
 
 		return out;
+	}
+
+	std::string hexString(std::span<uint8_t> span) {
+		std::stringstream ss;
+		bool first = true;
+		for (const uint8_t byte: span) {
+			if (first)
+				first = false;
+			else
+				ss << ' ';
+			ss << std::hex << std::setw(2) << std::setfill('0') << std::right << static_cast<uint16_t>(byte);
+		}
+		return ss.str();
 	}
 
 	long parseLong(const std::string &str, int base) {

@@ -20,7 +20,7 @@ namespace Game3 {
 			virtual ~Sock();
 
 			/** Connects to the socket. */
-			virtual void connect();
+			virtual void connect(bool blocking);
 
 			/** Closes the socket. */
 			virtual void close();

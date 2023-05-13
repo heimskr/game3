@@ -34,17 +34,11 @@ namespace Game3 {
 
 		private:
 			enum class State {Begin, Data};
-
 			State state = State::Begin;
-
 			std::vector<uint8_t> headerBytes;
 			uint16_t packetType = 0;
 			uint32_t payloadSize = 0;
 			std::weak_ptr<Player> weakPlayer;
-
-
-
-
 			Buffer buffer;
 	};
 }
