@@ -292,7 +292,7 @@ namespace Game3 {
 		game = std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, canvas.get()));
 		game->client = std::make_shared<LocalClient>();
 		game->client->connect("::1", 12255);
-		game->client->game = game;
+		game->client->weakGame = game;
 		game->initEntities();
 		// networkRunning = true;
 		// networkThread = std::thread([this] {

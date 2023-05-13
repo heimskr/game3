@@ -64,3 +64,6 @@ namespace Game3 {
 	     ::Game3::log << "\e[2m[\e[1m" << ::Game3::Logger::getTimestamp() \
 	                  << "\e[22;2m]\e[22m (\e[22;1;32m🗸\e[22;39m)\e[2m :: " \
 	                  << message << "\e[22m" << std::endl; } while (false)
+
+#undef SPAM
+#define SPAM(message)

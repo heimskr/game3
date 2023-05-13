@@ -15,7 +15,7 @@ namespace Game3 {
 		public:
 			constexpr static size_t MAX_PACKET_SIZE = 1 << 24;
 
-			std::shared_ptr<ClientGame> game;
+			std::weak_ptr<ClientGame> weakGame;
 
 			LocalClient() = default;
 
@@ -23,6 +23,7 @@ namespace Game3 {
 			void read();
 			void send(const Packet &);
 			bool isConnected() const;
+			std::shared_ptr<ClientGame> lockGame() const;
 
 		private:
 			enum class State {Begin, Data};

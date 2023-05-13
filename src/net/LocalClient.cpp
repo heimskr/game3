@@ -53,7 +53,7 @@ namespace Game3 {
 				throw std::logic_error("Buffer grew too large");
 
 			if (payloadSize == buffer.size()) {
-				assert(game);
+				auto game = lockGame();
 				auto packet = (*game->registry<PacketFactoryRegistry>()[packetType])();
 				packet->decode(*game, buffer);
 				buffer.clear();
@@ -65,6 +65,7 @@ namespace Game3 {
 
 	void LocalClient::send(const Packet &packet) {
 		Buffer buffer;
+		auto game = lockGame();
 		packet.encode(*game, buffer);
 		assert(buffer.size() < UINT32_MAX);
 		sendRaw(packet.getID());
@@ -75,5 +76,11 @@ namespace Game3 {
 
 	bool LocalClient::isConnected() const {
 		return sock->isConnected();
+	}
+
+	std::shared_ptr<ClientGame> LocalClient::lockGame() const {
+		auto locked = weakGame.lock();
+		assert(locked);
+		return locked;
 	}
 }
