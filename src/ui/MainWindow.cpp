@@ -294,13 +294,12 @@ namespace Game3 {
 		game->client->connect("::1", 12255);
 		game->client->weakGame = game;
 		game->initEntities();
-		// networkRunning = true;
-		// networkThread = std::thread([this] {
-		// 	while (networkRunning) {
-		// 		game->tick();
-		// 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		// 	}
-		// });
+
+		if (std::filesystem::exists("tokens.json"))
+			game->client->readTokens("tokens.json");
+		else
+			game->client->saveTokens("tokens.json");
+
 		onGameLoaded();
 	}
 

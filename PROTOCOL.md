@@ -84,6 +84,8 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 13. **Registration Status**: informs a client of the status of their registration attempt.
 
+	- `string` Username
+	- `string` Display Name
 	- `u64` Token
 
 	The token will be 0 if the attempt failed, or an arbitrary nonzero value otherwise.

@@ -1,8 +1,6 @@
-#include "entity/Player.h"
 #include "error/AuthenticationError.h"
-#include "game/ServerGame.h"
-#include "net/LocalServer.h"
-#include "net/RemoteClient.h"
+#include "game/ClientGame.h"
+#include "net/LocalClient.h"
 #include "packet/RegistrationStatusPacket.h"
 #include "packet/PacketError.h"
 
@@ -12,5 +10,9 @@ namespace Game3 {
 			throw AuthenticationError("Registration failed");
 
 		std::cout << "Registration succeeded: token = " << token << '\n';
+
+		auto &client = *game.client;
+		client.setToken(client.getHostname(), username, token);
+		client.saveTokens();
 	}
 }

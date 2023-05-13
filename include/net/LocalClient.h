@@ -1,7 +1,10 @@
 #pragma once
 
+#include <filesystem>
 #include <iostream>
 #include <memory>
+#include <optional>
+#include <string>
 
 #include "net/Buffer.h"
 #include "net/Sock.h"
@@ -24,6 +27,11 @@ namespace Game3 {
 			void send(const Packet &);
 			bool isConnected() const;
 			std::shared_ptr<ClientGame> lockGame() const;
+			void setToken(const std::string &hostname, const std::string &username, Token);
+			void readTokens(const std::filesystem::path &);
+			void saveTokens() const;
+			void saveTokens(const std::filesystem::path &);
+			const std::string & getHostname() const;
 
 		private:
 			enum class State {Begin, Data};
@@ -33,6 +41,8 @@ namespace Game3 {
 			uint32_t payloadSize = 0;
 			std::shared_ptr<Sock> sock;
 			std::vector<uint8_t> headerBytes;
+			std::map<std::string, std::map<std::string, Token>> tokenDatabase;
+			std::optional<std::filesystem::path> tokenDatabasePath;
 
 			template <std::integral T>
 			void sendRaw(T value) {

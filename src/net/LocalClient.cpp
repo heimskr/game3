@@ -1,3 +1,7 @@
+#include <fstream>
+
+#include <nlohmann/json.hpp>
+
 #include "Log.h"
 #include "game/ClientGame.h"
 #include "net/Buffer.h"
@@ -7,6 +11,7 @@
 #include "packet/Packet.h"
 #include "packet/PacketError.h"
 #include "packet/PacketFactory.h"
+#include "util/FS.h"
 
 namespace Game3 {
 	void LocalClient::connect(std::string_view hostname, uint16_t port) {
@@ -82,5 +87,30 @@ namespace Game3 {
 		auto locked = weakGame.lock();
 		assert(locked);
 		return locked;
+	}
+
+	void LocalClient::setToken(const std::string &hostname, const std::string &username, Token token) {
+		tokenDatabase[hostname][username] = token;
+	}
+
+	void LocalClient::readTokens(const std::filesystem::path &path) {
+		tokenDatabase = nlohmann::json::parse(readFile(path));
+		tokenDatabasePath = path;
+	}
+
+	void LocalClient::saveTokens() const {
+		assert(tokenDatabasePath);
+		std::ofstream(*tokenDatabasePath) << nlohmann::json(tokenDatabase).dump();
+	}
+
+	void LocalClient::saveTokens(const std::filesystem::path &path) {
+		tokenDatabasePath = path;
+		std::ofstream(path) << nlohmann::json(tokenDatabase).dump();
+	}
+
+	const std::string & LocalClient::getHostname() const {
+		if (!sock)
+			throw std::runtime_error("Client not connected");
+		return sock->hostname;
 	}
 }
