@@ -6,6 +6,7 @@
 #include <optional>
 #include <string>
 
+#include "Types.h"
 #include "net/Buffer.h"
 #include "net/Sock.h"
 #include "util/Math.h"

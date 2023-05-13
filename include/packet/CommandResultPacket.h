@@ -19,6 +19,6 @@ namespace Game3 {
 		PacketID getID() const override { return ID(); }
 
 		void encode(Game &, Buffer &buffer) const override { buffer << commandID << success << message; }
-		void decode(Game &, Buffer &buffer) override { buffer >> commandID >> success >> message; }
+		void decode(Game &, Buffer &buffer)       override { buffer >> commandID >> success >> message; }
 	};
 }

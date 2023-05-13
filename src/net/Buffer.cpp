@@ -2,7 +2,9 @@
 #include <cstring>
 #include <iomanip>
 
+#include "Log.h"
 #include "net/Buffer.h"
+#include "util/Util.h"
 
 namespace Game3 {
 	template <> std::string Buffer::getType<bool>    (const bool &)     { return {'\x01'}; }
@@ -35,6 +37,11 @@ namespace Game3 {
 	template <>
 	std::string Buffer::getType<std::string>(const std::string &string) {
 		return getType(std::string_view(string));
+	}
+
+	Buffer & Buffer::operator+=(bool item) {
+		bytes.insert(bytes.end(), static_cast<uint8_t>(item));
+		return *this;
 	}
 
 	Buffer & Buffer::operator+=(char item) {
@@ -218,6 +225,14 @@ namespace Game3 {
 		if (bytes.size() <= count)
 			return;
 		bytes.erase(bytes.begin() + count, bytes.end());
+	}
+
+	void Buffer::debug() const {
+		INFO("Buffer: " << hexString(bytes));
+	}
+
+	Buffer & Buffer::operator<<(bool item) {
+		return appendType(item) += item;
 	}
 
 	Buffer & Buffer::operator<<(uint8_t item) {

@@ -9,6 +9,7 @@
 #include <random>
 #include <set>
 #include <span>
+#include <sstream>
 #include <stdexcept>
 #include <unordered_set>
 #include <vector>
@@ -23,9 +24,36 @@ namespace Game3 {
 	extern std::default_random_engine utilRNG;
 
 	/** Splits a string by a given delimiter. If condense is true, empty strings won't be included in the output. */
-	std::vector<std::string_view> split(const std::string_view &str, const std::string &delimiter, bool condense = true);
+	template <typename T = std::string_view>
+	std::vector<T> split(std::string_view str, std::string_view delimiter, bool condense = true);
 
-	std::string hexString(std::span<uint8_t>);
+	template <typename C>
+	std::string join(const C &container, std::string_view delimiter = " ") {
+		std::stringstream ss;
+		bool first = true;
+		for (const auto &item: container) {
+			if (first)
+				first = false;
+			else
+				ss << delimiter;
+			ss << item;
+		}
+		return ss.str();
+	}
+
+	template <typename C>
+	std::string hexString(const C &container) {
+		std::stringstream ss;
+		bool first = true;
+		for (const uint8_t byte: container) {
+			if (first)
+				first = false;
+			else
+				ss << ' ';
+			ss << std::hex << std::setw(2) << std::setfill('0') << std::right << static_cast<uint16_t>(byte);
+		}
+		return ss.str();
+	}
 
 	long parseLong(const std::string &, int base = 10);
 	long parseLong(const char *, int base = 10);

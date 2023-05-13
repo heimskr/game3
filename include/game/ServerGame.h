@@ -8,6 +8,7 @@
 namespace Game3 {
 	class LocalServer;
 	class Packet;
+	class RemoteClient;
 
 	class ServerGame: public Game {
 		public:
@@ -22,7 +23,7 @@ namespace Game3 {
 
 			Side getSide() const override { return Side::Server; }
 			void queuePacket(std::shared_ptr<RemoteClient>, std::shared_ptr<Packet>);
-			void runCommand(const PlayerPtr &, const std::string &, GlobalID);
+			void runCommand(RemoteClient &, const std::string &, GlobalID);
 
 		private:
 			std::shared_mutex playersMutex;
@@ -32,6 +33,6 @@ namespace Game3 {
 			inline auto lockPlayersUnique() { return std::unique_lock(playersMutex); }
 
 			void handlePacket(RemoteClient &, const Packet &);
-			std::tuple<bool, std::string> commandHelper(const PlayerPtr &, const std::string &);
+			std::tuple<bool, std::string> commandHelper(RemoteClient &, const std::string &);
 	};
 }

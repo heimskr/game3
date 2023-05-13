@@ -4,6 +4,8 @@
 
 #include <nlohmann/json.hpp>
 
+#include "command/local/LocalCommandFactory.h"
+#include "command/local/RegisterCommand.h"
 #include "entity/Blacksmith.h"
 #include "entity/Chicken.h"
 #include "entity/Dog.h"
@@ -89,6 +91,7 @@ namespace Game3 {
 		registries.add<RealmTypeRegistry>();
 		registries.add<RealmDetailsRegistry>();
 		registries.add<PacketFactoryRegistry>();
+		registries.add<LocalCommandFactoryRegistry>();
 		// TODO: plugins
 	}
 
@@ -270,6 +273,10 @@ namespace Game3 {
 		add(PacketFactory::create<RegistrationStatusPacket>());
 	}
 
+	void Game::addLocalCommandFactories() {
+		add(LocalCommandFactory::create<RegisterCommand>());
+	}
+
 	void Game::initialSetup(const std::filesystem::path &dir) {
 		initRegistries();
 		addItems();
@@ -279,6 +286,7 @@ namespace Game3 {
 		addEntityFactories();
 		addTileEntityFactories();
 		addPacketFactories();
+		addLocalCommandFactories();
 	}
 
 	void Game::initEntities() {
@@ -321,6 +329,11 @@ namespace Game3 {
 	void Game::add(PacketFactory &&factory) {
 		auto shared = std::make_shared<PacketFactory>(std::move(factory));
 		registry<PacketFactoryRegistry>().add(shared->number, shared);
+	}
+
+	void Game::add(LocalCommandFactory &&factory) {
+		auto shared = std::make_shared<LocalCommandFactory>(std::move(factory));
+		registry<LocalCommandFactoryRegistry>().add(shared->name, shared);
 	}
 
 	void Game::add(GhostFunction &&function) {

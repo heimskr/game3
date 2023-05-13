@@ -37,24 +37,27 @@ namespace Game3 {
 		packetQueue.emplace(std::move(client), std::move(packet));
 	}
 
-	void ServerGame::runCommand(const PlayerPtr &player, const std::string &command, GlobalID command_id) {
-		auto [success, message] = commandHelper(player, command);
+	void ServerGame::runCommand(RemoteClient &client, const std::string &command, GlobalID command_id) {
+		auto [success, message] = commandHelper(client, command);
 		CommandResultPacket packet(command_id, success, std::move(message));
-		player->client->send(packet);
+		client.send(packet);
 	}
 
 	void ServerGame::handlePacket(RemoteClient &client, const Packet &packet) {
 		packet.handle(*this, client);
 	}
 
-	std::tuple<bool, std::string> ServerGame::commandHelper(const PlayerPtr &player, const std::string &command) {
+	std::tuple<bool, std::string> ServerGame::commandHelper(RemoteClient &client, const std::string &command) {
 		if (command.empty())
 			return {false, "Command is empty."};
 
 		const auto words = split(command, " ", false);
 		const auto &first = words.at(0);
+		auto player = client.getPlayer();
 
-		// TODO: command registry...?
+		// Change this check if there are any miscellaneous commands implemented later that don't require a player.
+		if (!player)
+			return {false, "No player."};
 
 		try {
 			if (first == "give") {
@@ -94,8 +97,8 @@ namespace Game3 {
 					player->setHeldRight(slot);
 				return {true, "Set held slot to " + std::to_string(slot)};
 			} else if (first == "h") {
-				runCommand(player, "heldL 0", threadContext.rng());
-				runCommand(player, "heldR 1", threadContext.rng());
+				runCommand(client, "heldL 0", threadContext.rng());
+				runCommand(client, "heldR 1", threadContext.rng());
 			}
 		} catch (const std::exception &err) {
 			return {false, err.what()};

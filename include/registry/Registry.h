@@ -328,4 +328,71 @@ namespace Game3 {
 				return items.size();
 			}
 	};
+
+	struct StringRegistryBase: Registry {
+		using Registry::Registry;
+	};
+
+	template <typename T>
+	class StringRegistry: public StringRegistryBase {
+#ifdef REGISTRY_ASSERTS
+		static_assert(std::is_base_of_v<StringRegisterable, T>);
+#endif
+
+		public:
+			std::map<std::string, std::shared_ptr<T>> items;
+
+			using StringRegistryBase::StringRegistryBase;
+			~StringRegistry() override = default;
+
+			inline StringRegistry & operator+=(std::shared_ptr<T> item) {
+				add(item);
+				return *this;
+			}
+
+			inline StringRegistry & operator+=(const std::pair<std::string, std::shared_ptr<T>> &pair) {
+				add(pair.first, pair.second);
+				return *this;
+			}
+
+			inline void add(const std::string &new_name, std::shared_ptr<T> new_item) {
+				if (auto [iter, inserted] = items.try_emplace(new_name, std::move(new_item)); inserted) {
+					iter->second->name = new_name;
+				} else
+					throw std::runtime_error("StringRegistry " + identifier.str() + " already contains an item with name " + new_name);
+			}
+
+			inline void add(const std::shared_ptr<T> &new_item) {
+				add(new_item->name, new_item);
+			}
+
+			inline void add(const std::string &new_name, T &&new_item) {
+				add(new_name, std::make_shared<T>(std::move(new_item)));
+			}
+
+			inline bool contains(const std::string &name) const {
+				return items.contains(name);
+			}
+
+			inline std::shared_ptr<T> operator[](const std::string &name) const {
+				return at(name);
+			}
+
+			inline std::shared_ptr<T> at(const std::string &name) const {
+				try {
+					return items.at(name);
+				} catch (const std::out_of_range &) {
+					std::cerr << "\e[31mCouldn't find \"" + name + "\" in registry " + identifier.str() << "\e[39m\n";
+					return {};
+				}
+			}
+
+			inline void clear() {
+				items.clear();
+			}
+
+			inline size_t size() const {
+				return items.size();
+			}
+	};
 }

@@ -147,7 +147,9 @@ namespace Game3 {
 
 			void popMany(size_t);
 			void limitTo(size_t);
+			void debug() const;
 
+			Buffer & operator<<(bool);
 			Buffer & operator<<(uint8_t);
 			Buffer & operator<<(uint16_t);
 			Buffer & operator<<(uint32_t);
@@ -212,8 +214,10 @@ namespace Game3 {
 
 			template <Numeric T>
 			Buffer & operator>>(T &out) {
-				if (!typesMatch(popType(), getType(T())))
+				if (!typesMatch(popType(), getType(T()))) {
+					debug();
 					throw std::invalid_argument("Invalid type in buffer");
+				}
 				out = popBuffer<T>(*this);
 				return *this;
 			}

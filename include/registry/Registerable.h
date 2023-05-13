@@ -24,4 +24,13 @@ namespace Game3 {
 		NumericRegisterable() = delete;
 		NumericRegisterable(Type number_): number(number_) {}
 	};
+
+	struct StringRegisterable: Registerable {
+		using Type = std::string;
+
+		Type name;
+
+		StringRegisterable() = delete;
+		StringRegisterable(Type name_): name(std::move(name_)) {}
+	};
 }

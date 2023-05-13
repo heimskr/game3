@@ -7,7 +7,8 @@
 namespace Game3 {
 	std::default_random_engine utilRNG;
 
-	std::vector<std::string_view> split(const std::string_view &str, const std::string &delimiter, bool condense) {
+	template <>
+	std::vector<std::string_view> split<std::string_view>(std::string_view str, std::string_view delimiter, bool condense) {
 		if (str.empty())
 			return {};
 
@@ -32,17 +33,14 @@ namespace Game3 {
 		return out;
 	}
 
-	std::string hexString(std::span<uint8_t> span) {
-		std::stringstream ss;
-		bool first = true;
-		for (const uint8_t byte: span) {
-			if (first)
-				first = false;
-			else
-				ss << ' ';
-			ss << std::hex << std::setw(2) << std::setfill('0') << std::right << static_cast<uint16_t>(byte);
-		}
-		return ss.str();
+	template <>
+	std::vector<std::string> split<std::string>(std::string_view str, std::string_view delimiter, bool condense) {
+		const auto pieces = split<std::string_view>(str, delimiter, condense);
+		std::vector<std::string> out;
+		out.reserve(pieces.size());
+		for (const auto &piece: pieces)
+			out.emplace_back(piece);
+		return out;
 	}
 
 	long parseLong(const std::string &str, int base) {

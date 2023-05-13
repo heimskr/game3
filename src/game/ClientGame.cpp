@@ -1,6 +1,7 @@
 #include "Log.h"
 #include "ThreadContext.h"
 #include "Tileset.h"
+#include "command/local/LocalCommandFactory.h"
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "net/LocalClient.h"
@@ -10,6 +11,7 @@
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "ui/tab/TextTab.h"
+#include "util/Util.h"
 
 namespace Game3 {
 	void ClientGame::click(int button, int, double pos_x, double pos_y) {
@@ -91,11 +93,20 @@ namespace Game3 {
 	}
 
 	void ClientGame::runCommand(const std::string &command) {
-		if (command == "reg") {
-			client->send(RegisterPlayerPacket("username", "Display Name"));
-		} else {
+		auto pieces = split<std::string>(command, " ", false);
+		if (pieces.empty())
+			throw CommandError("No command entered");
+
+		// try {
+		// 	if (auto factory = registry<LocalCommandFactoryRegistry>()[pieces.front()]) {
+		// 		auto command = (*factory)();
+		// 		command->pieces = std::move(pieces);
+		// 		(*command)(*client);
+		// 	} else
+		// 		throw std::out_of_range("Command not found");
+		// } catch (const std::out_of_range &) {
 			client->send(CommandPacket(threadContext.rng(), command));
-		}
+		// }
 	}
 
 	void ClientGame::tick() {

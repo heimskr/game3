@@ -7,6 +7,7 @@ namespace Game3 {
 	class EntityFactory;
 	class GhostFunction;
 	class Item;
+	class LocalCommandFactory;
 	class PacketFactory;
 	class RealmFactory;
 	class Texture;
@@ -92,5 +93,10 @@ namespace Game3 {
 	struct PacketFactoryRegistry: NumericRegistry<PacketFactory> {
 		static Identifier ID() { return {"base", "packet_factory"}; }
 		PacketFactoryRegistry(): NumericRegistry(ID()) {}
+	};
+
+	struct LocalCommandFactoryRegistry: StringRegistry<LocalCommandFactory> {
+		static Identifier ID() { return {"base", "local_command_factory"}; }
+		LocalCommandFactoryRegistry(): StringRegistry(ID()) {}
 	};
 }
