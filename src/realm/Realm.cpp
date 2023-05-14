@@ -463,7 +463,8 @@ namespace Game3 {
 	}
 
 	void Realm::setTile(Layer layer, const Position &position, TileID tile_id, bool run_helper) {
-		tileProvider.findTile(layer, position.row, position.column, TileProvider::TileMode::Create) = tile_id;
+		auto &found = tileProvider.findTile(layer, position.row, position.column, TileProvider::TileMode::Create);
+		found = tile_id;
 		if (isServer()) {
 			if (run_helper)
 				setLayerHelper(position.row, position.column);

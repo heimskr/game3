@@ -141,8 +141,8 @@ namespace Game3 {
 			/** Creates missing tile chunks at a given chunk position in every layer. */
 			void ensureTileChunk(const ChunkPosition &);
 
-			/** Creates missing tile chunks at a given chunk position in every layer except the one provided (which should be 1-based). */
-			void ensureTileChunk(const ChunkPosition &, Layer except);
+			/** Creates missing tile chunks at a given chunk position in a given layer (which should be 1-based). */
+			void ensureTileChunk(const ChunkPosition &, Layer);
 
 			/** Creates a missing biome chunk. */
 			void ensureBiomeChunk(const ChunkPosition &);
@@ -165,6 +165,7 @@ namespace Game3 {
 			static T & access(Chunk<T> &chunk, int64_t row, int64_t column) {
 				assert(0 <= row);
 				assert(0 <= column);
+				assert(chunk.data());
 				return chunk[row * CHUNK_SIZE + column];
 			}
 

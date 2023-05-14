@@ -136,6 +136,7 @@ namespace Game3 {
 		auto &player = *client.getPlayer();
 		auto realm  = player.getRealm();
 		INFO("Setting up player");
+		player.client = client.shared_from_this();
 		client.send(SelfTeleportedPacket(realm->id, player.getPosition()));
 		for (const auto &chunk_position: player.getVisibleChunks())
 			client.sendChunk(realm, chunk_position);

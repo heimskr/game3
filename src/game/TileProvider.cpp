@@ -214,11 +214,10 @@ namespace Game3 {
 				initTileChunk(layer, iter->second, chunk_position);
 	}
 
-	void TileProvider::ensureTileChunk(const ChunkPosition &chunk_position, Layer except) {
-		for (Layer layer = 0; layer < LAYER_COUNT; ++layer)
-			if (layer != except - 1)
-				if (auto [iter, inserted] = chunkMaps[layer].try_emplace(chunk_position); inserted)
-					initTileChunk(layer, iter->second, chunk_position);
+	void TileProvider::ensureTileChunk(const ChunkPosition &chunk_position, Layer layer) {
+		validateLayer(layer);
+		if (auto [iter, inserted] = chunkMaps[layer - 1].try_emplace(chunk_position); inserted)
+			initTileChunk(layer, iter->second, chunk_position);
 	}
 
 	void TileProvider::ensureBiomeChunk(const ChunkPosition &chunk_position) {
@@ -247,8 +246,8 @@ namespace Game3 {
 	}
 
 	void TileProvider::initTileChunk(Layer, Chunk<TileID> &chunk, const ChunkPosition &chunk_position) {
-		generationQueue.push_back(chunk_position);
 		chunk.resize(CHUNK_SIZE * CHUNK_SIZE, 0);
+		generationQueue.push_back(chunk_position);
 	}
 
 	void TileProvider::initBiomeChunk(Chunk<BiomeType> &chunk, const ChunkPosition &) {

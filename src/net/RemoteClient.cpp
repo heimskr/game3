@@ -65,6 +65,7 @@ namespace Game3 {
 	}
 
 	void RemoteClient::send(const Packet &packet) {
+		assert(server.game);
 		Buffer send_buffer;
 		packet.encode(*server.game, send_buffer);
 		assert(send_buffer.size() < UINT32_MAX);
