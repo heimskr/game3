@@ -136,7 +136,6 @@ namespace Game3 {
 		auto &player = *client.getPlayer();
 		auto &realm  = *player.getRealm();
 		INFO("Setting up player");
-		client.send(RealmNoticePacket(realm.id, realm.type, realm.getTileset().identifier, realm.seed, realm.outdoors));
 		client.send(SelfTeleportedPacket(realm.id, player.getPosition()));
 	}
 

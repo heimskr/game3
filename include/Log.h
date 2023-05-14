@@ -62,8 +62,8 @@ namespace Game3 {
 #define SUCCESS(message) \
 	do { std::unique_lock lock(Game3::log.mutex); \
 	     ::Game3::log << "\e[2m[\e[1m" << ::Game3::Logger::getTimestamp() \
-	                  << "\e[22;2m]\e[22m (\e[22;1;32m🗸\e[22;39m)\e[2m :: " \
-	                  << message << "\e[22m" << std::endl; } while (false)
+	                  << "\e[22;2m]\e[22m (\e[22;1;32m🗸\e[22;39m)\e[2m :: \e[22;32m" \
+	                  << message << "\e[39m" << std::endl; } while (false)
 
 #undef SPAM
 #define SPAM(message)

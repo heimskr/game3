@@ -19,8 +19,10 @@ namespace Game3 {
 		if (!success)
 			throw AuthenticationError("Login failed");
 
-		std::cout << "Login succeeded\n";
+		SUCCESS("Login succeeded");
 		game.player = Entity::create<Player>();
 		game.player->decode(playerDataBuffer);
+		game.player->setupRealm(game);
+		game.activeRealm = game.player->getRealm();
 	}
 }

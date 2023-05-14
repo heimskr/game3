@@ -57,6 +57,7 @@ namespace Game3 {
 			Place getPlace() override;
 			bool isMoving() const;
 			bool canSee(RealmID, const Position &);
+			void setupRealm(const Game &);
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;
 

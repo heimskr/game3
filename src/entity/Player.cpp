@@ -142,6 +142,10 @@ namespace Game3 {
 		return realm.id == realm_id && realm.isVisible(pos);
 	}
 
+	void Player::setupRealm(const Game &game) {
+		weakRealm = game.realms.at(realmID);
+	}
+
 	void Player::encode(Buffer &buffer) {
 		Entity::encode(buffer);
 		buffer << displayName;
