@@ -21,6 +21,7 @@ namespace Game3 {
 
 		SUCCESS("Login succeeded");
 		game.player = Entity::create<Player>();
+		game.player->init(game);
 		game.player->decode(playerDataBuffer);
 		game.player->setupRealm(game);
 		game.activeRealm = game.player->getRealm();
