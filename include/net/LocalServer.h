@@ -15,6 +15,7 @@
 #include "util/Math.h"
 
 namespace Game3 {
+	class RemoteClient;
 	class ServerGame;
 
 	/** Used by servers to represent themselves. */
@@ -46,6 +47,7 @@ namespace Game3 {
 			bool hasUsername(const std::string &) const;
 			bool hasDisplayName(const std::string &) const;
 			Token generateToken(const std::string &username) const;
+			void setupPlayer(RemoteClient &);
 
 			static bool validateUsername(std::string_view);
 			static int main(int argc, char **argv);

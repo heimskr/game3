@@ -13,6 +13,7 @@ namespace Game3 {
 				auto player = game.server->loadPlayer(username, *display_name);
 				client.setPlayer(player);
 				client.send(LoginStatusPacket(true, *display_name, player));
+				game.server->setupPlayer(client);
 				return;
 			}
 		}

@@ -282,10 +282,7 @@ namespace Game3 {
 		}, 2);
 	}
 
-	MainWindow::~MainWindow() {
-		networkRunning = false;
-		networkThread.join();
-	}
+	MainWindow::~MainWindow() = default;
 
 	void MainWindow::newGame(size_t seed, const WorldGenParams &params) {
 		glArea.get_context()->make_current();

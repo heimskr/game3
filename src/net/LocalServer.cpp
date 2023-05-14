@@ -6,13 +6,19 @@
 #include <event2/thread.h>
 
 #include "Log.h"
+#include "Tileset.h"
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
 #include "net/LocalServer.h"
 #include "net/RemoteClient.h"
 #include "net/Server.h"
 #include "net/SSLServer.h"
+#include "packet/ChunkTilesPacket.h"
+// #include "packet/EntityPacket.h"
 #include "packet/ProtocolVersionPacket.h"
+#include "packet/RealmNoticePacket.h"
+#include "packet/SelfTeleportedPacket.h"
+#include "packet/TileEntityPacket.h"
 #include "realm/Overworld.h"
 #include "util/Crypto.h"
 #include "util/FS.h"
@@ -124,6 +130,14 @@ namespace Game3 {
 
 	Token LocalServer::generateToken(const std::string &username) const {
 		return computeSHA3<Token>(secret + '/' + username);
+	}
+
+	void LocalServer::setupPlayer(RemoteClient &client) {
+		auto &player = *client.getPlayer();
+		auto &realm  = *player.getRealm();
+		INFO("Setting up player");
+		client.send(RealmNoticePacket(realm.id, realm.type, realm.getTileset().identifier, realm.seed, realm.outdoors));
+		client.send(SelfTeleportedPacket(realm.id, player.getPosition()));
 	}
 
 	static std::shared_ptr<Server> global_server;

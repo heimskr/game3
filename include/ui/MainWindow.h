@@ -89,8 +89,6 @@ namespace Game3 {
 			bool autofocus = true;
 			bool statusbarWaiting = false;
 			std::chrono::system_clock::time_point statusbarSetTime;
-			std::thread networkThread;
-			std::atomic_bool networkRunning = false;
 
 			struct KeyInfo {
 				guint code;
