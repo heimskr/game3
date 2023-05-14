@@ -5,7 +5,7 @@
 #include "packet/PacketError.h"
 
 namespace Game3 {
-	void CommandResultPacket::handle(ClientGame &) const {
+	void CommandResultPacket::handle(ClientGame &) {
 		INFO("Command " << commandID << " was " << (success? "" : "un") << "successful: " << message);
 	}
 }

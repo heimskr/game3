@@ -21,6 +21,6 @@ namespace Game3 {
 		void encode(Game &, Buffer &buffer) const override { buffer << username << token; }
 		void decode(Game &, Buffer &buffer)       override { buffer >> username >> token; }
 
-		void handle(ServerGame &, RemoteClient &) const override;
+		void handle(ServerGame &, RemoteClient &) override;
 	};
 }

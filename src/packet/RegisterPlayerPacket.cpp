@@ -8,7 +8,7 @@
 #include "packet/PacketError.h"
 
 namespace Game3 {
-	void RegisterPlayerPacket::handle(ServerGame &game, RemoteClient &client) const {
+	void RegisterPlayerPacket::handle(ServerGame &game, RemoteClient &client) {
 		if (game.server->hasUsername(username) || game.server->hasDisplayName(displayName)) {
 			WARN("Failed to register user " << username);
 			client.send(RegistrationStatusPacket());

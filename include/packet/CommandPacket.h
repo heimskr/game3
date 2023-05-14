@@ -20,6 +20,6 @@ namespace Game3 {
 		void encode(Game &, Buffer &buffer) const override { buffer << commandID << command; }
 		void decode(Game &, Buffer &buffer)       override { buffer >> commandID >> command; }
 
-		void handle(ServerGame &, RemoteClient &) const override;
+		void handle(ServerGame &, RemoteClient &) override;
 	};
 }

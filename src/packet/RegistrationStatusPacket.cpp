@@ -5,7 +5,7 @@
 #include "packet/PacketError.h"
 
 namespace Game3 {
-	void RegistrationStatusPacket::handle(ClientGame &game) const {
+	void RegistrationStatusPacket::handle(ClientGame &game) {
 		if (token == 0)
 			throw AuthenticationError("Registration failed");
 

@@ -32,7 +32,7 @@ namespace Game3 {
 			inline auto lockPlayersShared() { return std::shared_lock(playersMutex); }
 			inline auto lockPlayersUnique() { return std::unique_lock(playersMutex); }
 
-			void handlePacket(RemoteClient &, const Packet &);
+			void handlePacket(RemoteClient &, Packet &);
 			std::tuple<bool, std::string> commandHelper(RemoteClient &, const std::string &);
 	};
 }

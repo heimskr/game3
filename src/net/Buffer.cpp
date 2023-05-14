@@ -307,12 +307,14 @@ namespace Game3 {
 		const auto type = popType();
 		const auto front = type.front();
 		uint32_t size;
-		if (front == '\x1f')
+		if (front == '\x1f') {
 			size = popBuffer<uint32_t>(*this);
-		else if ('\x10' <= front && front < '\x1f')
+		} else if ('\x10' <= front && front < '\x1f') {
 			size = front - '\x10';
-		else
-			throw std::invalid_argument("Invalid type in buffer");
+		} else {
+			debug();
+			throw std::invalid_argument("Invalid type in buffer: " + hexString(std::string_view(&front, 1)));
+		}
 		out.clear();
 		out.reserve(size);
 		for (uint32_t i = 0; i < size; ++i)

@@ -21,6 +21,6 @@ namespace Game3 {
 		void encode(Game &, Buffer &buffer) const override { buffer << realmID << position; }
 		void decode(Game &, Buffer &buffer)       override { buffer >> realmID >> position; }
 
-		void handle(ClientGame &) const override;
+		void handle(ClientGame &) override;
 	};
 }

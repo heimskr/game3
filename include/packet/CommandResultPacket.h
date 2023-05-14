@@ -21,6 +21,6 @@ namespace Game3 {
 		void encode(Game &, Buffer &buffer) const override { buffer << commandID << success << message; }
 		void decode(Game &, Buffer &buffer)       override { buffer >> commandID >> success >> message; }
 
-		void handle(ClientGame &) const override;
+		void handle(ClientGame &) override;
 	};
 }

@@ -43,7 +43,7 @@ namespace Game3 {
 		client.send(packet);
 	}
 
-	void ServerGame::handlePacket(RemoteClient &client, const Packet &packet) {
+	void ServerGame::handlePacket(RemoteClient &client, Packet &packet) {
 		packet.handle(*this, client);
 	}
 

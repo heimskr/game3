@@ -24,6 +24,6 @@ namespace Game3 {
 		void encode(Game &, Buffer &buffer) const override { buffer << realmID << type << tileset << seed << outdoors; }
 		void decode(Game &, Buffer &buffer)       override { buffer >> realmID >> type >> tileset >> seed >> outdoors; }
 
-		void handle(ClientGame &) const override;
+		void handle(ClientGame &) override;
 	};
 }

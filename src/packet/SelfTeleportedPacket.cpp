@@ -4,7 +4,7 @@
 #include "packet/SelfTeleportedPacket.h"
 
 namespace Game3 {
-	void SelfTeleportedPacket::handle(ClientGame &game) const {
+	void SelfTeleportedPacket::handle(ClientGame &game) {
 		if (!game.player)
 			throw PlayerMissingError("Can't teleport self: player missing");
 
