@@ -62,18 +62,25 @@ namespace Game3 {
 
 	void LocalServer::readUsers(const std::filesystem::path &path) {
 		userDatabase = nlohmann::json::parse(readFile(path));
+		userDatabasePath = path;
 		displayNames.clear();
 		for (const auto &[username, user_info]: userDatabase)
 			displayNames.insert(user_info.displayName);
 	}
 
 	void LocalServer::saveUsers(const std::filesystem::path &path) {
+		userDatabasePath = path;
 		std::ofstream(path) << nlohmann::json(userDatabase).dump();
 	}
 
+	void LocalServer::saveUsers() {
+		assert(userDatabasePath);
+		std::ofstream(*userDatabasePath) << nlohmann::json(userDatabase).dump();
+	}
+
 	std::optional<std::string> LocalServer::authenticate(const std::string &username, Token token) const {
-		if (validateUsername(username))
-			if (auto iter = userDatabase.find(username); iter != userDatabase.end() && iter->second.token == token)
+		if (validateUsername(username) && generateToken(username) == token)
+			if (auto iter = userDatabase.find(username); iter != userDatabase.end())
 				return iter->second.displayName;
 		return std::nullopt;
 	}
@@ -102,7 +109,8 @@ namespace Game3 {
 		player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_hammer"));
 		player->inventory->add(ItemStack(*game, "base:item/cave_entrance"));
 		game->players.insert(player);
-		userDatabase.try_emplace(player->username, player->username, player->displayName, player->token);
+		userDatabase.try_emplace(player->username, player->username, player->displayName);
+		saveUsers();
 		return player;
 	}
 
@@ -122,7 +130,7 @@ namespace Game3 {
 	static std::atomic_bool running = true;
 
 	bool LocalServer::validateUsername(std::string_view username) {
-		if (username.empty())
+		if (username.empty() || 20 < username.size())
 			return false;
 		for (const char ch: username)
 			if (!std::isalnum(ch) && ch != '_')
@@ -166,8 +174,10 @@ namespace Game3 {
 
 		auto game_server = std::make_shared<LocalServer>(global_server, secret);
 
-		if (std::filesystem::exists("users.json"))
-			game_server->readUsers("users.json");
+		if (std::filesystem::exists("world/users.json"))
+			game_server->readUsers("world/users.json");
+		else
+			game_server->saveUsers("world/users.json");
 
 		auto game = std::dynamic_pointer_cast<ServerGame>(Game::create(Side::Server, game_server));
 		game->initEntities();

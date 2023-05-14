@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 
 #include "command/local/LocalCommandFactory.h"
+#include "command/local/LoginCommand.h"
 #include "command/local/RegisterCommand.h"
 #include "entity/Blacksmith.h"
 #include "entity/Chicken.h"
@@ -275,6 +276,7 @@ namespace Game3 {
 
 	void Game::addLocalCommandFactories() {
 		add(LocalCommandFactory::create<RegisterCommand>());
+		add(LocalCommandFactory::create<LoginCommand>());
 	}
 
 	void Game::initialSetup(const std::filesystem::path &dir) {

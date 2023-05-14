@@ -1,3 +1,4 @@
+#include "Log.h"
 #include "game/ServerGame.h"
 #include "net/LocalServer.h"
 #include "net/RemoteClient.h"

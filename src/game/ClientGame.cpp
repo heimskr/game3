@@ -97,16 +97,16 @@ namespace Game3 {
 		if (pieces.empty())
 			throw CommandError("No command entered");
 
-		// try {
-		// 	if (auto factory = registry<LocalCommandFactoryRegistry>()[pieces.front()]) {
-		// 		auto command = (*factory)();
-		// 		command->pieces = std::move(pieces);
-		// 		(*command)(*client);
-		// 	} else
-		// 		throw std::out_of_range("Command not found");
-		// } catch (const std::out_of_range &) {
+		try {
+			if (auto factory = registry<LocalCommandFactoryRegistry>()[pieces.front()]) {
+				auto command = (*factory)();
+				command->pieces = std::move(pieces);
+				(*command)(*client);
+			} else
+				throw std::out_of_range("Command not found");
+		} catch (const std::out_of_range &) {
 			client->send(CommandPacket(threadContext.rng(), command));
-		// }
+		}
 	}
 
 	void ClientGame::tick() {

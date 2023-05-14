@@ -39,6 +39,7 @@ namespace Game3 {
 			void send(int, std::string_view);
 			void readUsers(const std::filesystem::path &);
 			void saveUsers(const std::filesystem::path &);
+			void saveUsers();
 			/** Returns the display name if authentication was successful. */
 			std::optional<std::string> authenticate(const std::string &username, Token) const;
 			PlayerPtr loadPlayer(std::string_view username, std::string_view display_name);
@@ -64,6 +65,7 @@ namespace Game3 {
 		private:
 			std::string secret;
 			std::map<std::string, UserInfo> userDatabase;
+			std::optional<std::filesystem::path> userDatabasePath;
 			std::set<std::string> displayNames;
 	};
 

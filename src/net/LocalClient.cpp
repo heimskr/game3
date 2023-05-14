@@ -93,6 +93,15 @@ namespace Game3 {
 		tokenDatabase[hostname][username] = token;
 	}
 
+	std::optional<Token> LocalClient::getToken(const std::string &hostname, const std::string &username) const {
+		if (auto hostname_iter = tokenDatabase.find(hostname); hostname_iter != tokenDatabase.end()) {
+			const auto &users = hostname_iter->second;
+			if (auto username_iter = users.find(username); username_iter != users.end())
+				return username_iter->second;
+		}
+		return std::nullopt;
+	}
+
 	void LocalClient::readTokens(const std::filesystem::path &path) {
 		tokenDatabase = nlohmann::json::parse(readFile(path));
 		tokenDatabasePath = path;
@@ -106,6 +115,10 @@ namespace Game3 {
 	void LocalClient::saveTokens(const std::filesystem::path &path) {
 		tokenDatabasePath = path;
 		std::ofstream(path) << nlohmann::json(tokenDatabase).dump();
+	}
+
+	bool LocalClient::hasHostname() const {
+		return sock && !sock->hostname.empty();
 	}
 
 	const std::string & LocalClient::getHostname() const {

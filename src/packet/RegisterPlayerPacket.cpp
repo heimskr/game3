@@ -1,3 +1,4 @@
+#include "Log.h"
 #include "game/ServerGame.h"
 #include "net/LocalServer.h"
 #include "net/RemoteClient.h"
@@ -9,13 +10,13 @@
 namespace Game3 {
 	void RegisterPlayerPacket::handle(ServerGame &game, RemoteClient &client) const {
 		if (game.server->hasUsername(username) || game.server->hasDisplayName(displayName)) {
-			std::cout << "Failed.\n";
+			WARN("Failed to register user " << username);
 			client.send(RegistrationStatusPacket());
 			return;
 		}
 
 		auto player = game.server->loadPlayer(username, displayName);
-		std::cout << "Succeeded (" << player->token << ").\n";
+		SUCCESS("Registered user " << username << " with token " << player->token << '.');
 		client.send(RegistrationStatusPacket(username, displayName, player->token));
 	}
 }

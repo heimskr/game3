@@ -29,9 +29,11 @@ namespace Game3 {
 			bool isConnected() const;
 			std::shared_ptr<ClientGame> lockGame() const;
 			void setToken(const std::string &hostname, const std::string &username, Token);
+			std::optional<Token> getToken(const std::string &hostname, const std::string &username) const;
 			void readTokens(const std::filesystem::path &);
 			void saveTokens() const;
 			void saveTokens(const std::filesystem::path &);
+			bool hasHostname() const;
 			const std::string & getHostname() const;
 
 		private:
