@@ -134,9 +134,11 @@ namespace Game3 {
 
 	void LocalServer::setupPlayer(RemoteClient &client) {
 		auto &player = *client.getPlayer();
-		auto &realm  = *player.getRealm();
+		auto realm  = player.getRealm();
 		INFO("Setting up player");
-		client.send(SelfTeleportedPacket(realm.id, player.getPosition()));
+		client.send(SelfTeleportedPacket(realm->id, player.getPosition()));
+		for (const auto &chunk_position: player.getVisibleChunks())
+			client.sendChunk(realm, chunk_position);
 	}
 
 	static std::shared_ptr<Server> global_server;

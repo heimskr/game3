@@ -5,6 +5,7 @@
 #include "net/Buffer.h"
 #include "net/LocalServer.h"
 #include "net/RemoteClient.h"
+#include "packet/ChunkTilesPacket.h"
 #include "packet/Packet.h"
 #include "packet/PacketError.h"
 #include "packet/PacketFactory.h"
@@ -70,6 +71,20 @@ namespace Game3 {
 		send(packet.getID());
 		send(static_cast<uint32_t>(send_buffer.size()));
 		send(send_buffer.str());
+	}
+
+	void RemoteClient::sendChunk(const RealmPtr &realm, ChunkPosition chunk_position) {
+		assert(server.game);
+
+		std::vector<TileID> tiles;
+		tiles.reserve(CHUNK_SIZE * CHUNK_SIZE * LAYER_COUNT);
+
+		for (Layer layer = 1; layer <= LAYER_COUNT; ++layer) {
+			const auto layer_tiles = realm->tileProvider.getTileChunk(1, chunk_position);
+			tiles.insert(tiles.end(), layer_tiles.begin(), layer_tiles.end());
+		}
+
+		send(ChunkTilesPacket(realm->id, chunk_position, std::move(tiles)));
 	}
 
 	template <typename T>

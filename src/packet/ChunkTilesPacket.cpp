@@ -1,3 +1,4 @@
+#include "Log.h"
 #include "game/ClientGame.h"
 #include "game/TileProvider.h"
 #include "packet/ChunkTilesPacket.h"
@@ -14,5 +15,7 @@ namespace Game3 {
 			const size_t offset = (layer - 1) * CHUNK_SIZE * CHUNK_SIZE;
 			chunk = std::vector<TileID>(tiles.begin() + offset, tiles.begin() + offset + CHUNK_SIZE * CHUNK_SIZE);
 		}
+
+		SUCCESS("Set tiles for chunk (" << chunkPosition.x << ", " << chunkPosition.y << ") in realm " << realmID);
 	}
 }

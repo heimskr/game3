@@ -11,10 +11,10 @@ namespace Game3 {
 
 		RealmID realmID;
 		ChunkPosition chunkPosition;
-		std::vector<uint16_t> tiles;
+		std::vector<TileID> tiles;
 
 		ChunkTilesPacket() = default;
-		ChunkTilesPacket(RealmID realm_id, ChunkPosition chunk_position, std::vector<uint16_t> tiles_):
+		ChunkTilesPacket(RealmID realm_id, ChunkPosition chunk_position, std::vector<TileID> tiles_):
 			realmID(realm_id), chunkPosition(chunk_position), tiles(std::move(tiles_)) {}
 
 		PacketID getID() const override { return ID(); }
