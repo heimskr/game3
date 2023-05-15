@@ -108,9 +108,7 @@ namespace Game3 {
 		}
 
 		evutil_make_socket_nonblocking(new_fd);
-
-		bufferevent *buffer_event = bufferevent_openssl_socket_new(base, new_fd, ssl, BUFFEREVENT_SSL_ACCEPTING,
-			BEV_OPT_CLOSE_ON_FREE);
+		bufferevent *buffer_event = bufferevent_openssl_socket_new(base, new_fd, ssl, BUFFEREVENT_SSL_ACCEPTING, BEV_OPT_CLOSE_ON_FREE);
 
 		if (buffer_event == nullptr) {
 			event_base_loopbreak(base);
@@ -120,8 +118,7 @@ namespace Game3 {
 		{
 			auto lock = server.lockDescriptors();
 			if (server.bufferEvents.contains(new_fd))
-				throw std::runtime_error("File descriptor " + std::to_string(new_fd) + " already has a bufferevent "
-					"struct");
+				throw std::runtime_error("File descriptor " + std::to_string(new_fd) + " already has a bufferevent struct");
 			server.bufferEvents.emplace(new_fd, buffer_event);
 			server.bufferEventDescriptors.emplace(buffer_event, new_fd);
 		}

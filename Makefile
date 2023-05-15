@@ -58,7 +58,7 @@ $(NOISE_OBJ):
 flags:
 	@ echo "COMPILER: $(COMPILER)"
 	@ echo
-	@ echo "CFLAGS:   $(CFLAGS)"
+	@ echo "CPPFLAGS: $(CPPFLAGS)"
 	@ echo
 	@ echo "LDFLAGS:  $(LDFLAGS)"
 

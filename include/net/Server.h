@@ -6,6 +6,7 @@
 #include <mutex>
 #include <poll.h>
 #include <set>
+#include <shared_mutex>
 #include <string>
 #include <sys/types.h>
 #include <thread>
@@ -81,6 +82,8 @@ namespace Game3 {
 					void handleRead(bufferevent *);
 
 					[[nodiscard]] auto lockCloseQueue() { return std::unique_lock(closeQueueMutex); }
+
+					static event_base * makeBase();
 			};
 
 			int af;
@@ -91,6 +94,7 @@ namespace Game3 {
 			bool connected = false;
 			std::atomic_bool closed {false};
 			size_t threadCount;
+			std::shared_mutex threadCursorMutex;
 			size_t threadCursor = 0;
 
 			std::vector<std::thread> threads;
@@ -176,7 +180,7 @@ namespace Game3 {
 			[[nodiscard]] inline const decltype(allClients) & getClients() const { return allClients; }
 			[[nodiscard]] auto lockClients() { return std::unique_lock(clientsMutex); }
 
-			/** Given a buffer, this function returns {-1, *} if the message is still incomplete or the {i, l} if the
+			/** Given a buffer, this function returns {-1, *} if the message is still incomplete or {i, l} if the
 			 *  buffer contains a complete message, where i is the index at which the message ends and l is the size of
 			 *  the delimiter that ended the message. By default, a message is considered complete after the first
 			 *  newline. */

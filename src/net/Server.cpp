@@ -10,6 +10,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include <event2/thread.h>
+
 #include "Log.h"
 #include "net/NetError.h"
 #include "net/Server.h"
@@ -28,7 +30,7 @@ namespace Game3 {
 	}
 
 	Server::Worker::Worker(Server &server_, size_t buffer_size, size_t id_):
-	server(server_), bufferSize(buffer_size), buffer(std::make_unique<char[]>(buffer_size)), base(event_base_new()), id(id_) {
+	server(server_), bufferSize(buffer_size), buffer(std::make_unique<char[]>(buffer_size)), base(makeBase()), id(id_) {
 		if (base == nullptr)
 			throw std::runtime_error("Couldn't allocate a new event_base");
 
@@ -54,6 +56,13 @@ namespace Game3 {
 
 	void Server::Worker::stop() {
 		event_base_loopexit(base, nullptr);
+	}
+
+	event_base * Server::Worker::makeBase() {
+		event_config *config = event_config_new();
+		event_base *base = event_base_new_with_config(config);
+		event_config_free(config);
+		return base;
 	}
 
 	void Server::makeName() {
@@ -198,7 +207,10 @@ namespace Game3 {
 	}
 
 	void Server::mainLoop() {
-		base = event_base_new();
+		event_config *config = event_config_new();
+		base = event_base_new_with_config(config);
+		event_config_free(config);
+
 		if (base == nullptr) {
 			char error[64] = "?";
 			if (!strerror_r(errno, error, sizeof(error)) || strcmp(error, "?") == 0)
@@ -232,7 +244,8 @@ namespace Game3 {
 			} else
 				new_client = ++server.lastClient;
 			server.descriptors.emplace(new_client, new_fd);
-			server.clients[new_fd] = new_client;
+			server.clients.erase(new_fd);
+			server.clients.emplace(new_fd, new_client);
 		}
 
 		evutil_make_socket_nonblocking(new_fd);
@@ -256,9 +269,6 @@ namespace Game3 {
 			server.workerMap.emplace(buffer_event, shared_from_this());
 		}
 
-		bufferevent_setcb(buffer_event, conn_readcb, conn_writecb, conn_eventcb, this);
-		bufferevent_enable(buffer_event, EV_READ | EV_WRITE);
-
 		if (server.addClient) {
 			std::string ip;
 			sockaddr_in6 addr6 {};
@@ -276,6 +286,9 @@ namespace Game3 {
 			auto lock = server.lockClients();
 			server.addClient(*this, new_client, ip);
 		}
+
+		bufferevent_setcb(buffer_event, conn_readcb, conn_writecb, conn_eventcb, this);
+		bufferevent_enable(buffer_event, EV_READ | EV_WRITE);
 	}
 
 	void Server::Worker::handleWriteEmpty(bufferevent *buffer_event) {
@@ -410,6 +423,7 @@ namespace Game3 {
 
 	void listener_cb(evconnlistener *, evutil_socket_t fd, sockaddr *, int, void *data) {
 		auto *server = reinterpret_cast<Server *>(data);
+		std::unique_lock lock(server->threadCursorMutex);
 		server->workers.at(server->threadCursor)->queueAccept(fd);
 		server->threadCursor = (server->threadCursor + 1) % server->threadCount;
 	}

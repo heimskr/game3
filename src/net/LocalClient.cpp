@@ -3,6 +3,7 @@
 #include <nlohmann/json.hpp>
 
 #include "Log.h"
+#include "Options.h"
 #include "game/ClientGame.h"
 #include "net/Buffer.h"
 #include "net/LocalClient.h"
@@ -16,7 +17,11 @@
 
 namespace Game3 {
 	void LocalClient::connect(std::string_view hostname, uint16_t port) {
+#ifdef USE_SSL
 		sock = std::make_shared<SSLSock>(hostname, port);
+#else
+		sock = std::make_shared<Sock>(hostname, port);
+#endif
 		sock->connect(false);
 	}
 

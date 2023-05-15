@@ -6,6 +6,7 @@
 #include <event2/thread.h>
 
 #include "Log.h"
+#include "Options.h"
 #include "Tileset.h"
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
@@ -156,6 +157,7 @@ namespace Game3 {
 
 	int LocalServer::main(int, char **) {
 		evthread_use_pthreads();
+		event_enable_debug_mode();
 
 		std::string secret;
 
@@ -179,8 +181,11 @@ namespace Game3 {
 		} else
 			std::filesystem::create_directory("world/users");
 
+#ifdef USE_SSL
 		global_server = std::make_shared<SSLServer>(AF_INET6, "::0", 12255, "private.crt", "private.key", 2, 1024);
-		// global_server = std::make_shared<Server>(AF_INET6, "::0", 12255, 2, 1024);
+#else
+		global_server = std::make_shared<Server>(AF_INET6, "::0", 12255, 2, 1024);
+#endif
 
 		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
 			throw std::runtime_error("Couldn't register SIGPIPE handler");

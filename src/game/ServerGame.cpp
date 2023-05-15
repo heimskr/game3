@@ -27,8 +27,7 @@ namespace Game3 {
 		auto lock = lockPlayersShared();
 		for (const auto &player: players) {
 			if (player->canSee(realm_id, position)) {
-				TileUpdatePacket packet(realm_id, layer, position, tile_id);
-				player->client->send(packet);
+				player->client->send(TileUpdatePacket(realm_id, layer, position, tile_id));
 			}
 		}
 	}

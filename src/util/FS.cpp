@@ -14,7 +14,7 @@ namespace Game3 {
 		std::string out;
 		out.reserve(stream.tellg());
 		stream.seekg(0, std::ios::beg);
-		out.assign((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+		out.assign(std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>());
 		stream.close();
 		return out;
 	}
