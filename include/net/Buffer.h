@@ -22,6 +22,11 @@ namespace Game3 {
 	template <typename T>
 	T popBuffer(Buffer &);
 
+	template <typename T>
+	void popBuffer(Buffer &buffer, T &item) {
+		item = popBuffer<T>(buffer);
+	}
+
 	template <typename C>
 	std::string hexString(const C &);
 
@@ -336,19 +341,4 @@ namespace Game3 {
 	}
 
 	std::ostream & operator<<(std::ostream &, const Buffer &);
-
-	/** All the integral types are fixed width and don't need type specifiers when used as subtypes, but other types vary in width.
-	 *  Therefore, they need type specifiers before values in lists and such. We can exploit this to provide a default implementation
-	 *  for popBuffer that simply uses operator>>. */
-	template <typename T>
-	T popBuffer(Buffer &buffer) {
-		T out;
-		buffer >> out;
-		return out;
-	}
-
-	template <typename T>
-	void popBuffer(Buffer &buffer, T &item) {
-		item = popBuffer<T>(buffer);
-	}
 }

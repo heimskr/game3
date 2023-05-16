@@ -284,7 +284,7 @@ namespace Game3 {
 
 	MainWindow::~MainWindow() = default;
 
-	void MainWindow::newGame(size_t seed, const WorldGenParams &params) {
+	void MainWindow::newGame(size_t, const WorldGenParams &) {
 		glArea.get_context()->make_current();
 		game = std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, canvas.get()));
 		game->client = std::make_shared<LocalClient>();

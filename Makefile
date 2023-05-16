@@ -91,7 +91,7 @@ $(OUTPUT): $(OBJECTS) $(NOISE_OBJ)
 ifeq ($(BUILD),debug)
 else ifeq ($(BUILD),tsan)
 else ifeq ($(BUILD),asan)
-else
+else ifeq ($(CUSTOM_BUILD),)
 	strip $@
 endif
 
