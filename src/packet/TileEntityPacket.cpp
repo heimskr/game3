@@ -1,3 +1,4 @@
+#include "Log.h"
 #include "game/Game.h"
 #include "net/Buffer.h"
 #include "packet/TileEntityPacket.h"

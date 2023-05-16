@@ -9,6 +9,7 @@
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
+#include "util/Util.h"
 
 namespace Game3 {
 
@@ -261,7 +262,7 @@ namespace Game3 {
 
 	Buffer & operator+=(Buffer &buffer, const ItemStack &stack) {
 		assert(stack.item);
-		buffer += buffer.getType(stack);
+		buffer.appendType(stack);
 		buffer += stack.item->identifier;
 		buffer += stack.count;
 		buffer += stack.data.dump(); // TODO: Buffer::operator+= for json
@@ -274,15 +275,14 @@ namespace Game3 {
 
 	Buffer & operator>>(Buffer &buffer, ItemStack &stack) {
 		assert(stack.hasGame());
-		if (!buffer.typesMatch(buffer.popType(), buffer.getType(stack))) {
+		const auto type = buffer.popType();
+		if (!buffer.typesMatch(type, buffer.getType(stack))) {
 			buffer.debug();
-			throw std::invalid_argument("Invalid type in buffer (expected ItemStack)");
+			throw std::invalid_argument("Invalid type (" + hexString(type) + ") in buffer (expected Inventory)");
 		}
-		Identifier item_id;
-		buffer >> item_id;
-		buffer >> stack.count;
-		std::string raw_json;
-		buffer >> raw_json; // TODO: Buffer::operator>> for json
+		const auto item_id = popBuffer<Identifier>(buffer);
+		popBuffer(buffer, stack.count);
+		const auto raw_json = popBuffer<std::string>(buffer); // TODO: popBuffer for json
 		stack.data = nlohmann::json::parse(raw_json);
 		stack.item = stack.getGame().registry<ItemRegistry>().at(item_id);
 		return buffer;

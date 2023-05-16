@@ -14,6 +14,7 @@ namespace Game3 {
 		std::vector<TileID> tiles;
 
 		ChunkTilesPacket() = default;
+		ChunkTilesPacket(const Realm &, ChunkPosition);
 		ChunkTilesPacket(RealmID realm_id, ChunkPosition chunk_position, std::vector<TileID> tiles_):
 			realmID(realm_id), chunkPosition(chunk_position), tiles(std::move(tiles_)) {}
 

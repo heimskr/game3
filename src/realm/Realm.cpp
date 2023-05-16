@@ -2,6 +2,7 @@
 #include <thread>
 #include <unordered_set>
 
+#include "Log.h"
 #include "MarchingSquares.h"
 #include "ThreadContext.h"
 #include "Tileset.h"
@@ -12,6 +13,7 @@
 #include "game/InteractionSet.h"
 #include "game/ServerGame.h"
 #include "net/RemoteClient.h"
+#include "packet/ChunkTilesPacket.h"
 #include "realm/Keep.h"
 #include "realm/Realm.h"
 #include "realm/RealmFactory.h"
@@ -87,18 +89,27 @@ namespace Game3 {
 		initRendererTileProviders();
 		initTexture();
 		outdoors = json.at("outdoors");
-		for (const auto &[position_string, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>()) {
-			auto tile_entity = TileEntity::fromJSON(game, tile_entity_json);
-			tileEntities.emplace(Position(position_string), tile_entity);
-			tileEntitiesByGID.emplace(tile_entity->globalID, tile_entity);
-			tile_entity->setRealm(shared);
-			tile_entity->onSpawn();
-			if (tile_entity_json.at("id").get<Identifier>() == "base:te/ghost"_id)
-				++ghostCount;
+		{
+			auto lock = lockTileEntitiesUnique();
+			for (const auto &[position_string, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>()) {
+				auto tile_entity = TileEntity::fromJSON(game, tile_entity_json);
+				tileEntities.emplace(Position(position_string), tile_entity);
+				tileEntitiesByGID[tile_entity->globalID] = tile_entity;
+				tile_entity->setRealm(shared);
+				tile_entity->onSpawn();
+				if (tile_entity_json.at("id").get<Identifier>() == "base:te/ghost"_id)
+					++ghostCount;
+			}
 		}
-		entities.clear();
-		for (const auto &entity_json: json.at("entities"))
-			(*entities.insert(Entity::fromJSON(game, entity_json)).first)->setRealm(shared);
+		{
+			auto lock = lockEntitiesUnique();
+			entities.clear();
+			for (const auto &entity_json: json.at("entities")) {
+				auto entity = *entities.insert(Entity::fromJSON(game, entity_json)).first;
+				entity->setRealm(shared);
+				entitiesByGID[entity->globalID] = entity;
+			}
+		}
 		if (json.contains("extra"))
 			extraData = json.at("extra");
 	}
@@ -161,11 +172,18 @@ namespace Game3 {
 		sprite_renderer.update(bb_width, bb_height);
 		sprite_renderer.divisor = outdoors? game_time : 1;
 
-		for (const auto &entity: entities)
-			if (!entity->isPlayer())
-				entity->render(sprite_renderer);
-		for (const auto &[index, tile_entity]: tileEntities)
-			tile_entity->render(sprite_renderer);
+		{
+			auto lock = lockEntitiesShared();
+			for (const auto &entity: entities)
+				if (!entity->isPlayer())
+					entity->render(sprite_renderer);
+		}
+
+		{
+			auto lock = lockTileEntitiesShared();
+			for (const auto &[index, tile_entity]: tileEntities)
+				tile_entity->render(sprite_renderer);
+		}
 
 		if (client_game.player)
 			client_game.player->render(sprite_renderer);
@@ -236,6 +254,7 @@ namespace Game3 {
 	EntityPtr Realm::addUnsafe(const EntityPtr &entity) {
 		entity->setRealm(shared_from_this());
 		entities.insert(entity);
+		entitiesByGID[entity->globalID] = entity;
 		if (entity->isPlayer())
 			players.insert(std::dynamic_pointer_cast<Player>(entity));
 		return entity;
@@ -251,7 +270,7 @@ namespace Game3 {
 			return nullptr;
 		tile_entity->setRealm(shared_from_this());
 		tileEntities.emplace(tile_entity->position, tile_entity);
-		tileEntitiesByGID.emplace(tile_entity->globalID, tile_entity);
+		tileEntitiesByGID[tile_entity->globalID] = tile_entity;
 		if (tile_entity->solid)
 			tileProvider.findPathState(tile_entity->position) = false;
 		if (tile_entity->is("base:te/ghost"))
@@ -266,6 +285,7 @@ namespace Game3 {
 	}
 
 	void Realm::initEntities() {
+		auto lock = lockEntitiesShared();
 		for (auto &entity: entities) {
 			entity->setRealm(shared_from_this());
 			if (auto player = std::dynamic_pointer_cast<Player>(entity))
@@ -284,20 +304,26 @@ namespace Game3 {
 		for (const auto &stolen: tileEntityAdditionQueue.steal())
 			add(stolen);
 
-		for (auto &entity: entities) {
-			if (entity->isPlayer()) {
-				auto player = std::dynamic_pointer_cast<Player>(entity);
-				player_cpos = getChunkPosition(player->getPosition());
-				if (!player->ticked) {
-					player->ticked = true;
-					player->tick(game, delta);
-				}
-			} else
-				entity->tick(game, delta);
+		{
+			auto lock = lockEntitiesShared();
+			for (auto &entity: entities) {
+				if (entity->isPlayer()) {
+					auto player = std::dynamic_pointer_cast<Player>(entity);
+					player_cpos = getChunkPosition(player->getPosition());
+					if (!player->ticked) {
+						player->ticked = true;
+						player->tick(game, delta);
+					}
+				} else
+					entity->tick(game, delta);
+			}
 		}
 
-		for (auto &[index, tile_entity]: tileEntities)
-			tile_entity->tick(game, delta);
+		{
+			auto lock = lockTileEntitiesShared();
+			for (auto &[index, tile_entity]: tileEntities)
+				tile_entity->tick(game, delta);
+		}
 
 		ticking = false;
 
@@ -317,7 +343,16 @@ namespace Game3 {
 				generateChunk(chunk_position);
 				generatedChunks.insert(chunk_position);
 				remakePathMap(chunk_position);
-				reupload();
+				// reupload();
+				std::unique_lock lock(chunkRequestsMutex);
+				if (auto iter = chunkRequests.find(chunk_position); iter != chunkRequests.end()) {
+					ChunkTilesPacket packet(*this, chunk_position);
+					INFO("Late sending chunk position " << chunk_position << " to " << iter->second.size() << " client(s)");
+					for (const auto &client: iter->second) {
+						client->send(packet);
+					}
+					chunkRequests.erase(iter);
+				}
 			}
 		}
 
@@ -338,8 +373,8 @@ namespace Game3 {
 	}
 
 	std::vector<EntityPtr> Realm::findEntities(const Position &position) {
-		auto lock = lockEntitiesShared();
 		std::vector<EntityPtr> out;
+		auto lock = lockEntitiesShared();
 		for (const auto &entity: entities)
 			if (entity->position == position)
 				out.push_back(entity);
@@ -379,9 +414,10 @@ namespace Game3 {
 	}
 
 	void Realm::remove(const EntityPtr &entity) {
-		entities.erase(entity);
+		entitiesByGID.erase(entity->globalID);
 		if (auto player = std::dynamic_pointer_cast<Player>(entity))
-			entities.erase(player);
+			players.erase(player);
+		entities.erase(entity);
 	}
 
 	void Realm::removeSafe(const EntityPtr &entity) {
@@ -690,6 +726,11 @@ namespace Game3 {
 		return tileEntitiesByGID.contains(tile_entity_gid);
 	}
 
+	bool Realm::hasEntity(GlobalID entity_gid) {
+		auto lock = lockEntitiesShared();
+		return entitiesByGID.contains(entity_gid);
+	}
+
 	Side Realm::getSide() const {
 		return getGame().getSide();
 	}
@@ -748,6 +789,12 @@ namespace Game3 {
 		}
 	}
 
+	void Realm::requestChunk(ChunkPosition chunk_position, std::shared_ptr<RemoteClient> client) {
+		assert(isServer());
+		std::unique_lock lock(chunkRequestsMutex);
+		chunkRequests[chunk_position].insert(client);
+	}
+
 	bool Realm::rightClick(const Position &position, double x, double y) {
 		if (getSide() != Side::Client)
 			return false;
@@ -761,11 +808,11 @@ namespace Game3 {
 		if (!overlap && !adjacent)
 			return false;
 
-		if (const auto entities = findEntities(position); !entities.empty()) {
+		if (const auto found = findEntities(position); !found.empty()) {
 			auto gmenu = Gio::Menu::create();
 			auto group = Gio::SimpleActionGroup::create();
 			size_t i = 0;
-			for (const auto &entity: entities) {
+			for (const auto &entity: found) {
 				// TODO: Can you escape underscores?
 				gmenu->append(entity->getName(), "entity_menu.entity" + std::to_string(i));
 				group->add_action("entity" + std::to_string(i++), [entity, overlap, player] {

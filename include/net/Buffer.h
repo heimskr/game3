@@ -317,4 +317,9 @@ namespace Game3 {
 		buffer >> out;
 		return out;
 	}
+
+	template <typename T>
+	void popBuffer(Buffer &buffer, T &item) {
+		item = popBuffer<T>(buffer);
+	}
 }

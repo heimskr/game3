@@ -76,18 +76,15 @@ namespace Game3 {
 		send(send_buffer.str());
 	}
 
-	void RemoteClient::sendChunk(const Realm &realm, ChunkPosition chunk_position) {
+	void RemoteClient::sendChunk(Realm &realm, ChunkPosition chunk_position, bool can_request) {
 		assert(server.game);
-
-		std::vector<TileID> tiles;
-		tiles.reserve(CHUNK_SIZE * CHUNK_SIZE * LAYER_COUNT);
-
-		for (Layer layer = 1; layer <= LAYER_COUNT; ++layer) {
-			const auto layer_tiles = realm.tileProvider.getTileChunk(1, chunk_position);
-			tiles.insert(tiles.end(), layer_tiles.begin(), layer_tiles.end());
+		try {
+			send(ChunkTilesPacket(realm, chunk_position));
+		} catch (const std::out_of_range &) {
+			if (!can_request)
+				throw;
+			realm.requestChunk(chunk_position, shared_from_this());
 		}
-
-		send(ChunkTilesPacket(realm.id, chunk_position, std::move(tiles)));
 	}
 
 	template <typename T>

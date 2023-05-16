@@ -1,3 +1,4 @@
+#include "Log.h"
 #include "game/Game.h"
 #include "net/Buffer.h"
 #include "packet/EntityPacket.h"
@@ -5,29 +6,30 @@
 #include "entity/EntityFactory.h"
 
 namespace Game3 {
-	EntityPacket::EntityPacket(EntityPtr entity):
-		entity(std::move(entity)),
+	EntityPacket::EntityPacket(EntityPtr entity_):
+		entity(std::move(entity_)),
+		identifier(entity->type),
 		globalID(entity->globalID),
 		realmID(entity->realmID) {}
 
 	void EntityPacket::decode(Game &game, Buffer &buffer) {
 		buffer >> globalID >> identifier >> realmID;
 		auto realm = game.realms.at(realmID);
-		// if (auto iter = realm->entitiesByGID.find(globalID); iter != realm->entitiesByGID.end()) {
-		// 	(entity = iter->second)->decode(game, buffer);
-		// } else {
-		// 	auto factory = game.registry<EntityFactoryRegistry>()[identifier];
-		// 	entity = (*factory)(game);
-		// 	entity->globalID = globalID;
-		// 	entity->entityID = identifier; // TODO: is this redundant?
-		// 	realm->add(entity);
-		// 	entity->decode(game, buffer);
-		// }
+		if (auto iter = realm->entitiesByGID.find(globalID); iter != realm->entitiesByGID.end()) {
+			(entity = iter->second)->decode(buffer);
+		} else {
+			auto factory = game.registry<EntityFactoryRegistry>()[identifier];
+			entity = (*factory)(game, {});
+			entity->globalID = globalID;
+			entity->type = identifier;
+			realm->add(entity);
+			entity->decode(buffer);
+		}
 	}
 
-	void EntityPacket::encode(Game &game, Buffer &buffer) const {
+	void EntityPacket::encode(Game &, Buffer &buffer) const {
 		assert(entity);
 		buffer << globalID << identifier << realmID;
-		// entity->encode(game, buffer);
+		entity->encode(buffer);
 	}
 }

@@ -399,7 +399,7 @@ namespace Game3 {
 	}
 
 	Buffer & operator+=(Buffer &buffer, const Inventory &inventory) {
-		buffer += buffer.getType(inventory);
+		buffer.appendType(inventory);
 		if (auto locked = inventory.owner.lock())
 			buffer += locked->getGID();
 		else
@@ -415,19 +415,17 @@ namespace Game3 {
 	}
 
 	Buffer & operator>>(Buffer &buffer, Inventory &inventory) {
-		if (!buffer.typesMatch(buffer.popType(), buffer.getType(inventory))) {
+		const auto type = buffer.popType();
+		if (!buffer.typesMatch(type, buffer.getType(inventory))) {
 			buffer.debug();
-			throw std::invalid_argument("Invalid type in buffer (expected Inventory)");
+			throw std::invalid_argument("Invalid type (" + hexString(type) + ") in buffer (expected Inventory)");
 		}
-		GlobalID gid = -1;
-		buffer >> gid;
+		const auto gid = popBuffer<GlobalID>(buffer);
 		if (auto locked = inventory.owner.lock())
 			locked->setGID(gid);
-		buffer >> inventory.slotCount;
-		buffer >> inventory.activeSlot;
-		std::decay_t<decltype(inventory.getStorage())> storage;
-		buffer >> storage;
-		inventory.setStorage(std::move(storage));
+		popBuffer(buffer, inventory.slotCount);
+		popBuffer(buffer, inventory.activeSlot);
+		inventory.setStorage(popBuffer<std::decay_t<decltype(inventory.getStorage())>>(buffer));
 		return buffer;
 	}
 

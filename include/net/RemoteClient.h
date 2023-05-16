@@ -25,7 +25,7 @@ namespace Game3 {
 
 			void handleInput(std::string_view) override;
 			void send(const Packet &);
-			void sendChunk(const Realm &, ChunkPosition);
+			void sendChunk(Realm &, ChunkPosition, bool can_request = true);
 			inline auto getPlayer() const { return weakPlayer.lock(); }
 			inline void setPlayer(PlayerPtr shared) { weakPlayer = shared; }
 

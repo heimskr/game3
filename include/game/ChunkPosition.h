@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <functional>
+#include <ostream>
 #include <random>
 #include <string>
 
@@ -28,7 +29,7 @@ namespace Game3 {
 		explicit operator std::string() const;
 	};
 
-
+	std::ostream & operator<<(std::ostream &, ChunkPosition);
 	Buffer & operator+=(Buffer &, const ChunkPosition &);
 	Buffer & operator<<(Buffer &, const ChunkPosition &);
 	Buffer & operator>>(Buffer &, ChunkPosition &);

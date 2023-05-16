@@ -63,6 +63,8 @@ namespace Game3 {
 			/** Governed by entityMutex. */
 			std::unordered_set<EntityPtr> entities;
 			/** Governed by entityMutex. */
+			std::unordered_map<GlobalID, std::shared_ptr<Entity>> entitiesByGID;
+			/** Governed by entityMutex. */
 			std::unordered_set<PlayerPtr> players;
 			nlohmann::json extraData;
 			Position randomLand;
@@ -138,12 +140,14 @@ namespace Game3 {
 			void markGenerated(ChunkPosition);
 			bool isVisible(const Position &) const;
 			bool hasTileEntity(GlobalID);
+			bool hasEntity(GlobalID);
 			Side getSide() const;
 			/** Client-side. */
 			std::set<ChunkPosition> getMissingChunks() const;
 			void addPlayer(const PlayerPtr &);
 			void removePlayer(const PlayerPtr &);
 			void sendTo(RemoteClient &);
+			void requestChunk(ChunkPosition, std::shared_ptr<RemoteClient>);
 			inline void markGenerated(auto x, auto y) { generatedChunks.insert(ChunkPosition{x, y}); }
 			inline auto pauseUpdates() { return Pauser(shared_from_this()); }
 			inline bool isClient() const { return getSide() == Side::Client; }
@@ -255,12 +259,11 @@ namespace Game3 {
 			MTQueue<std::shared_ptr<TileEntity>> tileEntityAdditionQueue;
 			MTQueue<std::function<void()>> generalQueue;
 
+			std::map<ChunkPosition, std::set<std::shared_ptr<RemoteClient>>> chunkRequests;
+			std::shared_mutex chunkRequestsMutex;
+
 			SharedRecursiveMutex entityMutex;
 			SharedRecursiveMutex tileEntityMutex;
-
-			// std::mutex entityRemovalQueueMutex;
-			// std::mutex tileEntityRemovalQueueMutex;
-			// std::mutex generalQueueMutex;
 
 			void initRendererRealms();
 			void initRendererTileProviders();

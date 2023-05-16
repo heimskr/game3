@@ -6,6 +6,10 @@ namespace Game3 {
 		return std::default_random_engine(static_cast<uint_fast32_t>(std::hash<ChunkPosition>()(*this)));
 	}
 
+	std::ostream & operator<<(std::ostream &os, ChunkPosition chunk_position) {
+		return os << static_cast<std::string>(chunk_position);
+	}
+
 	Buffer & operator+=(Buffer &buffer, const ChunkPosition &chunk_position) {
 		return (buffer += chunk_position.x) += chunk_position.y;
 	}
