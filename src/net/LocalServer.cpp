@@ -163,13 +163,10 @@ namespace Game3 {
 
 		std::string secret;
 
-		if (std::filesystem::exists(".secret")) {
+		if (std::filesystem::exists(".secret"))
 			secret = readFile(".secret");
-		} else {
-			secret = generateSecret(8);
-			std::ofstream ofs(".secret");
-			ofs << secret;
-		}
+		else
+			std::ofstream(".secret") << (secret = generateSecret(8));
 
 		if (std::filesystem::exists("world")) {
 			if (!std::filesystem::is_directory("world"))
