@@ -129,11 +129,22 @@ namespace Game3 {
 			void encode(Game &, Buffer &);
 			void decode(Game &, Buffer &);
 
+			inline const Game & getGame() { assert(game); return *game; }
+			inline bool hasGame() const { return game != nullptr; }
+
 		private:
 			const Game *game = nullptr;
 			Glib::RefPtr<Gdk::Pixbuf> cachedImage;
 			void absorbGame(const Game &);
 	};
+
+	template <typename T>
+	T popBuffer(Buffer &);
+	template <>
+	Identifier popBuffer<Identifier>(Buffer &);
+	Buffer & operator+=(Buffer &, const ItemStack &);
+	Buffer & operator<<(Buffer &, const ItemStack &);
+	Buffer & operator>>(Buffer &, ItemStack &);
 
 	void to_json(nlohmann::json &, const ItemStack &);
 }

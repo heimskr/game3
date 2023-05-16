@@ -1,5 +1,7 @@
 #include "game/ClientGame.h"
 #include "net/Buffer.h"
+#include "net/RemoteClient.h"
+#include "packet/TileEntityPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/TileEntity.h"
 #include "tileentity/TileEntityFactory.h"
@@ -56,6 +58,10 @@ namespace Game3 {
 		std::string extra_json;
 		buffer >> extra_json;
 		extraData = nlohmann::json::parse(extra_json);
+	}
+
+	void TileEntity::sendTo(RemoteClient &client) {
+		client.send(TileEntityPacket(shared_from_this()));
 	}
 
 	void TileEntity::absorbJSON(Game &, const nlohmann::json &json) {

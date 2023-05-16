@@ -15,6 +15,7 @@ namespace Game3 {
 	class Game;
 	class Player;
 	class Realm;
+	class RemoteClient;
 	class SpriteRenderer;
 
 	class TileEntity: public Agent, public std::enable_shared_from_this<TileEntity> {
@@ -62,10 +63,14 @@ namespace Game3 {
 			/** Called when the TileEntity is destroyed violently, e.g. by a bomb. Returns false if the TileEntity should survive the destruction. */
 			virtual bool kill() { return false; }
 			inline bool is(const Identifier &check) const { return getID() == check; }
+			GlobalID getGID() const override { return globalID; }
+			void setGID(GlobalID new_gid) override { globalID = new_gid; }
 
 			virtual void encode(Game &, Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */
 			virtual void decode(Game &, Buffer &);
+
+			void sendTo(RemoteClient &);
 
 		protected:
 			TileEntity() = default;

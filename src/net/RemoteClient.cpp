@@ -55,6 +55,8 @@ namespace Game3 {
 				throw std::logic_error("Buffer grew too large");
 
 			if (payloadSize == buffer.size()) {
+				if (buffer.context.expired())
+					buffer.context = server.game;
 				auto packet = (*server.game->registry<PacketFactoryRegistry>()[packetType])();
 				packet->decode(*server.game, buffer);
 				buffer.clear();
@@ -74,18 +76,18 @@ namespace Game3 {
 		send(send_buffer.str());
 	}
 
-	void RemoteClient::sendChunk(const RealmPtr &realm, ChunkPosition chunk_position) {
+	void RemoteClient::sendChunk(const Realm &realm, ChunkPosition chunk_position) {
 		assert(server.game);
 
 		std::vector<TileID> tiles;
 		tiles.reserve(CHUNK_SIZE * CHUNK_SIZE * LAYER_COUNT);
 
 		for (Layer layer = 1; layer <= LAYER_COUNT; ++layer) {
-			const auto layer_tiles = realm->tileProvider.getTileChunk(1, chunk_position);
+			const auto layer_tiles = realm.tileProvider.getTileChunk(1, chunk_position);
 			tiles.insert(tiles.end(), layer_tiles.begin(), layer_tiles.end());
 		}
 
-		send(ChunkTilesPacket(realm->id, chunk_position, std::move(tiles)));
+		send(ChunkTilesPacket(realm.id, chunk_position, std::move(tiles)));
 	}
 
 	template <typename T>

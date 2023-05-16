@@ -8,6 +8,7 @@
 #include "recipe/CraftingRequirement.h"
 
 namespace Game3 {
+	class Buffer;
 	struct Agent;
 	struct CraftingRecipe;
 
@@ -102,12 +103,22 @@ namespace Game3 {
 
 		public:
 			inline const decltype(storage) & getStorage() const { return storage; }
+			inline void setStorage(decltype(storage) new_storage) { storage = std::move(new_storage); }
 			inline Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &game, Slot slot) { return storage.at(slot).getImage(game); }
 
 			static Inventory fromJSON(Game &, const nlohmann::json &, const std::shared_ptr<Agent> &);
 
 			friend void to_json(nlohmann::json &, const Inventory &);
 	};
+
+
+	template <typename T>
+	T popBuffer(Buffer &);
+	template <>
+	Inventory popBuffer<Inventory>(Buffer &);
+	Buffer & operator+=(Buffer &, const Inventory &);
+	Buffer & operator<<(Buffer &, const Inventory &);
+	Buffer & operator>>(Buffer &, Inventory &);
 
 	void to_json(nlohmann::json &, const Inventory &);
 }

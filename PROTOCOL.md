@@ -14,7 +14,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 2. **Tile Entity**: informs a client of a tile entity's data.
 
-	- `u64` Tile Entity ID
+	- `u64` Global ID
 	- `string` Identifier
 	- `i32` Realm ID
 	- `...` Tile Entity Data
@@ -91,6 +91,13 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	The token will be 0 if the attempt failed, or an arbitrary nonzero value otherwise.
 
+14. **Entity**: informs a client of an entity's data.
+
+	- `u64` Global ID
+	- `string` Identifier
+	- `i32` Realm ID
+	- `...` Tile Entity Data
+
 # Message Format
 
 All values are little endian.
@@ -116,6 +123,8 @@ All values are little endian.
 | `0x1f`                           | string of arbitrary length |
 | `0x20` . type                    | list&lt;type&gt;           |
 | `0x21` . type[key] . type[value] | map&lt;key, value&gt;      |
+| `0xe0`                           | ItemStack                  |
+| `0xe1`                           | Inventory                  |
 
 Note that string types are always encoded as `0x1f` when used as a subtype of a list or a map, and optional types are always encoded as `0x0b` followed by the subtype in the same scenario.
 

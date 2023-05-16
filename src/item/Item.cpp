@@ -244,6 +244,50 @@ namespace Game3 {
 			assert(game == &game_);
 	}
 
+	template <>
+	std::string Buffer::getType(const ItemStack &) {
+		return {'\xe0'};
+	}
+
+	template <>
+	ItemStack popBuffer<ItemStack>(Buffer &buffer) {
+		auto context = buffer.context.lock();
+		assert(context);
+		Game &game = dynamic_cast<Game &>(*context);
+		ItemStack out(game);
+		buffer >> out;
+		return out;
+	}
+
+	Buffer & operator+=(Buffer &buffer, const ItemStack &stack) {
+		assert(stack.item);
+		buffer += buffer.getType(stack);
+		buffer += stack.item->identifier;
+		buffer += stack.count;
+		buffer += stack.data.dump(); // TODO: Buffer::operator+= for json
+		return buffer;
+	}
+
+	Buffer & operator<<(Buffer &buffer, const ItemStack &stack) {
+		return buffer += stack;
+	}
+
+	Buffer & operator>>(Buffer &buffer, ItemStack &stack) {
+		assert(stack.hasGame());
+		if (!buffer.typesMatch(buffer.popType(), buffer.getType(stack))) {
+			buffer.debug();
+			throw std::invalid_argument("Invalid type in buffer (expected ItemStack)");
+		}
+		Identifier item_id;
+		buffer >> item_id;
+		buffer >> stack.count;
+		std::string raw_json;
+		buffer >> raw_json; // TODO: Buffer::operator>> for json
+		stack.data = nlohmann::json::parse(raw_json);
+		stack.item = stack.getGame().registry<ItemRegistry>().at(item_id);
+		return buffer;
+	}
+
 	void to_json(nlohmann::json &json, const ItemStack &stack) {
 		json[0] = stack.item->identifier;
 		json[1] = stack.count;

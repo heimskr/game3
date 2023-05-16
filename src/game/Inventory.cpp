@@ -3,6 +3,7 @@
 #include "game/Agent.h"
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
+#include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "recipe/CraftingRecipe.h"
 #include "util/Util.h"
@@ -390,6 +391,44 @@ namespace Game3 {
 		out.slotCount  = json.at("slotCount");
 		out.activeSlot = json.at("activeSlot");
 		return out;
+	}
+
+	template <>
+	std::string Buffer::getType(const Inventory &) {
+		return {'\xe1'};
+	}
+
+	Buffer & operator+=(Buffer &buffer, const Inventory &inventory) {
+		buffer += buffer.getType(inventory);
+		if (auto locked = inventory.owner.lock())
+			buffer += locked->getGID();
+		else
+			buffer += static_cast<GlobalID>(-1);
+		buffer += inventory.slotCount;
+		buffer += inventory.activeSlot;
+		buffer += inventory.getStorage();
+		return buffer;
+	}
+
+	Buffer & operator<<(Buffer &buffer, const Inventory &inventory) {
+		return buffer += inventory;
+	}
+
+	Buffer & operator>>(Buffer &buffer, Inventory &inventory) {
+		if (!buffer.typesMatch(buffer.popType(), buffer.getType(inventory))) {
+			buffer.debug();
+			throw std::invalid_argument("Invalid type in buffer (expected Inventory)");
+		}
+		GlobalID gid = -1;
+		buffer >> gid;
+		if (auto locked = inventory.owner.lock())
+			locked->setGID(gid);
+		buffer >> inventory.slotCount;
+		buffer >> inventory.activeSlot;
+		std::decay_t<decltype(inventory.getStorage())> storage;
+		buffer >> storage;
+		inventory.setStorage(std::move(storage));
+		return buffer;
 	}
 
 	void to_json(nlohmann::json &json, const Inventory &inventory) {

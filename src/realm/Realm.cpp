@@ -11,6 +11,7 @@
 #include "game/Game.h"
 #include "game/InteractionSet.h"
 #include "game/ServerGame.h"
+#include "net/RemoteClient.h"
 #include "realm/Keep.h"
 #include "realm/Realm.h"
 #include "realm/RealmFactory.h"
@@ -140,8 +141,8 @@ namespace Game3 {
 			onFocus();
 
 		auto &client_game = game.toClient();
-		Canvas &canvas = client_game.canvas;
-		auto &multiplier = canvas.multiplier;
+		// Canvas &canvas = client_game.canvas;
+		// auto &multiplier = canvas.multiplier;
 
 		const auto bb_width  = width;
 		const auto bb_height = height;
@@ -728,6 +729,23 @@ namespace Game3 {
 	void Realm::removePlayer(const PlayerPtr &player) {
 		auto lock = lockEntitiesUnique();
 		players.erase(player);
+	}
+
+	void Realm::sendTo(RemoteClient &client) {
+		for (const auto &chunk_position: client.getPlayer()->getVisibleChunks())
+			client.sendChunk(*this, chunk_position);
+
+		{
+			auto lock = lockEntitiesShared();
+			for (const auto &entity: entities)
+				entity->sendTo(client);
+		}
+
+		{
+			auto lock = lockTileEntitiesShared();
+			for (const auto &[tile_position, tile_entity]: tileEntities)
+				tile_entity->sendTo(client);
+		}
 	}
 
 	bool Realm::rightClick(const Position &position, double x, double y) {

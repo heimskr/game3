@@ -13,6 +13,7 @@
 
 #include "Types.h"
 #include "entity/Player.h"
+#include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
 #include "registry/Registry.h"
@@ -29,7 +30,7 @@ namespace Game3 {
 	struct InteractionSet;
 	struct Plantable;
 
-	class Game: public std::enable_shared_from_this<Game> {
+	class Game: public std::enable_shared_from_this<Game>, public BufferContext {
 		public:
 			static constexpr const char *DEFAULT_PATH = "game.g3";
 			static constexpr Version PROTOCOL_VERSION = 1;

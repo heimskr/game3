@@ -6,6 +6,7 @@
 #include <deque>
 #include <iostream>
 #include <list>
+#include <memory>
 #include <optional>
 #include <ostream>
 #include <ranges>
@@ -19,6 +20,10 @@ namespace Game3 {
 
 	template <typename T>
 	T popBuffer(Buffer &);
+
+	struct BufferContext {
+		virtual ~BufferContext() = default;
+	};
 
 	class Buffer {
 		private:
@@ -50,6 +55,8 @@ namespace Game3 {
 			 * 0x1f . (u32) length -> string of arbitrary length
 			 * 0x20 . type -> linear container
 			 * 0x21 . type[key] . type[value] -> map container
+			 * 0xe0 -> ItemStack
+			 * 0xe1 -> Inventory
 			 */
 			template <typename T>
 			std::string getType(const T &);
@@ -135,7 +142,11 @@ namespace Game3 {
 			static bool typesMatch(std::string_view, std::string_view);
 
 		public:
+			std::weak_ptr<BufferContext> context;
+
 			Buffer() = default;
+			Buffer(std::weak_ptr<BufferContext> context_):
+				context(std::move(context_)) {}
 
 			inline auto size() const { return bytes.size(); }
 			inline void clear() { bytes.clear(); }
@@ -296,4 +307,14 @@ namespace Game3 {
 	}
 
 	std::ostream & operator<<(std::ostream &, const Buffer &);
+
+	/** All the integral types are fixed width and don't need type specifiers when used as subtypes, but other types vary in width.
+	 *  Therefore, they need type specifiers before values in lists and such. We can exploit this to provide a default implementation
+	 *  for popBuffer that simply uses operator>>. */
+	template <typename T>
+	T popBuffer(Buffer &buffer) {
+		T out;
+		buffer >> out;
+		return out;
+	}
 }

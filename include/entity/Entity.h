@@ -24,6 +24,7 @@ namespace Game3 {
 	class Inventory;
 	class Player;
 	class Realm;
+	class RemoteClient;
 	class SpriteRenderer;
 
 	struct EntityTexture: NamedRegisterable {
@@ -110,10 +111,14 @@ namespace Game3 {
 			inline auto getHeldLeft()  const { return heldLeft.slot;  }
 			inline auto getHeldRight() const { return heldRight.slot; }
 			Side getSide() const;
+			GlobalID getGID() const override { return globalID; }
+			void setGID(GlobalID new_gid) override { globalID = new_gid; }
 
 			virtual void encode(Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */
 			virtual void decode(Buffer &);
+
+			void sendTo(RemoteClient &);
 
 		protected:
 			Game *game = nullptr;

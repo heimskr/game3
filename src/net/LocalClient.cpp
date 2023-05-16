@@ -1,3 +1,4 @@
+#include <cassert>
 #include <fstream>
 
 #include <nlohmann/json.hpp>
@@ -26,6 +27,10 @@ namespace Game3 {
 	}
 
 	void LocalClient::read() {
+		if (buffer.context.expired())
+			if (auto locked = lockGame())
+				buffer.context = locked;
+
 		std::array<char, 10240> array;
 		const auto byte_count = sock->recv(array.data(), array.size());
 		if (byte_count <= 0)
@@ -78,13 +83,14 @@ namespace Game3 {
 	}
 
 	void LocalClient::send(const Packet &packet) {
-		Buffer buffer;
+		Buffer send_buffer;
 		auto game = lockGame();
-		packet.encode(*game, buffer);
-		assert(buffer.size() < UINT32_MAX);
+		send_buffer.context = game;
+		packet.encode(*game, send_buffer);
+		assert(send_buffer.size() < UINT32_MAX);
 		sendRaw(packet.getID());
-		sendRaw(static_cast<uint32_t>(buffer.size()));
-		const auto str = buffer.str();
+		sendRaw(static_cast<uint32_t>(send_buffer.size()));
+		const auto str = send_buffer.str();
 		sock->send(str.c_str(), str.size());
 	}
 

@@ -27,6 +27,7 @@ namespace Game3 {
 
 	class Entity;
 	class Game;
+	class RemoteClient;
 	class SpriteRenderer;
 
 	using EntityPtr = std::shared_ptr<Entity>;
@@ -142,6 +143,7 @@ namespace Game3 {
 			std::set<ChunkPosition> getMissingChunks() const;
 			void addPlayer(const PlayerPtr &);
 			void removePlayer(const PlayerPtr &);
+			void sendTo(RemoteClient &);
 			inline void markGenerated(auto x, auto y) { generatedChunks.insert(ChunkPosition{x, y}); }
 			inline auto pauseUpdates() { return Pauser(shared_from_this()); }
 			inline bool isClient() const { return getSide() == Side::Client; }
