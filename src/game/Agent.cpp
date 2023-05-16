@@ -1,8 +1,13 @@
-#include "ThreadContext.h"
+#include <mutex>
+#include <random>
+
 #include "game/Agent.h"
 #include "realm/Realm.h"
 
 namespace Game3 {
+	static std::default_random_engine agent_rng(42);
+	static std::mutex agent_rng_mutex;
+
 	std::vector<ChunkPosition> Agent::getVisibleChunks() const {
 		ChunkPosition original_position = getChunkPosition(getPosition());
 		std::vector<ChunkPosition> out;
@@ -15,6 +20,7 @@ namespace Game3 {
 	}
 
 	GlobalID Agent::generateGID() {
-		return static_cast<GlobalID>(threadContext.rng());
+		std::unique_lock lock(agent_rng_mutex);
+		return static_cast<GlobalID>(agent_rng());
 	}
 }

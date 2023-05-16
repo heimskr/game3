@@ -225,16 +225,22 @@ namespace Game3 {
 
 			template <LinearOrSet T>
 			Buffer & operator>>(T &out) {
-				if (!typesMatch(popType(), getType(T())))
-					throw std::invalid_argument("Invalid type in buffer (expected list)");
+				const auto type = popType();
+				if (!typesMatch(type, getType(T()))) {
+					debug();
+					throw std::invalid_argument("Invalid type in buffer (expected list): " + hexString(type));
+				}
 				out = popBuffer<T>(*this);
 				return *this;
 			}
 
 			template <Map M>
 			Buffer & operator>>(M &out) {
-				if (!typesMatch(popType(), getType(M())))
-					throw std::invalid_argument("Invalid type in buffer (expected map)");
+				const auto type = popType();
+				if (!typesMatch(type, getType(M()))) {
+					debug();
+					throw std::invalid_argument("Invalid type in buffer (expected map): " + hexString(type));
+				}
 				out = popBuffer<M>(*this);
 				return *this;
 			}

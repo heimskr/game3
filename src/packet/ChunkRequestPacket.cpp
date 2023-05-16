@@ -1,3 +1,6 @@
+#include "game/ServerGame.h"
+#include "net/Buffer.h"
+#include "net/RemoteClient.h"
 #include "packet/ChunkRequestPacket.h"
 #include "packet/PacketError.h"
 
@@ -31,5 +34,10 @@ namespace Game3 {
 		chunkPositions.clear();
 		for (size_t i = 0; i < coordinates.size(); i += 2)
 			chunkPositions.insert(ChunkPosition{coordinates[i], coordinates[i + 1]});
+	}
+
+	void ChunkRequestPacket::handle(ServerGame &game, RemoteClient &client) {
+		for (const ChunkPosition chunk_position: chunkPositions)
+			client.sendChunk(*game.realms.at(realmID), chunk_position, true);
 	}
 }

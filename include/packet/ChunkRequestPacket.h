@@ -1,7 +1,6 @@
 #pragma once
 
 #include "game/ChunkPosition.h"
-#include "net/Buffer.h"
 #include "packet/Packet.h"
 
 namespace Game3 {
@@ -19,5 +18,7 @@ namespace Game3 {
 
 		void encode(Game &, Buffer &buffer) const override;
 		void decode(Game &, Buffer &buffer)       override;
+
+		void handle(ServerGame &, RemoteClient &) override;
 	};
 }

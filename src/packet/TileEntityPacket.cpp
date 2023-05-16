@@ -17,12 +17,14 @@ namespace Game3 {
 		buffer >> globalID >> identifier >> realmID;
 		auto realm = game.realms.at(realmID);
 		if (auto iter = realm->tileEntitiesByGID.find(globalID); iter != realm->tileEntitiesByGID.end()) {
+			assert(globalID != static_cast<GlobalID>(-1));
+			assert(globalID != static_cast<GlobalID>(0));
 			(tileEntity = iter->second)->decode(game, buffer);
 		} else {
 			auto factory = game.registry<TileEntityFactoryRegistry>()[identifier];
 			tileEntity = (*factory)(game);
 			tileEntity->globalID = globalID;
-			tileEntity->tileEntityID = identifier; // TODO: is this redundant?
+			tileEntity->tileEntityID = identifier;
 			realm->add(tileEntity);
 			tileEntity->decode(game, buffer);
 		}
