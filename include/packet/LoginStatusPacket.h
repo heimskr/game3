@@ -21,8 +21,8 @@ namespace Game3 {
 
 			PacketID getID() const override { return ID(); }
 
-			void encode(Game &, Buffer &buffer) const override { buffer << success << username << displayName << playerDataBuffer; }
-			void decode(Game &, Buffer &buffer)       override { buffer >> success >> username >> displayName >> playerDataBuffer; }
+			void encode(Game &, Buffer &) const override;
+			void decode(Game &, Buffer &)       override;
 
 			void handle(ClientGame &) override;
 

@@ -1,4 +1,5 @@
 #include "Log.h"
+#include "game/ClientGame.h"
 #include "game/Game.h"
 #include "net/Buffer.h"
 #include "packet/EntityPacket.h"
@@ -22,7 +23,6 @@ namespace Game3 {
 			entity = (*factory)(game, {});
 			entity->globalID = globalID;
 			entity->type = identifier;
-			realm->add(entity);
 			entity->decode(buffer);
 		}
 	}
@@ -31,5 +31,9 @@ namespace Game3 {
 		assert(entity);
 		buffer << globalID << identifier << realmID;
 		entity->encode(buffer);
+	}
+
+	void EntityPacket::handle(ClientGame &game) {
+		game.realms.at(realmID)->add(entity);
 	}
 }

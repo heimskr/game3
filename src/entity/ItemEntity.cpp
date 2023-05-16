@@ -38,6 +38,8 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<ItemEntity> ItemEntity::fromJSON(Game &game, const nlohmann::json &json) {
+		if (json.is_null())
+			return create(game, ItemStack(game));
 		auto out = create(game, ItemStack::fromJSON(game, json.at("stack")));
 		out->absorbJSON(game, json);
 		return out;

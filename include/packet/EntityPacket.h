@@ -4,7 +4,7 @@ namespace Game3 {
 	class Entity;
 
 	struct EntityPacket: Packet {
-		static PacketID ID() { return 2; }
+		static PacketID ID() { return 14; }
 
 		std::shared_ptr<Entity> entity;
 		Identifier identifier;
@@ -18,5 +18,7 @@ namespace Game3 {
 
 		void encode(Game &, Buffer &) const override;
 		void decode(Game &, Buffer &) override;
+
+		void handle(ClientGame &) override;
 	};
 }

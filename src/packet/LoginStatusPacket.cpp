@@ -11,8 +11,19 @@ namespace Game3 {
 	LoginStatusPacket::LoginStatusPacket(bool success_, std::string_view username_, std::string_view display_name, std::shared_ptr<Player> player):
 	success(success_), username(username_), displayName(display_name) {
 		assert(!success || (!username.empty() && !display_name.empty()));
-		if (player)
+		if (player) {
 			player->encode(playerDataBuffer);
+			playerDataBuffer.context = player->getGame().shared_from_this();
+		}
+	}
+
+	void LoginStatusPacket::encode(Game &, Buffer &buffer) const {
+		buffer << success << username << displayName << playerDataBuffer;
+	}
+
+	void LoginStatusPacket::decode(Game &game, Buffer &buffer) {
+		playerDataBuffer.context = game.shared_from_this();
+		buffer >> success >> username >> displayName >> playerDataBuffer;
 	}
 
 	void LoginStatusPacket::handle(ClientGame &game) {

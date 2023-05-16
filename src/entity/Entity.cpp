@@ -53,21 +53,29 @@ namespace Game3 {
 	}
 
 	void Entity::absorbJSON(Game &game, const nlohmann::json &json) {
-		type      = json.at("type");
-		position  = json.at("position");
-		realmID   = json.at("realmID");
-		direction = json.at("direction");
-		health    = json.at("health");
-		if (json.contains("inventory"))
-			inventory = std::make_shared<Inventory>(Inventory::fromJSON(game, json.at("inventory"), shared_from_this()));
-		if (json.contains("path"))
-			path = json.at("path").get<std::list<Direction>>();
-		if (json.contains("money"))
-			money = json.at("money");
-		if (json.contains("heldLeft"))
-			heldLeft.slot = json.at("heldLeft");
-		if (json.contains("heldRight"))
-			heldRight.slot = json.at("heldRight");
+		if (json.is_null())
+			return; // Hopefully this is because the Entity is being constructed in EntityPacket::decode.
+
+		if (auto iter = json.find("type"); iter != json.end())
+			type = *iter;
+		if (auto iter = json.find("position"); iter != json.end())
+			position = *iter;
+		if (auto iter = json.find("realmID"); iter != json.end())
+			realmID = *iter;
+		if (auto iter = json.find("direction"); iter != json.end())
+			direction = *iter;
+		if (auto iter = json.find("health"); iter != json.end())
+			health = *iter;
+		if (auto iter = json.find("inventory"); iter != json.end())
+			inventory = std::make_shared<Inventory>(Inventory::fromJSON(game, *iter, shared_from_this()));
+		if (auto iter = json.find("path"); iter != json.end())
+			path = iter->get<std::list<Direction>>();
+		if (auto iter = json.find("money"); iter != json.end())
+			money = *iter;
+		if (auto iter = json.find("heldLeft"); iter != json.end())
+			heldLeft.slot = *iter;
+		if (auto iter = json.find("heldRight"); iter != json.end())
+			heldRight.slot = *iter;
 	}
 
 	void Entity::tick(Game &, float delta) {
