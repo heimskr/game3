@@ -140,6 +140,8 @@ namespace Game3 {
 			Side getSide() const;
 			/** Client-side. */
 			std::set<ChunkPosition> getMissingChunks() const;
+			void addPlayer(const PlayerPtr &);
+			void removePlayer(const PlayerPtr &);
 			inline void markGenerated(auto x, auto y) { generatedChunks.insert(ChunkPosition{x, y}); }
 			inline auto pauseUpdates() { return Pauser(shared_from_this()); }
 			inline bool isClient() const { return getSide() == Side::Client; }

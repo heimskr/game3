@@ -139,7 +139,8 @@ namespace Game3 {
 		if (!focused)
 			onFocus();
 
-		Canvas &canvas = game.toClient().canvas;
+		auto &client_game = game.toClient();
+		Canvas &canvas = client_game.canvas;
 		auto &multiplier = canvas.multiplier;
 
 		const auto bb_width  = width;
@@ -159,27 +160,16 @@ namespace Game3 {
 		sprite_renderer.update(bb_width, bb_height);
 		sprite_renderer.divisor = outdoors? game_time : 1;
 
-		std::shared_ptr<Entity> player;
 		for (const auto &entity: entities)
-			if (entity->isPlayer()) {
-				player = entity;
-				const auto [x, y] = getChunkPosition(player->getPosition());
-				for (int32_t x_offset = -REALM_DIAMETER / 2; x_offset <= REALM_DIAMETER / 2; ++x_offset) {
-					for (int32_t y_offset = -REALM_DIAMETER / 2; y_offset <= REALM_DIAMETER / 2; ++y_offset) {
-						ChunkPosition chunk_position{x + x_offset, y + y_offset};
-						if (!generatedChunks.contains(chunk_position))
-							tileProvider.generationQueue.push_back(chunk_position);
-					}
-				}
-			} else
+			if (!entity->isPlayer())
 				entity->render(sprite_renderer);
 		for (const auto &[index, tile_entity]: tileEntities)
 			tile_entity->render(sprite_renderer);
 
-		if (player)
-			player->render(sprite_renderer);
+		if (client_game.player)
+			client_game.player->render(sprite_renderer);
 
-		multiplier.update(bb_width, bb_height);
+		// multiplier.update(bb_width, bb_height);
 		// sprite_renderer.drawOnMap(texture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
 		// if (renderer1.lightTexture) {
 			// textureB.useInFB();
@@ -728,6 +718,16 @@ namespace Game3 {
 		}
 
 		return out;
+	}
+
+	void Realm::addPlayer(const PlayerPtr &player) {
+		auto lock = lockEntitiesUnique();
+		players.insert(player);
+	}
+
+	void Realm::removePlayer(const PlayerPtr &player) {
+		auto lock = lockEntitiesUnique();
+		players.erase(player);
 	}
 
 	bool Realm::rightClick(const Position &position, double x, double y) {

@@ -25,5 +25,6 @@ namespace Game3 {
 		game.player->decode(playerDataBuffer);
 		game.player->setupRealm(game);
 		game.activeRealm = game.player->getRealm();
+		game.activeRealm->addPlayer(game.player);
 	}
 }
