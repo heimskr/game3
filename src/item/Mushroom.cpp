@@ -14,6 +14,7 @@ namespace Game3 {
 
 	void Mushroom::getOffsets(const Game &game, std::shared_ptr<Texture> &texture, float &x_offset, float &y_offset) {
 		texture = game.registry<TextureRegistry>().at("base:texture/mushrooms");
+		texture->init();
 		x_offset = (subID % 6) * 16 / 2.f;
 		y_offset = (subID / 6) * 16 / 2.f;
 	}

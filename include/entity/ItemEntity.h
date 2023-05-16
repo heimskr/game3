@@ -32,14 +32,12 @@ namespace Game3 {
 			ItemEntity(ItemStack);
 			float xOffset = 0.f;
 			float yOffset = 0.f;
-			bool needsTexture = false;
+			bool needsTexture = true;
 
 			ItemStack stack;
 
 			void setTexture(const Game &);
 			bool interact(const std::shared_ptr<Player> &);
-
-			static Texture missing;
 	};
 
 	void to_json(nlohmann::json &, const ItemEntity &);

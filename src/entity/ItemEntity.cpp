@@ -15,9 +15,7 @@ namespace Game3 {
 		Entity(ID()), stack(game) {}
 
 	ItemEntity::ItemEntity(ItemStack stack_):
-	Entity(ID()), stack(std::move(stack_)) {
-		needsTexture = true;
-	}
+		Entity(ID()), stack(std::move(stack_)) {}
 
 	void ItemEntity::setStack(ItemStack stack_) {
 		stack = std::move(stack_);
@@ -25,8 +23,11 @@ namespace Game3 {
 	}
 
 	void ItemEntity::setTexture(const Game &game) {
+		if (getSide() != Side::Client)
+			return;
 		auto item_texture = game.registry<ItemTextureRegistry>().at(stack.item->identifier);
 		texture = item_texture->getTexture(game);
+		texture->init();
 		xOffset = item_texture->x / 2.f;
 		yOffset = item_texture->y / 2.f;
 	}
@@ -60,7 +61,7 @@ namespace Game3 {
 		if (!isVisible())
 			return;
 
-		if (texture == nullptr) {
+		if (texture == nullptr || needsTexture) {
 			if (needsTexture) {
 				setTexture(*sprite_renderer.canvas->game);
 				needsTexture = false;
@@ -100,7 +101,6 @@ namespace Game3 {
 		Entity::encode(buffer);
 		buffer << xOffset;
 		buffer << yOffset;
-		buffer << needsTexture;
 		stack.encode(getGame(), buffer);
 	}
 
@@ -108,7 +108,6 @@ namespace Game3 {
 		Entity::decode(buffer);
 		buffer >> xOffset;
 		buffer >> yOffset;
-		buffer >> needsTexture;
 		stack.decode(getGame(), buffer);
 	}
 

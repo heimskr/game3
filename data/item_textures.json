@@ -102,5 +102,11 @@
 	"base:item/gray_dye":        ["base:texture/potions",      16, 208],
 	"base:item/lime_dye":        ["base:texture/potions",     112, 208],
 	"base:item/pride_flag":      ["base:texture/tileset",     128, 368],
-	"base:item/floor":           ["base:texture/tileset",      16, 112]
+	"base:item/floor":           ["base:texture/tileset",      16, 112],
+	"base:item/saffron_milkcap": ["base:texture/mushrooms",    16,   0],
+	"base:item/honey_fungus":    ["base:texture/mushrooms",     0,  48],
+	"base:item/brittlegill":     ["base:texture/mushrooms",    16,  16],
+	"base:item/indigo_milkcap":  ["base:texture/mushrooms",    80,  16],
+	"base:item/black_trumpet":   ["base:texture/mushrooms",    80,  80],
+	"base:item/grey_knight":     ["base:texture/mushrooms",     0,  32]
 }]
