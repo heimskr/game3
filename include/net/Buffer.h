@@ -21,6 +21,9 @@ namespace Game3 {
 	template <typename T>
 	T popBuffer(Buffer &);
 
+	template <typename C>
+	std::string hexString(const C &);
+
 	struct BufferContext {
 		virtual ~BufferContext() = default;
 	};
@@ -210,7 +213,7 @@ namespace Game3 {
 			template <LinearOrSet T>
 			Buffer & operator>>(T &out) {
 				if (!typesMatch(popType(), getType(T())))
-					throw std::invalid_argument("Invalid type in buffer");
+					throw std::invalid_argument("Invalid type in buffer (expected list)");
 				out = popBuffer<T>(*this);
 				return *this;
 			}
@@ -218,16 +221,17 @@ namespace Game3 {
 			template <Map M>
 			Buffer & operator>>(M &out) {
 				if (!typesMatch(popType(), getType(M())))
-					throw std::invalid_argument("Invalid type in buffer");
+					throw std::invalid_argument("Invalid type in buffer (expected map)");
 				out = popBuffer<M>(*this);
 				return *this;
 			}
 
 			template <Numeric T>
 			Buffer & operator>>(T &out) {
-				if (!typesMatch(popType(), getType(T()))) {
+				const auto type = popType();
+				if (!typesMatch(type, getType(T()))) {
 					debug();
-					throw std::invalid_argument("Invalid type in buffer");
+					throw std::invalid_argument("Invalid type in buffer (expected integral): " + hexString(type));
 				}
 				out = popBuffer<T>(*this);
 				return *this;
@@ -246,7 +250,7 @@ namespace Game3 {
 			Buffer & operator>>(std::optional<T> &out) {
 				const auto type = popType();
 				if (!typesMatch(type, getType(std::make_optional<T>())))
-					throw std::invalid_argument("Invalid type in buffer");
+					throw std::invalid_argument("Invalid type in buffer (expected " + std::string(typeid(T).name()) + ')');
 				if (type == "\x0c")
 					out = std::nullopt;
 				else

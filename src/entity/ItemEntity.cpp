@@ -52,7 +52,8 @@ namespace Game3 {
 
 	void ItemEntity::init(Game &game) {
 		Entity::init(game);
-		stack.item->getOffsets(game, texture, xOffset, yOffset);
+		if (stack.item)
+			stack.item->getOffsets(game, texture, xOffset, yOffset);
 	}
 
 	void ItemEntity::render(SpriteRenderer &sprite_renderer) {

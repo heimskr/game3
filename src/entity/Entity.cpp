@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "Log.h"
 #include "Position.h"
 #include "Tileset.h"
 #include "data/Identifier.h"

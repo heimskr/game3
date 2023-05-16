@@ -41,7 +41,6 @@ namespace Game3 {
 			constexpr static HitPoints INVINCIBLE = 0;
 
 			EntityType type;
-			GlobalID globalID = -1;
 			Position position {0, 0};
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;
@@ -111,8 +110,6 @@ namespace Game3 {
 			inline auto getHeldLeft()  const { return heldLeft.slot;  }
 			inline auto getHeldRight() const { return heldRight.slot; }
 			Side getSide() const;
-			GlobalID getGID() const override { return globalID; }
-			void setGID(GlobalID new_gid) override { globalID = new_gid; }
 
 			virtual void encode(Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */

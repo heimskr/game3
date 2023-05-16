@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "Log.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
 #include "game/ClientGame.h"

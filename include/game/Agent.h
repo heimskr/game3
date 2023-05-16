@@ -5,8 +5,13 @@
 
 namespace Game3 {
 	struct Agent: HasPlace {
+		GlobalID globalID = generateGID();
+
 		std::vector<ChunkPosition> getVisibleChunks() const;
-		virtual GlobalID getGID() const = 0;
-		virtual void setGID(GlobalID) = 0;
+
+		virtual GlobalID getGID() const { return globalID; }
+		virtual void setGID(GlobalID new_gid) { globalID = new_gid; }
+
+		static GlobalID generateGID();
 	};
 }

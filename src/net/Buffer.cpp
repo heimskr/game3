@@ -313,7 +313,7 @@ namespace Game3 {
 			size = front - '\x10';
 		} else {
 			debug();
-			throw std::invalid_argument("Invalid type in buffer: " + hexString(std::string_view(&front, 1)));
+			throw std::invalid_argument("Invalid type in buffer (expected string): " + hexString(std::string_view(&front, 1)));
 		}
 		out.clear();
 		out.reserve(size);
