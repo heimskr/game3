@@ -10,6 +10,7 @@
 #include "game/ClientGame.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
+#include "game/ServerGame.h"
 #include "net/Buffer.h"
 #include "net/RemoteClient.h"
 #include "packet/EntityPacket.h"
@@ -338,6 +339,10 @@ namespace Game3 {
 				moveQueue.erase(iter++);
 			else
 				++iter;
+		}
+
+		if (getSide() == Side::Server) {
+			getGame().toServer().entityTeleported(shared_from_this());
 		}
 	}
 

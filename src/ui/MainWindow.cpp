@@ -580,14 +580,14 @@ namespace Game3 {
 		if (game && game->player) {
 			auto &player = *game->player;
 			switch (keyval) {
-				case GDK_KEY_w: player.movingUp    = false; player.continuousInteraction = false; keyTimes.erase(GDK_KEY_W); break;
-				case GDK_KEY_d: player.movingRight = false; player.continuousInteraction = false; keyTimes.erase(GDK_KEY_D); break;
-				case GDK_KEY_s: player.movingDown  = false; player.continuousInteraction = false; keyTimes.erase(GDK_KEY_S); break;
-				case GDK_KEY_a: player.movingLeft  = false; player.continuousInteraction = false; keyTimes.erase(GDK_KEY_A); break;
-				case GDK_KEY_W: player.movingUp    = false; player.continuousInteraction = false; keyTimes.erase(GDK_KEY_w); break;
-				case GDK_KEY_D: player.movingRight = false; player.continuousInteraction = false; keyTimes.erase(GDK_KEY_d); break;
-				case GDK_KEY_S: player.movingDown  = false; player.continuousInteraction = false; keyTimes.erase(GDK_KEY_s); break;
-				case GDK_KEY_A: player.movingLeft  = false; player.continuousInteraction = false; keyTimes.erase(GDK_KEY_a); break;
+				case GDK_KEY_w: player.stopMoving(); player.continuousInteraction = false; keyTimes.erase(GDK_KEY_W); break;
+				case GDK_KEY_d: player.stopMoving(); player.continuousInteraction = false; keyTimes.erase(GDK_KEY_D); break;
+				case GDK_KEY_s: player.stopMoving(); player.continuousInteraction = false; keyTimes.erase(GDK_KEY_S); break;
+				case GDK_KEY_a: player.stopMoving(); player.continuousInteraction = false; keyTimes.erase(GDK_KEY_A); break;
+				case GDK_KEY_W: player.stopMoving(); player.continuousInteraction = false; keyTimes.erase(GDK_KEY_w); break;
+				case GDK_KEY_D: player.stopMoving(); player.continuousInteraction = false; keyTimes.erase(GDK_KEY_d); break;
+				case GDK_KEY_S: player.stopMoving(); player.continuousInteraction = false; keyTimes.erase(GDK_KEY_s); break;
+				case GDK_KEY_A: player.stopMoving(); player.continuousInteraction = false; keyTimes.erase(GDK_KEY_a); break;
 				case GDK_KEY_Shift_L:
 				case GDK_KEY_Shift_R:
 					player.continuousInteraction = false;
@@ -642,31 +642,39 @@ namespace Game3 {
 			switch (keyval) {
 				case GDK_KEY_S:
 				case GDK_KEY_s:
-					player.path.clear();
+					// player.path.clear();
 					if (!player.isMoving() && (player.continuousInteraction = keyval == GDK_KEY_S))
 						player.continuousInteractionModifiers = Modifiers(modifiers);
-					player.movingDown = true;
+					// player.movingDown = true;
+					if (!player.isMoving())
+						player.startMoving(Direction::Down);
 					return;
 				case GDK_KEY_W:
 				case GDK_KEY_w:
-					player.path.clear();
+					// player.path.clear();
 					if (!player.isMoving() && (player.continuousInteraction = keyval == GDK_KEY_W))
 						player.continuousInteractionModifiers = Modifiers(modifiers);
-					player.movingUp = true;
+					// player.movingUp = true;
+					if (!player.isMoving())
+						player.startMoving(Direction::Up);
 					return;
 				case GDK_KEY_A:
 				case GDK_KEY_a:
-					player.path.clear();
+					// player.path.clear();
 					if (!player.isMoving() && (player.continuousInteraction = keyval == GDK_KEY_A))
 						player.continuousInteractionModifiers = Modifiers(modifiers);
-					player.movingLeft = true;
+					// player.movingLeft = true;
+					if (!player.isMoving())
+						player.startMoving(Direction::Left);
 					return;
 				case GDK_KEY_D:
 				case GDK_KEY_d:
-					player.path.clear();
+					// player.path.clear();
 					if (!player.isMoving() && (player.continuousInteraction = keyval == GDK_KEY_D))
 						player.continuousInteractionModifiers = Modifiers(modifiers);
-					player.movingRight = true;
+					// player.movingRight = true;
+					if (!player.isMoving())
+						player.startMoving(Direction::Right);
 					return;
 				case GDK_KEY_Shift_L:
 				case GDK_KEY_Shift_R:

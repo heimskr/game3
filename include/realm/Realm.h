@@ -141,6 +141,7 @@ namespace Game3 {
 			bool isVisible(const Position &) const;
 			bool hasTileEntity(GlobalID);
 			bool hasEntity(GlobalID);
+			EntityPtr getEntity(GlobalID);
 			Side getSide() const;
 			/** Client-side. */
 			std::set<ChunkPosition> getMissingChunks() const;

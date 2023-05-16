@@ -7,6 +7,8 @@
 #include "game/Inventory.h"
 #include "item/Tool.h"
 #include "net/Buffer.h"
+#include "net/LocalClient.h"
+#include "packet/PlayerMovementPacket.h"
 #include "realm/Realm.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
@@ -138,9 +140,13 @@ namespace Game3 {
 		return movingUp || movingRight || movingDown || movingLeft;
 	}
 
-	bool Player::canSee(RealmID realm_id, const Position &pos) {
+	bool Player::canSee(RealmID realm_id, const Position &pos) const {
 		const auto &realm = *getRealm();
 		return realm.id == realm_id && realm.isVisible(pos);
+	}
+
+	bool Player::canSee(const EntityPtr &entity) const {
+		return canSee(entity->realmID, entity->getPosition());
 	}
 
 	void Player::setupRealm(const Game &game) {
@@ -164,11 +170,28 @@ namespace Game3 {
 		resetEphemeral();
 	}
 
-	void Player::resetEphemeral() {
-		movingUp = false;
+	void Player::startMoving(Direction direction) {
+		movingUp    = direction == Direction::Up;
+		movingRight = direction == Direction::Right;
+		movingDown  = direction == Direction::Down;
+		movingLeft  = direction == Direction::Left;
+
+		if (getSide() == Side::Client)
+			getGame().toClient().client->send(PlayerMovementPacket(direction));
+	}
+
+	void Player::stopMoving() {
+		movingUp    = false;
 		movingRight = false;
-		movingDown = false;
-		movingLeft = false;
+		movingDown  = false;
+		movingLeft  = false;
+
+		if (getSide() == Side::Client)
+			getGame().toClient().client->send(PlayerMovementPacket());
+	}
+
+	void Player::resetEphemeral() {
+		stopMoving();
 		continuousInteraction = false;
 		// `ticked` excluded intentionally. Probably.
 		lastContinousInteraction.reset();

@@ -3,6 +3,7 @@
 #include "net/LocalServer.h"
 #include "net/RemoteClient.h"
 #include "packet/CommandResultPacket.h"
+#include "packet/EntityMovePacket.h"
 #include "packet/TileUpdatePacket.h"
 #include "util/Util.h"
 
@@ -24,12 +25,11 @@ namespace Game3 {
 	}
 
 	void ServerGame::broadcastTileUpdate(RealmID realm_id, Layer layer, const Position &position, TileID tile_id) {
+		const TileUpdatePacket packet(realm_id, layer, position, tile_id);
 		auto lock = lockPlayersShared();
-		for (const auto &player: players) {
-			if (player->canSee(realm_id, position)) {
-				player->client->send(TileUpdatePacket(realm_id, layer, position, tile_id));
-			}
-		}
+		for (const auto &player: players)
+			if (player->canSee(realm_id, position))
+				player->client->send(packet);
 	}
 
 	void ServerGame::queuePacket(std::shared_ptr<RemoteClient> client, std::shared_ptr<Packet> packet) {
@@ -40,6 +40,14 @@ namespace Game3 {
 		auto [success, message] = commandHelper(client, command);
 		CommandResultPacket packet(command_id, success, std::move(message));
 		client.send(packet);
+	}
+
+	void ServerGame::entityTeleported(const EntityPtr &entity) {
+		const EntityMovePacket packet(entity);
+		auto lock = lockPlayersShared();
+		for (const auto &player: players)
+			if (player->canSee(entity))
+				player->client->send(packet);
 	}
 
 	void ServerGame::handlePacket(RemoteClient &client, Packet &packet) {

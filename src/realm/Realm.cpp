@@ -731,6 +731,13 @@ namespace Game3 {
 		return entitiesByGID.contains(entity_gid);
 	}
 
+	EntityPtr Realm::getEntity(GlobalID entity_gid) {
+		auto lock = lockEntitiesShared();
+		if (auto iter = entitiesByGID.find(entity_gid); iter != entitiesByGID.end())
+			return iter->second;
+		return {};
+	}
+
 	Side Realm::getSide() const {
 		return getGame().getSide();
 	}

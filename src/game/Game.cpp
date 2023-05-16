@@ -52,6 +52,9 @@
 #include "packet/RegisterPlayerPacket.h"
 #include "packet/RegistrationStatusPacket.h"
 #include "packet/EntityPacket.h"
+#include "packet/PlayerMovementPacket.h"
+#include "packet/ErrorPacket.h"
+#include "packet/EntityMovePacket.h"
 #include "realm/Cave.h"
 #include "realm/House.h"
 #include "realm/Keep.h"
@@ -274,6 +277,9 @@ namespace Game3 {
 		add(PacketFactory::create<RegisterPlayerPacket>());
 		add(PacketFactory::create<RegistrationStatusPacket>());
 		add(PacketFactory::create<EntityPacket>());
+		add(PacketFactory::create<PlayerMovementPacket>());
+		add(PacketFactory::create<ErrorPacket>());
+		add(PacketFactory::create<EntityMovePacket>());
 	}
 
 	void Game::addLocalCommandFactories() {
