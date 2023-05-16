@@ -1,4 +1,5 @@
 #include "Log.h"
+#include "game/ClientGame.h"
 #include "game/Game.h"
 #include "net/Buffer.h"
 #include "packet/TileEntityPacket.h"
@@ -31,5 +32,9 @@ namespace Game3 {
 		assert(tileEntity);
 		buffer << globalID << identifier << realmID;
 		tileEntity->encode(game, buffer);
+	}
+
+	void TileEntityPacket::handle(ClientGame &game) {
+		game.realms.at(realmID)->add(tileEntity);
 	}
 }
