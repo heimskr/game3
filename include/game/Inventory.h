@@ -18,6 +18,7 @@ namespace Game3 {
 			Slot slotCount = 0;
 			Slot activeSlot = 0;
 
+			Inventory() = default;
 			Inventory(const std::shared_ptr<Agent> &owner_, Slot slot_count);
 
 			ItemStack * operator[](size_t);

@@ -40,6 +40,18 @@ namespace Game3 {
 		return getRealm()->getGame().realms.at(innerRealmID);
 	}
 
+	void Building::encode(Game &game, Buffer &buffer) {
+		TileEntity::encode(game, buffer);
+		buffer << innerRealmID;
+		buffer << entrance;
+	}
+
+	void Building::decode(Game &game, Buffer &buffer) {
+		TileEntity::decode(game, buffer);
+		buffer >> innerRealmID;
+		buffer >> entrance;
+	}
+
 	void Building::render(SpriteRenderer &sprite_renderer) {
 		if (!isVisible())
 			return;

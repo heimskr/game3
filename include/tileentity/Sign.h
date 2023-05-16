@@ -21,6 +21,9 @@ namespace Game3 {
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			// void render(SpriteRenderer &) const override;
 
+			void encode(Game &, Buffer &) override;
+			void decode(Game &, Buffer &) override;
+
 		protected:
 			Sign() = default;
 			Sign(Identifier tilename, Position position_, std::string text_, std::string name_);

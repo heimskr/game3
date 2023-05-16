@@ -38,6 +38,9 @@ namespace Game3 {
 			void render(SpriteRenderer &) override;
 			const Ore & getOre(const Game &) const;
 
+			void encode(Game &, Buffer &) override;
+			void decode(Game &, Buffer &) override;
+
 		protected:
 			OreDeposit() = default;
 			OreDeposit(const Ore &ore, const Position &position_, float time_remaining = 0.f, uint32_t uses_ = 0);

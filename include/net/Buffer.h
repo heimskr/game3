@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bit>
+#include <cassert>
 #include <concepts>
 #include <cstdint>
 #include <deque>
@@ -135,6 +136,12 @@ namespace Game3 {
 				return *this += '\x0c';
 			}
 
+			template <typename T>
+			Buffer & operator+=(const std::shared_ptr<T> &item) {
+				assert(item);
+				return *this += *item;
+			}
+
 			std::string popType();
 
 			template <typename T1, typename T2>
@@ -205,6 +212,12 @@ namespace Game3 {
 				return *this += item;
 			}
 
+			template <typename T>
+			Buffer & operator<<(const std::shared_ptr<T> &item) {
+				assert(item);
+				return *this += *item;
+			}
+
 			friend std::ostream & operator<<(std::ostream &, const Buffer &);
 
 			template <typename T>
@@ -256,6 +269,12 @@ namespace Game3 {
 				else
 					out = take<T>();
 				return *this;
+			}
+
+			template <typename T>
+			Buffer & operator>>(std::shared_ptr<T> &out) {
+				assert(out);
+				return *this >> *out;
 			}
 
 			template <typename T>

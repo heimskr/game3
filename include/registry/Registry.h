@@ -122,17 +122,19 @@ namespace Game3 {
 				add(S::ID(), std::make_shared<S>());
 			}
 
-			inline void add(Identifier new_name, std::shared_ptr<T> new_item) {
+			inline std::shared_ptr<T> add(Identifier new_name, std::shared_ptr<T> new_item) {
 				if (auto [iter, inserted] = items.try_emplace(new_name, std::move(new_item)); inserted) {
 					iter->second->identifier = std::move(new_name);
 					iter->second->registryID = nextCounter++;
 					byCounter.push_back(iter->second);
-				} else
-					throw std::runtime_error("NamedRegistry " + identifier.str() + " already contains an item with name \"" + new_name.str() + '"');
+					return iter->second;
+				}
+
+				throw std::runtime_error("NamedRegistry " + identifier.str() + " already contains an item with name \"" + new_name.str() + '"');
 			}
 
-			inline void add(Identifier new_name, T &&new_item) {
-				add(std::move(new_name), std::make_shared<T>(std::move(new_item)));
+			inline std::shared_ptr<T> add(Identifier new_name, T &&new_item) {
+				return add(std::move(new_name), std::make_shared<T>(std::move(new_item)));
 			}
 
 			inline bool contains(const Identifier &id) const {

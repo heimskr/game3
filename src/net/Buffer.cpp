@@ -201,7 +201,8 @@ namespace Game3 {
 			return first + popType();
 		if (first == '\x21')
 			return first + popType() + popType();
-		throw std::invalid_argument("Invalid type byte: " + std::to_string(first));
+		debug();
+		throw std::invalid_argument("Invalid type byte: " + hexString(std::string_view(&first, 1)));
 	}
 
 	bool Buffer::typesMatch(std::string_view one, std::string_view two) {

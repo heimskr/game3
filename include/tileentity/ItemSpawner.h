@@ -25,6 +25,9 @@ namespace Game3 {
 			void tick(Game &, float) override;
 			void render(SpriteRenderer &) override;
 
+			void encode(Game &, Buffer &) override;
+			void decode(Game &, Buffer &) override;
+
 		protected:
 			ItemSpawner() = default;
 			ItemSpawner(Position position_, float chance_per_tenth, std::vector<ItemStack> spawnables_);

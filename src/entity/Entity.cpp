@@ -448,11 +448,7 @@ namespace Game3 {
 		buffer << path;
 		buffer << money;
 		buffer << health;
-		buffer << (inventory? inventory->slotCount : static_cast<Slot>(-1));
-		std::shared_ptr<Inventory> inventory_to_send = inventory;
-		if (!inventory_to_send)
-			inventory_to_send = std::make_shared<Inventory>(shared_from_this(), 0);
-		buffer << *inventory_to_send;
+		HasInventory::encode(buffer);
 		buffer << heldLeft.slot;
 		buffer << heldRight.slot;
 	}
@@ -468,10 +464,7 @@ namespace Game3 {
 		buffer >> path;
 		buffer >> money;
 		buffer >> health;
-		Slot slot_count = -1;
-		buffer >> slot_count;
-		inventory = std::make_shared<Inventory>(shared_from_this(), slot_count);
-		buffer >> *inventory;
+		HasInventory::decode(buffer);
 		Slot left_slot;
 		Slot right_slot;
 		buffer >> left_slot;

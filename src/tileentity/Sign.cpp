@@ -37,4 +37,16 @@ namespace Game3 {
 		text = json.at("text");
 		name = json.at("name");
 	}
+
+	void Sign::encode(Game &game, Buffer &buffer) {
+		TileEntity::encode(game, buffer);
+		buffer << text;
+		buffer << name;
+	}
+
+	void Sign::decode(Game &game, Buffer &buffer) {
+		TileEntity::decode(game, buffer);
+		buffer >> text;
+		buffer >> name;
+	}
 }

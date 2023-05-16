@@ -1,26 +1,31 @@
 LTO     :=
 LDFLAGS :=
 
-ifeq ($(BUILD),debug)
-BUILDFLAGS := -g -O0
-else ifeq ($(BUILD),tsan)
-BUILDFLAGS := -g -O1 -fsanitize=thread
-LDFLAGS    := -fsanitize=thread
-else ifeq ($(BUILD),asan)
-BUILDFLAGS := -g -O0 -fsanitize=address -fno-omit-frame-pointer
-LDFLAGS    := -fsanitize=address
-else ifeq ($(BUILD),nonnative)
-BUILDFLAGS := -Ofast -march=x86-64-v3
-LTO        := -flto
+ifeq ($(CUSTOM_BUILD),)
+	ifeq ($(BUILD),debug)
+		BUILDFLAGS := -g -O0
+	else ifeq ($(BUILD),tsan)
+		BUILDFLAGS := -g -O1 -fsanitize=thread
+		LDFLAGS    := -fsanitize=thread
+	else ifeq ($(BUILD),asan)
+		BUILDFLAGS := -g -O0 -fsanitize=address -fno-omit-frame-pointer
+		LDFLAGS    := -fsanitize=address
+	else ifeq ($(BUILD),nonnative)
+		BUILDFLAGS := -Ofast -march=x86-64-v3
+		LTO        := -flto
+	else
+		BUILDFLAGS := -Ofast -march=native
+		LTO        := -flto
+	endif
 else
-BUILDFLAGS := -Ofast -march=native
-LTO        := -flto
+	BUILDFLAGS := $(CUSTOM_BUILD)
+	LTO        := $(CUSTOM_LTO)
 endif
 
 ifeq ($(shell uname -s), Darwin)
-LDFLAGS := $(LDFLAGS) -framework Cocoa -framework OpenGL -framework IOKit
+	LDFLAGS := $(LDFLAGS) -framework Cocoa -framework OpenGL -framework IOKit
 else
-LDFLAGS := $(LDFLAGS) -lGL
+	LDFLAGS := $(LDFLAGS) -lGL
 endif
 
 DEPS         := glm glfw3 libzstd gtk4 gtkmm-4.0 glu libevent_openssl openssl libevent_pthreads
@@ -31,13 +36,13 @@ ZIG          ?= zig
 # --main-pkg-path is needed as otherwise it wouldn't let you embed any file outside of src/
 ZIGFLAGS     := -O ReleaseSmall --main-pkg-path .
 ifeq ($(GITHUB),true)
-INCLUDES     := $(shell PKG_CONFIG_PATH=.github-deps/prefix/lib/pkgconfig pkg-config --cflags $(DEPS))
-LIBS         := $(shell PKG_CONFIG_PATH=.github-deps/prefix/lib/pkgconfig pkg-config --libs   $(DEPS))
-ZIG          := .zig/zig
-COMPILER     := clang++-14
+	INCLUDES     := $(shell PKG_CONFIG_PATH=.github-deps/prefix/lib/pkgconfig pkg-config --cflags $(DEPS))
+	LIBS         := $(shell PKG_CONFIG_PATH=.github-deps/prefix/lib/pkgconfig pkg-config --libs   $(DEPS))
+	ZIG          := .zig/zig
+	COMPILER     := clang++-14
 else
-INCLUDES     := $(shell pkg-config --cflags $(DEPS))
-LIBS         := $(shell pkg-config --libs   $(DEPS))
+	INCLUDES     := $(shell pkg-config --cflags $(DEPS))
+	LIBS         := $(shell pkg-config --libs   $(DEPS))
 endif
 GLIB_COMPILE_RESOURCES = $(shell pkg-config --variable=glib_compile_resources gio-2.0)
 LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread $(LTO)
@@ -85,6 +90,7 @@ $(OUTPUT): $(OBJECTS) $(NOISE_OBJ)
 	@ $(COMPILER) $^ -o $@ $(LDFLAGS)
 ifeq ($(BUILD),debug)
 else ifeq ($(BUILD),tsan)
+else ifeq ($(BUILD),asan)
 else
 	strip $@
 endif

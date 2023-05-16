@@ -19,6 +19,9 @@ namespace Game3 {
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 
+			void encode(Game &, Buffer &) override;
+			void decode(Game &, Buffer &) override;
+
 			friend class TileEntity;
 
 		protected:

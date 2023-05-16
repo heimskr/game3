@@ -48,4 +48,14 @@ namespace Game3 {
 		TileEntity::absorbJSON(game, json);
 		stationType = json.at("stationType");
 	}
+
+	void CraftingStation::encode(Game &game, Buffer &buffer) {
+		TileEntity::encode(game, buffer);
+		buffer << stationType;
+	}
+
+	void CraftingStation::decode(Game &game, Buffer &buffer) {
+		TileEntity::decode(game, buffer);
+		buffer >> stationType;
+	}
 }

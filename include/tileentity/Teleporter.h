@@ -21,6 +21,9 @@ namespace Game3 {
 			void onOverlap(const std::shared_ptr<Entity> &) override;
 			void render(SpriteRenderer &) override;
 
+			void encode(Game &, Buffer &) override;
+			void decode(Game &, Buffer &) override;
+
 		protected:
 			Teleporter() = default;
 			Teleporter(Identifier tilename, Position position_, RealmID target_realm, Position target_position);

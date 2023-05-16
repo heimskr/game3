@@ -24,6 +24,9 @@ namespace Game3 {
 			void render(SpriteRenderer &) override;
 			std::shared_ptr<Realm> getInnerRealm() const;
 
+			void encode(Game &, Buffer &) override;
+			void decode(Game &, Buffer &) override;
+
 		protected:
 			Building() = default;
 			Building(Identifier, Position, RealmID inner_realm_id, Position entrance_);

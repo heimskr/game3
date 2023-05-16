@@ -31,6 +31,9 @@ namespace Game3 {
 			bool kill() override;
 			void render(SpriteRenderer &) override;
 
+			void encode(Game &, Buffer &) override;
+			void decode(Game &, Buffer &) override;
+
 		protected:
 			Tree() = default;
 			Tree(Identifier tilename, Identifier immature_tilename, Position position_, float age_);

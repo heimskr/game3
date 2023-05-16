@@ -183,4 +183,21 @@ namespace Game3 {
 			realm->reupload();
 		}
 	}
+
+	void Ghost::encode(Game &game, Buffer &buffer) {
+		TileEntity::encode(game, buffer);
+		buffer << details.identifier;
+		buffer << material;
+		buffer << marched;
+	}
+
+	void Ghost::decode(Game &game, Buffer &buffer) {
+		TileEntity::decode(game, buffer);
+		Identifier details_identifier;
+		buffer >> details_identifier;
+		buffer >> material;
+		buffer >> marched;
+		details = *game.registry<GhostDetailsRegistry>().at(details_identifier);
+
+	}
 }

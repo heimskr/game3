@@ -5,6 +5,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include "Log.h"
 #include "Texture.h"
 #include "util/GL.h"
 #include "util/Util.h"

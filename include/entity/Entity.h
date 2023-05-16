@@ -132,6 +132,8 @@ namespace Game3 {
 			std::list<std::function<bool(const std::shared_ptr<Entity> &)>> moveQueue;
 			std::shared_ptr<Texture> getTexture();
 
+			std::shared_ptr<Agent> getSharedAgent() override { return shared_from_this(); }
+
 		private:
 			struct Held {
 				Slot slot = -1;

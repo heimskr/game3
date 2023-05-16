@@ -27,9 +27,14 @@ namespace Game3 {
 			void render(SpriteRenderer &) override;
 			void setInventory(Slot slot_count);
 
+			void encode(Game &, Buffer &) override;
+			void decode(Game &, Buffer &) override;
+
 		protected:
 			Chest() = default;
 			Chest(Identifier tile_id, const Position &, std::string name_, std::shared_ptr<Texture> = cacheTexture(DEFAULT_TEXTURE_PATH));
+
+			std::shared_ptr<Agent> getSharedAgent() override { return std::dynamic_pointer_cast<Chest>(shared_from_this()); }
 
 			friend class TileEntity;
 	};

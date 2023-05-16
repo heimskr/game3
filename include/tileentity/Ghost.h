@@ -84,6 +84,9 @@ namespace Game3 {
 			/** This method doesn't remove the tile entity or decrement the realm's ghost count by itself. */
 			void confirm();
 
+			void encode(Game &, Buffer &) override;
+			void decode(Game &, Buffer &) override;
+
 			friend class TileEntity;
 
 		protected:

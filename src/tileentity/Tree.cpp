@@ -136,4 +136,18 @@ namespace Game3 {
 	TileID Tree::getImmatureTileID(const Tileset &tileset) {
 		return immatureTileID? *immatureTileID : *(immatureTileID = tileset[immatureTilename]);
 	}
+
+	void Tree::encode(Game &game, Buffer &buffer) {
+		TileEntity::encode(game, buffer);
+		buffer << age;
+		buffer << hiveAge;
+		buffer << immatureTilename;
+	}
+
+	void Tree::decode(Game &game, Buffer &buffer) {
+		TileEntity::decode(game, buffer);
+		buffer >> age;
+		buffer >> hiveAge;
+		buffer >> immatureTilename;
+	}
 }

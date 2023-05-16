@@ -52,4 +52,16 @@ namespace Game3 {
 			});
 		}
 	}
+
+	void Teleporter::encode(Game &game, Buffer &buffer) {
+		TileEntity::encode(game, buffer);
+		buffer << targetRealm;
+		buffer << targetPosition;
+	}
+
+	void Teleporter::decode(Game &game, Buffer &buffer) {
+		TileEntity::decode(game, buffer);
+		buffer >> targetRealm;
+		buffer >> targetPosition;
+	}
 }

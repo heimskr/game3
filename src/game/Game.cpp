@@ -406,11 +406,11 @@ namespace Game3 {
 			auto &textures = registry<TextureRegistry>();
 			for (const auto &[key, value]: json.at(1).items()) {
 				if (value.size() == 1)
-					textures.add(Identifier(key), Texture(Identifier(key), value.at(0)));
+					textures.add(Identifier(key), Texture(Identifier(key), value.at(0)))->init();
 				else if (value.size() == 2)
-					textures.add(Identifier(key), Texture(Identifier(key), value.at(0), value.at(1)));
+					textures.add(Identifier(key), Texture(Identifier(key), value.at(0), value.at(1)))->init();
 				else if (value.size() == 3)
-					textures.add(Identifier(key), Texture(Identifier(key), value.at(0), value.at(1), value.at(2)));
+					textures.add(Identifier(key), Texture(Identifier(key), value.at(0), value.at(1), value.at(2)))->init();
 				else
 					throw std::invalid_argument("Expected Texture JSON size to be 1, 2 or 3, not " + std::to_string(value.size()));
 			}

@@ -73,4 +73,16 @@ namespace Game3 {
 	void Chest::setInventory(Slot slot_count) {
 		inventory = std::make_shared<Inventory>(shared_from_this(), slot_count);
 	}
+
+	void Chest::encode(Game &game, Buffer &buffer) {
+		TileEntity::encode(game, buffer);
+		buffer << name;
+		HasInventory::encode(buffer);
+	}
+
+	void Chest::decode(Game &game, Buffer &buffer) {
+		TileEntity::decode(game, buffer);
+		buffer >> name;
+		HasInventory::decode(buffer);
+	}
 }

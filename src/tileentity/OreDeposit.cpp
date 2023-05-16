@@ -118,4 +118,18 @@ namespace Game3 {
 	const Ore & OreDeposit::getOre(const Game &game) const {
 		return *game.registry<OreRegistry>().at(oreType);
 	}
+
+	void OreDeposit::encode(Game &game, Buffer &buffer) {
+		TileEntity::encode(game, buffer);
+		buffer << oreType;
+		buffer << timeRemaining;
+		buffer << uses;
+	}
+
+	void OreDeposit::decode(Game &game, Buffer &buffer) {
+		TileEntity::decode(game, buffer);
+		buffer >> oreType;
+		buffer >> timeRemaining;
+		buffer >> uses;
+	}
 }
