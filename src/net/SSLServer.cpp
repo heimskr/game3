@@ -108,7 +108,7 @@ namespace Game3 {
 		}
 
 		evutil_make_socket_nonblocking(new_fd);
-		bufferevent *buffer_event = bufferevent_openssl_socket_new(base, new_fd, ssl, BUFFEREVENT_SSL_ACCEPTING, BEV_OPT_CLOSE_ON_FREE);
+		bufferevent *buffer_event = bufferevent_openssl_socket_new(base, new_fd, ssl, BUFFEREVENT_SSL_ACCEPTING, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
 
 		if (buffer_event == nullptr) {
 			event_base_loopbreak(base);

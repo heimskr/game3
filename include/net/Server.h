@@ -1,5 +1,7 @@
 #pragma once
 
+#include <atomic>
+#include <condition_variable>
 #include <functional>
 #include <map>
 #include <memory>
@@ -101,6 +103,9 @@ namespace Game3 {
 			std::thread acceptThread;
 
 			std::vector<std::shared_ptr<Worker>> workers;
+			std::atomic_bool workersReady = false;
+			std::condition_variable workersCV;
+			std::mutex workersCVMutex;
 
 			event_base *base = nullptr;
 			event *signalEvent = nullptr;

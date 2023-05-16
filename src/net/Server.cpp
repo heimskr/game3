@@ -187,16 +187,24 @@ namespace Game3 {
 
 		makeName();
 
+		for (size_t i = 0; i < threadCount; ++i)
+			workers.emplace_back(makeWorker(chunkSize, i));
+
+		for (size_t i = 0; i < threadCount; ++i)
+			threads.emplace_back(std::thread([this, i, &worker = *workers.at(i)] {
+				{
+						std::unique_lock lock(workersCVMutex);
+						workersCV.wait(lock, [this] { return workersReady.load(); });
+				}
+					worker.work(i);
+			}));
+
+		workersReady = true;
+		workersCV.notify_all();
+
 		acceptThread = std::thread([this] {
 			mainLoop();
 		});
-
-		for (size_t i = 0; i < threadCount; ++i) {
-			workers.emplace_back(makeWorker(chunkSize, i));
-			threads.emplace_back(std::thread([i, &worker = *workers.back()] {
-				worker.work(i);
-			}));
-		}
 
 		for (auto &thread: threads)
 			thread.join();
@@ -249,7 +257,7 @@ namespace Game3 {
 		}
 
 		evutil_make_socket_nonblocking(new_fd);
-		bufferevent *buffer_event = bufferevent_socket_new(base, new_fd, BEV_OPT_CLOSE_ON_FREE);
+		bufferevent *buffer_event = bufferevent_socket_new(base, new_fd, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
 
 		if (buffer_event == nullptr) {
 			event_base_loopbreak(base);

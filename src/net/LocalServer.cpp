@@ -145,6 +145,8 @@ namespace Game3 {
 
 	static std::shared_ptr<Server> global_server;
 	static std::atomic_bool running = true;
+	static std::condition_variable stopCV;
+	static std::mutex stopMutex;
 
 	bool LocalServer::validateUsername(std::string_view username) {
 		if (username.empty() || 20 < username.size())
@@ -190,7 +192,13 @@ namespace Game3 {
 		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
 			throw std::runtime_error("Couldn't register SIGPIPE handler");
 
-		if (signal(SIGINT, +[](int) { running = false; global_server->stop(); }) == SIG_ERR)
+		auto stop_thread = std::thread([] {
+			std::unique_lock lock(stopMutex);
+			stopCV.wait(lock, [] { return !running.load(); });
+			global_server->stop();
+		});
+
+		if (signal(SIGINT, +[](int) { running = false; stopCV.notify_all(); }) == SIG_ERR)
 			throw std::runtime_error("Couldn't register SIGINT handler");
 
 		auto game_server = std::make_shared<LocalServer>(global_server, secret);
@@ -223,6 +231,7 @@ namespace Game3 {
 
 		game_server->run();
 		tick_thread.join();
+		stop_thread.join();
 
 		return 0;
 	}
