@@ -1,5 +1,6 @@
 #pragma once
 
+#include <deque>
 #include <filesystem>
 #include <iostream>
 #include <memory>
@@ -38,12 +39,13 @@ namespace Game3 {
 
 		private:
 			enum class State {Begin, Data};
+			std::array<char, 1'000'000> array;
 			State state = State::Begin;
 			Buffer buffer;
 			uint16_t packetType = 0;
 			uint32_t payloadSize = 0;
 			std::shared_ptr<Sock> sock;
-			std::vector<uint8_t> headerBytes;
+			std::deque<uint8_t> headerBytes;
 			std::map<std::string, std::map<std::string, Token>> tokenDatabase;
 			std::optional<std::filesystem::path> tokenDatabasePath;
 

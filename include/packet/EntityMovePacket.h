@@ -19,7 +19,6 @@ namespace Game3 {
 		EntityMovePacket(GlobalID global_id, RealmID realm_id, const Position &position_):
 			globalID(global_id), realmID(realm_id), position(position_) {}
 
-
 		PacketID getID() const override { return ID(); }
 
 		void encode(Game &, Buffer &buffer) const override { buffer << globalID << realmID << position; }

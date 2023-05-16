@@ -31,7 +31,6 @@ namespace Game3 {
 			if (auto locked = lockGame())
 				buffer.context = locked;
 
-		std::array<char, 10240> array;
 		const auto byte_count = sock->recv(array.data(), array.size());
 		if (byte_count <= 0)
 			return;

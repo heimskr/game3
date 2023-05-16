@@ -1,3 +1,4 @@
+#include "Log.h"
 #include "ThreadContext.h"
 #include "game/ServerGame.h"
 #include "net/LocalServer.h"
