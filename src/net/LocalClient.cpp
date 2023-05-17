@@ -94,7 +94,7 @@ namespace Game3 {
 		sendRaw(packet.getID());
 		sendRaw(static_cast<uint32_t>(send_buffer.size()));
 		const auto str = send_buffer.str();
-		sock->send(str.c_str(), str.size());
+		sock->send(str.c_str(), str.size(), false);
 		bytesWritten += 6 + str.size();
 		std::unique_lock lock(sentPacketCountsMutex);
 		++sentPacketCounts[packet.getID()];

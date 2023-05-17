@@ -26,17 +26,17 @@ namespace Game3::WorldGen {
 
 		const auto set1 = [&](const Identifier &tilename) {
 			cleanup(row, column);
-			realm->setTile(1, {row, column}, tilename, false);
+			realm->setTile(1, {row, column}, tilename, false, true);
 		};
 
 		const auto set2 = [&](const Identifier &tilename) {
 			cleanup(row, column);
-			realm->setTile(2, {row, column}, tilename, false);
+			realm->setTile(2, {row, column}, tilename, false, true);
 		};
 
 		const auto set2p = [&](const Position &position, const Identifier &tilename) {
 			cleanup(position.row, position.column);
-			realm->setTile(2, position, tilename, false);
+			realm->setTile(2, position, tilename, false, true);
 		};
 
 		Timer town_timer("TownLayout");
@@ -137,7 +137,7 @@ namespace Game3::WorldGen {
 		game.realms.emplace(keep_realm_id, keep_realm);
 
 		auto create_keep = [&](const Identifier &tilename) {
-			realm->setTile(2, keep_position, tilename);
+			realm->setTile(2, keep_position, tilename, false, true);
 			realm->add(TileEntity::create<Building>(game, tilename, keep_position, keep_realm_id, keep_entrance));
 		};
 
@@ -167,7 +167,7 @@ namespace Game3::WorldGen {
 			Position building_position;
 
 			auto gen_building = [&](const Identifier &tilename, Index realm_width, Index realm_height, RealmType realm_type, const BuildingGenerator &gen_fn, std::optional<Position> entrance = std::nullopt) {
-				realm->setTile(2, building_position, tilename);
+				realm->setTile(2, building_position, tilename, false, true);
 				const RealmID realm_id = game.newRealmID();
 				// auto building = TileEntity::create<Building>(game, tilename, building_position, realm_id, entrance == -1? realm_width * (realm_height - 1) - 3 : entrance);
 				auto building = TileEntity::create<Building>(game, tilename, building_position, realm_id, entrance? *entrance : Position(realm_height - 2, realm_width - 3));

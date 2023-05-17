@@ -13,6 +13,18 @@ namespace Game3 {
 	/** Used by servers to represent a remote client. */
 	class RemoteClient: public GenericClient, public std::enable_shared_from_this<RemoteClient> {
 		public:
+			struct BufferGuard {
+				std::reference_wrapper<RemoteClient> parent;
+
+				BufferGuard(RemoteClient &parent_): parent(parent_) {
+					parent_.startBuffering();
+				}
+
+				~BufferGuard() {
+					parent.get().stopBuffering();
+				}
+			};
+
 			constexpr static size_t MAX_PACKET_SIZE = 1 << 24;
 
 			LocalServer &server;
@@ -28,6 +40,10 @@ namespace Game3 {
 			void sendChunk(Realm &, ChunkPosition, bool can_request = true);
 			inline auto getPlayer() const { return weakPlayer.lock(); }
 			inline void setPlayer(PlayerPtr shared) { weakPlayer = shared; }
+			void startBuffering();
+			void flushBuffer();
+			void stopBuffering();
+			inline auto bufferGuard() { return BufferGuard(*this); }
 
 			template <typename T>
 			requires (!std::derived_from<T, Packet>)

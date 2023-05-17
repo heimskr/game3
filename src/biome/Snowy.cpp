@@ -34,23 +34,23 @@ namespace Game3 {
 		static const Identifier stone         = "base:tile/stone"_id;
 
 		if (noise < wetness) {
-			realm.setTile(1, {row, column}, deeper_water);
+			realm.setTile(1, {row, column}, deeper_water, false, true);
 		} else if (noise < wetness + 0.1) {
-			realm.setTile(1, {row, column}, deep_water);
+			realm.setTile(1, {row, column}, deep_water, false, true);
 		} else if (noise < wetness + 0.2) {
-			realm.setTile(1, {row, column}, water);
+			realm.setTile(1, {row, column}, water, false, true);
 		} else if (noise < wetness + 0.3) {
-			realm.setTile(1, {row, column}, shallow_water);
+			realm.setTile(1, {row, column}, shallow_water, false, true);
 		} else if (noise < wetness + 0.39) {
-			realm.setTile(1, {row, column}, sand);
+			realm.setTile(1, {row, column}, sand, false, true);
 		} else if (noise < wetness + 0.42) {
-			realm.setTile(1, {row, column}, dark_ice);
+			realm.setTile(1, {row, column}, dark_ice, false, true);
 		} else if (noise < wetness + 0.5) {
-			realm.setTile(1, {row, column}, light_ice);
+			realm.setTile(1, {row, column}, light_ice, false, true);
 		} else if (stoneLevel < noise) {
-			realm.setTile(1, {row, column}, stone);
+			realm.setTile(1, {row, column}, stone, false, true);
 		} else {
-			realm.setTile(1, {row, column}, snow);
+			realm.setTile(1, {row, column}, snow, false, true);
 			const double forest_noise = forestPerlin->GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.5);
 			if (params.forestThreshold < forest_noise) {
 				uint8_t mod = abs(column) % 2;

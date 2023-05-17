@@ -63,7 +63,7 @@ namespace Game3 {
 			void sendRaw(T value) {
 				T little = toLittle(value);
 				bytesWritten += sizeof(T);
-				sock->send(&little, sizeof(little));
+				sock->send(&little, sizeof(little), false);
 			}
 	};
 }

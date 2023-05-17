@@ -120,9 +120,9 @@ namespace Game3 {
 			void queueAddition(const TileEntityPtr &);
 			void queue(std::function<void()>);
 			void absorb(const EntityPtr &, const Position &);
-			void setTile(Layer, Index row, Index column, TileID, bool run_helper = true);
-			void setTile(Layer, const Position &, TileID, bool run_helper = true);
-			void setTile(Layer, const Position &, const Identifier &, bool run_helper = true);
+			void setTile(Layer, Index row, Index column, TileID, bool run_helper = true, bool generating = false);
+			void setTile(Layer, const Position &, TileID, bool run_helper = true, bool generating = false);
+			void setTile(Layer, const Position &, const Identifier &, bool run_helper = true, bool generating = false);
 			TileID getTile(Layer, Index row, Index column) const;
 			TileID getTile(Layer, const Position &) const;
 			std::optional<TileID> tryTile(Layer, const Position &) const;

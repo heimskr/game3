@@ -488,24 +488,22 @@ namespace Game3 {
 		entity->teleport(position);
 	}
 
-	void Realm::setTile(Layer layer, Index row, Index column, TileID tile_id, bool run_helper) {
-		tileProvider.findTile(layer, row, column, TileProvider::TileMode::Create) = tile_id;
-		if (run_helper)
-			setLayerHelper(row, column);
+	void Realm::setTile(Layer layer, Index row, Index column, TileID tile_id, bool run_helper, bool generating) {
+		setTile(layer, Position(row, column), tile_id, run_helper, generating);
 	}
 
-	void Realm::setTile(Layer layer, const Position &position, TileID tile_id, bool run_helper) {
-		auto &found = tileProvider.findTile(layer, position.row, position.column, TileProvider::TileMode::Create);
-		found = tile_id;
+	void Realm::setTile(Layer layer, const Position &position, TileID tile_id, bool run_helper, bool generating) {
+		tileProvider.findTile(layer, position.row, position.column, TileProvider::TileMode::Create) = tile_id;
 		if (isServer()) {
 			if (run_helper)
 				setLayerHelper(position.row, position.column);
-			getGame().toServer().broadcastTileUpdate(id, layer, position, tile_id);
+			if (!generating)
+				getGame().toServer().broadcastTileUpdate(id, layer, position, tile_id);
 		}
 	}
 
-	void Realm::setTile(Layer layer, const Position &position, const Identifier &tilename, bool run_helper) {
-		setTile(layer, position, getTileset()[tilename], run_helper);
+	void Realm::setTile(Layer layer, const Position &position, const Identifier &tilename, bool run_helper, bool generating) {
+		setTile(layer, position, getTileset()[tilename], run_helper, generating);
 	}
 
 	TileID Realm::getTile(Layer layer, Index row, Index column) const {
@@ -791,6 +789,7 @@ namespace Game3 {
 		for (const auto &chunk_position: player->getVisibleChunks())
 			client.sendChunk(*this, chunk_position);
 
+		auto guard = client.bufferGuard();
 		{
 			auto lock = lockEntitiesShared();
 			for (const auto &entity: entities)

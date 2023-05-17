@@ -27,19 +27,19 @@ namespace Game3 {
 		static const Identifier volcanic_rock = "base:tile/volcanic_rock"_id;
 
 		if (noise < wetness)
-			realm.setTile(1, {row, column}, deeper_water);
+			realm.setTile(1, {row, column}, deeper_water, false, true);
 		else if (noise < wetness + 0.1)
-			realm.setTile(1, {row, column}, deep_water);
+			realm.setTile(1, {row, column}, deep_water, false, true);
 		else if (noise < wetness + 0.2)
-			realm.setTile(1, {row, column}, water);
+			realm.setTile(1, {row, column}, water, false, true);
 		else if (noise < wetness + 0.3)
-			realm.setTile(1, {row, column}, shallow_water);
+			realm.setTile(1, {row, column}, shallow_water, false, true);
 		else if (noise < wetness + 0.4)
-			realm.setTile(1, {row, column}, volcanic_sand);
+			realm.setTile(1, {row, column}, volcanic_sand, false, true);
 		else if (0.85 < noise)
-			realm.setTile(1, {row, column}, lava);
+			realm.setTile(1, {row, column}, lava, false, true);
 		else
-			realm.setTile(1, {row, column}, volcanic_rock);
+			realm.setTile(1, {row, column}, volcanic_rock, false, true);
 
 		return noise;
 	}

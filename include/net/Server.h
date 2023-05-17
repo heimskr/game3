@@ -88,6 +88,13 @@ namespace Game3 {
 					static event_base * makeBase();
 			};
 
+			struct SendBuffer {
+				std::shared_mutex mutex;
+				std::atomic_bool active = false;
+				std::vector<char> bytes;
+				SendBuffer() = default;
+			};
+
 			int af;
 			std::string ip;
 			int port;
@@ -116,6 +123,7 @@ namespace Game3 {
 			sockaddr_in6 name6 {};
 
 			bool removeClient(int);
+			void flushBuffer(int client, SendBuffer &);
 
 		public:
 			std::string id = "server";
@@ -138,15 +146,18 @@ namespace Game3 {
 			/** Maps client IDs to client instances. Lock clientsMutex before using. */
 			std::map<int, std::shared_ptr<GenericClient>> allClients;
 
+			/** Maps client IDs to send buffers. Lock clientsMutex before using. */
+			std::map<int, SendBuffer> sendBuffers;
+
 			/** Maps descriptors to bufferevents. Lock descriptorsMutex before using. */
 			std::map<int, bufferevent *> bufferEvents;
 
 			/** Maps bufferevents to descriptors. Lock descriptorsMutex before using. */
 			std::map<bufferevent *, int> bufferEventDescriptors;
 
-			std::recursive_mutex workerMapMutex;
-			std::recursive_mutex clientsMutex;
-			std::recursive_mutex descriptorsMutex;
+			std::shared_mutex workerMapMutex;
+			std::shared_mutex clientsMutex;
+			std::shared_mutex descriptorsMutex;
 
 			void makeName();
 
@@ -172,14 +183,17 @@ namespace Game3 {
 			[[nodiscard]] inline int getPort() const { return port; }
 			void handleMessage(GenericClient &, std::string_view);
 			void mainLoop();
-			ssize_t send(int client, std::string_view);
-			ssize_t send(int client, const std::string &);
+			ssize_t send(int client, std::string_view, bool force = false);
+			ssize_t send(int client, const std::string &, bool force = false);
 			void run();
 			void stop();
 			virtual std::shared_ptr<Worker> makeWorker(size_t buffer_size, size_t id);
 			bool remove(bufferevent *);
 			bool close(int client_id);
 			bool close(GenericClient &);
+			void startBuffering(int client);
+			void flushBuffer(int client);
+			void stopBuffering(int client);
 
 			[[nodiscard]] inline decltype(allClients) & getClients() { return allClients; }
 			[[nodiscard]] inline const decltype(allClients) & getClients() const { return allClients; }

@@ -19,7 +19,7 @@ namespace Game3::WorldGen {
 		auto pauser = realm->pauseUpdates();
 		generateIndoors(realm, rng, parent_realm, width, height, entrance, width / 2);
 
-		auto set = [&](auto &&...args) { realm->setTile(2, std::forward<decltype(args)>(args)...); };
+		auto set = [&](auto &&...args) { realm->setTile(2, std::forward<decltype(args)>(args)..., false, true); };
 
 		const auto &tileset = realm->getTileset();
 		const auto &plants = tileset.getTilesByCategory("base:category/plants"_id);

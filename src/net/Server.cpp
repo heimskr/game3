@@ -109,7 +109,19 @@ namespace Game3 {
 			messageHandler(client, message);
 	}
 
-	ssize_t Server::send(int client, std::string_view message) {
+	ssize_t Server::send(int client, std::string_view message, bool force) {
+		if (!force) {
+			std::shared_lock client_lock(clientsMutex);
+			if (auto iter = sendBuffers.find(client); iter != sendBuffers.end()) {
+				auto &buffer = iter->second;
+				if (buffer.active) {
+					std::unique_lock buffer_lock(buffer.mutex);
+					buffer.bytes.insert(buffer.bytes.end(), message.begin(), message.end());
+					return static_cast<ssize_t>(message.size());
+				}
+			}
+		}
+
 		try {
 			return bufferevent_write(getBufferEvent(getDescriptor(client)), message.begin(), message.size());
 		} catch (const std::out_of_range &err) {
@@ -117,8 +129,8 @@ namespace Game3 {
 		}
 	}
 
-	ssize_t Server::send(int client, const std::string &message) {
-		return send(client, std::string_view(message));
+	ssize_t Server::send(int client, const std::string &message, bool force) {
+		return send(client, std::string_view(message), force);
 	}
 
 	void Server::Worker::removeClient(int client) {
@@ -422,6 +434,35 @@ namespace Game3 {
 
 	bool Server::close(GenericClient &client) {
 		return close(client.id);
+	}
+
+	void Server::startBuffering(int client) {
+		std::unique_lock clients_lock(clientsMutex);
+		auto [iter, inserted] = sendBuffers.try_emplace(client);
+		iter->second.active = true;
+		INFO("Starting buffering for client " << client);
+	}
+
+	void Server::flushBuffer(int client) {
+		std::shared_lock clients_lock(clientsMutex);
+		if (auto iter = sendBuffers.find(client); iter != sendBuffers.end())
+			flushBuffer(client, iter->second);
+	}
+
+	void Server::flushBuffer(int client, SendBuffer &buffer) {
+		if (!buffer.active)
+			return;
+		std::unique_lock lock(buffer.mutex);
+		send(client, std::string_view(buffer.bytes.data(), buffer.bytes.size()), true);
+		buffer.bytes.clear();
+	}
+
+	void Server::stopBuffering(int client) {
+		INFO("Stopping buffering for client " << client);
+		std::shared_lock clients_lock(clientsMutex);
+		if (auto iter = sendBuffers.find(client); iter != sendBuffers.end())
+			if (iter->second.active.exchange(false))
+				flushBuffer(client, iter->second);
 	}
 
 	std::pair<ssize_t, size_t> Server::isMessageComplete(std::string_view view) {

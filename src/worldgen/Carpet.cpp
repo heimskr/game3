@@ -20,21 +20,21 @@ namespace Game3::WorldGen {
 
 		for (int row = carpet_padding + 1; row < height - carpet_padding - 1; ++row)
 			for (int column = carpet_padding + 1; column < width - carpet_padding - 1; ++column)
-				realm->setTile(1, {row, column}, carpet1c + carpet_offset);
+				realm->setTile(1, {row, column}, carpet1c + carpet_offset, false, true);
 
 		for (int row = carpet_padding + 1; row < height - carpet_padding - 1; ++row) {
-			realm->setTile(1, {row, carpet_padding}, carpet1w + carpet_offset);
-			realm->setTile(1, {row, width - carpet_padding - 1}, carpet1e + carpet_offset);
+			realm->setTile(1, {row, carpet_padding}, carpet1w + carpet_offset, false, true);
+			realm->setTile(1, {row, width - carpet_padding - 1}, carpet1e + carpet_offset, false, true);
 		}
 
 		for (int column = carpet_padding + 1; column < width - carpet_padding - 1; ++column) {
-			realm->setTile(1, {carpet_padding, column}, carpet1n + carpet_offset);
-			realm->setTile(1, {height - carpet_padding - 1, column}, carpet1s + carpet_offset);
+			realm->setTile(1, {carpet_padding, column}, carpet1n + carpet_offset, false, true);
+			realm->setTile(1, {height - carpet_padding - 1, column}, carpet1s + carpet_offset, false, true);
 		}
 
-		realm->setTile(1, {carpet_padding, carpet_padding}, carpet1nw + carpet_offset);
-		realm->setTile(1, {carpet_padding, width - carpet_padding - 1}, carpet1ne + carpet_offset);
-		realm->setTile(1, {height - carpet_padding - 1, carpet_padding}, carpet1sw + carpet_offset);
-		realm->setTile(1, {height - carpet_padding - 1, width - carpet_padding - 1}, carpet1se + carpet_offset);
+		realm->setTile(1, {carpet_padding, carpet_padding}, carpet1nw + carpet_offset, false, true);
+		realm->setTile(1, {carpet_padding, width - carpet_padding - 1}, carpet1ne + carpet_offset, false, true);
+		realm->setTile(1, {height - carpet_padding - 1, carpet_padding}, carpet1sw + carpet_offset, false, true);
+		realm->setTile(1, {height - carpet_padding - 1, width - carpet_padding - 1}, carpet1se + carpet_offset, false, true);
 	}
 }

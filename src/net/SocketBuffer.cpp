@@ -23,7 +23,7 @@ namespace Game3 {
 	std::streambuf::int_type SocketBuffer::overflow(std::streambuf::int_type byte) {
 		if (!traits_type::eq_int_type(byte, traits_type::eof())) {
 			try {
-				source->send(&byte, 1);
+				source->send(&byte, 1, false);
 			} catch (const NetError &err) {
 				ERROR("Network error in overflow(): " << err.what());
 				return EOF;
@@ -35,7 +35,7 @@ namespace Game3 {
 
 	std::streamsize SocketBuffer::xsputn(const char *src, std::streamsize size) {
 		try {
-			return source->send(src, size);
+			return source->send(src, size, false);
 		} catch (const NetError &err) {
 			ERROR("Network error in xsputn(): " << err.what());
 			return EOF;

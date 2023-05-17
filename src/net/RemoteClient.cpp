@@ -88,6 +88,18 @@ namespace Game3 {
 		}
 	}
 
+	void RemoteClient::startBuffering() {
+		server.server->startBuffering(id);
+	}
+
+	void RemoteClient::flushBuffer() {
+		server.server->flushBuffer(id);
+	}
+
+	void RemoteClient::stopBuffering() {
+		server.server->stopBuffering(id);
+	}
+
 	template <typename T>
 	requires (!std::derived_from<T, Packet>)
 	void RemoteClient::send(const T &value) {
