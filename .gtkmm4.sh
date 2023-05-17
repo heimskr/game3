@@ -1,6 +1,7 @@
 #!/bin/bash
 
 sudo pip3 install meson
+sudo pip3 install ninja
 
 mkdir .github-deps
 cd .github-deps
