@@ -123,7 +123,7 @@ namespace Game3 {
 			sockaddr_in6 name6 {};
 
 			bool removeClient(int);
-			void flushBuffer(int client, SendBuffer &);
+			void flushBuffer(int client, SendBuffer &, bool force = false);
 
 		public:
 			std::string id = "server";
@@ -155,9 +155,9 @@ namespace Game3 {
 			/** Maps bufferevents to descriptors. Lock descriptorsMutex before using. */
 			std::map<bufferevent *, int> bufferEventDescriptors;
 
-			std::shared_mutex workerMapMutex;
-			std::shared_mutex clientsMutex;
-			std::shared_mutex descriptorsMutex;
+			std::recursive_mutex workerMapMutex;
+			std::recursive_mutex clientsMutex;
+			std::recursive_mutex descriptorsMutex;
 
 			void makeName();
 
