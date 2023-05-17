@@ -8,8 +8,8 @@
 #include "packet/PacketError.h"
 
 namespace Game3 {
-	LoginStatusPacket::LoginStatusPacket(bool success_, std::string_view username_, std::string_view display_name, std::shared_ptr<Player> player):
-	success(success_), username(username_), displayName(display_name) {
+	LoginStatusPacket::LoginStatusPacket(bool success_, GlobalID global_id, std::string_view username_, std::string_view display_name, std::shared_ptr<Player> player):
+	success(success_), globalID(global_id), username(username_), displayName(display_name) {
 		assert(!success || (!username.empty() && !display_name.empty()));
 		if (player) {
 			player->encode(playerDataBuffer);
@@ -32,10 +32,12 @@ namespace Game3 {
 
 		SUCCESS("Login succeeded");
 		game.player = Entity::create<Player>();
+		game.player->setGID(globalID);
 		game.player->init(game);
 		game.player->decode(playerDataBuffer);
 		game.player->setupRealm(game);
 		game.activeRealm = game.player->getRealm();
+		game.activeRealm->add(game.player);
 		game.activeRealm->addPlayer(game.player);
 	}
 }

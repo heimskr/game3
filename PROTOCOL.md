@@ -72,6 +72,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 11. **Login Status**: informs a client of the result of a login attempt.
 
 	- `bool` Success
+	- `u64` Global ID
 	- `string` Username
 	- `string` Display Name
 	- `...` Player Data

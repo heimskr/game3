@@ -21,6 +21,8 @@ namespace Game3 {
 			constexpr static size_t MAX_PACKET_SIZE = 1 << 24;
 
 			std::weak_ptr<ClientGame> weakGame;
+			size_t bytesRead = 0;
+			size_t bytesWritten = 0;
 
 			LocalClient() = default;
 
@@ -52,6 +54,7 @@ namespace Game3 {
 			template <std::integral T>
 			void sendRaw(T value) {
 				T little = toLittle(value);
+				bytesWritten += sizeof(T);
 				sock->send(&little, sizeof(little));
 			}
 	};

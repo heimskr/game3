@@ -294,81 +294,88 @@ namespace Game3 {
 	}
 
 	void Realm::tick(float delta) {
-		ChunkPosition player_cpos {};
+		if (isServer()) {
+			ticking = true;
 
-		ticking = true;
+			for (const auto &stolen: entityAdditionQueue.steal())
+				add(stolen);
 
-		for (const auto &stolen: entityAdditionQueue.steal())
-			add(stolen);
+			for (const auto &stolen: tileEntityAdditionQueue.steal())
+				add(stolen);
 
-		for (const auto &stolen: tileEntityAdditionQueue.steal())
-			add(stolen);
-
-		{
-			auto lock = lockEntitiesShared();
-			for (auto &entity: entities) {
-				if (entity->isPlayer()) {
-					auto player = std::dynamic_pointer_cast<Player>(entity);
-					player_cpos = getChunkPosition(player->getPosition());
-					if (!player->ticked) {
-						player->ticked = true;
-						player->tick(game, delta);
-					}
-				} else
-					entity->tick(game, delta);
-			}
-		}
-
-		{
-			auto lock = lockTileEntitiesShared();
-			for (auto &[index, tile_entity]: tileEntities)
-				tile_entity->tick(game, delta);
-		}
-
-		ticking = false;
-
-		for (const auto &stolen: entityRemovalQueue.steal())
-			remove(stolen);
-
-		for (const auto &stolen: tileEntityRemovalQueue.steal())
-			remove(stolen);
-
-		for (const auto &stolen: generalQueue.steal())
-			stolen();
-
-		if (!tileProvider.generationQueue.empty()) {
-			const auto chunk_position = std::move(tileProvider.generationQueue.back());
-			tileProvider.generationQueue.pop_back();
-			if (!generatedChunks.contains(chunk_position)) {
-				generateChunk(chunk_position);
-				generatedChunks.insert(chunk_position);
-				remakePathMap(chunk_position);
-				// reupload();
-				std::unique_lock lock(chunkRequestsMutex);
-				if (auto iter = chunkRequests.find(chunk_position); iter != chunkRequests.end()) {
-					ChunkTilesPacket packet(*this, chunk_position);
-					INFO("Late sending chunk position " << chunk_position << " to " << iter->second.size() << " client(s)");
-					for (const auto &client: iter->second) {
-						client->send(packet);
-					}
-					chunkRequests.erase(iter);
+			{
+				auto lock = lockEntitiesShared();
+				for (auto &entity: entities) {
+					if (entity->isPlayer()) {
+						auto player = std::dynamic_pointer_cast<Player>(entity);
+						ChunkPosition player_cpos = getChunkPosition(player->getPosition());
+						if (!player->ticked) {
+							player->ticked = true;
+							player->tick(game, delta);
+						}
+					} else
+						entity->tick(game, delta);
 				}
 			}
-		}
 
-		Index row_index = 0;
-		for (auto &row: *renderers) {
-			Index col_index = 0;
-			for (auto &layers: row) {
-				for (auto &renderer: layers) {
-					renderer.setChunkPosition({
-						static_cast<int32_t>(player_cpos.x + col_index - REALM_DIAMETER / 2 - 1),
-						static_cast<int32_t>(player_cpos.y + row_index - REALM_DIAMETER / 2 - 1),
-					});
-				}
-				++col_index;
+			{
+				auto lock = lockTileEntitiesShared();
+				for (auto &[index, tile_entity]: tileEntities)
+					tile_entity->tick(game, delta);
 			}
-			++row_index;
+
+			ticking = false;
+
+			for (const auto &stolen: entityRemovalQueue.steal())
+				remove(stolen);
+
+			for (const auto &stolen: tileEntityRemovalQueue.steal())
+				remove(stolen);
+
+			for (const auto &stolen: generalQueue.steal())
+				stolen();
+
+			if (!tileProvider.generationQueue.empty()) {
+				const auto chunk_position = std::move(tileProvider.generationQueue.back());
+				tileProvider.generationQueue.pop_back();
+				if (!generatedChunks.contains(chunk_position)) {
+					generateChunk(chunk_position);
+					generatedChunks.insert(chunk_position);
+					remakePathMap(chunk_position);
+					// reupload();
+					std::unique_lock lock(chunkRequestsMutex);
+					if (auto iter = chunkRequests.find(chunk_position); iter != chunkRequests.end()) {
+						ChunkTilesPacket packet(*this, chunk_position);
+						INFO("Late sending chunk position " << chunk_position << " to " << iter->second.size() << " client(s)");
+						for (const auto &client: iter->second) {
+							client->send(packet);
+						}
+						chunkRequests.erase(iter);
+					}
+				}
+			}
+		} else {
+
+			auto player = getGame().toClient().player;
+			if (!player)
+				return;
+
+			const auto player_cpos = getChunkPosition(player->getPosition());
+
+			Index row_index = 0;
+			for (auto &row: *renderers) {
+				Index col_index = 0;
+				for (auto &layers: row) {
+					for (auto &renderer: layers) {
+						renderer.setChunkPosition({
+							static_cast<int32_t>(player_cpos.x + col_index - REALM_DIAMETER / 2 - 1),
+							static_cast<int32_t>(player_cpos.y + row_index - REALM_DIAMETER / 2 - 1),
+						});
+					}
+					++col_index;
+				}
+				++row_index;
+			}
 		}
 	}
 

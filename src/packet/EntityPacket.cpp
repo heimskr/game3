@@ -17,8 +17,12 @@ namespace Game3 {
 		buffer >> globalID >> identifier >> realmID;
 		auto realm = game.realms.at(realmID);
 		if (auto iter = realm->entitiesByGID.find(globalID); iter != realm->entitiesByGID.end()) {
+			if (identifier == "base:entity/player"_id)
+				SUCCESS("Found player");
 			(entity = iter->second)->decode(buffer);
 		} else {
+			if (identifier == "base:entity/player"_id)
+				ERROR("Didn't find player");
 			auto factory = game.registry<EntityFactoryRegistry>()[identifier];
 			entity = (*factory)(game, {});
 			entity->globalID = globalID;

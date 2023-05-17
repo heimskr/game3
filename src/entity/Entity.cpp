@@ -320,7 +320,7 @@ namespace Game3 {
 		// TODO!: fix
 		constexpr bool adjust = false; // Render-to-texture silliness
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
-		canvas.center.x() = -(getColumn() - map_length  / 2.f + 0.5f) - offset.x();
+		canvas.center.x() = -(getColumn() - map_length / 2.f + 0.5f) - offset.x();
 		canvas.center.y() = -(getRow()    - map_length / 2.f + 0.5f) - offset.y();
 		if (adjust) {
 			canvas.center.x() -= canvas.width()  / 32.f / canvas.scale;
@@ -330,10 +330,13 @@ namespace Game3 {
 
 	void Entity::teleport(const Position &new_position, bool clear_offset) {
 		position = new_position;
+
 		if (clear_offset)
 			offset = {0.f, 0.f};
+
 		auto shared = shared_from_this();
 		getRealm()->onMoved(shared, new_position);
+
 		for (auto iter = moveQueue.begin(); iter != moveQueue.end();) {
 			if ((*iter)(shared))
 				moveQueue.erase(iter++);

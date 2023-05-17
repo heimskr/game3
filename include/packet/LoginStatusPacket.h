@@ -13,11 +13,12 @@ namespace Game3 {
 			static PacketID ID() { return 11; }
 
 			bool success = false;
+			GlobalID globalID = -1;
 			std::string username;
 			std::string displayName;
 
 			LoginStatusPacket() = default;
-			LoginStatusPacket(bool success_, std::string_view username_ = {}, std::string_view display_name = {}, std::shared_ptr<Player> = nullptr);
+			LoginStatusPacket(bool success_, GlobalID = -1, std::string_view username_ = {}, std::string_view display_name = {}, std::shared_ptr<Player> = nullptr);
 
 			PacketID getID() const override { return ID(); }
 

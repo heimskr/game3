@@ -31,7 +31,7 @@ endif
 DEPS         := glm glfw3 libzstd gtk4 gtkmm-4.0 glu libevent_openssl openssl libevent_pthreads
 OUTPUT       := game3
 COMPILER     ?= clang++
-CPPFLAGS     := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude -Ijson/include -Ieigen -Istb -Ilibnoise/src $(LTO)
+CPPFLAGS     := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude -Ijson/include -Ieigen -Istb -Ilibnoise/src $(LTO) $(PROFILING)
 ZIG          ?= zig
 # --main-pkg-path is needed as otherwise it wouldn't let you embed any file outside of src/
 ZIGFLAGS     := -O ReleaseSmall --main-pkg-path .
@@ -45,7 +45,7 @@ else
 	LIBS         := $(shell pkg-config --libs   $(DEPS))
 endif
 GLIB_COMPILE_RESOURCES = $(shell pkg-config --variable=glib_compile_resources gio-2.0)
-LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread $(LTO)
+LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread $(LTO) $(PROFILING)
 SOURCES      := $(shell find src -name \*.cpp) src/gtk_resources.cpp
 OBJECTS      := $(SOURCES:.cpp=.o) src/resources.o
 RESXML       := $(OUTPUT).gresource.xml
@@ -91,6 +91,7 @@ $(OUTPUT): $(OBJECTS) $(NOISE_OBJ)
 ifeq ($(BUILD),debug)
 else ifeq ($(BUILD),tsan)
 else ifeq ($(BUILD),asan)
+else ifeq ($(BUILD),native)
 else ifeq ($(CUSTOM_BUILD),)
 	strip $@
 endif
@@ -109,6 +110,9 @@ count:
 
 countbf:
 	cloc --by-file $(CLOC_OPTIONS)
+
+analyze:
+	gprof ./game3 gmon.out > analysis.txt
 
 DEPFILE  := .dep
 DEPTOKEN := "\# MAKEDEPENDS"

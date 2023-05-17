@@ -35,6 +35,8 @@ namespace Game3 {
 		if (byte_count <= 0)
 			return;
 
+		bytesRead += static_cast<size_t>(byte_count);
+
 		std::string_view string(array.data(), byte_count);
 		headerBytes.insert(headerBytes.end(), string.begin(), string.end());
 
@@ -91,6 +93,7 @@ namespace Game3 {
 		sendRaw(static_cast<uint32_t>(send_buffer.size()));
 		const auto str = send_buffer.str();
 		sock->send(str.c_str(), str.size());
+		bytesWritten += str.size();
 	}
 
 	bool LocalClient::isConnected() const {

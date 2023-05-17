@@ -119,11 +119,16 @@ namespace Game3 {
 			return;
 
 		if (auto realm = player->getRealm()) {
+			auto now = getTime();
+			auto difference = now - lastTime;
+			lastTime = now;
+			delta = std::chrono::duration_cast<std::chrono::nanoseconds>(difference).count() / 1'000'000'000.;
+			realm->tick(delta);
+
 			if (chunksAwaited == 0) {
 				auto missing = realm->getMissingChunks();
-				// SPAM("missing: " << missing.size());
 				if (!missing.empty()) {
-					SPAM("Sending chunk request");
+					INFO("Sending chunk request");
 					chunksAwaited = missing.size();
 					client->send(ChunkRequestPacket(realm->id, std::move(missing)));
 				}

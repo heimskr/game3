@@ -47,6 +47,7 @@ namespace Game3 {
 
 		auto operator<=>(const Identifier &) const = default;
 
+		bool operator==(const char *) const;
 		bool operator==(std::string_view) const;
 		bool operator==(const Identifier &) const;
 	};
