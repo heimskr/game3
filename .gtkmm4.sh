@@ -1,5 +1,7 @@
 #!/bin/bash
 
+sudo pip3 install meson
+
 mkdir .github-deps
 cd .github-deps
 
