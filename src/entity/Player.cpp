@@ -160,6 +160,10 @@ namespace Game3 {
 		return canSee(entity->realmID, entity->getPosition());
 	}
 
+	bool Player::canSee(const TileEntityPtr &tile_entity) const {
+		return canSee(tile_entity->realmID, tile_entity->getPosition());
+	}
+
 	void Player::setupRealm(const Game &game) {
 		weakRealm = game.realms.at(realmID);
 	}

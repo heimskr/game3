@@ -785,19 +785,25 @@ namespace Game3 {
 	}
 
 	void Realm::sendTo(RemoteClient &client) {
-		for (const auto &chunk_position: client.getPlayer()->getVisibleChunks())
+		auto player = client.getPlayer();
+		assert(player);
+
+		for (const auto &chunk_position: player->getVisibleChunks())
 			client.sendChunk(*this, chunk_position);
+
 
 		{
 			auto lock = lockEntitiesShared();
 			for (const auto &entity: entities)
-				entity->sendTo(client);
+				if (player->canSee(entity))
+					entity->sendTo(client);
 		}
 
 		{
 			auto lock = lockTileEntitiesShared();
 			for (const auto &[tile_position, tile_entity]: tileEntities)
-				tile_entity->sendTo(client);
+				if (player->canSee(tile_entity))
+					tile_entity->sendTo(client);
 		}
 	}
 

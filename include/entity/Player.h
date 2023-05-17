@@ -8,6 +8,7 @@
 
 namespace Game3 {
 	class RemoteClient;
+	class TileEntity;
 
 	class Player: public Entity {
 		public:
@@ -59,6 +60,7 @@ namespace Game3 {
 			bool isMoving(Direction) const;
 			bool canSee(RealmID, const Position &) const;
 			bool canSee(const EntityPtr &) const;
+			bool canSee(const std::shared_ptr<TileEntity> &) const;
 			void setupRealm(const Game &);
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;
