@@ -4,13 +4,13 @@
 #include "packet/Packet.h"
 
 namespace Game3 {
-	struct PlayerMovementPacket: Packet {
-		static PacketID ID() { return 15; }
+	struct StopPlayerMovementPacket: Packet {
+		static PacketID ID() { return 18; }
 
 		std::optional<Direction> direction;
 
-		PlayerMovementPacket() = default;
-		PlayerMovementPacket(Direction direction_):
+		StopPlayerMovementPacket() = default;
+		StopPlayerMovementPacket(Direction direction_):
 			direction(direction_) {}
 
 		PacketID getID() const override { return ID(); }

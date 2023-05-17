@@ -56,6 +56,7 @@ namespace Game3 {
 			void give(const ItemStack &, Slot start = -1);
 			Place getPlace() override;
 			bool isMoving() const;
+			bool isMoving(Direction) const;
 			bool canSee(RealmID, const Position &) const;
 			bool canSee(const EntityPtr &) const;
 			void setupRealm(const Game &);
@@ -63,6 +64,7 @@ namespace Game3 {
 			void decode(Buffer &) override;
 			void startMoving(Direction);
 			void stopMoving();
+			void stopMoving(Direction);
 
 			friend class Entity;
 

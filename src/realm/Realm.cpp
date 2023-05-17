@@ -308,7 +308,6 @@ namespace Game3 {
 				for (auto &entity: entities) {
 					if (entity->isPlayer()) {
 						auto player = std::dynamic_pointer_cast<Player>(entity);
-						ChunkPosition player_cpos = getChunkPosition(player->getPosition());
 						if (!player->ticked) {
 							player->ticked = true;
 							player->tick(game, delta);

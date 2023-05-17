@@ -8,7 +8,8 @@
 #include "item/Tool.h"
 #include "net/Buffer.h"
 #include "net/LocalClient.h"
-#include "packet/PlayerMovementPacket.h"
+#include "packet/StartPlayerMovementPacket.h"
+#include "packet/StopPlayerMovementPacket.h"
 #include "realm/Realm.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
@@ -97,7 +98,7 @@ namespace Game3 {
 		game.activeRealm = new_realm;
 		if (getSide() == Side::Client) {
 			new_realm->reupload();
-			focus(game.toClient().canvas, false);
+			focus(game.toClient().canvas, true);
 		}
 	}
 
@@ -140,6 +141,16 @@ namespace Game3 {
 		return movingUp || movingRight || movingDown || movingLeft;
 	}
 
+	bool Player::isMoving(Direction direction) const {
+		switch (direction) {
+			case Direction::Up:    return movingUp;
+			case Direction::Right: return movingRight;
+			case Direction::Down:  return movingDown;
+			case Direction::Left:  return movingLeft;
+			default: return false;
+		}
+	}
+
 	bool Player::canSee(RealmID realm_id, const Position &pos) const {
 		const auto &realm = *getRealm();
 		return realm.id == realm_id && realm.isVisible(pos);
@@ -171,13 +182,15 @@ namespace Game3 {
 	}
 
 	void Player::startMoving(Direction direction) {
-		movingUp    = direction == Direction::Up;
-		movingRight = direction == Direction::Right;
-		movingDown  = direction == Direction::Down;
-		movingLeft  = direction == Direction::Left;
+		switch (direction) {
+			case Direction::Up:    movingUp    = true; break;
+			case Direction::Right: movingRight = true; break;
+			case Direction::Down:  movingDown  = true; break;
+			case Direction::Left:  movingLeft  = true; break;
+		}
 
 		if (getSide() == Side::Client)
-			getGame().toClient().client->send(PlayerMovementPacket(direction));
+			getGame().toClient().client->send(StartPlayerMovementPacket(direction));
 	}
 
 	void Player::stopMoving() {
@@ -187,7 +200,19 @@ namespace Game3 {
 		movingLeft  = false;
 
 		if (getSide() == Side::Client)
-			getGame().toClient().client->send(PlayerMovementPacket());
+			getGame().toClient().client->send(StopPlayerMovementPacket());
+	}
+
+	void Player::stopMoving(Direction direction) {
+		switch (direction) {
+			case Direction::Up:    movingUp    = false; break;
+			case Direction::Right: movingRight = false; break;
+			case Direction::Down:  movingDown  = false; break;
+			case Direction::Left:  movingLeft  = false; break;
+		}
+
+		if (getSide() == Side::Client)
+			getGame().toClient().client->send(StopPlayerMovementPacket(direction));
 	}
 
 	void Player::resetEphemeral() {

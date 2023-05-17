@@ -12,6 +12,8 @@
 #include "game/HasInventory.h"
 #include "game/Inventory.h"
 #include "net/LocalClient.h"
+#include "packet/StartPlayerMovementPacket.h"
+#include "packet/StopPlayerMovementPacket.h"
 #include "realm/Overworld.h"
 #include "tileentity/Building.h"
 #include "tileentity/Teleporter.h"
@@ -552,12 +554,8 @@ namespace Game3 {
 	void MainWindow::onBlur() {
 		keyTimes.clear();
 
-		if (game && game->player) {
-			game->player->movingUp    = false;
-			game->player->movingRight = false;
-			game->player->movingDown  = false;
-			game->player->movingLeft  = false;
-		}
+		if (game && game->player)
+			game->client->send(StopPlayerMovementPacket());
 	}
 
 	void MainWindow::activateContext() {
@@ -580,14 +578,14 @@ namespace Game3 {
 		if (game && game->player) {
 			auto &player = *game->player;
 			switch (keyval) {
-				case GDK_KEY_w: player.stopMoving(); player.continuousInteraction = false; keyTimes.erase(GDK_KEY_W); break;
-				case GDK_KEY_d: player.stopMoving(); player.continuousInteraction = false; keyTimes.erase(GDK_KEY_D); break;
-				case GDK_KEY_s: player.stopMoving(); player.continuousInteraction = false; keyTimes.erase(GDK_KEY_S); break;
-				case GDK_KEY_a: player.stopMoving(); player.continuousInteraction = false; keyTimes.erase(GDK_KEY_A); break;
-				case GDK_KEY_W: player.stopMoving(); player.continuousInteraction = false; keyTimes.erase(GDK_KEY_w); break;
-				case GDK_KEY_D: player.stopMoving(); player.continuousInteraction = false; keyTimes.erase(GDK_KEY_d); break;
-				case GDK_KEY_S: player.stopMoving(); player.continuousInteraction = false; keyTimes.erase(GDK_KEY_s); break;
-				case GDK_KEY_A: player.stopMoving(); player.continuousInteraction = false; keyTimes.erase(GDK_KEY_a); break;
+				case GDK_KEY_w: player.stopMoving(Direction::Up);    player.continuousInteraction = false; keyTimes.erase(GDK_KEY_W); break;
+				case GDK_KEY_d: player.stopMoving(Direction::Right); player.continuousInteraction = false; keyTimes.erase(GDK_KEY_D); break;
+				case GDK_KEY_s: player.stopMoving(Direction::Down);  player.continuousInteraction = false; keyTimes.erase(GDK_KEY_S); break;
+				case GDK_KEY_a: player.stopMoving(Direction::Left);  player.continuousInteraction = false; keyTimes.erase(GDK_KEY_A); break;
+				case GDK_KEY_W: player.stopMoving(Direction::Up);    player.continuousInteraction = false; keyTimes.erase(GDK_KEY_w); break;
+				case GDK_KEY_D: player.stopMoving(Direction::Right); player.continuousInteraction = false; keyTimes.erase(GDK_KEY_d); break;
+				case GDK_KEY_S: player.stopMoving(Direction::Down);  player.continuousInteraction = false; keyTimes.erase(GDK_KEY_s); break;
+				case GDK_KEY_A: player.stopMoving(Direction::Left);  player.continuousInteraction = false; keyTimes.erase(GDK_KEY_a); break;
 				case GDK_KEY_Shift_L:
 				case GDK_KEY_Shift_R:
 					player.continuousInteraction = false;
@@ -646,7 +644,7 @@ namespace Game3 {
 					if (!player.isMoving() && (player.continuousInteraction = keyval == GDK_KEY_S))
 						player.continuousInteractionModifiers = Modifiers(modifiers);
 					// player.movingDown = true;
-					if (!player.isMoving())
+					if (!player.isMoving(Direction::Down))
 						player.startMoving(Direction::Down);
 					return;
 				case GDK_KEY_W:
@@ -655,7 +653,7 @@ namespace Game3 {
 					if (!player.isMoving() && (player.continuousInteraction = keyval == GDK_KEY_W))
 						player.continuousInteractionModifiers = Modifiers(modifiers);
 					// player.movingUp = true;
-					if (!player.isMoving())
+					if (!player.isMoving(Direction::Up))
 						player.startMoving(Direction::Up);
 					return;
 				case GDK_KEY_A:
@@ -664,7 +662,7 @@ namespace Game3 {
 					if (!player.isMoving() && (player.continuousInteraction = keyval == GDK_KEY_A))
 						player.continuousInteractionModifiers = Modifiers(modifiers);
 					// player.movingLeft = true;
-					if (!player.isMoving())
+					if (!player.isMoving(Direction::Left))
 						player.startMoving(Direction::Left);
 					return;
 				case GDK_KEY_D:
@@ -673,7 +671,7 @@ namespace Game3 {
 					if (!player.isMoving() && (player.continuousInteraction = keyval == GDK_KEY_D))
 						player.continuousInteractionModifiers = Modifiers(modifiers);
 					// player.movingRight = true;
-					if (!player.isMoving())
+					if (!player.isMoving(Direction::Right))
 						player.startMoving(Direction::Right);
 					return;
 				case GDK_KEY_Shift_L:
