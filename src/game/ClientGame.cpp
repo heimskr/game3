@@ -132,7 +132,7 @@ namespace Game3 {
 					std::cerr << "Missing chunks:"; for (const auto &cpos: missingChunks) std::cerr << ' ' << cpos; std::cerr << '\n';
 					client->send(ChunkRequestPacket(realm->id, missingChunks));
 				} else {
-					std::cout << "Missing chunks is empty\n";
+					// std::cout << "Missing chunks is empty\n";
 				}
 			}
 		} else {

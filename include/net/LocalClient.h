@@ -3,8 +3,10 @@
 #include <deque>
 #include <filesystem>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <optional>
+#include <shared_mutex>
 #include <string>
 
 #include "Types.h"
@@ -23,6 +25,11 @@ namespace Game3 {
 			std::weak_ptr<ClientGame> weakGame;
 			size_t bytesRead = 0;
 			size_t bytesWritten = 0;
+
+			std::map<PacketID, size_t> receivedPacketCounts;
+			std::shared_mutex receivedPacketCountsMutex;
+			std::map<PacketID, size_t> sentPacketCounts;
+			std::shared_mutex sentPacketCountsMutex;
 
 			LocalClient() = default;
 

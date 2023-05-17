@@ -7,6 +7,7 @@
 #include "command/local/LocalCommandFactory.h"
 #include "command/local/LoginCommand.h"
 #include "command/local/RegisterCommand.h"
+#include "command/local/UsageCommand.h"
 #include "entity/Blacksmith.h"
 #include "entity/Chicken.h"
 #include "entity/Dog.h"
@@ -287,6 +288,7 @@ namespace Game3 {
 	void Game::addLocalCommandFactories() {
 		add(LocalCommandFactory::create<RegisterCommand>());
 		add(LocalCommandFactory::create<LoginCommand>());
+		add(LocalCommandFactory::create<UsageCommand>());
 	}
 
 	void Game::initialSetup(const std::filesystem::path &dir) {

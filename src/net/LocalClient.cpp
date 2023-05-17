@@ -75,8 +75,10 @@ namespace Game3 {
 					auto packet = (*game->registry<PacketFactoryRegistry>()[packetType])();
 					packet->decode(*game, buffer);
 					buffer.clear();
-					game->queuePacket(std::move(packet));
 					state = State::Begin;
+					std::unique_lock lock(receivedPacketCountsMutex);
+					++receivedPacketCounts[packet->getID()];
+					game->queuePacket(std::move(packet));
 				} else
 					break;
 			}
@@ -93,7 +95,9 @@ namespace Game3 {
 		sendRaw(static_cast<uint32_t>(send_buffer.size()));
 		const auto str = send_buffer.str();
 		sock->send(str.c_str(), str.size());
-		bytesWritten += str.size();
+		bytesWritten += 6 + str.size();
+		std::unique_lock lock(sentPacketCountsMutex);
+		++sentPacketCounts[packet.getID()];
 	}
 
 	bool LocalClient::isConnected() const {
