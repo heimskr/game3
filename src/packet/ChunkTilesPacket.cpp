@@ -26,6 +26,7 @@ namespace Game3 {
 			chunk = std::vector<TileID>(tiles.begin() + offset, tiles.begin() + offset + CHUNK_SIZE * CHUNK_SIZE);
 		}
 
+		game.chunkReceived(chunkPosition);
 		realm->reupload();
 
 		SUCCESS("Set tiles for chunk (" << chunkPosition.x << ", " << chunkPosition.y << ") in realm " << realmID);

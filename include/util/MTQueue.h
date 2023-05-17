@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mutex>
 #include <queue>
 #include <shared_mutex>
 
@@ -28,6 +29,13 @@ namespace Game3 {
 				std::queue<T, C>::pop();
 			}
 
+			inline T take() {
+				std::unique_lock lock(mutex);
+				T out = std::move(std::queue<T, C>::back());
+				std::queue<T, C>::pop();
+				return std::move(out);
+			}
+
 			inline void push(T &&value) {
 				std::unique_lock lock(mutex);
 				std::queue<T, C>::push(std::move(value));
@@ -38,7 +46,7 @@ namespace Game3 {
 				std::queue<T, C>::push(value);
 			}
 
-			inline bool empty() const {
+			inline bool empty() {
 				std::shared_lock lock(mutex);
 				return std::queue<T, C>::empty();
 			}

@@ -11,6 +11,7 @@
 #include "Types.h"
 #include "game/ChunkPosition.h"
 #include "util/Math.h"
+#include "util/MTQueue.h"
 
 namespace Game3 {
 	class Game;
@@ -35,7 +36,7 @@ namespace Game3 {
 			BiomeMap biomeMap;
 			PathMap pathMap;
 			Identifier tilesetID;
-			std::vector<ChunkPosition> generationQueue;
+			MTQueue<ChunkPosition> generationQueue;
 
 			TileProvider() = default;
 			TileProvider(Identifier tileset_id);

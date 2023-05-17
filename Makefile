@@ -88,11 +88,7 @@ include/resources.h: $(RESGEN)
 $(OUTPUT): $(OBJECTS) $(NOISE_OBJ)
 	@ printf "\e[2m[\e[22;36mld\e[39;2m]\e[22m $@\n"
 	@ $(COMPILER) $^ -o $@ $(LDFLAGS)
-ifeq ($(BUILD),debug)
-else ifeq ($(BUILD),tsan)
-else ifeq ($(BUILD),asan)
-else ifeq ($(BUILD),native)
-else ifeq ($(CUSTOM_BUILD),)
+ifeq ($(GITHUB),true)
 	strip $@
 endif
 

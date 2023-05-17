@@ -47,7 +47,7 @@ namespace Game3 {
 		const EntityMovePacket packet(entity);
 		auto lock = lockPlayersShared();
 		for (const auto &player: players)
-			if (player->canSee(entity))
+			if (player->getRealm() && player->canSee(entity))
 				player->client->send(packet);
 	}
 

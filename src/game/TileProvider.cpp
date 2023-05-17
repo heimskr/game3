@@ -247,7 +247,7 @@ namespace Game3 {
 
 	void TileProvider::initTileChunk(Layer, Chunk<TileID> &chunk, const ChunkPosition &chunk_position) {
 		chunk.resize(CHUNK_SIZE * CHUNK_SIZE, 0);
-		generationQueue.push_back(chunk_position);
+		generationQueue.push(chunk_position);
 	}
 
 	void TileProvider::initBiomeChunk(Chunk<BiomeType> &chunk, const ChunkPosition &) {

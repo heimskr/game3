@@ -125,12 +125,14 @@ namespace Game3 {
 			delta = std::chrono::duration_cast<std::chrono::nanoseconds>(difference).count() / 1'000'000'000.;
 			realm->tick(delta);
 
-			if (chunksAwaited == 0) {
-				auto missing = realm->getMissingChunks();
-				if (!missing.empty()) {
+			if (missingChunks.empty()) {
+				missingChunks = realm->getMissingChunks();
+				if (!missingChunks.empty()) {
 					INFO("Sending chunk request");
-					chunksAwaited = missing.size();
-					client->send(ChunkRequestPacket(realm->id, std::move(missing)));
+					std::cerr << "Missing chunks:"; for (const auto &cpos: missingChunks) std::cerr << ' ' << cpos; std::cerr << '\n';
+					client->send(ChunkRequestPacket(realm->id, missingChunks));
+				} else {
+					std::cout << "Missing chunks is empty\n";
 				}
 			}
 		} else {
@@ -140,5 +142,11 @@ namespace Game3 {
 
 	void ClientGame::queuePacket(std::shared_ptr<Packet> packet) {
 		packetQueue.push(std::move(packet));
+	}
+
+	void ClientGame::chunkReceived(ChunkPosition chunk_position) {
+		INFO("missingChunks<" << missingChunks.size() << ">.erase" << chunk_position);
+		missingChunks.erase(chunk_position);
+		std::cerr << "Still missing:"; for (const auto &cpos: missingChunks) std::cerr << ' ' << cpos; std::cerr << '\n';
 	}
 }

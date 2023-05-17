@@ -335,8 +335,7 @@ namespace Game3 {
 				stolen();
 
 			if (!tileProvider.generationQueue.empty()) {
-				const auto chunk_position = std::move(tileProvider.generationQueue.back());
-				tileProvider.generationQueue.pop_back();
+				const auto chunk_position = tileProvider.generationQueue.take();
 				if (!generatedChunks.contains(chunk_position)) {
 					generateChunk(chunk_position);
 					generatedChunks.insert(chunk_position);
@@ -804,6 +803,7 @@ namespace Game3 {
 
 	void Realm::requestChunk(ChunkPosition chunk_position, std::shared_ptr<RemoteClient> client) {
 		assert(isServer());
+		tileProvider.generationQueue.push(chunk_position);
 		std::unique_lock lock(chunkRequestsMutex);
 		chunkRequests[chunk_position].insert(client);
 	}
