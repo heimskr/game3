@@ -343,13 +343,33 @@ namespace Game3 {
 					// reupload();
 					std::unique_lock lock(chunkRequestsMutex);
 					if (auto iter = chunkRequests.find(chunk_position); iter != chunkRequests.end()) {
-						ChunkTilesPacket packet(*this, chunk_position);
+						const ChunkTilesPacket packet(*this, chunk_position);
 						INFO("Late sending chunk position " << chunk_position << " to " << iter->second.size() << " client(s)");
-						for (const auto &client: iter->second) {
+						for (const auto &client: iter->second)
 							client->send(packet);
-						}
 						chunkRequests.erase(iter);
+						INFO("Chunk requests size is now " << chunkRequests.size());
 					}
+				}
+			} else {
+				std::unique_lock lock(chunkRequestsMutex);
+
+				if (!chunkRequests.empty()) {
+					auto iter = chunkRequests.begin();
+					const auto &[chunk_position, client_set] = *iter;
+
+					if (!generatedChunks.contains(chunk_position)) {
+						generateChunk(chunk_position);
+						generatedChunks.insert(chunk_position);
+						remakePathMap(chunk_position);
+					}
+
+					const ChunkTilesPacket packet(*this, chunk_position);
+
+					for (const auto &client: client_set)
+						client->send(packet);
+
+					chunkRequests.erase(iter);
 				}
 			}
 		} else {
