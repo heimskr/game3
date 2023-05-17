@@ -147,4 +147,12 @@ namespace Game3 {
 			throw std::runtime_error("Client not connected");
 		return sock->hostname;
 	}
+
+	void LocalClient::setBuffering(bool new_value) {
+		assert(sock);
+		if (new_value)
+			sock->startBuffering();
+		else
+			sock->stopBuffering();
+	}
 }

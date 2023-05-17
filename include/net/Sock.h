@@ -1,7 +1,10 @@
 #pragma once
 
+#include <atomic>
 #include <netdb.h>
+#include <shared_mutex>
 #include <string>
+#include <vector>
 
 namespace Game3 {
 	class Sock {
@@ -26,12 +29,17 @@ namespace Game3 {
 			virtual void close();
 
 			/** Sends a given number of bytes from a buffer through the socket and returns the number of bytes sent. */
-			virtual ssize_t send(const void *, size_t);
+			virtual ssize_t send(const void *, size_t, bool force);
 
 			/** Reads a given number of bytes into a buffer from the socket and returns the number of bytes read. */
 			virtual ssize_t recv(void *, size_t);
 
+			void startBuffering();
+			void flushBuffer(bool do_lock = true);
+			void stopBuffering();
+
 			inline bool isConnected() const { return connected; }
+
 
 		protected:
 			static int sockCount;
@@ -39,7 +47,12 @@ namespace Game3 {
 			int netFD = -1, controlRead = -1, controlWrite = -1;
 			bool connected = false;
 			fd_set fds = {0};
+			std::vector<char> buffer;
+			std::atomic_bool buffering = false;
+			std::shared_mutex bufferMutex;
 
 			enum class ControlMessage: char {Close='C'};
+
+			void addToBuffer(const void *, size_t);
 	};
 }

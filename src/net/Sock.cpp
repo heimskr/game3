@@ -1,6 +1,7 @@
 #include <cstring>
 #include <cerrno>
 #include <fcntl.h>
+#include <optional>
 #include <sys/types.h>
 #include <sys/select.h>
 #include <sys/socket.h>
@@ -78,10 +79,13 @@ namespace Game3 {
 		}
 	}
 
-	ssize_t Sock::send(const void *data, size_t bytes) {
+	ssize_t Sock::send(const void *data, size_t bytes, bool force) {
 		if (!connected)
 			throw std::invalid_argument("Socket not connected");
-		return ::send(netFD, data, bytes, 0);
+		if (force || !buffering)
+			return ::send(netFD, data, bytes, 0);
+		addToBuffer(data, bytes);
+		return static_cast<ssize_t>(bytes);
 	}
 
 	ssize_t Sock::recv(void *data, size_t bytes) {
@@ -120,5 +124,32 @@ namespace Game3 {
 
 		SPAM("No file descriptor is ready.");
 		return -1;
+	}
+
+	void Sock::startBuffering() {
+		buffering = true;
+	}
+
+	void Sock::flushBuffer(bool do_lock) {
+		std::optional<std::unique_lock<std::shared_mutex>> lock;
+
+		if (do_lock)
+			lock.emplace(bufferMutex);
+
+		if (buffer.empty())
+			return;
+
+		send(buffer.data(), buffer.size(), true);
+		buffer.clear();
+	}
+
+	void Sock::stopBuffering() {
+		if (buffering.exchange(false))
+			flushBuffer(true);
+	}
+
+	void Sock::addToBuffer(const void *data, size_t bytes) {
+		const auto *char_data = reinterpret_cast<const char *>(data);
+		buffer.insert(buffer.end(), char_data, char_data + bytes);
 	}
 }

@@ -14,9 +14,14 @@ namespace Game3 {
 		connectSSL(blocking);
 	}
 
-	ssize_t SSLSock::send(const void *data, size_t bytes) {
+	ssize_t SSLSock::send(const void *data, size_t bytes, bool force) {
 		if (!connected)
 			throw std::invalid_argument("Socket not connected");
+
+		if (!force && buffering) {
+			addToBuffer(data, bytes);
+			return static_cast<ssize_t>(bytes);
+		}
 
 		size_t written = 0;
 		const int status = SSL_write_ex(ssl, data, bytes, &written);

@@ -45,6 +45,7 @@ namespace Game3 {
 			void saveTokens(const std::filesystem::path &);
 			bool hasHostname() const;
 			const std::string & getHostname() const;
+			void setBuffering(bool);
 
 		private:
 			enum class State {Begin, Data};

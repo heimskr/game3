@@ -791,7 +791,6 @@ namespace Game3 {
 		for (const auto &chunk_position: player->getVisibleChunks())
 			client.sendChunk(*this, chunk_position);
 
-
 		{
 			auto lock = lockEntitiesShared();
 			for (const auto &entity: entities)
