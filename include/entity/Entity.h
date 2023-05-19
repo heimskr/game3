@@ -3,8 +3,11 @@
 #include <functional>
 #include <list>
 #include <memory>
+#include <mutex>
+#include <shared_mutex>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 
 #include "lib/Eigen.h"
@@ -52,6 +55,7 @@ namespace Game3 {
 			std::list<Direction> path;
 			MoneyCount money = 0;
 			HitPoints health = 0;
+			std::unordered_set<PlayerPtr> visiblePlayers;
 
 			~Entity() override = default;
 
@@ -98,7 +102,7 @@ namespace Game3 {
 			Position nextTo() const;
 			std::string debug() const;
 			void queueForMove(const std::function<bool(const std::shared_ptr<Entity> &)> &);
-			bool pathfind(const Position &start, const Position &goal, std::list<Direction> &);
+			PathResult pathfind(const Position &start, const Position &goal, std::list<Direction> &);
 			bool pathfind(const Position &goal);
 			virtual float getSpeed() const { return MAX_SPEED; }
 			virtual Glib::ustring getName() { return "Unknown Entity (" + std::string(type) + ')'; }
@@ -106,10 +110,12 @@ namespace Game3 {
 			bool isVisible() const;
 			void setHeldLeft(Slot);
 			void setHeldRight(Slot);
+			Side getSide() const;
 			inline bool is(const Identifier &check) const { return type == check; }
 			inline auto getHeldLeft()  const { return heldLeft.slot;  }
 			inline auto getHeldRight() const { return heldRight.slot; }
-			Side getSide() const;
+			inline auto lockVisiblePlayers() { return std::unique_lock(visiblePlayersMutex); }
+			inline auto lockVisiblePlayersShared() { return std::shared_lock(visiblePlayersMutex); }
 
 			virtual void encode(Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */
@@ -121,8 +127,6 @@ namespace Game3 {
 			Game *game = nullptr;
 			std::shared_ptr<Texture> texture;
 			int variety = 0;
-			inline auto getHeldLeftTexture()  const { return heldLeft.texture;  }
-			inline auto getHeldRightTexture() const { return heldRight.texture; }
 
 			Entity() = delete;
 			Entity(EntityType);
@@ -131,6 +135,9 @@ namespace Game3 {
 			/** A list of functions to call the next time the entity moves. The functions return whether they should be removed from the queue. */
 			std::list<std::function<bool(const std::shared_ptr<Entity> &)>> moveQueue;
 			std::shared_ptr<Texture> getTexture();
+			inline auto getHeldLeftTexture()  const { return heldLeft.texture;  }
+			inline auto getHeldRightTexture() const { return heldRight.texture; }
+			void calculateVisiblePlayers();
 
 			std::shared_ptr<Agent> getSharedAgent() override { return shared_from_this(); }
 
@@ -145,6 +152,10 @@ namespace Game3 {
 
 			Held heldLeft;
 			Held heldRight;
+			/** The set of all players who have been sent a packet about the entity's current path. */
+			std::unordered_set<PlayerPtr> pathSeers;
+
+			std::shared_mutex visiblePlayersMutex;
 
 			void setHeld(Slot, Held &);
 	};

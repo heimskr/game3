@@ -27,6 +27,7 @@ namespace Game3 {
 			entity = (*factory)(game, {});
 			entity->globalID = globalID;
 			entity->type = identifier;
+			entity->init(game);
 			entity->decode(buffer);
 		}
 	}

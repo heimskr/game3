@@ -2,8 +2,6 @@
 
 Packets are encoded as a little-endian 2-byte integer representing the packet type, followed by a little-endian 4-byte integer representing the payload length.
 
-<!-- TODO: message encoding -->
-
 ## Packet Types
 
 0. Not used.

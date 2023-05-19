@@ -7,6 +7,7 @@
 #include "ui/Modifiers.h"
 
 namespace Game3 {
+	class Packet;
 	class RemoteClient;
 	class TileEntity;
 
@@ -59,14 +60,15 @@ namespace Game3 {
 			bool isMoving() const;
 			bool isMoving(Direction) const;
 			bool canSee(RealmID, const Position &) const;
-			bool canSee(const EntityPtr &) const;
-			bool canSee(const std::shared_ptr<TileEntity> &) const;
+			bool canSee(const Entity &) const;
+			bool canSee(const TileEntity &) const;
 			void setupRealm(const Game &);
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;
 			void startMoving(Direction);
 			void stopMoving();
 			void stopMoving(Direction);
+			bool send(const Packet &);
 
 			friend class Entity;
 

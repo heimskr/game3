@@ -14,6 +14,7 @@
 #include "net/Buffer.h"
 #include "net/RemoteClient.h"
 #include "packet/EntityPacket.h"
+#include "packet/EntitySetPathPacket.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
 #include "ui/Canvas.h"
@@ -106,8 +107,12 @@ namespace Game3 {
 	void Entity::init(Game &game_) {
 		game = &game_;
 
-		if (getSide() == Side::Client && texture == nullptr)
-			texture = getTexture();
+		if (getSide() == Side::Client) {
+			INFO("Ayo? " << typeid(*this).name());
+			calculateVisiblePlayers();
+			if (texture == nullptr)
+				texture = getTexture();
+		}
 
 		if (!inventory)
 			inventory = std::make_shared<Inventory>(shared_from_this(), DEFAULT_INVENTORY_SIZE);
@@ -248,7 +253,12 @@ namespace Game3 {
 			return false;
 
 		if (canMoveTo(new_position)) {
+			if (getChunkPosition(position) != getChunkPosition(new_position)) {
+				calculateVisiblePlayers();
+			}
+
 			teleport(new_position, false);
+
 			if (horizontal)
 				offset.x() = x_offset;
 			else
@@ -378,19 +388,20 @@ namespace Game3 {
 		moveQueue.push_back(function);
 	}
 
-	bool Entity::pathfind(const Position &start, const Position &goal, std::list<Direction> &out) {
+	PathResult Entity::pathfind(const Position &start, const Position &goal, std::list<Direction> &out) {
 		std::vector<Position> positions;
 
 		if (start == goal)
-			return true;
+			return PathResult::Trivial;
 
 		if (!simpleAStar(getRealm(), start, goal, positions))
-			return false;
+			return PathResult::Unpathable;
 
 		out.clear();
+		pathSeers.clear();
 
 		if (positions.size() < 2)
-			return true;
+			return PathResult::Trivial;
 
 		for (auto iter = positions.cbegin() + 1, end = positions.cend(); iter != end; ++iter) {
 			const Position &prev = *(iter - 1);
@@ -407,11 +418,20 @@ namespace Game3 {
 				throw std::runtime_error("Invalid path offset: " + std::string(next - prev));
 		}
 
-		return true;
+		return PathResult::Success;
 	}
 
 	bool Entity::pathfind(const Position &goal) {
-		return pathfind(position, goal, path);
+		const auto out = pathfind(position, goal, path);
+
+		if (out == PathResult::Success) {
+			const EntitySetPathPacket packet(*this);
+			auto lock = lockVisiblePlayersShared();
+			for (const auto &player: visiblePlayers)
+				player->send(packet);
+		}
+
+		return out == PathResult::Trivial || out == PathResult::Success;
 	}
 
 	Game & Entity::getGame() const {
@@ -473,10 +493,8 @@ namespace Game3 {
 		buffer >> money;
 		buffer >> health;
 		HasInventory::decode(buffer);
-		Slot left_slot;
-		Slot right_slot;
-		buffer >> left_slot;
-		buffer >> right_slot;
+		const auto left_slot  = buffer.take<Slot>();
+		const auto right_slot = buffer.take<Slot>();
 		setHeldLeft(left_slot);
 		setHeldRight(right_slot);
 	}
@@ -506,6 +524,17 @@ namespace Game3 {
 		auto entity_texture = game_ref.registry<EntityTextureRegistry>().at(type);
 		variety = entity_texture->variety;
 		return game_ref.registry<TextureRegistry>().at(entity_texture->textureID);
+	}
+
+	void Entity::calculateVisiblePlayers() {
+		if (getSide() != Side::Server)
+			return;
+
+		auto lock = lockVisiblePlayers();
+		visiblePlayers.clear();
+		for (const auto &player: getRealm()->getPlayers())
+			if (player->canSee(*this))
+				visiblePlayers.insert(player);
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {

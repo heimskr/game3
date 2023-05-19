@@ -8,6 +8,7 @@
 #include "item/Tool.h"
 #include "net/Buffer.h"
 #include "net/LocalClient.h"
+#include "net/RemoteClient.h"
 #include "packet/StartPlayerMovementPacket.h"
 #include "packet/StopPlayerMovementPacket.h"
 #include "realm/Realm.h"
@@ -156,12 +157,12 @@ namespace Game3 {
 		return realm.id == realm_id && realm.isVisible(pos);
 	}
 
-	bool Player::canSee(const EntityPtr &entity) const {
-		return canSee(entity->realmID, entity->getPosition());
+	bool Player::canSee(const Entity &entity) const {
+		return canSee(entity.realmID, entity.getPosition());
 	}
 
-	bool Player::canSee(const TileEntityPtr &tile_entity) const {
-		return canSee(tile_entity->realmID, tile_entity->getPosition());
+	bool Player::canSee(const TileEntity &tile_entity) const {
+		return canSee(tile_entity.realmID, tile_entity.getPosition());
 	}
 
 	void Player::setupRealm(const Game &game) {
@@ -217,6 +218,15 @@ namespace Game3 {
 
 		if (getSide() == Side::Client)
 			getGame().toClient().client->send(StopPlayerMovementPacket(direction));
+	}
+
+	bool Player::send(const Packet &packet) {
+		if (auto locked = client.lock()) {
+			locked->send(packet);
+			return true;
+		}
+
+		return false;
 	}
 
 	void Player::resetEphemeral() {

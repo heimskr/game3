@@ -149,6 +149,7 @@ namespace Game3 {
 			void removePlayer(const PlayerPtr &);
 			void sendTo(RemoteClient &);
 			void requestChunk(ChunkPosition, std::shared_ptr<RemoteClient>);
+			inline const auto & getPlayers() const { return players; }
 			inline void markGenerated(auto x, auto y) { generatedChunks.insert(ChunkPosition{x, y}); }
 			inline auto pauseUpdates() { return Pauser(shared_from_this()); }
 			inline bool isClient() const { return getSide() == Side::Client; }

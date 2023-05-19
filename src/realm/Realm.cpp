@@ -823,14 +823,14 @@ namespace Game3 {
 		{
 			auto lock = lockEntitiesShared();
 			for (const auto &entity: entities)
-				if (player->canSee(entity))
+				if (player->canSee(*entity))
 					entity->sendTo(client);
 		}
 
 		{
 			auto lock = lockTileEntitiesShared();
 			for (const auto &[tile_position, tile_entity]: tileEntities)
-				if (player->canSee(tile_entity))
+				if (player->canSee(*tile_entity))
 					tile_entity->sendTo(client);
 		}
 	}

@@ -57,4 +57,6 @@ namespace Game3 {
 	};
 
 	Index operator""_idx(unsigned long long);
+
+	enum class PathResult: uint8_t {Invalid, Trivial, Unpathable, Success};
 }
