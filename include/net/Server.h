@@ -88,13 +88,6 @@ namespace Game3 {
 					static event_base * makeBase();
 			};
 
-			struct SendBuffer {
-				std::shared_mutex mutex;
-				std::atomic_bool active = false;
-				std::vector<char> bytes;
-				SendBuffer() = default;
-			};
-
 			int af;
 			std::string ip;
 			int port;
@@ -123,7 +116,6 @@ namespace Game3 {
 			sockaddr_in6 name6 {};
 
 			bool removeClient(int);
-			void flushBuffer(int client, SendBuffer &, bool force = false);
 
 		public:
 			std::string id = "server";
@@ -145,9 +137,6 @@ namespace Game3 {
 
 			/** Maps client IDs to client instances. Lock clientsMutex before using. */
 			std::map<int, std::shared_ptr<GenericClient>> allClients;
-
-			/** Maps client IDs to send buffers. Lock clientsMutex before using. */
-			std::map<int, SendBuffer> sendBuffers;
 
 			/** Maps descriptors to bufferevents. Lock descriptorsMutex before using. */
 			std::map<int, bufferevent *> bufferEvents;
@@ -171,7 +160,7 @@ namespace Game3 {
 			/** clientsMutex will be locked while this is called. */
 			std::function<void(int client)> closeHandler;
 			/** clientsMutex will be locked while this is called. */
-			std::function<void(Worker &, int client, std::string_view ip)> addClient;
+			std::function<void(Worker &, int client, std::string_view ip, int fd, bufferevent *)> addClient;
 
 			Server(int af_, const std::string &ip_, uint16_t port_, size_t thread_count, size_t chunk_size = 1024);
 			Server(const Server &) = delete;
@@ -185,15 +174,14 @@ namespace Game3 {
 			void mainLoop();
 			ssize_t send(int client, std::string_view, bool force = false);
 			ssize_t send(int client, const std::string &, bool force = false);
+			ssize_t send(GenericClient &, std::string_view, bool force = false);
+			ssize_t send(GenericClient &, const std::string &, bool force = false);
 			void run();
 			void stop();
 			virtual std::shared_ptr<Worker> makeWorker(size_t buffer_size, size_t id);
 			bool remove(bufferevent *);
 			bool close(int client_id);
 			bool close(GenericClient &);
-			void startBuffering(int client);
-			void flushBuffer(int client);
-			void stopBuffering(int client);
 
 			[[nodiscard]] inline decltype(allClients) & getClients() { return allClients; }
 			[[nodiscard]] inline const decltype(allClients) & getClients() const { return allClients; }

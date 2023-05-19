@@ -303,11 +303,17 @@ namespace Game3 {
 			for (const auto &stolen: tileEntityAdditionQueue.steal())
 				add(stolen);
 
+			std::set<std::shared_ptr<Player>> temp_buffering;
+
 			{
 				auto lock = lockEntitiesShared();
 				for (auto &entity: entities) {
 					if (entity->isPlayer()) {
 						auto player = std::dynamic_pointer_cast<Player>(entity);
+						if (auto client = player->client.lock(); client && !client->isBuffering()) {
+							temp_buffering.insert(player);
+							client->startBuffering();
+						}
 						if (!player->ticked) {
 							player->ticked = true;
 							player->tick(game, delta);
@@ -372,6 +378,10 @@ namespace Game3 {
 					chunkRequests.erase(iter);
 				}
 			}
+
+			for (auto &buffering_player: temp_buffering)
+				if (auto client = buffering_player->client.lock())
+					client->stopBuffering();
 		} else {
 
 			auto player = getGame().toClient().player;

@@ -2,6 +2,7 @@
 #include <ctime>
 #include <iostream>
 #include <random>
+#include <vector>
 
 #include "App.h"
 #include "net/LocalServer.h"
@@ -9,6 +10,8 @@
 namespace Game3 {
 	void test();
 }
+
+#include "net/Sock.h"
 
 int main(int argc, char **argv) {
 	srand(time(nullptr));

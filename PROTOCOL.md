@@ -99,7 +99,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i32` Realm ID
 	- `...` Tile Entity Data
 
-15. **StartPlayerMovement**: tells the server to start moving the player in a given direction.
+15. **Start Player Movement**: tells the server to start moving the player in a given direction.
 
 	- `u8` Direction
 
@@ -107,15 +107,27 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `string` Error
 
-17. **EntityMove**: informs a client that an entity moved.
+17. **Entity Move**: informs a client that an entity moved.
 
-	- `u64` Global ID
+	- `u64` Entity Global ID
 	- `i32` Realm ID
 	- `{i64,i64}` Position
 
-18. **StopPlayerMovement**: tells the server to stop moving the player in a given direction or entirely.
+18. **Stop Player Movement**: tells the server to stop moving the player in a given direction or entirely.
 
 	- `optional<u8>` Direction
+
+19. **Entity Set Path**: informs a client that an entity chose a new path.
+
+	- `u64` Entity Global ID
+	- `i32` Realm ID
+	- `{i64,i64}` Position
+	- `list<u8>` Path Directions
+
+20. **Teleport Self**: tells the server to teleport the player.
+
+	- `i32` Realm ID
+	- `{i64,i64}` Position
 
 # Message Format
 

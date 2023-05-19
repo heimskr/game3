@@ -4,11 +4,13 @@
 
 #include "net/Buffer.h"
 #include "net/GenericClient.h"
+#include "net/LocalServer.h"
 #include "packet/Packet.h"
 
 namespace Game3 {
-	class LocalServer;
 	class Player;
+	class Realm;
+	struct ChunkPosition;
 
 	/** Used by servers to represent a remote client. */
 	class RemoteClient: public GenericClient, public std::enable_shared_from_this<RemoteClient> {
@@ -30,8 +32,8 @@ namespace Game3 {
 			LocalServer &server;
 
 			RemoteClient() = delete;
-			RemoteClient(LocalServer &server_, int id_, std::string_view ip_):
-				GenericClient(id_, ip_), server(server_) {}
+			RemoteClient(LocalServer &server_, int id_, int fd, std::string_view ip_, bufferevent *event):
+				GenericClient(*server_.server, id_, fd, ip_, event), server(server_) {}
 
 			~RemoteClient() override = default;
 
@@ -40,9 +42,6 @@ namespace Game3 {
 			void sendChunk(Realm &, ChunkPosition, bool can_request = true);
 			inline auto getPlayer() const { return weakPlayer.lock(); }
 			inline void setPlayer(PlayerPtr shared) { weakPlayer = shared; }
-			void startBuffering();
-			void flushBuffer();
-			void stopBuffering();
 			inline auto bufferGuard() { return BufferGuard(*this); }
 
 			template <typename T>

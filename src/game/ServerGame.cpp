@@ -15,14 +15,21 @@ namespace Game3 {
 		lastTime = now;
 		delta = std::chrono::duration_cast<std::chrono::nanoseconds>(difference).count() / 1'000'000'000.;
 
+		for (const auto &player: players)
+			if (auto client = player->client.lock())
+				client->startBuffering();
+
 		for (const auto &[client, packet]: packetQueue.steal())
 			handlePacket(*client, *packet);
 
 		for (auto &[id, realm]: realms)
 			realm->tick(delta);
 
-		for (const auto &player: players)
+		for (const auto &player: players) {
+			if (auto client = player->client.lock())
+				client->stopBuffering();
 			player->ticked = false;
+		}
 	}
 
 	void ServerGame::broadcastTileUpdate(RealmID realm_id, Layer layer, const Position &position, TileID tile_id) {
@@ -30,7 +37,8 @@ namespace Game3 {
 		auto lock = lockPlayersShared();
 		for (const auto &player: players)
 			if (player->canSee(realm_id, position))
-				player->client->send(packet);
+				if (auto client = player->client.lock())
+					client->send(packet);
 	}
 
 	void ServerGame::queuePacket(std::shared_ptr<RemoteClient> client, std::shared_ptr<Packet> packet) {
@@ -48,7 +56,8 @@ namespace Game3 {
 		auto lock = lockPlayersShared();
 		for (const auto &player: players)
 			if (player->getRealm() && player->canSee(entity))
-				player->client->send(packet);
+				if (auto client = player->client.lock())
+					client->send(packet);
 	}
 
 	void ServerGame::handlePacket(RemoteClient &client, Packet &packet) {

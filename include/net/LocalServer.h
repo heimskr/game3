@@ -36,8 +36,7 @@ namespace Game3 {
 
 			void run() override;
 			void stop() override;
-			void send(const GenericClient &, std::string_view);
-			void send(int, std::string_view);
+			void send(GenericClient &, std::string_view);
 			void readUsers(const std::filesystem::path &);
 			void saveUsers(const std::filesystem::path &);
 			void saveUsers();
@@ -53,15 +52,10 @@ namespace Game3 {
 			static int main(int argc, char **argv);
 
 			template <std::integral T>
-			void send(const GenericClient &client, T value) {
-				send(client.id, value);
-			}
-
-			template <std::integral T>
-			void send(int id, T value) {
+			void send(GenericClient &client, T value) {
 				assert(server);
 				const T little = toLittle(value);
-				server->send(id, std::string_view(reinterpret_cast<const char *>(&little), sizeof(T)));
+				server->send(client, std::string_view(reinterpret_cast<const char *>(&little), sizeof(T)));
 			}
 
 		private:

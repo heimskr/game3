@@ -30,8 +30,8 @@
 namespace Game3 {
 	LocalServer::LocalServer(std::shared_ptr<Server> server_, std::string_view secret_):
 	server(std::move(server_)), secret(secret_) {
-		server->addClient = [this](auto &, int new_client, std::string_view ip) {
-			auto game_client = std::make_shared<RemoteClient>(*this, new_client, ip);
+		server->addClient = [this](auto &, int new_client, std::string_view ip, int fd, bufferevent *event) {
+			auto game_client = std::make_shared<RemoteClient>(*this, new_client, fd, ip, event);
 			server->getClients().try_emplace(new_client, std::move(game_client));
 			INFO("Adding " << new_client << " from " << ip);
 		};
@@ -59,12 +59,8 @@ namespace Game3 {
 		server->stop();
 	}
 
-	void LocalServer::send(const GenericClient &client, std::string_view string) {
-		send(client.id, string);
-	}
-
-	void LocalServer::send(int id, std::string_view string) {
-		server->send(id, string);
+	void LocalServer::send(GenericClient &client, std::string_view string) {
+		server->send(client, string);
 	}
 
 	void LocalServer::readUsers(const std::filesystem::path &path) {

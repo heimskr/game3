@@ -149,7 +149,7 @@ namespace Game3 {
 			if (std::string_view(ip).substr(0, 7) == "::ffff:" && ip.find('.') != std::string::npos)
 				ip.erase(0, 7);
 			auto lock = server.lockClients();
-			server.addClient(*this, new_client, ip);
+			server.addClient(*this, new_client, ip, new_fd, buffer_event);
 		}
 
 		bufferevent_setcb(buffer_event, conn_readcb, conn_writecb, conn_eventcb, this);

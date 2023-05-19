@@ -31,7 +31,7 @@ namespace Game3 {
 			bool continuousInteraction = false;
 			bool ticked = false;
 			/** Server-side only. */
-			std::shared_ptr<RemoteClient> client;
+			std::weak_ptr<RemoteClient> client;
 
 			std::optional<Place> lastContinousInteraction;
 			Modifiers continuousInteractionModifiers;

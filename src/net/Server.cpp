@@ -99,7 +99,14 @@ namespace Game3 {
 		bufferevent *buffer_event;
 		{
 			auto lock = lockDescriptors();
-			buffer_event = bufferEvents.at(descriptor);
+			try {
+				buffer_event = bufferEvents.at(descriptor);
+			} catch (const std::out_of_range &) {
+				ERROR("Tried to find descriptor " << descriptor << " from " << bufferEvents.size() << ':');
+				for (const auto &[desc, ev]: bufferEvents)
+					ERROR("- " << desc);
+				throw;
+			}
 		}
 		return buffer_event;
 	}
@@ -111,14 +118,16 @@ namespace Game3 {
 
 	ssize_t Server::send(int client, std::string_view message, bool force) {
 		if (!force) {
-			std::unique_lock clients_lock(clientsMutex);
-			if (auto iter = sendBuffers.find(client); iter != sendBuffers.end()) {
-				auto &buffer = iter->second;
-				if (buffer.active) {
-					std::unique_lock buffer_lock(buffer.mutex);
-					buffer.bytes.insert(buffer.bytes.end(), message.begin(), message.end());
-					return static_cast<ssize_t>(message.size());
-				}
+			std::shared_ptr<GenericClient> client_ptr;
+			{
+				std::unique_lock clients_lock(clientsMutex);
+				client_ptr = allClients.at(client);
+			}
+			if (client_ptr->isBuffering()) {
+				auto &buffer = client_ptr->buffer;
+				auto lock = buffer.lock();
+				buffer.bytes.insert(buffer.bytes.end(), message.begin(), message.end());
+				return static_cast<ssize_t>(message.size());
 			}
 		}
 
@@ -130,6 +139,20 @@ namespace Game3 {
 	}
 
 	ssize_t Server::send(int client, const std::string &message, bool force) {
+		return send(client, std::string_view(message), force);
+	}
+
+	ssize_t Server::send(GenericClient &client, std::string_view message, bool force) {
+		if (!force && client.isBuffering()) {
+			auto lock = client.buffer.lock();
+			client.buffer.bytes.insert(client.buffer.bytes.end(), message.begin(), message.end());
+			return static_cast<ssize_t>(message.size());
+		}
+
+		return bufferevent_write(getBufferEvent(client.descriptor), message.begin(), message.size());
+	}
+
+	ssize_t Server::send(GenericClient &client, const std::string &message, bool force) {
 		return send(client, std::string_view(message), force);
 	}
 
@@ -304,7 +327,7 @@ namespace Game3 {
 			if (std::string_view(ip).substr(0, 7) == "::ffff:" && ip.find('.') != std::string::npos)
 				ip.erase(0, 7);
 			auto lock = server.lockClients();
-			server.addClient(*this, new_client, ip);
+			server.addClient(*this, new_client, ip, new_fd, buffer_event);
 		}
 
 		bufferevent_setcb(buffer_event, conn_readcb, conn_writecb, conn_eventcb, this);
@@ -433,34 +456,14 @@ namespace Game3 {
 	}
 
 	bool Server::close(GenericClient &client) {
-		return close(client.id);
-	}
-
-	void Server::startBuffering(int client) {
-		std::unique_lock clients_lock(clientsMutex);
-		auto [iter, inserted] = sendBuffers.try_emplace(client);
-		iter->second.active = true;
-	}
-
-	void Server::flushBuffer(int client) {
-		std::unique_lock clients_lock(clientsMutex);
-		if (auto iter = sendBuffers.find(client); iter != sendBuffers.end())
-			flushBuffer(client, iter->second);
-	}
-
-	void Server::flushBuffer(int client, SendBuffer &buffer, bool force) {
-		if (!force && !buffer.active)
-			return;
-		std::unique_lock lock(buffer.mutex);
-		send(client, std::string_view(buffer.bytes.data(), buffer.bytes.size()), true);
-		buffer.bytes.clear();
-	}
-
-	void Server::stopBuffering(int client) {
-		std::unique_lock clients_lock(clientsMutex);
-		if (auto iter = sendBuffers.find(client); iter != sendBuffers.end())
-			if (iter->second.active.exchange(false))
-				flushBuffer(client, iter->second, true);
+		bufferevent *buffer_event = client.event;
+		std::shared_ptr<Worker> worker;
+		{
+			auto lock = lockWorkerMap();
+			worker = workerMap.at(buffer_event);
+		}
+		worker->queueClose(buffer_event);
+		return true;
 	}
 
 	std::pair<ssize_t, size_t> Server::isMessageComplete(std::string_view view) {

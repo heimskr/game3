@@ -13,6 +13,9 @@ ifeq ($(CUSTOM_BUILD),)
 	else ifeq ($(BUILD),nonnative)
 		BUILDFLAGS := -Ofast -march=x86-64-v3
 		LTO        := -flto
+	else ifeq ($(BUILD),o3gnative)
+		BUILDFLAGS := -O3 -g -march=native
+		LTO        := -flto
 	else
 		BUILDFLAGS := -Ofast -march=native
 		LTO        := -flto
