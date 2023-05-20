@@ -3,7 +3,7 @@
 #include <mutex>
 
 #include "game/Game.h"
-#include "util/MTQueue.h"
+#include "threading/MTQueue.h"
 
 namespace Game3 {
 	class LocalServer;

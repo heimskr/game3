@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mutex>
+#include <optional>
 #include <queue>
 #include <shared_mutex>
 
@@ -12,6 +13,7 @@ namespace Game3 {
 			std::shared_mutex mutex;
 
 		public:
+			MTQueue() = default;
 			using std::queue<T, C>::queue;
 
 			inline T & front() {
@@ -36,6 +38,15 @@ namespace Game3 {
 				return std::move(out);
 			}
 
+			inline std::optional<T> tryTake() {
+				std::unique_lock lock(mutex);
+				if (std::queue<T, C>::empty())
+					return std::nullopt;
+				auto out = std::make_optional(std::move(std::queue<T, C>::back()));
+				std::queue<T, C>::pop();
+				return std::move(out);
+			}
+
 			inline void push(T &&value) {
 				std::unique_lock lock(mutex);
 				std::queue<T, C>::push(std::move(value));
@@ -49,6 +60,11 @@ namespace Game3 {
 			inline bool empty() {
 				std::shared_lock lock(mutex);
 				return std::queue<T, C>::empty();
+			}
+
+			inline void clear() {
+				std::unique_lock lock(mutex);
+				this->c.clear();
 			}
 
 			template <typename... Args>

@@ -1,4 +1,4 @@
-#include "ThreadContext.h"
+#include "threading/ThreadContext.h"
 #include "entity/Animal.h"
 #include "game/Game.h"
 #include "net/Buffer.h"
@@ -8,6 +8,8 @@
 #include "tileentity/Teleporter.h"
 
 namespace Game3 {
+	ThreadPool Animal::threadPool{2};
+
 	Animal::Animal(EntityType type_):
 		Entity(std::move(type_)) {}
 
@@ -15,7 +17,7 @@ namespace Game3 {
 		Entity::toJSON(json);
 
 		if (timeUntilWander != 0.f)
-			json["timeUntilWander"] = timeUntilWander;
+			json["timeUntilWander"] = timeUntilWander.load();
 	}
 
 	void Animal::absorbJSON(Game &game, const nlohmann::json &json) {
@@ -28,30 +30,40 @@ namespace Game3 {
 	void Animal::tick(Game &game, float delta) {
 		Entity::tick(game, delta);
 
-		if ((timeUntilWander -= delta) <= 0.f)
-			wander();
+		if (getSide() == Side::Server) {
+			if (!attemptingWander && (timeUntilWander -= delta) <= 0.f)
+				wander();
+		}
 	}
 
 	bool Animal::wander() {
-		timeUntilWander = getWanderDistribution()(threadContext.rng);
-		const auto [row, column] = position;
-		return pathfind({
-			std::uniform_int_distribution(row    - wanderRadius, row    + wanderRadius)(threadContext.rng),
-			std::uniform_int_distribution(column - wanderRadius, column + wanderRadius)(threadContext.rng)
-		});
+		if (!attemptingWander.exchange(true)) {
+			const auto [row, column] = position;
+			return threadPool.add([this, row, column](ThreadPool &, size_t) {
+				pathfind({
+					threadContext.random(static_cast<int64_t>(row    - wanderRadius), static_cast<int64_t>(row    + wanderRadius)),
+					threadContext.random(static_cast<int64_t>(column - wanderRadius), static_cast<int64_t>(column + wanderRadius))
+				});
+
+				timeUntilWander = getWanderDistribution()(threadContext.rng);
+				attemptingWander = false;
+			});
+		}
+
+		return false;
 	}
 
 	void Animal::encode(Buffer &buffer) {
 		Entity::encode(buffer);
 		buffer << destination;
-		buffer << timeUntilWander;
+		buffer << timeUntilWander.load();
 		buffer << wanderRadius;
 	}
 
 	void Animal::decode(Buffer &buffer) {
 		Entity::decode(buffer);
 		buffer >> destination;
-		buffer >> timeUntilWander;
+		timeUntilWander = buffer.take<float>();
 		buffer >> wanderRadius;
 	}
 }

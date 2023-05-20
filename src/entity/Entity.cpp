@@ -107,12 +107,8 @@ namespace Game3 {
 	void Entity::init(Game &game_) {
 		game = &game_;
 
-		if (getSide() == Side::Client) {
-			INFO("Ayo? " << typeid(*this).name());
-			calculateVisiblePlayers();
-			if (texture == nullptr)
+		if (texture == nullptr && getSide() == Side::Client)
 				texture = getTexture();
-		}
 
 		if (!inventory)
 			inventory = std::make_shared<Inventory>(shared_from_this(), DEFAULT_INVENTORY_SIZE);
@@ -257,7 +253,7 @@ namespace Game3 {
 				calculateVisiblePlayers();
 			}
 
-			teleport(new_position, false);
+			teleport(new_position, !path.empty(), false);
 
 			if (horizontal)
 				offset.x() = x_offset;
@@ -338,7 +334,7 @@ namespace Game3 {
 		}
 	}
 
-	void Entity::teleport(const Position &new_position, bool clear_offset) {
+	void Entity::teleport(const Position &new_position, bool from_path, bool clear_offset) {
 		position = new_position;
 
 		if (clear_offset)
@@ -354,9 +350,8 @@ namespace Game3 {
 				++iter;
 		}
 
-		if (getSide() == Side::Server) {
+		if (!from_path && getSide() == Side::Server)
 			getGame().toServer().entityTeleported(shared_from_this());
-		}
 	}
 
 	void Entity::teleport(const Position &new_position, const std::shared_ptr<Realm> &new_realm) {
@@ -365,7 +360,7 @@ namespace Game3 {
 			old_realm->queueRemoval(shared);
 			new_realm->queueAddition(shared);
 		}
-		teleport(new_position);
+		teleport(new_position, false);
 	}
 
 	Position Entity::nextTo() const {
@@ -530,9 +525,13 @@ namespace Game3 {
 		if (getSide() != Side::Server)
 			return;
 
+		auto realm = weakRealm.lock();
+		if (!realm)
+			return;
+
 		auto lock = lockVisiblePlayers();
 		visiblePlayers.clear();
-		for (const auto &player: getRealm()->getPlayers())
+		for (const auto &player: realm->getPlayers())
 			if (player->canSee(*this))
 				visiblePlayers.insert(player);
 	}

@@ -1,5 +1,5 @@
 #include "Log.h"
-#include "ThreadContext.h"
+#include "threading/ThreadContext.h"
 #include "Tileset.h"
 #include "command/local/LocalCommandFactory.h"
 #include "game/ClientGame.h"

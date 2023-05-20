@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "ThreadContext.h"
+#include "threading/ThreadContext.h"
 #include "Tileset.h"
 #include "entity/Miner.h"
 #include "game/ClientGame.h"

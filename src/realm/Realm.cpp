@@ -4,7 +4,7 @@
 
 #include "Log.h"
 #include "MarchingSquares.h"
-#include "ThreadContext.h"
+#include "threading/ThreadContext.h"
 #include "Tileset.h"
 #include "biome/Biome.h"
 #include "entity/Entity.h"
@@ -115,7 +115,7 @@ namespace Game3 {
 	}
 
 	void Realm::onFocus() {
-		if (getSide() != Side::Client)
+		if (getSide() != Side::Client || focused)
 			return;
 
 		focused = true;
@@ -127,7 +127,7 @@ namespace Game3 {
 	}
 
 	void Realm::onBlur() {
-		if (getSide() != Side::Client)
+		if (getSide() != Side::Client || !focused)
 			return;
 
 		focused = false;

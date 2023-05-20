@@ -14,11 +14,11 @@
 #include "Types.h"
 #include "game/BiomeMap.h"
 #include "game/TileProvider.h"
+#include "threading/MTQueue.h"
 #include "tileentity/TileEntity.h"
 #include "ui/ElementBufferedRenderer.h"
 #include "ui/Modifiers.h"
 #include "util/GL.h"
-#include "util/MTQueue.h"
 #include "util/RWLock.h"
 #include "util/SharedRecursiveMutex.h"
 

@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "Position.h"
-#include "ThreadContext.h"
+#include "threading/ThreadContext.h"
 #include "Tileset.h"
 #include "entity/Player.h"
 #include "biome/Biome.h"

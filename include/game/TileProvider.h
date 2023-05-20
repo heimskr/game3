@@ -10,8 +10,8 @@
 #include "Position.h"
 #include "Types.h"
 #include "game/ChunkPosition.h"
+#include "threading/MTQueue.h"
 #include "util/Math.h"
-#include "util/MTQueue.h"
 
 namespace Game3 {
 	class Game;

@@ -37,9 +37,15 @@ namespace Game3 {
 				valid(true),
 				game(game_) {}
 
+			template <std::integral T>
 			/** [min, max] */
-			int64_t random(int64_t min, int64_t max) {
+			T random(T min, T max) {
 				return std::uniform_int_distribution(min, max)(rng);
+			}
+
+			/** [min, max) */
+			double random(double min, double max) {
+				return std::uniform_real_distribution(min, max)(rng);
 			}
 
 			Game & getGame() {

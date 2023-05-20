@@ -1,8 +1,12 @@
 #pragma once
 
+#include <atomic>
+#include <list>
+#include <optional>
 #include <random>
 
 #include "entity/Entity.h"
+#include "threading/ThreadPool.h"
 
 namespace Game3 {
 	class Building;
@@ -18,7 +22,7 @@ namespace Game3 {
 			}
 
 			Position destination = {-1, -1};
-			float timeUntilWander = 0.f;
+			std::atomic<float> timeUntilWander = 0.f;
 			Index wanderRadius = 8;
 
 			void toJSON(nlohmann::json &) const override;
@@ -32,5 +36,10 @@ namespace Game3 {
 
 		protected:
 			Animal(EntityType);
+
+			std::optional<std::list<Direction>> wanderPath;
+			std::atomic_bool attemptingWander = false;
+
+			static ThreadPool threadPool;
 	};
 }
