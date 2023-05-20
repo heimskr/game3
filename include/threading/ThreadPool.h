@@ -8,6 +8,7 @@
 #include <thread>
 #include <vector>
 
+#include "Log.h"
 #include "threading/ThreadContext.h"
 #include "threading/MTQueue.h"
 
@@ -16,54 +17,16 @@ namespace Game3 {
 		public:
 			using Function = std::function<void(ThreadPool &, size_t)>;
 
-			ThreadPool(size_t size_): size(size_) {
-				pool.reserve(size);
-			}
+			ThreadPool(size_t size_);
 
-			~ThreadPool() {
-				join();
-			}
+			~ThreadPool();
 
 			inline bool isActive() const { return active; }
 			inline auto getSize() const { return size; }
 
-			void start() {
-				if (joining || active.exchange(true))
-					return;
-				assert(pool.empty());
-				for (size_t thread_index = 0; thread_index < size; ++thread_index)
-					pool.emplace_back([this, thread_index] {
-						threadContext = {};
-						while (active) {
-							std::unique_lock lock(workMutex);
-							workCV.wait(lock);
-							if (auto job = workQueue.tryTake())
-								(*job)(*this, thread_index);
-						}
-					});
-			}
-
-			void join() {
-				if (active.exchange(false) && !joining.exchange(true)) {
-					workQueue.clear();
-					workCV.notify_all();
-					for (auto &thread: pool)
-						thread.join();
-					pool.clear();
-					joining = false;
-				}
-			}
-
-			inline bool add(const Function &function) {
-				if (active) {
-					// TODO: race condition if active goes false during this block
-					workQueue.push(function);
-					workCV.notify_one();
-					return true;
-				}
-
-				return false;
-			}
+			void start();
+			void join();
+			bool add(const Function &);
 
 		protected:
 			const size_t size;

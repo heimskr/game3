@@ -33,18 +33,18 @@ namespace Game3 {
 
 			inline T take() {
 				std::unique_lock lock(mutex);
-				T out = std::move(std::queue<T, C>::back());
+				T out = std::move(std::queue<T, C>::front());
 				std::queue<T, C>::pop();
-				return std::move(out);
+				return out;
 			}
 
 			inline std::optional<T> tryTake() {
 				std::unique_lock lock(mutex);
 				if (std::queue<T, C>::empty())
 					return std::nullopt;
-				auto out = std::make_optional(std::move(std::queue<T, C>::back()));
+				auto out = std::make_optional(std::move(std::queue<T, C>::front()));
 				std::queue<T, C>::pop();
-				return std::move(out);
+				return out;
 			}
 
 			inline void push(T &&value) {

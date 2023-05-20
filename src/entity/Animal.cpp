@@ -27,6 +27,11 @@ namespace Game3 {
 			timeUntilWander = *iter;
 	}
 
+	void Animal::init(Game &game) {
+		Entity::init(game);
+		threadPool.start();
+	}
+
 	void Animal::tick(Game &game, float delta) {
 		Entity::tick(game, delta);
 

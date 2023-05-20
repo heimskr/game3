@@ -420,11 +420,13 @@ namespace Game3 {
 	bool Entity::pathfind(const Position &goal) {
 		const auto out = pathfind(position, goal, path);
 
-		if (out == PathResult::Success) {
+		if (out == PathResult::Success && getSide() == Side::Server) {
 			const EntitySetPathPacket packet(*this);
 			auto lock = lockVisiblePlayersShared();
-			for (const auto &player: visiblePlayers)
+			for (const auto &player: visiblePlayers) {
+				pathSeers.insert(player);
 				player->send(packet);
+			}
 		}
 
 		return out == PathResult::Trivial || out == PathResult::Success;

@@ -27,6 +27,7 @@ namespace Game3 {
 
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
+			void init(Game &) override;
 			virtual void tick(Game &, float) override;
 			float getSpeed() const override { return 5.f; }
 			HitPoints maxHealth() const override { return MAX_HEALTH; }
