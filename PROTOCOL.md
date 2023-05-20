@@ -110,6 +110,8 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u64` Entity Global ID
 	- `i32` Realm ID
 	- `{i64,i64}` Position
+	- `optional<float>` New X Offset
+	- `optional<float>` New Y Offset
 
 18. **Stop Player Movement**: tells the server to stop moving the player in a given direction or entirely.
 

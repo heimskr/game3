@@ -69,7 +69,7 @@ namespace Game3 {
 	void Woodcutter::tick(Game &game, float delta) {
 		Worker::tick(game, delta);
 
-		if (stillStuck(delta))
+		if (getSide() == Side::Client || stillStuck(delta))
 			return;
 
 		const auto hour = game.getHour();

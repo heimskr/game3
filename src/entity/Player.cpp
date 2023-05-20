@@ -41,31 +41,35 @@ namespace Game3 {
 
 	void Player::tick(Game &game, float delta) {
 		Entity::tick(game, delta);
+
 		if (0.f < tooldown && (tooldown -= delta) < 0.f) {
 			tooldown = 0;
 			inventory->notifyOwner();
 		}
 
-		Direction final_direction = direction;
-		if (movingLeft)
-			move(final_direction = Direction::Left);
-		if (movingRight)
-			move(final_direction = Direction::Right);
-		if (movingUp)
-			move(final_direction = Direction::Up);
-		if (movingDown)
-			move(final_direction = Direction::Down);
+		if (getSide() == Side::Server) {
+			Direction final_direction = direction;
 
-		if (continuousInteraction) {
-			Place place = getPlace();
-			if (!lastContinousInteraction || *lastContinousInteraction != place) {
-				interactOn();
-				getRealm()->interactGround(std::dynamic_pointer_cast<Player>(shared_from_this()), position, continuousInteractionModifiers);
-				lastContinousInteraction = std::move(place);
+			if (movingLeft)
+				move(final_direction = Direction::Left);
+			if (movingRight)
+				move(final_direction = Direction::Right);
+			if (movingUp)
+				move(final_direction = Direction::Up);
+			if (movingDown)
+				move(final_direction = Direction::Down);
+
+			if (continuousInteraction) {
+				Place place = getPlace();
+				if (!lastContinousInteraction || *lastContinousInteraction != place) {
+					interactOn();
+					getRealm()->interactGround(std::dynamic_pointer_cast<Player>(shared_from_this()), position, continuousInteractionModifiers);
+					lastContinousInteraction = std::move(place);
+				}
 			}
-		}
 
-		direction = final_direction;
+			direction = final_direction;
+		}
 	}
 
 	bool Player::interactOn() {

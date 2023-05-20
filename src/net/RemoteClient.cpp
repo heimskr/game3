@@ -83,7 +83,6 @@ namespace Game3 {
 		} catch (const std::out_of_range &) {
 			if (!can_request)
 				throw;
-			INFO("Making note of request for " << chunk_position);
 			realm.requestChunk(chunk_position, shared_from_this());
 		}
 	}

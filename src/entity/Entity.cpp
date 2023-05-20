@@ -253,12 +253,13 @@ namespace Game3 {
 				calculateVisiblePlayers();
 			}
 
-			teleport(new_position, !path.empty(), false);
-
 			if (horizontal)
 				offset.x() = x_offset;
 			else
 				offset.y() = y_offset;
+
+			teleport(new_position, !path.empty(), false);
+
 			return true;
 		}
 

@@ -350,11 +350,9 @@ namespace Game3 {
 					std::unique_lock lock(chunkRequestsMutex);
 					if (auto iter = chunkRequests.find(chunk_position); iter != chunkRequests.end()) {
 						const ChunkTilesPacket packet(*this, chunk_position);
-						INFO("Late sending chunk position " << chunk_position << " to " << iter->second.size() << " client(s)");
 						for (const auto &client: iter->second)
 							client->send(packet);
 						chunkRequests.erase(iter);
-						INFO("Chunk requests size is now " << chunkRequests.size());
 					}
 				}
 			} else {
@@ -389,6 +387,12 @@ namespace Game3 {
 				return;
 
 			const auto player_cpos = getChunkPosition(player->getPosition());
+
+			{
+				auto lock = lockEntitiesShared();
+				for (auto &entity: entities)
+					entity->tick(game, delta);
+			}
 
 			Index row_index = 0;
 			for (auto &row: *renderers) {
