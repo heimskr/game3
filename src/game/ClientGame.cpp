@@ -8,6 +8,7 @@
 #include "packet/CommandPacket.h"
 #include "packet/ChunkRequestPacket.h"
 #include "packet/RegisterPlayerPacket.h"
+#include "packet/TeleportSelfPacket.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "ui/tab/TextTab.h"
@@ -33,8 +34,8 @@ namespace Game3 {
 		if (button == 1) {
 			if (auto *stack = player->inventory->getActive())
 				stack->item->use(player->inventory->activeSlot, *stack, {{y, x}, activeRealm, player}, {});
-		} else if (button == 3 && player && !realm.rightClick({y, x}, pos_x, pos_y) && debugMode) {
-			player->teleport({y, x});
+		} else if (button == 3 && player && !realm.rightClick({y, x}, pos_x, pos_y) && debugMode && client && client->isConnected()) {
+			client->send(TeleportSelfPacket(realm.id, {y, x}));
 		}
 	}
 
