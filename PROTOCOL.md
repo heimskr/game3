@@ -110,6 +110,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u64` Entity Global ID
 	- `i32` Realm ID
 	- `{i64,i64}` Position
+	- `u8` Facing
 	- `optional<float>` New X Offset
 	- `optional<float>` New Y Offset
 
