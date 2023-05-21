@@ -19,7 +19,6 @@
 #include "packet/ProtocolVersionPacket.h"
 #include "packet/RealmNoticePacket.h"
 #include "packet/SelfTeleportedPacket.h"
-#include "packet/TileEntityPacket.h"
 #include "realm/Overworld.h"
 #include "util/Crypto.h"
 #include "util/FS.h"

@@ -47,11 +47,15 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i32` Realm ID
 	- `{i64,i64}` Position
 
-8. **Chunk Tiles**: sends all the terrain data for a chunk to a client.
+8. **Chunk**: sends all the terrain data, entities and tile entities in a chunk to a client.
 
 	- `i32` Realm ID
 	- `{i32,i32}` Chunk Position
 	- `i16[3*64**2]` Tile IDs (layer 1, then 2, then 3)
+	- `u32` Entity Count
+	- `...` Entity Data
+	- `u32` Tile Entity Count
+	- `...` Tile Entity Data
 
 	<!-- TODO: compression -->
 

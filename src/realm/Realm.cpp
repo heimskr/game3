@@ -13,7 +13,6 @@
 #include "game/InteractionSet.h"
 #include "game/ServerGame.h"
 #include "net/RemoteClient.h"
-#include "packet/ChunkTilesPacket.h"
 #include "realm/Keep.h"
 #include "realm/Realm.h"
 #include "realm/RealmFactory.h"
@@ -350,12 +349,9 @@ namespace Game3 {
 					generateChunk(chunk_position);
 					generatedChunks.insert(chunk_position);
 					remakePathMap(chunk_position);
-					// reupload();
 					std::unique_lock lock(chunkRequestsMutex);
 					if (auto iter = chunkRequests.find(chunk_position); iter != chunkRequests.end()) {
-						const ChunkTilesPacket packet(*this, chunk_position);
-						for (const auto &client: iter->second)
-							client->send(packet);
+						sendToMany(iter->second, chunk_position);
 						chunkRequests.erase(iter);
 					}
 				}
@@ -372,11 +368,7 @@ namespace Game3 {
 						remakePathMap(chunk_position);
 					}
 
-					const ChunkTilesPacket packet(*this, chunk_position);
-
-					for (const auto &client: client_set)
-						client->send(packet);
-
+					sendToMany(client_set, chunk_position);
 					chunkRequests.erase(iter);
 				}
 			}
@@ -719,6 +711,26 @@ namespace Game3 {
 						renderer.markDirty();
 	}
 
+	Realm::ChunkPackets Realm::getChunkPackets(ChunkPosition chunk_position) {
+		ChunkTilesPacket chunk_tiles(*this, chunk_position);
+		std::vector<EntityPacket> entity_packets;
+		std::vector<TileEntityPacket> tile_entity_packets;
+
+		if (auto entities_ptr = getEntities(chunk_position)) {
+			entity_packets.reserve(entities_ptr->size());
+			for (const auto &entity: *entities_ptr)
+				entity_packets.emplace_back(entity);
+		}
+
+		if (auto tile_entities_ptr = getTileEntities(chunk_position)) {
+			tile_entity_packets.reserve(tile_entities_ptr->size());
+			for (const auto &tile_entity: *tile_entities_ptr)
+				tile_entity_packets.emplace_back(tile_entity);
+		}
+
+		return {std::move(chunk_tiles), std::move(entity_packets), std::move(tile_entity_packets)};
+	}
+
 	void Realm::remakePathMap() {
 		const auto &tileset = getTileset();
 		for (auto &[chunk_position, path_chunk]: tileProvider.pathMap)
@@ -906,6 +918,28 @@ namespace Game3 {
 		if (auto iter = tileEntitiesByChunk.find(chunk_position); iter != tileEntitiesByChunk.end())
 			return iter->second;
 		return {};
+	}
+
+	void Realm::sendToMany(const std::unordered_set<std::shared_ptr<RemoteClient>> &clients, ChunkPosition chunk_position) {
+		const auto [chunk_tiles, entity_packets, tile_entity_packets] = getChunkPackets(chunk_position);
+
+		for (const auto &client: clients) {
+			client->send(chunk_tiles);
+			for (const auto &packet: entity_packets)
+				client->send(packet);
+			for (const auto &packet: tile_entity_packets)
+				client->send(packet);
+		}
+	}
+
+	void Realm::sendToOne(RemoteClient &client, ChunkPosition chunk_position) {
+		const auto [chunk_tiles, entity_packets, tile_entity_packets] = getChunkPackets(chunk_position);
+
+		client.send(chunk_tiles);
+		for (const auto &packet: entity_packets)
+			client.send(packet);
+		for (const auto &packet: tile_entity_packets)
+			client.send(packet);
 	}
 
 	bool Realm::rightClick(const Position &position, double x, double y) {

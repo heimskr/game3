@@ -14,6 +14,9 @@
 #include "Types.h"
 #include "game/BiomeMap.h"
 #include "game/TileProvider.h"
+#include "packet/ChunkTilesPacket.h"
+#include "packet/EntityPacket.h"
+#include "packet/TileEntityPacket.h"
 #include "threading/MTQueue.h"
 #include "tileentity/TileEntity.h"
 #include "ui/ElementBufferedRenderer.h"
@@ -159,6 +162,8 @@ namespace Game3 {
 			/** Adds the tile entity to tileEntitiesByChunk. */
 			void attach(const TileEntityPtr &);
 			std::shared_ptr<std::unordered_set<TileEntityPtr>> getTileEntities(ChunkPosition);
+			void sendToMany(const std::unordered_set<std::shared_ptr<RemoteClient>> &, ChunkPosition);
+			void sendToOne(RemoteClient &, ChunkPosition);
 
 			inline const auto & getPlayers() const { return players; }
 			inline void markGenerated(auto x, auto y) { generatedChunks.insert(ChunkPosition{x, y}); }
@@ -264,6 +269,12 @@ namespace Game3 {
 			virtual void toJSON(nlohmann::json &) const;
 
 		private:
+			struct ChunkPackets {
+				ChunkTilesPacket tilePacket;
+				std::vector<EntityPacket> entityPackets;
+				std::vector<TileEntityPacket> tileEntityPackets;
+			};
+
 			Game &game;
 			bool ticking = false;
 			MTQueue<EntityPtr> entityRemovalQueue;
@@ -275,7 +286,7 @@ namespace Game3 {
 			std::unordered_map<ChunkPosition, std::shared_ptr<std::unordered_set<EntityPtr>>> entitiesByChunk;
 			std::unordered_map<ChunkPosition, std::shared_ptr<std::unordered_set<TileEntityPtr>>> tileEntitiesByChunk;
 
-			std::map<ChunkPosition, std::set<std::shared_ptr<RemoteClient>>> chunkRequests;
+			std::map<ChunkPosition, std::unordered_set<std::shared_ptr<RemoteClient>>> chunkRequests;
 			std::shared_mutex chunkRequestsMutex;
 			std::shared_mutex entitiesByChunkMutex;
 			std::shared_mutex tileEntitiesByChunkMutex;
@@ -285,9 +296,9 @@ namespace Game3 {
 
 			void initRendererRealms();
 			void initRendererTileProviders();
-
 			bool isWalkable(Index row, Index column, const Tileset &);
 			void setLayerHelper(Index row, Index col, bool should_mark_dirty = true);
+			ChunkPackets getChunkPackets(ChunkPosition);
 
 			static BiomeType getBiome(int64_t seed);
 

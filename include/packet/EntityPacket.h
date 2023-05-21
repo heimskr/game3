@@ -1,3 +1,5 @@
+#pragma once
+
 #include "packet/Packet.h"
 
 namespace Game3 {
