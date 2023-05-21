@@ -27,6 +27,8 @@ namespace Game3 {
 			void tick();
 			void queuePacket(std::shared_ptr<Packet>);
 			void chunkReceived(ChunkPosition);
+			void interactOn();
+			void interactNextTo();
 
 			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update() const { return signal_player_inventory_update_; }
 			sigc::signal<void(const PlayerPtr &)> signal_player_money_update() const { return signal_player_money_update_; }

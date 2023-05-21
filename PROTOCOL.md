@@ -130,6 +130,16 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i32` Realm ID
 	- `{i64,i64}` Position
 
+21. **Interact**: tells the server to perform an interaction.
+
+	- `bool` Direct: whether to interact with the tile the player is on, rather than one tile in front of the player
+	- `u8` Modifiers: bitfield (1 = shift, 2 = ctrl, 4 = alt, 8 = super)
+
+22. **Inventory Slot Update**: tells the client to set an inventory slot.
+
+	- `i32` Slot
+	- `ItemStack` Item Stack
+
 # Message Format
 
 All values are little endian.

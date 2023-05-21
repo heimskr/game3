@@ -7,6 +7,7 @@
 #include "net/LocalClient.h"
 #include "packet/CommandPacket.h"
 #include "packet/ChunkRequestPacket.h"
+#include "packet/InteractPacket.h"
 #include "packet/RegisterPlayerPacket.h"
 #include "packet/TeleportSelfPacket.h"
 #include "ui/Canvas.h"
@@ -142,5 +143,15 @@ namespace Game3 {
 
 	void ClientGame::chunkReceived(ChunkPosition chunk_position) {
 		missingChunks.erase(chunk_position);
+	}
+
+	void ClientGame::interactOn() {
+		assert(client);
+		client->send(InteractPacket(true));
+	}
+
+	void ClientGame::interactNextTo() {
+		assert(client);
+		client->send(InteractPacket(false));
 	}
 }

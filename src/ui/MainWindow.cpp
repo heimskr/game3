@@ -695,11 +695,11 @@ namespace Game3 {
 				}
 					return;
 				case GDK_KEY_E:
-					game->player->interactOn();
+					game->interactOn();
 					return;
 				case GDK_KEY_e:
 				case GDK_KEY_space:
-					game->player->interactNextTo(Modifiers(modifiers));
+					game->interactNextTo();
 					return;
 				case GDK_KEY_b: {
 					const auto rect = game->getVisibleRealmBounds();

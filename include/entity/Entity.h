@@ -18,6 +18,7 @@
 #include "Texture.h"
 #include "Types.h"
 #include "game/Agent.h"
+#include "game/ChunkPosition.h"
 #include "game/HasInventory.h"
 #include "item/Item.h"
 
@@ -111,6 +112,7 @@ namespace Game3 {
 			void setHeldLeft(Slot);
 			void setHeldRight(Slot);
 			Side getSide() const;
+			ChunkPosition getChunk() const;
 			inline bool is(const Identifier &check) const { return type == check; }
 			inline auto getHeldLeft()  const { return heldLeft.slot;  }
 			inline auto getHeldRight() const { return heldRight.slot; }

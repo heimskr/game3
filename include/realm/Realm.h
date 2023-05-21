@@ -57,13 +57,13 @@ namespace Game3 {
 			TileProvider tileProvider;
 			std::optional<std::array<std::array<std::array<ElementBufferedRenderer, LAYER_COUNT>, REALM_DIAMETER>, REALM_DIAMETER>> renderers;
 			/** Governed by tileEntityMutex. */
-			std::unordered_map<Position, std::shared_ptr<TileEntity>> tileEntities;
+			std::unordered_map<Position, TileEntityPtr> tileEntities;
 			/** Governed by tileEntityMutex. */
-			std::unordered_map<GlobalID, std::shared_ptr<TileEntity>> tileEntitiesByGID;
+			std::unordered_map<GlobalID, TileEntityPtr> tileEntitiesByGID;
 			/** Governed by entityMutex. */
 			std::unordered_set<EntityPtr> entities;
 			/** Governed by entityMutex. */
-			std::unordered_map<GlobalID, std::shared_ptr<Entity>> entitiesByGID;
+			std::unordered_map<GlobalID, EntityPtr> entitiesByGID;
 			/** Governed by entityMutex. */
 			std::unordered_set<PlayerPtr> players;
 			nlohmann::json extraData;
@@ -98,15 +98,15 @@ namespace Game3 {
 			void reupload(Layer);
 			EntityPtr addUnsafe(const EntityPtr &);
 			EntityPtr add(const EntityPtr &);
-			std::shared_ptr<TileEntity> add(const TileEntityPtr &);
-			std::shared_ptr<TileEntity> addUnsafe(const TileEntityPtr &);
+			TileEntityPtr add(const TileEntityPtr &);
+			TileEntityPtr addUnsafe(const TileEntityPtr &);
 			void initEntities();
 			void tick(float delta);
 			std::vector<EntityPtr> findEntities(const Position &);
 			std::vector<EntityPtr> findEntities(const Position &, const EntityPtr &except);
 			EntityPtr findEntity(const Position &);
 			EntityPtr findEntity(const Position &, const EntityPtr &except);
-			std::shared_ptr<TileEntity> tileEntityAt(const Position &);
+			TileEntityPtr tileEntityAt(const Position &);
 			void remove(const EntityPtr &);
 			void removeSafe(const EntityPtr &);
 			void remove(TileEntityPtr, bool run_helper = true);
@@ -148,7 +148,18 @@ namespace Game3 {
 			void addPlayer(const PlayerPtr &);
 			void removePlayer(const PlayerPtr &);
 			void sendTo(RemoteClient &);
-			void requestChunk(ChunkPosition, std::shared_ptr<RemoteClient>);
+			void requestChunk(ChunkPosition, const std::shared_ptr<RemoteClient> &);
+			/** Removes the entity from entitiesByChunk. */
+			void detach(const EntityPtr &);
+			/** Adds the entity to entitiesByChunk. */
+			void attach(const EntityPtr &);
+			std::shared_ptr<std::unordered_set<EntityPtr>> getEntities(ChunkPosition);
+			/** Removes the tile entity from tileEntitiesByChunk. */
+			void detach(const TileEntityPtr &);
+			/** Adds the tile entity to tileEntitiesByChunk. */
+			void attach(const TileEntityPtr &);
+			std::shared_ptr<std::unordered_set<TileEntityPtr>> getTileEntities(ChunkPosition);
+
 			inline const auto & getPlayers() const { return players; }
 			inline void markGenerated(auto x, auto y) { generatedChunks.insert(ChunkPosition{x, y}); }
 			inline auto pauseUpdates() { return Pauser(shared_from_this()); }
@@ -257,12 +268,17 @@ namespace Game3 {
 			bool ticking = false;
 			MTQueue<EntityPtr> entityRemovalQueue;
 			MTQueue<EntityPtr> entityAdditionQueue;
-			MTQueue<std::shared_ptr<TileEntity>> tileEntityRemovalQueue;
-			MTQueue<std::shared_ptr<TileEntity>> tileEntityAdditionQueue;
+			MTQueue<TileEntityPtr> tileEntityRemovalQueue;
+			MTQueue<TileEntityPtr> tileEntityAdditionQueue;
 			MTQueue<std::function<void()>> generalQueue;
+			/** Governed by entitiesByChunkMutex. */
+			std::unordered_map<ChunkPosition, std::shared_ptr<std::unordered_set<EntityPtr>>> entitiesByChunk;
+			std::unordered_map<ChunkPosition, std::shared_ptr<std::unordered_set<TileEntityPtr>>> tileEntitiesByChunk;
 
 			std::map<ChunkPosition, std::set<std::shared_ptr<RemoteClient>>> chunkRequests;
 			std::shared_mutex chunkRequestsMutex;
+			std::shared_mutex entitiesByChunkMutex;
+			std::shared_mutex tileEntitiesByChunkMutex;
 
 			SharedRecursiveMutex entityMutex;
 			SharedRecursiveMutex tileEntityMutex;

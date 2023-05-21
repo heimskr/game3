@@ -44,6 +44,10 @@ namespace Game3 {
 		return getRealm()->getGame().getSide();
 	}
 
+	ChunkPosition TileEntity::getChunk() const {
+		return getChunkPosition(getPosition());
+	}
+
 	void TileEntity::encode(Game &, Buffer &buffer) {
 		buffer << tileID;
 		buffer << position;

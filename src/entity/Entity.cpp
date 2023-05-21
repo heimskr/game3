@@ -463,6 +463,10 @@ namespace Game3 {
 		return getGame().getSide();
 	}
 
+	ChunkPosition Entity::getChunk() const {
+		return getChunkPosition(getPosition());
+	}
+
 	void Entity::encode(Buffer &buffer) {
 		buffer << type;
 		buffer << globalID;

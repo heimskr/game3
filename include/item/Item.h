@@ -141,7 +141,7 @@ namespace Game3 {
 	template <typename T>
 	T popBuffer(Buffer &);
 	template <>
-	Identifier popBuffer<Identifier>(Buffer &);
+	ItemStack popBuffer<ItemStack>(Buffer &);
 	Buffer & operator+=(Buffer &, const ItemStack &);
 	Buffer & operator<<(Buffer &, const ItemStack &);
 	Buffer & operator>>(Buffer &, ItemStack &);

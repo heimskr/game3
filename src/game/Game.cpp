@@ -59,6 +59,8 @@
 #include "packet/StopPlayerMovementPacket.h"
 #include "packet/EntitySetPathPacket.h"
 #include "packet/TeleportSelfPacket.h"
+#include "packet/InteractPacket.h"
+#include "packet/InventorySlotUpdatePacket.h"
 #include "realm/Cave.h"
 #include "realm/House.h"
 #include "realm/Keep.h"
@@ -287,6 +289,8 @@ namespace Game3 {
 		add(PacketFactory::create<StopPlayerMovementPacket>());
 		add(PacketFactory::create<EntitySetPathPacket>());
 		add(PacketFactory::create<TeleportSelfPacket>());
+		add(PacketFactory::create<InteractPacket>());
+		add(PacketFactory::create<InventorySlotUpdatePacket>());
 	}
 
 	void Game::addLocalCommandFactories() {

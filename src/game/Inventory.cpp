@@ -13,14 +13,14 @@ namespace Game3 {
 		owner(owner_), slotCount(slot_count) {}
 
 	ItemStack * Inventory::operator[](size_t slot) {
-		if (storage.contains(slot))
-			return &storage.at(slot);
+		if (auto iter = storage.find(slot); iter != storage.end())
+			return &iter->second;
 		return nullptr;
 	}
 
 	const ItemStack * Inventory::operator[](size_t slot) const {
-		if (storage.contains(slot))
-			return &storage.at(slot);
+		if (auto iter = storage.find(slot); iter != storage.end())
+			return &iter->second;
 		return nullptr;
 	}
 

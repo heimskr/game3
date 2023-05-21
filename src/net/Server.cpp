@@ -228,10 +228,10 @@ namespace Game3 {
 		for (size_t i = 0; i < threadCount; ++i)
 			threads.emplace_back(std::thread([this, i, &worker = *workers.at(i)] {
 				{
-						std::unique_lock lock(workersCVMutex);
-						workersCV.wait(lock, [this] { return workersReady.load(); });
+					std::unique_lock lock(workersCVMutex);
+					workersCV.wait(lock, [this] { return workersReady.load(); });
 				}
-					worker.work(i);
+				worker.work(i);
 			}));
 
 		workersReady = true;

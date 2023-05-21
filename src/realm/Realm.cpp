@@ -95,6 +95,7 @@ namespace Game3 {
 				auto tile_entity = TileEntity::fromJSON(game, tile_entity_json);
 				tileEntities.emplace(Position(position_string), tile_entity);
 				tileEntitiesByGID[tile_entity->globalID] = tile_entity;
+				attach(tile_entity);
 				tile_entity->setRealm(shared);
 				tile_entity->onSpawn();
 				if (tile_entity_json.at("id").get<Identifier>() == "base:te/ghost"_id)
@@ -108,6 +109,7 @@ namespace Game3 {
 				auto entity = *entities.insert(Entity::fromJSON(game, entity_json)).first;
 				entity->setRealm(shared);
 				entitiesByGID[entity->globalID] = entity;
+				attach(entity);
 			}
 		}
 		if (json.contains("extra"))
@@ -255,6 +257,7 @@ namespace Game3 {
 		entity->setRealm(shared_from_this());
 		entities.insert(entity);
 		entitiesByGID[entity->globalID] = entity;
+		attach(entity);
 		if (entity->isPlayer())
 			players.insert(std::dynamic_pointer_cast<Player>(entity));
 		return entity;
@@ -271,6 +274,7 @@ namespace Game3 {
 		tile_entity->setRealm(shared_from_this());
 		tileEntities.emplace(tile_entity->position, tile_entity);
 		tileEntitiesByGID[tile_entity->globalID] = tile_entity;
+		attach(tile_entity);
 		if (tile_entity->solid)
 			tileProvider.findPathState(tile_entity->position) = false;
 		if (tile_entity->is("base:te/ghost"))
@@ -454,6 +458,7 @@ namespace Game3 {
 
 	void Realm::remove(const EntityPtr &entity) {
 		entitiesByGID.erase(entity->globalID);
+		detach(entity);
 		if (auto player = std::dynamic_pointer_cast<Player>(entity))
 			players.erase(player);
 		entities.erase(entity);
@@ -469,6 +474,7 @@ namespace Game3 {
 		tileEntities.at(position)->onRemove();
 		tileEntities.erase(position);
 		tileEntitiesByGID.erase(tile_entity->globalID);
+		detach(tile_entity);
 		if (run_helper)
 			setLayerHelper(position.row, position.column, false);
 		if (tile_entity->is("base:te/ghost"))
@@ -839,11 +845,67 @@ namespace Game3 {
 		}
 	}
 
-	void Realm::requestChunk(ChunkPosition chunk_position, std::shared_ptr<RemoteClient> client) {
+	void Realm::requestChunk(ChunkPosition chunk_position, const std::shared_ptr<RemoteClient> &client) {
 		assert(isServer());
 		tileProvider.generationQueue.push(chunk_position);
 		std::unique_lock lock(chunkRequestsMutex);
 		chunkRequests[chunk_position].insert(client);
+	}
+
+	void Realm::detach(const EntityPtr &entity) {
+		std::unique_lock lock(entitiesByChunkMutex);
+		if (auto iter = entitiesByChunk.find(entity->getChunk()); iter != entitiesByChunk.end()) {
+			iter->second->erase(entity);
+			if (iter->second->empty())
+				entitiesByChunk.erase(iter);
+		}
+	}
+
+	void Realm::attach(const EntityPtr &entity) {
+		std::unique_lock lock(entitiesByChunkMutex);
+		const auto chunk_position = entity->getChunk();
+		if (auto iter = entitiesByChunk.find(chunk_position); iter != entitiesByChunk.end()) {
+			iter->second->insert(entity);
+		} else {
+			auto set = std::make_shared<std::unordered_set<EntityPtr>>();
+			set->insert(entity);
+			entitiesByChunk.emplace(chunk_position, std::move(set));
+		}
+	}
+
+	std::shared_ptr<std::unordered_set<EntityPtr>> Realm::getEntities(ChunkPosition chunk_position) {
+		std::shared_lock lock(entitiesByChunkMutex);
+		if (auto iter = entitiesByChunk.find(chunk_position); iter != entitiesByChunk.end())
+			return iter->second;
+		return {};
+	}
+
+	void Realm::detach(const TileEntityPtr &tile_entity) {
+		std::unique_lock lock(tileEntitiesByChunkMutex);
+		if (auto iter = tileEntitiesByChunk.find(tile_entity->getChunk()); iter != tileEntitiesByChunk.end()) {
+			iter->second->erase(tile_entity);
+			if (iter->second->empty())
+				tileEntitiesByChunk.erase(iter);
+		}
+	}
+
+	void Realm::attach(const TileEntityPtr &tile_entity) {
+		std::unique_lock lock(tileEntitiesByChunkMutex);
+		const auto chunk_position = tile_entity->getChunk();
+		if (auto iter = tileEntitiesByChunk.find(chunk_position); iter != tileEntitiesByChunk.end()) {
+			iter->second->insert(tile_entity);
+		} else {
+			auto set = std::make_shared<std::unordered_set<TileEntityPtr>>();
+			set->insert(tile_entity);
+			tileEntitiesByChunk.emplace(chunk_position, std::move(set));
+		}
+	}
+
+	std::shared_ptr<std::unordered_set<TileEntityPtr>> Realm::getTileEntities(ChunkPosition chunk_position) {
+		std::shared_lock lock(tileEntitiesByChunkMutex);
+		if (auto iter = tileEntitiesByChunk.find(chunk_position); iter != tileEntitiesByChunk.end())
+			return iter->second;
+		return {};
 	}
 
 	bool Realm::rightClick(const Position &position, double x, double y) {
