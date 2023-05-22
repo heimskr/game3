@@ -105,10 +105,15 @@ namespace Game3 {
 		if (game.activeRealm->id != nextRealm && nextRealm != -1) {
 			game.activeRealm->onBlur();
 			game.activeRealm = new_realm;
-			game.activeRealm->onFocus();
 			if (getSide() == Side::Client) {
+				game.activeRealm->onFocus();
 				new_realm->reupload();
 				focus(game.toClient().canvas, true);
+			} else {
+				auto locked = client.lock();
+				assert(locked);
+				INFO("Sending " << new_realm->id << " to client");
+				new_realm->sendTo(*locked);
 			}
 		}
 	}
@@ -164,7 +169,18 @@ namespace Game3 {
 
 	bool Player::canSee(RealmID realm_id, const Position &pos) const {
 		const auto &realm = *getRealm();
-		return realm.id == realm_id && realm.isVisible(pos);
+
+		if (realm_id != (nextRealm == -1? realm.id : nextRealm))
+			return false;
+
+		const auto player_position = getChunk();
+		const auto chunk_position = getChunkPosition(pos);
+
+		if (player_position.x - REALM_DIAMETER / 2 <= chunk_position.x && chunk_position.x <= player_position.x + REALM_DIAMETER / 2)
+			if (player_position.y - REALM_DIAMETER / 2 <= chunk_position.y && chunk_position.y <= player_position.y + REALM_DIAMETER / 2)
+				return true;
+
+		return false;
 	}
 
 	bool Player::canSee(const Entity &entity) const {

@@ -53,7 +53,7 @@ namespace Game3 {
 
 			RegistryRegistry registries;
 
-			virtual ~Game() = default;
+			virtual ~Game();
 
 			template <typename T>
 			T & registry() {

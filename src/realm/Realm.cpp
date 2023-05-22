@@ -924,6 +924,8 @@ namespace Game3 {
 	}
 
 	void Realm::sendToMany(const std::unordered_set<std::shared_ptr<RemoteClient>> &clients, ChunkPosition chunk_position) {
+		assert(getSide() == Side::Server);
+
 		try {
 			const auto [chunk_tiles, entity_packets, tile_entity_packets] = getChunkPackets(chunk_position);
 

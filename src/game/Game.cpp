@@ -85,6 +85,11 @@
 #include "util/Util.h"
 
 namespace Game3 {
+	Game::~Game() {
+		// Clear allEntities early to double-free prevent silliness.
+		allEntities.clear();
+	}
+
 	void Game::initRegistries() {
 		registries.clear();
 		registries.add<CraftingRecipeRegistry>();
