@@ -15,7 +15,7 @@ namespace Game3 {
 				auto player = game.server->loadPlayer(username, *display_name);
 				client.setPlayer(player);
 				auto &realm = *player->getRealm();
-				client.send(RealmNoticePacket(realm.id, realm.type, realm.getTileset().identifier, realm.seed, realm.outdoors));
+				client.send(RealmNoticePacket(realm));
 				client.send(LoginStatusPacket(true, player->globalID, username, *display_name, player));
 				game.server->setupPlayer(client);
 				return;

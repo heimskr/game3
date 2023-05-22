@@ -37,6 +37,17 @@ namespace Game3 {
 		return out;
 	}
 
+	Entity::~Entity() {
+		if (hasGID() && game != nullptr) {
+			try {
+				auto lock = game->lockAllEntities();
+				game->allEntities.erase(globalID);
+			} catch (...) {
+				ERROR("Couldn't erase " << globalID << " from allEntities!");
+			}
+		}
+	}
+
 	void Entity::toJSON(nlohmann::json &json) const {
 		json["type"]      = type;
 		json["position"]  = position;
@@ -114,6 +125,11 @@ namespace Game3 {
 			inventory = std::make_shared<Inventory>(shared_from_this(), DEFAULT_INVENTORY_SIZE);
 		else
 			inventory->owner = shared_from_this();
+
+		if (hasGID()) {
+			auto lock = game->lockAllEntities();
+			game->allEntities.emplace(getGID(), shared_from_this());
+		}
 	}
 
 	void Entity::render(SpriteRenderer &sprite_renderer) {
@@ -357,6 +373,7 @@ namespace Game3 {
 
 	void Entity::teleport(const Position &new_position, const std::shared_ptr<Realm> &new_realm) {
 		if (auto old_realm = getRealm(); old_realm != new_realm) {
+			nextRealm = new_realm->id;
 			auto shared = shared_from_this();
 			old_realm->queueRemoval(shared);
 			new_realm->queueAddition(shared);
@@ -432,6 +449,12 @@ namespace Game3 {
 		return out == PathResult::Trivial || out == PathResult::Success;
 	}
 
+	Game & Entity::getGame() {
+		if (game == nullptr)
+			game = &getRealm()->getGame();
+		return *game;
+	}
+
 	Game & Entity::getGame() const {
 		if (game != nullptr)
 			return *game;
@@ -467,6 +490,17 @@ namespace Game3 {
 		return getChunkPosition(getPosition());
 	}
 
+	void Entity::setGID(GlobalID new_gid) {
+		if (new_gid != static_cast<GlobalID>(-1)) {
+			auto &game = getGame();
+			auto lock = game.lockAllEntities();
+			game.allEntities.erase(globalID);
+			game.allEntities.emplace(new_gid, shared_from_this());
+		}
+
+		Agent::setGID(new_gid);
+	}
+
 	void Entity::encode(Buffer &buffer) {
 		buffer << type;
 		buffer << globalID;
@@ -485,7 +519,7 @@ namespace Game3 {
 
 	void Entity::decode(Buffer &buffer) {
 		buffer >> type;
-		buffer >> globalID;
+		setGID(buffer.take<GlobalID>());
 		buffer >> realmID;
 		buffer >> position;
 		buffer >> direction;

@@ -4,7 +4,9 @@
 #include <filesystem>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <random>
+#include <shared_mutex>
 #include <unordered_map>
 #include <utility>
 
@@ -44,6 +46,7 @@ namespace Game3 {
 			size_t cavesGenerated = 0;
 			std::map<RealmType, std::shared_ptr<InteractionSet>> interactionSets;
 			std::map<Identifier, std::unordered_set<std::shared_ptr<Item>>> itemsByAttribute;
+			std::map<GlobalID, std::shared_ptr<Entity>> allEntities;
 
 			std::unordered_map<RealmID, RealmPtr> realms;
 			RealmPtr activeRealm;
@@ -106,9 +109,13 @@ namespace Game3 {
 			const ServerGame & toServer() const;
 			std::shared_ptr<ServerGame> toServerPointer();
 
+			inline auto lockAllEntities() { return std::unique_lock(allEntitiesMutex); }
+			inline auto lockAllEntitiesShared() { return std::shared_lock(allEntitiesMutex); }
+
 		protected:
 			Game() = default;
 			std::chrono::system_clock::time_point lastTime = startTime;
+			std::shared_mutex allEntitiesMutex;
 	};
 
 	void to_json(nlohmann::json &, const Game &);

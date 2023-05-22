@@ -9,6 +9,7 @@
 #include "net/Buffer.h"
 #include "net/LocalClient.h"
 #include "net/RemoteClient.h"
+#include "packet/RealmNoticePacket.h"
 #include "packet/StartPlayerMovementPacket.h"
 #include "packet/StopPlayerMovementPacket.h"
 #include "realm/Realm.h"
@@ -97,11 +98,14 @@ namespace Game3 {
 	}
 
 	void Player::teleport(const Position &position, const std::shared_ptr<Realm> &new_realm) {
-		Entity::teleport(position, new_realm);
 		auto &game = new_realm->getGame();
-		if (game.activeRealm != new_realm) {
+		if (game.activeRealm != new_realm && getSide() == Side::Server)
+			send(RealmNoticePacket(*new_realm));
+		Entity::teleport(position, new_realm);
+		if (game.activeRealm->id != nextRealm && nextRealm != -1) {
 			game.activeRealm->onBlur();
 			game.activeRealm = new_realm;
+			game.activeRealm->onFocus();
 			if (getSide() == Side::Client) {
 				new_realm->reupload();
 				focus(game.toClient().canvas, true);

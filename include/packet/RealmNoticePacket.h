@@ -16,8 +16,9 @@ namespace Game3 {
 		bool outdoors = false;
 
 		RealmNoticePacket() = default;
-		RealmNoticePacket(RealmID realm_id, Identifier type_, Identifier tileset_, int64_t seed_, bool outdoors_):
-			realmID(realm_id), type(std::move(type_)), tileset(std::move(tileset_)), seed(seed_), outdoors(outdoors_) {}
+		RealmNoticePacket(Realm &);
+		RealmNoticePacket(RealmID realm_id, const Identifier &type_, const Identifier &tileset_, int64_t seed_, bool outdoors_):
+			realmID(realm_id), type(type_), tileset(tileset_), seed(seed_), outdoors(outdoors_) {}
 
 		PacketID getID() const override { return ID(); }
 

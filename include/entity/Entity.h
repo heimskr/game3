@@ -57,12 +57,15 @@ namespace Game3 {
 			MoneyCount money = 0;
 			HitPoints health = 0;
 			std::unordered_set<PlayerPtr> visiblePlayers;
+			/** Set when an entity is beginning to teleport so that an EntityMovePacket can be sent with the proper realm ID
+			 *  before the actual realm switch has occurred. */
+			RealmID nextRealm = -1;
 
-			~Entity() override = default;
+			~Entity() override;
 
 			/** This won't call init() on the Entity. You need to do that yourself. */
 			template <typename T = Entity, typename... Args>
-			static std::shared_ptr<T> create(Args && ...args) {
+			static std::shared_ptr<T> create(Args &&...args) {
 				auto out = std::shared_ptr<T>(new T(std::forward<Args>(args)...));
 				out->health = out->maxHealth();
 				return out;
@@ -107,12 +110,14 @@ namespace Game3 {
 			bool pathfind(const Position &goal);
 			virtual float getSpeed() const { return MAX_SPEED; }
 			virtual Glib::ustring getName() { return "Unknown Entity (" + std::string(type) + ')'; }
+			Game & getGame();
 			Game & getGame() const;
 			bool isVisible() const;
 			void setHeldLeft(Slot);
 			void setHeldRight(Slot);
 			Side getSide() const;
 			ChunkPosition getChunk() const;
+			void setGID(GlobalID) override;
 			inline bool is(const Identifier &check) const { return type == check; }
 			inline auto getHeldLeft()  const { return heldLeft.slot;  }
 			inline auto getHeldRight() const { return heldRight.slot; }

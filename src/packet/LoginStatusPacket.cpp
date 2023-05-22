@@ -32,8 +32,9 @@ namespace Game3 {
 
 		SUCCESS("Login succeeded");
 		game.player = Entity::create<Player>();
-		game.player->setGID(globalID);
 		game.player->init(game);
+		INFO("Setting player GID to " << globalID);
+		game.player->setGID(globalID);
 		game.player->decode(playerDataBuffer);
 		game.player->setupRealm(game);
 		game.activeRealm = game.player->getRealm();

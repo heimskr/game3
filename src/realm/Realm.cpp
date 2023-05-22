@@ -13,6 +13,7 @@
 #include "game/InteractionSet.h"
 #include "game/ServerGame.h"
 #include "net/RemoteClient.h"
+#include "packet/ErrorPacket.h"
 #include "realm/Keep.h"
 #include "realm/Realm.h"
 #include "realm/RealmFactory.h"
@@ -297,15 +298,15 @@ namespace Game3 {
 	}
 
 	void Realm::tick(float delta) {
+		ticking = true;
+
+		for (const auto &stolen: entityAdditionQueue.steal())
+			add(stolen);
+
+		for (const auto &stolen: tileEntityAdditionQueue.steal())
+			add(stolen);
+
 		if (isServer()) {
-			ticking = true;
-
-			for (const auto &stolen: entityAdditionQueue.steal())
-				add(stolen);
-
-			for (const auto &stolen: tileEntityAdditionQueue.steal())
-				add(stolen);
-
 			std::set<std::shared_ptr<Player>> temp_buffering;
 
 			{
@@ -389,6 +390,8 @@ namespace Game3 {
 				for (auto &entity: entities)
 					entity->tick(game, delta);
 			}
+
+			ticking = false;
 
 			Index row_index = 0;
 			for (auto &row: *renderers) {
@@ -921,14 +924,21 @@ namespace Game3 {
 	}
 
 	void Realm::sendToMany(const std::unordered_set<std::shared_ptr<RemoteClient>> &clients, ChunkPosition chunk_position) {
-		const auto [chunk_tiles, entity_packets, tile_entity_packets] = getChunkPackets(chunk_position);
+		try {
+			const auto [chunk_tiles, entity_packets, tile_entity_packets] = getChunkPackets(chunk_position);
 
-		for (const auto &client: clients) {
-			client->send(chunk_tiles);
-			for (const auto &packet: entity_packets)
+			for (const auto &client: clients) {
+				client->send(chunk_tiles);
+				for (const auto &packet: entity_packets)
+					client->send(packet);
+				for (const auto &packet: tile_entity_packets)
+					client->send(packet);
+			}
+		} catch (const std::out_of_range &) {
+			const ErrorPacket packet("Chunk " + static_cast<std::string>(chunk_position) + " not present in realm " + std::to_string(id));
+			for (const auto &client: clients)
 				client->send(packet);
-			for (const auto &packet: tile_entity_packets)
-				client->send(packet);
+			return;
 		}
 	}
 

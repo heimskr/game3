@@ -18,6 +18,7 @@ namespace Game3 {
 	void ChunkTilesPacket::handle(ClientGame &game) {
 		if (tiles.size() != CHUNK_SIZE * CHUNK_SIZE * LAYER_COUNT)
 			throw PacketError("Invalid tile count in ChunkTilesPacket: " + std::to_string(tiles.size()));
+
 		auto realm = game.realms.at(realmID);
 		auto &provider = realm->tileProvider;
 		for (Layer layer = 1; layer <= LAYER_COUNT; ++layer) {
@@ -28,7 +29,5 @@ namespace Game3 {
 
 		game.chunkReceived(chunkPosition);
 		realm->reupload();
-
-		SUCCESS("Set tiles for chunk (" << chunkPosition.x << ", " << chunkPosition.y << ") in realm " << realmID);
 	}
 }

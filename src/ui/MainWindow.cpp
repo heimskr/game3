@@ -727,6 +727,8 @@ namespace Game3 {
 					std::cout << "Time: " << int(game->getHour()) << ':' << int(game->getMinute()) << '\n';
 					return;
 				case GDK_KEY_p: {
+					std::cout << "Player GID: " << game->player->getGID() << '\n';
+					std::cout << "Realm ID: " << game->player->getRealm()->id << " or perhaps " << game->activeRealm->id << '\n';
 					std::cout << "Position: " << game->player->getPosition() << '\n';
 					std::cout << "Chunk position: " << std::string(getChunkPosition(game->player->getPosition())) << '\n';
 					return;

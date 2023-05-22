@@ -120,13 +120,15 @@ namespace Game3 {
 		if (!player)
 			return;
 
-		if (auto realm = player->getRealm()) {
-			auto now = getTime();
-			auto difference = now - lastTime;
-			lastTime = now;
-			delta = std::chrono::duration_cast<std::chrono::nanoseconds>(difference).count() / 1'000'000'000.;
+		auto now = getTime();
+		auto difference = now - lastTime;
+		lastTime = now;
+		delta = std::chrono::duration_cast<std::chrono::nanoseconds>(difference).count() / 1'000'000'000.;
+
+		for (const auto &[realm_id, realm]: realms)
 			realm->tick(delta);
 
+		if (auto realm = player->getRealm()) {
 			if (missingChunks.empty()) {
 				missingChunks = realm->getMissingChunks();
 				if (!missingChunks.empty())

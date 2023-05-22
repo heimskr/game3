@@ -25,9 +25,9 @@ namespace Game3 {
 				ERROR("Didn't find player " << globalID);
 			auto factory = game.registry<EntityFactoryRegistry>()[identifier];
 			entity = (*factory)(game, {});
-			entity->globalID = globalID;
 			entity->type = identifier;
 			entity->init(game);
+			entity->setGID(globalID);
 			entity->decode(buffer);
 		}
 	}
