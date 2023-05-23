@@ -14,6 +14,7 @@ namespace Game3 {
 
 		GlobalID globalID = -1;
 		RealmID realmID = -1;
+		RealmID previousRealm = -1;
 		Position position;
 		Direction facing;
 		std::optional<float> xOffset;
@@ -21,13 +22,13 @@ namespace Game3 {
 
 		EntityMovePacket() = default;
 		EntityMovePacket(const std::shared_ptr<Entity> &);
-		EntityMovePacket(GlobalID global_id, RealmID realm_id, const Position &position_, Direction facing_, std::optional<float> x_offset = {}, std::optional<float> y_offset = {}):
-			globalID(global_id), realmID(realm_id), position(position_), facing(facing_), xOffset(x_offset), yOffset(y_offset) {}
+		EntityMovePacket(GlobalID global_id, RealmID realm_id, RealmID previous_realm, const Position &position_, Direction facing_, std::optional<float> x_offset = {}, std::optional<float> y_offset = {}):
+			globalID(global_id), realmID(realm_id), previousRealm(previous_realm), position(position_), facing(facing_), xOffset(x_offset), yOffset(y_offset) {}
 
 		PacketID getID() const override { return ID(); }
 
-		void encode(Game &, Buffer &buffer) const override { buffer << globalID << realmID << position << facing << xOffset << yOffset; }
-		void decode(Game &, Buffer &buffer)       override { buffer >> globalID >> realmID >> position >> facing >> xOffset >> yOffset; }
+		void encode(Game &, Buffer &buffer) const override { buffer << globalID << realmID << previousRealm << position << facing << xOffset << yOffset; }
+		void decode(Game &, Buffer &buffer)       override { buffer >> globalID >> realmID >> previousRealm >> position >> facing >> xOffset >> yOffset; }
 
 		void handle(ClientGame &) override;
 	};

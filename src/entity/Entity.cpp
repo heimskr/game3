@@ -38,15 +38,6 @@ namespace Game3 {
 	}
 
 	Entity::~Entity() {
-		if (hasGID() && game != nullptr) {
-			try {
-				auto lock = game->lockAllEntities();
-				game->allEntities.erase(globalID);
-			} catch (...) {
-				ERROR("Couldn't erase " << globalID << " from allEntities!");
-			}
-		}
-
 		if (storedSide == Side::Server) {
 			auto lock = lockVisibleEntitiesShared();
 			if (!visibleEntities.empty()) {
@@ -141,11 +132,6 @@ namespace Game3 {
 			inventory = std::make_shared<Inventory>(shared_from_this(), DEFAULT_INVENTORY_SIZE);
 		else
 			inventory->owner = shared_from_this();
-
-		if (hasGID()) {
-			auto lock = game->lockAllEntities();
-			game->allEntities.emplace(getGID(), shared_from_this());
-		}
 
 		movedToNewChunk();
 	}
@@ -514,17 +500,6 @@ namespace Game3 {
 
 	ChunkPosition Entity::getChunk() const {
 		return getChunkPosition(getPosition());
-	}
-
-	void Entity::setGID(GlobalID new_gid) {
-		if (new_gid != static_cast<GlobalID>(-1)) {
-			auto &game = getGame();
-			auto lock = game.lockAllEntities();
-			game.allEntities.erase(globalID);
-			game.allEntities.emplace(new_gid, shared_from_this());
-		}
-
-		Agent::setGID(new_gid);
 	}
 
 	bool Entity::canSee(RealmID realm_id, const Position &pos) const {

@@ -4,7 +4,7 @@
 
 namespace Game3 {
 	EntityMovePacket::EntityMovePacket(const EntityPtr &entity):
-		EntityMovePacket(entity->globalID, entity->nextRealm == -1? entity->realmID : entity->nextRealm, entity->getPosition(), entity->direction, entity->offset.x(), entity->offset.y()) {}
+		EntityMovePacket(entity->globalID, entity->nextRealm == -1? entity->realmID : entity->nextRealm, entity->realmID, entity->getPosition(), entity->direction, entity->offset.x(), entity->offset.y()) {}
 
 	void EntityMovePacket::handle(ClientGame &game) {
 		auto iter = game.realms.find(realmID);
@@ -17,11 +17,14 @@ namespace Game3 {
 		auto entity = realm->getEntity(globalID);
 
 		if (!entity) {
-			auto lock = game.lockAllEntitiesShared();
-			if (auto iter = game.allEntities.find(globalID); iter != game.allEntities.end())
-				entity = iter->second;
-			else
+			if (previousRealm != -1)
+				if (auto previous_realm = game.realms.find(previousRealm); previous_realm != game.realms.end())
+					entity = previous_realm->second->getEntity(globalID);
+
+			if (!entity) {
+				WARN("Couldn't find entity " << globalID << " anywhere, in either realm " << realmID << " or realm " << previousRealm);
 				return;
+			}
 		}
 
 		if (!dynamic_cast<Player *>(entity.get())) {

@@ -67,6 +67,7 @@ namespace Game3 {
 			RealmID nextRealm = -1;
 
 			~Entity() override;
+			virtual void destroy() {}
 
 			/** This won't call init() on the Entity. You need to do that yourself. */
 			template <typename T = Entity, typename... Args>
@@ -122,7 +123,6 @@ namespace Game3 {
 			void setHeldRight(Slot);
 			Side getSide() const;
 			ChunkPosition getChunk() const;
-			void setGID(GlobalID) override;
 			bool canSee(RealmID, const Position &) const;
 			bool canSee(const Entity &) const;
 			bool canSee(const TileEntity &) const;
