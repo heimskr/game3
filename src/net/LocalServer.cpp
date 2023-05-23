@@ -47,7 +47,9 @@ namespace Game3 {
 			if (auto player = client->getPlayer()) {
 				player->client.reset();
 				game->remove(player);
-				std::cout << "Player ref count: " << player.use_count() << '\n';
+				player->destroy();
+				if (auto count = player.use_count(); count != 1)
+					WARN("Player ref count: " << count << " (should be 1)");
 			}
 		};
 
@@ -111,20 +113,35 @@ namespace Game3 {
 		auto overworld = game->realms.at(1);
 
 		auto player = Entity::create<Player>();
+		INFO("loadPlayer[1] player.use_count() == " << player.use_count());
 		player->username = username;
+		INFO("loadPlayer[2] player.use_count() == " << player.use_count());
 		player->displayName = display_name;
+		INFO("loadPlayer[3] player.use_count() == " << player.use_count());
 		player->token = generateToken(player->username);
+		INFO("loadPlayer[4] player.use_count() == " << player.use_count());
 		overworld->add(player);
+		INFO("loadPlayer[5] player.use_count() == " << player.use_count());
 		player->position = overworld->randomLand;
+		INFO("loadPlayer[6] player.use_count() == " << player.use_count());
 		player->init(*game);
+		INFO("loadPlayer[7] player.use_count() == " << player.use_count());
 		player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_pickaxe"));
+		INFO("loadPlayer[8] player.use_count() == " << player.use_count());
 		player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_shovel"));
+		INFO("loadPlayer[9] player.use_count() == " << player.use_count());
 		player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_axe"));
+		INFO("loadPlayer[10] player.use_count() == " << player.use_count());
 		player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_hammer"));
+		INFO("loadPlayer[11] player.use_count() == " << player.use_count());
 		player->inventory->add(ItemStack(*game, "base:item/cave_entrance"));
+		INFO("loadPlayer[12] player.use_count() == " << player.use_count());
 		game->players.insert(player);
+		INFO("loadPlayer[13] player.use_count() == " << player.use_count());
 		userDatabase.try_emplace(player->username, player->username, player->displayName);
+		INFO("loadPlayer[14] player.use_count() == " << player.use_count());
 		saveUsers();
+		INFO("loadPlayer[15] player.use_count() == " << player.use_count());
 		return player;
 	}
 

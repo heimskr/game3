@@ -22,17 +22,14 @@ namespace Game3 {
 	Player::Player():
 		Entity(ID()) {}
 
-	Player::~Player() {
-		INFO("~Player(" << this << ")");
+	void Player::destroy() {
 		auto lock = lockVisibleEntitiesShared();
+
 		if (!visibleEntities.empty()) {
-			if (storedWeak.lock()) {
-				for (const auto &weak_visible: visibleEntities)
-					if (auto visible = weak_visible.lock())
-						visible->removeVisible(storedWeak);
-			} else {
-				WARN("Couldn't lock storedWeak in ~Player");
-			}
+			auto shared = getShared();
+			for (const auto &weak_visible: visibleEntities)
+				if (auto visible = weak_visible.lock())
+					visible->removeVisible(std::weak_ptr(shared));
 		}
 	}
 
@@ -82,9 +79,11 @@ namespace Game3 {
 				Place place = getPlace();
 				if (!lastContinuousInteraction || *lastContinuousInteraction != place) {
 					interactOn();
-					getRealm()->interactGround(std::dynamic_pointer_cast<Player>(shared_from_this()), position, continuousInteractionModifiers);
+					getRealm()->interactGround(getShared(), position, continuousInteractionModifiers);
 					lastContinuousInteraction = std::move(place);
 				}
+			} else {
+				lastContinuousInteraction.reset();
 			}
 
 			direction = final_direction;
@@ -93,7 +92,7 @@ namespace Game3 {
 
 	bool Player::interactOn() {
 		auto realm = getRealm();
-		auto player = std::dynamic_pointer_cast<Player>(shared_from_this());
+		auto player = getShared();
 		auto entity = realm->findEntity(position, player);
 		if (!entity)
 			return false;
@@ -103,7 +102,7 @@ namespace Game3 {
 	void Player::interactNextTo(Modifiers modifiers) {
 		auto realm = getRealm();
 		const Position next_to = nextTo();
-		auto player = std::dynamic_pointer_cast<Player>(shared_from_this());
+		auto player = getShared();
 		auto entity = realm->findEntity(next_to, player);
 		bool interesting = false;
 		if (entity)
@@ -122,7 +121,7 @@ namespace Game3 {
 		Entity::teleport(position, new_realm);
 		if (game.activeRealm->id != nextRealm && nextRealm != -1) {
 			game.activeRealm->onBlur();
-			game.activeRealm->removePlayer(std::dynamic_pointer_cast<Player>(shared_from_this()));
+			game.activeRealm->removePlayer(getShared());
 			game.activeRealm = new_realm;
 			if (getSide() == Side::Client) {
 				game.activeRealm->onFocus();
@@ -141,7 +140,7 @@ namespace Game3 {
 		money += to_add;
 		auto &game = getRealm()->getGame();
 		if (game.getSide() == Side::Client)
-			game.toClient().signal_player_money_update().emit(std::dynamic_pointer_cast<Player>(shared_from_this()));
+			game.toClient().signal_player_money_update().emit(getShared());
 	}
 
 	bool Player::setTooldown(float multiplier) {
@@ -169,7 +168,7 @@ namespace Game3 {
 	}
 
 	Place Player::getPlace() {
-		return {getPosition(), getRealm(), std::dynamic_pointer_cast<Player>(shared_from_this())};
+		return {getPosition(), getRealm(), getShared()};
 	}
 
 	bool Player::isMoving() const {
@@ -244,7 +243,7 @@ namespace Game3 {
 	void Player::movedToNewChunk() {
 		Entity::movedToNewChunk();
 
-		auto shared = std::dynamic_pointer_cast<Player>(shared_from_this());
+		auto shared = getShared();
 		auto lock = lockVisibleEntitiesShared();
 		for (const auto &weak_visible: visibleEntities) {
 			if (auto visible = weak_visible.lock()) {
@@ -264,6 +263,10 @@ namespace Game3 {
 		}
 
 		return false;
+	}
+
+	PlayerPtr Player::getShared() {
+		return std::dynamic_pointer_cast<Player>(shared_from_this());
 	}
 
 	void Player::resetEphemeral() {

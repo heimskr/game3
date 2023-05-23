@@ -109,7 +109,7 @@ namespace Game3 {
 				auto entity = *entities.insert(Entity::fromJSON(game, entity_json)).first;
 				entity->setRealm(shared);
 				entitiesByGID[entity->globalID] = entity;
-				attach(entity);
+				// attach(entity);
 			}
 		}
 		if (json.contains("extra"))
@@ -466,7 +466,7 @@ namespace Game3 {
 		return {};
 	}
 
-	void Realm::remove(const EntityPtr &entity) {
+	void Realm::remove(EntityPtr entity) {
 		entitiesByGID.erase(entity->globalID);
 		detach(entity);
 		if (auto player = std::dynamic_pointer_cast<Player>(entity))
@@ -886,11 +886,15 @@ namespace Game3 {
 
 	void Realm::detach(const EntityPtr &entity) {
 		std::unique_lock lock(entitiesByChunkMutex);
-		if (auto iter = entitiesByChunk.find(entity->getChunk()); iter != entitiesByChunk.end()) {
-			iter->second->erase(entity);
-			if (iter->second->empty())
+
+		if (auto iter = entitiesByChunk.find(entity->getChunk()); iter != entitiesByChunk.end())
+			if (0 < iter->second->erase(entity) && iter->second->empty())
 				entitiesByChunk.erase(iter);
-		}
+
+		// Silly hack.
+		if (auto iter = entitiesByChunk.find({0, 0}); iter != entitiesByChunk.end())
+			if (0 < iter->second->erase(entity) && iter->second->empty())
+				entitiesByChunk.erase(iter);
 	}
 
 	void Realm::attach(const EntityPtr &entity) {

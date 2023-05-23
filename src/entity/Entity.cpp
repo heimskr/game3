@@ -37,17 +37,18 @@ namespace Game3 {
 		return out;
 	}
 
-	Entity::~Entity() {
-		if (storedSide == Side::Server) {
+	void Entity::destroy() {
+		auto realm = getRealm();
+		assert(realm);
+		realm->removeSafe(shared_from_this());
+
+		if (getSide() == Side::Server) {
 			auto lock = lockVisibleEntitiesShared();
 			if (!visibleEntities.empty()) {
-				if (storedWeak.lock()) {
-					for (const auto &weak_visible: visibleEntities)
-						if (auto visible = weak_visible.lock())
-							visible->removeVisible(storedWeak);
-				} else {
-					WARN("Couldn't lock storedWeak in ~Player");
-				}
+				auto shared = shared_from_this();
+				for (const auto &weak_visible: visibleEntities)
+					if (auto visible = weak_visible.lock())
+						visible->removeVisible(shared);
 			}
 		}
 	}
@@ -122,10 +123,7 @@ namespace Game3 {
 	void Entity::init(Game &game_) {
 		game = &game_;
 
-		storedSide = getSide();
-		storedWeak = shared_from_this();
-
-		if (texture == nullptr && storedSide == Side::Client)
+		if (texture == nullptr && getSide() == Side::Client)
 				texture = getTexture();
 
 		if (!inventory)
@@ -383,6 +381,7 @@ namespace Game3 {
 		if (auto old_realm = getRealm(); old_realm != new_realm) {
 			nextRealm = new_realm->id;
 			auto shared = shared_from_this();
+			old_realm->detach(shared);
 			old_realm->queueRemoval(shared);
 			new_realm->queueAddition(shared);
 		}
@@ -533,10 +532,10 @@ namespace Game3 {
 		auto lock = lockVisibleEntities();
 		auto shared = shared_from_this();
 
-		std::vector<EntityPtr> entities_to_erase;
+		std::vector<std::weak_ptr<Entity>> entities_to_erase;
 		entities_to_erase.reserve(visibleEntities.size());
 
-		std::vector<PlayerPtr> players_to_erase;
+		std::vector<std::weak_ptr<Player>> players_to_erase;
 		players_to_erase.reserve(visibleEntities.size() / 20);
 
 		for (const auto &weak_visible: visibleEntities) {
@@ -554,6 +553,7 @@ namespace Game3 {
 
 		for (const auto &entity: entities_to_erase)
 			visibleEntities.erase(entity);
+
 
 		for (const auto &player: players_to_erase)
 			visiblePlayers.erase(player);
@@ -624,6 +624,7 @@ namespace Game3 {
 			lock.unlock();
 			auto unique_lock = lockVisibleEntities();
 			visiblePlayers.erase(player);
+			visibleEntities.erase(player);
 		}
 	}
 

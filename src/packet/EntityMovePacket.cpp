@@ -3,8 +3,8 @@
 #include "packet/EntityMovePacket.h"
 
 namespace Game3 {
-	EntityMovePacket::EntityMovePacket(const EntityPtr &entity):
-		EntityMovePacket(entity->globalID, entity->nextRealm == -1? entity->realmID : entity->nextRealm, entity->realmID, entity->getPosition(), entity->direction, entity->offset.x(), entity->offset.y()) {}
+	EntityMovePacket::EntityMovePacket(const Entity &entity):
+		EntityMovePacket(entity.globalID, entity.nextRealm == -1? entity.realmID : entity.nextRealm, entity.realmID, entity.getPosition(), entity.direction, entity.offset.x(), entity.offset.y()) {}
 
 	void EntityMovePacket::handle(ClientGame &game) {
 		auto iter = game.realms.find(realmID);

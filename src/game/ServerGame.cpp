@@ -52,7 +52,7 @@ namespace Game3 {
 	}
 
 	void ServerGame::entityTeleported(const EntityPtr &entity) {
-		const EntityMovePacket packet(entity);
+		const EntityMovePacket packet(*entity);
 
 		if (auto cast_player = std::dynamic_pointer_cast<Player>(entity)) {
 			cast_player->send(packet);

@@ -111,7 +111,7 @@ namespace Game3 {
 			EntityPtr findEntity(const Position &);
 			EntityPtr findEntity(const Position &, const EntityPtr &except);
 			TileEntityPtr tileEntityAt(const Position &);
-			void remove(const EntityPtr &);
+			void remove(EntityPtr);
 			void removeSafe(const EntityPtr &);
 			void remove(TileEntityPtr, bool run_helper = true);
 			void removeSafe(const TileEntityPtr &);

@@ -66,8 +66,7 @@ namespace Game3 {
 			 *  before the actual realm switch has occurred. */
 			RealmID nextRealm = -1;
 
-			~Entity() override;
-			virtual void destroy() {}
+			virtual void destroy();
 
 			/** This won't call init() on the Entity. You need to do that yourself. */
 			template <typename T = Entity, typename... Args>
@@ -147,8 +146,6 @@ namespace Game3 {
 			Game *game = nullptr;
 			std::shared_ptr<Texture> texture;
 			int variety = 0;
-			Side storedSide = Side::Invalid;
-			std::weak_ptr<Entity> storedWeak;
 
 			Entity() = delete;
 			Entity(EntityType);

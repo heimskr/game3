@@ -37,7 +37,7 @@ namespace Game3 {
 			std::optional<Place> lastContinuousInteraction;
 			Modifiers continuousInteractionModifiers;
 
-			~Player() override;
+			void destroy() override;
 
 			static std::shared_ptr<Player> fromJSON(Game &, const nlohmann::json &);
 
@@ -69,6 +69,7 @@ namespace Game3 {
 			void stopMoving(Direction);
 			void movedToNewChunk() override;
 			bool send(const Packet &);
+			std::shared_ptr<Player> getShared();
 
 			friend class Entity;
 

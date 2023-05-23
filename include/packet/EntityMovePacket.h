@@ -21,7 +21,7 @@ namespace Game3 {
 		std::optional<float> yOffset;
 
 		EntityMovePacket() = default;
-		EntityMovePacket(const std::shared_ptr<Entity> &);
+		EntityMovePacket(const Entity &);
 		EntityMovePacket(GlobalID global_id, RealmID realm_id, RealmID previous_realm, const Position &position_, Direction facing_, std::optional<float> x_offset = {}, std::optional<float> y_offset = {}):
 			globalID(global_id), realmID(realm_id), previousRealm(previous_realm), position(position_), facing(facing_), xOffset(x_offset), yOffset(y_offset) {}
 
