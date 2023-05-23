@@ -1,6 +1,6 @@
 // Credit: https://github.com/Jam3/glsl-fast-gaussian-blur
 
-#version 430 core
+#version 330 core
 
 precision mediump float;
 

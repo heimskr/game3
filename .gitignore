@@ -8,7 +8,7 @@
 /include/resources.h
 *.zst
 /.github-deps
-/game3.zip
+/*.zip
 *.o.tmp
 *.crt
 *.key

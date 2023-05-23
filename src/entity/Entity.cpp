@@ -448,11 +448,11 @@ namespace Game3 {
 		if (out == PathResult::Success && getSide() == Side::Server) {
 			const EntitySetPathPacket packet(*this);
 			auto lock = lockVisibleEntitiesShared();
-			INFO("visiblePlayers<" << visiblePlayers.size() << ">");
+			// INFO("visiblePlayers<" << visiblePlayers.size() << ">");
 			for (const auto &weak_player: visiblePlayers) {
 				if (auto player = weak_player.lock()) {
 					pathSeers.insert(weak_player);
-					INFO("Sending EntitySetPath packet");
+					// INFO("Sending EntitySetPath packet");
 					player->send(packet);
 				}
 			}

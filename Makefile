@@ -11,7 +11,7 @@ ifeq ($(CUSTOM_BUILD),)
 		BUILDFLAGS := -g -O0 -fsanitize=address -fno-omit-frame-pointer
 		LDFLAGS    := -fsanitize=address
 	else ifeq ($(BUILD),nonnative)
-		BUILDFLAGS := -Ofast -march=x86-64-v3
+		BUILDFLAGS := -Ofast -g -march=x86-64-v3
 		LTO        := -flto
 	else ifeq ($(BUILD),o3gnative)
 		BUILDFLAGS := -O3 -g -march=native
@@ -92,7 +92,7 @@ include/resources.h: $(RESGEN)
 	$(RESGEN) -h > $@
 
 $(OUTPUT): $(OBJECTS) $(NOISE_OBJ)
-	@ printf "\e[2m[\e[22;36mld\e[39;2m]\e[22m $@\n"
+	@ printf "\e[2m[\e[22;36mld\e[39;2m]\e[22m $@ \e[2m$(LTO)\e[22m\n"
 	@ $(COMPILER) $^ -o $@ $(LDFLAGS)
 ifeq ($(GITHUB),true)
 	strip $@

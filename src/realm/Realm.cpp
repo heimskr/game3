@@ -177,7 +177,7 @@ namespace Game3 {
 		{
 			auto lock = lockEntitiesShared();
 			for (const auto &entity: entities)
-				if (!entity->isPlayer())
+				if (!entity->isPlayer() || !client_game.player || entity->globalID != client_game.player->globalID)
 					entity->render(sprite_renderer);
 		}
 

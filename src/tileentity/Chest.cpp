@@ -57,6 +57,9 @@ namespace Game3 {
 			auto &tileset = realm.getTileset();
 			const auto tilesize = tileset.getTileSize();
 			const auto tile_index = tileset[tileID];
+			assert(texture);
+			texture->init();
+			assert(texture->width);
 			const auto x = (tile_index % (*texture->width / tilesize)) * tilesize;
 			const auto y = (tile_index / (*texture->width / tilesize)) * tilesize;
 			sprite_renderer(*texture, {
@@ -77,12 +80,15 @@ namespace Game3 {
 	void Chest::encode(Game &game, Buffer &buffer) {
 		TileEntity::encode(game, buffer);
 		buffer << name;
+		buffer << texture->path.string();
 		HasInventory::encode(buffer);
 	}
 
 	void Chest::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
 		buffer >> name;
+		std::filesystem::path texture_path = buffer.take<std::string>();
 		HasInventory::decode(buffer);
+		texture = cacheTexture(texture_path);
 	}
 }

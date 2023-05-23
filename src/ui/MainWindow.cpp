@@ -290,7 +290,7 @@ namespace Game3 {
 		glArea.get_context()->make_current();
 		game = std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, canvas.get()));
 		game->client = std::make_shared<LocalClient>();
-		game->client->connect("::1", 12255);
+		game->client->connect("24.6.88.167", 12255);
 		game->client->weakGame = game;
 		game->initEntities();
 
@@ -680,17 +680,17 @@ namespace Game3 {
 						player.continuousInteraction = true;
 					break;
 				case GDK_KEY_o: {
-					if (game->debugMode) {
-						static std::default_random_engine item_rng;
-						static const std::array<ItemID, 3> ids {"base:shortsword", "base:red_potion", "base:coins"};
-						ItemStack stack(*game, choose(ids, item_rng), 1);
-						auto leftover = player.inventory->add(stack);
-						if (leftover) {
-							auto &realm = *player.getRealm();
-							realm.spawn<ItemEntity>(player.position, *leftover);
-							game->signal_player_inventory_update().emit(game->player);
-						}
-					}
+					// if (game->debugMode) {
+					// 	static std::default_random_engine item_rng;
+					// 	static const std::array<ItemID, 3> ids {"base:shortsword", "base:red_potion", "base:coins"};
+					// 	ItemStack stack(*game, choose(ids, item_rng), 1);
+					// 	auto leftover = player.inventory->add(stack);
+					// 	if (leftover) {
+					// 		auto &realm = *player.getRealm();
+					// 		realm.spawn<ItemEntity>(player.position, *leftover);
+					// 		game->signal_player_inventory_update().emit(game->player);
+					// 	}
+					// }
 					return;
 				}
 					return;
@@ -717,11 +717,11 @@ namespace Game3 {
 						game->player->focus(*canvas, false);
 					return;
 				case GDK_KEY_v:
-					if (game->debugMode) {
-						auto merchant = player.getRealm()->spawn<Merchant>(player.getPosition(), "base:entity/merchant");
-						merchant->inventory->add(ItemStack(*game, "base:red_potion", 6));
-						merchant->inventory->add(ItemStack(*game, "base:shortsword", 1));
-					}
+					// if (game->debugMode) {
+					// 	auto merchant = player.getRealm()->spawn<Merchant>(player.getPosition(), "base:entity/merchant");
+					// 	merchant->inventory->add(ItemStack(*game, "base:red_potion", 6));
+					// 	merchant->inventory->add(ItemStack(*game, "base:shortsword", 1));
+					// }
 					return;
 				case GDK_KEY_t:
 					std::cout << "Time: " << int(game->getHour()) << ':' << int(game->getMinute()) << '\n';
@@ -734,20 +734,20 @@ namespace Game3 {
 					return;
 				}
 				case GDK_KEY_g:
-					if (game->debugMode) {
-						try {
-							auto house = player.getRealm();
-							auto door = house->getTileEntity<Teleporter>();
-							const auto house_pos = door->targetPosition + Position(-1, 0);
-							auto overworld = game->realms.at(door->targetRealm);
-							player.getRealm()->spawn<Miner>(player.getPosition(), overworld->id, house->id, house_pos,
-								overworld->closestTileEntity<Building>(house_pos, [](const auto &building) {
-									return building->tileID == "base:tile/keep_sw"_id;
-								}));
-						} catch (const std::exception &err) {
-							std::cerr << err.what() << '\n';
-						}
-					}
+					// if (game->debugMode) {
+					// 	try {
+					// 		auto house = player.getRealm();
+					// 		auto door = house->getTileEntity<Teleporter>();
+					// 		const auto house_pos = door->targetPosition + Position(-1, 0);
+					// 		auto overworld = game->realms.at(door->targetRealm);
+					// 		player.getRealm()->spawn<Miner>(player.getPosition(), overworld->id, house->id, house_pos,
+					// 			overworld->closestTileEntity<Building>(house_pos, [](const auto &building) {
+					// 				return building->tileID == "base:tile/keep_sw"_id;
+					// 			}));
+					// 	} catch (const std::exception &err) {
+					// 		std::cerr << err.what() << '\n';
+					// 	}
+					// }
 					return;
 				case GDK_KEY_0:
 				case GDK_KEY_1:

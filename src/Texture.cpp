@@ -56,7 +56,7 @@ namespace Game3 {
 		auto canonical = std::filesystem::canonical(path).string();
 		if (textureCache.contains(canonical))
 			return textureCache.at(canonical);
-		return textureCache.try_emplace(canonical, std::make_shared<Texture>(Identifier(), canonical, alpha, filter == -1? DEFAULT_FILTER : filter)).first->second;
+		return textureCache.try_emplace(canonical, std::make_shared<Texture>(Identifier(), path, alpha, filter == -1? DEFAULT_FILTER : filter)).first->second;
 	}
 
 	std::shared_ptr<Texture> cacheTexture(const char *path, bool alpha, int filter) {
