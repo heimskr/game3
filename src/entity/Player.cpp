@@ -31,6 +31,8 @@ namespace Game3 {
 				if (auto visible = weak_visible.lock())
 					visible->removeVisible(std::weak_ptr(shared));
 		}
+
+		Entity::destroy();
 	}
 
 	std::shared_ptr<Player> Player::fromJSON(Game &game, const nlohmann::json &json) {
