@@ -80,10 +80,10 @@ namespace Game3 {
 
 			if (continuousInteraction) {
 				Place place = getPlace();
-				if (!lastContinousInteraction || *lastContinousInteraction != place) {
+				if (!lastContinuousInteraction || *lastContinuousInteraction != place) {
 					interactOn();
 					getRealm()->interactGround(std::dynamic_pointer_cast<Player>(shared_from_this()), position, continuousInteractionModifiers);
-					lastContinousInteraction = std::move(place);
+					lastContinuousInteraction = std::move(place);
 				}
 			}
 
@@ -122,6 +122,7 @@ namespace Game3 {
 		Entity::teleport(position, new_realm);
 		if (game.activeRealm->id != nextRealm && nextRealm != -1) {
 			game.activeRealm->onBlur();
+			game.activeRealm->removePlayer(std::dynamic_pointer_cast<Player>(shared_from_this()));
 			game.activeRealm = new_realm;
 			if (getSide() == Side::Client) {
 				game.activeRealm->onFocus();
@@ -269,7 +270,7 @@ namespace Game3 {
 		stopMoving();
 		continuousInteraction = false;
 		// `ticked` excluded intentionally. Probably.
-		lastContinousInteraction.reset();
+		lastContinuousInteraction.reset();
 		continuousInteractionModifiers = {};
 	}
 

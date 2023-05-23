@@ -73,6 +73,7 @@ namespace Game3 {
 	void ServerGame::remove(const PlayerPtr &player) {
 		auto lock = lockPlayersUnique();
 		players.erase(player);
+		player->destroy();
 	}
 
 	void ServerGame::handlePacket(RemoteClient &client, Packet &packet) {

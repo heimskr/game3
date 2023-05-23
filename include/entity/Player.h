@@ -34,7 +34,7 @@ namespace Game3 {
 			/** Server-side only. */
 			std::weak_ptr<RemoteClient> client;
 
-			std::optional<Place> lastContinousInteraction;
+			std::optional<Place> lastContinuousInteraction;
 			Modifiers continuousInteractionModifiers;
 
 			~Player() override;

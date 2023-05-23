@@ -290,7 +290,7 @@ namespace Game3 {
 		glArea.get_context()->make_current();
 		game = std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, canvas.get()));
 		game->client = std::make_shared<LocalClient>();
-		game->client->connect("24.6.88.167", 12255);
+		game->client->connect("::1", 12255);
 		game->client->weakGame = game;
 		game->initEntities();
 

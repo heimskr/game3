@@ -35,7 +35,6 @@ namespace Game3 {
 	using PlayerPtr = std::shared_ptr<Player>;
 
 	struct Place;
-	using PlacePtr = std::shared_ptr<Place>;
 
 	enum class Side {Invalid, Server, Client};
 

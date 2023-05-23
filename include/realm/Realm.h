@@ -24,6 +24,7 @@
 #include "util/GL.h"
 #include "util/RWLock.h"
 #include "util/SharedRecursiveMutex.h"
+#include "util/WeakCompare.h"
 
 namespace Game3 {
 	constexpr int64_t REALM_DIAMETER = 3;
@@ -68,7 +69,7 @@ namespace Game3 {
 			/** Governed by entityMutex. */
 			std::unordered_map<GlobalID, EntityPtr> entitiesByGID;
 			/** Governed by entityMutex. */
-			std::unordered_set<PlayerPtr> players;
+			WeakSet<Player> players;
 			nlohmann::json extraData;
 			Position randomLand;
 			/** Whether the realm's rendering should be affected by the day-night cycle. */

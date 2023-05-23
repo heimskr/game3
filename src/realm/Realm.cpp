@@ -784,11 +784,13 @@ namespace Game3 {
 	bool Realm::isVisible(const Position &position) const {
 		const auto chunk_pos = getChunkPosition(position);
 
-		for (const auto &player: players) {
-			const auto player_chunk_pos = getChunkPosition(player->getPosition());
-			if (player_chunk_pos.x - REALM_DIAMETER / 2 <= chunk_pos.x && chunk_pos.x <= player_chunk_pos.x + REALM_DIAMETER / 2)
-				if (player_chunk_pos.y - REALM_DIAMETER / 2 <= chunk_pos.y && chunk_pos.y <= player_chunk_pos.y + REALM_DIAMETER / 2)
-					return true;
+		for (const auto &weak_player: players) {
+			if (auto player = weak_player.lock()) {
+				const auto player_chunk_pos = getChunkPosition(player->getPosition());
+				if (player_chunk_pos.x - REALM_DIAMETER / 2 <= chunk_pos.x && chunk_pos.x <= player_chunk_pos.x + REALM_DIAMETER / 2)
+					if (player_chunk_pos.y - REALM_DIAMETER / 2 <= chunk_pos.y && chunk_pos.y <= player_chunk_pos.y + REALM_DIAMETER / 2)
+						return true;
+			}
 		}
 
 		return false;
