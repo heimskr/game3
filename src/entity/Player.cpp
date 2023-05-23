@@ -51,13 +51,16 @@ namespace Game3 {
 		if (getSide() == Side::Server) {
 			Direction final_direction = direction;
 
-			if (movingLeft)
+			if (movingLeft && !movingRight)
 				move(final_direction = Direction::Left);
-			if (movingRight)
+
+			if (movingRight && !movingLeft)
 				move(final_direction = Direction::Right);
-			if (movingUp)
+
+			if (movingUp && !movingDown)
 				move(final_direction = Direction::Up);
-			if (movingDown)
+
+			if (movingDown && !movingUp)
 				move(final_direction = Direction::Down);
 
 			if (continuousInteraction) {
