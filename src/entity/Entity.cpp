@@ -50,6 +50,8 @@ namespace Game3 {
 					if (auto visible = weak_visible.lock())
 						visible->removeVisible(shared);
 			}
+
+			getGame().toServer().entityDestroyed(*this);
 		}
 	}
 
@@ -374,7 +376,7 @@ namespace Game3 {
 		}
 
 		if (!from_path && getSide() == Side::Server)
-			getGame().toServer().entityTeleported(shared_from_this());
+			getGame().toServer().entityTeleported(*this);
 	}
 
 	void Entity::teleport(const Position &new_position, const std::shared_ptr<Realm> &new_realm) {

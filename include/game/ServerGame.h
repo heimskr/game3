@@ -24,7 +24,8 @@ namespace Game3 {
 			Side getSide() const override { return Side::Server; }
 			void queuePacket(std::shared_ptr<RemoteClient>, std::shared_ptr<Packet>);
 			void runCommand(RemoteClient &, const std::string &, GlobalID);
-			void entityTeleported(const EntityPtr &);
+			void entityTeleported(Entity &);
+			void entityDestroyed(const Entity &);
 			void remove(const PlayerPtr &);
 
 		private:

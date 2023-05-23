@@ -4,6 +4,7 @@
 #include "net/LocalServer.h"
 #include "net/RemoteClient.h"
 #include "packet/CommandResultPacket.h"
+#include "packet/DestroyEntityPacket.h"
 #include "packet/EntityMovePacket.h"
 #include "packet/TileUpdatePacket.h"
 #include "util/Util.h"
@@ -51,23 +52,30 @@ namespace Game3 {
 		client.send(packet);
 	}
 
-	void ServerGame::entityTeleported(const EntityPtr &entity) {
-		const EntityMovePacket packet(*entity);
+	void ServerGame::entityTeleported(Entity &entity) {
+		const EntityMovePacket packet(entity);
 
-		if (auto cast_player = std::dynamic_pointer_cast<Player>(entity)) {
+		if (auto cast_player = dynamic_cast<Player *>(&entity)) {
 			cast_player->send(packet);
 			auto lock = lockPlayersShared();
 			for (const auto &player: players)
-				if (player != cast_player && player->getRealm() && player->canSee(*entity))
+				if (player.get() != cast_player && player->getRealm() && player->canSee(entity))
 					if (auto client = player->client.lock())
 						client->send(packet);
 		} else {
 			auto lock = lockPlayersShared();
 			for (const auto &player: players)
-				if (player->getRealm() && player->canSee(*entity))
+				if (player->getRealm() && player->canSee(entity))
 					if (auto client = player->client.lock())
 						client->send(packet);
 		}
+	}
+
+	void ServerGame::entityDestroyed(const Entity &entity) {
+		const DestroyEntityPacket packet(entity);
+		auto lock = server->server->lockClients();
+		for (const auto &[client_id, client]: server->server->getClients())
+			std::dynamic_pointer_cast<RemoteClient>(client)->send(packet);
 	}
 
 	void ServerGame::remove(const PlayerPtr &player) {
