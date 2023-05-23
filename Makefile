@@ -16,8 +16,11 @@ ifeq ($(CUSTOM_BUILD),)
 	else ifeq ($(BUILD),o3gnative)
 		BUILDFLAGS := -O3 -g -march=native
 		LTO        := -flto
-	else
+	else ifeq ($(BUILD),release)
 		BUILDFLAGS := -Ofast -march=native
+		LTO        := -flto
+	else
+		BUILDFLAGS := -g -Ofast -march=native
 		LTO        := -flto
 	endif
 else

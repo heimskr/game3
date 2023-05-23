@@ -70,6 +70,11 @@ namespace Game3 {
 		}
 	}
 
+	void ServerGame::remove(const PlayerPtr &player) {
+		auto lock = lockPlayersUnique();
+		players.erase(player);
+	}
+
 	void ServerGame::handlePacket(RemoteClient &client, Packet &packet) {
 		packet.handle(*this, client);
 	}

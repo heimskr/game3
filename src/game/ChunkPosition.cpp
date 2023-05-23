@@ -1,5 +1,6 @@
 #include "game/ChunkPosition.h"
 #include "net/Buffer.h"
+#include "realm/Realm.h"
 
 namespace Game3 {
 	std::default_random_engine ChunkPosition::getRNG() const {
@@ -25,6 +26,13 @@ namespace Game3 {
 	ChunkPosition::operator std::string() const {
 		return '(' + std::to_string(x) + ", " + std::to_string(y) + ')';
 	}
+
+	ChunkRange::ChunkRange(ChunkPosition top_left, ChunkPosition bottom_right):
+		topLeft(top_left), bottomRight(bottom_right) {}
+
+	ChunkRange::ChunkRange(ChunkPosition chunk_position):
+		topLeft{chunk_position.x - static_cast<int32_t>(REALM_DIAMETER / 2), chunk_position.y - static_cast<int32_t>(REALM_DIAMETER / 2)},
+		bottomRight{chunk_position.x + static_cast<int32_t>(REALM_DIAMETER / 2), chunk_position.y + static_cast<int32_t>(REALM_DIAMETER / 2)} {}
 
 	void from_json(const nlohmann::json &json, ChunkPosition &position) {
 		position.x = json.at(0);

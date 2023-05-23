@@ -35,7 +35,7 @@ namespace Game3 {
 			RemoteClient(LocalServer &server_, int id_, int fd, std::string_view ip_, bufferevent *event):
 				GenericClient(*server_.server, id_, fd, ip_, event), server(server_) {}
 
-			~RemoteClient() override = default;
+			~RemoteClient() override { std::cerr << "~RemoteClient(" << this << ")\n"; }
 
 			void handleInput(std::string_view) override;
 			void send(const Packet &);

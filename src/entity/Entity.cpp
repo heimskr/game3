@@ -46,6 +46,19 @@ namespace Game3 {
 				ERROR("Couldn't erase " << globalID << " from allEntities!");
 			}
 		}
+
+		if (storedSide == Side::Server) {
+			auto lock = lockVisibleEntitiesShared();
+			if (!visibleEntities.empty()) {
+				if (storedWeak.lock()) {
+					for (const auto &weak_visible: visibleEntities)
+						if (auto visible = weak_visible.lock())
+							visible->removeVisible(storedWeak);
+				} else {
+					WARN("Couldn't lock storedWeak in ~Player");
+				}
+			}
+		}
 	}
 
 	void Entity::toJSON(nlohmann::json &json) const {
@@ -118,7 +131,10 @@ namespace Game3 {
 	void Entity::init(Game &game_) {
 		game = &game_;
 
-		if (texture == nullptr && getSide() == Side::Client)
+		storedSide = getSide();
+		storedWeak = shared_from_this();
+
+		if (texture == nullptr && storedSide == Side::Client)
 				texture = getTexture();
 
 		if (!inventory)
@@ -130,6 +146,8 @@ namespace Game3 {
 			auto lock = game->lockAllEntities();
 			game->allEntities.emplace(getGID(), shared_from_this());
 		}
+
+		movedToNewChunk();
 	}
 
 	void Entity::render(SpriteRenderer &sprite_renderer) {
@@ -227,8 +245,10 @@ namespace Game3 {
 
 	bool Entity::move(Direction move_direction) {
 		auto realm = weakRealm.lock();
-		if (!realm)
+		if (!realm) {
+			if (getSide() == Side::Client) WARN("Can't move entity " << globalID << ": no realm");
 			return false;
+		}
 
 		Position new_position = position;
 		float x_offset = 0.f;
@@ -261,12 +281,14 @@ namespace Game3 {
 				throw std::invalid_argument("Invalid direction: " + std::to_string(int(move_direction)));
 		}
 
-		if ((horizontal && offset.x() != 0) || (!horizontal && offset.y() != 0))
+		if ((horizontal && offset.x() != 0) || (!horizontal && offset.y() != 0)) {
+			// WARN("Can't move entity " << globalID << ": improper offsets [" << horizontal << "/" << offset.x() << ", " << !horizontal << "/" << offset.y() << "]");
 			return false;
+		}
 
 		if (canMoveTo(new_position)) {
 			if (getChunkPosition(position) != getChunkPosition(new_position)) {
-				calculateVisiblePlayers();
+				movedToNewChunk();
 			}
 
 			if (horizontal)
@@ -439,10 +461,14 @@ namespace Game3 {
 
 		if (out == PathResult::Success && getSide() == Side::Server) {
 			const EntitySetPathPacket packet(*this);
-			auto lock = lockVisiblePlayersShared();
-			for (const auto &player: visiblePlayers) {
-				pathSeers.insert(player);
-				player->send(packet);
+			auto lock = lockVisibleEntitiesShared();
+			INFO("visiblePlayers<" << visiblePlayers.size() << ">");
+			for (const auto &weak_player: visiblePlayers) {
+				if (auto player = weak_player.lock()) {
+					pathSeers.insert(weak_player);
+					INFO("Sending EntitySetPath packet");
+					player->send(packet);
+				}
 			}
 		}
 
@@ -499,6 +525,131 @@ namespace Game3 {
 		}
 
 		Agent::setGID(new_gid);
+	}
+
+	bool Entity::canSee(RealmID realm_id, const Position &pos) const {
+		const auto &realm = *getRealm();
+
+		if (realm_id != (nextRealm == -1? realm.id : nextRealm))
+			return false;
+
+		const auto this_position = getChunk();
+		const auto other_position = getChunkPosition(pos);
+
+		if (this_position.x - REALM_DIAMETER / 2 <= other_position.x && other_position.x <= this_position.x + REALM_DIAMETER / 2)
+			if (this_position.y - REALM_DIAMETER / 2 <= other_position.y && other_position.y <= this_position.y + REALM_DIAMETER / 2)
+				return true;
+
+		return false;
+	}
+
+	bool Entity::canSee(const Entity &entity) const {
+		return canSee(entity.realmID, entity.getPosition());
+	}
+
+	bool Entity::canSee(const TileEntity &tile_entity) const {
+		return canSee(tile_entity.realmID, tile_entity.getPosition());
+	}
+
+	void Entity::movedToNewChunk() {
+		if (getSide() != Side::Server)
+			return;
+
+		auto lock = lockVisibleEntities();
+		auto shared = shared_from_this();
+
+		std::vector<EntityPtr> entities_to_erase;
+		entities_to_erase.reserve(visibleEntities.size());
+
+		std::vector<PlayerPtr> players_to_erase;
+		players_to_erase.reserve(visibleEntities.size() / 20);
+
+		for (const auto &weak_visible: visibleEntities) {
+			if (auto visible = weak_visible.lock()) {
+				if (!canSee(*visible)) {
+					assert(visible.get() != this);
+					entities_to_erase.push_back(visible);
+					auto other_lock = visible->lockVisibleEntities();
+					visible->visibleEntities.erase(shared);
+					if (visible->isPlayer())
+						players_to_erase.push_back(std::dynamic_pointer_cast<Player>(visible));
+				}
+			}
+		}
+
+		for (const auto &entity: entities_to_erase)
+			visibleEntities.erase(entity);
+
+		for (const auto &player: players_to_erase)
+			visiblePlayers.erase(player);
+
+		if (auto realm = weakRealm.lock()) {
+			const auto this_player = std::dynamic_pointer_cast<Player>(shared);
+			ChunkRange(getChunk()).iterate([this, realm, shared, this_player](ChunkPosition chunk_position) {
+				if (auto visible_at_chunk = realm->getEntities(chunk_position)) {
+					for (const auto &visible: *visible_at_chunk) {
+						if (visible.get() == this)
+							continue;
+						visibleEntities.insert(visible);
+						if (visible->isPlayer())
+							visiblePlayers.insert(std::dynamic_pointer_cast<Player>(visible));
+						auto other_lock = visible->lockVisibleEntities();
+						visible->visibleEntities.insert(shared);
+						if (this_player)
+							visible->visiblePlayers.insert(this_player);
+
+					}
+				}
+			});
+		}
+
+		if (!path.empty()) {
+			lock.unlock();
+			auto shared_lock = lockVisibleEntitiesShared();
+
+			if (!visiblePlayers.empty()) {
+				const EntitySetPathPacket packet(*this);
+				for (const auto &weak_player: visiblePlayers) {
+					if (auto player = weak_player.lock(); !hasSeenPath(player)) {
+						INFO("Late sending EntitySetPathPacket (Entity)");
+						player->send(packet);
+						setSeenPath(player);
+					}
+				}
+			}
+		}
+	}
+
+	bool Entity::hasSeenPath(const PlayerPtr &player) {
+		std::shared_lock lock(pathSeersMutex);
+		return pathSeers.contains(player);
+	}
+
+	void Entity::setSeenPath(const PlayerPtr &player, bool seen) {
+		std::unique_lock lock(pathSeersMutex);
+
+		if (seen)
+			pathSeers.insert(player);
+		else
+			pathSeers.erase(player);
+	}
+
+	void Entity::removeVisible(const std::weak_ptr<Entity> &entity) {
+		auto lock = lockVisibleEntitiesShared();
+		if (visibleEntities.contains(entity)) {
+			lock.unlock();
+			auto unique_lock = lockVisibleEntities();
+			visibleEntities.erase(entity);
+		}
+	}
+
+	void Entity::removeVisible(const std::weak_ptr<Player> &player) {
+		auto lock = lockVisibleEntitiesShared();
+		if (visiblePlayers.contains(player)) {
+			lock.unlock();
+			auto unique_lock = lockVisibleEntities();
+			visiblePlayers.erase(player);
+		}
 	}
 
 	void Entity::encode(Buffer &buffer) {
@@ -562,7 +713,7 @@ namespace Game3 {
 		return game_ref.registry<TextureRegistry>().at(entity_texture->textureID);
 	}
 
-	void Entity::calculateVisiblePlayers() {
+	void Entity::calculateVisibleEntities() {
 		if (getSide() != Side::Server)
 			return;
 
@@ -570,11 +721,12 @@ namespace Game3 {
 		if (!realm)
 			return;
 
-		auto lock = lockVisiblePlayers();
-		visiblePlayers.clear();
-		for (const auto &player: realm->getPlayers())
-			if (player->canSee(*this))
-				visiblePlayers.insert(player);
+		auto visible_lock = lockVisibleEntities();
+		visibleEntities.clear();
+		auto entities_lock = realm->lockEntitiesShared();
+		for (const auto &entity: realm->entities)
+			if (entity.get() != this && entity->canSee(*this))
+				visibleEntities.insert(entity);
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {

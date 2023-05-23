@@ -24,6 +24,10 @@ namespace Game3 {
 				return;
 		}
 
+		if (!dynamic_cast<Player *>(entity.get())) {
+			INFO("Moving non-player entity");
+		}
+
 		entity->direction = facing;
 		entity->teleport(position, realm);
 

@@ -8,14 +8,19 @@ namespace Game3 {
 
 	void EntitySetPathPacket::handle(ClientGame &game) {
 		auto iter = game.realms.find(realmID);
-		if (iter == game.realms.end())
+		if (iter == game.realms.end()) {
+			ERROR("EntitySetPathPacket: can't find realm " << realmID);
 			return;
+		}
 
 		auto realm = iter->second;
 		auto entity = realm->getEntity(globalID);
-		if (!entity)
+		if (!entity) {
+			ERROR("EntitySetPathPacket: can't find entity " << globalID << " in realm " << realmID);
 			return;
+		}
 
 		entity->path = {path.begin(), path.end()};
+		SUCCESS("Set path of " << typeid(*entity).name() << " " << globalID << " in realm " << realmID << "; new size: " << entity->path.size());
 	}
 }

@@ -9,6 +9,7 @@
 #include "net/Buffer.h"
 #include "net/LocalClient.h"
 #include "net/RemoteClient.h"
+#include "packet/EntitySetPathPacket.h"
 #include "packet/RealmNoticePacket.h"
 #include "packet/StartPlayerMovementPacket.h"
 #include "packet/StopPlayerMovementPacket.h"
@@ -20,6 +21,20 @@
 namespace Game3 {
 	Player::Player():
 		Entity(ID()) {}
+
+	Player::~Player() {
+		INFO("~Player(" << this << ")");
+		auto lock = lockVisibleEntitiesShared();
+		if (!visibleEntities.empty()) {
+			if (storedWeak.lock()) {
+				for (const auto &weak_visible: visibleEntities)
+					if (auto visible = weak_visible.lock())
+						visible->removeVisible(storedWeak);
+			} else {
+				WARN("Couldn't lock storedWeak in ~Player");
+			}
+		}
+	}
 
 	std::shared_ptr<Player> Player::fromJSON(Game &game, const nlohmann::json &json) {
 		auto out = Entity::create<Player>();
@@ -170,30 +185,6 @@ namespace Game3 {
 		}
 	}
 
-	bool Player::canSee(RealmID realm_id, const Position &pos) const {
-		const auto &realm = *getRealm();
-
-		if (realm_id != (nextRealm == -1? realm.id : nextRealm))
-			return false;
-
-		const auto player_position = getChunk();
-		const auto chunk_position = getChunkPosition(pos);
-
-		if (player_position.x - REALM_DIAMETER / 2 <= chunk_position.x && chunk_position.x <= player_position.x + REALM_DIAMETER / 2)
-			if (player_position.y - REALM_DIAMETER / 2 <= chunk_position.y && chunk_position.y <= player_position.y + REALM_DIAMETER / 2)
-				return true;
-
-		return false;
-	}
-
-	bool Player::canSee(const Entity &entity) const {
-		return canSee(entity.realmID, entity.getPosition());
-	}
-
-	bool Player::canSee(const TileEntity &tile_entity) const {
-		return canSee(tile_entity.realmID, tile_entity.getPosition());
-	}
-
 	void Player::setupRealm(const Game &game) {
 		weakRealm = game.realms.at(realmID);
 	}
@@ -247,6 +238,22 @@ namespace Game3 {
 
 		if (getSide() == Side::Client)
 			getGame().toClient().client->send(StopPlayerMovementPacket(direction));
+	}
+
+	void Player::movedToNewChunk() {
+		Entity::movedToNewChunk();
+
+		auto shared = std::dynamic_pointer_cast<Player>(shared_from_this());
+		auto lock = lockVisibleEntitiesShared();
+		for (const auto &weak_visible: visibleEntities) {
+			if (auto visible = weak_visible.lock()) {
+				if (!visible->path.empty() && visible->hasSeenPath(shared)) {
+					INFO("Late sending EntitySetPathPacket (Player)");
+					send(EntitySetPathPacket(*visible));
+					visible->setSeenPath(shared);
+				}
+			}
+		}
 	}
 
 	bool Player::send(const Packet &packet) {

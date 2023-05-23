@@ -316,6 +316,7 @@ namespace Game3 {
 				return lock;
 			}
 
+		public:
 			inline auto lockEntitiesShared() {
 				try {
 					return std::shared_lock(entityMutex);

@@ -21,6 +21,7 @@
 #include "game/ChunkPosition.h"
 #include "game/HasInventory.h"
 #include "item/Item.h"
+#include "util/WeakCompare.h"
 
 namespace Game3 {
 	class Canvas;
@@ -30,6 +31,7 @@ namespace Game3 {
 	class Realm;
 	class RemoteClient;
 	class SpriteRenderer;
+	class TileEntity;
 
 	struct EntityTexture: NamedRegisterable {
 		Identifier textureID;
@@ -56,7 +58,10 @@ namespace Game3 {
 			std::list<Direction> path;
 			MoneyCount money = 0;
 			HitPoints health = 0;
-			std::unordered_set<PlayerPtr> visiblePlayers;
+			/** Governed by visibleEntititesMutex. */
+			WeakSet<Entity> visibleEntities;
+			/** Governed by visibleEntititesMutex. */
+			WeakSet<Player> visiblePlayers;
 			/** Set when an entity is beginning to teleport so that an EntityMovePacket can be sent with the proper realm ID
 			 *  before the actual realm switch has occurred. */
 			RealmID nextRealm = -1;
@@ -118,11 +123,19 @@ namespace Game3 {
 			Side getSide() const;
 			ChunkPosition getChunk() const;
 			void setGID(GlobalID) override;
+			bool canSee(RealmID, const Position &) const;
+			bool canSee(const Entity &) const;
+			bool canSee(const TileEntity &) const;
+			virtual void movedToNewChunk();
+			bool hasSeenPath(const PlayerPtr &);
+			void setSeenPath(const PlayerPtr &, bool seen = true);
+			void removeVisible(const std::weak_ptr<Entity> &);
+			void removeVisible(const std::weak_ptr<Player> &);
 			inline bool is(const Identifier &check) const { return type == check; }
 			inline auto getHeldLeft()  const { return heldLeft.slot;  }
 			inline auto getHeldRight() const { return heldRight.slot; }
-			inline auto lockVisiblePlayers() { return std::unique_lock(visiblePlayersMutex); }
-			inline auto lockVisiblePlayersShared() { return std::shared_lock(visiblePlayersMutex); }
+			inline auto lockVisibleEntities() { return std::unique_lock(visibleEntitiesMutex); }
+			inline auto lockVisibleEntitiesShared() { return std::shared_lock(visibleEntitiesMutex); }
 
 			virtual void encode(Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */
@@ -134,6 +147,8 @@ namespace Game3 {
 			Game *game = nullptr;
 			std::shared_ptr<Texture> texture;
 			int variety = 0;
+			Side storedSide = Side::Invalid;
+			std::weak_ptr<Entity> storedWeak;
 
 			Entity() = delete;
 			Entity(EntityType);
@@ -144,7 +159,7 @@ namespace Game3 {
 			std::shared_ptr<Texture> getTexture();
 			inline auto getHeldLeftTexture()  const { return heldLeft.texture;  }
 			inline auto getHeldRightTexture() const { return heldRight.texture; }
-			void calculateVisiblePlayers();
+			void calculateVisibleEntities();
 
 			std::shared_ptr<Agent> getSharedAgent() override { return shared_from_this(); }
 
@@ -159,10 +174,11 @@ namespace Game3 {
 
 			Held heldLeft;
 			Held heldRight;
-			/** The set of all players who have been sent a packet about the entity's current path. */
-			std::unordered_set<PlayerPtr> pathSeers;
+			/** The set of all players who have been sent a packet about the entity's current path. Governed by pathSeersMutex */
+			WeakSet<Player> pathSeers;
 
-			std::shared_mutex visiblePlayersMutex;
+			std::shared_mutex visibleEntitiesMutex;
+			std::shared_mutex pathSeersMutex;
 
 			void setHeld(Slot, Held &);
 	};

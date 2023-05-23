@@ -31,12 +31,23 @@ namespace Game3 {
 	server(std::move(server_)), secret(secret_) {
 		server->addClient = [this](auto &, int new_client, std::string_view ip, int fd, bufferevent *event) {
 			auto game_client = std::make_shared<RemoteClient>(*this, new_client, fd, ip, event);
+			auto lock = server->lockClients();
 			server->getClients().try_emplace(new_client, std::move(game_client));
 			INFO("Adding " << new_client << " from " << ip);
 		};
 
-		server->closeHandler = [](int client_id) {
+		server->closeHandler = [this](int client_id) {
 			INFO("Closing " << client_id);
+			std::shared_ptr<RemoteClient> client;
+			{
+				auto lock = server->lockClients();
+				client = std::dynamic_pointer_cast<RemoteClient>(server->getClients().at(client_id));
+			}
+			assert(client);
+			auto player = client->getPlayer();
+			player->client.reset();
+			game->remove(player);
+			std::cout << "Player ref count: " << player.use_count() << '\n';
 		};
 
 		server->messageHandler = [](GenericClient &generic_client, std::string_view message) {

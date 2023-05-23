@@ -391,7 +391,22 @@ namespace Game3 {
 					entity->tick(game, delta);
 			}
 
+			{
+				auto lock = lockTileEntitiesShared();
+				for (auto &[index, tile_entity]: tileEntities)
+					tile_entity->tick(game, delta);
+			}
+
 			ticking = false;
+
+			for (const auto &stolen: entityRemovalQueue.steal())
+				remove(stolen);
+
+			for (const auto &stolen: tileEntityRemovalQueue.steal())
+				remove(stolen);
+
+			for (const auto &stolen: generalQueue.steal())
+				stolen();
 
 			Index row_index = 0;
 			for (auto &row: *renderers) {

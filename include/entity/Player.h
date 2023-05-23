@@ -37,6 +37,8 @@ namespace Game3 {
 			std::optional<Place> lastContinousInteraction;
 			Modifiers continuousInteractionModifiers;
 
+			~Player() override;
+
 			static std::shared_ptr<Player> fromJSON(Game &, const nlohmann::json &);
 
 			HitPoints maxHealth() const override { return MAX_HEALTH; }
@@ -59,15 +61,13 @@ namespace Game3 {
 			Place getPlace() override;
 			bool isMoving() const;
 			bool isMoving(Direction) const;
-			bool canSee(RealmID, const Position &) const;
-			bool canSee(const Entity &) const;
-			bool canSee(const TileEntity &) const;
 			void setupRealm(const Game &);
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;
 			void startMoving(Direction);
 			void stopMoving();
 			void stopMoving(Direction);
+			void movedToNewChunk() override;
 			bool send(const Packet &);
 
 			friend class Entity;

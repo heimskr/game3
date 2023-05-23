@@ -41,6 +41,9 @@ namespace Game3 {
 		ChunkPosition topLeft;
 		ChunkPosition bottomRight;
 
+		ChunkRange(ChunkPosition top_left, ChunkPosition bottom_right);
+		ChunkRange(ChunkPosition);
+
 		inline Index tileWidth() const  { return (bottomRight.x - topLeft.x + 1) * CHUNK_SIZE; }
 		inline Index tileHeight() const { return (bottomRight.y - topLeft.y + 1) * CHUNK_SIZE; }
 
@@ -52,6 +55,13 @@ namespace Game3 {
 		inline Index columnMax() const { return (bottomRight.x + 1) * CHUNK_SIZE - 1; }
 
 		auto operator<=>(const ChunkRange &) const = default;
+
+		template <typename Fn>
+		void iterate(const Fn &fn) {
+			for (auto y = topLeft.y; y <= bottomRight.y; ++y)
+				for (auto x = topLeft.x; x <= bottomRight.x; ++x)
+					fn(ChunkPosition{x, y});
+		}
 	};
 
 	void from_json(const nlohmann::json &, ChunkRange &);

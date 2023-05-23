@@ -25,6 +25,7 @@ namespace Game3 {
 			void queuePacket(std::shared_ptr<RemoteClient>, std::shared_ptr<Packet>);
 			void runCommand(RemoteClient &, const std::string &, GlobalID);
 			void entityTeleported(const EntityPtr &);
+			void remove(const PlayerPtr &);
 
 		private:
 			std::shared_mutex playersMutex;
