@@ -53,11 +53,21 @@ namespace Game3 {
 
 	void ServerGame::entityTeleported(const EntityPtr &entity) {
 		const EntityMovePacket packet(entity);
-		auto lock = lockPlayersShared();
-		for (const auto &player: players)
-			if (player->getRealm() && player->canSee(*entity))
-				if (auto client = player->client.lock())
-					client->send(packet);
+
+		if (auto cast_player = std::dynamic_pointer_cast<Player>(entity)) {
+			cast_player->send(packet);
+			auto lock = lockPlayersShared();
+			for (const auto &player: players)
+				if (player != cast_player && player->getRealm() && player->canSee(*entity))
+					if (auto client = player->client.lock())
+						client->send(packet);
+		} else {
+			auto lock = lockPlayersShared();
+			for (const auto &player: players)
+				if (player->getRealm() && player->canSee(*entity))
+					if (auto client = player->client.lock())
+						client->send(packet);
+		}
 	}
 
 	void ServerGame::handlePacket(RemoteClient &client, Packet &packet) {

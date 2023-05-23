@@ -18,14 +18,10 @@ namespace Game3 {
 
 		if (!entity) {
 			auto lock = game.lockAllEntitiesShared();
-			auto iter = game.allEntities.find(globalID);
-
-			if (iter == game.allEntities.end()) {
-				WARN("Couldn't find entity " << globalID << " in realm " << realm->id << " or in allEntities");
+			if (auto iter = game.allEntities.find(globalID); iter != game.allEntities.end())
+				entity = iter->second;
+			else
 				return;
-			}
-
-			entity = iter->second;
 		}
 
 		entity->direction = facing;

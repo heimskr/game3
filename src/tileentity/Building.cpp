@@ -22,6 +22,8 @@ namespace Game3 {
 	}
 
 	bool Building::onInteractNextTo(const std::shared_ptr<Player> &player) {
+		if (getSide() == Side::Client)
+			return false;
 		teleport(player);
 		return true;
 	}
