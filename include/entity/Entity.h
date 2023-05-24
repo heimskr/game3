@@ -142,6 +142,12 @@ namespace Game3 {
 
 			void sendTo(RemoteClient &);
 
+			template <template <typename...> typename T>
+			T<Direction> copyPath() {
+				std::shared_lock lock(pathMutex);
+				return {path.begin(), path.end()};
+			}
+
 		protected:
 			Game *game = nullptr;
 			std::shared_ptr<Texture> texture;
@@ -176,6 +182,7 @@ namespace Game3 {
 
 			std::shared_mutex visibleEntitiesMutex;
 			std::shared_mutex pathSeersMutex;
+			std::shared_mutex pathMutex;
 
 			void setHeld(Slot, Held &);
 	};

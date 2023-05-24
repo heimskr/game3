@@ -16,7 +16,7 @@ namespace Game3 {
 		std::vector<Direction> path;
 
 		EntitySetPathPacket() = default;
-		EntitySetPathPacket(const Entity &);
+		EntitySetPathPacket(Entity &);
 		EntitySetPathPacket(GlobalID global_id, RealmID realm_id, const Position &position_, const std::vector<Direction> &path_):
 			globalID(global_id), realmID(realm_id), position(position_), path(path_) {}
 

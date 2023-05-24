@@ -3,8 +3,8 @@
 #include "packet/EntitySetPathPacket.h"
 
 namespace Game3 {
-	EntitySetPathPacket::EntitySetPathPacket(const Entity &entity):
-		EntitySetPathPacket(entity.globalID, entity.realmID, entity.getPosition(), {entity.path.begin(), entity.path.end()}) {}
+	EntitySetPathPacket::EntitySetPathPacket(Entity &entity):
+		EntitySetPathPacket(entity.globalID, entity.realmID, entity.getPosition(), entity.copyPath<std::vector>()) {}
 
 	void EntitySetPathPacket::handle(ClientGame &game) {
 		auto iter = game.realms.find(realmID);

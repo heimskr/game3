@@ -63,8 +63,12 @@ namespace Game3 {
 		json["health"]    = health;
 		if (inventory)
 			json["inventory"] = *inventory;
-		if (!path.empty())
-			json["path"] = path;
+		{
+			// I'm sorry. nlohmann forced my hand.
+			std::shared_lock lock(const_cast<Entity *>(this)->pathMutex);
+			if (!path.empty())
+				json["path"] = path;
+		}
 		if (money != 0)
 			json["money"] = money;
 		if (0 <= heldLeft.slot)
@@ -89,8 +93,10 @@ namespace Game3 {
 			health = *iter;
 		if (auto iter = json.find("inventory"); iter != json.end())
 			inventory = std::make_shared<Inventory>(Inventory::fromJSON(game, *iter, shared_from_this()));
-		if (auto iter = json.find("path"); iter != json.end())
+		if (auto iter = json.find("path"); iter != json.end()) {
+			std::unique_lock lock(pathMutex);
 			path = iter->get<std::list<Direction>>();
+		}
 		if (auto iter = json.find("money"); iter != json.end())
 			money = *iter;
 		if (auto iter = json.find("heldLeft"); iter != json.end())
@@ -100,8 +106,16 @@ namespace Game3 {
 	}
 
 	void Entity::tick(Game &, float delta) {
-		if (!path.empty() && move(path.front()))
-			path.pop_front();
+		{
+			std::shared_lock shared_lock(pathMutex);
+			if (!path.empty() && move(path.front())) {
+				// Please no data race kthx.
+				shared_lock.unlock();
+				std::unique_lock unique_lock(pathMutex);
+				if (!path.empty())
+					path.pop_front();
+			}
+		}
 		auto &x = offset.x();
 		auto &y = offset.y();
 		const float speed = getSpeed();
@@ -282,7 +296,12 @@ namespace Game3 {
 			else
 				offset.y() = y_offset;
 
-			teleport(new_position, !path.empty(), false);
+			bool path_empty = true;
+			{
+				std::shared_lock lock(pathMutex);
+				path_empty = path.empty();
+			}
+			teleport(new_position, !path_empty, false);
 
 			return true;
 		}
@@ -444,7 +463,11 @@ namespace Game3 {
 	}
 
 	bool Entity::pathfind(const Position &goal) {
-		const auto out = pathfind(position, goal, path);
+		PathResult out = PathResult::Invalid;
+		{
+			std::unique_lock lock(pathMutex);
+			out = pathfind(position, goal, path);
+		}
 
 		if (out == PathResult::Success && getSide() == Side::Server) {
 			const EntitySetPathPacket packet(*this);
@@ -580,6 +603,8 @@ namespace Game3 {
 			});
 		}
 
+		std::shared_lock path_lock(pathMutex);
+
 		if (!path.empty()) {
 			lock.unlock();
 			auto shared_lock = lockVisibleEntitiesShared();
@@ -638,7 +663,10 @@ namespace Game3 {
 		buffer << direction;
 		buffer << offset.x();
 		buffer << offset.y();
-		buffer << path;
+		{
+			std::shared_lock lock(pathMutex);
+			buffer << path;
+		}
 		buffer << money;
 		buffer << health;
 		HasInventory::encode(buffer);
@@ -654,7 +682,10 @@ namespace Game3 {
 		buffer >> direction;
 		buffer >> offset.x();
 		buffer >> offset.y();
-		buffer >> path;
+		{
+			std::unique_lock lock(pathMutex);
+			buffer >> path;
+		}
 		buffer >> money;
 		buffer >> health;
 		HasInventory::decode(buffer);
@@ -689,6 +720,15 @@ namespace Game3 {
 		auto entity_texture = game_ref.registry<EntityTextureRegistry>().at(type);
 		variety = entity_texture->variety;
 		return game_ref.registry<TextureRegistry>().at(entity_texture->textureID);
+	}
+
+	template <>
+	std::vector<Direction> Entity::copyPath<std::vector>() {
+		std::vector<Direction> out;
+		std::shared_lock lock(pathMutex);
+		out.reserve(path.size());
+		out = {path.begin(), path.end()};
+		return out;
 	}
 
 	void Entity::calculateVisibleEntities() {

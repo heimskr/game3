@@ -258,8 +258,10 @@ namespace Game3 {
 		entities.insert(entity);
 		entitiesByGID[entity->globalID] = entity;
 		attach(entity);
-		if (entity->isPlayer())
+		if (entity->isPlayer()) {
+			std::unique_lock lock(playersMutex);
 			players.insert(std::dynamic_pointer_cast<Player>(entity));
+		}
 		return entity;
 	}
 
@@ -292,8 +294,10 @@ namespace Game3 {
 		auto lock = lockEntitiesShared();
 		for (auto &entity: entities) {
 			entity->setRealm(shared_from_this());
-			if (auto player = std::dynamic_pointer_cast<Player>(entity))
+			if (auto player = std::dynamic_pointer_cast<Player>(entity)) {
+				std::unique_lock lock(playersMutex);
 				players.insert(player);
+			}
 		}
 	}
 
@@ -469,8 +473,10 @@ namespace Game3 {
 	void Realm::remove(EntityPtr entity) {
 		entitiesByGID.erase(entity->globalID);
 		detach(entity);
-		if (auto player = std::dynamic_pointer_cast<Player>(entity))
+		if (auto player = std::dynamic_pointer_cast<Player>(entity)) {
+			std::unique_lock lock(playersMutex);
 			players.erase(player);
+		}
 		entities.erase(entity);
 	}
 
@@ -781,9 +787,9 @@ namespace Game3 {
 		generatedChunks.insert(std::move(chunk_position));
 	}
 
-	bool Realm::isVisible(const Position &position) const {
+	bool Realm::isVisible(const Position &position) {
 		const auto chunk_pos = getChunkPosition(position);
-
+		std::shared_lock lock(playersMutex);
 		for (const auto &weak_player: players) {
 			if (auto player = weak_player.lock()) {
 				const auto player_chunk_pos = getChunkPosition(player->getPosition());
@@ -850,7 +856,7 @@ namespace Game3 {
 	}
 
 	void Realm::removePlayer(const PlayerPtr &player) {
-		auto lock = lockEntitiesUnique();
+		std::unique_lock lock(playersMutex);
 		players.erase(player);
 	}
 
@@ -860,6 +866,8 @@ namespace Game3 {
 
 		for (const auto &chunk_position: player->getVisibleChunks())
 			client.sendChunk(*this, chunk_position);
+
+		INFO("Sending to client. Chunk position: " << client.getPlayer()->getChunk());
 
 		auto guard = client.bufferGuard();
 		{

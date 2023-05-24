@@ -142,7 +142,7 @@ namespace Game3 {
 			void remakePathMap(const ChunkPosition &);
 			void markGenerated(const ChunkRange &);
 			void markGenerated(ChunkPosition);
-			bool isVisible(const Position &) const;
+			bool isVisible(const Position &);
 			bool hasTileEntity(GlobalID);
 			bool hasEntity(GlobalID);
 			EntityPtr getEntity(GlobalID);
@@ -291,6 +291,7 @@ namespace Game3 {
 			std::shared_mutex chunkRequestsMutex;
 			std::shared_mutex entitiesByChunkMutex;
 			std::shared_mutex tileEntitiesByChunkMutex;
+			std::shared_mutex playersMutex;
 
 			SharedRecursiveMutex entityMutex;
 			SharedRecursiveMutex tileEntityMutex;
