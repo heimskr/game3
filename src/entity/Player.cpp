@@ -22,6 +22,10 @@ namespace Game3 {
 	Player::Player():
 		Entity(ID()) {}
 
+	Player::~Player() {
+		INFO("~Player(" << this << ')');
+	}
+
 	void Player::destroy() {
 		auto lock = lockVisibleEntitiesShared();
 
@@ -123,7 +127,7 @@ namespace Game3 {
 		Entity::teleport(position, new_realm);
 		if (game.activeRealm->id != nextRealm && nextRealm != -1) {
 			game.activeRealm->onBlur();
-			game.activeRealm->removePlayer(getShared());
+			game.activeRealm->queuePlayerRemoval(getShared());
 			game.activeRealm = new_realm;
 			if (getSide() == Side::Client) {
 				game.activeRealm->onFocus();
@@ -243,6 +247,9 @@ namespace Game3 {
 	}
 
 	void Player::movedToNewChunk() {
+		if (getSide() != Side::Server)
+			return;
+
 		Entity::movedToNewChunk();
 
 		auto shared = getShared();
@@ -256,6 +263,8 @@ namespace Game3 {
 				}
 			}
 		}
+
+		getRealm()->recalculateVisibleChunks();
 	}
 
 	bool Player::send(const Packet &packet) {

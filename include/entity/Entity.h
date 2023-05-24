@@ -100,7 +100,7 @@ namespace Game3 {
 			virtual void initAfterLoad(Game &) {}
 			/** Returns whether the entity actually moved. */
 			bool move(Direction);
-			std::shared_ptr<Realm> getRealm() const override;
+			std::shared_ptr<Realm> getRealm() const override final;
 			inline const Position & getPosition() const override { return position; }
 			Entity & setRealm(const Game &, RealmID);
 			Entity & setRealm(const std::shared_ptr<Realm>);

@@ -76,7 +76,10 @@ namespace Game3 {
 			bool outdoors = true;
 			size_t ghostCount = 0;
 			int64_t seed = 0;
-			std::set<ChunkPosition> generatedChunks;
+			std::unordered_set<ChunkPosition> generatedChunks;
+			std::unordered_set<ChunkPosition> visibleChunks;
+
+			std::shared_mutex visibleChunksMutex;
 
 			Realm(const Realm &) = delete;
 			Realm(Realm &&) = delete;
@@ -120,6 +123,7 @@ namespace Game3 {
 			const Game & getGame() const;
 			void queueRemoval(const EntityPtr &);
 			void queueRemoval(const TileEntityPtr &);
+			void queuePlayerRemoval(const PlayerPtr &);
 			void queueAddition(const EntityPtr &);
 			void queueAddition(const TileEntityPtr &);
 			void queue(std::function<void()>);
@@ -165,6 +169,7 @@ namespace Game3 {
 			std::shared_ptr<std::unordered_set<TileEntityPtr>> getTileEntities(ChunkPosition);
 			void sendToMany(const std::unordered_set<std::shared_ptr<RemoteClient>> &, ChunkPosition);
 			void sendToOne(RemoteClient &, ChunkPosition);
+			void recalculateVisibleChunks();
 
 			inline const auto & getPlayers() const { return players; }
 			inline void markGenerated(auto x, auto y) { generatedChunks.insert(ChunkPosition{x, y}); }
@@ -282,6 +287,7 @@ namespace Game3 {
 			MTQueue<EntityPtr> entityAdditionQueue;
 			MTQueue<TileEntityPtr> tileEntityRemovalQueue;
 			MTQueue<TileEntityPtr> tileEntityAdditionQueue;
+			MTQueue<PlayerPtr> playerRemovalQueue;
 			MTQueue<std::function<void()>> generalQueue;
 			/** Governed by entitiesByChunkMutex. */
 			std::unordered_map<ChunkPosition, std::shared_ptr<std::unordered_set<EntityPtr>>> entitiesByChunk;

@@ -314,10 +314,9 @@ namespace Game3 {
 			std::set<std::shared_ptr<Player>> temp_buffering;
 
 			{
-				auto lock = lockEntitiesShared();
-				for (auto &entity: entities) {
-					if (entity->isPlayer()) {
-						auto player = std::dynamic_pointer_cast<Player>(entity);
+				std::shared_lock lock(playersMutex);
+				for (const auto &weak_player: players) {
+					if (auto player = weak_player.lock()) {
 						if (auto client = player->client.lock(); client && !client->isBuffering()) {
 							temp_buffering.insert(player);
 							client->startBuffering();
@@ -326,15 +325,27 @@ namespace Game3 {
 							player->ticked = true;
 							player->tick(game, delta);
 						}
-					} else
-						entity->tick(game, delta);
+					}
 				}
 			}
 
 			{
-				auto lock = lockTileEntitiesShared();
-				for (auto &[index, tile_entity]: tileEntities)
-					tile_entity->tick(game, delta);
+				std::shared_lock visible_lock(visibleChunksMutex);
+				for (const auto &chunk: visibleChunks) {
+					{
+						std::shared_lock by_chunk_lock(entitiesByChunkMutex);
+						if (auto iter = entitiesByChunk.find(chunk); iter != entitiesByChunk.end() && iter->second)
+							for (const auto &entity: *iter->second)
+								if (!entity->isPlayer())
+									entity->tick(game, delta);
+					}
+					{
+						std::shared_lock by_chunk_lock(tileEntitiesByChunkMutex);
+						if (auto iter = tileEntitiesByChunk.find(chunk); iter != tileEntitiesByChunk.end() && iter->second)
+							for (const auto &tile_entity: *iter->second)
+								tile_entity->tick(game, delta);
+					}
+				}
 			}
 
 			ticking = false;
@@ -344,6 +355,9 @@ namespace Game3 {
 
 			for (const auto &stolen: tileEntityRemovalQueue.steal())
 				remove(stolen);
+
+			for (const auto &stolen: playerRemovalQueue.steal())
+				removePlayer(stolen);
 
 			for (const auto &stolen: generalQueue.steal())
 				stolen();
@@ -522,6 +536,10 @@ namespace Game3 {
 
 	void Realm::queueRemoval(const TileEntityPtr &tile_entity) {
 		tileEntityRemovalQueue.push(tile_entity);
+	}
+
+	void Realm::queuePlayerRemoval(const PlayerPtr &player) {
+		playerRemovalQueue.push(player);
 	}
 
 	void Realm::queueAddition(const EntityPtr &entity) {
@@ -981,6 +999,18 @@ namespace Game3 {
 			client.send(packet);
 		for (const auto &packet: tile_entity_packets)
 			client.send(packet);
+	}
+
+	void Realm::recalculateVisibleChunks() {
+		std::unique_lock lock(visibleChunksMutex);
+		visibleChunks.clear();
+		for (const auto &weak_player: players) {
+			if (auto player = weak_player.lock()) {
+				ChunkRange(player->getChunk()).iterate([this](ChunkPosition chunk_position) {
+					visibleChunks.insert(chunk_position);
+				});
+			}
+		}
 	}
 
 	bool Realm::rightClick(const Position &position, double x, double y) {
