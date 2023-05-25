@@ -34,6 +34,8 @@ namespace Game3 {
 			float divisor = 1.f;
 			float centerX = 0.f;
 			float centerY = 0.f;
+			int backbufferWidth = -1;
+			int backbufferHeight = -1;
 
 			SpriteRenderer(Canvas &);
 			~SpriteRenderer();
@@ -66,8 +68,6 @@ namespace Game3 {
 		private:
 			GLuint quadVAO = 0;
 			bool initialized = false;
-			int backbufferWidth = -1;
-			int backbufferHeight = -1;
 
 			void initRenderData();
 			void setupShader(int texture_width, int texture_height, const RenderOptions &);

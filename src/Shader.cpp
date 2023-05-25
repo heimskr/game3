@@ -40,6 +40,8 @@ namespace Game3 {
 		if (handle != 0)
 			glDeleteProgram(handle);
 
+		CHECKGL
+
 		const GLchar *vert_ptr = reinterpret_cast<const GLchar *>(vertex.begin());
 		const GLuint vert_handle = glCreateShader(GL_VERTEX_SHADER); CHECKGL
 		const GLint vertex_size = vertex.size();

@@ -10,6 +10,3 @@
 [submodule "eigen"]
 	path = eigen
 	url = https://gitlab.com/libeigen/eigen.git
-[submodule "GLFont"]
-	path = GLFont
-	url = https://github.com/heimskr/GLFont.git

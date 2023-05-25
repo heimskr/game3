@@ -1,5 +1,5 @@
 #include "Log.h"
-#include "entity/Player.h"
+#include "entity/ClientPlayer.h"
 #include "error/AuthenticationError.h"
 #include "game/ClientGame.h"
 #include "net/LocalServer.h"
@@ -31,7 +31,7 @@ namespace Game3 {
 			throw AuthenticationError("Login failed");
 
 		SUCCESS("Login succeeded");
-		game.player = Entity::create<Player>();
+		game.player = Entity::create<ClientPlayer>();
 		game.player->init(game);
 		INFO("Setting player GID to " << globalID);
 		game.player->setGID(globalID);
