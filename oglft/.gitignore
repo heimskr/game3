@@ -1,0 +1,14 @@
+/Makefile
+/config.log
+/config.status
+/config/config.h
+/config/stamp-h1
+/doc/Makefile
+/liboglft/.deps/
+/liboglft/.libs/
+/liboglft/Makefile
+/liboglft/OGLFT.lo
+/liboglft/libOGLFT.la
+/libtool
+/tests/.deps/
+/tests/Makefile

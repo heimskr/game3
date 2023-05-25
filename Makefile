@@ -53,7 +53,7 @@ endif
 GLIB_COMPILE_RESOURCES = $(shell pkg-config --variable=glib_compile_resources gio-2.0)
 LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread $(LTO) $(PROFILING)
 SOURCES      := $(shell find -L src -name \*.cpp) src/gtk_resources.cpp
-OBJECTS      := $(SOURCES:.cpp=.o) src/resources.o
+OBJECTS      := $(SOURCES:.cpp=.o) src/resources.o oglft/liboglft/.libs/libOGLFT.a
 RESXML       := $(OUTPUT).gresource.xml
 CLOC_OPTIONS := . --exclude-dir=.vscode,libnoise,stb,eigen,json,data,.github --fullpath --not-match-f='^.\/(src\/(gtk_)?resources\.cpp|include\/resources\.h)$$'
 RESGEN       := ./resgen
@@ -135,3 +135,9 @@ zip: $(OUTPUT)
 	cp $(OUTPUT) Game3/$(OUTPUT)
 	zip -r game3.zip Game3
 	rm -r Game3
+
+oglft/liboglft/.libs/libOGLFT.a: oglft/Makefile
+	make -C oglft
+
+oglft/Makefile:
+	cd oglft && ./configure
