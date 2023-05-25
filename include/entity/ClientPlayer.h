@@ -1,7 +1,5 @@
 #pragma once
 
-#include "FTLabel.h"
-
 #include "entity/Player.h"
 
 namespace Game3 {
@@ -14,11 +12,6 @@ namespace Game3 {
 			friend class Entity;
 
 		private:
-			std::unique_ptr<FTLabel> label;
-
 			ClientPlayer();
-
-			int backbufferWidth  = -1;
-			int backbufferHeight = -1;
 	};
 }
