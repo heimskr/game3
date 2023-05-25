@@ -1,5 +1,8 @@
 #include <atomic>
+#include <memory>
 #include <stdexcept>
+
+#include "util/GL.h"
 
 #include "ui/Text.h"
 
