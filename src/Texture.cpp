@@ -38,7 +38,7 @@ namespace Game3 {
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, *filter);
 			glBindTexture(GL_TEXTURE_2D, 0);
 			*valid_ = true;
-			*data = std::shared_ptr<uint8_t>(raw);
+			*data = std::shared_ptr<uint8_t>(raw, free);
 		}
 	}
 

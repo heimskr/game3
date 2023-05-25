@@ -4,6 +4,7 @@
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "net/Buffer.h"
+#include "packet/InventoryPacket.h"
 #include "realm/Realm.h"
 #include "recipe/CraftingRecipe.h"
 #include "util/Util.h"
@@ -42,12 +43,12 @@ namespace Game3 {
 				}
 			} else {
 				const ItemCount to_store = std::min(ItemCount(stack.item->maxCount), ItemCount(remaining));
-				storage.try_emplace(start, getOwner()->getRealm()->getGame(), stack.item, to_store);
+				assert(storage.try_emplace(start, getOwner()->getRealm()->getGame(), stack.item, to_store).second);
 				remaining -= to_store;
 			}
 		}
 
-		if (0 < remaining)
+		if (0 < remaining) {
 			for (auto &[slot, stored]: storage) {
 				if (slot == start || !stored.canMerge(stack))
 					continue;
@@ -60,6 +61,7 @@ namespace Game3 {
 						break;
 				}
 			}
+		}
 
 		if (0 < remaining) {
 			const Game &game = getOwner()->getRealm()->getGame();
@@ -365,12 +367,18 @@ namespace Game3 {
 
 	void Inventory::notifyOwner() {
 		if (auto locked_owner = owner.lock()) {
-			if (locked_owner->getRealm()->getSide() != Side::Client)
-				return;
-			if (auto player = std::dynamic_pointer_cast<Player>(locked_owner))
-				player->getRealm()->getGame().toClient().signal_player_inventory_update().emit(player);
-			else
-				locked_owner->getRealm()->getGame().toClient().signal_other_inventory_update().emit(locked_owner);
+			const auto side = locked_owner->getRealm()->getSide();
+			auto player = std::dynamic_pointer_cast<Player>(locked_owner);
+
+			if (side == Side::Server) {
+				if (player)
+					player->send(InventoryPacket(shared_from_this()));
+			} else {
+				if (player)
+					player->getRealm()->getGame().toClient().signal_player_inventory_update().emit(player);
+				else
+					locked_owner->getRealm()->getGame().toClient().signal_other_inventory_update().emit(locked_owner);
+			}
 		}
 	}
 

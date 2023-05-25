@@ -72,7 +72,7 @@ namespace Game3 {
 
 				if (payloadSize == buffer.size()) {
 					auto game = lockGame();
-					auto packet = (*game->registry<PacketFactoryRegistry>()[packetType])();
+					auto packet = (*game->registry<PacketFactoryRegistry>().at(packetType))();
 					packet->decode(*game, buffer);
 					buffer.clear();
 					state = State::Begin;

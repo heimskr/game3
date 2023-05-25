@@ -12,7 +12,7 @@ namespace Game3 {
 	struct Agent;
 	struct CraftingRecipe;
 
-	class Inventory: public Container {
+	class Inventory: public Container, public std::enable_shared_from_this<Inventory> {
 		public:
 			std::weak_ptr<Agent> owner;
 			Slot slotCount = 0;

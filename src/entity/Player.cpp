@@ -280,6 +280,12 @@ namespace Game3 {
 		return std::dynamic_pointer_cast<Player>(shared_from_this());
 	}
 
+	std::shared_ptr<RemoteClient> Player::getClient() const {
+		auto locked = client.lock();
+		assert(locked);
+		return locked;
+	}
+
 	void Player::resetEphemeral() {
 		stopMoving();
 		continuousInteraction = false;

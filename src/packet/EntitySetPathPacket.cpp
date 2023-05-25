@@ -21,6 +21,8 @@ namespace Game3 {
 		}
 
 		entity->path = {path.begin(), path.end()};
-		SUCCESS("Set path of " << typeid(*entity).name() << " " << globalID << " in realm " << realmID << "; new size: " << entity->path.size());
+
+		const auto &entity_ref = *entity;
+		SUCCESS("Set path of " << typeid(entity_ref).name() << " " << globalID << " in realm " << realmID << "; new size: " << entity->path.size());
 	}
 }

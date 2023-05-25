@@ -145,6 +145,10 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u64` Global ID
 	- `i32` Realm ID
 
+24. **Inventory**: sends a client its player's inventory.
+
+	- `Inventory` Inventory
+
 # Message Format
 
 All values are little endian.

@@ -32,21 +32,13 @@ namespace Game3 {
 
 		SUCCESS("Login succeeded");
 		game.player = Entity::create<Player>();
-		INFO("[1] game.player.use_count = " << game.player.use_count());
 		game.player->init(game);
-		INFO("[2] game.player.use_count = " << game.player.use_count());
 		INFO("Setting player GID to " << globalID);
 		game.player->setGID(globalID);
-		INFO("[3] game.player.use_count = " << game.player.use_count());
 		game.player->decode(playerDataBuffer);
-		INFO("[4] game.player.use_count = " << game.player.use_count());
 		game.player->setupRealm(game);
-		INFO("[5] game.player.use_count = " << game.player.use_count());
 		game.activeRealm = game.player->getRealm();
-		INFO("[6] game.player.use_count = " << game.player.use_count());
 		game.activeRealm->add(game.player);
-		INFO("[7] game.player.use_count = " << game.player.use_count());
 		game.activeRealm->addPlayer(game.player);
-		INFO("[8] game.player.use_count = " << game.player.use_count());
 	}
 }

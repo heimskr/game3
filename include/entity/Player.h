@@ -71,6 +71,7 @@ namespace Game3 {
 			void movedToNewChunk() override;
 			bool send(const Packet &);
 			std::shared_ptr<Player> getShared();
+			std::shared_ptr<RemoteClient> getClient() const;
 
 			friend class Entity;
 

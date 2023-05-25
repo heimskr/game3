@@ -869,13 +869,18 @@ namespace Game3 {
 	}
 
 	void Realm::addPlayer(const PlayerPtr &player) {
-		auto lock = lockEntitiesUnique();
+		std::unique_lock players_lock(playersMutex);
 		players.insert(player);
+		recalculateVisibleChunks();
 	}
 
 	void Realm::removePlayer(const PlayerPtr &player) {
-		std::unique_lock lock(playersMutex);
+		std::unique_lock players_lock(playersMutex);
 		players.erase(player);
+		if (players.empty()) {
+			std::unique_lock visible_lock(visibleChunksMutex);
+			visibleChunks.clear();
+		}
 	}
 
 	void Realm::sendTo(RemoteClient &client) {

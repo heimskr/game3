@@ -1,5 +1,8 @@
 #pragma once
 
+#include <ostream>
+#include <string>
+
 #include <gtkmm.h>
 
 namespace Game3 {
@@ -17,12 +20,15 @@ namespace Game3 {
 		explicit Modifiers(Gdk::ModifierType);
 
 		explicit operator uint8_t() const;
+		explicit operator std::string() const;
 
 		inline bool onlyShift() const { return shift && !ctrl && !alt && !super; }
 		inline bool onlyCtrl()  const { return !shift && ctrl && !alt && !super; }
 		inline bool onlyAlt()   const { return !shift && !ctrl && alt && !super; }
 		inline bool onlySuper() const { return !shift && !ctrl && !alt && super; }
 	};
+
+	std::ostream & operator<<(std::ostream &, Modifiers);
 
 	template <typename T>
 	T popBuffer(Buffer &);
