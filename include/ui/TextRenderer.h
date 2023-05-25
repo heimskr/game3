@@ -87,12 +87,15 @@ namespace Game3 {
 			int backbufferWidth = -1;
 			int backbufferHeight = -1;
 
+			glm::mat4 projection;
+			glm::vec4 v4;
+
 			std::unique_ptr<FT_Library, FreeLibrary> freetypeLibrary;
 			std::unique_ptr<FT_Face, FreeFace> freetypeFace;
 			std::unordered_map<gunichar, Character> characters;
 
 			void initRenderData();
-			void setupShader(const TextRenderOptions &);
+			void setupShader(std::string_view, const TextRenderOptions &);
 			void hackY(float &y, float y_offset, float scale);
 	};
 }

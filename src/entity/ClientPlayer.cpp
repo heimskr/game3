@@ -10,7 +10,12 @@ namespace Game3 {
 		Player::render(sprites, text);
 
 		auto &game = getGame().toClient();
-		text.drawOnMap(displayName, {.x = static_cast<float>(position.column), .y = static_cast<float>(position.row)});
+		text.drawOnMap(displayName, {
+			.x = static_cast<float>(position.column),
+			.y = static_cast<float>(position.row),
+			.scaleX = 10.f,
+			.scaleY = 10.f,
+		});
 		// drawText(game.canvas, displayName.c_str());
 	}
 }

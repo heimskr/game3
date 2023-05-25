@@ -173,6 +173,9 @@ namespace Game3 {
 		sprite_renderer.centerY = center.y();
 		sprite_renderer.update(bb_width, bb_height);
 		sprite_renderer.divisor = outdoors? game_time : 1;
+		text_renderer.centerX = center.x();
+		text_renderer.centerY = center.y();
+		text_renderer.update(bb_width, bb_height);
 
 		{
 			auto lock = lockEntitiesShared();

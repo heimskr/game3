@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <utility>
 
+#include <glm/gtx/string_cast.hpp>
+
 #include "Log.h"
 #include "Tileset.h"
 #include "game/ClientGame.h"
@@ -91,7 +93,8 @@ namespace Game3 {
 		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
 			backbufferWidth = backbuffer_width;
 			backbufferHeight = backbuffer_height;
-			glm::mat4 projection = glm::ortho(0.f, static_cast<float>(backbuffer_width), static_cast<float>(backbuffer_height), 0.f, -1.f, 1.f);
+			projection = glm::ortho(0.f, static_cast<float>(backbuffer_width), static_cast<float>(backbuffer_height), 0.f, -1.f, 1.f);
+			// projection = glm::ortho(0.f, static_cast<float>(backbuffer_width), 0.f, static_cast<float>(backbuffer_height), -1.f, 1.f);
 			shader.bind();
 			shader.set("projection", projection);
 		}
@@ -120,9 +123,10 @@ namespace Game3 {
 
 		auto x = options.x;
 		auto y = options.y;
-		INFO(x << " :: " << y);
-		auto scale_x = options.scaleX / 2.f;
-		auto scale_y = options.scaleY / 2.f;
+		// float x = 0;
+		// float y = 0;
+		auto scale_x = options.scaleX / 1.f;
+		auto scale_y = options.scaleY / 1.f;
 
 		x *= tile_size * canvas->scale / 2.f;
 		y *= tile_size * canvas->scale / 2.f;
@@ -135,21 +139,10 @@ namespace Game3 {
 		y -= map_length * tile_size * canvas->scale / canvas->magic * 2.f;
 		y += centerY * canvas->scale * tile_size / 2.f;
 
-		shader.bind();
+		std::cout << x << ", " << y << '\n';
+		v4 = {x, y, 0.f, 1.f};
 
-		const auto text_width = textWidth(text, 1.f);
-		const auto text_height = textHeight(text, 1.f);
-
-		glm::mat4 model = glm::mat4(1.f);
-		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(x, y, 0.f));
-		model = glm::translate(model, glm::vec3(0.5f * text_width, 0.5f * text_height, 0.f)); // move origin of rotation to center of quad
-		model = glm::rotate(model, glm::radians(options.angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
-		model = glm::translate(model, glm::vec3(-0.5f * text_width, -0.5f * text_height, 0.f)); // move origin back
-		model = glm::scale(model, glm::vec3(text_width * scale_x * canvas->scale / 2.f, -text_height * scale_y * canvas->scale / 2.f, 2.f)); // last scale
-
-		shader.set("model", model);
-		shader.set("textColor", options.color.red, options.color.green, options.color.blue, options.color.alpha);
+		setupShader(text, options); CHECKGL
 
 		glActiveTexture(GL_TEXTURE0); CHECKGL
 		glBindVertexArray(vao); CHECKGL
@@ -203,16 +196,24 @@ namespace Game3 {
 		return out;
 	}
 
-	// void drawText(Canvas &canvas, const char *text) {
-	// 	initText();
+	void TextRenderer::setupShader(std::string_view text, const TextRenderOptions &options) {
+		// const auto text_width = textWidth(text, 1.f);
+		// const auto text_height = textHeight(text, 1.f);
 
-	// 	glEnable(GL_BLEND); CHECKGL
-	// 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); CHECKGL
+		const float text_width = 1;
+		const float text_height = 1;
 
-	// 	const float screen_width = canvas.width();
-	// 	const float screen_height = canvas.height();
+		glm::mat4 model = glm::mat4(1.f);
+		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
+		model = glm::translate(model, glm::vec3(options.x * 16.f, options.y * 16.f, 0.0f));
+		model = glm::translate(model, glm::vec3(0.5f * text_width, 0.5f * text_height, 0.0f));
+		model = glm::rotate   (model, glm::radians(options.angle), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, glm::vec3(-0.5f * text_width, -0.5f * text_height, 0.0f));
+		model = glm::scale    (model, glm::vec3(text_width * options.scaleX, text_height * options.scaleY, 1.0f));
 
-	// 	glm::mat4 projection = glm::ortho(0.0f, screen_width, 0.0f, screen_height);
-
-	// }
+		shader.bind();
+		shader.set("model", model);
+		std::cout << glm::to_string(projection * model * v4) << '\n';
+		shader.set("textColor", options.color.red, options.color.green, options.color.blue, options.color.alpha);
+	}
 }
