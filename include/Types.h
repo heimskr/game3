@@ -58,4 +58,15 @@ namespace Game3 {
 	Index operator""_idx(unsigned long long);
 
 	enum class PathResult: uint8_t {Invalid, Trivial, Unpathable, Success};
+
+	struct Color {
+		float red   = 0.f;
+		float green = 0.f;
+		float blue  = 0.f;
+		float alpha = 1.f;
+
+		Color() = default;
+		Color(float red_, float green_, float blue_, float alpha_ = 1.f):
+			red(red_), green(green_), blue(blue_), alpha(alpha_) {}
+	};
 }
