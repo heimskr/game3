@@ -122,8 +122,9 @@ namespace Game3 {
 			Game & getGame();
 			const Game & getGame() const;
 			void queueRemoval(const EntityPtr &);
-			void queueDestruction(const EntityPtr &);
 			void queueRemoval(const TileEntityPtr &);
+			void queueDestruction(const EntityPtr &);
+			void queueDestruction(const TileEntityPtr &);
 			void queuePlayerRemoval(const PlayerPtr &);
 			void queueAddition(const EntityPtr &);
 			void queueAddition(const TileEntityPtr &);
@@ -151,6 +152,7 @@ namespace Game3 {
 			bool hasTileEntity(GlobalID);
 			bool hasEntity(GlobalID);
 			EntityPtr getEntity(GlobalID);
+			TileEntityPtr getTileEntity(GlobalID);
 			Side getSide() const;
 			/** Client-side. */
 			std::set<ChunkPosition> getMissingChunks() const;
@@ -298,6 +300,7 @@ namespace Game3 {
 			MTQueue<EntityPtr> entityDestructionQueue;
 			MTQueue<EntityPtr> entityAdditionQueue;
 			MTQueue<TileEntityPtr> tileEntityRemovalQueue;
+			MTQueue<TileEntityPtr> tileEntityDestructionQueue;
 			MTQueue<TileEntityPtr> tileEntityAdditionQueue;
 			MTQueue<PlayerPtr> playerRemovalQueue;
 			MTQueue<std::function<void()>> generalQueue;

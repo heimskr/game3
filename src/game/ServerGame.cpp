@@ -5,6 +5,7 @@
 #include "net/RemoteClient.h"
 #include "packet/CommandResultPacket.h"
 #include "packet/DestroyEntityPacket.h"
+#include "packet/DestroyTileEntityPacket.h"
 #include "packet/EntityMovePacket.h"
 #include "packet/TileUpdatePacket.h"
 #include "util/Util.h"
@@ -76,6 +77,13 @@ namespace Game3 {
 
 	void ServerGame::entityDestroyed(const Entity &entity) {
 		const DestroyEntityPacket packet(entity);
+		auto lock = server->server->lockClients();
+		for (const auto &[client_id, client]: server->server->getClients())
+			std::dynamic_pointer_cast<RemoteClient>(client)->send(packet);
+	}
+
+	void ServerGame::tileEntityDestroyed(const TileEntity &tile_entity) {
+		const DestroyTileEntityPacket packet(tile_entity);
 		auto lock = server->server->lockClients();
 		for (const auto &[client_id, client]: server->server->getClients())
 			std::dynamic_pointer_cast<RemoteClient>(client)->send(packet);

@@ -157,6 +157,11 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `i32` Slot
 
+27. **Destroy Tile Entity**: tells a client to remove a tile entity.
+
+	- `u64` Global ID
+	- `i32` Realm ID
+
 # Message Format
 
 All values are little endian.

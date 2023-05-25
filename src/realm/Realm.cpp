@@ -356,13 +356,14 @@ namespace Game3 {
 			for (const auto &stolen: entityRemovalQueue.steal())
 				remove(stolen);
 
-			for (const auto &stolen: entityDestructionQueue.steal()) {
-				remove(stolen);
+			for (const auto &stolen: entityDestructionQueue.steal())
 				stolen->destroy();
-			}
 
 			for (const auto &stolen: tileEntityRemovalQueue.steal())
 				remove(stolen);
+
+			for (const auto &stolen: tileEntityDestructionQueue.steal())
+				stolen->destroy();
 
 			for (const auto &stolen: playerRemovalQueue.steal())
 				removePlayer(stolen);
@@ -428,13 +429,14 @@ namespace Game3 {
 			for (const auto &stolen: entityRemovalQueue.steal())
 				remove(stolen);
 
-			for (const auto &stolen: entityDestructionQueue.steal()) {
-				remove(stolen);
+			for (const auto &stolen: entityDestructionQueue.steal())
 				stolen->destroy();
-			}
 
 			for (const auto &stolen: tileEntityRemovalQueue.steal())
 				remove(stolen);
+
+			for (const auto &stolen: tileEntityDestructionQueue.steal())
+				stolen->destroy();
 
 			for (const auto &stolen: generalQueue.steal())
 				stolen();
@@ -547,12 +549,16 @@ namespace Game3 {
 		entityRemovalQueue.push(entity);
 	}
 
+	void Realm::queueRemoval(const TileEntityPtr &tile_entity) {
+		tileEntityRemovalQueue.push(tile_entity);
+	}
+
 	void Realm::queueDestruction(const EntityPtr &entity) {
 		entityDestructionQueue.push(entity);
 	}
 
-	void Realm::queueRemoval(const TileEntityPtr &tile_entity) {
-		tileEntityRemovalQueue.push(tile_entity);
+	void Realm::queueDestruction(const TileEntityPtr &tile_entity) {
+		tileEntityDestructionQueue.push(tile_entity);
 	}
 
 	void Realm::queuePlayerRemoval(const PlayerPtr &player) {
@@ -850,6 +856,13 @@ namespace Game3 {
 	EntityPtr Realm::getEntity(GlobalID entity_gid) {
 		auto lock = lockEntitiesShared();
 		if (auto iter = entitiesByGID.find(entity_gid); iter != entitiesByGID.end())
+			return iter->second;
+		return {};
+	}
+
+	TileEntityPtr Realm::getTileEntity(GlobalID tile_entity_gid) {
+		auto lock = lockTileEntitiesShared();
+		if (auto iter = tileEntitiesByGID.find(tile_entity_gid); iter != tileEntitiesByGID.end())
 			return iter->second;
 		return {};
 	}

@@ -1,4 +1,5 @@
 #include "game/ClientGame.h"
+#include "game/ServerGame.h"
 #include "net/Buffer.h"
 #include "net/RemoteClient.h"
 #include "packet/TileEntityPacket.h"
@@ -8,6 +9,16 @@
 #include "ui/Canvas.h"
 
 namespace Game3 {
+	void TileEntity::destroy() {
+		auto realm = getRealm();
+		assert(realm);
+		realm->removeSafe(shared_from_this());
+
+		if (getSide() == Side::Server) {
+			getRealm()->getGame().toServer().tileEntityDestroyed(*this);
+		}
+	}
+
 	std::shared_ptr<TileEntity> TileEntity::fromJSON(Game &game, const nlohmann::json &json) {
 		auto factory = game.registry<TileEntityFactoryRegistry>().at(json.at("id").get<Identifier>());
 		assert(factory);

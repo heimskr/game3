@@ -36,6 +36,7 @@ namespace Game3 {
 			}
 
 			~TileEntity() override = default;
+			virtual void destroy();
 
 			static std::shared_ptr<TileEntity> fromJSON(Game &, const nlohmann::json &);
 
