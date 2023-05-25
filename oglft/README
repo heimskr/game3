@@ -1,0 +1,52 @@
+OGLFT Version 0.8
+
+OGLFT is a library for drawing text in OpenGL. It usees the FreeType 2
+library to extract information from font files on your system. OGLFT
+can handle any of the files which FreeType can read, both vector and
+bitmapped (although currently the bitmap routines are not implemented).
+
+The software is available from www.sf.net/project/oglft.
+
+The documentation is in ./doc/html/index.html.
+
+The mailing list is oglft-devel@lists.sourceforge.net.
+
+A couple of installation notes:
+
+OGLFT depends on the GLE Tubing and Extrusion library to create solid
+characters. If you don't have this library (or don't want solid
+glyphs), you can disable this feature with:
+
+./configure --disable-solid
+
+If the configure script can't find the GLE library and header files,
+it is disabled automatically.
+
+UNICODE character rendering, Demo3 and the performance test code
+depend on the Qt library. You can disable them with:
+
+./configure --disable-qt
+
+Note that the configure script depends on finding the environment
+variable QTDIR in order to locate the headers and library for Qt (if
+not disabled). If the configure script can't successfully build a
+simple Qt app, Qt is disabled automatically.
+
+'make check' builds the test programs in the tests/ directory.
+
+There is also a (mostly untested) Qt project file from which it may be
+possible to generate a Makefile for operating systems for which
+autoconf is not supported. Edit the files ./OGLFT/OGLFT.pro and
+./tests/tests.pro to change the values to those appropriate for your
+operating system. Generate the library and the test program by doing a
+"make install" (this will actually only copy the library to the ./lib
+directory).
+
+---------------------------------------------------------------------
+lignum Computing, Inc., July, 2002
+oglft@lignumcomputing.com
+
+
+;;;Local variables: ***
+;;;mode: text ***
+;;;End: ***

@@ -1,7 +1,6 @@
 #pragma once
 
-#include <memory>
-
 namespace Game3 {
-
+	void initText();
+	void drawText(const char *);
 }

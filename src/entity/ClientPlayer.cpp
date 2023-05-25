@@ -8,5 +8,7 @@ namespace Game3 {
 
 	void ClientPlayer::render(SpriteRenderer &renderer) {
 		Player::render(renderer);
+
+		drawText(displayName.c_str());
 	}
 }
