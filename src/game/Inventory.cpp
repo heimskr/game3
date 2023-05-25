@@ -1,17 +1,21 @@
+#include "Log.h"
 #include "entity/Entity.h"
 #include "entity/ItemEntity.h"
+#include "entity/Player.h"
 #include "game/Agent.h"
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "net/Buffer.h"
 #include "packet/InventoryPacket.h"
+#include "packet/SetActiveSlotPacket.h"
+#include "packet/ActiveSlotSetPacket.h"
 #include "realm/Realm.h"
 #include "recipe/CraftingRecipe.h"
 #include "util/Util.h"
 
 namespace Game3 {
-	Inventory::Inventory(const std::shared_ptr<Agent> &owner_, Slot slot_count):
-		owner(owner_), slotCount(slot_count) {}
+	Inventory::Inventory(const std::shared_ptr<Agent> &owner, Slot slot_count):
+		weakOwner(owner), slotCount(slot_count) {}
 
 	ItemStack * Inventory::operator[](size_t slot) {
 		if (auto iter = storage.find(slot); iter != storage.end())
@@ -121,12 +125,12 @@ namespace Game3 {
 		if (!storage.contains(slot))
 			return;
 
-		auto locked_owner = owner.lock();
-		if (!locked_owner)
+		auto owner = weakOwner.lock();
+		if (!owner)
 			throw std::logic_error("Inventory is missing an owner");
 
-		auto realm = locked_owner->getRealm();
-		realm->spawn<ItemEntity>(locked_owner->getPosition(), storage.at(slot));
+		auto realm = owner->getRealm();
+		realm->spawn<ItemEntity>(owner->getPosition(), storage.at(slot));
 		storage.erase(slot);
 
 		notifyOwner();
@@ -210,8 +214,8 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Agent> Inventory::getOwner() const {
-		if (auto locked_owner = owner.lock())
-			return locked_owner;
+		if (auto owner = weakOwner.lock())
+			return owner;
 		throw std::runtime_error("Couldn't lock inventory owner");
 	}
 
@@ -321,19 +325,35 @@ namespace Game3 {
 		return storage.contains(activeSlot)? &storage.at(activeSlot) : nullptr;
 	}
 
-	void Inventory::setActive(Slot new_active) {
-		if (0 <= new_active && new_active < slotCount)
+	void Inventory::setActive(Slot new_active, bool force) {
+		if (!(0 <= new_active && new_active < slotCount)) {
+			WARN("Bad slot: " << new_active << " (slot count: " << slotCount << ")");
+			return;
+		}
+
+		auto owner = getOwner();
+		auto player = std::dynamic_pointer_cast<Player>(owner);
+		const bool is_client = owner->getSide() == Side::Client;
+		if (is_client && !force) {
+			if (player)
+				player->send(SetActiveSlotPacket(new_active));
+		} else {
 			activeSlot = new_active;
+			if (is_client)
+				notifyOwner();
+			else if (player)
+				player->send(ActiveSlotSetPacket(activeSlot));
+		}
 	}
 
 	void Inventory::prevSlot() {
 		if (0 < activeSlot)
-			--activeSlot;
+			setActive(activeSlot - 1);
 	}
 
 	void Inventory::nextSlot() {
 		if (activeSlot < slotCount - 1)
-			++activeSlot;
+			setActive(activeSlot + 1);
 	}
 
 	ItemCount Inventory::craftable(const CraftingRecipe &recipe) const {
@@ -366,9 +386,10 @@ namespace Game3 {
 	}
 
 	void Inventory::notifyOwner() {
-		if (auto locked_owner = owner.lock()) {
-			const auto side = locked_owner->getRealm()->getSide();
-			auto player = std::dynamic_pointer_cast<Player>(locked_owner);
+		if (auto owner = weakOwner.lock()) {
+			INFO("Notified");
+			const auto side = owner->getRealm()->getSide();
+			auto player = std::dynamic_pointer_cast<Player>(owner);
 
 			if (side == Side::Server) {
 				if (player)
@@ -377,7 +398,7 @@ namespace Game3 {
 				if (player)
 					player->getRealm()->getGame().toClient().signal_player_inventory_update().emit(player);
 				else
-					locked_owner->getRealm()->getGame().toClient().signal_other_inventory_update().emit(locked_owner);
+					owner->getRealm()->getGame().toClient().signal_other_inventory_update().emit(owner);
 			}
 		}
 	}
@@ -408,7 +429,7 @@ namespace Game3 {
 
 	Buffer & operator+=(Buffer &buffer, const Inventory &inventory) {
 		buffer.appendType(inventory);
-		if (auto locked = inventory.owner.lock())
+		if (auto locked = inventory.weakOwner.lock())
 			buffer += locked->getGID();
 		else
 			buffer += static_cast<GlobalID>(-1);
@@ -429,7 +450,7 @@ namespace Game3 {
 			throw std::invalid_argument("Invalid type (" + hexString(type) + ") in buffer (expected Inventory)");
 		}
 		const auto gid = popBuffer<GlobalID>(buffer);
-		if (auto locked = inventory.owner.lock())
+		if (auto locked = inventory.weakOwner.lock())
 			locked->setGID(gid);
 		popBuffer(buffer, inventory.slotCount);
 		popBuffer(buffer, inventory.activeSlot);

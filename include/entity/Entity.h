@@ -121,7 +121,7 @@ namespace Game3 {
 			bool isVisible() const;
 			void setHeldLeft(Slot);
 			void setHeldRight(Slot);
-			Side getSide() const;
+			Side getSide() const override final;
 			ChunkPosition getChunk() const;
 			bool canSee(RealmID, const Position &) const;
 			bool canSee(const Entity &) const;

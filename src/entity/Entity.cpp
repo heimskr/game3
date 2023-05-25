@@ -142,7 +142,7 @@ namespace Game3 {
 		if (!inventory)
 			inventory = std::make_shared<Inventory>(shared_from_this(), DEFAULT_INVENTORY_SIZE);
 		else
-			inventory->owner = shared_from_this();
+			inventory->weakOwner = shared_from_this();
 
 		movedToNewChunk();
 	}

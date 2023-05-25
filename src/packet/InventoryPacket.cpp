@@ -14,7 +14,7 @@ namespace Game3 {
 
 	void InventoryPacket::handle(ClientGame &game) {
 		if (game.player) {
-			inventory->owner = game.player;
+			inventory->weakOwner = game.player;
 			game.player->inventory = inventory;
 			game.player->inventory->notifyOwner();
 		} else {

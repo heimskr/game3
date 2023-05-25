@@ -27,7 +27,7 @@ namespace Game3 {
 			buffer >> optional;
 			assert(optional);
 			inventory = std::make_shared<Inventory>(std::move(*optional));
-			inventory->owner = getSharedAgent();
+			inventory->weakOwner = getSharedAgent();
 			inventory->slotCount = slot_count; // Maybe not necessary? Try an assert before.
 		}
 	}

@@ -14,12 +14,12 @@ namespace Game3 {
 
 	class Inventory: public Container, public std::enable_shared_from_this<Inventory> {
 		public:
-			std::weak_ptr<Agent> owner;
+			std::weak_ptr<Agent> weakOwner;
 			Slot slotCount = 0;
 			Slot activeSlot = 0;
 
 			Inventory() = default;
-			Inventory(const std::shared_ptr<Agent> &owner_, Slot slot_count);
+			Inventory(const std::shared_ptr<Agent> &owner, Slot slot_count);
 
 			ItemStack * operator[](size_t);
 			const ItemStack * operator[](size_t) const;
@@ -85,7 +85,7 @@ namespace Game3 {
 
 			const ItemStack * getActive() const;
 
-			void setActive(Slot);
+			void setActive(Slot, bool force = false);
 
 			void prevSlot();
 

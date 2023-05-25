@@ -149,6 +149,14 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `Inventory` Inventory
 
+25. **Set Active Slot**: tells the server to set the active slot in the player's inventory.
+
+	- `i32` Slot
+
+26. **Active Slot Set**: tells a client that the player's active inventory slot changed.
+
+	- `i32` Slot
+
 # Message Format
 
 All values are little endian.

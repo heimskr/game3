@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iostream>
 
+#include "Log.h"
 #include "Shader.h"
 #include "Tileset.h"
 
@@ -48,6 +49,16 @@ namespace Game3 {
 		{GDK_KEY_o,     interactTime},
 		{GDK_KEY_space, interactTime},
 		{GDK_KEY_g,     slowTime},
+		{GDK_KEY_0,     slowTime},
+		{GDK_KEY_1,     slowTime},
+		{GDK_KEY_2,     slowTime},
+		{GDK_KEY_3,     slowTime},
+		{GDK_KEY_4,     slowTime},
+		{GDK_KEY_5,     slowTime},
+		{GDK_KEY_6,     slowTime},
+		{GDK_KEY_7,     slowTime},
+		{GDK_KEY_8,     slowTime},
+		{GDK_KEY_9,     slowTime},
 	};
 
 	MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &builder_):
@@ -759,10 +770,8 @@ namespace Game3 {
 				case GDK_KEY_7:
 				case GDK_KEY_8:
 				case GDK_KEY_9:
-					if (game && game->player) {
+					if (game && game->player)
 						game->player->inventory->setActive(keyval == GDK_KEY_0? 9 : keyval - 0x31);
-						game->player->inventory->notifyOwner();
-					}
 					return;
 			}
 		}

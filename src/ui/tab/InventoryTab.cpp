@@ -244,7 +244,7 @@ namespace Game3 {
 		externalInventory = inventory;
 		externalName = name;
 		if (inventory)
-			if (auto owner = inventory->owner.lock())
+			if (auto owner = inventory->weakOwner.lock())
 				reset(owner->getRealm()->getGame().toClientPointer());
 	}
 

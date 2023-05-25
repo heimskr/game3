@@ -183,7 +183,7 @@ namespace Game3 {
 		merchantName = name;
 		priceMultiplier = price_multiplier;
 		if (inventory)
-			if (auto owner = inventory->owner.lock())
+			if (auto owner = inventory->weakOwner.lock())
 				reset(owner->getRealm()->getGame().toClientPointer());
 	}
 

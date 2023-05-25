@@ -268,8 +268,13 @@ namespace Game3 {
 	}
 
 	bool Player::send(const Packet &packet) {
-		if (auto locked = client.lock()) {
-			locked->send(packet);
+		if (getSide() == Side::Server) {
+			if (auto locked = client.lock()) {
+				locked->send(packet);
+				return true;
+			}
+		} else {
+			getGame().toClient().client->send(packet);
 			return true;
 		}
 

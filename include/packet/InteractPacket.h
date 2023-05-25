@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Position.h"
 #include "net/Buffer.h"
 #include "packet/Packet.h"
 #include "ui/Modifiers.h"
