@@ -1,12 +1,12 @@
 #include "Log.h"
 #include "game/ClientGame.h"
-#include "packet/EntityMovePacket.h"
+#include "packet/EntityMovedPacket.h"
 
 namespace Game3 {
-	EntityMovePacket::EntityMovePacket(const Entity &entity):
-		EntityMovePacket(entity.globalID, entity.nextRealm == -1? entity.realmID : entity.nextRealm, entity.realmID, entity.getPosition(), entity.direction, entity.offset.x(), entity.offset.y()) {}
+	EntityMovedPacket::EntityMovedPacket(const Entity &entity):
+		EntityMovedPacket(entity.globalID, entity.nextRealm == -1? entity.realmID : entity.nextRealm, entity.realmID, entity.getPosition(), entity.direction, entity.offset.x(), entity.offset.y()) {}
 
-	void EntityMovePacket::handle(ClientGame &game) {
+	void EntityMovedPacket::handle(ClientGame &game) {
 		auto iter = game.realms.find(realmID);
 		if (iter == game.realms.end()) {
 			WARN("Couldn't find realm " << realmID);

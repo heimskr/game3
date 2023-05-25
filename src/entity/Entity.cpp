@@ -247,6 +247,7 @@ namespace Game3 {
 			return false;
 		}
 
+		const Direction old_direction = direction;
 		Position new_position = position;
 		float x_offset = 0.f;
 		float y_offset = 0.f;
@@ -283,22 +284,27 @@ namespace Game3 {
 			return false;
 		}
 
-		if (canMoveTo(new_position)) {
-			if (getChunkPosition(position) != getChunkPosition(new_position)) {
+		const bool can_move = canMoveTo(new_position);
+		const bool direction_changed = direction != old_direction;
+
+		if (can_move || direction_changed) {
+			if (can_move && getChunkPosition(position) != getChunkPosition(new_position)) {
 				movedToNewChunk();
 			}
 
-			if (horizontal)
-				offset.x() = x_offset;
-			else
-				offset.y() = y_offset;
+			if (can_move) {
+				if (horizontal)
+					offset.x() = x_offset;
+				else
+					offset.y() = y_offset;
+			}
 
 			bool path_empty = true;
 			{
 				std::shared_lock lock(pathMutex);
 				path_empty = path.empty();
 			}
-			teleport(new_position, !path_empty, false);
+			teleport(can_move? new_position : position, !path_empty, false);
 
 			return true;
 		}

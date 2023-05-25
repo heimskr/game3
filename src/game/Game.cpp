@@ -55,7 +55,7 @@
 #include "packet/EntityPacket.h"
 #include "packet/StartPlayerMovementPacket.h"
 #include "packet/ErrorPacket.h"
-#include "packet/EntityMovePacket.h"
+#include "packet/EntityMovedPacket.h"
 #include "packet/StopPlayerMovementPacket.h"
 #include "packet/EntitySetPathPacket.h"
 #include "packet/TeleportSelfPacket.h"
@@ -290,7 +290,7 @@ namespace Game3 {
 		add(PacketFactory::create<EntityPacket>());
 		add(PacketFactory::create<StartPlayerMovementPacket>());
 		add(PacketFactory::create<ErrorPacket>());
-		add(PacketFactory::create<EntityMovePacket>());
+		add(PacketFactory::create<EntityMovedPacket>());
 		add(PacketFactory::create<StopPlayerMovementPacket>());
 		add(PacketFactory::create<EntitySetPathPacket>());
 		add(PacketFactory::create<TeleportSelfPacket>());

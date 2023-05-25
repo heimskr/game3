@@ -62,7 +62,7 @@ namespace Game3 {
 			WeakSet<Entity> visibleEntities;
 			/** Governed by visibleEntititesMutex. */
 			WeakSet<Player> visiblePlayers;
-			/** Set when an entity is beginning to teleport so that an EntityMovePacket can be sent with the proper realm ID
+			/** Set when an entity is beginning to teleport so that an EntityMovedPacket can be sent with the proper realm ID
 			 *  before the actual realm switch has occurred. */
 			RealmID nextRealm = -1;
 			bool spawning = false;

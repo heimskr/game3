@@ -387,7 +387,6 @@ namespace Game3 {
 
 	void Inventory::notifyOwner() {
 		if (auto owner = weakOwner.lock()) {
-			INFO("Notified");
 			const auto side = owner->getRealm()->getSide();
 			auto player = std::dynamic_pointer_cast<Player>(owner);
 

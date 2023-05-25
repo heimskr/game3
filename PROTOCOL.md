@@ -105,7 +105,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `string` Error
 
-17. **Entity Move**: informs a client that an entity moved.
+17. **Entity Moved**: informs a client that an entity moved.
 
 	- `u64` Entity Global ID
 	- `i32` Realm ID

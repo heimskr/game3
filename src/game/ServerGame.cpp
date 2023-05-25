@@ -6,7 +6,7 @@
 #include "packet/CommandResultPacket.h"
 #include "packet/DestroyEntityPacket.h"
 #include "packet/DestroyTileEntityPacket.h"
-#include "packet/EntityMovePacket.h"
+#include "packet/EntityMovedPacket.h"
 #include "packet/TileUpdatePacket.h"
 #include "util/Util.h"
 
@@ -57,7 +57,7 @@ namespace Game3 {
 		if (entity.spawning)
 			return;
 
-		const EntityMovePacket packet(entity);
+		const EntityMovedPacket packet(entity);
 
 		if (auto cast_player = dynamic_cast<Player *>(&entity)) {
 			cast_player->send(packet);
