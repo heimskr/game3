@@ -26,7 +26,7 @@ namespace Game3 {
 		float scaleX = 1.f;
 		float scaleY = 1.f;
 		float angle  = 0.f;
-		Color color {};
+		Color color {1.f, 0.f, 0.f, 1.f};
 		TextAlign align = TextAlign::Left;
 	};
 
@@ -47,7 +47,7 @@ namespace Game3 {
 			void update(int backbuffer_width, int backbuffer_height);
 
 			void drawOnMap(std::string_view text, float x, float y, TextAlign align, float scale, float angle, float alpha);
-			void drawOnMap(std::string_view text, const TextRenderOptions & = {});
+			void drawOnMap(std::string_view text, TextRenderOptions = {});
 			void drawOnScreen(std::string_view text, const TextRenderOptions & = {});
 			float textWidth(std::string_view, float scale = 1.f);
 			float textHeight(std::string_view, float scale = 1.f);

@@ -93,8 +93,8 @@ namespace Game3 {
 		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
 			backbufferWidth = backbuffer_width;
 			backbufferHeight = backbuffer_height;
-			projection = glm::ortho(0.f, static_cast<float>(backbuffer_width), static_cast<float>(backbuffer_height), 0.f, -1.f, 1.f);
-			// projection = glm::ortho(0.f, static_cast<float>(backbuffer_width), 0.f, static_cast<float>(backbuffer_height), -1.f, 1.f);
+			// projection = glm::ortho(0.f, static_cast<float>(backbuffer_width), static_cast<float>(backbuffer_height), 0.f, -1.f, 1.f);
+			projection = glm::ortho(0.f, static_cast<float>(backbuffer_width), 0.f, static_cast<float>(backbuffer_height), -1.f, 1.f);
 			shader.bind();
 			shader.set("projection", projection);
 		}
@@ -112,7 +112,7 @@ namespace Game3 {
 		});
 	}
 
-	void TextRenderer::drawOnMap(std::string_view text, const TextRenderOptions &options) {
+	void TextRenderer::drawOnMap(std::string_view text, TextRenderOptions options) {
 		if (!initialized)
 			return;
 
@@ -121,25 +121,43 @@ namespace Game3 {
 		const auto tile_size  = tileset->getTileSize();
 		const auto map_length = CHUNK_SIZE * REALM_DIAMETER;
 
-		auto x = options.x;
-		auto y = options.y;
+		auto &x = options.x;
+		auto &y = options.y;
 		// float x = 0;
 		// float y = 0;
-		auto scale_x = options.scaleX / 1.f;
-		auto scale_y = options.scaleY / 1.f;
+		auto scale_x = options.scaleX / 48.f;
+		auto scale_y = options.scaleY / 48.f;
 
-		x *= tile_size * canvas->scale / 2.f;
-		y *= tile_size * canvas->scale / 2.f;
+		auto tw = textWidth(text, scale_x);
+		auto th = textHeight(text, scale_y);
+
+		// x = 0;
+		// y = 0;
+
+		std::cout << '(' << tw << ", " << th << ") tw,th (" << centerX << ", " << centerY << ") cent [" << canvas->scale << "] scale\n";
+
+		// x *= tile_size * canvas->scale / 2.f;
+		// y *= tile_size * canvas->scale / 2.f;
+		x *= canvas->scale;
+		y *= canvas->scale;
 
 		x += canvas->width() / 2.f;
 		x -= map_length * tile_size * canvas->scale / canvas->magic * 2.f; // TODO: the math here is a little sus... things might cancel out
-		x += centerX * canvas->scale * tile_size / 2.f;
+		x += centerX * canvas->scale / 2.f;
+		// x -= tw / 2.f;
 
 		y += canvas->height() / 2.f;
 		y -= map_length * tile_size * canvas->scale / canvas->magic * 2.f;
-		y += centerY * canvas->scale * tile_size / 2.f;
+		y += centerY * canvas->scale / 2.f;
+		// y -= th / 2.f;
 
-		std::cout << x << ", " << y << '\n';
+		// x /= 10;
+		// y /= 10;
+
+		// x = 100.0f;
+		// y = 100.0f;
+
+		std::cout << '(' << x << ", " << y << ") xy, (" << backbufferWidth << ", " << backbufferHeight << ") wh\n";
 		v4 = {x, y, 0.f, 1.f};
 
 		setupShader(text, options); CHECKGL
@@ -175,7 +193,7 @@ namespace Game3 {
 			// Render quad
 			glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
 			// Advance cursors for next glyph (note that advance is number of 1/64 pixels)
-			x += (character.advance >> 6) * options.scaleX; // Bitshift by 6 to get value in pixels (2^6 = 64)
+			x += (character.advance >> 6) * scale_x; // Bitshift by 6 to get value in pixels (2^6 = 64)
 		}
 
 		glBindVertexArray(0); CHECKGL
@@ -200,12 +218,14 @@ namespace Game3 {
 		// const auto text_width = textWidth(text, 1.f);
 		// const auto text_height = textHeight(text, 1.f);
 
-		const float text_width = 1;
-		const float text_height = 1;
+		// const float text_width = 1.f / 20.f;
+		// const float text_height = 1.f / 7.f;
+		const float text_width = 1.f;
+		const float text_height = 1.f;
 
 		glm::mat4 model = glm::mat4(1.f);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(options.x * 16.f, options.y * 16.f, 0.0f));
+		model = glm::translate(model, glm::vec3(options.x, options.y, 0.0f));
 		model = glm::translate(model, glm::vec3(0.5f * text_width, 0.5f * text_height, 0.0f));
 		model = glm::rotate   (model, glm::radians(options.angle), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::translate(model, glm::vec3(-0.5f * text_width, -0.5f * text_height, 0.0f));
