@@ -53,6 +53,9 @@ namespace Game3 {
 	}
 
 	void ServerGame::entityTeleported(Entity &entity) {
+		if (entity.spawning)
+			return;
+
 		const EntityMovePacket packet(entity);
 
 		if (auto cast_player = dynamic_cast<Player *>(&entity)) {

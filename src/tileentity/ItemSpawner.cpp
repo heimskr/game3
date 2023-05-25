@@ -1,5 +1,6 @@
-#include "threading/ThreadContext.h"
+#include "Log.h"
 #include "Tileset.h"
+#include "threading/ThreadContext.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
 #include "game/Game.h"
@@ -32,6 +33,9 @@ namespace Game3 {
 	}
 
 	void ItemSpawner::tick(Game &, float delta) {
+		if (getSide() != Side::Server)
+			return;
+
 		static std::uniform_real_distribution distribution(0., 1.);
 		for (float i = 0.f; i < delta; i += .1f) {
 			if (distribution(threadContext.rng) < chancePerTenth) {

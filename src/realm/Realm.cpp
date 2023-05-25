@@ -259,8 +259,11 @@ namespace Game3 {
 		entitiesByGID[entity->globalID] = entity;
 		attach(entity);
 		if (entity->isPlayer()) {
-			std::unique_lock lock(playersMutex);
-			players.insert(std::dynamic_pointer_cast<Player>(entity));
+			{
+				std::unique_lock lock(playersMutex);
+				players.insert(std::dynamic_pointer_cast<Player>(entity));
+			}
+			recalculateVisibleChunks();
 		}
 		return entity;
 	}

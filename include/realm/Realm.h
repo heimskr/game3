@@ -189,10 +189,20 @@ namespace Game3 {
 			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {
 				Game &game_ref = getGame();
 				auto entity = T::create(game_ref, std::forward<Args>(args)...);
+				entity->spawning = true;
 				entity->setRealm(shared_from_this());
 				entity->init(game_ref);
 				entity->teleport(position);
 				add(entity);
+				entity->calculateVisibleEntities();
+				entity->spawning = false;
+				auto lock = entity->lockVisibleEntitiesShared();
+				if (!entity->visiblePlayers.empty()) {
+					const EntityPacket packet(entity);
+					for (const auto &weak_player: entity->visiblePlayers)
+						if (auto player = weak_player.lock())
+							player->send(packet);
+				}
 				return entity;
 			}
 

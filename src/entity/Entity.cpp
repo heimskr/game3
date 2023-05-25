@@ -736,12 +736,17 @@ namespace Game3 {
 		if (!realm)
 			return;
 
+		auto entities_lock = realm->lockEntitiesShared();
 		auto visible_lock = lockVisibleEntities();
 		visibleEntities.clear();
-		auto entities_lock = realm->lockEntitiesShared();
-		for (const auto &entity: realm->entities)
-			if (entity.get() != this && entity->canSee(*this))
+		visiblePlayers.clear();
+		for (const auto &entity: realm->entities) {
+			if (entity.get() != this && entity->canSee(*this)) {
 				visibleEntities.insert(entity);
+				if (entity->isPlayer())
+					visiblePlayers.insert(std::dynamic_pointer_cast<Player>(entity));
+			}
+		}
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {

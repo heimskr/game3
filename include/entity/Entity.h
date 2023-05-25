@@ -65,6 +65,7 @@ namespace Game3 {
 			/** Set when an entity is beginning to teleport so that an EntityMovePacket can be sent with the proper realm ID
 			 *  before the actual realm switch has occurred. */
 			RealmID nextRealm = -1;
+			bool spawning = false;
 
 			virtual void destroy();
 
@@ -130,6 +131,7 @@ namespace Game3 {
 			void setSeenPath(const PlayerPtr &, bool seen = true);
 			void removeVisible(const std::weak_ptr<Entity> &);
 			void removeVisible(const std::weak_ptr<Player> &);
+			void calculateVisibleEntities();
 			inline bool is(const Identifier &check) const { return type == check; }
 			inline auto getHeldLeft()  const { return heldLeft.slot;  }
 			inline auto getHeldRight() const { return heldRight.slot; }
@@ -162,7 +164,6 @@ namespace Game3 {
 			std::shared_ptr<Texture> getTexture();
 			inline auto getHeldLeftTexture()  const { return heldLeft.texture;  }
 			inline auto getHeldRightTexture() const { return heldRight.texture; }
-			void calculateVisibleEntities();
 
 			std::shared_ptr<Agent> getSharedAgent() override { return shared_from_this(); }
 
