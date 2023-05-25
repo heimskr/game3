@@ -377,6 +377,9 @@ namespace GL {
 		public:
 			Texture() = default;
 
+			Texture(GLuint handle_, GLsizei width_, GLsizei height_):
+				handle(handle_), width(width_), height(height_) {}
+
 			Texture(const Texture &) = delete;
 			Texture(Texture &&other) {
 				handle = other.handle;

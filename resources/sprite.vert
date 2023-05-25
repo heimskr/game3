@@ -1,9 +1,8 @@
-#version 330 core
-
 // Credit: https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/3.2d_game/0.full_source/sprite.vs
 
-layout (location = 0) in vec4 vertex; // <vec2 position, vec2 texCoords>
+#version 330 core
 
+layout (location = 0) in vec4 vertex; // <vec2 position, vec2 texCoords>
 out vec2 TexCoords;
 
 uniform mat4 model;

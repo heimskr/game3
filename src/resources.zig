@@ -15,6 +15,7 @@ pub const shaders = [_]Shader{
 	.{ .name = "blur" },
 	.{ .name = "reshader", .types = &.{.vert} },
 	.{ .name = "multiplier" },
+	.{ .name = "text" },
 };
 
 comptime {

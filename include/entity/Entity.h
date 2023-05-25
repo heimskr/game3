@@ -31,6 +31,7 @@ namespace Game3 {
 	class Realm;
 	class RemoteClient;
 	class SpriteRenderer;
+	class TextRenderer;
 	class TileEntity;
 
 	struct EntityTexture: NamedRegisterable {
@@ -85,7 +86,7 @@ namespace Game3 {
 			/** Returns the maximum number of hitpoints this entity can have. If 0, the entity is invincible. */
 			virtual HitPoints maxHealth() const { return 0; }
 			bool isInvincible() const { return maxHealth() == INVINCIBLE; }
-			virtual void render(SpriteRenderer &);
+			virtual void render(SpriteRenderer &, TextRenderer &);
 			virtual void tick(Game &, float delta);
 			/** Removes the entity from existence. */
 			virtual void remove();

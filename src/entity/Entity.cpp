@@ -147,7 +147,7 @@ namespace Game3 {
 		movedToNewChunk();
 	}
 
-	void Entity::render(SpriteRenderer &sprite_renderer) {
+	void Entity::render(SpriteRenderer &sprite_renderer, TextRenderer &) {
 		if (texture == nullptr || !isVisible())
 			return;
 

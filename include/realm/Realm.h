@@ -33,6 +33,7 @@ namespace Game3 {
 	class Game;
 	class RemoteClient;
 	class SpriteRenderer;
+	class TextRenderer;
 
 	using EntityPtr = std::shared_ptr<Entity>;
 
@@ -99,7 +100,7 @@ namespace Game3 {
 			virtual void onFocus();
 			virtual void onBlur();
 			void createRenderers();
-			void render(int width, int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &, float game_time);
+			void render(int width, int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &, TextRenderer &, float game_time);
 			void reupload();
 			/** The Layer argument is 1-based. */
 			void reupload(Layer);

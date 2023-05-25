@@ -146,7 +146,7 @@ namespace Game3 {
 		renderers.emplace();
 	}
 
-	void Realm::render(const int width, const int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &sprite_renderer, float game_time) {
+	void Realm::render(const int width, const int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &sprite_renderer, TextRenderer &text_renderer, float game_time) {
 		if (getSide() != Side::Client)
 			return;
 
@@ -178,7 +178,7 @@ namespace Game3 {
 			auto lock = lockEntitiesShared();
 			for (const auto &entity: entities)
 				if (!entity->isPlayer() || !client_game.player || entity->globalID != client_game.player->globalID)
-					entity->render(sprite_renderer);
+					entity->render(sprite_renderer, text_renderer);
 		}
 
 		{
@@ -188,7 +188,7 @@ namespace Game3 {
 		}
 
 		if (client_game.player)
-			client_game.player->render(sprite_renderer);
+			client_game.player->render(sprite_renderer, text_renderer);
 
 		// multiplier.update(bb_width, bb_height);
 		// sprite_renderer.drawOnMap(texture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);

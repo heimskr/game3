@@ -12,6 +12,7 @@
 #include "ui/RectangleRenderer.h"
 #include "ui/Multiplier.h"
 #include "ui/SpriteRenderer.h"
+#include "ui/TextRenderer.h"
 #include "util/GL.h"
 
 namespace Game3 {
@@ -29,6 +30,7 @@ namespace Game3 {
 			Eigen::Vector2f center {0.f, 0.f};
 			float scale = DEFAULT_SCALE;
 			SpriteRenderer spriteRenderer {*this};
+			TextRenderer textRenderer {*this};
 			RectangleRenderer rectangleRenderer;
 			GL::Texture textureA;
 			GL::Texture textureB;

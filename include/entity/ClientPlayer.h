@@ -7,7 +7,7 @@ namespace Game3 {
 		public:
 			~ClientPlayer() override = default;
 
-			void render(SpriteRenderer &) override;
+			void render(SpriteRenderer &, TextRenderer &) override;
 
 			friend class Entity;
 

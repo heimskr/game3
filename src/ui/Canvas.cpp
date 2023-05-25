@@ -22,8 +22,9 @@ namespace Game3 {
 		game->tick();
 		spriteRenderer.update(width(), height());
 		rectangleRenderer.update(width(), height());
+		textRenderer.update(width(), height());
 		if (game->activeRealm) {
-			game->activeRealm->render(width(), height(), center, scale, spriteRenderer, game->getDivisor());
+			game->activeRealm->render(width(), height(), center, scale, spriteRenderer, textRenderer, game->getDivisor());
 			realmBounds = game->getVisibleRealmBounds();
 		}
 	}

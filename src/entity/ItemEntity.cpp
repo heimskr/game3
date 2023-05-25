@@ -57,7 +57,7 @@ namespace Game3 {
 			stack.item->getOffsets(game, texture, xOffset, yOffset);
 	}
 
-	void ItemEntity::render(SpriteRenderer &sprite_renderer) {
+	void ItemEntity::render(SpriteRenderer &sprite_renderer, TextRenderer &) {
 		if (!isVisible())
 			return;
 
