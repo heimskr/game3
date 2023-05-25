@@ -122,6 +122,7 @@ namespace Game3 {
 			Game & getGame();
 			const Game & getGame() const;
 			void queueRemoval(const EntityPtr &);
+			void queueDestruction(const EntityPtr &);
 			void queueRemoval(const TileEntityPtr &);
 			void queuePlayerRemoval(const PlayerPtr &);
 			void queueAddition(const EntityPtr &);
@@ -284,6 +285,7 @@ namespace Game3 {
 			Game &game;
 			bool ticking = false;
 			MTQueue<EntityPtr> entityRemovalQueue;
+			MTQueue<EntityPtr> entityDestructionQueue;
 			MTQueue<EntityPtr> entityAdditionQueue;
 			MTQueue<TileEntityPtr> tileEntityRemovalQueue;
 			MTQueue<TileEntityPtr> tileEntityAdditionQueue;

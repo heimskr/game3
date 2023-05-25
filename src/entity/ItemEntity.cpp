@@ -85,11 +85,15 @@ namespace Game3 {
 	}
 
 	bool ItemEntity::interact(const std::shared_ptr<Player> &player) {
+		if (getSide() != Side::Server)
+			return true;
+
 		auto leftover = player->inventory->add(stack);
 		if (leftover)
 			stack = std::move(*leftover);
 		else
 			remove();
+
 		return true;
 	}
 

@@ -130,10 +130,7 @@ namespace Game3 {
 	}
 
 	void Entity::remove() {
-		auto realm = getRealm();
-		// I'm assuming this has to be in its own variable to prevent the destructor from being called before this function returns.
-		auto shared = shared_from_this();
-		realm->entities.erase(shared);
+		getRealm()->queueDestruction(shared_from_this());
 	}
 
 	void Entity::init(Game &game_) {

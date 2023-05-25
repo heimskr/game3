@@ -353,6 +353,11 @@ namespace Game3 {
 			for (const auto &stolen: entityRemovalQueue.steal())
 				remove(stolen);
 
+			for (const auto &stolen: entityDestructionQueue.steal()) {
+				remove(stolen);
+				stolen->destroy();
+			}
+
 			for (const auto &stolen: tileEntityRemovalQueue.steal())
 				remove(stolen);
 
@@ -419,6 +424,11 @@ namespace Game3 {
 
 			for (const auto &stolen: entityRemovalQueue.steal())
 				remove(stolen);
+
+			for (const auto &stolen: entityDestructionQueue.steal()) {
+				remove(stolen);
+				stolen->destroy();
+			}
 
 			for (const auto &stolen: tileEntityRemovalQueue.steal())
 				remove(stolen);
@@ -532,6 +542,10 @@ namespace Game3 {
 
 	void Realm::queueRemoval(const EntityPtr &entity) {
 		entityRemovalQueue.push(entity);
+	}
+
+	void Realm::queueDestruction(const EntityPtr &entity) {
+		entityDestructionQueue.push(entity);
 	}
 
 	void Realm::queueRemoval(const TileEntityPtr &tile_entity) {
