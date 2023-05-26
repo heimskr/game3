@@ -125,34 +125,56 @@ namespace Game3 {
 		auto &y = options.y;
 		// float x = 0;
 		// float y = 0;
-		auto scale_x = options.scaleX / 48.f;
-		auto scale_y = options.scaleY / 48.f;
+		auto &scale_x = options.scaleX;
+		auto &scale_y = options.scaleY;
+		scale_x /= 48.f;
+		scale_y /= 48.f;
 
-		auto tw = textWidth(text, scale_x);
-		auto th = textHeight(text, scale_y);
+		auto tw = textWidth(text, canvas->scale);
+		auto th = textHeight(text, canvas->scale);
 
 		// x = 0;
 		// y = 0;
 
 		std::cout << '(' << tw << ", " << th << ") tw,th (" << centerX << ", " << centerY << ") cent [" << canvas->scale << "] scale\n";
 
-		// x *= tile_size * canvas->scale / 2.f;
-		// y *= tile_size * canvas->scale / 2.f;
-		x *= canvas->scale;
-		y *= canvas->scale;
+		x *= tile_size * canvas->scale / 2.f;
+		y *= tile_size * canvas->scale / 2.f;
 
-		x += canvas->width() / 2.f;
+		x += canvas->width() * canvas->scale / 2.f;
 		x -= map_length * tile_size * canvas->scale / canvas->magic * 2.f; // TODO: the math here is a little sus... things might cancel out
-		x += centerX * canvas->scale / 2.f;
-		// x -= tw / 2.f;
+		x += centerX * canvas->scale * 2.f;
 
-		y += canvas->height() / 2.f;
+		y += canvas->height() * canvas->scale / 2.f;
 		y -= map_length * tile_size * canvas->scale / canvas->magic * 2.f;
-		y += centerY * canvas->scale / 2.f;
+		y -= centerY * canvas->scale * 2.f;
+
+		// std::cout << "[1] " << x << " -> [2] ";
+		// x += canvas->width() / 2.f;
+		// y *= canvas->scale / 2.f;
+		// // x *= canvas->scale;
+		// // y *= canvas->scale;
+		// std::cout << x << " -> [3] ";
+		// x *= canvas->scale / 2.f;
+		// std::cout << x << " -> [4] ";
+		// // x -= map_length * tile_size * canvas->scale / canvas->magic * 2.f; // TODO: the math here is a little sus... things might cancel out
+		// x -= map_length * canvas->scale / canvas->magic * 2.f;
+		// std::cout << x << " -> [5] ";
+		// x += centerX * canvas->scale * 2.f;
+		// std::cout << x << " -> [6] ";
+		// // x -= tw / 2.f;
+
+		// y += canvas->height() / 2.f;
+		// // y -= map_length * tile_size * canvas->scale / canvas->magic * 2.f;
+		// y -= map_length * canvas->scale / canvas->magic * 2.f;
+		// y -= centerY * canvas->scale * 2.f;
 		// y -= th / 2.f;
 
-		// x /= 10;
-		// y /= 10;
+		// x /= 16.f;
+		std::cout << x << ".\n";
+		// y /= 16.f;
+
+
 
 		// x = 100.0f;
 		// y = 100.0f;
@@ -215,21 +237,21 @@ namespace Game3 {
 	}
 
 	void TextRenderer::setupShader(std::string_view text, const TextRenderOptions &options) {
-		// const auto text_width = textWidth(text, 1.f);
-		// const auto text_height = textHeight(text, 1.f);
+		const auto text_width = textWidth(text, options.scaleX);
+		const auto text_height = textHeight(text, options.scaleY);
 
 		// const float text_width = 1.f / 20.f;
 		// const float text_height = 1.f / 7.f;
-		const float text_width = 1.f;
-		const float text_height = 1.f;
+		// const float text_width = 1.f;
+		// const float text_height = 1.f;
 
 		glm::mat4 model = glm::mat4(1.f);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(options.x, options.y, 0.0f));
-		model = glm::translate(model, glm::vec3(0.5f * text_width, 0.5f * text_height, 0.0f));
+		model = glm::translate(model, glm::vec3(options.x + text_width / 2.f, options.y, 0.0f));
+		model = glm::translate(model, glm::vec3(.5f * text_width, .5f * text_height, 0.0f));
 		model = glm::rotate   (model, glm::radians(options.angle), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::translate(model, glm::vec3(-0.5f * text_width, -0.5f * text_height, 0.0f));
-		model = glm::scale    (model, glm::vec3(text_width * options.scaleX, text_height * options.scaleY, 1.0f));
+		model = glm::translate(model, glm::vec3(-.5f * text_width, -.5f * text_height, 0.0f));
+		model = glm::scale    (model, glm::vec3(text_width * options.scaleX * canvas->scale, text_height * options.scaleY * canvas->scale, 1.0f));
 
 		shader.bind();
 		shader.set("model", model);
