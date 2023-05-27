@@ -38,6 +38,15 @@ namespace Game3 {
 			float centerX = 0.f;
 			float centerY = 0.f;
 
+			struct Character {
+				GLuint     textureID; // ID handle of the glyph texture
+				glm::ivec2 size;      // Size of glyph
+				glm::ivec2 bearing;   // Offset from baseline to left/top of glyph
+				FT_Pos     advance;   // Offset to advance to next glyph
+			};
+
+			std::unordered_map<gunichar, Character> characters;
+
 			TextRenderer(Canvas &);
 			~TextRenderer();
 
@@ -74,13 +83,6 @@ namespace Game3 {
 				}
 			};
 
-			struct Character {
-				GLuint     textureID; // ID handle of the glyph texture
-				glm::ivec2 size;      // Size of glyph
-				glm::ivec2 bearing;   // Offset from baseline to left/top of glyph
-				FT_Pos     advance;   // Offset to advance to next glyph
-			};
-
 			GLuint vao = 0;
 			GLuint vbo = 0;
 			bool initialized = false;
@@ -92,7 +94,6 @@ namespace Game3 {
 
 			std::unique_ptr<FT_Library, FreeLibrary> freetypeLibrary;
 			std::unique_ptr<FT_Face, FreeFace> freetypeFace;
-			std::unordered_map<gunichar, Character> characters;
 
 			void initRenderData();
 			void setupShader(std::string_view, const TextRenderOptions &);
