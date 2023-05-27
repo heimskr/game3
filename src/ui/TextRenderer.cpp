@@ -93,6 +93,7 @@ namespace Game3 {
 			backbufferWidth = backbuffer_width;
 			backbufferHeight = backbuffer_height;
 			projection = glm::ortho(0.f, static_cast<float>(backbuffer_width), static_cast<float>(backbuffer_height), 0.f, -1.f, 1.f);
+			// projection = glm::ortho(0.f, 16.f, 16.f, 0.f, -1.f, 1.f);
 			// projection = glm::ortho(0.f, static_cast<float>(backbuffer_width), 0.f, static_cast<float>(backbuffer_height), -1.f, 1.f);
 			shader.bind();
 			shader.set("projection", projection);
@@ -111,6 +112,8 @@ namespace Game3 {
 		});
 	}
 
+	extern float xHax;
+
 	void TextRenderer::drawOnMap(std::string_view text, TextRenderOptions options) {
 		if (!initialized)
 			initRenderData();
@@ -126,8 +129,11 @@ namespace Game3 {
 		// float y = 0;
 		auto &scale_x = options.scaleX;
 		auto &scale_y = options.scaleY;
-		scale_x *= 1 / 16.f;
-		scale_y *= 1 / 16.f;
+		// scale_x *= 1 / 16.f;
+		// scale_y *= 1 / 16.f;
+
+		scale_x *= canvas->scale;
+		scale_y *= canvas->scale;
 
 		auto tw = textWidth(text, scale_x);
 		auto th = textHeight(text, scale_y);
@@ -135,7 +141,7 @@ namespace Game3 {
 		// x = 0;
 		// y = 0;
 
-		std::cout << '(' << tw << ", " << th << ") tw,th (" << centerX << ", " << centerY << ") cent [" << canvas->scale << "] scale\n";
+		std::cout << "\e[31m(" << tw << ", " << th << ") tw,th \e[32m(" << centerX << ", " << centerY << ") cent \e[33m[" << canvas->scale << "] scale \e[34m(" << x << ", " << y << ") orig\e[39m\n";
 
 		// x *= tile_size;
 		// y *= tile_size;
@@ -154,16 +160,60 @@ namespace Game3 {
 		// x *= canvas->scale;
 		// y *= canvas->scale;
 
-		x *= tile_size * canvas->scale / 2.f;
-		y *= tile_size * canvas->scale / 2.f;
+
+
+
+
+		// x *= tile_size * canvas->scale / 2.f;
+		// y *= tile_size * canvas->scale / 2.f;
+
+		// x += canvas->width() / 2.f;
+		// x -= map_length * tile_size * canvas->scale / canvas->magic * 2.f; // TODO: the math here is a little sus... things might cancel out
+		// x += centerX * canvas->scale * tile_size / 2.f;
+
+		// y += canvas->height() / 2.f;
+		// y -= map_length * tile_size * canvas->scale / canvas->magic * 2.f;
+		// y += centerY * canvas->scale * tile_size / 2.f;
+
+
+		// x *= canvas->scale;
+		// y *= canvas->scale;
+
+
+		// x *= canvas->scale / 2.f;
+		// y *= canvas->scale / 2.f;
+
+		x += map_length * tile_size;
+		// y += map_length * tile_size;
 
 		x += canvas->width() / 2.f;
-		x -= map_length * tile_size * canvas->scale / canvas->magic * 2.f; // TODO: the math here is a little sus... things might cancel out
-		x += centerX * canvas->scale * tile_size / 2.f;
-
 		y += canvas->height() / 2.f;
-		y -= map_length * tile_size * canvas->scale / canvas->magic * 2.f;
-		y += centerY * canvas->scale * tile_size / 2.f;
+
+		x *= canvas->scale;
+
+		x -= map_length * tile_size / 2.f;
+
+		x += centerX * 8.f * canvas->scale;
+		y += centerY * 8.f * canvas->scale;
+
+		// x *= canvas->scale;
+		// y *= canvas->scale;
+
+
+		auto whatX = 100.f / canvas->scale;
+		whatX = 0.f;
+
+		x += whatX;
+		// y -= what;
+
+		std::cout << "\e[33m" << whatX << "\e[39m\n";
+
+		y = 100;
+
+
+		// x /= 2.f;
+		// y /= 2.f;
+
 
 
 
@@ -286,9 +336,9 @@ namespace Game3 {
 
 
 		shader.bind();
-		shader.set("model", model);
-		std::cout << glm::to_string(projection * model * v4) << '\n';
-		std::cout << "\e[35mText model: " << glm::to_string(model) << "\e[39m text<" << text_width << " x " << text_height << ">\n";
+		// shader.set("model", model);
+		std::cout << glm::to_string(projection * v4) << '\n';
+		// std::cout << "\e[35mText model: " << glm::to_string(model) << "\e[39m text<" << text_width << " x " << text_height << ">\n";
 		shader.set("textColor", options.color.red, options.color.green, options.color.blue, options.color.alpha);
 	}
 }

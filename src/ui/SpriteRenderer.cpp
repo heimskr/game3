@@ -112,7 +112,7 @@ namespace Game3 {
 
 
 		if (thing) {
-			std::cout << "\e[36mTrue model: " << glm::to_string(model) << "\e[39m texture<" << *texture.width << " x " << *texture.height << ">\n";
+			// std::cout << "\e[36mTrue model: " << glm::to_string(model) << "\e[39m texture<" << *texture.width << " x " << *texture.height << ">\n";
 			thing = false;
 		}
 
