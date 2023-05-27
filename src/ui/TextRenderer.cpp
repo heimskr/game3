@@ -100,7 +100,7 @@ namespace Game3 {
 		}
 	}
 
-	void TextRenderer::drawOnMap(std::string_view text, float x, float y, TextAlign align, float scale, float angle, float alpha) {
+	void TextRenderer::drawOnMap(Glib::ustring text, float x, float y, TextAlign align, float scale, float angle, float alpha) {
 		drawOnMap(text, TextRenderOptions {
 			.x = x,
 			.y = y,
@@ -114,7 +114,7 @@ namespace Game3 {
 
 	extern float xHax;
 
-	void TextRenderer::drawOnMap(std::string_view text, TextRenderOptions options) {
+	void TextRenderer::drawOnMap(Glib::ustring text, TextRenderOptions options) {
 		if (!initialized)
 			initRenderData();
 
@@ -157,8 +157,8 @@ namespace Game3 {
 		glActiveTexture(GL_TEXTURE0); CHECKGL
 		glBindVertexArray(vao); CHECKGL
 
-		for (const char ch: text) {
-			const auto &character = characters.at(ch);
+		for (const auto ch: text) {
+			const auto &character = getCharacter(ch);
 
 			const float xpos = x + character.bearing.x * scale_x;
 			const float ypos = y - (character.size.y - character.bearing.y) * scale_y;
@@ -192,17 +192,23 @@ namespace Game3 {
 		glBindTexture(GL_TEXTURE_2D, 0); CHECKGL
 	}
 
-	float TextRenderer::textWidth(std::string_view text, float scale) {
+	float TextRenderer::textWidth(Glib::ustring text, float scale) {
 		float out = 0.f;
 		for (const char ch: text)
-			out += scale * (characters.at(ch).advance >> 6);
+			out += scale * (getCharacter(ch).advance >> 6);
 		return out;
 	}
 
-	float TextRenderer::textHeight(std::string_view text, float scale) {
+	float TextRenderer::textHeight(Glib::ustring text, float scale) {
 		float out = 0.f;
 		for (const char ch: text)
-			out = std::max(out, characters.at(ch).size.y * scale);
+			out = std::max(out, getCharacter(ch).size.y * scale);
 		return out;
+	}
+
+	const TextRenderer::Character & TextRenderer::getCharacter(gunichar ch) const {
+		if (auto iter = characters.find(ch); iter != characters.end())
+			return iter->second;
+		return characters.at('?');
 	}
 }

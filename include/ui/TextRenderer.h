@@ -56,11 +56,11 @@ namespace Game3 {
 			void remove();
 			void update(int backbuffer_width, int backbuffer_height);
 
-			void drawOnMap(std::string_view text, float x, float y, TextAlign align, float scale, float angle, float alpha);
-			void drawOnMap(std::string_view text, TextRenderOptions = {});
-			void drawOnScreen(std::string_view text, const TextRenderOptions & = {});
-			float textWidth(std::string_view, float scale = 1.f);
-			float textHeight(std::string_view, float scale = 1.f);
+			void drawOnMap(Glib::ustring text, float x, float y, TextAlign align, float scale, float angle, float alpha);
+			void drawOnMap(Glib::ustring text, TextRenderOptions = {});
+			void drawOnScreen(Glib::ustring text, const TextRenderOptions & = {});
+			float textWidth(Glib::ustring, float scale = 1.f);
+			float textHeight(Glib::ustring, float scale = 1.f);
 
 			template <typename... Args>
 			void operator()(Args &&...args) {
@@ -96,5 +96,6 @@ namespace Game3 {
 			std::unique_ptr<FT_Face, FreeFace> freetypeFace;
 
 			void initRenderData();
+			const Character & getCharacter(gunichar) const;
 	};
 }
