@@ -17,8 +17,6 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	extern bool thing;
-
 	SpriteRenderer::SpriteRenderer(Canvas &canvas_): canvas(&canvas_), shader("SpriteRenderer") {
 		shader.init(sprite_vert, sprite_frag);
 		initRenderData();
@@ -109,12 +107,6 @@ namespace Game3 {
 		model = glm::rotate(model, glm::radians(options.angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
 		model = glm::translate(model, glm::vec3(-0.5f * *texture.width, -0.5f * *texture.height, 0.f)); // move origin back
 		model = glm::scale(model, glm::vec3(*texture.width * options.scaleX * canvas->scale / 2.f, *texture.height * options.scaleY * canvas->scale / 2.f, 2.f)); // last scale
-
-
-		if (thing) {
-			// std::cout << "\e[36mTrue model: " << glm::to_string(model) << "\e[39m texture<" << *texture.width << " x " << *texture.height << ">\n";
-			thing = false;
-		}
 
 		shader.set("model", model);
 		shader.set("spriteColor", 1.f, 1.f, 1.f, options.alpha);

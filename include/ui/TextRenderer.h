@@ -26,7 +26,7 @@ namespace Game3 {
 		float scaleX = 1.f;
 		float scaleY = 1.f;
 		float angle  = 0.f;
-		Color color {1.f, 0.f, 0.f, 1.f};
+		Color color {0.f, 0.f, 0.f, 1.f};
 		TextAlign align = TextAlign::Left;
 	};
 
@@ -55,7 +55,6 @@ namespace Game3 {
 			void remove();
 			void update(int backbuffer_width, int backbuffer_height);
 
-			void initRenderData();
 			void drawOnMap(std::string_view text, float x, float y, TextAlign align, float scale, float angle, float alpha);
 			void drawOnMap(std::string_view text, TextRenderOptions = {});
 			void drawOnScreen(std::string_view text, const TextRenderOptions & = {});
@@ -91,12 +90,10 @@ namespace Game3 {
 			int backbufferHeight = -1;
 
 			glm::mat4 projection;
-			glm::vec4 v4;
 
 			std::unique_ptr<FT_Library, FreeLibrary> freetypeLibrary;
 			std::unique_ptr<FT_Face, FreeFace> freetypeFace;
 
-			void setupShader(std::string_view, const TextRenderOptions &);
-			void hackY(float &y, float y_offset, float scale);
+			void initRenderData();
 	};
 }

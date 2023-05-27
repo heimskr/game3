@@ -56,15 +56,17 @@ namespace Game3 {
 			if (FT_Load_Char(face, ch, FT_LOAD_RENDER))
 				throw std::runtime_error("Failed to load glyph " + std::to_string(static_cast<uint32_t>(ch)));
 
-			GLuint texture;
+			GLuint texture = 0;
 			glGenTextures(1, &texture); CHECKGL
 			glBindTexture(GL_TEXTURE_2D, texture); CHECKGL
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, face->glyph->bitmap.width, face->glyph->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer); CHECKGL
+
 			// Set texture options
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); CHECKGL
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); CHECKGL
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); CHECKGL
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); CHECKGL
+
 			// Store character for later use
 			characters.emplace(ch, Character {
 				texture,
@@ -92,9 +94,7 @@ namespace Game3 {
 		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
 			backbufferWidth = backbuffer_width;
 			backbufferHeight = backbuffer_height;
-			projection = glm::ortho(0.f, static_cast<float>(backbuffer_width), static_cast<float>(backbuffer_height), 0.f, -1.f, 1.f);
-			// projection = glm::ortho(0.f, 16.f, 16.f, 0.f, -1.f, 1.f);
-			// projection = glm::ortho(0.f, static_cast<float>(backbuffer_width), 0.f, static_cast<float>(backbuffer_height), -1.f, 1.f);
+			projection = glm::ortho(0.f, static_cast<float>(backbuffer_width), 0.f, static_cast<float>(backbuffer_height), -1.f, 1.f);
 			shader.bind();
 			shader.set("projection", projection);
 		}
@@ -125,132 +125,34 @@ namespace Game3 {
 
 		auto &x = options.x;
 		auto &y = options.y;
-		// float x = 0;
-		// float y = 0;
 		auto &scale_x = options.scaleX;
 		auto &scale_y = options.scaleY;
-		// scale_x *= 1 / 16.f;
-		// scale_y *= 1 / 16.f;
 
-		scale_x *= canvas->scale;
-		scale_y *= canvas->scale;
+		scale_x *= canvas->scale / 8.f;
+		scale_y *= canvas->scale / 8.f;
 
-		auto tw = textWidth(text, scale_x);
-		auto th = textHeight(text, scale_y);
+		x *= 8.f;
+		y *= -8.f;
 
-		// x = 0;
-		// y = 0;
+		x += canvas->width() / 2.f / canvas->scale;
+		y += canvas->height() / 2.f / canvas->scale;
 
-		std::cout << "\e[31m(" << tw << ", " << th << ") tw,th \e[32m(" << centerX << ", " << centerY << ") cent \e[33m[" << canvas->scale << "] scale \e[34m(" << x << ", " << y << ") orig\e[39m\n";
+		x -= map_length * tile_size / 4.f;
+		y += map_length * tile_size / 4.f;
 
-		// x *= tile_size;
-		// y *= tile_size;
-
-		// x += canvas->width() / 2.f;
-		// // x -= map_length * tile_size / 4.f;
-		// // x += centerX * 4.f;
-
-		// y += canvas->height() / 2.f;
-		// // y -= map_length * tile_size / 4.f;
-		// // y += centerY * 4.f;
-
-		// x += centerX;
-		// y -= centerY;
-
-		// x *= canvas->scale;
-		// y *= canvas->scale;
-
-
-
-
-
-		// x *= tile_size * canvas->scale / 2.f;
-		// y *= tile_size * canvas->scale / 2.f;
-
-		// x += canvas->width() / 2.f;
-		// x -= map_length * tile_size * canvas->scale / canvas->magic * 2.f; // TODO: the math here is a little sus... things might cancel out
-		// x += centerX * canvas->scale * tile_size / 2.f;
-
-		// y += canvas->height() / 2.f;
-		// y -= map_length * tile_size * canvas->scale / canvas->magic * 2.f;
-		// y += centerY * canvas->scale * tile_size / 2.f;
-
-
-		// x *= canvas->scale;
-		// y *= canvas->scale;
-
-
-		// x *= canvas->scale / 2.f;
-		// y *= canvas->scale / 2.f;
-
-		x += map_length * tile_size;
-		// y += map_length * tile_size;
-
-		x += canvas->width() / 2.f;
-		y += canvas->height() / 2.f;
+		x += centerX * 8.f;
+		y -= centerY * 8.f;
 
 		x *= canvas->scale;
+		y *= canvas->scale;
 
-		x -= map_length * tile_size / 2.f;
+		if (options.align == TextAlign::Center)
+			x -= textWidth(text, scale_x) / 2.f;
+		else if (options.align == TextAlign::Right)
+			x -= textWidth(text, scale_x);
 
-		x += centerX * 8.f * canvas->scale;
-		y += centerY * 8.f * canvas->scale;
-
-		// x *= canvas->scale;
-		// y *= canvas->scale;
-
-
-		auto whatX = 100.f / canvas->scale;
-		whatX = 0.f;
-
-		x += whatX;
-		// y -= what;
-
-		std::cout << "\e[33m" << whatX << "\e[39m\n";
-
-		y = 100;
-
-
-		// x /= 2.f;
-		// y /= 2.f;
-
-
-
-
-		// std::cout << "[1] " << x << " -> [2] ";
-		// x += canvas->width() / 2.f;
-		// y *= canvas->scale / 2.f;
-		// // x *= canvas->scale;
-		// // y *= canvas->scale;
-		// std::cout << x << " -> [3] ";
-		// x *= canvas->scale / 2.f;
-		// std::cout << x << " -> [4] ";
-		// // x -= map_length * tile_size * canvas->scale / canvas->magic * 2.f; // TODO: the math here is a little sus... things might cancel out
-		// x -= map_length * canvas->scale / canvas->magic * 2.f;
-		// std::cout << x << " -> [5] ";
-		// x += centerX * canvas->scale * 2.f;
-		// std::cout << x << " -> [6] ";
-		// // x -= tw / 2.f;
-
-		// y += canvas->height() / 2.f;
-		// // y -= map_length * tile_size * canvas->scale / canvas->magic * 2.f;
-		// y -= map_length * canvas->scale / canvas->magic * 2.f;
-		// y -= centerY * canvas->scale * 2.f;
-		// y -= th / 2.f;
-
-		// x /= 16.f;
-		// std::cout << x << ".\n";
-		// y /= 16.f;
-
-
-
-		// x = 100.0f;
-		// y = 100.0f;
-
-		std::cout << '(' << x << ", " << y << ") xy, (" << backbufferWidth << ", " << backbufferHeight << ") wh\n";
-		v4 = {x, y, 0.f, 1.f};
-
-		setupShader(text, options); CHECKGL
+		shader.bind();
+		shader.set("textColor", options.color.red, options.color.green, options.color.blue, options.color.alpha); CHECKGL
 
 		glActiveTexture(GL_TEXTURE0); CHECKGL
 		glBindVertexArray(vao); CHECKGL
@@ -302,43 +204,5 @@ namespace Game3 {
 		for (const char ch: text)
 			out = std::max(out, characters.at(ch).size.y * scale);
 		return out;
-	}
-
-	void TextRenderer::setupShader(std::string_view text, const TextRenderOptions &options) {
-		const auto text_width = textWidth(text, 1.f);
-		const auto text_height = textHeight(text, 1.f);
-
-		// const float text_width = 1.f / 20.f;
-		// const float text_height = 1.f / 7.f;
-		// const float text_width = 1.f;
-		// const float text_height = 1.f;
-
-		glm::mat4 model = glm::mat4(1.f);
-		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		// model = glm::translate(model, glm::vec3(options.x + text_width / 2.f, options.y, 0.0f));
-		// model = glm::translate(model, glm::vec3(options.x * 16.f, options.y * 16.f, 0.f));
-		// model = glm::translate(model, glm::vec3(.5f * text_width, .5f * text_height, 0.0f));
-		// model = glm::rotate   (model, glm::radians(options.angle), glm::vec3(0.0f, 0.0f, 1.0f));
-		// model = glm::translate(model, glm::vec3(-.5f * text_width, -.5f * text_height, 0.0f));
-		// model = glm::scale    (model, glm::vec3(text_width * options.scaleX, text_height * options.scaleY, 1.f));
-
-
-
-
-
-		model = glm::translate(model, glm::vec3(options.x, options.y, 0.f));
-		// model = glm::translate(model, glm::vec3(0.5f * text_width, 0.5f * text_height, 0.f)); // move origin of rotation to center of quad
-		// model = glm::rotate(model, glm::radians(options.angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
-		// model = glm::translate(model, glm::vec3(-0.5f * text_width, -0.5f * text_height, 0.f)); // move origin back
-		model = glm::scale(model, glm::vec3(text_width * canvas->scale / 2.f, text_height * canvas->scale / 2.f, 2.f)); // last scale
-
-
-
-
-		shader.bind();
-		// shader.set("model", model);
-		std::cout << glm::to_string(projection * v4) << '\n';
-		// std::cout << "\e[35mText model: " << glm::to_string(model) << "\e[39m text<" << text_width << " x " << text_height << ">\n";
-		shader.set("textColor", options.color.red, options.color.green, options.color.blue, options.color.alpha);
 	}
 }
