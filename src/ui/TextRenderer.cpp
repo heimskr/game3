@@ -16,7 +16,7 @@
 #include "ui/TextRenderer.h"
 
 namespace Game3 {
-	TextRenderer::TextRenderer(Canvas &canvas_): canvas(&canvas_), shader("TextRenderer") {
+	TextRenderer::TextRenderer(Canvas &canvas_, uint32_t font_scale): canvas(&canvas_), shader("TextRenderer"), fontScale(font_scale) {
 		shader.init(text_vert, text_frag);
 	}
 
@@ -47,7 +47,7 @@ namespace Game3 {
 			throw std::runtime_error("Couldn't initialize font");
 
 		auto &face = *freetypeFace;
-		FT_Set_Pixel_Sizes(face, 0, 48);
+		FT_Set_Pixel_Sizes(face, 0, fontScale);
 		characters.clear();
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1); CHECKGL
 
@@ -128,8 +128,8 @@ namespace Game3 {
 		auto &scale_x = options.scaleX;
 		auto &scale_y = options.scaleY;
 
-		scale_x *= canvas->scale / 8.f;
-		scale_y *= canvas->scale / 8.f;
+		scale_x *= canvas->scale * 6.f / fontScale;
+		scale_y *= canvas->scale * 6.f / fontScale;
 
 		x *= 8.f;
 		y *= -8.f;

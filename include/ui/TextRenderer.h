@@ -37,6 +37,7 @@ namespace Game3 {
 			float divisor = 1.f;
 			float centerX = 0.f;
 			float centerY = 0.f;
+			uint32_t fontScale = 48.f;
 
 			struct Character {
 				GLuint     textureID; // ID handle of the glyph texture
@@ -47,7 +48,7 @@ namespace Game3 {
 
 			std::unordered_map<gunichar, Character> characters;
 
-			TextRenderer(Canvas &);
+			TextRenderer(Canvas &, uint32_t font_scale = 96);
 			~TextRenderer();
 
 			// TextRenderer & operator=(TextRenderer &&);
