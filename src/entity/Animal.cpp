@@ -6,12 +6,36 @@
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
 #include "tileentity/Teleporter.h"
+#include "ui/TextRenderer.h"
 
 namespace Game3 {
 	ThreadPool Animal::threadPool{2};
 
 	Animal::Animal(EntityType type_):
 		Entity(std::move(type_)) {}
+
+	void Animal::render(SpriteRenderer &sprite, TextRenderer &text) {
+		if (!isVisible())
+			return;
+
+		Entity::render(sprite, text);
+
+		text.drawOnMap(std::to_string(getGID()), {
+			.x = static_cast<float>(position.column) + offset.x() + .5f,
+			.y = static_cast<float>(position.row) + offset.y(),
+			.color = {path.empty()? 0.f : 1.f, 0.f, 0.f, 1.f},
+			.align = TextAlign::Center,
+		});
+	}
+
+	bool Animal::onInteractNextTo(const std::shared_ptr<Player> &player) {
+		INFO("Path length for " << typeid(*this).name() << " is " << path.size());
+		{
+			auto lock = lockVisibleEntitiesShared();
+			INFO("Player is visible? " << std::boolalpha << visiblePlayers.contains(player));
+		}
+		return true;
+	}
 
 	void Animal::toJSON(nlohmann::json &json) const {
 		Entity::toJSON(json);

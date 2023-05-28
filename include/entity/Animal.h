@@ -18,13 +18,15 @@ namespace Game3 {
 			constexpr static float RETRY_TIME = 30.f;
 
 			static inline auto getWanderDistribution() {
-				return std::uniform_real_distribution(10.f, 20.f);
+				return std::uniform_real_distribution(2.f, 2.f);
 			}
 
 			Position destination = {-1, -1};
 			std::atomic<float> timeUntilWander = 0.f;
 			Index wanderRadius = 8;
 
+			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
+			void render(SpriteRenderer &, TextRenderer &) override;
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			void init(Game &) override;
