@@ -130,8 +130,8 @@ namespace Game3 {
 			virtual void movedToNewChunk();
 			bool hasSeenPath(const PlayerPtr &);
 			void setSeenPath(const PlayerPtr &, bool seen = true);
-			void removeVisible(const std::weak_ptr<Entity> &);
-			void removeVisible(const std::weak_ptr<Player> &);
+			bool removeVisible(const std::weak_ptr<Entity> &);
+			bool removeVisible(const std::weak_ptr<Player> &);
 			void calculateVisibleEntities();
 			inline bool is(const Identifier &check) const { return type == check; }
 			inline auto getHeldLeft()  const { return heldLeft.slot;  }

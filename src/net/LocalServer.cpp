@@ -47,7 +47,6 @@ namespace Game3 {
 			if (auto player = client->getPlayer()) {
 				player->client.reset();
 				game->remove(player);
-				player->destroy();
 				if (auto count = player.use_count(); count != 1)
 					WARN("Player ref count: " << count << " (should be 1)");
 			}

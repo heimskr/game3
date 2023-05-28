@@ -582,7 +582,6 @@ namespace Game3 {
 		for (const auto &entity: entities_to_erase)
 			visibleEntities.erase(entity);
 
-
 		for (const auto &player: players_to_erase)
 			visiblePlayers.erase(player);
 
@@ -615,7 +614,7 @@ namespace Game3 {
 			if (!visiblePlayers.empty()) {
 				const EntitySetPathPacket packet(*this);
 				for (const auto &weak_player: visiblePlayers) {
-					if (auto player = weak_player.lock(); !hasSeenPath(player)) {
+					if (auto player = weak_player.lock(); player && !hasSeenPath(player)) {
 						INFO("Late sending EntitySetPathPacket (Entity)");
 						player->send(packet);
 						setSeenPath(player);
@@ -639,23 +638,29 @@ namespace Game3 {
 			pathSeers.erase(player);
 	}
 
-	void Entity::removeVisible(const std::weak_ptr<Entity> &entity) {
+	bool Entity::removeVisible(const std::weak_ptr<Entity> &entity) {
 		auto lock = lockVisibleEntitiesShared();
 		if (visibleEntities.contains(entity)) {
 			lock.unlock();
 			auto unique_lock = lockVisibleEntities();
 			visibleEntities.erase(entity);
+			return true;
 		}
+
+		return false;
 	}
 
-	void Entity::removeVisible(const std::weak_ptr<Player> &player) {
+	bool Entity::removeVisible(const std::weak_ptr<Player> &player) {
 		auto lock = lockVisibleEntitiesShared();
 		if (visiblePlayers.contains(player)) {
 			lock.unlock();
 			auto unique_lock = lockVisibleEntities();
 			visiblePlayers.erase(player);
 			visibleEntities.erase(player);
+			return true;
 		}
+
+		return false;
 	}
 
 	void Entity::encode(Buffer &buffer) {

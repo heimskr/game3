@@ -29,12 +29,30 @@ namespace Game3 {
 	void Player::destroy() {
 		auto lock = lockVisibleEntitiesShared();
 
+		size_t times = 0;
+
 		if (!visibleEntities.empty()) {
 			auto shared = getShared();
 			for (const auto &weak_visible: visibleEntities)
 				if (auto visible = weak_visible.lock())
-					visible->removeVisible(std::weak_ptr(shared));
+					times += visible->removeVisible(std::weak_ptr(shared));
 		}
+
+		INFO("Removed from visible sets " << times << " time(s)");
+
+		size_t remaining = 0;
+		{
+			auto ent_lock = getRealm()->lockEntitiesShared();
+			for (const auto &entity: getRealm()->entities) {
+				auto vis_lock = entity->lockVisibleEntitiesShared();
+				remaining += entity->visiblePlayers.contains(std::weak_ptr(getShared()));
+			}
+		}
+
+		if (remaining == 0)
+			SUCCESS("No longer visible in any visible sets.");
+		else
+			ERROR("Still visible in " << remaining << " visible set" << (remaining == 1? "" : "s") << '!');
 
 		Entity::destroy();
 	}
@@ -250,19 +268,27 @@ namespace Game3 {
 		if (getSide() != Side::Server)
 			return;
 
-		Entity::movedToNewChunk();
+		{
+			auto shared = getShared();
+			auto lock = lockVisibleEntitiesShared();
+			for (const auto &weak_visible: visibleEntities) {
+				if (auto visible = weak_visible.lock()) {
+					if (!visible->path.empty() && visible->hasSeenPath(shared)) {
+						INFO("Late sending EntitySetPathPacket (Player)");
+						send(EntitySetPathPacket(*visible));
+						visible->setSeenPath(shared);
+					}
 
-		auto shared = getShared();
-		auto lock = lockVisibleEntitiesShared();
-		for (const auto &weak_visible: visibleEntities) {
-			if (auto visible = weak_visible.lock()) {
-				if (!visible->path.empty() && visible->hasSeenPath(shared)) {
-					INFO("Late sending EntitySetPathPacket (Player)");
-					send(EntitySetPathPacket(*visible));
-					visible->setSeenPath(shared);
+					if (!canSee(*visible)) {
+						auto visible_lock = visible->lockVisibleEntities();
+						visible->visiblePlayers.erase(shared);
+						visible->visibleEntities.erase(shared);
+					}
 				}
 			}
 		}
+
+		Entity::movedToNewChunk();
 
 		getRealm()->recalculateVisibleChunks();
 	}
