@@ -114,8 +114,15 @@ namespace Game3 {
 	void ClientGame::tick() {
 		client->read();
 
-		for (const auto &packet: packetQueue.steal())
-			packet->handle(*this);
+		for (const auto &packet: packetQueue.steal()) {
+			try {
+				packet->handle(*this);
+			} catch (const std::exception &err) {
+				auto &packet_ref = *packet;
+				ERROR("Couldn't handle packet of type " << typeid(packet_ref).name() << " (" << packet->getID() << "): " << err.what());
+				throw;
+			}
+		}
 
 		if (!player)
 			return;

@@ -21,6 +21,7 @@
 #include "game/ChunkPosition.h"
 #include "game/HasInventory.h"
 #include "item/Item.h"
+#include "threading/Lockable.h"
 #include "util/WeakCompare.h"
 
 namespace Game3 {
@@ -48,7 +49,7 @@ namespace Game3 {
 			constexpr static HitPoints INVINCIBLE = 0;
 
 			EntityType type;
-			Position position {0, 0};
+			Lockable<Position> position {0, 0};
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;
 			Direction direction = Direction::Down;

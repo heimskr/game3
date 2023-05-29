@@ -37,20 +37,31 @@ namespace Game3 {
 		const auto &tileset = *getTileset(game);
 		std::vector<Position> land_tiles;
 		land_tiles.resize((range.tileWidth() - right_pad) * (range.tileHeight() - bottom_pad));
+
+		std::shared_lock lock(chunkMutexes[0]);
+
 		size_t i = 0;
+		bool was_empty = false;
+
 		for (Index row = range.rowMin(); row <= range.rowMax() - bottom_pad; ++row)
 			for (Index column = range.columnMin(); column < range.columnMax() - right_pad; ++column)
-				if (tileset.isLand(copyTile(1, {row, column})))
+				if (tileset.isLand(copyTileUnsafe(1, row, column, was_empty, TileMode::Throw)))
 					land_tiles[i++] = {row, column};
 		return land_tiles;
 	}
 
 	TileID TileProvider::copyTile(Layer layer, Index row, Index column, bool &was_empty, TileMode mode) const {
+		std::shared_lock lock(const_cast<std::shared_mutex &>(chunkMutexes[layer - 1]));
+		return copyTileUnsafe(layer, row, column, was_empty, mode);
+	}
+
+	TileID TileProvider::copyTileUnsafe(Layer layer, Index row, Index column, bool &was_empty, TileMode mode) const {
 		was_empty = false;
 		validateLayer(layer);
 
-		const auto &map = chunkMaps[layer - 1];
 		const ChunkPosition chunk_position {divide<int32_t>(column), divide<int32_t>(row)};
+
+		const auto &map = chunkMaps[layer - 1];
 
 		if (auto iter = map.find(chunk_position); iter != map.end())
 			return access(iter->second, remainder(row), remainder(column));
@@ -71,8 +82,10 @@ namespace Game3 {
 	std::optional<TileID> TileProvider::tryTile(Layer layer, const Position &position) const {
 		validateLayer(layer);
 
-		const auto &map = chunkMaps[layer - 1];
 		const ChunkPosition chunk_position {divide(position.column), divide(position.row)};
+
+		std::shared_lock lock(const_cast<std::shared_mutex &>(chunkMutexes[layer - 1]));
+		const auto &map = chunkMaps[layer - 1];
 
 		if (auto iter = map.find(chunk_position); iter != map.end())
 			return access(iter->second, remainder(position.row), remainder(position.column));
@@ -83,6 +96,8 @@ namespace Game3 {
 	std::optional<BiomeType> TileProvider::copyBiomeType(Index row, Index column) const {
 		const ChunkPosition chunk_position {divide(column), divide(row)};
 
+		std::shared_lock lock(const_cast<std::shared_mutex &>(biomeMutex));
+
 		if (auto iter = biomeMap.find(chunk_position); iter != biomeMap.end())
 			return access(iter->second, remainder(row), remainder(column));
 
@@ -91,6 +106,8 @@ namespace Game3 {
 
 	std::optional<uint8_t> TileProvider::copyPathState(Index row, Index column) const {
 		const ChunkPosition chunk_position {divide(column), divide(row)};
+
+		std::shared_lock lock(const_cast<std::shared_mutex &>(pathMutex));
 
 		if (auto iter = pathMap.find(chunk_position); iter != pathMap.end())
 			return access(iter->second, remainder(row), remainder(column));
@@ -102,14 +119,18 @@ namespace Game3 {
 		created = false;
 		validateLayer(layer);
 
-		auto &map = chunkMaps[layer - 1];
 		const ChunkPosition chunk_position {divide(column), divide(row)};
+
+		std::shared_lock shared_lock(chunkMutexes[layer - 1]);
+		auto &map = chunkMaps[layer - 1];
 
 		if (auto iter = map.find(chunk_position); iter != map.end())
 			return access(iter->second, remainder(row), remainder(column));
 
 		if (mode == TileMode::Create) {
 			created = true;
+			shared_lock.unlock();
+			std::unique_lock unique_lock(chunkMutexes[layer - 1]);
 			auto &chunk = map[chunk_position];
 			initTileChunk(layer, chunk, chunk_position);
 			return access(chunk, remainder(row), remainder(column)) = 0;
@@ -128,11 +149,15 @@ namespace Game3 {
 
 		const ChunkPosition chunk_position {divide(column), divide(row)};
 
+		std::shared_lock shared_lock(biomeMutex);
+
 		if (auto iter = biomeMap.find(chunk_position); iter != biomeMap.end())
 			return access(iter->second, remainder(row), remainder(column));
 
 		if (mode == BiomeMode::Create) {
 			created = true;
+			shared_lock.unlock();
+			std::unique_lock unique_lock(biomeMutex);
 			auto &chunk = biomeMap[chunk_position];
 			initBiomeChunk(chunk, chunk_position);
 			return access(chunk, remainder(row), remainder(column)) = 0;
@@ -151,11 +176,15 @@ namespace Game3 {
 
 		const ChunkPosition chunk_position {divide(column), divide(row)};
 
+		std::shared_lock shared_lock(pathMutex);
+
 		if (auto iter = pathMap.find(chunk_position); iter != pathMap.end())
 			return access(iter->second, remainder(row), remainder(column));
 
 		if (mode == PathMode::Create) {
 			created = true;
+			shared_lock.unlock();
+			std::unique_lock unique_lock(pathMutex);
 			auto &chunk = pathMap[chunk_position];
 			initPathChunk(chunk, chunk_position);
 			return access(chunk, remainder(row), remainder(column)) = 0;
@@ -172,6 +201,7 @@ namespace Game3 {
 	const Chunk<TileID> & TileProvider::getTileChunk(Layer layer, const ChunkPosition &chunk_position) const {
 		validateLayer(layer);
 
+		std::shared_lock lock(const_cast<std::shared_mutex &>(chunkMutexes[layer - 1]));
 		if (auto iter = chunkMaps[layer - 1].find(chunk_position); iter != chunkMaps[layer - 1].end())
 			return iter->second;
 
@@ -181,10 +211,12 @@ namespace Game3 {
 	Chunk<TileID> & TileProvider::getTileChunk(Layer layer, const ChunkPosition &chunk_position) {
 		validateLayer(layer);
 		ensureTileChunk(chunk_position, layer);
+		std::unique_lock lock(chunkMutexes[layer - 1]);
 		return chunkMaps[layer - 1][chunk_position];
 	}
 
 	const Chunk<BiomeType> & TileProvider::getBiomeChunk(const ChunkPosition &chunk_position) const {
+		std::shared_lock lock(const_cast<std::shared_mutex &>(biomeMutex));
 		if (auto iter = biomeMap.find(chunk_position); iter != biomeMap.end())
 			return iter->second;
 
@@ -193,10 +225,12 @@ namespace Game3 {
 
 	Chunk<BiomeType> & TileProvider::getBiomeChunk(const ChunkPosition &chunk_position) {
 		ensureBiomeChunk(chunk_position);
+		std::unique_lock lock(biomeMutex);
 		return biomeMap[chunk_position];
 	}
 
 	const Chunk<uint8_t> & TileProvider::getPathChunk(const ChunkPosition &chunk_position) const {
+		std::shared_lock lock(const_cast<std::shared_mutex &>(pathMutex));
 		if (auto iter = pathMap.find(chunk_position); iter != pathMap.end())
 			return iter->second;
 
@@ -205,27 +239,33 @@ namespace Game3 {
 
 	Chunk<uint8_t> & TileProvider::getPathChunk(const ChunkPosition &chunk_position) {
 		ensurePathChunk(chunk_position);
+		std::unique_lock lock(pathMutex);
 		return pathMap[chunk_position];
 	}
 
 	void TileProvider::ensureTileChunk(const ChunkPosition &chunk_position) {
-		for (Layer layer = 0; layer < LAYER_COUNT; ++layer)
+		for (Layer layer = 0; layer < LAYER_COUNT; ++layer) {
+			std::unique_lock lock(chunkMutexes[layer]);
 			if (auto [iter, inserted] = chunkMaps[layer].try_emplace(chunk_position); inserted)
 				initTileChunk(layer, iter->second, chunk_position);
+		}
 	}
 
 	void TileProvider::ensureTileChunk(const ChunkPosition &chunk_position, Layer layer) {
 		validateLayer(layer);
+		std::unique_lock lock(chunkMutexes[layer - 1]);
 		if (auto [iter, inserted] = chunkMaps[layer - 1].try_emplace(chunk_position); inserted)
 			initTileChunk(layer, iter->second, chunk_position);
 	}
 
 	void TileProvider::ensureBiomeChunk(const ChunkPosition &chunk_position) {
+		std::unique_lock lock(biomeMutex);
 		if (auto [iter, inserted] = biomeMap.try_emplace(chunk_position); inserted)
 			initBiomeChunk(iter->second, chunk_position);
 	}
 
 	void TileProvider::ensurePathChunk(const ChunkPosition &chunk_position) {
+		std::unique_lock lock(pathMutex);
 		if (auto [iter, inserted] = pathMap.try_emplace(chunk_position); inserted)
 			initPathChunk(iter->second, chunk_position);
 	}

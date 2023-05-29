@@ -17,11 +17,15 @@ namespace Game3 {
 			pool.emplace_back([this, thread_index] {
 				threadContext = {};
 				while (active) {
-					std::unique_lock lock(workMutex);
-					workCV.wait(lock);
+					{
+						std::unique_lock lock(workMutex);
+						workCV.wait(lock);
+					}
 					if (auto job = workQueue.tryTake()) {
 						assert(*job);
 						(*job)(*this, thread_index);
+						// Issue when the thread pool contains only one worker?
+						workCV.notify_all();
 					}
 				}
 			});

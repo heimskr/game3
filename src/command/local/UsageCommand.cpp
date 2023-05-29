@@ -8,6 +8,8 @@ namespace Game3 {
 	void UsageCommand::operator()(LocalClient &client) {
 		INFO("Bytes read: " << client.bytesRead);
 		INFO("Bytes written: " << client.bytesWritten);
+		INFO("Header bytes: " << client.headerBytes.size());
+		INFO("Payload size: " << client.payloadSize);
 		{
 			INFO("Packets received:");
 			std::shared_lock lock(client.receivedPacketCountsMutex);

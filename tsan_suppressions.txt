@@ -1,0 +1,6 @@
+deadlock:
+
+# Here be Gtk/Glib nonsense
+race:__interceptor_
+race:sendmsg
+race:strcmp

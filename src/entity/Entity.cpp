@@ -43,12 +43,14 @@ namespace Game3 {
 		realm->removeSafe(shared_from_this());
 
 		if (getSide() == Side::Server) {
-			auto lock = lockVisibleEntitiesShared();
-			if (!visibleEntities.empty()) {
-				auto shared = shared_from_this();
-				for (const auto &weak_visible: visibleEntities)
-					if (auto visible = weak_visible.lock())
-						visible->removeVisible(shared);
+			{
+				auto lock = lockVisibleEntitiesShared();
+				if (!visibleEntities.empty()) {
+					auto shared = shared_from_this();
+					for (const auto &weak_visible: visibleEntities)
+						if (auto visible = weak_visible.lock())
+							visible->removeVisible(shared);
+				}
 			}
 
 			getGame().toServer().entityDestroyed(*this);
@@ -84,7 +86,7 @@ namespace Game3 {
 		if (auto iter = json.find("type"); iter != json.end())
 			type = *iter;
 		if (auto iter = json.find("position"); iter != json.end())
-			position = *iter;
+			position = iter->get<Position>();
 		if (auto iter = json.find("realmID"); iter != json.end())
 			realmID = *iter;
 		if (auto iter = json.find("direction"); iter != json.end())
@@ -589,9 +591,11 @@ namespace Game3 {
 			const auto this_player = std::dynamic_pointer_cast<Player>(shared);
 			ChunkRange(getChunk()).iterate([this, realm, shared, this_player](ChunkPosition chunk_position) {
 				if (auto visible_at_chunk = realm->getEntities(chunk_position)) {
+					auto chunk_lock = visible_at_chunk->sharedLock();
 					for (const auto &visible: *visible_at_chunk) {
 						if (visible.get() == this)
 							continue;
+						assert(visible->getGID() != getGID());
 						visibleEntities.insert(visible);
 						if (visible->isPlayer())
 							visiblePlayers.insert(std::dynamic_pointer_cast<Player>(visible));
@@ -599,7 +603,6 @@ namespace Game3 {
 						visible->visibleEntities.insert(shared);
 						if (this_player)
 							visible->visiblePlayers.insert(this_player);
-
 					}
 				}
 			});

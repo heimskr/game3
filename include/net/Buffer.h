@@ -164,6 +164,7 @@ namespace Game3 {
 				context(std::move(context_)) {}
 
 			inline auto size() const { return bytes.size(); }
+			inline bool empty() const { return bytes.empty(); }
 			inline void clear() { bytes.clear(); }
 
 			template <typename It>
@@ -233,7 +234,7 @@ namespace Game3 {
 				const auto type = popType();
 				if (!typesMatch(type, getType(T()))) {
 					debug();
-					throw std::invalid_argument("Invalid type in buffer (expected list): " + hexString(type));
+					throw std::invalid_argument("Invalid type in buffer (expected list: " + hexString(getType(T())) + "): " + hexString(type));
 				}
 				out = popBuffer<T>(*this);
 				return *this;
@@ -244,7 +245,7 @@ namespace Game3 {
 				const auto type = popType();
 				if (!typesMatch(type, getType(M()))) {
 					debug();
-					throw std::invalid_argument("Invalid type in buffer (expected map): " + hexString(type));
+					throw std::invalid_argument("Invalid type in buffer (expected map: " + hexString(getType(M())) + "): " + hexString(type));
 				}
 				out = popBuffer<M>(*this);
 				return *this;
@@ -255,7 +256,7 @@ namespace Game3 {
 				const auto type = popType();
 				if (!typesMatch(type, getType(T()))) {
 					debug();
-					throw std::invalid_argument("Invalid type in buffer (expected integral): " + hexString(type));
+					throw std::invalid_argument("Invalid type in buffer (expected integral: " + hexString(getType(T())) + "): " + hexString(type));
 				}
 				out = popBuffer<T>(*this);
 				return *this;
@@ -274,7 +275,7 @@ namespace Game3 {
 			Buffer & operator>>(std::optional<T> &out) {
 				const auto type = popType();
 				if (!typesMatch(type, getType(std::make_optional<T>())))
-					throw std::invalid_argument("Invalid type in buffer (expected " + std::string(typeid(T).name()) + ')');
+					throw std::invalid_argument("Invalid type in buffer (expected " + std::string(typeid(T).name()) + ": " + hexString(getType(std::make_optional<T>())) + ')');
 				if (type == "\x0c")
 					out = std::nullopt;
 				else

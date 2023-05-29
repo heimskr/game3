@@ -17,6 +17,7 @@
 #include "packet/ChunkTilesPacket.h"
 #include "packet/EntityPacket.h"
 #include "packet/TileEntityPacket.h"
+#include "threading/Lockable.h"
 #include "threading/MTQueue.h"
 #include "tileentity/TileEntity.h"
 #include "ui/ElementBufferedRenderer.h"
@@ -165,12 +166,12 @@ namespace Game3 {
 			void detach(const EntityPtr &);
 			/** Adds the entity to entitiesByChunk. */
 			void attach(const EntityPtr &);
-			std::shared_ptr<std::unordered_set<EntityPtr>> getEntities(ChunkPosition);
+			std::shared_ptr<Lockable<std::unordered_set<EntityPtr>>> getEntities(ChunkPosition);
 			/** Removes the tile entity from tileEntitiesByChunk. */
 			void detach(const TileEntityPtr &);
 			/** Adds the tile entity to tileEntitiesByChunk. */
 			void attach(const TileEntityPtr &);
-			std::shared_ptr<std::unordered_set<TileEntityPtr>> getTileEntities(ChunkPosition);
+			std::shared_ptr<Lockable<std::unordered_set<TileEntityPtr>>> getTileEntities(ChunkPosition);
 			void sendToMany(const std::unordered_set<std::shared_ptr<RemoteClient>> &, ChunkPosition);
 			void sendToOne(RemoteClient &, ChunkPosition);
 			void recalculateVisibleChunks();
@@ -306,8 +307,8 @@ namespace Game3 {
 			MTQueue<PlayerPtr> playerRemovalQueue;
 			MTQueue<std::function<void()>> generalQueue;
 			/** Governed by entitiesByChunkMutex. */
-			std::unordered_map<ChunkPosition, std::shared_ptr<std::unordered_set<EntityPtr>>> entitiesByChunk;
-			std::unordered_map<ChunkPosition, std::shared_ptr<std::unordered_set<TileEntityPtr>>> tileEntitiesByChunk;
+			std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::unordered_set<EntityPtr>>>> entitiesByChunk;
+			std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::unordered_set<TileEntityPtr>>>> tileEntitiesByChunk;
 
 			std::map<ChunkPosition, std::unordered_set<std::shared_ptr<RemoteClient>>> chunkRequests;
 			std::shared_mutex chunkRequestsMutex;

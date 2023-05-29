@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <shared_mutex>
 #include <unordered_map>
 #include <vector>
 
@@ -10,6 +11,7 @@
 #include "Position.h"
 #include "Types.h"
 #include "game/ChunkPosition.h"
+#include "threading/Lockable.h"
 #include "threading/MTQueue.h"
 #include "util/Math.h"
 
@@ -18,7 +20,7 @@ namespace Game3 {
 	class Tileset;
 
 	template <typename T>
-	using Chunk = std::vector<T>;
+	using Chunk = Lockable<std::vector<T>>;
 
 	class TileProvider {
 		public:
@@ -38,6 +40,10 @@ namespace Game3 {
 			Identifier tilesetID;
 			MTQueue<ChunkPosition> generationQueue;
 
+			std::array<std::shared_mutex, LAYER_COUNT> chunkMutexes;
+			std::shared_mutex biomeMutex;
+			std::shared_mutex pathMutex;
+
 			TileProvider() = default;
 			TileProvider(Identifier tileset_id);
 
@@ -50,6 +56,7 @@ namespace Game3 {
 
 			/** Returns a copy of the given tile. The Create mode will be treated as Throw. */
 			TileID copyTile(Layer, Index row, Index column, bool &was_empty, TileMode = TileMode::Throw) const;
+			TileID copyTileUnsafe(Layer, Index row, Index column, bool &was_empty, TileMode = TileMode::Throw) const;
 
 			/** Returns a copy of the given tile. The Create mode will be treated as Throw. */
 			TileID copyTile(Layer, Index row, Index column, TileMode = TileMode::Throw) const;
@@ -159,9 +166,11 @@ namespace Game3 {
 			static T access(const Chunk<T> &chunk, int64_t row, int64_t column) {
 				assert(0 <= row);
 				assert(0 <= column);
+				auto lock = const_cast<Chunk<T> &>(chunk).sharedLock();
 				return chunk[row * CHUNK_SIZE + column];
 			}
 
+			/** You need to lock the chunk yourself when using this method. */
 			template <typename T>
 			static T & access(Chunk<T> &chunk, int64_t row, int64_t column) {
 				assert(0 <= row);

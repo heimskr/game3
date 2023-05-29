@@ -58,7 +58,14 @@ namespace Game3 {
 				if (buffer.context.expired())
 					buffer.context = server.game;
 				auto packet = (*server.game->registry<PacketFactoryRegistry>()[packetType])();
-				packet->decode(*server.game, buffer);
+
+				try {
+					packet->decode(*server.game, buffer);
+				} catch (...) {
+					ERROR("Couldn't decode packet of type " << packetType << ", size " << payloadSize);
+					throw;
+				}
+
 				buffer.clear();
 				server.game->queuePacket(shared_from_this(), packet);
 				state = State::Begin;
@@ -71,6 +78,7 @@ namespace Game3 {
 		Buffer send_buffer;
 		packet.encode(*server.game, send_buffer);
 		assert(send_buffer.size() < UINT32_MAX);
+		std::unique_lock lock(packetMutex);
 		send(packet.getID());
 		send(static_cast<uint32_t>(send_buffer.size()));
 		send(send_buffer.str());

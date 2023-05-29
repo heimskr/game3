@@ -4,7 +4,7 @@
 
 namespace Game3 {
 	EntitySetPathPacket::EntitySetPathPacket(Entity &entity):
-		EntitySetPathPacket(entity.globalID, entity.realmID, entity.getPosition(), entity.copyPath<std::vector>()) {}
+		EntitySetPathPacket(entity.globalID, entity.realmID, entity.position.copyBase(), entity.copyPath<std::vector>()) {}
 
 	void EntitySetPathPacket::handle(ClientGame &game) {
 		auto iter = game.realms.find(realmID);

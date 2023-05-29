@@ -17,9 +17,12 @@ namespace Game3 {
 		lastTime = now;
 		delta = std::chrono::duration_cast<std::chrono::nanoseconds>(difference).count() / 1'000'000'000.;
 
+		std::vector<RemoteClient::BufferGuard> guards;
+		guards.reserve(players.size());
+
 		for (const auto &player: players)
 			if (auto client = player->client.lock())
-				client->startBuffering();
+				guards.emplace_back(client);
 
 		for (const auto &[client, packet]: packetQueue.steal())
 			handlePacket(*client, *packet);
@@ -27,10 +30,12 @@ namespace Game3 {
 		for (auto &[id, realm]: realms)
 			realm->tick(delta);
 
-		for (const auto &player: players) {
-			if (auto client = player->client.lock())
-				client->stopBuffering();
+		for (const auto &player: players)
 			player->ticked = false;
+
+		for (auto player: playerRemovalQueue.steal()) {
+			remove(player);
+			player->client.reset();
 		}
 	}
 
@@ -93,6 +98,10 @@ namespace Game3 {
 		auto lock = lockPlayersUnique();
 		players.erase(player);
 		player->destroy();
+	}
+
+	void ServerGame::queueRemoval(const PlayerPtr &player) {
+		playerRemovalQueue.push(player);
 	}
 
 	void ServerGame::handlePacket(RemoteClient &client, Packet &packet) {

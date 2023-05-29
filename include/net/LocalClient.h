@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <deque>
 #include <filesystem>
 #include <iostream>
@@ -58,6 +59,8 @@ namespace Game3 {
 			std::deque<uint8_t> headerBytes;
 			std::map<std::string, std::map<std::string, Token>> tokenDatabase;
 			std::optional<std::filesystem::path> tokenDatabasePath;
+			std::mutex packetMutex;
+			std::atomic_bool reading = false;
 
 			template <std::integral T>
 			void sendRaw(T value) {
@@ -65,5 +68,7 @@ namespace Game3 {
 				bytesWritten += sizeof(T);
 				sock->send(&little, sizeof(little), false);
 			}
+
+			friend struct UsageCommand;
 	};
 }

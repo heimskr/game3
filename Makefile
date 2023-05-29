@@ -99,10 +99,16 @@ ifeq ($(GITHUB),true)
 endif
 
 test: $(OUTPUT)
-	./$(OUTPUT)
+	./$<
 
 servertest: $(OUTPUT)
-	./$(OUTPUT) -s
+	./$< -s
+
+tsanservertest: $(OUTPUT)
+	TSAN_OPTIONS="suppressions=tsan_suppressions.txt" ./$< -s
+
+tsanclienttest: $(OUTPUT)
+	TSAN_OPTIONS="suppressions=tsan_suppressions.txt" ./$<
 
 clean:
 	@ rm -f $(shell find -L src -name \*.o) $(OUTPUT) src/gtk_resources.cpp include/resources.h $(RESGEN) $(RESGEN).o

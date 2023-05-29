@@ -31,9 +31,16 @@ namespace Game3 {
 			if (auto locked = lockGame())
 				buffer.context = locked;
 
+		assert(!reading.exchange(true));
+
+		static PacketID last_type = 0;
+		static Buffer last_buffer;
+
 		const auto byte_count = sock->recv(array.data(), array.size());
-		if (byte_count <= 0)
+		if (byte_count <= 0) {
+			reading = false;
 			return;
+		}
 
 		bytesRead += static_cast<size_t>(byte_count);
 
@@ -47,8 +54,9 @@ namespace Game3 {
 				payloadSize = 0;
 
 				if (6 <= headerBytes.size()) {
-					packetType = headerBytes[0] | (static_cast<uint16_t>(headerBytes[1]) << 8);
+					packetType  = headerBytes[0] | (static_cast<uint16_t>(headerBytes[1]) << 8);
 					payloadSize = headerBytes[2] | (static_cast<uint32_t>(headerBytes[3]) << 8) | (static_cast<uint32_t>(headerBytes[4]) << 16) | (static_cast<uint32_t>(headerBytes[5]) << 24);
+					assert(payloadSize < 100'000);
 					headerBytes.erase(headerBytes.begin(), headerBytes.begin() + 6);
 					state = State::Data;
 				} else
@@ -73,16 +81,20 @@ namespace Game3 {
 				if (payloadSize == buffer.size()) {
 					auto game = lockGame();
 					auto packet = (*game->registry<PacketFactoryRegistry>().at(packetType))();
+					last_buffer = buffer;
 					packet->decode(*game, buffer);
-					buffer.clear();
+					assert(buffer.empty());
 					state = State::Begin;
 					std::unique_lock lock(receivedPacketCountsMutex);
 					++receivedPacketCounts[packet->getID()];
 					game->queuePacket(std::move(packet));
+					last_type = packetType;
 				} else
 					break;
 			}
 		}
+
+		reading = false;
 	}
 
 	void LocalClient::send(const Packet &packet) {
@@ -91,10 +103,13 @@ namespace Game3 {
 		send_buffer.context = game;
 		packet.encode(*game, send_buffer);
 		assert(send_buffer.size() < UINT32_MAX);
-		sendRaw(packet.getID());
-		sendRaw(static_cast<uint32_t>(send_buffer.size()));
 		const auto str = send_buffer.str();
-		sock->send(str.c_str(), str.size(), false);
+		{
+			std::unique_lock lock(packetMutex);
+			sendRaw(packet.getID());
+			sendRaw(static_cast<uint32_t>(send_buffer.size()));
+			sock->send(str.c_str(), str.size(), false);
+		}
 		bytesWritten += 6 + str.size();
 		std::unique_lock lock(sentPacketCountsMutex);
 		++sentPacketCounts[packet.getID()];

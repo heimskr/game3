@@ -29,11 +29,23 @@ namespace Game3 {
 	}
 
 	bool Animal::onInteractNextTo(const std::shared_ptr<Player> &player) {
-		INFO("Path length for " << typeid(*this).name() << " is " << path.size());
+		INFO(typeid(*this).name() << ' ' << getGID() << ':');
+		INFO("  Path length is " << path.size());
+		auto realm = getRealm();
 		{
 			auto lock = lockVisibleEntitiesShared();
-			INFO("Player is visible? " << std::boolalpha << visiblePlayers.contains(player));
+			INFO("  Player is visible? " << std::boolalpha << visiblePlayers.contains(player));
 		}
+		{
+			auto lock = player->lockVisibleEntitiesShared();
+			INFO("  Visible to player? " << std::boolalpha << player->visibleEntities.contains(shared_from_this()));
+		}
+		if (auto ptr = realm->getEntities(getChunk()); ptr && ptr->contains(shared_from_this()))
+			SUCCESS("  In chunk.");
+		else
+			ERROR("  Not in chunk.");
+		INFO("  Time until wander: " << timeUntilWander.load());
+		INFO("  Attempting wander: " << std::boolalpha << attemptingWander.load());
 		return true;
 	}
 
@@ -67,7 +79,7 @@ namespace Game3 {
 
 	bool Animal::wander() {
 		if (!attemptingWander.exchange(true)) {
-			const auto [row, column] = position;
+			const auto [row, column] = position.copyBase();
 			return threadPool.add([this, row, column](ThreadPool &, size_t) {
 				pathfind({
 					threadContext.random(static_cast<int64_t>(row    - wanderRadius), static_cast<int64_t>(row    + wanderRadius)),

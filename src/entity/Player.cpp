@@ -50,9 +50,9 @@ namespace Game3 {
 		}
 
 		if (remaining == 0)
-			SUCCESS("No longer visible in any visible sets.");
+			SUCCESS("No longer present in any visible sets.");
 		else
-			ERROR("Still visible in " << remaining << " visible set" << (remaining == 1? "" : "s") << '!');
+			ERROR("Still present in " << remaining << " visible set" << (remaining == 1? "" : "s") << '!');
 
 		Entity::destroy();
 	}

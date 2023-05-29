@@ -28,10 +28,12 @@ namespace Game3 {
 			void entityDestroyed(const Entity &);
 			void tileEntityDestroyed(const TileEntity &);
 			void remove(const PlayerPtr &);
+			void queueRemoval(const PlayerPtr &);
 
 		private:
 			std::shared_mutex playersMutex;
 			MTQueue<std::pair<std::shared_ptr<RemoteClient>, std::shared_ptr<Packet>>> packetQueue;
+			MTQueue<PlayerPtr> playerRemovalQueue;
 
 			inline auto lockPlayersShared() { return std::shared_lock(playersMutex); }
 			inline auto lockPlayersUnique() { return std::unique_lock(playersMutex); }

@@ -16,14 +16,18 @@ namespace Game3 {
 	class RemoteClient: public GenericClient, public std::enable_shared_from_this<RemoteClient> {
 		public:
 			struct BufferGuard {
-				std::reference_wrapper<RemoteClient> parent;
+				std::weak_ptr<RemoteClient> parent;
 
-				BufferGuard(RemoteClient &parent_): parent(parent_) {
-					parent_.startBuffering();
+				BufferGuard(RemoteClient &parent_):
+					BufferGuard(parent_.shared_from_this()) {}
+
+				BufferGuard(const std::shared_ptr<RemoteClient> &parent_): parent(parent_) {
+					parent_->startBuffering();
 				}
 
 				~BufferGuard() {
-					parent.get().stopBuffering();
+					if (auto locked = parent.lock())
+						locked->stopBuffering();
 				}
 			};
 
@@ -56,5 +60,6 @@ namespace Game3 {
 			uint32_t payloadSize = 0;
 			std::weak_ptr<Player> weakPlayer;
 			Buffer buffer;
+			std::mutex packetMutex;
 	};
 }
