@@ -33,13 +33,13 @@ namespace Game3 {
 		if (!isVisible())
 			return;
 
-		auto &realm = *getRealm();
-		auto &tileset = realm.getTileset();
+		auto realm = getRealm();
+		auto &tileset = realm->getTileset();
 
 		if (tileID != tileset.getEmpty()) {
 			const auto tilesize = tileset.getTileSize();
 			const auto tile_num = tileset[tileID];
-			const auto texture  = tileset.getTexture(realm.getGame());
+			const auto texture  = tileset.getTexture(realm->getGame());
 			const auto x = (tile_num % (*texture->width / tilesize)) * tilesize;
 			const auto y = (tile_num / (*texture->width / tilesize)) * tilesize;
 			sprite_renderer(*texture, {

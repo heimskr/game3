@@ -9,8 +9,8 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "realm/keep"}; }
 			Position parentOrigin;
-			Index parentWidth;
-			Index parentHeight;
+			Index parentWidth = -1;
+			Index parentHeight = -1;
 			MoneyCount money = 1'000'000;
 			double greed = .05;
 			std::shared_ptr<Inventory> stockpileInventory;

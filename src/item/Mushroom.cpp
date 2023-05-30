@@ -16,7 +16,7 @@ namespace Game3 {
 		texture = game.registry<TextureRegistry>().at("base:texture/mushrooms");
 		texture->init();
 		x_offset = (subID % 6) * 16 / 2.f;
-		y_offset = (subID / 6) * 16 / 2.f;
+		y_offset = static_cast<float>(subID / 6) * 16 / 2.f;
 	}
 
 	Glib::RefPtr<Gdk::Pixbuf> Mushroom::makeImage(const Game &game) {

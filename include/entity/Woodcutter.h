@@ -12,7 +12,7 @@ namespace Game3 {
 			constexpr static float SELLING_TIME = 5.f;
 
 			std::optional<Position> chosenResource;
-			float harvestingTime;
+			float harvestingTime = 0.f;
 
 			static std::shared_ptr<Woodcutter> create(Game &, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_);
 			static std::shared_ptr<Woodcutter> fromJSON(Game &, const nlohmann::json &);

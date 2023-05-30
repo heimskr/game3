@@ -654,7 +654,7 @@ namespace Game3 {
 				case GDK_KEY_S:
 				case GDK_KEY_s:
 					// player.path.clear();
-					if (!player.isMoving() && (player.continuousInteraction = keyval == GDK_KEY_S))
+					if (!player.isMoving() && (player.continuousInteraction = (keyval == GDK_KEY_S)))
 						player.continuousInteractionModifiers = Modifiers(modifiers);
 					// player.movingDown = true;
 					if (!player.isMoving(Direction::Down))
@@ -663,7 +663,7 @@ namespace Game3 {
 				case GDK_KEY_W:
 				case GDK_KEY_w:
 					// player.path.clear();
-					if (!player.isMoving() && (player.continuousInteraction = keyval == GDK_KEY_W))
+					if (!player.isMoving() && (player.continuousInteraction = (keyval == GDK_KEY_W)))
 						player.continuousInteractionModifiers = Modifiers(modifiers);
 					// player.movingUp = true;
 					if (!player.isMoving(Direction::Up))
@@ -672,7 +672,7 @@ namespace Game3 {
 				case GDK_KEY_A:
 				case GDK_KEY_a:
 					// player.path.clear();
-					if (!player.isMoving() && (player.continuousInteraction = keyval == GDK_KEY_A))
+					if (!player.isMoving() && (player.continuousInteraction = (keyval == GDK_KEY_A)))
 						player.continuousInteractionModifiers = Modifiers(modifiers);
 					// player.movingLeft = true;
 					if (!player.isMoving(Direction::Left))
@@ -681,7 +681,7 @@ namespace Game3 {
 				case GDK_KEY_D:
 				case GDK_KEY_d:
 					// player.path.clear();
-					if (!player.isMoving() && (player.continuousInteraction = keyval == GDK_KEY_D))
+					if (!player.isMoving() && (player.continuousInteraction = (keyval == GDK_KEY_D)))
 						player.continuousInteractionModifiers = Modifiers(modifiers);
 					// player.movingRight = true;
 					if (!player.isMoving(Direction::Right))

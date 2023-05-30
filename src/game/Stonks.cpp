@@ -42,13 +42,13 @@ namespace Game3 {
 			--amount;
 		}
 
-		if (0 < amount) {
-			const double subunit_price = amount * sellPrice(base, held_amount, money, greed);
-			if (money < subunit_price)
-				result = false;
-			money -= subunit_price;
-			price += subunit_price;
-		}
+		// if (0 < amount) {
+		// 	const double subunit_price = amount * sellPrice(base, held_amount, money, greed);
+		// 	if (money < subunit_price)
+		// 		result = false;
+		// 	money -= subunit_price;
+		// 	price += subunit_price;
+		// }
 
 		const MoneyCount discrete_price = std::floor(price);
 		out = discrete_price;
@@ -75,11 +75,11 @@ namespace Game3 {
 			--amount;
 		}
 
-		if (0 < amount) {
-			const double subunit_price = amount * buyPrice(base, merchant_amount, money);
-			money += subunit_price;
-			price += subunit_price;
-		}
+		// if (0 < amount) {
+		// 	const double subunit_price = amount * buyPrice(base, merchant_amount, money);
+		// 	money += subunit_price;
+		// 	price += subunit_price;
+		// }
 
 		// It's assumed the caller will check whether the player has enough money.
 		return std::ceil(price);

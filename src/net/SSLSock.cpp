@@ -177,7 +177,8 @@ namespace Game3 {
 			SPAM("Issuer: " << line);
 			free(line);
 			X509_free(cert);
-		} else
+		} else {
 			SPAM("No client certificates configured.");
+		}
 	}
 }

@@ -96,10 +96,10 @@ namespace Game3 {
 		if (!isVisible())
 			return;
 
-		auto &realm = *getRealm();
-		auto &tileset = realm.getTileset();
+		auto realm = getRealm();
+		auto &tileset = realm->getTileset();
 		const auto tilesize = tileset.getTileSize();
-		auto texture = tileset.getTexture(realm.getGame());
+		auto texture = tileset.getTexture(realm->getGame());
 		const auto column_count = *texture->width / tilesize;
 
 		TileID tile_id = tileset.getEmptyID();

@@ -134,7 +134,7 @@ namespace Game3 {
 						return {false, "Invalid count."};
 					}
 				}
-				std::string_view item_name = words.at(1);
+				auto item_name = std::string(words.at(1));
 				size_t colon = item_name.find(':');
 				if (colon == item_name.npos)
 					item_name = "base:item/" + std::string(item_name);
@@ -142,7 +142,7 @@ namespace Game3 {
 					player->give(ItemStack(*this, item, count));
 					return {true, "Gave " + std::to_string(count) + " x " + item->name};
 				}
-				return {false, "Unknown item: " + std::string(item_name)};
+				return {false, "Unknown item: " + item_name};
 			} else if (first == "heldL" || first == "heldR") {
 				if (words.size() != 2)
 					return {false, "Invalid number of arguments."};

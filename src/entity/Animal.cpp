@@ -72,7 +72,8 @@ namespace Game3 {
 		Entity::tick(game, delta);
 
 		if (getSide() == Side::Server) {
-			if (!attemptingWander && (timeUntilWander -= delta) <= 0.f)
+			timeUntilWander -= delta;
+			if (!attemptingWander && timeUntilWander <= 0.f)
 				wander();
 		}
 	}

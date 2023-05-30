@@ -95,8 +95,11 @@ namespace Game3 {
 		else if (phase == 3 && position == destination)
 			buyResources();
 
-		else if (phase == 4 && BUYING_TIME <= (actionTime += delta))
-			leaveKeep(5);
+		else if (phase == 4) {
+			actionTime += delta;
+			if (BUYING_TIME <= actionTime)
+				leaveKeep(5);
+		}
 
 		else if (phase == 5 && realmID == overworldRealm)
 			goToHouse(6);
@@ -107,8 +110,11 @@ namespace Game3 {
 		else if (phase == 7 && position == destination)
 			craftTools();
 
-		else if (phase == 8 && CRAFTING_TIME <= (actionTime += delta))
-			goToCounter();
+		else if (phase == 8) {
+			actionTime += delta;
+			if (CRAFTING_TIME <= actionTime)
+				goToCounter();
+		}
 
 		else if (phase == 9 && position == destination)
 			startSelling();
@@ -227,14 +233,14 @@ namespace Game3 {
 			throw std::runtime_error("Blacksmith couldn't find house");
 		house->teleport(shared_from_this());
 
-		auto &realm = *getRealm();
-		if (realm.id != houseRealm) {
+		auto realm = getRealm();
+		if (realm->id != houseRealm) {
 			// throw std::runtime_error("Blacksmith couldn't teleport to house");
 			stuck = true;
 			return;
 		}
 
-		if (!pathfind(destination = realm.extraData.at("furnace").get<Position>() + Position(1, 0))) {
+		if (!pathfind(destination = realm->extraData.at("furnace").get<Position>() + Position(1, 0))) {
 			// throw std::runtime_error("Blacksmith couldn't pathfind to forge");
 			stuck = true;
 			return;

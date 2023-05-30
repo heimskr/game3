@@ -15,7 +15,7 @@ namespace Game3 {
 	class TileProvider;
 
 	/** Start corresponds to left or top, End corresponds to right or bottom. */
-	enum class Alignment {Start, Middle, End};
+	enum class Alignment {Invalid = 0, Start, Middle, End};
 
 	class ElementBufferedRenderer {
 		public:
@@ -23,8 +23,8 @@ namespace Game3 {
 			constexpr static float TILE_TEXTURE_PADDING = 1.f / 2048.f;
 			int backbufferWidth = -1;
 			int backbufferHeight = -1;
-			Alignment horizontal;
-			Alignment vertical;
+			Alignment horizontal = Alignment::Invalid;
+			Alignment vertical = Alignment::Invalid;
 			bool isMissing = false;
 
 			Eigen::Vector2f center {0.f, 0.f};

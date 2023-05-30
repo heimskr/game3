@@ -36,5 +36,7 @@ namespace Game3 {
 			std::vector<std::thread> pool;
 			std::atomic_bool active = false;
 			std::atomic_bool joining = false;
+			std::atomic_bool newJobReady = false;
+			std::atomic_size_t jobsDone = 0;
 	};
 }

@@ -79,9 +79,12 @@ namespace Game3 {
 	void Player::tick(Game &game, float delta) {
 		Entity::tick(game, delta);
 
-		if (0.f < tooldown && (tooldown -= delta) < 0.f) {
-			tooldown = 0;
-			inventory->notifyOwner();
+		if (0.f < tooldown) {
+			tooldown -= delta;
+			if (tooldown < 0.f) {
+				tooldown = 0;
+				inventory->notifyOwner();
+			}
 		}
 
 		if (getSide() == Side::Server) {
@@ -274,7 +277,7 @@ namespace Game3 {
 			for (const auto &weak_visible: visibleEntities) {
 				if (auto visible = weak_visible.lock()) {
 					if (!visible->path.empty() && visible->hasSeenPath(shared)) {
-						INFO("Late sending EntitySetPathPacket (Player)");
+						// INFO("Late sending EntitySetPathPacket (Player)");
 						send(EntitySetPathPacket(*visible));
 						visible->setSeenPath(shared);
 					}

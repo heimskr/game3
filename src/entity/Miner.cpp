@@ -23,7 +23,8 @@ namespace Game3 {
 		Entity(ID()), Worker(ID()) {}
 
 	Miner::Miner(RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_):
-		Entity(ID()), Worker(ID(), overworld_realm, house_realm, house_position, keep_) {}
+		Entity(ID()),
+		Worker(ID(), overworld_realm, house_realm, house_position, keep_) {}
 
 	std::shared_ptr<Miner> Miner::create(Game &game, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_) {
 		auto out = std::shared_ptr<Miner>(new Miner(overworld_realm, house_realm, house_position, keep_));
@@ -99,9 +100,12 @@ namespace Game3 {
 		else if (phase == 6 && position == destination)
 			sellInventory();
 
-		else if (phase == 7 && SELLING_TIME <= (sellTime += delta)) {
-			sellTime = 0;
-			leaveKeep(8);
+		else if (phase == 7) {
+			sellTime += delta;
+			if (SELLING_TIME <= sellTime) {
+				sellTime = 0;
+				leaveKeep(8);
+			}
 		}
 
 		else if (phase == 8 && realmID == overworldRealm)
@@ -157,11 +161,11 @@ namespace Game3 {
 	}
 
 	void Miner::goToResource() {
-		auto &realm = *getRealm();
+		auto realm = getRealm();
 		if (!chosenResource)
 			return;
 
-		if (auto next = realm.getPathableAdjacent(*chosenResource)) {
+		if (auto next = realm->getPathableAdjacent(*chosenResource)) {
 			if (!pathfind(destination = *next)) {
 				stuck = true;
 				return;
@@ -179,9 +183,9 @@ namespace Game3 {
 	void Miner::harvest(float delta) {
 		if (HARVESTING_TIME <= harvestingTime) {
 			harvestingTime = 0.f;
-			auto &realm = *getRealm();
-			auto &deposit = dynamic_cast<OreDeposit &>(*realm.tileEntityAt(*chosenResource));
-			const ItemStack &stack = deposit.getOre(realm.getGame()).stack;
+			auto realm = getRealm();
+			auto &deposit = dynamic_cast<OreDeposit &>(*realm->tileEntityAt(*chosenResource));
+			const ItemStack &stack = deposit.getOre(realm->getGame()).stack;
 			const auto leftover = inventory->add(stack);
 			if (leftover == stack)
 				phase = 4;

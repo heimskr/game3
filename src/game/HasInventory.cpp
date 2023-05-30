@@ -17,18 +17,19 @@ namespace Game3 {
 	void HasInventory::decode(Buffer &buffer) {
 		Slot slot_count = -1;
 		buffer >> slot_count;
+		std::optional<Inventory> optional;
 		if (slot_count == -1) {
 			inventory.reset();
-			std::optional<Inventory> optional;
 			buffer >> optional;
 			assert(!optional);
 		} else {
-			std::optional<Inventory> optional;
 			buffer >> optional;
 			assert(optional);
-			inventory = std::make_shared<Inventory>(std::move(*optional));
-			inventory->weakOwner = getSharedAgent();
-			inventory->slotCount = slot_count; // Maybe not necessary? Try an assert before.
+			if (optional) { // This is unnecessary but I want PVS-Studio to be happy.
+				inventory = std::make_shared<Inventory>(std::move(*optional));
+				inventory->weakOwner = getSharedAgent();
+				inventory->slotCount = slot_count; // Maybe not necessary? Try an assert before.
+			}
 		}
 	}
 }

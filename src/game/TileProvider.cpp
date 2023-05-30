@@ -34,7 +34,7 @@ namespace Game3 {
 	}
 
 	std::vector<Position> TileProvider::getLand(const Game &game, const ChunkRange &range, Index right_pad, Index bottom_pad) {
-		const auto &tileset = *getTileset(game);
+		const auto tileset = getTileset(game);
 		std::vector<Position> land_tiles;
 		land_tiles.resize((range.tileWidth() - right_pad) * (range.tileHeight() - bottom_pad));
 
@@ -45,7 +45,7 @@ namespace Game3 {
 
 		for (Index row = range.rowMin(); row <= range.rowMax() - bottom_pad; ++row)
 			for (Index column = range.columnMin(); column < range.columnMax() - right_pad; ++column)
-				if (tileset.isLand(copyTileUnsafe(1, row, column, was_empty, TileMode::Throw)))
+				if (tileset->isLand(copyTileUnsafe(1, row, column, was_empty, TileMode::Throw)))
 					land_tiles[i++] = {row, column};
 		return land_tiles;
 	}

@@ -127,9 +127,9 @@ namespace Game3 {
 					if (stack.count != 1)
 						label_text += " \u00d7 " + std::to_string(stack.count);
 					if (is_merchant) {
-						const auto &merchant = *std::dynamic_pointer_cast<Merchant>(inventory.getOwner());
-						const MoneyCount for_one = totalBuyPrice(merchant, stack.withCount(1));
-						const MoneyCount for_all = totalBuyPrice(merchant, stack);
+						const auto merchant = std::dynamic_pointer_cast<Merchant>(inventory.getOwner());
+						const MoneyCount for_one = totalBuyPrice(*merchant, stack.withCount(1));
+						const MoneyCount for_all = totalBuyPrice(*merchant, stack);
 						label_text += "\n(" + std::to_string(for_one) + " for one, " + std::to_string(for_all) + " for all)";
 					}
 					auto fixed_ptr = std::make_unique<Gtk::Fixed>();

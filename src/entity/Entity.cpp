@@ -505,10 +505,10 @@ namespace Game3 {
 
 	bool Entity::isVisible() const {
 		const auto pos = getPosition();
-		auto &realm = *getRealm();
+		auto realm = getRealm();
 		if (getSide() == Side::Client)
-			return realm.getGame().toClient().canvas.inBounds(pos) && realm.isVisible(pos);
-		return realm.isVisible(pos);
+			return realm->getGame().toClient().canvas.inBounds(pos) && realm->isVisible(pos);
+		return realm->isVisible(pos);
 	}
 
 	void Entity::setHeldLeft(Slot new_value) {
@@ -532,9 +532,9 @@ namespace Game3 {
 	}
 
 	bool Entity::canSee(RealmID realm_id, const Position &pos) const {
-		const auto &realm = *getRealm();
+		const auto realm = getRealm();
 
-		if (realm_id != (nextRealm == -1? realm.id : nextRealm))
+		if (realm_id != (nextRealm == -1? realm->id : nextRealm))
 			return false;
 
 		const auto this_position = getChunk();

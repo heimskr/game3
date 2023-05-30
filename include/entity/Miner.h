@@ -15,7 +15,7 @@ namespace Game3 {
 			constexpr static float SELLING_TIME = 5.f;
 
 			std::optional<Position> chosenResource;
-			float harvestingTime;
+			float harvestingTime = 0.f;
 
 			static std::shared_ptr<Miner> create(Game &, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_);
 			static std::shared_ptr<Miner> fromJSON(Game &, const nlohmann::json &);

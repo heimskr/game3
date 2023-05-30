@@ -19,3 +19,7 @@
 /gmon.out
 /analysis.txt
 /perf.*
+/strace_out
+*PVS-Studio*
+/pvs.log
+/pvs.tasks

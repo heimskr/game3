@@ -170,4 +170,8 @@ namespace Game3 {
 		else
 			sock->stopBuffering();
 	}
+
+	void LocalClient::printHeaderBytes() const {
+		INFO("HeaderBytes: (" << hexString(headerBytes) << ')');
+	}
 }

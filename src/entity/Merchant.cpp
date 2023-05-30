@@ -26,14 +26,12 @@ namespace Game3 {
 
 	void Merchant::toJSON(nlohmann::json &json) const {
 		Entity::toJSON(json);
-		json["money"] = money;
 		json["greed"] = greed;
 	}
 
 	void Merchant::absorbJSON(Game &game, const nlohmann::json &json) {
 		Entity::absorbJSON(game, json);
 		greed = json.at("greed");
-		money = json.at("money");
 	}
 
 	bool Merchant::onInteractNextTo(const std::shared_ptr<Player> &player) {
@@ -53,12 +51,10 @@ namespace Game3 {
 	}
 
 	void Merchant::encode(Buffer &buffer) {
-		buffer << money;
 		buffer << greed;
 	}
 
 	void Merchant::decode(Buffer &buffer) {
-		buffer >> money;
 		buffer >> greed;
 	}
 

@@ -29,7 +29,12 @@ namespace Game3 {
 	}
 
 	Sock::~Sock() {
-		close();
+		if (connected) {
+			ControlMessage message = ControlMessage::Close;
+			::write(controlWrite, &message, sizeof(message));
+			connected = false;
+		}
+
 		freeaddrinfo(info);
 	}
 

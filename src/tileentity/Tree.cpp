@@ -51,15 +51,15 @@ namespace Game3 {
 		if (age < MATURITY)
 			return false;
 
-		auto &realm = *getRealm();
-		auto &game = realm.getGame();
+		auto realm = getRealm();
+		auto &game = realm->getGame();
 		auto &inventory = *player->inventory;
 		const Slot active_slot = inventory.activeSlot;
 
 		if (auto *active_stack = inventory[active_slot]) {
 			if (active_stack->hasAttribute("base:attribute/axe"_id)) {
 				if (!inventory.add({game, "base:item/wood"_id, 1})) {
-					realm.queueDestruction(shared_from_this());
+					realm->queueDestruction(shared_from_this());
 					if (active_stack->reduceDurability())
 						inventory.erase(active_slot);
 					ItemCount saplings = 1;
@@ -87,21 +87,21 @@ namespace Game3 {
 	}
 
 	bool Tree::kill() {
-		auto &realm = *getRealm();
+		auto realm = getRealm();
 
 		static const Identifier expected("base", "tileset/monomap");
 
-		if (realm.getTileset().identifier != expected)
+		if (realm->getTileset().identifier != expected)
 			return true;
 
 		static std::uniform_real_distribution one(0., 1.);
 
 		if (one(threadContext.rng) < CHAR_CHANCE)
-			realm.setTile(3, getPosition(), "base:tile/charred_stump"_id);
+			realm->setTile(3, getPosition(), "base:tile/charred_stump"_id);
 		else
-			realm.spawn<ItemEntity>(getPosition(), ItemStack(realm.getGame(), "base:item/wood"_id, 1));
+			realm->spawn<ItemEntity>(getPosition(), ItemStack(realm->getGame(), "base:item/wood"_id, 1));
 
-		realm.setTile(2, getPosition(), "base:tile/ash"_id);
+		realm->setTile(2, getPosition(), "base:tile/ash"_id);
 		return true;
 	}
 

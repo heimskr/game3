@@ -22,6 +22,19 @@ namespace Game3 {
 		initRenderData();
 	}
 
+	SpriteRenderer::SpriteRenderer(SpriteRenderer &&other): SpriteRenderer(*other.canvas) {
+		other.canvas = nullptr;
+		shader = std::move(other.shader);
+		quadVAO = other.quadVAO;
+		initialized = other.initialized;
+		backbufferWidth = other.backbufferWidth;
+		backbufferHeight = other.backbufferHeight;
+		other.quadVAO = 0;
+		other.initialized = false;
+		other.backbufferWidth = -1;
+		other.backbufferHeight = -1;
+	}
+
 	SpriteRenderer::~SpriteRenderer() {
 		remove();
 	}

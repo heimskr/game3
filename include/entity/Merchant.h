@@ -9,7 +9,6 @@ namespace Game3 {
 			static std::shared_ptr<Merchant> create(Game &, EntityType = ID());
 			static std::shared_ptr<Merchant> fromJSON(Game &, const nlohmann::json &);
 
-			MoneyCount money = 0;
 			double greed = .1;
 
 			void toJSON(nlohmann::json &) const override;

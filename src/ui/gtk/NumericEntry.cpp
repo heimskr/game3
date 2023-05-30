@@ -1,3 +1,4 @@
+#include <cassert>
 #include <iostream>
 
 #include "ui/gtk/NumericEntry.h"
@@ -24,7 +25,7 @@ namespace Game3 {
 	NumericEntry::NumericEntry() {
 		signal_map().connect([this] {
 			Gtk::Text *text = dynamic_cast<Gtk::Text *>(get_first_child());
-
+			assert(text != nullptr);
 			GtkEditableInterface *interface = GTK_EDITABLE_GET_IFACE(GTK_EDITABLE(text->gobj()));
 			if (!old_insert_text)
 				old_insert_text = interface->do_insert_text;

@@ -15,8 +15,8 @@ namespace Game3 {
 			constexpr static HitPoints MAX_HEALTH = 40;
 
 			Phase phase = 0;
-			RealmID overworldRealm;
-			RealmID houseRealm;
+			RealmID overworldRealm = -1;
+			RealmID houseRealm = -1;
 			Position housePosition;
 			std::shared_ptr<Building> keep;
 			Position destination = {-1, -1};

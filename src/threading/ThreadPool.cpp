@@ -16,14 +16,19 @@ namespace Game3 {
 		for (size_t thread_index = 0; thread_index < size; ++thread_index)
 			pool.emplace_back([this, thread_index] {
 				threadContext = {};
+				size_t last_jobs_done = jobsDone.load();
 				while (active) {
 					{
 						std::unique_lock lock(workMutex);
-						workCV.wait(lock);
+						workCV.wait(lock, [this, &last_jobs_done] {
+							return newJobReady.load() || last_jobs_done < jobsDone;
+						});
 					}
 					if (auto job = workQueue.tryTake()) {
+						newJobReady = false;
 						assert(*job);
 						(*job)(*this, thread_index);
+						last_jobs_done = ++jobsDone;
 						// Issue when the thread pool contains only one worker?
 						workCV.notify_all();
 					}
@@ -46,6 +51,7 @@ namespace Game3 {
 		if (active) {
 			// TODO: race condition if active goes false during this block
 			workQueue.push(function);
+			newJobReady = true;
 			workCV.notify_one();
 			return true;
 		}

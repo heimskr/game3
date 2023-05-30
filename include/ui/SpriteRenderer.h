@@ -38,8 +38,12 @@ namespace Game3 {
 			int backbufferHeight = -1;
 
 			SpriteRenderer(Canvas &);
+			SpriteRenderer(const SpriteRenderer &) = delete;
+			SpriteRenderer(SpriteRenderer &&);
+
 			~SpriteRenderer();
 
+			SpriteRenderer & operator=(const SpriteRenderer &) = delete;
 			SpriteRenderer & operator=(SpriteRenderer &&);
 
 			void remove();

@@ -69,6 +69,8 @@ namespace Game3 {
 				sock->send(&little, sizeof(little), false);
 			}
 
+			void printHeaderBytes() const;
+
 			friend struct UsageCommand;
 	};
 }

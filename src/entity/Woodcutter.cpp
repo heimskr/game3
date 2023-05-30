@@ -21,10 +21,12 @@
 
 namespace Game3 {
 	Woodcutter::Woodcutter():
-		Entity(ID()), Worker(ID()) {}
+		Entity(ID()),
+		Worker(ID()) {}
 
 	Woodcutter::Woodcutter(RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_):
-		Entity(ID()), Worker(ID(), overworld_realm, house_realm, std::move(house_position), std::move(keep_)) {}
+		Entity(ID()),
+		Worker(ID(), overworld_realm, house_realm, std::move(house_position), std::move(keep_)) {}
 
 	std::shared_ptr<Woodcutter> Woodcutter::create(Game &game, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_) {
 		auto out = std::shared_ptr<Woodcutter>(new Woodcutter(overworld_realm, house_realm, std::move(house_position), std::move(keep_)));
@@ -98,9 +100,12 @@ namespace Game3 {
 		else if (phase == 6 && position == destination)
 			sellInventory();
 
-		else if (phase == 7 && SELLING_TIME <= (sellTime += delta)) {
-			sellTime = 0;
-			leaveKeep(8);
+		else if (phase == 7) {
+			sellTime += delta;
+			if (SELLING_TIME <= sellTime) {
+				sellTime = 0;
+				leaveKeep(8);
+			}
 		}
 
 		else if (phase == 8 && realmID == overworldRealm)
@@ -148,8 +153,8 @@ namespace Game3 {
 	}
 
 	void Woodcutter::goToResource() {
-		auto &realm = *getRealm();
-		if (auto next = realm.getPathableAdjacent(*chosenResource)) {
+		auto realm = getRealm();
+		if (auto next = realm->getPathableAdjacent(*chosenResource)) {
 			if (!pathfind(destination = *next)) {
 				stuck = true;
 				return;
@@ -167,8 +172,8 @@ namespace Game3 {
 	void Woodcutter::harvest(float delta) {
 		if (HARVESTING_TIME <= harvestingTime) {
 			harvestingTime = 0.f;
-			auto &realm = *getRealm();
-			auto &deposit = dynamic_cast<OreDeposit &>(*realm.tileEntityAt(*chosenResource));
+			auto realm = getRealm();
+			auto &deposit = dynamic_cast<OreDeposit &>(*realm->tileEntityAt(*chosenResource));
 			const ItemStack stack = deposit.getOre(getGame()).stack;
 			const auto leftover = inventory->add(stack);
 			if (leftover == stack)

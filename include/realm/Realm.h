@@ -58,7 +58,7 @@ namespace Game3 {
 			};
 
 		public:
-			RealmID id;
+			RealmID id = -1;
 			RealmType type;
 			TileProvider tileProvider;
 			std::optional<std::array<std::array<std::array<ElementBufferedRenderer, LAYER_COUNT>, REALM_DIAMETER>, REALM_DIAMETER>> renderers;

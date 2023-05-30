@@ -133,14 +133,14 @@ namespace Game3 {
 			throw std::runtime_error("Worker of type " + type.str() + " couldn't find house at " + std::string(housePosition));
 		house->teleport(shared_from_this());
 
-		auto &realm = *getRealm();
-		if (realm.id != houseRealm) {
+		auto realm = getRealm();
+		if (realm->id != houseRealm) {
 			// throw std::runtime_error("Worker couldn't teleport to house");
 			stuck = true;
 			return;
 		}
 
-		if (!pathfind(destination = realm.extraData.at("bed"))) {
+		if (!pathfind(destination = realm->extraData.at("bed"))) {
 			// throw std::runtime_error("Worker couldn't pathfind to bed");
 			stuck = true;
 			return;
