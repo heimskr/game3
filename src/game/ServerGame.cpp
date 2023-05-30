@@ -38,6 +38,31 @@ namespace Game3 {
 			remove(player);
 			player->toServer()->client.reset();
 		}
+
+		lastGarbageCollection += delta;
+		if (GARBAGE_COLLECTION_TIME <= lastGarbageCollection) {
+			garbageCollect();
+			lastGarbageCollection = 0.f;
+		}
+	}
+
+	void ServerGame::garbageCollect() {
+		std::shared_lock lock(playersMutex);
+		for (const auto &player: players) {
+			{
+				auto shared_lock = player->knownEntities.sharedLock();
+				if (player->knownEntities.empty())
+					continue;
+			}
+			auto unique_lock = player->knownEntities.uniqueLock();
+			std::vector<std::weak_ptr<Entity>> to_remove;
+			to_remove.reserve(player->knownEntities.size() / 4);
+			for (const auto &weak_entity: player->knownEntities)
+				if (!weak_entity.lock())
+					to_remove.push_back(weak_entity);
+			for (const auto &weak_entity: to_remove)
+				player->knownEntities.erase(weak_entity);
+		}
 	}
 
 	void ServerGame::broadcastTileUpdate(RealmID realm_id, Layer layer, const Position &position, TileID tile_id) {
@@ -95,13 +120,13 @@ namespace Game3 {
 			std::dynamic_pointer_cast<RemoteClient>(client)->send(packet);
 	}
 
-	void ServerGame::remove(const PlayerPtr &player) {
+	void ServerGame::remove(const ServerPlayerPtr &player) {
 		auto lock = lockPlayersUnique();
 		players.erase(player);
 		player->destroy();
 	}
 
-	void ServerGame::queueRemoval(const PlayerPtr &player) {
+	void ServerGame::queueRemoval(const ServerPlayerPtr &player) {
 		playerRemovalQueue.push(player);
 	}
 

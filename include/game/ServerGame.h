@@ -12,13 +12,17 @@ namespace Game3 {
 
 	class ServerGame: public Game {
 		public:
-			std::unordered_set<PlayerPtr> players;
+			constexpr static float GARBAGE_COLLECTION_TIME = 60.f;
+
+			std::unordered_set<ServerPlayerPtr> players;
 			std::shared_ptr<LocalServer> server;
+			float lastGarbageCollection = 0.f;
 
 			ServerGame(std::shared_ptr<LocalServer> server_):
 				server(std::move(server_)) {}
 
 			void tick();
+			void garbageCollect();
 			void broadcastTileUpdate(RealmID, Layer, const Position &, TileID);
 
 			Side getSide() const override { return Side::Server; }
@@ -27,13 +31,13 @@ namespace Game3 {
 			void entityTeleported(Entity &);
 			void entityDestroyed(const Entity &);
 			void tileEntityDestroyed(const TileEntity &);
-			void remove(const PlayerPtr &);
-			void queueRemoval(const PlayerPtr &);
+			void remove(const ServerPlayerPtr &);
+			void queueRemoval(const ServerPlayerPtr &);
 
 		private:
 			std::shared_mutex playersMutex;
 			MTQueue<std::pair<std::shared_ptr<RemoteClient>, std::shared_ptr<Packet>>> packetQueue;
-			MTQueue<PlayerPtr> playerRemovalQueue;
+			MTQueue<ServerPlayerPtr> playerRemovalQueue;
 
 			inline auto lockPlayersShared() { return std::shared_lock(playersMutex); }
 			inline auto lockPlayersUnique() { return std::unique_lock(playersMutex); }
