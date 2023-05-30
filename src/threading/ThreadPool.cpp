@@ -21,7 +21,7 @@ namespace Game3 {
 					{
 						std::unique_lock lock(workMutex);
 						workCV.wait(lock, [this, &last_jobs_done] {
-							return newJobReady.load() || last_jobs_done < jobsDone;
+							return joining.load() || newJobReady.load() || last_jobs_done < jobsDone;
 						});
 					}
 					if (auto job = workQueue.tryTake()) {
