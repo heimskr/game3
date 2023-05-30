@@ -34,9 +34,11 @@ namespace Game3 {
 		for (const auto &player: players)
 			player->ticked = false;
 
-		for (auto player: playerRemovalQueue.steal()) {
+		for (const auto &player: playerRemovalQueue.steal()) {
 			remove(player);
 			player->toServer()->weakClient.reset();
+			if (auto count = player.use_count(); count != 1)
+				WARN("Player ref count: " << count << " (should be 1)");
 		}
 
 		lastGarbageCollection += delta;

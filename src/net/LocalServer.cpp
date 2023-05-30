@@ -45,11 +45,8 @@ namespace Game3 {
 				client = std::dynamic_pointer_cast<RemoteClient>(server->getClients().at(client_id));
 			}
 			assert(client);
-			if (auto player = client->getPlayer()) {
+			if (auto player = client->getPlayer())
 				game->queueRemoval(player);
-				if (auto count = player.use_count(); count != 1)
-					WARN("Player ref count: " << count << " (should be 1)");
-			}
 		};
 
 		server->messageHandler = [](GenericClient &generic_client, std::string_view message) {
