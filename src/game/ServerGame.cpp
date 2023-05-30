@@ -22,7 +22,7 @@ namespace Game3 {
 		guards.reserve(players.size());
 
 		for (const auto &player: players)
-			if (auto client = player->toServer()->client.lock())
+			if (auto client = player->toServer()->weakClient.lock())
 				guards.emplace_back(client);
 
 		for (const auto &[client, packet]: packetQueue.steal())
@@ -36,7 +36,7 @@ namespace Game3 {
 
 		for (auto player: playerRemovalQueue.steal()) {
 			remove(player);
-			player->toServer()->client.reset();
+			player->toServer()->weakClient.reset();
 		}
 
 		lastGarbageCollection += delta;
@@ -70,7 +70,7 @@ namespace Game3 {
 		auto lock = lockPlayersShared();
 		for (const auto &player: players)
 			if (player->canSee(realm_id, position))
-				if (auto client = player->toServer()->client.lock())
+				if (auto client = player->toServer()->weakClient.lock())
 					client->send(packet);
 	}
 
@@ -95,13 +95,13 @@ namespace Game3 {
 			auto lock = lockPlayersShared();
 			for (const auto &player: players)
 				if (player.get() != cast_player && player->getRealm() && player->canSee(entity))
-					if (auto client = player->toServer()->client.lock())
+					if (auto client = player->toServer()->weakClient.lock())
 						client->send(packet);
 		} else {
 			auto lock = lockPlayersShared();
 			for (const auto &player: players)
 				if (player->getRealm() && player->canSee(entity))
-					if (auto client = player->toServer()->client.lock())
+					if (auto client = player->toServer()->weakClient.lock())
 						client->send(packet);
 		}
 	}

@@ -13,13 +13,17 @@ namespace Game3 {
 	}
 
 	bool ServerPlayer::ensureEntity(const std::shared_ptr<Entity> &entity) {
+		auto client = weakClient.lock();
+		if (!client)
+			return false;
+
 		{
 			auto lock = knownEntities.sharedLock();
 			if (knownEntities.contains(std::weak_ptr(entity)))
 				return false;
 		}
 
-		getClient()->send(EntityPacket(entity));
+		client->send(EntityPacket(entity));
 
 		{
 			auto lock = knownEntities.uniqueLock();
@@ -30,7 +34,7 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<RemoteClient> ServerPlayer::getClient() const {
-		auto locked = client.lock();
+		auto locked = weakClient.lock();
 		assert(locked);
 		return locked;
 	}

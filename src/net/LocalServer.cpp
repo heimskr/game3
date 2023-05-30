@@ -145,7 +145,7 @@ namespace Game3 {
 		auto player = client.getPlayer();
 		auto realm = player->getRealm();
 		INFO("Setting up player");
-		player->client = client.shared_from_this();
+		player->weakClient = client.shared_from_this();
 		client.send(SelfTeleportedPacket(realm->id, player->getPosition()));
 		realm->sendTo(client);
 	}

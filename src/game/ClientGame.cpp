@@ -10,6 +10,7 @@
 #include "packet/InteractPacket.h"
 #include "packet/RegisterPlayerPacket.h"
 #include "packet/TeleportSelfPacket.h"
+#include "packet/ClickPacket.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "ui/tab/TextTab.h"
@@ -33,8 +34,9 @@ namespace Game3 {
 		const auto [x, y] = translateCanvasCoordinates(pos_x, pos_y);
 
 		if (button == 1) {
-			if (auto *stack = player->inventory->getActive())
-				stack->item->use(player->inventory->activeSlot, *stack, {{y, x}, activeRealm, player}, {});
+			client->send(ClickPacket({y, x}));
+			// if (auto *stack = player->inventory->getActive())
+			// 	stack->item->use(player->inventory->activeSlot, *stack, {{y, x}, activeRealm, player}, {});
 		} else if (button == 3 && player && !realm.rightClick({y, x}, pos_x, pos_y) && debugMode && client && client->isConnected()) {
 			client->send(TeleportSelfPacket(realm.id, {y, x}));
 		}

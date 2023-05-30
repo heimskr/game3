@@ -8,7 +8,7 @@ namespace Game3 {
 	class ServerPlayer: public Player {
 		public:
 			Lockable<WeakSet<Entity>> knownEntities;
-			std::weak_ptr<RemoteClient> client;
+			std::weak_ptr<RemoteClient> weakClient;
 
 			~ServerPlayer() override = default;
 

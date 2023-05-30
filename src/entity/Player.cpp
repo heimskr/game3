@@ -150,7 +150,7 @@ namespace Game3 {
 				new_realm->reupload();
 				focus(game.toClient().canvas, true);
 			} else {
-				auto locked = toServer()->client.lock();
+				auto locked = toServer()->weakClient.lock();
 				assert(locked);
 				INFO("Sending " << new_realm->id << " to client");
 				new_realm->sendTo(*locked);
@@ -294,7 +294,7 @@ namespace Game3 {
 
 	bool Player::send(const Packet &packet) {
 		if (getSide() == Side::Server) {
-			if (auto locked = toServer()->client.lock()) {
+			if (auto locked = toServer()->weakClient.lock()) {
 				locked->send(packet);
 				return true;
 			}

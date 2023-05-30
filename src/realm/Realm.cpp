@@ -325,7 +325,7 @@ namespace Game3 {
 				guards.reserve(players.size());
 				for (const auto &weak_player: players) {
 					if (auto player = weak_player.lock()) {
-						if (auto client = player->toServer()->client.lock())
+						if (auto client = player->toServer()->weakClient.lock())
 							guards.emplace_back(client);
 
 						if (!player->ticked) {

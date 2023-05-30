@@ -66,6 +66,7 @@
 #include "packet/SetActiveSlotPacket.h"
 #include "packet/ActiveSlotSetPacket.h"
 #include "packet/DestroyTileEntityPacket.h"
+#include "packet/ClickPacket.h"
 #include "realm/Cave.h"
 #include "realm/House.h"
 #include "realm/Keep.h"
@@ -301,6 +302,7 @@ namespace Game3 {
 		add(PacketFactory::create<SetActiveSlotPacket>());
 		add(PacketFactory::create<ActiveSlotSetPacket>());
 		add(PacketFactory::create<DestroyTileEntityPacket>());
+		add(PacketFactory::create<ClickPacket>());
 	}
 
 	void Game::addLocalCommandFactories() {
