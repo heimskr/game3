@@ -98,7 +98,8 @@ namespace Game3 {
 			throw std::invalid_argument("Socket not connected");
 
 		fd_set fds_copy = fds;
-		int status = select(FD_SETSIZE, &fds_copy, NULL, NULL, NULL);
+		timeval timeout {.tv_sec = 0, .tv_usec = 100};
+		int status = select(FD_SETSIZE, &fds_copy, nullptr, nullptr, &timeout);
 		if (status < 0) {
 			ERROR("select status: " << strerror(status));
 			throw NetError(errno);
@@ -155,6 +156,7 @@ namespace Game3 {
 
 	void Sock::addToBuffer(const void *data, size_t bytes) {
 		const auto *char_data = reinterpret_cast<const char *>(data);
+		std::unique_lock lock(bufferMutex);
 		buffer.insert(buffer.end(), char_data, char_data + bytes);
 	}
 }

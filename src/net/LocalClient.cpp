@@ -33,9 +33,6 @@ namespace Game3 {
 
 		assert(!reading.exchange(true));
 
-		static PacketID last_type = 0;
-		static Buffer last_buffer;
-
 		const auto byte_count = sock->recv(array.data(), array.size());
 		if (byte_count <= 0) {
 			reading = false;
@@ -53,27 +50,31 @@ namespace Game3 {
 				packetType = 0;
 				payloadSize = 0;
 
-				if (6 <= headerBytes.size()) {
+				if (HEADER_SIZE <= headerBytes.size()) {
 					packetType  = headerBytes[0] | (static_cast<uint16_t>(headerBytes[1]) << 8);
 					payloadSize = headerBytes[2] | (static_cast<uint32_t>(headerBytes[3]) << 8) | (static_cast<uint32_t>(headerBytes[4]) << 16) | (static_cast<uint32_t>(headerBytes[5]) << 24);
+
+					if (100'000 <= payloadSize)
+						sock->close();
+
 					assert(payloadSize < 100'000);
-					headerBytes.erase(headerBytes.begin(), headerBytes.begin() + 6);
+					headerBytes.erase(headerBytes.begin(), headerBytes.begin() + HEADER_SIZE);
 					state = State::Data;
 				} else
 					break;
 			}
 
 			if (state == State::Data) {
+				if (headerBytes.empty())
+					break;
+
 				if (MAX_PACKET_SIZE < buffer.size() + headerBytes.size())
 					throw PacketError("Packet too large");
 
 				const size_t to_append = std::min(payloadSize - buffer.size(), headerBytes.size());
 
 				buffer.append(headerBytes.begin(), headerBytes.begin() + to_append);
-				if (to_append == headerBytes.size())
-					headerBytes.clear();
-				else
-					headerBytes.erase(headerBytes.begin(), headerBytes.begin() + to_append);
+				headerBytes.erase(headerBytes.begin(), headerBytes.begin() + to_append);
 
 				if (payloadSize < buffer.size())
 					throw std::logic_error("Buffer grew too large");
@@ -81,14 +82,14 @@ namespace Game3 {
 				if (payloadSize == buffer.size()) {
 					auto game = lockGame();
 					auto packet = (*game->registry<PacketFactoryRegistry>().at(packetType))();
-					last_buffer = buffer;
 					packet->decode(*game, buffer);
 					assert(buffer.empty());
 					state = State::Begin;
-					std::unique_lock lock(receivedPacketCountsMutex);
-					++receivedPacketCounts[packet->getID()];
+					{
+						std::unique_lock lock(receivedPacketCountsMutex);
+						++receivedPacketCounts[packet->getID()];
+					}
 					game->queuePacket(std::move(packet));
-					last_type = packetType;
 				} else
 					break;
 			}

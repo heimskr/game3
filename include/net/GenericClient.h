@@ -18,8 +18,9 @@ namespace Game3 {
 		std::string ip;
 		/** If nonzero, don't read more than this many bytes at a time. The amount read will be subtracted from this. */
 		size_t maxRead = 0;
-		SendBuffer buffer;
+		SendBuffer sendBuffer;
 		bufferevent *event = nullptr;
+		std::mutex networkMutex;
 
 		GenericClient() = delete;
 		GenericClient(const GenericClient &) = delete;

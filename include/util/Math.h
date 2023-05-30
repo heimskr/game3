@@ -14,6 +14,14 @@ namespace Game3 {
 		return std::modf(d, &d);
 	}
 
+	inline char swapBytes(char in) {
+		return in;
+	}
+
+	inline uint8_t swapBytes(uint8_t in) {
+		return in;
+	}
+
 	inline uint16_t swapBytes(uint16_t in) {
 		return ((in >> 8) & 0xff) | ((in & 0xff) << 8);
 	}

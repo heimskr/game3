@@ -10,7 +10,8 @@ namespace Game3 {
 	realmID(realm.id), chunkPosition(chunk_position) {
 		tiles.reserve(CHUNK_SIZE * CHUNK_SIZE * LAYER_COUNT);
 		for (Layer layer = 1; layer <= LAYER_COUNT; ++layer) {
-			const auto layer_tiles = realm.tileProvider.getTileChunk(layer, chunk_position);
+			auto &layer_tiles = realm.tileProvider.getTileChunk(layer, chunk_position);
+			auto lock = const_cast<Chunk<TileID> &>(layer_tiles).sharedLock();
 			tiles.insert(tiles.end(), layer_tiles.begin(), layer_tiles.end());
 		}
 	}

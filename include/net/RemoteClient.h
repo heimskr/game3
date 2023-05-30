@@ -59,7 +59,6 @@ namespace Game3 {
 			uint16_t packetType = 0;
 			uint32_t payloadSize = 0;
 			std::weak_ptr<Player> weakPlayer;
-			Buffer buffer;
-			std::mutex packetMutex;
+			Buffer receiveBuffer;
 	};
 }

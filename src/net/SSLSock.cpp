@@ -1,3 +1,4 @@
+#include <cassert>
 #include <fcntl.h>
 #include <iomanip>
 #include <iostream>
@@ -27,6 +28,7 @@ namespace Game3 {
 		const int status = SSL_write_ex(ssl, data, bytes, &written);
 
 		if (status == 1) {
+#ifdef SPAM
 			SPAM("SSLSock::send(status == 1): bytes[" << bytes << "], written[" << written << "]");
 			std::stringstream ss;
 			std::string str(static_cast<const char *>(data), written);
@@ -35,6 +37,7 @@ namespace Game3 {
 			while (!str.empty() && (str.back() == '\r' || str.back() == '\n'))
 				str.pop_back();
 			SPAM("    \"" << str << "\":" << ss.str());
+#endif
 			return static_cast<ssize_t>(written);
 		}
 
@@ -45,6 +48,11 @@ namespace Game3 {
 	ssize_t SSLSock::recv(void *data, size_t bytes) {
 		if (!connected)
 			throw std::invalid_argument("Socket not connected");
+
+		if (!threadID)
+			threadID.emplace(std::this_thread::get_id());
+		else
+			assert(*threadID == std::this_thread::get_id());
 
 		fd_set fds_copy = fds;
 		timeval timeout {.tv_sec = 0, .tv_usec = 100};
@@ -101,10 +109,12 @@ namespace Game3 {
 							break;
 					}
 				} else {
-					std::string read_str((const char *) data, bytes_read);
+#ifdef SPAM
+					std::string read_str(reinterpret_cast<const char *>(data), bytes_read);
 					while (!read_str.empty() && (read_str.back() == '\r' || read_str.back() == '\n'))
 						read_str.pop_back();
 					SPAM("SSLSock::recv(status == 1): \"" << read_str << "\"");
+#endif
 				}
 			} while (SSL_pending(ssl) && !read_blocked && 0 < bytes);
 

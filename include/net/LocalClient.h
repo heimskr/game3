@@ -22,6 +22,7 @@ namespace Game3 {
 	class LocalClient: public std::enable_shared_from_this<LocalClient> {
 		public:
 			constexpr static size_t MAX_PACKET_SIZE = 1 << 24;
+			constexpr static size_t HEADER_SIZE = 6;
 
 			std::weak_ptr<ClientGame> weakGame;
 			size_t bytesRead = 0;
@@ -50,7 +51,7 @@ namespace Game3 {
 
 		private:
 			enum class State {Begin, Data};
-			std::array<char, 1'000'000> array;
+			std::array<char, 16'384> array;
 			State state = State::Begin;
 			Buffer buffer;
 			uint16_t packetType = 0;

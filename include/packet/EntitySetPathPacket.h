@@ -17,8 +17,8 @@ namespace Game3 {
 
 		EntitySetPathPacket() = default;
 		EntitySetPathPacket(Entity &);
-		EntitySetPathPacket(GlobalID global_id, RealmID realm_id, const Position &position_, const std::vector<Direction> &path_):
-			globalID(global_id), realmID(realm_id), position(position_), path(path_) {}
+		EntitySetPathPacket(GlobalID global_id, RealmID realm_id, const Position &position_, std::vector<Direction> path_):
+			globalID(global_id), realmID(realm_id), position(position_), path(std::move(path_)) {}
 
 		PacketID getID() const override { return ID(); }
 

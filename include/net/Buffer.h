@@ -166,6 +166,8 @@ namespace Game3 {
 			inline auto size() const { return bytes.size(); }
 			inline bool empty() const { return bytes.empty(); }
 			inline void clear() { bytes.clear(); }
+			inline auto & getBytes() { return bytes; }
+			inline const auto & getBytes() const { return bytes; }
 
 			template <typename It>
 			void append(It first, It last) {

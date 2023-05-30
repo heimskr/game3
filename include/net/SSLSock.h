@@ -1,11 +1,13 @@
 #pragma once
 
 #include <cerrno>
+#include <cstring>
 #include <netdb.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
+#include <optional>
 #include <resolv.h>
-#include <cstring>
+#include <thread>
 #include <unistd.h>
 
 #include "net/Sock.h"
@@ -24,5 +26,6 @@ namespace Game3 {
 			SSL *ssl = nullptr;
 
 			void connectSSL(bool blocking);
+			std::optional<std::thread::id> threadID;
 	};
 }

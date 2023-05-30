@@ -1,25 +1,29 @@
+#include "Log.h"
 #include "net/GenericClient.h"
 #include "net/Server.h"
 
 namespace Game3 {
 	void GenericClient::startBuffering() {
-		++buffer;
+		++sendBuffer;
 	}
 
 	void GenericClient::flushBuffer(bool force) {
-		if (!force && !buffer.active())
+		if (!force && !sendBuffer.active())
 			return;
-		auto lock = buffer.lock();
-		server.send(*this, std::string_view(buffer.bytes.data(), buffer.bytes.size()), true);
-		buffer.bytes.clear();
+		auto buffer_lock = sendBuffer.lock();
+		{
+			std::unique_lock network_lock(networkMutex);
+			server.send(*this, std::string_view(sendBuffer.bytes.data(), sendBuffer.bytes.size()), true);
+		}
+		sendBuffer.bytes.clear();
 	}
 
 	void GenericClient::stopBuffering() {
-		if (!(--buffer).active())
+		if (!(--sendBuffer).active())
 			flushBuffer(true);
 	}
 
 	bool GenericClient::isBuffering() const {
-		return buffer.active();
+		return sendBuffer.active();
 	}
 }

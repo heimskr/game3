@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <cassert>
 #include <mutex>
 #include <shared_mutex>
 #include <vector>
@@ -14,7 +15,7 @@ namespace Game3 {
 
 		inline auto lock() { return std::unique_lock(mutex); }
 		inline SendBuffer & operator++() { ++depth; return *this; }
-		inline SendBuffer & operator--() { --depth; return *this; }
+		inline SendBuffer & operator--() { assert(0 <= --depth); return *this; }
 		inline bool active() const { return 0 < depth; }
 	};
 }

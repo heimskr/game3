@@ -1,4 +1,5 @@
 #include <cassert>
+#include <csignal>
 
 #include "Log.h"
 #include "game/ServerGame.h"
@@ -27,7 +28,7 @@ namespace Game3 {
 		headerBytes.insert(headerBytes.end(), string.begin(), string.end());
 
 		if (state == State::Begin) {
-			buffer.clear();
+			receiveBuffer.clear();
 			packetType = 0;
 			payloadSize = 0;
 
@@ -40,33 +41,33 @@ namespace Game3 {
 		}
 
 		if (state == State::Data) {
-			if (MAX_PACKET_SIZE < buffer.size() + headerBytes.size())
+			if (MAX_PACKET_SIZE < receiveBuffer.size() + headerBytes.size())
 				throw PacketError("Packet too large");
 
-			const size_t to_append = std::min(payloadSize - buffer.size(), headerBytes.size());
+			const size_t to_append = std::min(payloadSize - receiveBuffer.size(), headerBytes.size());
 
-			buffer.append(headerBytes.begin(), headerBytes.begin() + to_append);
+			receiveBuffer.append(headerBytes.begin(), headerBytes.begin() + to_append);
 			if (to_append == headerBytes.size())
 				headerBytes.clear();
 			else
 				headerBytes.erase(headerBytes.begin(), headerBytes.begin() + to_append);
 
-			if (payloadSize < buffer.size())
+			if (payloadSize < receiveBuffer.size())
 				throw std::logic_error("Buffer grew too large");
 
-			if (payloadSize == buffer.size()) {
-				if (buffer.context.expired())
-					buffer.context = server.game;
+			if (payloadSize == receiveBuffer.size()) {
+				if (receiveBuffer.context.expired())
+					receiveBuffer.context = server.game;
 				auto packet = (*server.game->registry<PacketFactoryRegistry>()[packetType])();
 
 				try {
-					packet->decode(*server.game, buffer);
+					packet->decode(*server.game, receiveBuffer);
 				} catch (...) {
 					ERROR("Couldn't decode packet of type " << packetType << ", size " << payloadSize);
 					throw;
 				}
 
-				buffer.clear();
+				receiveBuffer.clear();
 				server.game->queuePacket(shared_from_this(), packet);
 				state = State::Begin;
 			}
@@ -78,9 +79,12 @@ namespace Game3 {
 		Buffer send_buffer;
 		packet.encode(*server.game, send_buffer);
 		assert(send_buffer.size() < UINT32_MAX);
-		std::unique_lock lock(packetMutex);
-		send(packet.getID());
-		send(static_cast<uint32_t>(send_buffer.size()));
+		std::unique_lock lock(networkMutex);
+		auto &bytes = send_buffer.getBytes();
+		auto size = toLittle(static_cast<uint32_t>(send_buffer.size()));
+		auto packet_id = toLittle(packet.getID());
+		bytes.insert(bytes.begin(), reinterpret_cast<uint8_t *>(&size), reinterpret_cast<uint8_t *>(&size) + sizeof(size));
+		bytes.insert(bytes.begin(), reinterpret_cast<uint8_t *>(&packet_id), reinterpret_cast<uint8_t *>(&packet_id) + sizeof(packet_id));
 		send(send_buffer.str());
 	}
 
@@ -98,6 +102,8 @@ namespace Game3 {
 	template <typename T>
 	requires (!std::derived_from<T, Packet>)
 	void RemoteClient::send(const T &value) {
+		if (networkMutex.try_lock())
+			throw std::runtime_error("Network mutex not locked...?");
 		server.send(*this, value);
 	}
 }

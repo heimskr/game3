@@ -124,7 +124,7 @@ namespace Game3 {
 				client_ptr = allClients.at(client);
 			}
 			if (client_ptr->isBuffering()) {
-				auto &buffer = client_ptr->buffer;
+				auto &buffer = client_ptr->sendBuffer;
 				auto lock = buffer.lock();
 				buffer.bytes.insert(buffer.bytes.end(), message.begin(), message.end());
 				return static_cast<ssize_t>(message.size());
@@ -144,8 +144,9 @@ namespace Game3 {
 
 	ssize_t Server::send(GenericClient &client, std::string_view message, bool force) {
 		if (!force && client.isBuffering()) {
-			auto lock = client.buffer.lock();
-			client.buffer.bytes.insert(client.buffer.bytes.end(), message.begin(), message.end());
+			auto &buffer = client.sendBuffer;
+			auto lock = buffer.lock();
+			buffer.bytes.insert(buffer.bytes.end(), message.begin(), message.end());
 			return static_cast<ssize_t>(message.size());
 		}
 
