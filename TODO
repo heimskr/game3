@@ -10,3 +10,4 @@
 [2023/04/24 00:35:56] Towns can generate with flowers where their walls should be.
 [2023/04/24 20:20:58] Add a plugin system.
 [2023/05/27 19:41:41] Remove players from all visiblePlayers sets on disconnect.
+[2023/05/30 11:01:00] Update Entity/TileEntity documentation: add encode/decode.
