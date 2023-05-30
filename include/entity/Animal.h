@@ -18,7 +18,7 @@ namespace Game3 {
 			constexpr static float RETRY_TIME = 30.f;
 
 			static inline auto getWanderDistribution() {
-				return std::uniform_real_distribution(2.f, 2.f);
+				return std::uniform_real_distribution(10.f, 20.f);
 			}
 
 			Position destination = {-1, -1};
