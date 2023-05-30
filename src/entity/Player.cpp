@@ -1,8 +1,10 @@
 #include <iostream>
 
 #include "Log.h"
+#include "entity/ClientPlayer.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
+#include "entity/ServerPlayer.h"
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "item/Tool.h"
@@ -55,13 +57,6 @@ namespace Game3 {
 			ERROR("Still present in " << remaining << " visible set" << (remaining == 1? "" : "s") << '!');
 
 		Entity::destroy();
-	}
-
-	std::shared_ptr<Player> Player::fromJSON(Game &game, const nlohmann::json &json) {
-		auto out = Entity::create<Player>();
-		out->absorbJSON(game, json);
-		out->init(game);
-		return out;
 	}
 
 	void Player::toJSON(nlohmann::json &json) const {
@@ -155,7 +150,7 @@ namespace Game3 {
 				new_realm->reupload();
 				focus(game.toClient().canvas, true);
 			} else {
-				auto locked = client.lock();
+				auto locked = toServer()->client.lock();
 				assert(locked);
 				INFO("Sending " << new_realm->id << " to client");
 				new_realm->sendTo(*locked);
@@ -278,6 +273,7 @@ namespace Game3 {
 				if (auto visible = weak_visible.lock()) {
 					if (!visible->path.empty() && visible->hasSeenPath(shared)) {
 						// INFO("Late sending EntitySetPathPacket (Player)");
+						toServer()->ensureEntity(visible);
 						send(EntitySetPathPacket(*visible));
 						visible->setSeenPath(shared);
 					}
@@ -298,7 +294,7 @@ namespace Game3 {
 
 	bool Player::send(const Packet &packet) {
 		if (getSide() == Side::Server) {
-			if (auto locked = client.lock()) {
+			if (auto locked = toServer()->client.lock()) {
 				locked->send(packet);
 				return true;
 			}
@@ -314,10 +310,12 @@ namespace Game3 {
 		return std::dynamic_pointer_cast<Player>(shared_from_this());
 	}
 
-	std::shared_ptr<RemoteClient> Player::getClient() const {
-		auto locked = client.lock();
-		assert(locked);
-		return locked;
+	std::shared_ptr<ClientPlayer> Player::toClient() {
+		return std::dynamic_pointer_cast<ClientPlayer>(shared_from_this());
+	}
+
+	std::shared_ptr<ServerPlayer> Player::toServer() {
+		return std::dynamic_pointer_cast<ServerPlayer>(shared_from_this());
 	}
 
 	void Player::resetEphemeral() {

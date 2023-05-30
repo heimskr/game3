@@ -8,7 +8,7 @@
 #include "game/TileProvider.h"
 #include "net/Buffer.h"
 #include "util/Timer.h"
-#include "entity/Player.h"
+#include "entity/ServerPlayer.h"
 
 namespace Game3 {
 	void testQuadtree() {
@@ -159,7 +159,7 @@ namespace Game3 {
 	}
 
 	void testPlayerJSON() {
-		auto player = Entity::create<Player>();
+		auto player = Entity::create<ServerPlayer>();
 		std::cout << nlohmann::json(*player).dump() << '\n';
 	}
 

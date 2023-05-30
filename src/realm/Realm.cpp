@@ -8,6 +8,7 @@
 #include "Tileset.h"
 #include "biome/Biome.h"
 #include "entity/Entity.h"
+#include "entity/ServerPlayer.h"
 #include "game/ClientGame.h"
 #include "game/Game.h"
 #include "game/InteractionSet.h"
@@ -324,7 +325,7 @@ namespace Game3 {
 				guards.reserve(players.size());
 				for (const auto &weak_player: players) {
 					if (auto player = weak_player.lock()) {
-						if (auto client = player->client.lock())
+						if (auto client = player->toServer()->client.lock())
 							guards.emplace_back(client);
 
 						if (!player->ticked) {

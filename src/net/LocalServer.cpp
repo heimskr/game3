@@ -8,6 +8,7 @@
 #include "Log.h"
 #include "Options.h"
 #include "Tileset.h"
+#include "entity/ServerPlayer.h"
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
 #include "net/LocalServer.h"
@@ -99,18 +100,18 @@ namespace Game3 {
 		return std::nullopt;
 	}
 
-	PlayerPtr LocalServer::loadPlayer(std::string_view username, std::string_view display_name) {
+	std::shared_ptr<ServerPlayer> LocalServer::loadPlayer(std::string_view username, std::string_view display_name) {
 		if (!validateUsername(username))
 			return nullptr;
 
 		const std::filesystem::path path = "world/users/" + std::string(username);
 
 		if (std::filesystem::exists(path))
-			return Player::fromJSON(*game, nlohmann::json::parse(readFile(path)));
+			return ServerPlayer::fromJSON(*game, nlohmann::json::parse(readFile(path)));
 
 		auto overworld = game->realms.at(1);
 
-		auto player = Entity::create<Player>();
+		auto player = Entity::create<ServerPlayer>();
 		player->username = username;
 		player->displayName = display_name;
 		player->token = generateToken(player->username);

@@ -17,6 +17,7 @@
 namespace Game3 {
 	class RemoteClient;
 	class ServerGame;
+	class ServerPlayer;
 
 	/** Used by servers to represent themselves. */
 	class LocalServer: public ApplicationServer {
@@ -42,7 +43,7 @@ namespace Game3 {
 			void saveUsers();
 			/** Returns the display name if authentication was successful. */
 			std::optional<std::string> authenticate(const std::string &username, Token) const;
-			PlayerPtr loadPlayer(std::string_view username, std::string_view display_name);
+			std::shared_ptr<ServerPlayer> loadPlayer(std::string_view username, std::string_view display_name);
 			bool hasUsername(const std::string &) const;
 			bool hasDisplayName(const std::string &) const;
 			Token generateToken(const std::string &username) const;

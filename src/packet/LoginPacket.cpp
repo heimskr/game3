@@ -1,5 +1,6 @@
 #include "Log.h"
 #include "Tileset.h"
+#include "entity/ServerPlayer.h"
 #include "game/ServerGame.h"
 #include "net/LocalServer.h"
 #include "net/RemoteClient.h"

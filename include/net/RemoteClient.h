@@ -8,8 +8,8 @@
 #include "packet/Packet.h"
 
 namespace Game3 {
-	class Player;
 	class Realm;
+	class ServerPlayer;
 	struct ChunkPosition;
 
 	/** Used by servers to represent a remote client. */
@@ -45,7 +45,7 @@ namespace Game3 {
 			void send(const Packet &);
 			void sendChunk(Realm &, ChunkPosition, bool can_request = true);
 			inline auto getPlayer() const { return weakPlayer.lock(); }
-			inline void setPlayer(PlayerPtr shared) { weakPlayer = shared; }
+			inline void setPlayer(const std::shared_ptr<ServerPlayer> &shared) { weakPlayer = shared; }
 			inline auto bufferGuard() { return BufferGuard(*this); }
 
 			template <typename T>
@@ -58,7 +58,7 @@ namespace Game3 {
 			std::vector<uint8_t> headerBytes;
 			uint16_t packetType = 0;
 			uint32_t payloadSize = 0;
-			std::weak_ptr<Player> weakPlayer;
+			std::weak_ptr<ServerPlayer> weakPlayer;
 			Buffer receiveBuffer;
 	};
 }

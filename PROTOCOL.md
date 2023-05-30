@@ -162,6 +162,13 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u64` Global ID
 	- `i32` Realm ID
 
+28. **Entity Forgotten**: informs the server that the client has removed an entity from its memory.
+
+	- `u64` GlobalID
+	- `i32` RealmID
+
+	Currently unused.
+
 # Message Format
 
 All values are little endian.

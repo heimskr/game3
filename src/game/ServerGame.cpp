@@ -1,5 +1,6 @@
 #include "Log.h"
 #include "threading/ThreadContext.h"
+#include "entity/ServerPlayer.h"
 #include "game/ServerGame.h"
 #include "net/LocalServer.h"
 #include "net/RemoteClient.h"
@@ -21,7 +22,7 @@ namespace Game3 {
 		guards.reserve(players.size());
 
 		for (const auto &player: players)
-			if (auto client = player->client.lock())
+			if (auto client = player->toServer()->client.lock())
 				guards.emplace_back(client);
 
 		for (const auto &[client, packet]: packetQueue.steal())
@@ -35,7 +36,7 @@ namespace Game3 {
 
 		for (auto player: playerRemovalQueue.steal()) {
 			remove(player);
-			player->client.reset();
+			player->toServer()->client.reset();
 		}
 	}
 
@@ -44,7 +45,7 @@ namespace Game3 {
 		auto lock = lockPlayersShared();
 		for (const auto &player: players)
 			if (player->canSee(realm_id, position))
-				if (auto client = player->client.lock())
+				if (auto client = player->toServer()->client.lock())
 					client->send(packet);
 	}
 
@@ -69,13 +70,13 @@ namespace Game3 {
 			auto lock = lockPlayersShared();
 			for (const auto &player: players)
 				if (player.get() != cast_player && player->getRealm() && player->canSee(entity))
-					if (auto client = player->client.lock())
+					if (auto client = player->toServer()->client.lock())
 						client->send(packet);
 		} else {
 			auto lock = lockPlayersShared();
 			for (const auto &player: players)
 				if (player->getRealm() && player->canSee(entity))
-					if (auto client = player->client.lock())
+					if (auto client = player->toServer()->client.lock())
 						client->send(packet);
 		}
 	}

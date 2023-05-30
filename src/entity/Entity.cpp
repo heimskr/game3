@@ -7,6 +7,7 @@
 #include "data/Identifier.h"
 #include "entity/Entity.h"
 #include "entity/EntityFactory.h"
+#include "entity/ServerPlayer.h"
 #include "game/ClientGame.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
@@ -475,6 +476,7 @@ namespace Game3 {
 		}
 
 		if (out == PathResult::Success && getSide() == Side::Server) {
+			auto shared = shared_from_this();
 			const EntitySetPathPacket packet(*this);
 			auto lock = lockVisibleEntitiesShared();
 			// INFO("visiblePlayers<" << visiblePlayers.size() << ">");
@@ -482,6 +484,7 @@ namespace Game3 {
 				if (auto player = weak_player.lock()) {
 					pathSeers.insert(weak_player);
 					// INFO("Sending EntitySetPath packet");
+					player->toServer()->ensureEntity(shared);
 					player->send(packet);
 				}
 			}
@@ -615,10 +618,12 @@ namespace Game3 {
 			auto shared_lock = lockVisibleEntitiesShared();
 
 			if (!visiblePlayers.empty()) {
+				auto shared = shared_from_this();
 				const EntitySetPathPacket packet(*this);
 				for (const auto &weak_player: visiblePlayers) {
 					if (auto player = weak_player.lock(); player && !hasSeenPath(player)) {
 						INFO("Late sending EntitySetPathPacket (Entity)");
+						player->toServer()->ensureEntity(shared);
 						player->send(packet);
 						setSeenPath(player);
 					}

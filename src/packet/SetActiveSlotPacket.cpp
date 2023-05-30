@@ -1,4 +1,5 @@
 #include "Log.h"
+#include "entity/ServerPlayer.h"
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
 #include "net/RemoteClient.h"

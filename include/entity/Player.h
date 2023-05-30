@@ -7,8 +7,10 @@
 #include "ui/Modifiers.h"
 
 namespace Game3 {
+	class ClientPlayer;
 	class Packet;
 	class RemoteClient;
+	class ServerPlayer;
 	class TileEntity;
 
 	class Player: public Entity {
@@ -31,16 +33,12 @@ namespace Game3 {
 			/** When moving with shift held, the player will interact with each spot moved to. */
 			bool continuousInteraction = false;
 			bool ticked = false;
-			/** Server-side only. */
-			std::weak_ptr<RemoteClient> client;
 
 			std::optional<Place> lastContinuousInteraction;
 			Modifiers continuousInteractionModifiers;
 
-			~Player() override;
+			~Player() override = 0;
 			void destroy() override;
-
-			static std::shared_ptr<Player> fromJSON(Game &, const nlohmann::json &);
 
 			HitPoints maxHealth() const override { return MAX_HEALTH; }
 			void toJSON(nlohmann::json &) const override;
@@ -71,7 +69,8 @@ namespace Game3 {
 			void movedToNewChunk() override;
 			bool send(const Packet &);
 			std::shared_ptr<Player> getShared();
-			std::shared_ptr<RemoteClient> getClient() const;
+			std::shared_ptr<ClientPlayer> toClient();
+			std::shared_ptr<ServerPlayer> toServer();
 
 			friend class Entity;
 
