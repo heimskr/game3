@@ -10,6 +10,7 @@
 #include "packet/DestroyTileEntityPacket.h"
 #include "packet/EntityMovedPacket.h"
 #include "packet/TileUpdatePacket.h"
+#include "packet/TimePacket.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -19,10 +20,7 @@ namespace Game3 {
 	}
 
 	void ServerGame::tick() {
-		auto now = getTime();
-		auto difference = now - lastTime;
-		lastTime = now;
-		delta = std::chrono::duration_cast<std::chrono::nanoseconds>(difference).count() / 1'000'000'000.;
+		Game::tick();
 
 		std::vector<RemoteClient::BufferGuard> guards;
 		guards.reserve(players.size());
@@ -37,8 +35,19 @@ namespace Game3 {
 		for (auto &[id, realm]: realms)
 			realm->tick(delta);
 
-		for (const auto &player: players)
+		std::optional<TimePacket> time_packet;
+		timeSinceTimeUpdate += delta;
+		if (10. <= timeSinceTimeUpdate) {
+			time_packet.emplace(time);
+			timeSinceTimeUpdate = 0.;
+		}
+
+		for (const auto &player: players) {
 			player->ticked = false;
+			if (time_packet)
+				player->send(*time_packet);
+		}
+
 
 		for (const auto &player: playerRemovalQueue.steal()) {
 			remove(player);

@@ -67,6 +67,7 @@
 #include "packet/ActiveSlotSetPacket.h"
 #include "packet/DestroyTileEntityPacket.h"
 #include "packet/ClickPacket.h"
+#include "packet/TimePacket.h"
 #include "realm/Cave.h"
 #include "realm/House.h"
 #include "realm/Keep.h"
@@ -91,6 +92,15 @@
 #include "util/Util.h"
 
 namespace Game3 {
+	void Game::tick() {
+		auto now = getTime();
+		auto difference = now - lastTime;
+		lastTime = now;
+		delta = std::chrono::duration_cast<std::chrono::nanoseconds>(difference).count() / 1'000'000'000.;
+		time += delta;
+		++ticks;
+	}
+
 	void Game::initRegistries() {
 		registries.clear();
 		registries.add<CraftingRecipeRegistry>();
@@ -301,6 +311,7 @@ namespace Game3 {
 		add(PacketFactory::create<ActiveSlotSetPacket>());
 		add(PacketFactory::create<DestroyTileEntityPacket>());
 		add(PacketFactory::create<ClickPacket>());
+		add(PacketFactory::create<TimePacket>());
 	}
 
 	void Game::addLocalCommandFactories() {
@@ -471,11 +482,11 @@ namespace Game3 {
 	}
 
 	double Game::getTotalSeconds() const {
-		return std::chrono::duration_cast<std::chrono::nanoseconds>(getTime() - startTime).count() / 1e9;
+		return time;
 	}
 
 	double Game::getHour() const {
-		const auto base = getTotalSeconds() / 10. + hourOffset;
+		const auto base = time / 10. + hourOffset;
 		return static_cast<long>(base) % 24 + fractional(base);
 	}
 

@@ -43,6 +43,8 @@ namespace Game3 {
 			bool debugMode = true;
 			/** 12 because the game starts at noon */
 			float hourOffset = 12.;
+			double time = 0.f;
+			size_t ticks = 0;
 			size_t cavesGenerated = 0;
 			std::map<RealmType, std::shared_ptr<InteractionSet>> interactionSets;
 			std::map<Identifier, std::unordered_set<std::shared_ptr<Item>>> itemsByAttribute;
@@ -64,6 +66,7 @@ namespace Game3 {
 				return registries.get<const T>();
 			}
 
+			virtual void tick();
 			void initRegistries();
 			void addItems();
 			void addGhosts();

@@ -22,7 +22,7 @@ namespace Game3 {
 				server(std::move(server_)) {}
 
 			void addEntityFactories() override;
-			void tick();
+			void tick() override;
 			void garbageCollect();
 			void broadcastTileUpdate(RealmID, Layer, const Position &, TileID);
 			Side getSide() const override { return Side::Server; }
@@ -41,6 +41,7 @@ namespace Game3 {
 			std::shared_mutex playersMutex;
 			MTQueue<std::pair<std::shared_ptr<RemoteClient>, std::shared_ptr<Packet>>> packetQueue;
 			MTQueue<ServerPlayerPtr> playerRemovalQueue;
+			double timeSinceTimeUpdate = 0.;
 
 			void handlePacket(RemoteClient &, Packet &);
 			std::tuple<bool, std::string> commandHelper(RemoteClient &, const std::string &);

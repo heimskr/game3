@@ -171,7 +171,11 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 29. **Click**: informs the server that the client clicked on a given square.
 
-	- `{i64,i64}` PositionW
+	- `{i64,i64}` Position
+
+30. **Time**: informs a client of the game time.
+
+	- `double` Time
 
 # Message Format
 

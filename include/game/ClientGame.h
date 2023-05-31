@@ -25,7 +25,7 @@ namespace Game3 {
 			void setText(const Glib::ustring &text, const Glib::ustring &name = "", bool focus = true, bool ephemeral = false);
 			const Glib::ustring & getText() const;
 			void runCommand(const std::string &);
-			void tick();
+			void tick() override;
 			void queuePacket(std::shared_ptr<Packet>);
 			void chunkReceived(ChunkPosition);
 			void interactOn();

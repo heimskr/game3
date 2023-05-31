@@ -3,8 +3,6 @@
 #include "error/AuthenticationError.h"
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
-#include "net/LocalServer.h"
-#include "net/RemoteClient.h"
 #include "packet/LoginStatusPacket.h"
 #include "packet/PacketError.h"
 

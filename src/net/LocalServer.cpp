@@ -16,10 +16,10 @@
 #include "net/Server.h"
 #include "net/SSLServer.h"
 #include "packet/ChunkTilesPacket.h"
-// #include "packet/EntityPacket.h"
 #include "packet/ProtocolVersionPacket.h"
 #include "packet/RealmNoticePacket.h"
 #include "packet/SelfTeleportedPacket.h"
+#include "packet/TimePacket.h"
 #include "realm/Overworld.h"
 #include "util/Crypto.h"
 #include "util/FS.h"
@@ -148,7 +148,7 @@ namespace Game3 {
 		player->weakClient = client.shared_from_this();
 		client.send(SelfTeleportedPacket(realm->id, player->getPosition()));
 		realm->sendTo(client);
-
+		client.send(TimePacket(game->time));
 		auto lock = game->lockPlayersShared();
 		const EntityPacket packet(player);
 		for (const auto &other_player: game->players)

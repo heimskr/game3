@@ -121,6 +121,8 @@ namespace Game3 {
 	}
 
 	void ClientGame::tick() {
+		Game::tick();
+
 		client->read();
 
 		for (const auto &packet: packetQueue.steal()) {
@@ -135,11 +137,6 @@ namespace Game3 {
 
 		if (!player)
 			return;
-
-		auto now = getTime();
-		auto difference = now - lastTime;
-		lastTime = now;
-		delta = std::chrono::duration_cast<std::chrono::nanoseconds>(difference).count() / 1'000'000'000.;
 
 		for (const auto &[realm_id, realm]: realms)
 			realm->tick(delta);
