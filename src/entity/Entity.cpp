@@ -291,10 +291,6 @@ namespace Game3 {
 		const bool direction_changed = direction != old_direction;
 
 		if (can_move || direction_changed) {
-			if (can_move && getChunkPosition(position) != getChunkPosition(new_position)) {
-				movedToNewChunk();
-			}
-
 			if (can_move) {
 				if (horizontal)
 					offset.x() = x_offset;
@@ -385,6 +381,8 @@ namespace Game3 {
 	}
 
 	void Entity::teleport(const Position &new_position, bool from_path, bool clear_offset) {
+		const bool in_different_chunk = getChunkPosition(position) != getChunkPosition(new_position);
+
 		position = new_position;
 
 		if (clear_offset)
@@ -392,6 +390,9 @@ namespace Game3 {
 
 		auto shared = shared_from_this();
 		getRealm()->onMoved(shared, new_position);
+
+		if (in_different_chunk)
+			movedToNewChunk();
 
 		for (auto iter = moveQueue.begin(); iter != moveQueue.end();) {
 			if ((*iter)(shared))
