@@ -5,6 +5,8 @@
 
 namespace Game3 {
 	void TileUpdatePacket::handle(ClientGame &game) {
-		game.realms.at(realmID)->setTile(layer, position, tileID, false);
+		auto realm = game.realms.at(realmID);
+		realm->setTile(layer, position, tileID, false);
+		realm->reupload(layer);
 	}
 }

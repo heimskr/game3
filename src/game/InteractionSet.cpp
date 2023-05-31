@@ -28,17 +28,6 @@ namespace Game3 {
 			if (active->item->canUseOnWorld() && active->item->use(inventory.activeSlot, *active, place, modifiers))
 				return true;
 
-			// if (active->hasAttribute("base:attribute/hammer"_id)) {
-			// 	ItemStack stack(game);
-			// 	if (tileset.getItemStack(game, *tile2, stack) && !inventory.add(stack)) {
-			// 		if (active->reduceDurability())
-			// 			inventory.erase(inventory.activeSlot);
-			// 		realm.setTile(2, position, tileset.getEmpty());
-			// 		realm.reupload(2);
-			// 		return true;
-			// 	}
-			// }
-
 			if (active->hasAttribute("base:attribute/shovel"_id)) {
 				if (*tile2 == "base:tile/ash"_id) {
 					realm.setTile(2, position, "base:tile/empty"_id);
