@@ -234,7 +234,6 @@ namespace Game3 {
 		add(EntityFactory::create<ItemEntity>());
 		add(EntityFactory::create<Merchant>());
 		add(EntityFactory::create<Miner>());
-		add(EntityFactory::create<Player>());
 		add(EntityFactory::create<Woodcutter>());
 		add(EntityFactory::create<Worker>()); // TODO: verify whether adding this base class is necessary
 		add(EntityFactory::create<Sheep>());

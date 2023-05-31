@@ -265,7 +265,7 @@ namespace Game3 {
 		mainWindow.onBlur();
 
 		if (!external) {
-			game->player->inventory->activeSlot = slot;
+			game->player->inventory->setActive(slot);
 			updatePlayerClasses(game);
 		}
 	}

@@ -2,6 +2,8 @@
 #include "threading/ThreadContext.h"
 #include "Tileset.h"
 #include "command/local/LocalCommandFactory.h"
+#include "entity/ClientPlayer.h"
+#include "entity/EntityFactory.h"
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "net/LocalClient.h"
@@ -17,6 +19,11 @@
 #include "util/Util.h"
 
 namespace Game3 {
+	void ClientGame::addEntityFactories() {
+		Game::addEntityFactories();
+		add(EntityFactory::create<ClientPlayer>());
+	}
+
 	void ClientGame::click(int button, int, double pos_x, double pos_y) {
 		if (!activeRealm)
 			return;

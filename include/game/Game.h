@@ -67,7 +67,7 @@ namespace Game3 {
 			void initRegistries();
 			void addItems();
 			void addGhosts();
-			void addEntityFactories();
+			virtual void addEntityFactories();
 			void addTileEntityFactories();
 			void addRealms();
 			void addPacketFactories();

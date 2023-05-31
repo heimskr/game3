@@ -21,10 +21,10 @@ namespace Game3 {
 			ServerGame(std::shared_ptr<LocalServer> server_):
 				server(std::move(server_)) {}
 
+			void addEntityFactories() override;
 			void tick();
 			void garbageCollect();
 			void broadcastTileUpdate(RealmID, Layer, const Position &, TileID);
-
 			Side getSide() const override { return Side::Server; }
 			void queuePacket(std::shared_ptr<RemoteClient>, std::shared_ptr<Packet>);
 			void runCommand(RemoteClient &, const std::string &, GlobalID);

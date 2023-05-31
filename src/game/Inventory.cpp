@@ -1,3 +1,5 @@
+#include <cassert>
+
 #include "Log.h"
 #include "entity/Entity.h"
 #include "entity/ItemEntity.h"
@@ -333,6 +335,7 @@ namespace Game3 {
 
 		auto owner = getOwner();
 		auto player = std::dynamic_pointer_cast<Player>(owner);
+		assert(player);
 		const bool is_client = owner->getSide() == Side::Client;
 		if (is_client && !force) {
 			if (player)

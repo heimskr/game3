@@ -1,5 +1,6 @@
 #include "Log.h"
 #include "threading/ThreadContext.h"
+#include "entity/EntityFactory.h"
 #include "entity/ServerPlayer.h"
 #include "game/ServerGame.h"
 #include "net/LocalServer.h"
@@ -12,6 +13,11 @@
 #include "util/Util.h"
 
 namespace Game3 {
+	void ServerGame::addEntityFactories() {
+		Game::addEntityFactories();
+		add(EntityFactory::create<ServerPlayer>());
+	}
+
 	void ServerGame::tick() {
 		auto now = getTime();
 		auto difference = now - lastTime;
