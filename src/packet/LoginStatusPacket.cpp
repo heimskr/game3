@@ -2,6 +2,7 @@
 #include "entity/ClientPlayer.h"
 #include "error/AuthenticationError.h"
 #include "game/ClientGame.h"
+#include "game/Inventory.h"
 #include "net/LocalServer.h"
 #include "net/RemoteClient.h"
 #include "packet/LoginStatusPacket.h"
@@ -40,5 +41,6 @@ namespace Game3 {
 		game.activeRealm = game.player->getRealm();
 		game.activeRealm->add(game.player);
 		game.activeRealm->addPlayer(game.player);
+		game.player->inventory->notifyOwner();
 	}
 }

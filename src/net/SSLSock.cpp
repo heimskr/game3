@@ -90,7 +90,6 @@ namespace Game3 {
 							break;
 
 						case SSL_ERROR_WANT_READ:
-							ERROR("SSL_ERROR_WANT_READ");
 							read_blocked = true;
 							break;
 
