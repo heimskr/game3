@@ -27,6 +27,12 @@ namespace Game3 {
 	Blacksmith::Blacksmith(RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_):
 		Entity(ID()), Worker(ID(), overworld_realm, house_realm, std::move(house_position), std::move(keep_)), Merchant(ID()) {}
 
+	std::shared_ptr<Blacksmith> Blacksmith::create(Game &game) {
+		auto out = Entity::create<Blacksmith>();
+		out->init(game);
+		return out;
+	}
+
 	std::shared_ptr<Blacksmith> Blacksmith::create(Game &game, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_) {
 		auto out = Entity::create<Blacksmith>(overworld_realm, house_realm, std::move(house_position), std::move(keep_));
 		out->init(game);

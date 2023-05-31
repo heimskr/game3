@@ -7,7 +7,7 @@ namespace Game3 {
 	App::App(): Gtk::Application("game3") {}
 
 	Glib::RefPtr<App> App::create() {
-		return Glib::make_refptr_for_instance<App>(new App());
+		return Glib::make_refptr_for_instance<App>(new App);
 	}
 
 	void App::on_startup() {

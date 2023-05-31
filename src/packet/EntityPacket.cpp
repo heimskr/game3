@@ -20,7 +20,7 @@ namespace Game3 {
 			(entity = iter->second)->decode(buffer);
 		} else {
 			auto factory = game.registry<EntityFactoryRegistry>()[identifier];
-			entity = (*factory)(game, {});
+			entity = (*factory)(game);
 			entity->type = identifier;
 			entity->init(game);
 			entity->setGID(globalID);

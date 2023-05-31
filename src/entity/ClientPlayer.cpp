@@ -6,6 +6,12 @@
 namespace Game3 {
 	ClientPlayer::ClientPlayer(): Player() {}
 
+	std::shared_ptr<ClientPlayer> ClientPlayer::create(Game &game) {
+		auto out = Entity::create<ClientPlayer>();
+		out->init(game);
+		return out;
+	}
+
 	void ClientPlayer::render(SpriteRenderer &sprites, TextRenderer &text) {
 		Player::render(sprites, text);
 

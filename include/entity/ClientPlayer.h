@@ -7,11 +7,13 @@ namespace Game3 {
 		public:
 			~ClientPlayer() override = default;
 
-			void render(SpriteRenderer &, TextRenderer &) override;
+			static std::shared_ptr<ClientPlayer> create(Game &);
 
-			friend class Entity;
+			void render(SpriteRenderer &, TextRenderer &) override;
 
 		private:
 			ClientPlayer();
+
+		friend class Entity;
 	};
 }

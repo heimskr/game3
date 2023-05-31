@@ -10,7 +10,7 @@ namespace Game3 {
 			static Identifier ID() { return {"base", "entity/pig"}; }
 
 			static std::shared_ptr<Pig> create(Game &game) {
-				auto out = std::shared_ptr<Pig>(new Pig());
+				auto out = Entity::create<Pig>();
 				out->init(game);
 				return out;
 			}

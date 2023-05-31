@@ -12,15 +12,16 @@ namespace Game3 {
 
 			~ServerPlayer() override = default;
 
+			static std::shared_ptr<ServerPlayer> create(Game &);
 			static std::shared_ptr<ServerPlayer> fromJSON(Game &, const nlohmann::json &);
 
 			/** Returns true if the entity had to be sent. */
 			bool ensureEntity(const std::shared_ptr<Entity> &);
 			std::shared_ptr<RemoteClient> getClient() const;
 
-			friend class Entity;
-
 		private:
 			ServerPlayer();
+
+		friend class Entity;
 	};
 }

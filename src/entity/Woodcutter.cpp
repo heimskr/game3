@@ -28,8 +28,14 @@ namespace Game3 {
 		Entity(ID()),
 		Worker(ID(), overworld_realm, house_realm, std::move(house_position), std::move(keep_)) {}
 
+	std::shared_ptr<Woodcutter> Woodcutter::create(Game &game) {
+		auto out = Entity::create<Woodcutter>();
+		out->init(game);
+		return out;
+	}
+
 	std::shared_ptr<Woodcutter> Woodcutter::create(Game &game, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_) {
-		auto out = std::shared_ptr<Woodcutter>(new Woodcutter(overworld_realm, house_realm, std::move(house_position), std::move(keep_)));
+		auto out = Entity::create<Woodcutter>(overworld_realm, house_realm, std::move(house_position), std::move(keep_));
 		out->init(game);
 		return out;
 	}

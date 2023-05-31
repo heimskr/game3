@@ -13,6 +13,7 @@ namespace Game3 {
 			/** The number of iron bars, gold bars and diamonds that the blacksmith will try to maintain. */
 			constexpr static ItemCount RESOURCE_TARGET = 64;
 
+			static std::shared_ptr<Blacksmith> create(Game &);
 			static std::shared_ptr<Blacksmith> create(Game &, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_);
 			static std::shared_ptr<Blacksmith> fromJSON(Game &, const nlohmann::json &);
 
