@@ -7,15 +7,12 @@
 #include "packet/ClickPacket.h"
 
 namespace Game3 {
-	void ClickPacket::handle(ServerGame &game, RemoteClient &client) {
+	void ClickPacket::handle(ServerGame &, RemoteClient &client) {
 		auto player = client.getPlayer();
 		if (!player)
 			return;
 
-		if (auto *stack = player->inventory->getActive()) {
-			INFO("Click packet: true");
+		if (auto *stack = player->inventory->getActive())
 			stack->item->use(player->inventory->activeSlot, *stack, {position, player->getRealm(), player}, {});
-		} else
-			INFO("Click packet: false");
 	}
 }

@@ -34,13 +34,13 @@ namespace Game3 {
 			void remove(const ServerPlayerPtr &);
 			void queueRemoval(const ServerPlayerPtr &);
 
+			inline auto lockPlayersShared() { return std::shared_lock(playersMutex); }
+			inline auto lockPlayersUnique() { return std::unique_lock(playersMutex); }
+
 		private:
 			std::shared_mutex playersMutex;
 			MTQueue<std::pair<std::shared_ptr<RemoteClient>, std::shared_ptr<Packet>>> packetQueue;
 			MTQueue<ServerPlayerPtr> playerRemovalQueue;
-
-			inline auto lockPlayersShared() { return std::shared_lock(playersMutex); }
-			inline auto lockPlayersUnique() { return std::unique_lock(playersMutex); }
 
 			void handlePacket(RemoteClient &, Packet &);
 			std::tuple<bool, std::string> commandHelper(RemoteClient &, const std::string &);

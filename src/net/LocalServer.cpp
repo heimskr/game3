@@ -120,7 +120,10 @@ namespace Game3 {
 		player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_axe"));
 		player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_hammer"));
 		player->inventory->add(ItemStack(*game, "base:item/cave_entrance"));
-		game->players.insert(player);
+		{
+			auto lock = game->lockPlayersUnique();
+			game->players.insert(player);
+		}
 		userDatabase.try_emplace(player->username, player->username, player->displayName);
 		saveUsers();
 		return player;
@@ -145,6 +148,12 @@ namespace Game3 {
 		player->weakClient = client.shared_from_this();
 		client.send(SelfTeleportedPacket(realm->id, player->getPosition()));
 		realm->sendTo(client);
+
+		auto lock = game->lockPlayersShared();
+		const EntityPacket packet(player);
+		for (const auto &other_player: game->players)
+			if (other_player != player)
+				other_player->send(packet);
 	}
 
 	static std::shared_ptr<Server> global_server;
