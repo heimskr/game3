@@ -14,9 +14,8 @@ namespace Game3 {
 		assert(realm);
 		realm->removeSafe(shared_from_this());
 
-		if (getSide() == Side::Server) {
+		if (getSide() == Side::Server)
 			getRealm()->getGame().toServer().tileEntityDestroyed(*this);
-		}
 	}
 
 	std::shared_ptr<TileEntity> TileEntity::fromJSON(Game &game, const nlohmann::json &json) {

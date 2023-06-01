@@ -23,7 +23,7 @@ namespace Game3 {
 					continue;
 				realm.damageGround(pos);
 				if (auto tile = realm.tileEntityAt(pos); tile && tile->kill())
-					realm.remove(tile);
+					tile->destroy();
 			}
 		}
 
