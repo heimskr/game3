@@ -17,8 +17,16 @@ namespace Game3 {
 		Player::render(sprites, text);
 
 		text.drawOnMap(displayName, {
+			.x = static_cast<float>(position.column) + offset.x() + .525f,
+			.y = static_cast<float>(position.row) + offset.y() + .025f,
+			.color = {0.f, 0.f, 0.f, 1.f},
+			.align = TextAlign::Center,
+		});
+
+		text.drawOnMap(displayName, {
 			.x = static_cast<float>(position.column) + offset.x() + .5f,
 			.y = static_cast<float>(position.row) + offset.y(),
+			.color = {1.f, 1.f, 1.f, 1.f},
 			.align = TextAlign::Center,
 		});
 	}
