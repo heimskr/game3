@@ -6,6 +6,7 @@
 #include "Shader.h"
 #include "Tileset.h"
 
+#include "entity/ClientPlayer.h"
 #include "entity/ItemEntity.h"
 #include "entity/Merchant.h"
 #include "entity/Miner.h"
@@ -15,11 +16,12 @@
 #include "net/LocalClient.h"
 #include "packet/StartPlayerMovementPacket.h"
 #include "packet/StopPlayerMovementPacket.h"
+#include "packet/ContinuousInteractionPacket.h"
 #include "realm/Overworld.h"
 #include "tileentity/Building.h"
 #include "tileentity/Teleporter.h"
 #include "ui/gtk/CommandDialog.h"
-#include "ui/gtk/NewGameDialog.h"
+#include "ui/gtk/ConnectDialog.h"
 #include "ui/tab/CraftingTab.h"
 #include "ui/tab/InventoryTab.h"
 #include "ui/tab/MerchantTab.h"
@@ -79,37 +81,7 @@ namespace Game3 {
 			functionQueue.clear();
 		});
 
-		add_action("new", Gio::ActionMap::ActivateSlot(sigc::mem_fun(*this, &MainWindow::onNew)));
-
-		add_action("open", Gio::ActionMap::ActivateSlot([this] {
-			auto *chooser = new Gtk::FileChooserDialog(*this, "Choose File", Gtk::FileChooser::Action::OPEN, true);
-			dialog.reset(chooser);
-			chooser->set_current_folder(Gio::File::create_for_path(std::filesystem::current_path().string()));
-			chooser->set_transient_for(*this);
-			chooser->set_modal(true);
-			chooser->add_button("_Cancel", Gtk::ResponseType::CANCEL);
-			chooser->add_button("_Open", Gtk::ResponseType::OK);
-			chooser->signal_response().connect([this, chooser](int response) {
-				chooser->hide();
-				if (response == Gtk::ResponseType::OK)
-					delay([this, chooser] {
-						try {
-							loadGame(chooser->get_file()->get_path());
-						} catch (std::exception &err) {
-							error("Error loading save: " + std::string(err.what()));
-						}
-					});
-			});
-			chooser->signal_show().connect([this, chooser] {
-				chooser->set_default_size(get_width() - 40, get_height() - 40);
-				chooser->set_size_request(get_width() - 40, get_height() - 40);
-				delay([chooser] {
-					if (std::filesystem::exists(Game::DEFAULT_PATH))
-						chooser->set_file(Gio::File::create_for_path(Game::DEFAULT_PATH));
-				});
-			});
-			chooser->show();
-		}));
+		add_action("connect", Gio::ActionMap::ActivateSlot(sigc::mem_fun(*this, &MainWindow::onConnect)));
 
 		debugAction = add_action_bool("debug", [this] {
 			if (game) {
@@ -298,11 +270,11 @@ namespace Game3 {
 
 	MainWindow::~MainWindow() = default;
 
-	void MainWindow::newGame(size_t, const WorldGenParams &) {
+	void MainWindow::connect(const Glib::ustring &hostname, uint16_t port) {
 		glArea.get_context()->make_current();
 		game = std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, canvas.get()));
 		game->client = std::make_shared<LocalClient>();
-		game->client->connect("::1", 12255);
+		game->client->connect(hostname.raw(), port);
 		game->client->weakGame = game;
 		game->initEntities();
 
@@ -314,36 +286,11 @@ namespace Game3 {
 		onGameLoaded();
 	}
 
-	void MainWindow::loadGame(const std::filesystem::path &path) {
-		glArea.get_context()->make_current();
-		const std::string data = readFile(path);
-		if (!data.empty() && data.front() == '{')
-			game = std::dynamic_pointer_cast<ClientGame>(Game::fromJSON(Side::Client, nlohmann::json::parse(data), canvas.get()));
-		else
-			game = std::dynamic_pointer_cast<ClientGame>(Game::fromJSON(Side::Client, nlohmann::json::from_cbor(data), canvas.get()));
-		game->initEntities();
-		for (const auto &entity: game->activeRealm->entities)
-			if (entity->isPlayer()) {
-				if (!(game->player = std::dynamic_pointer_cast<Player>(entity)))
-					throw std::runtime_error("Couldn't cast entity with isPlayer() == true to Player");
-				break;
-			}
-		if (!game->player)
-			throw std::runtime_error("Player not found in active realm");
-		for (const auto &[id, realm]: game->realms)
-			for (const auto &entity: realm->entities)
-				entity->initAfterLoad(*game);
-		onGameLoaded();
-	}
-
 	void MainWindow::onGameLoaded() {
 		glArea.get_context()->make_current();
 		debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
-		// game->player->focus(*canvas, false);
 		game->initInteractionSets();
 		canvas->game = game;
-		// game->activeRealm->reupload();
-		connectSave();
 		for (auto &[widget, tab]: tabMap)
 			tab->reset(game);
 		game->signal_player_inventory_update().connect([this](const PlayerPtr &) {
@@ -366,23 +313,6 @@ namespace Game3 {
 			inventoryTab->reset(game);
 			merchantTab->reset(game);
 		});
-	}
-
-	void MainWindow::saveGame(const std::filesystem::path &path) {
-		std::ofstream stream(path);
-
-		if (!stream.is_open()) {
-			error("Couldn't open file for writing.");
-			return;
-		}
-
-#ifdef USE_CBOR
-		auto cbor = nlohmann::json::to_cbor(nlohmann::json(*game));
-		stream.write(reinterpret_cast<char *>(&cbor[0]), cbor.size());
-#else
-		stream << nlohmann::json(*game).dump();
-#endif
-		stream.close();
 	}
 
 	bool MainWindow::render(const Glib::RefPtr<Gdk::GLContext> &context) {
@@ -591,14 +521,14 @@ namespace Game3 {
 		if (game && game->player) {
 			auto &player = *game->player;
 			switch (keyval) {
-				case GDK_KEY_w: player.stopMoving(Direction::Up);    player.continuousInteraction = false; keyTimes.erase(GDK_KEY_W); break;
-				case GDK_KEY_d: player.stopMoving(Direction::Right); player.continuousInteraction = false; keyTimes.erase(GDK_KEY_D); break;
-				case GDK_KEY_s: player.stopMoving(Direction::Down);  player.continuousInteraction = false; keyTimes.erase(GDK_KEY_S); break;
-				case GDK_KEY_a: player.stopMoving(Direction::Left);  player.continuousInteraction = false; keyTimes.erase(GDK_KEY_A); break;
-				case GDK_KEY_W: player.stopMoving(Direction::Up);    player.continuousInteraction = false; keyTimes.erase(GDK_KEY_w); break;
-				case GDK_KEY_D: player.stopMoving(Direction::Right); player.continuousInteraction = false; keyTimes.erase(GDK_KEY_d); break;
-				case GDK_KEY_S: player.stopMoving(Direction::Down);  player.continuousInteraction = false; keyTimes.erase(GDK_KEY_s); break;
-				case GDK_KEY_A: player.stopMoving(Direction::Left);  player.continuousInteraction = false; keyTimes.erase(GDK_KEY_a); break;
+				case GDK_KEY_w: player.stopMoving(Direction::Up);    player.stopContinuousInteraction(); keyTimes.erase(GDK_KEY_W); break;
+				case GDK_KEY_d: player.stopMoving(Direction::Right); player.stopContinuousInteraction(); keyTimes.erase(GDK_KEY_D); break;
+				case GDK_KEY_s: player.stopMoving(Direction::Down);  player.stopContinuousInteraction(); keyTimes.erase(GDK_KEY_S); break;
+				case GDK_KEY_a: player.stopMoving(Direction::Left);  player.stopContinuousInteraction(); keyTimes.erase(GDK_KEY_A); break;
+				case GDK_KEY_W: player.stopMoving(Direction::Up);    player.stopContinuousInteraction(); keyTimes.erase(GDK_KEY_w); break;
+				case GDK_KEY_D: player.stopMoving(Direction::Right); player.stopContinuousInteraction(); keyTimes.erase(GDK_KEY_d); break;
+				case GDK_KEY_S: player.stopMoving(Direction::Down);  player.stopContinuousInteraction(); keyTimes.erase(GDK_KEY_s); break;
+				case GDK_KEY_A: player.stopMoving(Direction::Left);  player.stopContinuousInteraction(); keyTimes.erase(GDK_KEY_a); break;
 				case GDK_KEY_Shift_L:
 				case GDK_KEY_Shift_R:
 					player.continuousInteraction = false;
@@ -650,62 +580,34 @@ namespace Game3 {
 		if (game && game->player) {
 			auto &player = *game->player;
 
+			auto handle_movement = [&](guint kv, Direction direction) {
+				if (!player.isMoving())
+					player.setContinuousInteraction(keyval == kv, Modifiers(modifiers));
+				if (!player.isMoving(direction))
+					player.startMoving(direction);
+			};
+
 			switch (keyval) {
 				case GDK_KEY_S:
 				case GDK_KEY_s:
-					// player.path.clear();
-					if (!player.isMoving() && (player.continuousInteraction = (keyval == GDK_KEY_S)))
-						player.continuousInteractionModifiers = Modifiers(modifiers);
-					// player.movingDown = true;
-					if (!player.isMoving(Direction::Down))
-						player.startMoving(Direction::Down);
+					handle_movement(GDK_KEY_S, Direction::Down);
 					return;
 				case GDK_KEY_W:
 				case GDK_KEY_w:
-					// player.path.clear();
-					if (!player.isMoving() && (player.continuousInteraction = (keyval == GDK_KEY_W)))
-						player.continuousInteractionModifiers = Modifiers(modifiers);
-					// player.movingUp = true;
-					if (!player.isMoving(Direction::Up))
-						player.startMoving(Direction::Up);
+					handle_movement(GDK_KEY_W, Direction::Up);
 					return;
 				case GDK_KEY_A:
 				case GDK_KEY_a:
-					// player.path.clear();
-					if (!player.isMoving() && (player.continuousInteraction = (keyval == GDK_KEY_A)))
-						player.continuousInteractionModifiers = Modifiers(modifiers);
-					// player.movingLeft = true;
-					if (!player.isMoving(Direction::Left))
-						player.startMoving(Direction::Left);
+					handle_movement(GDK_KEY_A, Direction::Left);
 					return;
 				case GDK_KEY_D:
 				case GDK_KEY_d:
-					// player.path.clear();
-					if (!player.isMoving() && (player.continuousInteraction = (keyval == GDK_KEY_D)))
-						player.continuousInteractionModifiers = Modifiers(modifiers);
-					// player.movingRight = true;
-					if (!player.isMoving(Direction::Right))
-						player.startMoving(Direction::Right);
+					handle_movement(GDK_KEY_D, Direction::Right);
 					return;
 				case GDK_KEY_Shift_L:
 				case GDK_KEY_Shift_R:
 					if (player.isMoving())
-						player.continuousInteraction = true;
-					break;
-				case GDK_KEY_o: {
-					// if (game->debugMode) {
-					// 	static std::default_random_engine item_rng;
-					// 	static const std::array<ItemID, 3> ids {"base:shortsword", "base:red_potion", "base:coins"};
-					// 	ItemStack stack(*game, choose(ids, item_rng), 1);
-					// 	auto leftover = player.inventory->add(stack);
-					// 	if (leftover) {
-					// 		auto &realm = *player.getRealm();
-					// 		realm.spawn<ItemEntity>(player.position, *leftover);
-					// 		game->signal_player_inventory_update().emit(game->player);
-					// 	}
-					// }
-					return;
-				}
+						player.send(ContinuousInteractionPacket(player.continuousInteractionModifiers));
 					return;
 				case GDK_KEY_E:
 					game->interactOn();
@@ -729,13 +631,6 @@ namespace Game3 {
 					else
 						game->player->focus(*canvas, false);
 					return;
-				case GDK_KEY_v:
-					// if (game->debugMode) {
-					// 	auto merchant = player.getRealm()->spawn<Merchant>(player.getPosition(), "base:entity/merchant");
-					// 	merchant->inventory->add(ItemStack(*game, "base:red_potion", 6));
-					// 	merchant->inventory->add(ItemStack(*game, "base:shortsword", 1));
-					// }
-					return;
 				case GDK_KEY_t:
 					std::cout << "Time: " << int(game->getHour()) << ':' << int(game->getMinute()) << '\n';
 					return;
@@ -746,32 +641,8 @@ namespace Game3 {
 					std::cout << "Chunk position: " << std::string(getChunkPosition(game->player->getPosition())) << '\n';
 					return;
 				}
-				case GDK_KEY_g:
-					// if (game->debugMode) {
-					// 	try {
-					// 		auto house = player.getRealm();
-					// 		auto door = house->getTileEntity<Teleporter>();
-					// 		const auto house_pos = door->targetPosition + Position(-1, 0);
-					// 		auto overworld = game->realms.at(door->targetRealm);
-					// 		player.getRealm()->spawn<Miner>(player.getPosition(), overworld->id, house->id, house_pos,
-					// 			overworld->closestTileEntity<Building>(house_pos, [](const auto &building) {
-					// 				return building->tileID == "base:tile/keep_sw"_id;
-					// 			}));
-					// 	} catch (const std::exception &err) {
-					// 		std::cerr << err.what() << '\n';
-					// 	}
-					// }
-					return;
-				case GDK_KEY_0:
-				case GDK_KEY_1:
-				case GDK_KEY_2:
-				case GDK_KEY_3:
-				case GDK_KEY_4:
-				case GDK_KEY_5:
-				case GDK_KEY_6:
-				case GDK_KEY_7:
-				case GDK_KEY_8:
-				case GDK_KEY_9:
+				case GDK_KEY_0: case GDK_KEY_1: case GDK_KEY_2: case GDK_KEY_3: case GDK_KEY_4:
+				case GDK_KEY_5: case GDK_KEY_6: case GDK_KEY_7: case GDK_KEY_8: case GDK_KEY_9:
 					if (game && game->player)
 						game->player->inventory->setActive(keyval == GDK_KEY_0? 9 : keyval - 0x31);
 					return;
@@ -797,40 +668,12 @@ namespace Game3 {
 		}
 	}
 
-	void MainWindow::onNew() {
-		auto *new_dialog = new NewGameDialog(*this);
-		dialog.reset(new_dialog);
-		new_dialog->set_transient_for(*this);
-		new_dialog->signal_submit().connect(sigc::mem_fun(*this, &MainWindow::newGame));
-		new_dialog->show();
-	}
-
-	void MainWindow::connectSave() {
-		add_action("save", Gio::ActionMap::ActivateSlot([this] {
-			auto *chooser = new Gtk::FileChooserDialog(*this, "Save Location", Gtk::FileChooser::Action::SAVE, true);
-			dialog.reset(chooser);
-			chooser->set_current_folder(Gio::File::create_for_path(std::filesystem::current_path().string()));
-			chooser->set_transient_for(*this);
-			chooser->set_modal(true);
-			chooser->add_button("_Cancel", Gtk::ResponseType::CANCEL);
-			chooser->add_button("_Save", Gtk::ResponseType::OK);
-			chooser->signal_response().connect([this, chooser](int response) {
-				chooser->hide();
-				if (response == Gtk::ResponseType::OK)
-					delay([this, chooser] {
-						try {
-							saveGame(chooser->get_file()->get_path());
-						} catch (std::exception &err) {
-							error("Error saving game: " + std::string(err.what()));
-						}
-					});
-			});
-			chooser->signal_show().connect([this, chooser] {
-				chooser->set_default_size(get_width() - 40, get_height() - 40);
-				chooser->set_size_request(get_width() - 40, get_height() - 40);
-			});
-			chooser->show();
-		}));
+	void MainWindow::onConnect() {
+		auto *connect_dialog = new ConnectDialog(*this);
+		dialog.reset(connect_dialog);
+		connect_dialog->set_transient_for(*this);
+		connect_dialog->signal_submit().connect(sigc::mem_fun(*this, &MainWindow::connect));
+		connect_dialog->show();
 	}
 
 	bool MainWindow::isFocused(const std::shared_ptr<Tab> &tab) const {

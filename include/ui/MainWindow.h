@@ -114,16 +114,13 @@ namespace Game3 {
 			float rightPadStartCanvasX = 0.f;
 			float rightPadStartCanvasY = 0.f;
 
-			void newGame(size_t seed, const WorldGenParams &);
-			void loadGame(const std::filesystem::path &);
-			void saveGame(const std::filesystem::path &);
+			void connect(const Glib::ustring &hostname, uint16_t port);
 			bool render(const Glib::RefPtr<Gdk::GLContext> &);
 			bool onKeyPressed(guint, guint, Gdk::ModifierType);
 			void onKeyReleased(guint, guint, Gdk::ModifierType);
 			void handleKeys();
 			void handleKey(guint keyval, guint keycode, Gdk::ModifierType);
-			void onNew();
-			void connectSave();
+			void onConnect();
 			void onGameLoaded();
 			bool isFocused(const std::shared_ptr<Tab> &) const;
 

@@ -4,9 +4,9 @@
 
 #include "Log.h"
 #include "MarchingSquares.h"
-#include "threading/ThreadContext.h"
 #include "Tileset.h"
 #include "biome/Biome.h"
+#include "entity/ClientPlayer.h"
 #include "entity/Entity.h"
 #include "entity/ServerPlayer.h"
 #include "game/ClientGame.h"
@@ -18,6 +18,7 @@
 #include "realm/Keep.h"
 #include "realm/Realm.h"
 #include "realm/RealmFactory.h"
+#include "threading/ThreadContext.h"
 #include "tileentity/Ghost.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"

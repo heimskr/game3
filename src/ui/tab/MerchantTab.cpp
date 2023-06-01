@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "entity/ClientPlayer.h"
 #include "entity/Merchant.h"
 #include "game/ClientGame.h"
 #include "game/Inventory.h"

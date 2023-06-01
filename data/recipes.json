@@ -134,16 +134,16 @@
 		"station": "base:station/purifier"
 	}],
 	["base:crafting_recipe", {
+		"input": [["base:item/sulfur", 2]],
+		"output": [["base:item/bomb", 1]]
+	}],
+	["base:crafting_recipe", {
 		"input": [["base:item/wood",  1]],
 		"output": [["base:item/plank", 1]]
 	}],
 	["base:crafting_recipe", {
 		"input": [["base:item/plank", 2]],
 		"output": [["base:item/wooden_wall", 1]]
-	}],
-	["base:crafting_recipe", {
-		"input": [["base:item/stone", 1]],
-		"output": [["base:item/bomb", 64]]
 	}],
 	["base:crafting_recipe", {"input": [["base:attribute/flower_red",    1]], "output": [["base:item/red_dye",    1]]}],
 	["base:crafting_recipe", {"input": [["base:attribute/flower_orange", 1]], "output": [["base:item/orange_dye", 1]]}],

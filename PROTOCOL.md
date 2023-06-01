@@ -183,6 +183,12 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u64` Recipe Index
 	- `u64` Count
 
+32. **Continuous Interaction**: tells the server to start or stop continuous interaction.
+
+	- `optional<u8>` Modifiers
+
+	Continuous interaction starts if Modifiers is present, stops if not.
+
 # Message Format
 
 All values are little endian.

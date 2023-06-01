@@ -9,7 +9,7 @@ namespace Game3 {
 	class ClientGame: public Game {
 		public:
 			Canvas &canvas;
-			PlayerPtr player;
+			ClientPlayerPtr player;
 
 			std::shared_ptr<LocalClient> client;
 

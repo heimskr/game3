@@ -43,7 +43,7 @@ namespace Game3 {
 		return missing;
 	}
 
-	const std::set<Identifier> & Tileset::getBrightNames() const {
+	const std::unordered_set<Identifier> & Tileset::getBrightNames() const {
 		return bright;
 	}
 
@@ -126,18 +126,18 @@ namespace Game3 {
 		brightCache.reset();
 	}
 
-	const std::set<Identifier> Tileset::getCategories(const Identifier &tilename) const {
+	const std::unordered_set<Identifier> Tileset::getCategories(const Identifier &tilename) const {
 		return inverseCategories.at(tilename);
 	}
 
-	const std::set<TileID> Tileset::getCategoryIDs(const Identifier &category) const {
-		std::set<TileID> out;
+	const std::unordered_set<TileID> Tileset::getCategoryIDs(const Identifier &category) const {
+		std::unordered_set<TileID> out;
 		for (const auto &tilename: categories.at(category))
 			out.insert((*this)[tilename]);
 		return out;
 	}
 
-	const std::set<Identifier> Tileset::getTilesByCategory(const Identifier &category) const {
+	const std::unordered_set<Identifier> Tileset::getTilesByCategory(const Identifier &category) const {
 		return categories.at(category);
 	}
 
@@ -190,7 +190,7 @@ namespace Game3 {
 
 		tileset.missing = json.at("missing");
 
-		std::map<Identifier, Identifier> stacks = json.at("stacks");
+		std::unordered_map<Identifier, Identifier> stacks = json.at("stacks");
 		for (const auto &[key, val]: stacks) {
 			if (key.getPathStart() == "category")
 				tileset.stackCategories.emplace(key, val);
