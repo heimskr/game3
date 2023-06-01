@@ -182,13 +182,13 @@ namespace Game3 {
 		forward->signal_pressed().connect([this](int, double, double) {
 			if (game && game->player) {
 				game->player->inventory->nextSlot();
-				inventoryTab->reset(game);
+				inventoryTab->update(game);
 			}
 		});
 		backward->signal_pressed().connect([this](int, double, double) {
 			if (game && game->player) {
 				game->player->inventory->prevSlot();
-				inventoryTab->reset(game);
+				inventoryTab->update(game);
 			}
 		});
 		glArea.add_controller(forward);
@@ -294,24 +294,24 @@ namespace Game3 {
 		for (auto &[widget, tab]: tabMap)
 			tab->reset(game);
 		game->signal_player_inventory_update().connect([this](const PlayerPtr &) {
-			inventoryTab->reset(game);
+			inventoryTab->update(game);
 			if (isFocused(merchantTab))
-				merchantTab->reset(game);
-			craftingTab->reset(game);
+				merchantTab->update(game);
+			craftingTab->update(game);
 		});
 		game->signal_other_inventory_update().connect([this](const std::shared_ptr<HasRealm> &owner) {
 			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner)) {
 				if (has_inventory->inventory) {
 					if (has_inventory->inventory == inventoryTab->getExternalInventory())
-						inventoryTab->reset(game);
+						inventoryTab->update(game);
 					if (has_inventory->inventory == merchantTab->getMerchantInventory())
-						merchantTab->reset(game);
+						merchantTab->update(game);
 				}
 			}
 		});
 		game->signal_player_money_update().connect([this](const PlayerPtr &) {
-			inventoryTab->reset(game);
-			merchantTab->reset(game);
+			inventoryTab->update(game);
+			merchantTab->update(game);
 		});
 	}
 

@@ -51,6 +51,7 @@ namespace Game3 {
 			Glib::ustring externalName;
 			std::unordered_map<Gtk::Widget *, std::pair<Slot, bool>> widgetMap;
 			std::unordered_map<Slot, Gtk::Widget *> playerWidgetsBySlot;
+			std::unordered_map<Slot, Gtk::Widget *> externalWidgetsBySlot;
 			Glib::RefPtr<Gio::Menu> gmenuSelf;
 			Glib::RefPtr<Gio::Menu> gmenuExternal;
 
@@ -66,5 +67,6 @@ namespace Game3 {
 			void leftClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, bool external, double x, double y);
 			void rightClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, bool external, double x, double y);
 			void updatePlayerClasses(const std::shared_ptr<ClientGame> &);
+			void populate(Gtk::Grid &, Inventory &, bool external);
 	};
 }
