@@ -224,6 +224,20 @@ namespace Game3 {
 			} else if (first == "h") {
 				runCommand(client, "heldL 0", threadContext.rng());
 				runCommand(client, "heldR 1", threadContext.rng());
+			} else if (first == "go") {
+				if (words.size() != 3)
+					return {false, "Invalid number of arguments."};
+				Index row = 0;
+				Index column = 0;
+				try {
+					row = parseLong(words.at(1));
+					column = parseLong(words.at(2));
+				} catch (const std::invalid_argument &) {
+					return {false, "Invalid coordinates."};
+				}
+
+				player->teleport(Position(row, column));
+				return {true, "Teleported to " + static_cast<std::string>(Position(row, column))};
 			}
 		} catch (const std::exception &err) {
 			return {false, err.what()};
