@@ -40,7 +40,7 @@ namespace Game3 {
 		});
 
 		mainWindow.insert_action_group("merchant_popup", group);
-		popoverMenu.set_parent(mainWindow); // TODO: fix this silliness
+		popoverMenu.set_parent(vbox); // TODO: verify
 
 		auto source = Gtk::DragSource::create();
 		source->set_actions(Gdk::DragAction::MOVE);
@@ -212,12 +212,10 @@ namespace Game3 {
 	void MerchantTab::rightClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *widget, int, Slot slot, bool merchant, double x, double y) {
 		mainWindow.onBlur();
 
-		do {
-			const auto allocation = widget->get_allocation();
-			x += allocation.get_x();
-			y += allocation.get_y();
-			widget = widget->get_parent();
-		} while (widget);
+		// TODO: verify
+		const auto allocation = widget->get_allocation();
+		x += allocation.get_x();
+		y += allocation.get_y();
 
 		popoverMenu.set_has_arrow(true);
 		popoverMenu.set_pointing_to({int(x), int(y), 1, 1});
