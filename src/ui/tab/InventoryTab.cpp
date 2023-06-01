@@ -18,9 +18,10 @@ namespace Game3 {
 		vbox.append(hbox);
 		vbox.append(externalGrid);
 		hbox.append(externalLabel);
-		externalLabel.set_hexpand(true);
+		externalLabel.set_hexpand();
 		scrolled.set_child(vbox);
-		scrolled.set_vexpand(true);
+		scrolled.set_hexpand();
+		scrolled.set_vexpand();
 
 		gmenuSelf = Gio::Menu::create();
 		gmenuSelf->append("Hold (_Left)", "inventory_popup.hold_left");
@@ -134,6 +135,10 @@ namespace Game3 {
 
 		playerGrid.set_row_homogeneous();
 		playerGrid.set_column_homogeneous();
+		playerGrid.set_hexpand();
+		externalGrid.set_hexpand();
+		vbox.set_hexpand();
+		vbox.set_vexpand();
 	}
 
 	void InventoryTab::onResize(const std::shared_ptr<ClientGame> &game) {

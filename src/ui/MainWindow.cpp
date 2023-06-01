@@ -242,6 +242,7 @@ namespace Game3 {
 		paned.set_end_child(notebook);
 		glArea.set_expand(true);
 		notebook.set_hexpand(false);
+		notebook.set_vexpand(true);
 		paned.set_resize_start_child(true);
 		paned.set_shrink_start_child(false);
 		paned.set_resize_end_child(false);
