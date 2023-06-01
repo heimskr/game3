@@ -66,7 +66,6 @@ namespace Game3 {
 					while (rand() % 4 == 1)
 						++saplings;
 					player->give({game, "base:item/sapling"_id, saplings});
-					inventory.notifyOwner();
 					return true;
 				}
 				return false;

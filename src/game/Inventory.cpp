@@ -4,6 +4,7 @@
 #include "entity/Entity.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
+#include "entity/ServerPlayer.h"
 #include "game/Agent.h"
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
@@ -395,7 +396,8 @@ namespace Game3 {
 
 			if (side == Side::Server) {
 				if (player)
-					player->send(InventoryPacket(shared_from_this()));
+					if (auto server_player = player->cast<ServerPlayer>())
+						server_player->inventoryUpdated = true;
 			} else {
 				if (player)
 					player->getRealm()->getGame().toClient().signal_player_inventory_update().emit(player);

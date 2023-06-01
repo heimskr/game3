@@ -131,6 +131,9 @@ namespace Game3 {
 			}, false);
 			(external? externalGrid : playerGrid).add_controller(target);
 		}
+
+		playerGrid.set_row_homogeneous();
+		playerGrid.set_column_homogeneous();
 	}
 
 	void InventoryTab::onResize(const std::shared_ptr<ClientGame> &game) {

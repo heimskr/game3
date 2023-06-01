@@ -8,6 +8,7 @@
 #include "packet/CommandResultPacket.h"
 #include "packet/DestroyEntityPacket.h"
 #include "packet/DestroyTileEntityPacket.h"
+#include "packet/InventoryPacket.h"
 #include "packet/TileEntityPacket.h"
 #include "packet/EntityMovedPacket.h"
 #include "packet/TileUpdatePacket.h"
@@ -45,8 +46,14 @@ namespace Game3 {
 
 		for (const auto &player: players) {
 			player->ticked = false;
+
 			if (time_packet)
 				player->send(*time_packet);
+
+			if (player->inventoryUpdated) {
+				player->send(InventoryPacket(player->inventory));
+				player->inventoryUpdated = false;
+			}
 		}
 
 

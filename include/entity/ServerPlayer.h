@@ -19,6 +19,8 @@ namespace Game3 {
 			bool ensureEntity(const std::shared_ptr<Entity> &);
 			std::shared_ptr<RemoteClient> getClient() const;
 
+			bool inventoryUpdated = false;
+
 		private:
 			ServerPlayer();
 
