@@ -51,7 +51,7 @@ namespace Game3 {
 		});
 
 		mainWindow.insert_action_group("inventory_popup", group);
-		popoverMenu.set_parent(vbox); // TODO: fix this silliness
+		popoverMenu.set_parent(vbox);
 
 		for (bool external: {false, true}) {
 			auto source = Gtk::DragSource::create();
