@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "Log.h"
 #include "Tileset.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
@@ -62,9 +63,8 @@ namespace Game3 {
 			Inventory &inventory = *player->inventory;
 			if (auto *stack = inventory.getActive()) {
 				if (stack->hasAttribute("base:attribute/pickaxe"_id) && !inventory.add(*ore_stack)) {
-					setTile(2, position, tileset.getEmpty());
-					reupload(2);
 					reveal(position);
+					setTile(2, position, tileset.getEmpty());
 					if (stack->reduceDurability())
 						inventory.erase(inventory.activeSlot);
 					return true;
@@ -79,22 +79,12 @@ namespace Game3 {
 		const auto &tileset = getTileset();
 		const TileID empty_id = tileset.getEmptyID();
 		if (getTile(2, position) != empty_id) {
-			bool changed = false;
 			const TileID void_id = tileset["base:tile/void"];
-			for (Index row_offset = -1; row_offset <= 1; ++row_offset) {
-				for (Index column_offset = -1; column_offset <= 1; ++column_offset) {
-					if (row_offset != 0 || column_offset != 0) {
-						const Position offset_position = position + Position(row_offset, column_offset);
-						if (getTile(3, offset_position) == void_id) {
+			for (Index row_offset = -1; row_offset <= 1; ++row_offset)
+				for (Index column_offset = -1; column_offset <= 1; ++column_offset)
+					if (row_offset != 0 || column_offset != 0)
+						if (const Position offset_position = position + Position(row_offset, column_offset); getTile(3, offset_position) == void_id)
 							setTile(3, offset_position, empty_id);
-							changed = true;
-						}
-					}
-				}
-			}
-
-			if (changed)
-				reupload(3);
 		}
 	}
 
