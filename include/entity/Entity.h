@@ -152,6 +152,16 @@ namespace Game3 {
 				return {path.begin(), path.end()};
 			}
 
+			template <typename T>
+			std::shared_ptr<T> cast() {
+				return std::dynamic_pointer_cast<T>(shared_from_this());
+			}
+
+			template <typename T>
+			std::shared_ptr<const T> cast() const {
+				return std::dynamic_pointer_cast<const T>(shared_from_this());
+			}
+
 		protected:
 			Game *game = nullptr;
 			std::shared_ptr<Texture> texture;

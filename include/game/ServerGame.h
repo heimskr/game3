@@ -30,6 +30,7 @@ namespace Game3 {
 			void runCommand(RemoteClient &, const std::string &, GlobalID);
 			void entityTeleported(Entity &);
 			void entityDestroyed(const Entity &);
+			void tileEntitySpawned(const TileEntityPtr &);
 			void tileEntityDestroyed(const TileEntity &);
 			void remove(const ServerPlayerPtr &);
 			void queueRemoval(const ServerPlayerPtr &);

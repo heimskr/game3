@@ -8,6 +8,7 @@
 #include "packet/CommandResultPacket.h"
 #include "packet/DestroyEntityPacket.h"
 #include "packet/DestroyTileEntityPacket.h"
+#include "packet/TileEntityPacket.h"
 #include "packet/EntityMovedPacket.h"
 #include "packet/TileUpdatePacket.h"
 #include "packet/TimePacket.h"
@@ -128,6 +129,19 @@ namespace Game3 {
 		auto lock = server->server->lockClients();
 		for (const auto &[client_id, client]: server->server->getClients())
 			std::dynamic_pointer_cast<RemoteClient>(client)->send(packet);
+	}
+
+	void ServerGame::tileEntitySpawned(const TileEntityPtr &tile_entity) {
+		const TileEntityPacket packet(tile_entity);
+		auto realm = tile_entity->getRealm();
+		ChunkRange(tile_entity->getChunk()).iterate([&](ChunkPosition chunk_position) {
+			if (auto entities = realm->getEntities(chunk_position)) {
+				auto lock = entities->sharedLock();
+				for (const auto &entity: *entities)
+					if (entity->isPlayer())
+						entity->cast<ServerPlayer>()->send(packet);
+			}
+		});
 	}
 
 	void ServerGame::tileEntityDestroyed(const TileEntity &tile_entity) {
