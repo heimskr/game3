@@ -2,8 +2,10 @@
 
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
+#include "packet/CraftPacket.h"
 #include "recipe/CraftingRecipe.h"
 #include "registry/Registries.h"
+#include "threading/ThreadContext.h"
 #include "ui/MainWindow.h"
 #include "ui/gtk/EntryDialog.h"
 #include "ui/gtk/NumericEntry.h"
@@ -129,22 +131,12 @@ namespace Game3 {
 		}
 	}
 
-	bool CraftingTab::craftOne(const std::shared_ptr<ClientGame> &game, size_t registry_id) {
-		auto recipe = game->registries.get<CraftingRecipeRegistry>()[registry_id];
-		auto inventory = game->player->inventory;
-		std::vector<ItemStack> leftovers;
-		if (!recipe->craft(inventory, leftovers))
-			return false;
-		for (auto &leftover: leftovers)
-			leftover.spawn(game->player->getRealm(), game->player->position);
-		return true;
+	void CraftingTab::craftOne(const std::shared_ptr<ClientGame> &game, size_t registry_id) {
+		game->player->send(CraftPacket(threadContext.rng(), registry_id, 1));
 	}
 
-	size_t CraftingTab::craftAll(const std::shared_ptr<ClientGame> &game, size_t registry_id) {
-		size_t out = 0;
-		while (craftOne(game, registry_id))
-			++out;
-		return out;
+	void CraftingTab::craftAll(const std::shared_ptr<ClientGame> &game, size_t registry_id) {
+		game->player->send(CraftPacket(threadContext.rng(), registry_id, -1));
 	}
 
 	void CraftingTab::leftClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *, size_t registry_id, int n, double, double) {

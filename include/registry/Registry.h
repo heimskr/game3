@@ -151,6 +151,13 @@ namespace Game3 {
 				return *items.at(S::ID())->template cast<const S>();
 			}
 
+			inline std::shared_ptr<T> maybe(const Identifier &id) {
+				auto iter = items.find(id);
+				if (iter == items.end())
+					return {};
+				return iter->second;
+			}
+
 			inline std::shared_ptr<T> operator[](size_t counter) const {
 				return at(counter);
 			}
@@ -234,6 +241,12 @@ namespace Game3 {
 				throw std::runtime_error("Adding from JSON unimplemented");
 			}
 
+			inline std::shared_ptr<T> maybe(size_t counter) {
+				if (counter < byCounter.size())
+					return byCounter.at(counter);
+				return {};
+			}
+
 			inline std::shared_ptr<T> operator[](size_t counter) const {
 				return at(counter);
 			}
@@ -259,8 +272,7 @@ namespace Game3 {
 			using UnnamedRegistry<T>::UnnamedRegistry;
 
 			void add(const Game &game, const nlohmann::json &json) override {
-				// Why.
-				static_cast<UnnamedRegistry<T> *>(this)->add(T::fromJSON(game, json));
+				UnnamedRegistry<T>::add(T::fromJSON(game, json));
 			}
 	};
 

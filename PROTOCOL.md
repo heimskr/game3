@@ -39,7 +39,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 6. **Command**: sent to the server to run a command.
 
-	- `u64` Command ID
+	- `u64` Packet GID
 	- `string` Command
 
 7. **Self Teleported**: tells a client the position of their player.
@@ -164,8 +164,8 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 28. **Entity Forgotten**: informs the server that the client has removed an entity from its memory.
 
-	- `u64` GlobalID
-	- `i32` RealmID
+	- `u64` Global ID
+	- `i32` Realm ID
 
 	Currently unused.
 
@@ -176,6 +176,12 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 30. **Time**: informs a client of the game time.
 
 	- `double` Time
+
+31. **Craft**: tells the server to craft something.
+
+	- `u64` Packet GID
+	- `u64` Recipe Index
+	- `u64` Count
 
 # Message Format
 

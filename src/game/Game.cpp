@@ -68,6 +68,7 @@
 #include "packet/DestroyTileEntityPacket.h"
 #include "packet/ClickPacket.h"
 #include "packet/TimePacket.h"
+#include "packet/CraftPacket.h"
 #include "realm/Cave.h"
 #include "realm/House.h"
 #include "realm/Keep.h"
@@ -312,6 +313,7 @@ namespace Game3 {
 		add(PacketFactory::create<DestroyTileEntityPacket>());
 		add(PacketFactory::create<ClickPacket>());
 		add(PacketFactory::create<TimePacket>());
+		add(PacketFactory::create<CraftPacket>());
 	}
 
 	void Game::addLocalCommandFactories() {
