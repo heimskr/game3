@@ -17,6 +17,7 @@ namespace Game3 {
 			return false;
 
 		if (!realm.hasTileEntityAt(position) && nullptr != realm.add(TileEntity::create<Ghost>(game, place, stack.withCount(1)))) {
+			place.realm->confirmGhosts(); // lol
 			if (--stack.count == 0)
 				place.player->inventory->erase(slot);
 			place.player->inventory->notifyOwner();
