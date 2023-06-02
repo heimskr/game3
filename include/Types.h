@@ -25,6 +25,8 @@ namespace Game3 {
 	using Version      = uint32_t;
 	using GlobalID     = uint64_t;
 	using Token        = uint64_t;
+	using FluidLevel   = uint16_t;
+	using FluidID      = uint16_t;
 
 	using ItemID     = Identifier;
 	using EntityType = Identifier;

@@ -11,6 +11,7 @@
 #include "Position.h"
 #include "Types.h"
 #include "game/ChunkPosition.h"
+#include "game/Fluids.h"
 #include "threading/Lockable.h"
 #include "threading/MTQueue.h"
 #include "util/Math.h"
@@ -27,28 +28,32 @@ namespace Game3 {
 			using ChunkMap = std::unordered_map<ChunkPosition, Chunk<TileID>>;
 			using BiomeMap = std::unordered_map<ChunkPosition, Chunk<BiomeType>>;
 			using PathMap  = std::unordered_map<ChunkPosition, Chunk<uint8_t>>;
+			using FluidMap = std::unordered_map<ChunkPosition, Chunk<FluidTile>>;
 
 			/** Behavior when accessing a tile in an out-of-bounds chunk.
 			 *  The Create mode will cause a nonexistent chunk to be created on access. */
 			enum class TileMode  {Throw, Create, ReturnEmpty};
 			enum class BiomeMode {Throw, Create};
 			enum class PathMode  {Throw, Create};
+			enum class FluidMode {Throw, Create};
 
 			std::array<ChunkMap, LAYER_COUNT> chunkMaps;
 			BiomeMap biomeMap;
 			PathMap pathMap;
+			FluidMap fluidMap;
 			Identifier tilesetID;
 			MTQueue<ChunkPosition> generationQueue;
 
 			std::array<std::shared_mutex, LAYER_COUNT> chunkMutexes;
 			std::shared_mutex biomeMutex;
 			std::shared_mutex pathMutex;
+			std::shared_mutex fluidMutex;
 
 			TileProvider() = default;
 			TileProvider(Identifier tileset_id);
 
 			void clear();
-			bool contains(const ChunkPosition &) const;
+			bool contains(ChunkPosition) const;
 
 			std::shared_ptr<Tileset> getTileset(const Game &);
 
@@ -87,6 +92,14 @@ namespace Game3 {
 			/** Returns a copy of the path state at a given tile position. */
 			inline std::optional<uint8_t> copyPathState(const Position &position) const {
 				return copyPathState(position.row, position.column);
+			}
+
+			/** Returns a copy of the fluid ID/amount at a given tile position. */
+			std::optional<FluidTile> copyFluidTile(Index row, Index column) const;
+
+			/** Returns a copy of the fluid ID/amount at a given tile position. */
+			inline std::optional<FluidTile> copyFluidTile(const Position &position) const {
+				return copyFluidTile(position.row, position.column);
 			}
 
 			/** Returns a reference to the given tile. The ReturnEmpty mode will be treated as Throw. */
@@ -137,28 +150,34 @@ namespace Game3 {
 				return findPathState(position.row, position.column, mode);
 			}
 
-			const Chunk<TileID> & getTileChunk(Layer, const ChunkPosition &) const;
-			Chunk<TileID> & getTileChunk(Layer, const ChunkPosition &);
+			const Chunk<TileID> & getTileChunk(Layer, ChunkPosition) const;
+			Chunk<TileID> & getTileChunk(Layer, ChunkPosition);
 
-			const Chunk<BiomeType> & getBiomeChunk(const ChunkPosition &) const;
-			Chunk<BiomeType> & getBiomeChunk(const ChunkPosition &);
+			const Chunk<BiomeType> & getBiomeChunk(ChunkPosition) const;
+			Chunk<BiomeType> & getBiomeChunk(ChunkPosition);
 
-			const Chunk<uint8_t> & getPathChunk(const ChunkPosition &) const;
-			Chunk<uint8_t> & getPathChunk(const ChunkPosition &);
+			const Chunk<uint8_t> & getPathChunk(ChunkPosition) const;
+			Chunk<uint8_t> & getPathChunk(ChunkPosition);
+
+			const Chunk<FluidTile> & getFluidChunk(ChunkPosition) const;
+			Chunk<FluidTile> & getFluidChunk(ChunkPosition);
 
 			/** Creates missing tile chunks at a given chunk position in every layer. */
-			void ensureTileChunk(const ChunkPosition &);
+			void ensureTileChunk(ChunkPosition);
 
 			/** Creates missing tile chunks at a given chunk position in a given layer (which should be 1-based). */
-			void ensureTileChunk(const ChunkPosition &, Layer);
+			void ensureTileChunk(ChunkPosition, Layer);
 
 			/** Creates a missing biome chunk. */
-			void ensureBiomeChunk(const ChunkPosition &);
+			void ensureBiomeChunk(ChunkPosition);
 
 			/** Creates a missing path chunk. */
-			void ensurePathChunk(const ChunkPosition &);
+			void ensurePathChunk(ChunkPosition);
 
-			void ensureAllChunks(const ChunkPosition &);
+			/** Creates a missing fluid chunk. */
+			void ensureFluidChunk(ChunkPosition);
+
+			void ensureAllChunks(ChunkPosition);
 
 			void ensureAllChunks(const Position &);
 
@@ -198,9 +217,10 @@ namespace Game3 {
 			std::shared_ptr<Tileset> cachedTileset;
 
 			void validateLayer(Layer) const;
-			void initTileChunk(Layer, Chunk<TileID> &, const ChunkPosition &);
-			void initBiomeChunk(Chunk<BiomeType> &, const ChunkPosition &);
-			void initPathChunk(Chunk<uint8_t> &, const ChunkPosition &);
+			void initTileChunk(Layer, Chunk<TileID> &, ChunkPosition);
+			void initBiomeChunk(Chunk<BiomeType> &, ChunkPosition);
+			void initPathChunk(Chunk<uint8_t> &, ChunkPosition);
+			void initFluidChunk(Chunk<FluidTile> &, ChunkPosition);
 
 			friend void to_json(nlohmann::json &, const TileProvider &);
 			friend void from_json(const nlohmann::json &, TileProvider &);

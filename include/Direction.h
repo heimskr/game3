@@ -12,7 +12,4 @@ namespace Game3 {
 	Direction randomDirection();
 
 	std::ostream & operator<<(std::ostream &, Direction);
-	// Buffer & operator+=(Buffer &, Direction);
-	// Buffer & operator<<(Buffer &, Direction);
-	// Buffer & operator>>(Buffer &, Direction &);
 }

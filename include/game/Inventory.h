@@ -112,7 +112,6 @@ namespace Game3 {
 			friend void to_json(nlohmann::json &, const Inventory &);
 	};
 
-
 	template <typename T>
 	T popBuffer(Buffer &);
 	template <>

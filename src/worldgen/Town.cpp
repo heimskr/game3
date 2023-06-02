@@ -29,12 +29,7 @@ namespace Game3::WorldGen {
 			realm->setTile(Layer::Terrain, {row, column}, tilename, false, true);
 		};
 
-		const auto set_submerged = [&](const Identifier &tilename) {
-			cleanup(row, column);
-			realm->setTile(Layer::Submerged, {row, column}, tilename, false, true);
-		};
-
-		const auto set_submerged_pos = [&](const Position &position, const Identifier &tilename) {
+		const auto set_submerged = [&](const Position &position, const Identifier &tilename) {
 			cleanup(position.row, position.column);
 			realm->setTile(Layer::Submerged, position, tilename, false, true);
 		};
@@ -52,7 +47,7 @@ namespace Game3::WorldGen {
 		Timer town_timer("TownLayout");
 		for (row = position.row - pad; row < position.row + height + pad; ++row)
 			for (column = position.column - pad; column < position.column + width + pad; ++column) {
-				set_submerged_pos({row, column}, "base:tile/empty"_id);
+				set_submerged({row, column}, "base:tile/empty"_id);
 				set_objects_pos({row, column}, "base:tile/empty"_id);
 			}
 
