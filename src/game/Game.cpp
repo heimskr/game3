@@ -21,6 +21,7 @@
 #include "entity/Woodcutter.h"
 #include "entity/Worker.h"
 #include "game/ClientGame.h"
+#include "game/Fluids.h"
 #include "game/Game.h"
 #include "game/InteractionSet.h"
 #include "game/Inventory.h"
@@ -121,6 +122,7 @@ namespace Game3 {
 		registries.add<RealmDetailsRegistry>();
 		registries.add<PacketFactoryRegistry>();
 		registries.add<LocalCommandFactoryRegistry>();
+		registries.add<FluidRegistry>();
 		// TODO: plugins
 	}
 
@@ -468,6 +470,12 @@ namespace Game3 {
 
 			for (const auto &recipe_json: json.at(1))
 				addRecipe(recipe_json);
+
+		} else if (type == "base:fluid_map"_id) {
+
+			auto &fluids = registry<FluidRegistry>();
+			for (const auto &[key, value]: json.at(1).items())
+				fluids.add(Identifier(key), Fluid(Identifier(key), value.at("tileset"), value.at("tilename")));
 
 		} else
 			throw std::runtime_error("Unknown data file type: " + type.str());

@@ -2,6 +2,11 @@
 #include "net/Buffer.h"
 
 namespace Game3 {
+	Fluid::Fluid(Identifier identifier_, Identifier tileset_name, Identifier tilename_):
+		NamedRegisterable(std::move(identifier_)),
+		tilesetName(std::move(tileset_name)),
+		tilename(std::move(tilename_)) {}
+
 	FluidTile::FluidTile(uint32_t packed):
 		id(packed & 0xffff),
 		level((packed >> 16) & 0xffff) {}

@@ -4,9 +4,18 @@
 #include <string>
 
 #include "Types.h"
+#include "data/Identifier.h"
 
 namespace Game3 {
 	class Buffer;
+
+	struct Fluid: NamedRegisterable {
+		Identifier tilesetName;
+		Identifier tilename;
+
+		Fluid() = delete;
+		Fluid(Identifier identifier_, Identifier tileset_name, Identifier tilename_);
+	};
 
 	struct FluidTile {
 		FluidID id = 0;

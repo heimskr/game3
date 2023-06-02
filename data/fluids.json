@@ -1,0 +1,10 @@
+["base:fluid_map", {
+	"base:fluid/water": {
+		"tileset": "base:tileset/monomap",
+		"tilename": "base:tile/deeper_water"
+	},
+	"base:fluid/lava": {
+		"tileset": "base:tileset/monomap",
+		"tilename": "base:tile/lava"
+	}
+}]

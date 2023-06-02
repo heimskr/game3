@@ -25,10 +25,15 @@ namespace Game3 {
 
 	class TileProvider {
 		public:
-			using ChunkMap = std::unordered_map<ChunkPosition, Chunk<TileID>>;
-			using BiomeMap = std::unordered_map<ChunkPosition, Chunk<BiomeType>>;
-			using PathMap  = std::unordered_map<ChunkPosition, Chunk<uint8_t>>;
-			using FluidMap = std::unordered_map<ChunkPosition, Chunk<FluidTile>>;
+			using TileChunk  = Chunk<TileID>;
+			using BiomeChunk = Chunk<BiomeType>;
+			using PathChunk  = Chunk<uint8_t>;
+			using FluidChunk = Chunk<FluidTile>;
+
+			using ChunkMap = std::unordered_map<ChunkPosition, TileChunk>;
+			using BiomeMap = std::unordered_map<ChunkPosition, BiomeChunk>;
+			using PathMap  = std::unordered_map<ChunkPosition, PathChunk>;
+			using FluidMap = std::unordered_map<ChunkPosition, FluidChunk>;
 
 			/** Behavior when accessing a tile in an out-of-bounds chunk.
 			 *  The Create mode will cause a nonexistent chunk to be created on access. */

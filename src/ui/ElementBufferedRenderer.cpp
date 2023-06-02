@@ -160,7 +160,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void ElementBufferedRenderer::setChunk(Chunk<TileID> &new_chunk, bool can_reupload) {
+	void ElementBufferedRenderer::setChunk(TileProvider::TileChunk &new_chunk, bool can_reupload) {
 		if (&new_chunk == chunk)
 			return;
 		chunk = &new_chunk;

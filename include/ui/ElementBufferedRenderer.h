@@ -6,16 +6,13 @@
 
 #include "Shader.h"
 #include "Types.h"
+#include "game/TileProvider.h"
 #include "ui/RectangleRenderer.h"
 #include "ui/Reshader.h"
 #include "util/GL.h"
 
 namespace Game3 {
 	class Realm;
-	class TileProvider;
-
-	/** Start corresponds to left or top, End corresponds to right or bottom. */
-	enum class Alignment {Invalid = 0, Start, Middle, End};
 
 	class ElementBufferedRenderer {
 		public:
@@ -23,8 +20,6 @@ namespace Game3 {
 			constexpr static float TILE_TEXTURE_PADDING = 1.f / 2048.f;
 			int backbufferWidth = -1;
 			int backbufferHeight = -1;
-			Alignment horizontal = Alignment::Invalid;
-			Alignment vertical = Alignment::Invalid;
 			bool isMissing = false;
 
 			Eigen::Vector2f center {0.f, 0.f};
@@ -43,7 +38,7 @@ namespace Game3 {
 			void render(float divisor);
 			bool reupload();
 			bool onBackbufferResized(int width, int height);
-			void setChunk(Chunk<TileID> &, bool can_reupload = true);
+			void setChunk(TileProvider::TileChunk &, bool can_reupload = true);
 			void setChunkPosition(const ChunkPosition &);
 			inline void markDirty() { dirty = true; }
 			inline void setRealm(Realm &new_realm) { realm = &new_realm; }
