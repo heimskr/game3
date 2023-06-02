@@ -19,10 +19,10 @@ namespace Game3 {
 		const auto &position = place.position;
 		const auto &tileset = realm.getTileset();
 
-		if (realm.isPathable(position) && tileset.getEmptyID() == realm.getTile(2, position)) {
-			if (!validGround || tileset.isInCategory(tileset[realm.getTile(1, position)], validGround)) {
-				realm.setTile(2, position, tilename);
-				realm.reupload(2);
+		if (realm.isPathable(position) && realm.middleEmpty(position)) {
+			if (!validGround || tileset.isInCategory(tileset[realm.getTile(Layer::Terrain, position)], validGround)) {
+				realm.setTile(Layer::Submerged, position, tilename);
+				realm.reupload(Layer::Submerged);
 				if (--stack.count == 0)
 					place.player->inventory->erase(slot);
 				place.player->inventory->notifyOwner();

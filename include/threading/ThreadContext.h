@@ -19,7 +19,8 @@ namespace Game3 {
 			Index colMin = -1;
 			Index colMax = -1;
 			size_t updateNeighborsDepth = 0;
-			bool layer2Updated = false;
+			bool submergedLayerUpdated = false;
+			bool objectsLayerUpdated = false;
 			bool valid = false;
 
 			ThreadContext():

@@ -4,3 +4,5 @@
 - REALM_DIAMETER should be positive and odd.
 - Please don't modify the stores of Entities and TileEntities while Realms are ticking.
 - Entities that directly virtually inherit from Entity will **not** call `Entity::encode`/`Entity::decode` inside their `encode`/`decode` overloads; inheriting classes have to do that themselves.
+- If a tile entity occupies a tile, the submerged and object layers of that tile must be empty.
+- Plantable tiles should be on the submerged layer.

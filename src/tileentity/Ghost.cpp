@@ -28,12 +28,12 @@ namespace Game3 {
 
 	static void spawnCauldron(const Place &place) {
 		place.realm->add(TileEntity::create<CraftingStation>(place.realm->getGame(), "base:tile/cauldron_red_full"_id, place.position, "base:station/cauldron"_id));
-		place.realm->setTile(2, place.position, "base:tile/cauldron_red_full");
+		place.realm->setTile(Layer::Objects, place.position, "base:tile/cauldron_red_full");
 	}
 
 	static void spawnPurifier(const Place &place) {
 		place.realm->add(TileEntity::create<CraftingStation>(place.realm->getGame(), "base:tile/purifier"_id, place.position, "base:station/purifier"_id));
-		place.realm->setTile(2, place.position, "base:tile/purifier");
+		place.realm->setTile(Layer::Objects, place.position, "base:tile/purifier");
 	}
 
 	void initGhosts(Game &game) {
@@ -147,7 +147,7 @@ namespace Game3 {
 			const Position offset_position(position + Position(row_offset, column_offset));
 			if (auto value = check(offset_position))
 				return *value;
-			return fn(tileset[realm->getTile(2, offset_position)], Place(offset_position, realm, nullptr));
+			return fn(tileset[realm->getTile(Layer::Objects, offset_position)], Place(offset_position, realm, nullptr));
 		});
 
 		const TileID marched_row = march_result / 7;

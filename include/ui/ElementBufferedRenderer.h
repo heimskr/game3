@@ -57,7 +57,7 @@ namespace Game3 {
 			bool initialized = false;
 			/** Whether lighting needs to be recomputed. */
 			std::atomic_bool dirty = true;
-			Layer layer = -1;
+			Layer layer = Layer::Invalid;
 			Shader shader {"terrain"};
 			GL::FloatVAO vao;
 			GL::VBO vbo;

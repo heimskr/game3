@@ -18,10 +18,10 @@ namespace Game3 {
 		auto &inventory = *player.inventory;
 
 		auto &tileset = realm.getTileset();
-		const auto tile1 = place.getName(1);
-		const auto tile2 = place.getName(2);
+		const auto terrain_tile   = place.getName(Layer::Terrain);
+		const auto submerged_tile = place.getName(Layer::Submerged);
 
-		if (!tile1 || !tile2)
+		if (!terrain_tile || !submerged_tile)
 			return false;
 
 		if (auto *active = inventory.getActive()) {
@@ -29,8 +29,8 @@ namespace Game3 {
 				return true;
 
 			if (active->hasAttribute("base:attribute/shovel"_id)) {
-				if (*tile2 == "base:tile/ash"_id) {
-					realm.setTile(2, position, "base:tile/empty"_id);
+				if (*submerged_tile == "base:tile/ash"_id) {
+					realm.setTile(Layer::Submerged, position, "base:tile/empty"_id);
 					player.give({game, "base:item/ash"_id, 1});
 					realm.reupload();
 					return true;
@@ -41,16 +41,16 @@ namespace Game3 {
 		std::optional<Identifier> item;
 		std::optional<Identifier> attribute;
 
-		if (*tile1 == "base:tile/sand"_id) {
+		if (*terrain_tile == "base:tile/sand"_id) {
 			item.emplace("base:item/sand"_id);
 			attribute.emplace("base:attribute/shovel"_id);
-		} else if (*tile1 == "base:tile/shallow_water"_id) {
+		} else if (*terrain_tile == "base:tile/shallow_water"_id) {
 			item.emplace("base:item/clay"_id);
 			attribute.emplace("base:attribute/shovel"_id);
-		} else if (*tile1 == "base:tile/volcanic_sand"_id) {
+		} else if (*terrain_tile == "base:tile/volcanic_sand"_id) {
 			item.emplace("base:item/volcanic_sand"_id);
 			attribute.emplace("base:attribute/shovel"_id);
-		} else if (tileset.isInCategory(*tile1, "base:category/dirt")) {
+		} else if (tileset.isInCategory(*terrain_tile, "base:category/dirt")) {
 			item.emplace("base:item/dirt"_id);
 			attribute.emplace("base:attribute/shovel"_id);
 		}
@@ -69,13 +69,13 @@ namespace Game3 {
 			}
 		}
 
-		if (tileset.isInCategory(*tile2, "base:category/plantable"_id)) {
+		if (tileset.isInCategory(*submerged_tile, "base:category/plantable"_id)) {
 			if (auto iter = game.itemsByAttribute.find("base:attribute/plantable"_id); iter != game.itemsByAttribute.end()) {
 				for (const auto &item: iter->second) {
-					if (auto cast = std::dynamic_pointer_cast<Plantable>(item); cast && cast->tilename == *tile2) {
+					if (auto cast = std::dynamic_pointer_cast<Plantable>(item); cast && cast->tilename == *submerged_tile) {
 						player.give({game, item});
-						realm.setTile(2, position, tileset.getEmptyID());
-						realm.reupload(2);
+						realm.setTile(Layer::Submerged, position, tileset.getEmptyID());
+						realm.reupload(Layer::Submerged);
 						return true;
 					}
 				}
@@ -88,9 +88,8 @@ namespace Game3 {
 	bool StandardInteractions::damageGround(const Place &place) const {
 		// TODO: handle other tilemaps
 
-		const auto &tile3 = place.getName(3);
-		if (tile3 == "base:tile/charred_stump"_id) {
-			place.realm->setTile(3, place.position, "base:tile/empty"_id);
+		if (place.getName(Layer::Objects) == "base:tile/charred_stump"_id) {
+			place.realm->setTile(Layer::Objects, place.position, "base:tile/empty"_id);
 			return true;
 		}
 

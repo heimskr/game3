@@ -32,21 +32,20 @@ namespace Game3 {
 		auto &player = *place.player;
 		auto &inventory = *player.inventory;
 		auto &tileset = place.realm->getTileset();
-		Layer layer = 3;
 
-		for (const auto &tile: {place.getName(3), place.getName(2), place.getName(1)}) {
+		for (auto iter = allLayers.rbegin(); iter != allLayers.rend(); ++iter) {
+			const auto tile = place.getName(*iter);
 			ItemStack equivalent;
 			if (tile && tileset.getItemStack(place.getGame(), *tile, equivalent)) {
-				place.set(layer, tileset.getEmpty());
+				place.set(*iter, tileset.getEmpty());
 				if (stack.reduceDurability())
 					inventory.erase(slot);
 				else
 					inventory.notifyOwner();
 				player.give(equivalent);
-				place.realm->reupload(layer);
+				place.realm->reupload(*iter);
 				return true;
 			}
-			--layer;
 		}
 
 		return false;

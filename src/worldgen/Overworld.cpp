@@ -113,7 +113,7 @@ namespace Game3::WorldGen {
 
 					for (auto row = row_min; row < row_max; ++row)
 						for (auto column = col_min; column < col_max; ++column)
-							if (ore_set.contains(realm->getTile(1, {row, column})))
+							if (ore_set.contains(realm->getTile(Layer::Terrain, {row, column})))
 								resource_starts.push_back({row, column});
 
 					std::shuffle(resource_starts.begin(), resource_starts.end(), threadContext.rng);
@@ -182,7 +182,7 @@ namespace Game3::WorldGen {
 
 							for (Index row = row_start; row < row_end; row += 2)
 								for (Index column = column_start; column < column_end; column += 2)
-									if (auto tile = provider.tryTile(1, {row, column}); !tile || !tileset.isLand(*tile))
+									if (auto tile = provider.tryTile(Layer::Terrain, {row, column}); !tile || !tileset.isLand(*tile))
 										goto failed;
 
 							thread_candidates.push_back(position);

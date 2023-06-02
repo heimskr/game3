@@ -45,13 +45,13 @@ namespace Game3 {
 
 		for (Index row = range.rowMin(); row <= range.rowMax() - bottom_pad; ++row)
 			for (Index column = range.columnMin(); column < range.columnMax() - right_pad; ++column)
-				if (tileset->isLand(copyTileUnsafe(1, row, column, was_empty, TileMode::Throw)))
+				if (tileset->isLand(copyTileUnsafe(Layer::Terrain, row, column, was_empty, TileMode::Throw)))
 					land_tiles[i++] = {row, column};
 		return land_tiles;
 	}
 
 	TileID TileProvider::copyTile(Layer layer, Index row, Index column, bool &was_empty, TileMode mode) const {
-		std::shared_lock lock(const_cast<std::shared_mutex &>(chunkMutexes[layer - 1]));
+		std::shared_lock lock(const_cast<std::shared_mutex &>(chunkMutexes[getIndex(layer)]));
 		return copyTileUnsafe(layer, row, column, was_empty, mode);
 	}
 
@@ -61,7 +61,7 @@ namespace Game3 {
 
 		const ChunkPosition chunk_position {divide<int32_t>(column), divide<int32_t>(row)};
 
-		const auto &map = chunkMaps[layer - 1];
+		const auto &map = chunkMaps[getIndex(layer)];
 
 		if (auto iter = map.find(chunk_position); iter != map.end())
 			return access(iter->second, remainder(row), remainder(column));
@@ -84,8 +84,8 @@ namespace Game3 {
 
 		const ChunkPosition chunk_position {divide(position.column), divide(position.row)};
 
-		std::shared_lock lock(const_cast<std::shared_mutex &>(chunkMutexes[layer - 1]));
-		const auto &map = chunkMaps[layer - 1];
+		std::shared_lock lock(const_cast<std::shared_mutex &>(chunkMutexes[getIndex(layer)]));
+		const auto &map = chunkMaps[getIndex(layer)];
 
 		if (auto iter = map.find(chunk_position); iter != map.end())
 			return access(iter->second, remainder(position.row), remainder(position.column));
@@ -121,8 +121,8 @@ namespace Game3 {
 
 		const ChunkPosition chunk_position {divide(column), divide(row)};
 
-		std::shared_lock shared_lock(chunkMutexes[layer - 1]);
-		auto &map = chunkMaps[layer - 1];
+		std::shared_lock shared_lock(chunkMutexes[getIndex(layer)]);
+		auto &map = chunkMaps[getIndex(layer)];
 
 		if (auto iter = map.find(chunk_position); iter != map.end())
 			return access(iter->second, remainder(row), remainder(column));
@@ -130,7 +130,7 @@ namespace Game3 {
 		if (mode == TileMode::Create) {
 			created = true;
 			shared_lock.unlock();
-			std::unique_lock unique_lock(chunkMutexes[layer - 1]);
+			std::unique_lock unique_lock(chunkMutexes[getIndex(layer)]);
 			auto &chunk = map[chunk_position];
 			initTileChunk(layer, chunk, chunk_position);
 			return access(chunk, remainder(row), remainder(column)) = 0;
@@ -201,8 +201,8 @@ namespace Game3 {
 	const Chunk<TileID> & TileProvider::getTileChunk(Layer layer, const ChunkPosition &chunk_position) const {
 		validateLayer(layer);
 
-		std::shared_lock lock(const_cast<std::shared_mutex &>(chunkMutexes[layer - 1]));
-		if (auto iter = chunkMaps[layer - 1].find(chunk_position); iter != chunkMaps[layer - 1].end())
+		std::shared_lock lock(const_cast<std::shared_mutex &>(chunkMutexes[getIndex(layer)]));
+		if (auto iter = chunkMaps[getIndex(layer)].find(chunk_position); iter != chunkMaps[getIndex(layer)].end())
 			return iter->second;
 
 		throw std::out_of_range("Couldn't find tile chunk at position " + static_cast<std::string>(chunk_position));
@@ -211,8 +211,8 @@ namespace Game3 {
 	Chunk<TileID> & TileProvider::getTileChunk(Layer layer, const ChunkPosition &chunk_position) {
 		validateLayer(layer);
 		ensureTileChunk(chunk_position, layer);
-		std::unique_lock lock(chunkMutexes[layer - 1]);
-		return chunkMaps[layer - 1][chunk_position];
+		std::unique_lock lock(chunkMutexes[getIndex(layer)]);
+		return chunkMaps[getIndex(layer)][chunk_position];
 	}
 
 	const Chunk<BiomeType> & TileProvider::getBiomeChunk(const ChunkPosition &chunk_position) const {
@@ -244,17 +244,18 @@ namespace Game3 {
 	}
 
 	void TileProvider::ensureTileChunk(const ChunkPosition &chunk_position) {
-		for (Layer layer = 0; layer < LAYER_COUNT; ++layer) {
-			std::unique_lock lock(chunkMutexes[layer]);
-			if (auto [iter, inserted] = chunkMaps[layer].try_emplace(chunk_position); inserted)
+		// for (Layer layer = 0; layer < LAYER_COUNT; ++layer) {
+		for (const auto layer: allLayers) {
+			std::unique_lock lock(chunkMutexes[getIndex(layer)]);
+			if (auto [iter, inserted] = chunkMaps[getIndex(layer)].try_emplace(chunk_position); inserted)
 				initTileChunk(layer, iter->second, chunk_position);
 		}
 	}
 
 	void TileProvider::ensureTileChunk(const ChunkPosition &chunk_position, Layer layer) {
 		validateLayer(layer);
-		std::unique_lock lock(chunkMutexes[layer - 1]);
-		if (auto [iter, inserted] = chunkMaps[layer - 1].try_emplace(chunk_position); inserted)
+		std::unique_lock lock(chunkMutexes[getIndex(layer)]);
+		if (auto [iter, inserted] = chunkMaps[getIndex(layer)].try_emplace(chunk_position); inserted)
 			initTileChunk(layer, iter->second, chunk_position);
 	}
 
@@ -281,8 +282,8 @@ namespace Game3 {
 	}
 
 	void TileProvider::validateLayer(Layer layer) const {
-		if (layer == 0 || LAYER_COUNT < layer)
-			throw std::out_of_range("Invalid layer: " + std::to_string(layer));
+		if (static_cast<uint8_t>(layer) < static_cast<uint8_t>(Layer::Terrain) || static_cast<uint8_t>(Layer::Highest) < static_cast<uint8_t>(layer))
+			throw std::out_of_range("Invalid layer: " + std::to_string(static_cast<uint8_t>(layer)));
 	}
 
 	void TileProvider::initTileChunk(Layer, Chunk<TileID> &chunk, const ChunkPosition &chunk_position) {
@@ -302,9 +303,9 @@ namespace Game3 {
 		json.push_back(provider.tilesetID);
 
 		nlohmann::json tile_array;
-		for (Layer layer = 0; layer < LAYER_COUNT; ++layer)
-			for (const auto &[position, chunk]: provider.chunkMaps[layer])
-				tile_array.push_back(std::make_pair(std::make_tuple(layer, position.x, position.y), compress(std::span(chunk.data(), chunk.size()))));
+		for (const auto layer: allLayers)
+			for (const auto &[position, chunk]: provider.chunkMaps[getIndex(layer)])
+				tile_array.push_back(std::make_pair(std::make_tuple(getIndex(layer), position.x, position.y), compress(std::span(chunk.data(), chunk.size()))));
 		json.push_back(std::move(tile_array));
 
 		nlohmann::json biome_array;
@@ -322,7 +323,7 @@ namespace Game3 {
 		provider.tilesetID = json.at(0);
 
 		for (const auto &item: json.at(1)) {
-			const auto [layer, x, y] = item.at(0).get<std::tuple<Layer, int32_t, int32_t>>();
+			const auto [layer, x, y] = item.at(0).get<std::tuple<size_t, int32_t, int32_t>>();
 			const auto compressed = item.at(1).get<std::vector<uint8_t>>();
 			provider.chunkMaps[layer][ChunkPosition{x, y}] = decompress16(std::span(compressed.data(), compressed.size()));
 		}

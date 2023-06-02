@@ -62,9 +62,9 @@ namespace Game3 {
 	void Realm::initRendererTileProviders() {
 		for (auto &row: *renderers) {
 			for (auto &layers: row) {
-				Layer layer = 0;
+				size_t layer = 0;
 				for (auto &renderer: layers)
-					renderer.setup(tileProvider, ++layer);
+					renderer.setup(tileProvider, getLayer(++layer));
 			}
 		}
 	}
@@ -255,7 +255,7 @@ namespace Game3 {
 		getGame().toClient().activateContext();
 		for (auto &row: *renderers)
 			for (auto &layers: row)
-				layers[layer - 1].reupload();
+				layers[getIndex(layer)].reupload();
 	}
 
 	EntityPtr Realm::addUnsafe(const EntityPtr &entity) {
@@ -619,6 +619,14 @@ namespace Game3 {
 		return getTile(layer, position.row, position.column);
 	}
 
+	bool Realm::middleEmpty(const Position &position) {
+		const auto submerged = tryTile(Layer::Submerged, position);
+		const auto object = tryTile(Layer::Objects, position);
+		const auto empty = getTileset().getEmptyID();
+		assert(submerged.has_value() == object.has_value());
+		return (!submerged && !object) || (*submerged == empty && *object == empty);
+	}
+
 	std::optional<TileID> Realm::tryTile(Layer layer, const Position &position) const {
 		return tileProvider.tryTile(layer, position);
 	}
@@ -675,20 +683,25 @@ namespace Game3 {
 					if (auto neighbor = tileEntityAt(offset_position)) {
 						neighbor->onNeighborUpdated(-row_offset, -column_offset);
 					} else {
-						const TileID tile = tileProvider.copyTile(2, offset_position, TileProvider::TileMode::ReturnEmpty);
-						const auto &tilename = tileset[tile];
+						for (const Layer layer: {Layer::Submerged, Layer::Objects}) {
+							const TileID tile = tileProvider.copyTile(layer, offset_position, TileProvider::TileMode::ReturnEmpty);
+							const auto &tilename = tileset[tile];
 
-						for (const auto &category: tileset.getCategories(tilename)) {
-							if (tileset.isCategoryMarchable(category)) {
-								TileID march_result = march4([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
-									const Position march_position = offset_position + Position(march_row_offset, march_column_offset);
-									return tileset.isInCategory(tileset[tileProvider.copyTile(2, march_position, TileProvider::TileMode::ReturnEmpty)], category);
-								});
+							for (const auto &category: tileset.getCategories(tilename)) {
+								if (tileset.isCategoryMarchable(category)) {
+									const TileID march_result = march4([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
+										const Position march_position = offset_position + Position(march_row_offset, march_column_offset);
+										return tileset.isInCategory(tileset[tileProvider.copyTile(layer, march_position, TileProvider::TileMode::ReturnEmpty)], category);
+									});
 
-								const TileID marched = tileset[tileset.getMarchBase(category)] + (march_result / 7) * tileset.columnCount(getGame()) + march_result % 7;
-								if (marched != tile) {
-									setTile(2, offset_position, marched);
-									threadContext.layer2Updated = true;
+									const TileID marched = tileset[tileset.getMarchBase(category)] + (march_result / 7) * tileset.columnCount(getGame()) + march_result % 7;
+									if (marched != tile) {
+										setTile(layer, offset_position, marched);
+										if (layer == Layer::Submerged)
+											threadContext.submergedLayerUpdated = true;
+										else
+											threadContext.objectsLayerUpdated = true;
+									}
 								}
 							}
 						}
@@ -697,9 +710,16 @@ namespace Game3 {
 			}
 		}
 
-		if (--threadContext.updateNeighborsDepth == 0 && threadContext.layer2Updated) {
-			threadContext.layer2Updated = false;
-			reupload(2);
+		if (--threadContext.updateNeighborsDepth == 0) {
+			if (threadContext.submergedLayerUpdated) {
+				threadContext.submergedLayerUpdated = false;
+				reupload(Layer::Submerged);
+			}
+
+			if (threadContext.objectsLayerUpdated) {
+				threadContext.objectsLayerUpdated = false;
+				reupload(Layer::Objects);
+			}
 		}
 	}
 
@@ -724,7 +744,7 @@ namespace Game3 {
 
 		if (getSide() == Side::Client) {
 			game.toClient().activateContext();
-			reupload(2);
+			reupload(Layer::Objects);
 		}
 	}
 
@@ -762,7 +782,7 @@ namespace Game3 {
 	}
 
 	bool Realm::isWalkable(Index row, Index column, const Tileset &tileset) {
-		for (Layer layer = 1; layer <= LAYER_COUNT; ++layer)
+		for (const auto layer: allLayers)
 			if (auto tile = tryTile(layer, {row, column}); !tile || !tileset.isWalkable(*tile))
 				return false;
 		auto lock = lockTileEntitiesShared();

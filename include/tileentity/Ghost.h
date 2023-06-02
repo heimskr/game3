@@ -32,14 +32,14 @@ namespace Game3 {
 		Index columnsPerRow = 16;
 		Index rowOffset     = 0;
 		Index columnOffset  = 0;
-		Index layer = 2;
+		Layer layer = Layer::Objects;
 		CustomFn customFn;
 		Identifier customTilename;
 
 		GhostDetails(Identifier identifier_ = {}):
 			NamedRegisterable(std::move(identifier_)) {}
 
-		GhostDetails(Identifier identifier_, Identifier type_, Identifier tileset_name, bool use_marching_squares, Index columns_per_row, Index row_offset, Index column_offset, Index layer_):
+		GhostDetails(Identifier identifier_, Identifier type_, Identifier tileset_name, bool use_marching_squares, Index columns_per_row, Index row_offset, Index column_offset, Layer layer_):
 			NamedRegisterable(std::move(identifier_)),
 			type(std::move(type_)),
 			tilesetName(std::move(tileset_name)),

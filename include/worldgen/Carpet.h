@@ -9,6 +9,6 @@ namespace Game3 {
 	class Realm;
 
 	namespace WorldGen {
-		void generateCarpet(const std::shared_ptr<Realm> &, std::default_random_engine &, Index width, Index height, int padding = -1);
+		void generateCarpet(const std::shared_ptr<Realm> &, std::default_random_engine &, Index width, Index height, int padding = -1, Layer layer = Layer::Submerged);
 	}
 }

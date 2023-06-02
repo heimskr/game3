@@ -30,19 +30,19 @@ namespace Game3 {
 		static const Identifier stone         = "base:tile/stone"_id;
 
 		if (noise < wetness) {
-			realm.setTile(1, {row, column}, deeper_water, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, deeper_water, false, true);
 		} else if (noise < wetness + 0.1) {
-			realm.setTile(1, {row, column}, deep_water, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, deep_water, false, true);
 		} else if (noise < wetness + 0.2) {
-			realm.setTile(1, {row, column}, water, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, water, false, true);
 		} else if (noise < wetness + 0.3) {
-			realm.setTile(1, {row, column}, shallow_water, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, shallow_water, false, true);
 		} else if (noise < wetness + 0.4) {
-			realm.setTile(1, {row, column}, sand, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, sand, false, true);
 		} else if (stoneLevel < noise) {
-			realm.setTile(1, {row, column}, stone, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, stone, false, true);
 		} else {
-			realm.setTile(1, {row, column}, sand, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, sand, false, true);
 			const double forest_noise = forestPerlin->GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.5);
 			if (params.forestThreshold - 0.2 < forest_noise) {
 				std::default_random_engine tree_rng(static_cast<uint_fast32_t>(forest_noise * 1'000'000'000.));

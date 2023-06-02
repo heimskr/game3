@@ -340,14 +340,12 @@ namespace Game3 {
 
 		const auto &tileset = realm->getTileset();
 
-		if (auto tile = realm->tryTile(1, new_position); !tile || !tileset.isWalkable(*tile))
+		if (auto tile = realm->tryTile(Layer::Terrain, new_position); !tile || !tileset.isWalkable(*tile))
 			return false;
 
-		if (auto tile = realm->tryTile(2, new_position); !tile || tileset.isSolid(*tile))
-			return false;
-
-		if (auto tile = realm->tryTile(3, new_position); !tile || tileset.isSolid(*tile))
-			return false;
+		for (const auto layer: {Layer::Submerged, Layer::Objects, Layer::Highest})
+			if (auto tile = realm->tryTile(layer, new_position); !tile || tileset.isSolid(*tile))
+				return false;
 
 		if (auto tile_entity = realm->tileEntityAt(new_position))
 			if (tile_entity->solid)

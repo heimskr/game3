@@ -19,7 +19,7 @@ namespace Game3 {
 
 		auto &tileset = realm.getTileset();
 
-		if (auto tilename = place.getName(1); !tilename || !tileset.isInCategory(*tilename, "base:category/plant_soil"_id))
+		if (auto tilename = place.getName(Layer::Terrain); !tilename || !tileset.isInCategory(*tilename, "base:category/plant_soil"_id))
 			return false;
 
 		static const std::array<Identifier, 3> trees {"base:tile/tree1"_id, "base:tile/tree2"_id, "base:tile/tree3"_id};

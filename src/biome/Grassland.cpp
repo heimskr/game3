@@ -47,24 +47,24 @@ namespace Game3 {
 		static const Identifier forest_floor  = "base:tile/forest_floor"_id;
 
 		if (noise < wetness) {
-			realm.setTile(1, {row, column}, deeper_water, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, deeper_water, false, true);
 		} else if (noise < wetness + 0.1) {
-			realm.setTile(1, {row, column}, deep_water, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, deep_water, false, true);
 		} else if (noise < wetness + 0.2) {
-			realm.setTile(1, {row, column}, water, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, water, false, true);
 		} else if (noise < wetness + 0.3) {
-			realm.setTile(1, {row, column}, shallow_water, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, shallow_water, false, true);
 		} else if (noise < wetness + 0.4) {
-			realm.setTile(1, {row, column}, sand, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, sand, false, true);
 		} else if (noise < wetness + 0.5) {
-			realm.setTile(1, {row, column}, light_grass, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, light_grass, false, true);
 		} else if (stoneLevel < noise) {
-			realm.setTile(1, {row, column}, stone, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, stone, false, true);
 		} else {
 			if (std::uniform_int_distribution(0, 15)(rng) == 0)
-				realm.setTile(1, {row, column}, choose(tileset.getTilesByCategory("base:category/small_flowers"), rng), false, true);
+				realm.setTile(Layer::Terrain, {row, column}, choose(tileset.getTilesByCategory("base:category/small_flowers"), rng), false, true);
 			else
-				realm.setTile(1, {row, column}, choose(grasses, rng), false, true);
+				realm.setTile(Layer::Terrain, {row, column}, choose(grasses, rng), false, true);
 			const double forest_noise = forestPerlin->GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.5);
 			if (params.forestThreshold < forest_noise) {
 				uint8_t mod = abs(column) % 2;
@@ -75,7 +75,7 @@ namespace Game3 {
 					static const std::vector<Identifier> trees {"base:tile/tree1"_id, "base:tile/tree2"_id, "base:tile/tree3"_id};
 					realm.add(TileEntity::create<Tree>(realm.getGame(), choose(trees, rng), "base:tile/tree0"_id, Position(row, column), Tree::MATURITY));
 				}
-				realm.setTile(1, {row, column}, forest_floor, false, true);
+				realm.setTile(Layer::Terrain, {row, column}, forest_floor, false, true);
 			}
 		}
 
@@ -110,11 +110,11 @@ namespace Game3 {
 		}
 
 		const auto &tileset = realm.getTileset();
-		const auto tile1 = tileset[realm.getTile(1, {row, column})];
+		const auto tile1 = tileset[realm.getTile(Layer::Terrain, {row, column})];
 
-		if (grassSet.contains(tile1) && realm.getTile(2, {row, column}) == tileset.getEmptyID()) {
+		if (grassSet.contains(tile1) && realm.middleEmpty({row, column})) {
 			if (distribution(rng) < 2)
-				realm.setTile(2, {row, column}, choose(tileset.getCategoryIDs("base:category/flowers"), rng), false, true);
+				realm.setTile(Layer::Submerged, {row, column}, choose(tileset.getCategoryIDs("base:category/flowers"), rng), false, true);
 
 			std::shared_ptr<Animal> animal;
 

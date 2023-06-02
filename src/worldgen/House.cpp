@@ -19,21 +19,20 @@ namespace Game3::WorldGen {
 
 		realm->tileProvider.ensureAllChunks(ChunkPosition{0, 0});
 		auto pauser = realm->pauseUpdates();
-		// const Position exit_position =
 		generateIndoors(realm, rng, parent_realm, width, height, entrance);
 
-		const auto &tileset2 = realm->getTileset();
-		const auto &plants = tileset2.getTilesByCategory("base:category/plants"_id);
+		const auto &tileset = realm->getTileset();
+		const auto &plants = tileset.getTilesByCategory("base:category/plants"_id);
 
-		realm->setTile(2, {1, 1}, choose(plants, rng), false, true);
-		realm->setTile(2, {1, width - 2}, choose(plants, rng), false, true);
-		realm->setTile(2, {height - 2, 1}, choose(plants, rng), false, true);
-		realm->setTile(2, {height - 2, width - 2}, choose(plants, rng), false, true);
+		realm->setTile(Layer::Submerged, {1, 1}, choose(plants, rng), false, true);
+		realm->setTile(Layer::Submerged, {1, width - 2}, choose(plants, rng), false, true);
+		realm->setTile(Layer::Submerged, {height - 2, 1}, choose(plants, rng), false, true);
+		realm->setTile(Layer::Submerged, {height - 2, width - 2}, choose(plants, rng), false, true);
 
-		const auto &beds = tileset2.getTilesByCategory("base:category/beds"_id);
+		const auto &beds = tileset.getTilesByCategory("base:category/beds"_id);
 		std::array<Index, 2> edges {1, width - 2};
 		const Position bed_position(2 + rng() % (height - 4), choose(edges, rng));
-		realm->setTile(2, bed_position, choose(beds, rng), false, true);
+		realm->setTile(Layer::Objects, bed_position, choose(beds, rng), false, true);
 		realm->extraData["bed"] = bed_position;
 
 		// const auto house_position = entrance - Position(1, 0);
@@ -61,9 +60,8 @@ namespace Game3::WorldGen {
 				auto shuffled_texts = texts;
 				std::shuffle(shuffled_texts.begin(), shuffled_texts.end(), rng);
 
-				// for (Index index = width + 2; index < 2 * width - 2; ++index) {
 				for (Index column = 2; column < width - 2; ++column) {
-					realm->setTile(2, {1, column}, "base:tile/bookshelf"_id, false, true);
+					realm->setTile(Layer::Objects, {1, column}, "base:tile/bookshelf"_id, false, true);
 					realm->add(TileEntity::create<Sign>(realm->getGame(), "base:tile/empty"_id, Position(1, column), shuffled_texts.at((column - 2) % shuffled_texts.size()), "Bookshelf"));
 				}
 				break;

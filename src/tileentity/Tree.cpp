@@ -96,11 +96,11 @@ namespace Game3 {
 		static std::uniform_real_distribution one(0., 1.);
 
 		if (one(threadContext.rng) < CHAR_CHANCE)
-			realm->setTile(3, getPosition(), "base:tile/charred_stump"_id);
+			realm->setTile(Layer::Objects, getPosition(), "base:tile/charred_stump"_id);
 		else
 			realm->spawn<ItemEntity>(getPosition(), ItemStack(realm->getGame(), "base:item/wood"_id, 1));
 
-		realm->setTile(2, getPosition(), "base:tile/ash"_id);
+		realm->setTile(Layer::Submerged, getPosition(), "base:tile/ash"_id);
 		return true;
 	}
 

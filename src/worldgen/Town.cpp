@@ -24,103 +24,115 @@ namespace Game3::WorldGen {
 				realm->remove(tile_entity);
 		};
 
-		const auto set1 = [&](const Identifier &tilename) {
+		const auto set_terrain = [&](const Identifier &tilename) {
 			cleanup(row, column);
-			realm->setTile(1, {row, column}, tilename, false, true);
+			realm->setTile(Layer::Terrain, {row, column}, tilename, false, true);
 		};
 
-		const auto set2 = [&](const Identifier &tilename) {
+		const auto set_submerged = [&](const Identifier &tilename) {
 			cleanup(row, column);
-			realm->setTile(2, {row, column}, tilename, false, true);
+			realm->setTile(Layer::Submerged, {row, column}, tilename, false, true);
 		};
 
-		const auto set2p = [&](const Position &position, const Identifier &tilename) {
+		const auto set_submerged_pos = [&](const Position &position, const Identifier &tilename) {
 			cleanup(position.row, position.column);
-			realm->setTile(2, position, tilename, false, true);
+			realm->setTile(Layer::Submerged, position, tilename, false, true);
+		};
+
+		const auto set_objects = [&](const Identifier &tilename) {
+			cleanup(row, column);
+			realm->setTile(Layer::Objects, {row, column}, tilename, false, true);
+		};
+
+		const auto set_objects_pos = [&](const Position &position, const Identifier &tilename) {
+			cleanup(position.row, position.column);
+			realm->setTile(Layer::Objects, position, tilename, false, true);
 		};
 
 		Timer town_timer("TownLayout");
 		for (row = position.row - pad; row < position.row + height + pad; ++row)
-			for (column = position.column - pad; column < position.column + width + pad; ++column)
-				set2p({row, column}, "base:tile/empty"_id);
+			for (column = position.column - pad; column < position.column + width + pad; ++column) {
+				set_submerged_pos({row, column}, "base:tile/empty"_id);
+				set_objects_pos({row, column}, "base:tile/empty"_id);
+			}
 
 		for (row = position.row; row < position.row + height; ++row) {
-			set2p({row, position.column}, "base:tile/tower_ns"_id);
-			set2p({row, position.column + width - 1}, "base:tile/tower_ns"_id);
+			set_objects_pos({row, position.column}, "base:tile/tower_ns"_id);
+			set_objects_pos({row, position.column + width - 1}, "base:tile/tower_ns"_id);
 		}
 
 		for (column = position.column; column < position.column + width; ++column) {
-			set2p({position.row, column}, "base:tile/tower_we"_id);
-			set2p({position.row + height - 1, column}, "base:tile/tower_we"_id);
+			set_objects_pos({position.row, column}, "base:tile/tower_we"_id);
+			set_objects_pos({position.row + height - 1, column}, "base:tile/tower_we"_id);
 		}
 
-		set2p(position, "base:tile/tower_nw"_id);
-		set2p({position.row + height - 1, position.column}, "base:tile/tower_sw"_id);
-		set2p({position.row, position.column + width - 1}, "base:tile/tower_ne"_id);
-		set2p({position.row + height - 1, position.column + width - 1}, "base:tile/tower_se"_id);
+		set_objects_pos(position, "base:tile/tower_nw"_id);
+		set_objects_pos({position.row + height - 1, position.column}, "base:tile/tower_sw"_id);
+		set_objects_pos({position.row, position.column + width - 1}, "base:tile/tower_ne"_id);
+		set_objects_pos({position.row + height - 1, position.column + width - 1}, "base:tile/tower_se"_id);
 
 		std::unordered_set<Position> buildable_set;
 
 		for (row = position.row + 1; row < position.row + height - 1; ++row)
 			for (column = position.column + 1; column < position.column + width - 1; ++column) {
 				buildable_set.insert({row, column});
-				set1("base:tile/dirt"_id);
+				set_terrain("base:tile/dirt"_id);
 			}
 
 		row = position.row + height / 2 - 1;
 		for (column = position.column - pad; column < position.column + width + pad; ++column) {
 			buildable_set.erase({row, column});
 			buildable_set.erase({position.row + height - 2,  column}); // Make sure no houses spawn on the bottom row of the town
-			set1("base:tile/road"_id);
+			set_terrain("base:tile/road"_id);
 			++row;
 			buildable_set.erase({row, column});
-			set1("base:tile/road"_id);
+			set_terrain("base:tile/road"_id);
 			--row;
 		}
 		column = position.column;
-		set2("base:tile/empty"_id);
+		set_objects("base:tile/empty"_id);
 		--row;
-		set2("base:tile/tower_s"_id);
+		set_objects("base:tile/tower_s"_id);
 		row += 2;
-		set2("base:tile/empty"_id);
+		set_objects("base:tile/empty"_id);
 		++row;
-		set2("base:tile/tower_n"_id);
+		set_objects("base:tile/tower_n"_id);
 		--row;
 		column += width - 1;
-		set2("base:tile/empty"_id);
+		set_objects("base:tile/empty"_id);
 		--row;
-		set2("base:tile/empty"_id);
+		set_objects("base:tile/empty"_id);
 		--row;
-		set2("base:tile/tower_s"_id);
+		set_objects("base:tile/tower_s"_id);
 		row += 3;
-		set2("base:tile/tower_n"_id);
+		set_objects("base:tile/tower_n"_id);
 		--row;
 		column = position.column + width / 2 - 1;
 		for (row = position.row - pad; row < position.row + height + pad; ++row) {
 			buildable_set.erase({row, column});
-			set1("base:tile/road"_id);
+			set_terrain("base:tile/road"_id);
 			++column;
 			buildable_set.erase({row, column});
-			set1("base:tile/road"_id);
+			set_terrain("base:tile/road"_id);
 			--column;
 		}
 		row = position.row;
-		set2("base:tile/empty"_id);
+		set_objects("base:tile/empty"_id);
 		--column;
-		set2("base:tile/tower_ne"_id);
+		set_objects("base:tile/tower_ne"_id);
 		column += 2;
-		set2("base:tile/empty"_id);
+		set_objects("base:tile/empty"_id);
 		++column;
-		set2("base:tile/tower_nw"_id);
+		set_objects("base:tile/tower_nw"_id);
 		column -= 2;
 		row += height - 1;
-		set2("base:tile/empty"_id);
+		set_objects("base:tile/empty"_id);
 		--column;
-		set2("base:tile/tower_ne"_id);
+		set_objects("base:tile/tower_ne"_id);
 		column += 2;
-		set2("base:tile/empty"_id);
+		set_objects("base:tile/empty"_id);
 		++column;
-		set2("base:tile/tower_nw"_id);
+		set_objects("base:tile/tower_nw"_id);
 		--column;
 
 		Position keep_position(position.row + height / 2 - 1, position.column + width / 2 - 1);
@@ -137,7 +149,7 @@ namespace Game3::WorldGen {
 		game.realms.emplace(keep_realm_id, keep_realm);
 
 		auto create_keep = [&](const Identifier &tilename) {
-			realm->setTile(2, keep_position, tilename, false, true);
+			realm->setTile(Layer::Objects, keep_position, tilename, false, true);
 			realm->add(TileEntity::create<Building>(game, tilename, keep_position, keep_realm_id, keep_entrance));
 		};
 
@@ -167,7 +179,7 @@ namespace Game3::WorldGen {
 			Position building_position;
 
 			auto gen_building = [&](const Identifier &tilename, Index realm_width, Index realm_height, RealmType realm_type, const BuildingGenerator &gen_fn, std::optional<Position> entrance = std::nullopt) {
-				realm->setTile(2, building_position, tilename, false, true);
+				realm->setTile(Layer::Objects, building_position, tilename, false, true);
 				const RealmID realm_id = game.newRealmID();
 				// auto building = TileEntity::create<Building>(game, tilename, building_position, realm_id, entrance == -1? realm_width * (realm_height - 1) - 3 : entrance);
 				auto building = TileEntity::create<Building>(game, tilename, building_position, realm_id, entrance? *entrance : Position(realm_height - 2, realm_width - 3));

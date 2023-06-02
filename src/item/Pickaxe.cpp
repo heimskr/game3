@@ -13,14 +13,14 @@ namespace Game3 {
 			return false;
 
 		auto &inventory = *player.inventory;
-		auto tile1 = place.getName(1);
+		auto terrain_tile = place.getName(Layer::Terrain);
 
-		if (!tile1)
+		if (!terrain_tile)
 			return false;
 
 		std::optional<Identifier> item;
 
-		if (tile1 == "base:tile/stone"_id) {
+		if (terrain_tile == "base:tile/stone"_id) {
 			item = "base:item/stone"_id;
 		}
 

@@ -27,19 +27,19 @@ namespace Game3 {
 		static const Identifier volcanic_rock = "base:tile/volcanic_rock"_id;
 
 		if (noise < wetness)
-			realm.setTile(1, {row, column}, deeper_water, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, deeper_water, false, true);
 		else if (noise < wetness + 0.1)
-			realm.setTile(1, {row, column}, deep_water, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, deep_water, false, true);
 		else if (noise < wetness + 0.2)
-			realm.setTile(1, {row, column}, water, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, water, false, true);
 		else if (noise < wetness + 0.3)
-			realm.setTile(1, {row, column}, shallow_water, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, shallow_water, false, true);
 		else if (noise < wetness + 0.4)
-			realm.setTile(1, {row, column}, volcanic_sand, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, volcanic_sand, false, true);
 		else if (0.85 < noise)
-			realm.setTile(1, {row, column}, lava, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, lava, false, true);
 		else
-			realm.setTile(1, {row, column}, volcanic_rock, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, volcanic_rock, false, true);
 
 		return noise;
 	}
@@ -48,7 +48,7 @@ namespace Game3 {
 		Realm &realm = *getRealm();
 		static std::uniform_int_distribution distribution(0, 199);
 
-		if (realm.getTile(1, {row, column}) == realm.getTileset()["base:tile/volcanic_sand"_id]) {
+		if (realm.getTile(Layer::Terrain, {row, column}) == realm.getTileset()["base:tile/volcanic_sand"_id]) {
 			if (distribution(rng) < 1) {
 				Game &game = realm.getGame();
 				std::vector<ItemStack> mushrooms {

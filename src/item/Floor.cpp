@@ -14,9 +14,9 @@ namespace Game3 {
 		auto &realm = *place.realm;
 		const auto &tileset = realm.getTileset();
 
-		if (place.getName(1) == tileset.getEmpty()) {
-			place.set(1, tilename);
-			realm.reupload(1);
+		if (place.getName(Layer::Terrain) == tileset.getEmpty()) {
+			place.set(Layer::Terrain, tilename);
+			realm.reupload(Layer::Terrain);
 			if (--stack.count == 0)
 				place.player->inventory->erase(slot);
 			place.player->inventory->notifyOwner();
