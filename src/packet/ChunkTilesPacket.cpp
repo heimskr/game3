@@ -39,5 +39,6 @@ namespace Game3 {
 
 		game.chunkReceived(chunkPosition);
 		realm->reupload();
+		realm->reuploadFluids();
 	}
 }

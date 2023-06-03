@@ -76,5 +76,9 @@ namespace Game3 {
 				realm.removeSafe(tile);
 			}
 		}
+
+		if (row == -50 && column == -50) {
+			realm.setFluid({row, column}, "base:fluid/lava", 65535, false, true);
+		}
 	}
 }
