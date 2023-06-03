@@ -115,6 +115,17 @@ namespace Game3 {
 		return std::nullopt;
 	}
 
+	std::optional<FluidTile> TileProvider::copyFluidTile(Index row, Index column) const {
+		const ChunkPosition chunk_position {divide(column), divide(row)};
+
+		std::shared_lock lock(const_cast<std::shared_mutex &>(fluidMutex));
+
+		if (auto iter = fluidMap.find(chunk_position); iter != fluidMap.end())
+			return access(iter->second, remainder(row), remainder(column));
+
+		return std::nullopt;
+	}
+
 	TileID & TileProvider::findTile(Layer layer, Index row, Index column, bool &created, TileMode mode) {
 		created = false;
 		validateLayer(layer);
@@ -196,6 +207,24 @@ namespace Game3 {
 	uint8_t & TileProvider::findPathState(Index row, Index column, PathMode mode) {
 		bool created = false;
 		return findPathState(row, column, created, mode);
+	}
+
+	FluidTile & TileProvider::findFluid(const Position &position, FluidMode mode) {
+		const auto chunk_position = getChunkPosition(position);
+		std::shared_lock shared_lock(fluidMutex);
+
+		if (auto iter = fluidMap.find(chunk_position); iter != fluidMap.end())
+			return access(iter->second, remainder(position.row), remainder(position.column));
+
+		if (mode == FluidMode::Create) {
+			shared_lock.unlock();
+			std::unique_lock unique_lock(fluidMutex);
+			auto &chunk = fluidMap[chunk_position];
+			initFluidChunk(chunk, chunk_position);
+			return access(chunk, remainder(position.row), remainder(position.column)) = {0, 0};
+		}
+
+		throw std::out_of_range("Couldn't find fluid tile at " + static_cast<std::string>(position));
 	}
 
 	const Chunk<TileID> & TileProvider::getTileChunk(Layer layer, ChunkPosition chunk_position) const {

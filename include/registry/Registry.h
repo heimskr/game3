@@ -158,6 +158,12 @@ namespace Game3 {
 				return iter->second;
 			}
 
+			inline std::shared_ptr<T> maybe(size_t counter) {
+				if (counter < byCounter.size())
+					return byCounter.at(counter);
+				return {};
+			}
+
 			inline std::shared_ptr<T> operator[](size_t counter) const {
 				return at(counter);
 			}

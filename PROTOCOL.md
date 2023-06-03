@@ -189,6 +189,12 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	Continuous interaction starts if Modifiers is present, stops if not.
 
+33. **Fluid Update**: informs the client of the new fluid state for a single tile.
+
+	- `i32` Realm ID
+	- `{i64,i64}` Position
+	- `u32` Fluid ID and Level
+
 # Message Format
 
 All values are little endian.

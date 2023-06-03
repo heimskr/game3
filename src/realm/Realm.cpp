@@ -57,6 +57,10 @@ namespace Game3 {
 			for (auto &layers: row)
 				for (auto &renderer: layers)
 					renderer.setRealm(*this);
+
+		for (auto &row: *fluidRenderers)
+			for (auto &renderer: row)
+				renderer.setRealm(*this);
 	}
 
 	void Realm::initRendererTileProviders() {
@@ -67,6 +71,10 @@ namespace Game3 {
 					renderer.setup(tileProvider, getLayer(++layer));
 			}
 		}
+
+		for (auto &row: *fluidRenderers)
+			for (auto &renderer: row)
+				renderer.setup(tileProvider);
 	}
 
 	void Realm::initTexture() {}
@@ -111,7 +119,7 @@ namespace Game3 {
 				auto entity = *entities.insert(Entity::fromJSON(game, entity_json)).first;
 				entity->setRealm(shared);
 				entitiesByGID[entity->globalID] = entity;
-				// attach(entity);
+				attach(entity);
 			}
 		}
 		if (json.contains("extra"))
@@ -123,10 +131,16 @@ namespace Game3 {
 			return;
 
 		focused = true;
+
 		for (auto &row: *renderers)
 			for (auto &layers: row)
 				for (auto &renderer: layers)
 					renderer.wakeUp();
+
+		for (auto &row: *fluidRenderers)
+			for (auto &renderer: row)
+				renderer.wakeUp();
+
 		reupload();
 	}
 
@@ -135,10 +149,15 @@ namespace Game3 {
 			return;
 
 		focused = false;
+
 		for (auto &row: *renderers)
 			for (auto &layers: row)
 				for (auto &renderer: layers)
 					renderer.snooze();
+
+		for (auto &row: *fluidRenderers)
+			for (auto &renderer: row)
+				renderer.snooze();
 	}
 
 	void Realm::createRenderers() {
@@ -146,6 +165,7 @@ namespace Game3 {
 			return;
 
 		renderers.emplace();
+		fluidRenderers.emplace();
 	}
 
 	void Realm::render(const int width, const int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &sprite_renderer, TextRenderer &text_renderer, float game_time) {
@@ -168,6 +188,13 @@ namespace Game3 {
 					renderer.onBackbufferResized(bb_width, bb_height);
 					renderer.render(outdoors? game_time : 1, scale, center.x(), center.y());
 				}
+			}
+		}
+
+		for (auto &row: *fluidRenderers) {
+			for (auto &renderer: row) {
+				renderer.onBackbufferResized(bb_width, bb_height);
+				renderer.render(outdoors? game_time : 1, scale, center.x(), center.y());
 			}
 		}
 
@@ -256,6 +283,16 @@ namespace Game3 {
 		for (auto &row: *renderers)
 			for (auto &layers: row)
 				layers[getIndex(layer)].reupload();
+	}
+
+	void Realm::reuploadFluids() {
+		if (getSide() != Side::Client)
+			return;
+
+		getGame().toClient().activateContext();
+		for (auto &row: *fluidRenderers)
+			for (auto &renderer: row)
+				renderer.reupload();
 	}
 
 	EntityPtr Realm::addUnsafe(const EntityPtr &entity) {
@@ -456,6 +493,19 @@ namespace Game3 {
 				}
 				++row_index;
 			}
+
+			row_index = 0;
+			for (auto &row: *fluidRenderers) {
+				Index col_index = 0;
+				for (auto &renderer: row) {
+					renderer.setChunkPosition({
+						static_cast<int32_t>(player_cpos.x + col_index - REALM_DIAMETER / 2 - 1),
+						static_cast<int32_t>(player_cpos.y + row_index - REALM_DIAMETER / 2 - 1),
+					});
+					++col_index;
+				}
+				++row_index;
+			}
 		}
 	}
 
@@ -609,6 +659,23 @@ namespace Game3 {
 
 	void Realm::setTile(Layer layer, const Position &position, const Identifier &tilename, bool run_helper, bool generating) {
 		setTile(layer, position, getTileset()[tilename], run_helper, generating);
+	}
+
+	void Realm::setFluid(const Position &position, FluidTile tile, bool run_helper, bool generating) {
+		// TODO!!!
+		tileProvider.findFluid(position) = tile;
+		if (isServer()) {
+			if (run_helper)
+				setLayerHelper(position.row, position.column);
+			if (!generating)
+				getGame().toServer().broadcastFluidUpdate(id, position, tile);
+		}
+	}
+
+	void Realm::setFluid(const Position &position, const Identifier &fluidname, FluidLevel level, bool run_helper, bool generating) {
+		auto fluid = getGame().registry<FluidRegistry>().at(fluidname);
+		assert(fluid);
+		setFluid(position, FluidTile(fluid->registryID, level), run_helper, generating);
 	}
 
 	TileID Realm::getTile(Layer layer, Index row, Index column) const {

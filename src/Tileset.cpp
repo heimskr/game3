@@ -171,6 +171,18 @@ namespace Game3 {
 		return names.at(id);
 	}
 
+	std::optional<TileID> Tileset::maybe(const Identifier &id) const {
+		if (auto iter = ids.find(id); iter != ids.end())
+			return iter->second;
+		return std::nullopt;
+	}
+
+	std::optional<std::reference_wrapper<const Identifier>> Tileset::maybe(TileID id) const {
+		if (auto iter = names.find(id); iter != names.end())
+			return std::ref(iter->second);
+		return std::nullopt;
+	}
+
 	Tileset Tileset::fromJSON(Identifier identifier, const nlohmann::json &json) {
 		Tileset tileset(identifier);
 		tileset.tileSize = json.at("tileSize");

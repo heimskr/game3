@@ -8,6 +8,7 @@
 #include "packet/CommandResultPacket.h"
 #include "packet/DestroyEntityPacket.h"
 #include "packet/DestroyTileEntityPacket.h"
+#include "packet/FluidUpdatePacket.h"
 #include "packet/InventoryPacket.h"
 #include "packet/TileEntityPacket.h"
 #include "packet/EntityMovedPacket.h"
@@ -92,6 +93,15 @@ namespace Game3 {
 
 	void ServerGame::broadcastTileUpdate(RealmID realm_id, Layer layer, const Position &position, TileID tile_id) {
 		const TileUpdatePacket packet(realm_id, layer, position, tile_id);
+		auto lock = lockPlayersShared();
+		for (const auto &player: players)
+			if (player->canSee(realm_id, position))
+				if (auto client = player->toServer()->weakClient.lock())
+					client->send(packet);
+	}
+
+	void ServerGame::broadcastFluidUpdate(RealmID realm_id, const Position &position, FluidTile tile) {
+		const FluidUpdatePacket packet(realm_id, position, tile);
 		auto lock = lockPlayersShared();
 		for (const auto &player: players)
 			if (player->canSee(realm_id, position))

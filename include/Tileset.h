@@ -48,6 +48,9 @@ namespace Game3 {
 			const TileID & operator[](const Identifier &) const;
 			const Identifier & operator[](TileID) const;
 
+			std::optional<TileID> maybe(const Identifier &) const;
+			std::optional<std::reference_wrapper<const Identifier>> maybe(TileID) const;
+
 			static Tileset fromJSON(Identifier, const nlohmann::json &);
 
 		private:

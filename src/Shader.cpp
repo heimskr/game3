@@ -2,6 +2,7 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Log.h"
 #include "Shader.h"
 #include "util/GL.h"
 #include "util/Util.h"
@@ -22,25 +23,29 @@ namespace Game3 {
 	static void check(int handle, bool is_link = false) {
 		int success;
 		char info[1024];
-		if (is_link)
-			glGetProgramiv(handle, GL_LINK_STATUS, &success);
-		else
-			glGetShaderiv(handle, GL_COMPILE_STATUS, &success);
+		if (is_link) {
+			glGetProgramiv(handle, GL_LINK_STATUS, &success); CHECKGL
+		} else {
+			glGetShaderiv(handle, GL_COMPILE_STATUS, &success); CHECKGL
+		}
 		if (!success) {
 			GLsizei len = 666;
-			if (is_link)
-				glGetProgramInfoLog(handle, GL_INFO_LOG_LENGTH, &len, info);
-			else
-				glGetShaderInfoLog(handle, 1024, &len, info);
+			if (is_link) {
+				glGetProgramInfoLog(handle, GL_INFO_LOG_LENGTH, &len, info); CHECKGL
+			} else {
+				glGetShaderInfoLog(handle, 1024, &len, info); CHECKGL
+			}
 			std::cerr << "Error with " << handle << " (l=" << len << "): " << info << '\n';
 		}
 	}
 
 	void Shader::init(std::string_view vertex, std::string_view fragment, std::string_view geometry) {
-		if (handle != 0)
-			glDeleteProgram(handle);
-
 		CHECKGL
+
+		if (handle != 0) {
+			glDeleteProgram(handle);
+			CHECKGL
+		}
 
 		const GLchar *vert_ptr = reinterpret_cast<const GLchar *>(vertex.begin());
 		const GLuint vert_handle = glCreateShader(GL_VERTEX_SHADER); CHECKGL

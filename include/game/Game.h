@@ -5,6 +5,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <random>
 #include <shared_mutex>
 #include <unordered_map>
@@ -28,6 +29,7 @@ namespace Game3 {
 	class Menu;
 	class Player;
 	class ServerGame;
+	class Tileset;
 	struct GhostDetails;
 	struct InteractionSet;
 	struct Plantable;
@@ -95,8 +97,11 @@ namespace Game3 {
 			double getMinute() const;
 			/** The value to divide the color values of the tilemap pixels by. Based on the time of day. */
 			double getDivisor() const;
+			std::optional<TileID> getFluidTileID(FluidID);
 
 			virtual Side getSide() const = 0;
+
+			inline void clearFluidCache() { fluidCache.clear(); }
 
 			using ServerArgument = std::variant<Canvas *, std::shared_ptr<LocalServer>>;
 
@@ -114,6 +119,9 @@ namespace Game3 {
 		protected:
 			Game() = default;
 			std::chrono::system_clock::time_point lastTime = startTime;
+
+		private:
+			std::unordered_map<FluidID, TileID> fluidCache;
 	};
 
 	void to_json(nlohmann::json &, const Game &);

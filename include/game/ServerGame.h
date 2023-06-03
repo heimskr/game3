@@ -2,6 +2,7 @@
 
 #include <mutex>
 
+#include "game/Fluids.h"
 #include "game/Game.h"
 #include "threading/MTQueue.h"
 
@@ -25,6 +26,7 @@ namespace Game3 {
 			void tick() override;
 			void garbageCollect();
 			void broadcastTileUpdate(RealmID, Layer, const Position &, TileID);
+			void broadcastFluidUpdate(RealmID, const Position &, FluidTile);
 			Side getSide() const override { return Side::Server; }
 			void queuePacket(std::shared_ptr<RemoteClient>, std::shared_ptr<Packet>);
 			void runCommand(RemoteClient &, const std::string &, GlobalID);

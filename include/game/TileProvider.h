@@ -155,6 +155,8 @@ namespace Game3 {
 				return findPathState(position.row, position.column, mode);
 			}
 
+			FluidTile & findFluid(const Position &position, FluidMode mode = FluidMode::Create);
+
 			const Chunk<TileID> & getTileChunk(Layer, ChunkPosition) const;
 			Chunk<TileID> & getTileChunk(Layer, ChunkPosition);
 

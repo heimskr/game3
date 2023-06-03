@@ -4,6 +4,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include "Tileset.h"
 #include "command/local/LocalCommandFactory.h"
 #include "command/local/LoginCommand.h"
 #include "command/local/RegisterCommand.h"
@@ -71,6 +72,7 @@
 #include "packet/TimePacket.h"
 #include "packet/CraftPacket.h"
 #include "packet/ContinuousInteractionPacket.h"
+#include "packet/FluidUpdatePacket.h"
 #include "realm/Cave.h"
 #include "realm/House.h"
 #include "realm/Keep.h"
@@ -318,6 +320,7 @@ namespace Game3 {
 		add(PacketFactory::create<TimePacket>());
 		add(PacketFactory::create<CraftPacket>());
 		add(PacketFactory::create<ContinuousInteractionPacket>());
+		add(PacketFactory::create<FluidUpdatePacket>());
 	}
 
 	void Game::addLocalCommandFactories() {
@@ -508,6 +511,22 @@ namespace Game3 {
 
 	double Game::getDivisor() const {
 		return 3. - 2. * sin(getHour() * 3.1415926 / 24.);
+	}
+
+	std::optional<TileID> Game::getFluidTileID(FluidID fluid_id) {
+		if (auto iter = fluidCache.find(fluid_id); iter != fluidCache.end())
+			return iter->second;
+
+		if (auto fluid = registry<FluidRegistry>().maybe(static_cast<size_t>(fluid_id))) {
+			if (auto tileset = registry<TilesetRegistry>().maybe(fluid->tilesetName)) {
+				if (auto fluid_tileid = tileset->maybe(fluid->tilename)) {
+					fluidCache.emplace(fluid_id, *fluid_tileid);
+					return *fluid_tileid;
+				}
+			}
+		}
+
+		return std::nullopt;
 	}
 
 	GamePtr Game::create(Side side, const ServerArgument &argument) {

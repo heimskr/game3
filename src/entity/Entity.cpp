@@ -367,7 +367,7 @@ namespace Game3 {
 		canvas.autofocusCounter = 0;
 		auto &tileset = realm->getTileset();
 		const auto texture = tileset.getTexture(realm->getGame());
-		// TODO!: fix
+		// TODO: fix
 		constexpr bool adjust = false; // Render-to-texture silliness
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
 		canvas.center.x() = -(getColumn() - map_length / 2.f + 0.5f) - offset.x();

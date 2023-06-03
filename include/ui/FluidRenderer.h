@@ -8,13 +8,12 @@
 #include "Types.h"
 #include "game/TileProvider.h"
 #include "ui/RectangleRenderer.h"
-#include "ui/Reshader.h"
 #include "util/GL.h"
 
 namespace Game3 {
 	class Realm;
 
-	class ElementBufferedRenderer {
+	class FluidRenderer {
 		public:
 			constexpr static float TEXTURE_SCALE = 2.f;
 			constexpr static float TILE_TEXTURE_PADDING = 1.f / 2048.f;
@@ -23,23 +22,19 @@ namespace Game3 {
 			bool isMissing = false;
 
 			Eigen::Vector2f center {0.f, 0.f};
-			std::shared_ptr<Tileset> tileset;
-			GL::Texture lightTexture;
 
-			ElementBufferedRenderer();
-			ElementBufferedRenderer(Realm &);
-			~ElementBufferedRenderer();
+			FluidRenderer();
+			FluidRenderer(Realm &);
+			~FluidRenderer();
 
 			void reset();
 			void init();
-			void setup(TileProvider &, Layer);
+			void setup(TileProvider &);
 			void render(float divisor, float scale, float center_x, float center_y);
-			void render(float divisor);
 			bool reupload();
 			bool onBackbufferResized(int width, int height);
-			void setChunk(TileProvider::TileChunk &, bool can_reupload = true);
+			void setChunk(TileProvider::FluidChunk &, bool can_reupload = true);
 			void setChunkPosition(const ChunkPosition &);
-			inline void markDirty() { dirty = true; }
 			inline void setRealm(Realm &new_realm) { realm = &new_realm; }
 
 			void snooze();
@@ -49,33 +44,19 @@ namespace Game3 {
 
 		private:
 			bool initialized = false;
-			/** Whether lighting needs to be recomputed. */
-			std::atomic_bool dirty = true;
-			Layer layer = Layer::Invalid;
-			Shader shader {"terrain"};
+			Shader shader {"fluids"};
 			GL::FloatVAO vao;
 			GL::VBO vbo;
 			GL::EBO ebo;
 			GL::FBO fbo;
-			GL::Texture blurredLightTexture;
-			std::vector<GLint> brightTiles;
-			std::unordered_set<TileID> brightSet;
-			RectangleRenderer rectangle;
-			Reshader reshader;
 			Realm *realm = nullptr;
-			TileProvider::TileChunk *chunk = nullptr;
+			TileProvider::FluidChunk *chunk = nullptr;
 			TileProvider *provider = nullptr;
-			std::vector<TileID> tileCache;
 			bool positionDirty = false;
 			ChunkPosition chunkPosition;
 
 			bool generateVertexBufferObject();
 			bool generateElementBufferObject();
 			bool generateVertexArrayObject();
-			bool generateLightingTexture();
-
-			void recomputeLighting();
-
-			static void check(int handle, bool is_link = false);
 	};
 }

@@ -21,6 +21,7 @@
 #include "threading/MTQueue.h"
 #include "tileentity/TileEntity.h"
 #include "ui/ElementBufferedRenderer.h"
+#include "ui/FluidRenderer.h"
 #include "ui/Modifiers.h"
 #include "util/GL.h"
 #include "util/RWLock.h"
@@ -62,6 +63,7 @@ namespace Game3 {
 			RealmType type;
 			TileProvider tileProvider;
 			std::optional<std::array<std::array<std::array<ElementBufferedRenderer, LAYER_COUNT>, REALM_DIAMETER>, REALM_DIAMETER>> renderers;
+			std::optional<std::array<std::array<FluidRenderer, REALM_DIAMETER>, REALM_DIAMETER>> fluidRenderers;
 			/** Governed by tileEntityMutex. */
 			std::unordered_map<Position, TileEntityPtr> tileEntities;
 			/** Governed by tileEntityMutex. */
@@ -102,9 +104,11 @@ namespace Game3 {
 			virtual void onBlur();
 			void createRenderers();
 			void render(int width, int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &, TextRenderer &, float game_time);
+			/** Reuploads terrain in all layers. */
 			void reupload();
-			/** The Layer argument is 1-based. */
+			/** Reuploads terrain in one layer. The layer argument is 1-based. */
 			void reupload(Layer);
+			void reuploadFluids();
 			EntityPtr addUnsafe(const EntityPtr &);
 			EntityPtr add(const EntityPtr &);
 			TileEntityPtr add(const TileEntityPtr &);
@@ -135,6 +139,8 @@ namespace Game3 {
 			void setTile(Layer, Index row, Index column, TileID, bool run_helper = true, bool generating = false);
 			void setTile(Layer, const Position &, TileID, bool run_helper = true, bool generating = false);
 			void setTile(Layer, const Position &, const Identifier &, bool run_helper = true, bool generating = false);
+			void setFluid(const Position &, FluidTile, bool run_helper = true, bool generating = false);
+			void setFluid(const Position &, const Identifier &, FluidLevel, bool run_helper = true, bool generating = false);
 			TileID getTile(Layer, Index row, Index column) const;
 			TileID getTile(Layer, const Position &) const;
 			std::optional<TileID> tryTile(Layer, const Position &) const;
