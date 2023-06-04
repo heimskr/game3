@@ -28,15 +28,11 @@ namespace Game3 {
 		static const Identifier shallow_water = "base:tile/shallow_water"_id;
 		static const Identifier sand          = "base:tile/sand"_id;
 		static const Identifier stone         = "base:tile/stone"_id;
+		static const Identifier water_fluid   = "base:fluid/water"_id;
 
-		if (noise < wetness) {
-			realm.setTile(Layer::Terrain, {row, column}, deeper_water, false, true);
-		} else if (noise < wetness + 0.1) {
-			realm.setTile(Layer::Terrain, {row, column}, deep_water, false, true);
-		} else if (noise < wetness + 0.2) {
-			realm.setTile(Layer::Terrain, {row, column}, water, false, true);
-		} else if (noise < wetness + 0.3) {
-			realm.setTile(Layer::Terrain, {row, column}, shallow_water, false, true);
+		if (noise < wetness + 0.3) {
+			realm.setTile(Layer::Terrain, {row, column}, sand, false, true);
+			realm.setFluid({row, column}, water_fluid, 65535, false, true);
 		} else if (noise < wetness + 0.4) {
 			realm.setTile(Layer::Terrain, {row, column}, sand, false, true);
 		} else if (stoneLevel < noise) {

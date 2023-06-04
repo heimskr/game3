@@ -14,7 +14,6 @@
 #define CHECKGL do { if (auto err = glGetError()) { std::cerr << "\e[31mError at " << __FILE__ << ':' << __LINE__ << ": " << gluErrorString(err) << "\e[39m\n"; } } while(0);
 // #define CHECKGL
 
-
 namespace GL {
 	// TODO: makeRGBTexture
 	// TODO: makeRGBATexture

@@ -32,15 +32,11 @@ namespace Game3 {
 		static const Identifier light_ice     = "base:tile/light_ice"_id;
 		static const Identifier snow          = "base:tile/snow"_id;
 		static const Identifier stone         = "base:tile/stone"_id;
+		static const Identifier water_fluid   = "base:fluid/water"_id;
 
-		if (noise < wetness) {
-			realm.setTile(Layer::Terrain, {row, column}, deeper_water, false, true);
-		} else if (noise < wetness + 0.1) {
-			realm.setTile(Layer::Terrain, {row, column}, deep_water, false, true);
-		} else if (noise < wetness + 0.2) {
-			realm.setTile(Layer::Terrain, {row, column}, water, false, true);
-		} else if (noise < wetness + 0.3) {
-			realm.setTile(Layer::Terrain, {row, column}, shallow_water, false, true);
+		if (noise < wetness + 0.3) {
+			realm.setTile(Layer::Terrain, {row, column}, sand, false, true);
+			realm.setFluid({row, column}, water_fluid, 65535, false, true);
 		} else if (noise < wetness + 0.39) {
 			realm.setTile(Layer::Terrain, {row, column}, sand, false, true);
 		} else if (noise < wetness + 0.42) {
@@ -75,10 +71,6 @@ namespace Game3 {
 			if (auto tile = realm.tileEntityAt({row, column}); tile && tile->is("base:te/tree"_id) && !std::dynamic_pointer_cast<Tree>(tile)->hasHive()) {
 				realm.removeSafe(tile);
 			}
-		}
-
-		if (row == -50 && column == -50) {
-			realm.setFluid({row, column}, "base:fluid/lava", 65535, false, true);
 		}
 	}
 }

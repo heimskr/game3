@@ -662,7 +662,6 @@ namespace Game3 {
 	}
 
 	void Realm::setFluid(const Position &position, FluidTile tile, bool run_helper, bool generating) {
-		// TODO!!!
 		tileProvider.findFluid(position) = tile;
 		if (isServer()) {
 			if (run_helper)
