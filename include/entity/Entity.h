@@ -166,6 +166,7 @@ namespace Game3 {
 			Game *game = nullptr;
 			std::shared_ptr<Texture> texture;
 			int variety = 0;
+			float renderHeight = 16.f;
 
 			Entity() = delete;
 			Entity(EntityType);

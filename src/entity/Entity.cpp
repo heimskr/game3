@@ -176,6 +176,11 @@ namespace Game3 {
 				break;
 		}
 
+		if (auto fluid_tile = getRealm()->tileProvider.copyFluidTile(position); fluid_tile && 0 < fluid_tile->level)
+			renderHeight = 10.f;
+		else
+			renderHeight = 16.f;
+
 		const auto x = position.column + offset.x();
 		const auto y = position.row    + offset.y();
 		RenderOptions main_options {
@@ -184,7 +189,7 @@ namespace Game3 {
 			.x_offset = x_offset,
 			.y_offset = y_offset,
 			.size_x = 16.f,
-			.size_y = 16.f,
+			.size_y = renderHeight,
 		};
 
 		if (!heldLeft && !heldRight) {
