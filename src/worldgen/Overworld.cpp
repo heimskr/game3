@@ -17,6 +17,8 @@
 #include "worldgen/Town.h"
 #include "worldgen/WorldGen.h"
 
+// #define GENERATE_RIVERS
+
 namespace Game3::WorldGen {
 	void generateOverworld(const std::shared_ptr<Realm> &realm, size_t noise_seed, const WorldGenParams &params, const ChunkRange &range, bool initial_generation) {
 		realm->markGenerated(range);
@@ -76,6 +78,11 @@ namespace Game3::WorldGen {
 		noise::module::Perlin perlin;
 		perlin.SetSeed(noise_seed);
 
+#ifdef GENERATE_RIVERS
+		noise::module::Perlin river_perlin;
+		river_perlin.SetSeed(-5 * noise_seed + 1);
+#endif
+
 		const GamePtr game_ptr = realm->getGame().shared_from_this();
 
 		for (int32_t y = range.topLeft.y; y <= range.bottomRight.y; ++y)
@@ -100,9 +107,21 @@ namespace Game3::WorldGen {
 					size_t noise_index = 0;
 
 					// Timer noise_timer("BiomeGeneration");
-					for (auto row = row_min; row < row_max; ++row)
-						for (auto column = col_min; column < col_max; ++column)
-							saved_noise[noise_index++] = get_biome(row, column).generate(row, column, threadContext.rng, perlin, params);
+					for (auto row = row_min; row < row_max; ++row) {
+						for (auto column = col_min; column < col_max; ++column) {
+							auto &biome = get_biome(row, column);
+							saved_noise[noise_index++] = biome.generate(row, column, threadContext.rng, perlin, params);
+#ifdef GENERATE_RIVERS
+							constexpr double river_zoom = 400.;
+							const auto river = river_perlin.GetValue(row / river_zoom, column / river_zoom, 0.5);
+							constexpr double range = 0.05;
+							constexpr double start = -range / 2;
+							if (start <= river && river <= start + range) {
+								realm->setFluid({row, column}, "base:fluid/water"_id, 65535, false, true);
+							}
+#endif
+						}
+					}
 					// noise_timer.stop();
 
 					// Timer resource_timer("Resources");
