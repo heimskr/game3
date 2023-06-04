@@ -11,7 +11,9 @@ namespace Game3 {
 	void RealmNoticePacket::handle(ClientGame &game) {
 		if (!game.realms.contains(realmID)) {
 			INFO("Adding realm " << realmID << " of type " << type << " with tileset " << tileset);
-			game.realms.emplace(realmID, Realm::create(game, realmID, type, tileset, seed));
+			auto realm = Realm::create(game, realmID, type, tileset, seed);
+			realm->outdoors = outdoors;
+			game.realms.emplace(realmID, realm);
 		}
 	}
 }
