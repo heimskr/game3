@@ -176,7 +176,9 @@ namespace Game3 {
 	}
 
 	bool ItemStack::hasDurability() const {
-		return data.contains("durability");
+		if (auto iter = data.find("durability"); iter != data.end())
+			return 0 <= iter->get<std::pair<double, double>>().second;
+		return false;
 	}
 
 	double ItemStack::getDurabilityFraction() const {

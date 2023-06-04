@@ -108,5 +108,6 @@
 	"base:item/brittlegill":     ["base:texture/mushrooms",    16,  16],
 	"base:item/indigo_milkcap":  ["base:texture/mushrooms",    80,  16],
 	"base:item/black_trumpet":   ["base:texture/mushrooms",    80,  80],
-	"base:item/grey_knight":     ["base:texture/mushrooms",     0,  32]
+	"base:item/grey_knight":     ["base:texture/mushrooms",     0,  32],
+	"base:item/wrench":          ["base:texture/custom",       16,   0]
 }]

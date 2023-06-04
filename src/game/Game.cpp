@@ -178,6 +178,7 @@ namespace Game3 {
 		add(std::make_shared<Tool>        ("base:item/diamond_axe",     "Diamond Axe",     900,  1.f, 512, "base:attribute/axe"_id));
 		add(std::make_shared<Pickaxe>     ("base:item/diamond_pickaxe", "Diamond Pickaxe", 900,  1.f, 512, "base:attribute/pickaxe"_id));
 		add(std::make_shared<Tool>        ("base:item/diamond_shovel",  "Diamond Shovel",  700,  1.f, 512, "base:attribute/shovel"_id));
+		add(std::make_shared<Tool>        ("base:item/wrench",          "Wrench",           72,  0.f,  -1, "base:attribute/wrench"_id));
 		add(std::make_shared<Landfill>    ("base:item/sand",            "Sand",              1, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/sand"));
 		add(std::make_shared<Landfill>    ("base:item/volcanic_sand",   "Volcanic Sand",     3, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/volcanic_sand"));
 		add(std::make_shared<Landfill>    ("base:item/clay",            "Clay",              2, 64, clayRequirement));
