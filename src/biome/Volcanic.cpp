@@ -23,9 +23,9 @@ namespace Game3 {
 		static const Identifier water         = "base:tile/water"_id;
 		static const Identifier shallow_water = "base:tile/shallow_water"_id;
 		static const Identifier volcanic_sand = "base:tile/volcanic_sand"_id;
-		static const Identifier lava          = "base:tile/lava"_id;
 		static const Identifier volcanic_rock = "base:tile/volcanic_rock"_id;
 		static const Identifier water_fluid   = "base:fluid/water"_id;
+		static const Identifier lava_fluid    = "base:fluid/lava"_id;
 
 		if (noise < wetness + 0.3) {
 			realm.setTile(Layer::Terrain, {row, column}, volcanic_sand, false, true);
@@ -33,7 +33,8 @@ namespace Game3 {
 		} else if (noise < wetness + 0.4) {
 			realm.setTile(Layer::Terrain, {row, column}, volcanic_sand, false, true);
 		} else if (0.85 < noise) {
-			realm.setTile(Layer::Terrain, {row, column}, lava, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, volcanic_rock, false, true);
+			realm.setFluid({row, column}, lava_fluid, 65535, false, true);
 		} else {
 			realm.setTile(Layer::Terrain, {row, column}, volcanic_rock, false, true);
 		}
