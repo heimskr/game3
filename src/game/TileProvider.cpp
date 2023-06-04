@@ -46,7 +46,8 @@ namespace Game3 {
 		for (Index row = range.rowMin(); row <= range.rowMax() - bottom_pad; ++row)
 			for (Index column = range.columnMin(); column < range.columnMax() - right_pad; ++column)
 				if (tileset->isLand(copyTileUnsafe(Layer::Terrain, row, column, was_empty, TileMode::Throw)))
-					land_tiles[i++] = {row, column};
+					if (auto fluid_tile = copyFluidTile(row, column); !fluid_tile || fluid_tile->level == 0)
+						land_tiles[i++] = {row, column};
 		return land_tiles;
 	}
 
