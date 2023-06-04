@@ -92,21 +92,11 @@ namespace Game3 {
 	}
 
 	void ServerGame::broadcastTileUpdate(RealmID realm_id, Layer layer, const Position &position, TileID tile_id) {
-		const TileUpdatePacket packet(realm_id, layer, position, tile_id);
-		auto lock = lockPlayersShared();
-		for (const auto &player: players)
-			if (player->canSee(realm_id, position))
-				if (auto client = player->toServer()->weakClient.lock())
-					client->send(packet);
+		broadcast({position, realms.at(realm_id), nullptr}, TileUpdatePacket(realm_id, layer, position, tile_id));
 	}
 
 	void ServerGame::broadcastFluidUpdate(RealmID realm_id, const Position &position, FluidTile tile) {
-		const FluidUpdatePacket packet(realm_id, position, tile);
-		auto lock = lockPlayersShared();
-		for (const auto &player: players)
-			if (player->canSee(realm_id, position))
-				if (auto client = player->toServer()->weakClient.lock())
-					client->send(packet);
+		broadcast({position, realms.at(realm_id), nullptr}, FluidUpdatePacket(realm_id, position, tile));
 	}
 
 	void ServerGame::queuePacket(std::shared_ptr<RemoteClient> client, std::shared_ptr<Packet> packet) {

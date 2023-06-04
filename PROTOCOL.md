@@ -189,11 +189,31 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	Continuous interaction starts if Modifiers is present, stops if not.
 
-33. **Fluid Update**: informs the client of the new fluid state for a single tile.
+33. **Fluid Update**: informs a client of the new fluid state for a single tile.
 
 	- `i32` Realm ID
 	- `{i64,i64}` Position
 	- `u32` Fluid ID and Level
+
+34. **Held Item Set**: tells a client that an entity's held item changed.
+
+	- `i32` Realm ID
+	- `u64` Entity Global ID
+	- `bool` Hand
+	- `i32` Slot
+
+	Hand is `true` for left, `false` for right.
+
+	A negative Slot value indicates that the entity is no longer holding an item in the specified hand.
+
+35. **Set Held Item**: tells the server to set the player's held item.
+
+	- `bool` Hand
+	- `i32` Slot
+
+	Hand is `true` for left, `false` for right.
+
+	A negative Slot value indicates that the player should no longer be holding an item in the specified hand.
 
 # Message Format
 

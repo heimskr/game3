@@ -5,6 +5,7 @@
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "item/Tool.h"
+#include "packet/SetHeldItemPacket.h"
 #include "ui/MainWindow.h"
 #include "ui/gtk/EntryDialog.h"
 #include "ui/gtk/NumericEntry.h"
@@ -36,12 +37,12 @@ namespace Game3 {
 		auto group = Gio::SimpleActionGroup::create();
 		group->add_action("hold_left", [this] {
 			if (!lastExternal)
-				lastGame->player->setHeldLeft(lastSlot);
+				lastGame->player->send(SetHeldItemPacket(true, lastSlot));
 		});
 
 		group->add_action("hold_right", [this] {
 			if (!lastExternal)
-				lastGame->player->setHeldRight(lastSlot);
+				lastGame->player->send(SetHeldItemPacket(false, lastSlot));
 		});
 
 		group->add_action("drop", [this] {

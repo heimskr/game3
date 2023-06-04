@@ -2,8 +2,10 @@
 
 #include <mutex>
 
+#include "entity/ServerPlayer.h"
 #include "game/Fluids.h"
 #include "game/Game.h"
+#include "net/RemoteClient.h"
 #include "threading/MTQueue.h"
 
 namespace Game3 {
@@ -39,6 +41,15 @@ namespace Game3 {
 
 			inline auto lockPlayersShared() { return std::shared_lock(playersMutex); }
 			inline auto lockPlayersUnique() { return std::unique_lock(playersMutex); }
+
+			template <typename P>
+			void broadcast(const Place &place, const P &packet) {
+				auto lock = lockPlayersShared();
+				for (const auto &player: players)
+					if (player->canSee(place.realm->id, place.position))
+						if (auto client = player->toServer()->weakClient.lock())
+							client->send(packet);
+			}
 
 		private:
 			std::shared_mutex playersMutex;

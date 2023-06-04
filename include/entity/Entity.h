@@ -186,11 +186,14 @@ namespace Game3 {
 				std::shared_ptr<Texture> texture;
 				float xOffset = 0.f;
 				float yOffset = 0.f;
+				bool isLeft;
+				Held() = delete;
+				Held(bool is_left): isLeft(is_left) {}
 				inline explicit operator bool() const { return texture != nullptr; }
 			};
 
-			Held heldLeft;
-			Held heldRight;
+			Held heldLeft  {true};
+			Held heldRight {false};
 			/** The set of all players who have been sent a packet about the entity's current path. Governed by pathSeersMutex */
 			WeakSet<Player> pathSeers;
 

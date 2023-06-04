@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Position.h"
+#include "game/Fluids.h"
 #include "net/Buffer.h"
 #include "packet/Packet.h"
 
@@ -8,9 +9,9 @@ namespace Game3 {
 	struct FluidUpdatePacket: Packet {
 		static PacketID ID() { return 33; }
 
-		RealmID realmID;
+		RealmID realmID = -1;
 		Position position;
-		FluidTile fluidTile;
+		FluidTile fluidTile {0, 0};
 
 		FluidUpdatePacket() = default;
 		FluidUpdatePacket(RealmID realm_id, const Position &position_, FluidTile fluid_tile):

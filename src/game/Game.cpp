@@ -73,6 +73,8 @@
 #include "packet/CraftPacket.h"
 #include "packet/ContinuousInteractionPacket.h"
 #include "packet/FluidUpdatePacket.h"
+#include "packet/HeldItemSetPacket.h"
+#include "packet/SetHeldItemPacket.h"
 #include "realm/Cave.h"
 #include "realm/House.h"
 #include "realm/Keep.h"
@@ -321,6 +323,8 @@ namespace Game3 {
 		add(PacketFactory::create<CraftPacket>());
 		add(PacketFactory::create<ContinuousInteractionPacket>());
 		add(PacketFactory::create<FluidUpdatePacket>());
+		add(PacketFactory::create<HeldItemSetPacket>());
+		add(PacketFactory::create<SetHeldItemPacket>());
 	}
 
 	void Game::addLocalCommandFactories() {

@@ -16,6 +16,7 @@
 #include "net/RemoteClient.h"
 #include "packet/EntityPacket.h"
 #include "packet/EntitySetPathPacket.h"
+#include "packet/HeldItemSetPacket.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
 #include "ui/Canvas.h"
@@ -720,9 +721,15 @@ namespace Game3 {
 	}
 
 	void Entity::setHeld(Slot new_value, Held &held) {
+		const bool is_client = getSide() == Side::Client;
+
+		if (!is_client)
+			getGame().toServer().broadcast({position, getRealm(), nullptr}, HeldItemSetPacket(getRealm()->id, getGID(), held.isLeft, new_value));
+
 		if (new_value < 0) {
 			held.slot = -1;
-			held.texture.reset();
+			if (is_client)
+				held.texture.reset();
 			return;
 		}
 
