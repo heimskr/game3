@@ -277,8 +277,9 @@ namespace Game3 {
 		}
 	}
 
-	void InventoryTab::setExternalInventory(const Glib::ustring &name, const std::shared_ptr<Inventory> &inventory) {
+	void InventoryTab::setExternalInventory(const Glib::ustring &name, const std::shared_ptr<Inventory> &inventory, const std::shared_ptr<Agent> &agent) {
 		externalInventory = inventory;
+		externalAgent = agent;
 		externalName = name;
 		if (inventory)
 			if (auto owner = inventory->weakOwner.lock())

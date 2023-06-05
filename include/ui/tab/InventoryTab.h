@@ -9,6 +9,7 @@ namespace Game3 {
 	class ClientGame;
 	class Inventory;
 	class MainWindow;
+	class TileEntity;
 
 	class InventoryTab: public Tab {
 		public:
@@ -32,7 +33,7 @@ namespace Game3 {
 			void onResize(const std::shared_ptr<ClientGame> &) override;
 			void update(const std::shared_ptr<ClientGame> &) override;
 			void reset(const std::shared_ptr<ClientGame> &) override;
-			void setExternalInventory(const Glib::ustring &name, const std::shared_ptr<Inventory> &);
+			void setExternalInventory(const Glib::ustring &name, const std::shared_ptr<Inventory> &, const std::shared_ptr<Agent> &);
 			void resetExternalInventory();
 			std::shared_ptr<Inventory> getExternalInventory() const { return externalInventory; }
 
@@ -48,6 +49,7 @@ namespace Game3 {
 			std::vector<std::unique_ptr<Gtk::Widget>> externalWidgets;
 			int lastGridWidth = 0;
 			std::shared_ptr<Inventory> externalInventory;
+			std::weak_ptr<Agent> externalAgent;
 			Glib::ustring externalName;
 			std::unordered_map<Gtk::Widget *, std::pair<Slot, bool>> widgetMap;
 			std::unordered_map<Slot, Gtk::Widget *> playerWidgetsBySlot;

@@ -124,6 +124,7 @@ namespace Game3 {
 			void setHeldLeft(Slot);
 			void setHeldRight(Slot);
 			Side getSide() const override final;
+			Type getAgentType() const override final { return Agent::Type::Entity; }
 			ChunkPosition getChunk() const;
 			bool canSee(RealmID, const Position &) const;
 			bool canSee(const Entity &) const;

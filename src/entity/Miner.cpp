@@ -68,7 +68,7 @@ namespace Game3 {
 				tab.resetExternalInventory();
 				return true;
 			});
-			tab.setExternalInventory("Miner", inventory);
+			tab.setExternalInventory("Miner", inventory, shared_from_this());
 		}
 
 		return true;

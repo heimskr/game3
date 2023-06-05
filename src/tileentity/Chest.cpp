@@ -32,7 +32,7 @@ namespace Game3 {
 				tab.resetExternalInventory();
 				return true;
 			});
-			tab.setExternalInventory(name, inventory);
+			tab.setExternalInventory(name, inventory, shared_from_this());
 		}
 
 		return true;
