@@ -148,7 +148,7 @@ namespace Game3 {
 		else
 			inventory->weakOwner = shared_from_this();
 
-		movedToNewChunk();
+		movedToNewChunk(std::nullopt);
 	}
 
 	void Entity::render(SpriteRenderer &sprite_renderer, TextRenderer &) {
@@ -385,7 +385,8 @@ namespace Game3 {
 	}
 
 	void Entity::teleport(const Position &new_position, bool from_path, bool clear_offset) {
-		const bool in_different_chunk = getChunkPosition(position) != getChunkPosition(new_position);
+		const auto old_chunk_position = getChunkPosition(position);
+		const bool in_different_chunk = old_chunk_position != getChunkPosition(new_position);
 
 		position = new_position;
 
@@ -396,7 +397,7 @@ namespace Game3 {
 		getRealm()->onMoved(shared, new_position);
 
 		if (in_different_chunk)
-			movedToNewChunk();
+			movedToNewChunk(old_chunk_position);
 
 		for (auto iter = moveQueue.begin(); iter != moveQueue.end();) {
 			if ((*iter)(shared))
@@ -563,7 +564,7 @@ namespace Game3 {
 		return canSee(tile_entity.realmID, tile_entity.getPosition());
 	}
 
-	void Entity::movedToNewChunk() {
+	void Entity::movedToNewChunk(const std::optional<ChunkPosition> &) {
 		if (getSide() != Side::Server)
 			return;
 

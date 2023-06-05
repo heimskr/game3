@@ -7,7 +7,7 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "realm/house"}; }
 
-			void generateChunk(const ChunkPosition &) override {}
+			void generateChunk(const ChunkPosition &chunk_position) override { tileProvider.updateChunk(chunk_position); }
 
 		protected:
 			using Realm::Realm;

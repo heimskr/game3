@@ -1,5 +1,7 @@
 #pragma once
 
+#include <set>
+
 #include "game/ChunkPosition.h"
 #include "packet/Packet.h"
 
@@ -8,11 +10,12 @@ namespace Game3 {
 		static PacketID ID() { return 3; }
 
 		RealmID realmID;
-		std::set<ChunkPosition> chunkPositions;
+		std::set<ChunkRequest> requests;
 
 		ChunkRequestPacket() = default;
-		ChunkRequestPacket(RealmID realm_id, std::set<ChunkPosition> chunk_positions):
-			realmID(realm_id), chunkPositions(std::move(chunk_positions)) {}
+		ChunkRequestPacket(RealmID realm_id, std::set<ChunkRequest> requests_):
+			realmID(realm_id), requests(std::move(requests_)) {}
+		ChunkRequestPacket(Realm &, const std::set<ChunkPosition> &);
 
 		PacketID getID() const override { return ID(); }
 

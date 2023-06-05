@@ -88,8 +88,12 @@ namespace Game3 {
 		send(send_buffer.str());
 	}
 
-	void RemoteClient::sendChunk(Realm &realm, ChunkPosition chunk_position, bool can_request) {
+	void RemoteClient::sendChunk(Realm &realm, ChunkPosition chunk_position, bool can_request, uint64_t counter_threshold) {
 		assert(server.game);
+
+		if (counter_threshold != 0 && realm.tileProvider.contains(chunk_position) && realm.tileProvider.getUpdateCounter(chunk_position) < counter_threshold)
+			return;
+
 		try {
 			send(ChunkTilesPacket(realm, chunk_position));
 		} catch (const std::out_of_range &) {

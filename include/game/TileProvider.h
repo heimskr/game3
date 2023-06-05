@@ -23,6 +23,10 @@ namespace Game3 {
 	template <typename T>
 	using Chunk = Lockable<std::vector<T>>;
 
+	struct ChunkMeta {
+		uint64_t updateCount = 0;
+	};
+
 	class TileProvider {
 		public:
 			using TileChunk  = Chunk<TileID>;
@@ -34,6 +38,7 @@ namespace Game3 {
 			using BiomeMap = std::unordered_map<ChunkPosition, BiomeChunk>;
 			using PathMap  = std::unordered_map<ChunkPosition, PathChunk>;
 			using FluidMap = std::unordered_map<ChunkPosition, FluidChunk>;
+			using MetaMap  = std::unordered_map<ChunkPosition, ChunkMeta>;
 
 			/** Behavior when accessing a tile in an out-of-bounds chunk.
 			 *  The Create mode will cause a nonexistent chunk to be created on access. */
@@ -53,12 +58,18 @@ namespace Game3 {
 			std::shared_mutex biomeMutex;
 			std::shared_mutex pathMutex;
 			std::shared_mutex fluidMutex;
+			std::shared_mutex metaMutex;
 
 			TileProvider() = default;
 			TileProvider(Identifier tileset_id);
 
 			void clear();
 			bool contains(ChunkPosition) const;
+
+			uint64_t updateChunk(ChunkPosition);
+			/** If the chunk position isn't present in the meta map, this returns 0 without adding the chunk position to the meta map. */
+			uint64_t getUpdateCounter(ChunkPosition);
+			void setUpdateCounter(ChunkPosition, uint64_t);
 
 			std::shared_ptr<Tileset> getTileset(const Game &);
 
@@ -222,6 +233,7 @@ namespace Game3 {
 
 		private:
 			std::shared_ptr<Tileset> cachedTileset;
+			MetaMap metaMap;
 
 			void validateLayer(Layer) const;
 			void initTileChunk(Layer, Chunk<TileID> &, ChunkPosition);

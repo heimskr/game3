@@ -28,6 +28,8 @@ namespace Game3 {
 
 		explicit operator uint32_t() const;
 		explicit operator std::string() const;
+
+		auto operator<=>(const FluidTile &) const = default;
 	};
 
 	std::ostream & operator<<(std::ostream &, const FluidTile &);

@@ -4,6 +4,7 @@
 #include <list>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <shared_mutex>
 #include <string>
 #include <unordered_map>
@@ -129,7 +130,7 @@ namespace Game3 {
 			bool canSee(RealmID, const Position &) const;
 			bool canSee(const Entity &) const;
 			bool canSee(const TileEntity &) const;
-			virtual void movedToNewChunk();
+			virtual void movedToNewChunk(const std::optional<ChunkPosition> &);
 			bool hasSeenPath(const PlayerPtr &);
 			void setSeenPath(const PlayerPtr &, bool seen = true);
 			bool removeVisible(const std::weak_ptr<Entity> &);

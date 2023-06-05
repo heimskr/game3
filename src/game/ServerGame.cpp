@@ -227,6 +227,7 @@ namespace Game3 {
 			} else if (first == "go") {
 				if (words.size() != 3)
 					return {false, "Invalid number of arguments."};
+
 				Index row = 0;
 				Index column = 0;
 				try {
@@ -238,6 +239,10 @@ namespace Game3 {
 
 				player->teleport(Position(row, column));
 				return {true, "Teleported to " + static_cast<std::string>(Position(row, column))};
+			} else if (first == "counter") {
+				const auto chunk = player->getChunk();
+				const auto counter = player->getRealm()->tileProvider.getUpdateCounter(chunk);
+				return {true, "Counter for chunk " + static_cast<std::string>(chunk) + ": " + std::to_string(counter)};
 			}
 		} catch (const std::exception &err) {
 			return {false, err.what()};

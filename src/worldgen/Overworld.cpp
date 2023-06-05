@@ -251,6 +251,10 @@ namespace Game3::WorldGen {
 
 		postgen_timer.stop();
 
+		range.iterate([&](ChunkPosition chunk_position) {
+			provider.updateChunk(chunk_position);
+		});
+
 		if (initial_generation) {
 			std::dynamic_pointer_cast<Overworld>(realm)->worldgenParams = params;
 			Timer pathmap_timer("RemakePathmap");

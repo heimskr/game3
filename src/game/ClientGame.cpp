@@ -145,7 +145,7 @@ namespace Game3 {
 			if (missingChunks.empty()) {
 				missingChunks = realm->getMissingChunks();
 				if (!missingChunks.empty())
-					client->send(ChunkRequestPacket(realm->id, missingChunks));
+					client->send(ChunkRequestPacket(*realm, missingChunks));
 			}
 		} else {
 			WARN("No realm");

@@ -20,9 +20,9 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 3. **Chunk Request**: asks the server to send Chunk Tiles packets for a given list of chunks.
 
 	- `i32` Realm ID
-	- `i32[]` Chunk Positions
+	- `u32[4n]` Chunk Positions
 
-	The chunk positions will be sent as interlaced (x, y) pairs.
+	The chunk positions will be sent as sequential `(u32(x), u32(y), low32(nextCounter), high32(nextCounter))` tuples. Probably best to see the implementation in src/packets/ChunkRequestPacket.cpp.
 
 4. **Tile Update**: informs the client of the new tile ID for a single tile.
 
@@ -51,6 +51,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `i32` Realm ID
 	- `{i32,i32}` Chunk Position
+	- `u64` Update Counter
 	- `i16[3*64**2]` Tile IDs (layer 1, then 2, then 3)
 
 	<!-- TODO: compression -->

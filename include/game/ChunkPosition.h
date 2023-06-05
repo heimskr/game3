@@ -34,6 +34,16 @@ namespace Game3 {
 	Buffer & operator<<(Buffer &, const ChunkPosition &);
 	Buffer & operator>>(Buffer &, ChunkPosition &);
 
+	struct ChunkRequest {
+		ChunkPosition position;
+		uint64_t counterThreshold;
+
+		ChunkRequest(ChunkPosition position_, uint64_t counter_threshold = 0):
+			position(position_), counterThreshold(counter_threshold) {}
+
+		auto operator<=>(const ChunkRequest &) const = default;
+	};
+
 	void from_json(const nlohmann::json &, ChunkPosition &);
 	void to_json(nlohmann::json &, const ChunkPosition &);
 
@@ -54,10 +64,14 @@ namespace Game3 {
 		/** Compare with <=, not <. */
 		inline Index columnMax() const { return (bottomRight.x + 1) * CHUNK_SIZE - 1; }
 
+		inline bool contains(ChunkPosition chunk_position) const {
+			return topLeft.x <= chunk_position.x && chunk_position.x <= bottomRight.x && topLeft.y <= chunk_position.y && chunk_position.y <= bottomRight.y;
+		}
+
 		auto operator<=>(const ChunkRange &) const = default;
 
 		template <typename Fn>
-		void iterate(const Fn &fn) {
+		void iterate(const Fn &fn) const {
 			for (auto y = topLeft.y; y <= bottomRight.y; ++y)
 				for (auto x = topLeft.x; x <= bottomRight.x; ++x)
 					fn(ChunkPosition{x, y});

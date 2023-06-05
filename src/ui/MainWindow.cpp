@@ -640,6 +640,7 @@ namespace Game3 {
 					std::cout << "Realm ID: " << game->player->getRealm()->id << " or perhaps " << game->activeRealm->id << '\n';
 					std::cout << "Position: " << game->player->getPosition() << '\n';
 					std::cout << "Chunk position: " << std::string(getChunkPosition(game->player->getPosition())) << '\n';
+					std::cout << "Update counter: " << game->player->getRealm()->tileProvider.getUpdateCounter(getChunkPosition(game->player->getPosition())) << '\n';
 					return;
 				}
 				case GDK_KEY_0: case GDK_KEY_1: case GDK_KEY_2: case GDK_KEY_3: case GDK_KEY_4:

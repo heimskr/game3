@@ -6,8 +6,8 @@
 #include "realm/Realm.h"
 
 namespace Game3 {
-	ChunkTilesPacket::ChunkTilesPacket(const Realm &realm, ChunkPosition chunk_position):
-	realmID(realm.id), chunkPosition(chunk_position) {
+	ChunkTilesPacket::ChunkTilesPacket(const Realm &realm, ChunkPosition chunk_position, uint64_t update_counter):
+	realmID(realm.id), chunkPosition(chunk_position), updateCounter(update_counter) {
 		tiles.reserve(CHUNK_SIZE * CHUNK_SIZE * LAYER_COUNT);
 		for (const auto layer: allLayers) {
 			auto &layer_tiles = realm.tileProvider.getTileChunk(layer, chunk_position);
@@ -19,6 +19,11 @@ namespace Game3 {
 		auto lock = const_cast<Chunk<FluidTile> &>(fluid_chunk).sharedLock();
 		fluids = fluid_chunk;
 	}
+
+	ChunkTilesPacket::ChunkTilesPacket(Realm &realm, ChunkPosition chunk_position): ChunkTilesPacket(realm, chunk_position, 0) {
+		updateCounter = realm.tileProvider.getUpdateCounter(chunk_position);
+	}
+
 
 	void ChunkTilesPacket::handle(ClientGame &game) {
 		if (tiles.size() != CHUNK_SIZE * CHUNK_SIZE * LAYER_COUNT)
@@ -36,6 +41,8 @@ namespace Game3 {
 		}
 
 		provider.getFluidChunk(chunkPosition) = fluids;
+
+		provider.setUpdateCounter(chunkPosition, updateCounter);
 
 		game.chunkReceived(chunkPosition);
 		realm->reupload();

@@ -648,12 +648,19 @@ namespace Game3 {
 	}
 
 	void Realm::setTile(Layer layer, const Position &position, TileID tile_id, bool run_helper, bool generating) {
-		tileProvider.findTile(layer, position.row, position.column, TileProvider::TileMode::Create) = tile_id;
+		auto &tile = tileProvider.findTile(layer, position.row, position.column, TileProvider::TileMode::Create);
+		if (tile == tile_id)
+			return;
+
+		tile = tile_id;
+
 		if (isServer()) {
 			if (run_helper)
 				setLayerHelper(position.row, position.column);
-			if (!generating)
+			if (!generating) {
+				tileProvider.updateChunk(getChunkPosition(position));
 				getGame().toServer().broadcastTileUpdate(id, layer, position, tile_id);
+			}
 		}
 	}
 
@@ -662,12 +669,19 @@ namespace Game3 {
 	}
 
 	void Realm::setFluid(const Position &position, FluidTile tile, bool run_helper, bool generating) {
-		tileProvider.findFluid(position) = tile;
+		auto &fluid = tileProvider.findFluid(position);
+		if (fluid == tile)
+			return;
+
+		fluid = tile;
 		if (isServer()) {
 			if (run_helper)
 				setLayerHelper(position.row, position.column);
-			if (!generating)
+
+			if (!generating) {
+				tileProvider.updateChunk(getChunkPosition(position));
 				getGame().toServer().broadcastFluidUpdate(id, position, tile);
+			}
 		}
 	}
 

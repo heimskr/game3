@@ -11,6 +11,7 @@
 #include "net/Buffer.h"
 #include "net/LocalClient.h"
 #include "net/RemoteClient.h"
+#include "packet/ChunkRequestPacket.h"
 #include "packet/EntitySetPathPacket.h"
 #include "packet/RealmNoticePacket.h"
 #include "packet/StartPlayerMovementPacket.h"
@@ -265,34 +266,59 @@ namespace Game3 {
 			getGame().toClient().client->send(StopPlayerMovementPacket(direction));
 	}
 
-	void Player::movedToNewChunk() {
-		if (getSide() != Side::Server)
-			return;
+	void Player::movedToNewChunk(const std::optional<ChunkPosition> &old_position) {
+		if (getSide() == Side::Client) {
+			if (auto realm = weakRealm.lock()) {
+				std::set<ChunkPosition> requests;
 
-		{
-			auto shared = getShared();
-			auto lock = lockVisibleEntitiesShared();
-			for (const auto &weak_visible: visibleEntities) {
-				if (auto visible = weak_visible.lock()) {
-					if (!visible->path.empty() && visible->hasSeenPath(shared)) {
-						// INFO("Late sending EntitySetPathPacket (Player)");
-						toServer()->ensureEntity(visible);
-						send(EntitySetPathPacket(*visible));
-						visible->setSeenPath(shared);
-					}
+				if (old_position) {
+					const ChunkRange old_range(*old_position);
+					ChunkRange(getChunk()).iterate([&](ChunkPosition chunk_position) {
+						if (!old_range.contains(chunk_position)) {
+							INFO("Going to request chunk " << chunk_position);
+							requests.insert(chunk_position);
+						}
+					});
+				} else {
+					ChunkRange(getChunk()).iterate([&](ChunkPosition chunk_position) {
+						requests.insert(chunk_position);
+					});
+				}
 
-					if (!canSee(*visible)) {
-						auto visible_lock = visible->lockVisibleEntities();
-						visible->visiblePlayers.erase(shared);
-						visible->visibleEntities.erase(shared);
+				if (!requests.empty()) {
+					auto realm = getRealm();
+					send(ChunkRequestPacket(*realm, requests));
+				}
+			}
+
+			Entity::movedToNewChunk(old_position);
+		} else {
+			{
+				auto shared = getShared();
+				auto lock = lockVisibleEntitiesShared();
+				for (const auto &weak_visible: visibleEntities) {
+					if (auto visible = weak_visible.lock()) {
+						if (!visible->path.empty() && visible->hasSeenPath(shared)) {
+							// INFO("Late sending EntitySetPathPacket (Player)");
+							toServer()->ensureEntity(visible);
+							send(EntitySetPathPacket(*visible));
+							visible->setSeenPath(shared);
+						}
+
+						if (!canSee(*visible)) {
+							auto visible_lock = visible->lockVisibleEntities();
+							visible->visiblePlayers.erase(shared);
+							visible->visibleEntities.erase(shared);
+						}
 					}
 				}
 			}
+
+			Entity::movedToNewChunk(old_position);
+
+			getRealm()->recalculateVisibleChunks();
 		}
 
-		Entity::movedToNewChunk();
-
-		getRealm()->recalculateVisibleChunks();
 	}
 
 	bool Player::send(const Packet &packet) {

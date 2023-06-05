@@ -23,6 +23,23 @@ namespace Game3 {
 		return true;
 	}
 
+	uint64_t TileProvider::updateChunk(ChunkPosition chunk_position) {
+		std::unique_lock meta_lock(metaMutex);
+		return ++metaMap[chunk_position].updateCount;
+	}
+
+	uint64_t TileProvider::getUpdateCounter(ChunkPosition chunk_position) {
+		std::shared_lock shared_lock(metaMutex);
+		if (auto iter = metaMap.find(chunk_position); iter != metaMap.end())
+			return iter->second.updateCount;
+		return 0;
+	}
+
+	void TileProvider::setUpdateCounter(ChunkPosition chunk_position, uint64_t counter) {
+		std::unique_lock meta_lock(metaMutex);
+		metaMap[chunk_position].updateCount = counter;
+	}
+
 	std::shared_ptr<Tileset> TileProvider::getTileset(const Game &game) {
 		if (cachedTileset)
 			return cachedTileset;

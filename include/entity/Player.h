@@ -66,7 +66,7 @@ namespace Game3 {
 			void startMoving(Direction);
 			void stopMoving();
 			void stopMoving(Direction);
-			void movedToNewChunk() override;
+			void movedToNewChunk(const std::optional<ChunkPosition> &) override;
 			bool send(const Packet &);
 			std::shared_ptr<Player> getShared();
 			std::shared_ptr<ClientPlayer> toClient();
