@@ -9,7 +9,6 @@
 namespace Game3 {
 	class ClientPlayer;
 	class Packet;
-	class RemoteClient;
 	class ServerPlayer;
 	class TileEntity;
 

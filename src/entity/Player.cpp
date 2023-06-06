@@ -293,8 +293,9 @@ namespace Game3 {
 
 			Entity::movedToNewChunk(old_position);
 		} else {
+			auto shared = getShared();
+
 			{
-				auto shared = getShared();
 				auto lock = lockVisibleEntitiesShared();
 				for (const auto &weak_visible: visibleEntities) {
 					if (auto visible = weak_visible.lock()) {
@@ -314,9 +315,32 @@ namespace Game3 {
 				}
 			}
 
-			Entity::movedToNewChunk(old_position);
+			if (auto realm = weakRealm.lock()) {
+				if (const auto client_ptr = toServer()->weakClient.lock()) {
+					const auto chunk = getChunk();
+					auto &client = *client_ptr;
 
-			getRealm()->recalculateVisibleChunks();
+					if (auto tile_entities = realm->getTileEntities(chunk)) {
+						auto lock = tile_entities->sharedLock();
+						for (const auto &tile_entity: *tile_entities)
+							if (!tile_entity->hasBeenSentTo(shared))
+								tile_entity->sendTo(client);
+					}
+
+					if (auto entities = realm->getEntities(chunk)) {
+						auto lock = entities->sharedLock();
+						for (const auto &entity: *entities)
+							if (!entity->hasBeenSentTo(shared))
+								entity->sendTo(client);
+					}
+				}
+
+				Entity::movedToNewChunk(old_position);
+
+				realm->recalculateVisibleChunks();
+			} else {
+				Entity::movedToNewChunk(old_position);
+			}
 		}
 
 	}
