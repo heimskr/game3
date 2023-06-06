@@ -26,7 +26,7 @@
 #include "util/GL.h"
 #include "util/RWLock.h"
 #include "util/SharedRecursiveMutex.h"
-#include "util/WeakCompare.h"
+#include "util/WeakSet.h"
 
 namespace Game3 {
 	constexpr int64_t REALM_DIAMETER = 3;

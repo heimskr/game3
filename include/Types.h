@@ -8,25 +8,26 @@
 #include "registry/Registerable.h"
 
 namespace Game3 {
-	using Index        =  int64_t;
-	using TileID       = uint16_t;
-	using PlayerID     =  int32_t;
-	using RealmID      =  int32_t;
-	using Slot         =  int32_t;
-	using ItemCount    = uint64_t;
-	using MoneyCount   = uint64_t;
-	using Phase        =  uint8_t;
-	using Durability   =  int32_t;
-	using BiomeType    = uint32_t;
+	using Index         =  int64_t;
+	using TileID        = uint16_t;
+	using PlayerID      =  int32_t;
+	using RealmID       =  int32_t;
+	using Slot          =  int32_t;
+	using ItemCount     = uint64_t;
+	using MoneyCount    = uint64_t;
+	using Phase         =  uint8_t;
+	using Durability    =  int32_t;
+	using BiomeType     = uint32_t;
 	/** Number of quarter-hearts. */
-	using HitPoints    = uint32_t;
+	using HitPoints     = uint32_t;
 	/** 1-based. */
-	using PacketID     = uint16_t;
-	using Version      = uint32_t;
-	using GlobalID     = uint64_t;
-	using Token        = uint64_t;
-	using FluidLevel   = uint16_t;
-	using FluidID      = uint16_t;
+	using PacketID      = uint16_t;
+	using Version       = uint32_t;
+	using GlobalID      = uint64_t;
+	using Token         = uint64_t;
+	using FluidLevel    = uint16_t;
+	using FluidID       = uint16_t;
+	using UpdateCounter = uint64_t;
 
 	using ItemID     = Identifier;
 	using EntityType = Identifier;

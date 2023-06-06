@@ -23,4 +23,14 @@ namespace Game3 {
 		std::unique_lock lock(agent_rng_mutex);
 		return static_cast<GlobalID>(agent_rng());
 	}
+
+	bool Agent::hasBeenSentTo(const std::shared_ptr<Player> &player) {
+		auto lock = sentTo.sharedLock();
+		return sentTo.contains(player);
+	}
+
+	void Agent::onSend(const std::shared_ptr<Player> &player) {
+		auto lock = sentTo.uniqueLock();
+		sentTo.emplace(player);
+	}
 }

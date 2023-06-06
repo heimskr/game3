@@ -450,7 +450,7 @@ namespace Game3 {
 			const auto compressed = item.at(1).get<std::vector<uint8_t>>();
 			const auto decompressed = decompress32(std::span(compressed.data(), compressed.size()));
 			auto &chunk = provider.fluidMap[ChunkPosition{x, y}];
-			chunk = {};
+			chunk.clear();
 			chunk.reserve(decompressed.size());
 			for (const auto tile: decompressed)
 				chunk.emplace_back((tile & 0xff) | ((tile >> 8) & 0xff), ((tile >> 16) & 0xff) | ((tile >> 24) & 0xff));

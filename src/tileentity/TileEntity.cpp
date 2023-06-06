@@ -76,6 +76,7 @@ namespace Game3 {
 
 	void TileEntity::sendTo(RemoteClient &client) {
 		client.send(TileEntityPacket(shared_from_this()));
+		onSend(client.getPlayer());
 	}
 
 	void TileEntity::absorbJSON(Game &, const nlohmann::json &json) {

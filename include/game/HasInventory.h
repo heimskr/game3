@@ -3,10 +3,10 @@
 #include <memory>
 
 namespace Game3 {
+	class Agent;
 	class Buffer;
 	class Game;
 	class Inventory;
-	struct Agent;
 
 	struct HasInventory {
 		HasInventory(const std::shared_ptr<Inventory> &inventory_ = nullptr):
@@ -16,6 +16,8 @@ namespace Game3 {
 
 		void encode(Buffer &);
 		void decode(Buffer &);
+
+		virtual void inventoryUpdated() {}
 
 		protected:
 			virtual std::shared_ptr<Agent> getSharedAgent() = 0;

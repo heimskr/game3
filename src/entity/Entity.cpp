@@ -327,12 +327,14 @@ namespace Game3 {
 	Entity & Entity::setRealm(const Game &game, RealmID realm_id) {
 		weakRealm = game.realms.at(realm_id);
 		realmID = realm_id;
+		increaseUpdateCounter();
 		return *this;
 	}
 
 	Entity & Entity::setRealm(const std::shared_ptr<Realm> realm) {
 		weakRealm = realm;
 		realmID = realm->id;
+		increaseUpdateCounter();
 		return *this;
 	}
 
@@ -387,11 +389,15 @@ namespace Game3 {
 	void Entity::teleport(const Position &new_position, bool from_path, bool clear_offset) {
 		const auto old_chunk_position = getChunkPosition(position);
 		const bool in_different_chunk = old_chunk_position != getChunkPosition(new_position);
+		const bool is_server = getSide() == Side::Server;
 
 		position = new_position;
 
 		if (clear_offset)
 			offset = {0.f, 0.f};
+
+		if (is_server)
+			increaseUpdateCounter();
 
 		auto shared = shared_from_this();
 		getRealm()->onMoved(shared, new_position);
@@ -406,7 +412,7 @@ namespace Game3 {
 				++iter;
 		}
 
-		if (!from_path && getSide() == Side::Server)
+		if (is_server && !from_path)
 			getGame().toServer().entityTeleported(*this);
 	}
 
@@ -471,6 +477,7 @@ namespace Game3 {
 				throw std::runtime_error("Invalid path offset: " + std::string(next - prev));
 		}
 
+		increaseUpdateCounter();
 		return PathResult::Success;
 	}
 
@@ -534,6 +541,10 @@ namespace Game3 {
 
 	Side Entity::getSide() const {
 		return getGame().getSide();
+	}
+
+	void Entity::inventoryUpdated() {
+		increaseUpdateCounter();
 	}
 
 	ChunkPosition Entity::getChunk() const {
@@ -719,6 +730,7 @@ namespace Game3 {
 
 	void Entity::sendTo(RemoteClient &client) {
 		client.send(EntityPacket(shared_from_this()));
+		onSend(client.getPlayer());
 	}
 
 	void Entity::setHeld(Slot new_value, Held &held) {

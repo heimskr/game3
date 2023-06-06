@@ -23,7 +23,7 @@
 #include "game/HasInventory.h"
 #include "item/Item.h"
 #include "threading/Lockable.h"
-#include "util/WeakCompare.h"
+#include "util/WeakSet.h"
 
 namespace Game3 {
 	class Canvas;
@@ -126,6 +126,7 @@ namespace Game3 {
 			void setHeldRight(Slot);
 			Side getSide() const override final;
 			Type getAgentType() const override final { return Agent::Type::Entity; }
+			void inventoryUpdated() override;
 			ChunkPosition getChunk() const;
 			bool canSee(RealmID, const Position &) const;
 			bool canSee(const Entity &) const;

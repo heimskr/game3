@@ -15,8 +15,23 @@ namespace Game3 {
 		Lockable(const Lockable &other): T(other.getBase()) {}
 		Lockable(const T &other): T(other) {}
 
+		/** Likely data race issue. */
 		Lockable(Lockable &&other): T(other.getBase()) {}
 		Lockable(T &&other): T(other) {}
+
+		Lockable<T> & operator=(const Lockable<T> &other) {
+			auto this_lock = uniqueLock();
+			auto other_lock = const_cast<Lockable<T> &>(other).sharedLock();
+			T::operator=(other.getBase());
+			return *this;
+		}
+
+		Lockable<T> & operator=(Lockable<T> &&other) {
+			auto this_lock = uniqueLock();
+			auto other_lock = other.uniqueLock();
+			T::operator=(std::move(other.getBase()));
+			return *this;
+		}
 
 		Lockable<T> operator=(const T &other) {
 			auto lock = uniqueLock();
@@ -26,7 +41,7 @@ namespace Game3 {
 
 		Lockable<T> operator=(T &&other) {
 			auto lock = uniqueLock();
-			T::operator=(other);
+			T::operator=(std::forward<T>(other));
 			return *this;
 		}
 

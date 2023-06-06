@@ -14,7 +14,8 @@
 namespace Game3 {
 	Chest::Chest(Identifier tile_id, const Position &position_, std::string name_, std::shared_ptr<Texture> texture_):
 	TileEntity(std::move(tile_id), ID(), position_, true), name(std::move(name_)), texture(std::move(texture_)) {
-		texture->init();
+		if (texture)
+			texture->init();
 	}
 
 	void Chest::toJSON(nlohmann::json &json) const {
@@ -74,6 +75,11 @@ namespace Game3 {
 
 	void Chest::setInventory(Slot slot_count) {
 		inventory = std::make_shared<Inventory>(shared_from_this(), slot_count);
+		increaseUpdateCounter();
+	}
+
+	void Chest::inventoryUpdated() {
+		increaseUpdateCounter();
 	}
 
 	void Chest::encode(Game &game, Buffer &buffer) {

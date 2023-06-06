@@ -26,6 +26,7 @@ namespace Game3 {
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			void render(SpriteRenderer &) override;
 			void setInventory(Slot slot_count);
+			void inventoryUpdated() override;
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;

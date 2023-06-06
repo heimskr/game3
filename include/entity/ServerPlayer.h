@@ -2,7 +2,7 @@
 
 #include "entity/Player.h"
 #include "threading/Lockable.h"
-#include "util/WeakCompare.h"
+#include "util/WeakSet.h"
 
 namespace Game3 {
 	class ServerPlayer: public Player {
