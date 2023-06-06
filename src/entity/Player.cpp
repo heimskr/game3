@@ -273,11 +273,9 @@ namespace Game3 {
 
 				if (old_position) {
 					const ChunkRange old_range(*old_position);
-					ChunkRange(getChunk()).iterate([&](ChunkPosition chunk_position) {
-						if (!old_range.contains(chunk_position)) {
-							INFO("Going to request chunk " << chunk_position);
+					ChunkRange(getChunk()).iterate([&requests, old_range](ChunkPosition chunk_position) {
+						if (!old_range.contains(chunk_position))
 							requests.insert(chunk_position);
-						}
 					});
 				} else {
 					ChunkRange(getChunk()).iterate([&](ChunkPosition chunk_position) {
