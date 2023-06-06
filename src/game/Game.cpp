@@ -75,6 +75,7 @@
 #include "packet/FluidUpdatePacket.h"
 #include "packet/HeldItemSetPacket.h"
 #include "packet/SetHeldItemPacket.h"
+#include "packet/EntityRequestPacket.h"
 #include "realm/Cave.h"
 #include "realm/House.h"
 #include "realm/Keep.h"
@@ -326,6 +327,7 @@ namespace Game3 {
 		add(PacketFactory::create<FluidUpdatePacket>());
 		add(PacketFactory::create<HeldItemSetPacket>());
 		add(PacketFactory::create<SetHeldItemPacket>());
+		add(PacketFactory::create<EntityRequestPacket>());
 	}
 
 	void Game::addLocalCommandFactories() {

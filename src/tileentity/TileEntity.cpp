@@ -74,9 +74,11 @@ namespace Game3 {
 		extraData = nlohmann::json::parse(extra_json);
 	}
 
-	void TileEntity::sendTo(RemoteClient &client) {
-		client.send(TileEntityPacket(shared_from_this()));
-		onSend(client.getPlayer());
+	void TileEntity::sendTo(RemoteClient &client, UpdateCounter threshold) {
+		if (threshold == 0 || getUpdateCounter() < threshold) {
+			client.send(TileEntityPacket(shared_from_this()));
+			onSend(client.getPlayer());
+		}
 	}
 
 	void TileEntity::absorbJSON(Game &, const nlohmann::json &json) {

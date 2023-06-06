@@ -70,7 +70,7 @@ namespace Game3 {
 			/** More work needs to be done after this to initialize weakRealm. */
 			virtual void decode(Game &, Buffer &);
 
-			void sendTo(RemoteClient &);
+			void sendTo(RemoteClient &, UpdateCounter threshold = 0);
 
 		protected:
 			TileEntity() = default;

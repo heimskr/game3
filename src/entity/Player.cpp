@@ -12,6 +12,7 @@
 #include "net/LocalClient.h"
 #include "net/RemoteClient.h"
 #include "packet/ChunkRequestPacket.h"
+#include "packet/EntityRequestPacket.h"
 #include "packet/EntitySetPathPacket.h"
 #include "packet/RealmNoticePacket.h"
 #include "packet/StartPlayerMovementPacket.h"
@@ -269,24 +270,33 @@ namespace Game3 {
 	void Player::movedToNewChunk(const std::optional<ChunkPosition> &old_position) {
 		if (getSide() == Side::Client) {
 			if (auto realm = weakRealm.lock()) {
-				std::set<ChunkPosition> requests;
+				std::set<ChunkPosition> chunk_requests;
+				std::vector<EntityRequest> entity_requests;
+
+				auto process_chunk = [&](ChunkPosition chunk_position) {
+					chunk_requests.insert(chunk_position);
+					if (auto entities = realm->getEntities(chunk_position)) {
+						auto lock = entities->sharedLock();
+						for (const auto &entity: *entities)
+							entity_requests.emplace_back(*entity);
+					}
+				};
 
 				if (old_position) {
 					const ChunkRange old_range(*old_position);
-					ChunkRange(getChunk()).iterate([&requests, old_range](ChunkPosition chunk_position) {
+					ChunkRange(getChunk()).iterate([&process_chunk, old_range](ChunkPosition chunk_position) {
 						if (!old_range.contains(chunk_position))
-							requests.insert(chunk_position);
+							process_chunk(chunk_position);
 					});
 				} else {
-					ChunkRange(getChunk()).iterate([&](ChunkPosition chunk_position) {
-						requests.insert(chunk_position);
-					});
+					ChunkRange(getChunk()).iterate(process_chunk);
 				}
 
-				if (!requests.empty()) {
-					auto realm = getRealm();
-					send(ChunkRequestPacket(*realm, requests));
-				}
+				if (!chunk_requests.empty())
+					send(ChunkRequestPacket(*realm, chunk_requests));
+
+				if (!entity_requests.empty())
+					send(EntityRequestPacket(realm->id, std::move(entity_requests)));
 			}
 
 			Entity::movedToNewChunk(old_position);

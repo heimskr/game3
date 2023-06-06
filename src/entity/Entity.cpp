@@ -694,6 +694,7 @@ namespace Game3 {
 		buffer << realmID;
 		buffer << position;
 		buffer << direction;
+		buffer << getUpdateCounter();
 		buffer << offset.x();
 		buffer << offset.y();
 		{
@@ -713,6 +714,7 @@ namespace Game3 {
 		buffer >> realmID;
 		buffer >> position;
 		buffer >> direction;
+		setUpdateCounter(buffer.take<UpdateCounter>());
 		buffer >> offset.x();
 		buffer >> offset.y();
 		{
@@ -728,9 +730,11 @@ namespace Game3 {
 		setHeldRight(right_slot);
 	}
 
-	void Entity::sendTo(RemoteClient &client) {
-		client.send(EntityPacket(shared_from_this()));
-		onSend(client.getPlayer());
+	void Entity::sendTo(RemoteClient &client, UpdateCounter threshold) {
+		if (threshold == 0 || getUpdateCounter() < threshold) {
+			client.send(EntityPacket(shared_from_this()));
+			onSend(client.getPlayer());
+		}
 	}
 
 	void Entity::setHeld(Slot new_value, Held &held) {

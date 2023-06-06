@@ -22,7 +22,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i32` Realm ID
 	- `u32[4n]` Chunk Positions
 
-	The chunk positions will be sent as sequential `(u32(x), u32(y), low32(nextCounter), high32(nextCounter))` tuples. Probably best to see the implementation in src/packets/ChunkRequestPacket.cpp.
+	The chunk positions will be sent as sequential `(u32(x), u32(y), low32(threshold), high32(threshold))` tuples. Probably best to see the implementation in src/packets/ChunkRequestPacket.cpp.
 
 4. **Tile Update**: informs the client of the new tile ID for a single tile.
 
@@ -215,6 +215,11 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	Hand is `true` for left, `false` for right.
 
 	A negative Slot value indicates that the player should no longer be holding an item in the specified hand.
+
+36. **Entity Request**: asks the server to send entities' data if the client versions are stale.
+
+	- `i32` Realm ID
+	- `u64[2n]` Global ID + Threshold Pairs
 
 # Message Format
 
