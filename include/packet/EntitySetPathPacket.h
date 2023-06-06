@@ -14,16 +14,17 @@ namespace Game3 {
 		RealmID realmID = -1;
 		Position position;
 		std::vector<Direction> path;
+		UpdateCounter newCounter = -1;
 
 		EntitySetPathPacket() = default;
 		EntitySetPathPacket(Entity &);
-		EntitySetPathPacket(GlobalID global_id, RealmID realm_id, const Position &position_, std::vector<Direction> path_):
-			globalID(global_id), realmID(realm_id), position(position_), path(std::move(path_)) {}
+		EntitySetPathPacket(GlobalID global_id, RealmID realm_id, const Position &position_, std::vector<Direction> path_, UpdateCounter new_counter):
+			globalID(global_id), realmID(realm_id), position(position_), path(std::move(path_)), newCounter(new_counter) {}
 
 		PacketID getID() const override { return ID(); }
 
-		void encode(Game &, Buffer &buffer) const override { buffer << globalID << realmID << position << path; }
-		void decode(Game &, Buffer &buffer)       override { buffer >> globalID >> realmID >> position >> path; }
+		void encode(Game &, Buffer &buffer) const override { buffer << globalID << realmID << position << path << newCounter; }
+		void decode(Game &, Buffer &buffer)       override { buffer >> globalID >> realmID >> position >> path >> newCounter; }
 
 		void handle(ClientGame &) override;
 	};

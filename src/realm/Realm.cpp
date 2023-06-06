@@ -296,6 +296,8 @@ namespace Game3 {
 	}
 
 	EntityPtr Realm::addUnsafe(const EntityPtr &entity) {
+		if (auto found = getEntity(entity->getGID()))
+			return found;
 		entity->setRealm(shared_from_this());
 		entities.insert(entity);
 		entitiesByGID[entity->globalID] = entity;

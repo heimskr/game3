@@ -11,15 +11,16 @@ namespace Game3 {
 		GlobalID entityID = -1;
 		bool leftHand = false;
 		Slot slot = -1;
+		UpdateCounter newCounter = 0;
 
 		HeldItemSetPacket() = default;
-		HeldItemSetPacket(RealmID realm_id, GlobalID entity_id, bool left_hand, Slot slot_):
-			realmID(realm_id), entityID(entity_id), leftHand(left_hand), slot(slot_) {}
+		HeldItemSetPacket(RealmID realm_id, GlobalID entity_id, bool left_hand, Slot slot_, UpdateCounter new_counter):
+			realmID(realm_id), entityID(entity_id), leftHand(left_hand), slot(slot_), newCounter(new_counter) {}
 
 		PacketID getID() const override { return ID(); }
 
-		void encode(Game &, Buffer &buffer) const override { buffer << realmID << entityID << leftHand << slot; }
-		void decode(Game &, Buffer &buffer)       override { buffer >> realmID >> entityID >> leftHand >> slot; }
+		void encode(Game &, Buffer &buffer) const override { buffer << realmID << entityID << leftHand << slot << newCounter; }
+		void decode(Game &, Buffer &buffer)       override { buffer >> realmID >> entityID >> leftHand >> slot >> newCounter; }
 
 		void handle(ClientGame &) override;
 	};

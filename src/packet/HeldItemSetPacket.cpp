@@ -22,5 +22,7 @@ namespace Game3 {
 			entity->setHeldLeft(slot);
 		else
 			entity->setHeldRight(slot);
+
+		entity->setUpdateCounter(newCounter);
 	}
 }

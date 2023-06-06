@@ -4,7 +4,7 @@
 
 namespace Game3 {
 	EntitySetPathPacket::EntitySetPathPacket(Entity &entity):
-		EntitySetPathPacket(entity.globalID, entity.realmID, entity.position.copyBase(), entity.copyPath<std::vector>()) {}
+		EntitySetPathPacket(entity.globalID, entity.realmID, entity.position.copyBase(), entity.copyPath<std::vector>(), entity.getUpdateCounter()) {}
 
 	void EntitySetPathPacket::handle(ClientGame &game) {
 		auto iter = game.realms.find(realmID);
@@ -21,6 +21,7 @@ namespace Game3 {
 		}
 
 		entity->path = {path.begin(), path.end()};
+		entity->setUpdateCounter(newCounter);
 
 		// const auto &entity_ref = *entity;
 		// SUCCESS("Set path of " << typeid(entity_ref).name() << " " << globalID << " in realm " << realmID << "; new size: " << entity->path.size());

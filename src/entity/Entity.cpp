@@ -41,7 +41,6 @@ namespace Game3 {
 
 	void Entity::destroy() {
 		auto realm = getRealm();
-		assert(realm);
 		realm->removeSafe(shared_from_this());
 
 		if (getSide() == Side::Server) {
@@ -107,6 +106,8 @@ namespace Game3 {
 			heldLeft.slot = *iter;
 		if (auto iter = json.find("heldRight"); iter != json.end())
 			heldRight.slot = *iter;
+
+		increaseUpdateCounter();
 	}
 
 	void Entity::tick(Game &, float delta) {
@@ -477,7 +478,6 @@ namespace Game3 {
 				throw std::runtime_error("Invalid path offset: " + std::string(next - prev));
 		}
 
-		increaseUpdateCounter();
 		return PathResult::Success;
 	}
 
@@ -489,6 +489,7 @@ namespace Game3 {
 		}
 
 		if (out == PathResult::Success && getSide() == Side::Server) {
+			increaseUpdateCounter();
 			auto shared = shared_from_this();
 			const EntitySetPathPacket packet(*this);
 			auto lock = lockVisibleEntitiesShared();
@@ -609,6 +610,8 @@ namespace Game3 {
 
 		if (auto realm = weakRealm.lock()) {
 			const auto this_player = std::dynamic_pointer_cast<Player>(shared);
+			// Go through each chunk now visible and update both this entity's visible sets and the visible sets
+			// of all the entities in each chunk.
 			ChunkRange(getChunk()).iterate([this, realm, shared, this_player](ChunkPosition chunk_position) {
 				if (auto visible_at_chunk = realm->getEntities(chunk_position)) {
 					auto chunk_lock = visible_at_chunk->sharedLock();
@@ -741,7 +744,7 @@ namespace Game3 {
 		const bool is_client = getSide() == Side::Client;
 
 		if (!is_client)
-			getGame().toServer().broadcast({position, getRealm(), nullptr}, HeldItemSetPacket(getRealm()->id, getGID(), held.isLeft, new_value));
+			getGame().toServer().broadcast({position, getRealm(), nullptr}, HeldItemSetPacket(getRealm()->id, getGID(), held.isLeft, new_value, increaseUpdateCounter()));
 
 		if (new_value < 0) {
 			held.slot = -1;

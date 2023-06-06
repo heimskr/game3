@@ -125,6 +125,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i32` Realm ID
 	- `{i64,i64}` Position
 	- `list<u8>` Path Directions
+	- `u64` New Update Counter
 
 20. **Teleport Self**: tells the server to teleport the player.
 
@@ -202,6 +203,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u64` Entity Global ID
 	- `bool` Hand
 	- `i32` Slot
+	- `u64` New Update Counter
 
 	Hand is `true` for left, `false` for right.
 
