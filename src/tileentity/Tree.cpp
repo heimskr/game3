@@ -43,8 +43,10 @@ namespace Game3 {
 
 	void Tree::tick(Game &, float delta) {
 		age += delta;
-		if (0.f <= hiveAge && hiveAge < HIVE_MATURITY)
+		if (0.f <= hiveAge && hiveAge < HIVE_MATURITY) {
 			hiveAge += delta;
+			increaseUpdateCounter();
+		}
 	}
 
 	bool Tree::onInteractNextTo(const std::shared_ptr<Player> &player) {
@@ -66,6 +68,7 @@ namespace Game3 {
 					while (rand() % 4 == 1)
 						++saplings;
 					player->give({game, "base:item/sapling"_id, saplings});
+					increaseUpdateCounter();
 					return true;
 				}
 				return false;
@@ -75,6 +78,7 @@ namespace Game3 {
 		if (HIVE_MATURITY <= hiveAge && !inventory.add({game, "base:item/honey"_id, 1})) {
 			hiveAge = 0.f;
 			inventory.notifyOwner();
+			increaseUpdateCounter();
 			return true;
 		}
 
@@ -101,12 +105,15 @@ namespace Game3 {
 			realm->spawn<ItemEntity>(getPosition(), ItemStack(realm->getGame(), "base:item/wood"_id, 1));
 
 		realm->setTile(Layer::Submerged, getPosition(), "base:tile/ash"_id);
+
+		increaseUpdateCounter();
 		return true;
 	}
 
 	void Tree::render(SpriteRenderer &sprite_renderer) {
 		if (!isVisible())
 			return;
+
 		auto realm = getRealm();
 		auto &tileset = realm->getTileset();
 		if (tileID != tileset.getEmpty()) {

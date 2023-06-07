@@ -17,6 +17,7 @@
 #include "packet/RealmNoticePacket.h"
 #include "packet/StartPlayerMovementPacket.h"
 #include "packet/StopPlayerMovementPacket.h"
+#include "packet/TileEntityRequestPacket.h"
 #include "realm/Realm.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
@@ -168,12 +169,18 @@ namespace Game3 {
 		auto &game = getRealm()->getGame();
 		if (game.getSide() == Side::Client)
 			game.toClient().signal_player_money_update().emit(getShared());
+		else
+			increaseUpdateCounter();
 	}
 
 	bool Player::setTooldown(float multiplier) {
+		if (getSide() != Side::Server)
+			return false;
+
 		if (auto *active = inventory->getActive())
 			if (auto tool = std::dynamic_pointer_cast<Tool>(active->item)) {
 				tooldown = multiplier * tool->baseCooldown;
+				increaseUpdateCounter();
 				return true;
 			}
 		return false;
@@ -272,13 +279,21 @@ namespace Game3 {
 			if (auto realm = weakRealm.lock()) {
 				std::set<ChunkPosition> chunk_requests;
 				std::vector<EntityRequest> entity_requests;
+				std::vector<TileEntityRequest> tile_entity_requests;
 
 				auto process_chunk = [&](ChunkPosition chunk_position) {
 					chunk_requests.insert(chunk_position);
+
 					if (auto entities = realm->getEntities(chunk_position)) {
 						auto lock = entities->sharedLock();
 						for (const auto &entity: *entities)
 							entity_requests.emplace_back(*entity);
+					}
+
+					if (auto tile_entities = realm->getTileEntities(chunk_position)) {
+						auto lock = tile_entities->sharedLock();
+						for (const auto &tile_entity: *tile_entities)
+							tile_entity_requests.emplace_back(*tile_entity);
 					}
 				};
 
@@ -297,6 +312,9 @@ namespace Game3 {
 
 				if (!entity_requests.empty())
 					send(EntityRequestPacket(realm->id, std::move(entity_requests)));
+
+				if (!tile_entity_requests.empty())
+					send(TileEntityRequestPacket(realm->id, std::move(tile_entity_requests)));
 			}
 
 			Entity::movedToNewChunk(old_position);

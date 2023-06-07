@@ -87,7 +87,7 @@ namespace Game3 {
 			// throw std::runtime_error("Worker couldn't pathfind to keep");
 			stuck = true;
 		else
-			phase = new_phase;
+			setPhase(new_phase);
 	}
 
 	void Worker::goToStockpile(Phase new_phase) {
@@ -100,10 +100,11 @@ namespace Game3 {
 			stuck = true;
 		else
 			phase = new_phase;
+		increaseUpdateCounter();
 	}
 
 	void Worker::leaveKeep(Phase new_phase) {
-		phase = new_phase;
+		setPhase(new_phase);
 		auto &keep_realm = dynamic_cast<Keep &>(*keep->getInnerRealm());
 		auto door = keep_realm.getTileEntity<Teleporter>([](const auto &door) {
 			return door->extraData.contains("exit") && door->extraData.at("exit") == true;
@@ -121,9 +122,10 @@ namespace Game3 {
 			if (!adjacent || !pathfind(destination = *adjacent)) {
 				// throw std::runtime_error("Worker couldn't pathfind to house");
 				stuck = true;
+				increaseUpdateCounter();
 				return;
 			}
-			phase = new_phase;
+			setPhase(new_phase);
 		}
 	}
 
@@ -146,6 +148,16 @@ namespace Game3 {
 			return;
 		}
 
+		setPhase(new_phase);
+	}
+
+	void Worker::setMoney(MoneyCount new_money) {
+		money = new_money;
+		increaseUpdateCounter();
+	}
+
+	void Worker::setPhase(Phase new_phase) {
 		phase = new_phase;
+		increaseUpdateCounter();
 	}
 }

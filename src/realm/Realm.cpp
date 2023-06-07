@@ -693,6 +693,12 @@ namespace Game3 {
 		setFluid(position, FluidTile(fluid->registryID, level), run_helper, generating);
 	}
 
+	bool Realm::hasFluid(const Position &position, FluidLevel minimum) {
+		if (auto fluid = tileProvider.copyFluidTile(position))
+			return minimum <= fluid->level;
+		return false;
+	}
+
 	TileID Realm::getTile(Layer layer, Index row, Index column) const {
 		return tileProvider.copyTile(layer, row, column, TileProvider::TileMode::Throw);
 	}

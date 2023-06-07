@@ -223,6 +223,11 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i32` Realm ID
 	- `u64[2n]` Global ID + Threshold Pairs
 
+37. **Tile Entity Request**: asks the server to send tile entities' data if the client versions are stale.
+
+	- `i32` Realm ID
+	- `u64[2n]` Global ID + Threshold Pairs
+
 # Message Format
 
 All values are little endian.

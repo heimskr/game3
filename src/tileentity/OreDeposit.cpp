@@ -61,6 +61,9 @@ namespace Game3 {
 	}
 
 	bool OreDeposit::onInteractNextTo(const PlayerPtr &player) {
+		if (getSide() != Side::Server)
+			return false;
+
 		auto &inventory = *player->inventory;
 		const Slot active_slot = inventory.activeSlot;
 		if (auto *active_stack = inventory[active_slot]) {
@@ -82,6 +85,7 @@ namespace Game3 {
 						inventory.erase(active_slot);
 
 					inventory.notifyOwner();
+					increaseUpdateCounter();
 					return true;
 				}
 			}

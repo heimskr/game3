@@ -11,8 +11,9 @@ namespace Game3 {
 	struct EntityRequest {
 		GlobalID entityID;
 		UpdateCounter threshold;
-		EntityRequest(Entity &);
-		EntityRequest(GlobalID entity_id, UpdateCounter threshold_): entityID(entity_id), threshold(threshold_) {}
+		explicit EntityRequest(Entity &);
+		EntityRequest(GlobalID entity_id, UpdateCounter threshold_):
+			entityID(entity_id), threshold(threshold_) {}
 	};
 
 	struct EntityRequestPacket: Packet {

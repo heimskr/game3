@@ -62,6 +62,7 @@ namespace Game3 {
 		buffer << tileID;
 		buffer << position;
 		buffer << solid;
+		buffer << getUpdateCounter();
 		buffer << extraData.dump();
 	}
 
@@ -69,6 +70,7 @@ namespace Game3 {
 		buffer >> tileID;
 		buffer >> position;
 		buffer >> solid;
+		setUpdateCounter(buffer.take<UpdateCounter>());
 		std::string extra_json;
 		buffer >> extra_json;
 		extraData = nlohmann::json::parse(extra_json);
@@ -89,6 +91,7 @@ namespace Game3 {
 		solid        = json.at("solid");
 		if (auto iter = json.find("extra"); iter != json.end())
 			extraData = *iter;
+		increaseUpdateCounter();
 	}
 
 	void TileEntity::toJSON(nlohmann::json &json) const {

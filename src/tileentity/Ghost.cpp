@@ -155,6 +155,7 @@ namespace Game3 {
 		const TileID row = marched_row + details.rowOffset;
 		const TileID column = marched_column + details.columnOffset;
 		marched = row * details.columnsPerRow + column;
+		increaseUpdateCounter();
 	}
 
 	void Ghost::confirm() {
@@ -182,6 +183,8 @@ namespace Game3 {
 			realm->setTile(details.layer, position, tile_id);
 			realm->reupload();
 		}
+
+		increaseUpdateCounter();
 	}
 
 	void Ghost::encode(Game &game, Buffer &buffer) {

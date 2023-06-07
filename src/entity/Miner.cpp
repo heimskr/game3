@@ -60,7 +60,7 @@ namespace Game3 {
 	}
 
 	bool Miner::onInteractNextTo(const std::shared_ptr<Player> &player) {
-		std::cout << "Miner: money = " << money << ", phase = " << int(phase) << ", stuck = " << stuck << '\n';
+		std::cout << "Miner: money = " << money << ", phase = " << static_cast<int>(phase) << ", stuck = " << stuck << '\n';
 
 		if (getSide() == Side::Client) {
 			auto &tab = *getRealm()->getGame().toClient().canvas.window.inventoryTab;
@@ -94,7 +94,7 @@ namespace Game3 {
 		else if (phase == 3) {
 			harvest(delta);
 			if (WORK_END_HOUR <= hour)
-				phase = 4;
+				setPhase(4);
 		}
 
 		else if (phase == 4)
@@ -121,10 +121,10 @@ namespace Game3 {
 			goToBed(10);
 
 		else if (phase == 10 && position == destination)
-			phase = 11;
+			setPhase(11);
 
 		else if (phase == 11 && hour < WORK_END_HOUR)
-			phase = 0;
+			setPhase(0);
 	}
 
 
@@ -146,7 +146,7 @@ namespace Game3 {
 	}
 
 	void Miner::wakeUp() {
-		phase = 1;
+		setPhase(1);
 		auto &game = getRealm()->getGame();
 		auto &overworld = *game.realms.at(overworldRealm);
 		auto &house     = *game.realms.at(houseRealm);
@@ -157,7 +157,7 @@ namespace Game3 {
 				resource_choices.push_back(te_position);
 		// If there are no resources, get stuck forever. Seed -1998 has no resources.
 		if (resource_choices.empty()) {
-			phase = -1;
+			setPhase(-1);
 			return;
 		}
 		// Choose one at random
@@ -176,13 +176,13 @@ namespace Game3 {
 				stuck = true;
 				return;
 			}
-			phase = 2;
+			setPhase(2);
 		} else
 			stuck = true;
 	}
 
 	void Miner::startHarvesting() {
-		phase = 3;
+		setPhase(3);
 		harvestingTime = 0.f;
 	}
 
@@ -194,13 +194,13 @@ namespace Game3 {
 			const ItemStack &stack = deposit.getOre(realm->getGame()).stack;
 			const auto leftover = inventory->add(stack);
 			if (leftover == stack)
-				phase = 4;
+				setPhase(4);
 		} else
 			harvestingTime += delta;
 	}
 
 	void Miner::sellInventory() {
-		phase = 7;
+		setPhase(7);
 		auto &keep_realm = dynamic_cast<Keep &>(*keep->getInnerRealm());
 		MoneyCount new_money = money;
 

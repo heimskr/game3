@@ -95,9 +95,10 @@ namespace Game3 {
 			return true;
 
 		auto leftover = player->inventory->add(stack);
-		if (leftover)
+		if (leftover) {
 			stack = std::move(*leftover);
-		else
+			increaseUpdateCounter();
+		} else
 			remove();
 
 		return true;

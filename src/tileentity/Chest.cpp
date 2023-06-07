@@ -49,28 +49,26 @@ namespace Game3 {
 	}
 
 	void Chest::render(SpriteRenderer &sprite_renderer) {
-		if (!isVisible())
+		if (!isVisible() || !tileID)
 			return;
 
-		if (tileID) {
-			// Kinda silly to get the tilesize from the realm's second layer. Maybe it could be added as a Chest field.
-			auto &tileset = getRealm()->getTileset();
-			const auto tilesize = tileset.getTileSize();
-			const auto tile_index = tileset[tileID];
-			assert(texture);
-			texture->init();
-			assert(texture->width);
-			const auto x = (tile_index % (*texture->width / tilesize)) * tilesize;
-			const auto y = (tile_index / (*texture->width / tilesize)) * tilesize;
-			sprite_renderer(*texture, {
-				.x = static_cast<float>(position.column),
-				.y = static_cast<float>(position.row),
-				.x_offset = x / 2.f,
-				.y_offset = y / 2.f,
-				.size_x = static_cast<float>(tilesize),
-				.size_y = static_cast<float>(tilesize),
-			});
-		}
+		// Kinda silly to get the tilesize from the realm's second layer. Maybe it could be added as a Chest field.
+		auto &tileset = getRealm()->getTileset();
+		const auto tilesize = tileset.getTileSize();
+		const auto tile_index = tileset[tileID];
+		assert(texture);
+		texture->init();
+		assert(texture->width);
+		const auto x = (tile_index % (*texture->width / tilesize)) * tilesize;
+		const auto y = (tile_index / (*texture->width / tilesize)) * tilesize;
+		sprite_renderer(*texture, {
+			.x = static_cast<float>(position.column),
+			.y = static_cast<float>(position.row),
+			.x_offset = x / 2.f,
+			.y_offset = y / 2.f,
+			.size_x = static_cast<float>(tilesize),
+			.size_y = static_cast<float>(tilesize),
+		});
 	}
 
 	void Chest::setInventory(Slot slot_count) {

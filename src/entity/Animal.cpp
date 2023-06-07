@@ -82,6 +82,7 @@ namespace Game3 {
 
 	bool Animal::wander() {
 		if (!attemptingWander.exchange(true)) {
+			increaseUpdateCounter();
 			const auto [row, column] = position.copyBase();
 			return threadPool.add([this, row, column](ThreadPool &, size_t) {
 				pathfind({

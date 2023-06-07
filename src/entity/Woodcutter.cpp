@@ -165,13 +165,13 @@ namespace Game3 {
 				stuck = true;
 				return;
 			}
-			phase = 2;
+			setPhase(2);
 		} else
 			stuck = true;
 	}
 
 	void Woodcutter::startHarvesting() {
-		phase = 3;
+		setPhase(3);
 		harvestingTime = 0.f;
 	}
 
@@ -183,7 +183,7 @@ namespace Game3 {
 			const ItemStack stack = deposit.getOre(getGame()).stack;
 			const auto leftover = inventory->add(stack);
 			if (leftover == stack)
-				phase = 4;
+				setPhase(4);
 		} else
 			harvestingTime += delta;
 	}

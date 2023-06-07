@@ -45,6 +45,7 @@ namespace Game3 {
 			void goToHouse(Phase new_phase);
 			void goToBed(Phase new_phase);
 
-			inline void setMoney(MoneyCount new_money) { money = new_money; }
+			void setMoney(MoneyCount);
+			void setPhase(Phase);
 	};
 }
