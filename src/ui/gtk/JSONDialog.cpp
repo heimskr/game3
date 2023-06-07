@@ -90,7 +90,7 @@ namespace Game3 {
 					if (auto iter = meta.find("max"); iter != meta.end() && iter->get<long>() < number)
 						continue;
 					data[name] = number;
-				} catch (const std::invalid_argument) {
+				} catch (const std::invalid_argument &) {
 					// Intentionally leave out the data.
 				}
 			} else if (type == "slider") {
