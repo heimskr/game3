@@ -41,6 +41,8 @@ namespace Game3 {
 				}
 				if (auto iter = meta.find("initial"); iter != meta.end())
 					slider->set_value(iter->get<double>());
+				if (auto iter = meta.find("increments"); iter != meta.end())
+					slider->set_increments(iter->at(0).get<double>(), iter->at(1).get<double>());
 				area->append(*label_widget);
 				area->append(*slider);
 				widgets.push_back({label_widget, slider});

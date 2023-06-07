@@ -22,6 +22,7 @@
 #include "tileentity/Teleporter.h"
 #include "ui/gtk/CommandDialog.h"
 #include "ui/gtk/ConnectDialog.h"
+#include "ui/gtk/JSONDialog.h"
 #include "ui/tab/CraftingTab.h"
 #include "ui/tab/InventoryTab.h"
 #include "ui/tab/MerchantTab.h"
@@ -89,6 +90,21 @@ namespace Game3 {
 				debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
 			}
 		}, false);
+
+		add_action("json", Gio::ActionMap::ActivateSlot([this] {
+			auto *json_dialog = new JSONDialog(*this, "JSON Test", {
+				{"thing1", "text", "Text", {{"initial", "Hello"}}},
+				{"0", "number", "Numeric", {{"initial", "42"}}},
+				{"slider", "slider", "Slider", {{"range", {-10, 20.5}}, {"increments", {0.1, 1}}, {"initial", 1.2}, {"digits", 4}}},
+				{"ok", "ok", "T_est"},
+			});
+			dialog.reset(json_dialog);
+			json_dialog->set_transient_for(*this);
+			json_dialog->signal_submit().connect([](const nlohmann::json &json) {
+				std::cout << json.dump() << '\n';
+			});
+			json_dialog->show();
+		}));
 
 		glArea.set_expand(true);
 		glArea.set_required_version(3, 3);

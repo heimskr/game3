@@ -14,6 +14,7 @@ namespace Game3 {
 		Gtk::Application::on_startup();
 		set_accel_for_action("win.connect", "<Ctrl>n");
 		set_accel_for_action("win.debug", "<Ctrl>d");
+		set_accel_for_action("win.json", "<Ctrl>h");
 	}
 
 	void App::on_activate() {
