@@ -203,7 +203,7 @@ namespace Game3::WorldGen {
 								for (Index column = column_start; column < column_end; column += 2) {
 									if (auto tile = provider.tryTile(Layer::Terrain, {row, column}); !tile || !tileset.isLand(*tile))
 										goto failed;
-									if (auto fluid_tile = provider.copyFluidTile({row, column}); fluid_tile && 0 < fluid_tile->level)
+									if (realm->hasFluid({row, column}))
 										goto failed;
 								}
 							}

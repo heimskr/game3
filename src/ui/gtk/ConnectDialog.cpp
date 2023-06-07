@@ -1,10 +1,9 @@
 #include "ui/gtk/ConnectDialog.h"
-#include "ui/MainWindow.h"
 #include "util/Util.h"
 #include "worldgen/WorldGen.h"
 
 namespace Game3 {
-	ConnectDialog::ConnectDialog(MainWindow &parent_): Gtk::MessageDialog(parent_, "Connect", false, Gtk::MessageType::OTHER, Gtk::ButtonsType::CANCEL, true), mainWindow(parent_) {
+	ConnectDialog::ConnectDialog(Gtk::Window &parent_): Gtk::MessageDialog(parent_, "Connect", false, Gtk::MessageType::OTHER, Gtk::ButtonsType::CANCEL, true) {
 		auto *area = get_message_area();
 		hostnameLabel.set_halign(Gtk::Align::START);
 		portLabel.set_halign(Gtk::Align::START);
