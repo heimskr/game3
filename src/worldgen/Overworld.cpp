@@ -132,7 +132,7 @@ namespace Game3::WorldGen {
 
 					for (auto row = row_min; row < row_max; ++row)
 						for (auto column = col_min; column < col_max; ++column)
-							if (ore_set.contains(realm->getTile(Layer::Terrain, {row, column})))
+							if (ore_set.contains(realm->getTile(Layer::Terrain, {row, column})) && !realm->hasFluid({row, column}))
 								resource_starts.push_back({row, column});
 
 					std::shuffle(resource_starts.begin(), resource_starts.end(), threadContext.rng);
