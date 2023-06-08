@@ -153,18 +153,20 @@ namespace Game3 {
 
 		lastGame = game;
 
-		if (!externalName.empty()) {
-			externalLabel.set_text(externalName);
-			externalLabel.show();
-		}
+		mainWindow.queue([this, game] {
+			if (!externalName.empty()) {
+				externalLabel.set_text(externalName);
+				externalLabel.show();
+			}
 
-		if (game->player->inventory)
-			populate(playerGrid, *game->player->inventory, false);
+			if (game->player->inventory)
+				populate(playerGrid, *game->player->inventory, false);
 
-		if (externalInventory)
-			populate(externalGrid, *externalInventory, true);
-		else
-			removeChildren(externalGrid);
+			if (externalInventory)
+				populate(externalGrid, *externalInventory, true);
+			else
+				removeChildren(externalGrid);
+		});
 	}
 
 	void InventoryTab::reset(const std::shared_ptr<ClientGame> &game) {
@@ -173,24 +175,26 @@ namespace Game3 {
 
 		lastGame = game;
 
-		widgetMap.clear();
+		mainWindow.queue([this, game] {
+			widgetMap.clear();
 
-		removeChildren(playerGrid);
-		removeChildren(externalGrid);
-		if (!externalName.empty()) {
-			externalLabel.set_text(externalName);
-			externalLabel.show();
-		}
+			removeChildren(playerGrid);
+			removeChildren(externalGrid);
+			if (!externalName.empty()) {
+				externalLabel.set_text(externalName);
+				externalLabel.show();
+			}
 
-		playerWidgetsBySlot.clear();
-		playerWidgets.clear();
-		externalWidgets.clear();
+			playerWidgetsBySlot.clear();
+			playerWidgets.clear();
+			externalWidgets.clear();
 
-		if (game->player->inventory)
-			populate(playerGrid, *game->player->inventory, false);
+			if (game->player->inventory)
+				populate(playerGrid, *game->player->inventory, false);
 
-		if (externalInventory)
-			populate(externalGrid, *externalInventory, true);
+			if (externalInventory)
+				populate(externalGrid, *externalInventory, true);
+		});
 	}
 
 	void InventoryTab::populate(Gtk::Grid &grid, Inventory &inventory, bool external) {
