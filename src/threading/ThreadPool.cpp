@@ -24,13 +24,17 @@ namespace Game3 {
 							return joining.load() || newJobReady.load() || last_jobs_done < jobsDone;
 						});
 					}
+					if (joining)
+						break;
 					if (auto job = workQueue.tryTake()) {
 						newJobReady = false;
 						assert(*job);
 						(*job)(*this, thread_index);
 						last_jobs_done = ++jobsDone;
 						// Issue when the thread pool contains only one worker?
-						workCV.notify_all();
+						workCV.notify_one();
+					} else {
+						last_jobs_done = jobsDone;
 					}
 				}
 			});
