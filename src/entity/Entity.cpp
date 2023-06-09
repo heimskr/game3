@@ -261,14 +261,13 @@ namespace Game3 {
 		}
 	}
 
-	bool Entity::move(Direction move_direction) {
+	bool Entity::move(Direction move_direction, std::optional<Direction> new_direction) {
 		auto realm = weakRealm.lock();
 		if (!realm) {
 			if (getSide() == Side::Client) WARN("Can't move entity " << globalID << ": no realm");
 			return false;
 		}
 
-		const Direction old_direction = direction;
 		Position new_position = position;
 		float x_offset = 0.f;
 		float y_offset = 0.f;
@@ -276,23 +275,19 @@ namespace Game3 {
 		switch (move_direction) {
 			case Direction::Down:
 				++new_position.row;
-				direction = Direction::Down;
 				y_offset = -1.f;
 				break;
 			case Direction::Up:
 				--new_position.row;
-				direction = Direction::Up;
 				y_offset = 1.f;
 				break;
 			case Direction::Left:
 				--new_position.column;
-				direction = Direction::Left;
 				x_offset = 1.f;
 				horizontal = true;
 				break;
 			case Direction::Right:
 				++new_position.column;
-				direction = Direction::Right;
 				x_offset = -1.f;
 				horizontal = true;
 				break;
@@ -300,15 +295,20 @@ namespace Game3 {
 				throw std::invalid_argument("Invalid direction: " + std::to_string(int(move_direction)));
 		}
 
+		if (!new_direction)
+			new_direction = move_direction;
+
 		if ((horizontal && offset.x != 0) || (!horizontal && offset.y != 0)) {
 			// WARN("Can't move entity " << globalID << ": improper offsets [" << horizontal << "/" << offset.x << ", " << !horizontal << "/" << offset.y << "]");
 			return false;
 		}
 
 		const bool can_move = canMoveTo(new_position);
-		const bool direction_changed = direction != old_direction;
+		const bool direction_changed = *new_direction != direction;
 
 		if (can_move || direction_changed) {
+			direction = *new_direction;
+
 			if (can_move) {
 				if (horizontal)
 					offset.x = x_offset;

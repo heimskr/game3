@@ -89,16 +89,28 @@ namespace Game3 {
 			Direction final_direction = direction;
 
 			if (movingLeft && !movingRight)
-				move(final_direction = Direction::Left);
+				final_direction = Direction::Left;
 
 			if (movingRight && !movingLeft)
-				move(final_direction = Direction::Right);
+				final_direction = Direction::Right;
 
 			if (movingUp && !movingDown)
-				move(final_direction = Direction::Up);
+				final_direction = Direction::Up;
 
 			if (movingDown && !movingUp)
-				move(final_direction = Direction::Down);
+				final_direction = Direction::Down;
+
+			if (movingLeft && !movingRight)
+				move(Direction::Left, final_direction);
+
+			if (movingRight && !movingLeft)
+				move(Direction::Right, final_direction);
+
+			if (movingUp && !movingDown)
+				move(Direction::Up, final_direction);
+
+			if (movingDown && !movingUp)
+				move(Direction::Down, final_direction);
 
 			if (continuousInteraction) {
 				Place place = getPlace();
