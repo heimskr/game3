@@ -20,7 +20,7 @@
 namespace Game3 {
 	GhostFunction::GhostFunction(Identifier identifier_, decltype(function) function_):
 		NamedRegisterable(std::move(identifier_)),
-		function(function_) {}
+		function(std::move(function_)) {}
 
 	bool GhostFunction::operator()(const Identifier &tilename, const Place &place) const {
 		return function(tilename, place);
@@ -102,7 +102,7 @@ namespace Game3 {
 		auto texture = tileset.getTexture(realm->getGame());
 		const auto column_count = *texture->width / tilesize;
 
-		TileID tile_id = tileset.getEmptyID();
+		TileID tile_id;
 
 		if (details.customFn)
 			tile_id = tileset[details.customTilename];
@@ -116,8 +116,8 @@ namespace Game3 {
 		sprite_renderer(*texture, {
 			.x = static_cast<float>(position.column),
 			.y = static_cast<float>(position.row),
-			.x_offset = x / 2.f,
-			.y_offset = y / 2.f,
+			.x_offset = static_cast<float>(x) / 2.f,
+			.y_offset = static_cast<float>(y) / 2.f,
 			.size_x = static_cast<float>(tilesize),
 			.size_y = static_cast<float>(tilesize),
 			.alpha = .5f,
@@ -129,8 +129,6 @@ namespace Game3 {
 			return;
 
 		auto realm = getRealm();
-		TileID march_result;
-		// const auto &tiles = realm->tilemap2->getTiles();
 
 		auto check = [&](const Position &offset_position) -> std::optional<bool> {
 			if (auto tile_entity = realm->tileEntityAt(offset_position))
@@ -143,7 +141,7 @@ namespace Game3 {
 		const auto &fn       = *registry[details.type];
 		const auto &tileset  = realm->getTileset();
 
-		march_result = march4([&](int8_t row_offset, int8_t column_offset) -> bool {
+		const TileID march_result = march4([&](int8_t row_offset, int8_t column_offset) -> bool {
 			const Position offset_position(position + Position(row_offset, column_offset));
 			if (auto value = check(offset_position))
 				return *value;
@@ -170,7 +168,7 @@ namespace Game3 {
 		if (details.customFn) {
 			details.customFn({position, realm, nullptr});
 		} else {
-			TileID tile_id = tileset[tileset.getMissing()];
+			TileID tile_id;
 			if (details.useMarchingSquares) {
 				tile_id = marched;
 			} else {

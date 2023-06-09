@@ -61,29 +61,29 @@ namespace Game3 {
 		texture->init();
 		const int width  = item_texture->width;
 		const int height = item_texture->height;
-		const int channels = *texture->format == GL_RGBA? 4 : 3;
+		const ptrdiff_t channels = *texture->format == GL_RGBA? 4 : 3;
 		const size_t row_size = channels * width;
 
 		if (!rawImage) {
 			rawImage = std::make_unique<uint8_t[]>(channels * width * height);
 			uint8_t *raw_pointer = rawImage.get();
-			uint8_t *texture_pointer = texture->data->get() + item_texture->y * *texture->width * channels + item_texture->x * channels;
+			uint8_t *texture_pointer = texture->data->get() + item_texture->y * *texture->width * channels + static_cast<ptrdiff_t>(item_texture->x) * channels;
 			for (int row = 0; row < height; ++row) {
 				std::memcpy(raw_pointer + row_size * row, texture_pointer, row_size);
-				texture_pointer += channels * *texture->width;
+				texture_pointer += static_cast<ptrdiff_t>(channels) * *texture->width;
 			}
 		}
 
 		constexpr int doublings = 3;
-		return Gdk::Pixbuf::create_from_data(rawImage.get(), Gdk::Colorspace::RGB, *texture->alpha, 8, width, height, row_size)
+		return Gdk::Pixbuf::create_from_data(rawImage.get(), Gdk::Colorspace::RGB, *texture->alpha, 8, width, height, static_cast<int>(row_size))
 		       ->scale_simple(width << doublings, height << doublings, Gdk::InterpType::NEAREST);
 	}
 
 	void Item::getOffsets(const Game &game, std::shared_ptr<Texture> &texture, float &x_offset, float &y_offset) {
 		auto item_texture = game.registry<ItemTextureRegistry>().at(identifier);
 		texture  = item_texture->texture.lock();
-		x_offset = item_texture->x / 2.f;
-		y_offset = item_texture->y / 2.f;
+		x_offset = static_cast<float>(item_texture->x) / 2.f;
+		y_offset = static_cast<float>(item_texture->y) / 2.f;
 	}
 
 	std::shared_ptr<Item> Item::addAttribute(Identifier attribute) {
@@ -198,7 +198,7 @@ namespace Game3 {
 	}
 
 	void ItemStack::fromJSON(const Game &game, const nlohmann::json &json, ItemStack &stack) {
-		Identifier id = json.at(0);
+		const Identifier id = json.at(0);
 		stack.item = game.registry<ItemRegistry>()[id];
 		stack.count = json.at(1);
 		if (2 < json.size()) {
@@ -256,7 +256,7 @@ namespace Game3 {
 	ItemStack popBuffer<ItemStack>(Buffer &buffer) {
 		auto context = buffer.context.lock();
 		assert(context);
-		Game &game = dynamic_cast<Game &>(*context);
+		const auto &game = dynamic_cast<Game &>(*context);
 		ItemStack out(game);
 		buffer >> out;
 		return out;
@@ -278,7 +278,7 @@ namespace Game3 {
 	Buffer & operator>>(Buffer &buffer, ItemStack &stack) {
 		assert(stack.hasGame());
 		const auto type = buffer.popType();
-		if (!buffer.typesMatch(type, buffer.getType(stack))) {
+		if (!Buffer::typesMatch(type, buffer.getType(stack))) {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type) + ") in buffer (expected Inventory)");
 		}

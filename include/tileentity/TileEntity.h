@@ -57,7 +57,7 @@ namespace Game3 {
 			void setRealm(const std::shared_ptr<Realm> &);
 			std::shared_ptr<Realm> getRealm() const override;
 			const Position & getPosition() const override { return position; }
-			void updateNeighbors();
+			void updateNeighbors() const;
 			bool isVisible() const;
 			Side getSide() const override final;
 			Type getAgentType() const override final { return Agent::Type::TileEntity; }

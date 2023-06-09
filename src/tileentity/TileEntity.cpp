@@ -38,7 +38,7 @@ namespace Game3 {
 		return out;
 	}
 
-	void TileEntity::updateNeighbors() {
+	void TileEntity::updateNeighbors() const {
 		getRealm()->updateNeighbors(position);
 	}
 

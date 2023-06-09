@@ -13,21 +13,21 @@ namespace Game3 {
 		const bool center = get(0, 0);
 		int sum = 0;
 		if (center) {
-			uint8_t     top_left = get(-1, -1);
-			const uint8_t    top = get( 0, -1);
-			uint8_t    top_right = get( 1, -1);
-			const uint8_t   left = get(-1,  0);
-			const uint8_t  right = get( 1,  0);
-			uint8_t  bottom_left = get(-1,  1);
-			const uint8_t bottom = get( 0,  1);
-			uint8_t bottom_right = get( 1,  1);
-			if (!top || !left)
+			uint8_t     top_left = get(-1, -1)? 1 : 0;
+			const uint8_t    top = get( 0, -1)? 1 : 0;
+			uint8_t    top_right = get( 1, -1)? 1 : 0;
+			const uint8_t   left = get(-1,  0)? 1 : 0;
+			const uint8_t  right = get( 1,  0)? 1 : 0;
+			uint8_t  bottom_left = get(-1,  1)? 1 : 0;
+			const uint8_t bottom = get( 0,  1)? 1 : 0;
+			uint8_t bottom_right = get( 1,  1)? 1 : 0;
+			if (top == 0 || left == 0)
 				top_left = 0;
-			if (!top || !right)
+			if (top == 0 || right == 0)
 				top_right = 0;
-			if (!bottom || !right)
+			if (bottom == 0 || right == 0)
 				bottom_right = 0;
-			if (!bottom || !left)
+			if (bottom == 0 || left == 0)
 				bottom_left = 0;
 			sum = top_left + (top << 1) + (top_right << 2) + (left << 3) + (right << 4) + (bottom_left << 5) + (bottom << 6) + (bottom_right << 7);
 		}
@@ -39,10 +39,10 @@ namespace Game3 {
 		const bool center = get(0, 0);
 		int sum = 0;
 		if (center) {
-			const uint8_t top    = get(-1,  0);
-			const uint8_t left   = get( 0, -1);
-			const uint8_t right  = get( 0,  1);
-			const uint8_t bottom = get( 1,  0);
+			const uint8_t top    = get(-1,  0)? 1 : 0;
+			const uint8_t left   = get( 0, -1)? 1 : 0;
+			const uint8_t right  = get( 0,  1)? 1 : 0;
+			const uint8_t bottom = get( 1,  0)? 1 : 0;
 			sum = top + (left << 1) + (right << 2) + (bottom << 3);
 		}
 

@@ -64,8 +64,8 @@ namespace Game3 {
 		sprite_renderer(*texture, {
 			.x = static_cast<float>(position.column),
 			.y = static_cast<float>(position.row),
-			.x_offset = x / 2.f,
-			.y_offset = y / 2.f,
+			.x_offset = static_cast<float>(x) / 2.f,
+			.y_offset = static_cast<float>(y) / 2.f,
 			.size_x = static_cast<float>(tilesize),
 			.size_y = static_cast<float>(tilesize),
 		});
@@ -90,7 +90,7 @@ namespace Game3 {
 	void Chest::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
 		buffer >> name;
-		std::filesystem::path texture_path = buffer.take<std::string>();
+		const std::filesystem::path texture_path = buffer.take<std::string>();
 		HasInventory::decode(buffer);
 		texture = cacheTexture(texture_path);
 	}

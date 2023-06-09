@@ -110,6 +110,14 @@ tsanservertest: $(OUTPUT)
 tsanclienttest: $(OUTPUT)
 	TSAN_OPTIONS="suppressions=tsan_suppressions.txt" ./$<
 
+%.tidy: %.cpp
+	@ printf "\e[2m[\e[22;36mtidy\e[39;2m]\e[22m $<\n"
+	@ clang-tidy $< -- $(CPPFLAGS) $(INCLUDES)
+
+reverse = $(if $(wordlist 2,2,$(1)),$(call reverse,$(wordlist 2,$(words $(1)),$(1))) $(firstword $(1)),$(1))
+
+tidy: $(foreach source,$(call reverse,$(SOURCES)),$(source:.cpp=.tidy))
+
 clean:
 	@ rm -f $(shell find -L src -name \*.o) $(OUTPUT) src/gtk_resources.cpp include/resources.h $(RESGEN) $(RESGEN).o
 

@@ -1,11 +1,11 @@
 #include "Log.h"
 #include "Tileset.h"
-#include "threading/ThreadContext.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "realm/Realm.h"
+#include "threading/ThreadContext.h"
 #include "tileentity/ItemSpawner.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
@@ -15,7 +15,7 @@
 
 namespace Game3 {
 	ItemSpawner::ItemSpawner(Position position_, float chance_per_tenth, std::vector<ItemStack> spawnables_):
-		TileEntity("base:tile/empty", ID(), std::move(position_), false),
+		TileEntity("base:tile/empty", ID(), position_, false),
 		chancePerTenth(chance_per_tenth),
 		spawnables(std::move(spawnables_)) {}
 

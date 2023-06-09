@@ -11,13 +11,14 @@
 
 namespace Game3 {
 	bool Bomb::use(Slot, ItemStack &, const Place &place, Modifiers) {
-		constexpr double RADIUS = 2.5;
+		constexpr Index  DIAMETER = 5;
+		constexpr double RADIUS = DIAMETER / 2.;
 
 		auto &realm  = *place.realm;
 		const auto [prow, pcol] = place.position;
 
-		for (Index row = prow - RADIUS * 2; row <= prow + RADIUS * 2; ++row) {
-			for (Index column = pcol - RADIUS * 2; column <= pcol + RADIUS * 2; ++column) {
+		for (Index row = prow - DIAMETER; row <= prow + DIAMETER; ++row) {
+			for (Index column = pcol - DIAMETER; column <= pcol + DIAMETER; ++column) {
 				const Position pos(row, column);
 				if (RADIUS < pos.distance(place.position))
 					continue;

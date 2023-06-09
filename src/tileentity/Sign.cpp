@@ -12,7 +12,7 @@
 
 namespace Game3 {
 	Sign::Sign(Identifier tilename, Position position_, std::string text_, std::string name_):
-		TileEntity(std::move(tilename), ID(), std::move(position_), false), text(std::move(text_)), name(std::move(name_)) {}
+		TileEntity(std::move(tilename), ID(), position_, false), text(std::move(text_)), name(std::move(name_)) {}
 
 	void Sign::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);

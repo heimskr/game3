@@ -51,8 +51,7 @@ namespace Game3 {
 	std::string generateSecret(size_t count) {
 		std::stringstream ss;
 		std::random_device rng;
-		std::default_random_engine prng;
-		prng.seed(rng());
+		std::default_random_engine prng(rng());
 		for (size_t i = 0; i < count; ++i)
 			ss << std::hex << prng();
 		return ss.str();

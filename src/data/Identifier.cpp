@@ -15,21 +15,21 @@ namespace Game3 {
 
 	std::string Identifier::getPath() const {
 		const auto slash = name.find_last_of('/');
-		if (slash == name.npos)
+		if (slash == std::string::npos)
 			return "";
 		return name.substr(0, slash);
 	}
 
 	std::string Identifier::getPathStart() const {
 		const auto slash = name.find('/');
-		if (slash == name.npos)
+		if (slash == std::string::npos)
 			return "";
 		return name.substr(0, slash);
 	}
 
 	std::string Identifier::getPostPath() const {
 		const auto slash = name.find_last_of('/');
-		if (slash == name.npos)
+		if (slash == std::string::npos)
 			return name;
 		return name.substr(slash + 1);
 	}
@@ -54,12 +54,12 @@ namespace Game3 {
 	}
 
 	Identifier operator""_id(const char *string, size_t) {
-		return Identifier(string);
+		return {string};
 	}
 
 	template <>
 	Identifier popBuffer<Identifier>(Buffer &buffer) {
-		return Identifier(popBuffer<std::string>(buffer));
+		return {popBuffer<std::string>(buffer)};
 	}
 
 	template <>

@@ -12,7 +12,7 @@ namespace Game3 {
 		Item(std::move(id_), std::move(name_), base_price, max_count),
 		requirement(std::move(requirement_)) {}
 
-	Landfill::Landfill(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count, Identifier tileset_name, Identifier required_tile, ItemStack requirement, Identifier new_tile):
+	Landfill::Landfill(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count, const Identifier &tileset_name, const Identifier &required_tile, const ItemStack &requirement, const Identifier &new_tile):
 		Landfill(std::move(id_), std::move(name_), base_price, max_count, [=](const Place &place) -> std::optional<Result> {
 			if (place.realm->getTileset().identifier == tileset_name && place.getName(Layer::Terrain) == required_tile)
 				return Result{requirement, new_tile};
@@ -35,7 +35,8 @@ namespace Game3 {
 
 		if (const auto result = callRequirement(place)) {
 			if (result->required <= stack) {
-				if ((stack.count -= result->required.count) == 0)
+				stack.count -= result->required.count;
+				if (stack.count == 0)
 					player.inventory->erase(slot);
 				realm.setTile(Layer::Terrain, place.position, result->newTile);
 				realm.reupload();
@@ -50,6 +51,7 @@ namespace Game3 {
 	std::optional<Landfill::Result> Landfill::callRequirement(const Place &place) {
 		if (!fixRequirement())
 			return std::nullopt;
+		assert(requirement);
 		return (*requirement)(place);
 	}
 

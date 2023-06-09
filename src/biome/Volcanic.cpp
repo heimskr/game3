@@ -16,7 +16,7 @@ namespace Game3 {
 	double Volcanic::generate(Index row, Index column, std::default_random_engine &, const noise::module::Perlin &perlin, const WorldGenParams &params) {
 		Realm &realm = *getRealm();
 		const auto wetness = params.wetness;
-		const double noise = perlin.GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.666);
+		const double noise = perlin.GetValue(static_cast<double>(row) / Biome::NOISE_ZOOM, static_cast<double>(column) / Biome::NOISE_ZOOM, 0.666);
 
 		static const Identifier deeper_water  = "base:tile/deeper_water"_id;
 		static const Identifier deep_water    = "base:tile/deep_water"_id;

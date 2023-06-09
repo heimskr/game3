@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include "Position.h"
-#include "threading/ThreadContext.h"
 #include "Tileset.h"
 #include "entity/Player.h"
 #include "biome/Biome.h"
@@ -10,6 +9,7 @@
 #include "game/ServerGame.h"
 #include "item/CaveEntrance.h"
 #include "realm/Cave.h"
+#include "threading/ThreadContext.h"
 #include "tileentity/Building.h"
 #include "tileentity/Ghost.h"
 #include "ui/Canvas.h"

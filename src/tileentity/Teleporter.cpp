@@ -9,9 +9,9 @@
 
 namespace Game3 {
 	Teleporter::Teleporter(Identifier tilename, Position position_, RealmID target_realm, Position target_position):
-		TileEntity(std::move(tilename), ID(), std::move(position_), false),
+		TileEntity(std::move(tilename), ID(), position_, false),
 		targetRealm(target_realm),
-		targetPosition(std::move(target_position)) {}
+		targetPosition(target_position) {}
 
 	void Teleporter::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
@@ -45,8 +45,8 @@ namespace Game3 {
 			sprite_renderer(*texture, {
 				.x = static_cast<float>(position.column),
 				.y = static_cast<float>(position.row),
-				.x_offset = x / 2.f,
-				.y_offset = y / 2.f,
+				.x_offset = static_cast<float>(x) / 2.f,
+				.y_offset = static_cast<float>(y) / 2.f,
 				.size_x = static_cast<float>(tilesize),
 				.size_y = static_cast<float>(tilesize),
 			});
