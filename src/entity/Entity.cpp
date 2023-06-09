@@ -121,17 +121,28 @@ namespace Game3 {
 					path.pop_front();
 			}
 		}
-		auto &x = offset.x();
-		auto &y = offset.y();
+		auto &x = offset.x;
+		auto &y = offset.y;
+		auto &z = offset.z;
 		const float speed = getSpeed();
+
 		if (x < 0.f)
 			x = std::min(x + delta * speed, 0.f);
 		else if (0.f < x)
 			x = std::max(x - delta * speed, 0.f);
+
 		if (y < 0.f)
 			y = std::min(y + delta * speed, 0.f);
 		else if (0.f < y)
 			y = std::max(y - delta * speed, 0.f);
+
+		z = std::max(z + delta * zSpeed, 0.f);
+
+		if (z == 0.f) {
+			zSpeed = 0.f;
+		} else {
+			zSpeed -= 32.f * delta;
+		}
 	}
 
 	void Entity::remove() {
@@ -158,7 +169,7 @@ namespace Game3 {
 
 		float x_offset = 0.f;
 		float y_offset = 0.f;
-		if (offset.x() != 0.f || offset.y() != 0.f) {
+		if (offset.x != 0.f || offset.y != 0.f) {
 			switch (variety) {
 				case 3:
 					x_offset = 8.f * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - getRealm()->getGame().startTime).count() / 200) % 4);
@@ -183,15 +194,15 @@ namespace Game3 {
 		else
 			renderHeight = 16.f;
 
-		const auto x = position.column + offset.x();
-		const auto y = position.row    + offset.y();
+		const auto x = position.column + offset.x;
+		const auto y = position.row    + offset.y - offset.z;
 		RenderOptions main_options {
 			.x = x,
 			.y = y,
 			.x_offset = x_offset,
 			.y_offset = y_offset,
 			.size_x = 16.f,
-			.size_y = renderHeight,
+			.size_y = std::min(16.f, renderHeight + 8.f * offset.z),
 		};
 
 		if (!heldLeft && !heldRight) {
@@ -289,8 +300,8 @@ namespace Game3 {
 				throw std::invalid_argument("Invalid direction: " + std::to_string(int(move_direction)));
 		}
 
-		if ((horizontal && offset.x() != 0) || (!horizontal && offset.y() != 0)) {
-			// WARN("Can't move entity " << globalID << ": improper offsets [" << horizontal << "/" << offset.x() << ", " << !horizontal << "/" << offset.y() << "]");
+		if ((horizontal && offset.x != 0) || (!horizontal && offset.y != 0)) {
+			// WARN("Can't move entity " << globalID << ": improper offsets [" << horizontal << "/" << offset.x << ", " << !horizontal << "/" << offset.y << "]");
 			return false;
 		}
 
@@ -300,9 +311,9 @@ namespace Game3 {
 		if (can_move || direction_changed) {
 			if (can_move) {
 				if (horizontal)
-					offset.x() = x_offset;
+					offset.x = x_offset;
 				else
-					offset.y() = y_offset;
+					offset.y = y_offset;
 			}
 
 			bool path_empty = true;
@@ -379,8 +390,8 @@ namespace Game3 {
 		// TODO: fix
 		constexpr bool adjust = false; // Render-to-texture silliness
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
-		canvas.center.x() = -(getColumn() - map_length / 2.f + 0.5f) - offset.x();
-		canvas.center.y() = -(getRow()    - map_length / 2.f + 0.5f) - offset.y();
+		canvas.center.x() = -(getColumn() - map_length / 2.f + 0.5f) - offset.x;
+		canvas.center.y() = -(getRow()    - map_length / 2.f + 0.5f) - offset.y;
 		if (adjust) {
 			canvas.center.x() -= canvas.width()  / 32.f / canvas.scale;
 			canvas.center.y() += canvas.height() / 32.f / canvas.scale;
@@ -395,7 +406,7 @@ namespace Game3 {
 		position = new_position;
 
 		if (clear_offset)
-			offset = {0.f, 0.f};
+			offset = {0.f, 0.f, offset.z};
 
 		if (is_server)
 			increaseUpdateCounter();
@@ -698,8 +709,10 @@ namespace Game3 {
 		buffer << position;
 		buffer << direction;
 		buffer << getUpdateCounter();
-		buffer << offset.x();
-		buffer << offset.y();
+		buffer << offset.x;
+		buffer << offset.y;
+		buffer << offset.z;
+		buffer << zSpeed;
 		{
 			std::shared_lock lock(pathMutex);
 			buffer << path;
@@ -718,8 +731,10 @@ namespace Game3 {
 		buffer >> position;
 		buffer >> direction;
 		setUpdateCounter(buffer.take<UpdateCounter>());
-		buffer >> offset.x();
-		buffer >> offset.y();
+		buffer >> offset.x;
+		buffer >> offset.y;
+		buffer >> offset.z;
+		buffer >> zSpeed;
 		{
 			std::unique_lock lock(pathMutex);
 			buffer >> path;
@@ -797,6 +812,15 @@ namespace Game3 {
 					visiblePlayers.insert(std::dynamic_pointer_cast<Player>(entity));
 			}
 		}
+	}
+
+	void Entity::jump() {
+		if (getSide() != Side::Server || zSpeed != 0.f || offset.z != 0.f)
+			return;
+
+		zSpeed = 8.f;
+		increaseUpdateCounter();
+		getGame().toServer().entityTeleported(*this);
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {

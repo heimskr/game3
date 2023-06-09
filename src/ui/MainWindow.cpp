@@ -41,6 +41,7 @@
 namespace Game3 {
 	static std::chrono::milliseconds arrowTime {100};
 	static std::chrono::milliseconds interactTime {500};
+	static std::chrono::milliseconds jumpTime {50};
 	static std::chrono::milliseconds slowTime {1000};
 	std::unordered_map<guint, std::chrono::milliseconds> MainWindow::customKeyRepeatTimes {
 		{GDK_KEY_Up,    arrowTime},
@@ -50,7 +51,7 @@ namespace Game3 {
 		{GDK_KEY_e,     interactTime},
 		{GDK_KEY_E,     interactTime},
 		{GDK_KEY_o,     interactTime},
-		{GDK_KEY_space, interactTime},
+		{GDK_KEY_space, jumpTime},
 		{GDK_KEY_g,     slowTime},
 		{GDK_KEY_0,     slowTime},
 		{GDK_KEY_1,     slowTime},
@@ -630,8 +631,10 @@ namespace Game3 {
 					game->interactOn();
 					return;
 				case GDK_KEY_e:
-				case GDK_KEY_space:
 					game->interactNextTo();
+					return;
+				case GDK_KEY_space:
+					player.jump();
 					return;
 				case GDK_KEY_b: {
 					const auto rect = game->getVisibleRealmBounds();

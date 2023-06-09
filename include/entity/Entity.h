@@ -57,7 +57,8 @@ namespace Game3 {
 			/** When the entity moves a square, its position field is immediately updated but this field is set to an offset
 			 *  such that the sum of the new position and the offset is equal to the old offset. The offset is moved closer
 			 *  to zero each tick to achieve smooth movement instead of teleportation from one tile to the next. */
-			Eigen::Vector2f offset {0.f, 0.f};
+			Offset offset;
+			float zSpeed = 0.f;
 			std::list<Direction> path;
 			MoneyCount money = 0;
 			HitPoints health = 0;
@@ -137,6 +138,7 @@ namespace Game3 {
 			bool removeVisible(const std::weak_ptr<Entity> &);
 			bool removeVisible(const std::weak_ptr<Player> &);
 			void calculateVisibleEntities();
+			virtual void jump();
 			inline bool is(const Identifier &check) const { return type == check; }
 			inline auto getHeldLeft()  const { return heldLeft.slot;  }
 			inline auto getHeldRight() const { return heldRight.slot; }

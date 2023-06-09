@@ -13,6 +13,7 @@ namespace Game3 {
 			void render(SpriteRenderer &, TextRenderer &) override;
 			void stopContinuousInteraction();
 			void setContinuousInteraction(bool, Modifiers);
+			void jump() override;
 
 		private:
 			ClientPlayer();

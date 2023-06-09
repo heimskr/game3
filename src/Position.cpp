@@ -79,4 +79,20 @@ namespace Game3 {
 	Buffer & operator>>(Buffer &buffer, Position &position) {
 		return buffer >> position.row >> position.column;
 	}
+
+	std::ostream & operator<<(std::ostream &stream, const Offset &offset) {
+		return stream << '(' << offset.x << ", " << offset.y << ", " << offset.z << ')';
+	}
+
+	Buffer & operator+=(Buffer &buffer, const Offset &offset) {
+		return ((buffer += offset.x) += offset.y) += offset.z;
+	}
+
+	Buffer & operator<<(Buffer &buffer, const Offset &offset) {
+		return buffer << offset.x << offset.y << offset.z;
+	}
+
+	Buffer & operator>>(Buffer &buffer, Offset &offset) {
+		return buffer >> offset.x >> offset.y >> offset.z;
+	}
 }

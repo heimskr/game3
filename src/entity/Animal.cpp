@@ -22,8 +22,8 @@ namespace Game3 {
 
 		if constexpr (false) {
 			text.drawOnMap(std::to_string(getGID()), {
-				.x = static_cast<float>(position.column) + offset.x() + .5f,
-				.y = static_cast<float>(position.row) + offset.y(),
+				.x = static_cast<float>(position.column) + offset.x + .5f,
+				.y = static_cast<float>(position.row) + offset.y,
 				.color = {path.empty()? 0.f : 1.f, 0.f, 0.f, 1.f},
 				.align = TextAlign::Center,
 			});

@@ -1,6 +1,7 @@
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
 #include "packet/ContinuousInteractionPacket.h"
+#include "packet/JumpPacket.h"
 #include "ui/Canvas.h"
 #include "ui/TextRenderer.h"
 
@@ -17,15 +18,15 @@ namespace Game3 {
 		Player::render(sprites, text);
 
 		text.drawOnMap(displayName, {
-			.x = static_cast<float>(position.column) + offset.x() + .525f,
-			.y = static_cast<float>(position.row) + offset.y() + .025f,
+			.x = static_cast<float>(position.column) + offset.x + .525f,
+			.y = static_cast<float>(position.row) + offset.y + .025f,
 			.color = {0.f, 0.f, 0.f, 1.f},
 			.align = TextAlign::Center,
 		});
 
 		text.drawOnMap(displayName, {
-			.x = static_cast<float>(position.column) + offset.x() + .5f,
-			.y = static_cast<float>(position.row) + offset.y(),
+			.x = static_cast<float>(position.column) + offset.x + .5f,
+			.y = static_cast<float>(position.row) + offset.y,
 			.color = {1.f, 1.f, 1.f, 1.f},
 			.align = TextAlign::Center,
 		});
@@ -45,5 +46,10 @@ namespace Game3 {
 		}
 
 		continuousInteractionModifiers = modifiers;
+	}
+
+	void ClientPlayer::jump() {
+		if (abs(offset.z) <= 0.001f)
+			send(JumpPacket());
 	}
 }

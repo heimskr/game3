@@ -4,7 +4,7 @@
 
 namespace Game3 {
 	EntityMovedPacket::EntityMovedPacket(const Entity &entity):
-		EntityMovedPacket(entity.globalID, entity.nextRealm == -1? entity.realmID : entity.nextRealm, entity.realmID, entity.getPosition(), entity.direction, entity.offset.x(), entity.offset.y()) {}
+		EntityMovedPacket(entity.globalID, entity.nextRealm == -1? entity.realmID : entity.nextRealm, entity.realmID, entity.getPosition(), entity.direction, entity.offset, entity.zSpeed) {}
 
 	void EntityMovedPacket::handle(ClientGame &game) {
 		auto iter = game.realms.find(realmID);
@@ -34,10 +34,10 @@ namespace Game3 {
 		entity->direction = facing;
 		entity->teleport(position, realm);
 
-		if (xOffset)
-			entity->offset.x() = *xOffset;
+		if (offset)
+			entity->offset = *offset;
 
-		if (yOffset)
-			entity->offset.y() = *yOffset;
+		if (zSpeed)
+			entity->zSpeed = *zSpeed;
 	}
 }

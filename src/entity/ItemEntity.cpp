@@ -75,8 +75,8 @@ namespace Game3 {
 				return;
 		}
 
-		const float x = position.column + offset.x();
-		const float y = position.row + offset.y();
+		const float x = position.column + offset.x;
+		const float y = position.row + offset.y;
 
 		sprite_renderer(*texture, {
 			.x = x + .125f,

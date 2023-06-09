@@ -31,8 +31,8 @@ namespace Game3 {
 
 		PacketID getID() const override { return ID(); }
 
-		void encode(Game &, Buffer &buffer) const override;
-		void decode(Game &, Buffer &buffer)       override;
+		void encode(Game &, Buffer &) const override;
+		void decode(Game &, Buffer &)       override;
 
 		void handle(ServerGame &, RemoteClient &) override;
 	};

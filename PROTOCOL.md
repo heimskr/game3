@@ -112,8 +112,8 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i32` Realm ID
 	- `{i64,i64}` Position
 	- `u8` Facing
-	- `optional<float>` New X Offset
-	- `optional<float>` New Y Offset
+	- `optional<{float, float, float}>` New Offset
+	- `optional<float>` New Z-Speed
 
 18. **Stop Player Movement**: tells the server to stop moving the player in a given direction or entirely.
 
@@ -227,6 +227,8 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `i32` Realm ID
 	- `u64[2n]` Global ID + Threshold Pairs
+
+38. **Jump**: tells the server to make the player jump. No payload.
 
 # Message Format
 
