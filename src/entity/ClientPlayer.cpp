@@ -19,14 +19,14 @@ namespace Game3 {
 
 		text.drawOnMap(displayName, {
 			.x = static_cast<float>(position.column) + offset.x + .525f,
-			.y = static_cast<float>(position.row) + offset.y + .025f,
+			.y = static_cast<float>(position.row) + offset.y - offset.z + .025f,
 			.color = {0.f, 0.f, 0.f, 1.f},
 			.align = TextAlign::Center,
 		});
 
 		text.drawOnMap(displayName, {
 			.x = static_cast<float>(position.column) + offset.x + .5f,
-			.y = static_cast<float>(position.row) + offset.y,
+			.y = static_cast<float>(position.row) + offset.y - offset.z,
 			.color = {1.f, 1.f, 1.f, 1.f},
 			.align = TextAlign::Center,
 		});
