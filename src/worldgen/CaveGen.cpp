@@ -92,6 +92,7 @@ namespace Game3::WorldGen {
 
 		range.iterate([&](ChunkPosition chunk_position) {
 			realm->tileProvider.ensureAllChunks(chunk_position);
+			realm->tileProvider.updateChunk(chunk_position);
 		});
 
 		for (Index row = row_min; row <= row_max; ++row)

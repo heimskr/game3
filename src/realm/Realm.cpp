@@ -1036,10 +1036,10 @@ namespace Game3 {
 		auto player = client.getPlayer();
 		assert(player);
 
+		client.send(RealmNoticePacket(*this));
+
 		for (const auto &chunk_position: player->getVisibleChunks())
 			client.sendChunk(*this, chunk_position);
-
-		INFO("Sending to client. Chunk position: " << client.getPlayer()->getChunk());
 
 		auto guard = client.bufferGuard();
 		{

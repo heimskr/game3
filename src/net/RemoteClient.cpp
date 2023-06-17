@@ -101,7 +101,7 @@ namespace Game3 {
 			return;
 
 		try {
-			send(ChunkTilesPacket(realm, chunk_position));
+			realm.sendToOne(*this, chunk_position);
 		} catch (const std::out_of_range &) {
 			if (!can_request)
 				throw;

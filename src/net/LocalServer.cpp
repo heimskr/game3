@@ -146,8 +146,8 @@ namespace Game3 {
 		auto realm = player->getRealm();
 		INFO("Setting up player");
 		player->weakClient = client.shared_from_this();
+		auto guard = client.bufferGuard();
 		client.send(SelfTeleportedPacket(realm->id, player->getPosition()));
-		realm->sendTo(client);
 		client.send(TimePacket(game->time));
 		auto lock = game->lockPlayersShared();
 		const EntityPacket packet(player);
