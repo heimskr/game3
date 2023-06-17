@@ -1,3 +1,4 @@
+#include <cassert>
 #include <iostream>
 #include <sstream>
 
@@ -436,6 +437,13 @@ namespace Game3 {
 			old_realm->queueRemoval(shared);
 			new_realm->queueAddition(shared);
 		}
+
+		if (isPlayer() && getSide() == Side::Server) {
+			auto player = cast<Player>();
+			assert(player);
+			player->send(RealmNoticePacket(*new_realm));
+		}
+
 		teleport(new_position, false);
 	}
 

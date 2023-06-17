@@ -42,7 +42,7 @@ namespace Game3 {
 			~RemoteClient() override = default;
 
 			void handleInput(std::string_view) override;
-			void send(const Packet &);
+			bool send(const Packet &);
 			void sendChunk(Realm &, ChunkPosition, bool can_request = true, uint64_t counter_threshold = 0);
 			inline auto getPlayer() const { return weakPlayer.lock(); }
 			inline void setPlayer(const std::shared_ptr<ServerPlayer> &shared) { weakPlayer = shared; }

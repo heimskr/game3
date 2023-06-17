@@ -1,11 +1,12 @@
 #pragma once
 
 #include "game/ChunkPosition.h"
-#include "game/Game.h"
 #include "net/Buffer.h"
 #include "packet/Packet.h"
 
 namespace Game3 {
+	class Realm;
+
 	struct RealmNoticePacket: Packet {
 		static PacketID ID() { return 9; }
 

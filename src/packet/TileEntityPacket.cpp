@@ -2,6 +2,7 @@
 #include "game/ClientGame.h"
 #include "game/Game.h"
 #include "net/Buffer.h"
+#include "packet/PacketError.h"
 #include "packet/TileEntityPacket.h"
 #include "tileentity/TileEntity.h"
 #include "tileentity/TileEntityFactory.h"
@@ -15,7 +16,10 @@ namespace Game3 {
 
 	void TileEntityPacket::decode(Game &game, Buffer &buffer) {
 		buffer >> globalID >> identifier >> realmID;
-		auto realm = game.realms.at(realmID);
+		auto realm_iter = game.realms.find(realmID);
+		if (realm_iter == game.realms.end())
+			throw PacketError("Couldn't find realm " + std::to_string(realmID) + " in TileEntityPacket");
+		auto realm = realm_iter->second;
 		if (auto iter = realm->tileEntitiesByGID.find(globalID); iter != realm->tileEntitiesByGID.end()) {
 			assert(globalID != static_cast<GlobalID>(-1));
 			assert(globalID != static_cast<GlobalID>(0));
@@ -37,6 +41,7 @@ namespace Game3 {
 	}
 
 	void TileEntityPacket::handle(ClientGame &game) {
-		game.realms.at(realmID)->add(tileEntity);
+		if (tileEntity)
+			game.realms.at(realmID)->add(tileEntity);
 	}
 }

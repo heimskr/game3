@@ -15,5 +15,6 @@
 	"base:texture/pig":         ["resources/animals/pig.png"],
 	"base:texture/chicken":     ["resources/animals/chicken.png"],
 	"base:texture/dog":         ["resources/animals/dog.png"],
-	"base:texture/custom":      ["resources/items/custom.png"]
+	"base:texture/custom":      ["resources/items/custom.png"],
+	"base:texture/franuka":     ["resources/items/franuka.png"]
 }]

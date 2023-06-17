@@ -16,6 +16,7 @@
 #include "game/TileProvider.h"
 #include "packet/ChunkTilesPacket.h"
 #include "packet/EntityPacket.h"
+#include "packet/RealmNoticePacket.h"
 #include "packet/TileEntityPacket.h"
 #include "threading/Lockable.h"
 #include "threading/MTQueue.h"
@@ -299,6 +300,7 @@ namespace Game3 {
 
 		private:
 			struct ChunkPackets {
+				RealmNoticePacket realmNotice;
 				ChunkTilesPacket tilePacket;
 				std::vector<EntityPacket> entityPackets;
 				std::vector<TileEntityPacket> tileEntityPackets;

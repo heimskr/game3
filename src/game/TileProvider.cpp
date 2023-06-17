@@ -245,7 +245,7 @@ namespace Game3 {
 		throw std::out_of_range("Couldn't find fluid tile at " + static_cast<std::string>(position));
 	}
 
-	const Chunk<TileID> & TileProvider::getTileChunk(Layer layer, ChunkPosition chunk_position) const {
+	const TileChunk & TileProvider::getTileChunk(Layer layer, ChunkPosition chunk_position) const {
 		validateLayer(layer);
 
 		std::shared_lock lock(const_cast<std::shared_mutex &>(chunkMutexes[getIndex(layer)]));
@@ -255,11 +255,25 @@ namespace Game3 {
 		throw std::out_of_range("Couldn't find tile chunk at position " + static_cast<std::string>(chunk_position));
 	}
 
-	Chunk<TileID> & TileProvider::getTileChunk(Layer layer, ChunkPosition chunk_position) {
+	TileChunk & TileProvider::getTileChunk(Layer layer, ChunkPosition chunk_position) {
 		validateLayer(layer);
 		ensureTileChunk(chunk_position, layer);
 		std::unique_lock lock(chunkMutexes[getIndex(layer)]);
 		return chunkMaps[getIndex(layer)][chunk_position];
+	}
+
+	std::optional<std::reference_wrapper<const TileChunk>> TileProvider::tryTileChunk(Layer layer, ChunkPosition chunk_position) const {
+		std::shared_lock lock(const_cast<std::shared_mutex &>(chunkMutexes[getIndex(layer)]));
+		if (auto iter = chunkMaps[getIndex(layer)].find(chunk_position); iter != chunkMaps[getIndex(layer)].end())
+			return std::ref(iter->second);
+		return std::nullopt;
+	}
+
+	std::optional<std::reference_wrapper<TileChunk>> TileProvider::tryTileChunk(Layer layer, ChunkPosition chunk_position) {
+		std::shared_lock lock(chunkMutexes[getIndex(layer)]);
+		if (auto iter = chunkMaps[getIndex(layer)].find(chunk_position); iter != chunkMaps[getIndex(layer)].end())
+			return std::ref(iter->second);
+		return std::nullopt;
 	}
 
 	const Chunk<BiomeType> & TileProvider::getBiomeChunk(ChunkPosition chunk_position) const {
@@ -305,7 +319,6 @@ namespace Game3 {
 	}
 
 	void TileProvider::ensureTileChunk(ChunkPosition chunk_position) {
-		// for (Layer layer = 0; layer < LAYER_COUNT; ++layer) {
 		for (const auto layer: allLayers) {
 			std::unique_lock lock(chunkMutexes[getIndex(layer)]);
 			if (auto [iter, inserted] = chunkMaps[getIndex(layer)].try_emplace(chunk_position); inserted)
@@ -350,7 +363,7 @@ namespace Game3 {
 	}
 
 	void TileProvider::validateLayer(Layer layer) const {
-		if (static_cast<uint8_t>(layer) < static_cast<uint8_t>(Layer::Terrain) || static_cast<uint8_t>(Layer::Highest) < static_cast<uint8_t>(layer))
+		if (static_cast<uint8_t>(layer) < static_cast<uint8_t>(Layer::Terrain) || LAYER_COUNT < static_cast<uint8_t>(layer))
 			throw std::out_of_range("Invalid layer: " + std::to_string(static_cast<uint8_t>(layer)));
 	}
 

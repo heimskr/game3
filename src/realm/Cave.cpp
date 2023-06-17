@@ -90,6 +90,7 @@ namespace Game3 {
 
 	void Cave::generateChunk(const ChunkPosition &chunk_position) {
 		auto rng = chunk_position.getRNG();
+		tileProvider.ensureAllChunks(chunk_position);
 		WorldGen::generateCave(shared_from_this(), rng, seed, {chunk_position, chunk_position});
 		tileProvider.updateChunk(chunk_position);
 	}

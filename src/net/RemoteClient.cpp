@@ -74,7 +74,12 @@ namespace Game3 {
 		}
 	}
 
-	void RemoteClient::send(const Packet &packet) {
+	bool RemoteClient::send(const Packet &packet) {
+		if (!packet.valid) {
+			WARN("Dropping invalid packet of type " << typeid(packet).name());
+			return false;
+		}
+
 		assert(server.game);
 		Buffer send_buffer;
 		packet.encode(*server.game, send_buffer);
@@ -86,6 +91,7 @@ namespace Game3 {
 		bytes.insert(bytes.begin(), reinterpret_cast<uint8_t *>(&size), reinterpret_cast<uint8_t *>(&size) + sizeof(size));
 		bytes.insert(bytes.begin(), reinterpret_cast<uint8_t *>(&packet_id), reinterpret_cast<uint8_t *>(&packet_id) + sizeof(packet_id));
 		send(send_buffer.str());
+		return true;
 	}
 
 	void RemoteClient::sendChunk(Realm &realm, ChunkPosition chunk_position, bool can_request, uint64_t counter_threshold) {

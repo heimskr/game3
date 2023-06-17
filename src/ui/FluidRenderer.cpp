@@ -103,7 +103,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void FluidRenderer::setChunk(TileProvider::FluidChunk &new_chunk, bool can_reupload) {
+	void FluidRenderer::setChunk(FluidChunk &new_chunk, bool can_reupload) {
 		if (&new_chunk == chunk)
 			return;
 		chunk = &new_chunk;

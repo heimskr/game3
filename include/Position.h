@@ -8,6 +8,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include "Layer.h"
 #include "Types.h"
 
 namespace Game3 {

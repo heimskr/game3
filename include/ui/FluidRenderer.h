@@ -33,7 +33,7 @@ namespace Game3 {
 			void render(float divisor, float scale, float center_x, float center_y);
 			bool reupload();
 			bool onBackbufferResized(int width, int height);
-			void setChunk(TileProvider::FluidChunk &, bool can_reupload = true);
+			void setChunk(FluidChunk &, bool can_reupload = true);
 			void setChunkPosition(const ChunkPosition &);
 			inline void setRealm(Realm &new_realm) { realm = &new_realm; }
 
@@ -50,7 +50,7 @@ namespace Game3 {
 			GL::EBO ebo;
 			GL::FBO fbo;
 			Realm *realm = nullptr;
-			TileProvider::FluidChunk *chunk = nullptr;
+			FluidChunk *chunk = nullptr;
 			TileProvider *provider = nullptr;
 			bool positionDirty = false;
 			ChunkPosition chunkPosition;

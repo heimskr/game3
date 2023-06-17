@@ -14,6 +14,8 @@ namespace Game3 {
 			Packet() = default;
 			virtual ~Packet() = default;
 
+			bool valid = true;
+
 			virtual void encode(Game &, Buffer &) const = 0;
 			virtual void decode(Game &, Buffer &) = 0;
 			virtual PacketID getID() const = 0;

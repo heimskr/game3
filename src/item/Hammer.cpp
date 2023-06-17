@@ -33,7 +33,7 @@ namespace Game3 {
 		auto &inventory = *player.inventory;
 		auto &tileset = place.realm->getTileset();
 
-		for (auto iter = allLayers.rbegin(); iter != allLayers.rend(); ++iter) {
+		for (auto iter = mainLayers.rbegin(); iter != mainLayers.rend(); ++iter) {
 			const auto tile = place.getName(*iter);
 			ItemStack equivalent;
 			if (tile && tileset.getItemStack(place.getGame(), *tile, equivalent)) {

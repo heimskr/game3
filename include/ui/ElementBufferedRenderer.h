@@ -37,7 +37,7 @@ namespace Game3 {
 			void render(float divisor);
 			bool reupload();
 			bool onBackbufferResized(int width, int height);
-			void setChunk(TileProvider::TileChunk &, bool can_reupload = true);
+			void setChunk(TileChunk &, bool can_reupload = true);
 			void setChunkPosition(const ChunkPosition &);
 			inline void markDirty() { dirty = true; }
 			inline void setRealm(Realm &new_realm) { realm = &new_realm; }
@@ -63,7 +63,7 @@ namespace Game3 {
 			RectangleRenderer rectangle;
 			Reshader reshader;
 			Realm *realm = nullptr;
-			TileProvider::TileChunk *chunk = nullptr;
+			TileChunk *chunk = nullptr;
 			TileProvider *provider = nullptr;
 			std::vector<TileID> tileCache;
 			bool positionDirty = false;

@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "Log.h"
 #include "Tileset.h"
 #include "game/Game.h"
 #include "lib/noise.h"
@@ -88,6 +89,10 @@ namespace Game3::WorldGen {
 		const Index column_max = CHUNK_SIZE * (range.bottomRight.x + 1) - 1;
 
 		std::vector<Position> inside;
+
+		range.iterate([&](ChunkPosition chunk_position) {
+			realm->tileProvider.ensureAllChunks(chunk_position);
+		});
 
 		for (Index row = row_min; row <= row_max; ++row)
 			for (Index column = column_min; column <= column_max; ++column)

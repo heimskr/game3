@@ -13,6 +13,8 @@ Thanks to Fayabella again for her farmland and cotton tiles as well as the fabri
 
 Thanks to [190n](https://github.com/190n) for their work on the resource embedding system.
 
+Sprites in `/resources/items/franuka.png` were made by [Franuka](https://twitter.com/franuka_art) and are not governed by this project's license.
+
 ## Contribution Ideas
 If you'd like to contribute, here are some ideas, ordered roughly from easiest to hardest.
 

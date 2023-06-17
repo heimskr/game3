@@ -27,12 +27,13 @@ namespace Game3 {
 		uint64_t updateCount = 0;
 	};
 
+	using TileChunk  = Chunk<TileID>;
+	using BiomeChunk = Chunk<BiomeType>;
+	using PathChunk  = Chunk<uint8_t>;
+	using FluidChunk = Chunk<FluidTile>;
+
 	class TileProvider {
 		public:
-			using TileChunk  = Chunk<TileID>;
-			using BiomeChunk = Chunk<BiomeType>;
-			using PathChunk  = Chunk<uint8_t>;
-			using FluidChunk = Chunk<FluidTile>;
 
 			using ChunkMap = std::unordered_map<ChunkPosition, TileChunk>;
 			using BiomeMap = std::unordered_map<ChunkPosition, BiomeChunk>;
@@ -168,8 +169,11 @@ namespace Game3 {
 
 			FluidTile & findFluid(const Position &position, FluidMode mode = FluidMode::Create);
 
-			const Chunk<TileID> & getTileChunk(Layer, ChunkPosition) const;
-			Chunk<TileID> & getTileChunk(Layer, ChunkPosition);
+			const TileChunk & getTileChunk(Layer, ChunkPosition) const;
+			TileChunk & getTileChunk(Layer, ChunkPosition);
+
+			std::optional<std::reference_wrapper<const TileChunk>> tryTileChunk(Layer, ChunkPosition) const;
+			std::optional<std::reference_wrapper<TileChunk>> tryTileChunk(Layer, ChunkPosition);
 
 			const Chunk<BiomeType> & getBiomeChunk(ChunkPosition) const;
 			Chunk<BiomeType> & getBiomeChunk(ChunkPosition);
@@ -236,7 +240,7 @@ namespace Game3 {
 			MetaMap metaMap;
 
 			void validateLayer(Layer) const;
-			void initTileChunk(Layer, Chunk<TileID> &, ChunkPosition);
+			void initTileChunk(Layer, TileChunk &, ChunkPosition);
 			void initBiomeChunk(Chunk<BiomeType> &, ChunkPosition);
 			void initPathChunk(Chunk<uint8_t> &, ChunkPosition);
 			void initFluidChunk(Chunk<FluidTile> &, ChunkPosition);

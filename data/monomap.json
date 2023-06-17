@@ -211,7 +211,23 @@
 			"base:tile/cactus5",
 			"base:tile/cactus6",
 			"base:tile/cactus7",
-			"base:tile/cactus8"
+			"base:tile/cactus8",
+			"base:tile/energy_pipe_nw",
+			"base:tile/energy_pipe_we",
+			"base:tile/energy_pipe_ne",
+			"base:tile/energy_pipe_e",
+			"base:tile/energy_pipe_w",
+			"base:tile/energy_pipe_ns",
+			"base:tile/energy_pipe_sw",
+			"base:tile/energy_pipe_se",
+			"base:tile/energy_pipe_n",
+			"base:tile/energy_pipe_s",
+			"base:tile/energy_pipe_nwes",
+			"base:tile/energy_pipe_nws",
+			"base:tile/energy_pipe_nes",
+			"base:tile/energy_pipe_wes",
+			"base:tile/energy_pipe",
+			"base:tile/energy_pipe_nwe"
 		],
 		"bright": [
 			"base:tile/lava"
@@ -450,7 +466,23 @@
 			"base:tile/flower5_blue":         877,
 			"base:tile/flower5_purple":       878,
 			"base:tile/flower5_white":        879,
-			"base:tile/flower5_black":        880
+			"base:tile/flower5_black":        880,
+			"base:tile/energy_pipe_nw":        91,
+			"base:tile/energy_pipe_we":        26,
+			"base:tile/energy_pipe_ne":        89,
+			"base:tile/energy_pipe_e":         29,
+			"base:tile/energy_pipe_w":         31,
+			"base:tile/energy_pipe_ns":        57,
+			"base:tile/energy_pipe_sw":        27,
+			"base:tile/energy_pipe_se":        25,
+			"base:tile/energy_pipe_n":         92,
+			"base:tile/energy_pipe_s":         28,
+			"base:tile/energy_pipe_nwes":      94,
+			"base:tile/energy_pipe_nws":       95,
+			"base:tile/energy_pipe_nes":       93,
+			"base:tile/energy_pipe_wes":       62,
+			"base:tile/energy_pipe":          122,
+			"base:tile/energy_pipe_nwe":      126
 		},
 		"stacks": {
 			"base:category/wooden_walls": "base:item/wooden_wall",
@@ -503,7 +535,8 @@
 		},
 		"marchable": {
 			"base:category/wooden_walls": "base:tile/wall_se",
-			"base:category/towers": "base:tile/tower_se"
+			"base:category/towers":       "base:tile/tower_se",
+			"base:category/energy_pipes": "base:tile/energy_pipe_se"
 		},
 		"categories": {
 			"base:category/wooden_walls": [
@@ -751,6 +784,24 @@
 				"base:tile/small_flowers_green",
 				"base:tile/small_flowers_blue",
 				"base:tile/small_flowers_purple"
+			],
+			"base:category/energy_pipes": [
+				"base:tile/energy_pipe_nw",
+				"base:tile/energy_pipe_we",
+				"base:tile/energy_pipe_ne",
+				"base:tile/energy_pipe_e",
+				"base:tile/energy_pipe_w",
+				"base:tile/energy_pipe_ns",
+				"base:tile/energy_pipe_sw",
+				"base:tile/energy_pipe_se",
+				"base:tile/energy_pipe_n",
+				"base:tile/energy_pipe_s",
+				"base:tile/energy_pipe_nwes",
+				"base:tile/energy_pipe_nws",
+				"base:tile/energy_pipe_nes",
+				"base:tile/energy_pipe_wes",
+				"base:tile/energy_pipe",
+				"base:tile/energy_pipe_nwe"
 			]
 		}
 	}

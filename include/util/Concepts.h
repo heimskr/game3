@@ -1,6 +1,7 @@
 #pragma once
 
 #include <climits>
+#include <cstdint>
 #include <deque>
 #include <list>
 #include <map>

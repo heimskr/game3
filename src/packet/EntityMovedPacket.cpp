@@ -9,7 +9,7 @@ namespace Game3 {
 	void EntityMovedPacket::handle(ClientGame &game) {
 		auto iter = game.realms.find(realmID);
 		if (iter == game.realms.end()) {
-			WARN("Couldn't find realm " << realmID);
+			WARN("Couldn't find realm " << realmID << " in EntityMovedPacket");
 			return;
 		}
 
