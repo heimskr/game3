@@ -70,6 +70,8 @@ namespace Game3 {
 			 *  before the actual realm switch has occurred. */
 			RealmID nextRealm = -1;
 			bool spawning = false;
+			/** Whether the entity is currently teleporting to its first position on realm change. */
+			bool firstTeleport = false;
 
 			virtual void destroy();
 
@@ -110,7 +112,8 @@ namespace Game3 {
 			Entity & setRealm(const Game &, RealmID);
 			Entity & setRealm(const std::shared_ptr<Realm>);
 			void focus(Canvas &, bool is_autofocus);
-			void teleport(const Position &, bool from_path = false, bool clear_offset = true);
+			/** Returns whether the entity moved to a new chunk. */
+			bool teleport(const Position &, bool from_path = false, bool clear_offset = true);
 			virtual void teleport(const Position &, const std::shared_ptr<Realm> &);
 			/** Returns the position of the tile in front of the entity. */
 			Position nextTo() const;

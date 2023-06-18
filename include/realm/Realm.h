@@ -110,8 +110,8 @@ namespace Game3 {
 			/** Reuploads terrain in one layer. The layer argument is 1-based. */
 			void reupload(Layer);
 			void reuploadFluids();
-			EntityPtr addUnsafe(const EntityPtr &);
-			EntityPtr add(const EntityPtr &);
+			EntityPtr addUnsafe(const EntityPtr &, const Position &);
+			EntityPtr add(const EntityPtr &, const Position &);
 			TileEntityPtr add(const TileEntityPtr &);
 			TileEntityPtr addUnsafe(const TileEntityPtr &);
 			void initEntities();
@@ -133,7 +133,7 @@ namespace Game3 {
 			void queueDestruction(const EntityPtr &);
 			void queueDestruction(const TileEntityPtr &);
 			void queuePlayerRemoval(const PlayerPtr &);
-			void queueAddition(const EntityPtr &);
+			void queueAddition(const EntityPtr &, const Position &);
 			void queueAddition(const TileEntityPtr &);
 			void queue(std::function<void()>);
 			void absorb(const EntityPtr &, const Position &);
@@ -205,8 +205,7 @@ namespace Game3 {
 				entity->spawning = true;
 				entity->setRealm(shared_from_this());
 				entity->init(game_ref);
-				entity->teleport(position);
-				add(entity);
+				add(entity, position);
 				entity->calculateVisibleEntities();
 				entity->spawning = false;
 				auto lock = entity->lockVisibleEntitiesShared();
@@ -310,7 +309,7 @@ namespace Game3 {
 			bool ticking = false;
 			MTQueue<std::weak_ptr<Entity>> entityRemovalQueue;
 			MTQueue<std::weak_ptr<Entity>> entityDestructionQueue;
-			MTQueue<std::weak_ptr<Entity>> entityAdditionQueue;
+			MTQueue<std::pair<std::weak_ptr<Entity>, Position>> entityAdditionQueue;
 			MTQueue<std::weak_ptr<TileEntity>> tileEntityRemovalQueue;
 			MTQueue<std::weak_ptr<TileEntity>> tileEntityDestructionQueue;
 			MTQueue<std::weak_ptr<TileEntity>> tileEntityAdditionQueue;
@@ -319,6 +318,8 @@ namespace Game3 {
 			/** Governed by entitiesByChunkMutex. */
 			std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::unordered_set<EntityPtr>>>> entitiesByChunk;
 			std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::unordered_set<TileEntityPtr>>>> tileEntitiesByChunk;
+
+			friend class ServerGame;
 
 			std::map<ChunkPosition, WeakSet<RemoteClient>> chunkRequests;
 			std::shared_mutex chunkRequestsMutex;

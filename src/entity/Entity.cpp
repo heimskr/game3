@@ -45,6 +45,12 @@ namespace Game3 {
 		auto shared = shared_from_this();
 		realm->removeSafe(shared);
 
+		{
+			auto &all_entities = getGame().allEntities;
+			auto lock = all_entities.uniqueLock();
+			all_entities.erase(globalID);
+		}
+
 		if (getSide() == Side::Server) {
 			{
 				auto lock = lockVisibleEntitiesShared();
@@ -152,14 +158,20 @@ namespace Game3 {
 
 	void Entity::init(Game &game_) {
 		game = &game_;
+		auto shared = shared_from_this();
+
+		{
+			auto lock = game->allEntities.uniqueLock();
+			game->allEntities[globalID] = shared;
+		}
 
 		if (texture == nullptr && getSide() == Side::Client)
 				texture = getTexture();
 
 		if (!inventory)
-			inventory = std::make_shared<Inventory>(shared_from_this(), DEFAULT_INVENTORY_SIZE);
+			inventory = std::make_shared<Inventory>(shared, DEFAULT_INVENTORY_SIZE);
 		else
-			inventory->weakOwner = shared_from_this();
+			inventory->weakOwner = shared;
 
 		movedToNewChunk(std::nullopt);
 	}
@@ -399,9 +411,9 @@ namespace Game3 {
 		}
 	}
 
-	void Entity::teleport(const Position &new_position, bool from_path, bool clear_offset) {
+	bool Entity::teleport(const Position &new_position, bool from_path, bool clear_offset) {
 		const auto old_chunk_position = getChunkPosition(position);
-		const bool in_different_chunk = old_chunk_position != getChunkPosition(new_position);
+		const bool in_different_chunk = firstTeleport || old_chunk_position != getChunkPosition(new_position);
 		const bool is_server = getSide() == Side::Server;
 
 		position = new_position;
@@ -427,24 +439,36 @@ namespace Game3 {
 
 		if (is_server && !from_path)
 			getGame().toServer().entityTeleported(*this);
+
+		return in_different_chunk;
 	}
 
 	void Entity::teleport(const Position &new_position, const std::shared_ptr<Realm> &new_realm) {
-		if (auto old_realm = getRealm(); old_realm != new_realm) {
+		bool changing_realms = false;
+		auto old_realm = weakRealm.lock();
+
+		if (old_realm != new_realm) {
+			changing_realms = true;
 			nextRealm = new_realm->id;
 			auto shared = shared_from_this();
-			old_realm->detach(shared);
-			old_realm->queueRemoval(shared);
-			new_realm->queueAddition(shared);
-		}
+			if (old_realm) {
+				INFO("Moving from " << old_realm->id << " to " << new_realm->id << "; detaching.");
+				old_realm->detach(shared);
+				old_realm->queueRemoval(shared);
+			}
 
-		if (isPlayer() && getSide() == Side::Server) {
-			auto player = cast<Player>();
-			assert(player);
-			player->send(RealmNoticePacket(*new_realm));
-		}
+			setRealm(new_realm);
 
-		teleport(new_position, false);
+			if (isPlayer() && new_realm->getSide() == Side::Server) {
+				auto player = cast<Player>();
+				assert(player);
+				player->send(RealmNoticePacket(*new_realm));
+			}
+
+			new_realm->queueAddition(shared_from_this(), new_position);
+		} else {
+			teleport(new_position, false);
+		}
 	}
 
 	Position Entity::nextTo() const {

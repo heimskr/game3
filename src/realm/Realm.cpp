@@ -295,12 +295,16 @@ namespace Game3 {
 				renderer.reupload();
 	}
 
-	EntityPtr Realm::addUnsafe(const EntityPtr &entity) {
+	EntityPtr Realm::addUnsafe(const EntityPtr &entity, const Position &position) {
 		if (auto found = getEntity(entity->getGID()))
 			return found;
-		entity->setRealm(shared_from_this());
+		auto shared = shared_from_this();
 		entities.insert(entity);
 		entitiesByGID[entity->globalID] = entity;
+		entity->firstTeleport = true;
+		entity->setRealm(shared);
+		entity->teleport(position);
+		entity->firstTeleport = false;
 		attach(entity);
 		if (entity->isPlayer()) {
 			{
@@ -312,9 +316,9 @@ namespace Game3 {
 		return entity;
 	}
 
-	EntityPtr Realm::add(const EntityPtr &entity) {
+	EntityPtr Realm::add(const EntityPtr &entity, const Position &position) {
 		auto lock = lockEntitiesUnique();
-		return addUnsafe(entity);
+		return addUnsafe(entity, position);
 	}
 
 	TileEntityPtr Realm::addUnsafe(const TileEntityPtr &tile_entity) {
@@ -352,8 +356,8 @@ namespace Game3 {
 		ticking = true;
 
 		for (const auto &stolen: entityAdditionQueue.steal())
-			if (auto locked = stolen.lock())
-				add(locked);
+			if (auto locked = stolen.first.lock())
+				add(locked, stolen.second);
 
 		for (const auto &stolen: tileEntityAdditionQueue.steal())
 			if (auto locked = stolen.lock())
@@ -578,10 +582,6 @@ namespace Game3 {
 			players.erase(player);
 		}
 		entities.erase(entity);
-		std::unique_lock lock(entitiesByChunkMutex);
-		if (auto by_chunk_iter = entitiesByChunk.find(entity->getChunk()); by_chunk_iter != entitiesByChunk.end())
-			if (auto by_chunk = by_chunk_iter->second)
-				by_chunk->erase(entity);
 	}
 
 	void Realm::removeSafe(const EntityPtr &entity) {
@@ -643,8 +643,8 @@ namespace Game3 {
 		playerRemovalQueue.push(player);
 	}
 
-	void Realm::queueAddition(const EntityPtr &entity) {
-		entityAdditionQueue.push(entity);
+	void Realm::queueAddition(const EntityPtr &entity, const Position &new_position) {
+		entityAdditionQueue.emplace(entity, new_position);
 	}
 
 	void Realm::queueAddition(const TileEntityPtr &tile_entity) {
@@ -1084,14 +1084,35 @@ namespace Game3 {
 	void Realm::detach(const EntityPtr &entity) {
 		std::unique_lock lock(entitiesByChunkMutex);
 
+		bool any_erased = false;
+
 		if (auto iter = entitiesByChunk.find(entity->getChunk()); iter != entitiesByChunk.end())
-			if (0 < iter->second->erase(entity) && iter->second->empty())
-				entitiesByChunk.erase(iter);
+			if (0 < iter->second->erase(entity)) {
+				any_erased = true;
+				if (iter->second->empty())
+					entitiesByChunk.erase(iter);
+			}
 
 		// Silly hack.
 		if (auto iter = entitiesByChunk.find({0, 0}); iter != entitiesByChunk.end())
-			if (0 < iter->second->erase(entity) && iter->second->empty())
-				entitiesByChunk.erase(iter);
+			if (0 < iter->second->erase(entity)) {
+				any_erased = true;
+				if (iter->second->empty())
+					entitiesByChunk.erase(iter);
+			}
+
+		if (any_erased) {
+			SUCCESS("Detached " << entity->getName() << " from " << id << ". Current ID is " << entity->getRealm()->id << ". Current chunk is " << entity->getChunk());
+		} else {
+			WARN("Couldn't detach " << entity->getName() << " from " << id << ". Current ID is " << entity->getRealm()->id << ". Current chunk is " << entity->getChunk());
+			for (const auto &[chunk_pos, set]: entitiesByChunk) {
+				if (set) {
+					auto set_lock = set->sharedLock();
+					if (set->contains(entity))
+						WARN("Still present in realm " << id << "'s " << chunk_pos);
+				}
+			}
+		}
 	}
 
 	void Realm::attach(const EntityPtr &entity) {

@@ -17,12 +17,12 @@ namespace Game3 {
 	}
 
 	void LoginStatusPacket::encode(Game &, Buffer &buffer) const {
-		buffer << success << username << displayName << playerDataBuffer;
+		buffer << success << globalID << username << displayName << playerDataBuffer;
 	}
 
 	void LoginStatusPacket::decode(Game &game, Buffer &buffer) {
 		playerDataBuffer.context = game.shared_from_this();
-		buffer >> success >> username >> displayName >> playerDataBuffer;
+		buffer >> success >> globalID >> username >> displayName >> playerDataBuffer;
 	}
 
 	void LoginStatusPacket::handle(ClientGame &game) {
@@ -31,13 +31,13 @@ namespace Game3 {
 
 		SUCCESS("Login succeeded");
 		game.player = Entity::create<ClientPlayer>();
-		game.player->init(game);
-		INFO("Setting player GID to " << globalID);
 		game.player->setGID(globalID);
+		INFO("Setting player GID to " << globalID);
+		game.player->init(game);
 		game.player->decode(playerDataBuffer);
 		game.player->setupRealm(game);
 		game.activeRealm = game.player->getRealm();
-		game.activeRealm->add(game.player);
+		game.activeRealm->add(game.player, game.player->getPosition());
 		game.activeRealm->addPlayer(game.player);
 		game.player->inventory->notifyOwner();
 	}

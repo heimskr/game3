@@ -58,13 +58,33 @@ namespace Game3 {
 			}
 		}
 
-
 		for (const auto &weak_player: playerRemovalQueue.steal()) {
 			if (auto player = weak_player.lock()) {
 				remove(player);
 				player->toServer()->weakClient.reset();
 				if (auto count = player.use_count(); count != 1)
 					WARN("Player " << player.get() << " ref count: " << count << " (should be 1)");
+
+				for (const auto &[id, realm]: realms) {
+					{
+						auto ent_lock = realm->lockEntitiesShared();
+						if (realm->entities.contains(player))
+							INFO("Still present in Realm " << id << "'s entities");
+						if (realm->entitiesByGID.contains(player->getGID()))
+							INFO("Still present in Realm " << id << "'s entitiesByGID");
+					}
+
+					{
+						std::shared_lock lock(realm->entitiesByChunkMutex);
+						for (const auto &[cpos, set]: realm->entitiesByChunk) {
+							if (set) {
+								auto lock = set->sharedLock();
+								if (set->contains(player))
+									INFO("Still present in Realm " << id << "'s entitiesByChunk at chunk position " << cpos);
+							}
+						}
+					}
+				}
 			}
 		}
 

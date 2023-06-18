@@ -20,6 +20,7 @@
 #include "realm/Realm.h"
 #include "registry/Registries.h"
 #include "registry/Registry.h"
+#include "threading/Lockable.h"
 
 namespace Game3 {
 	class Canvas;
@@ -55,6 +56,8 @@ namespace Game3 {
 			RealmPtr activeRealm;
 
 			RegistryRegistry registries;
+
+			Lockable<std::unordered_map<GlobalID, std::weak_ptr<Entity>>> allEntities;
 
 			virtual ~Game() = default;
 
@@ -98,6 +101,7 @@ namespace Game3 {
 			/** The value to divide the color values of the tilemap pixels by. Based on the time of day. */
 			double getDivisor() const;
 			std::optional<TileID> getFluidTileID(FluidID);
+			EntityPtr getEntity(GlobalID);
 
 			virtual Side getSide() const = 0;
 

@@ -540,6 +540,20 @@ namespace Game3 {
 		return std::nullopt;
 	}
 
+	EntityPtr Game::getEntity(GlobalID gid) {
+		auto shared_lock = allEntities.sharedLock();
+		if (auto iter = allEntities.find(gid); iter != allEntities.end()) {
+			if (auto locked = iter->second.lock())
+				return locked;
+			// This should *probably* not result in a data race in practice...
+			shared_lock.unlock();
+			auto unique_lock = allEntities.uniqueLock();
+			allEntities.erase(gid);
+		}
+
+		return nullptr;
+	}
+
 	GamePtr Game::create(Side side, const ServerArgument &argument) {
 		GamePtr out;
 		if (side == Side::Client)

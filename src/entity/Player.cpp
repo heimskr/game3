@@ -154,7 +154,7 @@ namespace Game3 {
 	void Player::teleport(const Position &position, const std::shared_ptr<Realm> &new_realm) {
 		auto &game = new_realm->getGame();
 
-		if (game.activeRealm != new_realm && getSide() == Side::Server)
+		if ((firstTeleport || game.activeRealm != new_realm) && getSide() == Side::Server)
 			send(RealmNoticePacket(*new_realm));
 
 		Entity::teleport(position, new_realm);

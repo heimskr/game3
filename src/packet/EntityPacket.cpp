@@ -46,6 +46,6 @@ namespace Game3 {
 		auto iter = game.realms.find(realmID);
 		if (iter == game.realms.end())
 			throw PacketError("Couldn't find realm " + std::to_string(realmID) + " in EntityPacket");
-		iter->second->add(entity);
+		iter->second->add(entity, entity->getPosition());
 	}
 }
