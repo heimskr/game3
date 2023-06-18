@@ -32,8 +32,9 @@ namespace Game3 {
 			if (auto client = player->toServer()->weakClient.lock())
 				guards.emplace_back(client);
 
-		for (const auto &[client, packet]: packetQueue.steal())
-			handlePacket(*client, *packet);
+		for (const auto &[weak_client, packet]: packetQueue.steal())
+			if (auto client = weak_client.lock())
+				handlePacket(*client, *packet);
 
 		for (auto &[id, realm]: realms)
 			realm->tick(delta);
@@ -58,11 +59,13 @@ namespace Game3 {
 		}
 
 
-		for (const auto &player: playerRemovalQueue.steal()) {
-			remove(player);
-			player->toServer()->weakClient.reset();
-			if (auto count = player.use_count(); count != 1)
-				WARN("Player ref count: " << count << " (should be 1)");
+		for (const auto &weak_player: playerRemovalQueue.steal()) {
+			if (auto player = weak_player.lock()) {
+				remove(player);
+				player->toServer()->weakClient.reset();
+				if (auto count = player.use_count(); count != 1)
+					WARN("Player " << player.get() << " ref count: " << count << " (should be 1)");
+			}
 		}
 
 		lastGarbageCollection += delta;

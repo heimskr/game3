@@ -55,6 +55,15 @@ namespace Game3 {
 		return ss.str();
 	}
 
+	template <typename T, template <typename...> typename C, typename... Args>
+	std::unordered_set<std::shared_ptr<T>> filterWeak(const C<std::weak_ptr<T>, Args...> &container) {
+		std::unordered_set<std::shared_ptr<T>> out;
+		for (const auto &weak: container)
+			if (auto locked = weak.lock())
+				out.insert(locked);
+		return out;
+	}
+
 	long parseLong(const std::string &, int base = 10);
 	long parseLong(const char *, int base = 10);
 	long parseLong(std::string_view, int base = 10);

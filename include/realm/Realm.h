@@ -308,19 +308,19 @@ namespace Game3 {
 
 			Game &game;
 			bool ticking = false;
-			MTQueue<EntityPtr> entityRemovalQueue;
-			MTQueue<EntityPtr> entityDestructionQueue;
-			MTQueue<EntityPtr> entityAdditionQueue;
-			MTQueue<TileEntityPtr> tileEntityRemovalQueue;
-			MTQueue<TileEntityPtr> tileEntityDestructionQueue;
-			MTQueue<TileEntityPtr> tileEntityAdditionQueue;
-			MTQueue<PlayerPtr> playerRemovalQueue;
+			MTQueue<std::weak_ptr<Entity>> entityRemovalQueue;
+			MTQueue<std::weak_ptr<Entity>> entityDestructionQueue;
+			MTQueue<std::weak_ptr<Entity>> entityAdditionQueue;
+			MTQueue<std::weak_ptr<TileEntity>> tileEntityRemovalQueue;
+			MTQueue<std::weak_ptr<TileEntity>> tileEntityDestructionQueue;
+			MTQueue<std::weak_ptr<TileEntity>> tileEntityAdditionQueue;
+			MTQueue<std::weak_ptr<Player>> playerRemovalQueue;
 			MTQueue<std::function<void()>> generalQueue;
 			/** Governed by entitiesByChunkMutex. */
 			std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::unordered_set<EntityPtr>>>> entitiesByChunk;
 			std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::unordered_set<TileEntityPtr>>>> tileEntitiesByChunk;
 
-			std::map<ChunkPosition, std::unordered_set<std::shared_ptr<RemoteClient>>> chunkRequests;
+			std::map<ChunkPosition, WeakSet<RemoteClient>> chunkRequests;
 			std::shared_mutex chunkRequestsMutex;
 			std::shared_mutex entitiesByChunkMutex;
 			std::shared_mutex tileEntitiesByChunkMutex;

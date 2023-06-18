@@ -352,10 +352,12 @@ namespace Game3 {
 		ticking = true;
 
 		for (const auto &stolen: entityAdditionQueue.steal())
-			add(stolen);
+			if (auto locked = stolen.lock())
+				add(locked);
 
 		for (const auto &stolen: tileEntityAdditionQueue.steal())
-			add(stolen);
+			if (auto locked = stolen.lock())
+				add(locked);
 
 		if (isServer()) {
 			std::vector<RemoteClient::BufferGuard> guards;
@@ -398,19 +400,24 @@ namespace Game3 {
 			ticking = false;
 
 			for (const auto &stolen: entityRemovalQueue.steal())
-				remove(stolen);
+				if (auto locked = stolen.lock())
+					remove(locked);
 
 			for (const auto &stolen: entityDestructionQueue.steal())
-				stolen->destroy();
+				if (auto locked = stolen.lock())
+					locked->destroy();
 
 			for (const auto &stolen: tileEntityRemovalQueue.steal())
-				remove(stolen);
+				if (auto locked = stolen.lock())
+					remove(locked);
 
 			for (const auto &stolen: tileEntityDestructionQueue.steal())
-				stolen->destroy();
+				if (auto locked = stolen.lock())
+					locked->destroy();
 
 			for (const auto &stolen: playerRemovalQueue.steal())
-				removePlayer(stolen);
+				if (auto locked = stolen.lock())
+					removePlayer(locked);
 
 			for (const auto &stolen: generalQueue.steal())
 				stolen();
@@ -424,7 +431,11 @@ namespace Game3 {
 					remakePathMap(chunk_position);
 					std::unique_lock lock(chunkRequestsMutex);
 					if (auto iter = chunkRequests.find(chunk_position); iter != chunkRequests.end()) {
-						sendToMany(iter->second, chunk_position);
+						std::unordered_set<std::shared_ptr<RemoteClient>> strong;
+						for (const auto &weak: iter->second)
+							if (auto locked = weak.lock())
+								strong.insert(locked);
+						sendToMany(strong, chunk_position);
 						chunkRequests.erase(iter);
 					}
 				}
@@ -441,7 +452,9 @@ namespace Game3 {
 						remakePathMap(chunk_position);
 					}
 
-					sendToMany(client_set, chunk_position);
+					std::unordered_set<std::shared_ptr<RemoteClient>> strong;
+
+					sendToMany(filterWeak(client_set), chunk_position);
 					chunkRequests.erase(iter);
 				}
 			}
@@ -468,16 +481,20 @@ namespace Game3 {
 			ticking = false;
 
 			for (const auto &stolen: entityRemovalQueue.steal())
-				remove(stolen);
+				if (auto locked = stolen.lock())
+					remove(locked);
 
 			for (const auto &stolen: entityDestructionQueue.steal())
-				stolen->destroy();
+				if (auto locked = stolen.lock())
+					locked->destroy();
 
 			for (const auto &stolen: tileEntityRemovalQueue.steal())
-				remove(stolen);
+				if (auto locked = stolen.lock())
+					remove(locked);
 
 			for (const auto &stolen: tileEntityDestructionQueue.steal())
-				stolen->destroy();
+				if (auto locked = stolen.lock())
+					locked->destroy();
 
 			for (const auto &stolen: generalQueue.steal())
 				stolen();
@@ -1129,6 +1146,9 @@ namespace Game3 {
 
 	void Realm::sendToMany(const std::unordered_set<std::shared_ptr<RemoteClient>> &clients, ChunkPosition chunk_position) {
 		assert(getSide() == Side::Server);
+
+		if (clients.empty())
+			return;
 
 		try {
 			const auto [realm_notice, chunk_tiles, entity_packets, tile_entity_packets] = getChunkPackets(chunk_position);

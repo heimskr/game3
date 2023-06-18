@@ -42,13 +42,13 @@ namespace Game3 {
 
 	void Entity::destroy() {
 		auto realm = getRealm();
-		realm->removeSafe(shared_from_this());
+		auto shared = shared_from_this();
+		realm->removeSafe(shared);
 
 		if (getSide() == Side::Server) {
 			{
 				auto lock = lockVisibleEntitiesShared();
 				if (!visibleEntities.empty()) {
-					auto shared = shared_from_this();
 					for (const auto &weak_visible: visibleEntities)
 						if (auto visible = weak_visible.lock())
 							visible->removeVisible(shared);

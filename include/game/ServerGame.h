@@ -53,8 +53,8 @@ namespace Game3 {
 
 		private:
 			std::shared_mutex playersMutex;
-			MTQueue<std::pair<std::shared_ptr<RemoteClient>, std::shared_ptr<Packet>>> packetQueue;
-			MTQueue<ServerPlayerPtr> playerRemovalQueue;
+			MTQueue<std::pair<std::weak_ptr<RemoteClient>, std::shared_ptr<Packet>>> packetQueue;
+			MTQueue<std::weak_ptr<ServerPlayer>> playerRemovalQueue;
 			double timeSinceTimeUpdate = 0.;
 
 			void handlePacket(RemoteClient &, Packet &);
