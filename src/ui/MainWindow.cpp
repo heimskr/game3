@@ -641,6 +641,29 @@ namespace Game3 {
 					std::cout << '(' << rect.get_x() << ", " << rect.get_y() << " | " << rect.get_width() << " x " << rect.get_height() << ")\n";
 					return;
 				}
+				case GDK_KEY_m: {
+					if (player.isMoving()) {
+						std::vector<const char *> moves;
+						if (player.movingUp) moves.push_back("up");
+						if (player.movingDown) moves.push_back("down");
+						if (player.movingLeft) moves.push_back("left");
+						if (player.movingRight) moves.push_back("right");
+						std::stringstream ss;
+						ss << "Player is moving ";
+						bool first = true;
+						for (const char *move: moves) {
+							if (first)
+								first = false;
+							else
+								ss << ", ";
+							ss << move;
+						}
+						INFO(ss.str());
+					} else {
+						INFO("Player isn't moving");
+					}
+					return;
+				}
 				case GDK_KEY_u:
 					glArea.get_context()->make_current();
 					game->activeRealm->reupload();
