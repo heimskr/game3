@@ -24,6 +24,8 @@ namespace Game3 {
 
 		if (!entity->isPlayer())
 			INFO("Moving non-player entity");
+		else
+			INFO("New offset: " << offset->x << ", " << offset->y << ", " << offset->z);
 
 		entity->direction = facing;
 		entity->teleport(position, realm);

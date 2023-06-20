@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <functional>
 #include <list>
 #include <memory>
@@ -142,6 +143,7 @@ namespace Game3 {
 			bool removeVisible(const std::weak_ptr<Player> &);
 			void calculateVisibleEntities();
 			virtual void jump();
+			void clearOffset();
 			inline bool is(const Identifier &check) const { return type == check; }
 			inline auto getHeldLeft()  const { return heldLeft.slot;  }
 			inline auto getHeldRight() const { return heldRight.slot; }
@@ -199,6 +201,8 @@ namespace Game3 {
 				Held(bool is_left): isLeft(is_left) {}
 				inline explicit operator bool() const { return texture != nullptr; }
 			};
+
+			std::atomic<GlobalID> otherEntityToLock = -1;
 
 			Held heldLeft  {true};
 			Held heldRight {false};

@@ -128,6 +128,7 @@ namespace Game3 {
 					path.pop_front();
 			}
 		}
+
 		auto &x = offset.x;
 		auto &y = offset.y;
 		auto &z = offset.z;
@@ -418,7 +419,9 @@ namespace Game3 {
 
 		position = new_position;
 
-		if (clear_offset)
+		if (firstTeleport)
+			offset = {0.f, 0.f, 0.f};
+		else if (clear_offset)
 			offset = {0.f, 0.f, offset.z};
 
 		if (is_server)
@@ -427,8 +430,10 @@ namespace Game3 {
 		auto shared = shared_from_this();
 		getRealm()->onMoved(shared, new_position);
 
-		if (in_different_chunk)
+		if (in_different_chunk) {
+			if (isPlayer()) INFO("Moving to new chunk...");
 			movedToNewChunk(old_chunk_position);
+		}
 
 		for (auto iter = moveQueue.begin(); iter != moveQueue.end();) {
 			if ((*iter)(shared))
@@ -452,19 +457,13 @@ namespace Game3 {
 			nextRealm = new_realm->id;
 			auto shared = shared_from_this();
 			if (old_realm) {
-				INFO("Moving from " << old_realm->id << " to " << new_realm->id << "; detaching.");
+				INFO("Moving from " << old_realm->id << " to " << new_realm->id << "; detaching. Old chunk position is " << getChunkPosition(getPosition()));
 				old_realm->detach(shared);
 				old_realm->queueRemoval(shared);
 			}
 
+			clearOffset();
 			setRealm(new_realm);
-
-			if (isPlayer() && new_realm->getSide() == Side::Server) {
-				auto player = cast<Player>();
-				assert(player);
-				player->send(RealmNoticePacket(*new_realm));
-			}
-
 			new_realm->queueAddition(shared_from_this(), new_position);
 		} else {
 			teleport(new_position, false);
@@ -619,12 +618,19 @@ namespace Game3 {
 		return canSee(tile_entity.realmID, tile_entity.getPosition());
 	}
 
-	void Entity::movedToNewChunk(const std::optional<ChunkPosition> &) {
+	void Entity::movedToNewChunk(const std::optional<ChunkPosition> &old_chunk_position) {
 		if (getSide() != Side::Server)
 			return;
 
-		auto lock = lockVisibleEntities();
 		auto shared = shared_from_this();
+
+		if (auto realm = weakRealm.lock()) {
+			if (old_chunk_position)
+				realm->detach(shared, *old_chunk_position);
+			realm->attach(shared);
+		}
+
+		auto lock = lockVisibleEntities();
 
 		std::vector<std::weak_ptr<Entity>> entities_to_erase;
 		entities_to_erase.reserve(visibleEntities.size());
@@ -665,10 +671,16 @@ namespace Game3 {
 						visibleEntities.insert(visible);
 						if (visible->isPlayer())
 							visiblePlayers.insert(std::dynamic_pointer_cast<Player>(visible));
-						auto other_lock = visible->lockVisibleEntities();
-						visible->visibleEntities.insert(shared);
-						if (this_player)
-							visible->visiblePlayers.insert(this_player);
+						if (visible->otherEntityToLock != globalID) {
+							otherEntityToLock = visible->globalID;
+							auto other_lock = visible->lockVisibleEntities();
+							visible->visibleEntities.insert(shared);
+							if (this_player)
+								visible->visiblePlayers.insert(this_player);
+							otherEntityToLock = -1;
+						} else {
+							// The other entity is already handling this.
+						}
 					}
 				}
 			});
@@ -853,6 +865,12 @@ namespace Game3 {
 		zSpeed = 8.f;
 		increaseUpdateCounter();
 		getGame().toServer().entityTeleported(*this);
+	}
+
+	void Entity::clearOffset() {
+		offset.x = 0.f;
+		offset.y = 0.f;
+		offset.z = 0.f;
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {

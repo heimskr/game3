@@ -302,8 +302,11 @@ namespace Game3 {
 		entities.insert(entity);
 		entitiesByGID[entity->globalID] = entity;
 		entity->firstTeleport = true;
+		if (entity->isPlayer() && entity->weakRealm.lock())
+			entity->cast<Player>()->stopMoving();
 		entity->setRealm(shared);
 		entity->teleport(position);
+		entity->clearOffset();
 		entity->firstTeleport = false;
 		attach(entity);
 		if (entity->isPlayer()) {
@@ -1081,38 +1084,36 @@ namespace Game3 {
 		chunkRequests[chunk_position].insert(client);
 	}
 
-	void Realm::detach(const EntityPtr &entity) {
+	void Realm::detach(const EntityPtr &entity, ChunkPosition chunk_position) {
 		std::unique_lock lock(entitiesByChunkMutex);
 
 		bool any_erased = false;
 
-		if (auto iter = entitiesByChunk.find(entity->getChunk()); iter != entitiesByChunk.end())
+		if (auto iter = entitiesByChunk.find(chunk_position); iter != entitiesByChunk.end())
 			if (0 < iter->second->erase(entity)) {
 				any_erased = true;
 				if (iter->second->empty())
 					entitiesByChunk.erase(iter);
 			}
 
-		// Silly hack.
-		if (auto iter = entitiesByChunk.find({0, 0}); iter != entitiesByChunk.end())
-			if (0 < iter->second->erase(entity)) {
-				any_erased = true;
-				if (iter->second->empty())
-					entitiesByChunk.erase(iter);
-			}
-
-		if (any_erased) {
-			SUCCESS("Detached " << entity->getName() << " from " << id << ". Current ID is " << entity->getRealm()->id << ". Current chunk is " << entity->getChunk());
-		} else {
-			WARN("Couldn't detach " << entity->getName() << " from " << id << ". Current ID is " << entity->getRealm()->id << ". Current chunk is " << entity->getChunk());
-			for (const auto &[chunk_pos, set]: entitiesByChunk) {
-				if (set) {
-					auto set_lock = set->sharedLock();
-					if (set->contains(entity))
-						WARN("Still present in realm " << id << "'s " << chunk_pos);
+		if (entity->isPlayer()) {
+			if (any_erased) {
+				SUCCESS("Detached " << entity->getName() << " from " << id << ". Current ID is " << entity->getRealm()->id << ". Specified chunk is " << chunk_position);
+			} else {
+				WARN("Couldn't detach " << entity->getName() << " from " << id << ". Current ID is " << entity->getRealm()->id << ". Specified chunk is " << chunk_position);
+				for (const auto &[chunk_pos, set]: entitiesByChunk) {
+					if (set) {
+						auto set_lock = set->sharedLock();
+						if (set->contains(entity))
+							WARN("Still present in realm " << id << "'s " << chunk_pos);
+					}
 				}
 			}
 		}
+	}
+
+	void Realm::detach(const EntityPtr &entity) {
+		detach(entity, entity->getChunk());
 	}
 
 	void Realm::attach(const EntityPtr &entity) {

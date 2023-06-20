@@ -658,9 +658,10 @@ namespace Game3 {
 								ss << ", ";
 							ss << move;
 						}
+						ss << ". Offset: " << player.offset.x << ", " << player.offset.y << ", " << player.offset.z;
 						INFO(ss.str());
 					} else {
-						INFO("Player isn't moving");
+						INFO("Player isn't moving. Offset: " << player.offset.x << ", " << player.offset.y << ", " << player.offset.z);
 					}
 					return;
 				}

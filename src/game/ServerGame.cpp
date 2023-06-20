@@ -266,6 +266,28 @@ namespace Game3 {
 				const auto chunk = player->getChunk();
 				const auto counter = player->getRealm()->tileProvider.getUpdateCounter(chunk);
 				return {true, "Counter for chunk " + static_cast<std::string>(chunk) + ": " + std::to_string(counter)};
+			} else if (first == "moving") {
+				std::stringstream ss;
+				if (player->isMoving()) {
+					std::vector<const char *> moves;
+					if (player->movingUp) moves.push_back("up");
+					if (player->movingDown) moves.push_back("down");
+					if (player->movingLeft) moves.push_back("left");
+					if (player->movingRight) moves.push_back("right");
+					ss << "Player is moving ";
+					bool first = true;
+					for (const char *move: moves) {
+						if (first)
+							first = false;
+						else
+							ss << ", ";
+						ss << move;
+					}
+					ss << ". Offset: " << player->offset.x << ", " << player->offset.y << ", " << player->offset.z;
+				} else {
+					ss << "Player isn't moving. Offset: " << player->offset.x << ", " << player->offset.y << ", " << player->offset.z;
+				}
+				return {true, ss.str()};
 			}
 		} catch (const std::exception &err) {
 			return {false, err.what()};
