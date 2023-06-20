@@ -430,17 +430,14 @@ namespace Game3 {
 		auto shared = shared_from_this();
 		getRealm()->onMoved(shared, new_position);
 
-		if (in_different_chunk) {
-			if (isPlayer()) INFO("Moving to new chunk...");
+		if (in_different_chunk)
 			movedToNewChunk(old_chunk_position);
-		}
 
-		for (auto iter = moveQueue.begin(); iter != moveQueue.end();) {
+		for (auto iter = moveQueue.begin(); iter != moveQueue.end();)
 			if ((*iter)(shared))
 				moveQueue.erase(iter++);
 			else
 				++iter;
-		}
 
 		if (is_server && !from_path)
 			getGame().toServer().entityTeleported(*this);
@@ -449,15 +446,12 @@ namespace Game3 {
 	}
 
 	void Entity::teleport(const Position &new_position, const std::shared_ptr<Realm> &new_realm) {
-		bool changing_realms = false;
 		auto old_realm = weakRealm.lock();
 
 		if (old_realm != new_realm) {
-			changing_realms = true;
 			nextRealm = new_realm->id;
 			auto shared = shared_from_this();
 			if (old_realm) {
-				INFO("Moving from " << old_realm->id << " to " << new_realm->id << "; detaching. Old chunk position is " << getChunkPosition(getPosition()));
 				old_realm->detach(shared);
 				old_realm->queueRemoval(shared);
 			}

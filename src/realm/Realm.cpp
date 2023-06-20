@@ -358,9 +358,13 @@ namespace Game3 {
 	void Realm::tick(float delta) {
 		ticking = true;
 
-		for (const auto &stolen: entityAdditionQueue.steal())
-			if (auto locked = stolen.first.lock())
-				add(locked, stolen.second);
+		for (const auto &[entity, position]: entityInitializationQueue.steal())
+			if (auto locked = entity.lock())
+				initEntity(locked, position);
+
+		for (const auto &[entity, position]: entityAdditionQueue.steal())
+			if (auto locked = entity.lock())
+				add(locked, position);
 
 		for (const auto &stolen: tileEntityAdditionQueue.steal())
 			if (auto locked = stolen.lock())
@@ -1087,29 +1091,10 @@ namespace Game3 {
 	void Realm::detach(const EntityPtr &entity, ChunkPosition chunk_position) {
 		std::unique_lock lock(entitiesByChunkMutex);
 
-		bool any_erased = false;
-
 		if (auto iter = entitiesByChunk.find(chunk_position); iter != entitiesByChunk.end())
-			if (0 < iter->second->erase(entity)) {
-				any_erased = true;
+			if (0 < iter->second->erase(entity))
 				if (iter->second->empty())
 					entitiesByChunk.erase(iter);
-			}
-
-		if (entity->isPlayer()) {
-			if (any_erased) {
-				SUCCESS("Detached " << entity->getName() << " from " << id << ". Current ID is " << entity->getRealm()->id << ". Specified chunk is " << chunk_position);
-			} else {
-				WARN("Couldn't detach " << entity->getName() << " from " << id << ". Current ID is " << entity->getRealm()->id << ". Specified chunk is " << chunk_position);
-				for (const auto &[chunk_pos, set]: entitiesByChunk) {
-					if (set) {
-						auto set_lock = set->sharedLock();
-						if (set->contains(entity))
-							WARN("Still present in realm " << id << "'s " << chunk_pos);
-					}
-				}
-			}
-		}
 	}
 
 	void Realm::detach(const EntityPtr &entity) {
@@ -1254,6 +1239,20 @@ namespace Game3 {
 		}
 
 		return false;
+	}
+
+	void Realm::initEntity(const EntityPtr &entity, const Position &position) {
+		entity->init(getGame());
+		add(entity, position);
+		entity->calculateVisibleEntities();
+		entity->spawning = false;
+		auto lock = entity->lockVisibleEntitiesShared();
+		if (!entity->visiblePlayers.empty()) {
+			const EntityPacket packet(entity);
+			for (const auto &weak_player: entity->visiblePlayers)
+				if (auto player = weak_player.lock())
+					player->send(packet);
+		}
 	}
 
 	BiomeType Realm::getBiome(int64_t seed) {

@@ -206,17 +206,7 @@ namespace Game3 {
 				auto entity = T::create(game_ref, std::forward<Args>(args)...);
 				entity->spawning = true;
 				entity->setRealm(shared_from_this());
-				entity->init(game_ref);
-				add(entity, position);
-				entity->calculateVisibleEntities();
-				entity->spawning = false;
-				auto lock = entity->lockVisibleEntitiesShared();
-				if (!entity->visiblePlayers.empty()) {
-					const EntityPacket packet(entity);
-					for (const auto &weak_player: entity->visiblePlayers)
-						if (auto player = weak_player.lock())
-							player->send(packet);
-				}
+				entityInitializationQueue.emplace(entity, position);
 				return entity;
 			}
 
@@ -312,6 +302,7 @@ namespace Game3 {
 			MTQueue<std::weak_ptr<Entity>> entityRemovalQueue;
 			MTQueue<std::weak_ptr<Entity>> entityDestructionQueue;
 			MTQueue<std::pair<std::weak_ptr<Entity>, Position>> entityAdditionQueue;
+			MTQueue<std::pair<std::weak_ptr<Entity>, Position>> entityInitializationQueue;
 			MTQueue<std::weak_ptr<TileEntity>> tileEntityRemovalQueue;
 			MTQueue<std::weak_ptr<TileEntity>> tileEntityDestructionQueue;
 			MTQueue<std::weak_ptr<TileEntity>> tileEntityAdditionQueue;
@@ -337,6 +328,7 @@ namespace Game3 {
 			bool isWalkable(Index row, Index column, const Tileset &);
 			void setLayerHelper(Index row, Index col, bool should_mark_dirty = true);
 			ChunkPackets getChunkPackets(ChunkPosition);
+			void initEntity(const EntityPtr &, const Position &);
 
 			static BiomeType getBiome(int64_t seed);
 
