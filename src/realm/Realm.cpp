@@ -412,10 +412,9 @@ namespace Game3 {
 					for (size_t i = 0; i < game.randomTicksPerChunk; ++i) {
 						const Position position(chunk.y * CHUNK_SIZE + distribution(threadContext.rng), chunk.x * CHUNK_SIZE + distribution(threadContext.rng));
 
-						if (auto tile_id = tileProvider.tryTile(Layer::Terrain, position)) {
-							auto tile = game.getTile(tileset[*tile_id]);
-							tile->randomTick({position, shared, nullptr});
-						}
+						for (const Layer layer: mainLayers)
+							if (auto tile_id = tileProvider.tryTile(layer, position); tile_id && *tile_id != 0)
+								game.getTile(tileset[*tile_id])->randomTick({position, shared, nullptr});
 					}
 				}
 			}
