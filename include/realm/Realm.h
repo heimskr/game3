@@ -302,7 +302,7 @@ namespace Game3 {
 			MTQueue<std::weak_ptr<Entity>> entityRemovalQueue;
 			MTQueue<std::weak_ptr<Entity>> entityDestructionQueue;
 			MTQueue<std::pair<std::weak_ptr<Entity>, Position>> entityAdditionQueue;
-			MTQueue<std::pair<std::weak_ptr<Entity>, Position>> entityInitializationQueue;
+			MTQueue<std::pair<EntityPtr, Position>> entityInitializationQueue;
 			MTQueue<std::weak_ptr<TileEntity>> tileEntityRemovalQueue;
 			MTQueue<std::weak_ptr<TileEntity>> tileEntityDestructionQueue;
 			MTQueue<std::weak_ptr<TileEntity>> tileEntityAdditionQueue;

@@ -30,6 +30,7 @@ namespace Game3 {
 	class Menu;
 	class Player;
 	class ServerGame;
+	class Tile;
 	class Tileset;
 	struct GhostDetails;
 	struct InteractionSet;
@@ -49,6 +50,8 @@ namespace Game3 {
 			double time = 0.f;
 			size_t ticks = 0;
 			size_t cavesGenerated = 0;
+			size_t randomTicksPerChunk = 1;
+
 			std::map<RealmType, std::shared_ptr<InteractionSet>> interactionSets;
 			std::map<Identifier, std::unordered_set<std::shared_ptr<Item>>> itemsByAttribute;
 
@@ -80,6 +83,7 @@ namespace Game3 {
 			void addRealms();
 			void addPacketFactories();
 			void addLocalCommandFactories();
+			void addTiles();
 			void initialSetup(const std::filesystem::path &dir = "data");
 			void initEntities();
 			void initInteractionSets();
@@ -102,6 +106,7 @@ namespace Game3 {
 			double getDivisor() const;
 			std::optional<TileID> getFluidTileID(FluidID);
 			EntityPtr getEntity(GlobalID);
+			std::shared_ptr<Tile> getTile(const Identifier &);
 
 			virtual Side getSide() const = 0;
 

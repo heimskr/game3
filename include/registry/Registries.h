@@ -11,6 +11,7 @@ namespace Game3 {
 	class PacketFactory;
 	class RealmFactory;
 	class Texture;
+	class Tile;
 	class Tileset;
 	class TileEntityFactory;
 	struct CraftingRecipe;
@@ -104,5 +105,10 @@ namespace Game3 {
 	struct FluidRegistry: NamedRegistry<Fluid> {
 		static Identifier ID() { return {"base", "registry/fluid"}; }
 		FluidRegistry(): NamedRegistry(ID()) {}
+	};
+
+	struct TileRegistry: NamedRegistry<Tile> {
+		static Identifier ID() { return {"base", "registry/tile"}; }
+		TileRegistry(): NamedRegistry(ID()) {}
 	};
 }

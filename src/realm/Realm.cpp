@@ -19,6 +19,7 @@
 #include "realm/Realm.h"
 #include "realm/RealmFactory.h"
 #include "threading/ThreadContext.h"
+#include "tile/Tile.h"
 #include "tileentity/Ghost.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
@@ -359,8 +360,7 @@ namespace Game3 {
 		ticking = true;
 
 		for (const auto &[entity, position]: entityInitializationQueue.steal())
-			if (auto locked = entity.lock())
-				initEntity(locked, position);
+			initEntity(entity, position);
 
 		for (const auto &[entity, position]: entityAdditionQueue.steal())
 			if (auto locked = entity.lock())
@@ -404,6 +404,18 @@ namespace Game3 {
 						if (auto iter = tileEntitiesByChunk.find(chunk); iter != tileEntitiesByChunk.end() && iter->second)
 							for (const auto &tile_entity: *iter->second)
 								tile_entity->tick(game, delta);
+					}
+					static std::uniform_int_distribution distribution(0l, CHUNK_SIZE - 1);
+					auto &tileset = getTileset();
+					auto shared = shared_from_this();
+
+					for (size_t i = 0; i < game.randomTicksPerChunk; ++i) {
+						const Position position(chunk.y * CHUNK_SIZE + distribution(threadContext.rng), chunk.x * CHUNK_SIZE + distribution(threadContext.rng));
+
+						if (auto tile_id = tileProvider.tryTile(Layer::Terrain, position)) {
+							auto tile = game.getTile(tileset[*tile_id]);
+							tile->randomTick({position, shared, nullptr});
+						}
 					}
 				}
 			}
@@ -584,10 +596,8 @@ namespace Game3 {
 	void Realm::remove(EntityPtr entity) {
 		entitiesByGID.erase(entity->globalID);
 		detach(entity);
-		if (auto player = std::dynamic_pointer_cast<Player>(entity)) {
-			std::unique_lock lock(playersMutex);
-			players.erase(player);
-		}
+		if (auto player = std::dynamic_pointer_cast<Player>(entity))
+			removePlayer(player);
 		entities.erase(entity);
 	}
 
@@ -1053,7 +1063,8 @@ namespace Game3 {
 		if (players.empty()) {
 			std::unique_lock visible_lock(visibleChunksMutex);
 			visibleChunks.clear();
-		}
+		} else
+			recalculateVisibleChunks();
 	}
 
 	void Realm::sendTo(RemoteClient &client) {

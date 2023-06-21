@@ -85,6 +85,8 @@
 #include "realm/RealmFactory.h"
 #include "recipe/CraftingRecipe.h"
 #include "registry/Registries.h"
+#include "tile/ForestFloorTile.h"
+#include "tile/Tile.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
 #include "tileentity/CraftingStation.h"
@@ -130,6 +132,7 @@ namespace Game3 {
 		registries.add<PacketFactoryRegistry>();
 		registries.add<LocalCommandFactoryRegistry>();
 		registries.add<FluidRegistry>();
+		registries.add<TileRegistry>();
 		// TODO: plugins
 	}
 
@@ -340,6 +343,11 @@ namespace Game3 {
 		add(LocalCommandFactory::create<UsageCommand>());
 	}
 
+	void Game::addTiles() {
+		auto &reg = registry<TileRegistry>();
+		reg.add<ForestFloorTile>();
+	}
+
 	void Game::initialSetup(const std::filesystem::path &dir) {
 		initRegistries();
 		addItems();
@@ -350,6 +358,7 @@ namespace Game3 {
 		addTileEntityFactories();
 		addPacketFactories();
 		addLocalCommandFactories();
+		addTiles();
 	}
 
 	void Game::initEntities() {
@@ -552,6 +561,14 @@ namespace Game3 {
 		}
 
 		return nullptr;
+	}
+
+	std::shared_ptr<Tile> Game::getTile(const Identifier &identifier) {
+		auto &reg = registry<TileRegistry>();
+		if (auto found = reg.maybe(identifier))
+			return found;
+		static auto default_tile = std::make_shared<Tile>("base:tile"_id);
+		return default_tile;
 	}
 
 	GamePtr Game::create(Side side, const ServerArgument &argument) {

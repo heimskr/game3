@@ -87,7 +87,6 @@ namespace Game3 {
 		glBindVertexArray(0); CHECKGL
 
 		initialized = true;
-		SUCCESS("TextRenderer::initRenderData() finished.");
 	}
 
 	void TextRenderer::update(int backbuffer_width, int backbuffer_height) {

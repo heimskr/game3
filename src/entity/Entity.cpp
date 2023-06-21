@@ -619,9 +619,16 @@ namespace Game3 {
 		auto shared = shared_from_this();
 
 		if (auto realm = weakRealm.lock()) {
-			if (old_chunk_position)
-				realm->detach(shared, *old_chunk_position);
-			realm->attach(shared);
+			if (old_chunk_position) {
+				realm->queue([realm, shared, chunk_position = *old_chunk_position] {
+					realm->detach(shared, chunk_position);
+					realm->attach(shared);
+				});
+			} else {
+				realm->queue([realm, shared] {
+					realm->attach(shared);
+				});
+			}
 		}
 
 		auto lock = lockVisibleEntities();

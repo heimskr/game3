@@ -7,6 +7,8 @@
 namespace Game3 {
 	struct Registerable {
 		size_t registryID = -1;
+		protected:
+			Registerable() = default;
 	};
 
 	struct NamedRegisterable: Registerable {
