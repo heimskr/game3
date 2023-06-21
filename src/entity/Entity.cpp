@@ -167,7 +167,7 @@ namespace Game3 {
 		}
 
 		if (texture == nullptr && getSide() == Side::Client)
-				texture = getTexture();
+			texture = getTexture();
 
 		if (!inventory)
 			inventory = std::make_shared<Inventory>(shared, DEFAULT_INVENTORY_SIZE);

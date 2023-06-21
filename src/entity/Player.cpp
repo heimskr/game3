@@ -28,7 +28,7 @@ namespace Game3 {
 		Entity(ID()) {}
 
 	Player::~Player() {
-		INFO("~Player(" << this << ')');
+		INFO("~Player(" << this << ':' << globalID << ')');
 	}
 
 	void Player::destroy() {

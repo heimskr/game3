@@ -28,9 +28,9 @@ namespace Game3 {
 			auto factory = game.registry<EntityFactoryRegistry>()[identifier];
 			entity = (*factory)(game);
 			entity->type = identifier;
-			entity->init(game);
 			entity->setGID(globalID);
 			entity->decode(buffer);
+			entity->init(game);
 		}
 	}
 
