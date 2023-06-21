@@ -14,9 +14,9 @@ namespace Game3 {
 		auto &realm = *place.realm;
 		auto &game = realm.getGame();
 
-		// static std::uniform_int_distribution distribution(0, 99);
-		// if (distribution(threadContext.rng) != 0)
-		// 	return;
+		static std::uniform_int_distribution distribution(0, 99);
+		if (distribution(threadContext.rng) != 0)
+			return;
 
 		// If there are any adjacent or overlapping items, give up and don't spawn anything.
 		if (auto entities = realm.getEntities(getChunkPosition(place.position))) {
