@@ -22,6 +22,7 @@
 #include "entity/Woodcutter.h"
 #include "entity/Worker.h"
 #include "game/ClientGame.h"
+#include "game/Crop.h"
 #include "game/Fluids.h"
 #include "game/Game.h"
 #include "game/InteractionSet.h"
@@ -85,6 +86,7 @@
 #include "realm/RealmFactory.h"
 #include "recipe/CraftingRecipe.h"
 #include "registry/Registries.h"
+#include "tile/CropTile.h"
 #include "tile/ForestFloorTile.h"
 #include "tile/GrassTile.h"
 #include "tile/Tile.h"
@@ -134,67 +136,88 @@ namespace Game3 {
 		registries.add<LocalCommandFactoryRegistry>();
 		registries.add<FluidRegistry>();
 		registries.add<TileRegistry>();
+		registries.add<CropRegistry>();
 		// TODO: plugins
 	}
 
 	void Game::addItems() {
-		add(std::make_shared<Item>        ("base:item/shortsword",      "Shortsword",      100,  1));
-		add(std::make_shared<Item>        ("base:item/red_potion",      "Red Potion",       20,  8));
-		add(std::make_shared<Item>        ("base:item/coins",           "Gold",              1, 1'000'000));
-		add(std::make_shared<Item>        ("base:item/iron_ore",        "Iron Ore",         10, 64));
-		add(std::make_shared<Item>        ("base:item/copper_ore",      "Copper Ore",        8, 64));
-		add(std::make_shared<Item>        ("base:item/gold_ore",        "Gold Ore",         20, 64));
-		add(std::make_shared<Item>        ("base:item/diamond_ore",     "Diamond Ore",      80, 64));
-		add(std::make_shared<Item>        ("base:item/diamond",         "Diamond",         100, 64));
-		add(std::make_shared<Item>        ("base:item/coal",            "Coal",              5, 64));
-		add(std::make_shared<Item>        ("base:item/oil",             "Oil",              15, 64));
-		add(std::make_shared<Item>        ("base:item/wood",            "Wood",              3, 64));
-		add(std::make_shared<Item>        ("base:item/stone",           "Stone",             1, 64));
-		add(std::make_shared<Item>        ("base:item/iron_bar",        "Iron Bar",         16, 64));
-		add(std::make_shared<Sapling>     ("base:item/sapling",         "Sapling",           5, 64));
-		add(std::make_shared<Item>        ("base:item/gold_bar",        "Gold Bar",         45, 64));
-		add(std::make_shared<Furniture>   ("base:item/wooden_wall",     "Wooden Wall",       9, 64));
-		add(std::make_shared<Item>        ("base:item/plank",           "Plank",             4, 64));
-		add(std::make_shared<Item>        ("base:item/dirt",            "Dirt",              1, 64));
-		add(std::make_shared<Item>        ("base:item/brick",           "Brick",             3, 64));
-		add(std::make_shared<Item>        ("base:item/pot",             "Pot",              24, 64));
-		add(std::make_shared<Furniture>   ("base:item/plant_pot1",      "Plant Pot",        32, 64));
-		add(std::make_shared<Furniture>   ("base:item/plant_pot2",      "Plant Pot",        32, 64));
-		add(std::make_shared<Furniture>   ("base:item/plant_pot3",      "Plant Pot",        32, 64));
-		add(std::make_shared<Furniture>   ("base:item/tower",           "Tower",            10, 64));
-		add(std::make_shared<Furniture>   ("base:item/pride_flag",      "Pride Flag",       80, 64));
-		add(std::make_shared<CaveEntrance>("base:item/cave_entrance",   "Cave Entrance",    50,  1));
-		add(std::make_shared<Item>        ("base:item/mead",            "Mead",             10, 16));
-		add(std::make_shared<Item>        ("base:item/honey",           "Honey",             5, 64));
-		add(std::make_shared<Bomb>        ("base:item/bomb",            "Bomb",             32, 64));
-		add(std::make_shared<Item>        ("base:item/ash",             "Ash",               1, 64));
-		add(std::make_shared<Item>        ("base:item/silicon",         "Silicon",           2, 64));
-		add(std::make_shared<Item>        ("base:item/electronics",     "Electronics",      32, 64));
-		add(std::make_shared<Item>        ("base:item/sulfur",          "Sulfur",           15, 64));
-		add(std::make_shared<Furniture>   ("base:item/cauldron",        "Cauldron",        175,  1));
-		add(std::make_shared<Furniture>   ("base:item/purifier",        "Purifier",        300,  1));
-		add(std::make_shared<Hammer>      ("base:item/iron_hammer",     "Iron Hammer",     150,  3.f, 128));
-		add(std::make_shared<Hammer>      ("base:item/gold_hammer",     "Gold Hammer",     400, .75f, 128));
-		add(std::make_shared<Hammer>      ("base:item/diamond_hammer",  "Diamond Hammer",  900,  1.f, 128));
-		add(std::make_shared<Tool>        ("base:item/iron_axe",        "Iron Axe",        150,  3.f, 128, "base:attribute/axe"_id));
-		add(std::make_shared<Pickaxe>     ("base:item/iron_pickaxe",    "Iron Pickaxe",    150,  3.f,  64, "base:attribute/pickaxe"_id));
-		add(std::make_shared<Tool>        ("base:item/iron_shovel",     "Iron Shovel",     120,  3.f,  64, "base:attribute/shovel"_id));
-		add(std::make_shared<Tool>        ("base:item/gold_axe",        "Gold Axe",        400, .75f,  64, "base:attribute/axe"_id));
-		add(std::make_shared<Pickaxe>     ("base:item/gold_pickaxe",    "Gold Pickaxe",    400, .75f,  64, "base:attribute/pickaxe"_id));
-		add(std::make_shared<Tool>        ("base:item/gold_shovel",     "Gold Shovel",     300, .75f, 512, "base:attribute/shovel"_id));
-		add(std::make_shared<Tool>        ("base:item/diamond_axe",     "Diamond Axe",     900,  1.f, 512, "base:attribute/axe"_id));
-		add(std::make_shared<Pickaxe>     ("base:item/diamond_pickaxe", "Diamond Pickaxe", 900,  1.f, 512, "base:attribute/pickaxe"_id));
-		add(std::make_shared<Tool>        ("base:item/diamond_shovel",  "Diamond Shovel",  700,  1.f, 512, "base:attribute/shovel"_id));
-		add(std::make_shared<Tool>        ("base:item/wrench",          "Wrench",           72,  0.f,  -1, "base:attribute/wrench"_id));
-		add(std::make_shared<Landfill>    ("base:item/sand",            "Sand",              1, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/sand"));
-		add(std::make_shared<Landfill>    ("base:item/volcanic_sand",   "Volcanic Sand",     3, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/volcanic_sand"));
-		add(std::make_shared<Landfill>    ("base:item/clay",            "Clay",              2, 64, clayRequirement));
+		add(std::make_shared<Bomb>("base:item/bomb",           "Bomb",            32, 64));
+		add(std::make_shared<Item>("base:item/shortsword",     "Shortsword",     100,  1));
+		add(std::make_shared<Item>("base:item/red_potion",     "Red Potion",      20,  8));
+		add(std::make_shared<Item>("base:item/coins",          "Gold",             1, 1'000'000));
+		add(std::make_shared<Item>("base:item/iron_ore",       "Iron Ore",        10, 64));
+		add(std::make_shared<Item>("base:item/copper_ore",     "Copper Ore",       8, 64));
+		add(std::make_shared<Item>("base:item/gold_ore",       "Gold Ore",        20, 64));
+		add(std::make_shared<Item>("base:item/diamond_ore",    "Diamond Ore",     80, 64));
+		add(std::make_shared<Item>("base:item/diamond",        "Diamond",        100, 64));
+		add(std::make_shared<Item>("base:item/coal",           "Coal",             5, 64));
+		add(std::make_shared<Item>("base:item/oil",            "Oil",             15, 64));
+		add(std::make_shared<Item>("base:item/wood",           "Wood",             3, 64));
+		add(std::make_shared<Item>("base:item/stone",          "Stone",            1, 64));
+		add(std::make_shared<Item>("base:item/iron_bar",       "Iron Bar",        16, 64));
+		add(std::make_shared<Item>("base:item/gold_bar",       "Gold Bar",        45, 64));
+		add(std::make_shared<Item>("base:item/plank",          "Plank",            4, 64));
+		add(std::make_shared<Item>("base:item/dirt",           "Dirt",             1, 64));
+		add(std::make_shared<Item>("base:item/brick",          "Brick",            3, 64));
+		add(std::make_shared<Item>("base:item/pot",            "Pot",             24, 64));
+		add(std::make_shared<Item>("base:item/mead",           "Mead",            10, 16));
+		add(std::make_shared<Item>("base:item/honey",          "Honey",            5, 64));
+		add(std::make_shared<Item>("base:item/ash",            "Ash",              1, 64));
+		add(std::make_shared<Item>("base:item/silicon",        "Silicon",          2, 64));
+		add(std::make_shared<Item>("base:item/electronics",    "Electronics",     32, 64));
+		add(std::make_shared<Item>("base:item/sulfur",         "Sulfur",          15, 64));
+		add(std::make_shared<Item>("base:item/red_dye",        "Red Dye",        12, 64));
+		add(std::make_shared<Item>("base:item/orange_dye",     "Orange Dye",     12, 64));
+		add(std::make_shared<Item>("base:item/yellow_dye",     "Yellow Dye",     12, 64));
+		add(std::make_shared<Item>("base:item/green_dye",      "Green Dye",      12, 64));
+		add(std::make_shared<Item>("base:item/blue_dye",       "Blue Dye",       12, 64));
+		add(std::make_shared<Item>("base:item/purple_dye",     "Purple Dye",     12, 64));
+		add(std::make_shared<Item>("base:item/white_dye",      "White Dye",      12, 64));
+		add(std::make_shared<Item>("base:item/black_dye",      "Black Dye",      12, 64));
+		add(std::make_shared<Item>("base:item/brown_dye",      "Brown Dye",      12, 64));
+		add(std::make_shared<Item>("base:item/pink_dye",       "Pink Dye",       12, 64));
+		add(std::make_shared<Item>("base:item/light_blue_dye", "Light Blue Dye", 12, 64));
+		add(std::make_shared<Item>("base:item/gray_dye",       "Gray Dye",       12, 64));
+		add(std::make_shared<Item>("base:item/lime_dye",       "Lime Dye",       12, 64));
+		add(std::make_shared<Tool>("base:item/iron_axe",       "Iron Axe",       150,  3.f, 128, "base:attribute/axe"_id));
+		add(std::make_shared<Tool>("base:item/iron_shovel",    "Iron Shovel",    120,  3.f,  64, "base:attribute/shovel"_id));
+		add(std::make_shared<Tool>("base:item/gold_axe",       "Gold Axe",       400, .75f,  64, "base:attribute/axe"_id));
+		add(std::make_shared<Tool>("base:item/gold_shovel",    "Gold Shovel",    300, .75f, 512, "base:attribute/shovel"_id));
+		add(std::make_shared<Tool>("base:item/diamond_axe",    "Diamond Axe",    900,  1.f, 512, "base:attribute/axe"_id));
+		add(std::make_shared<Tool>("base:item/diamond_shovel", "Diamond Shovel", 700,  1.f, 512, "base:attribute/shovel"_id));
+		add(std::make_shared<Tool>("base:item/wrench",         "Wrench",          72,  0.f,  -1, "base:attribute/wrench"_id));
+
+		add(std::make_shared<Floor>("base:item/floor", "Floor", "base:tile/floor", 4, 64));
+
+		add(std::make_shared<Hammer>("base:item/iron_hammer",    "Iron Hammer",    150,  3.f, 128));
+		add(std::make_shared<Hammer>("base:item/gold_hammer",    "Gold Hammer",    400, .75f, 128));
+		add(std::make_shared<Hammer>("base:item/diamond_hammer", "Diamond Hammer", 900,  1.f, 128));
+
+		add(std::make_shared<Pickaxe>("base:item/iron_pickaxe",    "Iron Pickaxe",    150,  3.f,  64, "base:attribute/pickaxe"_id));
+		add(std::make_shared<Pickaxe>("base:item/gold_pickaxe",    "Gold Pickaxe",    400, .75f,  64, "base:attribute/pickaxe"_id));
+		add(std::make_shared<Pickaxe>("base:item/diamond_pickaxe", "Diamond Pickaxe", 900,  1.f, 512, "base:attribute/pickaxe"_id));
+		add(std::make_shared<Sapling>("base:item/sapling",         "Sapling",           5, 64));
+
+		add(std::make_shared<Landfill>("base:item/sand",          "Sand",          1, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/sand"));
+		add(std::make_shared<Landfill>("base:item/volcanic_sand", "Volcanic Sand", 3, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/volcanic_sand"));
+		add(std::make_shared<Landfill>("base:item/clay",          "Clay",          2, 64, clayRequirement));
+
 		add(std::make_shared<Mushroom>("base:item/saffron_milkcap", "Saffron Milkcap",    10, 1 ));
 		add(std::make_shared<Mushroom>("base:item/honey_fungus",    "Honey Fungus",       15, 18));
 		add(std::make_shared<Mushroom>("base:item/brittlegill",     "Golden Brittlegill", 20, 7 ));
 		add(std::make_shared<Mushroom>("base:item/indigo_milkcap",  "Indigo Milkcap",     20, 11));
 		add(std::make_shared<Mushroom>("base:item/black_trumpet",   "Black Trumpet",      20, 29));
 		add(std::make_shared<Mushroom>("base:item/grey_knight",     "Grey Knight",        20, 12));
+
+		add(std::make_shared<Furniture>("base:item/wooden_wall", "Wooden Wall",   9, 64));
+		add(std::make_shared<Furniture>("base:item/plant_pot1",  "Plant Pot",    32, 64));
+		add(std::make_shared<Furniture>("base:item/plant_pot2",  "Plant Pot",    32, 64));
+		add(std::make_shared<Furniture>("base:item/plant_pot3",  "Plant Pot",    32, 64));
+		add(std::make_shared<Furniture>("base:item/tower",       "Tower",        10, 64));
+		add(std::make_shared<Furniture>("base:item/pride_flag",  "Pride Flag",   80, 64));
+		add(std::make_shared<Furniture>("base:item/cauldron",    "Cauldron",    175,  1));
+		add(std::make_shared<Furniture>("base:item/purifier",    "Purifier",    300,  1));
+
 		add(std::make_shared<Plantable>("base:item/flower1_red",    "Red Flower",    "base:tile/flower1_red",    "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_red"));
 		add(std::make_shared<Plantable>("base:item/flower1_orange", "Orange Flower", "base:tile/flower1_orange", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_orange"));
 		add(std::make_shared<Plantable>("base:item/flower1_yellow", "Yellow Flower", "base:tile/flower1_yellow", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_yellow"));
@@ -235,20 +258,8 @@ namespace Game3 {
 		add(std::make_shared<Plantable>("base:item/flower5_purple", "Purple Flower", "base:tile/flower5_purple", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_purple"));
 		add(std::make_shared<Plantable>("base:item/flower5_white",  "White Flower",  "base:tile/flower5_white",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_white"));
 		add(std::make_shared<Plantable>("base:item/flower5_black",  "Black Flower",  "base:tile/flower5_black",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_black"));
-		add(std::make_shared<Item>("base:item/red_dye",        "Red Dye",        12, 64));
-		add(std::make_shared<Item>("base:item/orange_dye",     "Orange Dye",     12, 64));
-		add(std::make_shared<Item>("base:item/yellow_dye",     "Yellow Dye",     12, 64));
-		add(std::make_shared<Item>("base:item/green_dye",      "Green Dye",      12, 64));
-		add(std::make_shared<Item>("base:item/blue_dye",       "Blue Dye",       12, 64));
-		add(std::make_shared<Item>("base:item/purple_dye",     "Purple Dye",     12, 64));
-		add(std::make_shared<Item>("base:item/white_dye",      "White Dye",      12, 64));
-		add(std::make_shared<Item>("base:item/black_dye",      "Black Dye",      12, 64));
-		add(std::make_shared<Item>("base:item/brown_dye",      "Brown Dye",      12, 64));
-		add(std::make_shared<Item>("base:item/pink_dye",       "Pink Dye",       12, 64));
-		add(std::make_shared<Item>("base:item/light_blue_dye", "Light Blue Dye", 12, 64));
-		add(std::make_shared<Item>("base:item/gray_dye",       "Gray Dye",       12, 64));
-		add(std::make_shared<Item>("base:item/lime_dye",       "Lime Dye",       12, 64));
-		add(std::make_shared<Floor>("base:item/floor", "Floor", "base:tile/floor", 4, 64));
+
+		add(std::make_shared<CaveEntrance>("base:item/cave_entrance", "Cave Entrance", 50, 1));
 	}
 
 	void Game::addGhosts() {
@@ -352,6 +363,12 @@ namespace Game3 {
 		auto grass = std::make_shared<GrassTile>();
 		for (const auto &tilename: monomap->getTilesByCategory("base:category/flower_spawners"_id))
 			reg.add(tilename, grass);
+
+		for (const auto &[crop_name, crop]: registry<CropRegistry>()) {
+			auto tile = std::make_shared<CropTile>(crop);
+			for (const auto &stage: crop->stages)
+				reg.add(stage, tile);
+		}
 	}
 
 	void Game::initialSetup(const std::filesystem::path &dir) {
@@ -505,6 +522,12 @@ namespace Game3 {
 			auto &fluids = registry<FluidRegistry>();
 			for (const auto &[key, value]: json.at(1).items())
 				fluids.add(Identifier(key), Fluid(Identifier(key), value.at("tileset"), value.at("tilename")));
+
+		} else if (type == "base:crop_map"_id) {
+
+			auto &crops = registry<CropRegistry>();
+			for (const auto &[key, value]: json.at(1).items())
+				crops.add(Identifier(key), Crop(Identifier(key), value));
 
 		} else
 			throw std::runtime_error("Unknown data file type: " + type.str());

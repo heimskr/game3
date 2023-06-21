@@ -288,6 +288,11 @@ namespace Game3 {
 					ss << "Player isn't moving. Offset: " << player->offset.x << ", " << player->offset.y << ", " << player->offset.z;
 				}
 				return {true, ss.str()};
+			} else if (first == "submerge") {
+				if (words.size() != 2)
+					return {false, "Invalid number of arguments."};
+				player->getRealm()->setTile(Layer::Submerged, player->getPosition(), words.at(1));
+				return {true, "Set tile."};
 			}
 		} catch (const std::exception &err) {
 			return {false, err.what()};

@@ -1,0 +1,6 @@
+["base:crop_map", {
+	"base:crop/cotton": {
+		"stages": ["base:tile/cotton_0", "base:tile/cotton_1", "base:tile/cotton_2"],
+		"chance": 1.0
+	}
+}]

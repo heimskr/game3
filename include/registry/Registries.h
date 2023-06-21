@@ -4,6 +4,7 @@
 #include "registry/Registry.h"
 
 namespace Game3 {
+	class Crop;
 	class EntityFactory;
 	class GhostFunction;
 	class Item;
@@ -110,5 +111,10 @@ namespace Game3 {
 	struct TileRegistry: NamedRegistry<Tile> {
 		static Identifier ID() { return {"base", "registry/tile"}; }
 		TileRegistry(): NamedRegistry(ID()) {}
+	};
+
+	struct CropRegistry: NamedRegistry<Crop> {
+		static Identifier ID() { return {"base", "registry/crop"}; }
+		CropRegistry(): NamedRegistry(ID()) {}
 	};
 }
