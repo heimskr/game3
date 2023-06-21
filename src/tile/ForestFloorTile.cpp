@@ -8,7 +8,7 @@
 
 namespace Game3 {
 	ForestFloorTile::ForestFloorTile():
-		Tile("base:tile/forest_floor"_id) {}
+		Tile(ID()) {}
 
 	void ForestFloorTile::randomTick(const Place &place) {
 		auto &realm = *place.realm;
@@ -35,6 +35,6 @@ namespace Game3 {
 			{game, "base:item/brittlegill"},
 		};
 
-		choose(mushrooms).spawn(place.realm, place.position);
+		choose(mushrooms, threadContext.rng).spawn(place.realm, place.position);
 	}
 }

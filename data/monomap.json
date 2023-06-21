@@ -785,6 +785,17 @@
 				"base:tile/small_flowers_blue",
 				"base:tile/small_flowers_purple"
 			],
+			"base:category/flower_spawners": [
+				"base:tile/grass",
+				"base:tile/grass_alt1",
+				"base:tile/grass_alt2",
+				"base:tile/small_flowers_red",
+				"base:tile/small_flowers_orange",
+				"base:tile/small_flowers_yellow",
+				"base:tile/small_flowers_green",
+				"base:tile/small_flowers_blue",
+				"base:tile/small_flowers_purple"
+			],
 			"base:category/energy_pipes": [
 				"base:tile/energy_pipe_nw",
 				"base:tile/energy_pipe_we",

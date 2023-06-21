@@ -86,6 +86,7 @@
 #include "recipe/CraftingRecipe.h"
 #include "registry/Registries.h"
 #include "tile/ForestFloorTile.h"
+#include "tile/GrassTile.h"
 #include "tile/Tile.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
@@ -346,6 +347,11 @@ namespace Game3 {
 	void Game::addTiles() {
 		auto &reg = registry<TileRegistry>();
 		reg.add<ForestFloorTile>();
+
+		const auto monomap = registry<TilesetRegistry>().at("base:tileset/monomap"_id);
+		auto grass = std::make_shared<GrassTile>();
+		for (const auto &tilename: monomap->getTilesByCategory("base:category/flower_spawners"_id))
+			reg.add(tilename, grass);
 	}
 
 	void Game::initialSetup(const std::filesystem::path &dir) {
