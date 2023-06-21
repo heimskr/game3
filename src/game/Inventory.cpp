@@ -12,6 +12,7 @@
 #include "packet/InventoryPacket.h"
 #include "packet/SetActiveSlotPacket.h"
 #include "packet/ActiveSlotSetPacket.h"
+#include "packet/DropItemPacket.h"
 #include "realm/Realm.h"
 #include "recipe/CraftingRecipe.h"
 #include "util/Util.h"
@@ -132,11 +133,28 @@ namespace Game3 {
 		if (!owner)
 			throw std::logic_error("Inventory is missing an owner");
 
-		auto realm = owner->getRealm();
-		realm->spawn<ItemEntity>(owner->getPosition(), storage.at(slot));
-		storage.erase(slot);
+		if (owner->getSide() == Side::Server) {
+			auto realm = owner->getRealm();
+			realm->spawn<ItemEntity>(owner->getPosition(), storage.at(slot));
+			storage.erase(slot);
+			notifyOwner();
+		} else if (auto player = std::dynamic_pointer_cast<Player>(owner)) {
+			player->send(DropItemPacket(slot, false));
+		} else
+			throw std::runtime_error("Only Players can drop items on the client");
+	}
 
-		notifyOwner();
+	void Inventory::discard(Slot slot) {
+		auto owner = weakOwner.lock();
+		if (!owner)
+			throw std::logic_error("Inventory is missing an owner");
+
+		if (owner->getSide() == Side::Server)
+			erase(slot);
+		else if (auto player = std::dynamic_pointer_cast<Player>(owner))
+			player->send(DropItemPacket(slot, true));
+		else
+			throw std::runtime_error("Only Players can discard items on the client");
 	}
 
 	bool Inventory::swap(Slot source, Slot destination) {

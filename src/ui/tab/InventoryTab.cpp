@@ -49,7 +49,7 @@ namespace Game3 {
 			(lastExternal? externalInventory : lastGame->player->inventory)->drop(lastSlot);
 		});
 		group->add_action("discard", [this] {
-			(lastExternal? externalInventory : lastGame->player->inventory)->erase(lastSlot);
+			(lastExternal? externalInventory : lastGame->player->inventory)->discard(lastSlot);
 		});
 
 		mainWindow.insert_action_group("inventory_popup", group);

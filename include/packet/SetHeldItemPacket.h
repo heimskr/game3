@@ -1,10 +1,7 @@
 #pragma once
 
-#include <optional>
-
 #include "game/Game.h"
 #include "packet/Packet.h"
-#include "ui/Modifiers.h"
 
 namespace Game3 {
 	struct SetHeldItemPacket: Packet {

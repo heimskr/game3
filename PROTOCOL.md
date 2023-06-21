@@ -230,6 +230,11 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 38. **Jump**: tells the server to make the player jump. No payload.
 
+39. **Drop Item**: tells the server to drop or discard an item from the player's inventory.
+
+	- `i32` Slot
+	- `bool` Discard
+
 # Message Format
 
 All values are little endian.

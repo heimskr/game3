@@ -46,10 +46,10 @@ namespace Game3 {
 				agentMeta.updateCounter = new_counter;
 			}
 
-			static GlobalID generateGID();
-
 			bool hasBeenSentTo(const std::shared_ptr<Player> &);
 			void onSend(const std::shared_ptr<Player> &);
+
+			static GlobalID generateGID();
 
 		private:
 			Lockable<AgentMeta> agentMeta;
