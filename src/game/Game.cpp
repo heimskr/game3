@@ -167,19 +167,19 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/silicon",        "Silicon",          2, 64));
 		add(std::make_shared<Item>("base:item/electronics",    "Electronics",     32, 64));
 		add(std::make_shared<Item>("base:item/sulfur",         "Sulfur",          15, 64));
-		add(std::make_shared<Item>("base:item/red_dye",        "Red Dye",        12, 64));
-		add(std::make_shared<Item>("base:item/orange_dye",     "Orange Dye",     12, 64));
-		add(std::make_shared<Item>("base:item/yellow_dye",     "Yellow Dye",     12, 64));
-		add(std::make_shared<Item>("base:item/green_dye",      "Green Dye",      12, 64));
-		add(std::make_shared<Item>("base:item/blue_dye",       "Blue Dye",       12, 64));
-		add(std::make_shared<Item>("base:item/purple_dye",     "Purple Dye",     12, 64));
-		add(std::make_shared<Item>("base:item/white_dye",      "White Dye",      12, 64));
-		add(std::make_shared<Item>("base:item/black_dye",      "Black Dye",      12, 64));
-		add(std::make_shared<Item>("base:item/brown_dye",      "Brown Dye",      12, 64));
-		add(std::make_shared<Item>("base:item/pink_dye",       "Pink Dye",       12, 64));
-		add(std::make_shared<Item>("base:item/light_blue_dye", "Light Blue Dye", 12, 64));
-		add(std::make_shared<Item>("base:item/gray_dye",       "Gray Dye",       12, 64));
-		add(std::make_shared<Item>("base:item/lime_dye",       "Lime Dye",       12, 64));
+		add(std::make_shared<Item>("base:item/red_dye",        "Red Dye",         12, 64));
+		add(std::make_shared<Item>("base:item/orange_dye",     "Orange Dye",      12, 64));
+		add(std::make_shared<Item>("base:item/yellow_dye",     "Yellow Dye",      12, 64));
+		add(std::make_shared<Item>("base:item/green_dye",      "Green Dye",       12, 64));
+		add(std::make_shared<Item>("base:item/blue_dye",       "Blue Dye",        12, 64));
+		add(std::make_shared<Item>("base:item/purple_dye",     "Purple Dye",      12, 64));
+		add(std::make_shared<Item>("base:item/white_dye",      "White Dye",       12, 64));
+		add(std::make_shared<Item>("base:item/black_dye",      "Black Dye",       12, 64));
+		add(std::make_shared<Item>("base:item/brown_dye",      "Brown Dye",       12, 64));
+		add(std::make_shared<Item>("base:item/pink_dye",       "Pink Dye",        12, 64));
+		add(std::make_shared<Item>("base:item/light_blue_dye", "Light Blue Dye",  12, 64));
+		add(std::make_shared<Item>("base:item/gray_dye",       "Gray Dye",        12, 64));
+		add(std::make_shared<Item>("base:item/lime_dye",       "Lime Dye",        12, 64));
 		add(std::make_shared<Tool>("base:item/iron_axe",       "Iron Axe",       150,  3.f, 128, "base:attribute/axe"_id));
 		add(std::make_shared<Tool>("base:item/iron_shovel",    "Iron Shovel",    120,  3.f,  64, "base:attribute/shovel"_id));
 		add(std::make_shared<Tool>("base:item/gold_axe",       "Gold Axe",       400, .75f,  64, "base:attribute/axe"_id));
@@ -578,20 +578,6 @@ namespace Game3 {
 		}
 
 		return std::nullopt;
-	}
-
-	EntityPtr Game::getEntity(GlobalID gid) {
-		auto shared_lock = allEntities.sharedLock();
-		if (auto iter = allEntities.find(gid); iter != allEntities.end()) {
-			if (auto locked = iter->second.lock())
-				return locked;
-			// This should *probably* not result in a data race in practice...
-			shared_lock.unlock();
-			auto unique_lock = allEntities.uniqueLock();
-			allEntities.erase(gid);
-		}
-
-		return nullptr;
 	}
 
 	std::shared_ptr<Tile> Game::getTile(const Identifier &identifier) {

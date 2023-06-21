@@ -26,6 +26,11 @@ namespace Game3 {
 		return out;
 	}
 
+	void TileEntity::init(Game &game) {
+		auto lock = game.allAgents.uniqueLock();
+		game.allAgents[globalID] = shared_from_this();
+	}
+
 	void TileEntity::setRealm(const std::shared_ptr<Realm> &realm) {
 		realmID = realm->id;
 		weakRealm = realm;

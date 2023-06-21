@@ -40,7 +40,7 @@ namespace Game3 {
 
 			static std::shared_ptr<TileEntity> fromJSON(Game &, const nlohmann::json &);
 
-			virtual void init(Game &) {}
+			virtual void init(Game &);
 			virtual void tick(Game &, float) {}
 			virtual void onSpawn() {}
 			virtual void onRemove() {}

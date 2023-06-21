@@ -145,7 +145,6 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 23. **Destroy Entity**: tells a client to remove an entity.
 
 	- `u64` Global ID
-	- `i32` Realm ID
 
 24. **Inventory**: sends a client its player's inventory.
 
@@ -162,7 +161,6 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 27. **Destroy Tile Entity**: tells a client to remove a tile entity.
 
 	- `u64` Global ID
-	- `i32` Realm ID
 
 28. **Entity Forgotten**: informs the server that the client has removed an entity from its memory.
 

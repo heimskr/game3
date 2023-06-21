@@ -70,7 +70,7 @@ namespace Game3 {
 			if (auto iter = realm->tileEntitiesByGID.find(tile_entity_id); iter != realm->tileEntitiesByGID.end())
 				iter->second->sendTo(client, threshold);
 			else
-				client.send(DestroyTileEntityPacket(tile_entity_id, realmID));
+				client.send(DestroyTileEntityPacket(tile_entity_id));
 		}
 	}
 }

@@ -110,5 +110,6 @@
 	"base:item/black_trumpet":   ["base:texture/mushrooms",    80,  80],
 	"base:item/grey_knight":     ["base:texture/mushrooms",     0,  32],
 	"base:item/wrench":          ["base:texture/custom",       16,   0],
-	"base:item/iron_hoe":        ["base:texture/franuka",       0,   0]
+	"base:item/iron_hoe":        ["base:texture/franuka",       0,   0],
+	"base:item/cotton_seeds":    ["base:texture/custom",       32,   0]
 }]

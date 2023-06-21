@@ -15,7 +15,7 @@ namespace Game3 {
 		}
 
 		auto realm = iter->second;
-		auto entity = game.getEntity(globalID);
+		auto entity = game.getAgent<Entity>(globalID);
 
 		if (!entity) {
 			WARN("Couldn't find entity " << globalID << ". Player is " << game.player->getGID());

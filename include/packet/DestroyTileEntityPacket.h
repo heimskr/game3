@@ -10,17 +10,16 @@ namespace Game3 {
 		static PacketID ID() { return 27; }
 
 		GlobalID globalID = -1;
-		RealmID realmID = -1;
 
 		DestroyTileEntityPacket() = default;
 		DestroyTileEntityPacket(const TileEntity &);
-		DestroyTileEntityPacket(GlobalID global_id, RealmID realm_id):
-			globalID(global_id), realmID(realm_id) {}
+		DestroyTileEntityPacket(GlobalID global_id):
+			globalID(global_id) {}
 
 		PacketID getID() const override { return ID(); }
 
-		void encode(Game &, Buffer &buffer) const override { buffer << globalID << realmID; }
-		void decode(Game &, Buffer &buffer)       override { buffer >> globalID >> realmID; }
+		void encode(Game &, Buffer &buffer) const override { buffer << globalID; }
+		void decode(Game &, Buffer &buffer)       override { buffer >> globalID; }
 
 		void handle(ClientGame &) override;
 	};

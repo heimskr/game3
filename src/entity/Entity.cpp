@@ -46,9 +46,9 @@ namespace Game3 {
 		realm->removeSafe(shared);
 
 		{
-			auto &all_entities = getGame().allEntities;
-			auto lock = all_entities.uniqueLock();
-			all_entities.erase(globalID);
+			auto &all_agents = getGame().allAgents;
+			auto lock = all_agents.uniqueLock();
+			all_agents.erase(globalID);
 		}
 
 		if (getSide() == Side::Server) {
@@ -146,11 +146,10 @@ namespace Game3 {
 
 		z = std::max(z + delta * zSpeed, 0.f);
 
-		if (z == 0.f) {
+		if (z == 0.f)
 			zSpeed = 0.f;
-		} else {
+		else
 			zSpeed -= 32.f * delta;
-		}
 	}
 
 	void Entity::remove() {
@@ -162,8 +161,8 @@ namespace Game3 {
 		auto shared = shared_from_this();
 
 		{
-			auto lock = game->allEntities.uniqueLock();
-			game->allEntities[globalID] = shared;
+			auto lock = game->allAgents.uniqueLock();
+			game->allAgents[globalID] = shared;
 		}
 
 		if (texture == nullptr && getSide() == Side::Client)

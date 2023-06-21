@@ -39,7 +39,7 @@ namespace Game3 {
 	class Game: public std::enable_shared_from_this<Game>, public BufferContext {
 		public:
 			static constexpr const char *DEFAULT_PATH = "game.g3";
-			static constexpr Version PROTOCOL_VERSION = 2;
+			static constexpr Version PROTOCOL_VERSION = 3;
 
 			/** Seconds since the last tick */
 			float delta = 0.f;
@@ -60,7 +60,7 @@ namespace Game3 {
 
 			RegistryRegistry registries;
 
-			Lockable<std::unordered_map<GlobalID, std::weak_ptr<Entity>>> allEntities;
+			Lockable<std::unordered_map<GlobalID, std::weak_ptr<Agent>>> allAgents;
 
 			virtual ~Game() = default;
 
@@ -105,7 +105,6 @@ namespace Game3 {
 			/** The value to divide the color values of the tilemap pixels by. Based on the time of day. */
 			double getDivisor() const;
 			std::optional<TileID> getFluidTileID(FluidID);
-			EntityPtr getEntity(GlobalID);
 			std::shared_ptr<Tile> getTile(const Identifier &);
 
 			virtual Side getSide() const = 0;
@@ -124,6 +123,24 @@ namespace Game3 {
 			ServerGame & toServer();
 			const ServerGame & toServer() const;
 			std::shared_ptr<ServerGame> toServerPointer();
+
+			template <typename T = Agent>
+			std::shared_ptr<T> getAgent(GlobalID gid) {
+				auto shared_lock = allAgents.sharedLock();
+				if (auto iter = allAgents.find(gid); iter != allAgents.end()) {
+					if (auto agent = iter->second.lock()) {
+						if (auto out = std::dynamic_pointer_cast<T>(agent))
+							return out;
+					} else {
+						// This should *probably* not result in a data race in practice...
+						shared_lock.unlock();
+						auto unique_lock = allAgents.uniqueLock();
+						allAgents.erase(gid);
+					}
+				}
+
+				return nullptr;
+			}
 
 		protected:
 			Game() = default;
