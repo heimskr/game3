@@ -1264,12 +1264,15 @@ namespace Game3 {
 		add(entity, position);
 		entity->calculateVisibleEntities();
 		entity->spawning = false;
-		auto lock = entity->lockVisibleEntitiesShared();
-		if (!entity->visiblePlayers.empty()) {
-			const EntityPacket packet(entity);
-			for (const auto &weak_player: entity->visiblePlayers)
-				if (auto player = weak_player.lock())
-					player->send(packet);
+
+		if (getSide() == Side::Server) {
+			auto lock = entity->lockVisibleEntitiesShared();
+			if (!entity->visiblePlayers.empty()) {
+				const EntityPacket packet(entity);
+				for (const auto &weak_player: entity->visiblePlayers)
+					if (auto player = weak_player.lock())
+						player->send(packet);
+			}
 		}
 	}
 

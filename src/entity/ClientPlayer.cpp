@@ -8,10 +8,8 @@
 namespace Game3 {
 	ClientPlayer::ClientPlayer(): Player() {}
 
-	std::shared_ptr<ClientPlayer> ClientPlayer::create(Game &game) {
-		auto out = Entity::create<ClientPlayer>();
-		out->init(game);
-		return out;
+	std::shared_ptr<ClientPlayer> ClientPlayer::create(Game &) {
+		return Entity::create<ClientPlayer>();
 	}
 
 	void ClientPlayer::render(SpriteRenderer &sprites, TextRenderer &text) {

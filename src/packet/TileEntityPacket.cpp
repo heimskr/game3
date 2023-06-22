@@ -16,19 +16,25 @@ namespace Game3 {
 
 	void TileEntityPacket::decode(Game &game, Buffer &buffer) {
 		buffer >> globalID >> identifier >> realmID;
+		assert(globalID != static_cast<GlobalID>(-1));
+		assert(globalID != static_cast<GlobalID>(0));
+
 		auto realm_iter = game.realms.find(realmID);
 		if (realm_iter == game.realms.end())
 			throw PacketError("Couldn't find realm " + std::to_string(realmID) + " in TileEntityPacket");
+
 		auto realm = realm_iter->second;
-		if (auto iter = realm->tileEntitiesByGID.find(globalID); iter != realm->tileEntitiesByGID.end()) {
-			assert(globalID != static_cast<GlobalID>(-1));
-			assert(globalID != static_cast<GlobalID>(0));
-			(tileEntity = iter->second)->decode(game, buffer);
+
+		if (auto found = game.getAgent<TileEntity>(globalID)) {
+			wasFound = true;
+			(tileEntity = found)->decode(game, buffer);
 		} else {
+			wasFound = false;
 			auto factory = game.registry<TileEntityFactoryRegistry>()[identifier];
 			tileEntity = (*factory)(game);
 			tileEntity->globalID = globalID;
 			tileEntity->tileEntityID = identifier;
+			tileEntity->init(game);
 			realm->add(tileEntity);
 			tileEntity->decode(game, buffer);
 		}
@@ -41,7 +47,7 @@ namespace Game3 {
 	}
 
 	void TileEntityPacket::handle(ClientGame &game) {
-		if (tileEntity)
+		if (tileEntity && !wasFound)
 			game.realms.at(realmID)->add(tileEntity);
 	}
 }

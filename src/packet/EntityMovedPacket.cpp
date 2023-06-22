@@ -19,11 +19,22 @@ namespace Game3 {
 
 		if (!entity) {
 			WARN("Couldn't find entity " << globalID << ". Player is " << game.player->getGID());
+			auto lock = game.allAgents.sharedLock();
+			WARN("allAgents size: " << game.allAgents.size());
+			if (game.allAgents.size() < 2000) {
+				for (const auto &[gid, weak]: game.allAgents) {
+					if (auto locked = weak.lock()) {
+						INFO("    " << gid << ": " << typeid(*locked).name() << " " << locked->getGID());
+					} else {
+						INFO("    " << gid << ": expired");
+					}
+				}
+			}
 			return;
 		}
 
 		if (!entity->isPlayer())
-			INFO("Moving non-player entity");
+			INFO("Moving non-player entity " << globalID << " (" << typeid(*entity).name() << "). Player is " << game.player->getGID());
 
 		entity->direction = facing;
 		entity->teleport(position, realm);

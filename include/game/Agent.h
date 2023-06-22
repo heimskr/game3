@@ -19,6 +19,7 @@ namespace Game3 {
 			enum class Type {Entity, TileEntity};
 
 			GlobalID globalID = generateGID();
+			bool initialized = false;
 
 			virtual ~Agent() = default;
 

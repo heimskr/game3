@@ -1,11 +1,13 @@
 #include <mutex>
 #include <random>
 
+#include "Log.h"
 #include "game/Agent.h"
 #include "realm/Realm.h"
 
 namespace Game3 {
 	static std::default_random_engine agent_rng(42);
+	// static std::random_device agent_rng;
 	static std::mutex agent_rng_mutex;
 
 	std::vector<ChunkPosition> Agent::getVisibleChunks() const {

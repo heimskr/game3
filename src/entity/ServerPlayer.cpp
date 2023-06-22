@@ -6,15 +6,12 @@ namespace Game3 {
 	ServerPlayer::ServerPlayer(): Player() {}
 
 	std::shared_ptr<ServerPlayer> ServerPlayer::create(Game &game) {
-		auto out = Entity::create<ServerPlayer>();
-		out->init(game);
-		return out;
+		return Entity::create<ServerPlayer>();
 	}
 
 	std::shared_ptr<ServerPlayer> ServerPlayer::fromJSON(Game &game, const nlohmann::json &json) {
 		auto out = Entity::create<ServerPlayer>();
 		out->absorbJSON(game, json);
-		out->init(game);
 		return out;
 	}
 

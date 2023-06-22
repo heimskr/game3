@@ -26,22 +26,17 @@ namespace Game3 {
 		Entity(ID()),
 		Worker(ID(), overworld_realm, house_realm, house_position, keep_) {}
 
-	std::shared_ptr<Miner> Miner::create(Game &game) {
-		auto out = Entity::create<Miner>();
-		out->init(game);
-		return out;
+	std::shared_ptr<Miner> Miner::create(Game &) {
+		return Entity::create<Miner>();
 	}
 
-	std::shared_ptr<Miner> Miner::create(Game &game, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_) {
-		auto out = Entity::create<Miner>(overworld_realm, house_realm, house_position, keep_);
-		out->init(game);
-		return out;
+	std::shared_ptr<Miner> Miner::create(Game &, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_) {
+		return Entity::create<Miner>(overworld_realm, house_realm, house_position, keep_);
 	}
 
 	std::shared_ptr<Miner> Miner::fromJSON(Game &game, const nlohmann::json &json) {
 		auto out = Entity::create<Miner>();
 		out->absorbJSON(game, json);
-		out->init(game);
 		return out;
 	}
 

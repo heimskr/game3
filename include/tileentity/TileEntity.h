@@ -29,10 +29,8 @@ namespace Game3 {
 			nlohmann::json extraData;
 
 			template <typename T, typename... Args>
-			static std::shared_ptr<T> create(Game &game, Args && ...args) {
-				auto out = std::shared_ptr<T>(new T(std::forward<Args>(args)...));
-				out->init(game);
-				return out;
+			static std::shared_ptr<T> create(Game &, Args && ...args) {
+				return std::shared_ptr<T>(new T(std::forward<Args>(args)...));
 			}
 
 			~TileEntity() override = default;

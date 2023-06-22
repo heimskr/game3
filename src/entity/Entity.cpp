@@ -36,7 +36,6 @@ namespace Game3 {
 		assert(factory);
 		auto out = (*factory)(game, json);
 		out->absorbJSON(game, json);
-		out->init(game);
 		return out;
 	}
 
@@ -157,11 +156,22 @@ namespace Game3 {
 	}
 
 	void Entity::init(Game &game_) {
+		assert(!initialized);
+		initialized = true;
+
 		game = &game_;
 		auto shared = shared_from_this();
 
 		{
 			auto lock = game->allAgents.uniqueLock();
+			if (game->allAgents.contains(globalID)) {
+				if (auto locked = game->allAgents.at(globalID).lock()) {
+					ERROR("globalID[" << globalID << "], allAgents<" << game->allAgents.size() << ">, type[this=" << typeid(*this).name() << ", other=" << typeid(*locked).name() << "], this=" << this << ", other=" << locked.get());
+				} else {
+					ERROR("globalID[" << globalID << "], allAgents<" << game->allAgents.size() << ">, type[this=" << typeid(*this).name() << ", other=expired]");
+				}
+				assert(!game->allAgents.contains(globalID));
+			}
 			game->allAgents[globalID] = shared;
 		}
 

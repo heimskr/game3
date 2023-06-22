@@ -16,10 +16,14 @@ namespace Game3 {
 
 	void EntityPacket::decode(Game &game, Buffer &buffer) {
 		buffer >> globalID >> identifier >> realmID;
+		assert(globalID != static_cast<GlobalID>(-1));
+		assert(globalID != static_cast<GlobalID>(0));
+
 		auto realm_iter = game.realms.find(realmID);
 		if (realm_iter == game.realms.end())
 			throw PacketError("Couldn't find realm " + std::to_string(realmID) + " in EntityPacket");
 		auto realm = realm_iter->second;
+
 		if (auto found = realm->getEntity(globalID)) {
 			wasFound = true;
 			(entity = found)->decode(buffer);
@@ -29,8 +33,8 @@ namespace Game3 {
 			entity = (*factory)(game);
 			entity->type = identifier;
 			entity->setGID(globalID);
-			entity->decode(buffer);
 			entity->init(game);
+			entity->decode(buffer);
 		}
 	}
 

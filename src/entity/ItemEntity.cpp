@@ -32,16 +32,12 @@ namespace Game3 {
 		yOffset = item_texture->y / 2.f;
 	}
 
-	std::shared_ptr<ItemEntity> ItemEntity::create(Game &game) {
-		auto out = Entity::create<ItemEntity>();
-		out->init(game);
-		return out;
+	std::shared_ptr<ItemEntity> ItemEntity::create(Game &) {
+		return Entity::create<ItemEntity>();
 	}
 
-	std::shared_ptr<ItemEntity> ItemEntity::create(Game &game, const ItemStack &stack) {
-		auto out = Entity::create<ItemEntity>(stack);
-		out->init(game);
-		return out;
+	std::shared_ptr<ItemEntity> ItemEntity::create(Game &, const ItemStack &stack) {
+		return Entity::create<ItemEntity>(stack);
 	}
 
 	std::shared_ptr<ItemEntity> ItemEntity::fromJSON(Game &game, const nlohmann::json &json) {
