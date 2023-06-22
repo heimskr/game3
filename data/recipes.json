@@ -20,6 +20,16 @@
 		"station": "base:station/anvil"
 	}],
 	["base:crafting_recipe", {
+		"input": [["base:item/iron_bar", 4]],
+		"output": [["base:item/wrench", 1]],
+		"station": "base:station/anvil"
+	}],
+	["base:crafting_recipe", {
+		"input": [["base:item/iron_bar", 4], ["base:item/wood", 4]],
+		"output": [["base:item/iron_hoe", 1, "with_durability"]],
+		"station": "base:station/anvil"
+	}],
+	["base:crafting_recipe", {
 		"input": [["base:item/gold_bar", 8], ["base:item/wood", 4]],
 		"output": [["base:item/gold_pickaxe", 1, "with_durability"]],
 		"station": "base:station/anvil"

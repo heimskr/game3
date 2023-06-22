@@ -187,6 +187,7 @@ namespace Game3 {
 		add(std::make_shared<Tool>("base:item/diamond_axe",    "Diamond Axe",    900,  1.f, 512, "base:attribute/axe"_id));
 		add(std::make_shared<Tool>("base:item/diamond_shovel", "Diamond Shovel", 700,  1.f, 512, "base:attribute/shovel"_id));
 		add(std::make_shared<Tool>("base:item/wrench",         "Wrench",          72,  0.f,  -1, "base:attribute/wrench"_id));
+		add(std::make_shared<Tool>("base:item/iron_hoe",       "Iron Hoe",        85,  0.f, 128, "base:attribute/hoe"_id));
 
 		add(std::make_shared<Floor>("base:item/floor", "Floor", "base:tile/floor", 4, 64));
 
