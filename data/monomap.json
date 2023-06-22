@@ -734,6 +734,9 @@
 			],
 			"base:category/tillable": [
 				"base:category/plant_soil"
+			],
+			"base:category/farmland": [
+				"base:tile/farmland"
 			]
 		}
 	}

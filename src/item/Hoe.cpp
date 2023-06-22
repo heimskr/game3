@@ -7,8 +7,8 @@
 #include "realm/Realm.h"
 
 namespace Game3 {
-	Hoe::Hoe(ItemID id_, const std::string &name_, MoneyCount base_price, Durability max_durability):
-		Tool(id_, name_, base_price, 0.f, max_durability, "base:attribute/hoe"_id) {}
+	Hoe::Hoe(ItemID id_, std::string name_, MoneyCount base_price, Durability max_durability):
+		Tool(id_, std::move(name_), base_price, 0.f, max_durability, "base:attribute/hoe"_id) {}
 
 	bool Hoe::use(Slot slot, ItemStack &stack, const Place &place, Modifiers) {
 		auto &realm = *place.realm;

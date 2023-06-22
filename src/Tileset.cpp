@@ -254,7 +254,6 @@ namespace Game3 {
 			for (const auto &tilename: set)
 				tileset.inverseCategories[tilename].insert(category);
 
-
 		return tileset;
 	}
 }

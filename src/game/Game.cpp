@@ -41,6 +41,7 @@
 #include "item/Pickaxe.h"
 #include "item/Plantable.h"
 #include "item/Sapling.h"
+#include "item/Seed.h"
 #include "item/Tool.h"
 #include "packet/PacketFactory.h"
 #include "packet/ProtocolVersionPacket.h"
@@ -183,6 +184,7 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/light_blue_dye", "Light Blue Dye",  12, 64));
 		add(std::make_shared<Item>("base:item/gray_dye",       "Gray Dye",        12, 64));
 		add(std::make_shared<Item>("base:item/lime_dye",       "Lime Dye",        12, 64));
+		add(std::make_shared<Seed>("base:item/cotton_seeds",   "Cotton Seeds",   "base:tile/cotton_0"_id, 4));
 		add(std::make_shared<Tool>("base:item/iron_axe",       "Iron Axe",       150,  3.f, 128, "base:attribute/axe"_id));
 		add(std::make_shared<Tool>("base:item/iron_shovel",    "Iron Shovel",    120,  3.f,  64, "base:attribute/shovel"_id));
 		add(std::make_shared<Tool>("base:item/gold_axe",       "Gold Axe",       400, .75f,  64, "base:attribute/axe"_id));
