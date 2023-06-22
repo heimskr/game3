@@ -24,10 +24,11 @@ namespace Game3 {
 			throw PacketError("Couldn't find realm " + std::to_string(realmID) + " in EntityPacket");
 		auto realm = realm_iter->second;
 
-		if (auto found = realm->getEntity(globalID)) {
+		if (auto found = game.getAgent<Entity>(globalID)) {
 			wasFound = true;
 			(entity = found)->decode(buffer);
 		} else {
+			{ auto lock = game.allAgents.sharedLock(); assert(!game.allAgents.contains(globalID)); }
 			wasFound = false;
 			auto factory = game.registry<EntityFactoryRegistry>()[identifier];
 			entity = (*factory)(game);

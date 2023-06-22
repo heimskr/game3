@@ -29,6 +29,7 @@ namespace Game3 {
 			wasFound = true;
 			(tileEntity = found)->decode(game, buffer);
 		} else {
+			{ auto lock = game.allAgents.sharedLock(); assert(!game.allAgents.contains(globalID)); }
 			wasFound = false;
 			auto factory = game.registry<TileEntityFactoryRegistry>()[identifier];
 			tileEntity = (*factory)(game);
