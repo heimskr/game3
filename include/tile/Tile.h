@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Layer.h"
 #include "registry/Registerable.h"
 
 namespace Game3 {
@@ -11,5 +12,7 @@ namespace Game3 {
 			virtual ~Tile() = default;
 
 			virtual void randomTick(const Place &) {}
+			/** Returns false to continue propagation to lower layers, true to stop it. */
+			virtual bool interact(const Place &, Layer) { return false; }
 	};
 }

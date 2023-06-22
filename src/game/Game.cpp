@@ -146,7 +146,8 @@ namespace Game3 {
 	void Game::addItems() {
 		add(std::make_shared<Hoe>("base:item/iron_hoe", "Iron Hoe", 85, 128));
 
-		add(std::make_shared<Bomb>("base:item/bomb",           "Bomb",            32, 64));
+		add(std::make_shared<Bomb>("base:item/bomb", "Bomb", 32, 64));
+
 		add(std::make_shared<Item>("base:item/shortsword",     "Shortsword",     100,  1));
 		add(std::make_shared<Item>("base:item/red_potion",     "Red Potion",      20,  8));
 		add(std::make_shared<Item>("base:item/coins",          "Gold",             1, 1'000'000));
@@ -171,6 +172,7 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/silicon",        "Silicon",          2, 64));
 		add(std::make_shared<Item>("base:item/electronics",    "Electronics",     32, 64));
 		add(std::make_shared<Item>("base:item/sulfur",         "Sulfur",          15, 64));
+		add(std::make_shared<Item>("base:item/cotton",         "Cotton",           8, 64));
 		add(std::make_shared<Item>("base:item/red_dye",        "Red Dye",         12, 64));
 		add(std::make_shared<Item>("base:item/orange_dye",     "Orange Dye",      12, 64));
 		add(std::make_shared<Item>("base:item/yellow_dye",     "Yellow Dye",      12, 64));
@@ -184,7 +186,9 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/light_blue_dye", "Light Blue Dye",  12, 64));
 		add(std::make_shared<Item>("base:item/gray_dye",       "Gray Dye",        12, 64));
 		add(std::make_shared<Item>("base:item/lime_dye",       "Lime Dye",        12, 64));
+
 		add(std::make_shared<Seed>("base:item/cotton_seeds",   "Cotton Seeds",   "base:tile/cotton_0"_id, 4));
+
 		add(std::make_shared<Tool>("base:item/iron_axe",       "Iron Axe",       150,  3.f, 128, "base:attribute/axe"_id));
 		add(std::make_shared<Tool>("base:item/iron_shovel",    "Iron Shovel",    120,  3.f,  64, "base:attribute/shovel"_id));
 		add(std::make_shared<Tool>("base:item/gold_axe",       "Gold Axe",       400, .75f,  64, "base:attribute/axe"_id));
@@ -202,7 +206,8 @@ namespace Game3 {
 		add(std::make_shared<Pickaxe>("base:item/iron_pickaxe",    "Iron Pickaxe",    150,  3.f,  64, "base:attribute/pickaxe"_id));
 		add(std::make_shared<Pickaxe>("base:item/gold_pickaxe",    "Gold Pickaxe",    400, .75f,  64, "base:attribute/pickaxe"_id));
 		add(std::make_shared<Pickaxe>("base:item/diamond_pickaxe", "Diamond Pickaxe", 900,  1.f, 512, "base:attribute/pickaxe"_id));
-		add(std::make_shared<Sapling>("base:item/sapling",         "Sapling",           5, 64));
+
+		add(std::make_shared<Sapling>("base:item/sapling", "Sapling", 5, 64));
 
 		add(std::make_shared<Landfill>("base:item/sand",          "Sand",          1, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/sand"));
 		add(std::make_shared<Landfill>("base:item/volcanic_sand", "Volcanic Sand", 3, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/volcanic_sand"));
@@ -534,7 +539,7 @@ namespace Game3 {
 
 			auto &crops = registry<CropRegistry>();
 			for (const auto &[key, value]: json.at(1).items())
-				crops.add(Identifier(key), Crop(Identifier(key), value));
+				crops.add(Identifier(key), Crop(Identifier(key), *this, value));
 
 		} else
 			throw std::runtime_error("Unknown data file type: " + type.str());

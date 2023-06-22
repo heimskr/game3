@@ -1,7 +1,7 @@
 #include "Log.h"
 #include "Position.h"
 #include "Tileset.h"
-#include "entity/ItemEntity.h"
+#include "entity/Player.h"
 #include "game/Crop.h"
 #include "realm/Realm.h"
 #include "threading/ThreadContext.h"
@@ -21,6 +21,7 @@ namespace Game3 {
 			return;
 
 		const Identifier tilename = tileset[*tile];
+		assert(!crop->stages.empty());
 		if (tilename == crop->stages.back())
 			return;
 
@@ -30,17 +31,17 @@ namespace Game3 {
 
 		auto iter = std::find(crop->stages.begin(), crop->stages.end(), tilename);
 		place.set(Layer::Submerged, *++iter);
+	}
 
-		// const auto [row, column] = place.position;
-		// auto &tileset = realm.getTileset();
+	bool CropTile::interact(const Place &place, Layer layer) {
+		assert(!crop->stages.empty());
 
-		// If there are any adjacent or overlapping flowers, give up and don't spawn anything.
-		// constexpr Index radius = 3;
-		// for (Index y = row - radius; y <= row + radius; ++y)
-		// 	for (Index x = column - radius; x <= column + radius; ++x)
-		// 		if (auto tile_id = realm.tryTile(Layer::Submerged, {y, x}); tile_id && tileset.isInCategory(tileset[*tile_id], "base:category/flowers"))
-		// 			return;
+		if (auto tilename = place.getName(layer); tilename && *tilename == crop->stages.back()) {
+			place.set(layer, 0);
+			place.player->give(crop->product);
+			return true;
+		}
 
-		// place.set(Layer::Submerged, choose(tileset.getTilesByCategory("base:category/flowers"), threadContext.rng));
+		return false;
 	}
 }
