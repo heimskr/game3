@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include <map>
 #include <memory>
 #include <set>
@@ -12,6 +11,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include "Log.h"
 #include "data/Identifier.h"
 #include "registry/Registerable.h"
 
@@ -180,7 +180,7 @@ namespace Game3 {
 				try {
 					return items.at(id);
 				} catch (const std::out_of_range &) {
-					std::cerr << "\e[31mCouldn't find \"" + id.str() + "\" in registry " + identifier.str() << "\e[39m\n";
+					ERROR("Couldn't find \"" << id << "\" in registry " << identifier);
 					return {};
 				}
 			}
@@ -343,7 +343,7 @@ namespace Game3 {
 				try {
 					return items.at(number);
 				} catch (const std::out_of_range &) {
-					std::cerr << "\e[31mCouldn't find \"" + std::to_string(number) + "\" in registry " + identifier.str() << "\e[39m\n";
+					ERROR("Couldn't find \"" << number << "\" in registry " << identifier);
 					return {};
 				}
 			}
@@ -402,6 +402,13 @@ namespace Game3 {
 				return items.contains(name);
 			}
 
+			inline std::shared_ptr<T> maybe(const std::string &name) {
+				auto iter = items.find(name);
+				if (iter == items.end())
+					return {};
+				return iter->second;
+			}
+
 			inline std::shared_ptr<T> operator[](const std::string &name) const {
 				return at(name);
 			}
@@ -410,7 +417,7 @@ namespace Game3 {
 				try {
 					return items.at(name);
 				} catch (const std::out_of_range &) {
-					std::cerr << "\e[31mCouldn't find \"" + name + "\" in registry " + identifier.str() << "\e[39m\n";
+					ERROR("Couldn't find \"" << name << "\" in registry " << identifier);
 					return {};
 				}
 			}

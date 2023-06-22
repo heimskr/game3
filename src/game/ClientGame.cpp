@@ -105,19 +105,16 @@ namespace Game3 {
 
 	void ClientGame::runCommand(const std::string &command) {
 		auto pieces = split<std::string>(command, " ", false);
+
 		if (pieces.empty())
 			throw CommandError("No command entered");
 
-		try {
-			if (auto factory = registry<LocalCommandFactoryRegistry>()[pieces.front()]) {
-				auto command = (*factory)();
-				command->pieces = std::move(pieces);
-				(*command)(*client);
-			} else
-				throw std::out_of_range("Command not found");
-		} catch (const std::out_of_range &) {
+		if (auto factory = registry<LocalCommandFactoryRegistry>().maybe(pieces.front())) {
+			auto command = (*factory)();
+			command->pieces = std::move(pieces);
+			(*command)(*client);
+		} else
 			client->send(CommandPacket(threadContext.rng(), command));
-		}
 	}
 
 	void ClientGame::tick() {
