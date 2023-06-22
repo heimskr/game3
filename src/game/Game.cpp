@@ -33,6 +33,7 @@
 #include "item/Floor.h"
 #include "item/Furniture.h"
 #include "item/Hammer.h"
+#include "item/Hoe.h"
 #include "item/Item.h"
 #include "item/Landfill.h"
 #include "item/Landfills.h"
@@ -142,6 +143,8 @@ namespace Game3 {
 	}
 
 	void Game::addItems() {
+		add(std::make_shared<Hoe>("base:item/iron_hoe", "Iron Hoe", 85, 128));
+
 		add(std::make_shared<Bomb>("base:item/bomb",           "Bomb",            32, 64));
 		add(std::make_shared<Item>("base:item/shortsword",     "Shortsword",     100,  1));
 		add(std::make_shared<Item>("base:item/red_potion",     "Red Potion",      20,  8));
@@ -187,7 +190,6 @@ namespace Game3 {
 		add(std::make_shared<Tool>("base:item/diamond_axe",    "Diamond Axe",    900,  1.f, 512, "base:attribute/axe"_id));
 		add(std::make_shared<Tool>("base:item/diamond_shovel", "Diamond Shovel", 700,  1.f, 512, "base:attribute/shovel"_id));
 		add(std::make_shared<Tool>("base:item/wrench",         "Wrench",          72,  0.f,  -1, "base:attribute/wrench"_id));
-		add(std::make_shared<Tool>("base:item/iron_hoe",       "Iron Hoe",        85,  0.f, 128, "base:attribute/hoe"_id));
 
 		add(std::make_shared<Floor>("base:item/floor", "Floor", "base:tile/floor", 4, 64));
 

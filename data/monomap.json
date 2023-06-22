@@ -563,9 +563,7 @@
 			],
 			"base:category/dirt": [
 				"base:tile/light_grass",
-				"base:tile/grass",
-				"base:tile/grass_alt1",
-				"base:tile/grass_alt2",
+				"base:category/grass",
 				"base:tile/dirt"
 			],
 			"base:category/towers": [
@@ -624,102 +622,24 @@
 				"base:tile/door2"
 			],
 			"base:category/plant_soil": [
-				"base:tile/grass",
-				"base:tile/grass_alt1",
-				"base:tile/grass_alt2",
+				"base:category/grass",
 				"base:tile/light_grass",
 				"base:tile/dirt",
 				"base:tile/forest_floor",
-				"base:tile/small_flowers_red",
-				"base:tile/small_flowers_orange",
-				"base:tile/small_flowers_yellow",
-				"base:tile/small_flowers_green",
-				"base:tile/small_flowers_blue",
-				"base:tile/small_flowers_purple"
+				"base:category/small_flowers"
 			],
 			"base:category/flowers": [
-				"base:tile/flower1_red",
-				"base:tile/flower1_orange",
-				"base:tile/flower1_yellow",
-				"base:tile/flower1_green",
-				"base:tile/flower1_blue",
-				"base:tile/flower1_purple",
-				"base:tile/flower1_white",
-				"base:tile/flower1_black",
-				"base:tile/flower2_red",
-				"base:tile/flower2_orange",
-				"base:tile/flower2_yellow",
-				"base:tile/flower2_green",
-				"base:tile/flower2_blue",
-				"base:tile/flower2_purple",
-				"base:tile/flower2_white",
-				"base:tile/flower2_black",
-				"base:tile/flower3_red",
-				"base:tile/flower3_orange",
-				"base:tile/flower3_yellow",
-				"base:tile/flower3_green",
-				"base:tile/flower3_blue",
-				"base:tile/flower3_purple",
-				"base:tile/flower3_white",
-				"base:tile/flower3_black",
-				"base:tile/flower4_red",
-				"base:tile/flower4_orange",
-				"base:tile/flower4_yellow",
-				"base:tile/flower4_green",
-				"base:tile/flower4_blue",
-				"base:tile/flower4_purple",
-				"base:tile/flower4_white",
-				"base:tile/flower4_black",
-				"base:tile/flower5_red",
-				"base:tile/flower5_orange",
-				"base:tile/flower5_yellow",
-				"base:tile/flower5_green",
-				"base:tile/flower5_blue",
-				"base:tile/flower5_purple",
-				"base:tile/flower5_white",
-				"base:tile/flower5_black"
+				"base:category/red_flowers",
+				"base:category/orange_flowers",
+				"base:category/yellow_flowers",
+				"base:category/green_flowers",
+				"base:category/blue_flowers",
+				"base:category/purple_flowers",
+				"base:category/white_flowers",
+				"base:category/black_flowers"
 			],
 			"base:category/plantable": [
-				"base:tile/flower1_red",
-				"base:tile/flower1_orange",
-				"base:tile/flower1_yellow",
-				"base:tile/flower1_green",
-				"base:tile/flower1_blue",
-				"base:tile/flower1_purple",
-				"base:tile/flower1_white",
-				"base:tile/flower1_black",
-				"base:tile/flower2_red",
-				"base:tile/flower2_orange",
-				"base:tile/flower2_yellow",
-				"base:tile/flower2_green",
-				"base:tile/flower2_blue",
-				"base:tile/flower2_purple",
-				"base:tile/flower2_white",
-				"base:tile/flower2_black",
-				"base:tile/flower3_red",
-				"base:tile/flower3_orange",
-				"base:tile/flower3_yellow",
-				"base:tile/flower3_green",
-				"base:tile/flower3_blue",
-				"base:tile/flower3_purple",
-				"base:tile/flower3_white",
-				"base:tile/flower3_black",
-				"base:tile/flower4_red",
-				"base:tile/flower4_orange",
-				"base:tile/flower4_yellow",
-				"base:tile/flower4_green",
-				"base:tile/flower4_blue",
-				"base:tile/flower4_purple",
-				"base:tile/flower4_white",
-				"base:tile/flower4_black",
-				"base:tile/flower5_red",
-				"base:tile/flower5_orange",
-				"base:tile/flower5_yellow",
-				"base:tile/flower5_green",
-				"base:tile/flower5_blue",
-				"base:tile/flower5_purple",
-				"base:tile/flower5_white",
-				"base:tile/flower5_black"
+				"base:category/flowers"
 			],
 			"base:category/red_flowers": [
 				"base:tile/flower1_red",
@@ -786,15 +706,13 @@
 				"base:tile/small_flowers_purple"
 			],
 			"base:category/flower_spawners": [
+				"base:category/grass",
+				"base:category/small_flowers"
+			],
+			"base:category/grass": [
 				"base:tile/grass",
 				"base:tile/grass_alt1",
-				"base:tile/grass_alt2",
-				"base:tile/small_flowers_red",
-				"base:tile/small_flowers_orange",
-				"base:tile/small_flowers_yellow",
-				"base:tile/small_flowers_green",
-				"base:tile/small_flowers_blue",
-				"base:tile/small_flowers_purple"
+				"base:tile/grass_alt2"
 			],
 			"base:category/energy_pipes": [
 				"base:tile/energy_pipe_nw",
@@ -813,6 +731,9 @@
 				"base:tile/energy_pipe_wes",
 				"base:tile/energy_pipe",
 				"base:tile/energy_pipe_nwe"
+			],
+			"base:category/tillable": [
+				"base:category/plant_soil"
 			]
 		}
 	}

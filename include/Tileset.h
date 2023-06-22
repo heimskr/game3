@@ -39,6 +39,7 @@ namespace Game3 {
 			const std::unordered_set<TileID> getCategoryIDs(const Identifier &) const;
 			const std::unordered_set<Identifier> getTilesByCategory(const Identifier &) const;
 			bool isInCategory(const Identifier &tilename, const Identifier &category) const;
+			bool isInCategory(TileID, const Identifier &category) const;
 			bool hasName(const Identifier &) const;
 			bool hasCategory(const Identifier &) const;
 			inline auto getTileSize() const { return tileSize; }

@@ -147,6 +147,10 @@ namespace Game3 {
 		return false;
 	}
 
+	bool Tileset::isInCategory(TileID tile_id, const Identifier &category) const {
+		return isInCategory((*this)[tile_id], category);
+	}
+
 	bool Tileset::hasName(const Identifier &tilename) const {
 		return ids.contains(tilename);
 	}
@@ -215,9 +219,41 @@ namespace Game3 {
 			tileset.inverseCategories.try_emplace(key);
 		}
 
+		bool changed;
+		std::vector<Identifier> add_vector;
+		std::vector<Identifier> remove_vector;
+
+		// Please don't introduce any cycles in the category dependency graph.
+		do {
+			changed = false;
+
+			for (auto &[category, set]: tileset.categories) {
+				add_vector.clear();
+				remove_vector.clear();
+
+				for (const auto &tilename: set) {
+					if (tilename.getPath() == "category") {
+						if (auto iter = tileset.categories.find(tilename); iter != tileset.categories.end()) {
+							remove_vector.push_back(tilename);
+							for (const auto &other: iter->second)
+								add_vector.push_back(other);
+							changed = true;
+						}
+					}
+				}
+
+				for (const auto &to_add: add_vector)
+					set.insert(to_add);
+
+				for (const auto &to_remove: remove_vector)
+					set.erase(to_remove);
+			}
+		} while (changed);
+
 		for (const auto &[category, set]: tileset.categories)
 			for (const auto &tilename: set)
 				tileset.inverseCategories[tilename].insert(category);
+
 
 		return tileset;
 	}
