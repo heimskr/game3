@@ -613,7 +613,6 @@ namespace Game3 {
 		out->initialSetup();
 		for (const auto &[string, realm_json]: json.at("realms").get<std::unordered_map<std::string, nlohmann::json>>())
 			out->realms.emplace(parseUlong(string), Realm::fromJSON(*out, realm_json));
-		out->activeRealm = out->realms.at(json.at("activeRealmID"));
 		out->hourOffset = json.contains("hourOffset")? json.at("hourOffset").get<float>() : 0.f;
 		out->debugMode = json.contains("debugMode")? json.at("debugMode").get<bool>() : false;
 		out->cavesGenerated = json.contains("cavesGenerated")? json.at("cavesGenerated").get<decltype(Game::cavesGenerated)>() : 0;
@@ -647,7 +646,6 @@ namespace Game3 {
 	}
 
 	void to_json(nlohmann::json &json, const Game &game) {
-		json["activeRealmID"] = game.activeRealm->id;
 		json["debugMode"] = game.debugMode;
 		json["realms"] = std::unordered_map<std::string, nlohmann::json>();
 		for (const auto &[id, realm]: game.realms)

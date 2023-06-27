@@ -56,7 +56,6 @@ namespace Game3 {
 			std::map<Identifier, std::unordered_set<std::shared_ptr<Item>>> itemsByAttribute;
 
 			std::unordered_map<RealmID, RealmPtr> realms;
-			RealmPtr activeRealm;
 
 			RegistryRegistry registries;
 

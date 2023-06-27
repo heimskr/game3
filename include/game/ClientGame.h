@@ -12,6 +12,7 @@ namespace Game3 {
 			ClientPlayerPtr player;
 
 			std::shared_ptr<LocalClient> client;
+			RealmPtr activeRealm;
 
 			ClientGame(Canvas &canvas_): Game(), canvas(canvas_) {}
 

@@ -227,7 +227,6 @@ namespace Game3 {
 		rng.seed(seed);
 		WorldGen::generateOverworld(realm, seed, {}, {{-1, -1}, {1, 1}}, true);
 		game->realms.emplace(realm->id, realm);
-		game->activeRealm = realm;
 		game->initInteractionSets();
 		game_server->game = game;
 

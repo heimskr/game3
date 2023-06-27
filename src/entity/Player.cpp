@@ -154,27 +154,35 @@ namespace Game3 {
 	void Player::teleport(const Position &position, const std::shared_ptr<Realm> &new_realm) {
 		auto &game = new_realm->getGame();
 
-		if ((firstTeleport || game.activeRealm != new_realm) && getSide() == Side::Server) {
+		if ((firstTeleport || weakRealm.lock() != new_realm) && getSide() == Side::Server) {
 			clearOffset();
 			stopMoving();
 			send(RealmNoticePacket(*new_realm));
 		}
 
+		RealmID old_realm_id = -1;
+		auto locked_realm = weakRealm.lock();
+		if (locked_realm)
+			old_realm_id = locked_realm->id;
+
 		Entity::teleport(position, new_realm);
 
-		if (game.activeRealm->id != nextRealm && nextRealm != -1) {
-			game.activeRealm->onBlur();
-			game.activeRealm->queuePlayerRemoval(getShared());
-			game.activeRealm = new_realm;
+		if ((old_realm_id == -1 || old_realm_id != nextRealm) && nextRealm != -1) {
 			if (getSide() == Side::Client) {
-				game.activeRealm->onFocus();
+				auto &client_game = game.toClient();
+				client_game.activeRealm->onBlur();
+				client_game.activeRealm->queuePlayerRemoval(getShared());
+				client_game.activeRealm = new_realm;
+				client_game.activeRealm->onFocus();
 				new_realm->reupload();
 				focus(game.toClient().canvas, true);
 			} else {
-				auto locked = toServer()->weakClient.lock();
-				assert(locked);
+				if (locked_realm)
+					locked_realm->queuePlayerRemoval(getShared());
+				auto locked_client = toServer()->weakClient.lock();
+				assert(locked_client);
 				INFO("Sending " << new_realm->id << " to client");
-				new_realm->sendTo(*locked);
+				new_realm->sendTo(*locked_client);
 			}
 		}
 	}
