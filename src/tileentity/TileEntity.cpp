@@ -31,14 +31,7 @@ namespace Game3 {
 		initialized = true;
 
 		auto lock = game.allAgents.uniqueLock();
-		if (game.allAgents.contains(globalID)) {
-			if (auto locked = game.allAgents.at(globalID).lock()) {
-				ERROR("globalID[" << globalID << "], allAgents<" << game.allAgents.size() << ">, type[this=" << typeid(*this).name() << ", other=" << typeid(*locked).name() << "]");
-			} else {
-				ERROR("globalID[" << globalID << "], allAgents<" << game.allAgents.size() << ">, type[this=" << typeid(*this).name() << ", other=expired]");
-			}
-			assert(!game.allAgents.contains(globalID));
-		}
+		assert(!game.allAgents.contains(globalID));
 		game.allAgents[globalID] = shared_from_this();
 	}
 
