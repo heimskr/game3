@@ -846,6 +846,10 @@
 				"base:category/item_pipes_normal",
 				"base:category/item_pipes_alt"
 			],
+			"base:category/pipes": [
+				"base:category/energy_pipes",
+				"base:category/item_pipes"
+			],
 			"base:category/tillable": [
 				"base:category/plant_soil"
 			],

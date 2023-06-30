@@ -15,6 +15,8 @@ Thanks to [190n](https://github.com/190n) for their work on the resource embeddi
 
 Sprites in `/resources/items/franuka.png` were made by [Franuka](https://twitter.com/franuka_art) and are not governed by this project's license.
 
+See `/resources/CREDIT.txt` for more credits.
+
 ## Contribution Ideas
 If you'd like to contribute, here are some ideas, ordered roughly from easiest to hardest.
 
