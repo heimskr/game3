@@ -841,6 +841,9 @@ namespace Game3 {
 										setTile(layer, offset_position, marched);
 										threadContext.updatedLayers.insert(layer);
 									}
+
+									// Allow only one marching. This should be fine.
+									break;
 								}
 							}
 						}
