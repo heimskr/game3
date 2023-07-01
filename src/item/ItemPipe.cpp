@@ -16,12 +16,34 @@ namespace Game3 {
 		auto &realm = *place.realm;
 		auto &tileset = realm.getTileset();
 
-		if (auto item_pipe = realm.tryTile(Layer::ItemPipes, place.position); !item_pipe || *item_pipe == tileset.getEmptyID()) {
+		auto item_pipe = realm.tryTile(Layer::ItemPipes, place.position);
+
+		if (!item_pipe || *item_pipe == tileset.getEmptyID()) {
 			if (--stack.count == 0)
 				place.player->inventory->erase(slot);
 			else
 				place.player->inventory->notifyOwner();
 			place.set(Layer::ItemPipes, "base:tile/item_pipe"_id);
+			return true;
+		}
+
+		const auto &tilename = tileset[*item_pipe];
+
+		if (tileset.isInCategory(tilename, "base:category/item_pipes_normal"_id)) {
+			Identifier alt = tilename;
+			alt.name += "_alt";
+			place.set(Layer::ItemPipes, alt);
+			return true;
+		}
+
+		if (tileset.isInCategory(tilename, "base:category/item_pipes_alt"_id)) {
+			Identifier normal = tilename;
+			// Remove "_alt" from the end
+			normal.name.pop_back();
+			normal.name.pop_back();
+			normal.name.pop_back();
+			normal.name.pop_back();
+			place.set(Layer::ItemPipes, normal);
 			return true;
 		}
 

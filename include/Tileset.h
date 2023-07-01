@@ -1,18 +1,33 @@
 #pragma once
 
+#include "Types.h"
+#include "registry/Registerable.h"
+
 #include <map>
 #include <memory>
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
 
-#include "Types.h"
-#include "registry/Registerable.h"
+#include <nlohmann/json.hpp>
 
 namespace Game3 {
 	class Game;
 	class ItemStack;
 	class Texture;
+
+	struct MarchableInfo {
+		/** The top-left corner of the set of marchable tiles. */
+		Identifier corner;
+		/** A set of categories of tiles that this marchable category should consider possible neighbors. */
+		std::unordered_set<Identifier> categories;
+
+		MarchableInfo() = default;
+		MarchableInfo(Identifier corner_, std::unordered_set<Identifier> categories_):
+			corner(std::move(corner_)), categories(std::move(categories_)) {}
+	};
+
+	void from_json(const nlohmann::json &, MarchableInfo &);
 
 	class Tileset: public NamedRegisterable {
 		public:
@@ -33,7 +48,8 @@ namespace Game3 {
 			bool getItemStack(const Game &, const Identifier &, ItemStack &) const;
 			bool isMarchable(TileID);
 			bool isCategoryMarchable(const Identifier &category) const;
-			const Identifier & getMarchBase(const Identifier &category) const;
+			const Identifier & getMarchCorner(const Identifier &category) const;
+			const MarchableInfo & getMarchableInfo(const Identifier &category) const;
 			void clearCache();
 			const std::unordered_set<Identifier> getCategories(const Identifier &) const;
 			const std::unordered_set<TileID> getCategoryIDs(const Identifier &) const;
@@ -68,7 +84,7 @@ namespace Game3 {
 			std::unordered_set<Identifier> solid;
 			std::unordered_set<Identifier> bright;
 			std::unordered_set<Identifier> marchable;
-			std::unordered_map<Identifier, Identifier> marchableMap;
+			std::unordered_map<Identifier, MarchableInfo> marchableMap;
 			std::unordered_map<Identifier, TileID> ids;
 			std::unordered_map<TileID, Identifier> names;
 			std::unordered_map<Identifier, Identifier> stackNames;

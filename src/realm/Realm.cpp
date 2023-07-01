@@ -825,12 +825,18 @@ namespace Game3 {
 
 							for (const auto &category: tileset.getCategories(tilename)) {
 								if (tileset.isCategoryMarchable(category)) {
+									const auto &neighbor_categories = tileset.getMarchableInfo(category).categories;
+
 									const TileID march_result = march4([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
 										const Position march_position = offset_position + Position(march_row_offset, march_column_offset);
-										return tileset.isInCategory(tileset[tileProvider.copyTile(layer, march_position, TileProvider::TileMode::ReturnEmpty)], category);
+										const TileID tile = tileProvider.copyTile(layer, march_position, TileProvider::TileMode::ReturnEmpty);
+										for (const auto &neighbor_category: neighbor_categories)
+											if (tileset.isInCategory(tile, neighbor_category))
+												return true;
+										return false;
 									});
 
-									const TileID marched = tileset[tileset.getMarchBase(category)] + (march_result / 7) * tileset.columnCount(getGame()) + march_result % 7;
+									const TileID marched = tileset[tileset.getMarchableInfo(category).corner] + (march_result / 7) * tileset.columnCount(getGame()) + march_result % 7;
 									if (marched != tile) {
 										setTile(layer, offset_position, marched);
 										threadContext.updatedLayers.insert(layer);

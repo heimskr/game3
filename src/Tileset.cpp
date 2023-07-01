@@ -4,6 +4,16 @@
 #include "realm/Realm.h"
 
 namespace Game3 {
+	void from_json(const nlohmann::json &json, MarchableInfo &marchable_info) {
+		if (json.is_string()) {
+			marchable_info.corner = json.get<Identifier>();
+			marchable_info.categories.clear();
+		} else {
+			marchable_info.corner     = json.at("corner");
+			marchable_info.categories = json.at("categories");
+		}
+	}
+
 	Tileset::Tileset(Identifier identifier_):
 		NamedRegisterable(std::move(identifier_)) {}
 
@@ -116,7 +126,7 @@ namespace Game3 {
 		return marchable.contains(category);
 	}
 
-	const Identifier & Tileset::getMarchBase(const Identifier &category) const {
+	const MarchableInfo & Tileset::getMarchableInfo(const Identifier &category) const {
 		return marchableMap.at(category);
 	}
 
@@ -201,7 +211,14 @@ namespace Game3 {
 		tileset.textureName = json.at("texture");
 		for (const auto &[key, value]: json.at("marchable").items()) {
 			tileset.marchable.emplace(key);
-			tileset.marchableMap.emplace(Identifier(key), Identifier(value));
+			if (value.is_string()) {
+				auto info = value.get<MarchableInfo>();
+				// Make sure the category is in its own set of categories if only the corner is specified.
+				info.categories.emplace(key);
+				tileset.marchableMap.emplace(Identifier(key), std::move(info));
+			} else {
+				tileset.marchableMap.emplace(Identifier(key), value.get<MarchableInfo>());
+			}
 		}
 
 		tileset.missing = json.at("missing");
