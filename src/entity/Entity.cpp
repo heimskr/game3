@@ -1,7 +1,3 @@
-#include <cassert>
-#include <iostream>
-#include <sstream>
-
 #include "Log.h"
 #include "Position.h"
 #include "Tileset.h"
@@ -24,6 +20,10 @@
 #include "ui/SpriteRenderer.h"
 #include "util/AStar.h"
 #include "util/Util.h"
+
+#include <cassert>
+#include <iostream>
+#include <sstream>
 
 namespace Game3 {
 	EntityTexture::EntityTexture(Identifier identifier_, Identifier texture_id, uint8_t variety_):
@@ -166,7 +166,8 @@ namespace Game3 {
 			auto lock = game->allAgents.uniqueLock();
 			if (game->allAgents.contains(globalID)) {
 				if (auto locked = game->allAgents.at(globalID).lock()) {
-					ERROR("globalID[" << globalID << "], allAgents<" << game->allAgents.size() << ">, type[this=" << typeid(*this).name() << ", other=" << typeid(*locked).name() << "], this=" << this << ", other=" << locked.get());
+					auto &locked_ref = *locked;
+					ERROR("globalID[" << globalID << "], allAgents<" << game->allAgents.size() << ">, type[this=" << typeid(*this).name() << ", other=" << typeid(locked_ref).name() << "], this=" << this << ", other=" << locked.get());
 				} else {
 					ERROR("globalID[" << globalID << "], allAgents<" << game->allAgents.size() << ">, type[this=" << typeid(*this).name() << ", other=expired]");
 				}

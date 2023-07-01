@@ -3,6 +3,8 @@
 #include "entity/Player.h"
 #include "ui/Modifiers.h"
 
+#include <unordered_set>
+
 namespace Game3 {
 	class ClientPlayer: public Player {
 		public:
@@ -14,6 +16,7 @@ namespace Game3 {
 			void stopContinuousInteraction();
 			void setContinuousInteraction(bool, Modifiers);
 			void jump() override;
+			const std::unordered_set<Layer> & getVisibleLayers() const;
 
 		private:
 			ClientPlayer();

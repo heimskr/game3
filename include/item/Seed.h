@@ -1,6 +1,6 @@
 #pragma once
 
-#include "item/Tool.h"
+#include "item/Item.h"
 
 namespace Game3 {
 	class Seed: public Item {

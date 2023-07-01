@@ -6,11 +6,11 @@
 
 namespace Game3 {
 	/** Doesn't include the fluid layer between Submerged and Objects. */
-	enum class Layer: uint8_t {Invalid = 0, Terrain, Submerged, Objects, Highest, Wires};
+	enum class Layer: uint8_t {Invalid = 0, Terrain, Submerged, Objects, Highest, ItemPipes, Wires};
 
 	constexpr auto LAYER_COUNT = static_cast<size_t>(Layer::Wires);
 	constexpr std::array<Layer, 4> mainLayers {Layer::Terrain, Layer::Submerged, Layer::Objects, Layer::Highest};
-	constexpr std::array<Layer, 5> allLayers  {Layer::Terrain, Layer::Submerged, Layer::Objects, Layer::Highest, Layer::Wires};
+	constexpr std::array<Layer, 6> allLayers  {Layer::Terrain, Layer::Submerged, Layer::Objects, Layer::Highest, Layer::ItemPipes, Layer::Wires};
 
 	/** Zero-based. */
 	inline size_t getIndex(Layer layer) {

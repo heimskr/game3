@@ -1,7 +1,3 @@
-#include <iostream>
-#include <thread>
-#include <unordered_set>
-
 #include "Log.h"
 #include "MarchingSquares.h"
 #include "Tileset.h"
@@ -29,6 +25,10 @@
 #include "worldgen/Carpet.h"
 #include "worldgen/House.h"
 #include "worldgen/Keep.h"
+
+#include <iostream>
+#include <thread>
+#include <unordered_set>
 
 namespace Game3 {
 	void from_json(const nlohmann::json &json, RealmDetails &details) {
@@ -183,11 +183,16 @@ namespace Game3 {
 		const auto bb_width  = width;
 		const auto bb_height = height;
 
+		const auto &visible = client_game.player? client_game.player->getVisibleLayers() : std::unordered_set{Layer::Terrain, Layer::Submerged, Layer::Objects, Layer::Highest};
+
 		for (auto &row: *renderers) {
 			for (auto &layers: row) {
+				uint8_t layer = 0;
 				for (auto &renderer: layers) {
-					renderer.onBackbufferResized(bb_width, bb_height);
-					renderer.render(outdoors? game_time : 1, scale, center.x(), center.y());
+					if (visible.contains(static_cast<Layer>(++layer))) {
+						renderer.onBackbufferResized(bb_width, bb_height);
+						renderer.render(outdoors? game_time : 1, scale, center.x(), center.y());
+					}
 				}
 			}
 		}

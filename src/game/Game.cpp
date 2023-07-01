@@ -35,6 +35,7 @@
 #include "item/Hammer.h"
 #include "item/Hoe.h"
 #include "item/Item.h"
+#include "item/ItemPipe.h"
 #include "item/Landfill.h"
 #include "item/Landfills.h"
 #include "item/Mushroom.h"
@@ -212,6 +213,8 @@ namespace Game3 {
 		add(std::make_shared<Landfill>("base:item/sand",          "Sand",          1, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/sand"));
 		add(std::make_shared<Landfill>("base:item/volcanic_sand", "Volcanic Sand", 3, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/volcanic_sand"));
 		add(std::make_shared<Landfill>("base:item/clay",          "Clay",          2, 64, clayRequirement));
+
+		add(std::make_shared<ItemPipe>(4));
 
 		add(std::make_shared<Mushroom>("base:item/saffron_milkcap", "Saffron Milkcap",    10, 1 ));
 		add(std::make_shared<Mushroom>("base:item/honey_fungus",    "Honey Fungus",       15, 18));

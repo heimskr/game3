@@ -5,7 +5,7 @@
 namespace Game3 {
 	ServerPlayer::ServerPlayer(): Player() {}
 
-	std::shared_ptr<ServerPlayer> ServerPlayer::create(Game &game) {
+	std::shared_ptr<ServerPlayer> ServerPlayer::create(Game &) {
 		return Entity::create<ServerPlayer>();
 	}
 

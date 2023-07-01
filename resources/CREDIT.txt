@@ -4,4 +4,4 @@ Credit for miniworld+: https://octoshrimpy.itch.io/miniworld-plus
 
 Credit for items/mushrooms.png: https://pixerelia.itch.io/vf-edible-mushrooms
 
-Credit for items/tinywonder.png: https://butterymilk.itch.io/tiny-wonder-rpg-icons
+Credit for items/tinywonder.png: https://butterymilk.itch.io/tiny-wonder-rpg-icons (though note that some sprites are my own modifications of butterymilk's original sprites)
