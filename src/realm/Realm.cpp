@@ -696,12 +696,12 @@ namespace Game3 {
 		tile = tile_id;
 
 		if (isServer()) {
-			if (run_helper)
-				setLayerHelper(position.row, position.column);
 			if (!generating) {
 				tileProvider.updateChunk(getChunkPosition(position));
 				getGame().toServer().broadcastTileUpdate(id, layer, position, tile_id);
 			}
+			if (run_helper)
+				setLayerHelper(position.row, position.column);
 		}
 	}
 
@@ -809,6 +809,7 @@ namespace Game3 {
 			return;
 
 		++threadContext.updateNeighborsDepth;
+
 		auto &tileset = getTileset();
 
 		for (Index row_offset = -1; row_offset <= 1; ++row_offset) {
@@ -818,7 +819,7 @@ namespace Game3 {
 					if (auto neighbor = tileEntityAt(offset_position)) {
 						neighbor->onNeighborUpdated(-row_offset, -column_offset);
 					} else {
-						for (const Layer layer: {Layer::Submerged, Layer::Objects}) {
+						for (const Layer layer: {Layer::Submerged, Layer::Objects, Layer::ItemPipes}) {
 							const TileID tile = tileProvider.copyTile(layer, offset_position, TileProvider::TileMode::ReturnEmpty);
 							const auto &tilename = tileset[tile];
 
@@ -832,10 +833,7 @@ namespace Game3 {
 									const TileID marched = tileset[tileset.getMarchBase(category)] + (march_result / 7) * tileset.columnCount(getGame()) + march_result % 7;
 									if (marched != tile) {
 										setTile(layer, offset_position, marched);
-										if (layer == Layer::Submerged)
-											threadContext.submergedLayerUpdated = true;
-										else
-											threadContext.objectsLayerUpdated = true;
+										threadContext.updatedLayers.insert(layer);
 									}
 								}
 							}
@@ -846,15 +844,9 @@ namespace Game3 {
 		}
 
 		if (--threadContext.updateNeighborsDepth == 0) {
-			if (threadContext.submergedLayerUpdated) {
-				threadContext.submergedLayerUpdated = false;
-				reupload(Layer::Submerged);
-			}
-
-			if (threadContext.objectsLayerUpdated) {
-				threadContext.objectsLayerUpdated = false;
-				reupload(Layer::Objects);
-			}
+			for (const Layer layer: threadContext.updatedLayers)
+				reupload(layer);
+			threadContext.updatedLayers.clear();
 		}
 	}
 

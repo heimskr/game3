@@ -1,11 +1,13 @@
 #pragma once
 
+#include "Layer.h"
+#include "Types.h"
+
 #include <chrono>
 #include <memory>
 #include <random>
 #include <thread>
-
-#include "Types.h"
+#include <unordered_set>
 
 namespace Game3 {
 	class Game;
@@ -19,8 +21,7 @@ namespace Game3 {
 			Index colMin = -1;
 			Index colMax = -1;
 			size_t updateNeighborsDepth = 0;
-			bool submergedLayerUpdated = false;
-			bool objectsLayerUpdated = false;
+			std::unordered_set<Layer> updatedLayers;
 			bool valid = false;
 
 			ThreadContext():
