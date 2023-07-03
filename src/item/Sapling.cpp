@@ -10,7 +10,7 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	bool Sapling::use(Slot slot, ItemStack &stack, const Place &place, Modifiers) {
+	bool Sapling::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		auto &player = *place.player;
 		auto &realm  = *place.realm;
 		assert(realm.getSide() == Side::Server);

@@ -17,7 +17,7 @@
 #include "worldgen/CaveGen.h"
 
 namespace Game3 {
-	bool CaveEntrance::use(Slot slot, ItemStack &stack, const Place &place, Modifiers) {
+	bool CaveEntrance::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		auto &realm = *place.realm;
 		auto &game  = realm.getGame();
 		assert(game.getSide() == Side::Server);

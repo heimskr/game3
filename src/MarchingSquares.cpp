@@ -1,5 +1,9 @@
 #include "MarchingSquares.h"
 
+#include <array>
+#include <unordered_map>
+#include <unordered_set>
+
 namespace Game3 {
 	std::unordered_map<int, int> marchingMap8 {
 		{  0, 40}, {  2, 20}, {  8, 33}, { 10, 26}, { 11, 23}, { 16, 31}, { 18, 24}, { 22, 21}, { 24, 32}, { 26, 25}, { 27, 46}, { 30, 45}, { 31, 22}, { 64,  0}, { 66, 10}, { 72,  6}, { 74, 16},

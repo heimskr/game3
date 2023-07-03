@@ -25,7 +25,7 @@ namespace Game3 {
 			return false;
 
 		if (auto *active = inventory.getActive()) {
-			if (active->item->canUseOnWorld() && active->item->use(inventory.activeSlot, *active, place, modifiers))
+			if (active->item->canUseOnWorld() && active->item->use(inventory.activeSlot, *active, place, modifiers, {0.f, 0.f}))
 				return true;
 
 			if (active->hasAttribute("base:attribute/shovel"_id)) {

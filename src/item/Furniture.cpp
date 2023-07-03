@@ -7,7 +7,7 @@
 #include "tileentity/Ghost.h"
 
 namespace Game3 {
-	bool Furniture::use(Slot slot, ItemStack &stack, const Place &place, Modifiers) {
+	bool Furniture::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		auto &realm = *place.realm;
 		Game &game = realm.getGame();
 		const auto &position = place.position;

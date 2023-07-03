@@ -7,6 +7,6 @@ namespace Game3 {
 		public:
 			ItemPipe(MoneyCount base_price);
 
-			bool use(Slot, ItemStack &, const Place &, Modifiers) override;
+			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
 	};
 }

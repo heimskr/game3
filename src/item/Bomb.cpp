@@ -10,7 +10,7 @@
 #include "tileentity/Tree.h"
 
 namespace Game3 {
-	bool Bomb::use(Slot, ItemStack &, const Place &place, Modifiers) {
+	bool Bomb::use(Slot, ItemStack &, const Place &place, Modifiers, std::pair<float, float>) {
 		constexpr Index  DIAMETER = 5;
 		constexpr double RADIUS = DIAMETER / 2.;
 

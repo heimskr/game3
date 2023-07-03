@@ -32,26 +32,20 @@ namespace Game3 {
 		const auto width  = canvas.width();
 		const auto height = canvas.height();
 
-		// Lovingly chosen by trial and error.
-		if (0 < realm.ghostCount && width - 40.f <= pos_x && pos_x < width - 16.f && height - 40.f <= pos_y && pos_y < height - 16.f) {
-			realm.confirmGhosts();
-			return;
-		}
+		double fractional_x = 0.;
+		double fractional_y = 0.;
 
-		const auto [x, y] = translateCanvasCoordinates(pos_x, pos_y);
+		const Position translated = translateCanvasCoordinates(pos_x, pos_y, &fractional_x, &fractional_y);
 
-		if (button == 1) {
-			client->send(ClickPacket({y, x}));
-			// if (auto *stack = player->inventory->getActive())
-			// 	stack->item->use(player->inventory->activeSlot, *stack, {{y, x}, activeRealm, player}, {});
-		} else if (button == 3 && player && !realm.rightClick({y, x}, pos_x, pos_y) && debugMode && client && client->isConnected()) {
-			client->send(TeleportSelfPacket(realm.id, {y, x}));
-		}
+		if (button == 1)
+			client->send(ClickPacket(translated, fractional_x, fractional_y));
+		else if (button == 3 && player && !realm.rightClick(translated, pos_x, pos_y) && debugMode && client && client->isConnected())
+			client->send(TeleportSelfPacket(realm.id, translated));
 	}
 
 	Gdk::Rectangle ClientGame::getVisibleRealmBounds() const {
-		const auto [left,     top] = translateCanvasCoordinates(0., 0.);
-		const auto [right, bottom] = translateCanvasCoordinates(canvas.width(), canvas.height());
+		const auto [top,     left] = translateCanvasCoordinates(0., 0.);
+		const auto [bottom, right] = translateCanvasCoordinates(canvas.width(), canvas.height());
 		return {
 			static_cast<int>(left),
 			static_cast<int>(top),
@@ -64,7 +58,7 @@ namespace Game3 {
 		return canvas.window;
 	}
 
-	Position ClientGame::translateCanvasCoordinates(double x, double y) const {
+	Position ClientGame::translateCanvasCoordinates(double x, double y, double *x_offset_out, double *y_offset_out) const {
 		if (!activeRealm)
 			return {};
 
@@ -78,7 +72,16 @@ namespace Game3 {
 		const double sub_y = y < 0.? 1. : 0.;
 		x /= tile_size * scale / 2.f;
 		y /= tile_size * scale / 2.f;
-		return {static_cast<Index>(x - sub_x), static_cast<Index>(y - sub_y)};
+
+		double intpart = 0.;
+
+		if (x_offset_out)
+			*x_offset_out = std::modf(x, &intpart);
+
+		if (y_offset_out)
+			*y_offset_out = std::modf(y, &intpart);
+
+		return {static_cast<Index>(y - sub_y), static_cast<Index>(x - sub_x)};
 	}
 
 	void ClientGame::activateContext() {

@@ -21,7 +21,7 @@ namespace Game3 {
 			Gdk::Rectangle getVisibleRealmBounds() const;
 			MainWindow & getWindow();
 			/** Translates coordinates relative to the top left corner of the canvas to realm coordinates. */
-			Position translateCanvasCoordinates(double x, double y) const;
+			Position translateCanvasCoordinates(double x, double y, double *x_offset_out = nullptr, double *y_offset_out = nullptr) const;
 			void activateContext();
 			void setText(const Glib::ustring &text, const Glib::ustring &name = "", bool focus = true, bool ephemeral = false);
 			const Glib::ustring & getText() const;

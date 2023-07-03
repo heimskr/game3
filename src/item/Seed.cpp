@@ -10,7 +10,7 @@ namespace Game3 {
 	Seed::Seed(ItemID id_, std::string name_, Identifier crop_tilename, MoneyCount base_price, ItemCount max_count):
 		Item(id_, std::move(name_), base_price, max_count), cropTilename(std::move(crop_tilename)) {}
 
-	bool Seed::use(Slot slot, ItemStack &stack, const Place &place, Modifiers) {
+	bool Seed::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		auto &realm = *place.realm;
 		auto &tileset = realm.getTileset();
 

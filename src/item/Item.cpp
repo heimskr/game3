@@ -98,7 +98,7 @@ namespace Game3 {
 		return cachedTexture = game.registry<ItemTextureRegistry>().at(identifier)->getTexture(game);
 	}
 
-	bool Item::use(Slot, ItemStack &, const Place &, Modifiers) {
+	bool Item::use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) {
 		return false;
 	}
 

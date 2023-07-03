@@ -14,7 +14,7 @@ namespace Game3 {
 		attributes.insert("base:attribute/plantable"_id);
 	}
 
-	bool Plantable::use(Slot slot, ItemStack &stack, const Place &place, Modifiers) {
+	bool Plantable::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		auto &realm = *place.realm;
 		const auto &position = place.position;
 		const auto &tileset = realm.getTileset();

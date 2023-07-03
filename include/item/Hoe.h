@@ -7,6 +7,6 @@ namespace Game3 {
 		public:
 			Hoe(ItemID id_, std::string name_, MoneyCount base_price, Durability max_durability);
 
-			bool use(Slot, ItemStack &, const Place &, Modifiers) override;
+			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
 	};
 }

@@ -9,15 +9,17 @@ namespace Game3 {
 		static PacketID ID() { return 29; }
 
 		Position position;
+		float offsetX = 0.f;
+		float offsetY = 0.f;
 
 		ClickPacket() = default;
-		ClickPacket(const Position &position_):
-			position(position_) {}
+		ClickPacket(const Position &position_, float offset_x, float offset_y):
+			position(position_), offsetX(offset_x), offsetY(offset_y) {}
 
 		PacketID getID() const override { return ID(); }
 
-		void encode(Game &, Buffer &buffer) const override { buffer << position; }
-		void decode(Game &, Buffer &buffer)       override { buffer >> position; }
+		void encode(Game &, Buffer &buffer) const override { buffer << position << offsetX << offsetY; }
+		void decode(Game &, Buffer &buffer)       override { buffer >> position >> offsetX >> offsetY; }
 
 		void handle(ServerGame &, RemoteClient &) override;
 	};

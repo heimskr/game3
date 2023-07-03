@@ -6,7 +6,7 @@
 #include "realm/Realm.h"
 
 namespace Game3 {
-	bool Pickaxe::use(Slot slot, ItemStack &stack, const Place &place, Modifiers) {
+	bool Pickaxe::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		auto &player = *place.player;
 
 		if (player.hasTooldown())

@@ -68,7 +68,7 @@ namespace Game3 {
 
 			virtual void initStack(const Game &, ItemStack &) {}
 
-			virtual bool use(Slot, ItemStack &, const Place &, Modifiers);
+			virtual bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float> offsets);
 
 			/** Whether the item's use function (see Item::use) should be called when the user interacts with a floor tile and this item is selected in the inventory tab. */
 			virtual bool canUseOnWorld() const { return false; }
