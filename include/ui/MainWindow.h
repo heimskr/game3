@@ -89,6 +89,8 @@ namespace Game3 {
 			bool autofocus = true;
 			bool statusbarWaiting = false;
 			std::chrono::system_clock::time_point statusbarSetTime;
+			Glib::RefPtr<Gtk::GestureClick> leftClick;
+			Glib::RefPtr<Gtk::GestureClick> rightClick;
 
 			struct KeyInfo {
 				guint code;

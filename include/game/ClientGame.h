@@ -17,7 +17,7 @@ namespace Game3 {
 			ClientGame(Canvas &canvas_): Game(), canvas(canvas_) {}
 
 			void addEntityFactories() override;
-			void click(int button, int n, double pos_x, double pos_y);
+			void click(int button, int n, double pos_x, double pos_y, Modifiers);
 			Gdk::Rectangle getVisibleRealmBounds() const;
 			MainWindow & getWindow();
 			/** Translates coordinates relative to the top left corner of the canvas to realm coordinates. */

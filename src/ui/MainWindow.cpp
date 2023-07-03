@@ -175,22 +175,22 @@ namespace Game3 {
 		});
 		glArea.add_controller(motion);
 
-		auto left_click  = Gtk::GestureClick::create();
-		auto right_click = Gtk::GestureClick::create();
-		left_click->set_button(1);
-		right_click->set_button(3);
-		left_click->signal_released().connect([this](int n, double x, double y) {
+		leftClick  = Gtk::GestureClick::create();
+		rightClick = Gtk::GestureClick::create();
+		leftClick->set_button(1);
+		rightClick->set_button(3);
+		leftClick->signal_released().connect([this](int n, double x, double y) {
 			glArea.grab_focus();
 			if (game)
-				game->click(1, n, x, y);
+				game->click(1, n, x, y, Modifiers(leftClick->get_current_event()->get_modifier_state()));
 		});
-		right_click->signal_released().connect([this](int n, double x, double y) {
+		rightClick->signal_released().connect([this](int n, double x, double y) {
 			glArea.grab_focus();
 			if (game)
-				game->click(3, n, x, y);
+				game->click(3, n, x, y, Modifiers(rightClick->get_current_event()->get_modifier_state()));
 		});
-		glArea.add_controller(left_click);
-		glArea.add_controller(right_click);
+		glArea.add_controller(leftClick);
+		glArea.add_controller(rightClick);
 
 		auto forward  = Gtk::GestureClick::create();
 		auto backward = Gtk::GestureClick::create();

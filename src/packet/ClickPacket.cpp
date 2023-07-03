@@ -13,6 +13,6 @@ namespace Game3 {
 			return;
 
 		if (auto *stack = player->inventory->getActive())
-			stack->item->use(player->inventory->activeSlot, *stack, {position, player->getRealm(), player}, {}, {offsetX, offsetY});
+			stack->item->use(player->inventory->activeSlot, *stack, {position, player->getRealm(), player}, modifiers, {offsetX, offsetY});
 	}
 }

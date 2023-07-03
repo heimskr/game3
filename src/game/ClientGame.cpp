@@ -24,13 +24,11 @@ namespace Game3 {
 		add(EntityFactory::create<ClientPlayer>());
 	}
 
-	void ClientGame::click(int button, int, double pos_x, double pos_y) {
+	void ClientGame::click(int button, int, double pos_x, double pos_y, Modifiers modifiers) {
 		if (!activeRealm)
 			return;
 
 		auto &realm = *activeRealm;
-		const auto width  = canvas.width();
-		const auto height = canvas.height();
 
 		double fractional_x = 0.;
 		double fractional_y = 0.;
@@ -38,7 +36,7 @@ namespace Game3 {
 		const Position translated = translateCanvasCoordinates(pos_x, pos_y, &fractional_x, &fractional_y);
 
 		if (button == 1)
-			client->send(ClickPacket(translated, fractional_x, fractional_y));
+			client->send(ClickPacket(translated, fractional_x, fractional_y, modifiers));
 		else if (button == 3 && player && !realm.rightClick(translated, pos_x, pos_y) && debugMode && client && client->isConnected())
 			client->send(TeleportSelfPacket(realm.id, translated));
 	}

@@ -173,6 +173,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `{i64,i64}` Position
 	- `{float,float}` Offset
+	- `u8` Modifiers: bitfield (1 = shift, 2 = ctrl, 4 = alt, 8 = super)
 
 30. **Time**: informs a client of the game time.
 
