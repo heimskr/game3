@@ -75,11 +75,12 @@ namespace Game3 {
 
 		double intpart = 0.;
 
+		// The math here is bizarre. Probably tied to the getQuadrant silliness.
 		if (x_offset_out)
-			*x_offset_out = std::modf(x, &intpart);
+			*x_offset_out = std::abs(1 - sub_x - std::abs(std::modf(x, &intpart)));
 
 		if (y_offset_out)
-			*y_offset_out = std::modf(y, &intpart);
+			*y_offset_out = std::abs(1 - sub_y - std::abs(std::modf(y, &intpart)));
 
 		return {static_cast<Index>(y - sub_y), static_cast<Index>(x - sub_x)};
 	}

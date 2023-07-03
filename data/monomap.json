@@ -588,9 +588,7 @@
 		"marchable": {
 			"base:category/wooden_walls": "base:tile/wall_se",
 			"base:category/towers":       "base:tile/tower_se",
-			"base:category/energy_pipes": "base:tile/energy_pipe_se",
-			"base:category/item_pipes_normal": {"corner": "base:tile/item_pipe_se",     "categories": ["base:category/item_pipes_normal", "base:category/item_pipes_alt"]},
-			"base:category/item_pipes_alt":    {"corner": "base:tile/item_pipe_se_alt", "categories": ["base:category/item_pipes_alt", "base:category/item_pipes_normal"]}
+			"base:category/energy_pipes": "base:tile/energy_pipe_se"
 		},
 		"categories": {
 			"base:category/wooden_walls": [

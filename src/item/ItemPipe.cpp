@@ -51,16 +51,22 @@ namespace Game3 {
 				return true;
 			}
 		} else {
-			Identifier corner;
+			TileID corner = 0;
 
 			if (tileset.isInCategory(tilename, "base:category/item_pipes_normal"_id))
-				corner = "base:tile/item_pipe_se"_id;
+				corner = tileset["base:tile/item_pipe_se"_id];
 			else if (tileset.isInCategory(tilename, "base:category/item_pipes_alt"_id))
-				corner = "base:tile/item_pipe_se_alt"_id;
+				corner = tileset["base:tile/item_pipe_se_alt"_id];
 			else
 				return false;
 
-			Quadrant quadrant = getQuadrant(x, y);
+			const Quadrant quadrant = getQuadrant(x, y);
+			const auto column_count = tileset.columnCount(place.getGame());
+			const int8_t march_index = toggleQuadrant((tileset[tilename] % column_count) - (corner % column_count) + 7 * (tileset[tilename] / column_count - corner / column_count), quadrant);
+			const TileID new_tile = corner + column_count * (march_index / 7) + march_index % 7;
+			place.realm->setTile(Layer::ItemPipes, place.position, new_tile, false, false);
+
+			return true;
 		}
 
 		return false;

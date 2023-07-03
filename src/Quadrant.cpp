@@ -60,6 +60,10 @@ namespace Game3 {
 		}
 	}
 
+	int8_t toggleQuadrant(int8_t march_index, Quadrant quadrant) {
+		return hasQuadrant(march_index, quadrant)? removeQuadrant(march_index, quadrant) : addQuadrant(march_index, quadrant);
+	}
+
 	Quadrant flipQuadrant(Quadrant quadrant) {
 		switch (quadrant) {
 			case Quadrant::Top:    return Quadrant::Bottom;
@@ -72,10 +76,26 @@ namespace Game3 {
 	}
 
 	Quadrant getQuadrant(float x, float y) {
-		const bool top_left = x <= y;
-		const bool top_right = (1. - x) <= y;
-		if (top_left)
-			return top_right? Quadrant::Top : Quadrant::Left;
-		return top_right? Quadrant::Right : Quadrant::Bottom;
+		// Garbage variable names, but the original useful names weren't quite correct.
+		const bool one = x <= y;
+		const bool two = (1. - x) <= y;
+		if (one)
+			return two? Quadrant::Top : Quadrant::Right;
+		return two? Quadrant::Left : Quadrant::Bottom;
+	}
+
+	std::string_view toString(Quadrant quadrant) {
+		switch (quadrant) {
+			case Quadrant::Top:    return "Top";
+			case Quadrant::Right:  return "Right";
+			case Quadrant::Bottom: return "Bottom";
+			case Quadrant::Left:   return "Left";
+			default:
+				return "invalid";
+		}
+	}
+
+	std::ostream & operator<<(std::ostream &os, Quadrant quadrant) {
+		return os << toString(quadrant);
 	}
 }
