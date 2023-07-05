@@ -9,7 +9,20 @@ namespace Game3 {
 			case Direction::Up:    return Direction((configuration >>  8) & 0xf);
 			case Direction::Right: return Direction((configuration >>  4) & 0xf);
 			case Direction::Left:  return Direction((configuration >>  0) & 0xf);
-			default: return Direction::Up; // Could throw, but that might waste a few cycles.
+			default:
+				// Could throw, but that might waste a few cycles.
+				return Direction::Invalid;
+		}
+	}
+
+	Direction flipDirection(Direction direction) {
+		switch (direction) {
+			case Direction::Up:    return Direction::Down;
+			case Direction::Right: return Direction::Left;
+			case Direction::Down:  return Direction::Up;
+			case Direction::Left:  return Direction::Right;
+			default:
+				return Direction::Invalid;
 		}
 	}
 

@@ -53,15 +53,7 @@ namespace Game3 {
 	}
 
 	const std::unordered_set<Layer> & ClientPlayer::getVisibleLayers() const {
-		static std::unordered_set<Layer> main_layers     {Layer::Terrain, Layer::Submerged, Layer::Objects, Layer::Highest};
-		static std::unordered_set<Layer> with_item_pipes {Layer::Terrain, Layer::Submerged, Layer::Objects, Layer::Highest, Layer::ItemPipes, Layer::ItemExtractors};
-
-		if (const auto *stack = inventory->getActive()) {
-			static const std::unordered_set<Identifier> item_set {"base:item/wrench"_id, "base:item/item_pipe"_id};
-			if (item_set.contains(stack->item->identifier))
-				return with_item_pipes;
-		}
-
+		static std::unordered_set<Layer> main_layers {Layer::Terrain, Layer::Submerged, Layer::Objects, Layer::Highest};
 		return main_layers;
 	}
 }

@@ -16,6 +16,30 @@ namespace Game3 {
 		return (diff.row == 0 && (diff.column == 1 || diff.column == -1)) || (diff.column == 0 && (diff.row == 1 || diff.row == -1));
 	}
 
+	Position Position::operator+(Direction direction) const {
+		switch (direction) {
+			case Direction::Up:    return *this + Position(-1,  0);
+			case Direction::Right: return *this + Position( 0,  1);
+			case Direction::Down:  return *this + Position( 1,  0);
+			case Direction::Left:  return *this + Position( 0, -1);
+			default:
+				assert(!"Direction is valid");
+				return *this;
+		}
+	}
+
+	Position & Position::operator+=(Direction direction) {
+		switch (direction) {
+			case Direction::Up:    return *this += Position(-1,  0);
+			case Direction::Right: return *this += Position( 0,  1);
+			case Direction::Down:  return *this += Position( 1,  0);
+			case Direction::Left:  return *this += Position( 0, -1);
+			default:
+				assert(!"Direction is valid");
+				return *this;
+		}
+	}
+
 	bool Position::operator<(const Position &other) const {
 		if (row < other.row)
 			return true;

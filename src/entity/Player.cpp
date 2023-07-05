@@ -269,6 +269,8 @@ namespace Game3 {
 			case Direction::Right: movingRight = true; break;
 			case Direction::Down:  movingDown  = true; break;
 			case Direction::Left:  movingLeft  = true; break;
+			default:
+				return;
 		}
 
 		if (getSide() == Side::Client)
@@ -291,6 +293,8 @@ namespace Game3 {
 			case Direction::Right: movingRight = false; break;
 			case Direction::Down:  movingDown  = false; break;
 			case Direction::Left:  movingLeft  = false; break;
+			default:
+				return;
 		}
 
 		if (getSide() == Side::Client)

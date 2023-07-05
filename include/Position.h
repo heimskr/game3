@@ -8,6 +8,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include "Direction.h"
 #include "Layer.h"
 #include "Types.h"
 
@@ -31,6 +32,8 @@ namespace Game3 {
 		inline Position operator-(const Position &other) const { return {row - other.row, column - other.column}; }
 		inline Position & operator+=(const Position &other) { row += other.row; column += other.column; return *this; }
 		inline Position & operator-=(const Position &other) { row -= other.row; column -= other.column; return *this; }
+		Position operator+(Direction) const;
+		Position & operator+=(Direction);
 		inline operator std::string() const { return '(' + std::to_string(row) + ", " + std::to_string(column) + ')'; }
 		inline double distance(const Position &other) const { return std::sqrt(std::pow(row - other.row, 2) + std::pow(column - other.column, 2)); }
 		inline long taxiDistance(const Position &other) const { return std::abs(row - other.row) + std::abs(column - other.column); }

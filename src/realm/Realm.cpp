@@ -819,7 +819,7 @@ namespace Game3 {
 					if (auto neighbor = tileEntityAt(offset_position)) {
 						neighbor->onNeighborUpdated(-row_offset, -column_offset);
 					} else {
-						for (const Layer layer: {Layer::Submerged, Layer::Objects, Layer::ItemPipes}) {
+						for (const Layer layer: {Layer::Submerged, Layer::Objects}) {
 							const TileID tile = tileProvider.copyTile(layer, offset_position, TileProvider::TileMode::ReturnEmpty);
 							const auto &tilename = tileset[tile];
 

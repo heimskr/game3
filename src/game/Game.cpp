@@ -35,7 +35,7 @@
 #include "item/Hammer.h"
 #include "item/Hoe.h"
 #include "item/Item.h"
-#include "item/ItemPipe.h"
+#include "item/ItemPipeItem.h"
 #include "item/Landfill.h"
 #include "item/Landfills.h"
 #include "item/Mushroom.h"
@@ -98,6 +98,7 @@
 #include "tileentity/Chest.h"
 #include "tileentity/CraftingStation.h"
 #include "tileentity/Ghost.h"
+#include "tileentity/ItemPipe.h"
 #include "tileentity/ItemSpawner.h"
 #include "tileentity/OreDeposit.h"
 #include "tileentity/Sign.h"
@@ -214,8 +215,6 @@ namespace Game3 {
 		add(std::make_shared<Landfill>("base:item/volcanic_sand", "Volcanic Sand", 3, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/volcanic_sand"));
 		add(std::make_shared<Landfill>("base:item/clay",          "Clay",          2, 64, clayRequirement));
 
-		add(std::make_shared<ItemPipe>(4));
-
 		add(std::make_shared<Mushroom>("base:item/saffron_milkcap", "Saffron Milkcap",    10, 1 ));
 		add(std::make_shared<Mushroom>("base:item/honey_fungus",    "Honey Fungus",       15, 18));
 		add(std::make_shared<Mushroom>("base:item/brittlegill",     "Golden Brittlegill", 20, 7 ));
@@ -274,6 +273,8 @@ namespace Game3 {
 		add(std::make_shared<Plantable>("base:item/flower5_black",  "Black Flower",  "base:tile/flower5_black",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_black"));
 
 		add(std::make_shared<CaveEntrance>("base:item/cave_entrance", "Cave Entrance", 50, 1));
+
+		add(std::make_shared<ItemPipeItem>(4));
 	}
 
 	void Game::addGhosts() {
@@ -303,6 +304,7 @@ namespace Game3 {
 		add(TileEntityFactory::create<Stockpile>());
 		add(TileEntityFactory::create<Teleporter>());
 		add(TileEntityFactory::create<Tree>());
+		add(TileEntityFactory::create<ItemPipe>());
 	}
 
 	void Game::addRealms() {

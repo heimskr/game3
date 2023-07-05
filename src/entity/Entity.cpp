@@ -206,10 +206,10 @@ namespace Game3 {
 		switch (variety) {
 			case 1:
 			case 3:
-				y_offset = 8.f * static_cast<int>(direction);
+				y_offset = 8.f * (static_cast<int>(direction) - 1);
 				break;
 			case 2:
-				y_offset = 16.f * static_cast<int>(remapDirection(direction, 0x0213));
+				y_offset = 16.f * (static_cast<int>(remapDirection(direction, 0x1324)) - 1);
 				break;
 		}
 
