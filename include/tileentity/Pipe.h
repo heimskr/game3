@@ -16,6 +16,7 @@ namespace Game3 {
 			Pipe(Identifier tile_entity_id, Identifier corner_, Position);
 
 			DirectionalContainer<std::shared_ptr<Pipe>> getConnected() const;
+			void updateTileID();
 
 		public:
 			void render(SpriteRenderer &) override;

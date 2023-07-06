@@ -33,5 +33,6 @@ namespace Game3 {
 		bool toggle(Direction);
 		std::vector<Direction> toVector() const;
 		bool has(Direction) const;
+		int8_t getMarchIndex() const;
 	};
 }

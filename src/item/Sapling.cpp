@@ -24,7 +24,7 @@ namespace Game3 {
 
 		static const std::array<Identifier, 3> trees {"base:tile/tree1"_id, "base:tile/tree2"_id, "base:tile/tree3"_id};
 		auto new_tree = TileEntity::create<Tree>(realm.getGame(), choose(trees), "base:tile/tree0"_id, place.position, 0.f);
-		if (place.isPathable() && nullptr != realm.add(new_tree)) {
+		if (place.isPathable() && realm.add(new_tree)) {
 			realm.getGame().toServer().tileEntitySpawned(new_tree);
 			if (--stack.count == 0)
 				player.inventory->erase(slot);

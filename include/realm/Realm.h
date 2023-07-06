@@ -213,12 +213,13 @@ namespace Game3 {
 			template <typename T>
 			std::shared_ptr<T> getTileEntity() const {
 				std::shared_ptr<T> out;
-				for (const auto &[index, tile_entity]: tileEntities)
+				for (const auto &[index, tile_entity]: tileEntities) {
 					if (auto cast = std::dynamic_pointer_cast<T>(tile_entity)) {
 						if (out)
 							throw std::runtime_error("Multiple tile entities of type " + std::string(typeid(T).name()) + " found");
 						out = cast;
 					}
+				}
 				if (!out)
 					throw std::runtime_error("No tile entities of type " + std::string(typeid(T).name()) + " found");
 				return out;
@@ -227,7 +228,7 @@ namespace Game3 {
 			template <typename T, typename P>
 			std::shared_ptr<T> getTileEntity(const P &predicate) const {
 				std::shared_ptr<T> out;
-				for (const auto &[index, tile_entity]: tileEntities)
+				for (const auto &[index, tile_entity]: tileEntities) {
 					if (auto cast = std::dynamic_pointer_cast<T>(tile_entity)) {
 						if (predicate(cast)) {
 							if (out)
@@ -235,6 +236,7 @@ namespace Game3 {
 							out = cast;
 						}
 					}
+				}
 				if (!out)
 					throw std::runtime_error("No tile entities of type " + std::string(typeid(T).name()) + " found");
 				return out;
@@ -244,7 +246,7 @@ namespace Game3 {
 			std::shared_ptr<T> closestTileEntity(const Position &position) const {
 				double minimum_distance = INFINITY;
 				std::shared_ptr<T> out;
-				for (const auto &[index, entity]: tileEntities)
+				for (const auto &[index, entity]: tileEntities) {
 					if (auto cast = std::dynamic_pointer_cast<T>(entity)) {
 						const double distance = entity->position.distance(position);
 						if (distance < minimum_distance) {
@@ -252,6 +254,7 @@ namespace Game3 {
 							out = cast;
 						}
 					}
+				}
 				if (!out)
 					throw std::runtime_error("No tile entities of type " + std::string(typeid(T).name()) + " found");
 				return out;
@@ -261,7 +264,7 @@ namespace Game3 {
 			std::shared_ptr<T> closestTileEntity(const Position &position, const P &predicate) const {
 				double minimum_distance = INFINITY;
 				std::shared_ptr<T> out;
-				for (const auto &[index, entity]: tileEntities)
+				for (const auto &[index, entity]: tileEntities) {
 					if (auto cast = std::dynamic_pointer_cast<T>(entity)) {
 						const double distance = entity->position.distance(position);
 						if (predicate(cast) && distance < minimum_distance) {
@@ -269,6 +272,7 @@ namespace Game3 {
 							out = cast;
 						}
 					}
+				}
 				if (!out)
 					throw std::runtime_error("No tile entities of type " + std::string(typeid(T).name()) + " found");
 				return out;

@@ -40,7 +40,7 @@ namespace Game3 {
 
 			virtual void init(Game &);
 			virtual void tick(Game &, float) {}
-			virtual void onSpawn() {}
+			virtual void onSpawn();
 			virtual void onRemove() {}
 			virtual void onNeighborUpdated(Index /* row_offset */, Index /* column_offset */) {}
 			/** Returns the TileEntity ID. This is not the tile ID, which corresponds to a tile in the tileset. */

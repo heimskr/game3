@@ -21,11 +21,18 @@ namespace Game3 {
 		return out;
 	}
 
+	void Pipe::updateTileID() {
+		RealmPtr realm = getRealm();
+		Tileset &tileset = realm->getTileset();
+		const auto march_index = directions.getMarchIndex();
+		tileID = tileset[corner] + tileset.columnCount(realm->getGame()) * (march_index / 7) + march_index % 7;
+	}
+
 	void Pipe::render(SpriteRenderer &sprite_renderer) {
-		auto realm = getRealm();
-		auto &tileset = realm->getTileset();
+		RealmPtr realm = getRealm();
+		Tileset &tileset = realm->getTileset();
 		if (tileID == 0)
-			tileID = tileset[corner];
+			updateTileID();
 		const auto tilesize = tileset.getTileSize();
 		const auto texture = tileset.getTexture(realm->getGame());
 		const auto x = (tileID % (*texture->width / tilesize)) * tilesize;

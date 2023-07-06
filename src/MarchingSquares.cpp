@@ -11,8 +11,6 @@ namespace Game3 {
 		{208,  1}, {210, 44}, {214, 11}, {216, 37}, {218, 49}, {219, 42}, {222, 19}, {223,  9}, {248,  2}, {250, 28}, {251, 27}, {254, 29}, {255, 12},
 	};
 
-	std::array<int, 16> marchingArray4 {22 /* TODO: verify */, 17, 6, 16, 4, 14, 1, 26, 3, 7, 2, 20, 0, 18, 12, 19};
-
 	TileID march8(const std::function<bool(int8_t, int8_t)> &get) {
 		const bool center = get(0, 0);
 		int sum = 0;

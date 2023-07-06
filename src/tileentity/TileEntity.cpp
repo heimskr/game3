@@ -35,6 +35,12 @@ namespace Game3 {
 		game.allAgents[globalID] = shared_from_this();
 	}
 
+	void TileEntity::onSpawn() {
+		Game &game = getRealm()->getGame();
+		if (game.getSide() == Side::Server)
+			game.toServer().tileEntitySpawned(shared_from_this());
+	}
+
 	void TileEntity::setRealm(const std::shared_ptr<Realm> &realm) {
 		realmID = realm->id;
 		weakRealm = realm;

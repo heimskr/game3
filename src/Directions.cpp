@@ -1,4 +1,5 @@
 #include "Directions.h"
+#include "MarchingSquares.h"
 
 namespace Game3 {
 	Directions::Directions(bool north_, bool east_, bool south_, bool west_, bool middle_):
@@ -63,5 +64,10 @@ namespace Game3 {
 			default:
 				return false;
 		}
+	}
+
+	int8_t Directions::getMarchIndex() const {
+		const int sum = (north? 1 : 0) | (west? 2 : 0) | (east? 4 : 0) | (south? 8 : 0);
+		return !middle || sum != 0? marchingArray4[sum] : 22;
 	}
 }

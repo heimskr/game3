@@ -613,16 +613,24 @@ namespace Game3 {
 	void Realm::remove(TileEntityPtr tile_entity, bool run_helper) {
 		const Position position = tile_entity->position;
 		auto iter = tileEntities.find(position);
-		if (iter == tileEntities.end())
+		if (iter == tileEntities.end()) {
+			WARN("Can't remove tile entity: not found");
 			return; // Probably already destroyed. Could happen if the tile entity was queued for removal multiple times in the same tick.
+		}
 		iter->second->onRemove();
 		tileEntities.erase(iter);
 		tileEntitiesByGID.erase(tile_entity->globalID);
 		detach(tile_entity);
+
+		if (const auto count = tile_entity.use_count(); 3 < count)
+			WARN("Tile entity use count: " << count);
+
 		if (run_helper)
 			setLayerHelper(position.row, position.column, false);
+
 		if (tile_entity->is("base:te/ghost"))
 			--ghostCount;
+
 		updateNeighbors(position);
 	}
 
@@ -1160,7 +1168,10 @@ namespace Game3 {
 		std::unique_lock lock(tileEntitiesByChunkMutex);
 		const auto chunk_position = tile_entity->getChunk();
 		if (auto iter = tileEntitiesByChunk.find(chunk_position); iter != tileEntitiesByChunk.end()) {
-			iter->second->insert(tile_entity);
+			assert(iter->second);
+			auto &set = *iter->second;
+			auto set_lock = set.uniqueLock();
+			set.insert(tile_entity);
 		} else {
 			auto set = std::make_shared<Lockable<std::unordered_set<TileEntityPtr>>>();
 			set->insert(tile_entity);

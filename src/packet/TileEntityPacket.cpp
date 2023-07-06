@@ -36,8 +36,8 @@ namespace Game3 {
 			tileEntity->globalID = globalID;
 			tileEntity->tileEntityID = identifier;
 			tileEntity->init(game);
-			realm->add(tileEntity);
 			tileEntity->decode(game, buffer);
+			realm->add(tileEntity);
 		}
 	}
 

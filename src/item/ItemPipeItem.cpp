@@ -26,21 +26,33 @@ namespace Game3 {
 
 	bool ItemPipeItem::use(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) {
 		auto &realm = *place.realm;
-		// auto &tileset = realm.getTileset();
+
 		auto tile_entity = realm.tileEntityAt(place.position);
 		if (!tile_entity) {
+			if (modifiers.onlyShift())
+				return false;
+
 			if (--stack.count == 0)
 				place.player->inventory->erase(slot);
 			else
 				place.player->inventory->notifyOwner();
 			auto pipe = TileEntity::create<ItemPipe>(realm.getGame(), place.position);
-			place.realm->add(pipe);
-			realm.getGame().toServer().tileEntitySpawned(pipe);
+			if (place.realm->add(pipe)) {
+				realm.getGame().toServer().tileEntitySpawned(pipe);
+			}
 			return true;
 		}
+
 		auto pipe = std::dynamic_pointer_cast<Pipe>(tile_entity);
 		if (!pipe)
 			return false;
+
+		if (modifiers.onlyShift()) {
+			place.player->give(ItemStack(place.getGame(), shared_from_this(), 1));
+			realm.queueDestruction(pipe);
+			return true;
+		}
+
 		return false;
 	}
 
