@@ -27,10 +27,7 @@ namespace Game3 {
 			else
 				place.player->inventory->notifyOwner();
 
-			auto pipe = TileEntity::create<ItemPipe>(realm.getGame(), place.position);
-			if (place.realm->add(pipe))
-				realm.getGame().toServer().tileEntitySpawned(pipe);
-
+			place.realm->add(TileEntity::create<ItemPipe>(realm.getGame(), place.position));
 			return true;
 		}
 
