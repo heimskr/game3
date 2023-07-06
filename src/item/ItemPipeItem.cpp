@@ -11,16 +11,6 @@
 #include "tileentity/ItemPipe.h"
 
 namespace Game3 {
-	static Extractors getExtractors(Index corner, Index sheet_index, Index column_count) {
-		if (sheet_index == 0)
-			return {};
-
-		const auto column = (sheet_index - corner) % column_count;
-		// We might be able to apply the distributive property here, but I'm not sure how it would work with rounding and I don't feel like thinking for maybe 20 seconds.
-		const auto row = sheet_index / column_count - corner / column_count;
-		return Extractors(column + row * 8);
-	}
-
 	ItemPipeItem::ItemPipeItem(MoneyCount base_price):
 		Item("base:item/item_pipe"_id, "Item Pipe", base_price, 64) {}
 
@@ -69,20 +59,4 @@ namespace Game3 {
 		pipe->broadcast();
 		return true;
 	}
-
-	// 	const size_t column_count = tileset.columnCount(place.getGame());
-
-	// 	if (modifiers.onlyCtrl()) {
-	// 	} else {
-	// 		const TileID corner = tileset["base:tile/item_pipe_se"_id];
-	// 		const Quadrant quadrant = getQuadrant(x, y);
-	// 		int8_t march_index = (tileset[tilename] - corner) % column_count + 7 * (tileset[tilename] / column_count - corner / column_count);
-	// 		march_index = toggleQuadrant(march_index, quadrant);
-	// 		const TileID new_tile = corner + column_count * (march_index / 7) + march_index % 7;
-	// 		place.realm->setTile(Layer::ItemPipes, place.position, new_tile, false, false);
-	// 		return true;
-	// 	}
-
-	// 	return false;
-	// }
 }
