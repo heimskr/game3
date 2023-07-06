@@ -9,15 +9,17 @@
 #include "Quadrant.h"
 
 namespace Game3 {
+	class Buffer;
+
 	struct Directions {
 		bool north  = false;
 		bool east   = false;
+		bool middle = false;
 		bool south  = false;
 		bool west   = false;
-		bool middle = false;
 
 		Directions() = default;
-		Directions(bool north_, bool east_, bool south_, bool west_, bool middle_);
+		Directions(bool north_, bool east_, bool middle_, bool south_, bool west_);
 		explicit Directions(uint8_t);
 
 		explicit operator uint8_t() const;
@@ -25,9 +27,9 @@ namespace Game3 {
 
 		inline bool toggleNorth()  { return north  = !north;  }
 		inline bool toggleEast()   { return east   = !east;   }
+		inline bool toggleMiddle() { return middle = !middle; }
 		inline bool toggleSouth()  { return south  = !south;  }
 		inline bool toggleWest()   { return west   = !west;   }
-		inline bool toggleMiddle() { return middle = !middle; }
 
 		bool toggle(Quadrant);
 		bool toggle(Direction);
@@ -35,4 +37,8 @@ namespace Game3 {
 		bool has(Direction) const;
 		int8_t getMarchIndex() const;
 	};
+
+	Buffer & operator+=(Buffer &, const Directions &);
+	Buffer & operator<<(Buffer &, const Directions &);
+	Buffer & operator>>(Buffer &, Directions &);
 }

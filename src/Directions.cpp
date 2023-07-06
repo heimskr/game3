@@ -1,15 +1,16 @@
 #include "Directions.h"
 #include "MarchingSquares.h"
+#include "net/Buffer.h"
 
 namespace Game3 {
-	Directions::Directions(bool north_, bool east_, bool south_, bool west_, bool middle_):
-		north(north_), east(east_), south(south_), west(west_), middle(middle_) {}
+	Directions::Directions(bool north_, bool east_, bool middle_, bool south_, bool west_):
+		north(north_), east(east_), middle(middle_), south(south_), west(west_) {}
 
 	Directions::Directions(uint8_t mask):
-		north(mask & 1), east(mask & 2), south(mask & 4), west(mask & 8), middle(mask & 16) {}
+		north(mask & 1), east(mask & 2), middle(mask & 4), south(mask & 8), west(mask & 16) {}
 
 	Directions::operator uint8_t() const {
-		return north | (east << 1) | (south << 2) | (west << 3) | (middle << 4);
+		return north | (east << 1) | (middle << 2) | (south << 3) | (west << 4);
 	}
 
 	Directions::operator std::string() const {
@@ -69,5 +70,17 @@ namespace Game3 {
 	int8_t Directions::getMarchIndex() const {
 		const int sum = (north? 1 : 0) | (west? 2 : 0) | (east? 4 : 0) | (south? 8 : 0);
 		return !middle || sum != 0? marchingArray4[sum] : 22;
+	}
+
+	Buffer & operator+=(Buffer &buffer, const Directions &directions) {
+		return ((((buffer += directions.north) += directions.east) += directions.south) += directions.west) += directions.middle;
+	}
+
+	Buffer & operator<<(Buffer &buffer, const Directions &directions) {
+		return buffer << directions.north << directions.east << directions.south << directions.west << directions.middle;
+	}
+
+	Buffer & operator>>(Buffer &buffer, Directions &directions) {
+		return buffer >> directions.north >> directions.east >> directions.south >> directions.west >> directions.middle;
 	}
 }

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Directions.h"
 
 namespace Game3 {

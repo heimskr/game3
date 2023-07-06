@@ -98,6 +98,22 @@ namespace Game3 {
 		}
 	}
 
+	void TileEntity::broadcast() {
+		assert(getSide() == Side::Server);
+
+		auto realm = getRealm();
+		TileEntityPacket packet(shared_from_this());
+
+		ChunkRange(getChunk()).iterate([&](ChunkPosition chunk_position) {
+			if (auto entities = realm->getEntities(chunk_position)) {
+				auto lock = entities->sharedLock();
+				for (const auto &entity: *entities)
+					if (entity->isPlayer())
+						entity->cast<Player>()->send(packet);
+			}
+		});
+	}
+
 	void TileEntity::absorbJSON(Game &, const nlohmann::json &json) {
 		tileEntityID = json.at("id");
 		globalID     = json.at("gid");

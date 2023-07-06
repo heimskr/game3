@@ -1,3 +1,4 @@
+#include "Log.h"
 #include "Tileset.h"
 #include "realm/Realm.h"
 #include "tileentity/Pipe.h"
@@ -31,12 +32,17 @@ namespace Game3 {
 	void Pipe::render(SpriteRenderer &sprite_renderer) {
 		RealmPtr realm = getRealm();
 		Tileset &tileset = realm->getTileset();
+
 		if (tileID == 0)
 			updateTileID();
+
+		if (extractorsCorner == static_cast<uint16_t>(-1))
+			extractorsCorner = tileset["base:tile/extractor_"_id];
+
 		const auto tilesize = tileset.getTileSize();
 		const auto texture = tileset.getTexture(realm->getGame());
-		const auto x = (tileID % (*texture->width / tilesize)) * tilesize;
-		const auto y = (tileID / (*texture->width / tilesize)) * tilesize;
+		auto x = (tileID % (*texture->width / tilesize)) * tilesize;
+		auto y = (tileID / (*texture->width / tilesize)) * tilesize;
 		sprite_renderer(*texture, {
 			.x = static_cast<float>(position.column),
 			.y = static_cast<float>(position.row),
@@ -45,5 +51,34 @@ namespace Game3 {
 			.size_x = static_cast<float>(tilesize),
 			.size_y = static_cast<float>(tilesize),
 		});
+
+		const auto [extractors_x, extractors_y] = extractors.getOffsets();
+		const TileID extractor_tile = extractorsCorner + extractors_x + extractors_y * tileset.columnCount(realm->getGame());
+		x = (extractor_tile % (*texture->width / tilesize)) * tilesize;
+		y = (extractor_tile / (*texture->width / tilesize)) * tilesize;
+		sprite_renderer(*texture, {
+			.x = static_cast<float>(position.column),
+			.y = static_cast<float>(position.row),
+			.x_offset = static_cast<float>(x) / 2.f,
+			.y_offset = static_cast<float>(y) / 2.f,
+			.size_x = static_cast<float>(tilesize),
+			.size_y = static_cast<float>(tilesize),
+		});
+	}
+
+	void Pipe::encode(Game &game, Buffer &buffer) {
+		TileEntity::encode(game, buffer);
+		buffer << directions;
+		buffer << extractors;
+		buffer << corner;
+	}
+
+	void Pipe::decode(Game &game, Buffer &buffer) {
+		TileEntity::decode(game, buffer);
+		buffer >> directions;
+		buffer >> static_cast<Directions &>(extractors);
+		buffer >> corner;
+		tileID = 0;
+		extractorsCorner = -1;
 	}
 }

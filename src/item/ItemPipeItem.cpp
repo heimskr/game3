@@ -36,10 +36,11 @@ namespace Game3 {
 				place.player->inventory->erase(slot);
 			else
 				place.player->inventory->notifyOwner();
+
 			auto pipe = TileEntity::create<ItemPipe>(realm.getGame(), place.position);
-			if (place.realm->add(pipe)) {
+			if (place.realm->add(pipe))
 				realm.getGame().toServer().tileEntitySpawned(pipe);
-			}
+
 			return true;
 		}
 
@@ -53,51 +54,24 @@ namespace Game3 {
 			return true;
 		}
 
+		const auto [x, y] = offsets;
+
+		// Hold ctrl to toggle extractors.
+		if (modifiers.onlyCtrl()) {
+			Extractors &extractors = pipe->getExtractors();
+			if (0.375 <= x && x <= 0.625 && 0.375 <= y && y <= 0.625)
+				extractors.toggleMiddle();
+			else
+				extractors.toggle(getQuadrant(x, y));
+			pipe->broadcast();
+		}
+
 		return false;
 	}
 
-	// bool ItemPipe::use(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) {
-	// 	auto &realm = *place.realm;
-	// 	auto &tileset = realm.getTileset();
-
-	// 	auto item_pipe = realm.tryTile(Layer::ItemPipes, place.position);
-
-	// 	if (!item_pipe || *item_pipe == tileset.getEmptyID()) {
-	// 		if (--stack.count == 0)
-	// 			place.player->inventory->erase(slot);
-	// 		else
-	// 			place.player->inventory->notifyOwner();
-	// 		place.set(Layer::ItemPipes, "base:tile/item_pipe"_id);
-	// 		return true;
-	// 	}
-
-	// 	const auto &tilename = tileset[*item_pipe];
-
-	// 	const auto [x, y] = offsets;
-
-	// 	if (modifiers.onlyShift() && tileset.isInCategory(tilename, "base:category/item_pipes"_id)) {
-	// 		place.player->give(ItemStack(place.getGame(), shared_from_this(), 1));
-	// 		place.set(Layer::ItemPipes, 0);
-	// 		place.set(Layer::ItemExtractors, 0);
-	// 		return true;
-	// 	}
-
 	// 	const size_t column_count = tileset.columnCount(place.getGame());
 
-	// 	// Hold ctrl to toggle extractors.
 	// 	if (modifiers.onlyCtrl()) {
-	// 		if (auto sheet_index = place.get(Layer::ItemExtractors)) {
-	// 			const TileID corner = tileset["base:tile/extractor_"_id];
-	// 			Extractors extractors = getExtractors(corner, *sheet_index, column_count);
-	// 			// Detect the center, otherwise use quadrants.
-	// 			if (0.375 <= x && x <= 0.625 && 0.375 <= y && y <= 0.625)
-	// 				extractors.toggleMiddle();
-	// 			else
-	// 				extractors.toggle(getQuadrant(x, y));
-	// 			const auto [x_offset, y_offset] = extractors.getOffsets();
-	// 			const TileID new_tile = corner + x_offset + y_offset * column_count;
-	// 			place.set(Layer::ItemExtractors, new_tile);
-	// 		}
 	// 	} else {
 	// 		const TileID corner = tileset["base:tile/item_pipe_se"_id];
 	// 		const Quadrant quadrant = getQuadrant(x, y);
