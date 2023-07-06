@@ -53,17 +53,19 @@ namespace Game3 {
 		});
 
 		const auto [extractors_x, extractors_y] = extractors.getOffsets();
-		const TileID extractor_tile = extractorsCorner + extractors_x + extractors_y * tileset.columnCount(realm->getGame());
-		x = (extractor_tile % (*texture->width / tilesize)) * tilesize;
-		y = (extractor_tile / (*texture->width / tilesize)) * tilesize;
-		sprite_renderer(*texture, {
-			.x = static_cast<float>(position.column),
-			.y = static_cast<float>(position.row),
-			.x_offset = static_cast<float>(x) / 2.f,
-			.y_offset = static_cast<float>(y) / 2.f,
-			.size_x = static_cast<float>(tilesize),
-			.size_y = static_cast<float>(tilesize),
-		});
+		if (extractors_x != 0 || extractors_y != 0) {
+			const TileID extractor_tile = extractorsCorner + extractors_x + extractors_y * tileset.columnCount(realm->getGame());
+			x = (extractor_tile % (*texture->width / tilesize)) * tilesize;
+			y = (extractor_tile / (*texture->width / tilesize)) * tilesize;
+			sprite_renderer(*texture, {
+				.x = static_cast<float>(position.column),
+				.y = static_cast<float>(position.row),
+				.x_offset = static_cast<float>(x) / 2.f,
+				.y_offset = static_cast<float>(y) / 2.f,
+				.size_x = static_cast<float>(tilesize),
+				.size_y = static_cast<float>(tilesize),
+			});
+		}
 	}
 
 	void Pipe::encode(Game &game, Buffer &buffer) {
