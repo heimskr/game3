@@ -31,8 +31,12 @@ namespace Game3 {
 		inline bool toggleSouth()  { return south  = !south;  }
 		inline bool toggleWest()   { return west   = !west;   }
 
+		bool & operator[](Quadrant);
+		const bool & operator[](Quadrant) const;
+
 		bool toggle(Quadrant);
 		bool toggle(Direction);
+
 		std::vector<Direction> toVector() const;
 		bool has(Direction) const;
 		int8_t getMarchIndex() const;

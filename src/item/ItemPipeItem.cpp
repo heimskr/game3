@@ -55,18 +55,19 @@ namespace Game3 {
 		}
 
 		const auto [x, y] = offsets;
+		const Quadrant quadrant = getQuadrant(x, y);
 
 		// Hold ctrl to toggle extractors.
 		if (modifiers.onlyCtrl()) {
-			Extractors &extractors = pipe->getExtractors();
-			if (0.375 <= x && x <= 0.625 && 0.375 <= y && y <= 0.625)
-				extractors.toggleMiddle();
-			else
-				extractors.toggle(getQuadrant(x, y));
-			pipe->broadcast();
+			if (pipe->getDirections()[quadrant])
+				pipe->getExtractors().toggle(quadrant);
+		} else if (!pipe->getDirections().toggle(quadrant)) {
+			pipe->getExtractors()[quadrant] = false;
 		}
 
-		return false;
+		pipe->increaseUpdateCounter();
+		pipe->broadcast();
+		return true;
 	}
 
 	// 	const size_t column_count = tileset.columnCount(place.getGame());

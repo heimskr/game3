@@ -25,6 +25,28 @@ namespace Game3 {
 		return out;
 	}
 
+	bool & Directions::operator[](Quadrant quadrant) {
+		switch (quadrant) {
+			case Quadrant::Top:    return north;
+			case Quadrant::Right:  return east;
+			case Quadrant::Bottom: return south;
+			case Quadrant::Left:   return west;
+			default:
+				throw std::invalid_argument("Invalid quadrant: " + std::to_string(static_cast<uint8_t>(quadrant)));
+		}
+	}
+
+	const bool & Directions::operator[](Quadrant quadrant) const {
+		switch (quadrant) {
+			case Quadrant::Top:    return north;
+			case Quadrant::Right:  return east;
+			case Quadrant::Bottom: return south;
+			case Quadrant::Left:   return west;
+			default:
+				throw std::invalid_argument("Invalid quadrant: " + std::to_string(static_cast<uint8_t>(quadrant)));
+		}
+	}
+
 	bool Directions::toggle(Quadrant quadrant) {
 		switch (quadrant) {
 			case Quadrant::Top:    return toggleNorth();

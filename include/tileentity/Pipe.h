@@ -24,6 +24,9 @@ namespace Game3 {
 		public:
 			void render(SpriteRenderer &) override;
 
+			inline auto & getDirections() { return directions; }
+			inline const auto & getDirections() const { return directions; }
+
 			inline auto & getExtractors() { return extractors; }
 			inline const auto & getExtractors() const { return extractors; }
 
