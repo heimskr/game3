@@ -13,5 +13,6 @@ namespace Game3 {
 	Direction flipDirection(Direction);
 	Direction randomDirection();
 
+	std::string toString(Direction);
 	std::ostream & operator<<(std::ostream &, Direction);
 }

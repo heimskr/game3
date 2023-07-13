@@ -61,7 +61,7 @@ namespace Game3 {
 		}
 
 		auto realm = realm_iter->second;
-		auto lock = realm->lockEntitiesShared();
+		auto lock = realm->entitiesByGID.sharedLock();
 
 		for (const auto [entity_id, threshold]: requests) {
 			// If the entity is found in this realm, try to send it if its update counter is higher than the threshold.

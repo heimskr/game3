@@ -52,7 +52,7 @@ namespace Game3 {
 
 		if (getSide() == Side::Server) {
 			{
-				auto lock = lockVisibleEntitiesShared();
+				auto lock = visibleEntities.sharedLock();
 				if (!visibleEntities.empty()) {
 					for (const auto &weak_visible: visibleEntities)
 						if (auto visible = weak_visible.lock())
@@ -74,7 +74,7 @@ namespace Game3 {
 			json["inventory"] = *inventory;
 		{
 			// I'm sorry. nlohmann forced my hand.
-			std::shared_lock lock(const_cast<Entity *>(this)->pathMutex);
+			auto lock = const_cast<Entity *>(this)->path.sharedLock();
 			if (!path.empty())
 				json["path"] = path;
 		}
@@ -103,7 +103,7 @@ namespace Game3 {
 		if (auto iter = json.find("inventory"); iter != json.end())
 			inventory = std::make_shared<Inventory>(Inventory::fromJSON(game, *iter, shared_from_this()));
 		if (auto iter = json.find("path"); iter != json.end()) {
-			std::unique_lock lock(pathMutex);
+			auto lock = path.uniqueLock();
 			path = iter->get<std::list<Direction>>();
 		}
 		if (auto iter = json.find("money"); iter != json.end())
@@ -118,11 +118,11 @@ namespace Game3 {
 
 	void Entity::tick(Game &, float delta) {
 		{
-			std::shared_lock shared_lock(pathMutex);
+			auto shared_lock = path.sharedLock();
 			if (!path.empty() && move(path.front())) {
 				// Please no data race kthx.
 				shared_lock.unlock();
-				std::unique_lock unique_lock(pathMutex);
+				auto unique_lock = path.uniqueLock();
 				if (!path.empty())
 					path.pop_front();
 			}
@@ -342,7 +342,7 @@ namespace Game3 {
 
 			bool path_empty = true;
 			{
-				std::shared_lock lock(pathMutex);
+				auto lock = path.sharedLock();
 				path_empty = path.empty();
 			}
 			teleport(can_move? new_position : position, !path_empty, false);
@@ -530,7 +530,7 @@ namespace Game3 {
 	bool Entity::pathfind(const Position &goal) {
 		PathResult out = PathResult::Invalid;
 		{
-			std::unique_lock lock(pathMutex);
+			auto lock = path.uniqueLock();
 			out = pathfind(position, goal, path);
 		}
 
@@ -538,7 +538,7 @@ namespace Game3 {
 			increaseUpdateCounter();
 			auto shared = shared_from_this();
 			const EntitySetPathPacket packet(*this);
-			auto lock = lockVisibleEntitiesShared();
+			auto lock = visiblePlayers.sharedLock();
 			// INFO("visiblePlayers<" << visiblePlayers.size() << ">");
 			for (const auto &weak_player: visiblePlayers) {
 				if (auto player = weak_player.lock()) {
@@ -641,7 +641,7 @@ namespace Game3 {
 			}
 		}
 
-		auto lock = lockVisibleEntities();
+		auto entities_lock = visibleEntities.uniqueLock();
 
 		std::vector<std::weak_ptr<Entity>> entities_to_erase;
 		entities_to_erase.reserve(visibleEntities.size());
@@ -654,16 +654,22 @@ namespace Game3 {
 				if (!canSee(*visible)) {
 					assert(visible.get() != this);
 					entities_to_erase.push_back(visible);
-					auto other_lock = visible->lockVisibleEntities();
-					visible->visibleEntities.erase(shared);
+
+					{
+						auto other_lock = visible->visibleEntities.uniqueLock();
+						visible->visibleEntities.erase(shared);
+					}
+
 					if (visible->isPlayer())
-						players_to_erase.push_back(std::dynamic_pointer_cast<Player>(visible));
+						players_to_erase.push_back(visible->cast<Player>());
 				}
 			}
 		}
 
 		for (const auto &entity: entities_to_erase)
 			visibleEntities.erase(entity);
+
+		auto players_lock = visiblePlayers.uniqueLock();
 
 		for (const auto &player: players_to_erase)
 			visiblePlayers.erase(player);
@@ -684,10 +690,14 @@ namespace Game3 {
 							visiblePlayers.insert(std::dynamic_pointer_cast<Player>(visible));
 						if (visible->otherEntityToLock != globalID) {
 							otherEntityToLock = visible->globalID;
-							auto other_lock = visible->lockVisibleEntities();
-							visible->visibleEntities.insert(shared);
-							if (this_player)
+							{
+								auto other_lock = visible->visibleEntities.uniqueLock();
+								visible->visibleEntities.insert(shared);
+							}
+							if (this_player) {
+								auto other_lock = visible->visiblePlayers.uniqueLock();
 								visible->visiblePlayers.insert(this_player);
+							}
 							otherEntityToLock = -1;
 						} else {
 							// The other entity is already handling this.
@@ -697,11 +707,11 @@ namespace Game3 {
 			});
 		}
 
-		std::shared_lock path_lock(pathMutex);
+		auto path_lock = path.sharedLock();
 
 		if (!path.empty()) {
-			lock.unlock();
-			auto shared_lock = lockVisibleEntitiesShared();
+			entities_lock.unlock();
+			auto shared_lock = visiblePlayers.sharedLock();
 
 			if (!visiblePlayers.empty()) {
 				auto shared = shared_from_this();
@@ -719,12 +729,12 @@ namespace Game3 {
 	}
 
 	bool Entity::hasSeenPath(const PlayerPtr &player) {
-		std::shared_lock lock(pathSeersMutex);
+		auto lock = pathSeers.sharedLock();
 		return pathSeers.contains(player);
 	}
 
 	void Entity::setSeenPath(const PlayerPtr &player, bool seen) {
-		std::unique_lock lock(pathSeersMutex);
+		auto lock = pathSeers.uniqueLock();
 
 		if (seen)
 			pathSeers.insert(player);
@@ -733,10 +743,10 @@ namespace Game3 {
 	}
 
 	bool Entity::removeVisible(const std::weak_ptr<Entity> &entity) {
-		auto lock = lockVisibleEntitiesShared();
+		auto shared_lock = visibleEntities.uniqueLock();
 		if (visibleEntities.contains(entity)) {
-			lock.unlock();
-			auto unique_lock = lockVisibleEntities();
+			shared_lock.unlock();
+			auto lock = visibleEntities.uniqueLock();
 			visibleEntities.erase(entity);
 			return true;
 		}
@@ -745,12 +755,18 @@ namespace Game3 {
 	}
 
 	bool Entity::removeVisible(const std::weak_ptr<Player> &player) {
-		auto lock = lockVisibleEntitiesShared();
+		auto shared_lock = visiblePlayers.sharedLock();
+
 		if (visiblePlayers.contains(player)) {
-			lock.unlock();
-			auto unique_lock = lockVisibleEntities();
-			visiblePlayers.erase(player);
-			visibleEntities.erase(player);
+			shared_lock.unlock();
+			{
+				auto lock = visiblePlayers.uniqueLock();
+				visiblePlayers.erase(player);
+			}
+			{
+				auto lock = visibleEntities.uniqueLock();
+				visibleEntities.erase(player);
+			}
 			return true;
 		}
 
@@ -769,7 +785,7 @@ namespace Game3 {
 		buffer << offset.z;
 		buffer << zSpeed;
 		{
-			std::shared_lock lock(pathMutex);
+			auto lock = path.sharedLock();
 			buffer << path;
 		}
 		buffer << money;
@@ -791,7 +807,7 @@ namespace Game3 {
 		buffer >> offset.z;
 		buffer >> zSpeed;
 		{
-			std::unique_lock lock(pathMutex);
+			auto lock = path.uniqueLock();
 			buffer >> path;
 		}
 		buffer >> money;
@@ -842,7 +858,7 @@ namespace Game3 {
 	template <>
 	std::vector<Direction> Entity::copyPath<std::vector>() {
 		std::vector<Direction> out;
-		std::shared_lock lock(pathMutex);
+		auto lock = path.sharedLock();
 		out.reserve(path.size());
 		out = {path.begin(), path.end()};
 		return out;
@@ -856,8 +872,9 @@ namespace Game3 {
 		if (!realm)
 			return;
 
-		auto entities_lock = realm->lockEntitiesShared();
-		auto visible_lock = lockVisibleEntities();
+		auto entities_lock = realm->entities.sharedLock();
+		auto visible_lock = visibleEntities.uniqueLock();
+		auto players_lock = visiblePlayers.uniqueLock();
 		visibleEntities.clear();
 		visiblePlayers.clear();
 		for (const auto &entity: realm->entities) {

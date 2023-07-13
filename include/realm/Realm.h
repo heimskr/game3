@@ -65,16 +65,11 @@ namespace Game3 {
 			TileProvider tileProvider;
 			std::optional<std::array<std::array<std::array<ElementBufferedRenderer, LAYER_COUNT>, REALM_DIAMETER>, REALM_DIAMETER>> renderers;
 			std::optional<std::array<std::array<FluidRenderer, REALM_DIAMETER>, REALM_DIAMETER>> fluidRenderers;
-			/** Governed by tileEntityMutex. */
-			std::unordered_map<Position, TileEntityPtr> tileEntities;
-			/** Governed by tileEntityMutex. */
-			std::unordered_map<GlobalID, TileEntityPtr> tileEntitiesByGID;
-			/** Governed by entityMutex. */
-			std::unordered_set<EntityPtr> entities;
-			/** Governed by entityMutex. */
-			std::unordered_map<GlobalID, EntityPtr> entitiesByGID;
-			/** Governed by entityMutex. */
-			WeakSet<Player> players;
+			Lockable<std::unordered_map<Position, TileEntityPtr>> tileEntities;
+			Lockable<std::unordered_map<GlobalID, TileEntityPtr>> tileEntitiesByGID;
+			Lockable<std::unordered_set<EntityPtr>> entities;
+			Lockable<std::unordered_map<GlobalID, EntityPtr>> entitiesByGID;
+			Lockable<WeakSet<Player>> players;
 			nlohmann::json extraData;
 			Position randomLand;
 			/** Whether the realm's rendering should be affected by the day-night cycle. */
@@ -312,19 +307,13 @@ namespace Game3 {
 			MTQueue<std::weak_ptr<TileEntity>> tileEntityAdditionQueue;
 			MTQueue<std::weak_ptr<Player>> playerRemovalQueue;
 			MTQueue<std::function<void()>> generalQueue;
-			/** Governed by entitiesByChunkMutex. */
-			std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::unordered_set<EntityPtr>>>> entitiesByChunk;
-			std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::unordered_set<TileEntityPtr>>>> tileEntitiesByChunk;
+			Lockable<std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::unordered_set<EntityPtr>>>>> entitiesByChunk;
+			Lockable<std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::unordered_set<TileEntityPtr>>>>> tileEntitiesByChunk;
 
 			friend class ServerGame;
 
-			std::map<ChunkPosition, WeakSet<RemoteClient>> chunkRequests;
-			std::shared_mutex chunkRequestsMutex;
-			std::shared_mutex entitiesByChunkMutex;
-			std::shared_mutex tileEntitiesByChunkMutex;
-			std::shared_mutex playersMutex;
+			Lockable<std::map<ChunkPosition, WeakSet<RemoteClient>>> chunkRequests;
 
-			SharedRecursiveMutex entityMutex;
 			SharedRecursiveMutex tileEntityMutex;
 
 			void initRendererRealms();
@@ -336,38 +325,38 @@ namespace Game3 {
 
 			static BiomeType getBiome(int64_t seed);
 
-			std::atomic<std::thread::id> entityOwner;
-			inline auto lockEntitiesUnique() {
-				std::unique_lock lock(entityMutex);
-				entityOwner = std::this_thread::get_id();
-				return lock;
-			}
+			// std::atomic<std::thread::id> entityOwner;
+			// inline auto lockEntitiesUnique() {
+			// 	auto lock = entities.uniqueLock();
+			// 	entityOwner = std::this_thread::get_id();
+			// 	return lock;
+			// }
 
-			std::atomic<std::thread::id> tileEntityOwner;
-			inline auto lockTileEntitiesUnique() {
-				std::unique_lock lock(tileEntityMutex);
-				tileEntityOwner = std::this_thread::get_id();
-				return lock;
-			}
+			// std::atomic<std::thread::id> tileEntityOwner;
+			// inline auto lockTileEntitiesUnique() {
+			// 	auto lock = tileEntities.uniqueLock();
+			// 	tileEntityOwner = std::this_thread::get_id();
+			// 	return lock;
+			// }
 
 		public:
-			inline auto lockEntitiesShared() {
-				try {
-					return std::shared_lock(entityMutex);
-				} catch (const std::system_error &) {
-					std::cerr << "\e[31mThread " << std::this_thread::get_id() << " can't lock entity mutex held by " << entityOwner << "!\e[39m\n";
-					throw;
-				}
-			}
+			// inline auto lockEntitiesShared() {
+			// 	try {
+			// 		return entities.sharedLock();
+			// 	} catch (const std::system_error &) {
+			// 		std::cerr << "\e[31mThread " << std::this_thread::get_id() << " can't lock entity mutex held by " << entityOwner << "!\e[39m\n";
+			// 		throw;
+			// 	}
+			// }
 
-			inline auto lockTileEntitiesShared() {
-				try {
-					return std::shared_lock(tileEntityMutex);
-				} catch (const std::system_error &) {
-					std::cerr << "\e[31mThread " << std::this_thread::get_id() << " can't lock tile entity mutex held by " << tileEntityOwner << "!\e[39m\n";
-					throw;
-				}
-			}
+			// inline auto lockTileEntitiesShared() {
+			// 	try {
+			// 		return tileEntities.sharedLock();
+			// 	} catch (const std::system_error &) {
+			// 		std::cerr << "\e[31mThread " << std::this_thread::get_id() << " can't lock tile entity mutex held by " << tileEntityOwner << "!\e[39m\n";
+			// 		throw;
+			// 	}
+			// }
 	};
 
 	void to_json(nlohmann::json &, const Realm &);

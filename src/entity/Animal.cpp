@@ -35,11 +35,11 @@ namespace Game3 {
 		INFO("  Path length is " << path.size());
 		auto realm = getRealm();
 		{
-			auto lock = lockVisibleEntitiesShared();
+			auto lock = visibleEntities.sharedLock();
 			INFO("  Player is visible? " << std::boolalpha << visiblePlayers.contains(player));
 		}
 		{
-			auto lock = player->lockVisibleEntitiesShared();
+			auto lock = player->visibleEntities.sharedLock();
 			INFO("  Visible to player? " << std::boolalpha << player->visibleEntities.contains(shared_from_this()));
 		}
 		if (auto ptr = realm->getEntities(getChunk()); ptr && ptr->contains(shared_from_this()))

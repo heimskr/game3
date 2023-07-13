@@ -30,14 +30,19 @@ namespace Game3 {
 		return static_cast<Direction>(std::uniform_int_distribution(0, 3)(threadContext.rng));
 	}
 
-	std::ostream & operator<<(std::ostream &stream, Direction direction) {
+	std::string toString(Direction direction) {
 		switch (direction) {
-			case Game3::Direction::Up:    return stream << "up";
-			case Game3::Direction::Down:  return stream << "down";
-			case Game3::Direction::Left:  return stream << "left";
-			case Game3::Direction::Right: return stream << "right";
-			default: return stream << '?';
+			case Game3::Direction::Up:    return "up";
+			case Game3::Direction::Down:  return "down";
+			case Game3::Direction::Left:  return "left";
+			case Game3::Direction::Right: return "right";
+			default:
+				return "?";
 		}
+	}
+
+	std::ostream & operator<<(std::ostream &os, Direction direction) {
+		return os << toString(direction);
 	}
 
 	Buffer & operator+=(Buffer &buffer, Direction direction) {

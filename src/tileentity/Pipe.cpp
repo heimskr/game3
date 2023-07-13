@@ -83,4 +83,12 @@ namespace Game3 {
 		tileID = 0;
 		extractorsCorner = -1;
 	}
+
+	void Pipe::setNetwork(const std::shared_ptr<PipeNetwork> &new_network) {
+		weakNetwork = new_network;
+	}
+
+	std::shared_ptr<PipeNetwork> Pipe::getNetwork() const {
+		return weakNetwork.lock();
+	}
 }

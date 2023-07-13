@@ -41,6 +41,8 @@ namespace Game3 {
 			virtual void init(Game &);
 			virtual void tick(Game &, float) {}
 			virtual void onSpawn();
+			/** Called after the tile entity is loaded from disk. */
+			virtual void onLoad() {}
 			virtual void onRemove() {}
 			virtual void onNeighborUpdated(Index /* row_offset */, Index /* column_offset */) {}
 			/** Returns the TileEntity ID. This is not the tile ID, which corresponds to a tile in the tileset. */

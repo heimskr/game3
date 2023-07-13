@@ -67,18 +67,22 @@ namespace Game3 {
 
 				for (const auto &[id, realm]: realms) {
 					{
-						auto ent_lock = realm->lockEntitiesShared();
+						auto lock = realm->entities.sharedLock();
 						if (realm->entities.contains(player))
 							INFO("Still present in Realm " << id << "'s entities");
+					}
+
+					{
+						auto lock = realm->entitiesByGID.sharedLock();
 						if (realm->entitiesByGID.contains(player->getGID()))
 							INFO("Still present in Realm " << id << "'s entitiesByGID");
 					}
 
 					{
-						std::shared_lock lock(realm->entitiesByChunkMutex);
+						auto lock = realm->entitiesByChunk.sharedLock();
 						for (const auto &[cpos, set]: realm->entitiesByChunk) {
 							if (set) {
-								auto lock = set->sharedLock();
+								auto set_lock = set->sharedLock();
 								if (set->contains(player))
 									INFO("Still present in Realm " << id << "'s entitiesByChunk at chunk position " << cpos);
 							}

@@ -32,7 +32,7 @@ namespace Game3 {
 	}
 
 	void Player::destroy() {
-		auto lock = lockVisibleEntitiesShared();
+		auto lock = visibleEntities.sharedLock();
 
 		size_t times = 0;
 
@@ -47,9 +47,9 @@ namespace Game3 {
 
 		size_t remaining = 0;
 		{
-			auto ent_lock = getRealm()->lockEntitiesShared();
+			auto ent_lock = getRealm()->entities.sharedLock();
 			for (const auto &entity: getRealm()->entities) {
-				auto vis_lock = entity->lockVisibleEntitiesShared();
+				auto vis_lock = entity->visibleEntities.sharedLock();
 				remaining += entity->visiblePlayers.contains(std::weak_ptr(getShared()));
 			}
 		}
@@ -349,7 +349,7 @@ namespace Game3 {
 			auto shared = getShared();
 
 			{
-				auto lock = lockVisibleEntitiesShared();
+				auto lock = visibleEntities.sharedLock();
 				for (const auto &weak_visible: visibleEntities) {
 					if (auto visible = weak_visible.lock()) {
 						if (!visible->path.empty() && visible->hasSeenPath(shared)) {
@@ -360,7 +360,7 @@ namespace Game3 {
 						}
 
 						if (!canSee(*visible)) {
-							auto visible_lock = visible->lockVisibleEntities();
+							auto visible_lock = visible->visibleEntities.uniqueLock();
 							visible->visiblePlayers.erase(shared);
 							visible->visibleEntities.erase(shared);
 						}

@@ -7,6 +7,8 @@
 #include "tileentity/TileEntity.h"
 
 namespace Game3 {
+	class PipeNetwork;
+
 	class Pipe: public TileEntity {
 		protected:
 			Directions directions;
@@ -14,6 +16,8 @@ namespace Game3 {
 			Identifier corner;
 			TileID tileID = 0;
 			TileID extractorsCorner = -1;
+			std::weak_ptr<PipeNetwork> weakNetwork;
+			// bool searching = false;
 
 			Pipe() = default;
 			Pipe(Identifier tile_entity_id, Identifier corner_, Position);
@@ -32,6 +36,9 @@ namespace Game3 {
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
+
+			void setNetwork(const std::shared_ptr<PipeNetwork> &);
+			std::shared_ptr<PipeNetwork> getNetwork() const;
 
 			template <typename T>
 			inline void toggle(T value) { directions.toggle(value); }

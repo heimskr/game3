@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -40,6 +41,21 @@ namespace Game3 {
 		std::vector<Direction> toVector() const;
 		bool has(Direction) const;
 		int8_t getMarchIndex() const;
+
+		static void iterate(const std::function<void(Direction)> &fn) {
+			fn(Direction::Up);
+			fn(Direction::Right);
+			fn(Direction::Down);
+			fn(Direction::Left);
+		}
+
+		/** Return false to break. */
+		static void iterate(const std::function<bool(Direction)> &fn) {
+			if (fn(Direction::Up))
+				if (fn(Direction::Right))
+					if (fn(Direction::Down))
+						fn(Direction::Left);
+		}
 	};
 
 	Buffer & operator+=(Buffer &, const Directions &);

@@ -20,7 +20,7 @@ namespace Game3 {
 			return;
 		}
 
-		entity->path = {path.begin(), path.end()};
+		entity->path = std::list<Direction>{path.begin(), path.end()};
 		entity->setUpdateCounter(newCounter);
 
 		// const auto &entity_ref = *entity;

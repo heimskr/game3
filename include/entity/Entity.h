@@ -60,13 +60,11 @@ namespace Game3 {
 			 *  to zero each tick to achieve smooth movement instead of teleportation from one tile to the next. */
 			Offset offset;
 			float zSpeed = 0.f;
-			std::list<Direction> path;
+			Lockable<std::list<Direction>> path;
 			MoneyCount money = 0;
 			HitPoints health = 0;
-			/** Governed by visibleEntititesMutex. */
-			WeakSet<Entity> visibleEntities;
-			/** Governed by visibleEntititesMutex. */
-			WeakSet<Player> visiblePlayers;
+			Lockable<WeakSet<Entity>> visibleEntities;
+			Lockable<WeakSet<Player>> visiblePlayers;
 			/** Set when an entity is beginning to teleport so that an EntityMovedPacket can be sent with the proper realm ID
 			 *  before the actual realm switch has occurred. */
 			RealmID nextRealm = -1;
@@ -147,8 +145,6 @@ namespace Game3 {
 			inline bool is(const Identifier &check) const { return type == check; }
 			inline auto getHeldLeft()  const { return heldLeft.slot;  }
 			inline auto getHeldRight() const { return heldRight.slot; }
-			inline auto lockVisibleEntities() { return std::unique_lock(visibleEntitiesMutex); }
-			inline auto lockVisibleEntitiesShared() { return std::shared_lock(visibleEntitiesMutex); }
 
 			virtual void encode(Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */
@@ -158,7 +154,7 @@ namespace Game3 {
 
 			template <template <typename...> typename T>
 			T<Direction> copyPath() {
-				std::shared_lock lock(pathMutex);
+				auto lock = path.sharedLock();
 				return {path.begin(), path.end()};
 			}
 
@@ -207,11 +203,7 @@ namespace Game3 {
 			Held heldLeft  {true};
 			Held heldRight {false};
 			/** The set of all players who have been sent a packet about the entity's current path. Governed by pathSeersMutex */
-			WeakSet<Player> pathSeers;
-
-			std::shared_mutex visibleEntitiesMutex;
-			std::shared_mutex pathSeersMutex;
-			std::shared_mutex pathMutex;
+			Lockable<WeakSet<Player>> pathSeers;
 
 			void setHeld(Slot, Held &);
 	};
