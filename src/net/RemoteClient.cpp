@@ -58,6 +58,7 @@ namespace Game3 {
 			if (payloadSize == receiveBuffer.size()) {
 				if (receiveBuffer.context.expired())
 					receiveBuffer.context = server.game;
+
 				auto packet = (*server.game->registry<PacketFactoryRegistry>()[packetType])();
 
 				try {

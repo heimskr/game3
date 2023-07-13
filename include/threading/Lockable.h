@@ -8,7 +8,7 @@
 #include "net/Buffer.h"
 
 namespace Game3 {
-	template <typename T>
+	template <typename T, typename M = std::shared_mutex>
 	struct Lockable: T {
 		using T::T;
 
@@ -45,7 +45,7 @@ namespace Game3 {
 			return *this;
 		}
 
-		std::shared_mutex mutex;
+		M mutex;
 
 		inline auto uniqueLock() { return std::unique_lock(mutex); }
 		inline auto sharedLock() { return std::shared_lock(mutex); }

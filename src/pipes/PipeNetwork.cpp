@@ -2,6 +2,9 @@
 #include "tileentity/Pipe.h"
 
 namespace Game3 {
+	PipeNetwork::PipeNetwork(size_t id_):
+		id(id_) {}
+
 	void PipeNetwork::add(std::weak_ptr<Pipe> pipe) {
 		if (auto locked = pipe.lock()) {
 			locked->setNetwork(shared_from_this());

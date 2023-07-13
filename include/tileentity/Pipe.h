@@ -10,6 +10,8 @@ namespace Game3 {
 	class PipeNetwork;
 
 	class Pipe: public TileEntity {
+		friend class PipeLoader;
+
 		protected:
 			Directions directions;
 			Extractors extractors;
@@ -17,7 +19,7 @@ namespace Game3 {
 			TileID tileID = 0;
 			TileID extractorsCorner = -1;
 			std::weak_ptr<PipeNetwork> weakNetwork;
-			// bool searching = false;
+			bool loaded = false;
 
 			Pipe() = default;
 			Pipe(Identifier tile_entity_id, Identifier corner_, Position);
@@ -26,6 +28,7 @@ namespace Game3 {
 			void updateTileID();
 
 		public:
+
 			void render(SpriteRenderer &) override;
 
 			inline auto & getDirections() { return directions; }
@@ -37,10 +40,14 @@ namespace Game3 {
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
 
+			/** Implicitly marks the pipe as loaded. */
 			void setNetwork(const std::shared_ptr<PipeNetwork> &);
 			std::shared_ptr<PipeNetwork> getNetwork() const;
 
 			template <typename T>
-			inline void toggle(T value) { directions.toggle(value); }
+			inline void toggle(T value) {
+				if (!directions.toggle(value))
+					extractors[value] = false;
+			}
 	};
 }

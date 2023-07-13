@@ -86,6 +86,7 @@ namespace Game3 {
 
 	void Pipe::setNetwork(const std::shared_ptr<PipeNetwork> &new_network) {
 		weakNetwork = new_network;
+		loaded = true;
 	}
 
 	std::shared_ptr<PipeNetwork> Pipe::getNetwork() const {

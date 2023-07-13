@@ -35,12 +35,27 @@ namespace Game3 {
 		bool & operator[](Quadrant);
 		const bool & operator[](Quadrant) const;
 
+		bool & operator[](Direction);
+		const bool & operator[](Direction) const;
+
 		bool toggle(Quadrant);
 		bool toggle(Direction);
 
 		std::vector<Direction> toVector() const;
 		bool has(Direction) const;
 		int8_t getMarchIndex() const;
+
+		template <typename Fn>
+		void iterate(const Fn &fn) {
+			if (north)
+				fn(Direction::Up);
+			if (east)
+				fn(Direction::Right);
+			if (south)
+				fn(Direction::Down);
+			if (west)
+				fn(Direction::Left);
+		}
 
 		static void iterate(const std::function<void(Direction)> &fn) {
 			fn(Direction::Up);

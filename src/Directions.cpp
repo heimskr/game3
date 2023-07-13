@@ -47,6 +47,28 @@ namespace Game3 {
 		}
 	}
 
+	bool & Directions::operator[](Direction direction) {
+		switch (direction) {
+			case Direction::Up:    return north;
+			case Direction::Right: return east;
+			case Direction::Down:  return south;
+			case Direction::Left:  return west;
+			default:
+				throw std::invalid_argument("Invalid direction: " + std::to_string(static_cast<uint8_t>(direction)));
+		}
+	}
+
+	const bool & Directions::operator[](Direction direction) const {
+		switch (direction) {
+			case Direction::Up:    return north;
+			case Direction::Right: return east;
+			case Direction::Down:  return south;
+			case Direction::Left:  return west;
+			default:
+				throw std::invalid_argument("Invalid direction: " + std::to_string(static_cast<uint8_t>(direction)));
+		}
+	}
+
 	bool Directions::toggle(Quadrant quadrant) {
 		switch (quadrant) {
 			case Quadrant::Top:    return toggleNorth();

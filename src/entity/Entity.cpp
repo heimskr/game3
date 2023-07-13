@@ -669,10 +669,12 @@ namespace Game3 {
 		for (const auto &entity: entities_to_erase)
 			visibleEntities.erase(entity);
 
-		auto players_lock = visiblePlayers.uniqueLock();
+		{
+			auto players_lock = visiblePlayers.uniqueLock();
 
-		for (const auto &player: players_to_erase)
-			visiblePlayers.erase(player);
+			for (const auto &player: players_to_erase)
+				visiblePlayers.erase(player);
+		}
 
 		if (auto realm = weakRealm.lock()) {
 			const auto this_player = std::dynamic_pointer_cast<Player>(shared);
@@ -784,10 +786,7 @@ namespace Game3 {
 		buffer << offset.y;
 		buffer << offset.z;
 		buffer << zSpeed;
-		{
-			auto lock = path.sharedLock();
-			buffer << path;
-		}
+		buffer << path;
 		buffer << money;
 		buffer << health;
 		HasInventory::encode(buffer);
@@ -806,10 +805,7 @@ namespace Game3 {
 		buffer >> offset.y;
 		buffer >> offset.z;
 		buffer >> zSpeed;
-		{
-			auto lock = path.uniqueLock();
-			buffer >> path;
-		}
+		buffer >> path;
 		buffer >> money;
 		buffer >> health;
 		HasInventory::decode(buffer);

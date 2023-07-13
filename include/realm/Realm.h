@@ -65,9 +65,9 @@ namespace Game3 {
 			TileProvider tileProvider;
 			std::optional<std::array<std::array<std::array<ElementBufferedRenderer, LAYER_COUNT>, REALM_DIAMETER>, REALM_DIAMETER>> renderers;
 			std::optional<std::array<std::array<FluidRenderer, REALM_DIAMETER>, REALM_DIAMETER>> fluidRenderers;
-			Lockable<std::unordered_map<Position, TileEntityPtr>> tileEntities;
+			Lockable<std::unordered_map<Position, TileEntityPtr>, SharedRecursiveMutex> tileEntities;
 			Lockable<std::unordered_map<GlobalID, TileEntityPtr>> tileEntitiesByGID;
-			Lockable<std::unordered_set<EntityPtr>> entities;
+			Lockable<std::unordered_set<EntityPtr>, SharedRecursiveMutex> entities;
 			Lockable<std::unordered_map<GlobalID, EntityPtr>> entitiesByGID;
 			Lockable<WeakSet<Player>> players;
 			nlohmann::json extraData;
@@ -324,39 +324,6 @@ namespace Game3 {
 			void initEntity(const EntityPtr &, const Position &);
 
 			static BiomeType getBiome(int64_t seed);
-
-			// std::atomic<std::thread::id> entityOwner;
-			// inline auto lockEntitiesUnique() {
-			// 	auto lock = entities.uniqueLock();
-			// 	entityOwner = std::this_thread::get_id();
-			// 	return lock;
-			// }
-
-			// std::atomic<std::thread::id> tileEntityOwner;
-			// inline auto lockTileEntitiesUnique() {
-			// 	auto lock = tileEntities.uniqueLock();
-			// 	tileEntityOwner = std::this_thread::get_id();
-			// 	return lock;
-			// }
-
-		public:
-			// inline auto lockEntitiesShared() {
-			// 	try {
-			// 		return entities.sharedLock();
-			// 	} catch (const std::system_error &) {
-			// 		std::cerr << "\e[31mThread " << std::this_thread::get_id() << " can't lock entity mutex held by " << entityOwner << "!\e[39m\n";
-			// 		throw;
-			// 	}
-			// }
-
-			// inline auto lockTileEntitiesShared() {
-			// 	try {
-			// 		return tileEntities.sharedLock();
-			// 	} catch (const std::system_error &) {
-			// 		std::cerr << "\e[31mThread " << std::this_thread::get_id() << " can't lock tile entity mutex held by " << tileEntityOwner << "!\e[39m\n";
-			// 		throw;
-			// 	}
-			// }
 	};
 
 	void to_json(nlohmann::json &, const Realm &);
