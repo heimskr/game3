@@ -111,14 +111,14 @@ namespace Game3 {
 		buffer >> extractors;
 		buffer >> present;
 		tileIDs = {};
-		extractorsCorners = {static_cast<uint16_t>(-1), static_cast<uint16_t>(-1), static_cast<uint16_t>(-1)};
-		loaded = false;
+		extractorsCorners = {};
+		loaded = {};
 		networks = {};
 	}
 
 	void Pipe::setNetwork(PipeType pipe_type, const std::shared_ptr<PipeNetwork> &new_network) {
 		networks[pipe_type] = new_network;
-		loaded = true;
+		loaded[pipe_type] = true;
 	}
 
 	std::shared_ptr<PipeNetwork> Pipe::getNetwork(PipeType pipe_type) const {
@@ -135,20 +135,18 @@ namespace Game3 {
 	}
 
 	bool Pipe::onInteractNextTo(const std::shared_ptr<Player> &) {
-		INFO("Pipe loaded? " << std::boolalpha << loaded);
-
 		if (auto network = networks[PipeType::Item])
-			INFO("Item network ID: " << network->getID());
+			INFO("Item network ID: " << network->getID() << ", loaded: " << std::boolalpha << loaded[PipeType::Item]);
 		else
 			INFO("Pipe not connected to an item network.");
 
 		if (auto network = networks[PipeType::Fluid])
-			INFO("Fluid network ID: " << network->getID());
+			INFO("Fluid network ID: " << network->getID() << ", loaded: " << std::boolalpha << loaded[PipeType::Fluid]);
 		else
 			INFO("Pipe not connected to a fluid network.");
 
 		if (auto network = networks[PipeType::Energy])
-			INFO("Energy network ID: " << network->getID());
+			INFO("Energy network ID: " << network->getID() << ", loaded: " << std::boolalpha << loaded[PipeType::Energy]);
 		else
 			INFO("Pipe not connected to an energy network.");
 

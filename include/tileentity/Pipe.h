@@ -49,9 +49,9 @@ namespace Game3 {
 			static Identifier EnergyCorner() { return {"base", "tile/energy_pipe_se"}; }
 			static Identifier Corner(PipeType);
 
-			static Identifier ItemExtractorsCorner()   { return {"base", "tile/item_extractors_se"};   }
-			static Identifier FluidExtractorsCorner()  { return {"base", "tile/fluid_extractors_se"};  }
-			static Identifier EnergyExtractorsCorner() { return {"base", "tile/energy_extractors_se"}; }
+			static Identifier ItemExtractorsCorner()   { return {"base", "tile/item_extractors_es"};   }
+			static Identifier FluidExtractorsCorner()  { return {"base", "tile/fluid_extractors_es"};  }
+			static Identifier EnergyExtractorsCorner() { return {"base", "tile/energy_extractors_es"}; }
 			static Identifier ExtractorsCorner(PipeType);
 
 			PipeTuple<Directions> directions;
@@ -60,7 +60,7 @@ namespace Game3 {
 			PipeTuple<bool> present;
 			PipeTuple<std::shared_ptr<PipeNetwork>> networks;
 			PipeTuple<std::optional<TileID>> extractorsCorners;
-			bool loaded = false;
+			PipeTuple<bool> loaded;
 
 			DirectionalContainer<std::shared_ptr<Pipe>> getConnected(PipeType) const;
 			void updateTileID(PipeType);

@@ -24,13 +24,11 @@ namespace Game3 {
 
 		if (auto by_chunk = realm.getTileEntities(chunk_position)) {
 			auto lock = by_chunk->sharedLock();
-			for (const TileEntityPtr &tile_entity: *by_chunk) {
-				if (auto pipe = tile_entity->cast<Pipe>(); pipe && !pipe->loaded) {
-					floodFill(PipeType::Item,   pipe);
-					floodFill(PipeType::Fluid,  pipe);
-					floodFill(PipeType::Energy, pipe);
-				}
-			}
+			for (const TileEntityPtr &tile_entity: *by_chunk)
+				if (auto pipe = tile_entity->cast<Pipe>())
+					for (const PipeType pipe_type: {PipeType::Item, PipeType::Fluid, PipeType::Energy})
+						if (!pipe->loaded[pipe_type])
+							floodFill(pipe_type, pipe);
 		}
 
 		{
@@ -41,7 +39,7 @@ namespace Game3 {
 
 	void PipeLoader::floodFill(PipeType pipe_type, const std::shared_ptr<Pipe> &start) const {
 		// The initial pipe needs to have not been loaded yet, and it can't already have a network.
-		assert(!start->loaded);
+		assert(!start->loaded[pipe_type]);
 		// If this assertion ever fails, something is horribly wrong.
 		assert(!start->getNetwork(pipe_type));
 
@@ -56,6 +54,7 @@ namespace Game3 {
 				break;
 			case PipeType::Fluid:
 			case PipeType::Energy:
+				return;
 			default:
 				throw std::invalid_argument("Invalid PipeType");
 		}
@@ -82,7 +81,7 @@ namespace Game3 {
 				if (TileEntityPtr base_neighbor = realm->tileEntityAt(neighbor_position)) {
 					if (auto neighbor = base_neighbor->cast<Pipe>()) {
 						// Check whether the connection is matched with a connection on the other pipe.
-						if (!neighbor->loaded && neighbor->getDirections()[pipe_type][flipDirection(direction)])
+						if (!neighbor->loaded[pipe_type] && neighbor->getDirections()[pipe_type][flipDirection(direction)])
 							queue.push_back(neighbor);
 					}
 				}

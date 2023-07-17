@@ -511,8 +511,8 @@ namespace Game3 {
 		const auto gid = popBuffer<GlobalID>(buffer);
 		if (auto locked = inventory.weakOwner.lock())
 			locked->setGID(gid);
-		inventory.slotCount = buffer.take<Slot>();
-		inventory.activeSlot = buffer.take<Slot>();
+		inventory.slotCount = popBuffer<Slot>(buffer);
+		inventory.activeSlot = popBuffer<Slot>(buffer);
 		inventory.setStorage(popBuffer<std::decay_t<decltype(inventory.getStorage())>>(buffer));
 		return buffer;
 	}
