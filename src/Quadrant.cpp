@@ -75,6 +75,28 @@ namespace Game3 {
 		}
 	}
 
+	Direction toDirection(Quadrant quadrant) {
+		switch (quadrant) {
+			case Quadrant::Top:    return Direction::Up;
+			case Quadrant::Right:  return Direction::Right;
+			case Quadrant::Bottom: return Direction::Down;
+			case Quadrant::Left:   return Direction::Left;
+			default:
+				return Direction::Invalid;
+		}
+	}
+
+	Quadrant toQuadrant(Direction direction) {
+		switch (direction) {
+			case Direction::Up:    return Quadrant::Top;
+			case Direction::Right: return Quadrant::Right;
+			case Direction::Down:  return Quadrant::Bottom;
+			case Direction::Left:  return Quadrant::Left;
+			default:
+				return Quadrant::Invalid;
+		}
+	}
+
 	Quadrant getQuadrant(float x, float y) {
 		// Garbage variable names, but the original useful names weren't quite correct.
 		const bool one = x <= y;

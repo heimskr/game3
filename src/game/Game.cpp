@@ -98,9 +98,9 @@
 #include "tileentity/Chest.h"
 #include "tileentity/CraftingStation.h"
 #include "tileentity/Ghost.h"
-#include "tileentity/ItemPipe.h"
 #include "tileentity/ItemSpawner.h"
 #include "tileentity/OreDeposit.h"
+#include "tileentity/Pipe.h"
 #include "tileentity/Sign.h"
 #include "tileentity/Stockpile.h"
 #include "tileentity/Teleporter.h"
@@ -118,7 +118,7 @@ namespace Game3 {
 		lastTime = now;
 		delta = std::chrono::duration_cast<std::chrono::nanoseconds>(difference).count() / 1'000'000'000.;
 		time += delta;
-		++ticks;
+		++currentTick;
 	}
 
 	void Game::initRegistries() {
@@ -304,7 +304,7 @@ namespace Game3 {
 		add(TileEntityFactory::create<Stockpile>());
 		add(TileEntityFactory::create<Teleporter>());
 		add(TileEntityFactory::create<Tree>());
-		add(TileEntityFactory::create<ItemPipe>());
+		add(TileEntityFactory::create<Pipe>());
 	}
 
 	void Game::addRealms() {

@@ -18,6 +18,7 @@
 #include "packet/EntityPacket.h"
 #include "packet/RealmNoticePacket.h"
 #include "packet/TileEntityPacket.h"
+#include "pipes/PipeLoader.h"
 #include "threading/Lockable.h"
 #include "threading/MTQueue.h"
 #include "tileentity/TileEntity.h"
@@ -63,6 +64,7 @@ namespace Game3 {
 			RealmID id = -1;
 			RealmType type;
 			TileProvider tileProvider;
+			PipeLoader pipeLoader;
 			std::optional<std::array<std::array<std::array<ElementBufferedRenderer, LAYER_COUNT>, REALM_DIAMETER>, REALM_DIAMETER>> renderers;
 			std::optional<std::array<std::array<FluidRenderer, REALM_DIAMETER>, REALM_DIAMETER>> fluidRenderers;
 			Lockable<std::unordered_map<Position, TileEntityPtr>, SharedRecursiveMutex> tileEntities;

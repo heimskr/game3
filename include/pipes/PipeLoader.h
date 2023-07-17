@@ -12,14 +12,12 @@ namespace Game3 {
 
 	class PipeLoader {
 		private:
-			Realm &realm;
 			Lockable<std::unordered_set<ChunkPosition>> busyChunks;
 
-			void floodFill(const std::shared_ptr<Pipe> &) const;
-
 		public:
-			PipeLoader(Realm &);
+			PipeLoader() = default;
 
-			void load(ChunkPosition);
+			void load(Realm &, ChunkPosition);
+			void floodFill(PipeType, const std::shared_ptr<Pipe> &) const;
 	};
 }

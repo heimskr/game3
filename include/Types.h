@@ -28,6 +28,7 @@ namespace Game3 {
 	using FluidLevel    = uint16_t;
 	using FluidID       = uint16_t;
 	using UpdateCounter = uint64_t;
+	using Tick          = uint64_t;
 
 	using ItemID     = Identifier;
 	using EntityType = Identifier;
@@ -77,4 +78,6 @@ namespace Game3 {
 		Color(float red_, float green_, float blue_, float alpha_ = 1.f):
 			red(red_), green(green_), blue(blue_), alpha(alpha_) {}
 	};
+
+enum class PipeType {Item, Fluid, Energy};
 }

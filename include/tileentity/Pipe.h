@@ -6,28 +6,75 @@
 #include "container/DirectionalContainer.h"
 #include "tileentity/TileEntity.h"
 
+#include <optional>
+
 namespace Game3 {
 	class PipeNetwork;
+
+	template <typename T>
+	class PipeTuple {
+		public:
+			T item{};
+			T fluid{};
+			T energy{};
+
+			PipeTuple() = default;
+			PipeTuple(T item_, T fluid_, T energy_):
+				item(std::move(item_)), fluid(std::move(fluid_)), energy(std::move(energy_)) {}
+
+			T & operator[](PipeType type) {
+				switch (type) {
+					case PipeType::Item:   return item;
+					case PipeType::Fluid:  return fluid;
+					case PipeType::Energy: return energy;
+					default: throw std::invalid_argument("Invalid PipeType");
+				}
+			}
+
+			const T & operator[](PipeType type) const {
+				switch (type) {
+					case PipeType::Item:   return item;
+					case PipeType::Fluid:  return fluid;
+					case PipeType::Energy: return energy;
+					default: throw std::invalid_argument("Invalid PipeType");
+				}
+			}
+	};
 
 	class Pipe: public TileEntity {
 		friend class PipeLoader;
 
-		protected:
-			Directions directions;
-			Extractors extractors;
-			Identifier corner;
-			TileID tileID = 0;
-			TileID extractorsCorner = -1;
-			std::weak_ptr<PipeNetwork> weakNetwork;
+		private:
+			static Identifier ItemCorner()   { return {"base", "tile/item_pipe_se"};   }
+			static Identifier FluidCorner()  { return {"base", "tile/fluid_pipe_se"};  }
+			static Identifier EnergyCorner() { return {"base", "tile/energy_pipe_se"}; }
+			static Identifier Corner(PipeType);
+
+			static Identifier ItemExtractorsCorner()   { return {"base", "tile/item_extractors_se"};   }
+			static Identifier FluidExtractorsCorner()  { return {"base", "tile/fluid_extractors_se"};  }
+			static Identifier EnergyExtractorsCorner() { return {"base", "tile/energy_extractors_se"}; }
+			static Identifier ExtractorsCorner(PipeType);
+
+			PipeTuple<Directions> directions;
+			PipeTuple<Extractors> extractors;
+			PipeTuple<std::optional<TileID>> tileIDs;
+			PipeTuple<bool> present;
+			PipeTuple<std::shared_ptr<PipeNetwork>> networks;
+			PipeTuple<TileID> extractorsCorners{static_cast<uint16_t>(-1), static_cast<uint16_t>(-1), static_cast<uint16_t>(-1)};
 			bool loaded = false;
 
-			Pipe() = default;
-			Pipe(Identifier tile_entity_id, Identifier corner_, Position);
+			DirectionalContainer<std::shared_ptr<Pipe>> getConnected(PipeType) const;
+			void updateTileID(PipeType);
 
-			DirectionalContainer<std::shared_ptr<Pipe>> getConnected() const;
-			void updateTileID();
+			bool get(PipeType, Direction);
+			void set(PipeType, Direction, bool);
+			void setExtractor(PipeType, Direction, bool);
 
 		public:
+			static Identifier ID() { return {"base", "te/pipe"}; }
+
+			Pipe() = default;
+			Pipe(Position);
 
 			void render(SpriteRenderer &) override;
 
@@ -37,17 +84,35 @@ namespace Game3 {
 			inline auto & getExtractors() { return extractors; }
 			inline const auto & getExtractors() const { return extractors; }
 
+			void toggle(PipeType, Direction);
+			void toggleExtractor(PipeType, Direction);
+
+			void setPresent(PipeType, bool);
+			inline bool getPresent(PipeType pipe_type) const { return present[pipe_type]; }
+
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
 
 			/** Implicitly marks the pipe as loaded. */
-			void setNetwork(const std::shared_ptr<PipeNetwork> &);
-			std::shared_ptr<PipeNetwork> getNetwork() const;
+			void setNetwork(PipeType, const std::shared_ptr<PipeNetwork> &);
+			std::shared_ptr<PipeNetwork> getNetwork(PipeType) const;
 
-			template <typename T>
-			inline void toggle(T value) {
-				if (!directions.toggle(value))
-					extractors[value] = false;
-			}
+			void onSpawn() override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 	};
+
+	template <typename T>
+	Buffer & operator+=(Buffer &buffer, const PipeTuple<T> &tuple) {
+		return ((buffer += tuple.item) += tuple.fluid) += tuple.energy;
+	}
+
+	template <typename T>
+	Buffer & operator<<(Buffer &buffer, const PipeTuple<T> &tuple) {
+		return buffer << tuple.item << tuple.fluid << tuple.energy;
+	}
+
+	template <typename T>
+	Buffer & operator>>(Buffer &buffer, PipeTuple<T> &tuple) {
+		return buffer >> tuple.item >> tuple.fluid >> tuple.energy;
+	}
 }

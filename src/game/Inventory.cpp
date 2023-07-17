@@ -21,6 +21,16 @@ namespace Game3 {
 	Inventory::Inventory(const std::shared_ptr<Agent> &owner, Slot slot_count):
 		weakOwner(owner), slotCount(slot_count) {}
 
+	Inventory::Inventory(const Inventory &other):
+		weakOwner(other.weakOwner), slotCount(other.slotCount.load()), activeSlot(other.activeSlot.load()), storage(other.storage) {}
+
+	Inventory::Inventory(Inventory &&other):
+	weakOwner(other.weakOwner), slotCount(other.slotCount.load()), activeSlot(other.activeSlot.load()), storage(std::move(other.storage)) {
+		other.weakOwner = {};
+		other.slotCount = 0;
+		other.activeSlot = 0;
+	}
+
 	ItemStack * Inventory::operator[](size_t slot) {
 		if (auto iter = storage.find(slot); iter != storage.end())
 			return &iter->second;
@@ -426,11 +436,14 @@ namespace Game3 {
 	}
 
 	void Inventory::compact() {
-		for (auto iter = storage.begin(); iter != storage.end();)
+		auto lock = storage.uniqueLock();
+
+		for (auto iter = storage.begin(); iter != storage.end();) {
 			if (iter->second.count == 0)
 				storage.erase(iter++);
 			else
 				++iter;
+		}
 	}
 
 	Inventory Inventory::fromJSON(Game &game, const nlohmann::json &json, const std::shared_ptr<Agent> &owner) {
@@ -441,6 +454,7 @@ namespace Game3 {
 				out.storage.emplace(parseUlong(key), ItemStack::fromJSON(game, val));
 		out.slotCount  = json.at("slotCount");
 		out.activeSlot = json.at("activeSlot");
+
 		return out;
 	}
 
@@ -455,9 +469,13 @@ namespace Game3 {
 			buffer += locked->getGID();
 		else
 			buffer += static_cast<GlobalID>(-1);
-		buffer += inventory.slotCount;
-		buffer += inventory.activeSlot;
-		buffer += inventory.getStorage();
+		buffer += inventory.slotCount.load();
+		buffer += inventory.activeSlot.load();
+		{
+			auto &storage = inventory.getStorage();
+			auto lock = const_cast<decltype(Inventory().getStorage()) &>(storage).sharedLock();
+			buffer += storage.getBase();
+		}
 		return buffer;
 	}
 
@@ -483,7 +501,7 @@ namespace Game3 {
 	void to_json(nlohmann::json &json, const Inventory &inventory) {
 		for (const auto &[key, val]: inventory.storage)
 			json["storage"][std::to_string(key)] = val;
-		json["slotCount"]  = inventory.slotCount;
-		json["activeSlot"] = inventory.activeSlot;
+		json["slotCount"]  = inventory.slotCount.load();
+		json["activeSlot"] = inventory.activeSlot.load();
 	}
 }

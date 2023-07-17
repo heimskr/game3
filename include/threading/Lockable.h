@@ -12,11 +12,11 @@ namespace Game3 {
 	struct Lockable: T {
 		using T::T;
 
-		Lockable(const Lockable &other): T(other.getBase()) {}
+		Lockable(const Lockable<T> &other): T(other.getBase()) {}
 		Lockable(const T &other): T(other) {}
 
 		/** Likely data race issue. */
-		Lockable(Lockable &&other): T(other.getBase()) {}
+		Lockable(Lockable<T> &&other): T(other.getBase()) {}
 		Lockable(T &&other): T(other) {}
 
 		Lockable<T> & operator=(const Lockable<T> &other) {

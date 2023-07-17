@@ -8,7 +8,7 @@
 #include "game/ServerGame.h"
 #include "item/ItemPipeItem.h"
 #include "realm/Realm.h"
-#include "tileentity/ItemPipe.h"
+#include "tileentity/Pipe.h"
 
 namespace Game3 {
 	ItemPipeItem::ItemPipeItem(MoneyCount base_price):
@@ -27,7 +27,11 @@ namespace Game3 {
 			else
 				place.player->inventory->notifyOwner();
 
-			place.realm->add(TileEntity::create<ItemPipe>(realm.getGame(), place.position));
+			auto pipe = TileEntity::create<Pipe>(realm.getGame(), place.position);
+			if (place.realm->add(pipe)) {
+				pipe->setPresent(PipeType::Item, true);
+			}
+
 			return true;
 		}
 
@@ -42,14 +46,14 @@ namespace Game3 {
 		}
 
 		const auto [x, y] = offsets;
-		const Quadrant quadrant = getQuadrant(x, y);
+		const Direction direction = toDirection(getQuadrant(x, y));
 
 		// Hold ctrl to toggle extractors.
 		if (modifiers.onlyCtrl()) {
-			if (pipe->getDirections()[quadrant])
-				pipe->getExtractors().toggle(quadrant);
-		} else if (!pipe->getDirections().toggle(quadrant)) {
-			pipe->getExtractors()[quadrant] = false;
+			if (pipe->getDirections()[PipeType::Item][direction])
+				pipe->toggleExtractor(PipeType::Item, direction);
+		} else {
+			pipe->toggle(PipeType::Item, direction);
 		}
 
 		pipe->increaseUpdateCounter();

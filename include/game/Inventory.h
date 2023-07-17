@@ -1,11 +1,13 @@
 #pragma once
 
+#include <atomic>
 #include <map>
 #include <optional>
 
 #include "game/Container.h"
 #include "item/Item.h"
 #include "recipe/CraftingRequirement.h"
+#include "threading/Lockable.h"
 
 namespace Game3 {
 	class Agent;
@@ -15,11 +17,13 @@ namespace Game3 {
 	class Inventory: public Container, public std::enable_shared_from_this<Inventory> {
 		public:
 			std::weak_ptr<Agent> weakOwner;
-			Slot slotCount = 0;
-			Slot activeSlot = 0;
+			std::atomic<Slot> slotCount = 0;
+			std::atomic<Slot> activeSlot = 0;
 
 			Inventory() = default;
 			Inventory(const std::shared_ptr<Agent> &owner, Slot slot_count);
+			Inventory(const Inventory &);
+			Inventory(Inventory &&);
 
 			ItemStack * operator[](size_t);
 			const ItemStack * operator[](size_t) const;
@@ -100,12 +104,13 @@ namespace Game3 {
 			ItemCount craftable(const CraftingRecipe &) const;
 
 		private:
-			std::map<Slot, ItemStack> storage;
+			Lockable<std::map<Slot, ItemStack>> storage;
 
 			/** Removes every slot whose item count is zero from the storage map. */
 			void compact();
 
 		public:
+			inline decltype(storage) & getStorage() { return storage; }
 			inline const decltype(storage) & getStorage() const { return storage; }
 			inline void setStorage(decltype(storage) new_storage) { storage = std::move(new_storage); }
 			inline Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &game, Slot slot) { return storage.at(slot).getImage(game); }

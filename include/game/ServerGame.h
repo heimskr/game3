@@ -25,7 +25,7 @@ namespace Game3 {
 				server(std::move(server_)) {}
 
 			void addEntityFactories() override;
-			void tick() override;
+			void tick() final;
 			void garbageCollect();
 			void broadcastTileUpdate(RealmID, Layer, const Position &, TileID);
 			void broadcastFluidUpdate(RealmID, const Position &, FluidTile);

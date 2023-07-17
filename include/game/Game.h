@@ -48,7 +48,7 @@ namespace Game3 {
 			/** 12 because the game starts at noon */
 			float hourOffset = 12.;
 			double time = 0.f;
-			size_t ticks = 0;
+			Tick currentTick = 0;
 			size_t cavesGenerated = 0;
 			size_t randomTicksPerChunk = 1;
 
