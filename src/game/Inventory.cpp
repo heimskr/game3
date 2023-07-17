@@ -31,6 +31,25 @@ namespace Game3 {
 		other.activeSlot = 0;
 	}
 
+	Inventory & Inventory::operator=(const Inventory &other) {
+		weakOwner = other.weakOwner;
+		slotCount = other.slotCount.load();
+		activeSlot = other.activeSlot.load();
+		storage = other.storage;
+		return *this;
+	}
+
+	Inventory & Inventory::operator=(Inventory &&other) {
+		weakOwner = std::move(other.weakOwner);
+		slotCount = other.slotCount.exchange(0);
+		activeSlot = other.activeSlot.exchange(0);
+		{
+			auto lock = other.storage.uniqueLock();
+			storage = std::move(other.storage);
+		}
+		return *this;
+	}
+
 	ItemStack * Inventory::operator[](size_t slot) {
 		if (auto iter = storage.find(slot); iter != storage.end())
 			return &iter->second;
@@ -492,8 +511,8 @@ namespace Game3 {
 		const auto gid = popBuffer<GlobalID>(buffer);
 		if (auto locked = inventory.weakOwner.lock())
 			locked->setGID(gid);
-		popBuffer(buffer, inventory.slotCount);
-		popBuffer(buffer, inventory.activeSlot);
+		inventory.slotCount = buffer.take<Slot>();
+		inventory.activeSlot = buffer.take<Slot>();
 		inventory.setStorage(popBuffer<std::decay_t<decltype(inventory.getStorage())>>(buffer));
 		return buffer;
 	}

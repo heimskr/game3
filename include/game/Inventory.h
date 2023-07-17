@@ -25,6 +25,9 @@ namespace Game3 {
 			Inventory(const Inventory &);
 			Inventory(Inventory &&);
 
+			Inventory & operator=(const Inventory &);
+			Inventory & operator=(Inventory &&);
+
 			ItemStack * operator[](size_t);
 			const ItemStack * operator[](size_t) const;
 

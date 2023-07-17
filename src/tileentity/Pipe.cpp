@@ -18,6 +18,15 @@ namespace Game3 {
 		}
 	}
 
+	Identifier Pipe::ExtractorsCorner(PipeType type) {
+		switch (type) {
+			case PipeType::Item:   return ItemExtractorsCorner();
+			case PipeType::Fluid:  return FluidExtractorsCorner();
+			case PipeType::Energy: return EnergyExtractorsCorner();
+			default: return {};
+		}
+	}
+
 	DirectionalContainer<std::shared_ptr<Pipe>> Pipe::getConnected(PipeType pipe_type) const {
 		DirectionalContainer<std::shared_ptr<Pipe>> out;
 		auto realm = getRealm();
@@ -54,7 +63,7 @@ namespace Game3 {
 
 			auto &extractors_corner = extractorsCorners[pipe_type];
 
-			if (extractors_corner == static_cast<uint16_t>(-1))
+			if (!extractors_corner)
 				extractors_corner = tileset[ExtractorsCorner(pipe_type)];
 
 			std::optional<TileID> &tile_id = tileIDs[pipe_type];
@@ -72,9 +81,9 @@ namespace Game3 {
 				});
 			}
 
-			const auto [extractors_x, extractors_y] = extractors[pipe_type].getOffsets();
+			const auto [extractors_x, extractors_y] = extractors[pipe_type].extractorOffsets();
 			if (extractors_x != 0 || extractors_y != 0) {
-				const TileID extractor_tile = extractors_corner + extractors_x + extractors_y * column_count;
+				const TileID extractor_tile = *extractors_corner + extractors_x + extractors_y * column_count;
 				const float x = (extractor_tile % (*texture->width / tilesize)) * tilesize;
 				const float y = (extractor_tile / (*texture->width / tilesize)) * tilesize;
 				sprite_renderer(*texture, {
@@ -158,6 +167,17 @@ namespace Game3 {
 		setExtractor(pipe_type, direction, !extractors[pipe_type][direction]);
 	}
 
+	void Pipe::setPresent(PipeType pipe_type, bool value) {
+		present[pipe_type] = value;
+
+		if (!value) {
+			for (const Direction direction: {Direction::Up, Direction::Right, Direction::Down, Direction::Left}) {
+				set(pipe_type, direction, false);
+				setExtractor(pipe_type, direction, false);
+			}
+		}
+	}
+
 	bool Pipe::get(PipeType pipe_type, Direction direction) {
 		return directions[pipe_type][direction];
 	}
@@ -168,7 +188,11 @@ namespace Game3 {
 
 	void Pipe::setExtractor(PipeType pipe_type, Direction direction, bool value) {
 		if (auto network = networks[pipe_type]) {
-			network->removeExtraction(position + direction, flipDirection(direction));
+			if (value) {
+				network->addExtraction(position + direction, flipDirection(direction));
+			} else {
+				network->removeExtraction(position + direction, flipDirection(direction));
+			}
 		}
 	}
 }

@@ -71,6 +71,13 @@ namespace Game3 {
 					if (fn(Direction::Down))
 						fn(Direction::Left);
 		}
+
+		/** (x, y) */
+		template <typename T = int>
+		inline std::pair<T, T> extractorOffsets() const {
+			const uint8_t mask(*this);
+			return {mask % 8, mask / 8};
+		}
 	};
 
 	Buffer & operator+=(Buffer &, const Directions &);

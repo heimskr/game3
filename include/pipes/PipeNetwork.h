@@ -28,8 +28,12 @@ namespace Game3 {
 		public:
 			PipeNetwork(size_t id_, const std::shared_ptr<Realm> &);
 
+			virtual ~PipeNetwork() = default;
+
 			void add(std::weak_ptr<Pipe>);
 			void absorb(const std::shared_ptr<PipeNetwork> &);
+			virtual void addExtraction(Position, Direction);
+			virtual void addInsertion(Position, Direction);
 			virtual bool removeExtraction(Position, Direction);
 			virtual bool removeInsertion(Position, Direction);
 

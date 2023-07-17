@@ -33,13 +33,13 @@ namespace Game3 {
 			return *this;
 		}
 
-		Lockable<T> operator=(const T &other) {
+		Lockable<T> & operator=(const T &other) {
 			auto lock = uniqueLock();
 			T::operator=(other);
 			return *this;
 		}
 
-		Lockable<T> operator=(T &&other) {
+		Lockable<T> & operator=(T &&other) {
 			auto lock = uniqueLock();
 			T::operator=(std::forward<T>(other));
 			return *this;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Directions.h"
-#include "Extractors.h"
 #include "Types.h"
 #include "container/DirectionalContainer.h"
 #include "tileentity/TileEntity.h"
@@ -56,11 +55,11 @@ namespace Game3 {
 			static Identifier ExtractorsCorner(PipeType);
 
 			PipeTuple<Directions> directions;
-			PipeTuple<Extractors> extractors;
+			PipeTuple<Directions> extractors;
 			PipeTuple<std::optional<TileID>> tileIDs;
 			PipeTuple<bool> present;
 			PipeTuple<std::shared_ptr<PipeNetwork>> networks;
-			PipeTuple<TileID> extractorsCorners{static_cast<uint16_t>(-1), static_cast<uint16_t>(-1), static_cast<uint16_t>(-1)};
+			PipeTuple<std::optional<TileID>> extractorsCorners;
 			bool loaded = false;
 
 			DirectionalContainer<std::shared_ptr<Pipe>> getConnected(PipeType) const;

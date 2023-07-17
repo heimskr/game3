@@ -32,6 +32,14 @@ namespace Game3 {
 		other->members.clear();
 	}
 
+	void PipeNetwork::addExtraction(Position position, Direction direction) {
+		extractions.emplace(position, direction);
+	}
+
+	void PipeNetwork::addInsertion(Position position, Direction direction) {
+		insertions.emplace(position, direction);
+	}
+
 	bool PipeNetwork::removeExtraction(Position position, Direction direction) {
 		return 1 == extractions.erase(std::make_pair(position, direction));
 	}
