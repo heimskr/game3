@@ -57,9 +57,10 @@ namespace Game3 {
 			visited.insert(pipe);
 			new_network->add(pipe);
 
-			for (const auto &neighbor: pipe->getConnected(type))
-				if (!visited.contains(neighbor))
+			pipe->getDirections()[type].iterate([&](Direction direction) {
+				if (auto neighbor = pipe->getConnected(type, direction); neighbor && !visited.contains(neighbor))
 					queue.push_back(neighbor);
+			});
 		}
 	}
 

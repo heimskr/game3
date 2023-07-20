@@ -34,11 +34,12 @@ namespace Game3 {
 		DirectionalContainer<std::shared_ptr<Pipe>> out;
 		auto realm = getRealm();
 
-		for (const Direction direction: directions[pipe_type].toVector())
+		directions[pipe_type].iterate([&](Direction direction) {
 			if (auto neighbor = realm->tileEntityAt(position + direction))
 				if (auto neighbor_pipe = neighbor->cast<Pipe>())
 					if (neighbor_pipe->directions[pipe_type].has(flipDirection(direction)))
 						out[direction] = neighbor_pipe;
+		});
 
 		return out;
 	}
@@ -204,9 +205,10 @@ namespace Game3 {
 			if (pipe == target)
 				return true;
 
-			for (const Direction direction: {Direction::Up, Direction::Right, Direction::Down, Direction::Left})
-				if (auto neighbor = pipe->getConnected(pipe_type, direction); neighbor && !visited.contains(neighbor))
+			directions[pipe_type].iterate([&](Direction direction) {
+				if (std::shared_ptr<Pipe> neighbor = pipe->getConnected(pipe_type, direction); neighbor && !visited.contains(neighbor))
 					queue.push_back(neighbor);
+			});
 		}
 
 		return false;
