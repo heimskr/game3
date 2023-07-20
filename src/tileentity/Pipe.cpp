@@ -201,13 +201,12 @@ namespace Game3 {
 			queue.pop_front();
 			visited.insert(pipe);
 
-			for (const auto &neighbor: pipe->getConnected(pipe_type)) {
-				if (neighbor == target)
-					return true;
+			if (pipe == target)
+				return true;
 
-				if (!visited.contains(neighbor))
+			for (const Direction direction: {Direction::Up, Direction::Right, Direction::Down, Direction::Left})
+				if (auto neighbor = pipe->getConnected(pipe_type, direction); neighbor && !visited.contains(neighbor))
 					queue.push_back(neighbor);
-			}
 		}
 
 		return false;
