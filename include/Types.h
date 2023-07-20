@@ -79,5 +79,5 @@ namespace Game3 {
 			red(red_), green(green_), blue(blue_), alpha(alpha_) {}
 	};
 
-enum class PipeType {Item, Fluid, Energy};
+	enum class PipeType {Item, Fluid, Energy};
 }

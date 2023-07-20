@@ -10,6 +10,8 @@
 namespace Game3 {
 	class PipeNetwork;
 
+	constexpr std::array<PipeType, 3> PIPE_TYPES{PipeType::Item, PipeType::Fluid, PipeType::Energy};
+
 	template <typename T>
 	class PipeTuple {
 		public:
@@ -63,6 +65,7 @@ namespace Game3 {
 			PipeTuple<bool> loaded;
 
 			DirectionalContainer<std::shared_ptr<Pipe>> getConnected(PipeType) const;
+			std::shared_ptr<Pipe> getConnected(PipeType, Direction) const;
 			void updateTileID(PipeType);
 
 			bool get(PipeType, Direction);
@@ -88,6 +91,9 @@ namespace Game3 {
 
 			void setPresent(PipeType, bool);
 			inline bool getPresent(PipeType pipe_type) const { return present[pipe_type]; }
+
+			/** Returns whether there exists some path between this pipe and the given pipe. */
+			bool reachable(PipeType, const std::shared_ptr<Pipe> &);
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;

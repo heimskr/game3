@@ -4,6 +4,9 @@
 #include "realm/Realm.h"
 #include "tileentity/Pipe.h"
 #include "ui/SpriteRenderer.h"
+#include "util/Util.h"
+
+#include <deque>
 
 namespace Game3 {
 	Pipe::Pipe(Position position_):
@@ -33,11 +36,22 @@ namespace Game3 {
 
 		for (const Direction direction: directions[pipe_type].toVector())
 			if (auto neighbor = realm->tileEntityAt(position + direction))
-				if (auto neighbor_pipe = std::dynamic_pointer_cast<Pipe>(neighbor))
+				if (auto neighbor_pipe = neighbor->cast<Pipe>())
 					if (neighbor_pipe->directions[pipe_type].has(flipDirection(direction)))
 						out[direction] = neighbor_pipe;
 
 		return out;
+	}
+
+	std::shared_ptr<Pipe> Pipe::getConnected(PipeType pipe_type, Direction direction) const {
+		auto realm = getRealm();
+
+		if (auto neighbor = realm->tileEntityAt(position + direction))
+			if (auto neighbor_pipe = neighbor->cast<Pipe>())
+				if (neighbor_pipe->directions[pipe_type].has(flipDirection(direction)))
+					return neighbor_pipe;
+
+		return nullptr;
 	}
 
 	void Pipe::updateTileID(PipeType pipe_type) {
@@ -57,7 +71,7 @@ namespace Game3 {
 		const auto texture      = tileset.getTexture(game);
 		const auto column_count = tileset.columnCount(game);
 
-		for (const PipeType pipe_type: {PipeType::Energy, PipeType::Fluid, PipeType::Item}) {
+		for (const PipeType pipe_type: reverse(PIPE_TYPES)) {
 			if (!tileIDs[pipe_type] && present[pipe_type])
 				updateTileID(pipe_type);
 
@@ -128,9 +142,8 @@ namespace Game3 {
 	void Pipe::onSpawn() {
 		auto realm = getRealm();
 		auto shared = shared_from_this()->cast<Pipe>();
-		realm->pipeLoader.floodFill(PipeType::Item, shared);
-		realm->pipeLoader.floodFill(PipeType::Fluid, shared);
-		realm->pipeLoader.floodFill(PipeType::Energy, shared);
+		for (const PipeType pipe_type: PIPE_TYPES)
+			realm->pipeLoader.floodFill(pipe_type, shared);
 		TileEntity::onSpawn();
 	}
 
@@ -174,6 +187,29 @@ namespace Game3 {
 				setExtractor(pipe_type, direction, false);
 			}
 		}
+	}
+
+	bool Pipe::reachable(PipeType pipe_type, const std::shared_ptr<Pipe> &target) {
+		assert(target);
+		std::shared_ptr<Pipe> shared = shared_from_this()->cast<Pipe>();
+		std::unordered_set visited{shared};
+		std::deque queue{shared};
+
+		while (!queue.empty()) {
+			auto pipe = queue.front();
+			queue.pop_front();
+			visited.insert(pipe);
+
+			for (const auto &neighbor: pipe->getConnected(pipe_type)) {
+				if (neighbor == target)
+					return true;
+
+				if (!visited.contains(neighbor))
+					queue.push_back(neighbor);
+			}
+		}
+
+		return false;
 	}
 
 	bool Pipe::get(PipeType pipe_type, Direction direction) {
