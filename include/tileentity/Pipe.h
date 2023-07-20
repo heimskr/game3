@@ -64,10 +64,7 @@ namespace Game3 {
 			PipeTuple<std::optional<TileID>> extractorsCorners;
 			PipeTuple<bool> loaded;
 
-			DirectionalContainer<std::shared_ptr<Pipe>> getConnected(PipeType) const;
-			std::shared_ptr<Pipe> getConnected(PipeType, Direction) const;
 			void updateTileID(PipeType);
-
 			bool get(PipeType, Direction);
 			void set(PipeType, Direction, bool);
 			void setExtractor(PipeType, Direction, bool);
@@ -77,6 +74,9 @@ namespace Game3 {
 
 			Pipe() = default;
 			Pipe(Position);
+
+			DirectionalContainer<std::shared_ptr<Pipe>> getConnected(PipeType) const;
+			std::shared_ptr<Pipe> getConnected(PipeType, Direction) const;
 
 			void render(SpriteRenderer &) override;
 

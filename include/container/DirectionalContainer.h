@@ -25,13 +25,17 @@ namespace Game3 {
 						return nullptr;
 					}
 
+					bool valid() const {
+						return member && (parent.*member).has_value();
+					}
+
 				public:
 					explicit iterator_base(P &parent_, Member member_ = &DirectionalContainer::north):
 						parent(parent_), member(member_) {}
 
 					iterator_base<P> & operator++() {
 						Member next_member = next(member);
-						while (next_member && !(parent.*next_member))
+						while (next_member && !(parent.*next_member).has_value())
 							next_member = next(next_member);
 						member = next_member;
 						return *this;
@@ -44,16 +48,15 @@ namespace Game3 {
 					}
 
 					T & operator*() {
-						return *(parent.*member);
+						return (parent.*member).value();
 					}
 
 					const T & operator*() const {
-						// If you try to dereference an invalid iterator, that's on you.
-						return *(parent.*member);
+						return (parent.*member).value();
 					}
 
 					bool operator==(const iterator_base<P> &other) const {
-						return this == &other || (&parent == &other.parent && member == other.member);
+						return this == &other || (&parent == &other.parent && (member == other.member || (!valid() && !other.valid())));
 					}
 			};
 

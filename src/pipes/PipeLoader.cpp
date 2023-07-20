@@ -37,20 +37,18 @@ namespace Game3 {
 		}
 	}
 
-	void PipeLoader::floodFill(PipeType pipe_type, const std::shared_ptr<Pipe> &start) const {
+	void PipeLoader::floodFill(PipeType pipe_type, const std::shared_ptr<Pipe> &start) {
 		// The initial pipe needs to have not been loaded yet, and it can't already have a network.
 		assert(!start->loaded[pipe_type]);
 		// If this assertion ever fails, something is horribly wrong.
 		assert(!start->getNetwork(pipe_type));
-
-		static std::atomic_size_t last_id = 0;
 
 		std::shared_ptr<PipeNetwork> network;
 		auto realm = start->getRealm();
 
 		switch (pipe_type) {
 			case PipeType::Item:
-				network = std::make_shared<ItemNetwork>(++last_id, realm);
+				network = std::make_shared<ItemNetwork>(++lastID, realm);
 				break;
 			case PipeType::Fluid:
 			case PipeType::Energy:
@@ -59,7 +57,7 @@ namespace Game3 {
 				throw std::invalid_argument("Invalid PipeType");
 		}
 
-		start->setNetwork(pipe_type, network);
+		network->add(start);
 
 		std::vector<std::shared_ptr<Pipe>> queue{start};
 
@@ -72,9 +70,8 @@ namespace Game3 {
 			if (auto other_network = pipe->getNetwork(pipe_type)) {
 				if (network != other_network)
 					network->absorb(other_network);
-			} else {
-				pipe->setNetwork(pipe_type, network);
-			}
+			} else
+				network->add(pipe);
 
 			directions.iterate([&](Direction direction) {
 				const Position neighbor_position = pipe->getPosition() + direction;

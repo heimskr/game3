@@ -192,6 +192,7 @@ namespace Game3 {
 	bool Pipe::reachable(PipeType pipe_type, const std::shared_ptr<Pipe> &target) {
 		assert(target);
 		std::shared_ptr<Pipe> shared = shared_from_this()->cast<Pipe>();
+		assert(shared);
 		std::unordered_set visited{shared};
 		std::deque queue{shared};
 
@@ -217,7 +218,35 @@ namespace Game3 {
 	}
 
 	void Pipe::set(PipeType pipe_type, Direction direction, bool value) {
-		directions[pipe_type][direction] = value;
+		if (value) {
+			directions[pipe_type][direction] = true;
+
+			if (!loaded[pipe_type])
+				return;
+
+			if (std::shared_ptr<Pipe> connection = getConnected(pipe_type, direction)) {
+				std::shared_ptr<PipeNetwork> network = getNetwork(pipe_type);
+				assert(network);
+				network->absorb(connection->getNetwork(pipe_type));
+			}
+
+			return;
+		}
+
+
+		if (!loaded[pipe_type]) {
+			directions[pipe_type][direction] = false;
+			return;
+		}
+
+		std::shared_ptr<Pipe> connection = getConnected(pipe_type, direction);
+		directions[pipe_type][direction] = false;
+
+		if (connection && !reachable(pipe_type, connection)) {
+			std::shared_ptr<PipeNetwork> network = getNetwork(pipe_type);
+			assert(network);
+			network->partition(connection);
+		}
 	}
 
 	void Pipe::setExtractor(PipeType pipe_type, Direction direction, bool value) {
