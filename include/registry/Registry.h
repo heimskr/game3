@@ -14,29 +14,20 @@
 #include "Log.h"
 #include "data/Identifier.h"
 #include "registry/Registerable.h"
+#include "util/Castable.h"
 
 namespace Game3 {
 	class Game;
 	struct NamedRegistryBase;
 	struct UnnamedRegistryBase;
 
-	class Registry: public NamedRegisterable, public std::enable_shared_from_this<Registry> {
+	class Registry: public NamedRegisterable, public Castable<Registry> {
 		protected:
 			explicit Registry(Identifier identifier_): NamedRegisterable(std::move(identifier_)) {}
 
 		public:
 			Registry(): Registry(Identifier()) { throw std::logic_error("Cannot default-construct a Registry"); }
 			virtual ~Registry() = default;
-
-			template <typename T>
-			std::shared_ptr<T> cast() {
-				return std::dynamic_pointer_cast<T>(shared_from_this());
-			}
-
-			template <typename T>
-			std::shared_ptr<const T> cast() const {
-				return std::dynamic_pointer_cast<const T>(shared_from_this());
-			}
 
 			std::shared_ptr<NamedRegistryBase> toNamed() {
 				return cast<NamedRegistryBase>();

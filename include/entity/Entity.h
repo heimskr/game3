@@ -24,6 +24,7 @@
 #include "game/HasInventory.h"
 #include "item/Item.h"
 #include "threading/Lockable.h"
+#include "util/Castable.h"
 #include "util/WeakSet.h"
 
 namespace Game3 {
@@ -43,7 +44,7 @@ namespace Game3 {
 		EntityTexture(Identifier identifier_, Identifier texture_id, uint8_t variety_);
 	};
 
-	class Entity: public Agent, public HasInventory, public std::enable_shared_from_this<Entity> {
+	class Entity: public Agent, public HasInventory, public Castable<Entity> {
 		public:
 			constexpr static Slot DEFAULT_INVENTORY_SIZE = 30;
 			/** The reciprocal of this is how many seconds it takes to move one square. */
@@ -156,16 +157,6 @@ namespace Game3 {
 			T<Direction> copyPath() {
 				auto lock = path.sharedLock();
 				return {path.begin(), path.end()};
-			}
-
-			template <typename T>
-			std::shared_ptr<T> cast() {
-				return std::dynamic_pointer_cast<T>(shared_from_this());
-			}
-
-			template <typename T>
-			std::shared_ptr<const T> cast() const {
-				return std::dynamic_pointer_cast<const T>(shared_from_this());
 			}
 
 		protected:

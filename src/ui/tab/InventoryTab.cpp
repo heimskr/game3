@@ -3,7 +3,7 @@
 #include "Log.h"
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
-#include "game/Inventory.h"
+#include "game/ClientInventory.h"
 #include "item/Tool.h"
 #include "packet/SetHeldItemPacket.h"
 #include "ui/MainWindow.h"
@@ -109,7 +109,7 @@ namespace Game3 {
 
 							if (player_inventory.canInsert(*source)) {
 								player_inventory.add(*source, destination_slot);
-								externalInventory->erase(source_slot);
+								externalInventory->erase(source_slot, false);
 							}
 						}
 					} else {
@@ -160,7 +160,7 @@ namespace Game3 {
 			}
 
 			if (game->player->inventory)
-				populate(playerGrid, *game->player->inventory, false);
+				populate(playerGrid, static_cast<ClientInventory &>(*game->player->inventory), false);
 
 			if (externalInventory)
 				populate(externalGrid, *externalInventory, true);
@@ -190,14 +190,14 @@ namespace Game3 {
 			externalWidgets.clear();
 
 			if (game->player->inventory)
-				populate(playerGrid, *game->player->inventory, false);
+				populate(playerGrid, static_cast<ClientInventory &>(*game->player->inventory), false);
 
 			if (externalInventory)
 				populate(externalGrid, *externalInventory, true);
 		});
 	}
 
-	void InventoryTab::populate(Gtk::Grid &grid, Inventory &inventory, bool external) {
+	void InventoryTab::populate(Gtk::Grid &grid, ClientInventory &inventory, bool external) {
 		auto &storage = inventory.getStorage();
 		auto &widgets = external? externalWidgets : playerWidgets;
 
@@ -264,11 +264,15 @@ namespace Game3 {
 
 			auto left_click = Gtk::GestureClick::create();
 			left_click->set_button(1);
-			left_click->signal_released().connect([this, slot, external, widget = widget_ptr.get()](int n, double x, double y) { leftClick(lastGame, widget, n, slot, external, x, y); });
+			left_click->signal_released().connect([this, slot, external, widget = widget_ptr.get()](int n, double x, double y) {
+				leftClick(lastGame, widget, n, slot, external, x, y);
+			});
 
 			auto right_click = Gtk::GestureClick::create();
 			right_click->set_button(3);
-			right_click->signal_pressed().connect([this, slot, external, widget = widget_ptr.get()](int n, double x, double y) { rightClick(lastGame, widget, n, slot, external, x, y); });
+			right_click->signal_pressed().connect([this, slot, external, widget = widget_ptr.get()](int n, double x, double y) {
+				rightClick(lastGame, widget, n, slot, external, x, y);
+			});
 
 			widget_ptr->add_controller(left_click);
 			widget_ptr->add_controller(right_click);
@@ -281,7 +285,7 @@ namespace Game3 {
 		}
 	}
 
-	void InventoryTab::setExternalInventory(const Glib::ustring &name, const std::shared_ptr<Inventory> &inventory, const std::shared_ptr<Agent> &agent) {
+	void InventoryTab::setExternalInventory(const Glib::ustring &name, const std::shared_ptr<ClientInventory> &inventory, const std::shared_ptr<Agent> &agent) {
 		externalInventory = inventory;
 		externalAgent = agent;
 		externalName = name;
@@ -309,7 +313,7 @@ namespace Game3 {
 		mainWindow.onBlur();
 
 		if (!external) {
-			game->player->inventory->setActive(slot);
+			game->player->inventory->setActive(slot, false);
 			updatePlayerClasses(game);
 		}
 	}

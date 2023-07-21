@@ -8,6 +8,7 @@
 #include "Position.h"
 #include "Types.h"
 #include "game/Agent.h"
+#include "util/Castable.h"
 
 namespace Game3 {
 	class Buffer;
@@ -18,7 +19,7 @@ namespace Game3 {
 	class RemoteClient;
 	class SpriteRenderer;
 
-	class TileEntity: public Agent, public std::enable_shared_from_this<TileEntity> {
+	class TileEntity: public Agent, public Castable<TileEntity> {
 		public:
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;
@@ -73,16 +74,6 @@ namespace Game3 {
 
 			void sendTo(RemoteClient &, UpdateCounter threshold = 0);
 			void broadcast();
-
-			template <typename T>
-			std::shared_ptr<T> cast() {
-				return std::dynamic_pointer_cast<T>(shared_from_this());
-			}
-
-			template <typename T>
-			std::shared_ptr<const T> cast() const {
-				return std::dynamic_pointer_cast<const T>(shared_from_this());
-			}
 
 		protected:
 			TileEntity() = default;

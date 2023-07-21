@@ -7,7 +7,7 @@
 
 namespace Game3 {
 	class ClientGame;
-	class Inventory;
+	class ClientInventory;
 	class MainWindow;
 	class TileEntity;
 
@@ -33,9 +33,9 @@ namespace Game3 {
 			void onResize(const std::shared_ptr<ClientGame> &) override;
 			void update(const std::shared_ptr<ClientGame> &) override;
 			void reset(const std::shared_ptr<ClientGame> &) override;
-			void setExternalInventory(const Glib::ustring &name, const std::shared_ptr<Inventory> &, const std::shared_ptr<Agent> &);
+			void setExternalInventory(const Glib::ustring &name, const std::shared_ptr<ClientInventory> &, const std::shared_ptr<Agent> &);
 			void resetExternalInventory();
-			std::shared_ptr<Inventory> getExternalInventory() const { return externalInventory; }
+			std::shared_ptr<ClientInventory> getExternalInventory() const { return externalInventory; }
 
 		private:
 			Gtk::ScrolledWindow scrolled;
@@ -48,7 +48,7 @@ namespace Game3 {
 			std::vector<std::unique_ptr<Gtk::Widget>> playerWidgets;
 			std::vector<std::unique_ptr<Gtk::Widget>> externalWidgets;
 			int lastGridWidth = 0;
-			std::shared_ptr<Inventory> externalInventory;
+			std::shared_ptr<ClientInventory> externalInventory;
 			std::weak_ptr<Agent> externalAgent;
 			Glib::ustring externalName;
 			std::unordered_map<Gtk::Widget *, std::pair<Slot, bool>> widgetMap;
@@ -69,6 +69,6 @@ namespace Game3 {
 			void leftClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, bool external, double x, double y);
 			void rightClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, bool external, double x, double y);
 			void updatePlayerClasses(const std::shared_ptr<ClientGame> &);
-			void populate(Gtk::Grid &, Inventory &, bool external);
+			void populate(Gtk::Grid &, ClientInventory &, bool external);
 	};
 }
