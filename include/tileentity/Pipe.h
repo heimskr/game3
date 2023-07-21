@@ -78,6 +78,7 @@ namespace Game3 {
 			DirectionalContainer<std::shared_ptr<Pipe>> getConnected(PipeType) const;
 			std::shared_ptr<Pipe> getConnected(PipeType, Direction) const;
 
+			void tick(Game &, float) override;
 			void render(SpriteRenderer &) override;
 
 			inline auto & getDirections() { return directions; }

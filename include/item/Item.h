@@ -103,11 +103,17 @@ namespace Game3 {
 			/** Returns true iff the other stack is mergeable with this one and has an equal count. */
 			inline bool operator==(const ItemStack &other) const { return canMerge(other) && count == other.count; }
 
-			/** Returns true iff the other stack is mergeable with this one and has a greater count. */
+			/** Returns true iff the other stack is mergeable with this one and has a lesser count. */
 			inline bool operator<(const ItemStack &other)  const { return canMerge(other) && count <  other.count; }
 
-			/** Returns true iff the other stack is mergeable with this one and has a greater or equal count. */
+			/** Returns true iff the other stack is mergeable with this one and has a lesser or equal count. */
 			inline bool operator<=(const ItemStack &other) const { return canMerge(other) && count <= other.count; }
+
+			/** Returns true iff the other stack is mergeable with this one and has a greater count. */
+			inline bool operator>(const ItemStack &other)  const { return canMerge(other) && count >  other.count; }
+
+			/** Returns true iff the other stack is mergeable with this one and has a greater or equal count. */
+			inline bool operator>=(const ItemStack &other) const { return canMerge(other) && count >= other.count; }
 
 			static ItemStack withDurability(const Game &, const ItemID &, Durability durability);
 			static ItemStack withDurability(const Game &, const ItemID &);

@@ -35,7 +35,7 @@ namespace Game3 {
 			 *  Otherwise, this function returns nothing. */
 			std::optional<ItemStack> add(const ItemStack &, Slot start = -1);
 
-			bool canStore(const ItemStack &) const;
+			bool canInsert(const ItemStack &) const;
 
 			/** Removes an item from the inventory and drops it at the owner's location. */
 			void drop(Slot);

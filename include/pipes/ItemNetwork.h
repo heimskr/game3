@@ -3,6 +3,8 @@
 #include "pipes/PipeNetwork.h"
 
 namespace Game3 {
+	class Inventory;
+
 	class ItemNetwork: public PipeNetwork {
 		public:
 			using PipeNetwork::PipeNetwork;
@@ -13,5 +15,9 @@ namespace Game3 {
 
 		private:
 			std::optional<PairSet::iterator> roundRobinIterator;
+			std::shared_ptr<Inventory> cachedRoundRobinInventory;
+
+			void advanceRoundRobin();
+			std::shared_ptr<Inventory> getRoundRobinInventory();
 	};
 }

@@ -1,5 +1,6 @@
 #include "Log.h"
 #include "Tileset.h"
+#include "game/Game.h"
 #include "pipes/PipeNetwork.h"
 #include "realm/Realm.h"
 #include "tileentity/Pipe.h"
@@ -58,8 +59,14 @@ namespace Game3 {
 	void Pipe::updateTileID(PipeType pipe_type) {
 		RealmPtr realm = getRealm();
 		Tileset &tileset = realm->getTileset();
-		const auto march_index = directions[pipe_type].getMarchIndex();
+		const int8_t march_index = directions[pipe_type].getMarchIndex();
 		tileIDs[pipe_type] = tileset[Corner(pipe_type)] + tileset.columnCount(realm->getGame()) * (march_index / 7) + march_index % 7;
+	}
+
+	void Pipe::tick(Game &game, float) {
+		for (const PipeType pipe_type: PIPE_TYPES)
+			if (auto network = networks[pipe_type])
+				network->tick(game.currentTick);
 	}
 
 	void Pipe::render(SpriteRenderer &sprite_renderer) {
@@ -183,7 +190,7 @@ namespace Game3 {
 		present[pipe_type] = value;
 
 		if (!value) {
-			for (const Direction direction: {Direction::Up, Direction::Right, Direction::Down, Direction::Left}) {
+			for (const Direction direction: ALL_DIRECTIONS) {
 				set(pipe_type, direction, false);
 				setExtractor(pipe_type, direction, false);
 			}

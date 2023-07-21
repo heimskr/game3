@@ -124,7 +124,7 @@ namespace Game3 {
 		return ItemStack(getOwner()->getRealm()->getGame(), stack.item, remaining);
 	}
 
-	bool Inventory::canStore(const ItemStack &stack) const {
+	bool Inventory::canInsert(const ItemStack &stack) const {
 		ssize_t remaining = stack.count;
 
 		for (const auto &[slot, stored]: storage) {

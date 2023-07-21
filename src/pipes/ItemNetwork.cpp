@@ -26,28 +26,85 @@ namespace Game3 {
 				continue;
 			}
 
-			if (!roundRobinIterator)
-				roundRobinIterator = insertions.begin();
-
 			auto &rr_iter = *roundRobinIterator;
 
 			if (rr_iter == insertions.end())
-				continue;
+				break;
 
 			if (auto has_inventory = tile_entity->cast<HasInventory>(); has_inventory && has_inventory->inventory) {
 				auto &inventory = *has_inventory->inventory;
-				// inventory.
 				if (!inventory.empty()) {
 					auto &storage = inventory.getStorage();
-					auto lock = storage.sharedLock();
-					const auto &[slot, stack] = *storage.begin();
+					auto lock = storage.uniqueLock();
+					auto &[slot, stack] = *storage.begin();
 
+					std::optional<ItemStack> leftover = getRoundRobinInventory()->add(stack);
+
+					if (leftover) {
+						// If the insertion didn't fully complete, we need to try to put the leftovers
+						// in the next inventories in the round-robin configuration.
+						ItemStack original_leftover = *leftover;
+						auto old_iter = rr_iter;
+						// Keep trying to insert into the next machine until we reach
+						// the original machine or the leftovers are all gone.
+						do {
+							advanceRoundRobin();
+							// Prevent insertion to self. It would presumably cause issues with locks.
+							if (rr_iter->first == tile_entity->getPosition())
+								continue;
+							leftover = getRoundRobinInventory()->add(*leftover);
+						} while (old_iter != rr_iter && leftover);
+
+						if (leftover) {
+							// If there's anything left over, subtract the amount that was inserted elsewhere
+							// from the original stack extracted from.
+							stack.count -= original_leftover.count - leftover->count;
+							inventory.notifyOwner();
+						} else {
+							// Otherwise, we've sent out the entire stack and can simply erase it.
+							inventory.erase(slot, false);
+						}
+					} else {
+						// If the insertion completed successfully without leftovers, erase the source slot.
+						inventory.erase(slot, false);
+					}
 				}
 			}
 		}
 
-		for (const auto &iter: to_erase) {
+		for (const auto &iter: to_erase)
 			extractions.erase(iter);
-		}
+	}
+
+	void ItemNetwork::advanceRoundRobin() {
+		if (!roundRobinIterator || *roundRobinIterator == insertions.end() || ++*roundRobinIterator == insertions.end())
+			roundRobinIterator = insertions.begin();
+
+		cachedRoundRobinInventory = nullptr;
+	}
+
+	std::shared_ptr<Inventory> ItemNetwork::getRoundRobinInventory() {
+		if (cachedRoundRobinInventory)
+			return cachedRoundRobinInventory;
+
+		if (!roundRobinIterator)
+			roundRobinIterator = insertions.begin();
+
+		if (*roundRobinIterator == insertions.end())
+			return nullptr;
+
+		auto realm = weakRealm.lock();
+		if (!realm)
+			return nullptr;
+
+		TileEntityPtr tile_entity = realm->tileEntityAt((*roundRobinIterator)->first);
+		if (!tile_entity)
+			return nullptr;
+
+		std::shared_ptr has_inventory = tile_entity->cast<HasInventory>();
+		if (!has_inventory)
+			return nullptr;
+
+		return cachedRoundRobinInventory = has_inventory->inventory;
 	}
 }

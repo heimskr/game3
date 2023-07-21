@@ -107,7 +107,7 @@ namespace Game3 {
 								return true;
 							}
 
-							if (player_inventory.canStore(*source)) {
+							if (player_inventory.canInsert(*source)) {
 								player_inventory.add(*source, destination_slot);
 								externalInventory->erase(source_slot);
 							}
@@ -120,7 +120,7 @@ namespace Game3 {
 								return true;
 							}
 
-							if (externalInventory->canStore(*source)) {
+							if (externalInventory->canInsert(*source)) {
 								externalInventory->add(*source, destination_slot);
 								player_inventory.erase(source_slot);
 							}
