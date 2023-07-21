@@ -25,7 +25,7 @@ namespace Game3 {
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 			void tick(Game &, float delta) override;
-			Glib::ustring getName() override { return "Miner"; }
+			std::string getName() override { return "Miner"; }
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;
 

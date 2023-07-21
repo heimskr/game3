@@ -21,7 +21,7 @@ namespace Game3 {
 			MerchantTab & operator=(MerchantTab &&) = delete;
 
 			Gtk::Widget & getWidget() override { return scrolled; }
-			Glib::ustring getName() override { return merchantName.empty()? "Merchant" : merchantName; }
+			std::string getName() override { return merchantName.empty()? "Merchant" : merchantName; }
 			void onResize(const std::shared_ptr<ClientGame> &) override;
 			void update(const std::shared_ptr<ClientGame> &) override;
 			void reset(const std::shared_ptr<ClientGame> &) override;

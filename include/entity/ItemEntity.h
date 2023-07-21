@@ -24,7 +24,7 @@ namespace Game3 {
 			void render(SpriteRenderer &, TextRenderer &) override;
 			virtual bool onInteractOn    (const std::shared_ptr<Player> &player) override { return interact(player); }
 			virtual bool onInteractNextTo(const std::shared_ptr<Player> &player) override { return interact(player); }
-			Glib::ustring getName() override;
+			std::string getName() override;
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;
 

@@ -65,6 +65,7 @@ namespace Game3 {
 			/** Called when the TileEntity is destroyed violently, e.g. by a bomb. Returns false if the TileEntity should survive the destruction. */
 			virtual bool kill() { return false; }
 			inline bool is(const Identifier &check) const { return getID() == check; }
+			std::string getName() override { return "Unknown TileEntity (" + std::string(tileEntityID) + ')'; }
 
 			virtual void encode(Game &, Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */

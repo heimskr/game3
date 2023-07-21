@@ -4,6 +4,7 @@
 #include "Tileset.h"
 #include "entity/Player.h"
 #include "game/ClientGame.h"
+#include "packet/OpenAgentInventoryPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Chest.h"
 #include "ui/Canvas.h"
@@ -27,15 +28,7 @@ namespace Game3 {
 	}
 
 	bool Chest::onInteractNextTo(const std::shared_ptr<Player> &player) {
-		if (player->getSide() == Side::Client) {
-			auto &tab = *getRealm()->getGame().toClient().canvas.window.inventoryTab;
-			player->queueForMove([player, &tab](const auto &) {
-				tab.resetExternalInventory();
-				return true;
-			});
-			tab.setExternalInventory(name, inventory, shared_from_this());
-		}
-
+		player->send(OpenAgentInventoryPacket(getGID()));
 		return true;
 	}
 

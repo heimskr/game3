@@ -22,7 +22,7 @@ namespace Game3 {
 			TextTab & operator=(TextTab &&) = delete;
 
 			Gtk::Widget & getWidget() override { return scrolled; }
-			Glib::ustring getName() override { return name; }
+			std::string getName() override { return name; }
 			void onBlur() override;
 			void update(const std::shared_ptr<ClientGame> &) override;
 			void reset(const std::shared_ptr<ClientGame> &) override;

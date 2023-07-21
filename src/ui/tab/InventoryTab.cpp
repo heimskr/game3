@@ -292,6 +292,8 @@ namespace Game3 {
 
 	void InventoryTab::resetExternalInventory() {
 		removeChildren(externalGrid);
+		externalWidgets.clear();
+		externalWidgetsBySlot.clear();
 		externalLabel.hide();
 		externalLabel.set_text("");
 		externalWidgets.clear();

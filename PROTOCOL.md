@@ -235,6 +235,11 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i32` Slot
 	- `bool` Discard
 
+40. **Open Agent Inventory**: tells a client to open an agent's inventory.
+
+	- `u64` Global ID
+	- `string` Name
+
 # Message Format
 
 All values are little endian.

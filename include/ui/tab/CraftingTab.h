@@ -22,7 +22,7 @@ namespace Game3 {
 			CraftingTab & operator=(CraftingTab &&) = delete;
 
 			Gtk::Widget & getWidget() override { return scrolled; }
-			Glib::ustring getName() override { return "Crafting"; }
+			std::string getName() override { return "Crafting"; }
 			void update(const std::shared_ptr<ClientGame> &) override;
 			void reset(const std::shared_ptr<ClientGame> &) override;
 

@@ -27,6 +27,7 @@ namespace Game3 {
 
 			virtual Side getSide() const = 0;
 			virtual Type getAgentType() const = 0;
+			virtual std::string getName() = 0;
 
 			virtual GlobalID getGID() const { return globalID; }
 			virtual void setGID(GlobalID new_gid) { globalID = new_gid; }
@@ -56,4 +57,6 @@ namespace Game3 {
 			Lockable<AgentMeta> agentMeta;
 			Lockable<WeakSet<Player>> sentTo;
 	};
+
+	using AgentPtr = std::shared_ptr<Agent>;
 }

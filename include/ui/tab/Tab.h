@@ -15,7 +15,7 @@ namespace Game3 {
 			virtual ~Tab() = default;
 
 			virtual Gtk::Widget & getWidget() = 0;
-			virtual Glib::ustring getName() = 0;
+			virtual std::string getName() = 0;
 			virtual void onFocus() {}
 			virtual void onBlur() {}
 			virtual void onResize(const std::shared_ptr<ClientGame> &) {}

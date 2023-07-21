@@ -100,7 +100,7 @@ namespace Game3 {
 		return true;
 	}
 
-	Glib::ustring ItemEntity::getName() {
+	std::string ItemEntity::getName() {
 		return stack.item->name;
 	}
 

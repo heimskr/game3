@@ -29,7 +29,7 @@ namespace Game3 {
 			InventoryTab & operator=(InventoryTab &&) = delete;
 
 			Gtk::Widget & getWidget() override { return scrolled; }
-			Glib::ustring getName() override { return "Inventory"; }
+			std::string getName() override { return "Inventory"; }
 			void onResize(const std::shared_ptr<ClientGame> &) override;
 			void update(const std::shared_ptr<ClientGame> &) override;
 			void reset(const std::shared_ptr<ClientGame> &) override;
