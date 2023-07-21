@@ -2,6 +2,7 @@
 #include "entity/ClientPlayer.h"
 #include "error/PlayerMissingError.h"
 #include "game/ClientGame.h"
+#include "game/ClientInventory.h"
 #include "packet/OpenAgentInventoryPacket.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
@@ -28,6 +29,6 @@ namespace Game3 {
 			return true;
 		});
 
-		tab->setExternalInventory(agent->getName(), has_inventory->inventory, agent);
+		tab->setExternalInventory(agent->getName(), has_inventory->inventory->cast<ClientInventory>(), agent);
 	}
 }

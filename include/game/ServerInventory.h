@@ -31,7 +31,6 @@ namespace Game3 {
 
 			void notifyOwner() override;
 
-		protected:
 			static ServerInventory fromJSON(Game &, const nlohmann::json &, const std::shared_ptr<Agent> &);
 
 			friend void to_json(nlohmann::json &, const Inventory &);

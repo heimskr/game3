@@ -3,6 +3,7 @@
 #include "entity/ClientPlayer.h"
 #include "entity/Merchant.h"
 #include "game/ClientGame.h"
+#include "game/ClientInventory.h"
 #include "game/Inventory.h"
 #include "game/Stonks.h"
 #include "ui/MainWindow.h"
@@ -113,7 +114,7 @@ namespace Game3 {
 		const int grid_width = lastGridWidth = gridWidth();
 		const int tile_size = scrolled.get_width() / (scrolled.get_width() / TILE_SIZE);
 
-		auto populate = [&](Gtk::Grid &grid, Inventory &inventory, bool is_merchant) {
+		auto populate = [&](Gtk::Grid &grid, ClientInventory &inventory, bool is_merchant) {
 			auto &storage = inventory.getStorage();
 			auto &widgets = is_merchant? merchantWidgets : playerWidgets;
 
@@ -173,13 +174,13 @@ namespace Game3 {
 		};
 
 		if (game->player->inventory)
-			populate(playerGrid, *game->player->inventory, false);
+			populate(playerGrid, *game->player->inventory->cast<ClientInventory>(), false);
 
 		if (merchantInventory)
 			populate(merchantGrid, *merchantInventory, true);
 	}
 
-	void MerchantTab::setMerchantInventory(const Glib::ustring &name, const std::shared_ptr<Inventory> &inventory, double price_multiplier) {
+	void MerchantTab::setMerchantInventory(const Glib::ustring &name, const std::shared_ptr<ClientInventory> &inventory, double price_multiplier) {
 		merchantInventory = inventory;
 		merchantName = name;
 		priceMultiplier = price_multiplier;

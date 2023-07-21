@@ -10,6 +10,7 @@ namespace Game3 {
 		protected:
 			Lockable<Storage> storage;
 
+			StorageInventory() = default;
 			StorageInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, Storage);
 			StorageInventory(const StorageInventory &);
 			StorageInventory(StorageInventory &&);
@@ -18,27 +19,27 @@ namespace Game3 {
 			StorageInventory & operator=(const StorageInventory &);
 			StorageInventory & operator=(StorageInventory &&);
 
-			ItemStack * operator[](size_t);
-			const ItemStack * operator[](size_t) const;
+			ItemStack * operator[](size_t) override;
+			const ItemStack * operator[](size_t) const override;
 
-			bool canInsert(const ItemStack &) const;
-
-			/** Counts the number of an item in the inventory. */
-			ItemCount count(const ItemID &) const;
+			bool canInsert(const ItemStack &) const override;
 
 			/** Counts the number of an item in the inventory. */
-			ItemCount count(const Item &) const;
+			ItemCount count(const ItemID &) const override;
+
+			/** Counts the number of an item in the inventory. */
+			ItemCount count(const Item &) const override;
 
 			/** Counts the number of an item in the inventory. This takes ItemStack data into account but ignores the given ItemStack's count. */
-			ItemCount count(const ItemStack &) const;
+			ItemCount count(const ItemStack &) const override;
 
 			/** Counts the number of items with a given attribute in the inventory. */
-			ItemCount countAttribute(const Identifier &) const;
+			ItemCount countAttribute(const Identifier &) const override;
 
 			bool empty() const override;
 
-			ItemStack & front();
-			const ItemStack & front() const;
+			ItemStack & front() override;
+			const ItemStack & front() const override;
 
 			bool contains(Slot) const override;
 

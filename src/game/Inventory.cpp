@@ -7,7 +7,9 @@
 #include "entity/ServerPlayer.h"
 #include "game/Agent.h"
 #include "game/ClientGame.h"
+#include "game/ClientInventory.h"
 #include "game/Inventory.h"
+#include "game/ServerInventory.h"
 #include "net/Buffer.h"
 #include "packet/InventoryPacket.h"
 #include "packet/SetActiveSlotPacket.h"
@@ -83,5 +85,13 @@ namespace Game3 {
 		}
 
 		return out;
+	}
+
+	std::shared_ptr<Inventory> Inventory::create(Side side, std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, std::map<Slot, ItemStack> storage) {
+		if (side == Side::Server)
+			return std::make_shared<ServerInventory>(owner, slot_count, active_slot, std::move(storage));
+		if (side == Side::Client)
+			return std::make_shared<ClientInventory>(owner, slot_count, active_slot, std::move(storage));
+		throw std::invalid_argument("Can't create inventory for side " + std::to_string(static_cast<int>(side)));
 	}
 }

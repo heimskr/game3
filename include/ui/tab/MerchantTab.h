@@ -4,7 +4,7 @@
 #include "ui/tab/Tab.h"
 
 namespace Game3 {
-	class Inventory;
+	class ClientInventory;
 	class MainWindow;
 
 	class MerchantTab: public Tab {
@@ -25,9 +25,9 @@ namespace Game3 {
 			void onResize(const std::shared_ptr<ClientGame> &) override;
 			void update(const std::shared_ptr<ClientGame> &) override;
 			void reset(const std::shared_ptr<ClientGame> &) override;
-			void setMerchantInventory(const Glib::ustring &name, const std::shared_ptr<Inventory> &, double price_multiplier);
+			void setMerchantInventory(const Glib::ustring &name, const std::shared_ptr<ClientInventory> &, double price_multiplier);
 			void resetMerchantInventory();
-			std::shared_ptr<Inventory> getMerchantInventory() const { return merchantInventory; }
+			std::shared_ptr<ClientInventory> getMerchantInventory() const { return merchantInventory; }
 
 		private:
 			constexpr static int TILE_MARGIN = 2;
@@ -44,7 +44,7 @@ namespace Game3 {
 			std::vector<std::unique_ptr<Gtk::Widget>> playerWidgets;
 			std::vector<std::unique_ptr<Gtk::Widget>> merchantWidgets;
 			int lastGridWidth = 0;
-			std::shared_ptr<Inventory> merchantInventory;
+			std::shared_ptr<ClientInventory> merchantInventory;
 			Glib::ustring merchantName;
 			std::unordered_map<Gtk::Widget *, Slot> widgetMap;
 

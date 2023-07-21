@@ -14,6 +14,9 @@ namespace Game3 {
 			ClientInventory(const ClientInventory &);
 			ClientInventory(ClientInventory &&);
 
+			ClientInventory & operator=(const ClientInventory &);
+			ClientInventory & operator=(ClientInventory &&);
+
 			std::optional<ItemStack> add(const ItemStack &, Slot start) override;
 
 			void drop(Slot) override;

@@ -4,6 +4,7 @@
 #include "Tileset.h"
 #include "entity/Woodcutter.h"
 #include "game/ClientGame.h"
+#include "game/ClientInventory.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "game/Stonks.h"
@@ -64,7 +65,7 @@ namespace Game3 {
 				tab.resetExternalInventory();
 				return true;
 			});
-			tab.setExternalInventory("Woodcutter", inventory, shared_from_this());
+			tab.setExternalInventory("Woodcutter", inventory->cast<ClientInventory>(), shared_from_this());
 		}
 		return true;
 	}

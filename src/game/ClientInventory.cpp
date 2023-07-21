@@ -25,6 +25,23 @@ namespace Game3 {
 		throw std::runtime_error("Clients cannot add items to inventories");
 	}
 
+	ClientInventory::ClientInventory(const ClientInventory &other):
+		StorageInventory(other) {}
+
+	ClientInventory::ClientInventory(ClientInventory &&other):
+		StorageInventory(std::move(other)) {}
+
+
+	ClientInventory & ClientInventory::operator=(const ClientInventory &other) {
+		StorageInventory::operator=(other);
+		return *this;
+	}
+
+	ClientInventory & ClientInventory::operator=(ClientInventory &&other) {
+		StorageInventory::operator=(std::move(other));
+		return *this;
+	}
+
 	void ClientInventory::drop(Slot slot) {
 		auto owner = weakOwner.lock();
 		if (!owner)

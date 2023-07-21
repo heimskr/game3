@@ -4,6 +4,7 @@
 #include "Tileset.h"
 #include "entity/Miner.h"
 #include "game/ClientGame.h"
+#include "game/ClientInventory.h"
 #include "game/Inventory.h"
 #include "game/Stonks.h"
 #include "net/Buffer.h"
@@ -63,7 +64,7 @@ namespace Game3 {
 				tab.resetExternalInventory();
 				return true;
 			});
-			tab.setExternalInventory("Miner", inventory, shared_from_this());
+			tab.setExternalInventory("Miner", inventory->cast<ClientInventory>(), shared_from_this());
 		}
 
 		return true;

@@ -30,14 +30,16 @@ namespace Game3 {
 			Inventory & operator=(const Inventory &);
 			Inventory & operator=(Inventory &&);
 
-			ItemStack * operator[](size_t);
-			const ItemStack * operator[](size_t) const;
+			virtual ItemStack * operator[](size_t) = 0;
+			virtual const ItemStack * operator[](size_t) const = 0;
 
 			/** If the ItemStack couldn't be inserted into the inventory, this function returns an ItemStack
 			 *  containing the leftovers that couldn't be inserted. Otherwise, this function returns nothing. */
 			virtual std::optional<ItemStack> add(const ItemStack &, Slot start) = 0;
 
-			bool canInsert(const ItemStack &) const;
+			virtual std::optional<ItemStack> add(const ItemStack &stack) { return add(stack, -1); }
+
+			virtual bool canInsert(const ItemStack &) const = 0;
 
 			/** Removes an item from the inventory and drops it at the owner's location. */
 			virtual void drop(Slot) = 0;
@@ -58,7 +60,7 @@ namespace Game3 {
 			/** Erases the active slot. */
 			virtual void erase() { erase(false); }
 
-			virtual bool empty() const;
+			virtual bool empty() const = 0;
 
 			/** Counts the number of an item in the inventory. */
 			virtual ItemCount count(const ItemID &) const = 0;
@@ -107,6 +109,8 @@ namespace Game3 {
 
 			virtual void setActive(Slot, bool force) = 0;
 
+			virtual void setActive(Slot slot) { setActive(slot, false); }
+
 			virtual void prevSlot();
 
 			virtual void nextSlot();
@@ -116,6 +120,8 @@ namespace Game3 {
 			/** Returns the number of times a recipe can be crafted with the inventory's items.
 			 *  Doesn't take the output of the recipe into account. */
 			virtual ItemCount craftable(const CraftingRecipe &) const = 0;
+
+			static std::shared_ptr<Inventory> create(Side side, std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot = 0, std::map<Slot, ItemStack> storage = {});
 
 		protected:
 			/** Removes every slot whose item count is zero from the storage map. */

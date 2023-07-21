@@ -2,6 +2,7 @@
 
 #include "entity/Merchant.h"
 #include "game/ClientGame.h"
+#include "game/ClientInventory.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "ui/Canvas.h"
@@ -42,7 +43,7 @@ namespace Game3 {
 			});
 			tab.show();
 			window.delay([this, &tab] {
-				tab.setMerchantInventory("Merchant", inventory, greed);
+				tab.setMerchantInventory("Merchant", inventory->cast<ClientInventory>(), greed);
 			}, 2);
 		}
 		return true;

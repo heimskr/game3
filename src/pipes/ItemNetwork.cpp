@@ -1,5 +1,5 @@
 #include "game/HasInventory.h"
-#include "game/Inventory.h"
+#include "game/StorageInventory.h"
 #include "pipes/ItemNetwork.h"
 #include "realm/Realm.h"
 
@@ -34,7 +34,7 @@ namespace Game3 {
 			if (auto has_inventory = tile_entity->cast<HasInventory>(); has_inventory && has_inventory->inventory) {
 				auto &inventory = *has_inventory->inventory;
 				if (!inventory.empty()) {
-					auto &storage = inventory.getStorage();
+					auto &storage = dynamic_cast<StorageInventory &>(inventory).getStorage();
 					auto lock = storage.uniqueLock();
 					auto &[slot, stack] = *storage.begin();
 

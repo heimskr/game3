@@ -131,7 +131,6 @@ namespace Game3 {
 	}
 
 	ItemCount ServerInventory::remove(const ItemStack &stack_to_remove) {
-		bool retry;
 		ItemCount count_to_remove = stack_to_remove.count;
 		ItemCount removed = 0;
 

@@ -7,8 +7,8 @@
 #include "entity/ServerPlayer.h"
 #include "game/ClientGame.h"
 #include "game/Game.h"
-#include "game/Inventory.h"
 #include "game/ServerGame.h"
+#include "game/ServerInventory.h"
 #include "net/Buffer.h"
 #include "net/RemoteClient.h"
 #include "packet/EntityPacket.h"
@@ -65,13 +65,14 @@ namespace Game3 {
 	}
 
 	void Entity::toJSON(nlohmann::json &json) const {
+		assert(getSide() == Side::Server);
 		json["type"]      = type;
 		json["position"]  = position;
 		json["realmID"]   = realmID;
 		json["direction"] = direction;
 		json["health"]    = health;
 		if (inventory)
-			json["inventory"] = *inventory;
+			json["inventory"] = static_cast<ServerInventory &>(*inventory);
 		{
 			// I'm sorry. nlohmann forced my hand.
 			auto lock = const_cast<Entity *>(this)->path.sharedLock();
@@ -101,7 +102,7 @@ namespace Game3 {
 		if (auto iter = json.find("health"); iter != json.end())
 			health = *iter;
 		if (auto iter = json.find("inventory"); iter != json.end())
-			inventory = std::make_shared<Inventory>(Inventory::fromJSON(game, *iter, shared_from_this()));
+			inventory = std::make_shared<ServerInventory>(ServerInventory::fromJSON(game, *iter, shared_from_this()));
 		if (auto iter = json.find("path"); iter != json.end()) {
 			auto lock = path.uniqueLock();
 			path = iter->get<std::list<Direction>>();
@@ -180,7 +181,7 @@ namespace Game3 {
 			texture = getTexture();
 
 		if (!inventory)
-			inventory = std::make_shared<Inventory>(shared, DEFAULT_INVENTORY_SIZE);
+			inventory = Inventory::create(getSide(), shared, DEFAULT_INVENTORY_SIZE);
 		else
 			inventory->weakOwner = shared;
 

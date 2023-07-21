@@ -4,6 +4,7 @@
 #include "entity/Blacksmith.h"
 #include "entity/Merchant.h"
 #include "game/ClientGame.h"
+#include "game/ClientInventory.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "game/Stonks.h"
@@ -69,7 +70,7 @@ namespace Game3 {
 			});
 			tab.show();
 			window.delay([this, &tab] {
-				tab.setMerchantInventory("Blacksmith", inventory, greed);
+				tab.setMerchantInventory("Blacksmith", inventory->cast<ClientInventory>(), greed);
 			}, 2);
 		}
 

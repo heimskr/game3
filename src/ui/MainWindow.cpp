@@ -11,6 +11,7 @@
 #include "entity/Merchant.h"
 #include "entity/Miner.h"
 #include "game/ClientGame.h"
+#include "game/ClientInventory.h"
 #include "game/HasInventory.h"
 #include "game/Inventory.h"
 #include "net/LocalClient.h"
@@ -320,9 +321,10 @@ namespace Game3 {
 		game->signal_other_inventory_update().connect([this](const std::shared_ptr<HasRealm> &owner) {
 			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner)) {
 				if (has_inventory->inventory) {
-					if (has_inventory->inventory == inventoryTab->getExternalInventory())
+					auto client_inventory = has_inventory->inventory->cast<ClientInventory>();
+					if (client_inventory == inventoryTab->getExternalInventory())
 						inventoryTab->update(game);
-					if (has_inventory->inventory == merchantTab->getMerchantInventory())
+					if (client_inventory == merchantTab->getMerchantInventory())
 						merchantTab->update(game);
 				}
 			}

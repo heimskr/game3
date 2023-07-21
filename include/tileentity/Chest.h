@@ -25,8 +25,10 @@ namespace Game3 {
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			void render(SpriteRenderer &) override;
-			void setInventory(Slot slot_count);
 			void inventoryUpdated() override;
+
+			/** Server-side only. */
+			void setInventory(Slot slot_count);
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;

@@ -4,6 +4,7 @@
 #include "Tileset.h"
 #include "entity/Player.h"
 #include "game/ClientGame.h"
+#include "game/ServerInventory.h"
 #include "packet/OpenAgentInventoryPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Chest.h"
@@ -23,7 +24,7 @@ namespace Game3 {
 		TileEntity::toJSON(json);
 		json["texture"] = *texture;
 		if (inventory)
-			json["inventory"] = *inventory;
+			json["inventory"] = dynamic_cast<ServerInventory &>(*inventory);
 		json["name"] = name;
 	}
 
@@ -35,7 +36,7 @@ namespace Game3 {
 	void Chest::absorbJSON(Game &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		if (json.contains("inventory"))
-			inventory = std::make_shared<Inventory>(Inventory::fromJSON(game, json.at("inventory"), shared_from_this()));
+			inventory = std::make_shared<ServerInventory>(ServerInventory::fromJSON(game, json.at("inventory"), shared_from_this()));
 		name = json.at("name");
 		texture = cacheTexture(json.at("texture"));
 		texture->init();
@@ -64,7 +65,7 @@ namespace Game3 {
 	}
 
 	void Chest::setInventory(Slot slot_count) {
-		inventory = std::make_shared<Inventory>(shared_from_this(), slot_count);
+		inventory = std::make_shared<ServerInventory>(shared_from_this(), slot_count);
 		increaseUpdateCounter();
 	}
 
