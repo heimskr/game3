@@ -109,7 +109,7 @@ namespace Game3 {
 
 							if (player_inventory.canInsert(*source)) {
 								player_inventory.add(*source, destination_slot);
-								externalInventory->erase(source_slot, false);
+								externalInventory->erase(source_slot);
 							}
 						}
 					} else {

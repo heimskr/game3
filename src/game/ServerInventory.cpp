@@ -93,16 +93,18 @@ namespace Game3 {
 
 		auto realm = owner->getRealm();
 		realm->spawn<ItemEntity>(owner->getPosition(), storage.at(slot));
-		erase(slot, false);
+		erase(slot);
+		notifyOwner();
 	}
 
 	void ServerInventory::discard(Slot slot) {
-		erase(slot, false);
+		erase(slot);
+		notifyOwner();
 	}
 
-	bool ServerInventory::swap(Slot source, Slot destination) {
+	void ServerInventory::swap(Slot source, Slot destination) {
 		if (slotCount <= source || slotCount <= destination || !storage.contains(source))
-			return false;
+			return;
 
 		ItemStack &source_stack = storage.at(source);
 
@@ -121,13 +123,10 @@ namespace Game3 {
 		}
 
 		notifyOwner();
-		return true;
 	}
 
-	void ServerInventory::erase(Slot slot, bool suppress_notification) {
+	void ServerInventory::erase(Slot slot) {
 		storage.erase(slot);
-		if (!suppress_notification)
-			notifyOwner();
 	}
 
 	ItemCount ServerInventory::remove(const ItemStack &stack_to_remove) {

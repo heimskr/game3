@@ -240,6 +240,12 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u64` Global ID
 	- `string` Name
 
+41. **Swap Slots**: tells the server to swap two slots in an agent's inventory.
+
+	- `u64` Agent Global ID
+	- `i32` First Slot
+	- `i32` Second Slot
+
 # Message Format
 
 All values are little endian.

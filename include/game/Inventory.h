@@ -47,18 +47,14 @@ namespace Game3 {
 			/** Like erase, but sends a packet to the server instead if run on a client. */
 			virtual void discard(Slot) = 0;
 
-			/** Swaps two slots. Returns true if at least one of the first slot contained an item and the second slot was valid. */
-			virtual bool swap(Slot, Slot) = 0;
+			/** Swaps two slots. */
+			virtual void swap(Slot, Slot) = 0;
 
-			virtual void erase(Slot, bool suppress_notification) = 0;
+			/** Erases a given slot. Doesn't notify the owner! */
+			virtual void erase(Slot) = 0;
 
-			virtual void erase(Slot slot) { erase(slot, false); }
-
-			/** Erases the active slot. */
-			virtual void erase(bool suppress_notification);
-
-			/** Erases the active slot. */
-			virtual void erase() { erase(false); }
+			/** Erases the active slot. Doesn't notify the owner! */
+			virtual void erase();
 
 			virtual bool empty() const = 0;
 

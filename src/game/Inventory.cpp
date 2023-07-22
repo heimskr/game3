@@ -51,8 +51,8 @@ namespace Game3 {
 		return *this;
 	}
 
-	void Inventory::erase(bool suppress_notification) {
-		erase(activeSlot, suppress_notification);
+	void Inventory::erase() {
+		erase(activeSlot);
 	}
 
 	std::shared_ptr<Agent> Inventory::getOwner() const {

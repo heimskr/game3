@@ -84,6 +84,7 @@
 #include "packet/JumpPacket.h"
 #include "packet/DropItemPacket.h"
 #include "packet/OpenAgentInventoryPacket.h"
+#include "packet/SwapSlotsPacket.h"
 #include "realm/Cave.h"
 #include "realm/House.h"
 #include "realm/Keep.h"
@@ -366,6 +367,7 @@ namespace Game3 {
 		add(PacketFactory::create<JumpPacket>());
 		add(PacketFactory::create<DropItemPacket>());
 		add(PacketFactory::create<OpenAgentInventoryPacket>());
+		add(PacketFactory::create<SwapSlotsPacket>());
 	}
 
 	void Game::addLocalCommandFactories() {

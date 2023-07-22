@@ -18,9 +18,9 @@ namespace Game3 {
 
 			void discard(Slot) override;
 
-			bool swap(Slot, Slot) override;
+			void swap(Slot, Slot) override;
 
-			void erase(Slot, bool suppress_notification) override;
+			void erase(Slot) override;
 
 			ItemCount remove(const ItemStack &) override;
 			ItemCount remove(const ItemStack &, Slot) override;

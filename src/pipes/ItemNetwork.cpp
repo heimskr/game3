@@ -62,11 +62,13 @@ namespace Game3 {
 							inventory.notifyOwner();
 						} else {
 							// Otherwise, we've sent out the entire stack and can simply erase it.
-							inventory.erase(slot, false);
+							inventory.erase(slot);
+							inventory.notifyOwner();
 						}
 					} else {
 						// If the insertion completed successfully without leftovers, erase the source slot.
-						inventory.erase(slot, false);
+						inventory.erase(slot);
+						inventory.notifyOwner();
 					}
 				}
 			}

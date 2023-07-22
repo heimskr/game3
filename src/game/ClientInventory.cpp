@@ -9,10 +9,11 @@
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
 #include "net/Buffer.h"
-#include "packet/InventoryPacket.h"
-#include "packet/SetActiveSlotPacket.h"
 #include "packet/ActiveSlotSetPacket.h"
 #include "packet/DropItemPacket.h"
+#include "packet/InventoryPacket.h"
+#include "packet/SetActiveSlotPacket.h"
+#include "packet/SwapSlotsPacket.h"
 #include "realm/Realm.h"
 #include "recipe/CraftingRecipe.h"
 #include "util/Util.h"
@@ -43,36 +44,20 @@ namespace Game3 {
 	}
 
 	void ClientInventory::drop(Slot slot) {
-		auto owner = weakOwner.lock();
-		if (!owner)
-			throw std::logic_error("ClientInventory is missing an owner");
-
-		if (auto player = std::dynamic_pointer_cast<Player>(owner))
-			player->send(DropItemPacket(slot, false));
-		else
-			throw std::runtime_error("Only Players can drop items on the client");
+		send(DropItemPacket(slot, false));
 	}
 
 	void ClientInventory::discard(Slot slot) {
-		auto owner = weakOwner.lock();
-		if (!owner)
-			throw std::logic_error("ClientInventory is missing an owner");
-
-		if (auto player = std::dynamic_pointer_cast<Player>(owner))
-			player->send(DropItemPacket(slot, true));
-		else
-			throw std::runtime_error("Only Players can discard items on the client");
+		send(DropItemPacket(slot, true));
 	}
 
-	bool ClientInventory::swap(Slot source, Slot destination) {
-		// TODO
-		return true;
+	void ClientInventory::swap(Slot source, Slot destination) {
+		if (auto owner = weakOwner.lock())
+			send(SwapSlotsPacket(owner->getGID(), source, destination));
 	}
 
-	void ClientInventory::erase(Slot slot, bool suppress_notification) {
+	void ClientInventory::erase(Slot slot) {
 		// TODO
-		if (!suppress_notification)
-			notifyOwner();
 	}
 
 	ItemCount ClientInventory::remove(const ItemStack &stack_to_remove) {
@@ -107,6 +92,17 @@ namespace Game3 {
 			else
 				owner->getRealm()->getGame().toClient().signal_other_inventory_update().emit(owner);
 		}
+	}
+
+	void ClientInventory::send(const Packet &packet) {
+		auto owner = weakOwner.lock();
+		if (!owner)
+			throw std::logic_error("ClientInventory is missing an owner");
+
+		if (auto player = std::dynamic_pointer_cast<Player>(owner))
+			player->send(packet);
+		else
+			throw std::runtime_error("Can't send packets from a non-player-owned ClientInventory");
 	}
 
 	template <>
