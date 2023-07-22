@@ -36,6 +36,8 @@ namespace Game3 {
 			/** Counts the number of items with a given attribute in the inventory. */
 			ItemCount countAttribute(const Identifier &) const override;
 
+			bool hasSlot(Slot) const override;
+
 			bool empty() const override;
 
 			ItemStack & front() override;

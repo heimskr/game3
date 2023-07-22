@@ -240,11 +240,22 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u64` Global ID
 	- `string` Name
 
-41. **Swap Slots**: tells the server to swap two slots in an agent's inventory.
+41. **Swap Slots**: tells the server to swap a slot in one agent's inventory with a slot in another agent's inventory.
 
-	- `u64` Agent Global ID
+	- `u64` First Agent Global ID
+	- `u64` Second Agent Global ID
 	- `i32` First Slot
 	- `i32` Second Slot
+
+41. **Move Slots**: tells the server to move a slot in one agent's inventory into a slot in another agent's inventory.
+
+	- `u64` First Agent Global ID
+	- `u64` Second Agent Global ID
+	- `i32` First Slot
+	- `i32` Second Slot
+
+	This differs from Swap Slots in that compatible stacks will be merged instead of swapped
+	and that the first slot has to have something in it.
 
 # Message Format
 

@@ -21,6 +21,10 @@ namespace Game3 {
 		return out;
 	}
 
+	bool Agent::validateGID(GlobalID gid) {
+		return gid != 0 && gid != static_cast<GlobalID>(-1);
+	}
+
 	GlobalID Agent::generateGID() {
 		std::unique_lock lock(agent_rng_mutex);
 		return static_cast<GlobalID>(agent_rng());

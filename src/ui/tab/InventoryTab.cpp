@@ -5,6 +5,7 @@
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
 #include "item/Tool.h"
+#include "packet/MoveSlotsPacket.h"
 #include "packet/SetHeldItemPacket.h"
 #include "ui/MainWindow.h"
 #include "ui/gtk/EntryDialog.h"
@@ -95,38 +96,16 @@ namespace Game3 {
 					const Slot destination_slot = pair.first;
 					const bool from_external    = draggedExternal;
 					const bool to_external      = pair.second;
-					auto &player_inventory = *mainWindow.game->player->inventory;
+					auto &player = *mainWindow.game->player;
+					auto &player_inventory = player.inventory;
 
-					if (from_external) {
-						if (to_external) {
-							externalInventory->swap(source_slot, destination_slot);
-						} else {
-							const ItemStack *source = (*externalInventory)[source_slot];
-							if (!source) {
-								std::cerr << "Warning: slot " << source_slot << " not present in external inventory\n";
-								return true;
-							}
+					const GlobalID player_gid = player.getGID();
+					GlobalID external_gid = -1;
 
-							if (player_inventory.canInsert(*source)) {
-								player_inventory.add(*source, destination_slot);
-								externalInventory->erase(source_slot);
-							}
-						}
-					} else {
-						if (to_external) {
-							const ItemStack *source = player_inventory[source_slot];
-							if (!source) {
-								std::cerr << "Warning: slot " << source_slot << " not present in player inventory\n";
-								return true;
-							}
+					if (const auto external_agent = externalAgent.lock())
+						external_gid = external_agent->getGID();
 
-							if (externalInventory->canInsert(*source)) {
-								externalInventory->add(*source, destination_slot);
-								player_inventory.erase(source_slot);
-							}
-						} else
-							player_inventory.swap(source_slot, destination_slot);
-					}
+					player.send(MoveSlotsPacket(from_external? external_gid : player_gid, to_external? external_gid : player_gid, source_slot, destination_slot));
 				}
 
 				return true;

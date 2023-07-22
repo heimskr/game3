@@ -85,6 +85,7 @@
 #include "packet/DropItemPacket.h"
 #include "packet/OpenAgentInventoryPacket.h"
 #include "packet/SwapSlotsPacket.h"
+#include "packet/MoveSlotsPacket.h"
 #include "realm/Cave.h"
 #include "realm/House.h"
 #include "realm/Keep.h"
@@ -368,6 +369,7 @@ namespace Game3 {
 		add(PacketFactory::create<DropItemPacket>());
 		add(PacketFactory::create<OpenAgentInventoryPacket>());
 		add(PacketFactory::create<SwapSlotsPacket>());
+		add(PacketFactory::create<MoveSlotsPacket>());
 	}
 
 	void Game::addLocalCommandFactories() {
@@ -662,5 +664,20 @@ namespace Game3 {
 		json["hourOffset"] = game.getHour();
 		if (0 < game.cavesGenerated)
 			json["cavesGenerated"] = game.cavesGenerated;
+	}
+
+	template <>
+	std::shared_ptr<Agent> Game::getAgent<Agent>(GlobalID gid) {
+		auto shared_lock = allAgents.sharedLock();
+		if (auto iter = allAgents.find(gid); iter != allAgents.end()) {
+			if (auto agent = iter->second.lock())
+				return agent;
+			// This should *probably* not result in a data race in practice...
+			shared_lock.unlock();
+			auto unique_lock = allAgents.uniqueLock();
+			allAgents.erase(gid);
+		}
+
+		return nullptr;
 	}
 }

@@ -32,6 +32,7 @@ namespace Game3 {
 			virtual GlobalID getGID() const { return globalID; }
 			virtual void setGID(GlobalID new_gid) { globalID = new_gid; }
 			inline bool hasGID() const { return globalID != static_cast<GlobalID>(-1); }
+			static bool validateGID(GlobalID);
 
 			inline auto getUpdateCounter() {
 				auto lock = agentMeta.sharedLock();

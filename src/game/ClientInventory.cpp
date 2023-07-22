@@ -52,8 +52,10 @@ namespace Game3 {
 	}
 
 	void ClientInventory::swap(Slot source, Slot destination) {
-		if (auto owner = weakOwner.lock())
-			send(SwapSlotsPacket(owner->getGID(), source, destination));
+		if (auto owner = weakOwner.lock()) {
+			GlobalID gid = owner->getGID();
+			send(SwapSlotsPacket(gid, gid, source, destination));
+		}
 	}
 
 	void ClientInventory::erase(Slot slot) {
@@ -82,7 +84,8 @@ namespace Game3 {
 	}
 
 	void ClientInventory::setActive(Slot new_active, bool force) {
-		// TODO
+		if (!std::dynamic_pointer_cast<Player>(weakOwner.lock()))
+			throw std::runtime_error("Can't set the active slot of a non-player inventory");
 	}
 
 	void ClientInventory::notifyOwner() {

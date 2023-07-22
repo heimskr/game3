@@ -39,9 +39,11 @@ namespace Game3::WorldGen {
 		// realm->spawn<Miner>({exit_position.row - 1, exit_position.column}, parent_realm->id, realm->id, house_position, parent_realm->closestTileEntity<Building>(house_position,
 		// 	[](const auto &building) { return building->tileID == "base:tile/keep_sw"_id; }));
 
+		Game &game = realm->getGame();
+
 		switch(rng() % 2) {
 			case 0: {
-				constexpr static std::array<const char *, 13> texts {
+				std::array<const char *, 13> texts {
 					"Express ideas directly in code.",
 					"Write in ISO Standard C++.",
 					"Express intent.",
@@ -54,21 +56,20 @@ namespace Game3::WorldGen {
 					"Prefer immutable data to mutable data.",
 					"Encapsulate messy constructs, rather than spreading through the code.",
 					"Use supporting tools as appropriate.",
-					"Use support libraries as appropriate."
+					"Use support libraries as appropriate.",
 				};
 
-				auto shuffled_texts = texts;
-				std::shuffle(shuffled_texts.begin(), shuffled_texts.end(), rng);
+				std::shuffle(texts.begin(), texts.end(), rng);
 
 				for (Index column = 2; column < width - 2; ++column) {
 					realm->setTile(Layer::Objects, {1, column}, "base:tile/bookshelf"_id, false, true);
-					realm->add(TileEntity::create<Sign>(realm->getGame(), "base:tile/empty"_id, Position(1, column), shuffled_texts.at((column - 2) % shuffled_texts.size()), "Bookshelf"));
+					realm->add(TileEntity::create<Sign>(game, "base:tile/empty"_id, Position(1, column), texts.at((column - 2) % texts.size()), "Bookshelf"));
 				}
 				break;
 			}
 
 			case 1: {
-				auto chest = TileEntity::create<Chest>(realm->getGame(), "base:tile/empty"_id, Position(1, width / 2), "Chest");
+				auto chest = TileEntity::create<Chest>(game, "base:tile/empty"_id, Position(1, width / 2), "Chest");
 				chest->setInventory(4);
 				realm->add(chest);
 				break;

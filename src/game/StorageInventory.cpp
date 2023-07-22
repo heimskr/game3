@@ -119,6 +119,10 @@ namespace Game3 {
 		return out;
 	}
 
+	bool StorageInventory::hasSlot(Slot slot) const {
+		return 0 <= slot && slot < slotCount;
+	}
+
 	bool StorageInventory::empty() const {
 		return storage.empty();
 	}

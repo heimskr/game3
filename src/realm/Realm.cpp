@@ -337,6 +337,8 @@ namespace Game3 {
 	TileEntityPtr Realm::addUnsafe(const TileEntityPtr &tile_entity) {
 		if (tileEntities.contains(tile_entity->position))
 			return nullptr;
+		if (!tile_entity->initialized)
+			tile_entity->init(game);
 		tile_entity->setRealm(shared_from_this());
 		tileEntities.emplace(tile_entity->position, tile_entity);
 		tileEntitiesByGID[tile_entity->globalID] = tile_entity;

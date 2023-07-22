@@ -1,14 +1,15 @@
 #pragma once
 
-#include <atomic>
-#include <map>
-#include <optional>
-
 #include "game/Container.h"
 #include "item/Item.h"
 #include "recipe/CraftingRequirement.h"
 #include "threading/Lockable.h"
 #include "util/Castable.h"
+
+#include <atomic>
+#include <map>
+#include <mutex>
+#include <optional>
 
 namespace Game3 {
 	class Agent;
@@ -22,6 +23,9 @@ namespace Game3 {
 			Inventory(const Inventory &);
 			Inventory(Inventory &&);
 
+			/** Should be locked appropriately when something is calling Inventory methods. Will not be locked by the Inventory itself. */
+			std::shared_mutex externalMutex;
+
 		public:
 			std::weak_ptr<Agent> weakOwner;
 			std::atomic<Slot> slotCount = 0;
@@ -29,6 +33,9 @@ namespace Game3 {
 
 			Inventory & operator=(const Inventory &);
 			Inventory & operator=(Inventory &&);
+
+			inline auto sharedLock() { return std::shared_lock(externalMutex); }
+			inline auto uniqueLock() { return std::unique_lock(externalMutex); }
 
 			virtual ItemStack * operator[](size_t) = 0;
 			virtual const ItemStack * operator[](size_t) const = 0;
@@ -70,6 +77,8 @@ namespace Game3 {
 
 			/** Counts the number of items with a given attribute in the inventory. */
 			virtual ItemCount countAttribute(const Identifier &) const = 0;
+
+			virtual bool hasSlot(Slot) const = 0;
 
 			std::shared_ptr<Agent> getOwner() const;
 
