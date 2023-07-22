@@ -76,7 +76,7 @@ namespace Game3 {
 		template <typename T = int>
 		inline std::pair<T, T> extractorOffsets() const {
 			const uint8_t mask(*this);
-			return {mask % 8, mask / 8};
+			return {static_cast<T>(mask) % 8, static_cast<T>(mask) / 8};
 		}
 	};
 

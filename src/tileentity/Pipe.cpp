@@ -264,6 +264,10 @@ namespace Game3 {
 			} else {
 				network->removeExtraction(position + direction, flipDirection(direction));
 			}
+
+			extractors[pipe_type][direction] = value;
+		} else {
+			extractors[pipe_type][direction] = false;
 		}
 	}
 }

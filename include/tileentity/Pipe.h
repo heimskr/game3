@@ -51,9 +51,9 @@ namespace Game3 {
 			static Identifier EnergyCorner() { return {"base", "tile/energy_pipe_se"}; }
 			static Identifier Corner(PipeType);
 
-			static Identifier ItemExtractorsCorner()   { return {"base", "tile/item_extractors_es"};   }
-			static Identifier FluidExtractorsCorner()  { return {"base", "tile/fluid_extractors_es"};  }
-			static Identifier EnergyExtractorsCorner() { return {"base", "tile/energy_extractors_es"}; }
+			static Identifier ItemExtractorsCorner()   { return {"base", "tile/item_extractors_"};   }
+			static Identifier FluidExtractorsCorner()  { return {"base", "tile/fluid_extractors_"};  }
+			static Identifier EnergyExtractorsCorner() { return {"base", "tile/energy_extractors_"}; }
 			static Identifier ExtractorsCorner(PipeType);
 
 			PipeTuple<Directions> directions;
