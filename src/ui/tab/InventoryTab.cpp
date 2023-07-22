@@ -167,6 +167,7 @@ namespace Game3 {
 			playerWidgetsBySlot.clear();
 			playerWidgets.clear();
 			externalWidgets.clear();
+			externalWidgetsBySlot.clear();
 
 			if (game->player->inventory)
 				populate(playerGrid, static_cast<ClientInventory &>(*game->player->inventory), false);
@@ -282,6 +283,12 @@ namespace Game3 {
 		externalWidgets.clear();
 		externalInventory.reset();
 		externalName.clear();
+	}
+
+	GlobalID InventoryTab::getExternalGID() const {
+		if (auto locked = externalAgent.lock())
+			return locked->getGID();
+		return -1;
 	}
 
 	int InventoryTab::gridWidth() const {

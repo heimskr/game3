@@ -1,6 +1,7 @@
 #include "Log.h"
 #include "game/ClientGame.h"
 #include "game/Game.h"
+#include "game/Inventory.h"
 #include "net/Buffer.h"
 #include "packet/PacketError.h"
 #include "packet/TileEntityPacket.h"
@@ -48,7 +49,11 @@ namespace Game3 {
 	}
 
 	void TileEntityPacket::handle(ClientGame &game) {
-		if (tileEntity && !wasFound)
-			game.realms.at(realmID)->add(tileEntity);
+		if (tileEntity) {
+			if (!wasFound)
+				game.realms.at(realmID)->add(tileEntity);
+			if (auto has_inventory = tileEntity->cast<HasInventory>())
+				has_inventory->inventory->notifyOwner();
+		}
 	}
 }

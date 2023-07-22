@@ -318,12 +318,15 @@ namespace Game3 {
 				merchantTab->update(game);
 			craftingTab->update(game);
 		});
-		game->signal_other_inventory_update().connect([this](const std::shared_ptr<HasRealm> &owner) {
+		game->signal_other_inventory_update().connect([this](const std::shared_ptr<Agent> &owner) {
 			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner)) {
 				if (has_inventory->inventory) {
 					auto client_inventory = has_inventory->inventory->cast<ClientInventory>();
-					if (client_inventory == inventoryTab->getExternalInventory())
+					if (owner->getGID() == inventoryTab->getExternalGID()) {
+						inventoryTab->setExternalInventory(owner->getName(), client_inventory, owner);
 						inventoryTab->update(game);
+					}
+					// TODO: fix merchant tab
 					if (client_inventory == merchantTab->getMerchantInventory())
 						merchantTab->update(game);
 				}

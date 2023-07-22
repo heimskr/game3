@@ -36,6 +36,7 @@ namespace Game3 {
 			void setExternalInventory(const Glib::ustring &name, const std::shared_ptr<ClientInventory> &, const std::shared_ptr<Agent> &);
 			void resetExternalInventory();
 			std::shared_ptr<ClientInventory> getExternalInventory() const { return externalInventory; }
+			GlobalID getExternalGID() const;
 
 		private:
 			Gtk::ScrolledWindow scrolled;
