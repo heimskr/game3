@@ -12,7 +12,7 @@ namespace Game3 {
 		PipeNetwork::tick(tick_id);
 
 		auto realm = weakRealm.lock();
-		if (!realm)
+		if (!realm || insertions.empty())
 			return;
 
 		// Doing this instead of std::erase_if so that perhaps later I could do something special on each removal.
@@ -27,10 +27,10 @@ namespace Game3 {
 				continue;
 			}
 
-			auto &rr_iter = *roundRobinIterator;
+			if (!roundRobinIterator)
+				advanceRoundRobin();
 
-			if (rr_iter == insertions.end())
-				break;
+			auto &rr_iter = *roundRobinIterator;
 
 			if (auto has_inventory = tile_entity->cast<HasInventory>(); has_inventory && has_inventory->inventory) {
 				auto &inventory = *has_inventory->inventory;
@@ -79,8 +79,40 @@ namespace Game3 {
 	}
 
 	void ItemNetwork::advanceRoundRobin() {
-		if (!roundRobinIterator || *roundRobinIterator == insertions.end() || ++*roundRobinIterator == insertions.end())
+		auto realm = weakRealm.lock();
+		if (!realm) {
+			roundRobinIterator = insertions.end();
+			return;
+		}
+
+		if (insertions.size() == 1) {
+			auto tile_entity = realm->tileEntityAt(insertions.begin()->first);
+
+			if (std::dynamic_pointer_cast<HasInventory>(tile_entity))
+				roundRobinIterator = insertions.begin();
+			else
+				roundRobinIterator = insertions.end();
+
+			return;
+		}
+
+		if (!roundRobinIterator || *roundRobinIterator == insertions.end())
 			roundRobinIterator = insertions.begin();
+
+		auto old_iter = *roundRobinIterator;
+		bool has_inventory = false;
+
+		// Keep searching for the next insertion that has an inventory until we reach the initial iterator.
+		do {
+			if (++*roundRobinIterator == insertions.end())
+				roundRobinIterator = insertions.begin();
+			has_inventory = std::dynamic_pointer_cast<HasInventory>(realm->tileEntityAt((*roundRobinIterator)->first)) != nullptr;
+		} while (*roundRobinIterator != old_iter && !has_inventory);
+
+		// If we haven't found an inventoried tile entity by this point, it means none exists among the insertion set;
+		// therefore, we need to invalidate the iterator.
+		if (!has_inventory)
+			roundRobinIterator = insertions.end();
 
 		cachedRoundRobinInventory = nullptr;
 	}
@@ -90,7 +122,7 @@ namespace Game3 {
 			return cachedRoundRobinInventory;
 
 		if (!roundRobinIterator)
-			roundRobinIterator = insertions.begin();
+			advanceRoundRobin();
 
 		if (*roundRobinIterator == insertions.end())
 			return nullptr;
@@ -103,7 +135,7 @@ namespace Game3 {
 		if (!tile_entity)
 			return nullptr;
 
-		std::shared_ptr has_inventory = tile_entity->cast<HasInventory>();
+		auto has_inventory = std::dynamic_pointer_cast<HasInventory>(tile_entity);
 		if (!has_inventory)
 			return nullptr;
 

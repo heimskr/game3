@@ -230,9 +230,11 @@ namespace Game3 {
 	void ServerInventory::notifyOwner() {
 		if (auto owner = weakOwner.lock()) {
 			owner->increaseUpdateCounter();
-			if (auto tile_entity = std::dynamic_pointer_cast<TileEntity>(owner))
-				tile_entity->broadcast();
-			else if (auto server_player = std::dynamic_pointer_cast<ServerPlayer>(owner))
+			if (auto tile_entity = std::dynamic_pointer_cast<TileEntity>(owner)) {
+				owner->getRealm()->queue([=] {
+					tile_entity->broadcast();
+				});
+			} else if (auto server_player = std::dynamic_pointer_cast<ServerPlayer>(owner))
 				server_player->inventoryUpdated = true;
 		}
 	}
