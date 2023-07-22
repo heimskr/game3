@@ -21,6 +21,11 @@ namespace Game3 {
 		if (auto locked = pipe.lock()) {
 			locked->setNetwork(getType(), shared_from_this());
 			members.insert(std::move(pipe));
+			// Detect insertions
+			locked->onNeighborUpdated(Position( 1,  0));
+			locked->onNeighborUpdated(Position(-1,  0));
+			locked->onNeighborUpdated(Position( 0,  1));
+			locked->onNeighborUpdated(Position( 0, -1));
 		} else
 			throw std::runtime_error("Can't lock pipe in PipeNetwork::add");
 	}
@@ -69,6 +74,7 @@ namespace Game3 {
 	}
 
 	void PipeNetwork::addInsertion(Position position, Direction direction) {
+		INFO("Adding insertion: " << position << ", " << direction);
 		insertions.emplace(position, direction);
 	}
 

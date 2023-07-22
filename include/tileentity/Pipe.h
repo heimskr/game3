@@ -80,6 +80,7 @@ namespace Game3 {
 
 			void tick(Game &, float) override;
 			void render(SpriteRenderer &) override;
+			void onNeighborUpdated(Position offset) override;
 
 			inline auto & getDirections() { return directions; }
 			inline const auto & getDirections() const { return directions; }

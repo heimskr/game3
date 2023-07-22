@@ -64,9 +64,10 @@ namespace Game3 {
 	}
 
 	void Pipe::tick(Game &game, float) {
-		for (const PipeType pipe_type: PIPE_TYPES)
-			if (auto network = networks[pipe_type])
-				network->tick(game.currentTick);
+		if (getSide() == Side::Server)
+			for (const PipeType pipe_type: PIPE_TYPES)
+				if (auto network = networks[pipe_type])
+					network->tick(game.currentTick);
 	}
 
 	void Pipe::render(SpriteRenderer &sprite_renderer) {
@@ -118,6 +119,23 @@ namespace Game3 {
 				});
 			}
 		}
+	}
+
+	void Pipe::onNeighborUpdated(Position offset) {
+		const Direction direction{offset};
+
+		if (direction == Direction::Invalid || offset.taxiDistance({}) != 1)
+			return;
+
+		const Position neighbor_position = position + offset;
+
+		if (!getRealm()->hasTileEntityAt(neighbor_position))
+			return;
+
+		for (const PipeType pipe_type: PIPE_TYPES)
+			if (directions[pipe_type][direction])
+				if (const auto &network = networks[pipe_type])
+					network->addInsertion(neighbor_position, flipDirection(direction));
 	}
 
 	void Pipe::encode(Game &game, Buffer &buffer) {
@@ -260,8 +278,10 @@ namespace Game3 {
 	void Pipe::setExtractor(PipeType pipe_type, Direction direction, bool value) {
 		if (auto network = networks[pipe_type]) {
 			if (value) {
+				INFO("Adding extractor");
 				network->addExtraction(position + direction, flipDirection(direction));
 			} else {
+				INFO("Removing extractor");
 				network->removeExtraction(position + direction, flipDirection(direction));
 			}
 

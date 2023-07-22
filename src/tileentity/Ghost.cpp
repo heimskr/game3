@@ -78,8 +78,8 @@ namespace Game3 {
 		updateNeighbors();
 	}
 
-	void Ghost::onNeighborUpdated(Index row_offset, Index column_offset) {
-		if (row_offset == 0 || column_offset == 0)
+	void Ghost::onNeighborUpdated(Position offset) {
+		if (offset.row == 0 || offset.column == 0)
 			march();
 	}
 

@@ -45,7 +45,7 @@ namespace Game3 {
 			/** Called after the tile entity is loaded from disk. */
 			virtual void onLoad() {}
 			virtual void onRemove() {}
-			virtual void onNeighborUpdated(Index /* row_offset */, Index /* column_offset */) {}
+			virtual void onNeighborUpdated(Position /* offset */) {}
 			/** Returns the TileEntity ID. This is not the tile ID, which corresponds to a tile in the tileset. */
 			inline Identifier getID() const { return tileEntityID; }
 			virtual void render(SpriteRenderer &) {}

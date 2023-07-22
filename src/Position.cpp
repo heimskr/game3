@@ -40,6 +40,17 @@ namespace Game3 {
 		}
 	}
 
+	Position::operator Direction() const {
+		// Diagonals and zero are invalid.
+		if ((row == 0) == (column == 0))
+			return Direction::Invalid;
+
+		if (row == 0)
+			return column < 0? Direction::Left : Direction::Right;
+
+		return row < 0? Direction::Up : Direction::Down;
+	}
+
 	bool Position::operator<(const Position &other) const {
 		if (row < other.row)
 			return true;

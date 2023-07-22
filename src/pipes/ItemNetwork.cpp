@@ -1,3 +1,4 @@
+#include "Log.h"
 #include "game/HasInventory.h"
 #include "game/StorageInventory.h"
 #include "pipes/ItemNetwork.h"
@@ -59,17 +60,16 @@ namespace Game3 {
 							// If there's anything left over, subtract the amount that was inserted elsewhere
 							// from the original stack extracted from.
 							stack.count -= original_leftover.count - leftover->count;
-							inventory.notifyOwner();
 						} else {
 							// Otherwise, we've sent out the entire stack and can simply erase it.
 							inventory.erase(slot);
-							inventory.notifyOwner();
 						}
 					} else {
 						// If the insertion completed successfully without leftovers, erase the source slot.
 						inventory.erase(slot);
-						inventory.notifyOwner();
 					}
+
+					inventory.notifyOwner();
 				}
 			}
 		}

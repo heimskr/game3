@@ -831,7 +831,7 @@ namespace Game3 {
 				if (row_offset != 0 || column_offset != 0) {
 					const Position offset_position = position + Position(row_offset, column_offset);
 					if (auto neighbor = tileEntityAt(offset_position)) {
-						neighbor->onNeighborUpdated(-row_offset, -column_offset);
+						neighbor->onNeighborUpdated(Position(-row_offset, -column_offset));
 					} else {
 						for (const Layer layer: {Layer::Submerged, Layer::Objects}) {
 							const TileID tile = tileProvider.copyTile(layer, offset_position, TileProvider::TileMode::ReturnEmpty);
