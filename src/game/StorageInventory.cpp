@@ -46,6 +46,19 @@ namespace Game3 {
 		return nullptr;
 	}
 
+	ItemStack * StorageInventory::firstItem(Slot *slot_out) {
+		if (storage.empty()) {
+			if (slot_out != nullptr)
+				*slot_out = -1;
+			return nullptr;
+		}
+
+		auto &[slot, stack] = *storage.begin();
+		if (slot_out)
+			*slot_out = slot;
+		return &stack;
+	}
+
 	bool StorageInventory::canInsert(const ItemStack &stack) const {
 		ssize_t remaining = stack.count;
 

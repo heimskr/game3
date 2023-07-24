@@ -40,6 +40,8 @@ namespace Game3 {
 			virtual ItemStack * operator[](size_t) = 0;
 			virtual const ItemStack * operator[](size_t) const = 0;
 
+			virtual ItemStack * firstItem(Slot *slot_out) = 0;
+
 			/** If the ItemStack couldn't be inserted into the inventory, this function returns an ItemStack
 			 *  containing the leftovers that couldn't be inserted. Otherwise, this function returns nothing. */
 			virtual std::optional<ItemStack> add(const ItemStack &, Slot start) = 0;

@@ -41,7 +41,8 @@ namespace Game3::WorldGen {
 
 		Game &game = realm->getGame();
 
-		switch(rng() % 2) {
+		// switch(rng() % 2) {
+		switch(1) {
 			case 0: {
 				std::array<const char *, 13> texts {
 					"Express ideas directly in code.",
@@ -70,8 +71,11 @@ namespace Game3::WorldGen {
 
 			case 1: {
 				auto chest = TileEntity::create<Chest>(game, "base:tile/empty"_id, Position(1, width / 2), "Chest");
-				chest->setInventory(4);
+				chest->setInventory(10);
 				realm->add(chest);
+				auto chest2 = TileEntity::create<Chest>(game, "base:tile/empty"_id, Position(4, width / 2), "Chest");
+				chest2->setInventory(10);
+				realm->add(chest2);
 				break;
 			}
 

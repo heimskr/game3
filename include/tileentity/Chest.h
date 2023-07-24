@@ -1,12 +1,11 @@
 #pragma once
 
 #include "Texture.h"
-#include "game/HasInventory.h"
 #include "game/Inventory.h"
-#include "tileentity/TileEntity.h"
+#include "tileentity/InventoriedTileEntity.h"
 
 namespace Game3 {
-	class Chest: public HasInventory, public TileEntity {
+	class Chest: public InventoriedTileEntity {
 		public:
 			static Identifier ID() { return {"base", "te/chest"}; }
 			static constexpr const char * DEFAULT_TEXTURE_PATH = "resources/rpg/chests.png";
@@ -25,10 +24,6 @@ namespace Game3 {
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			void render(SpriteRenderer &) override;
-			void inventoryUpdated() override;
-
-			/** Server-side only. */
-			void setInventory(Slot slot_count);
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
@@ -36,8 +31,6 @@ namespace Game3 {
 		protected:
 			Chest() = default;
 			Chest(Identifier tile_id, const Position &, std::string name_, std::shared_ptr<Texture> = cacheTexture(DEFAULT_TEXTURE_PATH));
-
-			std::shared_ptr<Agent> getSharedAgent() override { return std::dynamic_pointer_cast<Chest>(shared_from_this()); }
 
 			friend class TileEntity;
 	};

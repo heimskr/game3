@@ -129,7 +129,9 @@ namespace Game3 {
 
 		const Position neighbor_position = position + offset;
 
-		if (!getRealm()->hasTileEntityAt(neighbor_position))
+		auto tile_entity = getRealm()->tileEntityAt(neighbor_position);
+
+		if (!tile_entity || !std::dynamic_pointer_cast<HasInventory>(tile_entity))
 			return;
 
 		for (const PipeType pipe_type: PIPE_TYPES)
@@ -259,7 +261,6 @@ namespace Game3 {
 			return;
 		}
 
-
 		if (!loaded[pipe_type]) {
 			directions[pipe_type][direction] = false;
 			return;
@@ -286,6 +287,8 @@ namespace Game3 {
 			}
 
 			extractors[pipe_type][direction] = value;
+			if (!value)
+				onNeighborUpdated(position + direction);
 		} else {
 			extractors[pipe_type][direction] = false;
 		}

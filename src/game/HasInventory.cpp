@@ -23,6 +23,7 @@ namespace Game3 {
 		std::optional<ClientInventory> optional;
 		if (slot_count == -1) {
 			inventory.reset();
+			inventoryUpdated();
 			buffer >> optional;
 			assert(!optional);
 		} else {
@@ -32,6 +33,7 @@ namespace Game3 {
 				inventory = std::make_shared<ClientInventory>(std::move(*optional));
 				inventory->weakOwner = getSharedAgent();
 				inventory->slotCount = slot_count; // Maybe not necessary? Try an assert before.
+				inventoryUpdated();
 			}
 		}
 	}

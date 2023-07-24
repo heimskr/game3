@@ -97,7 +97,6 @@ namespace Game3 {
 					const bool from_external    = draggedExternal;
 					const bool to_external      = pair.second;
 					auto &player = *mainWindow.game->player;
-					auto &player_inventory = player.inventory;
 
 					const GlobalID player_gid = player.getGID();
 					GlobalID external_gid = -1;
