@@ -3,6 +3,7 @@
 #include "game/Game.h"
 #include "pipes/PipeNetwork.h"
 #include "realm/Realm.h"
+#include "tileentity/InventoriedTileEntity.h"
 #include "tileentity/Pipe.h"
 #include "ui/SpriteRenderer.h"
 #include "util/Util.h"
@@ -176,9 +177,25 @@ namespace Game3 {
 	}
 
 	bool Pipe::onInteractNextTo(const std::shared_ptr<Player> &) {
-		if (auto network = networks[PipeType::Item])
+		if (auto network = networks[PipeType::Item]) {
 			INFO("Item network ID: " << network->getID() << ", loaded: " << std::boolalpha << loaded[PipeType::Item]);
-		else
+
+			if (const auto &insertions = network->getInsertions(); !insertions.empty()) {
+				INFO("Item insertion points (" << insertions.size() << "):");
+				for (const auto &[pos, direction]: insertions)
+					INFO("- " << pos << ", " << direction);
+			} else {
+				INFO("No item insertion points.");
+			}
+
+			if (const auto &extractions = network->getExtractions(); !extractions.empty()) {
+				INFO("Item extraction points (" << extractions.size() << "):");
+				for (const auto &[pos, direction]: extractions)
+					INFO("- " << pos << ", " << direction);
+			} else {
+				INFO("No item extraction points.");
+			}
+		} else
 			INFO("Pipe not connected to an item network.");
 
 		if (auto network = networks[PipeType::Fluid])
@@ -246,17 +263,23 @@ namespace Game3 {
 	}
 
 	void Pipe::set(PipeType pipe_type, Direction direction, bool value) {
+		std::shared_ptr<PipeNetwork> network = getNetwork(pipe_type);
+		assert(network);
+
 		if (value) {
 			directions[pipe_type][direction] = true;
 
 			if (!loaded[pipe_type])
 				return;
 
-			if (std::shared_ptr<Pipe> connection = getConnected(pipe_type, direction)) {
-				std::shared_ptr<PipeNetwork> network = getNetwork(pipe_type);
-				assert(network);
+
+			if (std::shared_ptr<Pipe> connection = getConnected(pipe_type, direction))
 				network->absorb(connection->getNetwork(pipe_type));
-			}
+
+			// If there's a tile entity at the attached position and it has an inventory, add it to the network as an insertion point.
+			if (auto realm = weakRealm.lock())
+				if (auto inventoried = std::dynamic_pointer_cast<InventoriedTileEntity>(realm->tileEntityAt(position + direction)))
+					network->addInsertion(position + direction, flipDirection(direction));
 
 			return;
 		}
@@ -269,15 +292,16 @@ namespace Game3 {
 		std::shared_ptr<Pipe> connection = getConnected(pipe_type, direction);
 		directions[pipe_type][direction] = false;
 
-		if (connection && !reachable(pipe_type, connection)) {
-			std::shared_ptr<PipeNetwork> network = getNetwork(pipe_type);
-			assert(network);
+		network->reconsiderInsertion(position + direction);
+
+		if (connection && !reachable(pipe_type, connection))
 			network->partition(connection);
-		}
 	}
 
 	void Pipe::setExtractor(PipeType pipe_type, Direction direction, bool value) {
 		if (auto network = networks[pipe_type]) {
+			extractors[pipe_type][direction] = value;
+
 			if (value) {
 				INFO("Adding extractor");
 				network->addExtraction(position + direction, flipDirection(direction));
@@ -286,7 +310,8 @@ namespace Game3 {
 				network->removeExtraction(position + direction, flipDirection(direction));
 			}
 
-			extractors[pipe_type][direction] = value;
+			network->reconsiderInsertion(position + direction);
+
 			if (!value)
 				onNeighborUpdated(position + direction);
 		} else {

@@ -40,6 +40,13 @@ namespace Game3 {
 			virtual void addInsertion(Position, Direction);
 			virtual bool removeExtraction(Position, Direction);
 			virtual bool removeInsertion(Position, Direction);
+			/** If there is no inventoried tile entity at the given position, all insertion points for the position are removed.
+			 *  Otherwise, the realm is searched for pipe entities neighboring the position. For each direction to which a pipe
+			 *  is attached, an insertion point is added; insertion points are removed from directions without attached pipes. */
+			virtual void reconsiderInsertion(Position);
+
+			inline const auto & getExtractions() const { return extractions; }
+			inline const auto & getInsertions()  const { return insertions; }
 
 			inline auto getID() const { return id; }
 

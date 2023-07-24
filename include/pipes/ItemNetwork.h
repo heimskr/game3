@@ -15,7 +15,6 @@ namespace Game3 {
 
 		private:
 			std::optional<PairSet::iterator> roundRobinIterator;
-			std::shared_ptr<Inventory> cachedRoundRobinInventory;
 
 			void advanceRoundRobin();
 			std::shared_ptr<Inventory> getRoundRobinInventory();

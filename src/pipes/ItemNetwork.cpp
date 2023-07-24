@@ -39,7 +39,12 @@ namespace Game3 {
 					auto lock = storage.uniqueLock();
 					auto &[slot, stack] = *storage.begin();
 
-					std::optional<ItemStack> leftover = getRoundRobinInventory()->add(stack);
+					std::optional<ItemStack> leftover;
+
+					if (std::shared_ptr<Inventory> round_robin_inventory = getRoundRobinInventory())
+						leftover = round_robin_inventory->add(stack);
+					else
+						return;
 
 					if (leftover) {
 						// If the insertion didn't fully complete, we need to try to put the leftovers
@@ -53,7 +58,10 @@ namespace Game3 {
 							// Prevent insertion to self. It would presumably cause issues with locks.
 							if (rr_iter->first == tile_entity->getPosition())
 								continue;
-							leftover = getRoundRobinInventory()->add(*leftover);
+							if (std::shared_ptr<Inventory> round_robin_inventory = getRoundRobinInventory())
+								leftover = round_robin_inventory->add(*leftover);
+							else
+								return;
 						} while (old_iter != rr_iter && leftover);
 
 						if (leftover) {
@@ -66,6 +74,7 @@ namespace Game3 {
 						}
 					} else {
 						// If the insertion completed successfully without leftovers, erase the source slot.
+						advanceRoundRobin();
 						inventory.erase(slot);
 					}
 
@@ -113,14 +122,9 @@ namespace Game3 {
 		// therefore, we need to invalidate the iterator.
 		if (!has_inventory)
 			roundRobinIterator = insertions.end();
-
-		cachedRoundRobinInventory = nullptr;
 	}
 
 	std::shared_ptr<Inventory> ItemNetwork::getRoundRobinInventory() {
-		if (cachedRoundRobinInventory)
-			return cachedRoundRobinInventory;
-
 		if (!roundRobinIterator)
 			advanceRoundRobin();
 
@@ -139,6 +143,6 @@ namespace Game3 {
 		if (!has_inventory)
 			return nullptr;
 
-		return cachedRoundRobinInventory = has_inventory->inventory;
+		return has_inventory->inventory;
 	}
 }
