@@ -17,6 +17,7 @@ namespace Game3 {
 			return;
 
 		if (overflowPeriod != 0 && tick_id % overflowPeriod == 0 && !overflowQueue.empty()) {
+			auto lock = overflowQueue.uniqueLock();
 			// Every so often, if there's anything in the overflowQueue, we try to insert that somewhere instead of extracting anything more.
 			std::optional<ItemStack> stack = std::move(overflowQueue.front());
 			overflowQueue.pop_front();

@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <ostream>
 #include <utility>
 
 #include "data/Identifier.h"
@@ -80,4 +81,5 @@ namespace Game3 {
 	};
 
 	enum class PipeType {Item, Fluid, Energy};
+	std::ostream & operator<<(std::ostream &, PipeType);
 }

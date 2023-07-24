@@ -26,7 +26,7 @@ namespace Game3 {
 			auto lock = by_chunk->sharedLock();
 			for (const TileEntityPtr &tile_entity: *by_chunk)
 				if (auto pipe = tile_entity->cast<Pipe>())
-					for (const PipeType pipe_type: {PipeType::Item, PipeType::Fluid, PipeType::Energy})
+					for (const PipeType pipe_type: PIPE_TYPES)
 						if (!pipe->loaded[pipe_type])
 							floodFill(pipe_type, pipe);
 		}
@@ -43,20 +43,9 @@ namespace Game3 {
 		// If this assertion ever fails, something is horribly wrong.
 		assert(!start->getNetwork(pipe_type));
 
-		std::shared_ptr<PipeNetwork> network;
-		auto realm = start->getRealm();
+		RealmPtr realm = start->getRealm();
 
-		switch (pipe_type) {
-			case PipeType::Item:
-				network = std::make_shared<ItemNetwork>(++lastID, realm);
-				break;
-			case PipeType::Fluid:
-			case PipeType::Energy:
-				return;
-			default:
-				throw std::invalid_argument("Invalid PipeType");
-		}
-
+		std::shared_ptr<PipeNetwork> network = PipeNetwork::create(pipe_type, ++lastID, realm);
 		network->add(start);
 
 		std::vector<std::shared_ptr<Pipe>> queue{start};

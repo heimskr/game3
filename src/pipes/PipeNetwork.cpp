@@ -1,3 +1,5 @@
+#include "pipes/EnergyNetwork.h"
+#include "pipes/FluidNetwork.h"
 #include "pipes/ItemNetwork.h"
 #include "pipes/PipeNetwork.h"
 #include "realm/Realm.h"
@@ -15,6 +17,10 @@ namespace Game3 {
 		switch (type) {
 			case PipeType::Item:
 				return std::make_unique<ItemNetwork>(id, realm);
+			case PipeType::Fluid:
+				return std::make_unique<FluidNetwork>(id, realm);
+			case PipeType::Energy:
+				return std::make_unique<EnergyNetwork>(id, realm);
 			default:
 				throw std::invalid_argument("Can't create pipe network with type " + std::to_string(static_cast<int>(type)));
 		}

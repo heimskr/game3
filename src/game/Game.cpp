@@ -35,11 +35,11 @@
 #include "item/Hammer.h"
 #include "item/Hoe.h"
 #include "item/Item.h"
-#include "item/ItemPipeItem.h"
 #include "item/Landfill.h"
 #include "item/Landfills.h"
 #include "item/Mushroom.h"
 #include "item/Pickaxe.h"
+#include "item/PipeItem.h"
 #include "item/Plantable.h"
 #include "item/Sapling.h"
 #include "item/Seed.h"
@@ -278,6 +278,8 @@ namespace Game3 {
 		add(std::make_shared<CaveEntrance>("base:item/cave_entrance", "Cave Entrance", 50, 1));
 
 		add(std::make_shared<ItemPipeItem>(4));
+		add(std::make_shared<FluidPipeItem>(4));
+		add(std::make_shared<EnergyPipeItem>(4));
 	}
 
 	void Game::addGhosts() {

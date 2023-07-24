@@ -23,7 +23,7 @@ namespace Game3 {
 
 		private:
 			std::optional<PairSet::iterator> roundRobinIterator;
-			std::deque<ItemStack> overflowQueue;
+			Lockable<std::deque<ItemStack>> overflowQueue;
 
 			void advanceRoundRobin();
 			std::shared_ptr<Inventory> getRoundRobinInventory();
