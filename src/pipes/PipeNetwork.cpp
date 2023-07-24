@@ -28,7 +28,12 @@ namespace Game3 {
 
 	void PipeNetwork::add(std::weak_ptr<Pipe> pipe) {
 		if (std::shared_ptr<Pipe> locked = pipe.lock()) {
-			locked->setNetwork(getType(), shared_from_this());
+			std::shared_ptr<PipeNetwork> shared = shared_from_this();
+
+			if (locked->getNetwork(getType()) == shared)
+				return;
+
+			locked->setNetwork(getType(), shared);
 			{
 				auto lock = members.uniqueLock();
 				members.insert(std::move(pipe));
