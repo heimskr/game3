@@ -1,6 +1,7 @@
 #include "Log.h"
 #include "Tileset.h"
 #include "game/Game.h"
+#include "pipes/ItemNetwork.h"
 #include "pipes/PipeNetwork.h"
 #include "realm/Realm.h"
 #include "tileentity/InventoriedTileEntity.h"
@@ -176,6 +177,15 @@ namespace Game3 {
 		TileEntity::onSpawn();
 	}
 
+	void Pipe::onRemove() {
+		auto shared = std::dynamic_pointer_cast<Pipe>(shared_from_this());
+		for (const PipeType pipe_type: PIPE_TYPES)
+			if (present[pipe_type])
+				if (const auto &network = networks[pipe_type])
+					network->removePipe(shared);
+		TileEntity::onRemove();
+	}
+
 	bool Pipe::onInteractNextTo(const std::shared_ptr<Player> &) {
 		if (auto network = networks[PipeType::Item]) {
 			INFO("Item network ID: " << network->getID() << ", loaded: " << std::boolalpha << loaded[PipeType::Item]);
@@ -195,6 +205,8 @@ namespace Game3 {
 			} else {
 				INFO("No item extraction points.");
 			}
+
+			INFO("Overflow queue size: " << std::dynamic_pointer_cast<ItemNetwork>(network)->overflowCount());
 		} else
 			INFO("Pipe not connected to an item network.");
 

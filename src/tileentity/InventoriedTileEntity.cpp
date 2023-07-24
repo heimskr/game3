@@ -39,6 +39,10 @@ namespace Game3 {
 		return *stack;
 	}
 
+	bool InventoriedTileEntity::empty() const {
+		return !inventory || inventory->empty();
+	}
+
 	void InventoriedTileEntity::setInventory(Slot slot_count) {
 		if (auto realm = weakRealm.lock())
 			assert(realm->getSide() == Side::Server);

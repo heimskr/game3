@@ -105,6 +105,7 @@ namespace Game3 {
 			std::shared_ptr<PipeNetwork> getNetwork(PipeType) const;
 
 			void onSpawn() override;
+			void onRemove() override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
 	};
 

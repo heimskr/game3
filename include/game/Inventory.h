@@ -134,4 +134,6 @@ namespace Game3 {
 			/** Removes every slot whose item count is zero from the storage map. */
 			virtual void compact() = 0;
 	};
+
+	using InventoryPtr = std::shared_ptr<Inventory>;
 }

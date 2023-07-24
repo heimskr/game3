@@ -14,6 +14,8 @@ namespace Game3 {
 			virtual bool canInsertItem(const ItemStack &, Direction);
 			virtual std::optional<ItemStack> extractItem(Direction, bool remove);
 
+			virtual bool empty() const;
+
 			/** Server-side only. */
 			void setInventory(Slot slot_count);
 

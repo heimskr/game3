@@ -2,6 +2,7 @@
 
 #include "Position.h"
 #include "Types.h"
+#include "threading/Lockable.h"
 #include "util/PairHash.h"
 #include "util/WeakSet.h"
 
@@ -17,13 +18,13 @@ namespace Game3 {
 		protected:
 			using PairSet = std::unordered_set<std::pair<Position, Direction>, PairHash<Position, Direction>>;
 
-			WeakSet<Pipe> members;
+			Lockable<WeakSet<Pipe>> members;
 			size_t id = 0;
 			std::weak_ptr<Realm> weakRealm;
 			size_t lastTick = 0;
 
-			PairSet extractions;
-			PairSet insertions;
+			Lockable<PairSet> extractions;
+			Lockable<PairSet> insertions;
 
 		public:
 			PipeNetwork(size_t id_, const std::shared_ptr<Realm> &);
@@ -44,6 +45,8 @@ namespace Game3 {
 			 *  Otherwise, the realm is searched for pipe entities neighboring the position. For each direction to which a pipe
 			 *  is attached, an insertion point is added; insertion points are removed from directions without attached pipes. */
 			virtual void reconsiderInsertion(Position);
+			virtual void removePipe(const std::shared_ptr<Pipe> &);
+			virtual void lastPipeRemoved(Position) {}
 
 			inline const auto & getExtractions() const { return extractions; }
 			inline const auto & getInsertions()  const { return insertions; }

@@ -21,9 +21,12 @@ namespace Game3 {
 	}
 
 	void PipeNetwork::add(std::weak_ptr<Pipe> pipe) {
-		if (auto locked = pipe.lock()) {
+		if (std::shared_ptr<Pipe> locked = pipe.lock()) {
 			locked->setNetwork(getType(), shared_from_this());
-			members.insert(std::move(pipe));
+			{
+				auto lock = members.uniqueLock();
+				members.insert(std::move(pipe));
+			}
 			// Detect insertions
 			locked->onNeighborUpdated(Position( 1,  0));
 			locked->onNeighborUpdated(Position(-1,  0));
@@ -39,10 +42,12 @@ namespace Game3 {
 		const PipeType type = getType();
 		assert(other->getType() == type);
 
-		const auto shared = shared_from_this();
+		const std::shared_ptr<PipeNetwork> shared = shared_from_this();
+
+		auto lock = other->members.uniqueLock();
 
 		for (const std::weak_ptr<Pipe> &member: other->members)
-			if (auto locked = member.lock())
+			if (std::shared_ptr<Pipe> locked = member.lock())
 				add(locked);
 
 		other->members.clear();
@@ -66,7 +71,7 @@ namespace Game3 {
 			new_network->add(pipe);
 
 			pipe->getDirections()[type].iterate([&](Direction direction) {
-				if (auto neighbor = pipe->getConnected(type, direction); neighbor && !visited.contains(neighbor))
+				if (std::shared_ptr<Pipe> neighbor = pipe->getConnected(type, direction); neighbor && !visited.contains(neighbor))
 					queue.push_back(neighbor);
 			});
 		}
@@ -77,7 +82,6 @@ namespace Game3 {
 	}
 
 	void PipeNetwork::addInsertion(Position position, Direction direction) {
-		INFO("Adding insertion: " << position << ", " << direction);
 		insertions.emplace(position, direction);
 	}
 
@@ -110,6 +114,15 @@ namespace Game3 {
 				else
 					removeInsertion(position, flipDirection(direction));
 			}
+		}
+	}
+
+	void PipeNetwork::removePipe(const std::shared_ptr<Pipe> &member) {
+		auto lock = members.uniqueLock();
+		members.erase(member);
+		if (members.empty()) {
+			lock.unlock();
+			lastPipeRemoved(member->getPosition());
 		}
 	}
 
