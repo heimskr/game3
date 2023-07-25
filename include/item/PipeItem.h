@@ -35,11 +35,8 @@ namespace Game3 {
 						place.player->inventory->notifyOwner();
 
 					auto pipe = TileEntity::create<Pipe>(realm.getGame(), place.position);
-					if (place.realm->add(pipe)) {
-						pipe->setPresent(P, true);
-						pipe->increaseUpdateCounter();
-						pipe->broadcast();
-					}
+					pipe->setPresent(P, true);
+					place.realm->add(pipe);
 
 					return true;
 				}
