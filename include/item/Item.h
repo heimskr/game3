@@ -50,7 +50,7 @@ namespace Game3 {
 			std::unordered_set<Identifier> attributes;
 
 			Item() = delete;
-			Item(ItemID, std::string name_, MoneyCount base_price, ItemCount max_count = 64);
+			Item(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count = 64);
 			virtual ~Item() = default;
 
 			Item(const Item &) = delete;

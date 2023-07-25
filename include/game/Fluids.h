@@ -12,12 +12,16 @@ namespace Game3 {
 	struct Fluid: NamedRegisterable {
 		Identifier tilesetName;
 		Identifier tilename;
+		Identifier flaskName;
 
 		Fluid() = delete;
-		Fluid(Identifier identifier_, Identifier tileset_name, Identifier tilename_);
+		Fluid(Identifier identifier_, Identifier tileset_name, Identifier tilename_, Identifier flask_name = {});
 	};
 
 	struct FluidTile {
+		static constexpr FluidLevel INFINITE = 65535;
+		static constexpr FluidLevel FULL     = 65534;
+
 		FluidID id = 0;
 		FluidLevel level = 0;
 

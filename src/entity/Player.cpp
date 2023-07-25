@@ -220,8 +220,11 @@ namespace Game3 {
 	}
 
 	void Player::give(const ItemStack &stack, Slot start) {
-		if (auto leftover = inventory->add(stack, start))
+		auto lock = inventory->uniqueLock();
+		if (auto leftover = inventory->add(stack, start)) {
+			lock.unlock();
 			getRealm()->spawn<ItemEntity>(getPosition(), *leftover);
+		}
 	}
 
 	Place Player::getPlace() {

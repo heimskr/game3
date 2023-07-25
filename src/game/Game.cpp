@@ -30,6 +30,8 @@
 #include "game/ServerGame.h"
 #include "item/Bomb.h"
 #include "item/CaveEntrance.h"
+#include "item/EmptyFlask.h"
+#include "item/FilledFlask.h"
 #include "item/Floor.h"
 #include "item/Furniture.h"
 #include "item/Hammer.h"
@@ -274,6 +276,10 @@ namespace Game3 {
 		add(std::make_shared<Plantable>("base:item/flower5_purple", "Purple Flower", "base:tile/flower5_purple", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_purple"));
 		add(std::make_shared<Plantable>("base:item/flower5_white",  "White Flower",  "base:tile/flower5_white",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_white"));
 		add(std::make_shared<Plantable>("base:item/flower5_black",  "Black Flower",  "base:tile/flower5_black",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_black"));
+
+		add(std::make_shared<EmptyFlask>("base:item/flask", "Flask", 2, 64));
+		add(std::make_shared<FilledFlask>("base:item/water_flask", "Water Flask", 3, "base:fluid/water"_id));
+		add(std::make_shared<FilledFlask>("base:item/lava_flask",  "Lava Flask",  4, "base:fluid/lava"_id));
 
 		add(std::make_shared<CaveEntrance>("base:item/cave_entrance", "Cave Entrance", 50, 1));
 
@@ -545,8 +551,12 @@ namespace Game3 {
 		} else if (type == "base:fluid_map"_id) {
 
 			auto &fluids = registry<FluidRegistry>();
-			for (const auto &[key, value]: json.at(1).items())
-				fluids.add(Identifier(key), Fluid(Identifier(key), value.at("tileset"), value.at("tilename")));
+			for (const auto &[key, value]: json.at(1).items()) {
+				if (auto iter = value.find("flask"); iter != value.end())
+					fluids.add(Identifier(key), Fluid(Identifier(key), value.at("tileset"), value.at("tilename"), *iter));
+				else
+					fluids.add(Identifier(key), Fluid(Identifier(key), value.at("tileset"), value.at("tilename")));
+			}
 
 		} else if (type == "base:crop_map"_id) {
 
@@ -601,6 +611,10 @@ namespace Game3 {
 		}
 
 		return std::nullopt;
+	}
+
+	std::shared_ptr<Fluid> Game::getFluid(FluidID fluid_id) const {
+		return registry<FluidRegistry>().maybe(static_cast<size_t>(fluid_id));
 	}
 
 	std::shared_ptr<Tile> Game::getTile(const Identifier &identifier) {

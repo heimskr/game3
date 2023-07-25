@@ -772,6 +772,10 @@ namespace Game3 {
 		return tileProvider.tryTile(layer, position);
 	}
 
+	std::optional<FluidTile> Realm::tryFluid(const Position &position) const {
+		return tileProvider.copyFluidTile(position);
+	}
+
 	bool Realm::interactGround(const PlayerPtr &player, const Position &position, Modifiers modifiers) {
 		const Place place(position, shared_from_this(), player);
 		auto &game = getGame();

@@ -142,14 +142,14 @@ namespace Game3 {
 				return *items.at(S::ID())->template cast<const S>();
 			}
 
-			inline std::shared_ptr<T> maybe(const Identifier &id) {
+			inline std::shared_ptr<T> maybe(const Identifier &id) const {
 				auto iter = items.find(id);
 				if (iter == items.end())
 					return {};
 				return iter->second;
 			}
 
-			inline std::shared_ptr<T> maybe(size_t counter) {
+			inline std::shared_ptr<T> maybe(size_t counter) const {
 				if (counter < byCounter.size())
 					return byCounter.at(counter);
 				return {};

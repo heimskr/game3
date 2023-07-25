@@ -143,6 +143,7 @@ namespace Game3 {
 			TileID getTile(Layer, Index row, Index column) const;
 			TileID getTile(Layer, const Position &) const;
 			std::optional<TileID> tryTile(Layer, const Position &) const;
+			std::optional<FluidTile> tryFluid(const Position &) const;
 			bool middleEmpty(const Position &);
 			std::optional<Position> getPathableAdjacent(const Position &) const;
 			bool isPathable(const Position &) const;

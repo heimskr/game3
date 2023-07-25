@@ -116,5 +116,8 @@
 	"base:item/cotton":          ["base:texture/custom",       48,   0],
 	"base:item/item_pipe":       ["base:texture/tileset",     416, 176],
 	"base:item/fluid_pipe":      ["base:texture/tileset",     416, 112],
-	"base:item/energy_pipe":     ["base:texture/tileset",     416,  48]
+	"base:item/energy_pipe":     ["base:texture/tileset",     416,  48],
+	"base:item/flask":           ["base:texture/flasks",        0,   0],
+	"base:item/water_flask":     ["base:texture/flasks",       32,   0],
+	"base:item/lava_flask":      ["base:texture/flasks",       16,   0]
 }]

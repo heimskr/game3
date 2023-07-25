@@ -2,10 +2,11 @@
 #include "net/Buffer.h"
 
 namespace Game3 {
-	Fluid::Fluid(Identifier identifier_, Identifier tileset_name, Identifier tilename_):
+	Fluid::Fluid(Identifier identifier_, Identifier tileset_name, Identifier tilename_, Identifier flask_name):
 		NamedRegisterable(std::move(identifier_)),
 		tilesetName(std::move(tileset_name)),
-		tilename(std::move(tilename_)) {}
+		tilename(std::move(tilename_)),
+		flaskName(std::move(flask_name)) {}
 
 	FluidTile::FluidTile(uint32_t packed):
 		id(packed & 0xffff),

@@ -104,6 +104,7 @@ namespace Game3 {
 			/** The value to divide the color values of the tilemap pixels by. Based on the time of day. */
 			double getDivisor() const;
 			std::optional<TileID> getFluidTileID(FluidID);
+			std::shared_ptr<Fluid> getFluid(FluidID) const;
 			std::shared_ptr<Tile> getTile(const Identifier &);
 
 			virtual Side getSide() const = 0;

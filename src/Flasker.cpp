@@ -5,8 +5,26 @@
 
 #include <stb_image.h>
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#endif
+
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#endif
+
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 namespace Game3 {
 	// Credit for RGB to HSL: https://www.programmingalgorithms.com/algorithm/rgb-to-hsl/cpp/
