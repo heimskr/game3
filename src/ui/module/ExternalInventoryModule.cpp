@@ -38,13 +38,12 @@ namespace Game3 {
 				return nullptr;
 
 			Glib::Value<DragSource> value;
-			// value.init(value.value_type());
-			value.set({widgetMap.at(item), std::static_pointer_cast<ClientInventory>(game->player->inventory)});
+			value.init(value.value_type());
+			value.set({widgetMap.at(item), inventory});
 			return Gdk::ContentProvider::create(value);
 		}, false);
-		grid.add_controller(source);
 
-		auto target = Gtk::DropTarget::create(GTK_TYPE_WIDGET, Gdk::DragAction::MOVE);
+		auto target = Gtk::DropTarget::create(Glib::Value<DragSource>::value_type(), Gdk::DragAction::MOVE);
 		target->signal_drop().connect([this](const Glib::ValueBase &base, double x, double y) {
 			if (base.gobj()->g_type != Glib::Value<DragSource>::value_type())
 				return false;
@@ -63,6 +62,7 @@ namespace Game3 {
 			return true;
 		}, false);
 
+		grid.add_controller(source);
 		grid.add_controller(target);
 	}
 
@@ -89,17 +89,19 @@ namespace Game3 {
 		populate();
 	}
 
+	void ExternalInventoryModule::onResize(int width) {
+		tabWidth = width;
+		update();
+	}
+
 	int ExternalInventoryModule::gridWidth() const {
-		return grid.get_width() / (InventoryTab::TILE_SIZE + 2 * InventoryTab::TILE_MARGIN);
+		return tabWidth / (InventoryTab::TILE_SIZE + 2 * InventoryTab::TILE_MARGIN);
 	}
 
 	void ExternalInventoryModule::populate() {
 		auto &storage = inventory->getStorage();
-		int grid_width = gridWidth();
-		if (grid_width == 0)
-			grid_width = InventoryTab::TILE_SIZE;
-		const int gw = grid.get_width()? grid.get_width() : InventoryTab::TILE_SIZE;
-		const int tile_size  = gw / (gw / InventoryTab::TILE_SIZE);
+		const int grid_width = gridWidth();
+		const int tile_size  = InventoryTab::TILE_SIZE <= tabWidth? tabWidth / (tabWidth / InventoryTab::TILE_SIZE) : InventoryTab::TILE_SIZE;
 
 		for (Slot slot = 0; slot < inventory->slotCount; ++slot) {
 			const int row    = slot / grid_width;
@@ -169,7 +171,7 @@ namespace Game3 {
 		}
 	}
 
-	void ExternalInventoryModule::rightClick(Gtk::Widget *widget, int click_count, Slot slot, double x, double y) {
+	void ExternalInventoryModule::rightClick(Gtk::Widget *widget, int, Slot slot, double x, double y) {
 		// mainWindow.onBlur();
 
 		if (!inventory->contains(slot))

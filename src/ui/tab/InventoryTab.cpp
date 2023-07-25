@@ -63,13 +63,12 @@ namespace Game3 {
 				return nullptr;
 
 			Glib::Value<DragSource> value;
-			// value.init(value.value_type());
+			value.init(value.value_type());
 			value.set({widgetMap.at(item), std::static_pointer_cast<ClientInventory>(mainWindow.game->player->inventory)});
 			return Gdk::ContentProvider::create(value);
 		}, false);
-		grid.add_controller(source);
 
-		auto target = Gtk::DropTarget::create(GTK_TYPE_WIDGET, Gdk::DragAction::MOVE);
+		auto target = Gtk::DropTarget::create(Glib::Value<DragSource>::value_type(), Gdk::DragAction::MOVE);
 		target->signal_drop().connect([this](const Glib::ValueBase &base, double x, double y) {
 			if (base.gobj()->g_type != Glib::Value<DragSource>::value_type())
 				return false;
@@ -80,7 +79,6 @@ namespace Game3 {
 			if (destination != nullptr && destination != &grid) {
 				if (dynamic_cast<Gtk::Fixed *>(destination->get_parent()))
 					destination = destination->get_parent();
-
 				const DragSource source = value.get();
 				ClientPlayer &player = *mainWindow.game->player;
 				player.send(MoveSlotsPacket(source.inventory->getOwner()->getGID(), player.getGID(), source.slot, widgetMap.at(destination)));
@@ -89,6 +87,7 @@ namespace Game3 {
 			return true;
 		}, false);
 
+		grid.add_controller(source);
 		grid.add_controller(target);
 		grid.set_row_homogeneous();
 		grid.set_column_homogeneous();
@@ -98,8 +97,11 @@ namespace Game3 {
 	}
 
 	void InventoryTab::onResize(const std::shared_ptr<ClientGame> &game) {
-		if (gridWidth() != lastGridWidth)
+		if (gridWidth() != lastGridWidth) {
 			reset(game);
+			if (currentModule)
+				currentModule->onResize(grid.get_width());
+		}
 	}
 
 	void InventoryTab::update(const std::shared_ptr<ClientGame> &game) {
@@ -225,23 +227,13 @@ namespace Game3 {
 		}
 	}
 
-	// void InventoryTab::setExternalInventory(const Glib::ustring &name, const std::shared_ptr<ClientInventory> &inventory, const std::shared_ptr<Agent> &agent) {
-	// 	externalInventory = inventory;
-	// 	externalAgent = agent;
-	// 	externalName = name;
-	// 	if (inventory)
-	// 		if (auto owner = inventory->weakOwner.lock())
-	// 			reset(owner->getRealm()->getGame().toClientPointer());
-	// }
-
 	void InventoryTab::setModule(std::unique_ptr<Module> &&module_) {
 		assert(module_);
 		removeModule();
 		currentModule = std::move(module_);
 		vbox.append(currentModule->getWidget());
-		mainWindow.queue([this] {
-			currentModule->reset();
-		});
+		currentModule->onResize(grid.get_width());
+		currentModule->reset();
 	}
 
 	void InventoryTab::removeModule() {

@@ -20,6 +20,7 @@ namespace Game3 {
 			Gtk::Widget & getWidget() final;
 			void reset()  final;
 			void update() final;
+			void onResize(int) final;
 
 			inline auto getInventory() const { return inventory; }
 
@@ -38,6 +39,7 @@ namespace Game3 {
 			Gtk::Grid grid;
 			Gtk::Label label;
 			Slot lastSlot = -1;
+			int tabWidth = 0;
 
 			int gridWidth() const;
 			void populate();

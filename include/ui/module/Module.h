@@ -17,5 +17,6 @@ namespace Game3 {
 			virtual Gtk::Widget & getWidget() = 0;
 			virtual void reset()  = 0;
 			virtual void update() = 0;
+			virtual void onResize(int /* width */) {}
 	};
 }
