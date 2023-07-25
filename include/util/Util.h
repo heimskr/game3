@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <concepts>
 #include <csignal>
 #include <iostream>
 #include <list>
@@ -70,6 +71,24 @@ namespace Game3 {
 	unsigned long parseUlong(const std::string &, int base = 10);
 	unsigned long parseUlong(const char *, int base = 10);
 	unsigned long parseUlong(std::string_view, int base = 10);
+
+	template <std::integral I>
+	I parseNumber(std::string_view view, int base = 10) {
+		I out{};
+		auto result = std::from_chars(view.begin(), view.end(), out, base);
+		if (result.ec == std::errc::invalid_argument)
+			throw std::invalid_argument("Not an integer: \"" + std::string(view) + "\"");
+		return out;
+	}
+
+	template <std::floating_point F>
+	F parseNumber(std::string_view view) {
+		F out{};
+		auto result = std::from_chars(view.begin(), view.end(), out);
+		if (result.ec == std::errc::invalid_argument)
+			throw std::invalid_argument("Not a floating point: \"" + std::string(view) + "\"");
+		return out;
+	}
 
 	inline std::chrono::system_clock::time_point getTime() {
 		return std::chrono::system_clock::now();
