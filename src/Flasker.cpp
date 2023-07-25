@@ -53,7 +53,7 @@ namespace Game3 {
 
 		hsl.l = (max + min) / 2.f;
 
-		if (delta == 0.f) {
+		if (std::abs(delta) <= 0.001f) {
 			hsl.h = 0;
 			hsl.s = 0.f;
 		} else {
@@ -62,11 +62,11 @@ namespace Game3 {
 			float hue = 0.f;
 
 			if (std::abs(r - max) < 0.0001f)
-				hue = (g - b) / 6.f / delta;
+				hue = (g - b) / 6 / delta;
 			else if (std::abs(g - max) < 0.0001f)
-				hue = 1.f / 3.f + (b - r) / 6.f / delta;
+				hue = 1.f / 3.f + (b - r) / 6 / delta;
 			else
-				hue = 2.f / 3.f + (r - g) / 6.f / delta;
+				hue = 2.f / 3.f + (r - g) / 6 / delta;
 
 			if (hue < 0.f)
 				hue += 1.f;
@@ -82,8 +82,7 @@ namespace Game3 {
 	static float hueToRGB(float v1, float v2, float vh) {
 		if (vh < 0.f)
 			vh += 1.f;
-
-		if (1.f < vh)
+		else if (1.f < vh)
 			vh -= 1.f;
 
 		if (6 * vh < 1)
@@ -105,7 +104,7 @@ namespace Game3 {
 			rgb.r = rgb.g = rgb.b = static_cast<uint8_t>(hsl.l * 255.f);
 		} else {
 			float hue = static_cast<float>(hsl.h) / 360.f;
-			float v2 = hsl.l < .5f? hsl.l * (1.f + hsl.s) : hsl.l + hsl.s - hsl.l * hsl.s;
+			float v2 = (hsl.l < .5f)? (hsl.l * (1.f + hsl.s)) : (hsl.l + hsl.s - hsl.l * hsl.s);
 			float v1 = 2.f * hsl.l - v2;
 
 			rgb.r = static_cast<uint8_t>(255.f * hueToRGB(v1, v2, hue + 1.f / 3.f));
