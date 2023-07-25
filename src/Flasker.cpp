@@ -115,7 +115,7 @@ namespace Game3 {
 		return rgb;
 	}
 
-	std::string generateFlask(uint16_t hue, float saturation) {
+	std::string generateFlask(uint16_t hue, float saturation, float value_diff) {
 		int base_width  = 0;
 		int base_height = 0;
 		int mask_width  = 0;
@@ -159,6 +159,7 @@ namespace Game3 {
 			HSL hsl = toHSL(RGB(&base[i]));
 			hsl.h = hue;
 			hsl.s = saturation;
+			hsl.l = std::min(1.f, std::max(0.f, hsl.l + value_diff));
 
 			const RGB rgb = toRGB(hsl);
 			raw[i] = rgb.r;
@@ -177,7 +178,7 @@ namespace Game3 {
 		return ss.str();
 	}
 
-	std::string generateFlask(std::string_view hue, std::string_view saturation) {
-		return generateFlask(parseNumber<uint16_t>(hue), parseNumber<float>(saturation));
+	std::string generateFlask(std::string_view hue, std::string_view saturation, std::string_view value_diff) {
+		return generateFlask(parseNumber<uint16_t>(hue), parseNumber<float>(saturation), parseNumber<float>(value_diff));
 	}
 }

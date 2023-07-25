@@ -18,8 +18,8 @@ int main(int argc, char **argv) {
 	srand(time(nullptr));
 
 	if (2 <= argc) {
-		if (argc == 3) {
-			std::cout << Game3::generateFlask(argv[1], argv[2]);
+		if (argc == 4) {
+			std::cout << Game3::generateFlask(argv[1], argv[2], argv[3]);
 			return 0;
 		}
 

@@ -105,7 +105,7 @@ servertest: $(OUTPUT)
 	./$< -s
 
 flasktest: $(OUTPUT)
-	./$< 240 1 > flask.png
+	./$< 0 0.0 -0.2 > flask.png
 
 tsanservertest: $(OUTPUT)
 	TSAN_OPTIONS="suppressions=tsan_suppressions.txt" ./$< -s
