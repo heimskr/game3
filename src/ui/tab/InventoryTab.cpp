@@ -10,112 +10,89 @@
 #include "ui/MainWindow.h"
 #include "ui/gtk/EntryDialog.h"
 #include "ui/gtk/NumericEntry.h"
+#include "ui/gtk/UITypes.h"
 #include "ui/gtk/Util.h"
 #include "ui/tab/InventoryTab.h"
+#include "ui/module/Module.h"
 #include "util/Util.h"
 
 namespace Game3 {
 	InventoryTab::InventoryTab(MainWindow &main_window): Tab(main_window.notebook), mainWindow(main_window) {
-		vbox.append(playerGrid);
-		vbox.append(hbox);
-		vbox.append(externalGrid);
-		hbox.append(externalLabel);
-		externalLabel.set_hexpand();
+		vbox.append(grid);
 		scrolled.set_child(vbox);
 		scrolled.set_hexpand();
 		scrolled.set_vexpand();
 
-		gmenuSelf = Gio::Menu::create();
-		gmenuSelf->append("Hold (_Left)", "inventory_popup.hold_left");
-		gmenuSelf->append("Hold (_Right)", "inventory_popup.hold_right");
-		gmenuSelf->append("_Drop", "inventory_popup.drop");
-		gmenuSelf->append("D_iscard", "inventory_popup.discard");
-
-		gmenuExternal = Gio::Menu::create();
-		gmenuExternal->append("_Drop", "inventory_popup.drop");
-		gmenuExternal->append("D_iscard", "inventory_popup.discard");
+		gmenu = Gio::Menu::create();
+		gmenu->append("Hold (_Left)", "inventory_popup.hold_left");
+		gmenu->append("Hold (_Right)", "inventory_popup.hold_right");
+		gmenu->append("_Drop", "inventory_popup.drop");
+		gmenu->append("D_iscard", "inventory_popup.discard");
 
 		auto group = Gio::SimpleActionGroup::create();
 		group->add_action("hold_left", [this] {
-			if (!lastExternal)
-				lastGame->player->send(SetHeldItemPacket(true, lastSlot));
+			lastGame->player->send(SetHeldItemPacket(true, lastSlot));
 		});
 
 		group->add_action("hold_right", [this] {
-			if (!lastExternal)
-				lastGame->player->send(SetHeldItemPacket(false, lastSlot));
+			lastGame->player->send(SetHeldItemPacket(false, lastSlot));
 		});
 
 		group->add_action("drop", [this] {
-			(lastExternal? externalInventory : lastGame->player->inventory)->drop(lastSlot);
+			lastGame->player->inventory->drop(lastSlot);
 		});
 		group->add_action("discard", [this] {
-			(lastExternal? externalInventory : lastGame->player->inventory)->discard(lastSlot);
+			lastGame->player->inventory->discard(lastSlot);
 		});
 
 		mainWindow.insert_action_group("inventory_popup", group);
 		popoverMenu.set_parent(vbox);
 
-		for (bool external: {false, true}) {
-			auto source = Gtk::DragSource::create();
-			source->set_actions(Gdk::DragAction::MOVE);
-			source->signal_prepare().connect([this, source, external](double x, double y) -> Glib::RefPtr<Gdk::ContentProvider> { // Does capturing `source` cause a memory leak?
-				auto *item = (external? externalGrid : playerGrid).pick(x, y);
-				draggedSlot = -1;
+		auto source = Gtk::DragSource::create();
+		source->set_actions(Gdk::DragAction::MOVE);
+		source->signal_prepare().connect([this, source](double x, double y) -> Glib::RefPtr<Gdk::ContentProvider> { // Does capturing `source` cause a memory leak?
+			auto *item = grid.pick(x, y);
 
-				if (dynamic_cast<Gtk::Fixed *>(item->get_parent()))
-					item = item->get_parent();
+			if (dynamic_cast<Gtk::Fixed *>(item->get_parent()))
+				item = item->get_parent();
 
-				if (auto *label = dynamic_cast<Gtk::Label *>(item)) {
-					if (label->get_text().empty())
-						return nullptr;
-				} else if (!dynamic_cast<Gtk::Fixed *>(item))
+			if (auto *label = dynamic_cast<Gtk::Label *>(item)) {
+				if (label->get_text().empty())
 					return nullptr;
+			} else if (!dynamic_cast<Gtk::Fixed *>(item))
+				return nullptr;
 
-				const auto &pair = widgetMap.at(item);
-				draggedSlot = pair.first;
-				draggedExternal = pair.second;
+			Glib::Value<DragSource> value;
+			// value.init(value.value_type());
+			value.set({widgetMap.at(item), std::static_pointer_cast<ClientInventory>(mainWindow.game->player->inventory)});
+			return Gdk::ContentProvider::create(value);
+		}, false);
+		grid.add_controller(source);
 
-				Glib::ValueBase base;
-				base.init(GTK_TYPE_WIDGET);
-				return Gdk::ContentProvider::create(base);
-			}, false);
-			(external? externalGrid : playerGrid).add_controller(source);
+		auto target = Gtk::DropTarget::create(GTK_TYPE_WIDGET, Gdk::DragAction::MOVE);
+		target->signal_drop().connect([this](const Glib::ValueBase &base, double x, double y) {
+			if (base.gobj()->g_type != Glib::Value<DragSource>::value_type())
+				return false;
 
-			auto target = Gtk::DropTarget::create(GTK_TYPE_WIDGET, Gdk::DragAction::MOVE);
-			target->signal_drop().connect([this, external](const Glib::ValueBase &, double x, double y) {
-				auto &grid = external? externalGrid : playerGrid;
-				auto *destination = grid.pick(x, y);
+			const auto &value = static_cast<const Glib::Value<DragSource> &>(base);
+			auto *destination = grid.pick(x, y);
 
-				if (destination != nullptr && destination != &grid) {
-					if (dynamic_cast<Gtk::Fixed *>(destination->get_parent()))
-						destination = destination->get_parent();
+			if (destination != nullptr && destination != &grid) {
+				if (dynamic_cast<Gtk::Fixed *>(destination->get_parent()))
+					destination = destination->get_parent();
 
-					const auto &pair = widgetMap.at(destination);
-					const Slot source_slot      = draggedSlot;
-					const Slot destination_slot = pair.first;
-					const bool from_external    = draggedExternal;
-					const bool to_external      = pair.second;
-					auto &player = *mainWindow.game->player;
+				const DragSource source = value.get();
+				ClientPlayer &player = *mainWindow.game->player;
+				player.send(MoveSlotsPacket(source.inventory->getOwner()->getGID(), player.getGID(), source.slot, widgetMap.at(destination)));
+			}
 
-					const GlobalID player_gid = player.getGID();
-					GlobalID external_gid = -1;
+			return true;
+		}, false);
 
-					if (const auto external_agent = externalAgent.lock())
-						external_gid = external_agent->getGID();
-
-					player.send(MoveSlotsPacket(from_external? external_gid : player_gid, to_external? external_gid : player_gid, source_slot, destination_slot));
-				}
-
-				return true;
-			}, false);
-			(external? externalGrid : playerGrid).add_controller(target);
-		}
-
-		playerGrid.set_row_homogeneous();
-		playerGrid.set_column_homogeneous();
-		playerGrid.set_hexpand();
-		externalGrid.set_hexpand();
+		grid.add_controller(target);
+		grid.set_row_homogeneous();
+		grid.set_column_homogeneous();
+		grid.set_hexpand();
 		vbox.set_hexpand();
 		vbox.set_vexpand();
 	}
@@ -132,18 +109,11 @@ namespace Game3 {
 		lastGame = game;
 
 		mainWindow.queue([this, game] {
-			if (!externalName.empty()) {
-				externalLabel.set_text(externalName);
-				externalLabel.show();
-			}
-
 			if (game->player->inventory)
-				populate(playerGrid, static_cast<ClientInventory &>(*game->player->inventory), false);
+				populate(grid, static_cast<ClientInventory &>(*game->player->inventory));
 
-			if (externalInventory)
-				populate(externalGrid, *externalInventory, true);
-			else
-				removeChildren(externalGrid);
+			if (currentModule)
+				currentModule->update();
 		});
 	}
 
@@ -156,32 +126,24 @@ namespace Game3 {
 		mainWindow.queue([this, game] {
 			widgetMap.clear();
 
-			removeChildren(playerGrid);
-			removeChildren(externalGrid);
-			if (!externalName.empty()) {
-				externalLabel.set_text(externalName);
-				externalLabel.show();
-			}
+			removeChildren(grid);
 
-			playerWidgetsBySlot.clear();
-			playerWidgets.clear();
-			externalWidgets.clear();
-			externalWidgetsBySlot.clear();
+			widgetsBySlot.clear();
+			widgets.clear();
 
 			if (game->player->inventory)
-				populate(playerGrid, static_cast<ClientInventory &>(*game->player->inventory), false);
+				populate(grid, static_cast<ClientInventory &>(*game->player->inventory));
 
-			if (externalInventory)
-				populate(externalGrid, *externalInventory, true);
+			if (currentModule)
+				currentModule->reset();
 		});
 	}
 
-	void InventoryTab::populate(Gtk::Grid &grid, ClientInventory &inventory, bool external) {
+	void InventoryTab::populate(Gtk::Grid &grid, ClientInventory &inventory) {
 		auto &storage = inventory.getStorage();
-		auto &widgets = external? externalWidgets : playerWidgets;
 
 		const int grid_width = lastGridWidth = gridWidth();
-		const int tile_size  = playerGrid.get_width() / (playerGrid.get_width() / TILE_SIZE);
+		const int tile_size  = grid.get_width() / (grid.get_width() / TILE_SIZE);
 		const bool tooldown = 0.f < lastGame->player->tooldown;
 
 		for (Slot slot = 0; slot < inventory.slotCount; ++slot) {
@@ -230,33 +192,32 @@ namespace Game3 {
 
 			widget_ptr->set_size_request(tile_size, tile_size);
 			widget_ptr->add_css_class("item-slot");
-			if (slot == inventory.activeSlot && !external)
+			if (slot == inventory.activeSlot)
 				widget_ptr->add_css_class("active-slot");
 
-			auto &by_slot = external? externalWidgetsBySlot : playerWidgetsBySlot;
 			Gtk::Widget *old_widget = nullptr;
-			if (auto iter = by_slot.find(slot); iter != by_slot.end()) {
+			if (auto iter = widgetsBySlot.find(slot); iter != widgetsBySlot.end()) {
 				old_widget = iter->second;
 				widgetMap.erase(iter->second);
 			}
-			by_slot[slot] = widget_ptr.get();
+			widgetsBySlot[slot] = widget_ptr.get();
 
 			auto left_click = Gtk::GestureClick::create();
 			left_click->set_button(1);
-			left_click->signal_released().connect([this, slot, external, widget = widget_ptr.get()](int n, double x, double y) {
-				leftClick(lastGame, widget, n, slot, external, x, y);
+			left_click->signal_released().connect([this, slot, widget = widget_ptr.get()](int n, double x, double y) {
+				leftClick(lastGame, widget, n, slot, x, y);
 			});
 
 			auto right_click = Gtk::GestureClick::create();
 			right_click->set_button(3);
-			right_click->signal_pressed().connect([this, slot, external, widget = widget_ptr.get()](int n, double x, double y) {
-				rightClick(lastGame, widget, n, slot, external, x, y);
+			right_click->signal_pressed().connect([this, slot, widget = widget_ptr.get()](int n, double x, double y) {
+				rightClick(lastGame, widget, n, slot, x, y);
 			});
 
 			widget_ptr->add_controller(left_click);
 			widget_ptr->add_controller(right_click);
 
-			widgetMap[widget_ptr.get()] = std::make_pair(slot, external);
+			widgetMap[widget_ptr.get()] = slot;
 			if (old_widget != nullptr)
 				grid.remove(*old_widget);
 			grid.attach(*widget_ptr, column, row);
@@ -264,49 +225,50 @@ namespace Game3 {
 		}
 	}
 
-	void InventoryTab::setExternalInventory(const Glib::ustring &name, const std::shared_ptr<ClientInventory> &inventory, const std::shared_ptr<Agent> &agent) {
-		externalInventory = inventory;
-		externalAgent = agent;
-		externalName = name;
-		if (inventory)
-			if (auto owner = inventory->weakOwner.lock())
-				reset(owner->getRealm()->getGame().toClientPointer());
+	// void InventoryTab::setExternalInventory(const Glib::ustring &name, const std::shared_ptr<ClientInventory> &inventory, const std::shared_ptr<Agent> &agent) {
+	// 	externalInventory = inventory;
+	// 	externalAgent = agent;
+	// 	externalName = name;
+	// 	if (inventory)
+	// 		if (auto owner = inventory->weakOwner.lock())
+	// 			reset(owner->getRealm()->getGame().toClientPointer());
+	// }
+
+	void InventoryTab::setModule(std::unique_ptr<Module> &&module_) {
+		assert(module_);
+		removeModule();
+		currentModule = std::move(module_);
+		vbox.append(currentModule->getWidget());
+		mainWindow.queue([this] {
+			currentModule->reset();
+		});
 	}
 
-	void InventoryTab::resetExternalInventory() {
-		removeChildren(externalGrid);
-		externalWidgets.clear();
-		externalWidgetsBySlot.clear();
-		externalLabel.hide();
-		externalLabel.set_text("");
-		externalWidgets.clear();
-		externalInventory.reset();
-		externalName.clear();
+	void InventoryTab::removeModule() {
+		if (currentModule) {
+			vbox.remove(currentModule->getWidget());
+			currentModule.reset();
+		}
 	}
 
 	GlobalID InventoryTab::getExternalGID() const {
-		if (auto locked = externalAgent.lock())
-			return locked->getGID();
-		return -1;
+		throw std::logic_error("InventoryTab::getExternalGID() needs to be replaced");
 	}
 
 	int InventoryTab::gridWidth() const {
 		return scrolled.get_width() / (TILE_SIZE + 2 * TILE_MARGIN);
 	}
 
-	void InventoryTab::leftClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *, int, Slot slot, bool external, double, double) {
+	void InventoryTab::leftClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *, int, Slot slot, double, double) {
 		mainWindow.onBlur();
-
-		if (!external) {
-			game->player->inventory->setActive(slot, false);
-			updatePlayerClasses(game);
-		}
+		game->player->inventory->setActive(slot, false);
+		updatePlayerClasses(game);
 	}
 
-	void InventoryTab::rightClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *widget, int, Slot slot, bool external, double x, double y) {
+	void InventoryTab::rightClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *widget, int, Slot slot, double x, double y) {
 		mainWindow.onBlur();
 
-		if ((external && !externalInventory->contains(slot)) || (!external && !game->player->inventory->contains(slot)))
+		if (!game->player->inventory->contains(slot))
 			return;
 
 		const auto allocation = widget->get_allocation();
@@ -315,21 +277,19 @@ namespace Game3 {
 
 		popoverMenu.set_has_arrow(true);
 		popoverMenu.set_pointing_to({int(x), int(y), 1, 1});
-		if (external)
-			popoverMenu.set_menu_model(gmenuExternal);
-		else
-			popoverMenu.set_menu_model(gmenuSelf);
+		popoverMenu.set_menu_model(gmenu);
 		lastGame = game;
 		lastSlot = slot;
-		lastExternal = external;
 		popoverMenu.popup();
 	}
 
 	void InventoryTab::updatePlayerClasses(const std::shared_ptr<ClientGame> &game) {
 		const Slot active_slot = game->player->inventory->activeSlot;
-		if (playerWidgetsBySlot.contains(active_slot))
-			playerWidgetsBySlot.at(active_slot)->add_css_class("active-slot");
-		for (auto &[slot, widget]: playerWidgetsBySlot)
+
+		if (widgetsBySlot.contains(active_slot))
+			widgetsBySlot.at(active_slot)->add_css_class("active-slot");
+
+		for (auto &[slot, widget]: widgetsBySlot)
 			if (slot != active_slot)
 				widget->remove_css_class("active-slot");
 	}

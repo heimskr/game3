@@ -22,13 +22,14 @@ namespace Game3 {
 			return;
 		}
 
-		auto tab = game.canvas.window.inventoryTab;
+		auto &window = game.canvas.window;
+		auto tab = window.inventoryTab;
 
 		game.player->queueForMove([player = game.player, tab](const auto &) {
-			tab->resetExternalInventory();
+			tab->removeModule();
 			return true;
 		});
 
-		tab->setExternalInventory(agent->getName(), has_inventory->inventory->cast<ClientInventory>(), agent);
+		window.showExternalInventory(std::dynamic_pointer_cast<ClientInventory>(has_inventory->inventory));
 	}
 }

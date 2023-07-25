@@ -3,12 +3,15 @@
 #include <unordered_map>
 #include <utility>
 
+#include "Types.h"
 #include "ui/tab/Tab.h"
 
 namespace Game3 {
+	class Agent;
 	class ClientGame;
 	class ClientInventory;
 	class MainWindow;
+	class Module;
 	class TileEntity;
 
 	class InventoryTab: public Tab {
@@ -33,43 +36,31 @@ namespace Game3 {
 			void onResize(const std::shared_ptr<ClientGame> &) override;
 			void update(const std::shared_ptr<ClientGame> &) override;
 			void reset(const std::shared_ptr<ClientGame> &) override;
-			void setExternalInventory(const Glib::ustring &name, const std::shared_ptr<ClientInventory> &, const std::shared_ptr<Agent> &);
-			void resetExternalInventory();
-			std::shared_ptr<ClientInventory> getExternalInventory() const { return externalInventory; }
+			void setModule(std::unique_ptr<Module> &&);
+			Module & getModule() const { return *currentModule; }
+			void removeModule();
 			GlobalID getExternalGID() const;
 
 		private:
 			Gtk::ScrolledWindow scrolled;
-			Gtk::Grid playerGrid;
-			Gtk::Grid externalGrid;
-			Gtk::Label externalLabel;
-			Gtk::Box vbox {Gtk::Orientation::VERTICAL};
-			Gtk::Box hbox {Gtk::Orientation::HORIZONTAL};
+			Gtk::Grid grid;
+			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
 			Gtk::PopoverMenu popoverMenu;
-			std::vector<std::unique_ptr<Gtk::Widget>> playerWidgets;
-			std::vector<std::unique_ptr<Gtk::Widget>> externalWidgets;
+			std::vector<std::unique_ptr<Gtk::Widget>> widgets;
 			int lastGridWidth = 0;
-			std::shared_ptr<ClientInventory> externalInventory;
-			std::weak_ptr<Agent> externalAgent;
-			Glib::ustring externalName;
-			std::unordered_map<Gtk::Widget *, std::pair<Slot, bool>> widgetMap;
-			std::unordered_map<Slot, Gtk::Widget *> playerWidgetsBySlot;
-			std::unordered_map<Slot, Gtk::Widget *> externalWidgetsBySlot;
-			Glib::RefPtr<Gio::Menu> gmenuSelf;
-			Glib::RefPtr<Gio::Menu> gmenuExternal;
+			std::unordered_map<Gtk::Widget *, Slot> widgetMap;
+			std::unordered_map<Slot, Gtk::Widget *> widgetsBySlot;
+			Glib::RefPtr<Gio::Menu> gmenu;
+			std::unique_ptr<Module> currentModule;
 
 			/** We can't store state in a popover, so we have to store it here. */
 			std::shared_ptr<ClientGame> lastGame;
 			Slot lastSlot = -1;
-			bool lastExternal = false;
-
-			Slot draggedSlot = -1;
-			bool draggedExternal = false;
 
 			int gridWidth() const;
-			void leftClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, bool external, double x, double y);
-			void rightClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, bool external, double x, double y);
+			void leftClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, double x, double y);
+			void rightClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, double x, double y);
 			void updatePlayerClasses(const std::shared_ptr<ClientGame> &);
-			void populate(Gtk::Grid &, ClientInventory &, bool external);
+			void populate(Gtk::Grid &, ClientInventory &);
 	};
 }

@@ -1,7 +1,8 @@
 #pragma once
 
-#include <gtkmm.h>
 #include <memory>
+
+#include <gtkmm.h>
 
 namespace Game3 {
 	class ClientGame;

@@ -59,12 +59,13 @@ namespace Game3 {
 		std::cout << "Miner: money = " << money << ", phase = " << static_cast<int>(phase) << ", stuck = " << stuck << '\n';
 
 		if (getSide() == Side::Client) {
-			auto &tab = *getRealm()->getGame().toClient().canvas.window.inventoryTab;
+			auto &window = getRealm()->getGame().toClient().getWindow();
+			auto &tab = *window.inventoryTab;
 			player->queueForMove([player, &tab](const auto &) {
-				tab.resetExternalInventory();
+				tab.removeModule();
 				return true;
 			});
-			tab.setExternalInventory("Miner", inventory->cast<ClientInventory>(), shared_from_this());
+			window.showExternalInventory(std::dynamic_pointer_cast<ClientInventory>(inventory));
 		}
 
 		return true;

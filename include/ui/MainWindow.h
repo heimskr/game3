@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Types.h"
+
 #include <atomic>
 #include <chrono>
 #include <filesystem>
@@ -16,6 +18,7 @@
 namespace Game3 {
 	class Canvas;
 	class ClientGame;
+	class ClientInventory;
 	class CraftingTab;
 	class InventoryTab;
 	class MerchantTab;
@@ -59,6 +62,9 @@ namespace Game3 {
 			void onBlur();
 
 			void activateContext();
+
+			void showExternalInventory(const std::shared_ptr<ClientInventory> &);
+			GlobalID getExternalGID() const;
 
 			friend class Canvas;
 

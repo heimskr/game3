@@ -24,6 +24,7 @@
 #include "ui/gtk/CommandDialog.h"
 #include "ui/gtk/ConnectDialog.h"
 #include "ui/gtk/JSONDialog.h"
+#include "ui/module/ExternalInventoryModule.h"
 #include "ui/tab/CraftingTab.h"
 #include "ui/tab/InventoryTab.h"
 #include "ui/tab/MerchantTab.h"
@@ -322,8 +323,8 @@ namespace Game3 {
 			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner)) {
 				if (has_inventory->inventory) {
 					auto client_inventory = has_inventory->inventory->cast<ClientInventory>();
-					if (owner->getGID() == inventoryTab->getExternalGID()) {
-						inventoryTab->setExternalInventory(owner->getName(), client_inventory, owner);
+					if (owner->getGID() == getExternalGID()) {
+						// inventoryTab->setExternalInventory(owner->getName(), client_inventory, owner);
 						inventoryTab->update(game);
 					}
 					// TODO: fix merchant tab
@@ -526,6 +527,17 @@ namespace Game3 {
 
 	void MainWindow::activateContext() {
 		glArea.get_context()->make_current();
+	}
+
+	void MainWindow::showExternalInventory(const std::shared_ptr<ClientInventory> &inventory) {
+		inventoryTab->setModule(std::make_unique<ExternalInventoryModule>(game, inventory));
+	}
+
+	GlobalID MainWindow::getExternalGID() const {
+		if (auto *ext_module = dynamic_cast<ExternalInventoryModule *>(&inventoryTab->getModule()))
+			if (auto inventory = ext_module->getInventory())
+				return inventory->getOwner()->getGID();
+		return -1;
 	}
 
 	bool MainWindow::onKeyPressed(guint keyval, guint keycode, Gdk::ModifierType modifiers) {
