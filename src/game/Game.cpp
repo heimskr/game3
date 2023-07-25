@@ -280,6 +280,7 @@ namespace Game3 {
 		add(std::make_shared<EmptyFlask>("base:item/flask", "Flask", 2, 64));
 		add(std::make_shared<FilledFlask>("base:item/water_flask", "Water Flask", 3, "base:fluid/water"_id));
 		add(std::make_shared<FilledFlask>("base:item/lava_flask",  "Lava Flask",  4, "base:fluid/lava"_id));
+		add(std::make_shared<FilledFlask>("base:item/milk_flask",  "Milk Flask",  4, "base:fluid/milk"_id));
 
 		add(std::make_shared<CaveEntrance>("base:item/cave_entrance", "Cave Entrance", 50, 1));
 
