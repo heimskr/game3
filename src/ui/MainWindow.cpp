@@ -323,10 +323,9 @@ namespace Game3 {
 			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner)) {
 				if (has_inventory->inventory) {
 					auto client_inventory = has_inventory->inventory->cast<ClientInventory>();
-					if (owner->getGID() == getExternalGID()) {
-						// inventoryTab->setExternalInventory(owner->getName(), client_inventory, owner);
-						inventoryTab->update(game);
-					}
+					if (owner->getGID() == getExternalGID())
+						inventoryTab->getModule().update();
+
 					// TODO: fix merchant tab
 					if (client_inventory == merchantTab->getMerchantInventory())
 						merchantTab->update(game);
