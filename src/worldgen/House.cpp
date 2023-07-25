@@ -76,6 +76,9 @@ namespace Game3::WorldGen {
 				auto chest2 = TileEntity::create<Chest>(game, "base:tile/empty"_id, Position(4, width / 2), "Chest");
 				chest2->setInventory(10);
 				realm->add(chest2);
+				auto chest3 = TileEntity::create<Chest>(game, "base:tile/empty"_id, Position(4, width / 2 - 2), "Chest");
+				chest3->setInventory(10);
+				realm->add(chest3);
 				break;
 			}
 
