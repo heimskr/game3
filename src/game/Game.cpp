@@ -39,6 +39,7 @@
 #include "item/Item.h"
 #include "item/Landfill.h"
 #include "item/Landfills.h"
+#include "item/Mead.h"
 #include "item/Mushroom.h"
 #include "item/Pickaxe.h"
 #include "item/PipeItem.h"
@@ -174,7 +175,6 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/dirt",           "Dirt",             1, 64));
 		add(std::make_shared<Item>("base:item/brick",          "Brick",            3, 64));
 		add(std::make_shared<Item>("base:item/pot",            "Pot",             24, 64));
-		add(std::make_shared<Item>("base:item/mead",           "Mead",            10, 16));
 		add(std::make_shared<Item>("base:item/honey",          "Honey",            5, 64));
 		add(std::make_shared<Item>("base:item/ash",            "Ash",              1, 64));
 		add(std::make_shared<Item>("base:item/silicon",        "Silicon",          2, 64));
@@ -194,6 +194,8 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/light_blue_dye", "Light Blue Dye",  12, 64));
 		add(std::make_shared<Item>("base:item/gray_dye",       "Gray Dye",        12, 64));
 		add(std::make_shared<Item>("base:item/lime_dye",       "Lime Dye",        12, 64));
+
+		add(std::make_shared<Mead>("base:item/mead", "Mead", 10, 16));
 
 		add(std::make_shared<Seed>("base:item/cotton_seeds",   "Cotton Seeds",   "base:tile/cotton_0"_id, 4));
 
