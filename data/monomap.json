@@ -428,6 +428,7 @@
 			"base:tile/flower2_white":           783,
 			"base:tile/flower2_black":           784,
 			"base:tile/milk":                    800,
+			"base:tile/mead":                    801,
 			"base:tile/flower3_red":             809,
 			"base:tile/flower3_orange":          810,
 			"base:tile/flower3_yellow":          811,

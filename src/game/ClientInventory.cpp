@@ -22,8 +22,8 @@ namespace Game3 {
 	ClientInventory::ClientInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, Storage storage_):
 		StorageInventory(std::move(owner), slot_count, active_slot, std::move(storage_)) {}
 
-	std::optional<ItemStack> ClientInventory::add(const ItemStack &stack, Slot start) {
-		throw std::runtime_error("Clients cannot add items to inventories");
+	std::optional<ItemStack> ClientInventory::add(const ItemStack &, Slot) {
+		throw std::logic_error("Clients cannot add items to inventories");
 	}
 
 	ClientInventory::ClientInventory(const ClientInventory &other):
@@ -58,29 +58,24 @@ namespace Game3 {
 		}
 	}
 
-	void ClientInventory::erase(Slot slot) {
-		// TODO
+	void ClientInventory::erase(Slot) {
+		throw std::logic_error("ClientInventory::erase(Slot) unimplemented");
 	}
 
-	ItemCount ClientInventory::remove(const ItemStack &stack_to_remove) {
-		// TODO
-		return 0;
+	ItemCount ClientInventory::remove(const ItemStack &) {
+		throw std::logic_error("ClientInventory::remove(const ItemStack &) unimplemented");
 	}
 
-	ItemCount ClientInventory::remove(const ItemStack &stack_to_remove, Slot slot) {
-		// TODO
-		return 0;
+	ItemCount ClientInventory::remove(const ItemStack &, Slot) {
+		throw std::logic_error("ClientInventory::remove(const ItemStack &, Slot) unimplemented");
 	}
 
-	ItemCount ClientInventory::remove(const CraftingRequirement &requirement) {
-		if (requirement.is<ItemStack>())
-			return remove(requirement.get<ItemStack>());
-		return remove(requirement.get<AttributeRequirement>());
+	ItemCount ClientInventory::remove(const CraftingRequirement &) {
+		throw std::logic_error("ClientInventory::remove(const CraftingRequirement &) unimplemented");
 	}
 
-	ItemCount ClientInventory::remove(const AttributeRequirement &requirement) {
-		// TODO
-		return 0;
+	ItemCount ClientInventory::remove(const AttributeRequirement &) {
+		throw std::logic_error("ClientInventory::remove(const AttributeRequirement &) unimplemented");
 	}
 
 	void ClientInventory::setActive(Slot new_active, bool force) {

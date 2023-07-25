@@ -13,5 +13,10 @@
 		"tileset":  "base:tileset/monomap",
 		"tilename": "base:tile/milk",
 		"flask":    "base:item/milk_flask"
+	},
+	"base:fluid/mead": {
+		"tileset":  "base:tileset/monomap",
+		"tilename": "base:tile/mead",
+		"flask":    "base:item/mead"
 	}
 }]

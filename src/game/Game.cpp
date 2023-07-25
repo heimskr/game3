@@ -46,6 +46,7 @@
 #include "item/Sapling.h"
 #include "item/Seed.h"
 #include "item/Tool.h"
+#include "item/VoidFlask.h"
 #include "packet/PacketFactory.h"
 #include "packet/ProtocolVersionPacket.h"
 #include "packet/TileEntityPacket.h"
@@ -277,7 +278,10 @@ namespace Game3 {
 		add(std::make_shared<Plantable>("base:item/flower5_white",  "White Flower",  "base:tile/flower5_white",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_white"));
 		add(std::make_shared<Plantable>("base:item/flower5_black",  "Black Flower",  "base:tile/flower5_black",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_black"));
 
+		add(std::make_shared<VoidFlask>("base:item/void_flask", "Void Flask", 128, 1));
+
 		add(std::make_shared<EmptyFlask>("base:item/flask", "Flask", 2, 64));
+
 		add(std::make_shared<FilledFlask>("base:item/water_flask", "Water Flask", 3, "base:fluid/water"_id));
 		add(std::make_shared<FilledFlask>("base:item/lava_flask",  "Lava Flask",  4, "base:fluid/lava"_id));
 		add(std::make_shared<FilledFlask>("base:item/milk_flask",  "Milk Flask",  4, "base:fluid/milk"_id));
