@@ -13,11 +13,12 @@ namespace Game3 {
 		SetActiveSlotPacket(Slot slot_):
 			slot(slot_) {}
 
-		PacketID getID() const override { return ID(); }
+		PacketID getID() const final { return ID(); }
 
-		void encode(Game &, Buffer &buffer) const override { buffer << slot; }
-		void decode(Game &, Buffer &buffer)       override { buffer >> slot; }
+		void encode(Game &, Buffer &buffer) const final { buffer << slot; }
+		void decode(Game &, Buffer &buffer)       final { buffer >> slot; }
 
-		void handle(ServerGame &, RemoteClient &) override;
+		void handle(ServerGame &, RemoteClient &) final;
+		void handle(ClientGame &) final;
 	};
 }

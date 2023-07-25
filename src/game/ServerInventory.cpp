@@ -214,17 +214,9 @@ namespace Game3 {
 		auto owner = getOwner();
 		auto player = std::dynamic_pointer_cast<Player>(owner);
 		assert(player);
-		const bool is_client = owner->getSide() == Side::Client;
-		if (is_client && !force) {
-			if (player)
-				player->send(SetActiveSlotPacket(new_active));
-		} else {
-			activeSlot = new_active;
-			if (is_client)
-				notifyOwner();
-			else if (player)
-				player->send(ActiveSlotSetPacket(activeSlot));
-		}
+		activeSlot = new_active;
+		player->send(SetActiveSlotPacket(new_active));
+		notifyOwner();
 	}
 
 	void ServerInventory::notifyOwner() {

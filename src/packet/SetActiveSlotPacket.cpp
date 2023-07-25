@@ -1,5 +1,7 @@
 #include "Log.h"
+#include "entity/ClientPlayer.h"
 #include "entity/ServerPlayer.h"
+#include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
 #include "net/RemoteClient.h"
@@ -9,5 +11,9 @@ namespace Game3 {
 	void SetActiveSlotPacket::handle(ServerGame &, RemoteClient &client) {
 		if (auto player = client.getPlayer(); player && player->inventory)
 			player->inventory->setActive(slot);
+	}
+
+	void SetActiveSlotPacket::handle(ClientGame &game) {
+		game.player->inventory->setActive(slot, true);
 	}
 }

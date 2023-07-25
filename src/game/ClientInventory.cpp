@@ -83,11 +83,14 @@ namespace Game3 {
 		return 0;
 	}
 
-	void ClientInventory::setActive(Slot new_active, bool) {
+	void ClientInventory::setActive(Slot new_active, bool force) {
 		if (!std::dynamic_pointer_cast<Player>(weakOwner.lock()))
 			throw std::runtime_error("Can't set the active slot of a non-player inventory");
 
-		send(SetActiveSlotPacket(new_active));
+		if (force)
+			activeSlot = new_active;
+		else
+			send(SetActiveSlotPacket(new_active));
 	}
 
 	void ClientInventory::notifyOwner() {
