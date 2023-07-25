@@ -37,6 +37,8 @@ namespace Game3 {
 					auto pipe = TileEntity::create<Pipe>(realm.getGame(), place.position);
 					if (place.realm->add(pipe)) {
 						pipe->setPresent(P, true);
+						pipe->increaseUpdateCounter();
+						pipe->broadcast();
 					}
 
 					return true;

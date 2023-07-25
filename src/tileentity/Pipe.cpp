@@ -83,15 +83,15 @@ namespace Game3 {
 		const auto column_count = tileset.columnCount(game);
 
 		for (const PipeType pipe_type: reverse(PIPE_TYPES)) {
-			if (!tileIDs[pipe_type] && present[pipe_type])
+			std::optional<TileID> &tile_id = tileIDs[pipe_type];
+
+			if (!tile_id && present[pipe_type])
 				updateTileID(pipe_type);
 
 			auto &extractors_corner = extractorsCorners[pipe_type];
 
 			if (!extractors_corner)
 				extractors_corner = tileset[ExtractorsCorner(pipe_type)];
-
-			std::optional<TileID> &tile_id = tileIDs[pipe_type];
 
 			if (tile_id && *tile_id != 0) {
 				const float x = (*tile_id % (*texture->width / tilesize)) * tilesize;
