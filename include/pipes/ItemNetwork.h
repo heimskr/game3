@@ -18,11 +18,9 @@ namespace Game3 {
 
 			void tick(Tick) final;
 			void lastPipeRemoved(Position) final;
+			bool canWorkWith(const std::shared_ptr<TileEntity> &) const final;
 
 			inline size_t overflowCount() const { return overflowQueue.size(); }
-
-		protected:
-			bool canWorkWith(const std::shared_ptr<TileEntity> &) const final;
 
 		private:
 			std::optional<PairSet::iterator> roundRobinIterator;

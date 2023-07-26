@@ -14,8 +14,6 @@ namespace Game3 {
 			PipeType getType() const final { return PipeType::Fluid; }
 
 			void tick(Tick) final;
-
-		protected:
 			bool canWorkWith(const std::shared_ptr<TileEntity> &) const final;
 
 		private:

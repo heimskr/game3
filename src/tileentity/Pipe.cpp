@@ -4,7 +4,6 @@
 #include "pipes/ItemNetwork.h"
 #include "pipes/PipeNetwork.h"
 #include "realm/Realm.h"
-#include "tileentity/InventoriedTileEntity.h"
 #include "tileentity/Pipe.h"
 #include "ui/SpriteRenderer.h"
 #include "util/Util.h"
@@ -133,12 +132,12 @@ namespace Game3 {
 
 		auto tile_entity = getRealm()->tileEntityAt(neighbor_position);
 
-		if (!tile_entity || !std::dynamic_pointer_cast<HasInventory>(tile_entity))
+		if (!tile_entity)
 			return;
 
 		for (const PipeType pipe_type: PIPE_TYPES)
 			if (directions[pipe_type][direction])
-				if (const auto &network = networks[pipe_type])
+				if (const auto &network = networks[pipe_type]; network && network->canWorkWith(tile_entity))
 					network->addInsertion(neighbor_position, flipDirection(direction));
 	}
 
@@ -283,7 +282,7 @@ namespace Game3 {
 
 			// If there's a tile entity at the attached position and it has an inventory, add it to the network as an insertion point.
 			if (auto realm = weakRealm.lock())
-				if (auto inventoried = std::dynamic_pointer_cast<InventoriedTileEntity>(realm->tileEntityAt(position + direction)))
+				if (network->canWorkWith(realm->tileEntityAt(position + direction)))
 					network->addInsertion(position + direction, flipDirection(direction));
 
 			return;
@@ -316,9 +315,7 @@ namespace Game3 {
 			}
 
 			network->reconsiderInsertion(position + direction);
-
-			if (!value)
-				onNeighborUpdated(position + direction);
+			onNeighborUpdated(position + direction);
 		} else {
 			extractors[pipe_type][direction] = false;
 		}

@@ -27,7 +27,6 @@ namespace Game3 {
 			Lockable<PairSet> extractions;
 			Lockable<PairSet> insertions;
 
-			virtual bool canWorkWith(const std::shared_ptr<TileEntity> &) const { return false; }
 
 		public:
 			PipeNetwork(size_t id_, const std::shared_ptr<Realm> &);
@@ -50,6 +49,7 @@ namespace Game3 {
 			virtual void reconsiderInsertion(Position);
 			virtual void removePipe(const std::shared_ptr<Pipe> &);
 			virtual void lastPipeRemoved(Position) {}
+			virtual bool canWorkWith(const std::shared_ptr<TileEntity> &) const { return false; }
 
 			inline const auto & getExtractions() const { return extractions; }
 			inline const auto & getInsertions()  const { return insertions; }
