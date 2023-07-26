@@ -15,17 +15,24 @@ namespace Game3 {
 		public:
 			FluidHoldingTileEntity(HasFluids::Map = {});
 
-			// virtual bool canInsertItem(const ItemStack &, Direction);
-			// virtual std::optional<ItemStack> extractItem(Direction, bool remove);
-
-			virtual bool empty();
+			virtual bool canInsertFluid(FluidStack, Direction);
+			/** Returns the amount not added. */
+			virtual FullFluidLevel addFluid(FluidStack, Direction);
+			virtual std::optional<FluidStack> extractFluid(Direction, bool remove, FullFluidLevel max_amount);
+			virtual std::optional<FluidStack> extractFluid(Direction, bool remove);
 
 			/** Server-side only. */
 			void setFluidLevels(HasFluids::Map);
 
 			void fluidsUpdated() override;
 
+			void toJSON(nlohmann::json &) const override;
+			void absorbJSON(Game &, const nlohmann::json &) override;
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
+
+		protected:
+			using HasFluids::canInsertFluid;
+			using HasFluids::addFluid;
 	};
 }

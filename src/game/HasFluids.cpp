@@ -40,6 +40,28 @@ namespace Game3 {
 		return 0;
 	}
 
+	bool HasFluids::canInsertFluid(FluidStack stack) {
+		auto lock = fluidLevels.sharedLock();
+
+		auto iter = fluidLevels.find(stack.id);
+
+		if (iter == fluidLevels.end())
+			return fluidLevels.size() < getMaxFluidTypes() && stack.level <= getMaxLevel(stack.id);
+
+		const FullFluidLevel current_level = iter->second;
+
+		// Integer overflow definitely isn't allowed.
+		if (current_level + stack.level < current_level)
+			return false;
+
+		return current_level + stack.level <= getMaxLevel(stack.id);
+	}
+
+	bool HasFluids::empty() {
+		auto lock = fluidLevels.sharedLock();
+		return fluidLevels.empty();
+	}
+
 	void HasFluids::encode(Buffer &buffer) {
 		buffer << fluidLevels;
 	}

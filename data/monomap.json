@@ -366,7 +366,7 @@
 			"base:tile/blacksmith2":             612,
 			"base:tile/blacksmith3":             613,
 			"base:tile/tavern1":                 614,
-			"base:tile/fluid_pump":              615,
+			"base:tile/pump":                    615,
 			"base:tile/tank":                    616,
 			"base:tile/house1":                  672,
 			"base:tile/house2":                  673,

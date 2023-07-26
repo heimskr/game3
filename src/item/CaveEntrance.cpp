@@ -18,12 +18,12 @@
 
 namespace Game3 {
 	bool CaveEntrance::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
-		auto &realm = *place.realm;
-		auto &game  = realm.getGame();
+		Realm &realm = *place.realm;
+		Game  &game  = realm.getGame();
 		assert(game.getSide() == Side::Server);
 
-		const auto &player   = place.player;
-		const auto &position = place.position;
+		const PlayerPtr &player   = place.player;
+		const Position  &position = place.position;
 
 		const Position exit_position = position + Position(1, 0);
 
@@ -33,8 +33,8 @@ namespace Game3 {
 		std::optional<RealmID> realm_id;
 		Position entrance;
 
-		for (const auto &[index, tile_entity]: realm.tileEntities)
-			if (tile_entity->tileID == "base:tile/cave"_id && tile_entity->is("base:te/building"_id))
+		for (const auto &[index, tile_entity]: realm.tileEntities) {
+			if (tile_entity->tileID == "base:tile/cave"_id && tile_entity->is("base:te/building"_id)) {
 				if (auto building = std::dynamic_pointer_cast<Building>(tile_entity)) {
 					realm_id = building->innerRealmID;
 					if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game.realms.at(*realm_id)))
@@ -44,6 +44,8 @@ namespace Game3 {
 					entrance = building->entrance;
 					break;
 				}
+			}
+		}
 
 		bool emplaced = false;
 

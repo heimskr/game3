@@ -4,7 +4,7 @@
 #include "threading/Lockable.h"
 
 #include <memory>
-#include <unordered_map>
+#include <map>
 
 namespace Game3 {
 	class Agent;
@@ -14,21 +14,26 @@ namespace Game3 {
 
 	class HasFluids {
 		public:
-			using Map = std::unordered_map<FluidID, FullFluidLevel>;
+			using Map = std::map<FluidID, FullFluidLevel>;
 
 			HasFluids(Map = {});
-
-			Lockable<Map> fluidLevels;
 
 			virtual size_t getMaxFluidTypes() const { return 1; }
 			virtual FullFluidLevel getMaxLevel(FluidID) const;
 
 			/** Returns how much fluid was unable to be added. */
-			virtual FullFluidLevel addFluid(FluidStack);
+			FullFluidLevel addFluid(FluidStack);
+
+			virtual bool canInsertFluid(FluidStack);
+
+			bool empty();
 
 			virtual void fluidsUpdated() {}
 
 			void encode(Buffer &);
 			void decode(Buffer &);
+
+		protected:
+			Lockable<Map> fluidLevels;
 	};
 }

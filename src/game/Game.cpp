@@ -44,6 +44,7 @@
 #include "item/Pickaxe.h"
 #include "item/PipeItem.h"
 #include "item/Plantable.h"
+#include "item/PumpItem.h"
 #include "item/Sapling.h"
 #include "item/Seed.h"
 #include "item/Tool.h"
@@ -108,6 +109,7 @@
 #include "tileentity/ItemSpawner.h"
 #include "tileentity/OreDeposit.h"
 #include "tileentity/Pipe.h"
+#include "tileentity/Pump.h"
 #include "tileentity/Sign.h"
 #include "tileentity/Stockpile.h"
 #include "tileentity/Teleporter.h"
@@ -230,6 +232,8 @@ namespace Game3 {
 		add(std::make_shared<Mushroom>("base:item/black_trumpet",   "Black Trumpet",      20, 29));
 		add(std::make_shared<Mushroom>("base:item/grey_knight",     "Grey Knight",        20, 12));
 
+		add(std::make_shared<PumpItem>("base:item/pump", "Pump", 999, 64)); // TODO: cost
+
 		add(std::make_shared<Furniture>("base:item/wooden_wall", "Wooden Wall",   9, 64));
 		add(std::make_shared<Furniture>("base:item/plant_pot1",  "Plant Pot",    32, 64));
 		add(std::make_shared<Furniture>("base:item/plant_pot2",  "Plant Pot",    32, 64));
@@ -323,6 +327,7 @@ namespace Game3 {
 		add(TileEntityFactory::create<Teleporter>());
 		add(TileEntityFactory::create<Tree>());
 		add(TileEntityFactory::create<Pipe>());
+		add(TileEntityFactory::create<Pump>());
 	}
 
 	void Game::addRealms() {
