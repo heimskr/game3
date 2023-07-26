@@ -7,9 +7,13 @@
 #include <optional>
 
 namespace Game3 {
-	class InventoriedTileEntity: public TileEntity, public HasInventory {
+	/**
+	 * This class inherits TileEntity *virtually*. It doesn't call any TileEntity methods itself.
+	 * Deriving classes must remember to do so in the encode and decode methods.
+	 */
+	class InventoriedTileEntity: public virtual TileEntity, public HasInventory {
 		public:
-			using TileEntity::TileEntity;
+			InventoriedTileEntity(std::shared_ptr<Inventory> = nullptr);
 
 			virtual bool canInsertItem(const ItemStack &, Direction);
 			virtual std::optional<ItemStack> extractItem(Direction, bool remove);

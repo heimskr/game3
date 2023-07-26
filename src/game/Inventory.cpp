@@ -72,7 +72,7 @@ namespace Game3 {
 	}
 
 	ItemCount Inventory::craftable(const CraftingRecipe &recipe) const {
-		ItemCount out = UINT64_MAX;
+		ItemCount out = std::numeric_limits<ItemCount>::max();
 
 		for (const auto &input: recipe.input) {
 			if (input.is<ItemStack>()) {

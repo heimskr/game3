@@ -19,8 +19,8 @@ namespace Game3 {
 	};
 
 	struct FluidTile {
-		static constexpr FluidLevel INFINITE = 65535;
-		static constexpr FluidLevel FULL     = 65534;
+		static constexpr FluidLevel FULL     = 1000;
+		static constexpr FluidLevel INFINITE = FULL + 1;
 
 		FluidID id = 0;
 		FluidLevel level = 0;
@@ -36,14 +36,34 @@ namespace Game3 {
 		auto operator<=>(const FluidTile &) const = default;
 	};
 
-	std::ostream & operator<<(std::ostream &, const FluidTile &);
+	std::ostream & operator<<(std::ostream &, FluidTile);
+
+	struct FluidStack {
+		FluidID id = 0;
+		FullFluidLevel level = 0;
+
+		FluidStack() = default;
+		FluidStack(FluidID, FullFluidLevel);
+
+		explicit operator std::string() const;
+
+		auto operator<=>(const FluidStack &) const = default;
+	};
+
+	std::ostream & operator<<(std::ostream &, FluidStack);
 
 	template <typename T>
 	T popBuffer(Buffer &);
 	template <>
 	FluidTile popBuffer<FluidTile>(Buffer &);
+	template <>
+	FluidStack popBuffer<FluidStack>(Buffer &);
 
 	Buffer & operator+=(Buffer &, const FluidTile &);
 	Buffer & operator<<(Buffer &, const FluidTile &);
 	Buffer & operator>>(Buffer &, FluidTile &);
+
+	Buffer & operator+=(Buffer &, const FluidStack &);
+	Buffer & operator<<(Buffer &, const FluidStack &);
+	Buffer & operator>>(Buffer &, FluidStack &);
 }

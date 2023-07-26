@@ -8,16 +8,17 @@ namespace Game3 {
 	class Game;
 	class Inventory;
 
-	struct HasInventory {
-		HasInventory(const std::shared_ptr<Inventory> &inventory_ = nullptr):
-			inventory(inventory_) {}
+	class HasInventory {
+		public:
+			HasInventory(std::shared_ptr<Inventory> inventory_ = nullptr):
+				inventory(std::move(inventory_)) {}
 
-		std::shared_ptr<Inventory> inventory;
+			std::shared_ptr<Inventory> inventory;
 
-		void encode(Buffer &);
-		void decode(Buffer &);
+			void encode(Buffer &);
+			void decode(Buffer &);
 
-		virtual void inventoryUpdated() {}
+			virtual void inventoryUpdated() {}
 
 		protected:
 			virtual std::shared_ptr<Agent> getSharedAgent() = 0;

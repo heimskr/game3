@@ -201,22 +201,6 @@ namespace Game3 {
 			setActive(activeSlot + 1, false);
 	}
 
-	ItemCount StorageInventory::craftable(const CraftingRecipe &recipe) const {
-		ItemCount out = UINT64_MAX;
-
-		for (const auto &input: recipe.input) {
-			if (input.is<ItemStack>()) {
-				const ItemStack &stack = input.get<ItemStack>();
-				out = std::min(out, count(stack) / stack.count);
-			} else {
-				const auto &[attribute, attribute_count] = input.get<AttributeRequirement>();
-				out = std::min(out, countAttribute(attribute) / attribute_count);
-			}
-		}
-
-		return out;
-	}
-
 	void StorageInventory::compact() {
 		auto lock = storage.uniqueLock();
 

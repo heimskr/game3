@@ -158,10 +158,10 @@ namespace Game3 {
 			if (fluid_opt) {
 				if (auto tile_opt = game.getFluidTileID(fluid_opt->id)) {
 					tile = *tile_opt;
-					if (fluid_opt->level == UINT16_MAX)
+					if (FluidTile::FULL <= fluid_opt->level)
 						opacity = 1.f;
 					else
-						opacity = fluid_opt->level / 65534.f;
+						opacity = fluid_opt->level / FluidTile::FULL;
 				}
 			}
 

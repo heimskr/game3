@@ -205,7 +205,7 @@ namespace Game3 {
 		return count_removed;
 	}
 
-	void ServerInventory::setActive(Slot new_active, bool force) {
+	void ServerInventory::setActive(Slot new_active, bool) {
 		if (!(0 <= new_active && new_active < slotCount)) {
 			WARN("Bad slot: " << new_active << " (slot count: " << slotCount << ")");
 			return;

@@ -284,6 +284,7 @@ All values are little endian.
 | `0x21` . type[key] . type[value] | map&lt;key, value&gt;      |
 | `0xe0`                           | ItemStack                  |
 | `0xe1`                           | Inventory                  |
+| `0xe2`                           | FluidStack                 |
 
 Note that string types are always encoded as `0x1f` when used as a subtype of a list or a map, and optional types are always encoded as `0x0b` followed by the subtype in the same scenario.
 

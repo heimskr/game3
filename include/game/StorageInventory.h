@@ -64,9 +64,6 @@ namespace Game3 {
 
 			void nextSlot() override;
 
-			/** Returns the number of times a recipe can be crafted with the inventory's items. Doesn't take the output of the recipe into account. */
-			ItemCount craftable(const CraftingRecipe &) const override;
-
 			inline auto & getStorage() { return storage; }
 			inline const auto & getStorage() const { return storage; }
 			inline void setStorage(Lockable<Storage> &&new_storage) { storage = std::forward<Lockable<Storage>>(new_storage); }

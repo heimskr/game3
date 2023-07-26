@@ -15,7 +15,7 @@
 
 namespace Game3 {
 	Chest::Chest(Identifier tile_id, const Position &position_, std::string name_, std::shared_ptr<Texture> texture_):
-	InventoriedTileEntity(std::move(tile_id), ID(), position_, true), name(std::move(name_)), texture(std::move(texture_)) {
+	TileEntity(std::move(tile_id), ID(), position_, true), name(std::move(name_)), texture(std::move(texture_)) {
 		if (texture)
 			texture->init();
 	}
@@ -65,12 +65,14 @@ namespace Game3 {
 	}
 
 	void Chest::encode(Game &game, Buffer &buffer) {
+		TileEntity::encode(game, buffer);
 		InventoriedTileEntity::encode(game, buffer);
 		buffer << name;
 		buffer << texture->path.string();
 	}
 
 	void Chest::decode(Game &game, Buffer &buffer) {
+		TileEntity::decode(game, buffer);
 		InventoriedTileEntity::decode(game, buffer);
 		buffer >> name;
 		const std::filesystem::path texture_path = buffer.take<std::string>();

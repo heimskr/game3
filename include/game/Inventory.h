@@ -126,7 +126,7 @@ namespace Game3 {
 
 			/** Returns the number of times a recipe can be crafted with the inventory's items.
 			 *  Doesn't take the output of the recipe into account. */
-			virtual ItemCount craftable(const CraftingRecipe &) const = 0;
+			virtual ItemCount craftable(const CraftingRecipe &) const;
 
 			static std::shared_ptr<Inventory> create(Side side, std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot = 0, std::map<Slot, ItemStack> storage = {});
 

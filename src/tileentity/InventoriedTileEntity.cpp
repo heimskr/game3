@@ -4,6 +4,9 @@
 #include "tileentity/InventoriedTileEntity.h"
 
 namespace Game3 {
+	InventoriedTileEntity::InventoriedTileEntity(InventoryPtr inventory_):
+		HasInventory(std::move(inventory_)) {}
+
 	bool InventoriedTileEntity::canInsertItem(const ItemStack &stack, Direction) {
 		if (!inventory)
 			return false;
@@ -58,13 +61,11 @@ namespace Game3 {
 		return shared_from_this();
 	}
 
-	void InventoriedTileEntity::encode(Game &game, Buffer &buffer) {
-		TileEntity::encode(game, buffer);
+	void InventoriedTileEntity::encode(Game &, Buffer &buffer) {
 		HasInventory::encode(buffer);
 	}
 
-	void InventoriedTileEntity::decode(Game &game, Buffer &buffer) {
-		TileEntity::decode(game, buffer);
+	void InventoriedTileEntity::decode(Game &, Buffer &buffer) {
 		HasInventory::decode(buffer);
 	}
 }
