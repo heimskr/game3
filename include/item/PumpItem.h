@@ -1,11 +1,11 @@
 #pragma once
 
-#include "item/Item.h"
+#include "item/TileEntityItem.h"
+#include "tileentity/Pump.h"
 
 namespace Game3 {
-	class PumpItem: public Item {
+	class PumpItem: public TileEntityItem<Pump> {
 		public:
-			using Item::Item;
-			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
+			using TileEntityItem<Pump>::TileEntityItem;
 	};
 }

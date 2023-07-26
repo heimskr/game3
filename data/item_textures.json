@@ -122,5 +122,6 @@
 	"base:item/lava_flask":      ["base:texture/flasks",       16,   0],
 	"base:item/milk_flask":      ["base:texture/flasks",       48,   0],
 	"base:item/void_flask":      ["base:texture/flasks",       64,   0],
-	"base:item/pump":            ["base:texture/tileset",     192, 304]
+	"base:item/pump":            ["base:texture/tileset",     192, 304],
+	"base:item/tank":            ["base:texture/tileset",     112, 304]
 }]

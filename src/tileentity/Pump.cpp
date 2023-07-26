@@ -1,16 +1,12 @@
 #include <iostream>
 
-#include "Texture.h"
 #include "Tileset.h"
 #include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/ServerInventory.h"
 #include "realm/Realm.h"
 #include "tileentity/Pump.h"
-#include "ui/Canvas.h"
-#include "ui/MainWindow.h"
 #include "ui/SpriteRenderer.h"
-#include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
 	Pump::Pump(Identifier tile_id, Position position_):
