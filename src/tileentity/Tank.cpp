@@ -33,9 +33,11 @@ namespace Game3 {
 
 		// TODO: open fluid level module
 		auto lock = fluidLevels.sharedLock();
-		for (const auto &[id, amount]: fluidLevels) {
-			INFO(realm.getGame().getFluid(id)->identifier << " = " << amount);
-		}
+		if (fluidLevels.empty())
+			WARN("No fluids.");
+		else
+			for (const auto &[id, amount]: fluidLevels)
+				INFO(realm.getGame().getFluid(id)->identifier << " = " << amount);
 		return false;
 	}
 

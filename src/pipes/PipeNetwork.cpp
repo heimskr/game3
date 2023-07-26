@@ -3,7 +3,6 @@
 #include "pipes/ItemNetwork.h"
 #include "pipes/PipeNetwork.h"
 #include "realm/Realm.h"
-#include "tileentity/InventoriedTileEntity.h"
 #include "tileentity/Pipe.h"
 #include "util/PairHash.h"
 
@@ -109,10 +108,12 @@ namespace Game3 {
 		if (!realm)
 			throw std::runtime_error("Couldn't lock realm");
 
+		INFO("Reconsidering " << position);
+
 		PipeType type = getType();
 		std::unordered_set<Direction> found;
 
-		if (!std::dynamic_pointer_cast<InventoriedTileEntity>(realm->tileEntityAt(position))) {
+		if (!canWorkWith(realm->tileEntityAt(position))) {
 			for (const Direction direction: ALL_DIRECTIONS)
 				removeInsertion(position, direction);
 			return;

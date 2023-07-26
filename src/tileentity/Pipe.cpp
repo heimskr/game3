@@ -187,38 +187,31 @@ namespace Game3 {
 	}
 
 	bool Pipe::onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) {
-		if (auto network = networks[PipeType::Item]) {
-			INFO("Item network ID: " << network->getID() << ", loaded: " << std::boolalpha << loaded[PipeType::Item]);
+		for (const PipeType pipe_type: PIPE_TYPES) {
+			if (auto network = networks[pipe_type]) {
+				INFO(pipe_type << " network ID: " << network->getID() << ", loaded: " << std::boolalpha << loaded[pipe_type]);
 
-			if (const auto &insertions = network->getInsertions(); !insertions.empty()) {
-				INFO("Item insertion points (" << insertions.size() << "):");
-				for (const auto &[pos, direction]: insertions)
-					INFO("- " << pos << ", " << direction);
-			} else {
-				INFO("No item insertion points.");
-			}
+				if (const auto &insertions = network->getInsertions(); !insertions.empty()) {
+					INFO(pipe_type << " insertion points (" << insertions.size() << "):");
+					for (const auto &[pos, direction]: insertions)
+						INFO("- " << pos << ", " << direction);
+				} else {
+					INFO("No " << pipe_type << " insertion points.");
+				}
 
-			if (const auto &extractions = network->getExtractions(); !extractions.empty()) {
-				INFO("Item extraction points (" << extractions.size() << "):");
-				for (const auto &[pos, direction]: extractions)
-					INFO("- " << pos << ", " << direction);
-			} else {
-				INFO("No item extraction points.");
-			}
+				if (const auto &extractions = network->getExtractions(); !extractions.empty()) {
+					INFO(pipe_type << " extraction points (" << extractions.size() << "):");
+					for (const auto &[pos, direction]: extractions)
+						INFO("- " << pos << ", " << direction);
+				} else {
+					INFO("No " << pipe_type << " extraction points.");
+				}
 
-			INFO("Overflow queue size: " << std::dynamic_pointer_cast<ItemNetwork>(network)->overflowCount());
-		} else
-			INFO("Pipe not connected to an item network.");
-
-		if (auto network = networks[PipeType::Fluid])
-			INFO("Fluid network ID: " << network->getID() << ", loaded: " << std::boolalpha << loaded[PipeType::Fluid]);
-		else
-			INFO("Pipe not connected to a fluid network.");
-
-		if (auto network = networks[PipeType::Energy])
-			INFO("Energy network ID: " << network->getID() << ", loaded: " << std::boolalpha << loaded[PipeType::Energy]);
-		else
-			INFO("Pipe not connected to an energy network.");
+				if (pipe_type == PipeType::Item)
+					INFO("Overflow queue size: " << std::dynamic_pointer_cast<ItemNetwork>(network)->overflowCount());
+			} else
+				INFO("Pipe not connected to a(n) " << pipe_type << " network.");
+		}
 
 		return false;
 	}

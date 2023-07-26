@@ -1,9 +1,9 @@
 #pragma once
 
 #include "game/HasFluids.h"
-#include "item/Item.h"
 #include "tileentity/TileEntity.h"
 
+#include <functional>
 #include <optional>
 
 namespace Game3 {
@@ -18,6 +18,7 @@ namespace Game3 {
 			virtual bool canInsertFluid(FluidStack, Direction);
 			/** Returns the amount not added. */
 			virtual FluidAmount addFluid(FluidStack, Direction);
+			virtual std::optional<FluidStack> extractFluid(Direction, const std::function<bool(FluidID)> &predicate, bool remove, const std::function<FluidAmount(FluidID)> &max_amount);
 			virtual std::optional<FluidStack> extractFluid(Direction, bool remove, FluidAmount max_amount);
 			virtual std::optional<FluidStack> extractFluid(Direction, bool remove);
 

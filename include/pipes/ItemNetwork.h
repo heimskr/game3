@@ -21,6 +21,9 @@ namespace Game3 {
 
 			inline size_t overflowCount() const { return overflowQueue.size(); }
 
+		protected:
+			bool canWorkWith(const std::shared_ptr<TileEntity> &) const final;
+
 		private:
 			std::optional<PairSet::iterator> roundRobinIterator;
 			Lockable<std::deque<ItemStack>> overflowQueue;

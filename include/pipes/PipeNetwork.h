@@ -13,6 +13,7 @@
 namespace Game3 {
 	class Pipe;
 	class Realm;
+	class TileEntity;
 
 	class PipeNetwork: public std::enable_shared_from_this<PipeNetwork> {
 		protected:
@@ -25,6 +26,8 @@ namespace Game3 {
 
 			Lockable<PairSet> extractions;
 			Lockable<PairSet> insertions;
+
+			virtual bool canWorkWith(const std::shared_ptr<TileEntity> &) const { return false; }
 
 		public:
 			PipeNetwork(size_t id_, const std::shared_ptr<Realm> &);

@@ -16,9 +16,9 @@ namespace Game3 {
 		if (!realm || insertions.empty())
 			return;
 
+		// Every so often, if there's anything in the overflowQueue, we try to insert that somewhere instead of extracting anything more.
 		if (overflowPeriod != 0 && tick_id % overflowPeriod == 0 && !overflowQueue.empty()) {
 			auto lock = overflowQueue.uniqueLock();
-			// Every so often, if there's anything in the overflowQueue, we try to insert that somewhere instead of extracting anything more.
 			std::optional<ItemStack> stack = std::move(overflowQueue.front());
 			overflowQueue.pop_front();
 
@@ -128,6 +128,10 @@ namespace Game3 {
 
 		// Just in case.
 		overflowQueue.clear();
+	}
+
+	bool ItemNetwork::canWorkWith(const std::shared_ptr<TileEntity> &tile_entity) const {
+		return std::dynamic_pointer_cast<InventoriedTileEntity>(tile_entity) != nullptr;
 	}
 
 	void ItemNetwork::advanceRoundRobin() {

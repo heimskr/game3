@@ -46,15 +46,15 @@ namespace Game3 {
 		auto iter = fluidLevels.find(stack.id);
 
 		if (iter == fluidLevels.end())
-			return fluidLevels.size() < getMaxFluidTypes() && stack.level <= getMaxLevel(stack.id);
+			return fluidLevels.size() < getMaxFluidTypes() && stack.amount <= getMaxLevel(stack.id);
 
-		const FluidAmount current_level = iter->second;
+		const FluidAmount current_amount = iter->second;
 
 		// Integer overflow definitely isn't allowed.
-		if (current_level + stack.level < current_level)
+		if (current_amount + stack.amount < current_amount)
 			return false;
 
-		return current_level + stack.level <= getMaxLevel(stack.id);
+		return current_amount + stack.amount <= getMaxLevel(stack.id);
 	}
 
 	bool HasFluids::empty() {

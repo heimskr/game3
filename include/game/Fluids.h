@@ -42,7 +42,7 @@ namespace Game3 {
 
 	struct FluidStack {
 		FluidID id = 0;
-		FluidAmount level = 0;
+		FluidAmount amount = 0;
 
 		FluidStack() = default;
 		FluidStack(FluidID, FluidAmount);

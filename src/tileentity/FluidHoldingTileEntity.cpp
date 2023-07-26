@@ -13,7 +13,7 @@ namespace Game3 {
 		return addFluid(stack);
 	}
 
-	std::optional<FluidStack> FluidHoldingTileEntity::extractFluid(Direction, bool remove, FluidAmount max_amount) {
+	std::optional<FluidStack> FluidHoldingTileEntity::extractFluid(Direction, const std::function<bool(FluidID)> &predicate, bool remove, const std::function<FluidAmount(FluidID)> &max_amount) {
 		{
 			auto lock = fluidLevels.sharedLock();
 			if (fluidLevels.empty())
@@ -23,17 +23,26 @@ namespace Game3 {
 		auto lock = fluidLevels.uniqueLock();
 		auto iter = fluidLevels.begin();
 
+		// Advance through possible fluids until we find an acceptable one.
+		if (predicate)
+			while (iter != fluidLevels.end() && !predicate(iter->first))
+				++iter;
+
 		if (iter == fluidLevels.end())
 			return std::nullopt;
 
 		const FluidID id = iter->first;
-		const FluidAmount to_remove = std::min(max_amount, iter->second);
+		const FluidAmount to_remove = std::min(max_amount? max_amount(id) : std::numeric_limits<FluidAmount>::max(), iter->second);
 
 		if (remove)
 			if (0 == (iter->second -= to_remove))
 				fluidLevels.erase(iter);
 
 		return FluidStack(id, to_remove);
+	}
+
+	std::optional<FluidStack> FluidHoldingTileEntity::extractFluid(Direction direction, bool remove, FluidAmount max_amount) {
+		return extractFluid(direction, [](FluidID) { return true; }, remove, [=](FluidID) { return max_amount; });
 	}
 
 	std::optional<FluidStack> FluidHoldingTileEntity::extractFluid(Direction direction, bool remove) {

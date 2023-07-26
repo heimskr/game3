@@ -119,6 +119,9 @@ namespace Game3 {
 		player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_axe"));
 		player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_hammer"));
 		player->inventory->add(ItemStack(*game, "base:item/cave_entrance"));
+		player->inventory->add(ItemStack(*game, "base:item/pump", 64));
+		player->inventory->add(ItemStack(*game, "base:item/tank", 64));
+		player->inventory->add(ItemStack(*game, "base:item/fluid_pipe", 64));
 		{
 			auto lock = game->lockPlayersUnique();
 			game->players.insert(player);
