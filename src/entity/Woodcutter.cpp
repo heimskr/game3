@@ -57,7 +57,7 @@ namespace Game3 {
 			chosenResource = json.at("chosenResource");
 	}
 
-	bool Woodcutter::onInteractNextTo(const std::shared_ptr<Player> &player) {
+	bool Woodcutter::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
 		if (getSide() == Side::Client) {
 			auto &window = getRealm()->getGame().toClient().getWindow();
 			auto &tab = *window.inventoryTab;

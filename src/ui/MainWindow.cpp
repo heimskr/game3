@@ -413,7 +413,7 @@ namespace Game3 {
 						player.interactNextTo(Modifiers());
 
 					if (!x && prevX)
-						player.interactOn();
+						player.interactOn(Modifiers());
 
 					if (up)
 						player.movingUp = true;
@@ -642,10 +642,10 @@ namespace Game3 {
 						player.send(ContinuousInteractionPacket(player.continuousInteractionModifiers));
 					return;
 				case GDK_KEY_E:
-					game->interactOn();
+					game->interactOn(Modifiers(modifiers));
 					return;
 				case GDK_KEY_e:
-					game->interactNextTo();
+					game->interactNextTo(Modifiers(modifiers));
 					return;
 				case GDK_KEY_space:
 					player.jump();

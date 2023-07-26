@@ -642,7 +642,7 @@ namespace Game3 {
 
 	void Realm::removeSafe(const TileEntityPtr &tile_entity) {
 		auto lock = tileEntities.uniqueLock();
-		remove(tile_entity, false);
+		remove(tile_entity, true);
 	}
 
 	void Realm::onMoved(const EntityPtr &entity, const Position &position) {
@@ -988,18 +988,25 @@ namespace Game3 {
 	}
 
 	void Realm::remakePathMap(const ChunkRange &range) {
-		for (auto y = range.topLeft.y; y <= range.bottomRight.y; ++y)
-			for (auto x = range.topLeft.x; x <= range.bottomRight.x; ++x)
-				remakePathMap(ChunkPosition{x, y});
+		range.iterate([this](ChunkPosition chunk_position) {
+			remakePathMap(chunk_position);
+		});
 	}
 
-	void Realm::remakePathMap(const ChunkPosition &position) {
+	void Realm::remakePathMap(ChunkPosition position) {
 		const auto &tileset = getTileset();
 		auto &path_chunk = tileProvider.getPathChunk(position);
 		auto lock = path_chunk.uniqueLock();
 		for (int64_t row = 0; row < CHUNK_SIZE; ++row)
 			for (int64_t column = 0; column < CHUNK_SIZE; ++column)
 				path_chunk[row * CHUNK_SIZE + column] = isWalkable(position.y * CHUNK_SIZE + row, position.x * CHUNK_SIZE + column, tileset);
+	}
+
+	void Realm::remakePathMap(Position position) {
+		const auto &tileset = getTileset();
+		auto &path_chunk = tileProvider.getPathChunk(getChunkPosition(position));
+		auto lock = path_chunk.uniqueLock();
+		path_chunk[position.row * CHUNK_SIZE + position.column] = isWalkable(position.row, position.column, tileset);
 	}
 
 	void Realm::markGenerated(const ChunkRange &range) {
@@ -1268,9 +1275,9 @@ namespace Game3 {
 				gmenu->append(entity->getName(), "entity_menu.entity" + std::to_string(i));
 				group->add_action("entity" + std::to_string(i++), [entity, overlap, player] {
 					if (overlap)
-						entity->onInteractOn(player);
+						entity->onInteractOn(player, Modifiers());
 					else
-						entity->onInteractNextTo(player);
+						entity->onInteractNextTo(player, Modifiers());
 				});
 			}
 

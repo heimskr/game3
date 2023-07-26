@@ -60,7 +60,7 @@ namespace Game3 {
 		timeRemaining = std::max(timeRemaining - delta, 0.f);
 	}
 
-	bool OreDeposit::onInteractNextTo(const PlayerPtr &player) {
+	bool OreDeposit::onInteractNextTo(const PlayerPtr &player, Modifiers) {
 		if (getSide() != Side::Server)
 			return false;
 

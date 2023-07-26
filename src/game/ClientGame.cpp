@@ -159,13 +159,13 @@ namespace Game3 {
 		missingChunks.erase(chunk_position);
 	}
 
-	void ClientGame::interactOn() {
+	void ClientGame::interactOn(Modifiers modifiers) {
 		assert(client);
-		client->send(InteractPacket(true));
+		client->send(InteractPacket(true, modifiers));
 	}
 
-	void ClientGame::interactNextTo() {
+	void ClientGame::interactNextTo(Modifiers modifiers) {
 		assert(client);
-		client->send(InteractPacket(false));
+		client->send(InteractPacket(false, modifiers));
 	}
 }

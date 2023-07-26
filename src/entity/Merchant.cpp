@@ -33,7 +33,7 @@ namespace Game3 {
 		greed = json.at("greed");
 	}
 
-	bool Merchant::onInteractNextTo(const std::shared_ptr<Player> &player) {
+	bool Merchant::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
 		if (getSide() == Side::Client) {
 			auto &window = getRealm()->getGame().toClient().canvas.window;
 			auto &tab = *window.merchantTab;

@@ -83,7 +83,7 @@ namespace Game3 {
 			march();
 	}
 
-	bool Ghost::onInteractNextTo(const std::shared_ptr<Player> &player) {
+	bool Ghost::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
 		auto &inventory = *player->inventory;
 		auto realm = getRealm();
 		if (auto leftover = inventory.add(material))

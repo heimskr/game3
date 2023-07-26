@@ -30,7 +30,7 @@ namespace Game3 {
 		}
 	}
 
-	bool Animal::onInteractNextTo(const std::shared_ptr<Player> &player) {
+	bool Animal::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
 		INFO(typeid(*this).name() << ' ' << getGID() << ':');
 		INFO("  Path length is " << path.size());
 		auto realm = getRealm();

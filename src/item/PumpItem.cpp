@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "Log.h"
 #include "Position.h"
 #include "Tileset.h"
 #include "entity/Player.h"
@@ -25,8 +26,9 @@ namespace Game3 {
 		const PlayerPtr &player   = place.player;
 		const Position  &position = place.position;
 
+		auto pump = std::dynamic_pointer_cast<Pump>(realm.tileEntityAt(position));
+
 		if (modifiers.onlyShift()) {
-			auto pump = std::dynamic_pointer_cast<Pump>(realm.tileEntityAt(position));
 			if (!pump)
 				return false;
 
@@ -36,8 +38,10 @@ namespace Game3 {
 			return true;
 		}
 
-		if (!realm.isPathable(position) || realm.hasTileEntityAt(position))
+		if (!realm.isPathable(position) || realm.hasTileEntityAt(position)) {
+			INFO("Pathable: " << realm.isPathable(position) << ", has TE: " << realm.hasTileEntityAt(position));
 			return false;
+		}
 
 		std::shared_ptr<Pump> tile_entity = TileEntity::create<Pump>(game, position);
 
@@ -49,6 +53,7 @@ namespace Game3 {
 			return true;
 		}
 
+		INFO("Oops, couldn't add...?");
 		return false;
 	}
 }

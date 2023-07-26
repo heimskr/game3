@@ -1,6 +1,7 @@
 #pragma once
 
 #include "game/Game.h"
+#include "ui/Modifiers.h"
 
 namespace Game3 {
 	class LocalClient;
@@ -29,8 +30,8 @@ namespace Game3 {
 			void tick() final;
 			void queuePacket(std::shared_ptr<Packet>);
 			void chunkReceived(ChunkPosition);
-			void interactOn();
-			void interactNextTo();
+			void interactOn(Modifiers);
+			void interactNextTo(Modifiers);
 
 			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update() const { return signal_player_inventory_update_; }
 			sigc::signal<void(const PlayerPtr &)> signal_player_money_update() const { return signal_player_money_update_; }

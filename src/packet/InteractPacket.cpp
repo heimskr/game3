@@ -8,7 +8,7 @@ namespace Game3 {
 	void InteractPacket::handle(ServerGame &, RemoteClient &client) {
 		if (auto player = client.getPlayer()) {
 			if (direct)
-				player->interactOn();
+				player->interactOn(modifiers);
 			else
 				player->interactNextTo(modifiers);
 		}

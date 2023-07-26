@@ -16,7 +16,7 @@ namespace Game3 {
 			CraftingStation & operator=(CraftingStation &&) = default;
 
 			void toJSON(nlohmann::json &) const override;
-			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 
 			void encode(Game &, Buffer &) override;

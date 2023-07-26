@@ -12,8 +12,8 @@ namespace Game3 {
 		Modifiers modifiers;
 
 		InteractPacket() = default;
-		InteractPacket(bool direct_):
-			direct(direct_) {}
+		InteractPacket(bool direct_, Modifiers modifiers_):
+			direct(direct_), modifiers(modifiers_) {}
 
 		PacketID getID() const override { return ID(); }
 

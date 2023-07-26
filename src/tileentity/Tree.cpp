@@ -49,7 +49,7 @@ namespace Game3 {
 		}
 	}
 
-	bool Tree::onInteractNextTo(const std::shared_ptr<Player> &player) {
+	bool Tree::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
 		if (age < MATURITY)
 			return false;
 

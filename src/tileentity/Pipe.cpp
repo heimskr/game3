@@ -186,7 +186,7 @@ namespace Game3 {
 		TileEntity::onRemove();
 	}
 
-	bool Pipe::onInteractNextTo(const std::shared_ptr<Player> &) {
+	bool Pipe::onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) {
 		if (auto network = networks[PipeType::Item]) {
 			INFO("Item network ID: " << network->getID() << ", loaded: " << std::boolalpha << loaded[PipeType::Item]);
 

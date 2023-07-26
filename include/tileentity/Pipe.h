@@ -106,7 +106,7 @@ namespace Game3 {
 
 			void onSpawn() override;
 			void onRemove() override;
-			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) override;
 	};
 
 	template <typename T>

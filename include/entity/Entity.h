@@ -1,17 +1,5 @@
 #pragma once
 
-#include <atomic>
-#include <functional>
-#include <list>
-#include <memory>
-#include <mutex>
-#include <optional>
-#include <shared_mutex>
-#include <string>
-#include <unordered_map>
-#include <unordered_set>
-#include <utility>
-
 #include "lib/Eigen.h"
 #include <nlohmann/json.hpp>
 
@@ -24,8 +12,21 @@
 #include "game/HasInventory.h"
 #include "item/Item.h"
 #include "threading/Lockable.h"
+#include "ui/Modifiers.h"
 #include "util/Castable.h"
 #include "util/WeakSet.h"
+
+#include <atomic>
+#include <functional>
+#include <list>
+#include <memory>
+#include <mutex>
+#include <optional>
+#include <shared_mutex>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
 
 namespace Game3 {
 	class Canvas;
@@ -96,9 +97,9 @@ namespace Game3 {
 			/** Removes the entity from existence. */
 			virtual void remove();
 			/** Handles when the player interacts with the tile they're on and that tile contains this entity. Returns whether anything interesting happened. */
-			virtual bool onInteractOn(const std::shared_ptr<Player> &) { return false; }
+			virtual bool onInteractOn(const std::shared_ptr<Player> &, Modifiers) { return false; }
 			/** Handles when the player interacts with the tile in front of them and that tile contains this entity. Returns whether anything interesting happened. */
-			virtual bool onInteractNextTo(const std::shared_ptr<Player> &) { return false; }
+			virtual bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) { return false; }
 			inline const Position::value_type & getRow()    const { return position.row;    }
 			inline const Position::value_type & getColumn() const { return position.column; }
 			inline Position::value_type & getRow()    { return position.row;    }

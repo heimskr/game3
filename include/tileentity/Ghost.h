@@ -79,7 +79,7 @@ namespace Game3 {
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			void onSpawn() override;
 			void onNeighborUpdated(Position offset) override;
-			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) override;
 			void render(SpriteRenderer &) override;
 			/** This method doesn't remove the tile entity or decrement the realm's ghost count by itself. */
 			void confirm();

@@ -56,7 +56,7 @@ namespace Game3 {
 			actionTime = json.at("actionTime");
 	}
 
-	bool Blacksmith::onInteractNextTo(const std::shared_ptr<Player> &player) {
+	bool Blacksmith::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
 		std::cout << "Blacksmith: money = " << money << ", phase = " << int(phase) << ", stuck = " << stuck << '\n';
 
 		if (phase != 10) {

@@ -17,11 +17,11 @@ namespace Game3 {
 		json["entrance"] = entrance;
 	}
 
-	bool Building::onInteractOn(const std::shared_ptr<Player> &player) {
-		return onInteractNextTo(player);
+	bool Building::onInteractOn(const std::shared_ptr<Player> &player, Modifiers modifiers) {
+		return onInteractNextTo(player, modifiers);
 	}
 
-	bool Building::onInteractNextTo(const std::shared_ptr<Player> &player) {
+	bool Building::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
 		if (getSide() == Side::Client)
 			return false;
 		teleport(player);

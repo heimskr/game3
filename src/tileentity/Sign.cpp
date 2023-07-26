@@ -20,7 +20,7 @@ namespace Game3 {
 		json["name"] = name;
 	}
 
-	bool Sign::onInteractNextTo(const std::shared_ptr<Player> &player) {
+	bool Sign::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
 		if (getSide() == Side::Client) {
 			auto &game = getRealm()->getGame().toClient();
 			game.setText(text, name, true, true);

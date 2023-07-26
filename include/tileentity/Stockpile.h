@@ -14,7 +14,7 @@ namespace Game3 {
 			Stockpile & operator=(Stockpile &&) = default;
 
 			void toJSON(nlohmann::json &) const override;
-			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 
 		protected:

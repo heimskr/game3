@@ -19,12 +19,12 @@ namespace Game3 {
 		Chest::toJSON(json);
 	}
 
-	bool Stockpile::onInteractNextTo(const std::shared_ptr<Player> &player) {
+	bool Stockpile::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers modifiers) {
 		auto keep = std::dynamic_pointer_cast<Keep>(getRealm());
 		if (!keep)
 			throw std::runtime_error("Stockpile must be placed inside a Keep realm");
 		std::cout << "Keep: money = " << keep->money << ", greed = " << keep->greed << '\n';
-		Chest::onInteractNextTo(player);
+		Chest::onInteractNextTo(player, modifiers);
 		return true;
 	}
 

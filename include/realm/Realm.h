@@ -154,7 +154,8 @@ namespace Game3 {
 			/** Redoes the pathmap for the entire stored map, not just the visible ones! Can be very expensive. */
 			void remakePathMap();
 			void remakePathMap(const ChunkRange &);
-			void remakePathMap(const ChunkPosition &);
+			void remakePathMap(ChunkPosition);
+			void remakePathMap(Position);
 			void markGenerated(const ChunkRange &);
 			void markGenerated(ChunkPosition);
 			bool isVisible(const Position &);

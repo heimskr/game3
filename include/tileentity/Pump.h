@@ -16,15 +16,21 @@ namespace Game3 {
 			Pump & operator=(const Pump &) = delete;
 			Pump & operator=(Pump &&) = default;
 
+			inline Direction getDirection() const { return pumpDirection; }
+			void setDirection(Direction);
+
 			void toJSON(nlohmann::json &) const override;
-			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			void render(SpriteRenderer &) override;
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
 
+
 		protected:
+			Direction pumpDirection = Direction::Down;
+
 			Pump() = default;
 			Pump(Identifier tile_id, Position);
 			Pump(Position);

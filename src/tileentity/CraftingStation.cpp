@@ -20,7 +20,7 @@ namespace Game3 {
 		json["stationType"] = stationType;
 	}
 
-	bool CraftingStation::onInteractNextTo(const std::shared_ptr<Player> &player) {
+	bool CraftingStation::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
 		player->stationTypes.insert(stationType);
 
 		if (player->getSide() == Side::Client) {

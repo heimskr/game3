@@ -17,20 +17,57 @@ namespace Game3 {
 		TileEntity(std::move(tile_id), ID(), position_, true) {}
 
 	Pump::Pump(Position position_):
-		Pump("base:tile/pump"_id, position_) {}
+		Pump("base:tile/pump_s"_id, position_) {}
+
+	void Pump::setDirection(Direction new_direction) {
+		pumpDirection = new_direction;
+
+		switch (pumpDirection) {
+			case Direction::Up:    tileID = "base:tile/pump_n"_id; break;
+			case Direction::Right: tileID = "base:tile/pump_e"_id; break;
+			case Direction::Down:  tileID = "base:tile/pump_s"_id; break;
+			case Direction::Left:  tileID = "base:tile/pump_w"_id; break;
+			default:
+				tileID = "base:tile/missing"_id;
+		}
+
+		cachedTile = -1;
+	}
 
 	void Pump::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
 		FluidHoldingTileEntity::toJSON(json);
+		json["direction"] = pumpDirection;
 	}
 
-	bool Pump::onInteractNextTo(const PlayerPtr &) {
-		return true;
+	bool Pump::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
+		auto &realm = *getRealm();
+		INFO("Modifiers: " << modifiers);
+
+		if (modifiers.onlyAlt()) {
+			INFO("Only alt");
+			realm.queueDestruction(shared_from_this());
+			player->give(ItemStack(realm.getGame(), "base:item/pump"_id));
+			return true;
+		}
+
+		if (modifiers.onlyCtrl()) {
+			INFO("Only ctrl");
+			setDirection(rotateClockwise(getDirection()));
+			increaseUpdateCounter();
+			broadcast();
+			return true;
+		}
+
+		INFO("Else");
+		// TODO: open fluid level module
+		return false;
 	}
 
 	void Pump::absorbJSON(Game &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		FluidHoldingTileEntity::absorbJSON(game, json);
+		setDirection(json.at("direction"));
 	}
 
 	void Pump::render(SpriteRenderer &sprite_renderer) {
@@ -60,10 +97,12 @@ namespace Game3 {
 	void Pump::encode(Game &game, Buffer &buffer) {
 		TileEntity::encode(game, buffer);
 		FluidHoldingTileEntity::encode(game, buffer);
+		buffer << getDirection();
 	}
 
 	void Pump::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
 		FluidHoldingTileEntity::decode(game, buffer);
+		setDirection(buffer.take<Direction>());
 	}
 }

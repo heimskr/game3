@@ -13,7 +13,7 @@ namespace Game3 {
 
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
-			bool onInteractNextTo(const std::shared_ptr<Player> &) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) override;
 			std::string getName() override { return "Blacksmith"; }
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;

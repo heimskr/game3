@@ -3,7 +3,9 @@
 #include <ostream>
 #include <string>
 
+#ifndef GAME3_SERVER_ONLY
 #include <gtkmm.h>
+#endif
 
 namespace Game3 {
 	class Buffer;
@@ -17,7 +19,10 @@ namespace Game3 {
 		Modifiers() = default;
 		Modifiers(uint8_t);
 		Modifiers(bool shift_, bool ctrl_, bool alt_, bool super_);
+
+#ifndef GAME3_SERVER_ONLY
 		explicit Modifiers(Gdk::ModifierType);
+#endif
 
 		explicit operator uint8_t() const;
 		explicit operator std::string() const;

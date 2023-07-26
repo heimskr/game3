@@ -28,7 +28,7 @@ namespace Game3 {
 		json["name"] = name;
 	}
 
-	bool Chest::onInteractNextTo(const std::shared_ptr<Player> &player) {
+	bool Chest::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
 		player->send(OpenAgentInventoryPacket(getGID()));
 		return true;
 	}

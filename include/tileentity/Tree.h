@@ -26,7 +26,7 @@ namespace Game3 {
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			void onSpawn() override;
 			void tick(Game &, float) override;
-			bool onInteractNextTo(const PlayerPtr &) override;
+			bool onInteractNextTo(const PlayerPtr &, Modifiers) override;
 			bool hasHive() const;
 			bool kill() override;
 			void render(SpriteRenderer &) override;

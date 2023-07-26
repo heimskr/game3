@@ -13,6 +13,8 @@ namespace Game3 {
 	constexpr std::array<Direction, 4> ALL_DIRECTIONS{Direction::Up, Direction::Right, Direction::Down, Direction::Left};
 
 	Direction remapDirection(Direction, uint16_t configuration);
+	Direction rotateClockwise(Direction);
+	Direction rotateCounterClockwise(Direction);
 	Direction flipDirection(Direction);
 	Direction randomDirection();
 

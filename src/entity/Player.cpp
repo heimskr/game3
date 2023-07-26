@@ -115,7 +115,7 @@ namespace Game3 {
 			if (continuousInteraction) {
 				Place place = getPlace();
 				if (!lastContinuousInteraction || *lastContinuousInteraction != place) {
-					interactOn();
+					interactOn(Modifiers());
 					getRealm()->interactGround(getShared(), position, continuousInteractionModifiers);
 					lastContinuousInteraction = std::move(place);
 				}
@@ -127,13 +127,13 @@ namespace Game3 {
 		}
 	}
 
-	bool Player::interactOn() {
+	bool Player::interactOn(Modifiers modifiers) {
 		auto realm = getRealm();
 		auto player = getShared();
 		auto entity = realm->findEntity(position, player);
 		if (!entity)
 			return false;
-		return entity->onInteractOn(player);
+		return entity->onInteractOn(player, modifiers);
 	}
 
 	void Player::interactNextTo(Modifiers modifiers) {
@@ -143,10 +143,10 @@ namespace Game3 {
 		auto entity = realm->findEntity(next_to, player);
 		bool interesting = false;
 		if (entity)
-			interesting = entity->onInteractNextTo(player);
+			interesting = entity->onInteractNextTo(player, modifiers);
 		if (!interesting)
 			if (auto tileEntity = realm->tileEntityAt(next_to))
-				interesting = tileEntity->onInteractNextTo(player);
+				interesting = tileEntity->onInteractNextTo(player, modifiers);
 		if (!interesting)
 			realm->interactGround(player, next_to, modifiers);
 	}
