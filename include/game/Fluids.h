@@ -34,16 +34,18 @@ namespace Game3 {
 		explicit operator std::string() const;
 
 		auto operator<=>(const FluidTile &) const = default;
+
+		inline bool isInfinite() const { return INFINITE <= level; }
 	};
 
 	std::ostream & operator<<(std::ostream &, FluidTile);
 
 	struct FluidStack {
 		FluidID id = 0;
-		FullFluidLevel level = 0;
+		FluidAmount level = 0;
 
 		FluidStack() = default;
-		FluidStack(FluidID, FullFluidLevel);
+		FluidStack(FluidID, FluidAmount);
 
 		explicit operator std::string() const;
 

@@ -6,30 +6,30 @@ namespace Game3 {
 	HasFluids::HasFluids(Map fluid_levels):
 		fluidLevels(std::move(fluid_levels)) {}
 
-	FullFluidLevel HasFluids::getMaxLevel(FluidID) const {
+	FluidAmount HasFluids::getMaxLevel(FluidID) const {
 		return std::numeric_limits<FluidLevel>::max();
 	}
 
-	FullFluidLevel HasFluids::addFluid(FluidStack stack) {
+	FluidAmount HasFluids::addFluid(FluidStack stack) {
 		auto [id, to_add] = stack;
 		auto lock = fluidLevels.uniqueLock();
 
 		if (getMaxFluidTypes() <= fluidLevels.size() && !fluidLevels.contains(id))
 			return to_add;
 
-		FullFluidLevel &level = fluidLevels[id];
-		const FullFluidLevel max = getMaxLevel(id);
+		FluidAmount &level = fluidLevels[id];
+		const FluidAmount max = getMaxLevel(id);
 
 		// Just in case there would be integer overflow.
 		if (level + to_add < level) {
-			const FullFluidLevel remainder = to_add - (std::numeric_limits<FullFluidLevel>::max() - level);
+			const FluidAmount remainder = to_add - (std::numeric_limits<FluidAmount>::max() - level);
 			level = max;
 			fluidsUpdated();
 			return remainder;
 		}
 
 		if (max < level + to_add) {
-			const FullFluidLevel remainder = level + to_add - max;
+			const FluidAmount remainder = level + to_add - max;
 			level = max;
 			fluidsUpdated();
 			return remainder;
@@ -48,7 +48,7 @@ namespace Game3 {
 		if (iter == fluidLevels.end())
 			return fluidLevels.size() < getMaxFluidTypes() && stack.level <= getMaxLevel(stack.id);
 
-		const FullFluidLevel current_level = iter->second;
+		const FluidAmount current_level = iter->second;
 
 		// Integer overflow definitely isn't allowed.
 		if (current_level + stack.level < current_level)

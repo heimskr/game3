@@ -9,11 +9,11 @@ namespace Game3 {
 		return canInsertFluid(stack);
 	}
 
-	FullFluidLevel FluidHoldingTileEntity::addFluid(FluidStack stack, Direction) {
+	FluidAmount FluidHoldingTileEntity::addFluid(FluidStack stack, Direction) {
 		return addFluid(stack);
 	}
 
-	std::optional<FluidStack> FluidHoldingTileEntity::extractFluid(Direction, bool remove, FullFluidLevel max_amount) {
+	std::optional<FluidStack> FluidHoldingTileEntity::extractFluid(Direction, bool remove, FluidAmount max_amount) {
 		{
 			auto lock = fluidLevels.sharedLock();
 			if (fluidLevels.empty())
@@ -27,7 +27,7 @@ namespace Game3 {
 			return std::nullopt;
 
 		const FluidID id = iter->first;
-		const FullFluidLevel to_remove = std::min(max_amount, iter->second);
+		const FluidAmount to_remove = std::min(max_amount, iter->second);
 
 		if (remove)
 			if (0 == (iter->second -= to_remove))
@@ -37,7 +37,7 @@ namespace Game3 {
 	}
 
 	std::optional<FluidStack> FluidHoldingTileEntity::extractFluid(Direction direction, bool remove) {
-		return extractFluid(direction, remove, std::numeric_limits<FullFluidLevel>::max());
+		return extractFluid(direction, remove, std::numeric_limits<FluidAmount>::max());
 	}
 
 	void FluidHoldingTileEntity::setFluidLevels(HasFluids::Map map) {

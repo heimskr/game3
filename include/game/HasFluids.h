@@ -14,15 +14,15 @@ namespace Game3 {
 
 	class HasFluids {
 		public:
-			using Map = std::map<FluidID, FullFluidLevel>;
+			using Map = std::map<FluidID, FluidAmount>;
 
 			HasFluids(Map = {});
 
 			virtual size_t getMaxFluidTypes() const { return 1; }
-			virtual FullFluidLevel getMaxLevel(FluidID) const;
+			virtual FluidAmount getMaxLevel(FluidID) const;
 
 			/** Returns how much fluid was unable to be added. */
-			FullFluidLevel addFluid(FluidStack);
+			FluidAmount addFluid(FluidStack);
 
 			virtual bool canInsertFluid(FluidStack);
 

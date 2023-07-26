@@ -9,6 +9,10 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "te/pump"}; }
 
+			constexpr static float PERIOD = 0.25;
+
+			FluidAmount extractionRate = 250;
+
 			Pump(const Pump &) = delete;
 			Pump(Pump &&) = default;
 			~Pump() override = default;
@@ -19,6 +23,9 @@ namespace Game3 {
 			inline Direction getDirection() const { return pumpDirection; }
 			void setDirection(Direction);
 
+			FluidAmount getMaxLevel(FluidID) const override;
+
+			void tick(Game &, float) override;
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
@@ -27,8 +34,9 @@ namespace Game3 {
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
 
-
-		protected:
+		private:
+			TileID cachedTile = -1;
+			float accumulatedTime = 0.f;
 			Direction pumpDirection = Direction::Down;
 
 			Pump() = default;
@@ -37,7 +45,5 @@ namespace Game3 {
 
 			friend class TileEntity;
 
-		private:
-			TileID cachedTile = -1;
 	};
 }

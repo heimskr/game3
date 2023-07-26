@@ -34,6 +34,48 @@ namespace Game3 {
 		cachedTile = -1;
 	}
 
+	FluidAmount Pump::getMaxLevel(FluidID) const {
+		return 64 * FluidTile::FULL;
+	}
+
+	void Pump::tick(Game &, float delta) {
+		auto realm = weakRealm.lock();
+		if (!realm || realm->getSide() != Side::Server)
+			return;
+
+		accumulatedTime += delta;
+
+		if (accumulatedTime < PERIOD)
+			return;
+
+		const FluidAmount amount = std::min<FluidAmount>(std::numeric_limits<FluidLevel>::max(), extractionRate * accumulatedTime);
+		accumulatedTime = 0.f;
+
+		if (amount == 0)
+			return;
+
+		auto fluid = realm->tryFluid(position + pumpDirection);
+		if (!fluid)
+			return;
+
+		const FluidLevel to_remove = std::min<FluidLevel>(amount, fluid->level);
+		if (to_remove == 0)
+			return;
+
+		const FluidAmount not_added = addFluid(FluidStack(fluid->id, to_remove));
+		const FluidAmount removed = to_remove - not_added;
+
+		if (removed == 0)
+			return;
+
+		assert(removed <= std::numeric_limits<FluidLevel>::max());
+
+		if (!fluid->isInfinite()) {
+			fluid->level -= FluidLevel(removed);
+			realm->setFluid(position + pumpDirection, *fluid);
+		}
+	}
+
 	void Pump::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
 		FluidHoldingTileEntity::toJSON(json);
@@ -42,25 +84,25 @@ namespace Game3 {
 
 	bool Pump::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
 		auto &realm = *getRealm();
-		INFO("Modifiers: " << modifiers);
 
 		if (modifiers.onlyAlt()) {
-			INFO("Only alt");
 			realm.queueDestruction(shared_from_this());
 			player->give(ItemStack(realm.getGame(), "base:item/pump"_id));
 			return true;
 		}
 
 		if (modifiers.onlyCtrl()) {
-			INFO("Only ctrl");
 			setDirection(rotateClockwise(getDirection()));
 			increaseUpdateCounter();
 			broadcast();
 			return true;
 		}
 
-		INFO("Else");
 		// TODO: open fluid level module
+		auto lock = fluidLevels.sharedLock();
+		for (const auto &[id, amount]: fluidLevels) {
+			INFO(realm.getGame().getFluid(id)->identifier << " = " << amount);
+		}
 		return false;
 	}
 

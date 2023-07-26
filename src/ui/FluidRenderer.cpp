@@ -161,7 +161,7 @@ namespace Game3 {
 					if (FluidTile::FULL <= fluid_opt->level)
 						opacity = 1.f;
 					else
-						opacity = fluid_opt->level / FluidTile::FULL;
+						opacity = float(fluid_opt->level) / FluidTile::FULL;
 				}
 			}
 

@@ -36,7 +36,7 @@ namespace Game3 {
 
 // FluidStack
 
-	FluidStack::FluidStack(FluidID id_, FullFluidLevel level_):
+	FluidStack::FluidStack(FluidID id_, FluidAmount level_):
 		id(id_), level(level_) {}
 
 	FluidStack::operator std::string() const {
