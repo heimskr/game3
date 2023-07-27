@@ -27,10 +27,11 @@ namespace Game3 {
 	using GlobalID       = uint64_t;
 	using Token          = uint64_t;
 	using FluidLevel     = uint16_t;
-	using FluidAmount = uint64_t;
+	using FluidAmount    = uint64_t;
 	using FluidID        = uint16_t;
 	using UpdateCounter  = uint64_t;
 	using Tick           = uint64_t;
+	using EnergyAmount   = uint64_t;
 
 	using ItemID     = Identifier;
 	using EntityType = Identifier;

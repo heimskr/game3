@@ -22,11 +22,11 @@ namespace Game3 {
 			virtual FluidAmount getMaxLevel(FluidID) const;
 
 			/** Returns how much fluid was unable to be added. */
-			FluidAmount addFluid(FluidStack);
+			virtual FluidAmount addFluid(FluidStack);
 
 			virtual bool canInsertFluid(FluidStack);
 
-			bool empty();
+			bool fluidsEmpty();
 
 			virtual void fluidsUpdated() {}
 

@@ -22,8 +22,9 @@ namespace Game3 {
 
 		// Just in case there would be integer overflow.
 		if (level + to_add < level) {
-			const FluidAmount remainder = to_add - (std::numeric_limits<FluidAmount>::max() - level);
+			const FluidAmount remainder = to_add - (max - level);
 			level = max;
+			lock.unlock();
 			fluidsUpdated();
 			return remainder;
 		}
@@ -31,11 +32,13 @@ namespace Game3 {
 		if (max < level + to_add) {
 			const FluidAmount remainder = level + to_add - max;
 			level = max;
+			lock.unlock();
 			fluidsUpdated();
 			return remainder;
 		}
 
 		level += to_add;
+		lock.unlock();
 		fluidsUpdated();
 		return 0;
 	}
@@ -57,7 +60,7 @@ namespace Game3 {
 		return current_amount + stack.amount <= getMaxLevel(stack.id);
 	}
 
-	bool HasFluids::empty() {
+	bool HasFluids::fluidsEmpty() {
 		auto lock = fluidLevels.sharedLock();
 		return fluidLevels.empty();
 	}
