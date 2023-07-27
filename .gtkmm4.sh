@@ -6,9 +6,9 @@ sudo pip3 install ninja
 mkdir .github-deps
 cd .github-deps
 
-wget https://download.gnome.org/sources/glib/2.76/glib-2.76.1.tar.xz
-tar xf glib-2.76.1.tar.xz
-cd glib-2.76.1
+wget https://download.gnome.org/sources/glib/2.77/glib-2.77.0.tar.xz
+tar xf glib-2.77.0.tar.xz
+cd glib-2.77.0
 meson setup --libdir lib -Dtests=false meson_build .
 cd meson_build
 sudo ninja install
