@@ -37,7 +37,9 @@ namespace Game3 {
 			void update(const std::shared_ptr<ClientGame> &) override;
 			void reset(const std::shared_ptr<ClientGame> &) override;
 			void setModule(std::unique_ptr<Module> &&);
-			Module & getModule() const { return *currentModule; }
+			Module & getModule() const;
+			Module * getModule(std::shared_lock<std::shared_mutex> &);
+			Module * getModule(std::unique_lock<std::shared_mutex> &);
 			void removeModule();
 			GlobalID getExternalGID() const;
 
@@ -51,7 +53,7 @@ namespace Game3 {
 			std::unordered_map<Gtk::Widget *, Slot> widgetMap;
 			std::unordered_map<Slot, Gtk::Widget *> widgetsBySlot;
 			Glib::RefPtr<Gio::Menu> gmenu;
-			std::unique_ptr<Module> currentModule;
+			Lockable<std::unique_ptr<Module>> currentModule;
 
 			/** We can't store state in a popover, so we have to store it here. */
 			std::shared_ptr<ClientGame> lastGame;

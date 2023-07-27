@@ -18,6 +18,7 @@ namespace Game3 {
 			Gtk::Widget & getWidget() final;
 			void reset()  final;
 			void update() final;
+			void updateIf(const std::shared_ptr<HasFluids> &);
 			// void onResize(int) final;
 
 		private:

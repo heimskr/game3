@@ -74,6 +74,11 @@ namespace Game3 {
 		reset();
 	}
 
+	void FluidLevelsModule::updateIf(const std::shared_ptr<HasFluids> &has_fluids) {
+		if (has_fluids == fluidHaver)
+			update();
+	}
+
 	// void FluidLevelsModule::onResize(int width) {
 	// 	tabWidth = width;
 	// 	update();

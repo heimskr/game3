@@ -1,3 +1,4 @@
+#include "game/ClientGame.h"
 #include "realm/Realm.h"
 #include "tileentity/FluidHoldingTileEntity.h"
 
@@ -55,8 +56,16 @@ namespace Game3 {
 	}
 
 	void FluidHoldingTileEntity::fluidsUpdated() {
-		increaseUpdateCounter();
-		broadcast();
+		auto realm = weakRealm.lock();
+		if (!realm)
+			return;
+
+		if (realm->getSide() == Side::Server) {
+			increaseUpdateCounter();
+			broadcast();
+		} else {
+			getRealm()->getGame().toClient().signal_fluid_update().emit(std::dynamic_pointer_cast<HasFluids>(shared_from_this()));
+		}
 	}
 
 	void FluidHoldingTileEntity::toJSON(nlohmann::json &json) const {
@@ -74,5 +83,6 @@ namespace Game3 {
 
 	void FluidHoldingTileEntity::decode(Game &, Buffer &buffer) {
 		HasFluids::decode(buffer);
+		fluidsUpdated();
 	}
 }

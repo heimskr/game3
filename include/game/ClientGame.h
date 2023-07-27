@@ -4,6 +4,8 @@
 #include "ui/Modifiers.h"
 
 namespace Game3 {
+	class HasFluids;
+	class HasInventory;
 	class LocalClient;
 	class Packet;
 
@@ -33,9 +35,10 @@ namespace Game3 {
 			void interactOn(Modifiers);
 			void interactNextTo(Modifiers);
 
-			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update() const { return signal_player_inventory_update_; }
-			sigc::signal<void(const PlayerPtr &)> signal_player_money_update() const { return signal_player_money_update_; }
-			sigc::signal<void(const std::shared_ptr<Agent> &)> signal_other_inventory_update()  const { return signal_other_inventory_update_; }
+			auto signal_player_inventory_update() const { return signal_player_inventory_update_; }
+			auto signal_player_money_update()     const { return signal_player_money_update_;     }
+			auto signal_other_inventory_update()  const { return signal_other_inventory_update_;  }
+			auto signal_fluid_update()            const { return signal_fluid_update_;            }
 
 			Side getSide() const override { return Side::Client; }
 
@@ -43,6 +46,7 @@ namespace Game3 {
 			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update_;
 			sigc::signal<void(const PlayerPtr &)> signal_player_money_update_;
 			sigc::signal<void(const std::shared_ptr<Agent> &)> signal_other_inventory_update_;
+			sigc::signal<void(const std::shared_ptr<HasFluids> &)> signal_fluid_update_;
 
 			std::set<ChunkPosition> missingChunks;
 			MTQueue<std::shared_ptr<Packet>> packetQueue;

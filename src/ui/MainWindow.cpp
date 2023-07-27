@@ -335,6 +335,11 @@ namespace Game3 {
 			inventoryTab->update(game);
 			merchantTab->update(game);
 		});
+		game->signal_fluid_update().connect([this](const std::shared_ptr<HasFluids> &has_fluids) {
+			std::unique_lock<std::shared_mutex> lock;
+			if (auto *fluid_module = dynamic_cast<FluidLevelsModule *>(inventoryTab->getModule(lock)))
+				fluid_module->updateIf(has_fluids);
+		});
 	}
 
 	bool MainWindow::render(const Glib::RefPtr<Gdk::GLContext> &context) {
@@ -343,123 +348,6 @@ namespace Game3 {
 		glArea.throw_if_error();
 		glClearColor(.2f, .2f, .2f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		for (int joystick = GLFW_JOYSTICK_1; joystick <= GLFW_JOYSTICK_LAST; ++joystick)
-			if (glfwJoystickPresent(joystick)) {
-				int button_count = 0;
-				const uint8_t *buttons = glfwGetJoystickButtons(joystick, &button_count);
-				// const bool left_pad = buttons[0];
-				const bool right_pad = buttons[1];
-				const bool a = buttons[2];
-				const bool b = buttons[3];
-				const bool x = buttons[4];
-				const bool y = buttons[5];
-				const bool l2Full = buttons[8];
-				const bool left_grip  = buttons[15];
-				const bool right_grip = buttons[16];
-				const bool up    = buttons[17];
-				const bool down  = buttons[18];
-				const bool left  = buttons[19];
-				const bool right = buttons[20];
-
-				int axis_count = 0;
-				const float *axes = glfwGetJoystickAxes(joystick, &axis_count);
-				if (axes != nullptr && 4 <= axis_count) {
-					if (right_pad && canvas) {
-						const float rx = axes[2];
-						const float ry = axes[3];
-						if (!prevRightPad) {
-							autofocus = false;
-							rightPadStartX = rx;
-							rightPadStartY = ry;
-							rightPadStartCanvasX = canvas->center.x();
-							rightPadStartCanvasY = canvas->center.y();
-						} else {
-							const float multiplier = 10.f;
-							if (rx <= -0.01 || 0.01 <= rx)
-								canvas->center.x() = rightPadStartCanvasX + (rx - rightPadStartX) * multiplier;
-							if (ry <= -0.01 || 0.01 <= ry)
-								canvas->center.y() = rightPadStartCanvasY + (ry - rightPadStartY) * multiplier;
-						}
-					}
-
-					if (game && game->player) {
-						const float lx = axes[0];
-						const float ly = axes[1];
-						auto &player = *game->player;
-						if (ly <= -.5f)
-							player.movingUp = true;
-						else if (-.1f < ly)
-							player.movingUp = false;
-						if (.5f <= ly)
-							player.movingDown = true;
-						else if (ly < .1f)
-							player.movingDown = false;
-						if (lx <= -.5f)
-							player.movingLeft = true;
-						else if (-.1f < lx)
-							player.movingLeft = false;
-						if (.5f <= lx)
-							player.movingRight = true;
-						else if (lx < .1f)
-							player.movingRight = false;
-					}
-				}
-
-				if (l2Full)
-					autofocus = true;
-
-				if (game && game->player) {
-					auto &player = *game->player;
-					if (!a && prevA)
-						player.interactNextTo(Modifiers());
-
-					if (!x && prevX)
-						player.interactOn(Modifiers());
-
-					if (up)
-						player.movingUp = true;
-					else if (prevUp)
-						player.movingUp = false;
-
-					if (down)
-						player.movingDown = true;
-					else if (prevDown)
-						player.movingDown = false;
-
-					if (left)
-						player.movingLeft = true;
-					else if (prevLeft)
-						player.movingLeft = false;
-
-					if (right)
-						player.movingRight = true;
-					else if (prevRight)
-						player.movingRight = false;
-
-					if (canvas) {
-						if (left_grip)
-							canvas->scale /= 1.01f;
-						if (right_grip)
-							canvas->scale *= 1.01f;
-					}
-				}
-
-				if (left_grip && right_grip && x)
-					get_application()->quit();
-
-				prevA = a;
-				prevB = b;
-				prevX = x;
-				prevY = y;
-				prevUp = up;
-				prevDown = down;
-				prevLeft = left;
-				prevRight = right;
-				prevRightPad = right_pad;
-
-				// for (int i = 0; i < button_count; ++i) std::cout << i << ':' << int(buttons[i]) << ' ';
-				// std::cout << '\n';
-			}
 		if (autofocus && game && game->player)
 			game->player->focus(*canvas, true);
 		canvas->drawGL();

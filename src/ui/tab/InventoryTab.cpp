@@ -99,6 +99,7 @@ namespace Game3 {
 	void InventoryTab::onResize(const std::shared_ptr<ClientGame> &game) {
 		if (gridWidth() != lastGridWidth) {
 			reset(game);
+			auto lock = currentModule.sharedLock();
 			if (currentModule)
 				currentModule->onResize(grid.get_width());
 		}
@@ -114,6 +115,7 @@ namespace Game3 {
 			if (game->player->inventory)
 				populate(grid, static_cast<ClientInventory &>(*game->player->inventory));
 
+			auto lock = currentModule.sharedLock();
 			if (currentModule)
 				currentModule->update();
 		});
@@ -136,6 +138,7 @@ namespace Game3 {
 			if (game->player->inventory)
 				populate(grid, static_cast<ClientInventory &>(*game->player->inventory));
 
+			auto lock = currentModule.sharedLock();
 			if (currentModule)
 				currentModule->reset();
 		});
@@ -230,13 +233,32 @@ namespace Game3 {
 	void InventoryTab::setModule(std::unique_ptr<Module> &&module_) {
 		assert(module_);
 		removeModule();
-		currentModule = std::move(module_);
+		auto lock = currentModule.uniqueLock();
+		currentModule.std::unique_ptr<Module>::operator=(std::move(module_));
 		vbox.append(currentModule->getWidget());
 		currentModule->onResize(grid.get_width());
 		currentModule->reset();
 	}
 
+	Module & InventoryTab::getModule() const {
+		assert(currentModule);
+		return *currentModule;
+	}
+
+	Module * InventoryTab::getModule(std::shared_lock<std::shared_mutex> &lock) {
+		if (currentModule)
+			lock = currentModule.sharedLock();
+		return currentModule.get();
+	}
+
+	Module * InventoryTab::getModule(std::unique_lock<std::shared_mutex> &lock) {
+		if (currentModule)
+			lock = currentModule.uniqueLock();
+		return currentModule.get();
+	}
+
 	void InventoryTab::removeModule() {
+		auto lock = currentModule.uniqueLock();
 		if (currentModule) {
 			vbox.remove(currentModule->getWidget());
 			currentModule.reset();
