@@ -11,7 +11,7 @@ namespace Game3 {
 
 		// Handle integer overflow
 		if (energyAmount + to_add < energyAmount) {
-			const EnergyAmount remainder = to_add - (std::numeric_limits<EnergyAmount>::max() - energyAmount);
+			const EnergyAmount remainder = to_add - (max - energyAmount);
 			energyAmount = max;
 			lock.unlock();
 			energyUpdated();
