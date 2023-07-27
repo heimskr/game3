@@ -4,6 +4,7 @@
 #include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/ServerInventory.h"
+#include "packet/OpenFluidLevelsPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Pump.h"
 #include "ui/SpriteRenderer.h"
@@ -94,7 +95,8 @@ namespace Game3 {
 			return true;
 		}
 
-		// TODO: open fluid level module
+		player->send(OpenFluidLevelsPacket(getGID()));
+
 		auto lock = fluidLevels.sharedLock();
 		for (const auto &[id, amount]: fluidLevels) {
 			INFO(realm.getGame().getFluid(id)->identifier << " = " << amount);

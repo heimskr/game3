@@ -66,8 +66,6 @@ namespace Game3 {
 		grid.add_controller(target);
 	}
 
-	ExternalInventoryModule::~ExternalInventoryModule() = default;
-
 	Gtk::Widget & ExternalInventoryModule::getWidget() {
 		return vbox;
 	}

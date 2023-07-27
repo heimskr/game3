@@ -15,8 +15,6 @@ namespace Game3 {
 		public:
 			ExternalInventoryModule(std::shared_ptr<ClientGame>, std::shared_ptr<ClientInventory>);
 
-			~ExternalInventoryModule() override;
-
 			Gtk::Widget & getWidget() final;
 			void reset()  final;
 			void update() final;

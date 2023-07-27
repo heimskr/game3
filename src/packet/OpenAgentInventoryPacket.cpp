@@ -4,7 +4,6 @@
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
 #include "packet/OpenAgentInventoryPacket.h"
-#include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "ui/tab/InventoryTab.h"
 
@@ -22,10 +21,10 @@ namespace Game3 {
 			return;
 		}
 
-		auto &window = game.canvas.window;
+		auto &window = game.getWindow();
 		auto tab = window.inventoryTab;
 
-		game.player->queueForMove([player = game.player, tab](const auto &) {
+		game.player->queueForMove([tab](const auto &) {
 			tab->removeModule();
 			return true;
 		});

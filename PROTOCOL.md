@@ -238,7 +238,6 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 40. **Open Agent Inventory**: tells a client to open an agent's inventory.
 
 	- `u64` Global ID
-	- `string` Name
 
 41. **Swap Slots**: tells the server to swap a slot in one agent's inventory with a slot in another agent's inventory.
 
@@ -247,7 +246,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i32` First Slot
 	- `i32` Second Slot
 
-41. **Move Slots**: tells the server to move a slot in one agent's inventory into a slot in another agent's inventory.
+42. **Move Slots**: tells the server to move a slot in one agent's inventory into a slot in another agent's inventory.
 
 	- `u64` First Agent Global ID
 	- `u64` Second Agent Global ID
@@ -256,6 +255,10 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	This differs from Swap Slots in that compatible stacks will be merged instead of swapped
 	and that the first slot has to have something in it.
+
+43. **Open Fluid Levels**: tells a client to display an agent's fluid levels.
+
+	- `u64` Global ID
 
 # Message Format
 

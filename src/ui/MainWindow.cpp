@@ -25,6 +25,7 @@
 #include "ui/gtk/ConnectDialog.h"
 #include "ui/gtk/JSONDialog.h"
 #include "ui/module/ExternalInventoryModule.h"
+#include "ui/module/FluidLevelsModule.h"
 #include "ui/tab/CraftingTab.h"
 #include "ui/tab/InventoryTab.h"
 #include "ui/tab/MerchantTab.h"
@@ -535,6 +536,10 @@ namespace Game3 {
 			if (auto inventory = ext_module->getInventory())
 				return inventory->getOwner()->getGID();
 		return -1;
+	}
+
+	void MainWindow::showFluids(const std::shared_ptr<HasFluids> &has_fluids) {
+		inventoryTab->setModule(std::make_unique<FluidLevelsModule>(game, has_fluids));
 	}
 
 	bool MainWindow::onKeyPressed(guint keyval, guint keycode, Gdk::ModifierType modifiers) {

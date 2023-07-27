@@ -20,6 +20,7 @@ namespace Game3 {
 	class ClientGame;
 	class ClientInventory;
 	class CraftingTab;
+	class HasFluids;
 	class InventoryTab;
 	class MerchantTab;
 	class TextTab;
@@ -65,6 +66,8 @@ namespace Game3 {
 
 			void showExternalInventory(const std::shared_ptr<ClientInventory> &);
 			GlobalID getExternalGID() const;
+
+			void showFluids(const std::shared_ptr<HasFluids> &);
 
 			friend class Canvas;
 

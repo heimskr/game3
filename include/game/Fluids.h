@@ -10,12 +10,13 @@ namespace Game3 {
 	class Buffer;
 
 	struct Fluid: NamedRegisterable {
+		std::string name;
 		Identifier tilesetName;
 		Identifier tilename;
 		Identifier flaskName;
 
 		Fluid() = delete;
-		Fluid(Identifier identifier_, Identifier tileset_name, Identifier tilename_, Identifier flask_name = {});
+		Fluid(Identifier identifier_, std::string name_, Identifier tileset_name, Identifier tilename_, Identifier flask_name = {});
 	};
 
 	struct FluidTile {

@@ -56,6 +56,7 @@ namespace Game3 {
 
 	void FluidHoldingTileEntity::fluidsUpdated() {
 		increaseUpdateCounter();
+		broadcast();
 	}
 
 	void FluidHoldingTileEntity::toJSON(nlohmann::json &json) const {

@@ -33,6 +33,9 @@ namespace Game3 {
 			void encode(Buffer &);
 			void decode(Buffer &);
 
+			inline auto & getFluidLevels() { return fluidLevels; }
+			inline const auto & getFluidLevels() const { return fluidLevels; }
+
 		protected:
 			Lockable<Map> fluidLevels;
 	};

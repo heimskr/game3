@@ -2,6 +2,7 @@
 
 #include "Tileset.h"
 #include "game/ClientGame.h"
+#include "packet/OpenFluidLevelsPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Tank.h"
 #include "ui/SpriteRenderer.h"
@@ -31,7 +32,8 @@ namespace Game3 {
 			return true;
 		}
 
-		// TODO: open fluid level module
+		player->send(OpenFluidLevelsPacket(getGID()));
+
 		auto lock = fluidLevels.sharedLock();
 		if (fluidLevels.empty())
 			WARN("No fluids.");

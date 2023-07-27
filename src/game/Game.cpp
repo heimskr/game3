@@ -92,6 +92,7 @@
 #include "packet/OpenAgentInventoryPacket.h"
 #include "packet/SwapSlotsPacket.h"
 #include "packet/MoveSlotsPacket.h"
+#include "packet/OpenFluidLevelsPacket.h"
 #include "realm/Cave.h"
 #include "realm/House.h"
 #include "realm/Keep.h"
@@ -394,6 +395,7 @@ namespace Game3 {
 		add(PacketFactory::create<OpenAgentInventoryPacket>());
 		add(PacketFactory::create<SwapSlotsPacket>());
 		add(PacketFactory::create<MoveSlotsPacket>());
+		add(PacketFactory::create<OpenFluidLevelsPacket>());
 	}
 
 	void Game::addLocalCommandFactories() {
@@ -569,9 +571,9 @@ namespace Game3 {
 			auto &fluids = registry<FluidRegistry>();
 			for (const auto &[key, value]: json.at(1).items()) {
 				if (auto iter = value.find("flask"); iter != value.end())
-					fluids.add(Identifier(key), Fluid(Identifier(key), value.at("tileset"), value.at("tilename"), *iter));
+					fluids.add(Identifier(key), Fluid(Identifier(key), value.at("name"), value.at("tileset"), value.at("tilename"), *iter));
 				else
-					fluids.add(Identifier(key), Fluid(Identifier(key), value.at("tileset"), value.at("tilename")));
+					fluids.add(Identifier(key), Fluid(Identifier(key), value.at("name"), value.at("tileset"), value.at("tilename")));
 			}
 
 		} else if (type == "base:crop_map"_id) {
