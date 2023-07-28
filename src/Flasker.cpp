@@ -133,7 +133,7 @@ namespace Game3 {
 		return rgb;
 	}
 
-	std::string generateFlask(uint16_t hue, float saturation, float value_diff) {
+	std::string generateFlask(const std::string &base_filename, const std::string &mask_filename, uint16_t hue, float saturation, float value_diff) {
 		int base_width  = 0;
 		int base_height = 0;
 		int mask_width  = 0;
@@ -141,13 +141,13 @@ namespace Game3 {
 		int base_channels = 0;
 		int mask_channels = 0;
 
-		uint8_t *base = stbi_load("resources/flaskbase.png", &base_width, &base_height, &base_channels, 0);
+		uint8_t *base = stbi_load(base_filename.c_str(), &base_width, &base_height, &base_channels, 0);
 		if (base == nullptr)
-			throw std::runtime_error("Couldn't load resources/flaskbase.png");
+			throw std::runtime_error("Couldn't load " + base_filename);
 
-		uint8_t *mask = stbi_load("resources/flaskmask.png", &mask_width, &mask_height, &mask_channels, 0);
+		uint8_t *mask = stbi_load(mask_filename.c_str(), &mask_width, &mask_height, &mask_channels, 0);
 		if (mask == nullptr)
-			throw std::runtime_error("Couldn't load resources/flaskmask.png");
+			throw std::runtime_error("Couldn't load " + mask_filename);
 
 		if (base_width != mask_width)
 			throw std::runtime_error("Width mismatch (" + std::to_string(base_width) + " base vs. " + std::to_string(mask_width) + " mask)");
@@ -196,7 +196,7 @@ namespace Game3 {
 		return ss.str();
 	}
 
-	std::string generateFlask(std::string_view hue, std::string_view saturation, std::string_view value_diff) {
-		return generateFlask(parseNumber<uint16_t>(hue), parseNumber<float>(saturation), parseNumber<float>(value_diff));
+	std::string generateFlask(const std::string &base_filename, const std::string &mask_filename, std::string_view hue, std::string_view saturation, std::string_view value_diff) {
+		return generateFlask(base_filename, mask_filename, parseNumber<uint16_t>(hue), parseNumber<float>(saturation), parseNumber<float>(value_diff));
 	}
 }

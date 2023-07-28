@@ -420,7 +420,8 @@ namespace Game3 {
 	}
 
 	GlobalID MainWindow::getExternalGID() const {
-		if (auto *ext_module = dynamic_cast<ExternalInventoryModule *>(&inventoryTab->getModule()))
+		std::shared_lock<std::shared_mutex> lock;
+		if (auto *ext_module = dynamic_cast<ExternalInventoryModule *>(inventoryTab->getModule(lock)))
 			if (auto inventory = ext_module->getInventory())
 				return inventory->getOwner()->getGID();
 		return -1;

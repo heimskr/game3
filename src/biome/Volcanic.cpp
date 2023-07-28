@@ -55,7 +55,8 @@ namespace Game3 {
 					{game, "base:item/grey_knight"_id},
 				};
 
-				realm.add(TileEntity::create<ItemSpawner>(game, Position(row, column), 0.0002f, std::move(mushrooms)));
+				// TODO: use random ticks to spawn mushrooms
+				// realm.add(TileEntity::create<ItemSpawner>(game, Position(row, column), 0.0002f, std::move(mushrooms)));
 			}
 		}
 	}

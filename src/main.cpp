@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
 
 	if (2 <= argc) {
 		if (argc == 4) {
-			std::cout << Game3::generateFlask(argv[1], argv[2], argv[3]);
+			std::cout << Game3::generateFlask("resources/testtubebase.png", "resources/testtubemask.png", argv[1], argv[2], argv[3]);
 			return 0;
 		}
 
