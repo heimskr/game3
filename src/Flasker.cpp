@@ -133,7 +133,7 @@ namespace Game3 {
 		return rgb;
 	}
 
-	std::string generateFlask(const std::string &base_filename, const std::string &mask_filename, uint16_t hue, float saturation, float value_diff) {
+	std::unique_ptr<uint8_t[]> generateFlaskRaw(const std::string &base_filename, const std::string &mask_filename, uint16_t hue, float saturation, float value_diff, int *width_out, int *height_out) {
 		int base_width  = 0;
 		int base_height = 0;
 		int mask_width  = 0;
@@ -185,6 +185,20 @@ namespace Game3 {
 			raw[i + 2] = rgb.b;
 			raw[i + 3] = base[i + 3];
 		}
+
+		if (width_out != nullptr)
+			*width_out = width;
+
+		if (height_out != nullptr)
+			*height_out = height;
+
+		return raw;
+	}
+
+	std::string generateFlask(const std::string &base_filename, const std::string &mask_filename, uint16_t hue, float saturation, float value_diff) {
+		int width = 0;
+		int height = 0;
+		std::unique_ptr<uint8_t[]> raw = generateFlaskRaw(base_filename, mask_filename, hue, saturation, value_diff, &width, &height);
 
 		std::stringstream ss;
 
