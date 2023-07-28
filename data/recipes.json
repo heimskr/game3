@@ -216,7 +216,10 @@
 	["base:centrifuge_recipe", {
 		"input": ["base:fluid/lava", 1000],
 		"output": [
-			[1.0, ["base:item/water_flask", 1]]
+			[1.0, ["base:item/stone", 1]],
+			[0.3, ["base:item/iron_ore", 1]],
+			[0.2, ["base:item/gold_ore", 1]],
+			[0.1, ["base:item/diamond_ore", 1]]
 		]
 	}]
 ]]
