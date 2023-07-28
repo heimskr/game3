@@ -32,6 +32,16 @@ namespace Game3 {
 			return std::get<T>(*this);
 		}
 
+		template <typename T>
+		constexpr inline T * get_if() {
+			return std::get_if<T>(this);
+		}
+
+		template <typename T>
+		constexpr inline const T * get_if() const {
+			return std::get_if<T>(this);
+		}
+
 		constexpr inline ItemCount count() const {
 			return is<ItemStack>()? get<ItemStack>().count : get<AttributeRequirement>().count;
 		}

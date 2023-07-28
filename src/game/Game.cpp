@@ -98,6 +98,7 @@
 #include "realm/Keep.h"
 #include "realm/Overworld.h"
 #include "realm/RealmFactory.h"
+#include "recipe/CentrifugeRecipe.h"
 #include "recipe/CraftingRecipe.h"
 #include "registry/Registries.h"
 #include "tile/CropTile.h"
@@ -154,6 +155,7 @@ namespace Game3 {
 		registries.add<FluidRegistry>();
 		registries.add<TileRegistry>();
 		registries.add<CropRegistry>();
+		registries.add<CentrifugeRecipeRegistry>();
 		// TODO: plugins
 	}
 

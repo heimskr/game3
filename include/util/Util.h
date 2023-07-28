@@ -7,6 +7,7 @@
 #include <csignal>
 #include <iostream>
 #include <list>
+#include <map>
 #include <random>
 #include <set>
 #include <span>
@@ -208,6 +209,21 @@ namespace Game3 {
 		std::array<char, BL> buffer;
 		strftime(buffer.data(), buffer.size() * sizeof(buffer[0]), format, &now_tm);
 		return buffer.data();
+	}
+
+	template <typename T, typename R, template <typename...> typename M = std::map, std::floating_point F = double>
+	const T & weightedChoice(const M<T, F> &map, R &rng) {
+		F sum{};
+		for (const auto &[item, weight]: map)
+			sum += weight;
+		F choice = std::uniform_real_distribution<F>(0, sum)(rng);
+		F so_far{};
+		for (const auto &[item, weight]: map) {
+			if (choice < so_far + weight)
+				return item;
+			so_far += weight;
+		}
+		throw std::logic_error("Unable to select item from map of weights");
 	}
 
 	// Credit for reverse: https://stackoverflow.com/a/28139075/227663

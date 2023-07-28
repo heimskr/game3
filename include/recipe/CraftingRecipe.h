@@ -16,12 +16,11 @@ namespace Game3 {
 
 		CraftingRecipe() = default;
 		CraftingRecipe(Input, Output, Identifier);
-		virtual ~CraftingRecipe() = default;
 
-		Input getInput() override;
-		Output getOutput() override;
+		Input getInput(Game &) override;
+		Output getOutput(const Input &, Game &) override;
 		bool canCraft(const std::shared_ptr<Container> &) override;
-		bool craft(const std::shared_ptr<Container> &, Output &leftovers) override;
+		bool craft(Game &, const std::shared_ptr<Container> &, std::optional<Output> &leftovers) override;
 
 		static CraftingRecipe fromJSON(const Game &, const nlohmann::json &);
 	};

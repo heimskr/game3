@@ -19,18 +19,19 @@ namespace Game3 {
 		if (!recipe)
 			return;
 
-		auto inventory = player->inventory;
-		auto realm = player->getRealm();
-		std::vector<ItemStack> leftovers;
+		InventoryPtr inventory = player->inventory;
+		RealmPtr realm = player->getRealm();
+		std::optional<std::vector<ItemStack>> leftovers;
 
 		for (size_t i = 0; i < count; ++i) {
-			if (!recipe->craft(inventory, leftovers))
+			if (!recipe->craft(game, inventory, leftovers))
 				break;
 
-			for (const auto &leftover: leftovers)
-				leftover.spawn(realm, player->position);
-
-			leftovers.clear();
+			if (leftovers) {
+				for (const auto &leftover: *leftovers)
+					leftover.spawn(realm, player->position);
+				leftovers.reset();
+			}
 		}
 
 		inventory->notifyOwner();

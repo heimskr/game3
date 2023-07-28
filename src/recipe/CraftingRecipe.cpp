@@ -5,11 +5,11 @@ namespace Game3 {
 	CraftingRecipe::CraftingRecipe(Input input_, Output output_, Identifier station_type):
 		input(std::move(input_)), output(std::move(output_)), stationType(std::move(station_type)) {}
 
-	CraftingRecipe::Input CraftingRecipe::getInput() {
+	CraftingRecipe::Input CraftingRecipe::getInput(Game &) {
 		return input;
 	}
 
-	CraftingRecipe::Output CraftingRecipe::getOutput() {
+	CraftingRecipe::Output CraftingRecipe::getOutput(const Input &, Game &) {
 		return output;
 	}
 
@@ -33,20 +33,20 @@ namespace Game3 {
 		return true;
 	}
 
-	bool CraftingRecipe::craft(const std::shared_ptr<Container> &container, Output &leftovers) {
+	bool CraftingRecipe::craft(Game &, const std::shared_ptr<Container> &container, std::optional<Output> &leftovers) {
 		auto inventory = std::dynamic_pointer_cast<Inventory>(container);
 
 		if (!inventory || !canCraft(container))
 			return false;
 
-		leftovers.clear();
+		leftovers.emplace();
 
 		for (const auto &requirement: input)
 			inventory->remove(requirement);
 
 		for (const auto &stack: output)
 			if (auto leftover = inventory->add(stack))
-				leftovers.push_back(std::move(*leftover));
+				leftovers->push_back(std::move(*leftover));
 
 		return true;
 	}
