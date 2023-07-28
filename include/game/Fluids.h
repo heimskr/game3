@@ -1,13 +1,15 @@
 #pragma once
 
-#include <ostream>
-#include <string>
-
 #include "Types.h"
 #include "data/Identifier.h"
 
+#include <nlohmann/json_fwd.hpp>
+#include <ostream>
+#include <string>
+
 namespace Game3 {
 	class Buffer;
+	class Game;
 
 	struct Fluid: NamedRegisterable {
 		std::string name;
@@ -51,6 +53,8 @@ namespace Game3 {
 		explicit operator std::string() const;
 
 		auto operator<=>(const FluidStack &) const = default;
+
+		static FluidStack fromJSON(const Game &, const nlohmann::json &);
 	};
 
 	std::ostream & operator<<(std::ostream &, FluidStack);

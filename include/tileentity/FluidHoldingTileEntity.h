@@ -13,7 +13,7 @@ namespace Game3 {
 	 */
 	class FluidHoldingTileEntity: public virtual TileEntity, public HasFluids {
 		public:
-			FluidHoldingTileEntity(HasFluids::Map = {});
+			FluidHoldingTileEntity(FluidContainer::Map = {});
 
 			virtual bool canInsertFluid(FluidStack, Direction);
 			/** Returns the amount not added. */
@@ -23,7 +23,7 @@ namespace Game3 {
 			virtual std::optional<FluidStack> extractFluid(Direction, bool remove);
 
 			/** Server-side only. */
-			void setFluidLevels(HasFluids::Map);
+			void setFluidLevels(FluidContainer::Map);
 
 			void fluidsUpdated() override;
 

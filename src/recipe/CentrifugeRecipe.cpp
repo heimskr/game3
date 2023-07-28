@@ -17,42 +17,42 @@ namespace Game3 {
 	}
 
 	bool CentrifugeRecipe::canCraft(const std::shared_ptr<Container> &container) {
-		auto inventory = std::dynamic_pointer_cast<Inventory>(container);
-		if (!inventory)
-			return false;
+		// auto inventory = std::dynamic_pointer_cast<Inventory>(container);
+		// if (!inventory)
+		// 	return false;
 
-		if (auto *stack = input.get_if<ItemStack>()) {
-			if (inventory->count(*stack) < stack->count)
-				return false;
-		} else if (auto *requirement = input.get_if<AttributeRequirement>()) {
-			const auto &[attribute, count] = *requirement;
-			if (inventory->countAttribute(attribute) < count)
-				return false;
-		} else
-			throw std::logic_error("Unhandled CentrifugeRecipe input type: " + std::to_string(input.index()));
+		// if (auto *stack = input.get_if<ItemStack>()) {
+		// 	if (inventory->count(*stack) < stack->count)
+		// 		return false;
+		// } else if (auto *requirement = input.get_if<AttributeRequirement>()) {
+		// 	const auto &[attribute, count] = *requirement;
+		// 	if (inventory->countAttribute(attribute) < count)
+		// 		return false;
+		// } else
+		// 	throw std::logic_error("Unhandled CentrifugeRecipe input type: " + std::to_string(input.index()));
 
 		return true;
 	}
 
 	bool CentrifugeRecipe::craft(Game &game, const std::shared_ptr<Container> &container, std::optional<Output> &leftovers) {
-		auto inventory = std::dynamic_pointer_cast<Inventory>(container);
-		if (!inventory)
-			return false;
+		// auto inventory = std::dynamic_pointer_cast<Inventory>(container);
+		// if (!inventory)
+		// 	return false;
 
-		auto lock = inventory->uniqueLock();
+		// auto lock = inventory->uniqueLock();
 
-		if (!canCraft(container))
-			return false;
+		// if (!canCraft(container))
+		// 	return false;
 
-		inventory->remove(input);
-		leftovers = inventory->add(getOutput(input, game));
+		// inventory->remove(input);
+		// leftovers = inventory->add(getOutput(input, game));
 		return true;
 	}
 
 	CentrifugeRecipe CentrifugeRecipe::fromJSON(const Game &game, const nlohmann::json &json) {
 		CentrifugeRecipe recipe;
 
-		recipe.input = CraftingRequirement::fromJSON(game, json.at("input"));
+		recipe.input = FluidStack::fromJSON(game, json.at("input"));
 
 		for (const auto &item: json.at("output"))
 			recipe.weightMap[item.at(1)] = item.at(0);

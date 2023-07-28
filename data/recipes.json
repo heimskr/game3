@@ -212,5 +212,11 @@
 	["base:crafting_recipe", {
 		"input":  [["base:item/stone", 1]],
 		"output": [["base:item/floor", 2]]
+	}],
+	["base:centrifuge_recipe", {
+		"input": ["base:fluid/lava", 1000],
+		"output": [
+			[1.0, "base:item/water_flask"]
+		]
 	}]
 ]]

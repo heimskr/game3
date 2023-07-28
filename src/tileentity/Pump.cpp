@@ -97,8 +97,8 @@ namespace Game3 {
 
 		player->send(OpenFluidLevelsPacket(getGID()));
 
-		auto lock = fluidLevels.sharedLock();
-		for (const auto &[id, amount]: fluidLevels) {
+		auto lock = fluidContainer->levels.sharedLock();
+		for (const auto &[id, amount]: fluidContainer->levels) {
 			INFO(realm.getGame().getFluid(id)->identifier << " = " << amount);
 		}
 		return false;

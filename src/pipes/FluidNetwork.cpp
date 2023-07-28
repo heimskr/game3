@@ -15,9 +15,11 @@ namespace Game3 {
 		if (!realm || insertions.empty())
 			return;
 
+		auto &levels = fluidContainer->levels;
+
 		{
-			auto fluid_lock = fluidLevels.uniqueLock();
-			if (auto begin = fluidLevels.begin(); begin != fluidLevels.end()) {
+			auto fluid_lock = levels.uniqueLock();
+			if (auto begin = levels.begin(); begin != levels.end()) {
 				auto &[id, amount] = *begin;
 
 				if (const FluidAmount remainder = distribute(FluidStack(id, amount)); 0 < remainder) {
@@ -25,11 +27,11 @@ namespace Game3 {
 					return;
 				}
 
-				fluidLevels.erase(begin);
+				levels.erase(begin);
 			}
 		}
 
-		auto fluid_lock = fluidLevels.sharedLock();
+		auto fluid_lock = levels.sharedLock();
 
 		for (auto iter = extractions.begin(), end = extractions.end(); iter != end; ++iter) {
 			const auto &[position, direction] = *iter;
@@ -40,12 +42,12 @@ namespace Game3 {
 
 			// Extract the first fluid that isn't contained in our overflow storage.
 			std::optional<FluidStack> extracted = fluid_holding->extractFluid(direction, [&](FluidID candidate) {
-				return !fluidLevels.contains(candidate);
+				return !levels.contains(candidate);
 			}, true, {});
 
 			if (extracted) {
 				if (const FluidAmount remainder = distribute(*extracted); 0 < remainder)
-					fluidLevels[extracted->id] = remainder;
+					levels[extracted->id] = remainder;
 				return;
 			}
 		}

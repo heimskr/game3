@@ -3,8 +3,8 @@
 #include "tileentity/FluidHoldingTileEntity.h"
 
 namespace Game3 {
-	FluidHoldingTileEntity::FluidHoldingTileEntity(HasFluids::Map map):
-		HasFluids(std::move(map)) {}
+	FluidHoldingTileEntity::FluidHoldingTileEntity(FluidContainer::Map map):
+		HasFluids(std::make_shared<FluidContainer>(std::move(map))) {}
 
 	bool FluidHoldingTileEntity::canInsertFluid(FluidStack stack, Direction) {
 		return canInsertFluid(stack);
@@ -15,21 +15,22 @@ namespace Game3 {
 	}
 
 	std::optional<FluidStack> FluidHoldingTileEntity::extractFluid(Direction, const std::function<bool(FluidID)> &predicate, bool remove, const std::function<FluidAmount(FluidID)> &max_amount) {
+		auto &levels = fluidContainer->levels;
 		{
-			auto lock = fluidLevels.sharedLock();
-			if (fluidLevels.empty())
+			auto lock = levels.sharedLock();
+			if (levels.empty())
 				return std::nullopt;
 		}
 
-		auto lock = fluidLevels.uniqueLock();
-		auto iter = fluidLevels.begin();
+		auto lock = levels.uniqueLock();
+		auto iter = levels.begin();
 
 		// Advance through possible fluids until we find an acceptable one.
 		if (predicate)
-			while (iter != fluidLevels.end() && !predicate(iter->first))
+			while (iter != levels.end() && !predicate(iter->first))
 				++iter;
 
-		if (iter == fluidLevels.end())
+		if (iter == levels.end())
 			return std::nullopt;
 
 		const FluidID id = iter->first;
@@ -37,7 +38,7 @@ namespace Game3 {
 
 		if (remove)
 			if (0 == (iter->second -= to_remove))
-				fluidLevels.erase(iter);
+				levels.erase(iter);
 
 		return FluidStack(id, to_remove);
 	}
@@ -50,8 +51,8 @@ namespace Game3 {
 		return extractFluid(direction, remove, std::numeric_limits<FluidAmount>::max());
 	}
 
-	void FluidHoldingTileEntity::setFluidLevels(HasFluids::Map map) {
-		fluidLevels = std::move(map);
+	void FluidHoldingTileEntity::setFluidLevels(FluidContainer::Map map) {
+		fluidContainer->levels = std::move(map);
 		fluidsUpdated();
 	}
 
@@ -69,12 +70,12 @@ namespace Game3 {
 	}
 
 	void FluidHoldingTileEntity::toJSON(nlohmann::json &json) const {
-		auto lock = const_cast<Lockable<Map> &>(fluidLevels).sharedLock();
-		json["fluidLevels"] = fluidLevels.getBase();
+		auto lock = const_cast<Lockable<FluidContainer::Map> &>(fluidContainer->levels).sharedLock();
+		json["fluidContainer->levels"] = fluidContainer->levels.getBase();
 	}
 
 	void FluidHoldingTileEntity::absorbJSON(Game &, const nlohmann::json &json) {
-		fluidLevels = json.at("fluidLevels").get<Map>();
+		fluidContainer->levels = json.at("fluidContainer->levels").get<FluidContainer::Map>();
 	}
 
 	void FluidHoldingTileEntity::encode(Game &, Buffer &buffer) {

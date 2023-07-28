@@ -3,21 +3,25 @@
 #include "net/Buffer.h"
 
 namespace Game3 {
-	HasFluids::HasFluids(Map fluid_levels):
-		fluidLevels(std::move(fluid_levels)) {}
+	HasFluids::HasFluids(std::shared_ptr<FluidContainer> fluid_container):
+		fluidContainer(std::move(fluid_container)) {}
 
 	FluidAmount HasFluids::getMaxLevel(FluidID) const {
 		return std::numeric_limits<FluidLevel>::max();
 	}
 
 	FluidAmount HasFluids::addFluid(FluidStack stack) {
-		auto [id, to_add] = stack;
-		auto lock = fluidLevels.uniqueLock();
+		assert(fluidContainer);
 
-		if (getMaxFluidTypes() <= fluidLevels.size() && !fluidLevels.contains(id))
+		auto [id, to_add] = stack;
+
+		auto &levels = fluidContainer->levels;
+		auto lock = levels.uniqueLock();
+
+		if (getMaxFluidTypes() <= levels.size() && !levels.contains(id))
 			return to_add;
 
-		FluidAmount &level = fluidLevels[id];
+		FluidAmount &level = levels[id];
 		const FluidAmount max = getMaxLevel(id);
 
 		// Just in case there would be integer overflow.
@@ -44,12 +48,15 @@ namespace Game3 {
 	}
 
 	bool HasFluids::canInsertFluid(FluidStack stack) {
-		auto lock = fluidLevels.sharedLock();
+		assert(fluidContainer);
 
-		auto iter = fluidLevels.find(stack.id);
+		auto &levels = fluidContainer->levels;
+		auto lock = levels.sharedLock();
 
-		if (iter == fluidLevels.end())
-			return fluidLevels.size() < getMaxFluidTypes() && stack.amount <= getMaxLevel(stack.id);
+		auto iter = levels.find(stack.id);
+
+		if (iter == levels.end())
+			return levels.size() < getMaxFluidTypes() && stack.amount <= getMaxLevel(stack.id);
 
 		const FluidAmount current_amount = iter->second;
 
@@ -61,15 +68,18 @@ namespace Game3 {
 	}
 
 	bool HasFluids::fluidsEmpty() {
-		auto lock = fluidLevels.sharedLock();
-		return fluidLevels.empty();
+		assert(fluidContainer);
+		auto lock = fluidContainer->levels.sharedLock();
+		return fluidContainer->levels.empty();
 	}
 
 	void HasFluids::encode(Buffer &buffer) {
-		buffer << fluidLevels;
+		assert(fluidContainer);
+		buffer << fluidContainer->levels;
 	}
 
 	void HasFluids::decode(Buffer &buffer) {
-		buffer >> fluidLevels;
+		assert(fluidContainer);
+		buffer >> fluidContainer->levels;
 	}
 }

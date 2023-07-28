@@ -34,11 +34,12 @@ namespace Game3 {
 
 		player->send(OpenFluidLevelsPacket(getGID()));
 
-		auto lock = fluidLevels.sharedLock();
-		if (fluidLevels.empty())
+		assert(fluidContainer);
+		auto lock = fluidContainer->levels.sharedLock();
+		if (fluidContainer->levels.empty())
 			WARN("No fluids.");
 		else
-			for (const auto &[id, amount]: fluidLevels)
+			for (const auto &[id, amount]: fluidContainer->levels)
 				INFO(realm.getGame().getFluid(id)->identifier << " = " << amount);
 		return false;
 	}

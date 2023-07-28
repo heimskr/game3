@@ -1,15 +1,15 @@
 #pragma once
 
 #include "data/Identifier.h"
+#include "game/Fluids.h"
 #include "item/Item.h"
-#include "recipe/CraftingRequirement.h"
 #include "recipe/Recipe.h"
 #include "registry/Registries.h"
 
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
-	struct CentrifugeRecipe: Recipe<CraftingRequirement, ItemStack> {
+	struct CentrifugeRecipe: Recipe<FluidStack, ItemStack> {
 		Input input;
 		std::map<nlohmann::json, double> weightMap;
 

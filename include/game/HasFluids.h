@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/Fluids.h"
+#include "game/FluidContainer.h"
 #include "threading/Lockable.h"
 
 #include <memory>
@@ -9,14 +9,15 @@
 namespace Game3 {
 	class Agent;
 	class Buffer;
+	class FluidContainer;
 	class Game;
 	class Inventory;
 
 	class HasFluids {
 		public:
-			using Map = std::map<FluidID, FluidAmount>;
+			std::shared_ptr<FluidContainer> fluidContainer;
 
-			HasFluids(Map = {});
+			HasFluids(std::shared_ptr<FluidContainer> = nullptr);
 
 			virtual size_t getMaxFluidTypes() const { return 1; }
 			virtual FluidAmount getMaxLevel(FluidID) const;
@@ -33,10 +34,5 @@ namespace Game3 {
 			void encode(Buffer &);
 			void decode(Buffer &);
 
-			inline auto & getFluidLevels() { return fluidLevels; }
-			inline const auto & getFluidLevels() const { return fluidLevels; }
-
-		protected:
-			Lockable<Map> fluidLevels;
 	};
 }

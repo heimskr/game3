@@ -1,5 +1,8 @@
 #include "game/Fluids.h"
+#include "game/Game.h"
 #include "net/Buffer.h"
+
+#include <nlohmann/json_fwd.hpp>
 
 namespace Game3 {
 
@@ -47,6 +50,11 @@ namespace Game3 {
 		out += std::to_string(amount);
 		out += ')';
 		return out;
+	}
+
+	FluidStack FluidStack::fromJSON(const Game &game, const nlohmann::json &json) {
+		const auto &registry = game.registry<FluidRegistry>();
+		return FluidStack(registry.at(json.at(0).get<Identifier>())->registryID, json.at(1));
 	}
 
 	std::ostream & operator<<(std::ostream &os, FluidStack fluid_stack) {

@@ -89,7 +89,7 @@ namespace Game3 {
 			return;
 
 		const auto &registry = game->registry<FluidRegistry>();
-		auto &levels = fluidHaver->getFluidLevels();
+		auto &levels = fluidHaver->fluidContainer->levels;
 		auto lock = levels.sharedLock();
 
 		auto header = std::make_unique<Gtk::Label>("???");
