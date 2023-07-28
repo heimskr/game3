@@ -33,19 +33,20 @@ namespace Game3 {
 		return true;
 	}
 
-	bool CraftingRecipe::craft(Game &, const std::shared_ptr<Container> &container, std::optional<Output> &leftovers) {
-		auto inventory = std::dynamic_pointer_cast<Inventory>(container);
+	bool CraftingRecipe::craft(Game &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) {
+		auto inventory_in  = std::dynamic_pointer_cast<Inventory>(input_container);
+		auto inventory_out = std::dynamic_pointer_cast<Inventory>(output_container);
 
-		if (!inventory || !canCraft(container))
+		if (!inventory_in || !inventory_out || !canCraft(input_container))
 			return false;
 
 		leftovers.emplace();
 
-		for (const auto &requirement: input)
-			inventory->remove(requirement);
+		for (const CraftingRequirement &requirement: input)
+			inventory_in->remove(requirement);
 
-		for (const auto &stack: output)
-			if (auto leftover = inventory->add(stack))
+		for (const ItemStack &stack: output)
+			if (std::optional<ItemStack> leftover = inventory_out->add(stack))
 				leftovers->push_back(std::move(*leftover));
 
 		return true;

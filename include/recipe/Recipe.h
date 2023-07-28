@@ -29,7 +29,7 @@ namespace Game3 {
 		virtual bool canCraft(const std::shared_ptr<Container> &) = 0;
 
 		/** Attempts to produce the result of the recipe, removing any ingredients from the given container as necessary. */
-		virtual bool craft(Game &, const std::shared_ptr<Container> &, std::optional<Output> &leftovers) = 0;
+		virtual bool craft(Game &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) = 0;
 
 		virtual bool operator==(const Recipe &other) {
 			return this == &other;

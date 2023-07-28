@@ -24,7 +24,7 @@ namespace Game3 {
 		std::optional<std::vector<ItemStack>> leftovers;
 
 		for (size_t i = 0; i < count; ++i) {
-			if (!recipe->craft(game, inventory, leftovers))
+			if (!recipe->craft(game, inventory, inventory, leftovers))
 				break;
 
 			if (leftovers) {

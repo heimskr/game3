@@ -20,7 +20,7 @@ namespace Game3 {
 		Input getInput(Game &) override;
 		Output getOutput(const Input &, Game &) override;
 		bool canCraft(const std::shared_ptr<Container> &) override;
-		bool craft(Game &, const std::shared_ptr<Container> &, std::optional<Output> &leftovers) override;
+		bool craft(Game &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) override;
 
 		static CraftingRecipe fromJSON(const Game &, const nlohmann::json &);
 	};

@@ -98,9 +98,8 @@ namespace Game3 {
 		player->send(OpenFluidLevelsPacket(getGID()));
 
 		auto lock = fluidContainer->levels.sharedLock();
-		for (const auto &[id, amount]: fluidContainer->levels) {
+		for (const auto &[id, amount]: fluidContainer->levels)
 			INFO(realm.getGame().getFluid(id)->identifier << " = " << amount);
-		}
 		return false;
 	}
 
@@ -108,30 +107,6 @@ namespace Game3 {
 		TileEntity::absorbJSON(game, json);
 		FluidHoldingTileEntity::absorbJSON(game, json);
 		setDirection(json.at("direction"));
-	}
-
-	void Pump::render(SpriteRenderer &sprite_renderer) {
-		if (!isVisible())
-			return;
-
-		auto realm = getRealm();
-		auto &tileset = realm->getTileset();
-
-		if (cachedTile == TileID(-1))
-			cachedTile = tileset[tileID];
-
-		const auto tilesize = tileset.getTileSize();
-		const auto texture = tileset.getTexture(realm->getGame());
-		const auto x = (cachedTile % (*texture->width / tilesize)) * tilesize;
-		const auto y = (cachedTile / (*texture->width / tilesize)) * tilesize;
-		sprite_renderer(*texture, {
-			.x = static_cast<float>(position.column),
-			.y = static_cast<float>(position.row),
-			.x_offset = x / 2.f,
-			.y_offset = y / 2.f,
-			.size_x = static_cast<float>(tilesize),
-			.size_y = static_cast<float>(tilesize),
-		});
 	}
 
 	void Pump::encode(Game &game, Buffer &buffer) {

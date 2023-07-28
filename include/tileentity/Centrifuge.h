@@ -3,28 +3,26 @@
 #include "Texture.h"
 #include "game/Inventory.h"
 #include "tileentity/FluidHoldingTileEntity.h"
+#include "tileentity/InventoriedTileEntity.h"
 
 namespace Game3 {
-	class Pump: public FluidHoldingTileEntity {
+	class Centrifuge: public FluidHoldingTileEntity, public InventoriedTileEntity {
 		public:
-			static Identifier ID() { return {"base", "te/pump"}; }
+			static Identifier ID() { return {"base", "te/centrifuge"}; }
 
 			constexpr static float PERIOD = 0.25;
 
-			FluidAmount extractionRate = 250;
+			Centrifuge(const Centrifuge &) = delete;
+			Centrifuge(Centrifuge &&) = default;
+			~Centrifuge() override = default;
 
-			Pump(const Pump &) = delete;
-			Pump(Pump &&) = default;
-			~Pump() override = default;
+			Centrifuge & operator=(const Centrifuge &) = delete;
+			Centrifuge & operator=(Centrifuge &&) = default;
 
-			Pump & operator=(const Pump &) = delete;
-			Pump & operator=(Pump &&) = default;
-
-			inline Direction getDirection() const { return pumpDirection; }
-			void setDirection(Direction);
-
+			size_t getMaxFluidTypes() const override;
 			FluidAmount getMaxLevel(FluidID) const override;
 
+			void init(Game &) override;
 			void tick(Game &, float) override;
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) override;
@@ -35,11 +33,10 @@ namespace Game3 {
 
 		private:
 			float accumulatedTime = 0.f;
-			Direction pumpDirection = Direction::Down;
 
-			Pump() = default;
-			Pump(Identifier tile_id, Position);
-			Pump(Position);
+			Centrifuge() = default;
+			Centrifuge(Identifier tile_id, Position);
+			Centrifuge(Position);
 
 			friend class TileEntity;
 	};

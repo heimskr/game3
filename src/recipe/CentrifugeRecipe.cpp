@@ -1,3 +1,4 @@
+#include "game/FluidContainer.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "recipe/CentrifugeRecipe.h"
@@ -17,35 +18,28 @@ namespace Game3 {
 	}
 
 	bool CentrifugeRecipe::canCraft(const std::shared_ptr<Container> &container) {
-		// auto inventory = std::dynamic_pointer_cast<Inventory>(container);
-		// if (!inventory)
-		// 	return false;
+		if (auto fluids = std::dynamic_pointer_cast<FluidContainer>(container))
+			if (auto iter = fluids->levels.find(input.id); iter != fluids->levels.end())
+				return input.amount <= iter->second;
 
-		// if (auto *stack = input.get_if<ItemStack>()) {
-		// 	if (inventory->count(*stack) < stack->count)
-		// 		return false;
-		// } else if (auto *requirement = input.get_if<AttributeRequirement>()) {
-		// 	const auto &[attribute, count] = *requirement;
-		// 	if (inventory->countAttribute(attribute) < count)
-		// 		return false;
-		// } else
-		// 	throw std::logic_error("Unhandled CentrifugeRecipe input type: " + std::to_string(input.index()));
-
-		return true;
+		return false;
 	}
 
-	bool CentrifugeRecipe::craft(Game &game, const std::shared_ptr<Container> &container, std::optional<Output> &leftovers) {
-		// auto inventory = std::dynamic_pointer_cast<Inventory>(container);
-		// if (!inventory)
-		// 	return false;
+	bool CentrifugeRecipe::craft(Game &game, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) {
+		auto fluids = std::dynamic_pointer_cast<FluidContainer>(input_container);
+		auto inventory = std::dynamic_pointer_cast<Inventory>(output_container);
 
-		// auto lock = inventory->uniqueLock();
+		if (!fluids || !inventory || !canCraft(fluids))
+			return false;
 
-		// if (!canCraft(container))
-		// 	return false;
+		ItemStack output = getOutput(input, game);
 
-		// inventory->remove(input);
-		// leftovers = inventory->add(getOutput(input, game));
+		if (!inventory->canInsert(output))
+			return false;
+
+		assert(0. <= (fluids->levels.at(input.id) -= input.amount));
+		leftovers = inventory->add(output);
+		assert(!leftovers.has_value());
 		return true;
 	}
 

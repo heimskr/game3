@@ -1,3 +1,4 @@
+#include "Tileset.h"
 #include "game/ClientGame.h"
 #include "game/ServerGame.h"
 #include "net/Buffer.h"
@@ -33,6 +34,30 @@ namespace Game3 {
 		auto lock = game.allAgents.uniqueLock();
 		assert(!game.allAgents.contains(globalID));
 		game.allAgents[globalID] = shared_from_this();
+	}
+
+	void TileEntity::render(SpriteRenderer &sprite_renderer) {
+		if (!isVisible())
+			return;
+
+		auto realm = getRealm();
+		auto &tileset = realm->getTileset();
+
+		if (cachedTile == TileID(-1))
+			cachedTile = tileset[tileID];
+
+		const auto tilesize = tileset.getTileSize();
+		const auto texture = tileset.getTexture(realm->getGame());
+		const auto x = (cachedTile % (*texture->width / tilesize)) * tilesize;
+		const auto y = (cachedTile / (*texture->width / tilesize)) * tilesize;
+		sprite_renderer(*texture, {
+			.x = static_cast<float>(position.column),
+			.y = static_cast<float>(position.row),
+			.x_offset = x / 2.f,
+			.y_offset = y / 2.f,
+			.size_x = static_cast<float>(tilesize),
+			.size_y = static_cast<float>(tilesize),
+		});
 	}
 
 	void TileEntity::onSpawn() {

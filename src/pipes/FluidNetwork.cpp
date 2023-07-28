@@ -5,6 +5,10 @@
 #include "tileentity/FluidHoldingTileEntity.h"
 
 namespace Game3 {
+	FluidNetwork::FluidNetwork(size_t id_, const std::shared_ptr<Realm> &realm_):
+		PipeNetwork(id_, realm_),
+		HasFluids(std::make_shared<FluidContainer>()) {}
+
 	void FluidNetwork::tick(Tick tick_id) {
 		if (!canTick(tick_id))
 			return;

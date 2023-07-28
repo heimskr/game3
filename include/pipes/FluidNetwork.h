@@ -9,7 +9,7 @@ namespace Game3 {
 
 	class FluidNetwork: public PipeNetwork, private HasFluids {
 		public:
-			using PipeNetwork::PipeNetwork;
+			FluidNetwork(size_t id_, const std::shared_ptr<Realm> &);
 
 			PipeType getType() const final { return PipeType::Fluid; }
 

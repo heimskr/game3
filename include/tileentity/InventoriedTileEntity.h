@@ -25,6 +25,7 @@ namespace Game3 {
 
 			void inventoryUpdated() override;
 			std::shared_ptr<Agent> getSharedAgent() final;
+			void absorbJSON(Game &, const nlohmann::json &) override;
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;

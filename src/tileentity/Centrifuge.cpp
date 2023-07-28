@@ -1,0 +1,105 @@
+#include <iostream>
+
+#include "Tileset.h"
+#include "entity/Player.h"
+#include "game/ClientGame.h"
+#include "game/ServerInventory.h"
+#include "packet/OpenAgentInventoryPacket.h"
+#include "packet/OpenFluidLevelsPacket.h"
+#include "realm/Realm.h"
+#include "recipe/CentrifugeRecipe.h"
+#include "tileentity/Centrifuge.h"
+#include "ui/SpriteRenderer.h"
+
+namespace Game3 {
+	Centrifuge::Centrifuge(Identifier tile_id, Position position_):
+		TileEntity(std::move(tile_id), ID(), position_, true) {}
+
+	Centrifuge::Centrifuge(Position position_):
+		Centrifuge("base:tile/centrifuge"_id, position_) {}
+
+	size_t Centrifuge::getMaxFluidTypes() const {
+		return 1;
+	}
+
+	FluidAmount Centrifuge::getMaxLevel(FluidID) const {
+		return 64 * FluidTile::FULL;
+	}
+
+	void Centrifuge::init(Game &game) {
+		TileEntity::init(game);
+		inventory = std::make_shared<ServerInventory>(shared_from_this(), 10);
+	}
+
+	void Centrifuge::tick(Game &, float delta) {
+		RealmPtr realm = weakRealm.lock();
+		if (!realm || realm->getSide() != Side::Server)
+			return;
+
+		accumulatedTime += delta;
+
+		if (accumulatedTime < PERIOD)
+			return;
+
+		accumulatedTime = 0.f;
+
+		auto &levels = fluidContainer->levels;
+		auto fluids_lock = levels.uniqueLock();
+
+		if (levels.empty())
+			return;
+
+		Game &game = realm->getGame();
+		auto &registry = game.registry<CentrifugeRecipeRegistry>();
+
+		std::optional<ItemStack> leftovers;
+		auto inventory_lock = inventory->uniqueLock();
+		for (const std::shared_ptr<CentrifugeRecipe> &recipe: registry.items)
+			if (recipe->craft(game, fluidContainer, inventory, leftovers))
+				return;
+	}
+
+	void Centrifuge::toJSON(nlohmann::json &json) const {
+		TileEntity::toJSON(json);
+		FluidHoldingTileEntity::toJSON(json);
+		InventoriedTileEntity::toJSON(json);
+	}
+
+	bool Centrifuge::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
+		auto &realm = *getRealm();
+
+		if (modifiers.onlyAlt()) {
+			realm.queueDestruction(shared_from_this());
+			player->give(ItemStack(realm.getGame(), "base:item/centrifuge"_id));
+			return true;
+		}
+
+		if (modifiers.onlyCtrl())
+			player->send(OpenFluidLevelsPacket(getGID()));
+		else
+			player->send(OpenAgentInventoryPacket(getGID()));
+
+		auto lock = fluidContainer->levels.sharedLock();
+		for (const auto &[id, amount]: fluidContainer->levels)
+			INFO(realm.getGame().getFluid(id)->identifier << " = " << amount);
+		return true;
+	}
+
+	void Centrifuge::absorbJSON(Game &game, const nlohmann::json &json) {
+		TileEntity::absorbJSON(game, json);
+		FluidHoldingTileEntity::absorbJSON(game, json);
+		InventoriedTileEntity::absorbJSON(game, json);
+	}
+
+	void Centrifuge::encode(Game &game, Buffer &buffer) {
+		TileEntity::encode(game, buffer);
+		FluidHoldingTileEntity::encode(game, buffer);
+		InventoriedTileEntity::encode(game, buffer);
+	}
+
+	void Centrifuge::decode(Game &game, Buffer &buffer) {
+		TileEntity::decode(game, buffer);
+		FluidHoldingTileEntity::decode(game, buffer);
+		InventoriedTileEntity::decode(game, buffer);
+	}
+}

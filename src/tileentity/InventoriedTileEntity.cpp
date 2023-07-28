@@ -61,6 +61,8 @@ namespace Game3 {
 		return shared_from_this();
 	}
 
+	void InventoriedTileEntity::absorbJSON(Game &, const nlohmann::json &) {}
+
 	void InventoriedTileEntity::encode(Game &, Buffer &buffer) {
 		HasInventory::encode(buffer);
 	}

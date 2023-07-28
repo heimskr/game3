@@ -49,7 +49,7 @@ namespace Game3 {
 			virtual void onNeighborUpdated(Position /* offset */) {}
 			/** Returns the TileEntity ID. This is not the tile ID, which corresponds to a tile in the tileset. */
 			inline Identifier getID() const { return tileEntityID; }
-			virtual void render(SpriteRenderer &) {}
+			virtual void render(SpriteRenderer &);
 			/** Handles when the player interacts with the tile they're on and that tile contains this tile entity. Returns whether anything interesting happened. */
 			virtual bool onInteractOn(const std::shared_ptr<Player> &, Modifiers) { return false; }
 			/** Handles when the player interacts with the tile in front of them and that tile contains this tile entity. Returns whether anything interesting happened. */
@@ -77,6 +77,8 @@ namespace Game3 {
 			void broadcast();
 
 		protected:
+			TileID cachedTile = -1;
+
 			TileEntity() = default;
 			TileEntity(Identifier tile_id, Identifier tile_entity_id, Position position_, bool solid_):
 				tileID(std::move(tile_id)), tileEntityID(std::move(tile_entity_id)), position(std::move(position_)), solid(solid_) {}

@@ -30,6 +30,7 @@
 #include "game/ServerGame.h"
 #include "item/Bomb.h"
 #include "item/CaveEntrance.h"
+#include "item/CentrifugeItem.h"
 #include "item/EmptyFlask.h"
 #include "item/FilledFlask.h"
 #include "item/Floor.h"
@@ -106,6 +107,7 @@
 #include "tile/GrassTile.h"
 #include "tile/Tile.h"
 #include "tileentity/Building.h"
+#include "tileentity/Centrifuge.h"
 #include "tileentity/Chest.h"
 #include "tileentity/CraftingStation.h"
 #include "tileentity/Ghost.h"
@@ -302,6 +304,9 @@ namespace Game3 {
 
 		add(std::make_shared<ItemPipeItem>(4));
 		add(std::make_shared<FluidPipeItem>(4));
+
+		add(std::make_shared<CentrifugeItem>("base:item/centrifuge", "Centrifuge", 999, 64)); // TODO: cost
+
 		add(std::make_shared<EnergyPipeItem>(4));
 	}
 
@@ -311,30 +316,31 @@ namespace Game3 {
 
 	void Game::addEntityFactories() {
 		add(EntityFactory::create<Blacksmith>());
+		add(EntityFactory::create<Chicken>());
+		add(EntityFactory::create<Dog>());
 		add(EntityFactory::create<ItemEntity>());
 		add(EntityFactory::create<Merchant>());
 		add(EntityFactory::create<Miner>());
-		add(EntityFactory::create<Woodcutter>());
-		add(EntityFactory::create<Sheep>());
 		add(EntityFactory::create<Pig>());
-		add(EntityFactory::create<Chicken>());
-		add(EntityFactory::create<Dog>());
+		add(EntityFactory::create<Sheep>());
+		add(EntityFactory::create<Woodcutter>());
 	}
 
 	void Game::addTileEntityFactories() {
 		add(TileEntityFactory::create<Building>());
+		add(TileEntityFactory::create<Centrifuge>());
 		add(TileEntityFactory::create<Chest>());
 		add(TileEntityFactory::create<CraftingStation>());
 		add(TileEntityFactory::create<Ghost>());
 		add(TileEntityFactory::create<ItemSpawner>());
 		add(TileEntityFactory::create<OreDeposit>());
-		add(TileEntityFactory::create<Sign>());
-		add(TileEntityFactory::create<Stockpile>());
-		add(TileEntityFactory::create<Teleporter>());
-		add(TileEntityFactory::create<Tree>());
 		add(TileEntityFactory::create<Pipe>());
 		add(TileEntityFactory::create<Pump>());
+		add(TileEntityFactory::create<Sign>());
+		add(TileEntityFactory::create<Stockpile>());
 		add(TileEntityFactory::create<Tank>());
+		add(TileEntityFactory::create<Teleporter>());
+		add(TileEntityFactory::create<Tree>());
 	}
 
 	void Game::addRealms() {
