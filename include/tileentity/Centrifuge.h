@@ -30,6 +30,7 @@ namespace Game3 {
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
+			void broadcast() override;
 
 		private:
 			float accumulatedTime = 0.f;

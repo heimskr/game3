@@ -75,7 +75,7 @@ namespace Game3 {
 			virtual void decode(Game &, Buffer &);
 
 			void sendTo(RemoteClient &, UpdateCounter threshold = 0);
-			void broadcast();
+			virtual void broadcast();
 
 		protected:
 			TileID cachedTile = -1;

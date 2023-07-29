@@ -37,8 +37,10 @@ namespace Game3 {
 	}
 
 	void TileEntity::tick(Game &, float) {
-		if (needsBroadcast.exchange(false))
+		if (needsBroadcast.exchange(false)) {
 			broadcast();
+			forceBroadcast = false;
+		}
 	}
 
 	void TileEntity::render(SpriteRenderer &sprite_renderer) {

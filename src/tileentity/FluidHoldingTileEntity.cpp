@@ -1,4 +1,6 @@
 #include "game/ClientGame.h"
+#include "packet/OpenFluidLevelsPacket.h"
+#include "packet/TileEntityPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/FluidHoldingTileEntity.h"
 
@@ -69,6 +71,16 @@ namespace Game3 {
 		}
 	}
 
+	void FluidHoldingTileEntity::addObserver(const std::shared_ptr<Player> &player) {
+		Observable::addObserver(player);
+		player->send(TileEntityPacket(shared_from_this()));
+		player->send(OpenFluidLevelsPacket(getGID()));
+		player->queueForMove([this](const std::shared_ptr<Entity> &entity) {
+			removeObserver(std::static_pointer_cast<Player>(entity));
+			return true;
+		});
+	}
+
 	void FluidHoldingTileEntity::toJSON(nlohmann::json &json) const {
 		auto lock = const_cast<Lockable<FluidContainer::Map> &>(fluidContainer->levels).sharedLock();
 		json["fluidContainer->levels"] = fluidContainer->levels.getBase();
@@ -85,5 +97,26 @@ namespace Game3 {
 	void FluidHoldingTileEntity::decode(Game &, Buffer &buffer) {
 		HasFluids::decode(buffer);
 		fluidsUpdated();
+	}
+
+	void FluidHoldingTileEntity::broadcast() {
+		if (forceBroadcast)
+			TileEntity::broadcast();
+		else
+			broadcast(TileEntityPacket(shared_from_this()));
+	}
+
+	void FluidHoldingTileEntity::broadcast(const TileEntityPacket &packet) {
+		assert(getSide() == Side::Server);
+		auto lock = observers.uniqueLock();
+
+		std::erase_if(observers, [&](const std::weak_ptr<Player> &weak_player) {
+			if (auto player = weak_player.lock()) {
+				player->send(packet);
+				return false;
+			}
+
+			return false;
+		});
 	}
 }

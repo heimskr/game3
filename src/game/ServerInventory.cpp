@@ -15,6 +15,7 @@
 #include "packet/DropItemPacket.h"
 #include "realm/Realm.h"
 #include "recipe/CraftingRecipe.h"
+#include "tileentity/InventoriedTileEntity.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -226,9 +227,9 @@ namespace Game3 {
 
 		if (auto owner = weakOwner.lock()) {
 			owner->increaseUpdateCounter();
-			if (auto tile_entity = std::dynamic_pointer_cast<TileEntity>(owner)) {
+			if (auto tile_entity = std::dynamic_pointer_cast<InventoriedTileEntity>(owner))
 				tile_entity->queueBroadcast();
-			} else if (auto server_player = std::dynamic_pointer_cast<ServerPlayer>(owner))
+			else if (auto server_player = std::dynamic_pointer_cast<ServerPlayer>(owner))
 				server_player->inventoryUpdated = true;
 		}
 	}

@@ -444,11 +444,12 @@ namespace Game3 {
 		if (in_different_chunk)
 			movedToNewChunk(old_chunk_position);
 
-		for (auto iter = moveQueue.begin(); iter != moveQueue.end();)
-			if ((*iter)(shared))
-				moveQueue.erase(iter++);
-			else
-				++iter;
+		{
+			auto move_lock = moveQueue.uniqueLock();
+			std::erase_if(moveQueue, [shared](const auto &function) {
+				return function(shared);
+			});
+		}
 
 		if (is_server && !from_path)
 			getGame().toServer().entityTeleported(*this);
@@ -492,6 +493,7 @@ namespace Game3 {
 	}
 
 	void Entity::queueForMove(const std::function<bool(const std::shared_ptr<Entity> &)> &function) {
+		auto lock = moveQueue.uniqueLock();
 		moveQueue.push_back(function);
 	}
 

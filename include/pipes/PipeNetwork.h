@@ -4,7 +4,7 @@
 #include "Types.h"
 #include "threading/Lockable.h"
 #include "util/PairHash.h"
-#include "util/WeakSet.h"
+#include "container/WeakSet.h"
 
 #include <memory>
 #include <unordered_set>

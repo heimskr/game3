@@ -23,9 +23,13 @@ namespace Game3 {
 				return *this;
 			}
 
-			void queueBroadcast() { needsBroadcast = true; }
+			void queueBroadcast(bool force = false) {
+				needsBroadcast = true;
+				forceBroadcast = force;
+			}
 
 		protected:
 			std::atomic_bool needsBroadcast{false};
+			std::atomic_bool forceBroadcast{false};
 	};
 }

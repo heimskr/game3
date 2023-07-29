@@ -93,11 +93,11 @@ namespace Game3 {
 		if (modifiers.onlyCtrl()) {
 			setDirection(rotateClockwise(getDirection()));
 			increaseUpdateCounter();
-			queueBroadcast();
+			queueBroadcast(true);
 			return true;
 		}
 
-		player->send(OpenFluidLevelsPacket(getGID()));
+		addObserver(player);
 
 		auto lock = fluidContainer->levels.sharedLock();
 		for (const auto &[id, amount]: fluidContainer->levels)

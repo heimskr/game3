@@ -14,7 +14,7 @@
 #include "threading/Lockable.h"
 #include "ui/Modifiers.h"
 #include "util/Castable.h"
-#include "util/WeakSet.h"
+#include "container/WeakSet.h"
 
 #include <atomic>
 #include <functional>
@@ -170,8 +170,8 @@ namespace Game3 {
 			Entity(EntityType);
 
 			bool canMoveTo(const Position &) const;
-			/** A list of functions to call the next time the entity moves. The functions return whether they should be removed from the queue. */
-			std::list<std::function<bool(const std::shared_ptr<Entity> &)>> moveQueue;
+			/** A list of functions to call the next time the entity moves. Each function returns whether it should be removed from the queue. */
+			Lockable<std::list<std::function<bool(const std::shared_ptr<Entity> &)>>> moveQueue;
 			std::shared_ptr<Texture> getTexture();
 			inline auto getHeldLeftTexture()  const { return heldLeft.texture;  }
 			inline auto getHeldRightTexture() const { return heldRight.texture; }

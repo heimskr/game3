@@ -1,17 +1,20 @@
 #pragma once
 
 #include "game/HasInventory.h"
+#include "game/Observable.h"
 #include "item/Item.h"
 #include "tileentity/TileEntity.h"
 
 #include <optional>
 
 namespace Game3 {
+	class TileEntityPacket;
+
 	/**
 	 * This class inherits TileEntity *virtually*. It doesn't call any TileEntity methods itself.
 	 * Deriving classes must remember to do so in the encode and decode methods.
 	 */
-	class InventoriedTileEntity: public virtual TileEntity, public HasInventory {
+	class InventoriedTileEntity: public virtual TileEntity, public HasInventory, public Observable {
 		public:
 			InventoriedTileEntity(std::shared_ptr<Inventory> = nullptr);
 
@@ -28,9 +31,15 @@ namespace Game3 {
 
 			void inventoryUpdated() override;
 			std::shared_ptr<Agent> getSharedAgent() final;
-			void absorbJSON(Game &, const nlohmann::json &) override;
 
+			void addObserver(const std::shared_ptr<Player> &) override;
+
+			void absorbJSON(Game &, const nlohmann::json &) override;
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
+			void broadcast() override;
+
+		protected:
+			void broadcast(const TileEntityPacket &);
 	};
 }

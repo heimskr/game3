@@ -3,7 +3,7 @@
 #include "ChunkPosition.h"
 #include "game/HasPlace.h"
 #include "threading/Lockable.h"
-#include "util/WeakSet.h"
+#include "container/WeakSet.h"
 
 namespace Game3 {
 	class Player;

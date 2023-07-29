@@ -25,7 +25,7 @@ namespace Game3 {
 					if (!existing)
 						return false;
 
-					realm.removeSafe(existing);
+					realm.queueDestruction(existing);
 					player->inventory->add(stack.withCount(1));
 					player->inventory->notifyOwner();
 					return true;

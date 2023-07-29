@@ -76,9 +76,9 @@ namespace Game3 {
 		}
 
 		if (modifiers.onlyCtrl())
-			player->send(OpenFluidLevelsPacket(getGID()));
+			FluidHoldingTileEntity::addObserver(player);
 		else
-			player->send(OpenAgentInventoryPacket(getGID()));
+			InventoriedTileEntity::addObserver(player);
 
 		auto lock = fluidContainer->levels.sharedLock();
 		for (const auto &[id, amount]: fluidContainer->levels)
@@ -102,5 +102,34 @@ namespace Game3 {
 		TileEntity::decode(game, buffer);
 		FluidHoldingTileEntity::decode(game, buffer);
 		InventoriedTileEntity::decode(game, buffer);
+	}
+
+	void Centrifuge::broadcast() {
+		assert(getSide() == Side::Server);
+
+		const TileEntityPacket packet(shared_from_this());
+
+		auto inventoried_lock = InventoriedTileEntity::observers.uniqueLock();
+
+		std::erase_if(InventoriedTileEntity::observers, [&](const std::weak_ptr<Player> &weak_player) {
+			if (auto player = weak_player.lock()) {
+				player->send(packet);
+				return false;
+			}
+
+			return true;
+		});
+
+		auto fluid_holding_lock = FluidHoldingTileEntity::observers.uniqueLock();
+
+		std::erase_if(FluidHoldingTileEntity::observers, [&](const std::weak_ptr<Player> &weak_player) {
+			if (auto player = weak_player.lock()) {
+				if (!InventoriedTileEntity::observers.contains(player))
+					player->send(packet);
+				return false;
+			}
+
+			return true;
+		});
 	}
 }
