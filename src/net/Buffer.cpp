@@ -138,7 +138,6 @@ namespace Game3 {
 		std::span span = buffer.getSpan();
 		if (span.empty())
 			throw std::out_of_range("Buffer is empty");
-		// return buffer.bytes[buffer.skip++];
 		const char out = span[0];
 		++buffer.skip;
 		return out;
@@ -190,15 +189,11 @@ namespace Game3 {
 	void Buffer::popMany(size_t count) {
 		assert(count <= size() - skip);
 		skip += count;
-		// bytes.erase(bytes.begin() + (size() - count), bytes.end());
 	}
 
 	void Buffer::limitTo(size_t count) {
-		if (bytes.size() - skip <= count)
-			return;
-
-		skip += count;
-		// bytes.erase(bytes.begin() + count, bytes.end());
+		if (count < bytes.size() - skip)
+			skip += count;
 	}
 
 	void Buffer::debug() const {
