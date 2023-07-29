@@ -756,17 +756,62 @@
 				"base:category/small_flowers"
 			],
 			"base:category/flowers": [
-				"base:category/red_flowers",
-				"base:category/orange_flowers",
-				"base:category/yellow_flowers",
-				"base:category/green_flowers",
-				"base:category/blue_flowers",
-				"base:category/purple_flowers",
-				"base:category/white_flowers",
-				"base:category/black_flowers"
+				"base:category/flowers_2",
+				"base:category/flowers_3",
+				"base:category/flowers_4"
 			],
 			"base:category/plantable": [
 				"base:category/flowers"
+			],
+			"base:category/flowers_1": [
+				"base:tile/flower1_red",
+				"base:tile/flower1_orange",
+				"base:tile/flower1_yellow",
+				"base:tile/flower1_green",
+				"base:tile/flower1_blue",
+				"base:tile/flower1_purple",
+				"base:tile/flower1_white",
+				"base:tile/flower1_black"
+			],
+			"base:category/flowers_2": [
+				"base:tile/flower2_red",
+				"base:tile/flower2_orange",
+				"base:tile/flower2_yellow",
+				"base:tile/flower2_green",
+				"base:tile/flower2_blue",
+				"base:tile/flower2_purple",
+				"base:tile/flower2_white",
+				"base:tile/flower2_black"
+			],
+			"base:category/flowers_3": [
+				"base:tile/flower3_red",
+				"base:tile/flower3_orange",
+				"base:tile/flower3_yellow",
+				"base:tile/flower3_green",
+				"base:tile/flower3_blue",
+				"base:tile/flower3_purple",
+				"base:tile/flower3_white",
+				"base:tile/flower3_black"
+			],
+			"base:category/flowers_4": [
+				"base:tile/flower4_red",
+				"base:tile/flower4_orange",
+				"base:tile/flower4_yellow",
+				"base:tile/flower4_green",
+				"base:tile/flower4_blue",
+				"base:tile/flower4_purple",
+				"base:tile/flower4_white",
+				"base:tile/flower4_black"
+			],
+			"base:category/flowers_5": [
+				"base:tile/flower5_red",
+				"base:tile/flower5_orange",
+				"base:tile/flower5_yellow",
+				"base:tile/flower5_green",
+				"base:tile/flower5_blue",
+				"base:tile/flower5_purple",
+				"base:tile/flower5_white",
+				"base:tile/flower5_black"
 			],
 			"base:category/red_flowers": [
 				"base:tile/flower1_red",
