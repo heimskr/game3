@@ -20,6 +20,19 @@ namespace Game3 {
 	template <> std::string Buffer::getType<float>   (const float &)    { return {'\x09'}; }
 	template <> std::string Buffer::getType<double>  (const double &)   { return {'\x0a'}; }
 
+	template <> Buffer & Buffer::appendType<bool>    (const bool     &) { return *this += '\x01'; }
+	template <> Buffer & Buffer::appendType<uint8_t> (const uint8_t  &) { return *this += '\x01'; }
+	template <> Buffer & Buffer::appendType<uint16_t>(const uint16_t &) { return *this += '\x02'; }
+	template <> Buffer & Buffer::appendType<uint32_t>(const uint32_t &) { return *this += '\x03'; }
+	template <> Buffer & Buffer::appendType<uint64_t>(const uint64_t &) { return *this += '\x04'; }
+	template <> Buffer & Buffer::appendType<char>    (const char     &) { return *this += '\x05'; }
+	template <> Buffer & Buffer::appendType<int8_t>  (const int8_t   &) { return *this += '\x05'; }
+	template <> Buffer & Buffer::appendType<int16_t> (const int16_t  &) { return *this += '\x06'; }
+	template <> Buffer & Buffer::appendType<int32_t> (const int32_t  &) { return *this += '\x07'; }
+	template <> Buffer & Buffer::appendType<int64_t> (const int64_t  &) { return *this += '\x08'; }
+	template <> Buffer & Buffer::appendType<float>   (const float    &) { return *this += '\x09'; }
+	template <> Buffer & Buffer::appendType<double>  (const double   &) { return *this += '\x0a'; }
+
 	template <>
 	std::string Buffer::getType<std::string_view>(const std::string_view &string) {
 		const auto size = string.size();
@@ -56,7 +69,7 @@ namespace Game3 {
 
 	Buffer & Buffer::operator+=(uint16_t item) {
 		if constexpr (std::endian::native == std::endian::little) {
-			const auto *raw = reinterpret_cast<const uint8_t *>(&item);
+			const auto *raw = reinterpret_cast<uint8_t *>(&item);
 			bytes.insert(bytes.end(), raw, raw + sizeof(item));
 		} else
 			bytes.insert(bytes.end(), {static_cast<uint8_t>(item), static_cast<uint8_t>(item >> 8)});
@@ -65,7 +78,7 @@ namespace Game3 {
 
 	Buffer & Buffer::operator+=(uint32_t item) {
 		if constexpr (std::endian::native == std::endian::little) {
-			const auto *raw = reinterpret_cast<const uint8_t *>(&item);
+			const auto *raw = reinterpret_cast<uint8_t *>(&item);
 			bytes.insert(bytes.end(), raw, raw + sizeof(item));
 		} else
 			bytes.insert(bytes.end(), {static_cast<uint8_t>(item), static_cast<uint8_t>(item >> 8), static_cast<uint8_t>(item >> 16), static_cast<uint8_t>(item >> 24)});
@@ -74,7 +87,7 @@ namespace Game3 {
 
 	Buffer & Buffer::operator+=(uint64_t item) {
 		if constexpr (std::endian::native == std::endian::little) {
-			const auto *raw = reinterpret_cast<const uint8_t *>(&item);
+			const auto *raw = reinterpret_cast<uint8_t *>(&item);
 			bytes.insert(bytes.end(), raw, raw + sizeof(item));
 		} else {
 			bytes.insert(bytes.end(), {
@@ -122,10 +135,12 @@ namespace Game3 {
 
 	template <>
 	char popBuffer<char>(Buffer &buffer) {
-		if (buffer.bytes.empty())
+		std::span span = buffer.getSpan();
+		if (span.empty())
 			throw std::out_of_range("Buffer is empty");
-		const auto out = buffer.bytes.front();
-		buffer.bytes.pop_front();
+		// return buffer.bytes[buffer.skip++];
+		const char out = span[0];
+		++buffer.skip;
 		return out;
 	}
 
@@ -135,60 +150,15 @@ namespace Game3 {
 	}
 
 	template <>
-	uint8_t popBuffer<uint8_t>(Buffer &buffer) {
-		return static_cast<uint8_t>(popBuffer<char>(buffer));
-	}
-
-	template <>
-	uint16_t popBuffer<uint16_t>(Buffer &buffer) {
-		if (buffer.bytes.size() < sizeof(uint16_t))
-			throw std::out_of_range("Buffer is too empty");
-		return popBuffer<uint8_t>(buffer) | (buffer.popConv<uint8_t, uint16_t>() << 8);
-	}
-
-	template <>
-	uint32_t popBuffer<uint32_t>(Buffer &buffer) {
-		if (buffer.bytes.size() < sizeof(uint16_t))
-			throw std::out_of_range("Buffer is too empty");
-		return popBuffer<uint8_t>(buffer) | (buffer.popConv<uint8_t, uint32_t>() << 8) | (buffer.popConv<uint8_t, uint32_t>() << 16) | (buffer.popConv<uint8_t, uint32_t>() << 24);
-	}
-
-	template <>
-	uint64_t popBuffer<uint64_t>(Buffer &buffer) {
-		if (buffer.bytes.size() < sizeof(uint16_t))
-			throw std::out_of_range("Buffer is too empty");
-		return popBuffer<uint8_t>(buffer) | (buffer.popConv<uint8_t, uint64_t>() << 8) | (buffer.popConv<uint8_t, uint64_t>() << 16) | (buffer.popConv<uint8_t, uint64_t>() << 24)
-		     | (buffer.popConv<uint8_t, uint64_t>() << 32) | (buffer.popConv<uint8_t, uint64_t>() << 40) | (buffer.popConv<uint8_t, uint64_t>() << 48) | (buffer.popConv<uint8_t, uint64_t>() << 56);
-	}
-
-	template <>
-	int8_t popBuffer<int8_t>(Buffer &buffer) {
-		return static_cast<int8_t>(popBuffer<uint8_t>(buffer));
-	}
-
-	template <>
-	int16_t popBuffer<int16_t>(Buffer &buffer) {
-		return static_cast<int16_t>(popBuffer<uint16_t>(buffer));
-	}
-
-	template <>
-	int32_t popBuffer<int32_t>(Buffer &buffer) {
-		return static_cast<int32_t>(popBuffer<uint32_t>(buffer));
-	}
-
-	template <>
-	int64_t popBuffer<int64_t>(Buffer &buffer) {
-		return static_cast<int64_t>(popBuffer<uint64_t>(buffer));
-	}
-
-	template <>
 	float popBuffer<float>(Buffer &buffer) {
+		static_assert(sizeof(float) == sizeof(uint32_t));
 		const auto raw = popBuffer<uint32_t>(buffer);
 		return *reinterpret_cast<const float *>(&raw);
 	}
 
 	template <>
 	double popBuffer<double>(Buffer &buffer) {
+		static_assert(sizeof(double) == sizeof(uint64_t));
 		const auto raw = popBuffer<uint64_t>(buffer);
 		return *reinterpret_cast<const double *>(&raw);
 	}
@@ -218,14 +188,17 @@ namespace Game3 {
 	}
 
 	void Buffer::popMany(size_t count) {
-		assert(count <= size());
-		bytes.erase(bytes.begin() + (size() - count), bytes.end());
+		assert(count <= size() - skip);
+		skip += count;
+		// bytes.erase(bytes.begin() + (size() - count), bytes.end());
 	}
 
 	void Buffer::limitTo(size_t count) {
-		if (bytes.size() <= count)
+		if (bytes.size() - skip <= count)
 			return;
-		bytes.erase(bytes.begin() + count, bytes.end());
+
+		skip += count;
+		// bytes.erase(bytes.begin() + count, bytes.end());
 	}
 
 	void Buffer::debug() const {
@@ -325,8 +298,10 @@ namespace Game3 {
 
 	template <>
 	Buffer & Buffer::operator>>(Buffer &other) {
-		other.append(bytes.begin(), bytes.end());
+		const std::span span = getSpan();
+		other.append(span.begin(), span.end());
 		bytes.clear();
+		skip = 0;
 		return *this;
 	}
 }

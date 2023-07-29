@@ -4,6 +4,7 @@
 #include <cassert>
 #include <concepts>
 #include <cstdint>
+#include <cstring>
 #include <deque>
 #include <iostream>
 #include <list>
@@ -35,10 +36,14 @@ namespace Game3 {
 	};
 
 	class Buffer {
-		private:
-			std::deque<uint8_t> bytes;
-
 		public:
+			std::vector<uint8_t> bytes;
+			size_t skip = 0;
+
+			std::span<const uint8_t> getSpan() const {
+				return std::span(bytes.begin() + skip, bytes.size() - skip);
+			}
+
 			template <typename T>
 			Buffer & appendType(const T &t) {
 				const auto type = getType(t);
@@ -163,9 +168,9 @@ namespace Game3 {
 			Buffer(std::weak_ptr<BufferContext> context_):
 				context(std::move(context_)) {}
 
-			inline auto size() const { return bytes.size(); }
-			inline bool empty() const { return bytes.empty(); }
-			inline void clear() { bytes.clear(); }
+			inline auto size() const { return bytes.size() - skip; }
+			inline bool empty() const { return bytes.size() == skip; }
+			inline void clear() { bytes.clear(); skip = 0; }
 			inline auto & getBytes() { return bytes; }
 			inline const auto & getBytes() const { return bytes; }
 
@@ -305,6 +310,23 @@ namespace Game3 {
 			template <typename T>
 			friend T popBuffer(Buffer &);
 	};
+
+	template <std::integral T>
+	T popBuffer(Buffer &buffer) {
+		std::span span = buffer.getSpan();
+
+		if (span.size_bytes() < sizeof(T))
+			throw std::out_of_range("Buffer is too empty");
+
+		T out{};
+		std::memmove(reinterpret_cast<char *>(&out), span.data(), sizeof(T));
+
+		buffer.skip += sizeof(T);
+
+		if constexpr (std::endian::native == std::endian::big)
+			return swapBytes(out);
+		return out;
+	}
 
 	template <Linear C>
 	C popBuffer(Buffer &buffer) {

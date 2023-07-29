@@ -68,6 +68,7 @@ namespace Game3 {
 					throw;
 				}
 
+				assert(receiveBuffer.empty());
 				receiveBuffer.clear();
 				server.game->queuePacket(shared_from_this(), packet);
 				state = State::Begin;

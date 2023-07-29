@@ -84,6 +84,7 @@ namespace Game3 {
 					auto packet = (*game->registry<PacketFactoryRegistry>().at(packetType))();
 					packet->decode(*game, buffer);
 					assert(buffer.empty());
+					buffer.clear();
 					state = State::Begin;
 					{
 						std::unique_lock lock(receivedPacketCountsMutex);
