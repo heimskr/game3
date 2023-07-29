@@ -72,9 +72,10 @@ namespace Game3 {
 			}
 		}
 
-		notifyOwner();
+		if (remaining != ssize_t(stack.count))
+			notifyOwner();
 
-		if (remaining < 0)
+		if (remaining < 0 || ssize_t(stack.count) < remaining)
 			throw std::logic_error("How'd we end up with " + std::to_string(remaining) + " items remaining?");
 
 		if (remaining == 0)
