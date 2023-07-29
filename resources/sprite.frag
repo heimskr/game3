@@ -8,7 +8,7 @@ out vec4 color;
 uniform sampler2D sprite;
 uniform vec4 spriteColor;
 uniform vec4 texturePosition;
-uniform float divisor;
+// uniform float divisor;
 
 void main() {
 	color = spriteColor * texture(sprite, TexCoords);
@@ -16,8 +16,8 @@ void main() {
 	if (TexCoords.x < texturePosition.x || TexCoords.y < texturePosition.y || texturePosition.x + texturePosition.z < TexCoords.x || texturePosition.y + texturePosition.w < TexCoords.y) {
 		discard;
 	} else {
-		color.r /= divisor;
-		color.g /= divisor;
-		color.b /= divisor;
+		// color.r /= divisor;
+		// color.g /= divisor;
+		// color.b /= divisor;
 	}
 }

@@ -8,12 +8,12 @@ flat in int index;
 flat in float opacity;
 
 uniform sampler2D texture0;
-uniform float divisor;
+// uniform float divisor;
 
 void main() {
 	FragColor = texture(texture0, texCoord);
-	FragColor.r /= divisor;
-	FragColor.g /= divisor;
-	FragColor.b /= divisor;
+	// FragColor.r /= divisor;
+	// FragColor.g /= divisor;
+	// FragColor.b /= divisor;
 	FragColor.a = opacity;
 }

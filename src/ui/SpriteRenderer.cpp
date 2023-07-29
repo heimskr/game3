@@ -125,7 +125,7 @@ namespace Game3 {
 		shader.set("spriteColor", 1.f, 1.f, 1.f, options.alpha);
 		const float multiplier = 2.f / *texture.width;
 		shader.set("texturePosition", options.x_offset * multiplier, options.y_offset * multiplier, options.size_x / *texture.width, options.size_y / *texture.width);
-		shader.set("divisor", divisor);
+		// shader.set("divisor", divisor);
 
 		glActiveTexture(GL_TEXTURE0);
 		texture.bind();
@@ -179,7 +179,7 @@ namespace Game3 {
 		shader.set("spriteColor", 1.f, 1.f, 1.f, options.alpha);
 		const float multiplier = 2.f / texture_width;
 		shader.set("texturePosition", options.x_offset * multiplier, options.y_offset * multiplier, options.size_x / texture_width, options.size_y / texture_width);
-		shader.set("divisor", divisor);
+		// shader.set("divisor", divisor);
 
 		texture.bind(0);
 
@@ -301,7 +301,7 @@ namespace Game3 {
 		const float multiplier_x = multiplier / texture_width;
 		const float multiplier_y = multiplier / texture_height;
 		shader.set("texturePosition", options.x_offset * multiplier_x, options.y_offset * multiplier_y, options.size_x / texture_width, options.size_y / texture_height);
-		shader.set("divisor", divisor);
+		// shader.set("divisor", divisor);
 	}
 
 	void SpriteRenderer::hackY(float &y, float y_offset, float scale) {

@@ -54,7 +54,7 @@ namespace Game3 {
 		provider = &provider_;
 	}
 
-	void FluidRenderer::render(float divisor, float scale, float center_x, float center_y) {
+	void FluidRenderer::render(float /* divisor */, float scale, float center_x, float center_y) {
 		if (!initialized)
 			return;
 
@@ -86,7 +86,7 @@ namespace Game3 {
 		texture->bind(0);
 		shader.set("texture0", 0);
 		shader.set("projection", projection);
-		shader.set("divisor", divisor);
+		// shader.set("divisor", divisor);
 
 		GL::triangles(CHUNK_SIZE * CHUNK_SIZE);
 	}

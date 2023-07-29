@@ -66,7 +66,7 @@ namespace Game3 {
 		provider = &provider_;
 	}
 
-	void ElementBufferedRenderer::render(float divisor, float scale, float center_x, float center_y) {
+	void ElementBufferedRenderer::render(float /* divisor */, float scale, float center_x, float center_y) {
 		if (!initialized)
 			return;
 
@@ -104,13 +104,13 @@ namespace Game3 {
 		texture->bind(0);
 		shader.set("texture0", 0);
 		shader.set("projection", projection);
-		shader.set("divisor", divisor);
-		shader.set("bright_tiles", brightTiles);
+		// shader.set("divisor", divisor);
+		// shader.set("bright_tiles", brightTiles);
 
 		GL::triangles(CHUNK_SIZE * CHUNK_SIZE);
 	}
 
-	void ElementBufferedRenderer::render(float divisor) {
+	void ElementBufferedRenderer::render(float /* divisor */) {
 		if (!initialized)
 			return;
 
@@ -142,8 +142,8 @@ namespace Game3 {
 		tileset.getTexture(realm->getGame())->bind(0);
 		shader.set("texture0", 0);
 		shader.set("projection", projection);
-		shader.set("divisor", divisor);
-		shader.set("bright_tiles", brightTiles);
+		// shader.set("divisor", divisor);
+		// shader.set("bright_tiles", brightTiles);
 
 		GL::triangles(CHUNK_SIZE * CHUNK_SIZE);
 	}
