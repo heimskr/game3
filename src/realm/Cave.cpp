@@ -36,8 +36,6 @@ namespace Game3 {
 		if (Realm::interactGround(player, position, modifiers))
 			return true;
 
-		// const Index index = getIndex(position);
-
 		std::optional<ItemStack> ore_stack;
 
 		const TileID tile2 = getTile(Layer::Objects, position);
