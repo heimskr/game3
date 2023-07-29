@@ -56,8 +56,9 @@ namespace Game3 {
 		uses = json.contains("uses")? json.at("uses").get<uint32_t>() : 0;
 	}
 
-	void OreDeposit::tick(Game &, float delta) {
+	void OreDeposit::tick(Game &game, float delta) {
 		timeRemaining = std::max(timeRemaining - delta, 0.f);
+		TileEntity::tick(game, delta);
 	}
 
 	bool OreDeposit::onInteractNextTo(const PlayerPtr &player, Modifiers) {

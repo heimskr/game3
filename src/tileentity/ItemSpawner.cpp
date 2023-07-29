@@ -32,9 +32,11 @@ namespace Game3 {
 			spawnables.push_back(ItemStack::fromJSON(game, spawnable));
 	}
 
-	void ItemSpawner::tick(Game &, float delta) {
+	void ItemSpawner::tick(Game &game, float delta) {
 		if (getSide() != Side::Server)
 			return;
+
+		Ticker ticker{*this, game, delta};
 
 		static std::uniform_real_distribution distribution(0., 1.);
 		for (float i = 0.f; i < delta; i += .1f) {

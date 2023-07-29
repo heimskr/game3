@@ -41,12 +41,15 @@ namespace Game3 {
 			hiveAge = 0.f;
 	}
 
-	void Tree::tick(Game &, float delta) {
+	void Tree::tick(Game &game, float delta) {
 		age += delta;
+
 		if (0.f <= hiveAge && hiveAge < HIVE_MATURITY) {
 			hiveAge += delta;
 			increaseUpdateCounter();
 		}
+
+		TileEntity::tick(game, delta);
 	}
 
 	bool Tree::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {

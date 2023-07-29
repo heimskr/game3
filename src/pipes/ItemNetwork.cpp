@@ -16,9 +16,10 @@ namespace Game3 {
 		if (!realm || insertions.empty())
 			return;
 
+		auto overflow_lock = overflowQueue.uniqueLock();
+
 		// Every so often, if there's anything in the overflowQueue, we try to insert that somewhere instead of extracting anything more.
 		if (overflowPeriod != 0 && tick_id % overflowPeriod == 0 && !overflowQueue.empty()) {
-			auto lock = overflowQueue.uniqueLock();
 			std::optional<ItemStack> stack = std::move(overflowQueue.front());
 			overflowQueue.pop_front();
 
@@ -64,6 +65,12 @@ namespace Game3 {
 				continue;
 
 			if (auto inventoried = tile_entity->cast<InventoriedTileEntity>(); inventoried && !inventoried->empty()) {
+				auto inventory_lock = inventoried->inventory->uniqueLock();
+
+				// It's possible we'll extract an item and put it right back.
+				// If that happens, we don't want to notify the owner and potentially queue a broadcast.
+				auto suppressor = inventoried->inventory->suppress();
+
 				std::optional<ItemStack> extracted = inventoried->extractItem(direction, true);
 				if (!extracted)
 					continue;
@@ -92,6 +99,7 @@ namespace Game3 {
 							continue;
 
 						if (InventoryPtr round_robin_inventory = getRoundRobinInventory()) {
+							auto round_robin_lock = round_robin_inventory->uniqueLock();
 							leftover = round_robin_inventory->add(*leftover);
 						} else {
 							overflowQueue.push_back(std::move(*leftover));
@@ -100,8 +108,17 @@ namespace Game3 {
 					} while (old_iter != round_robin_iter && leftover);
 
 					if (leftover) {
-						// If there's anything left over, move it to the overflowQueue so we can try to insert it somewhere another time.
-						overflowQueue.push_back(std::move(*leftover));
+						// If there's anything left over, try putting it back into the inventory it was extracted from.
+						if (std::optional<ItemStack> new_leftover = inventoried->inventory->add(*leftover)) {
+							// If there's still anything left over, move it to the overflowQueue so we can try to insert it somewhere another time.
+							// Theoretically this should never happen because we've locked the source inventory.
+							// Also, because the source inventory changed, we need to cancel the suppressor.
+							suppressor.cancel(true);
+							overflowQueue.push_back(std::move(*leftover));
+						}
+					} else {
+						// Because no leftovers means the extraction was successful and the source inventory changed, we need to undo the effect of the suppressor.
+						suppressor.cancel(true);
 					}
 				} else {
 					advanceRoundRobin();

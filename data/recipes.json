@@ -214,7 +214,7 @@
 		"output": [["base:item/floor", 2]]
 	}],
 	["base:centrifuge_recipe", {
-		"input": ["base:fluid/lava", 1000],
+		"input": ["base:fluid/lava", 1],
 		"output": [
 			[1.0, ["base:item/stone", 1]],
 			[0.3, ["base:item/iron_ore", 1]],

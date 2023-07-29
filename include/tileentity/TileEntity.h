@@ -8,6 +8,7 @@
 #include "Position.h"
 #include "Types.h"
 #include "game/Agent.h"
+#include "net/Broadcastable.h"
 #include "ui/Modifiers.h"
 #include "util/Castable.h"
 
@@ -20,7 +21,7 @@ namespace Game3 {
 	class RemoteClient;
 	class SpriteRenderer;
 
-	class TileEntity: public Agent, public Castable<TileEntity> {
+	class TileEntity: public Agent, public Castable<TileEntity>, public Broadcastable {
 		public:
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;
@@ -41,7 +42,7 @@ namespace Game3 {
 			static std::shared_ptr<TileEntity> fromJSON(Game &, const nlohmann::json &);
 
 			virtual void init(Game &);
-			virtual void tick(Game &, float) {}
+			virtual void tick(Game &, float);
 			virtual void onSpawn();
 			/** Called after the tile entity is loaded from disk. */
 			virtual void onLoad() {}
@@ -87,6 +88,14 @@ namespace Game3 {
 			virtual void toJSON(nlohmann::json &) const;
 
 			friend void to_json(nlohmann::json &, const TileEntity &);
+
+		public:
+			struct Ticker {
+				TileEntity &parent;
+				Game &game;
+				float delta;
+				~Ticker() { parent.TileEntity::tick(game, delta); }
+			};
 	};
 
 	using TileEntityPtr = std::shared_ptr<TileEntity>;

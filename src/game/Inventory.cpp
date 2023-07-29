@@ -26,12 +26,14 @@ namespace Game3 {
 	Inventory::Inventory(const Inventory &other):
 		weakOwner(other.weakOwner),
 		slotCount(other.slotCount.load()),
-		activeSlot(other.activeSlot.load()) {}
+		activeSlot(other.activeSlot.load()),
+		suppressInventoryNotifications(other.suppressInventoryNotifications.load()) {}
 
 	Inventory::Inventory(Inventory &&other):
 	weakOwner(other.weakOwner),
 	slotCount(other.slotCount.load()),
-	activeSlot(other.activeSlot.load()) {
+	activeSlot(other.activeSlot.load()),
+	suppressInventoryNotifications(other.suppressInventoryNotifications.load()) {
 		other.weakOwner = {};
 		other.slotCount = 0;
 		other.activeSlot = 0;
@@ -41,6 +43,7 @@ namespace Game3 {
 		weakOwner = other.weakOwner;
 		slotCount = other.slotCount.load();
 		activeSlot = other.activeSlot.load();
+		suppressInventoryNotifications = other.suppressInventoryNotifications.load();
 		return *this;
 	}
 
@@ -48,6 +51,7 @@ namespace Game3 {
 		weakOwner = std::move(other.weakOwner);
 		slotCount = other.slotCount.exchange(0);
 		activeSlot = other.activeSlot.exchange(0);
+		suppressInventoryNotifications = other.suppressInventoryNotifications.exchange(false);
 		return *this;
 	}
 

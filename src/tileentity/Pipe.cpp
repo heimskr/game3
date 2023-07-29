@@ -64,11 +64,13 @@ namespace Game3 {
 		tileIDs[pipe_type] = tileset[Corner(pipe_type)] + tileset.columnCount(realm->getGame()) * (march_index / 7) + march_index % 7;
 	}
 
-	void Pipe::tick(Game &game, float) {
-		if (getSide() == Side::Server)
+	void Pipe::tick(Game &game, float delta) {
+		if (getSide() == Side::Server) {
 			for (const PipeType pipe_type: PIPE_TYPES)
 				if (auto network = networks[pipe_type])
 					network->tick(game.currentTick);
+			TileEntity::tick(game, delta);
+		}
 	}
 
 	void Pipe::render(SpriteRenderer &sprite_renderer) {

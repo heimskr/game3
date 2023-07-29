@@ -31,10 +31,12 @@ namespace Game3 {
 		inventory = std::make_shared<ServerInventory>(shared_from_this(), 10);
 	}
 
-	void Centrifuge::tick(Game &, float delta) {
+	void Centrifuge::tick(Game &game, float delta) {
 		RealmPtr realm = weakRealm.lock();
 		if (!realm || realm->getSide() != Side::Server)
 			return;
+
+		Ticker ticker{*this, game, delta};
 
 		accumulatedTime += delta;
 
@@ -49,7 +51,6 @@ namespace Game3 {
 		if (levels.empty())
 			return;
 
-		Game &game = realm->getGame();
 		auto &registry = game.registry<CentrifugeRecipeRegistry>();
 
 		std::optional<ItemStack> leftovers;

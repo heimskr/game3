@@ -35,10 +35,12 @@ namespace Game3 {
 		return 64 * FluidTile::FULL;
 	}
 
-	void Pump::tick(Game &, float delta) {
+	void Pump::tick(Game &game, float delta) {
 		auto realm = weakRealm.lock();
 		if (!realm || realm->getSide() != Side::Server)
 			return;
+
+		Ticker ticker{*this, game, delta};
 
 		accumulatedTime += delta;
 
@@ -91,7 +93,7 @@ namespace Game3 {
 		if (modifiers.onlyCtrl()) {
 			setDirection(rotateClockwise(getDirection()));
 			increaseUpdateCounter();
-			broadcast();
+			queueBroadcast();
 			return true;
 		}
 

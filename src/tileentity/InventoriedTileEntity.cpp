@@ -11,7 +11,6 @@ namespace Game3 {
 		if (!inventory)
 			return false;
 
-		auto lock = inventory->sharedLock();
 		return inventory->canInsert(stack);
 	}
 
@@ -22,7 +21,6 @@ namespace Game3 {
 		if (remove) {
 			std::optional<ItemStack> out;
 			{
-				auto lock = inventory->uniqueLock();
 				Slot slot = -1;
 				ItemStack *stack = inventory->firstItem(&slot);
 				if (slot == Slot(-1) || stack == nullptr)
@@ -35,7 +33,6 @@ namespace Game3 {
 			return out;
 		}
 
-		auto lock = inventory->sharedLock();
 		ItemStack *stack = inventory->firstItem(nullptr);
 		if (stack == nullptr)
 			return std::nullopt;

@@ -65,7 +65,7 @@ namespace Game3 {
 				}
 
 				pipe->increaseUpdateCounter();
-				pipe->broadcast();
+				pipe->queueBroadcast();
 				return true;
 			}
 	};

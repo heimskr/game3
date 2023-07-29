@@ -36,6 +36,11 @@ namespace Game3 {
 		game.allAgents[globalID] = shared_from_this();
 	}
 
+	void TileEntity::tick(Game &, float) {
+		if (needsBroadcast.exchange(false))
+			broadcast();
+	}
+
 	void TileEntity::render(SpriteRenderer &sprite_renderer) {
 		if (!isVisible())
 			return;

@@ -133,6 +133,33 @@ namespace Game3 {
 		protected:
 			/** Removes every slot whose item count is zero from the storage map. */
 			virtual void compact() = 0;
+
+			std::atomic_bool suppressInventoryNotifications{false};
+
+		public:
+			struct Suppressor {
+				Inventory &parent;
+				bool active = true;
+
+				explicit Suppressor(Inventory &parent_): parent(parent_) {
+					parent.suppressInventoryNotifications = true;
+				}
+
+				~Suppressor() {
+					if (active)
+						parent.suppressInventoryNotifications = false;
+				}
+
+				void cancel(bool notify = false) {
+					active = false;
+					if (notify)
+						parent.notifyOwner();
+				}
+			};
+
+			Suppressor suppress() {
+				return Suppressor(*this);
+			}
 	};
 
 	using InventoryPtr = std::shared_ptr<Inventory>;

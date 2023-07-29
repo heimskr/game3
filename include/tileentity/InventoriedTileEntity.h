@@ -15,12 +15,15 @@ namespace Game3 {
 		public:
 			InventoriedTileEntity(std::shared_ptr<Inventory> = nullptr);
 
+			/** Doesn't lock the inventory. */
 			virtual bool canInsertItem(const ItemStack &, Direction);
+			/** Doesn't lock the inventory. */
 			virtual std::optional<ItemStack> extractItem(Direction, bool remove);
 
+			/** Doesn't lock the inventory. */
 			virtual bool empty() const;
 
-			/** Server-side only. */
+			/** Server-side only. Doesn't lock the inventory. */
 			void setInventory(Slot slot_count);
 
 			void inventoryUpdated() override;

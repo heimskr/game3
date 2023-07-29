@@ -63,7 +63,7 @@ namespace Game3 {
 
 		if (realm->getSide() == Side::Server) {
 			increaseUpdateCounter();
-			broadcast();
+			queueBroadcast();
 		} else {
 			getRealm()->getGame().toClient().signal_fluid_update().emit(std::dynamic_pointer_cast<HasFluids>(shared_from_this()));
 		}
