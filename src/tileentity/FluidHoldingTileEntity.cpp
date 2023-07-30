@@ -83,11 +83,11 @@ namespace Game3 {
 
 	void FluidHoldingTileEntity::toJSON(nlohmann::json &json) const {
 		auto lock = const_cast<Lockable<FluidContainer::Map> &>(fluidContainer->levels).sharedLock();
-		json["fluidContainer->levels"] = fluidContainer->levels.getBase();
+		json["fluidLevels"] = fluidContainer->levels.getBase();
 	}
 
 	void FluidHoldingTileEntity::absorbJSON(Game &, const nlohmann::json &json) {
-		fluidContainer->levels = json.at("fluidContainer->levels").get<FluidContainer::Map>();
+		fluidContainer->levels = json.at("fluidLevels").get<FluidContainer::Map>();
 	}
 
 	void FluidHoldingTileEntity::encode(Game &, Buffer &buffer) {

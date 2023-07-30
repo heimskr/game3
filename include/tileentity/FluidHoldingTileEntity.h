@@ -8,6 +8,8 @@
 #include <optional>
 
 namespace Game3 {
+	class TileEntityPacket;
+
 	/**
 	 * This class inherits TileEntity *virtually*. It doesn't call any TileEntity methods itself.
 	 * Deriving classes must remember to do so in the encode and decode methods.

@@ -32,6 +32,20 @@ namespace Game3 {
 		return 0;
 	}
 
+	EnergyAmount HasEnergy::getEnergy() {
+		// Probably don't need the lock, but TSAN might complain.
+		std::shared_lock lock{energyMutex};
+		return energyAmount;
+	}
+
+	void HasEnergy::setEnergy(EnergyAmount new_amount) {
+		{
+			std::unique_lock lock{energyMutex};
+			energyAmount = new_amount;
+		}
+		energyUpdated();
+	}
+
 	void HasEnergy::encode(Buffer &buffer) {
 		std::shared_lock lock{energyMutex};
 		buffer << energyAmount;

@@ -10,8 +10,6 @@ namespace Game3 {
 
 	class HasEnergy {
 		public:
-			EnergyAmount energyAmount = 0;
-
 			HasEnergy() = default;
 
 			explicit HasEnergy(EnergyAmount energy_amount):
@@ -20,6 +18,8 @@ namespace Game3 {
 			/** Returns the amount of energy unable to be added. */
 			virtual EnergyAmount addEnergy(EnergyAmount);
 			virtual EnergyAmount getEnergyCapacity() = 0;
+			virtual EnergyAmount getEnergy();
+			virtual void setEnergy(EnergyAmount);
 
 			virtual void energyUpdated() {}
 
@@ -27,6 +27,8 @@ namespace Game3 {
 			void decode(Buffer &);
 
 		protected:
+			// I wish I could just use std::atomic for this.
+			EnergyAmount energyAmount = 0;
 			std::shared_mutex energyMutex;
 	};
 }
