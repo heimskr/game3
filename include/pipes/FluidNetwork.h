@@ -16,6 +16,8 @@ namespace Game3 {
 			void tick(Tick) final;
 			bool canWorkWith(const std::shared_ptr<TileEntity> &) const final;
 
+			Game & getGame() const override;
+
 		private:
 			/** Returns the amount not distributed. */
 			FluidAmount distribute(const FluidStack &stack);

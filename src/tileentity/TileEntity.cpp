@@ -106,6 +106,12 @@ namespace Game3 {
 		return getChunkPosition(getPosition());
 	}
 
+	Game & TileEntity::getGame() const {
+		if (auto realm = weakRealm.lock())
+			return realm->getGame();
+		throw std::runtime_error("Couldn't get Game from TileEntity: couldn't lock Realm");
+	}
+
 	void TileEntity::encode(Game &, Buffer &buffer) {
 		buffer << tileID;
 		buffer << position;

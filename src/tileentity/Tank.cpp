@@ -14,7 +14,7 @@ namespace Game3 {
 	Tank::Tank(Position position_):
 		Tank("base:tile/tank"_id, position_) {}
 
-	FluidAmount Tank::getMaxLevel(const Game &, FluidID) const {
+	FluidAmount Tank::getMaxLevel(FluidID) const {
 		return 64 * FluidTile::FULL;
 	}
 
@@ -57,5 +57,9 @@ namespace Game3 {
 	void Tank::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
 		FluidHoldingTileEntity::decode(game, buffer);
+	}
+
+	Game & Tank::getGame() const {
+		return TileEntity::getGame();
 	}
 }

@@ -15,12 +15,12 @@ namespace Game3 {
 
 	class HasFluids {
 		public:
-			std::shared_ptr<FluidC[ontainer> fluidContainer;
+			std::shared_ptr<FluidContainer> fluidContainer;
 
 			HasFluids(std::shared_ptr<FluidContainer> = nullptr);
 
 			virtual size_t getMaxFluidTypes() const { return 1; }
-			virtual FluidAmount getMaxLevel(const Game &, FluidID) const;
+			virtual FluidAmount getMaxLevel(FluidID) const;
 
 			/** Returns how much fluid was unable to be added. */
 			virtual FluidAmount addFluid(FluidStack);
@@ -34,5 +34,7 @@ namespace Game3 {
 			void encode(Buffer &);
 			void decode(Buffer &);
 
+		protected:
+			virtual Game & getGame() const = 0;
 	};
 }

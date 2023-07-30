@@ -14,8 +14,10 @@ namespace Game3 {
 	GeothermalGenerator::GeothermalGenerator(Position position_):
 		GeothermalGenerator("base:tile/geothermal_generator"_id, position_) {}
 
-	FluidAmount GeothermalGenerator::getMaxLevel(const Game &, FluidID id) {
-
+	FluidAmount GeothermalGenerator::getMaxLevel(FluidID id) const {
+		if (auto fluid = getGame().registry<FluidRegistry>().maybe(id))
+			return fluid->identifier == "base:fluid/lava"_id? 16 * FluidTile::FULL : 0;
+		return 0;
 	}
 
 	EnergyAmount GeothermalGenerator::getEnergyCapacity() {
@@ -37,8 +39,10 @@ namespace Game3 {
 			return true;
 		}
 
-		// TODO!
-		// player->send(OpenEnergyLevelPacket(getGID()));
+		if (modifiers.onlyCtrl())
+			FluidHoldingTileEntity::addObserver(player);
+		else
+			EnergeticTileEntity::addObserver(player);
 
 		{
 			assert(fluidContainer);
@@ -71,5 +75,38 @@ namespace Game3 {
 		TileEntity::decode(game, buffer);
 		FluidHoldingTileEntity::decode(game, buffer);
 		EnergeticTileEntity::decode(game, buffer);
+	}
+
+	void GeothermalGenerator::broadcast() {
+		assert(getSide() == Side::Server);
+
+		const TileEntityPacket packet(shared_from_this());
+
+		auto energetic_lock = EnergeticTileEntity::observers.uniqueLock();
+
+		std::erase_if(EnergeticTileEntity::observers, [&](const std::weak_ptr<Player> &weak_player) {
+			if (auto player = weak_player.lock()) {
+				player->send(packet);
+				return false;
+			}
+
+			return true;
+		});
+
+		auto fluid_holding_lock = FluidHoldingTileEntity::observers.uniqueLock();
+
+		std::erase_if(FluidHoldingTileEntity::observers, [&](const std::weak_ptr<Player> &weak_player) {
+			if (auto player = weak_player.lock()) {
+				if (!EnergeticTileEntity::observers.contains(player))
+					player->send(packet);
+				return false;
+			}
+
+			return true;
+		});
+	}
+
+	Game & GeothermalGenerator::getGame() const {
+		return TileEntity::getGame();
 	}
 }

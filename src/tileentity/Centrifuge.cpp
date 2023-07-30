@@ -132,4 +132,8 @@ namespace Game3 {
 			return true;
 		});
 	}
+
+	Game & Centrifuge::getGame() const {
+		return TileEntity::getGame();
+	}
 }

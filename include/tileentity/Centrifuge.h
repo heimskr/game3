@@ -23,6 +23,8 @@ namespace Game3 {
 			void decode(Game &, Buffer &) override;
 			void broadcast() override;
 
+			Game & getGame() const final;
+
 		private:
 			float accumulatedTime = 0.f;
 

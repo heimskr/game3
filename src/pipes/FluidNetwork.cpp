@@ -61,6 +61,12 @@ namespace Game3 {
 		return std::dynamic_pointer_cast<FluidHoldingTileEntity>(tile_entity) != nullptr;
 	}
 
+	Game & FluidNetwork::getGame() const {
+		if (auto realm = weakRealm.lock())
+			return realm->getGame();
+		throw std::runtime_error("Couldn't get Game from FluidNetwork: couldn't lock Realm");
+	}
+
 	FluidAmount FluidNetwork::distribute(const FluidStack &stack) {
 		auto [id, amount] = stack;
 

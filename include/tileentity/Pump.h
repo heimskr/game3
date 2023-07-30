@@ -14,7 +14,7 @@ namespace Game3 {
 			inline Direction getDirection() const { return pumpDirection; }
 			void setDirection(Direction);
 
-			FluidAmount getMaxLevel(const Game &, FluidID) const override;
+			FluidAmount getMaxLevel(FluidID) const override;
 
 			void tick(Game &, float) override;
 			void toJSON(nlohmann::json &) const override;
@@ -23,6 +23,8 @@ namespace Game3 {
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
+
+			Game & getGame() const final;
 
 		private:
 			float accumulatedTime = 0.f;

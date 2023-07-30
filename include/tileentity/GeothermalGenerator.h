@@ -9,7 +9,7 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "te/geothermal_generator"}; }
 
-			FluidAmount getMaxLevel(const Game &, FluidID) const override;
+			FluidAmount getMaxLevel(FluidID) const override;
 			EnergyAmount getEnergyCapacity() override;
 
 			void toJSON(nlohmann::json &) const override;
@@ -18,6 +18,9 @@ namespace Game3 {
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
+			void broadcast() override;
+
+			Game & getGame() const final;
 
 		private:
 			GeothermalGenerator() = default;

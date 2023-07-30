@@ -43,24 +43,18 @@ namespace Game3 {
 
 	std::ostream & operator<<(std::ostream &, FluidTile);
 
-	class FluidStack {
-		public:
-			FluidID id = 0;
-			FluidAmount amount = 0;
+	struct FluidStack {
+		FluidID id = 0;
+		FluidAmount amount = 0;
 
-			FluidStack() = default;
-			FluidStack(const std::shared_ptr<Game> &, FluidID, FluidAmount);
+		FluidStack() = default;
+		FluidStack(FluidID, FluidAmount);
 
-			explicit operator std::string() const;
+		explicit operator std::string() const;
 
-			auto operator<=>(const FluidStack &) const = default;
+		auto operator<=>(const FluidStack &) const = default;
 
-			static FluidStack fromJSON(const Game &, const nlohmann::json &);
-
-			inline const Game & getGame() { auto locked = game.lock(); assert(game); return *game; }
-
-		private:
-			std::weak_ptr<Game> game;
+		static FluidStack fromJSON(const Game &, const nlohmann::json &);
 	};
 
 	std::ostream & operator<<(std::ostream &, FluidStack);

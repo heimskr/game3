@@ -69,6 +69,7 @@ namespace Game3 {
 			virtual bool kill() { return false; }
 			inline bool is(const Identifier &check) const { return getID() == check; }
 			std::string getName() override { return "Unknown TileEntity (" + std::string(tileEntityID) + ')'; }
+			virtual Game & getGame() const;
 
 			virtual void encode(Game &, Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */
