@@ -10,6 +10,7 @@ namespace Game3 {
 
 	bool EnergeticTileEntity::canInsertEnergy(EnergyAmount amount, Direction) {
 		std::shared_lock lock{energyMutex};
+		// TODO: handle integer overflow
 		return energyAmount + amount <= getEnergyCapacity();
 	}
 

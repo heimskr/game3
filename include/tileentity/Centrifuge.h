@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Texture.h"
-#include "game/Inventory.h"
 #include "tileentity/FluidHoldingTileEntity.h"
 #include "tileentity/InventoriedTileEntity.h"
 
@@ -11,13 +9,6 @@ namespace Game3 {
 			static Identifier ID() { return {"base", "te/centrifuge"}; }
 
 			constexpr static float PERIOD = 0.25;
-
-			Centrifuge(const Centrifuge &) = delete;
-			Centrifuge(Centrifuge &&) = default;
-			~Centrifuge() override = default;
-
-			Centrifuge & operator=(const Centrifuge &) = delete;
-			Centrifuge & operator=(Centrifuge &&) = default;
 
 			size_t getMaxFluidTypes() const override;
 			FluidAmount getMaxLevel(FluidID) const override;

@@ -124,6 +124,7 @@ namespace Game3 {
 		player->inventory->add(ItemStack(*game, "base:item/fluid_pipe", 64));
 		player->inventory->add(ItemStack(*game, "base:item/centrifuge", 64));
 		player->inventory->add(ItemStack(*game, "base:item/item_pipe", 64));
+		player->inventory->add(ItemStack(*game, "base:item/geothermal_generator", 64));
 		{
 			auto lock = game->lockPlayersUnique();
 			game->players.insert(player);

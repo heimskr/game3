@@ -35,6 +35,7 @@
 #include "item/FilledFlask.h"
 #include "item/Floor.h"
 #include "item/Furniture.h"
+#include "item/GeothermalGeneratorItem.h"
 #include "item/Hammer.h"
 #include "item/Hoe.h"
 #include "item/Item.h"
@@ -110,6 +111,7 @@
 #include "tileentity/Centrifuge.h"
 #include "tileentity/Chest.h"
 #include "tileentity/CraftingStation.h"
+#include "tileentity/GeothermalGenerator.h"
 #include "tileentity/Ghost.h"
 #include "tileentity/ItemSpawner.h"
 #include "tileentity/OreDeposit.h"
@@ -308,6 +310,8 @@ namespace Game3 {
 		add(std::make_shared<CentrifugeItem>("base:item/centrifuge", "Centrifuge", 999, 64)); // TODO: cost
 
 		add(std::make_shared<EnergyPipeItem>(4));
+
+		add(std::make_shared<GeothermalGeneratorItem>("base:item/geothermal_generator", "Geothermal Generator", 999, 64)); // TODO: cost
 	}
 
 	void Game::addGhosts() {
@@ -331,6 +335,7 @@ namespace Game3 {
 		add(TileEntityFactory::create<Centrifuge>());
 		add(TileEntityFactory::create<Chest>());
 		add(TileEntityFactory::create<CraftingStation>());
+		add(TileEntityFactory::create<GeothermalGenerator>());
 		add(TileEntityFactory::create<Ghost>());
 		add(TileEntityFactory::create<ItemSpawner>());
 		add(TileEntityFactory::create<OreDeposit>());

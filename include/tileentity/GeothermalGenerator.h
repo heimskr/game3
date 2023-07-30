@@ -1,13 +1,14 @@
 #pragma once
 
-#include "tileentity/FluidHoldingTileEntity.h"
+#include "Texture.h"
+#include "tileentity/EnergeticTileEntity.h"
 
 namespace Game3 {
-	class Tank: public FluidHoldingTileEntity {
+	class GeothermalGenerator: public EnergeticTileEntity {
 		public:
-			static Identifier ID() { return {"base", "te/tank"}; }
+			static Identifier ID() { return {"base", "te/geothermal_generator"}; }
 
-			FluidAmount getMaxLevel(FluidID) const override;
+			EnergyAmount getEnergyCapacity() override;
 
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) override;
@@ -17,9 +18,9 @@ namespace Game3 {
 			void decode(Game &, Buffer &) override;
 
 		private:
-			Tank() = default;
-			Tank(Identifier tile_id, Position);
-			Tank(Position);
+			GeothermalGenerator() = default;
+			GeothermalGenerator(Identifier tile_id, Position);
+			GeothermalGenerator(Position);
 
 			friend class TileEntity;
 	};

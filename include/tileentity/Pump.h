@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Texture.h"
-#include "game/Inventory.h"
 #include "tileentity/FluidHoldingTileEntity.h"
 
 namespace Game3 {
@@ -12,13 +10,6 @@ namespace Game3 {
 			constexpr static float PERIOD = 0.25;
 
 			FluidAmount extractionRate = 250;
-
-			Pump(const Pump &) = delete;
-			Pump(Pump &&) = default;
-			~Pump() override = default;
-
-			Pump & operator=(const Pump &) = delete;
-			Pump & operator=(Pump &&) = default;
 
 			inline Direction getDirection() const { return pumpDirection; }
 			void setDirection(Direction);
