@@ -2,8 +2,10 @@
 
 #include "Tileset.h"
 #include "game/ClientGame.h"
+#include "game/EnergyContainer.h"
 // #include "packet/OpenEnergyLevelPacket.h"
 #include "realm/Realm.h"
+#include "recipe/GeothermalRecipe.h"
 #include "tileentity/GeothermalGenerator.h"
 #include "ui/SpriteRenderer.h"
 
@@ -22,6 +24,39 @@ namespace Game3 {
 
 	EnergyAmount GeothermalGenerator::getEnergyCapacity() {
 		return 64'000;
+	}
+
+	void GeothermalGenerator::tick(Game &game, float delta) {
+		RealmPtr realm = weakRealm.lock();
+		if (!realm || realm->getSide() != Side::Server)
+			return;
+
+		Ticker ticker{*this, game, delta};
+
+		accumulatedTime += delta;
+
+		if (accumulatedTime < PERIOD)
+			return;
+
+		accumulatedTime = 0.f;
+
+		assert(fluidContainer);
+		assert(energyContainer);
+		auto &levels = fluidContainer->levels;
+		auto fluid_lock = levels.uniqueLock();
+
+		if (levels.empty())
+			return;
+
+		assert(levels.contains(game.registry<FluidRegistry>()["base:fluid/lava"_id]->registryID));
+		auto &registry = game.registry<GeothermalRecipeRegistry>();
+
+		std::optional<EnergyAmount> leftovers;
+		auto energy_lock = energyContainer->uniqueLock();
+
+		for (const std::shared_ptr<GeothermalRecipe> &recipe: registry.items)
+			if (recipe->craft(game, fluidContainer, energyContainer, leftovers))
+				return;
 	}
 
 	void GeothermalGenerator::toJSON(nlohmann::json &json) const {
@@ -54,8 +89,8 @@ namespace Game3 {
 					INFO(realm.getGame().getFluid(id)->identifier << " = " << amount);
 		}
 
-		std::shared_lock lock{energyMutex};
-		INFO("Energy: " << energyAmount);
+		std::shared_lock lock{energyContainer->mutex};
+		INFO("Energy: " << energyContainer->energy);
 		return false;
 	}
 

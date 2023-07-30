@@ -7,17 +7,19 @@
 
 namespace Game3 {
 	class Buffer;
+	class EnergyContainer;
 
 	class HasEnergy {
 		public:
-			HasEnergy() = default;
+			std::shared_ptr<EnergyContainer> energyContainer;
 
-			explicit HasEnergy(EnergyAmount energy_amount):
-				energyAmount(energy_amount) {}
+			HasEnergy() = default;
+			explicit HasEnergy(std::shared_ptr<EnergyContainer>);
+			explicit HasEnergy(EnergyAmount);
 
 			/** Returns the amount of energy unable to be added. */
 			virtual EnergyAmount addEnergy(EnergyAmount);
-			virtual EnergyAmount getEnergyCapacity() = 0;
+			virtual EnergyAmount getEnergyCapacity();
 			virtual EnergyAmount getEnergy();
 			virtual void setEnergy(EnergyAmount);
 
@@ -25,10 +27,5 @@ namespace Game3 {
 
 			void encode(Buffer &);
 			void decode(Buffer &);
-
-		protected:
-			// I wish I could just use std::atomic for this.
-			EnergyAmount energyAmount = 0;
-			std::shared_mutex energyMutex;
 	};
 }

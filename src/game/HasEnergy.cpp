@@ -1,58 +1,56 @@
+#include "game/EnergyContainer.h"
 #include "game/HasEnergy.h"
 #include "net/Buffer.h"
 
 #include <mutex>
 
 namespace Game3 {
+	HasEnergy::HasEnergy(std::shared_ptr<EnergyContainer> container):
+		energyContainer(std::move(container)) {}
+
+	HasEnergy::HasEnergy(EnergyAmount amount):
+		energyContainer(std::make_shared<EnergyContainer>(amount)) {}
+
 	EnergyAmount HasEnergy::addEnergy(EnergyAmount to_add) {
-		const EnergyAmount max = getEnergyCapacity();
-
-		std::unique_lock lock{energyMutex};
-
-		// Handle integer overflow
-		if (energyAmount + to_add < energyAmount) {
-			const EnergyAmount remainder = to_add - (max - energyAmount);
-			energyAmount = max;
-			lock.unlock();
-			energyUpdated();
-			return remainder;
+		assert(energyContainer);
+		EnergyAmount remainder{};
+		{
+			std::unique_lock lock{energyContainer->mutex};
+			remainder = energyContainer->add(to_add);
 		}
-
-		if (max < energyAmount + to_add) {
-			const EnergyAmount remainder = energyAmount + to_add - max;
-			energyAmount = max;
-			lock.unlock();
+		if (remainder != to_add)
 			energyUpdated();
-			return remainder;
-		}
+		return remainder;
+	}
 
-		energyAmount += to_add;
-		lock.unlock();
-		energyUpdated();
-		return 0;
+	EnergyAmount HasEnergy::getEnergyCapacity() {
+		assert(energyContainer);
+		std::shared_lock lock{energyContainer->mutex};
+		return energyContainer->capacity;
 	}
 
 	EnergyAmount HasEnergy::getEnergy() {
+		assert(energyContainer);
 		// Probably don't need the lock, but TSAN might complain.
-		std::shared_lock lock{energyMutex};
-		return energyAmount;
+		std::shared_lock lock{energyContainer->mutex};
+		return energyContainer->energy;
 	}
 
 	void HasEnergy::setEnergy(EnergyAmount new_amount) {
 		{
-			std::unique_lock lock{energyMutex};
-			energyAmount = new_amount;
+			std::unique_lock lock{energyContainer->mutex};
+			energyContainer->energy = new_amount;
 		}
 		energyUpdated();
 	}
 
 	void HasEnergy::encode(Buffer &buffer) {
-		std::shared_lock lock{energyMutex};
-		buffer << energyAmount;
+		std::shared_lock lock{energyContainer->mutex};
+		buffer << energyContainer->energy;
 	}
 
 	void HasEnergy::decode(Buffer &buffer) {
-		std::unique_lock lock{energyMutex};
-		buffer >> energyAmount;
+		std::unique_lock lock{energyContainer->mutex};
+		buffer >> energyContainer->energy;
 	}
 }

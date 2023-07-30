@@ -221,5 +221,9 @@
 			[0.2, ["base:item/gold_ore", 1]],
 			[0.1, ["base:item/diamond_ore", 1]]
 		]
+	}],
+	["base:geothermal_recipe", {
+		"input": ["base:fluid/lava", 10],
+		"output": 25
 	}]
 ]]

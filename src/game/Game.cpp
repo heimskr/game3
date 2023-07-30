@@ -102,6 +102,7 @@
 #include "realm/RealmFactory.h"
 #include "recipe/CentrifugeRecipe.h"
 #include "recipe/CraftingRecipe.h"
+#include "recipe/GeothermalRecipe.h"
 #include "registry/Registries.h"
 #include "tile/CropTile.h"
 #include "tile/ForestFloorTile.h"
@@ -160,6 +161,7 @@ namespace Game3 {
 		registries.add<TileRegistry>();
 		registries.add<CropRegistry>();
 		registries.add<CentrifugeRecipeRegistry>();
+		registries.add<GeothermalRecipeRegistry>();
 		// TODO: plugins
 	}
 

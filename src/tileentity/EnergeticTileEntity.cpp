@@ -1,4 +1,5 @@
 #include "game/ClientGame.h"
+#include "game/EnergyContainer.h"
 // #include "packet/OpenEnergyLevelPacket.h"
 #include "packet/TileEntityPacket.h"
 #include "realm/Realm.h"
@@ -9,9 +10,9 @@ namespace Game3 {
 		HasEnergy(amount) {}
 
 	bool EnergeticTileEntity::canInsertEnergy(EnergyAmount amount, Direction) {
-		std::shared_lock lock{energyMutex};
-		// TODO: handle integer overflow
-		return energyAmount + amount <= getEnergyCapacity();
+		assert(energyContainer);
+		std::shared_lock lock{energyContainer->mutex};
+		return energyContainer->canInsert(amount);
 	}
 
 	EnergyAmount EnergeticTileEntity::addEnergy(EnergyAmount amount, Direction) {
@@ -19,13 +20,11 @@ namespace Game3 {
 	}
 
 	EnergyAmount EnergeticTileEntity::extractEnergy(Direction, bool remove, EnergyAmount max_amount) {
-		std::unique_lock lock{energyMutex};
-
-		const EnergyAmount to_remove = std::min(max_amount, energyAmount);
-
-		if (remove)
-			energyAmount -= to_remove;
-
+		assert(energyContainer);
+		std::unique_lock lock{energyContainer->mutex};
+		const EnergyAmount to_remove = std::min(max_amount, energyContainer->energy);
+		if (0 < remove)
+			energyContainer->energy -= to_remove;
 		return to_remove;
 	}
 
@@ -58,14 +57,14 @@ namespace Game3 {
 	}
 
 	void EnergeticTileEntity::toJSON(nlohmann::json &json) const {
-		std::shared_lock lock{const_cast<std::shared_mutex &>(energyMutex)};
-		json["energy"] = energyAmount;
+		std::shared_lock lock{energyContainer->mutex};
+		json["energy"] = energyContainer->energy;
 	}
 
 	void EnergeticTileEntity::absorbJSON(Game &, const nlohmann::json &json) {
 		const EnergyAmount amount = json.at("energy");
-		std::unique_lock lock{const_cast<std::shared_mutex &>(energyMutex)};
-		energyAmount = amount;
+		std::unique_lock lock{energyContainer->mutex};
+		energyContainer->energy = amount;
 	}
 
 	void EnergeticTileEntity::encode(Game &, Buffer &buffer) {
@@ -75,14 +74,14 @@ namespace Game3 {
 	void EnergeticTileEntity::decode(Game &, Buffer &buffer) {
 		EnergyAmount old_amount{};
 		{
-			std::shared_lock lock{energyMutex};
-			old_amount = energyAmount;
+			std::shared_lock lock{energyContainer->mutex};
+			old_amount = energyContainer->energy;
 		}
 		HasEnergy::decode(buffer);
 		bool updated = false;
 		{
-			std::shared_lock lock{energyMutex};
-			updated = old_amount != energyAmount;
+			std::shared_lock lock{energyContainer->mutex};
+			updated = old_amount != energyContainer->energy;
 		}
 		if (updated)
 			energyUpdated();

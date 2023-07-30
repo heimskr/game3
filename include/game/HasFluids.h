@@ -17,7 +17,8 @@ namespace Game3 {
 		public:
 			std::shared_ptr<FluidContainer> fluidContainer;
 
-			HasFluids(std::shared_ptr<FluidContainer> = nullptr);
+			HasFluids() = default;
+			explicit HasFluids(std::shared_ptr<FluidContainer>);
 
 			virtual size_t getMaxFluidTypes() const { return 1; }
 			virtual FluidAmount getMaxLevel(FluidID) const;

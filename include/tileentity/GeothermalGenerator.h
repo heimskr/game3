@@ -9,9 +9,12 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "te/geothermal_generator"}; }
 
+			constexpr static float PERIOD = 0.25;
+
 			FluidAmount getMaxLevel(FluidID) const override;
 			EnergyAmount getEnergyCapacity() override;
 
+			void tick(Game &, float) override;
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
@@ -23,6 +26,8 @@ namespace Game3 {
 			Game & getGame() const final;
 
 		private:
+			float accumulatedTime = 0.f;
+
 			GeothermalGenerator() = default;
 			GeothermalGenerator(Identifier tile_id, Position);
 			GeothermalGenerator(Position);

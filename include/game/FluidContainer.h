@@ -11,6 +11,7 @@ namespace Game3 {
 
 			Lockable<Map> levels;
 
-			FluidContainer(Map = {});
+			FluidContainer(Map levels_ = {}):
+				levels(std::move(levels_)) {}
 	};
 }
