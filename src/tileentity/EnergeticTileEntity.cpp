@@ -6,8 +6,8 @@
 #include "tileentity/EnergeticTileEntity.h"
 
 namespace Game3 {
-	EnergeticTileEntity::EnergeticTileEntity(EnergyAmount amount):
-		HasEnergy(amount) {}
+	EnergeticTileEntity::EnergeticTileEntity(EnergyAmount capacity, EnergyAmount energy):
+		HasEnergy(capacity, energy) {}
 
 	bool EnergeticTileEntity::canInsertEnergy(EnergyAmount amount, Direction) {
 		assert(energyContainer);

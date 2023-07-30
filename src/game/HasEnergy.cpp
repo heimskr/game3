@@ -8,8 +8,8 @@ namespace Game3 {
 	HasEnergy::HasEnergy(std::shared_ptr<EnergyContainer> container):
 		energyContainer(std::move(container)) {}
 
-	HasEnergy::HasEnergy(EnergyAmount amount):
-		energyContainer(std::make_shared<EnergyContainer>(amount)) {}
+	HasEnergy::HasEnergy(EnergyAmount capacity, EnergyAmount amount):
+		energyContainer(std::make_shared<EnergyContainer>(capacity, amount)) {}
 
 	EnergyAmount HasEnergy::addEnergy(EnergyAmount to_add) {
 		assert(energyContainer);

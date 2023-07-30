@@ -15,7 +15,7 @@ namespace Game3 {
 
 			HasEnergy() = default;
 			explicit HasEnergy(std::shared_ptr<EnergyContainer>);
-			explicit HasEnergy(EnergyAmount);
+			HasEnergy(EnergyAmount capacity, EnergyAmount amount);
 
 			/** Returns the amount of energy unable to be added. */
 			virtual EnergyAmount addEnergy(EnergyAmount);

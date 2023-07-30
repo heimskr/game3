@@ -1,3 +1,4 @@
+#include "Log.h"
 #include "game/EnergyContainer.h"
 
 namespace Game3 {

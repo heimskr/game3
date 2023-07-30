@@ -38,8 +38,8 @@ namespace Game3 {
 		if (!energy->canInsert(output))
 			return false;
 
-		leftovers = energy->add(output);
-		assert(!leftovers.has_value());
+		assert(energy->add(output) == 0);
+		leftovers.reset();
 		return true;
 	}
 

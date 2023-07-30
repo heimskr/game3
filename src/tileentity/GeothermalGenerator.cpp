@@ -10,20 +10,36 @@
 #include "ui/SpriteRenderer.h"
 
 namespace Game3 {
+	GeothermalGenerator::GeothermalGenerator():
+		EnergeticTileEntity(ENERGY_CAPACITY) {}
+
 	GeothermalGenerator::GeothermalGenerator(Identifier tile_id, Position position_):
-		TileEntity(std::move(tile_id), ID(), position_, true) {}
+		TileEntity(std::move(tile_id), ID(), position_, true), EnergeticTileEntity(ENERGY_CAPACITY) {}
 
 	GeothermalGenerator::GeothermalGenerator(Position position_):
 		GeothermalGenerator("base:tile/geothermal_generator"_id, position_) {}
 
-	FluidAmount GeothermalGenerator::getMaxLevel(FluidID id) const {
-		if (auto fluid = getGame().registry<FluidRegistry>().maybe(id))
-			return fluid->identifier == "base:fluid/lava"_id? 16 * FluidTile::FULL : 0;
-		return 0;
+	FluidAmount GeothermalGenerator::getMaxLevel(FluidID id) {
+		auto shared_lock = supportedFluids.sharedLock();
+		if (supportedFluids)
+			return supportedFluids->contains(id)? FLUID_CAPACITY : 0;
+		shared_lock.unlock();
+		// No data race please :)
+		auto unique_lock = supportedFluids.uniqueLock();
+		supportedFluids.emplace();
+		FluidAmount out = 0;
+		for (const std::shared_ptr<GeothermalRecipe> &recipe: getGame().registry<GeothermalRecipeRegistry>().items) {
+			supportedFluids->emplace(recipe->input.id);
+			if (recipe->input.id == id)
+				out = FLUID_CAPACITY;
+		}
+		return out;
 	}
 
 	EnergyAmount GeothermalGenerator::getEnergyCapacity() {
-		return 64'000;
+		assert(energyContainer);
+		auto lock = energyContainer->sharedLock();
+		return energyContainer->capacity;
 	}
 
 	void GeothermalGenerator::tick(Game &game, float delta) {

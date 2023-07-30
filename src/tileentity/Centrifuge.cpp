@@ -22,7 +22,7 @@ namespace Game3 {
 		return 1;
 	}
 
-	FluidAmount Centrifuge::getMaxLevel(FluidID) const {
+	FluidAmount Centrifuge::getMaxLevel(FluidID) {
 		return 64 * FluidTile::FULL;
 	}
 

@@ -9,9 +9,11 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "te/geothermal_generator"}; }
 
+			constexpr static EnergyAmount ENERGY_CAPACITY = 64'000;
+			constexpr static FluidAmount  FLUID_CAPACITY  = 16 * FluidTile::FULL;
 			constexpr static float PERIOD = 0.25;
 
-			FluidAmount getMaxLevel(FluidID) const override;
+			FluidAmount getMaxLevel(FluidID) override;
 			EnergyAmount getEnergyCapacity() override;
 
 			void tick(Game &, float) override;
@@ -27,8 +29,9 @@ namespace Game3 {
 
 		private:
 			float accumulatedTime = 0.f;
+			Lockable<std::optional<std::unordered_set<FluidID>>> supportedFluids;
 
-			GeothermalGenerator() = default;
+			GeothermalGenerator();
 			GeothermalGenerator(Identifier tile_id, Position);
 			GeothermalGenerator(Position);
 

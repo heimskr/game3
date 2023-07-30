@@ -21,7 +21,7 @@ namespace Game3 {
 			explicit HasFluids(std::shared_ptr<FluidContainer>);
 
 			virtual size_t getMaxFluidTypes() const { return 1; }
-			virtual FluidAmount getMaxLevel(FluidID) const;
+			virtual FluidAmount getMaxLevel(FluidID);
 
 			/** Returns how much fluid was unable to be added. */
 			virtual FluidAmount addFluid(FluidStack);

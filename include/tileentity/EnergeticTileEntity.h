@@ -16,7 +16,7 @@ namespace Game3 {
 	 */
 	class EnergeticTileEntity: public virtual TileEntity, public HasEnergy, public Observable {
 		public:
-			EnergeticTileEntity(EnergyAmount = 0);
+			EnergeticTileEntity(EnergyAmount capacity, EnergyAmount energy = 0);
 
 			virtual bool canInsertEnergy(EnergyAmount, Direction);
 			/** Returns the amount not added. */

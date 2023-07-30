@@ -6,7 +6,7 @@ namespace Game3 {
 	HasFluids::HasFluids(std::shared_ptr<FluidContainer> fluid_container):
 		fluidContainer(std::move(fluid_container)) {}
 
-	FluidAmount HasFluids::getMaxLevel(FluidID) const {
+	FluidAmount HasFluids::getMaxLevel(FluidID) {
 		return std::numeric_limits<FluidLevel>::max();
 	}
 

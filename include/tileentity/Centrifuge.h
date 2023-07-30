@@ -11,7 +11,7 @@ namespace Game3 {
 			constexpr static float PERIOD = 0.25;
 
 			size_t getMaxFluidTypes() const override;
-			FluidAmount getMaxLevel(FluidID) const override;
+			FluidAmount getMaxLevel(FluidID) override;
 
 			void init(Game &) override;
 			void tick(Game &, float) override;
