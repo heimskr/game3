@@ -2,12 +2,14 @@
 
 #include "Texture.h"
 #include "tileentity/EnergeticTileEntity.h"
+#include "tileentity/FluidHoldingTileEntity.h"
 
 namespace Game3 {
-	class GeothermalGenerator: public EnergeticTileEntity {
+	class GeothermalGenerator: public FluidHoldingTileEntity, public EnergeticTileEntity {
 		public:
 			static Identifier ID() { return {"base", "te/geothermal_generator"}; }
 
+			FluidAmount getMaxLevel(const Game &, FluidID) const override;
 			EnergyAmount getEnergyCapacity() override;
 
 			void toJSON(nlohmann::json &) const override;

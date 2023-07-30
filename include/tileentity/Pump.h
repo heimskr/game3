@@ -14,7 +14,7 @@ namespace Game3 {
 			inline Direction getDirection() const { return pumpDirection; }
 			void setDirection(Direction);
 
-			FluidAmount getMaxLevel(FluidID) const override;
+			FluidAmount getMaxLevel(const Game &, FluidID) const override;
 
 			void tick(Game &, float) override;
 			void toJSON(nlohmann::json &) const override;

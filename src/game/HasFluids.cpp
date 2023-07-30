@@ -6,7 +6,7 @@ namespace Game3 {
 	HasFluids::HasFluids(std::shared_ptr<FluidContainer> fluid_container):
 		fluidContainer(std::move(fluid_container)) {}
 
-	FluidAmount HasFluids::getMaxLevel(FluidID) const {
+	FluidAmount HasFluids::getMaxLevel(const Game &, FluidID) const {
 		return std::numeric_limits<FluidLevel>::max();
 	}
 
@@ -22,7 +22,7 @@ namespace Game3 {
 			return to_add;
 
 		FluidAmount &level = levels[id];
-		const FluidAmount max = getMaxLevel(id);
+		const FluidAmount max = getMaxLevel(stack.game, id);
 
 		// Just in case there would be integer overflow.
 		if (level + to_add < level) {

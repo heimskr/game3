@@ -31,7 +31,7 @@ namespace Game3 {
 		cachedTile = -1;
 	}
 
-	FluidAmount Pump::getMaxLevel(FluidID) const {
+	FluidAmount Pump::getMaxLevel(const Game &, FluidID) const {
 		return 64 * FluidTile::FULL;
 	}
 

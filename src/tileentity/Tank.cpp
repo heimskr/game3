@@ -14,7 +14,7 @@ namespace Game3 {
 	Tank::Tank(Position position_):
 		Tank("base:tile/tank"_id, position_) {}
 
-	FluidAmount Tank::getMaxLevel(FluidID) const {
+	FluidAmount Tank::getMaxLevel(const Game &, FluidID) const {
 		return 64 * FluidTile::FULL;
 	}
 

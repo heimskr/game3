@@ -7,7 +7,7 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "te/tank"}; }
 
-			FluidAmount getMaxLevel(FluidID) const override;
+			FluidAmount getMaxLevel(const Game &, FluidID) const override;
 
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) override;

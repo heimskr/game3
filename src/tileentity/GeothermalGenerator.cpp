@@ -14,12 +14,17 @@ namespace Game3 {
 	GeothermalGenerator::GeothermalGenerator(Position position_):
 		GeothermalGenerator("base:tile/geothermal_generator"_id, position_) {}
 
+	FluidAmount GeothermalGenerator::getMaxLevel(const Game &, FluidID id) {
+
+	}
+
 	EnergyAmount GeothermalGenerator::getEnergyCapacity() {
 		return 64'000;
 	}
 
 	void GeothermalGenerator::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
+		FluidHoldingTileEntity::toJSON(json);
 		EnergeticTileEntity::toJSON(json);
 	}
 
@@ -35,6 +40,16 @@ namespace Game3 {
 		// TODO!
 		// player->send(OpenEnergyLevelPacket(getGID()));
 
+		{
+			assert(fluidContainer);
+			auto lock = fluidContainer->levels.sharedLock();
+			if (fluidContainer->levels.empty())
+				WARN("No fluids.");
+			else
+				for (const auto &[id, amount]: fluidContainer->levels)
+					INFO(realm.getGame().getFluid(id)->identifier << " = " << amount);
+		}
+
 		std::shared_lock lock{energyMutex};
 		INFO("Energy: " << energyAmount);
 		return false;
@@ -42,16 +57,19 @@ namespace Game3 {
 
 	void GeothermalGenerator::absorbJSON(Game &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
+		FluidHoldingTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);
 	}
 
 	void GeothermalGenerator::encode(Game &game, Buffer &buffer) {
 		TileEntity::encode(game, buffer);
+		FluidHoldingTileEntity::encode(game, buffer);
 		EnergeticTileEntity::encode(game, buffer);
 	}
 
 	void GeothermalGenerator::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
+		FluidHoldingTileEntity::decode(game, buffer);
 		EnergeticTileEntity::decode(game, buffer);
 	}
 }
