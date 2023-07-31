@@ -22,13 +22,13 @@ namespace Game3 {
 	ServerInventory::ServerInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, Storage storage_):
 		StorageInventory(std::move(owner), slot_count, active_slot, std::move(storage_)) {}
 
-	std::optional<ItemStack> ServerInventory::add(const ItemStack &stack, Slot start) {
+	std::optional<ItemStack> ServerInventory::add(const ItemStack &stack, const std::function<bool(Slot)> &predicate, Slot start) {
 		ssize_t remaining = stack.count;
 
 		if (0 <= start) {
 			if (slotCount <= start)
 				throw std::out_of_range("Can't start at slot " + std::to_string(start) + ": out of range");
-			if (storage.contains(start)) {
+			if (storage.contains(start) && predicate(start)) {
 				auto &stored = storage.at(start);
 				if (stored.canMerge(stack)) {
 					const ssize_t storable = ssize_t(stored.item->maxCount) - ssize_t(stored.count);
@@ -47,7 +47,7 @@ namespace Game3 {
 
 		if (0 < remaining) {
 			for (auto &[slot, stored]: storage) {
-				if (slot == start || !stored.canMerge(stack))
+				if (slot == start || !stored.canMerge(stack) || !predicate(slot))
 					continue;
 				const ssize_t storable = ssize_t(stored.item->maxCount) - ssize_t(stored.count);
 				if (0 < storable) {
@@ -63,7 +63,7 @@ namespace Game3 {
 		if (0 < remaining) {
 			const Game &game = getOwner()->getRealm()->getGame();
 			for (Slot slot = 0; slot < slotCount; ++slot) {
-				if (storage.contains(slot))
+				if (storage.contains(slot) || !predicate(slot))
 					continue;
 				const ItemCount to_store = std::min(ItemCount(remaining), stack.item->maxCount);
 				storage.emplace(slot, ItemStack(game, stack.item, to_store, stack.data));

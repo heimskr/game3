@@ -47,10 +47,12 @@ namespace Game3 {
 			virtual ItemStack * firstItem(Slot *slot_out) = 0;
 
 			/** If the ItemStack couldn't be inserted into the inventory, this function returns an ItemStack
-			 *  containing the leftovers that couldn't be inserted. Otherwise, this function returns nothing. */
-			virtual std::optional<ItemStack> add(const ItemStack &, Slot start) = 0;
-
-			virtual std::optional<ItemStack> add(const ItemStack &stack) { return add(stack, -1); }
+			 *  containing the leftovers that couldn't be inserted. Otherwise, this function returns nothing.
+			 *  The predicate will be used to determine which slots can be inserted into. */
+			virtual std::optional<ItemStack> add(const ItemStack &, const std::function<bool(Slot)> &predicate, Slot start) = 0;
+			virtual std::optional<ItemStack> add(const ItemStack &stack, const std::function<bool(Slot)> &predicate) { return add(stack, predicate, -1); }
+			virtual std::optional<ItemStack> add(const ItemStack &stack, Slot start) { return add(stack, [](Slot) { return true; }, start); }
+			virtual std::optional<ItemStack> add(const ItemStack &stack) { return add(stack, [](Slot) { return true; }, -1); }
 
 			virtual bool canInsert(const ItemStack &) const = 0;
 			virtual bool canInsert(const ItemStack &, Slot) const = 0;

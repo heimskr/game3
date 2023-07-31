@@ -17,6 +17,7 @@ namespace Game3 {
 			return;
 
 		auto overflow_lock = overflowQueue.uniqueLock();
+		auto round_robin_lock = roundRobinIterator.uniqueLock();
 
 		// Every so often, if there's anything in the overflowQueue, we try to insert that somewhere instead of extracting anything more.
 		if (overflowPeriod != 0 && tick_id % overflowPeriod == 0 && !overflowQueue.empty()) {
@@ -26,18 +27,10 @@ namespace Game3 {
 			if (!roundRobinIterator)
 				advanceRoundRobin();
 
-			auto &round_robin_iter = *roundRobinIterator;
-			const auto old_iter = round_robin_iter;
-
-			do {
-				advanceRoundRobin();
-				if (const auto [round_robin_tile_entity, round_robin_direction] = getRoundRobin(); round_robin_tile_entity) {
-					std::optional<ItemStack> leftover;
-					if (!round_robin_tile_entity->insertItem(*stack, round_robin_direction, &stack))
-						continue;
-				} else
-					break;
-			} while (old_iter != round_robin_iter && stack);
+			iterateRoundRobin([&](const std::shared_ptr<InventoriedTileEntity> &inventoried, Direction direction) {
+				inventoried->insertItem(*stack, direction, &stack);
+				return !stack.has_value();
+			});
 
 			// If the stack couldn't be fully inserted, put the remainder at the end of the overflow queue.
 			if (stack)
@@ -52,82 +45,76 @@ namespace Game3 {
 		for (auto iter = extractions.begin(), end = extractions.end(); iter != end; ++iter) {
 			const auto &[position, direction] = *iter;
 
-			auto tile_entity = realm->tileEntityAt(position);
-			if (!tile_entity) {
+			auto inventoried = std::dynamic_pointer_cast<InventoriedTileEntity>(realm->tileEntityAt(position));
+			if (!inventoried) {
 				to_erase.push_back(iter);
 				continue;
+			}
+
+			{
+				auto inventory_lock = inventoried->inventory->sharedLock();
+				if (inventoried->empty())
+					continue;
 			}
 
 			if (!roundRobinIterator)
 				advanceRoundRobin();
 
-			auto &round_robin_iter = *roundRobinIterator;
+			bool failed = false;
+			auto inventory_lock = inventoried->inventory->uniqueLock();
 
-			if (round_robin_iter == insertions.end())
-				continue;
-
-			if (auto inventoried = tile_entity->cast<InventoriedTileEntity>(); inventoried && !inventoried->empty()) {
-				auto inventory_lock = inventoried->inventory->uniqueLock();
-
+			inventoried->iterateExtractableItems(direction, [&](const ItemStack &, Slot slot) {
 				// It's possible we'll extract an item and put it right back.
 				// If that happens, we don't want to notify the owner and potentially queue a broadcast.
 				auto suppressor = inventoried->inventory->suppress();
 
-				std::optional<ItemStack> extracted = inventoried->extractItem(direction, true);
-				if (!extracted)
-					continue;
+				std::optional<ItemStack> extracted = inventoried->extractItem(direction, true, slot);
 
-				std::optional<ItemStack> leftover;
-
-				if (const auto [round_robin_tile_entity, round_robin_direction] = getRoundRobin(); round_robin_tile_entity) {
-					if (!round_robin_tile_entity->insertItem(*extracted, round_robin_direction, &leftover))
-						leftover = std::move(*extracted);
-				} else {
-					overflowQueue.push_back(std::move(*extracted));
-					return;
+				// This would be a little strange.
+				if (!extracted) {
+					WARN("Couldn't extract item indicated to be extractable.");
+					return false;
 				}
 
-				if (leftover) {
-					// If the insertion didn't fully complete, we need to try to put the leftovers
-					// in the next inventories in the round-robin configuration.
-					const auto old_iter = round_robin_iter;
+				const ItemCount original_count = extracted->count;
 
-					// Keep trying to insert into the next machine until we reach
-					// the original machine or the leftovers are all gone.
-					do {
-						advanceRoundRobin();
+				// Try to insert the extracted item into insertion points until we either finish inserting all of it
+				// or we run out of insertion points.
+				iterateRoundRobin([&](const std::shared_ptr<InventoriedTileEntity> &round_robin, Direction round_robin_direction) -> bool {
+					auto lock = round_robin->inventory->uniqueLock();
+					round_robin->insertItem(*extracted, round_robin_direction, &extracted);
+					return !extracted.has_value();
+				}, inventoried);
 
-						// Prevent insertion to self. It would presumably cause issues with locks.
-						if (round_robin_iter->first == tile_entity->getPosition())
-							continue;
+				if (extracted) {
+					const bool changed = extracted->count != original_count;
 
-						if (const auto [round_robin_tile_entity, round_robin_direction] = getRoundRobin(); round_robin_tile_entity) {
-							auto round_robin_lock = round_robin_tile_entity->inventory->uniqueLock();
-							if (!round_robin_tile_entity->insertItem(*leftover, round_robin_direction, &leftover))
-								continue;
-						} else {
-							overflowQueue.push_back(std::move(*leftover));
-							return;
-						}
-					} while (old_iter != round_robin_iter && leftover);
-
-					if (leftover) {
-						// If there's anything left over, try putting it back into the inventory it was extracted from.
-						if (std::optional<ItemStack> new_leftover = inventoried->inventory->add(*leftover)) {
-							// If there's still anything left over, move it to the overflowQueue so we can try to insert it somewhere another time.
-							// Theoretically this should never happen because we've locked the source inventory.
-							// Also, because the source inventory changed, we need to cancel the suppressor.
-							suppressor.cancel(true);
-							overflowQueue.push_back(std::move(*leftover));
-						}
-					} else {
-						// Because no leftovers means the extraction was successful and the source inventory changed, we need to undo the effect of the suppressor.
+					// If there's anything left over, try putting it back into the inventory it was extracted from.
+					if (std::optional<ItemStack> new_leftover = inventoried->inventory->add(*extracted)) {
+						// If there's still anything left over, move it to the overflowQueue so we can try to insert it somewhere another time.
+						// Theoretically this should never happen because we've locked the source inventory.
+						// Also, because the source inventory changed, we need to cancel the suppressor.
+						WARN("Can't put leftovers back into source inventory.");
 						suppressor.cancel(true);
+						overflowQueue.push_back(std::move(*extracted));
+						// Since we're in a weird situation here, it might be safer to just cancel the iteration here.
+						failed = true;
+						return true;
 					}
+
+					// If we inserted it back but the size was different (due to partial insertion), we need to update the inventory.
+					if (changed)
+						suppressor.cancel(true);
 				} else {
-					advanceRoundRobin();
+					// Because no leftovers means the extraction was successful and the source inventory changed, we need to undo the effect of the suppressor.
+					suppressor.cancel(true);
 				}
-			}
+
+				return false;
+			});
+
+			if (failed)
+				return;
 		}
 
 		for (const auto &iter: to_erase)
@@ -157,8 +144,9 @@ namespace Game3 {
 
 	void ItemNetwork::advanceRoundRobin() {
 		RealmPtr realm = weakRealm.lock();
+
 		if (!realm) {
-			roundRobinIterator = insertions.end();
+			roundRobinIterator.getBase() = insertions.end();
 			return;
 		}
 
@@ -166,15 +154,15 @@ namespace Game3 {
 			TileEntityPtr tile_entity = realm->tileEntityAt(insertions.begin()->first);
 
 			if (std::dynamic_pointer_cast<HasInventory>(tile_entity))
-				roundRobinIterator = insertions.begin();
+				roundRobinIterator.getBase() = insertions.begin();
 			else
-				roundRobinIterator = insertions.end();
+				roundRobinIterator.getBase() = insertions.end();
 
 			return;
 		}
 
 		if (!roundRobinIterator || *roundRobinIterator == insertions.end())
-			roundRobinIterator = insertions.begin();
+			roundRobinIterator.getBase() = insertions.begin();
 
 		auto old_iter = *roundRobinIterator;
 		bool has_inventory = false;
@@ -182,14 +170,14 @@ namespace Game3 {
 		// Keep searching for the next insertion that has an inventory until we reach the initial iterator.
 		do {
 			if (++*roundRobinIterator == insertions.end())
-				roundRobinIterator = insertions.begin();
+				roundRobinIterator.getBase() = insertions.begin();
 			has_inventory = std::dynamic_pointer_cast<HasInventory>(realm->tileEntityAt((*roundRobinIterator)->first)) != nullptr;
 		} while (*roundRobinIterator != old_iter && !has_inventory);
 
 		// If we haven't found an inventoried tile entity by this point, it means none exists among the insertion set;
 		// therefore, we need to invalidate the iterator.
 		if (!has_inventory)
-			roundRobinIterator = insertions.end();
+			roundRobinIterator.getBase() = insertions.end();
 	}
 
 	std::pair<std::shared_ptr<InventoriedTileEntity>, Direction> ItemNetwork::getRoundRobin() {
@@ -210,5 +198,16 @@ namespace Game3 {
 			return {nullptr, Direction::Invalid};
 
 		return {std::dynamic_pointer_cast<InventoriedTileEntity>(tile_entity), direction};
+	}
+
+	void ItemNetwork::iterateRoundRobin(const std::function<bool(const std::shared_ptr<InventoriedTileEntity> &, Direction)> &function, const std::shared_ptr<TileEntity> &avoid) {
+		auto old_iter = roundRobinIterator;
+		do {
+			advanceRoundRobin();
+			if (const auto [tile_entity, direction] = getRoundRobin(); tile_entity) {
+				if (tile_entity != avoid && function(tile_entity, direction))
+					return;
+			}
+		} while (old_iter != roundRobinIterator.getBase());
 	}
 }

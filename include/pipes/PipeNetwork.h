@@ -27,7 +27,6 @@ namespace Game3 {
 			Lockable<PairSet> extractions;
 			Lockable<PairSet> insertions;
 
-
 		public:
 			PipeNetwork(size_t id_, const std::shared_ptr<Realm> &);
 

@@ -10,8 +10,8 @@ namespace Game3 {
 	InventoriedTileEntity::InventoriedTileEntity(InventoryPtr inventory_):
 		HasInventory(std::move(inventory_)) {}
 
-	bool InventoriedTileEntity::canInsertItem(const ItemStack &stack, Direction direction) {
-		if (!inventory || !mayInsertItem(stack, direction))
+	bool InventoriedTileEntity::canInsertItem(const ItemStack &stack, Direction direction, Slot slot) {
+		if (!inventory || !mayInsertItem(stack, direction, slot))
 			return false;
 		return inventory->canInsert(stack);
 	}
@@ -56,13 +56,17 @@ namespace Game3 {
 	}
 
 	bool InventoriedTileEntity::insertItem(const ItemStack &stack, Direction direction, std::optional<ItemStack> *leftover) {
-		if (!canInsertItem(stack, direction))
+		if (!mayInsertItem(stack, direction))
 			return false;
 
+		auto predicate = [&](Slot slot) {
+			return mayInsertItem(stack, direction, slot);
+		};
+
 		if (leftover != nullptr)
-			*leftover = inventory->add(stack);
+			*leftover = inventory->add(stack, predicate);
 		else
-			inventory->add(stack);
+			inventory->add(stack, predicate);
 
 		return true;
 	}

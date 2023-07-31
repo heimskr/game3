@@ -18,7 +18,7 @@ namespace Game3 {
 			ClientInventory & operator=(const ClientInventory &);
 			ClientInventory & operator=(ClientInventory &&);
 
-			std::optional<ItemStack> add(const ItemStack &, Slot start) override;
+			std::optional<ItemStack> add(const ItemStack &, const std::function<bool(Slot)> &, Slot start) override;
 
 			void drop(Slot) override;
 

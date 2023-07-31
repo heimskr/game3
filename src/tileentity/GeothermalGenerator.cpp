@@ -20,7 +20,10 @@ namespace Game3 {
 	GeothermalGenerator::GeothermalGenerator(Position position_):
 		GeothermalGenerator("base:tile/geothermal_generator"_id, position_) {}
 
-	bool GeothermalGenerator::mayInsertItem(const ItemStack &stack, Direction) {
+	bool GeothermalGenerator::mayInsertItem(const ItemStack &stack, Direction, Slot slot) {
+		if (slot != 0 && slot != Slot(-1))
+			return false;
+
 		auto flask = std::dynamic_pointer_cast<FilledFlask>(stack.item);
 		if (!flask)
 			return false;
@@ -43,8 +46,11 @@ namespace Game3 {
 		return slot == 1;
 	}
 
-	bool GeothermalGenerator::canInsertItem(const ItemStack &stack, Direction direction) {
-		return mayInsertItem(stack, direction) && inventory->canInsert(stack, 0);
+	bool GeothermalGenerator::canInsertItem(const ItemStack &stack, Direction direction, Slot slot) {
+		if (slot != 0 && slot != Slot(-1))
+			return false;
+
+		return mayInsertItem(stack, direction, 0) && inventory->canInsert(stack, 0);
 	}
 
 	FluidAmount GeothermalGenerator::getMaxLevel(FluidID id) {

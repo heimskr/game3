@@ -22,7 +22,7 @@ namespace Game3 {
 	ClientInventory::ClientInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, Storage storage_):
 		StorageInventory(std::move(owner), slot_count, active_slot, std::move(storage_)) {}
 
-	std::optional<ItemStack> ClientInventory::add(const ItemStack &, Slot) {
+	std::optional<ItemStack> ClientInventory::add(const ItemStack &, const std::function<bool(Slot)> &, Slot) {
 		throw std::logic_error("Clients cannot add items to inventories");
 	}
 
