@@ -66,6 +66,7 @@ namespace Game3 {
 
 	void Entity::toJSON(nlohmann::json &json) const {
 		assert(getSide() == Side::Server);
+		auto lock = const_cast<Entity &>(*this).sharedLock();
 		json["type"]      = type;
 		json["position"]  = position;
 		json["realmID"]   = realmID;
@@ -90,6 +91,8 @@ namespace Game3 {
 	void Entity::absorbJSON(Game &game, const nlohmann::json &json) {
 		if (json.is_null())
 			return; // Hopefully this is because the Entity is being constructed in EntityPacket::decode.
+
+		auto lock = uniqueLock();
 
 		if (auto iter = json.find("type"); iter != json.end())
 			type = *iter;
@@ -128,6 +131,8 @@ namespace Game3 {
 					path.pop_front();
 			}
 		}
+
+		auto lock = uniqueLock();
 
 		auto &x = offset.x;
 		auto &y = offset.y;
@@ -207,7 +212,7 @@ namespace Game3 {
 		switch (variety) {
 			case 1:
 			case 3:
-				y_offset = 8.f * (static_cast<int>(direction) - 1);
+				y_offset = 8.f * (int(direction) - 1);
 				break;
 			case 2:
 				y_offset = 16.f * (static_cast<int>(remapDirection(direction, 0x1324)) - 1);
@@ -287,11 +292,11 @@ namespace Game3 {
 	}
 
 	bool Entity::move(Direction move_direction, std::optional<Direction> new_direction) {
-		auto realm = weakRealm.lock();
-		if (!realm) {
-			if (getSide() == Side::Client) WARN("Can't move entity " << globalID << ": no realm");
+		auto self_lock = uniqueLock();
+
+		RealmPtr realm = weakRealm.lock();
+		if (!realm)
 			return false;
-		}
 
 		Position new_position = position;
 		float x_offset = 0.f;
@@ -779,6 +784,7 @@ namespace Game3 {
 	}
 
 	void Entity::encode(Buffer &buffer) {
+		auto lock = sharedLock();
 		buffer << type;
 		buffer << globalID;
 		buffer << realmID;
@@ -798,6 +804,7 @@ namespace Game3 {
 	}
 
 	void Entity::decode(Buffer &buffer) {
+		auto lock = uniqueLock();
 		buffer >> type;
 		setGID(buffer.take<GlobalID>());
 		buffer >> realmID;

@@ -42,7 +42,7 @@ namespace Game3 {
 		return geothermal_registry.fluidIDs.contains(fluid->registryID);
 	}
 
-	bool GeothermalGenerator::mayExtractItem(const ItemStack &, Direction, Slot slot) {
+	bool GeothermalGenerator::mayExtractItem(Direction, Slot slot) {
 		return slot == 1;
 	}
 

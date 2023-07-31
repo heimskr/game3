@@ -21,13 +21,13 @@
 #include "pipes/PipeLoader.h"
 #include "threading/Lockable.h"
 #include "threading/MTQueue.h"
+#include "threading/SharedRecursiveMutex.h"
 #include "tileentity/TileEntity.h"
 #include "ui/ElementBufferedRenderer.h"
 #include "ui/FluidRenderer.h"
 #include "ui/Modifiers.h"
 #include "util/GL.h"
 #include "util/RWLock.h"
-#include "util/SharedRecursiveMutex.h"
 #include "container/WeakSet.h"
 
 namespace Game3 {

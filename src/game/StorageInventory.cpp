@@ -119,6 +119,10 @@ namespace Game3 {
 		return false;
 	}
 
+	bool StorageInventory::canExtract(Slot slot) const {
+		return storage.contains(slot);
+	}
+
 	ItemCount StorageInventory::insertable(const ItemStack &stack, Slot slot) const {
 		auto iter = storage.find(slot);
 

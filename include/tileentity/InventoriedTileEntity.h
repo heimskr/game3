@@ -14,34 +14,29 @@ namespace Game3 {
 	/**
 	 * This class inherits TileEntity *virtually*. It doesn't call any TileEntity methods itself.
 	 * Deriving classes must remember to do so in the encode and decode methods.
+	 * None of the methods here lock the inventory.
 	 */
 	class InventoriedTileEntity: public virtual TileEntity, public HasInventory, public Observable {
 		public:
 			InventoriedTileEntity(std::shared_ptr<Inventory> = nullptr);
 
-			/** Doesn't lock the inventory. */
 			virtual bool mayInsertItem(const ItemStack &, Direction, Slot) { return true; }
-			/** Doesn't lock the inventory. */
 			virtual bool mayInsertItem(const ItemStack &stack, Direction direction) { return mayInsertItem(stack, direction, -1); }
-			/** Doesn't lock the inventory. */
-			virtual bool mayExtractItem(const ItemStack &, Direction, Slot) { return true; }
-			/** Doesn't lock the inventory. */
-			virtual bool mayExtractItem(const ItemStack &stack, Direction direction) { return mayExtractItem(stack, direction, -1); }
-			/** Doesn't lock the inventory. */
+			virtual bool mayExtractItem(Direction, Slot) { return true; }
+			virtual bool mayExtractItem(Direction direction) { return mayExtractItem(direction, -1); }
 			virtual bool canInsertItem(const ItemStack &, Direction, Slot);
-			/** Doesn't lock the inventory. Returns the extracted item. */
+			virtual bool canExtractItem(Direction, Slot);
+			/** Returns the extracted item. */
 			virtual std::optional<ItemStack> extractItem(Direction, bool remove, Slot slot = -1);
-			/** Doesn't lock the inventory. Returns whether the item was insertable at all. */
+			/** Returns whether the item was insertable at all. */
 			virtual bool insertItem(const ItemStack &, Direction, std::optional<ItemStack> *);
-			/** Doesn't lock the inventory. */
 			virtual ItemCount itemsInsertable(const ItemStack &, Direction, Slot);
 			/** Iterates over each extractable item until there all have been iterated or the iteration function returns true. */
 			virtual void iterateExtractableItems(Direction, const std::function<bool(const ItemStack &, Slot)> &);
 
-			/** Doesn't lock the inventory. */
 			virtual bool empty() const;
 
-			/** Server-side only. Doesn't lock the inventory. */
+			/** Server-side only. */
 			void setInventory(Slot slot_count);
 
 			void inventoryUpdated() override;

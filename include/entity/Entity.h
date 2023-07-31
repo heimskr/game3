@@ -7,14 +7,16 @@
 #include "Position.h"
 #include "Texture.h"
 #include "Types.h"
+#include "container/WeakSet.h"
 #include "game/Agent.h"
 #include "game/ChunkPosition.h"
 #include "game/HasInventory.h"
 #include "item/Item.h"
+#include "threading/HasMutex.h"
 #include "threading/Lockable.h"
+#include "threading/SharedRecursiveMutex.h"
 #include "ui/Modifiers.h"
 #include "util/Castable.h"
-#include "container/WeakSet.h"
 
 #include <atomic>
 #include <functional>
@@ -45,7 +47,7 @@ namespace Game3 {
 		EntityTexture(Identifier identifier_, Identifier texture_id, uint8_t variety_);
 	};
 
-	class Entity: public Agent, public HasInventory, public Castable<Entity> {
+	class Entity: public Agent, public HasInventory, public Castable<Entity>, public HasMutex<SharedRecursiveMutex> {
 		public:
 			constexpr static Slot DEFAULT_INVENTORY_SIZE = 30;
 			/** The reciprocal of this is how many seconds it takes to move one square. */

@@ -72,7 +72,7 @@ namespace Game3 {
 
 				// This would be a little strange.
 				if (!extracted) {
-					WARN("Couldn't extract item indicated to be extractable.");
+					WARN("Couldn't extract item indicated to be extractable from slot " << slot << " (inventoried: " << typeid(*inventoried).name() << ')');
 					return false;
 				}
 

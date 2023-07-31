@@ -16,6 +16,12 @@ namespace Game3 {
 		return inventory->canInsert(stack);
 	}
 
+	bool InventoriedTileEntity::canExtractItem(Direction direction, Slot slot) {
+		if (!inventory || !mayExtractItem(direction, slot))
+			return false;
+		return inventory->canExtract(slot);
+	}
+
 	std::optional<ItemStack> InventoriedTileEntity::extractItem(Direction, bool remove, Slot slot) {
 		if (!inventory)
 			return std::nullopt;
@@ -80,7 +86,7 @@ namespace Game3 {
 
 	void InventoriedTileEntity::iterateExtractableItems(Direction direction, const std::function<bool(const ItemStack &, Slot)> &function) {
 		inventory->iterate([&](const ItemStack &stack, Slot slot) {
-			return mayExtractItem(stack, direction, slot) && function(stack, slot);
+			return mayExtractItem(direction, slot) && function(stack, slot);
 		});
 	}
 
