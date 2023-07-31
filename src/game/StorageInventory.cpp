@@ -46,6 +46,12 @@ namespace Game3 {
 		return nullptr;
 	}
 
+	void StorageInventory::iterate(const std::function<bool(const ItemStack &, Slot)> &function) {
+		for (const auto &[slot, stack]: storage)
+			if (function(stack, slot))
+				return;
+	}
+
 	ItemStack * StorageInventory::firstItem(Slot *slot_out) {
 		if (storage.empty()) {
 			if (slot_out != nullptr)

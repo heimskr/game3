@@ -7,6 +7,7 @@
 #include "util/Castable.h"
 
 #include <atomic>
+#include <functional>
 #include <map>
 #include <mutex>
 #include <optional>
@@ -39,6 +40,9 @@ namespace Game3 {
 
 			virtual ItemStack * operator[](size_t) = 0;
 			virtual const ItemStack * operator[](size_t) const = 0;
+
+			/** Iterates over all items in the inventory until all have been iterated or the iteration function returns true. */
+			virtual void iterate(const std::function<bool(const ItemStack &, Slot)> &) = 0;
 
 			virtual ItemStack * firstItem(Slot *slot_out) = 0;
 

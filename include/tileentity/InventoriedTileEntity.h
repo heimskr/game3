@@ -5,6 +5,7 @@
 #include "item/Item.h"
 #include "tileentity/TileEntity.h"
 
+#include <functional>
 #include <optional>
 
 namespace Game3 {
@@ -21,12 +22,17 @@ namespace Game3 {
 			/** Doesn't lock the inventory. */
 			virtual bool mayInsertItem(const ItemStack &, Direction) { return true; }
 			/** Doesn't lock the inventory. */
+			virtual bool mayExtractItem(const ItemStack &, Direction, Slot) { return true; }
+			/** Doesn't lock the inventory. */
 			virtual bool canInsertItem(const ItemStack &, Direction);
 			/** Doesn't lock the inventory. Returns the extracted item. */
-			virtual std::optional<ItemStack> extractItem(Direction, bool remove);
+			virtual std::optional<ItemStack> extractItem(Direction, bool remove, Slot slot = -1);
 			/** Doesn't lock the inventory. Returns whether the item was insertable at all. */
 			virtual bool insertItem(const ItemStack &, Direction, std::optional<ItemStack> *);
+			/** Doesn't lock the inventory. */
 			virtual ItemCount itemsInsertable(const ItemStack &, Direction, Slot);
+			/** Iterates over each extractable item until there all have been iterated or the iteration function returns true. */
+			virtual void iterateExtractableItems(Direction, const std::function<bool(const ItemStack &, Slot)> &);
 
 			/** Doesn't lock the inventory. */
 			virtual bool empty() const;

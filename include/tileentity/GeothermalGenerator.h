@@ -15,6 +15,7 @@ namespace Game3 {
 			constexpr static float PERIOD = 0.25;
 
 			bool mayInsertItem(const ItemStack &, Direction) override;
+			bool mayExtractItem(const ItemStack &, Direction, Slot) override;
 			bool canInsertItem(const ItemStack &, Direction) override;
 			FluidAmount getMaxLevel(FluidID) override;
 			EnergyAmount getEnergyCapacity() override;

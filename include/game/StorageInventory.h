@@ -22,6 +22,8 @@ namespace Game3 {
 			ItemStack * operator[](size_t) override;
 			const ItemStack * operator[](size_t) const override;
 
+			void iterate(const std::function<bool(const ItemStack &, Slot)> &) override;
+
 			ItemStack * firstItem(Slot *slot_out) override;
 
 			bool canInsert(const ItemStack &) const override;

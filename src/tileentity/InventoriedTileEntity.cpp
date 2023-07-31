@@ -16,25 +16,42 @@ namespace Game3 {
 		return inventory->canInsert(stack);
 	}
 
-	std::optional<ItemStack> InventoriedTileEntity::extractItem(Direction, bool remove) {
+	std::optional<ItemStack> InventoriedTileEntity::extractItem(Direction, bool remove, Slot slot) {
 		if (!inventory)
 			return std::nullopt;
 
+		ItemStack *stack = nullptr;
+
 		if (remove) {
 			std::optional<ItemStack> out;
-			Slot slot = -1;
-			ItemStack *stack = inventory->firstItem(&slot);
-			if (slot == Slot(-1) || stack == nullptr)
-				return std::nullopt;
-			out = std::move(*stack);
-			inventory->erase(slot);
+
+			if (slot == Slot(-1)) {
+				Slot slot_extracted_from = -1;
+				stack = inventory->firstItem(&slot_extracted_from);
+				if (slot_extracted_from == Slot(-1) || stack == nullptr)
+					return std::nullopt;
+				out = std::move(*stack);
+				inventory->erase(slot_extracted_from);
+			} else {
+				stack = (*inventory)[slot];
+				if (stack == nullptr)
+					return std::nullopt;
+				out = std::move(*stack);
+				inventory->erase(slot);
+			}
+
 			inventory->notifyOwner();
 			return out;
 		}
 
-		ItemStack *stack = inventory->firstItem(nullptr);
+		if (slot == Slot(-1))
+			stack = inventory->firstItem(nullptr);
+		else
+			stack = (*inventory)[slot];
+
 		if (stack == nullptr)
 			return std::nullopt;
+
 		return *stack;
 	}
 
@@ -55,6 +72,12 @@ namespace Game3 {
 			return 0;
 
 		return inventory->insertable(stack, slot);
+	}
+
+	void InventoriedTileEntity::iterateExtractableItems(Direction direction, const std::function<bool(const ItemStack &, Slot)> &function) {
+		inventory->iterate([&](const ItemStack &stack, Slot slot) {
+			return mayExtractItem(stack, direction, slot) && function(stack, slot);
+		});
 	}
 
 	bool InventoriedTileEntity::empty() const {
