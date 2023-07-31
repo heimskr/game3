@@ -6,7 +6,7 @@
 #include <deque>
 
 namespace Game3 {
-	class Inventory;
+	class InventoriedTileEntity;
 
 	class ItemNetwork: public PipeNetwork {
 		public:
@@ -27,6 +27,6 @@ namespace Game3 {
 			Lockable<std::deque<ItemStack>> overflowQueue;
 
 			void advanceRoundRobin();
-			std::shared_ptr<Inventory> getRoundRobinInventory();
+			std::pair<std::shared_ptr<InventoriedTileEntity>, Direction> getRoundRobin();
 	};
 }

@@ -20,8 +20,10 @@ namespace Game3 {
 
 			/** Doesn't lock the inventory. */
 			virtual bool canInsertItem(const ItemStack &, Direction);
-			/** Doesn't lock the inventory. */
+			/** Doesn't lock the inventory. Returns the extracted item. */
 			virtual std::optional<ItemStack> extractItem(Direction, bool remove);
+			/** Doesn't lock the inventory. Returns whether the item was insertable at all. */
+			virtual bool insertItem(const ItemStack &, Direction, std::optional<ItemStack> *);
 
 			/** Doesn't lock the inventory. */
 			virtual bool empty() const;

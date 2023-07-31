@@ -1,3 +1,4 @@
+#include "Log.h"
 #include "entity/Player.h"
 #include "game/Inventory.h"
 #include "game/ServerInventory.h"
@@ -13,7 +14,6 @@ namespace Game3 {
 	bool InventoriedTileEntity::canInsertItem(const ItemStack &stack, Direction) {
 		if (!inventory)
 			return false;
-
 		return inventory->canInsert(stack);
 	}
 
@@ -37,6 +37,20 @@ namespace Game3 {
 		if (stack == nullptr)
 			return std::nullopt;
 		return *stack;
+	}
+
+	bool InventoriedTileEntity::insertItem(const ItemStack &stack, Direction direction, std::optional<ItemStack> *leftover) {
+		if (!canInsertItem(stack, direction)) {
+			INFO("Nope! Can't insert!");
+			return false;
+		}
+
+		if (leftover != nullptr)
+			*leftover = inventory->add(stack);
+		else
+			inventory->add(stack);
+
+		return true;
 	}
 
 	bool InventoriedTileEntity::empty() const {

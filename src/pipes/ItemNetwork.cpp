@@ -31,9 +31,11 @@ namespace Game3 {
 
 			do {
 				advanceRoundRobin();
-				if (InventoryPtr round_robin_inventory = getRoundRobinInventory())
-					stack = round_robin_inventory->add(*stack);
-				else
+				if (const auto [round_robin_tile_entity, round_robin_direction] = getRoundRobin(); round_robin_tile_entity) {
+					std::optional<ItemStack> leftover;
+					if (!round_robin_tile_entity->insertItem(*stack, round_robin_direction, &stack))
+						continue;
+				} else
 					break;
 			} while (old_iter != round_robin_iter && stack);
 
@@ -61,11 +63,16 @@ namespace Game3 {
 
 			auto &round_robin_iter = *roundRobinIterator;
 
+			INFO("Found round robin iterator.");
+
 			if (round_robin_iter == insertions.end())
 				continue;
 
+			INFO("Round robin iterator is valid.");
+
 			if (auto inventoried = tile_entity->cast<InventoriedTileEntity>(); inventoried && !inventoried->empty()) {
 				auto inventory_lock = inventoried->inventory->uniqueLock();
+				INFO("Locked inventory.");
 
 				// It's possible we'll extract an item and put it right back.
 				// If that happens, we don't want to notify the owner and potentially queue a broadcast.
@@ -75,16 +82,24 @@ namespace Game3 {
 				if (!extracted)
 					continue;
 
+				INFO("Extracted item: " << std::string(*extracted));
 				std::optional<ItemStack> leftover;
 
-				if (InventoryPtr round_robin_inventory = getRoundRobinInventory()) {
-					leftover = round_robin_inventory->add(*extracted);
+				if (const auto [round_robin_tile_entity, round_robin_direction] = getRoundRobin(); round_robin_tile_entity) {
+					if (!round_robin_tile_entity->insertItem(*extracted, round_robin_direction, &leftover)) {
+						INFO("Couldn't insert item.");
+						leftover = std::move(*extracted);
+					} else {
+						INFO("Inserted item at " << round_robin_tile_entity->position << ".");
+					}
 				} else {
+					INFO("Moved to overflow queue.");
 					overflowQueue.push_back(std::move(*extracted));
 					return;
 				}
 
 				if (leftover) {
+					INFO("Leftovers present.");
 					// If the insertion didn't fully complete, we need to try to put the leftovers
 					// in the next inventories in the round-robin configuration.
 					const auto old_iter = round_robin_iter;
@@ -98,16 +113,23 @@ namespace Game3 {
 						if (round_robin_iter->first == tile_entity->getPosition())
 							continue;
 
-						if (InventoryPtr round_robin_inventory = getRoundRobinInventory()) {
-							auto round_robin_lock = round_robin_inventory->uniqueLock();
-							leftover = round_robin_inventory->add(*leftover);
+						if (const auto [round_robin_tile_entity, round_robin_direction] = getRoundRobin(); round_robin_tile_entity) {
+							auto round_robin_lock = round_robin_tile_entity->inventory->uniqueLock();
+							if (!round_robin_tile_entity->insertItem(*leftover, round_robin_direction, &leftover)) {
+								continue;
+								INFO("Couldn't insert at " << round_robin_tile_entity->position << '.');
+							} else {
+								INFO("Inserted at " << round_robin_tile_entity->position << (leftover? " with" : " without") << " leftovers.");
+							}
 						} else {
+							INFO("Moved to overflow queue; couldn't find anywhere to insert leftovers.");
 							overflowQueue.push_back(std::move(*leftover));
 							return;
 						}
 					} while (old_iter != round_robin_iter && leftover);
 
 					if (leftover) {
+						INFO("Leftovers present after all insertions.");
 						// If there's anything left over, try putting it back into the inventory it was extracted from.
 						if (std::optional<ItemStack> new_leftover = inventoried->inventory->add(*leftover)) {
 							// If there's still anything left over, move it to the overflowQueue so we can try to insert it somewhere another time.
@@ -117,12 +139,16 @@ namespace Game3 {
 							overflowQueue.push_back(std::move(*leftover));
 						}
 					} else {
+						INFO("No final leftovers present.");
 						// Because no leftovers means the extraction was successful and the source inventory changed, we need to undo the effect of the suppressor.
 						suppressor.cancel(true);
 					}
 				} else {
+					INFO("Leftovers not present.");
 					advanceRoundRobin();
 				}
+			} else {
+				INFO("Not an inventoried tile entity at " << tile_entity->position << ", or empty.");
 			}
 		}
 
@@ -131,6 +157,7 @@ namespace Game3 {
 	}
 
 	void ItemNetwork::lastPipeRemoved(Position where) {
+		INFO("Last pipe removed at " << where << "; overflow queue size: " << overflowQueue.size());
 		if (overflowQueue.empty())
 			return;
 
@@ -188,25 +215,23 @@ namespace Game3 {
 			roundRobinIterator = insertions.end();
 	}
 
-	InventoryPtr ItemNetwork::getRoundRobinInventory() {
+	std::pair<std::shared_ptr<InventoriedTileEntity>, Direction> ItemNetwork::getRoundRobin() {
 		if (!roundRobinIterator)
 			advanceRoundRobin();
 
 		if (*roundRobinIterator == insertions.end())
-			return nullptr;
+			return {nullptr, Direction::Invalid};
 
 		RealmPtr realm = weakRealm.lock();
 		if (!realm)
-			return nullptr;
+			return {nullptr, Direction::Invalid};
 
-		TileEntityPtr tile_entity = realm->tileEntityAt((*roundRobinIterator)->first);
+		const auto [position, direction] = **roundRobinIterator;
+
+		TileEntityPtr tile_entity = realm->tileEntityAt(position);
 		if (!tile_entity)
-			return nullptr;
+			return {nullptr, Direction::Invalid};
 
-		auto has_inventory = std::dynamic_pointer_cast<HasInventory>(tile_entity);
-		if (!has_inventory)
-			return nullptr;
-
-		return has_inventory->inventory;
+		return {std::dynamic_pointer_cast<InventoriedTileEntity>(tile_entity), direction};
 	}
 }
