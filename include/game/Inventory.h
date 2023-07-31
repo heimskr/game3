@@ -163,6 +163,7 @@ namespace Game3 {
 
 				void cancel(bool notify = false) {
 					active = false;
+					parent.suppressInventoryNotifications = false;
 					if (notify)
 						parent.notifyOwner();
 				}

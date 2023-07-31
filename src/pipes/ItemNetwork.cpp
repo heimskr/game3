@@ -72,7 +72,7 @@ namespace Game3 {
 
 				// This would be a little strange.
 				if (!extracted) {
-					WARN("Couldn't extract item indicated to be extractable from slot " << slot << " (inventoried: " << typeid(*inventoried).name() << ')');
+					WARN("Couldn't extract item indicated to be extractable from slot " << slot << '.');
 					return false;
 				}
 
@@ -90,7 +90,7 @@ namespace Game3 {
 					const bool changed = extracted->count != original_count;
 
 					// If there's anything left over, try putting it back into the inventory it was extracted from.
-					if (std::optional<ItemStack> new_leftover = inventoried->inventory->add(*extracted)) {
+					if (std::optional<ItemStack> new_leftover = inventoried->inventory->add(*extracted, slot)) {
 						// If there's still anything left over, move it to the overflowQueue so we can try to insert it somewhere another time.
 						// Theoretically this should never happen because we've locked the source inventory.
 						// Also, because the source inventory changed, we need to cancel the suppressor.
