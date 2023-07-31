@@ -304,7 +304,7 @@ namespace Game3 {
 			}
 
 			inline auto str() const {
-				return std::string(bytes.begin(), bytes.end());
+				return std::string(bytes.begin() + skip, bytes.end());
 			}
 
 			template <typename T>
