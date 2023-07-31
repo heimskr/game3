@@ -113,6 +113,20 @@ namespace Game3 {
 		return false;
 	}
 
+	ItemCount StorageInventory::insertable(const ItemStack &stack, Slot slot) const {
+		auto iter = storage.find(slot);
+
+		if (iter == storage.end())
+			return stack.count;
+
+		const ItemStack &stored = iter->second;
+
+		if (!stored.canMerge(stack))
+			return 0;
+
+		return stored.item->maxCount - stack.count;
+	}
+
 	ItemCount StorageInventory::count(const ItemID &id) const {
 		if (id.getPath() == "attribute")
 			return countAttribute(id);

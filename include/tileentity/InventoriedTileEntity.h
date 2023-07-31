@@ -19,11 +19,14 @@ namespace Game3 {
 			InventoriedTileEntity(std::shared_ptr<Inventory> = nullptr);
 
 			/** Doesn't lock the inventory. */
+			virtual bool mayInsertItem(const ItemStack &, Direction) { return true; }
+			/** Doesn't lock the inventory. */
 			virtual bool canInsertItem(const ItemStack &, Direction);
 			/** Doesn't lock the inventory. Returns the extracted item. */
 			virtual std::optional<ItemStack> extractItem(Direction, bool remove);
 			/** Doesn't lock the inventory. Returns whether the item was insertable at all. */
 			virtual bool insertItem(const ItemStack &, Direction, std::optional<ItemStack> *);
+			virtual ItemCount itemsInsertable(const ItemStack &, Direction, Slot);
 
 			/** Doesn't lock the inventory. */
 			virtual bool empty() const;

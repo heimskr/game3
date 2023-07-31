@@ -27,6 +27,8 @@ namespace Game3 {
 			bool canInsert(const ItemStack &) const override;
 			bool canInsert(const ItemStack &, Slot) const override;
 
+			ItemCount insertable(const ItemStack &, Slot) const override;
+
 			/** Counts the number of an item in the inventory. */
 			ItemCount count(const ItemID &) const override;
 

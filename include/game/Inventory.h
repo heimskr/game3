@@ -51,6 +51,8 @@ namespace Game3 {
 			virtual bool canInsert(const ItemStack &) const = 0;
 			virtual bool canInsert(const ItemStack &, Slot) const = 0;
 
+			virtual ItemCount insertable(const ItemStack &, Slot) const = 0;
+
 			/** Removes an item from the inventory and drops it at the owner's location. */
 			virtual void drop(Slot) = 0;
 
