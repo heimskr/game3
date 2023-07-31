@@ -107,7 +107,7 @@ namespace Game3 {
 			std::condition_variable workersCV;
 			std::mutex workersCVMutex;
 
-			event_base *base = nullptr;
+			std::atomic<event_base *> base = nullptr;
 			event *signalEvent = nullptr;
 
 			sockaddr *name = nullptr;
