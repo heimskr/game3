@@ -29,8 +29,16 @@ namespace Game3 {
 	// void from_json(const nlohmann::json &, GeothermalRecipe &);
 	void to_json(nlohmann::json &, const GeothermalRecipe &);
 
-	struct GeothermalRecipeRegistry: UnnamedJSONRegistry<GeothermalRecipe> {
-		static Identifier ID() { return {"base", "geothermal_recipe"}; }
-		GeothermalRecipeRegistry(): UnnamedJSONRegistry(ID()) {}
+	class GeothermalRecipeRegistry: public UnnamedJSONRegistry<GeothermalRecipe> {
+		public:
+			std::unordered_set<FluidID> fluidIDs;
+
+			static Identifier ID() { return {"base", "geothermal_recipe"}; }
+
+			GeothermalRecipeRegistry(): UnnamedJSONRegistry(ID()) {}
+
+			void onAdd(const GeothermalRecipe &recipe) override {
+				fluidIDs.insert(recipe.input.id);
+			}
 	};
 }

@@ -214,6 +214,8 @@ namespace Game3 {
 			using UnnamedRegistryBase::UnnamedRegistryBase;
 			~UnnamedRegistry() override = default;
 
+			virtual void onAdd(const T &) {}
+
 			inline UnnamedRegistry & operator+=(std::shared_ptr<T> item) {
 				add(std::move(item));
 				return *this;
@@ -223,6 +225,7 @@ namespace Game3 {
 				if (auto [iter, inserted] = items.insert(std::move(item)); inserted) {
 					(*iter)->registryID = nextCounter++;
 					byCounter.push_back(*iter);
+					onAdd(**iter);
 				}
 			}
 
@@ -237,6 +240,7 @@ namespace Game3 {
 				if (auto [iter, inserted] = items.insert(std::move(item)); inserted) {
 					(*iter)->registryID = nextCounter++;
 					byCounter.push_back(*iter);
+					onAdd(**iter);
 					return true;
 				}
 				return false;

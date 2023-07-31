@@ -11,6 +11,7 @@ namespace Game3 {
 	ExternalInventoryModule::ExternalInventoryModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<ClientInventory> inventory_):
 	game(std::move(game_)),
 	inventory(std::move(inventory_)) {
+		assert(inventory);
 		label.set_hexpand();
 		grid.set_hexpand();
 		hbox.append(label);
@@ -97,6 +98,7 @@ namespace Game3 {
 	}
 
 	void ExternalInventoryModule::populate() {
+		assert(inventory);
 		auto &storage = inventory->getStorage();
 		const int grid_width = gridWidth();
 		const int tile_size  = InventoryTab::TILE_SIZE <= tabWidth? tabWidth / (tabWidth / InventoryTab::TILE_SIZE) : InventoryTab::TILE_SIZE;

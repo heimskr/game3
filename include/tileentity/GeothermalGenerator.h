@@ -3,9 +3,10 @@
 #include "Texture.h"
 #include "tileentity/EnergeticTileEntity.h"
 #include "tileentity/FluidHoldingTileEntity.h"
+#include "tileentity/InventoriedTileEntity.h"
 
 namespace Game3 {
-	class GeothermalGenerator: public FluidHoldingTileEntity, public EnergeticTileEntity {
+	class GeothermalGenerator: public InventoriedTileEntity, public FluidHoldingTileEntity, public EnergeticTileEntity {
 		public:
 			static Identifier ID() { return {"base", "te/geothermal_generator"}; }
 
@@ -13,9 +14,11 @@ namespace Game3 {
 			constexpr static FluidAmount  FLUID_CAPACITY  = 16 * FluidTile::FULL;
 			constexpr static float PERIOD = 0.25;
 
+			bool canInsertItem(const ItemStack &, Direction) override;
 			FluidAmount getMaxLevel(FluidID) override;
 			EnergyAmount getEnergyCapacity() override;
 
+			void init(Game &) override;
 			void tick(Game &, float) override;
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) override;

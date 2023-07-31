@@ -3,6 +3,8 @@
 #include "Tileset.h"
 #include "game/ClientGame.h"
 #include "game/EnergyContainer.h"
+#include "game/ServerInventory.h"
+#include "item/FilledFlask.h"
 // #include "packet/OpenEnergyLevelPacket.h"
 #include "realm/Realm.h"
 #include "recipe/GeothermalRecipe.h"
@@ -18,6 +20,26 @@ namespace Game3 {
 
 	GeothermalGenerator::GeothermalGenerator(Position position_):
 		GeothermalGenerator("base:tile/geothermal_generator"_id, position_) {}
+
+	bool GeothermalGenerator::canInsertItem(const ItemStack &stack, Direction) {
+		auto flask = std::dynamic_pointer_cast<FilledFlask>(stack.item);
+		if (!flask)
+			return false;
+
+		RealmPtr realm = weakRealm.lock();
+		if (!realm)
+			return false;
+
+		Game &game = realm->getGame();
+		auto &geothermal_registry = game.registry<GeothermalRecipeRegistry>();
+		auto &fluid_registry = game.registry<FluidRegistry>();
+		std::shared_ptr<Fluid> fluid = fluid_registry.at(flask->fluidName);
+		if (!fluid || !geothermal_registry.fluidIDs.contains(fluid->registryID))
+			return false;
+
+		auto lock = inventory->sharedLock();
+		return inventory->canInsert(stack);
+	}
 
 	FluidAmount GeothermalGenerator::getMaxLevel(FluidID id) {
 		auto shared_lock = supportedFluids.sharedLock();
@@ -40,6 +62,11 @@ namespace Game3 {
 		assert(energyContainer);
 		auto lock = energyContainer->sharedLock();
 		return energyContainer->capacity;
+	}
+
+	void GeothermalGenerator::init(Game &game) {
+		TileEntity::init(game);
+		inventory = std::make_shared<ServerInventory>(shared_from_this(), 1);
 	}
 
 	void GeothermalGenerator::tick(Game &game, float delta) {
@@ -92,8 +119,10 @@ namespace Game3 {
 
 		if (modifiers.onlyCtrl())
 			FluidHoldingTileEntity::addObserver(player);
-		else
+		else if (modifiers.ctrl && modifiers.shift)
 			EnergeticTileEntity::addObserver(player);
+		else
+			InventoriedTileEntity::addObserver(player);
 
 		{
 			assert(fluidContainer);
@@ -112,18 +141,21 @@ namespace Game3 {
 
 	void GeothermalGenerator::absorbJSON(Game &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
+		InventoriedTileEntity::absorbJSON(game, json);
 		FluidHoldingTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);
 	}
 
 	void GeothermalGenerator::encode(Game &game, Buffer &buffer) {
 		TileEntity::encode(game, buffer);
+		InventoriedTileEntity::encode(game, buffer);
 		FluidHoldingTileEntity::encode(game, buffer);
 		EnergeticTileEntity::encode(game, buffer);
 	}
 
 	void GeothermalGenerator::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
+		InventoriedTileEntity::decode(game, buffer);
 		FluidHoldingTileEntity::decode(game, buffer);
 		EnergeticTileEntity::decode(game, buffer);
 	}
@@ -149,6 +181,18 @@ namespace Game3 {
 		std::erase_if(FluidHoldingTileEntity::observers, [&](const std::weak_ptr<Player> &weak_player) {
 			if (auto player = weak_player.lock()) {
 				if (!EnergeticTileEntity::observers.contains(player))
+					player->send(packet);
+				return false;
+			}
+
+			return true;
+		});
+
+		auto inventoried_lock = InventoriedTileEntity::observers.uniqueLock();
+
+		std::erase_if(InventoriedTileEntity::observers, [&](const std::weak_ptr<Player> &weak_player) {
+			if (auto player = weak_player.lock()) {
+				if (!EnergeticTileEntity::observers.contains(player) && !FluidHoldingTileEntity::observers.contains(player))
 					player->send(packet);
 				return false;
 			}
