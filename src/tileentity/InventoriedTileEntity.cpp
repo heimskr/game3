@@ -1,4 +1,3 @@
-#include "Log.h"
 #include "entity/Player.h"
 #include "game/Inventory.h"
 #include "game/ServerInventory.h"
@@ -40,10 +39,8 @@ namespace Game3 {
 	}
 
 	bool InventoriedTileEntity::insertItem(const ItemStack &stack, Direction direction, std::optional<ItemStack> *leftover) {
-		if (!canInsertItem(stack, direction)) {
-			INFO("Nope! Can't insert!");
+		if (!canInsertItem(stack, direction))
 			return false;
-		}
 
 		if (leftover != nullptr)
 			*leftover = inventory->add(stack);

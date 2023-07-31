@@ -1,5 +1,4 @@
-#include <iostream>
-
+#include "Log.h"
 #include "Tileset.h"
 #include "game/ClientGame.h"
 #include "game/EnergyContainer.h"
@@ -22,34 +21,24 @@ namespace Game3 {
 		GeothermalGenerator("base:tile/geothermal_generator"_id, position_) {}
 
 	bool GeothermalGenerator::canInsertItem(const ItemStack &stack, Direction) {
-		INFO("Geo: can insert " << std::string(stack) << "?");
 		auto flask = std::dynamic_pointer_cast<FilledFlask>(stack.item);
-		if (!flask) {
-			INFO("Not a flask.");
+		if (!flask)
 			return false;
-		}
 
 		RealmPtr realm = weakRealm.lock();
-		if (!realm) {
-			INFO("No realm.");
+		if (!realm)
 			return false;
-		}
 
 		Game &game = realm->getGame();
 		auto &geothermal_registry = game.registry<GeothermalRecipeRegistry>();
 		auto &fluid_registry = game.registry<FluidRegistry>();
 		std::shared_ptr<Fluid> fluid = fluid_registry.at(flask->fluidName);
-		if (!fluid) {
-			INFO("No fluid.");
+		if (!fluid)
 			return false;
-		}
 
-		if (!geothermal_registry.fluidIDs.contains(fluid->registryID)) {
-			INFO("Not an accepted fluid.");
+		if (!geothermal_registry.fluidIDs.contains(fluid->registryID))
 			return false;
-		}
 
-		INFO("Maybe.");
 		auto lock = inventory->sharedLock();
 		return inventory->canInsert(stack);
 	}
