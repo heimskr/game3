@@ -87,8 +87,8 @@ namespace Game3 {
 		packet.encode(*server.game, send_buffer);
 		assert(send_buffer.size() < UINT32_MAX);
 		std::unique_lock lock(networkMutex);
-		auto size = toLittle(static_cast<uint32_t>(send_buffer.size()));
-		auto packet_id = toLittle(packet.getID());
+		const auto size = toLittle(static_cast<uint32_t>(send_buffer.size()));
+		const auto packet_id = toLittle(packet.getID());
 
 		std::span span = send_buffer.getSpan();
 		std::string to_send;

@@ -10,12 +10,13 @@ namespace Game3 {
 	void GenericClient::flushBuffer(bool force) {
 		if (!force && !sendBuffer.active())
 			return;
-		auto buffer_lock = sendBuffer.lock();
+		std::vector<char> moved_buffer;
 		{
-			std::unique_lock network_lock(networkMutex);
-			server.send(*this, std::string_view(sendBuffer.bytes.data(), sendBuffer.bytes.size()), true);
+			auto buffer_lock = sendBuffer.uniqueLock();
+			moved_buffer = std::move(sendBuffer.bytes);
 		}
-		sendBuffer.bytes.clear();
+		std::unique_lock network_lock(networkMutex);
+		server.send(*this, std::string_view(moved_buffer.data(), moved_buffer.size()), true);
 	}
 
 	void GenericClient::stopBuffering() {
