@@ -47,9 +47,10 @@ namespace Game3 {
 	}
 
 	void StorageInventory::iterate(const std::function<bool(const ItemStack &, Slot)> &function) {
-		for (const auto &[slot, stack]: storage)
-			if (function(stack, slot))
-				return;
+		for (Slot slot = 0; slot < slotCount; ++slot)
+			if (auto iter = storage.find(slot); iter != storage.end())
+				if (function(iter->second, slot))
+					return;
 	}
 
 	ItemStack * StorageInventory::firstItem(Slot *slot_out) {
