@@ -89,6 +89,30 @@ namespace Game3 {
 		return remaining == 0;
 	}
 
+	bool StorageInventory::canInsert(const ItemStack &stack, Slot slot) const {
+		auto iter = storage.find(slot);
+
+		if (iter == storage.end())
+			return stack.count <= stack.item->maxCount;
+
+		const ItemStack &stored = iter->second;
+
+		if (!stored.canMerge(stack))
+			return false;
+
+		ssize_t remaining = stack.count;
+		const ssize_t storable = ssize_t(stored.item->maxCount) - ssize_t(stored.count);
+
+		if (0 < storable) {
+			const ItemCount to_store = std::min<ItemCount>(remaining, storable);
+			remaining -= to_store;
+			assert(0 <= remaining);
+			return remaining == 0;
+		}
+
+		return false;
+	}
+
 	ItemCount StorageInventory::count(const ItemID &id) const {
 		if (id.getPath() == "attribute")
 			return countAttribute(id);

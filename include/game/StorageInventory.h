@@ -25,6 +25,7 @@ namespace Game3 {
 			ItemStack * firstItem(Slot *slot_out) override;
 
 			bool canInsert(const ItemStack &) const override;
+			bool canInsert(const ItemStack &, Slot) const override;
 
 			/** Counts the number of an item in the inventory. */
 			ItemCount count(const ItemID &) const override;

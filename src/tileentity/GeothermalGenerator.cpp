@@ -39,8 +39,7 @@ namespace Game3 {
 		if (!geothermal_registry.fluidIDs.contains(fluid->registryID))
 			return false;
 
-		auto lock = inventory->sharedLock();
-		return inventory->canInsert(stack);
+		return inventory->canInsert(stack, 0);
 	}
 
 	FluidAmount GeothermalGenerator::getMaxLevel(FluidID id) {
@@ -68,7 +67,7 @@ namespace Game3 {
 
 	void GeothermalGenerator::init(Game &game) {
 		TileEntity::init(game);
-		inventory = std::make_shared<ServerInventory>(shared_from_this(), 1);
+		inventory = std::make_shared<ServerInventory>(shared_from_this(), 2);
 	}
 
 	void GeothermalGenerator::tick(Game &game, float delta) {
