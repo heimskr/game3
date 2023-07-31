@@ -140,7 +140,6 @@ namespace Game3 {
 			void setFluid(const Position &, FluidTile, bool run_helper = true, bool generating = false);
 			void setFluid(const Position &, const Identifier &, FluidLevel, bool run_helper = true, bool generating = false);
 			bool hasFluid(const Position &, FluidLevel minimum = 1);
-			TileID getTile(Layer, Index row, Index column) const;
 			TileID getTile(Layer, const Position &) const;
 			std::optional<TileID> tryTile(Layer, const Position &) const;
 			std::optional<FluidTile> tryFluid(const Position &) const;

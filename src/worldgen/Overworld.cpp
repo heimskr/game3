@@ -47,7 +47,7 @@ namespace Game3::WorldGen {
 
 		auto biomes = Biome::getMap(*realm, noise_seed);
 		auto get_biome = [&](Index row, Index column) -> Biome & {
-			if (auto biome_type = provider.copyBiomeType(row, column))
+			if (auto biome_type = provider.copyBiomeType(Position(row, column)))
 				return *biomes.at(*biome_type);
 			throw std::runtime_error("Couldn't get biome type at (" + std::to_string(row) + ", " + std::to_string(column) + ')');
 		};
@@ -63,7 +63,8 @@ namespace Game3::WorldGen {
 		for (Index row = range_row_min; row <= range_row_max; ++row) {
 			for (Index column = range_column_min; column <= range_column_max; ++column) {
 				const double noise = std::min(1., std::max(-1., p2.GetValue(row / params.biomeZoom, column / params.biomeZoom, 0.0) * 5.));
-				auto &type = provider.findBiomeType({row, column});
+				std::unique_lock<std::shared_mutex> lock;
+				auto &type = provider.findBiomeType(Position(row, column), &lock);
 				if (noise < -0.8)
 					type = Biome::VOLCANIC;
 				else if (noise < -0.5)

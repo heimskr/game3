@@ -29,7 +29,8 @@ namespace Game3 {
 			if (--stack.count == 0)
 				player.inventory->erase(slot);
 			player.inventory->notifyOwner();
-			realm.tileProvider.findPathState(place.position) = 0;
+			std::unique_lock<std::shared_mutex> lock;
+			realm.tileProvider.findPathState(place.position, &lock) = 0;
 			return true;
 		}
 

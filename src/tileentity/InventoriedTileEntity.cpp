@@ -86,7 +86,7 @@ namespace Game3 {
 
 	void InventoriedTileEntity::iterateExtractableItems(Direction direction, const std::function<bool(const ItemStack &, Slot)> &function) {
 		inventory->iterate([&](const ItemStack &stack, Slot slot) {
-			return mayExtractItem(direction, slot) && function(stack, slot);
+			return canExtractItem(direction, slot) && function(stack, slot);
 		});
 	}
 

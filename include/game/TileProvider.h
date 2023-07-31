@@ -77,97 +77,66 @@ namespace Game3 {
 			std::vector<Position> getLand(const Game &, const ChunkRange &, Index right_pad, Index bottom_pad);
 
 			/** Returns a copy of the given tile. The Create mode will be treated as Throw. */
-			TileID copyTile(Layer, Index row, Index column, bool &was_empty, TileMode = TileMode::Throw) const;
-			TileID copyTileUnsafe(Layer, Index row, Index column, bool &was_empty, TileMode = TileMode::Throw) const;
+			TileID copyTile(Layer, Position, bool &was_empty, TileMode = TileMode::Throw) const;
+			TileID copyTileUnsafe(Layer, Position, bool &was_empty, TileMode = TileMode::Throw) const;
 
 			/** Returns a copy of the given tile. The Create mode will be treated as Throw. */
-			TileID copyTile(Layer, Index row, Index column, TileMode = TileMode::Throw) const;
-
-			/** Returns a copy of the given tile. The Create mode will be treated as Throw. */
-			inline TileID copyTile(Layer layer, const Position &position, bool &was_empty, TileMode mode = TileMode::Throw) const {
-				return copyTile(layer, position.row, position.column, was_empty, mode);
-			}
-
-			/** Returns a copy of the given tile. The Create mode will be treated as Throw. */
-			inline TileID copyTile(Layer layer, const Position &position, TileMode mode = TileMode::Throw) const {
-				return copyTile(layer, position.row, position.column, mode);
-			}
+			TileID copyTile(Layer, Position, TileMode = TileMode::Throw) const;
 
 			std::optional<TileID> tryTile(Layer layer, const Position &position) const;
 
 			/** Returns a copy of the biome type at a given tile position. */
-			std::optional<BiomeType> copyBiomeType(Index row, Index column) const;
-
-			/** Returns a copy of the biome type at a given tile position. */
-			inline std::optional<BiomeType> copyBiomeType(const Position &position) const {
-				return copyBiomeType(position.row, position.column);
-			}
+			std::optional<BiomeType> copyBiomeType(Position) const;
 
 			/** Returns a copy of the path state at a given tile position. */
-			std::optional<uint8_t> copyPathState(Index row, Index column) const;
-
-			/** Returns a copy of the path state at a given tile position. */
-			inline std::optional<uint8_t> copyPathState(const Position &position) const {
-				return copyPathState(position.row, position.column);
-			}
+			std::optional<uint8_t> copyPathState(Position) const;
 
 			/** Returns a copy of the fluid ID/amount at a given tile position. */
-			std::optional<FluidTile> copyFluidTile(Index row, Index column) const;
+			std::optional<FluidTile> copyFluidTile(Position) const;
 
-			/** Returns a copy of the fluid ID/amount at a given tile position. */
-			inline std::optional<FluidTile> copyFluidTile(const Position &position) const {
-				return copyFluidTile(position.row, position.column);
+			/** Returns a reference to the given tile and sets up a shared lock. The ReturnEmpty mode will be treated as Throw. */
+			TileID & findTile(Layer, Position, bool &created, std::shared_lock<std::shared_mutex> *lock_out, TileMode = TileMode::Create);
+
+			/** Returns a reference to the given tile and sets up a unique lock. The ReturnEmpty mode will be treated as Throw. */
+			TileID & findTile(Layer, Position, bool &created, std::unique_lock<std::shared_mutex> *lock_out, TileMode = TileMode::Create);
+
+			template <typename T>
+			/** Returns a reference to the given tile. The ReturnEmpty mode will be treated as Throw. */
+			TileID & findTile(Layer layer, Position position, T *lock_out, TileMode mode = TileMode::Create) {
+				bool created{};
+				return findTile(layer, position, created, lock_out, mode);
 			}
 
-			/** Returns a reference to the given tile. The ReturnEmpty mode will be treated as Throw. */
-			TileID & findTile(Layer, Index row, Index column, bool &created, TileMode = TileMode::Create);
-
-			/** Returns a reference to the given tile. The ReturnEmpty mode will be treated as Throw. */
-			inline TileID & findTile(Layer layer, const Position &position, bool &created, TileMode mode = TileMode::Create) {
-				return findTile(layer, position.row, position.column, created, mode);
-			}
-
-			/** Returns a reference to the given tile. The ReturnEmpty mode will be treated as Throw. */
-			TileID & findTile(Layer, Index row, Index column, TileMode = TileMode::Create);
-
-			/** Returns a reference to the given tile. The ReturnEmpty mode will be treated as Throw. */
-			inline TileID & findTile(Layer layer, const Position &position, TileMode mode = TileMode::Create) {
-				return findTile(layer, position.row, position.column, mode);
-			}
 
 			/** Returns a reference to the biome type at a given tile position. */
-			BiomeType & findBiomeType(Index row, Index column, bool &created, BiomeMode = BiomeMode::Create);
+			BiomeType & findBiomeType(Position, bool &created, std::shared_lock<std::shared_mutex> *lock_out, BiomeMode = BiomeMode::Create);
 
 			/** Returns a reference to the biome type at a given tile position. */
-			inline BiomeType & findBiomeType(const Position &position, bool &created, BiomeMode mode = BiomeMode::Create) {
-				return findBiomeType(position.row, position.column, created, mode);
-			}
+			BiomeType & findBiomeType(Position, bool &created, std::unique_lock<std::shared_mutex> *lock_out, BiomeMode = BiomeMode::Create);
 
 			/** Returns a reference to the biome type at a given tile position. */
-			BiomeType & findBiomeType(Index row, Index column, BiomeMode = BiomeMode::Create);
-
-			/** Returns a reference to the biome type at a given tile position. */
-			inline BiomeType & findBiomeType(const Position &position, BiomeMode mode = BiomeMode::Create) {
-				return findBiomeType(position.row, position.column, mode);
+			template <typename T>
+			BiomeType & findBiomeType(Position position, T *lock_out, BiomeMode mode = BiomeMode::Create) {
+				bool created{};
+				return findBiomeType(position, created, lock_out, mode);
 			}
 
-			/** Returns a reference to the path state at a given tile position. */
-			uint8_t & findPathState(Index row, Index column, bool &created, PathMode = PathMode::Create);
+			/** Returns a reference to the path state at a given tile position and sets up a shared lock. */
+			uint8_t & findPathState(Position, bool &created, std::shared_lock<std::shared_mutex> *lock_out, PathMode = PathMode::Create);
+
+			/** Returns a reference to the path state at a given tile position and sets up a unique lock. */
+			uint8_t & findPathState(Position, bool &created, std::unique_lock<std::shared_mutex> *lock_out, PathMode = PathMode::Create);
 
 			/** Returns a reference to the path state at a given tile position. */
-			inline uint8_t & findPathState(const Position &position, bool &created, PathMode mode = PathMode::Create) {
-				return findPathState(position.row, position.column, created, mode);
+			template <typename T>
+			uint8_t & findPathState(Position position, T *lock_out, PathMode mode = PathMode::Create) {
+				bool created{};
+				return findPathState(position, created, lock_out, mode);
 			}
 
-			/** Returns a reference to the path state at a given tile position. */
-			uint8_t & findPathState(Index row, Index column, PathMode = PathMode::Create);
+			FluidTile & findFluid(Position, std::shared_lock<std::shared_mutex> *lock_out, FluidMode mode = FluidMode::Create);
 
-			/** Returns a reference to the path state at a given tile position. */
-			inline uint8_t & findPathState(const Position &position, PathMode mode = PathMode::Create) {
-				return findPathState(position.row, position.column, mode);
-			}
-
-			FluidTile & findFluid(const Position &position, FluidMode mode = FluidMode::Create);
+			FluidTile & findFluid(Position, std::unique_lock<std::shared_mutex> *lock_out, FluidMode mode = FluidMode::Create);
 
 			const TileChunk & getTileChunk(Layer, ChunkPosition) const;
 			TileChunk & getTileChunk(Layer, ChunkPosition);
@@ -201,7 +170,7 @@ namespace Game3 {
 
 			void ensureAllChunks(ChunkPosition);
 
-			void ensureAllChunks(const Position &);
+			void ensureAllChunks(Position);
 
 			template <typename T>
 			static T access(const Chunk<T> &chunk, int64_t row, int64_t column) {
@@ -252,6 +221,5 @@ namespace Game3 {
 	void to_json(nlohmann::json &, const TileProvider &);
 	void from_json(const nlohmann::json &, TileProvider &);
 
-	ChunkPosition getChunkPosition(Index row, Index column);
-	ChunkPosition getChunkPosition(const Position &);
+	ChunkPosition getChunkPosition(Position);
 }

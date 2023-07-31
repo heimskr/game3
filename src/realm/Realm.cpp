@@ -343,8 +343,10 @@ namespace Game3 {
 		tileEntities.emplace(tile_entity->position, tile_entity);
 		tileEntitiesByGID[tile_entity->globalID] = tile_entity;
 		attach(tile_entity);
-		if (tile_entity->solid)
-			tileProvider.findPathState(tile_entity->position) = false;
+		if (tile_entity->solid) {
+			std::unique_lock<std::shared_mutex> path_lock;
+			tileProvider.findPathState(tile_entity->position, &path_lock) = false;
+		}
 		if (tile_entity->is("base:te/ghost"))
 			++ghostCount;
 		tile_entity->onSpawn();
@@ -703,11 +705,13 @@ namespace Game3 {
 	}
 
 	void Realm::setTile(Layer layer, const Position &position, TileID tile_id, bool run_helper, bool generating) {
-		auto &tile = tileProvider.findTile(layer, position.row, position.column, TileProvider::TileMode::Create);
-		if (tile == tile_id)
-			return;
-
-		tile = tile_id;
+		{
+			std::unique_lock<std::shared_mutex> tile_lock;
+			auto &tile = tileProvider.findTile(layer, position, &tile_lock, TileProvider::TileMode::Create);
+			if (tile == tile_id)
+				return;
+			tile = tile_id;
+		}
 
 		if (isServer()) {
 			if (!generating) {
@@ -724,11 +728,14 @@ namespace Game3 {
 	}
 
 	void Realm::setFluid(const Position &position, FluidTile tile, bool run_helper, bool generating) {
-		auto &fluid = tileProvider.findFluid(position);
-		if (fluid == tile)
-			return;
+		{
+			std::unique_lock<std::shared_mutex> fluid_lock;
+			auto &fluid = tileProvider.findFluid(position, &fluid_lock);
+			if (fluid == tile)
+				return;
+			fluid = tile;
+		}
 
-		fluid = tile;
 		if (isServer()) {
 			if (run_helper)
 				setLayerHelper(position.row, position.column);
@@ -752,12 +759,8 @@ namespace Game3 {
 		return false;
 	}
 
-	TileID Realm::getTile(Layer layer, Index row, Index column) const {
-		return tileProvider.copyTile(layer, row, column, TileProvider::TileMode::Throw);
-	}
-
 	TileID Realm::getTile(Layer layer, const Position &position) const {
-		return getTile(layer, position.row, position.column);
+		return tileProvider.copyTile(layer, position, TileProvider::TileMode::Throw);
 	}
 
 	bool Realm::middleEmpty(const Position &position) {
@@ -948,7 +951,11 @@ namespace Game3 {
 	void Realm::setLayerHelper(Index row, Index column, bool should_mark_dirty) {
 		const auto &tileset = getTileset();
 		const Position position(row, column);
-		tileProvider.findPathState(position) = isWalkable(row, column, tileset);
+
+		{
+			std::unique_lock<std::shared_mutex> path_lock;
+			tileProvider.findPathState(position, &path_lock) = isWalkable(row, column, tileset);
+		}
 
 		updateNeighbors(position);
 		if (should_mark_dirty)
