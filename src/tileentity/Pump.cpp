@@ -61,7 +61,11 @@ namespace Game3 {
 		if (to_remove == 0)
 			return;
 
-		const FluidAmount not_added = addFluid(FluidStack(fluid->id, to_remove));
+		FluidAmount not_added{};
+		{
+			auto fluid_lock = fluidContainer->levels.uniqueLock();
+			not_added = addFluid(FluidStack(fluid->id, to_remove));
+		}
 		const FluidAmount removed = to_remove - not_added;
 
 		if (removed == 0)

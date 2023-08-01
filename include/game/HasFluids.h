@@ -13,6 +13,7 @@ namespace Game3 {
 	class Game;
 	class Inventory;
 
+	/** None of these methods should (or do) lock anything. */
 	class HasFluids {
 		public:
 			std::shared_ptr<FluidContainer> fluidContainer;
@@ -27,6 +28,8 @@ namespace Game3 {
 			virtual FluidAmount addFluid(FluidStack);
 
 			virtual bool canInsertFluid(FluidStack);
+
+			virtual FluidAmount fluidInsertable(FluidID);
 
 			bool fluidsEmpty();
 

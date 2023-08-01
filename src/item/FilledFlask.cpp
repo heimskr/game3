@@ -34,4 +34,15 @@ namespace Game3 {
 
 		return false;
 	}
+
+	FluidStack FilledFlask::getFluidStack(const Game &game) const {
+		return getFluidStack(game.registry<FluidRegistry>());
+	}
+
+	FluidStack FilledFlask::getFluidStack(const FluidRegistry &registry) const {
+		std::shared_ptr<Fluid> fluid = registry.at(fluidName);
+		if (!fluid)
+			throw std::runtime_error("Couldn't find fluid " + std::string(fluidName));
+		return FluidStack(fluid->registryID, FluidTile::FULL);
+	}
 }

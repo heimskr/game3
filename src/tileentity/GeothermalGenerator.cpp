@@ -97,6 +97,9 @@ namespace Game3 {
 
 		assert(fluidContainer);
 		assert(energyContainer);
+
+		slurpFlasks();
+
 		auto &levels = fluidContainer->levels;
 		auto fluid_lock = levels.uniqueLock();
 
@@ -215,5 +218,44 @@ namespace Game3 {
 
 	Game & GeothermalGenerator::getGame() const {
 		return TileEntity::getGame();
+	}
+
+	void GeothermalGenerator::slurpFlasks() {
+		assert(inventory);
+		auto inventory_lock = inventory->uniqueLock();
+
+		ItemStack *stack = (*inventory)[0];
+		if (stack == nullptr)
+			return;
+
+		auto flask = std::dynamic_pointer_cast<FilledFlask>(stack->item);
+		if (!flask)
+			return;
+
+		const Game &game = getGame();
+		auto &geothermal_registry = game.registry<GeothermalRecipeRegistry>();
+		auto &fluid_registry = game.registry<FluidRegistry>();
+		std::shared_ptr<Fluid> fluid = fluid_registry.at(flask->fluidName);
+		if (!fluid || !geothermal_registry.fluidIDs.contains(fluid->registryID))
+			return;
+
+		const FluidStack fluid_stack = flask->getFluidStack(fluid_registry);
+		auto fluid_lock = fluidContainer->levels.uniqueLock();
+		const FluidAmount insertable = HasFluids::fluidInsertable(fluid_stack.id);
+		const size_t flasks_to_insert = std::min(insertable / fluid_stack.amount, stack->count);
+
+		if (flasks_to_insert == 0)
+			return;
+
+		stack->count -= flasks_to_insert;
+		if (stack->count == 0)
+			inventory->erase(0);
+
+		fluidContainer->levels[fluid_stack.id] += flasks_to_insert * fluid_stack.amount;
+
+		inventory_lock.unlock();
+		inventoryUpdated();
+		inventory->notifyOwner(); // Necessary?
+		fluidsUpdated();
 	}
 }

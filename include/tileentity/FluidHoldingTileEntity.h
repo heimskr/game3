@@ -21,6 +21,7 @@ namespace Game3 {
 			virtual bool canInsertFluid(FluidStack, Direction);
 			/** Returns the amount not added. */
 			virtual FluidAmount addFluid(FluidStack, Direction);
+			virtual FluidAmount fluidInsertable(FluidID, Direction);
 			virtual std::optional<FluidStack> extractFluid(Direction, const std::function<bool(FluidID)> &predicate, bool remove, const std::function<FluidAmount(FluidID)> &max_amount);
 			virtual std::optional<FluidStack> extractFluid(Direction, bool remove, FluidAmount max_amount);
 			virtual std::optional<FluidStack> extractFluid(Direction, bool remove);
@@ -40,6 +41,7 @@ namespace Game3 {
 		protected:
 			using HasFluids::canInsertFluid;
 			using HasFluids::addFluid;
+			using HasFluids::fluidInsertable;
 			void broadcast(const TileEntityPacket &);
 	};
 }

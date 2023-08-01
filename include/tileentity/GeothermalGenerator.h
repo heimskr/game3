@@ -40,6 +40,8 @@ namespace Game3 {
 			GeothermalGenerator(Identifier tile_id, Position);
 			GeothermalGenerator(Position);
 
+			void slurpFlasks();
+
 			friend class TileEntity;
 	};
 }

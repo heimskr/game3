@@ -13,7 +13,13 @@ namespace Game3 {
 	}
 
 	FluidAmount FluidHoldingTileEntity::addFluid(FluidStack stack, Direction) {
+		auto lock = fluidContainer->levels.uniqueLock();
 		return addFluid(stack);
+	}
+
+	FluidAmount FluidHoldingTileEntity::fluidInsertable(FluidID id, Direction) {
+		auto lock = fluidContainer->levels.sharedLock();
+		return HasFluids::fluidInsertable(id);
 	}
 
 	std::optional<FluidStack> FluidHoldingTileEntity::extractFluid(Direction, const std::function<bool(FluidID)> &predicate, bool remove, const std::function<FluidAmount(FluidID)> &max_amount) {

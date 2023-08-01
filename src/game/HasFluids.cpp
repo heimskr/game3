@@ -14,9 +14,7 @@ namespace Game3 {
 		assert(fluidContainer);
 
 		auto [id, to_add] = stack;
-
 		auto &levels = fluidContainer->levels;
-		auto lock = levels.uniqueLock();
 
 		if (getMaxFluidTypes() <= levels.size() && !levels.contains(id))
 			return to_add;
@@ -28,7 +26,6 @@ namespace Game3 {
 		if (level + to_add < level) {
 			const FluidAmount remainder = to_add - (max - level);
 			level = max;
-			lock.unlock();
 			fluidsUpdated();
 			return remainder;
 		}
@@ -36,13 +33,11 @@ namespace Game3 {
 		if (max < level + to_add) {
 			const FluidAmount remainder = level + to_add - max;
 			level = max;
-			lock.unlock();
 			fluidsUpdated();
 			return remainder;
 		}
 
 		level += to_add;
-		lock.unlock();
 		fluidsUpdated();
 		return 0;
 	}
@@ -51,7 +46,6 @@ namespace Game3 {
 		assert(fluidContainer);
 
 		auto &levels = fluidContainer->levels;
-		auto lock = levels.sharedLock();
 
 		auto iter = levels.find(stack.id);
 
@@ -67,9 +61,19 @@ namespace Game3 {
 		return current_amount + stack.amount <= getMaxLevel(stack.id);
 	}
 
+	FluidAmount HasFluids::fluidInsertable(FluidID id) {
+		assert(fluidContainer);
+		auto &levels = fluidContainer->levels;
+
+		auto iter = levels.find(id);
+		if (iter == levels.end())
+			return levels.size() < getMaxFluidTypes()? getMaxLevel(id) : 0;
+
+		return getMaxLevel(id) - iter->second;
+	}
+
 	bool HasFluids::fluidsEmpty() {
 		assert(fluidContainer);
-		auto lock = fluidContainer->levels.sharedLock();
 		return fluidContainer->levels.empty();
 	}
 
