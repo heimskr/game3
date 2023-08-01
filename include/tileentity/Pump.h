@@ -9,6 +9,7 @@ namespace Game3 {
 			static Identifier ID() { return {"base", "te/pump"}; }
 
 			constexpr static EnergyAmount ENERGY_CAPACITY = 16'000;
+			constexpr static double ENERGY_PER_UNIT = 0.5;
 			constexpr static float PERIOD = 0.25;
 
 			FluidAmount extractionRate = 250;

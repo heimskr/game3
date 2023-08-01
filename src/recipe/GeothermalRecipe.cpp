@@ -33,7 +33,7 @@ namespace Game3 {
 		if (!fluids || !energy || !canCraft(fluids))
 			return false;
 
-		EnergyAmount output = getOutput(input, game);
+		const EnergyAmount output = getOutput(input, game);
 
 		if (!energy->canInsert(output))
 			return false;

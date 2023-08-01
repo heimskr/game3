@@ -61,7 +61,13 @@ namespace Game3 {
 		if (!fluid)
 			return;
 
-		const FluidLevel to_remove = std::min<FluidLevel>(amount, fluid->level);
+		auto energy_lock = energyContainer->uniqueLock();
+
+		FluidLevel to_remove = std::min<FluidLevel>(amount, fluid->level);
+
+		if (ENERGY_PER_UNIT != 0)
+			to_remove = std::min<FluidLevel>(energyContainer->energy / ENERGY_PER_UNIT, to_remove);
+
 		if (to_remove == 0)
 			return;
 
@@ -71,6 +77,11 @@ namespace Game3 {
 			not_added = addFluid(FluidStack(fluid->id, to_remove));
 		}
 		const FluidAmount removed = to_remove - not_added;
+
+		const EnergyAmount consumed_energy = removed * ENERGY_PER_UNIT;
+		assert(consumed_energy <= energyContainer->energy);
+		energyContainer->energy -= consumed_energy;
+		energy_lock.unlock();
 
 		if (removed == 0)
 			return;
