@@ -70,7 +70,7 @@ namespace Game3 {
 
 		{
 			auto insertions_lock = insertions.uniqueLock();
-			accepting_insertions.resize(insertions.size());
+			accepting_insertions.reserve(insertions.size());
 
 			std::erase_if(insertions, [&](const std::pair<Position, Direction> &pair) {
 				const auto [position, direction] = pair;
