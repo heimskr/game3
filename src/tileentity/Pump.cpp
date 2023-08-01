@@ -3,6 +3,7 @@
 #include "Tileset.h"
 #include "entity/Player.h"
 #include "game/ClientGame.h"
+#include "game/EnergyContainer.h"
 #include "game/ServerInventory.h"
 #include "packet/OpenFluidLevelsPacket.h"
 #include "realm/Realm.h"
@@ -10,8 +11,11 @@
 #include "ui/SpriteRenderer.h"
 
 namespace Game3 {
+	Pump::Pump():
+		EnergeticTileEntity(ENERGY_CAPACITY) {}
+
 	Pump::Pump(Identifier tile_id, Position position_):
-		TileEntity(std::move(tile_id), ID(), position_, true) {}
+		TileEntity(std::move(tile_id), ID(), position_, true), EnergeticTileEntity(ENERGY_CAPACITY) {}
 
 	Pump::Pump(Position position_):
 		Pump("base:tile/pump_s"_id, position_) {}
@@ -101,30 +105,73 @@ namespace Game3 {
 			return true;
 		}
 
-		addObserver(player);
+		if (modifiers.shift && modifiers.ctrl)
+			EnergeticTileEntity::addObserver(player);
+		else
+			FluidHoldingTileEntity::addObserver(player);
 
-		auto lock = fluidContainer->levels.sharedLock();
-		for (const auto &[id, amount]: fluidContainer->levels)
-			INFO(realm.getGame().getFluid(id)->identifier << " = " << amount);
+		{
+			auto lock = energyContainer->sharedLock();
+			INFO("Energy: " << energyContainer->energy);
+		}
+
+		{
+			auto lock = fluidContainer->levels.sharedLock();
+			for (const auto &[id, amount]: fluidContainer->levels)
+				INFO(realm.getGame().getFluid(id)->identifier << " = " << amount);
+		}
+
 		return false;
 	}
 
 	void Pump::absorbJSON(Game &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		FluidHoldingTileEntity::absorbJSON(game, json);
+		EnergeticTileEntity::absorbJSON(game, json);
 		setDirection(json.at("direction"));
 	}
 
 	void Pump::encode(Game &game, Buffer &buffer) {
 		TileEntity::encode(game, buffer);
 		FluidHoldingTileEntity::encode(game, buffer);
+		EnergeticTileEntity::encode(game, buffer);
 		buffer << getDirection();
 	}
 
 	void Pump::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
 		FluidHoldingTileEntity::decode(game, buffer);
+		EnergeticTileEntity::decode(game, buffer);
 		setDirection(buffer.take<Direction>());
+	}
+
+	void Pump::broadcast() {
+		assert(getSide() == Side::Server);
+
+		const TileEntityPacket packet(shared_from_this());
+
+		auto energetic_lock = EnergeticTileEntity::observers.uniqueLock();
+
+		std::erase_if(EnergeticTileEntity::observers, [&](const std::weak_ptr<Player> &weak_player) {
+			if (auto player = weak_player.lock()) {
+				player->send(packet);
+				return false;
+			}
+
+			return true;
+		});
+
+		auto fluid_holding_lock = FluidHoldingTileEntity::observers.uniqueLock();
+
+		std::erase_if(FluidHoldingTileEntity::observers, [&](const std::weak_ptr<Player> &weak_player) {
+			if (auto player = weak_player.lock()) {
+				if (!EnergeticTileEntity::observers.contains(player))
+					player->send(packet);
+				return false;
+			}
+
+			return true;
+		});
 	}
 
 	Game & Pump::getGame() const {

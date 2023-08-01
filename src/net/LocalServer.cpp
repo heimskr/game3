@@ -127,6 +127,7 @@ namespace Game3 {
 		player->inventory->add(ItemStack(*game, "base:item/item_pipe", 64));
 		player->inventory->add(ItemStack(*game, "base:item/geothermal_generator", 64));
 		player->inventory->add(ItemStack(*game, "base:item/energy_pipe", 64));
+		player->inventory->add(ItemStack(*game, "base:item/lava_flask", 64));
 		player->direction = Direction::Right;
 		{
 			auto lock = game->lockPlayersUnique();

@@ -1,12 +1,14 @@
 #pragma once
 
+#include "tileentity/EnergeticTileEntity.h"
 #include "tileentity/FluidHoldingTileEntity.h"
 
 namespace Game3 {
-	class Pump: public FluidHoldingTileEntity {
+	class Pump: public FluidHoldingTileEntity, public EnergeticTileEntity {
 		public:
 			static Identifier ID() { return {"base", "te/pump"}; }
 
+			constexpr static EnergyAmount ENERGY_CAPACITY = 16'000;
 			constexpr static float PERIOD = 0.25;
 
 			FluidAmount extractionRate = 250;
@@ -23,6 +25,7 @@ namespace Game3 {
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
+			void broadcast() override;
 
 			Game & getGame() const final;
 
@@ -30,7 +33,7 @@ namespace Game3 {
 			float accumulatedTime = 0.f;
 			Direction pumpDirection = Direction::Down;
 
-			Pump() = default;
+			Pump();
 			Pump(Identifier tile_id, Position);
 			Pump(Position);
 

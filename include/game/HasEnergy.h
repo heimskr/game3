@@ -9,6 +9,7 @@ namespace Game3 {
 	class Buffer;
 	class EnergyContainer;
 
+	/** None of these methods should (or do) lock anything. */
 	class HasEnergy {
 		public:
 			std::shared_ptr<EnergyContainer> energyContainer;

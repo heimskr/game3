@@ -54,6 +54,10 @@ namespace Game3 {
 		energy = distribute(energy);
 	}
 
+	bool EnergyNetwork::canWorkWith(const std::shared_ptr<TileEntity> &tile_entity) const {
+		return std::dynamic_pointer_cast<EnergeticTileEntity>(tile_entity) != nullptr;
+	}
+
 	EnergyAmount EnergyNetwork::distribute(EnergyAmount amount) {
 		if (amount == 0)
 			return 0;
