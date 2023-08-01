@@ -16,7 +16,7 @@ namespace Game3 {
 		inline auto sharedLock() { return std::shared_lock(mutex); }
 		inline auto uniqueLock() { return std::unique_lock(mutex); }
 		inline SendBuffer & operator++() { ++depth; return *this; }
-		inline SendBuffer & operator--() { assert(0 <= --depth); return *this; }
+		inline SendBuffer & operator--() { --depth; return *this; }
 		inline bool active() const { return 0 < depth; }
 	};
 }
