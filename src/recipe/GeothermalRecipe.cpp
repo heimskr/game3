@@ -40,6 +40,7 @@ namespace Game3 {
 
 		assert(energy->add(output) == 0);
 		leftovers.reset();
+		fluids->levels[input.id] -= input.amount;
 		return true;
 	}
 
