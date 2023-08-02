@@ -19,7 +19,7 @@ namespace Game3 {
 		y_offset = static_cast<float>(subID / 6) * 8.f;
 	}
 
-	Glib::RefPtr<Gdk::Pixbuf> Mushroom::makeImage(const Game &game) {
+	Glib::RefPtr<Gdk::Pixbuf> Mushroom::makeImage(const Game &game, const ItemStack &) {
 		auto texture = game.registry<TextureRegistry>().at("base:texture/mushrooms");
 		texture->init();
 		constexpr int width  = 16;

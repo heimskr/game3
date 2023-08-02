@@ -59,8 +59,8 @@ namespace Game3 {
 			Item & operator=(const Item &) = delete;
 			Item & operator=(Item &&) = default;
 
-			virtual Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &);
-			virtual Glib::RefPtr<Gdk::Pixbuf> makeImage(const Game &);
+			virtual Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &, const ItemStack &);
+			virtual Glib::RefPtr<Gdk::Pixbuf> makeImage(const Game &, const ItemStack &);
 			virtual void getOffsets(const Game &, std::shared_ptr<Texture> &, float &x_offset, float &y_offset);
 			std::shared_ptr<Item> addAttribute(Identifier);
 			virtual std::shared_ptr<Texture> getTexture(const Game &);

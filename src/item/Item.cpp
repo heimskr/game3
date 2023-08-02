@@ -49,13 +49,13 @@ namespace Game3 {
 	Item::Item(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count):
 		NamedRegisterable(std::move(id_)), name(std::move(name_)), basePrice(base_price), maxCount(max_count) {}
 
-	Glib::RefPtr<Gdk::Pixbuf> Item::getImage(const Game &game) {
+	Glib::RefPtr<Gdk::Pixbuf> Item::getImage(const Game &game, const ItemStack &stack) {
 		if (!cachedImage)
-			cachedImage = makeImage(game);
+			cachedImage = makeImage(game, stack);
 		return cachedImage;
 	}
 
-	Glib::RefPtr<Gdk::Pixbuf> Item::makeImage(const Game &game) {
+	Glib::RefPtr<Gdk::Pixbuf> Item::makeImage(const Game &game, const ItemStack &) {
 		auto item_texture = game.registry<ItemTextureRegistry>().at(identifier);
 		auto texture = item_texture->getTexture(game);
 		texture->init();
@@ -145,7 +145,7 @@ namespace Game3 {
 			return cachedImage;
 
 		if (item)
-			return cachedImage = item->getImage(game_);
+			return cachedImage = item->getImage(game_, *this);
 
 		return {};
 	}

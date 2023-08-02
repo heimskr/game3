@@ -31,6 +31,7 @@
 #include "item/Bomb.h"
 #include "item/CaveEntrance.h"
 #include "item/CentrifugeItem.h"
+#include "item/ChemicalItem.h"
 #include "item/EmptyFlask.h"
 #include "item/FilledFlask.h"
 #include "item/Floor.h"
@@ -306,7 +307,10 @@ namespace Game3 {
 
 		add(std::make_shared<CaveEntrance>("base:item/cave_entrance", "Cave Entrance", 50, 1));
 
+		add(std::make_shared<ChemicalItem>("base:item/chemical", "Chemical", 0));
+
 		add(std::make_shared<ItemPipeItem>(4));
+
 		add(std::make_shared<FluidPipeItem>(4));
 
 		add(std::make_shared<CentrifugeItem>("base:item/centrifuge", "Centrifuge", 999, 64)); // TODO: cost

@@ -132,8 +132,7 @@ namespace Game3 {
 
 	void ServerGame::runCommand(RemoteClient &client, const std::string &command, GlobalID command_id) {
 		auto [success, message] = commandHelper(client, command);
-		CommandResultPacket packet(command_id, success, std::move(message));
-		client.send(packet);
+		client.send(CommandResultPacket(command_id, success, std::move(message)));
 	}
 
 	void ServerGame::entityTeleported(Entity &entity) {
@@ -216,24 +215,36 @@ namespace Game3 {
 			if (first == "give") {
 				if (words.size() < 2)
 					return {false, "Not enough arguments."};
-				if (3 < words.size())
-					return {false, "Too many arguments."};
 				long count = 1;
-				if (words.size() == 3) {
+				if (3 <= words.size()) {
 					try {
 						count = parseLong(words.at(2));
 					} catch (const std::invalid_argument &) {
 						return {false, "Invalid count."};
 					}
 				}
-				auto item_name = std::string(words.at(1));
-				size_t colon = item_name.find(':');
+
+				nlohmann::json data;
+				if (3 < words.size()) {
+					try {
+						data = nlohmann::json::parse(join(std::span(words.begin() + 3, words.end()), " "));
+					} catch (const std::exception &err) {
+						ERROR(err.what());
+						return {false, "Couldn't parse data as JSON."};
+					}
+				}
+
+				std::string item_name(words.at(1));
+				const size_t colon = item_name.find(':');
+
 				if (colon == item_name.npos)
 					item_name = "base:item/" + std::string(item_name);
+
 				if (auto item = registry<ItemRegistry>()[Identifier(item_name)]) {
-					player->give(ItemStack(*this, item, count));
+					player->give(ItemStack(*this, item, count, std::move(data)));
 					return {true, "Gave " + std::to_string(count) + " x " + item->name};
 				}
+
 				return {false, "Unknown item: " + item_name};
 			} else if (first == "heldL" || first == "heldR") {
 				if (words.size() != 2)
