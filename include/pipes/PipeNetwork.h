@@ -35,7 +35,7 @@ namespace Game3 {
 			static std::unique_ptr<PipeNetwork> create(PipeType, size_t id, const std::shared_ptr<Realm> &);
 
 			void add(std::weak_ptr<Pipe>);
-			void absorb(const std::shared_ptr<PipeNetwork> &);
+			void absorb(std::shared_ptr<PipeNetwork>);
 			/** Cuts the network into two pieces by setting all pipes reachable from the given pipe to a new network. */
 			void partition(const std::shared_ptr<Pipe> &);
 			virtual void addExtraction(Position, Direction);

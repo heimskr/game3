@@ -46,7 +46,7 @@ namespace Game3 {
 			throw std::runtime_error("Can't lock pipe in PipeNetwork::add");
 	}
 
-	void PipeNetwork::absorb(const std::shared_ptr<PipeNetwork> &other) {
+	void PipeNetwork::absorb(std::shared_ptr<PipeNetwork> other) {
 		assert(other);
 
 		const PipeType type = getType();
@@ -54,13 +54,25 @@ namespace Game3 {
 
 		const std::shared_ptr<PipeNetwork> shared = shared_from_this();
 
-		auto lock = other->members.uniqueLock();
+		{
+			auto lock = other->members.uniqueLock();
+			for (const std::weak_ptr<Pipe> &member: other->members)
+				if (std::shared_ptr<Pipe> locked = member.lock())
+					add(locked);
+			other->members.clear();
+		}
 
-		for (const std::weak_ptr<Pipe> &member: other->members)
-			if (std::shared_ptr<Pipe> locked = member.lock())
-				add(locked);
+		{
+			auto lock = other->insertions.uniqueLock();
+			for (const auto &[position, direction]: other->insertions)
+				addInsertion(position, direction);
+		}
 
-		other->members.clear();
+		{
+			auto lock = other->extractions.uniqueLock();
+			for (const auto &[position, direction]: other->extractions)
+				addExtraction(position, direction);
+		}
 	}
 
 	void PipeNetwork::partition(const std::shared_ptr<Pipe> &start) {
@@ -88,18 +100,24 @@ namespace Game3 {
 	}
 
 	void PipeNetwork::addExtraction(Position position, Direction direction) {
+		removeInsertion(position, direction);
+		auto lock = extractions.uniqueLock();
 		extractions.emplace(position, direction);
 	}
 
 	void PipeNetwork::addInsertion(Position position, Direction direction) {
+		removeExtraction(position, direction);
+		auto lock = insertions.uniqueLock();
 		insertions.emplace(position, direction);
 	}
 
 	bool PipeNetwork::removeExtraction(Position position, Direction direction) {
+		auto lock = extractions.uniqueLock();
 		return 1 == extractions.erase(std::make_pair(position, direction));
 	}
 
 	bool PipeNetwork::removeInsertion(Position position, Direction direction) {
+		auto lock = insertions.uniqueLock();
 		return 1 == insertions.erase(std::make_pair(position, direction));
 	}
 
