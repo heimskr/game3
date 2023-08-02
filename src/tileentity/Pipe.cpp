@@ -308,13 +308,10 @@ namespace Game3 {
 		if (auto network = networks[pipe_type]) {
 			extractors[pipe_type][direction] = value;
 
-			if (value) {
-				INFO("Adding extractor");
+			if (value)
 				network->addExtraction(position + direction, flipDirection(direction));
-			} else {
-				INFO("Removing extractor");
+			else
 				network->removeExtraction(position + direction, flipDirection(direction));
-			}
 
 			network->reconsiderInsertion(position + direction);
 			onNeighborUpdated(position + direction);

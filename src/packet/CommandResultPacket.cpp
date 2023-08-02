@@ -1,11 +1,12 @@
-#include "Log.h"
 #include "game/ClientGame.h"
-#include "game/TileProvider.h"
 #include "packet/CommandResultPacket.h"
-#include "packet/PacketError.h"
+#include "ui/MainWindow.h"
 
 namespace Game3 {
-	void CommandResultPacket::handle(ClientGame &) {
-		INFO("Command " << commandID << " was " << (success? "" : "un") << "successful: " << message);
+	void CommandResultPacket::handle(ClientGame &game) {
+		if (success)
+			game.getWindow().alert("Command " + std::to_string(commandID) + " was successful:\n\n" + message);
+		else
+			game.getWindow().error("Command " + std::to_string(commandID) + " was unsuccessful:\n\n" + message);
 	}
 }

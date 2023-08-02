@@ -1,9 +1,11 @@
 #pragma once
 
 #include "Types.h"
+#include "threading/Lockable.h"
 
 #include <atomic>
 #include <chrono>
+#include <deque>
 #include <filesystem>
 #include <functional>
 #include <list>
@@ -51,10 +53,13 @@ namespace Game3 {
 			void queue(std::function<void()>);
 
 			/** Displays an alert. This will reset the dialog pointer. If you need to use this inside a dialog's code, use delay(). */
-			void alert(const Glib::ustring &message, Gtk::MessageType = Gtk::MessageType::INFO, bool modal = true, bool use_markup = false);
+			void alert(const Glib::ustring &message, Gtk::MessageType = Gtk::MessageType::INFO, bool queue = true, bool modal = true, bool use_markup = false);
 
 			/** Displays an error message. (See alert.) */
-			void error(const Glib::ustring &message, bool modal = true, bool use_markup = false);
+			void error(const Glib::ustring &message, bool queue = true, bool modal = true, bool use_markup = false);
+
+			void closeDialog();
+			void queueDialog(std::unique_ptr<Gtk::Dialog> &&);
 
 			Glib::RefPtr<Gdk::GLContext> glContext();
 
@@ -100,6 +105,7 @@ namespace Game3 {
 			std::chrono::system_clock::time_point statusbarSetTime;
 			Glib::RefPtr<Gtk::GestureClick> leftClick;
 			Glib::RefPtr<Gtk::GestureClick> rightClick;
+			Lockable<std::deque<std::unique_ptr<Gtk::Dialog>>> dialogQueue;
 
 			struct KeyInfo {
 				guint code;
@@ -134,6 +140,7 @@ namespace Game3 {
 			void onConnect();
 			void onGameLoaded();
 			bool isFocused(const std::shared_ptr<Tab> &) const;
+			void connectClose(Gtk::Dialog &);
 
 			template <typename T>
 			T & initTab(std::shared_ptr<T> &tab) {

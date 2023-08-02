@@ -96,18 +96,17 @@ namespace Game3 {
 		}, false);
 
 		add_action("json", Gio::ActionMap::ActivateSlot([this] {
-			auto *json_dialog = new JSONDialog(*this, "JSON Test", {
+			auto json_dialog = std::make_unique<JSONDialog>(*this, "JSON Test", nlohmann::json{
 				{"thing1", "text", "Text", {{"initial", "Hello"}}},
 				{"0", "number", "Numeric", {{"initial", "42"}}},
 				{"slider", "slider", "Slider", {{"range", {-10, 20.5}}, {"increments", {0.1, 1}}, {"initial", 1.2}, {"digits", 4}}},
 				{"ok", "ok", "T_est"},
 			});
-			dialog.reset(json_dialog);
 			json_dialog->set_transient_for(*this);
 			json_dialog->signal_submit().connect([](const nlohmann::json &json) {
 				std::cout << json.dump() << '\n';
 			});
-			json_dialog->show();
+			queueDialog(std::move(json_dialog));
 		}));
 
 		glArea.set_expand(true);
@@ -342,6 +341,14 @@ namespace Game3 {
 		});
 	}
 
+	void MainWindow::connectClose(Gtk::Dialog &to_connect) {
+		to_connect.signal_hide().connect([this] {
+			queue([this] {
+				closeDialog();
+			});
+		}, true);
+	}
+
 	bool MainWindow::render(const Glib::RefPtr<Gdk::GLContext> &context) {
 		context->make_current();
 
@@ -382,16 +389,45 @@ namespace Game3 {
 		functionQueueDispatcher.emit();
 	}
 
-	void MainWindow::alert(const Glib::ustring &message, Gtk::MessageType type, bool modal, bool use_markup) {
-		dialog.reset(new Gtk::MessageDialog(*this, message, use_markup, type, Gtk::ButtonsType::OK, modal));
-		dialog->signal_response().connect([this](int) {
-			dialog->close();
+	void MainWindow::alert(const Glib::ustring &message, Gtk::MessageType type, bool do_queue, bool modal, bool use_markup) {
+		auto new_dialog = std::make_unique<Gtk::MessageDialog>(*this, message, use_markup, type, Gtk::ButtonsType::OK, modal);
+		new_dialog->signal_response().connect([this](int) {
+			closeDialog();
 		});
-		dialog->show();
+
+		if (do_queue) {
+			queueDialog(std::move(new_dialog));
+		} else {
+			dialog = std::move(new_dialog);
+			connectClose(*dialog);
+			dialog->show();
+		}
 	}
 
-	void MainWindow::error(const Glib::ustring &message, bool modal, bool use_markup) {
-		alert(message, Gtk::MessageType::ERROR, modal, use_markup);
+	void MainWindow::error(const Glib::ustring &message, bool do_queue, bool modal, bool use_markup) {
+		alert(message, Gtk::MessageType::ERROR, do_queue, modal, use_markup);
+	}
+
+	void MainWindow::closeDialog() {
+		dialog.reset();
+		auto lock = dialogQueue.uniqueLock();
+		if (!dialogQueue.empty()) {
+			dialog = std::move(dialogQueue.front());
+			dialogQueue.pop_front();
+			dialog->show();
+		}
+	}
+
+	void MainWindow::queueDialog(std::unique_ptr<Gtk::Dialog> &&new_dialog) {
+		if (!dialog) {
+			dialog = std::move(new_dialog);
+			connectClose(*dialog);
+			dialog->show();
+		} else {
+			auto lock = dialogQueue.uniqueLock();
+			connectClose(*new_dialog);
+			dialogQueue.push_back(std::move(new_dialog));
+		}
 	}
 
 	Glib::RefPtr<Gdk::GLContext> MainWindow::glContext() {
@@ -489,12 +525,15 @@ namespace Game3 {
 			switch (keyval) {
 				case GDK_KEY_c:
 					if (control) {
-						auto *command_dialog = new CommandDialog(*this);
-						dialog.reset(command_dialog);
+						auto command_dialog = std::make_unique<CommandDialog>(*this);
 						command_dialog->signal_submit().connect([this](const Glib::ustring &command) {
-							game->runCommand(command);
+							try {
+								game->runCommand(command);
+							} catch (const std::exception &err) {
+								error(err.what());
+							}
 						});
-						command_dialog->show();
+						queueDialog(std::move(command_dialog));
 						return;
 					}
 					break;
@@ -622,11 +661,10 @@ namespace Game3 {
 	}
 
 	void MainWindow::onConnect() {
-		auto *connect_dialog = new ConnectDialog(*this);
-		dialog.reset(connect_dialog);
+		auto connect_dialog = std::make_unique<ConnectDialog>(*this);
 		connect_dialog->set_transient_for(*this);
 		connect_dialog->signal_submit().connect(sigc::mem_fun(*this, &MainWindow::connect));
-		connect_dialog->show();
+		queueDialog(std::move(connect_dialog));
 	}
 
 	bool MainWindow::isFocused(const std::shared_ptr<Tab> &tab) const {

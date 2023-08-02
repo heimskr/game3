@@ -126,8 +126,6 @@ namespace Game3 {
 		if (!realm)
 			throw std::runtime_error("Couldn't lock realm");
 
-		INFO("Reconsidering " << position);
-
 		PipeType type = getType();
 		std::unordered_set<Direction> found;
 
