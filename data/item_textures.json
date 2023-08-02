@@ -126,5 +126,6 @@
 	"base:item/pump":                 ["base:texture/tileset",     192, 304],
 	"base:item/centrifuge":           ["base:texture/tileset",     208, 304],
 	"base:item/geothermal_generator": ["base:texture/tileset",     224, 304],
-	"base:item/alchemizer":           ["base:texture/tileset",     240, 304]
+	"base:item/alchemizer":           ["base:texture/tileset",     240, 304],
+	"base:item/chemical":             ["base:texture/flasks",       80,   0]
 }]

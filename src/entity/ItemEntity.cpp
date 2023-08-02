@@ -55,7 +55,7 @@ namespace Game3 {
 
 	void ItemEntity::init(Game &game) {
 		Entity::init(game);
-		if (stack.item)
+		if (stack.item && getSide() == Side::Client)
 			stack.item->getOffsets(game, texture, xOffset, yOffset);
 	}
 

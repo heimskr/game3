@@ -170,11 +170,11 @@ namespace Game3 {
 	}
 
 	size_t Tileset::columnCount(const Game &game) {
-		return *getTexture(game)->width / getTileSize();
+		return getTexture(game)->width / getTileSize();
 	}
 
 	size_t Tileset::rowCount(const Game &game) {
-		return *getTexture(game)->height / getTileSize();
+		return getTexture(game)->height / getTileSize();
 	}
 
 	const TileID & Tileset::operator[](const Identifier &tilename) const {

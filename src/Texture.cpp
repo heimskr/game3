@@ -16,29 +16,35 @@ namespace Game3 {
 	Texture::Texture():
 		NamedRegisterable(Identifier()) {}
 
-	Texture::Texture(Identifier identifier_, const std::filesystem::path &path_, bool alpha_, int filter_):
+	Texture::Texture(Identifier identifier_, std::filesystem::path path_, bool alpha_, int filter_):
 		NamedRegisterable(std::move(identifier_)),
-		format(std::make_shared<int>(alpha_? GL_RGBA : GL_RGB)),
-		filter(std::make_shared<int>(filter_ == -1? DEFAULT_FILTER : filter_)),
-		alpha(std::make_shared<bool>(alpha_)),
-		path(path_) {}
+		format(alpha_? GL_RGBA : GL_RGB),
+		filter(filter_ == -1? DEFAULT_FILTER : filter_),
+		alpha(alpha_),
+		path(std::move(path_)) {}
 
 	void Texture::init() {
-		if (!*valid_) {
+		if (!valid) {
 			int channels = 0;
-			uint8_t *raw = stbi_load(path.c_str(), width.get(), height.get(), &channels, 0);
+			uint8_t *raw = stbi_load(path.c_str(), &width, &height, &channels, 0);
 			if (raw == nullptr)
 				throw std::runtime_error("Couldn't load image from " + path.string());
-			glGenTextures(1, id.get());
-			glBindTexture(GL_TEXTURE_2D, *id);
-			glTexImage2D(GL_TEXTURE_2D, 0, *format, *width, *height, 0, *format, GL_UNSIGNED_BYTE, raw);
+			init(std::shared_ptr<uint8_t[]>(raw, free));
+		}
+	}
+
+	void Texture::init(std::shared_ptr<uint8_t[]> new_data) {
+		if (!valid) {
+			data = std::move(new_data);
+			glGenTextures(1, &id);
+			glBindTexture(GL_TEXTURE_2D, id);
+			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data.get());
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, *filter);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, *filter);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
 			glBindTexture(GL_TEXTURE_2D, 0);
-			*valid_ = true;
-			*data = std::shared_ptr<uint8_t>(raw, free);
+			valid = true;
 		}
 	}
 
@@ -47,7 +53,7 @@ namespace Game3 {
 		if (0 <= bind_id) {
 			glActiveTexture(GL_TEXTURE0 + bind_id); CHECKGL
 		}
-		glBindTexture(GL_TEXTURE_2D, *id); CHECKGL
+		glBindTexture(GL_TEXTURE_2D, id); CHECKGL
 	}
 
 	static std::unordered_map<std::string, std::shared_ptr<Texture>> textureCache;
@@ -91,8 +97,8 @@ namespace Game3 {
 
 	void to_json(nlohmann::json &json, const Texture &texture) {
 		json[0] = texture.path;
-		json[1] = *texture.alpha;
-		json[2] = Texture::filterToString(*texture.filter);
+		json[1] = texture.alpha;
+		json[2] = Texture::filterToString(texture.filter);
 	}
 
 	void from_json(const nlohmann::json &json, Texture &texture) {

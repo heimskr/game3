@@ -95,30 +95,30 @@ namespace Game3 {
 				extractors_corner = tileset[ExtractorsCorner(pipe_type)];
 
 			if (tile_id && *tile_id != 0) {
-				const float x = (*tile_id % (*texture->width / tilesize)) * tilesize;
-				const float y = (*tile_id / (*texture->width / tilesize)) * tilesize;
+				const float x = (*tile_id % (texture->width / tilesize)) * tilesize;
+				const float y = (*tile_id / (texture->width / tilesize)) * tilesize;
 				sprite_renderer(*texture, {
-					.x = static_cast<float>(position.column),
-					.y = static_cast<float>(position.row),
+					.x = float(position.column),
+					.y = float(position.row),
 					.x_offset = x / 2,
 					.y_offset = y / 2,
-					.size_x = static_cast<float>(tilesize),
-					.size_y = static_cast<float>(tilesize),
+					.size_x = float(tilesize),
+					.size_y = float(tilesize),
 				});
 			}
 
 			const auto [extractors_x, extractors_y] = extractors[pipe_type].extractorOffsets();
 			if (extractors_x != 0 || extractors_y != 0) {
 				const TileID extractor_tile = *extractors_corner + extractors_x + extractors_y * column_count;
-				const float x = (extractor_tile % (*texture->width / tilesize)) * tilesize;
-				const float y = (extractor_tile / (*texture->width / tilesize)) * tilesize;
+				const float x = (extractor_tile % (texture->width / tilesize)) * tilesize;
+				const float y = (extractor_tile / (texture->width / tilesize)) * tilesize;
 				sprite_renderer(*texture, {
-					.x = static_cast<float>(position.column),
-					.y = static_cast<float>(position.row),
+					.x = float(position.column),
+					.y = float(position.row),
 					.x_offset = x / 2,
 					.y_offset = y / 2,
-					.size_x = static_cast<float>(tilesize),
-					.size_y = static_cast<float>(tilesize),
+					.size_x = float(tilesize),
+					.size_y = float(tilesize),
 				});
 			}
 		}

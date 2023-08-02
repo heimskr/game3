@@ -188,7 +188,7 @@ namespace Game3 {
 
 		auto &tileset = realm->getTileset();
 		const auto tilesize = tileset.getTileSize();
-		const auto tileset_width = *tileset.getTexture(realm->getGame())->width;
+		const auto tileset_width = tileset.getTexture(realm->getGame())->width;
 
 		const auto set_width = tileset_width / tilesize;
 

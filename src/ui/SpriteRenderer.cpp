@@ -77,8 +77,8 @@ namespace Game3 {
 		drawOnMap(texture, RenderOptions {
 			.x = x,
 			.y = y,
-			.size_x = static_cast<float>(*texture.width),
-			.size_y = static_cast<float>(*texture.height),
+			.size_x = float(texture.width),
+			.size_y = float(texture.height),
 			.scaleX = scale,
 			.scaleY = scale,
 			.angle = angle,
@@ -91,9 +91,9 @@ namespace Game3 {
 			return;
 
 		if (options.size_x < 0)
-			options.size_x = *texture.width;
+			options.size_x = texture.width;
 		if (options.size_y < 0)
-			options.size_y = *texture.height;
+			options.size_y = texture.height;
 
 		auto &provider = canvas->game->activeRealm->tileProvider;
 		const auto &tileset   = provider.getTileset(*canvas->game);
@@ -116,15 +116,15 @@ namespace Game3 {
 		glm::mat4 model = glm::mat4(1.f);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
 		model = glm::translate(model, glm::vec3(options.x - options.x_offset * canvas->scale * options.scaleX, options.y - options.y_offset * canvas->scale * options.scaleY, 0.f));
-		model = glm::translate(model, glm::vec3(0.5f * *texture.width, 0.5f * *texture.height, 0.f)); // move origin of rotation to center of quad
+		model = glm::translate(model, glm::vec3(0.5f * texture.width, 0.5f * texture.height, 0.f)); // move origin of rotation to center of quad
 		model = glm::rotate(model, glm::radians(options.angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
-		model = glm::translate(model, glm::vec3(-0.5f * *texture.width, -0.5f * *texture.height, 0.f)); // move origin back
-		model = glm::scale(model, glm::vec3(*texture.width * options.scaleX * canvas->scale / 2.f, *texture.height * options.scaleY * canvas->scale / 2.f, 2.f)); // last scale
+		model = glm::translate(model, glm::vec3(-0.5f * texture.width, -0.5f * texture.height, 0.f)); // move origin back
+		model = glm::scale(model, glm::vec3(texture.width * options.scaleX * canvas->scale / 2.f, texture.height * options.scaleY * canvas->scale / 2.f, 2.f)); // last scale
 
 		shader.set("model", model);
 		shader.set("spriteColor", 1.f, 1.f, 1.f, options.alpha);
-		const float multiplier = 2.f / *texture.width;
-		shader.set("texturePosition", options.x_offset * multiplier, options.y_offset * multiplier, options.size_x / *texture.width, options.size_y / *texture.width);
+		const float multiplier = 2.f / texture.width;
+		shader.set("texturePosition", options.x_offset * multiplier, options.y_offset * multiplier, options.size_x / texture.width, options.size_y / texture.width);
 		// shader.set("divisor", divisor);
 
 		glActiveTexture(GL_TEXTURE0);
@@ -194,8 +194,8 @@ namespace Game3 {
 		drawOnScreen(texture, RenderOptions {
 			.x = x,
 			.y = y,
-			.size_x = static_cast<float>(*texture.width),
-			.size_y = static_cast<float>(*texture.height),
+			.size_x = static_cast<float>(texture.width),
+			.size_y = static_cast<float>(texture.height),
 			.scaleX = scale,
 			.scaleY = scale,
 			.angle = angle,
@@ -207,8 +207,8 @@ namespace Game3 {
 		if (!initialized)
 			return;
 
-		const auto texture_width  = *texture.width;
-		const auto texture_height = *texture.height;
+		const auto texture_width  = texture.width;
+		const auto texture_height = texture.height;
 		if (options.hackY)
 			hackY(options.y, options.y_offset, options.scaleY);
 

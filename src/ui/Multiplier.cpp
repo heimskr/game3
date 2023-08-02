@@ -90,7 +90,7 @@ namespace Game3 {
 	void Multiplier::operator()(const Texture &texture0, const Texture &texture1) {
 		// assert(*texture0.width == *texture1.width);
 		// assert(*texture0.height == *texture1.height);
-		(*this)(*texture0.id, *texture1.id, *texture0.width, *texture0.height);
+		(*this)(texture0.id, texture1.id, texture0.width, texture0.height);
 	}
 
 	void Multiplier::initRenderData() {

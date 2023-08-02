@@ -107,8 +107,8 @@ namespace Game3 {
 			const auto tilesize = tileset.getTileSize();
 			const TileID tile_id = tileset[0.f < timeRemaining? ore.regenTilename : tileID];
 			const auto texture = tileset.getTexture(realm->getGame());
-			const auto x = (tile_id % (*texture->width / tilesize)) * tilesize;
-			const auto y = (tile_id / (*texture->width / tilesize)) * tilesize;
+			const auto x = (tile_id % (texture->width / tilesize)) * tilesize;
+			const auto y = (tile_id / (texture->width / tilesize)) * tilesize;
 			sprite_renderer(*texture, {
 				.x = static_cast<float>(position.column),
 				.y = static_cast<float>(position.row),

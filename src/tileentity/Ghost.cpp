@@ -100,7 +100,7 @@ namespace Game3 {
 		auto &tileset = realm->getTileset();
 		const auto tilesize = tileset.getTileSize();
 		auto texture = tileset.getTexture(realm->getGame());
-		const auto column_count = *texture->width / tilesize;
+		const auto column_count = texture->width / tilesize;
 
 		TileID tile_id;
 
@@ -174,7 +174,7 @@ namespace Game3 {
 			} else {
 				const auto tilesize = tileset.getTileSize();
 				const auto texture = tileset.getTexture(realm->getGame());
-				const auto column_count = *texture->width / tilesize;
+				const auto column_count = texture->width / tilesize;
 				tile_id = details.rowOffset * column_count + details.columnOffset;
 			}
 

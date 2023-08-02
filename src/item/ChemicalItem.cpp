@@ -26,7 +26,7 @@ namespace Game3 {
 
 		uint16_t hue = 0;
 		float saturation = 1.f;
-		float value_difference = 0.f;
+		float value_difference = -1.f;
 
 		if (!formula.empty()) {
 			const size_t hash = std::hash<std::string>{}(formula);
@@ -34,7 +34,6 @@ namespace Game3 {
 			saturation = (hash / double(std::numeric_limits<size_t>::max())) / 2.f + .5f;
 			std::default_random_engine rng(hash);
 			std::normal_distribution<float> normal(0, 0.1);
-			// value_difference = (((hash / 100) % 21) - 10) * .1f;
 			value_difference = normal(rng);
 		}
 

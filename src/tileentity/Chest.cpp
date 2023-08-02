@@ -51,15 +51,15 @@ namespace Game3 {
 		assert(texture);
 		texture->init();
 		assert(texture->width);
-		const auto x = (tile_index % (*texture->width / tilesize)) * tilesize;
-		const auto y = (tile_index / (*texture->width / tilesize)) * tilesize;
+		const auto x = (tile_index % (texture->width / tilesize)) * tilesize;
+		const auto y = (tile_index / (texture->width / tilesize)) * tilesize;
 		sprite_renderer(*texture, {
-			.x = static_cast<float>(position.column),
-			.y = static_cast<float>(position.row),
-			.x_offset = static_cast<float>(x) / 2.f,
-			.y_offset = static_cast<float>(y) / 2.f,
-			.size_x = static_cast<float>(tilesize),
-			.size_y = static_cast<float>(tilesize),
+			.x = float(position.column),
+			.y = float(position.row),
+			.x_offset = float(x) / 2.f,
+			.y_offset = float(y) / 2.f,
+			.size_x = float(tilesize),
+			.size_y = float(tilesize),
 		});
 	}
 

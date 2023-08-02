@@ -61,29 +61,35 @@ namespace Game3 {
 		texture->init();
 		const int width  = item_texture->width;
 		const int height = item_texture->height;
-		const ptrdiff_t channels = *texture->format == GL_RGBA? 4 : 3;
+		const ptrdiff_t channels = texture->format == GL_RGBA? 4 : 3;
 		const size_t row_size = channels * width;
 
 		if (!rawImage) {
 			rawImage = std::make_unique<uint8_t[]>(channels * width * height);
 			uint8_t *raw_pointer = rawImage.get();
-			uint8_t *texture_pointer = texture->data->get() + item_texture->y * *texture->width * channels + static_cast<ptrdiff_t>(item_texture->x) * channels;
+			uint8_t *texture_pointer = texture->data.get() + item_texture->y * texture->width * channels + static_cast<ptrdiff_t>(item_texture->x) * channels;
 			for (int row = 0; row < height; ++row) {
 				std::memcpy(raw_pointer + row_size * row, texture_pointer, row_size);
-				texture_pointer += static_cast<ptrdiff_t>(channels) * *texture->width;
+				texture_pointer += static_cast<ptrdiff_t>(channels) * texture->width;
 			}
 		}
 
 		constexpr int doublings = 3;
-		return Gdk::Pixbuf::create_from_data(rawImage.get(), Gdk::Colorspace::RGB, *texture->alpha, 8, width, height, static_cast<int>(row_size))
+		return Gdk::Pixbuf::create_from_data(rawImage.get(), Gdk::Colorspace::RGB, texture->alpha, 8, width, height, int(row_size))
 		       ->scale_simple(width << doublings, height << doublings, Gdk::InterpType::NEAREST);
 	}
 
 	void Item::getOffsets(const Game &game, std::shared_ptr<Texture> &texture, float &x_offset, float &y_offset) {
-		auto item_texture = game.registry<ItemTextureRegistry>().at(identifier);
-		texture  = item_texture->texture.lock();
-		x_offset = static_cast<float>(item_texture->x) / 2.f;
-		y_offset = static_cast<float>(item_texture->y) / 2.f;
+		const auto &registry = game.registry<ItemTextureRegistry>();
+		if (registry.contains(identifier)) {
+			auto item_texture = registry.at(identifier);
+			texture  = item_texture->texture.lock();
+			x_offset = static_cast<float>(item_texture->x) / 2.f;
+			y_offset = static_cast<float>(item_texture->y) / 2.f;
+		} else {
+			x_offset = 0.f;
+			y_offset = 0.f;
+		}
 	}
 
 	std::shared_ptr<Item> Item::addAttribute(Identifier attribute) {

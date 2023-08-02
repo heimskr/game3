@@ -55,8 +55,8 @@ namespace Game3 {
 
 		const auto tilesize = tileset.getTileSize();
 		const auto texture = tileset.getTexture(realm->getGame());
-		const auto x = (cachedTile % (*texture->width / tilesize)) * tilesize;
-		const auto y = (cachedTile / (*texture->width / tilesize)) * tilesize;
+		const auto x = (cachedTile % (texture->width / tilesize)) * tilesize;
+		const auto y = (cachedTile / (texture->width / tilesize)) * tilesize;
 
 		sprite_renderer(*texture, {
 			.x = static_cast<float>(position.column),
