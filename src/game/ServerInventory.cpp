@@ -40,7 +40,7 @@ namespace Game3 {
 				}
 			} else {
 				const ItemCount to_store = std::min(ItemCount(stack.item->maxCount), ItemCount(remaining));
-				assert(storage.try_emplace(start, getOwner()->getRealm()->getGame(), stack.item, to_store).second);
+				assert(storage.try_emplace(start, getOwner()->getRealm()->getGame(), stack.item, to_store, stack.data).second);
 				remaining -= to_store;
 			}
 		}
