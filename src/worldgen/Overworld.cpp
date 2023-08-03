@@ -1,5 +1,3 @@
-#include <thread>
-
 #include "threading/ThreadContext.h"
 #include "Tileset.h"
 #include "biome/Biome.h"
@@ -16,6 +14,8 @@
 #include "worldgen/Overworld.h"
 #include "worldgen/Town.h"
 #include "worldgen/WorldGen.h"
+
+#include <thread>
 
 // #define GENERATE_RIVERS
 
@@ -186,9 +186,9 @@ namespace Game3::WorldGen {
 				candidate_threads.reserve(chunk_max);
 
 				std::mutex candidates_mutex;
+				realm->randomLand = choose(starts, rng);
 
 				for (size_t chunk = 0; chunk < chunk_max; ++chunk) {
-					realm->randomLand = choose(starts, rng);
 
 					candidate_threads.emplace_back([&, chunk] {
 						std::vector<Position> thread_candidates;
@@ -223,8 +223,10 @@ namespace Game3::WorldGen {
 
 				candidate_timer.stop();
 
-				if (!candidates.empty())
-					WorldGen::generateTown(realm, rng, choose(candidates, rng) + Position(pad + 1, 0), n, m, pad, noise_seed);
+				if (!candidates.empty()) {
+					std::default_random_engine town_rng(noise_seed + 1);
+					WorldGen::generateTown(realm, town_rng, choose(candidates, town_rng) + Position(pad + 1, 0), n, m, pad, noise_seed);
+				}
 			}
 		}
 

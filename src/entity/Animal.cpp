@@ -22,8 +22,8 @@ namespace Game3 {
 
 		if constexpr (false) {
 			text.drawOnMap(std::to_string(getGID()), {
-				.x = static_cast<float>(position.column) + offset.x + .5f,
-				.y = static_cast<float>(position.row) + offset.y,
+				.x = float(position.column) + offset.x + .5f,
+				.y = float(position.row)    + offset.y,
 				.color = {path.empty()? 0.f : 1.f, 0.f, 0.f, 1.f},
 				.align = TextAlign::Center,
 			});
@@ -86,8 +86,8 @@ namespace Game3 {
 			const auto [row, column] = position.copyBase();
 			return threadPool.add([this, row, column](ThreadPool &, size_t) {
 				pathfind({
-					threadContext.random(static_cast<int64_t>(row    - wanderRadius), static_cast<int64_t>(row    + wanderRadius)),
-					threadContext.random(static_cast<int64_t>(column - wanderRadius), static_cast<int64_t>(column + wanderRadius))
+					threadContext.random(int64_t(row    - wanderRadius), int64_t(row    + wanderRadius)),
+					threadContext.random(int64_t(column - wanderRadius), int64_t(column + wanderRadius))
 				}, 256);
 
 				timeUntilWander = getWanderDistribution()(threadContext.rng);

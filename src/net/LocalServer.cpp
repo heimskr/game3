@@ -112,8 +112,8 @@ namespace Game3 {
 		player->username = username;
 		player->displayName = display_name;
 		player->token = generateToken(player->username);
-		// overworld->add(player, overworld->randomLand);
-		overworld->add(player, Position(31, 82));
+		overworld->add(player, overworld->randomLand);
+		// overworld->add(player, Position(31, 82));
 		player->init(*game);
 		player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_pickaxe"));
 		player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_shovel"));
