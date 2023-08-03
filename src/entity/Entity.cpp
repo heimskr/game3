@@ -502,13 +502,13 @@ namespace Game3 {
 		moveQueue.push_back(function);
 	}
 
-	PathResult Entity::pathfind(const Position &start, const Position &goal, std::list<Direction> &out) {
+	PathResult Entity::pathfind(const Position &start, const Position &goal, std::list<Direction> &out, size_t loop_max) {
 		std::vector<Position> positions;
 
 		if (start == goal)
 			return PathResult::Trivial;
 
-		if (!simpleAStar(getRealm(), start, goal, positions))
+		if (!simpleAStar(getRealm(), start, goal, positions, loop_max))
 			return PathResult::Unpathable;
 
 		out.clear();
@@ -535,11 +535,11 @@ namespace Game3 {
 		return PathResult::Success;
 	}
 
-	bool Entity::pathfind(const Position &goal) {
+	bool Entity::pathfind(const Position &goal, size_t loop_max) {
 		PathResult out = PathResult::Invalid;
 		{
 			auto lock = path.uniqueLock();
-			out = pathfind(position, goal, path);
+			out = pathfind(position, goal, path, loop_max);
 		}
 
 		if (out == PathResult::Success && getSide() == Side::Server) {

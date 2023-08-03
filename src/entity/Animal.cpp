@@ -88,7 +88,7 @@ namespace Game3 {
 				pathfind({
 					threadContext.random(static_cast<int64_t>(row    - wanderRadius), static_cast<int64_t>(row    + wanderRadius)),
 					threadContext.random(static_cast<int64_t>(column - wanderRadius), static_cast<int64_t>(column + wanderRadius))
-				});
+				}, 256);
 
 				timeUntilWander = getWanderDistribution()(threadContext.rng);
 				attemptingWander = false;

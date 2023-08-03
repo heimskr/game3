@@ -9,5 +9,5 @@
 namespace Game3 {
 	class Realm;
 
-	bool simpleAStar(const std::shared_ptr<Realm> &realm, const Position &from, const Position &to, std::vector<Position> &path);
+	bool simpleAStar(const std::shared_ptr<Realm> &realm, const Position &from, const Position &to, std::vector<Position> &path, size_t loop_max = 1'000);
 }

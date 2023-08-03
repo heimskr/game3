@@ -1,11 +1,10 @@
-#include <iostream>
+#include "Log.h"
+#include "realm/Realm.h"
+#include "util/AStar.h"
 
 #include <algorithm>
 #include <queue>
 #include <vector>
-
-#include "realm/Realm.h"
-#include "util/AStar.h"
 
 namespace Game3 {
 	template<typename T, typename Priority>
@@ -57,7 +56,7 @@ namespace Game3 {
 	}
 
 	// Credit: https://www.redblobgames.com/pathfinding/a-star/implementation.html#cplusplus
-	bool simpleAStar(const std::shared_ptr<Realm> &realm, const Position &start, const Position &goal, std::vector<Position> &path) {
+	bool simpleAStar(const std::shared_ptr<Realm> &realm, const Position &start, const Position &goal, std::vector<Position> &path, size_t loop_max) {
 		std::unordered_map<Position, Position> moves;
 		std::unordered_map<Position, size_t> costs;
 		PriorityQueue<Position, size_t> frontier;
@@ -69,7 +68,7 @@ namespace Game3 {
 		std::vector<Position> next_positions;
 		next_positions.reserve(4);
 
-		while (!frontier.empty()) {
+		for (size_t loops = 0; loops < loop_max && !frontier.empty(); ++loops) {
 			Position current = frontier.get();
 			if (current == goal) {
 				path.clear();

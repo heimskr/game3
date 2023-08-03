@@ -122,8 +122,8 @@ namespace Game3 {
 			Position nextTo() const;
 			std::string debug() const;
 			void queueForMove(const std::function<bool(const std::shared_ptr<Entity> &)> &);
-			PathResult pathfind(const Position &start, const Position &goal, std::list<Direction> &);
-			bool pathfind(const Position &goal);
+			PathResult pathfind(const Position &start, const Position &goal, std::list<Direction> &, size_t loop_max = 1'000);
+			bool pathfind(const Position &goal, size_t loop_max = 1'000);
 			virtual float getSpeed() const { return MAX_SPEED; }
 			std::string getName() override { return "Unknown Entity (" + std::string(type) + ')'; }
 			Game & getGame();
