@@ -48,6 +48,13 @@ namespace Game3 {
 		return Gdk::Pixbuf::create_from_data(rawImage.get(), Gdk::Colorspace::RGB, true, 8, width, height, 4 * width)->scale_simple(width << 3, height << 3, Gdk::InterpType::NEAREST);
 	}
 
+	std::string ChemicalItem::getTooltip(const ItemStack &stack) {
+		const std::string formula = getFormula(stack);
+		if (formula.empty())
+			return "Unknown Chemical";
+		return formula;
+	}
+
 	std::string ChemicalItem::getFormula(const ItemStack &stack) {
 		if (auto iter = stack.data.find("formula"); iter != stack.data.end())
 			return *iter;

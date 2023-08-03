@@ -64,6 +64,8 @@ namespace Game3 {
 			virtual void getOffsets(const Game &, std::shared_ptr<Texture> &, float &x_offset, float &y_offset);
 			std::shared_ptr<Item> addAttribute(Identifier);
 			virtual std::shared_ptr<Texture> getTexture(const Game &);
+			virtual std::string getTooltip(const ItemStack &);
+
 			inline bool operator==(const Item &other) const { return identifier == other.identifier; }
 
 			virtual void initStack(const Game &, ItemStack &) {}

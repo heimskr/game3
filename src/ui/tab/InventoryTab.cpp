@@ -158,11 +158,11 @@ namespace Game3 {
 
 			if (storage.contains(slot)) {
 				auto &stack = storage.at(slot);
-				Glib::ustring label_text = stack.item->name;
+				Glib::ustring tooltip_text = stack.item->getTooltip(stack);
 				if (stack.count != 1)
-					label_text += " \u00d7 " + std::to_string(stack.count);
+					tooltip_text += " \u00d7 " + std::to_string(stack.count);
 				if (stack.hasDurability())
-					label_text += "\n(" + std::to_string(stack.data.at("durability").at(0).get<Durability>()) + "/" + std::to_string(stack.data.at("durability").at(1).get<Durability>()) + ")";
+					tooltip_text += "\n(" + std::to_string(stack.data.at("durability").at(0).get<Durability>()) + "/" + std::to_string(stack.data.at("durability").at(1).get<Durability>()) + ")";
 				auto fixed_ptr = std::make_unique<Gtk::Fixed>();
 				auto image_ptr = std::make_unique<Gtk::Image>(inventory.getImage(*lastGame, slot));
 				auto label_ptr = std::make_unique<Gtk::Label>(std::to_string(stack.count));
@@ -179,7 +179,7 @@ namespace Game3 {
 				}
 				fixed.put(*image_ptr, 0, 0);
 				fixed.put(*label_ptr, 0, 0);
-				fixed.set_tooltip_text(label_text);
+				fixed.set_tooltip_text(tooltip_text);
 				widget_ptr = std::move(fixed_ptr);
 				image_ptr->set_size_request(tile_size - TILE_MAGIC, tile_size - TILE_MAGIC);
 				if (tooldown && dynamic_cast<Tool *>(stack.item.get()))
