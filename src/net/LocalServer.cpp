@@ -128,6 +128,9 @@ namespace Game3 {
 		player->inventory->add(ItemStack(*game, "base:item/geothermal_generator", 64));
 		player->inventory->add(ItemStack(*game, "base:item/energy_pipe", 64));
 		player->inventory->add(ItemStack(*game, "base:item/lava_flask", 64));
+		player->inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "H"}}));
+		player->inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "W"}}));
+		player->inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "N2"}}));
 		player->direction = Direction::Right;
 		{
 			auto lock = game->lockPlayersUnique();
@@ -231,7 +234,7 @@ namespace Game3 {
 		game->initEntities();
 
 		constexpr size_t seed = 1621;
-		auto realm = Realm::create<Overworld>(*game, 1, Overworld::ID(), "base:tileset/monomap"_id, seed);
+		RealmPtr realm = Realm::create<Overworld>(*game, 1, Overworld::ID(), "base:tileset/monomap"_id, seed);
 		realm->outdoors = true;
 		std::default_random_engine rng;
 		rng.seed(seed);

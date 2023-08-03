@@ -13,6 +13,8 @@
 #include "tileentity/Pipe.h"
 
 namespace Game3 {
+	std::shared_ptr<Item> getPipeItem(const Game &, PipeType);
+
 	template <PipeType P>
 	class PipeItem: public Item {
 		protected:
@@ -20,19 +22,17 @@ namespace Game3 {
 				Item(std::move(identifier_), display_name, base_price, 64) {}
 
 		public:
-
 			bool use(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) override{
-				auto &realm = *place.realm;
+				Realm &realm = *place.realm;
+				Inventory &inventory = *place.player->inventory;
 
-				auto tile_entity = realm.tileEntityAt(place.position);
+				TileEntityPtr tile_entity = realm.tileEntityAt(place.position);
+
 				if (!tile_entity) {
 					if (modifiers.onlyShift())
 						return false;
 
-					if (--stack.count == 0)
-						place.player->inventory->erase(slot);
-					else
-						place.player->inventory->notifyOwner();
+					inventory.decrease(stack, slot);
 
 					auto pipe = TileEntity::create<Pipe>(realm.getGame(), place.position);
 					pipe->setPresent(P, true);
@@ -46,7 +46,13 @@ namespace Game3 {
 					return false;
 
 				if (modifiers.onlyShift()) {
-					place.player->give(ItemStack(place.getGame(), shared_from_this(), 1));
+					Game &game = place.getGame();
+
+					// Give back each present type.
+					for (const PipeType pipe_type: PIPE_TYPES)
+						if (pipe->getPresent(pipe_type))
+							place.player->give(ItemStack(game, getPipeItem(game, pipe_type), 1));
+
 					realm.queueDestruction(pipe);
 					return true;
 				}
@@ -54,10 +60,11 @@ namespace Game3 {
 				const auto [x, y] = offsets;
 				const Direction direction = toDirection(getQuadrant(x, y));
 
-				pipe->setPresent(P, true);
-
-				// Hold ctrl to toggle extractors.
-				if (modifiers.onlyCtrl()) {
+				if (!pipe->getPresent(P)) {
+					inventory.decrease(stack, slot);
+					pipe->setPresent(P, true);
+				} else if (modifiers.onlyCtrl()) {
+					// Hold ctrl to toggle extractors.
 					if (pipe->getDirections()[P][direction])
 						pipe->toggleExtractor(P, direction);
 				} else {
@@ -70,21 +77,26 @@ namespace Game3 {
 			}
 	};
 
-	class ItemPipeItem: public PipeItem<PipeType::Item>   {
+	class ItemPipeItem: public PipeItem<PipeType::Item> {
 		public:
+			static Identifier ID() { return {"base", "item/item_pipe"}; }
 			ItemPipeItem(MoneyCount base_price):
-				PipeItem("base:item/item_pipe"_id, "Item Pipe", base_price) {}
+				PipeItem(ID(), "Item Pipe", base_price) {}
 	};
 
-	class FluidPipeItem: public PipeItem<PipeType::Fluid>  {
+	class FluidPipeItem: public PipeItem<PipeType::Fluid> {
 		public:
+			static Identifier ID() { return {"base", "item/fluid_pipe"}; }
 			FluidPipeItem(MoneyCount base_price):
-				PipeItem("base:item/fluid_pipe"_id, "Fluid Pipe", base_price) {}
+				PipeItem(ID(), "Fluid Pipe", base_price) {}
 	};
 
 	class EnergyPipeItem: public PipeItem<PipeType::Energy> {
 		public:
+			static Identifier ID() { return {"base", "item/energy_pipe"}; }
 			EnergyPipeItem(MoneyCount base_price):
-				PipeItem("base:item/energy_pipe"_id, "Energy Pipe", base_price) {}
+				PipeItem(ID(), "Energy Pipe", base_price) {}
 	};
+
+
 }
