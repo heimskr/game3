@@ -188,30 +188,26 @@ namespace Game3 {
 			auto reactant_lock = reactants.sharedLock();
 			std::vector<ItemStack> stacks;
 			auto predicate = [range = SlotRange{0, INPUT_CAPACITY - 1}](Slot slot) {
-				INFO("Reactant predicate: " << slot << " -> " << std::boolalpha << range.contains(slot));
 				return range.contains(slot);
 			};
 
 			for (const auto &[reactant, count]: reactants) {
 				stacks.emplace_back(game, chemical_item, 1, nlohmann::json{{"formula", reactant}});
 				const ItemCount in_inventory = inventory_copy->count(stacks.back(), predicate);
-				INFO("in_inventory[" << in_inventory << "], count[" << count << "]");
 				if (in_inventory < count)
 					return false;
 			}
 
 			for (const ItemStack &stack: stacks) {
 				const ItemCount removed = inventory_copy->remove(stack, predicate);
-				if (stack.count != removed)  {
+				if (stack.count != removed)
 					throw std::runtime_error("Couldn't remove stack from ChemicalReactor (" + std::to_string(stack.count) + " in stack != " + std::to_string(removed) + " removed)");
-				}
 			}
 		}
 
 		{
 			auto products_lock = products.sharedLock();
 			auto predicate = [range = SlotRange{INPUT_CAPACITY, INPUT_CAPACITY + OUTPUT_CAPACITY - 1}](Slot slot) {
-				INFO("Product predicate: " << slot << " -> " << std::boolalpha << range.contains(slot));
 				return range.contains(slot);
 			};
 
