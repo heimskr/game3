@@ -149,7 +149,7 @@ namespace Game3 {
 
 		std::shared_lock lock{energyContainer->mutex};
 		INFO("Energy: " << energyContainer->energy);
-		return false;
+		return true;
 	}
 
 	void GeothermalGenerator::absorbJSON(Game &game, const nlohmann::json &json) {

@@ -25,5 +25,7 @@ namespace Game3 {
 
 			/** Returns the amount of energy left over. Doesn't lock the mutex. */
 			EnergyAmount add(EnergyAmount);
+
+			bool remove(EnergyAmount);
 	};
 }

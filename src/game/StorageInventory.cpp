@@ -171,6 +171,16 @@ namespace Game3 {
 		return out;
 	}
 
+	ItemCount StorageInventory::count(const ItemStack &stack, const std::function<bool(Slot)> &predicate) const {
+		ItemCount out = 0;
+
+		for (const auto &[slot, stored_stack]: storage)
+			if (predicate(slot) && stack.canMerge(stored_stack))
+				out += stored_stack.count;
+
+		return out;
+	}
+
 	ItemCount StorageInventory::countAttribute(const Identifier &attribute) const {
 		ItemCount out = 0;
 

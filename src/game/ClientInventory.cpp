@@ -66,6 +66,10 @@ namespace Game3 {
 		throw std::logic_error("ClientInventory::remove(const ItemStack &) unimplemented");
 	}
 
+	ItemCount ClientInventory::remove(const ItemStack &, const std::function<bool(Slot)> &) {
+		throw std::logic_error("ClientInventory::remove(const ItemStack &, const std::function<bool(Slot)> &) unimplemented");
+	}
+
 	ItemCount ClientInventory::remove(const ItemStack &, Slot) {
 		throw std::logic_error("ClientInventory::remove(const ItemStack &, Slot) unimplemented");
 	}

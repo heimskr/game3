@@ -24,4 +24,11 @@ namespace Game3 {
 		energy += to_add;
 		return 0;
 	}
+
+	bool EnergyContainer::remove(EnergyAmount to_remove) {
+		if (energy < to_remove)
+			return false;
+		energy -= to_remove;
+		return true;
+	}
 }

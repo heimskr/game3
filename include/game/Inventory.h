@@ -17,6 +17,14 @@ namespace Game3 {
 	class Buffer;
 	struct CraftingRecipe;
 
+	struct SlotRange {
+		Slot min;
+		Slot max;
+		inline bool contains(Slot slot) const {
+			return min <= slot && slot <= max;
+		}
+	};
+
 	class Inventory: public Container, public Castable<Inventory> {
 		protected:
 			Inventory() = default;
@@ -90,6 +98,9 @@ namespace Game3 {
 			 *  This takes ItemStack data into account but ignores the given ItemStack's count. */
 			virtual ItemCount count(const ItemStack &) const = 0;
 
+			/** Counts the number of an item in the inventory, given a predicate to select the slots read from. */
+			virtual ItemCount count(const ItemStack &, const std::function<bool(Slot)> &) const = 0;
+
 			/** Counts the number of items with a given attribute in the inventory. */
 			virtual ItemCount countAttribute(const Identifier &) const = 0;
 
@@ -104,8 +115,12 @@ namespace Game3 {
 			 *  Returns the count removed. */
 			virtual ItemCount remove(const ItemStack &) = 0;
 
-			/** Attempts to remove a given amount of an item from a specific slot.
+			/** Attempts to remove a given amount of an item from the inventory.
+			 *  Uses a predicate to determine which slots can be removed from.
 			 *  Returns the count removed. */
+			virtual ItemCount remove(const ItemStack &, const std::function<bool(Slot)> &) = 0;
+
+			/** Attempts to remove a given amount of an item from a specific slot. Returns the count removed. */
 			virtual ItemCount remove(const ItemStack &, Slot) = 0;
 
 			virtual ItemCount remove(const CraftingRequirement &) = 0;

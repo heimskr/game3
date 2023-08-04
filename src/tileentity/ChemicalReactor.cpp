@@ -1,5 +1,4 @@
 #include "Log.h"
-#include "chemskr/Chemskr.h"
 #include "game/ClientGame.h"
 #include "game/EnergyContainer.h"
 #include "game/ServerInventory.h"
@@ -65,7 +64,9 @@ namespace Game3 {
 		TileEntity::toJSON(json);
 		InventoriedTileEntity::toJSON(json);
 		EnergeticTileEntity::toJSON(json);
-		json["equation"] = equation;
+		auto equation_lock = const_cast<ChemicalReactor &>(*this).equation.sharedLock();
+		if (equation)
+			json["equation"] = equation->getText();
 	}
 
 	bool ChemicalReactor::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
@@ -84,9 +85,12 @@ namespace Game3 {
 		else
 			InventoriedTileEntity::addObserver(player);
 
+		// DEBUG
+		setEquation("H2O -> H + H + O");
+
 		std::shared_lock lock{energyContainer->mutex};
 		INFO("Energy: " << energyContainer->energy);
-		return false;
+		return true;
 	}
 
 	void ChemicalReactor::absorbJSON(Game &game, const nlohmann::json &json) {
@@ -141,15 +145,15 @@ namespace Game3 {
 		return TileEntity::getGame();
 	}
 
-	bool ChemicalReactor::setEquation(std::string new_equation) {
+	bool ChemicalReactor::setEquation(std::string equation_string) {
 		try {
 
-			std::map<std::string, size_t> new_atom_counts;
-			const bool balanced = Chemskr::balanceAndCount(new_equation, new_atom_counts);
+			Chemskr::Equation new_equation(std::move(equation_string));
 
-			if (balanced) {
-				atomCounts = std::move(new_atom_counts);
-				equation = std::move(new_equation);
+			if (new_equation.isBalanced()) {
+				equation  = std::move(new_equation);
+				reactants.clear();
+				products.clear();
 				return true;
 			}
 
@@ -160,11 +164,78 @@ namespace Game3 {
 		}
 	}
 
-	void ChemicalReactor::react() {
+	bool ChemicalReactor::react() {
 		assert(inventory);
 		assert(energyContainer);
 
-		auto energy_lock = energyContainer->uniqueLock();
+		{
+			auto energy_lock = energyContainer->uniqueLock();
+			auto equation_lock = equation.uniqueLock();
+			if (!equation || !equation->isBalanced())
+				return false;
+			EnergyAmount to_consume = equation->getAtomCount() * ENERGY_PER_ATOM;
+			if (!energyContainer->remove(to_consume))
+				return false;
+			EnergeticTileEntity::queueBroadcast();
+		}
 
+		fillReactants();
+		fillProducts();
+
+		auto inventory_lock = inventory->uniqueLock();
+
+		Game &game = getGame();
+		auto &item_registry = game.registry<ItemRegistry>();
+		std::shared_ptr<Item> chemical_item = item_registry["base:item/chemical"_id];
+
+		{
+			auto reactant_lock = reactants.sharedLock();
+			std::vector<ItemStack> stacks;
+
+			auto predicate = [range = SlotRange{0, INPUT_CAPACITY - 1}](Slot slot) {
+				return range.contains(slot);
+			};
+
+			for (const auto &[reactant, count]: reactants) {
+				stacks.emplace_back(game, chemical_item, 1, nlohmann::json{{"formula", reactant}});
+				if (inventory->count(stacks.back(), predicate) < count)
+					return false;
+			}
+
+			for (const ItemStack &stack: stacks) {
+				if (stack.count != inventory->remove(stack, predicate)) {
+					ERROR(std::string(stack));
+					throw std::runtime_error("Couldn't remove stack from ChemicalReactor");
+				}
+			}
+		}
+
+
+
+		return true;
+	}
+
+	void ChemicalReactor::fillReactants() {
+		auto shared_lock = reactants.sharedLock();
+		if (reactants.empty()) {
+			shared_lock.unlock();
+			auto equation_lock = equation.sharedLock();
+			assert(equation);
+			auto unique_lock = reactants.uniqueLock();
+			for (const std::string &reactant: equation->getReactants())
+				++reactants[reactant];
+		}
+	}
+
+	void ChemicalReactor::fillProducts() {
+		auto shared_lock = reactants.sharedLock();
+		if (products.empty()) {
+			shared_lock.unlock();
+			auto equation_lock = equation.sharedLock();
+			assert(equation);
+			auto unique_lock = products.uniqueLock();
+			for (const std::string &product: equation->getProducts())
+				++products[product];
+		}
 	}
 }

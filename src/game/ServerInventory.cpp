@@ -132,6 +132,9 @@ namespace Game3 {
 	}
 
 	ItemCount ServerInventory::remove(const ItemStack &stack_to_remove) {
+		// Could just use a simple call to remove(const ItemStack &, const std::function<bool(Slot)> &) with [](Slot) { return true; },
+		// but that would be slightly slower so we'll just spam a near copy of that function here.
+
 		ItemCount count_to_remove = stack_to_remove.count;
 		ItemCount removed = 0;
 
@@ -142,6 +145,35 @@ namespace Game3 {
 			auto &[slot, stack] = item;
 
 			if (stack.canMerge(stack_to_remove)) {
+				const ItemCount to_remove = std::min(stack.count, count_to_remove);
+				stack.count -= to_remove;
+				count_to_remove -= to_remove;
+				removed += 0;
+
+				if (stack.count == 0)
+					return true;
+			}
+
+			return false;
+		});
+
+		if (0 < removed)
+			notifyOwner();
+
+		return removed;
+	}
+
+	ItemCount ServerInventory::remove(const ItemStack &stack_to_remove, const std::function<bool(Slot)> &predicate) {
+		ItemCount count_to_remove = stack_to_remove.count;
+		ItemCount removed = 0;
+
+		std::erase_if(storage, [&](auto &item) {
+			if (count_to_remove == 0)
+				return false;
+
+			auto &[slot, stack] = item;
+
+			if (predicate(slot) && stack.canMerge(stack_to_remove)) {
 				const ItemCount to_remove = std::min(stack.count, count_to_remove);
 				stack.count -= to_remove;
 				count_to_remove -= to_remove;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "chemskr/Chemskr.h"
 #include "tileentity/EnergeticTileEntity.h"
 #include "tileentity/InventoriedTileEntity.h"
 
@@ -31,8 +32,9 @@ namespace Game3 {
 			Game & getGame() const final;
 
 		private:
-			Lockable<std::string> equation;
-			Lockable<std::map<std::string, size_t>> atomCounts;
+			Lockable<std::optional<Chemskr::Equation>> equation;
+			Lockable<std::unordered_map<std::string, size_t>> reactants;
+			Lockable<std::unordered_map<std::string, size_t>> products;
 			float accumulatedTime = 0.f;
 
 			ChemicalReactor();
@@ -41,7 +43,9 @@ namespace Game3 {
 
 			/** Returns whether the equation was actually set (i.e., whether the equation was valid and balanced). */
 			bool setEquation(std::string);
-			void react();
+			bool react();
+			void fillReactants();
+			void fillProducts();
 
 			friend class TileEntity;
 	};
