@@ -189,7 +189,6 @@ namespace Game3::WorldGen {
 				realm->randomLand = choose(starts, rng);
 
 				for (size_t chunk = 0; chunk < chunk_max; ++chunk) {
-
 					candidate_threads.emplace_back([&, chunk] {
 						std::vector<Position> thread_candidates;
 
