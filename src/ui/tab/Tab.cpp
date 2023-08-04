@@ -6,7 +6,7 @@ namespace Game3 {
 	}
 
 	void Tab::show() {
-		auto &widget = getWidget();
+		Gtk::Widget &widget = getWidget();
 		if (!notebook.get_page(widget))
 			notebook.set_current_page(notebook.append_page(widget, getName()));
 		else
@@ -19,7 +19,7 @@ namespace Game3 {
 	}
 
 	void Tab::add() {
-		auto &widget = getWidget();
+		Gtk::Widget &widget = getWidget();
 		if (!notebook.get_page(widget))
 			notebook.append_page(widget, getName());
 	}

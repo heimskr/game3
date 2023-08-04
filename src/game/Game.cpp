@@ -32,6 +32,7 @@
 #include "item/CaveEntrance.h"
 #include "item/CentrifugeItem.h"
 #include "item/ChemicalItem.h"
+#include "item/ChemicalReactorItem.h"
 #include "item/EmptyFlask.h"
 #include "item/FilledFlask.h"
 #include "item/Floor.h"
@@ -96,6 +97,7 @@
 #include "packet/SwapSlotsPacket.h"
 #include "packet/MoveSlotsPacket.h"
 #include "packet/OpenFluidLevelsPacket.h"
+#include "packet/OpenChemicalReactorPacket.h"
 #include "realm/Cave.h"
 #include "realm/House.h"
 #include "realm/Keep.h"
@@ -111,6 +113,7 @@
 #include "tile/Tile.h"
 #include "tileentity/Building.h"
 #include "tileentity/Centrifuge.h"
+#include "tileentity/ChemicalReactor.h"
 #include "tileentity/Chest.h"
 #include "tileentity/CraftingStation.h"
 #include "tileentity/GeothermalGenerator.h"
@@ -317,6 +320,8 @@ namespace Game3 {
 
 		add(std::make_shared<EnergyPipeItem>(4));
 
+		add(std::make_shared<ChemicalReactorItem>("base:item/chemical_reactor", "Chemical Reactor", 999, 64)); // TODO: cost
+
 		add(std::make_shared<GeothermalGeneratorItem>("base:item/geothermal_generator", "Geothermal Generator", 999, 64)); // TODO: cost
 	}
 
@@ -339,6 +344,7 @@ namespace Game3 {
 	void Game::addTileEntityFactories() {
 		add(TileEntityFactory::create<Building>());
 		add(TileEntityFactory::create<Centrifuge>());
+		add(TileEntityFactory::create<ChemicalReactor>());
 		add(TileEntityFactory::create<Chest>());
 		add(TileEntityFactory::create<CraftingStation>());
 		add(TileEntityFactory::create<GeothermalGenerator>());
@@ -415,6 +421,7 @@ namespace Game3 {
 		add(PacketFactory::create<SwapSlotsPacket>());
 		add(PacketFactory::create<MoveSlotsPacket>());
 		add(PacketFactory::create<OpenFluidLevelsPacket>());
+		add(PacketFactory::create<OpenChemicalReactorPacket>());
 	}
 
 	void Game::addLocalCommandFactories() {

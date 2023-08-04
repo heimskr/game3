@@ -260,6 +260,10 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `u64` Global ID
 
+44. **Open Chemical Reactor**: tells a client to display the editor for a chemical reactor's formula.
+
+	- `u64` Global ID
+
 # Message Format
 
 All values are little endian.

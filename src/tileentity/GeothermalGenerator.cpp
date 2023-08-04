@@ -1,14 +1,11 @@
 #include "Log.h"
-#include "Tileset.h"
 #include "game/ClientGame.h"
 #include "game/EnergyContainer.h"
 #include "game/ServerInventory.h"
 #include "item/FilledFlask.h"
-// #include "packet/OpenEnergyLevelPacket.h"
 #include "realm/Realm.h"
 #include "recipe/GeothermalRecipe.h"
 #include "tileentity/GeothermalGenerator.h"
-#include "ui/SpriteRenderer.h"
 
 namespace Game3 {
 	GeothermalGenerator::GeothermalGenerator():
@@ -119,6 +116,7 @@ namespace Game3 {
 
 	void GeothermalGenerator::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
+		InventoriedTileEntity::toJSON(json);
 		FluidHoldingTileEntity::toJSON(json);
 		EnergeticTileEntity::toJSON(json);
 	}

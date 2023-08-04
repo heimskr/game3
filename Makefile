@@ -37,7 +37,7 @@ endif
 DEPS         := glm glfw3 libzstd gtk4 gtkmm-4.0 glu libevent_openssl openssl libevent_pthreads freetype2
 OUTPUT       := game3
 COMPILER     ?= clang++
-CPPFLAGS     := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude -Ijson/include -Ieigen -Istb -Ilibnoise/src $(LTO) $(PROFILING)
+CPPFLAGS     := -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude -Ijson/include -Ieigen -Istb -Ilibnoise/src -Ichemskr/include $(LTO) $(PROFILING)
 ZIG          ?= zig
 # --main-pkg-path is needed as otherwise it wouldn't let you embed any file outside of src/
 ZIGFLAGS     := -O ReleaseSmall --main-pkg-path .
@@ -76,7 +76,7 @@ flags:
 src/gtk_resources.cpp: $(RESXML) $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=resources --generate-dependencies $(RESXML))
 	$(GLIB_COMPILE_RESOURCES) --target=$@ --sourcedir=resources --generate-source $<
 
-%.o: %.cpp include/resources.h
+%.o: %.cpp include/resources.h chemskr/libchemskr.a
 	@ printf "\e[2m[\e[22;32mc++\e[39;2m]\e[22m $< \e[2m$(strip $(BUILDFLAGS) $(LTO))\e[22m\n"
 	@ $(COMPILER) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
 
@@ -97,6 +97,9 @@ $(OUTPUT): $(OBJECTS) $(NOISE_OBJ)
 ifeq ($(GITHUB),true)
 	strip $@
 endif
+
+chemskr/libchemskr.a:
+	make -C chemskr libchemskr.a
 
 test: $(OUTPUT)
 	./$<
