@@ -12,6 +12,8 @@ namespace Game3 {
 			ServerInventory() = default;
 			ServerInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot = 0, Storage = {});
 
+			std::unique_ptr<Inventory> copy() const override;
+
 			std::optional<ItemStack> add(const ItemStack &, const std::function<bool(Slot)> &, Slot start) override;
 
 			void drop(Slot) override;

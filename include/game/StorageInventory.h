@@ -42,7 +42,8 @@ namespace Game3 {
 			/** Counts the number of an item in the inventory. This takes ItemStack data into account but ignores the given ItemStack's count. */
 			ItemCount count(const ItemStack &) const override;
 
-			/** Counts the number of an item in the inventory, given a predicate to select the slots read from. */
+			/** Counts the number of an item in the inventory, given a predicate to select the slots read from.
+			 *  This takes ItemStack data into account but ignores the given ItemStack's count. */
 			ItemCount count(const ItemStack &, const std::function<bool(Slot)> &) const override;
 
 			/** Counts the number of items with a given attribute in the inventory. */

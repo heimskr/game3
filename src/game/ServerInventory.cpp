@@ -22,6 +22,10 @@ namespace Game3 {
 	ServerInventory::ServerInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, Storage storage_):
 		StorageInventory(std::move(owner), slot_count, active_slot, std::move(storage_)) {}
 
+	std::unique_ptr<Inventory> ServerInventory::copy() const {
+		return std::make_unique<ServerInventory>(*this);
+	}
+
 	std::optional<ItemStack> ServerInventory::add(const ItemStack &stack, const std::function<bool(Slot)> &predicate, Slot start) {
 		ssize_t remaining = stack.count;
 

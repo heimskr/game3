@@ -46,6 +46,8 @@ namespace Game3 {
 			inline auto sharedLock() { return std::shared_lock(externalMutex); }
 			inline auto uniqueLock() { return std::unique_lock(externalMutex); }
 
+			virtual std::unique_ptr<Inventory> copy() const = 0;
+
 			virtual ItemStack * operator[](size_t) = 0;
 			virtual const ItemStack * operator[](size_t) const = 0;
 
@@ -98,7 +100,8 @@ namespace Game3 {
 			 *  This takes ItemStack data into account but ignores the given ItemStack's count. */
 			virtual ItemCount count(const ItemStack &) const = 0;
 
-			/** Counts the number of an item in the inventory, given a predicate to select the slots read from. */
+			/** Counts the number of an item in the inventory, given a predicate to select the slots read from.
+			 *  This takes ItemStack data into account but ignores the given ItemStack's count. */
 			virtual ItemCount count(const ItemStack &, const std::function<bool(Slot)> &) const = 0;
 
 			/** Counts the number of items with a given attribute in the inventory. */

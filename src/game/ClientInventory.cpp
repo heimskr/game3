@@ -43,6 +43,10 @@ namespace Game3 {
 		return *this;
 	}
 
+	std::unique_ptr<Inventory> ClientInventory::copy() const {
+		return std::make_unique<ClientInventory>(*this);
+	}
+
 	void ClientInventory::drop(Slot slot) {
 		send(DropItemPacket(slot, false));
 	}

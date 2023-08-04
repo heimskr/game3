@@ -55,7 +55,7 @@ LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread $(LTO) $(PROFILING)
 SOURCES      := $(shell find -L src -name \*.cpp) src/gtk_resources.cpp
 OBJECTS      := $(SOURCES:.cpp=.o) src/resources.o
 RESXML       := $(OUTPUT).gresource.xml
-CLOC_OPTIONS := . --exclude-dir=.vscode,libnoise,stb,eigen,json,data,.github,.idea --fullpath --not-match-f='^.\/(src\/(gtk_)?resources\.cpp|include\/resources\.h|analysis\.txt|include\/lib\/.*|.*\.(json|txt|md|xml))$$'
+CLOC_OPTIONS := . --exclude-dir=.vscode,libnoise,stb,eigen,json,data,.github,.idea --fullpath --not-match-f='^\.\/((src\/(gtk_)?resources\.cpp|include\/resources\.h|analysis\.txt|include\/lib\/.*|.*\.(json|txt|md|xml))|(chemskr\/src\/chemskr/(NuclideMasses|yylex|yyparse)\.cpp|chemskr\/(include|src)\/chemskr\/yyparse\.h))$$'
 RESGEN       := ./resgen
 NOISE_OBJ    := libnoise/src/libnoise.a
 

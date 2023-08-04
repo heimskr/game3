@@ -182,33 +182,46 @@ namespace Game3 {
 		fillReactants();
 		fillProducts();
 
-		auto inventory_lock = inventory->uniqueLock();
+		auto shared_inventory_lock = inventory->sharedLock();
 
 		Game &game = getGame();
 		auto &item_registry = game.registry<ItemRegistry>();
 		std::shared_ptr<Item> chemical_item = item_registry["base:item/chemical"_id];
+		std::unique_ptr<Inventory> inventory_copy = inventory->copy();
 
 		{
 			auto reactant_lock = reactants.sharedLock();
 			std::vector<ItemStack> stacks;
-
 			auto predicate = [range = SlotRange{0, INPUT_CAPACITY - 1}](Slot slot) {
 				return range.contains(slot);
 			};
 
 			for (const auto &[reactant, count]: reactants) {
 				stacks.emplace_back(game, chemical_item, 1, nlohmann::json{{"formula", reactant}});
-				if (inventory->count(stacks.back(), predicate) < count)
+				if (inventory_copy->count(stacks.back(), predicate) < count)
 					return false;
 			}
 
 			for (const ItemStack &stack: stacks) {
-				if (stack.count != inventory->remove(stack, predicate)) {
+				if (stack.count != inventory_copy->remove(stack, predicate)) {
 					ERROR(std::string(stack));
 					throw std::runtime_error("Couldn't remove stack from ChemicalReactor");
 				}
 			}
 		}
+
+		{
+			auto products_lock = products.sharedLock();
+			auto predicate = [range = SlotRange{INPUT_CAPACITY, INPUT_CAPACITY + OUTPUT_CAPACITY - 1}](Slot slot) {
+				return range.contains(slot);
+			};
+
+			for (const auto &[product, count]: products)
+				if (auto leftover = inventory_copy->add(ItemStack(game, chemical_item, count, nlohmann::json{{"formula", product}}), predicate))
+					return false;
+		}
+
+		auto unique_inventory_lock = inventory->uniqueLock();
 
 
 
