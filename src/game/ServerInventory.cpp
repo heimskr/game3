@@ -8,6 +8,7 @@
 #include "game/Agent.h"
 #include "game/ClientGame.h"
 #include "game/ServerInventory.h"
+#include "item/Item.h"
 #include "net/Buffer.h"
 #include "packet/InventoryPacket.h"
 #include "packet/SetActiveSlotPacket.h"
@@ -152,7 +153,7 @@ namespace Game3 {
 				const ItemCount to_remove = std::min(stack.count, count_to_remove);
 				stack.count -= to_remove;
 				count_to_remove -= to_remove;
-				removed += 0;
+				removed += to_remove;
 
 				if (stack.count == 0)
 					return true;
@@ -181,7 +182,7 @@ namespace Game3 {
 				const ItemCount to_remove = std::min(stack.count, count_to_remove);
 				stack.count -= to_remove;
 				count_to_remove -= to_remove;
-				removed += 0;
+				removed += to_remove;
 
 				if (stack.count == 0)
 					return true;

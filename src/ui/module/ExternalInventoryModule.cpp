@@ -110,7 +110,7 @@ namespace Game3 {
 
 			if (storage.contains(slot)) {
 				auto &stack = storage.at(slot);
-				Glib::ustring label_text = stack.item->name;
+				Glib::ustring label_text = stack.item->getTooltip(stack);
 				if (stack.count != 1)
 					label_text += " \u00d7 " + std::to_string(stack.count);
 				if (stack.hasDurability())

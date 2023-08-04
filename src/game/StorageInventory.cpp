@@ -27,10 +27,7 @@ namespace Game3 {
 		weakOwner = std::move(other.weakOwner);
 		slotCount = other.slotCount.exchange(0);
 		activeSlot = other.activeSlot.exchange(0);
-		{
-			auto lock = other.storage.uniqueLock();
-			storage = std::move(other.storage);
-		}
+		storage = std::move(other.storage);
 		return *this;
 	}
 

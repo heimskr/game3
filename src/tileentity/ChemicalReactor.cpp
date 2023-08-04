@@ -41,7 +41,7 @@ namespace Game3 {
 
 	void ChemicalReactor::init(Game &game) {
 		TileEntity::init(game);
-		inventory = std::make_shared<ServerInventory>(shared_from_this(), 2);
+		inventory = std::make_shared<ServerInventory>(shared_from_this(), INPUT_CAPACITY + OUTPUT_CAPACITY);
 	}
 
 	void ChemicalReactor::tick(Game &game, float delta) {
@@ -169,14 +169,9 @@ namespace Game3 {
 		assert(energyContainer);
 
 		{
-			auto energy_lock = energyContainer->uniqueLock();
 			auto equation_lock = equation.uniqueLock();
 			if (!equation || !equation->isBalanced())
 				return false;
-			EnergyAmount to_consume = equation->getAtomCount() * ENERGY_PER_ATOM;
-			if (!energyContainer->remove(to_consume))
-				return false;
-			EnergeticTileEntity::queueBroadcast();
 		}
 
 		fillReactants();
@@ -193,19 +188,22 @@ namespace Game3 {
 			auto reactant_lock = reactants.sharedLock();
 			std::vector<ItemStack> stacks;
 			auto predicate = [range = SlotRange{0, INPUT_CAPACITY - 1}](Slot slot) {
+				INFO("Reactant predicate: " << slot << " -> " << std::boolalpha << range.contains(slot));
 				return range.contains(slot);
 			};
 
 			for (const auto &[reactant, count]: reactants) {
 				stacks.emplace_back(game, chemical_item, 1, nlohmann::json{{"formula", reactant}});
-				if (inventory_copy->count(stacks.back(), predicate) < count)
+				const ItemCount in_inventory = inventory_copy->count(stacks.back(), predicate);
+				INFO("in_inventory[" << in_inventory << "], count[" << count << "]");
+				if (in_inventory < count)
 					return false;
 			}
 
 			for (const ItemStack &stack: stacks) {
-				if (stack.count != inventory_copy->remove(stack, predicate)) {
-					ERROR(std::string(stack));
-					throw std::runtime_error("Couldn't remove stack from ChemicalReactor");
+				const ItemCount removed = inventory_copy->remove(stack, predicate);
+				if (stack.count != removed)  {
+					throw std::runtime_error("Couldn't remove stack from ChemicalReactor (" + std::to_string(stack.count) + " in stack != " + std::to_string(removed) + " removed)");
 				}
 			}
 		}
@@ -213,6 +211,7 @@ namespace Game3 {
 		{
 			auto products_lock = products.sharedLock();
 			auto predicate = [range = SlotRange{INPUT_CAPACITY, INPUT_CAPACITY + OUTPUT_CAPACITY - 1}](Slot slot) {
+				INFO("Product predicate: " << slot << " -> " << std::boolalpha << range.contains(slot));
 				return range.contains(slot);
 			};
 
@@ -221,9 +220,21 @@ namespace Game3 {
 					return false;
 		}
 
-		auto unique_inventory_lock = inventory->uniqueLock();
+		shared_inventory_lock.unlock();
 
+		{
+			auto equation_lock = equation.uniqueLock();
+			auto energy_lock = energyContainer->uniqueLock();
+			EnergyAmount to_consume = equation->getAtomCount() * ENERGY_PER_ATOM;
+			if (!energyContainer->remove(to_consume))
+				return false;
+			EnergeticTileEntity::queueBroadcast();
+		}
 
+		// Silly.
+		auto storage_inventory = std::dynamic_pointer_cast<StorageInventory>(inventory);
+		assert(storage_inventory);
+		*storage_inventory = std::move(dynamic_cast<StorageInventory &>(*inventory_copy));
 
 		return true;
 	}

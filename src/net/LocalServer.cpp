@@ -112,8 +112,8 @@ namespace Game3 {
 		player->username = username;
 		player->displayName = display_name;
 		player->token = generateToken(player->username);
-		overworld->add(player, overworld->randomLand);
-		// overworld->add(player, Position(31, 82));
+		// overworld->add(player, overworld->randomLand);
+		overworld->add(player, Position(31, 82));
 		player->init(*game);
 		player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_pickaxe"));
 		player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_shovel"));
@@ -129,8 +129,8 @@ namespace Game3 {
 		player->inventory->add(ItemStack(*game, "base:item/energy_pipe", 64));
 		player->inventory->add(ItemStack(*game, "base:item/lava_flask", 64));
 		player->inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "H"}}));
-		player->inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "W"}}));
-		player->inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "N2"}}));
+		player->inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "H2O"}}));
+		player->inventory->add(ItemStack(*game, "base:item/chemical_reactor"));
 		player->direction = Direction::Right;
 		{
 			auto lock = game->lockPlayersUnique();

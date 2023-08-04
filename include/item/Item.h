@@ -100,7 +100,7 @@ namespace Game3 {
 			/** Returns a copy of the ItemStack with a different count. */
 			ItemStack withCount(ItemCount) const;
 
-			inline operator std::string() const { return item->name + " x " + std::to_string(count); }
+			inline operator std::string() const { return item->getTooltip(*this) + " x " + std::to_string(count); }
 
 			/** Returns true iff the other stack is mergeable with this one and has an equal count. */
 			inline bool operator==(const ItemStack &other) const { return canMerge(other) && count == other.count; }

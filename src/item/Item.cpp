@@ -309,5 +309,5 @@ namespace Game3 {
 }
 
 std::ostream & operator<<(std::ostream &os, const Game3::ItemStack &stack) {
-	return os << stack.item->name << " x " << stack.count;
+	return os << stack.item->getTooltip(stack) << " x " << stack.count;
 }
