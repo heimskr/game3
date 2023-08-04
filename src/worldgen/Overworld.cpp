@@ -8,7 +8,6 @@
 #include "realm/Realm.h"
 #include "tileentity/OreDeposit.h"
 #include "tileentity/Teleporter.h"
-#include "tileentity/Tree.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 #include "worldgen/Overworld.h"
