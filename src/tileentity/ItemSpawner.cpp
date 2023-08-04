@@ -54,13 +54,13 @@ namespace Game3 {
 
 	void ItemSpawner::encode(Game &game, Buffer &buffer) {
 		TileEntity::encode(game, buffer);
-		buffer << chancePerTenth;
-		buffer << spawnables;
+		// buffer << chancePerTenth;
+		// buffer << spawnables;
 	}
 
 	void ItemSpawner::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
-		buffer >> chancePerTenth;
-		buffer >> spawnables;
+		// buffer >> chancePerTenth;
+		// buffer >> spawnables;
 	}
 }

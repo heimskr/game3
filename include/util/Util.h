@@ -16,11 +16,8 @@
 #include <unordered_set>
 #include <vector>
 
+#include "util/Concepts.h"
 #include "util/Math.h"
-
-#define TRY try {
-#define CATCH } catch (std::exception &err) { std::cerr << "\e[31m" << __FILE__ << ':' << __LINE__ << ": " << err.what() << "\e[39m\n"; }
-#define PRINTMAT4(m) do { std::cerr << "[[[\n"; for (int r = 0; r < 4; ++r) { for (int c = 0; c < 4; ++c) std::cerr << (m)[c][r] << ' '; std::cerr << '\n'; } std::cerr << "]]]\n"; } while (0)
 
 namespace Game3 {
 	extern std::default_random_engine utilRNG;
