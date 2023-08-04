@@ -273,9 +273,9 @@ namespace Game3 {
 
 	template <>
 	Buffer & Buffer::operator>><std::string>(std::string &out) {
-		const auto type = popType();
-		const auto front = type.front();
-		uint32_t size;
+		const std::string type = popType();
+		const char front = type.front();
+		uint32_t size{};
 		if (front == '\x1f') {
 			size = popBuffer<uint32_t>(*this);
 		} else if ('\x10' <= front && front < '\x1f') {
@@ -293,7 +293,7 @@ namespace Game3 {
 
 	template <>
 	Buffer & Buffer::operator>>(Buffer &other) {
-		const std::span span = getSpan();
+		const std::span<const uint8_t> span = getSpan();
 		other.append(span.begin(), span.end());
 		bytes.clear();
 		skip = 0;

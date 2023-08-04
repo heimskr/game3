@@ -12,13 +12,13 @@ namespace Game3 {
 		INFO("Payload size: \e[33m" << client.payloadSize << "\e[39m");
 		{
 			INFO("Packets received:");
-			std::shared_lock lock(client.receivedPacketCountsMutex);
+			auto lock = client.receivedPacketCounts.sharedLock();
 			for (const auto &[packet_id, count]: client.receivedPacketCounts)
 				INFO("    " << std::setw(3) << std::right << packet_id << "\e[2m:\e[22m " << count);
 		}
 		{
 			INFO("Packets sent:");
-			std::shared_lock lock(client.sentPacketCountsMutex);
+			auto lock = client.sentPacketCounts.sharedLock();
 			for (const auto &[packet_id, count]: client.sentPacketCounts)
 				INFO("    " << std::setw(3) << std::right << packet_id << "\e[2m:\e[22m " << count);
 		}

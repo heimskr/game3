@@ -13,6 +13,7 @@
 #include "Types.h"
 #include "net/Buffer.h"
 #include "net/Sock.h"
+#include "threading/Lockable.h"
 #include "util/Math.h"
 
 namespace Game3 {
@@ -28,10 +29,8 @@ namespace Game3 {
 			size_t bytesRead = 0;
 			size_t bytesWritten = 0;
 
-			std::map<PacketID, size_t> receivedPacketCounts;
-			std::shared_mutex receivedPacketCountsMutex;
-			std::map<PacketID, size_t> sentPacketCounts;
-			std::shared_mutex sentPacketCountsMutex;
+			Lockable<std::map<PacketID, size_t>> receivedPacketCounts;
+			Lockable<std::map<PacketID, size_t>> sentPacketCounts;
 
 			LocalClient() = default;
 

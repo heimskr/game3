@@ -63,9 +63,8 @@ namespace Game3 {
 	Buffer & operator+=(Buffer &, const Identifier &);
 	Buffer & operator<<(Buffer &, const Identifier &);
 	Buffer & operator>>(Buffer &, Identifier &);
-	std::ostream & operator<<(std::ostream &, const Game3::Identifier &);
+	std::ostream & operator<<(std::ostream &, const Identifier &);
 }
-
 
 namespace std {
 	template <>

@@ -87,7 +87,7 @@ namespace Game3 {
 					buffer.clear();
 					state = State::Begin;
 					{
-						std::unique_lock lock(receivedPacketCountsMutex);
+						auto lock = receivedPacketCounts.uniqueLock();
 						++receivedPacketCounts[packet->getID()];
 					}
 					game->queuePacket(std::move(packet));
@@ -113,7 +113,7 @@ namespace Game3 {
 			sock->send(str.c_str(), str.size(), false);
 		}
 		bytesWritten += 6 + str.size();
-		std::unique_lock lock(sentPacketCountsMutex);
+		auto lock = sentPacketCounts.uniqueLock();
 		++sentPacketCounts[packet.getID()];
 	}
 
