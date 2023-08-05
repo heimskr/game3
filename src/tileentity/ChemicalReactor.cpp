@@ -86,7 +86,7 @@ namespace Game3 {
 			InventoriedTileEntity::addObserver(player);
 
 		// DEBUG
-		setEquation("H2O -> H + H + O");
+		setEquation("H + H + O -> H2O");
 
 		std::shared_lock lock{energyContainer->mutex};
 		INFO("Energy: " << energyContainer->energy);
@@ -115,8 +115,7 @@ namespace Game3 {
 		TileEntity::decode(game, buffer);
 		InventoriedTileEntity::decode(game, buffer);
 		EnergeticTileEntity::decode(game, buffer);
-		auto equation_text = buffer.take<std::optional<std::string>>();
-		if (equation_text) {
+		if (auto equation_text = buffer.take<std::optional<std::string>>()) {
 			equation = Chemskr::Equation(*equation_text);
 		} else {
 			auto lock = equation.uniqueLock();
@@ -204,7 +203,7 @@ namespace Game3 {
 			};
 
 			for (const auto &[reactant, count]: reactants) {
-				stacks.emplace_back(game, chemical_item, 1, nlohmann::json{{"formula", reactant}});
+				stacks.emplace_back(game, chemical_item, count, nlohmann::json{{"formula", reactant}});
 				const ItemCount in_inventory = inventory_copy->count(stacks.back(), predicate);
 				if (in_inventory < count)
 					return false;
