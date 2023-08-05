@@ -86,7 +86,7 @@ namespace Game3 {
 			InventoriedTileEntity::addObserver(player);
 
 		// DEBUG
-		setEquation("H + H + O -> H2O");
+		setEquation("2*H + O -> H2O");
 
 		std::shared_lock lock{energyContainer->mutex};
 		INFO("Energy: " << energyContainer->energy);
@@ -253,8 +253,8 @@ namespace Game3 {
 			auto equation_lock = equation.sharedLock();
 			assert(equation);
 			auto unique_lock = reactants.uniqueLock();
-			for (const std::string &reactant: equation->getReactants())
-				++reactants[reactant];
+			for (const auto &[reactant, count]: equation->getReactants())
+				reactants[reactant] += count;
 		}
 	}
 
@@ -265,8 +265,8 @@ namespace Game3 {
 			auto equation_lock = equation.sharedLock();
 			assert(equation);
 			auto unique_lock = products.uniqueLock();
-			for (const std::string &product: equation->getProducts())
-				++products[product];
+			for (const auto &[product, count]: equation->getProducts())
+				products[product] += count;
 		}
 	}
 }
