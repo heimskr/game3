@@ -223,6 +223,7 @@ namespace Game3::WorldGen {
 
 				if (!candidates.empty()) {
 					std::default_random_engine town_rng(noise_seed + 1);
+					std::sort(candidates.begin(), candidates.end());
 					WorldGen::generateTown(realm, town_rng, choose(candidates, town_rng) + Position(pad + 1, 0), n, m, pad, noise_seed);
 				}
 			}
