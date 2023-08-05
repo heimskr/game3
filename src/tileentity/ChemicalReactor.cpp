@@ -105,7 +105,10 @@ namespace Game3 {
 		InventoriedTileEntity::encode(game, buffer);
 		EnergeticTileEntity::encode(game, buffer);
 		auto lock = equation.sharedLock();
-		buffer << equation->getText();
+		std::optional<std::string> equation_text;
+		if (equation)
+			equation_text = equation->getText();
+		buffer << equation_text;
 	}
 
 	void ChemicalReactor::decode(Game &game, Buffer &buffer) {
@@ -113,7 +116,11 @@ namespace Game3 {
 		InventoriedTileEntity::decode(game, buffer);
 		EnergeticTileEntity::decode(game, buffer);
 		auto lock = equation.uniqueLock();
-		equation = Chemskr::Equation(buffer.take<std::string>());
+		auto equation_text = buffer.take<std::optional<std::string>>();
+		if (equation_text)
+			equation = Chemskr::Equation(*equation_text);
+		else
+			equation.reset();
 	}
 
 	void ChemicalReactor::broadcast() {
