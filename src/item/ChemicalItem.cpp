@@ -1,4 +1,5 @@
 #include "Flasker.h"
+#include "chemistry/MoleculeNames.h"
 #include "item/ChemicalItem.h"
 
 #include <random>
@@ -42,9 +43,6 @@ namespace Game3 {
 
 		rawImage = generateFlaskRaw("resources/testtubebase.png", "resources/testtubemask.png", hue, saturation, value_difference, &width, &height);
 
-		assert(width == 16);
-		assert(height == 16);
-
 		return Gdk::Pixbuf::create_from_data(rawImage.get(), Gdk::Colorspace::RGB, true, 8, width, height, 4 * width)->scale_simple(width << 3, height << 3, Gdk::InterpType::NEAREST);
 	}
 
@@ -52,6 +50,8 @@ namespace Game3 {
 		const std::string formula = getFormula(stack);
 		if (formula.empty())
 			return "Unknown Chemical";
+		if (auto iter = moleculeNames.find(formula); iter != moleculeNames.end())
+			return iter->second + " (" + formula + ')';
 		return formula;
 	}
 
