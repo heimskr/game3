@@ -47,3 +47,11 @@ progressbar.item-durability.horizontal > trough {
 .recipe .input-label {
 	padding-left: 10px;
 }
+
+.equation_error {
+	color: red;
+}
+
+.equation_success {
+	color: green;
+}

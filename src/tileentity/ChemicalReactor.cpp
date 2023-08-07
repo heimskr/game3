@@ -42,11 +42,10 @@ namespace Game3 {
 
 	void ChemicalReactor::handleMessage(Agent &source, const std::string &name, Buffer &data) {
 		if (name == "SetEquation") {
-			std::string new_equation = data.take<std::string>();
-			if (setEquation(new_equation))
-				SUCCESS("Equation set to \e[1m" << new_equation << "\e[22m");
-			else
-				ERROR("Couldn't set equation to \e[1m" << new_equation << "\e[22m");
+			const std::string new_equation = data.take<std::string>();
+			const bool success = setEquation(new_equation);
+			if (success) SUCCESS("Equation set to " << getEquation()); else ERROR("Couldn't set equation to " << new_equation);
+			sendMessage(source, "ModuleMessage", ChemicalReactorModule::ID(), "EquationSet", success);
 		}
 	}
 
@@ -98,9 +97,6 @@ namespace Game3 {
 			EnergeticTileEntity::addObserver(player);
 		else
 			InventoriedTileEntity::addObserver(player);
-
-		// DEBUG
-		setEquation("2*H + O -> H2O");
 
 		std::shared_lock lock{energyContainer->mutex};
 		INFO("Energy: " << energyContainer->energy);
@@ -183,7 +179,7 @@ namespace Game3 {
 			Chemskr::Equation new_equation(std::move(equation_string));
 
 			if (new_equation.isBalanced()) {
-				equation  = std::move(new_equation);
+				equation = std::move(new_equation);
 				reactants.clear();
 				products.clear();
 				return true;
@@ -192,6 +188,8 @@ namespace Game3 {
 			return false;
 
 		} catch (const Chemskr::InvalidEquationError &) {
+			return false;
+		} catch (const Chemskr::ParserError &) {
 			return false;
 		}
 	}
@@ -204,6 +202,12 @@ namespace Game3 {
 	bool ChemicalReactor::react() {
 		assert(inventory);
 		assert(energyContainer);
+
+		{
+			auto energy_lock = energyContainer->sharedLock();
+			if (energyContainer->energy < ENERGY_PER_ATOM)
+				return false;
+		}
 
 		{
 			auto equation_lock = equation.uniqueLock();

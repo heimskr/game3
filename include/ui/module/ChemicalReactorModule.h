@@ -18,14 +18,16 @@ namespace Game3 {
 
 			ChemicalReactorModule(std::shared_ptr<ClientGame>, const std::any &);
 
+			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;
 			void reset()  final;
 			void update() final;
+			void handleMessage(Agent &source, const std::string &name, Buffer &data) final;
 
 		private:
 			std::shared_ptr<ClientGame> game;
 			std::shared_ptr<ChemicalReactor> reactor;
-			std::vector<std::unique_ptr<Gtk::Widget>> widgets;
+			Gtk::Label header;
 			Gtk::Entry entry;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
 

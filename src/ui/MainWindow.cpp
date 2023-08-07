@@ -467,8 +467,24 @@ namespace Game3 {
 	}
 
 	void MainWindow::openModule(const Identifier &module_id, const std::any &argument) {
-		auto &registry = game->registry<ModuleFactoryRegistry>();
-		inventoryTab->setModule((*registry[module_id])(game, argument));
+		std::unique_lock<std::shared_mutex> module_lock;
+		Module *current_module = inventoryTab->getModule(module_lock);
+		if (current_module != nullptr && current_module->getID() == module_id) {
+			current_module->update();
+		} else {
+			if (current_module != nullptr)
+				module_lock.unlock();
+			auto &registry = game->registry<ModuleFactoryRegistry>();
+			inventoryTab->setModule((*registry[module_id])(game, argument));
+		}
+	}
+
+	void MainWindow::moduleMessage(const Identifier &module_id, Agent &source, const std::string &name, Buffer &data) {
+		std::unique_lock<std::shared_mutex> module_lock;
+		Module *current_module = inventoryTab->getModule(module_lock);
+		if (current_module != nullptr && current_module->getID() == module_id) {
+			current_module->handleMessage(source, name, data);
+		}
 	}
 
 	void MainWindow::showFluids(const std::shared_ptr<HasFluids> &has_fluids) {

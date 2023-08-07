@@ -1,5 +1,6 @@
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
+#include "net/Buffer.h"
 #include "tileentity/ChemicalReactor.h"
 #include "ui/gtk/UITypes.h"
 #include "ui/gtk/Util.h"
@@ -10,41 +11,50 @@ namespace Game3 {
 	ChemicalReactorModule::ChemicalReactorModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
 	game(std::move(game_)),
 	reactor(std::dynamic_pointer_cast<ChemicalReactor>(std::any_cast<AgentPtr>(argument))) {
+		INFO("ChemicalReactorModule()");
 		vbox.set_hexpand();
 
+		header.set_text(reactor->getName());
+		header.set_margin(10);
+		header.set_xalign(0.5);
+		vbox.append(header);
+
+		entry.set_text(reactor->getEquation());
+		entry.set_margin(5);
+
+		entry.signal_activate().connect([this] {
+			INFO("Text: \"" << entry.get_text().raw() << '"');
+			game->player->sendMessage(*reactor, "SetEquation", entry.get_text().raw());
+		});
+
+		entry.signal_changed().connect([this] {
+			entry.remove_css_class("equation_error");
+			entry.remove_css_class("equation_success");
+		});
+
+		vbox.append(entry);
 	}
 
 	Gtk::Widget & ChemicalReactorModule::getWidget() {
 		return vbox;
 	}
 
-	void ChemicalReactorModule::reset() {
-		removeChildren(vbox);
-		widgets.clear();
-		populate();
-	}
+	void ChemicalReactorModule::reset() {}
 
-	void ChemicalReactorModule::update() {
-		reset();
-	}
+	void ChemicalReactorModule::update() {}
 
-	void ChemicalReactorModule::populate() {
-		if (!reactor)
-			return;
-
-		removeChildren(vbox);
-
-		auto header = std::make_unique<Gtk::Label>("???");
-		header->set_text(reactor->getName());
-		header->set_margin(10);
-		header->set_xalign(0.5);
-		vbox.append(*header);
-		widgets.push_back(std::move(header));
-
-		entry.set_text(reactor->getEquation());
-		entry.signal_activate().connect([this] {
-			game->player->sendMessage(*reactor, "SetEquation", entry.get_text().raw());
-		});
-		vbox.append(entry);
+	void ChemicalReactorModule::handleMessage(Agent &source, const std::string &name, Buffer &data) {
+		if (name == "EquationSet") {
+			const bool success = data.take<bool>();
+			if (success) {
+				SUCCESS("Equation changed");
+				entry.remove_css_class("equation_error");
+				entry.add_css_class("equation_success");
+			} else {
+				ERROR("Equation not changed");
+				entry.remove_css_class("equation_success");
+				entry.add_css_class("equation_error");
+			}
+		}
 	}
 }

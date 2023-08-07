@@ -18,6 +18,7 @@
 #include <gtkmm.h>
 
 namespace Game3 {
+	class Agent;
 	class Canvas;
 	class ClientGame;
 	class ClientInventory;
@@ -73,6 +74,7 @@ namespace Game3 {
 			GlobalID getExternalGID() const;
 
 			void openModule(const Identifier &, const std::any &);
+			void moduleMessage(const Identifier &module_id, Agent &source, const std::string &name, Buffer &data);
 
 			void showFluids(const std::shared_ptr<HasFluids> &);
 

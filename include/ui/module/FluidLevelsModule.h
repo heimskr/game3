@@ -18,6 +18,7 @@ namespace Game3 {
 
 			FluidLevelsModule(std::shared_ptr<ClientGame>, const std::any &);
 
+			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;
 			void reset()  final;
 			void update() final;

@@ -1,5 +1,6 @@
 #include "entity/ServerPlayer.h"
 #include "net/RemoteClient.h"
+#include "packet/AgentMessagePacket.h"
 #include "packet/EntityPacket.h"
 
 namespace Game3 {
@@ -40,5 +41,9 @@ namespace Game3 {
 		auto locked = weakClient.lock();
 		assert(locked);
 		return locked;
+	}
+
+	void ServerPlayer::handleMessage(Agent &source, const std::string &name, Buffer &data) {
+		send(AgentMessagePacket(source.getGID(), name, data));
 	}
 }

@@ -6,6 +6,7 @@
 #include "packet/ContinuousInteractionPacket.h"
 #include "packet/JumpPacket.h"
 #include "ui/Canvas.h"
+#include "ui/MainWindow.h"
 #include "ui/TextRenderer.h"
 
 namespace Game3 {
@@ -57,6 +58,13 @@ namespace Game3 {
 	const std::unordered_set<Layer> & ClientPlayer::getVisibleLayers() const {
 		static std::unordered_set<Layer> main_layers {Layer::Terrain, Layer::Submerged, Layer::Objects, Layer::Highest};
 		return main_layers;
+	}
+
+	void ClientPlayer::handleMessage(Agent &source, const std::string &name, Buffer &data) {
+		if (name == "ModuleMessage") {
+			auto module_name = data.take<Identifier>();
+			getGame().toClient().getWindow().moduleMessage(module_name, source, name, data);
+		}
 	}
 
 	void ClientPlayer::sendBuffer(Agent &destination, const std::string &name, Buffer &data) {

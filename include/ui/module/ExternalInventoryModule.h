@@ -19,6 +19,7 @@ namespace Game3 {
 			ExternalInventoryModule(std::shared_ptr<ClientGame>, const std::any &);
 			ExternalInventoryModule(std::shared_ptr<ClientGame>, std::shared_ptr<ClientInventory>);
 
+			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;
 			void reset()  final;
 			void update() final;
