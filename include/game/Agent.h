@@ -6,6 +6,8 @@
 #include "container/WeakSet.h"
 
 namespace Game3 {
+	class Buffer;
+	class Game;
 	class Player;
 
 	struct AgentMeta {
@@ -28,6 +30,9 @@ namespace Game3 {
 			virtual Side getSide() const = 0;
 			virtual Type getAgentType() const = 0;
 			virtual std::string getName() = 0;
+
+			virtual void handleMessage(Agent &source, const std::string &name, Buffer &data);
+			virtual void sendMessage(Agent &destination, const std::string &name, Buffer &data);
 
 			virtual GlobalID getGID() const { return globalID; }
 			virtual void setGID(GlobalID new_gid) { globalID = new_gid; }

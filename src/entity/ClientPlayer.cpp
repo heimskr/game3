@@ -1,6 +1,8 @@
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
+#include "net/LocalClient.h"
+#include "packet/AgentMessagePacket.h"
 #include "packet/ContinuousInteractionPacket.h"
 #include "packet/JumpPacket.h"
 #include "ui/Canvas.h"
@@ -55,5 +57,9 @@ namespace Game3 {
 	const std::unordered_set<Layer> & ClientPlayer::getVisibleLayers() const {
 		static std::unordered_set<Layer> main_layers {Layer::Terrain, Layer::Submerged, Layer::Objects, Layer::Highest};
 		return main_layers;
+	}
+
+	void ClientPlayer::sendMessage(Agent &destination, const std::string &name, Buffer &data) {
+		getGame().toClient().client->send(AgentMessagePacket(destination.getGID(), name, data));
 	}
 }

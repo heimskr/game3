@@ -258,6 +258,12 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	This differs from Swap Slots in that compatible stacks will be merged instead of swapped
 	and that the first slot has to have something in it.
 
+43. **Agent Message**: tells the server to send a message from the player to an agent.
+
+	- `u64` Destination Agent Global ID
+	- `string` Message Name
+	- `...` Message Data
+
 # Message Format
 
 All values are little endian.

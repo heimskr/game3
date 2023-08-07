@@ -18,6 +18,8 @@ namespace Game3 {
 			void jump() override;
 			const std::unordered_set<Layer> & getVisibleLayers() const;
 
+			void sendMessage(Agent &, const std::string &, Buffer &) final;
+
 		private:
 			ClientPlayer();
 

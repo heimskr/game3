@@ -3,6 +3,9 @@
 
 #include "Log.h"
 #include "game/Agent.h"
+#include "game/ClientGame.h"
+#include "game/Game.h"
+#include "net/LocalClient.h"
 #include "realm/Realm.h"
 
 namespace Game3 {
@@ -19,6 +22,15 @@ namespace Game3 {
 			for (int32_t x = -half; x <= half; ++x)
 				out.emplace_back(ChunkPosition{x + original_position.x, y + original_position.y});
 		return out;
+	}
+
+	void Agent::handleMessage(Agent &, const std::string &, Buffer &) {
+		throw std::runtime_error("Agent of type " + std::string(typeid(*this).name()) + " has no message handler");
+	}
+
+	void Agent::sendMessage(Agent &destination, const std::string &name, Buffer &data) {
+		assert(getSide() != Side::Client);
+		destination.handleMessage(*this, name, data);
 	}
 
 	bool Agent::validateGID(GlobalID gid) {
