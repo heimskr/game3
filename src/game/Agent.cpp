@@ -10,7 +10,6 @@
 
 namespace Game3 {
 	static std::default_random_engine agent_rng(42);
-	// static std::random_device agent_rng;
 	static std::mutex agent_rng_mutex;
 
 	std::vector<ChunkPosition> Agent::getVisibleChunks() const {
@@ -28,7 +27,7 @@ namespace Game3 {
 		throw std::runtime_error("Agent of type " + std::string(typeid(*this).name()) + " has no message handler");
 	}
 
-	void Agent::sendMessage(Agent &destination, const std::string &name, Buffer &data) {
+	void Agent::sendBuffer(Agent &destination, const std::string &name, Buffer &data) {
 		assert(getSide() != Side::Client);
 		destination.handleMessage(*this, name, data);
 	}

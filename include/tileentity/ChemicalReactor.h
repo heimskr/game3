@@ -19,6 +19,8 @@ namespace Game3 {
 			bool mayExtractItem(Direction, Slot) override;
 			EnergyAmount getEnergyCapacity() override;
 
+			void handleMessage(Agent &source, const std::string &name, Buffer &data) override;
+
 			void init(Game &) override;
 			void tick(Game &, float) override;
 			void toJSON(nlohmann::json &) const override;
@@ -31,10 +33,11 @@ namespace Game3 {
 
 			Game & getGame() const final;
 
-			std::string getEquation();
 
+			std::string getEquation();
 			/** Returns whether the equation was actually set (i.e., whether the equation was valid and balanced). */
 			bool setEquation(std::string);
+			bool hasEquation();
 
 		private:
 			Lockable<std::optional<Chemskr::Equation>> equation;

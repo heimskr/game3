@@ -40,6 +40,16 @@ namespace Game3 {
 		return energyContainer->capacity;
 	}
 
+	void ChemicalReactor::handleMessage(Agent &source, const std::string &name, Buffer &data) {
+		if (name == "SetEquation") {
+			std::string new_equation = data.take<std::string>();
+			if (setEquation(new_equation))
+				SUCCESS("Equation set to \e[1m" << new_equation << "\e[22m");
+			else
+				ERROR("Couldn't set equation to \e[1m" << new_equation << "\e[22m");
+		}
+	}
+
 	void ChemicalReactor::init(Game &game) {
 		TileEntity::init(game);
 		inventory = std::make_shared<ServerInventory>(shared_from_this(), INPUT_CAPACITY + OUTPUT_CAPACITY);
@@ -71,6 +81,9 @@ namespace Game3 {
 	}
 
 	bool ChemicalReactor::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
+		if (getSide() == Side::Client)
+			return false;
+
 		auto &realm = *getRealm();
 
 		if (modifiers.onlyAlt()) {
@@ -181,6 +194,11 @@ namespace Game3 {
 		} catch (const Chemskr::InvalidEquationError &) {
 			return false;
 		}
+	}
+
+	bool ChemicalReactor::hasEquation() {
+		auto lock = equation.sharedLock();
+		return equation.has_value();
 	}
 
 	bool ChemicalReactor::react() {

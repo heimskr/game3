@@ -252,6 +252,10 @@ namespace Game3 {
 		return *this << std::string_view(string);
 	}
 
+	Buffer & Buffer::operator<<(const char *string) {
+		return *this << std::string_view(string);
+	}
+
 	Buffer & Buffer::operator<<(const Buffer &other) {
 		append(other.bytes.begin(), other.bytes.end());
 		return *this;

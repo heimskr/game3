@@ -2,11 +2,11 @@
 
 #include "ChunkPosition.h"
 #include "game/HasPlace.h"
+#include "net/Buffer.h"
 #include "threading/Lockable.h"
 #include "container/WeakSet.h"
 
 namespace Game3 {
-	class Buffer;
 	class Game;
 	class Player;
 
@@ -32,7 +32,16 @@ namespace Game3 {
 			virtual std::string getName() = 0;
 
 			virtual void handleMessage(Agent &source, const std::string &name, Buffer &data);
-			virtual void sendMessage(Agent &destination, const std::string &name, Buffer &data);
+			virtual void sendBuffer(Agent &destination, const std::string &name, Buffer &data);
+
+			template <typename... Args>
+			void sendMessage(Agent &destination, const std::string &name, Args &&...args) {
+				Buffer buffer;
+				(void) std::initializer_list<int> {
+					((void) (buffer << std::forward<Args>(args)), 0)...
+				};
+				sendBuffer(destination, name, buffer);
+			}
 
 			virtual GlobalID getGID() const { return globalID; }
 			virtual void setGID(GlobalID new_gid) { globalID = new_gid; }

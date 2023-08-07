@@ -1,3 +1,4 @@
+#include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
 #include "tileentity/ChemicalReactor.h"
 #include "ui/gtk/UITypes.h"
@@ -10,6 +11,7 @@ namespace Game3 {
 	game(std::move(game_)),
 	reactor(std::dynamic_pointer_cast<ChemicalReactor>(std::any_cast<AgentPtr>(argument))) {
 		vbox.set_hexpand();
+
 	}
 
 	Gtk::Widget & ChemicalReactorModule::getWidget() {
@@ -30,6 +32,8 @@ namespace Game3 {
 		if (!reactor)
 			return;
 
+		removeChildren(vbox);
+
 		auto header = std::make_unique<Gtk::Label>("???");
 		header->set_text(reactor->getName());
 		header->set_margin(10);
@@ -38,8 +42,9 @@ namespace Game3 {
 		widgets.push_back(std::move(header));
 
 		entry.set_text(reactor->getEquation());
-		// entry.signal_activate().connect([this] {
-
-		// });
+		entry.signal_activate().connect([this] {
+			game->player->sendMessage(*reactor, "SetEquation", entry.get_text().raw());
+		});
+		vbox.append(entry);
 	}
 }

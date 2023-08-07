@@ -9,6 +9,8 @@
 
 namespace Game3 {
 	void OpenModuleForAgentPacket::handle(ClientGame &game) {
+		INFO("Hello?");
+
 		AgentPtr agent = game.getAgent(agentGID);
 		if (!agent) {
 			ERROR("Couldn't find agent " << agentGID << " in OpenModuleForAgentPacket handler");
@@ -24,6 +26,7 @@ namespace Game3 {
 			});
 		}
 
+		INFO("ayo");
 		window.openModule(moduleID, std::any(agent));
 	}
 }

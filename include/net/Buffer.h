@@ -196,6 +196,7 @@ namespace Game3 {
 			Buffer & operator<<(double);
 			Buffer & operator<<(std::string_view);
 			Buffer & operator<<(const std::string &);
+			Buffer & operator<<(const char *);
 			Buffer & operator<<(const Buffer &);
 
 			template <LinearOrSet T>

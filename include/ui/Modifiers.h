@@ -31,6 +31,8 @@ namespace Game3 {
 		inline bool onlyCtrl()  const { return !shift && ctrl && !alt && !super; }
 		inline bool onlyAlt()   const { return !shift && !ctrl && alt && !super; }
 		inline bool onlySuper() const { return !shift && !ctrl && !alt && super; }
+
+		Modifiers operator|(Modifiers) const;
 	};
 
 	std::ostream & operator<<(std::ostream &, Modifiers);

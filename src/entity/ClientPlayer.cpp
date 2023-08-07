@@ -59,7 +59,7 @@ namespace Game3 {
 		return main_layers;
 	}
 
-	void ClientPlayer::sendMessage(Agent &destination, const std::string &name, Buffer &data) {
+	void ClientPlayer::sendBuffer(Agent &destination, const std::string &name, Buffer &data) {
 		getGame().toClient().client->send(AgentMessagePacket(destination.getGID(), name, data));
 	}
 }
