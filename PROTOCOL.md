@@ -235,9 +235,11 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i32` Slot
 	- `bool` Discard
 
-40. **Open Agent Inventory**: tells a client to open an agent's inventory.
+40. **Open Module For Agent**: tells a client to open a module for a given agent.
 
-	- `u64` Global ID
+	- `string` Module Identifier
+	- `u64` Agent Global ID
+	- `bool` Remove On Player Movement
 
 41. **Swap Slots**: tells the server to swap a slot in one agent's inventory with a slot in another agent's inventory.
 
@@ -255,14 +257,6 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	This differs from Swap Slots in that compatible stacks will be merged instead of swapped
 	and that the first slot has to have something in it.
-
-43. **Open Fluid Levels**: tells a client to display an agent's fluid levels.
-
-	- `u64` Global ID
-
-44. **Open Chemical Reactor**: tells a client to display the editor for a chemical reactor's formula.
-
-	- `u64` Global ID
 
 # Message Format
 

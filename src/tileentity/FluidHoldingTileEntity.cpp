@@ -1,8 +1,9 @@
 #include "game/ClientGame.h"
-#include "packet/OpenFluidLevelsPacket.h"
+#include "packet/OpenModuleForAgentPacket.h"
 #include "packet/TileEntityPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/FluidHoldingTileEntity.h"
+#include "ui/module/FluidLevelsModule.h"
 
 namespace Game3 {
 	FluidHoldingTileEntity::FluidHoldingTileEntity(FluidContainer::Map map):
@@ -80,7 +81,7 @@ namespace Game3 {
 	void FluidHoldingTileEntity::addObserver(const std::shared_ptr<Player> &player) {
 		Observable::addObserver(player);
 		player->send(TileEntityPacket(shared_from_this()));
-		player->send(OpenFluidLevelsPacket(getGID()));
+		player->send(OpenModuleForAgentPacket(FluidLevelsModule::ID(), getGID(), true));
 		player->queueForMove([this](const std::shared_ptr<Entity> &entity) {
 			removeObserver(std::static_pointer_cast<Player>(entity));
 			return true;

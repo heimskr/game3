@@ -1,13 +1,11 @@
 #pragma once
 
-#include <functional>
-#include <memory>
-
-#include <nlohmann/json.hpp>
-
 #include "Types.h"
 #include "tileentity/TileEntity.h"
 #include "registry/Registerable.h"
+
+#include <functional>
+#include <memory>
 
 namespace Game3 {
 	class Game;

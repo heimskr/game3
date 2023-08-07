@@ -5,7 +5,6 @@
 #include "game/ClientGame.h"
 #include "game/EnergyContainer.h"
 #include "game/ServerInventory.h"
-#include "packet/OpenFluidLevelsPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Pump.h"
 #include "ui/SpriteRenderer.h"

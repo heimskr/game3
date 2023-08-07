@@ -31,6 +31,11 @@ namespace Game3 {
 
 			Game & getGame() const final;
 
+			std::string getEquation();
+
+			/** Returns whether the equation was actually set (i.e., whether the equation was valid and balanced). */
+			bool setEquation(std::string);
+
 		private:
 			Lockable<std::optional<Chemskr::Equation>> equation;
 			Lockable<std::unordered_map<std::string, size_t>> reactants;
@@ -40,9 +45,6 @@ namespace Game3 {
 			ChemicalReactor();
 			ChemicalReactor(Identifier tile_id, Position);
 			ChemicalReactor(Position);
-
-			/** Returns whether the equation was actually set (i.e., whether the equation was valid and balanced). */
-			bool setEquation(std::string);
 			bool react();
 			void fillReactants();
 			void fillProducts();

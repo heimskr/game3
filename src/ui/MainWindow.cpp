@@ -26,6 +26,7 @@
 #include "ui/gtk/JSONDialog.h"
 #include "ui/module/ExternalInventoryModule.h"
 #include "ui/module/FluidLevelsModule.h"
+#include "ui/module/ModuleFactory.h"
 #include "ui/tab/CraftingTab.h"
 #include "ui/tab/InventoryTab.h"
 #include "ui/tab/MerchantTab.h"
@@ -461,6 +462,11 @@ namespace Game3 {
 			if (auto inventory = ext_module->getInventory())
 				return inventory->getOwner()->getGID();
 		return -1;
+	}
+
+	void MainWindow::openModule(const Identifier &module_id, const std::any &argument) {
+		auto &registry = game->registry<ModuleFactoryRegistry>();
+		inventoryTab->setModule((*registry[module_id])(game, argument));
 	}
 
 	void MainWindow::showFluids(const std::shared_ptr<HasFluids> &has_fluids) {

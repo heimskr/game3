@@ -3,9 +3,10 @@
 #include "game/EnergyContainer.h"
 #include "game/ServerInventory.h"
 #include "item/ChemicalItem.h"
-#include "packet/OpenChemicalReactorPacket.h"
+#include "packet/OpenModuleForAgentPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/ChemicalReactor.h"
+#include "ui/module/ChemicalReactorModule.h"
 
 #include <cassert>
 
@@ -79,7 +80,7 @@ namespace Game3 {
 		}
 
 		if (modifiers.onlyShift())
-			player->send(OpenChemicalReactorPacket(getGID()));
+			player->send(OpenModuleForAgentPacket(ChemicalReactorModule::ID(), getGID()));
 		else if (modifiers.shift && modifiers.ctrl)
 			EnergeticTileEntity::addObserver(player);
 		else
@@ -154,6 +155,13 @@ namespace Game3 {
 
 	Game & ChemicalReactor::getGame() const {
 		return TileEntity::getGame();
+	}
+
+	std::string ChemicalReactor::getEquation() {
+		auto lock = equation.sharedLock();
+		if (equation)
+			return equation->getText();
+		return {};
 	}
 
 	bool ChemicalReactor::setEquation(std::string equation_string) {

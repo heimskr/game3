@@ -8,6 +8,9 @@
 #include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
+	ExternalInventoryModule::ExternalInventoryModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
+		ExternalInventoryModule(std::move(game_), std::dynamic_pointer_cast<ClientInventory>(std::dynamic_pointer_cast<HasInventory>(std::any_cast<AgentPtr>(argument))->inventory)) {}
+
 	ExternalInventoryModule::ExternalInventoryModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<ClientInventory> inventory_):
 	game(std::move(game_)),
 	inventory(std::move(inventory_)) {

@@ -3,6 +3,7 @@
 #include "Types.h"
 #include "ui/module/Module.h"
 
+#include <any>
 #include <memory>
 #include <vector>
 
@@ -13,6 +14,9 @@ namespace Game3 {
 
 	class ExternalInventoryModule: public Module {
 		public:
+			static Identifier ID() { return {"base", "module/external_inventory"}; }
+
+			ExternalInventoryModule(std::shared_ptr<ClientGame>, const std::any &);
 			ExternalInventoryModule(std::shared_ptr<ClientGame>, std::shared_ptr<ClientInventory>);
 
 			Gtk::Widget & getWidget() final;

@@ -9,24 +9,24 @@
 
 namespace Game3 {
 	class Agent;
-	class HasFluids;
+	class ChemicalReactor;
 	class InventoryTab;
 
-	class FluidLevelsModule: public Module {
+	class ChemicalReactorModule: public Module {
 		public:
-			static Identifier ID() { return {"base", "module/fluid_levels"}; }
+			static Identifier ID() { return {"base", "module/chemical_reactor"}; }
 
-			FluidLevelsModule(std::shared_ptr<ClientGame>, const std::any &);
+			ChemicalReactorModule(std::shared_ptr<ClientGame>, const std::any &);
 
 			Gtk::Widget & getWidget() final;
 			void reset()  final;
 			void update() final;
-			void updateIf(const std::shared_ptr<HasFluids> &);
 
 		private:
 			std::shared_ptr<ClientGame> game;
-			std::shared_ptr<HasFluids> fluidHaver;
+			std::shared_ptr<ChemicalReactor> reactor;
 			std::vector<std::unique_ptr<Gtk::Widget>> widgets;
+			Gtk::Entry entry;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
 
 			void populate();

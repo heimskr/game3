@@ -39,7 +39,7 @@ namespace Game3 {
 	class Game: public std::enable_shared_from_this<Game>, public BufferContext {
 		public:
 			static constexpr const char *DEFAULT_PATH = "game.g3";
-			static constexpr Version PROTOCOL_VERSION = 4;
+			static constexpr Version PROTOCOL_VERSION = 5;
 
 			/** Seconds since the last tick */
 			float delta = 0.f;
@@ -83,6 +83,7 @@ namespace Game3 {
 			void addPacketFactories();
 			void addLocalCommandFactories();
 			void addTiles();
+			void addModuleFactories();
 			void initialSetup(const std::filesystem::path &dir = "data");
 			void initEntities();
 			void initInteractionSets();
@@ -94,6 +95,7 @@ namespace Game3 {
 			void add(PacketFactory &&);
 			void add(LocalCommandFactory &&);
 			void add(GhostFunction &&);
+			void add(ModuleFactory &&);
 			void traverseData(const std::filesystem::path &);
 			void loadDataFile(const std::filesystem::path &);
 			void addRecipe(const nlohmann::json &);

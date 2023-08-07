@@ -2,7 +2,6 @@
 
 #include "Tileset.h"
 #include "game/ClientGame.h"
-#include "packet/OpenFluidLevelsPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Tank.h"
 #include "ui/SpriteRenderer.h"
@@ -32,7 +31,7 @@ namespace Game3 {
 			return true;
 		}
 
-		player->send(OpenFluidLevelsPacket(getGID()));
+		FluidHoldingTileEntity::addObserver(player);
 
 		assert(fluidContainer);
 		auto lock = fluidContainer->levels.sharedLock();

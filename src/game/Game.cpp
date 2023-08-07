@@ -93,11 +93,9 @@
 #include "packet/TileEntityRequestPacket.h"
 #include "packet/JumpPacket.h"
 #include "packet/DropItemPacket.h"
-#include "packet/OpenAgentInventoryPacket.h"
+#include "packet/OpenModuleForAgentPacket.h"
 #include "packet/SwapSlotsPacket.h"
 #include "packet/MoveSlotsPacket.h"
-#include "packet/OpenFluidLevelsPacket.h"
-#include "packet/OpenChemicalReactorPacket.h"
 #include "realm/Cave.h"
 #include "realm/House.h"
 #include "realm/Keep.h"
@@ -129,6 +127,10 @@
 #include "tileentity/TileEntity.h"
 #include "tileentity/TileEntityFactory.h"
 #include "tileentity/Tree.h"
+#include "ui/module/ChemicalReactorModule.h"
+#include "ui/module/ExternalInventoryModule.h"
+#include "ui/module/FluidLevelsModule.h"
+#include "ui/module/ModuleFactory.h"
 #include "util/AStar.h"
 #include "util/Timer.h"
 #include "util/Util.h"
@@ -166,7 +168,7 @@ namespace Game3 {
 		registries.add<CropRegistry>();
 		registries.add<CentrifugeRecipeRegistry>();
 		registries.add<GeothermalRecipeRegistry>();
-		// TODO: plugins
+		registries.add<ModuleFactoryRegistry>();
 	}
 
 	void Game::addItems() {
@@ -417,11 +419,9 @@ namespace Game3 {
 		add(PacketFactory::create<TileEntityRequestPacket>());
 		add(PacketFactory::create<JumpPacket>());
 		add(PacketFactory::create<DropItemPacket>());
-		add(PacketFactory::create<OpenAgentInventoryPacket>());
+		add(PacketFactory::create<OpenModuleForAgentPacket>());
 		add(PacketFactory::create<SwapSlotsPacket>());
 		add(PacketFactory::create<MoveSlotsPacket>());
-		add(PacketFactory::create<OpenFluidLevelsPacket>());
-		add(PacketFactory::create<OpenChemicalReactorPacket>());
 	}
 
 	void Game::addLocalCommandFactories() {
@@ -446,6 +446,12 @@ namespace Game3 {
 		}
 	}
 
+	void Game::addModuleFactories() {
+		add(ModuleFactory::create<ExternalInventoryModule>());
+		add(ModuleFactory::create<FluidLevelsModule>());
+		add(ModuleFactory::create<ChemicalReactorModule>());
+	}
+
 	void Game::initialSetup(const std::filesystem::path &dir) {
 		initRegistries();
 		addItems();
@@ -457,6 +463,7 @@ namespace Game3 {
 		addPacketFactories();
 		addLocalCommandFactories();
 		addTiles();
+		addModuleFactories();
 	}
 
 	void Game::initEntities() {
@@ -509,6 +516,11 @@ namespace Game3 {
 	void Game::add(GhostFunction &&function) {
 		auto shared = std::make_shared<GhostFunction>(std::move(function));
 		registry<GhostFunctionRegistry>().add(shared->identifier, shared);
+	}
+
+	void Game::add(ModuleFactory &&factory) {
+		auto shared = std::make_shared<ModuleFactory>(std::move(factory));
+		registry<ModuleFactoryRegistry>().add(shared->identifier, shared);
 	}
 
 	void Game::traverseData(const std::filesystem::path &dir) {

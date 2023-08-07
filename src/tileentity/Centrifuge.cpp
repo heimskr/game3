@@ -4,8 +4,6 @@
 #include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/ServerInventory.h"
-#include "packet/OpenAgentInventoryPacket.h"
-#include "packet/OpenFluidLevelsPacket.h"
 #include "realm/Realm.h"
 #include "recipe/CentrifugeRecipe.h"
 #include "tileentity/Centrifuge.h"

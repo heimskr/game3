@@ -72,6 +72,8 @@ namespace Game3 {
 			void showExternalInventory(const std::shared_ptr<ClientInventory> &);
 			GlobalID getExternalGID() const;
 
+			void openModule(const Identifier &, const std::any &);
+
 			void showFluids(const std::shared_ptr<HasFluids> &);
 
 			friend class Canvas;

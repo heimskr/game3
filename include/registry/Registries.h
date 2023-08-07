@@ -9,6 +9,7 @@ namespace Game3 {
 	class GhostFunction;
 	class Item;
 	class LocalCommandFactory;
+	class ModuleFactory;
 	class PacketFactory;
 	class RealmFactory;
 	class Texture;
@@ -116,5 +117,10 @@ namespace Game3 {
 	struct CropRegistry: NamedRegistry<Crop> {
 		static Identifier ID() { return {"base", "registry/crop"}; }
 		CropRegistry(): NamedRegistry(ID()) {}
+	};
+
+	struct ModuleFactoryRegistry: NamedRegistry<ModuleFactory> {
+		static Identifier ID() { return {"base", "registry/module_factory"}; }
+		ModuleFactoryRegistry(): NamedRegistry(ID()) {}
 	};
 }
