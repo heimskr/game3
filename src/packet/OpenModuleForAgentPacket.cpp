@@ -23,6 +23,8 @@ namespace Game3 {
 			});
 		}
 
-		window.openModule(moduleID, std::any(agent));
+		window.queue([&window, agent, module_id = moduleID] {
+			window.openModule(module_id, std::any(agent));
+		});
 	}
 }
