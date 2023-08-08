@@ -17,6 +17,10 @@ namespace Game3 {
 		age(age_),
 		immatureTilename(std::move(immature_tilename)) {}
 
+	void Tree::onRemove() {
+		// Don't send a module message. No one's opening a tree's inventory or anything like that.
+	}
+
 	void Tree::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
 		json["immatureTilename"] = immatureTilename;

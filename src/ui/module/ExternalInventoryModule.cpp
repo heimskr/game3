@@ -6,6 +6,7 @@
 #include "ui/gtk/Util.h"
 #include "ui/module/ExternalInventoryModule.h"
 #include "ui/tab/InventoryTab.h"
+#include "ui/MainWindow.h"
 
 namespace Game3 {
 	ExternalInventoryModule::ExternalInventoryModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
@@ -99,6 +100,15 @@ namespace Game3 {
 	void ExternalInventoryModule::setInventory(std::shared_ptr<ClientInventory> new_inventory) {
 		inventory = std::move(new_inventory);
 		update();
+	}
+
+	void ExternalInventoryModule::handleMessage(Agent &source, const std::string &name, Buffer &) {
+		if (name == "TileEntityRemoved") {
+			if (source.getGID() == inventory->getOwner()->getGID()) {
+				MainWindow &window = game->getWindow();
+				window.queue([&window] { window.removeModule(); });
+			}
+		}
 	}
 
 	int ExternalInventoryModule::gridWidth() const {

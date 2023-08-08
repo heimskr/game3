@@ -4,6 +4,7 @@
 #include "ui/gtk/Util.h"
 #include "ui/module/FluidLevelsModule.h"
 #include "ui/tab/InventoryTab.h"
+#include "ui/MainWindow.h"
 
 namespace Game3 {
 	FluidLevelsModule::FluidLevelsModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
@@ -24,6 +25,15 @@ namespace Game3 {
 
 	void FluidLevelsModule::update() {
 		reset();
+	}
+
+	void FluidLevelsModule::handleMessage(Agent &source, const std::string &name, Buffer &) {
+		if (name == "TileEntityRemoved") {
+			if (auto agent = std::dynamic_pointer_cast<Agent>(fluidHaver); agent && source.getGID() == agent->getGID()) {
+				MainWindow &window = game->getWindow();
+				window.queue([&window] { window.removeModule(); });
+			}
+		}
 	}
 
 	void FluidLevelsModule::updateIf(const std::shared_ptr<HasFluids> &has_fluids) {

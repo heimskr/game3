@@ -487,10 +487,14 @@ namespace Game3 {
 		}
 	}
 
-	void MainWindow::moduleMessage(const Identifier &module_id, Agent &source, const std::string &name, Buffer &data) {
+	void MainWindow::removeModule() {
+		inventoryTab->removeModule();
+	}
+
+	void MainWindow::moduleMessageBuffer(const Identifier &module_id, Agent &source, const std::string &name, Buffer &data) {
 		std::unique_lock<std::shared_mutex> module_lock;
 		Module *current_module = inventoryTab->getModule(module_lock);
-		if (current_module != nullptr && current_module->getID() == module_id) {
+		if (current_module != nullptr && (module_id.empty() || current_module->getID() == module_id)) {
 			current_module->handleMessage(source, name, data);
 		}
 	}

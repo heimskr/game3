@@ -168,4 +168,8 @@ namespace Game3 {
 		assert(client);
 		client->send(InteractPacket(false, modifiers));
 	}
+
+	void ClientGame::moduleMessageBuffer(const Identifier &module_id, Agent &source, const std::string &name, Buffer &data) {
+		getWindow().moduleMessageBuffer(module_id, source, name, data);
+	}
 }

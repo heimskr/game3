@@ -64,7 +64,7 @@ namespace Game3 {
 		if (name == "ModuleMessage") {
 			const auto module_name = data.take<Identifier>();
 			const auto message_name = data.take<std::string>();
-			getGame().toClient().getWindow().moduleMessage(module_name, source, message_name, data);
+			getGame().toClient().getWindow().moduleMessageBuffer(module_name, source, message_name, data);
 		}
 	}
 

@@ -74,6 +74,12 @@ namespace Game3 {
 			game.toServer().tileEntitySpawned(shared_from_this());
 	}
 
+	void TileEntity::onRemove() {
+		Game &game = getRealm()->getGame();
+		if (game.getSide() == Side::Client)
+			game.toClient().moduleMessage({}, *this, "TileEntityRemoved");
+	}
+
 	void TileEntity::setRealm(const std::shared_ptr<Realm> &realm) {
 		realmID = realm->id;
 		weakRealm = realm;

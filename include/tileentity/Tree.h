@@ -22,6 +22,7 @@ namespace Game3 {
 			Tree & operator=(const Tree &) = delete;
 			Tree & operator=(Tree &&) = default;
 
+			void onRemove() override;
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			void onSpawn() override;

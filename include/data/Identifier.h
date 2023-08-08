@@ -19,9 +19,13 @@ namespace Game3 {
 		Identifier(const char *);
 
 		inline explicit operator bool() const {
+			return !empty();
+		}
+
+		inline bool empty() const {
 			if (space.empty() != name.empty())
 				throw std::runtime_error("Partially empty identifier");
-			return !space.empty();
+			return space.empty();
 		}
 
 		inline explicit operator std::string() const {

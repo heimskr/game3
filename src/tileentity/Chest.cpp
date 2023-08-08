@@ -7,8 +7,6 @@
 #include "game/ServerInventory.h"
 #include "realm/Realm.h"
 #include "tileentity/Chest.h"
-#include "ui/Canvas.h"
-#include "ui/MainWindow.h"
 #include "ui/SpriteRenderer.h"
 #include "ui/tab/InventoryTab.h"
 

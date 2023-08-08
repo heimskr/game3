@@ -74,7 +74,17 @@ namespace Game3 {
 			GlobalID getExternalGID() const;
 
 			void openModule(const Identifier &, const std::any &);
-			void moduleMessage(const Identifier &module_id, Agent &source, const std::string &name, Buffer &data);
+			void removeModule();
+			void moduleMessageBuffer(const Identifier &module_id, Agent &source, const std::string &name, Buffer &data);
+
+			template <typename... Args>
+			void moduleMessage(const Identifier &module_id, Agent &source, const std::string &name, Args &&...args) {
+				Buffer buffer;
+				(void) std::initializer_list<int> {
+					((void) (buffer << std::forward<Args>(args)), 0)...
+				};
+				moduleMessageBuffer(module_id, source, name, buffer);
+			}
 
 			void showFluids(const std::shared_ptr<HasFluids> &);
 
