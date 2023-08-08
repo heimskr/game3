@@ -62,8 +62,9 @@ namespace Game3 {
 
 	void ClientPlayer::handleMessage(Agent &source, const std::string &name, Buffer &data) {
 		if (name == "ModuleMessage") {
-			auto module_name = data.take<Identifier>();
-			getGame().toClient().getWindow().moduleMessage(module_name, source, name, data);
+			const auto module_name = data.take<Identifier>();
+			const auto message_name = data.take<std::string>();
+			getGame().toClient().getWindow().moduleMessage(module_name, source, message_name, data);
 		}
 	}
 

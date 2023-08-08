@@ -11,7 +11,6 @@ namespace Game3 {
 	ChemicalReactorModule::ChemicalReactorModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
 	game(std::move(game_)),
 	reactor(std::dynamic_pointer_cast<ChemicalReactor>(std::any_cast<AgentPtr>(argument))) {
-		INFO("ChemicalReactorModule()");
 		vbox.set_hexpand();
 
 		header.set_text(reactor->getName());
@@ -23,7 +22,6 @@ namespace Game3 {
 		entry.set_margin(5);
 
 		entry.signal_activate().connect([this] {
-			INFO("Text: \"" << entry.get_text().raw() << '"');
 			game->player->sendMessage(*reactor, "SetEquation", entry.get_text().raw());
 		});
 
@@ -47,11 +45,9 @@ namespace Game3 {
 		if (name == "EquationSet") {
 			const bool success = data.take<bool>();
 			if (success) {
-				SUCCESS("Equation changed");
 				entry.remove_css_class("equation_error");
 				entry.add_css_class("equation_success");
 			} else {
-				ERROR("Equation not changed");
 				entry.remove_css_class("equation_success");
 				entry.add_css_class("equation_error");
 			}
