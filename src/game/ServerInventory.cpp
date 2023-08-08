@@ -66,12 +66,11 @@ namespace Game3 {
 		}
 
 		if (0 < remaining) {
-			const Game &game = getOwner()->getRealm()->getGame();
 			for (Slot slot = 0; slot < slotCount; ++slot) {
 				if (storage.contains(slot) || !predicate(slot))
 					continue;
 				const ItemCount to_store = std::min(ItemCount(remaining), stack.item->maxCount);
-				storage.emplace(slot, ItemStack(game, stack.item, to_store, stack.data));
+				storage.emplace(slot, ItemStack(stack.getGame(), stack.item, to_store, stack.data));
 				remaining -= to_store;
 				if (remaining <= 0)
 					break;

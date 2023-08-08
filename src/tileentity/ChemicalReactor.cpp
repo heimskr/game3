@@ -224,6 +224,7 @@ namespace Game3 {
 		auto &item_registry = game.registry<ItemRegistry>();
 		std::shared_ptr<Item> chemical_item = item_registry["base:item/chemical"_id];
 		std::unique_ptr<Inventory> inventory_copy = inventory->copy();
+		inventory_copy->weakOwner = {};
 
 		{
 			auto reactant_lock = reactants.sharedLock();

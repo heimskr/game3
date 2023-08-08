@@ -137,7 +137,7 @@ namespace Game3 {
 			void encode(Game &, Buffer &);
 			void decode(Game &, Buffer &);
 
-			inline const Game & getGame() { assert(game); return *game; }
+			inline const Game & getGame() const { assert(game); return *game; }
 			inline bool hasGame() const { return game != nullptr; }
 
 		private:

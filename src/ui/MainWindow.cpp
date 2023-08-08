@@ -522,8 +522,14 @@ namespace Game3 {
 				case GDK_KEY_E:
 					keyTimes.erase(GDK_KEY_e);
 					break;
+				case GDK_KEY_e:
+					keyTimes.erase(GDK_KEY_E);
+					break;
 				case GDK_KEY_R:
 					keyTimes.erase(GDK_KEY_r);
+					break;
+				case GDK_KEY_r:
+					keyTimes.erase(GDK_KEY_R);
 					break;
 			}
 		}

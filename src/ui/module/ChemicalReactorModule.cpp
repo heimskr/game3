@@ -41,7 +41,7 @@ namespace Game3 {
 
 	void ChemicalReactorModule::update() {}
 
-	void ChemicalReactorModule::handleMessage(Agent &source, const std::string &name, Buffer &data) {
+	void ChemicalReactorModule::handleMessage(Agent &, const std::string &name, Buffer &data) {
 		if (name == "EquationSet") {
 			const bool success = data.take<bool>();
 			if (success) {
