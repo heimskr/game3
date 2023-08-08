@@ -102,17 +102,18 @@ namespace Game3 {
 		update();
 	}
 
-	std::optional<Buffer> ExternalInventoryModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, Buffer &) {
+	std::optional<Buffer> ExternalInventoryModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &) {
 		if (name == "TileEntityRemoved") {
-			if (!source)
-				return {};
 
-			if (source->getGID() == inventory->getOwner()->getGID()) {
+			if (source && source->getGID() == inventory->getOwner()->getGID()) {
 				MainWindow &window = game->getWindow();
 				window.queue([&window] { window.removeModule(); });
 			}
+
 		} else if (name == "GetAgentGID") {
+
 			return Buffer{inventory->getOwner()->getGID()};
+
 		}
 
 		return {};

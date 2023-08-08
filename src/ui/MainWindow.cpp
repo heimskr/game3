@@ -314,8 +314,10 @@ namespace Game3 {
 		debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
 		game->initInteractionSets();
 		canvas->game = game;
+
 		for (auto &[widget, tab]: tabMap)
 			tab->reset(game);
+
 		game->signal_player_inventory_update().connect([this](const PlayerPtr &player) {
 			if (player != game->player)
 				return;
@@ -324,13 +326,14 @@ namespace Game3 {
 				merchantTab->update(game);
 			craftingTab->update(game);
 		});
+
 		game->signal_other_inventory_update().connect([this](const std::shared_ptr<Agent> &owner) {
 			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner); has_inventory && has_inventory->inventory) {
 				auto client_inventory = std::dynamic_pointer_cast<ClientInventory>(has_inventory->inventory);
 				queue([this, owner, client_inventory] {
 					if (owner->getGID() == getExternalGID()) {
 						std::unique_lock<std::shared_mutex> lock;
-						if (auto *module_ = dynamic_cast<ExternalInventoryModule *>(inventoryTab->getModule(lock)))
+						if (auto *module_ = inventoryTab->getModule(lock))
 							module_->setInventory(client_inventory);
 					}
 				});
@@ -340,14 +343,18 @@ namespace Game3 {
 					merchantTab->update(game);
 			}
 		});
+
 		game->signal_player_money_update().connect([this](const PlayerPtr &) {
 			inventoryTab->update(game);
 			merchantTab->update(game);
 		});
+
 		game->signal_fluid_update().connect([this](const std::shared_ptr<HasFluids> &has_fluids) {
 			std::unique_lock<std::shared_mutex> lock;
-			if (auto *fluid_module = dynamic_cast<FluidLevelsModule *>(inventoryTab->getModule(lock)))
-				fluid_module->updateIf(has_fluids);
+			if (Module *module_ = inventoryTab->getModule(lock)) {
+				std::any data(has_fluids);
+				module_->handleMessage({}, "UpdateFluids", data);
+			}
 		});
 	}
 
@@ -469,8 +476,8 @@ namespace Game3 {
 		std::unique_lock<std::shared_mutex> lock;
 
 		if (Module *module_ = inventoryTab->getModule(lock)) {
-			Buffer buffer;
-			if (std::optional<Buffer> response = module_->handleMessage({}, "GetAgentGID", buffer))
+			std::any empty;
+			if (std::optional<Buffer> response = module_->handleMessage({}, "GetAgentGID", empty))
 				return response->take<GlobalID>();
 		}
 
@@ -498,10 +505,11 @@ namespace Game3 {
 		inventoryTab->removeModule();
 	}
 
-	void MainWindow::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &data) {
+	void MainWindow::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&buffer) {
 		std::unique_lock<std::shared_mutex> module_lock;
 		Module *current_module = inventoryTab->getModule(module_lock);
 		if (current_module != nullptr && (module_id.empty() || current_module->getID() == module_id)) {
+			std::any data{std::move(buffer)};
 			current_module->handleMessage(source, name, data);
 		}
 	}

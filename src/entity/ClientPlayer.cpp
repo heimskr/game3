@@ -60,16 +60,21 @@ namespace Game3 {
 		return main_layers;
 	}
 
-	void ClientPlayer::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, Buffer &data) {
+	void ClientPlayer::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
 		if (name == "ModuleMessage") {
-			const auto module_name = data.take<Identifier>();
-			const auto message_name = data.take<std::string>();
-			getGame().toClient().getWindow().moduleMessageBuffer(module_name, source, message_name, data);
+			auto *buffer = std::any_cast<Buffer>(&data);
+			assert(buffer != nullptr);
+			const auto module_name = buffer->take<Identifier>();
+			const auto message_name = buffer->take<std::string>();
+			getGame().toClient().getWindow().moduleMessageBuffer(module_name, source, message_name, std::move(*buffer));
 		}
 	}
 
-	void ClientPlayer::sendBuffer(const std::shared_ptr<Agent> &destination, const std::string &name, Buffer &data) {
+	void ClientPlayer::sendMessage(const std::shared_ptr<Agent> &destination, const std::string &name, std::any &data) {
 		assert(destination);
-		getGame().toClient().client->send(AgentMessagePacket(destination->getGID(), name, data));
+		if (auto *buffer = std::any_cast<Buffer>(&data))
+			getGame().toClient().client->send(AgentMessagePacket(destination->getGID(), name, *buffer));
+		else
+			throw std::runtime_error("Expected data to be a Buffer in ClientPlayer::sendMessage");
 	}
 }

@@ -31,16 +31,13 @@ namespace Game3 {
 			virtual Type getAgentType() const = 0;
 			virtual std::string getName() = 0;
 
-			virtual void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, Buffer &data);
-			virtual void sendBuffer(const std::shared_ptr<Agent> &destination, const std::string &name, Buffer &data);
+			virtual void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data);
+			virtual void sendMessage(const std::shared_ptr<Agent> &destination, const std::string &name, std::any &data);
 
 			template <typename... Args>
 			void sendMessage(const std::shared_ptr<Agent> &destination, const std::string &name, Args &&...args) {
-				Buffer buffer{std::forward<Args>(args)...};
-				// (void) std::initializer_list<int> {
-				// 	((void) (buffer << std::forward<Args>(args)), 0)...
-				// };
-				sendBuffer(destination, name, buffer);
+				std::any data{Buffer{std::forward<Args>(args)...}};
+				sendMessage(destination, name, data);
 			}
 
 			virtual GlobalID getGID() const { return globalID; }

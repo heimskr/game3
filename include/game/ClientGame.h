@@ -36,15 +36,11 @@ namespace Game3 {
 			void interactOn(Modifiers);
 			void interactNextTo(Modifiers);
 
-			void moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &data);
+			void moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data);
 
 			template <typename... Args>
 			void moduleMessage(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Args &&...args) {
-				Buffer buffer;
-				(void) std::initializer_list<int> {
-					((void) (buffer << std::forward<Args>(args)), 0)...
-				};
-				moduleMessageBuffer(module_id, source, name, buffer);
+				moduleMessageBuffer(module_id, source, name, Buffer{std::forward<Args>(args)...});
 			}
 
 			auto signal_player_inventory_update() const { return signal_player_inventory_update_; }

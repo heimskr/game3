@@ -23,11 +23,11 @@ namespace Game3 {
 		return out;
 	}
 
-	void Agent::handleMessage(const std::shared_ptr<Agent> &, const std::string &, Buffer &) {
+	void Agent::handleMessage(const std::shared_ptr<Agent> &, const std::string &, std::any &) {
 		throw std::runtime_error("Agent of type " + std::string(typeid(*this).name()) + " has no message handler");
 	}
 
-	void Agent::sendBuffer(const std::shared_ptr<Agent> &destination, const std::string &name, Buffer &data) {
+	void Agent::sendMessage(const std::shared_ptr<Agent> &destination, const std::string &name, std::any &data) {
 		assert(getSide() != Side::Client);
 		destination->handleMessage(shared_from_this(), name, data);
 	}

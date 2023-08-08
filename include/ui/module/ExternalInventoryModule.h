@@ -24,10 +24,10 @@ namespace Game3 {
 			void reset()  final;
 			void update() final;
 			void onResize(int) final;
-			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, Buffer &data) final;
+			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
 
 			inline auto getInventory() const { return inventory; }
-			void setInventory(std::shared_ptr<ClientInventory>);
+			void setInventory(std::shared_ptr<ClientInventory>) override;
 
 		private:
 			std::shared_ptr<ClientGame> game;

@@ -3,6 +3,7 @@
 #include "data/Identifier.h"
 #include "net/Buffer.h"
 
+#include <any>
 #include <optional>
 
 #include <gtkmm.h>
@@ -11,6 +12,7 @@ namespace Game3 {
 	class Agent;
 	class Buffer;
 	class ClientGame;
+	class ClientInventory;
 	class InventoryTab;
 
 	/** Displayed below the inventory in the inventory tab. */
@@ -26,6 +28,7 @@ namespace Game3 {
 			virtual void reset()  = 0;
 			virtual void update() = 0;
 			virtual void onResize(int /* width */) {}
-			virtual std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &, const std::string &, Buffer &) { return {}; }
+			virtual std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &, const std::string &, std::any &) { return {}; }
+			virtual void setInventory(std::shared_ptr<ClientInventory>) {}
 	};
 }

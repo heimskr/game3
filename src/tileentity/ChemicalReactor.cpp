@@ -41,12 +41,16 @@ namespace Game3 {
 		return energyContainer->capacity;
 	}
 
-	void ChemicalReactor::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, Buffer &data) {
+	void ChemicalReactor::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
 		if (name == "SetEquation") {
-			const std::string new_equation = data.take<std::string>();
+
+			auto *buffer = std::any_cast<Buffer>(&data);
+			assert(buffer != nullptr);
+			const std::string new_equation = buffer->take<std::string>();
 			const bool success = setEquation(new_equation);
 			if (source)
 				sendMessage(source, "ModuleMessage", ChemicalReactorModule::ID(), "EquationSet", success);
+
 		}
 	}
 

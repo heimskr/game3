@@ -20,7 +20,8 @@ namespace Game3 {
 			return;
 		}
 
-		destination->handleMessage(client.getPlayer(), messageName, messageData);
+		std::any data{std::move(messageData)};
+		destination->handleMessage(client.getPlayer(), messageName, data);
 	}
 
 	void AgentMessagePacket::handle(ClientGame &game) {
@@ -35,6 +36,7 @@ namespace Game3 {
 			return;
 		}
 
-		game.player->handleMessage(source, messageName, messageData);
+		std::any data{std::move(messageData)};
+		game.player->handleMessage(source, messageName, data);
 	}
 }

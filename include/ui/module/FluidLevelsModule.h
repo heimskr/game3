@@ -22,7 +22,7 @@ namespace Game3 {
 			Gtk::Widget & getWidget() final;
 			void reset()  final;
 			void update() final;
-			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, Buffer &data) final;
+			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
 
 			void updateIf(const std::shared_ptr<HasFluids> &);
 

@@ -43,8 +43,11 @@ namespace Game3 {
 		return locked;
 	}
 
-	void ServerPlayer::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, Buffer &data) {
+	void ServerPlayer::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
 		assert(source);
-		send(AgentMessagePacket(source->getGID(), name, data));
+		if (auto *buffer = std::any_cast<Buffer>(&data))
+			send(AgentMessagePacket(source->getGID(), name, std::move(*buffer)));
+		else
+			throw std::runtime_error("Expected data to be a Buffer in ServerPlayer::handleMessage");
 	}
 }

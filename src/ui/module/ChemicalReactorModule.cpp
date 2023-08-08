@@ -59,9 +59,12 @@ namespace Game3 {
 		inventoryModule->onResize(width);
 	}
 
-	std::optional<Buffer> ChemicalReactorModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, Buffer &data) {
+	std::optional<Buffer> ChemicalReactorModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
 		if (name == "EquationSet") {
-			const bool success = data.take<bool>();
+
+			auto *buffer = std::any_cast<Buffer>(&data);
+			assert(buffer != nullptr);
+			const bool success = buffer->take<bool>();
 			if (success) {
 				entry.remove_css_class("equation_error");
 				entry.add_css_class("equation_success");
@@ -69,18 +72,27 @@ namespace Game3 {
 				entry.remove_css_class("equation_success");
 				entry.add_css_class("equation_error");
 			}
+
 		} else if (name == "TileEntityRemoved") {
+
 			if (source && source->getGID() == reactor->getGID()) {
 				inventoryModule->handleMessage(source, name, data);
 				MainWindow &window = game->getWindow();
 				window.queue([&window] { window.removeModule(); });
 			}
+
 		} else if (name == "GetAgentGID") {
+
 			return Buffer{reactor->getGID()};
+
 		} else {
 			return inventoryModule->handleMessage(source, name, data);
 		}
 
 		return {};
+	}
+
+	void ChemicalReactorModule::setInventory(std::shared_ptr<ClientInventory> inventory) {
+		inventoryModule->setInventory(std::move(inventory));
 	}
 }

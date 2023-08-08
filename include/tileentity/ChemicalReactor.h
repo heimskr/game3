@@ -19,7 +19,7 @@ namespace Game3 {
 			bool mayExtractItem(Direction, Slot) override;
 			EnergyAmount getEnergyCapacity() override;
 
-			void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, Buffer &data) override;
+			void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) override;
 
 			void init(Game &) override;
 			void tick(Game &, float) override;

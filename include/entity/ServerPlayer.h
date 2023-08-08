@@ -19,7 +19,7 @@ namespace Game3 {
 			bool ensureEntity(const std::shared_ptr<Entity> &);
 			std::shared_ptr<RemoteClient> getClient() const;
 
-			void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, Buffer &data) final;
+			void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
 
 			bool inventoryUpdated = false;
 

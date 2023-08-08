@@ -27,8 +27,9 @@ namespace Game3 {
 		reset();
 	}
 
-	std::optional<Buffer> FluidLevelsModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, Buffer &) {
+	std::optional<Buffer> FluidLevelsModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
 		if (name == "TileEntityRemoved") {
+
 			if (!source)
 				return {};
 
@@ -36,9 +37,18 @@ namespace Game3 {
 				MainWindow &window = game->getWindow();
 				window.queue([&window] { window.removeModule(); });
 			}
+
 		} else if (name == "GetAgentGID") {
+
 			if (auto agent = std::dynamic_pointer_cast<Agent>(fluidHaver))
 				return Buffer{agent->getGID()};
+
+		} else if (name == "UpdateFluids") {
+
+			auto *has_fluids = std::any_cast<std::shared_ptr<HasFluids>>(&data);
+			assert(has_fluids != nullptr);
+			updateIf(*has_fluids);
+
 		}
 
 		return {};
