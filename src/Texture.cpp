@@ -1,14 +1,16 @@
 // Credit: https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/3.2d_game/0.full_source/texture.cpp
+#include "Log.h"
+#include "Texture.h"
+#include "util/GL.h"
+#include "util/Util.h"
+
 #include <csignal>
 #include <unordered_map>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#include "Log.h"
-#include "Texture.h"
-#include "util/GL.h"
-#include "util/Util.h"
+#include <nlohmann/json.hpp>
 
 namespace Game3 {
 	static constexpr GLint DEFAULT_FILTER = GL_NEAREST;

@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Log.h"
+#include "data/Identifier.h"
+#include "registry/Registerable.h"
+
 #include <map>
 #include <memory>
 #include <set>
@@ -9,19 +13,14 @@
 #include <utility>
 #include <vector>
 
-#include <nlohmann/json.hpp>
-
-#include "Log.h"
-#include "data/Identifier.h"
-#include "registry/Registerable.h"
-#include "util/Castable.h"
+#include <nlohmann/json_fwd.hpp>
 
 namespace Game3 {
 	class Game;
 	struct NamedRegistryBase;
 	struct UnnamedRegistryBase;
 
-	class Registry: public NamedRegisterable, public Castable<Registry> {
+	class Registry: public NamedRegisterable, public std::enable_shared_from_this<Registry> {
 		protected:
 			explicit Registry(Identifier identifier_): NamedRegisterable(std::move(identifier_)) {}
 
@@ -30,11 +29,11 @@ namespace Game3 {
 			virtual ~Registry() = default;
 
 			std::shared_ptr<NamedRegistryBase> toNamed() {
-				return cast<NamedRegistryBase>();
+				return std::dynamic_pointer_cast<NamedRegistryBase>(shared_from_this());
 			}
 
 			std::shared_ptr<UnnamedRegistryBase> toUnnamed() {
-				return cast<UnnamedRegistryBase>();
+				return std::dynamic_pointer_cast<UnnamedRegistryBase>(shared_from_this());
 			}
 
 		protected:
@@ -134,12 +133,12 @@ namespace Game3 {
 
 			template <typename S>
 			inline S & get() {
-				return *items.at(S::ID())->template cast<S>();
+				return *std::dynamic_pointer_cast<S>(items.at(S::ID()));
 			}
 
 			template <typename S>
 			inline const S & get() const {
-				return *items.at(S::ID())->template cast<const S>();
+				return *std::dynamic_pointer_cast<const S>(items.at(S::ID()));
 			}
 
 			inline std::shared_ptr<T> maybe(const Identifier &id) const {

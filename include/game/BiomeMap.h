@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 #include "Position.h"
 #include "Texture.h"

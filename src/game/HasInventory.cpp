@@ -8,7 +8,7 @@ namespace Game3 {
 	void HasInventory::encode(Buffer &buffer) {
 		std::optional<std::shared_ptr<ServerInventory>> optional;
 		if (inventory) {
-			auto server_inventory = inventory->cast<ServerInventory>();
+			auto server_inventory = std::dynamic_pointer_cast<ServerInventory>(inventory);
 			assert(server_inventory);
 			optional = server_inventory;
 			buffer << inventory->slotCount;

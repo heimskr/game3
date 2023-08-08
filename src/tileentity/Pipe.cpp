@@ -38,7 +38,7 @@ namespace Game3 {
 
 		directions[pipe_type].iterate([&](Direction direction) {
 			if (auto neighbor = realm->tileEntityAt(position + direction))
-				if (auto neighbor_pipe = neighbor->cast<Pipe>())
+				if (auto neighbor_pipe = std::dynamic_pointer_cast<Pipe>(neighbor))
 					if (neighbor_pipe->directions[pipe_type].has(flipDirection(direction)))
 						out[direction] = neighbor_pipe;
 		});
@@ -50,7 +50,7 @@ namespace Game3 {
 		auto realm = getRealm();
 
 		if (auto neighbor = realm->tileEntityAt(position + direction))
-			if (auto neighbor_pipe = neighbor->cast<Pipe>())
+			if (auto neighbor_pipe = std::dynamic_pointer_cast<Pipe>(neighbor))
 				if (neighbor_pipe->directions[pipe_type].has(flipDirection(direction)))
 					return neighbor_pipe;
 
@@ -172,18 +172,20 @@ namespace Game3 {
 
 	void Pipe::onSpawn() {
 		auto realm = getRealm();
-		auto shared = shared_from_this()->cast<Pipe>();
+		auto shared = std::static_pointer_cast<Pipe>(shared_from_this());
 		for (const PipeType pipe_type: PIPE_TYPES)
 			realm->pipeLoader.floodFill(pipe_type, shared);
+
 		TileEntity::onSpawn();
 	}
 
 	void Pipe::onRemove() {
-		auto shared = std::dynamic_pointer_cast<Pipe>(shared_from_this());
+		auto shared = std::static_pointer_cast<Pipe>(shared_from_this());
 		for (const PipeType pipe_type: PIPE_TYPES)
 			if (present[pipe_type])
 				if (const auto &network = networks[pipe_type])
 					network->removePipe(shared);
+
 		TileEntity::onRemove();
 	}
 
@@ -242,7 +244,7 @@ namespace Game3 {
 
 	bool Pipe::reachable(PipeType pipe_type, const std::shared_ptr<Pipe> &target) {
 		assert(target);
-		std::shared_ptr<Pipe> shared = shared_from_this()->cast<Pipe>();
+		auto shared = std::static_pointer_cast<Pipe>(shared_from_this());
 		assert(shared);
 		std::unordered_set visited{shared};
 		std::deque queue{shared};

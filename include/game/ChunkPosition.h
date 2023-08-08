@@ -6,7 +6,7 @@
 #include <random>
 #include <string>
 
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 #include "Constants.h"
 #include "Types.h"

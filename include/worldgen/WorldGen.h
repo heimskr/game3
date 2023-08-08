@@ -4,7 +4,7 @@
 #include <memory>
 #include <random>
 
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 #include "Types.h"
 #include "game/ChunkPosition.h"

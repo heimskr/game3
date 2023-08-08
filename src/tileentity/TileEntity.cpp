@@ -154,7 +154,7 @@ namespace Game3 {
 				auto lock = entities->sharedLock();
 				for (const auto &entity: *entities)
 					if (entity->isPlayer())
-						entity->cast<Player>()->send(packet);
+						std::static_pointer_cast<Player>(entity)->send(packet);
 			}
 		});
 	}

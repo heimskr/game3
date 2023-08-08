@@ -313,7 +313,7 @@ namespace Game3 {
 		entitiesByGID[entity->globalID] = entity;
 		entity->firstTeleport = true;
 		if (entity->isPlayer() && entity->weakRealm.lock())
-			entity->cast<Player>()->stopMoving();
+			std::static_pointer_cast<Player>(entity)->stopMoving();
 		entity->setRealm(shared);
 		entity->teleport(position);
 		entity->clearOffset();
@@ -322,7 +322,7 @@ namespace Game3 {
 		if (entity->isPlayer()) {
 			{
 				auto lock = players.uniqueLock();
-				players.insert(std::dynamic_pointer_cast<Player>(entity));
+				players.insert(std::static_pointer_cast<Player>(entity));
 			}
 			recalculateVisibleChunks();
 		}

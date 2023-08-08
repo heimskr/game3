@@ -25,7 +25,7 @@ namespace Game3 {
 		if (auto by_chunk = realm.getTileEntities(chunk_position)) {
 			auto lock = by_chunk->sharedLock();
 			for (const TileEntityPtr &tile_entity: *by_chunk)
-				if (auto pipe = tile_entity->cast<Pipe>())
+				if (auto pipe = std::dynamic_pointer_cast<Pipe>(tile_entity))
 					for (const PipeType pipe_type: PIPE_TYPES)
 						if (!pipe->loaded[pipe_type])
 							floodFill(pipe_type, pipe);
@@ -65,7 +65,7 @@ namespace Game3 {
 			directions.iterate([&](Direction direction) {
 				const Position neighbor_position = pipe->getPosition() + direction;
 				if (TileEntityPtr base_neighbor = realm->tileEntityAt(neighbor_position)) {
-					if (auto neighbor = base_neighbor->cast<Pipe>()) {
+					if (auto neighbor = std::dynamic_pointer_cast<Pipe>(base_neighbor)) {
 						// Check whether the connection is matched with a connection on the other pipe.
 						if (!neighbor->loaded[pipe_type] && neighbor->getDirections()[pipe_type][flipDirection(direction)])
 							queue.push_back(neighbor);

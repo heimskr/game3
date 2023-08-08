@@ -174,7 +174,7 @@ namespace Game3 {
 		};
 
 		if (game->player->inventory)
-			populate(playerGrid, *game->player->inventory->cast<ClientInventory>(), false);
+			populate(playerGrid, *std::static_pointer_cast<ClientInventory>(game->player->inventory), false);
 
 		if (merchantInventory)
 			populate(merchantGrid, *merchantInventory, true);

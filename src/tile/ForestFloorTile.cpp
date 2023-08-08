@@ -22,7 +22,7 @@ namespace Game3 {
 		if (auto entities = realm.getEntities(getChunkPosition(place.position))) {
 			auto lock = entities->sharedLock();
 			for (const auto &entity: *entities)
-				if (entity->position.taxiDistance(place.position) <= 3 && entity->cast<ItemEntity>())
+				if (entity->position.taxiDistance(place.position) <= 3 && std::dynamic_pointer_cast<ItemEntity>(entity))
 					return;
 		}
 

@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 #include "Types.h"
 #include "game/BiomeMap.h"

@@ -669,7 +669,7 @@ namespace Game3 {
 					}
 
 					if (visible->isPlayer())
-						players_to_erase.push_back(visible->cast<Player>());
+						players_to_erase.push_back(std::dynamic_pointer_cast<Player>(visible));
 				}
 			}
 		}

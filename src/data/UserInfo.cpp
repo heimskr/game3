@@ -1,5 +1,7 @@
 #include "data/UserInfo.h"
 
+#include <nlohmann/json.hpp>
+
 namespace Game3 {
 	void to_json(nlohmann::json &json, const UserInfo &user_info) {
 		json[0] = user_info.username;

@@ -4,6 +4,7 @@
 #include "ui/module/Module.h"
 #include "registry/Registerable.h"
 
+#include <any>
 #include <functional>
 #include <memory>
 

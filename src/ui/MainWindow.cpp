@@ -326,7 +326,7 @@ namespace Game3 {
 		});
 		game->signal_other_inventory_update().connect([this](const std::shared_ptr<Agent> &owner) {
 			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner); has_inventory && has_inventory->inventory) {
-				auto client_inventory = has_inventory->inventory->cast<ClientInventory>();
+				auto client_inventory = std::dynamic_pointer_cast<ClientInventory>(has_inventory->inventory);
 				queue([this, owner, client_inventory] {
 					if (owner->getGID() == getExternalGID()) {
 						std::unique_lock<std::shared_mutex> lock;

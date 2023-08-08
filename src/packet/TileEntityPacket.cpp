@@ -52,7 +52,7 @@ namespace Game3 {
 		if (tileEntity) {
 			if (!wasFound)
 				game.realms.at(realmID)->add(tileEntity);
-			if (auto has_inventory = tileEntity->cast<HasInventory>())
+			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(tileEntity))
 				has_inventory->inventory->notifyOwner();
 		}
 	}

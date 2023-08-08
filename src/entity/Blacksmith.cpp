@@ -70,7 +70,7 @@ namespace Game3 {
 			});
 			tab.show();
 			window.delay([this, &tab] {
-				tab.setMerchantInventory("Blacksmith", inventory->cast<ClientInventory>(), greed);
+				tab.setMerchantInventory("Blacksmith", std::dynamic_pointer_cast<ClientInventory>(inventory), greed);
 			}, 2);
 		}
 

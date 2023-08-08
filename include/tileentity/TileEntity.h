@@ -1,16 +1,15 @@
 #pragma once
 
-#include <memory>
-#include <random>
-
-#include <nlohmann/json.hpp>
-
 #include "Position.h"
 #include "Types.h"
 #include "game/Agent.h"
 #include "net/Broadcastable.h"
 #include "ui/Modifiers.h"
-#include "util/Castable.h"
+
+#include <memory>
+#include <random>
+
+#include <nlohmann/json_fwd.hpp>
 
 namespace Game3 {
 	class Buffer;
@@ -21,7 +20,7 @@ namespace Game3 {
 	class RemoteClient;
 	class SpriteRenderer;
 
-	class TileEntity: public Agent, public Castable<TileEntity>, public Broadcastable {
+	class TileEntity: public Agent, public Broadcastable, public std::enable_shared_from_this<TileEntity> {
 		public:
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;

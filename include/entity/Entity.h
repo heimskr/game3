@@ -1,7 +1,7 @@
 #pragma once
 
 #include "lib/Eigen.h"
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 #include "Direction.h"
 #include "Position.h"
@@ -16,7 +16,6 @@
 #include "threading/Lockable.h"
 #include "threading/SharedRecursiveMutex.h"
 #include "ui/Modifiers.h"
-#include "util/Castable.h"
 
 #include <atomic>
 #include <functional>
@@ -47,7 +46,7 @@ namespace Game3 {
 		EntityTexture(Identifier identifier_, Identifier texture_id, uint8_t variety_);
 	};
 
-	class Entity: public Agent, public HasInventory, public Castable<Entity>, public HasMutex<SharedRecursiveMutex> {
+	class Entity: public Agent, public HasInventory, public HasMutex<SharedRecursiveMutex>, public std::enable_shared_from_this<Entity> {
 		public:
 			constexpr static Slot DEFAULT_INVENTORY_SIZE = 30;
 			/** The reciprocal of this is how many seconds it takes to move one square. */

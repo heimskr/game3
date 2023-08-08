@@ -12,7 +12,7 @@
 #include <utility>
 
 #include <gtkmm.h>
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 #include "Types.h"
 #include "entity/Player.h"

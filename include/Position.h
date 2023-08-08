@@ -1,16 +1,17 @@
 #pragma once
 
-#include <cmath>
-#include <functional>
-#include <memory>
-#include <ostream>
-#include <string>
-
-#include <nlohmann/json.hpp>
-
 #include "Direction.h"
 #include "Layer.h"
 #include "Types.h"
+
+#include <cmath>
+#include <functional>
+#include <memory>
+#include <optional>
+#include <ostream>
+#include <string>
+
+#include <nlohmann/json_fwd.hpp>
 
 namespace Game3 {
 	class Buffer;

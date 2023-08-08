@@ -1,5 +1,10 @@
 #pragma once
 
+#include "Types.h"
+#include "data/Identifier.h"
+#include "registry/Registerable.h"
+#include "ui/Modifiers.h"
+
 #include <gtkmm.h>
 #include <map>
 #include <memory>
@@ -7,11 +12,6 @@
 #include <unordered_set>
 
 #include <nlohmann/json.hpp>
-
-#include "Types.h"
-#include "data/Identifier.h"
-#include "registry/Registerable.h"
-#include "ui/Modifiers.h"
 
 namespace Game3 {
 	class Game;

@@ -6,7 +6,7 @@
 #include "recipe/Recipe.h"
 #include "registry/Registries.h"
 
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 namespace Game3 {
 	struct CentrifugeRecipe: Recipe<FluidStack, ItemStack> {

@@ -8,7 +8,7 @@
 
 namespace Game3 {
 	void InventoryPacket::encode(Game &, Buffer &buffer) const {
-		buffer << *inventory->cast<ServerInventory>();
+		buffer << *std::dynamic_pointer_cast<ServerInventory>(inventory);
 	}
 
 	void InventoryPacket::decode(Game &, Buffer &buffer) {

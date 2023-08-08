@@ -161,7 +161,7 @@ namespace Game3 {
 		const DestroyEntityPacket packet(entity);
 		auto lock = server->server->lockClients();
 		for (const auto &[client_id, client]: server->server->getClients())
-			std::dynamic_pointer_cast<RemoteClient>(client)->send(packet);
+			std::static_pointer_cast<RemoteClient>(client)->send(packet);
 	}
 
 	void ServerGame::tileEntitySpawned(const TileEntityPtr &tile_entity) {
@@ -173,7 +173,7 @@ namespace Game3 {
 				auto lock = entities->sharedLock();
 				for (const auto &entity: *entities)
 					if (entity->isPlayer())
-						entity->cast<ServerPlayer>()->send(packet);
+						std::static_pointer_cast<ServerPlayer>(entity)->send(packet);
 			}
 		});
 	}

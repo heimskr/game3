@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 #include "Constants.h"
 #include "Position.h"

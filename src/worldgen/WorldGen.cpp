@@ -1,5 +1,7 @@
 #include "worldgen/WorldGen.h"
 
+#include <nlohmann/json.hpp>
+
 namespace Game3 {
 	void from_json(const nlohmann::json &json, WorldGenParams &params) {
 		params.wetness = json.at("wetness");

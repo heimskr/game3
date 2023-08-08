@@ -1,6 +1,8 @@
 #include "data/Identifier.h"
 #include "net/Buffer.h"
 
+#include <nlohmann/json.hpp>
+
 namespace Game3 {
 	Identifier::Identifier(std::string_view combined) {
 		const size_t colon = combined.find(':');

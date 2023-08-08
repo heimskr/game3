@@ -4,7 +4,6 @@
 #include "item/Item.h"
 #include "recipe/CraftingRequirement.h"
 #include "threading/Lockable.h"
-#include "util/Castable.h"
 
 #include <atomic>
 #include <functional>
@@ -25,7 +24,7 @@ namespace Game3 {
 		}
 	};
 
-	class Inventory: public Container, public Castable<Inventory> {
+	class Inventory: public Container {
 		protected:
 			Inventory() = default;
 			Inventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot = 0);
