@@ -10,6 +10,7 @@
 namespace Game3 {
 	class Agent;
 	class ChemicalReactor;
+	class ExternalInventoryModule;
 	class InventoryTab;
 
 	class ChemicalReactorModule: public Module {
@@ -17,16 +18,19 @@ namespace Game3 {
 			static Identifier ID() { return {"base", "module/chemical_reactor"}; }
 
 			ChemicalReactorModule(std::shared_ptr<ClientGame>, const std::any &);
+			ChemicalReactorModule(std::shared_ptr<ClientGame>, std::shared_ptr<ChemicalReactor>);
 
 			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;
 			void reset()  final;
 			void update() final;
-			void handleMessage(Agent &source, const std::string &name, Buffer &data) final;
+			void onResize(int) final;
+			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, Buffer &data) final;
 
 		private:
 			std::shared_ptr<ClientGame> game;
 			std::shared_ptr<ChemicalReactor> reactor;
+			std::unique_ptr<ExternalInventoryModule> inventoryModule;
 			Gtk::Label header;
 			Gtk::Entry entry;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};

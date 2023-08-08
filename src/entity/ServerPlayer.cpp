@@ -43,7 +43,8 @@ namespace Game3 {
 		return locked;
 	}
 
-	void ServerPlayer::handleMessage(Agent &source, const std::string &name, Buffer &data) {
-		send(AgentMessagePacket(source.getGID(), name, data));
+	void ServerPlayer::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, Buffer &data) {
+		assert(source);
+		send(AgentMessagePacket(source->getGID(), name, data));
 	}
 }

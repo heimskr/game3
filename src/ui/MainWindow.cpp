@@ -466,10 +466,18 @@ namespace Game3 {
 	}
 
 	GlobalID MainWindow::getExternalGID() const {
-		std::shared_lock<std::shared_mutex> lock;
-		if (auto *ext_module = dynamic_cast<ExternalInventoryModule *>(inventoryTab->getModule(lock)))
-			if (auto inventory = ext_module->getInventory())
-				return inventory->getOwner()->getGID();
+		std::unique_lock<std::shared_mutex> lock;
+
+		if (Module *module_ = inventoryTab->getModule(lock)) {
+			Buffer buffer;
+			if (std::optional<Buffer> response = module_->handleMessage({}, "GetAgentGID", buffer))
+				return response->take<GlobalID>();
+		}
+
+		// std::shared_lock<std::shared_mutex> lock;
+		// if (auto *ext_module = dynamic_cast<ExternalInventoryModule *>(inventoryTab->getModule(lock)))
+		// 	if (auto inventory = ext_module->getInventory())
+		// 		return inventory->getOwner()->getGID();
 		return -1;
 	}
 
@@ -490,7 +498,7 @@ namespace Game3 {
 		inventoryTab->removeModule();
 	}
 
-	void MainWindow::moduleMessageBuffer(const Identifier &module_id, Agent &source, const std::string &name, Buffer &data) {
+	void MainWindow::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &data) {
 		std::unique_lock<std::shared_mutex> module_lock;
 		Module *current_module = inventoryTab->getModule(module_lock);
 		if (current_module != nullptr && (module_id.empty() || current_module->getID() == module_id)) {

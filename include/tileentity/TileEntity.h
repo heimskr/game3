@@ -20,7 +20,7 @@ namespace Game3 {
 	class RemoteClient;
 	class SpriteRenderer;
 
-	class TileEntity: public Agent, public Broadcastable, public std::enable_shared_from_this<TileEntity> {
+	class TileEntity: public Agent, public Broadcastable {
 		public:
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;
@@ -69,6 +69,7 @@ namespace Game3 {
 			inline bool is(const Identifier &check) const { return getID() == check; }
 			std::string getName() override { return "Unknown TileEntity (" + std::string(tileEntityID) + ')'; }
 			virtual Game & getGame() const;
+			std::shared_ptr<TileEntity> getSelf();
 
 			virtual void encode(Game &, Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */

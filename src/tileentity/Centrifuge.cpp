@@ -68,7 +68,7 @@ namespace Game3 {
 		auto &realm = *getRealm();
 
 		if (modifiers.onlyAlt()) {
-			realm.queueDestruction(shared_from_this());
+			realm.queueDestruction(getSelf());
 			player->give(ItemStack(realm.getGame(), "base:item/centrifuge"_id));
 			return true;
 		}
@@ -105,7 +105,7 @@ namespace Game3 {
 	void Centrifuge::broadcast() {
 		assert(getSide() == Side::Server);
 
-		const TileEntityPacket packet(shared_from_this());
+		const TileEntityPacket packet(getSelf());
 
 		auto inventoried_lock = InventoriedTileEntity::observers.uniqueLock();
 

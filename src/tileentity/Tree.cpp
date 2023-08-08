@@ -68,7 +68,7 @@ namespace Game3 {
 		if (auto *active_stack = inventory[active_slot]) {
 			if (active_stack->hasAttribute("base:attribute/axe"_id)) {
 				if (!inventory.add({game, "base:item/wood"_id, 1})) {
-					realm->queueDestruction(shared_from_this());
+					realm->queueDestruction(getSelf());
 					if (active_stack->reduceDurability())
 						inventory.erase(active_slot);
 					ItemCount saplings = 1;

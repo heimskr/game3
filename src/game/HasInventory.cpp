@@ -11,9 +11,9 @@ namespace Game3 {
 			auto server_inventory = std::dynamic_pointer_cast<ServerInventory>(inventory);
 			assert(server_inventory);
 			optional = server_inventory;
-			buffer << inventory->slotCount;
+			buffer << inventory->slotCount.load();
 		} else
-			buffer << static_cast<Slot>(-1);
+			buffer << Slot(-1);
 		buffer << optional;
 	}
 

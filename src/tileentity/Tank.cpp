@@ -26,7 +26,7 @@ namespace Game3 {
 		auto &realm = *getRealm();
 
 		if (modifiers.onlyAlt()) {
-			realm.queueDestruction(shared_from_this());
+			realm.queueDestruction(getSelf());
 			player->give(ItemStack(realm.getGame(), "base:item/tank"_id));
 			return true;
 		}

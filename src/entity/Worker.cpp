@@ -91,7 +91,7 @@ namespace Game3 {
 	}
 
 	void Worker::goToStockpile(Phase new_phase) {
-		keep->teleport(shared_from_this());
+		keep->teleport(getSelf());
 		auto keep_realm = keep->getInnerRealm();
 		auto stockpile = keep_realm->getTileEntity<Chest>();
 		const auto adjacent = keep_realm->getPathableAdjacent(stockpile->position);
@@ -133,7 +133,7 @@ namespace Game3 {
 		auto house = std::dynamic_pointer_cast<Building>(getRealm()->getGame().realms.at(overworldRealm)->tileEntityAt(housePosition));
 		if (!house)
 			throw std::runtime_error("Worker of type " + type.str() + " couldn't find house at " + std::string(housePosition));
-		house->teleport(shared_from_this());
+		house->teleport(getSelf());
 
 		auto realm = getRealm();
 		if (realm->id != houseRealm) {

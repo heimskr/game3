@@ -112,7 +112,7 @@ namespace Game3 {
 
 	void InventoriedTileEntity::addObserver(const std::shared_ptr<Player> &player) {
 		Observable::addObserver(player);
-		player->send(TileEntityPacket(shared_from_this()));
+		player->send(TileEntityPacket(getSelf()));
 		player->send(OpenModuleForAgentPacket(ExternalInventoryModule::ID(), getGID()));
 		player->queueForMove([this, self = shared_from_this()](const std::shared_ptr<Entity> &entity) {
 			removeObserver(std::static_pointer_cast<Player>(entity));
@@ -134,7 +134,7 @@ namespace Game3 {
 		if (forceBroadcast)
 			TileEntity::broadcast();
 		else
-			broadcast(TileEntityPacket(shared_from_this()));
+			broadcast(TileEntityPacket(getSelf()));
 	}
 
 	void InventoriedTileEntity::broadcast(const TileEntityPacket &packet) {

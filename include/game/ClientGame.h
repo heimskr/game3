@@ -36,10 +36,10 @@ namespace Game3 {
 			void interactOn(Modifiers);
 			void interactNextTo(Modifiers);
 
-			void moduleMessageBuffer(const Identifier &module_id, Agent &source, const std::string &name, Buffer &data);
+			void moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &data);
 
 			template <typename... Args>
-			void moduleMessage(const Identifier &module_id, Agent &source, const std::string &name, Args &&...args) {
+			void moduleMessage(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Args &&...args) {
 				Buffer buffer;
 				(void) std::initializer_list<int> {
 					((void) (buffer << std::forward<Args>(args)), 0)...

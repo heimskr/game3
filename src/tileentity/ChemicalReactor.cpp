@@ -41,12 +41,12 @@ namespace Game3 {
 		return energyContainer->capacity;
 	}
 
-	void ChemicalReactor::handleMessage(Agent &source, const std::string &name, Buffer &data) {
+	void ChemicalReactor::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, Buffer &data) {
 		if (name == "SetEquation") {
 			const std::string new_equation = data.take<std::string>();
 			const bool success = setEquation(new_equation);
-			if (success) SUCCESS("Equation set to " << getEquation()); else ERROR("Couldn't set equation to " << new_equation);
-			sendMessage(source, "ModuleMessage", ChemicalReactorModule::ID(), "EquationSet", success);
+			if (source)
+				sendMessage(source, "ModuleMessage", ChemicalReactorModule::ID(), "EquationSet", success);
 		}
 	}
 
@@ -87,7 +87,7 @@ namespace Game3 {
 		auto &realm = *getRealm();
 
 		if (modifiers.onlyAlt()) {
-			realm.queueDestruction(shared_from_this());
+			realm.queueDestruction(getSelf());
 			player->give(ItemStack(realm.getGame(), "base:item/chemical_reactor"_id));
 			return true;
 		}
@@ -137,7 +137,7 @@ namespace Game3 {
 	void ChemicalReactor::broadcast() {
 		assert(getSide() == Side::Server);
 
-		const TileEntityPacket packet(shared_from_this());
+		const TileEntityPacket packet(getSelf());
 		const SetTileEntityEnergyPacket energy_packet = makeEnergyPacket();
 
 		{

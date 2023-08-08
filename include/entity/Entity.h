@@ -46,7 +46,7 @@ namespace Game3 {
 		EntityTexture(Identifier identifier_, Identifier texture_id, uint8_t variety_);
 	};
 
-	class Entity: public Agent, public HasInventory, public HasMutex<SharedRecursiveMutex>, public std::enable_shared_from_this<Entity> {
+	class Entity: public Agent, public HasInventory, public HasMutex<SharedRecursiveMutex> {
 		public:
 			constexpr static Slot DEFAULT_INVENTORY_SIZE = 30;
 			/** The reciprocal of this is how many seconds it takes to move one square. */
@@ -148,6 +148,7 @@ namespace Game3 {
 			inline bool is(const Identifier &check) const { return type == check; }
 			inline auto getHeldLeft()  const { return heldLeft.slot;  }
 			inline auto getHeldRight() const { return heldRight.slot; }
+			std::shared_ptr<Entity> getSelf();
 
 			virtual void encode(Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */

@@ -125,7 +125,7 @@ namespace Game3 {
 		auto &realm = *getRealm();
 
 		if (modifiers.onlyAlt()) {
-			realm.queueDestruction(shared_from_this());
+			realm.queueDestruction(getSelf());
 			player->give(ItemStack(realm.getGame(), "base:item/geothermal_generator"_id));
 			return true;
 		}
@@ -176,7 +176,7 @@ namespace Game3 {
 	void GeothermalGenerator::broadcast() {
 		assert(getSide() == Side::Server);
 
-		const TileEntityPacket packet(shared_from_this());
+		const TileEntityPacket packet(getSelf());
 
 		auto energetic_lock = EnergeticTileEntity::observers.uniqueLock();
 

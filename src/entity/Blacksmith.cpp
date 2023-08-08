@@ -233,7 +233,7 @@ namespace Game3 {
 		auto house = std::dynamic_pointer_cast<Building>(getRealm()->tileEntityAt(housePosition));
 		if (!house)
 			throw std::runtime_error("Blacksmith couldn't find house");
-		house->teleport(shared_from_this());
+		house->teleport(getSelf());
 
 		auto realm = getRealm();
 		if (realm->id != houseRealm) {

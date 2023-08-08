@@ -1,17 +1,24 @@
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
+#include "game/ClientInventory.h"
 #include "net/Buffer.h"
 #include "tileentity/ChemicalReactor.h"
 #include "ui/gtk/UITypes.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/ChemicalReactorModule.h"
+#include "ui/module/ExternalInventoryModule.h"
 #include "ui/tab/InventoryTab.h"
 #include "ui/MainWindow.h"
 
 namespace Game3 {
 	ChemicalReactorModule::ChemicalReactorModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
+		ChemicalReactorModule(game_, std::dynamic_pointer_cast<ChemicalReactor>(std::any_cast<AgentPtr>(argument))) {}
+
+	ChemicalReactorModule::ChemicalReactorModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<ChemicalReactor> reactor_):
 	game(std::move(game_)),
-	reactor(std::dynamic_pointer_cast<ChemicalReactor>(std::any_cast<AgentPtr>(argument))) {
+	reactor(std::move(reactor_)),
+	inventoryModule(std::make_unique<ExternalInventoryModule>(game, std::static_pointer_cast<ClientInventory>(reactor->inventory))) {
+		assert(reactor);
 		vbox.set_hexpand();
 
 		header.set_text(reactor->getName());
@@ -24,7 +31,7 @@ namespace Game3 {
 
 		entry.signal_activate().connect([this] {
 			if (reactor)
-				game->player->sendMessage(*reactor, "SetEquation", entry.get_text().raw());
+				game->player->sendMessage(reactor, "SetEquation", entry.get_text().raw());
 		});
 
 		entry.signal_changed().connect([this] {
@@ -33,17 +40,26 @@ namespace Game3 {
 		});
 
 		vbox.append(entry);
+		vbox.append(inventoryModule->getWidget());
 	}
 
 	Gtk::Widget & ChemicalReactorModule::getWidget() {
 		return vbox;
 	}
 
-	void ChemicalReactorModule::reset() {}
+	void ChemicalReactorModule::reset() {
+		inventoryModule->reset();
+	}
 
-	void ChemicalReactorModule::update() {}
+	void ChemicalReactorModule::update() {
+		inventoryModule->update();
+	}
 
-	void ChemicalReactorModule::handleMessage(Agent &source, const std::string &name, Buffer &data) {
+	void ChemicalReactorModule::onResize(int width) {
+		inventoryModule->onResize(width);
+	}
+
+	std::optional<Buffer> ChemicalReactorModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, Buffer &data) {
 		if (name == "EquationSet") {
 			const bool success = data.take<bool>();
 			if (success) {
@@ -54,10 +70,17 @@ namespace Game3 {
 				entry.add_css_class("equation_error");
 			}
 		} else if (name == "TileEntityRemoved") {
-			if (source.getGID() == reactor->getGID()) {
+			if (source && source->getGID() == reactor->getGID()) {
+				inventoryModule->handleMessage(source, name, data);
 				MainWindow &window = game->getWindow();
 				window.queue([&window] { window.removeModule(); });
 			}
+		} else if (name == "GetAgentGID") {
+			return Buffer{reactor->getGID()};
+		} else {
+			return inventoryModule->handleMessage(source, name, data);
 		}
+
+		return {};
 	}
 }

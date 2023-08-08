@@ -169,7 +169,7 @@ namespace Game3 {
 		client->send(InteractPacket(false, modifiers));
 	}
 
-	void ClientGame::moduleMessageBuffer(const Identifier &module_id, Agent &source, const std::string &name, Buffer &data) {
+	void ClientGame::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &data) {
 		getWindow().moduleMessageBuffer(module_id, source, name, data);
 	}
 }

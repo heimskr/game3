@@ -41,7 +41,7 @@ namespace Game3 {
 
 	void Entity::destroy() {
 		auto realm = getRealm();
-		auto shared = shared_from_this();
+		auto shared = getSelf();
 		realm->removeSafe(shared);
 
 		{
@@ -158,7 +158,7 @@ namespace Game3 {
 	}
 
 	void Entity::remove() {
-		getRealm()->queueDestruction(shared_from_this());
+		getRealm()->queueDestruction(getSelf());
 	}
 
 	void Entity::init(Game &game_) {
@@ -443,7 +443,7 @@ namespace Game3 {
 		if (is_server)
 			increaseUpdateCounter();
 
-		auto shared = shared_from_this();
+		auto shared = getSelf();
 		getRealm()->onMoved(shared, new_position);
 
 		if (in_different_chunk)
@@ -467,7 +467,7 @@ namespace Game3 {
 
 		if (old_realm != new_realm) {
 			nextRealm = new_realm->id;
-			auto shared = shared_from_this();
+			auto shared = getSelf();
 			if (old_realm) {
 				old_realm->detach(shared);
 				old_realm->queueRemoval(shared);
@@ -475,7 +475,7 @@ namespace Game3 {
 
 			clearOffset();
 			setRealm(new_realm);
-			new_realm->queueAddition(shared_from_this(), new_position);
+			new_realm->queueAddition(getSelf(), new_position);
 		} else {
 			teleport(new_position, false);
 		}
@@ -544,7 +544,7 @@ namespace Game3 {
 
 		if (out == PathResult::Success && getSide() == Side::Server) {
 			increaseUpdateCounter();
-			auto shared = shared_from_this();
+			auto shared = getSelf();
 			const EntitySetPathPacket packet(*this);
 			auto lock = visiblePlayers.sharedLock();
 			// INFO("visiblePlayers<" << visiblePlayers.size() << ">");
@@ -634,7 +634,7 @@ namespace Game3 {
 		if (getSide() != Side::Server)
 			return;
 
-		auto shared = shared_from_this();
+		auto shared = getSelf();
 
 		if (auto realm = weakRealm.lock()) {
 			if (old_chunk_position) {
@@ -724,7 +724,7 @@ namespace Game3 {
 			auto shared_lock = visiblePlayers.sharedLock();
 
 			if (!visiblePlayers.empty()) {
-				auto shared = shared_from_this();
+				auto shared = getSelf();
 				const EntitySetPathPacket packet(*this);
 				for (const auto &weak_player: visiblePlayers) {
 					if (auto player = weak_player.lock(); player && !hasSeenPath(player)) {
@@ -827,7 +827,7 @@ namespace Game3 {
 
 	void Entity::sendTo(RemoteClient &client, UpdateCounter threshold) {
 		if (threshold == 0 || getUpdateCounter() < threshold) {
-			client.send(EntityPacket(shared_from_this()));
+			client.send(EntityPacket(getSelf()));
 			onSend(client.getPlayer());
 		}
 	}
@@ -905,6 +905,10 @@ namespace Game3 {
 		offset.x = 0.f;
 		offset.y = 0.f;
 		offset.z = 0.f;
+	}
+
+	std::shared_ptr<Entity> Entity::getSelf() {
+		return std::static_pointer_cast<Entity>(shared_from_this());
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {

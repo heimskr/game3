@@ -16,7 +16,7 @@ namespace Game3 {
 		AgentMeta(UpdateCounter counter): updateCounter(counter) {}
 	};
 
-	class Agent: public HasPlace {
+	class Agent: public HasPlace, public std::enable_shared_from_this<Agent> {
 		public:
 			enum class Type {Entity, TileEntity};
 
@@ -31,15 +31,15 @@ namespace Game3 {
 			virtual Type getAgentType() const = 0;
 			virtual std::string getName() = 0;
 
-			virtual void handleMessage(Agent &source, const std::string &name, Buffer &data);
-			virtual void sendBuffer(Agent &destination, const std::string &name, Buffer &data);
+			virtual void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, Buffer &data);
+			virtual void sendBuffer(const std::shared_ptr<Agent> &destination, const std::string &name, Buffer &data);
 
 			template <typename... Args>
-			void sendMessage(Agent &destination, const std::string &name, Args &&...args) {
-				Buffer buffer;
-				(void) std::initializer_list<int> {
-					((void) (buffer << std::forward<Args>(args)), 0)...
-				};
+			void sendMessage(const std::shared_ptr<Agent> &destination, const std::string &name, Args &&...args) {
+				Buffer buffer{std::forward<Args>(args)...};
+				// (void) std::initializer_list<int> {
+				// 	((void) (buffer << std::forward<Args>(args)), 0)...
+				// };
 				sendBuffer(destination, name, buffer);
 			}
 

@@ -60,7 +60,7 @@ namespace Game3 {
 		return main_layers;
 	}
 
-	void ClientPlayer::handleMessage(Agent &source, const std::string &name, Buffer &data) {
+	void ClientPlayer::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, Buffer &data) {
 		if (name == "ModuleMessage") {
 			const auto module_name = data.take<Identifier>();
 			const auto message_name = data.take<std::string>();
@@ -68,7 +68,8 @@ namespace Game3 {
 		}
 	}
 
-	void ClientPlayer::sendBuffer(Agent &destination, const std::string &name, Buffer &data) {
-		getGame().toClient().client->send(AgentMessagePacket(destination.getGID(), name, data));
+	void ClientPlayer::sendBuffer(const std::shared_ptr<Agent> &destination, const std::string &name, Buffer &data) {
+		assert(destination);
+		getGame().toClient().client->send(AgentMessagePacket(destination->getGID(), name, data));
 	}
 }

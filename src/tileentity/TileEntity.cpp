@@ -13,7 +13,7 @@ namespace Game3 {
 	void TileEntity::destroy() {
 		auto realm = getRealm();
 		assert(realm);
-		realm->removeSafe(shared_from_this());
+		realm->removeSafe(getSelf());
 
 		if (getSide() == Side::Server)
 			realm->getGame().toServer().tileEntityDestroyed(*this);
@@ -71,13 +71,13 @@ namespace Game3 {
 	void TileEntity::onSpawn() {
 		Game &game = getRealm()->getGame();
 		if (game.getSide() == Side::Server)
-			game.toServer().tileEntitySpawned(shared_from_this());
+			game.toServer().tileEntitySpawned(getSelf());
 	}
 
 	void TileEntity::onRemove() {
 		Game &game = getRealm()->getGame();
 		if (game.getSide() == Side::Client)
-			game.toClient().moduleMessage({}, *this, "TileEntityRemoved");
+			game.toClient().moduleMessage({}, shared_from_this(), "TileEntityRemoved");
 	}
 
 	void TileEntity::setRealm(const std::shared_ptr<Realm> &realm) {
@@ -118,6 +118,10 @@ namespace Game3 {
 		throw std::runtime_error("Couldn't get Game from TileEntity: couldn't lock Realm");
 	}
 
+	std::shared_ptr<TileEntity> TileEntity::getSelf() {
+		return std::static_pointer_cast<TileEntity>(shared_from_this());
+	}
+
 	void TileEntity::encode(Game &, Buffer &buffer) {
 		buffer << tileID;
 		buffer << position;
@@ -138,7 +142,7 @@ namespace Game3 {
 
 	void TileEntity::sendTo(RemoteClient &client, UpdateCounter threshold) {
 		if (threshold == 0 || getUpdateCounter() < threshold) {
-			client.send(TileEntityPacket(shared_from_this()));
+			client.send(TileEntityPacket(getSelf()));
 			onSend(client.getPlayer());
 		}
 	}
@@ -147,7 +151,7 @@ namespace Game3 {
 		assert(getSide() == Side::Server);
 
 		auto realm = getRealm();
-		TileEntityPacket packet(shared_from_this());
+		TileEntityPacket packet(getSelf());
 
 		ChunkRange(getChunk()).iterate([&](ChunkPosition chunk_position) {
 			if (auto entities = realm->getEntities(chunk_position)) {

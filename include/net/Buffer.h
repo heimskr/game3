@@ -168,9 +168,17 @@ namespace Game3 {
 			Buffer(std::weak_ptr<BufferContext> context_):
 				context(std::move(context_)) {}
 
+			template <typename... Args>
+			Buffer(Args &&...args) {
+				(void) std::initializer_list<int> {
+					((void) (*this << std::forward<Args>(args)), 0)...
+				};
+			}
+
 			inline auto size() const { return bytes.size() - skip; }
 			inline bool empty() const { return bytes.size() == skip; }
 			inline void clear() { bytes.clear(); skip = 0; }
+			inline void reserve(size_t to_reserve) { bytes.reserve(to_reserve); }
 			inline auto & getBytes() { return bytes; }
 			inline const auto & getBytes() const { return bytes; }
 

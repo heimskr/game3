@@ -88,7 +88,7 @@ namespace Game3 {
 		auto realm = getRealm();
 		if (auto leftover = inventory.add(material))
 			leftover->spawn(realm, position);
-		realm->remove(shared_from_this());
+		realm->remove(getSelf());
 		return true;
 	}
 

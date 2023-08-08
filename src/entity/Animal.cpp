@@ -40,9 +40,9 @@ namespace Game3 {
 		}
 		{
 			auto lock = player->visibleEntities.sharedLock();
-			INFO("  Visible to player? " << std::boolalpha << player->visibleEntities.contains(shared_from_this()));
+			INFO("  Visible to player? " << std::boolalpha << player->visibleEntities.contains(getSelf()));
 		}
-		if (auto ptr = realm->getEntities(getChunk()); ptr && ptr->contains(shared_from_this()))
+		if (auto ptr = realm->getEntities(getChunk()); ptr && ptr->contains(getSelf()))
 			SUCCESS("  In chunk.");
 		else
 			ERROR("  Not in chunk.");
