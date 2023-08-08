@@ -50,7 +50,7 @@ namespace Game3 {
 		player->send(TileEntityPacket(shared_from_this()));
 		// TODO!
 		// player->send(OpenEnergyLevelPacket(getGID()));
-		player->queueForMove([this](const std::shared_ptr<Entity> &entity) {
+		player->queueForMove([this, self = shared_from_this()](const std::shared_ptr<Entity> &entity) {
 			removeObserver(std::static_pointer_cast<Player>(entity));
 			return true;
 		});

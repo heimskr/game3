@@ -88,7 +88,7 @@ namespace Game3 {
 
 		if (modifiers.onlyAlt()) {
 			realm.queueDestruction(shared_from_this());
-			player->give(ItemStack(realm.getGame(), "base:item/geothermal_generator"_id));
+			player->give(ItemStack(realm.getGame(), "base:item/chemical_reactor"_id));
 			return true;
 		}
 

@@ -114,7 +114,7 @@ namespace Game3 {
 		Observable::addObserver(player);
 		player->send(TileEntityPacket(shared_from_this()));
 		player->send(OpenModuleForAgentPacket(ExternalInventoryModule::ID(), getGID()));
-		player->queueForMove([this](const std::shared_ptr<Entity> &entity) {
+		player->queueForMove([this, self = shared_from_this()](const std::shared_ptr<Entity> &entity) {
 			removeObserver(std::static_pointer_cast<Player>(entity));
 			return true;
 		});
