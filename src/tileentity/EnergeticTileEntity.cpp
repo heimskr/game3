@@ -1,7 +1,7 @@
 #include "game/ClientGame.h"
 #include "game/EnergyContainer.h"
 // #include "packet/OpenEnergyLevelPacket.h"
-#include "packet/TileEntityPacket.h"
+#include "packet/SetTileEntityEnergyPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/EnergeticTileEntity.h"
 
@@ -91,10 +91,20 @@ namespace Game3 {
 		if (forceBroadcast)
 			TileEntity::broadcast();
 		else
-			broadcast(TileEntityPacket(shared_from_this()));
+			broadcast(makeEnergyPacket());
 	}
 
-	void EnergeticTileEntity::broadcast(const TileEntityPacket &packet) {
+	SetTileEntityEnergyPacket EnergeticTileEntity::makeEnergyPacket() const {
+		const GlobalID gid = getGID();
+		EnergyAmount energy{};
+		{
+			auto lock = energyContainer->sharedLock();
+			energy = energyContainer->energy;
+		}
+		return {gid, energy};
+	}
+
+	void EnergeticTileEntity::broadcast(const SetTileEntityEnergyPacket &packet) {
 		assert(getSide() == Side::Server);
 		auto lock = observers.uniqueLock();
 

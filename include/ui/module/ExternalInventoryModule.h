@@ -26,12 +26,12 @@ namespace Game3 {
 			void onResize(int) final;
 
 			inline auto getInventory() const { return inventory; }
+			void setInventory(std::shared_ptr<ClientInventory>);
 
 		private:
 			std::shared_ptr<ClientGame> game;
 			Glib::RefPtr<Gio::Menu> gmenu;
 			Glib::ustring name;
-			std::weak_ptr<Agent> agent;
 			std::unordered_map<Gtk::Widget *, Slot> widgetMap;
 			std::unordered_map<Slot, Gtk::Widget *> widgetsBySlot;
 			std::shared_ptr<ClientInventory> inventory;

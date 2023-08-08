@@ -2,14 +2,13 @@
 
 #include "game/HasEnergy.h"
 #include "game/Observable.h"
+#include "packet/SetTileEntityEnergyPacket.h"
 #include "tileentity/TileEntity.h"
 
 #include <functional>
 #include <optional>
 
 namespace Game3 {
-	class TileEntityPacket;
-
 	/**
 	 * This class inherits TileEntity *virtually*. It doesn't call any TileEntity methods itself.
 	 * Deriving classes must remember to do so in the encode and decode methods.
@@ -33,8 +32,10 @@ namespace Game3 {
 			void decode(Game &, Buffer &) override;
 			void broadcast() override;
 
+			SetTileEntityEnergyPacket makeEnergyPacket() const;
+
 		protected:
-			void broadcast(const TileEntityPacket &);
+			void broadcast(const SetTileEntityEnergyPacket &);
 			using HasEnergy::addEnergy;
 			using HasEnergy::getEnergy;
 	};

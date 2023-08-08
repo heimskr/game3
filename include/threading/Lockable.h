@@ -51,6 +51,8 @@ namespace Game3 {
 
 		inline auto uniqueLock() { return std::unique_lock(mutex); }
 		inline auto sharedLock() { return std::shared_lock(mutex); }
+		inline auto tryUniqueLock() { return std::unique_lock(mutex, std::try_to_lock); }
+		inline auto trySharedLock() { return std::shared_lock(mutex, std::try_to_lock); }
 
 		inline T & getBase() { return static_cast<T &>(*this); }
 		inline const T & getBase() const { return static_cast<const T &>(*this); }

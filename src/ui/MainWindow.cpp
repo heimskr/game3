@@ -316,7 +316,9 @@ namespace Game3 {
 		canvas->game = game;
 		for (auto &[widget, tab]: tabMap)
 			tab->reset(game);
-		game->signal_player_inventory_update().connect([this](const PlayerPtr &) {
+		game->signal_player_inventory_update().connect([this](const PlayerPtr &player) {
+			if (player != game->player)
+				return;
 			inventoryTab->update(game);
 			if (isFocused(merchantTab))
 				merchantTab->update(game);
@@ -325,8 +327,14 @@ namespace Game3 {
 		game->signal_other_inventory_update().connect([this](const std::shared_ptr<Agent> &owner) {
 			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner); has_inventory && has_inventory->inventory) {
 				auto client_inventory = has_inventory->inventory->cast<ClientInventory>();
-				if (owner->getGID() == getExternalGID())
-					showExternalInventory(client_inventory);
+				if (owner->getGID() == getExternalGID()) {
+					auto lock = std::make_shared<std::unique_lock<std::shared_mutex>>();
+					if (auto *module_ = dynamic_cast<ExternalInventoryModule *>(inventoryTab->getModule(*lock))) {
+						queue([module_, lock, client_inventory] {
+							 module_->setInventory(client_inventory);
+						});
+					}
+				}
 
 				// TODO: fix merchant tab
 				if (client_inventory == merchantTab->getMerchantInventory())
@@ -387,7 +395,7 @@ namespace Game3 {
 	void MainWindow::queue(std::function<void()> fn) {
 		{
 			auto lock = std::unique_lock(functionQueueMutex);
-			functionQueue.push_back(fn);
+			functionQueue.push_back(std::move(fn));
 		}
 		functionQueueDispatcher.emit();
 	}

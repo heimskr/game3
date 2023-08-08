@@ -115,7 +115,7 @@ namespace Game3 {
 			if (game->player->inventory)
 				populate(grid, static_cast<ClientInventory &>(*game->player->inventory));
 
-			auto lock = currentModule.sharedLock();
+			auto lock = currentModule.trySharedLock();
 			if (currentModule)
 				currentModule->update();
 		});

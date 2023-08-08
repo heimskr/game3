@@ -4,6 +4,7 @@
 #include "game/ServerInventory.h"
 #include "item/ChemicalItem.h"
 #include "packet/OpenModuleForAgentPacket.h"
+#include "packet/SetTileEntityEnergyPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/ChemicalReactor.h"
 #include "ui/module/ChemicalReactorModule.h"
@@ -137,24 +138,25 @@ namespace Game3 {
 		assert(getSide() == Side::Server);
 
 		const TileEntityPacket packet(shared_from_this());
+		const SetTileEntityEnergyPacket energy_packet = makeEnergyPacket();
 
-		auto energetic_lock = EnergeticTileEntity::observers.uniqueLock();
+		{
+			auto energetic_lock = EnergeticTileEntity::observers.uniqueLock();
+			std::erase_if(EnergeticTileEntity::observers, [&](const std::weak_ptr<Player> &weak_player) {
+				if (auto player = weak_player.lock()) {
+					player->send(energy_packet);
+					return false;
+				}
 
-		std::erase_if(EnergeticTileEntity::observers, [&](const std::weak_ptr<Player> &weak_player) {
-			if (auto player = weak_player.lock()) {
-				player->send(packet);
-				return false;
-			}
-
-			return true;
-		});
+				return true;
+			});
+		}
 
 		auto inventoried_lock = InventoriedTileEntity::observers.uniqueLock();
 
 		std::erase_if(InventoriedTileEntity::observers, [&](const std::weak_ptr<Player> &weak_player) {
 			if (auto player = weak_player.lock()) {
-				if (!EnergeticTileEntity::observers.contains(player))
-					player->send(packet);
+				player->send(packet);
 				return false;
 			}
 

@@ -1,6 +1,5 @@
 #include "Log.h"
 #include "entity/ClientPlayer.h"
-#include "error/PlayerMissingError.h"
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
 #include "packet/OpenModuleForAgentPacket.h"

@@ -96,6 +96,11 @@ namespace Game3 {
 		update();
 	}
 
+	void ExternalInventoryModule::setInventory(std::shared_ptr<ClientInventory> new_inventory) {
+		inventory = std::move(new_inventory);
+		update();
+	}
+
 	int ExternalInventoryModule::gridWidth() const {
 		return tabWidth / (InventoryTab::TILE_SIZE + 2 * InventoryTab::TILE_MARGIN);
 	}

@@ -264,6 +264,11 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `string` Message Name
 	- `...` Message Data
 
+44. **Set Tile Entity Energy**: tells a client that a tile entity's stored energy has changed.
+
+	- `u64` Global ID
+	- `u64` Energy Amount
+
 # Message Format
 
 All values are little endian.
