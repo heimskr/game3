@@ -31,7 +31,7 @@ namespace Game3 {
 			return true;
 		}
 
-		FluidHoldingTileEntity::addObserver(player);
+		FluidHoldingTileEntity::addObserver(player, false);
 
 		assert(fluidContainer);
 		auto lock = fluidContainer->levels.sharedLock();

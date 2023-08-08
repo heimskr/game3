@@ -12,7 +12,7 @@ namespace Game3 {
 	 *  which might want to send inventory updates only to the players currently viewing its inventory. */
 	class Observable {
 		public:
-			virtual void addObserver(const std::shared_ptr<Player> &);
+			virtual void addObserver(const std::shared_ptr<Player> &, bool silent);
 			virtual void removeObserver(const std::shared_ptr<Player> &);
 
 		protected:

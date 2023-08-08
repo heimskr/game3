@@ -26,7 +26,7 @@ namespace Game3 {
 	}
 
 	bool Chest::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
-		addObserver(player);
+		addObserver(player, false);
 		return true;
 	}
 

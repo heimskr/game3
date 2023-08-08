@@ -74,9 +74,9 @@ namespace Game3 {
 		}
 
 		if (modifiers.onlyCtrl())
-			FluidHoldingTileEntity::addObserver(player);
+			FluidHoldingTileEntity::addObserver(player, false);
 		else
-			InventoriedTileEntity::addObserver(player);
+			InventoriedTileEntity::addObserver(player, false);
 
 		auto lock = fluidContainer->levels.sharedLock();
 		for (const auto &[id, amount]: fluidContainer->levels)

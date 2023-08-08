@@ -131,11 +131,11 @@ namespace Game3 {
 		}
 
 		if (modifiers.onlyCtrl())
-			FluidHoldingTileEntity::addObserver(player);
+			FluidHoldingTileEntity::addObserver(player, false);
 		else if (modifiers.ctrl && modifiers.shift)
-			EnergeticTileEntity::addObserver(player);
+			EnergeticTileEntity::addObserver(player, false);
 		else
-			InventoriedTileEntity::addObserver(player);
+			InventoriedTileEntity::addObserver(player, false);
 
 		{
 			assert(fluidContainer);

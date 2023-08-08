@@ -78,10 +78,14 @@ namespace Game3 {
 		}
 	}
 
-	void FluidHoldingTileEntity::addObserver(const std::shared_ptr<Player> &player) {
-		Observable::addObserver(player);
+	void FluidHoldingTileEntity::addObserver(const std::shared_ptr<Player> &player, bool silent) {
+		Observable::addObserver(player, silent);
+
 		player->send(TileEntityPacket(getSelf()));
-		player->send(OpenModuleForAgentPacket(FluidLevelsModule::ID(), getGID(), true));
+
+		if (!silent)
+			player->send(OpenModuleForAgentPacket(FluidLevelsModule::ID(), getGID(), true));
+
 		player->queueForMove([this, self = shared_from_this()](const std::shared_ptr<Entity> &entity) {
 			removeObserver(std::static_pointer_cast<Player>(entity));
 			return true;

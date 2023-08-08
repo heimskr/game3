@@ -96,12 +96,14 @@ namespace Game3 {
 			return true;
 		}
 
-		if (modifiers.onlyShift())
+		if (modifiers.onlyShift()) {
 			player->send(OpenModuleForAgentPacket(ChemicalReactorModule::ID(), getGID()));
-		else if (modifiers.shift && modifiers.ctrl)
-			EnergeticTileEntity::addObserver(player);
+			InventoriedTileEntity::addObserver(player, true);
+			// TODO: formula observation
+		} else if (modifiers.shift && modifiers.ctrl)
+			EnergeticTileEntity::addObserver(player, false);
 		else
-			InventoriedTileEntity::addObserver(player);
+			InventoriedTileEntity::addObserver(player, false);
 
 		std::shared_lock lock{energyContainer->mutex};
 		INFO("Energy: " << energyContainer->energy);

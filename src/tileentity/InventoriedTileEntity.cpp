@@ -110,11 +110,15 @@ namespace Game3 {
 		return shared_from_this();
 	}
 
-	void InventoriedTileEntity::addObserver(const std::shared_ptr<Player> &player) {
-		Observable::addObserver(player);
+	void InventoriedTileEntity::addObserver(const std::shared_ptr<Player> &player, bool silent) {
+		Observable::addObserver(player, silent);
+
 		player->send(TileEntityPacket(getSelf()));
-		player->send(OpenModuleForAgentPacket(ExternalInventoryModule::ID(), getGID()));
-		player->queueForMove([this, self = shared_from_this()](const std::shared_ptr<Entity> &entity) {
+
+		if (!silent)
+			player->send(OpenModuleForAgentPacket(ExternalInventoryModule::ID(), getGID()));
+
+		player->queueForMove([this, self = shared_from_this()](const EntityPtr &entity) {
 			removeObserver(std::static_pointer_cast<Player>(entity));
 			return true;
 		});

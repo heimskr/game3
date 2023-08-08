@@ -1,7 +1,7 @@
 #include "game/Observable.h"
 
 namespace Game3 {
-	void Observable::addObserver(const std::shared_ptr<Player> &player) {
+	void Observable::addObserver(const std::shared_ptr<Player> &player, bool) {
 		auto lock = observers.uniqueLock();
 		observers.emplace(player);
 	}

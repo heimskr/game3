@@ -116,9 +116,9 @@ namespace Game3 {
 		}
 
 		if (modifiers.shift && modifiers.ctrl)
-			EnergeticTileEntity::addObserver(player);
+			EnergeticTileEntity::addObserver(player, false);
 		else
-			FluidHoldingTileEntity::addObserver(player);
+			FluidHoldingTileEntity::addObserver(player, false);
 
 		{
 			auto lock = energyContainer->sharedLock();

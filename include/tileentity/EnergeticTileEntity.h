@@ -24,7 +24,7 @@ namespace Game3 {
 			virtual EnergyAmount extractEnergy(Direction, bool remove);
 
 			void energyUpdated() override;
-			void addObserver(const std::shared_ptr<Player> &) override;
+			void addObserver(const std::shared_ptr<Player> &, bool silent) override;
 
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;

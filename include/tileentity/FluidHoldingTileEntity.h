@@ -30,7 +30,7 @@ namespace Game3 {
 			void setFluidLevels(FluidContainer::Map);
 
 			void fluidsUpdated() override;
-			void addObserver(const std::shared_ptr<Player> &) override;
+			void addObserver(const std::shared_ptr<Player> &, bool silent) override;
 
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;

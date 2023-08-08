@@ -42,7 +42,7 @@ namespace Game3 {
 			void inventoryUpdated() override;
 			std::shared_ptr<Agent> getSharedAgent() final;
 
-			void addObserver(const std::shared_ptr<Player> &) override;
+			void addObserver(const std::shared_ptr<Player> &, bool silent) override;
 
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			void encode(Game &, Buffer &) override;

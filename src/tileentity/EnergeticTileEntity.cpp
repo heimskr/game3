@@ -45,11 +45,14 @@ namespace Game3 {
 		}
 	}
 
-	void EnergeticTileEntity::addObserver(const std::shared_ptr<Player> &player) {
-		Observable::addObserver(player);
+	void EnergeticTileEntity::addObserver(const std::shared_ptr<Player> &player, bool silent) {
+		Observable::addObserver(player, silent);
+
 		player->send(TileEntityPacket(getSelf()));
+
 		// TODO!
 		// player->send(OpenEnergyLevelPacket(getGID()));
+
 		player->queueForMove([this, self = shared_from_this()](const std::shared_ptr<Entity> &entity) {
 			removeObserver(std::static_pointer_cast<Player>(entity));
 			return true;
