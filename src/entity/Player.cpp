@@ -15,6 +15,7 @@
 #include "packet/EntityRequestPacket.h"
 #include "packet/EntitySetPathPacket.h"
 #include "packet/RealmNoticePacket.h"
+#include "packet/SetPlayerStationTypesPacket.h"
 #include "packet/StartPlayerMovementPacket.h"
 #include "packet/StopPlayerMovementPacket.h"
 #include "packet/TileEntityRequestPacket.h"
@@ -413,6 +414,27 @@ namespace Game3 {
 		}
 
 		return false;
+	}
+
+	void Player::addStationType(Identifier station_type) {
+		{
+			auto lock = stationTypes.uniqueLock();
+			if (stationTypes.contains(station_type))
+				return;
+			stationTypes.insert(std::move(station_type));
+		}
+		send(SetPlayerStationTypesPacket(stationTypes));
+	}
+
+	void Player::removeStationType(const Identifier &station_type) {
+		{
+			auto lock = stationTypes.uniqueLock();
+			if (auto iter = stationTypes.find(station_type); iter != stationTypes.end())
+				stationTypes.erase(station_type);
+			else
+				return;
+		}
+		send(SetPlayerStationTypesPacket(stationTypes));
 	}
 
 	PlayerPtr Player::getShared() {

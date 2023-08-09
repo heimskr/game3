@@ -149,6 +149,7 @@ namespace Game3 {
 			inline auto getHeldLeft()  const { return heldLeft.slot;  }
 			inline auto getHeldRight() const { return heldRight.slot; }
 			std::shared_ptr<Entity> getSelf();
+			void clearQueues();
 
 			virtual void encode(Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */

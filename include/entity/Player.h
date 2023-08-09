@@ -23,7 +23,7 @@ namespace Game3 {
 			Token token = -1;
 			std::string displayName;
 			float tooldown = 0.f;
-			std::unordered_set<Identifier> stationTypes {{}};
+			Lockable<std::unordered_set<Identifier>> stationTypes{{}};
 			float speed = 10.f;
 			bool movingUp = false;
 			bool movingRight = false;
@@ -67,6 +67,8 @@ namespace Game3 {
 			void stopMoving(Direction);
 			void movedToNewChunk(const std::optional<ChunkPosition> &) override;
 			bool send(const Packet &);
+			void addStationType(Identifier);
+			void removeStationType(const Identifier &);
 			std::shared_ptr<Player> getShared();
 			std::shared_ptr<ClientPlayer> toClient();
 			std::shared_ptr<ServerPlayer> toServer();

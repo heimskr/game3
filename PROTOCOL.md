@@ -269,6 +269,10 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u64` Global ID
 	- `u64` Energy Amount
 
+45. **Set Player Station Types**: tells a client what their available crafting station types are.
+
+	- `list<string>` Identifiers
+
 # Message Format
 
 All values are little endian.

@@ -99,6 +99,7 @@
 #include "packet/MoveSlotsPacket.h"
 #include "packet/AgentMessagePacket.h"
 #include "packet/SetTileEntityEnergyPacket.h"
+#include "packet/SetPlayerStationTypesPacket.h"
 #include "realm/Cave.h"
 #include "realm/House.h"
 #include "realm/Keep.h"
@@ -427,6 +428,7 @@ namespace Game3 {
 		add(PacketFactory::create<MoveSlotsPacket>());
 		add(PacketFactory::create<AgentMessagePacket>());
 		add(PacketFactory::create<SetTileEntityEnergyPacket>());
+		add(PacketFactory::create<SetPlayerStationTypesPacket>());
 	}
 
 	void Game::addLocalCommandFactories() {

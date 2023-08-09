@@ -6,8 +6,6 @@
 
 namespace Game3 {
 	void SetTileEntityEnergyPacket::handle(ClientGame &game) {
-		INFO("Hello!");
-
 		AgentPtr agent = game.getAgent(agentGID);
 		if (!agent) {
 			ERROR("Couldn't find agent " << agentGID << " in SetTileEntityEnergyPacket handler");

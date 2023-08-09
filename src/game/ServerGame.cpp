@@ -62,6 +62,7 @@ namespace Game3 {
 			if (auto player = weak_player.lock()) {
 				remove(player);
 				player->toServer()->weakClient.reset();
+				player->clearQueues();
 				if (auto count = player.use_count(); count != 1)
 					WARN("Player " << player.get() << " ref count: " << count << " (should be 1)");
 

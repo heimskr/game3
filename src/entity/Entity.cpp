@@ -40,6 +40,7 @@ namespace Game3 {
 	}
 
 	void Entity::destroy() {
+		clearQueues();
 		auto realm = getRealm();
 		auto shared = getSelf();
 		realm->removeSafe(shared);
@@ -157,6 +158,7 @@ namespace Game3 {
 	}
 
 	void Entity::remove() {
+		clearQueues();
 		getRealm()->queueDestruction(getSelf());
 	}
 
@@ -908,6 +910,11 @@ namespace Game3 {
 
 	std::shared_ptr<Entity> Entity::getSelf() {
 		return std::static_pointer_cast<Entity>(shared_from_this());
+	}
+
+	void Entity::clearQueues() {
+		auto lock = moveQueue.uniqueLock();
+		moveQueue.clear();
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {

@@ -21,7 +21,6 @@ namespace Game3 {
 	}
 
 	bool CraftingStation::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
-		player->stationTypes.insert(stationType);
 
 		if (player->getSide() == Side::Client) {
 			auto &game = getRealm()->getGame().toClient();
@@ -29,14 +28,14 @@ namespace Game3 {
 			tab.reset(game.toClientPointer());
 			tab.show();
 			player->queueForMove([&game, player, station_type = stationType, &tab](const auto &) {
-				player->stationTypes.erase(station_type);
 				tab.reset(game.toClientPointer());
 				game.getWindow().inventoryTab->show();
 				return true;
 			});
 		} else {
+			player->addStationType(stationType);
 			player->queueForMove([player, station_type = stationType](const auto &) {
-				player->stationTypes.erase(station_type);
+				player->removeStationType(station_type);
 				return true;
 			});
 		}
