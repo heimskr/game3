@@ -305,6 +305,7 @@
 			"base:tile/bed2":                    353,
 			"base:tile/bed3":                    354,
 			"base:tile/bookshelf":               355,
+			"base:tile/chest":                   366,
 			"base:tile/plant1":                  388,
 			"base:tile/plant2":                  389,
 			"base:tile/plant3":                  390,

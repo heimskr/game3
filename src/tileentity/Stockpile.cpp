@@ -10,8 +10,8 @@
 #include "ui/MainWindow.h"
 
 namespace Game3 {
-	Stockpile::Stockpile(Identifier tilename, Position position_, std::shared_ptr<Texture> texture_):
-	Chest(std::move(tilename), std::move(position_), "Stockpile", std::move(texture_)) {
+	Stockpile::Stockpile(Identifier tilename, const Position &position_):
+	Chest(std::move(tilename), position_, "Stockpile") {
 		tileEntityID = ID();
 	}
 
