@@ -423,7 +423,7 @@ namespace Game3 {
 				return;
 			stationTypes.insert(std::move(station_type));
 		}
-		send(SetPlayerStationTypesPacket(stationTypes));
+		send(SetPlayerStationTypesPacket(stationTypes, true));
 	}
 
 	void Player::removeStationType(const Identifier &station_type) {
@@ -434,7 +434,7 @@ namespace Game3 {
 			else
 				return;
 		}
-		send(SetPlayerStationTypesPacket(stationTypes));
+		send(SetPlayerStationTypesPacket(stationTypes, false));
 	}
 
 	PlayerPtr Player::getShared() {

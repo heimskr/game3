@@ -8,15 +8,16 @@ namespace Game3 {
 		static PacketID ID() { return 45; }
 
 		std::unordered_set<Identifier> stationTypes;
+		bool focus = false;
 
 		SetPlayerStationTypesPacket() = default;
-		SetPlayerStationTypesPacket(std::unordered_set<Identifier> station_types):
-			stationTypes(std::move(station_types)) {}
+		SetPlayerStationTypesPacket(std::unordered_set<Identifier> station_types, bool focus_):
+			stationTypes(std::move(station_types)), focus(focus_) {}
 
 		PacketID getID() const override { return ID(); }
 
-		void encode(Game &, Buffer &buffer) const override { buffer << stationTypes; }
-		void decode(Game &, Buffer &buffer)       override { buffer >> stationTypes; }
+		void encode(Game &, Buffer &buffer) const override { buffer << stationTypes << focus; }
+		void decode(Game &, Buffer &buffer)       override { buffer >> stationTypes >> focus; }
 
 		void handle(ClientGame &) override;
 	};

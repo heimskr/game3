@@ -28,7 +28,7 @@ namespace Game3 {
 
 		private:
 			Gtk::ScrolledWindow scrolled;
-			Gtk::Box vbox {Gtk::Orientation::VERTICAL};
+			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
 			Gtk::PopoverMenu popoverMenu;
 			std::vector<std::unique_ptr<Gtk::Widget>> widgets;
 

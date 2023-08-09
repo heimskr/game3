@@ -33,7 +33,6 @@ namespace Game3 {
 		group->add_action("craft_all", [this] { craftAll(lastGame, lastRegistryID); });
 
 		mainWindow.insert_action_group("crafting_popup", group);
-		popoverMenu.set_parent(vbox); // TODO: verify
 	}
 
 	void CraftingTab::update(const std::shared_ptr<ClientGame> &) {}
@@ -149,13 +148,13 @@ namespace Game3 {
 	void CraftingTab::rightClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *widget, size_t registry_id, double x, double y) {
 		mainWindow.onBlur();
 
-		// TODO: verify
 		const auto allocation = widget->get_allocation();
 		x += allocation.get_x();
 		y += allocation.get_y();
 
 		popoverMenu.set_has_arrow(true);
 		popoverMenu.set_pointing_to({int(x), int(y), 1, 1});
+		popoverMenu.set_parent(vbox);
 		lastGame = game;
 		lastRegistryID = registry_id;
 		popoverMenu.popup();

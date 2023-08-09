@@ -113,7 +113,9 @@ namespace Game3 {
 		player->displayName = display_name;
 		player->token = generateToken(player->username);
 		// overworld->add(player, overworld->randomLand);
-		overworld->add(player, Position(31, 82));
+		// overworld->add(player, Position(31, 82));
+		// player->direction = Direction::Right;
+		overworld->add(player, Position(-25, -36));
 		player->init(*game);
 		player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_pickaxe"));
 		player->inventory->add(ItemStack::withDurability(*game, "base:item/iron_shovel"));
@@ -133,7 +135,6 @@ namespace Game3 {
 		player->inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "H"}}));
 		player->inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "H"}}));
 		player->inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "O"}}));
-		player->direction = Direction::Right;
 		{
 			auto lock = game->lockPlayersUnique();
 			game->players.insert(player);
