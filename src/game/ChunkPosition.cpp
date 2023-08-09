@@ -1,8 +1,16 @@
 #include "game/ChunkPosition.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
+#include "game/TileProvider.h"
 
 namespace Game3 {
+	ChunkPosition::ChunkPosition(int32_t x_, int32_t y_):
+		x(x_), y(y_) {}
+
+	ChunkPosition::ChunkPosition(const Position &position):
+		x(TileProvider::divide<int32_t>(position.column)),
+		y(TileProvider::divide<int32_t>(position.row)) {}
+
 	std::default_random_engine ChunkPosition::getRNG() const {
 		return std::default_random_engine(static_cast<uint_fast32_t>(std::hash<ChunkPosition>()(*this)));
 	}

@@ -9,6 +9,7 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include "Constants.h"
+#include "Position.h"
 #include "Types.h"
 
 namespace Game3 {
@@ -20,6 +21,10 @@ namespace Game3 {
 
 		std::default_random_engine getRNG() const;
 
+		ChunkPosition() = default;
+		ChunkPosition(int32_t x_, int32_t y_);
+		explicit ChunkPosition(const Position &);
+
 		inline bool operator==(const ChunkPosition &other) const {
 			return this == &other || (x == other.x && y == other.y);
 		}
@@ -27,6 +32,13 @@ namespace Game3 {
 		auto operator<=>(const ChunkPosition &) const = default;
 
 		explicit operator std::string() const;
+
+		template <typename Fn>
+		void iterate(const Fn &fn) const {
+			for (auto row = y * CHUNK_SIZE, row_max = (y + 1) * CHUNK_SIZE; row < row_max; ++row)
+				for (auto column = x * CHUNK_SIZE, column_max = (x + 1) * CHUNK_SIZE; column < column_max; ++column)
+					fn(Position{row, column});
+		}
 	};
 
 	std::ostream & operator<<(std::ostream &, ChunkPosition);
