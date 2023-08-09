@@ -131,7 +131,7 @@ namespace Game3 {
 		buffer += inventory.activeSlot.load();
 		{
 			auto &storage = inventory.getStorage();
-			auto lock = constorage.sharedLock();
+			auto lock = storage.sharedLock();
 			buffer += storage.getBase();
 		}
 		return buffer;
