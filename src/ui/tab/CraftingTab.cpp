@@ -21,21 +21,24 @@ namespace Game3 {
 		scrolled.add_css_class("crafting-tab");
 		scrolled.set_child(vbox);
 
-		auto gmenu = Gio::Menu::create();
+		popoverMenu.set_parent(vbox);
+
+		gmenu = Gio::Menu::create();
 		gmenu->append("Craft _1", "crafting_popup.craft_one");
 		gmenu->append("Craft _X", "crafting_popup.craft_x");
 		gmenu->append("Craft _All", "crafting_popup.craft_all");
-		popoverMenu.set_menu_model(gmenu);
 
 		auto group = Gio::SimpleActionGroup::create();
 		group->add_action("craft_one", [this] { craftOne(lastGame, lastRegistryID); });
-		group->add_action("craft_x",   [] { std::cout << "x\n"; });
+		group->add_action("craft_x",   []     { INFO("Craft X");                    });
 		group->add_action("craft_all", [this] { craftAll(lastGame, lastRegistryID); });
 
 		mainWindow.insert_action_group("crafting_popup", group);
 	}
 
-	void CraftingTab::update(const std::shared_ptr<ClientGame> &) {}
+	void CraftingTab::update(const std::shared_ptr<ClientGame> &game) {
+		reset(game);
+	}
 
 	void CraftingTab::reset(const std::shared_ptr<ClientGame> &game) {
 		if (!game || !game->player)
@@ -51,6 +54,8 @@ namespace Game3 {
 		auto inventory = game->player->inventory;
 		if (!inventory)
 			return;
+
+		auto lock = inventory->sharedLock();
 
 		for (const auto &recipe: game->registries.get<CraftingRecipeRegistry>().items) {
 			if (game->player->stationTypes.contains(recipe->stationType) && recipe->canCraft(inventory)) {
@@ -146,15 +151,16 @@ namespace Game3 {
 	}
 
 	void CraftingTab::rightClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *widget, size_t registry_id, double x, double y) {
-		mainWindow.onBlur();
+		// mainWindow.onBlur();
 
 		const auto allocation = widget->get_allocation();
 		x += allocation.get_x();
 		y += allocation.get_y();
 
+		popoverMenu.set_parent(vbox);
+		popoverMenu.set_menu_model(gmenu);
 		popoverMenu.set_has_arrow(true);
 		popoverMenu.set_pointing_to({int(x), int(y), 1, 1});
-		popoverMenu.set_parent(vbox);
 		lastGame = game;
 		lastRegistryID = registry_id;
 		popoverMenu.popup();

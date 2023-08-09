@@ -84,6 +84,8 @@ namespace Game3 {
 
 			void showFluids(const std::shared_ptr<HasFluids> &);
 
+			inline auto getActiveTab() const { return activeTab; }
+
 			friend class Canvas;
 
 		private:
