@@ -10,7 +10,7 @@ namespace Game3 {
 	template <typename T, typename C = std::deque<T>>
 	class MTQueue: private std::queue<T, C> {
 		private:
-			std::shared_mutex mutex;
+			mutable std::shared_mutex mutex;
 
 		public:
 			MTQueue() = default;
@@ -21,7 +21,17 @@ namespace Game3 {
 				return std::queue<T, C>::front();
 			}
 
+			inline const T & front() const {
+				std::shared_lock lock(mutex);
+				return std::queue<T, C>::front();
+			}
+
 			inline T & back() {
+				std::shared_lock lock(mutex);
+				return std::queue<T, C>::back();
+			}
+
+			inline const T & back() const {
 				std::shared_lock lock(mutex);
 				return std::queue<T, C>::back();
 			}
@@ -57,7 +67,7 @@ namespace Game3 {
 				std::queue<T, C>::push(value);
 			}
 
-			inline bool empty() {
+			inline bool empty() const {
 				std::shared_lock lock(mutex);
 				return std::queue<T, C>::empty();
 			}
@@ -73,7 +83,7 @@ namespace Game3 {
 				return std::queue<T, C>::emplace(std::forward<Args>(args)...);
 			}
 
-			inline auto size() {
+			inline auto size() const {
 				std::shared_lock lock(mutex);
 				return std::queue<T, C>::size();
 			}
@@ -83,15 +93,11 @@ namespace Game3 {
 				return std::move(this->c);
 			}
 
-			inline const C & peek() {
-				return this->c;
-			}
-
-			inline auto lock_shared() {
+			inline auto sharedLock() {
 				return std::shared_lock(mutex);
 			}
 
-			inline auto lock_unique() {
+			inline auto uniqueLock() {
 				return std::unique_lock(mutex);
 			}
 	};
