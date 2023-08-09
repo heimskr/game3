@@ -26,6 +26,7 @@ namespace Game3 {
 		header.set_xalign(0.5);
 		vbox.append(header);
 
+		entry.set_placeholder_text("Equation");
 		entry.set_text(reactor->getEquation());
 		entry.set_margin(5);
 
@@ -66,6 +67,7 @@ namespace Game3 {
 			assert(buffer != nullptr);
 			const bool success = buffer->take<bool>();
 			if (success) {
+				entry.get_root()->unset_focus();
 				entry.remove_css_class("equation_error");
 				entry.add_css_class("equation_success");
 			} else {
