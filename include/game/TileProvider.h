@@ -55,11 +55,11 @@ namespace Game3 {
 			Identifier tilesetID;
 			MTQueue<ChunkPosition> generationQueue;
 
-			std::array<std::shared_mutex, LAYER_COUNT> chunkMutexes;
-			std::shared_mutex biomeMutex;
-			std::shared_mutex pathMutex;
-			std::shared_mutex fluidMutex;
-			std::shared_mutex metaMutex;
+			mutable std::array<std::shared_mutex, LAYER_COUNT> chunkMutexes;
+			mutable std::shared_mutex biomeMutex;
+			mutable std::shared_mutex pathMutex;
+			mutable std::shared_mutex fluidMutex;
+			mutable std::shared_mutex metaMutex;
 
 			TileProvider() = default;
 			TileProvider(Identifier tileset_id);
@@ -176,7 +176,7 @@ namespace Game3 {
 			static T access(const Chunk<T> &chunk, int64_t row, int64_t column) {
 				assert(0 <= row);
 				assert(0 <= column);
-				auto lock = const_cast<Chunk<T> &>(chunk).sharedLock();
+				auto lock = chunk.sharedLock();
 				return chunk[row * CHUNK_SIZE + column];
 			}
 

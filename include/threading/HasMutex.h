@@ -8,12 +8,12 @@ namespace Game3 {
 	template <typename T = std::shared_mutex>
 	class HasMutex {
 		protected:
-			T internalMutex;
+			mutable T internalMutex;
 
 			HasMutex() = default;
 
 		public:
-			inline auto sharedLock() { return std::shared_lock(internalMutex); }
-			inline auto uniqueLock() { return std::unique_lock(internalMutex); }
+			inline auto sharedLock() const { return std::shared_lock(internalMutex); }
+			inline auto uniqueLock() const { return std::unique_lock(internalMutex); }
 	};
 }

@@ -400,9 +400,9 @@ namespace Game3 {
 
 	std::unordered_map<Node *, std::unordered_set<Node *>> Graph::predecessors() const {
 		std::unordered_map<Node *, std::unordered_set<Node *>> out;
-		for (const Node *node: nodes)
+		for (Node *node: nodes)
 			for (Node *successor: node->out)
-				out[successor].insert(const_cast<Node *>(node));
+				out[successor].insert(node);
 		return out;
 	}
 

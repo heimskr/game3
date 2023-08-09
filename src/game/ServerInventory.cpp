@@ -45,7 +45,7 @@ namespace Game3 {
 				}
 			} else {
 				const ItemCount to_store = std::min(ItemCount(stack.item->maxCount), ItemCount(remaining));
-				assert(storage.try_emplace(start, getOwner()->getRealm()->getGame(), stack.item, to_store, stack.data).second);
+				assert(storage.try_emplace(start, stack.getGame(), stack.item, to_store, stack.data).second);
 				remaining -= to_store;
 			}
 		}
@@ -297,7 +297,7 @@ namespace Game3 {
 		buffer += inventory.activeSlot.load();
 		{
 			auto &storage = inventory.getStorage();
-			auto lock = const_cast<Lockable<ServerInventory::Storage> &>(storage).sharedLock();
+			auto lock = storage.sharedLock();
 			buffer += storage.getBase();
 		}
 		return buffer;

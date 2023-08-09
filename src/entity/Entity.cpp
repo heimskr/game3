@@ -66,7 +66,7 @@ namespace Game3 {
 
 	void Entity::toJSON(nlohmann::json &json) const {
 		assert(getSide() == Side::Server);
-		auto lock = const_cast<Entity &>(*this).sharedLock();
+		auto lock = sharedLock();
 		json["type"]      = type;
 		json["position"]  = position;
 		json["realmID"]   = realmID;
@@ -75,8 +75,7 @@ namespace Game3 {
 		if (inventory)
 			json["inventory"] = static_cast<ServerInventory &>(*inventory);
 		{
-			// I'm sorry. nlohmann forced my hand.
-			auto lock = const_cast<Entity *>(this)->path.sharedLock();
+			auto lock = path.sharedLock();
 			if (!path.empty())
 				json["path"] = path;
 		}

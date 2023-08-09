@@ -79,7 +79,7 @@ namespace Game3 {
 		TileEntity::toJSON(json);
 		InventoriedTileEntity::toJSON(json);
 		EnergeticTileEntity::toJSON(json);
-		auto equation_lock = const_cast<ChemicalReactor &>(*this).equation.sharedLock();
+		auto equation_lock = equation.sharedLock();
 		if (equation)
 			json["equation"] = equation->getText();
 	}

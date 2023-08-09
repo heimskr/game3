@@ -69,7 +69,7 @@ namespace Game3 {
 	}
 
 	TileID TileProvider::copyTile(Layer layer, Position position, bool &was_empty, TileMode mode) const {
-		std::shared_lock lock(const_cast<std::shared_mutex &>(chunkMutexes[getIndex(layer)]));
+		std::shared_lock lock(chunkMutexes[getIndex(layer)]);
 		return copyTileUnsafe(layer, position, was_empty, mode);
 	}
 
@@ -102,7 +102,7 @@ namespace Game3 {
 
 		const ChunkPosition chunk_position {divide(position.column), divide(position.row)};
 
-		std::shared_lock lock(const_cast<std::shared_mutex &>(chunkMutexes[getIndex(layer)]));
+		std::shared_lock lock(chunkMutexes[getIndex(layer)]);
 		const auto &map = chunkMaps[getIndex(layer)];
 
 		if (auto iter = map.find(chunk_position); iter != map.end())
@@ -114,7 +114,7 @@ namespace Game3 {
 	std::optional<BiomeType> TileProvider::copyBiomeType(Position position) const {
 		const ChunkPosition chunk_position {divide(position.column), divide(position.row)};
 
-		std::shared_lock lock(const_cast<std::shared_mutex &>(biomeMutex));
+		std::shared_lock lock(biomeMutex);
 
 		if (auto iter = biomeMap.find(chunk_position); iter != biomeMap.end())
 			return access(iter->second, remainder(position.row), remainder(position.column));
@@ -125,7 +125,7 @@ namespace Game3 {
 	std::optional<uint8_t> TileProvider::copyPathState(Position position) const {
 		const ChunkPosition chunk_position {divide(position.column), divide(position.row)};
 
-		std::shared_lock lock(const_cast<std::shared_mutex &>(pathMutex));
+		std::shared_lock lock(pathMutex);
 
 		if (auto iter = pathMap.find(chunk_position); iter != pathMap.end())
 			return access(iter->second, remainder(position.row), remainder(position.column));
@@ -136,7 +136,7 @@ namespace Game3 {
 	std::optional<FluidTile> TileProvider::copyFluidTile(Position position) const {
 		const ChunkPosition chunk_position {divide(position.column), divide(position.row)};
 
-		std::shared_lock lock(const_cast<std::shared_mutex &>(fluidMutex));
+		std::shared_lock lock(fluidMutex);
 
 		if (auto iter = fluidMap.find(chunk_position); iter != fluidMap.end())
 			return access(iter->second, remainder(position.row), remainder(position.column));
@@ -403,7 +403,7 @@ namespace Game3 {
 	const TileChunk & TileProvider::getTileChunk(Layer layer, ChunkPosition chunk_position) const {
 		validateLayer(layer);
 
-		std::shared_lock lock(const_cast<std::shared_mutex &>(chunkMutexes[getIndex(layer)]));
+		std::shared_lock lock(chunkMutexes[getIndex(layer)]);
 		if (auto iter = chunkMaps[getIndex(layer)].find(chunk_position); iter != chunkMaps[getIndex(layer)].end())
 			return iter->second;
 
@@ -418,7 +418,7 @@ namespace Game3 {
 	}
 
 	std::optional<std::reference_wrapper<const TileChunk>> TileProvider::tryTileChunk(Layer layer, ChunkPosition chunk_position) const {
-		std::shared_lock lock(const_cast<std::shared_mutex &>(chunkMutexes[getIndex(layer)]));
+		std::shared_lock lock(chunkMutexes[getIndex(layer)]);
 		if (auto iter = chunkMaps[getIndex(layer)].find(chunk_position); iter != chunkMaps[getIndex(layer)].end())
 			return std::ref(iter->second);
 		return std::nullopt;
@@ -432,7 +432,7 @@ namespace Game3 {
 	}
 
 	const Chunk<BiomeType> & TileProvider::getBiomeChunk(ChunkPosition chunk_position) const {
-		std::shared_lock lock(const_cast<std::shared_mutex &>(biomeMutex));
+		std::shared_lock lock(biomeMutex);
 		if (auto iter = biomeMap.find(chunk_position); iter != biomeMap.end())
 			return iter->second;
 
@@ -446,7 +446,7 @@ namespace Game3 {
 	}
 
 	const Chunk<uint8_t> & TileProvider::getPathChunk(ChunkPosition chunk_position) const {
-		std::shared_lock lock(const_cast<std::shared_mutex &>(pathMutex));
+		std::shared_lock lock(pathMutex);
 		if (auto iter = pathMap.find(chunk_position); iter != pathMap.end())
 			return iter->second;
 
@@ -460,7 +460,7 @@ namespace Game3 {
 	}
 
 	const Chunk<FluidTile> & TileProvider::getFluidChunk(ChunkPosition chunk_position) const {
-		std::shared_lock lock(const_cast<std::shared_mutex &>(fluidMutex));
+		std::shared_lock lock(fluidMutex);
 		if (auto iter = fluidMap.find(chunk_position); iter != fluidMap.end())
 			return iter->second;
 
@@ -540,7 +540,7 @@ namespace Game3 {
 	}
 
 	void to_json(nlohmann::json &json, const TileProvider &provider) {
-		auto &unconst = const_cast<TileProvider &>(provider);
+		auto &unconst = provider;
 		json.push_back(provider.tilesetID);
 
 		nlohmann::json tile_array;

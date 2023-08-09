@@ -21,7 +21,7 @@ namespace Game3 {
 
 		Lockable<T> & operator=(const Lockable<T> &other) {
 			auto this_lock = uniqueLock();
-			auto other_lock = const_cast<Lockable<T> &>(other).sharedLock();
+			auto other_lock = other.sharedLock();
 			T::operator=(other.getBase());
 			return *this;
 		}
@@ -47,17 +47,17 @@ namespace Game3 {
 			return *this;
 		}
 
-		M mutex;
+		mutable M mutex;
 
-		inline auto uniqueLock() { return std::unique_lock(mutex); }
-		inline auto sharedLock() { return std::shared_lock(mutex); }
-		inline auto tryUniqueLock() { return std::unique_lock(mutex, std::try_to_lock); }
-		inline auto trySharedLock() { return std::shared_lock(mutex, std::try_to_lock); }
+		inline auto uniqueLock() const { return std::unique_lock(mutex); }
+		inline auto sharedLock() const { return std::shared_lock(mutex); }
+		inline auto tryUniqueLock() const { return std::unique_lock(mutex, std::try_to_lock); }
+		inline auto trySharedLock() const { return std::shared_lock(mutex, std::try_to_lock); }
 
 		inline T & getBase() { return static_cast<T &>(*this); }
 		inline const T & getBase() const { return static_cast<const T &>(*this); }
 
-		inline T copyBase() {
+		inline T copyBase() const {
 			auto lock = sharedLock();
 			return static_cast<T>(*this);
 		}
@@ -65,7 +65,7 @@ namespace Game3 {
 
 	template <typename T>
 	void to_json(nlohmann::json &json, const Lockable<T> &lockable) {
-		auto lock = const_cast<Lockable<T> &>(lockable).sharedLock();
+		auto lock = lockable.sharedLock();
 		json = lockable.getBase();
 	}
 
@@ -77,19 +77,19 @@ namespace Game3 {
 
 	template <typename T>
 	std::ostream & operator<<(std::ostream &os, const Lockable<T> &lockable) {
-		auto lock = const_cast<Lockable<T> &>(lockable).sharedLock();
+		auto lock = lockable.sharedLock();
 		return os << lockable.getBase();
 	}
 
 	template <typename T>
 	Buffer & operator+=(Buffer &buffer, const Lockable<T> &lockable) {
-		auto lock = const_cast<Lockable<T> &>(lockable).sharedLock();
+		auto lock = lockable.sharedLock();
 		return buffer += lockable.getBase();
 	}
 
 	template <typename T>
 	Buffer & operator<<(Buffer &buffer, const Lockable<T> &lockable) {
-		auto lock = const_cast<Lockable<T> &>(lockable).sharedLock();
+		auto lock = lockable.sharedLock();
 		return buffer << lockable.getBase();
 	}
 

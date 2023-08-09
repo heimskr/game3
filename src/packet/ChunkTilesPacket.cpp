@@ -11,12 +11,12 @@ namespace Game3 {
 		tiles.reserve(CHUNK_SIZE * CHUNK_SIZE * LAYER_COUNT);
 		for (const auto layer: allLayers) {
 			auto &layer_tiles = realm.tileProvider.getTileChunk(layer, chunk_position);
-			auto lock = const_cast<TileChunk &>(layer_tiles).sharedLock();
+			auto lock = layer_tiles.sharedLock();
 			tiles.insert(tiles.end(), layer_tiles.begin(), layer_tiles.end());
 		}
 
 		auto &fluid_chunk = realm.tileProvider.getFluidChunk(chunk_position);
-		auto lock = const_cast<FluidChunk &>(fluid_chunk).sharedLock();
+		auto lock = fluid_chunk.sharedLock();
 		fluids = fluid_chunk;
 	}
 

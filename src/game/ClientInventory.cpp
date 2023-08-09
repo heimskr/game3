@@ -131,7 +131,7 @@ namespace Game3 {
 		buffer += inventory.activeSlot.load();
 		{
 			auto &storage = inventory.getStorage();
-			auto lock = const_cast<Lockable<ClientInventory::Storage> &>(storage).sharedLock();
+			auto lock = constorage.sharedLock();
 			buffer += storage.getBase();
 		}
 		return buffer;
