@@ -23,8 +23,8 @@ namespace Game3 {
 
 		if (0 < energy) {
 			energy = distribute(energy);
-			if (0 < energy)
-				return;
+			// if (0 < energy)
+			// 	return;
 		}
 
 		const EnergyAmount capacity = getEnergyCapacity();
