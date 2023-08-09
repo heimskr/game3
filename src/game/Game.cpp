@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 
 #include "Tileset.h"
+#include "command/local/ChemicalCommand.h"
 #include "command/local/LocalCommandFactory.h"
 #include "command/local/LoginCommand.h"
 #include "command/local/RegisterCommand.h"
@@ -432,6 +433,7 @@ namespace Game3 {
 		add(LocalCommandFactory::create<RegisterCommand>());
 		add(LocalCommandFactory::create<LoginCommand>());
 		add(LocalCommandFactory::create<UsageCommand>());
+		add(LocalCommandFactory::create<ChemicalCommand>());
 	}
 
 	void Game::addTiles() {
