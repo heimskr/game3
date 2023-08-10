@@ -2,6 +2,8 @@
 
 #include "realm/Realm.h"
 
+#include <atomic>
+
 namespace Game3 {
 	class Inventory;
 
@@ -9,7 +11,7 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "realm/cave"}; }
 			RealmID parentRealm;
-			size_t entranceCount = 1;
+			std::atomic_size_t entranceCount = 1;
 
 			Cave(const Cave &) = delete;
 			Cave(Cave &&) = delete;

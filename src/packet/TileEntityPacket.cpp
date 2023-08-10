@@ -20,11 +20,9 @@ namespace Game3 {
 		assert(globalID != static_cast<GlobalID>(-1));
 		assert(globalID != static_cast<GlobalID>(0));
 
-		auto realm_iter = game.realms.find(realmID);
-		if (realm_iter == game.realms.end())
+		RealmPtr realm = game.tryRealm(realmID);
+		if (!realm)
 			throw PacketError("Couldn't find realm " + std::to_string(realmID) + " in TileEntityPacket");
-
-		auto realm = realm_iter->second;
 
 		if (auto found = game.getAgent<TileEntity>(globalID)) {
 			wasFound = true;
@@ -51,7 +49,7 @@ namespace Game3 {
 	void TileEntityPacket::handle(ClientGame &game) {
 		if (tileEntity) {
 			if (!wasFound)
-				game.realms.at(realmID)->add(tileEntity);
+				game.getRealm(realmID)->add(tileEntity);
 			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(tileEntity))
 				has_inventory->inventory->notifyOwner();
 		}

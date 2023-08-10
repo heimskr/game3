@@ -141,7 +141,7 @@ namespace Game3::WorldGen {
 		auto keep_realm = Realm::create<Keep>(game, keep_realm_id, town_origin, width, height, -seed);
 		keep_realm->outdoors = false;
 		WorldGen::generateKeep(keep_realm, rng, realm->id, keep_width, keep_height, keep_exit);
-		game.realms.emplace(keep_realm_id, keep_realm);
+		game.addRealm(keep_realm_id, keep_realm);
 
 		auto create_keep = [&](const Identifier &tilename) {
 			realm->setTile(Layer::Objects, keep_position, tilename, false, true);
@@ -182,7 +182,7 @@ namespace Game3::WorldGen {
 				auto new_realm = Realm::create(game, realm_id, realm_type, details->tilesetName, -seed);
 				new_realm->outdoors = false;
 				gen_fn(new_realm, rng, realm, realm_width, realm_height, building_position + Position(1, 0));
-				game.realms.emplace(realm_id, new_realm);
+				game.addRealm(realm_id, new_realm);
 				realm->add(building);
 			};
 

@@ -137,11 +137,11 @@ namespace Game3 {
 	void Woodcutter::wakeUp() {
 		phase = 1;
 		auto &game = getRealm()->getGame();
-		auto &overworld = *game.realms.at(overworldRealm);
-		auto &house     = *game.realms.at(houseRealm);
+		auto overworld = game.getRealm(overworldRealm);
+		auto house     = game.getRealm(houseRealm);
 		// Detect all resources within a given radius of the house
 		std::vector<Position> resource_choices;
-		for (const auto &[te_position, tile_entity]: overworld.tileEntities)
+		for (const auto &[te_position, tile_entity]: overworld->tileEntities)
 			if (dynamic_cast<OreDeposit *>(tile_entity.get()))
 				resource_choices.push_back(te_position);
 		// If there are no resources, get stuck forever. Seed -1998 has no resources.
@@ -152,7 +152,7 @@ namespace Game3 {
 		// Choose one at random
 		chosenResource = choose(resource_choices, threadContext.rng);
 		// Pathfind to the door
-		pathfind(house.getTileEntity<Teleporter>()->position);
+		pathfind(house->getTileEntity<Teleporter>()->position);
 	}
 
 	void Woodcutter::goToResource() {

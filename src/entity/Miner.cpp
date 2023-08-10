@@ -145,8 +145,8 @@ namespace Game3 {
 	void Miner::wakeUp() {
 		setPhase(1);
 		auto &game = getRealm()->getGame();
-		auto &overworld = *game.realms.at(overworldRealm);
-		auto &house     = *game.realms.at(houseRealm);
+		auto &overworld = *game.getRealm(overworldRealm);
+		auto &house     = *game.getRealm(houseRealm);
 		// Detect all resources within a given radius of the house
 		std::vector<Position> resource_choices;
 		for (const auto &[te_position, tile_entity]: overworld.tileEntities)

@@ -50,6 +50,6 @@ namespace Game3 {
 
 	void ChunkRequestPacket::handle(ServerGame &game, RemoteClient &client) {
 		for (const auto &request: requests)
-			client.sendChunk(*game.realms.at(realmID), request.position, true, request.counterThreshold);
+			client.sendChunk(*game.getRealm(realmID), request.position, true, request.counterThreshold);
 	}
 }

@@ -19,12 +19,11 @@ namespace Game3 {
 		assert(globalID != static_cast<GlobalID>(-1));
 		assert(globalID != static_cast<GlobalID>(0));
 
-		auto realm_iter = game.realms.find(realmID);
-		if (realm_iter == game.realms.end())
+		RealmPtr realm = game.tryRealm(realmID);
+		if (!realm)
 			throw PacketError("Couldn't find realm " + std::to_string(realmID) + " in EntityPacket");
-		auto realm = realm_iter->second;
 
-		if (auto found = game.getAgent<Entity>(globalID)) {
+		if (EntityPtr found = game.getAgent<Entity>(globalID)) {
 			wasFound = true;
 			(entity = found)->decode(buffer);
 		} else {
@@ -48,9 +47,9 @@ namespace Game3 {
 	void EntityPacket::handle(ClientGame &game) {
 		if (wasFound)
 			return;
-		auto iter = game.realms.find(realmID);
-		if (iter == game.realms.end())
+		RealmPtr realm = game.tryRealm(realmID);
+		if (!realm)
 			throw PacketError("Couldn't find realm " + std::to_string(realmID) + " in EntityPacket");
-		iter->second->add(entity, entity->getPosition());
+		realm->add(entity, entity->getPosition());
 	}
 }

@@ -5,7 +5,7 @@
 
 namespace Game3 {
 	void FluidUpdatePacket::handle(ClientGame &game) {
-		auto realm = game.realms.at(realmID);
+		auto realm = game.getRealm(realmID);
 		realm->setFluid(position, fluidTile, false);
 		realm->reuploadFluids();
 	}

@@ -100,6 +100,7 @@
 #include "packet/AgentMessagePacket.h"
 #include "packet/SetTileEntityEnergyPacket.h"
 #include "packet/SetPlayerStationTypesPacket.h"
+#include "packet/EntityChangingRealmsPacket.h"
 #include "realm/Cave.h"
 #include "realm/House.h"
 #include "realm/Keep.h"
@@ -429,6 +430,7 @@ namespace Game3 {
 		add(PacketFactory::create<AgentMessagePacket>());
 		add(PacketFactory::create<SetTileEntityEnergyPacket>());
 		add(PacketFactory::create<SetPlayerStationTypesPacket>());
+		add(PacketFactory::create<EntityChangingRealmsPacket>());
 	}
 
 	void Game::addLocalCommandFactories() {
@@ -689,6 +691,38 @@ namespace Game3 {
 		return default_tile;
 	}
 
+	RealmPtr Game::tryRealm(RealmID realm_id) const {
+		auto lock = realms.sharedLock();
+		if (auto iter = realms.find(realm_id); iter != realms.end())
+			return iter->second;
+		return {};
+	}
+
+	RealmPtr Game::getRealm(RealmID realm_id) const {
+		auto lock = realms.sharedLock();
+		return realms.at(realm_id);
+	}
+
+	void Game::addRealm(RealmID realm_id, RealmPtr realm) {
+		auto lock = realms.uniqueLock();
+		if (!realms.emplace(realm_id, realm).second)
+			throw std::runtime_error("Couldn't add realm " + std::to_string(realm_id) + ": a realm with that ID already exists");
+	}
+
+	void Game::addRealm(RealmPtr realm) {
+		addRealm(realm->id, realm);
+	}
+
+	bool Game::hasRealm(RealmID realm_id) const {
+		auto lock = realms.sharedLock();
+		return realms.contains(realm_id);
+	}
+
+	void Game::removeRealm(RealmID realm_id) {
+		auto lock = realms.uniqueLock();
+		realms.erase(realm_id);
+	}
+
 	GamePtr Game::create(Side side, const ServerArgument &argument) {
 		GamePtr out;
 		if (side == Side::Client)
@@ -702,8 +736,11 @@ namespace Game3 {
 	GamePtr Game::fromJSON(Side side, const nlohmann::json &json, const ServerArgument &argument) {
 		auto out = create(side, argument);
 		out->initialSetup();
-		for (const auto &[string, realm_json]: json.at("realms").get<std::unordered_map<std::string, nlohmann::json>>())
-			out->realms.emplace(parseUlong(string), Realm::fromJSON(*out, realm_json));
+		{
+			auto lock = out->realms.uniqueLock();
+			for (const auto &[string, realm_json]: json.at("realms").get<std::unordered_map<std::string, nlohmann::json>>())
+				out->realms.emplace(parseUlong(string), Realm::fromJSON(*out, realm_json));
+		}
 		out->hourOffset = json.contains("hourOffset")? json.at("hourOffset").get<float>() : 0.f;
 		out->debugMode = json.contains("debugMode")? json.at("debugMode").get<bool>() : false;
 		out->cavesGenerated = json.contains("cavesGenerated")? json.at("cavesGenerated").get<decltype(Game::cavesGenerated)>() : 0;
@@ -739,8 +776,9 @@ namespace Game3 {
 	void to_json(nlohmann::json &json, const Game &game) {
 		json["debugMode"] = game.debugMode;
 		json["realms"] = std::unordered_map<std::string, nlohmann::json>();
-		for (const auto &[id, realm]: game.realms)
-			json["realms"][std::to_string(id)] = nlohmann::json(*realm);
+		game.iterateRealms([&](const RealmPtr &realm) {
+			json["realms"][std::to_string(realm->id)] = nlohmann::json(*realm);
+		});
 		json["hourOffset"] = game.getHour();
 		if (0 < game.cavesGenerated)
 			json["cavesGenerated"] = game.cavesGenerated;

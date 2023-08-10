@@ -517,7 +517,7 @@ namespace Game3 {
 
 			for (const auto &stolen: entityRemovalQueue.steal())
 				if (auto locked = stolen.lock())
-					remove(locked);
+					removeSafe(locked);
 
 			for (const auto &stolen: entityDestructionQueue.steal())
 				if (auto locked = stolen.lock())
@@ -525,7 +525,7 @@ namespace Game3 {
 
 			for (const auto &stolen: tileEntityRemovalQueue.steal())
 				if (auto locked = stolen.lock())
-					remove(locked);
+					removeSafe(locked);
 
 			for (const auto &stolen: tileEntityDestructionQueue.steal())
 				if (auto locked = stolen.lock())
@@ -614,7 +614,8 @@ namespace Game3 {
 	}
 
 	void Realm::removeSafe(const EntityPtr &entity) {
-		auto lock = entities.uniqueLock();
+		auto entity_lock = entities.uniqueLock();
+		auto by_gid_lock = entitiesByGID.uniqueLock();
 		remove(entity);
 	}
 
@@ -1148,10 +1149,12 @@ namespace Game3 {
 	void Realm::detach(const EntityPtr &entity, ChunkPosition chunk_position) {
 		auto lock = entitiesByChunk.uniqueLock();
 
-		if (auto iter = entitiesByChunk.find(chunk_position); iter != entitiesByChunk.end())
+		if (auto iter = entitiesByChunk.find(chunk_position); iter != entitiesByChunk.end()) {
+			auto sublock = iter->second->uniqueLock();
 			if (0 < iter->second->erase(entity))
 				if (iter->second->empty())
 					entitiesByChunk.erase(iter);
+		}
 	}
 
 	void Realm::detach(const EntityPtr &entity) {

@@ -169,6 +169,11 @@ namespace Game3 {
 		client->send(InteractPacket(false, modifiers));
 	}
 
+	void ClientGame::putInLimbo(EntityPtr entity, RealmID next_realm_id, const Position &next_position) {
+		auto lock = entityLimbo.uniqueLock();
+		entityLimbo[std::move(entity)] = {next_realm_id, next_position};
+	}
+
 	void ClientGame::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data) {
 		getWindow().moduleMessageBuffer(module_id, source, name, std::move(data));
 	}

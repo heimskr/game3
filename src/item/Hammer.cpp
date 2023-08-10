@@ -17,9 +17,9 @@ namespace Game3 {
 			Game &game = realm.getGame();
 			const RealmID realm_id = building->innerRealmID;
 
-			if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game.realms.at(realm_id))) {
+			if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game.getRealm(realm_id))) {
 				if (--cave_realm->entranceCount == 0)
-					game.realms.erase(realm_id);
+					game.removeRealm(realm_id);
 				realm.remove(building);
 				if (stack.reduceDurability())
 					place.player->inventory->erase(slot);

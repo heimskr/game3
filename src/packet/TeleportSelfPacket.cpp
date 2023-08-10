@@ -10,11 +10,10 @@ namespace Game3 {
 		if (!player)
 			return;
 
-		auto iter = game.realms.find(realmID);
-		if (iter == game.realms.end())
+		RealmPtr realm = game.tryRealm(realmID);
+		if (!realm)
 			return;
 
-		auto realm = iter->second;
 		player->teleport(position, realm);
 	}
 }

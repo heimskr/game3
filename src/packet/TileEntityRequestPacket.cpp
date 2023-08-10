@@ -54,13 +54,12 @@ namespace Game3 {
 	}
 
 	void TileEntityRequestPacket::handle(ServerGame &game, RemoteClient &client) {
-		auto realm_iter = game.realms.find(realmID);
-		if (realm_iter == game.realms.end()) {
+		RealmPtr realm = game.tryRealm(realmID);
+		if (!realm) {
 			client.send(ErrorPacket("Invalid realm"));
 			return;
 		}
 
-		auto realm = realm_iter->second;
 		auto lock = realm->tileEntitiesByGID.sharedLock();
 
 		for (const auto [tile_entity_id, threshold]: requests) {

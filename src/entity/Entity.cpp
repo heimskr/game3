@@ -368,7 +368,7 @@ namespace Game3 {
 	}
 
 	Entity & Entity::setRealm(const Game &game, RealmID realm_id) {
-		weakRealm = game.realms.at(realm_id);
+		weakRealm = game.getRealm(realm_id);
 		realmID = realm_id;
 		increaseUpdateCounter();
 		return *this;
@@ -469,7 +469,12 @@ namespace Game3 {
 		if (old_realm != new_realm) {
 			nextRealm = new_realm->id;
 			auto shared = getSelf();
+
+			if (getSide() == Side::Server)
+				getGame().toServer().entityChangingRealms(*this, new_realm, new_position);
+
 			if (old_realm) {
+				INFO("Detaching and queueing removal for " << getGID());
 				old_realm->detach(shared);
 				old_realm->queueRemoval(shared);
 			}

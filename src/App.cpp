@@ -4,7 +4,7 @@
 #include "ui/MainWindow.h"
 
 namespace Game3 {
-	App::App(): Gtk::Application("gay.heimskr.game3") {}
+	App::App(): Gtk::Application("gay_heimskr_game3") {}
 
 	Glib::RefPtr<App> App::create() {
 		return Glib::make_refptr_for_instance<App>(new App);

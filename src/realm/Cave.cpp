@@ -23,10 +23,10 @@ namespace Game3 {
 			if (tile_entity->tileID != "base:tile/cave"_id)
 				continue;
 			if (auto building = std::dynamic_pointer_cast<Building>(tile_entity)) {
-				if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game.realms.at(building->innerRealmID)))
-					game.realms.erase(building->innerRealmID);
+				if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game.getRealm(building->innerRealmID)))
+					game.removeRealm(building->innerRealmID);
 				else
-					std::cerr << "Cave entrance leads to realm " + std::to_string(building->innerRealmID) + ", which isn't a cave. Not erasing.\n";
+					WARN("Cave entrance leads to realm " << building->innerRealmID << ", which isn't a cave. Not erasing.");
 				break;
 			}
 		}
@@ -96,13 +96,16 @@ namespace Game3 {
 	void Cave::absorbJSON(const nlohmann::json &json) {
 		Realm::absorbJSON(json);
 		parentRealm = json.at("parentRealm");
-		entranceCount = json.contains("entranceCount")? json.at("entranceCount").get<decltype(entranceCount)>() : 1;
+		if (auto iter = json.find("entranceCount"); iter != json.end())
+			entranceCount = iter->get<size_t>();
+		else
+			entranceCount = 1;
 	}
 
 	void Cave::toJSON(nlohmann::json &json) const {
 		Realm::toJSON(json);
 		json["parentRealm"] = parentRealm;
 		if (entranceCount != 1)
-			json["entranceCount"] = entranceCount;
+			json["entranceCount"] = entranceCount.load();
 	}
 }

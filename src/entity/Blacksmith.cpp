@@ -170,7 +170,7 @@ namespace Game3 {
 			coalNeeded = 0;
 
 		Game  &game  = getRealm()->getGame();
-		Realm &house = *game.realms.at(houseRealm);
+		Realm &house = *game.getRealm(houseRealm);
 
 		if (0 < coalNeeded || diamonds < RESOURCE_TARGET) {
 			phase = 1;

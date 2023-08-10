@@ -8,10 +8,11 @@
 #include "packet/CommandResultPacket.h"
 #include "packet/DestroyEntityPacket.h"
 #include "packet/DestroyTileEntityPacket.h"
+#include "packet/EntityChangingRealmsPacket.h"
+#include "packet/EntityMovedPacket.h"
 #include "packet/FluidUpdatePacket.h"
 #include "packet/InventoryPacket.h"
 #include "packet/TileEntityPacket.h"
-#include "packet/EntityMovedPacket.h"
 #include "packet/TileUpdatePacket.h"
 #include "packet/TimePacket.h"
 #include "util/Util.h"
@@ -134,6 +135,24 @@ namespace Game3 {
 	void ServerGame::runCommand(RemoteClient &client, const std::string &command, GlobalID command_id) {
 		auto [success, message] = commandHelper(client, command);
 		client.send(CommandResultPacket(command_id, success, std::move(message)));
+	}
+
+	void ServerGame::entityChangingRealms(Entity &entity, const RealmPtr &new_realm, const Position &new_position) {
+		const EntityChangingRealmsPacket packet(entity.getGID(), new_realm->id, new_position);
+
+		if (auto cast_player = dynamic_cast<Player *>(&entity)) {
+			cast_player->send(packet);
+			auto lock = lockPlayersShared();
+			for (const auto &player: players)
+				if (player.get() != cast_player)
+					if (auto client = player->toServer()->weakClient.lock())
+						client->send(packet);
+		} else {
+			auto lock = lockPlayersShared();
+			for (const auto &player: players)
+				if (auto client = player->toServer()->weakClient.lock())
+					client->send(packet);
+		}
 	}
 
 	void ServerGame::entityTeleported(Entity &entity) {

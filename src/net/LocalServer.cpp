@@ -106,7 +106,7 @@ namespace Game3 {
 		if (std::filesystem::exists(path))
 			return ServerPlayer::fromJSON(*game, nlohmann::json::parse(readFile(path)));
 
-		auto overworld = game->realms.at(1);
+		RealmPtr overworld = game->getRealm(1);
 
 		auto player = Entity::create<ServerPlayer>();
 		player->username = username;
@@ -243,7 +243,7 @@ namespace Game3 {
 		std::default_random_engine rng;
 		rng.seed(seed);
 		WorldGen::generateOverworld(realm, seed, {}, {{-1, -1}, {1, 1}}, true);
-		game->realms.emplace(realm->id, realm);
+		game->addRealm(realm->id, realm);
 		game->initInteractionSets();
 		game_server->game = game;
 

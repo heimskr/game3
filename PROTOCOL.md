@@ -266,12 +266,18 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 44. **Set Tile Entity Energy**: tells a client that a tile entity's stored energy has changed.
 
-	- `u64` Global ID
+	- `u64` Tile Entity Global ID
 	- `u64` Energy Amount
 
 45. **Set Player Station Types**: tells a client what their available crafting station types are.
 
 	- `list<string>` Identifiers
+
+46. **Entity Changing Realms**: tells a client that an entity is about to teleport to a different realm.
+
+	- `u64` Entity Global ID
+	- `i32` New Realm ID
+	- `{i64,i64}` New Position
 
 # Message Format
 

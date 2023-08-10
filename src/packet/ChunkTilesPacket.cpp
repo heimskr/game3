@@ -32,7 +32,7 @@ namespace Game3 {
 		if (fluids.size() != CHUNK_SIZE * CHUNK_SIZE)
 			throw PacketError("Invalid fluid count in ChunkTilesPacket: " + std::to_string(fluids.size()));
 
-		auto realm = game.realms.at(realmID);
+		auto realm = game.getRealm(realmID);
 		auto &provider = realm->tileProvider;
 		for (const auto layer: allLayers) {
 			auto &chunk = provider.getTileChunk(layer, chunkPosition);

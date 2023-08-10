@@ -247,7 +247,7 @@ namespace Game3 {
 	}
 
 	void Player::setupRealm(const Game &game) {
-		weakRealm = game.realms.at(realmID);
+		weakRealm = game.getRealm(realmID);
 	}
 
 	void Player::encode(Buffer &buffer) {

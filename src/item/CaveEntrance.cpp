@@ -37,7 +37,7 @@ namespace Game3 {
 			if (tile_entity->tileID == "base:tile/cave"_id && tile_entity->is("base:te/building"_id)) {
 				if (auto building = std::dynamic_pointer_cast<Building>(tile_entity)) {
 					realm_id = building->innerRealmID;
-					if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game.realms.at(*realm_id)))
+					if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game.getRealm(*realm_id)))
 						++cave_realm->entranceCount;
 					else
 						throw std::runtime_error("Cave entrance leads to realm " + std::to_string(*realm_id) + ", which isn't a cave");
@@ -57,7 +57,7 @@ namespace Game3 {
 			Position entrance_position;
 			WorldGen::generateCaveFull(new_realm, threadContext.rng, cave_seed, exit_position, entrance_position, realm.id, {{-1, -1}, {1, 1}});
 			entrance = entrance_position;
-			game.realms.emplace(*realm_id, new_realm);
+			game.addRealm(*realm_id, new_realm);
 			++game.cavesGenerated;
 			emplaced = true;
 		}
@@ -73,7 +73,7 @@ namespace Game3 {
 		}
 
 		if (emplaced)
-			game.realms.erase(*realm_id);
+			game.removeRealm(*realm_id);
 
 		return false;
 	}

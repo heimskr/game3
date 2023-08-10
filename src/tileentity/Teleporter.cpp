@@ -20,7 +20,7 @@ namespace Game3 {
 	}
 
 	void Teleporter::onOverlap(const std::shared_ptr<Entity> &entity) {
-		entity->teleport(targetPosition, getRealm()->getGame().realms.at(targetRealm));
+		entity->teleport(targetPosition, getRealm()->getGame().getRealm(targetRealm));
 	}
 
 	void Teleporter::absorbJSON(Game &game, const nlohmann::json &json) {

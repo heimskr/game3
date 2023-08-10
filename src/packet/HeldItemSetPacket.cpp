@@ -5,10 +5,8 @@
 
 namespace Game3 {
 	void HeldItemSetPacket::handle(ClientGame &game) {
-		RealmPtr realm;
-		if (auto iter = game.realms.find(realmID); iter != game.realms.end()) {
-			realm = iter->second;
-		} else {
+		RealmPtr realm = game.tryRealm(realmID);
+		if (!realm) {
 			ERROR("Couldn't find realm " << realmID << " in HeldItemSetPacket handler");
 			return;
 		}
@@ -16,6 +14,7 @@ namespace Game3 {
 		EntityPtr entity = realm->getEntity(entityID);
 		if (!entity) {
 			ERROR("Couldn't find entity " << entityID << " in realm " << realmID << " in HeldItemSetPacket handler");
+			return;
 		}
 
 		if (leftHand)

@@ -39,7 +39,7 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Realm> Building::getInnerRealm() const {
-		return getRealm()->getGame().realms.at(innerRealmID);
+		return getRealm()->getGame().getRealm(innerRealmID);
 	}
 
 	void Building::encode(Game &game, Buffer &buffer) {

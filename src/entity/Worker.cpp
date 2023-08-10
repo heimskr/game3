@@ -46,7 +46,7 @@ namespace Game3 {
 	}
 
 	void Worker::initAfterLoad(Game &game) {
-		if (!(keep = std::dynamic_pointer_cast<Building>(game.realms.at(overworldRealm)->tileEntityAt(keepPosition))))
+		if (!(keep = std::dynamic_pointer_cast<Building>(game.getRealm(overworldRealm)->tileEntityAt(keepPosition))))
 			throw std::runtime_error("Couldn't find keep for worker");
 	}
 
@@ -130,7 +130,7 @@ namespace Game3 {
 	}
 
 	void Worker::goToBed(Phase new_phase) {
-		auto house = std::dynamic_pointer_cast<Building>(getRealm()->getGame().realms.at(overworldRealm)->tileEntityAt(housePosition));
+		auto house = std::dynamic_pointer_cast<Building>(getRealm()->getGame().getRealm(overworldRealm)->tileEntityAt(housePosition));
 		if (!house)
 			throw std::runtime_error("Worker of type " + type.str() + " couldn't find house at " + std::string(housePosition));
 		house->teleport(getSelf());

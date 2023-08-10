@@ -55,8 +55,6 @@ namespace Game3 {
 			std::map<RealmType, std::shared_ptr<InteractionSet>> interactionSets;
 			std::map<Identifier, std::unordered_set<std::shared_ptr<Item>>> itemsByAttribute;
 
-			std::unordered_map<RealmID, RealmPtr> realms;
-
 			RegistryRegistry registries;
 
 			Lockable<std::unordered_map<GlobalID, std::weak_ptr<Agent>>> allAgents;
@@ -108,6 +106,12 @@ namespace Game3 {
 			std::optional<TileID> getFluidTileID(FluidID);
 			std::shared_ptr<Fluid> getFluid(FluidID) const;
 			std::shared_ptr<Tile> getTile(const Identifier &);
+			RealmPtr tryRealm(RealmID) const;
+			RealmPtr getRealm(RealmID) const;
+			void addRealm(RealmID, RealmPtr);
+			void addRealm(RealmPtr);
+			bool hasRealm(RealmID) const;
+			void removeRealm(RealmID);
 
 			virtual Side getSide() const = 0;
 
@@ -145,11 +149,21 @@ namespace Game3 {
 			}
 
 		protected:
-			Game() = default;
 			std::chrono::system_clock::time_point lastTime = startTime;
+			Lockable<std::unordered_map<RealmID, RealmPtr>> realms;
+
+			Game() = default;
 
 		private:
 			std::unordered_map<FluidID, TileID> fluidCache;
+
+		public:
+			template <typename Fn>
+			void iterateRealms(const Fn &function) const {
+				auto lock = realms.sharedLock();
+				for (const auto &[realm_id, realm]: realms)
+					function(realm);
+			}
 	};
 
 	void to_json(nlohmann::json &, const Game &);
