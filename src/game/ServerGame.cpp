@@ -178,7 +178,7 @@ namespace Game3 {
 	}
 
 	void ServerGame::entityDestroyed(const Entity &entity) {
-		const DestroyEntityPacket packet(entity);
+		const DestroyEntityPacket packet(entity, false);
 		auto lock = server->server->lockClients();
 		for (const auto &[client_id, client]: server->server->getClients())
 			std::static_pointer_cast<RemoteClient>(client)->send(packet);

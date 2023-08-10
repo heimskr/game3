@@ -177,6 +177,7 @@ namespace Game3 {
 				client_game.activeRealm->onFocus();
 				new_realm->reupload();
 				focus(game.toClient().canvas, true);
+				client_game.requestFromLimbo(new_realm->id);
 			} else {
 				if (locked_realm)
 					locked_realm->queuePlayerRemoval(getShared());

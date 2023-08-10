@@ -23,21 +23,10 @@ namespace Game3 {
 		if (!entity->isPlayer()) {
 			auto &entity_ref = *entity;
 			INFO("Moving non-player entity " << globalID << " (" << typeid(entity_ref).name() << "). Player is " << game.player->getGID());
-		} else {
-			INFO("Moving " << std::dynamic_pointer_cast<Player>(entity)->displayName << " to " << position << " in realm " << realm->id << ". (GID: " << entity->getGID() << ")");
-			if (auto r = entity->weakRealm.lock()) {
-				INFO("Said player is in " << r->id << ".");
-			}
 		}
 
 		entity->direction = facing;
 		entity->teleport(position, realm);
-
-		if (entity->isPlayer()) {
-			if (auto r = entity->weakRealm.lock()) {
-				INFO("Now they're in " << r->id << ".");
-			}
-		}
 
 		if (offset)
 			entity->offset = *offset;

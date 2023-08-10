@@ -474,7 +474,6 @@ namespace Game3 {
 				getGame().toServer().entityChangingRealms(*this, new_realm, new_position);
 
 			if (old_realm) {
-				INFO("Detaching and queueing removal for " << getGID());
 				old_realm->detach(shared);
 				old_realm->queueRemoval(shared);
 			}

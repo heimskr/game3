@@ -9,10 +9,11 @@
 #include "net/LocalClient.h"
 #include "packet/CommandPacket.h"
 #include "packet/ChunkRequestPacket.h"
+#include "packet/ClickPacket.h"
+#include "packet/EntityRequestPacket.h"
 #include "packet/InteractPacket.h"
 #include "packet/RegisterPlayerPacket.h"
 #include "packet/TeleportSelfPacket.h"
-#include "packet/ClickPacket.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "ui/tab/TextTab.h"
@@ -171,7 +172,25 @@ namespace Game3 {
 
 	void ClientGame::putInLimbo(EntityPtr entity, RealmID next_realm_id, const Position &next_position) {
 		auto lock = entityLimbo.uniqueLock();
-		entityLimbo[std::move(entity)] = {next_realm_id, next_position};
+		entity->getRealm()->queueRemoval(entity);
+		entityLimbo[next_realm_id][std::move(entity)] = next_position;
+	}
+
+	void ClientGame::requestFromLimbo(RealmID realm_id) {
+		auto lock = entityLimbo.uniqueLock();
+		if (auto iter = entityLimbo.find(realm_id); iter != entityLimbo.end()) {
+			std::vector<EntityRequest> requests;
+			const std::unordered_map<EntityPtr, Position> &entity_map = iter->second;
+			requests.reserve(entity_map.size());
+			for (const auto &[entity, position]: entity_map)
+				requests.emplace_back(entity->getGID(), 0);
+			// TODO: is this safe/reasonable?
+			// Safe in the sense that we aren't erasing something we shouldn't erase.
+			entityLimbo.erase(iter);
+			lock.unlock();
+			INFO("Requesting " << requests.size() << " from limbo in realm " << realm_id << ".");
+			player->send(EntityRequestPacket(realm_id, std::move(requests)));
+		}
 	}
 
 	void ClientGame::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data) {

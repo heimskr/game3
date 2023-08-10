@@ -145,6 +145,9 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 23. **Destroy Entity**: tells a client to remove an entity.
 
 	- `u64` Global ID
+	- `optional<i32>` Realm Requirement
+
+	If the realm requirement is set, the entity will not be destroyed unless its current realm ID (as far as the client knows) matches the realm requirement.
 
 24. **Inventory**: sends a client its player's inventory.
 

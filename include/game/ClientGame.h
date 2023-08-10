@@ -36,6 +36,7 @@ namespace Game3 {
 			void interactOn(Modifiers);
 			void interactNextTo(Modifiers);
 			void putInLimbo(EntityPtr, RealmID, const Position &);
+			void requestFromLimbo(RealmID);
 
 			void moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data);
 
@@ -62,6 +63,6 @@ namespace Game3 {
 			std::set<ChunkPosition> missingChunks;
 			MTQueue<std::shared_ptr<Packet>> packetQueue;
 			/** Temporarily stores shared pointers to entities that have moved to a realm we're unaware of to prevent destruction. */
-			Lockable<std::unordered_map<EntityPtr, std::pair<RealmID, Position>>> entityLimbo;
+			Lockable<std::unordered_map<RealmID, std::unordered_map<EntityPtr, Position>>> entityLimbo;
 	};
 }
