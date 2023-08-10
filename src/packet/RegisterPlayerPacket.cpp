@@ -19,5 +19,11 @@ namespace Game3 {
 		auto player = game.server->loadPlayer(username, displayName);
 		SUCCESS("Registered user " << username << " with token " << player->token << '.');
 		client.send(RegistrationStatusPacket(username, displayName, player->token));
+		client.setPlayer(player);
+		auto realm = player->getRealm();
+		client.send(RealmNoticePacket(*realm));
+		INFO("Player GID is " << player->globalID);
+		client.send(LoginStatusPacket(true, player->globalID, username, displayName, player));
+		game.server->setupPlayer(client);
 	}
 }
