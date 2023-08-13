@@ -5,6 +5,9 @@
 
 namespace Game3 {
 	void EntityChangingRealmsPacket::handle(ClientGame &game) {
+		if (globalID == game.player->getGID())
+			return;
+
 		EntityPtr entity = game.getAgent<Entity>(globalID);
 		if (!entity) {
 			WARN("Couldn't find entity " << globalID << "; can't put in limbo for realm " << newRealmID << '.');
