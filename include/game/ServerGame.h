@@ -33,7 +33,7 @@ namespace Game3 {
 			void queuePacket(std::shared_ptr<RemoteClient>, std::shared_ptr<Packet>);
 			void runCommand(RemoteClient &, const std::string &, GlobalID);
 			void entityChangingRealms(Entity &, const RealmPtr &new_realm, const Position &new_position);
-			void entityTeleported(Entity &);
+			void entityTeleported(Entity &, MovementContext);
 			void entityDestroyed(const Entity &);
 			void tileEntitySpawned(const TileEntityPtr &);
 			void tileEntityDestroyed(const TileEntity &);

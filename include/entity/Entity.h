@@ -11,6 +11,7 @@
 #include "game/Agent.h"
 #include "game/ChunkPosition.h"
 #include "game/HasInventory.h"
+#include "game/MovementContext.h"
 #include "item/Item.h"
 #include "threading/HasMutex.h"
 #include "threading/Lockable.h"
@@ -108,15 +109,17 @@ namespace Game3 {
 			virtual void init(Game &);
 			virtual void initAfterLoad(Game &) {}
 			/** Returns whether the entity actually moved. */
-			bool move(Direction, std::optional<Direction> new_direction = {});
+			virtual bool move(Direction, MovementContext);
+			bool move(Direction direction);
 			std::shared_ptr<Realm> getRealm() const override final;
 			inline const Position & getPosition() const override { return position; }
 			Entity & setRealm(const Game &, RealmID);
 			Entity & setRealm(const std::shared_ptr<Realm>);
 			void focus(Canvas &, bool is_autofocus);
 			/** Returns whether the entity moved to a new chunk. */
-			bool teleport(const Position &, bool from_path = false, bool clear_offset = true);
-			virtual void teleport(const Position &, const std::shared_ptr<Realm> &);
+			bool teleport(const Position &, MovementContext = {});
+			virtual void teleport(const Position &, const std::shared_ptr<Realm> &, MovementContext);
+			void teleport(const Position &position, const std::shared_ptr<Realm> &realm) { teleport(position, realm, MovementContext{}); }
 			/** Returns the position of the tile in front of the entity. */
 			Position nextTo() const;
 			std::string debug() const;

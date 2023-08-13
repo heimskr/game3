@@ -15,8 +15,8 @@
 #include "game/HasInventory.h"
 #include "game/Inventory.h"
 #include "net/LocalClient.h"
-#include "packet/StartPlayerMovementPacket.h"
-#include "packet/StopPlayerMovementPacket.h"
+// #include "packet/StartPlayerMovementPacket.h"
+// #include "packet/StopPlayerMovementPacket.h"
 #include "packet/ContinuousInteractionPacket.h"
 #include "realm/Overworld.h"
 #include "tileentity/Building.h"
@@ -461,7 +461,8 @@ namespace Game3 {
 		keyTimes.clear();
 
 		if (game && game->player)
-			game->client->send(StopPlayerMovementPacket());
+			// game->client->send(StopPlayerMovementPacket());
+			game->player->stopMoving();
 	}
 
 	void MainWindow::activateContext() {

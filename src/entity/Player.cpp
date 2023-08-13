@@ -16,8 +16,6 @@
 #include "packet/EntitySetPathPacket.h"
 #include "packet/RealmNoticePacket.h"
 #include "packet/SetPlayerStationTypesPacket.h"
-#include "packet/StartPlayerMovementPacket.h"
-#include "packet/StopPlayerMovementPacket.h"
 #include "packet/TileEntityRequestPacket.h"
 #include "realm/Realm.h"
 #include "ui/Canvas.h"
@@ -86,7 +84,7 @@ namespace Game3 {
 			}
 		}
 
-		if (getSide() == Side::Server) {
+		if (getSide() == Side::Client) {
 			Direction final_direction = direction;
 
 			if (movingLeft && !movingRight)
@@ -101,18 +99,25 @@ namespace Game3 {
 			if (movingDown && !movingUp)
 				final_direction = Direction::Down;
 
+			const MovementContext context {
+				.clearOffset = false,
+				.facingDirection = final_direction
+			};
+
 			if (movingLeft && !movingRight)
-				move(Direction::Left, final_direction);
+				move(Direction::Left, context);
 
 			if (movingRight && !movingLeft)
-				move(Direction::Right, final_direction);
+				move(Direction::Right, context);
 
 			if (movingUp && !movingDown)
-				move(Direction::Up, final_direction);
+				move(Direction::Up, context);
 
 			if (movingDown && !movingUp)
-				move(Direction::Down, final_direction);
+				move(Direction::Down, context);
 
+			direction = final_direction;
+		} else {
 			if (continuousInteraction) {
 				Place place = getPlace();
 				if (!lastContinuousInteraction || *lastContinuousInteraction != place) {
@@ -123,8 +128,6 @@ namespace Game3 {
 			} else {
 				lastContinuousInteraction.reset();
 			}
-
-			direction = final_direction;
 		}
 	}
 
@@ -152,7 +155,7 @@ namespace Game3 {
 			realm->interactGround(player, next_to, modifiers);
 	}
 
-	void Player::teleport(const Position &position, const std::shared_ptr<Realm> &new_realm) {
+	void Player::teleport(const Position &position, const std::shared_ptr<Realm> &new_realm, MovementContext context) {
 		auto &game = new_realm->getGame();
 
 		if ((firstTeleport || weakRealm.lock() != new_realm) && getSide() == Side::Server) {
@@ -166,7 +169,7 @@ namespace Game3 {
 		if (locked_realm)
 			old_realm_id = locked_realm->id;
 
-		Entity::teleport(position, new_realm);
+		Entity::teleport(position, new_realm, context);
 
 		if ((old_realm_id == -1 || old_realm_id != nextRealm) && nextRealm != -1) {
 			if (getSide() == Side::Client) {
@@ -278,8 +281,8 @@ namespace Game3 {
 				return;
 		}
 
-		if (getSide() == Side::Client)
-			getGame().toClient().client->send(StartPlayerMovementPacket(direction));
+		// if (getSide() == Side::Client)
+		// 	getGame().toClient().client->send(StartPlayerMovementPacket(direction));
 	}
 
 	void Player::stopMoving() {
@@ -288,8 +291,8 @@ namespace Game3 {
 		movingDown  = false;
 		movingLeft  = false;
 
-		if (getSide() == Side::Client)
-			getGame().toClient().client->send(StopPlayerMovementPacket());
+		// if (getSide() == Side::Client)
+		// 	getGame().toClient().client->send(StopPlayerMovementPacket());
 	}
 
 	void Player::stopMoving(Direction direction) {
@@ -302,8 +305,8 @@ namespace Game3 {
 				return;
 		}
 
-		if (getSide() == Side::Client)
-			getGame().toClient().client->send(StopPlayerMovementPacket(direction));
+		// if (getSide() == Side::Client)
+		// 	getGame().toClient().client->send(StopPlayerMovementPacket(direction));
 	}
 
 	void Player::movedToNewChunk(const std::optional<ChunkPosition> &old_position) {

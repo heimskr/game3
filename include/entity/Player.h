@@ -48,7 +48,7 @@ namespace Game3 {
 			bool interactOn(Modifiers);
 			void interactNextTo(Modifiers);
 			using Entity::teleport;
-			void teleport(const Position &, const std::shared_ptr<Realm> &) override;
+			void teleport(const Position &, const std::shared_ptr<Realm> &, MovementContext) override;
 			void addMoney(MoneyCount);
 			float getSpeed() const override { return speed; }
 			bool setTooldown(float multiplier);

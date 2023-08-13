@@ -5,6 +5,7 @@
 #include "packet/AgentMessagePacket.h"
 #include "packet/ContinuousInteractionPacket.h"
 #include "packet/JumpPacket.h"
+#include "packet/MovePlayerPacket.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "ui/TextRenderer.h"
@@ -58,6 +59,11 @@ namespace Game3 {
 	const std::unordered_set<Layer> & ClientPlayer::getVisibleLayers() const {
 		static std::unordered_set<Layer> main_layers {Layer::Terrain, Layer::Submerged, Layer::Objects, Layer::Highest};
 		return main_layers;
+	}
+
+	bool ClientPlayer::move(Direction direction, MovementContext context) {
+		send(MovePlayerPacket(direction, context.facingDirection));
+		return Entity::move(direction, context);
 	}
 
 	void ClientPlayer::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {

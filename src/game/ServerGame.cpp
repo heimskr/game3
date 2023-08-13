@@ -155,14 +155,15 @@ namespace Game3 {
 		}
 	}
 
-	void ServerGame::entityTeleported(Entity &entity) {
+	void ServerGame::entityTeleported(Entity &entity, MovementContext context) {
 		if (entity.spawning)
 			return;
 
 		const EntityMovedPacket packet(entity);
 
 		if (auto cast_player = dynamic_cast<Player *>(&entity)) {
-			cast_player->send(packet);
+			if (!context.excludePlayerSelf)
+				cast_player->send(packet);
 			auto lock = lockPlayersShared();
 			for (const auto &player: players)
 				if (player.get() != cast_player && player->getRealm() && player->canSee(entity))

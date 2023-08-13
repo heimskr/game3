@@ -292,7 +292,7 @@ namespace Game3 {
 		}
 	}
 
-	bool Entity::move(Direction move_direction, std::optional<Direction> new_direction) {
+	bool Entity::move(Direction move_direction, MovementContext context) {
 		auto self_lock = uniqueLock();
 
 		RealmPtr realm = weakRealm.lock();
@@ -326,8 +326,8 @@ namespace Game3 {
 				throw std::invalid_argument("Invalid direction: " + std::to_string(int(move_direction)));
 		}
 
-		if (!new_direction)
-			new_direction = move_direction;
+		if (!context.facingDirection)
+			context.facingDirection = move_direction;
 
 		if ((horizontal && offset.x != 0) || (!horizontal && offset.y != 0)) {
 			// WARN("Can't move entity " << globalID << ": improper offsets [" << horizontal << "/" << offset.x << ", " << !horizontal << "/" << offset.y << "]");
@@ -335,10 +335,10 @@ namespace Game3 {
 		}
 
 		const bool can_move = canMoveTo(new_position);
-		const bool direction_changed = *new_direction != direction;
+		const bool direction_changed = *context.facingDirection != direction;
 
 		if (can_move || direction_changed) {
-			direction = *new_direction;
+			direction = *context.facingDirection;
 
 			if (can_move) {
 				if (horizontal)
@@ -347,17 +347,20 @@ namespace Game3 {
 					offset.y = y_offset;
 			}
 
-			bool path_empty = true;
 			{
 				auto lock = path.sharedLock();
-				path_empty = path.empty();
+				context.fromPath = !path.empty();
 			}
-			teleport(can_move? new_position : position, !path_empty, false);
+			teleport(can_move? new_position : position, context);
 
 			return true;
 		}
 
 		return false;
+	}
+
+	bool Entity::move(Direction direction) {
+		return move(direction, MovementContext{.clearOffset = false});
 	}
 
 	std::shared_ptr<Realm> Entity::getRealm() const {
@@ -429,7 +432,7 @@ namespace Game3 {
 		}
 	}
 
-	bool Entity::teleport(const Position &new_position, bool from_path, bool clear_offset) {
+	bool Entity::teleport(const Position &new_position, MovementContext context) {
 		const auto old_chunk_position = getChunkPosition(position);
 		const bool in_different_chunk = firstTeleport || old_chunk_position != getChunkPosition(new_position);
 		const bool is_server = getSide() == Side::Server;
@@ -438,7 +441,7 @@ namespace Game3 {
 
 		if (firstTeleport)
 			offset = {0.f, 0.f, 0.f};
-		else if (clear_offset)
+		else if (context.clearOffset)
 			offset = {0.f, 0.f, offset.z};
 
 		if (is_server)
@@ -457,13 +460,13 @@ namespace Game3 {
 			});
 		}
 
-		if (is_server && !from_path)
-			getGame().toServer().entityTeleported(*this);
+		if (is_server && !context.fromPath)
+			getGame().toServer().entityTeleported(*this, context);
 
 		return in_different_chunk;
 	}
 
-	void Entity::teleport(const Position &new_position, const std::shared_ptr<Realm> &new_realm) {
+	void Entity::teleport(const Position &new_position, const std::shared_ptr<Realm> &new_realm, MovementContext context) {
 		auto old_realm = weakRealm.lock();
 
 		if (old_realm != new_realm) {
@@ -482,7 +485,7 @@ namespace Game3 {
 			setRealm(new_realm);
 			new_realm->queueAddition(getSelf(), new_position);
 		} else {
-			teleport(new_position, false);
+			teleport(new_position, context);
 		}
 	}
 
@@ -903,7 +906,7 @@ namespace Game3 {
 
 		zSpeed = 8.f;
 		increaseUpdateCounter();
-		getGame().toServer().entityTeleported(*this);
+		getGame().toServer().entityTeleported(*this, MovementContext{});
 	}
 
 	void Entity::clearOffset() {

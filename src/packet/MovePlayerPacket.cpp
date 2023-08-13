@@ -3,13 +3,13 @@
 #include "game/ServerGame.h"
 #include "net/RemoteClient.h"
 #include "packet/ErrorPacket.h"
-#include "packet/StartPlayerMovementPacket.h"
+#include "packet/MovePlayerPacket.h"
 
 namespace Game3 {
-	void StartPlayerMovementPacket::handle(ServerGame &, RemoteClient &client) {
+	void MovePlayerPacket::handle(ServerGame &, RemoteClient &client) {
 		if (auto player = client.getPlayer()) {
 			player->path.clear();
-			player->startMoving(direction);
+			player->move(movementDirection, {.excludePlayerSelf = true, .clearOffset = false, .facingDirection = facingDirection});
 			return;
 		}
 

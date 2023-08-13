@@ -17,6 +17,7 @@ namespace Game3 {
 			void setContinuousInteraction(bool, Modifiers);
 			void jump() override;
 			const std::unordered_set<Layer> & getVisibleLayers() const;
+			bool move(Direction, MovementContext) final;
 
 			void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
 			void sendMessage(const std::shared_ptr<Agent> &destination, const std::string &, std::any &) final;
