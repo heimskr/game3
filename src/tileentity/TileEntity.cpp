@@ -50,8 +50,15 @@ namespace Game3 {
 		auto realm = getRealm();
 		auto &tileset = realm->getTileset();
 
-		if (cachedTile == TileID(-1))
-			cachedTile = tileset[tileID];
+		if (cachedTile == TileID(-1) || tileLookupFailed) {
+			if (tileID.empty()) {
+				tileLookupFailed = true;
+				cachedTile = 0;
+			} else {
+				tileLookupFailed = false;
+				cachedTile = tileset[tileID];
+			}
+		}
 
 		const auto tilesize = tileset.getTileSize();
 		const auto texture = tileset.getTexture(realm->getGame());

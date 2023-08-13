@@ -48,7 +48,7 @@ namespace Game3::WorldGen {
 		realm->setTile(Layer::Objects, Position(height - 2, 1), "base:tile/stockpile_w"_id, false, true);
 		realm->setTile(Layer::Objects, Position(height - 2, 2), "base:tile/stockpile_e"_id, false, true);
 		// TODO: the identifier here used to inexplicably be 48 so I'm putting in a silly tile temporarily to see whether it does anything.
-		auto stockpile = TileEntity::create<Stockpile>(game, "base:tile/furnace"_id, Position(height - 2, 2));
+		auto stockpile = TileEntity::create<Stockpile>(game, "base:tile/stockpile_e"_id, Position(height - 2, 2));
 		stockpile->setInventory(40);
 		realm->add(stockpile);
 		realm->stockpileInventory = stockpile->inventory;

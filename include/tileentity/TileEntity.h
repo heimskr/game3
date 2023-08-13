@@ -80,6 +80,7 @@ namespace Game3 {
 
 		protected:
 			TileID cachedTile = -1;
+			bool tileLookupFailed = false;
 
 			TileEntity() = default;
 			TileEntity(Identifier tile_id, Identifier tile_entity_id, Position position_, bool solid_):

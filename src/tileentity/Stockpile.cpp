@@ -15,10 +15,6 @@ namespace Game3 {
 		tileEntityID = ID();
 	}
 
-	void Stockpile::toJSON(nlohmann::json &json) const {
-		Chest::toJSON(json);
-	}
-
 	bool Stockpile::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers modifiers) {
 		auto keep = std::dynamic_pointer_cast<Keep>(getRealm());
 		if (!keep)
@@ -26,9 +22,5 @@ namespace Game3 {
 		std::cout << "Keep: money = " << keep->money << ", greed = " << keep->greed << '\n';
 		Chest::onInteractNextTo(player, modifiers);
 		return true;
-	}
-
-	void Stockpile::absorbJSON(Game &game, const nlohmann::json &json) {
-		Chest::absorbJSON(game, json);
 	}
 }
