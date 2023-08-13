@@ -9,7 +9,7 @@ namespace Game3 {
 	void MovePlayerPacket::handle(ServerGame &, RemoteClient &client) {
 		if (auto player = client.getPlayer()) {
 			player->path.clear();
-			player->move(movementDirection, {.excludePlayerSelf = true, .clearOffset = false, .facingDirection = facingDirection});
+			player->move(movementDirection, {.excludePlayerSelf = true, .clearOffset = false, .facingDirection = facingDirection, .forcedPosition = position});
 			return;
 		}
 

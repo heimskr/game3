@@ -62,7 +62,7 @@ namespace Game3 {
 	}
 
 	bool ClientPlayer::move(Direction direction, MovementContext context) {
-		send(MovePlayerPacket(direction, context.facingDirection));
+		send(MovePlayerPacket(position + direction, direction, context.facingDirection));
 		return Entity::move(direction, context);
 	}
 

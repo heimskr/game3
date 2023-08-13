@@ -326,6 +326,9 @@ namespace Game3 {
 				throw std::invalid_argument("Invalid direction: " + std::to_string(int(move_direction)));
 		}
 
+		if (context.forcedPosition)
+			new_position = *context.forcedPosition;
+
 		if (!context.facingDirection)
 			context.facingDirection = move_direction;
 
