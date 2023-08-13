@@ -19,6 +19,8 @@ namespace Game3 {
 	struct EntityRequestPacket: Packet {
 		static PacketID ID() { return 36; }
 
+		constexpr static size_t MAX_REQUESTS = 4096;
+
 		RealmID realmID = -1;
 		std::vector<EntityRequest> requests;
 

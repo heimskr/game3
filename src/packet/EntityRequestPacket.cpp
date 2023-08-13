@@ -45,7 +45,7 @@ namespace Game3 {
 		if (data.size() % 2 != 0)
 			throw PacketError("Misshapen EntityRequestPacket");
 
-		if (data.size() > 4096 * 2)
+		if (data.size() > MAX_REQUESTS * 2)
 			throw PacketError("Excessively greedy EntityRequestPacket");
 
 		requests.clear();
