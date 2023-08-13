@@ -1,5 +1,13 @@
 #pragma once
 
+#include "Types.h"
+#include "entity/Player.h"
+#include "net/Buffer.h"
+#include "realm/Realm.h"
+#include "registry/Registries.h"
+#include "registry/Registry.h"
+#include "threading/Lockable.h"
+
 #include <chrono>
 #include <filesystem>
 #include <map>
@@ -10,17 +18,10 @@
 #include <shared_mutex>
 #include <unordered_map>
 #include <utility>
+#include <variant>
 
 #include <gtkmm.h>
 #include <nlohmann/json_fwd.hpp>
-
-#include "Types.h"
-#include "entity/Player.h"
-#include "net/Buffer.h"
-#include "realm/Realm.h"
-#include "registry/Registries.h"
-#include "registry/Registry.h"
-#include "threading/Lockable.h"
 
 namespace Game3 {
 	class Canvas;
