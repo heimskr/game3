@@ -343,7 +343,9 @@ namespace Game3 {
 		if (can_move || direction_changed) {
 			direction = *context.facingDirection;
 
-			if (can_move) {
+			if (context.forcedOffset) {
+				offset = *context.forcedOffset;
+			} else if (can_move) {
 				if (horizontal)
 					offset.x = x_offset;
 				else

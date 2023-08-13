@@ -62,8 +62,10 @@ namespace Game3 {
 	}
 
 	bool ClientPlayer::move(Direction direction, MovementContext context) {
-		send(MovePlayerPacket(position + direction, direction, context.facingDirection));
-		return Entity::move(direction, context);
+		const bool moved = Entity::move(direction, context);
+		if (moved)
+			send(MovePlayerPacket(position, direction, context.facingDirection, offset));
+		return moved;
 	}
 
 	void ClientPlayer::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {

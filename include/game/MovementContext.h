@@ -12,8 +12,6 @@ namespace Game3 {
 		bool clearOffset = true;
 		std::optional<Direction> facingDirection;
 		std::optional<Position> forcedPosition;
-
-		// explicit MovementContext(bool exclude_player_self = false, bool from_path = false, bool clear_offset = true):
-		// 	excludePlayerSelf(exclude_player_self), fromPath(from_path), clearOffset(clear_offset) {}
+		std::optional<Offset> forcedOffset;
 	};
 }
