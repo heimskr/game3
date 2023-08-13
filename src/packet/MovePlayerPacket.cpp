@@ -15,7 +15,7 @@ namespace Game3 {
 
 	void MovePlayerPacket::handle(ServerGame &, RemoteClient &client) {
 		if (offset)
-			if (1.01f < std::abs(offset->x) || 1.01f < std::abs(offset->y) || 1.01f < std::abs(offset->z))
+			if (1.01f < std::abs(offset->x) || 1.01f < std::abs(offset->y))
 				throw PacketError("Invalid MovePlayerPacket offset");
 
 		if (auto player = client.getPlayer()) {
