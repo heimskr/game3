@@ -189,9 +189,6 @@ namespace Game3 {
 			// Safe in the sense that we aren't erasing something we shouldn't erase.
 			entityLimbo.erase(iter);
 			lock.unlock();
-			INFO("Requesting " << requests.size() << " from limbo in realm " << realm_id << ".");
-			for (const auto &[entity_id, threshold]: requests)
-				INFO("- " << entity_id);
 			player->send(EntityRequestPacket(realm_id, std::move(requests)));
 		}
 	}

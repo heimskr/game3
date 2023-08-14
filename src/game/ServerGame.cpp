@@ -142,7 +142,6 @@ namespace Game3 {
 		EntityMovedPacket moved_packet(entity);
 		moved_packet.arguments.position = new_position;
 		moved_packet.arguments.isTeleport = true;
-		INFO("EntityChanging: entity " << entity.getGID() << " to " << new_position << " in realm " << new_realm->id);
 
 		auto lock = lockPlayersShared();
 		for (const auto &player: players)
@@ -156,7 +155,6 @@ namespace Game3 {
 		if (entity.spawning)
 			return;
 
-		INFO("EntityTeleported: entity " << entity.getGID() << " to " << entity.getPosition() << " in realm " << entity.realmID);
 		EntityMovedPacket packet(entity);
 		packet.arguments.isTeleport = context.isTeleport;
 

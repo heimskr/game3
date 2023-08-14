@@ -31,8 +31,6 @@ namespace Game3 {
 		if (!entity->isPlayer()) {
 			auto &entity_ref = *entity;
 			INFO("Moving non-player entity " << arguments.globalID << " (" << typeid(entity_ref).name() << "). Player is " << game.player->getGID());
-		} else {
-			INFO("Moving player " << entity->getGID() << " to " << arguments.position << " in realm " << arguments.realmID << " from realm " << entity->getRealm()->id << " (cached as " << entity->realmID << ')');
 		}
 
 		const double apparent_x = entity->offset.x + double(entity->getPosition().column);

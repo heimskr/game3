@@ -476,10 +476,6 @@ namespace Game3 {
 
 	void Entity::teleport(const Position &new_position, const std::shared_ptr<Realm> &new_realm, MovementContext context) {
 		auto old_realm = weakRealm.lock();
-
-		if (isPlayer())
-			INFO(getGID() << ": " << (old_realm? std::to_string(old_realm->id) : "???") << ':' << position << " → " << (new_realm? std::to_string(new_realm->id) : "???") << ':' << new_position);
-
 		RealmID limbo_id = inLimboFor.load();
 
 		if ((old_realm != new_realm) || (limbo_id != RealmID(-1) && limbo_id != new_realm->id)) {
@@ -495,7 +491,6 @@ namespace Game3 {
 			}
 
 			clearOffset();
-			INFO("Queueing addition of " << getGID() << " to realm " << new_realm->id << " at position " << new_position);
 			inLimboFor = -1;
 			new_realm->queueAddition(getSelf(), new_position);
 		} else {
