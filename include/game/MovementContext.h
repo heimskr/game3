@@ -13,5 +13,6 @@ namespace Game3 {
 		std::optional<Direction> facingDirection;
 		std::optional<Position> forcedPosition;
 		std::optional<Offset> forcedOffset;
+		bool isTeleport = false;
 	};
 }

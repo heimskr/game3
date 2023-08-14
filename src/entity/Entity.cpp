@@ -442,6 +442,9 @@ namespace Game3 {
 		const bool in_different_chunk = firstTeleport || old_chunk_position != getChunkPosition(new_position);
 		const bool is_server = getSide() == Side::Server;
 
+		if (2 < position.taxiDistance(new_position))
+			context.isTeleport = true;
+
 		position = new_position;
 
 		if (firstTeleport)

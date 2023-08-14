@@ -14,6 +14,6 @@ namespace Game3 {
 		if (!realm)
 			return;
 
-		player->teleport(position, realm);
+		player->teleport(position, realm, MovementContext{.isTeleport = true});
 	}
 }

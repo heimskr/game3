@@ -159,7 +159,11 @@ namespace Game3 {
 		if (entity.spawning)
 			return;
 
-		const EntityMovedPacket packet(entity);
+		EntityMovedPacket packet(entity);
+
+		// Actual teleportation (rather than regular movement between adjacent tiles) should be instant.
+		if (context.isTeleport)
+			packet.arguments.adjustOffset = false;
 
 		if (auto cast_player = dynamic_cast<Player *>(&entity)) {
 			if (!context.excludePlayerSelf)
