@@ -139,7 +139,9 @@ namespace Game3 {
 
 	void ServerGame::entityChangingRealms(Entity &entity, const RealmPtr &new_realm, const Position &new_position) {
 		const EntityChangingRealmsPacket changing_packet(entity.getGID(), new_realm->id, new_position);
-		const EntityMovedPacket moved_packet(entity);
+		EntityMovedPacket moved_packet(entity);
+		moved_packet.arguments.position = new_position;
+		moved_packet.arguments.isTeleport = true;
 
 		auto lock = lockPlayersShared();
 		for (const auto &player: players)
@@ -154,6 +156,7 @@ namespace Game3 {
 			return;
 
 		EntityMovedPacket packet(entity);
+		packet.arguments.isTeleport = context.isTeleport;
 
 		// Actual teleportation (rather than regular movement between adjacent tiles) should be instant.
 		if (context.isTeleport)

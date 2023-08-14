@@ -478,7 +478,7 @@ namespace Game3 {
 		auto old_realm = weakRealm.lock();
 
 		if (isPlayer())
-			INFO(getGID() << ": " << (old_realm? std::to_string(old_realm->id) : "???") << " → " << (new_realm? std::to_string(new_realm->id) : "???"));
+			INFO(getGID() << ": " << (old_realm? std::to_string(old_realm->id) : "???") << ':' << position << " → " << (new_realm? std::to_string(new_realm->id) : "???") << ':' << new_position);
 
 		RealmID limbo_id = inLimboFor.load();
 
@@ -486,7 +486,7 @@ namespace Game3 {
 			nextRealm = new_realm->id;
 			auto shared = getSelf();
 
-			if (getSide() == Side::Server)
+			if (getSide() == Side::Server && old_realm != new_realm)
 				getGame().toServer().entityChangingRealms(*this, new_realm, new_position);
 
 			if (old_realm && old_realm != new_realm) {

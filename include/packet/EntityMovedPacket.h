@@ -18,6 +18,7 @@ namespace Game3 {
 			std::optional<Offset> offset;
 			std::optional<float> zSpeed;
 			bool adjustOffset = false;
+			bool isTeleport = false;
 		};
 
 		static PacketID ID() { return 17; }
@@ -30,8 +31,8 @@ namespace Game3 {
 
 		PacketID getID() const override { return ID(); }
 
-		void encode(Game &, Buffer &buffer) const override;
-		void decode(Game &, Buffer &buffer) override;
+		void encode(Game &, Buffer &) const override;
+		void decode(Game &, Buffer &) override;
 
 		void handle(ClientGame &) override;
 	};

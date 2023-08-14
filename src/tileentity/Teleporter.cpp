@@ -20,6 +20,9 @@ namespace Game3 {
 	}
 
 	void Teleporter::onOverlap(const std::shared_ptr<Entity> &entity) {
+		if (getSide() != Side::Server)
+			return;
+
 		getRealm()->queue([entity, position = targetPosition, target = getRealm()->getGame().getRealm(targetRealm)] {
 			entity->teleport(position, target, MovementContext{.isTeleport = true});
 		});

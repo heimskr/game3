@@ -5,14 +5,14 @@
 
 namespace Game3 {
 	EntityMovedPacket::EntityMovedPacket(const Entity &entity):
-		EntityMovedPacket(Args{entity.globalID, entity.nextRealm == -1? entity.realmID : entity.nextRealm, entity.getPosition(), entity.direction, entity.offset, entity.zSpeed, true}) {}
+		EntityMovedPacket(Args{entity.globalID, entity.nextRealm == -1? entity.realmID : entity.nextRealm, entity.getPosition(), entity.direction, entity.offset, entity.zSpeed, true, false}) {}
 
 	void EntityMovedPacket::encode(Game &, Buffer &buffer) const {
-		buffer << arguments.globalID << arguments.realmID << arguments.position << arguments.facing << arguments.offset << arguments.zSpeed << arguments.adjustOffset;
+		buffer << arguments.globalID << arguments.realmID << arguments.position << arguments.facing << arguments.offset << arguments.zSpeed << arguments.adjustOffset << arguments.isTeleport;
 	}
 
 	void EntityMovedPacket::decode(Game &, Buffer &buffer) {
-		buffer >> arguments.globalID >> arguments.realmID >> arguments.position >> arguments.facing >> arguments.offset >> arguments.zSpeed >> arguments.adjustOffset;
+		buffer >> arguments.globalID >> arguments.realmID >> arguments.position >> arguments.facing >> arguments.offset >> arguments.zSpeed >> arguments.adjustOffset >> arguments.isTeleport;
 	}
 
 	void EntityMovedPacket::handle(ClientGame &game) {
@@ -38,7 +38,9 @@ namespace Game3 {
 		const double apparent_x = entity->offset.x + double(entity->getPosition().column);
 		const double apparent_y = entity->offset.y + double(entity->getPosition().row);
 
-		MovementContext context;
+		MovementContext context{
+			.isTeleport = arguments.isTeleport
+		};
 
 		if (entity->isInLimbo())
 			context.isTeleport = true;
@@ -46,11 +48,13 @@ namespace Game3 {
 		entity->direction = arguments.facing;
 		entity->teleport(arguments.position, realm, context);
 
-		if (arguments.adjustOffset && !context.isTeleport) {
-			entity->offset.x = apparent_x - entity->getPosition().column;
-			entity->offset.y = apparent_y - entity->getPosition().row;
-		} else if (arguments.offset)
-			entity->offset = *arguments.offset;
+		if (!context.isTeleport) {
+			if (arguments.adjustOffset) {
+				entity->offset.x = apparent_x - entity->getPosition().column;
+				entity->offset.y = apparent_y - entity->getPosition().row;
+			} else if (arguments.offset)
+				entity->offset = *arguments.offset;
+		}
 
 		if (arguments.zSpeed)
 			entity->zSpeed = *arguments.zSpeed;
