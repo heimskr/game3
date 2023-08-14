@@ -496,7 +496,7 @@ namespace Game3 {
 
 			clearOffset();
 			setRealm(new_realm);
-			INFO("Queueing addition of " << getGID() << " to realm " << new_realm->id);
+			INFO("Queueing addition of " << getGID() << " to realm " << new_realm->id << " at position " << new_position);
 			inLimboFor = -1;
 			new_realm->queueAddition(getSelf(), new_position);
 		} else {
@@ -510,7 +510,8 @@ namespace Game3 {
 			case Direction::Down:  return {position.row + 1, position.column};
 			case Direction::Left:  return {position.row, position.column - 1};
 			case Direction::Right: return {position.row, position.column + 1};
-			default: throw std::invalid_argument("Invalid direction: " + std::to_string(int(direction)));
+			default:
+				throw std::invalid_argument("Invalid direction: " + std::to_string(int(direction)));
 		}
 	}
 
