@@ -161,7 +161,7 @@ namespace Game3 {
 		if ((firstTeleport || weakRealm.lock() != new_realm) && getSide() == Side::Server) {
 			clearOffset();
 			stopMoving();
-			send(RealmNoticePacket(*new_realm));
+			notifyOfRealm(*new_realm);
 		}
 
 		RealmID old_realm_id = -1;
@@ -174,13 +174,14 @@ namespace Game3 {
 		if ((old_realm_id == -1 || old_realm_id != nextRealm) && nextRealm != -1) {
 			if (getSide() == Side::Client) {
 				auto &client_game = game.toClient();
-				client_game.activeRealm->onBlur();
-				client_game.activeRealm->queuePlayerRemoval(getShared());
-				client_game.activeRealm = new_realm;
-				client_game.activeRealm->onFocus();
-				new_realm->reupload();
-				focus(game.toClient().canvas, true);
-				client_game.requestFromLimbo(new_realm->id);
+				if (getGID() == client_game.player->getGID()) {
+					client_game.activeRealm->onBlur();
+					client_game.activeRealm->queuePlayerRemoval(getShared());
+					client_game.activeRealm = new_realm;
+					client_game.activeRealm->onFocus();
+					focus(game.toClient().canvas, true);
+					client_game.requestFromLimbo(new_realm->id);
+				}
 			} else {
 				if (locked_realm)
 					locked_realm->queuePlayerRemoval(getShared());
@@ -451,6 +452,23 @@ namespace Game3 {
 
 	std::shared_ptr<ServerPlayer> Player::toServer() {
 		return std::dynamic_pointer_cast<ServerPlayer>(shared_from_this());
+	}
+
+	void Player::addKnownRealm(RealmID realm_id) {
+		auto lock = knownRealms.uniqueLock();
+		knownRealms.insert(realm_id);
+	}
+
+	bool Player::knowsRealm(RealmID realm_id) const {
+		auto lock = knownRealms.sharedLock();
+		return knownRealms.contains(realm_id);
+	}
+
+	void Player::notifyOfRealm(Realm &realm) {
+		if (knowsRealm(realm.id))
+			return;
+		send(RealmNoticePacket(realm));
+		addKnownRealm(realm.id);
 	}
 
 	void Player::resetEphemeral() {

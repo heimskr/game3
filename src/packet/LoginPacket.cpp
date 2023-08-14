@@ -16,7 +16,8 @@ namespace Game3 {
 				auto player = game.server->loadPlayer(username, *display_name);
 				client.setPlayer(player);
 				auto realm = player->getRealm();
-				client.send(RealmNoticePacket(*realm));
+				player->weakClient = client.shared_from_this();
+				player->notifyOfRealm(*realm);
 				INFO("Player GID is " << player->globalID);
 				client.send(LoginStatusPacket(true, player->globalID, username, *display_name, player));
 				game.server->setupPlayer(client);

@@ -17,7 +17,6 @@
 #include "net/SSLServer.h"
 #include "packet/ChunkTilesPacket.h"
 #include "packet/ProtocolVersionPacket.h"
-#include "packet/RealmNoticePacket.h"
 #include "packet/SelfTeleportedPacket.h"
 #include "packet/TimePacket.h"
 #include "realm/Overworld.h"
@@ -162,6 +161,7 @@ namespace Game3 {
 		auto realm = player->getRealm();
 		INFO("Setting up player");
 		player->weakClient = client.shared_from_this();
+		player->notifyOfRealm(*player->getRealm());
 		auto guard = client.bufferGuard();
 		client.send(SelfTeleportedPacket(realm->id, player->getPosition()));
 		client.send(TimePacket(game->time));

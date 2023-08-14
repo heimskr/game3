@@ -72,10 +72,15 @@ namespace Game3 {
 			std::shared_ptr<Player> getShared();
 			std::shared_ptr<ClientPlayer> toClient();
 			std::shared_ptr<ServerPlayer> toServer();
+			void addKnownRealm(RealmID);
+			bool knowsRealm(RealmID) const;
+			void notifyOfRealm(Realm &);
 
 			friend class Entity;
 
 		protected:
+			Lockable<std::unordered_set<RealmID>> knownRealms;
+
 			Player();
 
 			/** Resets client-side things like movingUp and the continous interaction fields that aren't transferred over the network. */

@@ -293,7 +293,6 @@ namespace Game3 {
 
 		private:
 			struct ChunkPackets {
-				RealmNoticePacket realmNotice;
 				ChunkTilesPacket tilePacket;
 				std::vector<EntityPacket> entityPackets;
 				std::vector<TileEntityPacket> tileEntityPackets;

@@ -55,7 +55,7 @@ namespace Game3 {
 			constexpr static HitPoints INVINCIBLE = 0;
 
 			EntityType type;
-			Lockable<Position> position {0, 0};
+			Lockable<Position> position{0, 0};
 			RealmID realmID = 0;
 			std::weak_ptr<Realm> weakRealm;
 			Direction direction = Direction::Down;
@@ -75,6 +75,7 @@ namespace Game3 {
 			bool spawning = false;
 			/** Whether the entity is currently teleporting to its first position on realm change. */
 			bool firstTeleport = false;
+			std::atomic<RealmID> inLimboFor{-1};
 
 			virtual void destroy();
 
@@ -153,6 +154,7 @@ namespace Game3 {
 			inline auto getHeldRight() const { return heldRight.slot; }
 			std::shared_ptr<Entity> getSelf();
 			void clearQueues();
+			bool isInLimbo() const;
 
 			virtual void encode(Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */

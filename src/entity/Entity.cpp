@@ -477,20 +477,27 @@ namespace Game3 {
 	void Entity::teleport(const Position &new_position, const std::shared_ptr<Realm> &new_realm, MovementContext context) {
 		auto old_realm = weakRealm.lock();
 
-		if (old_realm != new_realm) {
+		if (isPlayer())
+			INFO(getGID() << ": " << (old_realm? std::to_string(old_realm->id) : "???") << " → " << (new_realm? std::to_string(new_realm->id) : "???"));
+
+		RealmID limbo_id = inLimboFor.load();
+
+		if ((old_realm != new_realm) || (limbo_id != RealmID(-1) && limbo_id != new_realm->id)) {
 			nextRealm = new_realm->id;
 			auto shared = getSelf();
 
 			if (getSide() == Side::Server)
 				getGame().toServer().entityChangingRealms(*this, new_realm, new_position);
 
-			if (old_realm) {
+			if (old_realm && old_realm != new_realm) {
 				old_realm->detach(shared);
 				old_realm->queueRemoval(shared);
 			}
 
 			clearOffset();
 			setRealm(new_realm);
+			INFO("Queueing addition of " << getGID() << " to realm " << new_realm->id);
+			inLimboFor = -1;
 			new_realm->queueAddition(getSelf(), new_position);
 		} else {
 			teleport(new_position, context);
@@ -930,6 +937,10 @@ namespace Game3 {
 	void Entity::clearQueues() {
 		auto lock = moveQueue.uniqueLock();
 		moveQueue.clear();
+	}
+
+	bool Entity::isInLimbo() const {
+		return inLimboFor != RealmID(-1);
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {

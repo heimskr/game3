@@ -173,6 +173,7 @@ namespace Game3 {
 	void ClientGame::putInLimbo(EntityPtr entity, RealmID next_realm_id, const Position &next_position) {
 		auto lock = entityLimbo.uniqueLock();
 		entity->getRealm()->queueRemoval(entity);
+		entity->inLimboFor = next_realm_id;
 		entityLimbo[next_realm_id][std::move(entity)] = next_position;
 	}
 

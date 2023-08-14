@@ -138,21 +138,15 @@ namespace Game3 {
 	}
 
 	void ServerGame::entityChangingRealms(Entity &entity, const RealmPtr &new_realm, const Position &new_position) {
-		const EntityChangingRealmsPacket packet(entity.getGID(), new_realm->id, new_position);
+		const EntityChangingRealmsPacket changing_packet(entity.getGID(), new_realm->id, new_position);
+		const EntityMovedPacket moved_packet(entity);
 
-		if (auto cast_player = dynamic_cast<Player *>(&entity)) {
-			cast_player->send(packet);
-			auto lock = lockPlayersShared();
-			for (const auto &player: players)
-				if (player.get() != cast_player)
-					if (auto client = player->toServer()->weakClient.lock())
-						client->send(packet);
-		} else {
-			auto lock = lockPlayersShared();
-			for (const auto &player: players)
-				if (auto client = player->toServer()->weakClient.lock())
-					client->send(packet);
-		}
+		auto lock = lockPlayersShared();
+		for (const auto &player: players)
+			if (player->knowsRealm(new_realm->id))
+				player->send(moved_packet);
+			else
+				player->send(changing_packet);
 	}
 
 	void ServerGame::entityTeleported(Entity &entity, MovementContext context) {

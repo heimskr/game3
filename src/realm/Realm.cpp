@@ -315,8 +315,7 @@ namespace Game3 {
 		if (entity->isPlayer() && entity->weakRealm.lock())
 			std::static_pointer_cast<Player>(entity)->stopMoving();
 		entity->setRealm(shared);
-		entity->teleport(position);
-		entity->clearOffset();
+		entity->teleport(position, MovementContext{.isTeleport = true});
 		entity->firstTeleport = false;
 		attach(entity);
 		if (entity->isPlayer()) {
@@ -967,7 +966,6 @@ namespace Game3 {
 	}
 
 	Realm::ChunkPackets Realm::getChunkPackets(ChunkPosition chunk_position) {
-		RealmNoticePacket realm_notice(*this);
 		ChunkTilesPacket chunk_tiles(*this, chunk_position);
 		std::vector<EntityPacket> entity_packets;
 		std::vector<TileEntityPacket> tile_entity_packets;
@@ -984,7 +982,7 @@ namespace Game3 {
 				tile_entity_packets.emplace_back(tile_entity);
 		}
 
-		return {std::move(realm_notice), std::move(chunk_tiles), std::move(entity_packets), std::move(tile_entity_packets)};
+		return {std::move(chunk_tiles), std::move(entity_packets), std::move(tile_entity_packets)};
 	}
 
 	void Realm::remakePathMap() {
@@ -1117,7 +1115,7 @@ namespace Game3 {
 		auto player = client.getPlayer();
 		assert(player);
 
-		client.send(RealmNoticePacket(*this));
+		player->notifyOfRealm(*this);
 
 		for (const auto &chunk_position: player->getVisibleChunks())
 			client.sendChunk(*this, chunk_position);
@@ -1222,10 +1220,10 @@ namespace Game3 {
 			return;
 
 		try {
-			const auto [realm_notice, chunk_tiles, entity_packets, tile_entity_packets] = getChunkPackets(chunk_position);
+			const auto [chunk_tiles, entity_packets, tile_entity_packets] = getChunkPackets(chunk_position);
 
 			for (const auto &client: clients) {
-				client->send(realm_notice);
+				client->getPlayer()->notifyOfRealm(*this);
 				client->send(chunk_tiles);
 				for (const auto &packet: entity_packets)
 					client->send(packet);
@@ -1241,9 +1239,9 @@ namespace Game3 {
 	}
 
 	void Realm::sendToOne(RemoteClient &client, ChunkPosition chunk_position) {
-		const auto [realm_notice, chunk_tiles, entity_packets, tile_entity_packets] = getChunkPackets(chunk_position);
+		const auto [chunk_tiles, entity_packets, tile_entity_packets] = getChunkPackets(chunk_position);
 
-		client.send(realm_notice);
+		client.getPlayer()->notifyOfRealm(*this);
 		client.send(chunk_tiles);
 		for (const auto &packet: entity_packets)
 			client.send(packet);

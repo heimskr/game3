@@ -31,15 +31,22 @@ namespace Game3 {
 		if (!entity->isPlayer()) {
 			auto &entity_ref = *entity;
 			INFO("Moving non-player entity " << arguments.globalID << " (" << typeid(entity_ref).name() << "). Player is " << game.player->getGID());
+		} else {
+			INFO("Moving player " << entity->getGID() << " to " << arguments.position << " in realm " << arguments.realmID << " from realm " << entity->getRealm()->id << " (cached as " << entity->realmID << ')');
 		}
 
 		const double apparent_x = entity->offset.x + double(entity->getPosition().column);
 		const double apparent_y = entity->offset.y + double(entity->getPosition().row);
 
-		entity->direction = arguments.facing;
-		entity->teleport(arguments.position, realm);
+		MovementContext context;
 
-		if (arguments.adjustOffset) {
+		if (entity->isInLimbo())
+			context.isTeleport = true;
+
+		entity->direction = arguments.facing;
+		entity->teleport(arguments.position, realm, context);
+
+		if (arguments.adjustOffset && !context.isTeleport) {
 			entity->offset.x = apparent_x - entity->getPosition().column;
 			entity->offset.y = apparent_y - entity->getPosition().row;
 		} else if (arguments.offset)

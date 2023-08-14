@@ -30,14 +30,14 @@ namespace Game3 {
 		INFO(players.size() << " player" << (players.size() == 1? ":" : "s:"));
 		for (const PlayerPtr &player: players) {
 			if (auto realm = player->weakRealm.lock()) {
-				INFO("- GID[\e[1m" << player->getGID() << "\e[22m], Position[\e[1m" << player->getPosition() << "\e[22m], RealmID[\e[1m" << player->realmID << "\e[22m], Realm->ID[\e[3"
+				INFO("- GID[\e[1m" << player->getGID() << "\e[22m], Position[\e[1m" << player->getPosition() << "\e[22m], RealmID[\e[1m" << player->realmID << "\e[22m], Offsets[\e[1m" << player->offset << "\e[22m], Realm->ID[\e[3"
 					<< (player->realmID == realm->id? '2' : '3') << 'm' << realm->id << "\e[39m]");
 				if (!realm->hasEntity(player->getGID()))
 					WARN("  \e[33mSeemingly not present in realm!\e[39m");
 				else
 					SUCCESS("  Present in realm.");
 			} else
-				WARN("- GID[\e[1m" << player->getGID() << "\e[22m], Position[\e[1m" << player->getPosition() << "\e[22m], RealmID[\e[1m" << player->realmID << "\e[22m], no realm pointer");
+				WARN("- GID[\e[1m" << player->getGID() << "\e[22m], Position[\e[1m" << player->getPosition() << "\e[22m], RealmID[\e[1m" << player->realmID << "\e[22m], Offsets[\e[1m" << player->offset << "\e[22m], no realm pointer");
 		}
 
 		if (game->player)
