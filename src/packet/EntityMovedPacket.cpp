@@ -5,33 +5,47 @@
 
 namespace Game3 {
 	EntityMovedPacket::EntityMovedPacket(const Entity &entity):
-		EntityMovedPacket(entity.globalID, entity.nextRealm == -1? entity.realmID : entity.nextRealm, entity.getPosition(), entity.direction, entity.offset, entity.zSpeed) {}
+		EntityMovedPacket(Args{entity.globalID, entity.nextRealm == -1? entity.realmID : entity.nextRealm, entity.getPosition(), entity.direction, entity.offset, entity.zSpeed, true}) {}
+
+	void EntityMovedPacket::encode(Game &, Buffer &buffer) const {
+		buffer << arguments.globalID << arguments.realmID << arguments.position << arguments.facing << arguments.offset << arguments.zSpeed << arguments.adjustOffset;
+	}
+
+	void EntityMovedPacket::decode(Game &, Buffer &buffer) {
+		buffer >> arguments.globalID >> arguments.realmID >> arguments.position >> arguments.facing >> arguments.offset >> arguments.zSpeed >> arguments.adjustOffset;
+	}
 
 	void EntityMovedPacket::handle(ClientGame &game) {
-		RealmPtr realm = game.tryRealm(realmID);
+		RealmPtr realm = game.tryRealm(arguments.realmID);
 		if (!realm) {
-			WARN("Couldn't find realm " << realmID << " in EntityMovedPacket.");
+			WARN("Couldn't find realm " << arguments.realmID << " in EntityMovedPacket.");
 			return;
 		}
 
-		EntityPtr entity = game.getAgent<Entity>(globalID);
+		EntityPtr entity = game.getAgent<Entity>(arguments.globalID);
 		if (!entity) {
-			WARN("Couldn't find entity " << globalID << ". Player is " << game.player->getGID());
+			WARN("Couldn't find entity " << arguments.globalID << ". Player is " << game.player->getGID());
 			return;
 		}
 
 		if (!entity->isPlayer()) {
 			auto &entity_ref = *entity;
-			INFO("Moving non-player entity " << globalID << " (" << typeid(entity_ref).name() << "). Player is " << game.player->getGID());
+			INFO("Moving non-player entity " << arguments.globalID << " (" << typeid(entity_ref).name() << "). Player is " << game.player->getGID());
 		}
 
-		entity->direction = facing;
-		entity->teleport(position, realm);
+		const double apparent_x = entity->offset.x + double(entity->getPosition().column);
+		const double apparent_y = entity->offset.y + double(entity->getPosition().row);
 
-		if (offset)
-			entity->offset = *offset;
+		entity->direction = arguments.facing;
+		entity->teleport(arguments.position, realm);
 
-		if (zSpeed)
-			entity->zSpeed = *zSpeed;
+		if (arguments.adjustOffset) {
+			entity->offset.x = apparent_x - entity->getPosition().column;
+			entity->offset.y = apparent_y - entity->getPosition().row;
+		} else if (arguments.offset)
+			entity->offset = *arguments.offset;
+
+		if (arguments.zSpeed)
+			entity->zSpeed = *arguments.zSpeed;
 	}
 }

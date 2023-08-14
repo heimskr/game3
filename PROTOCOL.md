@@ -116,6 +116,10 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u8` Facing
 	- `optional<{float, float, float}>` New Offset
 	- `optional<float>` New Z-Speed
+	- `bool` Adjust Offset
+
+	The adjust offset flag, if true, tells the client to set the offset so that the entity's visible position
+	(i.e., the integer coordinates + the float offsets) appears unchanged after the integer coordinates are updated.
 
 18. Unused.
 
