@@ -302,7 +302,7 @@ namespace Game3 {
 			bool ticking = false;
 			MTQueue<std::weak_ptr<Entity>> entityRemovalQueue;
 			MTQueue<std::weak_ptr<Entity>> entityDestructionQueue;
-			MTQueue<std::pair<std::weak_ptr<Entity>, Position>> entityAdditionQueue;
+			MTQueue<std::pair<std::shared_ptr<Entity>, Position>> entityAdditionQueue;
 			MTQueue<std::pair<EntityPtr, Position>> entityInitializationQueue;
 			MTQueue<std::weak_ptr<TileEntity>> tileEntityRemovalQueue;
 			MTQueue<std::weak_ptr<TileEntity>> tileEntityDestructionQueue;

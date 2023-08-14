@@ -315,7 +315,7 @@ namespace Game3 {
 		if (entity->isPlayer() && entity->weakRealm.lock())
 			std::static_pointer_cast<Player>(entity)->stopMoving();
 		entity->setRealm(shared);
-		entity->teleport(position, MovementContext{.isTeleport = true});
+		entity->teleport(position, MovementContext{.excludePlayerSelf = true, .isTeleport = true});
 		entity->firstTeleport = false;
 		attach(entity);
 		if (entity->isPlayer()) {
@@ -375,8 +375,7 @@ namespace Game3 {
 			initEntity(entity, position);
 
 		for (const auto &[entity, position]: entityAdditionQueue.steal())
-			if (auto locked = entity.lock())
-				add(locked, position);
+			add(entity, position);
 
 		for (const auto &stolen: tileEntityAdditionQueue.steal())
 			if (auto locked = stolen.lock())

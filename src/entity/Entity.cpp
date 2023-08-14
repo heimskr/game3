@@ -495,7 +495,6 @@ namespace Game3 {
 			}
 
 			clearOffset();
-			setRealm(new_realm);
 			INFO("Queueing addition of " << getGID() << " to realm " << new_realm->id << " at position " << new_position);
 			inLimboFor = -1;
 			new_realm->queueAddition(getSelf(), new_position);
