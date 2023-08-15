@@ -17,20 +17,15 @@ namespace Game3 {
 	}
 
 	void Canvas::drawGL() {
-		if (!game) {
-			WARN("No game.");
+		if (!game)
 			return;
-		}
 		game->activateContext();
 		spriteRenderer.update(width(), height());
 		rectangleRenderer.update(width(), height());
 		textRenderer.update(width(), height());
 		if (RealmPtr realm = game->activeRealm.copyBase()) {
-			SUCCESS("Going to call Realm::render.");
 			realm->render(width(), height(), center, scale, spriteRenderer, textRenderer, game->getDivisor());
 			realmBounds = game->getVisibleRealmBounds();
-		} else {
-			WARN("No realm.");
 		}
 	}
 

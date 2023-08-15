@@ -1267,6 +1267,13 @@ namespace Game3 {
 		});
 	}
 
+	void Realm::queueReupload(Layer layer) {
+		assert(getSide() == Side::Client);
+		getGame().toClient().getWindow().queue([shared = shared_from_this(), layer] {
+			shared->reupload(layer);
+		});
+	}
+
 	void Realm::queueReuploadFluids() {
 		assert(getSide() == Side::Client);
 		getGame().toClient().getWindow().queue([shared = shared_from_this()] {

@@ -185,6 +185,7 @@ namespace Game3 {
 			void sendToOne(RemoteClient &, ChunkPosition);
 			void recalculateVisibleChunks();
 			void queueReupload();
+			void queueReupload(Layer);
 			void queueReuploadFluids();
 			void queueReuploadAll();
 
