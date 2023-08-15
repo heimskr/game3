@@ -129,8 +129,9 @@ namespace Game3 {
 		glArea.add_tick_callback([this](const Glib::RefPtr<Gdk::FrameClock> &clock) {
 			glArea.queue_render();
 			if (game) {
-				if (autofocus && game->player)
-					game->player->focus(*canvas, true);
+				PlayerPtr player = game->player.copyBase();
+				if (autofocus && player)
+					player->focus(*canvas, true);
 				const int minute = game->getMinute();
 				timeLabel.set_text(std::to_string(int(game->getHour())) + (minute < 10? ":0" : ":") + std::to_string(minute));
 			}
@@ -291,7 +292,10 @@ namespace Game3 {
 		}, 2);
 	}
 
-	MainWindow::~MainWindow() = default;
+	MainWindow::~MainWindow() {
+		if (game)
+			game->stopThread();
+	}
 
 	void MainWindow::connect(const Glib::ustring &hostname, uint16_t port) {
 		glArea.get_context()->make_current();
@@ -356,6 +360,8 @@ namespace Game3 {
 				module_->handleMessage({}, "UpdateFluids", data);
 			}
 		});
+
+		game->startThread();
 	}
 
 	void MainWindow::connectClose(Gtk::Dialog &to_connect) {
@@ -387,15 +393,16 @@ namespace Game3 {
 	}
 
 	void MainWindow::delay(std::function<void()> fn, unsigned count) {
-		if (count <= 1)
+		if (count <= 1) {
 			add_tick_callback([fn](const auto &) {
 				fn();
 				return false;
 			});
-		else
+		} else {
 			delay([this, fn, count] {
 				delay(fn, count - 1);
 			});
+		}
 	}
 
 	void MainWindow::queue(std::function<void()> fn) {
@@ -681,7 +688,7 @@ namespace Game3 {
 				}
 				case GDK_KEY_u:
 					glArea.get_context()->make_current();
-					game->activeRealm->reupload();
+					game->activeRealm.copyBase()->reupload();
 					return;
 				case GDK_KEY_f:
 					if (control)
@@ -694,7 +701,7 @@ namespace Game3 {
 					return;
 				case GDK_KEY_p: {
 					std::cout << "Player GID: " << game->player->getGID() << '\n';
-					std::cout << "Realm ID: " << game->player->getRealm()->id << " or perhaps " << game->activeRealm->id << '\n';
+					std::cout << "Realm ID: " << game->player->getRealm()->id << " or perhaps " << game->activeRealm.copyBase()->id << '\n';
 					std::cout << "Position: " << game->player->getPosition() << '\n';
 					std::cout << "Chunk position: " << std::string(getChunkPosition(game->player->getPosition())) << '\n';
 					std::cout << "Update counter: " << game->player->getRealm()->tileProvider.getUpdateCounter(getChunkPosition(game->player->getPosition())) << '\n';

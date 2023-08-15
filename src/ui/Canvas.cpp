@@ -19,12 +19,12 @@ namespace Game3 {
 	void Canvas::drawGL() {
 		if (!game)
 			return;
-		game->tick();
+		game->activateContext();
 		spriteRenderer.update(width(), height());
 		rectangleRenderer.update(width(), height());
 		textRenderer.update(width(), height());
-		if (game->activeRealm) {
-			game->activeRealm->render(width(), height(), center, scale, spriteRenderer, textRenderer, game->getDivisor());
+		if (RealmPtr realm = game->activeRealm.copyBase()) {
+			realm->render(width(), height(), center, scale, spriteRenderer, textRenderer, game->getDivisor());
 			realmBounds = game->getVisibleRealmBounds();
 		}
 	}

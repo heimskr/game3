@@ -117,10 +117,11 @@ namespace Game3 {
 		if (!initialized)
 			initRenderData();
 
-		auto &provider = canvas->game->activeRealm->tileProvider;
-		const auto &tileset   = provider.getTileset(*canvas->game);
-		const auto tile_size  = tileset->getTileSize();
-		const auto map_length = CHUNK_SIZE * REALM_DIAMETER;
+		RealmPtr realm = canvas->game->activeRealm.copyBase();
+		TileProvider &provider = realm->tileProvider;
+		TilesetPtr tileset     = provider.getTileset(*canvas->game);
+		const auto tile_size   = tileset->getTileSize();
+		const auto map_length  = CHUNK_SIZE * REALM_DIAMETER;
 
 		auto &x = options.x;
 		auto &y = options.y;

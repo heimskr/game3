@@ -6,6 +6,7 @@
 #include "entity/EntityFactory.h"
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
+#include "game/SimulationOptions.h"
 #include "net/LocalClient.h"
 #include "packet/CommandPacket.h"
 #include "packet/ChunkRequestPacket.h"
@@ -26,10 +27,10 @@ namespace Game3 {
 	}
 
 	void ClientGame::click(int button, int, double pos_x, double pos_y, Modifiers modifiers) {
-		if (!activeRealm)
-			return;
+		RealmPtr realm = activeRealm.copyBase();
 
-		auto &realm = *activeRealm;
+		if (!realm)
+			return;
 
 		double fractional_x = 0.;
 		double fractional_y = 0.;
@@ -38,8 +39,8 @@ namespace Game3 {
 
 		if (button == 1)
 			client->send(ClickPacket(translated, fractional_x, fractional_y, modifiers));
-		else if (button == 3 && player && !realm.rightClick(translated, pos_x, pos_y) && debugMode && client && client->isConnected())
-			client->send(TeleportSelfPacket(realm.id, translated));
+		else if (button == 3 && player && !realm->rightClick(translated, pos_x, pos_y) && debugMode && client && client->isConnected())
+			client->send(TeleportSelfPacket(realm->id, translated));
 	}
 
 	Gdk::Rectangle ClientGame::getVisibleRealmBounds() const {
@@ -58,12 +59,13 @@ namespace Game3 {
 	}
 
 	Position ClientGame::translateCanvasCoordinates(double x, double y, double *x_offset_out, double *y_offset_out) const {
-		if (!activeRealm)
+		RealmPtr realm = activeRealm.copyBase();
+
+		if (!realm)
 			return {};
 
-		auto &realm = *activeRealm;
 		const auto scale = canvas.scale;
-		const auto tile_size = realm.getTileset().getTileSize();
+		const auto tile_size = realm->getTileset().getTileSize();
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
 		x -= canvas.width() / 2.f - (map_length * tile_size / 4.f) * scale + canvas.center.x() * canvas.magic * scale;
 		y -= canvas.height() / 2.f - (map_length * tile_size / 4.f) * scale + canvas.center.y() * canvas.magic * scale;
@@ -195,5 +197,31 @@ namespace Game3 {
 
 	void ClientGame::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data) {
 		getWindow().moduleMessageBuffer(module_id, source, name, std::move(data));
+	}
+
+	bool ClientGame::startThread() {
+		if (active.exchange(true))
+			return false;
+
+		tickThread = std::thread([this] {
+			while (active) {
+				try {
+					tick();
+				} catch (const std::exception &err) {
+					ERROR("Client tick thread failed: " << err.what());
+					active = false;
+					break;
+				}
+
+				std::this_thread::sleep_for(std::chrono::milliseconds(TICK_PERIOD));
+			}
+		});
+
+		return true;
+	}
+
+	void ClientGame::stopThread() {
+		if (active.exchange(false))
+			tickThread.join();
 	}
 }

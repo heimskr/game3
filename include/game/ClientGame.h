@@ -3,6 +3,10 @@
 #include "game/Game.h"
 #include "ui/Modifiers.h"
 
+#include <atomic>
+#include <condition_variable>
+#include <thread>
+
 namespace Game3 {
 	class HasEnergy;
 	class HasFluids;
@@ -13,10 +17,10 @@ namespace Game3 {
 	class ClientGame: public Game {
 		public:
 			Canvas &canvas;
-			ClientPlayerPtr player;
+			Lockable<ClientPlayerPtr> player;
 
 			std::shared_ptr<LocalClient> client;
-			RealmPtr activeRealm;
+			Lockable<RealmPtr> activeRealm;
 
 			ClientGame(Canvas &canvas_): Game(), canvas(canvas_) {}
 
@@ -51,7 +55,11 @@ namespace Game3 {
 			auto signal_fluid_update()            const { return signal_fluid_update_;            }
 			auto signal_energy_update()           const { return signal_energy_update_;           }
 
-			Side getSide() const override { return Side::Client; }
+			Side getSide() const final { return Side::Client; }
+
+			/** Returns whether the thread could be started. The thread can't be started if the thread is already running. */
+			bool startThread();
+			void stopThread();
 
 		private:
 			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update_;
@@ -59,6 +67,8 @@ namespace Game3 {
 			sigc::signal<void(const std::shared_ptr<Agent> &)> signal_other_inventory_update_;
 			sigc::signal<void(const std::shared_ptr<HasFluids> &)> signal_fluid_update_;
 			sigc::signal<void(const std::shared_ptr<HasEnergy> &)> signal_energy_update_;
+			std::atomic_bool active{false};
+			std::thread tickThread;
 
 			std::set<ChunkPosition> missingChunks;
 			MTQueue<std::shared_ptr<Packet>> packetQueue;

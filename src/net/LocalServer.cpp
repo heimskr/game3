@@ -11,6 +11,7 @@
 #include "entity/ServerPlayer.h"
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
+#include "game/SimulationOptions.h"
 #include "net/LocalServer.h"
 #include "net/RemoteClient.h"
 #include "net/Server.h"
@@ -250,7 +251,7 @@ namespace Game3 {
 		std::thread tick_thread = std::thread([&] {
 			while (running) {
 				game->tick();
-				std::this_thread::sleep_for(std::chrono::milliseconds(50));
+				std::this_thread::sleep_for(std::chrono::milliseconds(TICK_PERIOD));
 			}
 		});
 

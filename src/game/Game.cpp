@@ -652,7 +652,7 @@ namespace Game3 {
 
 	double Game::getHour() const {
 		const auto base = time / 10. + hourOffset;
-		return static_cast<long>(base) % 24 + fractional(base);
+		return int64_t(base) % 24 + fractional(base);
 	}
 
 	double Game::getMinute() const {

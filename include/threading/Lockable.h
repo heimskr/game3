@@ -57,6 +57,12 @@ namespace Game3 {
 		inline T & getBase() { return static_cast<T &>(*this); }
 		inline const T & getBase() const { return static_cast<const T &>(*this); }
 
+		inline T & getBase(std::shared_lock<std::shared_mutex> &lock) { lock = sharedLock(); return static_cast<T &>(*this); }
+		inline T & getBase(std::unique_lock<std::shared_mutex> &lock) { lock = uniqueLock(); return static_cast<T &>(*this); }
+
+		inline const T & getBase(std::shared_lock<std::shared_mutex> &lock) const { lock = sharedLock(); return static_cast<const T &>(*this); }
+		inline const T & getBase(std::unique_lock<std::shared_mutex> &lock) const { lock = uniqueLock(); return static_cast<const T &>(*this); }
+
 		inline T copyBase() const {
 			auto lock = sharedLock();
 			return static_cast<T>(*this);

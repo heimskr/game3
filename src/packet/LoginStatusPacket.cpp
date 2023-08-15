@@ -36,9 +36,12 @@ namespace Game3 {
 		game.player->init(game);
 		game.player->decode(playerDataBuffer);
 		game.player->setupRealm(game);
-		game.activeRealm = game.player->getRealm();
-		game.activeRealm->add(game.player, game.player->getPosition());
-		game.activeRealm->addPlayer(game.player);
+		{
+			auto lock = game.activeRealm.uniqueLock();
+			game.activeRealm = game.player->getRealm();
+			game.activeRealm->add(game.player, game.player->getPosition());
+			game.activeRealm->addPlayer(game.player);
+		}
 		game.player->inventory->notifyOwner();
 	}
 }

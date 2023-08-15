@@ -95,10 +95,11 @@ namespace Game3 {
 		if (options.size_y < 0)
 			options.size_y = texture.height;
 
-		auto &provider = canvas->game->activeRealm->tileProvider;
-		const auto &tileset   = provider.getTileset(*canvas->game);
-		const auto tile_size  = tileset->getTileSize();
-		const auto map_length = CHUNK_SIZE * REALM_DIAMETER;
+		RealmPtr realm = canvas->game->activeRealm.copyBase();
+		TileProvider &provider = realm->tileProvider;
+		TilesetPtr tileset     = provider.getTileset(*canvas->game);
+		const auto tile_size   = tileset->getTileSize();
+		const auto map_length  = CHUNK_SIZE * REALM_DIAMETER;
 
 		options.x *= tile_size * canvas->scale / 2.f;
 		options.y *= tile_size * canvas->scale / 2.f;
@@ -149,10 +150,10 @@ namespace Game3 {
 		if (options.size_y < 0)
 			options.size_y = texture_height;
 
-		auto &provider = canvas->game->activeRealm->tileProvider;
-		const auto &tileset   = provider.getTileset(*canvas->game);
-		const auto tile_size  = tileset->getTileSize();
-		const auto map_length = CHUNK_SIZE * REALM_DIAMETER;
+		TileProvider &provider = canvas->game->activeRealm->tileProvider;
+		TilesetPtr tileset     = provider.getTileset(*canvas->game);
+		const auto tile_size   = tileset->getTileSize();
+		const auto map_length  = CHUNK_SIZE * REALM_DIAMETER;
 
 		options.x *= tile_size * canvas->scale / 2.f;
 		options.y *= tile_size * canvas->scale / 2.f;

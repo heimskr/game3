@@ -22,14 +22,14 @@ namespace Game3 {
 
 	static void check(int handle, bool is_link = false) {
 		int success;
-		char info[1024];
+		char info[1024] {"No info available"};
 		if (is_link) {
 			glGetProgramiv(handle, GL_LINK_STATUS, &success); CHECKGL
 		} else {
 			glGetShaderiv(handle, GL_COMPILE_STATUS, &success); CHECKGL
 		}
 		if (!success) {
-			GLsizei len = 666;
+			GLsizei len = 0;
 			if (is_link) {
 				glGetProgramInfoLog(handle, GL_INFO_LOG_LENGTH, &len, info); CHECKGL
 			} else {

@@ -175,10 +175,13 @@ namespace Game3 {
 			if (getSide() == Side::Client) {
 				auto &client_game = game.toClient();
 				if (getGID() == client_game.player->getGID()) {
-					client_game.activeRealm->onBlur();
-					client_game.activeRealm->queuePlayerRemoval(getShared());
-					client_game.activeRealm = new_realm;
-					client_game.activeRealm->onFocus();
+					{
+						auto lock = client_game.activeRealm.uniqueLock();
+						client_game.activeRealm->onBlur();
+						client_game.activeRealm->queuePlayerRemoval(getShared());
+						client_game.activeRealm = new_realm;
+						client_game.activeRealm->onFocus();
+					}
 					focus(game.toClient().canvas, true);
 					client_game.requestFromLimbo(new_realm->id);
 				}

@@ -1,15 +1,15 @@
 #pragma once
 
-#include <atomic>
-#include <unordered_set>
-#include <vector>
-
 #include "Shader.h"
 #include "Types.h"
 #include "game/TileProvider.h"
 #include "ui/RectangleRenderer.h"
 #include "ui/Reshader.h"
 #include "util/GL.h"
+
+#include <atomic>
+#include <unordered_set>
+#include <vector>
 
 namespace Game3 {
 	class Realm;
@@ -20,7 +20,7 @@ namespace Game3 {
 			constexpr static float TILE_TEXTURE_PADDING = 1.f / 2048.f;
 			int backbufferWidth = -1;
 			int backbufferHeight = -1;
-			bool isMissing = false;
+			std::atomic_bool isMissing = false;
 
 			Eigen::Vector2f center {0.f, 0.f};
 			std::shared_ptr<Tileset> tileset;
