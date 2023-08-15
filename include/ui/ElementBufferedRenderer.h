@@ -8,6 +8,7 @@
 #include "util/GL.h"
 
 #include <atomic>
+#include <future>
 #include <unordered_set>
 #include <vector>
 
@@ -36,6 +37,7 @@ namespace Game3 {
 			void render(float divisor, float scale, float center_x, float center_y);
 			void render(float divisor);
 			bool reupload();
+			std::future<bool> queueReupload();
 			bool onBackbufferResized(int width, int height);
 			void setChunk(TileChunk &, bool can_reupload = true);
 			void setChunkPosition(const ChunkPosition &);

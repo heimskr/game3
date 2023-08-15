@@ -11,9 +11,11 @@
 #include "resources.h"
 #include "Tileset.h"
 #include "container/Quadtree.h"
+#include "game/ClientGame.h"
 #include "game/Game.h"
 #include "realm/Realm.h"
 #include "ui/ElementBufferedRenderer.h"
+#include "ui/MainWindow.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 
@@ -150,6 +152,21 @@ namespace Game3 {
 
 	bool ElementBufferedRenderer::reupload() {
 		return generateVertexBufferObject() && generateVertexArrayObject();
+	}
+
+	std::future<bool> ElementBufferedRenderer::queueReupload() {
+		assert(realm != nullptr);
+
+		std::promise<bool> promise;
+		std::future<bool> future = promise.get_future();
+		ClientGamePtr client_game = realm->getGame().toClientPointer();
+
+		client_game->getWindow().queueMoveOnly([this, promise = std::move(promise), client_game]() mutable {
+			client_game->activateContext();
+			promise.set_value(reupload());
+		});
+
+		return future;
 	}
 
 	bool ElementBufferedRenderer::onBackbufferResized(int width, int height) {

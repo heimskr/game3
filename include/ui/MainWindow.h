@@ -1,10 +1,12 @@
 #pragma once
 
 #include "Types.h"
+#include "threading/MTQueue.h"
 #include "threading/Lockable.h"
 
 #include <atomic>
 #include <chrono>
+#include <concepts>
 #include <deque>
 #include <filesystem>
 #include <functional>
@@ -53,6 +55,9 @@ namespace Game3 {
 			/** Queues a function to be executed in the GTK thread. Thread-safe. Can be used from any thread. */
 			void queue(std::function<void()>);
 
+			/** Queues a function to be executed in the GTK thread. Thread-safe. Can be used from any thread. */
+			void queueMoveOnly(std::move_only_function<void()> &&);
+
 			/** Displays an alert. This will reset the dialog pointer. If you need to use this inside a dialog's code, use delay(). */
 			void alert(const Glib::ustring &message, Gtk::MessageType = Gtk::MessageType::INFO, bool queue = true, bool modal = true, bool use_markup = false);
 
@@ -73,18 +78,18 @@ namespace Game3 {
 			void showExternalInventory(const std::shared_ptr<ClientInventory> &);
 			GlobalID getExternalGID() const;
 
+			inline auto getActiveTab() const { return activeTab; }
+
 			void openModule(const Identifier &, const std::any &);
 			void removeModule();
+			void showFluids(const std::shared_ptr<HasFluids> &);
+
 			void moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data);
 
 			template <typename... Args>
 			void moduleMessage(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Args &&...args) {
 				moduleMessageBuffer(module_id, source, name, Buffer{std::forward<Args>(args)...});
 			}
-
-			void showFluids(const std::shared_ptr<HasFluids> &);
-
-			inline auto getActiveTab() const { return activeTab; }
 
 			friend class Canvas;
 
@@ -95,8 +100,8 @@ namespace Game3 {
 
 			Glib::RefPtr<Gtk::Builder> builder;
 			Glib::RefPtr<Gtk::CssProvider> cssProvider;
-			std::list<std::function<void()>> functionQueue;
-			std::recursive_mutex functionQueueMutex;
+			MTQueue<std::function<void()>> functionQueue;
+			MTQueue<std::move_only_function<void()>> moveOnlyFunctionQueue;
 			Glib::Dispatcher functionQueueDispatcher;
 			Gtk::Paned paned;
 			Gtk::Box vbox {Gtk::Orientation::VERTICAL};

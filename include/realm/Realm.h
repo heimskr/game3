@@ -184,6 +184,9 @@ namespace Game3 {
 			void sendToMany(const std::unordered_set<std::shared_ptr<RemoteClient>> &, ChunkPosition);
 			void sendToOne(RemoteClient &, ChunkPosition);
 			void recalculateVisibleChunks();
+			void queueReupload();
+			void queueReuploadFluids();
+			void queueReuploadAll();
 
 			inline const auto & getPlayers() const { return players; }
 			inline void markGenerated(auto x, auto y) { generatedChunks.insert(ChunkPosition{x, y}); }

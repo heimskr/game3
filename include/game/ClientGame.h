@@ -1,10 +1,12 @@
 #pragma once
 
 #include "game/Game.h"
+#include "threading/LockableSharedPtr.h"
 #include "ui/Modifiers.h"
 
 #include <atomic>
 #include <condition_variable>
+#include <memory>
 #include <thread>
 
 namespace Game3 {
@@ -17,10 +19,9 @@ namespace Game3 {
 	class ClientGame: public Game {
 		public:
 			Canvas &canvas;
-			Lockable<ClientPlayerPtr> player;
-
-			std::shared_ptr<LocalClient> client;
-			Lockable<RealmPtr> activeRealm;
+			LockableSharedPtr<ClientPlayer> player;
+			LockableSharedPtr<LocalClient> client;
+			LockableSharedPtr<Realm> activeRealm;
 
 			ClientGame(Canvas &canvas_): Game(), canvas(canvas_) {}
 
@@ -75,4 +76,6 @@ namespace Game3 {
 			/** Temporarily stores shared pointers to entities that have moved to a realm we're unaware of to prevent destruction. */
 			Lockable<std::unordered_map<RealmID, std::unordered_map<EntityPtr, Position>>> entityLimbo;
 	};
+
+	using ClientGamePtr = std::shared_ptr<ClientGame>;
 }

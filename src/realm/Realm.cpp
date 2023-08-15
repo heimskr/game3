@@ -1260,6 +1260,28 @@ namespace Game3 {
 		}
 	}
 
+	void Realm::queueReupload() {
+		assert(getSide() == Side::Client);
+		getGame().toClient().getWindow().queue([shared = shared_from_this()] {
+			shared->reupload();
+		});
+	}
+
+	void Realm::queueReuploadFluids() {
+		assert(getSide() == Side::Client);
+		getGame().toClient().getWindow().queue([shared = shared_from_this()] {
+			shared->reuploadFluids();
+		});
+	}
+
+	void Realm::queueReuploadAll() {
+		assert(getSide() == Side::Client);
+		getGame().toClient().getWindow().queue([shared = shared_from_this()] {
+			shared->reupload();
+			shared->reuploadFluids();
+		});
+	}
+
 	bool Realm::rightClick(const Position &position, double x, double y) {
 		if (getSide() != Side::Client)
 			return false;

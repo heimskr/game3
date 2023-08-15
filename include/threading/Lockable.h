@@ -10,6 +10,10 @@
 namespace Game3 {
 	template <typename T, typename M = std::shared_mutex>
 	struct Lockable: T {
+		using Base = T;
+
+		mutable M mutex;
+
 		using T::T;
 
 		Lockable(const Lockable<T> &other): T(other.getBase()) {}
@@ -47,7 +51,11 @@ namespace Game3 {
 			return *this;
 		}
 
-		mutable M mutex;
+		template <typename U>
+		Lockable<T> & unsafeSet(U &&other) {
+			T::operator=(std::forward<U>(other));
+			return *this;
+		}
 
 		inline auto uniqueLock() const { return std::unique_lock(mutex); }
 		inline auto sharedLock() const { return std::shared_lock(mutex); }

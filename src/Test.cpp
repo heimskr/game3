@@ -1,8 +1,11 @@
-// #include "game/Game.h"
+#include "Log.h"
 #include "container/Quadtree.h"
 #include "entity/ServerPlayer.h"
+// #include "game/Game.h"
 #include "game/TileProvider.h"
 #include "net/Buffer.h"
+#include "threading/LockableSharedPtr.h"
+#include "threading/LockableWeakPtr.h"
 #include "util/Timer.h"
 
 #include <array>
@@ -165,7 +168,32 @@ namespace Game3 {
 		std::cout << nlohmann::json(*player).dump() << '\n';
 	}
 
+	void testLockableWeakPtr() {
+		auto shared = std::make_shared<int>(42);
+		LockableWeakPtr<int> lwp = shared;
+
+		constexpr size_t sum_count = 1'000'000;
+
+		auto lambda = [&] {
+			size_t sum = 0;
+			for (size_t i = 0; i < sum_count; ++i) {
+				sum += lwp.use_count();
+				lwp.reset();
+			}
+			INFO("sum[" << sum << ']');
+		};
+
+		std::thread t1 = std::thread(lambda);
+		std::thread t2 = std::thread(lambda);
+
+		t1.join();
+		t2.join();
+	}
+
 	void test() {
-		testPlayerJSON();
+		// testPlayerJSON();
+		testLockableWeakPtr();
+
+		LockableSharedPtr<int> lsp = std::make_shared<int>(42);
 	}
 }

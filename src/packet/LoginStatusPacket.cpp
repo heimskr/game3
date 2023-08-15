@@ -37,8 +37,8 @@ namespace Game3 {
 		game.player->decode(playerDataBuffer);
 		game.player->setupRealm(game);
 		{
-			auto lock = game.activeRealm.uniqueLock();
-			game.activeRealm = game.player->getRealm();
+			auto lock = game.activeRealm.sharedLock();
+			game.activeRealm.unsafeSet(game.player->getRealm());
 			game.activeRealm->add(game.player, game.player->getPosition());
 			game.activeRealm->addPlayer(game.player);
 		}

@@ -45,7 +45,6 @@ namespace Game3 {
 		provider.setUpdateCounter(chunkPosition, updateCounter);
 
 		game.chunkReceived(chunkPosition);
-		realm->reupload();
-		realm->reuploadFluids();
+		realm->queueReuploadAll();
 	}
 }

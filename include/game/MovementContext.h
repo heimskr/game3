@@ -10,9 +10,9 @@ namespace Game3 {
 		bool excludePlayerSelf = false;
 		bool fromPath = false;
 		bool clearOffset = true;
-		std::optional<Direction> facingDirection;
-		std::optional<Position> forcedPosition;
-		std::optional<Offset> forcedOffset;
+		std::optional<Direction> facingDirection{};
+		std::optional<Position> forcedPosition{};
+		std::optional<Offset> forcedOffset{};
 		bool isTeleport = false;
 	};
 }

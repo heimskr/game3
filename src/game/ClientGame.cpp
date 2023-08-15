@@ -205,13 +205,13 @@ namespace Game3 {
 
 		tickThread = std::thread([this] {
 			while (active) {
-				try {
+				// try {
 					tick();
-				} catch (const std::exception &err) {
-					ERROR("Client tick thread failed: " << err.what());
-					active = false;
-					break;
-				}
+				// } catch (const std::exception &err) {
+				// 	ERROR("Client tick thread failed: " << err.what());
+				// 	active = false;
+				// 	break;
+				// }
 
 				std::this_thread::sleep_for(std::chrono::milliseconds(TICK_PERIOD));
 			}

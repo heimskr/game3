@@ -83,10 +83,10 @@ namespace Game3 {
 			GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
 		functionQueueDispatcher.connect([this] {
-			auto lock = std::unique_lock(functionQueueMutex);
-			for (auto fn: functionQueue)
+			for (const auto &fn: functionQueue.steal())
 				fn();
-			functionQueue.clear();
+			for (auto &&fn: moveOnlyFunctionQueue.steal())
+				fn();
 		});
 
 		add_action("connect", Gio::ActionMap::ActivateSlot(sigc::mem_fun(*this, &MainWindow::onConnect)));
@@ -378,8 +378,9 @@ namespace Game3 {
 		glArea.throw_if_error();
 		glClearColor(.2f, .2f, .2f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		if (autofocus && game && game->player)
-			game->player->focus(*canvas, true);
+		if (autofocus && game)
+			if (PlayerPtr player = game->player.copyBase())
+				player->focus(*canvas, true);
 		canvas->drawGL();
 		return true;
 	}
@@ -406,10 +407,12 @@ namespace Game3 {
 	}
 
 	void MainWindow::queue(std::function<void()> fn) {
-		{
-			auto lock = std::unique_lock(functionQueueMutex);
-			functionQueue.push_back(std::move(fn));
-		}
+		functionQueue.push(std::move(fn));
+		functionQueueDispatcher.emit();
+	}
+
+	void MainWindow::queueMoveOnly(std::move_only_function<void()> &&fn) {
+		moveOnlyFunctionQueue.push(std::move(fn));
 		functionQueueDispatcher.emit();
 	}
 
