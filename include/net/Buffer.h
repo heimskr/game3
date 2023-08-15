@@ -1,5 +1,7 @@
 #pragma once
 
+#include "util/Concepts.h"
+
 #include <bit>
 #include <cassert>
 #include <concepts>
@@ -14,8 +16,6 @@
 #include <ranges>
 #include <span>
 #include <vector>
-
-#include "util/Concepts.h"
 
 namespace Game3 {
 	class Buffer;
@@ -363,8 +363,11 @@ namespace Game3 {
 	M popBuffer(Buffer &buffer) {
 		const auto size = popBuffer<uint32_t>(buffer);
 		M out;
-		for (uint32_t i = 0; i < size; ++i)
-			out.emplace(popBuffer<typename M::key_type>(buffer), popBuffer<typename M::mapped_type>(buffer));
+		for (uint32_t i = 0; i < size; ++i) {
+			auto key = popBuffer<typename M::key_type>(buffer);
+			auto value = popBuffer<typename M::mapped_type>(buffer);
+			out.emplace(std::move(key), std::move(value));
+		}
 		return out;
 	}
 

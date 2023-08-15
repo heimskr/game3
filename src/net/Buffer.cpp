@@ -164,7 +164,7 @@ namespace Game3 {
 
 	std::string Buffer::popType() {
 		const char first = popBuffer<char>(*this);
-		if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first <= '\x1f') || first == '\xe0' || first == '\xe1')
+		if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first <= '\x1f') || ('\xe0' <= first && first <= '\xe2'))
 			return {first};
 		if (first == '\x20')
 			return first + popType();
@@ -197,7 +197,10 @@ namespace Game3 {
 	}
 
 	void Buffer::debug() const {
-		INFO("Buffer: " << hexString(bytes));
+		if (skip == 0)
+			INFO("Buffer: " << hexString(bytes));
+		else
+			INFO("Buffer: \e[2m" << hexString(std::span(bytes.begin(), bytes.begin() + skip)) << "\e[22m " << hexString(std::span(bytes.begin() + skip, bytes.end())));
 	}
 
 	Buffer & Buffer::operator<<(bool item) {
