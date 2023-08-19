@@ -56,7 +56,7 @@ namespace Game3 {
 	}
 
 	std::string ChemicalItem::getFormula(const ItemStack &stack) {
-		if (auto iter = stack.data.find("formula"); iter != stack.data.end())
+		if (auto iter = stack.data.find("formula"); iter != stack.data.end() && !iter->is_null())
 			return *iter;
 		return {};
 	}
