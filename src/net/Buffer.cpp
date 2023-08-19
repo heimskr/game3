@@ -168,8 +168,11 @@ namespace Game3 {
 			return {first};
 		if (first == '\x20')
 			return first + popType();
-		if (first == '\x21')
-			return first + popType() + popType();
+		if (first == '\x21') {
+			std::string key_type = popType();
+			std::string value_type = popType();
+			return first + std::move(key_type) + std::move(value_type);
+		}
 		debug();
 		throw std::invalid_argument("Invalid type byte: " + hexString(std::string_view(&first, 1)));
 	}
