@@ -77,8 +77,8 @@ namespace Game3 {
 		drawOnMap(texture, RenderOptions {
 			.x = x,
 			.y = y,
-			.size_x = float(texture.width),
-			.size_y = float(texture.height),
+			.sizeX = float(texture.width),
+			.sizeY = float(texture.height),
 			.scaleX = scale,
 			.scaleY = scale,
 			.angle = angle,
@@ -90,10 +90,10 @@ namespace Game3 {
 		if (!initialized)
 			return;
 
-		if (options.size_x < 0)
-			options.size_x = texture.width;
-		if (options.size_y < 0)
-			options.size_y = texture.height;
+		if (options.sizeX < 0)
+			options.sizeX = texture.width;
+		if (options.sizeY < 0)
+			options.sizeY = texture.height;
 
 		RealmPtr realm = canvas->game->activeRealm.copyBase();
 		TileProvider &provider = realm->tileProvider;
@@ -116,7 +116,7 @@ namespace Game3 {
 
 		glm::mat4 model = glm::mat4(1.f);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(options.x - options.x_offset * canvas->scale * options.scaleX, options.y - options.y_offset * canvas->scale * options.scaleY, 0.f));
+		model = glm::translate(model, glm::vec3(options.x - options.xOffset * canvas->scale * options.scaleX, options.y - options.yOffset * canvas->scale * options.scaleY, 0.f));
 		model = glm::translate(model, glm::vec3(0.5f * texture.width, 0.5f * texture.height, 0.f)); // move origin of rotation to center of quad
 		model = glm::rotate(model, glm::radians(options.angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
 		model = glm::translate(model, glm::vec3(-0.5f * texture.width, -0.5f * texture.height, 0.f)); // move origin back
@@ -125,7 +125,7 @@ namespace Game3 {
 		shader.set("model", model);
 		shader.set("spriteColor", 1.f, 1.f, 1.f, options.alpha);
 		const float multiplier = 2.f / texture.width;
-		shader.set("texturePosition", options.x_offset * multiplier, options.y_offset * multiplier, options.size_x / texture.width, options.size_y / texture.width);
+		shader.set("texturePosition", options.xOffset * multiplier, options.yOffset * multiplier, options.sizeX / texture.width, options.sizeY / texture.width);
 		// shader.set("divisor", divisor);
 
 		glActiveTexture(GL_TEXTURE0);
@@ -145,10 +145,10 @@ namespace Game3 {
 		const auto texture_width = texture.getWidth();
 		const auto texture_height = texture.getHeight();
 
-		if (options.size_x < 0)
-			options.size_x = texture_width;
-		if (options.size_y < 0)
-			options.size_y = texture_height;
+		if (options.sizeX < 0)
+			options.sizeX = texture_width;
+		if (options.sizeY < 0)
+			options.sizeY = texture_height;
 
 		TileProvider &provider = canvas->game->activeRealm->tileProvider;
 		TilesetPtr tileset     = provider.getTileset(*canvas->game);
@@ -170,7 +170,7 @@ namespace Game3 {
 
 		glm::mat4 model = glm::mat4(1.f);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(options.x - options.x_offset * canvas->scale * options.scaleX, options.y - options.y_offset * canvas->scale * options.scaleY, 0.f));
+		model = glm::translate(model, glm::vec3(options.x - options.xOffset * canvas->scale * options.scaleX, options.y - options.yOffset * canvas->scale * options.scaleY, 0.f));
 		model = glm::translate(model, glm::vec3(0.5f * texture_width, 0.5f * texture_height, 0.f)); // move origin of rotation to center of quad
 		model = glm::rotate(model, glm::radians(options.angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
 		model = glm::translate(model, glm::vec3(-0.5f * texture_width, -0.5f * texture_height, 0.f)); // move origin back
@@ -179,7 +179,7 @@ namespace Game3 {
 		shader.set("model", model);
 		shader.set("spriteColor", 1.f, 1.f, 1.f, options.alpha);
 		const float multiplier = 2.f / texture_width;
-		shader.set("texturePosition", options.x_offset * multiplier, options.y_offset * multiplier, options.size_x / texture_width, options.size_y / texture_width);
+		shader.set("texturePosition", options.xOffset * multiplier, options.yOffset * multiplier, options.sizeX / texture_width, options.sizeY / texture_width);
 		// shader.set("divisor", divisor);
 
 		texture.bind(0);
@@ -195,8 +195,8 @@ namespace Game3 {
 		drawOnScreen(texture, RenderOptions {
 			.x = x,
 			.y = y,
-			.size_x = static_cast<float>(texture.width),
-			.size_y = static_cast<float>(texture.height),
+			.sizeX = static_cast<float>(texture.width),
+			.sizeY = static_cast<float>(texture.height),
 			.scaleX = scale,
 			.scaleY = scale,
 			.angle = angle,
@@ -211,10 +211,10 @@ namespace Game3 {
 		const auto texture_width  = texture.width;
 		const auto texture_height = texture.height;
 		if (options.hackY)
-			hackY(options.y, options.y_offset, options.scaleY);
+			hackY(options.y, options.yOffset, options.scaleY);
 
-		options.size_x = options.size_x < 0.f? -options.size_x * texture_width  : options.size_x;
-		options.size_y = options.size_y < 0.f? -options.size_y * texture_height : options.size_y;
+		options.sizeX = options.sizeX < 0.f? -options.sizeX * texture_width  : options.sizeX;
+		options.sizeY = options.sizeY < 0.f? -options.sizeY * texture_height : options.sizeY;
 		setupShader(texture_width, texture_height, options);
 
 		glActiveTexture(GL_TEXTURE0);
@@ -234,10 +234,10 @@ namespace Game3 {
 		const auto texture_width  = texture.getWidth();
 		const auto texture_height = texture.getHeight();
 		if (options.hackY)
-			hackY(options.y, options.y_offset, options.scaleY);
+			hackY(options.y, options.yOffset, options.scaleY);
 
-		options.size_x = options.size_x < 0.f? -options.size_x * texture_width  : options.size_x;
-		options.size_y = options.size_y < 0.f? -options.size_y * texture_height : options.size_y;
+		options.sizeX = options.sizeX < 0.f? -options.sizeX * texture_width  : options.sizeX;
+		options.sizeY = options.sizeY < 0.f? -options.sizeY * texture_height : options.sizeY;
 		setupShader(texture_width, texture_height, options);
 
 		texture.bind(0);
@@ -287,7 +287,7 @@ namespace Game3 {
 	void SpriteRenderer::setupShader(int texture_width, int texture_height, const RenderOptions &options) {
 		glm::mat4 model = glm::mat4(1.f);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(options.x * 16.f - options.x_offset * 2.f * options.scaleX, options.y * 16.f - options.y_offset * 2.f * options.scaleY, 0.0f));
+		model = glm::translate(model, glm::vec3(options.x * 16.f - options.xOffset * 2.f * options.scaleX, options.y * 16.f - options.yOffset * 2.f * options.scaleY, 0.0f));
 		if (options.invertY)
 			model = glm::scale(model, glm::vec3(1.f, -1.f, 1.f));
 		model = glm::translate(model, glm::vec3(0.5f * texture_width, 0.5f * texture_height, 0.0f));
@@ -301,11 +301,11 @@ namespace Game3 {
 		const float multiplier = 2.f;
 		const float multiplier_x = multiplier / texture_width;
 		const float multiplier_y = multiplier / texture_height;
-		shader.set("texturePosition", options.x_offset * multiplier_x, options.y_offset * multiplier_y, options.size_x / texture_width, options.size_y / texture_height);
+		shader.set("texturePosition", options.xOffset * multiplier_x, options.yOffset * multiplier_y, options.sizeX / texture_width, options.sizeY / texture_height);
 		// shader.set("divisor", divisor);
 	}
 
-	void SpriteRenderer::hackY(float &y, float y_offset, float scale) {
-		y = backbufferHeight / 16.f - y + y_offset / 4.f * scale; // Four?!
+	void SpriteRenderer::hackY(float &y, float yOffset, float scale) {
+		y = backbufferHeight / 16.f - y + yOffset / 4.f * scale; // Four?!
 	}
 }

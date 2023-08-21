@@ -1,8 +1,9 @@
 #pragma once
 
-#include <optional>
-
+#include "threading/Atomic.h"
 #include "tileentity/TileEntity.h"
+
+#include <optional>
 
 namespace Game3 {
 	class Tree: public TileEntity {
@@ -12,8 +13,8 @@ namespace Game3 {
 			constexpr static float HIVE_MATURITY = 60.f;
 			constexpr static double CHAR_CHANCE = 0.314159265358979323;
 
-			float age = 0.f;
-			float hiveAge = -1.f; // < 0 for no hive
+			Atomic<float> age = 0.f;
+			Atomic<float> hiveAge = -1.f; // < 0 for no hive
 
 			Tree(const Tree &) = delete;
 			Tree(Tree &&) = default;

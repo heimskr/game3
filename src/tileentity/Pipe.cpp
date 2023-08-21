@@ -100,10 +100,10 @@ namespace Game3 {
 				sprite_renderer(*texture, {
 					.x = float(position.column),
 					.y = float(position.row),
-					.x_offset = x / 2,
-					.y_offset = y / 2,
-					.size_x = float(tilesize),
-					.size_y = float(tilesize),
+					.xOffset = x / 2,
+					.yOffset = y / 2,
+					.sizeX = float(tilesize),
+					.sizeY = float(tilesize),
 				});
 			}
 
@@ -115,10 +115,10 @@ namespace Game3 {
 				sprite_renderer(*texture, {
 					.x = float(position.column),
 					.y = float(position.row),
-					.x_offset = x / 2,
-					.y_offset = y / 2,
-					.size_x = float(tilesize),
-					.size_y = float(tilesize),
+					.xOffset = x / 2,
+					.yOffset = y / 2,
+					.sizeX = float(tilesize),
+					.sizeY = float(tilesize),
 				});
 			}
 		}
@@ -280,12 +280,11 @@ namespace Game3 {
 			if (!loaded[pipe_type])
 				return;
 
-
 			if (std::shared_ptr<Pipe> connection = getConnected(pipe_type, direction))
 				network->absorb(connection->getNetwork(pipe_type));
 
 			// If there's a tile entity at the attached position and it has an inventory, add it to the network as an insertion point.
-			if (auto realm = weakRealm.lock())
+			if (RealmPtr realm = weakRealm.lock())
 				if (network->canWorkWith(realm->tileEntityAt(position + direction)))
 					network->addInsertion(position + direction, flipDirection(direction));
 

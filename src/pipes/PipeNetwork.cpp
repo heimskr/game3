@@ -47,6 +47,9 @@ namespace Game3 {
 	}
 
 	void PipeNetwork::absorb(std::shared_ptr<PipeNetwork> other) {
+		if (this == other.get())
+			return;
+
 		assert(other);
 
 		const PipeType type = getType();

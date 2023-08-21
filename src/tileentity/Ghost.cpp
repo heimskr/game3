@@ -116,10 +116,10 @@ namespace Game3 {
 		sprite_renderer(*texture, {
 			.x = static_cast<float>(position.column),
 			.y = static_cast<float>(position.row),
-			.x_offset = static_cast<float>(x) / 2.f,
-			.y_offset = static_cast<float>(y) / 2.f,
-			.size_x = static_cast<float>(tilesize),
-			.size_y = static_cast<float>(tilesize),
+			.xOffset = static_cast<float>(x) / 2.f,
+			.yOffset = static_cast<float>(y) / 2.f,
+			.sizeX = static_cast<float>(tilesize),
+			.sizeY = static_cast<float>(tilesize),
 			.alpha = .5f,
 		});
 	}

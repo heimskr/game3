@@ -165,11 +165,11 @@ namespace Game3 {
 			std::weak_ptr<BufferContext> context;
 
 			Buffer() = default;
-			Buffer(std::weak_ptr<BufferContext> context_):
+			explicit Buffer(std::weak_ptr<BufferContext> context_):
 				context(std::move(context_)) {}
 
 			template <typename... Args>
-			Buffer(Args &&...args) {
+			explicit Buffer(Args &&...args) {
 				(void) std::initializer_list<int> {
 					((void) (*this << std::forward<Args>(args)), 0)...
 				};

@@ -186,6 +186,7 @@ namespace Game3 {
 	}
 
 	void ElementBufferedRenderer::setChunkPosition(const ChunkPosition &new_pos) {
+		auto lock = chunkPosition.uniqueLock();
 		if (new_pos != chunkPosition) {
 			chunkPosition = new_pos;
 			positionDirty = true;
@@ -220,10 +221,11 @@ namespace Game3 {
 		const TileID missing = tileset["base:tile/void"];
 
 		vbo.init<float, 3>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, set_width, divisor, t_size, missing](size_t x, size_t y) {
-			const auto tile_opt = realm->tryTile(layer, Position(
-				static_cast<Index>(y) + CHUNK_SIZE * (chunkPosition.y + 1), // why `+ 1`?
-				static_cast<Index>(x) + CHUNK_SIZE * (chunkPosition.x + 1)  // here too
-			));
+			const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
+			const std::optional<TileID> tile_opt = realm->tryTile(layer, Position{
+				static_cast<Index>(y) + CHUNK_SIZE * (chunk_y + 1), // why `+ 1`?
+				static_cast<Index>(x) + CHUNK_SIZE * (chunk_x + 1)  // here too
+			});
 			TileID tile;
 			if (!tile_opt) {
 				isMissing = true;

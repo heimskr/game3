@@ -132,7 +132,7 @@ namespace Game3 {
 			}
 		}
 
-		auto lock = uniqueLock();
+		auto lock = offset.uniqueLock();
 
 		auto &x = offset.x;
 		auto &y = offset.y;
@@ -198,25 +198,27 @@ namespace Game3 {
 		if (texture == nullptr || !isVisible())
 			return;
 
-		float x_offset = 0.f;
-		float y_offset = 0.f;
-		if (offset.x != 0.f || offset.y != 0.f) {
+		const auto [offset_x, offset_y, offset_z] = offset.copyBase();
+
+		float texture_x_offset = 0.f;
+		float texture_y_offset = 0.f;
+		if (offset_x != 0.f || offset_y != 0.f) {
 			switch (variety) {
 				case 3:
-					x_offset = 8.f * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - getRealm()->getGame().startTime).count() / 200) % 4);
+					texture_x_offset = 8.f * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - getRealm()->getGame().startTime).count() / 200) % 4);
 					break;
 				default:
-					x_offset = 8.f * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - getRealm()->getGame().startTime).count() / 100) % 5);
+					texture_x_offset = 8.f * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - getRealm()->getGame().startTime).count() / 100) % 5);
 			}
 		}
 
 		switch (variety) {
 			case 1:
 			case 3:
-				y_offset = 8.f * (int(direction) - 1);
+				texture_y_offset = 8.f * (int(direction.load()) - 1);
 				break;
 			case 2:
-				y_offset = 16.f * (static_cast<int>(remapDirection(direction, 0x1324)) - 1);
+				texture_y_offset = 16.f * (static_cast<int>(remapDirection(direction, 0x1324)) - 1);
 				break;
 		}
 
@@ -225,15 +227,16 @@ namespace Game3 {
 		else
 			renderHeight = 16.f;
 
-		const auto x = position.column + offset.x;
-		const auto y = position.row    + offset.y - offset.z;
-		RenderOptions main_options {
+		const float x = position.column + offset_x;
+		const float y = position.row    + offset_y - offset_z;
+
+		RenderOptions main_options{
 			.x = x,
 			.y = y,
-			.x_offset = x_offset,
-			.y_offset = y_offset,
-			.size_x = 16.f,
-			.size_y = std::min(16.f, renderHeight + 8.f * offset.z),
+			.xOffset = texture_x_offset,
+			.yOffset = texture_y_offset,
+			.sizeX = 16.f,
+			.sizeY = std::min(16.f, renderHeight + 8.f * offset_z),
 		};
 
 		if (!heldLeft && !heldRight) {
@@ -246,10 +249,10 @@ namespace Game3 {
 				sprite_renderer(*held.texture, {
 					.x = x + x_o,
 					.y = y + y_o,
-					.x_offset = held.xOffset,
-					.y_offset = held.yOffset,
-					.size_x = 16.f,
-					.size_y = 16.f,
+					.xOffset = held.xOffset,
+					.yOffset = held.yOffset,
+					.sizeX = 16.f,
+					.sizeY = 16.f,
 					.scaleX = .5f * (flip? -1 : 1),
 					.scaleY = .5f,
 					.angle = degrees,
@@ -346,6 +349,7 @@ namespace Game3 {
 			if (context.forcedOffset) {
 				offset = *context.forcedOffset;
 			} else if (can_move) {
+				auto lock = offset.uniqueLock();
 				if (horizontal)
 					offset.x = x_offset;
 				else
@@ -429,8 +433,11 @@ namespace Game3 {
 		// TODO: fix
 		constexpr bool adjust = false; // Render-to-texture silliness
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
-		canvas.center.x() = -(getColumn() - map_length / 2.f + 0.5f) - offset.x;
-		canvas.center.y() = -(getRow()    - map_length / 2.f + 0.5f) - offset.y;
+		{
+			auto lock = offset.sharedLock();
+			canvas.center.x() = -(getColumn() - map_length / 2.f + 0.5f) - offset.x;
+			canvas.center.y() = -(getRow()    - map_length / 2.f + 0.5f) - offset.y;
+		}
 		if (adjust) {
 			canvas.center.x() -= canvas.width()  / 32.f / canvas.scale;
 			canvas.center.y() += canvas.height() / 32.f / canvas.scale;
@@ -448,9 +455,9 @@ namespace Game3 {
 		position = new_position;
 
 		if (firstTeleport)
-			offset = {0.f, 0.f, 0.f};
+			offset = Offset{0.f, 0.f, 0.f};
 		else if (context.clearOffset)
-			offset = {0.f, 0.f, offset.z};
+			offset = Offset{0.f, 0.f, offset.z};
 
 		if (is_server)
 			increaseUpdateCounter();
@@ -505,7 +512,7 @@ namespace Game3 {
 			case Direction::Left:  return {position.row, position.column - 1};
 			case Direction::Right: return {position.row, position.column + 1};
 			default:
-				throw std::invalid_argument("Invalid direction: " + std::to_string(int(direction)));
+				throw std::invalid_argument("Invalid direction: " + std::to_string(int(direction.load())));
 		}
 	}
 
@@ -627,7 +634,7 @@ namespace Game3 {
 	bool Entity::canSee(RealmID realm_id, const Position &pos) const {
 		const auto realm = getRealm();
 
-		if (realm_id != (nextRealm == -1? realm->id : nextRealm))
+		if (realm_id != (nextRealm == -1? realm->id : nextRealm.load()))
 			return false;
 
 		const auto this_position = getChunk();
@@ -807,7 +814,7 @@ namespace Game3 {
 		buffer << globalID;
 		buffer << realmID;
 		buffer << position;
-		buffer << direction;
+		buffer << direction.load();
 		buffer << getUpdateCounter();
 		buffer << offset.x;
 		buffer << offset.y;

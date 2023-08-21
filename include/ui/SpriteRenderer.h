@@ -15,10 +15,10 @@ namespace Game3 {
 	struct RenderOptions {
 		float x = 0.f;
 		float y = 0.f;
-		float x_offset = 0.f;
-		float y_offset = 0.f;
-		float size_x = 16.f;
-		float size_y = 16.f;
+		float xOffset = 0.f;
+		float yOffset = 0.f;
+		float sizeX = 16.f;
+		float sizeY = 16.f;
 		float scaleX = 1.f;
 		float scaleY = 1.f;
 		float angle = 0.f;

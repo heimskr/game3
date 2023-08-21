@@ -68,10 +68,10 @@ namespace Game3 {
 		sprite_renderer(*texture, {
 			.x = float(position.column),
 			.y = float(position.row),
-			.x_offset = x / 2.f,
-			.y_offset = y / 2.f,
-			.size_x = float(tilesize),
-			.size_y = float(tilesize),
+			.xOffset = x / 2.f,
+			.yOffset = y / 2.f,
+			.sizeX = float(tilesize),
+			.sizeY = float(tilesize),
 		});
 	}
 

@@ -181,43 +181,49 @@ namespace Game3 {
 
 		add(std::make_shared<Bomb>("base:item/bomb", "Bomb", 32, 64));
 
-		add(std::make_shared<Item>("base:item/shortsword",     "Shortsword",     100,  1));
-		add(std::make_shared<Item>("base:item/red_potion",     "Red Potion",      20,  8));
-		add(std::make_shared<Item>("base:item/coins",          "Gold",             1, 1'000'000));
-		add(std::make_shared<Item>("base:item/iron_ore",       "Iron Ore",        10, 64));
-		add(std::make_shared<Item>("base:item/copper_ore",     "Copper Ore",       8, 64));
-		add(std::make_shared<Item>("base:item/gold_ore",       "Gold Ore",        20, 64));
-		add(std::make_shared<Item>("base:item/diamond_ore",    "Diamond Ore",     80, 64));
-		add(std::make_shared<Item>("base:item/diamond",        "Diamond",        100, 64));
-		add(std::make_shared<Item>("base:item/coal",           "Coal",             5, 64));
-		add(std::make_shared<Item>("base:item/oil",            "Oil",             15, 64));
-		add(std::make_shared<Item>("base:item/wood",           "Wood",             3, 64));
-		add(std::make_shared<Item>("base:item/stone",          "Stone",            1, 64));
-		add(std::make_shared<Item>("base:item/iron_bar",       "Iron Bar",        16, 64));
-		add(std::make_shared<Item>("base:item/gold_bar",       "Gold Bar",        45, 64));
-		add(std::make_shared<Item>("base:item/plank",          "Plank",            4, 64));
-		add(std::make_shared<Item>("base:item/dirt",           "Dirt",             1, 64));
-		add(std::make_shared<Item>("base:item/brick",          "Brick",            3, 64));
-		add(std::make_shared<Item>("base:item/pot",            "Pot",             24, 64));
-		add(std::make_shared<Item>("base:item/honey",          "Honey",            5, 64));
-		add(std::make_shared<Item>("base:item/ash",            "Ash",              1, 64));
-		add(std::make_shared<Item>("base:item/silicon",        "Silicon",          2, 64));
-		add(std::make_shared<Item>("base:item/electronics",    "Electronics",     32, 64));
-		add(std::make_shared<Item>("base:item/sulfur",         "Sulfur",          15, 64));
-		add(std::make_shared<Item>("base:item/cotton",         "Cotton",           8, 64));
-		add(std::make_shared<Item>("base:item/red_dye",        "Red Dye",         12, 64));
-		add(std::make_shared<Item>("base:item/orange_dye",     "Orange Dye",      12, 64));
-		add(std::make_shared<Item>("base:item/yellow_dye",     "Yellow Dye",      12, 64));
-		add(std::make_shared<Item>("base:item/green_dye",      "Green Dye",       12, 64));
-		add(std::make_shared<Item>("base:item/blue_dye",       "Blue Dye",        12, 64));
-		add(std::make_shared<Item>("base:item/purple_dye",     "Purple Dye",      12, 64));
-		add(std::make_shared<Item>("base:item/white_dye",      "White Dye",       12, 64));
-		add(std::make_shared<Item>("base:item/black_dye",      "Black Dye",       12, 64));
-		add(std::make_shared<Item>("base:item/brown_dye",      "Brown Dye",       12, 64));
-		add(std::make_shared<Item>("base:item/pink_dye",       "Pink Dye",        12, 64));
-		add(std::make_shared<Item>("base:item/light_blue_dye", "Light Blue Dye",  12, 64));
-		add(std::make_shared<Item>("base:item/gray_dye",       "Gray Dye",        12, 64));
-		add(std::make_shared<Item>("base:item/lime_dye",       "Lime Dye",        12, 64));
+		add(std::make_shared<Item>("base:item/shortsword",      "Shortsword",        100,  1));
+		add(std::make_shared<Item>("base:item/red_potion",      "Red Potion",         20,  8));
+		add(std::make_shared<Item>("base:item/coins",           "Gold",                1, 1'000'000));
+		add(std::make_shared<Item>("base:item/iron_ore",        "Iron Ore",           10, 64));
+		add(std::make_shared<Item>("base:item/copper_ore",      "Copper Ore",          8, 64));
+		add(std::make_shared<Item>("base:item/gold_ore",        "Gold Ore",           20, 64));
+		add(std::make_shared<Item>("base:item/diamond_ore",     "Diamond Ore",        80, 64));
+		add(std::make_shared<Item>("base:item/diamond",         "Diamond",           100, 64));
+		add(std::make_shared<Item>("base:item/coal",            "Coal",                5, 64));
+		add(std::make_shared<Item>("base:item/oil",             "Oil",                15, 64));
+		add(std::make_shared<Item>("base:item/wood",            "Wood",                3, 64));
+		add(std::make_shared<Item>("base:item/stone",           "Stone",               1, 64));
+		add(std::make_shared<Item>("base:item/iron_bar",        "Iron Bar",           16, 64));
+		add(std::make_shared<Item>("base:item/gold_bar",        "Gold Bar",           45, 64));
+		add(std::make_shared<Item>("base:item/plank",           "Plank",               4, 64));
+		add(std::make_shared<Item>("base:item/dirt",            "Dirt",                1, 64));
+		add(std::make_shared<Item>("base:item/brick",           "Brick",               3, 64));
+		add(std::make_shared<Item>("base:item/pot",             "Pot",                24, 64));
+		add(std::make_shared<Item>("base:item/honey",           "Honey",               5, 64));
+		add(std::make_shared<Item>("base:item/ash",             "Ash",                 1, 64));
+		add(std::make_shared<Item>("base:item/silicon",         "Silicon",             2, 64));
+		add(std::make_shared<Item>("base:item/electronics",     "Electronics",        32, 64));
+		add(std::make_shared<Item>("base:item/sulfur",          "Sulfur",             15, 64));
+		add(std::make_shared<Item>("base:item/cotton",          "Cotton",              8, 64));
+		add(std::make_shared<Item>("base:item/red_dye",         "Red Dye",            12, 64));
+		add(std::make_shared<Item>("base:item/orange_dye",      "Orange Dye",         12, 64));
+		add(std::make_shared<Item>("base:item/yellow_dye",      "Yellow Dye",         12, 64));
+		add(std::make_shared<Item>("base:item/green_dye",       "Green Dye",          12, 64));
+		add(std::make_shared<Item>("base:item/blue_dye",        "Blue Dye",           12, 64));
+		add(std::make_shared<Item>("base:item/purple_dye",      "Purple Dye",         12, 64));
+		add(std::make_shared<Item>("base:item/white_dye",       "White Dye",          12, 64));
+		add(std::make_shared<Item>("base:item/black_dye",       "Black Dye",          12, 64));
+		add(std::make_shared<Item>("base:item/brown_dye",       "Brown Dye",          12, 64));
+		add(std::make_shared<Item>("base:item/pink_dye",        "Pink Dye",           12, 64));
+		add(std::make_shared<Item>("base:item/light_blue_dye",  "Light Blue Dye",     12, 64));
+		add(std::make_shared<Item>("base:item/gray_dye",        "Gray Dye",           12, 64));
+		add(std::make_shared<Item>("base:item/lime_dye",        "Lime Dye",           12, 64));
+		add(std::make_shared<Item>("base:item/saffron_milkcap", "Saffron Milkcap",    10));
+		add(std::make_shared<Item>("base:item/honey_fungus",    "Honey Fungus",       15));
+		add(std::make_shared<Item>("base:item/brittlegill",     "Golden Brittlegill", 20));
+		add(std::make_shared<Item>("base:item/indigo_milkcap",  "Indigo Milkcap",     20));
+		add(std::make_shared<Item>("base:item/black_trumpet",   "Black Trumpet",      20));
+		add(std::make_shared<Item>("base:item/grey_knight",     "Grey Knight",        20));
 
 		add(std::make_shared<Mead>("base:item/mead", "Mead", 10, 16));
 
@@ -246,13 +252,6 @@ namespace Game3 {
 		add(std::make_shared<Landfill>("base:item/sand",          "Sand",          1, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/sand"));
 		add(std::make_shared<Landfill>("base:item/volcanic_sand", "Volcanic Sand", 3, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/volcanic_sand"));
 		add(std::make_shared<Landfill>("base:item/clay",          "Clay",          2, 64, clayRequirement));
-
-		add(std::make_shared<Mushroom>("base:item/saffron_milkcap", "Saffron Milkcap",    10, 1 ));
-		add(std::make_shared<Mushroom>("base:item/honey_fungus",    "Honey Fungus",       15, 18));
-		add(std::make_shared<Mushroom>("base:item/brittlegill",     "Golden Brittlegill", 20, 7 ));
-		add(std::make_shared<Mushroom>("base:item/indigo_milkcap",  "Indigo Milkcap",     20, 11));
-		add(std::make_shared<Mushroom>("base:item/black_trumpet",   "Black Trumpet",      20, 29));
-		add(std::make_shared<Mushroom>("base:item/grey_knight",     "Grey Knight",        20, 12));
 
 		add(std::make_shared<PumpItem>("base:item/pump", "Pump", 999, 64)); // TODO: cost
 		add(std::make_shared<TankItem>("base:item/tank", "Tank", 999, 64)); // TODO: cost

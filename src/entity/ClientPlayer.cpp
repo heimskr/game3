@@ -20,16 +20,19 @@ namespace Game3 {
 	void ClientPlayer::render(SpriteRenderer &sprites, TextRenderer &text) {
 		Player::render(sprites, text);
 
+		const auto [column, row] = getPosition();
+		const auto [x, y, z] = offset.copyBase();
+
 		text.drawOnMap(displayName, {
-			.x = static_cast<float>(position.column) + offset.x + .525f,
-			.y = static_cast<float>(position.row) + offset.y - offset.z + .025f,
+			.x = static_cast<float>(column) + x + .525f,
+			.y = static_cast<float>(row) + y - z + .025f,
 			.color = {0.f, 0.f, 0.f, 1.f},
 			.align = TextAlign::Center,
 		});
 
 		text.drawOnMap(displayName, {
-			.x = static_cast<float>(position.column) + offset.x + .5f,
-			.y = static_cast<float>(position.row) + offset.y - offset.z,
+			.x = static_cast<float>(column) + x + .5f,
+			.y = static_cast<float>(row) + y - z,
 			.color = {1.f, 1.f, 1.f, 1.f},
 			.align = TextAlign::Center,
 		});

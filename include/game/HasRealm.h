@@ -10,6 +10,6 @@ namespace Game3 {
 	struct HasRealm {
 		virtual ~HasRealm() = default;
 		virtual std::shared_ptr<Realm> getRealm() const = 0;
-		virtual const Position & getPosition() const = 0;
+		virtual Position getPosition() const = 0;
 	};
 }

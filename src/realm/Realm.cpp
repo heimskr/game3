@@ -257,8 +257,8 @@ namespace Game3 {
 		// 	// .x = -center.x() / 2.f,
 		// 	// .y = -0.5f,
 		// 	// .y = -center.y() / 2.f,
-		// 	.size_x = -1.f,
-		// 	.size_y = -1.f,
+		// 	.sizeX = -1.f,
+		// 	.sizeY = -1.f,
 		// });
 
 		if (0 < ghostCount) {

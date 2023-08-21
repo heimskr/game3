@@ -306,8 +306,8 @@ namespace Game3 {
 		if (!stack.data.empty())
 			json[2] = stack.data;
 	}
-}
 
-std::ostream & operator<<(std::ostream &os, const Game3::ItemStack &stack) {
-	return os << stack.item->getTooltip(stack) << " x " << stack.count;
+	std::ostream & operator<<(std::ostream &os, const Game3::ItemStack &stack) {
+		return os << stack.item->getTooltip(stack) << " x " << stack.count;
+	}
 }

@@ -37,6 +37,7 @@ endif
 DEPS         := glm glfw3 libzstd gtk4 gtkmm-4.0 glu libevent_openssl openssl libevent_pthreads freetype2
 OUTPUT       := game3
 COMPILER     ?= g++
+DEBUGGER     ?= gdb
 CPPFLAGS     := -Wall -Wextra $(BUILDFLAGS) -std=c++23 -Iinclude -Ijson/include -Ieigen -Istb -Ilibnoise/src -Ichemskr/include $(LTO) $(PROFILING)
 ZIG          ?= zig
 # --main-pkg-path is needed as otherwise it wouldn't let you embed any file outside of src/
@@ -117,7 +118,7 @@ tsanclienttest: $(OUTPUT)
 	TSAN_OPTIONS="suppressions=tsan_suppressions.txt" ./$<
 
 tsandebugtest: $(OUTPUT)
-	TSAN_OPTIONS="suppressions=tsan_suppressions.txt" lldb ./$<
+	TSAN_OPTIONS="suppressions=tsan_suppressions.txt" $(DEBUGGER) ./$<
 
 %.tidy: %.cpp
 	@ printf "\e[2m[\e[22;36mtidy\e[39;2m]\e[22m $<\n"

@@ -3,6 +3,7 @@
 #include "Shader.h"
 #include "Types.h"
 #include "game/TileProvider.h"
+#include "threading/Lockable.h"
 #include "ui/RectangleRenderer.h"
 #include "ui/Reshader.h"
 #include "util/GL.h"
@@ -69,7 +70,7 @@ namespace Game3 {
 			TileProvider *provider = nullptr;
 			std::vector<TileID> tileCache;
 			bool positionDirty = false;
-			ChunkPosition chunkPosition;
+			Lockable<ChunkPosition> chunkPosition;
 
 			bool generateVertexBufferObject();
 			bool generateElementBufferObject();

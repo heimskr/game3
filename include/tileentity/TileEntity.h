@@ -4,6 +4,7 @@
 #include "Types.h"
 #include "game/Agent.h"
 #include "net/Broadcastable.h"
+#include "threading/Lockable.h"
 #include "ui/Modifiers.h"
 
 #include <memory>
@@ -26,7 +27,7 @@ namespace Game3 {
 			std::weak_ptr<Realm> weakRealm;
 			Identifier tileID;
 			Identifier tileEntityID;
-			Position position {-1, -1};
+			Lockable<Position> position {-1, -1};
 			bool solid = false;
 			nlohmann::json extraData;
 
@@ -58,7 +59,7 @@ namespace Game3 {
 			virtual void onOverlap(const std::shared_ptr<Entity> &) {}
 			void setRealm(const std::shared_ptr<Realm> &);
 			std::shared_ptr<Realm> getRealm() const override;
-			const Position & getPosition() const override { return position; }
+			Position getPosition() const override { return position.copyBase(); }
 			void updateNeighbors() const;
 			bool isVisible() const;
 			Side getSide() const override final;

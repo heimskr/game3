@@ -13,8 +13,10 @@
 #include "game/HasInventory.h"
 #include "game/MovementContext.h"
 #include "item/Item.h"
+#include "threading/Atomic.h"
 #include "threading/HasMutex.h"
 #include "threading/Lockable.h"
+#include "threading/LockableWeakPtr.h"
 #include "threading/SharedRecursiveMutex.h"
 #include "ui/Modifiers.h"
 
@@ -56,25 +58,25 @@ namespace Game3 {
 
 			EntityType type;
 			Lockable<Position> position{0, 0};
-			RealmID realmID = 0;
-			std::weak_ptr<Realm> weakRealm;
-			Direction direction = Direction::Down;
+			Atomic<RealmID> realmID = 0;
+			LockableWeakPtr<Realm> weakRealm;
+			Atomic<Direction> direction = Direction::Down;
 			/** When the entity moves a square, its position field is immediately updated but this field is set to an offset
 			 *  such that the sum of the new position and the offset is equal to the old offset. The offset is moved closer
 			 *  to zero each tick to achieve smooth movement instead of teleportation from one tile to the next. */
-			Offset offset;
-			float zSpeed = 0.f;
+			Lockable<Offset> offset;
+			Atomic<float> zSpeed = 0.f;
 			Lockable<std::list<Direction>> path;
-			MoneyCount money = 0;
-			HitPoints health = 0;
+			Atomic<MoneyCount> money = 0;
+			Atomic<HitPoints> health = 0;
 			Lockable<WeakSet<Entity>> visibleEntities;
 			Lockable<WeakSet<Player>> visiblePlayers;
 			/** Set when an entity is beginning to teleport so that an EntityMovedPacket can be sent with the proper realm ID
 			 *  before the actual realm switch has occurred. */
-			RealmID nextRealm = -1;
-			bool spawning = false;
+			Atomic<RealmID> nextRealm = -1;
+			Atomic<bool> spawning = false;
 			/** Whether the entity is currently teleporting to its first position on realm change. */
-			bool firstTeleport = false;
+			Atomic<bool> firstTeleport = false;
 			std::atomic<RealmID> inLimboFor{-1};
 
 			virtual void destroy();
@@ -105,15 +107,15 @@ namespace Game3 {
 			virtual bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) { return false; }
 			inline const Position::value_type & getRow()    const { return position.row;    }
 			inline const Position::value_type & getColumn() const { return position.column; }
-			inline Position::value_type & getRow()    { return position.row;    }
-			inline Position::value_type & getColumn() { return position.column; }
+			inline Position::value_type getRow()    { return position.row;    }
+			inline Position::value_type getColumn() { return position.column; }
 			virtual void init(Game &);
 			virtual void initAfterLoad(Game &) {}
 			/** Returns whether the entity actually moved. */
 			virtual bool move(Direction, MovementContext);
 			bool move(Direction direction);
 			std::shared_ptr<Realm> getRealm() const override final;
-			inline const Position & getPosition() const override { return position; }
+			inline Position getPosition() const override { return position.copyBase(); }
 			Entity & setRealm(const Game &, RealmID);
 			Entity & setRealm(const std::shared_ptr<Realm>);
 			void focus(Canvas &, bool is_autofocus);

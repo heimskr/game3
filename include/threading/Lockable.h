@@ -71,6 +71,18 @@ namespace Game3 {
 		inline const T & getBase(std::shared_lock<std::shared_mutex> &lock) const { lock = sharedLock(); return static_cast<const T &>(*this); }
 		inline const T & getBase(std::unique_lock<std::shared_mutex> &lock) const { lock = uniqueLock(); return static_cast<const T &>(*this); }
 
+		template <typename Fn>
+		void withShared(const Fn &function) {
+			auto lock = sharedLock();
+			function();
+		}
+
+		template <typename Fn>
+		void withUnique(const Fn &function) {
+			auto lock = uniqueLock();
+			function();
+		}
+
 		inline T copyBase() const {
 			auto lock = sharedLock();
 			return static_cast<T>(*this);

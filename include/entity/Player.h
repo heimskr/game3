@@ -25,10 +25,10 @@ namespace Game3 {
 			float tooldown = 0.f;
 			Lockable<std::unordered_set<Identifier>> stationTypes{{}};
 			float speed = 10.f;
-			bool movingUp = false;
-			bool movingRight = false;
-			bool movingDown = false;
-			bool movingLeft = false;
+			std::atomic_bool movingUp = false;
+			std::atomic_bool movingRight = false;
+			std::atomic_bool movingDown = false;
+			std::atomic_bool movingLeft = false;
 			/** When moving with shift held, the player will interact with each spot moved to. */
 			bool continuousInteraction = false;
 			bool ticked = false;

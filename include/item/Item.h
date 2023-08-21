@@ -155,6 +155,6 @@ namespace Game3 {
 	Buffer & operator>>(Buffer &, ItemStack &);
 
 	void to_json(nlohmann::json &, const ItemStack &);
-}
 
-std::ostream & operator<<(std::ostream &, const Game3::ItemStack &);
+	std::ostream & operator<<(std::ostream &, const Game3::ItemStack &);
+}

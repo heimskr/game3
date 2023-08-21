@@ -1,6 +1,7 @@
 #pragma once
 
 #include "item/Item.h"
+#include "threading/Atomic.h"
 #include "tileentity/TileEntity.h"
 
 namespace Game3 {
@@ -21,8 +22,8 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "te/ore_deposit"}; }
 			Identifier oreType;
-			float timeRemaining = 0.f;
-			uint32_t uses = 0;
+			Atomic<float> timeRemaining = 0.f;
+			Atomic<uint32_t> uses = 0;
 
 			OreDeposit(const OreDeposit &) = delete;
 			OreDeposit(OreDeposit &&) = default;

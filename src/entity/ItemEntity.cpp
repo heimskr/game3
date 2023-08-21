@@ -1,9 +1,9 @@
-#include <iostream>
-
+#include "Log.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
+#include "item/Item.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
@@ -25,7 +25,7 @@ namespace Game3 {
 	void ItemEntity::setTexture(const Game &game) {
 		if (getSide() != Side::Client)
 			return;
-		auto item_texture = game.registry<ItemTextureRegistry>().at(stack.item->identifier);
+		std::shared_ptr<ItemTexture> item_texture = game.registry<ItemTextureRegistry>().at(stack.item->identifier);
 		texture = item_texture->getTexture(game);
 		texture->init();
 		xOffset = item_texture->x / 2.f;
@@ -77,10 +77,10 @@ namespace Game3 {
 		sprite_renderer(*texture, {
 			.x = x + .125f,
 			.y = y + .125f,
-			.x_offset = xOffset,
-			.y_offset = yOffset,
-			.size_x = 16.f,
-			.size_y = 16.f,
+			.xOffset = xOffset,
+			.yOffset = yOffset,
+			.sizeX = 16.f,
+			.sizeY = 16.f,
 			.scaleX = .75f,
 			.scaleY = .75f,
 		});
@@ -89,6 +89,9 @@ namespace Game3 {
 	bool ItemEntity::interact(const std::shared_ptr<Player> &player) {
 		if (getSide() != Side::Server)
 			return true;
+
+		INFO("ItemEntity stack: " << stack);
+		return true;
 
 		auto leftover = player->inventory->add(stack);
 		if (leftover) {

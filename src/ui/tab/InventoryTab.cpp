@@ -113,7 +113,7 @@ namespace Game3 {
 
 		mainWindow.queue([this, game] {
 			if (game->player->inventory)
-				populate(grid, static_cast<ClientInventory &>(*game->player->inventory));
+				populate(grid, std::static_pointer_cast<ClientInventory>(game->player->inventory));
 
 			auto lock = currentModule.trySharedLock();
 			if (currentModule)
@@ -136,7 +136,7 @@ namespace Game3 {
 			widgets.clear();
 
 			if (game->player->inventory)
-				populate(grid, static_cast<ClientInventory &>(*game->player->inventory));
+				populate(grid, std::static_pointer_cast<ClientInventory>(game->player->inventory));
 
 			auto lock = currentModule.sharedLock();
 			if (currentModule)
@@ -144,14 +144,17 @@ namespace Game3 {
 		});
 	}
 
-	void InventoryTab::populate(Gtk::Grid &grid, ClientInventory &inventory) {
-		auto &storage = inventory.getStorage();
+	void InventoryTab::populate(Gtk::Grid &grid, std::shared_ptr<ClientInventory> inventory) {
+		auto &storage = inventory->getStorage();
+
+		std::shared_ptr<ClientGame> last_game = lastGame.copyBase();
 
 		const int grid_width = lastGridWidth = gridWidth();
 		const int tile_size  = grid.get_width() / (grid.get_width() / TILE_SIZE);
-		const bool tooldown = 0.f < lastGame->player->tooldown;
+		const bool tooldown = 0.f < last_game->player->tooldown;
 
-		for (Slot slot = 0; slot < inventory.slotCount; ++slot) {
+
+		for (Slot slot = 0; slot < inventory->slotCount; ++slot) {
 			const int row    = slot / grid_width;
 			const int column = slot % grid_width;
 			std::unique_ptr<Gtk::Widget> widget_ptr;
@@ -164,7 +167,7 @@ namespace Game3 {
 				if (stack.hasDurability())
 					tooltip_text += "\n(" + std::to_string(stack.data.at("durability").at(0).get<Durability>()) + "/" + std::to_string(stack.data.at("durability").at(1).get<Durability>()) + ")";
 				auto fixed_ptr = std::make_unique<Gtk::Fixed>();
-				auto image_ptr = std::make_unique<Gtk::Image>(inventory.getImage(*lastGame, slot));
+				auto image_ptr = std::make_unique<Gtk::Image>(inventory->getImage(*last_game, slot));
 				auto label_ptr = std::make_unique<Gtk::Label>(std::to_string(stack.count));
 				label_ptr->set_xalign(1.f);
 				label_ptr->set_yalign(1.f);
@@ -197,7 +200,7 @@ namespace Game3 {
 
 			widget_ptr->set_size_request(tile_size, tile_size);
 			widget_ptr->add_css_class("item-slot");
-			if (slot == inventory.activeSlot)
+			if (slot == inventory->activeSlot)
 				widget_ptr->add_css_class("active-slot");
 
 			Gtk::Widget *old_widget = nullptr;
@@ -209,14 +212,14 @@ namespace Game3 {
 
 			auto left_click = Gtk::GestureClick::create();
 			left_click->set_button(1);
-			left_click->signal_released().connect([this, slot, widget = widget_ptr.get()](int n, double x, double y) {
-				leftClick(lastGame, widget, n, slot, x, y);
+			left_click->signal_released().connect([this, last_game, slot, widget = widget_ptr.get()](int n, double x, double y) {
+				leftClick(last_game, widget, n, slot, x, y);
 			});
 
 			auto right_click = Gtk::GestureClick::create();
 			right_click->set_button(3);
-			right_click->signal_pressed().connect([this, slot, widget = widget_ptr.get()](int n, double x, double y) {
-				rightClick(lastGame, widget, n, slot, x, y);
+			right_click->signal_pressed().connect([this, last_game, slot, widget = widget_ptr.get()](int n, double x, double y) {
+				rightClick(last_game, widget, n, slot, x, y);
 			});
 
 			widget_ptr->add_controller(left_click);
