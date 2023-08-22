@@ -7,6 +7,7 @@
 #include "Shader.h"
 #include "Types.h"
 #include "game/TileProvider.h"
+#include "threading/Lockable.h"
 #include "ui/RectangleRenderer.h"
 #include "util/GL.h"
 
@@ -17,9 +18,9 @@ namespace Game3 {
 		public:
 			constexpr static float TEXTURE_SCALE = 2.f;
 			constexpr static float TILE_TEXTURE_PADDING = 1.f / 2048.f;
-			int backbufferWidth = -1;
-			int backbufferHeight = -1;
-			bool isMissing = false;
+			std::atomic_int backbufferWidth = -1;
+			std::atomic_int backbufferHeight = -1;
+			std::atomic_bool isMissing = false;
 
 			Eigen::Vector2f center {0.f, 0.f};
 
@@ -43,7 +44,7 @@ namespace Game3 {
 			inline explicit operator bool() const { return initialized; }
 
 		private:
-			bool initialized = false;
+			std::atomic_bool initialized = false;
 			Shader shader {"fluids"};
 			GL::FloatVAO vao;
 			GL::VBO vbo;
@@ -52,8 +53,8 @@ namespace Game3 {
 			Realm *realm = nullptr;
 			FluidChunk *chunk = nullptr;
 			TileProvider *provider = nullptr;
-			bool positionDirty = false;
-			ChunkPosition chunkPosition;
+			std::atomic_bool positionDirty = false;
+			Lockable<ChunkPosition> chunkPosition;
 
 			bool generateVertexBufferObject();
 			bool generateElementBufferObject();

@@ -176,7 +176,6 @@ namespace Game3 {
 				auto &client_game = game.toClient();
 				if (getGID() == client_game.player->getGID()) {
 					{
-						auto lock = client_game.activeRealm.uniqueLock();
 						client_game.activeRealm->onBlur();
 						client_game.activeRealm->queuePlayerRemoval(getShared());
 						client_game.activeRealm = new_realm;

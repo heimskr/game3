@@ -20,7 +20,7 @@ namespace Game3 {
 	void ClientPlayer::render(SpriteRenderer &sprites, TextRenderer &text) {
 		Player::render(sprites, text);
 
-		const auto [column, row] = getPosition();
+		const auto [row, column] = getPosition();
 		const auto [x, y, z] = offset.copyBase();
 
 		text.drawOnMap(displayName, {

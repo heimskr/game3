@@ -222,13 +222,16 @@ namespace Game3 {
 				break;
 		}
 
-		if (auto fluid_tile = getRealm()->tileProvider.copyFluidTile(position); fluid_tile && 0 < fluid_tile->level)
+		const auto [row, column] = position.copyBase();
+
+		if (auto fluid_tile = getRealm()->tileProvider.copyFluidTile({row, column}); fluid_tile && 0 < fluid_tile->level)
 			renderHeight = 10.f;
 		else
 			renderHeight = 16.f;
 
-		const float x = position.column + offset_x;
-		const float y = position.row    + offset_y - offset_z;
+
+		const float x = column + offset_x;
+		const float y = row    + offset_y - offset_z;
 
 		RenderOptions main_options{
 			.x = x,
@@ -836,9 +839,12 @@ namespace Game3 {
 		buffer >> position;
 		buffer >> direction;
 		setUpdateCounter(buffer.take<UpdateCounter>());
-		buffer >> offset.x;
-		buffer >> offset.y;
-		buffer >> offset.z;
+		{
+			auto offset_lock = offset.uniqueLock();
+			buffer >> offset.x;
+			buffer >> offset.y;
+			buffer >> offset.z;
+		}
 		buffer >> zSpeed;
 		buffer >> path;
 		buffer >> money;

@@ -69,13 +69,14 @@ namespace Game3 {
 		auto &tileset = realm->getTileset();
 		const auto tilesize = static_cast<float>(tileset.getTileSize());
 		auto texture = tileset.getTexture(realm->getGame());
+		const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
 
 		glm::mat4 projection(1.f);
 		projection = glm::scale(projection, {tilesize, -tilesize, 1.f}) *
 		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1.f}) *
 		             glm::translate(projection, {
-		                 center_x - CHUNK_SIZE / 2.f + chunkPosition.x * CHUNK_SIZE,
-		                 center_y - CHUNK_SIZE / 2.f + chunkPosition.y * CHUNK_SIZE,
+		                 center_x - CHUNK_SIZE / 2.f + chunk_x * CHUNK_SIZE,
+		                 center_y - CHUNK_SIZE / 2.f + chunk_y * CHUNK_SIZE,
 		                 0.f
 		             });
 
@@ -112,8 +113,9 @@ namespace Game3 {
 	}
 
 	void FluidRenderer::setChunkPosition(const ChunkPosition &new_pos) {
+		auto lock = chunkPosition.uniqueLock();
 		if (new_pos != chunkPosition) {
-			chunkPosition = new_pos;
+			chunkPosition.getBase() = new_pos;
 			positionDirty = true;
 		}
 	}
@@ -143,13 +145,14 @@ namespace Game3 {
 		const float t_size = 1.f / divisor - TILE_TEXTURE_PADDING * 2;
 
 		isMissing = false;
-
 		const TileID missing = tileset["base:tile/missing"];
 
-		vbo.init<float, 4>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, &game, set_width, divisor, t_size, missing](size_t x, size_t y) {
+		const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
+
+		vbo.init<float, 4>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, chunk_x, chunk_y, &game, set_width, divisor, t_size, missing](size_t x, size_t y) {
 			const auto fluid_opt = realm->tileProvider.copyFluidTile({
-				static_cast<Index>(y) + CHUNK_SIZE * (chunkPosition.y + 1), // why `+ 1`?
-				static_cast<Index>(x) + CHUNK_SIZE * (chunkPosition.x + 1)  // here too
+				Index(y) + CHUNK_SIZE * (chunk_y + 1), // why `+ 1`?
+				Index(x) + CHUNK_SIZE * (chunk_x + 1)  // here too
 			});
 
 			TileID tile = -1;
