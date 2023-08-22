@@ -107,8 +107,8 @@ namespace Game3 {
 			virtual bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) { return false; }
 			inline const Position::value_type & getRow()    const { return position.row;    }
 			inline const Position::value_type & getColumn() const { return position.column; }
-			inline Position::value_type getRow()    { return position.row;    }
-			inline Position::value_type getColumn() { return position.column; }
+			inline Position::value_type getRow()    { auto lock = position.sharedLock(); return position.row;    }
+			inline Position::value_type getColumn() { auto lock = position.sharedLock(); return position.column; }
 			virtual void init(Game &);
 			virtual void initAfterLoad(Game &) {}
 			/** Returns whether the entity actually moved. */

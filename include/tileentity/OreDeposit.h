@@ -21,7 +21,7 @@ namespace Game3 {
 	class OreDeposit: public TileEntity {
 		public:
 			static Identifier ID() { return {"base", "te/ore_deposit"}; }
-			Identifier oreType;
+			Lockable<Identifier> oreType;
 			Atomic<float> timeRemaining = 0.f;
 			Atomic<uint32_t> uses = 0;
 

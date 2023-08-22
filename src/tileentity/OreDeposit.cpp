@@ -121,6 +121,7 @@ namespace Game3 {
 	}
 
 	const Ore & OreDeposit::getOre(const Game &game) const {
+		auto lock = oreType.sharedLock();
 		return *game.registry<OreRegistry>().at(oreType);
 	}
 
