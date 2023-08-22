@@ -55,7 +55,12 @@ namespace Game3 {
 	}
 
 	void ClientPlayer::jump() {
-		if (abs(offset.z) <= 0.001f)
+		float z;
+		{
+			auto lock = offset.sharedLock();
+			z = offset.z;
+		}
+		if (abs(z) <= 0.001f)
 			send(JumpPacket());
 	}
 

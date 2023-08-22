@@ -69,7 +69,7 @@ namespace Game3 {
 			TileChunk *chunk = nullptr;
 			TileProvider *provider = nullptr;
 			std::vector<TileID> tileCache;
-			bool positionDirty = false;
+			std::atomic_bool positionDirty = false;
 			Lockable<ChunkPosition> chunkPosition;
 
 			bool generateVertexBufferObject();
