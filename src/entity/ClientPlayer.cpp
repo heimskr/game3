@@ -60,8 +60,10 @@ namespace Game3 {
 			auto lock = offset.sharedLock();
 			z = offset.z;
 		}
-		if (abs(z) <= 0.001f)
+		if (abs(z) <= 0.001f) {
+			zSpeed = getJumpSpeed();
 			send(JumpPacket());
+		}
 	}
 
 	const std::unordered_set<Layer> & ClientPlayer::getVisibleLayers() const {

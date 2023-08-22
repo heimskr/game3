@@ -157,6 +157,7 @@ namespace Game3 {
 			std::shared_ptr<Entity> getSelf();
 			void clearQueues();
 			bool isInLimbo() const;
+			virtual float getJumpSpeed() const { return 8.f; }
 
 			virtual void encode(Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */

@@ -928,9 +928,9 @@ namespace Game3 {
 		if (getSide() != Side::Server || zSpeed != 0.f || offset.z != 0.f)
 			return;
 
-		zSpeed = 8.f;
+		zSpeed = getJumpSpeed();
 		increaseUpdateCounter();
-		getGame().toServer().entityTeleported(*this, MovementContext{});
+		getGame().toServer().entityTeleported(*this, MovementContext{.excludePlayerSelf = true});
 	}
 
 	void Entity::clearOffset() {
