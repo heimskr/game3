@@ -80,6 +80,8 @@ namespace Game3 {
 			int64_t seed = 0;
 			std::unordered_set<ChunkPosition> generatedChunks;
 			std::unordered_set<ChunkPosition> visibleChunks;
+			std::atomic_bool wakeupPending = false;
+			std::atomic_bool snoozePending = false;
 
 			std::shared_mutex visibleChunksMutex;
 
@@ -284,7 +286,7 @@ namespace Game3 {
 			friend void to_json(nlohmann::json &, const Realm &);
 
 		protected:
-			bool focused = false;
+			std::atomic_bool focused = false;
 			/** Whether to prevent updateNeighbors from running. */
 			bool updatesPaused = false;
 

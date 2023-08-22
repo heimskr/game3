@@ -23,6 +23,31 @@ namespace Game3 {
 		spriteRenderer.update(width(), height());
 		rectangleRenderer.update(width(), height());
 		textRenderer.update(width(), height());
+
+		game->iterateRealms([](const RealmPtr &realm) {
+			if (realm->wakeupPending.exchange(false)) {
+				for (auto &row: *realm->renderers)
+					for (auto &layers: row)
+						for (auto &renderer: layers)
+							renderer.wakeUp();
+
+				for (auto &row: *realm->fluidRenderers)
+					for (auto &renderer: row)
+						renderer.wakeUp();
+
+				realm->reupload();
+			} else if (realm->snoozePending.exchange(false)) {
+				for (auto &row: *realm->renderers)
+					for (auto &layers: row)
+						for (auto &renderer: layers)
+							renderer.snooze();
+
+				for (auto &row: *realm->fluidRenderers)
+					for (auto &renderer: row)
+						renderer.snooze();
+			}
+		});
+
 		if (RealmPtr realm = game->activeRealm.copyBase()) {
 			realm->render(width(), height(), center, scale, spriteRenderer, textRenderer, game->getDivisor());
 			realmBounds = game->getVisibleRealmBounds();

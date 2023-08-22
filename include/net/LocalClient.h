@@ -26,8 +26,8 @@ namespace Game3 {
 			constexpr static size_t HEADER_SIZE = 6;
 
 			std::weak_ptr<ClientGame> weakGame;
-			size_t bytesRead = 0;
-			size_t bytesWritten = 0;
+			std::atomic_size_t bytesRead = 0;
+			std::atomic_size_t bytesWritten = 0;
 
 			Lockable<std::map<PacketID, size_t>> receivedPacketCounts;
 			Lockable<std::map<PacketID, size_t>> sentPacketCounts;

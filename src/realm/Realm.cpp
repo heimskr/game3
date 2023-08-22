@@ -136,17 +136,7 @@ namespace Game3 {
 			return;
 
 		focused = true;
-
-		for (auto &row: *renderers)
-			for (auto &layers: row)
-				for (auto &renderer: layers)
-					renderer.wakeUp();
-
-		for (auto &row: *fluidRenderers)
-			for (auto &renderer: row)
-				renderer.wakeUp();
-
-		reupload();
+		wakeupPending = true;
 	}
 
 	void Realm::onBlur() {
@@ -154,15 +144,7 @@ namespace Game3 {
 			return;
 
 		focused = false;
-
-		for (auto &row: *renderers)
-			for (auto &layers: row)
-				for (auto &renderer: layers)
-					renderer.snooze();
-
-		for (auto &row: *fluidRenderers)
-			for (auto &renderer: row)
-				renderer.snooze();
+		snoozePending = true;
 	}
 
 	void Realm::createRenderers() {

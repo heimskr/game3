@@ -438,8 +438,9 @@ namespace Game3 {
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
 		{
 			auto lock = offset.sharedLock();
-			canvas.center.x() = -(getColumn() - map_length / 2.f + 0.5f) - offset.x;
-			canvas.center.y() = -(getRow()    - map_length / 2.f + 0.5f) - offset.y;
+			const auto [row, column] = getPosition();
+			canvas.center.x() = -(column - map_length / 2.f + 0.5f) - offset.x;
+			canvas.center.y() = -(row    - map_length / 2.f + 0.5f) - offset.y;
 		}
 		if (adjust) {
 			canvas.center.x() -= canvas.width()  / 32.f / canvas.scale;
@@ -933,6 +934,7 @@ namespace Game3 {
 	}
 
 	void Entity::clearOffset() {
+		auto lock = offset.uniqueLock();
 		offset.x = 0.f;
 		offset.y = 0.f;
 		offset.z = 0.f;
