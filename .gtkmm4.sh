@@ -1,4 +1,4 @@
-!/bin/bash
+#!/usr/bin/bash
 
 sudo pip3 install meson
 sudo pip3 install ninja
