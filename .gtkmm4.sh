@@ -8,9 +8,6 @@ cd .github-deps
 
 ORIG_DIR=$(pwd)
 
-sudo apt remove libglib2.0-0 pkg-config
-sudo apt install gettext
-
 wget https://pkg-config.freedesktop.org/releases/pkg-config-0.29.2.tar.gz
 tar xf pkg-config-0.29.2.tar.gz
 cd pkg-config-0.29.2
