@@ -15,7 +15,7 @@ cd pkg-config-0.29.2
 make -j2
 sudo make install
 cd "$ORIG_DIR"
-export PKG_CONFIG_PATH="$(realpath prefix/lib/pkgconfig):/usr/lib/x86_64-linux-gnu/pkgconfig"
+export PKG_CONFIG_PATH="$(realpath prefix/lib/pkgconfig):$PKG_CONFIG_PATH:/usr/lib/x86_64-linux-gnu/pkgconfig"
 
 wget https://download.gnome.org/sources/glib/2.77/glib-2.77.0.tar.xz
 tar xf glib-2.77.0.tar.xz
@@ -56,7 +56,7 @@ ninja install
 cd ..
 meson setup --reconfigure --prefix /usr --libdir lib -Dmedia-gstreamer=disabled -Dbuild-examples=false -Dbuild-tests=false -Dbuild-testsuite=false -Dbuild-demos=false -Dwayland:documentation=false -Dwayland:tests=false -Dlibsigcplusplus:build-documentation=false -Dlibsigcplusplus:build-examples=false -Dlibsigcplusplus:build-tests=false -Dlibsigcplusplus:validation=false -Dlibsigcplusplus:dist-warnings=no -Dlibsigcplusplus:warnings=no -Dsigc++-3.0:build-documentation=false -Dsigc++-3.0:build-examples=false -Dsigc++-3.0:build-tests=false -Dsigc++-3.0:validation=false -Dsigc++-3.0:dist-warnings=no -Dsigc++-3.0:warnings=no -Dwayland-protocols:tests=false -Dmm-common:use-network=true meson_build .
 cd meson_build
-ninja install
+sudo ninja install
 cd "$ORIG_DIR"
 
 wget https://download.gnome.org/sources/gtkmm/4.12/gtkmm-4.12.0.tar.xz
