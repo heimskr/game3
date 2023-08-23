@@ -43,8 +43,8 @@ ZIG          ?= zig
 # --main-pkg-path is needed as otherwise it wouldn't let you embed any file outside of src/
 ZIGFLAGS     := -O ReleaseSmall --main-pkg-path .
 ifeq ($(GITHUB),true)
-	INCLUDES     := $(shell PKG_CONFIG_PATH=.github-deps/prefix/lib/pkgconfig pkg-config --cflags $(DEPS))
-	LIBS         := $(shell PKG_CONFIG_PATH=.github-deps/prefix/lib/pkgconfig pkg-config --libs   $(DEPS))
+	INCLUDES     := $(shell PKG_CONFIG_PATH=.github-deps/prefix/lib/pkgconfig .github-deps/prefix/bin/pkg-config --cflags $(DEPS))
+	LIBS         := $(shell PKG_CONFIG_PATH=.github-deps/prefix/lib/pkgconfig .github-deps/prefix/bin/pkg-config --libs   $(DEPS))
 	ZIG          := .zig/zig
 	COMPILER     := clang++-14
 else
