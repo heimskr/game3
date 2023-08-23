@@ -17,12 +17,6 @@ sudo make install
 cd "$ORIG_DIR"
 export PKG_CONFIG_PATH="$(realpath prefix/lib/pkgconfig):/usr/lib/x86_64-linux-gnu/pkgconfig"
 
-wget https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/master/shared-mime-info-master.tar.gz
-tar xf shared-mime-info-master.tar.gz
-cd shared-mime-info-master
-meson _build -Dprefix=/usr
-sudo ninja -v -C _build install
-
 wget https://download.gnome.org/sources/glib/2.77/glib-2.77.0.tar.xz
 tar xf glib-2.77.0.tar.xz
 cd glib-2.77.0
