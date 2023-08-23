@@ -8,14 +8,14 @@ cd .github-deps
 
 ORIG_DIR=$(pwd)
 
-wget https://pkg-config.freedesktop.org/releases/pkg-config-0.29.2.tar.gz
-tar xf pkg-config-0.29.2.tar.gz
-cd pkg-config-0.29.2
-./configure --prefix=/usr --with-internal-glib
-make -j2
-sudo make install
-cd "$ORIG_DIR"
-export PKG_CONFIG_PATH="$(realpath prefix/lib/pkgconfig):$PKG_CONFIG_PATH:/usr/lib/x86_64-linux-gnu/pkgconfig"
+# wget https://pkg-config.freedesktop.org/releases/pkg-config-0.29.2.tar.gz
+# tar xf pkg-config-0.29.2.tar.gz
+# cd pkg-config-0.29.2
+# ./configure --prefix=/usr --with-internal-glib
+# make -j2
+# sudo make install
+# cd "$ORIG_DIR"
+export PKG_CONFIG_PATH="$(realpath prefix/lib/pkgconfig):$PKG_CONFIG_PATH:/usr/lib/pkgconfig:/usr/share/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig"
 
 wget https://download.gnome.org/sources/glib/2.77/glib-2.77.0.tar.xz
 tar xf glib-2.77.0.tar.xz
