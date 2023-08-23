@@ -8,6 +8,7 @@
 
 #include "Types.h"
 #include "game/ChunkPosition.h"
+#include "threading/ThreadPool.h"
 
 namespace Game3 {
 	class Realm;
@@ -25,4 +26,8 @@ namespace Game3 {
 
 	void from_json(const nlohmann::json &, WorldGenParams &);
 	void to_json(nlohmann::json &, const WorldGenParams &);
+
+	namespace WorldGen {
+		extern ThreadPool pool;
+	}
 }

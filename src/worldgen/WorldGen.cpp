@@ -3,6 +3,10 @@
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
+	namespace WorldGen {
+		ThreadPool pool{5};
+	}
+
 	void from_json(const nlohmann::json &json, WorldGenParams &params) {
 		params.wetness = json.at("wetness");
 		params.stoneLevel = json.at("stoneLevel");

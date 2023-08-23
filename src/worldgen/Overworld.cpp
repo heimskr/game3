@@ -6,6 +6,7 @@
 #include "lib/noise.h"
 #include "realm/Overworld.h"
 #include "realm/Realm.h"
+#include "threading/Waiter.h"
 #include "tileentity/OreDeposit.h"
 #include "tileentity/Teleporter.h"
 #include "util/Timer.h"
@@ -14,6 +15,7 @@
 #include "worldgen/Town.h"
 #include "worldgen/WorldGen.h"
 
+#include <semaphore>
 #include <thread>
 
 // #define GENERATE_RIVERS
@@ -34,10 +36,7 @@ namespace Game3::WorldGen {
 
 		const size_t regions_x = updiv(width,  CHUNK_SIZE);
 		const size_t regions_y = updiv(height, CHUNK_SIZE);
-		const size_t thread_count = regions_x * regions_y;
-
-		std::vector<std::thread> threads;
-		threads.reserve(thread_count);
+		const size_t job_count = regions_x * regions_y;
 
 		noise::module::Perlin p2;
 		p2.SetSeed(noise_seed * 3 - 1);
@@ -89,6 +88,9 @@ namespace Game3::WorldGen {
 			for (int32_t x = range.topLeft.x; x <= range.bottomRight.x; ++x)
 				provider.ensureAllChunks(ChunkPosition{x, y});
 
+		pool.start();
+		Waiter waiter(job_count);
+
 		for (size_t thread_row = 0; thread_row < regions_y; ++thread_row) {
 			const Index row_min = range_row_min + thread_row * CHUNK_SIZE;
 			// Compare with <, not <=
@@ -99,7 +101,7 @@ namespace Game3::WorldGen {
 				// Compare with <, not <=
 				const Index col_max = col_min + CHUNK_SIZE;
 
-				threads.emplace_back([&, game_ptr, row_min, row_max, col_min, col_max] {
+				pool.add([&, game_ptr, row_min, row_max, col_min, col_max](ThreadPool &, size_t) {
 					threadContext = {game_ptr, noise_seed - 1'000'000ul * row_min + col_min, row_min, row_max, col_min, col_max};
 
 					std::vector<double> saved_noise((row_max - row_min) * (col_max - col_min));
@@ -157,14 +159,13 @@ namespace Game3::WorldGen {
 					add_resources(0.5, "base:ore/coal");
 					// TODO: oil
 					// resource_timer.stop();
+
+					--waiter;
 				});
 			}
 		}
 
-		for (std::thread &thread: threads)
-			thread.join();
-
-		threads.clear();
+		waiter.wait();
 
 		std::default_random_engine rng(noise_seed);
 
@@ -180,15 +181,15 @@ namespace Game3::WorldGen {
 
 				std::vector<Position> candidates;
 				candidates.reserve(starts.size() / 16);
-				std::vector<std::thread> candidate_threads;
 				const size_t chunk_max = updiv(starts.size(), chunk_size);
-				candidate_threads.reserve(chunk_max);
 
 				std::mutex candidates_mutex;
 				realm->randomLand = choose(starts, rng);
 
+				waiter.reset(chunk_max);
+
 				for (size_t chunk = 0; chunk < chunk_max; ++chunk) {
-					candidate_threads.emplace_back([&, chunk] {
+					pool.add([&, chunk](ThreadPool &, size_t) {
 						std::vector<Position> thread_candidates;
 
 						for (size_t i = chunk * chunk_size, max = std::min((chunk + 1) * chunk_size, starts.size()); i < max; ++i) {
@@ -213,12 +214,11 @@ namespace Game3::WorldGen {
 
 						std::unique_lock lock(candidates_mutex);
 						candidates.insert(candidates.end(), thread_candidates.begin(), thread_candidates.end());
+						--waiter;
 					});
 				}
 
-				for (std::thread &thread: candidate_threads)
-					thread.join();
-
+				waiter.wait();
 				candidate_timer.stop();
 
 				if (!candidates.empty()) {
@@ -231,25 +231,27 @@ namespace Game3::WorldGen {
 
 		Timer postgen_timer("Postgen");
 
+		waiter.reset(regions_y * regions_x);
+
 		for (size_t thread_row = 0; thread_row < regions_y; ++thread_row) {
 			const Index row_min = range_row_min + thread_row * CHUNK_SIZE;
 			// Compare with <, not <=
 			const Index row_max = row_min + CHUNK_SIZE;
-			for (size_t thread_col = 0; thread_col < regions_y; ++thread_col) {
+			for (size_t thread_col = 0; thread_col < regions_x; ++thread_col) {
 				const Index col_min = range_column_min + thread_col * CHUNK_SIZE;
 				// Compare with <, not <=
 				const Index col_max = col_min + CHUNK_SIZE;
-				threads.emplace_back([realm, &get_biome, &perlin, &params, noise_seed, row_min, row_max, col_min, col_max] {
+				pool.add([realm, &waiter, &get_biome, &perlin, &params, noise_seed, row_min, row_max, col_min, col_max](ThreadPool &, size_t) {
 					threadContext = {realm->getGame().shared_from_this(), noise_seed - 1'000'000ul * row_min + col_min, row_min, row_max, col_min, col_max};
 					for (Index row = row_min; row < row_max; ++row)
 						for (Index column = col_min; column < col_max; ++column)
 							get_biome(row, column).postgen(row, column, threadContext.rng, perlin, params);
+					--waiter;
 				});
 			}
 		}
 
-		for (std::thread &thread: threads)
-			thread.join();
+		waiter.wait();
 
 		postgen_timer.stop();
 
