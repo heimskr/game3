@@ -25,7 +25,7 @@ jobs:
       if: steps.cache-gtkmm4.outputs.cache-hit != 'true'
       uses: awalsh128/cache-apt-pkgs-action@latest
       with:
-        packages: python3-pip libglu1-mesa-dev libglm-dev libglfw3-dev libzstd-dev cmake libxml2-dev xsltproc libstdc++-12-dev dpkg-dev iso-codes libpng-dev libpolkit-gobject-1-dev librsvg2-common librsvg2-dev libswscale-dev libtiff-dev libvulkan-dev libwayland-dev libx11-dev libxcomposite-dev libxcursor-dev libxdamage-dev libxext-dev libxfixes-dev libxi-dev libxinerama-dev libxkbcommon-dev libxkbfile-dev libxml2-utils locales locales-all pkg-config shared-mime-info gettext
+        packages: python3-pip libglu1-mesa-dev libglm-dev libglfw3-dev libzstd-dev cmake libxml2-dev xsltproc libstdc++-12-dev dpkg-dev iso-codes libpng-dev libpolkit-gobject-1-dev librsvg2-common librsvg2-dev libswscale-dev libtiff-dev libvulkan-dev libwayland-dev libx11-dev libxcomposite-dev libxcursor-dev libxdamage-dev libxext-dev libxfixes-dev libxi-dev libxinerama-dev libxkbcommon-dev libxkbfile-dev libxml2-utils locales locales-all pkg-config shared-mime-info gettext doxygen
         version: 1.0
 
     - name: Install Packages (cache hit)
