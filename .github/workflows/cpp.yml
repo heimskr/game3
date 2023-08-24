@@ -35,15 +35,15 @@ jobs:
         packages: libglu1-mesa-dev libglm-dev libglfw3-dev libzstd-dev libpango1.0-dev libgraphene-1.0-dev
         version: 1.0
 
-    # - name: Setup upterm session
-    #   uses: lhotari/action-upterm@v1
-    #   with:
-    #     limit-access-to-actor: true
-    #     limit-access-to-users: heimskr
-
     - name: Build gtkmm4
       if: steps.cache-gtkmm4.outputs.cache-hit != 'true'
       run: ./.gtkmm4.sh
+
+    - name: Setup upterm session
+      uses: lhotari/action-upterm@v1
+      with:
+        limit-access-to-actor: true
+        limit-access-to-users: heimskr
 
     - name: Compile
       run: make -j2 zip GITHUB=true BUILD=nonnative
