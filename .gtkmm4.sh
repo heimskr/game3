@@ -57,6 +57,10 @@ cd ..
 meson setup --reconfigure --prefix /usr --libdir lib -Dmedia-gstreamer=disabled -Dbuild-examples=false -Dbuild-tests=false -Dbuild-testsuite=false -Dbuild-demos=false -Dwayland:documentation=false -Dwayland:tests=false -Dlibsigcplusplus:build-documentation=false -Dlibsigcplusplus:build-examples=false -Dlibsigcplusplus:build-tests=false -Dlibsigcplusplus:validation=false -Dlibsigcplusplus:dist-warnings=no -Dlibsigcplusplus:warnings=no -Dsigc++-3.0:build-documentation=false -Dsigc++-3.0:build-examples=false -Dsigc++-3.0:build-tests=false -Dsigc++-3.0:validation=false -Dsigc++-3.0:dist-warnings=no -Dsigc++-3.0:warnings=no -Dwayland-protocols:tests=false -Dmm-common:use-network=true meson_build .
 cd meson_build
 sudo ninja install
+cd ..
+meson setup --reconfigure --prefix /usr/local --libdir lib -Dmedia-gstreamer=disabled -Dbuild-examples=false -Dbuild-tests=false -Dbuild-testsuite=false -Dbuild-demos=false -Dwayland:documentation=false -Dwayland:tests=false -Dlibsigcplusplus:build-documentation=false -Dlibsigcplusplus:build-examples=false -Dlibsigcplusplus:build-tests=false -Dlibsigcplusplus:validation=false -Dlibsigcplusplus:dist-warnings=no -Dlibsigcplusplus:warnings=no -Dsigc++-3.0:build-documentation=false -Dsigc++-3.0:build-examples=false -Dsigc++-3.0:build-tests=false -Dsigc++-3.0:validation=false -Dsigc++-3.0:dist-warnings=no -Dsigc++-3.0:warnings=no -Dwayland-protocols:tests=false -Dmm-common:use-network=true meson_build .
+cd meson_build
+sudo ninja install
 cd "$ORIG_DIR"
 
 wget https://download.gnome.org/sources/gtkmm/4.12/gtkmm-4.12.0.tar.xz
