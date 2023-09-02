@@ -105,13 +105,17 @@ namespace Game3 {
 	}
 
 	Buffer & Buffer::operator+=(float item) {
-		static_assert(sizeof(item) == 4);
-		return *this += *reinterpret_cast<const uint32_t *>(&item);
+		static_assert(sizeof(item) == 4 && sizeof(item) == sizeof(uint32_t));
+		uint32_t to_add{};
+		std::memcpy(&to_add, &item, sizeof(to_add));
+		return *this += to_add;
 	}
 
 	Buffer & Buffer::operator+=(double item) {
-		static_assert(sizeof(item) == 8);
-		return *this += *reinterpret_cast<const uint64_t *>(&item);
+		static_assert(sizeof(item) == 8 && sizeof(item) == sizeof(uint64_t));
+		uint64_t to_add{};
+		std::memcpy(&to_add, &item, sizeof(to_add));
+		return *this += to_add;
 	}
 
 	Buffer & Buffer::operator+=(std::string_view string) {
@@ -152,14 +156,18 @@ namespace Game3 {
 	float popBuffer<float>(Buffer &buffer) {
 		static_assert(sizeof(float) == sizeof(uint32_t));
 		const auto raw = popBuffer<uint32_t>(buffer);
-		return *reinterpret_cast<const float *>(&raw);
+		float out{};
+		std::memcpy(&out, &raw, sizeof(out));
+		return out;
 	}
 
 	template <>
 	double popBuffer<double>(Buffer &buffer) {
 		static_assert(sizeof(double) == sizeof(uint64_t));
 		const auto raw = popBuffer<uint64_t>(buffer);
-		return *reinterpret_cast<const double *>(&raw);
+		double out{};
+		std::memcpy(&out, &raw, sizeof(out));
+		return out;
 	}
 
 	std::string Buffer::popType() {
