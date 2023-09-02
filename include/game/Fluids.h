@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Chunk.h"
 #include "Types.h"
 #include "data/Identifier.h"
 
@@ -73,4 +74,6 @@ namespace Game3 {
 	Buffer & operator+=(Buffer &, const FluidStack &);
 	Buffer & operator<<(Buffer &, const FluidStack &);
 	Buffer & operator>>(Buffer &, FluidStack &);
+
+	using FluidChunk = Chunk<FluidTile>;
 }

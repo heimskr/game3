@@ -331,6 +331,16 @@ namespace Game3 {
 					return {false, "Invalid number of arguments."};
 				player->getRealm()->setTile(Layer::Submerged, player->getPosition(), words.at(1));
 				return {true, "Set tile."};
+			} else if (first == "saveall") {
+				if (!worldDB.isOpen()) {
+					INFO("Opening.");
+					worldDB.open("./world.db");
+					INFO("Opened.");
+				}
+				INFO("Writing.");
+				worldDB.writeAll();
+				INFO("Writing done.");
+				return {true, "Wrote all chunks."};
 			}
 		} catch (const std::exception &err) {
 			return {false, err.what()};

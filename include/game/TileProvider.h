@@ -20,21 +20,12 @@ namespace Game3 {
 	class Game;
 	class Tileset;
 
-	template <typename T>
-	using Chunk = Lockable<std::vector<T>>;
-
 	struct ChunkMeta {
 		uint64_t updateCount = 0;
 	};
 
-	using TileChunk  = Chunk<TileID>;
-	using BiomeChunk = Chunk<BiomeType>;
-	using PathChunk  = Chunk<uint8_t>;
-	using FluidChunk = Chunk<FluidTile>;
-
 	class TileProvider {
 		public:
-
 			using ChunkMap = std::unordered_map<ChunkPosition, TileChunk>;
 			using BiomeMap = std::unordered_map<ChunkPosition, BiomeChunk>;
 			using PathMap  = std::unordered_map<ChunkPosition, PathChunk>;
@@ -106,7 +97,6 @@ namespace Game3 {
 				bool created{};
 				return findTile(layer, position, created, lock_out, mode);
 			}
-
 
 			/** Returns a reference to the biome type at a given tile position. */
 			BiomeType & findBiomeType(Position, bool &created, std::shared_lock<std::shared_mutex> *lock_out, BiomeMode = BiomeMode::Create);

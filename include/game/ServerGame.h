@@ -1,12 +1,13 @@
 #pragma once
 
-#include <mutex>
-
+#include "data/WorldDB.h"
 #include "entity/ServerPlayer.h"
 #include "game/Fluids.h"
 #include "game/Game.h"
 #include "net/RemoteClient.h"
 #include "threading/MTQueue.h"
+
+#include <mutex>
 
 namespace Game3 {
 	class LocalServer;
@@ -57,6 +58,7 @@ namespace Game3 {
 			MTQueue<std::pair<std::weak_ptr<RemoteClient>, std::shared_ptr<Packet>>> packetQueue;
 			MTQueue<std::weak_ptr<ServerPlayer>> playerRemovalQueue;
 			double timeSinceTimeUpdate = 0.;
+			WorldDB worldDB{*this};
 
 			void handlePacket(RemoteClient &, Packet &);
 			std::tuple<bool, std::string> commandHelper(RemoteClient &, const std::string &);

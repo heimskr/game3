@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <ostream>
+#include <shared_mutex>
 #include <utility>
 
 #include "data/Identifier.h"
@@ -18,7 +19,7 @@ namespace Game3 {
 	using MoneyCount     = uint64_t;
 	using Phase          =  uint8_t;
 	using Durability     =  int32_t;
-	using BiomeType      = uint32_t;
+	using BiomeType      = uint16_t;
 	/** Number of quarter-hearts. */
 	using HitPoints      = uint32_t;
 	/** 1-based. */
