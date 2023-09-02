@@ -1,26 +1,34 @@
-["base:fluid_map", {
-	"base:fluid/water": {
-		"name":     "Water",
-		"tileset":  "base:tileset/monomap",
-		"tilename": "base:tile/deeper_water",
-		"flask":    "base:item/water_flask"
-	},
-	"base:fluid/lava": {
-		"name":     "Lava",
-		"tileset":  "base:tileset/monomap",
-		"tilename": "base:tile/lava",
-		"flask":    "base:item/lava_flask"
-	},
-	"base:fluid/milk": {
-		"name":     "Milk",
-		"tileset":  "base:tileset/monomap",
-		"tilename": "base:tile/milk",
-		"flask":    "base:item/milk_flask"
-	},
-	"base:fluid/mead": {
-		"name":     "Mead",
-		"tileset":  "base:tileset/monomap",
-		"tilename": "base:tile/mead",
-		"flask":    "base:item/mead"
-	}
-}]
+{
+	"name": "base_fluids",
+	"dependencies": [
+		["after", "name", "base_monomap"]
+	],
+	"data": [
+		["base:fluid_map", {
+			"base:fluid/water": {
+				"name":     "Water",
+				"tileset":  "base:tileset/monomap",
+				"tilename": "base:tile/deeper_water",
+				"flask":    "base:item/water_flask"
+			},
+			"base:fluid/lava": {
+				"name":     "Lava",
+				"tileset":  "base:tileset/monomap",
+				"tilename": "base:tile/lava",
+				"flask":    "base:item/lava_flask"
+			},
+			"base:fluid/milk": {
+				"name":     "Milk",
+				"tileset":  "base:tileset/monomap",
+				"tilename": "base:tile/milk",
+				"flask":    "base:item/milk_flask"
+			},
+			"base:fluid/mead": {
+				"name":     "Mead",
+				"tileset":  "base:tileset/monomap",
+				"tilename": "base:tile/mead",
+				"flask":    "base:item/mead"
+			}
+		}]
+	]
+}

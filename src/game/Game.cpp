@@ -30,6 +30,7 @@
 #include "game/InteractionSet.h"
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
+#include "graph/Graph.h"
 #include "item/Bomb.h"
 #include "item/CaveEntrance.h"
 #include "item/CentrifugeItem.h"
@@ -532,23 +533,106 @@ namespace Game3 {
 		registry<ModuleFactoryRegistry>().add(shared->identifier, shared);
 	}
 
+	struct Dependency {
+		std::string name;
+		bool isCategory;
+	};
+
 	void Game::traverseData(const std::filesystem::path &dir) {
-		for (const auto &entry: std::filesystem::directory_iterator(dir)) {
-			if (entry.is_directory()) {
-				traverseData(entry.path());
-			} else if (entry.is_regular_file()) {
-				if (auto path = entry.path(); path.extension() == ".json")
-					loadDataFile(path);
+		std::vector<std::filesystem::path> json_paths;
+		// A -> B means A is loaded before B.
+		Graph<Dependency> dependencies;
+		// Maps data types like "base:crop_map" to vectors of names of data files that contain instances of them.
+		std::unordered_map<std::string, std::vector<std::string>> categories;
+		std::unordered_map<std::string, nlohmann::json> jsons;
+
+		auto add_dependencies = [&](const nlohmann::json &json) {
+			const std::string name = json.at("name");
+
+			bool created{};
+			auto &node = dependencies.get(name, created);
+			if (created)
+				node.data = {name, false};
+
+			for (const auto &dependency_json: json.at("dependencies")) {
+				const std::string order = dependency_json.at(0);
+				const bool is_after = order == "after";
+				if (!is_after && order != "before")
+					throw std::runtime_error("Couldn't load JSON: invalid order \"" + order + '"');
+
+				const std::string specifier = dependency_json.at(1);
+				const bool is_type = specifier == "type";
+				if (!is_type && specifier != "name")
+					throw std::runtime_error("Couldn't load JSON: invalid specifier \"" + specifier + '"');
+
+				const std::string id = dependency_json.at(2);
+				const bool is_category = id.find(':') != std::string::npos;
+
+				auto &other_node = dependencies.get(id, created);
+				if (created)
+					other_node.data = {id, is_category};
+
+				if (is_after)
+					other_node.link(node);
+				else
+					node.link(other_node);
 			}
+		};
+
+		std::function<void(const std::filesystem::path &)> traverse = [&](const auto &dir) {
+			for (const auto &entry: std::filesystem::directory_iterator(dir)) {
+				if (entry.is_directory()) {
+					traverse(entry.path());
+				} else if (entry.is_regular_file()) {
+					if (auto path = entry.path(); path.extension() == ".json")
+						json_paths.push_back(std::move(path));
+				}
+			}
+		};
+
+		traverse(dir);
+
+		for (const auto &path: json_paths) {
+			std::ifstream ifs(path);
+			std::stringstream ss;
+			ss << ifs.rdbuf();
+			nlohmann::json json = nlohmann::json::parse(ss.str());
+			add_dependencies(json);
+			std::string name = json.at("name");
+			for (const nlohmann::json &item: json.at("data"))
+				categories[item.at(0)].push_back(name);
+			jsons.emplace(std::move(name), std::move(json));
+		}
+
+		for (const auto &[category, names]: categories) {
+			auto *category_node = dependencies.maybe(category);
+			if (category_node == nullptr)
+				continue; // ???
+
+			for (const std::string &name: names) {
+				auto &name_node = dependencies[name];
+
+				for (const auto &in: category_node->getIn())
+					in->link(name_node);
+
+				for (const auto &out: category_node->getOut())
+					name_node.link(*out);
+			}
+
+		}
+
+		for (const auto &[category, names]: categories)
+			if (dependencies.hasLabel(category))
+				dependencies -= category;
+
+		for (const auto &node: dependencies.topoSort()) {
+			assert(!node->data.isCategory);
+			for (const nlohmann::json &json: jsons.at(node->data.name).at("data"))
+				loadData(json);
 		}
 	}
 
-	void Game::loadDataFile(const std::filesystem::path &file) {
-		std::ifstream ifs(file);
-		std::stringstream ss;
-		ss << ifs.rdbuf();
-		std::string raw = ss.str();
-		nlohmann::json json = nlohmann::json::parse(raw);
+	void Game::loadData(const nlohmann::json &json) {
 		Identifier type = json.at(0);
 
 		// TODO: make a map of handlers for different types instead of if-elsing here

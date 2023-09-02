@@ -1,12 +1,18 @@
-["base:entity_texture_map", {
-	"base:entity/player":     ["base:texture/gangblanc",  1],
-	"base:entity/item":       ["base:texture/item",       0],
-	"base:entity/miner":      ["base:texture/villager1",  2],
-	"base:entity/merchant":   ["base:texture/villager1",  2],
-	"base:entity/blacksmith": ["base:texture/blacksmith", 2],
-	"base:entity/woodcutter": ["base:texture/woodcutter", 2],
-	"base:entity/sheep":      ["base:texture/sheep",      3],
-	"base:entity/pig":        ["base:texture/pig",        3],
-	"base:entity/chicken":    ["base:texture/chicken",    3],
-	"base:entity/dog":        ["base:texture/dog",        3]
-}]
+{
+	"name": "base_entity_textures",
+	"dependencies": [
+		["after", "name", "base_textures"]
+	],
+	"data": [["base:entity_texture_map", {
+		"base:entity/player":     ["base:texture/gangblanc",  1],
+		"base:entity/item":       ["base:texture/item",       0],
+		"base:entity/miner":      ["base:texture/villager1",  2],
+		"base:entity/merchant":   ["base:texture/villager1",  2],
+		"base:entity/blacksmith": ["base:texture/blacksmith", 2],
+		"base:entity/woodcutter": ["base:texture/woodcutter", 2],
+		"base:entity/sheep":      ["base:texture/sheep",      3],
+		"base:entity/pig":        ["base:texture/pig",        3],
+		"base:entity/chicken":    ["base:texture/chicken",    3],
+		"base:entity/dog":        ["base:texture/dog",        3]
+	}]]
+}

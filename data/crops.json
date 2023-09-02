@@ -1,7 +1,15 @@
-["base:crop_map", {
-	"base:crop/cotton": {
-		"stages": ["base:tile/cotton_0", "base:tile/cotton_1", "base:tile/cotton_2"],
-		"product": ["base:item/cotton", 1],
-		"chance": 1.0
-	}
-}]
+{
+	"name": "base_crops",
+	"dependencies": [
+		["after", "type", "base:tileset_map"]
+	],
+	"data": [
+		["base:crop_map", {
+			"base:crop/cotton": {
+				"stages": ["base:tile/cotton_0", "base:tile/cotton_1", "base:tile/cotton_2"],
+				"product": ["base:item/cotton", 1],
+				"chance": 1.0
+			}
+		}]
+	]
+}

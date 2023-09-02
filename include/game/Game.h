@@ -96,7 +96,7 @@ namespace Game3 {
 			void add(GhostFunction &&);
 			void add(ModuleFactory &&);
 			void traverseData(const std::filesystem::path &);
-			void loadDataFile(const std::filesystem::path &);
+			void loadData(const nlohmann::json &);
 			void addRecipe(const nlohmann::json &);
 			RealmID newRealmID() const;
 			double getTotalSeconds() const;

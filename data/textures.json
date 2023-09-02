@@ -1,22 +1,28 @@
-["base:texture_map", {
-	"base:texture/gangblanc":   ["resources/characters/champions/Gangblanc.png"],
-	"base:texture/item":        ["resources/missing.png"],
-	"base:texture/villager1":   ["resources/characters/villager1.png"],
-	"base:texture/blacksmith":  ["resources/characters/blacksmith.png"],
-	"base:texture/woodcutter":  ["resources/characters/woodcutter.png"],
-	"base:texture/shortsword":  ["resources/items/shortsword.png"],
-	"base:texture/potions":     ["resources/rpg/potions.png"],
-	"base:texture/items":       ["resources/items/items.png"],
-	"base:texture/palisade":    ["resources/items/palisade.png"],
-	"base:texture/tileset":     ["resources/tileset.png"],
-	"base:texture/consumables": ["resources/rpg/consumables.png"],
-	"base:texture/mushrooms":   ["resources/items/mushrooms.png"],
-	"base:texture/sheep":       ["resources/animals/sheep.png"],
-	"base:texture/pig":         ["resources/animals/pig.png"],
-	"base:texture/chicken":     ["resources/animals/chicken.png"],
-	"base:texture/dog":         ["resources/animals/dog.png"],
-	"base:texture/custom":      ["resources/items/custom.png"],
-	"base:texture/franuka":     ["resources/items/franuka.png"],
-	"base:texture/tinywonder":  ["resources/items/tinywonder.png"],
-	"base:texture/flasks":      ["resources/flasks.png"]
-}]
+{
+	"name": "base_textures",
+	"dependencies": [],
+	"data": [
+		["base:texture_map", {
+			"base:texture/gangblanc":   ["resources/characters/champions/Gangblanc.png"],
+			"base:texture/item":        ["resources/missing.png"],
+			"base:texture/villager1":   ["resources/characters/villager1.png"],
+			"base:texture/blacksmith":  ["resources/characters/blacksmith.png"],
+			"base:texture/woodcutter":  ["resources/characters/woodcutter.png"],
+			"base:texture/shortsword":  ["resources/items/shortsword.png"],
+			"base:texture/potions":     ["resources/rpg/potions.png"],
+			"base:texture/items":       ["resources/items/items.png"],
+			"base:texture/palisade":    ["resources/items/palisade.png"],
+			"base:texture/tileset":     ["resources/tileset.png"],
+			"base:texture/consumables": ["resources/rpg/consumables.png"],
+			"base:texture/mushrooms":   ["resources/items/mushrooms.png"],
+			"base:texture/sheep":       ["resources/animals/sheep.png"],
+			"base:texture/pig":         ["resources/animals/pig.png"],
+			"base:texture/chicken":     ["resources/animals/chicken.png"],
+			"base:texture/dog":         ["resources/animals/dog.png"],
+			"base:texture/custom":      ["resources/items/custom.png"],
+			"base:texture/franuka":     ["resources/items/franuka.png"],
+			"base:texture/tinywonder":  ["resources/items/tinywonder.png"],
+			"base:texture/flasks":      ["resources/flasks.png"]
+		}]
+	]
+}
