@@ -1,15 +1,15 @@
-LTO     :=
-LDFLAGS :=
-
 ifeq ($(CUSTOM_BUILD),)
 	ifeq ($(BUILD),debug)
 		BUILDFLAGS := -g -O0
 	else ifeq ($(BUILD),tsan)
-		BUILDFLAGS := -g -O1 -fsanitize=thread
+		BUILDFLAGS := -g -O1 -fsanitize=thread -fno-omit-frame-pointer
 		LDFLAGS    := -fsanitize=thread
 	else ifeq ($(BUILD),asan)
 		BUILDFLAGS := -g -O0 -fsanitize=address -fno-omit-frame-pointer
 		LDFLAGS    := -fsanitize=address
+	else ifeq ($(BUILD),ubsan)
+		BUILDFLAGS := -g -O1 -fsanitize=undefined -fno-omit-frame-pointer
+		LDFLAGS    := -fsanitize=undefined
 	else ifeq ($(BUILD),nonnative)
 		BUILDFLAGS := -Ofast -g -march=x86-64-v3
 		LTO        := -flto
@@ -29,16 +29,16 @@ else
 endif
 
 ifeq ($(shell uname -s), Darwin)
-	LDFLAGS := $(LDFLAGS) -framework Cocoa -framework OpenGL -framework IOKit
+	LDFLAGS += -framework Cocoa -framework OpenGL -framework IOKit
 else
-	LDFLAGS := $(LDFLAGS) -lGL
+	LDFLAGS += -lGL
 endif
 
 DEPS         := glm glfw3 libzstd gtk4 gtkmm-4.0 glu libevent_openssl openssl libevent_pthreads freetype2
 OUTPUT       := game3
 COMPILER     ?= g++
 DEBUGGER     ?= gdb
-CPPFLAGS     := -Wall -Wextra $(BUILDFLAGS) -std=c++23 -Iinclude -Ijson/include -Ieigen -Istb -Ilibnoise/src -Ichemskr/include $(LTO) $(PROFILING)
+CPPFLAGS     += -Wall -Wextra $(BUILDFLAGS) -std=c++23 -Iinclude -Ijson/include -Ieigen -Istb -Ilibnoise/src -Ichemskr/include $(LTO) $(PROFILING)
 ZIG          ?= zig
 # --main-pkg-path is needed as otherwise it wouldn't let you embed any file outside of src/
 ZIGFLAGS     := -O ReleaseSmall --main-pkg-path .

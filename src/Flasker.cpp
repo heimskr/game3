@@ -141,12 +141,12 @@ namespace Game3 {
 		int base_channels = 0;
 		int mask_channels = 0;
 
-		uint8_t *base = stbi_load(base_filename.c_str(), &base_width, &base_height, &base_channels, 0);
-		if (base == nullptr)
+		auto base = std::unique_ptr<uint8_t[], FreeDeleter>(stbi_load(base_filename.c_str(), &base_width, &base_height, &base_channels, 0));
+		if (!base)
 			throw std::runtime_error("Couldn't load " + base_filename);
 
-		uint8_t *mask = stbi_load(mask_filename.c_str(), &mask_width, &mask_height, &mask_channels, 0);
-		if (mask == nullptr)
+		auto mask = std::unique_ptr<uint8_t[], FreeDeleter>(stbi_load(mask_filename.c_str(), &mask_width, &mask_height, &mask_channels, 0));
+		if (!mask)
 			throw std::runtime_error("Couldn't load " + mask_filename);
 
 		if (base_width != mask_width)

@@ -6,6 +6,7 @@
 #include <chrono>
 #include <concepts>
 #include <csignal>
+#include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include <list>
@@ -225,6 +226,12 @@ namespace Game3 {
 		}
 		throw std::logic_error("Unable to select item from map of weights");
 	}
+
+	struct FreeDeleter {
+		void operator()(void *pointer) const noexcept {
+			free(pointer);
+		}
+	};
 
 	// Credit for reverse: https://stackoverflow.com/a/28139075/227663
 
