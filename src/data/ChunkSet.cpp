@@ -36,12 +36,11 @@ namespace Game3 {
 			raw = raw.subspan(layer_byte_count);
 		}
 
-		fluids.resize(CHUNK_SIZE * CHUNK_SIZE);
-
 		if constexpr (std::endian::native == std::endian::little) {
 			biomes.resize(CHUNK_SIZE * CHUNK_SIZE);
 			std::memcpy(biomes.data(), raw.data(), biomes_byte_count);
 			raw = raw.subspan(biomes_byte_count);
+			fluids.reserve(CHUNK_SIZE * CHUNK_SIZE);
 			static_assert(sizeof(FluidInt) == 4);
 			for (size_t i = 0; i < fluids_byte_count; i += sizeof(FluidInt)) {
 				FluidInt encoded_fluid{};
@@ -54,6 +53,7 @@ namespace Game3 {
 			for (size_t i = 0; i < biomes_byte_count; i += sizeof(BiomeType))
 				biomes.push_back(raw[i] | (BiomeType(raw[i + 1]) << 8));
 			raw = raw.subspan(biomes_byte_count);
+			fluids.resize(CHUNK_SIZE * CHUNK_SIZE);
 			static_assert(sizeof(FluidInt) == 4);
 			for (size_t i = 0; i < fluids_byte_count; i += sizeof(FluidInt)) {
 				const FluidInt encoded_fluid = raw[i] | (FluidInt(raw[i + 1]) << 8) | (FluidInt(raw[i + 2]) << 16) | (FluidInt(raw[i + 3]) << 24);

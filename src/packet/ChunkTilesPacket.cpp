@@ -24,7 +24,6 @@ namespace Game3 {
 		updateCounter = realm.tileProvider.getUpdateCounter(chunk_position);
 	}
 
-
 	void ChunkTilesPacket::handle(ClientGame &game) {
 		if (tiles.size() != CHUNK_SIZE * CHUNK_SIZE * LAYER_COUNT)
 			throw PacketError("Invalid tile count in ChunkTilesPacket: " + std::to_string(tiles.size()));

@@ -44,6 +44,12 @@ namespace Game3 {
 		if (chunk_set.terrain.size() != LAYER_COUNT)
 			throw std::invalid_argument("ChunkSet has invalid number of terrain layers in TileProvider::absorb: " + std::to_string(chunk_set.terrain.size()));
 
+		if (chunk_set.biomes.size() != CHUNK_SIZE * CHUNK_SIZE)
+			throw std::invalid_argument("Invalid number of biome tiles in TileProvider::absorb: " + std::to_string(chunk_set.biomes.size()));
+
+		if (chunk_set.fluids.size() != CHUNK_SIZE * CHUNK_SIZE)
+			throw std::invalid_argument("Invalid number of fluid tiles in TileProvider::absorb: " + std::to_string(chunk_set.fluids.size()));
+
 		for (size_t i = 0; i < LAYER_COUNT; ++i) {
 			std::unique_lock lock(chunkMutexes[i]);
 			chunkMaps[i][chunk_position] = chunk_set.terrain[i];
