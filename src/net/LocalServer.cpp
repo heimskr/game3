@@ -227,6 +227,7 @@ namespace Game3 {
 
 		const bool database_existed = std::filesystem::exists("world");
 		game->openDatabase("world");
+		game_server->game = game;
 
 		if (database_existed)
 			game_server->readUsers();
@@ -245,7 +246,6 @@ namespace Game3 {
 		WorldGen::generateOverworld(realm, seed, {}, {{-1, -1}, {1, 1}}, true);
 		game->addRealm(realm->id, realm);
 		game->initInteractionSets();
-		game_server->game = game;
 
 		std::thread tick_thread = std::thread([&] {
 			while (running) {
