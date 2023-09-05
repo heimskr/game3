@@ -338,7 +338,7 @@ namespace Game3 {
 				return {true, "Set tile."};
 			} else if (first == "saveall") {
 				INFO("Writing...");
-				database.writeAllChunks();
+				database.writeAllRealms();
 				INFO("Writing done.");
 				return {true, "Wrote all chunks."};
 			}

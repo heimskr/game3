@@ -1,26 +1,26 @@
 ifeq ($(CUSTOM_BUILD),)
 	ifeq ($(BUILD),debug)
-		BUILDFLAGS := -g -Og
+		BUILDFLAGS := -g3 -Og
 	else ifeq ($(BUILD),tsan)
-		BUILDFLAGS := -g -O1 -fsanitize=thread -fno-omit-frame-pointer
+		BUILDFLAGS := -g3 -O1 -fsanitize=thread -fno-omit-frame-pointer
 		LDFLAGS    := -fsanitize=thread
 	else ifeq ($(BUILD),asan)
-		BUILDFLAGS := -g -Og -fsanitize=address -fno-omit-frame-pointer
+		BUILDFLAGS := -g3 -Og -fsanitize=address -fno-omit-frame-pointer
 		LDFLAGS    := -fsanitize=address
 	else ifeq ($(BUILD),ubsan)
-		BUILDFLAGS := -g -O1 -fsanitize=undefined -fno-omit-frame-pointer
+		BUILDFLAGS := -g3 -O1 -fsanitize=undefined -fno-omit-frame-pointer
 		LDFLAGS    := -fsanitize=undefined
 	else ifeq ($(BUILD),nonnative)
-		BUILDFLAGS := -Ofast -g -march=x86-64-v3
+		BUILDFLAGS := -Ofast -g3 -march=x86-64-v3
 		LTO        := -flto
 	else ifeq ($(BUILD),o3gnative)
-		BUILDFLAGS := -O3 -g -march=native
+		BUILDFLAGS := -O3 -g3 -march=native
 		LTO        := -flto
 	else ifeq ($(BUILD),release)
 		BUILDFLAGS := -Ofast -march=native
 		LTO        := -flto
 	else
-		BUILDFLAGS := -g -Ofast -march=native
+		BUILDFLAGS := -g3 -Ofast -march=native
 		LTO        := -flto
 	endif
 else

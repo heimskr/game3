@@ -172,6 +172,9 @@ namespace Game3 {
 
 			void ensureAllChunks(Position);
 
+			void toJSON(nlohmann::json &, bool full_data = false) const;
+			void absorbJSON(const nlohmann::json &, bool full_data = false);
+
 			template <typename T>
 			static T access(const Chunk<T> &chunk, int64_t row, int64_t column) {
 				assert(0 <= row);
@@ -213,13 +216,7 @@ namespace Game3 {
 			void initBiomeChunk(Chunk<BiomeType> &, ChunkPosition);
 			void initPathChunk(Chunk<uint8_t> &, ChunkPosition);
 			void initFluidChunk(Chunk<FluidTile> &, ChunkPosition);
-
-			friend void to_json(nlohmann::json &, const TileProvider &);
-			friend void from_json(const nlohmann::json &, TileProvider &);
 	};
-
-	void to_json(nlohmann::json &, const TileProvider &);
-	void from_json(const nlohmann::json &, TileProvider &);
 
 	ChunkPosition getChunkPosition(Position);
 }

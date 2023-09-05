@@ -44,14 +44,21 @@ namespace Game3 {
 			/** Throws if anything goes wrong. */
 			void put(const std::string &key, const std::string &value);
 
-			void writeAllChunks();
+			/** Writes both metadata and chunk data for all realms. */
+			void writeAllRealms();
+
 			void writeChunk(const std::shared_ptr<Realm> &, ChunkPosition);
 
-			void readAllChunks();
+			void readAllRealms();
+
 			/** Reads metadata from the database and returns an empty realm based on the metadata. */
 			std::shared_ptr<Realm> loadRealm(RealmID);
 
+			void writeRealmMeta(const std::shared_ptr<Realm> &);
+
 			std::optional<ChunkSet> getChunk(RealmID, ChunkPosition);
+
+			void dumpKeys();
 
 			inline bool isOpen() {
 				return database != nullptr;

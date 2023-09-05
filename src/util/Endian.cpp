@@ -5,7 +5,7 @@
 
 namespace Game3 {
 	int32_t decodeLittleS32(std::span<const char> span) {
-		if (span.size() != sizeof(int32_t))
+		if (span.size() < sizeof(int32_t))
 			throw std::invalid_argument("Invalid span size in decodeLittleS32");
 
 		if constexpr (isLittleEndian()) {

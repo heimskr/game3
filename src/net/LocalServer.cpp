@@ -234,17 +234,21 @@ namespace Game3 {
 		else
 			game_server->saveUsers();
 
-
-
 		game->initEntities();
 
 		constexpr size_t seed = 1621;
-		RealmPtr realm = Realm::create<Overworld>(*game, 1, Overworld::ID(), "base:tileset/monomap"_id, seed);
-		realm->outdoors = true;
-		std::default_random_engine rng;
-		rng.seed(seed);
-		WorldGen::generateOverworld(realm, seed, {}, {{-1, -1}, {1, 1}}, true);
-		game->addRealm(realm->id, realm);
+		if (database_existed) {
+			game->database.readAllRealms();
+			INFO("Finished reading all worlds from database.");
+		} else {
+			RealmPtr realm = Realm::create<Overworld>(*game, 1, Overworld::ID(), "base:tileset/monomap"_id, seed);
+			realm->outdoors = true;
+			std::default_random_engine rng;
+			rng.seed(seed);
+			WorldGen::generateOverworld(realm, seed, {}, {{-1, -1}, {1, 1}}, true);
+			game->addRealm(realm->id, realm);
+		}
+
 		game->initInteractionSets();
 
 		std::thread tick_thread = std::thread([&] {

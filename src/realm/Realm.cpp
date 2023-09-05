@@ -103,8 +103,9 @@ namespace Game3 {
 		initRendererTileProviders();
 		initTexture();
 
+		tileProvider.absorbJSON(json.at("provider"), full_data);
+
 		if (full_data) {
-			from_json(json.at("tilemap"), tileProvider);
 			outdoors = json.at("outdoors");
 
 			{
@@ -908,12 +909,13 @@ namespace Game3 {
 		json["type"] = type;
 		json["seed"] = seed;
 		json["outdoors"] = outdoors;
+		json["generatedChunks"] = generatedChunks;
 		if (!extraData.empty())
 			json["extra"] = extraData;
 
+		tileProvider.toJSON(json["provider"], full_data);
+
 		if (full_data) {
-			json["provider"] = tileProvider;
-			json["generatedChunks"] = generatedChunks;
 			json["tileEntities"] = std::unordered_map<std::string, nlohmann::json>();
 			for (const auto &[position, tile_entity]: tileEntities)
 				json["tileEntities"][position.simpleString()] = *tile_entity;

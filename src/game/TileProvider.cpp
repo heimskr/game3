@@ -615,92 +615,99 @@ namespace Game3 {
 		chunk.resize(CHUNK_SIZE * CHUNK_SIZE, {0, 0});
 	}
 
-	void to_json(nlohmann::json &json, const TileProvider &provider) {
-		auto &unconst = provider;
-		json.push_back(provider.tilesetID);
+	void TileProvider::toJSON(nlohmann::json &json, bool full_data) const {
+		json["tilesetID"] = tilesetID;
 
-		nlohmann::json tile_array;
-		for (const auto layer: allLayers) {
-			std::shared_lock biome_lock(unconst.chunkMutexes[getIndex(layer)]);
-			for (auto &[position, chunk]: unconst.chunkMaps[getIndex(layer)]) {
-				auto chunk_lock = chunk.sharedLock();
-				tile_array.push_back(std::make_pair(std::make_tuple(getIndex(layer), position.x, position.y), compress(std::span(chunk.data(), chunk.size()))));
-			}
-		}
-		json.push_back(std::move(tile_array));
+		if (full_data) {
+			auto &data = json["data"];
 
-		nlohmann::json biome_array;
-		{
-			std::shared_lock biome_lock(unconst.biomeMutex);
-			for (auto &[position, chunk]: unconst.biomeMap) {
-				auto chunk_lock = chunk.sharedLock();
-				biome_array.push_back(std::make_pair(std::make_pair(position.x, position.y), compress(std::span(chunk.data(), chunk.size()))));
-			}
-		}
-		json.push_back(std::move(biome_array));
-
-		nlohmann::json path_array;
-		{
-			std::shared_lock path_lock(unconst.pathMutex);
-			for (auto &[position, chunk]: unconst.pathMap) {
-				auto chunk_lock = chunk.sharedLock();
-				path_array.push_back(std::make_pair(std::make_pair(position.x, position.y), compress(std::span(chunk.data(), chunk.size()))));
-			}
-		}
-		json.push_back(std::move(path_array));
-
-		nlohmann::json fluid_array;
-		{
-			static_assert(sizeof(FluidLevel) == 2);
-			std::shared_lock fluid_lock(unconst.fluidMutex);
-			for (auto &[position, chunk]: unconst.fluidMap) {
-				std::vector<uint32_t> packed;
-				{
+			nlohmann::json tile_array;
+			for (const auto layer: allLayers) {
+				std::shared_lock biome_lock(chunkMutexes[getIndex(layer)]);
+				for (auto &[position, chunk]: chunkMaps[getIndex(layer)]) {
 					auto chunk_lock = chunk.sharedLock();
-					packed.reserve(chunk.size());
-					for (const auto &[fluid_id, level]: chunk)
-						packed.push_back(static_cast<uint32_t>(fluid_id) | (static_cast<uint32_t>(level) << 16));
+					tile_array.push_back(std::make_pair(std::make_tuple(getIndex(layer), position.x, position.y), compress(std::span(chunk.data(), chunk.size()))));
 				}
-				fluid_array.push_back(std::make_pair(std::make_pair(position.x, position.y), compress(std::span(packed.data(), packed.size()))));
 			}
+			data.push_back(std::move(tile_array));
+
+			nlohmann::json biome_array;
+			{
+				std::shared_lock biome_lock(biomeMutex);
+				for (auto &[position, chunk]: biomeMap) {
+					auto chunk_lock = chunk.sharedLock();
+					biome_array.push_back(std::make_pair(std::make_pair(position.x, position.y), compress(std::span(chunk.data(), chunk.size()))));
+				}
+			}
+			data.push_back(std::move(biome_array));
+
+			nlohmann::json path_array;
+			{
+				std::shared_lock path_lock(pathMutex);
+				for (auto &[position, chunk]: pathMap) {
+					auto chunk_lock = chunk.sharedLock();
+					path_array.push_back(std::make_pair(std::make_pair(position.x, position.y), compress(std::span(chunk.data(), chunk.size()))));
+				}
+			}
+			data.push_back(std::move(path_array));
+
+			nlohmann::json fluid_array;
+			{
+				static_assert(sizeof(FluidLevel) == 2);
+				std::shared_lock fluid_lock(fluidMutex);
+				for (auto &[position, chunk]: fluidMap) {
+					std::vector<uint32_t> packed;
+					{
+						auto chunk_lock = chunk.sharedLock();
+						packed.reserve(chunk.size());
+						for (const auto &[fluid_id, level]: chunk)
+							packed.push_back(static_cast<uint32_t>(fluid_id) | (static_cast<uint32_t>(level) << 16));
+					}
+					fluid_array.push_back(std::make_pair(std::make_pair(position.x, position.y), compress(std::span(packed.data(), packed.size()))));
+				}
+			}
+			data.push_back(std::move(fluid_array));
 		}
-		json.push_back(std::move(fluid_array));
 	}
 
-	void from_json(const nlohmann::json &json, TileProvider &provider) {
-		provider.tilesetID = json.at(0);
+	void TileProvider::absorbJSON(const nlohmann::json &json, bool full_data) {
+		tilesetID = json.at("tilesetID");
 
-		for (const auto &item: json.at(1)) {
-			const auto [layer, x, y] = item.at(0).get<std::tuple<size_t, int32_t, int32_t>>();
-			static_assert(sizeof(TileID) == 2);
-			const auto compressed = item.at(1).get<std::vector<uint8_t>>();
-			provider.chunkMaps[layer][ChunkPosition{x, y}] = decompress16(std::span(compressed.data(), compressed.size()));
-		}
+		if (full_data) {
+			const nlohmann::json &data = json.at("data");
 
-		for (const auto &item: json.at(2)) {
-			const auto [x, y] = item.at(0).get<std::pair<int32_t, int32_t>>();
-			static_assert(sizeof(BiomeType) == 2);
-			const auto compressed = item.at(1).get<std::vector<uint8_t>>();
-			provider.biomeMap[ChunkPosition{x, y}] = decompress16(std::span(compressed.data(), compressed.size()));
-		}
+			for (const auto &item: data.at(0)) {
+				const auto [layer, x, y] = item.at(0).get<std::tuple<size_t, int32_t, int32_t>>();
+				static_assert(sizeof(TileID) == 2);
+				const auto compressed = item.at(1).get<std::vector<uint8_t>>();
+				chunkMaps[layer][ChunkPosition{x, y}] = decompress16(std::span(compressed.data(), compressed.size()));
+			}
 
-		for (const auto &item: json.at(3)) {
-			const auto [x, y] = item.at(0).get<std::pair<int32_t, int32_t>>();
-			static_assert(sizeof(PathChunk::value_type) == 1);
-			const auto compressed = item.at(1).get<std::vector<uint8_t>>();
-			provider.pathMap[ChunkPosition{x, y}] = decompress8(std::span(compressed.data(), compressed.size()));
-		}
+			for (const auto &item: data.at(1)) {
+				const auto [x, y] = item.at(0).get<std::pair<int32_t, int32_t>>();
+				static_assert(sizeof(BiomeType) == 2);
+				const auto compressed = item.at(1).get<std::vector<uint8_t>>();
+				biomeMap[ChunkPosition{x, y}] = decompress16(std::span(compressed.data(), compressed.size()));
+			}
 
-		for (const auto &item: json.at(4)) {
-			const auto [x, y] = item.at(0).get<std::pair<int32_t, int32_t>>();
-			static_assert(sizeof(FluidTile) == sizeof(uint32_t));
-			const auto compressed = item.at(1).get<std::vector<uint8_t>>();
-			const auto decompressed = decompress32(std::span(compressed.data(), compressed.size()));
-			auto &chunk = provider.fluidMap[ChunkPosition{x, y}];
-			chunk.clear();
-			chunk.reserve(decompressed.size());
-			for (const auto tile: decompressed)
-				chunk.emplace_back((tile & 0xff) | ((tile >> 8) & 0xff), ((tile >> 16) & 0xff) | ((tile >> 24) & 0xff));
+			for (const auto &item: data.at(2)) {
+				const auto [x, y] = item.at(0).get<std::pair<int32_t, int32_t>>();
+				static_assert(sizeof(PathChunk::value_type) == 1);
+				const auto compressed = item.at(1).get<std::vector<uint8_t>>();
+				pathMap[ChunkPosition{x, y}] = decompress8(std::span(compressed.data(), compressed.size()));
+			}
+
+			for (const auto &item: data.at(3)) {
+				const auto [x, y] = item.at(0).get<std::pair<int32_t, int32_t>>();
+				static_assert(sizeof(FluidTile) == sizeof(uint32_t));
+				const auto compressed = item.at(1).get<std::vector<uint8_t>>();
+				const auto decompressed = decompress32(std::span(compressed.data(), compressed.size()));
+				auto &chunk = fluidMap[ChunkPosition{x, y}];
+				chunk.clear();
+				chunk.reserve(decompressed.size());
+				for (const auto tile: decompressed)
+					chunk.emplace_back((tile & 0xff) | ((tile >> 8) & 0xff), ((tile >> 16) & 0xff) | ((tile >> 24) & 0xff));
+			}
 		}
 	}
 
