@@ -4,9 +4,10 @@
 
 namespace Game3 {
 	void CommandResultPacket::handle(ClientGame &game) {
+		MainWindow &window = game.getWindow();
 		if (success)
-			game.getWindow().alert("Command " + std::to_string(commandID) + " was successful:\n\n" + message);
+			window.alert("Command " + std::to_string(commandID) + " was successful:\n\n" + message);
 		else
-			game.getWindow().error("Command " + std::to_string(commandID) + " was unsuccessful:\n\n" + message);
+			window.error("Command " + std::to_string(commandID) + " was unsuccessful:\n\n" + message);
 	}
 }

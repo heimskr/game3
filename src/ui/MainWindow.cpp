@@ -423,7 +423,9 @@ namespace Game3 {
 		});
 
 		if (do_queue) {
-			queueDialog(std::move(new_dialog));
+			queueMoveOnly([this, new_dialog = std::move(new_dialog)] mutable {
+				queueDialog(std::move(new_dialog));
+			});
 		} else {
 			dialog = std::move(new_dialog);
 			connectClose(*dialog);
