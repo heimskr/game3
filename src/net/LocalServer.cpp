@@ -73,21 +73,27 @@ namespace Game3 {
 	}
 
 	void LocalServer::readUsers() {
-		userDatabase = nlohmann::json::parse(game->database.getUsers());
-		userDatabasePath = path;
+		userDatabase = nlohmann::json::parse(game->database.get("_Users", "{}"));
 		displayNames.clear();
 		for (const auto &[username, user_info]: userDatabase)
 			displayNames.insert(user_info.displayName);
 	}
 
-	void LocalServer::saveUsers(const std::filesystem::path &path) {
-		userDatabasePath = path;
-		std::ofstream(path) << nlohmann::json(userDatabase).dump();
+	void LocalServer::saveUsers() {
+		game->database.put("_Users", nlohmann::json(userDatabase).dump());
 	}
 
-	void LocalServer::saveUsers() {
-		assert(userDatabasePath);
-		std::ofstream(*userDatabasePath) << nlohmann::json(userDatabase).dump();
+	void LocalServer::saveUserData() {
+		auto lock = game->players.sharedLock();
+
+		for (const ServerPlayerPtr &player: game->players) {
+			nlohmann::json json;
+			{
+				auto player_lock = player->sharedLock();
+				player->toJSON(json);
+			}
+			game->database.put("_User_" + player->username, json.dump());
+		}
 	}
 
 	std::optional<std::string> LocalServer::authenticate(const std::string &username, Token token) const {
@@ -101,10 +107,10 @@ namespace Game3 {
 		if (!validateUsername(username))
 			return nullptr;
 
-		const std::filesystem::path path = "world/users/" + std::string(username);
+		std::string raw = game->database.get("_User_" + std::string(username), "");
 
-		if (std::filesystem::exists(path))
-			return ServerPlayer::fromJSON(*game, nlohmann::json::parse(readFile(path)));
+		if (!raw.empty())
+			return ServerPlayer::fromJSON(*game, nlohmann::json::parse(raw));
 
 		RealmPtr overworld = game->getRealm(1);
 
@@ -137,7 +143,7 @@ namespace Game3 {
 		player->inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "O"}}));
 		player->inventory->add(ItemStack(*game, "base:item/clay", 64));
 		{
-			auto lock = game->lockPlayersUnique();
+			auto lock = game->players.uniqueLock();
 			game->players.insert(player);
 		}
 		userDatabase.try_emplace(player->username, player->username, player->displayName);
@@ -166,7 +172,7 @@ namespace Game3 {
 		auto guard = client.bufferGuard();
 		client.send(SelfTeleportedPacket(realm->id, player->getPosition()));
 		client.send(TimePacket(game->time));
-		auto lock = game->lockPlayersShared();
+		auto lock = game->players.sharedLock();
 		const EntityPacket packet(player);
 		for (const auto &other_player: game->players)
 			if (other_player != player)
@@ -197,18 +203,6 @@ namespace Game3 {
 			secret = readFile(".secret");
 		else
 			std::ofstream(".secret") << (secret = generateSecret(8));
-
-		if (std::filesystem::exists("world")) {
-			if (!std::filesystem::is_directory("world"))
-				throw std::runtime_error("Path \"world\" exists but isn't a directory");
-		} else
-			std::filesystem::create_directory("world");
-
-		if (std::filesystem::exists("world/users")) {
-			if (!std::filesystem::is_directory("world/users"))
-				throw std::runtime_error("Path \"world/users\" exists but isn't a directory");
-		} else
-			std::filesystem::create_directory("world/users");
 
 #ifdef USE_SSL
 		global_server = std::make_shared<SSLServer>(AF_INET6, "::0", 12255, "private.crt", "private.key", 2, 1024);

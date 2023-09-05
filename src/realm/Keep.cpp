@@ -11,18 +11,22 @@ namespace Game3 {
 		parentWidth(parent_width),
 		parentHeight(parent_height) {}
 
-	void Keep::absorbJSON(const nlohmann::json &json) {
-		Realm::absorbJSON(json);
+	void Keep::absorbJSON(const nlohmann::json &json, bool full_data) {
+		Realm::absorbJSON(json, full_data);
 		parentOrigin = json.at("town").at("origin");
 		parentWidth  = json.at("town").at("width");
 		parentHeight = json.at("town").at("height");
 		money = json.at("money");
 		greed = json.at("greed");
-		stockpileInventory = getTileEntity<Chest>([](const auto &chest) { return chest->name == "Stockpile"; })->inventory;
+		try {
+			stockpileInventory = getTileEntity<Chest>([](const auto &chest) { return chest->name == "Stockpile"; })->inventory;
+		} catch (const NoneFoundError &) {
+			stockpileInventory = nullptr;
+		}
 	}
 
-	void Keep::toJSON(nlohmann::json &json) const {
-		Realm::toJSON(json);
+	void Keep::toJSON(nlohmann::json &json, bool full_data) const {
+		Realm::toJSON(json, full_data);
 		json["town"]["origin"] = parentOrigin;
 		json["town"]["width"]  = parentWidth;
 		json["town"]["height"] = parentHeight;

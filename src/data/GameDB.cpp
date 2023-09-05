@@ -25,12 +25,25 @@ namespace Game3 {
 		database.reset();
 	}
 
-	std::string GameDB::read(const std::string &key) {
-
+	std::string GameDB::get(const std::string &key) {
+		assert(database);
+		std::string out;
+		if (!database->Get({}, key, &out).ok())
+			throw std::out_of_range("Key \"" + key + "\" not found in database.");
+		return out;
 	}
 
-	std::string GameDB::read(const std::string &key, std::string otherwise) {
+	std::string GameDB::get(const std::string &key, std::string otherwise) {
+		assert(database);
+		// Slightly silly shenanigans.
+		database->Get({}, key, &otherwise);
+		return otherwise;
+	}
 
+	void GameDB::put(const std::string &key, const std::string &value) {
+		assert(database);
+		if (!database->Put({}, key, value).ok())
+			throw std::runtime_error("Couldn't write to database");
 	}
 
 	void GameDB::writeAllChunks() {

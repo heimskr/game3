@@ -5,6 +5,7 @@
 #include "game/Fluids.h"
 #include "game/Game.h"
 #include "net/RemoteClient.h"
+#include "threading/Lockable.h"
 #include "threading/MTQueue.h"
 
 #include <mutex>
@@ -18,7 +19,7 @@ namespace Game3 {
 		public:
 			constexpr static float GARBAGE_COLLECTION_TIME = 60.f;
 
-			std::unordered_set<ServerPlayerPtr> players;
+			Lockable<std::unordered_set<ServerPlayerPtr>> players;
 			std::shared_ptr<LocalServer> server;
 			GameDB database{*this};
 			float lastGarbageCollection = 0.f;
@@ -43,12 +44,9 @@ namespace Game3 {
 			void queueRemoval(const ServerPlayerPtr &);
 			void openDatabase(std::filesystem::path);
 
-			inline auto lockPlayersShared() { return std::shared_lock(playersMutex); }
-			inline auto lockPlayersUnique() { return std::unique_lock(playersMutex); }
-
 			template <typename P>
 			void broadcast(const Place &place, const P &packet) {
-				auto lock = lockPlayersShared();
+				auto lock = players.sharedLock();
 				for (const auto &player: players)
 					if (player->canSee(place.realm->id, place.position))
 						if (auto client = player->toServer()->weakClient.lock())
@@ -56,7 +54,6 @@ namespace Game3 {
 			}
 
 		private:
-			std::shared_mutex playersMutex;
 			MTQueue<std::pair<std::weak_ptr<RemoteClient>, std::shared_ptr<Packet>>> packetQueue;
 			MTQueue<std::weak_ptr<ServerPlayer>> playerRemovalQueue;
 			double timeSinceTimeUpdate = 0.;

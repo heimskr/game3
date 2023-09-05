@@ -80,56 +80,60 @@ namespace Game3 {
 
 	void Realm::initTexture() {}
 
-	RealmPtr Realm::fromJSON(Game &game, const nlohmann::json &json, bool absorb) {
+	RealmPtr Realm::fromJSON(Game &game, const nlohmann::json &json, bool full_data) {
 		const RealmType type = json.at("type");
 		auto factory = game.registry<RealmFactoryRegistry>().at(type);
 		assert(factory);
 		auto out = (*factory)(game);
-		if (absorb)
-			out->absorbJSON(json);
+		out->absorbJSON(json, full_data);
 		return out;
 	}
 
-	void Realm::absorbJSON(const nlohmann::json &json) {
+	void Realm::absorbJSON(const nlohmann::json &json, bool full_data) {
 		auto shared = shared_from_this();
 		id = json.at("id");
 		type = json.at("type");
 		seed = json.at("seed");
 		generatedChunks = json.at("generatedChunks");
 		tileProvider.clear();
-		from_json(json.at("tilemap"), tileProvider);
-		initRendererTileProviders();
-		initTexture();
-		outdoors = json.at("outdoors");
 
-		{
-			auto tile_entities_lock = tileEntities.uniqueLock();
-			auto by_gid_lock = tileEntitiesByGID.uniqueLock();
-			for (const auto &[position_string, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>()) {
-				auto tile_entity = TileEntity::fromJSON(game, tile_entity_json);
-				tileEntities.emplace(Position(position_string), tile_entity);
-				tileEntitiesByGID[tile_entity->globalID] = tile_entity;
-				attach(tile_entity);
-				tile_entity->setRealm(shared);
-				tile_entity->onSpawn();
-				if (tile_entity_json.at("id").get<Identifier>() == "base:te/ghost"_id)
-					++ghostCount;
-			}
-		}
-
-		{
-			auto entities_lock = entities.uniqueLock();
-			auto by_gid_lock = entitiesByGID.uniqueLock();
-			entities.clear();
-			for (const auto &entity_json: json.at("entities")) {
-				auto entity = *entities.insert(Entity::fromJSON(game, entity_json)).first;
-				entity->setRealm(shared);
-				entitiesByGID[entity->globalID] = entity;
-				attach(entity);
-			}
-		}
 		if (json.contains("extra"))
 			extraData = json.at("extra");
+
+		initRendererTileProviders();
+		initTexture();
+
+		if (full_data) {
+			from_json(json.at("tilemap"), tileProvider);
+			outdoors = json.at("outdoors");
+
+			{
+				auto tile_entities_lock = tileEntities.uniqueLock();
+				auto by_gid_lock = tileEntitiesByGID.uniqueLock();
+				for (const auto &[position_string, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>()) {
+					auto tile_entity = TileEntity::fromJSON(game, tile_entity_json);
+					tileEntities.emplace(Position(position_string), tile_entity);
+					tileEntitiesByGID[tile_entity->globalID] = tile_entity;
+					attach(tile_entity);
+					tile_entity->setRealm(shared);
+					tile_entity->onSpawn();
+					if (tile_entity_json.at("id").get<Identifier>() == "base:te/ghost"_id)
+						++ghostCount;
+				}
+			}
+
+			{
+				auto entities_lock = entities.uniqueLock();
+				auto by_gid_lock = entitiesByGID.uniqueLock();
+				entities.clear();
+				for (const auto &entity_json: json.at("entities")) {
+					auto entity = *entities.insert(Entity::fromJSON(game, entity_json)).first;
+					entity->setRealm(shared);
+					entitiesByGID[entity->globalID] = entity;
+					attach(entity);
+				}
+			}
+		}
 	}
 
 	void Realm::onFocus() {
@@ -1337,9 +1341,5 @@ namespace Game3 {
 		std::default_random_engine rng;
 		rng.seed(seed * 79);
 		return std::uniform_int_distribution(0, 100)(rng) % Biome::COUNT + 1;
-	}
-
-	void to_json(nlohmann::json &json, const Realm &realm) {
-		realm.toJSON(json);
 	}
 }

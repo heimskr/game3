@@ -28,7 +28,7 @@ namespace Game3 {
 			Keep(Game &);
 			Keep(Game &, RealmID, Position parent_origin, Index parent_width, Index parent_height, int seed_);
 
-			void absorbJSON(const nlohmann::json &) override;
-			void toJSON(nlohmann::json &) const override;
+			void absorbJSON(const nlohmann::json &, bool full_data) override;
+			void toJSON(nlohmann::json &, bool full_data) const override;
 	};
 }

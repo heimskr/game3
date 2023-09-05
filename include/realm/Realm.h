@@ -12,6 +12,8 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include "Types.h"
+#include "error/MultipleFoundError.h"
+#include "error/NoneFoundError.h"
 #include "game/BiomeMap.h"
 #include "game/TileProvider.h"
 #include "packet/ChunkTilesPacket.h"
@@ -98,7 +100,7 @@ namespace Game3 {
 				return std::shared_ptr<T>(new T(std::forward<Args>(args)...));
 			}
 
-			static std::shared_ptr<Realm> fromJSON(Game &, const nlohmann::json &, bool absorb = true);
+			static std::shared_ptr<Realm> fromJSON(Game &, const nlohmann::json &, bool full_data = false);
 
 			virtual void onFocus();
 			virtual void onBlur();
@@ -204,6 +206,9 @@ namespace Game3 {
 			/** Generates additional chunks for the infinite map after the initial worldgen of the realm. */
 			virtual void generateChunk(const ChunkPosition &) {}
 
+			/** Full data doesn't include terrain, entities or tile entities. */
+			virtual void toJSON(nlohmann::json &, bool full_data) const;
+
 			template <typename T, typename... Args>
 			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {
 				Game &game_ref = getGame();
@@ -220,12 +225,12 @@ namespace Game3 {
 				for (const auto &[index, tile_entity]: tileEntities) {
 					if (auto cast = std::dynamic_pointer_cast<T>(tile_entity)) {
 						if (out)
-							throw std::runtime_error("Multiple tile entities of type " + std::string(typeid(T).name()) + " found");
+							throw MultipleFoundError("Multiple tile entities of type " + std::string(typeid(T).name()) + " found");
 						out = cast;
 					}
 				}
 				if (!out)
-					throw std::runtime_error("No tile entities of type " + std::string(typeid(T).name()) + " found");
+					throw NoneFoundError("No tile entities of type " + std::string(typeid(T).name()) + " found");
 				return out;
 			}
 
@@ -236,13 +241,13 @@ namespace Game3 {
 					if (auto cast = std::dynamic_pointer_cast<T>(tile_entity)) {
 						if (predicate(cast)) {
 							if (out)
-								throw std::runtime_error("Multiple tile entities of type " + std::string(typeid(T).name()) + " found");
+								throw MultipleFoundError("Multiple tile entities of type " + std::string(typeid(T).name()) + " found");
 							out = cast;
 						}
 					}
 				}
 				if (!out)
-					throw std::runtime_error("No tile entities of type " + std::string(typeid(T).name()) + " found");
+					throw NoneFoundError("No tile entities of type " + std::string(typeid(T).name()) + " found");
 				return out;
 			}
 
@@ -283,7 +288,6 @@ namespace Game3 {
 			}
 
 			friend class MainWindow;
-			friend void to_json(nlohmann::json &, const Realm &);
 
 		protected:
 			std::atomic_bool focused = false;
@@ -294,8 +298,9 @@ namespace Game3 {
 			Realm(Game &, RealmID, RealmType, Identifier tileset_id, int64_t seed_);
 
 			void initTexture();
-			virtual void absorbJSON(const nlohmann::json &);
-			virtual void toJSON(nlohmann::json &, bool full_data) const;
+
+			/** Full data doesn't include terrain, entities or tile entities. */
+			virtual void absorbJSON(const nlohmann::json &, bool full_data);
 
 		private:
 			struct ChunkPackets {
@@ -333,8 +338,6 @@ namespace Game3 {
 
 			static BiomeType getBiome(int64_t seed);
 	};
-
-	void to_json(nlohmann::json &, const Realm &);
 
 	using RealmPtr = std::shared_ptr<Realm>;
 }

@@ -869,7 +869,7 @@ namespace Game3 {
 		json["debugMode"] = game.debugMode;
 		json["realms"] = std::unordered_map<std::string, nlohmann::json>();
 		game.iterateRealms([&](const RealmPtr &realm) {
-			json["realms"][std::to_string(realm->id)] = nlohmann::json(*realm);
+			realm->toJSON(json["realms"][std::to_string(realm->id)], true);
 		});
 		json["hourOffset"] = game.getHour();
 		if (0 < game.cavesGenerated)

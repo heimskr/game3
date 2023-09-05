@@ -102,7 +102,8 @@ namespace Game3 {
 	}
 
 	void ServerGame::garbageCollect() {
-		std::shared_lock lock(playersMutex);
+		auto lock = players.sharedLock();
+
 		for (const auto &player: players) {
 			{
 				auto shared_lock = player->knownEntities.sharedLock();
@@ -143,7 +144,7 @@ namespace Game3 {
 		moved_packet.arguments.position = new_position;
 		moved_packet.arguments.isTeleport = true;
 
-		auto lock = lockPlayersShared();
+		auto lock = players.sharedLock();
 		for (const auto &player: players)
 			if (player->knowsRealm(new_realm->id))
 				player->send(moved_packet);
@@ -165,13 +166,13 @@ namespace Game3 {
 		if (auto cast_player = dynamic_cast<Player *>(&entity)) {
 			if (!context.excludePlayerSelf)
 				cast_player->send(packet);
-			auto lock = lockPlayersShared();
+			auto lock = players.sharedLock();
 			for (const auto &player: players)
 				if (player.get() != cast_player && player->getRealm() && player->canSee(entity))
 					if (auto client = player->toServer()->weakClient.lock())
 						client->send(packet);
 		} else {
-			auto lock = lockPlayersShared();
+			auto lock = players.sharedLock();
 			for (const auto &player: players)
 				if (player->getRealm() && player->canSee(entity))
 					if (auto client = player->toServer()->weakClient.lock())
@@ -208,7 +209,7 @@ namespace Game3 {
 	}
 
 	void ServerGame::remove(const ServerPlayerPtr &player) {
-		auto lock = lockPlayersUnique();
+		auto lock = players.uniqueLock();
 		players.erase(player);
 		player->destroy();
 	}
@@ -337,7 +338,7 @@ namespace Game3 {
 				return {true, "Set tile."};
 			} else if (first == "saveall") {
 				INFO("Writing...");
-				database.writeAll();
+				database.writeAllChunks();
 				INFO("Writing done.");
 				return {true, "Wrote all chunks."};
 			}

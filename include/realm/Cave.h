@@ -32,7 +32,7 @@ namespace Game3 {
 			Cave() = delete;
 			Cave(Game &, RealmID, RealmID parent_realm, int seed_);
 
-			void absorbJSON(const nlohmann::json &) override;
-			void toJSON(nlohmann::json &) const override;
+			void absorbJSON(const nlohmann::json &, bool full_data) override;
+			void toJSON(nlohmann::json &, bool full_data) const override;
 	};
 }

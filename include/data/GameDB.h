@@ -37,10 +37,12 @@ namespace Game3 {
 			void close();
 
 			/** Throws if the key isn't found. */
-			std::string read(const std::string &key);
-
+			std::string get(const std::string &key);
 			/** Returns `otherwise` if the key isn't found. */
-			std::string read(const std::string &key, std::string otherwise);
+			std::string get(const std::string &key, std::string otherwise);
+
+			/** Throws if anything goes wrong. */
+			void put(const std::string &key, const std::string &value);
 
 			void writeAllChunks();
 			void writeChunk(const std::shared_ptr<Realm> &, ChunkPosition);

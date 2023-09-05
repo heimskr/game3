@@ -93,8 +93,8 @@ namespace Game3 {
 		tileProvider.updateChunk(chunk_position);
 	}
 
-	void Cave::absorbJSON(const nlohmann::json &json) {
-		Realm::absorbJSON(json);
+	void Cave::absorbJSON(const nlohmann::json &json, bool full_data) {
+		Realm::absorbJSON(json, full_data);
 		parentRealm = json.at("parentRealm");
 		if (auto iter = json.find("entranceCount"); iter != json.end())
 			entranceCount = iter->get<size_t>();
@@ -102,8 +102,8 @@ namespace Game3 {
 			entranceCount = 1;
 	}
 
-	void Cave::toJSON(nlohmann::json &json) const {
-		Realm::toJSON(json);
+	void Cave::toJSON(nlohmann::json &json, bool full_data) const {
+		Realm::toJSON(json, full_data);
 		json["parentRealm"] = parentRealm;
 		if (entranceCount != 1)
 			json["entranceCount"] = entranceCount.load();
