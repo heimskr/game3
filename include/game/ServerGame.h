@@ -1,6 +1,6 @@
 #pragma once
 
-#include "data/WorldDB.h"
+#include "data/GameDB.h"
 #include "entity/ServerPlayer.h"
 #include "game/Fluids.h"
 #include "game/Game.h"
@@ -20,6 +20,7 @@ namespace Game3 {
 
 			std::unordered_set<ServerPlayerPtr> players;
 			std::shared_ptr<LocalServer> server;
+			GameDB database{*this};
 			float lastGarbageCollection = 0.f;
 
 			ServerGame(std::shared_ptr<LocalServer> server_):
@@ -40,6 +41,7 @@ namespace Game3 {
 			void tileEntityDestroyed(const TileEntity &);
 			void remove(const ServerPlayerPtr &);
 			void queueRemoval(const ServerPlayerPtr &);
+			void openDatabase(std::filesystem::path);
 
 			inline auto lockPlayersShared() { return std::shared_lock(playersMutex); }
 			inline auto lockPlayersUnique() { return std::unique_lock(playersMutex); }
@@ -58,7 +60,6 @@ namespace Game3 {
 			MTQueue<std::pair<std::weak_ptr<RemoteClient>, std::shared_ptr<Packet>>> packetQueue;
 			MTQueue<std::weak_ptr<ServerPlayer>> playerRemovalQueue;
 			double timeSinceTimeUpdate = 0.;
-			WorldDB worldDB{*this};
 
 			void handlePacket(RemoteClient &, Packet &);
 			std::tuple<bool, std::string> commandHelper(RemoteClient &, const std::string &);

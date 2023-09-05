@@ -72,8 +72,8 @@ namespace Game3 {
 		server->send(client, string);
 	}
 
-	void LocalServer::readUsers(const std::filesystem::path &path) {
-		userDatabase = nlohmann::json::parse(readFile(path));
+	void LocalServer::readUsers() {
+		userDatabase = nlohmann::json::parse(game->database.getUsers());
 		userDatabasePath = path;
 		displayNames.clear();
 		for (const auto &[username, user_info]: userDatabase)
@@ -229,13 +229,18 @@ namespace Game3 {
 			throw std::runtime_error("Couldn't register SIGINT handler");
 
 		auto game_server = std::make_shared<LocalServer>(global_server, secret);
-
-		if (std::filesystem::exists("world/users.json"))
-			game_server->readUsers("world/users.json");
-		else
-			game_server->saveUsers("world/users.json");
-
 		auto game = std::dynamic_pointer_cast<ServerGame>(Game::create(Side::Server, game_server));
+
+		const bool database_existed = std::filesystem::exists("world");
+		game->openDatabase("world");
+
+		if (database_existed)
+			game_server->readUsers();
+		else
+			game_server->saveUsers();
+
+
+
 		game->initEntities();
 
 		constexpr size_t seed = 1621;

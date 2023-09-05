@@ -4,12 +4,12 @@
 #include "game/TileProvider.h"
 
 namespace Game3 {
-	ChunkPosition::ChunkPosition(int32_t x_, int32_t y_):
+	ChunkPosition::ChunkPosition(IntType x_, IntType y_):
 		x(x_), y(y_) {}
 
 	ChunkPosition::ChunkPosition(const Position &position):
-		x(TileProvider::divide<int32_t>(position.column)),
-		y(TileProvider::divide<int32_t>(position.row)) {}
+		x(TileProvider::divide<IntType>(position.column)),
+		y(TileProvider::divide<IntType>(position.row)) {}
 
 	std::default_random_engine ChunkPosition::getRNG() const {
 		return std::default_random_engine(static_cast<uint_fast32_t>(std::hash<ChunkPosition>()(*this)));
@@ -39,8 +39,8 @@ namespace Game3 {
 		topLeft(top_left), bottomRight(bottom_right) {}
 
 	ChunkRange::ChunkRange(ChunkPosition chunk_position):
-		topLeft{chunk_position.x - static_cast<int32_t>(REALM_DIAMETER / 2), chunk_position.y - static_cast<int32_t>(REALM_DIAMETER / 2)},
-		bottomRight{chunk_position.x + static_cast<int32_t>(REALM_DIAMETER / 2), chunk_position.y + static_cast<int32_t>(REALM_DIAMETER / 2)} {}
+		topLeft    {chunk_position.x - ChunkPosition::IntType(REALM_DIAMETER / 2), chunk_position.y - ChunkPosition::IntType(REALM_DIAMETER / 2)},
+		bottomRight{chunk_position.x + ChunkPosition::IntType(REALM_DIAMETER / 2), chunk_position.y + ChunkPosition::IntType(REALM_DIAMETER / 2)} {}
 
 	void from_json(const nlohmann::json &json, ChunkPosition &position) {
 		position.x = json.at(0);

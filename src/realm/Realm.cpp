@@ -80,12 +80,13 @@ namespace Game3 {
 
 	void Realm::initTexture() {}
 
-	RealmPtr Realm::fromJSON(Game &game, const nlohmann::json &json) {
+	RealmPtr Realm::fromJSON(Game &game, const nlohmann::json &json, bool absorb) {
 		const RealmType type = json.at("type");
 		auto factory = game.registry<RealmFactoryRegistry>().at(type);
 		assert(factory);
 		auto out = (*factory)(game);
-		out->absorbJSON(json);
+		if (absorb)
+			out->absorbJSON(json);
 		return out;
 	}
 
@@ -898,25 +899,27 @@ namespace Game3 {
 		return *tileProvider.getTileset(getGame());
 	}
 
-	void Realm::toJSON(nlohmann::json &json) const {
+	void Realm::toJSON(nlohmann::json &json, bool full_data) const {
 		json["id"] = id;
 		json["type"] = type;
 		json["seed"] = seed;
-		json["provider"] = tileProvider;
 		json["outdoors"] = outdoors;
-		json["generatedChunks"] = generatedChunks;
-		json["tileEntities"] = std::unordered_map<std::string, nlohmann::json>();
-		json["tilemap"] = tileProvider;
-		for (const auto &[position, tile_entity]: tileEntities)
-			json["tileEntities"][position.simpleString()] = *tile_entity;
-		json["entities"] = std::vector<nlohmann::json>();
-		for (const auto &entity: entities) {
-			nlohmann::json entity_json;
-			entity->toJSON(entity_json);
-			json["entities"].push_back(std::move(entity_json));
-		}
 		if (!extraData.empty())
 			json["extra"] = extraData;
+
+		if (full_data) {
+			json["provider"] = tileProvider;
+			json["generatedChunks"] = generatedChunks;
+			json["tileEntities"] = std::unordered_map<std::string, nlohmann::json>();
+			for (const auto &[position, tile_entity]: tileEntities)
+				json["tileEntities"][position.simpleString()] = *tile_entity;
+			json["entities"] = std::vector<nlohmann::json>();
+			for (const auto &entity: entities) {
+				nlohmann::json entity_json;
+				entity->toJSON(entity_json);
+				json["entities"].push_back(std::move(entity_json));
+			}
+		}
 	}
 
 	bool Realm::isWalkable(Index row, Index column, const Tileset &tileset) {

@@ -217,6 +217,10 @@ namespace Game3 {
 		playerRemovalQueue.push(player);
 	}
 
+	void ServerGame::openDatabase(std::filesystem::path path) {
+		database.open(std::move(path));
+	}
+
 	void ServerGame::handlePacket(RemoteClient &client, Packet &packet) {
 		packet.handle(*this, client);
 	}
@@ -332,13 +336,8 @@ namespace Game3 {
 				player->getRealm()->setTile(Layer::Submerged, player->getPosition(), words.at(1));
 				return {true, "Set tile."};
 			} else if (first == "saveall") {
-				if (!worldDB.isOpen()) {
-					INFO("Opening.");
-					worldDB.open("./world.db");
-					INFO("Opened.");
-				}
-				INFO("Writing.");
-				worldDB.writeAll();
+				INFO("Writing...");
+				database.writeAll();
 				INFO("Writing done.");
 				return {true, "Wrote all chunks."};
 			}

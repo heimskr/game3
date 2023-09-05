@@ -1,11 +1,11 @@
 ifeq ($(CUSTOM_BUILD),)
 	ifeq ($(BUILD),debug)
-		BUILDFLAGS := -g -O0
+		BUILDFLAGS := -g -Og
 	else ifeq ($(BUILD),tsan)
 		BUILDFLAGS := -g -O1 -fsanitize=thread -fno-omit-frame-pointer
 		LDFLAGS    := -fsanitize=thread
 	else ifeq ($(BUILD),asan)
-		BUILDFLAGS := -g -O0 -fsanitize=address -fno-omit-frame-pointer
+		BUILDFLAGS := -g -Og -fsanitize=address -fno-omit-frame-pointer
 		LDFLAGS    := -fsanitize=address
 	else ifeq ($(BUILD),ubsan)
 		BUILDFLAGS := -g -O1 -fsanitize=undefined -fno-omit-frame-pointer

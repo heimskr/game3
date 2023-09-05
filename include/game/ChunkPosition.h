@@ -16,13 +16,15 @@ namespace Game3 {
 	class Buffer;
 
 	struct ChunkPosition {
-		int32_t x = 0;
-		int32_t y = 0;
+		using IntType = int32_t;
+
+		IntType x = 0;
+		IntType y = 0;
 
 		std::default_random_engine getRNG() const;
 
 		ChunkPosition() = default;
-		ChunkPosition(int32_t x_, int32_t y_);
+		ChunkPosition(IntType x_, IntType y_);
 		explicit ChunkPosition(const Position &);
 
 		inline bool operator==(const ChunkPosition &other) const {

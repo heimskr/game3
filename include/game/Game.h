@@ -10,6 +10,7 @@
 
 #include <chrono>
 #include <filesystem>
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -109,6 +110,8 @@ namespace Game3 {
 			std::shared_ptr<Tile> getTile(const Identifier &);
 			RealmPtr tryRealm(RealmID) const;
 			RealmPtr getRealm(RealmID) const;
+			/** Tries to return the realm corresponding to a given realm ID. If one doesn't exist, one is created via the given function, added to the realm container and returned. */
+			RealmPtr getRealm(RealmID, const std::function<RealmPtr()> &);
 			void addRealm(RealmID, RealmPtr);
 			void addRealm(RealmPtr);
 			bool hasRealm(RealmID) const;

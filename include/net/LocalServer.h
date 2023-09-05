@@ -38,8 +38,7 @@ namespace Game3 {
 			void run() override;
 			void stop() override;
 			void send(GenericClient &, std::string_view);
-			void readUsers(const std::filesystem::path &);
-			void saveUsers(const std::filesystem::path &);
+			void readUsers();
 			void saveUsers();
 			/** Returns the display name if authentication was successful. */
 			std::optional<std::string> authenticate(const std::string &username, Token) const;

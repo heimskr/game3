@@ -98,7 +98,7 @@ namespace Game3 {
 				return std::shared_ptr<T>(new T(std::forward<Args>(args)...));
 			}
 
-			static std::shared_ptr<Realm> fromJSON(Game &, const nlohmann::json &);
+			static std::shared_ptr<Realm> fromJSON(Game &, const nlohmann::json &, bool absorb = true);
 
 			virtual void onFocus();
 			virtual void onBlur();
@@ -295,7 +295,7 @@ namespace Game3 {
 
 			void initTexture();
 			virtual void absorbJSON(const nlohmann::json &);
-			virtual void toJSON(nlohmann::json &) const;
+			virtual void toJSON(nlohmann::json &, bool full_data) const;
 
 		private:
 			struct ChunkPackets {

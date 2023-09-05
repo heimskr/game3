@@ -786,6 +786,15 @@ namespace Game3 {
 		return realms.at(realm_id);
 	}
 
+	RealmPtr Game::getRealm(RealmID realm_id, const std::function<RealmPtr()> &creator) {
+		auto lock = realms.uniqueLock();
+		if (auto iter = realms.find(realm_id); iter != realms.end())
+			return iter->second;
+		RealmPtr new_realm = creator();
+		realms.emplace(realm_id, new_realm);
+		return new_realm;
+	}
+
 	void Game::addRealm(RealmID realm_id, RealmPtr realm) {
 		auto lock = realms.uniqueLock();
 		if (!realms.emplace(realm_id, realm).second)

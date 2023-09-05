@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstddef>
+#include <cstdint>
 
 namespace Game3 {
 	constexpr int64_t CHUNK_SIZE = 64;

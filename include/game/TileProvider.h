@@ -10,6 +10,7 @@
 #include "Constants.h"
 #include "Position.h"
 #include "Types.h"
+#include "data/ChunkSet.h"
 #include "game/ChunkPosition.h"
 #include "game/Fluids.h"
 #include "threading/Lockable.h"
@@ -63,6 +64,10 @@ namespace Game3 {
 			uint64_t getUpdateCounter(ChunkPosition);
 			void setUpdateCounter(ChunkPosition, uint64_t);
 
+			/** Copies the data from a ChunkSet object into this TileProvider object's terrain, biome and fluid data, then remakes the path map.
+			 *  Doesn't lock any of the ChunkSet object's mutexes. */
+			void absorb(ChunkPosition, const ChunkSet &);
+
 			std::shared_ptr<Tileset> getTileset(const Game &);
 
 			std::vector<Position> getLand(const Game &, const ChunkRange &, Index right_pad, Index bottom_pad);
@@ -84,6 +89,11 @@ namespace Game3 {
 
 			/** Returns a copy of the fluid ID/amount at a given tile position. */
 			std::optional<FluidTile> copyFluidTile(Position) const;
+
+			ChunkSet getChunkSet(ChunkPosition) const;
+
+			/** An empty vector indicates failure. */
+			std::string getRawChunks(ChunkPosition) const;
 
 			/** Returns a reference to the given tile and sets up a shared lock. The ReturnEmpty mode will be treated as Throw. */
 			TileID & findTile(Layer, Position, bool &created, std::shared_lock<std::shared_mutex> *lock_out, TileMode = TileMode::Create);

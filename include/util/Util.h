@@ -2,11 +2,13 @@
 
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <charconv>
 #include <chrono>
 #include <concepts>
 #include <csignal>
 #include <cstdlib>
+#include <cstring>
 #include <iomanip>
 #include <iostream>
 #include <list>
@@ -42,6 +44,27 @@ namespace Game3 {
 			ss << item;
 		}
 		return ss.str();
+	}
+
+	template <typename S, typename T>
+	void appendSpan(S &raw, const std::span<T> &source) {
+		const size_t byte_count = source.size() * sizeof(source[0]);
+		if constexpr (std::endian::native == std::endian::little) {
+			const size_t start = raw.size();
+			raw.resize(raw.size() + byte_count);
+			std::memcpy(&raw[start], source.data(), byte_count);
+		} else {
+			raw.reserve(raw.size() + byte_count);
+			for (const auto item: source)
+				for (size_t i = 0; i < sizeof(item); ++i)
+					raw.push_back((item >> (8 * i)) & 0xff);
+		}
+	}
+
+	template <typename S, typename T>
+	void appendBytes(S &raw, T item) {
+		for (size_t i = 0; i < sizeof(item); ++i)
+			raw.push_back((item >> (8 * i)) & 0xff);
 	}
 
 	template <typename C>

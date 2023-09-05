@@ -40,6 +40,28 @@ namespace Game3 {
 		metaMap[chunk_position].updateCount = counter;
 	}
 
+	void TileProvider::absorb(ChunkPosition chunk_position, const ChunkSet &chunk_set) {
+		if (chunk_set.terrain.size() != LAYER_COUNT)
+			throw std::invalid_argument("ChunkSet has invalid number of terrain layers in TileProvider::absorb: " + std::to_string(chunk_set.terrain.size()));
+
+		for (size_t i = 0; i < LAYER_COUNT; ++i) {
+			std::unique_lock lock(chunkMutexes[i]);
+			chunkMaps[i][chunk_position] = chunk_set.terrain[i];
+		}
+
+		{
+			std::unique_lock lock(biomeMutex);
+			biomeMap[chunk_position] = chunk_set.biomes;
+		}
+
+		{
+			std::unique_lock lock(fluidMutex);
+			fluidMap[chunk_position] = chunk_set.fluids;
+		}
+
+		updateChunk(chunk_position);
+	}
+
 	std::shared_ptr<Tileset> TileProvider::getTileset(const Game &game) {
 		if (cachedTileset)
 			return cachedTileset;
@@ -142,6 +164,60 @@ namespace Game3 {
 			return access(iter->second, remainder(position.row), remainder(position.column));
 
 		return std::nullopt;
+	}
+
+	ChunkSet TileProvider::getChunkSet(ChunkPosition chunk_position) const {
+		std::vector<TileChunk> terrain;
+
+		for (size_t i = 0; i < LAYER_COUNT; ++i) {
+			std::shared_lock lock(chunkMutexes[i]);
+			terrain.push_back(chunkMaps[i].at(chunk_position));
+		}
+
+		BiomeChunk biomes;
+
+		{
+			std::shared_lock lock(biomeMutex);
+			biomes = biomeMap.at(chunk_position);
+		}
+
+		FluidChunk fluids;
+
+		{
+			std::shared_lock lock(fluidMutex);
+			fluids = fluidMap.at(chunk_position);
+		}
+
+		return {std::move(terrain), std::move(biomes), std::move(fluids)};
+	}
+
+	std::string TileProvider::getRawChunks(ChunkPosition chunk_position) const {
+		std::string raw;
+		raw.reserve(LAYER_COUNT * CHUNK_SIZE * CHUNK_SIZE * sizeof(TileID));
+
+		for (Layer layer: allLayers) {
+			std::shared_lock lock(chunkMutexes[getIndex(layer)]);
+			const TileChunk &chunk = chunkMaps[getIndex(layer)].at(chunk_position);
+			appendSpan(raw, std::span(chunk));
+		}
+
+		{
+			std::shared_lock lock(biomeMutex);
+			appendSpan(raw, std::span(biomeMap.at(chunk_position)));
+		}
+
+		{
+			std::shared_lock lock(fluidMutex);
+			std::vector<uint32_t> raw_fluids;
+			raw_fluids.reserve(CHUNK_SIZE * CHUNK_SIZE);
+
+			for (const FluidTile &tile: fluidMap.at(chunk_position))
+				raw_fluids.emplace_back(tile);
+
+			appendSpan(raw, std::span(raw_fluids));
+		}
+
+		return raw;
 	}
 
 	TileID & TileProvider::findTile(Layer layer, Position position, bool &created, std::shared_lock<std::shared_mutex> *lock_out, TileMode mode) {
