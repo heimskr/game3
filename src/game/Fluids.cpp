@@ -17,12 +17,15 @@ namespace Game3 {
 
 // FluidTile
 
-	FluidTile::FluidTile(uint32_t packed):
+	static_assert(sizeof(FluidTile::id)    == 2);
+	static_assert(sizeof(FluidTile::level) == 2);
+
+	FluidTile::FluidTile(FluidInt packed):
 		id(packed & 0xffff),
 		level((packed >> 16) & 0xffff) {}
 
-	FluidTile::operator uint32_t() const {
-		return static_cast<uint32_t>(id) | (static_cast<uint32_t>(level) << 16);
+	FluidTile::operator FluidInt() const {
+		return static_cast<FluidInt>(id) | (static_cast<FluidInt>(level) << 16);
 	}
 
 	FluidTile::operator std::string() const {

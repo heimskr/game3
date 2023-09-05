@@ -22,6 +22,8 @@ namespace Game3 {
 		Fluid(Identifier identifier_, std::string name_, Identifier tileset_name, Identifier tilename_, Identifier flask_name = {});
 	};
 
+	using FluidInt = uint32_t;
+
 	struct FluidTile {
 		static constexpr FluidLevel FULL     = 1000;
 		static constexpr FluidLevel INFINITE = FULL + 1;
@@ -30,11 +32,11 @@ namespace Game3 {
 		FluidLevel level = 0;
 
 		FluidTile() = default;
-		explicit FluidTile(uint32_t);
+		explicit FluidTile(FluidInt);
 		FluidTile(FluidID id_, FluidLevel level_):
 			id(id_), level(level_) {}
 
-		explicit operator uint32_t() const;
+		explicit operator FluidInt() const;
 		explicit operator std::string() const;
 
 		auto operator<=>(const FluidTile &) const = default;
