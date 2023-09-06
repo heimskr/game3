@@ -66,10 +66,20 @@ namespace Game3 {
 			// If the entity is found in this realm, try to send it if its update counter is higher than the threshold.
 			// Otherwise, try to get the client to destroy it. If the entity does exist but is in another realm,
 			// everything will be taken care of once the player enters that realm.
-			if (auto iter = realm->entitiesByGID.find(entity_id); iter != realm->entitiesByGID.end())
+			if (auto iter = realm->entitiesByGID.find(entity_id); iter != realm->entitiesByGID.end()) {
 				iter->second->sendTo(client, threshold);
-			else
-				client.send(DestroyEntityPacket(entity_id, realm->id));
+			} else {
+				auto entity = game.getAgent<Entity>(entity_id);
+				if (!entity) {
+					WARN("Can't tell client to destroy entity " << entity_id << ": entity not found.");
+				} else if (entity->realmID != realmID) {
+					// The condition here is to handle an edge case (likely a bug elsewhere) in which the entity is
+					// missing from Realm::entitiesByGID but still exists in the realm somehow. I encountered the bug
+					// by teleporting around a lot.
+					INFO("Telling client to destroy entity " << entity_id);
+					client.send(DestroyEntityPacket(entity_id, realm->id));
+				}
+			}
 		}
 	}
 }

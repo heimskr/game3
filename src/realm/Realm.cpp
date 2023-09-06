@@ -656,6 +656,8 @@ namespace Game3 {
 	}
 
 	void Realm::queueDestruction(const EntityPtr &entity) {
+		if (entity->isPlayer())
+			INFO("Queueing player " << entity->getGID() << " for entity destruction.");
 		entityDestructionQueue.push(entity);
 	}
 
@@ -664,6 +666,7 @@ namespace Game3 {
 	}
 
 	void Realm::queuePlayerRemoval(const PlayerPtr &player) {
+		INFO("Queueing player " << player->getGID() << " for player removal.");
 		playerRemovalQueue.push(player);
 	}
 
