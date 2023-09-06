@@ -352,6 +352,10 @@ namespace Game3 {
 				database.writeAllRealms();
 				INFO("Writing done.");
 				return {true, "Wrote all chunks."};
+			} else if (first == "pos") {
+				INFO("Player " << player->getGID() << " position: " << player->getPosition());
+				INFO("Player " << player->getGID() << " chunk position: " << player->getChunk());
+				return {true, "Position = " + std::string(player->getPosition()) + ", chunk position = " + std::string(player->getChunk())};
 			}
 		} catch (const std::exception &err) {
 			return {false, err.what()};
