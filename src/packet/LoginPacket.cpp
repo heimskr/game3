@@ -18,6 +18,7 @@ namespace Game3 {
 
 			if (game.database.readUser(username, &display_name, &json)) {
 				auto player = ServerPlayer::fromJSON(game, json);
+				player->username = username;
 				client.setPlayer(player);
 				{
 					auto lock = game.players.uniqueLock();
