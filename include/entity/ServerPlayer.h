@@ -10,7 +10,7 @@ namespace Game3 {
 			Lockable<WeakSet<Entity>> knownEntities;
 			std::weak_ptr<RemoteClient> weakClient;
 
-			~ServerPlayer() override = default;
+			~ServerPlayer() override;
 
 			static std::shared_ptr<ServerPlayer> create(Game &);
 			static std::shared_ptr<ServerPlayer> fromJSON(Game &, const nlohmann::json &);
@@ -26,6 +26,6 @@ namespace Game3 {
 		private:
 			ServerPlayer();
 
-		friend class Entity;
+			friend class Entity;
 	};
 }

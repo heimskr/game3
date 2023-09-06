@@ -1,3 +1,4 @@
+#include "game/ServerGame.h"
 #include "entity/ServerPlayer.h"
 #include "net/RemoteClient.h"
 #include "packet/AgentMessagePacket.h"
@@ -5,6 +6,13 @@
 
 namespace Game3 {
 	ServerPlayer::ServerPlayer(): Player() {}
+
+	ServerPlayer::~ServerPlayer() {
+		nlohmann::json json;
+		toJSON(json);
+		getGame().toServer().database.writeUser(username, json);
+		INFO("Persisted ServerPlayer with username " << username << '.');
+	}
 
 	std::shared_ptr<ServerPlayer> ServerPlayer::create(Game &) {
 		return Entity::create<ServerPlayer>();
