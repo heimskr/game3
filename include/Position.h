@@ -40,7 +40,6 @@ namespace Game3 {
 		inline double distance(const Position &other) const { return std::sqrt(std::pow(row - other.row, 2) + std::pow(column - other.column, 2)); }
 		inline uint64_t taxiDistance(const Position &other) const { return uint64_t(std::abs(row - other.row) + std::abs(column - other.column)); }
 		bool adjacent4(const Position &other) const;
-		explicit inline operator bool() const { return 0 <= row && 0 <= column; }
 		bool operator<(const Position &) const;
 		std::string simpleString() const { return std::to_string(row) + "," + std::to_string(column); }
 	};

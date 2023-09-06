@@ -28,8 +28,7 @@ namespace Game3 {
 		json["keepPosition"] = keep->position;
 		if (stuck)
 			json["stuck"] = stuck;
-		if (destination)
-			json["destination"] = destination;
+		json["destination"] = destination;
 	}
 
 	void Worker::absorbJSON(Game &game, const nlohmann::json &json) {

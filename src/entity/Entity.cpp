@@ -309,8 +309,10 @@ namespace Game3 {
 		auto self_lock = uniqueLock();
 
 		RealmPtr realm = weakRealm.lock();
-		if (!realm)
+		if (!realm) {
+			WARN("Can't move entity " << getGID() << ": no realm");
 			return false;
+		}
 
 		Position new_position = position;
 		float x_offset = 0.f;
@@ -339,14 +341,13 @@ namespace Game3 {
 				throw std::invalid_argument("Invalid direction: " + std::to_string(int(move_direction)));
 		}
 
-		if (context.forcedPosition)
-			new_position = *context.forcedPosition;
-
 		if (!context.facingDirection)
 			context.facingDirection = move_direction;
 
-		if ((horizontal && offset.x != 0) || (!horizontal && offset.y != 0)) {
-			// WARN("Can't move entity " << globalID << ": improper offsets [" << horizontal << "/" << offset.x << ", " << !horizontal << "/" << offset.y << "]");
+		if (context.forcedPosition) {
+			new_position = *context.forcedPosition;
+		} else if ((horizontal && offset.x != 0) || (!horizontal && offset.y != 0)) {
+			// WARN("Can't move entity " << globalID << ": improper offsets [" << (horizontal? "horizontal" : "vertical") << " : (" << offset.x << ", " << offset.y << ")]");
 			return false;
 		}
 
