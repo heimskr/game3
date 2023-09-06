@@ -130,6 +130,7 @@ namespace Game3 {
 	}
 
 	void TileEntity::encode(Game &, Buffer &buffer) {
+		buffer << tileEntityID;
 		buffer << tileID;
 		buffer << position;
 		buffer << solid;
@@ -138,6 +139,7 @@ namespace Game3 {
 	}
 
 	void TileEntity::decode(Game &, Buffer &buffer) {
+		buffer >> tileEntityID;
 		buffer >> tileID;
 		buffer >> position;
 		buffer >> solid;
