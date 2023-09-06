@@ -115,6 +115,7 @@
 #include "tile/ForestFloorTile.h"
 #include "tile/GrassTile.h"
 #include "tile/Tile.h"
+#include "tile/TreeTile.h"
 #include "tileentity/Building.h"
 #include "tileentity/Centrifuge.h"
 #include "tileentity/ChemicalReactor.h"
@@ -442,6 +443,7 @@ namespace Game3 {
 
 	void Game::addTiles() {
 		auto &reg = registry<TileRegistry>();
+
 		reg.add<ForestFloorTile>();
 
 		const auto monomap = registry<TilesetRegistry>().at("base:tileset/monomap"_id);
@@ -450,10 +452,19 @@ namespace Game3 {
 			reg.add(tilename, grass);
 
 		for (const auto &[crop_name, crop]: registry<CropRegistry>()) {
-			auto tile = std::make_shared<CropTile>(crop);
-			for (const auto &stage: crop->stages)
-				reg.add(stage, tile);
+			if (crop->customType.empty()) {
+				auto tile = std::make_shared<CropTile>(crop);
+				for (const auto &stage: crop->stages)
+					reg.add(stage, tile);
+			} else if (crop->customType == "base:tile/tree"_id) {
+				// TODO!: We need the factory thing.
+				auto tile = std::make_shared<TreeTile>(crop);
+				for (const auto &stage: crop->stages)
+					reg.add(stage, tile);
+			}
 		}
+
+
 	}
 
 	void Game::addModuleFactories() {

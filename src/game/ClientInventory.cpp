@@ -155,4 +155,11 @@ namespace Game3 {
 		inventory.setStorage(popBuffer<std::decay_t<decltype(inventory.getStorage())>>(buffer));
 		return buffer;
 	}
+
+	void to_json(nlohmann::json &json, const ClientInventory &inventory) {
+		for (const auto &[key, val]: inventory.getStorage())
+			json["storage"][std::to_string(key)] = val;
+		json["slotCount"]  = inventory.slotCount.load();
+		json["activeSlot"] = inventory.activeSlot.load();
+	}
 }

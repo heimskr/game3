@@ -9,8 +9,9 @@
 #include "realm/Realm.h"
 
 namespace Game3 {
-	static std::default_random_engine agent_rng(42);
+	static std::default_random_engine agent_rng;
 	static std::mutex agent_rng_mutex;
+	static bool agent_rng_seeded = false;
 
 	std::vector<ChunkPosition> Agent::getVisibleChunks() const {
 		ChunkPosition original_position = getChunkPosition(getPosition());
@@ -38,6 +39,13 @@ namespace Game3 {
 
 	GlobalID Agent::generateGID() {
 		std::unique_lock lock(agent_rng_mutex);
+
+		if (!agent_rng_seeded) {
+			std::random_device hardware_rng;
+			agent_rng.seed(hardware_rng());
+			agent_rng_seeded = true;
+		}
+
 		return static_cast<GlobalID>(agent_rng());
 	}
 

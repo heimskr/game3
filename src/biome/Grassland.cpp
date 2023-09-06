@@ -65,8 +65,16 @@ namespace Game3 {
 			if (params.forestThreshold < forest_noise) {
 				std::default_random_engine tree_rng(static_cast<uint_fast32_t>(forest_noise * 1'000'000'000.));
 				if ((abs(row) % 2) == (std::uniform_int_distribution(0, 39)(tree_rng) < 20)) {
-					static const std::vector<Identifier> trees {"base:tile/tree1"_id, "base:tile/tree2"_id, "base:tile/tree3"_id};
-					realm.add(TileEntity::create<Tree>(realm.getGame(), choose(trees, rng), "base:tile/tree0"_id, Position(row, column), Tree::MATURITY));
+					// realm.add(TileEntity::create<Tree>(realm.getGame(), choose(trees, rng), "base:tile/tree0"_id, Position(row, column), Tree::MATURITY));
+					static const std::vector<Identifier> trees {
+						"base:tile/tree1"_id,
+						"base:tile/tree2"_id,
+						"base:tile/tree3"_id,
+						"base:tile/tree1_empty"_id,
+						"base:tile/tree2_empty"_id,
+						"base:tile/tree3_empty"_id
+					};
+					realm.setTile(Layer::Submerged, {row, column}, choose(trees, rng), false, true);
 				}
 				realm.setTile(Layer::Terrain, {row, column}, forest_floor, false, true);
 			}

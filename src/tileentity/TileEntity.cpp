@@ -144,9 +144,7 @@ namespace Game3 {
 		buffer >> position;
 		buffer >> solid;
 		setUpdateCounter(buffer.take<UpdateCounter>());
-		std::string extra_json;
-		buffer >> extra_json;
-		extraData = nlohmann::json::parse(extra_json);
+		extraData = nlohmann::json::parse(buffer.take<std::string>());
 	}
 
 	void TileEntity::sendTo(RemoteClient &client, UpdateCounter threshold) {

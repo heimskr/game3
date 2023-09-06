@@ -11,6 +11,7 @@ namespace Game3 {
 
 			std::shared_ptr<Crop> crop;
 
+			CropTile(Identifier, std::shared_ptr<Crop>);
 			CropTile(std::shared_ptr<Crop>);
 
 			void randomTick(const Place &) override;

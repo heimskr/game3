@@ -62,8 +62,8 @@ namespace Game3 {
 			Position getPosition() const override { return position.copyBase(); }
 			void updateNeighbors() const;
 			bool isVisible() const;
-			Side getSide() const override final;
-			Type getAgentType() const override final { return Agent::Type::TileEntity; }
+			Side getSide() const final;
+			Type getAgentType() const final { return Agent::Type::TileEntity; }
 			ChunkPosition getChunk() const;
 			/** Called when the TileEntity is destroyed violently, e.g. by a bomb. Returns false if the TileEntity should survive the destruction. */
 			virtual bool kill() { return false; }
@@ -79,6 +79,8 @@ namespace Game3 {
 			void sendTo(RemoteClient &, UpdateCounter threshold = 0);
 			virtual void broadcast();
 
+			virtual void toJSON(nlohmann::json &) const;
+
 		protected:
 			TileID cachedTile = -1;
 			bool tileLookupFailed = false;
@@ -88,7 +90,6 @@ namespace Game3 {
 				tileID(std::move(tile_id)), tileEntityID(std::move(tile_entity_id)), position(std::move(position_)), solid(solid_) {}
 
 			virtual void absorbJSON(Game &, const nlohmann::json &);
-			virtual void toJSON(nlohmann::json &) const;
 
 			friend void to_json(nlohmann::json &, const TileEntity &);
 

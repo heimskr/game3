@@ -9,6 +9,71 @@
 				"stages": ["base:tile/cotton_0", "base:tile/cotton_1", "base:tile/cotton_2"],
 				"product": ["base:item/cotton", 1],
 				"chance": 1.0
+			},
+
+			"base:crop/tree1": {
+				"type": "base:tile/tree",
+				"stages": ["base:tile/tree1_stump", "base:tile/tree1"],
+				"custom": {"sapling": "base:item/sapling"},
+				"product": ["base:item/wood", 1],
+				"chance": 0.75
+			},
+			"base:crop/tree2": {
+				"type": "base:tile/tree",
+				"stages": ["base:tile/tree2_stump", "base:tile/tree2"],
+				"custom": {"sapling": "base:item/sapling"},
+				"product": ["base:item/wood", 1],
+				"chance": 0.75
+			},
+			"base:crop/tree3": {
+				"type": "base:tile/tree",
+				"stages": ["base:tile/tree3_stump", "base:tile/tree3"],
+				"custom": {"sapling": "base:item/sapling"},
+				"product": ["base:item/wood", 1],
+				"chance": 0.75
+			},
+
+			"base:crop/tree1_honey": {
+				"type": "base:tile/tree",
+				"stages": ["base:tile/tree1_honey_stump", "base:tile/tree1_empty", "base:tile/tree1_full"],
+				"custom": {
+					"sapling": "base:item/sapling",
+					"honey": {
+						"empty": "base:tile/tree1_empty",
+						"full": "base:tile/tree1_full",
+						"item": "base:item/honey"
+					}
+				},
+				"product": ["base:item/wood", 1],
+				"chance": 0.75
+			},
+			"base:crop/tree2_honey": {
+				"type": "base:tile/tree",
+				"stages": ["base:tile/tree2_honey_stump", "base:tile/tree2_empty", "base:tile/tree2_full"],
+				"custom": {
+					"sapling": "base:item/sapling",
+					"honey": {
+						"empty": "base:tile/tree2_empty",
+						"full": "base:tile/tree2_full",
+						"item": "base:item/honey"
+					}
+				},
+				"product": ["base:item/wood", 1],
+				"chance": 0.75
+			},
+			"base:crop/tree3_honey": {
+				"type": "base:tile/tree",
+				"stages": ["base:tile/tree3_honey_stump", "base:tile/tree3_empty", "base:tile/tree3_full"],
+				"custom": {
+					"sapling": "base:item/sapling",
+					"honey": {
+						"empty": "base:tile/tree3_empty",
+						"full": "base:tile/tree3_full",
+						"item": "base:item/honey"
+					}
+				},
+				"product": ["base:item/wood", 1],
+				"chance": 0.75
 			}
 		}]
 	]

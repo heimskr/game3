@@ -6,6 +6,7 @@
 #include "entity/EntityFactory.h"
 #include "entity/ServerPlayer.h"
 #include "game/ClientGame.h"
+#include "game/ClientInventory.h"
 #include "game/Game.h"
 #include "game/ServerGame.h"
 #include "game/ServerInventory.h"
@@ -66,20 +67,26 @@ namespace Game3 {
 	}
 
 	void Entity::toJSON(nlohmann::json &json) const {
-		assert(getSide() == Side::Server);
 		auto lock = sharedLock();
 		json["type"]      = type;
 		json["position"]  = position;
 		json["realmID"]   = realmID;
 		json["direction"] = direction;
 		json["health"]    = health;
-		if (inventory)
-			json["inventory"] = static_cast<ServerInventory &>(*inventory);
+		if (inventory) {
+			// TODO: move JSONification to StorageInventory
+			if (getSide() == Side::Client)
+				json["inventory"] = static_cast<ClientInventory &>(*inventory);
+			else
+				json["inventory"] = static_cast<ServerInventory &>(*inventory);
+		}
+
 		{
 			auto lock = path.sharedLock();
 			if (!path.empty())
 				json["path"] = path;
 		}
+
 		if (money != 0)
 			json["money"] = money;
 		if (0 <= heldLeft.slot)

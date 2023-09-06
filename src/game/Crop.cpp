@@ -1,14 +1,31 @@
-#include <cassert>
-
 #include "game/Crop.h"
 #include "game/Game.h"
 
+#include <cassert>
+
 namespace Game3 {
-	Crop::Crop(Identifier identifier_, std::vector<Identifier> stages_, ItemStack product_, double chance_):
-	NamedRegisterable(std::move(identifier_)), stages(std::move(stages_)), product(std::move(product_)), chance(chance_) {
+	Crop::Crop(Identifier identifier_, Identifier custom_type, std::vector<Identifier> stages_, ItemStack product_, double chance_, nlohmann::json custom_data):
+	NamedRegisterable(std::move(identifier_)),
+	customType(std::move(custom_type)),
+	stages(std::move(stages_)),
+	product(std::move(product_)),
+	chance(chance_),
+	customData(std::move(custom_data)) {
 		assert(!stages.empty());
 	}
 
 	Crop::Crop(Identifier identifier_, Game &game, const nlohmann::json &json):
-		Crop(std::move(identifier_), json.at("stages"), ItemStack::fromJSON(game, json.at("product")), json.at("chance")) {}
+		Crop(std::move(identifier_), getCustomType(json), json.at("stages"), ItemStack::fromJSON(game, json.at("product")), json.at("chance"), getCustomData(json)) {}
+
+	Identifier Crop::getCustomType(const nlohmann::json &json) {
+		if (auto iter = json.find("type"); iter != json.end())
+			return iter->get<Identifier>();
+		return {};
+	}
+
+	nlohmann::json Crop::getCustomData(const nlohmann::json &json) {
+		if (auto iter = json.find("custom"); iter != json.end())
+			return *iter;
+		return {};
+	}
 }
