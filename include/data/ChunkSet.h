@@ -24,6 +24,7 @@ namespace Game3 {
 			ChunkSet(std::vector<TileChunk>, BiomeChunk, FluidChunk);
 			ChunkSet(std::span<const uint8_t>);
 			ChunkSet(std::span<const char>);
+			ChunkSet(std::span<const char> terrain_, std::span<const char> biomes_, std::span<const char> fluids_);
 
 			template <typename C>
 			C getBytes() const {

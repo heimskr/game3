@@ -72,19 +72,10 @@ namespace Game3 {
 		server->send(client, string);
 	}
 
-	void LocalServer::readUsers() {
-		userDatabase = nlohmann::json::parse(game->database.get("_Users", "{}"));
-		displayNames.clear();
-		for (const auto &[username, user_info]: userDatabase)
-			displayNames.insert(user_info.displayName);
-	}
-
-	void LocalServer::saveUsers() {
-		game->database.put("_Users", nlohmann::json(userDatabase).dump());
-	}
-
 	void LocalServer::saveUserData() {
 		auto lock = game->players.sharedLock();
+
+		game->database.writeUsers(game->players);
 
 		for (const ServerPlayerPtr &player: game->players) {
 			nlohmann::json json;
@@ -92,7 +83,7 @@ namespace Game3 {
 				auto player_lock = player->sharedLock();
 				player->toJSON(json);
 			}
-			game->database.put("_User_" + player->username, json.dump());
+			game->database.writeUser(player->username, json);
 		}
 	}
 
@@ -107,10 +98,11 @@ namespace Game3 {
 		if (!validateUsername(username))
 			return nullptr;
 
-		std::string raw = game->database.get("_User_" + std::string(username), "");
-
-		if (!raw.empty())
-			return ServerPlayer::fromJSON(*game, nlohmann::json::parse(raw));
+		{
+			nlohmann::json json;
+			if (game->database.readUser(username, nullptr, &json))
+				return ServerPlayer::fromJSON(*game, json);
+		}
 
 		RealmPtr overworld = game->getRealm(1);
 
@@ -147,7 +139,6 @@ namespace Game3 {
 			game->players.insert(player);
 		}
 		userDatabase.try_emplace(player->username, player->username, player->displayName);
-		saveUsers();
 		return player;
 	}
 
@@ -225,21 +216,17 @@ namespace Game3 {
 		auto game_server = std::make_shared<LocalServer>(global_server, secret);
 		auto game = std::dynamic_pointer_cast<ServerGame>(Game::create(Side::Server, game_server));
 
-		const bool database_existed = std::filesystem::exists("world");
-		game->openDatabase("world");
+		constexpr const char *world_path = "world.db";
+
+		const bool database_existed = std::filesystem::exists(world_path);
+		game->openDatabase(world_path);
 		game_server->game = game;
-
-		if (database_existed)
-			game_server->readUsers();
-		else
-			game_server->saveUsers();
-
 		game->initEntities();
 
 		constexpr size_t seed = 1621;
 		if (database_existed) {
 			game->database.readAllRealms();
-			INFO("Finished reading all worlds from database.");
+			INFO("Finished reading all realms from database.");
 		} else {
 			RealmPtr realm = Realm::create<Overworld>(*game, 1, Overworld::ID(), "base:tileset/monomap"_id, seed);
 			realm->outdoors = true;

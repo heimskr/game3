@@ -10,13 +10,15 @@
 
 namespace Game3 {
 	void RegisterPlayerPacket::handle(ServerGame &game, RemoteClient &client) {
-		if (game.server->hasUsername(username) || game.server->hasDisplayName(displayName)) {
+		auto server = game.getServer();
+
+		if (server->hasUsername(username) || server->hasDisplayName(displayName)) {
 			WARN("Failed to register user " << username);
 			client.send(RegistrationStatusPacket());
 			return;
 		}
 
-		auto player = game.server->loadPlayer(username, displayName);
+		auto player = server->loadPlayer(username, displayName);
 		SUCCESS("Registered user " << username << " with token " << player->token << '.');
 		client.send(RegistrationStatusPacket(username, displayName, player->token));
 		client.setPlayer(player);
@@ -25,6 +27,6 @@ namespace Game3 {
 		player->notifyOfRealm(*realm);
 		INFO("Player GID is " << player->globalID);
 		client.send(LoginStatusPacket(true, player->globalID, username, displayName, player));
-		game.server->setupPlayer(client);
+		server->setupPlayer(client);
 	}
 }

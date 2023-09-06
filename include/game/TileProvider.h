@@ -95,6 +95,15 @@ namespace Game3 {
 			/** An empty vector indicates failure. */
 			std::string getRawChunks(ChunkPosition) const;
 
+			/** An empty vector indicates failure. */
+			std::string getRawTerrain(ChunkPosition) const;
+
+			/** An empty vector indicates failure. */
+			std::string getRawBiomes(ChunkPosition) const;
+
+			/** An empty vector indicates failure. */
+			std::string getRawFluids(ChunkPosition) const;
+
 			/** Returns a reference to the given tile and sets up a shared lock. The ReturnEmpty mode will be treated as Throw. */
 			TileID & findTile(Layer, Position, bool &created, std::shared_lock<std::shared_mutex> *lock_out, TileMode = TileMode::Create);
 

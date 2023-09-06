@@ -12,15 +12,16 @@
 namespace Game3 {
 	void LoginPacket::handle(ServerGame &game, RemoteClient &client) {
 		if (!client.getPlayer()) {
-			if (auto display_name = game.server->authenticate(username, token)) {
-				auto player = game.server->loadPlayer(username, *display_name);
+			auto server = game.getServer();
+			if (auto display_name = server->authenticate(username, token)) {
+				auto player = server->loadPlayer(username, *display_name);
 				client.setPlayer(player);
 				auto realm = player->getRealm();
 				player->weakClient = client.shared_from_this();
 				player->notifyOfRealm(*realm);
 				INFO("Player GID is " << player->globalID);
 				client.send(LoginStatusPacket(true, player->globalID, username, *display_name, player));
-				game.server->setupPlayer(client);
+				server->setupPlayer(client);
 				return;
 			}
 		}

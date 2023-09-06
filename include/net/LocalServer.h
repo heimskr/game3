@@ -38,9 +38,6 @@ namespace Game3 {
 			void run() override;
 			void stop() override;
 			void send(GenericClient &, std::string_view);
-			void readUsers();
-			/** Saves username and display name information. */
-			void saveUsers();
 			/** Writes every player's full data to the database. */
 			void saveUserData();
 			/** Returns the display name if authentication was successful. */

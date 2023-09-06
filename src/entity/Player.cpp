@@ -64,13 +64,18 @@ namespace Game3 {
 	void Player::toJSON(nlohmann::json &json) const {
 		Entity::toJSON(json);
 		json["isPlayer"] = true;
+		json["displayName"] = displayName;
 		if (0.f < tooldown)
 			json["tooldown"] = tooldown;
 	}
 
 	void Player::absorbJSON(Game &game, const nlohmann::json &json) {
 		Entity::absorbJSON(game, json);
-		tooldown = json.contains("tooldown")? json.at("tooldown").get<float>() : 0.f;
+		displayName = json.at("displayName");
+		if (auto iter = json.find("tooldown"); iter != json.end())
+			tooldown = *iter;
+		else
+			tooldown = 0.f;
 	}
 
 	void Player::tick(Game &game, float delta) {

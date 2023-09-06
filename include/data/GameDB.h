@@ -4,6 +4,7 @@
 #include "data/ChunkSet.h"
 #include "game/Chunk.h"
 #include "game/ChunkPosition.h"
+#include "threading/Lockable.h"
 
 #include <filesystem>
 #include <memory>
@@ -12,37 +13,27 @@
 #include <string>
 #include <vector>
 
-#include <leveldb/db.h>
+#include <SQLiteCpp/SQLiteCpp.h>
 
 namespace Game3 {
 	class Game;
+	class Player;
 	class Realm;
 
 	class GameDB {
 		private:
 			Game &game;
-			std::unique_ptr<leveldb::DB> database;
 			std::filesystem::path path;
 
-			static std::string getChunkKey(RealmID, ChunkPosition);
-			static void parseChunkKey(const std::string &, RealmID &, ChunkPosition &);
-
-			static std::string getRealmKey(RealmID);
-			static RealmID parseRealmKey(const std::string &);
+			void bind(SQLite::Statement &, const std::shared_ptr<Player> &);
 
 		public:
+			Lockable<std::unique_ptr<SQLite::Database>> database;
+
 			GameDB(Game &);
 
 			void open(std::filesystem::path);
 			void close();
-
-			/** Throws if the key isn't found. */
-			std::string get(const std::string &key);
-			/** Returns `otherwise` if the key isn't found. */
-			std::string get(const std::string &key, std::string otherwise);
-
-			/** Throws if anything goes wrong. */
-			void put(const std::string &key, const std::string &value);
 
 			/** Writes both metadata and chunk data for all realms. */
 			void writeAllRealms();
@@ -58,10 +49,31 @@ namespace Game3 {
 
 			std::optional<ChunkSet> getChunk(RealmID, ChunkPosition);
 
-			void dumpKeys();
+			bool readUser(std::string_view username, std::string *display_name_out, nlohmann::json *json_out);
+			void writeUser(std::string_view username, const nlohmann::json &);
 
 			inline bool isOpen() {
 				return database != nullptr;
+			}
+
+			template <typename C>
+			void writeUsers(const C &container) {
+				if (container.empty())
+					return;
+
+				assert(database);
+				auto db_lock = database.uniqueLock();
+
+				SQLite::Transaction transaction{*database};
+				SQLite::Statement statement{*database, "INSERT INTO USERS VALUES (?, ?, ?)"};
+
+				for (const std::shared_ptr<Player> player: container) {
+					bind(statement, player);
+					statement.exec();
+					statement.reset();
+				}
+
+				transaction.commit();
 			}
 	};
 }

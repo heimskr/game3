@@ -23,6 +23,12 @@ namespace Game3 {
 		add(EntityFactory::create<ServerPlayer>());
 	}
 
+	ServerGame::~ServerGame() {
+		database.writeAllRealms();
+		database.writeUsers(players);
+		INFO("Saved realms and users.");
+	}
+
 	void ServerGame::tick() {
 		Game::tick();
 
@@ -182,6 +188,8 @@ namespace Game3 {
 
 	void ServerGame::entityDestroyed(const Entity &entity) {
 		const DestroyEntityPacket packet(entity, false);
+		auto server = weakServer.lock();
+		assert(server);
 		auto lock = server->server->lockClients();
 		for (const auto &[client_id, client]: server->server->getClients())
 			std::static_pointer_cast<RemoteClient>(client)->send(packet);
@@ -203,6 +211,8 @@ namespace Game3 {
 
 	void ServerGame::tileEntityDestroyed(const TileEntity &tile_entity) {
 		const DestroyTileEntityPacket packet(tile_entity);
+		auto server = weakServer.lock();
+		assert(server);
 		auto lock = server->server->lockClients();
 		for (const auto &[client_id, client]: server->server->getClients())
 			std::dynamic_pointer_cast<RemoteClient>(client)->send(packet);

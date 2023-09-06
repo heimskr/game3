@@ -214,7 +214,7 @@ namespace Game3 {
 
 		{
 			std::shared_lock lock(fluidMutex);
-			std::vector<uint32_t> raw_fluids;
+			std::vector<FluidInt> raw_fluids;
 			raw_fluids.reserve(CHUNK_SIZE * CHUNK_SIZE);
 
 			for (const FluidTile &tile: fluidMap.at(chunk_position))
@@ -223,6 +223,47 @@ namespace Game3 {
 			appendSpan(raw, std::span(raw_fluids));
 		}
 
+		return raw;
+	}
+
+	std::string TileProvider::getRawTerrain(ChunkPosition chunk_position) const {
+		std::string raw;
+		raw.reserve(LAYER_COUNT * CHUNK_SIZE * CHUNK_SIZE * sizeof(TileID));
+
+		for (Layer layer: allLayers) {
+			std::shared_lock lock(chunkMutexes[getIndex(layer)]);
+			const TileChunk &chunk = chunkMaps[getIndex(layer)].at(chunk_position);
+			appendSpan(raw, std::span(chunk));
+		}
+
+		return raw;
+	}
+
+	std::string TileProvider::getRawBiomes(ChunkPosition chunk_position) const {
+		std::string raw;
+		raw.reserve(sizeof(BiomeType) * CHUNK_SIZE * CHUNK_SIZE);
+		{
+			std::shared_lock lock(biomeMutex);
+			const BiomeChunk &biome_data = biomeMap.at(chunk_position);
+			auto biome_lock = biome_data.sharedLock();
+			appendSpan(raw, std::span(biome_data));
+		}
+		return raw;
+	}
+
+	std::string TileProvider::getRawFluids(ChunkPosition chunk_position) const {
+		std::vector<FluidInt> raw_fluids;
+		std::string raw;
+		raw_fluids.reserve(CHUNK_SIZE * CHUNK_SIZE);
+		raw.reserve(CHUNK_SIZE * CHUNK_SIZE * sizeof(FluidInt));
+		{
+			std::shared_lock lock(fluidMutex);
+			const FluidChunk &fluid_data = fluidMap.at(chunk_position);
+			auto fluid_lock = fluid_data.sharedLock();
+			for (const FluidTile &tile: fluidMap.at(chunk_position))
+				raw_fluids.emplace_back(tile);
+		}
+		appendSpan(raw, std::span(raw_fluids));
 		return raw;
 	}
 

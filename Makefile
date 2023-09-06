@@ -28,7 +28,7 @@ else
 	LTO        := $(CUSTOM_LTO)
 endif
 
-LDFLAGS += -lleveldb
+LDFLAGS += -lSQLiteCpp
 
 ifeq ($(shell uname -s), Darwin)
 	LDFLAGS += -framework Cocoa -framework OpenGL -framework IOKit

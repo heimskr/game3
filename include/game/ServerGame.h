@@ -20,12 +20,14 @@ namespace Game3 {
 			constexpr static float GARBAGE_COLLECTION_TIME = 60.f;
 
 			Lockable<std::unordered_set<ServerPlayerPtr>> players;
-			std::shared_ptr<LocalServer> server;
+			std::weak_ptr<LocalServer> weakServer;
 			GameDB database{*this};
 			float lastGarbageCollection = 0.f;
 
-			ServerGame(std::shared_ptr<LocalServer> server_):
-				server(std::move(server_)) {}
+			ServerGame(const std::shared_ptr<LocalServer> &server_):
+				weakServer(server_) {}
+
+			~ServerGame() override;
 
 			void addEntityFactories() override;
 			void tick() final;
@@ -43,6 +45,12 @@ namespace Game3 {
 			void remove(const ServerPlayerPtr &);
 			void queueRemoval(const ServerPlayerPtr &);
 			void openDatabase(std::filesystem::path);
+
+			inline auto getServer() const {
+				auto out = weakServer.lock();
+				assert(out);
+				return out;
+			}
 
 			template <typename P>
 			void broadcast(const Place &place, const P &packet) {
