@@ -99,7 +99,6 @@ namespace Game3 {
 				std::span<const char>(reinterpret_cast<const char *>(biomes),  query.getColumn(4).getBytes()),
 				std::span<const char>(reinterpret_cast<const char *>(fluids),  query.getColumn(5).getBytes())
 			};
-			INFO("RealmID: " << realm_id);
 			RealmPtr realm = game.getRealm(realm_id, [&] { return loadRealm(realm_id, false); });
 			realm->tileProvider.absorb(ChunkPosition(x, y), chunk_set);
 		}

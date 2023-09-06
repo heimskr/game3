@@ -24,9 +24,10 @@ namespace Game3 {
 	}
 
 	ServerGame::~ServerGame() {
+		INFO("Saving realms and users...");
 		database.writeAllRealms();
 		database.writeUsers(players);
-		INFO("Saved realms and users.");
+		SUCCESS("Saved realms and users.");
 	}
 
 	void ServerGame::tick() {

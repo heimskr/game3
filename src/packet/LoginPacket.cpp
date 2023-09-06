@@ -19,7 +19,12 @@ namespace Game3 {
 			if (game.database.readUser(username, &display_name, &json)) {
 				auto player = ServerPlayer::fromJSON(game, json);
 				client.setPlayer(player);
-				auto realm = player->getRealm();
+				{
+					auto lock = game.players.uniqueLock();
+					game.players.insert(player);
+				}
+				RealmPtr realm = game.getRealm(player->realmID);
+				player->setRealm(realm);
 				player->weakClient = client.shared_from_this();
 				player->notifyOfRealm(*realm);
 				INFO("Player GID is " << player->globalID);
