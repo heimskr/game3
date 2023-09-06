@@ -307,6 +307,21 @@ namespace Game3 {
 		return buffer += inventory;
 	}
 
+	Buffer & operator>>(Buffer &buffer, ServerInventory &inventory) {
+		const auto type = buffer.popType();
+		if (!buffer.typesMatch(type, buffer.getType(inventory))) {
+			buffer.debug();
+			throw std::invalid_argument("Invalid type (" + hexString(type) + ") in buffer (expected inventory)");
+		}
+		const auto gid = popBuffer<GlobalID>(buffer);
+		if (auto locked = inventory.weakOwner.lock())
+			locked->setGID(gid);
+		inventory.slotCount = popBuffer<Slot>(buffer);
+		inventory.activeSlot = popBuffer<Slot>(buffer);
+		inventory.setStorage(popBuffer<std::decay_t<decltype(inventory.getStorage())>>(buffer));
+		return buffer;
+	}
+
 	void to_json(nlohmann::json &json, const ServerInventory &inventory) {
 		for (const auto &[key, val]: inventory.getStorage())
 			json["storage"][std::to_string(key)] = val;

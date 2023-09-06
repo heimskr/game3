@@ -7,6 +7,7 @@
 #include "threading/Lockable.h"
 
 #include <filesystem>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <span>
@@ -16,9 +17,11 @@
 #include <SQLiteCpp/SQLiteCpp.h>
 
 namespace Game3 {
+	class Entity;
 	class Game;
 	class Player;
 	class Realm;
+	class TileEntity;
 
 	class GameDB {
 		private:
@@ -38,6 +41,8 @@ namespace Game3 {
 			/** Writes both metadata and chunk data for all realms. */
 			void writeAllRealms();
 
+			void writeRealm(const std::shared_ptr<Realm> &);
+
 			void writeChunk(const std::shared_ptr<Realm> &, ChunkPosition);
 
 			void readAllRealms();
@@ -52,6 +57,12 @@ namespace Game3 {
 			bool readUser(std::string_view username, std::string *display_name_out, nlohmann::json *json_out);
 			void writeUser(std::string_view username, const nlohmann::json &);
 			bool hasName(std::string_view username, std::string_view display_name);
+
+			void writeTileEntities(const std::function<bool(std::shared_ptr<TileEntity> &)> &);
+			void writeTileEntities(const std::shared_ptr<Realm> &);
+
+			void writeEntities(const std::function<bool(std::shared_ptr<Entity> &)> &);
+			void writeEntities(const std::shared_ptr<Realm> &);
 
 			inline bool isOpen() {
 				return database != nullptr;

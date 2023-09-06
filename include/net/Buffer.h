@@ -165,8 +165,12 @@ namespace Game3 {
 			std::weak_ptr<BufferContext> context;
 
 			Buffer() = default;
+
 			explicit Buffer(std::weak_ptr<BufferContext> context_):
 				context(std::move(context_)) {}
+
+			explicit Buffer(decltype(bytes) bytes_):
+				bytes(std::move(bytes_)) {}
 
 			template <typename... Args>
 			explicit Buffer(Args &&...args) {

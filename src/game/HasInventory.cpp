@@ -17,24 +17,34 @@ namespace Game3 {
 		buffer << optional;
 	}
 
-	void HasInventory::decode(Buffer &buffer) {
-		Slot slot_count = -1;
-		buffer >> slot_count;
-		std::optional<ClientInventory> optional;
-		if (slot_count == -1) {
-			inventory.reset();
-			inventoryUpdated();
-			buffer >> optional;
-			assert(!optional);
-		} else {
-			buffer >> optional;
-			assert(optional);
-			if (optional) { // This is unnecessary but I want PVS-Studio to be happy.
-				inventory = std::make_shared<ClientInventory>(std::move(*optional));
-				inventory->weakOwner = getSharedAgent();
-				inventory->slotCount = slot_count; // Maybe not necessary? Try an assert before.
-				inventoryUpdated();
+	namespace {
+		template <typename T>
+		void decodeHasInventory(HasInventory &has_inventory, Buffer &buffer) {
+			Slot slot_count = -1;
+			buffer >> slot_count;
+			std::optional<T> optional;
+			if (slot_count == -1) {
+				has_inventory.inventory.reset();
+				has_inventory.inventoryUpdated();
+				buffer >> optional;
+				assert(!optional);
+			} else {
+				buffer >> optional;
+				assert(optional);
+				if (optional) { // This is unnecessary but I want PVS-Studio to be happy.
+					has_inventory.inventory = std::make_shared<T>(std::move(*optional));
+					has_inventory.inventory->weakOwner = has_inventory.getSharedAgent();
+					has_inventory.inventory->slotCount = slot_count; // Maybe not necessary? Try an assert before.
+					has_inventory.inventoryUpdated();
+				}
 			}
 		}
+	}
+
+	void HasInventory::decode(Buffer &buffer) {
+		if (getSharedAgent()->getSide() == Side::Client)
+			decodeHasInventory<ClientInventory>(*this, buffer);
+		else
+			decodeHasInventory<ServerInventory>(*this, buffer);
 	}
 }

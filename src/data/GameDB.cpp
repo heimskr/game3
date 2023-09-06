@@ -1,7 +1,11 @@
 #include "data/GameDB.h"
+#include "entity/EntityFactory.h"
 #include "entity/Player.h"
 #include "game/Game.h"
+#include "net/Buffer.h"
 #include "realm/Realm.h"
+#include "tileentity/TileEntity.h"
+#include "tileentity/TileEntityFactory.h"
 #include "util/Endian.h"
 #include "util/Util.h"
 
@@ -45,6 +49,26 @@ namespace Game3 {
 				displayName VARCHAR(64),
 				json MEDIUMTEXT
 			);
+
+			CREATE TABLE IF NOT EXISTS tileEntities (
+				globalID INT8 PRIMARY KEY,
+				realmID INT,
+				row INT8,
+				column INT8,
+				tileID VARCHAR(255),
+				tileEntityID VARCHAR(255),
+				encoded MEDIUMBLOB
+			);
+
+			CREATE TABLE IF NOT EXISTS entities (
+				globalID INT8 PRIMARY KEY,
+				realmID INT,
+				row INT8,
+				column INT8,
+				entityType VARCHAR(255),
+				direction TINYINT(1),
+				encoded MEDIUMBLOB
+			);
 		)");
 	}
 
@@ -54,11 +78,17 @@ namespace Game3 {
 
 	void GameDB::writeAllRealms() {
 		game.iterateRealms([this](const RealmPtr &realm) {
-			writeRealmMeta(realm);
-			std::shared_lock lock(realm->tileProvider.chunkMutexes[0]);
-			for (const auto &[chunk_position, chunk]: realm->tileProvider.chunkMaps[0])
-				writeChunk(realm, chunk_position);
+			writeRealm(realm);
 		});
+	}
+
+	void GameDB::writeRealm(const RealmPtr &realm) {
+		writeRealmMeta(realm);
+		std::shared_lock lock(realm->tileProvider.chunkMutexes[0]);
+		for (const auto &[chunk_position, chunk]: realm->tileProvider.chunkMaps[0])
+			writeChunk(realm, chunk_position);
+		writeTileEntities(realm);
+		writeEntities(realm);
 	}
 
 	void GameDB::writeChunk(const RealmPtr &realm, ChunkPosition chunk_position) {
@@ -111,14 +141,79 @@ namespace Game3 {
 		if (do_lock)
 			db_lock = database.uniqueLock();
 
-		SQLite::Statement query{*database, "SELECT json FROM realms WHERE realmID = ? LIMIT 1"};
+		std::string raw_json;
 
-		query.bind(1, realm_id);
+		{
+			SQLite::Statement query{*database, "SELECT json FROM realms WHERE realmID = ? LIMIT 1"};
 
-		while (query.executeStep())
-			return Realm::fromJSON(game, nlohmann::json::parse(query.getColumn(0).getString()), false);
+			query.bind(1, realm_id);
 
-		throw std::out_of_range("Couldn't find realm " + std::to_string(realm_id) + " in database");
+			if (!query.executeStep())
+				throw std::out_of_range("Couldn't find realm " + std::to_string(realm_id) + " in database");
+
+			raw_json = query.getColumn(0).getString();
+		}
+
+		RealmPtr realm = Realm::fromJSON(game, nlohmann::json::parse(raw_json), false);
+
+		{
+			SQLite::Statement query{*database, "SELECT tileEntityID, encoded FROM tileEntities WHERE realmID = ?"};
+
+			query.bind(1, realm_id);
+
+			while (query.executeStep()) {
+				const Identifier tile_entity_id{query.getColumn(0).getString()};
+				auto factory = game.registry<TileEntityFactoryRegistry>().at(tile_entity_id);
+				assert(factory);
+				TileEntityPtr tile_entity = (*factory)(game);
+
+				const auto *buffer_bytes = reinterpret_cast<const uint8_t *>(query.getColumn(1).getBlob());
+				const size_t buffer_size = query.getColumn(1).getBytes();
+
+				tile_entity->setRealm(realm);
+
+				Buffer buffer(std::vector<uint8_t>(buffer_bytes, buffer_bytes + buffer_size));
+				buffer.context = game.shared_from_this();
+				tile_entity->decode(game, buffer);
+
+				// TODO: functionize this
+				realm->tileEntities.emplace(tile_entity->position, tile_entity);
+				realm->tileEntitiesByGID[tile_entity->globalID] = tile_entity;
+				realm->attach(tile_entity);
+				tile_entity->onSpawn();
+				if (tile_entity_id == "base:te/ghost"_id)
+					++realm->ghostCount;
+			}
+		}
+
+		{
+			SQLite::Statement query{*database, "SELECT entityType, encoded FROM entities WHERE realmID = ?"};
+
+			query.bind(1, realm_id);
+
+			while (query.executeStep()) {
+				const Identifier entity_id{query.getColumn(0).getString()};
+
+				auto factory = game.registry<EntityFactoryRegistry>().at(entity_id);
+				assert(factory);
+				EntityPtr entity = (*factory)(game);
+
+				const auto *buffer_bytes = reinterpret_cast<const uint8_t *>(query.getColumn(1).getBlob());
+				const size_t buffer_size = query.getColumn(1).getBytes();
+
+				entity->setRealm(realm);
+
+				Buffer buffer(std::vector<uint8_t>(buffer_bytes, buffer_bytes + buffer_size));
+				buffer.context = game.shared_from_this();
+				entity->decode(buffer);
+
+				realm->entities.insert(entity);
+				realm->entitiesByGID[entity->globalID] = entity;
+				realm->attach(entity);
+			}
+		}
+
+		return realm;
 	}
 
 	void GameDB::writeRealmMeta(const std::shared_ptr<Realm> &realm) {
@@ -189,7 +284,7 @@ namespace Game3 {
 		auto db_lock = database.uniqueLock();
 
 		SQLite::Transaction transaction{*database};
-		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO USERS VALUES (?, ?, ?)"};
+		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO users VALUES (?, ?, ?)"};
 
 		statement.bind(1, username.data());
 		statement.bind(2, json.at("displayName").get<std::string>());
@@ -209,6 +304,86 @@ namespace Game3 {
 		query.bind(2, display_name.data());
 
 		return query.executeStep();
+	}
+
+	void GameDB::writeTileEntities(const std::function<bool(std::shared_ptr<TileEntity> &)> &getter) {
+		assert(database);
+		std::shared_ptr<TileEntity> tile_entity;
+		auto db_lock = database.uniqueLock();
+
+		SQLite::Transaction transaction{*database};
+		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO tileEntities VALUES (?, ?, ?, ?, ?, ?, ?)"};
+
+		while (getter(tile_entity)) {
+			statement.bind(1, std::make_signed_t<GlobalID>(tile_entity->getGID()));
+			statement.bind(2, tile_entity->realmID);
+			statement.bind(3, tile_entity->position.row);
+			statement.bind(4, tile_entity->position.column);
+			statement.bind(5, tile_entity->tileID.str());
+			statement.bind(6, tile_entity->tileEntityID.str());
+			Buffer buffer;
+			tile_entity->encode(tile_entity->getGame(), buffer);
+			statement.bind(7, buffer.bytes.data(), buffer.bytes.size());
+			statement.exec();
+			statement.reset();
+		}
+
+		transaction.commit();
+	}
+
+	void GameDB::writeTileEntities(const RealmPtr &realm) {
+		decltype(realm->tileEntities)::Base copy;
+		{
+			auto lock = realm->tileEntities.sharedLock();
+			copy = realm->tileEntities.getBase();
+		}
+		auto iter = copy.begin();
+		writeTileEntities([&](std::shared_ptr<TileEntity> &out) {
+			if (iter == copy.end())
+				return false;
+			out = iter++->second;
+			return true;
+		});
+	}
+
+	void GameDB::writeEntities(const std::function<bool(std::shared_ptr<Entity> &)> &getter) {
+		assert(database);
+		std::shared_ptr<Entity> entity;
+		auto db_lock = database.uniqueLock();
+
+		SQLite::Transaction transaction{*database};
+		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO entities VALUES (?, ?, ?, ?, ?, ?, ?)"};
+
+		while (getter(entity)) {
+			statement.bind(1, std::make_signed_t<GlobalID>(entity->getGID()));
+			statement.bind(2, entity->realmID);
+			statement.bind(3, entity->position.row);
+			statement.bind(4, entity->position.column);
+			statement.bind(5, entity->type.str());
+			statement.bind(6, int(entity->direction.load()));
+			Buffer buffer;
+			entity->encode(buffer);
+			statement.bind(7, buffer.bytes.data(), buffer.bytes.size());
+			statement.exec();
+			statement.reset();
+		}
+
+		transaction.commit();
+	}
+
+	void GameDB::writeEntities(const RealmPtr &realm) {
+		decltype(realm->entities)::Base copy;
+		{
+			auto lock = realm->entities.sharedLock();
+			copy = realm->entities.getBase();
+		}
+		auto iter = copy.begin();
+		writeEntities([&](std::shared_ptr<Entity> &out) {
+			if (iter == copy.end())
+				return false;
+			out = *iter++;
+			return true;
+		});
 	}
 
 	void GameDB::bind(SQLite::Statement &statement, const std::shared_ptr<Player> &player) {

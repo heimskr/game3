@@ -19,8 +19,6 @@ namespace Game3 {
 			void decode(Buffer &);
 
 			virtual void inventoryUpdated() {}
-
-		protected:
 			virtual std::shared_ptr<Agent> getSharedAgent() = 0;
 	};
 }
