@@ -9,7 +9,7 @@
 #include "realm/Realm.h"
 
 namespace Game3 {
-	static std::default_random_engine agent_rng;
+	static std::mt19937_64 agent_rng;
 	static std::mutex agent_rng_mutex;
 	static bool agent_rng_seeded = false;
 
