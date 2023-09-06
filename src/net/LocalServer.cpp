@@ -87,13 +87,6 @@ namespace Game3 {
 		}
 	}
 
-	std::optional<std::string> LocalServer::authenticate(const std::string &username, Token token) const {
-		if (validateUsername(username) && generateToken(username) == token)
-			if (auto iter = userDatabase.find(username); iter != userDatabase.end())
-				return iter->second.displayName;
-		return std::nullopt;
-	}
-
 	std::shared_ptr<ServerPlayer> LocalServer::loadPlayer(std::string_view username, std::string_view display_name) {
 		if (!validateUsername(username))
 			return nullptr;
@@ -138,16 +131,7 @@ namespace Game3 {
 			auto lock = game->players.uniqueLock();
 			game->players.insert(player);
 		}
-		userDatabase.try_emplace(player->username, player->username, player->displayName);
 		return player;
-	}
-
-	bool LocalServer::hasUsername(const std::string &username) const {
-		return userDatabase.contains(username);
-	}
-
-	bool LocalServer::hasDisplayName(const std::string &display_name) const {
-		return displayNames.contains(display_name);
 	}
 
 	Token LocalServer::generateToken(const std::string &username) const {

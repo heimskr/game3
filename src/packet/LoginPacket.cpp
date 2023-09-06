@@ -13,14 +13,17 @@ namespace Game3 {
 	void LoginPacket::handle(ServerGame &game, RemoteClient &client) {
 		if (!client.getPlayer()) {
 			auto server = game.getServer();
-			if (auto display_name = server->authenticate(username, token)) {
-				auto player = server->loadPlayer(username, *display_name);
+			std::string display_name;
+			nlohmann::json json;
+
+			if (game.database.readUser(username, &display_name, &json)) {
+				auto player = ServerPlayer::fromJSON(game, json);
 				client.setPlayer(player);
 				auto realm = player->getRealm();
 				player->weakClient = client.shared_from_this();
 				player->notifyOfRealm(*realm);
 				INFO("Player GID is " << player->globalID);
-				client.send(LoginStatusPacket(true, player->globalID, username, *display_name, player));
+				client.send(LoginStatusPacket(true, player->globalID, username, display_name, player));
 				server->setupPlayer(client);
 				return;
 			}

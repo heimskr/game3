@@ -1,3 +1,4 @@
+#include "Log.h"
 #include "data/ChunkSet.h"
 
 namespace Game3 {
@@ -39,28 +40,28 @@ namespace Game3 {
 			}
 
 			terrain_ = terrain_.subspan(LAYER_BYTE_COUNT);
+		}
 
-			if constexpr (std::endian::native == std::endian::little) {
-				biomes.resize(CHUNK_SIZE * CHUNK_SIZE);
-				std::memcpy(biomes.data(), biomes_.data(), BIOMES_BYTE_COUNT);
-				fluids.reserve(CHUNK_SIZE * CHUNK_SIZE);
-				static_assert(sizeof(FluidInt) == 4);
-				for (size_t i = 0; i < FLUIDS_BYTE_COUNT; i += sizeof(FluidInt)) {
-					FluidInt encoded_fluid{};
-					std::memcpy(&encoded_fluid, &fluids_[i], sizeof(FluidInt));
-					fluids.emplace_back(encoded_fluid);
-				}
-			} else {
-				biomes.reserve(CHUNK_SIZE * CHUNK_SIZE);
-				static_assert(sizeof(BiomeType) == 2);
-				for (size_t i = 0; i < BIOMES_BYTE_COUNT; i += sizeof(BiomeType))
-					biomes.push_back(biomes_[i] | (BiomeType(biomes_[i + 1]) << 8));
-				fluids.resize(CHUNK_SIZE * CHUNK_SIZE);
-				static_assert(sizeof(FluidInt) == 4);
-				for (size_t i = 0; i < FLUIDS_BYTE_COUNT; i += sizeof(FluidInt)) {
-					const FluidInt encoded_fluid = fluids_[i] | (FluidInt(fluids_[i + 1]) << 8) | (FluidInt(fluids_[i + 2]) << 16) | (FluidInt(fluids_[i + 3]) << 24);
-					fluids.emplace_back(encoded_fluid);
-				}
+		if constexpr (std::endian::native == std::endian::little) {
+			biomes.resize(CHUNK_SIZE * CHUNK_SIZE);
+			std::memcpy(biomes.data(), biomes_.data(), BIOMES_BYTE_COUNT);
+			fluids.reserve(CHUNK_SIZE * CHUNK_SIZE);
+			static_assert(sizeof(FluidInt) == 4);
+			for (size_t i = 0; i < FLUIDS_BYTE_COUNT; i += sizeof(FluidInt)) {
+				FluidInt encoded_fluid{};
+				std::memcpy(&encoded_fluid, &fluids_[i], sizeof(FluidInt));
+				fluids.emplace_back(encoded_fluid);
+			}
+		} else {
+			biomes.reserve(CHUNK_SIZE * CHUNK_SIZE);
+			static_assert(sizeof(BiomeType) == 2);
+			for (size_t i = 0; i < BIOMES_BYTE_COUNT; i += sizeof(BiomeType))
+				biomes.push_back(biomes_[i] | (BiomeType(biomes_[i + 1]) << 8));
+			fluids.reserve(CHUNK_SIZE * CHUNK_SIZE);
+			static_assert(sizeof(FluidInt) == 4);
+			for (size_t i = 0; i < FLUIDS_BYTE_COUNT; i += sizeof(FluidInt)) {
+				const FluidInt encoded_fluid = fluids_[i] | (FluidInt(fluids_[i + 1]) << 8) | (FluidInt(fluids_[i + 2]) << 16) | (FluidInt(fluids_[i + 3]) << 24);
+				fluids.emplace_back(encoded_fluid);
 			}
 		}
 	}

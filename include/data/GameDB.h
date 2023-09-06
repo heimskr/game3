@@ -43,7 +43,7 @@ namespace Game3 {
 			void readAllRealms();
 
 			/** Reads metadata from the database and returns an empty realm based on the metadata. */
-			std::shared_ptr<Realm> loadRealm(RealmID);
+			std::shared_ptr<Realm> loadRealm(RealmID, bool do_lock);
 
 			void writeRealmMeta(const std::shared_ptr<Realm> &);
 
@@ -51,6 +51,7 @@ namespace Game3 {
 
 			bool readUser(std::string_view username, std::string *display_name_out, nlohmann::json *json_out);
 			void writeUser(std::string_view username, const nlohmann::json &);
+			bool hasName(std::string_view username, std::string_view display_name);
 
 			inline bool isOpen() {
 				return database != nullptr;

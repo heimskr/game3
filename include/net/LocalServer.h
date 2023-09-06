@@ -40,11 +40,7 @@ namespace Game3 {
 			void send(GenericClient &, std::string_view);
 			/** Writes every player's full data to the database. */
 			void saveUserData();
-			/** Returns the display name if authentication was successful. */
-			std::optional<std::string> authenticate(const std::string &username, Token) const;
 			std::shared_ptr<ServerPlayer> loadPlayer(std::string_view username, std::string_view display_name);
-			bool hasUsername(const std::string &) const;
-			bool hasDisplayName(const std::string &) const;
 			Token generateToken(const std::string &username) const;
 			void setupPlayer(RemoteClient &);
 
@@ -60,8 +56,6 @@ namespace Game3 {
 
 		private:
 			std::string secret;
-			std::map<std::string, UserInfo> userDatabase;
-			std::optional<std::filesystem::path> userDatabasePath;
 			std::set<std::string> displayNames;
 	};
 

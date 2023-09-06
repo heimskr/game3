@@ -12,7 +12,7 @@ namespace Game3 {
 	void RegisterPlayerPacket::handle(ServerGame &game, RemoteClient &client) {
 		auto server = game.getServer();
 
-		if (server->hasUsername(username) || server->hasDisplayName(displayName)) {
+		if (game.database.hasName(username, displayName)) {
 			WARN("Failed to register user " << username);
 			client.send(RegistrationStatusPacket());
 			return;

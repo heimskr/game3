@@ -68,7 +68,7 @@ namespace Game3 {
 		auto db_lock = database.uniqueLock();
 
 		SQLite::Transaction transaction{*database};
-		SQLite::Statement statement{*database, "INSERT INTO chunks VALUES (?, ?, ?, ?, ?, ?)"};
+		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO chunks VALUES (?, ?, ?, ?, ?, ?)"};
 
 		statement.bind(1, realm->id);
 		statement.bind(2, chunk_position.x);
@@ -100,14 +100,17 @@ namespace Game3 {
 				std::span<const char>(reinterpret_cast<const char *>(fluids),  query.getColumn(5).getBytes())
 			};
 			INFO("RealmID: " << realm_id);
-			RealmPtr realm = game.getRealm(realm_id, [&] { return loadRealm(realm_id); });
+			RealmPtr realm = game.getRealm(realm_id, [&] { return loadRealm(realm_id, false); });
 			realm->tileProvider.absorb(ChunkPosition(x, y), chunk_set);
 		}
 	}
 
-	RealmPtr GameDB::loadRealm(RealmID realm_id) {
+	RealmPtr GameDB::loadRealm(RealmID realm_id, bool do_lock) {
 		assert(database);
-		auto db_lock = database.uniqueLock();
+
+		std::unique_lock<std::shared_mutex> db_lock;
+		if (do_lock)
+			db_lock = database.uniqueLock();
 
 		SQLite::Statement query{*database, "SELECT json FROM realms WHERE realmID = ? LIMIT 1"};
 
@@ -128,7 +131,7 @@ namespace Game3 {
 		auto db_lock = database.uniqueLock();
 
 		SQLite::Transaction transaction{*database};
-		SQLite::Statement statement{*database, "INSERT INTO realms VALUES (?, ?)"};
+		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO realms VALUES (?, ?)"};
 
 		statement.bind(1, realm->id);
 		statement.bind(2, json.dump());
@@ -187,7 +190,7 @@ namespace Game3 {
 		auto db_lock = database.uniqueLock();
 
 		SQLite::Transaction transaction{*database};
-		SQLite::Statement statement{*database, "INSERT INTO USERS VALUES (?, ?, ?)"};
+		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO USERS VALUES (?, ?, ?)"};
 
 		statement.bind(1, username.data());
 		statement.bind(2, json.at("displayName").get<std::string>());
@@ -195,6 +198,18 @@ namespace Game3 {
 
 		statement.exec();
 		transaction.commit();
+	}
+
+	bool GameDB::hasName(std::string_view username, std::string_view display_name) {
+		assert(database);
+		auto db_lock = database.uniqueLock();
+
+		SQLite::Statement query{*database, "SELECT NULL FROM users WHERE username = ? OR displayName = ? LIMIT 1"};
+
+		query.bind(1, username.data());
+		query.bind(2, display_name.data());
+
+		return query.executeStep();
 	}
 
 	void GameDB::bind(SQLite::Statement &statement, const std::shared_ptr<Player> &player) {
