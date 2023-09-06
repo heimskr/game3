@@ -17,7 +17,6 @@
 #include "tileentity/Teleporter.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
-#include "ui/tab/MerchantTab.h"
 #include "ui/tab/TextTab.h"
 #include "util/Util.h"
 
@@ -62,16 +61,16 @@ namespace Game3 {
 		if (phase != 10) {
 			player->showText("Sorry, I'm not selling anything right now.", "Blacksmith");
 		} else if (getSide() == Side::Client) {
-			auto &window = getRealm()->getGame().toClient().getWindow();
-			auto &tab    = *window.merchantTab;
-			player->queueForMove([player, &tab](const auto &) {
-				tab.hide();
-				return true;
-			});
-			tab.show();
-			window.delay([this, &tab] {
-				tab.setMerchantInventory("Blacksmith", std::dynamic_pointer_cast<ClientInventory>(inventory), greed);
-			}, 2);
+			// auto &window = getRealm()->getGame().toClient().getWindow();
+			// auto &tab    = *window.merchantTab;
+			// player->queueForMove([player, &tab](const auto &) {
+			// 	tab.hide();
+			// 	return true;
+			// });
+			// tab.show();
+			// window.delay([this, &tab] {
+			// 	tab.setMerchantInventory("Blacksmith", std::dynamic_pointer_cast<ClientInventory>(inventory), greed);
+			// }, 2);
 		}
 
 		return true;

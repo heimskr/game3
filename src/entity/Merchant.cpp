@@ -7,7 +7,6 @@
 #include "realm/Realm.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
-#include "ui/tab/MerchantTab.h"
 
 namespace Game3 {
 	Merchant::Merchant(EntityType type_):
@@ -34,17 +33,18 @@ namespace Game3 {
 	}
 
 	bool Merchant::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
+		(void) player;
 		if (getSide() == Side::Client) {
-			auto &window = getRealm()->getGame().toClient().canvas.window;
-			auto &tab = *window.merchantTab;
-			player->queueForMove([player, &tab](const auto &) {
-				tab.hide();
-				return true;
-			});
-			tab.show();
-			window.delay([this, &tab] {
-				tab.setMerchantInventory("Merchant", std::dynamic_pointer_cast<ClientInventory>(inventory), greed);
-			}, 2);
+			// auto &window = getRealm()->getGame().toClient().canvas.window;
+			// auto &tab = *window.merchantTab;
+			// player->queueForMove([player, &tab](const auto &) {
+			// 	tab.hide();
+			// 	return true;
+			// });
+			// tab.show();
+			// window.delay([this, &tab] {
+			// 	tab.setMerchantInventory("Merchant", std::dynamic_pointer_cast<ClientInventory>(inventory), greed);
+			// }, 2);
 		}
 		return true;
 	}

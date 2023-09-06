@@ -1,13 +1,14 @@
+#include "Log.h"
+#include "net/DisconnectedError.h"
+#include "net/NetError.h"
+#include "net/SSLSock.h"
+
 #include <cassert>
 #include <fcntl.h>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
-
-#include "Log.h"
-#include "net/SSLSock.h"
-#include "net/NetError.h"
 
 namespace Game3 {
 	void SSLSock::connect(bool blocking) {
@@ -17,7 +18,7 @@ namespace Game3 {
 
 	ssize_t SSLSock::send(const void *data, size_t bytes, bool force) {
 		if (!connected)
-			throw std::invalid_argument("Socket not connected");
+			throw DisconnectedError("Socket not connected");
 
 		if (!force && buffering) {
 			addToBuffer(data, bytes);
@@ -47,7 +48,7 @@ namespace Game3 {
 
 	ssize_t SSLSock::recv(void *data, size_t bytes) {
 		if (!connected)
-			throw std::invalid_argument("Socket not connected");
+			throw DisconnectedError("Socket not connected");
 
 		if (!threadID)
 			threadID.emplace(std::this_thread::get_id());

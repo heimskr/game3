@@ -25,8 +25,11 @@ namespace Game3 {
 	}
 
 	void TextTab::reset(const std::shared_ptr<ClientGame> &game) {
-		if (!game)
+		if (!game) {
+			textBuffer->set_text("");
+			setName("Text");
 			return;
+		}
 
 		textBuffer->set_text(text);
 		setName(name);

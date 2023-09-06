@@ -27,7 +27,6 @@ namespace Game3 {
 	class CraftingTab;
 	class HasFluids;
 	class InventoryTab;
-	class MerchantTab;
 	class TextTab;
 	class Tab;
 	struct WorldGenParams;
@@ -40,7 +39,6 @@ namespace Game3 {
 			std::shared_ptr<ClientGame> game;
 			std::shared_ptr<TextTab> textTab;
 			std::shared_ptr<InventoryTab> inventoryTab;
-			std::shared_ptr<MerchantTab> merchantTab;
 			std::shared_ptr<CraftingTab> craftingTab;
 			Gtk::PopoverMenu glMenu;
 
@@ -66,6 +64,8 @@ namespace Game3 {
 
 			void closeDialog();
 			void queueDialog(std::unique_ptr<Gtk::Dialog> &&);
+
+			void closeGame();
 
 			Glib::RefPtr<Gdk::GLContext> glContext();
 

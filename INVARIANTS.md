@@ -7,4 +7,3 @@
 - If a tile entity occupies a tile, the submerged and object layers of that tile must be empty.
 - Plantable tiles should be on the submerged layer.
 - A Realm's generateChunk method must increase the chunk's update counter if it's 0.
-- Encoding to JSON and decoding from JSON is a server-side operation only.

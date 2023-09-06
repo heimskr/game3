@@ -1,7 +1,12 @@
 #pragma once
 
+#include <memory>
+#include <mutex>
+#include <shared_mutex>
+#include <string>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include "Types.h"
 #include "threading/LockableSharedPtr.h"
@@ -65,5 +70,6 @@ namespace Game3 {
 			void rightClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, double x, double y);
 			void updatePlayerClasses(const std::shared_ptr<ClientGame> &);
 			void populate(Gtk::Grid &, std::shared_ptr<ClientInventory>);
+			void clear();
 	};
 }

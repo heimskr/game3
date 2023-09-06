@@ -1,3 +1,9 @@
+#include "Log.h"
+#include "net/DisconnectedError.h"
+#include "net/NetError.h"
+#include "net/ResolutionError.h"
+#include "net/Sock.h"
+
 #include <cstring>
 #include <cerrno>
 #include <fcntl.h>
@@ -7,11 +13,6 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
-
-#include "Log.h"
-#include "net/Sock.h"
-#include "net/NetError.h"
-#include "net/ResolutionError.h"
 
 namespace Game3 {
 	int Sock::sockCount = 0;
@@ -86,7 +87,7 @@ namespace Game3 {
 
 	ssize_t Sock::send(const void *data, size_t bytes, bool force) {
 		if (!connected)
-			throw std::invalid_argument("Socket not connected");
+			throw DisconnectedError("Socket not connected");
 		if (force || !buffering)
 			return ::send(netFD, data, bytes, 0);
 		addToBuffer(data, bytes);
@@ -95,7 +96,7 @@ namespace Game3 {
 
 	ssize_t Sock::recv(void *data, size_t bytes) {
 		if (!connected)
-			throw std::invalid_argument("Socket not connected");
+			throw DisconnectedError("Socket not connected");
 
 		fd_set fds_copy = fds;
 		timeval timeout {.tv_sec = 0, .tv_usec = 100};

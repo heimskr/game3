@@ -122,18 +122,18 @@ namespace Game3 {
 	}
 
 	void InventoryTab::reset(const std::shared_ptr<ClientGame> &game) {
-		if (!game || !game->player)
+		if (!game) {
+			clear();
+			return;
+		}
+
+		if (!game->player)
 			return;
 
 		lastGame = game;
 
 		mainWindow.queue([this, game] {
-			widgetMap.clear();
-
-			removeChildren(grid);
-
-			widgetsBySlot.clear();
-			widgets.clear();
+			clear();
 
 			if (game->player->inventory)
 				populate(grid, std::static_pointer_cast<ClientInventory>(game->player->inventory));
@@ -142,6 +142,13 @@ namespace Game3 {
 			if (currentModule)
 				currentModule->reset();
 		});
+	}
+
+	void InventoryTab::clear() {
+		widgetMap.clear();
+		removeChildren(grid);
+		widgetsBySlot.clear();
+		widgets.clear();
 	}
 
 	void InventoryTab::populate(Gtk::Grid &grid, std::shared_ptr<ClientInventory> inventory) {

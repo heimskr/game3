@@ -139,8 +139,7 @@ namespace Game3 {
 				auto shared_lock = allAgents.sharedLock();
 				if (auto iter = allAgents.find(gid); iter != allAgents.end()) {
 					if (auto agent = iter->second.lock()) {
-						if (auto out = std::dynamic_pointer_cast<T>(agent))
-							return out;
+						return std::dynamic_pointer_cast<T>(agent);
 					} else {
 						// This should *probably* not result in a data race in practice...
 						shared_lock.unlock();

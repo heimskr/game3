@@ -8,8 +8,6 @@
 
 #include "entity/ClientPlayer.h"
 #include "entity/ItemEntity.h"
-#include "entity/Merchant.h"
-#include "entity/Miner.h"
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
 #include "game/HasInventory.h"
@@ -25,7 +23,6 @@
 #include "ui/module/ModuleFactory.h"
 #include "ui/tab/CraftingTab.h"
 #include "ui/tab/InventoryTab.h"
-#include "ui/tab/MerchantTab.h"
 #include "ui/tab/TextTab.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
@@ -279,7 +276,6 @@ namespace Game3 {
 		initTab(inventoryTab, *this).add();
 		initTab(craftingTab, *this).add();
 		initTab(textTab, notebook, "", "");
-		initTab(merchantTab, *this);
 		activeTab = inventoryTab;
 
 		set_child(paned);
@@ -295,6 +291,7 @@ namespace Game3 {
 
 	void MainWindow::connect(const Glib::ustring &hostname, uint16_t port) {
 		glArea.get_context()->make_current();
+		closeGame();
 		game = std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, canvas.get()));
 		game->client = std::make_shared<LocalClient>();
 		game->client->connect(hostname.raw(), port);
@@ -322,8 +319,6 @@ namespace Game3 {
 			if (player != game->player)
 				return;
 			inventoryTab->update(game);
-			if (isFocused(merchantTab))
-				merchantTab->update(game);
 			craftingTab->update(game);
 		});
 
@@ -337,16 +332,11 @@ namespace Game3 {
 							module_->setInventory(client_inventory);
 					}
 				});
-
-				// TODO: fix merchant tab
-				if (client_inventory == merchantTab->getMerchantInventory())
-					merchantTab->update(game);
 			}
 		});
 
 		game->signal_player_money_update().connect([this](const PlayerPtr &) {
 			inventoryTab->update(game);
-			merchantTab->update(game);
 		});
 
 		game->signal_fluid_update().connect([this](const std::shared_ptr<HasFluids> &has_fluids) {
@@ -452,6 +442,18 @@ namespace Game3 {
 			auto lock = dialogQueue.uniqueLock();
 			connectClose(*new_dialog);
 			dialogQueue.push_back(std::move(new_dialog));
+		}
+	}
+
+	void MainWindow::closeGame() {
+		if (game) {
+			if (dialog)
+				dialog->close();
+			removeModule();
+			game->stopThread();
+			game = nullptr;
+			for (const auto &[widget, tab]: tabMap)
+				tab->reset(nullptr);
 		}
 	}
 
