@@ -77,7 +77,7 @@ namespace Game3 {
 				auto db_lock = database.uniqueLock();
 
 				SQLite::Transaction transaction{*database};
-				SQLite::Statement statement{*database, "INSERT INTO USERS VALUES (?, ?, ?)"};
+				SQLite::Statement statement{*database, "INSERT OR REPLACE INTO USERS VALUES (?, ?, ?)"};
 
 				for (const std::shared_ptr<Player> player: container) {
 					bind(statement, player);

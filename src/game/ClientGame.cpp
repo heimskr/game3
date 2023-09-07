@@ -214,11 +214,9 @@ namespace Game3 {
 				try {
 					if (!tick()) {
 						active = false;
-						stoppedByError = true;
 						break;
 					}
 				} catch (const DisconnectedError &) {
-					INFO("DisconnectedError caught!");
 					active = false;
 					stoppedByError = true;
 					break;
@@ -227,9 +225,8 @@ namespace Game3 {
 				std::this_thread::sleep_for(std::chrono::milliseconds(TICK_PERIOD));
 			}
 
-			if (stoppedByError && errorCallback) {
+			if (stoppedByError && errorCallback)
 				errorCallback();
-			}
 		});
 
 		return true;

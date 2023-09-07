@@ -8,10 +8,13 @@ namespace Game3 {
 	ServerPlayer::ServerPlayer(): Player() {}
 
 	ServerPlayer::~ServerPlayer() {
-		nlohmann::json json;
-		toJSON(json);
-		getGame().toServer().database.writeUser(username, json);
-		INFO("Persisted ServerPlayer with username " << username << '.');
+		GameDB &database = getGame().toServer().database;
+		if (database.isOpen()) {
+			nlohmann::json json;
+			toJSON(json);
+			database.writeUser(username, json);
+			INFO("Persisted ServerPlayer with username " << username << '.');
+		}
 	}
 
 	std::shared_ptr<ServerPlayer> ServerPlayer::create(Game &) {
