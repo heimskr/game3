@@ -30,8 +30,9 @@ namespace Game3 {
 		SUCCESS("Saved realms and users.");
 	}
 
-	void ServerGame::tick() {
-		Game::tick();
+	bool ServerGame::tick() {
+		if (!Game::tick())
+			return false;
 
 		std::vector<RemoteClient::BufferGuard> guards;
 		guards.reserve(players.size());
@@ -106,6 +107,8 @@ namespace Game3 {
 			garbageCollect();
 			lastGarbageCollection = 0.f;
 		}
+
+		return true;
 	}
 
 	void ServerGame::garbageCollect() {

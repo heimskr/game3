@@ -7,6 +7,7 @@
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "game/SimulationOptions.h"
+#include "net/DisconnectedError.h"
 #include "net/LocalClient.h"
 #include "packet/CommandPacket.h"
 #include "packet/ChunkRequestPacket.h"
@@ -122,8 +123,9 @@ namespace Game3 {
 			client->send(CommandPacket(threadContext.rng(), command));
 	}
 
-	void ClientGame::tick() {
-		Game::tick();
+	bool ClientGame::tick() {
+		if (!Game::tick())
+			return false;
 
 		client->read();
 
@@ -138,7 +140,7 @@ namespace Game3 {
 		}
 
 		if (!player)
-			return;
+			return true;
 
 		for (const auto &[realm_id, realm]: realms)
 			realm->tick(delta);
@@ -152,6 +154,8 @@ namespace Game3 {
 		} else {
 			WARN("No realm");
 		}
+
+		return true;
 	}
 
 	void ClientGame::queuePacket(std::shared_ptr<Packet> packet) {
@@ -203,17 +207,28 @@ namespace Game3 {
 		if (active.exchange(true))
 			return false;
 
+		stoppedByError = false;
+
 		tickThread = std::thread([this] {
 			while (active) {
-				// try {
-					tick();
-				// } catch (const std::exception &err) {
-				// 	ERROR("Client tick thread failed: " << err.what());
-				// 	active = false;
-				// 	break;
-				// }
+				try {
+					if (!tick()) {
+						active = false;
+						stoppedByError = true;
+						break;
+					}
+				} catch (const DisconnectedError &) {
+					INFO("DisconnectedError caught!");
+					active = false;
+					stoppedByError = true;
+					break;
+				}
 
 				std::this_thread::sleep_for(std::chrono::milliseconds(TICK_PERIOD));
+			}
+
+			if (stoppedByError && errorCallback) {
+				errorCallback();
 			}
 		});
 

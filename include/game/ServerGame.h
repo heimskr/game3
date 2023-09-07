@@ -30,7 +30,7 @@ namespace Game3 {
 			~ServerGame() override;
 
 			void addEntityFactories() override;
-			void tick() final;
+			bool tick() final;
 			void garbageCollect();
 			void broadcastTileUpdate(RealmID, Layer, const Position &, TileID);
 			void broadcastFluidUpdate(RealmID, const Position &, FluidTile);

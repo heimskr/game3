@@ -73,7 +73,8 @@ namespace Game3 {
 				return registries.get<const T>();
 			}
 
-			virtual void tick();
+			/** Returns true if ticking should continue, false if the game needs to stop. */
+			virtual bool tick();
 			void initRegistries();
 			void addItems();
 			void addGhosts();

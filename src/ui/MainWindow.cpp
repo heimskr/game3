@@ -347,6 +347,13 @@ namespace Game3 {
 			}
 		});
 
+		game->errorCallback = [this] {
+			queue([this] {
+				error("Game disconnected.");
+				closeGame();
+			});
+		};
+
 		game->startThread();
 	}
 
@@ -452,6 +459,7 @@ namespace Game3 {
 			removeModule();
 			game->stopThread();
 			game = nullptr;
+			canvas->game = nullptr;
 			for (const auto &[widget, tab]: tabMap)
 				tab->reset(nullptr);
 		}

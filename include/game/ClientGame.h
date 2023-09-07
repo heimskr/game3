@@ -6,6 +6,7 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <functional>
 #include <memory>
 #include <thread>
 
@@ -22,6 +23,8 @@ namespace Game3 {
 			LockableSharedPtr<ClientPlayer> player;
 			LockableSharedPtr<LocalClient> client;
 			LockableSharedPtr<Realm> activeRealm;
+			bool stoppedByError = false;
+			std::function<void()> errorCallback;
 
 			ClientGame(Canvas &canvas_): Game(), canvas(canvas_) {}
 
@@ -35,7 +38,7 @@ namespace Game3 {
 			void setText(const Glib::ustring &text, const Glib::ustring &name = "", bool focus = true, bool ephemeral = false);
 			const Glib::ustring & getText() const;
 			void runCommand(const std::string &);
-			void tick() final;
+			bool tick() final;
 			void queuePacket(std::shared_ptr<Packet>);
 			void chunkReceived(ChunkPosition);
 			void interactOn(Modifiers);
