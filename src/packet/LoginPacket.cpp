@@ -31,6 +31,7 @@ namespace Game3 {
 				INFO("Player GID is " << player->globalID);
 				client.send(LoginStatusPacket(true, player->globalID, username, display_name, player));
 				server->setupPlayer(client);
+				realm->addPlayer(player);
 				return;
 			}
 		}

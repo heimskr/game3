@@ -175,6 +175,7 @@ namespace Game3 {
 				Buffer buffer(std::vector<uint8_t>(buffer_bytes, buffer_bytes + buffer_size));
 				buffer.context = game.shared_from_this();
 				tile_entity->decode(game, buffer);
+				tile_entity->init(game);
 
 				// TODO: functionize this
 				realm->tileEntities.emplace(tile_entity->position, tile_entity);
@@ -206,6 +207,7 @@ namespace Game3 {
 				Buffer buffer(std::vector<uint8_t>(buffer_bytes, buffer_bytes + buffer_size));
 				buffer.context = game.shared_from_this();
 				entity->decode(buffer);
+				entity->init(game);
 
 				realm->entities.insert(entity);
 				realm->entitiesByGID[entity->globalID] = entity;

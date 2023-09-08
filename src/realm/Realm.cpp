@@ -389,7 +389,7 @@ namespace Game3 {
 			}
 
 			{
-				std::shared_lock visible_lock(visibleChunksMutex);
+				auto visible_lock = visibleChunks.sharedLock();
 				for (const auto &chunk: visibleChunks) {
 					{
 						auto by_chunk_lock = entitiesByChunk.sharedLock();
@@ -1098,7 +1098,7 @@ namespace Game3 {
 		auto players_lock = players.uniqueLock();
 		players.erase(player);
 		if (players.empty()) {
-			std::unique_lock visible_lock(visibleChunksMutex);
+			auto lock = visibleChunks.uniqueLock();
 			visibleChunks.clear();
 		} else
 			recalculateVisibleChunks();
@@ -1243,15 +1243,15 @@ namespace Game3 {
 	}
 
 	void Realm::recalculateVisibleChunks() {
-		std::unique_lock lock(visibleChunksMutex);
-		visibleChunks.clear();
+		decltype(visibleChunks)::Base new_visible_chunks;
 		for (const auto &weak_player: players) {
 			if (auto player = weak_player.lock()) {
-				ChunkRange(player->getChunk()).iterate([this](ChunkPosition chunk_position) {
-					visibleChunks.insert(chunk_position);
+				ChunkRange(player->getChunk()).iterate([&](ChunkPosition chunk_position) {
+					new_visible_chunks.insert(chunk_position);
 				});
 			}
 		}
+		visibleChunks = std::move(new_visible_chunks);
 	}
 
 	void Realm::queueReupload() {

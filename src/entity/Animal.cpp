@@ -54,7 +54,7 @@ namespace Game3 {
 	void Animal::toJSON(nlohmann::json &json) const {
 		Entity::toJSON(json);
 
-		if (timeUntilWander != 0.f)
+		if (0.f < timeUntilWander)
 			json["timeUntilWander"] = timeUntilWander.load();
 	}
 
