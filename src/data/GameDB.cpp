@@ -131,6 +131,7 @@ namespace Game3 {
 			};
 			RealmPtr realm = game.getRealm(realm_id, [&] { return loadRealm(realm_id, false); });
 			realm->tileProvider.absorb(ChunkPosition(x, y), chunk_set);
+			realm->remakePathMap(ChunkPosition(x, y));
 		}
 	}
 
