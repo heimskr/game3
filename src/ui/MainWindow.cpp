@@ -66,9 +66,10 @@ namespace Game3 {
 
 	MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &builder_):
 	Gtk::ApplicationWindow(cobject), builder(builder_) {
-
 		header = builder->get_widget<Gtk::HeaderBar>("headerbar");
 		set_titlebar(*header);
+
+		set_icon_name("game3");
 
 		cssProvider = Gtk::CssProvider::create();
 		cssProvider->load_from_resource("/game3/style.css");
