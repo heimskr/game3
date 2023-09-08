@@ -40,6 +40,7 @@ namespace Game3 {
 			tileEntity = (*factory)(game);
 			tileEntity->globalID = globalID;
 			tileEntity->tileEntityID = identifier;
+			tileEntity->setRealm(realm);
 			tileEntity->decode(game, buffer);
 
 			if (weak_agent) {
