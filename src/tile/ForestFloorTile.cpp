@@ -26,6 +26,9 @@ namespace Game3 {
 					return;
 		}
 
+		if (!place.isPathable())
+			return;
+
 		std::vector<ItemStack> mushrooms {
 			{game, "base:item/saffron_milkcap"},
 			{game, "base:item/saffron_milkcap"},
