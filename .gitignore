@@ -25,3 +25,4 @@
 /pvs.tasks
 /*.png
 *.db
+*.db-journal

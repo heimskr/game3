@@ -358,6 +358,8 @@ namespace Game3 {
 		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO entities VALUES (?, ?, ?, ?, ?, ?, ?)"};
 
 		while (getter(entity)) {
+			if (entity->isPlayer())
+				continue;
 			statement.bind(1, std::make_signed_t<GlobalID>(entity->getGID()));
 			statement.bind(2, entity->realmID);
 			statement.bind(3, entity->position.row);
