@@ -63,6 +63,7 @@ namespace Game3 {
 
 			void writeEntities(const std::function<bool(std::shared_ptr<Entity> &)> &);
 			void writeEntities(const std::shared_ptr<Realm> &);
+			void deleteEntity(const std::shared_ptr<Entity> &);
 
 			inline bool isOpen() {
 				return database != nullptr;

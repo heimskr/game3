@@ -77,7 +77,7 @@ namespace Game3 {
 			Atomic<bool> spawning = false;
 			/** Whether the entity is currently teleporting to its first position on realm change. */
 			Atomic<bool> firstTeleport = false;
-			std::atomic<RealmID> inLimboFor{-1};
+			Atomic<RealmID> inLimboFor{-1};
 
 			virtual void destroy();
 
@@ -201,7 +201,7 @@ namespace Game3 {
 				inline explicit operator bool() const { return texture != nullptr; }
 			};
 
-			std::atomic<GlobalID> otherEntityToLock = -1;
+			Atomic<GlobalID> otherEntityToLock = -1;
 
 			Held heldLeft  {true};
 			Held heldRight {false};

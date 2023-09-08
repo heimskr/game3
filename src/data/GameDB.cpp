@@ -219,7 +219,7 @@ namespace Game3 {
 		return realm;
 	}
 
-	void GameDB::writeRealmMeta(const std::shared_ptr<Realm> &realm) {
+	void GameDB::writeRealmMeta(const RealmPtr &realm) {
 		assert(database);
 
 		nlohmann::json json;
@@ -309,9 +309,9 @@ namespace Game3 {
 		return query.executeStep();
 	}
 
-	void GameDB::writeTileEntities(const std::function<bool(std::shared_ptr<TileEntity> &)> &getter) {
+	void GameDB::writeTileEntities(const std::function<bool(TileEntityPtr &)> &getter) {
 		assert(database);
-		std::shared_ptr<TileEntity> tile_entity;
+		TileEntityPtr tile_entity;
 		auto db_lock = database.uniqueLock();
 
 		SQLite::Transaction transaction{*database};
@@ -341,7 +341,7 @@ namespace Game3 {
 			copy = realm->tileEntities.getBase();
 		}
 		auto iter = copy.begin();
-		writeTileEntities([&](std::shared_ptr<TileEntity> &out) {
+		writeTileEntities([&](TileEntityPtr &out) {
 			if (iter == copy.end())
 				return false;
 			out = iter++->second;
@@ -349,9 +349,9 @@ namespace Game3 {
 		});
 	}
 
-	void GameDB::writeEntities(const std::function<bool(std::shared_ptr<Entity> &)> &getter) {
+	void GameDB::writeEntities(const std::function<bool(EntityPtr &)> &getter) {
 		assert(database);
-		std::shared_ptr<Entity> entity;
+		EntityPtr entity;
 		auto db_lock = database.uniqueLock();
 
 		SQLite::Transaction transaction{*database};
@@ -383,7 +383,7 @@ namespace Game3 {
 			copy = realm->entities.getBase();
 		}
 		auto iter = copy.begin();
-		writeEntities([&](std::shared_ptr<Entity> &out) {
+		writeEntities([&](EntityPtr &out) {
 			if (iter == copy.end())
 				return false;
 			out = *iter++;
@@ -391,7 +391,17 @@ namespace Game3 {
 		});
 	}
 
-	void GameDB::bind(SQLite::Statement &statement, const std::shared_ptr<Player> &player) {
+	void GameDB::deleteEntity(const EntityPtr &entity) {
+		assert(database);
+		auto db_lock = database.uniqueLock();
+		SQLite::Transaction transaction{*database};
+		SQLite::Statement statement{*database, "DELETE FROM entities WHERE globalID = ?"};
+		statement.bind(1, std::make_signed_t<GlobalID>(entity->getGID()));
+		statement.exec();
+		transaction.commit();
+	}
+
+	void GameDB::bind(SQLite::Statement &statement, const PlayerPtr &player) {
 		statement.bind(1, player->username);
 		statement.bind(2, player->displayName);
 		statement.bind(3, nlohmann::json(*player).dump());

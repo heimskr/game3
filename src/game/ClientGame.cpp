@@ -4,6 +4,7 @@
 #include "command/local/LocalCommandFactory.h"
 #include "entity/ClientPlayer.h"
 #include "entity/EntityFactory.h"
+#include "error/Warning.h"
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "game/SimulationOptions.h"
@@ -132,6 +133,8 @@ namespace Game3 {
 		for (const auto &packet: packetQueue.steal()) {
 			try {
 				packet->handle(*this);
+			} catch (const Warning &warning) {
+				canvas.window.error(warning.what());
 			} catch (const std::exception &err) {
 				auto &packet_ref = *packet;
 				ERROR("Couldn't handle packet of type " << typeid(packet_ref).name() << " (" << packet->getID() << "): " << err.what());

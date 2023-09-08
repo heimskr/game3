@@ -259,10 +259,12 @@ namespace Game3::WorldGen {
 			provider.updateChunk(chunk_position);
 		});
 
-		if (initial_generation) {
+		if (initial_generation)
 			std::dynamic_pointer_cast<Overworld>(realm)->worldgenParams = params;
+
+		{
 			Timer pathmap_timer("RemakePathmap");
-			realm->remakePathMap();
+			realm->remakePathMap(range);
 		}
 
 		overworld_timer.stop();

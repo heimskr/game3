@@ -359,6 +359,23 @@ namespace Game3 {
 				INFO("Player " << player->getGID() << " position: " << player->getPosition());
 				INFO("Player " << player->getGID() << " chunk position: " << player->getChunk());
 				return {true, "Position = " + std::string(player->getPosition()) + ", chunk position = " + std::string(player->getChunk())};
+			} else if (first == "pm") {
+				if (1 < words.size())
+					player->getRealm()->remakePathMap(player->getChunk());
+
+				TileProvider &provider = player->getRealm()->tileProvider;
+				auto &path_chunk = provider.getPathChunk(player->getChunk());
+				auto lock = path_chunk.sharedLock();
+				size_t walkables = 0;
+				for (size_t y = 0; y < CHUNK_SIZE; ++y) {
+					for (size_t x = 0; x < CHUNK_SIZE; ++x) {
+						const auto walkable = path_chunk[y * CHUNK_SIZE + x];
+						std::cerr << int(walkable);
+						walkables += walkable;
+					}
+					std::cerr << '\n';
+				}
+				return {true, "Walkable: " + std::to_string(walkables) + " / " + std::to_string(CHUNK_SIZE * CHUNK_SIZE)};
 			}
 		} catch (const std::exception &err) {
 			return {false, err.what()};

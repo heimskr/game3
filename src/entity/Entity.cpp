@@ -62,7 +62,9 @@ namespace Game3 {
 				}
 			}
 
-			getGame().toServer().entityDestroyed(*this);
+			ServerGame &game = getGame().toServer();
+			game.database.deleteEntity(shared);
+			game.entityDestroyed(*this);
 		}
 	}
 

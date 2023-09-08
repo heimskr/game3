@@ -91,7 +91,7 @@ namespace Game3 {
 			return true;
 
 		INFO("ItemEntity stack: " << stack);
-		return true;
+		// return true;
 
 		auto leftover = player->inventory->add(stack);
 		if (leftover) {
