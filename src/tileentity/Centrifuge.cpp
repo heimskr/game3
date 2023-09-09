@@ -26,7 +26,7 @@ namespace Game3 {
 
 	void Centrifuge::init(Game &game) {
 		TileEntity::init(game);
-		inventory = std::make_shared<ServerInventory>(shared_from_this(), 10);
+		inventory = Inventory::create(shared_from_this(), 10);
 	}
 
 	void Centrifuge::tick(Game &game, float delta) {

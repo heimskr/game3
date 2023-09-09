@@ -56,7 +56,7 @@ namespace Game3 {
 
 	void ChemicalReactor::init(Game &game) {
 		TileEntity::init(game);
-		inventory = std::make_shared<ServerInventory>(shared_from_this(), INPUT_CAPACITY + OUTPUT_CAPACITY);
+		inventory = Inventory::create(shared_from_this(), INPUT_CAPACITY + OUTPUT_CAPACITY);
 	}
 
 	void ChemicalReactor::tick(Game &game, float delta) {

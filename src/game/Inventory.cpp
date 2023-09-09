@@ -111,4 +111,8 @@ namespace Game3 {
 			return std::make_shared<ClientInventory>(owner, slot_count, active_slot, std::move(storage));
 		throw std::invalid_argument("Can't create inventory for side " + std::to_string(static_cast<int>(side)));
 	}
+
+	std::shared_ptr<Inventory> Inventory::create(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, std::map<Slot, ItemStack> storage) {
+		return create(owner->getSide(), owner, slot_count, active_slot, std::move(storage));
+	}
 }

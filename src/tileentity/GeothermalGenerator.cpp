@@ -75,7 +75,7 @@ namespace Game3 {
 
 	void GeothermalGenerator::init(Game &game) {
 		TileEntity::init(game);
-		inventory = std::make_shared<ServerInventory>(shared_from_this(), 2);
+		inventory = Inventory::create(shared_from_this(), 2);
 	}
 
 	void GeothermalGenerator::tick(Game &game, float delta) {

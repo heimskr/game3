@@ -159,6 +159,7 @@ namespace Game3 {
 			virtual ItemCount craftable(const CraftingRecipe &) const;
 
 			static std::shared_ptr<Inventory> create(Side side, std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot = 0, std::map<Slot, ItemStack> storage = {});
+			static std::shared_ptr<Inventory> create(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot = 0, std::map<Slot, ItemStack> storage = {});
 
 		protected:
 			/** Removes every slot whose item count is zero from the storage map. */

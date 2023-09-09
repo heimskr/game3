@@ -35,6 +35,7 @@ namespace Game3 {
 
 	void Chest::absorbJSON(Game &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
+		assert(getSide() == Side::Server);
 		if (json.contains("inventory"))
 			inventory = std::make_shared<ServerInventory>(ServerInventory::fromJSON(game, json.at("inventory"), shared_from_this()));
 		name = json.at("name");
