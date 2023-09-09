@@ -96,9 +96,9 @@ namespace Game3 {
 	}
 
 	void InventoriedTileEntity::setInventory(Slot slot_count) {
-		if (auto realm = weakRealm.lock())
-			assert(realm->getSide() == Side::Server);
-		inventory = Inventory::create(shared_from_this(), slot_count);
+		auto realm = weakRealm.lock();
+		assert(realm);
+		inventory = Inventory::create(realm->getSide(), shared_from_this(), slot_count);
 		inventoryUpdated();
 	}
 

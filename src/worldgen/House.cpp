@@ -71,14 +71,14 @@ namespace Game3::WorldGen {
 
 			case 1: {
 				auto chest = TileEntity::create<Chest>(game, Position(1, width / 2));
+				assert(realm->add(chest));
 				chest->setInventory(10);
-				realm->add(chest);
 				auto chest2 = TileEntity::create<Chest>(game, Position(4, width / 2));
+				assert(realm->add(chest2));
 				chest2->setInventory(10);
-				realm->add(chest2);
 				auto chest3 = TileEntity::create<Chest>(game, Position(4, width / 2 - 2));
+				assert(realm->add(chest3));
 				chest3->setInventory(10);
-				realm->add(chest3);
 				break;
 			}
 
