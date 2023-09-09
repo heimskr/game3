@@ -28,9 +28,9 @@ namespace Game3 {
 
 		popoverMenu.set_parent(vbox);
 
-		auto source = Gtk::DragSource::create();
+		source = Gtk::DragSource::create();
 		source->set_actions(Gdk::DragAction::MOVE);
-		source->signal_prepare().connect([this, source](double x, double y) -> Glib::RefPtr<Gdk::ContentProvider> { // Does capturing `source` cause a memory leak?
+		source->signal_prepare().connect([this](double x, double y) -> Glib::RefPtr<Gdk::ContentProvider> {
 			auto *item = grid.pick(x, y);
 
 			if (dynamic_cast<Gtk::Fixed *>(item->get_parent()))

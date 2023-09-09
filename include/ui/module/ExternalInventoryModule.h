@@ -32,6 +32,7 @@ namespace Game3 {
 		private:
 			std::shared_ptr<ClientGame> game;
 			Glib::RefPtr<Gio::Menu> gmenu;
+			Glib::RefPtr<Gtk::DragSource> source;
 			Glib::ustring name;
 			std::unordered_map<Gtk::Widget *, Slot> widgetMap;
 			std::unordered_map<Slot, Gtk::Widget *> widgetsBySlot;

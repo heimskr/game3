@@ -24,6 +24,7 @@ namespace Game3 {
 		public:
 			std::shared_ptr<Server> server;
 			std::shared_ptr<ServerGame> game;
+			std::function<void()> onStop;
 
 			LocalServer() = delete;
 			LocalServer(const LocalServer &) = delete;

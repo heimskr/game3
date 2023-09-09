@@ -66,6 +66,8 @@ namespace Game3 {
 
 	void LocalServer::stop() {
 		server->stop();
+		if (onStop)
+			onStop();
 	}
 
 	void LocalServer::send(GenericClient &client, std::string_view string) {
@@ -199,6 +201,11 @@ namespace Game3 {
 
 		auto game_server = std::make_shared<LocalServer>(global_server, secret);
 		auto game = std::dynamic_pointer_cast<ServerGame>(Game::create(Side::Server, game_server));
+
+		game_server->onStop = [] {
+			running = false;
+			stopCV.notify_all();
+		};
 
 		constexpr const char *world_path = "world.db";
 

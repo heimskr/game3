@@ -376,6 +376,12 @@ namespace Game3 {
 					std::cerr << '\n';
 				}
 				return {true, "Walkable: " + std::to_string(walkables) + " / " + std::to_string(CHUNK_SIZE * CHUNK_SIZE)};
+			} else if (first == "stop") {
+				auto server = weakServer.lock();
+				if (!server)
+					return {false, "Couldn't lock server."};
+				server->stop();
+				return {true, "Stopped server."};
 			}
 		} catch (const std::exception &err) {
 			return {false, err.what()};
