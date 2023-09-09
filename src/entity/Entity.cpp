@@ -75,7 +75,7 @@ namespace Game3 {
 		json["realmID"]   = realmID;
 		json["direction"] = direction;
 		json["health"]    = health;
-		if (inventory) {
+		if (const InventoryPtr inventory = getInventory()) {
 			// TODO: move JSONification to StorageInventory
 			if (getSide() == Side::Client)
 				json["inventory"] = static_cast<ClientInventory &>(*inventory);
@@ -114,7 +114,7 @@ namespace Game3 {
 		if (auto iter = json.find("health"); iter != json.end())
 			health = *iter;
 		if (auto iter = json.find("inventory"); iter != json.end())
-			inventory = std::make_shared<ServerInventory>(ServerInventory::fromJSON(game, *iter, shared_from_this()));
+			setInventory(std::make_shared<ServerInventory>(ServerInventory::fromJSON(game, *iter, shared_from_this())));
 		if (auto iter = json.find("path"); iter != json.end()) {
 			auto lock = path.uniqueLock();
 			path = iter->get<std::list<Direction>>();
@@ -195,8 +195,10 @@ namespace Game3 {
 		if (texture == nullptr && getSide() == Side::Client)
 			texture = getTexture();
 
+		const InventoryPtr inventory = getInventory();
+
 		if (!inventory)
-			inventory = Inventory::create(getSide(), shared, DEFAULT_INVENTORY_SIZE);
+			setInventory(Inventory::create(getSide(), shared, DEFAULT_INVENTORY_SIZE));
 		else
 			inventory->weakOwner = shared;
 
@@ -887,8 +889,11 @@ namespace Game3 {
 			return;
 		}
 
+		const InventoryPtr inventory = getInventory();
+
 		if (!inventory->contains(new_value))
 			throw std::invalid_argument("Can't equip slot " + std::to_string(new_value) + ": no item in inventory");
+
 		held.slot = new_value;
 		auto item_texture = getGame().registry<ItemTextureRegistry>().at((*inventory)[held.slot]->item->identifier);
 		held.texture = item_texture->getTexture(getGame());

@@ -84,9 +84,9 @@ namespace Game3 {
 	}
 
 	bool Ghost::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
-		auto &inventory = *player->inventory;
+		const InventoryPtr inventory = player->getInventory();
 		auto realm = getRealm();
-		if (auto leftover = inventory.add(material))
+		if (auto leftover = inventory->add(material))
 			leftover->spawn(realm, position);
 		realm->remove(getSelf());
 		return true;

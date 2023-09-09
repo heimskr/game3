@@ -20,14 +20,15 @@ namespace Game3 {
 				const Position  &position = place.position;
 
 				auto existing = std::dynamic_pointer_cast<T>(realm.tileEntityAt(position));
+				const InventoryPtr inventory = player->getInventory();
 
 				if (modifiers.onlyShift()) {
 					if (!existing)
 						return false;
 
 					realm.queueDestruction(existing);
-					player->inventory->add(stack.withCount(1));
-					player->inventory->notifyOwner();
+					inventory->add(stack.withCount(1));
+					inventory->notifyOwner();
 					return true;
 				}
 
@@ -39,8 +40,8 @@ namespace Game3 {
 				if (realm.add(tile_entity) != nullptr) {
 					game.toServer().tileEntitySpawned(tile_entity);
 					if (--stack.count == 0)
-						player->inventory->erase(slot);
-					player->inventory->notifyOwner();
+						inventory->erase(slot);
+					inventory->notifyOwner();
 					return true;
 				}
 

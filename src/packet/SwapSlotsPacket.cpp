@@ -28,7 +28,7 @@ namespace Game3 {
 		}
 
 		if (firstGID == secondGID) {
-			first_has_inventory->inventory->swap(firstSlot, secondSlot);
+			first_has_inventory->getInventory()->swap(firstSlot, secondSlot);
 		} else {
 			AgentPtr second_agent = game.getAgent(secondGID);
 			if (!second_agent) {
@@ -42,8 +42,8 @@ namespace Game3 {
 				return;
 			}
 
-			Inventory &first_inventory  = *first_has_inventory->inventory;
-			Inventory &second_inventory = *second_has_inventory->inventory;
+			Inventory &first_inventory  = *first_has_inventory->getInventory();
+			Inventory &second_inventory = *second_has_inventory->getInventory();
 
 			{
 				auto first_lock  = first_inventory.uniqueLock();

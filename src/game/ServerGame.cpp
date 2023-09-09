@@ -62,7 +62,7 @@ namespace Game3 {
 				player->send(*time_packet);
 
 			if (player->inventoryUpdated) {
-				player->send(InventoryPacket(player->inventory));
+				player->send(InventoryPacket(player->getInventory()));
 				player->inventoryUpdated = false;
 			}
 		}

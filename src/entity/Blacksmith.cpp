@@ -153,6 +153,7 @@ namespace Game3 {
 	}
 
 	void Blacksmith::wakeUp() {
+		const InventoryPtr inventory = getInventory();
 		const ItemCount iron_bars = inventory->count(Identifier("base", "item/iron_bar"));
 		const ItemCount gold_bars = inventory->count(Identifier("base", "item/gold_bar"));
 		const ItemCount diamonds  = inventory->count(Identifier("base", "item/diamond"));
@@ -207,7 +208,7 @@ namespace Game3 {
 				--stack.count;
 			if (stack.count == 0)
 				continue;
-			auto leftover = inventory->add(stack);
+			auto leftover = getInventory()->add(stack);
 			if (leftover) {
 				stack.count -= leftover->count;
 				if (new_money < totalBuyPrice(keep_realm, stack))

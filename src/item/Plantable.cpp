@@ -23,9 +23,10 @@ namespace Game3 {
 			if (!validGround || tileset.isInCategory(tileset[realm.getTile(Layer::Terrain, position)], validGround)) {
 				realm.setTile(Layer::Submerged, position, tilename);
 				realm.reupload(Layer::Submerged);
+				const InventoryPtr inventory = place.player->getInventory();
 				if (--stack.count == 0)
-					place.player->inventory->erase(slot);
-				place.player->inventory->notifyOwner();
+					inventory->erase(slot);
+				inventory->notifyOwner();
 				return true;
 			}
 		}

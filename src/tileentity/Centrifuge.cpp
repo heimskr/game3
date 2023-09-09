@@ -26,7 +26,7 @@ namespace Game3 {
 
 	void Centrifuge::init(Game &game) {
 		TileEntity::init(game);
-		inventory = Inventory::create(shared_from_this(), 10);
+		HasInventory::setInventory(Inventory::create(shared_from_this(), 10));
 	}
 
 	void Centrifuge::tick(Game &game, float delta) {
@@ -52,6 +52,7 @@ namespace Game3 {
 		auto &registry = game.registry<CentrifugeRecipeRegistry>();
 
 		std::optional<ItemStack> leftovers;
+		const InventoryPtr inventory = getInventory();
 		auto inventory_lock = inventory->uniqueLock();
 		for (const std::shared_ptr<CentrifugeRecipe> &recipe: registry.items)
 			if (recipe->craft(game, fluidContainer, inventory, leftovers))

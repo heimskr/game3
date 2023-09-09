@@ -5,6 +5,10 @@
 #include "net/Buffer.h"
 
 namespace Game3 {
+	void HasInventory::setInventory(std::shared_ptr<Inventory> new_inventory) {
+		inventory = std::move(new_inventory);
+	}
+
 	void HasInventory::encode(Buffer &buffer) {
 		std::optional<std::shared_ptr<ServerInventory>> optional;
 		if (inventory) {
@@ -24,7 +28,7 @@ namespace Game3 {
 			buffer >> slot_count;
 			std::optional<T> optional;
 			if (slot_count == -1) {
-				has_inventory.inventory.reset();
+				has_inventory.setInventory(nullptr);
 				has_inventory.inventoryUpdated();
 				buffer >> optional;
 				assert(!optional);
@@ -32,9 +36,10 @@ namespace Game3 {
 				buffer >> optional;
 				assert(optional);
 				if (optional) { // This is unnecessary but I want PVS-Studio to be happy.
-					has_inventory.inventory = std::make_shared<T>(std::move(*optional));
-					has_inventory.inventory->weakOwner = has_inventory.getSharedAgent();
-					has_inventory.inventory->slotCount = slot_count; // Maybe not necessary? Try an assert before.
+					const auto inventory = std::make_shared<T>(std::move(*optional));
+					inventory->weakOwner = has_inventory.getSharedAgent();
+					inventory->slotCount = slot_count; // Maybe not necessary? Try an assert before.
+					has_inventory.setInventory(inventory);
 					has_inventory.inventoryUpdated();
 				}
 			}

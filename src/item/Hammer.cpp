@@ -22,16 +22,16 @@ namespace Game3 {
 					game.removeRealm(realm_id);
 				realm.remove(building);
 				if (stack.reduceDurability())
-					place.player->inventory->erase(slot);
+					place.player->getInventory()->erase(slot);
 				return true;
 			}
 
 			throw std::runtime_error("Cave entrance leads to realm " + std::to_string(realm_id) + ", which isn't a cave");
 		}
 
-		auto &player = *place.player;
-		auto &inventory = *player.inventory;
-		auto &tileset = place.realm->getTileset();
+		Player &player = *place.player;
+		Inventory &inventory = *player.getInventory();
+		Tileset &tileset = place.realm->getTileset();
 
 		for (auto iter = mainLayers.rbegin(); iter != mainLayers.rend(); ++iter) {
 			const auto tile = place.getName(*iter);

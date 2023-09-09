@@ -93,7 +93,7 @@ namespace Game3 {
 		INFO("ItemEntity stack: " << stack);
 		// return true;
 
-		auto leftover = player->inventory->add(stack);
+		auto leftover = player->getInventory()->add(stack);
 		if (leftover) {
 			stack = std::move(*leftover);
 			increaseUpdateCounter();

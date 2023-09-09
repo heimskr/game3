@@ -7,13 +7,13 @@
 
 namespace Game3 {
 	void SetHeldItemPacket::handle(ServerGame &, RemoteClient &client) {
-		auto player = client.getPlayer();
+		const ServerPlayerPtr player = client.getPlayer();
 		if (!player) {
 			client.send(ErrorPacket("Can't set held item: no player"));
 			return;
 		}
 
-		auto inventory = player->inventory;
+		const InventoryPtr inventory = player->getInventory();
 		if (!inventory) {
 			client.send(ErrorPacket("Can't set held item: no inventory"));
 			return;

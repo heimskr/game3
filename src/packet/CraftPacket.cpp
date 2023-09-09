@@ -19,7 +19,7 @@ namespace Game3 {
 		if (!recipe)
 			return;
 
-		InventoryPtr inventory = player->inventory;
+		const InventoryPtr inventory = player->getInventory();
 		RealmPtr realm = player->getRealm();
 		std::optional<std::vector<ItemStack>> leftovers;
 

@@ -70,6 +70,7 @@ namespace Game3 {
 		set_titlebar(*header);
 
 		set_icon_name("game3");
+		set_title("Game3");
 
 		cssProvider = Gtk::CssProvider::create();
 		cssProvider->load_from_resource("/game3/style.css");
@@ -198,13 +199,13 @@ namespace Game3 {
 		backward->set_button(8);
 		forward->signal_pressed().connect([this](int, double, double) {
 			if (game && game->player) {
-				game->player->inventory->nextSlot();
+				game->player->getInventory()->nextSlot();
 				inventoryTab->update(game);
 			}
 		});
 		backward->signal_pressed().connect([this](int, double, double) {
 			if (game && game->player) {
-				game->player->inventory->prevSlot();
+				game->player->getInventory()->prevSlot();
 				inventoryTab->update(game);
 			}
 		});
@@ -324,8 +325,8 @@ namespace Game3 {
 		});
 
 		game->signal_other_inventory_update().connect([this](const std::shared_ptr<Agent> &owner) {
-			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner); has_inventory && has_inventory->inventory) {
-				auto client_inventory = std::dynamic_pointer_cast<ClientInventory>(has_inventory->inventory);
+			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner); has_inventory && has_inventory->getInventory()) {
+				auto client_inventory = std::dynamic_pointer_cast<ClientInventory>(has_inventory->getInventory());
 				queue([this, owner, client_inventory] {
 					if (owner->getGID() == getExternalGID()) {
 						std::unique_lock<std::shared_mutex> lock;
@@ -722,7 +723,7 @@ namespace Game3 {
 				case GDK_KEY_0: case GDK_KEY_1: case GDK_KEY_2: case GDK_KEY_3: case GDK_KEY_4:
 				case GDK_KEY_5: case GDK_KEY_6: case GDK_KEY_7: case GDK_KEY_8: case GDK_KEY_9:
 					if (game && game->player)
-						game->player->inventory->setActive(keyval == GDK_KEY_0? 9 : keyval - 0x31);
+						game->player->getInventory()->setActive(keyval == GDK_KEY_0? 9 : keyval - 0x31);
 					return;
 			}
 		}

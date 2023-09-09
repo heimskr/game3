@@ -58,13 +58,13 @@ namespace Game3 {
 			ore_stack.emplace(game, "base:item/stone"_id, 1);
 
 		if (ore_stack) {
-			Inventory &inventory = *player->inventory;
-			if (auto *stack = inventory.getActive()) {
-				if (stack->hasAttribute("base:attribute/pickaxe"_id) && !inventory.add(*ore_stack)) {
+			const InventoryPtr inventory = player->getInventory();
+			if (auto *stack = inventory->getActive()) {
+				if (stack->hasAttribute("base:attribute/pickaxe"_id) && !inventory->add(*ore_stack)) {
 					reveal(position);
 					setTile(Layer::Objects, position, tileset.getEmpty());
 					if (stack->reduceDurability())
-						inventory.erase(inventory.activeSlot);
+						inventory->erase(inventory->activeSlot);
 					return true;
 				}
 			}

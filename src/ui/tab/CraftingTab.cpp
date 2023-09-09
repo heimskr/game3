@@ -57,7 +57,7 @@ namespace Game3 {
 		widgets.clear();
 
 		// size_t index = 0;
-		auto inventory = game->player->inventory;
+		const InventoryPtr inventory = game->player->getInventory();
 		if (!inventory)
 			return;
 

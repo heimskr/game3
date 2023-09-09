@@ -24,7 +24,7 @@ namespace Game3 {
 		public:
 			bool use(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) override{
 				Realm &realm = *place.realm;
-				Inventory &inventory = *place.player->inventory;
+				const InventoryPtr inventory = place.player->getInventory();
 
 				TileEntityPtr tile_entity = realm.tileEntityAt(place.position);
 
@@ -32,7 +32,7 @@ namespace Game3 {
 					if (modifiers.onlyShift())
 						return false;
 
-					inventory.decrease(stack, slot);
+					inventory->decrease(stack, slot);
 
 					auto pipe = TileEntity::create<Pipe>(realm.getGame(), place.position);
 					pipe->setPresent(P, true);
@@ -61,7 +61,7 @@ namespace Game3 {
 				const Direction direction = toDirection(getQuadrant(x, y));
 
 				if (!pipe->getPresent(P)) {
-					inventory.decrease(stack, slot);
+					inventory->decrease(stack, slot);
 					pipe->setPresent(P, true);
 				} else if (modifiers.onlyCtrl()) {
 					// Hold ctrl to toggle extractors.

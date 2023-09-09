@@ -12,7 +12,9 @@ namespace Game3 {
 		if (!player)
 			return;
 
-		if (auto *stack = player->inventory->getActive())
-			stack->item->use(player->inventory->activeSlot, *stack, {position, player->getRealm(), player}, modifiers, {offsetX, offsetY});
+		const InventoryPtr inventory = player->getInventory();
+
+		if (auto *stack = inventory->getActive())
+			stack->item->use(inventory->activeSlot, *stack, {position, player->getRealm(), player}, modifiers, {offsetX, offsetY});
 	}
 }

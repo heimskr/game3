@@ -11,11 +11,11 @@ namespace Game3 {
 	bool StandardInteractions::interact(const Place &place, Modifiers modifiers) const {
 		// TODO: handle other tilemaps
 
-		const auto &position = place.position;
-		auto &player = *place.player;
-		auto &realm  = *place.realm;
-		auto &game   = realm.getGame();
-		auto &inventory = *player.inventory;
+		const Position position = place.position;
+		Player &player = *place.player;
+		Realm &realm = *place.realm;
+		Game &game = realm.getGame();
+		Inventory &inventory = *player.getInventory();
 
 		auto &tileset = realm.getTileset();
 		const auto terrain_tile   = place.getName(Layer::Terrain);
@@ -63,7 +63,7 @@ namespace Game3 {
 						inventory.erase(inventory.activeSlot);
 					else
 						// setTooldown doesn't call notifyOwner on the player's inventory, so we have to do it here.
-						player.inventory->notifyOwner();
+						inventory.notifyOwner();
 					return true;
 				}
 			}

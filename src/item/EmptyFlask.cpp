@@ -23,14 +23,16 @@ namespace Game3 {
 				realm.setFluid(place.position, *tile);
 			}
 
+			const InventoryPtr inventory = player.getInventory();
+
 			{
-				auto lock = player.inventory->uniqueLock();
+				auto lock = inventory->uniqueLock();
 				if (--stack.count == 0)
-					player.inventory->erase(slot);
+					inventory->erase(slot);
 			}
 
 			player.give(ItemStack(realm.getGame(), fluid->flaskName, 1), slot);
-			player.inventory->notifyOwner();
+			inventory->notifyOwner();
 			return true;
 		}
 

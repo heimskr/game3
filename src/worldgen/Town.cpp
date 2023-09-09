@@ -176,7 +176,6 @@ namespace Game3::WorldGen {
 			auto gen_building = [&](const Identifier &tilename, Index realm_width, Index realm_height, RealmType realm_type, const BuildingGenerator &gen_fn, std::optional<Position> entrance = std::nullopt) {
 				realm->setTile(Layer::Objects, building_position, tilename, false, true);
 				const RealmID realm_id = game.newRealmID();
-				// auto building = TileEntity::create<Building>(game, tilename, building_position, realm_id, entrance == -1? realm_width * (realm_height - 1) - 3 : entrance);
 				auto building = TileEntity::create<Building>(game, tilename, building_position, realm_id, entrance? *entrance : Position(realm_height - 2, realm_width - 3));
 				auto details = game.registry<RealmDetailsRegistry>()[realm_type];
 				auto new_realm = Realm::create(game, realm_id, realm_type, details->tilesetName, -seed);

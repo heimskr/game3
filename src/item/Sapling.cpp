@@ -26,9 +26,10 @@ namespace Game3 {
 		auto new_tree = TileEntity::create<Tree>(realm.getGame(), choose(trees), "base:tile/tree0"_id, place.position, 0.f);
 		if (place.isPathable() && realm.add(new_tree)) {
 			realm.getGame().toServer().tileEntitySpawned(new_tree);
+			const InventoryPtr inventory = player.getInventory();
 			if (--stack.count == 0)
-				player.inventory->erase(slot);
-			player.inventory->notifyOwner();
+				inventory->erase(slot);
+			inventory->notifyOwner();
 			std::unique_lock<std::shared_mutex> lock;
 			realm.tileProvider.findPathState(place.position, &lock) = 0;
 			return true;

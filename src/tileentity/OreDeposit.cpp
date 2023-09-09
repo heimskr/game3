@@ -65,16 +65,16 @@ namespace Game3 {
 		if (getSide() != Side::Server)
 			return false;
 
-		auto &inventory = *player->inventory;
-		const Slot active_slot = inventory.activeSlot;
-		if (auto *active_stack = inventory[active_slot]) {
+		const InventoryPtr inventory = player->getInventory();
+		const Slot active_slot = inventory->activeSlot;
+		if (auto *active_stack = (*inventory)[active_slot]) {
 			if (0.f < timeRemaining || 0.f < player->tooldown)
 				return true;
 			if (active_stack->hasAttribute("base:attribute/pickaxe"_id)) {
 				const auto &tool = dynamic_cast<Tool &>(*active_stack->item);
 				const Ore &ore = getOre(player->getGame());
 
-				if (!inventory.add(ore.stack)) {
+				if (!inventory->add(ore.stack)) {
 					player->tooldown = ore.tooldownMultiplier * tool.baseCooldown;
 
 					if (ore.maxUses <= ++uses) {
@@ -83,9 +83,9 @@ namespace Game3 {
 					}
 
 					if (active_stack->reduceDurability())
-						inventory.erase(active_slot);
+						inventory->erase(active_slot);
 
-					inventory.notifyOwner();
+					inventory->notifyOwner();
 					increaseUpdateCounter();
 					return true;
 				}

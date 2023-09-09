@@ -20,7 +20,7 @@ namespace Game3 {
 
 		AgentPtr first_agent = game.getAgent(firstGID);
 		if (!first_agent) {
-			client.send(ErrorPacket("Can't move slots: first agent not found"));
+			client.send(ErrorPacket("Can't move slots: first agent not found (" + std::to_string(firstGID) + ')'));
 			return;
 		}
 
@@ -51,8 +51,8 @@ namespace Game3 {
 			return;
 		}
 
-		Inventory &first_inventory  = *first_has_inventory->inventory;
-		Inventory &second_inventory = *second_has_inventory->inventory;
+		Inventory &first_inventory  = *first_has_inventory->getInventory();
+		Inventory &second_inventory = *second_has_inventory->getInventory();
 
 		{
 			auto first_lock  = first_inventory.uniqueLock();

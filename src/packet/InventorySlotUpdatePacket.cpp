@@ -7,11 +7,13 @@
 
 namespace Game3 {
 	void InventorySlotUpdatePacket::handle(ClientGame &game) {
-		if (auto player = game.player; player && player->inventory) {
-			if (auto stack_pointer = (*player->inventory)[slot])
-				*stack_pointer = stack;
-			else
-				player->inventory->add(stack, slot);
+		if (auto player = game.player) {
+			if (const InventoryPtr inventory = player->getInventory()) {
+				if (auto stack_pointer = (*inventory)[slot])
+					*stack_pointer = stack;
+				else
+					inventory->add(stack, slot);
+			}
 		}
 	}
 }

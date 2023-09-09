@@ -66,9 +66,10 @@ namespace Game3 {
 
 		if (realm.add(tile_entity) != nullptr) {
 			game.toServer().tileEntitySpawned(tile_entity);
+			const InventoryPtr inventory = player->getInventory();
 			if (--stack.count == 0)
-				player->inventory->erase(slot);
-			player->inventory->notifyOwner();
+				inventory->erase(slot);
+			inventory->notifyOwner();
 			return true;
 		}
 

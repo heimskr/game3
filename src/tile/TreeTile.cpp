@@ -13,17 +13,17 @@ namespace Game3 {
 		assert(!crop->stages.empty());
 
 		PlayerPtr player = place.player;
-		Inventory &inventory = *player->inventory;
+		const InventoryPtr inventory = player->getInventory();
 		Game &game = player->getGame();
 
-		if (ItemStack *active_stack = inventory.getActive()) {
-			if (active_stack->hasAttribute("base:attribute/axe") && !inventory.add(crop->product)) {
+		if (ItemStack *active_stack = inventory->getActive()) {
+			if (active_stack->hasAttribute("base:attribute/axe") && !inventory->add(crop->product)) {
 				// Remove tree
 				place.set(layer, 0);
 
 				// Handle axe durability
 				if (active_stack->reduceDurability())
-					inventory.erase(inventory.activeSlot);
+					inventory->erase(inventory->activeSlot);
 
 				// Give saplings if possible
 				if (auto sapling = crop->customData.find("sapling"); sapling != crop->customData.end()) {
@@ -40,7 +40,7 @@ namespace Game3 {
 
 		if (auto honey = crop->customData.find("honey"); honey != crop->customData.end()) {
 			if (auto tilename = place.getName(layer); tilename && tilename->get() == honey->at("full")) {
-				if (!inventory.add({game, honey->at("item").get<Identifier>()})) {
+				if (!inventory->add({game, honey->at("item").get<Identifier>()})) {
 					place.set(layer, honey->at("empty").get<Identifier>());
 					return true;
 				}

@@ -7,12 +7,12 @@
 
 namespace Game3 {
 	bool Pickaxe::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
-		auto &player = *place.player;
+		Player &player = *place.player;
 
 		if (player.hasTooldown())
 			return false;
 
-		auto &inventory = *player.inventory;
+		Inventory &inventory = *player.getInventory();
 		auto terrain_tile = place.getName(Layer::Terrain);
 
 		if (!terrain_tile)

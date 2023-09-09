@@ -41,6 +41,7 @@ namespace Game3 {
 			tileEntity->globalID = globalID;
 			tileEntity->tileEntityID = identifier;
 			tileEntity->setRealm(realm);
+			tileEntity->init(game);
 			tileEntity->decode(game, buffer);
 
 			if (weak_agent) {
@@ -64,7 +65,6 @@ namespace Game3 {
 				assert(false);
 			}
 
-			tileEntity->init(game);
 			realm->add(tileEntity);
 		}
 	}
@@ -80,7 +80,7 @@ namespace Game3 {
 			if (!wasFound)
 				game.getRealm(realmID)->add(tileEntity);
 			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(tileEntity))
-				has_inventory->inventory->notifyOwner();
+				has_inventory->getInventory()->notifyOwner();
 		}
 	}
 }

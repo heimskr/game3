@@ -51,7 +51,7 @@ namespace Game3::WorldGen {
 		auto stockpile = TileEntity::create<Stockpile>(game, "base:tile/stockpile_e"_id, Position(height - 2, 2));
 		assert(realm->add(stockpile));
 		stockpile->setInventory(40);
-		realm->stockpileInventory = stockpile->inventory;
+		realm->stockpileInventory = stockpile->getInventory();
 
 		WorldGen::generateCarpet(realm, rng, width, height);
 	}

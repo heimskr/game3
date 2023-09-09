@@ -158,7 +158,7 @@ namespace Game3 {
 		RealmPtr realm = Realm::fromJSON(game, nlohmann::json::parse(raw_json), false);
 
 		{
-			SQLite::Statement query{*database, "SELECT tileEntityID, encoded FROM tileEntities WHERE realmID = ?"};
+			SQLite::Statement query{*database, "SELECT tileEntityID, encoded, globalID FROM tileEntities WHERE realmID = ?"};
 
 			query.bind(1, realm_id);
 
@@ -167,6 +167,7 @@ namespace Game3 {
 				auto factory = game.registry<TileEntityFactoryRegistry>().at(tile_entity_id);
 				assert(factory);
 				TileEntityPtr tile_entity = (*factory)(game);
+				tile_entity->setGID(GlobalID(query.getColumn(2).getInt64()));
 
 				const auto *buffer_bytes = reinterpret_cast<const uint8_t *>(query.getColumn(1).getBlob());
 				const size_t buffer_size = query.getColumn(1).getBytes();

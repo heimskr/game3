@@ -45,14 +45,17 @@ namespace Game3 {
 		for (auto iter = extractions.begin(), end = extractions.end(); iter != end; ++iter) {
 			const auto &[position, direction] = *iter;
 
+
 			auto inventoried = std::dynamic_pointer_cast<InventoriedTileEntity>(realm->tileEntityAt(position));
 			if (!inventoried) {
 				to_erase.push_back(iter);
 				continue;
 			}
 
+			const InventoryPtr inventory = inventoried->getInventory();
+
 			{
-				auto inventory_lock = inventoried->inventory->sharedLock();
+				auto inventory_lock = inventory->sharedLock();
 				if (inventoried->empty())
 					continue;
 			}
@@ -61,12 +64,12 @@ namespace Game3 {
 				advanceRoundRobin();
 
 			bool failed = false;
-			auto inventory_lock = inventoried->inventory->uniqueLock();
+			auto inventory_lock = inventory->uniqueLock();
 
 			inventoried->iterateExtractableItems(direction, [&](const ItemStack &, Slot slot) {
 				// It's possible we'll extract an item and put it right back.
 				// If that happens, we don't want to notify the owner and potentially queue a broadcast.
-				auto suppressor = inventoried->inventory->suppress();
+				auto suppressor = inventory->suppress();
 
 				std::optional<ItemStack> extracted = inventoried->extractItem(direction, true, slot);
 
@@ -81,7 +84,7 @@ namespace Game3 {
 				// Try to insert the extracted item into insertion points until we either finish inserting all of it
 				// or we run out of insertion points.
 				iterateRoundRobin([&](const std::shared_ptr<InventoriedTileEntity> &round_robin, Direction round_robin_direction) -> bool {
-					auto lock = round_robin->inventory->uniqueLock();
+					auto lock = round_robin->getInventory()->uniqueLock();
 					round_robin->insertItem(*extracted, round_robin_direction, &extracted);
 					return !extracted.has_value();
 				}, inventoried);
@@ -90,7 +93,7 @@ namespace Game3 {
 					const bool changed = extracted->count != original_count;
 
 					// If there's anything left over, try putting it back into the inventory it was extracted from.
-					if (std::optional<ItemStack> new_leftover = inventoried->inventory->add(*extracted, slot)) {
+					if (std::optional<ItemStack> new_leftover = inventory->add(*extracted, slot)) {
 						// If there's still anything left over, move it to the overflowQueue so we can try to insert it somewhere another time.
 						// Theoretically this should never happen because we've locked the source inventory.
 						// Also, because the source inventory changed, we need to cancel the suppressor.

@@ -60,17 +60,17 @@ namespace Game3 {
 		if (age < MATURITY)
 			return false;
 
-		auto realm = getRealm();
-		auto &game = realm->getGame();
-		auto &inventory = *player->inventory;
-		const Slot active_slot = inventory.activeSlot;
+		const RealmPtr realm = getRealm();
+		Game &game = realm->getGame();
+		const InventoryPtr inventory = player->getInventory();
+		const Slot active_slot = inventory->activeSlot;
 
-		if (auto *active_stack = inventory[active_slot]) {
+		if (auto *active_stack = (*inventory)[active_slot]) {
 			if (active_stack->hasAttribute("base:attribute/axe"_id)) {
-				if (!inventory.add({game, "base:item/wood"_id, 1})) {
+				if (!inventory->add({game, "base:item/wood"_id, 1})) {
 					realm->queueDestruction(getSelf());
 					if (active_stack->reduceDurability())
-						inventory.erase(active_slot);
+						inventory->erase(active_slot);
 					ItemCount saplings = 1;
 					while (rand() % 4 == 1)
 						++saplings;
@@ -82,9 +82,9 @@ namespace Game3 {
 			}
 		}
 
-		if (HIVE_MATURITY <= hiveAge && !inventory.add({game, "base:item/honey"_id, 1})) {
+		if (HIVE_MATURITY <= hiveAge && !inventory->add({game, "base:item/honey"_id, 1})) {
 			hiveAge = 0.f;
-			inventory.notifyOwner();
+			inventory->notifyOwner();
 			increaseUpdateCounter();
 			return true;
 		}

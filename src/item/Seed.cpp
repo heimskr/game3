@@ -16,10 +16,11 @@ namespace Game3 {
 
 		if (auto tile = realm.tryTile(Layer::Terrain, place.position); tile && tileset.isInCategory(*tile, "base:category/farmland"_id)) {
 			if (auto submerged = realm.tryTile(Layer::Submerged, place.position); !submerged || *submerged == tileset.getEmptyID()) {
+				const InventoryPtr inventory = place.player->getInventory();
 				if (--stack.count == 0)
-					place.player->inventory->erase(slot);
+					inventory->erase(slot);
 				else
-					place.player->inventory->notifyOwner();
+					inventory->notifyOwner();
 				place.set(Layer::Submerged, cropTilename);
 				return true;
 			}

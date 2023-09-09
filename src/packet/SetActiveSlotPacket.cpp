@@ -9,11 +9,12 @@
 
 namespace Game3 {
 	void SetActiveSlotPacket::handle(ServerGame &, RemoteClient &client) {
-		if (auto player = client.getPlayer(); player && player->inventory)
-			player->inventory->setActive(slot);
+		if (const PlayerPtr player = client.getPlayer())
+			if (const InventoryPtr inventory = player->getInventory())
+				inventory->setActive(slot);
 	}
 
 	void SetActiveSlotPacket::handle(ClientGame &game) {
-		game.player->inventory->setActive(slot, true);
+		game.player->getInventory()->setActive(slot, true);
 	}
 }

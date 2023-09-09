@@ -56,7 +56,7 @@ namespace Game3 {
 	}
 
 	bool totalSellPrice(const Merchant &merchant, const ItemStack &stack, MoneyCount &out) {
-		return totalSellPrice(*merchant.inventory, merchant.money, merchant.greed, stack, out);
+		return totalSellPrice(*merchant.getInventory(), merchant.money, merchant.greed, stack, out);
 	}
 
 	bool totalSellPrice(const Keep &keep, const ItemStack &stack, MoneyCount &out) {
@@ -86,7 +86,7 @@ namespace Game3 {
 	}
 
 	size_t totalBuyPrice(const Merchant &merchant, const ItemStack &stack) {
-		return totalBuyPrice(*merchant.inventory, merchant.money, stack);
+		return totalBuyPrice(*merchant.getInventory(), merchant.money, stack);
 	}
 
 	size_t totalBuyPrice(const Keep &keep, const ItemStack &stack) {

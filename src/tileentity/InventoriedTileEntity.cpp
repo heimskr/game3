@@ -1,3 +1,4 @@
+#include "Log.h"
 #include "entity/Player.h"
 #include "game/Inventory.h"
 #include "game/ServerInventory.h"
@@ -12,18 +13,22 @@ namespace Game3 {
 		HasInventory(std::move(inventory_)) {}
 
 	bool InventoriedTileEntity::canInsertItem(const ItemStack &stack, Direction direction, Slot slot) {
+		const InventoryPtr inventory = getInventory();
 		if (!inventory || !mayInsertItem(stack, direction, slot))
 			return false;
 		return inventory->canInsert(stack);
 	}
 
 	bool InventoriedTileEntity::canExtractItem(Direction direction, Slot slot) {
+		const InventoryPtr inventory = getInventory();
 		if (!inventory || !mayExtractItem(direction, slot))
 			return false;
 		return inventory->canExtract(slot);
 	}
 
 	std::optional<ItemStack> InventoriedTileEntity::extractItem(Direction, bool remove, Slot slot) {
+		const InventoryPtr inventory = getInventory();
+
 		if (!inventory)
 			return std::nullopt;
 
@@ -70,6 +75,8 @@ namespace Game3 {
 			return mayInsertItem(stack, direction, slot);
 		};
 
+		const InventoryPtr inventory = getInventory();
+
 		if (leftover != nullptr)
 			*leftover = inventory->add(stack, predicate);
 		else
@@ -82,23 +89,24 @@ namespace Game3 {
 		if (!mayInsertItem(stack, direction))
 			return 0;
 
-		return inventory->insertable(stack, slot);
+		return getInventory()->insertable(stack, slot);
 	}
 
 	void InventoriedTileEntity::iterateExtractableItems(Direction direction, const std::function<bool(const ItemStack &, Slot)> &function) {
-		inventory->iterate([&](const ItemStack &stack, Slot slot) {
+		getInventory()->iterate([&](const ItemStack &stack, Slot slot) {
 			return canExtractItem(direction, slot) && function(stack, slot);
 		});
 	}
 
 	bool InventoriedTileEntity::empty() const {
+		const InventoryPtr inventory = getInventory();
 		return !inventory || inventory->empty();
 	}
 
 	void InventoriedTileEntity::setInventory(Slot slot_count) {
 		auto realm = weakRealm.lock();
 		assert(realm);
-		inventory = Inventory::create(realm->getSide(), shared_from_this(), slot_count);
+		HasInventory::setInventory(Inventory::create(realm->getSide(), shared_from_this(), slot_count));
 		inventoryUpdated();
 	}
 

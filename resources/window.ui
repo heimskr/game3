@@ -10,7 +10,7 @@
 			<object class="GtkHeaderBar" id="headerbar">
 				<property name="title-widget">
 					<object class="GtkLabel">
-						<property name="label" translatable="yes">Game</property>
+						<property name="label" translatable="yes">Game3</property>
 						<property name="single-line-mode">True</property>
 						<property name="ellipsize">end</property>
 						<style>
