@@ -5,10 +5,19 @@
 #include "packet/EntityPacket.h"
 
 namespace Game3 {
-	ServerPlayer::ServerPlayer(): Player() {}
+	ServerPlayer::ServerPlayer():
+		Player() {}
 
 	ServerPlayer::~ServerPlayer() {
-		GameDB &database = getGame().toServer().database;
+		Game &game = getGame();
+
+		// If the game is being destroyed right now, we can't cast it.
+		// The game is responsible for persisting all players before
+		// the compiler-generated part of its destructor begins.
+		if (game.dying)
+			return;
+
+		GameDB &database = game.toServer().database;
 		if (database.isOpen()) {
 			nlohmann::json json;
 			toJSON(json);

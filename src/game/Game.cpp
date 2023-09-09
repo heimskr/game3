@@ -143,6 +143,10 @@
 #include "util/Util.h"
 
 namespace Game3 {
+	Game::~Game() {
+		dying = true;
+	}
+
 	bool Game::tick() {
 		auto now = getTime();
 		auto difference = now - lastTime;

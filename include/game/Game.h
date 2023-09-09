@@ -53,6 +53,7 @@ namespace Game3 {
 			Tick currentTick = 0;
 			size_t cavesGenerated = 0;
 			size_t randomTicksPerChunk = 1;
+			bool dying = false;
 
 			std::map<RealmType, std::shared_ptr<InteractionSet>> interactionSets;
 			std::map<Identifier, std::unordered_set<std::shared_ptr<Item>>> itemsByAttribute;
@@ -61,7 +62,7 @@ namespace Game3 {
 
 			Lockable<std::unordered_map<GlobalID, std::weak_ptr<Agent>>> allAgents;
 
-			virtual ~Game() = default;
+			virtual ~Game();
 
 			template <typename T>
 			T & registry() {
