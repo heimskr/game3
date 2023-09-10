@@ -3,6 +3,7 @@
 #include <random>
 
 #include <gdkmm/rectangle.h>
+
 #include "lib/Eigen.h"
 
 #include "resources.h"
@@ -15,17 +16,19 @@
 #include "ui/TextRenderer.h"
 #include "util/GL.h"
 
+#include <nanogui/nanogui.h>
+
 namespace Game3 {
+	class Application;
 	class ClientGame;
-	class MainWindow;
 	class Realm;
 
-	class Canvas {
+	class Canvas: public nanogui::Canvas {
 		public:
 			constexpr static float DEFAULT_SCALE = 2.f;
 			constexpr static int AUTOFOCUS_DELAY = 1;
 
-			MainWindow &window;
+			Application &app;
 			std::shared_ptr<ClientGame> game;
 			Eigen::Vector2f center {0.f, 0.f};
 			float scale = DEFAULT_SCALE;
@@ -41,12 +44,12 @@ namespace Game3 {
 			Gdk::Rectangle realmBounds;
 			const Realm *lastRealm = nullptr;
 
-			Canvas(MainWindow &);
+			Canvas(Application &);
 
 			void drawGL();
 			// bool mouseButtonEvent(const Eigen::Vector2i &p, int button, bool down, int modifiers) override;
-			int width() const;
-			int height() const;
+			// int width() const;
+			// int height() const;
 
 			bool inBounds(const Position &) const;
 	};

@@ -1,7 +1,7 @@
-#include "App.h"
 #include "Flasker.h"
 #include "net/LocalServer.h"
 #include "net/Sock.h"
+#include "ui/Nanogui.h"
 
 #include <cstdlib>
 #include <ctime>
@@ -39,7 +39,5 @@ int main(int argc, char **argv) {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-	auto app = Game3::App::create();
-	const int out = app->run(argc, argv);
-	return out;
+	return Game3::Application::run(argc, argv);
 }

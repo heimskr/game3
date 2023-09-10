@@ -226,7 +226,8 @@ namespace Game3 {
 		if (getSide() == Side::Client) {
 			getRealm()->getGame().toClient().setText(text, name, true, true);
 			queueForMove([player = shared_from_this()](const auto &) {
-				player->getRealm()->getGame().toClient().canvas.window.textTab->hide();
+				// TODO!: nanogui
+				// player->getRealm()->getGame().toClient().canvas.window.textTab->hide();
 				return true;
 			});
 		}

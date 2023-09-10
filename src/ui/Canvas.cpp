@@ -2,7 +2,7 @@
 #include <unordered_set>
 
 #include "ui/Canvas.h"
-#include "ui/MainWindow.h"
+#include "ui/Nanogui.h"
 
 #include "game/ClientGame.h"
 #include "util/Timer.h"
@@ -11,7 +11,7 @@
 #include "Tileset.h"
 
 namespace Game3 {
-	Canvas::Canvas(MainWindow &window_): window(window_) {
+	Canvas::Canvas(Application &app_): nanogui::Canvas(&app_), app(app_) {
 		magic = 16 / 2;
 		fbo.init();
 	}
@@ -19,7 +19,8 @@ namespace Game3 {
 	void Canvas::drawGL() {
 		if (!game)
 			return;
-		game->activateContext();
+
+		// game->activateContext();
 		spriteRenderer.update(width(), height());
 		rectangleRenderer.update(width(), height());
 		textRenderer.update(width(), height());
@@ -54,13 +55,13 @@ namespace Game3 {
 		}
 	}
 
-	int Canvas::width() const {
-		return window.glArea.get_width();
-	}
+	// int Canvas::width() const {
+	// 	return app.window()->width();
+	// }
 
-	int Canvas::height() const {
-		return window.glArea.get_height();
-	}
+	// int Canvas::height() const {
+	// 	return app.window()->height();
+	// }
 
 	bool Canvas::inBounds(const Position &pos) const {
 		return realmBounds.get_x() <= pos.column && pos.column < realmBounds.get_x() + realmBounds.get_width()

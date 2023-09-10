@@ -1,3 +1,4 @@
+/*
 #include <deque>
 #include <fstream>
 #include <iostream>
@@ -758,3 +759,4 @@ namespace Game3 {
 		return tab == tabMap.at(notebook.get_nth_page(notebook.get_current_page()));
 	}
 }
+//*/

@@ -22,12 +22,13 @@ namespace Game3 {
 
 	bool Sign::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
 		if (getSide() == Side::Client) {
-			auto &game = getRealm()->getGame().toClient();
-			game.setText(text, name, true, true);
-			player->queueForMove([&game, player](const auto &) {
-				game.canvas.window.textTab->hide();
-				return true;
-			});
+			// TODO!: nanogui
+			// auto &game = getRealm()->getGame().toClient();
+			// game.setText(text, name, true, true);
+			// player->queueForMove([&game, player](const auto &) {
+			// 	game.canvas.window.textTab->hide();
+			// 	return true;
+			// });
 		}
 		return true;
 	}

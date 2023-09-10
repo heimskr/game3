@@ -7,7 +7,7 @@
 #include <csignal>
 #include <unordered_map>
 
-#define STB_IMAGE_IMPLEMENTATION
+// #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 #include <nlohmann/json.hpp>

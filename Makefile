@@ -40,7 +40,7 @@ DEPS         := glm glfw3 libzstd gtk4 gtkmm-4.0 glu libevent_openssl openssl li
 OUTPUT       := game3
 COMPILER     ?= g++
 DEBUGGER     ?= gdb
-CPPFLAGS     += -Wall -Wextra $(BUILDFLAGS) -std=c++23 -Iinclude -Ijson/include -Ieigen -Istb -Ilibnoise/src -Ichemskr/include $(LTO) $(PROFILING)
+CPPFLAGS     += -Wall -Wextra $(BUILDFLAGS) -std=c++23 -Iinclude -Ijson/include -Ieigen -Istb -Ilibnoise/src -Ichemskr/include -Inanogui/include $(LTO) $(PROFILING)
 ZIG          ?= zig
 # --main-pkg-path is needed as otherwise it wouldn't let you embed any file outside of src/
 ZIGFLAGS     := -O ReleaseSmall --main-pkg-path .
@@ -61,13 +61,17 @@ RESXML       := $(OUTPUT).gresource.xml
 CLOC_OPTIONS := . --exclude-dir=.vscode,libnoise,stb,eigen,json,data,.github,.idea --fullpath --not-match-f='^\.\/((src\/(gtk_)?resources\.cpp|include\/resources\.h|analysis\.txt|include\/lib\/.*|.*\.(json|txt|md|xml))|(chemskr\/src\/chemskr/(NuclideMasses|yylex|yyparse)\.cpp|chemskr\/(include|src)\/chemskr\/yyparse\.h))$$'
 RESGEN       := ./resgen
 NOISE_OBJ    := libnoise/src/libnoise.a
+NANOGUI_OBJ  := nanogui/build/libnanogui.a
 
 .PHONY: all clean flags test
 
-all: $(NOISE_OBJ) $(OUTPUT)
+all: $(NOISE_OBJ) $(NANOGUI_OBJ) $(OUTPUT)
 
 $(NOISE_OBJ):
-	cd libnoise && cmake . && make
+	cd libnoise && cmake . && make $(filter -j%,$(MAKEFLAGS))
+
+$(NANOGUI_OBJ):
+	cd nanogui && mkdir -p build && cd build && cmake -DNANOGUI_BUILD_SHARED=OFF .. && make
 
 flags:
 	@ echo "COMPILER: $(COMPILER)"
@@ -94,7 +98,7 @@ $(RESGEN): src/resgen.zig src/resources.zig
 include/resources.h: $(RESGEN)
 	$(RESGEN) -h > $@
 
-$(OUTPUT): $(OBJECTS) chemskr/libchemskr.a $(NOISE_OBJ)
+$(OUTPUT): $(OBJECTS) chemskr/libchemskr.a $(NOISE_OBJ) $(NANOGUI_OBJ)
 	@ printf "\e[2m[\e[22;36mld\e[39;2m]\e[22m $@ \e[2m$(LTO)\e[22m\n"
 	@ $(COMPILER) $^ -o $@ $(LDFLAGS)
 ifeq ($(GITHUB),true)

@@ -13,3 +13,6 @@
 [submodule "chemskr"]
 	path = chemskr
 	url = https://github.com/heimskr/chemskr.git
+[submodule "nanogui"]
+	path = nanogui
+	url = https://github.com/mitsuba-renderer/nanogui.git

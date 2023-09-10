@@ -23,15 +23,16 @@ namespace Game3 {
 	bool CraftingStation::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
 
 		if (player->getSide() == Side::Client) {
-			auto &game = getRealm()->getGame().toClient();
-			auto &tab = *game.canvas.window.craftingTab;
-			tab.reset(game.toClientPointer());
-			tab.show();
-			player->queueForMove([&game, player, station_type = stationType, &tab](const auto &) {
-				tab.reset(game.toClientPointer());
-				game.getWindow().inventoryTab->show();
-				return true;
-			});
+			// TODO!: nanogui
+			// auto &game = getRealm()->getGame().toClient();
+			// auto &tab = *game.canvas.window.craftingTab;
+			// tab.reset(game.toClientPointer());
+			// tab.show();
+			// player->queueForMove([&game, player, station_type = stationType, &tab](const auto &) {
+			// 	tab.reset(game.toClientPointer());
+			// 	game.getWindow().inventoryTab->show();
+			// 	return true;
+			// });
 		} else {
 			player->addStationType(stationType);
 			player->queueForMove([player, station_type = stationType](const auto &) {

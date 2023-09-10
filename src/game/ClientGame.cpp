@@ -56,10 +56,6 @@ namespace Game3 {
 		};
 	}
 
-	MainWindow & ClientGame::getWindow() {
-		return canvas.window;
-	}
-
 	Position ClientGame::translateCanvasCoordinates(double x, double y, double *x_offset_out, double *y_offset_out) const {
 		RealmPtr realm = activeRealm.copyBase();
 
@@ -88,25 +84,23 @@ namespace Game3 {
 		return {static_cast<Index>(y - sub_y), static_cast<Index>(x - sub_x)};
 	}
 
-	void ClientGame::activateContext() {
-		canvas.window.activateContext();
-	}
-
 	void ClientGame::setText(const Glib::ustring &text, const Glib::ustring &name, bool focus, bool ephemeral) {
-		if (canvas.window.textTab) {
-			auto &tab = *canvas.window.textTab;
-			tab.text = text;
-			tab.name = name;
-			tab.ephemeral = ephemeral;
-			if (focus)
-				tab.show();
-			tab.reset(toClientPointer());
-		}
+		// TODO!: nanogui
+		// if (canvas.window.textTab) {
+		// 	auto &tab = *canvas.window.textTab;
+		// 	tab.text = text;
+		// 	tab.name = name;
+		// 	tab.ephemeral = ephemeral;
+		// 	if (focus)
+		// 		tab.show();
+		// 	tab.reset(toClientPointer());
+		// }
 	}
 
 	const Glib::ustring & ClientGame::getText() const {
-		if (canvas.window.textTab)
-			return canvas.window.textTab->text;
+		// TODO!: nanogui
+		// if (canvas.window.textTab)
+		// 	return canvas.window.textTab->text;
 		throw std::runtime_error("Can't get text: TextTab is null");
 	}
 
@@ -134,7 +128,8 @@ namespace Game3 {
 			try {
 				packet->handle(*this);
 			} catch (const Warning &warning) {
-				canvas.window.error(warning.what());
+				// TODO!: nanogui
+				// canvas.window.error(warning.what());
 			} catch (const std::exception &err) {
 				auto &packet_ref = *packet;
 				ERROR("Couldn't handle packet of type " << typeid(packet_ref).name() << " (" << packet->getID() << "): " << err.what());
@@ -203,7 +198,8 @@ namespace Game3 {
 	}
 
 	void ClientGame::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data) {
-		getWindow().moduleMessageBuffer(module_id, source, name, std::move(data));
+		// TODO!: nanogui
+		// getWindow().moduleMessageBuffer(module_id, sou.rce, name, std::move(data));
 	}
 
 	bool ClientGame::startThread() {
