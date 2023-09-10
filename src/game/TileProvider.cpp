@@ -128,7 +128,7 @@ namespace Game3 {
 	std::optional<TileID> TileProvider::tryTile(Layer layer, const Position &position) const {
 		validateLayer(layer);
 
-		const ChunkPosition chunk_position {divide(position.column), divide(position.row)};
+		const ChunkPosition chunk_position{divide(position.column), divide(position.row)};
 
 		std::shared_lock lock(chunkMutexes[getIndex(layer)]);
 		const auto &map = chunkMaps[getIndex(layer)];
@@ -140,7 +140,7 @@ namespace Game3 {
 	}
 
 	std::optional<BiomeType> TileProvider::copyBiomeType(Position position) const {
-		const ChunkPosition chunk_position {divide(position.column), divide(position.row)};
+		const ChunkPosition chunk_position{divide(position.column), divide(position.row)};
 
 		std::shared_lock lock(biomeMutex);
 
@@ -151,7 +151,7 @@ namespace Game3 {
 	}
 
 	std::optional<uint8_t> TileProvider::copyPathState(Position position) const {
-		const ChunkPosition chunk_position {divide(position.column), divide(position.row)};
+		const ChunkPosition chunk_position{divide(position.column), divide(position.row)};
 
 		std::shared_lock lock(pathMutex);
 
@@ -162,7 +162,7 @@ namespace Game3 {
 	}
 
 	std::optional<FluidTile> TileProvider::copyFluidTile(Position position) const {
-		const ChunkPosition chunk_position {divide(position.column), divide(position.row)};
+		const ChunkPosition chunk_position{divide(position.column), divide(position.row)};
 
 		std::shared_lock lock(fluidMutex);
 

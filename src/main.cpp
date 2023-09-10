@@ -1,18 +1,19 @@
+#include "App.h"
+#include "Flasker.h"
+#include "net/LocalServer.h"
+#include "net/Sock.h"
+
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
 #include <random>
 #include <vector>
 
-#include "App.h"
-#include "Flasker.h"
-#include "net/LocalServer.h"
+#include <GLFW/glfw3.h>
 
 namespace Game3 {
 	void test();
 }
-
-#include "net/Sock.h"
 
 int main(int argc, char **argv) {
 	srand(time(nullptr));
@@ -31,6 +32,12 @@ int main(int argc, char **argv) {
 			return 0;
 		}
 	}
+
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	auto app = Game3::App::create();
 	const int out = app->run(argc, argv);
