@@ -31,7 +31,7 @@ endif
 LDFLAGS += -lSQLiteCpp
 
 ifeq ($(shell uname -s), Darwin)
-	LDFLAGS += -framework Cocoa -framework OpenGL -framework IOKit
+	LDFLAGS += -framework Cocoa -framework OpenGL -framework IOKit -framework GLUT
 else
 	LDFLAGS += -lGL
 endif
