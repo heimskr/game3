@@ -1,3 +1,4 @@
+/*
 #include <iostream>
 
 #include "App.h"
@@ -51,3 +52,4 @@ namespace Game3 {
 		delete window;
 	}
 }
+//*/

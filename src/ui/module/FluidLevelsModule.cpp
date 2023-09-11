@@ -34,8 +34,9 @@ namespace Game3 {
 				return {};
 
 			if (auto agent = std::dynamic_pointer_cast<Agent>(fluidHaver); agent && source->getGID() == agent->getGID()) {
-				MainWindow &window = game->getWindow();
-				window.queue([&window] { window.removeModule(); });
+				// TODO!: nanogui
+				// MainWindow &window = game->getWindow();
+				// window.queue([&window] { window.removeModule(); });
 			}
 
 		} else if (name == "GetAgentGID") {

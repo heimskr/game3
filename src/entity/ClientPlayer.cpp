@@ -84,7 +84,8 @@ namespace Game3 {
 			assert(buffer != nullptr);
 			const auto module_name = buffer->take<Identifier>();
 			const auto message_name = buffer->take<std::string>();
-			getGame().toClient().getWindow().moduleMessageBuffer(module_name, source, message_name, std::move(*buffer));
+			// TODO!: nanogui
+			// getGame().toClient().getWindow().moduleMessageBuffer(module_name, source, message_name, std::move(*buffer));
 		}
 	}
 

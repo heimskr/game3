@@ -266,7 +266,7 @@ namespace Game3 {
 		if (getSide() != Side::Client)
 			return;
 
-		getGame().toClient().activateContext();
+		// getGame().toClient().activateContext();
 		for (auto &row: *renderers)
 			for (auto &layers: row)
 				for (auto &renderer: layers)
@@ -277,7 +277,7 @@ namespace Game3 {
 		if (getSide() != Side::Client)
 			return;
 
-		getGame().toClient().activateContext();
+		// getGame().toClient().activateContext();
 		for (auto &row: *renderers)
 			for (auto &layers: row)
 				layers[getIndex(layer)].reupload();
@@ -287,7 +287,7 @@ namespace Game3 {
 		if (getSide() != Side::Client)
 			return;
 
-		getGame().toClient().activateContext();
+		// getGame().toClient().activateContext();
 		for (auto &row: *fluidRenderers)
 			for (auto &renderer: row)
 				renderer.reupload();
@@ -890,7 +890,7 @@ namespace Game3 {
 		}
 
 		if (getSide() == Side::Client) {
-			game.toClient().activateContext();
+			// game.toClient().activateContext();
 			reupload(Layer::Objects);
 		}
 	}
@@ -1256,31 +1256,35 @@ namespace Game3 {
 
 	void Realm::queueReupload() {
 		assert(getSide() == Side::Client);
-		getGame().toClient().getWindow().queue([shared = shared_from_this()] {
-			shared->reupload();
-		});
+		// TODO!: nanogui
+		// getGame().toClient().getWindow().queue([shared = shared_from_this()] {
+		// 	shared->reupload();
+		// });
 	}
 
 	void Realm::queueReupload(Layer layer) {
 		assert(getSide() == Side::Client);
-		getGame().toClient().getWindow().queue([shared = shared_from_this(), layer] {
-			shared->reupload(layer);
-		});
+		// TODO!: nanogui
+		// getGame().toClient().getWindow().queue([shared = shared_from_this(), layer] {
+		// 	shared->reupload(layer);
+		// });
 	}
 
 	void Realm::queueReuploadFluids() {
 		assert(getSide() == Side::Client);
-		getGame().toClient().getWindow().queue([shared = shared_from_this()] {
-			shared->reuploadFluids();
-		});
+		// TODO!: nanogui
+		// getGame().toClient().getWindow().queue([shared = shared_from_this()] {
+		// 	shared->reuploadFluids();
+		// });
 	}
 
 	void Realm::queueReuploadAll() {
 		assert(getSide() == Side::Client);
-		getGame().toClient().getWindow().queue([shared = shared_from_this()] {
-			shared->reupload();
-			shared->reuploadFluids();
-		});
+		// TODO!: nanogui
+		// getGame().toClient().getWindow().queue([shared = shared_from_this()] {
+		// 	shared->reupload();
+		// 	shared->reuploadFluids();
+		// });
 	}
 
 	bool Realm::rightClick(const Position &position, double x, double y) {
@@ -1311,14 +1315,15 @@ namespace Game3 {
 				});
 			}
 
-			auto &window = game.getWindow();
-			auto &menu = window.glMenu;
-			window.remove_action_group("entity_menu");
-			window.insert_action_group("entity_menu", group);
-			menu.set_menu_model(gmenu);
-			menu.set_has_arrow(true);
-			menu.set_pointing_to({int(x), int(y), 1, 1});
-			menu.popup();
+			// TODO!: nanogui
+			// auto &window = game.getWindow();
+			// auto &menu = window.glMenu;
+			// window.remove_action_group("entity_menu");
+			// window.insert_action_group("entity_menu", group);
+			// menu.set_menu_model(gmenu);
+			// menu.set_has_arrow(true);
+			// menu.set_pointing_to({int(x), int(y), 1, 1});
+			// menu.popup();
 			return true;
 		}
 

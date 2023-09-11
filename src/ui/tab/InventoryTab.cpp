@@ -1,5 +1,4 @@
-#include <iostream>
-
+/*
 #include "Log.h"
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
@@ -318,3 +317,4 @@ namespace Game3 {
 				widget->remove_css_class("active-slot");
 	}
 }
+//*/

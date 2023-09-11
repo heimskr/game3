@@ -106,8 +106,9 @@ namespace Game3 {
 		if (name == "TileEntityRemoved") {
 
 			if (source && source->getGID() == inventory->getOwner()->getGID()) {
-				MainWindow &window = game->getWindow();
-				window.queue([&window] { window.removeModule(); });
+				// TODO!: nanogui
+				// MainWindow &window = game->getWindow();
+				// window.queue([&window] { window.removeModule(); });
 			}
 
 		} else if (name == "GetAgentGID") {

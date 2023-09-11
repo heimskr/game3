@@ -4,10 +4,11 @@
 
 namespace Game3 {
 	void CommandResultPacket::handle(ClientGame &game) {
-		MainWindow &window = game.getWindow();
-		if (success)
-			window.alert("Command " + std::to_string(commandID) + " was successful:\n\n" + message);
-		else
-			window.error("Command " + std::to_string(commandID) + " was unsuccessful:\n\n" + message);
+		// TODO!: nanogui
+		// MainWindow &window = game.getWindow();
+		// if (success)
+		// 	window.alert("Command " + std::to_string(commandID) + " was successful:\n\n" + message);
+		// else
+		// 	window.error("Command " + std::to_string(commandID) + " was unsuccessful:\n\n" + message);
 	}
 }

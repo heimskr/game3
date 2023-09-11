@@ -1,5 +1,4 @@
-#include <iostream>
-
+/*
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
@@ -172,3 +171,4 @@ namespace Game3 {
 		popoverMenu.popup();
 	}
 }
+//*/

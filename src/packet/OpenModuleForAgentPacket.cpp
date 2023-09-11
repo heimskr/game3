@@ -8,25 +8,27 @@
 
 namespace Game3 {
 	void OpenModuleForAgentPacket::handle(ClientGame &game) {
+
 		AgentPtr agent = game.getAgent(agentGID);
 		if (!agent) {
 			ERROR("Couldn't find agent " << agentGID << " in OpenModuleForAgentPacket handler");
 			return;
 		}
 
-		MainWindow &window = game.getWindow();
+		// TODO!: nanogui
+		// MainWindow &window = game.getWindow();
 
-		if (removeOnMove) {
-			game.player->queueForMove([&window, tab = window.inventoryTab](const auto &) {
-				window.queue([tab] {
-					tab->removeModule();
-				});
-				return true;
-			});
-		}
+		// if (removeOnMove) {
+		// 	game.player->queueForMove([&window, tab = window.inventoryTab](const auto &) {
+		// 		window.queue([tab] {
+		// 			tab->removeModule();
+		// 		});
+		// 		return true;
+		// 	});
+		// }
 
-		window.queue([&window, agent, module_id = moduleID] {
-			window.openModule(module_id, std::any(agent));
-		});
+		// window.queue([&window, agent, module_id = moduleID] {
+		// 	window.openModule(module_id, std::any(agent));
+		// });
 	}
 }

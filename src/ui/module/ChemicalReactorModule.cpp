@@ -79,8 +79,9 @@ namespace Game3 {
 
 			if (source && source->getGID() == reactor->getGID()) {
 				inventoryModule->handleMessage(source, name, data);
-				MainWindow &window = game->getWindow();
-				window.queue([&window] { window.removeModule(); });
+				// TODO!: nanogui
+				// MainWindow &window = game->getWindow();
+				// window.queue([&window] { window.removeModule(); });
 			}
 
 		} else if (name == "GetAgentGID") {

@@ -1,6 +1,4 @@
-#include <iostream>
-
-#include "threading/ThreadContext.h"
+#include "Log.h"
 #include "Tileset.h"
 #include "entity/Woodcutter.h"
 #include "game/ClientGame.h"
@@ -11,6 +9,7 @@
 #include "net/Buffer.h"
 #include "realm/Keep.h"
 #include "realm/Realm.h"
+#include "threading/ThreadContext.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
 #include "tileentity/OreDeposit.h"
@@ -59,14 +58,15 @@ namespace Game3 {
 
 	bool Woodcutter::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
 		if (getSide() == Side::Client) {
-			auto &window = getRealm()->getGame().toClient().getWindow();
-			auto &tab = *window.inventoryTab;
-			std::cout << "Woodcutter: money = " << money << ", phase = " << int(phase) << ", stuck = " << stuck << '\n';
-			player->queueForMove([player, &tab](const auto &) {
-				tab.removeModule();
-				return true;
-			});
-			window.showExternalInventory(std::dynamic_pointer_cast<ClientInventory>(getInventory()));
+			// TODO!: nanogui
+			// auto &window = getRealm()->getGame().toClient().getWindow();
+			// auto &tab = *window.inventoryTab;
+			// INFO("Woodcutter: money = " << money << ", phase = " << int(phase) << ", stuck = " << stuck);
+			// player->queueForMove([player, &tab](const auto &) {
+			// 	tab.removeModule();
+			// 	return true;
+			// });
+			// window.showExternalInventory(std::dynamic_pointer_cast<ClientInventory>(getInventory()));
 		}
 		return true;
 	}

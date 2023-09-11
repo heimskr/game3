@@ -8,8 +8,10 @@
 
 namespace Game3 {
 	void RegistrationStatusPacket::handle(ClientGame &game) {
+		// TODO!: nanogui
+
 		if (token == 0) {
-			game.getWindow().error("Registration failed.");
+			// game.getWindow().error("Registration failed.");
 			return;
 		}
 

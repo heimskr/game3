@@ -4,6 +4,7 @@
 
 namespace Game3 {
 	void ErrorPacket::handle(ClientGame &game) {
-		game.getWindow().error(error);
+		// TODO!: nanogui
+		// game.getWindow().error(error);
 	}
 }

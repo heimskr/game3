@@ -162,10 +162,11 @@ namespace Game3 {
 		std::future<bool> future = promise.get_future();
 		ClientGamePtr client_game = realm->getGame().toClientPointer();
 
-		client_game->getWindow().queueMoveOnly([this, promise = std::move(promise), client_game]() mutable {
-			client_game->activateContext();
-			promise.set_value(reupload());
-		});
+		// TODO!: nanogui
+		// client_game->getWindow().queueMoveOnly([this, promise = std::move(promise), client_game]() mutable {
+		// 	client_game->activateContext();
+		// 	promise.set_value(reupload());
+		// });
 
 		return future;
 	}
