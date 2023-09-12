@@ -22,10 +22,7 @@ message(meson.current_build_dir())
 resources_o = custom_target('resources-obj-gen',
 	input: 'resources.zig',
 	output: 'resources.o',
-	command: [zig, 'build-obj', '-O', 'ReleaseSmall', '--main-pkg-path', '..', '@INPUT@'])
-
-# I am deeply sorry.
-run_command('cp', meson.current_build_dir() / '..' / 'resources.o', meson.current_build_dir())
+	command: ['../hack.sh', '@INPUT@'])
 
 resources_dep = declare_dependency(sources: resources_o[0])
 
@@ -47,7 +44,8 @@ game3_deps = [
 	dependency('glm'),
 	chemskr.get_variable('chemskr'),
 	sqlitecpp.get_variable('sqlitecpp_dep'),
-	cxx.find_library('noise-static', dirs: meson.source_root() / vcpkg_root / 'lib')
+	cxx.find_library('noise-static', dirs: meson.source_root() / vcpkg_root / 'lib'),
+	resources_dep
 ]
 
 game3_sources += gnome.compile_resources('game3-resources',
@@ -65,7 +63,6 @@ inc_dirs = [
 executable('game3', game3_sources,
 	dependencies: game3_deps,
 	link_with: [chemskr.get_variable('chemskr_lib')],
-	objects: resources_o,
 	install: true,
 	include_directories: [inc_dirs]
 )
