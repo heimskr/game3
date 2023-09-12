@@ -1,9 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop">
-	<id>gay.heimskr.Game3.desktop</id>
+	<id>gay.heimskr.Game3</id>
+	<update_contact>heimskr@bingchilli.ng</update_contact>
 	<metadata_license>CC0-1.0</metadata_license>
 	<project_license>GPL-3.0-or-later</project_license>
+	<name>Game3</name>
+	<developer_name>Heimskr</developer_name>
 	<description>
-	  <p>A silly little game.</p>
+		<p>A silly little game.</p>
 	</description>
+	<url type="homepage">https://github.com/heimskr/game3</url>
+	<launchable type="desktop-id">gay.heimskr.Game3.desktop</launchable>
+	<screenshots>
+		<screenshot type="default">
+			<image>https://github.com/heimskr/game3/blob/master/screenshots/1.png?raw=true</image>
+		</screenshot>
+		<screenshot type="default">
+			<image>https://github.com/heimskr/game3/blob/master/screenshots/2.png?raw=true</image>
+		</screenshot>
+	</screenshots>
 </component>

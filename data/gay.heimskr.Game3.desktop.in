@@ -4,5 +4,5 @@ Exec=game3
 Icon=gay.heimskr.Game3
 Terminal=false
 Type=Application
-Categories=GTK;Game
+Categories=GTK;Game;
 StartupNotify=true

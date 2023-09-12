@@ -22,12 +22,9 @@ int main(int argc, char **argv) {
 
 #ifdef IS_FLATPAK
 	std::filesystem::current_path(".var/app/gay.heimskr.Game3/data");
+	if (!std::filesystem::exists("resources"))
+		std::filesystem::create_symlink(Game3::dataRoot / "resources", "resources");
 #endif
-
-	std::cout << "cwd[" << std::filesystem::current_path() << "]\n";
-	for (const auto &thing: std::filesystem::directory_iterator(std::filesystem::current_path())) {
-		std::cout << "- [" << thing << "]\n";
-	}
 
 	if (2 <= argc) {
 		if (argc == 4) {
