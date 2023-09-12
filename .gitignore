@@ -26,3 +26,5 @@
 /*.png
 *.db
 *.db-journal
+/.flatpak-builder
+/vcpkg_installed

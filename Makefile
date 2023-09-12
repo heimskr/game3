@@ -36,6 +36,7 @@ else
 	LDFLAGS += -lGL
 endif
 
+TRIPLET      ?= x64-linux
 DEPS         := glm glfw3 libzstd gtk4 gtkmm-4.0 glu libevent_openssl openssl libevent_pthreads freetype2
 OUTPUT       := game3
 COMPILER     ?= g++
@@ -58,13 +59,22 @@ LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread $(LTO) $(PROFILING)
 SOURCES      := $(shell find -L src -name \*.cpp) src/gtk_resources.cpp
 OBJECTS      := $(SOURCES:.cpp=.o) src/resources.o
 RESXML       := $(OUTPUT).gresource.xml
-CLOC_OPTIONS := . --exclude-dir=.vscode,libnoise,stb,eigen,json,data,.github,.idea --fullpath --not-match-f='^\.\/((src\/(gtk_)?resources\.cpp|include\/resources\.h|analysis\.txt|include\/lib\/.*|.*\.(json|txt|md|xml))|(chemskr\/src\/chemskr/(NuclideMasses|yylex|yyparse)\.cpp|chemskr\/(include|src)\/chemskr\/yyparse\.h))$$'
+CLOC_OPTIONS := . --exclude-dir=.vscode,stb,eigen,json,data,.github,.idea,vcpkg_installed,build,builddir,.flatpak-builder,libnoise --fullpath --not-match-f='^\.\/((src\/(gtk_)?resources\.cpp|include\/resources\.h|analysis\.txt|include\/lib\/.*|.*\.(json|txt|md|xml))|(chemskr\/src\/chemskr/(NuclideMasses|yylex|yyparse)\.cpp|chemskr\/(include|src)\/chemskr\/yyparse\.h))$$'
 RESGEN       := ./resgen
-NOISE_OBJ    := libnoise/src/libnoise.a
 
 .PHONY: all clean flags test
 
 all: $(NOISE_OBJ) $(OUTPUT)
+
+vcpkg_install:
+	vcpkg install
+
+all_install: vcpkg all
+
+vcpkg_zip: all_install zip
+
+flat:
+	flatpak-builder --user --force-clean build gay.heimskr.Game3.json
 
 $(NOISE_OBJ):
 	cd libnoise && cmake . && make

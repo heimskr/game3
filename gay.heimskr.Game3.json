@@ -1,0 +1,43 @@
+{
+	"app-id": "gay.heimskr.Game3",
+	"runtime": "org.gnome.Platform",
+	"runtime-version": "42",
+	"sdk": "org.gnome.Sdk",
+	"command": "game3",
+	"finish-args": [
+		"--share=ipc",
+		"--socket=fallback-x11",
+		"--socket=wayland",
+		"--share=network"
+	],
+	"build-options": {
+		"cflags": "-Og -g3"
+	},
+	"cleanup": [
+		"*.la",
+		"*.a",
+		"/include",
+		"/lib/pkgconfig",
+		"/share/doc",
+		"/share/gtk-doc",
+		"/share/man",
+		"/share/pkg-config"
+	],
+	"modules": [
+		{
+			"name": "game3",
+			"builddir": true,
+			"buildsystem": "simple",
+			"build-commands": [
+				"make all_install -j20"
+			],
+			"sources": [
+				{
+					"type": "dir",
+					"path": "."
+				}
+			]
+		}
+	]
+}
+
