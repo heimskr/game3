@@ -7,15 +7,17 @@ vcpkg_root = 'vcpkg_installed' / get_option('vcpkg-triplet')
 
 zig = find_program('zig', required: true)
 
-resgen_gen = custom_target('resgen-gen',
-	input: 'resgen.zig',
-	output: 'resgen',
-	command: [zig, 'build-exe', '-O', 'ReleaseSmall', '--main-pkg-path', '..', '@INPUT@'])
+# resgen_gen = custom_target('resgen-gen',
+# 	input: 'resgen.zig',
+# 	output: 'resgen',
+# 	command: [zig, 'build-exe', '-O', 'ReleaseSmall', '--main-pkg-path', '..', '@INPUT@'])
+
+run_command('zig', 'build-exe', '-O', 'ReleaseSmall', '--main-pkg-path', '..', '../src/resgen.zig')
 
 resources_h = custom_target('resources-header-gen',
 	output: 'resources.h',
 	capture: true,
-	command: ['../resgen', '-h'])
+	command: ['../src/resgen', '-h'])
 
 message(meson.current_build_dir())
 

@@ -54,7 +54,7 @@ namespace Game3 {
 			void queue(std::function<void()>);
 
 			/** Queues a function to be executed in the GTK thread. Thread-safe. Can be used from any thread. */
-			void queueMoveOnly(std::move_only_function<void()> &&);
+			// void queueMoveOnly(std::move_only_function<void()> &&);
 
 			/** Displays an alert. This will reset the dialog pointer. If you need to use this inside a dialog's code, use delay(). */
 			void alert(const Glib::ustring &message, Gtk::MessageType = Gtk::MessageType::INFO, bool queue = true, bool modal = true, bool use_markup = false);
@@ -101,7 +101,7 @@ namespace Game3 {
 			Glib::RefPtr<Gtk::Builder> builder;
 			Glib::RefPtr<Gtk::CssProvider> cssProvider;
 			MTQueue<std::function<void()>> functionQueue;
-			MTQueue<std::move_only_function<void()>> moveOnlyFunctionQueue;
+			// MTQueue<std::move_only_function<void()>> moveOnlyFunctionQueue;
 			Glib::Dispatcher functionQueueDispatcher;
 			Gtk::Paned paned;
 			Gtk::Box vbox {Gtk::Orientation::VERTICAL};

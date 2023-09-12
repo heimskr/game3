@@ -158,13 +158,13 @@ namespace Game3 {
 	std::future<bool> ElementBufferedRenderer::queueReupload() {
 		assert(realm != nullptr);
 
-		std::promise<bool> promise;
-		std::future<bool> future = promise.get_future();
+		auto promise = std::make_shared<std::promise<bool>>();
+		std::future<bool> future = promise->get_future();
 		ClientGamePtr client_game = realm->getGame().toClientPointer();
 
-		client_game->getWindow().queueMoveOnly([this, promise = std::move(promise), client_game]() mutable {
+		client_game->getWindow().queue([this, promise, client_game]() {
 			client_game->activateContext();
-			promise.set_value(reupload());
+			promise->set_value(reupload());
 		});
 
 		return future;

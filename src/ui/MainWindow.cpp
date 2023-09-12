@@ -80,8 +80,8 @@ namespace Game3 {
 		functionQueueDispatcher.connect([this] {
 			for (const auto &fn: functionQueue.steal())
 				fn();
-			for (auto &&fn: moveOnlyFunctionQueue.steal())
-				fn();
+			// for (auto &&fn: moveOnlyFunctionQueue.steal())
+			// 	fn();
 		});
 
 		add_action("connect", Gio::ActionMap::ActivateSlot(sigc::mem_fun(*this, &MainWindow::onConnect)));
@@ -406,23 +406,25 @@ namespace Game3 {
 		functionQueueDispatcher.emit();
 	}
 
-	void MainWindow::queueMoveOnly(std::move_only_function<void()> &&fn) {
-		moveOnlyFunctionQueue.push(std::move(fn));
-		functionQueueDispatcher.emit();
-	}
+	// void MainWindow::queueMoveOnly(std::move_only_function<void()> &&fn) {
+	// 	moveOnlyFunctionQueue.push(std::move(fn));
+	// 	functionQueueDispatcher.emit();
+	// }
 
 	void MainWindow::alert(const Glib::ustring &message, Gtk::MessageType type, bool do_queue, bool modal, bool use_markup) {
-		auto new_dialog = std::make_unique<Gtk::MessageDialog>(*this, message, use_markup, type, Gtk::ButtonsType::OK, modal);
-		new_dialog->signal_response().connect([this](int) {
+		// This is a horrible hack to avoid C++23.
+		auto new_dialog = std::make_shared<std::unique_ptr<Gtk::MessageDialog>>(std::make_unique<Gtk::MessageDialog>(*this, message, use_markup, type, Gtk::ButtonsType::OK, modal));
+
+		(*new_dialog)->signal_response().connect([this](int) {
 			closeDialog();
 		});
 
 		if (do_queue) {
-			queueMoveOnly([this, new_dialog = std::move(new_dialog)] mutable {
-				queueDialog(std::move(new_dialog));
+			queue([this, new_dialog] {
+				queueDialog(std::move(*new_dialog));
 			});
 		} else {
-			dialog = std::move(new_dialog);
+			dialog = std::move(*new_dialog);
 			connectClose(*dialog);
 			dialog->show();
 		}
