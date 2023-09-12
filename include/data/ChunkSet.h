@@ -51,7 +51,8 @@ namespace Game3 {
 					appendSpan(raw, std::span(biomes));
 				}
 
-				appendSpan(raw, std::span(getFluids()));
+				auto fluids = getFluids();
+				appendSpan(raw, std::span<const uint8_t>(fluids.data(), fluids.size()));
 				return raw;
 			}
 	};
