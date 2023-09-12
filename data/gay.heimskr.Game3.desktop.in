@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Game3
+Exec=game3
+Icon=gay.heimskr.Game3
+Terminal=false
+Type=Application
+Categories=GTK;Game
+StartupNotify=true

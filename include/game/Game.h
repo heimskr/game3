@@ -86,7 +86,7 @@ namespace Game3 {
 			void addLocalCommandFactories();
 			void addTiles();
 			void addModuleFactories();
-			void initialSetup(const std::filesystem::path &dir = "data");
+			void initialSetup(const std::filesystem::path &dir = "gamedata");
 			void initEntities();
 			void initInteractionSets();
 			void add(std::shared_ptr<Item>);

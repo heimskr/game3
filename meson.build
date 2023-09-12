@@ -15,8 +15,8 @@ config_h.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('lo
 configure_file(output: 'config.h', configuration: config_h)
 add_project_arguments(['-I' + meson.project_build_root()], language: 'cpp')
 
-project_c_args = []
-test_c_args = [
+project_cpp_args = []
+test_cpp_args = [
   '-Wcast-align',
   '-Wdeclaration-after-statement',
   '-Werror=address',
@@ -72,14 +72,14 @@ test_c_args = [
   ['-Werror=format-security', '-Werror=format=2'],
 ]
 if get_option('buildtype') != 'plain'
-  test_c_args += '-fstack-protector-strong'
+  test_cpp_args += '-fstack-protector-strong'
 endif
-foreach arg: test_c_args
+foreach arg: test_cpp_args
   if cc.has_multi_arguments(arg)
-    project_c_args += arg
+    project_cpp_args += arg
   endif
 endforeach
-add_project_arguments(project_c_args, language: 'c')
+add_project_arguments(project_cpp_args, language: 'cpp')
 
 subdir('data')
 subdir('src')
