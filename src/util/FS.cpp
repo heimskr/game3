@@ -1,8 +1,16 @@
-#include <fstream>
-
+#include "config.h"
 #include "util/FS.h"
 
+#include <fstream>
+
 namespace Game3 {
+	std::filesystem::path dataRoot =
+#ifdef IS_FLATPAK
+		"/app/bin";
+#else
+		".";
+#endif
+
 	std::string readFile(const std::filesystem::path &path) {
 		std::ifstream stream;
 		stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);

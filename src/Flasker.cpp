@@ -133,7 +133,7 @@ namespace Game3 {
 		return rgb;
 	}
 
-	std::unique_ptr<uint8_t[]> generateFlaskRaw(const std::string &base_filename, const std::string &mask_filename, uint16_t hue, float saturation, float value_diff, int *width_out, int *height_out) {
+	std::unique_ptr<uint8_t[]> generateFlaskRaw(const std::filesystem::path &base_filename, const std::filesystem::path &mask_filename, uint16_t hue, float saturation, float value_diff, int *width_out, int *height_out) {
 		int base_width  = 0;
 		int base_height = 0;
 		int mask_width  = 0;
@@ -143,11 +143,11 @@ namespace Game3 {
 
 		auto base = std::unique_ptr<uint8_t[], FreeDeleter>(stbi_load(base_filename.c_str(), &base_width, &base_height, &base_channels, 0));
 		if (!base)
-			throw std::runtime_error("Couldn't load " + base_filename);
+			throw std::runtime_error("Couldn't load " + base_filename.string());
 
 		auto mask = std::unique_ptr<uint8_t[], FreeDeleter>(stbi_load(mask_filename.c_str(), &mask_width, &mask_height, &mask_channels, 0));
 		if (!mask)
-			throw std::runtime_error("Couldn't load " + mask_filename);
+			throw std::runtime_error("Couldn't load " + mask_filename.string());
 
 		if (base_width != mask_width)
 			throw std::runtime_error("Width mismatch (" + std::to_string(base_width) + " base vs. " + std::to_string(mask_width) + " mask)");
@@ -195,7 +195,7 @@ namespace Game3 {
 		return raw;
 	}
 
-	std::string generateFlask(const std::string &base_filename, const std::string &mask_filename, uint16_t hue, float saturation, float value_diff) {
+	std::string generateFlask(const std::filesystem::path &base_filename, const std::filesystem::path &mask_filename, uint16_t hue, float saturation, float value_diff) {
 		int width = 0;
 		int height = 0;
 		std::unique_ptr<uint8_t[]> raw = generateFlaskRaw(base_filename, mask_filename, hue, saturation, value_diff, &width, &height);
@@ -210,7 +210,7 @@ namespace Game3 {
 		return ss.str();
 	}
 
-	std::string generateFlask(const std::string &base_filename, const std::string &mask_filename, std::string_view hue, std::string_view saturation, std::string_view value_diff) {
+	std::string generateFlask(const std::filesystem::path &base_filename, const std::filesystem::path &mask_filename, std::string_view hue, std::string_view saturation, std::string_view value_diff) {
 		return generateFlask(base_filename, mask_filename, parseNumber<uint16_t>(hue), parseNumber<float>(saturation), parseNumber<float>(value_diff));
 	}
 }

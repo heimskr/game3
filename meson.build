@@ -1,10 +1,7 @@
 project('game3', 'cpp', version: '0.1.0',
-	#meson_version: '>= 0.62.0',
+	meson_version: '>= 0.62.0',
 	default_options: ['warning_level=2', 'werror=false', 'cpp_std=c++20'],
 )
-
-# vcpkg = find_program('vcpkg', required: true)
-# run_command(vcpkg, 'install', '--x-wait-for-lock', '--x-manifest-root=' + meson.global_source_root())
 
 i18n = import('i18n')
 gnome = import('gnome')
@@ -23,14 +20,25 @@ test_cpp_args = [
 	'-Wextra',
 	'-Wno-volatile'
 ]
+
+game3_config_data = configuration_data()
+
+if get_option('is_flatpak') == true
+	game3_config_data.set('IS_FLATPAK', '1')
+endif
+
 if get_option('buildtype') != 'plain'
 	test_cpp_args += '-fstack-protector-strong'
 endif
+
+configure_file(output: 'config.h', configuration: game3_config_data)
+
 foreach arg: test_cpp_args
 	if cxx.has_multi_arguments(arg)
 		project_cpp_args += arg
 	endif
 endforeach
+
 add_project_arguments(project_cpp_args, language: 'cpp')
 
 subdir('data')
@@ -38,7 +46,7 @@ subdir('src')
 subdir('po')
 
 gnome.post_install(
-		 glib_compile_schemas: true,
-		gtk_update_icon_cache: true,
+	glib_compile_schemas: true,
+	gtk_update_icon_cache: true,
 	update_desktop_database: true,
 )

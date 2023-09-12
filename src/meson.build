@@ -3,17 +3,12 @@ game3_sources = run_command('grabber.sh', check: true).stdout().strip().split('\
 chemskr = subproject('chemskr')
 sqlitecpp = subproject('sqlitecpp')
 
-vcpkg_root = 'vcpkg_installed' / get_option('vcpkg-triplet')
-
 zig = find_program('zig', required: true)
 
-# resgen_gen = custom_target('resgen-gen',
-# 	input: 'resgen.zig',
-# 	output: 'resgen',
-# 	command: [zig, 'build-exe', '-O', 'ReleaseSmall', '--main-pkg-path', '..', '@INPUT@'])
-
-
-run_command('zig', 'build-exe', '-O', 'ReleaseSmall', '--main-pkg-path', '..', '../src/resgen.zig')
+resgen_gen = custom_target('resgen-gen',
+	input: 'resgen.zig',
+	output: 'resgen',
+	command: [zig, 'build-exe', '-O', 'ReleaseSmall', '--main-pkg-path', '..', '@INPUT@'])
 
 resources_h = custom_target('resources-header-gen',
 	output: 'resources.h',
@@ -47,25 +42,25 @@ game3_deps = [
 	dependency('x11'),
 	chemskr.get_variable('chemskr'),
 	sqlitecpp.get_variable('sqlitecpp_dep'),
-	cxx.find_library('noise-static', dirs: meson.source_root() / vcpkg_root / 'lib'),
+
 	resources_dep
 ]
 
 game3_sources += gnome.compile_resources('game3-resources',
 	'game3.gresource.xml',
 	c_name: 'game3',
-	source_dir: '../resources')
+	source_dir: '..' / 'resources')
 
 game3_sources += resources_h[0]
 
 inc_dirs = [
-	include_directories('../include'),
-	include_directories('..' / vcpkg_root / 'include'),
+	include_directories('..' / 'include')
 ]
 
 executable('game3', game3_sources,
 	dependencies: game3_deps,
 	link_with: [chemskr.get_variable('chemskr_lib')],
+	link_args: ['-lnoise'],
 	install: true,
 	include_directories: [inc_dirs]
 )

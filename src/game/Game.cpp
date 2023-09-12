@@ -139,6 +139,7 @@
 #include "ui/module/FluidLevelsModule.h"
 #include "ui/module/ModuleFactory.h"
 #include "util/AStar.h"
+#include "util/FS.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 
@@ -481,7 +482,7 @@ namespace Game3 {
 	void Game::initialSetup(const std::filesystem::path &dir) {
 		initRegistries();
 		addItems();
-		traverseData(dir);
+		traverseData(dataRoot / dir);
 		addGhosts();
 		addRealms();
 		addEntityFactories();

@@ -9,7 +9,9 @@
 		"--share=ipc",
 		"--socket=fallback-x11",
 		"--socket=wayland",
-		"--share=network"
+		"--share=network",
+		"--socket=session-bus",
+		"--device=dri"
 	],
 	"build-options": {
 		"cxxflags": "-Og -g3",
@@ -21,16 +23,18 @@
 		"*.la",
 		"*.a",
 		"/include",
+		"/lib/*/include",
 		"/lib/pkgconfig",
 		"/share/doc",
 		"/share/gtk-doc",
 		"/share/man",
-		"/share/pkg-config"
+		"/share/pkg-config",
+		"/share/aclocal"
 	],
 	"modules": [
 		{
 			"name": "mm-common",
-			"cleanup": ["/"],
+			"cleanup": ["*"],
 			"buildsystem": "meson",
 			"config-opts": [
 				"--buildtype=debugoptimized",
@@ -255,19 +259,81 @@
 		},
 		{
 			"name": "glm",
-			"buildsystem": "cmake",
-			"no-make-install": true,
+			"buildsystem": "cmake-ninja",
 			"sources": [
 				{
-					"type": "archive",
-					"url": "https://github.com/g-truc/glm/releases/download/0.9.9.8/glm-0.9.9.8.zip",
-					"sha256": "37e2a3d62ea3322e43593c34bae29f57e3e251ea89f4067506c94043769ade4c"
+					"type": "git",
+					"url": "https://github.com/g-truc/glm.git"
+				}
+			]
+		},
+		{
+			"name": "libnoise",
+			"buildsystem": "cmake",
+			"builddir": true,
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/qknight/libnoise.git"
+				}
+			]
+		},
+		{
+			"name": "nlohmann-json",
+			"buildsystem": "meson",
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/nlohmann/json.git"
+				}
+			]
+		},
+		{
+			"name": "stb",
+			"buildsystem": "simple",
+			"build-commands": [
+				"install -D *.h /app/include/"
+			],
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/nothings/stb.git"
+				}
+			]
+		},
+		{
+			"name": "game3-data",
+			"buildsystem": "simple",
+			"build-commands": [
+				"mkdir /app/bin/gamedata/",
+				"install -D *.json /app/bin/gamedata"
+			],
+			"sources": [
+				{
+					"type": "dir",
+					"path": "gamedata"
+				}
+			]
+		},
+		{
+			"name": "game3-resources",
+			"buildsystem": "simple",
+			"build-commands": [
+				"cp -r . /app/bin/resources"
+			],
+			"sources": [
+				{
+					"type": "dir",
+					"path": "resources"
 				}
 			]
 		},
 		{
 			"name": "game3",
 			"buildsystem": "meson",
+			"config-opts": [
+				"-Dis_flatpak=true"
+			],
 			"sources": [
 				{
 					"type": "dir",

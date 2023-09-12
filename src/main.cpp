@@ -1,7 +1,9 @@
+#include "config.h"
 #include "App.h"
 #include "Flasker.h"
 #include "net/LocalServer.h"
 #include "net/Sock.h"
+#include "util/FS.h"
 
 #include <cstdlib>
 #include <ctime>
@@ -18,9 +20,18 @@ namespace Game3 {
 int main(int argc, char **argv) {
 	srand(time(nullptr));
 
+#ifdef IS_FLATPAK
+	std::filesystem::current_path(".var/app/gay.heimskr.Game3/data");
+#endif
+
+	std::cout << "cwd[" << std::filesystem::current_path() << "]\n";
+	for (const auto &thing: std::filesystem::directory_iterator(std::filesystem::current_path())) {
+		std::cout << "- [" << thing << "]\n";
+	}
+
 	if (2 <= argc) {
 		if (argc == 4) {
-			std::cout << Game3::generateFlask("resources/testtubebase.png", "resources/testtubemask.png", argv[1], argv[2], argv[3]);
+			std::cout << Game3::generateFlask(Game3::dataRoot / "resources" / "testtubebase.png", Game3::dataRoot / "resources" / "testtubemask.png", argv[1], argv[2], argv[3]);
 			return 0;
 		}
 
