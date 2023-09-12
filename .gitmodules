@@ -1,3 +1,6 @@
 [submodule "subprojects/chemskr"]
 	path = subprojects/chemskr
 	url = https://github.com/heimskr/chemskr.git
+[submodule "subprojects/sqlitecpp"]
+	path = subprojects/sqlitecpp
+	url = https://github.com/SRombauts/SQLiteCpp.git

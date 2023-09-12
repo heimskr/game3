@@ -16,7 +16,6 @@
 		"stb",
 		"nlohmann-json",
 		"libnoise",
-		"eigen3",
-		"sqlitecpp"
+		"eigen3"
 	]
 }

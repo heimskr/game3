@@ -1,0 +1,1 @@
+option('vcpkg-triplet', type: 'string', value: 'x64-linux', description: 'The host architecture for vcpkg')
