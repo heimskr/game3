@@ -4,6 +4,9 @@ project('game3', 'cpp',
   default_options: ['warning_level=2', 'werror=false', 'cpp_std=c++23',],
 )
 
+vcpkg = find_program('vcpkg', required : true)
+run_command(vcpkg, 'install', '--x-wait-for-lock', '--x-manifest-root=' + meson.current_source_dir())
+
 i18n = import('i18n')
 gnome = import('gnome')
 cc = meson.get_compiler('cpp')
@@ -17,59 +20,8 @@ add_project_arguments(['-I' + meson.project_build_root()], language: 'cpp')
 
 project_cpp_args = []
 test_cpp_args = [
-  '-Wcast-align',
-  '-Wdeclaration-after-statement',
-  '-Werror=address',
-  '-Werror=array-bounds',
-  '-Werror=empty-body',
-  '-Werror=implicit',
-  '-Werror=implicit-function-declaration',
-  '-Werror=incompatible-pointer-types',
-  '-Werror=init-self',
-  '-Werror=int-conversion',
-  '-Werror=int-to-pointer-cast',
-  '-Werror=main',
-  '-Werror=misleading-indentation',
-  '-Werror=missing-braces',
-  '-Werror=missing-include-dirs',
-  '-Werror=nonnull',
-  '-Werror=overflow',
-  '-Werror=parenthesis',
-  '-Werror=pointer-arith',
-  '-Werror=pointer-to-int-cast',
-  '-Werror=redundant-decls',
-  '-Werror=return-type',
-  '-Werror=sequence-point',
-  '-Werror=shadow',
-  '-Werror=strict-prototypes',
-  '-Werror=trigraphs',
-  '-Werror=undef',
-  '-Werror=write-strings',
-  '-Wformat-nonliteral',
-  '-Wignored-qualifiers',
-  '-Wimplicit-function-declaration',
-  '-Wlogical-op',
-  '-Wmissing-declarations',
-  '-Wmissing-format-attribute',
-  '-Wmissing-include-dirs',
-  '-Wmissing-noreturn',
-  '-Wnested-externs',
-  '-Wno-cast-function-type',
-  '-Wno-dangling-pointer',
-  '-Wno-missing-field-initializers',
-  '-Wno-sign-compare',
-  '-Wno-unused-parameter',
-  '-Wold-style-definition',
-  '-Wpointer-arith',
-  '-Wredundant-decls',
-  '-Wstrict-prototypes',
-  '-Wswitch-default',
-  '-Wswitch-enum',
-  '-Wundef',
-  '-Wuninitialized',
-  '-Wunused',
-  '-fno-strict-aliasing',
-  ['-Werror=format-security', '-Werror=format=2'],
+  '-Wall',
+  '-Wextra',
 ]
 if get_option('buildtype') != 'plain'
   test_cpp_args += '-fstack-protector-strong'

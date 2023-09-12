@@ -7,12 +7,16 @@
 		"glfw3",
 		"zstd",
 		"freeglut",
-		"libevent",
+		{
+			"name": "libevent",
+			"features": ["openssl", "thread"]
+		},
 		"openssl",
 		"freetype",
 		"stb",
 		"nlohmann-json",
 		"libnoise",
-		"eigen3"
+		"eigen3",
+		"sqlitecpp"
 	]
 }
