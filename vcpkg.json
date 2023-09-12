@@ -9,6 +9,10 @@
 		"freeglut",
 		"libevent",
 		"openssl",
-		"freetype"
+		"freetype",
+		"stb",
+		"nlohmann-json",
+		"libnoise",
+		"eigen3"
 	]
 }
