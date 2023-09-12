@@ -21,6 +21,7 @@ project_cpp_args = []
 test_cpp_args = [
 	'-Wall',
 	'-Wextra',
+	'-Wno-volatile'
 ]
 if get_option('buildtype') != 'plain'
 	test_cpp_args += '-fstack-protector-strong'

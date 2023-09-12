@@ -44,7 +44,7 @@ game3_deps = [
 	dependency('gl'),
 	dependency('glu'),
 	dependency('glfw3'),
-	dependency('glm'),
+	dependency('x11'),
 	chemskr.get_variable('chemskr'),
 	sqlitecpp.get_variable('sqlitecpp_dep'),
 	cxx.find_library('noise-static', dirs: meson.source_root() / vcpkg_root / 'lib'),

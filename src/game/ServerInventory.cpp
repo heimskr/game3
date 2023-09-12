@@ -150,7 +150,7 @@ namespace Game3 {
 
 			if (stack.canMerge(stack_to_remove)) {
 				const ItemCount to_remove = std::min(stack.count, count_to_remove);
-				stack.count -= to_remove;
+				const_cast<ItemStack &>(stack).count -= to_remove;
 				count_to_remove -= to_remove;
 				removed += to_remove;
 
@@ -179,7 +179,7 @@ namespace Game3 {
 
 			if (predicate(slot) && stack.canMerge(stack_to_remove)) {
 				const ItemCount to_remove = std::min(stack.count, count_to_remove);
-				stack.count -= to_remove;
+				const_cast<ItemStack &>(stack).count -= to_remove;
 				count_to_remove -= to_remove;
 				removed += to_remove;
 

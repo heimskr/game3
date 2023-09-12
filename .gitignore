@@ -30,5 +30,6 @@
 /vcpkg_installed
 /build
 /builddir
+/_build
 /src/resgen
 *~

@@ -13,6 +13,8 @@ namespace Game3 {
 			HasInventory(std::shared_ptr<Inventory> inventory_ = nullptr):
 				inventory(std::move(inventory_)) {}
 
+			virtual ~HasInventory() = default;
+
 			inline const auto & getInventory() const { return inventory; }
 			void setInventory(std::shared_ptr<Inventory>);
 
