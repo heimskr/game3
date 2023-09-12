@@ -1,7 +1,7 @@
 game3_sources = run_command('grabber.sh', check: true).stdout().strip().split('\n')
 
 chemskr = subproject('chemskr')
-sqlitecpp = subproject('sqlitecpp')
+sqlitecpp = subproject('sqlitecpp', default_options: 'default_library=static')
 
 zig = find_program('zig', required: true)
 
@@ -42,7 +42,6 @@ game3_deps = [
 	dependency('x11'),
 	chemskr.get_variable('chemskr'),
 	sqlitecpp.get_variable('sqlitecpp_dep'),
-
 	resources_dep
 ]
 
@@ -62,5 +61,4 @@ executable('game3', game3_sources,
 	link_with: [chemskr.get_variable('chemskr_lib')],
 	link_args: ['-lnoise'],
 	install: true,
-	include_directories: [inc_dirs]
-)
+	include_directories: [inc_dirs])

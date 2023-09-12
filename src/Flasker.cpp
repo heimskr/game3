@@ -3,7 +3,7 @@
 
 #include <sstream>
 
-#include <stb_image.h>
+#include <stb/stb_image.h>
 
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -16,7 +16,7 @@
 #endif
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stb_image_write.h>
+#include <stb/stb_image_write.h>
 
 #ifdef __clang__
 #pragma clang diagnostic pop

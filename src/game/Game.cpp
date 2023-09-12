@@ -550,7 +550,7 @@ namespace Game3 {
 		registry<ModuleFactoryRegistry>().add(shared->identifier, shared);
 	}
 
-	struct Dependency {
+	struct DependencyNode {
 		std::string name;
 		bool isCategory;
 	};
@@ -558,7 +558,7 @@ namespace Game3 {
 	void Game::traverseData(const std::filesystem::path &dir) {
 		std::vector<std::filesystem::path> json_paths;
 		// A -> B means A is loaded before B.
-		Graph<Dependency> dependencies;
+		Graph<DependencyNode> dependencies;
 		// Maps data types like "base:crop_map" to vectors of names of data files that contain instances of them.
 		std::unordered_map<std::string, std::vector<std::string>> categories;
 		std::unordered_map<std::string, nlohmann::json> jsons;
