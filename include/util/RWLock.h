@@ -5,6 +5,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <shared_mutex>
+#include <thread>
 
 namespace Game3 {
 	class RWLock {
