@@ -1,43 +1,208 @@
 {
-	"app-id": "gay.heimskr.Game3",
-	"runtime": "org.gnome.Platform",
-	"runtime-version": "42",
-	"sdk": "org.gnome.Sdk",
-	"command": "game3",
-	"finish-args": [
-		"--share=ipc",
-		"--socket=fallback-x11",
-		"--socket=wayland",
-		"--share=network"
-	],
-	"build-options": {
-		"cflags": "-Og -g3"
-	},
-	"cleanup": [
-		"*.la",
-		"*.a",
-		"/include",
-		"/lib/pkgconfig",
-		"/share/doc",
-		"/share/gtk-doc",
-		"/share/man",
-		"/share/pkg-config"
-	],
-	"modules": [
-		{
-			"name": "game3",
-			"builddir": true,
-			"buildsystem": "simple",
-			"build-commands": [
-				"make all_install -j20"
-			],
-			"sources": [
-				{
-					"type": "dir",
-					"path": "."
-				}
-			]
-		}
-	]
+    "app-id": "gay.heimskr.Game3",
+    "runtime": "org.gnome.Platform",
+    "runtime-version": "44",
+    "sdk": "org.gnome.Sdk",
+    "command": "game3",
+    "sdk-extensions": ["org.freedesktop.Sdk.Extension.ziglang"],
+    "finish-args": [
+        "--share=ipc",
+        "--socket=fallback-x11",
+        "--socket=wayland",
+        "--share=network"
+    ],
+    "build-options": {
+        "cxxflags": "-Og -g3",
+        "env": {},
+        "append-path": "/usr/lib/sdk/ziglang",
+        "prepend-ld-library-path": "/usr/lib/sdk/ziglang/lib"
+    },
+    "cleanup": [
+        "*.la",
+        "*.a",
+        "/include",
+        "/lib/pkgconfig",
+        "/share/doc",
+        "/share/gtk-doc",
+        "/share/man",
+        "/share/pkg-config"
+    ],
+    "modules": [
+        {
+            "name": "mm-common",
+            "cleanup": ["/"],
+            "buildsystem": "meson",
+            "config-opts": [
+                "--buildtype=debugoptimized",
+                "--wrap-mode=nodownload",
+                "-Duse-network=false"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://download.gnome.org/sources/mm-common/1.0/mm-common-1.0.5.tar.xz",
+                    "sha256": "705c6d29f4116a29bde4e36cfc1b046c92b6ef8c6dae4eaec85018747e6da5aa"
+                }
+            ]
+        },
+        {
+            "name": "sigc++-2.0",
+            "buildsystem": "meson",
+            "config-opts": [
+                "-Dmaintainer-mode=true",
+                "-Dbuild-examples=false",
+                "-Dbuild-documentation=false",
+                "-Dbuild-tests=false"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://download.gnome.org/sources/libsigc++/2.12/libsigc++-2.12.0.tar.xz",
+                    "sha256": "1c466d2e64b34f9b118976eb21b138c37ed124d0f61497df2a90ce6c3d9fa3b5"
+                }
+            ]
+        },
+        {
+            "name": "sigc++-3.0",
+            "buildsystem": "meson",
+            "config-opts": [
+                "-Dmaintainer-mode=true",
+                "-Dbuild-examples=false",
+                "-Dbuild-documentation=false",
+                "-Dbuild-tests=false"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://download.gnome.org/sources/libsigc++/3.4/libsigc++-3.4.0.tar.xz",
+                    "sha256": "02e2630ffb5ce93cd52c38423521dfe7063328863a6e96d41d765a6116b8707e"
+                }
+            ]
+        },
+        {
+            "name": "cairomm",
+            "config-opts": ["--disable-documentation"],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://www.cairographics.org/releases/cairomm-1.16.2.tar.xz",
+                    "sha256": "6a63bf98a97dda2b0f55e34d1b5f3fb909ef8b70f9b8d382cb1ff3978e7dc13f"
+                },
+                {
+                    "type": "shell",
+                    "commands": [
+                        "cp -p /usr/share/automake-*/config.{sub,guess} \"build/\";"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "glibmm-2.4",
+            "buildsystem": "meson",
+            "config-opts": [
+                "-Dmaintainer-mode=true",
+                "-Dbuild-examples=false",
+                "-Dbuild-documentation=false"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://download.gnome.org/sources/glibmm/2.66/glibmm-2.66.6.tar.xz",
+                    "sha256": "5358742598181e5351d7bf8da072bf93e6dd5f178d27640d4e462bc8f14e152f"
+                }
+            ]
+        },
+        {
+            "name": "glibmm-2.68",
+            "buildsystem": "meson",
+            "config-opts": [
+                "-Dmaintainer-mode=true",
+                "-Dbuild-examples=false",
+                "-Dbuild-documentation=false"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://download.gnome.org/sources/glibmm/2.76/glibmm-2.76.0.tar.xz",
+                    "sha256": "8637d80ceabd94fddd6e48970a082a264558d4ab82684e15ffc87e7ef3462ab2"
+                }
+            ]
+        },
+        {
+            "name": "pangomm",
+            "buildsystem": "meson",
+            "config-opts": [
+                "-Dmaintainer-mode=true",
+                "-Dbuild-documentation=false"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://download.gnome.org/sources/pangomm/2.50/pangomm-2.50.1.tar.xz",
+                    "sha256": "ccc9923413e408c2bff637df663248327d72822f11e394b423e1c5652b7d9214"
+                }
+            ]
+        },
+        {
+            "name": "atkmm",
+            "buildsystem": "meson",
+            "config-opts": [
+                "-Dmaintainer-mode=true",
+                "-Dbuild-documentation=false"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://download.gnome.org/sources/atkmm/2.28/atkmm-2.28.3.tar.xz",
+                    "sha256": "7c2088b486a909be8da2b18304e56c5f90884d1343c8da7367ea5cd3258b9969"
+                }
+            ]
+        },
+        {
+            "name": "gtk4",
+            "buildsystem": "meson",
+            "config-opts": [
+                "-Ddocumentation=false",
+                "-Dbuild-demos=false",
+                "-Dbuild-examples=false",
+                "-Dbuild-tests=false"
+            ],
+            "build-options": {"cxxflags": "-O2 -g -std=c++20"},
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://download.gnome.org/sources/gtk/4.12/gtk-4.12.1.tar.xz",
+                    "sha256": "b8b61d6cf94fac64bf3a0bfc7af137c9dd2f8360033fdeb0cfe9612b77a99a72"
+                }
+            ]
+        },
+        {
+            "name": "gtkmm",
+            "buildsystem": "meson",
+            "config-opts": [
+                "-Dmaintainer-mode=true",
+                "-Dbuild-documentation=false",
+                "-Dbuild-demos=false",
+                "-Dbuild-tests=false"
+            ],
+            "build-options": {"cxxflags": "-O2 -g -std=c++20"},
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://download.gnome.org/sources/gtkmm/4.12/gtkmm-4.12.0.tar.xz",
+                    "sha256": "fbc3e7618123345c0148ef71abb6548d421f52bb224fbda34875b677dc032c92"
+                }
+            ]
+        },
+        {
+            "name": "game3",
+            "buildsystem": "meson",
+            "sources": [
+                {
+                    "type": "dir",
+                    "path": "."
+                }
+            ]
+        }
+    ]
 }
-

@@ -1,10 +1,10 @@
 project('game3', 'cpp', version: '0.1.0',
-	meson_version: '>= 0.62.0',
+	#meson_version: '>= 0.62.0',
 	default_options: ['warning_level=2', 'werror=false', 'cpp_std=c++20'],
 )
 
-vcpkg = find_program('vcpkg', required : true)
-run_command(vcpkg, 'install', '--x-wait-for-lock', '--x-manifest-root=' + meson.global_source_root())
+# vcpkg = find_program('vcpkg', required: true)
+# run_command(vcpkg, 'install', '--x-wait-for-lock', '--x-manifest-root=' + meson.global_source_root())
 
 i18n = import('i18n')
 gnome = import('gnome')

@@ -12,6 +12,7 @@ zig = find_program('zig', required: true)
 # 	output: 'resgen',
 # 	command: [zig, 'build-exe', '-O', 'ReleaseSmall', '--main-pkg-path', '..', '@INPUT@'])
 
+
 run_command('zig', 'build-exe', '-O', 'ReleaseSmall', '--main-pkg-path', '..', '../src/resgen.zig')
 
 resources_h = custom_target('resources-header-gen',
@@ -24,7 +25,7 @@ message(meson.current_build_dir())
 resources_o = custom_target('resources-obj-gen',
 	input: 'resources.zig',
 	output: 'resources.o',
-	command: ['../hack.sh', '@INPUT@'])
+	command: ['../hack.sh', '@BUILD_ROOT@', meson.project_source_root()])
 
 resources_dep = declare_dependency(sources: resources_o[0])
 
