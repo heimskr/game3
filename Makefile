@@ -45,14 +45,8 @@ CPPFLAGS     += -Wall -Wextra $(BUILDFLAGS) -std=c++23 -Iinclude -Ijson/include 
 ZIG          ?= zig
 # --main-pkg-path is needed as otherwise it wouldn't let you embed any file outside of src/
 ZIGFLAGS     := -O ReleaseSmall --main-pkg-path .
-ifeq ($(GITHUB),true)
-	INCLUDES     := $(shell PKG_CONFIG_PATH=.github-deps/prefix/lib/pkgconfig .github-deps/prefix/bin/pkg-config --cflags $(DEPS))
-	LIBS         := $(shell PKG_CONFIG_PATH=.github-deps/prefix/lib/pkgconfig .github-deps/prefix/bin/pkg-config --libs   $(DEPS))
-	ZIG          := .zig/zig
-	COMPILER     := clang++-14
-else
-	INCLUDES     := $(shell pkg-config --cflags $(DEPS))
-	LIBS         := $(shell pkg-config --libs   $(DEPS))
+INCLUDES     := $(shell pkg-config --cflags $(DEPS))
+LIBS         := $(shell pkg-config --libs   $(DEPS))
 endif
 GLIB_COMPILE_RESOURCES = $(shell pkg-config --variable=glib_compile_resources gio-2.0)
 LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread $(LTO) $(PROFILING)
@@ -107,9 +101,6 @@ include/resources.h: $(RESGEN)
 $(OUTPUT): $(OBJECTS) chemskr/libchemskr.a $(NOISE_OBJ)
 	@ printf "\e[2m[\e[22;36mld\e[39;2m]\e[22m $@ \e[2m$(LTO)\e[22m\n"
 	@ $(COMPILER) $^ -o $@ $(LDFLAGS)
-ifeq ($(GITHUB),true)
-	strip $@
-endif
 
 chemskr/libchemskr.a:
 	make -C chemskr libchemskr.a
