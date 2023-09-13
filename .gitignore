@@ -33,3 +33,4 @@
 /_build
 /src/resgen
 *~
+/*.flatpak

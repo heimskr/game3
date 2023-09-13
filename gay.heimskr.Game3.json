@@ -4,7 +4,6 @@
 	"runtime-version": "44",
 	"sdk": "org.gnome.Sdk",
 	"command": "game3",
-	"metadata": "flatpak.ini",
 	"sdk-extensions": [
 		"org.freedesktop.Sdk.Extension.ziglang"
 	],
@@ -32,7 +31,11 @@
 		"/share/gtk-doc",
 		"/share/man",
 		"/share/pkg-config",
-		"/share/aclocal"
+		"/share/aclocal",
+		"/bin/gtk4-*",
+		"/bin/libnoise*",
+		"/bin/event_rpcgen.py",
+		"/lib/libgtk-4.*"
 	],
 	"modules": [
 		{
@@ -341,19 +344,28 @@
 			]
 		},
 		{
-			"name": "game3",
+			"name": "game3-bin",
 			"buildsystem": "meson",
 			"config-opts": [
 				"-Dis_flatpak=true",
 				"-Dstrip=true",
 				"-Db_lto=true"
 			],
+			"build-options": {
+				"strip": true
+			},
 			"sources": [
 				{
 					"type": "dir",
 					"path": "."
 				}
 			]
+		},
+		{
+			"name": "game3-cleanup",
+			"buildsystem": "simple",
+			"build-commands": ["./flatpak-cleanup.sh"],
+			"sources": [{"type": "dir", "path": "."}]
 		}
 	]
 }
