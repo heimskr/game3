@@ -40,10 +40,8 @@
 	"modules": [
 		{
 			"name": "mm-common",
-			"cleanup": [
-				"*"
-			],
 			"buildsystem": "meson",
+			"cleanup": ["/"],
 			"config-opts": [
 				"--buildtype=debugoptimized",
 				"--wrap-mode=nodownload",
@@ -346,6 +344,7 @@
 		{
 			"name": "game3-bin",
 			"buildsystem": "meson",
+			"builddir": true,
 			"config-opts": [
 				"-Dis_flatpak=true",
 				"-Dstrip=true",
@@ -360,12 +359,6 @@
 					"path": "."
 				}
 			]
-		},
-		{
-			"name": "game3-cleanup",
-			"buildsystem": "simple",
-			"build-commands": ["./flatpak-cleanup.sh"],
-			"sources": [{"type": "dir", "path": "."}]
 		}
 	]
 }

@@ -11,7 +11,6 @@ config_h = configuration_data()
 config_h.set_quoted('PACKAGE_VERSION', meson.project_version())
 config_h.set_quoted('GETTEXT_PACKAGE', 'game3')
 config_h.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('localedir')))
-configure_file(output: 'config.h', configuration: config_h)
 add_project_arguments(['-I' + meson.project_build_root()], language: 'cpp')
 
 project_cpp_args = []
@@ -24,14 +23,14 @@ test_cpp_args = [
 game3_config_data = configuration_data()
 
 if get_option('is_flatpak') == true
-	game3_config_data.set('IS_FLATPAK', '1')
+	config_h.set('IS_FLATPAK', '1')
 endif
 
 if get_option('buildtype') != 'plain'
 	test_cpp_args += '-fstack-protector-strong'
 endif
 
-configure_file(output: 'config.h', configuration: game3_config_data)
+configure_file(output: 'config.h', configuration: config_h)
 
 foreach arg: test_cpp_args
 	if cxx.has_multi_arguments(arg)
