@@ -11,6 +11,9 @@
 
 namespace Game3 {
 	bool Sapling::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
+		// TODO: use the crop system
+		return false;
+
 		auto &player = *place.player;
 		auto &realm  = *place.realm;
 		assert(realm.getSide() == Side::Server);

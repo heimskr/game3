@@ -65,7 +65,8 @@ namespace Game3 {
 					packet->decode(*server.game, receiveBuffer);
 				} catch (...) {
 					ERROR("Couldn't decode packet of type " << packetType << ", size " << payloadSize);
-					throw;
+					server.server->close(*this);
+					return;
 				}
 
 				assert(receiveBuffer.empty());

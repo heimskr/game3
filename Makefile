@@ -47,7 +47,6 @@ ZIG          ?= zig
 ZIGFLAGS     := -O ReleaseSmall --main-pkg-path .
 INCLUDES     := $(shell pkg-config --cflags $(DEPS))
 LIBS         := $(shell pkg-config --libs   $(DEPS))
-endif
 GLIB_COMPILE_RESOURCES = $(shell pkg-config --variable=glib_compile_resources gio-2.0)
 LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread $(LTO) $(PROFILING)
 SOURCES      := $(shell find -L src -name \*.cpp) src/gtk_resources.cpp
