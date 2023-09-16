@@ -1,1 +1,2 @@
 option('is_flatpak', type: 'boolean', value: 'false', description: 'Whether a Flatpak is being built')
+option('use_vcpkg', type: 'boolean', value: 'false', description: 'Whether to add vcpkg_installed to the include directories')

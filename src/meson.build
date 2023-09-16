@@ -56,6 +56,11 @@ inc_dirs = [
 	include_directories('..' / 'include')
 ]
 
+if get_option('use_vcpkg') == true
+	vcpkg_root = 'vcpkg_installed' / get_option('vcpkg-triplet')
+	inc_dirs += include_directories('..' / vcpkg_root / 'include')
+endif
+
 executable('game3', game3_sources,
 	dependencies: game3_deps,
 	link_with: [chemskr.get_variable('chemskr_lib')],
