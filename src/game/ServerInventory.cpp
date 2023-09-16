@@ -114,6 +114,11 @@ namespace Game3 {
 
 		ItemStack &source_stack = storage.at(source);
 
+		std::function<void()> action;
+
+		if (onSwap)
+			action = onSwap(*this, source, *this, destination);
+
 		if (storage.contains(destination)) {
 			ItemStack &destination_stack = storage.at(destination);
 			if (destination_stack.canMerge(source_stack)) {
@@ -127,6 +132,9 @@ namespace Game3 {
 			storage.emplace(destination, std::move(source_stack));
 			storage.erase(source);
 		}
+
+		if (action)
+			action();
 
 		notifyOwner();
 	}
@@ -150,6 +158,8 @@ namespace Game3 {
 
 			if (stack.canMerge(stack_to_remove)) {
 				const ItemCount to_remove = std::min(stack.count, count_to_remove);
+				// The const_cast is for certain older compilers (looking at you, gcc) that constify the first argument of the function passed to std::erase_if.
+				// Such behavior doesn't comply with the C++ standard, but I want to support those compilers anyway.
 				const_cast<ItemStack &>(stack).count -= to_remove;
 				count_to_remove -= to_remove;
 				removed += to_remove;
@@ -179,6 +189,7 @@ namespace Game3 {
 
 			if (predicate(slot) && stack.canMerge(stack_to_remove)) {
 				const ItemCount to_remove = std::min(stack.count, count_to_remove);
+				// See above for the reasoning behind this const_cast.
 				const_cast<ItemStack &>(stack).count -= to_remove;
 				count_to_remove -= to_remove;
 				removed += to_remove;

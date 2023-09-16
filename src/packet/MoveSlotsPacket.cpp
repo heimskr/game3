@@ -45,6 +45,8 @@ namespace Game3 {
 		Inventory &first_inventory  = *first_has_inventory->getInventory();
 		Inventory &second_inventory = *second_has_inventory->getInventory();
 
+		std::function<void()> first_action, second_action;
+
 		{
 			auto first_lock  = first_inventory.uniqueLock();
 			// Just in case there's some trickery with shared inventories or something.
@@ -58,6 +60,7 @@ namespace Game3 {
 				return;
 			}
 
+
 			if (second_stack != nullptr && first_stack->canMerge(*second_stack)) {
 
 				if (!second_inventory.canInsert(*first_stack)) {
@@ -66,10 +69,10 @@ namespace Game3 {
 				}
 
 				if (first_inventory.onMove)
-					first_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, false);
+					first_action = first_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, false);
 
 				if (&first_inventory != &second_inventory && second_inventory.onMove)
-					second_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, false);
+					second_action = second_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, false);
 
 				if (std::optional<ItemStack> leftovers = second_inventory.add(*first_stack, secondSlot))
 					*first_stack = std::move(*leftovers);
@@ -84,10 +87,10 @@ namespace Game3 {
 				}
 
 				if (first_inventory.onMove)
-					first_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, true);
+					first_action = first_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, true);
 
 				if (&first_inventory != &second_inventory && second_inventory.onMove)
-					second_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, true);
+					second_action = second_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, true);
 
 				second_inventory.add(*first_stack, secondSlot);
 				first_inventory.erase(firstSlot);
@@ -95,10 +98,10 @@ namespace Game3 {
 			} else {
 
 				if (first_inventory.onSwap)
-					first_inventory.onSwap(first_inventory, firstSlot, second_inventory, secondSlot);
+					first_action = first_inventory.onSwap(first_inventory, firstSlot, second_inventory, secondSlot);
 
 				if (&first_inventory != &second_inventory && second_inventory.onSwap)
-					second_inventory.onSwap(second_inventory, secondSlot, first_inventory, firstSlot);
+					second_action = second_inventory.onSwap(second_inventory, secondSlot, first_inventory, firstSlot);
 
 				std::swap(*first_stack, *second_stack);
 
@@ -107,5 +110,11 @@ namespace Game3 {
 
 		first_inventory.notifyOwner();
 		second_inventory.notifyOwner();
+
+		if (first_action)
+			first_action();
+
+		if (second_action)
+			second_action();
 	}
 }

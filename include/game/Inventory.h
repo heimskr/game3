@@ -38,10 +38,12 @@ namespace Game3 {
 			std::weak_ptr<Agent> weakOwner;
 			Atomic<Slot> slotCount = 0;
 			Atomic<Slot> activeSlot = 0;
-			/** Called before the swap occurs. The first argument always refers to this object. */
-			std::function<void(Inventory &, Slot, Inventory &, Slot)> onSwap;
-			/** Called before the move occurs. The first pair of arguments are always the source may or not refer to this object; the second pair of arguments are always the destination. */
-			std::function<void(Inventory &, Slot from, Inventory &, Slot to, bool consumed)> onMove;
+			/** Called before the swap occurs. The first argument always refers to this object.
+			 *  Returns (optionally) a function to call after the swap has occurred. */
+			std::function<std::function<void()>(Inventory &, Slot, Inventory &, Slot)> onSwap;
+			/** Called before the move occurs. The first pair of arguments are always the source may or not refer to this object;
+			 *  the second pair of arguments are always the destination. Returns (optionally) a function to call after the move has occurred. */
+			std::function<std::function<void()>(Inventory &, Slot from, Inventory &, Slot to, bool consumed)> onMove;
 
 			Inventory & operator=(const Inventory &);
 			Inventory & operator=(Inventory &&);

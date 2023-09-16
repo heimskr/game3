@@ -134,8 +134,8 @@ namespace Game3 {
 			Game & getGame();
 			Game & getGame() const;
 			bool isVisible() const;
-			void setHeldLeft(Slot);
-			void setHeldRight(Slot);
+			bool setHeldLeft(Slot);
+			bool setHeldRight(Slot);
 			Side getSide() const override final;
 			Type getAgentType() const override final { return Agent::Type::Entity; }
 			void inventoryUpdated() override;
@@ -208,7 +208,7 @@ namespace Game3 {
 			/** The set of all players who have been sent a packet about the entity's current path. Governed by pathSeersMutex */
 			Lockable<WeakSet<Player>> pathSeers;
 
-			void setHeld(Slot, Held &);
+			bool setHeld(Slot, Held &);
 	};
 
 	void to_json(nlohmann::json &, const Entity &);

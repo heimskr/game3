@@ -29,82 +29,91 @@ namespace Game3 {
 
 		if (firstGID == secondGID) {
 			first_has_inventory->getInventory()->swap(firstSlot, secondSlot);
-		} else {
-			AgentPtr second_agent = game.getAgent(secondGID);
-			if (!second_agent) {
-				client.send(ErrorPacket("Can't swap slots: second agent not found"));
+			return;
+		}
+
+		AgentPtr second_agent = game.getAgent(secondGID);
+		if (!second_agent) {
+			client.send(ErrorPacket("Can't swap slots: second agent not found"));
+			return;
+		}
+
+		auto second_has_inventory = std::dynamic_pointer_cast<HasInventory>(second_agent);
+		if (!second_has_inventory) {
+			client.send(ErrorPacket("Can't swap slots: second agent doesn't have an inventory"));
+			return;
+		}
+
+		Inventory &first_inventory  = *first_has_inventory->getInventory();
+		Inventory &second_inventory = *second_has_inventory->getInventory();
+
+		std::function<void()> first_action, second_action;
+
+		{
+			auto first_lock  = first_inventory.uniqueLock();
+			// Just in case there's some trickery with shared inventories or something.
+			auto second_lock = &first_inventory == &second_inventory? std::unique_lock<std::shared_mutex>() : second_inventory.uniqueLock();
+
+			ItemStack *first_stack  = first_inventory[firstSlot];
+			ItemStack *second_stack = second_inventory[secondSlot];
+
+			if (first_stack == nullptr && second_stack == nullptr) {
+				client.send(ErrorPacket("Can't swap slots: both slots are invalid or empty"));
 				return;
 			}
 
-			auto second_has_inventory = std::dynamic_pointer_cast<HasInventory>(second_agent);
-			if (!second_has_inventory) {
-				client.send(ErrorPacket("Can't swap slots: second agent doesn't have an inventory"));
-				return;
-			}
+			if (first_stack == nullptr) {
 
-			Inventory &first_inventory  = *first_has_inventory->getInventory();
-			Inventory &second_inventory = *second_has_inventory->getInventory();
-
-			{
-				auto first_lock  = first_inventory.uniqueLock();
-				// Just in case there's some trickery with shared inventories or something.
-				auto second_lock = &first_inventory == &second_inventory? std::unique_lock<std::shared_mutex>() : second_inventory.uniqueLock();
-
-				ItemStack *first_stack  = first_inventory[firstSlot];
-				ItemStack *second_stack = second_inventory[secondSlot];
-
-				if (first_stack == nullptr && second_stack == nullptr) {
-					client.send(ErrorPacket("Can't swap slots: both slots are invalid or empty"));
+				if (!first_inventory.hasSlot(firstSlot)) {
+					client.send(ErrorPacket("Can't swap slots: first slot is invalid"));
 					return;
 				}
 
-				if (first_stack == nullptr) {
+				if (first_inventory.onMove)
+					first_action = first_inventory.onMove(second_inventory, secondSlot, first_inventory, firstSlot, true);
 
-					if (!first_inventory.hasSlot(firstSlot)) {
-						client.send(ErrorPacket("Can't swap slots: first slot is invalid"));
-						return;
-					}
+				if (&first_inventory != &second_inventory && second_inventory.onMove)
+					second_action = second_inventory.onMove(second_inventory, secondSlot, first_inventory, firstSlot, true);
 
-					if (first_inventory.onMove)
-						first_inventory.onMove(second_inventory, secondSlot, first_inventory, firstSlot, true);
+				first_inventory.add(*second_stack, firstSlot);
+				second_inventory.erase(secondSlot);
 
-					if (&first_inventory != &second_inventory && second_inventory.onMove)
-						second_inventory.onMove(second_inventory, secondSlot, first_inventory, firstSlot, true);
+			} else if (second_stack == nullptr) {
 
-					first_inventory.add(*second_stack, firstSlot);
-					second_inventory.erase(secondSlot);
-
-				} else if (second_stack == nullptr) {
-
-					if (!second_inventory.hasSlot(secondSlot)) {
-						client.send(ErrorPacket("Can't swap slots: second slot is invalid"));
-						return;
-					}
-
-					if (first_inventory.onMove)
-						first_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, true);
-
-					if (&first_inventory != &second_inventory && second_inventory.onMove)
-						second_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, true);
-
-					second_inventory.add(*first_stack, secondSlot);
-					first_inventory.erase(firstSlot);
-
-				} else {
-
-					if (first_inventory.onSwap)
-						first_inventory.onSwap(first_inventory, firstSlot, second_inventory, secondSlot);
-
-					if (&first_inventory != &second_inventory && second_inventory.onSwap)
-						second_inventory.onSwap(second_inventory, secondSlot, first_inventory, firstSlot);
-
-					std::swap(*first_stack, *second_stack);
-
+				if (!second_inventory.hasSlot(secondSlot)) {
+					client.send(ErrorPacket("Can't swap slots: second slot is invalid"));
+					return;
 				}
-			}
 
-			first_inventory.notifyOwner();
-			second_inventory.notifyOwner();
+				if (first_inventory.onMove)
+					first_action = first_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, true);
+
+				if (&first_inventory != &second_inventory && second_inventory.onMove)
+					second_action = second_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, true);
+
+				second_inventory.add(*first_stack, secondSlot);
+				first_inventory.erase(firstSlot);
+
+			} else {
+
+				if (first_inventory.onSwap)
+					first_action = first_inventory.onSwap(first_inventory, firstSlot, second_inventory, secondSlot);
+
+				if (&first_inventory != &second_inventory && second_inventory.onSwap)
+					second_action = second_inventory.onSwap(second_inventory, secondSlot, first_inventory, firstSlot);
+
+				std::swap(*first_stack, *second_stack);
+
+			}
 		}
+
+		first_inventory.notifyOwner();
+		second_inventory.notifyOwner();
+
+		if (first_action)
+			first_action();
+
+		if (second_action)
+			second_action();
 	}
 }

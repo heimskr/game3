@@ -195,43 +195,55 @@ namespace Game3 {
 		if (texture == nullptr && getSide() == Side::Client)
 			texture = getTexture();
 
-		const InventoryPtr inventory = getInventory();
+		InventoryPtr inventory = getInventory();
 
-		if (!inventory)
+		if (!inventory) {
 			setInventory(Inventory::create(getSide(), shared, DEFAULT_INVENTORY_SIZE));
-		else
+			inventory = getInventory();
+		} else
 			inventory->weakOwner = shared;
 
-		inventory->onSwap = [this](Inventory &here, Slot here_slot, Inventory &there, Slot there_slot) {
-			InventoryPtr this_inventory = getInventory();
-			assert(here == *this_inventory || there == *this_inventory);
+		if (getSide() == Side::Server) {
+			inventory->onSwap = [this](Inventory &here, Slot here_slot, Inventory &there, Slot there_slot) {
+				InventoryPtr this_inventory = getInventory();
+				assert(here == *this_inventory || there == *this_inventory);
 
-			for (Held &held: {std::ref(heldLeft), std::ref(heldRight)})
-				if (here_slot == held.slot)
-					setHeld(here == there? there_slot : -1, held);
-		};
+				return [this, &here, here_slot, &there, there_slot, this_inventory] {
+					for (Held &held: {std::ref(heldLeft), std::ref(heldRight)})
+						if (here_slot == held.slot)
+							setHeld(here == there? there_slot : -1, held);
+				};
+			};
 
-		inventory->onMove = [this](Inventory &source, Slot source_slot, Inventory &destination, Slot destination_slot, bool consumed) {
-			InventoryPtr this_inventory = getInventory();
-
-			if (source == *this_inventory && destination == *this_inventory) {
-				for (Held &held: {std::ref(heldLeft), std::ref(heldRight)}) {
-					if (source_slot == held.slot)
-						setHeld(destination_slot, held);
-					else if (destination_slot == held.slot)
-						setHeld(source_slot, held);
-				}
-			} else if (source == *this_inventory) {
-				for (Held &held: {std::ref(heldLeft), std::ref(heldRight)})
-					if (source_slot == held.slot)
-						setHeld(-1, held);
-			} else {
-				assert(destination == *this_inventory);
-				for (Held &held: {std::ref(heldLeft), std::ref(heldRight)})
-					if (destination_slot == held.slot)
-						setHeld(-1, held);
-			}
-		};
+			inventory->onMove = [this](Inventory &source, Slot source_slot, Inventory &destination, Slot destination_slot, bool consumed) {
+				return [this, &source, source_slot, &destination, destination_slot, consumed, this_inventory = getInventory()] {
+					if (source == *this_inventory && destination == *this_inventory) {
+						for (Held &held: {std::ref(heldLeft), std::ref(heldRight)}) {
+							if (source_slot == held.slot) {
+								INFO(__FILE__ << ':' << __LINE__ << ": setHeld(destination_slot{" << destination_slot << "}, " << (held.isLeft? "left" : "right") << ')');
+								setHeld(destination_slot, held);
+							} else if (destination_slot == held.slot) {
+								INFO(__FILE__ << ':' << __LINE__ << ": setHeld(source_slot{" << destination_slot << "}, " << (held.isLeft? "left" : "right") << ')');
+								setHeld(source_slot, held);
+							}
+						}
+					} else if (source == *this_inventory) {
+						for (Held &held: {std::ref(heldLeft), std::ref(heldRight)})
+							if (source_slot == held.slot) {
+								INFO(__FILE__ << ':' << __LINE__ << ": setHeld(-1, " << (held.isLeft? "left" : "right") << ')');
+								setHeld(-1, held);
+							}
+					} else {
+						assert(destination == *this_inventory);
+						for (Held &held: {std::ref(heldLeft), std::ref(heldRight)})
+							if (destination_slot == held.slot) {
+								INFO(__FILE__ << ':' << __LINE__ << ": setHeld(-1, " << (held.isLeft? "left" : "right") << ')');
+								setHeld(-1, held);
+							}
+					}
+				};
+			};
+		}
 
 		movedToNewChunk(std::nullopt);
 	}
@@ -654,16 +666,16 @@ namespace Game3 {
 		return realm->isVisible(pos);
 	}
 
-	void Entity::setHeldLeft(Slot new_value) {
-		if (0 <= new_value && heldRight.slot == new_value)
-			setHeld(-1, heldRight);
-		setHeld(new_value, heldLeft);
+	bool Entity::setHeldLeft(Slot new_value) {
+		if (0 <= new_value && heldRight.slot == new_value && !setHeld(-1, heldRight))
+			return false;
+		return setHeld(new_value, heldLeft);
 	}
 
-	void Entity::setHeldRight(Slot new_value) {
-		if (0 <= new_value && heldLeft.slot == new_value)
-			setHeld(-1, heldLeft);
-		setHeld(new_value, heldRight);
+	bool Entity::setHeldRight(Slot new_value) {
+		if (0 <= new_value && heldLeft.slot == new_value && !setHeld(-1, heldLeft))
+			return false;
+		return setHeld(new_value, heldRight);
 	}
 
 	Side Entity::getSide() const {
@@ -907,7 +919,7 @@ namespace Game3 {
 		}
 	}
 
-	void Entity::setHeld(Slot new_value, Held &held) {
+	bool Entity::setHeld(Slot new_value, Held &held) {
 		const bool is_client = getSide() == Side::Client;
 
 		if (!is_client)
@@ -917,19 +929,22 @@ namespace Game3 {
 			held.slot = -1;
 			if (is_client)
 				held.texture.reset();
-			return;
+			return true;
 		}
 
 		const InventoryPtr inventory = getInventory();
 
-		if (!inventory->contains(new_value))
-			throw std::invalid_argument("Can't equip slot " + std::to_string(new_value) + ": no item in inventory");
+		if (!inventory->contains(new_value)) {
+			WARN("Can't equip slot " << new_value << ": no item in inventory");
+			return false;
+		}
 
 		held.slot = new_value;
 		auto item_texture = getGame().registry<ItemTextureRegistry>().at((*inventory)[held.slot]->item->identifier);
 		held.texture = item_texture->getTexture(getGame());
 		held.xOffset = item_texture->x / 2.f;
 		held.yOffset = item_texture->y / 2.f;
+		return true;
 	}
 
 	std::shared_ptr<Texture> Entity::getTexture() {

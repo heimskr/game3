@@ -157,7 +157,7 @@ namespace Game3 {
 		if (getSide() != Side::Client)
 			return;
 
-		game.toClient().activateContext();
+		// game.toClient().activateContext();
 		renderers.emplace();
 		fluidRenderers.emplace();
 	}
