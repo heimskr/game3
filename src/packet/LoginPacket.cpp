@@ -16,7 +16,7 @@ namespace Game3 {
 			std::string display_name;
 			nlohmann::json json;
 
-			if (!game.hasPlayer(username) && game.database.readUser(username, &display_name, &json)) {
+			if (!game.hasPlayer(username) && server->generateToken(username) == token && game.database.readUser(username, &display_name, &json)) {
 				auto player = ServerPlayer::fromJSON(game, json);
 				player->username = username;
 				client.setPlayer(player);
