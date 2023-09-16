@@ -6,7 +6,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 0. Not used.
 
-1. **Protocol Version**: informs the other side of the protocol version in use.
+1. **Protocol Version**: informs the other side of the protocol version in use. Currently unused.
 
 	- `u32` Version
 
@@ -289,7 +289,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 # Message Format
 
-All values are little endian.
+All values are little endian. Strings are not null-terminated.
 
 ## Types
 
