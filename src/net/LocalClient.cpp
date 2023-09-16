@@ -17,6 +17,11 @@
 #include "util/Util.h"
 
 namespace Game3 {
+	LocalClient::~LocalClient() {
+		INFO("~LocalClient(" << this << ')');
+		sock->close();
+	}
+
 	void LocalClient::connect(std::string_view hostname, uint16_t port) {
 #ifdef USE_SSL
 		sock = std::make_shared<SSLSock>(hostname, port);

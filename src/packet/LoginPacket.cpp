@@ -16,14 +16,11 @@ namespace Game3 {
 			std::string display_name;
 			nlohmann::json json;
 
-			if (game.database.readUser(username, &display_name, &json)) {
+			if (!game.hasPlayer(username) && game.database.readUser(username, &display_name, &json)) {
 				auto player = ServerPlayer::fromJSON(game, json);
 				player->username = username;
 				client.setPlayer(player);
-				{
-					auto lock = game.players.uniqueLock();
-					game.players.insert(player);
-				}
+				game.addPlayer(player);
 				RealmPtr realm = game.getRealm(player->realmID);
 				player->setRealm(realm);
 				player->weakClient = client.shared_from_this();

@@ -462,8 +462,10 @@ namespace Game3 {
 				dialog->close();
 			removeModule();
 			game->stopThread();
-			game = nullptr;
+			INFO("Client use count: " << game->client.use_count());
 			canvas->game = nullptr;
+			INFO("Game use count: " << game.use_count());
+			game = nullptr;
 			for (const auto &[widget, tab]: tabMap)
 				tab->reset(nullptr);
 		}

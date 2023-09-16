@@ -130,10 +130,7 @@ namespace Game3 {
 		inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "H"}}));
 		inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "O"}}));
 		inventory->add(ItemStack(*game, "base:item/clay", 64));
-		{
-			auto lock = game->players.uniqueLock();
-			game->players.insert(player);
-		}
+		game->addPlayer(player);
 		return player;
 	}
 

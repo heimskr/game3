@@ -8,7 +8,14 @@
 #include "threading/Lockable.h"
 #include "threading/MTQueue.h"
 
+#include <filesystem>
+#include <memory>
 #include <mutex>
+#include <string>
+#include <tuple>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
 
 namespace Game3 {
 	class LocalServer;
@@ -20,6 +27,7 @@ namespace Game3 {
 			constexpr static float GARBAGE_COLLECTION_TIME = 60.f;
 
 			Lockable<std::unordered_set<ServerPlayerPtr>> players;
+			Lockable<std::unordered_map<std::string, ServerPlayerPtr>> playerMap;
 			std::weak_ptr<LocalServer> weakServer;
 			GameDB database{*this};
 			float lastGarbageCollection = 0.f;
@@ -43,6 +51,8 @@ namespace Game3 {
 			void tileEntitySpawned(const TileEntityPtr &);
 			void tileEntityDestroyed(const TileEntity &);
 			void remove(const ServerPlayerPtr &);
+			void addPlayer(const ServerPlayerPtr &);
+			bool hasPlayer(const std::string &username) const;
 			void queueRemoval(const ServerPlayerPtr &);
 			void openDatabase(std::filesystem::path);
 

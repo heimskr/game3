@@ -223,9 +223,26 @@ namespace Game3 {
 	}
 
 	void ServerGame::remove(const ServerPlayerPtr &player) {
-		auto lock = players.uniqueLock();
-		players.erase(player);
+		{
+			auto set_lock = players.uniqueLock();
+			players.erase(player);
+			auto map_lock = playerMap.uniqueLock();
+			playerMap.erase(player->username);
+		}
 		player->destroy();
+	}
+
+	void ServerGame::addPlayer(const ServerPlayerPtr &player) {
+		assert(!player->username.empty());
+		auto set_lock = players.uniqueLock();
+		players.insert(player);
+		auto map_lock = playerMap.uniqueLock();
+		playerMap.emplace(player->username, player);
+	}
+
+	bool ServerGame::hasPlayer(const std::string &username) const {
+		auto lock = playerMap.sharedLock();
+		return playerMap.contains(username);
 	}
 
 	void ServerGame::queueRemoval(const ServerPlayerPtr &player) {

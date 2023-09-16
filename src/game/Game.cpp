@@ -145,6 +145,7 @@
 
 namespace Game3 {
 	Game::~Game() {
+		INFO("~Game(" << this << ')');
 		dying = true;
 	}
 

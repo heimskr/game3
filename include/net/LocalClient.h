@@ -34,6 +34,8 @@ namespace Game3 {
 
 			LocalClient() = default;
 
+			~LocalClient();
+
 			void connect(std::string_view hostname, uint16_t port);
 			void read();
 			void send(const Packet &);
