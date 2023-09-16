@@ -7,6 +7,7 @@
 #include "tileentity/TileEntity.h"
 #include "tileentity/TileEntityFactory.h"
 #include "util/Endian.h"
+#include "util/Timer.h"
 #include "util/Util.h"
 
 #include <iomanip>
@@ -36,6 +37,7 @@ namespace Game3 {
 				terrain VARBINARY(65535),
 				biomes  VARBINARY(65535),
 				fluids  VARBINARY(65535),
+				pathmap VARBINARY(65535),
 				PRIMARY KEY (realmID, x, y)
 			);
 
@@ -77,18 +79,30 @@ namespace Game3 {
 	}
 
 	void GameDB::writeAllRealms() {
+		Timer timer{"WriteAllRealms"};
 		game.iterateRealms([this](const RealmPtr &realm) {
 			writeRealm(realm);
 		});
 	}
 
 	void GameDB::writeRealm(const RealmPtr &realm) {
-		writeRealmMeta(realm);
+		{
+			Timer timer{"WriteRealmMeta"};
+			writeRealmMeta(realm);
+		}
 		std::shared_lock lock(realm->tileProvider.chunkMutexes[0]);
-		for (const auto &[chunk_position, chunk]: realm->tileProvider.chunkMaps[0])
+		for (const auto &[chunk_position, chunk]: realm->tileProvider.chunkMaps[0]) {
+			Timer timer{"WriteChunk"};
 			writeChunk(realm, chunk_position);
-		writeTileEntities(realm);
-		writeEntities(realm);
+		}
+		{
+			Timer timer{"WriteTileEntities"};
+			writeTileEntities(realm);
+		}
+		{
+			Timer timer{"WriteEntities"};
+			writeEntities(realm);
+		}
 	}
 
 	void GameDB::writeChunk(const RealmPtr &realm, ChunkPosition chunk_position) {
@@ -98,40 +112,105 @@ namespace Game3 {
 		auto db_lock = database.uniqueLock();
 
 		SQLite::Transaction transaction{*database};
-		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO chunks VALUES (?, ?, ?, ?, ?, ?)"};
+		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO chunks VALUES (?, ?, ?, ?, ?, ?, ?)"};
+
+		std::string raw_terrain;
+		std::string raw_biomes;
+		std::string raw_fluids;
+		std::string raw_pathmap;
+
+		{
+			Timer timer{"GetRawTerrain"};
+			raw_terrain = provider.getRawTerrain(chunk_position);
+		}
+
+		{
+			Timer timer{"GetRawBiomes"};
+			raw_biomes = provider.getRawBiomes(chunk_position);
+		}
+
+		{
+			Timer timer{"GetRawFluids"};
+			raw_fluids = provider.getRawFluids(chunk_position);
+		}
+
+		{
+			Timer timer{"GetRawPathmap"};
+			raw_pathmap = provider.getRawPathmap(chunk_position);
+		}
 
 		statement.bind(1, realm->id);
 		statement.bind(2, chunk_position.x);
 		statement.bind(3, chunk_position.y);
-		statement.bind(4, provider.getRawTerrain(chunk_position));
-		statement.bind(5, provider.getRawBiomes(chunk_position));
-		statement.bind(6, provider.getRawFluids(chunk_position));
+		{
+			Timer timer{"BindTerrain"};
+			statement.bind(4, raw_terrain);
+		}
+		{
+			Timer timer{"BindBiomes"};
+			statement.bind(5, raw_biomes);
+		}
+		{
+			Timer timer{"BindFluids"};
+			statement.bind(6, raw_fluids);
+		}
+		{
+			Timer timer{"BindPathmap"};
+			statement.bind(7, raw_pathmap);
+		}
 
-		statement.exec();
-		transaction.commit();
+		{
+			Timer timer{"ExecStatement"};
+			statement.exec();
+		}
+
+		{
+			Timer timer{"CommitTransaction"};
+			transaction.commit();
+		}
 	}
 
 	void GameDB::readAllRealms() {
 		assert(database);
+
+		Timer lock_timer{"LockDB"};
 		auto db_lock = database.uniqueLock();
+		lock_timer.stop();
 
 		SQLite::Statement query{*database, "SELECT * FROM chunks"};
 
+		Timer query_timer{"ExecuteStep"};
+
 		while (query.executeStep()) {
-			RealmID realm_id = query.getColumn(0);
-			ChunkPosition::IntType x = query.getColumn(1);
-			ChunkPosition::IntType y = query.getColumn(2);
-			const void *terrain = query.getColumn(3);
-			const void *biomes  = query.getColumn(4);
-			const void *fluids  = query.getColumn(5);
-			ChunkSet chunk_set{
-				std::span<const char>(reinterpret_cast<const char *>(terrain), query.getColumn(3).getBytes()),
-				std::span<const char>(reinterpret_cast<const char *>(biomes),  query.getColumn(4).getBytes()),
-				std::span<const char>(reinterpret_cast<const char *>(fluids),  query.getColumn(5).getBytes())
-			};
-			RealmPtr realm = game.getRealm(realm_id, [&] { return loadRealm(realm_id, false); });
-			realm->tileProvider.absorb(ChunkPosition(x, y), chunk_set);
-			realm->remakePathMap(ChunkPosition(x, y));
+			query_timer.stop();
+			{
+				Timer iteration_timer{"RealmLoad"};
+				RealmID realm_id = query.getColumn(0);
+				ChunkPosition::IntType x = query.getColumn(1);
+				ChunkPosition::IntType y = query.getColumn(2);
+				const void *terrain = query.getColumn(3);
+				const void *biomes  = query.getColumn(4);
+				const void *fluids  = query.getColumn(5);
+				const void *pathmap = query.getColumn(6);
+				Timer chunk_set_timer{"ChunkSet"};
+				ChunkSet chunk_set{
+					std::span<const char>(reinterpret_cast<const char *>(terrain), query.getColumn(3).getBytes()),
+					std::span<const char>(reinterpret_cast<const char *>(biomes),  query.getColumn(4).getBytes()),
+					std::span<const char>(reinterpret_cast<const char *>(fluids),  query.getColumn(5).getBytes()),
+					std::span<const char>(reinterpret_cast<const char *>(pathmap), query.getColumn(6).getBytes())
+				};
+				chunk_set_timer.stop();
+				RealmPtr realm;
+				{
+					Timer get_realm_timer{"GetRealm"};
+					realm = game.getRealm(realm_id, [&] { return loadRealm(realm_id, false); });
+				}
+				{
+					Timer absorb_timer{"Absorb"};
+					realm->tileProvider.absorb(ChunkPosition(x, y), std::move(chunk_set));
+				}
+			}
+			query_timer.restart();
 		}
 	}
 
@@ -244,7 +323,7 @@ namespace Game3 {
 
 		auto db_lock = database.uniqueLock();
 
-		SQLite::Statement query{*database, "SELECT terrain, biomes, fluids FROM chunks WHERE realmID = ? AND x = ? AND y = ? LIMIT 1"};
+		SQLite::Statement query{*database, "SELECT terrain, biomes, fluids, pathmap FROM chunks WHERE realmID = ? AND x = ? AND y = ? LIMIT 1"};
 
 		query.bind(1, realm_id);
 		query.bind(2, chunk_position.x);
@@ -254,10 +333,12 @@ namespace Game3 {
 			const void *terrain = query.getColumn(0);
 			const void *biomes  = query.getColumn(1);
 			const void *fluids  = query.getColumn(2);
+			const void *pathmap = query.getColumn(3);
 			return ChunkSet{
 				std::span<const char>(reinterpret_cast<const char *>(terrain), query.getColumn(0).getBytes()),
 				std::span<const char>(reinterpret_cast<const char *>(biomes),  query.getColumn(1).getBytes()),
-				std::span<const char>(reinterpret_cast<const char *>(fluids),  query.getColumn(2).getBytes())
+				std::span<const char>(reinterpret_cast<const char *>(fluids),  query.getColumn(2).getBytes()),
+				std::span<const char>(reinterpret_cast<const char *>(pathmap), query.getColumn(3).getBytes())
 			};
 		}
 

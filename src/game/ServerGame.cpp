@@ -15,6 +15,7 @@
 #include "packet/TileEntityPacket.h"
 #include "packet/TileUpdatePacket.h"
 #include "packet/TimePacket.h"
+#include "util/Timer.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -24,10 +25,12 @@ namespace Game3 {
 	}
 
 	ServerGame::~ServerGame() {
+		Timer::clear();
 		INFO("Saving realms and users...");
 		database.writeAllRealms();
 		database.writeUsers(players);
 		SUCCESS("Saved realms and users.");
+		Timer::summary();
 	}
 
 	bool ServerGame::tick() {

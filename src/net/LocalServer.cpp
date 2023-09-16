@@ -23,6 +23,7 @@
 #include "realm/Overworld.h"
 #include "util/Crypto.h"
 #include "util/FS.h"
+#include "util/Timer.h"
 #include "util/Util.h"
 #include "worldgen/Overworld.h"
 #include "worldgen/WorldGen.h"
@@ -215,6 +216,8 @@ namespace Game3 {
 		constexpr size_t seed = 1621;
 		if (database_existed) {
 			game->database.readAllRealms();
+			Timer::summary();
+			Timer::clear();
 			INFO("Finished reading all realms from database.");
 		} else {
 			RealmPtr realm = Realm::create<Overworld>(*game, 1, Overworld::ID(), "base:tileset/monomap"_id, seed);

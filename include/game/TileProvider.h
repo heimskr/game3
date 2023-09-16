@@ -66,7 +66,7 @@ namespace Game3 {
 
 			/** Copies the data from a ChunkSet object into this TileProvider object's terrain, biome and fluid data, then remakes the path map.
 			 *  Doesn't lock any of the ChunkSet object's mutexes. */
-			void absorb(ChunkPosition, const ChunkSet &);
+			void absorb(ChunkPosition, ChunkSet);
 
 			std::shared_ptr<Tileset> getTileset(const Game &);
 
@@ -100,6 +100,9 @@ namespace Game3 {
 
 			/** An empty vector indicates failure. */
 			std::string getRawBiomes(ChunkPosition) const;
+
+			/** An empty vector indicates failure. */
+			std::string getRawPathmap(ChunkPosition) const;
 
 			/** An empty vector indicates failure. */
 			std::string getRawFluids(ChunkPosition) const;

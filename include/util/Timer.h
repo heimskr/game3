@@ -19,6 +19,7 @@ namespace Game3 {
 
 			std::chrono::nanoseconds difference() const;
 			void stop();
+			void restart();
 
 			static void summary(double threshold = 0.0);
 			static void clear();

@@ -40,7 +40,7 @@ namespace Game3 {
 		metaMap[chunk_position].updateCount = counter;
 	}
 
-	void TileProvider::absorb(ChunkPosition chunk_position, const ChunkSet &chunk_set) {
+	void TileProvider::absorb(ChunkPosition chunk_position, ChunkSet chunk_set) {
 		if (chunk_set.terrain.size() != LAYER_COUNT)
 			throw std::invalid_argument("ChunkSet has invalid number of terrain layers in TileProvider::absorb: " + std::to_string(chunk_set.terrain.size()));
 
@@ -52,17 +52,22 @@ namespace Game3 {
 
 		for (size_t i = 0; i < LAYER_COUNT; ++i) {
 			std::unique_lock lock(chunkMutexes[i]);
-			chunkMaps[i][chunk_position] = chunk_set.terrain[i];
+			chunkMaps[i][chunk_position] = std::move(chunk_set.terrain[i]);
 		}
 
 		{
 			std::unique_lock lock(biomeMutex);
-			biomeMap[chunk_position] = chunk_set.biomes;
+			biomeMap[chunk_position] = std::move(chunk_set.biomes);
 		}
 
 		{
 			std::unique_lock lock(fluidMutex);
-			fluidMap[chunk_position] = chunk_set.fluids;
+			fluidMap[chunk_position] = std::move(chunk_set.fluids);
+		}
+
+		{
+			std::unique_lock lock(pathMutex);
+			pathMap[chunk_position] = std::move(chunk_set.pathmap);
 		}
 
 		updateChunk(chunk_position);
@@ -194,7 +199,14 @@ namespace Game3 {
 			fluids = fluidMap.at(chunk_position);
 		}
 
-		return {std::move(terrain), std::move(biomes), std::move(fluids)};
+		PathChunk pathmap;
+
+		{
+			std::shared_lock lock(pathMutex);
+			pathmap = pathMap.at(chunk_position);
+		}
+
+		return {std::move(terrain), std::move(biomes), std::move(fluids), std::move(pathmap)};
 	}
 
 	std::string TileProvider::getRawChunks(ChunkPosition chunk_position) const {
@@ -247,6 +259,18 @@ namespace Game3 {
 			const BiomeChunk &biome_data = biomeMap.at(chunk_position);
 			auto biome_lock = biome_data.sharedLock();
 			appendSpan(raw, std::span(biome_data));
+		}
+		return raw;
+	}
+
+	std::string TileProvider::getRawPathmap(ChunkPosition chunk_position) const {
+		std::string raw;
+		raw.reserve(sizeof(uint8_t) * CHUNK_SIZE * CHUNK_SIZE);
+		{
+			std::shared_lock lock(pathMutex);
+			const PathChunk &pathmap_data = pathMap.at(chunk_position);
+			auto pathmap_lock = pathmap_data.sharedLock();
+			appendSpan(raw, std::span(pathmap_data));
 		}
 		return raw;
 	}

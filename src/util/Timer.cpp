@@ -26,6 +26,11 @@ namespace Game3 {
 		}
 	}
 
+	void Timer::restart() {
+		start = std::chrono::system_clock::now();
+		stopped = false;
+	}
+
 	void Timer::summary(double threshold) {
 		if (!times.empty()) {
 			std::cerr << "Timer summary:\n";

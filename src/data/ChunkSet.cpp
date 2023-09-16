@@ -6,8 +6,8 @@ namespace Game3 {
 		terrain.resize(LAYER_COUNT);
 	}
 
-	ChunkSet::ChunkSet(std::vector<TileChunk> terrain_, BiomeChunk biomes_, FluidChunk fluids_):
-	terrain(std::move(terrain_)), biomes(std::move(biomes_)), fluids(std::move(fluids_)) {
+	ChunkSet::ChunkSet(std::vector<TileChunk> terrain_, BiomeChunk biomes_, FluidChunk fluids_, PathChunk pathmap_):
+	terrain(std::move(terrain_)), biomes(std::move(biomes_)), fluids(std::move(fluids_)), pathmap(std::move(pathmap_)) {
 		if (terrain.size() != LAYER_COUNT)
 			throw std::invalid_argument("Invalid layer count in ChunkSet::ChunkSet: " + std::to_string(terrain.size()));
 	}
@@ -15,16 +15,18 @@ namespace Game3 {
 	ChunkSet::ChunkSet(std::span<const uint8_t> raw):
 		ChunkSet(std::span<const char>(reinterpret_cast<const char *>(raw.data()), raw.size())) {}
 
-	constexpr size_t LAYER_BYTE_COUNT  = CHUNK_SIZE * CHUNK_SIZE * sizeof(TileID);
-	constexpr size_t BIOMES_BYTE_COUNT = CHUNK_SIZE * CHUNK_SIZE * sizeof(BiomeType);
-	constexpr size_t FLUIDS_BYTE_COUNT = CHUNK_SIZE * CHUNK_SIZE * sizeof(FluidInt);
+	constexpr size_t LAYER_BYTE_COUNT   = CHUNK_SIZE * CHUNK_SIZE * sizeof(TileID);
+	constexpr size_t BIOMES_BYTE_COUNT  = CHUNK_SIZE * CHUNK_SIZE * sizeof(BiomeType);
+	constexpr size_t FLUIDS_BYTE_COUNT  = CHUNK_SIZE * CHUNK_SIZE * sizeof(FluidInt);
+	constexpr size_t PATHMAP_BYTE_COUNT = CHUNK_SIZE * CHUNK_SIZE * sizeof(uint8_t);
 
 	ChunkSet::ChunkSet(std::span<const char> raw):
 		ChunkSet(raw.subspan(0, LAYER_COUNT * LAYER_BYTE_COUNT),
 		         raw.subspan(LAYER_COUNT * LAYER_BYTE_COUNT, BIOMES_BYTE_COUNT),
-		         raw.subspan(LAYER_COUNT * LAYER_BYTE_COUNT + BIOMES_BYTE_COUNT)) {}
+		         raw.subspan(LAYER_COUNT * LAYER_BYTE_COUNT + BIOMES_BYTE_COUNT, FLUIDS_BYTE_COUNT),
+				 raw.subspan(LAYER_COUNT * LAYER_BYTE_COUNT + BIOMES_BYTE_COUNT + FLUIDS_BYTE_COUNT, PATHMAP_BYTE_COUNT)) {}
 
-	ChunkSet::ChunkSet(std::span<const char> terrain_, std::span<const char> biomes_, std::span<const char> fluids_) {
+	ChunkSet::ChunkSet(std::span<const char> terrain_, std::span<const char> biomes_, std::span<const char> fluids_, std::span<const char> pathmap_) {
 		terrain.resize(LAYER_COUNT);
 
 		for (TileChunk &layer: terrain) {
@@ -45,6 +47,7 @@ namespace Game3 {
 		if constexpr (std::endian::native == std::endian::little) {
 			biomes.resize(CHUNK_SIZE * CHUNK_SIZE);
 			std::memcpy(biomes.data(), biomes_.data(), BIOMES_BYTE_COUNT);
+
 			fluids.reserve(CHUNK_SIZE * CHUNK_SIZE);
 			static_assert(sizeof(FluidInt) == 4);
 			for (size_t i = 0; i < FLUIDS_BYTE_COUNT; i += sizeof(FluidInt)) {
@@ -57,6 +60,7 @@ namespace Game3 {
 			static_assert(sizeof(BiomeType) == 2);
 			for (size_t i = 0; i < BIOMES_BYTE_COUNT; i += sizeof(BiomeType))
 				biomes.push_back(biomes_[i] | (BiomeType(biomes_[i + 1]) << 8));
+
 			fluids.reserve(CHUNK_SIZE * CHUNK_SIZE);
 			static_assert(sizeof(FluidInt) == 4);
 			for (size_t i = 0; i < FLUIDS_BYTE_COUNT; i += sizeof(FluidInt)) {
@@ -64,6 +68,10 @@ namespace Game3 {
 				fluids.emplace_back(encoded_fluid);
 			}
 		}
+
+		static_assert(sizeof(decltype(pathmap)::value_type) == 1);
+		pathmap.resize(CHUNK_SIZE * CHUNK_SIZE);
+		std::memcpy(pathmap.data(), pathmap_.data(), PATHMAP_BYTE_COUNT);
 	}
 
 	ChunkSet::FluidsArray ChunkSet::getFluids() const {

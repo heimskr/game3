@@ -19,12 +19,13 @@ namespace Game3 {
 			std::vector<TileChunk> terrain;
 			BiomeChunk biomes;
 			FluidChunk fluids;
+			PathChunk pathmap;
 
 			ChunkSet();
-			ChunkSet(std::vector<TileChunk>, BiomeChunk, FluidChunk);
+			ChunkSet(std::vector<TileChunk>, BiomeChunk, FluidChunk, PathChunk);
 			ChunkSet(std::span<const uint8_t>);
 			ChunkSet(std::span<const char>);
-			ChunkSet(std::span<const char> terrain_, std::span<const char> biomes_, std::span<const char> fluids_);
+			ChunkSet(std::span<const char> terrain_, std::span<const char> biomes_, std::span<const char> fluids_, std::span<const char> pathmap_);
 
 			template <typename C>
 			C getBytes() const {
@@ -32,11 +33,13 @@ namespace Game3 {
 				//   - Terrain: [ChunkSize^2 x sizeof(TileID) bytes] x LayerCount
 				//   - Biomes:   ChunkSize^2 x sizeof(BiomeType)
 				//   - Fluids:   ChunkSize^2 x sizeof(FluidInt)
+				//   - Pathmap:  ChunkSize^2 x sizeof(uint8_t)
 				// Or, as of this writing:
 				//   - Terrain: [4096 x 2 bytes] x 4 = 32768 bytes
 				//   - Biomes:   4096 x 2 bytes      =  8192 bytes
 				//   - Fluids:   4096 x 4 bytes      = 16384 bytes
-				//   Total: 57344 bytes
+				//   - Pathmap:  4096 x 1 byte       =  4096 bytes
+				//   Total: 61440 bytes
 				C raw;
 				constexpr size_t square = CHUNK_SIZE * CHUNK_SIZE;
 				raw.reserve((LAYER_COUNT * sizeof(TileID) + sizeof(BiomeType) + sizeof(FluidInt)) * square);
@@ -51,8 +54,16 @@ namespace Game3 {
 					appendSpan(raw, std::span(biomes));
 				}
 
-				auto fluids = getFluids();
-				appendSpan(raw, std::span<const uint8_t>(fluids.data(), fluids.size()));
+				{
+					auto fluids = getFluids();
+					appendSpan(raw, std::span<const uint8_t>(fluids.data(), fluids.size()));
+				}
+
+				{
+					auto lock = pathmap.sharedLock();
+					appendSpan(raw, std::span(pathmap));
+				}
+
 				return raw;
 			}
 	};
