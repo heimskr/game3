@@ -6,28 +6,40 @@ namespace Game3 {
 		Inventory(std::move(owner), slot_count, active_slot), storage(std::move(storage_)) {}
 
 	StorageInventory::StorageInventory(const StorageInventory &other):
-		Inventory(other), storage(other.storage) {}
+	Inventory(other) {
+		auto lock = other.sharedLock();
+		storage = other.storage;
+		onSwap = other.onSwap;
+	}
 
 	StorageInventory::StorageInventory(StorageInventory &&other):
-	Inventory(std::forward<Inventory>(other)), storage(std::move(other.storage)) {
-		other.weakOwner = {};
-		other.slotCount = 0;
-		other.activeSlot = 0;
+	Inventory(std::forward<Inventory>(other)) {
+		auto lock = other.uniqueLock();
+		storage = std::move(other.storage);
+		onSwap = std::move(other.onSwap);
 	}
 
 	StorageInventory & StorageInventory::operator=(const StorageInventory &other) {
-		weakOwner = other.weakOwner;
-		slotCount = other.slotCount.load();
-		activeSlot = other.activeSlot.load();
+		if (this == &other)
+			return *this;
+
+		Inventory::operator=(other);
+		auto this_lock = uniqueLock();
+		auto other_lock = other.sharedLock();
 		storage = other.storage;
+		onSwap = other.onSwap;
 		return *this;
 	}
 
 	StorageInventory & StorageInventory::operator=(StorageInventory &&other) {
-		weakOwner = std::move(other.weakOwner);
-		slotCount = other.slotCount.exchange(0);
-		activeSlot = other.activeSlot.exchange(0);
+		if (this == &other)
+			return *this;
+
+		Inventory::operator=(std::move(other));
+		auto this_lock = uniqueLock();
+		auto other_lock = other.uniqueLock();
 		storage = std::move(other.storage);
+		onSwap = std::move(other.onSwap);
 		return *this;
 	}
 

@@ -202,6 +202,37 @@ namespace Game3 {
 		else
 			inventory->weakOwner = shared;
 
+		inventory->onSwap = [this](Inventory &here, Slot here_slot, Inventory &there, Slot there_slot) {
+			InventoryPtr this_inventory = getInventory();
+			assert(here == *this_inventory || there == *this_inventory);
+
+			for (Held &held: {std::ref(heldLeft), std::ref(heldRight)})
+				if (here_slot == held.slot)
+					setHeld(here == there? there_slot : -1, held);
+		};
+
+		inventory->onMove = [this](Inventory &source, Slot source_slot, Inventory &destination, Slot destination_slot, bool consumed) {
+			InventoryPtr this_inventory = getInventory();
+
+			if (source == *this_inventory && destination == *this_inventory) {
+				for (Held &held: {std::ref(heldLeft), std::ref(heldRight)}) {
+					if (source_slot == held.slot)
+						setHeld(destination_slot, held);
+					else if (destination_slot == held.slot)
+						setHeld(source_slot, held);
+				}
+			} else if (source == *this_inventory) {
+				for (Held &held: {std::ref(heldLeft), std::ref(heldRight)})
+					if (source_slot == held.slot)
+						setHeld(-1, held);
+			} else {
+				assert(destination == *this_inventory);
+				for (Held &held: {std::ref(heldLeft), std::ref(heldRight)})
+					if (destination_slot == held.slot)
+						setHeld(-1, held);
+			}
+		};
+
 		movedToNewChunk(std::nullopt);
 	}
 

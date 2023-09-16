@@ -3,6 +3,8 @@
 #include "game/Container.h"
 #include "item/Item.h"
 #include "recipe/CraftingRequirement.h"
+#include "threading/Atomic.h"
+#include "threading/HasMutex.h"
 #include "threading/Lockable.h"
 
 #include <atomic>
@@ -24,31 +26,32 @@ namespace Game3 {
 		}
 	};
 
-	class Inventory: public Container {
+	/** Inventories should be locked appropriately (see HasMutex) when something is calling Inventory methods. The Inventory will not lock itself. */
+	class Inventory: public Container, public HasMutex<> {
 		protected:
 			Inventory() = default;
 			Inventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot = 0);
 			Inventory(const Inventory &);
 			Inventory(Inventory &&);
 
-			/** Should be locked appropriately when something is calling Inventory methods. Will not be locked by the Inventory itself. */
-			std::shared_mutex externalMutex;
-
 		public:
 			std::weak_ptr<Agent> weakOwner;
-			std::atomic<Slot> slotCount = 0;
-			std::atomic<Slot> activeSlot = 0;
+			Atomic<Slot> slotCount = 0;
+			Atomic<Slot> activeSlot = 0;
+			/** Called before the swap occurs. The first argument always refers to this object. */
+			std::function<void(Inventory &, Slot, Inventory &, Slot)> onSwap;
+			/** Called before the move occurs. The first pair of arguments are always the source may or not refer to this object; the second pair of arguments are always the destination. */
+			std::function<void(Inventory &, Slot from, Inventory &, Slot to, bool consumed)> onMove;
 
 			Inventory & operator=(const Inventory &);
 			Inventory & operator=(Inventory &&);
-
-			inline auto sharedLock() { return std::shared_lock(externalMutex); }
-			inline auto uniqueLock() { return std::unique_lock(externalMutex); }
 
 			virtual std::unique_ptr<Inventory> copy() const = 0;
 
 			virtual ItemStack * operator[](size_t) = 0;
 			virtual const ItemStack * operator[](size_t) const = 0;
+
+			bool operator==(const Inventory &other) const { return this == &other; }
 
 			/** Iterates over all items in the inventory until all have been iterated or the iteration function returns true. */
 			virtual void iterate(const std::function<bool(const ItemStack &, Slot)> &) = 0;
@@ -165,7 +168,7 @@ namespace Game3 {
 			/** Removes every slot whose item count is zero from the storage map. */
 			virtual void compact() = 0;
 
-			std::atomic_bool suppressInventoryNotifications{false};
+			Atomic<bool> suppressInventoryNotifications{false};
 
 		public:
 			struct Suppressor {

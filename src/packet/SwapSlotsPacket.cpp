@@ -59,23 +59,47 @@ namespace Game3 {
 				}
 
 				if (first_stack == nullptr) {
+
 					if (!first_inventory.hasSlot(firstSlot)) {
 						client.send(ErrorPacket("Can't swap slots: first slot is invalid"));
 						return;
 					}
 
+					if (first_inventory.onMove)
+						first_inventory.onMove(second_inventory, secondSlot, first_inventory, firstSlot, true);
+
+					if (&first_inventory != &second_inventory && second_inventory.onMove)
+						second_inventory.onMove(second_inventory, secondSlot, first_inventory, firstSlot, true);
+
 					first_inventory.add(*second_stack, firstSlot);
 					second_inventory.erase(secondSlot);
+
 				} else if (second_stack == nullptr) {
+
 					if (!second_inventory.hasSlot(secondSlot)) {
 						client.send(ErrorPacket("Can't swap slots: second slot is invalid"));
 						return;
 					}
 
+					if (first_inventory.onMove)
+						first_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, true);
+
+					if (&first_inventory != &second_inventory && second_inventory.onMove)
+						second_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, true);
+
 					second_inventory.add(*first_stack, secondSlot);
 					first_inventory.erase(firstSlot);
+
 				} else {
+
+					if (first_inventory.onSwap)
+						first_inventory.onSwap(first_inventory, firstSlot, second_inventory, secondSlot);
+
+					if (&first_inventory != &second_inventory && second_inventory.onSwap)
+						second_inventory.onSwap(second_inventory, secondSlot, first_inventory, firstSlot);
+
 					std::swap(*first_stack, *second_stack);
+
 				}
 			}
 

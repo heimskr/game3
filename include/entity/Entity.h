@@ -203,8 +203,8 @@ namespace Game3 {
 
 			Atomic<GlobalID> otherEntityToLock = -1;
 
-			Held heldLeft  {true};
-			Held heldRight {false};
+			Held heldLeft {true};
+			Held heldRight{false};
 			/** The set of all players who have been sent a packet about the entity's current path. Governed by pathSeersMutex */
 			Lockable<WeakSet<Player>> pathSeers;
 

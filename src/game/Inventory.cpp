@@ -23,35 +23,53 @@ namespace Game3 {
 	Inventory::Inventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot):
 		weakOwner(owner), slotCount(slot_count), activeSlot(active_slot) {}
 
-	Inventory::Inventory(const Inventory &other):
-		weakOwner(other.weakOwner),
-		slotCount(other.slotCount.load()),
-		activeSlot(other.activeSlot.load()),
-		suppressInventoryNotifications(other.suppressInventoryNotifications.load()) {}
-
-	Inventory::Inventory(Inventory &&other):
-	weakOwner(other.weakOwner),
-	slotCount(other.slotCount.load()),
-	activeSlot(other.activeSlot.load()),
-	suppressInventoryNotifications(other.suppressInventoryNotifications.load()) {
-		other.weakOwner = {};
-		other.slotCount = 0;
-		other.activeSlot = 0;
-	}
-
-	Inventory & Inventory::operator=(const Inventory &other) {
+	Inventory::Inventory(const Inventory &other) {
+		auto lock = other.sharedLock();
 		weakOwner = other.weakOwner;
 		slotCount = other.slotCount.load();
 		activeSlot = other.activeSlot.load();
 		suppressInventoryNotifications = other.suppressInventoryNotifications.load();
-		return *this;
+		onSwap = other.onSwap;
+		onMove = other.onMove;
 	}
 
-	Inventory & Inventory::operator=(Inventory &&other) {
+	Inventory::Inventory(Inventory &&other) {
+		auto lock = other.uniqueLock();
 		weakOwner = std::move(other.weakOwner);
 		slotCount = other.slotCount.exchange(0);
 		activeSlot = other.activeSlot.exchange(0);
 		suppressInventoryNotifications = other.suppressInventoryNotifications.exchange(false);
+		onSwap = std::move(other.onSwap);
+		onMove = std::move(other.onMove);
+	}
+
+	Inventory & Inventory::operator=(const Inventory &other) {
+		if (this == &other)
+			return *this;
+
+		auto this_lock = uniqueLock();
+		auto other_lock = other.sharedLock();
+		weakOwner = other.weakOwner;
+		slotCount = other.slotCount.load();
+		activeSlot = other.activeSlot.load();
+		suppressInventoryNotifications = other.suppressInventoryNotifications.load();
+		onSwap = other.onSwap;
+		onMove = other.onMove;
+		return *this;
+	}
+
+	Inventory & Inventory::operator=(Inventory &&other) {
+		if (this == &other)
+			return *this;
+
+		auto this_lock = uniqueLock();
+		auto other_lock = other.uniqueLock();
+		weakOwner = std::move(other.weakOwner);
+		slotCount = other.slotCount.exchange(0);
+		activeSlot = other.activeSlot.exchange(0);
+		suppressInventoryNotifications = other.suppressInventoryNotifications.exchange(false);
+		onSwap = std::move(other.onSwap);
+		onMove = std::move(other.onMove);
 		return *this;
 	}
 

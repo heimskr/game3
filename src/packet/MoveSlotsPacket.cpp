@@ -26,15 +26,6 @@ namespace Game3 {
 
 		AgentPtr second_agent = game.getAgent(secondGID);
 		if (!second_agent) {
-			WARN("firstGID[" << firstGID << "], secondGID[" << secondGID << "]");
-			{
-				auto lock = game.allAgents.sharedLock();
-				for (const auto &[gid, weak]: game.allAgents) {
-					if (auto locked = weak.lock(); std::dynamic_pointer_cast<Chest>(locked)) {
-						WARN("Chest: " << gid << " / " << locked->getGID());
-					}
-				}
-			}
 			client.send(ErrorPacket("Can't move slots: second agent not found"));
 			return;
 		}
@@ -68,23 +59,49 @@ namespace Game3 {
 			}
 
 			if (second_stack != nullptr && first_stack->canMerge(*second_stack)) {
+
 				if (!second_inventory.canInsert(*first_stack)) {
 					client.send(ErrorPacket("Can't move slots: not enough room in second inventory"));
 					return;
 				}
 
-				second_inventory.add(*first_stack, secondSlot);
-				first_inventory.erase(firstSlot);
+				if (first_inventory.onMove)
+					first_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, false);
+
+				if (&first_inventory != &second_inventory && second_inventory.onMove)
+					second_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, false);
+
+				if (std::optional<ItemStack> leftovers = second_inventory.add(*first_stack, secondSlot))
+					*first_stack = std::move(*leftovers);
+				else
+					first_inventory.erase(firstSlot);
+
 			} else if (second_stack == nullptr) {
+
 				if (!second_inventory.hasSlot(secondSlot)) {
 					client.send(ErrorPacket("Can't swap slots: second slot is invalid"));
 					return;
 				}
 
+				if (first_inventory.onMove)
+					first_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, true);
+
+				if (&first_inventory != &second_inventory && second_inventory.onMove)
+					second_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, true);
+
 				second_inventory.add(*first_stack, secondSlot);
 				first_inventory.erase(firstSlot);
+
 			} else {
+
+				if (first_inventory.onSwap)
+					first_inventory.onSwap(first_inventory, firstSlot, second_inventory, secondSlot);
+
+				if (&first_inventory != &second_inventory && second_inventory.onSwap)
+					second_inventory.onSwap(second_inventory, secondSlot, first_inventory, firstSlot);
+
 				std::swap(*first_stack, *second_stack);
+
 			}
 		}
 

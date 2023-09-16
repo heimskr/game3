@@ -2,6 +2,11 @@
 
 #include "game/Inventory.h"
 
+#include <functional>
+#include <map>
+#include <memory>
+#include <optional>
+
 namespace Game3 {
 	class StorageInventory: public Inventory {
 		public:
