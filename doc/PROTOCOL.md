@@ -28,7 +28,8 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `i32` Realm ID
 	- `u8` Layer
-	- `{i64,i64}` Position
+	- `i64` Position Y
+	- `i64` Position X
 	- `u16` Tile ID
 
 5. **Command Result**: informs a client of the result of a command.
@@ -45,12 +46,14 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 7. **Self Teleported**: tells a client the position of their player.
 
 	- `i32` Realm ID
-	- `{i64,i64}` Position
+	- `i64` Position Y
+	- `i64` Position X
 
 8. **Chunk Tiles**: sends all the terrain data for a chunk to a client.
 
 	- `i32` Realm ID
-	- `{i32,i32}` Chunk Position
+	- `i32` Chunk Position X
+	- `i32` Chunk Position Y
 	- `u64` Update Counter
 	- `i16[3*64**2]` Tile IDs (layer 1, then 2, then 3)
 
@@ -117,7 +120,8 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 15. **Move Player**: tells the server to move the player to a given location.
 
-	- `{i64,i64}` New Position
+	- `i64` New Position Y
+	- `i64` New Position X
 	- `u8` Movement Direction
 	- `optional<u8>` Facing Direction
 
@@ -129,7 +133,8 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `u64` Entity Global ID
 	- `i32` Realm ID
-	- `{i64,i64}` Position
+	- `i64` Position Y
+	- `i64` Position X
 	- `u8` Facing
 	- `optional<{float, float, float}>` New Offset
 	- `optional<float>` New Z-Speed
@@ -145,14 +150,16 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `u64` Entity Global ID
 	- `i32` Realm ID
-	- `{i64,i64}` Position
+	- `i64` Position Y
+	- `i64` Position X
 	- `list<u8>` Path Directions
 	- `u64` New Update Counter
 
 20. **Teleport Self**: tells the server to teleport the player.
 
 	- `i32` Realm ID
-	- `{i64,i64}` Position
+	- `i64` Position Y
+	- `i64` Position X
 
 21. **Interact**: tells the server to perform an interaction.
 
@@ -196,8 +203,10 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 29. **Click**: informs the server that the client clicked on a given square.
 
-	- `{i64,i64}` Position
-	- `{float,float}` Offset
+	- `i64` Position Y
+	- `i64` Position X
+	- `float` Offset X
+	- `float` Offset Y
 	- `u8` Modifiers: bitfield (1 = shift, 2 = ctrl, 4 = alt, 8 = super)
 
 30. **Time**: informs a client of the game time.
@@ -219,7 +228,8 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 33. **Fluid Update**: informs a client of the new fluid state for a single tile.
 
 	- `i32` Realm ID
-	- `{i64,i64}` Position
+	- `i64` Position Y
+	- `i64` Position X
 	- `u32` Fluid ID and Level
 
 34. **Held Item Set**: tells a client that an entity's held item changed.
@@ -302,7 +312,8 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `u64` Entity Global ID
 	- `i32` New Realm ID
-	- `{i64,i64}` New Position
+	- `i64` New Position Y
+	- `i64` New Position X
 
 # Message Format
 
@@ -339,8 +350,9 @@ Note that string types are always encoded as `0x1f` when used as a subtype of a 
 
 To send a numeric type (`0x01` through `0x0a`), send its type encoding followed by its little-endian representation. For example, the unsigned 16-bit integer `0x1234` would be sent as `0x02 0x34 0x12`.
 
-To send an optional value, send `0x0c` if it's empty, or `0x0c` followed by the type and value. For example, an optional signed 8-bit integer with a value of `0x64` would be sent as `0x0c 0x01 0x64`, whereas if it lacked a value it would be sent as `0x0c`.
+To send an optional value, send `0x0c` if it's empty, or `0x0b` followed by the type and value. For example, an optional signed 8-bit integer with a value of `0x64` would be sent as `0x0b 0x01 0x64`, whereas if it lacked a value it would be sent as `0x0c`.
 <!-- TODO: do empty optionals also require the type to be appended? -->
+<!-- For now, no. -->
 
 To send an empty string, send `0x10`.
 
