@@ -223,6 +223,7 @@ namespace Game3 {
 	}
 
 	void ServerGame::remove(const ServerPlayerPtr &player) {
+		INFO("ServerGame::remove(" << player->getGID() << ")");
 		{
 			auto set_lock = players.uniqueLock();
 			players.erase(player);

@@ -149,6 +149,7 @@ namespace Game3 {
 		removeChildren(grid);
 		widgetsBySlot.clear();
 		widgets.clear();
+		lastGame.reset();
 	}
 
 	void InventoryTab::populate(Gtk::Grid &grid, std::shared_ptr<ClientInventory> inventory) {

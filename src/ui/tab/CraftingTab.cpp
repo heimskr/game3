@@ -42,6 +42,7 @@ namespace Game3 {
 
 	void CraftingTab::reset(const std::shared_ptr<ClientGame> &game) {
 		if (!game) {
+			lastGame.reset();
 			removeChildren(vbox);
 			widgets.clear();
 			return;

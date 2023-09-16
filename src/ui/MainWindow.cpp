@@ -464,10 +464,11 @@ namespace Game3 {
 			game->stopThread();
 			INFO("Client use count: " << game->client.use_count());
 			canvas->game = nullptr;
-			INFO("Game use count: " << game.use_count());
-			game = nullptr;
+			INFO(__LINE__ << " → Game use count: " << game.use_count());
 			for (const auto &[widget, tab]: tabMap)
 				tab->reset(nullptr);
+			INFO(__LINE__ << " → Game use count: " << game.use_count());
+			game = nullptr;
 		}
 	}
 
