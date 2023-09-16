@@ -59,8 +59,10 @@ namespace Game3 {
 					packetType  = headerBytes[0] | (static_cast<uint16_t>(headerBytes[1]) << 8);
 					payloadSize = headerBytes[2] | (static_cast<uint32_t>(headerBytes[3]) << 8) | (static_cast<uint32_t>(headerBytes[4]) << 16) | (static_cast<uint32_t>(headerBytes[5]) << 24);
 
-					if (100'000 <= payloadSize)
+					if (100'000 <= payloadSize) {
 						sock->close(false);
+						throw PacketError("Payload too large");
+					}
 
 					assert(payloadSize < 100'000);
 					headerBytes.erase(headerBytes.begin(), headerBytes.begin() + HEADER_SIZE);
