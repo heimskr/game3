@@ -96,7 +96,24 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u64` Global ID
 	- `string` Identifier
 	- `i32` Realm ID
-	- `...` Tile Entity Data
+	- `...` Entity Data
+
+	The Entity Data varies with entity type, but it always begins with:
+
+	- `string` Entity Type
+	- `u64` Global ID
+	- `i32` Realm ID
+	- `i64` Position Y
+	- `i64` Position X
+	- `u8` Facing Direction
+	- `u64` Update Counter
+	- `float` Offset X
+	- `float` Offset Y
+	- `float` Offset Z
+	- `float` Z-Speed
+	- `list<u8>` Path
+	- `u64` Money
+	- `u32` Hitpoints
 
 15. **Move Player**: tells the server to move the player to a given location.
 
