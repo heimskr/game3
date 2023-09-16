@@ -3,6 +3,7 @@
 #include "Flasker.h"
 #include "net/LocalServer.h"
 #include "net/Sock.h"
+#include "util/Crypto.h"
 #include "util/FS.h"
 
 #include <cstdlib>
@@ -27,6 +28,17 @@ int main(int argc, char **argv) {
 #endif
 
 	if (2 <= argc) {
+		if (strcmp(argv[1], "--token") == 0 && argc == 3) {
+			if (!std::filesystem::exists(".secret")) {
+				std::cerr << "Can't find .secret\n";
+				return 1;
+			}
+
+			std::string secret = Game3::readFile(".secret");
+			std::cout << Game3::computeSHA3<Game3::Token>(secret + '/' + argv[2]) << '\n';
+			return 0;
+		}
+
 		if (argc == 4) {
 			std::cout << Game3::generateFlask(Game3::dataRoot / "resources" / "testtubebase.png", Game3::dataRoot / "resources" / "testtubemask.png", argv[1], argv[2], argv[3]);
 			return 0;
