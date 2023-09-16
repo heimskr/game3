@@ -33,6 +33,7 @@ namespace Game3 {
 		if (connected) {
 			ControlMessage message = ControlMessage::Close;
 			::write(controlWrite, &message, sizeof(message));
+			::close(netFD);
 			connected = false;
 		}
 
@@ -77,12 +78,17 @@ namespace Game3 {
 		connected = true;
 	}
 
-	void Sock::close() {
-		if (connected) {
+	void Sock::close(bool force) {
+		if (connected || force) {
 			ControlMessage message = ControlMessage::Close;
-			::write(controlWrite, &message, sizeof(message));
-			connected = false;
-		}
+
+			if (-1 == ::write(controlWrite, &message, sizeof(message)))
+				WARN("Couldn't write to control pipe");
+
+			if (force)
+				::close(netFD);
+		} else
+			WARN("Can't close: not connected");
 	}
 
 	ssize_t Sock::send(const void *data, size_t bytes, bool force) {
@@ -109,7 +115,7 @@ namespace Game3 {
 		if (FD_ISSET(netFD, &fds_copy)) {
 			ssize_t bytes_read = ::recv(netFD, data, bytes, 0);
 			if (bytes_read == 0)
-				close();
+				close(false);
 
 			return bytes_read;
 		}
@@ -126,6 +132,7 @@ namespace Game3 {
 				ERROR("Unknown control message: '" << static_cast<char>(message) << "'");
 			}
 
+			::close(netFD);
 			return 0;
 		}
 

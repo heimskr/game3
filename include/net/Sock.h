@@ -26,7 +26,7 @@ namespace Game3 {
 			virtual void connect(bool blocking);
 
 			/** Closes the socket. */
-			virtual void close();
+			virtual void close(bool force);
 
 			/** Sends a given number of bytes from a buffer through the socket and returns the number of bytes sent. */
 			virtual ssize_t send(const void *, size_t, bool force);

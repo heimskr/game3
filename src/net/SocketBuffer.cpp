@@ -65,6 +65,6 @@ namespace Game3 {
 	}
 
 	void SocketBuffer::close() {
-		source->close();
+		source->close(false);
 	}
 }

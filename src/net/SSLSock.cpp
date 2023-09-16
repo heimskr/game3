@@ -16,6 +16,26 @@ namespace Game3 {
 		connectSSL(blocking);
 	}
 
+	void SSLSock::close(bool force) {
+		if (connected || force) {
+			ControlMessage message = ControlMessage::Close;
+			if (-1 == ::write(controlWrite, &message, sizeof(message)))
+				WARN("Couldn't write to control pipe");
+
+			if (force) {
+				if (ssl != nullptr)
+					SSL_free(ssl);
+				::close(netFD);
+				if (sslContext != nullptr)
+					SSL_CTX_free(sslContext);
+				ssl = nullptr;
+				sslContext = nullptr;
+				connected = false;
+			}
+		} else
+			WARN("Can't close: not connected");
+	}
+
 	ssize_t SSLSock::send(const void *data, size_t bytes, bool force) {
 		if (!connected)
 			throw DisconnectedError("Socket not connected");
@@ -83,11 +103,10 @@ namespace Game3 {
 						case SSL_ERROR_NONE:
 							ERROR("SSL_ERROR_NONE");
 							return bytes_read;
-							break;
 
 						case SSL_ERROR_ZERO_RETURN:
 							ERROR("SSL_ERROR_ZERO_RETURN");
-							close();
+							close(false);
 							break;
 
 						case SSL_ERROR_WANT_READ:
@@ -100,12 +119,12 @@ namespace Game3 {
 
 						case SSL_ERROR_SYSCALL:
 							ERROR("SSL_ERROR_SYSCALL");
-							close();
+							close(false);
 							break;
 
 						default:
 							ERROR("default SSL error");
-							close();
+							close(false);
 							break;
 					}
 				} else {
@@ -117,6 +136,9 @@ namespace Game3 {
 #endif
 				}
 			} while (SSL_pending(ssl) && !read_blocked && 0 < bytes);
+
+			if (auto control_set = FD_ISSET(controlRead, &fds_copy))
+				WARN("FD_ISSET(controlRead): " << control_set);
 
 			return total_bytes_read;
 		}
@@ -133,9 +155,11 @@ namespace Game3 {
 				ERROR("Unknown control message: '" << static_cast<char>(message) << "'");
 			}
 
-			SSL_free(ssl);
+			if (ssl != nullptr)
+				SSL_free(ssl);
 			::close(netFD);
-			SSL_CTX_free(sslContext);
+			if (sslContext != nullptr)
+				SSL_CTX_free(sslContext);
 			return 0;
 		}
 

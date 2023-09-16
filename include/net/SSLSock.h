@@ -18,6 +18,7 @@ namespace Game3 {
 			using Sock::Sock;
 
 			void connect(bool blocking) override;
+			void close(bool force) override;
 			ssize_t send(const void *, size_t, bool force) override;
 			ssize_t recv(void *, size_t) override;
 

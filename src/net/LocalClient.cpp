@@ -19,7 +19,7 @@
 namespace Game3 {
 	LocalClient::~LocalClient() {
 		INFO("~LocalClient(" << this << ')');
-		sock->close();
+		sock->close(true);
 	}
 
 	void LocalClient::connect(std::string_view hostname, uint16_t port) {
@@ -60,7 +60,7 @@ namespace Game3 {
 					payloadSize = headerBytes[2] | (static_cast<uint32_t>(headerBytes[3]) << 8) | (static_cast<uint32_t>(headerBytes[4]) << 16) | (static_cast<uint32_t>(headerBytes[5]) << 24);
 
 					if (100'000 <= payloadSize)
-						sock->close();
+						sock->close(false);
 
 					assert(payloadSize < 100'000);
 					headerBytes.erase(headerBytes.begin(), headerBytes.begin() + HEADER_SIZE);
