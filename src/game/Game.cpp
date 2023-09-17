@@ -256,8 +256,6 @@ namespace Game3 {
 		add(std::make_shared<Pickaxe>("base:item/gold_pickaxe",    "Gold Pickaxe",    400, .75f,  64, "base:attribute/pickaxe"_id));
 		add(std::make_shared<Pickaxe>("base:item/diamond_pickaxe", "Diamond Pickaxe", 900,  1.f, 512, "base:attribute/pickaxe"_id));
 
-		add(std::make_shared<Sapling>("base:item/sapling", "Sapling", 5, 64));
-
 		add(std::make_shared<Landfill>("base:item/sand",          "Sand",          1, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/sand"));
 		add(std::make_shared<Landfill>("base:item/volcanic_sand", "Volcanic Sand", 3, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/volcanic_sand"));
 		add(std::make_shared<Landfill>("base:item/clay",          "Clay",          2, 64, clayRequirement));
@@ -338,6 +336,10 @@ namespace Game3 {
 		add(std::make_shared<ChemicalReactorItem>("base:item/chemical_reactor", "Chemical Reactor", 999, 64)); // TODO: cost
 
 		add(std::make_shared<GeothermalGeneratorItem>("base:item/geothermal_generator", "Geothermal Generator", 999, 64)); // TODO: cost
+
+		add(std::make_shared<SnowySapling>("base:item/snowy_sapling", "Snowy Sapling", 5, 64));
+		add(std::make_shared<DesertSapling>("base:item/desert_sapling", "Cactus Sapling", 5, 64));
+		add(std::make_shared<GrasslandSapling>("base:item/sapling", "Sapling", 5, 64));
 	}
 
 	void Game::addGhosts() {
@@ -372,7 +374,7 @@ namespace Game3 {
 		add(TileEntityFactory::create<Stockpile>());
 		add(TileEntityFactory::create<Tank>());
 		add(TileEntityFactory::create<Teleporter>());
-		add(TileEntityFactory::create<Tree>());
+		// add(TileEntityFactory::create<Tree>());
 	}
 
 	void Game::addRealms() {

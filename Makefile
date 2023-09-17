@@ -51,7 +51,7 @@ GLIB_COMPILE_RESOURCES = $(shell pkg-config --variable=glib_compile_resources gi
 LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread $(LTO) $(PROFILING)
 SOURCES      := $(shell find -L src -name \*.cpp) src/gtk_resources.cpp
 OBJECTS      := $(SOURCES:.cpp=.o) src/resources.o
-RESXML       := $(OUTPUT).gresource.xml
+RESXML       := src/$(OUTPUT).gresource.xml
 CLOC_OPTIONS := . --exclude-dir=.vscode,stb,eigen,json,data,.github,.idea,vcpkg_installed,build,builddir,.flatpak-builder,libnoise --fullpath --not-match-f='^\.\/((src\/(gtk_)?resources\.cpp|include\/resources\.h|analysis\.txt|include\/lib\/.*|.*\.(json|txt|md|xml))|(chemskr\/src\/chemskr/(NuclideMasses|yylex|yyparse)\.cpp|chemskr\/(include|src)\/chemskr\/yyparse\.h))$$'
 RESGEN       := ./resgen
 

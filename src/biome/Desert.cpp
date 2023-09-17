@@ -58,7 +58,7 @@ namespace Game3 {
 						"base:tile/cactus7"_id,
 						"base:tile/cactus8"_id,
 					};
-					realm.add(TileEntity::create<Tree>(realm.getGame(), choose(cactuses, rng), "base:tile/cactus6"_id, Position(row, column), Tree::MATURITY));
+					// realm.add(TileEntity::create<Tree>(realm.getGame(), choose(cactuses, rng), "base:tile/cactus6"_id, Position(row, column), Tree::MATURITY));
 				}
 			}
 		}

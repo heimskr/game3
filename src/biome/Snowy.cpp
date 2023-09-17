@@ -53,10 +53,10 @@ namespace Game3 {
 				std::default_random_engine tree_rng(static_cast<uint_fast32_t>(forest_noise * 1'000'000'000.));
 				if (std::uniform_int_distribution(0, 99)(tree_rng) < 50)
 					mod = 1 - mod;
-				if ((abs(row) % 2) == mod) {
-					static const std::vector<Identifier> trees {"base:tile/winter_tree1"_id, "base:tile/winter_tree2"_id, "base:tile/winter_tree3"_id};
-					realm.add(TileEntity::create<Tree>(realm.getGame(), choose(trees, rng), "base:tile/winter_stump"_id, Position(row, column), Tree::MATURITY));
-				}
+				// if ((abs(row) % 2) == mod) {
+				// 	static const std::vector<Identifier> trees {"base:tile/winter_tree1"_id, "base:tile/winter_tree2"_id, "base:tile/winter_tree3"_id};
+				// 	realm.add(TileEntity::create<Tree>(realm.getGame(), choose(trees, rng), "base:tile/winter_stump"_id, Position(row, column), Tree::MATURITY));
+				// }
 			}
 		}
 
@@ -68,6 +68,7 @@ namespace Game3 {
 		constexpr double factor = 10;
 
 		if (params.antiforestThreshold > perlin.GetValue(row / Biome::NOISE_ZOOM * factor, column / Biome::NOISE_ZOOM * factor, 0.)) {
+			// TODO!: cropification
 			if (auto tile = realm.tileEntityAt({row, column}); tile && tile->is("base:te/tree"_id) && !std::dynamic_pointer_cast<Tree>(tile)->hasHive()) {
 				realm.removeSafe(tile);
 			}

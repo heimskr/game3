@@ -88,6 +88,7 @@ namespace Game3 {
 		constexpr double factor = 10;
 		static std::uniform_int_distribution distribution(0, 99);
 
+		// TODO!: cropification
 		if (params.antiforestThreshold > perlin.GetValue(row / Biome::NOISE_ZOOM * factor, column / Biome::NOISE_ZOOM * factor, 0.))
 			if (auto tile_entity = realm.tileEntityAt({row, column}); tile_entity && tile_entity->is("base:te/tree"_id) && !std::dynamic_pointer_cast<Tree>(tile_entity)->hasHive())
 				realm.removeSafe(tile_entity);
