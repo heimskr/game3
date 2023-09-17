@@ -138,7 +138,8 @@
 			"base:item/chemical":             ["base:texture/flasks",       80,   0],
 			"base:item/chemical_reactor":     ["base:texture/tileset",     256, 304],
 			"base:item/glass":                ["base:texture/custom",       64,   0],
-			"base:item/cheese":               ["base:texture/custom",       80,   0]
+			"base:item/cheese":               ["base:texture/custom",       80,   0],
+			"base:item/cactus":               ["base:texture/custom",       96,   0]
 		}]
 	]
 }

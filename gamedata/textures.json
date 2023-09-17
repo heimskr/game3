@@ -4,6 +4,7 @@
 	"data": [
 		["base:texture_map", {
 			"base:texture/gangblanc":   ["resources/characters/champions/Gangblanc.png"],
+			"base:texture/kanji":       ["resources/characters/champions/Kanji.png"],
 			"base:texture/item":        ["resources/missing.png"],
 			"base:texture/villager1":   ["resources/characters/villager1.png"],
 			"base:texture/blacksmith":  ["resources/characters/blacksmith.png"],
