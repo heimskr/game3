@@ -35,9 +35,7 @@ namespace Game3 {
 		uint16_t port = 12255;
 
 		try {
-			const uint64_t long_port = parseUlong(portEntry.get_text());
-			if (UINT16_MAX < long_port)
-				throw std::invalid_argument("Port too large");
+			port = parseNumber<uint16_t>(portEntry.get_text().raw());
 		} catch (const std::invalid_argument &) {}
 
 		signal_submit_.emit(hostnameEntry.get_text(), port);

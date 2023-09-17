@@ -169,7 +169,7 @@ namespace Game3 {
 		return true;
 	}
 
-	int LocalServer::main(int, char **) {
+	int LocalServer::main(int argc, char **argv) {
 		evthread_use_pthreads();
 		event_enable_debug_mode();
 
@@ -180,10 +180,17 @@ namespace Game3 {
 		else
 			std::ofstream(".secret") << (secret = generateSecret(8));
 
+		uint16_t port = 12255;
+		if (3 <= argc) {
+			try {
+				port = parseNumber<uint16_t>(argv[2]);
+			} catch (const std::invalid_argument &) {}
+		}
+
 #ifdef USE_SSL
-		global_server = std::make_shared<SSLServer>(AF_INET6, "::0", 12255, "private.crt", "private.key", 2, 1024);
+		global_server = std::make_shared<SSLServer>(AF_INET6, "::0", port, "private.crt", "private.key", 2, 1024);
 #else
-		global_server = std::make_shared<Server>(AF_INET6, "::0", 12255, 2, 1024);
+		global_server = std::make_shared<Server>(AF_INET6, "::0", port, 2, 1024);
 #endif
 
 		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
@@ -206,7 +213,9 @@ namespace Game3 {
 			stopCV.notify_all();
 		};
 
-		constexpr const char *world_path = "world.db";
+		const char *world_path = "world.db";
+		if (4 <= argc)
+			world_path = argv[3];
 
 		const bool database_existed = std::filesystem::exists(world_path);
 		game->openDatabase(world_path);

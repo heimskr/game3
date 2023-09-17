@@ -40,11 +40,6 @@ int main(int argc, char **argv) {
 			return 0;
 		}
 
-		if (argc == 4) {
-			std::cout << Game3::generateFlask(Game3::dataRoot / "resources" / "testtubebase.png", Game3::dataRoot / "resources" / "testtubemask.png", argv[1], argv[2], argv[3]);
-			return 0;
-		}
-
 		if (strcmp(argv[1], "-s") == 0) {
 			const auto out = Game3::LocalServer::main(argc, argv);
 			Game3::Timer::summary();
@@ -53,6 +48,11 @@ int main(int argc, char **argv) {
 
 		if (strcmp(argv[1], "-t") == 0) {
 			Game3::test();
+			return 0;
+		}
+
+		if (argc == 4) {
+			std::cout << Game3::generateFlask(Game3::dataRoot / "resources" / "testtubebase.png", Game3::dataRoot / "resources" / "testtubemask.png", argv[1], argv[2], argv[3]);
 			return 0;
 		}
 	}
