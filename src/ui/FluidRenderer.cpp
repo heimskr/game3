@@ -108,8 +108,10 @@ namespace Game3 {
 		if (&new_chunk == chunk)
 			return;
 		chunk = &new_chunk;
-		if (can_reupload)
+		if (can_reupload) {
+			Timer timer{"FR::setChunk::reupload"};
 			reupload();
+		}
 	}
 
 	void FluidRenderer::setChunkPosition(const ChunkPosition &new_pos) {
@@ -149,6 +151,7 @@ namespace Game3 {
 
 		const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
 
+		Timer timer{"FluidVBOInit"};
 		vbo.init<float, 4>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, chunk_x, chunk_y, &game, set_width, divisor, t_size, missing](size_t x, size_t y) {
 			const auto fluid_opt = realm->tileProvider.copyFluidTile({
 				Index(y) + CHUNK_SIZE * (chunk_y + 1), // why `+ 1`?

@@ -5,6 +5,7 @@
 #include "net/Sock.h"
 #include "util/Crypto.h"
 #include "util/FS.h"
+#include "util/Timer.h"
 
 #include <cstdlib>
 #include <ctime>
@@ -44,8 +45,11 @@ int main(int argc, char **argv) {
 			return 0;
 		}
 
-		if (strcmp(argv[1], "-s") == 0)
-			return Game3::LocalServer::main(argc, argv);
+		if (strcmp(argv[1], "-s") == 0) {
+			const auto out = Game3::LocalServer::main(argc, argv);
+			Game3::Timer::summary();
+			return out;
+		}
 
 		if (strcmp(argv[1], "-t") == 0) {
 			Game3::test();
@@ -61,5 +65,6 @@ int main(int argc, char **argv) {
 
 	auto app = Game3::App::create();
 	const int out = app->run(argc, argv);
+	Game3::Timer::summary();
 	return out;
 }

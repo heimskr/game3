@@ -25,7 +25,6 @@ namespace Game3 {
 	}
 
 	ServerGame::~ServerGame() {
-		Timer::clear();
 		INFO("Saving realms and users...");
 		database.writeAllRealms();
 		database.writeUsers(players);

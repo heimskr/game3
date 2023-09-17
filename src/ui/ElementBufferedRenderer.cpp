@@ -182,8 +182,10 @@ namespace Game3 {
 		if (&new_chunk == chunk)
 			return;
 		chunk = &new_chunk;
-		if (can_reupload)
+		if (can_reupload) {
+			Timer timer{"EBR::setChunk::reupload"};
 			reupload();
+		}
 	}
 
 	void ElementBufferedRenderer::setChunkPosition(const ChunkPosition &new_pos) {
@@ -221,6 +223,7 @@ namespace Game3 {
 
 		const TileID missing = tileset["base:tile/void"];
 
+		Timer timer{"BufferedVBOInit"};
 		vbo.init<float, 3>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, set_width, divisor, t_size, missing](size_t x, size_t y) {
 			const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
 			const std::optional<TileID> tile_opt = realm->tryTile(layer, Position{

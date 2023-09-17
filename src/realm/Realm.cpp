@@ -994,6 +994,7 @@ namespace Game3 {
 	}
 
 	void Realm::remakePathMap(ChunkPosition position) {
+		Timer timer{"RemakePathMap"};
 		const auto &tileset = getTileset();
 		auto &path_chunk = tileProvider.getPathChunk(position);
 		auto lock = path_chunk.uniqueLock();
@@ -1257,31 +1258,56 @@ namespace Game3 {
 
 	void Realm::queueReupload() {
 		assert(getSide() == Side::Client);
-		getGame().toClient().getWindow().queue([shared = shared_from_this()] {
-			shared->reupload();
-		});
+		if (!reuploadPending.exchange(true)) {
+			getGame().toClient().getWindow().queue([shared = shared_from_this()] {
+				shared->reupload();
+				shared->reuploadPending = false;
+			});
+		}
 	}
 
 	void Realm::queueReupload(Layer layer) {
 		assert(getSide() == Side::Client);
-		getGame().toClient().getWindow().queue([shared = shared_from_this(), layer] {
-			shared->reupload(layer);
-		});
+		if (!layerReuploadPending[getIndex(layer)].exchange(true)) {
+			getGame().toClient().getWindow().queue([shared = shared_from_this(), layer] {
+				shared->reupload(layer);
+				shared->layerReuploadPending[getIndex(layer)] = false;
+			});
+		}
 	}
 
 	void Realm::queueReuploadFluids() {
 		assert(getSide() == Side::Client);
-		getGame().toClient().getWindow().queue([shared = shared_from_this()] {
-			shared->reuploadFluids();
-		});
+		if (!fluidReuploadPending.exchange(true)) {
+			getGame().toClient().getWindow().queue([shared = shared_from_this()] {
+				shared->reuploadFluids();
+				shared->fluidReuploadPending = false;
+			});
+		}
 	}
 
 	void Realm::queueReuploadAll() {
 		assert(getSide() == Side::Client);
-		getGame().toClient().getWindow().queue([shared = shared_from_this()] {
-			shared->reupload();
-			shared->reuploadFluids();
-		});
+		bool fluid_reuploading = fluidReuploadPending.exchange(true);
+		bool reuploading = reuploadPending.exchange(true);
+		if (!fluid_reuploading && !reuploading) {
+			getGame().toClient().getWindow().queue([shared = shared_from_this()] {
+				shared->reupload();
+				shared->reuploadFluids();
+				shared->reuploadPending = false;
+				shared->fluidReuploadPending = false;
+			});
+		} else if (fluid_reuploading && !reuploading) {
+			getGame().toClient().getWindow().queue([shared = shared_from_this()] {
+				shared->reupload();
+				shared->reuploadPending = false;
+			});
+		} else if (!fluid_reuploading && reuploading) {
+			getGame().toClient().getWindow().queue([shared = shared_from_this()] {
+				shared->reuploadFluids();
+				shared->fluidReuploadPending = false;
+			});
+		}
 	}
 
 	bool Realm::rightClick(const Position &position, double x, double y) {
