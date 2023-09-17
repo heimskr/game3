@@ -30,19 +30,33 @@ namespace Game3 {
 		gmenu->append("D_iscard", "inventory_popup.discard");
 
 		auto group = Gio::SimpleActionGroup::create();
+
 		group->add_action("hold_left", [this] {
-			lastGame->player->send(SetHeldItemPacket(true, lastSlot));
+			if (lastGame)
+				lastGame->player->send(SetHeldItemPacket(true, lastSlot));
+			else
+				WARN(__FILE__ << ':' << __LINE__ << ": no lastGame");
 		});
 
 		group->add_action("hold_right", [this] {
-			lastGame->player->send(SetHeldItemPacket(false, lastSlot));
+			if (lastGame)
+				lastGame->player->send(SetHeldItemPacket(false, lastSlot));
+			else
+				WARN(__FILE__ << ':' << __LINE__ << ": no lastGame");
 		});
 
 		group->add_action("drop", [this] {
-			lastGame->player->getInventory()->drop(lastSlot);
+			if (lastGame)
+				lastGame->player->getInventory()->drop(lastSlot);
+			else
+				WARN(__FILE__ << ':' << __LINE__ << ": no lastGame");
 		});
+
 		group->add_action("discard", [this] {
-			lastGame->player->getInventory()->discard(lastSlot);
+			if (lastGame)
+				lastGame->player->getInventory()->discard(lastSlot);
+			else
+				WARN(__FILE__ << ':' << __LINE__ << ": no lastGame");
 		});
 
 		mainWindow.insert_action_group("inventory_popup", group);
@@ -124,6 +138,7 @@ namespace Game3 {
 	void InventoryTab::reset(const std::shared_ptr<ClientGame> &game) {
 		if (!game) {
 			clear();
+			lastGame = nullptr;
 			return;
 		}
 
@@ -149,14 +164,15 @@ namespace Game3 {
 		removeChildren(grid);
 		widgetsBySlot.clear();
 		widgets.clear();
-		lastGame.reset();
 	}
 
 	void InventoryTab::populate(Gtk::Grid &grid, std::shared_ptr<ClientInventory> inventory) {
-		auto &storage = inventory->getStorage();
+		if (!lastGame)
+			return;
 
 		std::shared_ptr<ClientGame> last_game = lastGame.copyBase();
 
+		auto &storage = inventory->getStorage();
 		const int grid_width = lastGridWidth = gridWidth();
 		const int tile_size  = grid.get_width() / (grid.get_width() / TILE_SIZE);
 		const bool tooldown = 0.f < last_game->player->tooldown;
