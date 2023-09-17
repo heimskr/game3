@@ -38,6 +38,7 @@ namespace Game3 {
 		public:
 			using Sapling::Sapling;
 
+			virtual Identifier getSoilCategory() const { return "base:category/cactus_soil"; }
 			std::vector<Identifier> getTreeTypes() const final {
 				return {"base:tile/cactus1_young", "base:tile/cactus2_young", "base:tile/cactus3_young", "base:tile/cactus4_young"};
 			}

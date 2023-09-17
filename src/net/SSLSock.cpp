@@ -104,7 +104,7 @@ namespace Game3 {
 					switch (ssl_error = SSL_get_error(ssl, status)) {
 						case SSL_ERROR_NONE:
 							ERROR("SSL_ERROR_NONE");
-							return bytes_read;
+							break;
 
 						case SSL_ERROR_ZERO_RETURN:
 							ERROR("SSL_ERROR_ZERO_RETURN");

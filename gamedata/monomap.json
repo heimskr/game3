@@ -783,6 +783,9 @@
 						"base:tile/door1",
 						"base:tile/door2"
 					],
+					"base:category/cactus_soil": [
+						"base:tile/sand"
+					],
 					"base:category/plant_soil": [
 						"base:category/grass",
 						"base:tile/light_grass",

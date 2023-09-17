@@ -24,6 +24,8 @@
 			"base:item/stone":                ["base:texture/tinywonder",   16,  32],
 			"base:item/iron_bar":             ["base:texture/tinywonder",   16,   0],
 			"base:item/sapling":              ["base:texture/palisade",     32,   0],
+			"base:item/snowy_sapling":        ["base:texture/shade",         0,   0],
+			"base:item/desert_sapling":       ["base:texture/shade",        16,   0],
 			"base:item/gold_axe":             ["base:texture/palisade",     32, 160],
 			"base:item/gold_pickaxe":         ["base:texture/palisade",    160, 160],
 			"base:item/gold_shovel":          ["base:texture/palisade",    224, 160],

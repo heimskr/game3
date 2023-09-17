@@ -22,7 +22,8 @@
 			"base:texture/custom":      ["resources/items/custom.png"],
 			"base:texture/franuka":     ["resources/items/franuka.png"],
 			"base:texture/tinywonder":  ["resources/items/tinywonder.png"],
-			"base:texture/flasks":      ["resources/flasks.png"]
+			"base:texture/flasks":      ["resources/flasks.png"],
+			"base:texture/shade":       ["resources/items/shade.png"]
 		}]
 	]
 }

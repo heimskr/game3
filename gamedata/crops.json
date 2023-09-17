@@ -77,30 +77,52 @@
 			},
 
 			"base:crop/cactus1": {
-				"type": "base:tile/cactus",
+				"type": "base:tile/tree",
 				"stages": ["base:tile/cactus1_young", "base:tile/cactus1"],
 				"custom": {"sapling": "base:item/desert_sapling"},
 				"product": ["base:item/wood", 1],
 				"chance": 0.75
 			},
 			"base:crop/cactus2": {
-				"type": "base:tile/cactus",
+				"type": "base:tile/tree",
 				"stages": ["base:tile/cactus2_young", "base:tile/cactus2"],
 				"custom": {"sapling": "base:item/desert_sapling"},
 				"product": ["base:item/wood", 1],
 				"chance": 0.75
 			},
 			"base:crop/cactus3": {
-				"type": "base:tile/cactus",
+				"type": "base:tile/tree",
 				"stages": ["base:tile/cactus3_young", "base:tile/cactus3"],
 				"custom": {"sapling": "base:item/desert_sapling"},
 				"product": ["base:item/wood", 1],
 				"chance": 0.75
 			},
 			"base:crop/cactus4": {
-				"type": "base:tile/cactus",
+				"type": "base:tile/tree",
 				"stages": ["base:tile/cactus4_young", "base:tile/cactus4"],
 				"custom": {"sapling": "base:item/desert_sapling"},
+				"product": ["base:item/wood", 1],
+				"chance": 0.75
+			},
+
+			"base:crop/winter_tree1": {
+				"type": "base:tile/tree",
+				"stages": ["base:tile/winter_tree1_stump", "base:tile/winter_tree1"],
+				"custom": {"sapling": "base:item/snowy_sapling"},
+				"product": ["base:item/wood", 1],
+				"chance": 0.75
+			},
+			"base:crop/winter_tree2": {
+				"type": "base:tile/tree",
+				"stages": ["base:tile/winter_tree2_stump", "base:tile/winter_tree2"],
+				"custom": {"sapling": "base:item/snowy_sapling"},
+				"product": ["base:item/wood", 1],
+				"chance": 0.75
+			},
+			"base:crop/winter_tree3": {
+				"type": "base:tile/tree",
+				"stages": ["base:tile/winter_tree3_stump", "base:tile/winter_tree3"],
+				"custom": {"sapling": "base:item/snowy_sapling"},
 				"product": ["base:item/wood", 1],
 				"chance": 0.75
 			}
