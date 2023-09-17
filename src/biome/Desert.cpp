@@ -10,6 +10,15 @@
 #include "worldgen/WorldGen.h"
 
 namespace Game3 {
+	namespace {
+		const std::unordered_set<Identifier> cactuses {
+			"base:tile/cactus1"_id,
+			"base:tile/cactus2"_id,
+			"base:tile/cactus3"_id,
+			"base:tile/cactus4"_id,
+		};
+	}
+
 	void Desert::init(Realm &realm, int noise_seed) {
 		Biome::init(realm, noise_seed);
 		forestPerlin = std::make_shared<noise::module::Perlin>();
@@ -48,18 +57,8 @@ namespace Game3 {
 				uint8_t mod = abs(column) % 2;
 				if (hundred(tree_rng) < 50)
 					mod = 1 - mod;
-				if ((abs(row) % 2) == mod) {
-					static const std::vector<Identifier> cactuses {
-						"base:tile/cactus1"_id,
-						"base:tile/cactus2"_id,
-						"base:tile/cactus3"_id,
-						"base:tile/cactus4"_id,
-						"base:tile/cactus5"_id,
-						"base:tile/cactus7"_id,
-						"base:tile/cactus8"_id,
-					};
-					// realm.add(TileEntity::create<Tree>(realm.getGame(), choose(cactuses, rng), "base:tile/cactus6"_id, Position(row, column), Tree::MATURITY));
-				}
+				if ((abs(row) % 2) == mod)
+					realm.setTile(Layer::Submerged, {row, column}, choose(cactuses, rng), false, true);
 			}
 		}
 
@@ -70,10 +69,8 @@ namespace Game3 {
 		Realm &realm = *getRealm();
 		constexpr double factor = 10;
 
-		if (params.antiforestThreshold > perlin.GetValue(row / Biome::NOISE_ZOOM * factor, column / Biome::NOISE_ZOOM * factor, 0.)) {
-			if (auto tile = realm.tileEntityAt({row, column}); tile && tile->is("base:te/tree"_id) && !std::dynamic_pointer_cast<Tree>(tile)->hasHive()) {
-				realm.queueRemoval(tile);
-			}
-		}
+		if (params.antiforestThreshold > perlin.GetValue(row / Biome::NOISE_ZOOM * factor, column / Biome::NOISE_ZOOM * factor, 0.))
+			if (auto tile = realm.tryTile(Layer::Submerged, {row, column}); tile && cactuses.contains(realm.getTileset()[*tile]))
+				realm.setTile(Layer::Submerged, {row, column}, 0, false, true);
 	}
 }
