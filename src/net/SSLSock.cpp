@@ -83,6 +83,8 @@ namespace Game3 {
 			throw NetError(errno);
 		}
 
+		std::optional<ssize_t> return_value;
+
 		if (FD_ISSET(netFD, &fds_copy)) {
 			bool read_blocked = false;
 			size_t bytes_read = 0;
@@ -140,7 +142,7 @@ namespace Game3 {
 			if (auto control_set = FD_ISSET(controlRead, &fds_copy))
 				WARN("FD_ISSET(controlRead): " << control_set);
 
-			return total_bytes_read;
+			return_value = total_bytes_read;
 		}
 
 		if (FD_ISSET(controlRead, &fds_copy)) {
@@ -160,10 +162,12 @@ namespace Game3 {
 			::close(netFD);
 			if (sslContext != nullptr)
 				SSL_CTX_free(sslContext);
-			return 0;
+
+			if (!return_value)
+				return_value = 0;
 		}
 
-		return -1;
+		return return_value? *return_value : -1;
 	}
 
 	void SSLSock::connectSSL(bool blocking) {
