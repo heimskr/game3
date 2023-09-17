@@ -364,6 +364,24 @@ To send a list, send `0x20`, followed by the type encoding of the subtype, follo
 
 To send a map, send `0x21`, followed by the type encoding of the key type, followed by the type encoding of the value type, followed by the number of key-value pairs as an unsigned little-endian 32-bit integer, followed by the key-value pairs without type encodings (except for variable-length types such as optionals, strings, lists and maps, which must include their full type encodings before each key or value). For example, the map of unsigned 8-bit integers to strings `{0x30 => "", 0x40 => "Hi", 0x50 => "This is a long string"}` would be sent as `0x21 0x01 0x1f 0x03 0x00 0x00 0x00 0x30 0x10 0x40 0x12 0x48 0x69 0x50 0x1f 0x15 0x00 0x00 0x00 0x54 0x68 0x69 0x73 0x20 0x69 0x73 0x20 0x61 0x20 0x6c 0x6f 0x6e 0x67 0x20 0x73 0x74 0x72 0x69 0x6e 0x67`.
 
+### ItemStack
+
+- `string` Item ID
+- `u64` Item Count
+- `string` Item Extra Data (JSON)
+
+### Inventory
+
+- `u64` Inventory Owner
+- `i32` Inventory Slot Count
+- `i32` Inventory Active Slot
+- `map<i32, ItemStack>` Inventory Items
+
+### FluidStack
+
+- `u16` Fluid ID
+- `u64` Fluid Amount
+
 # Examples
 
 To send a chunk request in realm 42 for chunks (-1, -2), (0, 0) and (40, 64), the encoded packet would be:
