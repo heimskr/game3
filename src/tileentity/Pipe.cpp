@@ -74,6 +74,9 @@ namespace Game3 {
 	}
 
 	void Pipe::render(SpriteRenderer &sprite_renderer) {
+		if (!isVisible())
+			return;
+
 		RealmPtr realm = getRealm();
 		Tileset &tileset = realm->getTileset();
 
