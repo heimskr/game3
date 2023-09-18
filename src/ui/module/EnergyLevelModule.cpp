@@ -72,8 +72,6 @@ namespace Game3 {
 		if (!energyHaver)
 			return;
 
-		const auto &registry = game->registry<FluidRegistry>();
-
 		if (auto agent = std::dynamic_pointer_cast<Agent>(energyHaver))
 			headerLabel.set_text(agent->getName());
 		else
