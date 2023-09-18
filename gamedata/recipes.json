@@ -183,6 +183,24 @@
 			["base:crafting_recipe", {
 				"input": [
 					["base:item/black_dye", 1],
+					["base:item/gray_dye", 1],
+					["base:item/white_dye", 1],
+					["base:item/purple_dye", 1]
+				],
+				"output": [["base:item/ace_flag", 1]]
+			}],
+			["base:crafting_recipe", {
+				"input": [
+					["base:item/yellow_dye", 1],
+					["base:item/white_dye", 1],
+					["base:item/purple_dye", 1],
+					["base:item/black_dye", 1]
+				],
+				"output": [["base:item/nb_flag", 1]]
+			}],
+			["base:crafting_recipe", {
+				"input": [
+					["base:item/black_dye", 1],
 					["base:item/orange_dye", 1]
 				],
 				"output": [["base:item/brown_dye", 2]]

@@ -472,6 +472,8 @@
 					"base:tile/flower3_purple":          814,
 					"base:tile/flower3_white":           815,
 					"base:tile/flower3_black":           816,
+					"base:tile/ace_flag":                839,
+					"base:tile/nb_flag":                 840,
 					"base:tile/flower4_red":             841,
 					"base:tile/flower4_orange":          842,
 					"base:tile/flower4_yellow":          843,
