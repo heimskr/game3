@@ -3,6 +3,7 @@
 #include "net/RemoteClient.h"
 #include "packet/AgentMessagePacket.h"
 #include "packet/EntityPacket.h"
+#include "util/Util.h"
 
 namespace Game3 {
 	ServerPlayer::ServerPlayer():
@@ -23,6 +24,22 @@ namespace Game3 {
 			toJSON(json);
 			database.writeUser(username, json);
 			INFO("Persisted ServerPlayer with username " << username << '.');
+
+			std::vector<std::string> usernames;
+
+			{
+				const auto &players = game.toServer().players;
+				auto lock = players.sharedLock();
+				if (players.empty()) {
+					INFO("No remaining players.");
+					return;
+				}
+
+				for (const ServerPlayerPtr &player: players)
+					usernames.push_back(player->username);
+			}
+
+			INFO("Remaining player" << (usernames.size() == 1? "" : "s") << ": " << join(usernames, ", "));
 		}
 	}
 
