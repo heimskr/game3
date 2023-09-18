@@ -342,11 +342,13 @@ namespace Game3 {
 		});
 
 		game->signal_fluid_update().connect([this](const std::shared_ptr<HasFluids> &has_fluids) {
-			std::unique_lock<std::shared_mutex> lock;
-			if (Module *module_ = inventoryTab->getModule(lock)) {
-				std::any data(has_fluids);
-				module_->handleMessage({}, "UpdateFluids", data);
-			}
+			queue([this, has_fluids] {
+				std::unique_lock<std::shared_mutex> lock;
+				if (Module *module_ = inventoryTab->getModule(lock)) {
+					std::any data(has_fluids);
+					module_->handleMessage({}, "UpdateFluids", data);
+				}
+			});
 		});
 
 		game->errorCallback = [this] {
