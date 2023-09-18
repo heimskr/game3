@@ -206,20 +206,16 @@ namespace Game3 {
 		text_renderer.update(bb_width, bb_height);
 
 		{
-			auto lock = entities.sharedLock();
-			for (const auto &entity: entities)
-				if (!entity->isPlayer() || !client_game.player || entity->globalID != client_game.player->globalID)
-					entity->render(sprite_renderer, text_renderer);
-		}
-
-		{
 			auto lock = tileEntities.sharedLock();
 			for (const auto &[index, tile_entity]: tileEntities)
 				tile_entity->render(sprite_renderer);
 		}
 
-		if (client_game.player)
-			client_game.player->render(sprite_renderer, text_renderer);
+		{
+			auto lock = entities.sharedLock();
+			for (const auto &entity: entities)
+				entity->render(sprite_renderer, text_renderer);
+		}
 
 		// multiplier.update(bb_width, bb_height);
 		// sprite_renderer.drawOnMap(texture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
