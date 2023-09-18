@@ -695,6 +695,8 @@
 					"base:tile/flower5_white":    "base:item/flower5_white",
 					"base:tile/flower5_black":    "base:item/flower5_black",
 					"base:tile/pride_flag":       "base:item/pride_flag",
+					"base:tile/ace_flag":         "base:item/ace_flag",
+					"base:tile/nb_flag":          "base:item/nb_flag",
 					"base:tile/floor":            "base:item/floor"
 				},
 				"marchable": {

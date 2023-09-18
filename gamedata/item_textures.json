@@ -111,6 +111,8 @@
 			"base:item/gray_dye":             ["base:texture/potions",      16, 208],
 			"base:item/lime_dye":             ["base:texture/potions",     112, 208],
 			"base:item/pride_flag":           ["base:texture/tileset",     128, 368],
+			"base:item/ace_flag":             ["base:texture/tileset",     112, 416],
+			"base:item/nb_flag":              ["base:texture/tileset",     128, 416],
 			"base:item/floor":                ["base:texture/tileset",      16, 112],
 			"base:item/saffron_milkcap":      ["base:texture/mushrooms",    16,   0],
 			"base:item/honey_fungus":         ["base:texture/mushrooms",     0,  48],
