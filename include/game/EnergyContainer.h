@@ -2,20 +2,14 @@
 
 #include "Types.h"
 #include "game/Container.h"
-
-#include <mutex>
-#include <shared_mutex>
+#include "threading/HasMutex.h"
 
 namespace Game3 {
-	class EnergyContainer: public Container {
+	class EnergyContainer: public Container, public HasMutex<> {
 		public:
 			// I wish I could just use std::atomic for this.
 			EnergyAmount energy;
 			EnergyAmount capacity;
-			std::shared_mutex mutex;
-
-			auto uniqueLock() { return std::unique_lock{mutex}; }
-			auto sharedLock() { return std::shared_lock{mutex}; }
 
 			EnergyContainer(EnergyAmount capacity_, EnergyAmount energy_ = 0):
 				energy(energy_), capacity(capacity_) {}

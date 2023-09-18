@@ -136,6 +136,7 @@
 #include "tileentity/Tree.h"
 #include "ui/module/ChemicalReactorModule.h"
 #include "ui/module/ExternalInventoryModule.h"
+#include "ui/module/EnergyLevelModule.h"
 #include "ui/module/FluidLevelsModule.h"
 #include "ui/module/ModuleFactory.h"
 #include "util/AStar.h"
@@ -482,6 +483,7 @@ namespace Game3 {
 		add(ModuleFactory::create<ExternalInventoryModule>());
 		add(ModuleFactory::create<FluidLevelsModule>());
 		add(ModuleFactory::create<ChemicalReactorModule>());
+		add(ModuleFactory::create<EnergyLevelModule>());
 	}
 
 	void Game::initialSetup(const std::filesystem::path &dir) {

@@ -104,7 +104,7 @@ namespace Game3 {
 			// TODO: formula observation
 		}
 
-		std::shared_lock lock{energyContainer->mutex};
+		auto lock = energyContainer->sharedLock();
 		INFO("Energy: " << energyContainer->energy);
 		return true;
 	}

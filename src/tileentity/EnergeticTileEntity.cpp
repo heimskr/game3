@@ -1,9 +1,10 @@
 #include "game/ClientGame.h"
 #include "game/EnergyContainer.h"
-// #include "packet/OpenEnergyLevelPacket.h"
+#include "packet/OpenModuleForAgentPacket.h"
 #include "packet/SetTileEntityEnergyPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/EnergeticTileEntity.h"
+#include "ui/module/EnergyLevelModule.h"
 
 namespace Game3 {
 	EnergeticTileEntity::EnergeticTileEntity(EnergyAmount capacity, EnergyAmount energy):
@@ -11,7 +12,7 @@ namespace Game3 {
 
 	bool EnergeticTileEntity::canInsertEnergy(EnergyAmount amount, Direction) {
 		assert(energyContainer);
-		std::shared_lock lock{energyContainer->mutex};
+		auto lock = energyContainer->sharedLock();
 		return energyContainer->canInsert(amount);
 	}
 
@@ -21,7 +22,7 @@ namespace Game3 {
 
 	EnergyAmount EnergeticTileEntity::extractEnergy(Direction, bool remove, EnergyAmount max_amount) {
 		assert(energyContainer);
-		std::unique_lock lock{energyContainer->mutex};
+		auto lock = energyContainer->uniqueLock();
 		const EnergyAmount to_remove = std::min(max_amount, energyContainer->energy);
 		if (0 < remove)
 			energyContainer->energy -= to_remove;
@@ -50,8 +51,8 @@ namespace Game3 {
 
 		player->send(TileEntityPacket(getSelf()));
 
-		// TODO!
-		// player->send(OpenEnergyLevelPacket(getGID()));
+		if (!silent)
+			player->send(OpenModuleForAgentPacket(EnergyLevelModule::ID(), getGID(), true));
 
 		player->queueForMove([this, self = shared_from_this()](const std::shared_ptr<Entity> &entity) {
 			removeObserver(std::static_pointer_cast<Player>(entity));
@@ -60,13 +61,13 @@ namespace Game3 {
 	}
 
 	void EnergeticTileEntity::toJSON(nlohmann::json &json) const {
-		std::shared_lock lock{energyContainer->mutex};
+		auto lock = energyContainer->sharedLock();
 		json["energy"] = energyContainer->energy;
 	}
 
 	void EnergeticTileEntity::absorbJSON(Game &, const nlohmann::json &json) {
 		const EnergyAmount amount = json.at("energy");
-		std::unique_lock lock{energyContainer->mutex};
+		auto lock = energyContainer->uniqueLock();
 		energyContainer->energy = amount;
 	}
 
@@ -77,13 +78,13 @@ namespace Game3 {
 	void EnergeticTileEntity::decode(Game &, Buffer &buffer) {
 		EnergyAmount old_amount{};
 		{
-			std::shared_lock lock{energyContainer->mutex};
+			auto lock = energyContainer->sharedLock();
 			old_amount = energyContainer->energy;
 		}
 		HasEnergy::decode(buffer);
 		bool updated = false;
 		{
-			std::shared_lock lock{energyContainer->mutex};
+			auto lock = energyContainer->sharedLock();
 			updated = old_amount != energyContainer->energy;
 		}
 		if (updated)

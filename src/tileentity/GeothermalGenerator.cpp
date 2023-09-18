@@ -147,7 +147,7 @@ namespace Game3 {
 					INFO(realm.getGame().getFluid(id)->identifier << " = " << amount);
 		}
 
-		std::shared_lock lock{energyContainer->mutex};
+		auto lock = energyContainer->sharedLock();
 		INFO("Energy: " << energyContainer->energy);
 		return true;
 	}

@@ -338,7 +338,9 @@ namespace Game3 {
 		});
 
 		game->signal_player_money_update().connect([this](const PlayerPtr &) {
-			inventoryTab->update(game);
+			queue([this] {
+				inventoryTab->update(game);
+			});
 		});
 
 		game->signal_fluid_update().connect([this](const std::shared_ptr<HasFluids> &has_fluids) {
@@ -347,6 +349,16 @@ namespace Game3 {
 				if (Module *module_ = inventoryTab->getModule(lock)) {
 					std::any data(has_fluids);
 					module_->handleMessage({}, "UpdateFluids", data);
+				}
+			});
+		});
+
+		game->signal_energy_update().connect([this](const std::shared_ptr<HasEnergy> &has_energy) {
+			queue([this, has_energy] {
+				std::unique_lock<std::shared_mutex> lock;
+				if (Module *module_ = inventoryTab->getModule(lock)) {
+					std::any data(has_energy);
+					module_->handleMessage({}, "UpdateEnergy", data);
 				}
 			});
 		});
