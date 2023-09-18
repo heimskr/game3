@@ -45,7 +45,6 @@ namespace Game3 {
 		for (auto iter = extractions.begin(), end = extractions.end(); iter != end; ++iter) {
 			const auto &[position, direction] = *iter;
 
-
 			auto inventoried = std::dynamic_pointer_cast<InventoriedTileEntity>(realm->tileEntityAt(position));
 			if (!inventoried) {
 				to_erase.push_back(iter);

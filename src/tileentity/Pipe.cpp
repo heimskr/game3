@@ -140,10 +140,16 @@ namespace Game3 {
 		if (!tile_entity)
 			return;
 
-		for (const PipeType pipe_type: PIPE_TYPES)
-			if (directions[pipe_type][direction])
-				if (const auto &network = networks[pipe_type]; network && network->canWorkWith(tile_entity))
-					network->addInsertion(neighbor_position, flipDirection(direction));
+		for (const PipeType pipe_type: PIPE_TYPES) {
+			if (directions[pipe_type][direction]) {
+				if (const auto &network = networks[pipe_type]; network && network->canWorkWith(tile_entity)) {
+					if (extractors[pipe_type][direction])
+						network->addExtraction(neighbor_position, flipDirection(direction));
+					else
+						network->addInsertion(neighbor_position, flipDirection(direction));
+				}
+			}
+		}
 	}
 
 	void Pipe::encode(Game &game, Buffer &buffer) {
