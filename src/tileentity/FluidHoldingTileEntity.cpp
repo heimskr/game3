@@ -127,7 +127,7 @@ namespace Game3 {
 				return false;
 			}
 
-			return false;
+			return true;
 		});
 	}
 }
