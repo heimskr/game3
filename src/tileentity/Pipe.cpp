@@ -1,6 +1,8 @@
 #include "Log.h"
 #include "Tileset.h"
+#include "game/EnergyContainer.h"
 #include "game/Game.h"
+#include "pipes/EnergyNetwork.h"
 #include "pipes/ItemNetwork.h"
 #include "pipes/PipeNetwork.h"
 #include "realm/Realm.h"
@@ -221,6 +223,8 @@ namespace Game3 {
 
 				if (pipe_type == PipeType::Item)
 					INFO("Overflow queue size: " << std::dynamic_pointer_cast<ItemNetwork>(network)->overflowCount());
+				else if (pipe_type == PipeType::Energy)
+					INFO("Stored energy: " << std::dynamic_pointer_cast<EnergyNetwork>(network)->energyContainer->energy);
 			} else
 				INFO("Pipe not connected to a(n) " << pipe_type << " network.");
 		}
