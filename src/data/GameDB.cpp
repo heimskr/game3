@@ -431,6 +431,16 @@ namespace Game3 {
 		});
 	}
 
+	void GameDB::deleteTileEntity(const TileEntityPtr &tile_entity) {
+		assert(database);
+		auto db_lock = database.uniqueLock();
+		SQLite::Transaction transaction{*database};
+		SQLite::Statement statement{*database, "DELETE FROM tileEntities WHERE globalID = ?"};
+		statement.bind(1, std::make_signed_t<GlobalID>(tile_entity->getGID()));
+		statement.exec();
+		transaction.commit();
+	}
+
 	void GameDB::writeEntities(const std::function<bool(EntityPtr &)> &getter) {
 		assert(database);
 		EntityPtr entity;

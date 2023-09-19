@@ -8,7 +8,7 @@ namespace Game3 {
 
 	class EnergyNetwork: public PipeNetwork, public HasEnergy {
 		public:
-			constexpr static EnergyAmount CAPACITY = 100'000;
+			constexpr static EnergyAmount CAPACITY = 10'000;
 
 			EnergyNetwork(size_t id_, const std::shared_ptr<Realm> &);
 

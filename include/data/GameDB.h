@@ -60,6 +60,7 @@ namespace Game3 {
 
 			void writeTileEntities(const std::function<bool(std::shared_ptr<TileEntity> &)> &);
 			void writeTileEntities(const std::shared_ptr<Realm> &);
+			void deleteTileEntity(const std::shared_ptr<TileEntity> &);
 
 			void writeEntities(const std::function<bool(std::shared_ptr<Entity> &)> &);
 			void writeEntities(const std::shared_ptr<Realm> &);

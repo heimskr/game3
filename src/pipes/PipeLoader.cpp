@@ -67,8 +67,16 @@ namespace Game3 {
 				if (TileEntityPtr base_neighbor = realm->tileEntityAt(neighbor_position)) {
 					if (auto neighbor = std::dynamic_pointer_cast<Pipe>(base_neighbor)) {
 						// Check whether the connection is matched with a connection on the other pipe.
-						if (!neighbor->loaded[pipe_type] && neighbor->getDirections()[pipe_type][flipDirection(direction)])
-							queue.push_back(neighbor);
+						if (neighbor->getDirections()[pipe_type][flipDirection(direction)]) {
+							if (neighbor->loaded[pipe_type]) {
+								std::shared_ptr<PipeNetwork> other_network = neighbor->getNetwork(pipe_type);
+								if (network != other_network) {
+									network->absorb(other_network);
+								}
+							} else {
+								queue.push_back(neighbor);
+							}
+						}
 					}
 				}
 			});

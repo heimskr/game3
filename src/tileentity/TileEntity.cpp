@@ -13,7 +13,9 @@ namespace Game3 {
 	void TileEntity::destroy() {
 		auto realm = getRealm();
 		assert(realm);
-		realm->removeSafe(getSelf());
+		TileEntityPtr self = getSelf();
+		realm->removeSafe(self);
+		realm->getGame().toServer().database.deleteTileEntity(self);
 
 		if (getSide() == Side::Server)
 			realm->getGame().toServer().tileEntityDestroyed(*this);

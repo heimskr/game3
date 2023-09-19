@@ -12,13 +12,13 @@ namespace Game3 {
 	TileEntityPacket::TileEntityPacket(TileEntityPtr tile_entity):
 		tileEntity(std::move(tile_entity)),
 		identifier(tileEntity->getID()),
-		globalID(tileEntity->globalID),
+		globalID(tileEntity->getGID()),
 		realmID(tileEntity->realmID) {}
 
 	void TileEntityPacket::decode(Game &game, Buffer &buffer) {
 		buffer >> globalID >> identifier >> realmID;
-		assert(globalID != static_cast<GlobalID>(-1));
-		assert(globalID != static_cast<GlobalID>(0));
+		assert(globalID != GlobalID(-1));
+		assert(globalID != GlobalID(0));
 
 		RealmPtr realm = game.tryRealm(realmID);
 		if (!realm)
@@ -38,7 +38,7 @@ namespace Game3 {
 			wasFound = false;
 			auto factory = game.registry<TileEntityFactoryRegistry>()[identifier];
 			tileEntity = (*factory)(game);
-			tileEntity->globalID = globalID;
+			tileEntity->setGID(globalID);
 			tileEntity->tileEntityID = identifier;
 			tileEntity->setRealm(realm);
 			tileEntity->init(game);

@@ -182,12 +182,12 @@ namespace Game3 {
 	}
 
 	void Pipe::onSpawn() {
+		TileEntity::onSpawn();
+
 		auto realm = getRealm();
 		auto shared = std::static_pointer_cast<Pipe>(shared_from_this());
 		for (const PipeType pipe_type: PIPE_TYPES)
 			realm->pipeLoader.floodFill(pipe_type, shared);
-
-		TileEntity::onSpawn();
 	}
 
 	void Pipe::onRemove() {
