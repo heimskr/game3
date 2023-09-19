@@ -154,7 +154,7 @@ namespace Game3 {
 		auto now = getTime();
 		auto difference = now - lastTime;
 		lastTime = now;
-		delta = std::chrono::duration_cast<std::chrono::nanoseconds>(difference).count() / 1'000'000'000.;
+		delta = std::chrono::duration_cast<std::chrono::nanoseconds>(difference).count() / 1e9;
 		time += delta;
 		++currentTick;
 		return true;

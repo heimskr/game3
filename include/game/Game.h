@@ -54,6 +54,7 @@ namespace Game3 {
 			size_t cavesGenerated = 0;
 			size_t randomTicksPerChunk = 1;
 			bool dying = false;
+			std::atomic_bool tickingPaused{false};
 
 			std::map<RealmType, std::shared_ptr<InteractionSet>> interactionSets;
 			std::map<Identifier, std::unordered_set<std::shared_ptr<Item>>> itemsByAttribute;

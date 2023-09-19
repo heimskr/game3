@@ -155,10 +155,13 @@ namespace Game3 {
 				other_player->send(packet);
 	}
 
-	static std::shared_ptr<Server> global_server;
-	static std::atomic_bool running = true;
-	static std::condition_variable stopCV;
-	static std::mutex stopMutex;
+	namespace {
+		std::shared_ptr<Server> global_server;
+		std::atomic_bool running = true;
+		std::condition_variable stopCV;
+		std::mutex stopMutex;
+		std::condition_variable saveCV;
+	}
 
 	bool LocalServer::validateUsername(std::string_view username) {
 		if (username.empty() || 20 < username.size())
@@ -202,7 +205,7 @@ namespace Game3 {
 			global_server->stop();
 		});
 
-		if (signal(SIGINT, +[](int) { running = false; stopCV.notify_all(); }) == SIG_ERR)
+		if (signal(SIGINT, +[](int) { running = false; stopCV.notify_all(); saveCV.notify_all(); }) == SIG_ERR)
 			throw std::runtime_error("Couldn't register SIGINT handler");
 
 		auto game_server = std::make_shared<LocalServer>(global_server, secret);
@@ -211,6 +214,7 @@ namespace Game3 {
 		game_server->onStop = [] {
 			running = false;
 			stopCV.notify_all();
+			saveCV.notify_all();
 		};
 
 		const char *world_path = "world.db";
@@ -239,16 +243,43 @@ namespace Game3 {
 
 		game->initInteractionSets();
 
-		std::thread tick_thread = std::thread([&] {
+		std::thread tick_thread([&] {
 			while (running) {
-				game->tick();
+				if (!game->tickingPaused)
+					game->tick();
 				std::this_thread::sleep_for(std::chrono::milliseconds(TICK_PERIOD));
+			}
+		});
+
+		std::mutex save_mutex;
+		std::chrono::seconds save_period{120};
+
+		std::thread save_thread([&] {
+			std::chrono::time_point last_save = std::chrono::system_clock::now();
+
+			while (running) {
+				std::unique_lock lock{save_mutex};
+				saveCV.wait_for(lock, save_period, [&] {
+					return !running || save_period <= std::chrono::system_clock::now() - last_save;
+				});
+
+				if (save_period <= std::chrono::system_clock::now() - last_save) {
+					INFO("Autosaving...");
+					game->tickingPaused = true;
+					game->database.writeAllRealms();
+					auto player_lock = game->players.sharedLock();
+					game->database.writeUsers(game->players);
+					game->tickingPaused = false;
+					INFO("Autosaved.");
+					last_save = std::chrono::system_clock::now();
+				}
 			}
 		});
 
 		game_server->run();
 		tick_thread.join();
 		stop_thread.join();
+		save_thread.join();
 
 		return 0;
 	}
