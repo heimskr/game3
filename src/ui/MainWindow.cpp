@@ -728,6 +728,15 @@ namespace Game3 {
 				case GDK_KEY_t:
 					std::cout << "Time: " << int(game->getHour()) << ':' << int(game->getMinute()) << '\n';
 					return;
+				case GDK_KEY_T: {
+					auto realm = game->player->getRealm();
+					const Position where = game->player->getPosition() + game->player->direction.load();
+					if (auto tile_entity = realm->tileEntityAt(where))
+						INFO("TileEntity: " << tile_entity->tileEntityID << " " << tile_entity->getGID());
+					else
+						INFO("No TileEntity found at " << where);
+					return;
+				}
 				case GDK_KEY_p: {
 					std::cout << "Player GID: " << game->player->getGID() << '\n';
 					std::cout << "Realm ID: " << game->player->getRealm()->id << " or perhaps " << game->activeRealm.copyBase()->id << '\n';
