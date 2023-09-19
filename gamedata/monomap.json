@@ -386,7 +386,6 @@
 					"base:tile/pump_e":                  617,
 					"base:tile/pump_s":                  618,
 					"base:tile/pump_w":                  619,
-					"base:tile/pump":                    620,
 					"base:tile/centrifuge":              621,
 					"base:tile/geothermal_generator":    622,
 					"base:tile/alchemizer":              623,

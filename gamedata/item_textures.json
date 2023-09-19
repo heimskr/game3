@@ -133,7 +133,7 @@
 			"base:item/milk_flask":           ["base:texture/flasks",       48,   0],
 			"base:item/void_flask":           ["base:texture/flasks",       64,   0],
 			"base:item/tank":                 ["base:texture/tileset",     112, 304],
-			"base:item/pump":                 ["base:texture/tileset",     192, 304],
+			"base:item/pump":                 ["base:texture/tileset",     160, 304],
 			"base:item/centrifuge":           ["base:texture/tileset",     208, 304],
 			"base:item/geothermal_generator": ["base:texture/tileset",     224, 304],
 			"base:item/alchemizer":           ["base:texture/tileset",     240, 304],
