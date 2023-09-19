@@ -248,7 +248,7 @@
 			}],
 			["base:geothermal_recipe", {
 				"input": ["base:fluid/lava", 100],
-				"output": 200
+				"output": 500
 			}]
 		]]
 	]
