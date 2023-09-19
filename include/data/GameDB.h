@@ -43,14 +43,14 @@ namespace Game3 {
 
 			void writeRealm(const std::shared_ptr<Realm> &);
 
-			void writeChunk(const std::shared_ptr<Realm> &, ChunkPosition);
+			void writeChunk(const std::shared_ptr<Realm> &, ChunkPosition, bool use_transaction = true);
 
 			void readAllRealms();
 
 			/** Reads metadata from the database and returns an empty realm based on the metadata. */
 			std::shared_ptr<Realm> loadRealm(RealmID, bool do_lock);
 
-			void writeRealmMeta(const std::shared_ptr<Realm> &);
+			void writeRealmMeta(const std::shared_ptr<Realm> &, bool use_transaction = true);
 
 			std::optional<ChunkSet> getChunk(RealmID, ChunkPosition);
 
@@ -58,12 +58,12 @@ namespace Game3 {
 			void writeUser(std::string_view username, const nlohmann::json &);
 			bool hasName(std::string_view username, std::string_view display_name);
 
-			void writeTileEntities(const std::function<bool(std::shared_ptr<TileEntity> &)> &);
-			void writeTileEntities(const std::shared_ptr<Realm> &);
+			void writeTileEntities(const std::function<bool(std::shared_ptr<TileEntity> &)> &, bool use_transaction = true);
+			void writeTileEntities(const std::shared_ptr<Realm> &, bool use_transaction = true);
 			void deleteTileEntity(const std::shared_ptr<TileEntity> &);
 
-			void writeEntities(const std::function<bool(std::shared_ptr<Entity> &)> &);
-			void writeEntities(const std::shared_ptr<Realm> &);
+			void writeEntities(const std::function<bool(std::shared_ptr<Entity> &)> &, bool use_transaction = true);
+			void writeEntities(const std::shared_ptr<Realm> &, bool use_transaction = true);
 			void deleteEntity(const std::shared_ptr<Entity> &);
 
 			inline bool isOpen() {

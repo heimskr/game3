@@ -86,32 +86,40 @@ namespace Game3 {
 	}
 
 	void GameDB::writeRealm(const RealmPtr &realm) {
+		SQLite::Transaction transaction{*database};
+
 		{
 			Timer timer{"WriteRealmMeta"};
-			writeRealmMeta(realm);
+			writeRealmMeta(realm, false);
 		}
 		std::shared_lock lock(realm->tileProvider.chunkMutexes[0]);
 		for (const auto &[chunk_position, chunk]: realm->tileProvider.chunkMaps[0]) {
 			Timer timer{"WriteChunk"};
-			writeChunk(realm, chunk_position);
+			writeChunk(realm, chunk_position, false);
 		}
 		{
 			Timer timer{"WriteTileEntities"};
-			writeTileEntities(realm);
+			writeTileEntities(realm, false);
 		}
 		{
 			Timer timer{"WriteEntities"};
-			writeEntities(realm);
+			writeEntities(realm, false);
 		}
+
+		Timer timer{"WriteRealmCommit"};
+		transaction.commit();
 	}
 
-	void GameDB::writeChunk(const RealmPtr &realm, ChunkPosition chunk_position) {
+	void GameDB::writeChunk(const RealmPtr &realm, ChunkPosition chunk_position, bool use_transaction) {
 		assert(database);
 		TileProvider &provider = realm->tileProvider;
 
 		auto db_lock = database.uniqueLock();
 
-		SQLite::Transaction transaction{*database};
+		std::optional<SQLite::Transaction> transaction;
+		if (use_transaction)
+			transaction.emplace(*database);
+
 		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO chunks VALUES (?, ?, ?, ?, ?, ?, ?)"};
 
 		std::string raw_terrain;
@@ -164,9 +172,9 @@ namespace Game3 {
 			statement.exec();
 		}
 
-		{
+		if (use_transaction) {
 			Timer timer{"CommitTransaction"};
-			transaction.commit();
+			transaction->commit();
 		}
 	}
 
@@ -299,7 +307,7 @@ namespace Game3 {
 		return realm;
 	}
 
-	void GameDB::writeRealmMeta(const RealmPtr &realm) {
+	void GameDB::writeRealmMeta(const RealmPtr &realm, bool use_transaction) {
 		assert(database);
 
 		nlohmann::json json;
@@ -307,15 +315,19 @@ namespace Game3 {
 
 		auto db_lock = database.uniqueLock();
 
-		SQLite::Transaction transaction{*database};
+		std::optional<SQLite::Transaction> transaction;
+		if (use_transaction)
+			transaction.emplace(*database);
+
 		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO realms VALUES (?, ?)"};
 
 		statement.bind(1, realm->id);
 		statement.bind(2, json.dump());
 
 		statement.exec();
-		transaction.commit();
 
+		if (use_transaction)
+			transaction->commit();
 	}
 
 	std::optional<ChunkSet> GameDB::getChunk(RealmID realm_id, ChunkPosition chunk_position) {
@@ -391,12 +403,15 @@ namespace Game3 {
 		return query.executeStep();
 	}
 
-	void GameDB::writeTileEntities(const std::function<bool(TileEntityPtr &)> &getter) {
+	void GameDB::writeTileEntities(const std::function<bool(TileEntityPtr &)> &getter, bool use_transaction) {
 		assert(database);
 		TileEntityPtr tile_entity;
 		auto db_lock = database.uniqueLock();
 
-		SQLite::Transaction transaction{*database};
+		std::optional<SQLite::Transaction> transaction;
+		if (use_transaction)
+			transaction.emplace(*database);
+
 		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO tileEntities VALUES (?, ?, ?, ?, ?, ?, ?)"};
 
 		while (getter(tile_entity)) {
@@ -413,10 +428,11 @@ namespace Game3 {
 			statement.reset();
 		}
 
-		transaction.commit();
+		if (use_transaction)
+			transaction->commit();
 	}
 
-	void GameDB::writeTileEntities(const RealmPtr &realm) {
+	void GameDB::writeTileEntities(const RealmPtr &realm, bool use_transaction) {
 		decltype(realm->tileEntities)::Base copy;
 		{
 			auto lock = realm->tileEntities.sharedLock();
@@ -428,7 +444,7 @@ namespace Game3 {
 				return false;
 			out = iter++->second;
 			return true;
-		});
+		}, use_transaction);
 	}
 
 	void GameDB::deleteTileEntity(const TileEntityPtr &tile_entity) {
@@ -441,12 +457,15 @@ namespace Game3 {
 		transaction.commit();
 	}
 
-	void GameDB::writeEntities(const std::function<bool(EntityPtr &)> &getter) {
+	void GameDB::writeEntities(const std::function<bool(EntityPtr &)> &getter, bool use_transaction) {
 		assert(database);
 		EntityPtr entity;
 		auto db_lock = database.uniqueLock();
 
-		SQLite::Transaction transaction{*database};
+		std::optional<SQLite::Transaction> transaction;
+		if (use_transaction)
+			transaction.emplace(*database);
+
 		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO entities VALUES (?, ?, ?, ?, ?, ?, ?)"};
 
 		while (getter(entity)) {
@@ -465,10 +484,11 @@ namespace Game3 {
 			statement.reset();
 		}
 
-		transaction.commit();
+		if (use_transaction)
+			transaction->commit();
 	}
 
-	void GameDB::writeEntities(const RealmPtr &realm) {
+	void GameDB::writeEntities(const RealmPtr &realm, bool use_transaction) {
 		decltype(realm->entities)::Base copy;
 		{
 			auto lock = realm->entities.sharedLock();
@@ -480,7 +500,7 @@ namespace Game3 {
 				return false;
 			out = *iter++;
 			return true;
-		});
+		}, use_transaction);
 	}
 
 	void GameDB::deleteEntity(const EntityPtr &entity) {
