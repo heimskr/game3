@@ -91,7 +91,7 @@ namespace Game3 {
 		auto texture = tileset.getTexture(realm->getGame());
 
 		glm::mat4 projection(1.f);
-		projection = glm::scale(projection, {static_cast<float>(tilesize), -static_cast<float>(tilesize), 1.f}) *
+		projection = glm::scale(projection, {float(tilesize), -float(tilesize), 1.f}) *
 		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1.f}) *
 		             glm::translate(projection, {
 		                 center_x - CHUNK_SIZE / 2.f + chunk_x * CHUNK_SIZE,
@@ -238,12 +238,12 @@ namespace Game3 {
 				tile = *tile_opt;
 			const float tx0 = (tile % set_width) / divisor + TILE_TEXTURE_PADDING;
 			const float ty0 = (tile / set_width) / divisor + TILE_TEXTURE_PADDING;
-			const float tile_f = static_cast<float>(tile);
-			return std::array {
-				std::array {tx0,          ty0,          tile_f},
-				std::array {tx0 + t_size, ty0,          tile_f},
-				std::array {tx0,          ty0 + t_size, tile_f},
-				std::array {tx0 + t_size, ty0 + t_size, tile_f},
+			const float tile_f = float(tile);
+			return std::array{
+				std::array{tx0,          ty0,          tile_f},
+				std::array{tx0 + t_size, ty0,          tile_f},
+				std::array{tx0,          ty0 + t_size, tile_f},
+				std::array{tx0 + t_size, ty0 + t_size, tile_f},
 			};
 		});
 
@@ -254,7 +254,7 @@ namespace Game3 {
 		uint32_t i = 0;
 		ebo.init<uint32_t, 6>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [&i](size_t, size_t) {
 			i += 4;
-			return std::array {i - 4, i - 3, i - 2, i - 3, i - 2, i - 1};
+			return std::array{i - 4, i - 3, i - 2, i - 3, i - 2, i - 1};
 		});
 		return ebo.getHandle() != 0;
 	}
@@ -320,8 +320,8 @@ namespace Game3 {
 			// }
 
 			reshader.bind();
-			reshader.set("xs", static_cast<float>(width));
-			reshader.set("ys", static_cast<float>(height));
+			reshader.set("xs", float(width));
+			reshader.set("ys", float(height));
 			reshader.set("r", 5.f);
 
 			blurredLightTexture.useInFB();
@@ -349,7 +349,7 @@ namespace Game3 {
 
 	void ElementBufferedRenderer::check(int handle, bool is_link) {
 		int success;
-		std::array<char, 1024> info {};
+		std::array<char, 1024> info{};
 		if (is_link)
 			glGetProgramiv(handle, GL_LINK_STATUS, &success);
 		else

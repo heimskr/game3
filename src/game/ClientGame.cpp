@@ -149,10 +149,14 @@ namespace Game3 {
 			realm->tick(delta);
 
 		if (auto realm = player->getRealm()) {
+			auto missing_chunks_lock = missingChunks.sharedLock();
 			if (missingChunks.empty()) {
-				missingChunks = realm->getMissingChunks();
+				auto new_missing_chunks = realm->getMissingChunks();
+				missing_chunks_lock.unlock();
+				missingChunks = std::move(new_missing_chunks);
+				missing_chunks_lock.lock();
 				if (!missingChunks.empty())
-					client->send(ChunkRequestPacket(*realm, missingChunks));
+					client->send(ChunkRequestPacket(*realm, missingChunks, true));
 			}
 		} else {
 			WARN("No realm");
@@ -166,6 +170,7 @@ namespace Game3 {
 	}
 
 	void ClientGame::chunkReceived(ChunkPosition chunk_position) {
+		auto lock = missingChunks.uniqueLock();
 		missingChunks.erase(chunk_position);
 	}
 

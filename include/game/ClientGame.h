@@ -74,7 +74,7 @@ namespace Game3 {
 			std::atomic_bool active{false};
 			std::thread tickThread;
 
-			std::set<ChunkPosition> missingChunks;
+			Lockable<std::set<ChunkPosition>> missingChunks;
 			MTQueue<std::shared_ptr<Packet>> packetQueue;
 			/** Temporarily stores shared pointers to entities that have moved to a realm we're unaware of to prevent destruction. */
 			Lockable<std::unordered_map<RealmID, std::unordered_map<EntityPtr, Position>>> entityLimbo;

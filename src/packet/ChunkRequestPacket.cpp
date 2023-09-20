@@ -6,10 +6,10 @@
 #include "packet/PacketError.h"
 
 namespace Game3 {
-	ChunkRequestPacket::ChunkRequestPacket(Realm &realm, const std::set<ChunkPosition> &positions):
+	ChunkRequestPacket::ChunkRequestPacket(Realm &realm, const std::set<ChunkPosition> &positions, bool no_threshold):
 	realmID(realm.id) {
 		for (const auto chunk_position: positions)
-			requests.emplace(chunk_position, realm.tileProvider.getUpdateCounter(chunk_position) + 1);
+			requests.emplace(chunk_position, no_threshold? 0 : (realm.tileProvider.getUpdateCounter(chunk_position) + 1));
 	}
 
 	void ChunkRequestPacket::encode(Game &, Buffer &buffer) const {

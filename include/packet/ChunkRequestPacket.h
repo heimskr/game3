@@ -15,7 +15,7 @@ namespace Game3 {
 		ChunkRequestPacket() = default;
 		ChunkRequestPacket(RealmID realm_id, std::set<ChunkRequest> requests_):
 			realmID(realm_id), requests(std::move(requests_)) {}
-		ChunkRequestPacket(Realm &, const std::set<ChunkPosition> &);
+		ChunkRequestPacket(Realm &, const std::set<ChunkPosition> &, bool no_threshold = false);
 
 		PacketID getID() const override { return ID(); }
 

@@ -1074,9 +1074,12 @@ namespace Game3 {
 			chunk_pos.x = original_x;
 
 			for (const auto &layers: row) {
-				for (const auto &renderer: layers)
-					if (renderer.isMissing)
+				for (const auto &renderer: layers) {
+					if (renderer.isMissing) {
 						out.insert(chunk_pos);
+						break;
+					}
+				}
 				++chunk_pos.x;
 			}
 
