@@ -5,6 +5,7 @@
 #include "game/ServerGame.h"
 #include "net/LocalServer.h"
 #include "net/RemoteClient.h"
+#include "packet/ChatMessageSentPacket.h"
 #include "packet/CommandResultPacket.h"
 #include "packet/DestroyEntityPacket.h"
 #include "packet/DestroyTileEntityPacket.h"
@@ -256,6 +257,12 @@ namespace Game3 {
 		database.open(std::move(path));
 	}
 
+	void ServerGame::broadcast(const Packet &packet) {
+		auto lock = players.sharedLock();
+		for (const ServerPlayerPtr &player: players)
+			player->send(packet);
+	}
+
 	void ServerGame::handlePacket(RemoteClient &client, Packet &packet) {
 		packet.handle(*this, client);
 	}
@@ -402,6 +409,11 @@ namespace Game3 {
 					return {false, "Couldn't lock server."};
 				server->stop();
 				return {true, "Stopped server."};
+			} else if (first == "say") {
+				std::string_view message = std::string_view(command).substr(4);
+				INFO('[' << player->username << "] " << message);
+				broadcast(ChatMessageSentPacket{player->getGID(), std::string(message)});
+				return {true, "Sent message."};
 			}
 		} catch (const std::exception &err) {
 			return {false, err.what()};

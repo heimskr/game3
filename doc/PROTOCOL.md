@@ -144,7 +144,9 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	The adjust offset flag, if true, tells the client to set the offset so that the entity's visible position
 	(i.e., the integer coordinates + the float offsets) appears unchanged after the integer coordinates are updated.
 
-18. Unused.
+18. **Send Chat Message**: tells the server to send a chat message.
+
+	- `string` Message
 
 19. **Entity Set Path**: informs a client that an entity chose a new path.
 
@@ -314,6 +316,11 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i32` New Realm ID
 	- `i64` New Position Y
 	- `i64` New Position X
+
+47. **Chat Message Sent**: informs a client that a player sent a chat message.
+
+	- `u64` Player Global ID
+	- `string` Message
 
 # Message Format
 

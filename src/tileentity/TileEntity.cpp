@@ -15,10 +15,12 @@ namespace Game3 {
 		assert(realm);
 		TileEntityPtr self = getSelf();
 		realm->removeSafe(self);
-		realm->getGame().toServer().database.deleteTileEntity(self);
 
-		if (getSide() == Side::Server)
-			realm->getGame().toServer().tileEntityDestroyed(*this);
+		if (getSide() == Side::Server) {
+			ServerGame &game = realm->getGame().toServer();
+			game.database.deleteTileEntity(self);
+			game.tileEntityDestroyed(*this);
+		}
 	}
 
 	std::shared_ptr<TileEntity> TileEntity::fromJSON(Game &game, const nlohmann::json &json) {

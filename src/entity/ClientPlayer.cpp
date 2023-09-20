@@ -17,22 +17,50 @@ namespace Game3 {
 		return Entity::create<ClientPlayer>();
 	}
 
+	void ClientPlayer::tick(Game &game, float delta) {
+		lastMessageAge += delta;
+		Player::tick(game, delta);
+	}
+
 	void ClientPlayer::render(SpriteRenderer &sprites, TextRenderer &text) {
 		Player::render(sprites, text);
 
 		const auto [row, column] = getPosition();
 		const auto [x, y, z] = offset.copyBase();
 
+		const bool show_message = lastMessageAge.load() < 7;
+		const float name_offset = show_message? -1 : 0;
+
+		if (show_message) {
+			text.drawOnMap(lastMessage, {
+				.x = float(column) + x + .525f,
+				.y = float(row) + y - z - 0.225f,
+				.scaleX = 0.75f,
+				.scaleY = 0.75f,
+				.color = {0.f, 0.f, 0.f, 1.f},
+				.align = TextAlign::Center,
+			});
+
+			text.drawOnMap(lastMessage, {
+				.x = float(column) + x + .5f,
+				.y = float(row) + y - z - 0.25f,
+				.scaleX = 0.75f,
+				.scaleY = 0.75f,
+				.color = {1.f, 1.f, 1.f, 1.f},
+				.align = TextAlign::Center,
+			});
+		}
+
 		text.drawOnMap(displayName, {
-			.x = static_cast<float>(column) + x + .525f,
-			.y = static_cast<float>(row) + y - z + .025f,
+			.x = float(column) + x + .525f,
+			.y = float(row) + y - z + name_offset + .025f,
 			.color = {0.f, 0.f, 0.f, 1.f},
 			.align = TextAlign::Center,
 		});
 
 		text.drawOnMap(displayName, {
-			.x = static_cast<float>(column) + x + .5f,
-			.y = static_cast<float>(row) + y - z,
+			.x = float(column) + x + .5f,
+			.y = float(row) + y - z + name_offset,
 			.color = {1.f, 1.f, 1.f, 1.f},
 			.align = TextAlign::Center,
 		});
@@ -55,12 +83,12 @@ namespace Game3 {
 	}
 
 	void ClientPlayer::jump() {
-		float z;
+		float z{};
 		{
 			auto lock = offset.sharedLock();
 			z = offset.z;
 		}
-		if (abs(z) <= 0.001f) {
+		if (std::abs(z) <= 0.001f) {
 			zSpeed = getJumpSpeed();
 			send(JumpPacket());
 		}
@@ -94,5 +122,10 @@ namespace Game3 {
 			getGame().toClient().client->send(AgentMessagePacket(destination->getGID(), name, *buffer));
 		else
 			throw std::runtime_error("Expected data to be a Buffer in ClientPlayer::sendMessage");
+	}
+
+	void ClientPlayer::setLastMessage(std::string message) {
+		lastMessage = std::move(message);
+		lastMessageAge = 0;
 	}
 }

@@ -55,6 +55,7 @@ namespace Game3 {
 			bool hasPlayer(const std::string &username) const;
 			void queueRemoval(const ServerPlayerPtr &);
 			void openDatabase(std::filesystem::path);
+			void broadcast(const Packet &);
 
 			inline auto getServer() const {
 				auto out = weakServer.lock();
@@ -65,9 +66,9 @@ namespace Game3 {
 			template <typename P>
 			void broadcast(const Place &place, const P &packet) {
 				auto lock = players.sharedLock();
-				for (const auto &player: players)
+				for (const ServerPlayerPtr &player: players)
 					if (player->canSee(place.realm->id, place.position))
-						if (auto client = player->toServer()->weakClient.lock())
+						if (std::shared_ptr<RemoteClient> client = player->toServer()->weakClient.lock())
 							client->send(packet);
 			}
 

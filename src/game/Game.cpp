@@ -75,6 +75,7 @@
 #include "packet/MovePlayerPacket.h"
 #include "packet/ErrorPacket.h"
 #include "packet/EntityMovedPacket.h"
+#include "packet/SendChatMessagePacket.h"
 #include "packet/EntitySetPathPacket.h"
 #include "packet/TeleportSelfPacket.h"
 #include "packet/InteractPacket.h"
@@ -102,6 +103,7 @@
 #include "packet/SetTileEntityEnergyPacket.h"
 #include "packet/SetPlayerStationTypesPacket.h"
 #include "packet/EntityChangingRealmsPacket.h"
+#include "packet/ChatMessageSentPacket.h"
 #include "realm/Cave.h"
 #include "realm/House.h"
 #include "realm/Keep.h"
@@ -416,6 +418,7 @@ namespace Game3 {
 		add(PacketFactory::create<MovePlayerPacket>());
 		add(PacketFactory::create<ErrorPacket>());
 		add(PacketFactory::create<EntityMovedPacket>());
+		add(PacketFactory::create<SendChatMessagePacket>());
 		add(PacketFactory::create<EntitySetPathPacket>());
 		add(PacketFactory::create<TeleportSelfPacket>());
 		add(PacketFactory::create<InteractPacket>());
@@ -443,6 +446,7 @@ namespace Game3 {
 		add(PacketFactory::create<SetTileEntityEnergyPacket>());
 		add(PacketFactory::create<SetPlayerStationTypesPacket>());
 		add(PacketFactory::create<EntityChangingRealmsPacket>());
+		add(PacketFactory::create<ChatMessageSentPacket>());
 	}
 
 	void Game::addLocalCommandFactories() {
@@ -475,8 +479,6 @@ namespace Game3 {
 					reg.add(stage, tile);
 			}
 		}
-
-
 	}
 
 	void Game::addModuleFactories() {
