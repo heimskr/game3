@@ -1,4 +1,4 @@
-project('game3', 'cpp', version: '0.1.4',
+project('game3', 'cpp', version: '0.1.5',
 	meson_version: '>= 0.62.0',
 	default_options: ['warning_level=2', 'werror=false', 'cpp_std=c++20'])
 
