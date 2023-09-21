@@ -77,7 +77,7 @@ namespace Game3 {
 			virtual void decode(Game &, Buffer &);
 
 			void sendTo(RemoteClient &, UpdateCounter threshold = 0);
-			virtual void broadcast();
+			virtual void broadcast(bool force);
 
 			virtual void toJSON(nlohmann::json &) const;
 

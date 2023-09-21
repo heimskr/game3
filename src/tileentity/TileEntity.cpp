@@ -41,10 +41,8 @@ namespace Game3 {
 	}
 
 	void TileEntity::tick(Game &, float) {
-		if (needsBroadcast.exchange(false)) {
-			broadcast();
-			forceBroadcast = false;
-		}
+		if (needsBroadcast.exchange(false))
+			broadcast(forceBroadcast.exchange(false));
 	}
 
 	void TileEntity::render(SpriteRenderer &sprite_renderer) {
@@ -149,6 +147,7 @@ namespace Game3 {
 		buffer >> solid;
 		setUpdateCounter(buffer.take<UpdateCounter>());
 		extraData = nlohmann::json::parse(buffer.take<std::string>());
+		cachedTile = -1;
 	}
 
 	void TileEntity::sendTo(RemoteClient &client, UpdateCounter threshold) {
@@ -158,7 +157,7 @@ namespace Game3 {
 		}
 	}
 
-	void TileEntity::broadcast() {
+	void TileEntity::broadcast(bool) {
 		assert(getSide() == Side::Server);
 
 		auto realm = getRealm();

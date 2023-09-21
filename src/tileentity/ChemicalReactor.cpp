@@ -139,8 +139,13 @@ namespace Game3 {
 		}
 	}
 
-	void ChemicalReactor::broadcast() {
+	void ChemicalReactor::broadcast(bool force) {
 		assert(getSide() == Side::Server);
+
+		if (force) {
+			TileEntity::broadcast(true);
+			return;
+		}
 
 		const TileEntityPacket packet(getSelf());
 		const SetTileEntityEnergyPacket energy_packet = makeEnergyPacket();

@@ -91,9 +91,9 @@ namespace Game3 {
 			energyUpdated();
 	}
 
-	void EnergeticTileEntity::broadcast() {
-		if (forceBroadcast)
-			TileEntity::broadcast();
+	void EnergeticTileEntity::broadcast(bool force) {
+		if (force)
+			TileEntity::broadcast(true);
 		else
 			broadcast(makeEnergyPacket());
 	}

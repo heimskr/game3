@@ -155,8 +155,13 @@ namespace Game3 {
 		setDirection(buffer.take<Direction>());
 	}
 
-	void Pump::broadcast() {
+	void Pump::broadcast(bool force) {
 		assert(getSide() == Side::Server);
+
+		if (force) {
+			TileEntity::broadcast(true);
+			return;
+		}
 
 		const TileEntityPacket packet(getSelf());
 

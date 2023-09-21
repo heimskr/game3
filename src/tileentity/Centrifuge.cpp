@@ -103,8 +103,13 @@ namespace Game3 {
 		InventoriedTileEntity::decode(game, buffer);
 	}
 
-	void Centrifuge::broadcast() {
+	void Centrifuge::broadcast(bool force) {
 		assert(getSide() == Side::Server);
+
+		if (force) {
+			TileEntity::broadcast(true);
+			return;
+		}
 
 		const TileEntityPacket packet(getSelf());
 

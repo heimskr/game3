@@ -142,9 +142,9 @@ namespace Game3 {
 		HasInventory::decode(buffer);
 	}
 
-	void InventoriedTileEntity::broadcast() {
-		if (forceBroadcast)
-			TileEntity::broadcast();
+	void InventoriedTileEntity::broadcast(bool force) {
+		if (force)
+			TileEntity::broadcast(true);
 		else
 			broadcast(TileEntityPacket(getSelf()));
 	}

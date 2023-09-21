@@ -30,7 +30,7 @@ namespace Game3 {
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
-			void broadcast() override;
+			void broadcast(bool force) override;
 
 			Game & getGame() const final;
 

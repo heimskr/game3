@@ -110,9 +110,9 @@ namespace Game3 {
 		fluidsUpdated();
 	}
 
-	void FluidHoldingTileEntity::broadcast() {
-		if (forceBroadcast)
-			TileEntity::broadcast();
+	void FluidHoldingTileEntity::broadcast(bool force) {
+		if (force)
+			TileEntity::broadcast(true);
 		else
 			broadcast(TileEntityPacket(getSelf()));
 	}

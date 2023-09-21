@@ -103,7 +103,7 @@ namespace Game3 {
 		if (levels.empty())
 			return;
 
-		assert(levels.contains(game.registry<FluidRegistry>()["base:fluid/lava"_id]->registryID));
+		// assert(levels.contains(game.registry<FluidRegistry>()["base:fluid/lava"_id]->registryID));
 		auto &registry = game.registry<GeothermalRecipeRegistry>();
 
 		std::optional<EnergyAmount> leftovers;
@@ -173,8 +173,13 @@ namespace Game3 {
 		EnergeticTileEntity::decode(game, buffer);
 	}
 
-	void GeothermalGenerator::broadcast() {
+	void GeothermalGenerator::broadcast(bool force) {
 		assert(getSide() == Side::Server);
+
+		if (force) {
+			TileEntity::broadcast(true);
+			return;
+		}
 
 		const TileEntityPacket packet(getSelf());
 
