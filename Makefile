@@ -67,7 +67,9 @@ all_install: vcpkg all
 vcpkg_zip: all_install zip
 
 flat:
-	flatpak-builder --user --force-clean build gay.heimskr.Game3.json
+	flatpak-builder --force-clean --arch=x86_64 --ccache --state-dir .flatpak-builder staging gay.heimskr.Game3.json
+	- flatpak build-finish --command game3 --share=ipc --socket=x11 --socket=wayland --socket=fallback-x11 --share=network --socket=session-bus --device=dri staging
+	flatpak build-bundle --arch=x86_64 /var/lib/flatpak/repo gay.heimskr.Game3.flatpak gay.heimskr.Game3 master
 
 $(NOISE_OBJ):
 	cd libnoise && cmake . && make
