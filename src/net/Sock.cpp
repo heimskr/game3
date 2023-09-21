@@ -32,7 +32,8 @@ namespace Game3 {
 	Sock::~Sock() {
 		if (connected) {
 			ControlMessage message = ControlMessage::Close;
-			::write(controlWrite, &message, sizeof(message));
+			if (-1 == ::write(controlWrite, &message, sizeof(message)))
+				WARN("Couldn't write control message to Sock pipe");
 			::close(netFD);
 			connected = false;
 		}
