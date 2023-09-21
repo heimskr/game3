@@ -241,7 +241,10 @@ namespace Game3 {
 	}
 
 	void ClientGame::stopThread() {
-		if (active.exchange(false))
+		if (tickThread.joinable()) {
+			active = false;
 			tickThread.join();
+		} else
+			WARN("Trying to stop an unjoinable ClientGame");
 	}
 }

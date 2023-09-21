@@ -139,9 +139,6 @@ namespace Game3 {
 				}
 			} while (SSL_pending(ssl) && !read_blocked && 0 < bytes);
 
-			if (auto control_set = FD_ISSET(controlRead, &fds_copy))
-				WARN("FD_ISSET(controlRead): " << control_set);
-
 			return_value = total_bytes_read;
 		}
 
@@ -162,6 +159,9 @@ namespace Game3 {
 			::close(netFD);
 			if (sslContext != nullptr)
 				SSL_CTX_free(sslContext);
+			ssl = nullptr;
+			sslContext = nullptr;
+			connected = false;
 
 			if (!return_value)
 				return_value = 0;
