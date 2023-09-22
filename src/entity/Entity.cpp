@@ -915,6 +915,8 @@ namespace Game3 {
 
 	void Entity::sendTo(RemoteClient &client, UpdateCounter threshold) {
 		if (threshold == 0 || getUpdateCounter() < threshold) {
+			RealmPtr realm = getRealm();
+			client.getPlayer()->notifyOfRealm(*realm);
 			client.send(EntityPacket(getSelf()));
 			onSend(client.getPlayer());
 		}

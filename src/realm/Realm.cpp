@@ -1361,9 +1361,12 @@ namespace Game3 {
 			auto lock = entity->visiblePlayers.sharedLock();
 			if (!entity->visiblePlayers.empty()) {
 				const EntityPacket packet(entity);
-				for (const auto &weak_player: entity->visiblePlayers)
-					if (auto player = weak_player.lock())
+				for (const auto &weak_player: entity->visiblePlayers) {
+					if (auto player = weak_player.lock()) {
+						player->notifyOfRealm(*this);
 						player->send(packet);
+					}
+				}
 			}
 		}
 	}

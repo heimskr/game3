@@ -64,6 +64,8 @@ namespace Game3 {
 				return false;
 		}
 
+		RealmPtr realm = entity->getRealm();
+		client->getPlayer()->notifyOfRealm(*realm);
 		client->send(EntityPacket(entity));
 
 		{
