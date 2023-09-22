@@ -464,6 +464,34 @@ namespace Game3 {
 
 				return {true, "Teleported."};
 			}
+
+			if (first == "realm") {
+				if (words.size() != 2)
+					return {false, "Invalid number of arguments."};
+
+				RealmID id{};
+
+				try {
+					id = parseNumber<RealmID>(words.at(1));
+				} catch (const std::invalid_argument &) {
+					return {false, "Invalid number."};
+				}
+
+				RealmPtr realm;
+
+				try {
+					realm = getRealm(id);
+				} catch (const std::out_of_range &) {
+					return {false, "Realm not found."};
+				}
+
+				player->teleport(player->getPosition(), realm, {
+					.isTeleport = true
+				});
+
+				return {true, "Teleported."};
+			}
+
 		} catch (const std::exception &err) {
 			return {false, err.what()};
 		}
