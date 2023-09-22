@@ -18,7 +18,7 @@ namespace Game3 {
 	}
 
 	void ClientPlayer::tick(Game &game, float delta) {
-		lastMessageAge += delta;
+		lastMessageAge = lastMessageAge + delta;
 		Player::tick(game, delta);
 	}
 

@@ -163,7 +163,8 @@ namespace Game3 {
 		if (z == 0.f)
 			zSpeed = 0.f;
 		else
-			zSpeed -= 32.f * delta;
+			// Not all platforms support += and -= for atomic floating point types, unfortunately.
+			zSpeed = zSpeed - 32.f * delta;
 	}
 
 	void Entity::remove() {

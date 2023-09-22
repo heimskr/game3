@@ -74,7 +74,7 @@ namespace Game3 {
 		Entity::tick(game, delta);
 
 		if (getSide() == Side::Server) {
-			timeUntilWander -= delta;
+			timeUntilWander = timeUntilWander - delta;
 			if (!attemptingWander && timeUntilWander <= 0.f)
 				wander();
 		}
@@ -84,7 +84,7 @@ namespace Game3 {
 		if (!attemptingWander.exchange(true)) {
 			increaseUpdateCounter();
 			const auto [row, column] = position.copyBase();
-			return threadPool.add([this, row, column](ThreadPool &, size_t) {
+			return threadPool.add([this, row = row, column = column](ThreadPool &, size_t) {
 				pathfind({
 					threadContext.random(int64_t(row    - wanderRadius), int64_t(row    + wanderRadius)),
 					threadContext.random(int64_t(column - wanderRadius), int64_t(column + wanderRadius))
