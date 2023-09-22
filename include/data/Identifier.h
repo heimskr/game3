@@ -54,6 +54,7 @@ namespace Game3 {
 		bool operator==(const char *) const;
 		bool operator==(std::string_view) const;
 		bool operator==(const Identifier &) const;
+		bool operator<(const Identifier &) const;
 	};
 
 	void from_json(const nlohmann::json &, Identifier &);
