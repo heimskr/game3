@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Types.h"
+#include "client/ClientSettings.h"
 #include "threading/MTQueue.h"
 #include "threading/Lockable.h"
 
@@ -41,6 +42,7 @@ namespace Game3 {
 			std::shared_ptr<InventoryTab> inventoryTab;
 			std::shared_ptr<CraftingTab> craftingTab;
 			Gtk::PopoverMenu glMenu;
+			Lockable<ClientSettings> settings;
 
 			MainWindow(BaseObjectType *, const Glib::RefPtr<Gtk::Builder> &);
 			~MainWindow() override;
@@ -74,6 +76,8 @@ namespace Game3 {
 			void onBlur();
 
 			void activateContext();
+
+			void saveSettings();
 
 			void showExternalInventory(const std::shared_ptr<ClientInventory> &);
 			GlobalID getExternalGID() const;
@@ -148,13 +152,14 @@ namespace Game3 {
 			float rightPadStartCanvasX = 0.f;
 			float rightPadStartCanvasY = 0.f;
 
-			void connect(const Glib::ustring &hostname, uint16_t port);
+			bool connect(const Glib::ustring &hostname, uint16_t port);
 			bool render(const Glib::RefPtr<Gdk::GLContext> &);
 			bool onKeyPressed(guint, guint, Gdk::ModifierType);
 			void onKeyReleased(guint, guint, Gdk::ModifierType);
 			void handleKeys();
 			void handleKey(guint keyval, guint keycode, Gdk::ModifierType);
 			void onConnect();
+			void autoConnect();
 			void onGameLoaded();
 			bool isFocused(const std::shared_ptr<Tab> &) const;
 			void connectClose(Gtk::Dialog &);

@@ -39,6 +39,10 @@
 				<attribute name="action">win.connect</attribute>
 			</item>
 			<item>
+				<attribute name="label" translatable="yes">_Autoconnect</attribute>
+				<attribute name="action">win.autoconnect</attribute>
+			</item>
+			<item>
 				<attribute name="label" translatable="yes">_Log In</attribute>
 				<attribute name="action">win.login</attribute>
 			</item>

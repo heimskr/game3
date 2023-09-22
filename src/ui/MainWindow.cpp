@@ -15,9 +15,11 @@
 #include "net/LocalClient.h"
 #include "net/NetError.h"
 #include "packet/ContinuousInteractionPacket.h"
+#include "packet/LoginPacket.h"
 #include "realm/Overworld.h"
 #include "ui/gtk/CommandDialog.h"
 #include "ui/gtk/ConnectDialog.h"
+#include "ui/gtk/ConnectionSuccessDialog.h"
 #include "ui/gtk/JSONDialog.h"
 #include "ui/module/ExternalInventoryModule.h"
 #include "ui/module/FluidLevelsModule.h"
@@ -81,11 +83,11 @@ namespace Game3 {
 		functionQueueDispatcher.connect([this] {
 			for (const auto &fn: functionQueue.steal())
 				fn();
-			// for (auto &&fn: moveOnlyFunctionQueue.steal())
-			// 	fn();
 		});
 
 		add_action("connect", Gio::ActionMap::ActivateSlot(sigc::mem_fun(*this, &MainWindow::onConnect)));
+
+		add_action("autoconnect", Gio::ActionMap::ActivateSlot(sigc::mem_fun(*this, &MainWindow::autoConnect)));
 
 		debugAction = add_action_bool("debug", [this] {
 			if (game) {
@@ -285,6 +287,9 @@ namespace Game3 {
 		delay([this] {
 			paned.set_position(paned.get_width() - 344);
 		}, 2);
+
+		if (std::filesystem::exists("settings.json"))
+			settings = nlohmann::json::parse(readFile("settings.json"));
 	}
 
 	MainWindow::~MainWindow() {
@@ -292,7 +297,7 @@ namespace Game3 {
 			game->stopThread();
 	}
 
-	void MainWindow::connect(const Glib::ustring &hostname, uint16_t port) {
+	bool MainWindow::connect(const Glib::ustring &hostname, uint16_t port) {
 		glArea.get_context()->make_current();
 		closeGame();
 		game = std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, canvas.get()));
@@ -302,10 +307,14 @@ namespace Game3 {
 		} catch (const NetError &err) {
 			closeGame();
 			error(err.what());
-			return;
+			return false;
 		}
 		game->client->weakGame = game;
 		game->initEntities();
+
+		// It's assumed that the caller already owns a unique lock on the settings.
+		settings.hostname = hostname;
+		settings.port = port;
 
 		if (std::filesystem::exists("tokens.json"))
 			game->client->readTokens("tokens.json");
@@ -313,7 +322,17 @@ namespace Game3 {
 			game->client->saveTokens("tokens.json");
 
 		onGameLoaded();
-		alert("Connection established.\n\nUse Ctrl-C to send commands.");
+
+		if (settings.alertOnConnection) {
+			auto success_dialog = std::make_unique<ConnectionSuccessDialog>(*this);
+			success_dialog->signal_submit().connect([this](bool checked) {
+				auto lock = settings.uniqueLock();
+				settings.alertOnConnection = !checked;
+			});
+			queueDialog(std::move(success_dialog));
+		}
+
+		return true;
 	}
 
 	void MainWindow::onGameLoaded() {
@@ -428,11 +447,6 @@ namespace Game3 {
 		functionQueueDispatcher.emit();
 	}
 
-	// void MainWindow::queueMoveOnly(std::move_only_function<void()> &&fn) {
-	// 	moveOnlyFunctionQueue.push(std::move(fn));
-	// 	functionQueueDispatcher.emit();
-	// }
-
 	void MainWindow::alert(const Glib::ustring &message, Gtk::MessageType type, bool do_queue, bool modal, bool use_markup) {
 		// This is a horrible hack to avoid C++23.
 		auto new_dialog = std::make_shared<std::unique_ptr<Gtk::MessageDialog>>(std::make_unique<Gtk::MessageDialog>(*this, message, use_markup, type, Gtk::ButtonsType::OK, modal));
@@ -505,12 +519,21 @@ namespace Game3 {
 		keyTimes.clear();
 
 		if (game && game->player)
-			// game->client->send(StopPlayerMovementPacket());
 			game->player->stopMoving();
 	}
 
 	void MainWindow::activateContext() {
 		glArea.get_context()->make_current();
+	}
+
+	void MainWindow::saveSettings() {
+		std::ofstream ofs("settings.json");
+		nlohmann::json json;
+		{
+			auto lock = settings.sharedLock();
+			json = settings;
+		}
+		ofs << json.dump();
 	}
 
 	void MainWindow::showExternalInventory(const std::shared_ptr<ClientInventory> &inventory) {
@@ -526,10 +549,6 @@ namespace Game3 {
 				return response->take<GlobalID>();
 		}
 
-		// std::shared_lock<std::shared_mutex> lock;
-		// if (auto *ext_module = dynamic_cast<ExternalInventoryModule *>(inventoryTab->getModule(lock)))
-		// 	if (auto inventory = ext_module->getInventory())
-		// 		return inventory->getOwner()->getGID();
 		return -1;
 	}
 
@@ -783,8 +802,33 @@ namespace Game3 {
 	void MainWindow::onConnect() {
 		auto connect_dialog = std::make_unique<ConnectDialog>(*this);
 		connect_dialog->set_transient_for(*this);
-		connect_dialog->signal_submit().connect(sigc::mem_fun(*this, &MainWindow::connect));
+		connect_dialog->signal_submit().connect([this](const auto &hostname, uint16_t port) {
+			MainWindow::connect(hostname, port);
+		});
 		queueDialog(std::move(connect_dialog));
+	}
+
+	void MainWindow::autoConnect() {
+		auto lock = settings.uniqueLock();
+
+		if (settings.username.empty()) {
+			error("No username set. Try logging in manually first.");
+			return;
+		}
+
+		if (!connect(settings.hostname, settings.port))
+			return;
+
+		LocalClient &client = *game->client;
+		const std::string &hostname = client.getHostname();
+		if (std::optional<Token> token = client.getToken(hostname, settings.username)) {
+			// Awful hack.
+			delay([this, token, hostname, username = settings.username, &client] {
+				client.send(LoginPacket(username, *token));
+			}, 16);
+		} else {
+			error("Couldn't find token for user " + settings.username + " on host " + hostname);
+		}
 	}
 
 	bool MainWindow::isFocused(const std::shared_ptr<Tab> &tab) const {

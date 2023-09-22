@@ -25,7 +25,7 @@ namespace Game3 {
 				player->setRealm(realm);
 				player->weakClient = client.shared_from_this();
 				player->notifyOfRealm(*realm);
-				INFO("Player GID is " << player->globalID);
+				SUCCESS("Player " << username << "'s GID is " << player->globalID);
 				player->init(game);
 				client.send(LoginStatusPacket(true, player->globalID, username, display_name, player));
 				server->setupPlayer(client);
