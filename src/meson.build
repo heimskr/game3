@@ -55,12 +55,10 @@ game3_sources += gnome.compile_resources('game3-resources',
 
 game3_sources += resources_h[0]
 
-inc_dirs = [
-	include_directories('..' / 'include')
-]
+inc_dirs = [include_directories('..' / 'include')]
 
-if get_option('use_vcpkg') == true
-	vcpkg_root = 'vcpkg_installed' / get_option('vcpkg-triplet')
+if get_option('vcpkg_triplet') != ''
+	vcpkg_root = 'vcpkg_installed' / get_option('vcpkg_triplet')
 	inc_dirs += include_directories('..' / vcpkg_root / 'include')
 endif
 
