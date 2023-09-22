@@ -284,6 +284,7 @@ namespace Game3 {
 			if (first == "give") {
 				if (words.size() < 2)
 					return {false, "Not enough arguments."};
+
 				long count = 1;
 				if (3 <= words.size()) {
 					try {
@@ -315,7 +316,9 @@ namespace Game3 {
 				}
 
 				return {false, "Unknown item: " + item_name};
-			} else if (first == "heldL" || first == "heldR") {
+			}
+
+			if (first == "heldL" || first == "heldR") {
 				if (words.size() != 2)
 					return {false, "Invalid number of arguments."};
 				long slot = -1;
@@ -329,10 +332,14 @@ namespace Game3 {
 				else
 					player->setHeldRight(slot);
 				return {true, "Set held slot to " + std::to_string(slot)};
-			} else if (first == "h") {
+			}
+
+			if (first == "h") {
 				runCommand(client, "heldL 0", threadContext.rng());
 				runCommand(client, "heldR 1", threadContext.rng());
-			} else if (first == "go") {
+			}
+
+			if (first == "go") {
 				if (words.size() != 3)
 					return {false, "Invalid number of arguments."};
 
@@ -347,11 +354,15 @@ namespace Game3 {
 
 				player->teleport(Position(row, column));
 				return {true, "Teleported to " + static_cast<std::string>(Position(row, column))};
-			} else if (first == "counter") {
+			}
+
+			if (first == "counter") {
 				const auto chunk = player->getChunk();
 				const auto counter = player->getRealm()->tileProvider.getUpdateCounter(chunk);
 				return {true, "Counter for chunk " + static_cast<std::string>(chunk) + ": " + std::to_string(counter)};
-			} else if (first == "moving") {
+			}
+
+			if (first == "moving") {
 				std::stringstream ss;
 				if (player->isMoving()) {
 					std::vector<const char *> moves;
@@ -373,21 +384,29 @@ namespace Game3 {
 					ss << "Player isn't moving. Offset: " << player->offset.x << ", " << player->offset.y << ", " << player->offset.z;
 				}
 				return {true, ss.str()};
-			} else if (first == "submerge") {
+			}
+
+			if (first == "submerge") {
 				if (words.size() != 2)
 					return {false, "Invalid number of arguments."};
 				player->getRealm()->setTile(Layer::Submerged, player->getPosition(), words.at(1));
 				return {true, "Set tile."};
-			} else if (first == "saveall") {
+			}
+
+			if (first == "saveall") {
 				INFO("Writing...");
 				database.writeAllRealms();
 				INFO("Writing done.");
 				return {true, "Wrote all chunks."};
-			} else if (first == "pos") {
+			}
+
+			if (first == "pos") {
 				INFO("Player " << player->getGID() << " position: " << player->getPosition());
 				INFO("Player " << player->getGID() << " chunk position: " << player->getChunk());
 				return {true, "Position = " + std::string(player->getPosition()) + ", chunk position = " + std::string(player->getChunk())};
-			} else if (first == "pm") {
+			}
+
+			if (first == "pm") {
 				if (1 < words.size())
 					player->getRealm()->remakePathMap(player->getChunk());
 
@@ -404,17 +423,46 @@ namespace Game3 {
 					std::cerr << '\n';
 				}
 				return {true, "Walkable: " + std::to_string(walkables) + " / " + std::to_string(CHUNK_SIZE * CHUNK_SIZE)};
-			} else if (first == "stop") {
+			}
+
+			if (first == "stop") {
 				auto server = weakServer.lock();
 				if (!server)
 					return {false, "Couldn't lock server."};
 				server->stop();
 				return {true, "Stopped server."};
-			} else if (first == "say") {
+			}
+
+			if (first == "say") {
 				std::string_view message = std::string_view(command).substr(4);
 				INFO('[' << player->username << "] " << message);
 				broadcast(ChatMessageSentPacket{player->getGID(), std::string(message)});
 				return {true, "Sent message."};
+			}
+
+			if (first == "goto") {
+				auto server = weakServer.lock();
+				if (!server)
+					return {false, "Couldn't lock server."};
+
+				if (words.size() != 2)
+					return {false, "Invalid number of arguments."};
+
+				ServerPlayerPtr other_player;
+				{
+					const std::string other_username(words.at(1));
+					auto lock = playerMap.sharedLock();
+					if (auto iter = playerMap.find(other_username); iter != playerMap.end())
+						other_player = iter->second;
+					else
+						return {false, "Couldn't find player " + other_username + "."};
+				}
+
+				player->teleport(other_player->getPosition(), other_player->getRealm(), {
+					.isTeleport = true
+				});
+
+				return {true, "Teleported."};
 			}
 		} catch (const std::exception &err) {
 			return {false, err.what()};
