@@ -70,6 +70,9 @@ macos_setup:
 	- vcpkg install
 	PKG_CONFIG_PATH=vcpkg_installed/arm64-osx/lib/pkgconfig meson setup -Dvcpkg_triplet=arm64-osx builddir .
 
+macos_reconf:
+	PKG_CONFIG_PATH=vcpkg_installed/arm64-osx/lib/pkgconfig meson setup -Dvcpkg_triplet=arm64-osx --reconfigure builddir .
+
 flat:
 	flatpak-builder --force-clean --arch=x86_64 --ccache --state-dir .flatpak-builder staging gay.heimskr.Game3.json
 	- flatpak build-finish --command game3 --share=ipc --socket=x11 --socket=wayland --socket=fallback-x11 --share=network --socket=session-bus --device=dri staging
