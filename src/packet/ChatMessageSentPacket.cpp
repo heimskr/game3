@@ -11,6 +11,7 @@ namespace Game3 {
 			return;
 		}
 
+		INFO("[" << player->displayName << "] " << message);
 		player->setLastMessage(std::move(message));
 	}
 }
