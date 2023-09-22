@@ -8,7 +8,11 @@
 #include <unordered_map>
 
 #define STB_IMAGE_IMPLEMENTATION
+#ifdef USING_VCPKG
+#include <stb_image.h>
+#else
 #include <stb/stb_image.h>
+#endif
 
 #include <nlohmann/json.hpp>
 
