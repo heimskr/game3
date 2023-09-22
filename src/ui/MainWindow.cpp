@@ -13,6 +13,7 @@
 #include "game/HasInventory.h"
 #include "game/Inventory.h"
 #include "net/LocalClient.h"
+#include "net/NetError.h"
 #include "packet/ContinuousInteractionPacket.h"
 #include "realm/Overworld.h"
 #include "ui/gtk/CommandDialog.h"
@@ -296,7 +297,13 @@ namespace Game3 {
 		closeGame();
 		game = std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, canvas.get()));
 		game->client = std::make_shared<LocalClient>();
-		game->client->connect(hostname.raw(), port);
+		try {
+			game->client->connect(hostname.raw(), port);
+		} catch (const NetError &err) {
+			closeGame();
+			error(err.what());
+			return;
+		}
 		game->client->weakGame = game;
 		game->initEntities();
 
@@ -306,6 +313,7 @@ namespace Game3 {
 			game->client->saveTokens("tokens.json");
 
 		onGameLoaded();
+		alert("Connection established.\n\nUse Ctrl-C to send commands.");
 	}
 
 	void MainWindow::onGameLoaded() {
