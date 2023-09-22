@@ -25,6 +25,10 @@ if get_option('is_flatpak') == true
 	config_h.set('IS_FLATPAK', '1')
 endif
 
+if get_option('vcpkg_triplet') != ''
+	config_h.set('USING_VCPKG', '1')
+endif
+
 if get_option('buildtype') != 'plain'
 	test_cpp_args += '-fstack-protector-strong'
 endif

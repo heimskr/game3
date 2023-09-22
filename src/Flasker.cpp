@@ -3,7 +3,11 @@
 
 #include <sstream>
 
+#ifdef USING_VCPKG
+#include <stb_image.h>
+#else
 #include <stb/stb_image.h>
+#endif
 
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -16,7 +20,11 @@
 #endif
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
+#ifdef USING_VCPKG
+#include <stb_image_write.h>
+#else
 #include <stb/stb_image_write.h>
+#endif
 
 #ifdef __clang__
 #pragma clang diagnostic pop
