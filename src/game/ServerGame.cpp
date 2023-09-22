@@ -37,12 +37,12 @@ namespace Game3 {
 		if (!Game::tick())
 			return false;
 
-		std::vector<RemoteClient::BufferGuard> guards;
+		std::unordered_map<Player *, RemoteClient::BufferGuard> guards;
 		guards.reserve(players.size());
 
 		for (const auto &player: players)
 			if (auto client = player->toServer()->weakClient.lock())
-				guards.emplace_back(client);
+				guards.emplace(player.get(), client);
 
 		for (const auto &[weak_client, packet]: packetQueue.steal())
 			if (auto client = weak_client.lock())
@@ -72,6 +72,7 @@ namespace Game3 {
 
 		for (const auto &weak_player: playerRemovalQueue.steal()) {
 			if (auto player = weak_player.lock()) {
+				guards.erase(player.get());
 				remove(player);
 				player->toServer()->weakClient.reset();
 				player->clearQueues();
