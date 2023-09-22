@@ -46,10 +46,10 @@ namespace Game3 {
 	}
 
 	void Tree::tick(Game &game, float delta) {
-		age += delta;
+		age = age + delta;
 
 		if (0.f <= hiveAge && hiveAge < HIVE_MATURITY) {
-			hiveAge += delta;
+			hiveAge = hiveAge + delta;
 			increaseUpdateCounter();
 		}
 
