@@ -48,7 +48,16 @@ namespace Game3 {
 	}
 
 	bool Identifier::operator<(const Identifier &other) const {
-		return this != &other && (*this <=> other) == std::strong_ordering::less;
+		if (this == &other)
+			return false;
+
+		if (space < other.space)
+			return true;
+
+		if (space > other.space)
+			return false;
+
+		return name < other.name;
 	}
 
 	void from_json(const nlohmann::json &json, Identifier &identifier) {
