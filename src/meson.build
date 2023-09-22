@@ -57,14 +57,19 @@ game3_sources += resources_h[0]
 
 inc_dirs = [include_directories('..' / 'include')]
 
+link_args = []
+
 if get_option('vcpkg_triplet') != ''
 	vcpkg_root = 'vcpkg_installed' / get_option('vcpkg_triplet')
 	inc_dirs += include_directories('..' / vcpkg_root / 'include')
+	link_args += '-L../' + vcpkg_root + '/lib/libnoise-static.a'
+else
+	link_args += '-lnoise'
 endif
 
 executable('game3', game3_sources,
 	dependencies: game3_deps,
 	link_with: [chemskr.get_variable('chemskr_lib')],
-	link_args: ['-lnoise'],
+	link_args: link_args,
 	install: true,
 	include_directories: [inc_dirs])
