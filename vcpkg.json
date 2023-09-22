@@ -6,13 +6,11 @@
 		"glm",
 		"glfw3",
 		"zstd",
-		"freeglut",
 		{
 			"name": "libevent",
 			"features": ["openssl", "thread"]
 		},
 		"openssl",
-		"freetype",
 		"stb",
 		"nlohmann-json",
 		"libnoise",
