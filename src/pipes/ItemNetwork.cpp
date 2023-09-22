@@ -65,7 +65,7 @@ namespace Game3 {
 			bool failed = false;
 			auto inventory_lock = inventory->uniqueLock();
 
-			inventoried->iterateExtractableItems(direction, [&](const ItemStack &, Slot slot) {
+			inventoried->iterateExtractableItems(direction, [&, direction = direction](const ItemStack &, Slot slot) {
 				// It's possible we'll extract an item and put it right back.
 				// If that happens, we don't want to notify the owner and potentially queue a broadcast.
 				auto suppressor = inventory->suppress();
