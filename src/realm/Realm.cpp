@@ -37,19 +37,23 @@ namespace Game3 {
 
 	Realm::Realm(Game &game_): game(game_) {
 		if (game.getSide() == Side::Client) {
-			createRenderers();
-			initRendererRealms();
-			initRendererTileProviders();
+			game.toClient().getWindow().queue([this] {
+				createRenderers();
+				initRendererRealms();
+				initRendererTileProviders();
+			});
 		}
 	}
 
 	Realm::Realm(Game &game_, RealmID id_, RealmType type_, Identifier tileset_id, int64_t seed_):
 	id(id_), type(type_), tileProvider(std::move(tileset_id)), seed(seed_), game(game_) {
 		if (game.getSide() == Side::Client) {
-			createRenderers();
-			initRendererRealms();
-			initTexture();
-			initRendererTileProviders();
+			game.toClient().getWindow().queue([this] {
+				createRenderers();
+				initRendererRealms();
+				initTexture();
+				initRendererTileProviders();
+			});
 		}
 	}
 
@@ -157,7 +161,7 @@ namespace Game3 {
 		if (getSide() != Side::Client)
 			return;
 
-		// game.toClient().activateContext();
+		game.toClient().activateContext();
 		renderers.emplace();
 		fluidRenderers.emplace();
 	}
