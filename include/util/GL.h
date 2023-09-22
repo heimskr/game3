@@ -9,6 +9,7 @@
 #define GL_GLEXT_PROTOTYPES
 #ifdef __APPLE__
 #define GL_SILENCE_DEPRECATION
+#define HIDE_CHECKGL
 #include <OpenGL/gl3.h>
 #include <OpenGL/glu.h>
 #else
