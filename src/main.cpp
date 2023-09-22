@@ -40,6 +40,15 @@ int main(int argc, char **argv) {
 			return 0;
 		}
 
+		if (strcmp(argv[1], "--is-flatpak") == 0) {
+#ifdef IS_FLATPAK
+			std::cout << "Is Flatpak: \e[1;32mtrue\e[22;39m\n";
+#else
+			std::cout << "Is Flatpak: \e[1;31mfalse\e[22;39m\n";
+#endif
+			return 0;
+		}
+
 		if (strcmp(argv[1], "-s") == 0) {
 			const auto out = Game3::LocalServer::main(argc, argv);
 			Game3::Timer::summary();
