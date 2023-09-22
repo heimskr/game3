@@ -224,19 +224,19 @@ namespace Game3 {
 						throw std::out_of_range("Can't remove: no neighbor with label \"" + label + "\" found");
 					}
 
-					decltype(out)::iterator begin() {
+					typename decltype(out)::iterator begin() {
 						return out.begin();
 					}
 
-					decltype(out)::iterator end() {
+					typename decltype(out)::iterator end() {
 						return out.end();
 					}
 
-					decltype(in)::iterator ibegin() {
+					typename decltype(in)::iterator ibegin() {
 						return in.begin();
 					}
 
-					decltype(in)::iterator iend() {
+					typename decltype(in)::iterator iend() {
 						return in.end();
 					}
 			};
@@ -895,19 +895,19 @@ namespace Game3 {
 				}
 			}
 
-			decltype(labelMap)::iterator begin() {
+			typename decltype(labelMap)::iterator begin() {
 				return labelMap.begin();
 			}
 
-			decltype(labelMap)::iterator end() {
+			typename decltype(labelMap)::iterator end() {
 				return labelMap.end();
 			}
 
-			decltype(labelMap)::const_iterator begin() const {
+			typename decltype(labelMap)::const_iterator begin() const {
 				return labelMap.cbegin();
 			}
 
-			decltype(labelMap)::const_iterator end() const {
+			typename decltype(labelMap)::const_iterator end() const {
 				return labelMap.cend();
 			}
 	};

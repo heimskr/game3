@@ -39,6 +39,14 @@
 				<attribute name="action">win.connect</attribute>
 			</item>
 			<item>
+				<attribute name="label" translatable="yes">_Log In</attribute>
+				<attribute name="action">win.login</attribute>
+			</item>
+			<item>
+				<attribute name="label" translatable="yes">_Register</attribute>
+				<attribute name="action">win.register</attribute>
+			</item>
+			<item>
 				<attribute name="label" translatable="yes">_Debug Mode</attribute>
 				<attribute name="action">win.debug</attribute>
 			</item>

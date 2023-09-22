@@ -157,7 +157,7 @@ namespace Game3 {
 		auto difference = now - lastTime;
 		lastTime = now;
 		delta = std::chrono::duration_cast<std::chrono::nanoseconds>(difference).count() / 1e9;
-		time += delta;
+		time = time + delta;
 		++currentTick;
 		return true;
 	}
@@ -200,6 +200,7 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/copper_ore",      "Copper Ore",          8, 64));
 		add(std::make_shared<Item>("base:item/gold_ore",        "Gold Ore",           20, 64));
 		add(std::make_shared<Item>("base:item/diamond_ore",     "Diamond Ore",        80, 64));
+		add(std::make_shared<Item>("base:item/uranium_ore",     "Uranium Ore",       100, 64));
 		add(std::make_shared<Item>("base:item/diamond",         "Diamond",           100, 64));
 		add(std::make_shared<Item>("base:item/coal",            "Coal",                5, 64));
 		add(std::make_shared<Item>("base:item/oil",             "Oil",                15, 64));
