@@ -62,7 +62,7 @@ link_args = []
 if get_option('vcpkg_triplet') != ''
 	vcpkg_root = 'vcpkg_installed' / get_option('vcpkg_triplet')
 	inc_dirs += include_directories('..' / vcpkg_root / 'include')
-	link_args += '-L../' + vcpkg_root + '/lib/libnoise-static.a'
+	link_args += '../' + vcpkg_root + '/lib/libnoise-static.a'
 else
 	link_args += '-lnoise'
 endif
