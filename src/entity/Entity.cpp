@@ -939,6 +939,9 @@ namespace Game3 {
 
 		if (!inventory->contains(new_value)) {
 			WARN("Can't equip slot " << new_value << ": no item in inventory");
+			held.slot = -1;
+			if (is_client)
+				held.texture.reset();
 			return false;
 		}
 
