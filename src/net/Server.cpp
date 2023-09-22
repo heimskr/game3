@@ -406,9 +406,9 @@ namespace Game3 {
 	}
 
 	void Server::stop() {
-		event_base_loopbreak(base);
 		for (auto &worker: workers)
 			worker->stop();
+		event_base_loopbreak(base);
 	}
 
 	std::shared_ptr<Server::Worker> Server::makeWorker(size_t buffer_size, size_t id) {

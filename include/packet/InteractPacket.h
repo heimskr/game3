@@ -10,15 +10,16 @@ namespace Game3 {
 
 		bool direct = false;
 		Modifiers modifiers;
+		std::optional<GlobalID> globalID;
 
 		InteractPacket() = default;
-		InteractPacket(bool direct_, Modifiers modifiers_):
-			direct(direct_), modifiers(modifiers_) {}
+		InteractPacket(bool direct_, Modifiers modifiers_, std::optional<GlobalID> global_id = {}):
+			direct(direct_), modifiers(modifiers_), globalID(global_id) {}
 
 		PacketID getID() const override { return ID(); }
 
-		void encode(Game &, Buffer &buffer) const override { buffer << direct << modifiers; }
-		void decode(Game &, Buffer &buffer)       override { buffer >> direct >> modifiers; }
+		void encode(Game &, Buffer &buffer) const override { buffer << direct << modifiers << globalID; }
+		void decode(Game &, Buffer &buffer)       override { buffer >> direct >> modifiers >> globalID; }
 
 		void handle(ServerGame &, RemoteClient &) override;
 	};

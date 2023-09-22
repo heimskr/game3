@@ -27,6 +27,7 @@ namespace Game3 {
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
+			bool populateMenu(const PlayerPtr &, bool overlap, const std::string &id, Glib::RefPtr<Gio::Menu>, Glib::RefPtr<Gio::SimpleActionGroup>) override;
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;

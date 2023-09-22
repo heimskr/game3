@@ -41,7 +41,7 @@ namespace Game3 {
 	class Game: public std::enable_shared_from_this<Game>, public BufferContext {
 		public:
 			static constexpr const char *DEFAULT_PATH = "game.g3";
-			static constexpr Version PROTOCOL_VERSION = 5;
+			static constexpr Version PROTOCOL_VERSION = 6;
 
 			/** Seconds since the last tick */
 			float delta = 0.f;

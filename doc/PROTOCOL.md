@@ -167,6 +167,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `bool` Direct: whether to interact with the tile the player is on, rather than one tile in front of the player
 	- `u8` Modifiers: bitfield (1 = shift, 2 = ctrl, 4 = alt, 8 = super)
+	- `optional<u64>` Global ID of specific agent to interact with
 
 22. **Inventory Slot Update**: tells a client to set an inventory slot.
 

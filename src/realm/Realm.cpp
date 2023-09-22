@@ -1322,25 +1322,41 @@ namespace Game3 {
 		if (!overlap && !adjacent)
 			return false;
 
-		if (const auto found = findEntities(position); !found.empty()) {
-			auto gmenu = Gio::Menu::create();
-			auto group = Gio::SimpleActionGroup::create();
-			size_t i = 0;
-			for (const auto &entity: found) {
+		auto gmenu = Gio::Menu::create();
+		auto group = Gio::SimpleActionGroup::create();
+
+		bool show_menu = false;
+		size_t i = 0;
+
+		auto add = [&](const AgentPtr &agent) {
+			show_menu = true;
+
+			if (!agent->populateMenu(player, overlap, std::to_string(i), gmenu, group)) {
 				// TODO: Can you escape underscores?
-				gmenu->append(entity->getName(), "entity_menu.entity" + std::to_string(i));
-				group->add_action("entity" + std::to_string(i++), [entity, overlap, player] {
+				gmenu->append(agent->getName(), "agent_menu.agent" + std::to_string(i));
+				group->add_action("agent" + std::to_string(i), [agent, overlap, player] {
 					if (overlap)
-						entity->onInteractOn(player, Modifiers());
+						agent->onInteractOn(player, Modifiers{});
 					else
-						entity->onInteractNextTo(player, Modifiers());
+						agent->onInteractNextTo(player, Modifiers{});
 				});
 			}
 
+			++i;
+		};
+
+		if (const TileEntityPtr tile_entity = tileEntityAt(position))
+			add(tile_entity);
+
+		if (const auto found = findEntities(position); !found.empty())
+			for (const EntityPtr &entity: found)
+				add(entity);
+
+		if (show_menu) {
 			auto &window = game.getWindow();
 			auto &menu = window.glMenu;
-			window.remove_action_group("entity_menu");
-			window.insert_action_group("entity_menu", group);
+			window.remove_action_group("agent_menu");
+			window.insert_action_group("agent_menu", group);
 			menu.set_menu_model(gmenu);
 			menu.set_has_arrow(true);
 			menu.set_pointing_to({int(x), int(y), 1, 1});

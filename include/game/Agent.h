@@ -1,10 +1,13 @@
 #pragma once
 
 #include "ChunkPosition.h"
+#include "container/WeakSet.h"
 #include "game/HasPlace.h"
 #include "net/Buffer.h"
 #include "threading/Lockable.h"
-#include "container/WeakSet.h"
+#include "ui/Modifiers.h"
+
+#include <gtkmm.h>
 
 namespace Game3 {
 	class Game;
@@ -30,6 +33,13 @@ namespace Game3 {
 			virtual Side getSide() const = 0;
 			virtual Type getAgentType() const = 0;
 			virtual std::string getName() = 0;
+
+			/** Handles when the player interacts with the tile they're on and that tile contains this agent. Returns whether anything interesting happened. */
+			virtual bool onInteractOn(const std::shared_ptr<Player> &, Modifiers) { return false; }
+			/** Handles when the player interacts with the tile in front of them and that tile contains this agent. Returns whether anything interesting happened. */
+			virtual bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) { return false; }
+
+			virtual bool populateMenu(const PlayerPtr &, bool overlap, const std::string &id, Glib::RefPtr<Gio::Menu>, Glib::RefPtr<Gio::SimpleActionGroup>) { (void) overlap; (void) id; return false; }
 
 			virtual void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data);
 			virtual void sendMessage(const std::shared_ptr<Agent> &destination, const std::string &name, std::any &data);
