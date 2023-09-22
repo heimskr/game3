@@ -43,8 +43,10 @@ subdir('data')
 subdir('src')
 subdir('po')
 
-gnome.post_install(
-	glib_compile_schemas: true,
-	gtk_update_icon_cache: true,
-	update_desktop_database: true,
-)
+if build_machine.system() != 'darwin'
+	gnome.post_install(
+		glib_compile_schemas: true,
+		gtk_update_icon_cache: true,
+		update_desktop_database: true,
+	)
+endif
