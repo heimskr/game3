@@ -67,7 +67,7 @@ all_install: vcpkg all
 vcpkg_zip: all_install zip
 
 macos_setup:
-	- vcpkg_install
+	- vcpkg install
 	PKG_CONFIG_PATH=vcpkg_installed/arm64-osx/lib/pkgconfig meson setup -Dvcpkg_triplet=arm64-osx builddir .
 
 flat:
