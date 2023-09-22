@@ -1,4 +1,5 @@
 // Credit: https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/3.2d_game/0.full_source/texture.cpp
+#include "config.h"
 #include "Log.h"
 #include "Texture.h"
 #include "util/GL.h"
