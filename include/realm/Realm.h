@@ -88,6 +88,7 @@ namespace Game3 {
 			std::atomic_bool reuploadPending = false;
 			std::atomic_bool fluidReuploadPending = false;
 			std::array<std::atomic_bool, LAYER_COUNT> layerReuploadPending{};
+			std::atomic_bool renderersReady = false;
 
 			Realm(const Realm &) = delete;
 			Realm(Realm &&) = delete;

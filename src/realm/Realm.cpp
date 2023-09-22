@@ -41,6 +41,7 @@ namespace Game3 {
 				createRenderers();
 				initRendererRealms();
 				initRendererTileProviders();
+				renderersReady = true;
 			});
 		}
 	}
@@ -53,6 +54,7 @@ namespace Game3 {
 				initRendererRealms();
 				initTexture();
 				initRendererTileProviders();
+				renderersReady = true;
 			});
 		}
 	}
@@ -521,32 +523,34 @@ namespace Game3 {
 			for (const auto &stolen: generalQueue.steal())
 				stolen();
 
-			Index row_index = 0;
-			for (auto &row: *renderers) {
-				Index col_index = 0;
-				for (auto &layers: row) {
-					for (auto &renderer: layers) {
+			if (renderersReady) {
+				Index row_index = 0;
+				for (auto &row: *renderers) {
+					Index col_index = 0;
+					for (auto &layers: row) {
+						for (auto &renderer: layers) {
+							renderer.setChunkPosition({
+								static_cast<int32_t>(player_cpos.x + col_index - REALM_DIAMETER / 2 - 1),
+								static_cast<int32_t>(player_cpos.y + row_index - REALM_DIAMETER / 2 - 1),
+							});
+						}
+						++col_index;
+					}
+					++row_index;
+				}
+
+				row_index = 0;
+				for (auto &row: *fluidRenderers) {
+					Index col_index = 0;
+					for (auto &renderer: row) {
 						renderer.setChunkPosition({
 							static_cast<int32_t>(player_cpos.x + col_index - REALM_DIAMETER / 2 - 1),
 							static_cast<int32_t>(player_cpos.y + row_index - REALM_DIAMETER / 2 - 1),
 						});
+						++col_index;
 					}
-					++col_index;
+					++row_index;
 				}
-				++row_index;
-			}
-
-			row_index = 0;
-			for (auto &row: *fluidRenderers) {
-				Index col_index = 0;
-				for (auto &renderer: row) {
-					renderer.setChunkPosition({
-						static_cast<int32_t>(player_cpos.x + col_index - REALM_DIAMETER / 2 - 1),
-						static_cast<int32_t>(player_cpos.y + row_index - REALM_DIAMETER / 2 - 1),
-					});
-					++col_index;
-				}
-				++row_index;
 			}
 		}
 	}
