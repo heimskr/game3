@@ -67,8 +67,6 @@ int main(int argc, char **argv) {
 		}
 	}
 
-	if (!glfwInit())
-		ERROR("glfwInit failed\n");
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
