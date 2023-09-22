@@ -90,9 +90,6 @@ namespace Game3 {
 		if (getSide() != Side::Server)
 			return true;
 
-		INFO("ItemEntity stack: " << stack);
-		// return true;
-
 		auto leftover = player->getInventory()->add(stack);
 		if (leftover) {
 			stack = std::move(*leftover);
@@ -109,15 +106,11 @@ namespace Game3 {
 
 	void ItemEntity::encode(Buffer &buffer) {
 		Entity::encode(buffer);
-		buffer << xOffset;
-		buffer << yOffset;
 		stack.encode(getGame(), buffer);
 	}
 
 	void ItemEntity::decode(Buffer &buffer) {
 		Entity::decode(buffer);
-		buffer >> xOffset;
-		buffer >> yOffset;
 		stack.decode(getGame(), buffer);
 	}
 
