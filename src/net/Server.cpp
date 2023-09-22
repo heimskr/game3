@@ -102,7 +102,7 @@ namespace Game3 {
 			try {
 				buffer_event = bufferEvents.at(descriptor);
 			} catch (const std::out_of_range &) {
-				ERROR("Tried to find descriptor " << descriptor << " from " << bufferEvents.size() << ':');
+				ERROR("Tried to find descriptor " << descriptor << " (number of bufferevents: " << bufferEvents.size() << ')');
 				for (const auto &[desc, ev]: bufferEvents)
 					ERROR("- " << desc);
 				throw;

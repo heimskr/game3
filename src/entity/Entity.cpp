@@ -813,7 +813,7 @@ namespace Game3 {
 				const EntitySetPathPacket packet(*this);
 				for (const auto &weak_player: visiblePlayers) {
 					if (auto player = weak_player.lock(); player && !hasSeenPath(player)) {
-						INFO("Late sending EntitySetPathPacket (Entity)");
+						// INFO("Late sending EntitySetPathPacket (Entity)");
 						player->toServer()->ensureEntity(shared);
 						player->send(packet);
 						setSeenPath(player);
