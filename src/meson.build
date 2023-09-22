@@ -37,13 +37,16 @@ game3_deps = [
 	dependency('libzstd'),
 	dependency('sqlite3'),
 	dependency('gl'),
-	dependency('glu'),
 	dependency('glfw3'),
 	dependency('x11'),
 	chemskr.get_variable('chemskr'),
 	sqlitecpp.get_variable('sqlitecpp_dep'),
 	resources_dep
 ]
+
+if build_machine.system() != 'darwin'
+	game3_deps += dependency('glu')
+endif
 
 game3_sources += gnome.compile_resources('game3-resources',
 	'game3.gresource.xml',
