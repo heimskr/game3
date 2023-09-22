@@ -17,12 +17,23 @@
 #include "worldgen/WorldGen.h"
 
 namespace Game3 {
-	static const std::vector<Identifier> grasses {
-		"base:tile/grass_alt1"_id, "base:tile/grass_alt2"_id,
-		"base:tile/grass"_id, "base:tile/grass"_id, "base:tile/grass"_id, "base:tile/grass"_id,
-	};
+	namespace {
+		const std::vector<Identifier> grasses{
+			"base:tile/grass_alt1"_id, "base:tile/grass_alt2"_id,
+			"base:tile/grass"_id, "base:tile/grass"_id, "base:tile/grass"_id, "base:tile/grass"_id,
+		};
 
-	static const std::unordered_set<Identifier> grassSet {grasses.begin(), grasses.end()};
+		const std::unordered_set<Identifier> trees{
+			"base:tile/tree1"_id,
+			"base:tile/tree2"_id,
+			"base:tile/tree3"_id,
+			"base:tile/tree1_empty"_id,
+			"base:tile/tree2_empty"_id,
+			"base:tile/tree3_empty"_id
+		};
+
+		const std::unordered_set<Identifier> grassSet{grasses.begin(), grasses.end()};
+	}
 
 	void Grassland::init(Realm &realm, int noise_seed) {
 		Biome::init(realm, noise_seed);
@@ -64,18 +75,8 @@ namespace Game3 {
 			const double forest_noise = forestPerlin->GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.5);
 			if (params.forestThreshold < forest_noise) {
 				std::default_random_engine tree_rng(static_cast<uint_fast32_t>(forest_noise * 1'000'000'000.));
-				if ((abs(row) % 2) == (std::uniform_int_distribution(0, 39)(tree_rng) < 20)) {
-					// realm.add(TileEntity::create<Tree>(realm.getGame(), choose(trees, rng), "base:tile/tree0"_id, Position(row, column), Tree::MATURITY));
-					static const std::vector<Identifier> trees {
-						"base:tile/tree1"_id,
-						"base:tile/tree2"_id,
-						"base:tile/tree3"_id,
-						"base:tile/tree1_empty"_id,
-						"base:tile/tree2_empty"_id,
-						"base:tile/tree3_empty"_id
-					};
+				if ((abs(row) % 2) == (std::uniform_int_distribution(0, 39)(tree_rng) < 20))
 					realm.setTile(Layer::Submerged, {row, column}, choose(trees, rng), false, true);
-				}
 				realm.setTile(Layer::Terrain, {row, column}, forest_floor, false, true);
 			}
 		}
@@ -88,10 +89,9 @@ namespace Game3 {
 		constexpr double factor = 10;
 		static std::uniform_int_distribution distribution(0, 99);
 
-		// TODO!: cropification
 		if (params.antiforestThreshold > perlin.GetValue(row / Biome::NOISE_ZOOM * factor, column / Biome::NOISE_ZOOM * factor, 0.))
-			if (auto tile_entity = realm.tileEntityAt({row, column}); tile_entity && tile_entity->is("base:te/tree"_id) && !std::dynamic_pointer_cast<Tree>(tile_entity)->hasHive())
-				realm.removeSafe(tile_entity);
+			if (auto tile = realm.tryTile(Layer::Submerged, {row, column}); tile && trees.contains(realm.getTileset()[*tile]))
+				realm.setTile(Layer::Submerged, {row, column}, 0, false, true);
 
 		const auto &tileset = realm.getTileset();
 		const auto tile1 = tileset[realm.getTile(Layer::Terrain, {row, column})];
