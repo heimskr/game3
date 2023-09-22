@@ -1,4 +1,6 @@
-#include <iostream>
+#include "Log.h"
+#include "net/NetError.h"
+#include "net/Server.h"
 
 #include <arpa/inet.h>
 #include <cerrno>
@@ -11,10 +13,6 @@
 #include <unistd.h>
 
 #include <event2/thread.h>
-
-#include "Log.h"
-#include "net/NetError.h"
-#include "net/Server.h"
 
 namespace Game3 {
 	Server::Server(int af_, const std::string &ip_, uint16_t port_, size_t thread_count, size_t chunk_size):
@@ -150,7 +148,12 @@ namespace Game3 {
 			return static_cast<ssize_t>(message.size());
 		}
 
-		return bufferevent_write(getBufferEvent(client.descriptor), message.begin(), message.size());
+		try {
+			return bufferevent_write(client.event, message.begin(), message.size());
+		} catch (const std::out_of_range &err) {
+			WARN("Couldn't send message of size " << message.size() << " to client " << client.id << ": " << err.what());
+			return -1;
+		}
 	}
 
 	ssize_t Server::send(GenericClient &client, const std::string &message, bool force) {
