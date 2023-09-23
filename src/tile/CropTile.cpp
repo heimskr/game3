@@ -34,7 +34,10 @@ namespace Game3 {
 			return;
 
 		auto iter = std::find(crop->stages.begin(), crop->stages.end(), tilename);
-		place.set(Layer::Submerged, *++iter);
+		if (iter != crop->stages.end())
+			place.set(Layer::Submerged, *++iter);
+		else
+			WARN("Couldn't find " << tilename << " in crop stages for crop " << crop->identifier);
 	}
 
 	bool CropTile::interact(const Place &place, Layer layer) {
