@@ -825,7 +825,7 @@ namespace Game3 {
 			// Awful hack.
 			delay([this, token, hostname, username = settings.username, &client] {
 				client.send(LoginPacket(username, *token));
-			}, 16);
+			}, 32);
 		} else {
 			error("Couldn't find token for user " + settings.username + " on host " + hostname);
 		}
