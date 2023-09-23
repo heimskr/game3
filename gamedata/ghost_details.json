@@ -11,8 +11,8 @@
 			"base:item/plant_pot3":  ["base:ghost/normal",      "base:tileset/monomap", false, 32, 12, 6, 2],
 			"base:item/tower":       ["base:ghost/tower",       "base:tileset/monomap", true,  32,  6, 7, 2],
 			"base:item/pride_flag":  ["base:ghost/normal",      "base:tileset/monomap", false, 32, 23, 8, 3],
-			"base:item/nb_flag":     ["base:ghost/normal",      "base:tileset/monomap", false, 32, 25, 8, 3],
-			"base:item/ace_flag":    ["base:ghost/normal",      "base:tileset/monomap", false, 32, 25, 7, 3]
+			"base:item/nb_flag":     ["base:ghost/normal",      "base:tileset/monomap", false, 32, 26, 8, 3],
+			"base:item/ace_flag":    ["base:ghost/normal",      "base:tileset/monomap", false, 32, 26, 7, 3]
 		}]
 	]
 }
