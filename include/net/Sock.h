@@ -39,13 +39,13 @@ namespace Game3 {
 			void stopBuffering();
 
 			inline bool isConnected() const { return connected; }
-
+			virtual bool isReady() const { return connected; }
 
 		protected:
 			static int sockCount;
 			struct addrinfo *info;
 			int netFD = -1, controlRead = -1, controlWrite = -1;
-			bool connected = false;
+			std::atomic_bool connected = false;
 			fd_set fds = {0};
 			std::vector<char> buffer;
 			std::atomic_bool buffering = false;

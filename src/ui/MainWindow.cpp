@@ -85,6 +85,18 @@ namespace Game3 {
 				fn();
 		});
 
+		boolFunctionDispatcher.connect([this] {
+			auto lock = boolFunctions.uniqueLock();
+			std::erase_if(boolFunctions, [](const auto &fn) {
+				return fn();
+			});
+			if (!boolFunctions.empty()) {
+				delay([this] {
+					boolFunctionDispatcher.emit();
+				});
+			}
+		});
+
 		add_action("connect", Gio::ActionMap::ActivateSlot(sigc::mem_fun(*this, &MainWindow::onConnect)));
 
 		add_action("autoconnect", Gio::ActionMap::ActivateSlot(sigc::mem_fun(*this, &MainWindow::autoConnect)));
@@ -445,6 +457,14 @@ namespace Game3 {
 	void MainWindow::queue(std::function<void()> fn) {
 		functionQueue.push(std::move(fn));
 		functionQueueDispatcher.emit();
+	}
+
+	void MainWindow::queueBool(std::function<bool()> fn) {
+		{
+			auto lock = boolFunctions.uniqueLock();
+			boolFunctions.push_back(std::move(fn));
+		}
+		boolFunctionDispatcher.emit();
 	}
 
 	void MainWindow::alert(const Glib::ustring &message, Gtk::MessageType type, bool do_queue, bool modal, bool use_markup) {
@@ -822,10 +842,14 @@ namespace Game3 {
 		LocalClient &client = *game->client;
 		const std::string &hostname = client.getHostname();
 		if (std::optional<Token> token = client.getToken(hostname, settings.username)) {
-			// Awful hack.
-			delay([this, token, hostname, username = settings.username, &client] {
-				client.send(LoginPacket(username, *token));
-			}, 32);
+			queueBool([this, token, hostname, username = settings.username, &client] {
+				if (client.isReady()) {
+					client.send(LoginPacket(username, *token));
+					return true;
+				}
+
+				return false;
+			});
 		} else {
 			error("Couldn't find token for user " + settings.username + " on host " + hostname);
 		}

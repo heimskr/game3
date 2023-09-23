@@ -18,7 +18,6 @@
 #include "game/TileProvider.h"
 #include "graphics/ElementBufferedRenderer.h"
 #include "graphics/FluidRenderer.h"
-#include "graphics/GL.h"
 #include "packet/ChunkTilesPacket.h"
 #include "packet/EntityPacket.h"
 #include "packet/RealmNoticePacket.h"

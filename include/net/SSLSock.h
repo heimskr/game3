@@ -21,6 +21,7 @@ namespace Game3 {
 			void close(bool force) override;
 			ssize_t send(const void *, size_t, bool force) override;
 			ssize_t recv(void *, size_t) override;
+			bool isReady() const override;
 
 		protected:
 			SSL_CTX *sslContext = nullptr;

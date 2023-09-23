@@ -170,6 +170,10 @@ namespace Game3 {
 		return return_value? *return_value : -1;
 	}
 
+	bool SSLSock::isReady() const {
+		return ssl != nullptr && SSL_is_init_finished(ssl);
+	}
+
 	void SSLSock::connectSSL(bool blocking) {
 		const SSL_METHOD *method = TLS_client_method();
 		sslContext = SSL_CTX_new(method);

@@ -49,6 +49,7 @@ namespace Game3 {
 			bool hasHostname() const;
 			const std::string & getHostname() const;
 			void setBuffering(bool);
+			bool isReady() const { return sock->isReady(); }
 
 		private:
 			enum class State {Begin, Data};
