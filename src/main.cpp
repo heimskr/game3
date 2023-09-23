@@ -18,6 +18,7 @@
 
 namespace Game3 {
 	void test();
+	void splitter();
 }
 
 int main(int argc, char **argv) {
@@ -58,6 +59,11 @@ int main(int argc, char **argv) {
 
 		if (strcmp(argv[1], "-t") == 0) {
 			Game3::test();
+			return 0;
+		}
+
+		if (strcmp(argv[1], "--split") == 0) {
+			Game3::splitter();
 			return 0;
 		}
 

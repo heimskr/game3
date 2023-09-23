@@ -63,6 +63,13 @@ namespace Game3 {
 			size_t columnCount(const Game &);
 			size_t rowCount(const Game &);
 
+			const auto & getIDs() { return ids; }
+			const auto & getNames() { return names; }
+			const auto & getLand() { return land; }
+			const auto & getWalkable() { return walkable; }
+			const auto & getSolid() { return solid; }
+			const auto & getMarchable() { return marchableMap; }
+
 			const TileID & operator[](const Identifier &) const;
 			const Identifier & operator[](TileID) const;
 

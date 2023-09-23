@@ -702,7 +702,9 @@
 				"marchable": {
 					"base:category/wooden_walls": "base:tile/wall_se",
 					"base:category/towers":       "base:tile/tower_se",
-					"base:category/energy_pipes": "base:tile/energy_pipe_se"
+					"base:category/energy_pipes": "base:tile/energy_pipe_se",
+					"base:category/item_pipes":   "base:tile/item_pipe_se",
+					"base:category/fluid_pipes":  "base:tile/fluid_pipe_se"
 				},
 				"categories": {
 					"base:category/wooden_walls": [
@@ -963,6 +965,24 @@
 						"base:tile/item_pipe_wes",
 						"base:tile/item_pipe",
 						"base:tile/item_pipe_nwe"
+					],
+					"base:category/fluid_pipes": [
+						"base:tile/fluid_pipe_nw",
+						"base:tile/fluid_pipe_we",
+						"base:tile/fluid_pipe_ne",
+						"base:tile/fluid_pipe_e",
+						"base:tile/fluid_pipe_w",
+						"base:tile/fluid_pipe_ns",
+						"base:tile/fluid_pipe_sw",
+						"base:tile/fluid_pipe_se",
+						"base:tile/fluid_pipe_n",
+						"base:tile/fluid_pipe_s",
+						"base:tile/fluid_pipe_nwes",
+						"base:tile/fluid_pipe_nws",
+						"base:tile/fluid_pipe_nes",
+						"base:tile/fluid_pipe_wes",
+						"base:tile/fluid_pipe",
+						"base:tile/fluid_pipe_nwe"
 					],
 					"base:category/pipes": [
 						"base:category/energy_pipes",
