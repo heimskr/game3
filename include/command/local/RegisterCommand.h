@@ -4,7 +4,7 @@
 
 namespace Game3 {
 	struct RegisterCommand: LocalCommand {
-		constexpr static const char *name = "reg";
+		constexpr static const char *name = "register";
 		using LocalCommand::LocalCommand;
 		void operator()(LocalClient &) override;
 		std::string getName() const override { return std::string(name); }

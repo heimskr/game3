@@ -54,7 +54,6 @@ namespace Game3 {
 			nlohmann::json meta;
 			meta["tilename"] = name;
 			meta["solid"] = tileset.isSolid(name);
-			meta["walkable"] = tileset.isWalkable(name);
 			meta["land"] = tileset.isLand(name);
 
 			if (auto iter = march.find(name); iter != march.end()) {
