@@ -184,22 +184,26 @@ namespace Game3 {
 
 		const auto &visible = client_game.player? client_game.player->getVisibleLayers() : std::unordered_set{Layer::Terrain, Layer::Submerged, Layer::Objects, Layer::Highest};
 
-		for (auto &row: *renderers) {
-			for (auto &layers: row) {
-				uint8_t layer = 0;
-				for (auto &renderer: layers) {
-					if (visible.contains(static_cast<Layer>(++layer))) {
-						renderer.onBackbufferResized(bb_width, bb_height);
-						renderer.render(outdoors? game_time : 1, scale, center.x(), center.y());
+		if (renderers) {
+			for (auto &row: *renderers) {
+				for (auto &layers: row) {
+					uint8_t layer = 0;
+					for (auto &renderer: layers) {
+						if (visible.contains(static_cast<Layer>(++layer))) {
+							renderer.onBackbufferResized(bb_width, bb_height);
+							renderer.render(outdoors? game_time : 1, scale, center.x(), center.y());
+						}
 					}
 				}
 			}
 		}
 
-		for (auto &row: *fluidRenderers) {
-			for (auto &renderer: row) {
-				renderer.onBackbufferResized(bb_width, bb_height);
-				renderer.render(outdoors? game_time : 1, scale, center.x(), center.y());
+		if (fluidRenderers) {
+			for (auto &row: *fluidRenderers) {
+				for (auto &renderer: row) {
+					renderer.onBackbufferResized(bb_width, bb_height);
+					renderer.render(outdoors? game_time : 1, scale, center.x(), center.y());
+				}
 			}
 		}
 

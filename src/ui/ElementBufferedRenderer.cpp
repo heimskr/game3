@@ -47,6 +47,8 @@ namespace Game3 {
 	}
 
 	void ElementBufferedRenderer::init() {
+		if (!realm)
+			return;
 		if (initialized)
 			reset();
 		assert(realm);
