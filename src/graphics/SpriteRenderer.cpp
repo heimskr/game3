@@ -11,9 +11,9 @@
 #include "Tileset.h"
 #include "resources.h"
 #include "game/ClientGame.h"
+#include "graphics/GL.h"
+#include "graphics/SpriteRenderer.h"
 #include "ui/Canvas.h"
-#include "ui/SpriteRenderer.h"
-#include "util/GL.h"
 #include "util/Util.h"
 
 namespace Game3 {

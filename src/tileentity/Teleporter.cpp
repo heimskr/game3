@@ -3,9 +3,9 @@
 #include "Tileset.h"
 #include "entity/Player.h"
 #include "game/Game.h"
+#include "graphics/SpriteRenderer.h"
 #include "realm/Realm.h"
 #include "tileentity/Teleporter.h"
-#include "ui/SpriteRenderer.h"
 
 namespace Game3 {
 	Teleporter::Teleporter(Identifier tilename, Position position_, RealmID target_realm, Position target_position):

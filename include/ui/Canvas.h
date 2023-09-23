@@ -9,11 +9,11 @@
 #include "Position.h"
 #include "Texture.h"
 #include "Types.h"
-#include "ui/RectangleRenderer.h"
-#include "ui/Multiplier.h"
-#include "ui/SpriteRenderer.h"
-#include "ui/TextRenderer.h"
-#include "util/GL.h"
+#include "graphics/GL.h"
+#include "graphics/Multiplier.h"
+#include "graphics/RectangleRenderer.h"
+#include "graphics/SpriteRenderer.h"
+#include "graphics/TextRenderer.h"
 
 namespace Game3 {
 	class ClientGame;

@@ -1,10 +1,12 @@
 #pragma once
 
-#include "lib/Eigen.h"
-#include <string_view>
 
 #include "Shader.h"
-#include "util/GL.h"
+#include "graphics/GL.h"
+
+#include <string_view>
+
+#include "lib/Eigen.h"
 
 namespace Game3 {
 	class Texture;

@@ -3,12 +3,12 @@
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
+#include "graphics/SpriteRenderer.h"
 #include "item/Tool.h"
 #include "realm/Realm.h"
 #include "tileentity/OreDeposit.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
-#include "ui/SpriteRenderer.h"
 #include "ui/tab/InventoryTab.h"
 
 namespace Game3 {

@@ -1,10 +1,11 @@
 #pragma once
 
+#include "graphics/GL.h"
+#include "lib/Eigen.h"
+
 #include <string>
 
-#include "lib/Eigen.h"
 #include <glm/glm.hpp>
-#include "util/GL.h"
 
 namespace Game3 {
 	class Shader {

@@ -2,9 +2,9 @@
 
 #include "Tileset.h"
 #include "game/ClientGame.h"
+#include "graphics/SpriteRenderer.h"
 #include "realm/Realm.h"
 #include "tileentity/Tank.h"
-#include "ui/SpriteRenderer.h"
 
 namespace Game3 {
 	Tank::Tank(Identifier tile_id, Position position_):

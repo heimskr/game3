@@ -1,12 +1,12 @@
 #include "threading/ThreadContext.h"
 #include "entity/Animal.h"
 #include "game/Game.h"
+#include "graphics/TextRenderer.h"
 #include "net/Buffer.h"
 #include "realm/Keep.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
 #include "tileentity/Teleporter.h"
-#include "ui/TextRenderer.h"
 
 namespace Game3 {
 	ThreadPool Animal::threadPool{2};

@@ -1,15 +1,15 @@
 #pragma once
 
-#include <atomic>
-#include <unordered_set>
-#include <vector>
-
 #include "Shader.h"
 #include "Types.h"
 #include "game/TileProvider.h"
+#include "graphics/GL.h"
+#include "graphics/RectangleRenderer.h"
 #include "threading/Lockable.h"
-#include "ui/RectangleRenderer.h"
-#include "util/GL.h"
+
+#include <atomic>
+#include <unordered_set>
+#include <vector>
 
 namespace Game3 {
 	class Realm;

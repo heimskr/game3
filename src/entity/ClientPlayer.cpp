@@ -1,6 +1,7 @@
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
+#include "graphics/TextRenderer.h"
 #include "net/LocalClient.h"
 #include "packet/AgentMessagePacket.h"
 #include "packet/ContinuousInteractionPacket.h"
@@ -8,7 +9,6 @@
 #include "packet/MovePlayerPacket.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
-#include "ui/TextRenderer.h"
 
 namespace Game3 {
 	ClientPlayer::ClientPlayer(): Player() {}

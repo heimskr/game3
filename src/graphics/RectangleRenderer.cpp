@@ -5,8 +5,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "resources.h"
-#include "ui/RectangleRenderer.h"
-#include "util/GL.h"
+#include "graphics/GL.h"
+#include "graphics/RectangleRenderer.h"
 #include "util/Util.h"
 
 namespace Game3 {

@@ -2,12 +2,12 @@
 #include "Tileset.h"
 #include "game/EnergyContainer.h"
 #include "game/Game.h"
+#include "graphics/SpriteRenderer.h"
 #include "pipes/EnergyNetwork.h"
 #include "pipes/ItemNetwork.h"
 #include "pipes/PipeNetwork.h"
 #include "realm/Realm.h"
 #include "tileentity/Pipe.h"
-#include "ui/SpriteRenderer.h"
 #include "util/Util.h"
 
 #include <deque>

@@ -2,7 +2,7 @@
 #include "config.h"
 #include "Log.h"
 #include "Texture.h"
-#include "util/GL.h"
+#include "graphics/GL.h"
 #include "util/Util.h"
 
 #include <csignal>

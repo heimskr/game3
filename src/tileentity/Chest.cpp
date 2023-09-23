@@ -5,9 +5,9 @@
 #include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/ServerInventory.h"
+#include "graphics/SpriteRenderer.h"
 #include "realm/Realm.h"
 #include "tileentity/Chest.h"
-#include "ui/SpriteRenderer.h"
 #include "ui/tab/InventoryTab.h"
 
 namespace Game3 {

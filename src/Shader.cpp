@@ -4,7 +4,7 @@
 
 #include "Log.h"
 #include "Shader.h"
-#include "util/GL.h"
+#include "graphics/GL.h"
 #include "util/Util.h"
 
 namespace Game3 {

@@ -5,9 +5,9 @@
 #include "game/ClientGame.h"
 #include "game/EnergyContainer.h"
 #include "game/ServerInventory.h"
+#include "graphics/SpriteRenderer.h"
 #include "realm/Realm.h"
 #include "tileentity/Pump.h"
-#include "ui/SpriteRenderer.h"
 
 namespace Game3 {
 	Pump::Pump():

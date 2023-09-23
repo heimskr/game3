@@ -3,12 +3,12 @@
 #include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
+#include "graphics/SpriteRenderer.h"
 #include "item/Item.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
 #include "ui/Canvas.h"
-#include "ui/SpriteRenderer.h"
 
 namespace Game3 {
 	ItemEntity::ItemEntity(const Game &game, const nlohmann::json &):

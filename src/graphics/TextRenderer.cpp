@@ -11,9 +11,9 @@
 #include "Log.h"
 #include "Tileset.h"
 #include "game/ClientGame.h"
+#include "graphics/TextRenderer.h"
 #include "realm/Realm.h"
 #include "ui/Canvas.h"
-#include "ui/TextRenderer.h"
 
 namespace Game3 {
 	TextRenderer::TextRenderer(Canvas &canvas_, uint32_t font_scale): canvas(&canvas_), shader("TextRenderer"), fontScale(font_scale) {

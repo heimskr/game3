@@ -1,9 +1,9 @@
 #include "Tileset.h"
 #include "entity/Player.h"
 #include "game/Game.h"
+#include "graphics/SpriteRenderer.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
-#include "ui/SpriteRenderer.h"
 
 namespace Game3 {
 	Building::Building(Identifier id_, Position position_, RealmID inner_realm_id, Position entrance_):

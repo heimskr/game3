@@ -10,6 +10,7 @@
 #include "game/Game.h"
 #include "game/ServerGame.h"
 #include "game/ServerInventory.h"
+#include "graphics/SpriteRenderer.h"
 #include "net/Buffer.h"
 #include "net/RemoteClient.h"
 #include "packet/EntityPacket.h"
@@ -18,7 +19,6 @@
 #include "realm/Realm.h"
 #include "registry/Registries.h"
 #include "ui/Canvas.h"
-#include "ui/SpriteRenderer.h"
 #include "util/AStar.h"
 #include "util/Util.h"
 

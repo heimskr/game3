@@ -3,10 +3,10 @@
 #include "Shader.h"
 #include "Types.h"
 #include "game/TileProvider.h"
+#include "graphics/GL.h"
+#include "graphics/RectangleRenderer.h"
+#include "graphics/Reshader.h"
 #include "threading/Lockable.h"
-#include "ui/RectangleRenderer.h"
-#include "ui/Reshader.h"
-#include "util/GL.h"
 
 #include <atomic>
 #include <future>

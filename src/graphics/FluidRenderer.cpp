@@ -13,8 +13,8 @@
 #include "Tileset.h"
 #include "container/Quadtree.h"
 #include "game/Game.h"
+#include "graphics/FluidRenderer.h"
 #include "realm/Realm.h"
-#include "ui/FluidRenderer.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 

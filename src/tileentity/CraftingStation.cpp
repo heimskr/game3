@@ -3,11 +3,11 @@
 #include "Tileset.h"
 #include "entity/Player.h"
 #include "game/ClientGame.h"
+#include "graphics/SpriteRenderer.h"
 #include "realm/Realm.h"
 #include "tileentity/CraftingStation.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
-#include "ui/SpriteRenderer.h"
 #include "ui/tab/CraftingTab.h"
 #include "ui/tab/InventoryTab.h"
 

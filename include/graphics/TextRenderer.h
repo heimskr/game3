@@ -2,18 +2,18 @@
 
 // Credit: https://learnopengl.com/In-Practice/Text-Rendering
 
-#include <memory>
+#include "graphics/GL.h"
 
-#include "util/GL.h"
+#include "Shader.h"
+#include "Types.h"
+
+#include <memory>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <gtkmm.h>
-
-#include "Shader.h"
-#include "Types.h"
 
 namespace Game3 {
 	class Canvas;
