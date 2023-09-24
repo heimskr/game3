@@ -6,6 +6,7 @@
 #include "Shader.h"
 #include "Tileset.h"
 
+#include "client/RichPresence.h"
 #include "entity/ClientPlayer.h"
 #include "entity/ItemEntity.h"
 #include "game/ClientGame.h"
@@ -37,6 +38,8 @@
 #include "worldgen/WorldGen.h"
 
 // #define USE_CBOR
+
+#include "discord.h"
 
 namespace Game3 {
 	static std::chrono::milliseconds arrowTime {100};
@@ -348,6 +351,8 @@ namespace Game3 {
 	}
 
 	void MainWindow::onGameLoaded() {
+		richPresence.setActivityDetails("Playing");
+
 		glArea.get_context()->make_current();
 		debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
 		game->initInteractionSets();
@@ -422,6 +427,8 @@ namespace Game3 {
 
 	bool MainWindow::render(const Glib::RefPtr<Gdk::GLContext> &context) {
 		context->make_current();
+
+		richPresence.tick();
 
 		glArea.throw_if_error();
 		glClearColor(.2f, .2f, .2f, 1.f);
@@ -514,8 +521,11 @@ namespace Game3 {
 
 	void MainWindow::closeGame() {
 		if (game) {
+			richPresence.setActivityDetails("Idling");
+
 			if (dialog)
 				dialog->close();
+
 			removeModule();
 			game->stopThread();
 			canvas->game = nullptr;

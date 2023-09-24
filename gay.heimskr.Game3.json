@@ -51,13 +51,11 @@
 				"--wrap-mode=nodownload",
 				"-Duse-network=false"
 			],
-			"sources": [
-				{
-					"type": "archive",
-					"url": "https://download.gnome.org/sources/mm-common/1.0/mm-common-1.0.5.tar.xz",
-					"sha256": "705c6d29f4116a29bde4e36cfc1b046c92b6ef8c6dae4eaec85018747e6da5aa"
-				}
-			]
+			"sources": [{
+				"type": "archive",
+				"url": "https://download.gnome.org/sources/mm-common/1.0/mm-common-1.0.5.tar.xz",
+				"sha256": "705c6d29f4116a29bde4e36cfc1b046c92b6ef8c6dae4eaec85018747e6da5aa"
+			}]
 		},
 		{
 			"name": "sigc++-2.0",
@@ -68,13 +66,11 @@
 				"-Dbuild-documentation=false",
 				"-Dbuild-tests=false"
 			],
-			"sources": [
-				{
-					"type": "archive",
-					"url": "https://download.gnome.org/sources/libsigc++/2.12/libsigc++-2.12.0.tar.xz",
-					"sha256": "1c466d2e64b34f9b118976eb21b138c37ed124d0f61497df2a90ce6c3d9fa3b5"
-				}
-			]
+			"sources": [{
+				"type": "archive",
+				"url": "https://download.gnome.org/sources/libsigc++/2.12/libsigc++-2.12.0.tar.xz",
+				"sha256": "1c466d2e64b34f9b118976eb21b138c37ed124d0f61497df2a90ce6c3d9fa3b5"
+			}]
 		},
 		{
 			"name": "sigc++-3.0",
@@ -85,13 +81,11 @@
 				"-Dbuild-documentation=false",
 				"-Dbuild-tests=false"
 			],
-			"sources": [
-				{
-					"type": "archive",
-					"url": "https://download.gnome.org/sources/libsigc++/3.4/libsigc++-3.4.0.tar.xz",
-					"sha256": "02e2630ffb5ce93cd52c38423521dfe7063328863a6e96d41d765a6116b8707e"
-				}
-			]
+			"sources": [{
+				"type": "archive",
+				"url": "https://download.gnome.org/sources/libsigc++/3.4/libsigc++-3.4.0.tar.xz",
+				"sha256": "02e2630ffb5ce93cd52c38423521dfe7063328863a6e96d41d765a6116b8707e"
+			}]
 		},
 		{
 			"name": "cairomm",
@@ -120,13 +114,11 @@
 				"-Dbuild-examples=false",
 				"-Dbuild-documentation=false"
 			],
-			"sources": [
-				{
-					"type": "archive",
-					"url": "https://download.gnome.org/sources/glibmm/2.66/glibmm-2.66.6.tar.xz",
-					"sha256": "5358742598181e5351d7bf8da072bf93e6dd5f178d27640d4e462bc8f14e152f"
-				}
-			]
+			"sources": [{
+				"type": "archive",
+				"url": "https://download.gnome.org/sources/glibmm/2.66/glibmm-2.66.6.tar.xz",
+				"sha256": "5358742598181e5351d7bf8da072bf93e6dd5f178d27640d4e462bc8f14e152f"
+			}]
 		},
 		{
 			"name": "glibmm-2.68",
@@ -136,13 +128,11 @@
 				"-Dbuild-examples=false",
 				"-Dbuild-documentation=false"
 			],
-			"sources": [
-				{
-					"type": "archive",
-					"url": "https://download.gnome.org/sources/glibmm/2.76/glibmm-2.76.0.tar.xz",
-					"sha256": "8637d80ceabd94fddd6e48970a082a264558d4ab82684e15ffc87e7ef3462ab2"
-				}
-			]
+			"sources": [{
+				"type": "archive",
+				"url": "https://download.gnome.org/sources/glibmm/2.76/glibmm-2.76.0.tar.xz",
+				"sha256": "8637d80ceabd94fddd6e48970a082a264558d4ab82684e15ffc87e7ef3462ab2"
+			}]
 		},
 		{
 			"name": "pangomm",
@@ -151,13 +141,11 @@
 				"-Dmaintainer-mode=true",
 				"-Dbuild-documentation=false"
 			],
-			"sources": [
-				{
-					"type": "archive",
-					"url": "https://download.gnome.org/sources/pangomm/2.50/pangomm-2.50.1.tar.xz",
-					"sha256": "ccc9923413e408c2bff637df663248327d72822f11e394b423e1c5652b7d9214"
-				}
-			]
+			"sources": [{
+				"type": "archive",
+				"url": "https://download.gnome.org/sources/pangomm/2.50/pangomm-2.50.1.tar.xz",
+				"sha256": "ccc9923413e408c2bff637df663248327d72822f11e394b423e1c5652b7d9214"
+			}]
 		},
 		{
 			"name": "atkmm",
@@ -166,13 +154,11 @@
 				"-Dmaintainer-mode=true",
 				"-Dbuild-documentation=false"
 			],
-			"sources": [
-				{
-					"type": "archive",
-					"url": "https://download.gnome.org/sources/atkmm/2.28/atkmm-2.28.3.tar.xz",
-					"sha256": "7c2088b486a909be8da2b18304e56c5f90884d1343c8da7367ea5cd3258b9969"
-				}
-			]
+			"sources": [{
+				"type": "archive",
+				"url": "https://download.gnome.org/sources/atkmm/2.28/atkmm-2.28.3.tar.xz",
+				"sha256": "7c2088b486a909be8da2b18304e56c5f90884d1343c8da7367ea5cd3258b9969"
+			}]
 		},
 		{
 			"name": "gtk4",
@@ -186,13 +172,11 @@
 			"build-options": {
 				"cxxflags": "-O2 -g -std=c++20"
 			},
-			"sources": [
-				{
-					"type": "archive",
-					"url": "https://download.gnome.org/sources/gtk/4.12/gtk-4.12.1.tar.xz",
-					"sha256": "b8b61d6cf94fac64bf3a0bfc7af137c9dd2f8360033fdeb0cfe9612b77a99a72"
-				}
-			]
+			"sources": [{
+				"type": "archive",
+				"url": "https://download.gnome.org/sources/gtk/4.12/gtk-4.12.1.tar.xz",
+				"sha256": "b8b61d6cf94fac64bf3a0bfc7af137c9dd2f8360033fdeb0cfe9612b77a99a72"
+			}]
 		},
 		{
 			"name": "gtkmm",
@@ -206,103 +190,85 @@
 			"build-options": {
 				"cxxflags": "-O2 -g -std=c++20"
 			},
-			"sources": [
-				{
-					"type": "archive",
-					"url": "https://download.gnome.org/sources/gtkmm/4.12/gtkmm-4.12.0.tar.xz",
-					"sha256": "fbc3e7618123345c0148ef71abb6548d421f52bb224fbda34875b677dc032c92"
-				}
-			]
+			"sources": [{
+				"type": "archive",
+				"url": "https://download.gnome.org/sources/gtkmm/4.12/gtkmm-4.12.0.tar.xz",
+				"sha256": "fbc3e7618123345c0148ef71abb6548d421f52bb224fbda34875b677dc032c92"
+			}]
 		},
 		{
 			"name": "eigen3",
 			"buildsystem": "cmake",
 			"builddir": true,
-			"sources": [
-				{
-					"type": "archive",
-					"url": "https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz",
-					"sha256": "8586084f71f9bde545ee7fa6d00288b264a2b7ac3607b974e54d13e7162c1c72"
-				}
-			]
+			"sources": [{
+				"type": "archive",
+				"url": "https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz",
+				"sha256": "8586084f71f9bde545ee7fa6d00288b264a2b7ac3607b974e54d13e7162c1c72"
+			}]
 		},
 		{
 			"name": "libevent",
 			"buildsystem": "cmake",
 			"builddir": true,
-			"sources": [
-				{
-					"type": "archive",
-					"url": "https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz",
-					"sha256": "92e6de1be9ec176428fd2367677e61ceffc2ee1cb119035037a27d346b0403bb"
-				}
-			]
+			"sources": [{
+				"type": "archive",
+				"url": "https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz",
+				"sha256": "92e6de1be9ec176428fd2367677e61ceffc2ee1cb119035037a27d346b0403bb"
+			}]
 		},
 		{
 			"name": "glfw3",
 			"buildsystem": "cmake",
 			"builddir": true,
-			"sources": [
-				{
-					"type": "archive",
-					"url": "https://github.com/glfw/glfw/releases/download/3.3.8/glfw-3.3.8.zip",
-					"sha256": "4d025083cc4a3dd1f91ab9b9ba4f5807193823e565a5bcf4be202669d9911ea6"
-				}
-			]
+			"sources": [{
+				"type": "archive",
+				"url": "https://github.com/glfw/glfw/releases/download/3.3.8/glfw-3.3.8.zip",
+				"sha256": "4d025083cc4a3dd1f91ab9b9ba4f5807193823e565a5bcf4be202669d9911ea6"
+			}]
 		},
 		{
 			"name": "glu",
 			"buildsystem": "meson",
-			"sources": [
-				{
-					"type": "archive",
-					"url": "https://gitlab.freedesktop.org/mesa/glu/-/archive/glu-9.0.3/glu-glu-9.0.3.tar.gz",
-					"sha256": "7e919cbc1b2677b01d65fc28fd36a19d1f3e23d76663020e0f3b82b991475e8b"
-				}
-			]
+			"sources": [{
+				"type": "archive",
+				"url": "https://gitlab.freedesktop.org/mesa/glu/-/archive/glu-9.0.3/glu-glu-9.0.3.tar.gz",
+				"sha256": "7e919cbc1b2677b01d65fc28fd36a19d1f3e23d76663020e0f3b82b991475e8b"
+			}]
 		},
 		{
 			"name": "freeglut",
 			"buildsystem": "cmake",
 			"builddir": true,
-			"sources": [
-				{
-					"type": "archive",
-					"url": "https://github.com/FreeGLUTProject/freeglut/releases/download/v3.4.0/freeglut-3.4.0.tar.gz",
-					"sha256": "3c0bcb915d9b180a97edaebd011b7a1de54583a838644dcd42bb0ea0c6f3eaec"
-				}
-			]
+			"sources": [{
+				"type": "archive",
+				"url": "https://github.com/FreeGLUTProject/freeglut/releases/download/v3.4.0/freeglut-3.4.0.tar.gz",
+				"sha256": "3c0bcb915d9b180a97edaebd011b7a1de54583a838644dcd42bb0ea0c6f3eaec"
+			}]
 		},
 		{
 			"name": "glm",
 			"buildsystem": "cmake-ninja",
-			"sources": [
-				{
-					"type": "git",
-					"url": "https://github.com/g-truc/glm.git"
-				}
-			]
+			"sources": [{
+				"type": "git",
+				"url": "https://github.com/g-truc/glm.git"
+			}]
 		},
 		{
 			"name": "libnoise",
 			"buildsystem": "cmake",
 			"builddir": true,
-			"sources": [
-				{
-					"type": "git",
-					"url": "https://github.com/qknight/libnoise.git"
-				}
-			]
+			"sources": [{
+				"type": "git",
+				"url": "https://github.com/qknight/libnoise.git"
+			}]
 		},
 		{
 			"name": "nlohmann-json",
 			"buildsystem": "meson",
-			"sources": [
-				{
-					"type": "git",
-					"url": "https://github.com/nlohmann/json.git"
-				}
-			]
+			"sources": [{
+				"type": "git",
+				"url": "https://github.com/nlohmann/json.git"
+			}]
 		},
 		{
 			"name": "stb",
@@ -311,12 +277,10 @@
 				"mkdir /app/include/stb",
 				"install -D *.h /app/include/stb/"
 			],
-			"sources": [
-				{
-					"type": "git",
-					"url": "https://github.com/nothings/stb.git"
-				}
-			]
+			"sources": [{
+				"type": "git",
+				"url": "https://github.com/nothings/stb.git"
+			}]
 		},
 		{
 			"name": "game3-data",
@@ -325,12 +289,10 @@
 				"mkdir /app/bin/gamedata/",
 				"install -D *.json /app/bin/gamedata"
 			],
-			"sources": [
-				{
-					"type": "dir",
-					"path": "gamedata"
-				}
-			]
+			"sources": [{
+				"type": "dir",
+				"path": "gamedata"
+			}]
 		},
 		{
 			"name": "game3-resources",
@@ -338,12 +300,21 @@
 			"build-commands": [
 				"cp -r . /app/bin/resources"
 			],
-			"sources": [
-				{
-					"type": "dir",
-					"path": "resources"
-				}
-			]
+			"sources": [{
+				"type": "dir",
+				"path": "resources"
+			}]
+		},
+		{
+			"name": "game3-discord",
+			"buildsystem": "simple",
+			"build-commands": [
+				"cp x86_64/discord_game_sdk.so /app/lib/"
+			],
+			"sources": [{
+				"type": "dir",
+				"path": "lib"
+			}]
 		},
 		{
 			"name": "game3-bin",
@@ -358,12 +329,10 @@
 			"build-options": {
 				"strip": true
 			},
-			"sources": [
-				{
-					"type": "dir",
-					"path": "."
-				}
-			]
+			"sources": [{
+				"type": "dir",
+				"path": "."
+			}]
 		}
 	]
 }

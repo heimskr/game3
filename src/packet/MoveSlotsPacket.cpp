@@ -108,7 +108,9 @@ namespace Game3 {
 			}
 		}
 
+		INFO("Notifying " << first_agent->getName() << " (" << first_agent->getGID() << ')');
 		first_inventory.notifyOwner();
+		INFO("Notifying " << second_agent->getName() << " (" << second_agent->getGID() << ')');
 		second_inventory.notifyOwner();
 
 		if (first_action)

@@ -55,7 +55,10 @@ game3_sources += gnome.compile_resources('game3-resources',
 
 game3_sources += resources_h[0]
 
-inc_dirs = [include_directories('..' / 'include')]
+inc_dirs = [
+	include_directories('..' / 'include'),
+	include_directories('..' / 'discord'),
+]
 
 link_args = []
 
@@ -66,6 +69,10 @@ if get_option('vcpkg_triplet') != ''
 else
 	link_args += '-lnoise'
 endif
+
+discord_sdk = cxx.find_library('discord_game_sdk', required: true, dirs: ['/app/lib'])
+
+game3_deps += discord_sdk
 
 executable('game3', game3_sources,
 	dependencies: game3_deps,

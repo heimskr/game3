@@ -2,6 +2,7 @@
 #include "App.h"
 #include "Flasker.h"
 #include "Log.h"
+#include "client/RichPresence.h"
 #include "net/LocalServer.h"
 #include "net/Sock.h"
 #include "util/Crypto.h"
@@ -79,8 +80,29 @@ int main(int argc, char **argv) {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
+	// discord::Core *core{};
+	// const discord::Result result = discord::Core::Create(1155446965744709672, DiscordCreateFlags_NoRequireDiscord, &core);
+	// if (result != discord::Result::Ok) {
+	// 	ERROR("Couldn't initialize Discord: " << int(result));
+	// } else {
+	// 	Game3::discordCore.reset(core);
+	// 	discord::Activity activity{};
+	// 	activity.SetDetails("Idling");
+	// 	auto &assets = activity.GetAssets();
+	// 	assets.SetLargeImage("gangblanc");
+	// 	assets.SetLargeText("It's our boy");
+	// 	Game3::discordCore->ActivityManager().UpdateActivity(activity, [](discord::Result result) {
+	// 		if (result != discord::Result::Ok)
+	// 			ERROR("Couldn't set activity: " << int(result));
+	// 	});
+	// }
+
+	Game3::richPresence.init();
+	Game3::richPresence.initActivity();
+
 	auto app = Game3::App::create();
 	const int out = app->run(argc, argv);
 	Game3::Timer::summary();
+	Game3::richPresence.reset();
 	return out;
 }
