@@ -192,7 +192,7 @@ namespace Game3 {
 		while (query.executeStep()) {
 			query_timer.stop();
 			{
-				Timer iteration_timer{"RealmLoad"};
+				Timer iteration_timer{"ChunkLoad"};
 				RealmID realm_id = query.getColumn(0);
 				ChunkPosition::IntType x = query.getColumn(1);
 				ChunkPosition::IntType y = query.getColumn(2);
