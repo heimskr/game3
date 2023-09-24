@@ -324,9 +324,10 @@ namespace Game3 {
 
 		add(std::make_shared<EmptyFlask>("base:item/flask", "Flask", 2, 64));
 
-		add(std::make_shared<FilledFlask>("base:item/water_flask", "Water Flask", 3, "base:fluid/water"_id));
-		add(std::make_shared<FilledFlask>("base:item/lava_flask",  "Lava Flask",  4, "base:fluid/lava"_id));
-		add(std::make_shared<FilledFlask>("base:item/milk_flask",  "Milk Flask",  4, "base:fluid/milk"_id));
+		add(std::make_shared<FilledFlask>("base:item/water_flask", "Water Flask", 3, "base:fluid/water"));
+		add(std::make_shared<FilledFlask>("base:item/lava_flask",  "Lava Flask",  4, "base:fluid/lava"));
+		add(std::make_shared<FilledFlask>("base:item/milk_flask",  "Milk Flask",  4, "base:fluid/milk"));
+		add(std::make_shared<FilledFlask>("base:item/brine_flask", "Brine Flask", 4, "base:fluid/brine"));
 
 		add(std::make_shared<CaveEntrance>("base:item/cave_entrance", "Cave Entrance", 50, 1));
 
@@ -725,14 +726,16 @@ namespace Game3 {
 			for (const auto &recipe_json: json.at(1))
 				addRecipe(recipe_json);
 
-		} else if (type == "base:fluid_map"_id) {
+		} else if (type == "base:fluid_list"_id) {
 
 			auto &fluids = registry<FluidRegistry>();
-			for (const auto &[key, value]: json.at(1).items()) {
+			for (const auto &pair: json.at(1)) {
+				const Identifier fluid_name = pair.at(0);
+				const nlohmann::json value = pair.at(1);
 				if (auto iter = value.find("flask"); iter != value.end())
-					fluids.add(Identifier(key), Fluid(Identifier(key), value.at("name"), value.at("tileset"), value.at("tilename"), *iter));
+					fluids.add(fluid_name, Fluid(fluid_name, value.at("name"), value.at("tileset"), value.at("tilename"), *iter));
 				else
-					fluids.add(Identifier(key), Fluid(Identifier(key), value.at("name"), value.at("tileset"), value.at("tilename")));
+					fluids.add(fluid_name, Fluid(fluid_name, value.at("name"), value.at("tileset"), value.at("tilename")));
 			}
 
 		} else if (type == "base:crop_map"_id) {

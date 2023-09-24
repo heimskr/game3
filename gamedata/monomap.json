@@ -391,6 +391,7 @@
 					"base:tile/geothermal_generator":    622,
 					"base:tile/alchemizer":              623,
 					"base:tile/chemical_reactor":        624,
+					"base:tile/brine":                   648,
 					"base:tile/house1":                  672,
 					"base:tile/house2":                  673,
 					"base:tile/house3":                  674,

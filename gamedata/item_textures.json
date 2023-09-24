@@ -142,7 +142,8 @@
 			"base:item/glass":                ["base:texture/custom",       64,   0],
 			"base:item/cheese":               ["base:texture/custom",       80,   0],
 			"base:item/cactus":               ["base:texture/custom",       96,   0],
-			"base:item/uranium_ore":          ["base:texture/tinywonder",   16,  64]
+			"base:item/uranium_ore":          ["base:texture/tinywonder",   16,  64],
+			"base:item/brine_flask":          ["base:texture/flasks",       96,   0]
 		}]
 	]
 }
