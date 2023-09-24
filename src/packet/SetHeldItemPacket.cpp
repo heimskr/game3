@@ -25,8 +25,8 @@ namespace Game3 {
 		}
 
 		if (leftHand)
-			player->setHeldLeft(slot);
+			player->setHeldLeft(player->getHeldLeft() == slot? -1 : slot);
 		else
-			player->setHeldRight(slot);
+			player->setHeldRight(player->getHeldRight() == slot? -1 : slot);
 	}
 }
