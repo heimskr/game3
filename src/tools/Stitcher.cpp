@@ -79,6 +79,14 @@ namespace Game3 {
 		size_t x_index = 0;
 		size_t y_index = 0;
 
+		const auto next = [&](size_t x_increment) {
+			x_index += x_increment;
+			if (x_index == dimension) {
+				x_index = 0;
+				y_index += 16;
+			}
+		};
+
 		for (const auto &[identifier, name]: autotiles) {
 			const auto &source = images.at(name);
 			for (size_t row = 0; row < 4; ++row) {
@@ -95,12 +103,15 @@ namespace Game3 {
 				}
 			}
 
-			x_index += 256;
+			next(256);
+		}
 
-			if (x_index == dimension) {
-				x_index = 0;
-				y_index += 16;
-			}
+		for (const auto &name: non_autotiles) {
+			const auto &source = images.at(name);
+			for (size_t y = 0; y < 16; ++y)
+				for (size_t x = 0; x < 16; ++x)
+					std::memcpy(&raw[4 * (x_index + x + dimension * (y_index + y))], &source[4 * (16 * y + x)], 4 * sizeof(uint8_t));
+			next(16);
 		}
 
 		stbi_write_png_to_func(+[](void *, void *data, int size) {
