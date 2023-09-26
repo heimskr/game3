@@ -1,10 +1,20 @@
 #pragma once
 
+#include "config.h"
+
 #include <functional>
 #include <memory>
 #include <string>
 
+#ifndef NO_DISCORD
 #include "discord.h"
+#else
+namespace discord {
+	struct Core {};
+	struct Activity {};
+	enum class Result {};
+}
+#endif
 
 namespace Game3 {
 	class Discord {

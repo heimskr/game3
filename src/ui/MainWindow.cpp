@@ -39,8 +39,6 @@
 
 // #define USE_CBOR
 
-#include "discord.h"
-
 namespace Game3 {
 	static std::chrono::milliseconds arrowTime {100};
 	static std::chrono::milliseconds interactTime {500};

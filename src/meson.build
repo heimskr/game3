@@ -1,5 +1,9 @@
 game3_sources = run_command('grabber.sh', check: true).stdout().strip().split('\n')
 
+if get_option('no_discord') != true
+	game3_sources += run_command('discord-grabber.sh', check: true).stdout().strip().split('\n')
+endif
+
 chemskr = subproject('chemskr')
 sqlitecpp = subproject('sqlitecpp', default_options: 'default_library=static')
 
@@ -57,7 +61,6 @@ game3_sources += resources_h[0]
 
 inc_dirs = [
 	include_directories('..' / 'include'),
-	include_directories('..' / 'discord'),
 ]
 
 link_args = []
@@ -70,9 +73,10 @@ else
 	link_args += '-lnoise'
 endif
 
-discord_sdk = cxx.find_library('discord_game_sdk', required: true, dirs: ['/app/lib'])
-
-game3_deps += discord_sdk
+if get_option('no_discord') == false
+	game3_deps += cxx.find_library('discord_game_sdk', required: true, dirs: ['/app/lib'])
+	inc_dirs += include_directories('..' / 'discord')
+endif
 
 executable('game3', game3_sources,
 	dependencies: game3_deps,

@@ -1,4 +1,4 @@
-project('game3', 'cpp', version: '0.4.0',
+project('game3', 'cpp', version: '0.4.2',
 	meson_version: '>= 0.62.0',
 	default_options: ['warning_level=2', 'werror=false', 'cpp_std=c++20'])
 
@@ -27,6 +27,10 @@ endif
 
 if get_option('vcpkg_triplet') != ''
 	config_h.set('USING_VCPKG', '1')
+endif
+
+if get_option('no_discord')
+	config_h.set('NO_DISCORD', '1')
 endif
 
 if get_option('buildtype') != 'plain'
