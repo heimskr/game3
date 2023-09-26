@@ -38,7 +38,7 @@ namespace Game3 {
 			void open(std::filesystem::path);
 			void close();
 
-			/** Writes both metadata and chunk data for all realms. */
+			/** Writes metadata, chunk data, entity data and tile entity data for all realms. */
 			void writeAllRealms();
 
 			void writeRealm(const std::shared_ptr<Realm> &);

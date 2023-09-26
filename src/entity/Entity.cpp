@@ -193,8 +193,12 @@ namespace Game3 {
 			game->allAgents[globalID] = shared;
 		}
 
-		if (texture == nullptr && getSide() == Side::Client)
-			texture = getTexture();
+		if (texture == nullptr && getSide() == Side::Client) {
+			if (customTexture)
+				changeTexture(customTexture);
+			else
+				texture = getTexture();
+		}
 
 		InventoryPtr inventory = getInventory();
 
@@ -886,6 +890,7 @@ namespace Game3 {
 		HasInventory::encode(buffer);
 		buffer << heldLeft.slot;
 		buffer << heldRight.slot;
+		buffer << customTexture;
 	}
 
 	void Entity::decode(Buffer &buffer) {
@@ -909,6 +914,13 @@ namespace Game3 {
 		HasInventory::decode(buffer);
 		const auto left_slot  = buffer.take<Slot>();
 		const auto right_slot = buffer.take<Slot>();
+
+		buffer >> customTexture;
+		if (customTexture)
+			changeTexture(customTexture);
+		else
+			texture = getTexture();
+
 		setHeldLeft(left_slot);
 		setHeldRight(right_slot);
 	}
@@ -1018,6 +1030,13 @@ namespace Game3 {
 
 	bool Entity::isInLimbo() const {
 		return inLimboFor != RealmID(-1);
+	}
+
+	void Entity::changeTexture(const Identifier &identifier) {
+		Game &game_ref = getGame();
+		auto entity_texture = game_ref.registry<EntityTextureRegistry>().at(identifier);
+		variety = entity_texture->variety;
+		texture = game_ref.registry<TextureRegistry>().at(entity_texture->textureID);
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {

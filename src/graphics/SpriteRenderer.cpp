@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "Shader.h"
+#include "graphics/Shader.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>

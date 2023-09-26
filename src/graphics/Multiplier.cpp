@@ -3,7 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "resources.h"
-#include "Shader.h"
+#include "graphics/Shader.h"
 #include "Texture.h"
 #include "graphics/GL.h"
 #include "graphics/Multiplier.h"

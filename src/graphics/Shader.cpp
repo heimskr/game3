@@ -3,8 +3,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Log.h"
-#include "Shader.h"
 #include "graphics/GL.h"
+#include "graphics/Shader.h"
 #include "util/Util.h"
 
 namespace Game3 {

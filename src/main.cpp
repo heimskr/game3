@@ -1,10 +1,11 @@
 #include "config.h"
 #include "App.h"
-#include "Flasker.h"
 #include "Log.h"
 #include "client/RichPresence.h"
 #include "net/LocalServer.h"
 #include "net/Sock.h"
+#include "tools/Flasker.h"
+#include "tools/Migrator.h"
 #include "util/Crypto.h"
 #include "util/FS.h"
 #include "util/Timer.h"
@@ -79,6 +80,13 @@ int main(int argc, char **argv) {
 		if (strcmp(argv[1], "--split") == 0) {
 			Game3::splitter();
 			return 0;
+		}
+
+		if (strcmp(argv[1], "--migrate") == 0) {
+			std::vector<std::string> args;
+			for (int i = 2; i < argc; ++i)
+				args.emplace_back(argv[i]);
+			return Game3::migrate(args);
 		}
 
 		if (argc == 4) {

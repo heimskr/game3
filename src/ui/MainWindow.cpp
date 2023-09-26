@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "Log.h"
-#include "Shader.h"
+#include "graphics/Shader.h"
 #include "Tileset.h"
 
 #include "client/RichPresence.h"

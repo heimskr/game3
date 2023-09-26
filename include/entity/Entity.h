@@ -16,6 +16,7 @@
 #include "threading/Atomic.h"
 #include "threading/HasMutex.h"
 #include "threading/Lockable.h"
+#include "threading/LockableSharedPtr.h"
 #include "threading/LockableWeakPtr.h"
 #include "threading/SharedRecursiveMutex.h"
 #include "ui/Modifiers.h"
@@ -78,6 +79,7 @@ namespace Game3 {
 			/** Whether the entity is currently teleporting to its first position on realm change. */
 			Atomic<bool> firstTeleport = false;
 			Atomic<RealmID> inLimboFor{-1};
+			Identifier customTexture;
 
 			virtual void destroy();
 
@@ -154,6 +156,7 @@ namespace Game3 {
 			void clearQueues();
 			bool isInLimbo() const;
 			virtual float getJumpSpeed() const { return 8.f; }
+			void changeTexture(const Identifier &);
 
 			virtual void encode(Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */
@@ -169,7 +172,7 @@ namespace Game3 {
 
 		protected:
 			Game *game = nullptr;
-			std::shared_ptr<Texture> texture;
+			LockableSharedPtr<Texture> texture;
 			int variety = 0;
 			float renderHeight = 16.f;
 

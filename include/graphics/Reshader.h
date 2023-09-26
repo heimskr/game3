@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "Shader.h"
+#include "graphics/Shader.h"
 #include "graphics/GL.h"
 
 #include <string_view>

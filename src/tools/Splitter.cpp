@@ -1,4 +1,4 @@
-#include "Flasker.h"
+#include "tools/Flasker.h"
 #include "Log.h"
 #include "Tileset.h"
 #include "util/FS.h"

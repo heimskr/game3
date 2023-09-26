@@ -1,5 +1,5 @@
 #include "config.h"
-#include "Flasker.h"
+#include "tools/Flasker.h"
 #include "util/Util.h"
 
 #include <sstream>

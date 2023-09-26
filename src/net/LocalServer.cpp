@@ -224,7 +224,6 @@ namespace Game3 {
 		const bool database_existed = std::filesystem::exists(world_path);
 		game->openDatabase(world_path);
 		game_server->game = game;
-		game->initEntities();
 
 		constexpr size_t seed = 1621;
 		if (database_existed) {
@@ -241,6 +240,7 @@ namespace Game3 {
 			game->addRealm(realm->id, realm);
 		}
 
+		game->initEntities();
 		game->initInteractionSets();
 
 		std::thread tick_thread([&] {

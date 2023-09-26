@@ -4,7 +4,7 @@
 
 #include "graphics/GL.h"
 
-#include "Shader.h"
+#include "graphics/Shader.h"
 #include "Types.h"
 
 #include <memory>
