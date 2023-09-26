@@ -15,8 +15,6 @@
 #include <stb/stb_image_write.h>
 #endif
 
-#include <malloc.h>
-
 namespace Game3 {
 	Tileset stitcher(const std::filesystem::path &base_dir, Identifier tileset_name) {
 		std::set<std::filesystem::path> dirs;
