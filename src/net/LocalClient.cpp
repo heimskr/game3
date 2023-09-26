@@ -181,6 +181,6 @@ namespace Game3 {
 	}
 
 	void LocalClient::printHeaderBytes() const {
-		INFO("HeaderBytes: (" << hexString(headerBytes) << ')');
+		INFO("HeaderBytes: (" << hexString(headerBytes, true) << ')');
 	}
 }

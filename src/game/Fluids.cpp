@@ -116,7 +116,7 @@ namespace Game3 {
 		const auto type = buffer.popType();
 		if (!Buffer::typesMatch(type, buffer.getType(fluid_stack))) {
 			buffer.debug();
-			throw std::invalid_argument("Invalid type (" + hexString(type) + ") in buffer (expected FluidStack)");
+			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected FluidStack)");
 		}
 		popBuffer(buffer, fluid_stack.id);
 		popBuffer(buffer, fluid_stack.amount);

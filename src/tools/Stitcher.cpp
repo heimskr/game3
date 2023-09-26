@@ -2,6 +2,7 @@
 #include "graphics/GL.h"
 #include "graphics/Texture.h"
 #include "tools/Stitcher.h"
+#include "util/Crypto.h"
 #include "util/FS.h"
 #include "util/Util.h"
 
@@ -34,6 +35,7 @@ namespace Game3 {
 		out.tileSize = tilesize;
 		out.empty = "base:tile/empty";
 		out.missing = "base:tile/missing";
+		Hasher hasher(Hasher::Algorithm::SHA3_512);
 
 		for (const std::filesystem::path &dir: dirs) {
 			nlohmann::json json = nlohmann::json::parse(readFile(dir / "tile.json"));
@@ -123,6 +125,8 @@ namespace Game3 {
 		};
 
 		for (const auto &[identifier, name]: autotiles) {
+			hasher += json_map.at(name).dump();
+
 			const auto &source = images.at(name);
 			for (size_t row = 0; row < 4; ++row) {
 				for (size_t column = 0; column < 4; ++column) {
@@ -146,6 +150,8 @@ namespace Game3 {
 		}
 
 		for (const auto &name: non_autotiles) {
+			hasher += json_map.at(name).dump();
+
 			const auto &source = images.at(name);
 			for (size_t y = 0; y < tilesize; ++y)
 				for (size_t x = 0; x < tilesize; ++x)
@@ -158,6 +164,8 @@ namespace Game3 {
 			next(tilesize);
 		}
 
+		out.hash = hasher.value<std::string>();
+		INFO("Hash: " << hexString(out.hash, false));
 		out.ids["base:tile/empty"] = 0;
 		out.names[0] = "base:tile/empty";
 

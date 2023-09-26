@@ -136,7 +136,7 @@ namespace Game3 {
 	}
 
 	Token LocalServer::generateToken(const std::string &username) const {
-		return computeSHA3<Token>(secret + '/' + username);
+		return computeSHA3_512<Token>(secret + '/' + username);
 	}
 
 	void LocalServer::setupPlayer(RemoteClient &client) {

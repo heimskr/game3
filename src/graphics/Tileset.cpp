@@ -2,6 +2,7 @@
 #include "game/Game.h"
 #include "item/Item.h"
 #include "realm/Realm.h"
+#include "util/Crypto.h"
 
 namespace Game3 {
 	void from_json(const nlohmann::json &json, MarchableInfo &marchable_info) {
@@ -201,6 +202,7 @@ namespace Game3 {
 		Tileset tileset(identifier);
 		tileset.tileSize = json.at("tileSize");
 		tileset.name = json.at("name");
+		tileset.hash = computeSHA3_512<std::string>(json.dump());
 		tileset.empty = json.at("empty");
 		tileset.land = json.at("land");
 		tileset.walkable = json.at("walkable");

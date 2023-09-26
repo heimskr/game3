@@ -64,12 +64,13 @@ namespace Game3 {
 			size_t columnCount(const Game &);
 			size_t rowCount(const Game &);
 
-			const auto & getIDs() { return ids; }
-			const auto & getNames() { return names; }
-			const auto & getLand() { return land; }
-			const auto & getWalkable() { return walkable; }
-			const auto & getSolid() { return solid; }
-			const auto & getMarchable() { return marchableMap; }
+			const auto & getIDs()       const { return ids;          }
+			const auto & getNames()     const { return names;        }
+			const auto & getLand()      const { return land;         }
+			const auto & getWalkable()  const { return walkable;     }
+			const auto & getSolid()     const { return solid;        }
+			const auto & getMarchable() const { return marchableMap; }
+			const auto & getHash()      const { return hash;         }
 
 			const TileID & operator[](const Identifier &) const;
 			const Identifier & operator[](TileID) const;
@@ -82,6 +83,7 @@ namespace Game3 {
 		private:
 			Tileset(Identifier identifier_);
 			std::string name;
+			std::string hash;
 			size_t tileSize = 0;
 			Identifier empty;
 			Identifier missing;

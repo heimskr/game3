@@ -182,7 +182,7 @@ namespace Game3 {
 			return first + std::move(key_type) + std::move(value_type);
 		}
 		debug();
-		throw std::invalid_argument("Invalid type byte: " + hexString(std::string_view(&first, 1)));
+		throw std::invalid_argument("Invalid type byte: " + hexString(std::string_view(&first, 1), true));
 	}
 
 	bool Buffer::typesMatch(std::string_view one, std::string_view two) {
@@ -209,9 +209,9 @@ namespace Game3 {
 
 	void Buffer::debug() const {
 		if (skip == 0)
-			INFO("Buffer: " << hexString(bytes));
+			INFO("Buffer: " << hexString(bytes, true));
 		else
-			INFO("Buffer: \e[2m" << hexString(std::span(bytes.begin(), bytes.begin() + skip)) << "\e[22m " << hexString(std::span(bytes.begin() + skip, bytes.end())));
+			INFO("Buffer: \e[2m" << hexString(std::span(bytes.begin(), bytes.begin() + skip), true) << "\e[22m " << hexString(std::span(bytes.begin() + skip, bytes.end()), true));
 	}
 
 	Buffer & Buffer::operator<<(bool item) {
@@ -300,7 +300,7 @@ namespace Game3 {
 			size = front - '\x10';
 		} else {
 			debug();
-			throw std::invalid_argument("Invalid type in buffer (expected string): " + hexString(std::string_view(&front, 1)));
+			throw std::invalid_argument("Invalid type in buffer (expected string): " + hexString(std::string_view(&front, 1), true));
 		}
 		out.clear();
 		out.reserve(size);

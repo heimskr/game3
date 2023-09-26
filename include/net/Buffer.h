@@ -29,7 +29,7 @@ namespace Game3 {
 	}
 
 	template <typename C>
-	std::string hexString(const C &);
+	std::string hexString(const C &, bool);
 
 	struct BufferContext {
 		virtual ~BufferContext() = default;
@@ -254,7 +254,7 @@ namespace Game3 {
 				const auto type = popType();
 				if (!typesMatch(type, getType(T()))) {
 					debug();
-					throw std::invalid_argument("Invalid type in buffer (expected list: " + hexString(getType(T())) + "): " + hexString(type));
+					throw std::invalid_argument("Invalid type in buffer (expected list: " + hexString(getType(T()), true) + "): " + hexString(type, true));
 				}
 				out = popBuffer<T>(*this);
 				return *this;
@@ -265,7 +265,7 @@ namespace Game3 {
 				const auto type = popType();
 				if (!typesMatch(type, getType(M()))) {
 					debug();
-					throw std::invalid_argument("Invalid type in buffer (expected map: " + hexString(getType(M())) + "): " + hexString(type));
+					throw std::invalid_argument("Invalid type in buffer (expected map: " + hexString(getType(M()), true) + "): " + hexString(type, true));
 				}
 				out = popBuffer<M>(*this);
 				return *this;
@@ -276,7 +276,7 @@ namespace Game3 {
 				const auto type = popType();
 				if (!typesMatch(type, getType(T()))) {
 					debug();
-					throw std::invalid_argument("Invalid type in buffer (expected integral: " + hexString(getType(T())) + "): " + hexString(type));
+					throw std::invalid_argument("Invalid type in buffer (expected integral: " + hexString(getType(T()), true) + "): " + hexString(type, true));
 				}
 				out = popBuffer<T>(*this);
 				return *this;
@@ -295,7 +295,7 @@ namespace Game3 {
 			Buffer & operator>>(std::optional<T> &out) {
 				const auto type = popType();
 				if (!typesMatch(type, getType(std::make_optional<T>())))
-					throw std::invalid_argument("Invalid type in buffer (expected " + std::string(typeid(T).name()) + ": " + hexString(getType(std::make_optional<T>())) + ')');
+					throw std::invalid_argument("Invalid type in buffer (expected " + std::string(typeid(T).name()) + ": " + hexString(getType(std::make_optional<T>()), true) + ')');
 				if (type == "\x0c")
 					out = std::nullopt;
 				else

@@ -76,7 +76,7 @@ namespace Game3 {
 		const auto type = buffer.popType();
 		if (!buffer.typesMatch(type, buffer.getType(modifiers))) {
 			buffer.debug();
-			throw std::invalid_argument("Invalid type (" + hexString(type) + ") in buffer (expected Modifiers = u8)");
+			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected Modifiers = u8)");
 		}
 		modifiers = popBuffer<Modifiers>(buffer);
 		return buffer;

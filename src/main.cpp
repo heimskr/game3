@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
 			}
 
 			std::string secret = Game3::readFile(".secret");
-			std::cout << Game3::computeSHA3<Game3::Token>(secret + '/' + argv[2]) << '\n';
+			std::cout << Game3::computeSHA3_512<Game3::Token>(secret + '/' + argv[2]) << '\n';
 			return 0;
 		}
 

@@ -68,14 +68,16 @@ namespace Game3 {
 	}
 
 	template <typename C>
-	std::string hexString(const C &container) {
+	std::string hexString(const C &container, bool spaces) {
 		std::stringstream ss;
 		bool first = true;
 		for (const uint8_t byte: container) {
-			if (first)
-				first = false;
-			else
-				ss << ' ';
+			if (spaces) {
+				if (first)
+					first = false;
+				else
+					ss << ' ';
+			}
 			ss << std::hex << std::setw(2) << std::setfill('0') << std::right << static_cast<uint16_t>(byte);
 		}
 		return ss.str();

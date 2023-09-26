@@ -322,7 +322,7 @@ namespace Game3 {
 		const auto type = buffer.popType();
 		if (!buffer.typesMatch(type, buffer.getType(inventory))) {
 			buffer.debug();
-			throw std::invalid_argument("Invalid type (" + hexString(type) + ") in buffer (expected inventory)");
+			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected inventory)");
 		}
 		const auto gid = popBuffer<GlobalID>(buffer);
 		if (auto locked = inventory.weakOwner.lock())
