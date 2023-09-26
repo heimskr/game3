@@ -24,7 +24,8 @@
 		"--filesystem=xdg-run/discord-ipc-6:ro",
 		"--filesystem=xdg-run/discord-ipc-7:ro",
 		"--filesystem=xdg-run/discord-ipc-8:ro",
-		"--filesystem=xdg-run/discord-ipc-9:ro"
+		"--filesystem=xdg-run/discord-ipc-9:ro",
+		"--filesystem=xdg-run/app/com.discordapp.Discord:ro"
 	],
 	"build-options": {
 		"append-path": "/usr/lib/sdk/ziglang",

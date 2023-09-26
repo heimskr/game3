@@ -26,6 +26,19 @@ int main(int argc, char **argv) {
 	srand(time(nullptr));
 
 #ifdef IS_FLATPAK
+	if (const char *xdg_runtime_dir = std::getenv("XDG_RUNTIME_DIR")) {
+		const auto old_cwd = std::filesystem::current_path();
+		std::filesystem::current_path(xdg_runtime_dir);
+		for (size_t i = 0; i < 10; ++i) {
+			std::string base = "discord-ipc-" + std::to_string(i);
+			try {
+				if (!std::filesystem::exists(base))
+					std::filesystem::create_symlink("app/com.discordapp.Discord/" + base, base);
+			} catch (const std::filesystem::filesystem_error &) { /* Necessary for some reason */ }
+		}
+		std::filesystem::current_path(old_cwd);
+	}
+
 	std::filesystem::current_path(".var/app/gay.heimskr.Game3/data");
 	if (!std::filesystem::exists("resources"))
 		std::filesystem::create_symlink(Game3::dataRoot / "resources", "resources");
