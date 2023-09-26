@@ -106,6 +106,7 @@ namespace Game3 {
 			std::unordered_set<TileID> unmarchableCache;
 			std::optional<std::vector<TileID>> brightCache;
 
+		friend void splitter();
 		friend Tileset stitcher(const std::filesystem::path &, Identifier);
 	};
 

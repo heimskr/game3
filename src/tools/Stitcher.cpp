@@ -28,19 +28,38 @@ namespace Game3 {
 		std::unordered_map<std::string, std::unique_ptr<uint8_t[], FreeDeleter>> images;
 
 		Tileset out(std::move(tileset_name));
+		out.tileSize = 16;
 
 		for (const std::filesystem::path &dir: dirs) {
 			nlohmann::json json = nlohmann::json::parse(readFile(dir / "tile.json"));
-			std::string name = dir.filename();
 			std::filesystem::path png_path = dir / "tile.png";
+			std::string name = dir.filename();
+
 			int width{}, height{}, channels{};
 			images.emplace(name, stbi_load(png_path.c_str(), &width, &height, &channels, 4));
+
 			int desired_dimension = 16;
 			if (auto autotile = json.find("autotile"); autotile != json.end()) {
 				autotiles.emplace(*autotile, name);
 				desired_dimension = 64;
 			} else
 				non_autotiles.insert(name);
+
+			Identifier tilename = json.at("tilename");
+
+			if (json.at("solid").get<bool>())
+				out.solid.insert(tilename);
+
+			if (json.at("land").get<bool>())
+				out.land.insert(tilename);
+
+			if (auto categories = json.find("categories"); categories != json.end()) {
+				for (const nlohmann::json &category_json: *categories) {
+					Identifier category{category_json};
+					out.categories[category].insert(tilename);
+					out.inverseCategories[tilename].insert(std::move(category));
+				}
+			}
 
 			json_map[name] = std::move(json);
 
@@ -76,9 +95,11 @@ namespace Game3 {
 		// In pixels.
 		size_t x_index = 0;
 		size_t y_index = 0;
+		size_t tile_index = 0;
 
 		const auto next = [&](size_t x_increment) {
 			x_index += x_increment;
+			tile_index += x_increment / 16;
 			if (x_index == dimension) {
 				x_index = 0;
 				y_index += 16;
@@ -101,6 +122,9 @@ namespace Game3 {
 				}
 			}
 
+			Identifier tilename = json_map.at(name).at("tilename");
+			out.ids[tilename] = tile_index;
+			out.names[tile_index] = std::move(tilename);
 			next(256);
 		}
 
@@ -112,9 +136,14 @@ namespace Game3 {
 			next(16);
 		}
 
-		stbi_write_png_to_func(+[](void *, void *data, int size) {
-			std::cout << std::string_view(reinterpret_cast<const char *>(data), size);
-		}, nullptr, dimension, dimension, 4, raw.get(), dimension * 4);
+		std::stringstream ss;
+
+		stbi_write_png_to_func(+[](void *context, void *data, int size) {
+			std::stringstream &ss = *reinterpret_cast<std::stringstream *>(context);
+			ss << std::string_view(reinterpret_cast<const char *>(data), size);
+		}, &ss, dimension, dimension, 4, raw.get(), dimension * 4);
+
+		std::cout << ss.str();
 
 		return out;
 	}

@@ -1,1 +1,1 @@
-{"categories":["base:category/wooden_walls"],"land":false,"marchable":{"corner":"base:tile/wall_se","offset":[6,0]},"solid":true,"tilename":"base:tile/wall_w"}
+{"categories":["base:category/wooden_walls"],"land":false,"marchable":{"corner":"base:tile/wall_se","offset":[6,0]},"solid":true,"stack":"base:item/wooden_wall","tilename":"base:tile/wall_w"}

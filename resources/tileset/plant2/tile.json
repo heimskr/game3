@@ -1,1 +1,1 @@
-{"categories":["base:category/plants"],"land":false,"solid":true,"tilename":"base:tile/plant2"}
+{"categories":["base:category/plants"],"land":false,"solid":true,"stack":"base:item/plant_pot2","tilename":"base:tile/plant2"}

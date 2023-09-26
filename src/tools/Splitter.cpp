@@ -37,6 +37,8 @@ namespace Game3 {
 			for (const auto &name: tileset.getTilesByCategory(category))
 				march[name] = corner;
 
+		std::set<Identifier> has_stack;
+
 		for (const auto &[name, id]: tileset.getIDs()) {
 			const int tileset_x = (id % 32) * 16;
 			const int tileset_y = (id / 32) * 16;
@@ -66,11 +68,23 @@ namespace Game3 {
 				meta["marchable"]["offset"] = std::make_pair(offset_x, offset_y);
 			}
 
-			for (const auto &category: tileset.getCategories(name))
+			for (const auto &category: tileset.getCategories(name)) {
 				meta["categories"].push_back(category);
+				if (auto stack_name_iter = tileset.stackCategories.find(category); stack_name_iter != tileset.stackCategories.end())
+					meta["stack"] = stack_name_iter->second;
+			}
+
+			if (auto stack_name_iter = tileset.stackNames.find(name); stack_name_iter != tileset.stackNames.end())
+				meta["stack"] = stack_name_iter->second;
+
+			if (meta.contains("stack"))
+				has_stack.insert(name);
 
 			std::ofstream of(dirname + "/tile.json");
 			of << meta.dump();
 		}
+
+		for (const Identifier &name: has_stack)
+			std::cout << name << '\n';
 	}
 }
