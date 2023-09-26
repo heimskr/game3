@@ -183,9 +183,9 @@ namespace Game3 {
 		texture->alpha = true;
 		texture->filter = GL_NEAREST;
 		texture->format = GL_RGBA;
-		texture->init(std::move(raw));
 		texture->width = dimension;
 		texture->height = dimension;
+		texture->init(std::move(raw));
 
 		out.cachedTexture = std::move(texture);
 

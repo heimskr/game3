@@ -43,7 +43,7 @@ namespace Game3 {
 	void Texture::init(std::shared_ptr<uint8_t[]> new_data) {
 		if (!valid) {
 			data = std::move(new_data);
-			glGenTextures(1, &id);
+			glGenTextures(1, &id); CHECKGL
 			glBindTexture(GL_TEXTURE_2D, id); CHECKGL
 			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data.get()); CHECKGL
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); CHECKGL
