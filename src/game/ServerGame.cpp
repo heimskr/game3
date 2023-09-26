@@ -492,6 +492,29 @@ namespace Game3 {
 				return {true, "Teleported."};
 			}
 
+			if (first == "texture") {
+				if (words.size() != 1 && words.size() != 2)
+					return {false, "Invalid number of arguments."};
+
+				Identifier choice;
+
+				if (words.size() < 2)
+					choice = "base:entity/player";
+				else if (words[1].find(':') != std::string_view::npos)
+					choice = words[1];
+				else
+					choice = Identifier("base:entity/" + std::string(words[1]));
+
+				auto &textures = registry<EntityTextureRegistry>();
+				if (!textures.contains(choice))
+					return {false, "Invalid entity texture."};
+
+				player->changeTexture(choice);
+				player->sendToVisible();
+				player->sendTo(*player->toServer()->getClient());
+				return {true, "Changed texture to " + choice.str() + "."};
+			}
+
 		} catch (const std::exception &err) {
 			return {false, err.what()};
 		}

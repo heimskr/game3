@@ -163,6 +163,7 @@ namespace Game3 {
 			virtual void decode(Buffer &);
 
 			void sendTo(RemoteClient &, UpdateCounter threshold = 0);
+			void sendToVisible();
 
 			template <template <typename...> typename T>
 			T<Direction> copyPath() {

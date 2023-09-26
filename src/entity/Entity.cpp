@@ -95,6 +95,8 @@ namespace Game3 {
 			json["heldLeft"] = heldLeft.slot;
 		if (0 <= heldRight.slot)
 			json["heldRight"] = heldRight.slot;
+		if (customTexture)
+			json["customTexture"] = customTexture;
 	}
 
 	void Entity::absorbJSON(Game &game, const nlohmann::json &json) {
@@ -125,6 +127,8 @@ namespace Game3 {
 			heldLeft.slot = *iter;
 		if (auto iter = json.find("heldRight"); iter != json.end())
 			heldRight.slot = *iter;
+		if (auto iter = json.find("customTexture"); iter != json.end())
+			customTexture = *iter;
 
 		increaseUpdateCounter();
 	}
@@ -918,8 +922,6 @@ namespace Game3 {
 		buffer >> customTexture;
 		if (customTexture)
 			changeTexture(customTexture);
-		else
-			texture = getTexture();
 
 		setHeldLeft(left_slot);
 		setHeldRight(right_slot);
@@ -932,6 +934,13 @@ namespace Game3 {
 			client.send(EntityPacket(getSelf()));
 			onSend(client.getPlayer());
 		}
+	}
+
+	void Entity::sendToVisible() {
+		auto lock = visiblePlayers.sharedLock();
+		for (const auto &weak_player: visiblePlayers)
+			if (PlayerPtr player = weak_player.lock())
+				sendTo(*player->toServer()->getClient());
 	}
 
 	bool Entity::setHeld(Slot new_value, Held &held) {
@@ -1037,6 +1046,7 @@ namespace Game3 {
 		auto entity_texture = game_ref.registry<EntityTextureRegistry>().at(identifier);
 		variety = entity_texture->variety;
 		texture = game_ref.registry<TextureRegistry>().at(entity_texture->textureID);
+		customTexture = identifier;
 	}
 
 	void to_json(nlohmann::json &json, const Entity &entity) {
