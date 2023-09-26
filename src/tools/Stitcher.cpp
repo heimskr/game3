@@ -28,7 +28,8 @@ namespace Game3 {
 		std::unordered_map<std::string, std::unique_ptr<uint8_t[], FreeDeleter>> images;
 
 		Tileset out(std::move(tileset_name));
-		out.tileSize = 16;
+		constexpr size_t tilesize = 16;
+		out.tileSize = tilesize;
 
 		for (const std::filesystem::path &dir: dirs) {
 			nlohmann::json json = nlohmann::json::parse(readFile(dir / "tile.json"));
@@ -88,7 +89,7 @@ namespace Game3 {
 		if (16 < effective_autotile_sets)
 			dimension = size_t(std::pow(2, std::ceil(std::log2(std::ceil(std::sqrt(16 * effective_autotile_sets))))));
 		// Each tile is 16 pixels by 16 pixels.
-		dimension *= 16;
+		dimension *= tilesize;
 
 		auto raw = std::make_unique<uint8_t[]>(dimension * dimension * 4); // 4 channels: RGBA
 
@@ -99,10 +100,10 @@ namespace Game3 {
 
 		const auto next = [&](size_t x_increment) {
 			x_index += x_increment;
-			tile_index += x_increment / 16;
+			tile_index += x_increment / tilesize;
 			if (x_index == dimension) {
 				x_index = 0;
-				y_index += 16;
+				y_index += tilesize;
 			}
 		};
 
@@ -110,13 +111,13 @@ namespace Game3 {
 			const auto &source = images.at(name);
 			for (size_t row = 0; row < 4; ++row) {
 				for (size_t column = 0; column < 4; ++column) {
-					for (size_t y = 0; y < 16; ++y) {
-						for (size_t x = 0; x < 16; ++x) {
-							const size_t source_x = 16 * column + x;
-							const size_t source_y = 16 * row + y;
-							const size_t destination_x = (4 * row + column) * 16 + x + x_index;
+					for (size_t y = 0; y < tilesize; ++y) {
+						for (size_t x = 0; x < tilesize; ++x) {
+							const size_t source_x = tilesize * column + x;
+							const size_t source_y = tilesize * row + y;
+							const size_t destination_x = (4 * row + column) * tilesize + x + x_index;
 							const size_t destination_y = y + y_index;
-							std::memcpy(&raw[4 * (destination_x + destination_y * dimension)], &source[4 * (source_x + 64 * source_y)], 4 * sizeof(uint8_t));
+							std::memcpy(&raw[4 * (destination_x + destination_y * dimension)], &source[4 * (source_x + 4 * tilesize * source_y)], 4 * sizeof(uint8_t));
 						}
 					}
 				}
@@ -125,15 +126,15 @@ namespace Game3 {
 			Identifier tilename = json_map.at(name).at("tilename");
 			out.ids[tilename] = tile_index;
 			out.names[tile_index] = std::move(tilename);
-			next(256);
+			next(16 * tilesize);
 		}
 
 		for (const auto &name: non_autotiles) {
 			const auto &source = images.at(name);
-			for (size_t y = 0; y < 16; ++y)
-				for (size_t x = 0; x < 16; ++x)
-					std::memcpy(&raw[4 * (x_index + x + dimension * (y_index + y))], &source[4 * (16 * y + x)], 4 * sizeof(uint8_t));
-			next(16);
+			for (size_t y = 0; y < tilesize; ++y)
+				for (size_t x = 0; x < tilesize; ++x)
+					std::memcpy(&raw[4 * (x_index + x + dimension * (y_index + y))], &source[4 * (tilesize * y + x)], 4 * sizeof(uint8_t));
+			next(tilesize);
 		}
 
 		std::stringstream ss;
