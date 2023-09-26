@@ -510,6 +510,7 @@ namespace Game3 {
 					return {false, "Invalid entity texture."};
 
 				player->changeTexture(choice);
+				player->increaseUpdateCounter();
 				player->sendToVisible();
 				player->sendTo(*player->toServer()->getClient());
 				return {true, "Changed texture to " + choice.str() + "."};
