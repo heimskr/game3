@@ -1,1 +1,1 @@
-{"categories":["base:category/fluid_pipes"],"land":false,"marchable":{"corner":"base:tile/fluid_pipe_se","offset":[1,3]},"solid":false,"tilename":"base:tile/fluid_pipe"}
+{"categories":["base:category/pipes","base:category/fluid_pipes"],"land":false,"solid":false,"tilename":"base:tile/fluid_pipe","autotile":"base:autotile/fluid_pipes"}

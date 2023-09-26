@@ -1,1 +1,1 @@
-{"categories":["base:category/pipes","base:category/item_pipes"],"land":false,"marchable":{"corner":"base:tile/item_pipe_se","offset":[1,3]},"solid":false,"tilename":"base:tile/item_pipe"}
+{"categories":["base:category/pipes","base:category/item_pipes"],"land":false,"solid":false,"tilename":"base:tile/item_pipe","autotile":"base:autotile/item_pipes"}

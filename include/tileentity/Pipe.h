@@ -46,9 +46,9 @@ namespace Game3 {
 		friend class PipeLoader;
 
 		private:
-			static Identifier ItemCorner()   { return {"base", "tile/item_pipe_se"};   }
-			static Identifier FluidCorner()  { return {"base", "tile/fluid_pipe_se"};  }
-			static Identifier EnergyCorner() { return {"base", "tile/energy_pipe_se"}; }
+			static Identifier ItemCorner()   { return {"base", "tile/item_pipe"};   }
+			static Identifier FluidCorner()  { return {"base", "tile/fluid_pipe"};  }
+			static Identifier EnergyCorner() { return {"base", "tile/energy_pipe"}; }
 			static Identifier Corner(PipeType);
 
 			static Identifier ItemExtractorsCorner()   { return {"base", "tile/item_extractors_"};   }

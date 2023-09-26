@@ -63,7 +63,7 @@ namespace Game3 {
 		RealmPtr realm = getRealm();
 		Tileset &tileset = realm->getTileset();
 		const int8_t march_index = directions[pipe_type].getMarchIndex();
-		tileIDs[pipe_type] = tileset[Corner(pipe_type)] + tileset.columnCount(realm->getGame()) * (march_index / 7) + march_index % 7;
+		tileIDs[pipe_type] = tileset[Corner(pipe_type)] + march_index;
 	}
 
 	void Pipe::tick(Game &game, float delta) {

@@ -112,8 +112,9 @@ namespace Game3 {
 	}
 
 	int8_t Directions::getMarchIndex() const {
-		const int sum = (north? 1 : 0) | (west? 2 : 0) | (east? 4 : 0) | (south? 8 : 0);
-		return !middle || sum != 0? marchingArray4[sum] : 22;
+		const int sum = (north? 1 : 0) | (east? 2 : 0) | (south? 4 : 0) | (west? 8 : 0);
+		// return !middle || sum != 0? marchingArray4[sum] : 22;
+		return marchingArray4Alt[sum];
 	}
 
 	Buffer & operator+=(Buffer &buffer, const Directions &directions) {
