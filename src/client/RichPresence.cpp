@@ -81,20 +81,32 @@ namespace Game3 {
 		return true;
 	}
 
-	bool Discord::setActivityDetails(const char *new_details) {
+	bool Discord::setActivityDetails(const char *new_details, bool update) {
 		details = new_details;
 #ifndef NO_DISCORD
 		activity.SetDetails(new_details);
 #endif
-		return updateActivity();
+		return update? updateActivity() : true;
 	}
 
-	bool Discord::setActivityDetails(std::string new_details) {
+	bool Discord::setActivityDetails(std::string new_details, bool update) {
 		details = std::move(new_details);
 #ifndef NO_DISCORD
 		activity.SetDetails(details.c_str());
 #endif
-		return updateActivity();
+		return update? updateActivity() : true;
+	}
+
+	bool Discord::setActivityStartTime(std::chrono::system_clock::time_point when, bool update) {
+		startingTime = when;
+#ifndef NO_DISCORD
+		activity.GetTimestamps().SetStart(std::chrono::duration_cast<std::chrono::seconds>(when.time_since_epoch()).count());
+#endif
+		return update? updateActivity() : true;
+	}
+
+	bool Discord::setActivityStartTime(bool update) {
+		return setActivityStartTime(std::chrono::system_clock::now(), update);
 	}
 
 	const std::string & Discord::getDetails() const {

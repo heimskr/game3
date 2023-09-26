@@ -349,7 +349,8 @@ namespace Game3 {
 	}
 
 	void MainWindow::onGameLoaded() {
-		richPresence.setActivityDetails("Playing");
+		richPresence.setActivityStartTime(false);
+		richPresence.setActivityDetails("Playing", true);
 
 		glArea.get_context()->make_current();
 		debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
