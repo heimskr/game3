@@ -9,7 +9,7 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include "Log.h"
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "game/ClientGame.h"
 #include "graphics/TextRenderer.h"
 #include "realm/Realm.h"

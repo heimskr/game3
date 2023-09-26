@@ -4,7 +4,7 @@
 #include "Log.h"
 #include "Position.h"
 #include "Quadrant.h"
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/Inventory.h"
 #include "game/ServerGame.h"

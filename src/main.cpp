@@ -6,9 +6,11 @@
 #include "net/Sock.h"
 #include "tools/Flasker.h"
 #include "tools/Migrator.h"
+#include "tools/Stitcher.h"
 #include "util/Crypto.h"
 #include "util/FS.h"
 #include "util/Timer.h"
+#include "util/Util.h"
 
 #include <cstdlib>
 #include <ctime>
@@ -79,6 +81,20 @@ int main(int argc, char **argv) {
 
 		if (strcmp(argv[1], "--split") == 0) {
 			Game3::splitter();
+			return 0;
+		}
+
+		if (strcmp(argv[1], "--stitch") == 0) {
+			if (argc == 3) {
+				const auto count = Game3::parseNumber<size_t>(argv[2]);
+				size_t dimension = 16;
+				if (16 < count)
+					dimension = 4 * size_t(std::pow(2, std::ceil(std::log2(std::ceil(std::sqrt(count))))));
+				std::cout << count << " → " << dimension << 'x' << dimension << '\n';
+				return 0;
+			}
+
+			Game3::stitcher("resources/tileset", "base:tileset/monomap");
 			return 0;
 		}
 

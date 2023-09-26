@@ -1,6 +1,6 @@
 #include "Log.h"
 #include "MarchingSquares.h"
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "biome/Biome.h"
 #include "entity/ClientPlayer.h"
 #include "entity/Entity.h"

@@ -1,5 +1,5 @@
 #include "threading/ThreadContext.h"
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "biome/Biome.h"
 #include "biome/Grassland.h"
 #include "game/Game.h"

@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "Log.h"
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "realm/Cave.h"

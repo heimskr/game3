@@ -1,6 +1,6 @@
 #include "tools/Flasker.h"
 #include "Log.h"
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "util/FS.h"
 #include "util/Util.h"
 
@@ -40,16 +40,15 @@ namespace Game3 {
 		for (const auto &[name, id]: tileset.getIDs()) {
 			const int tileset_x = (id % 32) * 16;
 			const int tileset_y = (id / 32) * 16;
-			auto raw_tile = std::make_unique<uint8_t[]>(256);
+			auto raw_tile = std::make_unique<uint8_t[]>(16 * 16 * channels);
 			for (size_t y = 0; y < 16; ++y)
 				for (size_t x = 0; x < 16; ++x)
-					for (int b = 0; b < channels; b++)
+					for (int b = 0; b < channels; ++b)
 						raw_tile[(y * 16 + x) * channels + b] = raw_tiles[(tileset_x + x + (tileset_y + y) * width) * channels + b];
 			std::string dirname = "split/" + name.name.substr(5);
 			std::string tilename = dirname + "/tile.png";
 			std::filesystem::create_directories(dirname);
 			stbi_write_png(tilename.c_str(), 16, 16, 4, raw_tile.get(), 16 * 4);
-			std::ofstream of(dirname + "/tile.json");
 
 			nlohmann::json meta;
 			meta["tilename"] = name;
@@ -70,6 +69,7 @@ namespace Game3 {
 			for (const auto &category: tileset.getCategories(name))
 				meta["categories"].push_back(category);
 
+			std::ofstream of(dirname + "/tile.json");
 			of << meta.dump();
 		}
 	}

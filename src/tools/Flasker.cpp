@@ -174,11 +174,11 @@ namespace Game3 {
 		if (channels != 4)
 			throw std::runtime_error("Unexpected number of channels (" + std::to_string(channels) + "; expected 4)");
 
-		auto raw = std::make_unique<uint8_t[]>(width * height * 4);
+		auto raw = std::make_unique<uint8_t[]>(width * height * channels);
 
 		for (int i = 0; i < width * height * channels; i += channels) {
 			if (mask[i] == 0) {
-				for (int j = 0; j < 4; ++j)
+				for (int j = 0; j < channels; ++j)
 					raw[i + j] = base[i + j];
 				continue;
 			}

@@ -1,5 +1,5 @@
 #include "Position.h"
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/Inventory.h"
 #include "item/Pickaxe.h"

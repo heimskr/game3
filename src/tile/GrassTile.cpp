@@ -1,6 +1,6 @@
 #include "Log.h"
 #include "Position.h"
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "entity/ItemEntity.h"
 #include "realm/Realm.h"
 #include "threading/ThreadContext.h"

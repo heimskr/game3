@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "threading/ThreadContext.h"
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "entity/Miner.h"
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"

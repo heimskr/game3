@@ -8,7 +8,7 @@
 #include "util/Timer.h"
 #include "util/Util.h"
 
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 
 namespace Game3 {
 	Canvas::Canvas(MainWindow &window_): window(window_) {

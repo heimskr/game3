@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "item/Item.h"
 #include "tileentity/TileEntity.h"
 

@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "game/ClientGame.h"
 #include "graphics/SpriteRenderer.h"
 #include "realm/Realm.h"

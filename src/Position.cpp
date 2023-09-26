@@ -1,5 +1,5 @@
 #include "Position.h"
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "util/Util.h"

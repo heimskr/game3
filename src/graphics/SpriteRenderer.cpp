@@ -8,7 +8,7 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include "Texture.h"
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "resources.h"
 #include "game/ClientGame.h"
 #include "graphics/GL.h"

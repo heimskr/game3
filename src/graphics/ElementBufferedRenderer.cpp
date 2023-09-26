@@ -9,7 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "resources.h"
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "container/Quadtree.h"
 #include "game/ClientGame.h"
 #include "game/Game.h"

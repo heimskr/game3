@@ -4,7 +4,7 @@
 
 #include "Log.h"
 #include "graphics/Shader.h"
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 
 #include "client/RichPresence.h"
 #include "entity/ClientPlayer.h"

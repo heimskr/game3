@@ -1,6 +1,6 @@
 #include "Log.h"
 #include "Position.h"
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "data/Identifier.h"
 #include "entity/Entity.h"
 #include "entity/EntityFactory.h"

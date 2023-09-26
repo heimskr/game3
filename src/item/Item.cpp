@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "Texture.h"
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "entity/ItemEntity.h"
 #include "game/Game.h"
 #include "item/HasMaxDurability.h"

@@ -1,5 +1,5 @@
 #include "Log.h"
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "game/ClientGame.h"
 #include "packet/RealmNoticePacket.h"
 #include "realm/Realm.h"

@@ -1,5 +1,5 @@
 #include "Log.h"
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "game/EnergyContainer.h"
 #include "game/Game.h"
 #include "graphics/SpriteRenderer.h"

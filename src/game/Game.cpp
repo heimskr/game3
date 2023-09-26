@@ -4,7 +4,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "command/local/ChemicalCommand.h"
 #include "command/local/LocalCommandFactory.h"
 #include "command/local/LoginCommand.h"

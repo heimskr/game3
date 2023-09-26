@@ -10,7 +10,7 @@
 
 #include "Log.h"
 #include "resources.h"
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "container/Quadtree.h"
 #include "game/Game.h"
 #include "graphics/FluidRenderer.h"

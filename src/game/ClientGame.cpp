@@ -1,6 +1,6 @@
 #include "Log.h"
 #include "threading/ThreadContext.h"
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "command/local/LocalCommandFactory.h"
 #include "entity/ClientPlayer.h"
 #include "entity/EntityFactory.h"

@@ -1,5 +1,5 @@
 #include "MarchingSquares.h"
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "entity/EntityFactory.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"

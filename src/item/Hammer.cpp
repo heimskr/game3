@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "Position.h"
-#include "Tileset.h"
+#include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
