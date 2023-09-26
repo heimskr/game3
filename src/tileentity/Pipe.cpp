@@ -84,9 +84,8 @@ namespace Game3 {
 
 		Game &game = realm->getGame();
 
-		const auto tilesize     = tileset.getTileSize();
-		const auto texture      = tileset.getTexture(game);
-		const auto column_count = tileset.columnCount(game);
+		const auto tilesize = tileset.getTileSize();
+		const auto texture  = tileset.getTexture(game);
 
 		for (const PipeType pipe_type: reverse(PIPE_TYPES)) {
 			std::optional<TileID> &tile_id = tileIDs[pipe_type];
@@ -112,9 +111,8 @@ namespace Game3 {
 				});
 			}
 
-			const auto [extractors_x, extractors_y] = extractors[pipe_type].extractorOffsets();
-			if (extractors_x != 0 || extractors_y != 0) {
-				const TileID extractor_tile = *extractors_corner + extractors_x + extractors_y * column_count;
+			if (const auto extractors_march = extractors[pipe_type].getMarchIndex()) {
+				const TileID extractor_tile = *extractors_corner + extractors_march;
 				const float x = (extractor_tile % (texture->width / tilesize)) * tilesize;
 				const float y = (extractor_tile / (texture->width / tilesize)) * tilesize;
 				sprite_renderer(*texture, {
