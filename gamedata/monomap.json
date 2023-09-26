@@ -4,7 +4,8 @@
 		["after", "type", "base:texture_map"]
 	],
 	"data": [
-		["base:tileset_map", {
+		["base:tileset", "base:tileset/monomap", "resources/tileset"],
+		["base:ignore/manual_tileset_map", {
 			"base:tileset/monomap": {
 				"tileSize": 16,
 				"name": "Monomap",

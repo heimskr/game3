@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Texture.h"
+#include "graphics/Texture.h"
 #include "game/Inventory.h"
 #include "tileentity/InventoriedTileEntity.h"
 

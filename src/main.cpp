@@ -94,7 +94,9 @@ int main(int argc, char **argv) {
 				return 0;
 			}
 
-			Game3::stitcher("resources/tileset", "base:tileset/monomap");
+			std::string png;
+			Game3::stitcher("resources/tileset", "base:tileset/monomap", &png);
+			std::cout << png;
 			return 0;
 		}
 

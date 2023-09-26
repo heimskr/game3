@@ -2,7 +2,7 @@
 
 #include <nlohmann/json_fwd.hpp>
 
-#include "Texture.h"
+#include "graphics/Texture.h"
 #include "entity/Entity.h"
 #include "item/Item.h"
 

@@ -4,7 +4,7 @@
 
 #include "resources.h"
 #include "graphics/Shader.h"
-#include "Texture.h"
+#include "graphics/Texture.h"
 #include "graphics/GL.h"
 #include "graphics/Multiplier.h"
 #include "util/Util.h"

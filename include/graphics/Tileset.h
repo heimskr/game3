@@ -107,7 +107,7 @@ namespace Game3 {
 			std::optional<std::vector<TileID>> brightCache;
 
 		friend void splitter();
-		friend Tileset stitcher(const std::filesystem::path &, Identifier);
+		friend Tileset stitcher(const std::filesystem::path &, Identifier, std::string *);
 	};
 
 	using TilesetPtr = std::shared_ptr<Tileset>;

@@ -101,6 +101,8 @@ namespace Game3 {
 		                 0.f
 		             });
 
+		CHECKGL
+
 		shader.bind();
 		vao.bind();
 		vbo.bind();

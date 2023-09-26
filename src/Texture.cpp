@@ -1,8 +1,8 @@
 // Credit: https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/3.2d_game/0.full_source/texture.cpp
 #include "config.h"
 #include "Log.h"
-#include "Texture.h"
 #include "graphics/GL.h"
+#include "graphics/Texture.h"
 #include "util/Util.h"
 
 #include <csignal>
@@ -20,8 +20,8 @@
 namespace Game3 {
 	static constexpr GLint DEFAULT_FILTER = GL_NEAREST;
 
-	Texture::Texture():
-		NamedRegisterable(Identifier()) {}
+	Texture::Texture(Identifier identifier_):
+		NamedRegisterable(std::move(identifier_)) {}
 
 	Texture::Texture(Identifier identifier_, std::filesystem::path path_, bool alpha_, int filter_):
 		NamedRegisterable(std::move(identifier_)),
@@ -44,13 +44,13 @@ namespace Game3 {
 		if (!valid) {
 			data = std::move(new_data);
 			glGenTextures(1, &id);
-			glBindTexture(GL_TEXTURE_2D, id);
-			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data.get());
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
-			glBindTexture(GL_TEXTURE_2D, 0);
+			glBindTexture(GL_TEXTURE_2D, id); CHECKGL
+			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data.get()); CHECKGL
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); CHECKGL
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); CHECKGL
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter); CHECKGL
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter); CHECKGL
+			glBindTexture(GL_TEXTURE_2D, 0); CHECKGL
 			valid = true;
 		}
 	}

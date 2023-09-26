@@ -8,7 +8,7 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include "Position.h"
-#include "Texture.h"
+#include "graphics/Texture.h"
 #include "Types.h"
 
 namespace Game3 {

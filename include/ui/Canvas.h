@@ -7,7 +7,7 @@
 
 #include "resources.h"
 #include "Position.h"
-#include "Texture.h"
+#include "graphics/Texture.h"
 #include "Types.h"
 #include "graphics/GL.h"
 #include "graphics/Multiplier.h"

@@ -1,7 +1,7 @@
 {
 	"name": "base_crops",
 	"dependencies": [
-		["after", "type", "base:tileset_map"]
+		["after", "type", "base:tileset"]
 	],
 	"data": [
 		["base:crop_map", {

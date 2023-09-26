@@ -782,7 +782,18 @@ namespace Game3 {
 						game->player->focus(*canvas, false);
 					return;
 				case GDK_KEY_t:
-					std::cout << "Time: " << int(game->getHour()) << ':' << int(game->getMinute()) << '\n';
+					if (Modifiers(modifiers).ctrl) {
+						RealmPtr realm = game->player->getRealm();
+						const auto &chunk = realm->tileProvider.getTileChunk(Layer::Terrain, game->player->getChunk());
+						auto lock = chunk.sharedLock();
+						for (size_t row = 0; row < CHUNK_SIZE; ++row) {
+							for (size_t column = 0; column < CHUNK_SIZE; ++column)
+								std::cout << std::setw(4) << std::right << chunk.at(row * CHUNK_SIZE + column);
+							std::cout << '\n';
+						}
+					} else {
+						std::cout << "Time: " << int(game->getHour()) << ':' << int(game->getMinute()) << '\n';
+					}
 					return;
 				case GDK_KEY_T: {
 					auto realm = game->player->getRealm();

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Texture.h"
+#include "graphics/Texture.h"
 #include "tileentity/EnergeticTileEntity.h"
 #include "tileentity/FluidHoldingTileEntity.h"
 #include "tileentity/InventoriedTileEntity.h"

@@ -18,7 +18,7 @@ namespace Game3 {
 			std::filesystem::path path;
 			std::shared_ptr<uint8_t[]> data;
 
-			Texture();
+			Texture(Identifier = {});
 			Texture(Identifier, std::filesystem::path, bool alpha_ = true, int filter_ = -1);
 
 			Texture(const Texture &) = default;

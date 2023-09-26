@@ -136,6 +136,7 @@
 #include "tileentity/TileEntity.h"
 #include "tileentity/TileEntityFactory.h"
 #include "tileentity/Tree.h"
+#include "tools/Stitcher.h"
 #include "ui/module/ChemicalReactorModule.h"
 #include "ui/module/ExternalInventoryModule.h"
 #include "ui/module/EnergyLevelModule.h"
@@ -715,7 +716,14 @@ namespace Game3 {
 					throw std::invalid_argument("Expected Texture JSON size to be 1, 2 or 3, not " + std::to_string(value.size()));
 			}
 
-		} else if (type == "base:tileset_map"_id) {
+		} else if (type == "base:tileset"_id) {
+
+			Identifier identifier = json.at(1);
+			std::filesystem::path base_dir = json.at(2);
+			auto &tilesets = registry<TilesetRegistry>();
+			tilesets.add(identifier, stitcher(base_dir, identifier));
+
+		} else if (type == "base:manual_tileset_map"_id) { // Deprecated.
 
 			auto &tilesets = registry<TilesetRegistry>();
 			for (const auto &[key, value]: json.at(1).items())
@@ -743,6 +751,10 @@ namespace Game3 {
 			auto &crops = registry<CropRegistry>();
 			for (const auto &[key, value]: json.at(1).items())
 				crops.add(Identifier(key), Crop(Identifier(key), *this, value));
+
+		} else if (type.getPathStart() == "ignore") {
+
+			// For old data that isn't ready to be removed yet.
 
 		} else
 			throw std::runtime_error("Unknown data file type: " + type.str());

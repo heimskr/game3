@@ -5,7 +5,7 @@
 
 #include "Direction.h"
 #include "Position.h"
-#include "Texture.h"
+#include "graphics/Texture.h"
 #include "Types.h"
 #include "container/WeakSet.h"
 #include "game/Agent.h"

@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "Texture.h"
+#include "graphics/Texture.h"
 #include "graphics/Tileset.h"
 #include "entity/ItemEntity.h"
 #include "game/Game.h"

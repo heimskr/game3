@@ -7,7 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-#include "Texture.h"
+#include "graphics/Texture.h"
 #include "graphics/Tileset.h"
 #include "resources.h"
 #include "game/ClientGame.h"

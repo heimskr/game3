@@ -94,6 +94,7 @@ namespace Game3 {
 	}
 
 	void Shader::bind() {
+		CHECKGL
 		if (handle == 0)
 			throw std::runtime_error("Can't bind uninitialized shader");
 		glUseProgram(handle); CHECKGL
