@@ -1,7 +1,9 @@
 #include "data/GameDB.h"
 #include "entity/EntityFactory.h"
 #include "entity/Player.h"
+#include "error/FailedMigrationError.h"
 #include "game/Game.h"
+#include "graphics/Tileset.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "tileentity/TileEntity.h"
@@ -10,6 +12,7 @@
 #include "util/Timer.h"
 #include "util/Util.h"
 
+#include <filesystem>
 #include <iomanip>
 #include <sstream>
 
@@ -71,6 +74,16 @@ namespace Game3 {
 				direction TINYINT(1),
 				encoded MEDIUMBLOB
 			);
+
+			CREATE TABLE IF NOT EXISTS realmTileMaps (
+				realmID INT PRIMARY KEY,
+				value MEDIUMTEXT
+			);
+
+			CREATE TABLE IF NOT EXISTS realmTilesetHashes (
+				realmID INT PRIMARY KEY,
+				value VARCHAR(128)
+			);
 		)");
 	}
 
@@ -104,6 +117,14 @@ namespace Game3 {
 		{
 			Timer timer{"WriteEntities"};
 			writeEntities(realm, false);
+		}
+		{
+			Timer timer{"WriteTileMap"};
+			writeRealmTileMap(realm->id, realm->getTileset().getNames(), false);
+		}
+		{
+			Timer timer{"WriteTilesetHash"};
+			writeRealmTilesetHash(realm->id, realm->getTileset().getHash(), false);
 		}
 
 		Timer timer{"WriteRealmCommit"};
@@ -220,6 +241,59 @@ namespace Game3 {
 			}
 			query_timer.restart();
 		}
+
+		const bool force_migrate = std::filesystem::exists(".force-migrate");
+		if (force_migrate)
+			std::filesystem::remove(".force-migrate");
+
+		game.iterateRealms([&](const RealmPtr &realm) {
+			Tileset &tileset = realm->getTileset();
+
+			if (tileset.getHash() == readRealmTilesetHash(realm->id, false))
+				return;
+
+			INFO("Auto-migrating tiles for realm " << realm->id);
+
+			Timer migration_timer{"TileMigration"};
+			std::unordered_map<TileID, TileID> migration_map;
+
+			const std::unordered_map<TileID, Identifier> old_map = readRealmTileMap<std::unordered_map>(realm->id, false);
+			const std::unordered_map<Identifier, TileID> new_map = tileset.getIDs();
+
+			for (const auto &[numeric, identifier]: old_map)
+				if (auto new_tile_iter = new_map.find(identifier); new_tile_iter != new_map.end())
+					migration_map[numeric] = new_tile_iter->second;
+
+			TileProvider &provider = realm->tileProvider;
+			std::unordered_set<TileID> covered;
+			std::unordered_set<TileID> warned;
+
+			for (const Layer layer: allLayers) {
+				std::unique_lock chunk_map_lock{provider.chunkMutexes.at(getIndex(layer))};
+				TileProvider::ChunkMap &chunk_map = provider.chunkMaps.at(getIndex(layer));
+				for (auto &[chunk_position, chunk]: chunk_map) {
+					std::unique_lock chunk_lock = chunk.uniqueLock();
+					for (TileID &tile_id: chunk) {
+						const TileID old = tile_id;
+						if (auto iter = migration_map.find(tile_id); iter != migration_map.end()) {
+							tile_id = iter->second;
+							if (tile_id != old && covered.insert(old).second)
+								INFO(old_map.at(old) << " (" << old << ") → " << tileset.getNames().at(tile_id) << " (" << tile_id << ')');
+						} else if (force_migrate) {
+							if (warned.insert(old).second)
+								WARN("Replacing tile " << old_map.at(old) << " (" << old << ") with nothing.");
+							tile_id = 0;
+						} else {
+							Identifier tilename = old_map.at(old);
+							ERROR("Canceling tile migration; tile " << tilename << " (" << old << ") is missing from the new tileset. Create .force-migrate to force migration.");
+							throw FailedMigrationError("Migration failed due to missing tile " + tilename.str() + " (" + std::to_string(old) + ')');
+						}
+					}
+				}
+			}
+
+			SUCCESS("Finished tile migration for realm " << realm->id);
+		});
 	}
 
 	RealmPtr GameDB::loadRealm(RealmID realm_id, bool do_lock) {
@@ -511,6 +585,42 @@ namespace Game3 {
 		statement.bind(1, std::make_signed_t<GlobalID>(entity->getGID()));
 		statement.exec();
 		transaction.commit();
+	}
+
+	std::string GameDB::readRealmTilesetHash(RealmID realm_id, bool do_lock) {
+		assert(database);
+
+		std::unique_lock<std::shared_mutex> db_lock;
+		if (do_lock)
+			db_lock = database.uniqueLock();
+
+		SQLite::Statement query{*database, "SELECT value FROM realmTilesetHashes WHERE realmID = ? LIMIT 1"};
+
+		query.bind(1, realm_id);
+
+		while (query.executeStep())
+			return query.getColumn(0).getString();
+
+		throw std::out_of_range("Can't find tileset hash for realm " + std::to_string(realm_id));
+	}
+
+	void GameDB::writeRealmTilesetHash(RealmID realm_id, const std::string &hash, bool use_transaction) {
+		assert(database);
+		auto db_lock = database.uniqueLock();
+
+		std::optional<SQLite::Transaction> transaction;
+		if (use_transaction)
+			transaction.emplace(*database);
+
+		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO realmTilesetHashes VALUES (?, ?)"};
+
+		statement.bind(1, realm_id);
+		statement.bind(2, hash);
+
+		statement.exec();
+
+		if (use_transaction)
+			transaction->commit();
 	}
 
 	void GameDB::bind(SQLite::Statement &statement, const PlayerPtr &player) {

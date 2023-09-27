@@ -178,6 +178,10 @@ namespace Game3 {
 		return getTexture(game)->height / getTileSize();
 	}
 
+	void Tileset::setHash(std::string new_hash) {
+		hash = std::move(new_hash);
+	}
+
 	const TileID & Tileset::operator[](const Identifier &tilename) const {
 		return ids.at(tilename);
 	}

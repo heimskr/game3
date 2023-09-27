@@ -63,6 +63,7 @@ namespace Game3 {
 			inline auto getTileSize() const { return tileSize; }
 			size_t columnCount(const Game &);
 			size_t rowCount(const Game &);
+			void setHash(std::string);
 
 			const auto & getIDs()       const { return ids;          }
 			const auto & getNames()     const { return names;        }
