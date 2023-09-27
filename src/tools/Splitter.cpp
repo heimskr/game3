@@ -1,3 +1,4 @@
+#include "config.h"
 #include "tools/Flasker.h"
 #include "Log.h"
 #include "graphics/Tileset.h"

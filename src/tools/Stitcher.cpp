@@ -1,3 +1,4 @@
+#include "config.h"
 #include "Log.h"
 #include "graphics/GL.h"
 #include "graphics/Texture.h"
