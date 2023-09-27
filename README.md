@@ -30,10 +30,6 @@ If you'd like to contribute, here are some ideas, ordered roughly from easiest t
 - Make animals useful.
 	- For example, add a shears tool that can be used to get wool from sheep.
 	- Chickens could lay eggs periodically.
-- Add crops like cotton or wheat.
-	- They should each require three sprites: just planted, half grown and fully grown.
-	- They'll need to be tile entities, at least while not fully grown. Once grown, they can be replaced with a layer 2 tile, or left as tile entities; either works, but the former would be more efficient in terms of rendering cost and save file size.
-	- [Mini World](https://merchant-shade.itch.io/16x16-mini-world-sprites), which is used heavily in this game, should have wheat sprites already.
 - Add a plugin system similar to that of [Algiz](https://github.com/heimskr/algiz)
 	(see [PluginHost.cpp](https://github.com/heimskr/algiz/blob/master/src/PluginHost.cpp),
 	[PluginHost.h](https://github.com/heimskr/algiz/blob/master/include/plugins/PluginHost.h),
