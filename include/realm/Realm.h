@@ -149,8 +149,8 @@ namespace Game3 {
 			void setTile(Layer, Index row, Index column, TileID, bool run_helper = true);
 			void setTile(Layer, const Position &, TileID, bool run_helper = true);
 			void setTile(Layer, const Position &, const Identifier &, bool run_helper = true);
-			void setFluid(const Position &, FluidTile, bool run_helper = true);
-			void setFluid(const Position &, const Identifier &, FluidLevel, bool run_helper = true);
+			void setFluid(const Position &, FluidTile);
+			void setFluid(const Position &, const Identifier &, FluidLevel);
 			bool hasFluid(const Position &, FluidLevel minimum = 1);
 			TileID getTile(Layer, const Position &) const;
 			std::optional<TileID> tryTile(Layer, const Position &) const;
@@ -209,7 +209,7 @@ namespace Game3 {
 			inline bool isServer() const { return getSide() == Side::Server; }
 
 			virtual bool interactGround(const PlayerPtr &, const Position &, Modifiers);
-			virtual void updateNeighbors(const Position &);
+			virtual void updateNeighbors(const Position &, Layer layer);
 			/** Returns true iff something was done with the right click. */
 			virtual bool rightClick(const Position &, double x, double y);
 			/** Generates additional chunks for the infinite map after the initial worldgen of the realm. */
@@ -343,7 +343,7 @@ namespace Game3 {
 			void initRendererRealms();
 			void initRendererTileProviders();
 			bool isWalkable(Index row, Index column, const Tileset &);
-			void setLayerHelper(Index row, Index col, bool should_mark_dirty = true);
+			void setLayerHelper(Index row, Index col, Layer layer, bool should_mark_dirty = true);
 			ChunkPackets getChunkPackets(ChunkPosition);
 			void initEntity(const EntityPtr &, const Position &);
 

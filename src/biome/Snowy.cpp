@@ -40,7 +40,7 @@ namespace Game3 {
 
 		if (noise < wetness + 0.3) {
 			realm.setTile(Layer::Terrain, {row, column}, sand, false);
-			realm.setFluid({row, column}, water_fluid, FluidTile::INFINITE, false);
+			realm.setFluid({row, column}, water_fluid, FluidTile::INFINITE);
 		} else if (noise < wetness + 0.39) {
 			realm.setTile(Layer::Terrain, {row, column}, sand, false);
 		} else if (noise < wetness + 0.42) {

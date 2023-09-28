@@ -206,7 +206,8 @@ namespace Game3 {
 	void ServerGame::tileEntitySpawned(const TileEntityPtr &tile_entity) {
 		const TileEntityPacket packet(tile_entity);
 		auto realm = tile_entity->getRealm();
-		realm->updateNeighbors(tile_entity->getPosition());
+		realm->updateNeighbors(tile_entity->getPosition(), Layer::Submerged);
+		realm->updateNeighbors(tile_entity->getPosition(), Layer::Objects);
 		ChunkRange(tile_entity->getChunk()).iterate([&](ChunkPosition chunk_position) {
 			if (auto entities = realm->getEntities(chunk_position)) {
 				auto lock = entities->sharedLock();

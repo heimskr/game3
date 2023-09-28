@@ -123,7 +123,7 @@ namespace Game3::WorldGen {
 							constexpr double range = 0.05;
 							constexpr double start = -range / 2;
 							if (start <= river && river <= start + range) {
-								realm->setFluid({row, column}, "base:fluid/water"_id, FluidTile::INFINITE, false, true);
+								realm->setFluid({row, column}, "base:fluid/water"_id, FluidTile::INFINITE);
 							}
 #endif
 						}

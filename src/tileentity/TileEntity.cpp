@@ -102,7 +102,8 @@ namespace Game3 {
 	}
 
 	void TileEntity::updateNeighbors() const {
-		getRealm()->updateNeighbors(position);
+		getRealm()->updateNeighbors(position, Layer::Submerged);
+		getRealm()->updateNeighbors(position, Layer::Objects);
 	}
 
 	bool TileEntity::isVisible() const {
