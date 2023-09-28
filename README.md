@@ -1,3 +1,5 @@
+[![wakatime](https://wakatime.com/badge/github/heimskr/game3.svg)](https://wakatime.com/badge/github/heimskr/game3)
+
 # Game3
 A 2D game made with OpenGL. No engine because I'd prefer to do things my own way.
 
