@@ -828,8 +828,6 @@ namespace Game3 {
 
 		++threadContext.updateNeighborsDepth;
 
-		const Tileset &tileset = getTileset();
-
 		for (Index row_offset = -1; row_offset <= 1; ++row_offset) {
 			for (Index column_offset = -1; column_offset <= 1; ++column_offset) {
 				if (row_offset != 0 || column_offset != 0) {

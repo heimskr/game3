@@ -57,11 +57,15 @@ namespace Game3 {
 				}
 			}
 
+			if (auto stack = json.find("stack"); stack != json.end())
+				out.stackNames[tilename] = *stack;
+
 			json_map[name] = std::move(json);
 		}
 
 		if (std::filesystem::exists(base_dir / "tileset.json")) {
 			nlohmann::json tileset_meta = nlohmann::json::parse(readFile(base_dir / "tileset.json"));
+
 			if (auto autotiles_iter = tileset_meta.find("autotiles"); autotiles_iter != tileset_meta.end()) {
 				for (const auto &[autotile, member]: autotiles_iter->items()) {
 					const Identifier autotile_id{autotile};
@@ -76,6 +80,10 @@ namespace Game3 {
 					}
 				}
 			}
+
+			if (auto stacks = tileset_meta.find("stacks"); stacks != tileset_meta.end())
+				for (const auto &[category, stack]: stacks->items())
+					out.stackCategories[Identifier(category)] = stack;
 		}
 
 		for (const auto &[name, json]: json_map) {
