@@ -38,16 +38,10 @@ namespace Game3 {
 	}
 
 	TileID march4(const std::function<bool(int8_t, int8_t)> &get) {
-		const bool center = get(0, 0);
-		int sum = 0;
-		if (center) {
-			const uint8_t top    = get(-1,  0)? 1 : 0;
-			const uint8_t left   = get( 0, -1)? 1 : 0;
-			const uint8_t right  = get( 0,  1)? 1 : 0;
-			const uint8_t bottom = get( 1,  0)? 1 : 0;
-			sum = top + (left << 1) + (right << 2) + (bottom << 3);
-		}
-
-		return !center || sum != 0? marchingArray4.at(sum) : 22;
+		const uint8_t top    = get(-1,  0)? 1 : 0;
+		const uint8_t left   = get( 0, -1)? 2 : 0;
+		const uint8_t right  = get( 0,  1)? 4 : 0;
+		const uint8_t bottom = get( 1,  0)? 8 : 0;
+		return top | left | right | bottom;
 	}
 }

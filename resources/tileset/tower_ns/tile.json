@@ -1,1 +1,0 @@
-{"categories":["base:category/towers"],"land":false,"marchable":{"corner":"base:tile/tower_se","offset":[0,1]},"solid":true,"stack":"base:item/tower","tilename":"base:tile/tower_ns"}

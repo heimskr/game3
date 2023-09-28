@@ -1,1 +1,1 @@
-{"categories":["base:category/extractors","base:category/fluid_extractors"],"land":false,"solid":false,"tilename":"base:tile/fluid_extractors","autotile":"base:autotile/fluid_extractors"}
+{"autotile":true,"categories":["base:category/extractors","base:category/fluid_extractors"],"land":false,"solid":false,"tilename":"base:tile/fluid_extractors"}

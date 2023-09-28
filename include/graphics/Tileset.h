@@ -18,6 +18,11 @@ namespace Game3 {
 	class ItemStack;
 	class Texture;
 
+	struct AutotileSet {
+		Identifier identifier;
+		std::unordered_set<Identifier> members;
+	};
+
 	struct MarchableInfo {
 		/** The top-left corner of the set of marchable tiles. */
 		Identifier corner;
@@ -64,14 +69,16 @@ namespace Game3 {
 			size_t columnCount(const Game &);
 			size_t rowCount(const Game &);
 			void setHash(std::string);
+			std::shared_ptr<AutotileSet> getAutotileSet(const Identifier &) const;
 
-			const auto & getIDs()       const { return ids;          }
-			const auto & getNames()     const { return names;        }
-			const auto & getLand()      const { return land;         }
-			const auto & getWalkable()  const { return walkable;     }
-			const auto & getSolid()     const { return solid;        }
-			const auto & getMarchable() const { return marchableMap; }
-			const auto & getHash()      const { return hash;         }
+			const auto & getIDs()          const { return ids;          }
+			const auto & getNames()        const { return names;        }
+			const auto & getLand()         const { return land;         }
+			const auto & getWalkable()     const { return walkable;     }
+			const auto & getSolid()        const { return solid;        }
+			const auto & getMarchable()    const { return marchableMap; }
+			const auto & getHash()         const { return hash;         }
+			const auto & getAutotileSets() const { return autotileSets; }
 
 			const TileID & operator[](const Identifier &) const;
 			const Identifier & operator[](TileID) const;
@@ -83,6 +90,7 @@ namespace Game3 {
 
 		private:
 			Tileset(Identifier identifier_);
+
 			std::string name;
 			std::string hash;
 			size_t tileSize = 0;
@@ -108,6 +116,12 @@ namespace Game3 {
 			std::unordered_set<TileID> marchableCache;
 			std::unordered_set<TileID> unmarchableCache;
 			std::optional<std::vector<TileID>> brightCache;
+			/** Maps autotile identifiers to autotile set pointers. */
+			std::unordered_map<Identifier, std::shared_ptr<AutotileSet>> autotileSets;
+			/** Maps tilenames to autotile set pointers. */
+			std::unordered_map<Identifier, std::shared_ptr<AutotileSet>> autotileSetMap;
+
+			void setAutotile(const Identifier &tilename, const Identifier &autotile_name);
 
 		friend void splitter();
 		friend Tileset stitcher(const std::filesystem::path &, Identifier, std::string *);

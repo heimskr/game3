@@ -26,8 +26,8 @@ namespace Game3 {
 		for (const std::filesystem::directory_entry &entry: std::filesystem::directory_iterator(base_dir))
 			dirs.insert(entry);
 
-		std::multimap<Identifier, std::string> autotiles;
 		std::unordered_map<std::string, nlohmann::json> json_map;
+		std::set<std::string> autotiles;
 		std::set<std::string> non_autotiles;
 		std::unordered_map<std::string, std::unique_ptr<uint8_t[], FreeDeleter>> images;
 
@@ -39,27 +39,13 @@ namespace Game3 {
 		Hasher hasher(Hasher::Algorithm::SHA3_512);
 
 		for (const std::filesystem::path &dir: dirs) {
+			if (!std::filesystem::is_directory(dir))
+				continue;
+
 			nlohmann::json json = nlohmann::json::parse(readFile(dir / "tile.json"));
-			std::filesystem::path png_path = dir / "tile.png";
 			std::string name = dir.filename();
 
-			int width{}, height{}, channels{};
-			images.emplace(name, stbi_load(png_path.c_str(), &width, &height, &channels, 4));
-
-			int desired_dimension = 16;
-			if (auto autotile = json.find("autotile"); autotile != json.end()) {
-				autotiles.emplace(*autotile, name);
-				desired_dimension = 64;
-			} else
-				non_autotiles.insert(name);
-
-			Identifier tilename = json.at("tilename");
-
-			if (json.at("solid").get<bool>())
-				out.solid.insert(tilename);
-
-			if (json.at("land").get<bool>())
-				out.land.insert(tilename);
+			const Identifier tilename = json.at("tilename");
 
 			out.inverseCategories[tilename] = {};
 
@@ -72,6 +58,48 @@ namespace Game3 {
 			}
 
 			json_map[name] = std::move(json);
+		}
+
+		if (std::filesystem::exists(base_dir / "tileset.json")) {
+			nlohmann::json tileset_meta = nlohmann::json::parse(readFile(base_dir / "tileset.json"));
+			if (auto autotiles_iter = tileset_meta.find("autotiles"); autotiles_iter != tileset_meta.end()) {
+				for (const auto &[autotile, member]: autotiles_iter->items()) {
+					const Identifier autotile_id{autotile};
+					const Identifier member_id{member.get<std::string>()};
+					if (const std::string path_start = member_id.getPathStart(); path_start == "category") {
+						for (const auto &tilename: out.getTilesByCategory(member_id)) {
+							INFO("Autotile mapping: " << tilename << " → " << autotile_id);
+							out.setAutotile(tilename, autotile_id);
+						}
+					} else if (path_start == "tile") {
+						INFO("Autotile mapping: " << member_id << " → " << autotile_id);
+						out.setAutotile(member_id, autotile_id);
+					} else {
+						throw std::runtime_error("Invalid autotile member: " + member_id.str());
+					}
+				}
+			}
+		}
+
+		for (const auto &[name, json]: json_map) {
+			std::filesystem::path png_path = base_dir / name / "tile.png";
+			int width{}, height{}, channels{};
+			images.emplace(name, stbi_load(png_path.c_str(), &width, &height, &channels, 4));
+
+			int desired_dimension = 16;
+			if (auto autotile = json.find("autotile"); autotile != json.end() && autotile->get<bool>()) {
+				autotiles.insert(name);
+				desired_dimension = 64;
+			} else
+				non_autotiles.insert(name);
+
+			Identifier tilename = json.at("tilename");
+
+			if (json.at("solid").get<bool>())
+				out.solid.insert(tilename);
+
+			if (json.at("land").get<bool>())
+				out.land.insert(tilename);
 
 			if (width != desired_dimension)
 				throw std::runtime_error("Invalid width for " + name + ": " + std::to_string(width) + " (expected " + std::to_string(desired_dimension) + ')');
@@ -125,7 +153,7 @@ namespace Game3 {
 			}
 		};
 
-		for (const auto &[identifier, name]: autotiles) {
+		for (const auto &name: autotiles) {
 			hasher += json_map.at(name).dump();
 
 			const auto &source = images.at(name);
@@ -171,7 +199,7 @@ namespace Game3 {
 		out.names[0] = "base:tile/empty";
 
 		if (png_out != nullptr) {
-			for (const auto &[key, name]: autotiles)
+			for (const auto &name: autotiles)
 				INFO(name << " → " << out.ids[json_map.at(name)["tilename"]]);
 
 			for (const auto &name: non_autotiles)
@@ -186,7 +214,6 @@ namespace Game3 {
 
 			*png_out = ss.str();
 		}
-
 
 		auto texture = std::make_shared<Texture>(std::move(tileset_name));
 		texture->alpha = true;

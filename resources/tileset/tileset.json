@@ -1,0 +1,13 @@
+{
+	"autotiles": {
+		"base:autotile/cave_walls":        "base:category/cave_walls",
+		"base:autotile/cave_floors":       "base:category/cave_floors",
+		"base:autotile/energy_pipes":      "base:tile/energy_pipe",
+		"base:autotile/fluid_pipes":       "base:tile/fluid_pipe",
+		"base:autotile/item_pipes":        "base:tile/item_pipe",
+		"base:autotile/energy_extractors": "base:tile/energy_extractors",
+		"base:autotile/fluid_extractors":  "base:tile/fluid_extractors",
+		"base:autotile/item_extractors":   "base:tile/item_extractors",
+		"base:autotile/towers":            "base:tile/tower"
+	}
+}

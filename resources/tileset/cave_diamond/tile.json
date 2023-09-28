@@ -1,1 +1,1 @@
-{"land":false,"solid":true,"tilename":"base:tile/cave_diamond","autotile":"base:autotile/cave_walls"}
+{"autotile":true,"categories":["base:category/cave_walls"],"land":false,"solid":true,"tilename":"base:tile/cave_diamond"}

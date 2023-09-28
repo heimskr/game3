@@ -182,6 +182,12 @@ namespace Game3 {
 		hash = std::move(new_hash);
 	}
 
+	std::shared_ptr<AutotileSet> Tileset::getAutotileSet(const Identifier &tilename) const {
+		if (auto iter = autotileSetMap.find(tilename); iter != autotileSetMap.end())
+			return iter->second;
+		return {};
+	}
+
 	const TileID & Tileset::operator[](const Identifier &tilename) const {
 		return ids.at(tilename);
 	}
@@ -278,5 +284,17 @@ namespace Game3 {
 				tileset.inverseCategories[tilename].insert(category);
 
 		return tileset;
+	}
+
+	void Tileset::setAutotile(const Identifier &tilename, const Identifier &autotile_name) {
+		if (auto iter = autotileSets.find(autotile_name); iter != autotileSets.end()) {
+			autotileSetMap[tilename] = iter->second;
+			iter->second->members.insert(tilename);
+			return;
+		}
+
+		auto autotile_set = std::make_shared<AutotileSet>(AutotileSet{autotile_name, {tilename}});
+		autotileSets[autotile_name] = autotile_set;
+		autotileSetMap[tilename] = std::move(autotile_set);
 	}
 }

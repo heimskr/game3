@@ -269,16 +269,16 @@ namespace Game3 {
 		add(std::make_shared<PumpItem>("base:item/pump", "Pump", 999, 64)); // TODO: cost
 		add(std::make_shared<TankItem>("base:item/tank", "Tank", 999, 64)); // TODO: cost
 
-		add(std::make_shared<Furniture>("base:item/wooden_wall", "Wooden Wall",       9, 64));
-		add(std::make_shared<Furniture>("base:item/plant_pot1",  "Plant Pot",        32, 64));
-		add(std::make_shared<Furniture>("base:item/plant_pot2",  "Plant Pot",        32, 64));
-		add(std::make_shared<Furniture>("base:item/plant_pot3",  "Plant Pot",        32, 64));
-		add(std::make_shared<Furniture>("base:item/tower",       "Tower",            10, 64));
-		add(std::make_shared<Furniture>("base:item/pride_flag",  "Pride Flag",       80, 64));
-		add(std::make_shared<Furniture>("base:item/ace_flag",    "Asexual Flag",     80, 64));
-		add(std::make_shared<Furniture>("base:item/nb_flag",     "Non-Binary Flag",  80, 64));
-		add(std::make_shared<Furniture>("base:item/cauldron",    "Cauldron",        175,  1));
-		add(std::make_shared<Furniture>("base:item/purifier",    "Purifier",        300,  1));
+		// add(std::make_shared<Furniture>("base:item/wooden_wall", "Wooden Wall",       9, 64));
+		// add(std::make_shared<Furniture>("base:item/plant_pot1",  "Plant Pot",        32, 64));
+		// add(std::make_shared<Furniture>("base:item/plant_pot2",  "Plant Pot",        32, 64));
+		// add(std::make_shared<Furniture>("base:item/plant_pot3",  "Plant Pot",        32, 64));
+		// add(std::make_shared<Furniture>("base:item/tower",       "Tower",            10, 64));
+		// add(std::make_shared<Furniture>("base:item/pride_flag",  "Pride Flag",       80, 64));
+		// add(std::make_shared<Furniture>("base:item/ace_flag",    "Asexual Flag",     80, 64));
+		// add(std::make_shared<Furniture>("base:item/nb_flag",     "Non-Binary Flag",  80, 64));
+		// add(std::make_shared<Furniture>("base:item/cauldron",    "Cauldron",        175,  1));
+		// add(std::make_shared<Furniture>("base:item/purifier",    "Purifier",        300,  1));
 
 		add(std::make_shared<Plantable>("base:item/flower1_red",    "Red Flower",    "base:tile/flower1_red",    "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_red"));
 		add(std::make_shared<Plantable>("base:item/flower1_orange", "Orange Flower", "base:tile/flower1_orange", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_orange"));
