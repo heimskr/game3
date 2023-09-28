@@ -29,56 +29,57 @@ namespace Game3::WorldGen {
 	}
 
 	bool generateCaveTile(const std::shared_ptr<Realm> &realm, Index row, Index column, const noise::module::Perlin &perlin) {
-		realm->setTile(Layer::Terrain, {row, column}, "base:tile/dirt"_id, false, true);
+		realm->setTile(Layer::Terrain, {row, column}, "base:tile/dirt"_id, false);
 		const double noise = perlin.GetValue(row / noise_zoom, column / noise_zoom, 0.1);
 		if (noise < -.95) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_iron"_id, false, true);
-			realm->setTile(Layer::Highest, {row, column}, "base:tile/void"_id, false, true);
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_iron"_id, false);
+			realm->setTile(Layer::Highest, {row, column}, "base:tile/void"_id, false);
 		} else if (noise < -.85) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_wall"_id, false, true);
-			realm->setTile(Layer::Highest, {row, column}, "base:tile/void"_id, false, true);
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_wall"_id, false);
+			realm->setTile(Layer::Highest, {row, column}, "base:tile/void"_id, false);
 		} else if (noise < -.825) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_diamond"_id, false, true);
-			realm->setTile(Layer::Highest, {row, column}, "base:tile/void"_id, false, true);
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_diamond"_id, false);
+			realm->setTile(Layer::Highest, {row, column}, "base:tile/void"_id, false);
 		} else if (noise < -.725) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_wall"_id, false, true);
-			realm->setTile(Layer::Highest, {row, column}, "base:tile/void"_id, false, true);
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_wall"_id, false);
+			realm->setTile(Layer::Highest, {row, column}, "base:tile/void"_id, false);
 		} else if (noise < -.7) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_gold"_id, false, true);
-			realm->setTile(Layer::Highest, {row, column}, "base:tile/void"_id, false, true);
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_gold"_id, false);
+			realm->setTile(Layer::Highest, {row, column}, "base:tile/void"_id, false);
 		} else if (noise < -.6) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_wall"_id, false, true);
-			realm->setTile(Layer::Highest, {row, column}, "base:tile/void"_id, false, true);
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_wall"_id, false);
+			realm->setTile(Layer::Highest, {row, column}, "base:tile/void"_id, false);
 		} else if (noise < -.55) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_copper"_id, false, true);
-			realm->setTile(Layer::Highest, {row, column}, "base:tile/void"_id, false, true);
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_copper"_id, false);
+			realm->setTile(Layer::Highest, {row, column}, "base:tile/void"_id, false);
 		} else if (noise < -.45) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_wall"_id, false, true);
-			realm->setTile(Layer::Highest, {row, column}, "base:tile/void"_id, false, true);
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_wall"_id, false);
+			realm->setTile(Layer::Highest, {row, column}, "base:tile/void"_id, false);
 		} else if (noise < -.375) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_coal"_id, false, true);
-			realm->setTile(Layer::Highest, {row, column}, "base:tile/void"_id, false, true);
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_coal"_id, false);
+			realm->setTile(Layer::Highest, {row, column}, "base:tile/void"_id, false);
 		} else if (noise < -.1) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_wall"_id, false, true);
-			realm->setTile(Layer::Highest, {row, column}, "base:tile/void"_id, false, true);
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_wall"_id, false);
+			realm->setTile(Layer::Highest, {row, column}, "base:tile/void"_id, false);
 		} else if (noise < .1) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_wall"_id, false, true);
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_wall"_id, false);
 		} else if (noise < .11) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_iron"_id, false, true);
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_iron"_id, false);
 		} else if (noise < .1125) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_diamond"_id, false, true);
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_diamond"_id, false);
 		} else if (noise < .12) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_copper"_id, false, true);
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_copper"_id, false);
 		} else if (noise < .1225) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_gold"_id, false, true);
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_gold"_id, false);
 		} else if (noise < .13) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_coal"_id, false, true);
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_coal"_id, false);
 		} else
 			return true;
 		return false;
 	}
 
 	void generateCaveFull(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, int noise_seed, const Position &exit_position, Position &entrance, RealmID parent_realm, const ChunkRange &range) {
+		auto guard = realm->guardGeneration();
 		realm->markGenerated(range);
 		noise::module::Perlin perlin;
 		perlin.SetSeed(noise_seed);

@@ -12,6 +12,7 @@
 
 namespace Game3::WorldGen {
 	void generateTavern(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const std::shared_ptr<Realm> &parent_realm, Index width, Index height, const Position &entrance) {
+		auto guard = realm->guardGeneration();
 		realm->markGenerated(0, 0);
 		realm->tileProvider.ensureAllChunks(ChunkPosition{0, 0});
 		Timer timer("GenerateTavern");
@@ -19,7 +20,7 @@ namespace Game3::WorldGen {
 		auto pauser = realm->pauseUpdates();
 		generateIndoors(realm, rng, parent_realm, width, height, entrance, width / 2);
 
-		auto set = [&](auto &&...args) { realm->setTile(Layer::Objects, std::forward<decltype(args)>(args)..., false, true); };
+		auto set = [&](auto &&...args) { realm->setTile(Layer::Objects, std::forward<decltype(args)>(args)..., false); };
 
 		const auto &tileset = realm->getTileset();
 		const auto &plants = tileset.getTilesByCategory("base:category/plants"_id);

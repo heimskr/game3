@@ -25,6 +25,8 @@ namespace Game3::WorldGen {
 		realm->markGenerated(range);
 		Timer overworld_timer("GenOverworld");
 
+		auto guard = realm->guardGeneration();
+
 		const auto width  = range.tileWidth();
 		const auto height = range.tileHeight();
 
@@ -103,6 +105,8 @@ namespace Game3::WorldGen {
 
 				pool.add([&, game_ptr, row_min, row_max, col_min, col_max](ThreadPool &, size_t) {
 					threadContext = {game_ptr, static_cast<uint_fast32_t>(noise_seed - 1'000'000ul * row_min + col_min), row_min, row_max, col_min, col_max};
+
+					auto guard = realm->guardGeneration();
 
 					std::vector<double> saved_noise((row_max - row_min) * (col_max - col_min));
 

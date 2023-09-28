@@ -4,6 +4,7 @@
 
 namespace Game3::WorldGen {
 	void generateCarpet(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, Index width, Index height, int padding, Layer layer) {
+		auto guard = realm->guardGeneration();
 		const int carpet_padding = padding < 0? std::uniform_int_distribution(2, 3)(rng) : padding;
 		const auto &tileset = realm->getTileset();
 
@@ -21,21 +22,21 @@ namespace Game3::WorldGen {
 
 		for (int row = carpet_padding + 1; row < height - carpet_padding - 1; ++row)
 			for (int column = carpet_padding + 1; column < width - carpet_padding - 1; ++column)
-				realm->setTile(layer, {row, column}, carpet1c, false, true);
+				realm->setTile(layer, {row, column}, carpet1c, false);
 
 		for (int row = carpet_padding + 1; row < height - carpet_padding - 1; ++row) {
-			realm->setTile(layer, {row, carpet_padding}, carpet1w, false, true);
-			realm->setTile(layer, {row, width - carpet_padding - 1}, carpet1e, false, true);
+			realm->setTile(layer, {row, carpet_padding}, carpet1w, false);
+			realm->setTile(layer, {row, width - carpet_padding - 1}, carpet1e, false);
 		}
 
 		for (int column = carpet_padding + 1; column < width - carpet_padding - 1; ++column) {
-			realm->setTile(layer, {carpet_padding, column}, carpet1n, false, true);
-			realm->setTile(layer, {height - carpet_padding - 1, column}, carpet1s, false, true);
+			realm->setTile(layer, {carpet_padding, column}, carpet1n, false);
+			realm->setTile(layer, {height - carpet_padding - 1, column}, carpet1s, false);
 		}
 
-		realm->setTile(layer, {carpet_padding, carpet_padding}, carpet1nw, false, true);
-		realm->setTile(layer, {carpet_padding, width - carpet_padding - 1}, carpet1ne, false, true);
-		realm->setTile(layer, {height - carpet_padding - 1, carpet_padding}, carpet1sw, false, true);
-		realm->setTile(layer, {height - carpet_padding - 1, width - carpet_padding - 1}, carpet1se, false, true);
+		realm->setTile(layer, {carpet_padding, carpet_padding}, carpet1nw, false);
+		realm->setTile(layer, {carpet_padding, width - carpet_padding - 1}, carpet1ne, false);
+		realm->setTile(layer, {height - carpet_padding - 1, carpet_padding}, carpet1sw, false);
+		realm->setTile(layer, {height - carpet_padding - 1, width - carpet_padding - 1}, carpet1se, false);
 	}
 }

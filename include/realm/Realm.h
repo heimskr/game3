@@ -61,6 +61,12 @@ namespace Game3 {
 				~Pauser() { realm->updatesPaused = false; }
 			};
 
+			struct GenerationGuard {
+				std::shared_ptr<Realm> realm;
+				GenerationGuard(std::shared_ptr<Realm> realm_): realm(realm_) { ++realm->generationDepth; }
+				~GenerationGuard() { --realm->generationDepth; }
+			};
+
 		public:
 			RealmID id = -1;
 			RealmType type;
@@ -140,11 +146,11 @@ namespace Game3 {
 			void queueAddition(const TileEntityPtr &);
 			void queue(std::function<void()>);
 			void absorb(const EntityPtr &, const Position &);
-			void setTile(Layer, Index row, Index column, TileID, bool run_helper = true, bool generating = false);
-			void setTile(Layer, const Position &, TileID, bool run_helper = true, bool generating = false);
-			void setTile(Layer, const Position &, const Identifier &, bool run_helper = true, bool generating = false);
-			void setFluid(const Position &, FluidTile, bool run_helper = true, bool generating = false);
-			void setFluid(const Position &, const Identifier &, FluidLevel, bool run_helper = true, bool generating = false);
+			void setTile(Layer, Index row, Index column, TileID, bool run_helper = true);
+			void setTile(Layer, const Position &, TileID, bool run_helper = true);
+			void setTile(Layer, const Position &, const Identifier &, bool run_helper = true);
+			void setFluid(const Position &, FluidTile, bool run_helper = true);
+			void setFluid(const Position &, const Identifier &, FluidLevel, bool run_helper = true);
 			bool hasFluid(const Position &, FluidLevel minimum = 1);
 			TileID getTile(Layer, const Position &) const;
 			std::optional<TileID> tryTile(Layer, const Position &) const;
@@ -198,6 +204,7 @@ namespace Game3 {
 			inline const auto & getPlayers() const { return players; }
 			inline void markGenerated(auto x, auto y) { generatedChunks.insert(ChunkPosition{x, y}); }
 			inline auto pauseUpdates() { return Pauser(shared_from_this()); }
+			inline auto guardGeneration() { return GenerationGuard(shared_from_this()); }
 			inline bool isClient() const { return getSide() == Side::Client; }
 			inline bool isServer() const { return getSide() == Side::Server; }
 
@@ -294,7 +301,9 @@ namespace Game3 {
 		protected:
 			std::atomic_bool focused = false;
 			/** Whether to prevent updateNeighbors from running. */
-			bool updatesPaused = false;
+			std::atomic_bool updatesPaused = false;
+			std::atomic_int generationDepth = 0;
+			bool isGenerating() const { return generationDepth > 0; }
 
 			Realm(Game &);
 			Realm(Game &, RealmID, RealmType, Identifier tileset_id, int64_t seed_);

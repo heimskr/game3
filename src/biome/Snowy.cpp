@@ -11,7 +11,7 @@
 
 namespace Game3 {
 	namespace {
-		const std::unordered_set<Identifier> trees{"base:tile/winter_tree1"_id, "base:tile/winter_tree2"_id, "base:tile/winter_tree3"_id};
+		const std::unordered_set<Identifier> trees{"base:tile/winter_tree1", "base:tile/winter_tree2", "base:tile/winter_tree3"};
 	}
 
 	void Snowy::init(Realm &realm, int noise_seed) {
@@ -27,30 +27,30 @@ namespace Game3 {
 
 		const double noise = perlin.GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.666);
 
-		static const Identifier deeper_water  = "base:tile/deeper_water"_id;
-		static const Identifier deep_water    = "base:tile/deep_water"_id;
-		static const Identifier water         = "base:tile/water"_id;
-		static const Identifier shallow_water = "base:tile/shallow_water"_id;
-		static const Identifier sand          = "base:tile/sand"_id;
-		static const Identifier dark_ice      = "base:tile/dark_ice"_id;
-		static const Identifier light_ice     = "base:tile/light_ice"_id;
-		static const Identifier snow          = "base:tile/snow"_id;
-		static const Identifier stone         = "base:tile/stone"_id;
-		static const Identifier water_fluid   = "base:fluid/water"_id;
+		static const Identifier deeper_water  = "base:tile/deeper_water";
+		static const Identifier deep_water    = "base:tile/deep_water";
+		static const Identifier water         = "base:tile/water";
+		static const Identifier shallow_water = "base:tile/shallow_water";
+		static const Identifier sand          = "base:tile/sand";
+		static const Identifier dark_ice      = "base:tile/dark_ice";
+		static const Identifier light_ice     = "base:tile/light_ice";
+		static const Identifier snow          = "base:tile/snow";
+		static const Identifier stone         = "base:tile/stone";
+		static const Identifier water_fluid   = "base:fluid/water";
 
 		if (noise < wetness + 0.3) {
-			realm.setTile(Layer::Terrain, {row, column}, sand, false, true);
-			realm.setFluid({row, column}, water_fluid, FluidTile::INFINITE, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, sand, false);
+			realm.setFluid({row, column}, water_fluid, FluidTile::INFINITE, false);
 		} else if (noise < wetness + 0.39) {
-			realm.setTile(Layer::Terrain, {row, column}, sand, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, sand, false);
 		} else if (noise < wetness + 0.42) {
-			realm.setTile(Layer::Terrain, {row, column}, dark_ice, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, dark_ice, false);
 		} else if (noise < wetness + 0.5) {
-			realm.setTile(Layer::Terrain, {row, column}, light_ice, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, light_ice, false);
 		} else if (stoneLevel < noise) {
-			realm.setTile(Layer::Terrain, {row, column}, stone, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, stone, false);
 		} else {
-			realm.setTile(Layer::Terrain, {row, column}, snow, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, snow, false);
 			const double forest_noise = forestPerlin->GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.5);
 			if (params.forestThreshold < forest_noise) {
 				uint8_t mod = abs(column) % 2;
@@ -58,7 +58,7 @@ namespace Game3 {
 				if (std::uniform_int_distribution(0, 99)(tree_rng) < 50)
 					mod = 1 - mod;
 				if ((abs(row) % 2) == mod)
-					realm.setTile(Layer::Submerged, {row, column}, choose(trees, rng), false, true);
+					realm.setTile(Layer::Submerged, {row, column}, choose(trees, rng), false);
 			}
 		}
 
@@ -71,6 +71,6 @@ namespace Game3 {
 
 		if (params.antiforestThreshold > perlin.GetValue(row / Biome::NOISE_ZOOM * factor, column / Biome::NOISE_ZOOM * factor, 0.))
 			if (auto tile = realm.tryTile(Layer::Submerged, {row, column}); tile && trees.contains(realm.getTileset()[*tile]))
-				realm.setTile(Layer::Submerged, {row, column}, 0, false, true);
+				realm.setTile(Layer::Submerged, {row, column}, 0, false);
 	}
 }

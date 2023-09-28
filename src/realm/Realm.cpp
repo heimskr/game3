@@ -699,11 +699,11 @@ namespace Game3 {
 		entity->teleport(position);
 	}
 
-	void Realm::setTile(Layer layer, Index row, Index column, TileID tile_id, bool run_helper, bool generating) {
-		setTile(layer, Position(row, column), tile_id, run_helper, generating);
+	void Realm::setTile(Layer layer, Index row, Index column, TileID tile_id, bool run_helper) {
+		setTile(layer, Position(row, column), tile_id, run_helper);
 	}
 
-	void Realm::setTile(Layer layer, const Position &position, TileID tile_id, bool run_helper, bool generating) {
+	void Realm::setTile(Layer layer, const Position &position, TileID tile_id, bool run_helper) {
 		{
 			std::unique_lock<std::shared_mutex> tile_lock;
 			auto &tile = tileProvider.findTile(layer, position, &tile_lock, TileProvider::TileMode::Create);
@@ -713,7 +713,7 @@ namespace Game3 {
 		}
 
 		if (isServer()) {
-			if (!generating) {
+			if (!isGenerating()) {
 				tileProvider.updateChunk(getChunkPosition(position));
 				getGame().toServer().broadcastTileUpdate(id, layer, position, tile_id);
 			}
@@ -722,11 +722,11 @@ namespace Game3 {
 		}
 	}
 
-	void Realm::setTile(Layer layer, const Position &position, const Identifier &tilename, bool run_helper, bool generating) {
-		setTile(layer, position, getTileset()[tilename], run_helper, generating);
+	void Realm::setTile(Layer layer, const Position &position, const Identifier &tilename, bool run_helper) {
+		setTile(layer, position, getTileset()[tilename], run_helper);
 	}
 
-	void Realm::setFluid(const Position &position, FluidTile tile, bool run_helper, bool generating) {
+	void Realm::setFluid(const Position &position, FluidTile tile, bool run_helper) {
 		{
 			std::unique_lock<std::shared_mutex> fluid_lock;
 			auto &fluid = tileProvider.findFluid(position, &fluid_lock);
@@ -739,17 +739,17 @@ namespace Game3 {
 			if (run_helper)
 				setLayerHelper(position.row, position.column);
 
-			if (!generating) {
+			if (!isGenerating()) {
 				tileProvider.updateChunk(getChunkPosition(position));
 				getGame().toServer().broadcastFluidUpdate(id, position, tile);
 			}
 		}
 	}
 
-	void Realm::setFluid(const Position &position, const Identifier &fluidname, FluidLevel level, bool run_helper, bool generating) {
+	void Realm::setFluid(const Position &position, const Identifier &fluidname, FluidLevel level, bool run_helper) {
 		auto fluid = getGame().registry<FluidRegistry>().at(fluidname);
 		assert(fluid);
-		setFluid(position, FluidTile(fluid->registryID, level), run_helper, generating);
+		setFluid(position, FluidTile(fluid->registryID, level), run_helper);
 	}
 
 	bool Realm::hasFluid(const Position &position, FluidLevel minimum) {
@@ -843,26 +843,20 @@ namespace Game3 {
 							const TileID tile = tileProvider.copyTile(layer, offset_position, TileProvider::TileMode::ReturnEmpty);
 							const auto &tilename = tileset[tile];
 
-							for (const auto &category: tileset.getCategories(tilename)) {
-								if (tileset.isCategoryMarchable(category)) {
-									const MarchableInfo &info = tileset.getMarchableInfo(category);
-									const auto &members = info.autotileSet->members;
+							if (const MarchableInfo *info = tileset.getMarchableInfo(tilename)) {
+								const auto &members = info->autotileSet->members;
 
-									const TileID march_result = march4([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
-										const Position march_position = offset_position + Position(march_row_offset, march_column_offset);
-										const TileID tile = tileProvider.copyTile(layer, march_position, TileProvider::TileMode::ReturnEmpty);
-										return members.contains(tileset[tile]);
-									});
+								const TileID march_result = march4([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
+									const Position march_position = offset_position + Position(march_row_offset, march_column_offset);
+									const TileID tile = tileProvider.copyTile(layer, march_position, TileProvider::TileMode::ReturnEmpty);
+									return members.contains(tileset[tile]);
+								});
 
-									const TileID marched = tileset[tileset.getMarchableInfo(category).start] + march_result;
+								const TileID marched = tileset[info->start] + march_result;
 
-									if (marched != tile) {
-										setTile(layer, offset_position, marched);
-										threadContext.updatedLayers.insert(layer);
-									}
-
-									// Allow only one marching. This should be fine.
-									break;
+								if (marched != tile) {
+									setTile(layer, offset_position, marched, true);
+									threadContext.updatedLayers.insert(layer);
 								}
 							}
 						}
@@ -959,6 +953,7 @@ namespace Game3 {
 		}
 
 		updateNeighbors(position);
+
 		if (should_mark_dirty)
 			for (auto &row: *renderers)
 				for (auto &layers: row)

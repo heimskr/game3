@@ -16,7 +16,8 @@ namespace Game3::WorldGen {
 		Index row = 0;
 		Index column = 0;
 
-		auto pauser = realm->pauseUpdates();
+		// auto pauser = realm->pauseUpdates();
+		auto guard = realm->guardGeneration();
 		Game &game = realm->getGame();
 
 		const auto cleanup = [&](Index row, Index column) {
@@ -26,22 +27,22 @@ namespace Game3::WorldGen {
 
 		const auto set_terrain = [&](const Identifier &tilename) {
 			cleanup(row, column);
-			realm->setTile(Layer::Terrain, {row, column}, tilename, false, true);
+			realm->setTile(Layer::Terrain, {row, column}, tilename, false);
 		};
 
 		const auto set_submerged = [&](const Position &position, const Identifier &tilename) {
 			cleanup(position.row, position.column);
-			realm->setTile(Layer::Submerged, position, tilename, false, true);
+			realm->setTile(Layer::Submerged, position, tilename, false);
 		};
 
 		const auto set_objects = [&](const Identifier &tilename, bool helper = false) {
 			cleanup(row, column);
-			realm->setTile(Layer::Objects, {row, column}, tilename, helper, true);
+			realm->setTile(Layer::Objects, {row, column}, tilename, helper);
 		};
 
 		const auto set_objects_pos = [&](const Position &position, const Identifier &tilename, bool helper = false) {
 			cleanup(position.row, position.column);
-			realm->setTile(Layer::Objects, position, tilename, helper, true);
+			realm->setTile(Layer::Objects, position, tilename, helper);
 		};
 
 		Timer town_timer("TownLayout");
@@ -52,8 +53,8 @@ namespace Game3::WorldGen {
 			}
 
 		for (row = position.row; row < position.row + height; ++row) {
-			set_objects_pos({row, position.column}, "base:tile/tower", true);
-			set_objects_pos({row, position.column + width - 1}, "base:tile/tower", true);
+			set_objects_pos({row, position.column}, "base:tile/tower");
+			set_objects_pos({row, position.column + width - 1}, "base:tile/tower");
 		}
 
 		for (column = position.column; column < position.column + width; ++column) {
@@ -140,11 +141,11 @@ namespace Game3::WorldGen {
 		auto keep_biomemap = std::make_shared<BiomeMap>(keep_width, keep_height);
 		auto keep_realm = Realm::create<Keep>(game, keep_realm_id, town_origin, width, height, -seed);
 		keep_realm->outdoors = false;
-		WorldGen::generateKeep(keep_realm, rng, realm->id, keep_width, keep_height, keep_exit);
 		game.addRealm(keep_realm_id, keep_realm);
+		WorldGen::generateKeep(keep_realm, rng, realm->id, keep_width, keep_height, keep_exit);
 
 		auto create_keep = [&](const Identifier &tilename) {
-			realm->setTile(Layer::Objects, keep_position, tilename, false, true);
+			realm->setTile(Layer::Objects, keep_position, tilename, false);
 			realm->add(TileEntity::create<Building>(game, tilename, keep_position, keep_realm_id, keep_entrance));
 		};
 
@@ -174,7 +175,7 @@ namespace Game3::WorldGen {
 			Position building_position;
 
 			auto gen_building = [&](const Identifier &tilename, Index realm_width, Index realm_height, RealmType realm_type, const BuildingGenerator &gen_fn, std::optional<Position> entrance = std::nullopt) {
-				realm->setTile(Layer::Objects, building_position, tilename, false, true);
+				realm->setTile(Layer::Objects, building_position, tilename, false);
 				const RealmID realm_id = game.newRealmID();
 				auto building = TileEntity::create<Building>(game, tilename, building_position, realm_id, entrance? *entrance : Position(realm_height - 2, realm_width - 3));
 				auto details = game.registry<RealmDetailsRegistry>()[realm_type];

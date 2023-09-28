@@ -55,7 +55,7 @@ namespace Game3 {
 			bool getItemStack(const Game &, const Identifier &, ItemStack &) const;
 			bool isMarchable(TileID);
 			bool isCategoryMarchable(const Identifier &category) const;
-			const MarchableInfo & getMarchableInfo(const Identifier &tilename) const;
+			const MarchableInfo * getMarchableInfo(const Identifier &tilename) const;
 			void clearCache();
 			const std::unordered_set<Identifier> getCategories(const Identifier &) const;
 			const std::unordered_set<TileID> getCategoryIDs(const Identifier &) const;
@@ -68,7 +68,7 @@ namespace Game3 {
 			size_t columnCount(const Game &);
 			size_t rowCount(const Game &);
 			void setHash(std::string);
-			std::shared_ptr<AutotileSet> getAutotileSet(const Identifier &) const;
+			std::shared_ptr<AutotileSet> getAutotileSet(const Identifier &tilename) const;
 
 			const auto & getIDs()          const { return ids;          }
 			const auto & getNames()        const { return names;        }

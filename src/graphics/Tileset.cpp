@@ -127,8 +127,10 @@ namespace Game3 {
 		return marchable.contains(category);
 	}
 
-	const MarchableInfo & Tileset::getMarchableInfo(const Identifier &tilename) const {
-		return marchableMap.at(tilename);
+	const MarchableInfo * Tileset::getMarchableInfo(const Identifier &tilename) const {
+		if (auto iter = marchableMap.find(tilename); iter != marchableMap.end())
+			return &iter->second;
+		return nullptr;
 	}
 
 	void Tileset::clearCache() {

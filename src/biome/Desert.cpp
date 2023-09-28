@@ -40,14 +40,14 @@ namespace Game3 {
 		static const Identifier water_fluid   = "base:fluid/water"_id;
 
 		if (noise < wetness + 0.3) {
-			realm.setTile(Layer::Terrain, {row, column}, sand, false, true);
-			realm.setFluid({row, column}, water_fluid, FluidTile::INFINITE, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, sand, false);
+			realm.setFluid({row, column}, water_fluid, FluidTile::INFINITE, false);
 		} else if (noise < wetness + 0.4) {
-			realm.setTile(Layer::Terrain, {row, column}, sand, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, sand, false);
 		} else if (stoneLevel < noise) {
-			realm.setTile(Layer::Terrain, {row, column}, stone, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, stone, false);
 		} else {
-			realm.setTile(Layer::Terrain, {row, column}, sand, false, true);
+			realm.setTile(Layer::Terrain, {row, column}, sand, false);
 			const double forest_noise = forestPerlin->GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.5);
 			if (params.forestThreshold - 0.2 < forest_noise) {
 				std::default_random_engine tree_rng(static_cast<uint_fast32_t>(forest_noise * 1'000'000'000.));
@@ -58,7 +58,7 @@ namespace Game3 {
 				if (hundred(tree_rng) < 50)
 					mod = 1 - mod;
 				if ((abs(row) % 2) == mod)
-					realm.setTile(Layer::Submerged, {row, column}, choose(cactuses, rng), false, true);
+					realm.setTile(Layer::Submerged, {row, column}, choose(cactuses, rng), false);
 			}
 		}
 
@@ -71,6 +71,6 @@ namespace Game3 {
 
 		if (params.antiforestThreshold > perlin.GetValue(row / Biome::NOISE_ZOOM * factor, column / Biome::NOISE_ZOOM * factor, 0.))
 			if (auto tile = realm.tryTile(Layer::Submerged, {row, column}); tile && cactuses.contains(realm.getTileset()[*tile]))
-				realm.setTile(Layer::Submerged, {row, column}, 0, false, true);
+				realm.setTile(Layer::Submerged, {row, column}, 0, false);
 	}
 }

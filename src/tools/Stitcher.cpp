@@ -67,12 +67,9 @@ namespace Game3 {
 					const Identifier autotile_id{autotile};
 					const Identifier member_id{member.get<std::string>()};
 					if (const std::string path_start = member_id.getPathStart(); path_start == "category") {
-						for (const auto &tilename: out.getTilesByCategory(member_id)) {
-							INFO("Autotile mapping: " << tilename << " → " << autotile_id);
+						for (const auto &tilename: out.getTilesByCategory(member_id))
 							out.setAutotile(tilename, autotile_id);
-						}
 					} else if (path_start == "tile") {
-						INFO("Autotile mapping: " << member_id << " → " << autotile_id);
 						out.setAutotile(member_id, autotile_id);
 					} else {
 						throw std::runtime_error("Invalid autotile member: " + member_id.str());
@@ -175,7 +172,8 @@ namespace Game3 {
 
 			Identifier tilename = json_map.at(name).at("tilename");
 			out.ids[tilename] = tile_index;
-			out.names[tile_index] = std::move(tilename);
+			for (size_t tile_offset = 0; tile_offset < 16; ++tile_offset)
+				out.names[tile_index + tile_offset] = tilename;
 
 			next(16 * tilesize);
 		}
@@ -196,7 +194,6 @@ namespace Game3 {
 		}
 
 		out.hash = hasher.value<std::string>();
-		INFO("Hash: " << hexString(out.hash, false));
 		out.ids["base:tile/empty"] = 0;
 		out.names[0] = "base:tile/empty";
 
