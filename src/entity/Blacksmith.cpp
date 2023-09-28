@@ -169,15 +169,15 @@ namespace Game3 {
 		else
 			coalNeeded = 0;
 
-		Game  &game  = getRealm()->getGame();
-		Realm &house = *game.getRealm(houseRealm);
+		Game &game = getRealm()->getGame();
+		RealmPtr house = game.getRealm(houseRealm);
 
 		if (0 < coalNeeded || diamonds < RESOURCE_TARGET) {
 			phase = 1;
-			pathfind(house.getTileEntity<Teleporter>()->position);
+			pathfind(house->getTileEntity<Teleporter>()->position);
 		} else {
 			phase = 8;
-			pathfind(destination = house.extraData.at("furnace"));
+			pathfind(destination = house->extraData.at("furnace"));
 		}
 	}
 

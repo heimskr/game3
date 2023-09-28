@@ -103,7 +103,7 @@ namespace Game3 {
 
 				statement.exec();
 
-				if (use_transaction)
+				if (transaction)
 					transaction->commit();
 			}
 

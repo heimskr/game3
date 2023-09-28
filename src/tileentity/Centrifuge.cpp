@@ -66,11 +66,11 @@ namespace Game3 {
 	}
 
 	bool Centrifuge::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
-		auto &realm = *getRealm();
+		RealmPtr realm = getRealm();
 
 		if (modifiers.onlyAlt()) {
-			realm.queueDestruction(getSelf());
-			player->give(ItemStack(realm.getGame(), "base:item/centrifuge"_id));
+			realm->queueDestruction(getSelf());
+			player->give(ItemStack(realm->getGame(), "base:item/centrifuge"_id));
 			return true;
 		}
 
@@ -81,7 +81,7 @@ namespace Game3 {
 
 		auto lock = fluidContainer->levels.sharedLock();
 		for (const auto &[id, amount]: fluidContainer->levels)
-			INFO(realm.getGame().getFluid(id)->identifier << " = " << amount);
+			INFO(realm->getGame().getFluid(id)->identifier << " = " << amount);
 		return true;
 	}
 

@@ -8,7 +8,7 @@ namespace Game3 {
 			throw CommandError("\"chem\" command arguments: <formula> [count]");
 		std::string count = "1";
 		if (pieces.size() == 3)
-			count = pieces.at(2);
+			count = pieces[2];
 		client.lockGame()->runCommand("give chemical " + count + " " + nlohmann::json{{"formula", std::move(pieces.at(1))}}.dump());
 	}
 }

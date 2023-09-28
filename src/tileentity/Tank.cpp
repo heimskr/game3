@@ -23,23 +23,27 @@ namespace Game3 {
 	}
 
 	bool Tank::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
-		auto &realm = *getRealm();
+		RealmPtr realm = getRealm();
 
 		if (modifiers.onlyAlt()) {
-			realm.queueDestruction(getSelf());
-			player->give(ItemStack(realm.getGame(), "base:item/tank"_id));
+			realm->queueDestruction(getSelf());
+			player->give(ItemStack(realm->getGame(), "base:item/tank"_id));
 			return true;
 		}
 
 		FluidHoldingTileEntity::addObserver(player, false);
 
 		assert(fluidContainer);
-		auto lock = fluidContainer->levels.sharedLock();
-		if (fluidContainer->levels.empty())
+		auto fluid_lock = fluidContainer->levels.sharedLock();
+
+		if (fluidContainer->levels.empty()) {
 			WARN("No fluids.");
-		else
+		} else {
+			Game &game = realm->getGame();
 			for (const auto &[id, amount]: fluidContainer->levels)
-				INFO(realm.getGame().getFluid(id)->identifier << " = " << amount);
+				INFO(game.getFluid(id)->identifier << " = " << amount);
+		}
+
 		return false;
 	}
 

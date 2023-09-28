@@ -24,7 +24,7 @@ namespace Game3 {
 		assert(energyContainer);
 		auto lock = energyContainer->uniqueLock();
 		const EnergyAmount to_remove = std::min(max_amount, energyContainer->energy);
-		if (0 < remove)
+		if (0 < to_remove)
 			energyContainer->energy -= to_remove;
 		return to_remove;
 	}

@@ -26,8 +26,6 @@ namespace Game3 {
 }
 
 int main(int argc, char **argv) {
-	srand(time(nullptr));
-
 #ifdef IS_FLATPAK
 	if (const char *xdg_runtime_dir = std::getenv("XDG_RUNTIME_DIR")) {
 		const auto old_cwd = std::filesystem::current_path();
@@ -54,7 +52,7 @@ int main(int argc, char **argv) {
 				return 1;
 			}
 
-			std::string secret = Game3::readFile(".secret");
+			const std::string secret = Game3::readFile(".secret");
 			std::cout << Game3::computeSHA3_512<Game3::Token>(secret + '/' + argv[2]) << '\n';
 			return 0;
 		}

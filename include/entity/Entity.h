@@ -192,10 +192,10 @@ namespace Game3 {
 		private:
 			struct Held {
 				Slot slot = -1;
-				std::shared_ptr<Texture> texture;
+				bool isLeft;
 				float xOffset = 0.f;
 				float yOffset = 0.f;
-				bool isLeft;
+				std::shared_ptr<Texture> texture;
 				Held() = delete;
 				Held(bool is_left): isLeft(is_left) {}
 				inline explicit operator bool() const { return texture != nullptr; }

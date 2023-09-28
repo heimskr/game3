@@ -1,6 +1,5 @@
 #include "Log.h"
 #include "MarchingSquares.h"
-#include "graphics/Tileset.h"
 #include "biome/Biome.h"
 #include "entity/ClientPlayer.h"
 #include "entity/Entity.h"
@@ -10,6 +9,7 @@
 #include "game/InteractionSet.h"
 #include "game/ServerGame.h"
 #include "graphics/SpriteRenderer.h"
+#include "graphics/Tileset.h"
 #include "net/RemoteClient.h"
 #include "packet/ErrorPacket.h"
 #include "realm/Keep.h"
@@ -47,7 +47,7 @@ namespace Game3 {
 	}
 
 	Realm::Realm(Game &game_, RealmID id_, RealmType type_, Identifier tileset_id, int64_t seed_):
-	id(id_), type(type_), tileProvider(std::move(tileset_id)), seed(seed_), game(game_) {
+	id(id_), type(std::move(type_)), tileProvider(std::move(tileset_id)), seed(seed_), game(game_) {
 		if (game.getSide() == Side::Client) {
 			game.toClient().getWindow().queue([this] {
 				createRenderers();
@@ -259,8 +259,8 @@ namespace Game3 {
 		if (0 < ghostCount) {
 			static auto checkmark = cacheTexture("resources/checkmark.png");
 			sprite_renderer.drawOnScreen(*checkmark, {
-				.x = static_cast<float>(width)  / checkmark->width  - 3.f,
-				.y = static_cast<float>(height) / checkmark->height - 3.f,
+				.x = static_cast<float>(width)  / static_cast<float>(checkmark->width)  - 3.f,
+				.y = static_cast<float>(height) / static_cast<float>(checkmark->height) - 3.f,
 				.scaleX = 2.f,
 				.scaleY = 2.f,
 				.hackY = false,
@@ -316,7 +316,7 @@ namespace Game3 {
 		if (entity->isPlayer()) {
 			{
 				auto lock = players.uniqueLock();
-				players.insert(std::static_pointer_cast<Player>(entity));
+				players.emplace(std::static_pointer_cast<Player>(entity));
 			}
 			recalculateVisibleChunks();
 		}
@@ -339,7 +339,7 @@ namespace Game3 {
 		attach(tile_entity);
 		if (tile_entity->solid) {
 			std::unique_lock<std::shared_mutex> path_lock;
-			tileProvider.findPathState(tile_entity->position, &path_lock) = false;
+			tileProvider.findPathState(tile_entity->position.copyBase(), &path_lock) = 0;
 		}
 		if (tile_entity->is("base:te/ghost"))
 			++ghostCount;
@@ -353,11 +353,11 @@ namespace Game3 {
 	}
 
 	void Realm::initEntities() {
-		auto lock = entities.sharedLock();
-		for (auto &entity: entities) {
+		auto entities_lock = entities.sharedLock();
+		for (const auto &entity: entities) {
 			entity->setRealm(shared_from_this());
 			if (auto player = std::dynamic_pointer_cast<Player>(entity)) {
-				auto lock = players.uniqueLock();
+				auto players_lock = players.uniqueLock();
 				players.insert(player);
 			}
 		}
@@ -411,7 +411,7 @@ namespace Game3 {
 							for (const auto &tile_entity: *iter->second)
 								tile_entity->tick(game, delta);
 					}
-					static std::uniform_int_distribution<long> distribution(0l, CHUNK_SIZE - 1);
+					static std::uniform_int_distribution<int64_t> distribution(0l, CHUNK_SIZE - 1);
 					auto &tileset = getTileset();
 					auto shared = shared_from_this();
 
@@ -480,8 +480,6 @@ namespace Game3 {
 						remakePathMap(chunk_position);
 					}
 
-					std::unordered_set<std::shared_ptr<RemoteClient>> strong;
-
 					sendToMany(filterWeak(client_set), chunk_position);
 					chunkRequests.erase(iter);
 				}
@@ -496,7 +494,7 @@ namespace Game3 {
 
 			{
 				auto lock = entities.sharedLock();
-				for (auto &entity: entities)
+				for (const auto &entity: entities)
 					entity->tick(game, delta);
 			}
 
@@ -600,7 +598,7 @@ namespace Game3 {
 		return {};
 	}
 
-	void Realm::remove(EntityPtr entity) {
+	void Realm::remove(const EntityPtr &entity) {
 		entitiesByGID.erase(entity->globalID);
 		detach(entity);
 		if (auto player = std::dynamic_pointer_cast<Player>(entity))
@@ -614,8 +612,8 @@ namespace Game3 {
 		remove(entity);
 	}
 
-	void Realm::remove(TileEntityPtr tile_entity, bool run_helper) {
-		const Position position = tile_entity->position;
+	void Realm::remove(const TileEntityPtr &tile_entity, bool run_helper) {
+		const Position position = tile_entity->getPosition();
 		auto iter = tileEntities.find(position);
 		if (iter == tileEntities.end()) {
 			WARN("Can't remove tile entity: not found");
@@ -765,7 +763,7 @@ namespace Game3 {
 		const auto object = tryTile(Layer::Objects, position);
 		const auto empty = getTileset().getEmptyID();
 		assert(submerged.has_value() == object.has_value());
-		return (!submerged && !object) || (*submerged == empty && *object == empty);
+		return (!submerged && !object) || (submerged && *submerged == empty && *object == empty);
 	}
 
 	std::optional<TileID> Realm::tryTile(Layer layer, const Position &position) const {
@@ -989,7 +987,7 @@ namespace Game3 {
 	void Realm::markGenerated(const ChunkRange &range) {
 		for (auto y = range.topLeft.y; y <= range.bottomRight.y; ++y)
 			for (auto x = range.topLeft.x; x <= range.bottomRight.x; ++x)
-				generatedChunks.insert(ChunkPosition{x, y});
+				generatedChunks.emplace(x, y);
 	}
 
 	void Realm::markGenerated(ChunkPosition chunk_position) {
@@ -1042,7 +1040,7 @@ namespace Game3 {
 	std::set<ChunkPosition> Realm::getMissingChunks() const {
 		assert(getSide() == Side::Client);
 		std::set<ChunkPosition> out;
-		auto &player = getGame().toClient().player;
+		const auto &player = getGame().toClient().player;
 
 		auto chunk_pos = getChunkPosition(player->getPosition());
 		chunk_pos.y -= REALM_DIAMETER / 2;
@@ -1270,8 +1268,8 @@ namespace Game3 {
 
 	void Realm::queueReuploadAll() {
 		assert(getSide() == Side::Client);
-		bool fluid_reuploading = fluidReuploadPending.exchange(true);
-		bool reuploading = reuploadPending.exchange(true);
+		const bool fluid_reuploading = fluidReuploadPending.exchange(true);
+		const bool reuploading = reuploadPending.exchange(true);
 		if (!fluid_reuploading && !reuploading) {
 			getGame().toClient().getWindow().queue([shared = shared_from_this()] {
 				shared->reupload();
@@ -1365,7 +1363,7 @@ namespace Game3 {
 			window.insert_action_group("agent_menu", group);
 			menu.set_menu_model(gmenu);
 			menu.set_has_arrow(true);
-			menu.set_pointing_to({int(x), int(y), 1, 1});
+			menu.set_pointing_to({static_cast<int>(x), static_cast<int>(y), 1, 1});
 			menu.popup();
 			return true;
 		}
@@ -1394,8 +1392,7 @@ namespace Game3 {
 	}
 
 	BiomeType Realm::getBiome(int64_t seed) {
-		std::default_random_engine rng;
-		rng.seed(seed * 79);
+		std::default_random_engine rng{seed * 79ul};
 		return std::uniform_int_distribution(0, 100)(rng) % Biome::COUNT + 1;
 	}
 }

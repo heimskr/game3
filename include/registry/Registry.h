@@ -150,7 +150,7 @@ namespace Game3 {
 
 			inline std::shared_ptr<T> maybe(size_t counter) const {
 				if (counter < byCounter.size())
-					return byCounter.at(counter);
+					return byCounter[counter];
 				return {};
 			}
 
@@ -251,7 +251,7 @@ namespace Game3 {
 
 			inline std::shared_ptr<T> maybe(size_t counter) {
 				if (counter < byCounter.size())
-					return byCounter.at(counter);
+					return byCounter[counter];
 				return {};
 			}
 

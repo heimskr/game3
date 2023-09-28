@@ -38,7 +38,7 @@ namespace Game3 {
 		explicit inline operator std::string() const { return '(' + std::to_string(row) + ", " + std::to_string(column) + ')'; }
 		explicit operator Direction() const;
 		inline double distance(const Position &other) const { return std::sqrt(std::pow(row - other.row, 2) + std::pow(column - other.column, 2)); }
-		inline uint64_t taxiDistance(const Position &other) const { return uint64_t(std::abs(row - other.row) + std::abs(column - other.column)); }
+		inline uint64_t taxiDistance(const Position &other) const { return static_cast<uint64_t>(std::abs(row - other.row) + std::abs(column - other.column)); }
 		bool adjacent4(const Position &other) const;
 		bool operator<(const Position &) const;
 		std::string simpleString() const { return std::to_string(row) + "," + std::to_string(column); }

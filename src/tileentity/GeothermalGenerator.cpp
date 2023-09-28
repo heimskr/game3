@@ -123,11 +123,11 @@ namespace Game3 {
 	}
 
 	bool GeothermalGenerator::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
-		auto &realm = *getRealm();
+		RealmPtr realm = getRealm();
 
 		if (modifiers.onlyAlt()) {
-			realm.queueDestruction(getSelf());
-			player->give(ItemStack(realm.getGame(), "base:item/geothermal_generator"_id));
+			realm->queueDestruction(getSelf());
+			player->give(ItemStack(realm->getGame(), "base:item/geothermal_generator"_id));
 			return true;
 		}
 
@@ -145,7 +145,7 @@ namespace Game3 {
 				WARN("No fluids.");
 			else
 				for (const auto &[id, amount]: fluidContainer->levels)
-					INFO(realm.getGame().getFluid(id)->identifier << " = " << amount);
+					INFO(realm->getGame().getFluid(id)->identifier << " = " << amount);
 		}
 
 		auto lock = energyContainer->sharedLock();

@@ -110,7 +110,7 @@ namespace GL {
 	inline GLuint makeBufferObject(GLenum target, const T *data, size_t count, GLenum usage)  {
 		GLuint bo = -1;
 		glGenBuffers(1, &bo); CHECKGL
-		if (bo == GLuint(-1))
+		if (bo == static_cast<GLuint>(-1))
 			throw std::runtime_error("Couldn't generate buffer object");
 		glBindBuffer(target, bo); CHECKGL
 		glBufferData(target, count * sizeof(T), data, usage); CHECKGL

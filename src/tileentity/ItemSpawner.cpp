@@ -29,7 +29,7 @@ namespace Game3 {
 		TileEntity::absorbJSON(game, json);
 		chancePerTenth = json.at("chance");
 		for (const auto &spawnable: json.at("spawnables"))
-			spawnables.push_back(ItemStack::fromJSON(game, spawnable));
+			spawnables.emplace_back(ItemStack::fromJSON(game, spawnable));
 	}
 
 	void ItemSpawner::tick(Game &game, float delta) {

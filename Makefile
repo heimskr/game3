@@ -37,7 +37,7 @@ else
 endif
 
 TRIPLET      ?= x64-linux
-DEPS         := glm glfw3 libzstd gtk4 gtkmm-4.0 glu libevent_openssl openssl libevent_pthreads freetype2
+DEPS         := glm glfw3 libzstd gtk4 gtkmm-4.0 glu libevent_openssl openssl libevent_pthreads freetype2 eigen3
 OUTPUT       := game3
 COMPILER     ?= g++
 DEBUGGER     ?= gdb
@@ -109,6 +109,37 @@ include/resources.h: $(RESGEN)
 $(OUTPUT): $(OBJECTS) chemskr/libchemskr.a $(NOISE_OBJ)
 	@ printf "\e[2m[\e[22;36mld\e[39;2m]\e[22m $@ \e[2m$(LTO)\e[22m\n"
 	@ $(COMPILER) $^ -o $@ $(LDFLAGS)
+
+pvs:
+	STAMP=$
+	mkdir -p pvs-report/
+	pvs-studio-analyzer trace -- meson compile -C builddir
+	pvs-studio-analyzer analyze \
+		-a "64;GA;OP;CS" \
+		-e subprojects \
+		-j "$(shell nproc)" \
+		-o pvs-analysis.log
+	plog-converter \
+		-p game3 \
+		-a "64;GA;OP;CS" \
+		-t fullhtml \
+		-o pvs-report/$$(date +'%Y-%m-%d_T%H%M%S') \
+		-d "V104,V1042" \
+		pvs-analysis.log\
+
+repvs:
+	pvs-studio-analyzer analyze \
+		-a "64;GA;OP;CS" \
+		-e subprojects \
+		-j "$(shell nproc)" \
+		-o pvs-analysis.log
+	plog-converter \
+		-p game3 \
+		-a "64;GA;OP;CS" \
+		-t fullhtml \
+		-o pvs-report/$$(date +'%Y-%m-%d_T%H%M%S') \
+		-d "V104,V1042" \
+		pvs-analysis.log\
 
 chemskr/libchemskr.a:
 	make -C chemskr libchemskr.a

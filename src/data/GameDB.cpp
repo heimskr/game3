@@ -193,7 +193,7 @@ namespace Game3 {
 			statement.exec();
 		}
 
-		if (use_transaction) {
+		if (transaction) {
 			Timer timer{"CommitTransaction"};
 			transaction->commit();
 		}
@@ -400,7 +400,7 @@ namespace Game3 {
 
 		statement.exec();
 
-		if (use_transaction)
+		if (transaction)
 			transaction->commit();
 	}
 
@@ -502,7 +502,7 @@ namespace Game3 {
 			statement.reset();
 		}
 
-		if (use_transaction)
+		if (transaction)
 			transaction->commit();
 	}
 
@@ -558,7 +558,7 @@ namespace Game3 {
 			statement.reset();
 		}
 
-		if (use_transaction)
+		if (transaction)
 			transaction->commit();
 	}
 
@@ -619,7 +619,7 @@ namespace Game3 {
 
 		statement.exec();
 
-		if (use_transaction)
+		if (transaction)
 			transaction->commit();
 	}
 

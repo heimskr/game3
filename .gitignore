@@ -39,3 +39,5 @@
 /core
 /.force-migrate
 /.seed
+pvs-analysis.log
+/pvs-report

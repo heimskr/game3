@@ -11,7 +11,7 @@ namespace Game3 {
 		if (!client.hasHostname())
 			throw CommandError("Can't log in: not connected");
 
-		const std::string &username = pieces.at(1);
+		const std::string &username = pieces[1];
 		const std::string &hostname = client.getHostname();
 		if (std::optional<Token> token = client.getToken(hostname, username))
 			client.send(LoginPacket(username, *token));

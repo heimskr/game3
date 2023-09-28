@@ -37,8 +37,8 @@ namespace Game3 {
 
 		template <typename Fn>
 		void iterate(const Fn &fn) const {
-			for (auto row = y * CHUNK_SIZE, row_max = (y + 1) * CHUNK_SIZE; row < row_max; ++row)
-				for (auto column = x * CHUNK_SIZE, column_max = (x + 1) * CHUNK_SIZE; column < column_max; ++column)
+			for (int64_t row = y * CHUNK_SIZE, row_max = (y + 1) * CHUNK_SIZE; row < row_max; ++row)
+				for (int64_t column = x * CHUNK_SIZE, column_max = (x + 1) * CHUNK_SIZE; column < column_max; ++column)
 					fn(Position{row, column});
 		}
 	};
@@ -100,7 +100,7 @@ namespace std {
 	template <>
 	struct hash<Game3::ChunkPosition> {
 		size_t operator()(const Game3::ChunkPosition &chunk_position) const {
-			return (static_cast<size_t>(chunk_position.x) << 32) | static_cast<size_t>(chunk_position.y);
+			return (static_cast<uint64_t>(chunk_position.x) << 32) | static_cast<uint64_t>(chunk_position.y);
 		}
 	};
 }

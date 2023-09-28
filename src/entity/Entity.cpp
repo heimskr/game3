@@ -69,7 +69,7 @@ namespace Game3 {
 	}
 
 	void Entity::toJSON(nlohmann::json &json) const {
-		auto lock = sharedLock();
+		auto this_lock = sharedLock();
 		json["type"]      = type;
 		json["position"]  = position;
 		json["realmID"]   = realmID;
@@ -84,7 +84,7 @@ namespace Game3 {
 		}
 
 		{
-			auto lock = path.sharedLock();
+			auto path_lock = path.sharedLock();
 			if (!path.empty())
 				json["path"] = path;
 		}
@@ -103,7 +103,7 @@ namespace Game3 {
 		if (json.is_null())
 			return; // Hopefully this is because the Entity is being constructed in EntityPacket::decode.
 
-		auto lock = uniqueLock();
+		auto this_lock = uniqueLock();
 
 		if (auto iter = json.find("type"); iter != json.end())
 			type = *iter;
@@ -118,7 +118,7 @@ namespace Game3 {
 		if (auto iter = json.find("inventory"); iter != json.end())
 			setInventory(std::make_shared<ServerInventory>(ServerInventory::fromJSON(game, *iter, shared_from_this())));
 		if (auto iter = json.find("path"); iter != json.end()) {
-			auto lock = path.uniqueLock();
+			auto path_lock = path.uniqueLock();
 			path = iter->get<std::list<Direction>>();
 		}
 		if (auto iter = json.find("money"); iter != json.end())
@@ -762,7 +762,7 @@ namespace Game3 {
 					}
 
 					if (visible->isPlayer())
-						players_to_erase.push_back(std::dynamic_pointer_cast<Player>(visible));
+						players_to_erase.emplace_back(std::dynamic_pointer_cast<Player>(visible));
 				}
 			}
 		}
@@ -790,7 +790,7 @@ namespace Game3 {
 						assert(visible->getGID() != getGID());
 						visibleEntities.insert(visible);
 						if (visible->isPlayer())
-							visiblePlayers.insert(std::dynamic_pointer_cast<Player>(visible));
+							visiblePlayers.emplace(std::dynamic_pointer_cast<Player>(visible));
 						if (visible->otherEntityToLock != globalID) {
 							otherEntityToLock = visible->globalID;
 							{
@@ -1007,7 +1007,7 @@ namespace Game3 {
 			if (entity.get() != this && entity->canSee(*this)) {
 				visibleEntities.insert(entity);
 				if (entity->isPlayer())
-					visiblePlayers.insert(std::dynamic_pointer_cast<Player>(entity));
+					visiblePlayers.emplace(std::dynamic_pointer_cast<Player>(entity));
 			}
 		}
 	}

@@ -33,8 +33,10 @@ namespace Game3 {
 			INFO("Moving non-player entity " << arguments.globalID << " (" << typeid(entity_ref).name() << "). Player is " << game.player->getGID());
 		}
 
-		const double apparent_x = entity->offset.x + double(entity->getPosition().column);
-		const double apparent_y = entity->offset.y + double(entity->getPosition().row);
+		const Offset offset = entity->offset.copyBase();
+		Position position = entity->getPosition();
+		const double apparent_x = offset.x + static_cast<double>(position.column);
+		const double apparent_y = offset.y + static_cast<double>(position.row);
 
 		MovementContext context{
 			.isTeleport = arguments.isTeleport
@@ -48,8 +50,9 @@ namespace Game3 {
 
 		if (!context.isTeleport) {
 			if (arguments.adjustOffset) {
-				entity->offset.x = apparent_x - entity->getPosition().column;
-				entity->offset.y = apparent_y - entity->getPosition().row;
+				position = entity->getPosition();
+				entity->offset.x = apparent_x - position.column;
+				entity->offset.y = apparent_y - position.row;
 			} else if (arguments.offset)
 				entity->offset = *arguments.offset;
 		}

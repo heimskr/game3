@@ -56,7 +56,7 @@ namespace Game3 {
 		CraftingRecipe recipe;
 
 		for (const auto &item: json.at("input"))
-			recipe.input.push_back(CraftingRequirement::fromJSON(game, item));
+			recipe.input.emplace_back(CraftingRequirement::fromJSON(game, item));
 
 		recipe.output = ItemStack::manyFromJSON(game, json.at("output"));
 

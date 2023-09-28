@@ -64,7 +64,7 @@ namespace Game3 {
 
 		FluidLevel to_remove = std::min<FluidLevel>(amount, fluid->level);
 
-		if (ENERGY_PER_UNIT != 0)
+		if (ENERGY_PER_UNIT > 0)
 			to_remove = std::min<FluidLevel>(energyContainer->energy / ENERGY_PER_UNIT, to_remove);
 
 		if (to_remove == 0)
@@ -100,11 +100,11 @@ namespace Game3 {
 	}
 
 	bool Pump::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
-		auto &realm = *getRealm();
+		RealmPtr realm = getRealm();
 
 		if (modifiers.onlyAlt()) {
-			realm.queueDestruction(getSelf());
-			player->give(ItemStack(realm.getGame(), "base:item/pump"_id));
+			realm->queueDestruction(getSelf());
+			player->give(ItemStack(realm->getGame(), "base:item/pump"_id));
 			return true;
 		}
 
@@ -128,7 +128,7 @@ namespace Game3 {
 		{
 			auto lock = fluidContainer->levels.sharedLock();
 			for (const auto &[id, amount]: fluidContainer->levels)
-				INFO(realm.getGame().getFluid(id)->identifier << " = " << amount);
+				INFO(realm->getGame().getFluid(id)->identifier << " = " << amount);
 		}
 
 		return false;

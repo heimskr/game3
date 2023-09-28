@@ -72,7 +72,7 @@ namespace Game3 {
 					if (active_stack->reduceDurability())
 						inventory->erase(active_slot);
 					ItemCount saplings = 1;
-					while (rand() % 4 == 1)
+					while (std::uniform_int_distribution(1, 4)(threadContext.rng) == 1)
 						++saplings;
 					player->give({game, "base:item/sapling"_id, saplings});
 					increaseUpdateCounter();

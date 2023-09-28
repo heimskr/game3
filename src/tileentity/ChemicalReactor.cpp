@@ -88,11 +88,11 @@ namespace Game3 {
 		if (getSide() == Side::Client)
 			return false;
 
-		auto &realm = *getRealm();
 
 		if (modifiers.onlyAlt()) {
-			realm.queueDestruction(getSelf());
-			player->give(ItemStack(realm.getGame(), "base:item/chemical_reactor"_id));
+			RealmPtr realm = getRealm();
+			realm->queueDestruction(getSelf());
+			player->give(ItemStack(realm->getGame(), "base:item/chemical_reactor"_id));
 			return true;
 		}
 

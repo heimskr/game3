@@ -23,8 +23,8 @@ namespace Game3 {
 			case Direction::Down:  return *this + Position( 1,  0);
 			case Direction::Left:  return *this + Position( 0, -1);
 			default:
-				assert(!"Direction is valid");
-				return *this;
+				ERROR("Direction " << static_cast<int>(direction) << " is invalid");
+				std::terminate();
 		}
 	}
 
@@ -35,8 +35,8 @@ namespace Game3 {
 			case Direction::Down:  return *this += Position( 1,  0);
 			case Direction::Left:  return *this += Position( 0, -1);
 			default:
-				assert(!"Direction is valid");
-				return *this;
+				ERROR("Direction " << static_cast<int>(direction) << " is invalid");
+				std::terminate();
 		}
 	}
 

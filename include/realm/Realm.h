@@ -130,9 +130,9 @@ namespace Game3 {
 			EntityPtr findEntity(const Position &);
 			EntityPtr findEntity(const Position &, const EntityPtr &except);
 			TileEntityPtr tileEntityAt(const Position &);
-			void remove(EntityPtr);
+			void remove(const EntityPtr &);
 			void removeSafe(const EntityPtr &);
-			void remove(TileEntityPtr, bool run_helper = true);
+			void remove(const TileEntityPtr &, bool run_helper = true);
 			void removeSafe(const TileEntityPtr &);
 			void onMoved(const EntityPtr &, const Position &);
 			Game & getGame();
@@ -203,7 +203,7 @@ namespace Game3 {
 			void autotile(const Position &, Layer);
 
 			inline const auto & getPlayers() const { return players; }
-			inline void markGenerated(auto x, auto y) { generatedChunks.insert(ChunkPosition{x, y}); }
+			inline void markGenerated(auto x, auto y) { generatedChunks.emplace(x, y); }
 			inline auto pauseUpdates() { return Pauser(shared_from_this()); }
 			inline auto guardGeneration() { return GenerationGuard(shared_from_this()); }
 			inline bool isClient() const { return getSide() == Side::Client; }
