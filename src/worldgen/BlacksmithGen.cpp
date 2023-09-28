@@ -18,20 +18,19 @@ namespace Game3::WorldGen {
 
 		realm->markGenerated(0, 0);
 		realm->tileProvider.ensureAllChunks(ChunkPosition{0, 0});
-		auto pauser = realm->pauseUpdates();
 		generateIndoors(realm, rng, parent_realm, width, height, entrance);
 		Game &game = realm->getGame();
 
-		realm->setTile(Layer::Objects, {1, 3}, "base:tile/furnace"_id, false);
-		realm->setTile(Layer::Objects, {1, 5}, "base:tile/anvil"_id, false);
-		realm->add(TileEntity::create<CraftingStation>(game, "base:tile/furnace"_id, Position(1, 3), "base:station/furnace"_id));
-		realm->add(TileEntity::create<CraftingStation>(game, "base:tile/anvil"_id,   Position(1, 5), "base:station/anvil"_id));
+		realm->setTile(Layer::Objects, {1, 3}, "base:tile/furnace", false);
+		realm->setTile(Layer::Objects, {1, 5}, "base:tile/anvil", false);
+		realm->add(TileEntity::create<CraftingStation>(game, "base:tile/furnace", Position(1, 3), "base:station/furnace"));
+		realm->add(TileEntity::create<CraftingStation>(game, "base:tile/anvil",   Position(1, 5), "base:station/anvil"));
 		realm->extraData["furnace"] = Position(1, 3);
 		realm->extraData["anvil"]   = Position(1, 5);
 
-		realm->setTile(Layer::Objects, {height / 2, width / 2 - 1}, "base:tile/counter_w"_id, false);
-		realm->setTile(Layer::Objects, {height / 2, width / 2},     "base:tile/counter_we"_id, false);
-		realm->setTile(Layer::Objects, {height / 2, width / 2 + 1}, "base:tile/counter_e"_id, false);
+		realm->setTile(Layer::Objects, {height / 2, width / 2 - 1}, "base:tile/counter_w",  false);
+		realm->setTile(Layer::Objects, {height / 2, width / 2},     "base:tile/counter_we", false);
+		realm->setTile(Layer::Objects, {height / 2, width / 2 + 1}, "base:tile/counter_e",  false);
 		realm->extraData["counter"] = Position(height / 2 - 1, width / 2);
 
 		const auto &beds = realm->getTileset().getTilesByCategory("base:category/beds");
@@ -42,6 +41,6 @@ namespace Game3::WorldGen {
 
 		// const Position building_position = entrance - Position(1, 0);
 		// realm->spawn<Blacksmith>(bed_position, parent_realm->id, realm->id, building_position, parent_realm->closestTileEntity<Building>(building_position,
-		// 	[](const auto &building) { return building->tileID == "base:tile/keep_sw"_id; }));
+		// 	[](const auto &building) { return building->tileID == "base:tile/keep_sw"; }));
 	}
 }

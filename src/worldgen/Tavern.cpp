@@ -17,7 +17,6 @@ namespace Game3::WorldGen {
 		realm->tileProvider.ensureAllChunks(ChunkPosition{0, 0});
 		Timer timer("GenerateTavern");
 
-		auto pauser = realm->pauseUpdates();
 		generateIndoors(realm, rng, parent_realm, width, height, entrance, width / 2);
 
 		auto set = [&](auto &&...args) { realm->setTile(Layer::Objects, std::forward<decltype(args)>(args)..., false); };

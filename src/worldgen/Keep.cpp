@@ -12,31 +12,31 @@ namespace Game3::WorldGen {
 		Timer timer("GenerateKeep");
 		realm->markGenerated(0, 0);
 		realm->tileProvider.ensureAllChunks(ChunkPosition{0, 0});
-		auto pauser = realm->pauseUpdates();
+		auto guard = realm->guardGeneration();
 
 		for (int column = 1; column < width - 1; ++column) {
-			realm->setTile(Layer::Objects, {0, column}, "base:tile/wall_we"_id, false);
-			realm->setTile(Layer::Objects, {height - 1, column}, "base:tile/wall_we"_id, false);
+			realm->setTile(Layer::Objects, {0, column},          "base:tile/wall", true);
+			realm->setTile(Layer::Objects, {height - 1, column}, "base:tile/wall", true);
 		}
 
 		for (int row = 1; row < height - 1; ++row) {
-			realm->setTile(Layer::Objects, {row, 0}, "base:tile/wall_ns"_id, false);
-			realm->setTile(Layer::Objects, {row, width - 1}, "base:tile/wall_ns"_id, false);
+			realm->setTile(Layer::Objects, {row, 0},         "base:tile/wall", true);
+			realm->setTile(Layer::Objects, {row, width - 1}, "base:tile/wall", true);
 		}
 
 		for (int row = 0; row < height; ++row)
 			for (int column = 0; column < width; ++column)
-				realm->setTile(Layer::Terrain, {row, column}, "base:tile/floor"_id, false);
+				realm->setTile(Layer::Terrain, {row, column}, "base:tile/floor", false);
 
-		realm->setTile(Layer::Objects, {0, 0}, "base:tile/wall_se"_id, false);
-		realm->setTile(Layer::Objects, {0, width - 1}, "base:tile/wall_sw"_id, false);
-		realm->setTile(Layer::Objects, {height - 1, 0}, "base:tile/wall_ne"_id, false);
-		realm->setTile(Layer::Objects, {height - 1, width - 1}, "base:tile/wall_nw"_id, false);
+		realm->setTile(Layer::Objects, {0, 0},                  "base:tile/wall", true);
+		realm->setTile(Layer::Objects, {0, width - 1},          "base:tile/wall", true);
+		realm->setTile(Layer::Objects, {height - 1, 0},         "base:tile/wall", true);
+		realm->setTile(Layer::Objects, {height - 1, width - 1}, "base:tile/wall", true);
 
 		const Position exit_position(height - 1, width / 2);
-		realm->setTile(Layer::Objects, exit_position - Position(0, 1), "base:tile/wall_w"_id, false);
-		realm->setTile(Layer::Objects, exit_position,     "base:tile/empty"_id, false);
-		realm->setTile(Layer::Objects, exit_position + Position(0, 1), "base:tile/wall_e"_id, false);
+		realm->setTile(Layer::Objects, exit_position - Position(0, 1), "base:tile/wall", true);
+		realm->setTile(Layer::Objects, exit_position,                  "base:tile/empty", false);
+		realm->setTile(Layer::Objects, exit_position + Position(0, 1), "base:tile/wall", true);
 
 		const auto &doors = realm->getTileset().getTilesByCategory("base:category/doors");
 
@@ -45,10 +45,10 @@ namespace Game3::WorldGen {
 		exit_door->extraData["exit"] = true;
 		realm->add(exit_door);
 
-		realm->setTile(Layer::Objects, Position(height - 2, 1), "base:tile/stockpile_w"_id, false);
-		realm->setTile(Layer::Objects, Position(height - 2, 2), "base:tile/stockpile_e"_id, false);
+		realm->setTile(Layer::Objects, Position(height - 2, 1), "base:tile/stockpile_w", false);
+		realm->setTile(Layer::Objects, Position(height - 2, 2), "base:tile/stockpile_e", false);
 		// TODO: the identifier here used to inexplicably be 48 so I'm putting in a silly tile temporarily to see whether it does anything.
-		auto stockpile = TileEntity::create<Stockpile>(game, "base:tile/stockpile_e"_id, Position(height - 2, 2));
+		auto stockpile = TileEntity::create<Stockpile>(game, "base:tile/stockpile_e", Position(height - 2, 2));
 		assert(realm->add(stockpile));
 		stockpile->setInventory(40);
 		realm->stockpileInventory = stockpile->getInventory();

@@ -19,7 +19,6 @@ namespace Game3::WorldGen {
 		Timer timer("GenerateHouse");
 
 		realm->tileProvider.ensureAllChunks(ChunkPosition{0, 0});
-		auto pauser = realm->pauseUpdates();
 		generateIndoors(realm, rng, parent_realm, width, height, entrance);
 
 		const auto &tileset = realm->getTileset();
