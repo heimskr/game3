@@ -9,6 +9,6 @@
 		"base:autotile/fluid_extractors":  "base:tile/fluid_extractors",
 		"base:autotile/item_extractors":   "base:tile/item_extractors",
 		"base:autotile/towers":            "base:tile/tower",
-		"base:autotile/walls":             "base:tile/wall"
+		"base:autotile/wooden_walls":      "base:tile/wooden_wall"
 	}
 }

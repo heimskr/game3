@@ -68,7 +68,7 @@ namespace Game3 {
 			size_t columnCount(const Game &);
 			size_t rowCount(const Game &);
 			void setHash(std::string);
-			std::shared_ptr<AutotileSet> getAutotileSet(const Identifier &tilename) const;
+			std::shared_ptr<AutotileSet> getAutotileSet(const Identifier &) const;
 
 			const auto & getIDs()          const { return ids;          }
 			const auto & getNames()        const { return names;        }
