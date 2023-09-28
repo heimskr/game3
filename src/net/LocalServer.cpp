@@ -225,7 +225,12 @@ namespace Game3 {
 		game->openDatabase(world_path);
 		game_server->game = game;
 
-		constexpr size_t seed = 1621;
+		size_t seed = 1621;
+		if (std::filesystem::exists(".seed")) {
+			seed = parseNumber<size_t>(strip(readFile(".seed")));
+			INFO("Using custom seed \e[1m" << seed << "\e[22m");
+		}
+
 		if (database_existed) {
 			game->database.readAllRealms();
 			Timer::summary();

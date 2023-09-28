@@ -43,6 +43,19 @@ namespace Game3 {
 		return out;
 	}
 
+	std::string strip(std::string_view str, const char *whitespace) {
+		if (str.empty())
+			return {};
+
+		while (!str.empty() && str.find_first_of(whitespace) == 0)
+			str.remove_prefix(1);
+
+		while (!str.empty() && str.find_last_of(whitespace) == str.size() - 1)
+			str.remove_suffix(1);
+
+		return std::string(str);
+	}
+
 	long parseLong(const std::string &str, int base) {
 		const char *c_str = str.c_str();
 		char *end = nullptr;

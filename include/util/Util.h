@@ -32,6 +32,8 @@ namespace Game3 {
 	template <typename T = std::string_view>
 	std::vector<T> split(std::string_view str, std::string_view delimiter, bool condense = true);
 
+	std::string strip(std::string_view, const char *whitespace = " \t\r\n");
+
 	template <typename C>
 	std::string join(const C &container, std::string_view delimiter = " ") {
 		std::stringstream ss;
