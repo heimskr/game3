@@ -24,17 +24,17 @@ namespace Game3 {
 	};
 
 	struct MarchableInfo {
-		/** The top-left corner of the set of marchable tiles. */
-		Identifier corner;
-		/** A set of categories of tiles that this marchable category should consider possible neighbors. */
-		std::unordered_set<Identifier> categories;
+		/** The left edge of the row of marchable tiles. */
+		Identifier start;
+		/** The set of possible neighbors. */
+		std::shared_ptr<AutotileSet> autotileSet;
 
 		MarchableInfo() = default;
-		MarchableInfo(Identifier corner_, std::unordered_set<Identifier> categories_):
-			corner(std::move(corner_)), categories(std::move(categories_)) {}
+		MarchableInfo(Identifier start_, std::shared_ptr<AutotileSet> autotile_set):
+			start(std::move(start_)), autotileSet(std::move(autotile_set)) {}
 	};
 
-	void from_json(const nlohmann::json &, MarchableInfo &);
+	// void from_json(const nlohmann::json &, MarchableInfo &);
 
 	class Tileset: public NamedRegisterable {
 		public:
@@ -55,8 +55,7 @@ namespace Game3 {
 			bool getItemStack(const Game &, const Identifier &, ItemStack &) const;
 			bool isMarchable(TileID);
 			bool isCategoryMarchable(const Identifier &category) const;
-			const Identifier & getMarchCorner(const Identifier &category) const;
-			const MarchableInfo & getMarchableInfo(const Identifier &category) const;
+			const MarchableInfo & getMarchableInfo(const Identifier &tilename) const;
 			void clearCache();
 			const std::unordered_set<Identifier> getCategories(const Identifier &) const;
 			const std::unordered_set<TileID> getCategoryIDs(const Identifier &) const;
@@ -86,7 +85,7 @@ namespace Game3 {
 			std::optional<TileID> maybe(const Identifier &) const;
 			std::optional<std::reference_wrapper<const Identifier>> maybe(TileID) const;
 
-			static Tileset fromJSON(Identifier, const nlohmann::json &);
+			// static Tileset fromJSON(Identifier, const nlohmann::json &);
 
 		private:
 			Tileset(Identifier identifier_);

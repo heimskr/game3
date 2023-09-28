@@ -23,12 +23,12 @@ namespace Game3 {
 		return false;
 	}
 
-	std::shared_ptr<Furniture> create(ItemID id_, std::string name_, MoneyCount base_price, Layer layer, Identifier tilename) {
+	std::shared_ptr<Furniture> Furniture::create(ItemID id_, std::string name_, MoneyCount base_price, Layer layer, Identifier tilename) {
 		return std::make_shared<SimpleFurniture>(std::move(id_), std::move(name_), base_price, layer, std::move(tilename));
 	}
 
-	std::shared_ptr<Furniture> create(ItemID id_, std::string name_, MoneyCount base_price, Layer layer, MarchableInfo info) {
-		return std::make_shared<MarchableFurniture>(std::move(id_), std::move(name_), base_price, layer, std::move(info));
+	std::shared_ptr<Furniture> Furniture::create(ItemID id_, std::string name_, MoneyCount base_price, Layer layer, Identifier start, Identifier autotile) {
+		return std::make_shared<MarchableFurniture>(std::move(id_), std::move(name_), base_price, layer, std::move(start), std::move(autotile));
 	}
 
 	SimpleFurniture::SimpleFurniture(ItemID id_, std::string name_, MoneyCount base_price, Layer layer_, Identifier tilename_):
@@ -41,9 +41,10 @@ namespace Game3 {
 		return true;
 	}
 
-	MarchableFurniture::MarchableFurniture(ItemID id_, std::string name_, MoneyCount base_price, Layer layer_, MarchableInfo info_):
+	MarchableFurniture::MarchableFurniture(ItemID id_, std::string name_, MoneyCount base_price, Layer layer_, Identifier start_, Identifier autotile_):
 		Furniture(std::move(id_), std::move(name_), base_price, 64),
-		info(std::move(info_)),
+		start(std::move(start_)),
+		autotile(std::move(autotile_)),
 		layer(layer_) {}
 
 	bool MarchableFurniture::apply(const Place &place) {
@@ -54,15 +55,13 @@ namespace Game3 {
 	TileID MarchableFurniture::march(const Place &place) {
 		const Tileset &tileset = place.realm->getTileset();
 
+		std::shared_ptr<AutotileSet> autotile_set = tileset.getAutotileSet(autotile);
+
 		const auto march_result = march4([&](int8_t row_offset, int8_t column_offset) -> bool {
 			const Position offset_position = place.position + Position(row_offset, column_offset);
-			const TileID tile = place.realm->getTile(layer, offset_position);
-			for (const Identifier &category: info.categories)
-				if (tileset.isInCategory(tile, category))
-					return true;
-			return false;
+			return autotile_set->members.contains(tileset[place.realm->getTile(layer, offset_position)]);
 		});
 
-		return tileset[info.corner] + march_result;
+		return tileset[start] + march_result;
 	}
 }

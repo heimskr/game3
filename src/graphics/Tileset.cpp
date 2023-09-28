@@ -5,15 +5,15 @@
 #include "util/Crypto.h"
 
 namespace Game3 {
-	void from_json(const nlohmann::json &json, MarchableInfo &marchable_info) {
-		if (json.is_string()) {
-			marchable_info.corner = json.get<Identifier>();
-			marchable_info.categories.clear();
-		} else {
-			marchable_info.corner     = json.at("corner");
-			marchable_info.categories = json.at("categories");
-		}
-	}
+	// void from_json(const nlohmann::json &json, MarchableInfo &marchable_info) {
+	// 	if (json.is_string()) {
+	// 		marchable_info.corner = json.get<Identifier>();
+	// 		marchable_info.categories.clear();
+	// 	} else {
+	// 		marchable_info.corner     = json.at("corner");
+	// 		marchable_info.categories = json.at("categories");
+	// 	}
+	// }
 
 	Tileset::Tileset(Identifier identifier_):
 		NamedRegisterable(std::move(identifier_)) {}
@@ -127,8 +127,8 @@ namespace Game3 {
 		return marchable.contains(category);
 	}
 
-	const MarchableInfo & Tileset::getMarchableInfo(const Identifier &category) const {
-		return marchableMap.at(category);
+	const MarchableInfo & Tileset::getMarchableInfo(const Identifier &tilename) const {
+		return marchableMap.at(tilename);
 	}
 
 	void Tileset::clearCache() {
@@ -208,83 +208,83 @@ namespace Game3 {
 		return std::nullopt;
 	}
 
-	Tileset Tileset::fromJSON(Identifier identifier, const nlohmann::json &json) {
-		Tileset tileset(identifier);
-		tileset.tileSize = json.at("tileSize");
-		tileset.name = json.at("name");
-		tileset.hash = computeSHA3_512<std::string>(json.dump());
-		tileset.empty = json.at("empty");
-		tileset.land = json.at("land");
-		tileset.walkable = json.at("walkable");
-		tileset.solid = json.at("solid");
-		tileset.bright = json.at("bright");
-		tileset.ids = json.at("ids");
-		tileset.categories = json.at("categories");
-		tileset.textureName = json.at("texture");
-		for (const auto &[key, value]: json.at("marchable").items()) {
-			tileset.marchable.emplace(key);
-			if (value.is_string()) {
-				auto info = value.get<MarchableInfo>();
-				// Make sure the category is in its own set of categories if only the corner is specified.
-				info.categories.emplace(key);
-				tileset.marchableMap.emplace(Identifier(key), std::move(info));
-			} else {
-				tileset.marchableMap.emplace(Identifier(key), value.get<MarchableInfo>());
-			}
-		}
+	// Tileset Tileset::fromJSON(Identifier identifier, const nlohmann::json &json) {
+	// 	Tileset tileset(identifier);
+	// 	tileset.tileSize = json.at("tileSize");
+	// 	tileset.name = json.at("name");
+	// 	tileset.hash = computeSHA3_512<std::string>(json.dump());
+	// 	tileset.empty = json.at("empty");
+	// 	tileset.land = json.at("land");
+	// 	tileset.walkable = json.at("walkable");
+	// 	tileset.solid = json.at("solid");
+	// 	tileset.bright = json.at("bright");
+	// 	tileset.ids = json.at("ids");
+	// 	tileset.categories = json.at("categories");
+	// 	tileset.textureName = json.at("texture");
+	// 	for (const auto &[key, value]: json.at("marchable").items()) {
+	// 		tileset.marchable.emplace(key);
+	// 		if (value.is_string()) {
+	// 			auto info = value.get<MarchableInfo>();
+	// 			// Make sure the category is in its own set of categories if only the corner is specified.
+	// 			info.categories.emplace(key);
+	// 			tileset.marchableMap.emplace(Identifier(key), std::move(info));
+	// 		} else {
+	// 			tileset.marchableMap.emplace(Identifier(key), value.get<MarchableInfo>());
+	// 		}
+	// 	}
 
-		tileset.missing = json.at("missing");
+	// 	tileset.missing = json.at("missing");
 
-		std::unordered_map<Identifier, Identifier> stacks = json.at("stacks");
-		for (const auto &[key, val]: stacks) {
-			if (key.getPathStart() == "category")
-				tileset.stackCategories.emplace(key, val);
-			else
-				tileset.stackNames.emplace(key, val);
-		}
+	// 	std::unordered_map<Identifier, Identifier> stacks = json.at("stacks");
+	// 	for (const auto &[key, val]: stacks) {
+	// 		if (key.getPathStart() == "category")
+	// 			tileset.stackCategories.emplace(key, val);
+	// 		else
+	// 			tileset.stackNames.emplace(key, val);
+	// 	}
 
-		for (const auto &[key, val]: tileset.ids) {
-			tileset.names.emplace(val, key);
-			tileset.inverseCategories.try_emplace(key);
-		}
+	// 	for (const auto &[key, val]: tileset.ids) {
+	// 		tileset.names.emplace(val, key);
+	// 		tileset.inverseCategories.try_emplace(key);
+	// 	}
 
-		bool changed;
-		std::vector<Identifier> add_vector;
-		std::vector<Identifier> remove_vector;
+	// 	bool changed;
+	// 	std::vector<Identifier> add_vector;
+	// 	std::vector<Identifier> remove_vector;
 
-		// Please don't introduce any cycles in the category dependency graph.
-		do {
-			changed = false;
+	// 	// Please don't introduce any cycles in the category dependency graph.
+	// 	do {
+	// 		changed = false;
 
-			for (auto &[category, set]: tileset.categories) {
-				add_vector.clear();
-				remove_vector.clear();
+	// 		for (auto &[category, set]: tileset.categories) {
+	// 			add_vector.clear();
+	// 			remove_vector.clear();
 
-				for (const auto &tilename: set) {
-					if (tilename.getPath() == "category") {
-						if (auto iter = tileset.categories.find(tilename); iter != tileset.categories.end()) {
-							remove_vector.push_back(tilename);
-							for (const auto &other: iter->second)
-								add_vector.push_back(other);
-							changed = true;
-						}
-					}
-				}
+	// 			for (const auto &tilename: set) {
+	// 				if (tilename.getPath() == "category") {
+	// 					if (auto iter = tileset.categories.find(tilename); iter != tileset.categories.end()) {
+	// 						remove_vector.push_back(tilename);
+	// 						for (const auto &other: iter->second)
+	// 							add_vector.push_back(other);
+	// 						changed = true;
+	// 					}
+	// 				}
+	// 			}
 
-				for (const auto &to_add: add_vector)
-					set.insert(to_add);
+	// 			for (const auto &to_add: add_vector)
+	// 				set.insert(to_add);
 
-				for (const auto &to_remove: remove_vector)
-					set.erase(to_remove);
-			}
-		} while (changed);
+	// 			for (const auto &to_remove: remove_vector)
+	// 				set.erase(to_remove);
+	// 		}
+	// 	} while (changed);
 
-		for (const auto &[category, set]: tileset.categories)
-			for (const auto &tilename: set)
-				tileset.inverseCategories[tilename].insert(category);
+	// 	for (const auto &[category, set]: tileset.categories)
+	// 		for (const auto &tilename: set)
+	// 			tileset.inverseCategories[tilename].insert(category);
 
-		return tileset;
-	}
+	// 	return tileset;
+	// }
 
 	void Tileset::setAutotile(const Identifier &tilename, const Identifier &autotile_name) {
 		if (auto iter = autotileSets.find(autotile_name); iter != autotileSets.end()) {

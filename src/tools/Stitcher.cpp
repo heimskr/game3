@@ -86,14 +86,16 @@ namespace Game3 {
 			int width{}, height{}, channels{};
 			images.emplace(name, stbi_load(png_path.c_str(), &width, &height, &channels, 4));
 
+			Identifier tilename = json.at("tilename");
+
 			int desired_dimension = 16;
-			if (auto autotile = json.find("autotile"); autotile != json.end() && autotile->get<bool>()) {
+
+			if (auto autotile_iter = out.autotileSetMap.find(tilename); autotile_iter != out.autotileSetMap.end()) {
 				autotiles.insert(name);
+				out.marchableMap[tilename] = MarchableInfo{tilename, autotile_iter->second};
 				desired_dimension = 64;
 			} else
 				non_autotiles.insert(name);
-
-			Identifier tilename = json.at("tilename");
 
 			if (json.at("solid").get<bool>())
 				out.solid.insert(tilename);

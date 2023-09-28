@@ -269,11 +269,13 @@ namespace Game3 {
 		add(std::make_shared<PumpItem>("base:item/pump", "Pump", 999, 64)); // TODO: cost
 		add(std::make_shared<TankItem>("base:item/tank", "Tank", 999, 64)); // TODO: cost
 
-		// add(std::make_shared<Furniture>("base:item/wooden_wall", "Wooden Wall",       9, 64));
-		// add(std::make_shared<Furniture>("base:item/plant_pot1",  "Plant Pot",        32, 64));
-		// add(std::make_shared<Furniture>("base:item/plant_pot2",  "Plant Pot",        32, 64));
-		// add(std::make_shared<Furniture>("base:item/plant_pot3",  "Plant Pot",        32, 64));
-		// add(std::make_shared<Furniture>("base:item/tower",       "Tower",            10, 64));
+		add(Furniture::create("base:item/wooden_wall", "Wooden Wall",  9, Layer::Objects, "base:tile/wooden_wall", "base:autotile/wooden_walls"));
+		add(Furniture::create("base:item/tower",       "Tower",       10, Layer::Objects, "base:tile/tower",       "base:autotile/towers"));
+
+		add(Furniture::create("base:item/plant_pot1", "Plant Pot", 32, Layer::Submerged, "base:tile/plant1"));
+		add(Furniture::create("base:item/plant_pot2", "Plant Pot", 32, Layer::Submerged, "base:tile/plant2"));
+		add(Furniture::create("base:item/plant_pot3", "Plant Pot", 32, Layer::Submerged, "base:tile/plant3"));
+
 		// add(std::make_shared<Furniture>("base:item/pride_flag",  "Pride Flag",       80, 64));
 		// add(std::make_shared<Furniture>("base:item/ace_flag",    "Asexual Flag",     80, 64));
 		// add(std::make_shared<Furniture>("base:item/nb_flag",     "Non-Binary Flag",  80, 64));
@@ -723,11 +725,11 @@ namespace Game3 {
 			auto &tilesets = registry<TilesetRegistry>();
 			tilesets.add(identifier, stitcher(base_dir, identifier));
 
-		} else if (type == "base:manual_tileset_map"_id) { // Deprecated.
+		// } else if (type == "base:manual_tileset_map"_id) { // Deprecated.
 
-			auto &tilesets = registry<TilesetRegistry>();
-			for (const auto &[key, value]: json.at(1).items())
-				tilesets.add(Identifier(key), Tileset::fromJSON(Identifier(key), value));
+		// 	auto &tilesets = registry<TilesetRegistry>();
+		// 	for (const auto &[key, value]: json.at(1).items())
+		// 		tilesets.add(Identifier(key), Tileset::fromJSON(Identifier(key), value));
 
 		} else if (type == "base:recipe_list"_id) {
 
@@ -761,7 +763,9 @@ namespace Game3 {
 	}
 
 	void Game::addRecipe(const nlohmann::json &json) {
-		registries.at(json.at(0).get<Identifier>())->toUnnamed()->add(*this, json.at(1));
+		const Identifier identifier = json.at(0);
+		if (identifier.getPathStart() != "ignore")
+			registries.at(identifier)->toUnnamed()->add(*this, json.at(1));
 	}
 
 	RealmID Game::newRealmID() const {

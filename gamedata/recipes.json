@@ -115,7 +115,7 @@
 				"output": [["base:item/electronics", 1]],
 				"station": "base:station/furnace"
 			}],
-			["base:crafting_recipe", {
+			["base:ignore/crafting_recipe", {
 				"input": [["base:item/electronics", 4], ["base:item/iron_bar", 8]],
 				"output": [["base:item/purifier", 1]],
 				"station": "base:station/anvil"
@@ -140,7 +140,7 @@
 				"input": [["base:item/stone", 10], ["base:item/plank", 10]],
 				"output": [["base:item/cave_entrance", 1]]
 			}],
-			["base:crafting_recipe", {
+			["base:ignore/crafting_recipe", {
 				"input": [["base:item/iron_bar", 10]],
 				"output": [["base:item/cauldron", 1]]
 			}],
@@ -169,7 +169,7 @@
 			["base:crafting_recipe", {"input": [["base:attribute/flower_purple", 1]], "output": [["base:item/purple_dye", 1]]}],
 			["base:crafting_recipe", {"input": [["base:attribute/flower_white", 1]],  "output": [["base:item/white_dye",  1]]}],
 			["base:crafting_recipe", {"input": [["base:attribute/flower_black", 1]],  "output": [["base:item/black_dye",  1]]}],
-			["base:crafting_recipe", {
+			["base:ignore/crafting_recipe", {
 				"input": [
 					["base:item/red_dye", 1],
 					["base:item/orange_dye", 1],
@@ -180,7 +180,7 @@
 				],
 				"output": [["base:item/pride_flag", 1]]
 			}],
-			["base:crafting_recipe", {
+			["base:ignore/crafting_recipe", {
 				"input": [
 					["base:item/black_dye", 1],
 					["base:item/gray_dye", 1],
@@ -189,7 +189,7 @@
 				],
 				"output": [["base:item/ace_flag", 1]]
 			}],
-			["base:crafting_recipe", {
+			["base:ignore/crafting_recipe", {
 				"input": [
 					["base:item/yellow_dye", 1],
 					["base:item/white_dye", 1],

@@ -18,6 +18,7 @@
 
 namespace Game3 {
 	void splitter() {
+		/*
 		std::filesystem::path filename = "resources/tileset.png";
 
 		int width{};
@@ -79,5 +80,6 @@ namespace Game3 {
 			std::ofstream of(dirname + "/tile.json");
 			of << meta.dump();
 		}
+		//*/
 	}
 }
