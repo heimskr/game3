@@ -62,7 +62,9 @@ namespace Game3 {
 			if (auto *stack = inventory->getActive()) {
 				if (stack->hasAttribute("base:attribute/pickaxe"_id) && !inventory->add(*ore_stack)) {
 					reveal(position);
-					setTile(Layer::Objects, position, tileset.getEmpty());
+					setTile(Layer::Objects, position, 0);
+					if (getTile(Layer::Terrain, position) == 0)
+						setTile(Layer::Terrain, position, "base:tile/cave_dirt", true);
 					if (stack->reduceDurability())
 						inventory->erase(inventory->activeSlot);
 					return true;

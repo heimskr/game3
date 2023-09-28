@@ -335,7 +335,8 @@
 				"-Dis_flatpak=true",
 				"-Dstrip=true",
 				"-Db_lto=true",
-				"-Doptimization=3"
+				"-Doptimization=3",
+				"-Dbuildtype=release"
 			],
 			"build-options": {
 				"strip": true

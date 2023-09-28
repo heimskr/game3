@@ -7,6 +7,7 @@
 #include <list>
 #include <map>
 #include <set>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -29,6 +30,8 @@ namespace Game3 {
 		t.end();
 		requires !Map<T>;
 		requires !Set<T>;
+		requires !std::same_as<T, std::string>;
+		requires !std::same_as<T, std::string_view>;
 	};
 
 	template <typename T>

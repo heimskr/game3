@@ -140,8 +140,14 @@ namespace Game3 {
 	template <>
 	char popBuffer<char>(Buffer &buffer) {
 		std::span span = buffer.getSpan();
-		if (span.empty())
+		if (span.empty()) {
+			ERROR("Buffer size: " << buffer.bytes.size());
+			ERROR("Skip: " << buffer.skip);
+			ERROR("Span size: " << span.size());
+			ERROR("Span size_bytes: " << span.size_bytes());
+			INFO(hexString(buffer.bytes, true));
 			throw std::out_of_range("Buffer is empty");
+		}
 		const char out = span[0];
 		++buffer.skip;
 		return out;
@@ -168,6 +174,11 @@ namespace Game3 {
 		double out{};
 		std::memcpy(&out, &raw, sizeof(out));
 		return out;
+	}
+
+	template <>
+	std::string popBuffer<std::string>(Buffer &buffer) {
+		return buffer.take<std::string>();
 	}
 
 	std::string Buffer::popType() {

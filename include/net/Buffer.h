@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Log.h"
 #include "util/Concepts.h"
 
 #include <bit>
@@ -41,7 +42,7 @@ namespace Game3 {
 			size_t skip = 0;
 
 			std::span<const uint8_t> getSpan() const {
-				return std::span(bytes.begin() + skip, bytes.size() - skip);
+				return std::span(bytes.data() + skip, bytes.size() - skip);
 			}
 
 			template <typename T>
@@ -216,11 +217,6 @@ namespace Game3 {
 				return appendType(container) += container;
 			}
 
-			template <Set S>
-			Buffer & operator<<(const S &set) {
-				return appendType(set) += set;
-			}
-
 			template <Map M>
 			Buffer & operator<<(const M &map) {
 				return appendType(map) += map;
@@ -328,8 +324,14 @@ namespace Game3 {
 	T popBuffer(Buffer &buffer) {
 		std::span span = buffer.getSpan();
 
-		if (span.size_bytes() < sizeof(T))
+		if (span.size_bytes() < sizeof(T)) {
+			ERROR("Buffer size: " << buffer.bytes.size());
+			ERROR("Skip: " << buffer.skip);
+			ERROR("Span size: " << span.size());
+			ERROR("Span size_bytes: " << span.size_bytes());
+			ERROR("sizeof(" << typeid(T).name() << "): " << sizeof(T));
 			throw std::out_of_range("Buffer is too empty");
+		}
 
 		T out{};
 		std::memmove(reinterpret_cast<char *>(&out), span.data(), sizeof(T));
