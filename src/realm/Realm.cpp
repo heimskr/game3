@@ -834,29 +834,9 @@ namespace Game3 {
 			for (Index column_offset = -1; column_offset <= 1; ++column_offset) {
 				if (row_offset != 0 || column_offset != 0) {
 					const Position offset_position = position + Position(row_offset, column_offset);
-					if (auto neighbor = tileEntityAt(offset_position)) {
+					if (auto neighbor = tileEntityAt(offset_position))
 						neighbor->onNeighborUpdated(Position(-row_offset, -column_offset));
-					} else {
-						const TileID tile = tileProvider.copyTile(layer, offset_position, TileProvider::TileMode::ReturnEmpty);
-						const auto &tilename = tileset[tile];
-
-						if (const MarchableInfo *info = tileset.getMarchableInfo(tilename)) {
-							const auto &members = info->autotileSet->members;
-
-							const TileID march_result = march4([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
-								const Position march_position = offset_position + Position(march_row_offset, march_column_offset);
-								const TileID tile = tileProvider.copyTile(layer, march_position, TileProvider::TileMode::ReturnEmpty);
-								return members.contains(tileset[tile]);
-							});
-
-							const TileID marched = tileset[info->start] + march_result;
-
-							if (marched != tile) {
-								setTile(layer, offset_position, marched, true);
-								threadContext.updatedLayers.insert(layer);
-							}
-						}
-					}
+					autotile(offset_position, layer);
 				}
 			}
 		}
@@ -1311,6 +1291,29 @@ namespace Game3 {
 				shared->reuploadFluids();
 				shared->fluidReuploadPending = false;
 			});
+		}
+	}
+
+	void Realm::autotile(const Position &position, Layer layer) {
+		const Tileset &tileset = getTileset();
+		const TileID tile = tileProvider.copyTile(layer, position, TileProvider::TileMode::ReturnEmpty);
+		const auto &tilename = tileset[tile];
+
+		if (const MarchableInfo *info = tileset.getMarchableInfo(tilename)) {
+			const auto &members = info->autotileSet->members;
+
+			const TileID march_result = march4([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
+				const Position march_position = position + Position(march_row_offset, march_column_offset);
+				const TileID march_tile = tileProvider.copyTile(layer, march_position, TileProvider::TileMode::ReturnEmpty);
+				return members.contains(tileset[march_tile]);
+			});
+
+			const TileID marched = tileset[info->start] + march_result;
+
+			if (marched != tile) {
+				setTile(layer, position, marched, true);
+				threadContext.updatedLayers.insert(layer);
+			}
 		}
 	}
 

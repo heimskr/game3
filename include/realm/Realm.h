@@ -200,6 +200,7 @@ namespace Game3 {
 			void queueReupload(Layer);
 			void queueReuploadFluids();
 			void queueReuploadAll();
+			void autotile(const Position &, Layer);
 
 			inline const auto & getPlayers() const { return players; }
 			inline void markGenerated(auto x, auto y) { generatedChunks.insert(ChunkPosition{x, y}); }
