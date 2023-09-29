@@ -119,18 +119,16 @@ namespace Game3 {
 		inventory->add(ItemStack(*game, "base:item/cave_entrance"));
 		inventory->add(ItemStack(*game, "base:item/pump", 64));
 		inventory->add(ItemStack(*game, "base:item/tank", 64));
-		inventory->add(ItemStack(*game, "base:item/fluid_pipe", 64));
-		inventory->add(ItemStack(*game, "base:item/centrifuge", 64));
-		inventory->add(ItemStack(*game, "base:item/item_pipe", 64));
-		inventory->add(ItemStack(*game, "base:item/geothermal_generator", 64));
 		inventory->add(ItemStack(*game, "base:item/energy_pipe", 64));
-		inventory->add(ItemStack(*game, "base:item/lava_flask", 64));
+		inventory->add(ItemStack(*game, "base:item/fluid_pipe", 64));
+		inventory->add(ItemStack(*game, "base:item/item_pipe", 64));
+		inventory->add(ItemStack(*game, "base:item/centrifuge", 64));
+		inventory->add(ItemStack(*game, "base:item/geothermal_generator", 64));
 		inventory->add(ItemStack(*game, "base:item/chemical_reactor"));
+		inventory->add(ItemStack(*game, "base:item/lava_flask", 64));
 		inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "H2O"}}));
 		inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "H"}}));
-		inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "H"}}));
 		inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "O"}}));
-		inventory->add(ItemStack(*game, "base:item/clay", 64));
 		game->addPlayer(player);
 		return player;
 	}
