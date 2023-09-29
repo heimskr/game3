@@ -1,1 +1,1 @@
-{"autotile":true,"categories":["base:category/cave_floors"],"land":true,"solid":false,"tilename":"base:tile/grimrubble"}
+{"autotile":true,"categories":["base:category/cave_floors"],"land":false,"solid":true,"tilename":"base:tile/grimrubble"}
