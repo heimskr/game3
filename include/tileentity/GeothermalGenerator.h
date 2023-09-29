@@ -20,7 +20,7 @@ namespace Game3 {
 			FluidAmount getMaxLevel(FluidID) override;
 			EnergyAmount getEnergyCapacity() override;
 
-			std::string getName() override { return "Geothermal Generator"; }
+			std::string getName() const override { return "Geothermal Generator"; }
 
 			void init(Game &) override;
 			void tick(Game &, float) override;

@@ -40,7 +40,6 @@ namespace Game3::WorldGen {
 
 		const auto &doors = realm->getTileset().getTilesByCategory("base:category/doors");
 
-		Game &game = realm->getGame();
 		auto exit_door = TileEntity::spawn<Teleporter>(realm, choose(doors, rng), exit_position, parent_realm, entrance);
 		assert(exit_door);
 		exit_door->extraData["exit"] = true;

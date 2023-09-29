@@ -32,7 +32,7 @@ namespace Game3 {
 
 			virtual Side getSide() const = 0;
 			virtual Type getAgentType() const = 0;
-			virtual std::string getName() = 0;
+			virtual std::string getName() const = 0;
 
 			/** Handles when the player interacts with the tile they're on and that tile contains this agent. Returns whether anything interesting happened. */
 			virtual bool onInteractOn(const std::shared_ptr<Player> &, Modifiers) { return false; }

@@ -17,7 +17,7 @@ namespace Game3 {
 	Chest::Chest(const Position &position_):
 		Chest("base:tile/chest"_id, position_, "Chest") {}
 
-	std::string Chest::getName() {
+	std::string Chest::getName() const {
 		return name;
 	}
 

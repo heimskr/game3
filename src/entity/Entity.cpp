@@ -2,6 +2,7 @@
 #include "Position.h"
 #include "graphics/Tileset.h"
 #include "data/Identifier.h"
+#include "entity/ClientPlayer.h"
 #include "entity/Entity.h"
 #include "entity/EntityFactory.h"
 #include "entity/ServerPlayer.h"
@@ -667,8 +668,10 @@ namespace Game3 {
 	bool Entity::isVisible() const {
 		const auto pos = getPosition();
 		auto realm = getRealm();
-		if (getSide() == Side::Client)
-			return realm->getGame().toClient().canvas.inBounds(pos) && realm->isVisible(pos);
+		if (getSide() == Side::Client) {
+			ClientGame &client_game = realm->getGame().toClient();
+			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.player->getChunk()).contains(getChunkPosition(pos));
+		}
 		return realm->isVisible(pos);
 	}
 

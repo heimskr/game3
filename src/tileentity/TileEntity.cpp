@@ -1,3 +1,4 @@
+#include "entity/ClientPlayer.h"
 #include "graphics/Tileset.h"
 #include "game/ClientGame.h"
 #include "game/ServerGame.h"
@@ -107,10 +108,12 @@ namespace Game3 {
 	}
 
 	bool TileEntity::isVisible() const {
-		const auto pos = getPosition();
+		const Position pos = getPosition();
 		auto realm = getRealm();
-		if (getSide() == Side::Client)
-			return realm->getGame().toClient().canvas.inBounds(pos) && realm->isVisible(pos);
+		if (getSide() == Side::Client) {
+			ClientGame &client_game = realm->getGame().toClient();
+			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.player->getChunk()).contains(getChunkPosition(pos));
+		}
 		return realm->isVisible(pos);
 	}
 

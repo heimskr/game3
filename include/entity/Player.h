@@ -54,7 +54,7 @@ namespace Game3 {
 			bool setTooldown(float multiplier);
 			inline bool hasTooldown() const { return 0.f < tooldown; }
 			void showText(const Glib::ustring &text, const Glib::ustring &name);
-			std::string getName() override { return "Player"; }
+			std::string getName() const override { return "Player"; }
 			void give(const ItemStack &, Slot start = -1);
 			Place getPlace() override;
 			bool isMoving() const;

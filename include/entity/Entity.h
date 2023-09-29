@@ -128,7 +128,7 @@ namespace Game3 {
 			PathResult pathfind(const Position &start, const Position &goal, std::list<Direction> &, size_t loop_max = 1'000);
 			bool pathfind(const Position &goal, size_t loop_max = 1'000);
 			virtual float getSpeed() const { return MAX_SPEED; }
-			std::string getName() override { return "Unknown Entity (" + std::string(type) + ')'; }
+			std::string getName() const override { return "Unknown Entity (" + std::string(type) + ')'; }
 			Game & getGame();
 			Game & getGame() const;
 			bool isVisible() const;

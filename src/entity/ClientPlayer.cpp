@@ -23,6 +23,9 @@ namespace Game3 {
 	}
 
 	void ClientPlayer::render(SpriteRenderer &sprites, TextRenderer &text) {
+		if (!isVisible())
+			return;
+
 		Player::render(sprites, text);
 
 		const auto [row, column] = getPosition();

@@ -19,7 +19,7 @@ namespace Game3 {
 			bool mayExtractItem(Direction, Slot) override;
 			EnergyAmount getEnergyCapacity() override;
 
-			std::string getName() override { return "Chemical Reactor"; }
+			std::string getName() const override { return "Chemical Reactor"; }
 			void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) override;
 
 			void init(Game &) override;

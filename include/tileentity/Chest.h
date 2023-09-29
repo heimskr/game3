@@ -18,7 +18,7 @@ namespace Game3 {
 			Chest & operator=(const Chest &) = delete;
 			Chest & operator=(Chest &&) = default;
 
-			std::string getName() override;
+			std::string getName() const override;
 
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) override;

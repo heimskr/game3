@@ -19,7 +19,7 @@ namespace Game3 {
 
 			FluidAmount getMaxLevel(FluidID) override;
 
-			std::string getName() override { return "Pump"; }
+			std::string getName() const override { return "Pump"; }
 
 			void tick(Game &, float) override;
 			void toJSON(nlohmann::json &) const override;

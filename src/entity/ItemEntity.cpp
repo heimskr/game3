@@ -100,7 +100,7 @@ namespace Game3 {
 		return true;
 	}
 
-	std::string ItemEntity::getName() {
+	std::string ItemEntity::getName() const {
 		return stack.item->name;
 	}
 
