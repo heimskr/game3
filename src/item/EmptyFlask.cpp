@@ -13,7 +13,7 @@ namespace Game3 {
 		auto &realm  = *place.realm;
 		assert(realm.getSide() == Side::Server);
 
-		if (std::optional<FluidTile> tile = realm.tryFluid(place.position); tile && FluidTile::FULL <= tile->level) {
+		if (std::optional<FluidTile> tile = realm.tryFluid(place.position); tile && (FluidTile::FULL <= tile->level || tile->isInfinite())) {
 			auto fluid = realm.getGame().getFluid(tile->id);
 			if (!fluid || !fluid->flaskName)
 				return false;
