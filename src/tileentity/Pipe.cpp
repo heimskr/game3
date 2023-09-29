@@ -199,8 +199,17 @@ namespace Game3 {
 	}
 
 	bool Pipe::onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) {
+		bool first = true;
+
 		for (const PipeType pipe_type: PIPE_TYPES) {
 			if (auto network = networks[pipe_type]) {
+				if (first) {
+					first = false;
+					INFO("================================");
+				} else {
+					INFO("--------------------------------");
+				}
+
 				INFO(pipe_type << " network ID: " << network->getID() << ", loaded: " << std::boolalpha << loaded[pipe_type]);
 
 				if (const auto &insertions = network->getInsertions(); !insertions.empty()) {
@@ -310,7 +319,7 @@ namespace Game3 {
 		std::shared_ptr<Pipe> connection = getConnected(pipe_type, direction);
 		directions[pipe_type][direction] = false;
 
-		network->reconsiderInsertion(position + direction);
+		network->reconsiderPoints(position + direction);
 
 		if (connection && !reachable(pipe_type, connection))
 			network->partition(connection);
@@ -325,7 +334,7 @@ namespace Game3 {
 			else
 				network->removeExtraction(position + direction, flipDirection(direction));
 
-			network->reconsiderInsertion(position + direction);
+			network->reconsiderPoints(position + direction);
 			onNeighborUpdated(position + direction);
 		} else {
 			extractors[pipe_type][direction] = false;

@@ -124,7 +124,7 @@ namespace Game3 {
 		return 1 == insertions.erase(std::make_pair(position, direction));
 	}
 
-	void PipeNetwork::reconsiderInsertion(Position position) {
+	void PipeNetwork::reconsiderPoints(Position position) {
 		RealmPtr realm = weakRealm.lock();
 		if (!realm)
 			throw std::runtime_error("Couldn't lock realm");
@@ -133,17 +133,33 @@ namespace Game3 {
 		std::unordered_set<Direction> found;
 
 		if (!canWorkWith(realm->tileEntityAt(position))) {
-			for (const Direction direction: ALL_DIRECTIONS)
-				removeInsertion(position, direction);
+			for (const Direction direction: ALL_DIRECTIONS) {
+				if (auto pipe = std::dynamic_pointer_cast<Pipe>(realm->tileEntityAt(position + flipDirection(direction)))) {
+					if (auto network = pipe->getNetwork(type)) {
+						network->removeInsertion(position, direction);
+						network->removeExtraction(position, direction);
+					}
+				}
+			}
 			return;
 		}
 
 		for (const Direction direction: ALL_DIRECTIONS) {
 			if (auto pipe = std::dynamic_pointer_cast<Pipe>(realm->tileEntityAt(position + flipDirection(direction)))) {
-				if (pipe->getDirections()[type][direction] && !pipe->getExtractors()[type][direction])
-					addInsertion(position, flipDirection(direction));
-				else
-					removeInsertion(position, flipDirection(direction));
+				if (auto network = pipe->getNetwork(type)) {
+					if (pipe->getDirections()[type][direction]) {
+						if (pipe->getExtractors()[type][direction]) {
+							network->addExtraction(position, flipDirection(direction));
+							network->removeInsertion(position, flipDirection(direction));
+						} else {
+							network->addInsertion(position, flipDirection(direction));
+							network->removeExtraction(position, flipDirection(direction));
+						}
+					} else {
+						network->removeInsertion(position, flipDirection(direction));
+						network->removeExtraction(position, flipDirection(direction));
+					}
+				}
 			}
 		}
 	}
