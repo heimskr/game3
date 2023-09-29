@@ -34,8 +34,6 @@ namespace Game3 {
 			start(std::move(start_)), autotileSet(std::move(autotile_set)) {}
 	};
 
-	// void from_json(const nlohmann::json &, MarchableInfo &);
-
 	class Tileset: public NamedRegisterable {
 		public:
 			bool isLand(const Identifier &) const;
@@ -85,7 +83,8 @@ namespace Game3 {
 			std::optional<TileID> maybe(const Identifier &) const;
 			std::optional<std::reference_wrapper<const Identifier>> maybe(TileID) const;
 
-			// static Tileset fromJSON(Identifier, const nlohmann::json &);
+			/** Produces a limited amount of JSON about the tileset. */
+			void getMeta(nlohmann::json &) const;
 
 		private:
 			Tileset(Identifier identifier_);
@@ -104,7 +103,9 @@ namespace Game3 {
 			std::unordered_set<Identifier> bright;
 			std::unordered_set<Identifier> marchable;
 			std::unordered_map<Identifier, MarchableInfo> marchableMap;
+			/** Maps tilename identifiers to numeric IDs. */
 			std::unordered_map<Identifier, TileID> ids;
+			/** Maps numeric IDs to tilename identifiers. */
 			std::unordered_map<TileID, Identifier> names;
 			std::unordered_map<Identifier, Identifier> stackNames;
 			std::unordered_map<Identifier, Identifier> stackCategories;

@@ -21,6 +21,7 @@ namespace Game3 {
 	class Game;
 	class Player;
 	class Realm;
+	class Tileset;
 	class TileEntity;
 
 	class GameDB {
@@ -67,45 +68,11 @@ namespace Game3 {
 			void deleteEntity(const std::shared_ptr<Entity> &);
 
 			std::string readRealmTilesetHash(RealmID, bool do_lock = true);
-			void writeRealmTilesetHash(RealmID, const std::string &, bool use_transaction = true);
+			bool hasTileset(const std::string &hash, bool do_lock = true);
 
-			template <template <typename...> typename T>
-			T<TileID, Identifier> readRealmTileMap(RealmID realm_id, bool do_lock) {
-				assert(database);
-
-				std::unique_lock<std::shared_mutex> db_lock;
-				if (do_lock)
-					db_lock = database.uniqueLock();
-
-				SQLite::Statement query{*database, "SELECT value FROM realmTileMaps WHERE realmID = ? LIMIT 1"};
-
-				query.bind(1, realm_id);
-
-				while (query.executeStep())
-					return nlohmann::json::parse(query.getColumn(0).getString());
-
-				throw std::out_of_range("Can't find tile map for realm " + std::to_string(realm_id));
-			}
-
-			template <typename T>
-			void writeRealmTileMap(RealmID realm_id, const T &tilemap, bool use_transaction = true) {
-				assert(database);
-				auto db_lock = database.uniqueLock();
-
-				std::optional<SQLite::Transaction> transaction;
-				if (use_transaction)
-					transaction.emplace(*database);
-
-				SQLite::Statement statement{*database, "INSERT OR REPLACE INTO realmTileMaps VALUES (?, ?)"};
-
-				statement.bind(1, realm_id);
-				statement.bind(2, nlohmann::json(tilemap).dump());
-
-				statement.exec();
-
-				if (transaction)
-					transaction->commit();
-			}
+			void writeTilesetMeta(const Tileset &, bool use_transaction = true);
+			/** Returns whether anything was found. */
+			bool readTilesetMeta(const std::string &hash, nlohmann::json &, bool do_lock = true);
 
 			inline bool isOpen() {
 				return database != nullptr;

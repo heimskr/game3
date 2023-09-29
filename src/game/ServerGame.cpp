@@ -31,6 +31,7 @@ namespace Game3 {
 		database.writeUsers(players);
 		SUCCESS("Saved realms and users.");
 		Timer::summary();
+		Timer::clear();
 	}
 
 	bool ServerGame::tick() {

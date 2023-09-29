@@ -201,7 +201,7 @@ namespace Game3 {
 			next(tilesize);
 		}
 
-		out.hash = hasher.value<std::string>();
+		out.hash = hexString(hasher.value<std::string>(), false);
 		out.ids["base:tile/empty"] = 0;
 		out.names[0] = "base:tile/empty";
 

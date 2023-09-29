@@ -46,7 +46,8 @@ namespace Game3 {
 
 			CREATE TABLE IF NOT EXISTS realms (
 				realmID INT PRIMARY KEY,
-				json MEDIUMTEXT
+				json MEDIUMTEXT,
+				tilesetHash VARCHAR(128)
 			);
 
 			CREATE TABLE IF NOT EXISTS users (
@@ -75,14 +76,9 @@ namespace Game3 {
 				encoded MEDIUMBLOB
 			);
 
-			CREATE TABLE IF NOT EXISTS realmTileMaps (
-				realmID INT PRIMARY KEY,
-				value MEDIUMTEXT
-			);
-
-			CREATE TABLE IF NOT EXISTS realmTilesetHashes (
-				realmID INT PRIMARY KEY,
-				value VARCHAR(128)
+			CREATE TABLE IF NOT EXISTS tilesets (
+				hash VARCHAR(128) PRIMARY KEY,
+				json MEDIUMTEXT
 			);
 		)");
 	}
@@ -105,10 +101,12 @@ namespace Game3 {
 			Timer timer{"WriteRealmMeta"};
 			writeRealmMeta(realm, false);
 		}
-		std::shared_lock lock(realm->tileProvider.chunkMutexes[0]);
-		for (const auto &[chunk_position, chunk]: realm->tileProvider.chunkMaps[0]) {
-			Timer timer{"WriteChunk"};
-			writeChunk(realm, chunk_position, false);
+		{
+			std::shared_lock lock(realm->tileProvider.chunkMutexes[0]);
+			for (const auto &[chunk_position, chunk]: realm->tileProvider.chunkMaps[0]) {
+				Timer timer{"WriteChunk"};
+				writeChunk(realm, chunk_position, false);
+			}
 		}
 		{
 			Timer timer{"WriteTileEntities"};
@@ -119,12 +117,10 @@ namespace Game3 {
 			writeEntities(realm, false);
 		}
 		{
-			Timer timer{"WriteTileMap"};
-			writeRealmTileMap(realm->id, realm->getTileset().getNames(), false);
-		}
-		{
-			Timer timer{"WriteTilesetHash"};
-			writeRealmTilesetHash(realm->id, realm->getTileset().getHash(), false);
+			Timer timer{"WriteTilesetMeta"};
+			const Tileset &tileset = realm->getTileset();
+			if (!hasTileset(tileset.getHash(), false))
+				writeTilesetMeta(tileset, false);
 		}
 
 		Timer timer{"WriteRealmCommit"};
@@ -246,18 +242,32 @@ namespace Game3 {
 		if (force_migrate)
 			std::filesystem::remove(".force-migrate");
 
+		std::unordered_map<std::string, nlohmann::json> meta_cache;
+
+		auto get_meta = [&](const std::string &hash) -> const nlohmann::json & {
+			if (auto iter = meta_cache.find(hash); iter != meta_cache.end())
+				return iter->second;
+			nlohmann::json json;
+			readTilesetMeta(hash, json, false);
+			return meta_cache[hash] = std::move(json);
+		};
+
 		game.iterateRealms([&](const RealmPtr &realm) {
 			Tileset &tileset = realm->getTileset();
 
-			if (tileset.getHash() == readRealmTilesetHash(realm->id, false))
+			const std::string realm_tileset_hash = readRealmTilesetHash(realm->id, false);
+			if (tileset.getHash() == realm_tileset_hash)
 				return;
+
+			const nlohmann::json &meta = get_meta(realm_tileset_hash);
+			const std::unordered_map<TileID, Identifier> old_map = meta.at("names");
+			const std::unordered_map<Identifier, Identifier> autotiles = meta.at("autotiles");
 
 			INFO("Auto-migrating tiles for realm " << realm->id);
 
 			Timer migration_timer{"TileMigration"};
 			std::unordered_map<TileID, TileID> migration_map;
 
-			const std::unordered_map<TileID, Identifier> old_map = readRealmTileMap<std::unordered_map>(realm->id, false);
 			const std::unordered_map<Identifier, TileID> new_map = tileset.getIDs();
 
 			for (const auto &[numeric, identifier]: old_map)
@@ -274,19 +284,26 @@ namespace Game3 {
 				for (auto &[chunk_position, chunk]: chunk_map) {
 					std::unique_lock chunk_lock = chunk.uniqueLock();
 					for (TileID &tile_id: chunk) {
-						const TileID old = tile_id;
+						const TileID old_tile = tile_id;
 						if (auto iter = migration_map.find(tile_id); iter != migration_map.end()) {
-							tile_id = iter->second;
-							if (tile_id != old && covered.insert(old).second)
-								INFO(old_map.at(old) << " (" << old << ") → " << tileset.getNames().at(tile_id) << " (" << tile_id << ')');
+							TileID new_tile = iter->second;
+
+							// We don't want to automigrate old autotiles to the base of the new autotile.
+							// Take the autotile offset of the old autotile and add it to the new autotile.
+							if (autotiles.contains(old_map.at(old_tile)))
+								new_tile += old_tile % 16;
+
+							tile_id = new_tile;
+							if (new_tile != old_tile && covered.insert(old_tile).second)
+								INFO(old_map.at(old_tile) << " (" << old_tile << ") → " << tileset.getNames().at(new_tile) << " (" << new_tile << ')');
 						} else if (force_migrate) {
-							if (warned.insert(old).second)
-								WARN("Replacing tile " << old_map.at(old) << " (" << old << ") with nothing.");
+							if (warned.insert(old_tile).second)
+								WARN("Replacing tile " << old_map.at(old_tile) << " (" << old_tile << ") with nothing.");
 							tile_id = 0;
 						} else {
-							Identifier tilename = old_map.at(old);
-							ERROR("Canceling tile migration; tile " << tilename << " (" << old << ") is missing from the new tileset. Create .force-migrate to force migration.");
-							throw FailedMigrationError("Migration failed due to missing tile " + tilename.str() + " (" + std::to_string(old) + ')');
+							Identifier tilename = old_map.at(old_tile);
+							ERROR("Canceling tile migration; tile " << tilename << " (" << old_tile << ") is missing from the new tileset. Create .force-migrate to force migration.");
+							throw FailedMigrationError("Migration failed due to missing tile " + tilename.str() + " (" + std::to_string(old_tile) + ')');
 						}
 					}
 				}
@@ -391,10 +408,11 @@ namespace Game3 {
 		if (use_transaction)
 			transaction.emplace(*database);
 
-		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO realms VALUES (?, ?)"};
+		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO realms VALUES (?, ?, ?)"};
 
 		statement.bind(1, realm->id);
 		statement.bind(2, json.dump());
+		statement.bind(3, realm->getTileset().getHash());
 
 		statement.exec();
 
@@ -592,7 +610,7 @@ namespace Game3 {
 		if (do_lock)
 			db_lock = database.uniqueLock();
 
-		SQLite::Statement query{*database, "SELECT value FROM realmTilesetHashes WHERE realmID = ? LIMIT 1"};
+		SQLite::Statement query{*database, "SELECT tilesetHash FROM realms WHERE realmID = ? LIMIT 1"};
 
 		query.bind(1, realm_id);
 
@@ -602,7 +620,21 @@ namespace Game3 {
 		throw std::out_of_range("Can't find tileset hash for realm " + std::to_string(realm_id));
 	}
 
-	void GameDB::writeRealmTilesetHash(RealmID realm_id, const std::string &hash, bool use_transaction) {
+	bool GameDB::hasTileset(const std::string &hash, bool do_lock) {
+		assert(database);
+
+		std::unique_lock<std::shared_mutex> db_lock;
+		if (do_lock)
+			db_lock = database.uniqueLock();
+
+		SQLite::Statement query{*database, "SELECT NULL FROM tilesets WHERE hash = ? LIMIT 1"};
+
+		query.bind(1, hash);
+
+		return query.executeStep();
+	}
+
+	void GameDB::writeTilesetMeta(const Tileset &tileset, bool use_transaction) {
 		assert(database);
 		auto db_lock = database.uniqueLock();
 
@@ -610,15 +642,37 @@ namespace Game3 {
 		if (use_transaction)
 			transaction.emplace(*database);
 
-		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO realmTilesetHashes VALUES (?, ?)"};
+		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO tilesets VALUES (?, ?)"};
 
-		statement.bind(1, realm_id);
-		statement.bind(2, hash);
+		nlohmann::json json;
+		tileset.getMeta(json);
+
+		statement.bind(1, tileset.getHash());
+		statement.bind(2, json.dump());
 
 		statement.exec();
 
 		if (transaction)
 			transaction->commit();
+	}
+
+	bool GameDB::readTilesetMeta(const std::string &hash, nlohmann::json &json, bool do_lock) {
+		assert(database);
+
+		std::unique_lock<std::shared_mutex> db_lock;
+		if (do_lock)
+			db_lock = database.uniqueLock();
+
+		SQLite::Statement query{*database, "SELECT json FROM tilesets WHERE hash = ? LIMIT 1"};
+
+		query.bind(1, hash);
+
+		while (query.executeStep()) {
+			json = nlohmann::json::parse(query.getColumn(0).getString());
+			return true;
+		}
+
+		return false;
 	}
 
 	void GameDB::bind(SQLite::Statement &statement, const PlayerPtr &player) {

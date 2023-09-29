@@ -1080,7 +1080,7 @@ namespace Game3 {
 		auto lock = entitiesByChunk.uniqueLock();
 
 		if (auto iter = entitiesByChunk.find(chunk_position); iter != entitiesByChunk.end()) {
-			std::optional<std::unique_lock<std::shared_mutex>> sublock = iter->second->uniqueLock();
+			std::optional<std::unique_lock<std::shared_mutex>> sublock{iter->second->uniqueLock()};
 			if (0 < iter->second->erase(entity)) {
 				if (iter->second->empty()) {
 					sublock.reset();

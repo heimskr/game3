@@ -85,6 +85,39 @@ namespace Game3 {
 		return ss.str();
 	}
 
+	template <typename T>
+	T unhex(std::string_view str) {
+		T out;
+		uint8_t buffer = 0;
+		bool buffered = false;
+		static auto from_hex = [](const uint8_t ch) -> uint8_t {
+			if (std::isdigit(ch))
+				return ch - '0';
+			if ('a' < ch && ch <= 'f')
+				return ch - 'a' + 10;
+			if ('A' < ch && ch <= 'F')
+				return ch - 'A' + 10;
+			throw std::invalid_argument("Invalid hex string");
+		};
+
+		for (const char ch: str) {
+			if (ch == ' ')
+				continue;
+			if (buffered) {
+				out.emplace_back((buffer << 4) | from_hex(ch));
+				buffered = false;
+			} else {
+				buffered = from_hex(ch);
+				buffered = true;
+			}
+		}
+
+		if (buffered)
+			throw std::invalid_argument("Invalid hex string length");
+
+		return out;
+	}
+
 	template <typename T, template <typename...> typename C, typename... Args>
 	std::unordered_set<std::shared_ptr<T>> filterWeak(const C<std::weak_ptr<T>, Args...> &container) {
 		std::unordered_set<std::shared_ptr<T>> out;

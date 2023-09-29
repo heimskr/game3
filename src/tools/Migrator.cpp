@@ -26,6 +26,7 @@ namespace Game3 {
 			game->database.writeAllRealms();
 			SUCCESS("Done.");
 			Timer::summary();
+			Timer::clear();
 			return 0;
 		}
 
