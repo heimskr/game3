@@ -6,6 +6,7 @@
 #include "tileentity/TileEntity.h"
 
 #include <optional>
+#include <utility>
 
 namespace Game3 {
 	class PipeNetwork;
@@ -44,6 +45,7 @@ namespace Game3 {
 
 	class Pipe: public TileEntity {
 		friend class PipeLoader;
+		friend class PipeNetwork;
 
 		private:
 			static Identifier ItemCorner()   { return {"base", "tile/item_pipe"};   }
@@ -63,6 +65,7 @@ namespace Game3 {
 			PipeTuple<std::shared_ptr<PipeNetwork>> networks;
 			PipeTuple<std::optional<TileID>> extractorsCorners;
 			PipeTuple<bool> loaded;
+			PipeTuple<bool> dying;
 
 			void updateTileID(PipeType);
 			bool get(PipeType, Direction);
@@ -93,6 +96,8 @@ namespace Game3 {
 
 			void setPresent(PipeType, bool);
 			inline bool getPresent(PipeType pipe_type) const { return present[pipe_type]; }
+
+			std::pair<std::shared_ptr<Pipe>, std::shared_ptr<PipeNetwork>> getNeighbor(PipeType, Direction) const;
 
 			/** Returns whether there exists some path between this pipe and the given pipe. */
 			bool reachable(PipeType, const std::shared_ptr<Pipe> &);

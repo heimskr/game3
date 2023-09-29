@@ -1,3 +1,4 @@
+#include "container/FriendSet.h"
 #include "pipes/EnergyNetwork.h"
 #include "pipes/FluidNetwork.h"
 #include "pipes/ItemNetwork.h"
@@ -37,7 +38,7 @@ namespace Game3 {
 				auto lock = members.uniqueLock();
 				members.insert(std::move(pipe));
 			}
-			// Detect insertions
+			// Detect insertions and extractions
 			locked->onNeighborUpdated(Position( 1,  0));
 			locked->onNeighborUpdated(Position(-1,  0));
 			locked->onNeighborUpdated(Position( 0,  1));
@@ -78,7 +79,7 @@ namespace Game3 {
 		}
 	}
 
-	void PipeNetwork::partition(const std::shared_ptr<Pipe> &start) {
+	std::shared_ptr<PipeNetwork> PipeNetwork::partition(const std::shared_ptr<Pipe> &start) {
 		auto realm = weakRealm.lock();
 		assert(realm);
 
@@ -96,10 +97,12 @@ namespace Game3 {
 			new_network->add(pipe);
 
 			pipe->getDirections()[type].iterate([&](Direction direction) {
-				if (std::shared_ptr<Pipe> neighbor = pipe->getConnected(type, direction); neighbor && !visited.contains(neighbor))
+				if (std::shared_ptr<Pipe> neighbor = pipe->getConnected(type, direction); neighbor && !neighbor->dying[type] && !visited.contains(neighbor))
 					queue.push_back(neighbor);
 			});
 		}
+
+		return new_network;
 	}
 
 	void PipeNetwork::addExtraction(Position position, Direction direction) {
@@ -165,11 +168,51 @@ namespace Game3 {
 	}
 
 	void PipeNetwork::removePipe(const std::shared_ptr<Pipe> &member) {
-		auto lock = members.uniqueLock();
-		members.erase(member);
-		if (members.empty()) {
-			lock.unlock();
-			lastPipeRemoved(member->getPosition());
+		const PipeType type = getType();
+		member->dying[type] = true;
+
+		{
+			auto lock = members.uniqueLock();
+			members.erase(member);
+
+			if (members.empty()) {
+				lock.unlock();
+				lastPipeRemoved(member->getPosition());
+			}
+		}
+
+		// Partition neighboring pipes if necessary.
+
+		std::vector<Direction> directions = member->getDirections()[type].toVector();
+		std::span remaining_directions(directions);
+		FriendSet<std::shared_ptr<Pipe>> friends;
+
+		const RealmPtr realm = member->getRealm();
+
+		for (const Direction first_direction: remaining_directions) {
+			remaining_directions = remaining_directions.subspan(1);
+
+			const auto [first_pipe, first_network] = member->getNeighbor(type, first_direction);
+			if (!first_network)
+				continue;
+
+			for (const Direction second_direction: remaining_directions) {
+				const auto [second_pipe, second_network] = member->getNeighbor(type, second_direction);
+				if (!second_network)
+					continue;
+
+				if (first_pipe->reachable(type, second_pipe)) {
+					friends.insert(first_pipe, second_pipe);
+					friends.insert(second_pipe, first_pipe);
+				} else {
+					friends.insert(first_pipe);
+				}
+			}
+		}
+
+		for (const auto &[index, set]: friends) {
+			std::shared_ptr<Pipe> pipe = *set.begin();
+			pipe->getNetwork(type)->partition(pipe);
 		}
 	}
 

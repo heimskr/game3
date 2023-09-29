@@ -262,6 +262,15 @@ namespace Game3 {
 		}
 	}
 
+	std::pair<std::shared_ptr<Pipe>, std::shared_ptr<PipeNetwork>> Pipe::getNeighbor(PipeType type, Direction direction) const {
+		TileEntityPtr tile_entity = getRealm()->tileEntityAt(position + direction);
+		auto neighbor = std::dynamic_pointer_cast<Pipe>(tile_entity);
+		if (!neighbor)
+			return {};
+
+		return {neighbor, neighbor->getNetwork(type)};
+	}
+
 	bool Pipe::reachable(PipeType pipe_type, const std::shared_ptr<Pipe> &target) {
 		assert(target);
 		auto shared = std::static_pointer_cast<Pipe>(shared_from_this());
@@ -278,7 +287,7 @@ namespace Game3 {
 				return true;
 
 			directions[pipe_type].iterate([&](Direction direction) {
-				if (std::shared_ptr<Pipe> neighbor = pipe->getConnected(pipe_type, direction); neighbor && !visited.contains(neighbor))
+				if (std::shared_ptr<Pipe> neighbor = pipe->getConnected(pipe_type, direction); neighbor && !neighbor->dying[pipe_type] && !visited.contains(neighbor))
 					queue.push_back(neighbor);
 			});
 		}
@@ -321,8 +330,19 @@ namespace Game3 {
 
 		network->reconsiderPoints(position + direction);
 
-		if (connection && !reachable(pipe_type, connection))
-			network->partition(connection);
+		if (connection && !reachable(pipe_type, connection)) {
+			std::shared_ptr<PipeNetwork> new_network = network->partition(connection);
+			{
+				const auto &insertions = new_network->getInsertions();
+				auto lock = insertions.sharedLock();
+				for (const auto &[insertion_position, insertion_direction]: insertions)
+					network->removeInsertion(insertion_position, insertion_direction);
+			}
+			const auto &extractions = new_network->getExtractions();
+			auto lock = extractions.sharedLock();
+			for (const auto &[extraction_position, extraction_direction]: extractions)
+				network->removeExtraction(extraction_position, extraction_direction);
+		}
 	}
 
 	void Pipe::setExtractor(PipeType pipe_type, Direction direction, bool value) {
