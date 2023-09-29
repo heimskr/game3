@@ -5,9 +5,11 @@ A 2D game made with OpenGL. No engine because I'd prefer to do things my own way
 
 ## Screenshots
 
-![Player in the forest](https://github.com/heimskr/game3/blob/dev/screenshots/1.png?raw=true)
+![Player in the forest](https://github.com/heimskr/game3/blob/master/screenshots/1.png?raw=true)
 
-![Item pipes between chests](https://github.com/heimskr/game3/blob/dev/screenshots/2.png?raw=true)
+![Player in a house](https://github.com/heimskr/game3/blob/master/screenshots/2.png?raw=true)
+
+![Players constructing machines near lava](https://github.com/heimskr/game3/blob/master/screenshots/3.png?raw=true)
 
 ## Credits
 Huge thanks to [Shade](https://merchant-shade.itch.io/) for creating [Mini World Sprites](https://merchant-shade.itch.io/16x16-mini-world-sprites),
