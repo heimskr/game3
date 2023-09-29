@@ -149,7 +149,7 @@ namespace Game3 {
 			void setTile(Layer, const Position &, TileID, bool run_helper = true);
 			void setTile(Layer, const Position &, const Identifier &, bool run_helper = true);
 			void setFluid(const Position &, FluidTile);
-			void setFluid(const Position &, const Identifier &, FluidLevel);
+			void setFluid(const Position &, const Identifier &, FluidLevel, bool infinite = false);
 			bool hasFluid(const Position &, FluidLevel minimum = 1);
 			TileID getTile(Layer, const Position &) const;
 			std::optional<TileID> tryTile(Layer, const Position &) const;

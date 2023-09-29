@@ -247,9 +247,12 @@ namespace Game3::WorldGen {
 				const Index col_max = col_min + CHUNK_SIZE;
 				pool.add([realm, &waiter, &get_biome, &perlin, &params, noise_seed, row_min, row_max, col_min, col_max](ThreadPool &, size_t) {
 					threadContext = {realm->getGame().shared_from_this(), static_cast<uint_fast32_t>(noise_seed - 1'000'000ul * row_min + col_min), row_min, row_max, col_min, col_max};
-					for (Index row = row_min; row < row_max; ++row)
-						for (Index column = col_min; column < col_max; ++column)
+					for (Index row = row_min; row < row_max; ++row) {
+						for (Index column = col_min; column < col_max; ++column) {
+							realm->autotile({row, column}, Layer::Terrain);
 							get_biome(row, column).postgen(row, column, threadContext.rng, perlin, params);
+						}
+					}
 					--waiter;
 				});
 			}

@@ -18,7 +18,7 @@ namespace Game3 {
 			if (!fluid || !fluid->flaskName)
 				return false;
 
-			if (tile->level < FluidTile::INFINITE) {
+			if (!tile->isInfinite()) {
 				tile->level = 0;
 				realm.setFluid(place.position, *tile);
 			}

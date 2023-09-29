@@ -37,9 +37,9 @@ namespace Game3 {
 				// Or, as of this writing:
 				//   - Terrain: [4096 x 2 bytes] x 4 = 32768 bytes
 				//   - Biomes:   4096 x 2 bytes      =  8192 bytes
-				//   - Fluids:   4096 x 4 bytes      = 16384 bytes
+				//   - Fluids:   4096 x 8 bytes      = 32768 bytes
 				//   - Pathmap:  4096 x 1 byte       =  4096 bytes
-				//   Total: 61440 bytes
+				//   Total: 77824 bytes
 				C raw;
 				constexpr size_t square = CHUNK_SIZE * CHUNK_SIZE;
 				raw.reserve((LAYER_COUNT * sizeof(TileID) + sizeof(BiomeType) + sizeof(FluidInt)) * square);

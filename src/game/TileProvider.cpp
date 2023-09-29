@@ -287,7 +287,9 @@ namespace Game3 {
 			for (const FluidTile &tile: fluidMap.at(chunk_position))
 				raw_fluids.emplace_back(tile);
 		}
+		assert(raw_fluids.size() == CHUNK_SIZE * CHUNK_SIZE);
 		appendSpan(raw, std::span(raw_fluids));
+		assert(raw.size() == CHUNK_SIZE * CHUNK_SIZE * sizeof(FluidInt));
 		return raw;
 	}
 
@@ -727,12 +729,12 @@ namespace Game3 {
 				static_assert(sizeof(FluidLevel) == 2);
 				std::shared_lock fluid_lock(fluidMutex);
 				for (auto &[position, chunk]: fluidMap) {
-					std::vector<uint32_t> packed;
+					std::vector<FluidInt> packed;
 					{
 						auto chunk_lock = chunk.sharedLock();
 						packed.reserve(chunk.size());
-						for (const auto &[fluid_id, level]: chunk)
-							packed.push_back(static_cast<uint32_t>(fluid_id) | (static_cast<uint32_t>(level) << 16));
+						for (const FluidTile &fluid_tile: chunk)
+							packed.emplace_back(fluid_tile);
 					}
 					fluid_array.push_back(std::make_pair(std::make_pair(position.x, position.y), compress(std::span(packed.data(), packed.size()))));
 				}
@@ -770,14 +772,17 @@ namespace Game3 {
 
 			for (const auto &item: data.at(3)) {
 				const auto [x, y] = item.at(0).get<std::pair<int32_t, int32_t>>();
-				static_assert(sizeof(FluidTile) == sizeof(uint32_t));
+				static_assert(sizeof(FluidTile) == 6);
 				const auto compressed = item.at(1).get<std::vector<uint8_t>>();
-				const auto decompressed = decompress32(std::span(compressed.data(), compressed.size()));
+				const auto decompressed = decompress64(std::span(compressed.data(), compressed.size()));
 				auto &chunk = fluidMap[ChunkPosition{x, y}];
 				chunk.clear();
 				chunk.reserve(decompressed.size());
-				for (const auto tile: decompressed)
-					chunk.emplace_back((tile & 0xff) | ((tile >> 8) & 0xff), ((tile >> 16) & 0xff) | ((tile >> 24) & 0xff));
+				for (const auto tile: decompressed) {
+					chunk.emplace_back(
+						(tile & 0xff) | ((tile >> 8) & 0xff), ((tile >> 16) & 0xff) | ((tile >> 24) & 0xff) | ((tile >> 32) & 0xff) | ((tile >> 40) & 0xff)
+					);
+				}
 			}
 		}
 	}

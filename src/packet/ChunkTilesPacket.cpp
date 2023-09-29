@@ -15,13 +15,21 @@ namespace Game3 {
 			tiles.insert(tiles.end(), layer_tiles.begin(), layer_tiles.end());
 		}
 
-		auto &fluid_chunk = realm.tileProvider.getFluidChunk(chunk_position);
+		const FluidChunk &fluid_chunk = realm.tileProvider.getFluidChunk(chunk_position);
 		auto lock = fluid_chunk.sharedLock();
 		fluids = fluid_chunk;
 	}
 
 	ChunkTilesPacket::ChunkTilesPacket(Realm &realm, ChunkPosition chunk_position): ChunkTilesPacket(realm, chunk_position, 0) {
 		updateCounter = realm.tileProvider.getUpdateCounter(chunk_position);
+	}
+
+	void ChunkTilesPacket::encode(Game &, Buffer &buffer) const {
+		buffer << realmID << chunkPosition << updateCounter << tiles << fluids;
+	}
+
+	void ChunkTilesPacket::decode(Game &, Buffer &buffer) {
+		buffer >> realmID >> chunkPosition >> updateCounter >> tiles >> fluids;
 	}
 
 	void ChunkTilesPacket::handle(ClientGame &game) {
@@ -39,7 +47,7 @@ namespace Game3 {
 			chunk = std::vector<TileID>(tiles.begin() + offset, tiles.begin() + offset + CHUNK_SIZE * CHUNK_SIZE);
 		}
 
-		provider.getFluidChunk(chunkPosition) = fluids;
+		provider.getFluidChunk(chunkPosition) = std::move(fluids);
 
 		provider.setUpdateCounter(chunkPosition, updateCounter);
 

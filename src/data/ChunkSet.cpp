@@ -49,12 +49,12 @@ namespace Game3 {
 			std::memcpy(biomes.data(), biomes_.data(), BIOMES_BYTE_COUNT);
 
 			fluids.reserve(CHUNK_SIZE * CHUNK_SIZE);
-			static_assert(sizeof(FluidInt) == 4);
 			for (size_t i = 0; i < FLUIDS_BYTE_COUNT; i += sizeof(FluidInt)) {
 				FluidInt encoded_fluid{};
 				std::memcpy(&encoded_fluid, &fluids_[i], sizeof(FluidInt));
 				fluids.emplace_back(encoded_fluid);
 			}
+			assert(fluids.size() == CHUNK_SIZE * CHUNK_SIZE);
 		} else {
 			biomes.reserve(CHUNK_SIZE * CHUNK_SIZE);
 			static_assert(sizeof(BiomeType) == 2);
@@ -62,11 +62,14 @@ namespace Game3 {
 				biomes.push_back(biomes_[i] | (BiomeType(biomes_[i + 1]) << 8));
 
 			fluids.reserve(CHUNK_SIZE * CHUNK_SIZE);
-			static_assert(sizeof(FluidInt) == 4);
+			static_assert(sizeof(FluidInt) == 8);
 			for (size_t i = 0; i < FLUIDS_BYTE_COUNT; i += sizeof(FluidInt)) {
-				const FluidInt encoded_fluid = fluids_[i] | (FluidInt(fluids_[i + 1]) << 8) | (FluidInt(fluids_[i + 2]) << 16) | (FluidInt(fluids_[i + 3]) << 24);
+				const FluidInt encoded_fluid =
+					fluids_[i] | (FluidInt(fluids_[i + 1]) << 8) | (FluidInt(fluids_[i + 2]) << 16) | (FluidInt(fluids_[i + 3]) << 24)
+					| (FluidInt(fluids_[i + 4]) << 32) | (FluidInt(fluids_[i + 5]) << 40) | (FluidInt(fluids_[i + 6]) << 48)| (FluidInt(fluids_[i + 7]) << 56);
 				fluids.emplace_back(encoded_fluid);
 			}
+			assert(fluids.size() == CHUNK_SIZE * CHUNK_SIZE);
 		}
 
 		static_assert(sizeof(decltype(pathmap)::value_type) == 1);
@@ -81,7 +84,7 @@ namespace Game3 {
 		auto lock = fluids.sharedLock();
 
 		for (size_t i = 0, max = fluids.size(); i < max; ++i) {
-			static_assert(sizeof(FluidInt) == 4);
+			static_assert(sizeof(FluidInt) == 8);
 			FluidInt encoded_fluid{fluids[i]};
 			if constexpr (std::endian::native == std::endian::little) {
 				std::memcpy(&out[i * sizeof(FluidInt)], &encoded_fluid, sizeof(FluidInt));
@@ -90,6 +93,10 @@ namespace Game3 {
 				out[i + 1] = (encoded_fluid >>  8) & 0xff;
 				out[i + 2] = (encoded_fluid >> 16) & 0xff;
 				out[i + 3] = (encoded_fluid >> 24) & 0xff;
+				out[i + 4] = (encoded_fluid >> 32) & 0xff;
+				out[i + 5] = (encoded_fluid >> 40) & 0xff;
+				out[i + 6] = (encoded_fluid >> 48) & 0xff;
+				out[i + 7] = (encoded_fluid >> 56) & 0xff;
 			}
 		}
 

@@ -29,12 +29,12 @@ namespace Game3 {
 
 		if (noise < wetness + 0.3) {
 			realm.setTile(Layer::Terrain, {row, column}, volcanic_sand, false);
-			realm.setFluid({row, column}, water_fluid, FluidTile::INFINITE);
+			realm.setFluid({row, column}, water_fluid, params.getFluidLevel(noise, 0.3), true);
 		} else if (noise < wetness + 0.4) {
 			realm.setTile(Layer::Terrain, {row, column}, volcanic_sand, false);
 		} else if (0.85 < noise) {
 			realm.setTile(Layer::Terrain, {row, column}, volcanic_rock, false);
-			realm.setFluid({row, column}, lava_fluid, FluidTile::INFINITE);
+			realm.setFluid({row, column}, lava_fluid, FluidTile::FULL, true);
 		} else {
 			realm.setTile(Layer::Terrain, {row, column}, volcanic_rock, false);
 		}

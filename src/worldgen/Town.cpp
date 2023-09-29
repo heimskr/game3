@@ -25,9 +25,9 @@ namespace Game3::WorldGen {
 				realm->remove(tile_entity);
 		};
 
-		const auto set_terrain = [&](const Identifier &tilename) {
+		const auto set_terrain = [&](const Identifier &tilename, bool helper = false) {
 			cleanup(row, column);
-			realm->setTile(Layer::Terrain, {row, column}, tilename, false);
+			realm->setTile(Layer::Terrain, {row, column}, tilename, helper);
 		};
 
 		const auto set_submerged = [&](const Position &position, const Identifier &tilename) {
@@ -72,7 +72,7 @@ namespace Game3::WorldGen {
 		for (row = position.row + 1; row < position.row + height - 1; ++row)
 			for (column = position.column + 1; column < position.column + width - 1; ++column) {
 				buildable_set.insert({row, column});
-				set_terrain("base:tile/dirt");
+				set_terrain("base:tile/town_dirt", true);
 			}
 
 		row = position.row + height / 2 - 1;

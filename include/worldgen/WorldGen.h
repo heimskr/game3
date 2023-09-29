@@ -8,6 +8,7 @@
 
 #include "Types.h"
 #include "game/ChunkPosition.h"
+#include "game/Fluids.h"
 #include "threading/ThreadPool.h"
 
 namespace Game3 {
@@ -22,6 +23,12 @@ namespace Game3 {
 		double forestThreshold = 0.5;
 		double antiforestThreshold = -0.4;
 		double biomeZoom = 1000.;
+
+		/** noise ∈ [-1, 1] */
+		FluidAmount getFluidLevel(double noise, double threshold = 0.3) const {
+			const double level = (1. + noise) / ((1. + threshold) + wetness);
+			return FluidTile::FULL * std::max(0., std::cos(level * M_PI / 4.));
+		}
 	};
 
 	void from_json(const nlohmann::json &, WorldGenParams &);

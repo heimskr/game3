@@ -22,10 +22,11 @@ namespace Game3 {
 
 	FluidTile::FluidTile(FluidInt packed):
 		id(packed & 0xffff),
-		level((packed >> 16) & 0xffff) {}
+		level((packed >> 16) & 0xffff),
+		infinite((packed >> 17) & 1) {}
 
 	FluidTile::operator FluidInt() const {
-		return static_cast<FluidInt>(id) | (static_cast<FluidInt>(level) << 16);
+		return static_cast<FluidInt>(id) | (static_cast<FluidInt>(level) << 16) | (static_cast<FluidInt>(infinite) << 17);
 	}
 
 	FluidTile::operator std::string() const {
@@ -33,6 +34,8 @@ namespace Game3 {
 		out += std::to_string(id);
 		out += ", ";
 		out += std::to_string(level);
+		out += ", ";
+		out += infinite? 'T' : 'F';
 		out += ')';
 		return out;
 	}
@@ -68,7 +71,7 @@ namespace Game3 {
 
 	template <>
 	std::string Buffer::getType(const FluidTile &) {
-		return getType(uint32_t{});
+		return getType(FluidInt{});
 	}
 
 	template <>
@@ -78,7 +81,7 @@ namespace Game3 {
 
 	template <>
 	FluidTile popBuffer<FluidTile>(Buffer &buffer) {
-		return FluidTile(popBuffer<uint32_t>(buffer));
+		return FluidTile(popBuffer<FluidInt>(buffer));
 	}
 
 	template <>
@@ -89,15 +92,15 @@ namespace Game3 {
 	}
 
 	Buffer & operator+=(Buffer &buffer, const FluidTile &fluid_tile) {
-		return buffer += static_cast<uint32_t>(fluid_tile);
+		return buffer += static_cast<FluidInt>(fluid_tile);
 	}
 
 	Buffer & operator<<(Buffer &buffer, const FluidTile &fluid_tile) {
-		return buffer << static_cast<uint32_t>(fluid_tile);
+		return buffer << static_cast<FluidInt>(fluid_tile);
 	}
 
 	Buffer & operator>>(Buffer &buffer, FluidTile &fluid_tile) {
-		fluid_tile = FluidTile(buffer.take<uint32_t>());
+		fluid_tile = FluidTile(buffer.take<FluidInt>());
 		return buffer;
 	}
 

@@ -23,8 +23,8 @@ namespace Game3 {
 
 		PacketID getID() const override { return ID(); }
 
-		void encode(Game &, Buffer &buffer) const override { buffer << realmID << chunkPosition << updateCounter << tiles << fluids; }
-		void decode(Game &, Buffer &buffer)       override { buffer >> realmID >> chunkPosition >> updateCounter >> tiles >> fluids; }
+		void encode(Game &, Buffer &buffer) const override;
+		void decode(Game &, Buffer &buffer)       override;
 
 		void handle(ClientGame &) override;
 	};

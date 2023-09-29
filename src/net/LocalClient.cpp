@@ -90,7 +90,10 @@ namespace Game3 {
 					auto game = lockGame();
 					auto packet = (*game->registry<PacketFactoryRegistry>().at(packetType))();
 					packet->decode(*game, buffer);
-					assert(buffer.empty());
+					if (!buffer.empty()) {
+						INFO("Bytes left in buffer: " << (buffer.bytes.size() - buffer.skip) << " / " << buffer.bytes.size());
+						assert(buffer.empty());
+					}
 					buffer.clear();
 					state = State::Begin;
 					{

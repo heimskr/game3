@@ -22,26 +22,26 @@ namespace Game3 {
 		Fluid(Identifier identifier_, std::string name_, Identifier tileset_name, Identifier tilename_, Identifier flask_name = {});
 	};
 
-	using FluidInt = uint32_t;
+	using FluidInt = uint64_t;
 
 	struct FluidTile {
-		static constexpr FluidLevel FULL     = 1000;
-		static constexpr FluidLevel INFINITE = FULL + 1;
+		static constexpr FluidLevel FULL = 1000;
 
 		FluidID id = 0;
 		FluidLevel level = 0;
+		bool infinite = false;
 
 		FluidTile() = default;
 		explicit FluidTile(FluidInt);
-		FluidTile(FluidID id_, FluidLevel level_):
-			id(id_), level(level_) {}
+		FluidTile(FluidID id_, FluidLevel level_, bool infinite_ = false):
+			id(id_), level(level_), infinite(infinite_) {}
 
 		explicit operator FluidInt() const;
 		explicit operator std::string() const;
 
 		auto operator<=>(const FluidTile &) const = default;
 
-		inline bool isInfinite() const { return INFINITE <= level; }
+		inline bool isInfinite() const { return infinite; }
 	};
 
 	std::ostream & operator<<(std::ostream &, FluidTile);

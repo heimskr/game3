@@ -711,7 +711,7 @@ namespace Game3 {
 	void Realm::setFluid(const Position &position, FluidTile tile) {
 		{
 			std::unique_lock<std::shared_mutex> fluid_lock;
-			auto &fluid = tileProvider.findFluid(position, &fluid_lock);
+			FluidTile &fluid = tileProvider.findFluid(position, &fluid_lock);
 			if (fluid == tile)
 				return;
 			fluid = tile;
@@ -723,10 +723,10 @@ namespace Game3 {
 		}
 	}
 
-	void Realm::setFluid(const Position &position, const Identifier &fluidname, FluidLevel level) {
-		auto fluid = getGame().registry<FluidRegistry>().at(fluidname);
+	void Realm::setFluid(const Position &position, const Identifier &fluidname, FluidLevel level, bool infinite) {
+		std::shared_ptr<Fluid> fluid = getGame().registry<FluidRegistry>().at(fluidname);
 		assert(fluid);
-		setFluid(position, FluidTile(fluid->registryID, level));
+		setFluid(position, FluidTile(fluid->registryID, level, infinite));
 	}
 
 	bool Realm::hasFluid(const Position &position, FluidLevel minimum) {
