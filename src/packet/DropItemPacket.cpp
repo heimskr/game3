@@ -23,5 +23,7 @@ namespace Game3 {
 			inventory->erase(slot);
 		else
 			inventory->drop(slot);
+
+		inventory->notifyOwner();
 	}
 }
