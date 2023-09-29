@@ -1333,9 +1333,9 @@ namespace Game3 {
 
 	void Realm::initEntity(const EntityPtr &entity, const Position &position) {
 		entity->init(getGame());
-		entity->spawning = false;
 		add(entity, position);
 		entity->calculateVisibleEntities();
+		entity->spawning = false;
 
 		if (getSide() == Side::Server) {
 			auto lock = entity->visiblePlayers.sharedLock();
@@ -1343,13 +1343,10 @@ namespace Game3 {
 				const EntityPacket packet(entity);
 				for (const auto &weak_player: entity->visiblePlayers) {
 					if (auto player = weak_player.lock()) {
-						INFO("Notifying " << player->username << " of " << entity->getName() << " " << entity->getGID());
 						player->notifyOfRealm(*this);
 						player->send(packet);
 					}
 				}
-			} else {
-				WARN("Visible players set is empty");
 			}
 		}
 	}
