@@ -266,12 +266,12 @@ namespace Game3 {
 		add(std::make_shared<PumpItem>("base:item/pump", "Pump", 999, 64)); // TODO: cost
 		add(std::make_shared<TankItem>("base:item/tank", "Tank", 999, 64)); // TODO: cost
 
-		add(Furniture::createSimple("base:item/pride_flag", "Pride Flag",      80, Layer::Highest,   "base:tile/pride_flag"));
-		add(Furniture::createSimple("base:item/ace_flag",   "Asexual Flag",    80, Layer::Highest,   "base:tile/ace_flag"));
-		add(Furniture::createSimple("base:item/nb_flag",    "Non-Binary Flag", 80, Layer::Highest,   "base:tile/nb_flag"));
-		add(Furniture::createSimple("base:item/plant_pot1", "Plant Pot",       32, Layer::Submerged, "base:tile/plant1"));
-		add(Furniture::createSimple("base:item/plant_pot2", "Plant Pot",       32, Layer::Submerged, "base:tile/plant2"));
-		add(Furniture::createSimple("base:item/plant_pot3", "Plant Pot",       32, Layer::Submerged, "base:tile/plant3"));
+		add(Furniture::createSimple("base:item/pride_flag", "Pride Flag",     80, Layer::Highest,   "base:tile/pride_flag"));
+		add(Furniture::createSimple("base:item/ace_flag",   "Asexual Flag",   80, Layer::Highest,   "base:tile/ace_flag"));
+		add(Furniture::createSimple("base:item/nb_flag",    "Nonbinary Flag", 80, Layer::Highest,   "base:tile/nb_flag"));
+		add(Furniture::createSimple("base:item/plant_pot1", "Plant Pot",      32, Layer::Submerged, "base:tile/plant1"));
+		add(Furniture::createSimple("base:item/plant_pot2", "Plant Pot",      32, Layer::Submerged, "base:tile/plant2"));
+		add(Furniture::createSimple("base:item/plant_pot3", "Plant Pot",      32, Layer::Submerged, "base:tile/plant3"));
 
 		add(Furniture::createMarchable("base:item/wooden_wall", "Wooden Wall",  9, Layer::Objects, "base:tile/wooden_wall", "base:autotile/wooden_walls"));
 		add(Furniture::createMarchable("base:item/tower",       "Tower",       10, Layer::Objects, "base:tile/tower",       "base:autotile/towers"));
@@ -484,7 +484,7 @@ namespace Game3 {
 				for (const auto &stage: crop->stages)
 					reg.add(stage, tile);
 			} else if (crop->customType == "base:tile/tree"_id) {
-				// TODO!: We need the factory thing.
+				// TODO: We need the factory thing.
 				auto tile = std::make_shared<TreeTile>(crop);
 				for (const auto &stage: crop->stages)
 					reg.add(stage, tile);

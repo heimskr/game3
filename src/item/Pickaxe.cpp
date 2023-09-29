@@ -28,9 +28,8 @@ namespace Game3 {
 			player.setTooldown(1.f);
 			if (stack.reduceDurability())
 				inventory.erase(slot);
-			else
-				// setTooldown doesn't call notifyOwner on the player's inventory, so we have to do it here.
-				inventory.notifyOwner();
+			// setTooldown doesn't call notifyOwner on the player's inventory, so we have to do it here.
+			inventory.notifyOwner();
 			return true;
 		}
 

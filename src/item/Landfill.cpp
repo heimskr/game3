@@ -39,7 +39,7 @@ namespace Game3 {
 				if (stack.count == 0)
 					player.getInventory()->erase(slot);
 				realm.setTile(Layer::Terrain, place.position, result->newTile);
-				realm.reupload();
+				realm.queueReupload();
 				player.getInventory()->notifyOwner();
 				return true;
 			}

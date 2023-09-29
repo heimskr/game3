@@ -40,10 +40,9 @@ namespace Game3 {
 				place.set(*iter, tileset.getEmpty());
 				if (stack.reduceDurability())
 					inventory.erase(slot);
-				else
-					inventory.notifyOwner();
 				player.give(equivalent);
-				place.realm->reupload(*iter);
+				inventory.notifyOwner();
+				place.realm->queueReupload(*iter);
 				return true;
 			}
 		}

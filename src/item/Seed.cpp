@@ -19,8 +19,7 @@ namespace Game3 {
 				const InventoryPtr inventory = place.player->getInventory();
 				if (--stack.count == 0)
 					inventory->erase(slot);
-				else
-					inventory->notifyOwner();
+				inventory->notifyOwner();
 				place.set(Layer::Submerged, cropTilename);
 				return true;
 			}
