@@ -6,7 +6,6 @@
 namespace Game3 {
 	class Crop;
 	class EntityFactory;
-	class GhostFunction;
 	class Item;
 	class LocalCommandFactory;
 	class ModuleFactory;
@@ -19,7 +18,6 @@ namespace Game3 {
 	struct CraftingRecipe;
 	struct EntityTexture;
 	struct Fluid;
-	struct GhostDetails;
 	struct ItemTexture;
 	struct Ore;
 	struct RealmDetails;
@@ -57,16 +55,6 @@ namespace Game3 {
 	struct TilesetRegistry: NamedRegistry<Tileset> {
 		static Identifier ID() { return {"base", "registry/tileset"}; }
 		TilesetRegistry(): NamedRegistry(ID()) {}
-	};
-
-	struct GhostDetailsRegistry: NamedRegistry<GhostDetails> {
-		static Identifier ID() { return {"base", "registry/ghost_details"}; }
-		GhostDetailsRegistry(): NamedRegistry(ID()) {}
-	};
-
-	struct GhostFunctionRegistry: NamedRegistry<GhostFunction> {
-		static Identifier ID() { return {"base", "registry/ghost_function"}; }
-		GhostFunctionRegistry(): NamedRegistry(ID()) {}
 	};
 
 	struct TileEntityFactoryRegistry: NamedRegistry<TileEntityFactory> {

@@ -5,7 +5,6 @@
 #include "game/Inventory.h"
 #include "item/Furniture.h"
 #include "realm/Realm.h"
-#include "tileentity/Ghost.h"
 
 namespace Game3 {
 	bool Furniture::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
@@ -23,12 +22,16 @@ namespace Game3 {
 		return false;
 	}
 
-	std::shared_ptr<Furniture> Furniture::create(ItemID id_, std::string name_, MoneyCount base_price, Layer layer, Identifier tilename) {
-		return std::make_shared<SimpleFurniture>(std::move(id_), std::move(name_), base_price, layer, std::move(tilename));
+	std::shared_ptr<Furniture> Furniture::createSimple(ItemID id, std::string name, MoneyCount base_price, Layer layer, Identifier tilename) {
+		return std::make_shared<SimpleFurniture>(std::move(id), std::move(name), base_price, layer, std::move(tilename));
 	}
 
-	std::shared_ptr<Furniture> Furniture::create(ItemID id_, std::string name_, MoneyCount base_price, Layer layer, Identifier start, Identifier autotile) {
-		return std::make_shared<MarchableFurniture>(std::move(id_), std::move(name_), base_price, layer, std::move(start), std::move(autotile));
+	std::shared_ptr<Furniture> Furniture::createMarchable(ItemID id, std::string name, MoneyCount base_price, Layer layer, Identifier start, Identifier autotile) {
+		return std::make_shared<MarchableFurniture>(std::move(id), std::move(name), base_price, layer, std::move(start), std::move(autotile));
+	}
+
+	std::shared_ptr<Furniture> Furniture::createCustom(ItemID id, std::string name, MoneyCount base_price, std::function<bool(const Place &)> placer) {
+		return std::make_shared<CustomFurniture>(std::move(id), std::move(name), base_price, std::move(placer));
 	}
 
 	SimpleFurniture::SimpleFurniture(ItemID id_, std::string name_, MoneyCount base_price, Layer layer_, Identifier tilename_):
@@ -63,5 +66,14 @@ namespace Game3 {
 		});
 
 		return tileset[start] + march_result;
+	}
+
+	CustomFurniture::CustomFurniture(ItemID id_, std::string name_, MoneyCount base_price, std::function<bool(const Place &)> placer_, Layer layer_):
+		Furniture(std::move(id_), std::move(name_), base_price, 64),
+		placer(std::move(placer_)),
+		layer(layer_) {}
+
+	bool CustomFurniture::apply(const Place &place) {
+		return placer(place);
 	}
 }

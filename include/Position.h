@@ -50,7 +50,7 @@ namespace Game3 {
 		std::shared_ptr<Realm> realm;
 		std::shared_ptr<Player> player;
 
-		Place(Position position_, std::shared_ptr<Realm> realm_, std::shared_ptr<Player> player_):
+		Place(Position position_, std::shared_ptr<Realm> realm_, std::shared_ptr<Player> player_ = {}):
 			position(std::move(position_)), realm(std::move(realm_)), player(std::move(player_)) {}
 
 		std::optional<TileID> get(Layer) const;

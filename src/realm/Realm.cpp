@@ -17,7 +17,6 @@
 #include "realm/RealmFactory.h"
 #include "threading/ThreadContext.h"
 #include "tile/Tile.h"
-#include "tileentity/Ghost.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "util/Timer.h"
@@ -124,8 +123,6 @@ namespace Game3 {
 					attach(tile_entity);
 					tile_entity->setRealm(shared);
 					tile_entity->onSpawn();
-					if (tile_entity_json.at("id").get<Identifier>() == "base:te/ghost"_id)
-						++ghostCount;
 				}
 			}
 
@@ -255,18 +252,6 @@ namespace Game3 {
 		// 	.sizeX = -1.f,
 		// 	.sizeY = -1.f,
 		// });
-
-		if (0 < ghostCount) {
-			static auto checkmark = cacheTexture("resources/checkmark.png");
-			sprite_renderer.drawOnScreen(*checkmark, {
-				.x = static_cast<float>(width)  / static_cast<float>(checkmark->width)  - 3.f,
-				.y = static_cast<float>(height) / static_cast<float>(checkmark->height) - 3.f,
-				.scaleX = 2.f,
-				.scaleY = 2.f,
-				.hackY = false,
-				.invertY = false,
-			});
-		}
 	}
 
 	void Realm::reupload() {
@@ -341,8 +326,6 @@ namespace Game3 {
 			std::unique_lock<std::shared_mutex> path_lock;
 			tileProvider.findPathState(tile_entity->position.copyBase(), &path_lock) = 0;
 		}
-		if (tile_entity->is("base:te/ghost"))
-			++ghostCount;
 		tile_entity->onSpawn();
 		return tile_entity;
 	}
@@ -366,8 +349,9 @@ namespace Game3 {
 	void Realm::tick(float delta) {
 		ticking = true;
 
-		for (const auto &[entity, position]: entityInitializationQueue.steal())
+		for (const auto &[entity, position]: entityInitializationQueue.steal()) {
 			initEntity(entity, position);
+		}
 
 		for (const auto &[entity, position]: entityAdditionQueue.steal())
 			add(entity, position);
@@ -632,9 +616,6 @@ namespace Game3 {
 			setLayerHelper(position.row, position.column, Layer::Objects, false);
 		}
 
-		if (tile_entity->is("base:te/ghost"))
-			--ghostCount;
-
 		updateNeighbors(position, Layer::Submerged);
 		updateNeighbors(position, Layer::Objects);
 	}
@@ -846,27 +827,6 @@ namespace Game3 {
 
 	bool Realm::hasTileEntityAt(const Position &position) const {
 		return tileEntities.contains(position);
-	}
-
-	void Realm::confirmGhosts() {
-		if (ghostCount <= 0)
-			return;
-
-		std::vector<std::shared_ptr<Ghost>> ghosts;
-
-		for (auto &[index, tile_entity]: tileEntities)
-			if (tile_entity->is("base:te/ghost"))
-				ghosts.push_back(std::dynamic_pointer_cast<Ghost>(tile_entity));
-
-		for (const auto &ghost: ghosts) {
-			remove(ghost);
-			ghost->confirm();
-		}
-
-		if (getSide() == Side::Client) {
-			game.toClient().activateContext();
-			reupload(Layer::Objects);
-		}
 	}
 
 	void Realm::damageGround(const Position &position) {
@@ -1373,9 +1333,9 @@ namespace Game3 {
 
 	void Realm::initEntity(const EntityPtr &entity, const Position &position) {
 		entity->init(getGame());
+		entity->spawning = false;
 		add(entity, position);
 		entity->calculateVisibleEntities();
-		entity->spawning = false;
 
 		if (getSide() == Side::Server) {
 			auto lock = entity->visiblePlayers.sharedLock();
@@ -1383,10 +1343,13 @@ namespace Game3 {
 				const EntityPacket packet(entity);
 				for (const auto &weak_player: entity->visiblePlayers) {
 					if (auto player = weak_player.lock()) {
+						INFO("Notifying " << player->username << " of " << entity->getName() << " " << entity->getGID());
 						player->notifyOfRealm(*this);
 						player->send(packet);
 					}
 				}
+			} else {
+				WARN("Visible players set is empty");
 			}
 		}
 	}

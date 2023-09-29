@@ -327,7 +327,7 @@ namespace Game3 {
 				const Identifier tile_entity_id{query.getColumn(0).getString()};
 				auto factory = game.registry<TileEntityFactoryRegistry>().at(tile_entity_id);
 				assert(factory);
-				TileEntityPtr tile_entity = (*factory)(game);
+				TileEntityPtr tile_entity = (*factory)();
 				tile_entity->setGID(GlobalID(query.getColumn(2).getInt64()));
 
 				const auto *buffer_bytes = reinterpret_cast<const uint8_t *>(query.getColumn(1).getBlob());
@@ -345,8 +345,6 @@ namespace Game3 {
 				realm->tileEntitiesByGID[tile_entity->globalID] = tile_entity;
 				realm->attach(tile_entity);
 				tile_entity->onSpawn();
-				if (tile_entity_id == "base:te/ghost"_id)
-					++realm->ghostCount;
 			}
 		}
 

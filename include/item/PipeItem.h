@@ -34,7 +34,7 @@ namespace Game3 {
 
 					inventory->decrease(stack, slot);
 
-					auto pipe = TileEntity::create<Pipe>(realm.getGame(), place.position);
+					auto pipe = TileEntity::create<Pipe>(place.position);
 					pipe->setPresent(P, true);
 					place.realm->add(pipe);
 

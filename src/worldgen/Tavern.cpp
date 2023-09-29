@@ -11,7 +11,7 @@
 #include "worldgen/Indoors.h"
 
 namespace Game3::WorldGen {
-	void generateTavern(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const std::shared_ptr<Realm> &parent_realm, Index width, Index height, const Position &entrance) {
+	void generateTavern(const RealmPtr &realm, std::default_random_engine &rng, const RealmPtr &parent_realm, Index width, Index height, const Position &entrance) {
 		auto guard = realm->guardGeneration();
 		realm->markGenerated(0, 0);
 		realm->tileProvider.ensureAllChunks(ChunkPosition{0, 0});
@@ -56,7 +56,7 @@ namespace Game3::WorldGen {
 					Game &game = realm->getGame();
 					realm->spawn<ItemEntity>({row, col}, ItemStack(game, "base:item/mead"_id));
 					static const std::vector<ItemStack> spawnables {{game, "base:item/mead"_id}};
-					realm->add(TileEntity::create<ItemSpawner>(game, Position(row, col), 0.0001f, spawnables));
+					TileEntity::spawn<ItemSpawner>(realm, Position(row, col), 0.0001f, spawnables);
 				}
 
 				if (2 < table_spacing)

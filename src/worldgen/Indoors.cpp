@@ -7,7 +7,7 @@
 #include "worldgen/Indoors.h"
 
 namespace Game3::WorldGen {
-	Position generateIndoors(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const std::shared_ptr<Realm> &parent_realm, Index width, Index height, const Position &entrance, Index door_x) {
+	Position generateIndoors(const RealmPtr &realm, std::default_random_engine &rng, const RealmPtr &parent_realm, Index width, Index height, const Position &entrance, Index door_x) {
 		Timer timer("GenerateIndoors");
 
 		auto guard = realm->guardGeneration();
@@ -37,8 +37,7 @@ namespace Game3::WorldGen {
 		realm->setTile(Layer::Objects, exit_position + Position(0, 1), "base:tile/wooden_wall", true);
 
 		const auto door_name = choose(realm->getTileset().getTilesByCategory("base:category/doors"), rng);
-		auto door = TileEntity::create<Teleporter>(realm->getGame(), door_name, exit_position, parent_realm->id, entrance);
-		realm->add(door);
+		TileEntity::spawn<Teleporter>(Place(exit_position, realm, {}), door_name, exit_position, parent_realm->id, entrance);
 
 		return exit_position;
 	}

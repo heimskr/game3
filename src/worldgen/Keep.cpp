@@ -41,15 +41,15 @@ namespace Game3::WorldGen {
 		const auto &doors = realm->getTileset().getTilesByCategory("base:category/doors");
 
 		Game &game = realm->getGame();
-		auto exit_door = TileEntity::create<Teleporter>(game, choose(doors, rng), exit_position, parent_realm, entrance);
+		auto exit_door = TileEntity::spawn<Teleporter>(realm, choose(doors, rng), exit_position, parent_realm, entrance);
+		assert(exit_door);
 		exit_door->extraData["exit"] = true;
-		realm->add(exit_door);
 
 		realm->setTile(Layer::Objects, Position(height - 2, 1), "base:tile/stockpile_w", false);
 		realm->setTile(Layer::Objects, Position(height - 2, 2), "base:tile/stockpile_e", false);
 		// TODO: the identifier here used to inexplicably be 48 so I'm putting in a silly tile temporarily to see whether it does anything.
-		auto stockpile = TileEntity::create<Stockpile>(game, "base:tile/stockpile_e", Position(height - 2, 2));
-		assert(realm->add(stockpile));
+		auto stockpile = TileEntity::spawn<Stockpile>(realm, "base:tile/stockpile_e", Position(height - 2, 2));
+		assert(stockpile);
 		stockpile->setInventory(40);
 		realm->stockpileInventory = stockpile->getInventory();
 

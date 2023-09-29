@@ -39,8 +39,6 @@ namespace Game3::WorldGen {
 		// realm->spawn<Miner>({exit_position.row - 1, exit_position.column}, parent_realm->id, realm->id, house_position, parent_realm->closestTileEntity<Building>(house_position,
 		// 	[](const auto &building) { return building->tileID == "base:tile/keep_sw"_id; }));
 
-		Game &game = realm->getGame();
-
 		switch(std::uniform_int_distribution(0, 1)(rng)) {
 			case 0: {
 				std::array<const char *, 14> texts {
@@ -64,15 +62,15 @@ namespace Game3::WorldGen {
 
 				for (Index column = 2; column < width - 2; ++column) {
 					realm->setTile(Layer::Objects, {1, column}, "base:tile/bookshelf"_id, false);
-					realm->add(TileEntity::create<Sign>(game, "base:tile/empty"_id, Position(1, column), texts.at((column - 2) % texts.size()), "Bookshelf"));
+					TileEntity::spawn<Sign>(realm, "base:tile/empty"_id, Position(1, column), texts.at((column - 2) % texts.size()), "Bookshelf");
 				}
 				break;
 			}
 
 			case 1: {
-				auto chest = TileEntity::create<Chest>(game, Position(1, width / 2));
-				assert(realm->add(chest));
-				chest->setInventory(10);
+				auto chest = TileEntity::spawn<Chest>(realm, Position(1, width / 2));
+				assert(chest);
+				chest->setInventory(30);
 				break;
 			}
 

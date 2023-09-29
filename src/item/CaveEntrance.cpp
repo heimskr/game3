@@ -11,7 +11,6 @@
 #include "realm/Cave.h"
 #include "threading/ThreadContext.h"
 #include "tileentity/Building.h"
-#include "tileentity/Ghost.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "worldgen/CaveGen.h"
@@ -62,9 +61,7 @@ namespace Game3 {
 			emplaced = true;
 		}
 
-		auto tile_entity = TileEntity::create<Building>(game, "base:tile/cave"_id, position, *realm_id, entrance);
-
-		if (realm.add(tile_entity) != nullptr) {
+		if (auto tile_entity = TileEntity::spawn<Building>(place.realm, "base:tile/cave"_id, position, *realm_id, entrance)) {
 			game.toServer().tileEntitySpawned(tile_entity);
 			const InventoryPtr inventory = player->getInventory();
 			if (--stack.count == 0)

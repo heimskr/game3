@@ -124,7 +124,6 @@
 #include "tileentity/Chest.h"
 #include "tileentity/CraftingStation.h"
 #include "tileentity/GeothermalGenerator.h"
-#include "tileentity/Ghost.h"
 #include "tileentity/ItemSpawner.h"
 #include "tileentity/OreDeposit.h"
 #include "tileentity/Pipe.h"
@@ -172,8 +171,6 @@ namespace Game3 {
 		registries.add<EntityTextureRegistry>();
 		registries.add<EntityFactoryRegistry>();
 		registries.add<TilesetRegistry>();
-		registries.add<GhostDetailsRegistry>();
-		registries.add<GhostFunctionRegistry>();
 		registries.add<TileEntityFactoryRegistry>();
 		registries.add<OreRegistry>();
 		registries.add<RealmFactoryRegistry>();
@@ -269,18 +266,31 @@ namespace Game3 {
 		add(std::make_shared<PumpItem>("base:item/pump", "Pump", 999, 64)); // TODO: cost
 		add(std::make_shared<TankItem>("base:item/tank", "Tank", 999, 64)); // TODO: cost
 
-		add(Furniture::create("base:item/wooden_wall", "Wooden Wall",  9, Layer::Objects, "base:tile/wooden_wall", "base:autotile/wooden_walls"));
-		add(Furniture::create("base:item/tower",       "Tower",       10, Layer::Objects, "base:tile/tower",       "base:autotile/towers"));
+		add(Furniture::createSimple("base:item/pride_flag", "Pride Flag",      80, Layer::Highest,   "base:tile/pride_flag"));
+		add(Furniture::createSimple("base:item/ace_flag",   "Asexual Flag",    80, Layer::Highest,   "base:tile/ace_flag"));
+		add(Furniture::createSimple("base:item/nb_flag",    "Non-Binary Flag", 80, Layer::Highest,   "base:tile/nb_flag"));
+		add(Furniture::createSimple("base:item/plant_pot1", "Plant Pot",       32, Layer::Submerged, "base:tile/plant1"));
+		add(Furniture::createSimple("base:item/plant_pot2", "Plant Pot",       32, Layer::Submerged, "base:tile/plant2"));
+		add(Furniture::createSimple("base:item/plant_pot3", "Plant Pot",       32, Layer::Submerged, "base:tile/plant3"));
 
-		add(Furniture::create("base:item/plant_pot1", "Plant Pot", 32, Layer::Submerged, "base:tile/plant1"));
-		add(Furniture::create("base:item/plant_pot2", "Plant Pot", 32, Layer::Submerged, "base:tile/plant2"));
-		add(Furniture::create("base:item/plant_pot3", "Plant Pot", 32, Layer::Submerged, "base:tile/plant3"));
+		add(Furniture::createMarchable("base:item/wooden_wall", "Wooden Wall",  9, Layer::Objects, "base:tile/wooden_wall", "base:autotile/wooden_walls"));
+		add(Furniture::createMarchable("base:item/tower",       "Tower",       10, Layer::Objects, "base:tile/tower",       "base:autotile/towers"));
 
-		// add(std::make_shared<Furniture>("base:item/pride_flag",  "Pride Flag",       80, 64));
-		// add(std::make_shared<Furniture>("base:item/ace_flag",    "Asexual Flag",     80, 64));
-		// add(std::make_shared<Furniture>("base:item/nb_flag",     "Non-Binary Flag",  80, 64));
-		// add(std::make_shared<Furniture>("base:item/cauldron",    "Cauldron",        175,  1));
-		// add(std::make_shared<Furniture>("base:item/purifier",    "Purifier",        300,  1));
+		add(Furniture::createCustom("base:item/cauldron", "Cauldron", 175, [](const Place &place) -> bool {
+			return nullptr != TileEntity::spawn<CraftingStation>(place, "base:tile/red_cauldron_full", place.position, "base:station/cauldron");
+		}));
+
+		add(Furniture::createCustom("base:item/purifier", "Purifier", 300, [](const Place &place) -> bool {
+			return nullptr != TileEntity::spawn<CraftingStation>(place, "base:tile/purifier", place.position, "base:station/purifier");
+		}));
+
+		add(Furniture::createCustom("base:item/chest", "Chest", 100, [](const Place &place) -> bool {
+			auto out = TileEntity::spawn<Chest>(place, "base:tile/chest", place.position, "Chest");
+			if (!out)
+				return false;
+			out->setInventory(30);
+			return true;
+		}));
 
 		add(std::make_shared<Plantable>("base:item/flower1_red",    "Red Flower",    "base:tile/flower1_red",    "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_red"));
 		add(std::make_shared<Plantable>("base:item/flower1_orange", "Orange Flower", "base:tile/flower1_orange", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_orange"));
@@ -353,10 +363,6 @@ namespace Game3 {
 		add(std::make_shared<GrasslandSapling>("base:item/sapling", "Sapling", 5, 64));
 	}
 
-	void Game::addGhosts() {
-		Game3::initGhosts(*this);
-	}
-
 	void Game::addEntityFactories() {
 		add(EntityFactory::create<Blacksmith>());
 		add(EntityFactory::create<Chicken>());
@@ -376,7 +382,6 @@ namespace Game3 {
 		add(TileEntityFactory::create<Chest>());
 		add(TileEntityFactory::create<CraftingStation>());
 		add(TileEntityFactory::create<GeothermalGenerator>());
-		add(TileEntityFactory::create<Ghost>());
 		add(TileEntityFactory::create<ItemSpawner>());
 		add(TileEntityFactory::create<OreDeposit>());
 		add(TileEntityFactory::create<Pipe>());
@@ -498,7 +503,6 @@ namespace Game3 {
 		initRegistries();
 		addItems();
 		traverseData(dataRoot / dir);
-		addGhosts();
 		addRealms();
 		addEntityFactories();
 		addTileEntityFactories();
@@ -526,10 +530,6 @@ namespace Game3 {
 			itemsByAttribute[attribute].insert(item);
 	}
 
-	void Game::add(std::shared_ptr<GhostDetails> details) {
-		registry<GhostDetailsRegistry>().add(details->identifier, details);
-	}
-
 	void Game::add(EntityFactory &&factory) {
 		auto shared = std::make_shared<EntityFactory>(std::move(factory));
 		registry<EntityFactoryRegistry>().add(shared->identifier, shared);
@@ -553,11 +553,6 @@ namespace Game3 {
 	void Game::add(LocalCommandFactory &&factory) {
 		auto shared = std::make_shared<LocalCommandFactory>(std::move(factory));
 		registry<LocalCommandFactoryRegistry>().add(shared->name, shared);
-	}
-
-	void Game::add(GhostFunction &&function) {
-		auto shared = std::make_shared<GhostFunction>(std::move(function));
-		registry<GhostFunctionRegistry>().add(shared->identifier, shared);
 	}
 
 	void Game::add(ModuleFactory &&factory) {
@@ -673,12 +668,6 @@ namespace Game3 {
 			auto &textures = registry<EntityTextureRegistry>();
 			for (const auto &[key, value]: json.at(1).items())
 				textures.add(Identifier(key), EntityTexture(Identifier(key), value.at(0), value.at(1)));
-
-		} else if (type == "base:ghost_details_map"_id) {
-
-			auto &details = registry<GhostDetailsRegistry>();
-			for (const auto &[key, value]: json.at(1).items())
-				details.add(Identifier(key), GhostDetails(Identifier(key), value.at(0), value.at(1), value.at(2), value.at(3), value.at(4), value.at(5), value.at(6)));
 
 		} else if (type == "base:item_texture_map"_id) {
 

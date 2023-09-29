@@ -19,12 +19,11 @@ namespace Game3::WorldGen {
 		realm->markGenerated(0, 0);
 		realm->tileProvider.ensureAllChunks(ChunkPosition{0, 0});
 		generateIndoors(realm, rng, parent_realm, width, height, entrance);
-		Game &game = realm->getGame();
 
 		realm->setTile(Layer::Objects, {1, 3}, "base:tile/furnace", false);
 		realm->setTile(Layer::Objects, {1, 5}, "base:tile/anvil", false);
-		realm->add(TileEntity::create<CraftingStation>(game, "base:tile/furnace", Position(1, 3), "base:station/furnace"));
-		realm->add(TileEntity::create<CraftingStation>(game, "base:tile/anvil",   Position(1, 5), "base:station/anvil"));
+		TileEntity::spawn<CraftingStation>(realm, "base:tile/furnace", Position(1, 3), "base:station/furnace");
+		TileEntity::spawn<CraftingStation>(realm, "base:tile/anvil",   Position(1, 5), "base:station/anvil");
 		realm->extraData["furnace"] = Position(1, 3);
 		realm->extraData["anvil"]   = Position(1, 5);
 

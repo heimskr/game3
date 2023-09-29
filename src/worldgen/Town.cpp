@@ -146,7 +146,7 @@ namespace Game3::WorldGen {
 
 		auto create_keep = [&](const Identifier &tilename) {
 			realm->setTile(Layer::Objects, keep_position, tilename, false);
-			realm->add(TileEntity::create<Building>(game, tilename, keep_position, keep_realm_id, keep_entrance));
+			TileEntity::spawn<Building>(realm, tilename, keep_position, keep_realm_id, keep_entrance);
 		};
 
 		create_keep("base:tile/keep_nw");
@@ -177,7 +177,8 @@ namespace Game3::WorldGen {
 			auto gen_building = [&](const Identifier &tilename, Index realm_width, Index realm_height, RealmType realm_type, const BuildingGenerator &gen_fn, std::optional<Position> entrance = std::nullopt) {
 				realm->setTile(Layer::Objects, building_position, tilename, false);
 				const RealmID realm_id = game.newRealmID();
-				auto building = TileEntity::create<Building>(game, tilename, building_position, realm_id, entrance? *entrance : Position(realm_height - 2, realm_width - 3));
+				auto building = TileEntity::spawn<Building>(realm, tilename, building_position, realm_id, entrance? *entrance : Position(realm_height - 2, realm_width - 3));
+				assert(building);
 				auto details = game.registry<RealmDetailsRegistry>()[realm_type];
 				auto new_realm = Realm::create(game, realm_id, realm_type, details->tilesetName, -seed);
 				new_realm->outdoors = false;

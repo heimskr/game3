@@ -37,7 +37,7 @@ namespace Game3 {
 
 			wasFound = false;
 			auto factory = game.registry<TileEntityFactoryRegistry>()[identifier];
-			tileEntity = (*factory)(game);
+			tileEntity = (*factory)();
 			tileEntity->setGID(globalID);
 			tileEntity->tileEntityID = identifier;
 			tileEntity->setRealm(realm);
@@ -79,8 +79,11 @@ namespace Game3 {
 		if (tileEntity) {
 			if (!wasFound)
 				game.getRealm(realmID)->add(tileEntity);
-			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(tileEntity))
-				has_inventory->getInventory()->notifyOwner();
+			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(tileEntity)) {
+				if (InventoryPtr inventory = has_inventory->getInventory()) {
+					inventory->notifyOwner();
+				}
+			}
 		}
 	}
 }

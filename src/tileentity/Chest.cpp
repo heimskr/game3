@@ -29,8 +29,18 @@ namespace Game3 {
 		json["name"] = name;
 	}
 
-	bool Chest::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
-		addObserver(player, false);
+	bool Chest::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
+		if (modifiers.onlyAlt()) {
+			getInventory()->iterate([&](const ItemStack &stack, Slot) {
+				stack.spawn(getRealm(), getPosition());
+				return false;
+			});
+			destroy();
+			player->give(ItemStack(getGame(), "base:item/chest"));
+		} else {
+			addObserver(player, false);
+		}
+
 		return true;
 	}
 

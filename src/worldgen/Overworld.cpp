@@ -151,7 +151,7 @@ namespace Game3::WorldGen {
 							const Position &position = resource_starts.back();
 							const Index index = (position.row - row_min) * CHUNK_SIZE + (position.column - col_min);
 							if (Grassland::THRESHOLD + threshold <= saved_noise[index])
-								realm->add(TileEntity::create<OreDeposit>(game, *ore, position));
+								TileEntity::spawn<OreDeposit>(realm, *ore, position);
 							resource_starts.pop_back();
 						}
 					};

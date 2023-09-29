@@ -20,6 +20,7 @@ namespace Game3 {
 	class Realm;
 	class RemoteClient;
 	class SpriteRenderer;
+	struct Place;
 
 	class TileEntity: public Agent, public Broadcastable {
 		public:
@@ -27,13 +28,29 @@ namespace Game3 {
 			std::weak_ptr<Realm> weakRealm;
 			Identifier tileID;
 			Identifier tileEntityID;
-			Lockable<Position> position {-1, -1};
+			Lockable<Position> position{-1, -1};
 			bool solid = false;
 			nlohmann::json extraData;
 
 			template <typename T, typename... Args>
-			static std::shared_ptr<T> create(Game &, Args && ...args) {
+			static std::shared_ptr<T> create(Args &&...args) {
 				return std::shared_ptr<T>(new T(std::forward<Args>(args)...));
+			}
+
+			template <typename T, typename... Args>
+			static std::shared_ptr<T> spawn(const Place &place, Args &&...args) {
+				auto out = create<T>(std::forward<Args>(args)...);
+				if (out->spawnIn(place))
+					return out;
+				return {};
+			}
+
+			template <typename T, typename... Args>
+			static std::shared_ptr<T> spawn(const std::shared_ptr<Realm> &realm, Args &&...args) {
+				auto out = create<T>(std::forward<Args>(args)...);
+				if (out->spawnIn(Place(out->getPosition(), realm)))
+					return out;
+				return {};
 			}
 
 			~TileEntity() override = default;
@@ -88,6 +105,9 @@ namespace Game3 {
 			virtual void absorbJSON(Game &, const nlohmann::json &);
 
 			friend void to_json(nlohmann::json &, const TileEntity &);
+
+		private:
+			bool spawnIn(const Place &);
 
 		public:
 			struct Ticker {

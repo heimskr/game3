@@ -83,7 +83,6 @@ namespace Game3 {
 			Position randomLand;
 			/** Whether the realm's rendering should be affected by the day-night cycle. */
 			bool outdoors = true;
-			size_t ghostCount = 0;
 			int64_t seed = 0;
 			std::unordered_set<ChunkPosition> generatedChunks;
 			Lockable<std::unordered_set<ChunkPosition>> visibleChunks;
@@ -159,7 +158,6 @@ namespace Game3 {
 			std::optional<Position> getPathableAdjacent(const Position &) const;
 			bool isPathable(const Position &) const;
 			bool hasTileEntityAt(const Position &) const;
-			void confirmGhosts();
 			void damageGround(const Position &);
 			Tileset & getTileset();
 			/** Redoes the pathmap for the entire stored map, not just the visible ones! Can be very expensive. */

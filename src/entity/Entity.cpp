@@ -325,7 +325,6 @@ namespace Game3 {
 				});
 		};
 
-		// constexpr float rotation = 45.f;
 		constexpr float rotation = 0.f;
 
 		switch (direction) {
@@ -640,11 +639,9 @@ namespace Game3 {
 			auto shared = getSelf();
 			const EntitySetPathPacket packet(*this);
 			auto lock = visiblePlayers.sharedLock();
-			// INFO("visiblePlayers<" << visiblePlayers.size() << ">");
 			for (const auto &weak_player: visiblePlayers) {
 				if (auto player = weak_player.lock()) {
 					pathSeers.insert(weak_player);
-					// INFO("Sending EntitySetPath packet");
 					player->toServer()->ensureEntity(shared);
 					player->send(packet);
 				}
@@ -998,17 +995,27 @@ namespace Game3 {
 		if (!realm)
 			return;
 
-		auto entities_lock = realm->entities.sharedLock();
-		auto visible_lock = visibleEntities.uniqueLock();
-		auto players_lock = visiblePlayers.uniqueLock();
-		visibleEntities.clear();
-		visiblePlayers.clear();
-		for (const auto &entity: realm->entities) {
-			if (entity.get() != this && entity->canSee(*this)) {
-				visibleEntities.insert(entity);
-				if (entity->isPlayer())
-					visiblePlayers.emplace(std::dynamic_pointer_cast<Player>(entity));
-			}
+		{
+			auto entities_lock = realm->entities.sharedLock();
+			auto visible_lock = visibleEntities.uniqueLock();
+			visibleEntities.clear();
+			for (const EntityPtr &entity: realm->entities)
+				if (entity.get() != this && entity->canSee(*this))
+					visibleEntities.insert(entity);
+		}
+
+		{
+			auto players_lock = realm->players.sharedLock();
+			auto visible_lock = visiblePlayers.uniqueLock();
+			visiblePlayers.clear();
+			std::erase_if(realm->players, [this](const std::weak_ptr<Player> &weak_player) {
+				if (std::shared_ptr<Player> player = weak_player.lock()) {
+					visiblePlayers.emplace(player);
+					return false;
+				}
+
+				return true;
+			});
 		}
 	}
 

@@ -26,7 +26,7 @@ namespace Game3 {
 	std::shared_ptr<TileEntity> TileEntity::fromJSON(Game &game, const nlohmann::json &json) {
 		auto factory = game.registry<TileEntityFactoryRegistry>().at(json.at("id").get<Identifier>());
 		assert(factory);
-		auto out = (*factory)(game);
+		auto out = (*factory)();
 		out->absorbJSON(game, json);
 		return out;
 	}
@@ -194,6 +194,10 @@ namespace Game3 {
 		json["solid"]    = solid;
 		if (!extraData.empty())
 			json["extra"] = extraData;
+	}
+
+	bool TileEntity::spawnIn(const Place &place) {
+		return place.realm->add(getSelf()) != nullptr;
 	}
 
 	void to_json(nlohmann::json &json, const TileEntity &tile_entity) {

@@ -35,9 +35,7 @@ namespace Game3 {
 				if (!realm.isPathable(position) || realm.hasTileEntityAt(position))
 					return false;
 
-				std::shared_ptr<T> tile_entity = TileEntity::create<T>(game, position);
-
-				if (realm.add(tile_entity) != nullptr) {
+				if (std::shared_ptr<T> tile_entity = TileEntity::spawn<T>(place.realm, position)) {
 					game.toServer().tileEntitySpawned(tile_entity);
 					if (--stack.count == 0)
 						inventory->erase(slot);

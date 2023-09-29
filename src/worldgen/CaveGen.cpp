@@ -135,7 +135,7 @@ namespace Game3::WorldGen {
 		else
 			entrance = choose(inside, rng);
 
-		realm->add(TileEntity::create<Building>(realm->getGame(), "base:tile/ladder", entrance, parent_realm, exit_position));
+		TileEntity::spawn<Building>(realm, "base:tile/ladder", entrance, parent_realm, exit_position);
 		timer.stop();
 		Timer::summary();
 		Timer::clear();

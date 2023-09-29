@@ -34,7 +34,6 @@ namespace Game3 {
 	class ServerGame;
 	class Tile;
 	class Tileset;
-	struct GhostDetails;
 	struct InteractionSet;
 	struct Plantable;
 
@@ -79,7 +78,6 @@ namespace Game3 {
 			virtual bool tick();
 			void initRegistries();
 			void addItems();
-			void addGhosts();
 			virtual void addEntityFactories();
 			void addTileEntityFactories();
 			void addRealms();
@@ -91,13 +89,11 @@ namespace Game3 {
 			void initEntities();
 			void initInteractionSets();
 			void add(std::shared_ptr<Item>);
-			void add(std::shared_ptr<GhostDetails>);
 			void add(EntityFactory &&);
 			void add(TileEntityFactory &&);
 			void add(RealmFactory &&);
 			void add(PacketFactory &&);
 			void add(LocalCommandFactory &&);
-			void add(GhostFunction &&);
 			void add(ModuleFactory &&);
 			void traverseData(const std::filesystem::path &);
 			void loadData(const nlohmann::json &);

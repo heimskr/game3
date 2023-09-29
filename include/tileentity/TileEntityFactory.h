@@ -12,17 +12,17 @@ namespace Game3 {
 
 	class TileEntityFactory: public NamedRegisterable {
 		private:
-			std::function<std::shared_ptr<TileEntity>(Game &)> function;
+			std::function<std::shared_ptr<TileEntity>()> function;
 
 		public:
 			TileEntityFactory(Identifier, decltype(function));
 
-			std::shared_ptr<TileEntity> operator()(Game &);
+			std::shared_ptr<TileEntity> operator()();
 
 			template <typename T>
 			static TileEntityFactory create(const Identifier &id = T::ID()) {
-				return {id, [](Game &game) {
-					return TileEntity::create<T>(game);
+				return {id, []() {
+					return TileEntity::create<T>();
 				}};
 			}
 	};
