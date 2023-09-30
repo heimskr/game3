@@ -1352,7 +1352,7 @@ namespace Game3 {
 	}
 
 	BiomeType Realm::getBiome(int64_t seed) {
-		std::default_random_engine rng{seed * 79ul};
-		return std::uniform_int_distribution(0, 100)(rng) % Biome::COUNT + 1;
+		std::default_random_engine rng{static_cast<uint_fast32_t>(seed * 79ul)};
+		return std::uniform_int_distribution(BiomeType(1), Biome::COUNT)(rng);
 	}
 }

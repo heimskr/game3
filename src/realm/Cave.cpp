@@ -10,7 +10,7 @@
 
 namespace Game3 {
 	Cave::Cave(Game &game_, RealmID id_, RealmID parent_realm, int seed_):
-		Realm(game_, id_, ID(), "base:tileset/monomap"_id, seed_), parentRealm(parent_realm) {}
+		Realm(game_, id_, ID(), "base:tileset/monomap", seed_), parentRealm(parent_realm) {}
 
 	Cave::~Cave() {
 		// Assumptions:
@@ -20,7 +20,7 @@ namespace Game3 {
 		//    -> If we find one cave entrance in a realm, we can stop after destroying its linked cave and we don't have to look for more entrances.
 		auto &game = getGame();
 		for (const auto &[index, tile_entity]: tileEntities) {
-			if (tile_entity->tileID != "base:tile/cave"_id)
+			if (tile_entity->tileID != "base:tile/cave")
 				continue;
 			if (auto building = std::dynamic_pointer_cast<Building>(tile_entity)) {
 				if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game.getRealm(building->innerRealmID)))
@@ -44,27 +44,34 @@ namespace Game3 {
 
 		Game &game = getGame();
 
-		if (tile_id == "base:tile/cave_coal"_id)
-			ore_stack.emplace(game, "base:item/coal"_id, 1);
-		else if (tile_id == "base:tile/cave_copper"_id)
-			ore_stack.emplace(game, "base:item/copper_ore"_id, 1);
-		else if (tile_id == "base:tile/cave_diamond"_id)
-			ore_stack.emplace(game, "base:item/diamond_ore"_id, 1);
-		else if (tile_id == "base:tile/cave_gold"_id)
-			ore_stack.emplace(game, "base:item/gold_ore"_id, 1);
-		else if (tile_id == "base:tile/cave_iron"_id)
-			ore_stack.emplace(game, "base:item/iron_ore"_id, 1);
-		else if (tile_id == "base:tile/cave_wall"_id)
-			ore_stack.emplace(game, "base:item/stone"_id, 1);
+		bool grim = false;
+
+		static std::unordered_map<Identifier, std::pair<Identifier, bool>> ores{
+			{"base:tile/cave_coal",     {"base:item/coal",        false}},
+			{"base:tile/cave_copper",   {"base:item/copper_ore",  false}},
+			{"base:tile/cave_diamond",  {"base:item/diamond_ore", false}},
+			{"base:tile/cave_gold",     {"base:item/gold_ore",    false}},
+			{"base:tile/cave_iron",     {"base:item/iron_ore",    false}},
+			{"base:tile/cave_wall",     {"base:item/stone",       false}},
+			{"base:tile/grimstone",     {"base:item/stone",        true}}, // TODO!: grimstone item
+			{"base:tile/grim_diamond",  {"base:item/diamond_ore",  true}},
+			{"base:tile/grim_uranium",  {"base:item/uranium_ore",  true}},
+			{"base:tile/grim_fireopal", {"base:item/diamond_ore",  true}}, // TODO!: fire opal ore item
+		};
+
+		if (auto iter = ores.find(tile_id); iter != ores.end()) {
+			ore_stack.emplace(game, iter->second.first, 1);
+			grim = iter->second.second;
+		}
 
 		if (ore_stack) {
 			const InventoryPtr inventory = player->getInventory();
 			if (auto *stack = inventory->getActive()) {
-				if (stack->hasAttribute("base:attribute/pickaxe"_id) && !inventory->add(*ore_stack)) {
+				if (stack->hasAttribute("base:attribute/pickaxe") && !inventory->add(*ore_stack)) {
 					reveal(position);
 					setTile(Layer::Objects, position, 0);
 					if (getTile(Layer::Terrain, position) == 0)
-						setTile(Layer::Terrain, position, "base:tile/cave_dirt", true);
+						setTile(Layer::Terrain, position, grim? "base:tile/grimdirt" : "base:tile/cave_dirt", true);
 					if (stack->reduceDurability())
 						inventory->erase(inventory->activeSlot);
 					return true;

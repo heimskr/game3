@@ -36,6 +36,10 @@ namespace Game3 {
 		return name.substr(slash + 1);
 	}
 
+	bool Identifier::operator==(const char *combined) const {
+		return *this == std::string_view(combined);
+	}
+
 	bool Identifier::operator==(std::string_view combined) const {
 		const size_t colon = combined.find(':');
 		if (colon == std::string_view::npos)
