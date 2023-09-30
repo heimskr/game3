@@ -21,7 +21,7 @@ test_cpp_args = [
 
 game3_config_data = configuration_data()
 
-if get_option('is_flatpak') == true
+if get_option('is_flatpak')
 	config_h.set('IS_FLATPAK', '1')
 endif
 

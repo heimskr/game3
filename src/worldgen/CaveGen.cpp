@@ -39,8 +39,9 @@ namespace Game3::WorldGen {
 		}
 	}
 
-	bool generateCaveTile(const std::shared_ptr<Realm> &realm, Index row, Index column, const noise::module::Perlin &perlin) {
+	bool generateNormalCaveTile(const std::shared_ptr<Realm> &realm, Index row, Index column, const noise::module::Perlin &perlin) {
 		const double noise = perlin.GetValue(row / noise_zoom, column / noise_zoom, 0.1);
+
 		if (noise < -.95) {
 			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_iron", false);
 			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
@@ -89,6 +90,69 @@ namespace Game3::WorldGen {
 		}
 
 		return false;
+	}
+
+	bool generateGrimCaveTile(const std::shared_ptr<Realm> &realm, Index row, Index column, const noise::module::Perlin &perlin) {
+		const double noise = perlin.GetValue(row / noise_zoom, column / noise_zoom, 0.1);
+
+		if (noise < -.95) {
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/grimstone", false);
+			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
+		} else if (noise < -.85) {
+		// 	realm->setTile(Layer::Objects, {row, column}, "base:tile/grimstone", false);
+		// 	realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
+		// } else if (noise < -.825) {
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/grim_diamond", false);
+			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
+		} else if (noise < -.725) {
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/grimstone", false);
+			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
+		} else if (noise < -.7) {
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/grim_fireopal", false);
+			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
+		} else if (noise < -.6) {
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/grimstone", false);
+			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
+		} else if (noise < -.55) {
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/grim_uranium", false);
+			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
+		} else if (noise < -.45) {
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/grimstone", false);
+			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
+		} else if (noise < -.375) {
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/grimstone", false);
+			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
+		} else if (noise < -.1) {
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/grimstone", false);
+			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
+		} else if (noise < .1) {
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/grimstone", false);
+		} else if (noise < .11) {
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/grimstone", false);
+		} else if (noise < .1125) {
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/grim_diamond", false);
+		} else if (noise < .12) {
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/grim_uranium", false);
+		} else if (noise < .1225) {
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/grim_fireopal", false);
+		} else if (noise < .13) {
+			realm->setTile(Layer::Objects, {row, column}, "base:tile/grimstone", false);
+		} else {
+			realm->setTile(Layer::Terrain, {row, column}, "base:tile/grimdirt", false);
+			return true;
+		}
+
+		return false;
+	}
+
+	bool generateCaveTile(const std::shared_ptr<Realm> &realm, Index row, Index column, const noise::module::Perlin &perlin) {
+		constexpr static double biome_zoom = noise_zoom * 10.;
+		const double biome_noise = perlin.GetValue(row / biome_zoom, column / biome_zoom, 5.0);
+
+		if (biome_noise < -0.5)
+			return generateGrimCaveTile(realm, row, column, perlin);
+
+		return generateNormalCaveTile(realm, row, column, perlin);
 	}
 
 	void generateCaveFull(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, int noise_seed, const Position &exit_position, Position &entrance, RealmID parent_realm, const ChunkRange &range) {

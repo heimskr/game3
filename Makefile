@@ -52,7 +52,7 @@ LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread $(LTO) $(PROFILING)
 SOURCES      := $(shell find -L src -name \*.cpp) src/gtk_resources.cpp
 OBJECTS      := $(SOURCES:.cpp=.o) src/resources.o
 RESXML       := src/$(OUTPUT).gresource.xml
-CLOC_OPTIONS := . --exclude-dir=subprojects,*build*,_build,po,vscode,stb,eigen,json,data,.github,.idea,vcpkg_installed,build,builddir,.flatpak-builder,libnoise --fullpath --not-match-f='^\.\/((src\/(gtk_)?resources\.cpp|include\/resources\.h|analysis\.txt|include\/lib\/.*|.*\.(json|txt|md|xml))|(chemskr\/src\/chemskr/(NuclideMasses|yylex|yyparse)\.cpp|chemskr\/(include|src)\/chemskr\/yyparse\.h))$$'
+CLOC_OPTIONS := . --exclude-dir=pvs-report,discord,subprojects,*build*,_build,po,vscode,stb,eigen,json,data,.github,.idea,vcpkg_installed,build,builddir,.flatpak-builder,libnoise --fullpath --not-match-f='^\.\/((src\/(gtk_)?resources\.cpp|include\/resources\.h|analysis\.txt|include\/lib\/.*|.*\.(json|txt|md|xml))|(chemskr\/src\/chemskr/(NuclideMasses|yylex|yyparse)\.cpp|chemskr\/(include|src)\/chemskr\/yyparse\.h))$$'
 RESGEN       := ./resgen
 
 .PHONY: all clean flags test

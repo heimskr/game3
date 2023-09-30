@@ -22,7 +22,8 @@ namespace Game3 {
 			constexpr static BiomeType SNOWY     = 3;
 			constexpr static BiomeType DESERT    = 4;
 			constexpr static BiomeType CAVE      = 5;
-			constexpr static BiomeType COUNT     = CAVE + 1;
+			constexpr static BiomeType GRIMSTONE = 6;
+			constexpr static BiomeType COUNT     = GRIMSTONE + 1;
 
 			constexpr static double NOISE_ZOOM = 100.;
 
