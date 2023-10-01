@@ -53,10 +53,10 @@ namespace Game3 {
 			{"base:tile/cave_gold",     {"base:item/gold_ore",    false}},
 			{"base:tile/cave_iron",     {"base:item/iron_ore",    false}},
 			{"base:tile/cave_wall",     {"base:item/stone",       false}},
-			{"base:tile/grimstone",     {"base:item/stone",        true}}, // TODO!: grimstone item
+			{"base:tile/grimstone",     {"base:item/grimstone",    true}},
 			{"base:tile/grim_diamond",  {"base:item/diamond_ore",  true}},
 			{"base:tile/grim_uranium",  {"base:item/uranium_ore",  true}},
-			{"base:tile/grim_fireopal", {"base:item/diamond_ore",  true}}, // TODO!: fire opal ore item
+			{"base:tile/grim_fireopal", {"base:item/fire_opal",    true}},
 		};
 
 		if (auto iter = ores.find(tile_id); iter != ores.end()) {

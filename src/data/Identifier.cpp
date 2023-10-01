@@ -105,4 +105,3 @@ namespace Game3 {
 		return os << id.str();
 	}
 }
-

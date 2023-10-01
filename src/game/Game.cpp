@@ -230,12 +230,14 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/light_blue_dye",  "Light Blue Dye",     12, 64));
 		add(std::make_shared<Item>("base:item/gray_dye",        "Gray Dye",           12, 64));
 		add(std::make_shared<Item>("base:item/lime_dye",        "Lime Dye",           12, 64));
-		add(std::make_shared<Item>("base:item/saffron_milkcap", "Saffron Milkcap",    10));
-		add(std::make_shared<Item>("base:item/honey_fungus",    "Honey Fungus",       15));
-		add(std::make_shared<Item>("base:item/brittlegill",     "Golden Brittlegill", 20));
-		add(std::make_shared<Item>("base:item/indigo_milkcap",  "Indigo Milkcap",     20));
-		add(std::make_shared<Item>("base:item/black_trumpet",   "Black Trumpet",      20));
-		add(std::make_shared<Item>("base:item/grey_knight",     "Grey Knight",        20));
+		add(std::make_shared<Item>("base:item/saffron_milkcap", "Saffron Milkcap",     8));
+		add(std::make_shared<Item>("base:item/honey_fungus",    "Honey Fungus",        8));
+		add(std::make_shared<Item>("base:item/brittlegill",     "Golden Brittlegill", 10));
+		add(std::make_shared<Item>("base:item/indigo_milkcap",  "Indigo Milkcap",     10));
+		add(std::make_shared<Item>("base:item/black_trumpet",   "Black Trumpet",      10));
+		add(std::make_shared<Item>("base:item/grey_knight",     "Grey Knight",        10));
+		add(std::make_shared<Item>("base:item/fire_opal",       "Fire Opal",          50));
+		add(std::make_shared<Item>("base:item/grimstone",       "Grimstone",           2));
 
 		add(std::make_shared<Mead>("base:item/mead", "Mead", 10, 16));
 
