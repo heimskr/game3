@@ -63,7 +63,7 @@ namespace Game3 {
 		} else if (getSide() == Side::Client) {
 			// auto &window = getRealm()->getGame().toClient().getWindow();
 			// auto &tab    = *window.merchantTab;
-			// player->queueForMove([player, &tab](const auto &) {
+			// player->queueForMove([&tab](const auto &) {
 			// 	tab.hide();
 			// 	return true;
 			// });

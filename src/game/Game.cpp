@@ -105,6 +105,7 @@
 #include "packet/SetPlayerStationTypesPacket.h"
 #include "packet/EntityChangingRealmsPacket.h"
 #include "packet/ChatMessageSentPacket.h"
+#include "packet/OpenTextTabPacket.h"
 #include "realm/Cave.h"
 #include "realm/House.h"
 #include "realm/Keep.h"
@@ -461,6 +462,7 @@ namespace Game3 {
 		add(PacketFactory::create<SetPlayerStationTypesPacket>());
 		add(PacketFactory::create<EntityChangingRealmsPacket>());
 		add(PacketFactory::create<ChatMessageSentPacket>());
+		add(PacketFactory::create<OpenTextTabPacket>());
 	}
 
 	void Game::addLocalCommandFactories() {

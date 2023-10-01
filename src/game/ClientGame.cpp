@@ -101,6 +101,8 @@ namespace Game3 {
 			if (focus)
 				tab.show();
 			tab.reset(toClientPointer());
+		} else {
+			WARN("Text tab not found");
 		}
 	}
 

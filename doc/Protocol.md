@@ -15,12 +15,12 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u64` Global ID
 	- `string` Identifier
 	- `i32` Realm ID
-	- `...` Tile Entity Data
+	- `...` Tile entity data
 
 3. **Chunk Request**: asks the server to send Chunk Tiles packets for a given list of chunks.
 
 	- `i32` Realm ID
-	- `u32[4n]` Chunk Positions
+	- `u32[4n]` Chunk positions
 
 	The chunk positions will be sent as sequential `(u32(x), u32(y), low32(threshold), high32(threshold))` tuples. Probably best to see the implementation in src/packets/ChunkRequestPacket.cpp.
 
@@ -52,9 +52,9 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 8. **Chunk Tiles**: sends all the terrain data for a chunk to a client.
 
 	- `i32` Realm ID
-	- `i32` Chunk Position X
-	- `i32` Chunk Position Y
-	- `u64` Update Counter
+	- `i32` Chunk position X
+	- `i32` Chunk position Y
+	- `u64` Update counter
 	- `i16[3*64**2]` Tile IDs (layer 1, then 2, then 3)
 
 	<!-- TODO: compression -->
@@ -62,8 +62,8 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 9. **Realm Notice**: informs a client of the existence of a realm.
 
 	- `i32` Realm ID
-	- `string` Realm Type
-	- `string` Tileset Identifier
+	- `string` Realm type
+	- `string` Tileset identifier
 	- `bool` Outdoors
 
 10. **Login**: sent by a client to log into the server.
@@ -76,20 +76,20 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `bool` Success
 	- `u64` Global ID
 	- `string` Username
-	- `string` Display Name
-	- `...` Player Data
+	- `string` Display name
+	- `...` Player data
 
 	Player data sent only if successful.
 
 12. **Register Player**: sent by a client to register a new player account.
 
 	- `string` Username
-	- `string` Display Name
+	- `string` Display name
 
 13. **Registration Status**: informs a client of the status of their registration attempt.
 
 	- `string` Username
-	- `string` Display Name
+	- `string` Display name
 	- `u64` Token
 
 	The token will be 0 if the attempt failed, or an arbitrary nonzero value otherwise.
@@ -99,31 +99,31 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u64` Global ID
 	- `string` Identifier
 	- `i32` Realm ID
-	- `...` Entity Data
+	- `...` Entity data
 
 	The Entity Data varies with entity type, but it always begins with:
 
-	- `string` Entity Type
+	- `string` Entity type
 	- `u64` Global ID
 	- `i32` Realm ID
 	- `i64` Position Y
 	- `i64` Position X
-	- `u8` Facing Direction
-	- `u64` Update Counter
+	- `u8` Facing direction
+	- `u64` Update counter
 	- `float` Offset X
 	- `float` Offset Y
 	- `float` Offset Z
-	- `float` Z-Speed
+	- `float` Z-speed
 	- `list<u8>` Path
 	- `u64` Money
 	- `u32` Hitpoints
 
 15. **Move Player**: tells the server to move the player to a given location.
 
-	- `i64` New Position Y
-	- `i64` New Position X
-	- `u8` Movement Direction
-	- `optional<u8>` Facing Direction
+	- `i64` New position Y
+	- `i64` New position X
+	- `u8` Movement direction
+	- `optional<u8>` Facing direction
 
 16. **Error**: informs a client of an error.
 
@@ -131,15 +131,15 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 17. **Entity Moved**: informs a client that an entity moved.
 
-	- `u64` Entity Global ID
+	- `u64` Entity global ID
 	- `i32` Realm ID
 	- `i64` Position Y
 	- `i64` Position X
 	- `u8` Facing
-	- `optional<{float, float, float}>` New Offset
-	- `optional<float>` New Z-Speed
-	- `bool` Adjust Offset
-	- `bool` Is Teleport
+	- `optional<{float, float, float}>` New offset
+	- `optional<float>` New z-speed
+	- `bool` Adjust offset
+	- `bool` Is teleport
 
 	The adjust offset flag, if true, tells the client to set the offset so that the entity's visible position
 	(i.e., the integer coordinates + the float offsets) appears unchanged after the integer coordinates are updated.
@@ -150,12 +150,12 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 19. **Entity Set Path**: informs a client that an entity chose a new path.
 
-	- `u64` Entity Global ID
+	- `u64` Entity global ID
 	- `i32` Realm ID
 	- `i64` Position Y
 	- `i64` Position X
-	- `list<u8>` Path Directions
-	- `u64` New Update Counter
+	- `list<u8>` Path directions
+	- `u64` New update counter
 
 20. **Teleport Self**: tells the server to teleport the player.
 
@@ -172,12 +172,12 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 22. **Inventory Slot Update**: tells a client to set an inventory slot.
 
 	- `i32` Slot
-	- `ItemStack` Item Stack
+	- `ItemStack`
 
 23. **Destroy Entity**: tells a client to remove an entity.
 
 	- `u64` Global ID
-	- `optional<i32>` Realm Requirement
+	- `optional<i32>` Realm requirement
 
 	If the realm requirement is set, the entity will not be destroyed unless its current realm ID (as far as the client knows) matches the realm requirement.
 
@@ -219,7 +219,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 31. **Craft**: tells the server to craft something.
 
 	- `u64` Packet GID
-	- `u64` Recipe Index
+	- `u64` Recipe index
 	- `u64` Count
 
 32. **Continuous Interaction**: tells the server to start or stop continuous interaction.
@@ -233,15 +233,15 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i32` Realm ID
 	- `i64` Position Y
 	- `i64` Position X
-	- `u32` Fluid ID and Level
+	- `u32` Fluid ID and level
 
 34. **Held Item Set**: tells a client that an entity's held item changed.
 
 	- `i32` Realm ID
-	- `u64` Entity Global ID
+	- `u64` Entity global ID
 	- `bool` Hand
 	- `i32` Slot
-	- `u64` New Update Counter
+	- `u64` New update counter
 
 	Hand is `true` for left, `false` for right.
 
@@ -259,12 +259,12 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 36. **Entity Request**: asks the server to send entities' data if the client versions are stale.
 
 	- `i32` Realm ID
-	- `u64[2n]` Global ID + Threshold Pairs
+	- `u64[2n]` Global ID + threshold pairs
 
 37. **Tile Entity Request**: asks the server to send tile entities' data if the client versions are stale.
 
 	- `i32` Realm ID
-	- `u64[2n]` Global ID + Threshold Pairs
+	- `u64[2n]` Global ID + threshold pairs
 
 38. **Jump**: tells the server to make the player jump. No payload.
 
@@ -275,37 +275,37 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 40. **Open Module For Agent**: tells a client to open a module for a given agent.
 
-	- `string` Module Identifier
-	- `u64` Agent Global ID
-	- `bool` Remove On Player Movement
+	- `string` Module identifier
+	- `u64` Agent global ID
+	- `bool` Remove on player movement
 
 41. **Swap Slots**: tells the server to swap a slot in one agent's inventory with a slot in another agent's inventory.
 
-	- `u64` First Agent Global ID
-	- `u64` Second Agent Global ID
-	- `i32` First Slot
-	- `i32` Second Slot
+	- `u64` First agent global ID
+	- `u64` Second agent global ID
+	- `i32` First slot
+	- `i32` Second slot
 
 42. **Move Slots**: tells the server to move a slot in one agent's inventory into a slot in another agent's inventory.
 
-	- `u64` First Agent Global ID
-	- `u64` Second Agent Global ID
-	- `i32` First Slot
-	- `i32` Second Slot
+	- `u64` First agent global ID
+	- `u64` Second agent global ID
+	- `i32` First slot
+	- `i32` Second slot
 
 	This differs from Swap Slots in that compatible stacks will be merged instead of swapped
 	and that the first slot has to have something in it.
 
 43. **Agent Message**: tells the server to send a message from the player to an agent, or tells a client to send a message from an agent to the player.
 
-	- `u64` Agent Global ID
-	- `string` Message Name
-	- `...` Message Data
+	- `u64` Agent global ID
+	- `string` Message name
+	- `...` Message data
 
 44. **Set Tile Entity Energy**: tells a client that a tile entity's stored energy has changed.
 
-	- `u64` Tile Entity Global ID
-	- `u64` Energy Amount
+	- `u64` Tile entity global ID
+	- `u64` Energy amount
 
 45. **Set Player Station Types**: tells a client what their available crafting station types are.
 
@@ -313,15 +313,22 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 46. **Entity Changing Realms**: tells a client that an entity is about to teleport to a different realm.
 
-	- `u64` Entity Global ID
-	- `i32` New Realm ID
-	- `i64` New Position Y
-	- `i64` New Position X
+	- `u64` Entity global ID
+	- `i32` New realm ID
+	- `i64` New position Y
+	- `i64` New position X
 
 47. **Chat Message Sent**: informs a client that a player sent a chat message.
 
-	- `u64` Player Global ID
+	- `u64` Player global ID
 	- `string` Message
+
+48. **Open Text Tab**: informs a client to open the text tab and display a message.
+
+	- `string` Name to display
+	- `string` Message
+	- `bool` Remove on move: Whether to close the tab when the player moves
+	- `bool` Ephemeral: Whether to hide the tab when another tab is opened
 
 # Message Format
 

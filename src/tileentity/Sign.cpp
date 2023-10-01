@@ -4,6 +4,7 @@
 #include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "graphics/SpriteRenderer.h"
+#include "packet/OpenTextTabPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Sign.h"
 #include "ui/Canvas.h"
@@ -21,14 +22,7 @@ namespace Game3 {
 	}
 
 	bool Sign::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
-		if (getSide() == Side::Client) {
-			ClientGame &game = getRealm()->getGame().toClient();
-			game.setText(text, name, true, true);
-			player->queueForMove([&game](const auto &) {
-				game.canvas.window.textTab->hide();
-				return true;
-			});
-		}
+		player->send(OpenTextTabPacket(name, text, true, true));
 		return true;
 	}
 

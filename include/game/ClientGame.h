@@ -65,6 +65,9 @@ namespace Game3 {
 			bool startThread();
 			void stopThread();
 
+			std::shared_ptr<ClientGame> getSelf() { return std::static_pointer_cast<ClientGame>(shared_from_this()); }
+			std::shared_ptr<const ClientGame> getSelf() const { return std::static_pointer_cast<const ClientGame>(shared_from_this()); }
+
 		private:
 			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update_;
 			sigc::signal<void(const PlayerPtr &)> signal_player_money_update_;
