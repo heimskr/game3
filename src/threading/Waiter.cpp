@@ -5,8 +5,8 @@ namespace Game3 {
 		remaining(remaining_) {}
 
 	Waiter & Waiter::operator--() noexcept {
-		--remaining;
-		condition.notify_all();
+		if (--remaining == 0)
+			condition.notify_all();
 		return *this;
 	}
 
