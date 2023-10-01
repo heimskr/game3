@@ -6,6 +6,7 @@
 #include "game/Inventory.h"
 #include "item/Plantable.h"
 #include "realm/Realm.h"
+#include "threading/ThreadContext.h"
 
 namespace Game3 {
 	bool StandardInteractions::interact(const Place &place, Modifiers modifiers) const {
@@ -86,6 +87,17 @@ namespace Game3 {
 
 	bool StandardInteractions::damageGround(const Place &place) const {
 		// TODO: handle other tilemaps
+
+		const Tileset &tileset = place.realm->getTileset();
+
+		if (const auto submerged = place.get(Layer::Submerged); submerged && tileset.isInCategory(*submerged, "base:category/trees")) {
+			if (std::uniform_real_distribution(0., 1.)(threadContext.rng) < M_PI / 10.)
+				place.set(Layer::Objects, "base:tile/charred_stump");
+			else
+				ItemStack(place.getGame(), "base:item/wood").spawn(place.realm, place.position);
+
+			place.set(Layer::Submerged, "base:tile/ash");
+		}
 
 		if (place.getName(Layer::Objects) == "base:tile/charred_stump"_id) {
 			place.realm->setTile(Layer::Objects, place.position, "base:tile/empty"_id);

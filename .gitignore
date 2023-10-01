@@ -41,3 +41,4 @@
 /.seed
 pvs-analysis.log
 /pvs-report
+/core.*

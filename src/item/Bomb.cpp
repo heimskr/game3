@@ -10,7 +10,7 @@
 #include "tileentity/Tree.h"
 
 namespace Game3 {
-	bool Bomb::use(Slot, ItemStack &, const Place &place, Modifiers, std::pair<float, float>) {
+	bool Bomb::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		constexpr Index  DIAMETER = 5;
 		constexpr double RADIUS = DIAMETER / 2.;
 
@@ -28,7 +28,10 @@ namespace Game3 {
 			}
 		}
 
-		realm.reupload();
+		const InventoryPtr inventory = place.player->getInventory();
+		if (--stack.count == 0)
+			inventory->erase(slot);
+		inventory->notifyOwner();
 
 		return true;
 	}
