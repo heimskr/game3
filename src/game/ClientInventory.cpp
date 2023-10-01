@@ -16,6 +16,7 @@
 #include "packet/SwapSlotsPacket.h"
 #include "realm/Realm.h"
 #include "recipe/CraftingRecipe.h"
+#include "ui/MainWindow.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -98,10 +99,14 @@ namespace Game3 {
 
 	void ClientInventory::notifyOwner() {
 		if (auto owner = weakOwner.lock()) {
-			if (auto player = std::dynamic_pointer_cast<Player>(owner))
-				player->getRealm()->getGame().toClient().signal_player_inventory_update().emit(player);
-			else
-				owner->getRealm()->getGame().toClient().signal_other_inventory_update().emit(owner);
+			ClientGame &game = owner->getRealm()->getGame().toClient();
+			game.getWindow().queue([&game, owner] {
+				if (auto player = std::dynamic_pointer_cast<Player>(owner)) {
+					game.signal_player_inventory_update().emit(player);
+				} else {
+					game.signal_other_inventory_update().emit(owner);
+				}
+			});
 		}
 	}
 
