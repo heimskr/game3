@@ -10,6 +10,7 @@
 #include "command/local/LoginCommand.h"
 #include "command/local/PlayersCommand.h"
 #include "command/local/RegisterCommand.h"
+#include "command/local/SegfaultCommand.h"
 #include "command/local/UsageCommand.h"
 #include "entity/Blacksmith.h"
 #include "entity/Chicken.h"
@@ -468,6 +469,7 @@ namespace Game3 {
 		add(LocalCommandFactory::create<UsageCommand>());
 		add(LocalCommandFactory::create<ChemicalCommand>());
 		add(LocalCommandFactory::create<PlayersCommand>());
+		add(LocalCommandFactory::create<SegfaultCommand>());
 	}
 
 	void Game::addTiles() {
