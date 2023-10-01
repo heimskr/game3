@@ -118,7 +118,7 @@ namespace Game3 {
 		return shared_from_this();
 	}
 
-	void InventoriedTileEntity::addObserver(const std::shared_ptr<Player> &player, bool silent) {
+	void InventoriedTileEntity::addObserver(const PlayerPtr &player, bool silent) {
 		Observable::addObserver(player, silent);
 
 		player->send(TileEntityPacket(getSelf()));

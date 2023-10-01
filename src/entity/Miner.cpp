@@ -61,7 +61,7 @@ namespace Game3 {
 		if (getSide() == Side::Client) {
 			auto &window = getRealm()->getGame().toClient().getWindow();
 			auto &tab = *window.inventoryTab;
-			player->queueForMove([player, &tab](const auto &) {
+			player->queueForMove([&tab](const auto &) {
 				tab.removeModule();
 				return true;
 			});

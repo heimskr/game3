@@ -62,7 +62,7 @@ namespace Game3 {
 			auto &window = getRealm()->getGame().toClient().getWindow();
 			auto &tab = *window.inventoryTab;
 			std::cout << "Woodcutter: money = " << money << ", phase = " << int(phase) << ", stuck = " << stuck << '\n';
-			player->queueForMove([player, &tab](const auto &) {
+			player->queueForMove([&tab](const auto &) {
 				tab.removeModule();
 				return true;
 			});

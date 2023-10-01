@@ -225,7 +225,7 @@ namespace Game3 {
 	void Player::showText(const Glib::ustring &text, const Glib::ustring &name) {
 		if (getSide() == Side::Client) {
 			getRealm()->getGame().toClient().setText(text, name, true, true);
-			queueForMove([player = shared_from_this()](const auto &) {
+			queueForMove([](const EntityPtr &player) {
 				player->getRealm()->getGame().toClient().canvas.window.textTab->hide();
 				return true;
 			});
