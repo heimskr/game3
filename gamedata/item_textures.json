@@ -126,6 +126,8 @@
 			"base:item/iron_hoe":             ["base:texture/franuka",       0,   0],
 			"base:item/cotton_seeds":         ["base:texture/custom",       32,   0],
 			"base:item/cotton":               ["base:texture/custom",       48,   0],
+			"base:item/wheat_seeds":          ["base:texture/tinywonder",    0,  80],
+			"base:item/wheat":                ["base:texture/tinywonder",   16,  80],
 			"base:item/item_pipe":            ["base:texture/tileset",     416, 176],
 			"base:item/fluid_pipe":           ["base:texture/tileset",     416, 112],
 			"base:item/energy_pipe":          ["base:texture/tileset",     416,  48],
