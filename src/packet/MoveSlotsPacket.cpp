@@ -5,7 +5,9 @@
 #include "net/RemoteClient.h"
 #include "packet/ErrorPacket.h"
 #include "packet/MoveSlotsPacket.h"
-#include "tileentity/Chest.h"
+#include "tileentity/InventoriedTileEntity.h"
+
+// #define CHECK_SLOT_COMPATIBILITY
 
 namespace Game3 {
 	// Magnificent code duplication.
@@ -45,6 +47,9 @@ namespace Game3 {
 		Inventory &first_inventory  = *first_has_inventory->getInventory();
 		Inventory &second_inventory = *second_has_inventory->getInventory();
 
+		auto first_inventoried  = std::dynamic_pointer_cast<InventoriedTileEntity>(first_has_inventory);
+		auto second_inventoried = std::dynamic_pointer_cast<InventoriedTileEntity>(second_has_inventory);
+
 		std::function<void()> first_action, second_action;
 
 		{
@@ -60,6 +65,17 @@ namespace Game3 {
 				return;
 			}
 
+#ifdef CHECK_SLOT_COMPATIBILITY
+			if (first_inventoried && !first_inventoried->canExtractItem(Direction::Invalid, firstSlot)) {
+				client.send(ErrorPacket("Can't move slots: first slot isn't extractable"));
+				return;
+			}
+
+			if (second_stack != nullptr && second_inventoried && !second_inventoried->canInsertItem(*second_stack, Direction::Invalid, secondSlot)) {
+				client.send(ErrorPacket("Can't move slots: second slot isn't insertable"));
+				return;
+			}
+#endif
 
 			if (second_stack != nullptr && first_stack->canMerge(*second_stack)) {
 

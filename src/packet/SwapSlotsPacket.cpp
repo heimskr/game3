@@ -4,6 +4,9 @@
 #include "net/RemoteClient.h"
 #include "packet/ErrorPacket.h"
 #include "packet/SwapSlotsPacket.h"
+#include "tileentity/InventoriedTileEntity.h"
+
+// #define CHECK_SLOT_COMPATIBILITY
 
 namespace Game3 {
 	void SwapSlotsPacket::handle(ServerGame &game, RemoteClient &client) {
@@ -47,6 +50,9 @@ namespace Game3 {
 		Inventory &first_inventory  = *first_has_inventory->getInventory();
 		Inventory &second_inventory = *second_has_inventory->getInventory();
 
+		auto first_inventoried  = std::dynamic_pointer_cast<InventoriedTileEntity>(first_has_inventory);
+		auto second_inventoried = std::dynamic_pointer_cast<InventoriedTileEntity>(second_has_inventory);
+
 		std::function<void()> first_action, second_action;
 
 		{
@@ -61,6 +67,18 @@ namespace Game3 {
 				client.send(ErrorPacket("Can't swap slots: both slots are invalid or empty"));
 				return;
 			}
+
+#ifdef CHECK_SLOT_COMPATIBILITY
+			if (first_stack != nullptr && first_inventoried && !first_inventoried->canExtractItem(Direction::Invalid, firstSlot)) {
+				client.send(ErrorPacket("Can't move slots: first slot isn't extractable"));
+				return;
+			}
+
+			if (second_stack != nullptr && second_inventoried && !second_inventoried->canInsertItem(*second_stack, Direction::Invalid, secondSlot)) {
+				client.send(ErrorPacket("Can't move slots: second slot isn't insertable"));
+				return;
+			}
+#endif
 
 			if (first_stack == nullptr) {
 
