@@ -77,32 +77,42 @@ namespace Game3 {
 				remove(player);
 				player->toServer()->weakClient.reset();
 				player->clearQueues();
-				if (auto count = player.use_count(); count != 1)
-					WARN("Player " << player.get() << " ref count: " << count << " (should be 1)");
 
 				for (const auto &[id, realm]: realms) {
 					{
-						auto lock = realm->entities.sharedLock();
-						if (realm->entities.contains(player))
-							INFO("Still present in Realm " << id << "'s entities");
+						auto lock = realm->entities.uniqueLock();
+						if (auto iter = realm->entities.find(player); iter != realm->entities.end()) {
+							WARN("Still present in Realm " << id << "'s entities");
+							realm->entities.erase(iter);
+						}
 					}
 
 					{
-						auto lock = realm->entitiesByGID.sharedLock();
-						if (realm->entitiesByGID.contains(player->getGID()))
-							INFO("Still present in Realm " << id << "'s entitiesByGID");
+						auto &by_gid = realm->entitiesByGID;
+						auto lock = by_gid.uniqueLock();
+						if (auto iter = by_gid.find(player->getGID()); iter != by_gid.end()) {
+							WARN("Still present in Realm " << id << "'s entitiesByGID");
+							by_gid.erase(iter);
+						}
 					}
 
 					{
 						auto lock = realm->entitiesByChunk.sharedLock();
-						for (const auto &[cpos, set]: realm->entitiesByChunk) {
-							if (set) {
-								auto set_lock = set->sharedLock();
-								if (set->contains(player))
-									INFO("Still present in Realm " << id << "'s entitiesByChunk at chunk position " << cpos);
+						for (const auto &[chunk_position, set]: realm->entitiesByChunk) {
+							if (!set)
+								continue;
+							auto set_lock = set->uniqueLock();
+							if (auto iter = set->find(player); iter != set->end()) {
+								WARN("Still present in Realm " << id << "'s entitiesByChunk at chunk position " << chunk_position);
+								set->erase(iter);
 							}
 						}
 					}
+				}
+
+				if (auto count = player.use_count(); count != 1) {
+					WARN("Player " << player.get() << " ref count: " << count << " (should be 1). Current realm: "
+						<< player->realmID << " (realmID) or " << player->getRealm()->id << " (getRealm()->id)");
 				}
 			}
 		}
