@@ -15,18 +15,27 @@ namespace Game3 {
 		globalID(tileEntity->getGID()),
 		realmID(tileEntity->realmID) {}
 
-	void TileEntityPacket::decode(Game &game, Buffer &buffer) {
+	void TileEntityPacket::decode(Game &, Buffer &buffer) {
 		buffer >> globalID >> identifier >> realmID;
 		assert(globalID != GlobalID(-1));
 		assert(globalID != GlobalID(0));
+		storedBuffer = std::move(buffer);
+	}
 
+	void TileEntityPacket::encode(Game &game, Buffer &buffer) const {
+		assert(tileEntity);
+		buffer << globalID << identifier << realmID;
+		tileEntity->encode(game, buffer);
+	}
+
+	void TileEntityPacket::handle(ClientGame &game) {
 		RealmPtr realm = game.tryRealm(realmID);
 		if (!realm)
 			throw PacketError("Couldn't find realm " + std::to_string(realmID) + " in TileEntityPacket");
 
 		if (auto found = game.getAgent<TileEntity>(globalID)) {
 			wasFound = true;
-			(tileEntity = found)->decode(game, buffer);
+			(tileEntity = found)->decode(game, storedBuffer);
 		} else {
 			std::optional<std::weak_ptr<Agent>> weak_agent;
 			{
@@ -42,7 +51,7 @@ namespace Game3 {
 			tileEntity->tileEntityID = identifier;
 			tileEntity->setRealm(realm);
 			tileEntity->init(game);
-			tileEntity->decode(game, buffer);
+			tileEntity->decode(game, storedBuffer);
 
 			if (weak_agent) {
 				ERROR("Found TileEntity " << globalID << " in allAgents, even though getAgent<TileEntity> returned null!");
@@ -67,15 +76,7 @@ namespace Game3 {
 
 			realm->add(tileEntity);
 		}
-	}
 
-	void TileEntityPacket::encode(Game &game, Buffer &buffer) const {
-		assert(tileEntity);
-		buffer << globalID << identifier << realmID;
-		tileEntity->encode(game, buffer);
-	}
-
-	void TileEntityPacket::handle(ClientGame &game) {
 		if (tileEntity) {
 			if (!wasFound)
 				game.getRealm(realmID)->add(tileEntity);

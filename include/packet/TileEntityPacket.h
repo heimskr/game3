@@ -25,6 +25,7 @@ namespace Game3 {
 			void handle(ClientGame &) override;
 
 		private:
+			Buffer storedBuffer;
 			bool wasFound = false;
 	};
 }

@@ -30,6 +30,8 @@ namespace Game3 {
 	}
 
 	bool Chest::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
+		assert(getSide() == Side::Server);
+
 		if (modifiers.onlyAlt()) {
 			getInventory()->iterate([&](const ItemStack &stack, Slot) {
 				stack.spawn(getRealm(), getPosition());

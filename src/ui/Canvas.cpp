@@ -25,6 +25,9 @@ namespace Game3 {
 		textRenderer.update(width(), height());
 
 		game->iterateRealms([](const RealmPtr &realm) {
+			if (!realm->renderersReady)
+				return;
+
 			if (realm->wakeupPending.exchange(false)) {
 				for (auto &row: *realm->renderers)
 					for (auto &layers: row)

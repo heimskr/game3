@@ -55,7 +55,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i32` Chunk position X
 	- `i32` Chunk position Y
 	- `u64` Update counter
-	- `i16[3*64**2]` Tile IDs (layer 1, then 2, then 3)
+	- `i16[4*64**2]` Tile IDs (layer 1, then 2, then 3, then 4)
 
 	<!-- TODO: compression -->
 

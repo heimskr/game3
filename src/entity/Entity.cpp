@@ -845,35 +845,33 @@ namespace Game3 {
 			pathSeers.erase(player);
 	}
 
-	bool Entity::removeVisible(const std::weak_ptr<Entity> &entity) {
-		auto shared_lock = visibleEntities.uniqueLock();
-		if (visibleEntities.contains(entity)) {
-			shared_lock.unlock();
+	size_t Entity::removeVisible(const std::weak_ptr<Entity> &entity) {
+		{
 			auto lock = visibleEntities.uniqueLock();
-			visibleEntities.erase(entity);
-			return true;
+			if (visibleEntities.contains(entity)) {
+				visibleEntities.erase(entity);
+				return 1;
+			}
 		}
 
-		return false;
+		return 0;
 	}
 
-	bool Entity::removeVisible(const std::weak_ptr<Player> &player) {
-		auto shared_lock = visiblePlayers.sharedLock();
+	size_t Entity::removeVisible(const std::weak_ptr<Player> &player) {
+		auto players_lock = visiblePlayers.uniqueLock();
 
-		if (visiblePlayers.contains(player)) {
-			shared_lock.unlock();
+		if (auto iter = visiblePlayers.find(player); iter != visiblePlayers.end()) {
+			size_t out = 0;
+			out += visiblePlayers.erase(iter) != visiblePlayers.end();
+			players_lock.unlock();
 			{
-				auto lock = visiblePlayers.uniqueLock();
-				visiblePlayers.erase(player);
+				auto entities_lock = visibleEntities.uniqueLock();
+				out += visibleEntities.erase(player);
 			}
-			{
-				auto lock = visibleEntities.uniqueLock();
-				visibleEntities.erase(player);
-			}
-			return true;
+			return out;
 		}
 
-		return false;
+		return 0;
 	}
 
 	void Entity::encode(Buffer &buffer) {

@@ -7,6 +7,19 @@
 #include "util/Util.h"
 
 namespace Game3 {
+	Buffer::Buffer(Buffer &&other):
+	bytes(std::move(other.bytes)), skip(other.skip), context(std::move(other.context)) {
+		other.skip = 0;
+	}
+
+	Buffer & Buffer::operator=(Buffer &&other) {
+		bytes = std::move(other.bytes);
+		skip = other.skip;
+		context = std::move(other.context);
+		other.skip = 0;
+		return *this;
+	}
+
 	template <> std::string Buffer::getType<bool>    (const bool &)     { return {'\x01'}; }
 	template <> std::string Buffer::getType<uint8_t> (const uint8_t &)  { return {'\x01'}; }
 	template <> std::string Buffer::getType<uint16_t>(const uint16_t &) { return {'\x02'}; }

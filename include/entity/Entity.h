@@ -144,8 +144,10 @@ namespace Game3 {
 			virtual void movedToNewChunk(const std::optional<ChunkPosition> &);
 			bool hasSeenPath(const PlayerPtr &);
 			void setSeenPath(const PlayerPtr &, bool seen = true);
-			bool removeVisible(const std::weak_ptr<Entity> &);
-			bool removeVisible(const std::weak_ptr<Player> &);
+			/** Returns the number of visible sets the entity was removed from. */
+			size_t removeVisible(const std::weak_ptr<Entity> &);
+			/** Returns the number of visible sets the player was removed from. */
+			size_t removeVisible(const std::weak_ptr<Player> &);
 			void calculateVisibleEntities();
 			virtual void jump();
 			void clearOffset();

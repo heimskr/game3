@@ -31,32 +31,39 @@ namespace Game3 {
 	}
 
 	void Player::destroy() {
-		auto lock = visibleEntities.sharedLock();
-
+		std::weak_ptr weak(getShared());
 		size_t times = 0;
 
-		if (!visibleEntities.empty()) {
-			auto shared = getShared();
-			for (const auto &weak_visible: visibleEntities)
-				if (auto visible = weak_visible.lock())
-					times += visible->removeVisible(std::weak_ptr(shared));
+
+		{
+			auto lock = visibleEntities.sharedLock();
+			if (!visibleEntities.empty()) {
+				auto shared = getShared();
+				for (const auto &weak_visible: visibleEntities)
+					if (auto visible = weak_visible.lock())
+						times += visible->removeVisible(weak);
+			}
 		}
 
-		INFO("Removed from visible sets " << times << " time(s)");
+		INFO("Removed from visible sets " << times << " time" << (times == 1? "" : "s"));
 
 		size_t remaining = 0;
+
 		{
 			auto ent_lock = getRealm()->entities.sharedLock();
 			for (const auto &entity: getRealm()->entities) {
-				auto vis_lock = entity->visibleEntities.sharedLock();
-				remaining += entity->visiblePlayers.contains(std::weak_ptr(getShared()));
+				auto vis_lock = entity->visiblePlayers.sharedLock();
+				if (auto iter = entity->visiblePlayers.find(weak); iter != entity->visiblePlayers.end()) {
+					++remaining;
+					entity->visiblePlayers.erase(iter);
+				}
 			}
 		}
 
 		if (remaining == 0)
 			SUCCESS("No longer present in any visible sets.");
 		else
-			ERROR("Still present in " << remaining << " visible set" << (remaining == 1? "" : "s") << '!');
+			ERROR("Still present in " << remaining << " visible set" << (remaining == 1? "!" : "s!"));
 
 		Entity::destroy();
 	}
@@ -179,13 +186,13 @@ namespace Game3 {
 		if ((old_realm_id == -1 || old_realm_id != nextRealm) && nextRealm != -1) {
 			if (getSide() == Side::Client) {
 				auto &client_game = game.toClient();
-				if (getGID() == client_game.player->getGID()) {
-					{
-						client_game.activeRealm->onBlur();
-						client_game.activeRealm->queuePlayerRemoval(getShared());
-						client_game.activeRealm = new_realm;
-						client_game.activeRealm->onFocus();
-					}
+				// Second condition is a hack. Sometimes the player gets interrealm teleported twice in the same tick.
+				// TODO: figure out the reason for the above double interrealm teleportation.
+				if (getGID() == client_game.player->getGID() && client_game.activeRealm != new_realm) {
+					client_game.activeRealm->onBlur();
+					client_game.activeRealm->queuePlayerRemoval(getShared());
+					client_game.activeRealm = new_realm;
+					client_game.activeRealm->onFocus();
 					focus(game.toClient().canvas, true);
 					client_game.requestFromLimbo(new_realm->id);
 				}
@@ -194,8 +201,10 @@ namespace Game3 {
 					locked_realm->queuePlayerRemoval(getShared());
 				auto locked_client = toServer()->weakClient.lock();
 				assert(locked_client);
-				INFO("Sending " << new_realm->id << " to client");
-				new_realm->sendTo(*locked_client);
+				if (!locked_client->getPlayer()->knowsRealm(new_realm->id)) {
+					INFO("Sending " << new_realm->id << " to client for the first time");
+					new_realm->sendTo(*locked_client);
+				}
 			}
 		}
 	}

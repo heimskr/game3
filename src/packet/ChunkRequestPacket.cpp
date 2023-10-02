@@ -41,11 +41,12 @@ namespace Game3 {
 			throw PacketError("Excessively greedy ChunkRequestPacket");
 
 		requests.clear();
-		for (size_t i = 0; i < data.size(); i += 4)
+		for (size_t i = 0; i < data.size(); i += 4) {
 			requests.emplace(
 				ChunkPosition{static_cast<int32_t>(data[i]), static_cast<int32_t>(data[i + 1])},
 				data[i + 2] | (static_cast<uint64_t>(data[i + 3]) << 32)
 			);
+		}
 	}
 
 	void ChunkRequestPacket::handle(ServerGame &game, RemoteClient &client) {

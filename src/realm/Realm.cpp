@@ -12,6 +12,7 @@
 #include "graphics/Tileset.h"
 #include "net/RemoteClient.h"
 #include "packet/ErrorPacket.h"
+#include "packet/InteractPacket.h"
 #include "realm/Keep.h"
 #include "realm/Realm.h"
 #include "realm/RealmFactory.h"
@@ -141,19 +142,13 @@ namespace Game3 {
 	}
 
 	void Realm::onFocus() {
-		if (getSide() != Side::Client || focused)
-			return;
-
-		focused = true;
-		wakeupPending = true;
+		if (getSide() == Side::Client && !focused.exchange(true))
+			wakeupPending = true;
 	}
 
 	void Realm::onBlur() {
-		if (getSide() != Side::Client || !focused)
-			return;
-
-		focused = false;
-		snoozePending = true;
+		if (getSide() == Side::Client && focused.exchange(false))
+			snoozePending = true;
 	}
 
 	void Realm::createRenderers() {
@@ -1300,9 +1295,9 @@ namespace Game3 {
 				gmenu->append(agent->getName(), "agent_menu.agent" + std::to_string(i));
 				group->add_action("agent" + std::to_string(i), [agent, overlap, player] {
 					if (overlap)
-						agent->onInteractOn(player, Modifiers{});
+						player->send(InteractPacket(true, Modifiers{}, agent->getGID()));
 					else
-						agent->onInteractNextTo(player, Modifiers{});
+						player->send(InteractPacket(false, Modifiers{}, agent->getGID()));
 				});
 			}
 

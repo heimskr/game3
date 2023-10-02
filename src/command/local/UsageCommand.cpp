@@ -5,6 +5,8 @@
 #include "util/Util.h"
 
 namespace Game3 {
+	extern Lockable<std::unordered_map<std::string, size_t>> entityUpdates;
+
 	void UsageCommand::operator()(LocalClient &client) {
 		std::cerr.imbue(std::locale(""));
 		INFO("");
@@ -25,6 +27,20 @@ namespace Game3 {
 
 		INFO("Bytes read: \e[36m" << client.bytesRead << "\e[39m");
 		INFO("Bytes written: \e[35m" << client.bytesWritten << "\e[39m");
+
+		{
+			auto lock = entityUpdates.sharedLock();
+			if (!entityUpdates.empty()) {
+				INFO("Entity updates:");
+				size_t total = 0;
+				for (const auto &[name, updates]: entityUpdates) {
+					INFO("- " << name << ": \e[32m" << updates << "\e[39m");
+					total += updates;
+				}
+				INFO("Total: \e[32m" << total << "\e[39m");
+			}
+		}
+
 		std::cerr.imbue(std::locale("C"));
 	}
 }

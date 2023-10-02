@@ -8,6 +8,8 @@
 #include "entity/EntityFactory.h"
 
 namespace Game3 {
+	Lockable<std::unordered_map<std::string, size_t>> entityUpdates;
+
 	EntityPacket::EntityPacket(EntityPtr entity_):
 		entity(std::move(entity_)),
 		identifier(entity->type),
@@ -18,24 +20,7 @@ namespace Game3 {
 		buffer >> globalID >> identifier >> realmID;
 		assert(globalID != static_cast<GlobalID>(-1));
 		assert(globalID != static_cast<GlobalID>(0));
-
-		RealmPtr realm = game.tryRealm(realmID);
-		if (!realm)
-			throw PacketError("Couldn't find realm " + std::to_string(realmID) + " in EntityPacket");
-
-		if (EntityPtr found = game.getAgent<Entity>(globalID)) {
-			wasFound = true;
-			(entity = found)->decode(buffer);
-		} else {
-			{ auto lock = game.allAgents.sharedLock(); assert(!game.allAgents.contains(globalID)); }
-			wasFound = false;
-			auto factory = game.registry<EntityFactoryRegistry>()[identifier];
-			entity = (*factory)(game);
-			entity->type = identifier;
-			entity->setGID(globalID);
-			entity->init(game);
-			entity->decode(buffer);
-		}
+		storedBuffer = std::move(buffer);
 	}
 
 	void EntityPacket::encode(Game &, Buffer &buffer) const {
@@ -45,11 +30,36 @@ namespace Game3 {
 	}
 
 	void EntityPacket::handle(ClientGame &game) {
-		if (wasFound)
-			return;
 		RealmPtr realm = game.tryRealm(realmID);
+
 		if (!realm)
 			throw PacketError("Couldn't find realm " + std::to_string(realmID) + " in EntityPacket");
-		realm->add(entity, entity->getPosition());
+
+		if (EntityPtr found = game.getAgent<Entity>(globalID)) {
+			wasFound = true;
+			(entity = found)->decode(storedBuffer);
+		} else {
+			{ auto lock = game.allAgents.sharedLock(); assert(!game.allAgents.contains(globalID)); }
+			wasFound = false;
+			auto factory = game.registry<EntityFactoryRegistry>()[identifier];
+			entity = (*factory)(game);
+			entity->type = identifier;
+			entity->setGID(globalID);
+			entity->init(game);
+			entity->decode(storedBuffer);
+		}
+
+		{
+			auto lock = entityUpdates.uniqueLock();
+			++entityUpdates[entity->getName()];
+		}
+
+		if (wasFound)
+			return;
+
+		if (RealmPtr realm = game.tryRealm(realmID))
+			realm->add(entity, entity->getPosition());
+		else
+			throw PacketError("Couldn't find realm " + std::to_string(realmID) + " in EntityPacket");
 	}
 }

@@ -33,8 +33,8 @@ namespace Game3 {
 
 	void LocalClient::read() {
 		if (buffer.context.expired())
-			if (auto locked = lockGame())
-				buffer.context = locked;
+			if (ClientGamePtr game = lockGame())
+				buffer.context = game;
 
 		assert(!reading.exchange(true));
 
@@ -87,14 +87,21 @@ namespace Game3 {
 					throw std::logic_error("Buffer grew too large");
 
 				if (payloadSize == buffer.size()) {
-					auto game = lockGame();
-					auto packet = (*game->registry<PacketFactoryRegistry>().at(packetType))();
+					ClientGamePtr game = lockGame();
+					std::shared_ptr<Packet> packet = (*game->registry<PacketFactoryRegistry>().at(packetType))();
 					packet->decode(*game, buffer);
+
 					if (!buffer.empty()) {
 						INFO("Bytes left in buffer: " << (buffer.bytes.size() - buffer.skip) << " / " << buffer.bytes.size());
 						assert(buffer.empty());
 					}
+
 					buffer.clear();
+
+					// In case a packet like TileEntityPacket moves the buffer.
+					if (buffer.context.expired())
+						buffer.context = game;
+
 					state = State::Begin;
 					{
 						auto lock = receivedPacketCounts.uniqueLock();
