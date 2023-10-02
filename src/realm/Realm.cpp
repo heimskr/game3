@@ -652,7 +652,6 @@ namespace Game3 {
 	}
 
 	void Realm::queuePlayerRemoval(const PlayerPtr &player) {
-		INFO("Queueing player " << player->getGID() << " for player removal.");
 		playerRemovalQueue.push(player);
 	}
 
