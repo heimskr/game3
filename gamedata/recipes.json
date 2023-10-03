@@ -241,6 +241,10 @@
 				"input":  [["base:item/stone", 1]],
 				"output": [["base:item/floor", 2]]
 			}],
+			["base:crafting_recipe", {
+				"input":  [["base:item/baguette", 1], ["base:item/knife", 0]],
+				"output": [["base:item/bread", 2]]
+			}],
 			["base:centrifuge_recipe", {
 				"input":  ["base:fluid/lava", 1],
 				"output": [

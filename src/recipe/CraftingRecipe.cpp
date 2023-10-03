@@ -21,11 +21,11 @@ namespace Game3 {
 		for (const auto &requirement: input) {
 			if (requirement.is<ItemStack>()) {
 				const auto &stack = requirement.get<ItemStack>();
-				if (inventory->count(stack) < stack.count)
+				if (0 < stack.count && inventory->count(stack) < stack.count)
 					return false;
 			} else {
 				const auto &[attribute, count] = requirement.get<AttributeRequirement>();
-				if (inventory->countAttribute(attribute) < count)
+				if (0 < count && inventory->countAttribute(attribute) < count)
 					return false;
 			}
 		}
