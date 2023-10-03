@@ -16,7 +16,7 @@ namespace Game3 {
 		globalID(entity->globalID),
 		realmID(entity->realmID) {}
 
-	void EntityPacket::decode(Game &game, Buffer &buffer) {
+	void EntityPacket::decode(Game &, Buffer &buffer) {
 		buffer >> globalID >> identifier >> realmID;
 		assert(globalID != static_cast<GlobalID>(-1));
 		assert(globalID != static_cast<GlobalID>(0));

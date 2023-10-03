@@ -34,7 +34,6 @@ namespace Game3 {
 
 			Game & getGame() const final;
 
-
 			std::string getEquation();
 			/** Returns whether the equation was actually set (i.e., whether the equation was valid and balanced). */
 			bool setEquation(std::string);

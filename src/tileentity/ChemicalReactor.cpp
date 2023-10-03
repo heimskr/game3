@@ -131,8 +131,8 @@ namespace Game3 {
 		TileEntity::decode(game, buffer);
 		InventoriedTileEntity::decode(game, buffer);
 		EnergeticTileEntity::decode(game, buffer);
-		if (auto equation_text = buffer.take<std::optional<std::string>>()) {
-			equation = Chemskr::Equation(*equation_text);
+		if (std::optional<std::string> equation_text = buffer.take<std::optional<std::string>>()) {
+			setEquation(std::move(*equation_text));
 		} else {
 			auto lock = equation.uniqueLock();
 			equation.reset();
@@ -286,6 +286,7 @@ namespace Game3 {
 		// Silly.
 		auto storage_inventory = std::dynamic_pointer_cast<StorageInventory>(inventory);
 		assert(storage_inventory);
+		inventory_copy->weakOwner = shared_from_this();
 		*storage_inventory = std::move(dynamic_cast<StorageInventory &>(*inventory_copy));
 
 		return true;
