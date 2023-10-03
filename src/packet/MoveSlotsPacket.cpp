@@ -90,10 +90,22 @@ namespace Game3 {
 				if (&first_inventory != &second_inventory && second_inventory.onMove)
 					second_action = second_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, false);
 
-				if (std::optional<ItemStack> leftovers = second_inventory.add(*first_stack, secondSlot))
+				if (first_inventory == second_inventory) {
+					const ItemCount max = second_stack->item->maxCount;
+					if (first_stack->count + second_stack->count <= max) {
+						second_stack->count += first_stack->count;
+						first_inventory.erase(firstSlot);
+					} else {
+						first_stack->count -= max - second_stack->count;
+						second_stack->count = max;
+						if (first_stack->count == 0)
+							first_inventory.erase(firstSlot);
+					}
+				} else if (std::optional<ItemStack> leftovers = second_inventory.add(*first_stack, secondSlot)) {
 					*first_stack = std::move(*leftovers);
-				else
+				} else {
 					first_inventory.erase(firstSlot);
+				}
 
 			} else if (second_stack == nullptr) {
 

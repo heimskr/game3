@@ -53,7 +53,7 @@ namespace Game3 {
 			virtual ItemStack * operator[](size_t) = 0;
 			virtual const ItemStack * operator[](size_t) const = 0;
 
-			bool operator==(const Inventory &other) const { return this == &other; }
+			inline bool operator==(const Inventory &other) const { return this == &other; }
 
 			/** Iterates over all items in the inventory until all have been iterated or the iteration function returns true. */
 			virtual void iterate(const std::function<bool(const ItemStack &, Slot)> &) = 0;
