@@ -153,7 +153,8 @@
 			"base:item/chest":                ["base:texture/tileset",     224, 176],
 			"base:item/baguette":             ["base:texture/kazzter",       0,   0],
 			"base:item/knife":                ["base:texture/kazzter",      16,   0],
-			"base:item/bread":                ["base:texture/kazzter",      32,   0]
+			"base:item/bread":                ["base:texture/kazzter",      32,   0],
+			"base:item/sandwich":             ["base:texture/kazzter",      48,   0]
 		}]
 	]
 }

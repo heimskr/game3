@@ -239,7 +239,6 @@ namespace Game3 {
 	}
 
 	void ServerGame::remove(const ServerPlayerPtr &player) {
-		INFO("ServerGame::remove(" << player->getGID() << ")");
 		{
 			auto set_lock = players.uniqueLock();
 			players.erase(player);
@@ -438,6 +437,8 @@ namespace Game3 {
 			}
 
 			if (first == "stop") {
+				if (player->username != "heimskr")
+					return {false, "No thanks."};
 				auto server = weakServer.lock();
 				if (!server)
 					return {false, "Couldn't lock server."};
@@ -526,6 +527,22 @@ namespace Game3 {
 				player->sendToVisible();
 				player->sendTo(*player->toServer()->getClient());
 				return {true, "Changed texture to " + choice.str() + "."};
+			}
+
+			if (first == "unhold") {
+				player->setHeldLeft(-1);
+				player->setHeldRight(-1);
+				return {true, "Unequipped items."};
+			}
+
+			if (first == "online") {
+				std::set<std::string> display_names;
+				{
+					auto lock = players.sharedLock();
+					for (const auto &iterated_player: players)
+						display_names.insert(iterated_player->displayName);
+				}
+				return {true, "Online players: " + join(display_names, ", ")};
 			}
 
 		} catch (const std::exception &err) {

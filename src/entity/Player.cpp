@@ -45,7 +45,7 @@ namespace Game3 {
 			}
 		}
 
-		INFO("Removed from visible sets " << times << " time" << (times == 1? "" : "s"));
+		INFO("Removed " << username << " from visible sets " << times << " time" << (times == 1? "" : "s"));
 
 		size_t remaining = 0;
 
