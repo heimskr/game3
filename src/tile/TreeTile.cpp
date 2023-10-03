@@ -17,7 +17,11 @@ namespace Game3 {
 		Game &game = player->getGame();
 
 		if (ItemStack *active_stack = inventory->getActive()) {
-			if (active_stack->hasAttribute("base:attribute/axe") && !inventory->add(crop->product)) {
+			if (active_stack->hasAttribute("base:attribute/axe")) {
+				for (const ItemStack &stack: crop->products.getStacks())
+					if (std::optional<ItemStack> leftover = inventory->add(stack))
+						leftover->spawn(place.realm, place.position);
+
 				// Remove tree
 				place.set(layer, 0);
 

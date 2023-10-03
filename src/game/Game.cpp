@@ -219,6 +219,7 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/electronics",     "Electronics",        32, 64));
 		add(std::make_shared<Item>("base:item/sulfur",          "Sulfur",             15, 64));
 		add(std::make_shared<Item>("base:item/cotton",          "Cotton",              8, 64));
+		add(std::make_shared<Item>("base:item/wheat",           "Wheat",               8, 64));
 		add(std::make_shared<Item>("base:item/red_dye",         "Red Dye",            12, 64));
 		add(std::make_shared<Item>("base:item/orange_dye",      "Orange Dye",         12, 64));
 		add(std::make_shared<Item>("base:item/yellow_dye",      "Yellow Dye",         12, 64));
@@ -243,15 +244,16 @@ namespace Game3 {
 
 		add(std::make_shared<Mead>("base:item/mead", "Mead", 10, 16));
 
-		add(std::make_shared<Seed>("base:item/cotton_seeds",   "Cotton Seeds",   "base:tile/cotton_0"_id, 4));
+		add(std::make_shared<Seed>("base:item/cotton_seeds",   "Cotton Seeds",   "base:tile/cotton_0", 4));
+		add(std::make_shared<Seed>("base:item/wheat_seeds",    "Wheat Seeds",    "base:tile/wheat_0",  4));
 
-		add(std::make_shared<Tool>("base:item/iron_axe",       "Iron Axe",       150,  3.f, 128, "base:attribute/axe"_id));
-		add(std::make_shared<Tool>("base:item/iron_shovel",    "Iron Shovel",    120,  3.f,  64, "base:attribute/shovel"_id));
-		add(std::make_shared<Tool>("base:item/gold_axe",       "Gold Axe",       400, .75f,  64, "base:attribute/axe"_id));
-		add(std::make_shared<Tool>("base:item/gold_shovel",    "Gold Shovel",    300, .75f, 512, "base:attribute/shovel"_id));
-		add(std::make_shared<Tool>("base:item/diamond_axe",    "Diamond Axe",    900,  1.f, 512, "base:attribute/axe"_id));
-		add(std::make_shared<Tool>("base:item/diamond_shovel", "Diamond Shovel", 700,  1.f, 512, "base:attribute/shovel"_id));
-		add(std::make_shared<Tool>("base:item/wrench",         "Wrench",          72,  0.f,  -1, "base:attribute/wrench"_id));
+		add(std::make_shared<Tool>("base:item/iron_axe",       "Iron Axe",       150,  3.f, 128, "base:attribute/axe"));
+		add(std::make_shared<Tool>("base:item/iron_shovel",    "Iron Shovel",    120,  3.f,  64, "base:attribute/shovel"));
+		add(std::make_shared<Tool>("base:item/gold_axe",       "Gold Axe",       400, .75f,  64, "base:attribute/axe"));
+		add(std::make_shared<Tool>("base:item/gold_shovel",    "Gold Shovel",    300, .75f, 512, "base:attribute/shovel"));
+		add(std::make_shared<Tool>("base:item/diamond_axe",    "Diamond Axe",    900,  1.f, 512, "base:attribute/axe"));
+		add(std::make_shared<Tool>("base:item/diamond_shovel", "Diamond Shovel", 700,  1.f, 512, "base:attribute/shovel"));
+		add(std::make_shared<Tool>("base:item/wrench",         "Wrench",          72,  0.f,  -1, "base:attribute/wrench"));
 
 		add(std::make_shared<Floor>("base:item/floor", "Floor", "base:tile/floor", 4, 64));
 
@@ -259,9 +261,9 @@ namespace Game3 {
 		add(std::make_shared<Hammer>("base:item/gold_hammer",    "Gold Hammer",    400, .75f, 128));
 		add(std::make_shared<Hammer>("base:item/diamond_hammer", "Diamond Hammer", 900,  1.f, 128));
 
-		add(std::make_shared<Pickaxe>("base:item/iron_pickaxe",    "Iron Pickaxe",    150,  3.f,  64, "base:attribute/pickaxe"_id));
-		add(std::make_shared<Pickaxe>("base:item/gold_pickaxe",    "Gold Pickaxe",    400, .75f,  64, "base:attribute/pickaxe"_id));
-		add(std::make_shared<Pickaxe>("base:item/diamond_pickaxe", "Diamond Pickaxe", 900,  1.f, 512, "base:attribute/pickaxe"_id));
+		add(std::make_shared<Pickaxe>("base:item/iron_pickaxe",    "Iron Pickaxe",    150,  3.f,  64, "base:attribute/pickaxe"));
+		add(std::make_shared<Pickaxe>("base:item/gold_pickaxe",    "Gold Pickaxe",    400, .75f,  64, "base:attribute/pickaxe"));
+		add(std::make_shared<Pickaxe>("base:item/diamond_pickaxe", "Diamond Pickaxe", 900,  1.f, 512, "base:attribute/pickaxe"));
 
 		add(std::make_shared<Landfill>("base:item/sand",          "Sand",          1, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/sand"));
 		add(std::make_shared<Landfill>("base:item/volcanic_sand", "Volcanic Sand", 3, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/volcanic_sand"));
@@ -409,9 +411,9 @@ namespace Game3 {
 		// ...
 		addRealm.operator()<Overworld>(Overworld::ID());
 		addRealm.operator()<House>(House::ID());
-		addRealm.operator()<Realm>("base:realm/blacksmith"_id);
+		addRealm.operator()<Realm>("base:realm/blacksmith");
 		addRealm.operator()<Cave>(Cave::ID());
-		addRealm.operator()<Realm>("base:realm/tavern"_id);
+		addRealm.operator()<Realm>("base:realm/tavern");
 		addRealm.operator()<Keep>(Keep::ID());
 	}
 
@@ -479,9 +481,9 @@ namespace Game3 {
 
 		reg.add<ForestFloorTile>();
 
-		const auto monomap = registry<TilesetRegistry>().at("base:tileset/monomap"_id);
+		const auto monomap = registry<TilesetRegistry>().at("base:tileset/monomap");
 		auto grass = std::make_shared<GrassTile>();
-		for (const auto &tilename: monomap->getTilesByCategory("base:category/flower_spawners"_id))
+		for (const auto &tilename: monomap->getTilesByCategory("base:category/flower_spawners"))
 			reg.add(tilename, grass);
 
 		for (const auto &[crop_name, crop]: registry<CropRegistry>()) {
@@ -489,7 +491,7 @@ namespace Game3 {
 				auto tile = std::make_shared<CropTile>(crop);
 				for (const auto &stage: crop->stages)
 					reg.add(stage, tile);
-			} else if (crop->customType == "base:tile/tree"_id) {
+			} else if (crop->customType == "base:tile/tree") {
 				// TODO: We need the factory thing.
 				auto tile = std::make_shared<TreeTile>(crop);
 				for (const auto &stage: crop->stages)
@@ -669,13 +671,13 @@ namespace Game3 {
 		Identifier type = json.at(0);
 
 		// TODO: make a map of handlers for different types instead of if-elsing here
-		if (type == "base:entity_texture_map"_id) {
+		if (type == "base:entity_texture_map") {
 
 			auto &textures = registry<EntityTextureRegistry>();
 			for (const auto &[key, value]: json.at(1).items())
 				textures.add(Identifier(key), EntityTexture(Identifier(key), value.at(0), value.at(1)));
 
-		} else if (type == "base:item_texture_map"_id) {
+		} else if (type == "base:item_texture_map") {
 
 			auto &textures = registry<ItemTextureRegistry>();
 			for (const auto &[key, value]: json.at(1).items()) {
@@ -687,19 +689,19 @@ namespace Game3 {
 					throw std::invalid_argument("Expected ItemTexture JSON size to be 3 or 5, not " + std::to_string(value.size()));
 			}
 
-		} else if (type == "base:ore_map"_id) {
+		} else if (type == "base:ore_map") {
 
 			auto &ores = registry<OreRegistry>();
 			for (const auto &[key, value]: json.at(1).items())
 				ores.add(Identifier(key), Ore(Identifier(key), ItemStack::fromJSON(*this, value.at(0)), value.at(1), value.at(2), value.at(3), value.at(4), value.at(5)));
 
-		} else if (type == "base:realm_details_map"_id) {
+		} else if (type == "base:realm_details_map") {
 
 			auto &details = registry<RealmDetailsRegistry>();
 			for (const auto &[key, value]: json.at(1).items())
 				details.add(Identifier(key), RealmDetails(Identifier(key), value.at("tileset")));
 
-		} else if (type == "base:texture_map"_id) {
+		} else if (type == "base:texture_map") {
 
 			auto &textures = registry<TextureRegistry>();
 			for (const auto &[key, value]: json.at(1).items()) {
@@ -713,25 +715,25 @@ namespace Game3 {
 					throw std::invalid_argument("Expected Texture JSON size to be 1, 2 or 3, not " + std::to_string(value.size()));
 			}
 
-		} else if (type == "base:tileset"_id) {
+		} else if (type == "base:tileset") {
 
 			Identifier identifier = json.at(1);
 			std::filesystem::path base_dir = json.at(2);
 			auto &tilesets = registry<TilesetRegistry>();
 			tilesets.add(identifier, stitcher(base_dir, identifier));
 
-		// } else if (type == "base:manual_tileset_map"_id) { // Deprecated.
+		// } else if (type == "base:manual_tileset_map") { // Deprecated.
 
 		// 	auto &tilesets = registry<TilesetRegistry>();
 		// 	for (const auto &[key, value]: json.at(1).items())
 		// 		tilesets.add(Identifier(key), Tileset::fromJSON(Identifier(key), value));
 
-		} else if (type == "base:recipe_list"_id) {
+		} else if (type == "base:recipe_list") {
 
 			for (const auto &recipe_json: json.at(1))
 				addRecipe(recipe_json);
 
-		} else if (type == "base:fluid_list"_id) {
+		} else if (type == "base:fluid_list") {
 
 			auto &fluids = registry<FluidRegistry>();
 			for (const auto &pair: json.at(1)) {
@@ -743,7 +745,7 @@ namespace Game3 {
 					fluids.add(fluid_name, Fluid(fluid_name, value.at("name"), value.at("tileset"), value.at("tilename")));
 			}
 
-		} else if (type == "base:crop_map"_id) {
+		} else if (type == "base:crop_map") {
 
 			auto &crops = registry<CropRegistry>();
 			for (const auto &[key, value]: json.at(1).items())
@@ -812,7 +814,7 @@ namespace Game3 {
 		auto &reg = registry<TileRegistry>();
 		if (auto found = reg.maybe(identifier))
 			return found;
-		static auto default_tile = std::make_shared<Tile>("base:tile"_id);
+		static auto default_tile = std::make_shared<Tile>("base:tile");
 		return default_tile;
 	}
 

@@ -210,7 +210,7 @@ namespace Game3 {
 	void ItemStack::fromJSON(const Game &game, const nlohmann::json &json, ItemStack &stack) {
 		const Identifier id = json.at(0);
 		stack.item = game.registry<ItemRegistry>()[id];
-		stack.count = json.at(1);
+		stack.count = 1 < json.size()? json.at(1).get<ItemCount>() : 1;
 		if (2 < json.size()) {
 			const auto &extra = json.at(2);
 			if (extra.is_string() && extra == "with_durability") {

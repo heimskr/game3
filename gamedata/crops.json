@@ -7,29 +7,47 @@
 		["base:crop_map", {
 			"base:crop/cotton": {
 				"stages": ["base:tile/cotton_0", "base:tile/cotton_1", "base:tile/cotton_2"],
-				"product": ["base:item/cotton", 1],
+				"products": [
+					["constant", ["base:item/cotton"], 1],
+					["exponential", ["base:item/cotton_seeds"], 1, 0.25]
+				],
+				"chance": 1.0
+			},
+
+			"base:crop/wheat": {
+				"stages": ["base:tile/wheat_0", "base:tile/wheat_1", "base:tile/wheat_2", "base:tile/wheat_3", "base:tile/wheat_4"],
+				"products": [
+					["constant", ["base:item/wheat"], 1],
+					["exponential", ["base:item/wheat_seeds"], 1, 0.25]
+				],
 				"chance": 1.0
 			},
 
 			"base:crop/tree1": {
 				"type": "base:tile/tree",
 				"stages": ["base:tile/tree1_stump", "base:tile/tree1"],
-				"custom": {"sapling": "base:item/sapling"},
-				"product": ["base:item/wood", 1],
+				"products": [
+					["constant", ["base:item/wood"], 1],
+					["exponential", ["base:item/sapling"], 1, 0.25]
+				],
 				"chance": 0.75
 			},
 			"base:crop/tree2": {
 				"type": "base:tile/tree",
 				"stages": ["base:tile/tree2_stump", "base:tile/tree2"],
-				"custom": {"sapling": "base:item/sapling"},
-				"product": ["base:item/wood", 1],
+				"products": [
+					["constant", ["base:item/wood"], 1],
+					["exponential", ["base:item/sapling"], 1, 0.25]
+				],
 				"chance": 0.75
 			},
 			"base:crop/tree3": {
 				"type": "base:tile/tree",
 				"stages": ["base:tile/tree3_stump", "base:tile/tree3"],
-				"custom": {"sapling": "base:item/sapling"},
-				"product": ["base:item/wood", 1],
+				"products": [
+					["constant", ["base:item/wood"], 1],
+					["exponential", ["base:item/sapling"], 1, 0.25]
+				],
 				"chance": 0.75
 			},
 
@@ -37,93 +55,113 @@
 				"type": "base:tile/tree",
 				"stages": ["base:tile/tree1_honey_stump", "base:tile/tree1_empty", "base:tile/tree1_full"],
 				"custom": {
-					"sapling": "base:item/sapling",
 					"honey": {
 						"empty": "base:tile/tree1_empty",
 						"full": "base:tile/tree1_full",
 						"item": "base:item/honey"
 					}
 				},
-				"product": ["base:item/wood", 1],
+				"products": [
+					["constant", ["base:item/wood"], 1],
+					["exponential", ["base:item/sapling"], 1, 0.25]
+				],
 				"chance": 0.75
 			},
 			"base:crop/tree2_honey": {
 				"type": "base:tile/tree",
 				"stages": ["base:tile/tree2_honey_stump", "base:tile/tree2_empty", "base:tile/tree2_full"],
 				"custom": {
-					"sapling": "base:item/sapling",
 					"honey": {
 						"empty": "base:tile/tree2_empty",
 						"full": "base:tile/tree2_full",
 						"item": "base:item/honey"
 					}
 				},
-				"product": ["base:item/wood", 1],
+				"products": [
+					["constant", ["base:item/wood"], 1],
+					["exponential", ["base:item/sapling"], 1, 0.25]
+				],
 				"chance": 0.75
 			},
 			"base:crop/tree3_honey": {
 				"type": "base:tile/tree",
 				"stages": ["base:tile/tree3_honey_stump", "base:tile/tree3_empty", "base:tile/tree3_full"],
 				"custom": {
-					"sapling": "base:item/sapling",
 					"honey": {
 						"empty": "base:tile/tree3_empty",
 						"full": "base:tile/tree3_full",
 						"item": "base:item/honey"
 					}
 				},
-				"product": ["base:item/wood", 1],
+				"products": [
+					["constant", ["base:item/wood"], 1],
+					["exponential", ["base:item/sapling"], 1, 0.25]
+				],
 				"chance": 0.75
 			},
 
 			"base:crop/cactus1": {
 				"type": "base:tile/tree",
 				"stages": ["base:tile/cactus1_young", "base:tile/cactus1"],
-				"custom": {"sapling": "base:item/desert_sapling"},
-				"product": ["base:item/cactus", 1],
+				"products": [
+					["constant", ["base:item/cactus"], 1],
+					["exponential", ["base:item/desert_sapling"], 1, 0.25]
+				],
 				"chance": 0.75
 			},
 			"base:crop/cactus2": {
 				"type": "base:tile/tree",
 				"stages": ["base:tile/cactus2_young", "base:tile/cactus2"],
-				"custom": {"sapling": "base:item/desert_sapling"},
-				"product": ["base:item/cactus", 1],
+				"products": [
+					["constant", ["base:item/cactus"], 1],
+					["exponential", ["base:item/desert_sapling"], 1, 0.25]
+				],
 				"chance": 0.75
 			},
 			"base:crop/cactus3": {
 				"type": "base:tile/tree",
 				"stages": ["base:tile/cactus3_young", "base:tile/cactus3"],
-				"custom": {"sapling": "base:item/desert_sapling"},
-				"product": ["base:item/cactus", 1],
+				"products": [
+					["constant", ["base:item/cactus"], 1],
+					["exponential", ["base:item/desert_sapling"], 1, 0.25]
+				],
 				"chance": 0.75
 			},
 			"base:crop/cactus4": {
 				"type": "base:tile/tree",
 				"stages": ["base:tile/cactus4_young", "base:tile/cactus4"],
-				"custom": {"sapling": "base:item/desert_sapling"},
-				"product": ["base:item/cactus", 1],
+				"products": [
+					["constant", ["base:item/cactus"], 1],
+					["exponential", ["base:item/desert_sapling"], 1, 0.25]
+				],
 				"chance": 0.75
 			},
 
 			"base:crop/winter_tree1": {
 				"type": "base:tile/tree",
 				"stages": ["base:tile/winter_tree1_stump", "base:tile/winter_tree1"],
-				"custom": {"sapling": "base:item/snowy_sapling"},
-				"product": ["base:item/wood", 1],
+				"products": [
+					["constant", ["base:item/wood"], 1],
+					["exponential", ["base:item/snowy_sapling"], 1, 0.25]
+				],
 				"chance": 0.75
 			},
 			"base:crop/winter_tree2": {
 				"type": "base:tile/tree",
 				"stages": ["base:tile/winter_tree2_stump", "base:tile/winter_tree2"],
-				"custom": {"sapling": "base:item/snowy_sapling"},
-				"product": ["base:item/wood", 1],
+				"products": [
+					["constant", ["base:item/wood"], 1],
+					["exponential", ["base:item/snowy_sapling"], 1, 0.25]
+				],
 				"chance": 0.75
 			},
 			"base:crop/winter_tree3": {
 				"type": "base:tile/tree",
 				"stages": ["base:tile/winter_tree3_stump", "base:tile/winter_tree3"],
-				"custom": {"sapling": "base:item/snowy_sapling"},
-				"product": ["base:item/wood", 1],
+				"products": [
+					["constant", ["base:item/wood"], 1],
+					["exponential", ["base:item/snowy_sapling"], 1, 0.25]
+				],
 				"chance": 0.75
 			}
 		}]

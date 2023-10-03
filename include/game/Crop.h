@@ -2,6 +2,7 @@
 
 #include "Types.h"
 #include "item/Item.h"
+#include "item/Products.h"
 
 #include <nlohmann/json_fwd.hpp>
 
@@ -12,12 +13,12 @@ namespace Game3 {
 		public:
 			Identifier customType;
 			std::vector<Identifier> stages;
-			ItemStack product;
+			Products products;
 			double chance;
 			// TODO: refactor into subclasses with CropFactory
 			nlohmann::json customData;
 
-			Crop(Identifier, Identifier custom_type, std::vector<Identifier> stages_, ItemStack product_, double chance_, nlohmann::json custom_data);
+			Crop(Identifier, Identifier custom_type, std::vector<Identifier> stages_, Products products_, double chance_, nlohmann::json custom_data);
 			Crop(Identifier, Game &, const nlohmann::json &);
 
 		private:
