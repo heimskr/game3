@@ -24,7 +24,8 @@
 			"base:texture/franuka":     ["resources/items/franuka.png"],
 			"base:texture/tinywonder":  ["resources/items/tinywonder.png"],
 			"base:texture/flasks":      ["resources/flasks.png"],
-			"base:texture/shade":       ["resources/items/shade.png"]
+			"base:texture/shade":       ["resources/items/shade.png"],
+			"base:texture/kazzter":     ["resources/items/kazzter.png"]
 		}]
 	]
 }

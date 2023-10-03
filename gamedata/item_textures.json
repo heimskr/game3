@@ -123,11 +123,13 @@
 			"base:item/black_trumpet":        ["base:texture/mushrooms",    80,  80],
 			"base:item/grey_knight":          ["base:texture/mushrooms",     0,  32],
 			"base:item/wrench":               ["base:texture/custom",       16,   0],
-			"base:item/iron_hoe":             ["base:texture/franuka",       0,   0],
 			"base:item/cotton_seeds":         ["base:texture/custom",       32,   0],
 			"base:item/cotton":               ["base:texture/custom",       48,   0],
 			"base:item/wheat_seeds":          ["base:texture/tinywonder",    0,  80],
 			"base:item/wheat":                ["base:texture/tinywonder",   16,  80],
+			"base:item/flour":                ["base:texture/tinywonder",   32,  80],
+			"base:item/egg":                  ["base:texture/tinywonder",   48,  80],
+			"base:item/iron_hoe":             ["base:texture/tinywonder",   64,  80],
 			"base:item/item_pipe":            ["base:texture/tileset",     416, 176],
 			"base:item/fluid_pipe":           ["base:texture/tileset",     416, 112],
 			"base:item/energy_pipe":          ["base:texture/tileset",     416,  48],
@@ -148,7 +150,8 @@
 			"base:item/cactus":               ["base:texture/custom",       96,   0],
 			"base:item/uranium_ore":          ["base:texture/tinywonder",   16,  64],
 			"base:item/brine_flask":          ["base:texture/flasks",       96,   0],
-			"base:item/chest":                ["base:texture/tileset",     224, 176]
+			"base:item/chest":                ["base:texture/tileset",     224, 176],
+			"base:item/baguette":             ["base:texture/kazzter",       0,   0]
 		}]
 	]
 }
