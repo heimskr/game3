@@ -29,15 +29,6 @@ namespace Game3 {
 				if (active_stack->reduceDurability())
 					inventory->erase(inventory->activeSlot);
 
-				// Give saplings if possible
-				if (auto sapling = crop->customData.find("sapling"); sapling != crop->customData.end()) {
-					ItemCount saplings = 1;
-					std::uniform_int_distribution distribution(1, 4);
-					while (distribution(threadContext.rng) == 1)
-						++saplings;
-					player->give({game, sapling->get<Identifier>(), saplings});
-				}
-
 				return true;
 			}
 		}
