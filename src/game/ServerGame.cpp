@@ -446,11 +446,11 @@ namespace Game3 {
 				return {true, "Stopped server."};
 			}
 
-			if (first == "say") {
+			if (first == "say" || first == ":") {
 				std::string_view message = std::string_view(command).substr(4);
 				INFO('[' << player->username << "] " << message);
 				broadcast(ChatMessageSentPacket{player->getGID(), std::string(message)});
-				return {true, "Sent message."};
+				return {true, ""};
 			}
 
 			if (first == "goto") {
