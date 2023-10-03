@@ -354,8 +354,8 @@ namespace Game3 {
 
 				Buffer buffer(std::vector<uint8_t>(buffer_bytes, buffer_bytes + buffer_size));
 				buffer.context = game.shared_from_this();
-				tile_entity->decode(game, buffer);
 				tile_entity->init(game);
+				tile_entity->decode(game, buffer);
 
 				// TODO: functionize this
 				realm->tileEntities.emplace(tile_entity->position, tile_entity);
