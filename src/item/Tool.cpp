@@ -2,6 +2,7 @@
 
 namespace Game3 {
 	void Tool::initStack(const Game &, ItemStack &stack) {
-		stack.data["durability"] = std::make_pair(maxDurability, maxDurability);
+		if (!stack.data.contains("durability"))
+			stack.data["durability"] = std::make_pair(maxDurability, maxDurability);
 	}
 }
