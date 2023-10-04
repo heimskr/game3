@@ -41,7 +41,7 @@ DEPS         := glm glfw3 libzstd gtk4 gtkmm-4.0 glu libevent_openssl openssl li
 OUTPUT       := game3
 COMPILER     ?= g++
 DEBUGGER     ?= gdb
-CPPFLAGS     += -Wall -Wextra $(BUILDFLAGS) -std=c++23 -Iinclude -Ijson/include -Ieigen -Istb -Ilibnoise/src -Ichemskr/include $(LTO) $(PROFILING)
+CPPFLAGS     += -Wall -Wextra $(BUILDFLAGS) -std=c++20 -Iinclude -Isubprojects/chemskr/include -Ibuilddir -Ibuilddir/subprojects/chemskr -Idiscord $(LTO) $(PROFILING)
 ZIG          ?= zig
 # --main-pkg-path is needed as otherwise it wouldn't let you embed any file outside of src/
 ZIGFLAGS     := -O ReleaseSmall --main-pkg-path .
