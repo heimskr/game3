@@ -14,7 +14,7 @@ namespace Game3 {
 			if (entity->isPlayer())
 				INFO("Destroying player " << entity->getGID());
 			entity->destroy();
-		} else
-			WARN("DestroyEntityPacket: couldn't find entity " << globalID << '.');
+		}
+		// else WARN("DestroyEntityPacket: couldn't find entity " << globalID << '.');
 	}
 }
