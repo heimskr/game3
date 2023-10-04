@@ -14,6 +14,7 @@
 		"stb",
 		"nlohmann-json",
 		"libnoise",
-		"eigen3"
+		"eigen3",
+		"cxxopts"
 	]
 }

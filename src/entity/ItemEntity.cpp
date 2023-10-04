@@ -59,6 +59,12 @@ namespace Game3 {
 			stack.item->getOffsets(game, texture, xOffset, yOffset);
 	}
 
+	void ItemEntity::tick(Game &, float delta) {
+		secondsLeft = secondsLeft - delta;
+		if (secondsLeft <= 0)
+			queueDestruction();
+	}
+
 	void ItemEntity::render(SpriteRenderer &sprite_renderer, TextRenderer &) {
 		if (!isVisible())
 			return;
@@ -107,11 +113,13 @@ namespace Game3 {
 	void ItemEntity::encode(Buffer &buffer) {
 		Entity::encode(buffer);
 		stack.encode(getGame(), buffer);
+		buffer << secondsLeft;
 	}
 
 	void ItemEntity::decode(Buffer &buffer) {
 		Entity::decode(buffer);
 		stack.decode(getGame(), buffer);
+		buffer >> secondsLeft;
 	}
 
 	void to_json(nlohmann::json &json, const ItemEntity &item_entity) {

@@ -1,10 +1,11 @@
 #pragma once
 
-#include <nlohmann/json_fwd.hpp>
-
 #include "graphics/Texture.h"
 #include "entity/Entity.h"
 #include "item/Item.h"
+#include "threading/Atomic.h"
+
+#include <nlohmann/json_fwd.hpp>
 
 namespace Game3 {
 	class Game;
@@ -21,6 +22,7 @@ namespace Game3 {
 
 			void toJSON(nlohmann::json &) const override;
 			void init(Game &) override;
+			void tick(Game &, float) override;
 			void render(SpriteRenderer &, TextRenderer &) override;
 			virtual bool onInteractOn    (const std::shared_ptr<Player> &player, Modifiers) override { return interact(player); }
 			virtual bool onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) override { return interact(player); }
@@ -35,6 +37,7 @@ namespace Game3 {
 			float xOffset = 0.f;
 			float yOffset = 0.f;
 			bool needsTexture = true;
+			Atomic<float> secondsLeft = 5 * 60;
 
 			ItemStack stack;
 

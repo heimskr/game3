@@ -595,6 +595,11 @@ namespace Game3 {
 		moveQueue.push_back(function);
 	}
 
+	void Entity::queueDestruction() {
+		if (!awaitingDestruction.exchange(true))
+			getRealm()->queueDestruction(getSelf());
+	}
+
 	PathResult Entity::pathfind(const Position &start, const Position &goal, std::list<Direction> &out, size_t loop_max) {
 		std::vector<Position> positions;
 
