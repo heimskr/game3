@@ -13,6 +13,7 @@
 #include "packet/CommandPacket.h"
 #include "packet/ChunkRequestPacket.h"
 #include "packet/ClickPacket.h"
+#include "packet/DragPacket.h"
 #include "packet/EntityRequestPacket.h"
 #include "packet/InteractPacket.h"
 #include "packet/RegisterPlayerPacket.h"
@@ -43,6 +44,27 @@ namespace Game3 {
 			client->send(ClickPacket(translated, fractional_x, fractional_y, modifiers));
 		else if (button == 3 && player && !realm->rightClick(translated, pos_x, pos_y) && debugMode && client && client->isConnected())
 			client->send(TeleportSelfPacket(realm->id, translated));
+	}
+
+	void ClientGame::dragStart(const Position &position, Modifiers modifiers) {
+		lastDragPosition = position;
+		client->send(DragPacket(DragPacket::Action::Start, position, modifiers));
+	}
+
+	void ClientGame::dragUpdate(const Position &position, Modifiers modifiers) {
+		if (lastDragPosition && *lastDragPosition != position) {
+			lastDragPosition = position;
+			drag(position, modifiers);
+		}
+	}
+
+	void ClientGame::dragEnd(const Position &position, Modifiers modifiers) {
+		lastDragPosition.reset();
+		client->send(DragPacket(DragPacket::Action::End, position, modifiers));
+	}
+
+	void ClientGame::drag(const Position &position, Modifiers modifiers) {
+		client->send(DragPacket(DragPacket::Action::Update, position, modifiers));
 	}
 
 	Gdk::Rectangle ClientGame::getVisibleRealmBounds() const {

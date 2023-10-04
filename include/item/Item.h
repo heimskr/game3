@@ -72,6 +72,8 @@ namespace Game3 {
 
 			virtual bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float> offsets);
 
+			virtual bool drag(Slot, ItemStack &, const Place &, Modifiers);
+
 			/** Whether the item's use function (see Item::use) should be called when the user interacts with a floor tile and this item is selected in the inventory tab. */
 			virtual bool canUseOnWorld() const { return false; }
 

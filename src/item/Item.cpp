@@ -112,6 +112,10 @@ namespace Game3 {
 		return false;
 	}
 
+	bool Item::drag(Slot, ItemStack &, const Place &, Modifiers) {
+		return false;
+	}
+
 // ItemStack
 
 	ItemStack::ItemStack(const Game &game_):

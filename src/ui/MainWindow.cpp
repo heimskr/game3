@@ -199,15 +199,37 @@ namespace Game3 {
 		leftClick->signal_released().connect([this](int n, double x, double y) {
 			glArea.grab_focus();
 			if (game)
-				game->click(1, n, x, y, Modifiers(leftClick->get_current_event()->get_modifier_state()));
+				game->click(1, n, x, y, Modifiers(leftClick->get_current_event_state()));
 		});
 		rightClick->signal_released().connect([this](int n, double x, double y) {
 			glArea.grab_focus();
 			if (game)
-				game->click(3, n, x, y, Modifiers(rightClick->get_current_event()->get_modifier_state()));
+				game->click(3, n, x, y, Modifiers(rightClick->get_current_event_state()));
 		});
 		glArea.add_controller(leftClick);
 		glArea.add_controller(rightClick);
+
+		dragGesture = Gtk::GestureDrag::create();
+		dragGesture->signal_drag_begin().connect([this](double x, double y) {
+			glArea.grab_focus();
+			dragStart.emplace(x, y);
+			if (game)
+				game->dragStart(game->translateCanvasCoordinates(x, y), Modifiers(dragGesture->get_current_event_state()));
+		});
+		dragGesture->signal_drag_update().connect([this](double x, double y) {
+			glArea.grab_focus();
+			if (game && autofocus) {
+				assert(dragStart);
+				game->dragUpdate(game->translateCanvasCoordinates(dragStart->first + x, dragStart->second + y), Modifiers(dragGesture->get_current_event_state()));
+			}
+		});
+		dragGesture->signal_drag_end().connect([this](double x, double y) {
+			glArea.grab_focus();
+			if (game)
+				game->dragEnd(game->translateCanvasCoordinates(dragStart->first + x, dragStart->second + y), Modifiers(dragGesture->get_current_event_state()));
+			dragStart.reset();
+		});
+		glArea.add_controller(dragGesture);
 
 		auto forward  = Gtk::GestureClick::create();
 		auto backward = Gtk::GestureClick::create();

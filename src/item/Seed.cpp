@@ -27,4 +27,8 @@ namespace Game3 {
 
 		return false;
 	}
+
+	bool Seed::drag(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers) {
+		return use(slot, stack, place, modifiers, {0.f, 0.f});
+	}
 }

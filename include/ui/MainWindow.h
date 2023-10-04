@@ -128,6 +128,8 @@ namespace Game3 {
 			std::chrono::system_clock::time_point statusbarSetTime;
 			Glib::RefPtr<Gtk::GestureClick> leftClick;
 			Glib::RefPtr<Gtk::GestureClick> rightClick;
+			Glib::RefPtr<Gtk::GestureDrag> dragGesture;
+			std::optional<std::pair<double, double>> dragStart;
 			Lockable<std::deque<std::unique_ptr<Gtk::Dialog>>> dialogQueue;
 
 			struct KeyInfo {

@@ -330,6 +330,12 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `bool` Remove on move: Whether to close the tab when the player moves
 	- `bool` Ephemeral: Whether to hide the tab when another tab is opened
 
+49. **Drag**: informs the server that the client dragged the mouse on a given square.
+
+	- `u8` Action (1 => drag started, 2 => drag updated, 3 => drag ended)
+	- `i64` Position Y
+	- `i64` Position X
+
 # Message Format
 
 All values are little endian. Strings are not null-terminated.

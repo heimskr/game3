@@ -30,6 +30,10 @@ namespace Game3 {
 
 			void addEntityFactories() override;
 			void click(int button, int n, double pos_x, double pos_y, Modifiers);
+			void dragStart(const Position &, Modifiers);
+			void dragUpdate(const Position &, Modifiers);
+			void dragEnd(const Position &, Modifiers);
+			void drag(const Position &, Modifiers);
 			Gdk::Rectangle getVisibleRealmBounds() const;
 			MainWindow & getWindow();
 			/** Translates coordinates relative to the top left corner of the canvas to realm coordinates. */
@@ -76,6 +80,7 @@ namespace Game3 {
 			sigc::signal<void(const std::shared_ptr<HasEnergy> &)> signal_energy_update_;
 			std::atomic_bool active{false};
 			std::thread tickThread;
+			std::optional<Position> lastDragPosition;
 
 			Lockable<std::set<ChunkPosition>> missingChunks;
 			MTQueue<std::shared_ptr<Packet>> packetQueue;
