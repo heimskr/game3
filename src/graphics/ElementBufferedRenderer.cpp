@@ -242,7 +242,6 @@ namespace Game3 {
 					static_cast<Index>(x) + CHUNK_SIZE * (chunk_x + 1)  // here too
 				});
 
-				TileID tile;
 				if (!tile_opt) {
 					isMissing = true;
 					tiles[layer_index - 1] = missing;
@@ -250,11 +249,10 @@ namespace Game3 {
 					tiles[layer_index - 1] = *tile_opt;
 
 				const std::optional<TileID> upper_opt = realm->tryTile(layer, Position{
-					static_cast<Index>(y + 1) + CHUNK_SIZE * (chunk_y + 1), // why `+ 1`?
-					static_cast<Index>(x)     + CHUNK_SIZE * (chunk_x + 1)  // here too
+					static_cast<Index>(y + 1) + CHUNK_SIZE * (chunk_y + 1),
+					static_cast<Index>(x)     + CHUNK_SIZE * (chunk_x + 1)
 				});
 
-				TileID upper;
 				if (!upper_opt) {
 					isMissing = true;
 					uppers[layer_index - 1] = missing;
@@ -262,9 +260,9 @@ namespace Game3 {
 					uppers[layer_index - 1] = *upper_opt;
 			}
 
-			const auto fluid_opt = realm->tileProvider.copyFluidTile({
-				Index(y) + CHUNK_SIZE * (chunk_y + 1), // why `+ 1`?
-				Index(x) + CHUNK_SIZE * (chunk_x + 1)  // here too
+			const auto fluid_opt = realm->tryFluid({
+				Index(y) + CHUNK_SIZE * (chunk_y + 1),
+				Index(x) + CHUNK_SIZE * (chunk_x + 1)
 			});
 
 			TileID fluid_tile = -1;
@@ -280,7 +278,7 @@ namespace Game3 {
 				}
 			}
 
-			if (fluid_tile == static_cast<uint16_t>(-1)) {
+			if (fluid_tile == static_cast<TileID>(-1)) {
 				isMissing = true;
 				fluid_tile = missing;
 				fluid_opacity = 0.f;
@@ -343,7 +341,7 @@ namespace Game3 {
 
 	bool ElementBufferedRenderer::generateVertexArrayObject() {
 		if (vbo.getHandle() != 0)
-			vao.init(vbo, {2, 2, 1});
+			vao.init(vbo, {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1});
 		return vao.getHandle() != 0;
 	}
 
@@ -433,7 +431,7 @@ namespace Game3 {
 
 	void ElementBufferedRenderer::check(int handle, bool is_link) {
 		int success;
-		std::array<char, 1024> info{};
+		std::array<char, 2048> info{};
 		if (is_link)
 			glGetProgramiv(handle, GL_LINK_STATUS, &success);
 		else
@@ -443,7 +441,7 @@ namespace Game3 {
 			if (is_link)
 				glGetProgramInfoLog(handle, GL_INFO_LOG_LENGTH, &len, info.data());
 			else
-				glGetShaderInfoLog(handle, 1024, &len, info.data());
+				glGetShaderInfoLog(handle, info.size(), &len, info.data());
 			std::cerr << "Error with " << handle << " (l=" << len << "): " << info.data() << '\n';
 		}
 	}

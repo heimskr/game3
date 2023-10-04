@@ -52,6 +52,9 @@ void main() {
 
 	FragColor = alphaComposite(mix7,  upper3);
 
+	// FragColor.a = 1.0;
+	// FragColor.r = 1.0;
+
 	// if (bright_tiles[0] != index && bright_tiles[1] != index && bright_tiles[2] != index && bright_tiles[3] != index && bright_tiles[4] != index && bright_tiles[5] != index && bright_tiles[6] != index && bright_tiles[7] != index) {
 	// 	FragColor.r /= divisor;
 	// 	FragColor.g /= divisor;
