@@ -1225,21 +1225,33 @@ namespace Game3 {
 		const bool fluid_reuploading = fluidReuploadPending.exchange(true);
 		const bool reuploading = reuploadPending.exchange(true);
 		if (!fluid_reuploading && !reuploading) {
-			getGame().toClient().getWindow().queue([shared = shared_from_this()] {
-				shared->reupload();
-				shared->reuploadFluids();
-				shared->reuploadPending = false;
-				shared->fluidReuploadPending = false;
+			getGame().toClient().getWindow().queue([weak = std::weak_ptr(shared_from_this())] {
+				if (auto shared = weak.lock()) {
+					shared->reupload();
+					shared->reuploadFluids();
+					shared->reuploadPending = false;
+					shared->fluidReuploadPending = false;
+				} else {
+					ERROR("Expired in " << __FILE__ << ':' << __LINE__);
+				}
 			});
 		} else if (fluid_reuploading && !reuploading) {
-			getGame().toClient().getWindow().queue([shared = shared_from_this()] {
-				shared->reupload();
-				shared->reuploadPending = false;
+			getGame().toClient().getWindow().queue([weak = std::weak_ptr(shared_from_this())] {
+				if (auto shared = weak.lock()) {
+					shared->reupload();
+					shared->reuploadPending = false;
+				} else {
+					ERROR("Expired in " << __FILE__ << ':' << __LINE__);
+				}
 			});
 		} else if (!fluid_reuploading && reuploading) {
-			getGame().toClient().getWindow().queue([shared = shared_from_this()] {
-				shared->reuploadFluids();
-				shared->fluidReuploadPending = false;
+			getGame().toClient().getWindow().queue([weak = std::weak_ptr(shared_from_this())] {
+				if (auto shared = weak.lock()) {
+					shared->reuploadFluids();
+					shared->fluidReuploadPending = false;
+				} else {
+					ERROR("Expired in " << __FILE__ << ':' << __LINE__);
+				}
 			});
 		}
 	}
