@@ -32,7 +32,7 @@ namespace Game3 {
 			void bind(SQLite::Statement &, const std::shared_ptr<Player> &);
 
 		public:
-			Lockable<std::unique_ptr<SQLite::Database>> database;
+			Lockable<std::unique_ptr<SQLite::Database>, std::recursive_mutex> database;
 
 			GameDB(Game &);
 

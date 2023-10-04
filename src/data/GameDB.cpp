@@ -95,6 +95,7 @@ namespace Game3 {
 	}
 
 	void GameDB::writeRealm(const RealmPtr &realm) {
+		auto lock = database.uniqueLock();
 		SQLite::Transaction transaction{*database};
 
 		{
@@ -316,7 +317,7 @@ namespace Game3 {
 	RealmPtr GameDB::loadRealm(RealmID realm_id, bool do_lock) {
 		assert(database);
 
-		std::unique_lock<std::shared_mutex> db_lock;
+		std::unique_lock<std::recursive_mutex> db_lock;
 		if (do_lock)
 			db_lock = database.uniqueLock();
 
@@ -606,7 +607,7 @@ namespace Game3 {
 	std::string GameDB::readRealmTilesetHash(RealmID realm_id, bool do_lock) {
 		assert(database);
 
-		std::unique_lock<std::shared_mutex> db_lock;
+		std::unique_lock<std::recursive_mutex> db_lock;
 		if (do_lock)
 			db_lock = database.uniqueLock();
 
@@ -623,7 +624,7 @@ namespace Game3 {
 	bool GameDB::hasTileset(const std::string &hash, bool do_lock) {
 		assert(database);
 
-		std::unique_lock<std::shared_mutex> db_lock;
+		std::unique_lock<std::recursive_mutex> db_lock;
 		if (do_lock)
 			db_lock = database.uniqueLock();
 
@@ -659,7 +660,7 @@ namespace Game3 {
 	bool GameDB::readTilesetMeta(const std::string &hash, nlohmann::json &json, bool do_lock) {
 		assert(database);
 
-		std::unique_lock<std::shared_mutex> db_lock;
+		std::unique_lock<std::recursive_mutex> db_lock;
 		if (do_lock)
 			db_lock = database.uniqueLock();
 
