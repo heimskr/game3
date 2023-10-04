@@ -50,6 +50,8 @@ namespace Game3 {
 			friend void to_json(nlohmann::json &, const Inventory &);
 	};
 
+	using ClientInventoryPtr = std::shared_ptr<ClientInventory>;
+
 	template <typename T>
 	T popBuffer(Buffer &);
 	template <>
