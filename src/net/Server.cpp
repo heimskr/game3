@@ -44,8 +44,15 @@ namespace Game3 {
 	}
 
 	Server::Worker::~Worker() {
-		event_free(acceptEvent);
-		event_base_free(base);
+		if (acceptEvent) {
+			event_free(acceptEvent);
+			acceptEvent = nullptr;
+		}
+
+		if (base) {
+			event_base_free(base);
+			base = nullptr;
+		}
 	}
 
 	void Server::Worker::work(size_t) {
@@ -53,7 +60,10 @@ namespace Game3 {
 	}
 
 	void Server::Worker::stop() {
-		event_base_loopexit(base, nullptr);
+		if (base) {
+			event_base_loopexit(base, nullptr);
+			base = nullptr;
+		}
 	}
 
 	event_base * Server::Worker::makeBase() {
