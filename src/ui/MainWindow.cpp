@@ -881,12 +881,11 @@ namespace Game3 {
 		if (!connect(settings.hostname, settings.port))
 			return;
 
-		LocalClient &client = *game->client;
-		const std::string &hostname = client.getHostname();
-		if (std::optional<Token> token = client.getToken(hostname, settings.username)) {
-			queueBool([this, token, hostname, username = settings.username, &client] {
-				if (client.isReady()) {
-					client.send(LoginPacket(username, *token));
+		const std::string &hostname = game->client->getHostname();
+		if (std::optional<Token> token = game->client->getToken(hostname, settings.username)) {
+			queueBool([this, token, hostname, username = settings.username] {
+				if (game && game->client && game->client->isReady()) {
+					game->client->send(LoginPacket(username, *token));
 					return true;
 				}
 
