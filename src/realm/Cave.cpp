@@ -19,6 +19,7 @@ namespace Game3 {
 		// - All cave entrances in a given realm lead to the same cave.
 		//    -> If we find one cave entrance in a realm, we can stop after destroying its linked cave and we don't have to look for more entrances.
 		Game &game = getGame();
+		auto lock = tileEntities.sharedLock();
 		for (const auto &[index, tile_entity]: tileEntities) {
 			if (tile_entity->tileID != "base:tile/cave")
 				continue;
