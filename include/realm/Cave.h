@@ -15,11 +15,11 @@ namespace Game3 {
 
 			Cave(const Cave &) = delete;
 			Cave(Cave &&) = delete;
-			~Cave() override;
 
 			Cave & operator=(const Cave &) = delete;
 			Cave & operator=(Cave &&) = delete;
 
+			void onRemove() override;
 			bool interactGround(const std::shared_ptr<Player> &, const Position &, Modifiers) override;
 			void reveal(const Position &);
 			void generateChunk(const ChunkPosition &) override;

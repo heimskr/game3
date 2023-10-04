@@ -862,6 +862,8 @@ namespace Game3 {
 	}
 
 	void Game::removeRealm(RealmID realm_id) {
+		RealmPtr realm = getRealm(realm_id);
+		realm->onRemove();
 		auto lock = realms.uniqueLock();
 		realms.erase(realm_id);
 	}

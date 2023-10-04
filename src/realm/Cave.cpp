@@ -12,13 +12,13 @@ namespace Game3 {
 	Cave::Cave(Game &game_, RealmID id_, RealmID parent_realm, int seed_):
 		Realm(game_, id_, ID(), "base:tileset/monomap", seed_), parentRealm(parent_realm) {}
 
-	Cave::~Cave() {
+	void Cave::onRemove() {
 		// Assumptions:
 		// - All entrances to a given cave realm appear in exactly one realm.
 		//    -> If we find a cave entrance in one realm, we don't need to search other realms for another entrance to the same cave.
 		// - All cave entrances in a given realm lead to the same cave.
 		//    -> If we find one cave entrance in a realm, we can stop after destroying its linked cave and we don't have to look for more entrances.
-		auto &game = getGame();
+		Game &game = getGame();
 		for (const auto &[index, tile_entity]: tileEntities) {
 			if (tile_entity->tileID != "base:tile/cave")
 				continue;

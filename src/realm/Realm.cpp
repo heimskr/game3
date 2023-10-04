@@ -151,6 +151,8 @@ namespace Game3 {
 			snoozePending = true;
 	}
 
+	void Realm::onRemove() {}
+
 	void Realm::createRenderers() {
 		if (getSide() != Side::Client)
 			return;

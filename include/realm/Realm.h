@@ -111,6 +111,8 @@ namespace Game3 {
 
 			virtual void onFocus();
 			virtual void onBlur();
+			/** Called when the realm is to be removed from the game. */
+			virtual void onRemove();
 			void createRenderers();
 			void render(int width, int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &, TextRenderer &, float game_time);
 			/** Reuploads terrain in all layers. */
