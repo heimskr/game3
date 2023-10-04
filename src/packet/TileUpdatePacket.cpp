@@ -7,6 +7,6 @@ namespace Game3 {
 	void TileUpdatePacket::handle(ClientGame &game) {
 		auto realm = game.getRealm(realmID);
 		realm->setTile(layer, position, tileID, false);
-		realm->queueReupload(layer);
+		realm->queueReupload();
 	}
 }

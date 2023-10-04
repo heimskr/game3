@@ -52,6 +52,6 @@ namespace Game3 {
 		provider.setUpdateCounter(chunkPosition, updateCounter);
 
 		game.chunkReceived(chunkPosition);
-		realm->queueReuploadAll();
+		realm->queueReupload();
 	}
 }

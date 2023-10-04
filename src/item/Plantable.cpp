@@ -22,7 +22,6 @@ namespace Game3 {
 		if (realm.isPathable(position) && realm.middleEmpty(position)) {
 			if (!validGround || tileset.isInCategory(tileset[realm.getTile(Layer::Terrain, position)], validGround)) {
 				realm.setTile(Layer::Submerged, position, tilename);
-				realm.reupload(Layer::Submerged);
 				const InventoryPtr inventory = place.player->getInventory();
 				if (--stack.count == 0)
 					inventory->erase(slot);

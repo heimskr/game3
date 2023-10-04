@@ -751,8 +751,7 @@ namespace Game3 {
 		}
 
 		if (--threadContext.updateNeighborsDepth == 0) {
-			for (const Layer layer: threadContext.updatedLayers)
-				reupload(layer);
+			reupload();
 			threadContext.updatedLayers.clear();
 		}
 	}
@@ -1128,25 +1127,15 @@ namespace Game3 {
 	void Realm::queueReupload() {
 		assert(getSide() == Side::Client);
 		if (!reuploadPending.exchange(true)) {
-			getGame().toClient().getWindow().queue([shared = shared_from_this()] {
-				shared->reupload();
-				shared->reuploadPending = false;
+			getGame().toClient().getWindow().queue([weak = std::weak_ptr(shared_from_this())] {
+				if (auto shared = weak.lock()) {
+					shared->reupload();
+					shared->reuploadPending = false;
+				} else {
+					ERROR("Expired in " << __FILE__ << ':' << __LINE__);
+				}
 			});
 		}
-	}
-
-	void Realm::queueReuploadAll() {
-		assert(getSide() == Side::Client);
-		if (reuploadPending.exchange(true))
-			return;
-		getGame().toClient().getWindow().queue([weak = std::weak_ptr(shared_from_this())] {
-			if (auto shared = weak.lock()) {
-				shared->reupload();
-				shared->reuploadPending = false;
-			} else {
-				ERROR("Expired in " << __FILE__ << ':' << __LINE__);
-			}
-		});
 	}
 
 	void Realm::autotile(const Position &position, Layer layer) {

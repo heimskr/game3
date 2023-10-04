@@ -16,7 +16,6 @@ namespace Game3 {
 
 		if (place.getName(Layer::Terrain) == tileset.getEmpty()) {
 			place.set(Layer::Terrain, tilename);
-			realm.reupload(Layer::Terrain);
 			const InventoryPtr inventory = place.player->getInventory();
 			if (--stack.count == 0)
 				inventory->erase(slot);

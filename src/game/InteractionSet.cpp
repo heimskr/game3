@@ -75,7 +75,6 @@ namespace Game3 {
 					if (auto cast = std::dynamic_pointer_cast<Plantable>(item); cast && cast->tilename == *submerged_tile) {
 						player.give({game, item});
 						realm.setTile(Layer::Submerged, position, tileset.getEmptyID());
-						realm.reupload(Layer::Submerged);
 						return true;
 					}
 				}
