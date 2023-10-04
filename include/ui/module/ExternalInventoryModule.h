@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Types.h"
+#include "ui/Modifiers.h"
 #include "ui/module/Module.h"
 
 #include <any>
@@ -35,6 +36,7 @@ namespace Game3 {
 			Glib::RefPtr<Gtk::DragSource> source;
 			Glib::ustring name;
 			std::unordered_map<Gtk::Widget *, Slot> widgetMap;
+			std::unordered_map<Gtk::Widget *, std::pair<Glib::RefPtr<Gtk::GestureClick>, Glib::RefPtr<Gtk::GestureClick>>> clickGestures;
 			std::unordered_map<Slot, Gtk::Widget *> widgetsBySlot;
 			std::shared_ptr<ClientInventory> inventory;
 			std::vector<std::unique_ptr<Gtk::Widget>> widgets;
@@ -48,6 +50,7 @@ namespace Game3 {
 
 			int gridWidth() const;
 			void populate();
-			void rightClick(Gtk::Widget *, int click_count, Slot, double x, double y);
+			void leftClick(Gtk::Widget *, int click_count, Slot, Modifiers, double x, double y);
+			void rightClick(Gtk::Widget *, int click_count, Slot, Modifiers, double x, double y);
 	};
 }

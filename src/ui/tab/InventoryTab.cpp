@@ -236,26 +236,26 @@ namespace Game3 {
 			}
 			widgetsBySlot[slot] = widget_ptr.get();
 
-			auto left_click_gesture = Gtk::GestureClick::create();
-			left_click_gesture->set_button(1);
-			left_click_gesture->signal_released().connect([this, last_game, slot, widget = widget_ptr.get()](int n, double x, double y) {
+			auto left_click = Gtk::GestureClick::create();
+			left_click->set_button(1);
+			left_click->signal_released().connect([this, last_game, slot, widget = widget_ptr.get()](int n, double x, double y) {
 				const auto mods = clickGestures[widget].first->get_current_event_state();
-				leftClick(last_game, widget, n, slot, Modifiers(mods), x, y);
+				leftClick(last_game, widget, n, slot, Modifiers{mods}, x, y);
 			});
 
-			auto right_click_gesture = Gtk::GestureClick::create();
-			right_click_gesture->set_button(3);
-			right_click_gesture->signal_pressed().connect([this, last_game, slot, widget = widget_ptr.get()](int n, double x, double y) {
+			auto right_click = Gtk::GestureClick::create();
+			right_click->set_button(3);
+			right_click->signal_pressed().connect([this, last_game, slot, widget = widget_ptr.get()](int n, double x, double y) {
 				const auto mods = clickGestures[widget].second->get_current_event_state();
-				rightClick(last_game, widget, n, slot, Modifiers(mods), x, y);
+				rightClick(last_game, widget, n, slot, Modifiers{mods}, x, y);
 			});
 
-			widget_ptr->add_controller(left_click_gesture);
-			widget_ptr->add_controller(right_click_gesture);
+			widget_ptr->add_controller(left_click);
+			widget_ptr->add_controller(right_click);
 
-			clickGestures[widget_ptr.get()] = {std::move(left_click_gesture), std::move(right_click_gesture)};
-
+			clickGestures[widget_ptr.get()] = {std::move(left_click), std::move(right_click)};
 			widgetMap[widget_ptr.get()] = slot;
+
 			if (old_widget != nullptr)
 				grid.remove(*old_widget);
 			grid.attach(*widget_ptr, column, row);
@@ -336,8 +336,11 @@ namespace Game3 {
 	}
 
 	void InventoryTab::shiftClick(const std::shared_ptr<ClientGame> &game, Slot slot) {
+		if (!game)
+			return;
+
 		InventoryPtr inventory = game->player->getInventory();
-		if (!inventory)
+		if (!inventory || !inventory->contains(slot))
 			return;
 
 		std::shared_lock<std::shared_mutex> lock;
