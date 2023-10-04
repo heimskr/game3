@@ -253,11 +253,7 @@ namespace Game3 {
 					static_cast<Index>(x)     + CHUNK_SIZE * (chunk_x + 1)
 				});
 
-				if (!upper_opt) {
-					isMissing = true;
-					uppers[layer_index - 1] = missing;
-				} else
-					uppers[layer_index - 1] = *upper_opt;
+				uppers[layer_index - 1] = upper_opt? *upper_opt : 0;
 			}
 
 			const auto fluid_opt = realm->tryFluid({

@@ -17,10 +17,7 @@ namespace GL {
 
 		for (size_t i = 0, n = sizes.size(); i < n; ++i)  {
 			glEnableVertexAttribArray(i); CHECKGL
-			glVertexAttribPointer(i, sizes.begin()[i], GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLvoid *>(sizeof(float) * offset)); CHECKGL_SET
-			if (gl_err) {
-				INFO("i=" << i << ", offset=" << offset);
-			}
+			glVertexAttribPointer(i, sizes.begin()[i], GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLvoid *>(sizeof(float) * offset)); CHECKGL
 			offset += sizes.begin()[i];
 		}
 
