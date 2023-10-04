@@ -42,7 +42,6 @@ namespace Game3 {
 					inventory.erase(slot);
 				player.give(equivalent);
 				inventory.notifyOwner();
-				place.realm->queueReupload(*iter);
 				return true;
 			}
 		}
