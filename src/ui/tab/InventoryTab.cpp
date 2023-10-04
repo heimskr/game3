@@ -13,6 +13,7 @@
 #include "ui/gtk/UITypes.h"
 #include "ui/gtk/Util.h"
 #include "ui/tab/InventoryTab.h"
+#include "ui/module/ExternalInventoryModule.h"
 #include "ui/module/Module.h"
 #include "util/Util.h"
 
@@ -160,6 +161,7 @@ namespace Game3 {
 	}
 
 	void InventoryTab::clear() {
+		clickGestures.clear();
 		widgetMap.clear();
 		removeChildren(grid);
 		widgetsBySlot.clear();
@@ -234,20 +236,24 @@ namespace Game3 {
 			}
 			widgetsBySlot[slot] = widget_ptr.get();
 
-			auto left_click = Gtk::GestureClick::create();
-			left_click->set_button(1);
-			left_click->signal_released().connect([this, last_game, slot, widget = widget_ptr.get()](int n, double x, double y) {
-				leftClick(last_game, widget, n, slot, x, y);
+			auto left_click_gesture = Gtk::GestureClick::create();
+			left_click_gesture->set_button(1);
+			left_click_gesture->signal_released().connect([this, last_game, slot, widget = widget_ptr.get()](int n, double x, double y) {
+				const auto mods = clickGestures[widget].first->get_current_event_state();
+				leftClick(last_game, widget, n, slot, Modifiers(mods), x, y);
 			});
 
-			auto right_click = Gtk::GestureClick::create();
-			right_click->set_button(3);
-			right_click->signal_pressed().connect([this, last_game, slot, widget = widget_ptr.get()](int n, double x, double y) {
-				rightClick(last_game, widget, n, slot, x, y);
+			auto right_click_gesture = Gtk::GestureClick::create();
+			right_click_gesture->set_button(3);
+			right_click_gesture->signal_pressed().connect([this, last_game, slot, widget = widget_ptr.get()](int n, double x, double y) {
+				const auto mods = clickGestures[widget].second->get_current_event_state();
+				rightClick(last_game, widget, n, slot, Modifiers(mods), x, y);
 			});
 
-			widget_ptr->add_controller(left_click);
-			widget_ptr->add_controller(right_click);
+			widget_ptr->add_controller(left_click_gesture);
+			widget_ptr->add_controller(right_click_gesture);
+
+			clickGestures[widget_ptr.get()] = {std::move(left_click_gesture), std::move(right_click_gesture)};
 
 			widgetMap[widget_ptr.get()] = slot;
 			if (old_widget != nullptr)
@@ -300,13 +306,18 @@ namespace Game3 {
 		return scrolled.get_width() / (TILE_SIZE + 2 * TILE_MARGIN);
 	}
 
-	void InventoryTab::leftClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *, int, Slot slot, double, double) {
+	void InventoryTab::leftClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *, int, Slot slot, Modifiers modifiers, double, double) {
 		mainWindow.onBlur();
-		game->player->getInventory()->setActive(slot, false);
-		updatePlayerClasses(game);
+
+		if (modifiers.onlyShift()) {
+			shiftClick(game, slot);
+		} else {
+			game->player->getInventory()->setActive(slot, false);
+			updatePlayerClasses(game);
+		}
 	}
 
-	void InventoryTab::rightClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *widget, int, Slot slot, double x, double y) {
+	void InventoryTab::rightClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *widget, int, Slot slot, Modifiers, double x, double y) {
 		mainWindow.onBlur();
 
 		if (!game->player->getInventory()->contains(slot))
@@ -322,6 +333,27 @@ namespace Game3 {
 		lastGame = game;
 		lastSlot = slot;
 		popoverMenu.popup();
+	}
+
+	void InventoryTab::shiftClick(const std::shared_ptr<ClientGame> &game, Slot slot) {
+		InventoryPtr inventory = game->player->getInventory();
+		if (!inventory)
+			return;
+
+		std::shared_lock<std::shared_mutex> lock;
+		ExternalInventoryModule *external = dynamic_cast<ExternalInventoryModule *>(getModule(lock));
+		if (!external)
+			return;
+
+		InventoryPtr external_inventory = external->getInventory();
+		if (!external_inventory)
+			return;
+
+		AgentPtr owner = external_inventory->weakOwner.lock();
+		if (!owner)
+			return;
+
+		game->player->send(MoveSlotsPacket(game->player->getGID(), owner->getGID(), slot, -1));
 	}
 
 	void InventoryTab::updatePlayerClasses(const std::shared_ptr<ClientGame> &game) {

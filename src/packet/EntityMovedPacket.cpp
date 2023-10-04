@@ -18,19 +18,19 @@ namespace Game3 {
 	void EntityMovedPacket::handle(ClientGame &game) {
 		RealmPtr realm = game.tryRealm(arguments.realmID);
 		if (!realm) {
-			WARN("Couldn't find realm " << arguments.realmID << " in EntityMovedPacket.");
+			WARN("EntityMovedPacket: Couldn't find realm " << arguments.realmID << " in EntityMovedPacket.");
 			return;
 		}
 
 		EntityPtr entity = game.getAgent<Entity>(arguments.globalID);
 		if (!entity) {
-			WARN("Couldn't find entity " << arguments.globalID << ". Player is " << game.player->getGID());
+			WARN("EntityMovedPacket: Couldn't find entity " << arguments.globalID << ". Player is " << game.player->getGID());
 			return;
 		}
 
 		if (!entity->isPlayer()) {
 			auto &entity_ref = *entity;
-			INFO("Moving non-player entity " << arguments.globalID << " (" << typeid(entity_ref).name() << "). Player is " << game.player->getGID());
+			INFO("EntityMovedPacket: Moving non-player entity " << arguments.globalID << " (" << typeid(entity_ref).name() << "). Player is " << game.player->getGID());
 		}
 
 		const Offset offset = entity->offset.copyBase();

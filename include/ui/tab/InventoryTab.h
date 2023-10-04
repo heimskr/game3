@@ -10,6 +10,7 @@
 
 #include "Types.h"
 #include "threading/LockableSharedPtr.h"
+#include "ui/Modifiers.h"
 #include "ui/tab/Tab.h"
 
 namespace Game3 {
@@ -60,14 +61,16 @@ namespace Game3 {
 			std::unordered_map<Slot, Gtk::Widget *> widgetsBySlot;
 			Glib::RefPtr<Gio::Menu> gmenu;
 			Lockable<std::unique_ptr<Module>> currentModule;
+			std::unordered_map<Gtk::Widget *, std::pair<Glib::RefPtr<Gtk::GestureClick>, Glib::RefPtr<Gtk::GestureClick>>> clickGestures;
 
 			/** We can't store state in a popover, so we have to store it here. */
 			LockableSharedPtr<ClientGame> lastGame;
 			Slot lastSlot = -1;
 
 			int gridWidth() const;
-			void leftClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, double x, double y);
-			void rightClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, double x, double y);
+			void leftClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, Modifiers, double x, double y);
+			void rightClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, Modifiers, double x, double y);
+			void shiftClick(const std::shared_ptr<ClientGame> &, Slot);
 			void updatePlayerClasses(const std::shared_ptr<ClientGame> &);
 			void populate(Gtk::Grid &, std::shared_ptr<ClientInventory>);
 			void clear();

@@ -77,7 +77,17 @@ namespace Game3 {
 			}
 #endif
 
-			if (second_stack != nullptr && first_stack->canMerge(*second_stack)) {
+			if (secondSlot == Slot(-1)) {
+
+				if (first_inventory == second_inventory) {
+					client.send(ErrorPacket("Can't move slot to an indeterminate slot in the same inventory"));
+				} else if (std::optional<ItemStack> leftovers = second_inventory.add(*first_stack, secondSlot)) {
+					*first_stack = std::move(*leftovers);
+				} else {
+					first_inventory.erase(firstSlot);
+				}
+
+			} else if (second_stack != nullptr && first_stack->canMerge(*second_stack)) {
 
 				if (!second_inventory.canInsert(*first_stack)) {
 					client.send(ErrorPacket("Can't move slots: not enough room in second inventory"));
@@ -110,7 +120,7 @@ namespace Game3 {
 			} else if (second_stack == nullptr) {
 
 				if (!second_inventory.hasSlot(secondSlot)) {
-					client.send(ErrorPacket("Can't swap slots: second slot is invalid"));
+					client.send(ErrorPacket("Can't move slots: second slot is invalid"));
 					return;
 				}
 

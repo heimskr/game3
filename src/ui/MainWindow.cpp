@@ -615,7 +615,7 @@ namespace Game3 {
 		if (!keyTimes.contains(keyval)) {
 			handleKey(keyval, keycode, modifiers);
 			if (unsigned(modifiers & Gdk::ModifierType::CONTROL_MASK) == 0)
-				keyTimes.emplace(keyval, KeyInfo {keycode, modifiers, getTime()});
+				keyTimes.emplace(keyval, KeyInfo{keycode, modifiers, getTime()});
 		} else
 			keyTimes.at(keyval).modifiers = modifiers;
 		return true;
