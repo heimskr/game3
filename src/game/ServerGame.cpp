@@ -447,7 +447,7 @@ namespace Game3 {
 			}
 
 			if (first == "say" || first == ":") {
-				std::string_view message = std::string_view(command).substr(4);
+				std::string_view message = std::string_view(command).substr(first.size() + 1);
 				INFO('[' << player->username << "] " << message);
 				broadcast(ChatMessageSentPacket{player->getGID(), std::string(message)});
 				return {true, ""};
