@@ -268,7 +268,7 @@ namespace Game3 {
 		evconnlistener *listener = evconnlistener_new_bind(base, listener_cb, this, LEV_OPT_REUSEABLE | LEV_OPT_CLOSE_ON_FREE | LEV_OPT_CLOSE_ON_EXEC | LEV_OPT_THREADSAFE, -1, name, nameSize);
 
 		if (listener == nullptr) {
-			event_base_free(base);
+			event_base_free(base.exchange(nullptr));
 			char error[64] = "?";
 			if (!strerror_r(errno, error, sizeof(error)) || strcmp(error, "?") == 0)
 				throw std::runtime_error("Couldn't initialize libevent listener (" + std::to_string(errno) + ')');
@@ -277,7 +277,7 @@ namespace Game3 {
 
 		event_base_dispatch(base);
 		evconnlistener_free(listener);
-		event_base_free(base);
+		event_base_free(base.exchange(nullptr));
 	}
 
 	void Server::Worker::accept(int new_fd) {
@@ -408,7 +408,8 @@ namespace Game3 {
 	void Server::stop() {
 		for (auto &worker: workers)
 			worker->stop();
-		event_base_loopbreak(base);
+		if (auto *loaded = base.load())
+			event_base_loopbreak(loaded);
 	}
 
 	std::shared_ptr<Server::Worker> Server::makeWorker(size_t buffer_size, size_t id) {
