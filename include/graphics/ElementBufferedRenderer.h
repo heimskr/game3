@@ -34,7 +34,7 @@ namespace Game3 {
 
 			void reset();
 			void init();
-			void setup(TileProvider &, Layer);
+			void setup(TileProvider &);
 			void render(float divisor, float scale, float center_x, float center_y);
 			void render(float divisor);
 			bool reupload();
@@ -54,7 +54,7 @@ namespace Game3 {
 			bool initialized = false;
 			/** Whether lighting needs to be recomputed. */
 			std::atomic_bool dirty = true;
-			Layer layer = Layer::Invalid;
+			// Layer layer = Layer::Invalid;
 			Shader shader {"terrain"};
 			GL::FloatVAO vao;
 			GL::VBO vbo;

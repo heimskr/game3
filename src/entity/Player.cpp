@@ -27,13 +27,12 @@ namespace Game3 {
 		Entity(ID()) {}
 
 	Player::~Player() {
-		INFO("~Player(" << this << ", " << globalID << ')');
+		INFO("~Player(" << this << ", " << (username.empty()? "[unknown username]" : username) << ", " << globalID << ')');
 	}
 
 	void Player::destroy() {
 		std::weak_ptr weak(getShared());
 		size_t times = 0;
-
 
 		{
 			auto lock = visibleEntities.sharedLock();

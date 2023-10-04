@@ -174,7 +174,7 @@ namespace Game3 {
 			if (tile == static_cast<uint16_t>(-1)) {
 				isMissing = true;
 				tile = missing;
-				opacity	= 0.f;
+				opacity = 0.f;
 			}
 
 			const float tx0 = (tile % set_width) / divisor + TILE_TEXTURE_PADDING;

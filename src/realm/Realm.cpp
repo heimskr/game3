@@ -61,25 +61,12 @@ namespace Game3 {
 
 	void Realm::initRendererRealms() {
 		for (auto &row: *renderers)
-			for (auto &layers: row)
-				for (auto &renderer: layers)
-					renderer.setRealm(*this);
-
-		for (auto &row: *fluidRenderers)
 			for (auto &renderer: row)
 				renderer.setRealm(*this);
 	}
 
 	void Realm::initRendererTileProviders() {
-		for (auto &row: *renderers) {
-			for (auto &layers: row) {
-				size_t layer = 0;
-				for (auto &renderer: layers)
-					renderer.setup(tileProvider, getLayer(++layer));
-			}
-		}
-
-		for (auto &row: *fluidRenderers)
+		for (auto &row: *renderers)
 			for (auto &renderer: row)
 				renderer.setup(tileProvider);
 	}
@@ -159,7 +146,6 @@ namespace Game3 {
 
 		game.toClient().activateContext();
 		renderers.emplace();
-		fluidRenderers.emplace();
 	}
 
 	void Realm::render(const int width, const int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &sprite_renderer, TextRenderer &text_renderer, float game_time) {
@@ -180,20 +166,6 @@ namespace Game3 {
 
 		if (renderers) {
 			for (auto &row: *renderers) {
-				for (auto &layers: row) {
-					uint8_t layer = 0;
-					for (auto &renderer: layers) {
-						if (visible.contains(static_cast<Layer>(++layer))) {
-							renderer.onBackbufferResized(bb_width, bb_height);
-							renderer.render(outdoors? game_time : 1, scale, center.x(), center.y());
-						}
-					}
-				}
-			}
-		}
-
-		if (fluidRenderers) {
-			for (auto &row: *fluidRenderers) {
 				for (auto &renderer: row) {
 					renderer.onBackbufferResized(bb_width, bb_height);
 					renderer.render(outdoors? game_time : 1, scale, center.x(), center.y());
@@ -257,27 +229,6 @@ namespace Game3 {
 
 		getGame().toClient().activateContext();
 		for (auto &row: *renderers)
-			for (auto &layers: row)
-				for (auto &renderer: layers)
-					renderer.reupload();
-	}
-
-	void Realm::reupload(Layer layer) {
-		if (getSide() != Side::Client)
-			return;
-
-		getGame().toClient().activateContext();
-		for (auto &row: *renderers)
-			for (auto &layers: row)
-				layers[getIndex(layer)].reupload();
-	}
-
-	void Realm::reuploadFluids() {
-		if (getSide() != Side::Client)
-			return;
-
-		getGame().toClient().activateContext();
-		for (auto &row: *fluidRenderers)
 			for (auto &renderer: row)
 				renderer.reupload();
 	}
@@ -509,21 +460,6 @@ namespace Game3 {
 			if (renderersReady) {
 				Index row_index = 0;
 				for (auto &row: *renderers) {
-					Index col_index = 0;
-					for (auto &layers: row) {
-						for (auto &renderer: layers) {
-							renderer.setChunkPosition({
-								static_cast<int32_t>(player_cpos.x + col_index - REALM_DIAMETER / 2 - 1),
-								static_cast<int32_t>(player_cpos.y + row_index - REALM_DIAMETER / 2 - 1),
-							});
-						}
-						++col_index;
-					}
-					++row_index;
-				}
-
-				row_index = 0;
-				for (auto &row: *fluidRenderers) {
 					Index col_index = 0;
 					for (auto &renderer: row) {
 						renderer.setChunkPosition({
@@ -884,9 +820,8 @@ namespace Game3 {
 
 		if (should_mark_dirty)
 			for (auto &row: *renderers)
-				for (auto &layers: row)
-					for (auto &renderer: layers)
-						renderer.markDirty();
+				for (auto &renderer: row)
+					renderer.markDirty();
 	}
 
 	Realm::ChunkPackets Realm::getChunkPackets(ChunkPosition chunk_position) {
@@ -1007,12 +942,10 @@ namespace Game3 {
 		for (const auto &row: *renderers) {
 			chunk_pos.x = original_x;
 
-			for (const auto &layers: row) {
-				for (const auto &renderer: layers) {
-					if (renderer.isMissing) {
-						out.insert(chunk_pos);
-						break;
-					}
+			for (const auto &renderer: row) {
+				if (renderer.isMissing) {
+					out.insert(chunk_pos);
+					break;
 				}
 				++chunk_pos.x;
 			}
@@ -1202,60 +1135,18 @@ namespace Game3 {
 		}
 	}
 
-	void Realm::queueReupload(Layer layer) {
-		assert(getSide() == Side::Client);
-		if (!layerReuploadPending[getIndex(layer)].exchange(true)) {
-			getGame().toClient().getWindow().queue([shared = shared_from_this(), layer] {
-				shared->reupload(layer);
-				shared->layerReuploadPending[getIndex(layer)] = false;
-			});
-		}
-	}
-
-	void Realm::queueReuploadFluids() {
-		assert(getSide() == Side::Client);
-		if (!fluidReuploadPending.exchange(true)) {
-			getGame().toClient().getWindow().queue([shared = shared_from_this()] {
-				shared->reuploadFluids();
-				shared->fluidReuploadPending = false;
-			});
-		}
-	}
-
 	void Realm::queueReuploadAll() {
 		assert(getSide() == Side::Client);
-		const bool fluid_reuploading = fluidReuploadPending.exchange(true);
-		const bool reuploading = reuploadPending.exchange(true);
-		if (!fluid_reuploading && !reuploading) {
-			getGame().toClient().getWindow().queue([weak = std::weak_ptr(shared_from_this())] {
-				if (auto shared = weak.lock()) {
-					shared->reupload();
-					shared->reuploadFluids();
-					shared->reuploadPending = false;
-					shared->fluidReuploadPending = false;
-				} else {
-					ERROR("Expired in " << __FILE__ << ':' << __LINE__);
-				}
-			});
-		} else if (fluid_reuploading && !reuploading) {
-			getGame().toClient().getWindow().queue([weak = std::weak_ptr(shared_from_this())] {
-				if (auto shared = weak.lock()) {
-					shared->reupload();
-					shared->reuploadPending = false;
-				} else {
-					ERROR("Expired in " << __FILE__ << ':' << __LINE__);
-				}
-			});
-		} else if (!fluid_reuploading && reuploading) {
-			getGame().toClient().getWindow().queue([weak = std::weak_ptr(shared_from_this())] {
-				if (auto shared = weak.lock()) {
-					shared->reuploadFluids();
-					shared->fluidReuploadPending = false;
-				} else {
-					ERROR("Expired in " << __FILE__ << ':' << __LINE__);
-				}
-			});
-		}
+		if (reuploadPending.exchange(true))
+			return;
+		getGame().toClient().getWindow().queue([weak = std::weak_ptr(shared_from_this())] {
+			if (auto shared = weak.lock()) {
+				shared->reupload();
+				shared->reuploadPending = false;
+			} else {
+				ERROR("Expired in " << __FILE__ << ':' << __LINE__);
+			}
+		});
 	}
 
 	void Realm::autotile(const Position &position, Layer layer) {

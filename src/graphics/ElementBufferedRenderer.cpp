@@ -1,14 +1,7 @@
 // Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Renderers/ElementBufferedRenderer.cs
 
-#include <iostream>
-
-#include "graphics/Shader.h"
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #include "resources.h"
+#include "graphics/Shader.h"
 #include "graphics/Tileset.h"
 #include "container/Quadtree.h"
 #include "game/ClientGame.h"
@@ -18,6 +11,13 @@
 #include "ui/MainWindow.h"
 #include "util/Timer.h"
 #include "util/Util.h"
+
+#include <array>
+#include <iostream>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace Game3 {
 	ElementBufferedRenderer::ElementBufferedRenderer():
@@ -65,8 +65,8 @@ namespace Game3 {
 		initialized = true;
 	}
 
-	void ElementBufferedRenderer::setup(TileProvider &provider_, Layer layer_) {
-		layer = layer_;
+	void ElementBufferedRenderer::setup(TileProvider &provider_) {
+		// layer = layer_;
 		provider = &provider_;
 	}
 
@@ -226,28 +226,106 @@ namespace Game3 {
 		isMissing = false;
 
 		const TileID missing = tileset["base:tile/void"];
+		Game &game = realm->getGame();
 
 		Timer timer{"BufferedVBOInit"};
-		vbo.init<float, 3>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, set_width, divisor, t_size, missing](size_t x, size_t y) {
+		vbo.init<float, 19>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, &game, set_width, divisor, t_size, missing](size_t x, size_t y) {
 			const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
-			const std::optional<TileID> tile_opt = realm->tryTile(layer, Position{
-				static_cast<Index>(y) + CHUNK_SIZE * (chunk_y + 1), // why `+ 1`?
-				static_cast<Index>(x) + CHUNK_SIZE * (chunk_x + 1)  // here too
+
+			std::array<TileID, LAYER_COUNT> tiles{}, uppers{};
+
+			for (uint8_t layer_index = 1; layer_index <= LAYER_COUNT; ++layer_index) {
+				Layer layer = getLayer(layer_index);
+
+				const std::optional<TileID> tile_opt = realm->tryTile(layer, Position{
+					static_cast<Index>(y) + CHUNK_SIZE * (chunk_y + 1), // why `+ 1`?
+					static_cast<Index>(x) + CHUNK_SIZE * (chunk_x + 1)  // here too
+				});
+
+				TileID tile;
+				if (!tile_opt) {
+					isMissing = true;
+					tiles[layer_index - 1] = missing;
+				} else
+					tiles[layer_index - 1] = *tile_opt;
+
+				const std::optional<TileID> upper_opt = realm->tryTile(layer, Position{
+					static_cast<Index>(y + 1) + CHUNK_SIZE * (chunk_y + 1), // why `+ 1`?
+					static_cast<Index>(x)     + CHUNK_SIZE * (chunk_x + 1)  // here too
+				});
+
+				TileID upper;
+				if (!upper_opt) {
+					isMissing = true;
+					uppers[layer_index - 1] = missing;
+				} else
+					uppers[layer_index - 1] = *upper_opt;
+			}
+
+			const auto fluid_opt = realm->tileProvider.copyFluidTile({
+				Index(y) + CHUNK_SIZE * (chunk_y + 1), // why `+ 1`?
+				Index(x) + CHUNK_SIZE * (chunk_x + 1)  // here too
 			});
-			TileID tile;
-			if (!tile_opt) {
+
+			TileID fluid_tile = -1;
+			float fluid_opacity;
+
+			if (fluid_opt) {
+				if (auto tile_opt = game.getFluidTileID(fluid_opt->id)) {
+					fluid_tile = *tile_opt;
+					if (FluidTile::FULL <= fluid_opt->level)
+						fluid_opacity = 1.f;
+					else
+						fluid_opacity = float(fluid_opt->level) / FluidTile::FULL;
+				}
+			}
+
+			if (fluid_tile == static_cast<uint16_t>(-1)) {
 				isMissing = true;
-				tile = missing;
-			} else
-				tile = *tile_opt;
-			const float tx0 = (tile % set_width) / divisor + TILE_TEXTURE_PADDING;
-			const float ty0 = (tile / set_width) / divisor + TILE_TEXTURE_PADDING;
-			const float tile_f = float(tile);
+				fluid_tile = missing;
+				fluid_opacity = 0.f;
+			}
+
+			static_assert(LAYER_COUNT == 4);
+
+			// Texture coordinates for the base tile
+#define T_DEFS(I) \
+			const float tx##I = (tiles[I] % set_width) / divisor + TILE_TEXTURE_PADDING; \
+			const float ty##I = (tiles[I] / set_width) / divisor + TILE_TEXTURE_PADDING;
+
+			// Texture coordinates for the upper portion of the below tile
+#define U_DEFS(I) \
+			const float ux##I = (uppers[I] % set_width) / divisor + TILE_TEXTURE_PADDING; \
+			const float uy##I = (uppers[I] / set_width) / divisor + TILE_TEXTURE_PADDING;
+
+			T_DEFS(0); T_DEFS(1); T_DEFS(2); T_DEFS(3);
+			U_DEFS(0); U_DEFS(1); U_DEFS(2); U_DEFS(3);
+
+			const float fx0 = (fluid_tile % set_width) / divisor + TILE_TEXTURE_PADDING;
+			const float fy0 = (fluid_tile / set_width) / divisor + TILE_TEXTURE_PADDING;
+
+#define T_ARR_0(I) tx##I, ty##I
+#define T_ARR_1(I) tx##I + t_size, ty##I
+#define T_ARR_2(I) tx##I, ty##I + t_size
+#define T_ARR_3(I) tx##I + t_size, ty##I + t_size
+#define T_ARR_N(N) T_ARR_##N(0), T_ARR_##N(1), T_ARR_##N(2), T_ARR_##N(3)
+
+#define U_ARR_0(I) ux##I, uy##I
+#define U_ARR_1(I) ux##I + t_size, uy##I
+#define U_ARR_2(I) ux##I, uy##I + t_size
+#define U_ARR_3(I) ux##I + t_size, uy##I + t_size
+#define U_ARR_N(N) U_ARR_##N(0), U_ARR_##N(1), U_ARR_##N(2), U_ARR_##N(3)
+
+#define F_ARR_0 fx0, fy0
+#define F_ARR_1 fx0 + t_size, fy0
+#define F_ARR_2 fx0, fy0 + t_size
+#define F_ARR_3 fx0 + t_size, fy0 + t_size
+
 			return std::array{
-				std::array{tx0,          ty0,          tile_f},
-				std::array{tx0 + t_size, ty0,          tile_f},
-				std::array{tx0,          ty0 + t_size, tile_f},
-				std::array{tx0 + t_size, ty0 + t_size, tile_f},
+				std::array{T_ARR_N(0), U_ARR_N(0), F_ARR_0, fluid_opacity},
+				std::array{T_ARR_N(1), U_ARR_N(1), F_ARR_1, fluid_opacity},
+				std::array{T_ARR_N(2), U_ARR_N(2), F_ARR_2, fluid_opacity},
+				std::array{T_ARR_N(3), U_ARR_N(3), F_ARR_3, fluid_opacity},
 			};
 		});
 
@@ -276,6 +354,7 @@ namespace Game3 {
 	void ElementBufferedRenderer::recomputeLighting() {
 		return;
 
+		/*
 		Timer timer("RecomputeLighting");
 
 		bool recomputation_needed = false;
@@ -349,6 +428,7 @@ namespace Game3 {
 		}
 
 		timer.stop();
+		//*/
 	}
 
 	void ElementBufferedRenderer::check(int handle, bool is_link) {

@@ -72,8 +72,7 @@ namespace Game3 {
 			RealmType type;
 			TileProvider tileProvider;
 			PipeLoader pipeLoader;
-			std::optional<std::array<std::array<std::array<ElementBufferedRenderer, LAYER_COUNT>, REALM_DIAMETER>, REALM_DIAMETER>> renderers;
-			std::optional<std::array<std::array<FluidRenderer, REALM_DIAMETER>, REALM_DIAMETER>> fluidRenderers;
+			std::optional<std::array<std::array<ElementBufferedRenderer, REALM_DIAMETER>, REALM_DIAMETER>> renderers;
 			Lockable<std::unordered_map<Position, TileEntityPtr>, SharedRecursiveMutex> tileEntities;
 			Lockable<std::unordered_map<GlobalID, TileEntityPtr>> tileEntitiesByGID;
 			Lockable<std::unordered_set<EntityPtr>, SharedRecursiveMutex> entities;
@@ -90,8 +89,6 @@ namespace Game3 {
 			std::atomic_bool snoozePending = false;
 
 			std::atomic_bool reuploadPending = false;
-			std::atomic_bool fluidReuploadPending = false;
-			std::array<std::atomic_bool, LAYER_COUNT> layerReuploadPending{};
 			std::atomic_bool renderersReady = false;
 
 			Realm(const Realm &) = delete;
@@ -115,11 +112,8 @@ namespace Game3 {
 			virtual void onRemove();
 			void createRenderers();
 			void render(int width, int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &, TextRenderer &, float game_time);
-			/** Reuploads terrain in all layers. */
+			/** Reuploads fluids and terrain in all layers. */
 			void reupload();
-			/** Reuploads terrain in one layer. The layer argument is 1-based. */
-			void reupload(Layer);
-			void reuploadFluids();
 			EntityPtr addUnsafe(const EntityPtr &, const Position &);
 			EntityPtr add(const EntityPtr &, const Position &);
 			TileEntityPtr add(const TileEntityPtr &);
@@ -197,9 +191,6 @@ namespace Game3 {
 			void sendToOne(RemoteClient &, ChunkPosition);
 			void recalculateVisibleChunks();
 			void queueReupload();
-			void queueReupload(Layer);
-			void queueReuploadFluids();
-			void queueReuploadAll();
 			void autotile(const Position &, Layer);
 
 			inline const auto & getPlayers() const { return players; }
