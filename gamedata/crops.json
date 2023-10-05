@@ -41,6 +41,33 @@
 				"chance": 1.0
 			},
 
+			"base:crop/pumpkin": {
+				"stages": ["base:tile/pumpkin_0", "base:tile/pumpkin_1", "base:tile/pumpkin_2", "base:tile/pumpkin_3", "base:tile/pumpkin_4"],
+				"products": [
+					["constant", ["base:item/pumpkin"], 1],
+					["exponential", ["base:item/pumpkin_seeds"], 1, 0.25]
+				],
+				"chance": 1.0
+			},
+
+			"base:crop/carrot": {
+				"stages": ["base:tile/carrot_0", "base:tile/carrot_1", "base:tile/carrot_2", "base:tile/carrot_3", "base:tile/carrot_4"],
+				"products": [
+					["constant", ["base:item/carrot"], 1],
+					["exponential", ["base:item/carrot_seeds"], 1, 0.25]
+				],
+				"chance": 1.0
+			},
+
+			"base:crop/potato": {
+				"stages": ["base:tile/potato_0", "base:tile/potato_1", "base:tile/potato_2", "base:tile/potato_3", "base:tile/potato_4"],
+				"products": [
+					["constant", ["base:item/potato"], 1],
+					["exponential", ["base:item/potato_seeds"], 1, 0.25]
+				],
+				"chance": 1.0
+			},
+
 			"base:crop/tree1": {
 				"type": "base:tile/tree",
 				"stages": ["base:tile/tree1_stump", "base:tile/tree1"],
