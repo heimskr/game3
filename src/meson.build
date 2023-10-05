@@ -17,9 +17,8 @@ resgen_gen = custom_target('resgen-gen',
 resources_h = custom_target('resources-header-gen',
 	output: 'resources.h',
 	capture: true,
-	command: ['../src/resgen', '-h'])
-
-message(meson.current_build_dir())
+	command: [meson.current_build_dir() / '..' / 'resgen', '-h'],
+	depends: [resgen_gen])
 
 resources_o = custom_target('resources-obj-gen',
 	input: 'resources.zig',

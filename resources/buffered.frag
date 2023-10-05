@@ -7,17 +7,10 @@ in vec2 texCoordBase0;
 in vec2 texCoordBase1;
 in vec2 texCoordBase2;
 in vec2 texCoordBase3;
-in vec2 texCoordUpper0;
-in vec2 texCoordUpper1;
-in vec2 texCoordUpper2;
-in vec2 texCoordUpper3;
 in vec2 fluidTexCoord;
 flat in float fluidOpacity;
-// flat in int index;
 
 uniform sampler2D texture0;
-// uniform float divisor;
-// uniform int bright_tiles[8];
 
 vec4 alphaComposite(vec4 bottom, vec4 top) {
 	float a0 = top.a + bottom.a * (1 - top.a);
@@ -35,10 +28,6 @@ void main() {
 	vec4 fluid  = texture(texture0, fluidTexCoord);
 	vec4 base2  = texture(texture0, texCoordBase2);
 	vec4 base3  = texture(texture0, texCoordBase3);
-	vec4 upper0 = texture(texture0, texCoordUpper0);
-	vec4 upper1 = texture(texture0, texCoordUpper1);
-	vec4 upper2 = texture(texture0, texCoordUpper2);
-	vec4 upper3 = texture(texture0, texCoordUpper3);
 
 	fluid.a = fluidOpacity;
 
@@ -46,19 +35,6 @@ void main() {
 	vec4 mix2 = alphaComposite(mix1,  fluid);
 	vec4 mix3 = alphaComposite(mix2,  base2);
 	vec4 mix4 = alphaComposite(mix3,  base3);
-	vec4 mix5 = alphaComposite(mix4,  upper0);
-	vec4 mix6 = alphaComposite(mix5,  upper1);
-	vec4 mix7 = alphaComposite(mix6,  upper2);
-	vec4 mix8 = alphaComposite(mix7,  upper3);
 
-	FragColor = mix8;
-
-	// FragColor.a = 1.0;
-	// FragColor.r = 1.0;
-
-	// if (bright_tiles[0] != index && bright_tiles[1] != index && bright_tiles[2] != index && bright_tiles[3] != index && bright_tiles[4] != index && bright_tiles[5] != index && bright_tiles[6] != index && bright_tiles[7] != index) {
-	// 	FragColor.r /= divisor;
-	// 	FragColor.g /= divisor;
-	// 	FragColor.b /= divisor;
-	// }
+	FragColor = mix4;
 }

@@ -1,4 +1,4 @@
-// Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Renderers/ElementBufferedRenderer.cs
+// Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Renderers/UpperRenderer.cs
 
 #include "resources.h"
 #include "graphics/Shader.h"
@@ -6,7 +6,7 @@
 #include "container/Quadtree.h"
 #include "game/ClientGame.h"
 #include "game/Game.h"
-#include "graphics/ElementBufferedRenderer.h"
+#include "graphics/UpperRenderer.h"
 #include "realm/Realm.h"
 #include "ui/MainWindow.h"
 #include "util/Timer.h"
@@ -20,36 +20,34 @@
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Game3 {
-	ElementBufferedRenderer::ElementBufferedRenderer():
-		reshader(blur_frag) {}
+	UpperRenderer::UpperRenderer() {}
 
-	ElementBufferedRenderer::ElementBufferedRenderer(Realm &realm_):
-		reshader(blur_frag), realm(&realm_) {}
+	UpperRenderer::UpperRenderer(Realm &realm_):
+		realm(&realm_) {}
 
-	ElementBufferedRenderer::~ElementBufferedRenderer() {
+	UpperRenderer::~UpperRenderer() {
 		reset();
 	}
 
-	void ElementBufferedRenderer::reset() {
+	void UpperRenderer::reset() {
 		if (initialized) {
 			vao.reset();
 			ebo.reset();
 			vbo.reset();
 			shader.reset();
-			reshader.reset();
 			tileset.reset();
 			fbo.reset();
 			initialized = false;
 		}
 	}
 
-	void ElementBufferedRenderer::init() {
+	void UpperRenderer::init() {
 		if (!realm)
 			return;
 		if (initialized)
 			reset();
 		assert(realm);
-		shader.init(buffered_vert, buffered_frag);
+		shader.init(upper_vert, upper_frag);
 		generateVertexBufferObject();
 		generateElementBufferObject();
 		generateVertexArrayObject();
@@ -57,12 +55,11 @@ namespace Game3 {
 		initialized = true;
 	}
 
-	void ElementBufferedRenderer::setup(TileProvider &provider_) {
-		// layer = layer_;
+	void UpperRenderer::setup(TileProvider &provider_) {
 		provider = &provider_;
 	}
 
-	void ElementBufferedRenderer::render(float /* divisor */, float scale, float center_x, float center_y) {
+	void UpperRenderer::render(float /* divisor */, float scale, float center_x, float center_y) {
 		if (!initialized)
 			return;
 
@@ -102,7 +99,7 @@ namespace Game3 {
 		GL::triangles(CHUNK_SIZE * CHUNK_SIZE);
 	}
 
-	void ElementBufferedRenderer::render(float /* divisor */) {
+	void UpperRenderer::render(float /* divisor */) {
 		if (!initialized)
 			return;
 
@@ -133,11 +130,11 @@ namespace Game3 {
 		GL::triangles(CHUNK_SIZE * CHUNK_SIZE);
 	}
 
-	bool ElementBufferedRenderer::reupload() {
+	bool UpperRenderer::reupload() {
 		return generateVertexBufferObject() && generateVertexArrayObject();
 	}
 
-	std::future<bool> ElementBufferedRenderer::queueReupload() {
+	std::future<bool> UpperRenderer::queueReupload() {
 		assert(realm != nullptr);
 
 		auto promise = std::make_shared<std::promise<bool>>();
@@ -152,7 +149,7 @@ namespace Game3 {
 		return future;
 	}
 
-	bool ElementBufferedRenderer::onBackbufferResized(int width, int height) {
+	bool UpperRenderer::onBackbufferResized(int width, int height) {
 		if (width == backbufferWidth && height == backbufferHeight)
 			return false;
 		backbufferWidth = width;
@@ -160,17 +157,17 @@ namespace Game3 {
 		return true;
 	}
 
-	void ElementBufferedRenderer::setChunk(TileChunk &new_chunk, bool can_reupload) {
+	void UpperRenderer::setChunk(TileChunk &new_chunk, bool can_reupload) {
 		if (&new_chunk == chunk)
 			return;
 		chunk = &new_chunk;
 		if (can_reupload) {
-			Timer timer{"EBR::setChunk::reupload"};
+			Timer timer{"UR::setChunk::reupload"};
 			reupload();
 		}
 	}
 
-	void ElementBufferedRenderer::setChunkPosition(const ChunkPosition &new_pos) {
+	void UpperRenderer::setChunkPosition(const ChunkPosition &new_pos) {
 		auto lock = chunkPosition.uniqueLock();
 		if (new_pos != chunkPosition) {
 			chunkPosition.getBase() = new_pos;
@@ -178,15 +175,15 @@ namespace Game3 {
 		}
 	}
 
-	void ElementBufferedRenderer::snooze() {
+	void UpperRenderer::snooze() {
 		reset();
 	}
 
-	void ElementBufferedRenderer::wakeUp() {
+	void UpperRenderer::wakeUp() {
 		init();
 	}
 
-	bool ElementBufferedRenderer::generateVertexBufferObject() {
+	bool UpperRenderer::generateVertexBufferObject() {
 		assert(realm);
 
 		auto &tileset = realm->getTileset();
@@ -201,91 +198,51 @@ namespace Game3 {
 		const float divisor = set_width;
 		const float t_size = 1.f / divisor - TILE_TEXTURE_PADDING * 2;
 
-		isMissing = false;
-
-		const TileID missing = tileset["base:tile/void"];
-		Game &game = realm->getGame();
-
-		Timer timer{"BufferedVBOInit"};
-		vbo.init<float, 11>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, &game, &tileset, set_width, divisor, t_size, missing](size_t x, size_t y) {
+		Timer timer{"UpperVBOInit"};
+		vbo.init<float, 8>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, &tileset, set_width, divisor, t_size](size_t x, size_t y) {
 			const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
 
-			std::array<TileID, LAYER_COUNT> tiles{};
+			std::array<TileID, LAYER_COUNT> uppers{};
 
 			for (uint8_t layer_index = 1; layer_index <= LAYER_COUNT; ++layer_index) {
-				Layer layer = getLayer(layer_index);
-
-				const std::optional<TileID> tile_opt = realm->tryTile(layer, Position{
-					static_cast<Index>(y) + CHUNK_SIZE * (chunk_y + 1), // why `+ 1`?
-					static_cast<Index>(x) + CHUNK_SIZE * (chunk_x + 1)  // here too
+				const std::optional<TileID> upper_opt = realm->tryTile(getLayer(layer_index), Position{
+					static_cast<Index>(y + 1) + CHUNK_SIZE * (chunk_y + 1),
+					static_cast<Index>(x)     + CHUNK_SIZE * (chunk_x + 1)
 				});
 
-				if (!tile_opt) {
-					isMissing = true;
-					tiles[layer_index - 1] = missing;
-				} else
-					tiles[layer_index - 1] = *tile_opt;
-			}
-
-			const auto fluid_opt = realm->tryFluid({
-				Index(y) + CHUNK_SIZE * (chunk_y + 1),
-				Index(x) + CHUNK_SIZE * (chunk_x + 1)
-			});
-
-			TileID fluid_tile = -1;
-			float fluid_opacity;
-
-			if (fluid_opt) {
-				if (auto tile_opt = game.getFluidTileID(fluid_opt->id)) {
-					fluid_tile = *tile_opt;
-					if (FluidTile::FULL <= fluid_opt->level)
-						fluid_opacity = 1.f;
-					else
-						fluid_opacity = float(fluid_opt->level) / FluidTile::FULL;
-				}
-			}
-
-			if (fluid_tile == static_cast<TileID>(-1)) {
-				isMissing = true;
-				fluid_tile = missing;
-				fluid_opacity = 0.f;
+				if (upper_opt)
+					uppers[layer_index - 1] = tileset.getUpper(*upper_opt);
+				else
+					uppers[layer_index - 1] = 0;
 			}
 
 			static_assert(LAYER_COUNT == 4);
 
-			// Texture coordinates for the base tile
-#define T_DEFS(I) \
-			const float tx##I = (tiles[I] % set_width) / divisor + TILE_TEXTURE_PADDING; \
-			const float ty##I = (tiles[I] / set_width) / divisor + TILE_TEXTURE_PADDING;
+			// Texture coordinates for the upper portion of the below tile
+#define U_DEFS(I) \
+			const float ux##I = (uppers[I] % set_width) / divisor + TILE_TEXTURE_PADDING; \
+			const float uy##I = (uppers[I] / set_width) / divisor + TILE_TEXTURE_PADDING;
 
-			T_DEFS(0); T_DEFS(1); T_DEFS(2); T_DEFS(3);
+			U_DEFS(0); U_DEFS(1); U_DEFS(2); U_DEFS(3);
 
-			const float fx0 = (fluid_tile % set_width) / divisor + TILE_TEXTURE_PADDING;
-			const float fy0 = (fluid_tile / set_width) / divisor + TILE_TEXTURE_PADDING;
-
-#define T_ARR_0(I) tx##I, ty##I
-#define T_ARR_1(I) tx##I + t_size, ty##I
-#define T_ARR_2(I) tx##I, ty##I + t_size
-#define T_ARR_3(I) tx##I + t_size, ty##I + t_size
-#define T_ARR_N(N) T_ARR_##N(0), T_ARR_##N(1), T_ARR_##N(2), T_ARR_##N(3)
-
-#define F_ARR_0 fx0, fy0
-#define F_ARR_1 fx0 + t_size, fy0
-#define F_ARR_2 fx0, fy0 + t_size
-#define F_ARR_3 fx0 + t_size, fy0 + t_size
+#define U_ARR_0(I) ux##I, uy##I
+#define U_ARR_1(I) ux##I + t_size, uy##I
+#define U_ARR_2(I) ux##I, uy##I + t_size
+#define U_ARR_3(I) ux##I + t_size, uy##I + t_size
+#define U_ARR_N(N) U_ARR_##N(0), U_ARR_##N(1), U_ARR_##N(2), U_ARR_##N(3)
 
 			return std::array{
-				std::array{T_ARR_N(0), F_ARR_0, fluid_opacity},
-				std::array{T_ARR_N(1), F_ARR_1, fluid_opacity},
-				std::array{T_ARR_N(2), F_ARR_2, fluid_opacity},
-				std::array{T_ARR_N(3), F_ARR_3, fluid_opacity},
+				std::array{U_ARR_N(0)},
+				std::array{U_ARR_N(1)},
+				std::array{U_ARR_N(2)},
+				std::array{U_ARR_N(3)},
 			};
 		});
 
 		return vbo.getHandle() != 0;
 	}
 
-	bool ElementBufferedRenderer::generateElementBufferObject() {
+	bool UpperRenderer::generateElementBufferObject() {
 		uint32_t i = 0;
 		ebo.init<uint32_t, 6>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [&i](size_t, size_t) {
 			i += 4;
@@ -294,13 +251,13 @@ namespace Game3 {
 		return ebo.getHandle() != 0;
 	}
 
-	bool ElementBufferedRenderer::generateVertexArrayObject() {
+	bool UpperRenderer::generateVertexArrayObject() {
 		if (vbo.getHandle() != 0)
-			vao.init(vbo, {2, 2, 2, 2, 2, 2, 1});
+			vao.init(vbo, {2, 2, 2, 2, 2});
 		return vao.getHandle() != 0;
 	}
 
-	void ElementBufferedRenderer::check(int handle, bool is_link) {
+	void UpperRenderer::check(int handle, bool is_link) {
 		int success;
 		std::array<char, 2048> info{};
 		if (is_link)

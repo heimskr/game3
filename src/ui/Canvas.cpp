@@ -29,13 +29,21 @@ namespace Game3 {
 				return;
 
 			if (realm->wakeupPending.exchange(false)) {
-				for (auto &row: *realm->renderers)
+				for (auto &row: *realm->baseRenderers)
+					for (auto &renderer: row)
+						renderer.wakeUp();
+
+				for (auto &row: *realm->upperRenderers)
 					for (auto &renderer: row)
 						renderer.wakeUp();
 
 				realm->reupload();
 			} else if (realm->snoozePending.exchange(false)) {
-				for (auto &row: *realm->renderers)
+				for (auto &row: *realm->baseRenderers)
+					for (auto &renderer: row)
+						renderer.snooze();
+
+				for (auto &row: *realm->upperRenderers)
 					for (auto &renderer: row)
 						renderer.snooze();
 			}

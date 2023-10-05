@@ -60,13 +60,27 @@ namespace Game3 {
 	}
 
 	void Realm::initRendererRealms() {
-		for (auto &row: *renderers)
+		assert(baseRenderers);
+		assert(upperRenderers);
+
+		for (auto &row: *baseRenderers)
+			for (auto &renderer: row)
+				renderer.setRealm(*this);
+
+		for (auto &row: *upperRenderers)
 			for (auto &renderer: row)
 				renderer.setRealm(*this);
 	}
 
 	void Realm::initRendererTileProviders() {
-		for (auto &row: *renderers)
+		assert(baseRenderers);
+		assert(upperRenderers);
+
+		for (auto &row: *baseRenderers)
+			for (auto &renderer: row)
+				renderer.setup(tileProvider);
+
+		for (auto &row: *upperRenderers)
 			for (auto &renderer: row)
 				renderer.setup(tileProvider);
 	}
@@ -145,7 +159,8 @@ namespace Game3 {
 			return;
 
 		game.toClient().activateContext();
-		renderers.emplace();
+		baseRenderers.emplace();
+		upperRenderers.emplace();
 	}
 
 	void Realm::render(const int width, const int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &sprite_renderer, TextRenderer &text_renderer, float game_time) {
@@ -164,8 +179,8 @@ namespace Game3 {
 
 		const auto &visible = client_game.player? client_game.player->getVisibleLayers() : std::unordered_set{Layer::Terrain, Layer::Submerged, Layer::Objects, Layer::Highest};
 
-		if (renderers) {
-			for (auto &row: *renderers) {
+		if (baseRenderers) {
+			for (auto &row: *baseRenderers) {
 				for (auto &renderer: row) {
 					renderer.onBackbufferResized(bb_width, bb_height);
 					renderer.render(outdoors? game_time : 1, scale, center.x(), center.y());
@@ -193,34 +208,14 @@ namespace Game3 {
 				entity->render(sprite_renderer, text_renderer);
 		}
 
-		// multiplier.update(bb_width, bb_height);
-		// sprite_renderer.drawOnMap(texture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
-		// if (renderer1.lightTexture) {
-			// textureB.useInFB();
-			// multiplier(textureA, renderer1.lightTexture);
-			// textureA.useInFB();
-			// game.canvas.multiplier(textureB, renderer2.lightTexture);
-		// }
-		// textureB.useInFB();
-		// game.canvas.multiplier(textureA, renderer3.lightTexture);
-		// sprite_renderer.drawOnScreen(renderer1.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
-		// sprite_renderer.drawOnScreen(renderer2.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
-		// sprite_renderer.drawOnScreen(renderer3.lightTexture, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f);
-
-		// fbo.undo();
-		// viewport.reset();
-
-		// GL::clear(1.f, 0.f, 1.f, 0.f);
-
-		// // sprite_renderer.update(width, height);
-		// // sprite_renderer.drawOnMap(textureB, 0.f, 0.f, 0.f, 0.f, -1.f, -1.f, 1.f);
-		// sprite_renderer.drawOnScreen(textureA, {
-		// 	// .x = -center.x() / 2.f,
-		// 	// .y = -0.5f,
-		// 	// .y = -center.y() / 2.f,
-		// 	.sizeX = -1.f,
-		// 	.sizeY = -1.f,
-		// });
+		if (upperRenderers) {
+			for (auto &row: *upperRenderers) {
+				for (auto &renderer: row) {
+					renderer.onBackbufferResized(bb_width, bb_height);
+					renderer.render(outdoors? game_time : 1, scale, center.x(), center.y());
+				}
+			}
+		}
 	}
 
 	void Realm::reupload() {
@@ -228,7 +223,12 @@ namespace Game3 {
 			return;
 
 		getGame().toClient().activateContext();
-		for (auto &row: *renderers)
+
+		for (auto &row: *baseRenderers)
+			for (auto &renderer: row)
+				renderer.reupload();
+
+		for (auto &row: *upperRenderers)
 			for (auto &renderer: row)
 				renderer.reupload();
 	}
@@ -459,7 +459,21 @@ namespace Game3 {
 
 			if (renderersReady) {
 				Index row_index = 0;
-				for (auto &row: *renderers) {
+
+				for (auto &row: *baseRenderers) {
+					Index col_index = 0;
+					for (auto &renderer: row) {
+						renderer.setChunkPosition({
+							static_cast<int32_t>(player_cpos.x + col_index - REALM_DIAMETER / 2 - 1),
+							static_cast<int32_t>(player_cpos.y + row_index - REALM_DIAMETER / 2 - 1),
+						});
+						++col_index;
+					}
+					++row_index;
+				}
+
+				row_index = 0;
+				for (auto &row: *upperRenderers) {
 					Index col_index = 0;
 					for (auto &renderer: row) {
 						renderer.setChunkPosition({
@@ -806,7 +820,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Realm::setLayerHelper(Index row, Index column, Layer layer, bool should_mark_dirty) {
+	void Realm::setLayerHelper(Index row, Index column, Layer layer, bool) {
 		const auto &tileset = getTileset();
 		const Position position(row, column);
 
@@ -816,11 +830,6 @@ namespace Game3 {
 		}
 
 		updateNeighbors(position, layer);
-
-		if (should_mark_dirty)
-			for (auto &row: *renderers)
-				for (auto &renderer: row)
-					renderer.markDirty();
 	}
 
 	Realm::ChunkPackets Realm::getChunkPackets(ChunkPosition chunk_position) {
@@ -938,7 +947,7 @@ namespace Game3 {
 
 		const auto original_x = chunk_pos.x;
 
-		for (const auto &row: *renderers) {
+		for (const auto &row: *baseRenderers) {
 			chunk_pos.x = original_x;
 
 			for (const auto &renderer: row) {

@@ -4,8 +4,6 @@
 #include "Types.h"
 #include "game/TileProvider.h"
 #include "graphics/GL.h"
-#include "graphics/RectangleRenderer.h"
-#include "graphics/Reshader.h"
 #include "threading/Lockable.h"
 
 #include <atomic>
@@ -16,20 +14,19 @@
 namespace Game3 {
 	class Realm;
 
-	class ElementBufferedRenderer {
+	class UpperRenderer {
 		public:
 			constexpr static float TEXTURE_SCALE = 2.f;
 			constexpr static float TILE_TEXTURE_PADDING = 1.f / 2048.f;
 			int backbufferWidth = -1;
 			int backbufferHeight = -1;
-			std::atomic_bool isMissing = false;
 
 			Eigen::Vector2f center{0.f, 0.f};
 			std::shared_ptr<Tileset> tileset;
 
-			ElementBufferedRenderer();
-			ElementBufferedRenderer(Realm &);
-			~ElementBufferedRenderer();
+			UpperRenderer();
+			UpperRenderer(Realm &);
+			~UpperRenderer();
 
 			void reset();
 			void init();
@@ -55,7 +52,6 @@ namespace Game3 {
 			GL::VBO vbo;
 			GL::EBO ebo;
 			GL::FBO fbo;
-			Reshader reshader;
 			Realm *realm = nullptr;
 			TileChunk *chunk = nullptr;
 			TileProvider *provider = nullptr;

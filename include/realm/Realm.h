@@ -17,7 +17,7 @@
 #include "game/BiomeMap.h"
 #include "game/TileProvider.h"
 #include "graphics/ElementBufferedRenderer.h"
-#include "graphics/FluidRenderer.h"
+#include "graphics/UpperRenderer.h"
 #include "packet/ChunkTilesPacket.h"
 #include "packet/EntityPacket.h"
 #include "packet/RealmNoticePacket.h"
@@ -72,7 +72,8 @@ namespace Game3 {
 			RealmType type;
 			TileProvider tileProvider;
 			PipeLoader pipeLoader;
-			std::optional<std::array<std::array<ElementBufferedRenderer, REALM_DIAMETER>, REALM_DIAMETER>> renderers;
+			std::optional<std::array<std::array<ElementBufferedRenderer, REALM_DIAMETER>, REALM_DIAMETER>> baseRenderers;
+			std::optional<std::array<std::array<UpperRenderer, REALM_DIAMETER>, REALM_DIAMETER>> upperRenderers;
 			Lockable<std::unordered_map<Position, TileEntityPtr>, SharedRecursiveMutex> tileEntities;
 			Lockable<std::unordered_map<GlobalID, TileEntityPtr>> tileEntitiesByGID;
 			Lockable<std::unordered_set<EntityPtr>, SharedRecursiveMutex> entities;

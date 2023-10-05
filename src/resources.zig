@@ -17,6 +17,7 @@ pub const shaders = [_]Shader{
 	.{ .name = "multiplier" },
 	.{ .name = "text" },
 	.{ .name = "fluids" },
+	.{ .name = "upper" },
 };
 
 comptime {
