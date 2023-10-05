@@ -7,6 +7,7 @@ namespace Game3 {
 		public:
 			using Item::Item;
 			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
+			bool drag(Slot, ItemStack &, const Place &, Modifiers) override;
 
 			virtual Identifier getRealmType() const { return "base:realm/overworld"; }
 			virtual Identifier getSoilCategory() const { return "base:category/plant_soil"; }

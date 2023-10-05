@@ -34,4 +34,8 @@ namespace Game3 {
 		realm.tileProvider.findPathState(place.position, &lock) = 0;
 		return true;
 	}
+
+	bool Sapling::drag(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers) {
+		return use(slot, stack, place, modifiers, {0.f, 0.f});
+	}
 }
