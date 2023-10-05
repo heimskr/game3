@@ -24,7 +24,7 @@ namespace Game3 {
 
 		EntityPtr entity = game.getAgent<Entity>(arguments.globalID);
 		if (!entity) {
-			WARN("EntityMovedPacket: Couldn't find entity " << arguments.globalID << ". Player is " << game.player->getGID());
+			// WARN("EntityMovedPacket: Couldn't find entity " << arguments.globalID << ". Player is " << game.player->getGID());
 			return;
 		}
 
