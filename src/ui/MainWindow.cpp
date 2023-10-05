@@ -452,6 +452,7 @@ namespace Game3 {
 		richPresence.tick();
 
 		glArea.throw_if_error();
+
 		glClearColor(.2f, .2f, .2f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		if (autofocus && game)

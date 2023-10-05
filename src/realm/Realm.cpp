@@ -60,6 +60,9 @@ namespace Game3 {
 	}
 
 	void Realm::initRendererRealms() {
+		if (getSide() != Side::Client)
+			return;
+
 		assert(baseRenderers);
 		assert(upperRenderers);
 
@@ -73,6 +76,9 @@ namespace Game3 {
 	}
 
 	void Realm::initRendererTileProviders() {
+		if (getSide() != Side::Client)
+			return;
+
 		assert(baseRenderers);
 		assert(upperRenderers);
 
@@ -171,8 +177,6 @@ namespace Game3 {
 			onFocus();
 
 		auto &client_game = game.toClient();
-		// Canvas &canvas = client_game.canvas;
-		// auto &multiplier = canvas.multiplier;
 
 		const auto bb_width  = width;
 		const auto bb_height = height;
@@ -227,6 +231,8 @@ namespace Game3 {
 		for (auto &row: *baseRenderers)
 			for (auto &renderer: row)
 				renderer.reupload();
+
+		getGame().toClient().activateContext();
 
 		for (auto &row: *upperRenderers)
 			for (auto &renderer: row)
@@ -765,7 +771,7 @@ namespace Game3 {
 		}
 
 		if (--threadContext.updateNeighborsDepth == 0) {
-			reupload();
+			queueReupload();
 			threadContext.updatedLayers.clear();
 		}
 	}
@@ -1017,10 +1023,12 @@ namespace Game3 {
 		auto lock = entitiesByChunk.uniqueLock();
 
 		if (auto iter = entitiesByChunk.find(chunk_position); iter != entitiesByChunk.end()) {
-			std::optional<std::unique_lock<std::shared_mutex>> sublock{iter->second->uniqueLock()};
+			auto sublock = iter->second->uniqueLock();
+
 			if (0 < iter->second->erase(entity)) {
 				if (iter->second->empty()) {
-					sublock.reset();
+					sublock.unlock();
+					sublock.release();
 					entitiesByChunk.erase(iter);
 				}
 			}

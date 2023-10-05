@@ -287,16 +287,19 @@ namespace Game3 {
 
 	bool ElementBufferedRenderer::generateElementBufferObject() {
 		uint32_t i = 0;
+
 		ebo.init<uint32_t, 6>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [&i](size_t, size_t) {
 			i += 4;
 			return std::array{i - 4, i - 3, i - 2, i - 3, i - 2, i - 1};
 		});
+
 		return ebo.getHandle() != 0;
 	}
 
 	bool ElementBufferedRenderer::generateVertexArrayObject() {
 		if (vbo.getHandle() != 0)
 			vao.init(vbo, {2, 2, 2, 2, 2, 2, 1});
+
 		return vao.getHandle() != 0;
 	}
 

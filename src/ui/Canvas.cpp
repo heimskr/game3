@@ -19,6 +19,7 @@ namespace Game3 {
 	void Canvas::drawGL() {
 		if (!game)
 			return;
+
 		game->activateContext();
 		spriteRenderer.update(width(), height());
 		rectangleRenderer.update(width(), height());
@@ -50,7 +51,7 @@ namespace Game3 {
 		});
 
 		if (RealmPtr realm = game->activeRealm.copyBase()) {
-			realm->render(width(), height(), center, scale, spriteRenderer, textRenderer, game->getDivisor());
+			realm->render(width(), height(), center, scale, spriteRenderer, textRenderer, game->getDivisor()); CHECKGL
 			realmBounds = game->getVisibleRealmBounds();
 		}
 	}

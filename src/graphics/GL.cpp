@@ -2,6 +2,13 @@
 #include "graphics/GL.h"
 
 namespace GL {
+	void checkGL(GLenum err, const char *file, int line) {
+		if (err) {
+			std::cerr << "\e[31mError at " << file << ':' << line << ": " << gluErrorString(err) << "\e[39m\n";
+			std::terminate();
+		}
+	}
+
 	GLuint makeFloatVAO(GLuint vbo, std::initializer_list<int> sizes) {
 		GLuint vao = -1;
 
