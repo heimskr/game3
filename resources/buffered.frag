@@ -40,7 +40,7 @@ void main() {
 	vec4 upper2 = texture(texture0, texCoordUpper2);
 	vec4 upper3 = texture(texture0, texCoordUpper3);
 
-	fluid.a *= fluidOpacity;
+	fluid.a = fluidOpacity;
 
 	vec4 mix1 = alphaComposite(base0, base1);
 	vec4 mix2 = alphaComposite(mix1,  fluid);
@@ -49,8 +49,9 @@ void main() {
 	vec4 mix5 = alphaComposite(mix4,  upper0);
 	vec4 mix6 = alphaComposite(mix5,  upper1);
 	vec4 mix7 = alphaComposite(mix6,  upper2);
+	vec4 mix8 = alphaComposite(mix7,  upper3);
 
-	FragColor = alphaComposite(mix7,  upper3);
+	FragColor = mix8;
 
 	// FragColor.a = 1.0;
 	// FragColor.r = 1.0;

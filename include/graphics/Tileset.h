@@ -67,6 +67,7 @@ namespace Game3 {
 			size_t rowCount(const Game &);
 			void setHash(std::string);
 			std::shared_ptr<AutotileSet> getAutotileSet(const Identifier &) const;
+			TileID getUpper(TileID) const;
 
 			const auto & getIDs()          const { return ids;          }
 			const auto & getNames()        const { return names;        }
@@ -120,6 +121,8 @@ namespace Game3 {
 			std::unordered_map<Identifier, std::shared_ptr<AutotileSet>> autotileSets;
 			/** Maps tilenames to autotile set pointers. */
 			std::unordered_map<Identifier, std::shared_ptr<AutotileSet>> autotileSetMap;
+			/** Maps base tile IDs for the lower portions of tall tiles to the tile IDs for the upper portions. */
+			std::unordered_map<TileID, TileID> uppers;
 
 			void setAutotile(const Identifier &tilename, const Identifier &autotile_name);
 

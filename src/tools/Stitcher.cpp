@@ -86,6 +86,8 @@ namespace Game3 {
 					out.stackCategories[Identifier(category)] = stack;
 		}
 
+		std::unordered_set<std::string> is_tall;
+
 		for (const auto &[name, json]: json_map) {
 			std::filesystem::path png_path = base_dir / name / "tile.png";
 			int width{}, height{}, channels{};
@@ -108,14 +110,18 @@ namespace Game3 {
 			if (json.at("land").get<bool>())
 				out.land.insert(tilename);
 
-			if (width != desired_dimension)
-				throw std::runtime_error("Invalid width for " + name + ": " + std::to_string(width) + " (expected " + std::to_string(desired_dimension) + ')');
-
-			if (height != desired_dimension)
-				throw std::runtime_error("Invalid height for " + name + ": " + std::to_string(height) + " (expected " + std::to_string(desired_dimension) + ')');
-
 			if (channels != 3 && channels != 4)
 				throw std::runtime_error("Invalid channel count for " + name + ": " + std::to_string(channels) + " (expected 3 or 4)");
+
+			if (desired_dimension == 16 && width == 16 && height == 32) {
+				is_tall.insert(std::move(name));
+			} else {
+				if (width != desired_dimension)
+					throw std::runtime_error("Invalid width for " + name + ": " + std::to_string(width) + " (expected " + std::to_string(desired_dimension) + ')');
+
+				if (height != desired_dimension)
+					throw std::runtime_error("Invalid height for " + name + ": " + std::to_string(height) + " (expected " + std::to_string(desired_dimension) + ')');
+			}
 		}
 
 		// We want to represent the 4x4 autotile sets as 16 wide, 1 tall lines of tiles.
@@ -125,7 +131,7 @@ namespace Game3 {
 		// For the sake of calculation, we can pretend that the tiles not part of autotile sets are
 		// arranged into lines just like the autotile sets. We add one because the top left tile of
 		// the tileset has to be empty.
-		const size_t effective_autotile_sets = 1 + autotiles.size() + updiv(single_tile_count, 16);
+		const size_t effective_autotile_sets = 1 + autotiles.size() + updiv(single_tile_count + is_tall.size(), 16);
 		// If the effective number of lines is no more than 16, then the square will be 16x16 tiles.
 		size_t dimension = 16;
 		// Otherwise, we need to take the square root of the effective number of lines and round it
@@ -194,9 +200,26 @@ namespace Game3 {
 				for (size_t x = 0; x < tilesize; ++x)
 					std::memcpy(&raw[4 * (x_index + x + dimension * (y_index + y))], &source[4 * (tilesize * y + x)], 4 * sizeof(uint8_t));
 
-			Identifier tilename = json_map.at(name).at("tilename");
-			out.ids[tilename] = tile_index;
-			out.names[tile_index] = std::move(tilename);
+
+			if (!is_tall.contains(name)) {
+				Identifier tilename = json_map.at(name).at("tilename");
+				out.ids[tilename] = tile_index;
+				out.names[tile_index] = std::move(tilename);
+
+				next(tilesize);
+				continue;
+			} else {
+				Identifier tilename = json_map.at(name).at("tilename");
+				out.ids[tilename] = tile_index + 1;
+				out.names[tile_index + 1] = tilename;
+				out.uppers[tile_index + 1] = tile_index;
+				out.names[tile_index] = std::move(tilename);
+				next(tilesize);
+			}
+
+			for (size_t y = 0; y < tilesize; ++y)
+				for (size_t x = 0; x < tilesize; ++x)
+					std::memcpy(&raw[4 * (x_index + x + dimension * (y_index + y))], &source[4 * (tilesize * (y + 16) + x)], 4 * sizeof(uint8_t));
 
 			next(tilesize);
 		}

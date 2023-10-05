@@ -229,7 +229,7 @@ namespace Game3 {
 		Game &game = realm->getGame();
 
 		Timer timer{"BufferedVBOInit"};
-		vbo.init<float, 19>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, &game, set_width, divisor, t_size, missing](size_t x, size_t y) {
+		vbo.init<float, 19>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, &game, &tileset, set_width, divisor, t_size, missing](size_t x, size_t y) {
 			const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
 
 			std::array<TileID, LAYER_COUNT> tiles{}, uppers{};
@@ -253,7 +253,10 @@ namespace Game3 {
 					static_cast<Index>(x)     + CHUNK_SIZE * (chunk_x + 1)
 				});
 
-				uppers[layer_index - 1] = upper_opt? *upper_opt : 0;
+				if (upper_opt)
+					uppers[layer_index - 1] = tileset.getUpper(*upper_opt);
+				else
+					uppers[layer_index - 1] = 0;
 			}
 
 			const auto fluid_opt = realm->tryFluid({

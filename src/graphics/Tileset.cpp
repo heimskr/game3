@@ -184,13 +184,19 @@ namespace Game3 {
 		hash = std::move(new_hash);
 	}
 
-	std::shared_ptr<AutotileSet> Tileset::getAutotileSet(const Identifier &identifier) const {
-		if (identifier.getPathStart() == "tile") {
-			if (auto iter = autotileSetMap.find(identifier); iter != autotileSetMap.end())
+	std::shared_ptr<AutotileSet> Tileset::getAutotileSet(const Identifier &id) const {
+		if (id.getPathStart() == "tile") {
+			if (auto iter = autotileSetMap.find(id); iter != autotileSetMap.end())
 				return iter->second;
-		} else if (auto iter = autotileSets.find(identifier); iter != autotileSets.end())
+		} else if (auto iter = autotileSets.find(id); iter != autotileSets.end())
 			return iter->second;
 		return {};
+	}
+
+	TileID Tileset::getUpper(TileID id) const {
+		if (auto iter = uppers.find(id); iter != uppers.end())
+			return iter->second;
+		return 0;
 	}
 
 	const TileID & Tileset::operator[](const Identifier &tilename) const {
