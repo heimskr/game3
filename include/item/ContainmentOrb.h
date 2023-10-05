@@ -11,5 +11,7 @@ namespace Game3 {
 
 			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
 			std::string getTooltip(const ItemStack &) override;
+			Identifier getTextureIdentifier(const ItemStack &) override;
+			bool isTextureCacheable() const override { return false; }
 	};
 }

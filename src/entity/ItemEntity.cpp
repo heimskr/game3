@@ -26,7 +26,7 @@ namespace Game3 {
 		if (getSide() != Side::Client)
 			return;
 		std::shared_ptr<ItemTexture> item_texture = game.registry<ItemTextureRegistry>().at(stack.item->identifier);
-		texture = item_texture->getTexture(game);
+		texture = stack.getTexture(game);
 		texture->init();
 		xOffset = item_texture->x / 2.f;
 		yOffset = item_texture->y / 2.f;

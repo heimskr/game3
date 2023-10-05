@@ -50,13 +50,13 @@ namespace Game3 {
 		NamedRegisterable(std::move(id_)), name(std::move(name_)), basePrice(base_price), maxCount(max_count) {}
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage(const Game &game, const ItemStack &stack) {
-		if (!cachedImage)
+		if (!isTextureCacheable() || !cachedImage)
 			cachedImage = makeImage(game, stack);
 		return cachedImage;
 	}
 
-	Glib::RefPtr<Gdk::Pixbuf> Item::makeImage(const Game &game, const ItemStack &) {
-		auto item_texture = game.registry<ItemTextureRegistry>().at(identifier);
+	Glib::RefPtr<Gdk::Pixbuf> Item::makeImage(const Game &game, const ItemStack &stack) {
+		auto item_texture = game.registry<ItemTextureRegistry>().at(getTextureIdentifier(stack));
 		auto texture = item_texture->getTexture(game);
 		texture->init();
 		const int width  = item_texture->width;
@@ -64,7 +64,7 @@ namespace Game3 {
 		const ptrdiff_t channels = texture->format == GL_RGBA? 4 : 3;
 		const size_t row_size = channels * width;
 
-		if (!rawImage) {
+		if (!rawImage || !isTextureCacheable()) {
 			rawImage = std::make_unique<uint8_t[]>(channels * width * height);
 			uint8_t *raw_pointer = rawImage.get();
 			uint8_t *texture_pointer = texture->data.get() + item_texture->y * texture->width * channels + static_cast<ptrdiff_t>(item_texture->x) * channels;
@@ -77,6 +77,10 @@ namespace Game3 {
 		constexpr int doublings = 3;
 		return Gdk::Pixbuf::create_from_data(rawImage.get(), Gdk::Colorspace::RGB, texture->alpha, 8, width, height, int(row_size))
 		       ->scale_simple(width << doublings, height << doublings, Gdk::InterpType::NEAREST);
+	}
+
+	Identifier Item::getTextureIdentifier(const ItemStack &) {
+		return identifier;
 	}
 
 	void Item::getOffsets(const Game &game, std::shared_ptr<Texture> &texture, float &x_offset, float &y_offset) {
@@ -97,10 +101,11 @@ namespace Game3 {
 		return shared_from_this();
 	}
 
-	std::shared_ptr<Texture> Item::getTexture(const Game &game) {
-		if (cachedTexture)
+	std::shared_ptr<Texture> Item::getTexture(const ItemStack &stack) {
+		if (isTextureCacheable() && cachedTexture)
 			return cachedTexture;
 
+		const Game &game = stack.getGame();
 		return cachedTexture = game.registry<ItemTextureRegistry>().at(identifier)->getTexture(game);
 	}
 
@@ -155,7 +160,7 @@ namespace Game3 {
 	}
 
 	Glib::RefPtr<Gdk::Pixbuf> ItemStack::getImage(const Game &game_) {
-		if (cachedImage)
+		if (!(item && !item->isTextureCacheable()) && cachedImage)
 			return cachedImage;
 
 		if (item)
@@ -207,8 +212,8 @@ namespace Game3 {
 		realm->spawn<ItemEntity>(position, *this);
 	}
 
-	std::shared_ptr<Texture> ItemStack::getTexture(const Game &game) const {
-		return item->getTexture(game);
+	std::shared_ptr<Texture> ItemStack::getTexture(const Game &) const {
+		return item->getTexture(*this);
 	}
 
 	void ItemStack::fromJSON(const Game &game, const nlohmann::json &json, ItemStack &stack) {

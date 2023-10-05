@@ -19,6 +19,8 @@ namespace Game3 {
 				return out;
 			}
 
+			std::string getName() const override { return "Dog"; }
+
 			/** You do not get to kill the dog. */
 			HitPoints maxHealth() const override { return INVINCIBLE; }
 

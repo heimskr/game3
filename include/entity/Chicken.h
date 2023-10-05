@@ -19,6 +19,8 @@ namespace Game3 {
 				return out;
 			}
 
+			std::string getName() const override { return "Chicken"; }
+
 			friend class Entity;
 
 		protected:
