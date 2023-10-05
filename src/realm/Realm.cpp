@@ -771,7 +771,8 @@ namespace Game3 {
 		}
 
 		if (--threadContext.updateNeighborsDepth == 0) {
-			queueReupload();
+			if (getSide() == Side::Client)
+				queueReupload();
 			threadContext.updatedLayers.clear();
 		}
 	}

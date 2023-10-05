@@ -129,6 +129,8 @@
 			"base:item/wheat":                ["base:texture/tinywonder",   16,  80],
 			"base:item/tomato_seeds":         ["base:texture/tinywonder",    0,  96],
 			"base:item/tomato":               ["base:texture/tinywonder",   16,  96],
+			"base:item/corn_seeds":           ["base:texture/tinywonder",    0, 112],
+			"base:item/corn":                 ["base:texture/tinywonder",   16, 112],
 			"base:item/flour":                ["base:texture/tinywonder",   32,  80],
 			"base:item/egg":                  ["base:texture/tinywonder",   48,  80],
 			"base:item/iron_hoe":             ["base:texture/tinywonder",   64,  80],

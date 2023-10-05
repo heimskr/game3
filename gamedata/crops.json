@@ -32,6 +32,15 @@
 				"chance": 1.0
 			},
 
+			"base:crop/corn": {
+				"stages": ["base:tile/corn_0", "base:tile/corn_1", "base:tile/corn_2", "base:tile/corn_3", "base:tile/corn_4"],
+				"products": [
+					["constant", ["base:item/corn"], 1],
+					["exponential", ["base:item/corn_seeds"], 1, 0.25]
+				],
+				"chance": 1.0
+			},
+
 			"base:crop/tree1": {
 				"type": "base:tile/tree",
 				"stages": ["base:tile/tree1_stump", "base:tile/tree1"],
