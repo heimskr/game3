@@ -843,22 +843,41 @@ namespace Game3 {
 			}
 		}
 
-		const float delta = canvas->scale / 20.f;
 		switch (keyval) {
 			case GDK_KEY_Down:
-				canvas->center.second -= delta;
+				game->player->face(Direction::Down);
 				break;
 			case GDK_KEY_Up:
-				canvas->center.second += delta;
+				game->player->face(Direction::Up);
 				break;
 			case GDK_KEY_Left:
-				canvas->center.first += delta;
+				game->player->face(Direction::Left);
 				break;
 			case GDK_KEY_Right:
-				canvas->center.first -= delta;
+				game->player->face(Direction::Right);
 				break;
 			default:
 				break;
+		}
+
+		if (!autofocus) {
+			const float delta = canvas->scale / 20.f;
+			switch (keyval) {
+				case GDK_KEY_Down:
+					canvas->center.second -= delta;
+					break;
+				case GDK_KEY_Up:
+					canvas->center.second += delta;
+					break;
+				case GDK_KEY_Left:
+					canvas->center.first += delta;
+					break;
+				case GDK_KEY_Right:
+					canvas->center.first -= delta;
+					break;
+				default:
+					break;
+			}
 		}
 	}
 

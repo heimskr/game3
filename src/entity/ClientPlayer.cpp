@@ -131,4 +131,11 @@ namespace Game3 {
 		lastMessage = std::move(message);
 		lastMessageAge = 0;
 	}
+
+	void ClientPlayer::face(Direction new_direction) {
+		if (direction.exchange(new_direction) == new_direction)
+			return;
+
+		send(MovePlayerPacket(position, new_direction, new_direction));
+	}
 }
