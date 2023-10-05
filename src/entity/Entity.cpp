@@ -503,12 +503,12 @@ namespace Game3 {
 		{
 			auto lock = offset.sharedLock();
 			const auto [row, column] = getPosition();
-			canvas.center.x() = -(column - map_length / 2.f + 0.5f) - offset.x;
-			canvas.center.y() = -(row    - map_length / 2.f + 0.5f) - offset.y;
+			canvas.center.first  = -(column - map_length / 2. + .5) - offset.x;
+			canvas.center.second = -(row    - map_length / 2. + .5) - offset.y;
 		}
 		if (adjust) {
-			canvas.center.x() -= canvas.width()  / 32.f / canvas.scale;
-			canvas.center.y() += canvas.height() / 32.f / canvas.scale;
+			canvas.center.first  -= canvas.width()  / 32. / canvas.scale;
+			canvas.center.second += canvas.height() / 32. / canvas.scale;
 		}
 	}
 

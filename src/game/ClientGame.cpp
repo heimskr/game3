@@ -91,8 +91,8 @@ namespace Game3 {
 		const auto scale = canvas.scale;
 		const auto tile_size = realm->getTileset().getTileSize();
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
-		x -= canvas.width() / 2.f - (map_length * tile_size / 4.f) * scale + canvas.center.x() * canvas.magic * scale;
-		y -= canvas.height() / 2.f - (map_length * tile_size / 4.f) * scale + canvas.center.y() * canvas.magic * scale;
+		x -= canvas.width()  / 2. - (map_length * tile_size / 4.) * scale + canvas.center.first  * canvas.magic * scale;
+		y -= canvas.height() / 2. - (map_length * tile_size / 4.) * scale + canvas.center.second * canvas.magic * scale;
 		const double sub_x = x < 0.? 1. : 0.;
 		const double sub_y = y < 0.? 1. : 0.;
 		x /= tile_size * scale / 2.f;

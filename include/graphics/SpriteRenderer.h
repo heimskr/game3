@@ -13,16 +13,16 @@ namespace Game3 {
 	class Texture;
 
 	struct RenderOptions {
-		float x = 0.f;
-		float y = 0.f;
-		float xOffset = 0.f;
-		float yOffset = 0.f;
-		float sizeX = 16.f;
-		float sizeY = 16.f;
-		float scaleX = 1.f;
-		float scaleY = 1.f;
-		float angle = 0.f;
-		float alpha = 1.f;
+		double x = 0.f;
+		double y = 0.f;
+		double xOffset = 0.f;
+		double yOffset = 0.f;
+		double sizeX = 16.f;
+		double sizeY = 16.f;
+		double scaleX = 1.f;
+		double scaleY = 1.f;
+		double angle = 0.f;
+		double alpha = 1.f;
 		bool hackY = true;
 		bool invertY = true;
 	};
@@ -31,9 +31,9 @@ namespace Game3 {
 		public:
 			Canvas *canvas = nullptr;
 			Shader shader;
-			float divisor = 1.f;
-			float centerX = 0.f;
-			float centerY = 0.f;
+			double divisor = 1.f;
+			double centerX = 0.f;
+			double centerY = 0.f;
 			int backbufferWidth = -1;
 			int backbufferHeight = -1;
 
@@ -49,18 +49,18 @@ namespace Game3 {
 			void remove();
 			void update(int backbuffer_width, int backbuffer_height);
 
-			void drawOnMap(Texture &, float x, float y, float scale = 1.f, float angle = 0.f, float alpha = 1.f);
+			void drawOnMap(Texture &, double x, double y, double scale = 1.f, double angle = 0.f, double alpha = 1.f);
 			void drawOnMap(Texture &, RenderOptions = {});
 			void drawOnMap(GL::Texture &, RenderOptions = {});
 
-			void drawOnScreen(Texture &, float x, float y, float scale = 1.f, float angle = 0.f, float alpha = 1.f);
+			void drawOnScreen(Texture &, double x, double y, double scale = 1.f, double angle = 0.f, double alpha = 1.f);
 			void drawOnScreen(Texture &, RenderOptions = {});
 			void drawOnScreen(GL::Texture &, RenderOptions = {});
 
-			// void drawOnMap(Texture &, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale = 1.f, float angle = 0.f, float alpha = 1.f);
-			// void drawOnMap(GL::Texture &, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale = 1.f, float angle = 0.f, float alpha = 1.f);
-			// void drawOnScreen(Texture &, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale = 1.f, float angle = 0.f, float alpha = 1.f);
-			// void drawOnScreen(GL::Texture &, float x, float y, float x_offset, float y_offset, float size_x, float size_y, float scale = 1.f, float angle = 0.f, float alpha = 1.f);
+			// void drawOnMap(Texture &, double x, double y, double x_offset, double y_offset, double size_x, double size_y, double scale = 1.f, double angle = 0.f, double alpha = 1.f);
+			// void drawOnMap(GL::Texture &, double x, double y, double x_offset, double y_offset, double size_x, double size_y, double scale = 1.f, double angle = 0.f, double alpha = 1.f);
+			// void drawOnScreen(Texture &, double x, double y, double x_offset, double y_offset, double size_x, double size_y, double scale = 1.f, double angle = 0.f, double alpha = 1.f);
+			// void drawOnScreen(GL::Texture &, double x, double y, double x_offset, double y_offset, double size_x, double size_y, double scale = 1.f, double angle = 0.f, double alpha = 1.f);
 
 			template <typename T>
 			void operator()(T &texture, RenderOptions options) {
@@ -75,6 +75,6 @@ namespace Game3 {
 
 			void initRenderData();
 			void setupShader(int texture_width, int texture_height, const RenderOptions &);
-			void hackY(float &y, float y_offset, float scale);
+			void hackY(double &y, double y_offset, double scale);
 	};
 }

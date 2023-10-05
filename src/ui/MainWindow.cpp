@@ -179,8 +179,8 @@ namespace Game3 {
 			lastDragX = x;
 			lastDragY = y;
 			if (canvas) {
-				canvas->center.x() += delta_x / (canvas->magic * canvas->scale);
-				canvas->center.y() += delta_y / (canvas->magic * canvas->scale);
+				canvas->center.first  += delta_x / (canvas->magic * canvas->scale);
+				canvas->center.second += delta_y / (canvas->magic * canvas->scale);
 			}
 		});
 		glArea.add_controller(drag);
@@ -268,11 +268,11 @@ namespace Game3 {
 
 			const auto difference_x = w / old_scale - w / canvas->scale;
 			const auto side_ratio_x = (glAreaMouseX - w / 2.f) / w;
-			canvas->center.x() -= difference_x * side_ratio_x / 8.f;
+			canvas->center.first -= difference_x * side_ratio_x / 8.f;
 
 			const auto difference_y = h / old_scale - h / canvas->scale;
 			const auto side_ratio_y = (glAreaMouseY - h / 2.f) / h;
-			canvas->center.y() -= difference_y * side_ratio_y / 8.f;
+			canvas->center.second -= difference_y * side_ratio_y / 8.f;
 
 			return true;
 		}, false);
@@ -846,16 +846,16 @@ namespace Game3 {
 		const float delta = canvas->scale / 20.f;
 		switch (keyval) {
 			case GDK_KEY_Down:
-				canvas->center.y() -= delta;
+				canvas->center.second -= delta;
 				break;
 			case GDK_KEY_Up:
-				canvas->center.y() += delta;
+				canvas->center.second += delta;
 				break;
 			case GDK_KEY_Left:
-				canvas->center.x() += delta;
+				canvas->center.first += delta;
 				break;
 			case GDK_KEY_Right:
-				canvas->center.x() -= delta;
+				canvas->center.first -= delta;
 				break;
 			default:
 				break;

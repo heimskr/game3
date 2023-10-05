@@ -112,7 +112,7 @@ namespace Game3 {
 			/** Called when the realm is to be removed from the game. */
 			virtual void onRemove();
 			void createRenderers();
-			void render(int width, int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &, TextRenderer &, float game_time);
+			void render(int width, int height, const std::pair<double, double> &center, float scale, SpriteRenderer &, TextRenderer &, float game_time);
 			/** Reuploads fluids and terrain in all layers. */
 			void reupload();
 			EntityPtr addUnsafe(const EntityPtr &, const Position &);

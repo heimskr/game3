@@ -169,7 +169,7 @@ namespace Game3 {
 		upperRenderers.emplace();
 	}
 
-	void Realm::render(const int width, const int height, const Eigen::Vector2f &center, float scale, SpriteRenderer &sprite_renderer, TextRenderer &text_renderer, float game_time) {
+	void Realm::render(const int width, const int height, const std::pair<double, double> &center, float scale, SpriteRenderer &sprite_renderer, TextRenderer &text_renderer, float game_time) {
 		if (getSide() != Side::Client)
 			return;
 
@@ -187,17 +187,17 @@ namespace Game3 {
 			for (auto &row: *baseRenderers) {
 				for (auto &renderer: row) {
 					renderer.onBackbufferResized(bb_width, bb_height);
-					renderer.render(outdoors? game_time : 1, scale, center.x(), center.y());
+					renderer.render(outdoors? game_time : 1, scale, center.first, center.second);
 				}
 			}
 		}
 
-		sprite_renderer.centerX = center.x();
-		sprite_renderer.centerY = center.y();
+		sprite_renderer.centerX = center.first;
+		sprite_renderer.centerY = center.second;
 		sprite_renderer.update(bb_width, bb_height);
 		sprite_renderer.divisor = outdoors? game_time : 1;
-		text_renderer.centerX = center.x();
-		text_renderer.centerY = center.y();
+		text_renderer.centerX = center.first;
+		text_renderer.centerY = center.second;
 		text_renderer.update(bb_width, bb_height);
 
 		{
@@ -216,7 +216,7 @@ namespace Game3 {
 			for (auto &row: *upperRenderers) {
 				for (auto &renderer: row) {
 					renderer.onBackbufferResized(bb_width, bb_height);
-					renderer.render(outdoors? game_time : 1, scale, center.x(), center.y());
+					renderer.render(outdoors? game_time : 1, scale, center.first, center.second);
 				}
 			}
 		}

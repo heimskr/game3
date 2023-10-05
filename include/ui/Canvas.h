@@ -22,15 +22,15 @@ namespace Game3 {
 
 	class Canvas {
 		public:
-			constexpr static float DEFAULT_SCALE = 2.f;
+			constexpr static double DEFAULT_SCALE = 2.;
 			constexpr static int AUTOFOCUS_DELAY = 1;
 
 			MainWindow &window;
 			std::shared_ptr<ClientGame> game;
-			Eigen::Vector2f center {0.f, 0.f};
-			float scale = DEFAULT_SCALE;
-			SpriteRenderer spriteRenderer {*this};
-			TextRenderer textRenderer {*this};
+			std::pair<double, double> center{0., 0.};
+			double scale = DEFAULT_SCALE;
+			SpriteRenderer spriteRenderer{*this};
+			TextRenderer textRenderer{*this};
 			RectangleRenderer rectangleRenderer;
 			GL::Texture textureA;
 			GL::Texture textureB;
