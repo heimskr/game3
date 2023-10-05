@@ -359,8 +359,16 @@ namespace Game3 {
 				tile_entity->decode(game, buffer);
 
 				// TODO: functionize this
-				realm->tileEntities.emplace(tile_entity->position, tile_entity);
-				realm->tileEntitiesByGID[tile_entity->globalID] = tile_entity;
+				{
+					auto lock = realm->tileEntities.uniqueLock();
+					realm->tileEntities.emplace(tile_entity->position, tile_entity);
+				}
+
+				{
+					auto lock = realm->tileEntitiesByGID.uniqueLock();
+					realm->tileEntitiesByGID[tile_entity->globalID] = tile_entity;
+				}
+
 				realm->attach(tile_entity);
 				tile_entity->onSpawn();
 			}
@@ -388,8 +396,16 @@ namespace Game3 {
 				entity->decode(buffer);
 				entity->init(game);
 
-				realm->entities.insert(entity);
-				realm->entitiesByGID[entity->globalID] = entity;
+				{
+					auto lock = realm->entities.uniqueLock();
+					realm->entities.insert(entity);
+				}
+
+				{
+					auto lock = realm->entitiesByGID.uniqueLock();
+					realm->entitiesByGID[entity->globalID] = entity;
+				}
+
 				realm->attach(entity);
 			}
 		}

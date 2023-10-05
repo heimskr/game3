@@ -303,9 +303,8 @@ namespace Game3 {
 	void Realm::tick(float delta) {
 		ticking = true;
 
-		for (const auto &[entity, position]: entityInitializationQueue.steal()) {
+		for (const auto &[entity, position]: entityInitializationQueue.steal())
 			initEntity(entity, position);
-		}
 
 		for (const auto &[entity, position]: entityAdditionQueue.steal())
 			add(entity, position);
@@ -815,6 +814,10 @@ namespace Game3 {
 				json["entities"].push_back(std::move(entity_json));
 			}
 		}
+	}
+
+	void Realm::queueEntityInit(EntityPtr entity, const Position &position) {
+		entityInitializationQueue.emplace(std::move(entity), position);
 	}
 
 	bool Realm::isWalkable(Index row, Index column, const Tileset &tileset) {

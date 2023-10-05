@@ -211,6 +211,8 @@ namespace Game3 {
 			/** Full data doesn't include terrain, entities or tile entities. */
 			virtual void toJSON(nlohmann::json &, bool full_data) const;
 
+			void queueEntityInit(EntityPtr, const Position &);
+
 			template <typename T, typename... Args>
 			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {
 				Game &game_ref = getGame();

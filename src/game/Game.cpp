@@ -37,6 +37,7 @@
 #include "item/CentrifugeItem.h"
 #include "item/ChemicalItem.h"
 #include "item/ChemicalReactorItem.h"
+#include "item/ContainmentOrb.h"
 #include "item/EmptyFlask.h"
 #include "item/FilledFlask.h"
 #include "item/Floor.h"
@@ -373,6 +374,8 @@ namespace Game3 {
 		add(std::make_shared<FluidPipeItem>(4));
 
 		add(std::make_shared<CentrifugeItem>("base:item/centrifuge", "Centrifuge", 999, 64)); // TODO: cost
+
+		add(std::make_shared<ContainmentOrb>("base:item/contorb", "Containment Orb", 64, 1)); // TODO: cost
 
 		add(std::make_shared<EnergyPipeItem>(4));
 
