@@ -6,6 +6,7 @@
 	"data": [["base:entity_texture_map", {
 		"base:entity/player":     ["base:texture/gangblanc",  1],
 		"base:entity/chair":      ["base:texture/chair",      1],
+		"base:entity/moth":       ["base:texture/moth",       1],
 		"base:entity/item":       ["base:texture/item",       0],
 		"base:entity/miner":      ["base:texture/villager1",  2],
 		"base:entity/merchant":   ["base:texture/villager1",  2],
