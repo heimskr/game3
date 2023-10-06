@@ -12,6 +12,8 @@ zig = find_program('zig', required: true)
 resgen_gen = custom_target('resgen',
 	input: 'resgen.zig',
 	output: 'resgen',
+	build_by_default: true,
+	build_always_stale: true,
 	command: [zig, 'build-exe', '-O', 'ReleaseSmall', '--main-pkg-path', meson.current_source_dir() / '..', '@INPUT@'])
 
 resources_h = custom_target('resources-header-gen',
