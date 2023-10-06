@@ -18,18 +18,20 @@ namespace Game3 {
 
 		if (ItemStack *active_stack = inventory->getActive()) {
 			if (active_stack->hasAttribute("base:attribute/axe")) {
-				for (const ItemStack &stack: crop->products.getStacks())
-					if (std::optional<ItemStack> leftover = inventory->add(stack))
-						leftover->spawn(place.realm, place.position);
+				if (auto tilename = place.getName(layer); tilename && tilename->get() == crop->stages.back()) {
+					for (const ItemStack &stack: crop->products.getStacks())
+						if (std::optional<ItemStack> leftover = inventory->add(stack))
+							leftover->spawn(place.realm, place.position);
 
-				// Remove tree
-				place.set(layer, 0);
+					// Remove tree
+					place.set(layer, 0);
 
-				// Handle axe durability
-				if (active_stack->reduceDurability())
-					inventory->erase(inventory->activeSlot);
+					// Handle axe durability
+					if (active_stack->reduceDurability())
+						inventory->erase(inventory->activeSlot);
 
-				return true;
+					return true;
+				}
 			}
 		}
 
