@@ -14,7 +14,7 @@ resgen_gen = custom_target('resgen',
 	output: 'resgen',
 	build_by_default: true,
 	build_always_stale: true,
-	command: [zig, 'build-exe', '-O', 'ReleaseSmall', '--main-pkg-path', meson.current_source_dir() / '..', '@INPUT@'])
+	command: ['../hack-resgen.sh', '@BUILD_ROOT@', meson.project_source_root()])
 
 resources_h = custom_target('resources-header-gen',
 	output: 'resources.h',
@@ -25,7 +25,7 @@ resources_h = custom_target('resources-header-gen',
 resources_o = custom_target('resources-obj-gen',
 	input: 'resources.zig',
 	output: 'resources.o',
-	command: ['../hack.sh', '@BUILD_ROOT@', meson.project_source_root()])
+	command: ['../hack-resources.sh', '@BUILD_ROOT@', meson.project_source_root()])
 
 resources_dep = declare_dependency(sources: resources_o[0])
 
