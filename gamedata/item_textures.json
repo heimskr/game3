@@ -166,7 +166,9 @@
 			"base:item/bread":                ["base:texture/kazzter",      32,   0],
 			"base:item/sandwich":             ["base:texture/kazzter",      48,   0],
 			"base:item/contorb":              ["base:texture/indfor",        0,   0],
-			"base:item/contorb_full":         ["base:texture/indfor",       16,   0]
+			"base:item/contorb_full":         ["base:texture/indfor",       16,   0],
+			"base:item/yeast":                ["base:texture/custom",      192,   0]
+
 		}]
 	]
 }

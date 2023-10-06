@@ -5,7 +5,6 @@ namespace GL {
 	void checkGL(GLenum err, const char *file, int line) {
 		if (err) {
 			std::cerr << "\e[31mError at " << file << ':' << line << ": " << gluErrorString(err) << "\e[39m\n";
-			std::terminate();
 		}
 	}
 

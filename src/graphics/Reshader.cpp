@@ -1,12 +1,13 @@
-#include <iostream>
-
-#include <glm/gtc/matrix_transform.hpp>
-
 #include "resources.h"
+#include "Log.h"
 #include "graphics/Shader.h"
 #include "graphics/GL.h"
 #include "graphics/Reshader.h"
 #include "util/Util.h"
+
+#include <iostream>
+
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace Game3 {
 	Reshader::Reshader(std::string_view fragment): shader("reshader") {
@@ -93,7 +94,9 @@ namespace Game3 {
 		glBindVertexArray(quadVAO); CHECKGL
 		glEnableVertexAttribArray(0); CHECKGL
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr); CHECKGL
-		glBindBuffer(GL_ARRAY_BUFFER, old_abb); CHECKGL
+		glBindBuffer(GL_ARRAY_BUFFER, old_abb); CHECKGL_SET
+		if (gl_err)
+			WARN("old_abb = " << old_abb);
 		glBindVertexArray(0); CHECKGL
 		initialized = true;
 	}
