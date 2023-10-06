@@ -106,6 +106,11 @@
 				"station": "base:station/cauldron"
 			}],
 			["base:crafting_recipe", {
+				"input":  [["base:item/wheat", 1]],
+				"output": [["base:item/flour", 1]],
+				"station": "base:station/millstone"
+			}],
+			["base:crafting_recipe", {
 				"input":  [["base:item/sand", 2]],
 				"output": [["base:item/silicon", 1]],
 				"station": "base:station/purifier"
@@ -119,6 +124,10 @@
 				"input":  [["base:item/electronics", 4], ["base:item/iron_bar", 8]],
 				"output": [["base:item/purifier", 1]],
 				"station": "base:station/anvil"
+			}],
+			["base:crafting_recipe", {
+				"input":  [["base:item/wood", 2], ["base:item/stone", 10]],
+				"output": [["base:item/millstone", 1]]
 			}],
 			["base:crafting_recipe", {
 				"input":  [["base:item/pot", 1], ["base:item/sapling", 1]],

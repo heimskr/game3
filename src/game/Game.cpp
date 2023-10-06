@@ -307,6 +307,10 @@ namespace Game3 {
 			return nullptr != TileEntity::spawn<CraftingStation>(place, "base:tile/purifier", place.position, "base:station/purifier");
 		}));
 
+		add(Furniture::createCustom("base:item/millstone", "Millstone", 20, [](const Place &place) -> bool {
+			return nullptr != TileEntity::spawn<CraftingStation>(place, "base:tile/millstone", place.position, "base:station/millstone");
+		}));
+
 		add(Furniture::createCustom("base:item/chest", "Chest", 100, [](const Place &place) -> bool {
 			auto out = TileEntity::spawn<Chest>(place, "base:tile/chest", place.position, "Chest");
 			if (!out)

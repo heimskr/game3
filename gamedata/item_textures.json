@@ -58,6 +58,7 @@
 			"base:item/cauldron":             ["base:texture/tileset",     144, 208],
 			"base:item/volcanic_sand":        ["base:texture/palisade",     80,   0],
 			"base:item/purifier":             ["base:texture/tileset",     112, 224],
+			"base:item/millstone":            ["base:texture/tileset",       0,  16],
 			"base:item/silicon":              ["base:texture/palisade",     96,   0],
 			"base:item/electronics":          ["base:texture/custom",      112,   0],
 			"base:item/fire_opal":            ["base:texture/custom",      128,   0],
