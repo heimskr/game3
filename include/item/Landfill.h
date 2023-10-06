@@ -10,36 +10,18 @@
 namespace Game3 {
 	class Landfill: public Item {
 		public:
-			constexpr static ItemCount DEFAULT_COUNT = 2;
+			constexpr static ItemCount DEFAULT_COUNT = 1;
 
-			struct Result {
-				ItemStack required;
-				Identifier newTile;
-			};
-
-			using RequirementFn = std::function<std::optional<Result>(const Place &)>;
-
-			std::optional<RequirementFn> requirement;
-
-			Landfill(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count, RequirementFn);
-
-			// TODO: support tilemap predicates (in case other realms end up not using the monomap)
-			Landfill(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count, const Identifier &tileset_name, const Identifier &required_tile, const ItemStack &requirement, const Identifier &new_tile);
-
-			/** Like the other function-creating instruction, but using this item as a requirement */
-			Landfill(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count, Identifier tileset_name, Identifier required_tile, ItemCount required_count, Identifier new_tile);
+			Landfill(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count, Identifier terrain_name, Identifier submerged_name = {}, ItemCount required_count = DEFAULT_COUNT);
 
 			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
-
-			virtual std::optional<Result> callRequirement(const Place &);
-
-			bool canUseOnWorld() const override { return true; }
+			bool drag(Slot, ItemStack &, const Place &, Modifiers) override;
+			bool canUseOnWorld() const override;
 
 		private:
-			Identifier tilesetName;
-			Identifier requiredTile;
-			ItemCount requiredCount = -1;
-			Identifier newTile;
+			Identifier terrainName;
+			Identifier submergedName;
+			ItemCount  requiredCount = -1;
 
 			bool fixRequirement();
 	};

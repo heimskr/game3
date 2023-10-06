@@ -47,7 +47,6 @@
 #include "item/Hoe.h"
 #include "item/Item.h"
 #include "item/Landfill.h"
-#include "item/Landfills.h"
 #include "item/Mead.h"
 #include "item/Mushroom.h"
 #include "item/Pickaxe.h"
@@ -208,7 +207,6 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/oil",             "Oil",                15, 64));
 		add(std::make_shared<Item>("base:item/wood",            "Wood",                3, 64));
 		add(std::make_shared<Item>("base:item/cactus",          "Cactus",              4, 64));
-		add(std::make_shared<Item>("base:item/stone",           "Stone",               1, 64));
 		add(std::make_shared<Item>("base:item/iron_bar",        "Iron Bar",           16, 64));
 		add(std::make_shared<Item>("base:item/gold_bar",        "Gold Bar",           45, 64));
 		add(std::make_shared<Item>("base:item/plank",           "Plank",               4, 64));
@@ -247,13 +245,13 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/black_trumpet",   "Black Trumpet",      10, 64));
 		add(std::make_shared<Item>("base:item/grey_knight",     "Grey Knight",        10, 64));
 		add(std::make_shared<Item>("base:item/fire_opal",       "Fire Opal",          50, 64));
-		add(std::make_shared<Item>("base:item/grimstone",       "Grimstone",           2, 64));
 		add(std::make_shared<Item>("base:item/flour",           "Flour",              10, 64));
 		add(std::make_shared<Item>("base:item/baguette",        "Baguette",           12, 64));
 		add(std::make_shared<Item>("base:item/cheese",          "Cheese",              8, 64));
 		add(std::make_shared<Item>("base:item/knife",           "Knife",              25, 64));
 		add(std::make_shared<Item>("base:item/bread",           "Bread",               6, 64));
 		add(std::make_shared<Item>("base:item/yeast",           "Yeast",               4, 64));
+		add(std::make_shared<Item>("base:item/clay",            "Clay",                2, 64));
 
 		add(std::make_shared<Mead>("base:item/mead", "Mead", 10, 16));
 
@@ -283,9 +281,10 @@ namespace Game3 {
 		add(std::make_shared<Pickaxe>("base:item/gold_pickaxe",    "Gold Pickaxe",    400, .75f,  64, "base:attribute/pickaxe"));
 		add(std::make_shared<Pickaxe>("base:item/diamond_pickaxe", "Diamond Pickaxe", 900,  1.f, 512, "base:attribute/pickaxe"));
 
-		add(std::make_shared<Landfill>("base:item/sand",          "Sand",          1, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/sand"));
-		add(std::make_shared<Landfill>("base:item/volcanic_sand", "Volcanic Sand", 3, 64, "base:tileset/monomap", "base:tile/shallow_water", Landfill::DEFAULT_COUNT, "base:tile/volcanic_sand"));
-		add(std::make_shared<Landfill>("base:item/clay",          "Clay",          2, 64, clayRequirement));
+		add(std::make_shared<Landfill>("base:item/sand",          "Sand",          1, 64, "base:tile/sand"));
+		add(std::make_shared<Landfill>("base:item/volcanic_sand", "Volcanic Sand", 3, 64, "base:tile/volcanic_sand"));
+		add(std::make_shared<Landfill>("base:item/stone",         "Stone",         1, 64, "base:tile/stone", "base:tile/cave_wall"));
+		add(std::make_shared<Landfill>("base:item/grimstone",     "Grimstone",     2, 64, "base:tile/grimstone"));
 
 		add(std::make_shared<PumpItem>("base:item/pump", "Pump", 999, 64)); // TODO: cost
 		add(std::make_shared<TankItem>("base:item/tank", "Tank", 999, 64)); // TODO: cost

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "net/Buffer.h"
 #include "packet/Packet.h"
 
 namespace Game3 {
