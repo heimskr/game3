@@ -4,9 +4,9 @@
 #include "worldgen/WorldGen.h"
 
 namespace Game3 {
-	class Overworld: public Realm {
+	class ShadowRealm: public Realm {
 		public:
-			static Identifier ID() { return "base:realm/overworld"; }
+			static Identifier ID() { return "base:realm/shadow"; }
 
 			WorldGenParams worldgenParams;
 

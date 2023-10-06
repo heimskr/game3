@@ -30,7 +30,7 @@ namespace Game3::WorldGen {
 		const auto width  = range.tileWidth();
 		const auto height = range.tileHeight();
 
-		auto &provider = realm->tileProvider;
+		TileProvider &provider = realm->tileProvider;
 
 		for (auto y = range.topLeft.y; y <= range.bottomRight.y; ++y)
 			for (auto x = range.topLeft.x; x <= range.bottomRight.x; ++x)
@@ -43,7 +43,7 @@ namespace Game3::WorldGen {
 		noise::module::Perlin p2;
 		p2.SetSeed(noise_seed * 3 - 1);
 
-		const auto &tileset = realm->getTileset();
+		const Tileset &tileset = realm->getTileset();
 
 		auto biomes = Biome::getMap(*realm, noise_seed);
 		auto get_biome = [&](Index row, Index column) -> Biome & {
@@ -85,10 +85,6 @@ namespace Game3::WorldGen {
 #endif
 
 		const GamePtr game_ptr = realm->getGame().shared_from_this();
-
-		for (int32_t y = range.topLeft.y; y <= range.bottomRight.y; ++y)
-			for (int32_t x = range.topLeft.x; x <= range.bottomRight.x; ++x)
-				provider.ensureAllChunks(ChunkPosition{x, y});
 
 		pool.start();
 		Waiter waiter(job_count);
@@ -270,7 +266,7 @@ namespace Game3::WorldGen {
 			std::dynamic_pointer_cast<Overworld>(realm)->worldgenParams = params;
 
 		{
-			Timer pathmap_timer("RemakePathmap");
+			Timer pathmap_timer("RemakePathMap");
 			realm->remakePathMap(range);
 		}
 

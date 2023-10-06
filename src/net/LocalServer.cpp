@@ -21,11 +21,13 @@
 #include "packet/SelfTeleportedPacket.h"
 #include "packet/TimePacket.h"
 #include "realm/Overworld.h"
+#include "realm/ShadowRealm.h"
 #include "util/Crypto.h"
 #include "util/FS.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 #include "worldgen/Overworld.h"
+#include "worldgen/ShadowRealm.h"
 #include "worldgen/WorldGen.h"
 
 namespace Game3 {
@@ -235,12 +237,21 @@ namespace Game3 {
 			Timer::clear();
 			INFO("Finished reading all realms from database.");
 		} else {
-			RealmPtr realm = Realm::create<Overworld>(*game, 1, Overworld::ID(), "base:tileset/monomap"_id, seed);
+			RealmPtr realm = Realm::create<Overworld>(*game, 1, Overworld::ID(), "base:tileset/monomap", seed);
 			realm->outdoors = true;
 			std::default_random_engine rng;
 			rng.seed(seed);
 			WorldGen::generateOverworld(realm, seed, {}, {{-1, -1}, {1, 1}}, true);
 			game->addRealm(realm->id, realm);
+		}
+
+		if (!game->hasRealm(-1)) {
+			RealmPtr shadow = Realm::create<ShadowRealm>(*game, -1, ShadowRealm::ID(), "base:tileset/monomap", seed);
+			shadow->outdoors = false;
+			std::default_random_engine rng;
+			rng.seed(seed);
+			WorldGen::generateShadowRealm(shadow, seed, {}, {{-1, -1}, {1, 1}}, true);
+			game->addRealm(shadow->id, shadow);
 		}
 
 		game->initEntities();

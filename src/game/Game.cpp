@@ -112,6 +112,7 @@
 #include "realm/Keep.h"
 #include "realm/Overworld.h"
 #include "realm/RealmFactory.h"
+#include "realm/ShadowRealm.h"
 #include "recipe/CentrifugeRecipe.h"
 #include "recipe/CraftingRecipe.h"
 #include "recipe/GeothermalRecipe.h"
@@ -433,6 +434,7 @@ namespace Game3 {
 
 		// ...
 		addRealm.operator()<Overworld>(Overworld::ID());
+		addRealm.operator()<ShadowRealm>(ShadowRealm::ID());
 		addRealm.operator()<House>(House::ID());
 		addRealm.operator()<Realm>("base:realm/blacksmith");
 		addRealm.operator()<Cave>(Cave::ID());
