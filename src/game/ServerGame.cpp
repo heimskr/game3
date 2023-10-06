@@ -332,9 +332,9 @@ namespace Game3 {
 			if (first == "heldL" || first == "heldR") {
 				if (words.size() != 2)
 					return {false, "Invalid number of arguments."};
-				long slot = -1;
+				Slot slot = -1;
 				try {
-					slot = parseLong(words.at(1));
+					slot = parseNumber<Slot>(words.at(1));
 				} catch (const std::invalid_argument &) {
 					return {false, "Invalid slot."};
 				}

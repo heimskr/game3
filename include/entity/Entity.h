@@ -74,7 +74,7 @@ namespace Game3 {
 			Lockable<WeakSet<Player>> visiblePlayers;
 			/** Set when an entity is beginning to teleport so that an EntityMovedPacket can be sent with the proper realm ID
 			 *  before the actual realm switch has occurred. */
-			Atomic<RealmID> nextRealm = -1;
+			Atomic<RealmID> nextRealm = 0;
 			Atomic<bool> spawning = false;
 			/** Whether the entity is currently teleporting to its first position on realm change. */
 			Atomic<bool> firstTeleport = false;

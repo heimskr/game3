@@ -5,7 +5,7 @@
 
 namespace Game3 {
 	EntityMovedPacket::EntityMovedPacket(const Entity &entity):
-		EntityMovedPacket(Args{entity.globalID, entity.nextRealm == -1? entity.realmID : entity.nextRealm, entity.getPosition(), entity.direction, entity.offset, entity.zSpeed, true, false}) {}
+		EntityMovedPacket(Args{entity.globalID, entity.nextRealm == 0? entity.realmID : entity.nextRealm, entity.getPosition(), entity.direction, entity.offset, entity.zSpeed, true, false}) {}
 
 	void EntityMovedPacket::encode(Game &, Buffer &buffer) const {
 		buffer << arguments.globalID << arguments.realmID << arguments.position << arguments.facing << arguments.offset << arguments.zSpeed << arguments.adjustOffset << arguments.isTeleport;

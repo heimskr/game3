@@ -171,7 +171,7 @@ namespace Game3 {
 				}
 			}
 
-			if (tile == static_cast<uint16_t>(-1)) {
+			if (tile == static_cast<TileID>(-1)) {
 				isMissing = true;
 				tile = missing;
 				opacity = 0.f;

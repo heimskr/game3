@@ -550,7 +550,7 @@ namespace Game3 {
 		auto old_realm = weakRealm.lock();
 		RealmID limbo_id = inLimboFor.load();
 
-		if ((old_realm != new_realm) || (limbo_id != RealmID(-1) && limbo_id != new_realm->id)) {
+		if ((old_realm != new_realm) || (limbo_id != 0 && limbo_id != new_realm->id)) {
 			nextRealm = new_realm->id;
 			auto shared = getSelf();
 
@@ -563,7 +563,7 @@ namespace Game3 {
 			}
 
 			clearOffset();
-			inLimboFor = -1;
+			inLimboFor = 0;
 			new_realm->queueAddition(getSelf(), new_position);
 		} else {
 			teleport(new_position, context);
@@ -704,7 +704,7 @@ namespace Game3 {
 	bool Entity::canSee(RealmID realm_id, const Position &pos) const {
 		const auto realm = getRealm();
 
-		if (realm_id != (nextRealm == -1? realm->id : nextRealm.load()))
+		if (realm_id != (nextRealm == 0? realm->id : nextRealm.load()))
 			return false;
 
 		const auto this_position = getChunk();
@@ -1048,7 +1048,7 @@ namespace Game3 {
 	}
 
 	bool Entity::isInLimbo() const {
-		return inLimboFor != RealmID(-1);
+		return inLimboFor != 0;
 	}
 
 	void Entity::changeTexture(const Identifier &identifier) {

@@ -175,14 +175,14 @@ namespace Game3 {
 			notifyOfRealm(*new_realm);
 		}
 
-		RealmID old_realm_id = -1;
+		RealmID old_realm_id = 0;
 		auto locked_realm = weakRealm.lock();
 		if (locked_realm)
 			old_realm_id = locked_realm->id;
 
 		Entity::teleport(position, new_realm, context);
 
-		if ((old_realm_id == -1 || old_realm_id != nextRealm) && nextRealm != -1) {
+		if ((old_realm_id == 0 || old_realm_id != nextRealm) && nextRealm != 0) {
 			if (getSide() == Side::Client) {
 				auto &client_game = game.toClient();
 				// Second condition is a hack. Sometimes the player gets interrealm teleported twice in the same tick.
