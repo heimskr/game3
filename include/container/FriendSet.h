@@ -1,5 +1,3 @@
-#include "Log.h"
-
 #include <cassert>
 #include <stdexcept>
 #include <unordered_map>
@@ -54,7 +52,6 @@ namespace Game3 {
 
 			/** Inserts an item into the friend set next to a friend if possible, or in a new subset otherwise. */
 			std::pair<typename decltype(sets)::iterator, bool> insert(const T &value, const T &buddy) {
-				INFO("insert(value = " << value << ", friend = " << buddy << ')');
 				if (const auto index_iter = indices.find(value); index_iter != indices.end()) {
 					const auto sets_iter = sets.find(index_iter->second);
 					assert(sets_iter != sets.end());

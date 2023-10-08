@@ -239,6 +239,38 @@ namespace Game3 {
 		return false;
 	}
 
+	void Pipe::autopipe(PipeType pipe_type) {
+		RealmPtr realm = getRealm();
+		std::shared_ptr<PipeNetwork> network = getNetwork(pipe_type);
+
+		for (const Direction direction: ALL_DIRECTIONS) {
+			TileEntityPtr neighbor = realm->tileEntityAt(position + direction);
+			if (!neighbor)
+				continue;
+
+			bool new_value = false;
+
+			if (auto pipe = std::dynamic_pointer_cast<Pipe>(neighbor)) {
+				new_value = pipe->getPresent(pipe_type);
+				if (new_value) {
+					Direction flipped = flipDirection(direction);
+					if (!pipe->get(pipe_type, flipped)) {
+						pipe->set(pipe_type, flipped, true);
+						pipe->increaseUpdateCounter();
+						pipe->queueBroadcast();
+					}
+				}
+			} else if (network->canWorkWith(neighbor)) {
+				new_value = true;
+			}
+
+			set(pipe_type, direction, new_value);
+		}
+
+		increaseUpdateCounter();
+		queueBroadcast();
+	}
+
 	void Pipe::toggle(PipeType pipe_type, Direction direction) {
 		if (get(pipe_type, direction)) {
 			set(pipe_type, direction, false);

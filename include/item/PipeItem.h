@@ -38,6 +38,10 @@ namespace Game3 {
 					pipe->setPresent(P, true);
 					place.realm->add(pipe);
 
+					// Hold ctrl while placing a pipe to prevent autopiping.
+					if (!modifiers.onlyCtrl())
+						pipe->autopipe(P);
+
 					return true;
 				}
 
@@ -63,6 +67,8 @@ namespace Game3 {
 				if (!pipe->getPresent(P)) {
 					inventory->decrease(stack, slot);
 					pipe->setPresent(P, true);
+					if (!modifiers.onlyCtrl())
+						pipe->autopipe(P);
 				} else if (modifiers.onlyCtrl()) {
 					// Hold ctrl to toggle extractors.
 					if (pipe->getDirections()[P][direction])
@@ -97,6 +103,4 @@ namespace Game3 {
 			EnergyPipeItem(MoneyCount base_price):
 				PipeItem(ID(), "Energy Pipe", base_price) {}
 	};
-
-
 }
