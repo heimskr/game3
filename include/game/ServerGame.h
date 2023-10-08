@@ -56,6 +56,7 @@ namespace Game3 {
 			void queueRemoval(const ServerPlayerPtr &);
 			void openDatabase(std::filesystem::path);
 			void broadcast(const Packet &);
+			void releasePlayer(const std::string &username, const Place &);
 
 			inline auto getServer() const {
 				auto out = weakServer.lock();

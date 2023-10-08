@@ -275,6 +275,16 @@ namespace Game3 {
 			player->send(packet);
 	}
 
+	void ServerGame::releasePlayer(const std::string &username, const Place &place) {
+		auto lock = playerMap.sharedLock();
+		if (auto iter = playerMap.find(username); iter != playerMap.end()) {
+			iter->second->teleport(place.position, place.realm, MovementContext{.isTeleport = true});
+		} else {
+			lock.unlock();
+			database.writeReleasePlace(username, place);
+		}
+	}
+
 	void ServerGame::handlePacket(RemoteClient &client, Packet &packet) {
 		packet.handle(*this, client);
 	}

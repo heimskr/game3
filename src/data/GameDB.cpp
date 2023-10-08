@@ -53,7 +53,9 @@ namespace Game3 {
 			CREATE TABLE IF NOT EXISTS users (
 				username VARCHAR(32) PRIMARY KEY,
 				displayName VARCHAR(64),
-				json MEDIUMTEXT
+				json MEDIUMTEXT,
+				releasePosition VARCHAR(42),
+				releaseRealm INT
 			);
 
 			CREATE TABLE IF NOT EXISTS tileEntities (
@@ -464,50 +466,112 @@ namespace Game3 {
 		return std::nullopt;
 	}
 
-	bool GameDB::readUser(std::string_view username, std::string *display_name_out, nlohmann::json *json_out) {
+	bool GameDB::readUser(const std::string &username, std::string *display_name_out, nlohmann::json *json_out, std::optional<Place> *release_place) {
 		assert(database);
 		auto db_lock = database.uniqueLock();
 
-		SQLite::Statement query{*database, "SELECT displayName, json FROM users WHERE username = ? LIMIT 1"};
+		SQLite::Statement query{*database, "SELECT displayName, json, releasePosition, releaseRealm FROM users WHERE username = ? LIMIT 1"};
 
-		query.bind(1, username.data());
+		query.bind(1, username);
 
 		while (query.executeStep()) {
 			if (display_name_out != nullptr)
 				*display_name_out = std::string(query.getColumn(0));
+
 			if (json_out != nullptr)
 				*json_out = nlohmann::json::parse(std::string(query.getColumn(1)));
+
+			if (release_place != nullptr) {
+				if (query.isColumnNull(2) || query.isColumnNull(3))
+					*release_place = std::nullopt;
+				else
+					*release_place = Place{Position{query.getColumn(2).getString()}, game.getRealm(query.getColumn(3).getInt()), nullptr};
+			}
+
 			return true;
 		}
 
 		return false;
 	}
 
-	void GameDB::writeUser(std::string_view username, const nlohmann::json &json) {
+	void GameDB::writeUser(const std::string &username, const nlohmann::json &json, const std::optional<Place> &release_place) {
 		assert(database);
 		auto db_lock = database.uniqueLock();
 
 		SQLite::Transaction transaction{*database};
-		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO users VALUES (?, ?, ?)"};
+		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO users VALUES (?, ?, ?, ?, ?)"};
 
-		statement.bind(1, username.data());
+		statement.bind(1, username);
 		statement.bind(2, json.at("displayName").get<std::string>());
 		statement.bind(3, json.dump());
+		if (release_place) {
+			statement.bind(4, release_place->position.simpleString());
+			statement.bind(5, release_place->realm->id);
+		} else {
+			statement.bind(4);
+			statement.bind(5);
+		}
 
 		statement.exec();
 		transaction.commit();
 	}
 
-	bool GameDB::hasName(std::string_view username, std::string_view display_name) {
+	void GameDB::writeUser(const Player &player) {
+		nlohmann::json json;
+		player.toJSON(json);
+		writeUser(player.username.copyBase(), json, std::nullopt);
+	}
+
+	void GameDB::writeReleasePlace(const std::string &username, const std::optional<Place> &release_place) {
+		assert(database);
+		auto db_lock = database.uniqueLock();
+
+		SQLite::Transaction transaction{*database};
+		SQLite::Statement statement{*database, "UPDATE users SET releasePosition = ?, releaseRealm = ? WHERE username = ?"};
+
+		if (release_place) {
+			statement.bind(1, release_place->position.simpleString());
+			statement.bind(2, release_place->realm->id);
+		} else {
+			statement.bind(1);
+			statement.bind(2);
+		}
+		statement.bind(3, username);
+
+		statement.exec();
+		transaction.commit();
+	}
+
+	bool GameDB::hasName(const std::string &username, const std::string &display_name) {
 		assert(database);
 		auto db_lock = database.uniqueLock();
 
 		SQLite::Statement query{*database, "SELECT NULL FROM users WHERE username = ? OR displayName = ? LIMIT 1"};
 
-		query.bind(1, username.data());
-		query.bind(2, display_name.data());
+		query.bind(1, username);
+		query.bind(2, display_name);
 
 		return query.executeStep();
+	}
+
+	std::optional<Place> GameDB::readReleasePlace(const std::string &username) {
+		assert(database);
+		auto db_lock = database.uniqueLock();
+
+		SQLite::Statement query{*database, "SELECT releasePosition, releaseRealm FROM users WHERE username = ? LIMIT 1"};
+
+		query.bind(1, username);
+
+		while (query.executeStep()) {
+			if (query.isColumnNull(0) || query.isColumnNull(1))
+				return std::nullopt;
+			const std::string concatenated = query.getColumn(0).getString();
+			if (concatenated.empty())
+				return std::nullopt;
+			return Place{Position{concatenated}, game.getRealm(query.getColumn(1).getInt())};
+		}
+
+		return std::nullopt;
 	}
 
 	void GameDB::writeTileEntities(const std::function<bool(TileEntityPtr &)> &getter, bool use_transaction) {

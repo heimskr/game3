@@ -55,9 +55,12 @@ namespace Game3 {
 
 			std::optional<ChunkSet> getChunk(RealmID, ChunkPosition);
 
-			bool readUser(std::string_view username, std::string *display_name_out, nlohmann::json *json_out);
-			void writeUser(std::string_view username, const nlohmann::json &);
-			bool hasName(std::string_view username, std::string_view display_name);
+			bool readUser(const std::string &username, std::string *display_name_out, nlohmann::json *json_out, std::optional<Place> *release_place);
+			void writeUser(const std::string &username, const nlohmann::json &, const std::optional<Place> &release_place);
+			void writeUser(const Player &);
+			void writeReleasePlace(const std::string &username, const std::optional<Place> &release_place);
+			bool hasName(const std::string &username, const std::string &display_name);
+			std::optional<Place> readReleasePlace(const std::string &username);
 
 			void writeTileEntities(const std::function<bool(std::shared_ptr<TileEntity> &)> &, bool use_transaction = true);
 			void writeTileEntities(const std::shared_ptr<Realm> &, bool use_transaction = true);

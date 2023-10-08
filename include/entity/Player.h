@@ -18,7 +18,7 @@ namespace Game3 {
 			constexpr static HitPoints MAX_HEALTH = 64;
 
 			/** Not encoded. */
-			std::string username;
+			Lockable<std::string> username;
 			/** Definitely not encoded. */
 			Token token = -1;
 			std::string displayName;

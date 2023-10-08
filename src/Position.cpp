@@ -6,7 +6,9 @@
 
 namespace Game3 {
 	Position::Position(std::string_view string) {
-		const auto comma = string.find(',');
+		const size_t comma = string.find(',');
+		if (comma == std::string::npos)
+			throw std::invalid_argument("Invalid position: \"" + std::string(string) + '"');
 		row = parseLong(string.substr(0, comma));
 		column = parseLong(string.substr(comma + 1));
 	}

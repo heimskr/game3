@@ -27,7 +27,7 @@ namespace Game3 {
 			{
 				auto lock = entities->sharedLock();
 				for (const EntityPtr &entity: *entities) {
-					if (!entity->isPlayer() && entity->getPosition() == place.position) {
+					if (entity->getPosition() == place.position) {
 						selected = entity;
 						break;
 					}
@@ -41,21 +41,33 @@ namespace Game3 {
 
 			stack.data["containedEntity"] = selected->type;
 			stack.data["containedName"] = selected->getName();
-			selected->toJSON(stack.data);
-			selected->queueDestruction();
+
+			if (selected->isPlayer()) {
+				auto player = std::static_pointer_cast<ServerPlayer>(selected);
+				player->teleport({32, 32}, game.getRealm(-1), MovementContext{.isTeleport = true});
+				stack.data["containedUsername"] = player->username;
+			} else {
+				selected->toJSON(stack.data);
+				selected->queueDestruction();
+			}
+
 			player->getInventory()->notifyOwner();
 			SUCCESS("Captured " << selected->type);
 			return true;
 		}
 
 		Identifier type = stack.data.at("containedEntity");
-		const GlobalID new_gid = Agent::generateGID();
-		const std::shared_ptr<EntityFactory> &factory = game.registry<EntityFactoryRegistry>()[type];
-		EntityPtr entity = (*factory)(game, stack.data);
-		entity->spawning = true;
-		entity->setRealm(realm);
-		realm->queueEntityInit(std::move(entity), place.position);
-		INFO("Spawned entity of type " << type << " with new GID " << new_gid);
+		if (type == "base:entity/player") {
+			game.toServer().releasePlayer(stack.data.at("containedUsername"), place);
+		} else {
+			const GlobalID new_gid = Agent::generateGID();
+			const std::shared_ptr<EntityFactory> &factory = game.registry<EntityFactoryRegistry>()[type];
+			EntityPtr entity = (*factory)(game, stack.data);
+			entity->spawning = true;
+			entity->setRealm(realm);
+			realm->queueEntityInit(std::move(entity), place.position);
+			INFO("Spawned entity of type " << type << " with new GID " << new_gid);
+		}
 		stack.data.clear();
 		player->getInventory()->notifyOwner();
 		return true;

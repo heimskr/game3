@@ -20,9 +20,7 @@ namespace Game3 {
 
 		GameDB &database = game.toServer().database;
 		if (database.isOpen()) {
-			nlohmann::json json;
-			toJSON(json);
-			database.writeUser(username, json);
+			database.writeUser(*this);
 			INFO("Persisted ServerPlayer with username " << username << '.');
 
 			std::vector<std::string> usernames;

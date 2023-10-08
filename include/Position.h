@@ -41,7 +41,7 @@ namespace Game3 {
 		inline uint64_t taxiDistance(const Position &other) const { return static_cast<uint64_t>(std::abs(row - other.row) + std::abs(column - other.column)); }
 		bool adjacent4(const Position &other) const;
 		bool operator<(const Position &) const;
-		std::string simpleString() const { return std::to_string(row) + "," + std::to_string(column); }
+		std::string simpleString() const { return std::to_string(row) + ',' + std::to_string(column); }
 	};
 
 	/** Silly naming, perhaps. */

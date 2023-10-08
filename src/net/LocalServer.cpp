@@ -88,7 +88,7 @@ namespace Game3 {
 				auto player_lock = player->sharedLock();
 				player->toJSON(json);
 			}
-			game->database.writeUser(player->username, json);
+			game->database.writeUser(player->username, json, std::nullopt);
 		}
 	}
 
@@ -98,7 +98,7 @@ namespace Game3 {
 
 		{
 			nlohmann::json json;
-			if (game->database.readUser(username, nullptr, &json))
+			if (game->database.readUser(std::string(username), nullptr, &json, nullptr))
 				return ServerPlayer::fromJSON(*game, json);
 		}
 
@@ -144,15 +144,18 @@ namespace Game3 {
 		auto realm = player->getRealm();
 		INFO("Setting up player");
 		player->weakClient = client.shared_from_this();
-		player->notifyOfRealm(*player->getRealm());
+		player->notifyOfRealm(*realm);
 		auto guard = client.bufferGuard();
 		client.send(SelfTeleportedPacket(realm->id, player->getPosition()));
 		client.send(TimePacket(game->time));
 		auto lock = game->players.sharedLock();
 		const EntityPacket packet(player);
-		for (const auto &other_player: game->players)
-			if (other_player != player)
+		for (const auto &other_player: game->players) {
+			if (other_player != player) {
+				other_player->notifyOfRealm(*realm);
 				other_player->send(packet);
+			}
+		}
 	}
 
 	namespace {
