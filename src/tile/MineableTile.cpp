@@ -12,6 +12,11 @@ namespace Game3 {
 		Tile(std::move(identifier_)), stack(std::move(stack_)), consumable(consumable_) {}
 
 	bool MineableTile::interact(const Place &place, Layer layer) {
+		if (layer == Layer::Terrain) {
+			// Terrain isn't mineable.
+			return false;
+		}
+
 		PlayerPtr player = place.player;
 		if (!player)
 			return false;
@@ -26,10 +31,8 @@ namespace Game3 {
 
 		player->give(stack);
 
-		if (consumable && layer != Layer::Terrain) {
-			// Terrain is never consumable with a regular pickaxe.
+		if (consumable)
 			place.set(layer, 0);
-		}
 
 		if (active->reduceDurability())
 			inventory->erase(inventory->activeSlot);
