@@ -15,6 +15,9 @@ namespace Game3 {
 		Game &game = realm->getGame();
 		PlayerPtr player = place.player;
 
+		if (place.realm->type == "base:realm/shadow")
+			return true;
+
 		if (stack.data.empty()) {
 			auto entities = realm->getEntities(getChunkPosition(place.position));
 			if (!entities) {
@@ -27,7 +30,7 @@ namespace Game3 {
 			{
 				auto lock = entities->sharedLock();
 				for (const EntityPtr &entity: *entities) {
-					if (entity->getPosition() == place.position) {
+					if (entity->getPosition() == place.position && entity != player) {
 						selected = entity;
 						break;
 					}
@@ -55,6 +58,9 @@ namespace Game3 {
 			SUCCESS("Captured " << selected->type);
 			return true;
 		}
+
+		if (!place.realm->isPathable(place.position))
+			return true;
 
 		Identifier type = stack.data.at("containedEntity");
 		if (type == "base:entity/player") {
