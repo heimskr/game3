@@ -138,7 +138,6 @@
 #include "tileentity/Teleporter.h"
 #include "tileentity/TileEntity.h"
 #include "tileentity/TileEntityFactory.h"
-#include "tileentity/Tree.h"
 #include "tools/Stitcher.h"
 #include "ui/module/ChemicalReactorModule.h"
 #include "ui/module/ExternalInventoryModule.h"
@@ -420,7 +419,6 @@ namespace Game3 {
 		add(TileEntityFactory::create<Stockpile>());
 		add(TileEntityFactory::create<Tank>());
 		add(TileEntityFactory::create<Teleporter>());
-		// add(TileEntityFactory::create<Tree>());
 	}
 
 	void Game::addRealms() {

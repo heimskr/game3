@@ -14,7 +14,7 @@ namespace Game3 {
 		auto &realm = *place.realm;
 		auto &game = realm.getGame();
 
-		static std::uniform_int_distribution distribution(0, 99);
+		std::uniform_int_distribution distribution{0, 99};
 		if (distribution(threadContext.rng) != 0)
 			return;
 

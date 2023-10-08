@@ -7,7 +7,6 @@
 #include "game/Inventory.h"
 #include "item/Bomb.h"
 #include "realm/Realm.h"
-#include "tileentity/Tree.h"
 
 namespace Game3 {
 	bool Bomb::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {

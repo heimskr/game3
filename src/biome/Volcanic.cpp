@@ -44,7 +44,7 @@ namespace Game3 {
 
 	void Volcanic::postgen(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &, const WorldGenParams &) {
 		Realm &realm = *getRealm();
-		static std::uniform_int_distribution distribution(0, 199);
+		std::uniform_int_distribution distribution{0, 199};
 
 		if (realm.getTile(Layer::Terrain, {row, column}) == realm.getTileset()["base:tile/volcanic_sand"_id]) {
 			if (distribution(rng) < 1) {

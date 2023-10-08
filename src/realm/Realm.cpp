@@ -348,7 +348,7 @@ namespace Game3 {
 							for (const auto &tile_entity: *iter->second)
 								tile_entity->tick(game, delta);
 					}
-					static std::uniform_int_distribution<int64_t> distribution(0l, CHUNK_SIZE - 1);
+					std::uniform_int_distribution<int64_t> distribution{0, CHUNK_SIZE - 1};
 					auto &tileset = getTileset();
 					auto shared = shared_from_this();
 

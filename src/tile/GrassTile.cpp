@@ -14,7 +14,7 @@ namespace Game3 {
 	void GrassTile::randomTick(const Place &place) {
 		auto &realm = *place.realm;
 
-		static std::uniform_int_distribution distribution(0, 99);
+		std::uniform_int_distribution distribution{0, 99};
 		if (distribution(threadContext.rng) != 0)
 			return;
 

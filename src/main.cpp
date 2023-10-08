@@ -107,7 +107,7 @@ int main(int argc, char **argv) {
 		}
 
 		if (strcmp(argv[1], "--maze") == 0) {
-			for (const auto &row: Game3::Mazer({32, 32}, 666, {1, 0}).getRows(true)) {
+			for (const auto &row: Game3::Mazer({32, 32}, 666, {2, 0}).getRows(false)) {
 				for (const auto column: row)
 					std::cout << (column? "\u2588" : " ");
 				std::cout << std::endl;

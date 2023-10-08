@@ -6,7 +6,6 @@
 #include "game/ServerGame.h"
 #include "item/Sapling.h"
 #include "realm/Realm.h"
-#include "tileentity/Tree.h"
 #include "util/Util.h"
 
 namespace Game3 {

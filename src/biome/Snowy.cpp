@@ -4,7 +4,6 @@
 #include "lib/noise.h"
 #include "realm/Realm.h"
 #include "tileentity/ItemSpawner.h"
-#include "tileentity/Tree.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 #include "worldgen/WorldGen.h"

@@ -38,7 +38,7 @@ namespace Game3 {
 
 		Ticker ticker{*this, game, delta};
 
-		static std::uniform_real_distribution distribution(0., 1.);
+		std::uniform_real_distribution distribution{0., 1.};
 		for (float i = 0.f; i < delta; i += .1f) {
 			if (distribution(threadContext.rng) < chancePerTenth) {
 				for (const auto &entity: getRealm()->findEntities(getPosition()))

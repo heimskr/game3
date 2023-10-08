@@ -4,7 +4,6 @@
 #include "lib/noise.h"
 #include "realm/Realm.h"
 #include "tileentity/ItemSpawner.h"
-#include "tileentity/Tree.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 #include "worldgen/WorldGen.h"
@@ -51,7 +50,7 @@ namespace Game3 {
 			const double forest_noise = forestPerlin->GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.5);
 			if (params.forestThreshold - 0.2 < forest_noise) {
 				std::default_random_engine tree_rng(static_cast<uint_fast32_t>(forest_noise * 1'000'000'000.));
-				static std::uniform_int_distribution hundred(0, 99);
+				std::uniform_int_distribution hundred{0, 99};
 				if (hundred(tree_rng) < 75)
 					return noise;
 				uint8_t mod = abs(column) % 2;

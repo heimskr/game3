@@ -29,7 +29,7 @@ namespace Game3 {
 		if (tilename == crop->stages.back())
 			return;
 
-		static std::uniform_real_distribution distribution(0.0, 1.0);
+		std::uniform_real_distribution distribution{0., 1.};
 		if (crop->chance <= distribution(threadContext.rng))
 			return;
 

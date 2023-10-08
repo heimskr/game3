@@ -41,6 +41,10 @@ namespace Game3 {
 				for (int64_t column = x * CHUNK_SIZE, column_max = (x + 1) * CHUNK_SIZE; column < column_max; ++column)
 					fn(Position{row, column});
 		}
+
+		Position topLeft() const {
+			return {y * CHUNK_SIZE, x * CHUNK_SIZE};
+		}
 	};
 
 	std::ostream & operator<<(std::ostream &, ChunkPosition);
