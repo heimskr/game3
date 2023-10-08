@@ -13,8 +13,10 @@ namespace Game3 {
 		assert(!crop->stages.empty());
 
 		PlayerPtr player = place.player;
-		const InventoryPtr inventory = player->getInventory();
 		Game &game = player->getGame();
+
+		const InventoryPtr inventory = player->getInventory();
+		auto inventory_lock = inventory->uniqueLock();
 
 		if (ItemStack *active_stack = inventory->getActive()) {
 			if (active_stack->hasAttribute("base:attribute/axe")) {
@@ -23,16 +25,17 @@ namespace Game3 {
 				// Remove tree
 				place.set(layer, 0);
 
+				// Handle axe durability
+				if (active_stack->reduceDurability())
+					inventory->erase(inventory->activeSlot);
+
 				// Make sure tree is fully grown before giving any products
 				if (tilename && tilename->get() == crop->stages.back())
 					for (const ItemStack &stack: crop->products.getStacks())
 						if (std::optional<ItemStack> leftover = inventory->add(stack))
 							leftover->spawn(place.realm, place.position);
 
-				// Handle axe durability
-				if (active_stack->reduceDurability())
-					inventory->erase(inventory->activeSlot);
-
+				inventory->notifyOwner();
 				return true;
 			}
 		}
@@ -46,6 +49,6 @@ namespace Game3 {
 			}
 		}
 
-		return false;
+		return Tile::interact(place, layer);
 	}
 }

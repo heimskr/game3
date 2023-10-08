@@ -13,6 +13,7 @@ namespace Game3 {
 
 		if (apply(place)) {
 			const InventoryPtr inventory = place.player->getInventory();
+			auto inventory_lock = inventory->uniqueLock();
 			if (--stack.count == 0)
 				inventory->erase(slot);
 			inventory->notifyOwner();

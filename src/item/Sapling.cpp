@@ -26,9 +26,12 @@ namespace Game3 {
 
 		place.set(Layer::Submerged, choose(getTreeTypes()));
 		const InventoryPtr inventory = player.getInventory();
-		if (--stack.count == 0)
-			inventory->erase(slot);
-		inventory->notifyOwner();
+		{
+			auto inventory_lock = inventory->uniqueLock();
+			if (--stack.count == 0)
+				inventory->erase(slot);
+			inventory->notifyOwner();
+		}
 		std::unique_lock<std::shared_mutex> lock;
 		realm.tileProvider.findPathState(place.position, &lock) = 0;
 		return true;

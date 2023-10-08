@@ -50,6 +50,6 @@ namespace Game3 {
 			return true;
 		}
 
-		return false;
+		return Tile::interact(place, layer);
 	}
 }

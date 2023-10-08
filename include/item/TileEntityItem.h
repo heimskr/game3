@@ -21,6 +21,7 @@ namespace Game3 {
 
 				auto existing = std::dynamic_pointer_cast<T>(realm.tileEntityAt(position));
 				const InventoryPtr inventory = player->getInventory();
+				auto inventory_lock = inventory->uniqueLock();
 
 				if (modifiers.onlyShift()) {
 					if (!existing)

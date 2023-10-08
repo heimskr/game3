@@ -34,6 +34,8 @@ namespace Game3 {
 
 		ItemStack *stack = nullptr;
 
+		auto inventory_lock = inventory->uniqueLock();
+
 		if (remove) {
 			std::optional<ItemStack> out;
 
@@ -76,6 +78,8 @@ namespace Game3 {
 		};
 
 		const InventoryPtr inventory = getInventory();
+		assert(inventory);
+		auto inventory_lock = inventory->uniqueLock();
 
 		if (leftover != nullptr)
 			*leftover = inventory->add(stack, predicate);

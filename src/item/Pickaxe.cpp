@@ -1,9 +1,11 @@
 #include "Position.h"
-#include "graphics/Tileset.h"
 #include "entity/Player.h"
+#include "game/Game.h"
 #include "game/Inventory.h"
+#include "graphics/Tileset.h"
 #include "item/Pickaxe.h"
 #include "realm/Realm.h"
+#include "tile/Tile.h"
 
 namespace Game3 {
 	bool Pickaxe::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
@@ -32,6 +34,9 @@ namespace Game3 {
 			inventory.notifyOwner();
 			return true;
 		}
+
+		if (std::optional<Identifier> terrain = place.getName(Layer::Terrain))
+			return player.getGame().getTile(*terrain)->interact(place, Layer::Terrain);
 
 		return false;
 	}

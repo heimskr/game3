@@ -1,14 +1,17 @@
 #pragma once
 
+#include "net/Buffer.h"
+#include "threading/SharedRecursiveMutex.h"
+
 #include <mutex>
 #include <shared_mutex>
 
 #include <nlohmann/json.hpp>
 
-#include "net/Buffer.h"
-
 namespace Game3 {
-	template <typename T, typename M = std::shared_mutex>
+	using DefaultMutex = SharedRecursiveMutex;
+
+	template <typename T, typename M = DefaultMutex>
 	struct Lockable: T {
 		using Base = T;
 
@@ -16,21 +19,21 @@ namespace Game3 {
 
 		using T::T;
 
-		Lockable(const Lockable<T> &other): T(other.getBase()) {}
+		Lockable(const Lockable<T, M> &other): T(other.getBase()) {}
 		Lockable(const T &other): T(other) {}
 
 		/** Likely data race issue. */
-		Lockable(Lockable<T> &&other): T(other.getBase()) {}
+		Lockable(Lockable<T, M> &&other): T(other.getBase()) {}
 		Lockable(T &&other): T(other) {}
 
-		Lockable<T> & operator=(const Lockable<T> &other) {
+		Lockable<T, M> & operator=(const Lockable<T, M> &other) {
 			auto this_lock = uniqueLock();
 			auto other_lock = other.sharedLock();
 			T::operator=(other.getBase());
 			return *this;
 		}
 
-		Lockable<T> & operator=(Lockable<T> &&other) {
+		Lockable<T, M> & operator=(Lockable<T, M> &&other) {
 			auto this_lock = uniqueLock();
 			auto other_lock = other.uniqueLock();
 			T::operator=(std::move(other.getBase()));
@@ -38,21 +41,21 @@ namespace Game3 {
 		}
 
 		template <typename U>
-		Lockable<T> & operator=(const U &other) {
+		Lockable<T, M> & operator=(const U &other) {
 			auto lock = uniqueLock();
 			T::operator=(other);
 			return *this;
 		}
 
 		template <typename U>
-		Lockable<T> & operator=(U &&other) {
+		Lockable<T, M> & operator=(U &&other) {
 			auto lock = uniqueLock();
 			T::operator=(std::forward<U>(other));
 			return *this;
 		}
 
 		template <typename U>
-		Lockable<T> & unsafeSet(U &&other) {
+		Lockable<T, M> & unsafeSet(U &&other) {
 			T::operator=(std::forward<U>(other));
 			return *this;
 		}
@@ -89,38 +92,38 @@ namespace Game3 {
 		}
 	};
 
-	template <typename T>
-	void to_json(nlohmann::json &json, const Lockable<T> &lockable) {
+	template <typename T, typename M>
+	void to_json(nlohmann::json &json, const Lockable<T, M> &lockable) {
 		auto lock = lockable.sharedLock();
 		json = lockable.getBase();
 	}
 
-	template <typename T>
-	void from_json(const nlohmann::json &json, Lockable<T> &lockable) {
+	template <typename T, typename M>
+	void from_json(const nlohmann::json &json, Lockable<T, M> &lockable) {
 		auto lock = lockable.uniqueLock();
 		lockable = json.get<T>();
 	}
 
-	template <typename T>
-	std::ostream & operator<<(std::ostream &os, const Lockable<T> &lockable) {
+	template <typename T, typename M>
+	std::ostream & operator<<(std::ostream &os, const Lockable<T, M> &lockable) {
 		auto lock = lockable.sharedLock();
 		return os << lockable.getBase();
 	}
 
-	template <typename T>
-	Buffer & operator+=(Buffer &buffer, const Lockable<T> &lockable) {
+	template <typename T, typename M>
+	Buffer & operator+=(Buffer &buffer, const Lockable<T, M> &lockable) {
 		auto lock = lockable.sharedLock();
 		return buffer += lockable.getBase();
 	}
 
-	template <typename T>
-	Buffer & operator<<(Buffer &buffer, const Lockable<T> &lockable) {
+	template <typename T, typename M>
+	Buffer & operator<<(Buffer &buffer, const Lockable<T, M> &lockable) {
 		auto lock = lockable.sharedLock();
 		return buffer << lockable.getBase();
 	}
 
-	template <typename T>
-	Buffer & operator>>(Buffer &buffer, Lockable<T> &lockable) {
+	template <typename T, typename M>
+	Buffer & operator>>(Buffer &buffer, Lockable<T, M> &lockable) {
 		auto lock = lockable.uniqueLock();
 		return buffer >> lockable.getBase();
 	}

@@ -1,11 +1,13 @@
 #pragma once
 
+#include "threading/Lockable.h"
+
 #include <mutex>
 #include <shared_mutex>
 
 namespace Game3 {
 	/** For protecting subclass fields that aren't instances of Lockable. */
-	template <typename T = std::shared_mutex>
+	template <typename T = DefaultMutex>
 	class HasMutex {
 		protected:
 			mutable T internalMutex;

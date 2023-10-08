@@ -66,6 +66,7 @@ namespace Game3 {
 			return false;
 
 		const InventoryPtr inventory = player->getInventory();
+		auto inventory_lock = inventory->uniqueLock();
 		const Slot active_slot = inventory->activeSlot;
 		if (auto *active_stack = (*inventory)[active_slot]) {
 			if (0.f < timeRemaining || 0.f < player->tooldown)

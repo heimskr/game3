@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <mutex>
+#include <shared_mutex>
 #include <thread>
 
 namespace Game3 {
@@ -34,10 +35,7 @@ namespace Game3 {
 			}
 
 			void unlock() {
-				if (1 < count) {
-					// recursive unlocking
-					--count;
-				} else {
+				if (count.fetch_sub(1) == 1) {
 					// normal unlocking
 					owner = std::thread::id();
 					count = 0;
@@ -45,8 +43,35 @@ namespace Game3 {
 				}
 			}
 
+			bool try_lock_shared() {
+				if (owner != std::this_thread::get_id())
+					return std::shared_mutex::try_lock_shared();
+
+				return true;
+			}
+
+			bool try_lock() {
+				auto this_id = std::this_thread::get_id();
+				if (owner == this_id) {
+					if (std::shared_mutex::try_lock()) {
+						++count;
+						return true;
+					}
+
+					return false;
+				}
+
+				if (std::shared_mutex::try_lock()) {
+					owner = this_id;
+					count = 1;
+					return true;
+				}
+
+				return false;
+			}
+
 		private:
 			std::atomic<std::thread::id> owner;
-			int count;
+			std::atomic_int count;
 	};
 }

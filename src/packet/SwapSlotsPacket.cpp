@@ -58,7 +58,7 @@ namespace Game3 {
 		{
 			auto first_lock  = first_inventory.uniqueLock();
 			// Just in case there's some trickery with shared inventories or something.
-			auto second_lock = &first_inventory == &second_inventory? std::unique_lock<std::shared_mutex>() : second_inventory.uniqueLock();
+			auto second_lock = &first_inventory == &second_inventory? std::unique_lock<DefaultMutex>() : second_inventory.uniqueLock();
 
 			ItemStack *first_stack  = first_inventory[firstSlot];
 			ItemStack *second_stack = second_inventory[secondSlot];

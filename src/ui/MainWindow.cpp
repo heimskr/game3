@@ -394,7 +394,7 @@ namespace Game3 {
 				auto client_inventory = std::dynamic_pointer_cast<ClientInventory>(has_inventory->getInventory());
 				queue([this, owner, client_inventory] {
 					if (owner->getGID() == getExternalGID()) {
-						std::unique_lock<std::shared_mutex> lock;
+						std::unique_lock<DefaultMutex> lock;
 						if (auto *module_ = inventoryTab->getModule(lock))
 							module_->setInventory(client_inventory);
 					}
@@ -410,7 +410,7 @@ namespace Game3 {
 
 		game->signal_fluid_update().connect([this](const std::shared_ptr<HasFluids> &has_fluids) {
 			queue([this, has_fluids] {
-				std::unique_lock<std::shared_mutex> lock;
+				std::unique_lock<DefaultMutex> lock;
 				if (Module *module_ = inventoryTab->getModule(lock)) {
 					std::any data(has_fluids);
 					module_->handleMessage({}, "UpdateFluids", data);
@@ -420,7 +420,7 @@ namespace Game3 {
 
 		game->signal_energy_update().connect([this](const std::shared_ptr<HasEnergy> &has_energy) {
 			queue([this, has_energy] {
-				std::unique_lock<std::shared_mutex> lock;
+				std::unique_lock<DefaultMutex> lock;
 				if (Module *module_ = inventoryTab->getModule(lock)) {
 					std::any data(has_energy);
 					module_->handleMessage({}, "UpdateEnergy", data);
@@ -593,7 +593,7 @@ namespace Game3 {
 	}
 
 	GlobalID MainWindow::getExternalGID() const {
-		std::unique_lock<std::shared_mutex> lock;
+		std::unique_lock<DefaultMutex> lock;
 
 		if (Module *module_ = inventoryTab->getModule(lock)) {
 			std::any empty;
@@ -605,7 +605,7 @@ namespace Game3 {
 	}
 
 	void MainWindow::openModule(const Identifier &module_id, const std::any &argument) {
-		std::unique_lock<std::shared_mutex> module_lock;
+		std::unique_lock<DefaultMutex> module_lock;
 		Module *current_module = inventoryTab->getModule(module_lock);
 		if (current_module != nullptr && current_module->getID() == module_id) {
 			current_module->update();
@@ -622,7 +622,7 @@ namespace Game3 {
 	}
 
 	void MainWindow::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&buffer) {
-		std::unique_lock<std::shared_mutex> module_lock;
+		std::unique_lock<DefaultMutex> module_lock;
 		Module *current_module = inventoryTab->getModule(module_lock);
 		if (current_module != nullptr && (module_id.empty() || current_module->getID() == module_id)) {
 			std::any data{std::move(buffer)};

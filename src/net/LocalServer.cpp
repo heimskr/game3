@@ -114,23 +114,26 @@ namespace Game3 {
 		overworld->add(player, Position(-25, -36));
 		player->init(*game);
 		const InventoryPtr inventory = player->getInventory();
-		inventory->add(ItemStack::withDurability(*game, "base:item/iron_pickaxe"));
-		inventory->add(ItemStack::withDurability(*game, "base:item/iron_shovel"));
-		inventory->add(ItemStack::withDurability(*game, "base:item/iron_axe"));
-		inventory->add(ItemStack::withDurability(*game, "base:item/iron_hammer"));
-		inventory->add(ItemStack(*game, "base:item/cave_entrance"));
-		inventory->add(ItemStack(*game, "base:item/pump", 64));
-		inventory->add(ItemStack(*game, "base:item/tank", 64));
-		inventory->add(ItemStack(*game, "base:item/centrifuge", 64));
-		inventory->add(ItemStack(*game, "base:item/geothermal_generator", 64));
-		inventory->add(ItemStack(*game, "base:item/chemical_reactor"));
-		inventory->add(ItemStack(*game, "base:item/energy_pipe", 64));
-		inventory->add(ItemStack(*game, "base:item/fluid_pipe", 64));
-		inventory->add(ItemStack(*game, "base:item/item_pipe", 64));
-		inventory->add(ItemStack(*game, "base:item/lava_flask", 64));
-		inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "H2O"}}));
-		inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "H"}}));
-		inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "O"}}));
+		{
+			auto inventory_lock = inventory->uniqueLock();
+			inventory->add(ItemStack::withDurability(*game, "base:item/iron_pickaxe"));
+			inventory->add(ItemStack::withDurability(*game, "base:item/iron_shovel"));
+			inventory->add(ItemStack::withDurability(*game, "base:item/iron_axe"));
+			inventory->add(ItemStack::withDurability(*game, "base:item/iron_hammer"));
+			inventory->add(ItemStack(*game, "base:item/cave_entrance"));
+			inventory->add(ItemStack(*game, "base:item/pump", 64));
+			inventory->add(ItemStack(*game, "base:item/tank", 64));
+			inventory->add(ItemStack(*game, "base:item/centrifuge", 64));
+			inventory->add(ItemStack(*game, "base:item/geothermal_generator", 64));
+			inventory->add(ItemStack(*game, "base:item/chemical_reactor"));
+			inventory->add(ItemStack(*game, "base:item/energy_pipe", 64));
+			inventory->add(ItemStack(*game, "base:item/fluid_pipe", 64));
+			inventory->add(ItemStack(*game, "base:item/item_pipe", 64));
+			inventory->add(ItemStack(*game, "base:item/lava_flask", 64));
+			inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "H2O"}}));
+			inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "H"}}));
+			inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "O"}}));
+		}
 		game->addPlayer(player);
 		return player;
 	}

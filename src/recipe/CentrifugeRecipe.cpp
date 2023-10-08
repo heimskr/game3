@@ -32,6 +32,7 @@ namespace Game3 {
 		if (!fluids || !inventory || !canCraft(fluids))
 			return false;
 
+		auto inventory_lock = inventory->uniqueLock();
 		ItemStack output = getOutput(input, game);
 
 		if (!inventory->canInsert(output))

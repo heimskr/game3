@@ -67,6 +67,7 @@ namespace Game3 {
 
 		if (ore_stack) {
 			const InventoryPtr inventory = player->getInventory();
+			auto inventory_lock = inventory->uniqueLock();
 			if (auto *stack = inventory->getActive()) {
 				if (stack->hasAttribute("base:attribute/pickaxe") && !inventory->add(*ore_stack)) {
 					reveal(position);

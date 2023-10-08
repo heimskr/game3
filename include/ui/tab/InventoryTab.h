@@ -45,8 +45,8 @@ namespace Game3 {
 			void reset(const std::shared_ptr<ClientGame> &) override;
 			void setModule(std::unique_ptr<Module> &&);
 			Module & getModule() const;
-			Module * getModule(std::shared_lock<std::shared_mutex> &);
-			Module * getModule(std::unique_lock<std::shared_mutex> &);
+			Module * getModule(std::shared_lock<DefaultMutex> &);
+			Module * getModule(std::unique_lock<DefaultMutex> &);
 			void removeModule();
 			GlobalID getExternalGID() const;
 

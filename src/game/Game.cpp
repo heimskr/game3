@@ -118,6 +118,7 @@
 #include "recipe/GeothermalRecipe.h"
 #include "registry/Registries.h"
 #include "tile/CropTile.h"
+#include "tile/FarmlandTile.h"
 #include "tile/ForestFloorTile.h"
 #include "tile/GrassTile.h"
 #include "tile/Tile.h"
@@ -503,6 +504,7 @@ namespace Game3 {
 	void Game::addTiles() {
 		auto &reg = registry<TileRegistry>();
 
+		reg.add<FarmlandTile>();
 		reg.add<ForestFloorTile>();
 
 		const auto monomap = registry<TilesetRegistry>().at("base:tileset/monomap");
@@ -838,7 +840,7 @@ namespace Game3 {
 		auto &reg = registry<TileRegistry>();
 		if (auto found = reg.maybe(identifier))
 			return found;
-		static auto default_tile = std::make_shared<Tile>("base:tile");
+		static auto default_tile = std::make_shared<Tile>("base:tile/?");
 		return default_tile;
 	}
 

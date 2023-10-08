@@ -23,6 +23,7 @@ namespace Game3 {
 			if (!validGround || tileset.isInCategory(tileset[realm.getTile(Layer::Terrain, position)], validGround)) {
 				realm.setTile(Layer::Submerged, position, tilename);
 				const InventoryPtr inventory = place.player->getInventory();
+				auto inventory_lock = inventory->uniqueLock();
 				if (--stack.count == 0)
 					inventory->erase(slot);
 				inventory->notifyOwner();

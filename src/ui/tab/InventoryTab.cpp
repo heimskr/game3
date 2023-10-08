@@ -278,13 +278,13 @@ namespace Game3 {
 		return *currentModule;
 	}
 
-	Module * InventoryTab::getModule(std::shared_lock<std::shared_mutex> &lock) {
+	Module * InventoryTab::getModule(std::shared_lock<DefaultMutex> &lock) {
 		if (currentModule)
 			lock = currentModule.sharedLock();
 		return currentModule.get();
 	}
 
-	Module * InventoryTab::getModule(std::unique_lock<std::shared_mutex> &lock) {
+	Module * InventoryTab::getModule(std::unique_lock<DefaultMutex> &lock) {
 		if (currentModule)
 			lock = currentModule.uniqueLock();
 		return currentModule.get();
@@ -343,7 +343,7 @@ namespace Game3 {
 		if (!inventory || !inventory->contains(slot))
 			return;
 
-		std::shared_lock<std::shared_mutex> lock;
+		std::shared_lock<DefaultMutex> lock;
 		ExternalInventoryModule *external = dynamic_cast<ExternalInventoryModule *>(getModule(lock));
 		if (!external)
 			return;
