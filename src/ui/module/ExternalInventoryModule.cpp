@@ -140,8 +140,10 @@ namespace Game3 {
 				Glib::ustring label_text = stack.item->getTooltip(stack);
 				if (stack.count != 1)
 					label_text += " \u00d7 " + std::to_string(stack.count);
-				if (stack.hasDurability())
-					label_text += "\n(" + std::to_string(stack.data.at("durability").at(0).get<Durability>()) + "/" + std::to_string(stack.data.at("durability").at(1).get<Durability>()) + ")";
+				if (stack.hasDurability()) {
+					const nlohmann::json &durability = stack.data->at("durability");
+					label_text += "\n(" + std::to_string(durability.at(0).get<Durability>()) + '/' + std::to_string(durability.at(1).get<Durability>()) + ')';
+				}
 				auto fixed_ptr = std::make_unique<Gtk::Fixed>();
 				auto image_ptr = std::make_unique<Gtk::Image>(inventory->getImage(*game, slot));
 				auto label_ptr = std::make_unique<Gtk::Label>(std::to_string(stack.count));

@@ -40,7 +40,7 @@ namespace Game3 {
 			}
 		}
 
-		if (auto honey = crop->customData.find("honey"); honey != crop->customData.end()) {
+		if (auto honey = crop->customData->find("honey"); honey != crop->customData->end()) {
 			if (auto tilename = place.getName(layer); tilename && tilename->get() == honey->at("full").get<Identifier>()) {
 				if (!inventory->add({game, honey->at("item").get<Identifier>()})) {
 					place.set(layer, honey->at("empty").get<Identifier>());

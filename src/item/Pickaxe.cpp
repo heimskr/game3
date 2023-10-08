@@ -30,7 +30,6 @@ namespace Game3 {
 			player.setTooldown(1.f);
 			if (stack.reduceDurability())
 				inventory.erase(slot);
-			// setTooldown doesn't call notifyOwner on the player's inventory, so we have to do it here.
 			inventory.notifyOwner();
 			return true;
 		}
@@ -39,5 +38,9 @@ namespace Game3 {
 			return player.getGame().getTile(*terrain)->interact(place, Layer::Terrain);
 
 		return false;
+	}
+
+	bool Pickaxe::drag(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers) {
+		return use(slot, stack, place, modifiers, {0.f, 0.f});
 	}
 }

@@ -1,6 +1,7 @@
 #include "graphics/Tileset.h"
 #include "biome/Volcanic.h"
 #include "item/Item.h"
+#include "item/ItemStack.h"
 #include "lib/noise.h"
 #include "realm/Realm.h"
 #include "tileentity/ItemSpawner.h"
@@ -49,7 +50,7 @@ namespace Game3 {
 		if (realm.getTile(Layer::Terrain, {row, column}) == realm.getTileset()["base:tile/volcanic_sand"_id]) {
 			if (distribution(rng) < 1) {
 				Game &game = realm.getGame();
-				std::vector<ItemStack> mushrooms {
+				std::vector<ItemStack> mushrooms{
 					{game, "base:item/indigo_milkcap"_id},
 					{game, "base:item/black_trumpet"_id},
 					{game, "base:item/grey_knight"_id},

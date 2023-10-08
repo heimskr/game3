@@ -9,6 +9,7 @@
 #include "game/ClientGame.h"
 #include "game/ServerInventory.h"
 #include "item/Item.h"
+#include "item/ItemStack.h"
 #include "net/Buffer.h"
 #include "packet/InventoryPacket.h"
 #include "packet/SetActiveSlotPacket.h"
@@ -27,7 +28,7 @@ namespace Game3 {
 		return std::make_unique<ServerInventory>(*this);
 	}
 
-	std::optional<ItemStack> ServerInventory::add(const ItemStack &stack, const std::function<bool(Slot)> &predicate, Slot start) {
+	std::optional<HeapObject<ItemStack>> ServerInventory::add(const ItemStack &stack, const std::function<bool(Slot)> &predicate, Slot start) {
 		ssize_t remaining = stack.count;
 
 		if (0 <= start) {
@@ -84,9 +85,9 @@ namespace Game3 {
 			throw std::logic_error("How'd we end up with " + std::to_string(remaining) + " items remaining?");
 
 		if (remaining == 0)
-			return std::nullopt;
+			return {};
 
-		return ItemStack(getOwner()->getRealm()->getGame(), stack.item, remaining);
+		return std::make_unique<ItemStack>(getOwner()->getRealm()->getGame(), stack.item, remaining);
 	}
 
 	void ServerInventory::drop(Slot slot) {

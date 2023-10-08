@@ -3,6 +3,7 @@
 #include "graphics/Texture.h"
 #include "entity/Entity.h"
 #include "item/Item.h"
+#include "item/ItemStack.h"
 #include "threading/Atomic.h"
 
 #include <nlohmann/json_fwd.hpp>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Types.h"
-#include "item/Item.h"
+#include "item/ItemStack.h"
 
 #include <memory>
 #include <vector>

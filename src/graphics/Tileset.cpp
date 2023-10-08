@@ -1,6 +1,7 @@
 #include "graphics/Tileset.h"
 #include "game/Game.h"
 #include "item/Item.h"
+#include "item/ItemStack.h"
 #include "realm/Realm.h"
 #include "util/Crypto.h"
 

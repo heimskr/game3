@@ -1,8 +1,11 @@
 #include "tools/Flasker.h"
 #include "chemistry/MoleculeNames.h"
 #include "item/ChemicalItem.h"
+#include "item/ItemStack.h"
 
 #include <random>
+
+#include <nlohmann/json.hpp>
 
 namespace Game3 {
 	Lockable<std::unordered_map<std::string, Glib::RefPtr<Gdk::Pixbuf>>> ChemicalItem::imageCache{};
@@ -56,7 +59,7 @@ namespace Game3 {
 	}
 
 	std::string ChemicalItem::getFormula(const ItemStack &stack) {
-		if (auto iter = stack.data.find("formula"); iter != stack.data.end() && !iter->is_null())
+		if (auto iter = stack.data->find("formula"); iter != stack.data->end() && !iter->is_null())
 			return *iter;
 		return {};
 	}

@@ -1,6 +1,8 @@
 #include "item/Products.h"
 #include "threading/ThreadContext.h"
 
+#include <nlohmann/json.hpp>
+
 namespace Game3 {
 	ConstantProduct::ConstantProduct(ItemStack stack_, ItemCount count_):
 		stack(std::move(stack_)), count(count_) {}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "item/Item.h"
+#include "item/ItemStack.h"
 #include "threading/Atomic.h"
 #include "tileentity/TileEntity.h"
 

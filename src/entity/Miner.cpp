@@ -218,7 +218,7 @@ namespace Game3 {
 			auto leftover = keep_realm.stockpileInventory->add(stack);
 
 			if (leftover) {
-				stack.count -= leftover->count;
+				stack.count -= (*leftover)->count;
 				if (!totalSellPrice(keep_realm, stack, sell_price))
 					throw std::runtime_error("Sell price calculation failed after reducing stack");
 				new_money += sell_price;

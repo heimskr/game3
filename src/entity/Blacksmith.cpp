@@ -210,7 +210,7 @@ namespace Game3 {
 				continue;
 			auto leftover = getInventory()->add(stack);
 			if (leftover) {
-				stack.count -= leftover->count;
+				stack.count -= (*leftover)->count;
 				if (new_money < totalBuyPrice(keep_realm, stack))
 					throw std::runtime_error("Buy price calculation failed after reducing stack");
 				new_money -= buy_price;
