@@ -52,12 +52,27 @@ namespace Game3 {
 				if (modifiers.onlyShift()) {
 					Game &game = place.getGame();
 
-					// Give back each present type.
-					for (const PipeType pipe_type: PIPE_TYPES)
-						if (pipe->getPresent(pipe_type))
-							place.player->give(ItemStack(game, getPipeItem(game, pipe_type), 1));
+					bool self_present = false;
+					bool others_present = false;
 
-					realm.queueDestruction(pipe);
+					for (const PipeType pipe_type: PIPE_TYPES) {
+						if (pipe->getPresent(pipe_type)) {
+							if (pipe_type == P) {
+								self_present = true;
+								place.player->give(ItemStack(game, getPipeItem(game, pipe_type), 1));
+								pipe->setPresent(P, false);
+							} else
+								others_present = true;
+						}
+					}
+
+					if (!others_present) {
+						realm.queueDestruction(pipe);
+					} else if (self_present) {
+						pipe->increaseUpdateCounter();
+						pipe->queueBroadcast();
+					}
+
 					return true;
 				}
 
