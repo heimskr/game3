@@ -714,11 +714,10 @@ namespace Game3 {
 			if (iter->second->interact(place, modifiers))
 				return true;
 
-		auto &tileset = getTileset();
+		Tileset &tileset = getTileset();
 
-		// TODO: when normally invisible layers become conditionally visible, handle that here.
 		for (const Layer layer: reverse(mainLayers))
-			if (auto tile = tryTile(layer, position))
+			if (std::optional<TileID> tile = tryTile(layer, position))
 				if (game.getTile(tileset[*tile])->interact(place, layer))
 					return true;
 
