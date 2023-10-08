@@ -1,14 +1,13 @@
+#include <iostream>
+
 #include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/ServerInventory.h"
 #include "graphics/SpriteRenderer.h"
-#include "item/ItemStack.h"
 #include "realm/Realm.h"
 #include "recipe/CentrifugeRecipe.h"
 #include "tileentity/Centrifuge.h"
-
-#include <iostream>
 
 namespace Game3 {
 	Centrifuge::Centrifuge(Identifier tile_id, Position position_):

@@ -46,7 +46,6 @@
 #include "item/Hammer.h"
 #include "item/Hoe.h"
 #include "item/Item.h"
-#include "item/ItemStack.h"
 #include "item/Landfill.h"
 #include "item/Mead.h"
 #include "item/Mushroom.h"

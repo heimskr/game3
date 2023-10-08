@@ -3,7 +3,6 @@
 #include "graphics/Tileset.h"
 #include "game/ClientGame.h"
 #include "graphics/SpriteRenderer.h"
-#include "item/ItemStack.h"
 #include "realm/Realm.h"
 #include "tileentity/Tank.h"
 
@@ -28,7 +27,7 @@ namespace Game3 {
 
 		if (modifiers.onlyAlt()) {
 			realm->queueDestruction(getSelf());
-			player->give(ItemStack(realm->getGame(), "base:item/tank"));
+			player->give(ItemStack(realm->getGame(), "base:item/tank"_id));
 			return true;
 		}
 

@@ -20,7 +20,7 @@ namespace Game3 {
 
 			std::unique_ptr<Inventory> copy() const override;
 
-			std::optional<HeapObject<ItemStack>> add(const ItemStack &, const std::function<bool(Slot)> &, Slot start) override;
+			std::optional<ItemStack> add(const ItemStack &, const std::function<bool(Slot)> &, Slot start) override;
 
 			void drop(Slot) override;
 

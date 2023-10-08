@@ -1,5 +1,4 @@
 #include "game/Inventory.h"
-#include "item/ItemStack.h"
 #include "recipe/CraftingRecipe.h"
 
 namespace Game3 {
@@ -47,8 +46,8 @@ namespace Game3 {
 			inventory_in->remove(requirement);
 
 		for (const ItemStack &stack: output)
-			if (auto leftover = inventory_out->add(stack))
-				leftovers->push_back(std::move(**leftover));
+			if (std::optional<ItemStack> leftover = inventory_out->add(stack))
+				leftovers->push_back(std::move(*leftover));
 
 		return true;
 	}

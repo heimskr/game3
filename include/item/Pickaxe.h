@@ -3,11 +3,9 @@
 #include "item/Tool.h"
 
 namespace Game3 {
-	class Pickaxe: public Tool {
-		public:
-			using Tool::Tool;
-
-			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
-			bool drag(Slot, ItemStack &, const Place &, Modifiers) override;
+	struct Pickaxe: Tool {
+		using Tool::Tool;
+		bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
+		bool canUseOnWorld() const override { return true; }
 	};
 }

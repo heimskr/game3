@@ -26,7 +26,7 @@ namespace Game3 {
 			return false;
 
 		if (auto chemical = std::dynamic_pointer_cast<ChemicalItem>(stack.item))
-			return stack.data->contains("formula");
+			return stack.data.contains("formula");
 
 		return false;
 	}

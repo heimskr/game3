@@ -3,7 +3,6 @@
 #include "entity/EntityFactory.h"
 #include "entity/ServerPlayer.h"
 #include "game/ServerGame.h"
-#include "item/ItemStack.h"
 #include "net/LocalServer.h"
 #include "net/RemoteClient.h"
 #include "packet/ChatMessageSentPacket.h"

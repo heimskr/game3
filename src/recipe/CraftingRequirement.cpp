@@ -1,7 +1,5 @@
 #include "recipe/CraftingRequirement.h"
 
-#include <nlohmann/json.hpp>
-
 namespace Game3 {
 	CraftingRequirement CraftingRequirement::fromJSON(const Game &game, const nlohmann::json &json) {
 		Identifier id = json.at(0);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "item/ItemStack.h"
+#include "item/Item.h"
 #include "pipes/PipeNetwork.h"
 
 #include <deque>

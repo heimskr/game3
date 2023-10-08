@@ -5,7 +5,6 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include "item/Item.h"
-#include "item/ItemStack.h"
 
 namespace Game3 {
 	struct AttributeRequirement {

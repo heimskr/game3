@@ -4,7 +4,7 @@
 #include <cassert>
 
 namespace Game3 {
-	Crop::Crop(Identifier identifier_, Identifier custom_type, std::vector<Identifier> stages_, Products products_, double chance_, HeapObject<nlohmann::json> custom_data):
+	Crop::Crop(Identifier identifier_, Identifier custom_type, std::vector<Identifier> stages_, Products products_, double chance_, nlohmann::json custom_data):
 	NamedRegisterable(std::move(identifier_)),
 	customType(std::move(custom_type)),
 	stages(std::move(stages_)),

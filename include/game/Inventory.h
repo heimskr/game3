@@ -1,6 +1,5 @@
 #pragma once
 
-#include "container/HeapObject.h"
 #include "game/Container.h"
 #include "item/Item.h"
 #include "recipe/CraftingRequirement.h"
@@ -64,10 +63,10 @@ namespace Game3 {
 			/** If the ItemStack couldn't be inserted into the inventory, this function returns an ItemStack
 			 *  containing the leftovers that couldn't be inserted. Otherwise, this function returns nothing.
 			 *  The predicate will be used to determine which slots can be inserted into. */
-			virtual std::optional<HeapObject<ItemStack>> add(const ItemStack &, const std::function<bool(Slot)> &predicate, Slot start) = 0;
-			virtual std::optional<HeapObject<ItemStack>> add(const ItemStack &stack, const std::function<bool(Slot)> &predicate) { return add(stack, predicate, -1); }
-			virtual std::optional<HeapObject<ItemStack>> add(const ItemStack &stack, Slot start) { return add(stack, [](Slot) { return true; }, start); }
-			virtual std::optional<HeapObject<ItemStack>> add(const ItemStack &stack) { return add(stack, [](Slot) { return true; }, -1); }
+			virtual std::optional<ItemStack> add(const ItemStack &, const std::function<bool(Slot)> &predicate, Slot start) = 0;
+			virtual std::optional<ItemStack> add(const ItemStack &stack, const std::function<bool(Slot)> &predicate) { return add(stack, predicate, -1); }
+			virtual std::optional<ItemStack> add(const ItemStack &stack, Slot start) { return add(stack, [](Slot) { return true; }, start); }
+			virtual std::optional<ItemStack> add(const ItemStack &stack) { return add(stack, [](Slot) { return true; }, -1); }
 
 			virtual bool canInsert(const ItemStack &) const = 0;
 			virtual bool canInsert(const ItemStack &, Slot) const = 0;

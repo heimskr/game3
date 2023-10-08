@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Types.h"
-#include "container/HeapObject.h"
 #include "item/Item.h"
 #include "item/Products.h"
 
@@ -17,9 +16,9 @@ namespace Game3 {
 			Products products;
 			double chance;
 			// TODO: refactor into subclasses with CropFactory
-			HeapObject<nlohmann::json> customData;
+			nlohmann::json customData;
 
-			Crop(Identifier, Identifier custom_type, std::vector<Identifier> stages_, Products products_, double chance_, HeapObject<nlohmann::json> custom_data);
+			Crop(Identifier, Identifier custom_type, std::vector<Identifier> stages_, Products products_, double chance_, nlohmann::json custom_data);
 			Crop(Identifier, Game &, const nlohmann::json &);
 
 		private:
