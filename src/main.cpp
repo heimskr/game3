@@ -5,6 +5,7 @@
 #include "net/LocalServer.h"
 #include "net/Sock.h"
 #include "tools/Flasker.h"
+#include "tools/Mazer.h"
 #include "tools/Migrator.h"
 #include "tools/Stitcher.h"
 #include "util/Crypto.h"
@@ -103,6 +104,16 @@ int main(int argc, char **argv) {
 			for (int i = 2; i < argc; ++i)
 				args.emplace_back(argv[i]);
 			return Game3::migrate(args);
+		}
+
+		if (strcmp(argv[1], "--maze") == 0) {
+			for (const auto &row: Game3::Mazer({32, 32}, 666, {1, 0}).getRows(true)) {
+				for (const auto column: row)
+					std::cout << (column? "\u2588" : " ");
+				std::cout << std::endl;
+			}
+
+			return 0;
 		}
 
 		if (argc == 4) {
