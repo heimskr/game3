@@ -23,7 +23,9 @@
 // SOFTWARE.
 
 #include <array>
+#include <cstddef>
 #include <random>
+#include <vector>
 
 namespace Game3 {
 	enum class MazeWall {North = 0b1000, East = 0b0100, South = 0b0010, West = 0b0001};
@@ -147,13 +149,13 @@ namespace Game3 {
 			[[nodiscard]]
 			static MazeWall wallInDirection(MazeDirection dir) {
 				constexpr static std::array walls{MazeWall::North, MazeWall::East, MazeWall::South, MazeWall::West};
-				return walls[static_cast<std::size_t>(dir)];
+				return walls[static_cast<size_t>(dir)];
 			}
 
 			[[nodiscard]]
 			static MazeDirection oppositeDirection(MazeDirection dir) {
 				constexpr static std::array directions{MazeDirection::South, MazeDirection::West, MazeDirection::North, MazeDirection::East};
-				return directions[static_cast<std::size_t>(dir)];
+				return directions[static_cast<size_t>(dir)];
 			}
 
 			[[nodiscard]]
