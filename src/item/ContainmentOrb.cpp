@@ -37,10 +37,8 @@ namespace Game3 {
 				}
 			}
 
-			if (!selected) {
-				WARN("No entities found at position " << place.position);
+			if (!selected)
 				return true;
-			}
 
 			stack.data["containedEntity"] = selected->type;
 			stack.data["containedName"] = selected->getName();
