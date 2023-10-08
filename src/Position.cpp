@@ -1,4 +1,5 @@
 #include "Position.h"
+#include "entity/Player.h"
 #include "graphics/Tileset.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
@@ -89,6 +90,18 @@ namespace Game3 {
 
 	bool Place::operator==(const Place &other) const {
 		return this == &other || (position == other.position && realm == other.realm && player == other.player);
+	}
+
+	std::ostream & operator<<(std::ostream &os, const Place &place) {
+		if (place.realm) {
+			if (place.player)
+				return os << place.position << ':' << place.realm->id << ':' << place.player->username;
+			return os << place.position << ':' << place.realm->id << ":?";
+		}
+
+		if (place.player)
+			return os << place.position << ":?:" << place.player->username;
+		return os << place.position << ":?:?";
 	}
 
 	void to_json(nlohmann::json &json, const Position &position) {

@@ -44,6 +44,13 @@ namespace Game3 {
 		std::string simpleString() const { return std::to_string(row) + ',' + std::to_string(column); }
 	};
 
+	void to_json(nlohmann::json &, const Position &);
+	void from_json(const nlohmann::json &, Position &);
+	std::ostream & operator<<(std::ostream &, const Position &);
+	Buffer & operator+=(Buffer &, const Position &);
+	Buffer & operator<<(Buffer &, const Position &);
+	Buffer & operator>>(Buffer &, Position &);
+
 	/** Silly naming, perhaps. */
 	struct Place {
 		Position position;
@@ -64,13 +71,7 @@ namespace Game3 {
 		bool operator==(const Place &) const;
 	};
 
-	void to_json(nlohmann::json &, const Position &);
-	void from_json(const nlohmann::json &, Position &);
-
-	std::ostream & operator<<(std::ostream &, const Position &);
-	Buffer & operator+=(Buffer &, const Position &);
-	Buffer & operator<<(Buffer &, const Position &);
-	Buffer & operator>>(Buffer &, Position &);
+	std::ostream & operator<<(std::ostream &, const Place &);
 
 	struct Offset {
 		float x = 0.f;

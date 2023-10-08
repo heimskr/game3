@@ -284,7 +284,7 @@ namespace Game3 {
 
 		add(std::make_shared<Landfill>("base:item/sand",          "Sand",          1, 64, "base:tile/sand"));
 		add(std::make_shared<Landfill>("base:item/volcanic_sand", "Volcanic Sand", 3, 64, "base:tile/volcanic_sand"));
-		add(std::make_shared<Landfill>("base:item/stone",         "Stone",         1, 64, "base:tile/stone", "base:tile/cave_wall"));
+		add(std::make_shared<Landfill>("base:item/stone",         "Stone",         1, 64, "base:tile/stone"));
 		add(std::make_shared<Landfill>("base:item/grimstone",     "Grimstone",     2, 64, "base:tile/grimstone"));
 
 		add(std::make_shared<PumpItem>("base:item/pump", "Pump", 999, 64)); // TODO: cost
@@ -506,6 +506,7 @@ namespace Game3 {
 
 		reg.add<FarmlandTile>();
 		reg.add<ForestFloorTile>();
+		reg.addMineable("base:tile/stone", ItemStack(*this, "base:item/stone"), true);
 
 		const auto monomap = registry<TilesetRegistry>().at("base:tileset/monomap");
 		auto grass = std::make_shared<GrassTile>();

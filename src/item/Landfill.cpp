@@ -8,20 +8,20 @@
 #include "ui/MainWindow.h"
 
 namespace Game3 {
-	Landfill::Landfill(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count, Identifier terrain_name, Identifier submerged_name, ItemCount required_count):
+	Landfill::Landfill(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count, Identifier terrain_name, Identifier objects_name, ItemCount required_count):
 	Item(std::move(id_), std::move(name_), base_price, max_count),
 	terrainName(std::move(terrain_name)),
-	submergedName(std::move(submerged_name)),
+	objectsName(std::move(objects_name)),
 	requiredCount(required_count) {
-		if (!submergedName)
-			submergedName = terrainName;
+		if (!objectsName)
+			objectsName = terrainName;
 	}
 
 	bool Landfill::use(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers, std::pair<float, float>) {
 		PlayerPtr player = place.player;
 		RealmPtr  realm  = place.realm;
 
-		Layer layer = modifiers.onlyShift()? Layer::Submerged : Layer::Terrain;
+		Layer layer = modifiers.onlyShift()? Layer::Objects : Layer::Terrain;
 
 		if (std::optional<TileID> tile_id = place.get(layer); tile_id && *tile_id != 0)
 			return false;
@@ -30,7 +30,7 @@ namespace Game3 {
 			return false;
 
 		player->getInventory()->decrease(stack, slot, requiredCount);
-		place.set(layer, layer == Layer::Submerged? submergedName : terrainName);
+		place.set(layer, layer == Layer::Objects? objectsName : terrainName);
 		return true;
 	}
 

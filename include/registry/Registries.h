@@ -7,6 +7,7 @@ namespace Game3 {
 	class Crop;
 	class EntityFactory;
 	class Item;
+	class ItemStack;
 	class LocalCommandFactory;
 	class ModuleFactory;
 	class PacketFactory;
@@ -100,6 +101,8 @@ namespace Game3 {
 	struct TileRegistry: NamedRegistry<Tile> {
 		static Identifier ID() { return {"base", "registry/tile"}; }
 		TileRegistry(): NamedRegistry(ID()) {}
+		void addMineable(Identifier, const ItemStack &, bool consumable);
+		void addMineable(Identifier, ItemStack &&, bool consumable);
 	};
 
 	struct CropRegistry: NamedRegistry<Crop> {
