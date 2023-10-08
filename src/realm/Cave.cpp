@@ -33,61 +33,10 @@ namespace Game3 {
 		}
 	}
 
-	bool Cave::interactGround(const std::shared_ptr<Player> &player, const Position &position, Modifiers modifiers) {
-		if (Realm::interactGround(player, position, modifiers))
-			return true;
-
-		std::optional<ItemStack> ore_stack;
-
-		const TileID tile2 = getTile(Layer::Objects, position);
-		const auto &tileset = getTileset();
-		const Identifier &tile_id = tileset[tile2];
-
-		Game &game = getGame();
-
-		bool grim = false;
-
-		static std::unordered_map<Identifier, std::pair<Identifier, bool>> ores{
-			{"base:tile/cave_coal",     {"base:item/coal",        false}},
-			{"base:tile/cave_copper",   {"base:item/copper_ore",  false}},
-			{"base:tile/cave_diamond",  {"base:item/diamond_ore", false}},
-			{"base:tile/cave_gold",     {"base:item/gold_ore",    false}},
-			{"base:tile/cave_iron",     {"base:item/iron_ore",    false}},
-			{"base:tile/cave_wall",     {"base:item/stone",       false}},
-			{"base:tile/grimstone",     {"base:item/grimstone",    true}},
-			{"base:tile/grim_diamond",  {"base:item/diamond_ore",  true}},
-			{"base:tile/grim_uranium",  {"base:item/uranium_ore",  true}},
-			{"base:tile/grim_fireopal", {"base:item/fire_opal",    true}},
-		};
-
-		if (auto iter = ores.find(tile_id); iter != ores.end()) {
-			ore_stack.emplace(game, iter->second.first, 1);
-			grim = iter->second.second;
-		}
-
-		if (ore_stack) {
-			const InventoryPtr inventory = player->getInventory();
-			auto inventory_lock = inventory->uniqueLock();
-			if (auto *stack = inventory->getActive()) {
-				if (stack->hasAttribute("base:attribute/pickaxe") && !inventory->add(*ore_stack)) {
-					reveal(position);
-					setTile(Layer::Objects, position, 0);
-					if (getTile(Layer::Terrain, position) == 0)
-						setTile(Layer::Terrain, position, grim? "base:tile/grimdirt" : "base:tile/cave_dirt", true);
-					if (stack->reduceDurability())
-						inventory->erase(inventory->activeSlot);
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	void Cave::reveal(const Position &position) {
+	void Cave::reveal(const Position &position, bool force) {
 		const auto &tileset = getTileset();
 		const TileID empty_id = tileset.getEmptyID();
-		if (getTile(Layer::Objects, position) != empty_id) {
+		if (force || getTile(Layer::Objects, position) != empty_id) {
 			const TileID void_id = tileset["base:tile/void"];
 			for (Index row_offset = -1; row_offset <= 1; ++row_offset)
 				for (Index column_offset = -1; column_offset <= 1; ++column_offset)

@@ -117,6 +117,7 @@
 #include "recipe/CraftingRecipe.h"
 #include "recipe/GeothermalRecipe.h"
 #include "registry/Registries.h"
+#include "tile/CaveTile.h"
 #include "tile/CropTile.h"
 #include "tile/FarmlandTile.h"
 #include "tile/ForestFloorTile.h"
@@ -507,6 +508,16 @@ namespace Game3 {
 		reg.add<FarmlandTile>();
 		reg.add<ForestFloorTile>();
 		reg.addMineable("base:tile/stone", ItemStack(*this, "base:item/stone"), true);
+		reg.add("base:tile/cave_coal",     std::make_shared<CaveTile>("base:tile/cave_coal",     ItemStack(*this, "base:item/coal"),        "base:tile/cave_dirt"));
+		reg.add("base:tile/cave_copper",   std::make_shared<CaveTile>("base:tile/cave_copper",   ItemStack(*this, "base:item/copper_ore"),  "base:tile/cave_dirt"));
+		reg.add("base:tile/cave_diamond",  std::make_shared<CaveTile>("base:tile/cave_diamond",  ItemStack(*this, "base:item/diamond_ore"), "base:tile/cave_dirt"));
+		reg.add("base:tile/cave_gold",     std::make_shared<CaveTile>("base:tile/cave_gold",     ItemStack(*this, "base:item/gold_ore"),    "base:tile/cave_dirt"));
+		reg.add("base:tile/cave_iron",     std::make_shared<CaveTile>("base:tile/cave_iron",     ItemStack(*this, "base:item/iron_ore"),    "base:tile/cave_dirt"));
+		reg.add("base:tile/cave_wall",     std::make_shared<CaveTile>("base:tile/cave_wall",     ItemStack(*this, "base:item/stone"),       "base:tile/cave_dirt"));
+		reg.add("base:tile/grimstone",     std::make_shared<CaveTile>("base:tile/grimstone",     ItemStack(*this, "base:item/grimstone"),   "base:tile/grimdirt"));
+		reg.add("base:tile/grim_diamond",  std::make_shared<CaveTile>("base:tile/grim_diamond",  ItemStack(*this, "base:item/diamond_ore"), "base:tile/grimdirt"));
+		reg.add("base:tile/grim_uranium",  std::make_shared<CaveTile>("base:tile/grim_uranium",  ItemStack(*this, "base:item/uranium_ore"), "base:tile/grimdirt"));
+		reg.add("base:tile/grim_fireopal", std::make_shared<CaveTile>("base:tile/grim_fireopal", ItemStack(*this, "base:item/fire_opal"),   "base:tile/grimdirt"));
 
 		const auto monomap = registry<TilesetRegistry>().at("base:tileset/monomap");
 		auto grass = std::make_shared<GrassTile>();

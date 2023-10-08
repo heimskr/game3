@@ -20,8 +20,7 @@ namespace Game3 {
 			Cave & operator=(Cave &&) = delete;
 
 			void onRemove() override;
-			bool interactGround(const std::shared_ptr<Player> &, const Position &, Modifiers) override;
-			void reveal(const Position &);
+			void reveal(const Position &, bool force = false);
 			void generateChunk(const ChunkPosition &) override;
 
 			friend class Realm;

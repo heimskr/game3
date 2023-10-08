@@ -29,14 +29,14 @@ namespace Game3 {
 		if (!active || !active->hasAttribute("base:attribute/pickaxe"))
 			return false;
 
-		player->give(stack);
-
 		if (consumable)
 			place.set(layer, 0);
 
 		if (active->reduceDurability())
 			inventory->erase(inventory->activeSlot);
 		inventory->notifyOwner();
+
+		player->give(stack);
 
 		return true;
 	}

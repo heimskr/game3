@@ -13,8 +13,5 @@ namespace Game3 {
 			MineableTile(Identifier, ItemStack, bool consumable_);
 
 			bool interact(const Place &, Layer) override;
-
-			inline const ItemStack & getStack() const { return stack; }
-			inline bool getConsumable() const { return consumable; }
 	};
 }
