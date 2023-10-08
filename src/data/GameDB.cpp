@@ -760,5 +760,7 @@ namespace Game3 {
 		statement.bind(1, player->username);
 		statement.bind(2, player->displayName);
 		statement.bind(3, nlohmann::json(*player).dump());
+		statement.bind(4);
+		statement.bind(5);
 	}
 }
