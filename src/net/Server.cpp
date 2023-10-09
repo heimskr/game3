@@ -53,9 +53,13 @@ namespace Game3 {
 
 	void Server::send(RemoteClient &client, std::string message, bool force) {
 		if (!force && client.isBuffering()) {
-			SendBuffer &buffer = client.sendBuffer;
-			auto lock = buffer.uniqueLock();
-			buffer.bytes.insert(buffer.bytes.end(), message.begin(), message.end());
+			asio::post(client.strand, [this, weak_client = std::weak_ptr(client.shared_from_this()), message = std::move(message)] {
+				if (std::shared_ptr<RemoteClient> client = weak_client.lock()) {
+					SendBuffer &buffer = client->sendBuffer;
+					auto lock = buffer.uniqueLock();
+					buffer.bytes.insert(buffer.bytes.end(), message.begin(), message.end());
+				}
+			});
 			return;
 		}
 
