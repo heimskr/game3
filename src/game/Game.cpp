@@ -153,7 +153,7 @@
 
 namespace Game3 {
 	Game::~Game() {
-		INFO("~Game(" << this << ')');
+		INFO("\e[31m~Game\e[39m(" << this << ')');
 		dying = true;
 	}
 

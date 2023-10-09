@@ -27,7 +27,7 @@ namespace Game3 {
 		Entity(ID()) {}
 
 	Player::~Player() {
-		INFO("~Player(" << this << ", " << (username.empty()? "[unknown username]" : username) << ", " << globalID << ')');
+		INFO("\e[31m~Player\e[39m(" << this << ", " << (username.empty()? "[unknown username]" : username) << ", " << globalID << ')');
 	}
 
 	void Player::destroy() {

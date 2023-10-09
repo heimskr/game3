@@ -18,7 +18,7 @@
 
 namespace Game3 {
 	LocalClient::~LocalClient() {
-		INFO("~LocalClient(" << this << ')');
+		INFO("\e[31m~LocalClient\e[39m(" << this << ')');
 		sock->close(true);
 	}
 

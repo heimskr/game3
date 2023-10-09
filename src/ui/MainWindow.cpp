@@ -828,11 +828,22 @@ namespace Game3 {
 					return;
 				}
 				case GDK_KEY_p: {
-					std::cout << "Player GID: " << game->player->getGID() << '\n';
-					std::cout << "Realm ID: " << game->player->getRealm()->id << " or perhaps " << game->activeRealm.copyBase()->id << '\n';
-					std::cout << "Position: " << game->player->getPosition() << '\n';
-					std::cout << "Chunk position: " << std::string(getChunkPosition(game->player->getPosition())) << '\n';
-					std::cout << "Update counter: " << game->player->getRealm()->tileProvider.getUpdateCounter(getChunkPosition(game->player->getPosition())) << '\n';
+					if (Modifiers(modifiers).ctrl) {
+						RealmPtr realm = game->player->getRealm();
+						const auto &chunk = realm->tileProvider.getPathChunk(game->player->getChunk());
+						auto lock = chunk.sharedLock();
+						for (size_t row = 0; row < CHUNK_SIZE; ++row) {
+							for (size_t column = 0; column < CHUNK_SIZE; ++column)
+								std::cout << (chunk.at(row * CHUNK_SIZE + column)? "\u2588" : "\u2591");
+							std::cout << '\n';
+						}
+					} else {
+						std::cout << "Player GID: " << game->player->getGID() << '\n';
+						std::cout << "Realm ID: " << game->player->getRealm()->id << " or perhaps " << game->activeRealm.copyBase()->id << '\n';
+						std::cout << "Position: " << game->player->getPosition() << '\n';
+						std::cout << "Chunk position: " << std::string(getChunkPosition(game->player->getPosition())) << '\n';
+						std::cout << "Update counter: " << game->player->getRealm()->tileProvider.getUpdateCounter(getChunkPosition(game->player->getPosition())) << '\n';
+					}
 					return;
 				}
 				case GDK_KEY_0: case GDK_KEY_1: case GDK_KEY_2: case GDK_KEY_3: case GDK_KEY_4:

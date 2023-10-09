@@ -200,10 +200,7 @@ namespace Game3 {
 
 	void GameDB::readAllRealms() {
 		assert(database);
-
-		Timer lock_timer{"LockDB"};
 		auto db_lock = database.uniqueLock();
-		lock_timer.stop();
 
 		SQLite::Statement query{*database, "SELECT * FROM chunks"};
 

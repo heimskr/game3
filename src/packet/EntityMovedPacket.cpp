@@ -28,11 +28,6 @@ namespace Game3 {
 			return;
 		}
 
-		if (!entity->isPlayer()) {
-			auto &entity_ref = *entity;
-			INFO("EntityMovedPacket: Moving non-player entity " << arguments.globalID << " (" << typeid(entity_ref).name() << "). Player is " << game.player->getGID());
-		}
-
 		const Offset offset = entity->offset.copyBase();
 		Position position = entity->getPosition();
 		const double apparent_x = offset.x + static_cast<double>(position.column);

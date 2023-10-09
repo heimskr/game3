@@ -157,7 +157,7 @@ namespace Game3 {
 			bool hasTileEntityAt(const Position &) const;
 			void damageGround(const Position &);
 			Tileset & getTileset();
-			/** Redoes the pathmap for the entire stored map, not just the visible ones! Can be very expensive. */
+			/** Redoes the pathmap for the entire stored map, not just the visible chunks! Can be very expensive. */
 			void remakePathMap();
 			void remakePathMap(const ChunkRange &);
 			void remakePathMap(ChunkPosition);
