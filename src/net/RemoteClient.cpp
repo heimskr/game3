@@ -121,6 +121,31 @@ namespace Game3 {
 	void RemoteClient::send(const T &value) {
 		if (networkMutex.try_lock())
 			throw std::runtime_error("Network mutex not locked...?");
-		server.send(*this, value);
+		localServer.send(*this, value);
+	}
+
+	void RemoteClient::startBuffering() {
+		++sendBuffer;
+	}
+
+	void RemoteClient::flushBuffer(bool force) {
+		if (!force && !sendBuffer.active())
+			return;
+		std::vector<char> moved_buffer;
+		{
+			auto buffer_lock = sendBuffer.uniqueLock();
+			moved_buffer = std::move(sendBuffer.bytes);
+		}
+		std::unique_lock network_lock(networkMutex);
+		server.send(*this, std::string_view(moved_buffer.data(), moved_buffer.size()), true);
+	}
+
+	void RemoteClient::stopBuffering() {
+		if (!(--sendBuffer).active())
+			flushBuffer(true);
+	}
+
+	bool RemoteClient::isBuffering() const {
+		return sendBuffer.active();
 	}
 }

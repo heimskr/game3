@@ -1,32 +1,30 @@
 #pragma once
 
+#include "net/SendBuffer.h"
+
 #include <cstddef>
 #include <string>
 
-#include "net/SendBuffer.h"
-
-struct bufferevent;
+#include <asio.hpp>
 
 namespace Game3 {
 	class Packet;
 	class Server;
+	class ServerWorker;
 
 	struct GenericClient {
 		Server &server;
 		int id = -1;
-		int descriptor = -1;
 		std::string ip;
-		/** If nonzero, don't read more than this many bytes at a time. The amount read will be subtracted from this. */
-		size_t maxRead = 0;
 		SendBuffer sendBuffer;
-		bufferevent *event = nullptr;
 		std::mutex networkMutex;
+		asio::ip::tcp::socket socket;
+		std::shared_ptr<ServerWorker> worker;
 
 		GenericClient() = delete;
 		GenericClient(const GenericClient &) = delete;
 		GenericClient(GenericClient &&) = delete;
-		GenericClient(Server &server_, int id_, int descriptor_, std::string_view ip_, bufferevent *event_):
-			server(server_), id(id_), descriptor(descriptor_), ip(ip_), event(event_) {}
+		GenericClient(Server &server_, std::string_view ip_, int id_);
 
 		virtual ~GenericClient() = default;
 
@@ -35,10 +33,5 @@ namespace Game3 {
 
 		virtual void handleInput(std::string_view) = 0;
 		virtual void onMaxLineSizeExceeded() {}
-
-		void startBuffering();
-		void flushBuffer(bool force = false);
-		void stopBuffering();
-		bool isBuffering() const;
 	};
 }

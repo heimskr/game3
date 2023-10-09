@@ -12,7 +12,6 @@ namespace Game3 {
 	class ServerPlayer;
 	struct ChunkPosition;
 
-	/** Used by servers to represent a remote client. */
 	class RemoteClient: public GenericClient, public std::enable_shared_from_this<RemoteClient> {
 		public:
 			struct BufferGuard {
@@ -33,11 +32,11 @@ namespace Game3 {
 
 			constexpr static size_t MAX_PACKET_SIZE = 1 << 24;
 
-			LocalServer &server;
+			LocalServer &localServer;
 
 			RemoteClient() = delete;
-			RemoteClient(LocalServer &server_, int id_, int fd, std::string_view ip_, bufferevent *event):
-				GenericClient(*server_.server, id_, fd, ip_, event), server(server_) {}
+			RemoteClient(LocalServer &local_server, std::string_view ip_, int id_):
+				GenericClient(*local_server.server, ip_, id_), localServer(local_server) {}
 
 			~RemoteClient() override = default;
 
@@ -51,6 +50,11 @@ namespace Game3 {
 			template <typename T>
 			requires (!std::derived_from<T, Packet>)
 			void send(const T &value);
+
+			void startBuffering();
+			void flushBuffer(bool force = false);
+			void stopBuffering();
+			bool isBuffering() const;
 
 		private:
 			enum class State {Begin, Data};

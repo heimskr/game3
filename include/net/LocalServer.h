@@ -38,7 +38,7 @@ namespace Game3 {
 
 			void run() override;
 			void stop() override;
-			void send(GenericClient &, std::string_view);
+			void send(RemoteClient &, std::string_view);
 			/** Writes every player's full data to the database. */
 			void saveUserData();
 			std::shared_ptr<ServerPlayer> loadPlayer(std::string_view username, std::string_view display_name);
@@ -49,7 +49,7 @@ namespace Game3 {
 			static int main(int argc, char **argv);
 
 			template <std::integral T>
-			void send(GenericClient &client, T value) {
+			void send(RemoteClient &client, T value) {
 				assert(server);
 				const T little = toLittle(value);
 				server->send(client, std::string_view(reinterpret_cast<const char *>(&little), sizeof(T)));

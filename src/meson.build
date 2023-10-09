@@ -29,14 +29,13 @@ resources_o = custom_target('resources-obj-gen',
 
 resources_dep = declare_dependency(sources: resources_o[0])
 
+boost_dep = dependency('boost')
+
 game3_deps = [
 	dependency('gtk4'),
 	dependency('gtkmm-4.0'),
 	dependency('threads'),
 	dependency('eigen3'),
-	dependency('libevent'),
-	dependency('libevent_openssl'),
-	dependency('libevent_pthreads'),
 	dependency('openssl'),
 	dependency('freetype2'),
 	dependency('libzstd'),
@@ -46,7 +45,8 @@ game3_deps = [
 	dependency('x11'),
 	chemskr.get_variable('chemskr'),
 	sqlitecpp.get_variable('sqlitecpp_dep'),
-	resources_dep
+	resources_dep,
+	boost_dep,
 ]
 
 if build_machine.system() != 'darwin'

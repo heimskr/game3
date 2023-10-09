@@ -1,10 +1,3 @@
-#include <atomic>
-#include <cctype>
-#include <filesystem>
-#include <fstream>
-
-#include <event2/thread.h>
-
 #include "Log.h"
 #include "Options.h"
 #include "graphics/Tileset.h"
@@ -30,37 +23,33 @@
 #include "worldgen/ShadowRealm.h"
 #include "worldgen/WorldGen.h"
 
+#include <atomic>
+#include <cctype>
+#include <filesystem>
+#include <fstream>
+
 namespace Game3 {
 	LocalServer::LocalServer(std::shared_ptr<Server> server_, std::string_view secret_):
 	server(std::move(server_)), secret(secret_) {
-		server->addClient = [this](auto &, int new_client, std::string_view ip, int fd, bufferevent *event) {
-			auto game_client = std::make_shared<RemoteClient>(*this, new_client, fd, ip, event);
-			auto lock = server->lockClients();
-			server->getClients().try_emplace(new_client, std::move(game_client));
-			INFO("Adding " << new_client << " from " << ip);
+		server->onAdd = [](RemoteClient &client) {
+			INFO("Adding connection from " << client.ip);
 		};
 
-		server->closeHandler = [this](int client_id) {
-			INFO("Closing " << client_id);
-			std::shared_ptr<RemoteClient> client;
-			{
-				auto lock = server->lockClients();
-				client = std::dynamic_pointer_cast<RemoteClient>(server->getClients().at(client_id));
-			}
-			assert(client);
-			if (auto player = client->getPlayer())
+		server->onClose = [this](RemoteClient &client) {
+			INFO("Closing connection from " << client.ip);
+			if (auto player = client.getPlayer())
 				game->queueRemoval(player);
 		};
 
-		server->messageHandler = [](GenericClient &generic_client, std::string_view message) {
-			generic_client.handleInput(message);
+		server->onMessage = [](RemoteClient &client, std::string_view message) {
+			client.handleInput(message);
 		};
 	}
 
 	LocalServer::~LocalServer() {
-		server->addClient = {};
-		server->closeHandler = {};
-		server->messageHandler = {};
+		server->onAdd = {};
+		server->onClose = {};
+		server->onMessage = {};
 	}
 
 	void LocalServer::run() {
@@ -73,7 +62,7 @@ namespace Game3 {
 			onStop();
 	}
 
-	void LocalServer::send(GenericClient &client, std::string_view string) {
+	void LocalServer::send(RemoteClient &client, std::string_view string) {
 		server->send(client, string);
 	}
 
@@ -179,8 +168,8 @@ namespace Game3 {
 	}
 
 	int LocalServer::main(int argc, char **argv) {
-		evthread_use_pthreads();
-		event_enable_debug_mode();
+		// evthread_use_pthreads();
+		// event_enable_debug_mode();
 
 		std::string secret;
 
