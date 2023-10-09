@@ -9,14 +9,19 @@
 
 #include "graphics/Texture.h"
 #include "graphics/Tileset.h"
-#include "resources.h"
 #include "game/ClientGame.h"
 #include "graphics/GL.h"
 #include "graphics/SpriteRenderer.h"
 #include "ui/Canvas.h"
+#include "util/FS.h"
 #include "util/Util.h"
 
 namespace Game3 {
+	namespace {
+		std::string sprite_frag = readFile("resources/sprite.frag");
+		std::string sprite_vert = readFile("resources/sprite.vert");
+	}
+
 	SpriteRenderer::SpriteRenderer(Canvas &canvas_): canvas(&canvas_), shader("SpriteRenderer") {
 		shader.init(sprite_vert, sprite_frag);
 		initRenderData();

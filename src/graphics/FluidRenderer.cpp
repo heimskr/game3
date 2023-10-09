@@ -9,16 +9,21 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Log.h"
-#include "resources.h"
 #include "graphics/Tileset.h"
 #include "container/Quadtree.h"
 #include "game/Game.h"
 #include "graphics/FluidRenderer.h"
 #include "realm/Realm.h"
+#include "util/FS.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 
 namespace Game3 {
+	namespace {
+		std::string fluids_frag = readFile("resources/fluids.frag");
+		std::string fluids_vert = readFile("resources/fluids.vert");
+	}
+
 	FluidRenderer::FluidRenderer() = default;
 
 	FluidRenderer::FluidRenderer(Realm &realm_):

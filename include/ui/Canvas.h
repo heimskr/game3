@@ -5,7 +5,6 @@
 #include <gdkmm/rectangle.h>
 #include "lib/Eigen.h"
 
-#include "resources.h"
 #include "Position.h"
 #include "graphics/Texture.h"
 #include "Types.h"

@@ -4,12 +4,17 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "resources.h"
 #include "graphics/GL.h"
 #include "graphics/RectangleRenderer.h"
+#include "util/FS.h"
 #include "util/Util.h"
 
 namespace Game3 {
+	namespace {
+		std::string rectangle_frag = readFile("resources/rectangle.frag");
+		std::string rectangle_vert = readFile("resources/rectangle.vert");
+	}
+
 	RectangleRenderer::RectangleRenderer(): shader("RectangleRenderer") {
 		shader.init(rectangle_vert, rectangle_frag); CHECKGL
 		initRenderData(); CHECKGL

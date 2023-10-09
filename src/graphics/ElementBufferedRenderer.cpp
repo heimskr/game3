@@ -1,6 +1,5 @@
 // Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Renderers/ElementBufferedRenderer.cs
 
-#include "resources.h"
 #include "graphics/Shader.h"
 #include "graphics/Tileset.h"
 #include "container/Quadtree.h"
@@ -9,6 +8,7 @@
 #include "graphics/ElementBufferedRenderer.h"
 #include "realm/Realm.h"
 #include "ui/MainWindow.h"
+#include "util/FS.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 
@@ -20,6 +20,12 @@
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Game3 {
+	namespace {
+		std::string blur_frag = readFile("resources/blur.frag");
+		std::string buffered_frag = readFile("resources/buffered.frag");
+		std::string buffered_vert = readFile("resources/buffered.vert");
+	}
+
 	ElementBufferedRenderer::ElementBufferedRenderer():
 		reshader(blur_frag) {}
 

@@ -4,9 +4,6 @@
 	"runtime-version": "44",
 	"sdk": "org.gnome.Sdk",
 	"command": "game3",
-	"sdk-extensions": [
-		"org.freedesktop.Sdk.Extension.ziglang"
-	],
 	"finish-args": [
 		"--share=ipc",
 		"--socket=x11",
@@ -28,8 +25,6 @@
 		"--filesystem=xdg-run/app/com.discordapp.Discord:ro"
 	],
 	"build-options": {
-		"append-path": "/usr/lib/sdk/ziglang",
-		"prepend-ld-library-path": "/usr/lib/sdk/ziglang/lib",
 		"strip": true
 	},
 	"cleanup": [

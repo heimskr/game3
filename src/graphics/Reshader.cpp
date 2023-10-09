@@ -1,8 +1,8 @@
-#include "resources.h"
 #include "Log.h"
 #include "graphics/Shader.h"
 #include "graphics/GL.h"
 #include "graphics/Reshader.h"
+#include "util/FS.h"
 #include "util/Util.h"
 
 #include <iostream>
@@ -10,6 +10,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace Game3 {
+	namespace {
+		std::string reshader_vert = readFile("resources/reshader.vert");
+	}
+
 	Reshader::Reshader(std::string_view fragment): shader("reshader") {
 		shader.init(reshader_vert, fragment); CHECKGL
 		initRenderData(); CHECKGL

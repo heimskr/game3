@@ -1,6 +1,5 @@
 // Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Renderers/UpperRenderer.cs
 
-#include "resources.h"
 #include "graphics/Shader.h"
 #include "graphics/Tileset.h"
 #include "container/Quadtree.h"
@@ -9,6 +8,7 @@
 #include "graphics/UpperRenderer.h"
 #include "realm/Realm.h"
 #include "ui/MainWindow.h"
+#include "util/FS.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 
@@ -20,6 +20,11 @@
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Game3 {
+	namespace {
+		std::string upper_frag = readFile("resources/upper.frag");
+		std::string upper_vert = readFile("resources/upper.vert");
+	}
+
 	UpperRenderer::UpperRenderer() {}
 
 	UpperRenderer::UpperRenderer(Realm &realm_):

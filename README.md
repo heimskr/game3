@@ -21,7 +21,7 @@ Thanks to [Vadim](https://github.com/Vadimuh), [Fayabella](https://github.com/Fa
 
 Thanks to Fayabella again for her farmland and cotton tiles as well as the fabric sprite in `/resources/items/custom.png`, in addition to a lot of other spritework.
 
-Thanks to [190n](https://github.com/190n) for their work on the resource embedding system.
+Thanks to [190n](https://github.com/190n) for their work on the resource embedding system (since removed).
 
 Sprites in `/resources/items/franuka.png` were made by [Franuka](https://twitter.com/franuka_art) and are not governed by this project's license.
 

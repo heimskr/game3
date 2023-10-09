@@ -1,17 +1,22 @@
-#include <iostream>
-
-#include <glm/gtc/matrix_transform.hpp>
-
-#include "resources.h"
 #include "graphics/Shader.h"
 #include "graphics/Texture.h"
 #include "graphics/GL.h"
 #include "graphics/Multiplier.h"
+#include "util/FS.h"
 #include "util/Util.h"
 
+#include <iostream>
+
+#include <glm/gtc/matrix_transform.hpp>
+
 namespace Game3 {
+	namespace {
+		std::string multiplier_frag = readFile("resources/multiplier.frag");
+		std::string multiplier_vert = readFile("resources/multiplier.vert");
+	}
+
 	Multiplier::Multiplier(): shader("multiplier") {
-		shader.init({multiplier_vert, multiplier_vert_len}, {multiplier_frag, multiplier_frag_len}); CHECKGL
+		shader.init(multiplier_vert, multiplier_frag); CHECKGL
 		initRenderData(); CHECKGL
 	}
 
