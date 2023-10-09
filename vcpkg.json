@@ -15,6 +15,10 @@
 		"nlohmann-json",
 		"libnoise",
 		"eigen3",
-		"cxxopts"
+		"cxxopts",
+		{
+			"name": "asio",
+			"features": ["openssl"]
+		}
 	]
 }
