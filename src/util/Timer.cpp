@@ -6,6 +6,7 @@
 namespace Game3 {
 	std::map<std::string, std::chrono::nanoseconds> Timer::times;
 	std::map<std::string, size_t> Timer::counts;
+	std::shared_mutex Timer::mutex;
 
 	Timer::Timer(const std::string &name_):
 		start(std::chrono::system_clock::now()), name(name_) {}
@@ -20,6 +21,7 @@ namespace Game3 {
 
 	void Timer::stop() {
 		if (!stopped) {
+			auto lock = uniqueLock();
 			times[name] += difference();
 			++counts[name];
 			stopped = true;
@@ -32,6 +34,8 @@ namespace Game3 {
 	}
 
 	void Timer::summary(double threshold) {
+		auto lock = sharedLock();
+
 		if (!times.empty()) {
 			std::cerr << "Timer summary:\n";
 
@@ -64,6 +68,7 @@ namespace Game3 {
 	}
 
 	void Timer::clear() {
+		auto lock = uniqueLock();
 		times.clear();
 		counts.clear();
 	}

@@ -53,6 +53,9 @@ namespace Game3 {
 			void stopBuffering();
 			bool isBuffering() const;
 
+		protected:
+			void removeSelf() override;
+
 		private:
 			enum class State {Begin, Data};
 			State state = State::Begin;

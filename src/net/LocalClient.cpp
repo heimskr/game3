@@ -61,10 +61,9 @@ namespace Game3 {
 
 					if (100'000 <= payloadSize) {
 						sock->close(false);
-						throw PacketError("Payload too large");
+						throw PacketError("Payload too large (" + std::to_string(payloadSize) + ')');
 					}
 
-					assert(payloadSize < 100'000);
 					headerBytes.erase(headerBytes.begin(), headerBytes.begin() + HEADER_SIZE);
 					state = State::Data;
 				} else

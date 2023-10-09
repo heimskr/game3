@@ -148,4 +148,24 @@ namespace Game3 {
 	bool RemoteClient::isBuffering() const {
 		return sendBuffer.active();
 	}
+
+	void RemoteClient::removeSelf() {
+		INFO("Removing client from IP " << ip);
+
+		if (server.game)
+			if (ServerPlayerPtr player = getPlayer())
+				server.game->queueRemoval(player);
+
+		try {
+			socket.shutdown();
+		} catch (const std::system_error &) {
+			// Sometimes the pipe is broken.
+		}
+
+		socket.next_layer().close();
+
+		auto &clients = server.getClients();
+		auto lock = clients.uniqueLock();
+		clients.erase(shared_from_this());
+	}
 }
