@@ -9,6 +9,8 @@ namespace Game3 {
 			if (getSide() == Side::Server)
 				ItemStack(game, "base:item/egg").spawn(getRealm(), position);
 		}
+
+		Animal::tick(game, delta);
 	}
 
 	void Chicken::encode(Buffer &buffer) {
