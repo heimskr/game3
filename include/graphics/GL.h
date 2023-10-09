@@ -18,9 +18,11 @@
 #endif
 #include <GLFW/glfw3.h>
 
+// #define HIDE_CHECKGL
+
 #ifdef HIDE_CHECKGL
 #define CHECKGL
-#define CHECKGL_SET
+#define CHECKGL_SET GLenum gl_err = 0;
 #else
 #define CHECKGL do { GL::checkGL(glGetError(), __FILE__, __LINE__); } while(0);
 #define CHECKGL_SET GLenum gl_err = glGetError(); GL::checkGL(gl_err, __FILE__, __LINE__);

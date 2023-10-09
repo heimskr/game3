@@ -294,6 +294,19 @@
 			}]
 		},
 		{
+			"name": "asio",
+			"buildsystem": "simple",
+			"build-commands": [
+				"./configure --prefix=/app",
+				"make -j $FLATPAK_BUILDER_N_JOBS install"
+			],
+			"sources": [{
+				"type": "archive",
+				"url": "https://versaweb.dl.sourceforge.net/project/asio/asio/1.28.0%20%28Stable%29/asio-1.28.0.tar.bz2",
+				"sha256": "d0ddc2361abd2f4c823e970aaf8e28b4b31ab21b1a68af16b114fc093661e232"
+			}]
+		},
+		{
 			"name": "game3-data",
 			"buildsystem": "simple",
 			"build-commands": [

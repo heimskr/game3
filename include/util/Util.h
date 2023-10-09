@@ -73,14 +73,18 @@ namespace Game3 {
 	std::string hexString(const C &container, bool spaces) {
 		std::stringstream ss;
 		bool first = true;
-		for (const uint8_t byte: container) {
+		for (const auto item: container) {
 			if (spaces) {
 				if (first)
 					first = false;
 				else
 					ss << ' ';
 			}
-			ss << std::hex << std::setw(2) << std::setfill('0') << std::right << static_cast<uint16_t>(byte);
+			ss << std::hex << std::setw(2 * sizeof(item)) << std::setfill('0') << std::right;
+			if constexpr (sizeof(item) == 1)
+				ss << static_cast<uint16_t>(item);
+			else
+				ss << static_cast<std::make_unsigned_t<decltype(item)>>(item);
 		}
 		return ss.str();
 	}

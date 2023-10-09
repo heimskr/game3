@@ -99,6 +99,8 @@ namespace Game3 {
 		shader.set("texture0", 0);
 		shader.set("projection", projection);
 
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		GL::triangles(CHUNK_SIZE * CHUNK_SIZE);
 	}
 
@@ -130,6 +132,8 @@ namespace Game3 {
 		shader.set("texture0", 0);
 		shader.set("projection", projection);
 
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		GL::triangles(CHUNK_SIZE * CHUNK_SIZE);
 	}
 

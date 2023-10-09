@@ -4,13 +4,14 @@
 #include "packet/ChunkTilesPacket.h"
 #include "packet/PacketError.h"
 #include "realm/Realm.h"
+#include "util/Util.h"
 
 namespace Game3 {
 	ChunkTilesPacket::ChunkTilesPacket(const Realm &realm, ChunkPosition chunk_position, uint64_t update_counter):
 	realmID(realm.id), chunkPosition(chunk_position), updateCounter(update_counter) {
 		tiles.reserve(CHUNK_SIZE * CHUNK_SIZE * LAYER_COUNT);
-		for (const auto layer: allLayers) {
-			auto &layer_tiles = realm.tileProvider.getTileChunk(layer, chunk_position);
+		for (const Layer layer: allLayers) {
+			const TileChunk &layer_tiles = realm.tileProvider.getTileChunk(layer, chunk_position);
 			auto lock = layer_tiles.sharedLock();
 			tiles.insert(tiles.end(), layer_tiles.begin(), layer_tiles.end());
 		}
@@ -39,9 +40,10 @@ namespace Game3 {
 		if (fluids.size() != CHUNK_SIZE * CHUNK_SIZE)
 			throw PacketError("Invalid fluid count in ChunkTilesPacket: " + std::to_string(fluids.size()));
 
-		auto realm = game.getRealm(realmID);
-		auto &provider = realm->tileProvider;
-		for (const auto layer: allLayers) {
+		RealmPtr realm = game.getRealm(realmID);
+		TileProvider &provider = realm->tileProvider;
+
+		for (const Layer layer: allLayers) {
 			auto &chunk = provider.getTileChunk(layer, chunkPosition);
 			const size_t offset = getIndex(layer) * CHUNK_SIZE * CHUNK_SIZE;
 			chunk = std::vector<TileID>(tiles.begin() + offset, tiles.begin() + offset + CHUNK_SIZE * CHUNK_SIZE);

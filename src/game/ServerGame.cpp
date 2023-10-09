@@ -409,10 +409,10 @@ namespace Game3 {
 				return {true, ss.str()};
 			}
 
-			if (first == "submerge") {
+			if (first == "submerge" || first == "terrain") {
 				if (words.size() != 2)
 					return {false, "Invalid number of arguments."};
-				player->getRealm()->setTile(Layer::Submerged, player->getPosition(), words.at(1));
+				player->getRealm()->setTile(first == "submerge"? Layer::Submerged : Layer::Terrain, player->getPosition(), words.at(1));
 				return {true, "Set tile."};
 			}
 

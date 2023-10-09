@@ -16,11 +16,19 @@ resgen_gen = custom_target('resgen',
 	build_always_stale: true,
 	command: ['../hack-resgen.sh', '@BUILD_ROOT@', meson.project_source_root()])
 
-resources_h = custom_target('resources-header-gen',
-	output: 'resources.h',
-	capture: true,
-	command: [meson.current_build_dir() / '..' / 'resgen', '-h'],
-	depends: [resgen_gen])
+if false and get_option('is_flatpak')
+	resources_h = custom_target('resources-header-gen',
+		output: 'resources.h',
+		capture: true,
+		command: [resgen_gen, '-h'],
+		depends: [resgen_gen])
+else
+	resources_h = custom_target('resources-header-gen',
+		output: 'resources.h',
+		capture: true,
+		command: [meson.current_build_dir() / '..' / 'resgen', '-h'],
+		depends: [resgen_gen])
+endif
 
 resources_o = custom_target('resources-obj-gen',
 	input: 'resources.zig',
@@ -28,8 +36,6 @@ resources_o = custom_target('resources-obj-gen',
 	command: ['../hack-resources.sh', '@BUILD_ROOT@', meson.project_source_root()])
 
 resources_dep = declare_dependency(sources: resources_o[0])
-
-boost_dep = dependency('boost')
 
 game3_deps = [
 	dependency('gtk4'),
@@ -43,10 +49,10 @@ game3_deps = [
 	dependency('gl'),
 	dependency('glfw3'),
 	dependency('x11'),
+	dependency('asio'),
 	chemskr.get_variable('chemskr'),
 	sqlitecpp.get_variable('sqlitecpp_dep'),
 	resources_dep,
-	boost_dep,
 ]
 
 if build_machine.system() != 'darwin'

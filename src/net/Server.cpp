@@ -24,8 +24,6 @@
 #include <cstdlib>
 #include <fstream>
 
-#include <boost/bind/bind.hpp>
-
 namespace Game3 {
 	Server::Server(const std::string &ip_, uint16_t port_, const std::filesystem::path &certificate_path, const std::filesystem::path &key_path, std::string_view secret_, size_t thread_count, size_t chunk_size):
 	ip(ip_),

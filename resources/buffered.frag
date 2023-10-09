@@ -15,9 +15,7 @@ uniform sampler2D texture0;
 vec4 alphaComposite(vec4 bottom, vec4 top) {
 	float a0 = top.a + bottom.a * (1 - top.a);
 	return vec4(
-		(top.r * top.a + bottom.r * bottom.a * (1 - top.a)) / a0,
-		(top.g * top.a + bottom.g * bottom.a * (1 - top.a)) / a0,
-		(top.b * top.a + bottom.b * bottom.a * (1 - top.a)) / a0,
+		(top.rgb * top.a + bottom.rgb * bottom.a * (1 - top.a)) / a0,
 		a0
 	);
 }
@@ -29,7 +27,8 @@ void main() {
 	vec4 base2  = texture(texture0, texCoordBase2);
 	vec4 base3  = texture(texture0, texCoordBase3);
 
-	fluid.a = fluidOpacity;
+	base0.a = 1.0;
+	fluid.a *= fluidOpacity;
 
 	vec4 mix1 = alphaComposite(base0, base1);
 	vec4 mix2 = alphaComposite(mix1,  fluid);

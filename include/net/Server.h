@@ -22,7 +22,6 @@
 
 #include <asio.hpp>
 #include <asio/ssl.hpp>
-#include <boost/bind/bind.hpp>
 
 namespace Game3 {
 	class RemoteClient;
