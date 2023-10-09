@@ -104,6 +104,7 @@ namespace Game3 {
 		context.stop();
 		if (onStop)
 			onStop();
+		game.reset();
 	}
 
 	bool Server::close(RemoteClient &client) {
