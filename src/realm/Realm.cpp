@@ -1208,9 +1208,9 @@ namespace Game3 {
 				gmenu->append(agent->getName(), "agent_menu.agent" + std::to_string(i));
 				group->add_action("agent" + std::to_string(i), [agent, overlap, player] {
 					if (overlap)
-						player->send(InteractPacket(true, Modifiers{}, agent->getGID()));
+						player->send(InteractPacket(true, Modifiers{}, agent->getGID(), player->direction));
 					else
-						player->send(InteractPacket(false, Modifiers{}, agent->getGID()));
+						player->send(InteractPacket(false, Modifiers{}, agent->getGID(), player->direction));
 				});
 			}
 

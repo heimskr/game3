@@ -40,7 +40,7 @@ namespace Game3 {
 			void read();
 			void send(const Packet &);
 			bool isConnected() const;
-			std::shared_ptr<ClientGame> lockGame() const;
+			std::shared_ptr<ClientGame> getGame() const;
 			void setToken(const std::string &hostname, const std::string &username, Token);
 			std::optional<Token> getToken(const std::string &hostname, const std::string &username) const;
 			void readTokens(const std::filesystem::path &);

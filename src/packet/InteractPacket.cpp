@@ -8,6 +8,14 @@
 namespace Game3 {
 	void InteractPacket::handle(ServerGame &game, RemoteClient &client) {
 		if (auto player = client.getPlayer()) {
+			if (direction && *direction != player->direction) {
+				player->teleport(player->position, MovementContext{
+					.excludePlayerSelf = true,
+					.clearOffset = false,
+					.facingDirection = direction
+				});
+			}
+
 			if (globalID) {
 				if (AgentPtr agent = game.getAgent<Agent>(*globalID)) {
 					if (direct)

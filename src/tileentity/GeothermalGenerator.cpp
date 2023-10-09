@@ -168,19 +168,19 @@ namespace Game3 {
 		Glib::ustring fluid_action = start + ".fluids";
 		submenu->append("Fluids", "agent_menu." + fluid_action);
 		group->add_action(fluid_action, [this, player] {
-			player->send(InteractPacket(false, Modifiers{false, true, false, false}, getGID()));
+			player->send(InteractPacket(false, Modifiers{false, true, false, false}, getGID(), player->direction));
 		});
 
 		Glib::ustring energy_action = start + ".energy";
 		submenu->append("Energy", "agent_menu." + energy_action);
 		group->add_action(energy_action, [this, player] {
-			player->send(InteractPacket(false, Modifiers{true, true, false, false}, getGID()));
+			player->send(InteractPacket(false, Modifiers{true, true, false, false}, getGID(), player->direction));
 		});
 
 		Glib::ustring inventory_action = start + ".inventory";
 		submenu->append("Inventory", "agent_menu." + inventory_action);
 		group->add_action(inventory_action, [this, player] {
-			player->send(InteractPacket(false, Modifiers{}, getGID()));
+			player->send(InteractPacket(false, Modifiers{}, getGID(), player->direction));
 		});
 
 		menu->append_submenu(getName(), submenu);

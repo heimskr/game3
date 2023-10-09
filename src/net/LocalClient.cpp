@@ -33,7 +33,7 @@ namespace Game3 {
 
 	void LocalClient::read() {
 		if (buffer.context.expired())
-			if (ClientGamePtr game = lockGame())
+			if (ClientGamePtr game = getGame())
 				buffer.context = game;
 
 		assert(!reading.exchange(true));
@@ -86,7 +86,7 @@ namespace Game3 {
 					throw std::logic_error("Buffer grew too large");
 
 				if (payloadSize == buffer.size()) {
-					ClientGamePtr game = lockGame();
+					ClientGamePtr game = getGame();
 					std::shared_ptr<Packet> packet = (*game->registry<PacketFactoryRegistry>().at(packetType))();
 					packet->decode(*game, buffer);
 
@@ -117,7 +117,7 @@ namespace Game3 {
 
 	void LocalClient::send(const Packet &packet) {
 		Buffer send_buffer;
-		auto game = lockGame();
+		auto game = getGame();
 		send_buffer.context = game;
 		packet.encode(*game, send_buffer);
 		assert(send_buffer.size() < UINT32_MAX);
@@ -137,7 +137,7 @@ namespace Game3 {
 		return sock->isConnected();
 	}
 
-	std::shared_ptr<ClientGame> LocalClient::lockGame() const {
+	std::shared_ptr<ClientGame> LocalClient::getGame() const {
 		auto locked = weakGame.lock();
 		assert(locked);
 		return locked;

@@ -200,12 +200,12 @@ namespace Game3 {
 
 	void ClientGame::interactOn(Modifiers modifiers) {
 		assert(client);
-		client->send(InteractPacket(true, modifiers));
+		client->send(InteractPacket(true, modifiers, {}, client->getGame()->player->direction));
 	}
 
 	void ClientGame::interactNextTo(Modifiers modifiers) {
 		assert(client);
-		client->send(InteractPacket(false, modifiers));
+		client->send(InteractPacket(false, modifiers, {}, client->getGame()->player->direction));
 	}
 
 	void ClientGame::putInLimbo(EntityPtr entity, RealmID next_realm_id, const Position &next_position) {
