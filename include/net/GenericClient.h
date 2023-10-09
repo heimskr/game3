@@ -21,6 +21,7 @@ namespace Game3 {
 			SendBuffer sendBuffer;
 			std::mutex networkMutex;
 			asio::ssl::stream<asio::ip::tcp::socket> socket;
+			asio::io_context::strand strand;
 
 			GenericClient() = delete;
 			GenericClient(const GenericClient &) = delete;

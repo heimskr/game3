@@ -8,6 +8,7 @@ namespace Game3 {
 		id(id_),
 		ip(ip_),
 		socket(std::move(socket_), server.sslContext),
+		strand(server.context),
 		bufferSize(server_.getChunkSize()),
 		buffer(std::make_unique<char[]>(bufferSize)) {}
 

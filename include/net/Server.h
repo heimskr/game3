@@ -32,7 +32,7 @@ namespace Game3 {
 	class ServerPlayer;
 
 	class Server {
-		protected:
+		private:
 			std::string ip;
 			int port;
 			size_t chunkSize;
@@ -43,6 +43,10 @@ namespace Game3 {
 
 			size_t threadCount = 0;
 			std::atomic_int lastID = 0;
+
+			Lockable<std::unordered_set<std::unique_ptr<std::string>>> stringFragments;
+			Lockable<std::unordered_set<std::unique_ptr<std::vector<char>>>> vectorFragments;
+			Lockable<std::unordered_set<RemoteClientPtr>> allClients;
 
 			void handleWrite(const asio::error_code &, size_t);
 			bool removeClient(int);
@@ -56,8 +60,6 @@ namespace Game3 {
 			std::string id = "server";
 			std::shared_ptr<ServerGame> game;
 			std::function<void()> onStop;
-
-			Lockable<std::unordered_set<RemoteClientPtr>> allClients;
 
 			std::function<void(RemoteClient &, std::string_view message)> onMessage;
 			std::function<void(RemoteClient &)> onClose;
@@ -73,8 +75,8 @@ namespace Game3 {
 			[[nodiscard]] inline int getPort() const { return port; }
 			void handleMessage(RemoteClient &, std::string_view);
 			void mainLoop();
-			void send(RemoteClient &, std::string_view, bool force = false);
-			void send(RemoteClient &, const std::string &, bool force = false);
+			void send(RemoteClient &, std::string, bool force = false);
+			void send(RemoteClient &, std::vector<char>, bool force = false);
 			void run();
 			void stop();
 			bool close(RemoteClient &);
@@ -91,7 +93,7 @@ namespace Game3 {
 			template <std::integral T>
 			void send(RemoteClient &client, T value) {
 				const T little = toLittle(value);
-				send(client, std::string_view(reinterpret_cast<const char *>(&little), sizeof(T)));
+				send(client, std::string(reinterpret_cast<const char *>(&little), sizeof(T)));
 			}
 
 			[[nodiscard]]

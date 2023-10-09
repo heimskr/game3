@@ -137,7 +137,7 @@ namespace Game3 {
 			moved_buffer = std::move(sendBuffer.bytes);
 		}
 		std::unique_lock network_lock(networkMutex);
-		server.send(*this, std::string_view(moved_buffer.data(), moved_buffer.size()), true);
+		server.send(*this, std::move(moved_buffer), true);
 	}
 
 	void RemoteClient::stopBuffering() {

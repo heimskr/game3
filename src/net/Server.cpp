@@ -53,7 +53,7 @@ namespace Game3 {
 			onMessage(client, message);
 	}
 
-	void Server::send(RemoteClient &client, std::string_view message, bool force) {
+	void Server::send(RemoteClient &client, std::string message, bool force) {
 		if (!force && client.isBuffering()) {
 			SendBuffer &buffer = client.sendBuffer;
 			auto lock = buffer.uniqueLock();
@@ -61,13 +61,44 @@ namespace Game3 {
 			return;
 		}
 
-		asio::async_write(client.socket, asio::buffer(message), [this](const asio::error_code &errc, size_t length) {
-			handleWrite(errc, length);
+		auto lock = stringFragments.uniqueLock();
+		auto [iter, inserted] = stringFragments.insert(std::make_unique<std::string>(std::move(message)));
+		lock.unlock();
+		assert(inserted);
+
+		asio::post(client.strand, [this, weak_client = std::weak_ptr(client.shared_from_this()), iter] {
+			if (std::shared_ptr<RemoteClient> client = weak_client.lock()) {
+				asio::async_write(client->socket, asio::buffer(**iter), [this, iter](const asio::error_code &errc, size_t length) {
+					handleWrite(errc, length);
+					auto lock = stringFragments.uniqueLock();
+					stringFragments.erase(iter);
+				});
+			}
 		});
 	}
 
-	void Server::send(RemoteClient &client, const std::string &message, bool force) {
-		return send(client, std::string_view(message), force);
+	void Server::send(RemoteClient &client, std::vector<char> message, bool force) {
+		if (!force && client.isBuffering()) {
+			SendBuffer &buffer = client.sendBuffer;
+			auto lock = buffer.uniqueLock();
+			buffer.bytes.insert(buffer.bytes.end(), message.begin(), message.end());
+			return;
+		}
+
+		auto lock = vectorFragments.uniqueLock();
+		auto [iter, inserted] = vectorFragments.insert(std::make_unique<std::vector<char>>(std::move(message)));
+		lock.unlock();
+		assert(inserted);
+
+		asio::post(client.strand, [this, weak_client = std::weak_ptr(client.shared_from_this()), iter] {
+			if (std::shared_ptr<RemoteClient> client = weak_client.lock()) {
+				asio::async_write(client->socket, asio::buffer(**iter), [this, iter](const asio::error_code &errc, size_t length) {
+					handleWrite(errc, length);
+					auto lock = vectorFragments.uniqueLock();
+					vectorFragments.erase(iter);
+				});
+			}
+		});
 	}
 
 	void Server::handleWrite(const asio::error_code &errc, size_t) {
