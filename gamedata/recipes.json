@@ -142,7 +142,7 @@
 				"output": [["base:item/plant_pot3", 1]]
 			}],
 			["base:crafting_recipe", {
-				"input":  [["base:item/stone", 8]],
+				"input":  [["base:item/stone", 2], ["base:item/plank", 2]],
 				"output": [["base:item/tower", 1]]
 			}],
 			["base:crafting_recipe", {
