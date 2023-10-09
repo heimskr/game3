@@ -170,11 +170,12 @@ namespace Game3 {
 		moved_packet.arguments.isTeleport = true;
 
 		auto lock = players.sharedLock();
-		for (const auto &player: players)
+		for (const auto &player: players) {
 			if (player->knowsRealm(new_realm->id))
 				player->send(moved_packet);
 			else
 				player->send(changing_packet);
+		}
 	}
 
 	void ServerGame::entityTeleported(Entity &entity, MovementContext context) {
@@ -440,7 +441,7 @@ namespace Game3 {
 				for (size_t y = 0; y < CHUNK_SIZE; ++y) {
 					for (size_t x = 0; x < CHUNK_SIZE; ++x) {
 						const auto walkable = path_chunk[y * CHUNK_SIZE + x];
-						std::cerr << int(walkable);
+						std::cerr << (walkable? "\u2588" : "\u2591");
 						walkables += walkable;
 					}
 					std::cerr << '\n';

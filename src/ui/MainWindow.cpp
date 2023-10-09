@@ -834,14 +834,7 @@ namespace Game3 {
 				}
 				case GDK_KEY_p: {
 					if (Modifiers(modifiers).ctrl) {
-						RealmPtr realm = game->player->getRealm();
-						const auto &chunk = realm->tileProvider.getPathChunk(game->player->getChunk());
-						auto lock = chunk.sharedLock();
-						for (size_t row = 0; row < CHUNK_SIZE; ++row) {
-							for (size_t column = 0; column < CHUNK_SIZE; ++column)
-								std::cout << (chunk.at(row * CHUNK_SIZE + column)? "\u2588" : "\u2591");
-							std::cout << '\n';
-						}
+						game->runCommand("pm");
 					} else {
 						std::cout << "Player GID: " << game->player->getGID() << '\n';
 						std::cout << "Realm ID: " << game->player->getRealm()->id << " or perhaps " << game->activeRealm.copyBase()->id << '\n';
