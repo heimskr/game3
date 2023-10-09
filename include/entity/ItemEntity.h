@@ -29,6 +29,7 @@ namespace Game3 {
 			std::string getName() const override;
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;
+			int getZIndex() const override { return -1; }
 
 		private:
 			ItemEntity(): Entity(ID()) {}

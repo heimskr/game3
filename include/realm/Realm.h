@@ -12,6 +12,7 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include "Types.h"
+#include "entity/EntityZCompare.h"
 #include "error/MultipleFoundError.h"
 #include "error/NoneFoundError.h"
 #include "game/BiomeMap.h"
@@ -182,7 +183,6 @@ namespace Game3 {
 			void detach(const EntityPtr &);
 			/** Adds the entity to entitiesByChunk. */
 			void attach(const EntityPtr &);
-			std::shared_ptr<Lockable<std::unordered_set<EntityPtr>>> getEntities(ChunkPosition);
 			/** Removes the tile entity from tileEntitiesByChunk. */
 			void detach(const TileEntityPtr &);
 			/** Adds the tile entity to tileEntitiesByChunk. */
@@ -326,7 +326,7 @@ namespace Game3 {
 			MTQueue<std::weak_ptr<TileEntity>> tileEntityAdditionQueue;
 			MTQueue<std::weak_ptr<Player>> playerRemovalQueue;
 			MTQueue<std::function<void()>> generalQueue;
-			Lockable<std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::unordered_set<EntityPtr>>>>> entitiesByChunk;
+			Lockable<std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::set<EntityPtr, EntityZCompare>>>>> entitiesByChunk;
 			Lockable<std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::unordered_set<TileEntityPtr>>>>> tileEntitiesByChunk;
 
 			friend class ServerGame;
@@ -343,6 +343,10 @@ namespace Game3 {
 			void initEntity(const EntityPtr &, const Position &);
 
 			static BiomeType getBiome(int64_t seed);
+
+		public:
+			using EntitySet = decltype(entitiesByChunk)::Base::mapped_type;
+			EntitySet getEntities(ChunkPosition);
 	};
 
 	using RealmPtr = std::shared_ptr<Realm>;

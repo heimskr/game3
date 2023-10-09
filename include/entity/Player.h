@@ -75,6 +75,7 @@ namespace Game3 {
 			void addKnownRealm(RealmID);
 			bool knowsRealm(RealmID) const;
 			void notifyOfRealm(Realm &);
+			int getZIndex() const override { return 1; }
 
 			friend class Entity;
 

@@ -160,6 +160,7 @@ namespace Game3 {
 			bool isInLimbo() const;
 			virtual float getJumpSpeed() const { return 8.f; }
 			void changeTexture(const Identifier &);
+			virtual int getZIndex() const { return 0; }
 
 			virtual void encode(Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */

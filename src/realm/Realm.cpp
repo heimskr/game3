@@ -177,11 +177,10 @@ namespace Game3 {
 			onFocus();
 
 		auto &client_game = game.toClient();
+		assert(client_game.player);
 
 		const auto bb_width  = width;
 		const auto bb_height = height;
-
-		const auto &visible = client_game.player? client_game.player->getVisibleLayers() : std::unordered_set{Layer::Terrain, Layer::Submerged, Layer::Objects, Layer::Highest};
 
 		if (baseRenderers) {
 			for (auto &row: *baseRenderers) {
@@ -206,11 +205,16 @@ namespace Game3 {
 				tile_entity->render(sprite_renderer);
 		}
 
-		{
-			auto lock = entities.sharedLock();
-			for (const auto &entity: entities)
-				entity->render(sprite_renderer, text_renderer);
-		}
+		ChunkRange(client_game.player->getChunk()).iterate([&](ChunkPosition chunk_position) {
+			if (auto entities_in_chunk = getEntities(chunk_position)) {
+				auto lock = entities_in_chunk->sharedLock();
+				for (const EntityPtr &entity: *entities_in_chunk)
+					if (entity != client_game.player)
+						entity->render(sprite_renderer, text_renderer);
+			}
+		});
+
+		client_game.player->render(sprite_renderer, text_renderer);
 
 		if (upperRenderers) {
 			for (auto &row: *upperRenderers) {
@@ -1052,13 +1056,13 @@ namespace Game3 {
 			auto set_lock = set.uniqueLock();
 			set.insert(entity);
 		} else {
-			auto set = std::make_shared<Lockable<std::unordered_set<EntityPtr>>>();
+			auto set = std::make_shared<EntitySet::element_type>();
 			set->insert(entity);
 			entitiesByChunk.emplace(chunk_position, std::move(set));
 		}
 	}
 
-	std::shared_ptr<Lockable<std::unordered_set<EntityPtr>>> Realm::getEntities(ChunkPosition chunk_position) {
+	Realm::EntitySet Realm::getEntities(ChunkPosition chunk_position) {
 		auto lock = entitiesByChunk.sharedLock();
 		if (auto iter = entitiesByChunk.find(chunk_position); iter != entitiesByChunk.end())
 			return iter->second;

@@ -254,6 +254,7 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/bread",           "Bread",               6, 64));
 		add(std::make_shared<Item>("base:item/yeast",           "Yeast",               4, 64));
 		add(std::make_shared<Item>("base:item/clay",            "Clay",                2, 64));
+		add(std::make_shared<Item>("base:item/egg",             "Egg",                16, 64));
 
 		add(std::make_shared<Mead>("base:item/mead", "Mead", 10, 16));
 
