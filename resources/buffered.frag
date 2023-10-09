@@ -27,7 +27,10 @@ void main() {
 	vec4 base2  = texture(texture0, texCoordBase2);
 	vec4 base3  = texture(texture0, texCoordBase3);
 
-	base0.a = 1.0;
+	if (base0.a == 0.0) {
+		base0 = vec4(0.2, 0.2, 0.2, 1.0);
+	}
+
 	fluid.a *= fluidOpacity;
 
 	vec4 mix1 = alphaComposite(base0, base1);
