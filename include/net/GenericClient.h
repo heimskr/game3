@@ -6,11 +6,11 @@
 #include <string>
 
 #include <asio.hpp>
+#include <asio/ssl.hpp>
 
 namespace Game3 {
 	class Packet;
 	class Server;
-	class ServerWorker;
 
 	struct GenericClient {
 		Server &server;
@@ -19,7 +19,8 @@ namespace Game3 {
 		SendBuffer sendBuffer;
 		std::mutex networkMutex;
 		asio::ip::tcp::socket socket;
-		std::shared_ptr<ServerWorker> worker;
+
+		asio::ssl::stream<asio::ip::tcp::socket &> sslStream;
 
 		GenericClient() = delete;
 		GenericClient(const GenericClient &) = delete;
@@ -30,6 +31,8 @@ namespace Game3 {
 
 		GenericClient & operator=(const GenericClient &) = delete;
 		GenericClient & operator=(GenericClient &&) = delete;
+
+		void init();
 
 		virtual void handleInput(std::string_view) = 0;
 		virtual void onMaxLineSizeExceeded() {}

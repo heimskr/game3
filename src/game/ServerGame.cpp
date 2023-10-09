@@ -209,8 +209,9 @@ namespace Game3 {
 		const DestroyEntityPacket packet(entity, false);
 		auto server = weakServer.lock();
 		assert(server);
-		auto lock = server->server->lockClients();
-		for (const auto &[client_id, client]: server->server->getClients())
+		auto &clients = server->server->getClients();
+		auto lock = clients.sharedLock();
+		for (const auto &client: clients)
 			std::static_pointer_cast<RemoteClient>(client)->send(packet);
 	}
 
@@ -233,8 +234,9 @@ namespace Game3 {
 		const DestroyTileEntityPacket packet(tile_entity);
 		auto server = weakServer.lock();
 		assert(server);
-		auto lock = server->server->lockClients();
-		for (const auto &[client_id, client]: server->server->getClients())
+		auto &clients = server->server->getClients();
+		auto lock = clients.sharedLock();
+		for (const auto &client: clients)
 			std::dynamic_pointer_cast<RemoteClient>(client)->send(packet);
 	}
 

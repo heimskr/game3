@@ -4,6 +4,7 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <filesystem>
 #include <functional>
 #include <map>
 #include <memory>
@@ -19,6 +20,7 @@
 #include <vector>
 
 #include <asio.hpp>
+#include <asio/ssl.hpp>
 #include <boost/bind/bind.hpp>
 
 namespace Game3 {
@@ -64,7 +66,6 @@ namespace Game3 {
 
 	class Server {
 		protected:
-			int af;
 			std::string ip;
 			int port;
 			size_t chunkSize;
@@ -85,10 +86,11 @@ namespace Game3 {
 			// std::mutex workersCVMutex;
 
 			void handleWrite(const asio::error_code &, size_t);
-
 			bool removeClient(int);
+			void accept();
 
 		public:
+			asio::ssl::context sslContext;
 			asio::io_context context;
 			asio::ip::tcp::acceptor acceptor;
 			std::string id = "server";
@@ -96,13 +98,11 @@ namespace Game3 {
 			// Lockable<std::unordered_map<RemoteClientPtr, std::shared_ptr<ServerWorker>>> workerMap;
 			Lockable<std::unordered_set<RemoteClientPtr>> allClients;
 
-			void makeName();
-
 			std::function<void(RemoteClient &, std::string_view message)> onMessage;
 			std::function<void(RemoteClient &)> onClose;
 			std::function<void(RemoteClient &)> onAdd;
 
-			Server(int af_, const std::string &ip_, uint16_t port_, size_t thread_count, size_t chunk_size = 1024);
+			Server(const std::string &ip_, uint16_t port_, const std::filesystem::path &certificate_path, const std::filesystem::path &key_path, size_t thread_count, size_t chunk_size = 1024);
 			Server(const Server &) = delete;
 			Server(Server &&) = delete;
 			Server & operator=(const Server &) = delete;
@@ -118,7 +118,6 @@ namespace Game3 {
 			void stop();
 			// virtual std::shared_ptr<ServerWorker> makeWorker(size_t buffer_size, size_t id);
 			// bool remove(bufferevent *);
-			bool close(int client_id);
 			bool close(RemoteClient &);
 
 			[[nodiscard]]

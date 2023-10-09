@@ -4,5 +4,9 @@
 
 namespace Game3 {
 	GenericClient::GenericClient(Server &server_, std::string_view ip_, int id_):
-		server(server_), id(id_), ip(ip_), socket(server_.context) {}
+		server(server_),
+		id(id_),
+		ip(ip_),
+		socket(server_.context),
+		sslStream(socket, server.sslContext) {}
 }

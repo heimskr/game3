@@ -57,21 +57,21 @@ namespace Game3 {
 
 			if (payloadSize == receiveBuffer.size()) {
 				if (receiveBuffer.context.expired())
-					receiveBuffer.context = server.game;
+					receiveBuffer.context = localServer.game;
 
-				auto packet = (*server.game->registry<PacketFactoryRegistry>()[packetType])();
+				auto packet = (*localServer.game->registry<PacketFactoryRegistry>()[packetType])();
 
 				try {
-					packet->decode(*server.game, receiveBuffer);
+					packet->decode(*localServer.game, receiveBuffer);
 				} catch (...) {
 					ERROR("Couldn't decode packet of type " << packetType << ", size " << payloadSize);
-					server.server->close(*this);
+					server.close(*this);
 					return;
 				}
 
 				assert(receiveBuffer.empty());
 				receiveBuffer.clear();
-				server.game->queuePacket(shared_from_this(), packet);
+				localServer.game->queuePacket(shared_from_this(), packet);
 				state = State::Begin;
 			}
 		}
@@ -83,9 +83,9 @@ namespace Game3 {
 			return false;
 		}
 
-		assert(server.game);
+		assert(localServer.game);
 		Buffer send_buffer;
-		packet.encode(*server.game, send_buffer);
+		packet.encode(*localServer.game, send_buffer);
 		assert(send_buffer.size() < UINT32_MAX);
 		std::unique_lock lock(networkMutex);
 		const auto size = toLittle(static_cast<uint32_t>(send_buffer.size()));
@@ -102,7 +102,7 @@ namespace Game3 {
 	}
 
 	void RemoteClient::sendChunk(Realm &realm, ChunkPosition chunk_position, bool can_request, uint64_t counter_threshold) {
-		assert(server.game);
+		assert(localServer.game);
 
 		if (counter_threshold != 0 && realm.tileProvider.contains(chunk_position) && realm.tileProvider.getUpdateCounter(chunk_position) < counter_threshold)
 			return;

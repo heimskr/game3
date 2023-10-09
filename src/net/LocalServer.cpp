@@ -185,11 +185,7 @@ namespace Game3 {
 			} catch (const std::invalid_argument &) {}
 		}
 
-#ifdef USE_SSL
-		global_server = std::make_shared<SSLServer>(AF_INET6, "::0", port, "private.crt", "private.key", 2, 1024);
-#else
-		global_server = std::make_shared<Server>(AF_INET6, "::0", port, 2, 1024);
-#endif
+		global_server = std::make_shared<Server>("::0", port, "private.crt", "private.key", 2, 1024);
 
 		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
 			throw std::runtime_error("Couldn't register SIGPIPE handler");

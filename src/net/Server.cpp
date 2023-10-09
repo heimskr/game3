@@ -17,17 +17,20 @@
 #include <boost/bind/bind.hpp>
 
 namespace Game3 {
-	Server::Server(int af_, const std::string &ip_, uint16_t port_, size_t thread_count, size_t chunk_size):
-	af(af_),
+	Server::Server(const std::string &ip_, uint16_t port_, const std::filesystem::path &certificate_path, const std::filesystem::path &key_path, size_t thread_count, size_t chunk_size):
 	ip(ip_),
 	port(port_),
 	chunkSize(chunk_size),
 	threadCount(thread_count),
 	pool(thread_count),
+	sslContext(asio::ssl::context::tls),
 	context(thread_count),
 	acceptor(context, asio::ip::tcp::endpoint(asio::ip::address::from_string(ip), port)) {
 		if (thread_count < 1)
 			throw std::invalid_argument("Cannot instantiate a Server with a thread count of zero");
+
+		sslContext.use_certificate_chain_file(certificate_path);
+		sslContext.use_private_key_file(key_path, asio::ssl::context::pem);
 	}
 
 	Server::~Server() {
@@ -172,14 +175,22 @@ namespace Game3 {
 			return;
 		}
 
-		asio::async_write(client.socket, asio::buffer(message), boost::bind(&Server::handleWrite, this));
+		asio::async_write(client.socket, asio::buffer(message), [this](const asio::error_code &errc, size_t length) {
+			handleWrite(errc, length);
+		});
 	}
 
 	void Server::send(RemoteClient &client, const std::string &message, bool force) {
 		return send(client, std::string_view(message), force);
 	}
 
-	void Server::handleWrite(const asio::error_code &, size_t) {
+	void Server::handleWrite(const asio::error_code &errc, size_t) {
+		if (errc) {
+			WARN("Write: " << errc.message());
+		}
+	}
+
+	void Server::accept() {
 
 	}
 

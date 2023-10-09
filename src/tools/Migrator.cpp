@@ -15,7 +15,7 @@ namespace Game3 {
 		}
 
 		if (args.front() == "all") {
-			auto ssl_server = std::make_shared<SSLServer>(AF_INET6, "::1", 40000, "private.crt", "private.key", 2, 1024);
+			auto ssl_server = std::make_shared<Server>("::1", 40000, "private.crt", "private.key", 2, 1024);
 			auto game_server = std::make_shared<LocalServer>(ssl_server, readFile(".secret"));
 			auto game = std::dynamic_pointer_cast<ServerGame>(Game::create(Side::Server, game_server));
 			game->openDatabase(1 < args.size()? args[1] : "world.db");
