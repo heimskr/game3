@@ -27,10 +27,10 @@
 namespace Game3 {
 	class Canvas;
 	class ClientGame;
-	class LocalServer;
 	class MainWindow;
 	class Menu;
 	class Player;
+	class Server;
 	class ServerGame;
 	class Tile;
 	class Tileset;
@@ -120,7 +120,7 @@ namespace Game3 {
 
 			inline void clearFluidCache() { fluidCache.clear(); }
 
-			using ServerArgument = std::variant<Canvas *, std::shared_ptr<LocalServer>>;
+			using ServerArgument = std::variant<Canvas *, std::shared_ptr<Server>>;
 
 			static std::shared_ptr<Game> create(Side, const ServerArgument &);
 			static std::shared_ptr<Game> fromJSON(Side, const nlohmann::json &, const ServerArgument &);

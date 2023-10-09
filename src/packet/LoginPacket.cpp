@@ -2,7 +2,7 @@
 #include "graphics/Tileset.h"
 #include "entity/ServerPlayer.h"
 #include "game/ServerGame.h"
-#include "net/LocalServer.h"
+#include "net/Server.h"
 #include "net/RemoteClient.h"
 #include "packet/LoginPacket.h"
 #include "packet/LoginStatusPacket.h"

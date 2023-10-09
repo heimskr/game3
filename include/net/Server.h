@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Types.h"
 #include "threading/Lockable.h"
 
 #include <atomic>
@@ -25,44 +26,10 @@
 
 namespace Game3 {
 	class RemoteClient;
-
 	using RemoteClientPtr = std::shared_ptr<RemoteClient>;
 
-	// class ServerWorker: public std::enable_shared_from_this<ServerWorker> {
-	// 	public:
-	// 		Server &server;
-	// 		size_t bufferSize;
-	// 		std::unique_ptr<char[]> buffer;
-	// 		size_t id;
-
-	// 		/** Maps descriptors to read buffers. */
-	// 		std::map<int, std::string> readBuffers;
-	// 		std::vector<int> acceptQueue;
-
-	// 		explicit ServerWorker(Server &server_, size_t buffer_size, size_t id_);
-
-	// 		virtual ~ServerWorker();
-
-	// 		void removeClient(int client);
-	// 		void work(size_t id);
-	// 		virtual void accept(int new_fd);
-	// 		void stop();
-	// 		void queueAccept(int new_fd);
-	// 		void queueClose(int client);
-	// 		[[nodiscard]] auto lockReadBuffers() { return std::unique_lock(readMutex); }
-	// 		[[nodiscard]] auto lockAcceptQueue() { return std::unique_lock(acceptQueueMutex); }
-
-	// 		friend Server;
-
-	// 	private:
-	// 		std::recursive_mutex readMutex;
-	// 		std::recursive_mutex acceptQueueMutex;
-	// 		std::recursive_mutex closeQueueMutex;
-
-	// 		Lockable<std::unordered_set<RemoteClientPtr>> closeQueue;
-
-	// 		virtual void remove(RemoteClientPtr);
-	// };
+	class ServerGame;
+	class ServerPlayer;
 
 	class Server {
 		protected:
@@ -72,18 +39,13 @@ namespace Game3 {
 			int sock = -1;
 			bool connected = false;
 			std::atomic_bool closed {false};
+			std::string secret;
 
 			size_t threadCount = 0;
 			asio::thread_pool pool;
 			std::thread acceptThread;
 
 			std::atomic_int lastID = 0;
-
-			// std::vector<std::shared_ptr<ServerWorker>> workers;
-			// std::atomic_bool workersReady = false;
-
-			// std::condition_variable workersCV;
-			// std::mutex workersCVMutex;
 
 			void handleWrite(const asio::error_code &, size_t);
 			bool removeClient(int);
@@ -94,15 +56,16 @@ namespace Game3 {
 			asio::io_context context;
 			asio::ip::tcp::acceptor acceptor;
 			std::string id = "server";
+			std::shared_ptr<ServerGame> game;
+			std::function<void()> onStop;
 
-			// Lockable<std::unordered_map<RemoteClientPtr, std::shared_ptr<ServerWorker>>> workerMap;
 			Lockable<std::unordered_set<RemoteClientPtr>> allClients;
 
 			std::function<void(RemoteClient &, std::string_view message)> onMessage;
 			std::function<void(RemoteClient &)> onClose;
 			std::function<void(RemoteClient &)> onAdd;
 
-			Server(const std::string &ip_, uint16_t port_, const std::filesystem::path &certificate_path, const std::filesystem::path &key_path, size_t thread_count, size_t chunk_size = 1024);
+			Server(const std::string &ip_, uint16_t port_, const std::filesystem::path &certificate_path, const std::filesystem::path &key_path, std::string_view secret_, size_t thread_count, size_t chunk_size = 1024);
 			Server(const Server &) = delete;
 			Server(Server &&) = delete;
 			Server & operator=(const Server &) = delete;
@@ -116,9 +79,22 @@ namespace Game3 {
 			void send(RemoteClient &, const std::string &, bool force = false);
 			void run();
 			void stop();
-			// virtual std::shared_ptr<ServerWorker> makeWorker(size_t buffer_size, size_t id);
-			// bool remove(bufferevent *);
 			bool close(RemoteClient &);
+
+			/** Writes every player's full data to the database. */
+			void saveUserData();
+			std::shared_ptr<ServerPlayer> loadPlayer(std::string_view username, std::string_view display_name);
+			Token generateToken(const std::string &username) const;
+			void setupPlayer(RemoteClient &);
+
+			static bool validateUsername(std::string_view);
+			static int main(int argc, char **argv);
+
+			template <std::integral T>
+			void send(RemoteClient &client, T value) {
+				const T little = toLittle(value);
+				send(client, std::string_view(reinterpret_cast<const char *>(&little), sizeof(T)));
+			}
 
 			[[nodiscard]]
 			inline auto & getClients() { return allClients; }

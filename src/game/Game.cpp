@@ -904,7 +904,7 @@ namespace Game3 {
 		if (side == Side::Client)
 			out = GamePtr(new ClientGame(*std::get<Canvas *>(argument)));
 		else
-			out = GamePtr(new ServerGame(std::get<std::shared_ptr<LocalServer>>(argument)));
+			out = GamePtr(new ServerGame(std::get<std::shared_ptr<Server>>(argument)));
 		out->initialSetup();
 		return out;
 	}

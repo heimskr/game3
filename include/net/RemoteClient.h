@@ -4,7 +4,6 @@
 
 #include "net/Buffer.h"
 #include "net/GenericClient.h"
-#include "net/LocalServer.h"
 #include "packet/Packet.h"
 
 namespace Game3 {
@@ -32,11 +31,9 @@ namespace Game3 {
 
 			constexpr static size_t MAX_PACKET_SIZE = 1 << 24;
 
-			LocalServer &localServer;
-
 			RemoteClient() = delete;
-			RemoteClient(LocalServer &local_server, std::string_view ip_, int id_):
-				GenericClient(*local_server.server, ip_, id_), localServer(local_server) {}
+
+			using GenericClient::GenericClient;
 
 			~RemoteClient() override = default;
 

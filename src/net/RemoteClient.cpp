@@ -4,7 +4,7 @@
 #include "Log.h"
 #include "game/ServerGame.h"
 #include "net/Buffer.h"
-#include "net/LocalServer.h"
+#include "net/Server.h"
 #include "net/RemoteClient.h"
 #include "packet/ChunkTilesPacket.h"
 #include "packet/Packet.h"
@@ -57,12 +57,12 @@ namespace Game3 {
 
 			if (payloadSize == receiveBuffer.size()) {
 				if (receiveBuffer.context.expired())
-					receiveBuffer.context = localServer.game;
+					receiveBuffer.context = server.game;
 
-				auto packet = (*localServer.game->registry<PacketFactoryRegistry>()[packetType])();
+				auto packet = (*server.game->registry<PacketFactoryRegistry>()[packetType])();
 
 				try {
-					packet->decode(*localServer.game, receiveBuffer);
+					packet->decode(*server.game, receiveBuffer);
 				} catch (...) {
 					ERROR("Couldn't decode packet of type " << packetType << ", size " << payloadSize);
 					server.close(*this);
@@ -71,7 +71,7 @@ namespace Game3 {
 
 				assert(receiveBuffer.empty());
 				receiveBuffer.clear();
-				localServer.game->queuePacket(shared_from_this(), packet);
+				server.game->queuePacket(shared_from_this(), packet);
 				state = State::Begin;
 			}
 		}
@@ -83,9 +83,9 @@ namespace Game3 {
 			return false;
 		}
 
-		assert(localServer.game);
+		assert(server.game);
 		Buffer send_buffer;
-		packet.encode(*localServer.game, send_buffer);
+		packet.encode(*server.game, send_buffer);
 		assert(send_buffer.size() < UINT32_MAX);
 		std::unique_lock lock(networkMutex);
 		const auto size = toLittle(static_cast<uint32_t>(send_buffer.size()));
@@ -102,7 +102,7 @@ namespace Game3 {
 	}
 
 	void RemoteClient::sendChunk(Realm &realm, ChunkPosition chunk_position, bool can_request, uint64_t counter_threshold) {
-		assert(localServer.game);
+		assert(server.game);
 
 		if (counter_threshold != 0 && realm.tileProvider.contains(chunk_position) && realm.tileProvider.getUpdateCounter(chunk_position) < counter_threshold)
 			return;
@@ -121,7 +121,7 @@ namespace Game3 {
 	void RemoteClient::send(const T &value) {
 		if (networkMutex.try_lock())
 			throw std::runtime_error("Network mutex not locked...?");
-		localServer.send(*this, value);
+		server.send(*this, value);
 	}
 
 	void RemoteClient::startBuffering() {

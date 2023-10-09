@@ -25,7 +25,7 @@ namespace Game3 {
 		GenericClient() = delete;
 		GenericClient(const GenericClient &) = delete;
 		GenericClient(GenericClient &&) = delete;
-		GenericClient(Server &server_, std::string_view ip_, int id_);
+		GenericClient(Server &server_, std::string_view ip_, int id_, asio::ip::tcp::socket &&socket_);
 
 		virtual ~GenericClient() = default;
 

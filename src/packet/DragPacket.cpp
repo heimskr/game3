@@ -2,7 +2,7 @@
 #include "entity/ServerPlayer.h"
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
-#include "net/LocalServer.h"
+#include "net/Server.h"
 #include "net/RemoteClient.h"
 #include "packet/DragPacket.h"
 

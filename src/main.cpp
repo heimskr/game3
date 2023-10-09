@@ -2,7 +2,7 @@
 #include "App.h"
 #include "Log.h"
 #include "client/RichPresence.h"
-#include "net/LocalServer.h"
+#include "net/Server.h"
 #include "net/Sock.h"
 #include "tools/Flasker.h"
 #include "tools/Mazer.h"
@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
 		}
 
 		if (strcmp(argv[1], "-s") == 0) {
-			const auto out = Game3::LocalServer::main(argc, argv);
+			const auto out = Game3::Server::main(argc, argv);
 			Game3::Timer::summary();
 			return out;
 		}

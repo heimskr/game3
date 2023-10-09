@@ -18,9 +18,9 @@
 #include <utility>
 
 namespace Game3 {
-	class LocalServer;
 	class Packet;
 	class RemoteClient;
+	class Server;
 
 	class ServerGame: public Game {
 		public:
@@ -28,11 +28,11 @@ namespace Game3 {
 
 			Lockable<std::unordered_set<ServerPlayerPtr>> players;
 			Lockable<std::unordered_map<std::string, ServerPlayerPtr>> playerMap;
-			std::weak_ptr<LocalServer> weakServer;
+			std::weak_ptr<Server> weakServer;
 			GameDB database{*this};
 			float lastGarbageCollection = 0.f;
 
-			ServerGame(const std::shared_ptr<LocalServer> &server_):
+			ServerGame(const std::shared_ptr<Server> &server_):
 				weakServer(server_) {}
 
 			~ServerGame() override;

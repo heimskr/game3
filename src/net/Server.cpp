@@ -1,26 +1,37 @@
 #include "Log.h"
+#include "entity/ServerPlayer.h"
+#include "game/Inventory.h"
+#include "game/ServerGame.h"
+#include "game/SimulationOptions.h"
 #include "net/NetError.h"
 #include "net/Server.h"
 #include "net/GenericClient.h"
 #include "net/RemoteClient.h"
+#include "packet/SelfTeleportedPacket.h"
+#include "packet/TimePacket.h"
+#include "realm/Overworld.h"
+#include "realm/ShadowRealm.h"
+#include "util/Crypto.h"
+#include "util/FS.h"
+#include "util/Timer.h"
+#include "util/Util.h"
+#include "worldgen/Overworld.h"
+#include "worldgen/ShadowRealm.h"
 
-#include <arpa/inet.h>
 #include <cerrno>
 #include <csignal>
 #include <cstdio>
 #include <cstdlib>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <unistd.h>
+#include <fstream>
 
 #include <boost/bind/bind.hpp>
 
 namespace Game3 {
-	Server::Server(const std::string &ip_, uint16_t port_, const std::filesystem::path &certificate_path, const std::filesystem::path &key_path, size_t thread_count, size_t chunk_size):
+	Server::Server(const std::string &ip_, uint16_t port_, const std::filesystem::path &certificate_path, const std::filesystem::path &key_path, std::string_view secret_, size_t thread_count, size_t chunk_size):
 	ip(ip_),
 	port(port_),
 	chunkSize(chunk_size),
+	secret(secret_),
 	threadCount(thread_count),
 	pool(thread_count),
 	sslContext(asio::ssl::context::tls),
@@ -34,138 +45,15 @@ namespace Game3 {
 	}
 
 	Server::~Server() {
-		// while (!bufferEvents.empty())
-		// 	remove(bufferEvents.begin()->second);
 		stop();
+		if (onStop)
+			onStop();
 	}
-
-	/*
-	ServerWorker::Worker(Server &server_, size_t buffer_size, size_t id_):
-	server(server_), bufferSize(buffer_size), buffer(std::make_unique<char[]>(buffer_size)), base(makeBase()), id(id_) {
-		if (base == nullptr)
-			throw std::runtime_error("Couldn't allocate a new event_base");
-
-		acceptEvent = event_new(base, -1, EV_PERSIST, &worker_acceptcb, this);
-		if (acceptEvent == nullptr)
-			throw std::runtime_error("Couldn't allocate acceptEvent");
-		if (event_add(acceptEvent, nullptr) < 0) {
-			char error[64] = "?";
-			if (!strerror_r(errno, error, sizeof(error)) || strcmp(error, "?") == 0)
-				throw std::runtime_error("Couldn't add acceptEvent (" + std::to_string(errno) + ')');
-			throw std::runtime_error("Couldn't add acceptEvent: " + std::string(error));
-		}
-	}
-
-	ServerWorker::~Worker() {
-		if (acceptEvent) {
-			event_free(acceptEvent);
-			acceptEvent = nullptr;
-		}
-
-		if (base) {
-			event_base_free(base);
-			base = nullptr;
-		}
-	}
-
-	void ServerWorker::work(size_t) {
-		event_base_loop(base, EVLOOP_NO_EXIT_ON_EMPTY);
-	}
-
-	void ServerWorker::stop() {
-		if (base) {
-			event_base_loopexit(base, nullptr);
-			base = nullptr;
-		}
-	}
-
-	event_base * ServerWorker::makeBase() {
-		event_config *config = event_config_new();
-		event_base *base = event_base_new_with_config(config);
-		event_config_free(config);
-		return base;
-	}
-
-	void Server::makeName() {
-		name4 = {.sin_family  = AF_INET,  .sin_port  = htons(port), .sin_addr = {}, .sin_zero = {0}};
-		name6 = {.sin6_family = AF_INET6, .sin6_port = htons(port), .sin6_flowinfo = {}, .sin6_addr = {}, .sin6_scope_id = 0};
-
-		int status;
-
-		if (af == AF_INET) {
-			name = reinterpret_cast<sockaddr *>(&name4);
-			nameSize = sizeof(name4);
-			status = inet_pton(AF_INET, ip.c_str(), &name4.sin_addr.s_addr);
-		} else if (af == AF_INET6) {
-			name = reinterpret_cast<sockaddr *>(&name6);
-			nameSize = sizeof(name6);
-			status = inet_pton(AF_INET6, ip.c_str(), &name6.sin6_addr);
-		} else
-			throw std::invalid_argument("Unsupported or invalid address family: " + std::to_string(af));
-
-		if (status != 1)
-			throw std::invalid_argument("Couldn't parse IP address \"" + ip + "\"");
-	}
-
-	int Server::getDescriptor(int client) {
-		int descriptor;
-		{
-			auto lock = lockClients();
-			descriptor = descriptors.at(client);
-		}
-		return descriptor;
-	}
-
-	bufferevent * Server::getBufferEvent(int descriptor) {
-		bufferevent *buffer_event;
-		{
-			auto lock = lockDescriptors();
-			try {
-				buffer_event = bufferEvents.at(descriptor);
-			} catch (const std::out_of_range &) {
-				ERROR("Tried to find descriptor " << descriptor << " (number of bufferevents: " << bufferEvents.size() << ')');
-				for (const auto &[desc, ev]: bufferEvents)
-					ERROR("- " << desc);
-				throw;
-			}
-		}
-		return buffer_event;
-	}
-
-	//*/
 
 	void Server::handleMessage(RemoteClient &client, std::string_view message) {
 		if (onMessage)
 			onMessage(client, message);
 	}
-
-	/*
-	ssize_t Server::send(int client, std::string_view message, bool force) {
-		if (!force) {
-			std::shared_ptr<GenericClient> client_ptr;
-			{
-				std::unique_lock clients_lock(clientsMutex);
-				client_ptr = allClients.at(client);
-			}
-			if (client_ptr->isBuffering()) {
-				auto &buffer = client_ptr->sendBuffer;
-				auto lock = buffer.uniqueLock();
-				buffer.bytes.insert(buffer.bytes.end(), message.begin(), message.end());
-				return static_cast<ssize_t>(message.size());
-			}
-		}
-
-		try {
-			return bufferevent_write(getBufferEvent(getDescriptor(client)), message.begin(), message.size());
-		} catch (const std::out_of_range &err) {
-			return -1;
-		}
-	}
-
-	ssize_t Server::send(int client, const std::string &message, bool force) {
-		return send(client, std::string_view(message), force);
-	}
-	//*/
 
 	void Server::send(RemoteClient &client, std::string_view message, bool force) {
 		if (!force && client.isBuffering()) {
@@ -191,375 +79,252 @@ namespace Game3 {
 	}
 
 	void Server::accept() {
-
+		acceptor.async_accept([this](const asio::error_code &errc, asio::ip::tcp::socket socket) {
+			if (errc) {
+				ERROR("Accept: " << errc.message());
+			} else {
+				std::string ip = socket.remote_endpoint().address().to_string();
+				auto client = std::make_shared<RemoteClient>(*this, ip, ++lastID, std::move(socket));
+				allClients.insert(client);
+			}
+		});
 	}
-
-	/*
-	void ServerWorker::removeClient(int client) {
-		remove(server.getBufferEvent(server.getDescriptor(client)));
-	}
-
-	void ServerWorker::remove(bufferevent *buffer_event) {
-		int descriptor = -1;
-		{
-			auto descriptors_lock = server.lockDescriptors();
-			descriptor = server.bufferEventDescriptors.at(buffer_event);
-			server.bufferEventDescriptors.erase(buffer_event);
-			server.bufferEvents.erase(descriptor);
-		}
-		{
-			auto clients_lock = server.lockClients();
-			const int client_id = server.clients.at(descriptor);
-			if (server.closeHandler)
-				server.closeHandler(client_id);
-			server.allClients.erase(client_id);
-			server.freePool.insert(client_id);
-			server.descriptors.erase(client_id);
-			server.clients.erase(descriptor);
-		}
-		{
-			auto read_lock = lockReadBuffers();
-			readBuffers.erase(descriptor);
-		}
-		{
-			auto worker_lock = server.lockWorkerMap();
-			server.workerMap.erase(buffer_event);
-		}
-		bufferevent_free(buffer_event);
-	}
-
-	void ServerWorker::removeDescriptor(int descriptor) {
-		remove(server.getBufferEvent(descriptor));
-	}
-
-	void ServerWorker::queueAccept(int new_fd) {
-		{
-			auto lock = lockAcceptQueue();
-			acceptQueue.push_back(new_fd);
-		}
-		event_active(acceptEvent, 0, 0);
-	}
-
-	void ServerWorker::queueClose(int client_id) {
-		queueClose(server.getBufferEvent(server.getDescriptor(client_id)));
-	}
-
-	void ServerWorker::queueClose(bufferevent *buffer_event) {
-		if (evbuffer_get_length(bufferevent_get_output(buffer_event)) == 0) {
-			remove(buffer_event);
-		} else {
-			auto lock = lockCloseQueue();
-			closeQueue.insert(buffer_event);
-		}
-	}
-	//*/
 
 	void Server::run() {
-		// if (!threads.empty())
-		// 	throw std::runtime_error("Cannot run server: already running");
-
 		connected = true;
 
 		for (size_t i = 0; i < threadCount; ++i)
 			asio::post(pool, boost::bind(&asio::io_context::run, &context));
-
-		// acceptThread = std::thread([this] {
-		// 	context.run
-		// });
-
-		// makeName();
-
-		// for (size_t i = 0; i < threadCount; ++i)
-		// 	workers.emplace_back(makeWorker(chunkSize, i));
-
-		// for (size_t i = 0; i < threadCount; ++i)
-		// 	threads.emplace_back(std::thread([this, i, &worker = *workers.at(i)] {
-		// 		{
-		// 			std::unique_lock lock(workersCVMutex);
-		// 			workersCV.wait(lock, [this] { return workersReady.load(); });
-		// 		}
-		// 		worker.work(i);
-		// 	}));
-
-		// workersReady = true;
-		// workersCV.notify_all();
-
-		// acceptThread = std::thread([this] {
-		// 	mainLoop();
-		// });
-
-		// for (auto &thread: threads)
-		// 	thread.join();
-
-		// acceptThread.join();
-		// pool.join();
 	}
-
-	void Server::mainLoop() {
-		// event_config *config = event_config_new();
-		// base = event_base_new_with_config(config);
-		// event_config_free(config);
-
-		// if (base == nullptr) {
-		// 	char error[64] = "?";
-		// 	if (!strerror_r(errno, error, sizeof(error)) || strcmp(error, "?") == 0)
-		// 		throw std::runtime_error("Couldn't initialize libevent (" + std::to_string(errno) + ')');
-		// 	throw std::runtime_error("Couldn't initialize libevent: " + std::string(error));
-		// }
-
-		// evconnlistener *listener = evconnlistener_new_bind(base, listener_cb, this, LEV_OPT_REUSEABLE | LEV_OPT_CLOSE_ON_FREE | LEV_OPT_CLOSE_ON_EXEC | LEV_OPT_THREADSAFE, -1, name, nameSize);
-
-		// if (listener == nullptr) {
-		// 	event_base_free(base.exchange(nullptr));
-		// 	char error[64] = "?";
-		// 	if (!strerror_r(errno, error, sizeof(error)) || strcmp(error, "?") == 0)
-		// 		throw std::runtime_error("Couldn't initialize libevent listener (" + std::to_string(errno) + ')');
-		// 	throw std::runtime_error("Couldn't initialize libevent listener: " + std::string(error));
-		// }
-
-		// event_base_dispatch(base);
-		// evconnlistener_free(listener);
-		// event_base_free(base.exchange(nullptr));
-	}
-
-	/*
-	void ServerWorker::accept(int new_fd) {
-		int new_client = -1;
-
-		{
-			auto lock = server.lockClients();
-			if (!server.freePool.empty()) {
-				new_client = *server.freePool.begin();
-				server.freePool.erase(new_client);
-			} else
-				new_client = ++server.lastClient;
-			server.descriptors.emplace(new_client, new_fd);
-			server.clients.erase(new_fd);
-			server.clients.emplace(new_fd, new_client);
-		}
-
-		evutil_make_socket_nonblocking(new_fd);
-		bufferevent *buffer_event = bufferevent_socket_new(base, new_fd, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
-
-		if (buffer_event == nullptr) {
-			event_base_loopbreak(base);
-			throw std::runtime_error("buffer_event is null");
-		}
-
-		{
-			auto lock = server.lockDescriptors();
-			if (server.bufferEvents.contains(new_fd))
-				throw std::runtime_error("File descriptor " + std::to_string(new_fd) + " already has a bufferevent struct");
-			server.bufferEvents.emplace(new_fd, buffer_event);
-			server.bufferEventDescriptors.emplace(buffer_event, new_fd);
-		}
-
-		{
-			auto lock = server.lockWorkerMap();
-			server.workerMap.emplace(buffer_event, shared_from_this());
-		}
-
-		if (server.addClient) {
-			std::string ip;
-			sockaddr_in6 addr6 {};
-			socklen_t addr6_len = sizeof(addr6);
-			if (getpeername(new_fd, reinterpret_cast<sockaddr *>(&addr6), &addr6_len) == 0) {
-				char ip_buffer[INET6_ADDRSTRLEN];
-				if (inet_ntop(addr6.sin6_family, &addr6.sin6_addr, ip_buffer, sizeof(ip_buffer)) != nullptr)
-					ip = ip_buffer;
-				else
-					WARN("inet_ntop failed: " << strerror(errno));
-			} else
-				WARN("getpeername failed: " << strerror(errno));
-			if (std::string_view(ip).substr(0, 7) == "::ffff:" && ip.find('.') != std::string::npos)
-				ip.erase(0, 7);
-			auto lock = server.lockClients();
-			server.addClient(*this, new_client, ip, new_fd, buffer_event);
-		}
-
-		bufferevent_setcb(buffer_event, conn_readcb, conn_writecb, conn_eventcb, this);
-		bufferevent_enable(buffer_event, EV_READ | EV_WRITE);
-	}
-
-	void ServerWorker::handleWriteEmpty(bufferevent *buffer_event) {
-		bool contains = false;
-		{
-			auto lock = lockCloseQueue();
-			if ((contains = closeQueue.contains(buffer_event)))
-				closeQueue.erase(buffer_event);
-		}
-
-		if (contains)
-			remove(buffer_event);
-	}
-
-	void ServerWorker::handleEOF(bufferevent *buffer_event) {
-		remove(buffer_event);
-	}
-
-	void ServerWorker::handleRead(bufferevent *buffer_event) {
-		const int descriptor = bufferevent_getfd(buffer_event);
-		if (descriptor == -1)
-			throw std::runtime_error("descriptor is -1 in Worker::handleRead");
-
-		evbuffer *input = bufferevent_get_input(buffer_event);
-
-		size_t readable = evbuffer_get_length(input);
-
-		try {
-			auto lock = lockReadBuffers();
-			std::string &str = readBuffers[descriptor];
-			str.reserve(bufferSize);
-
-			auto &clients = server.clients;
-			auto clients_lock = server.lockClients();
-			const int client_id = clients.at(descriptor);
-
-			std::shared_ptr<GenericClient> client;
-			try {
-				client = server.allClients.at(client_id);
-			} catch (const std::out_of_range &) {
-				// Seems the client isn't ready for reading yet.
-				ERROR("Client " << client_id << " doesn't have an instance yet");
-				return;
-			}
-
-			while (0 < readable) {
-				size_t to_read = std::min(bufferSize, readable);
-				const bool use_max_read = 0 < client->maxRead;
-
-				if (use_max_read)
-					to_read = std::min(to_read, client->maxRead);
-
-				const int byte_count = evbuffer_remove(input, buffer.get(), to_read);
-
-				if (use_max_read)
-					client->maxRead -= byte_count;
-
-				if (byte_count < 0)
-					throw NetError("Reading", errno);
-
-				server.handleMessage(*client, {buffer.get(), static_cast<size_t>(byte_count)});
-				readable = evbuffer_get_length(input);
-			}
-		} catch (const std::runtime_error &err) {
-			ERROR(err.what());
-			remove(buffer_event);
-		}
-	}
-	//*/
 
 	void Server::stop() {
-		// for (auto &worker: workers)
-		// 	worker->stop();
-		// if (auto *loaded = base.load())
-		// 	event_base_loopbreak(loaded);
 		pool.join();
 	}
 
-	/*
-	std::shared_ptr<ServerWorker> Server::makeWorker(size_t buffer_size, size_t id) {
-		return std::make_shared<ServerWorker>(*this, buffer_size, id);
-	}
-
-	bool Server::remove(bufferevent *buffer_event) {
-		std::shared_ptr<Worker> worker;
-		{
-			auto lock = lockWorkerMap();
-			if (!workerMap.contains(buffer_event))
-				return false;
-			worker = workerMap.at(buffer_event);
-		}
-		worker->remove(buffer_event);
-		return true;
-	}
-
-	bool Server::removeClient(int client) {
-		int descriptor = -1;
-		{
-			auto lock = lockClients();
-			descriptor = descriptors.at(client);
-		}
-
-		bufferevent *buffer_event = nullptr;
-		{
-			auto lock = lockDescriptors();
-			buffer_event = bufferEvents.at(descriptor);
-		}
-
-		return remove(buffer_event);
-	}
-
-	bool Server::close(int client_id) {
-		bufferevent *buffer_event = nullptr;
-		try {
-			buffer_event = getBufferEvent(getDescriptor(client_id));
-		} catch (const std::out_of_range &) {
-			return false;
-		}
-		std::shared_ptr<Worker> worker;
-		{
-			auto lock = lockWorkerMap();
-			worker = workerMap.at(buffer_event);
-		}
-		worker->queueClose(buffer_event);
-		return true;
-	}
-	//*/
-
 	bool Server::close(RemoteClient &client) {
 		client.socket.close();
-		// bufferevent *buffer_event = client.event;
-		// std::shared_ptr<Worker> worker;
-		// {
-		// 	auto lock = lockWorkerMap();
-		// 	worker = workerMap.at(buffer_event);
-		// }
-		// worker->queueClose(buffer_event);
 		return true;
 	}
 
-	/*
-	void listener_cb(evconnlistener *, evutil_socket_t fd, sockaddr *, int, void *data) {
-		auto *server = reinterpret_cast<Server *>(data);
-		std::unique_lock lock(server->threadCursorMutex);
-		server->workers.at(server->threadCursor)->queueAccept(fd);
-		server->threadCursor = (server->threadCursor + 1) % server->threadCount;
-	}
+	void Server::saveUserData() {
+		auto lock = game->players.sharedLock();
 
-	void conn_readcb(bufferevent *buffer_event, void *data) {
-		auto *worker = reinterpret_cast<ServerWorker *>(data);
-		worker->handleRead(buffer_event);
-	}
+		game->database.writeUsers(game->players);
 
-	void conn_writecb(bufferevent *buffer_event, void *data) {
-		if (evbuffer_get_length(bufferevent_get_output(buffer_event)) == 0) {
-			auto *worker = reinterpret_cast<ServerWorker *>(data);
-			worker->handleWriteEmpty(buffer_event);
+		for (const ServerPlayerPtr &player: game->players) {
+			nlohmann::json json;
+			{
+				auto player_lock = player->sharedLock();
+				player->toJSON(json);
+			}
+			game->database.writeUser(player->username, json, std::nullopt);
 		}
 	}
 
-	void conn_eventcb(bufferevent *buffer_event, short events, void *data) {
-		if ((events & BEV_EVENT_EOF) != 0)
-			reinterpret_cast<ServerWorker *>(data)->handleEOF(buffer_event);
-		else if ((events & (BEV_EVENT_ERROR | BEV_EVENT_TIMEOUT)) != 0)
-			reinterpret_cast<ServerWorker *>(data)->server.remove(buffer_event);
+	std::shared_ptr<ServerPlayer> Server::loadPlayer(std::string_view username, std::string_view display_name) {
+		if (!validateUsername(username))
+			return nullptr;
+
+		{
+			nlohmann::json json;
+			if (game->database.readUser(std::string(username), nullptr, &json, nullptr))
+				return ServerPlayer::fromJSON(*game, json);
+		}
+
+		RealmPtr overworld = game->getRealm(1);
+
+		auto player = Entity::create<ServerPlayer>();
+		player->username = username;
+		player->displayName = display_name;
+		player->token = generateToken(player->username);
+		// overworld->add(player, overworld->randomLand);
+		// overworld->add(player, Position(31, 82));
+		// player->direction = Direction::Right;
+		overworld->add(player, Position(-25, -36));
+		player->init(*game);
+		const InventoryPtr inventory = player->getInventory();
+		{
+			auto inventory_lock = inventory->uniqueLock();
+			inventory->add(ItemStack::withDurability(*game, "base:item/iron_pickaxe"));
+			inventory->add(ItemStack::withDurability(*game, "base:item/iron_shovel"));
+			inventory->add(ItemStack::withDurability(*game, "base:item/iron_axe"));
+			inventory->add(ItemStack::withDurability(*game, "base:item/iron_hammer"));
+			inventory->add(ItemStack(*game, "base:item/cave_entrance"));
+			inventory->add(ItemStack(*game, "base:item/pump", 64));
+			inventory->add(ItemStack(*game, "base:item/tank", 64));
+			inventory->add(ItemStack(*game, "base:item/centrifuge", 64));
+			inventory->add(ItemStack(*game, "base:item/geothermal_generator", 64));
+			inventory->add(ItemStack(*game, "base:item/chemical_reactor"));
+			inventory->add(ItemStack(*game, "base:item/energy_pipe", 64));
+			inventory->add(ItemStack(*game, "base:item/fluid_pipe", 64));
+			inventory->add(ItemStack(*game, "base:item/item_pipe", 64));
+			inventory->add(ItemStack(*game, "base:item/lava_flask", 64));
+			inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "H2O"}}));
+			inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "H"}}));
+			inventory->add(ItemStack(*game, "base:item/chemical", 64, {{"formula", "O"}}));
+		}
+		game->addPlayer(player);
+		return player;
 	}
 
-	void signal_cb(evutil_socket_t, short, void *data) {
-		auto *server = reinterpret_cast<Server *>(data);
-		WARN("Received SIGINT.");
-		server->stop();
+	Token Server::generateToken(const std::string &username) const {
+		return computeSHA3_512<Token>(secret + '/' + username);
 	}
 
-	void worker_acceptcb(evutil_socket_t, short, void *data) {
-		auto *worker = reinterpret_cast<ServerWorker *>(data);
-		auto lock = worker->lockAcceptQueue();
-		while (!worker->acceptQueue.empty()) {
-			const int descriptor = worker->acceptQueue.back();
-			worker->acceptQueue.pop_back();
-			worker->accept(descriptor);
+	void Server::setupPlayer(RemoteClient &client) {
+		auto player = client.getPlayer();
+		auto realm = player->getRealm();
+		INFO("Setting up player");
+		player->weakClient = client.shared_from_this();
+		player->notifyOfRealm(*realm);
+		auto guard = client.bufferGuard();
+		client.send(SelfTeleportedPacket(realm->id, player->getPosition()));
+		client.send(TimePacket(game->time));
+		auto lock = game->players.sharedLock();
+		const EntityPacket packet(player);
+		for (const auto &other_player: game->players) {
+			if (other_player != player) {
+				other_player->notifyOfRealm(*realm);
+				other_player->send(packet);
+			}
 		}
 	}
-	//*/
+
+	namespace {
+		std::shared_ptr<Server> global_server;
+		std::atomic_bool running = true;
+		std::condition_variable stopCV;
+		std::mutex stopMutex;
+		std::condition_variable saveCV;
+	}
+
+	bool Server::validateUsername(std::string_view username) {
+		if (username.empty() || 20 < username.size())
+			return false;
+		for (const char ch: username)
+			if (!std::isalnum(ch) && ch != '_')
+				return false;
+		return true;
+	}
+
+	int Server::main(int argc, char **argv) {
+		// evthread_use_pthreads();
+		// event_enable_debug_mode();
+
+		std::string secret;
+
+		if (std::filesystem::exists(".secret"))
+			secret = readFile(".secret");
+		else
+			std::ofstream(".secret") << (secret = generateSecret(8));
+
+		uint16_t port = 12255;
+		if (3 <= argc) {
+			try {
+				port = parseNumber<uint16_t>(argv[2]);
+			} catch (const std::invalid_argument &) {}
+		}
+
+		global_server = std::make_shared<Server>("::0", port, "private.crt", "private.key", secret, 2, 1024);
+
+		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+			throw std::runtime_error("Couldn't register SIGPIPE handler");
+
+		auto stop_thread = std::thread([] {
+			std::unique_lock lock(stopMutex);
+			stopCV.wait(lock, [] { return !running.load(); });
+			global_server->stop();
+		});
+
+		if (signal(SIGINT, +[](int) { running = false; stopCV.notify_all(); saveCV.notify_all(); }) == SIG_ERR)
+			throw std::runtime_error("Couldn't register SIGINT handler");
+
+		auto game = std::dynamic_pointer_cast<ServerGame>(Game::create(Side::Server, global_server));
+
+		global_server->onStop = [] {
+			running = false;
+			stopCV.notify_all();
+			saveCV.notify_all();
+		};
+
+		const char *world_path = "world.db";
+		if (4 <= argc)
+			world_path = argv[3];
+
+		const bool database_existed = std::filesystem::exists(world_path);
+		game->openDatabase(world_path);
+		global_server->game = game;
+
+		size_t seed = 1621;
+		if (std::filesystem::exists(".seed")) {
+			seed = parseNumber<size_t>(strip(readFile(".seed")));
+			INFO("Using custom seed \e[1m" << seed << "\e[22m");
+		}
+
+		if (database_existed) {
+			game->database.readAllRealms();
+			Timer::summary();
+			Timer::clear();
+			INFO("Finished reading all realms from database.");
+		} else {
+			RealmPtr realm = Realm::create<Overworld>(*game, 1, Overworld::ID(), "base:tileset/monomap", seed);
+			realm->outdoors = true;
+			std::default_random_engine rng;
+			rng.seed(seed);
+			WorldGen::generateOverworld(realm, seed, {}, {{-1, -1}, {1, 1}}, true);
+			game->addRealm(realm->id, realm);
+		}
+
+		if (!game->hasRealm(-1)) {
+			RealmPtr shadow = Realm::create<ShadowRealm>(*game, -1, ShadowRealm::ID(), "base:tileset/monomap", seed);
+			shadow->outdoors = false;
+			std::default_random_engine rng;
+			rng.seed(seed);
+			WorldGen::generateShadowRealm(shadow, seed, {}, {{-1, -1}, {1, 1}}, true);
+			game->addRealm(shadow->id, shadow);
+		}
+
+		game->initEntities();
+		game->initInteractionSets();
+
+		std::thread tick_thread([&] {
+			while (running) {
+				if (!game->tickingPaused)
+					game->tick();
+				std::this_thread::sleep_for(std::chrono::milliseconds(TICK_PERIOD));
+			}
+		});
+
+		std::mutex save_mutex;
+		std::chrono::seconds save_period{120};
+
+		std::thread save_thread([&] {
+			std::chrono::time_point last_save = std::chrono::system_clock::now();
+
+			while (running) {
+				std::unique_lock lock{save_mutex};
+				saveCV.wait_for(lock, save_period, [&] {
+					return !running || save_period <= std::chrono::system_clock::now() - last_save;
+				});
+
+				if (save_period <= std::chrono::system_clock::now() - last_save) {
+					INFO("Autosaving...");
+					game->tickingPaused = true;
+					game->database.writeAllRealms();
+					auto player_lock = game->players.sharedLock();
+					game->database.writeUsers(game->players);
+					game->tickingPaused = false;
+					INFO("Autosaved.");
+					last_save = std::chrono::system_clock::now();
+				}
+			}
+		});
+
+		global_server->run();
+		tick_thread.join();
+		stop_thread.join();
+		save_thread.join();
+
+		return 0;
+	}
 }

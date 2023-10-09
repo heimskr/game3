@@ -3,7 +3,7 @@
 #include "entity/EntityFactory.h"
 #include "entity/ServerPlayer.h"
 #include "game/ServerGame.h"
-#include "net/LocalServer.h"
+#include "net/Server.h"
 #include "net/RemoteClient.h"
 #include "packet/ChatMessageSentPacket.h"
 #include "packet/CommandResultPacket.h"
@@ -209,7 +209,7 @@ namespace Game3 {
 		const DestroyEntityPacket packet(entity, false);
 		auto server = weakServer.lock();
 		assert(server);
-		auto &clients = server->server->getClients();
+		auto &clients = server->getClients();
 		auto lock = clients.sharedLock();
 		for (const auto &client: clients)
 			std::static_pointer_cast<RemoteClient>(client)->send(packet);
@@ -234,7 +234,7 @@ namespace Game3 {
 		const DestroyTileEntityPacket packet(tile_entity);
 		auto server = weakServer.lock();
 		assert(server);
-		auto &clients = server->server->getClients();
+		auto &clients = server->getClients();
 		auto lock = clients.sharedLock();
 		for (const auto &client: clients)
 			std::dynamic_pointer_cast<RemoteClient>(client)->send(packet);

@@ -1,7 +1,7 @@
 #include "Log.h"
 #include "entity/ServerPlayer.h"
 #include "game/ServerGame.h"
-#include "net/LocalServer.h"
+#include "net/Server.h"
 #include "net/RemoteClient.h"
 #include "packet/RegisterPlayerPacket.h"
 #include "packet/RegistrationStatusPacket.h"

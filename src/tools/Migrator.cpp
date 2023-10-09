@@ -1,7 +1,7 @@
 #include "Log.h"
 #include "data/GameDB.h"
 #include "game/ServerGame.h"
-#include "net/LocalServer.h"
+#include "net/Server.h"
 #include "net/SSLServer.h"
 #include "tools/Migrator.h"
 #include "util/FS.h"
@@ -15,11 +15,10 @@ namespace Game3 {
 		}
 
 		if (args.front() == "all") {
-			auto ssl_server = std::make_shared<Server>("::1", 40000, "private.crt", "private.key", 2, 1024);
-			auto game_server = std::make_shared<LocalServer>(ssl_server, readFile(".secret"));
-			auto game = std::dynamic_pointer_cast<ServerGame>(Game::create(Side::Server, game_server));
+			auto ssl_server = std::make_shared<Server>("::1", 40000, "private.crt", "private.key", readFile(".secret"), 2, 1024);
+			auto game = std::dynamic_pointer_cast<ServerGame>(Game::create(Side::Server, ssl_server));
 			game->openDatabase(1 < args.size()? args[1] : "world.db");
-			game_server->game = game;
+			ssl_server->game = game;
 			INFO("Reading...");
 			game->database.readAllRealms();
 			INFO("Writing...");
