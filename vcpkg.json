@@ -6,10 +6,6 @@
 		"glm",
 		"glfw3",
 		"zstd",
-		{
-			"name": "libevent",
-			"features": ["openssl", "thread"]
-		},
 		"openssl",
 		"stb",
 		"nlohmann-json",

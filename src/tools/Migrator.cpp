@@ -2,7 +2,6 @@
 #include "data/GameDB.h"
 #include "game/ServerGame.h"
 #include "net/Server.h"
-#include "net/SSLServer.h"
 #include "tools/Migrator.h"
 #include "util/FS.h"
 #include "util/Timer.h"
