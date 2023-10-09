@@ -12,29 +12,35 @@ namespace Game3 {
 	class Packet;
 	class Server;
 
-	struct GenericClient {
-		Server &server;
-		int id = -1;
-		std::string ip;
-		SendBuffer sendBuffer;
-		std::mutex networkMutex;
-		asio::ip::tcp::socket socket;
+	class GenericClient {
+		public:
+			Server &server;
+			int id = -1;
+			std::string ip;
+			SendBuffer sendBuffer;
+			std::mutex networkMutex;
+			asio::ssl::stream<asio::ip::tcp::socket> socket;
 
-		asio::ssl::stream<asio::ip::tcp::socket &> sslStream;
+			GenericClient() = delete;
+			GenericClient(const GenericClient &) = delete;
+			GenericClient(GenericClient &&) = delete;
+			GenericClient(Server &server_, std::string_view ip_, int id_, asio::ip::tcp::socket &&socket_);
 
-		GenericClient() = delete;
-		GenericClient(const GenericClient &) = delete;
-		GenericClient(GenericClient &&) = delete;
-		GenericClient(Server &server_, std::string_view ip_, int id_, asio::ip::tcp::socket &&socket_);
+			virtual ~GenericClient() = default;
 
-		virtual ~GenericClient() = default;
+			GenericClient & operator=(const GenericClient &) = delete;
+			GenericClient & operator=(GenericClient &&) = delete;
 
-		GenericClient & operator=(const GenericClient &) = delete;
-		GenericClient & operator=(GenericClient &&) = delete;
+			void start();
 
-		void init();
+			virtual void handleInput(std::string_view) = 0;
+			virtual void onMaxLineSizeExceeded() {}
 
-		virtual void handleInput(std::string_view) = 0;
-		virtual void onMaxLineSizeExceeded() {}
+		private:
+			size_t bufferSize;
+			std::unique_ptr<char[]> buffer;
+
+			void doHandshake();
+			void doRead();
 	};
 }

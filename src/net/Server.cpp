@@ -33,10 +33,10 @@ namespace Game3 {
 	chunkSize(chunk_size),
 	secret(secret_),
 	threadCount(thread_count),
-	pool(thread_count),
 	sslContext(asio::ssl::context::tls),
 	context(thread_count),
-	acceptor(context, asio::ip::tcp::endpoint(asio::ip::address::from_string(ip), port)) {
+	acceptor(context, asio::ip::tcp::endpoint(asio::ip::address::from_string(ip), port)),
+	workGuard(asio::make_work_guard(context)) {
 		if (thread_count < 1)
 			throw std::invalid_argument("Cannot instantiate a Server with a thread count of zero");
 
@@ -46,8 +46,6 @@ namespace Game3 {
 
 	Server::~Server() {
 		stop();
-		if (onStop)
-			onStop();
 	}
 
 	void Server::handleMessage(RemoteClient &client, std::string_view message) {
@@ -73,36 +71,44 @@ namespace Game3 {
 	}
 
 	void Server::handleWrite(const asio::error_code &errc, size_t) {
-		if (errc) {
-			WARN("Write: " << errc.message());
-		}
+		if (errc)
+			ERROR("Server write: " << errc.message());
 	}
 
 	void Server::accept() {
+		INFO("Accepting.");
 		acceptor.async_accept([this](const asio::error_code &errc, asio::ip::tcp::socket socket) {
 			if (errc) {
-				ERROR("Accept: " << errc.message());
+				ERROR("Server accept: " << errc.message());
 			} else {
 				std::string ip = socket.remote_endpoint().address().to_string();
 				auto client = std::make_shared<RemoteClient>(*this, ip, ++lastID, std::move(socket));
 				allClients.insert(client);
+				client->start();
+				if (onAdd)
+					onAdd(*client);
 			}
+
+			accept();
 		});
 	}
 
 	void Server::run() {
 		connected = true;
-
-		for (size_t i = 0; i < threadCount; ++i)
-			asio::post(pool, boost::bind(&asio::io_context::run, &context));
+		asio::post(context, [this] { accept(); });
+		context.run();
 	}
 
 	void Server::stop() {
-		pool.join();
+		workGuard.reset();
+		context.stop();
+		if (onStop)
+			onStop();
 	}
 
 	bool Server::close(RemoteClient &client) {
-		client.socket.close();
+		client.socket.shutdown();
+		client.socket.lowest_layer().close();
 		return true;
 	}
 
@@ -208,9 +214,6 @@ namespace Game3 {
 	}
 
 	int Server::main(int argc, char **argv) {
-		// evthread_use_pthreads();
-		// event_enable_debug_mode();
-
 		std::string secret;
 
 		if (std::filesystem::exists(".secret"))

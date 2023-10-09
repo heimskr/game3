@@ -42,9 +42,6 @@ namespace Game3 {
 			std::string secret;
 
 			size_t threadCount = 0;
-			asio::thread_pool pool;
-			std::thread acceptThread;
-
 			std::atomic_int lastID = 0;
 
 			void handleWrite(const asio::error_code &, size_t);
@@ -55,6 +52,7 @@ namespace Game3 {
 			asio::ssl::context sslContext;
 			asio::io_context context;
 			asio::ip::tcp::acceptor acceptor;
+			asio::executor_work_guard<asio::io_context::executor_type> workGuard;
 			std::string id = "server";
 			std::shared_ptr<ServerGame> game;
 			std::function<void()> onStop;
@@ -95,6 +93,9 @@ namespace Game3 {
 				const T little = toLittle(value);
 				send(client, std::string_view(reinterpret_cast<const char *>(&little), sizeof(T)));
 			}
+
+			[[nodiscard]]
+			inline auto getChunkSize() const { return chunkSize; }
 
 			[[nodiscard]]
 			inline auto & getClients() { return allClients; }
