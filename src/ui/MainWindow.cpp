@@ -136,8 +136,8 @@ namespace Game3 {
 			glArea.throw_if_error();
 		});
 		glArea.signal_render().connect(sigc::mem_fun(*this, &MainWindow::render), false);
-		glArea.set_auto_render(false);
-		glArea.add_tick_callback([this](const Glib::RefPtr<Gdk::FrameClock> &clock) {
+		glArea.set_auto_render(true);
+		glArea.add_tick_callback([this](const Glib::RefPtr<Gdk::FrameClock> &) {
 			glArea.queue_render();
 			if (game) {
 				PlayerPtr player = game->player.copyBase();
@@ -146,9 +146,10 @@ namespace Game3 {
 				const int minute = game->getMinute();
 				timeLabel.set_text(std::to_string(int(game->getHour())) + (minute < 10? ":0" : ":") + std::to_string(minute));
 			}
+
 			static std::deque<double> fpses;
-			fpses.push_back(clock->get_fps());
-			if (36 < fpses.size())
+			fpses.push_back(lastFPS.load());
+			if (100 < fpses.size())
 				fpses.pop_front();
 			double sum = 0;
 			for (const double fps: fpses)
@@ -447,6 +448,10 @@ namespace Game3 {
 	}
 
 	bool MainWindow::render(const Glib::RefPtr<Gdk::GLContext> &context) {
+		auto now = std::chrono::system_clock::now();
+		lastFPS = 1e9 / std::chrono::duration_cast<std::chrono::nanoseconds>(now - lastRenderTime).count();
+		lastRenderTime = now;
+
 		context->make_current();
 
 		richPresence.tick();

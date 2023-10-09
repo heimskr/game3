@@ -131,6 +131,8 @@ namespace Game3 {
 			Glib::RefPtr<Gtk::GestureDrag> dragGesture;
 			std::optional<std::pair<double, double>> dragStart;
 			Lockable<std::deque<std::unique_ptr<Gtk::Dialog>>> dialogQueue;
+			std::chrono::system_clock::time_point lastRenderTime = std::chrono::system_clock::now();
+			std::atomic<double> lastFPS = 0;
 
 			struct KeyInfo {
 				guint code;
