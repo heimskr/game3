@@ -135,6 +135,9 @@ namespace Game3 {
 			bool isVisible() const;
 			bool setHeldLeft(Slot);
 			bool setHeldRight(Slot);
+			inline auto getHeldLeft()  const { return heldLeft.slot;  }
+			inline auto getHeldRight() const { return heldRight.slot; }
+			void unhold(Slot);
 			Side getSide() const override final;
 			Type getAgentType() const override final { return Agent::Type::Entity; }
 			void inventoryUpdated() override;
@@ -153,8 +156,6 @@ namespace Game3 {
 			virtual void jump();
 			void clearOffset();
 			inline bool is(const Identifier &check) const { return type == check; }
-			inline auto getHeldLeft()  const { return heldLeft.slot;  }
-			inline auto getHeldRight() const { return heldRight.slot; }
 			std::shared_ptr<Entity> getSelf();
 			void clearQueues();
 			bool isInLimbo() const;

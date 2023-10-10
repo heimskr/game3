@@ -238,20 +238,27 @@ namespace Game3 {
 							}
 						}
 					} else if (source == *this_inventory) {
-						for (Held &held: {std::ref(heldLeft), std::ref(heldRight)})
+						for (Held &held: {std::ref(heldLeft), std::ref(heldRight)}) {
 							if (source_slot == held.slot) {
 								INFO(__FILE__ << ':' << __LINE__ << ": setHeld(-1, " << (held.isLeft? "left" : "right") << ')');
 								setHeld(-1, held);
 							}
+						}
 					} else {
 						assert(destination == *this_inventory);
-						for (Held &held: {std::ref(heldLeft), std::ref(heldRight)})
+						for (Held &held: {std::ref(heldLeft), std::ref(heldRight)}) {
 							if (destination_slot == held.slot) {
 								INFO(__FILE__ << ':' << __LINE__ << ": setHeld(-1, " << (held.isLeft? "left" : "right") << ')');
 								setHeld(-1, held);
 							}
+						}
 					}
 				};
+			};
+
+			inventory->onRemove = [this](Slot slot) -> std::function<void()> {
+				unhold(slot);
+				return {};
 			};
 		}
 
@@ -687,6 +694,15 @@ namespace Game3 {
 		if (0 <= new_value && heldLeft.slot == new_value && !setHeld(-1, heldLeft))
 			return false;
 		return setHeld(new_value, heldRight);
+	}
+
+	void Entity::unhold(Slot slot) {
+		if (slot < 0)
+			return;
+		if (heldLeft.slot == slot)
+			setHeldLeft(-1);
+		if (heldRight.slot == slot)
+			setHeldRight(-1);
 	}
 
 	Side Entity::getSide() const {

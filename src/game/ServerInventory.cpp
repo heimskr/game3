@@ -140,7 +140,12 @@ namespace Game3 {
 	}
 
 	void ServerInventory::erase(Slot slot) {
+		std::function<void()> after;
+		if (onRemove)
+			after = onRemove(slot);
 		storage.erase(slot);
+		if (after)
+			after();
 	}
 
 	ItemCount ServerInventory::remove(const ItemStack &stack_to_remove) {

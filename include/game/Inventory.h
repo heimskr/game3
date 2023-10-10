@@ -41,9 +41,11 @@ namespace Game3 {
 			/** Called before the swap occurs. The first argument always refers to this object.
 			 *  Returns (optionally) a function to call after the swap has occurred. */
 			std::function<std::function<void()>(Inventory &, Slot, Inventory &, Slot)> onSwap;
-			/** Called before the move occurs. The first pair of arguments are always the source may or not refer to this object;
+			/** Called before the move occurs. The first pair of arguments are always the source and may or not refer to this object;
 			 *  the second pair of arguments are always the destination. Returns (optionally) a function to call after the move has occurred. */
 			std::function<std::function<void()>(Inventory &, Slot from, Inventory &, Slot to, bool consumed)> onMove;
+			/** Called before the removal occurs. Returns (optionally) a function to call after the removal has occurred. */
+			std::function<std::function<void()>(Slot)> onRemove;
 
 			Inventory & operator=(const Inventory &);
 			Inventory & operator=(Inventory &&);
