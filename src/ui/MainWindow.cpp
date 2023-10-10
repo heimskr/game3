@@ -844,6 +844,13 @@ namespace Game3 {
 					}
 					return;
 				}
+				case GDK_KEY_minus:
+					canvas->scale /= 1.08f;
+					return;
+				case GDK_KEY_equal:
+				case GDK_KEY_plus:
+					canvas->scale *= 1.08f;
+					return;
 				case GDK_KEY_0: case GDK_KEY_1: case GDK_KEY_2: case GDK_KEY_3: case GDK_KEY_4:
 				case GDK_KEY_5: case GDK_KEY_6: case GDK_KEY_7: case GDK_KEY_8: case GDK_KEY_9:
 					if (game && game->player)
