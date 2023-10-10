@@ -7,7 +7,7 @@ namespace Game3 {
 
 	class Chicken: public Animal {
 		public:
-			static constexpr float EGG_PERIOD = 60.f;
+			static constexpr float EGG_PERIOD = 150.f;
 
 			float timeUntilEgg = EGG_PERIOD;
 

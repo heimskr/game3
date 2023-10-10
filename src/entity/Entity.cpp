@@ -151,7 +151,7 @@ namespace Game3 {
 		auto &x = offset.x;
 		auto &y = offset.y;
 		auto &z = offset.z;
-		const float speed = getSpeed();
+		const auto speed = getSpeed();
 
 		if (x < 0.f)
 			x = std::min(x + delta * speed, 0.f);
@@ -319,7 +319,7 @@ namespace Game3 {
 		}
 
 		auto render_held = [&](const Held &held, float x_o, float y_o, bool flip = false, float degrees = 0.f) {
-			if (held)
+			if (held) {
 				sprite_renderer(*held.texture, {
 					.x = x + x_o,
 					.y = y + y_o,
@@ -331,6 +331,7 @@ namespace Game3 {
 					.scaleY = .5f,
 					.angle = degrees,
 				});
+			}
 		};
 
 		constexpr float rotation = 0.f;
