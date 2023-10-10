@@ -18,12 +18,12 @@
 
 namespace Game3 {
 	namespace {
-		std::string text_frag = readFile("resources/text.frag");
-		std::string text_vert = readFile("resources/text.vert");
+		const std::string & textFrag() { static auto out = readFile("resources/text.frag"); return out; }
+		const std::string & textVert() { static auto out = readFile("resources/text.vert"); return out; }
 	}
 
 	TextRenderer::TextRenderer(Canvas &canvas_, uint32_t font_scale): canvas(&canvas_), shader("TextRenderer"), fontScale(font_scale) {
-		shader.init(text_vert, text_frag);
+		shader.init(textVert(), textFrag());
 	}
 
 	TextRenderer::~TextRenderer() {

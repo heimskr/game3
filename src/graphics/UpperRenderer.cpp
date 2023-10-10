@@ -21,8 +21,8 @@
 
 namespace Game3 {
 	namespace {
-		std::string upper_frag = readFile("resources/upper.frag");
-		std::string upper_vert = readFile("resources/upper.vert");
+		const std::string & upperFrag() { static auto out = readFile("resources/upper.frag"); return out; }
+		const std::string & upperVert() { static auto out = readFile("resources/upper.vert"); return out; }
 	}
 
 	UpperRenderer::UpperRenderer() {}
@@ -52,7 +52,7 @@ namespace Game3 {
 		if (initialized)
 			reset();
 		assert(realm);
-		shader.init(upper_vert, upper_frag);
+		shader.init(upperVert(), upperFrag());
 		generateVertexBufferObject();
 		generateElementBufferObject();
 		generateVertexArrayObject();

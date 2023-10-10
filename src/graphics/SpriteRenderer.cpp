@@ -18,12 +18,12 @@
 
 namespace Game3 {
 	namespace {
-		std::string sprite_frag = readFile("resources/sprite.frag");
-		std::string sprite_vert = readFile("resources/sprite.vert");
+		const std::string & spriteFrag() { static auto out = readFile("resources/sprite.frag"); return out; }
+		const std::string & spriteVert() { static auto out = readFile("resources/sprite.vert"); return out; }
 	}
 
 	SpriteRenderer::SpriteRenderer(Canvas &canvas_): canvas(&canvas_), shader("SpriteRenderer") {
-		shader.init(sprite_vert, sprite_frag);
+		shader.init(spriteVert(), spriteFrag());
 		initRenderData();
 	}
 
@@ -255,7 +255,7 @@ namespace Game3 {
 	}
 
 	void SpriteRenderer::reset() {
-		shader.init(sprite_vert, sprite_frag);
+		shader.init(spriteVert(), spriteFrag());
 		initRenderData();
 	}
 

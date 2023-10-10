@@ -11,12 +11,12 @@
 
 namespace Game3 {
 	namespace {
-		std::string rectangle_frag = readFile("resources/rectangle.frag");
-		std::string rectangle_vert = readFile("resources/rectangle.vert");
+		const std::string & rectangleFrag() { static auto out = readFile("resources/rectangle.frag"); return out; }
+		const std::string & rectangleVert() { static auto out = readFile("resources/rectangle.vert"); return out; }
 	}
 
 	RectangleRenderer::RectangleRenderer(): shader("RectangleRenderer") {
-		shader.init(rectangle_vert, rectangle_frag); CHECKGL
+		shader.init(rectangleVert(), rectangleFrag()); CHECKGL
 		initRenderData(); CHECKGL
 	}
 

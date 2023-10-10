@@ -20,8 +20,8 @@
 
 namespace Game3 {
 	namespace {
-		std::string fluids_frag = readFile("resources/fluids.frag");
-		std::string fluids_vert = readFile("resources/fluids.vert");
+		const std::string & fluidsFrag() { static auto out = readFile("resources/fluids.frag"); return out; }
+		const std::string & fluidsVert() { static auto out = readFile("resources/fluids.vert"); return out; }
 	}
 
 	FluidRenderer::FluidRenderer() = default;
@@ -48,7 +48,7 @@ namespace Game3 {
 		if (initialized)
 			reset();
 		assert(realm);
-		shader.init(fluids_vert, fluids_frag);
+		shader.init(fluidsVert(), fluidsFrag());
 		generateVertexBufferObject();
 		generateElementBufferObject();
 		generateVertexArrayObject();

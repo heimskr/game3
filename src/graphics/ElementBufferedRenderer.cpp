@@ -21,16 +21,16 @@
 
 namespace Game3 {
 	namespace {
-		std::string blur_frag = readFile("resources/blur.frag");
-		std::string buffered_frag = readFile("resources/buffered.frag");
-		std::string buffered_vert = readFile("resources/buffered.vert");
+		const std::string & blurFrag()     { static auto out = readFile("resources/blur.frag");     return out; }
+		const std::string & bufferedFrag() { static auto out = readFile("resources/buffered.frag"); return out; }
+		const std::string & bufferedVert() { static auto out = readFile("resources/buffered.vert"); return out; }
 	}
 
 	ElementBufferedRenderer::ElementBufferedRenderer():
-		reshader(blur_frag) {}
+		reshader(blurFrag()) {}
 
 	ElementBufferedRenderer::ElementBufferedRenderer(Realm &realm_):
-		reshader(blur_frag), realm(&realm_) {}
+		reshader(blurFrag()), realm(&realm_) {}
 
 	ElementBufferedRenderer::~ElementBufferedRenderer() {
 		reset();
@@ -55,7 +55,7 @@ namespace Game3 {
 		if (initialized)
 			reset();
 		assert(realm);
-		shader.init(buffered_vert, buffered_frag);
+		shader.init(bufferedVert(), bufferedFrag());
 		generateVertexBufferObject();
 		generateElementBufferObject();
 		generateVertexArrayObject();

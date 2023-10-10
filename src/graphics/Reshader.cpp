@@ -11,11 +11,11 @@
 
 namespace Game3 {
 	namespace {
-		std::string reshader_vert = readFile("resources/reshader.vert");
+		const std::string & reshaderVert() { static auto out = readFile("resources/reshader.vert"); return out; }
 	}
 
 	Reshader::Reshader(std::string_view fragment): shader("reshader") {
-		shader.init(reshader_vert, fragment); CHECKGL
+		shader.init(reshaderVert(), fragment); CHECKGL
 		initRenderData(); CHECKGL
 	}
 

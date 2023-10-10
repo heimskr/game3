@@ -11,12 +11,12 @@
 
 namespace Game3 {
 	namespace {
-		std::string multiplier_frag = readFile("resources/multiplier.frag");
-		std::string multiplier_vert = readFile("resources/multiplier.vert");
+		const std::string & multiplierFrag() { static auto out = readFile("resources/multiplier.frag"); return out; }
+		const std::string & multiplierVert() { static auto out = readFile("resources/multiplier.vert"); return out; }
 	}
 
 	Multiplier::Multiplier(): shader("multiplier") {
-		shader.init(multiplier_vert, multiplier_frag); CHECKGL
+		shader.init(multiplierVert(), multiplierFrag()); CHECKGL
 		initRenderData(); CHECKGL
 	}
 
