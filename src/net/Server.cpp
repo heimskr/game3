@@ -73,7 +73,7 @@ namespace Game3 {
 
 		std::weak_ptr weak_client(client.shared_from_this());
 
-		asio::async_write(client.socket, asio::buffer(**iter), asio::bind_executor(client.strand, [this, iter, weak_client](const asio::error_code &errc, size_t length) {
+		asio::async_write(client.socket, asio::buffer(**iter), client.strand.wrap([this, iter, weak_client](const asio::error_code &errc, size_t length) {
 			if (std::shared_ptr<RemoteClient> client = weak_client.lock()) {
 				handleWrite(errc, length);
 				auto lock = stringFragments.uniqueLock();
@@ -100,7 +100,7 @@ namespace Game3 {
 
 		std::weak_ptr weak_client(client.shared_from_this());
 
-		asio::async_write(client.socket, asio::buffer(**iter), asio::bind_executor(client.strand, [this, iter, weak_client](const asio::error_code &errc, size_t length) {
+		asio::async_write(client.socket, asio::buffer(**iter), client.strand.wrap([this, iter, weak_client](const asio::error_code &errc, size_t length) {
 			if (std::shared_ptr<RemoteClient> client = weak_client.lock()) {
 				handleWrite(errc, length);
 				auto lock = vectorFragments.uniqueLock();
@@ -268,7 +268,7 @@ namespace Game3 {
 			} catch (const std::invalid_argument &) {}
 		}
 
-		global_server = std::make_shared<Server>("::0", port, "private.crt", "private.key", secret, 2, 1024);
+		global_server = std::make_shared<Server>("::0", port, "private.crt", "private.key", secret, 4, 1024);
 
 		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
 			throw std::runtime_error("Couldn't register SIGPIPE handler");

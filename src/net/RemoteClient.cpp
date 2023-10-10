@@ -87,7 +87,6 @@ namespace Game3 {
 		Buffer send_buffer;
 		packet.encode(*server.game, send_buffer);
 		assert(send_buffer.size() < UINT32_MAX);
-		std::unique_lock lock(networkMutex);
 		const auto size = toLittle(static_cast<uint32_t>(send_buffer.size()));
 		const auto packet_id = toLittle(packet.getID());
 
@@ -119,8 +118,6 @@ namespace Game3 {
 	template <typename T>
 	requires (!std::derived_from<T, Packet>)
 	void RemoteClient::send(const T &value) {
-		if (networkMutex.try_lock())
-			throw std::runtime_error("Network mutex not locked...?");
 		server.send(*this, value);
 	}
 
@@ -138,7 +135,6 @@ namespace Game3 {
 				return;
 			moved_buffer = std::move(sendBuffer.bytes);
 		}
-		std::unique_lock network_lock(networkMutex);
 		server.send(*this, std::move(moved_buffer), true);
 	}
 
