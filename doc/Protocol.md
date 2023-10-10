@@ -320,19 +320,19 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i64` New position Y
 	- `i64` New position X
 
-47. **Chat Message Sent**: informs a client that a player sent a chat message.
+47. **Chat Message Sent**: tells a client that a player sent a chat message.
 
 	- `u64` Player global ID
 	- `string` Message
 
-48. **Open Text Tab**: informs a client to open the text tab and display a message.
+48. **Open Text Tab**: tells a client to open the text tab and display a message.
 
 	- `string` Name to display
 	- `string` Message
 	- `bool` Remove on move: Whether to close the tab when the player moves
 	- `bool` Ephemeral: Whether to hide the tab when another tab is opened
 
-49. **Drag**: informs the server that the client dragged the mouse on a given square.
+49. **Drag**: tells the server that the client dragged the mouse on a given square.
 
 	- `u8` Action (1 => drag started, 2 => drag updated, 3 => drag ended)
 	- `i64` Position Y
