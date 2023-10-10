@@ -73,11 +73,15 @@ namespace Game3 {
 
 		std::weak_ptr weak_client(client.shared_from_this());
 
-		asio::async_write(client.socket, asio::buffer(**iter), asio::bind_executor(client.strand, [this, iter, weak_client](const asio::error_code &errc, size_t length) {
-			handleWrite(errc, length);
-			auto lock = stringFragments.uniqueLock();
-			stringFragments.erase(iter);
-		}));
+		asio::post(client.strand, [this, iter, weak_client] {
+			if (std::shared_ptr<RemoteClient> client = weak_client.lock()) {
+				asio::async_write(client->socket, asio::buffer(**iter), asio::bind_executor(client->strand, [this, iter, weak_client](const asio::error_code &errc, size_t length) {
+					handleWrite(errc, length);
+					auto lock = stringFragments.uniqueLock();
+					stringFragments.erase(iter);
+				}));
+			}
+		});
 	}
 
 	void Server::send(RemoteClient &client, std::vector<char> message, bool force) {
@@ -98,11 +102,15 @@ namespace Game3 {
 
 		std::weak_ptr weak_client(client.shared_from_this());
 
-		asio::async_write(client.socket, asio::buffer(**iter), asio::bind_executor(client.strand, [this, iter, weak_client](const asio::error_code &errc, size_t length) {
-			handleWrite(errc, length);
-			auto lock = vectorFragments.uniqueLock();
-			vectorFragments.erase(iter);
-		}));
+		asio::post(client.strand, [this, iter, weak_client] {
+			if (std::shared_ptr<RemoteClient> client = weak_client.lock()) {
+				asio::async_write(client->socket, asio::buffer(**iter), asio::bind_executor(client->strand, [this, iter, weak_client](const asio::error_code &errc, size_t length) {
+					handleWrite(errc, length);
+					auto lock = vectorFragments.uniqueLock();
+					vectorFragments.erase(iter);
+				}));
+			}
+		});
 	}
 
 	void Server::handleWrite(const asio::error_code &errc, size_t) {
@@ -143,7 +151,14 @@ namespace Game3 {
 	}
 
 	bool Server::close(RemoteClient &client) {
-		client.socket.shutdown();
+		try {
+			client.socket.shutdown();
+		} catch (const asio::system_error &err) {
+			// Who really cares if SSL doesn't shut down properly?
+			// Who decided that the client is worthy of a proper shutdown?
+			ERROR("Shutdown: " << err.what() << " (" << err.code() << ')');
+		}
+
 		client.socket.lowest_layer().close();
 		return true;
 	}

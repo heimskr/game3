@@ -63,6 +63,10 @@ namespace Game3 {
 
 				try {
 					packet->decode(*server.game, receiveBuffer);
+				} catch (const std::exception &err) {
+					ERROR("Couldn't decode packet of type " << packetType << ", size " << payloadSize << ": " << err.what());
+					server.close(*this);
+					return;
 				} catch (...) {
 					ERROR("Couldn't decode packet of type " << packetType << ", size " << payloadSize);
 					server.close(*this);
