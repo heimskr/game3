@@ -68,6 +68,51 @@
 				"chance": 1.0
 			},
 
+			"base:crop/strawberry": {
+				"stages": ["base:tile/strawberry_0", "base:tile/strawberry_1", "base:tile/strawberry_2", "base:tile/strawberry_3", "base:tile/strawberry_4"],
+				"products": [
+					["constant", ["base:item/strawberry"], 1],
+					["exponential", ["base:item/strawberry_seeds"], 1, 0.25]
+				],
+				"chance": 1.0
+			},
+
+			"base:crop/eggplant": {
+				"stages": ["base:tile/eggplant_0", "base:tile/eggplant_1", "base:tile/eggplant_2", "base:tile/eggplant_3", "base:tile/eggplant_4"],
+				"products": [
+					["constant", ["base:item/eggplant"], 1],
+					["exponential", ["base:item/eggplant_seeds"], 1, 0.25]
+				],
+				"chance": 1.0
+			},
+
+			"base:crop/cabbage": {
+				"stages": ["base:tile/cabbage_0", "base:tile/cabbage_1", "base:tile/cabbage_2", "base:tile/cabbage_3", "base:tile/cabbage_4"],
+				"products": [
+					["constant", ["base:item/cabbage"], 1],
+					["exponential", ["base:item/cabbage_seeds"], 1, 0.25]
+				],
+				"chance": 1.0
+			},
+
+			"base:crop/onion": {
+				"stages": ["base:tile/onion_0", "base:tile/onion_1", "base:tile/onion_2", "base:tile/onion_3", "base:tile/onion_4"],
+				"products": [
+					["constant", ["base:item/onion"], 1],
+					["exponential", ["base:item/onion_seeds"], 1, 0.25]
+				],
+				"chance": 1.0
+			},
+
+			"base:crop/bean": {
+				"stages": ["base:tile/bean_0", "base:tile/bean_1", "base:tile/bean_2", "base:tile/bean_3", "base:tile/bean_4"],
+				"products": [
+					["constant", ["base:item/bean"], 1],
+					["exponential", ["base:item/bean_seeds"], 1, 0.25]
+				],
+				"chance": 1.0
+			},
+
 			"base:crop/tree1": {
 				"type": "base:tile/tree",
 				"stages": ["base:tile/tree1_stump", "base:tile/tree1"],

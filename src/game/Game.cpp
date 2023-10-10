@@ -227,6 +227,11 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/pumpkin",         "Pumpkin",             8, 64));
 		add(std::make_shared<Item>("base:item/carrot",          "Carrot",              8, 64));
 		add(std::make_shared<Item>("base:item/potato",          "Potato",              8, 64));
+		add(std::make_shared<Item>("base:item/strawberry",      "Strawberry",          8, 64));
+		add(std::make_shared<Item>("base:item/eggplant",        "Eggplant",            8, 64));
+		add(std::make_shared<Item>("base:item/cabbage",         "Cabbage",             8, 64));
+		add(std::make_shared<Item>("base:item/onion",           "Onion",               8, 64));
+		add(std::make_shared<Item>("base:item/bean",            "Bean",                8, 64));
 		add(std::make_shared<Item>("base:item/red_dye",         "Red Dye",            12, 64));
 		add(std::make_shared<Item>("base:item/orange_dye",      "Orange Dye",         12, 64));
 		add(std::make_shared<Item>("base:item/yellow_dye",      "Yellow Dye",         12, 64));
@@ -258,13 +263,18 @@ namespace Game3 {
 
 		add(std::make_shared<Mead>("base:item/mead", "Mead", 10, 16));
 
-		add(std::make_shared<Seed>("base:item/cotton_seeds",  "Cotton Seeds",  "base:tile/cotton_0",  4));
-		add(std::make_shared<Seed>("base:item/wheat_seeds",   "Wheat Seeds",   "base:tile/wheat_0",   4));
-		add(std::make_shared<Seed>("base:item/tomato_seeds",  "Tomato Seeds",  "base:tile/tomato_0",  4));
-		add(std::make_shared<Seed>("base:item/corn_seeds",    "Corn Seeds",    "base:tile/corn_0",    4));
-		add(std::make_shared<Seed>("base:item/pumpkin_seeds", "Pumpkin Seeds", "base:tile/pumpkin_0", 4));
-		add(std::make_shared<Seed>("base:item/carrot_seeds",  "Carrot Seeds",  "base:tile/carrot_0",  4));
-		add(std::make_shared<Seed>("base:item/potato_seeds",  "Potato Seeds",  "base:tile/potato_0",  4));
+		add(std::make_shared<Seed>("base:item/cotton_seeds",     "Cotton Seeds",      "base:tile/cotton_0",     4));
+		add(std::make_shared<Seed>("base:item/wheat_seeds",      "Wheat Seeds",       "base:tile/wheat_0",      4));
+		add(std::make_shared<Seed>("base:item/tomato_seeds",     "Tomato Seeds",      "base:tile/tomato_0",     4));
+		add(std::make_shared<Seed>("base:item/corn_seeds",       "Corn Seeds",        "base:tile/corn_0",       4));
+		add(std::make_shared<Seed>("base:item/pumpkin_seeds",    "Pumpkin Seeds",     "base:tile/pumpkin_0",    4));
+		add(std::make_shared<Seed>("base:item/carrot_seeds",     "Carrot Seeds",      "base:tile/carrot_0",     4));
+		add(std::make_shared<Seed>("base:item/potato_seeds",     "Potato Seeds",      "base:tile/potato_0",     4));
+		add(std::make_shared<Seed>("base:item/strawberry_seeds", "Strawberry Seeds",  "base:tile/strawberry_0", 4));
+		add(std::make_shared<Seed>("base:item/eggplant_seeds",   "Eggplant Seeds",    "base:tile/eggplant_0",   4));
+		add(std::make_shared<Seed>("base:item/cabbage_seeds",    "Cabbage Seeds",     "base:tile/cabbage_0",    4));
+		add(std::make_shared<Seed>("base:item/onion_seeds",      "Onion Seeds",       "base:tile/onion_0",      4));
+		add(std::make_shared<Seed>("base:item/bean_seeds",       "Bean Seeds",        "base:tile/bean_0",       4));
 
 		add(std::make_shared<Tool>("base:item/iron_axe",       "Iron Axe",       150,  3.f, 128, "base:attribute/axe"));
 		add(std::make_shared<Tool>("base:item/iron_shovel",    "Iron Shovel",    120,  3.f,  64, "base:attribute/shovel"));
