@@ -20,7 +20,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 3. **Chunk Request**: asks the server to send Chunk Tiles packets for a given list of chunks.
 
 	- `i32` Realm ID
-	- `u32[4n]` Chunk positions
+	- `list<u32, 4n>` Chunk positions
 
 	The chunk positions will be sent as sequential `(u32(x), u32(y), low32(threshold), high32(threshold))` tuples. Probably best to see the implementation in src/packets/ChunkRequestPacket.cpp.
 
@@ -261,12 +261,12 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 36. **Entity Request**: asks the server to send entities' data if the client versions are stale.
 
 	- `i32` Realm ID
-	- `u64[2n]` Global ID + threshold pairs
+	- `list<u64, 2n>` Global ID + threshold pairs
 
 37. **Tile Entity Request**: asks the server to send tile entities' data if the client versions are stale.
 
 	- `i32` Realm ID
-	- `u64[2n]` Global ID + threshold pairs
+	- `list<u64, 2n>` Global ID + threshold pairs
 
 38. **Jump**: tells the server to make the player jump. No payload.
 
