@@ -19,6 +19,7 @@ namespace Game3 {
 			int id = -1;
 			std::string ip;
 			SendBuffer sendBuffer;
+			std::mutex networkMutex;
 			asio::ssl::stream<asio::ip::tcp::socket> socket;
 			asio::io_context::strand strand;
 

@@ -29,7 +29,7 @@ namespace Game3 {
 	}
 
 	void GenericClient::doRead() {
-		socket.async_read_some(asio::buffer(buffer.get(), bufferSize), strand.wrap([this](const asio::error_code &errc, size_t length) {
+		socket.async_read_some(asio::buffer(buffer.get(), bufferSize), asio::bind_executor(strand, [this](const asio::error_code &errc, size_t length) {
 			if (errc) {
 				if (errc.value() != 1) // "stream truncated"
 					ERROR("Client read: " << errc.message() << " (" << errc << ')');
