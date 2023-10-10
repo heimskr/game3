@@ -72,6 +72,7 @@ namespace Game3 {
 	template <typename C>
 	std::string hexString(const C &container, bool spaces) {
 		std::stringstream ss;
+		ss.imbue(std::locale("C"));
 		bool first = true;
 		for (const auto item: container) {
 			if (spaces) {
@@ -82,7 +83,7 @@ namespace Game3 {
 			}
 			ss << std::hex << std::setw(2 * sizeof(item)) << std::setfill('0') << std::right;
 			if constexpr (sizeof(item) == 1)
-				ss << static_cast<uint16_t>(item);
+				ss << static_cast<uint16_t>(static_cast<std::make_unsigned_t<decltype(item)>>(item));
 			else
 				ss << static_cast<std::make_unsigned_t<decltype(item)>>(item);
 		}

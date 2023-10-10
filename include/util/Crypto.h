@@ -1,5 +1,6 @@
 #pragma once
 
+#include <span>
 #include <string>
 
 #include <openssl/evp.h>
@@ -19,6 +20,11 @@ namespace Game3 {
 			~Hasher();
 
 			Hasher & operator+=(std::string_view);
+
+			template <typename T>
+			Hasher & operator+=(std::span<T> span) {
+				return *this += std::string_view(reinterpret_cast<const char *>(span.data()), span.size_bytes());
+			}
 
 			template <typename T>
 			T value();

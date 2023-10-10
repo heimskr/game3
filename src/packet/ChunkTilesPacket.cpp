@@ -4,7 +4,11 @@
 #include "packet/ChunkTilesPacket.h"
 #include "packet/PacketError.h"
 #include "realm/Realm.h"
+#include "util/Lz.h"
+#include "util/Timer.h"
 #include "util/Util.h"
+
+// #define DEBUG_COMPRESSION
 
 namespace Game3 {
 	ChunkTilesPacket::ChunkTilesPacket(const Realm &realm, ChunkPosition chunk_position, uint64_t update_counter):
@@ -26,11 +30,20 @@ namespace Game3 {
 	}
 
 	void ChunkTilesPacket::encode(Game &, Buffer &buffer) const {
-		buffer << realmID << chunkPosition << updateCounter << tiles << fluids;
+		Buffer secondary;
+		secondary << realmID << chunkPosition << updateCounter << tiles << fluids;
+		auto compressed = LZ4::compress(secondary.getSpan());
+#ifdef DEBUG_COMPRESSION
+		INFO("Compression: " << secondary.getSpan().size_bytes() << " → " << compressed.size() << " (" << (double(secondary.getSpan().size_bytes()) / compressed.size()) << ')');
+#endif
+		buffer << compressed;
 	}
 
 	void ChunkTilesPacket::decode(Game &, Buffer &buffer) {
-		buffer >> realmID >> chunkPosition >> updateCounter >> tiles >> fluids;
+		Buffer secondary;
+		buffer >> secondary.bytes;
+		secondary.bytes = LZ4::decompress(secondary.getSpan());
+		secondary >> realmID >> chunkPosition >> updateCounter >> tiles >> fluids;
 	}
 
 	void ChunkTilesPacket::handle(ClientGame &game) {

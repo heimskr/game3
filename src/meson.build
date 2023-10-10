@@ -20,6 +20,7 @@ game3_deps = [
 	dependency('glfw3'),
 	dependency('x11'),
 	dependency('asio'),
+	dependency('liblz4'),
 	chemskr.get_variable('chemskr'),
 	sqlitecpp.get_variable('sqlitecpp_dep'),
 ]
