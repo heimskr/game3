@@ -68,15 +68,15 @@ namespace Game3 {
 		lock.unlock();
 		assert(inserted);
 
-		asio::post(client.strand, [this, weak_client = std::weak_ptr(client.shared_from_this()), iter] {
+		std::weak_ptr weak_client(client.shared_from_this());
+
+		asio::async_write(client.socket, asio::buffer(**iter), asio::bind_executor(client.strand, [this, iter, weak_client](const asio::error_code &errc, size_t length) {
 			if (std::shared_ptr<RemoteClient> client = weak_client.lock()) {
-				asio::async_write(client->socket, asio::buffer(**iter), [this, iter](const asio::error_code &errc, size_t length) {
-					handleWrite(errc, length);
-					auto lock = stringFragments.uniqueLock();
-					stringFragments.erase(iter);
-				});
+				handleWrite(errc, length);
+				auto lock = stringFragments.uniqueLock();
+				stringFragments.erase(iter);
 			}
-		});
+		}));
 	}
 
 	void Server::send(RemoteClient &client, std::vector<char> message, bool force) {
@@ -92,15 +92,15 @@ namespace Game3 {
 		lock.unlock();
 		assert(inserted);
 
-		asio::post(client.strand, [this, weak_client = std::weak_ptr(client.shared_from_this()), iter] {
+		std::weak_ptr weak_client(client.shared_from_this());
+
+		asio::async_write(client.socket, asio::buffer(**iter), asio::bind_executor(client.strand, [this, iter, weak_client](const asio::error_code &errc, size_t length) {
 			if (std::shared_ptr<RemoteClient> client = weak_client.lock()) {
-				asio::async_write(client->socket, asio::buffer(**iter), [this, iter](const asio::error_code &errc, size_t length) {
-					handleWrite(errc, length);
-					auto lock = vectorFragments.uniqueLock();
-					vectorFragments.erase(iter);
-				});
+				handleWrite(errc, length);
+				auto lock = vectorFragments.uniqueLock();
+				vectorFragments.erase(iter);
 			}
-		});
+		}));
 	}
 
 	void Server::handleWrite(const asio::error_code &errc, size_t) {
