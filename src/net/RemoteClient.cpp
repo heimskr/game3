@@ -134,6 +134,8 @@ namespace Game3 {
 		std::vector<char> moved_buffer;
 		{
 			auto buffer_lock = sendBuffer.uniqueLock();
+			if (sendBuffer.bytes.empty())
+				return;
 			moved_buffer = std::move(sendBuffer.bytes);
 		}
 		std::unique_lock network_lock(networkMutex);

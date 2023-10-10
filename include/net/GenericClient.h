@@ -38,7 +38,6 @@ namespace Game3 {
 			virtual void handleInput(std::string_view) = 0;
 			virtual void onMaxLineSizeExceeded() {}
 
-		protected:
 			virtual void removeSelf() = 0;
 
 		private:

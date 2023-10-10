@@ -53,7 +53,6 @@ namespace Game3 {
 			void stopBuffering();
 			bool isBuffering() const;
 
-		protected:
 			void removeSelf() override;
 
 		private:
