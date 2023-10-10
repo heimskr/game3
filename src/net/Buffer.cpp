@@ -198,7 +198,7 @@ namespace Game3 {
 		const char first = popBuffer<char>(*this);
 		if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first <= '\x1f') || ('\xe0' <= first && first <= '\xe2'))
 			return {first};
-		if (first == '\x20')
+		if (first == '\x20' || ('\x30' <= first && first <= '\x3f'))
 			return first + popType();
 		if (first == '\x21') {
 			std::string key_type = popType();

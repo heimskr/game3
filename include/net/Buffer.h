@@ -52,27 +52,7 @@ namespace Game3 {
 				return *this;
 			}
 
-			/**
-			 * 0x01 -> bool / uint8_t
-			 * 0x02 -> uint16_t
-			 * 0x03 -> uint32_t
-			 * 0x04 -> uint64_t
-			 * 0x05 -> int8_t
-			 * 0x06 -> int16_t
-			 * 0x07 -> int32_t
-			 * 0x08 -> int64_t
-			 * 0x09 -> float
-			 * 0x0a -> double
-			 * 0x0b . type -> optional
-			 * 0x0c -> optional (empty)
-			 * 0x10 -> empty string
-			 * [0x11, 0x1f) -> string of length [0x1, 0xf)
-			 * 0x1f . (u32) length -> string of arbitrary length
-			 * 0x20 . type -> linear container
-			 * 0x21 . type[key] . type[value] -> map container
-			 * 0xe0 -> ItemStack
-			 * 0xe1 -> Inventory
-			 */
+			/* See doc/Protocol.md for a list of standard types. */
 			template <typename T>
 			std::string getType(const T &);
 

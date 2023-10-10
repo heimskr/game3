@@ -130,19 +130,32 @@ namespace Game3 {
 		return buffer >> position.row >> position.column;
 	}
 
+	template <>
+	std::string Buffer::getType(const Offset &) {
+		return std::string{'\x32'} + getType(float{});
+	}
+
 	std::ostream & operator<<(std::ostream &stream, const Offset &offset) {
 		return stream << '(' << offset.x << ", " << offset.y << ", " << offset.z << ')';
 	}
 
 	Buffer & operator+=(Buffer &buffer, const Offset &offset) {
-		return ((buffer += offset.x) += offset.y) += offset.z;
+		return ((buffer.appendType(offset) += offset.x) += offset.y) += offset.z;
 	}
 
 	Buffer & operator<<(Buffer &buffer, const Offset &offset) {
-		return buffer << offset.x << offset.y << offset.z;
+		return buffer += offset;
 	}
 
 	Buffer & operator>>(Buffer &buffer, Offset &offset) {
-		return buffer >> offset.x >> offset.y >> offset.z;
+		const auto type = buffer.popType();
+		if (!Buffer::typesMatch(type, buffer.getType(offset))) {
+			buffer.debug();
+			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected shortlist<f32, 3>)");
+		}
+		popBuffer(buffer, offset.x);
+		popBuffer(buffer, offset.y);
+		popBuffer(buffer, offset.z);
+		return buffer;
 	}
 }

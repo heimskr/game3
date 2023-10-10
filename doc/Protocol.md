@@ -55,7 +55,8 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i32` Chunk position X
 	- `i32` Chunk position Y
 	- `u64` Update counter
-	- `i16[4*64**2]` Tile IDs (layer 1, then 2, then 3, then 4)
+	- `list<u16, 4*64**2>` Tile IDs (layer 1, then 2, then 3, then 4)
+	- `list<u64, 64**2>` Fluid Tiles
 
 	<!-- TODO: compression -->
 
@@ -110,10 +111,10 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i64` Position X
 	- `u8` Facing direction
 	- `u64` Update counter
-	- `float` Offset X
-	- `float` Offset Y
-	- `float` Offset Z
-	- `float` Z-speed
+	- `f32` Offset X
+	- `f32` Offset Y
+	- `f32` Offset Z
+	- `f32` Z-speed
 	- `list<u8>` Path
 	- `u64` Money
 	- `u32` Hitpoints
@@ -136,8 +137,8 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i64` Position Y
 	- `i64` Position X
 	- `u8` Facing
-	- `optional<{float, float, float}>` New offset
-	- `optional<float>` New z-speed
+	- `optional<shortlist<f32, 3>>` New offset
+	- `optional<f32>` New z-speed
 	- `bool` Adjust offset
 	- `bool` Is teleport
 
@@ -209,13 +210,13 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `i64` Position Y
 	- `i64` Position X
-	- `float` Offset X
-	- `float` Offset Y
+	- `f32` Offset X
+	- `f32` Offset Y
 	- `u8` Modifiers: bitfield (1 = shift, 2 = ctrl, 4 = alt, 8 = super)
 
 30. **Time**: informs a client of the game time.
 
-	- `double` Time
+	- `f64` Time
 
 31. **Craft**: tells the server to craft something.
 
@@ -343,28 +344,29 @@ All values are little endian. Strings are not null-terminated.
 
 ## Types
 
-| Type Encoding                    | Type                       |
-|:---------------------------------|:---------------------------|
-| `0x00`                           | Unused                     |
-| `0x01`                           | `u8`/`bool`                |
-| `0x02`                           | `u16`                      |
-| `0x03`                           | `u32`                      |
-| `0x04`                           | `u64`                      |
-| `0x05`                           | `i8`                       |
-| `0x06`                           | `i16`                      |
-| `0x07`                           | `i32`                      |
-| `0x08`                           | `i64`                      |
-| `0x09`                           | `float`                    |
-| `0x0a`                           | `double`                   |
-| `0x0b` . type                    | optional&lt;type&gt;       |
-| `0x0c`                           | optional (empty)           |
-| [`0x10`, `0x1f`)                 | string of length [0, 15)   |
-| `0x1f`                           | string of arbitrary length |
-| `0x20` . type                    | list&lt;type&gt;           |
-| `0x21` . type[key] . type[value] | map&lt;key, value&gt;      |
-| `0xe0`                           | ItemStack                  |
-| `0xe1`                           | Inventory                  |
-| `0xe2`                           | FluidStack                 |
+| Type Encoding                    | Type                         |
+|:---------------------------------|:-----------------------------|
+| `0x00`                           | Unused                       |
+| `0x01`                           | `u8`/`bool`                  |
+| `0x02`                           | `u16`                        |
+| `0x03`                           | `u32`                        |
+| `0x04`                           | `u64`                        |
+| `0x05`                           | `i8`                         |
+| `0x06`                           | `i16`                        |
+| `0x07`                           | `i32`                        |
+| `0x08`                           | `i64`                        |
+| `0x09`                           | `f32`                        |
+| `0x0a`                           | `f64`                        |
+| `0x0b` . type                    | optional&lt;type&gt;         |
+| `0x0c`                           | optional (empty)             |
+| [`0x10`, `0x1f`)                 | string of length [0, 15)     |
+| `0x1f`                           | string of arbitrary length   |
+| `0x20` . type                    | list&lt;type&gt;             |
+| `0x21` . type[key] . type[value] | map&lt;key, value&gt;        |
+| [`0x30`, `0x3f`] . type          | shortlist of length [1, 16]  |
+| `0xe0`                           | ItemStack                    |
+| `0xe1`                           | Inventory                    |
+| `0xe2`                           | FluidStack                   |
 
 Note that string types are always encoded as `0x1f` when used as a subtype of a list or a map, and optional types are always encoded as `0x0b` followed by the subtype in the same scenario.
 
@@ -421,3 +423,8 @@ To send a chunk request in realm 42 for chunks (-1, -2), (0, 0) and (40, 64), th
 - `0x40 0x00 0x00 0x00`: y-coordinate of third chunk position (64)
 
 Concatenated: `03 00 23 00 00 00 03 2a 00 00 00 20 07 03 00 00 00 ff ff ff ff fe ff ff ff 00 00 00 00 00 00 00 00 2a 00 00 00 40 00 00 00`.
+
+### FluidTile
+
+Fluid tiles are represented with 64-bit integers. The lower 16 bits are the fluid ID, the next 16 bits are the
+fluid level and the 8 bits after that are a boolean indicating whether the fluid tile is an infinite source.
