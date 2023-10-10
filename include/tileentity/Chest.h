@@ -10,6 +10,7 @@ namespace Game3 {
 			static Identifier ID() { return {"base", "te/chest"}; }
 
 			std::string name;
+			Identifier itemName{"base", "item/chest"};
 
 			Chest(const Chest &) = delete;
 			Chest(Chest &&) = default;
@@ -29,7 +30,7 @@ namespace Game3 {
 
 		protected:
 			Chest() = default;
-			Chest(Identifier tile_id, const Position &, std::string name_);
+			Chest(Identifier tile_id, const Position &, std::string name_, Identifier item_name = {"base", "item/chest"});
 			Chest(const Position &);
 
 			friend class TileEntity;

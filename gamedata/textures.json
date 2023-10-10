@@ -28,7 +28,8 @@
 			"base:texture/flasks":      ["resources/flasks.png"],
 			"base:texture/shade":       ["resources/items/shade.png"],
 			"base:texture/kazzter":     ["resources/items/kazzter.png"],
-			"base:texture/indfor":      ["resources/items/industrial_foregoing.png"]
+			"base:texture/indfor":      ["resources/items/industrial_foregoing.png"],
+			"base:texture/interiors":   ["resources/items/modern_interiors.png"]
 		}]
 	]
 }

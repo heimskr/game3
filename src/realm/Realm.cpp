@@ -216,6 +216,12 @@ namespace Game3 {
 
 		client_game.player->render(sprite_renderer, text_renderer);
 
+		{
+			auto lock = tileEntities.sharedLock();
+			for (const auto &[index, tile_entity]: tileEntities)
+				tile_entity->renderUpper(sprite_renderer);
+		}
+
 		if (upperRenderers) {
 			for (auto &row: *upperRenderers) {
 				for (auto &renderer: row) {

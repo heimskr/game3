@@ -68,6 +68,7 @@ namespace Game3 {
 			/** Returns the TileEntity ID. This is not the tile ID, which corresponds to a tile in the tileset. */
 			inline Identifier getID() const { return tileEntityID; }
 			virtual void render(SpriteRenderer &);
+			virtual void renderUpper(SpriteRenderer &);
 			/** Handles when an entity steps on this tile entity's position. */
 			virtual void onOverlap(const std::shared_ptr<Entity> &) {}
 			void setRealm(const std::shared_ptr<Realm> &);
@@ -75,6 +76,7 @@ namespace Game3 {
 			Position getPosition() const override { return position.copyBase(); }
 			void updateNeighbors() const;
 			bool isVisible() const;
+			bool isVisible(const Position &offset) const;
 			Side getSide() const final;
 			Type getAgentType() const final { return Agent::Type::TileEntity; }
 			ChunkPosition getChunk() const;
@@ -96,6 +98,7 @@ namespace Game3 {
 
 		protected:
 			TileID cachedTile = -1;
+			TileID cachedUpperTile = -1;
 			bool tileLookupFailed = false;
 
 			TileEntity() = default;

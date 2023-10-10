@@ -189,6 +189,10 @@ namespace Game3 {
 		return 0;
 	}
 
+	bool Tileset::hasUpper(TileID id) const {
+		return uppers.contains(id);
+	}
+
 	const TileID & Tileset::operator[](const Identifier &tilename) const {
 		return ids.at(tilename);
 	}

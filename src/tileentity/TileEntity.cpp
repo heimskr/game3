@@ -12,7 +12,7 @@
 
 namespace Game3 {
 	void TileEntity::destroy() {
-		auto realm = getRealm();
+		RealmPtr realm = getRealm();
 		assert(realm);
 		TileEntityPtr self = getSelf();
 		realm->removeSafe(self);
@@ -50,16 +50,20 @@ namespace Game3 {
 		if (!isVisible())
 			return;
 
-		auto realm = getRealm();
+		RealmPtr realm = getRealm();
 		auto &tileset = realm->getTileset();
 
 		if (cachedTile == TileID(-1) || tileLookupFailed) {
 			if (tileID.empty()) {
 				tileLookupFailed = true;
 				cachedTile = 0;
+				cachedUpperTile = 0;
 			} else {
 				tileLookupFailed = false;
 				cachedTile = tileset[tileID];
+				cachedUpperTile = tileset.getUpper(cachedTile);
+				if (cachedUpperTile == 0)
+					cachedUpperTile = -1;
 			}
 		}
 
@@ -71,6 +75,31 @@ namespace Game3 {
 		sprite_renderer(*texture, {
 			.x = float(position.column),
 			.y = float(position.row),
+			.xOffset = x / 2.f,
+			.yOffset = y / 2.f,
+			.sizeX = float(tilesize),
+			.sizeY = float(tilesize),
+		});
+	}
+
+	void TileEntity::renderUpper(SpriteRenderer &sprite_renderer) {
+		if (!isVisible({-1, 0}))
+			return;
+
+		RealmPtr realm = getRealm();
+		Tileset &tileset = realm->getTileset();
+
+		if (cachedUpperTile == TileID(-1) || cachedUpperTile == 0)
+			return;
+
+		const auto tilesize = tileset.getTileSize();
+		const auto texture = tileset.getTexture(realm->getGame());
+		const auto x = (cachedUpperTile % (texture->width / tilesize)) * tilesize;
+		const auto y = (cachedUpperTile / (texture->width / tilesize)) * tilesize;
+
+		sprite_renderer(*texture, {
+			.x = float(position.column),
+			.y = float(position.row - 1),
 			.xOffset = x / 2.f,
 			.yOffset = y / 2.f,
 			.sizeX = float(tilesize),
@@ -90,13 +119,13 @@ namespace Game3 {
 			game.toClient().moduleMessage({}, shared_from_this(), "TileEntityRemoved");
 	}
 
-	void TileEntity::setRealm(const std::shared_ptr<Realm> &realm) {
+	void TileEntity::setRealm(const RealmPtr &realm) {
 		realmID = realm->id;
 		weakRealm = realm;
 	}
 
-	std::shared_ptr<Realm> TileEntity::getRealm() const {
-		auto out = weakRealm.lock();
+	RealmPtr TileEntity::getRealm() const {
+		RealmPtr out = weakRealm.lock();
 		if (!out)
 			throw std::runtime_error("Couldn't lock tile entity's realm");
 		return out;
@@ -109,7 +138,17 @@ namespace Game3 {
 
 	bool TileEntity::isVisible() const {
 		const Position pos = getPosition();
-		auto realm = getRealm();
+		RealmPtr realm = getRealm();
+		if (getSide() == Side::Client) {
+			ClientGame &client_game = realm->getGame().toClient();
+			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.player->getChunk()).contains(getChunkPosition(pos));
+		}
+		return realm->isVisible(pos);
+	}
+
+	bool TileEntity::isVisible(const Position &offset) const {
+		const Position pos = getPosition() + offset;
+		RealmPtr realm = getRealm();
 		if (getSide() == Side::Client) {
 			ClientGame &client_game = realm->getGame().toClient();
 			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.player->getChunk()).contains(getChunkPosition(pos));
@@ -126,7 +165,7 @@ namespace Game3 {
 	}
 
 	Game & TileEntity::getGame() const {
-		if (auto realm = weakRealm.lock())
+		if (RealmPtr realm = weakRealm.lock())
 			return realm->getGame();
 		throw std::runtime_error("Couldn't get Game from TileEntity: couldn't lock Realm");
 	}
@@ -165,7 +204,7 @@ namespace Game3 {
 	void TileEntity::broadcast(bool) {
 		assert(getSide() == Side::Server);
 
-		auto realm = getRealm();
+		RealmPtr realm = getRealm();
 		TileEntityPacket packet(getSelf());
 
 		ChunkRange(getChunk()).iterate([&](ChunkPosition chunk_position) {

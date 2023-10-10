@@ -11,8 +11,8 @@
 #include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
-	Chest::Chest(Identifier tile_id, const Position &position_, std::string name_):
-		TileEntity(std::move(tile_id), ID(), position_, true), name(std::move(name_)) {}
+	Chest::Chest(Identifier tile_id, const Position &position_, std::string name_, Identifier item_name):
+		TileEntity(std::move(tile_id), ID(), position_, true), name(std::move(name_)), itemName(std::move(item_name)) {}
 
 	Chest::Chest(const Position &position_):
 		Chest("base:tile/chest"_id, position_, "Chest") {}
@@ -38,7 +38,7 @@ namespace Game3 {
 				return false;
 			});
 			destroy();
-			player->give(ItemStack(getGame(), "base:item/chest"));
+			player->give(ItemStack(getGame(), itemName));
 		} else {
 			addObserver(player, false);
 		}
@@ -58,11 +58,13 @@ namespace Game3 {
 		TileEntity::encode(game, buffer);
 		InventoriedTileEntity::encode(game, buffer);
 		buffer << name;
+		buffer << itemName;
 	}
 
 	void Chest::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
 		InventoriedTileEntity::decode(game, buffer);
 		buffer >> name;
+		buffer >> itemName;
 	}
 }

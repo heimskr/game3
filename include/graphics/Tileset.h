@@ -68,6 +68,7 @@ namespace Game3 {
 			void setHash(std::string);
 			std::shared_ptr<AutotileSet> getAutotileSet(const Identifier &) const;
 			TileID getUpper(TileID) const;
+			bool hasUpper(TileID) const;
 
 			const auto & getIDs()          const { return ids;          }
 			const auto & getNames()        const { return names;        }
