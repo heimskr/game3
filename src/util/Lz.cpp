@@ -10,7 +10,7 @@ namespace LZ4 {
 		template <typename O, typename I>
 		O safeCast(I input) {
 			if (static_cast<I>(std::numeric_limits<O>::max()) < input)
-				throw std::invalid_argument("Input number too high");
+				throw std::invalid_argument("Input number too high: " + std::to_string(input) + " > " + std::to_string(static_cast<I>(std::numeric_limits<O>::max())));
 
 			if constexpr (std::is_signed_v<I> && std::is_signed_v<O>)
 				if (static_cast<I>(std::numeric_limits<O>::min()) > input)
@@ -42,8 +42,11 @@ namespace LZ4 {
 		std::vector<uint8_t> output;
 		output.resize(input.size() * 4);
 
+		const char *input_data = reinterpret_cast<const char *>(input.data());
+		const int input_size = safeCast<int>(input.size_bytes());
+
 		for (;;) {
-			int result = LZ4_decompress_safe(reinterpret_cast<const char *>(input.data()), reinterpret_cast<char *>(output.data()), safeCast<int>(input.size_bytes()), safeCast<int>(output.size()));
+			const int result = LZ4_decompress_safe(input_data, reinterpret_cast<char *>(output.data()), input_size, safeCast<int>(output.size()));
 
 			if (result == -1)
 				throw std::invalid_argument("Can't decompress: input is malformed");

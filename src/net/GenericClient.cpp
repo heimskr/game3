@@ -16,6 +16,40 @@ namespace Game3 {
 		doHandshake();
 	}
 
+	void GenericClient::queue(std::string message) {
+		{
+			auto lock = outbox.uniqueLock();
+			outbox.push_back(std::move(message));
+			if (1 < outbox.size())
+				return;
+		}
+
+		write();
+	}
+
+	void GenericClient::write() {
+		auto lock = outbox.sharedLock();
+		const std::string &message = outbox.front();
+		asio::async_write(socket, asio::buffer(message), strand.wrap(std::bind(&GenericClient::writeHandler, this, std::placeholders::_1, std::placeholders::_2)));
+	}
+
+	void GenericClient::writeHandler(const asio::error_code &errc, size_t) {
+		bool empty{};
+		{
+			auto lock = outbox.uniqueLock();
+			outbox.pop_front();
+			empty = outbox.empty();
+		}
+
+		if (errc) {
+			ERROR("Client write: " << errc.message() << " (" << errc.value() << ')');
+			return;
+		}
+
+		if (!empty)
+			write();
+	}
+
 	void GenericClient::doHandshake() {
 		socket.async_handshake(asio::ssl::stream_base::server, [this](const asio::error_code &errc) {
 			if (errc) {
@@ -29,16 +63,18 @@ namespace Game3 {
 	}
 
 	void GenericClient::doRead() {
-		socket.async_read_some(asio::buffer(buffer.get(), bufferSize), asio::bind_executor(strand, [this](const asio::error_code &errc, size_t length) {
-			if (errc) {
-				if (errc.value() != 1) // "stream truncated"
-					ERROR("Client read: " << errc.message() << " (" << errc << ')');
-				removeSelf();
-				return;
-			}
+		asio::post(strand, [this] {
+			socket.async_read_some(asio::buffer(buffer.get(), bufferSize), asio::bind_executor(strand, [this](const asio::error_code &errc, size_t length) {
+				if (errc) {
+					if (errc.value() != 1) // "stream truncated"
+						ERROR("Client read: " << errc.message() << " (" << errc << ')');
+					removeSelf();
+					return;
+				}
 
-			handleInput(std::string_view(buffer.get(), length));
-			doRead();
-		}));
+				handleInput(std::string_view(buffer.get(), length));
+				doRead();
+			}));
+		});
 	}
 }

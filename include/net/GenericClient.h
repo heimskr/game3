@@ -1,6 +1,7 @@
 #pragma once
 
 #include "net/SendBuffer.h"
+#include "threading/Lockable.h"
 
 #include <cstddef>
 #include <memory>
@@ -22,6 +23,7 @@ namespace Game3 {
 			std::mutex networkMutex;
 			asio::ssl::stream<asio::ip::tcp::socket> socket;
 			asio::io_context::strand strand;
+			Lockable<std::deque<std::string>> outbox;
 
 			GenericClient() = delete;
 			GenericClient(const GenericClient &) = delete;
@@ -34,6 +36,7 @@ namespace Game3 {
 			GenericClient & operator=(GenericClient &&) = delete;
 
 			void start();
+			void queue(std::string);
 
 			virtual void handleInput(std::string_view) = 0;
 			virtual void onMaxLineSizeExceeded() {}
@@ -44,6 +47,8 @@ namespace Game3 {
 			size_t bufferSize;
 			std::unique_ptr<char[]> buffer;
 
+			void write();
+			void writeHandler(const asio::error_code &, size_t);
 			void doHandshake();
 			void doRead();
 	};

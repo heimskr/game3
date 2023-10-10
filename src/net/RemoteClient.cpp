@@ -132,7 +132,7 @@ namespace Game3 {
 	void RemoteClient::flushBuffer(bool force) {
 		if (!force && !sendBuffer.active())
 			return;
-		std::vector<char> moved_buffer;
+		std::string moved_buffer;
 		{
 			auto buffer_lock = sendBuffer.uniqueLock();
 			if (sendBuffer.bytes.empty())

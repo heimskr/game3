@@ -43,11 +43,8 @@ namespace Game3 {
 			size_t threadCount = 0;
 			std::atomic_int lastID = 0;
 
-			Lockable<std::unordered_set<std::unique_ptr<std::string>>> stringFragments;
-			Lockable<std::unordered_set<std::unique_ptr<std::vector<char>>>> vectorFragments;
 			Lockable<std::unordered_set<RemoteClientPtr>> allClients;
 
-			void handleWrite(const asio::error_code &, size_t);
 			bool removeClient(int);
 			void accept();
 
@@ -75,7 +72,6 @@ namespace Game3 {
 			void handleMessage(RemoteClient &, std::string_view);
 			void mainLoop();
 			void send(RemoteClient &, std::string, bool force = false);
-			void send(RemoteClient &, std::vector<char>, bool force = false);
 			void run();
 			void stop();
 			bool close(RemoteClient &);

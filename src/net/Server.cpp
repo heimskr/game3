@@ -56,66 +56,18 @@ namespace Game3 {
 			return;
 
 		if (!force && client.isBuffering()) {
-			asio::post(client.strand, [this, weak_client = std::weak_ptr(client.shared_from_this()), message = std::move(message)] {
-				if (std::shared_ptr<RemoteClient> client = weak_client.lock()) {
-					SendBuffer &buffer = client->sendBuffer;
-					auto lock = buffer.uniqueLock();
-					buffer.bytes.insert(buffer.bytes.end(), message.begin(), message.end());
-				}
-			});
-			return;
-		}
-
-		auto lock = stringFragments.uniqueLock();
-		auto [iter, inserted] = stringFragments.insert(std::make_unique<std::string>(std::move(message)));
-		lock.unlock();
-		assert(inserted);
-
-		std::weak_ptr weak_client(client.shared_from_this());
-
-		asio::post(client.strand, [this, iter, weak_client] {
-			if (std::shared_ptr<RemoteClient> client = weak_client.lock()) {
-				asio::async_write(client->socket, asio::buffer(**iter), asio::bind_executor(client->strand, [this, iter, weak_client](const asio::error_code &errc, size_t length) {
-					handleWrite(errc, length);
-					auto lock = stringFragments.uniqueLock();
-					stringFragments.erase(iter);
-				}));
-			}
-		});
-	}
-
-	void Server::send(RemoteClient &client, std::vector<char> message, bool force) {
-		if (message.empty())
-			return;
-
-		if (!force && client.isBuffering()) {
 			SendBuffer &buffer = client.sendBuffer;
 			auto lock = buffer.uniqueLock();
 			buffer.bytes.insert(buffer.bytes.end(), message.begin(), message.end());
 			return;
 		}
 
-		auto lock = vectorFragments.uniqueLock();
-		auto [iter, inserted] = vectorFragments.insert(std::make_unique<std::vector<char>>(std::move(message)));
-		lock.unlock();
-		assert(inserted);
-
 		std::weak_ptr weak_client(client.shared_from_this());
 
-		asio::post(client.strand, [this, iter, weak_client] {
-			if (std::shared_ptr<RemoteClient> client = weak_client.lock()) {
-				asio::async_write(client->socket, asio::buffer(**iter), asio::bind_executor(client->strand, [this, iter, weak_client](const asio::error_code &errc, size_t length) {
-					handleWrite(errc, length);
-					auto lock = vectorFragments.uniqueLock();
-					vectorFragments.erase(iter);
-				}));
-			}
+		client.strand.post([this, weak_client, message = std::move(message)]() mutable {
+			if (std::shared_ptr<RemoteClient> client = weak_client.lock())
+				client->queue(std::move(message));
 		});
-	}
-
-	void Server::handleWrite(const asio::error_code &errc, size_t) {
-		if (errc)
-			ERROR("Server write: " << errc.message());
 	}
 
 	void Server::accept() {

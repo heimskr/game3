@@ -10,7 +10,7 @@ namespace Game3 {
 	struct SendBuffer {
 		std::shared_mutex mutex;
 		std::atomic_size_t depth = 0;
-		std::vector<char> bytes;
+		std::string bytes;
 		SendBuffer() = default;
 
 		inline auto sharedLock() { return std::shared_lock(mutex); }
