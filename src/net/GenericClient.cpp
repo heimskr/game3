@@ -29,18 +29,16 @@ namespace Game3 {
 	}
 
 	void GenericClient::doRead() {
-		asio::post(strand, [this] {
-			socket.async_read_some(asio::buffer(buffer.get(), bufferSize), [this](const asio::error_code &errc, size_t length) {
-				if (errc) {
-					if (errc.value() != 1) // "stream truncated"
-						ERROR("Client read: " << errc.message() << " (" << errc << ')');
-					removeSelf();
-					return;
-				}
+		socket.async_read_some(asio::buffer(buffer.get(), bufferSize), asio::bind_executor(strand, [this](const asio::error_code &errc, size_t length) {
+			if (errc) {
+				if (errc.value() != 1) // "stream truncated"
+					ERROR("Client read: " << errc.message() << " (" << errc << ')');
+				removeSelf();
+				return;
+			}
 
-				handleInput(std::string_view(buffer.get(), length));
-				doRead();
-			});
-		});
+			handleInput(std::string_view(buffer.get(), length));
+			doRead();
+		}));
 	}
 }
