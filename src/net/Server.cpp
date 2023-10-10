@@ -74,11 +74,9 @@ namespace Game3 {
 		std::weak_ptr weak_client(client.shared_from_this());
 
 		asio::async_write(client.socket, asio::buffer(**iter), asio::bind_executor(client.strand, [this, iter, weak_client](const asio::error_code &errc, size_t length) {
-			if (std::shared_ptr<RemoteClient> client = weak_client.lock()) {
-				handleWrite(errc, length);
-				auto lock = stringFragments.uniqueLock();
-				stringFragments.erase(iter);
-			}
+			handleWrite(errc, length);
+			auto lock = stringFragments.uniqueLock();
+			stringFragments.erase(iter);
 		}));
 	}
 
@@ -101,11 +99,9 @@ namespace Game3 {
 		std::weak_ptr weak_client(client.shared_from_this());
 
 		asio::async_write(client.socket, asio::buffer(**iter), asio::bind_executor(client.strand, [this, iter, weak_client](const asio::error_code &errc, size_t length) {
-			if (std::shared_ptr<RemoteClient> client = weak_client.lock()) {
-				handleWrite(errc, length);
-				auto lock = vectorFragments.uniqueLock();
-				vectorFragments.erase(iter);
-			}
+			handleWrite(errc, length);
+			auto lock = vectorFragments.uniqueLock();
+			vectorFragments.erase(iter);
 		}));
 	}
 
