@@ -21,6 +21,8 @@ namespace Game3 {
 
 			std::string getName() const override { return "Sheep"; }
 
+			Identifier getMilk() const override { return {"base", "fluid/milk"}; }
+
 			friend class Entity;
 
 		protected:
