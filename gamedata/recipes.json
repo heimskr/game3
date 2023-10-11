@@ -86,6 +86,11 @@
 				"station": "base:station/furnace"
 			}],
 			["base:crafting_recipe", {
+				"input":  [["base:item/sand", 1]],
+				"output": [["base:item/glass", 1]],
+				"station": "base:station/furnace"
+			}],
+			["base:crafting_recipe", {
 				"input":  [["base:item/gold_ore", 1], ["base:item/coal", 2]],
 				"output": [["base:item/gold_bar", 1]],
 				"station": "base:station/furnace"
