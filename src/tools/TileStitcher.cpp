@@ -2,7 +2,7 @@
 #include "Log.h"
 #include "graphics/GL.h"
 #include "graphics/Texture.h"
-#include "tools/Stitcher.h"
+#include "tools/TileStitcher.h"
 #include "util/Crypto.h"
 #include "util/FS.h"
 #include "util/Util.h"
@@ -20,7 +20,7 @@
 #endif
 
 namespace Game3 {
-	Tileset stitcher(const std::filesystem::path &base_dir, Identifier tileset_name, std::string *png_out) {
+	Tileset tileStitcher(const std::filesystem::path &base_dir, Identifier tileset_name, std::string *png_out) {
 		std::set<std::filesystem::path> dirs;
 
 		for (const std::filesystem::directory_entry &entry: std::filesystem::directory_iterator(base_dir))

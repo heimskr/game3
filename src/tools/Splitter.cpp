@@ -1,7 +1,10 @@
 #include "config.h"
-#include "tools/Flasker.h"
+#include "App.h"
 #include "Log.h"
+#include "game/Game.h"
 #include "graphics/Tileset.h"
+#include "item/Item.h"
+#include "tools/Flasker.h"
 #include "util/FS.h"
 #include "util/Util.h"
 
@@ -18,68 +21,98 @@
 
 namespace Game3 {
 	void splitter() {
-		/*
-		std::filesystem::path filename = "resources/tileset.png";
+		auto game = Game::create(Side::Client, nullptr);
 
-		int width{};
-		int height{};
-		int channels{};
+		const std::unordered_map<Identifier, std::string> credits{
+			{"base:texture/palisade",    "https://palisadestudio.itch.io/"},
+			{"base:texture/shortsword",  "https://merchant-shade.itch.io/16x16-mini-world-sprites"},
+			{"base:texture/potions",     "https://merchant-shade.itch.io/16x16-mixed-rpg-icons"},
+			{"base:texture/custom",      "Fayabella"},
+			{"base:texture/tinywonder",  "https://butterymilk.itch.io/tiny-wonder-farm-asset-pack"},
+			{"base:texture/items",       "https://kyrise.itch.io/kyrises-free-16x16-rpg-icon-pack"},
+			{"base:texture/shade",       "https://merchant-shade.itch.io/16x16-mini-world-sprites"},
+			{"base:texture/tileset",     "https://merchant-shade.itch.io/16x16-mini-world-sprites"},
+			{"base:texture/consumables", "https://merchant-shade.itch.io/16x16-mixed-rpg-icons"},
+			{"base:texture/mushrooms",   "https://pixerelia.itch.io/vf-edible-mushrooms"},
+			{"base:texture/kazzter",     "https://kazzter-k.itch.io/kazzter-16-rpg-icon-pack"},
+			{"base:texture/indfor",      "https://github.com/InnovativeOnlineIndustries/Industrial-Foregoing/"},
+			{"base:texture/interiors",   "https://limezu.itch.io/moderninteriors"},
+		};
 
-		auto raw_tiles = std::unique_ptr<uint8_t[], FreeDeleter>(stbi_load(filename.c_str(), &width, &height, &channels, 0));
-		if (!raw_tiles)
-			throw std::runtime_error("Couldn't load " + filename.string());
+		// The original tileset omnipng contains some Fayabella sprites.
+		const std::unordered_set<std::string> credit_override_fayabella{
+			"ace_flag", "centrifuge", "chemical_reactor", "energy_pipe",
+			"flower1_black", "flower1_blue", "flower1_green", "flower1_orange", "flower1_purple", "flower1_red", "flower1_white", "flower1_yellow",
+			"flower2_black", "flower2_blue", "flower2_green", "flower2_orange", "flower2_purple", "flower2_red", "flower2_white", "flower2_yellow",
+			"flower3_black", "flower3_blue", "flower3_green", "flower3_orange", "flower3_purple", "flower3_red", "flower3_white", "flower3_yellow",
+			"flower4_black", "flower4_blue", "flower4_green", "flower4_orange", "flower4_purple", "flower4_red", "flower4_white", "flower4_yellow",
+			"flower5_black", "flower5_blue", "flower5_green", "flower5_orange", "flower5_purple", "flower5_red", "flower5_white", "flower5_yellow",
+			"fluid_pipe", "geothermal_generator", "item_pipe", "millstone", "nb_flag", "pride_flag", "pump", "purifier", "tank",
+		};
 
-		auto json = nlohmann::json::parse(readFile("gamedata/monomap.json"))["data"][0][1]["base:tileset/monomap"];
+		// The original tileset omnipng also contains some sprites from Tilation.
+		const std::unordered_set<std::string> credit_override_tilation{
+			"floor", "plant_pot1", "plant_pot2", "plant_pot3", "pot", "wooden_wall",
+		};
 
-		Tileset tileset = Tileset::fromJSON("base:tileset/monomap", json);
+		std::filesystem::path base = "split";
 
-		std::unordered_map<Identifier, Identifier> march; // tile => corner
+		std::filesystem::create_directory(base);
 
-		for (const auto &[category, corner]: json["marchable"].get<std::unordered_map<Identifier, Identifier>>())
-			for (const auto &name: tileset.getTilesByCategory(category))
-				march[name] = corner;
+		// Necessary for Gdk::Pixbuf::getImage to work.
+		auto app = Game3::App::create();
 
-		for (const auto &[name, id]: tileset.getIDs()) {
-			const int tileset_x = (id % 32) * 16;
-			const int tileset_y = (id / 32) * 16;
-			auto raw_tile = std::make_unique<uint8_t[]>(16 * 16 * channels);
-			for (size_t y = 0; y < 16; ++y)
-				for (size_t x = 0; x < 16; ++x)
-					for (int b = 0; b < channels; ++b)
-						raw_tile[(y * 16 + x) * channels + b] = raw_tiles[(tileset_x + x + (tileset_y + y) * width) * channels + b];
-			std::string dirname = "split/" + name.name.substr(5);
-			std::string tilename = dirname + "/tile.png";
-			std::filesystem::create_directories(dirname);
-			stbi_write_png(tilename.c_str(), 16, 16, 4, raw_tile.get(), 16 * 4);
+		for (const auto &[id, item]: game->registry<ItemRegistry>()) {
+			std::filesystem::path dir = base / id.getPostPath();
+			std::filesystem::create_directory(dir);
 
-			nlohmann::json meta;
-			meta["tilename"] = name;
-			meta["solid"] = tileset.isSolid(name);
-			meta["land"] = tileset.isLand(name);
+			auto image = item->getImage(*game, ItemStack(*game, item));
 
-			if (auto iter = march.find(name); iter != march.end()) {
-				const Identifier &corner = iter->second;
-				const TileID corner_tile = tileset[corner];
-				const int corner_x = corner_tile % 32;
-				const int corner_y = corner_tile / 32;
-				const int offset_x = tileset_x / 16 - corner_x;
-				const int offset_y = tileset_y / 16 - corner_y;
-				meta["marchable"]["corner"] = corner;
-				meta["marchable"]["offset"] = std::make_pair(offset_x, offset_y);
+			// The images returned by Item::getImage are scaled up by a factor of 8.
+			constexpr static int scale = 8;
+			image = image->scale_simple(image->get_width() / scale, image->get_height() / scale, Gdk::InterpType::NEAREST);
+
+			guint length{};
+			guint8 *pixels = image->get_pixels(length);
+
+			double root = std::sqrt(length / 4.);
+			if (fractional(root) != 0.)
+				throw std::runtime_error("Pixel length not a perfect square: " + std::to_string(length));
+
+			const int dimension = static_cast<int>(root);
+
+			auto raw = std::make_unique<uint8_t[]>(dimension * dimension * 4);
+
+			for (int y = 0; y < dimension; ++y) {
+				for (int x = 0; x < dimension; ++x) {
+					size_t offset = (y * dimension + x) * 4;
+					std::memcpy(&raw[offset], &pixels[offset], 4);
+				}
 			}
 
-			for (const auto &category: tileset.getCategories(name)) {
-				meta["categories"].push_back(category);
-				if (auto stack_name_iter = tileset.stackCategories.find(category); stack_name_iter != tileset.stackCategories.end())
-					meta["stack"] = stack_name_iter->second;
+			std::filesystem::path png = dir / "item.png";
+			if (!stbi_write_png(png.c_str(), dimension, dimension, 4, raw.get(), dimension * 4))
+				throw std::runtime_error("Couldn't write png to " + png.string());
+
+			nlohmann::json meta{
+				{"size", std::make_pair(dimension, dimension)},
+			};
+
+			const std::string end = id.getPostPath();
+
+			if (credit_override_tilation.contains(end)) {
+				meta["credit"] = "https://tilation.itch.io/16x16-small-indoor-tileset";
+			} else if (credit_override_fayabella.contains(end)) {
+				meta["credit"] = "Fayabella";
+			} else {
+				const Identifier texture_id = item->getTexture(ItemStack(*game, item))->identifier;
+				if (auto iter = credits.find(texture_id); iter != credits.end())
+					meta["credit"] = iter->second;
+				else
+					WARN("No credit for " << id << " in texture " << texture_id);
 			}
 
-			if (auto stack_name_iter = tileset.stackNames.find(name); stack_name_iter != tileset.stackNames.end())
-				meta["stack"] = stack_name_iter->second;
-
-			std::ofstream of(dirname + "/tile.json");
-			of << meta.dump();
+			std::ofstream(dir / "item.json") << meta.dump();
 		}
-		//*/
 	}
 }

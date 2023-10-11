@@ -140,7 +140,7 @@
 #include "tileentity/Teleporter.h"
 #include "tileentity/TileEntity.h"
 #include "tileentity/TileEntityFactory.h"
-#include "tools/Stitcher.h"
+#include "tools/TileStitcher.h"
 #include "ui/module/ChemicalReactorModule.h"
 #include "ui/module/ExternalInventoryModule.h"
 #include "ui/module/EnergyLevelModule.h"
@@ -779,7 +779,7 @@ namespace Game3 {
 			Identifier identifier = json.at(1);
 			std::filesystem::path base_dir = json.at(2);
 			auto &tilesets = registry<TilesetRegistry>();
-			tilesets.add(identifier, stitcher(base_dir, identifier));
+			tilesets.add(identifier, tileStitcher(base_dir, identifier));
 
 		// } else if (type == "base:manual_tileset_map") { // Deprecated.
 
@@ -920,7 +920,7 @@ namespace Game3 {
 		realms.erase(realm_id);
 	}
 
-	GamePtr Game::create(Side side, const ServerArgument &argument) {
+	GamePtr Game::create(Side side, const GameArgument &argument) {
 		GamePtr out;
 		if (side == Side::Client)
 			out = GamePtr(new ClientGame(*std::get<Canvas *>(argument)));
@@ -930,7 +930,7 @@ namespace Game3 {
 		return out;
 	}
 
-	GamePtr Game::fromJSON(Side side, const nlohmann::json &json, const ServerArgument &argument) {
+	GamePtr Game::fromJSON(Side side, const nlohmann::json &json, const GameArgument &argument) {
 		auto out = create(side, argument);
 		out->initialSetup();
 		{

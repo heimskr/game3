@@ -7,7 +7,7 @@
 #include "tools/Flasker.h"
 #include "tools/Mazer.h"
 #include "tools/Migrator.h"
-#include "tools/Stitcher.h"
+#include "tools/TileStitcher.h"
 #include "util/Crypto.h"
 #include "util/FS.h"
 #include "util/Timer.h"
@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
 			return 0;
 		}
 
-		if (strcmp(argv[1], "--stitch") == 0) {
+		if (strcmp(argv[1], "--tile-stitch") == 0) {
 			if (argc == 3) {
 				const auto count = Game3::parseNumber<size_t>(argv[2]);
 				size_t dimension = 16;
@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
 			}
 
 			std::string png;
-			Game3::stitcher("resources/tileset", "base:tileset/monomap", &png);
+			Game3::tileStitcher("resources/tileset", "base:tileset/monomap", &png);
 			std::cout << png;
 			return 0;
 		}

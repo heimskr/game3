@@ -11,8 +11,8 @@ namespace Game3 {
 		Tool(id_, std::move(name_), base_price, 0.f, max_durability, "base:attribute/hoe"_id) {}
 
 	bool Hoe::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
-		auto &realm = *place.realm;
-		auto &tileset = realm.getTileset();
+		Realm &realm = *place.realm;
+		Tileset &tileset = realm.getTileset();
 
 		if (auto tile = realm.tryTile(Layer::Terrain, place.position); tile && tileset.isInCategory(*tile, "base:category/tillable"_id)) {
 			if (stack.reduceDurability())

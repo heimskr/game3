@@ -120,10 +120,10 @@ namespace Game3 {
 
 			inline void clearFluidCache() { fluidCache.clear(); }
 
-			using ServerArgument = std::variant<Canvas *, std::shared_ptr<Server>>;
+			using GameArgument = std::variant<Canvas *, std::shared_ptr<Server>>;
 
-			static std::shared_ptr<Game> create(Side, const ServerArgument &);
-			static std::shared_ptr<Game> fromJSON(Side, const nlohmann::json &, const ServerArgument &);
+			static std::shared_ptr<Game> create(Side, const GameArgument &);
+			static std::shared_ptr<Game> fromJSON(Side, const nlohmann::json &, const GameArgument &);
 
 			ClientGame & toClient();
 			const ClientGame & toClient() const;
