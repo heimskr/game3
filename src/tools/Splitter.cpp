@@ -42,15 +42,19 @@ namespace Game3 {
 		// The original tileset omnipng contains some Fayabella sprites.
 		const std::unordered_set<std::string> credit_override_fayabella{
 			"ace_flag", "centrifuge", "chemical_reactor", "energy_pipe",
-			"flower1_black", "flower1_blue", "flower1_green", "flower1_orange", "flower1_purple", "flower1_red", "flower1_white", "flower1_yellow",
 			"flower2_black", "flower2_blue", "flower2_green", "flower2_orange", "flower2_purple", "flower2_red", "flower2_white", "flower2_yellow",
-			"flower3_black", "flower3_blue", "flower3_green", "flower3_orange", "flower3_purple", "flower3_red", "flower3_white", "flower3_yellow",
 			"flower4_black", "flower4_blue", "flower4_green", "flower4_orange", "flower4_purple", "flower4_red", "flower4_white", "flower4_yellow",
-			"flower5_black", "flower5_blue", "flower5_green", "flower5_orange", "flower5_purple", "flower5_red", "flower5_white", "flower5_yellow",
 			"fluid_pipe", "geothermal_generator", "item_pipe", "millstone", "nb_flag", "pride_flag", "pump", "purifier", "tank",
 		};
 
-		// The original tileset omnipng also contains some sprites from Tilation.
+		// And some from Vadim.
+		const std::unordered_set<std::string> credit_override_vadim{
+			"flower1_black", "flower1_blue", "flower1_green", "flower1_orange", "flower1_purple", "flower1_red", "flower1_white", "flower1_yellow",
+			"flower3_black", "flower3_blue", "flower3_green", "flower3_orange", "flower3_purple", "flower3_red", "flower3_white", "flower3_yellow",
+			"flower5_black", "flower5_blue", "flower5_green", "flower5_orange", "flower5_purple", "flower5_red", "flower5_white", "flower5_yellow",
+		};
+
+		// And some from Tilation.
 		const std::unordered_set<std::string> credit_override_tilation{
 			"floor", "plant_pot1", "plant_pot2", "plant_pot3", "pot", "wooden_wall",
 		};
@@ -104,6 +108,8 @@ namespace Game3 {
 				meta["credit"] = "https://tilation.itch.io/16x16-small-indoor-tileset";
 			} else if (credit_override_fayabella.contains(end)) {
 				meta["credit"] = "Fayabella";
+			} else if (credit_override_vadim.contains(end)) {
+				meta["credit"] = "Vadim";
 			} else {
 				const Identifier texture_id = item->getTexture(ItemStack(*game, item))->identifier;
 				if (auto iter = credits.find(texture_id); iter != credits.end())
