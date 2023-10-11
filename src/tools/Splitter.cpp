@@ -100,6 +100,7 @@ namespace Game3 {
 
 			nlohmann::json meta{
 				{"size", std::make_pair(dimension, dimension)},
+				{"id",   id},
 			};
 
 			const std::string end = id.getPostPath();
