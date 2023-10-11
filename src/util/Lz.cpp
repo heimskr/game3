@@ -2,6 +2,7 @@
 
 #include <limits>
 #include <memory>
+#include <string>
 
 #include <lz4.h>
 
