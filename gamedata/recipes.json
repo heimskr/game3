@@ -126,6 +126,10 @@
 				"station": "base:station/furnace"
 			}],
 			["base:crafting_recipe", {
+				"input": [["base:item/electronics", 1], ["base:item/wood", 4]],
+				"output": [["base:item/electric_guitar", 1]]
+			}],
+			["base:crafting_recipe", {
 				"input":  [["base:item/electronics", 4], ["base:item/iron_bar", 8]],
 				"output": [["base:item/purifier", 1]],
 				"station": "base:station/anvil"
