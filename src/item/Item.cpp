@@ -4,6 +4,7 @@
 #include "graphics/Tileset.h"
 #include "entity/ItemEntity.h"
 #include "game/Game.h"
+#include "graphics/ItemTexture.h"
 #include "item/HasMaxDurability.h"
 #include "item/Item.h"
 #include "net/Buffer.h"
@@ -15,33 +16,22 @@ namespace Game3 {
 
 // ItemTexture
 
-	ItemTexture::ItemTexture(Identifier identifier_, Identifier texture_name, int x_, int y_, int width_, int height_):
+	ItemTexture::ItemTexture(Identifier identifier_, const std::shared_ptr<Texture> &texture_, int x_, int y_, int width_, int height_):
 		NamedRegisterable(std::move(identifier_)),
+		texture(texture_),
 		x(x_),
 		y(y_),
-		textureName(std::move(texture_name)),
 		width(width_),
 		height(height_) {}
 
-	std::shared_ptr<Texture> ItemTexture::getTexture(const Game &game) {
+	std::shared_ptr<Texture> ItemTexture::getTexture() {
 		if (auto locked = texture.lock())
 			return locked;
-
-		auto new_texture = game.registry<TextureRegistry>()[textureName];
-		texture = new_texture;
-		return new_texture;
+		throw std::runtime_error("Couldn't lock ItemTexture's texture");
 	}
 
 	ItemTexture::operator bool() const {
 		return x != -1 && y != -1 && texture.lock() && width != -1 && height != -1;
-	}
-
-	void to_json(nlohmann::json &json, const ItemTexture &item_texture) {
-		json.push_back(item_texture.textureName);
-		json.push_back(item_texture.x);
-		json.push_back(item_texture.y);
-		json.push_back(item_texture.width);
-		json.push_back(item_texture.height);
 	}
 
 // Item
@@ -57,7 +47,7 @@ namespace Game3 {
 
 	Glib::RefPtr<Gdk::Pixbuf> Item::makeImage(const Game &game, const ItemStack &stack) {
 		auto item_texture = game.registry<ItemTextureRegistry>().at(getTextureIdentifier(stack));
-		auto texture = item_texture->getTexture(game);
+		auto texture = item_texture->getTexture();
 		texture->init();
 		const int width  = item_texture->width;
 		const int height = item_texture->height;
@@ -106,7 +96,7 @@ namespace Game3 {
 			return cachedTexture;
 
 		const Game &game = stack.getGame();
-		return cachedTexture = game.registry<ItemTextureRegistry>().at(identifier)->getTexture(game);
+		return cachedTexture = game.registry<ItemTextureRegistry>().at(identifier)->getTexture();
 	}
 
 	std::string Item::getTooltip(const ItemStack &) {

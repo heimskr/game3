@@ -21,27 +21,6 @@ namespace Game3 {
 	class Texture;
 	struct Position;
 
-	struct ItemTexture: NamedRegisterable {
-		static constexpr int DEFAULT_WIDTH = 16;
-		static constexpr int DEFAULT_HEIGHT = 16;
-
-		int x = -1;
-		int y = -1;
-		Identifier textureName;
-		std::weak_ptr<Texture> texture;
-		int width = -1;
-		int height = -1;
-
-		ItemTexture() = delete;
-		ItemTexture(Identifier, Identifier texture_name, int x_, int y_, int width_ = DEFAULT_WIDTH, int height_ = DEFAULT_HEIGHT);
-
-		std::shared_ptr<Texture> getTexture(const Game &);
-
-		explicit operator bool() const;
-	};
-
-	void to_json(nlohmann::json &, const ItemTexture &);
-
 	class Item: public NamedRegisterable, public std::enable_shared_from_this<Item> {
 		public:
 			std::string name;

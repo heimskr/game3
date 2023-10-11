@@ -32,6 +32,7 @@
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
 #include "graph/Graph.h"
+#include "graphics/ItemTexture.h"
 #include "item/Bomb.h"
 #include "item/CaveEntrance.h"
 #include "item/CentrifugeItem.h"
@@ -140,6 +141,7 @@
 #include "tileentity/Teleporter.h"
 #include "tileentity/TileEntity.h"
 #include "tileentity/TileEntityFactory.h"
+#include "tools/ItemStitcher.h"
 #include "tools/TileStitcher.h"
 #include "ui/module/ChemicalReactorModule.h"
 #include "ui/module/ExternalInventoryModule.h"
@@ -189,6 +191,7 @@ namespace Game3 {
 		registries.add<CentrifugeRecipeRegistry>();
 		registries.add<GeothermalRecipeRegistry>();
 		registries.add<ModuleFactoryRegistry>();
+		registries.add<ItemSetRegistry>();
 	}
 
 	void Game::addItems() {
@@ -302,12 +305,13 @@ namespace Game3 {
 		add(std::make_shared<PumpItem>("base:item/pump", "Pump", 999, 64)); // TODO: cost
 		add(std::make_shared<TankItem>("base:item/tank", "Tank", 999, 64)); // TODO: cost
 
-		add(Furniture::createSimple("base:item/pride_flag", "Pride Flag",     80, Layer::Highest,   "base:tile/pride_flag"));
-		add(Furniture::createSimple("base:item/ace_flag",   "Asexual Flag",   80, Layer::Highest,   "base:tile/ace_flag"));
-		add(Furniture::createSimple("base:item/nb_flag",    "Nonbinary Flag", 80, Layer::Highest,   "base:tile/nb_flag"));
-		add(Furniture::createSimple("base:item/plant_pot1", "Plant Pot",      32, Layer::Submerged, "base:tile/plant1"));
-		add(Furniture::createSimple("base:item/plant_pot2", "Plant Pot",      32, Layer::Submerged, "base:tile/plant2"));
-		add(Furniture::createSimple("base:item/plant_pot3", "Plant Pot",      32, Layer::Submerged, "base:tile/plant3"));
+		add(Furniture::createSimple("base:item/pride_flag",      "Pride Flag",       80, Layer::Highest,   "base:tile/pride_flag"));
+		add(Furniture::createSimple("base:item/ace_flag",        "Asexual Flag",     80, Layer::Highest,   "base:tile/ace_flag"));
+		add(Furniture::createSimple("base:item/nb_flag",         "Nonbinary Flag",   80, Layer::Highest,   "base:tile/nb_flag"));
+		add(Furniture::createSimple("base:item/plant_pot1",      "Plant Pot",        32, Layer::Submerged, "base:tile/plant1"));
+		add(Furniture::createSimple("base:item/plant_pot2",      "Plant Pot",        32, Layer::Submerged, "base:tile/plant2"));
+		add(Furniture::createSimple("base:item/plant_pot3",      "Plant Pot",        32, Layer::Submerged, "base:tile/plant3"));
+		add(Furniture::createSimple("base:item/electric_guitar", "Electric Guitar", 100, Layer::Objects,   "base:tile/electric_guitar"));
 
 		add(Furniture::createMarchable("base:item/wooden_wall", "Wooden Wall",  9, Layer::Objects, "base:tile/wooden_wall", "base:autotile/wooden_walls"));
 		add(Furniture::createMarchable("base:item/tower",       "Tower",       10, Layer::Objects, "base:tile/tower",       "base:autotile/towers"));
@@ -736,18 +740,6 @@ namespace Game3 {
 			for (const auto &[key, value]: json.at(1).items())
 				textures.add(Identifier(key), EntityTexture(Identifier(key), value.at(0), value.at(1)));
 
-		} else if (type == "base:item_texture_map") {
-
-			auto &textures = registry<ItemTextureRegistry>();
-			for (const auto &[key, value]: json.at(1).items()) {
-				if (value.size() == 3)
-					textures.add(Identifier(key), ItemTexture(Identifier(key), value.at(0), value.at(1), value.at(2)));
-				else if (value.size() == 5)
-					textures.add(Identifier(key), ItemTexture(Identifier(key), value.at(0), value.at(1), value.at(2), value.at(3), value.at(4)));
-				else
-					throw std::invalid_argument("Expected ItemTexture JSON size to be 3 or 5, not " + std::to_string(value.size()));
-			}
-
 		} else if (type == "base:ore_map") {
 
 			auto &ores = registry<OreRegistry>();
@@ -781,11 +773,12 @@ namespace Game3 {
 			auto &tilesets = registry<TilesetRegistry>();
 			tilesets.add(identifier, tileStitcher(base_dir, identifier));
 
-		// } else if (type == "base:manual_tileset_map") { // Deprecated.
+		} else if (type == "base:itemset") {
 
-		// 	auto &tilesets = registry<TilesetRegistry>();
-		// 	for (const auto &[key, value]: json.at(1).items())
-		// 		tilesets.add(Identifier(key), Tileset::fromJSON(Identifier(key), value));
+			Identifier identifier = json.at(1);
+			std::filesystem::path base_dir = json.at(2);
+			auto &itemsets = registry<ItemSetRegistry>();
+			itemsets.add(identifier, itemStitcher(&registry<ItemTextureRegistry>(), base_dir, identifier));
 
 		} else if (type == "base:recipe_list") {
 

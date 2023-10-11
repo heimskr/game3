@@ -37,6 +37,8 @@ namespace Game3 {
 			ItemEntity(ItemStack);
 			float xOffset = 0.f;
 			float yOffset = 0.f;
+			float sizeX = 16.f;
+			float sizeY = 16.f;
 			bool needsTexture = true;
 			Atomic<float> secondsLeft = 5 * 60;
 

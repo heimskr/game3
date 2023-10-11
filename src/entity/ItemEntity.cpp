@@ -3,6 +3,7 @@
 #include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
+#include "graphics/ItemTexture.h"
 #include "graphics/SpriteRenderer.h"
 #include "item/Item.h"
 #include "net/Buffer.h"
@@ -30,6 +31,8 @@ namespace Game3 {
 		texture->init();
 		xOffset = item_texture->x / 2.f;
 		yOffset = item_texture->y / 2.f;
+		sizeX = float(item_texture->width);
+		sizeY = float(item_texture->height);
 	}
 
 	std::shared_ptr<ItemEntity> ItemEntity::create(Game &) {
@@ -85,10 +88,10 @@ namespace Game3 {
 			.y = y + .125f,
 			.xOffset = xOffset,
 			.yOffset = yOffset,
-			.sizeX = 16.f,
-			.sizeY = 16.f,
-			.scaleX = .75f,
-			.scaleY = .75f,
+			.sizeX = sizeX,
+			.sizeY = sizeY,
+			.scaleX = .75f * 16.f / sizeX,
+			.scaleY = .75f * 16.f / sizeY,
 		});
 	}
 

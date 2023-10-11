@@ -208,14 +208,14 @@ namespace Game3 {
 
 				next(tilesize);
 				continue;
-			} else {
-				Identifier tilename = json_map.at(name).at("tilename");
-				out.ids[tilename] = tile_index + 1;
-				out.names[tile_index + 1] = tilename;
-				out.uppers[tile_index + 1] = tile_index;
-				out.names[tile_index] = std::move(tilename);
-				next(tilesize);
 			}
+
+			Identifier tilename = json_map.at(name).at("tilename");
+			out.ids[tilename] = tile_index + 1;
+			out.names[tile_index + 1] = tilename;
+			out.uppers[tile_index + 1] = tile_index;
+			out.names[tile_index] = std::move(tilename);
+			next(tilesize);
 
 			for (size_t y = 0; y < tilesize; ++y)
 				for (size_t x = 0; x < tilesize; ++x)

@@ -7,6 +7,7 @@ namespace Game3 {
 	class Crop;
 	class EntityFactory;
 	class Item;
+	class ItemSet;
 	class ItemStack;
 	class LocalCommandFactory;
 	class ModuleFactory;
@@ -113,5 +114,10 @@ namespace Game3 {
 	struct ModuleFactoryRegistry: NamedRegistry<ModuleFactory> {
 		static Identifier ID() { return {"base", "registry/module_factory"}; }
 		ModuleFactoryRegistry(): NamedRegistry(ID()) {}
+	};
+
+	struct ItemSetRegistry: NamedRegistry<ItemSet> {
+		static Identifier ID() { return {"base", "registry/itemset"}; }
+		ItemSetRegistry(): NamedRegistry(ID()) {}
 	};
 }

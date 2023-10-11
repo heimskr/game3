@@ -5,6 +5,7 @@
 #include "net/Server.h"
 #include "net/Sock.h"
 #include "tools/Flasker.h"
+#include "tools/ItemStitcher.h"
 #include "tools/Mazer.h"
 #include "tools/Migrator.h"
 #include "tools/TileStitcher.h"
@@ -95,6 +96,13 @@ int main(int argc, char **argv) {
 
 			std::string png;
 			Game3::tileStitcher("resources/tileset", "base:tileset/monomap", &png);
+			std::cout << png;
+			return 0;
+		}
+
+		if (strcmp(argv[1], "--item-stitch") == 0) {
+			std::string png;
+			Game3::itemStitcher(nullptr, "resources/items", "base:itemset/items", &png);
 			std::cout << png;
 			return 0;
 		}

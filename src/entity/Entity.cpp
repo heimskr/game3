@@ -11,6 +11,7 @@
 #include "game/Game.h"
 #include "game/ServerGame.h"
 #include "game/ServerInventory.h"
+#include "graphics/ItemTexture.h"
 #include "graphics/SpriteRenderer.h"
 #include "net/Buffer.h"
 #include "net/RemoteClient.h"
@@ -985,7 +986,7 @@ namespace Game3 {
 
 		held.slot = new_value;
 		auto item_texture = getGame().registry<ItemTextureRegistry>().at((*inventory)[held.slot]->item->identifier);
-		held.texture = item_texture->getTexture(getGame());
+		held.texture = item_texture->getTexture();
 		held.xOffset = item_texture->x / 2.f;
 		held.yOffset = item_texture->y / 2.f;
 		return true;
