@@ -10,15 +10,13 @@
 
 namespace Game3 {
 	bool StandardInteractions::interact(const Place &place, Modifiers modifiers) const {
-		// TODO: handle other tilemaps
-
 		const Position position = place.position;
 		Player &player = *place.player;
 		Realm &realm = *place.realm;
 		Game &game = realm.getGame();
 		Inventory &inventory = *player.getInventory();
 
-		auto &tileset = realm.getTileset();
+		Tileset &tileset = realm.getTileset();
 		const auto terrain_tile   = place.getName(Layer::Terrain);
 		const auto submerged_tile = place.getName(Layer::Submerged);
 
@@ -85,8 +83,6 @@ namespace Game3 {
 	}
 
 	bool StandardInteractions::damageGround(const Place &place) const {
-		// TODO: handle other tilemaps
-
 		const Tileset &tileset = place.realm->getTileset();
 
 		if (const auto submerged = place.get(Layer::Submerged); submerged && tileset.isInCategory(*submerged, "base:category/trees")) {

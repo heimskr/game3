@@ -8,7 +8,5 @@ namespace Game3 {
 			static Identifier ID() { return {"base", "tile/farmland"}; }
 
 			FarmlandTile();
-
-			bool interact(const Place &, Layer) override;
 	};
 }

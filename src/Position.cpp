@@ -88,6 +88,15 @@ namespace Game3 {
 		return realm->getGame();
 	}
 
+	Place Place::operator+(Direction direction) const {
+		return {position + direction, realm, player};
+	}
+
+	Place & Place::operator+=(Direction direction) {
+		position += direction;
+		return *this;
+	}
+
 	bool Place::operator==(const Place &other) const {
 		return this == &other || (position == other.position && realm == other.realm && player == other.player);
 	}

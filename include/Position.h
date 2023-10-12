@@ -68,6 +68,8 @@ namespace Game3 {
 
 		Game & getGame() const;
 
+		Place operator+(Direction) const;
+		Place & operator+=(Direction);
 		bool operator==(const Place &) const;
 	};
 
