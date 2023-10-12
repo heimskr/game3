@@ -830,7 +830,7 @@ namespace Game3 {
 	}
 
 	bool Realm::isWalkable(Index row, Index column, const Tileset &tileset) {
-		for (const Layer layer: mainLayers)
+		for (const Layer layer: collidingLayers)
 			if (std::optional<TileID> tile = tryTile(layer, {row, column}); !tile || !tileset.isWalkable(*tile) || tileset.isSolid(*tile))
 				return false;
 		auto lock = tileEntities.sharedLock();

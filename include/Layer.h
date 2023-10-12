@@ -9,8 +9,9 @@ namespace Game3 {
 	enum class Layer: uint8_t {Invalid = 0, Terrain, Submerged, Objects, Highest};
 
 	constexpr auto LAYER_COUNT = static_cast<size_t>(Layer::Highest);
-	constexpr std::array<Layer, 4> mainLayers {Layer::Terrain, Layer::Submerged, Layer::Objects, Layer::Highest};
-	constexpr std::array<Layer, 4> allLayers  {Layer::Terrain, Layer::Submerged, Layer::Objects, Layer::Highest};
+	constexpr std::array<Layer, 4> mainLayers     {Layer::Terrain, Layer::Submerged, Layer::Objects, Layer::Highest};
+	constexpr std::array<Layer, 3> collidingLayers{                Layer::Submerged, Layer::Objects, Layer::Highest};
+	constexpr std::array<Layer, 4> allLayers      {Layer::Terrain, Layer::Submerged, Layer::Objects, Layer::Highest};
 
 	/** Zero-based. */
 	inline size_t getIndex(Layer layer) {
