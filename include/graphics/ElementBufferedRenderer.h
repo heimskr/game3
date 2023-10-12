@@ -18,8 +18,6 @@ namespace Game3 {
 
 	class ElementBufferedRenderer {
 		public:
-			constexpr static float TEXTURE_SCALE = 2.f;
-			constexpr static float TILE_TEXTURE_PADDING = 1.f / 2048.f;
 			int backbufferWidth = -1;
 			int backbufferHeight = -1;
 			std::atomic_bool isMissing = false;

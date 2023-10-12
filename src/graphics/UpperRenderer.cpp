@@ -23,6 +23,8 @@ namespace Game3 {
 	namespace {
 		const std::string & upperFrag() { static auto out = readFile("resources/upper.frag"); return out; }
 		const std::string & upperVert() { static auto out = readFile("resources/upper.vert"); return out; }
+		constexpr float TEXTURE_SCALE = 2.f;
+		constexpr float TILE_TEXTURE_PADDING = 1.f / 16384.f;
 	}
 
 	UpperRenderer::UpperRenderer() {}

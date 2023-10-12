@@ -24,6 +24,8 @@ namespace Game3 {
 		const std::string & blurFrag()     { static auto out = readFile("resources/blur.frag");     return out; }
 		const std::string & bufferedFrag() { static auto out = readFile("resources/buffered.frag"); return out; }
 		const std::string & bufferedVert() { static auto out = readFile("resources/buffered.vert"); return out; }
+		constexpr float TEXTURE_SCALE = 2.f;
+		constexpr float TILE_TEXTURE_PADDING = 1.f / 16384.f;
 	}
 
 	ElementBufferedRenderer::ElementBufferedRenderer():
