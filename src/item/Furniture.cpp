@@ -7,8 +7,14 @@
 #include "realm/Realm.h"
 
 namespace Game3 {
-	bool Furniture::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
+	bool Furniture::preCheck(const Place &place) const {
 		if (auto id = place.get(getLayer()); !id || *id != place.realm->getTileset().getEmptyID())
+			return false;
+		return true;
+	}
+
+	bool Furniture::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
+		if (!preCheck(place))
 			return false;
 
 		if (apply(place)) {
@@ -33,6 +39,10 @@ namespace Game3 {
 
 	std::shared_ptr<Furniture> Furniture::createCustom(ItemID id, std::string name, MoneyCount base_price, std::function<bool(const Place &)> placer) {
 		return std::make_shared<CustomFurniture>(std::move(id), std::move(name), base_price, std::move(placer));
+	}
+
+	std::shared_ptr<Furniture> Furniture::createTileEntity(ItemID id, std::string name, MoneyCount base_price, std::function<bool(const Place &)> placer) {
+		return std::make_shared<TileEntityFurniture>(std::move(id), std::move(name), base_price, std::move(placer));
 	}
 
 	SimpleFurniture::SimpleFurniture(ItemID id_, std::string name_, MoneyCount base_price, Layer layer_, Identifier tilename_):
@@ -76,5 +86,12 @@ namespace Game3 {
 
 	bool CustomFurniture::apply(const Place &place) {
 		return placer(place);
+	}
+
+	TileEntityFurniture::TileEntityFurniture(ItemID id_, std::string name_, MoneyCount base_price, std::function<bool(const Place &)> placer_):
+		CustomFurniture(std::move(id_), std::move(name_), base_price, std::move(placer_), Layer::Invalid) {}
+
+	bool TileEntityFurniture::preCheck(const Place &place) const {
+		return !place.realm->tileEntityAt(place.position);
 	}
 }

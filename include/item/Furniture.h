@@ -1,22 +1,31 @@
 #pragma once
 
+#include "Layer.h"
+#include "Types.h"
+#include "data/Identifier.h"
 #include "item/Item.h"
+#include "ui/Modifiers.h"
 
 #include <functional>
+#include <string>
+#include <utility>
 
 namespace Game3 {
-	struct AutotileSet;
 	class TileEntity;
+	struct AutotileSet;
+	struct Place;
 
 	struct Furniture: Item {
 		using Item::Item;
 		bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
+		virtual bool preCheck(const Place &) const;
 		virtual Layer getLayer() const = 0;
 		virtual bool apply(const Place &) = 0;
 
-		static std::shared_ptr<Furniture> createSimple(ItemID id_, std::string name_, MoneyCount base_price, Layer, Identifier tilename);
-		static std::shared_ptr<Furniture> createMarchable(ItemID id_, std::string name_, MoneyCount base_price, Layer, Identifier start, Identifier autotile);
-		static std::shared_ptr<Furniture> createCustom(ItemID id_, std::string name_, MoneyCount base_price, std::function<bool(const Place &)> placer);
+		static std::shared_ptr<Furniture> createSimple(ItemID id, std::string name, MoneyCount base_price, Layer, Identifier tilename);
+		static std::shared_ptr<Furniture> createMarchable(ItemID id, std::string name, MoneyCount base_price, Layer, Identifier start, Identifier autotile);
+		static std::shared_ptr<Furniture> createCustom(ItemID id, std::string name, MoneyCount base_price, std::function<bool(const Place &)> placer);
+		static std::shared_ptr<Furniture> createTileEntity(ItemID id, std::string name, MoneyCount base_price, std::function<bool(const Place &)> placer);
 	};
 
 	struct SimpleFurniture: Furniture {
@@ -50,8 +59,14 @@ namespace Game3 {
 			bool apply(const Place &) override;
 			Layer getLayer() const override { return layer; }
 
-		private:
+		protected:
 			std::function<bool(const Place &)> placer;
 			Layer layer;
+	};
+
+	class TileEntityFurniture: public CustomFurniture {
+		public:
+			TileEntityFurniture(ItemID, std::string name_, MoneyCount base_price, std::function<bool(const Place &)> placer_);
+			bool preCheck(const Place &) const override;
 	};
 }

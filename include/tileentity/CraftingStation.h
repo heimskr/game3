@@ -7,6 +7,7 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "te/crafting_station"}; }
 			Identifier stationType;
+			Identifier itemName;
 
 			CraftingStation(const CraftingStation &) = delete;
 			CraftingStation(CraftingStation &&) = default;
@@ -26,6 +27,6 @@ namespace Game3 {
 
 		protected:
 			CraftingStation() = default;
-			CraftingStation(Identifier, const Position &, Identifier station_type);
+			CraftingStation(Identifier, const Position &, Identifier station_type, Identifier item_name = {});
 	};
 }

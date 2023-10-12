@@ -27,6 +27,7 @@ namespace Game3 {
 		if (inventory)
 			json["inventory"] = dynamic_cast<ServerInventory &>(*inventory);
 		json["name"] = name;
+		json["itemName"] = itemName;
 	}
 
 	bool Chest::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
@@ -52,6 +53,7 @@ namespace Game3 {
 		if (json.contains("inventory"))
 			HasInventory::setInventory(std::make_shared<ServerInventory>(ServerInventory::fromJSON(game, json.at("inventory"), shared_from_this())));
 		name = json.at("name");
+		itemName = json.at("itemName");
 	}
 
 	void Chest::encode(Game &game, Buffer &buffer) {

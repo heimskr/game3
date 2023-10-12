@@ -130,6 +130,36 @@
 				"output": [["base:item/electric_guitar", 1]]
 			}],
 			["base:crafting_recipe", {
+				"input": [["base:item/stone", 8], ["base:item/iron_bar", 1]],
+				"output": [["base:item/sink", 1]]
+			}],
+			["base:crafting_recipe", {
+				"input": [["base:item/plank", 2]],
+				"output": [["base:item/cabinet", 1]]
+			}],
+			["base:crafting_recipe", {
+				"input": [["base:item/plank", 1], ["base:item/knife", 1]],
+				"output": [["base:item/cutting_board", 1]]
+			}],
+			["base:crafting_recipe", {
+				"input": [["base:item/wood", 1], ["base:item/iron_bar", 1]],
+				"output": [["base:item/knife", 1]]
+			}],
+			["base:crafting_recipe", {
+				"input": [["base:item/flour", 1]],
+				"output": [["base:item/dough", 1]],
+				"station": "base:station/sink"
+			}],
+			["base:crafting_recipe", {
+				"input": [["base:item/iron_bar", 10]],
+				"output": [["base:item/oven", 1]]
+			}],
+			["base:crafting_recipe", {
+				"input": [["base:item/dough", 1]],
+				"output": [["base:item/baguette", 1]],
+				"station": "base:station/oven"
+			}],
+			["base:crafting_recipe", {
 				"input":  [["base:item/electronics", 4], ["base:item/iron_bar", 8]],
 				"output": [["base:item/purifier", 1]],
 				"station": "base:station/anvil"
@@ -260,8 +290,9 @@
 				"output": [["base:item/floor", 2]]
 			}],
 			["base:crafting_recipe", {
-				"input":  [["base:item/baguette", 1], ["base:item/knife", 0]],
-				"output": [["base:item/bread", 2]]
+				"input":  [["base:item/baguette", 1]],
+				"output": [["base:item/bread", 2]],
+				"station": "base:station/cutting_board"
 			}],
 			["base:centrifuge_recipe", {
 				"input":  ["base:fluid/lava", 1],

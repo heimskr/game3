@@ -257,9 +257,10 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/grey_knight",     "Grey Knight",        10, 64));
 		add(std::make_shared<Item>("base:item/fire_opal",       "Fire Opal",          50, 64));
 		add(std::make_shared<Item>("base:item/flour",           "Flour",              10, 64));
+		add(std::make_shared<Item>("base:item/dough",           "Dough",              12, 64));
 		add(std::make_shared<Item>("base:item/baguette",        "Baguette",           12, 64));
 		add(std::make_shared<Item>("base:item/cheese",          "Cheese",              8, 64));
-		add(std::make_shared<Item>("base:item/knife",           "Knife",              25, 64));
+		add(std::make_shared<Item>("base:item/knife",           "Knife",              20, 64));
 		add(std::make_shared<Item>("base:item/bread",           "Bread",               6, 64));
 		add(std::make_shared<Item>("base:item/yeast",           "Yeast",               4, 64));
 		add(std::make_shared<Item>("base:item/clay",            "Clay",                2, 64));
@@ -316,36 +317,48 @@ namespace Game3 {
 		add(Furniture::createSimple("base:item/plant_pot2",       "Plant Pot",         32, Layer::Submerged, "base:tile/plant2"));
 		add(Furniture::createSimple("base:item/plant_pot3",       "Plant Pot",         32, Layer::Submerged, "base:tile/plant3"));
 		add(Furniture::createSimple("base:item/electric_guitar",  "Electric Guitar",  100, Layer::Objects,   "base:tile/electric_guitar"));
-		add(Furniture::createSimple("base:item/sink",             "Sink",              10, Layer::Highest,   "base:tile/sink"));
 		add(Furniture::createSimple("base:item/red_planter",      "Red Planter",        8, Layer::Highest,   "base:tile/red_planter"));
 		add(Furniture::createSimple("base:item/blue_planter",     "Blue Planter",       8, Layer::Highest,   "base:tile/blue_planter"));
+		add(Furniture::createSimple("base:item/cabinet",          "Cabinet",           10, Layer::Objects,   "base:tile/cabinet"));
 
 		add(Furniture::createMarchable("base:item/wooden_wall",     "Wooden Wall",      9, Layer::Objects, "base:tile/wooden_wall",     "base:autotile/wooden_walls"));
 		add(Furniture::createMarchable("base:item/tower",           "Tower",           10, Layer::Objects, "base:tile/tower",           "base:autotile/towers"));
 		add(Furniture::createMarchable("base:item/kitchen_counter", "Kitchen Counter", 10, Layer::Objects, "base:tile/kitchen_counter", "base:autotile/kitchen_counters"));
 		add(Furniture::createMarchable("base:item/dining_table",    "Dining Table",    10, Layer::Objects, "base:tile/dining_table",    "base:autotile/dining_tables"));
 
-		add(Furniture::createCustom("base:item/cauldron", "Cauldron", 175, [](const Place &place) -> bool {
-			return nullptr != TileEntity::spawn<CraftingStation>(place, "base:tile/red_cauldron_full", place.position, "base:station/cauldron");
+		add(Furniture::createTileEntity("base:item/cauldron", "Cauldron", 175, [](const Place &place) -> bool {
+			return nullptr != TileEntity::spawn<CraftingStation>(place, "base:tile/red_cauldron_full", place.position, "base:station/cauldron", "base:item/cauldron");
 		}));
 
-		add(Furniture::createCustom("base:item/purifier", "Purifier", 300, [](const Place &place) -> bool {
-			return nullptr != TileEntity::spawn<CraftingStation>(place, "base:tile/purifier", place.position, "base:station/purifier");
+		add(Furniture::createTileEntity("base:item/purifier", "Purifier", 300, [](const Place &place) -> bool {
+			return nullptr != TileEntity::spawn<CraftingStation>(place, "base:tile/purifier", place.position, "base:station/purifier", "base:item/purifier");
 		}));
 
-		add(Furniture::createCustom("base:item/millstone", "Millstone", 20, [](const Place &place) -> bool {
-			return nullptr != TileEntity::spawn<CraftingStation>(place, "base:tile/millstone", place.position, "base:station/millstone");
+		add(Furniture::createTileEntity("base:item/millstone", "Millstone", 20, [](const Place &place) -> bool {
+			return nullptr != TileEntity::spawn<CraftingStation>(place, "base:tile/millstone", place.position, "base:station/millstone", "base:item/millstone");
 		}));
 
-		add(Furniture::createCustom("base:item/chest", "Chest", 100, [](const Place &place) -> bool {
-			auto out = TileEntity::spawn<Chest>(place, "base:tile/chest", place.position, "Chest");
+		add(Furniture::createTileEntity("base:item/cutting_board", "Cutting Board", 30, [](const Place &place) -> bool {
+			return nullptr != TileEntity::spawn<CraftingStation>(place, "base:tile/cutting_board", place.position, "base:station/cutting_board", "base:item/cutting_board");
+		}));
+
+		add(Furniture::createTileEntity("base:item/sink", "Sink", 30, [](const Place &place) -> bool {
+			return nullptr != TileEntity::spawn<CraftingStation>(place, "base:tile/sink", place.position, "base:station/sink", "base:item/sink");
+		}));
+
+		add(Furniture::createTileEntity("base:item/oven", "Oven", 200, [](const Place &place) -> bool {
+			return nullptr != TileEntity::spawn<CraftingStation>(place, "base:tile/oven", place.position, "base:station/oven", "base:item/oven");
+		}));
+
+		add(Furniture::createTileEntity("base:item/chest", "Chest", 100, [](const Place &place) -> bool {
+			auto out = TileEntity::spawn<Chest>(place, "base:tile/chest", place.position, "Chest", "base:item/chest");
 			if (!out)
 				return false;
 			out->setInventory(30);
 			return true;
 		}));
 
-		add(Furniture::createCustom("base:item/fridge", "Fridge", 150, [](const Place &place) -> bool {
+		add(Furniture::createTileEntity("base:item/fridge", "Fridge", 150, [](const Place &place) -> bool {
 			auto out = TileEntity::spawn<Chest>(place, "base:tile/fridge", place.position, "Fridge", "base:item/fridge");
 			if (!out)
 				return false;
@@ -353,46 +366,16 @@ namespace Game3 {
 			return true;
 		}));
 
-		add(std::make_shared<Plantable>("base:item/flower1_red",    "Red Flower",    "base:tile/flower1_red",    "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_red"));
-		add(std::make_shared<Plantable>("base:item/flower1_orange", "Orange Flower", "base:tile/flower1_orange", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_orange"));
-		add(std::make_shared<Plantable>("base:item/flower1_yellow", "Yellow Flower", "base:tile/flower1_yellow", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_yellow"));
-		add(std::make_shared<Plantable>("base:item/flower1_green",  "Green Flower",  "base:tile/flower1_green",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_green"));
-		add(std::make_shared<Plantable>("base:item/flower1_blue",   "Blue Flower",   "base:tile/flower1_blue",   "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_blue"));
-		add(std::make_shared<Plantable>("base:item/flower1_purple", "Purple Flower", "base:tile/flower1_purple", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_purple"));
-		add(std::make_shared<Plantable>("base:item/flower1_white",  "White Flower",  "base:tile/flower1_white",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_white"));
-		add(std::make_shared<Plantable>("base:item/flower1_black",  "Black Flower",  "base:tile/flower1_black",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_black"));
-		add(std::make_shared<Plantable>("base:item/flower2_red",    "Red Flower",    "base:tile/flower2_red",    "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_red"));
-		add(std::make_shared<Plantable>("base:item/flower2_orange", "Orange Flower", "base:tile/flower2_orange", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_orange"));
-		add(std::make_shared<Plantable>("base:item/flower2_yellow", "Yellow Flower", "base:tile/flower2_yellow", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_yellow"));
-		add(std::make_shared<Plantable>("base:item/flower2_green",  "Green Flower",  "base:tile/flower2_green",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_green"));
-		add(std::make_shared<Plantable>("base:item/flower2_blue",   "Blue Flower",   "base:tile/flower2_blue",   "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_blue"));
-		add(std::make_shared<Plantable>("base:item/flower2_purple", "Purple Flower", "base:tile/flower2_purple", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_purple"));
-		add(std::make_shared<Plantable>("base:item/flower2_white",  "White Flower",  "base:tile/flower2_white",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_white"));
-		add(std::make_shared<Plantable>("base:item/flower2_black",  "Black Flower",  "base:tile/flower2_black",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_black"));
-		add(std::make_shared<Plantable>("base:item/flower3_red",    "Red Flower",    "base:tile/flower3_red",    "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_red"));
-		add(std::make_shared<Plantable>("base:item/flower3_orange", "Orange Flower", "base:tile/flower3_orange", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_orange"));
-		add(std::make_shared<Plantable>("base:item/flower3_yellow", "Yellow Flower", "base:tile/flower3_yellow", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_yellow"));
-		add(std::make_shared<Plantable>("base:item/flower3_green",  "Green Flower",  "base:tile/flower3_green",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_green"));
-		add(std::make_shared<Plantable>("base:item/flower3_blue",   "Blue Flower",   "base:tile/flower3_blue",   "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_blue"));
-		add(std::make_shared<Plantable>("base:item/flower3_purple", "Purple Flower", "base:tile/flower3_purple", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_purple"));
-		add(std::make_shared<Plantable>("base:item/flower3_white",  "White Flower",  "base:tile/flower3_white",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_white"));
-		add(std::make_shared<Plantable>("base:item/flower3_black",  "Black Flower",  "base:tile/flower3_black",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_black"));
-		add(std::make_shared<Plantable>("base:item/flower4_red",    "Red Flower",    "base:tile/flower4_red",    "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_red"));
-		add(std::make_shared<Plantable>("base:item/flower4_orange", "Orange Flower", "base:tile/flower4_orange", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_orange"));
-		add(std::make_shared<Plantable>("base:item/flower4_yellow", "Yellow Flower", "base:tile/flower4_yellow", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_yellow"));
-		add(std::make_shared<Plantable>("base:item/flower4_green",  "Green Flower",  "base:tile/flower4_green",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_green"));
-		add(std::make_shared<Plantable>("base:item/flower4_blue",   "Blue Flower",   "base:tile/flower4_blue",   "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_blue"));
-		add(std::make_shared<Plantable>("base:item/flower4_purple", "Purple Flower", "base:tile/flower4_purple", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_purple"));
-		add(std::make_shared<Plantable>("base:item/flower4_white",  "White Flower",  "base:tile/flower4_white",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_white"));
-		add(std::make_shared<Plantable>("base:item/flower4_black",  "Black Flower",  "base:tile/flower4_black",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_black"));
-		add(std::make_shared<Plantable>("base:item/flower5_red",    "Red Flower",    "base:tile/flower5_red",    "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_red"));
-		add(std::make_shared<Plantable>("base:item/flower5_orange", "Orange Flower", "base:tile/flower5_orange", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_orange"));
-		add(std::make_shared<Plantable>("base:item/flower5_yellow", "Yellow Flower", "base:tile/flower5_yellow", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_yellow"));
-		add(std::make_shared<Plantable>("base:item/flower5_green",  "Green Flower",  "base:tile/flower5_green",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_green"));
-		add(std::make_shared<Plantable>("base:item/flower5_blue",   "Blue Flower",   "base:tile/flower5_blue",   "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_blue"));
-		add(std::make_shared<Plantable>("base:item/flower5_purple", "Purple Flower", "base:tile/flower5_purple", "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_purple"));
-		add(std::make_shared<Plantable>("base:item/flower5_white",  "White Flower",  "base:tile/flower5_white",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_white"));
-		add(std::make_shared<Plantable>("base:item/flower5_black",  "Black Flower",  "base:tile/flower5_black",  "base:category/plant_soil", 10)->addAttribute("base:attribute/flower")->addAttribute("base:attribute/flower_black"));
+		for (int i = 1; i <= 5; ++i) {
+			for (const char *color: {"red", "orange", "yellow", "green", "blue", "purple", "white", "black"}) {
+				std::string name = std::string(color) + " Flower";
+				name[0] = std::toupper(name[0]);
+				std::string post = "flower" + std::to_string(i) + "_" + color;
+				add(std::make_shared<Plantable>(Identifier("base:item/" + post), std::move(name), Identifier("base:tile/" + post), "base:category/plant_soil", 10)
+					->addAttribute("base:attribute/flower")
+					->addAttribute(Identifier("base:attribute/flower_" + std::string(color))));
+			}
+		}
 
 		add(std::make_shared<VoidFlask>("base:item/void_flask", "Void Flask", 128, 1));
 
@@ -956,7 +939,7 @@ namespace Game3 {
 
 	std::shared_ptr<ClientGame> Game::toClientPointer() {
 		assert(getSide() == Side::Client);
-		return std::dynamic_pointer_cast<ClientGame>(shared_from_this());
+		return std::static_pointer_cast<ClientGame>(shared_from_this());
 	}
 
 	ServerGame & Game::toServer() {
@@ -969,7 +952,7 @@ namespace Game3 {
 
 	std::shared_ptr<ServerGame> Game::toServerPointer() {
 		assert(getSide() == Side::Server);
-		return std::dynamic_pointer_cast<ServerGame>(shared_from_this());
+		return std::static_pointer_cast<ServerGame>(shared_from_this());
 	}
 
 	void to_json(nlohmann::json &json, const Game &game) {
