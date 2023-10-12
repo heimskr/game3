@@ -134,7 +134,7 @@
 				"output": [["base:item/sink", 1]]
 			}],
 			["base:crafting_recipe", {
-				"input": [["base:item/plank", 2]],
+				"input": [["base:item/plank", 4]],
 				"output": [["base:item/cabinet", 1]]
 			}],
 			["base:crafting_recipe", {

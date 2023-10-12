@@ -319,7 +319,6 @@ namespace Game3 {
 		add(Furniture::createSimple("base:item/electric_guitar",  "Electric Guitar",  100, Layer::Objects,   "base:tile/electric_guitar"));
 		add(Furniture::createSimple("base:item/red_planter",      "Red Planter",        8, Layer::Highest,   "base:tile/red_planter"));
 		add(Furniture::createSimple("base:item/blue_planter",     "Blue Planter",       8, Layer::Highest,   "base:tile/blue_planter"));
-		add(Furniture::createSimple("base:item/cabinet",          "Cabinet",           10, Layer::Objects,   "base:tile/cabinet"));
 
 		add(Furniture::createMarchable("base:item/wooden_wall",     "Wooden Wall",      9, Layer::Objects, "base:tile/wooden_wall",     "base:autotile/wooden_walls"));
 		add(Furniture::createMarchable("base:item/tower",           "Tower",           10, Layer::Objects, "base:tile/tower",           "base:autotile/towers"));
@@ -363,6 +362,14 @@ namespace Game3 {
 			if (!out)
 				return false;
 			out->setInventory(30);
+			return true;
+		}));
+
+		add(Furniture::createTileEntity("base:item/cabinet", "Cabinet", 36, [](const Place &place) -> bool {
+			auto out = TileEntity::spawn<Chest>(place, "base:tile/cabinet", place.position, "Fridge", "base:item/cabinet");
+			if (!out)
+				return false;
+			out->setInventory(15);
 			return true;
 		}));
 
