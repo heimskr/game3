@@ -317,10 +317,13 @@ namespace Game3 {
 		add(Furniture::createSimple("base:item/plant_pot3",       "Plant Pot",         32, Layer::Submerged, "base:tile/plant3"));
 		add(Furniture::createSimple("base:item/electric_guitar",  "Electric Guitar",  100, Layer::Objects,   "base:tile/electric_guitar"));
 		add(Furniture::createSimple("base:item/sink",             "Sink",              10, Layer::Highest,   "base:tile/sink"));
+		add(Furniture::createSimple("base:item/red_planter",      "Red Planter",        8, Layer::Highest,   "base:tile/red_planter"));
+		add(Furniture::createSimple("base:item/blue_planter",     "Blue Planter",       8, Layer::Highest,   "base:tile/blue_planter"));
 
 		add(Furniture::createMarchable("base:item/wooden_wall",     "Wooden Wall",      9, Layer::Objects, "base:tile/wooden_wall",     "base:autotile/wooden_walls"));
 		add(Furniture::createMarchable("base:item/tower",           "Tower",           10, Layer::Objects, "base:tile/tower",           "base:autotile/towers"));
 		add(Furniture::createMarchable("base:item/kitchen_counter", "Kitchen Counter", 10, Layer::Objects, "base:tile/kitchen_counter", "base:autotile/kitchen_counters"));
+		add(Furniture::createMarchable("base:item/dining_table",    "Dining Table",    10, Layer::Objects, "base:tile/dining_table",    "base:autotile/dining_tables"));
 
 		add(Furniture::createCustom("base:item/cauldron", "Cauldron", 175, [](const Place &place) -> bool {
 			return nullptr != TileEntity::spawn<CraftingStation>(place, "base:tile/red_cauldron_full", place.position, "base:station/cauldron");
