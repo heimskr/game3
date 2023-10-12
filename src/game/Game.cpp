@@ -316,6 +316,7 @@ namespace Game3 {
 		add(Furniture::createSimple("base:item/plant_pot2",       "Plant Pot",         32, Layer::Submerged, "base:tile/plant2"));
 		add(Furniture::createSimple("base:item/plant_pot3",       "Plant Pot",         32, Layer::Submerged, "base:tile/plant3"));
 		add(Furniture::createSimple("base:item/electric_guitar",  "Electric Guitar",  100, Layer::Objects,   "base:tile/electric_guitar"));
+		add(Furniture::createSimple("base:item/sink",             "Sink",              10, Layer::Highest,   "base:tile/sink"));
 
 		add(Furniture::createMarchable("base:item/wooden_wall",     "Wooden Wall",      9, Layer::Objects, "base:tile/wooden_wall",     "base:autotile/wooden_walls"));
 		add(Furniture::createMarchable("base:item/tower",           "Tower",           10, Layer::Objects, "base:tile/tower",           "base:autotile/towers"));
