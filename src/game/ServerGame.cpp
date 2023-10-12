@@ -1,6 +1,8 @@
 #include "Log.h"
 #include "threading/ThreadContext.h"
+#include "entity/Animal.h"
 #include "entity/EntityFactory.h"
+#include "entity/ItemEntity.h"
 #include "entity/ServerPlayer.h"
 #include "game/ServerGame.h"
 #include "net/Server.h"
@@ -16,8 +18,11 @@
 #include "packet/TileEntityPacket.h"
 #include "packet/TileUpdatePacket.h"
 #include "packet/TimePacket.h"
+#include "util/Demangle.h"
 #include "util/Timer.h"
 #include "util/Util.h"
+
+#include <iomanip>
 
 namespace Game3 {
 	void ServerGame::addEntityFactories() {
@@ -556,6 +561,61 @@ namespace Game3 {
 						display_names.insert(iterated_player->displayName);
 				}
 				return {true, "Online players: " + join(display_names, ", ")};
+			}
+
+			if (first == "entities" || first == "ents") {
+				auto lock = allAgents.sharedLock();
+				std::vector<EntityPtr> entities;
+
+				auto has_arg = [&](const char *arg) {
+					for (const std::string_view &word: words)
+						if (word == arg)
+							return true;
+					return false;
+				};
+
+				const bool exclude_both    = has_arg("-ai");
+				const bool exclude_animals = exclude_both || has_arg("-a");
+				const bool exclude_items   = exclude_both || has_arg("-i");
+
+				for (const auto &[gid, weak_agent]: allAgents) {
+					if (AgentPtr agent = weak_agent.lock()) {
+						if (GlobalID agent_gid = agent->getGID(); gid != agent_gid)
+							WARN("Agent " << agent_gid << " is stored in allAgents with key " << gid);
+						if (auto entity = std::dynamic_pointer_cast<Entity>(agent))
+							if (!exclude_animals || !std::dynamic_pointer_cast<Animal>(entity))
+								if (!exclude_items || !std::dynamic_pointer_cast<ItemEntity>(entity))
+									entities.push_back(entity);
+					}
+				}
+
+				std::sort(entities.begin(), entities.end(), [](const EntityPtr &left, const EntityPtr &right) {
+					const std::string left_demangled  = DEMANGLE(*left);
+					const std::string right_demangled = DEMANGLE(*right);
+					if (left_demangled < right_demangled)
+						return true;
+					if (left_demangled > right_demangled)
+						return false;
+
+
+					const std::string left_name  = left->getName();
+					const std::string right_name = right->getName();
+					if (left_name < right_name)
+						return true;
+					if (left_name > right_name)
+						return false;
+
+					return left->getGID() < right->getGID();
+				});
+
+				for (const EntityPtr &entity: entities) {
+					Entity &entity_ref = *entity;
+					INFO((entity->isPlayer()? "\e[1m(" + std::dynamic_pointer_cast<Player>(entity)->username + ") \e[22;2m" : "\e[2m") << std::setw(20) << std::right
+						<< entity->getGID() << "\e[22m  " << DEMANGLE(entity_ref) << "  \e[32m" << entity->getName() << "\e[39m  Realm \e[31m" << entity->getRealm()->id
+						<< "\e[39m  Position \e[33m" << entity->getPosition() << "\e[39m");
+				}
+
+				return {true, ""};
 			}
 
 		} catch (const std::exception &err) {

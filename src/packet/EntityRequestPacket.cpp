@@ -76,7 +76,7 @@ namespace Game3 {
 					// The condition here is to handle an edge case (likely a bug elsewhere) in which the entity is
 					// missing from Realm::entitiesByGID but still exists in the realm somehow. I encountered the bug
 					// by teleporting around a lot.
-					INFO("Telling client to destroy entity " << entity_id);
+					INFO("Telling player " << client.getPlayer()->username << " to destroy entity " << entity_id);
 					client.send(DestroyEntityPacket(entity_id, realm->id));
 				}
 			}
