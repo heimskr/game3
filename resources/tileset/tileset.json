@@ -11,6 +11,7 @@
 		"base:autotile/towers":            "base:tile/tower",
 		"base:autotile/wooden_walls":      "base:tile/wooden_wall",
 		"base:autotile/town_dirt":         "base:tile/town_dirt",
-		"base:autotile/stone":             "base:tile/stone"
+		"base:autotile/stone":             "base:tile/stone",
+		"base:autotile/kitchen_counters":  "base:tile/kitchen_counter"
 	}
 }

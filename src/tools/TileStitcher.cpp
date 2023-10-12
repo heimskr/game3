@@ -27,8 +27,9 @@ namespace Game3 {
 			dirs.insert(entry);
 
 		std::unordered_map<std::string, nlohmann::json> json_map;
-		std::set<std::string> autotiles;
+		std::set<std::string> short_autotiles;
 		std::set<std::string> non_autotiles;
+		std::set<std::string> tall_autotiles;
 		std::unordered_map<std::string, std::unique_ptr<uint8_t[], FreeDeleter>> images;
 
 		Tileset out(tileset_name);
@@ -98,8 +99,8 @@ namespace Game3 {
 			int desired_dimension = 16;
 
 			if (auto autotile_iter = out.autotileSetMap.find(tilename); autotile_iter != out.autotileSetMap.end()) {
-				autotiles.insert(name);
-				out.marchableMap[tilename] = MarchableInfo{tilename, autotile_iter->second};
+				short_autotiles.insert(name);
+				out.marchableMap[tilename] = MarchableInfo{tilename, autotile_iter->second, false};
 				desired_dimension = 64;
 			} else
 				non_autotiles.insert(name);
@@ -115,6 +116,10 @@ namespace Game3 {
 
 			if (desired_dimension == 16 && width == 16 && height == 32) {
 				is_tall.insert(std::move(name));
+			} else if (desired_dimension == 64 && width == 64 && height == 128) {
+				short_autotiles.erase(name); // lazy tbh
+				tall_autotiles.insert(std::move(name));
+				out.marchableMap[tilename].tall = true;
 			} else {
 				if (width != desired_dimension)
 					throw std::runtime_error("Invalid width for " + name + ": " + std::to_string(width) + " (expected " + std::to_string(desired_dimension) + ')');
@@ -124,21 +129,24 @@ namespace Game3 {
 			}
 		}
 
-		// We want to represent the 4x4 autotile sets as 16 wide, 1 tall lines of tiles.
+		// We want to represent the 4x8 autotile sets as 32 wide, 1 tall lines of tiles.
 		// We then want to distribute those lines into a square whose dimension is a power of two,
-		// but no larger than necessary to store all the lines plus all the remaining single tiles.
-		const size_t single_tile_count = json_map.size() - autotiles.size();
+		// but no larger than necessary to store all the lines plus all the remaining 4x4 autotile
+		// sets (which will be 16 wide, 1 tall lines of tiles) and single tiles.
+		const size_t autotile_4x8_count = tall_autotiles.size();
+		const size_t autotile_4x4_count = short_autotiles.size();
+		const size_t single_tile_count  = json_map.size() - autotile_4x8_count - autotile_4x4_count;
 		// For the sake of calculation, we can pretend that the tiles not part of autotile sets are
 		// arranged into lines just like the autotile sets. We add one because the top left tile of
 		// the tileset has to be empty.
-		const size_t effective_autotile_sets = 1 + autotiles.size() + updiv(single_tile_count + is_tall.size(), 16);
-		// If the effective number of lines is no more than 16, then the square will be 16x16 tiles.
-		size_t dimension = 16;
+		const size_t effective_4x8_autotile_sets = 1 + autotile_4x8_count + updiv(autotile_4x4_count, 2) + updiv(single_tile_count + is_tall.size(), 32);
+		// If the effective number of lines is no more than 32, then the square will be 32x32 tiles.
+		size_t dimension = 32;
 		// Otherwise, we need to take the square root of the effective number of lines and round it
 		// up to the nearest power of two. This will get us the final side length of the omnisquare
 		// in tiles.
-		if (16 < effective_autotile_sets)
-			dimension = size_t(std::pow(2, std::ceil(std::log2(std::ceil(std::sqrt(16 * effective_autotile_sets))))));
+		if (32 < effective_4x8_autotile_sets)
+			dimension = size_t(std::pow(2, std::ceil(std::log2(std::ceil(std::sqrt(32 * effective_4x8_autotile_sets))))));
 		// Each tile is 16 pixels by 16 pixels.
 		dimension *= tilesize;
 
@@ -146,12 +154,12 @@ namespace Game3 {
 		auto raw = std::make_unique<uint8_t[]>(raw_byte_count); // 4 channels: RGBA
 
 		// In pixels.
-		size_t x_index = 256;
+		size_t x_index = 512;
 		size_t y_index = 0;
 
-		size_t tile_index = 16;
+		size_t tile_index = 32;
 
-		if (dimension == 16) {
+		if (dimension == 512) {
 			x_index = 0;
 			y_index = 16;
 		}
@@ -166,10 +174,42 @@ namespace Game3 {
 			}
 		};
 
-		for (const auto &name: autotiles) {
+		for (const std::string &name: tall_autotiles) {
 			hasher += json_map.at(name).dump();
-
 			const auto &source = images.at(name);
+
+			for (size_t row = 0; row < 4; ++row) {
+				for (size_t column = 0; column < 4; ++column) {
+					for (size_t y = 0; y < tilesize; ++y) {
+						for (size_t x = 0; x < tilesize; ++x) {
+							const size_t source_x = tilesize * column + x;
+							const size_t destination_y = y + y_index;
+							size_t source_y = tilesize * (2 * row) + y;
+							size_t destination_x = (8 * row + 2 * column + 1) * tilesize + x + x_index;
+							std::memcpy(&raw[4 * (destination_x + destination_y * dimension)], &source[4 * (source_x + 4 * tilesize * source_y)], 4 * sizeof(uint8_t));
+							source_y += tilesize;
+							destination_x -= tilesize;
+							std::memcpy(&raw[4 * (destination_x + destination_y * dimension)], &source[4 * (source_x + 4 * tilesize * source_y)], 4 * sizeof(uint8_t));
+						}
+					}
+				}
+			}
+
+			Identifier tilename = json_map.at(name).at("tilename");
+			out.ids[tilename] = tile_index;
+			for (size_t tile_offset = 0; tile_offset < 4 * 8; ++tile_offset) {
+				if (tile_offset % 2 == 0)
+					out.uppers[tile_index + tile_offset] = tile_index + tile_offset + 1;
+				out.names[tile_index + tile_offset] = tilename;
+			}
+
+			next(4 * 8 * tilesize);
+		}
+
+		for (const std::string &name: short_autotiles) {
+			hasher += json_map.at(name).dump();
+			const auto &source = images.at(name);
+
 			for (size_t row = 0; row < 4; ++row) {
 				for (size_t column = 0; column < 4; ++column) {
 					for (size_t y = 0; y < tilesize; ++y) {
@@ -186,13 +226,13 @@ namespace Game3 {
 
 			Identifier tilename = json_map.at(name).at("tilename");
 			out.ids[tilename] = tile_index;
-			for (size_t tile_offset = 0; tile_offset < 16; ++tile_offset)
+			for (size_t tile_offset = 0; tile_offset < 4 * 4; ++tile_offset)
 				out.names[tile_index + tile_offset] = tilename;
 
-			next(16 * tilesize);
+			next(4 * 4 * tilesize);
 		}
 
-		for (const auto &name: non_autotiles) {
+		for (const std::string &name: non_autotiles) {
 			hasher += json_map.at(name).dump();
 
 			const auto &source = images.at(name);
@@ -229,10 +269,13 @@ namespace Game3 {
 		out.names[0] = "base:tile/empty";
 
 		if (png_out != nullptr) {
-			for (const auto &name: autotiles)
+			for (const std::string &name: tall_autotiles)
 				INFO(name << " → " << out.ids[json_map.at(name)["tilename"]]);
 
-			for (const auto &name: non_autotiles)
+			for (const std::string &name: short_autotiles)
+				INFO(name << " → " << out.ids[json_map.at(name)["tilename"]]);
+
+			for (const std::string &name: non_autotiles)
 				INFO(name << " → " << out.ids[json_map.at(name)["tilename"]]);
 
 			std::stringstream ss;

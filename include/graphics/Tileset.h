@@ -28,10 +28,11 @@ namespace Game3 {
 		Identifier start;
 		/** The set of possible neighbors. */
 		std::shared_ptr<AutotileSet> autotileSet;
+		bool tall = false;
 
 		MarchableInfo() = default;
-		MarchableInfo(Identifier start_, std::shared_ptr<AutotileSet> autotile_set):
-			start(std::move(start_)), autotileSet(std::move(autotile_set)) {}
+		MarchableInfo(Identifier start_, std::shared_ptr<AutotileSet> autotile_set, bool tall_):
+			start(std::move(start_)), autotileSet(std::move(autotile_set)), tall(tall_) {}
 	};
 
 	class Tileset: public NamedRegisterable {

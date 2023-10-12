@@ -1182,7 +1182,7 @@ namespace Game3 {
 				return members.contains(tileset[march_tile]);
 			});
 
-			const TileID marched = tileset[info->start] + march_result;
+			const TileID marched = tileset[info->start] + (info->tall? 2 * march_result : march_result);
 
 			if (marched != tile) {
 				setTile(layer, position, marched, true);
