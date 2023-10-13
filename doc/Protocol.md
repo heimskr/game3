@@ -20,6 +20,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 3. **Chunk Request**: asks the server to send Chunk Tiles packets for a given list of chunks.
 
 	- `i32` Realm ID
+	- `bool` Generate missing chunks
 	- `list<u32, 4n>` Chunk positions
 
 	The chunk positions will be sent as sequential `(u32(x), u32(y), low32(threshold), high32(threshold))` tuples. Probably best to see the implementation in src/packets/ChunkRequestPacket.cpp.

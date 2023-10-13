@@ -6,8 +6,9 @@
 #include "packet/PacketError.h"
 
 namespace Game3 {
-	ChunkRequestPacket::ChunkRequestPacket(Realm &realm, const std::set<ChunkPosition> &positions, bool no_threshold):
-	realmID(realm.id) {
+	ChunkRequestPacket::ChunkRequestPacket(Realm &realm, const std::set<ChunkPosition> &positions, bool no_threshold, bool generate_missing):
+	realmID(realm.id),
+	generateMissing(generate_missing) {
 		for (const auto chunk_position: positions)
 			requests.emplace(chunk_position, no_threshold? 0 : (realm.tileProvider.getUpdateCounter(chunk_position) + 1));
 	}
@@ -23,13 +24,13 @@ namespace Game3 {
 			data.push_back((counter >> 32) & 0xffffffff);
 		}
 
-		buffer << realmID << data;
+		buffer << realmID << generateMissing << data;
 	}
 
 	void ChunkRequestPacket::decode(Game &, Buffer &buffer) {
 		std::vector<uint32_t> data;
 
-		buffer >> realmID >> data;
+		buffer >> realmID >> generateMissing >> data;
 
 		if (data.empty())
 			throw PacketError("Empty ChunkRequestPacket");
@@ -50,7 +51,16 @@ namespace Game3 {
 	}
 
 	void ChunkRequestPacket::handle(ServerGame &game, RemoteClient &client) {
-		for (const auto &request: requests)
-			client.sendChunk(*game.getRealm(realmID), request.position, true, request.counterThreshold);
+		if (generateMissing) {
+			for (const ChunkRequest &request: requests)
+				client.sendChunk(*game.getRealm(realmID), request.position, true, request.counterThreshold);
+			return;
+		}
+
+		for (const ChunkRequest &request: requests) {
+			try {
+				client.sendChunk(*game.getRealm(realmID), request.position, false, request.counterThreshold);
+			} catch (const std::out_of_range &) {}
+		}
 	}
 }
