@@ -42,7 +42,7 @@ namespace Game3 {
 		}
 
 		if (errc) {
-			ERROR("Client write: " << errc.message() << " (" << errc.value() << ')');
+			ERROR("Client write (" << ip << "): " << errc.message() << " (" << errc.value() << ')');
 			return;
 		}
 
@@ -53,7 +53,7 @@ namespace Game3 {
 	void GenericClient::doHandshake() {
 		socket.async_handshake(asio::ssl::stream_base::server, [this](const asio::error_code &errc) {
 			if (errc) {
-				ERROR("Client handshake: " << errc.message());
+				ERROR("Client handshake (" << ip << "): " << errc.message());
 				return;
 			}
 
@@ -67,7 +67,7 @@ namespace Game3 {
 			socket.async_read_some(asio::buffer(buffer.get(), bufferSize), asio::bind_executor(strand, [this](const asio::error_code &errc, size_t length) {
 				if (errc) {
 					if (errc.value() != 1) // "stream truncated"
-						ERROR("Client read: " << errc.message() << " (" << errc << ')');
+						ERROR("Client read (" << ip << "): " << errc.message() << " (" << errc << ')');
 					removeSelf();
 					return;
 				}
