@@ -121,6 +121,7 @@
 #include "registry/Registries.h"
 #include "tile/CaveTile.h"
 #include "tile/CropTile.h"
+#include "tile/DirtTile.h"
 #include "tile/FarmlandTile.h"
 #include "tile/ForestFloorTile.h"
 #include "tile/GrassTile.h"
@@ -531,6 +532,7 @@ namespace Game3 {
 	void Game::addTiles() {
 		auto &reg = registry<TileRegistry>();
 
+		reg.add<DirtTile>();
 		reg.add<FarmlandTile>();
 		reg.add<ForestFloorTile>();
 		reg.addMineable("base:tile/stone", ItemStack(*this, "base:item/stone"), true);

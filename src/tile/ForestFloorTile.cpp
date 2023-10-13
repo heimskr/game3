@@ -11,8 +11,8 @@ namespace Game3 {
 		Tile(ID()) {}
 
 	void ForestFloorTile::randomTick(const Place &place) {
-		auto &realm = *place.realm;
-		auto &game = realm.getGame();
+		Realm &realm = *place.realm;
+		Game &game = realm.getGame();
 
 		std::uniform_int_distribution distribution{0, 99};
 		if (distribution(threadContext.rng) != 0)
