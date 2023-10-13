@@ -153,7 +153,7 @@ namespace Game3::WorldGen {
 			constexpr static double extra_zoom = 6.66;
 			const double lava_noise = std::abs(perlin.GetValue(row / (extra_zoom * noise_zoom), column / (extra_zoom * noise_zoom), 1474.));
 			if (lava_noise < 0.0666)
-				realm->setFluid({row, column}, "base:fluid/lava", lava_noise < 0.04? FluidTile::FULL : FluidTile::FULL * std::cos(9001. * (lava_noise - 0.04)), true);
+				realm->setFluid({row, column}, "base:fluid/lava", FluidTile::FULL, true);
 
 			return true;
 		}
