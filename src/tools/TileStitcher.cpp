@@ -48,7 +48,8 @@ namespace Game3 {
 
 			const Identifier tilename = json.at("tilename");
 
-			out.inverseCategories[tilename] = {};
+			out.inverseCategories[tilename] = {"base:category/all_tiles"};
+			out.categories["base:category/all_tiles"].insert(tilename);
 
 			if (auto categories = json.find("categories"); categories != json.end()) {
 				for (const nlohmann::json &category_json: *categories) {
@@ -72,7 +73,7 @@ namespace Game3 {
 					const Identifier autotile_id{autotile};
 					const Identifier member_id{member.get<std::string>()};
 					if (const std::string path_start = member_id.getPathStart(); path_start == "category") {
-						for (const auto &tilename: out.getTilesByCategory(member_id))
+						for (const Identifier &tilename: out.getTilesByCategory(member_id))
 							out.setAutotile(tilename, autotile_id);
 					} else if (path_start == "tile") {
 						out.setAutotile(member_id, autotile_id);
@@ -81,6 +82,12 @@ namespace Game3 {
 					}
 				}
 			}
+
+			// Some tiles, such as fences, want to autotile with most tiles.
+			// The "omnitiles" member is a set of such autotiles.
+			if (auto omnitiles_iter = tileset_meta.find("omnitiles"); omnitiles_iter != tileset_meta.end())
+				for (const auto &omnitile: *omnitiles_iter)
+					out.autotileSets.at(omnitile.get<Identifier>())->omni = true;
 
 			if (auto stacks = tileset_meta.find("stacks"); stacks != tileset_meta.end())
 				for (const auto &[category, stack]: stacks->items())

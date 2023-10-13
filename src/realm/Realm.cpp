@@ -1176,11 +1176,26 @@ namespace Game3 {
 		if (const MarchableInfo *info = tileset.getMarchableInfo(tilename)) {
 			const auto &members = info->autotileSet->members;
 
-			const TileID march_result = march4([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
-				const Position march_position = position + Position(march_row_offset, march_column_offset);
-				const TileID march_tile = tileProvider.copyTile(layer, march_position, TileProvider::TileMode::ReturnEmpty);
-				return members.contains(tileset[march_tile]);
-			});
+			TileID march_result;
+
+			if (info->autotileSet->omni) {
+				const TileID empty = tileset.getEmptyID();
+				march_result = march4([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
+					const Position march_position = position + Position(march_row_offset, march_column_offset);
+					for (const Layer omni_layer: {Layer::Submerged, Layer::Objects}) {
+						const TileID march_tile = tileProvider.copyTile(omni_layer, march_position, TileProvider::TileMode::ReturnEmpty);
+						if (march_tile != empty && !tileset.isInCategory(march_tile, "base:category/no_omni"))
+							return true;
+					}
+					return false;
+				});
+			} else {
+				march_result = march4([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
+					const Position march_position = position + Position(march_row_offset, march_column_offset);
+					const TileID march_tile = tileProvider.copyTile(layer, march_position, TileProvider::TileMode::ReturnEmpty);
+					return members.contains(tileset[march_tile]);
+				});
+			}
 
 			const TileID marched = tileset[info->start] + (info->tall? 2 * march_result : march_result);
 

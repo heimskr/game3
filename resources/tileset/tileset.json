@@ -13,6 +13,10 @@
 		"base:autotile/town_dirt":         "base:tile/town_dirt",
 		"base:autotile/stone":             "base:tile/stone",
 		"base:autotile/kitchen_counters":  "base:tile/kitchen_counter",
-		"base:autotile/dining_tables":     "base:tile/dining_table"
-	}
+		"base:autotile/dining_tables":     "base:tile/dining_table",
+		"base:autotile/fences":            "base:tile/fence"
+	},
+	"omnitiles": [
+		"base:autotile/fences"
+	]
 }

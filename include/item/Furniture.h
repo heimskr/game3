@@ -15,17 +15,21 @@ namespace Game3 {
 	struct AutotileSet;
 	struct Place;
 
-	struct Furniture: Item {
-		using Item::Item;
-		bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
-		virtual bool preCheck(const Place &) const;
-		virtual Layer getLayer() const = 0;
-		virtual bool apply(const Place &) = 0;
+	class Furniture: public Item {
+		public:
+			using Item::Item;
 
-		static std::shared_ptr<Furniture> createSimple(ItemID id, std::string name, MoneyCount base_price, Layer, Identifier tilename);
-		static std::shared_ptr<Furniture> createMarchable(ItemID id, std::string name, MoneyCount base_price, Layer, Identifier start, Identifier autotile);
-		static std::shared_ptr<Furniture> createCustom(ItemID id, std::string name, MoneyCount base_price, std::function<bool(const Place &)> placer);
-		static std::shared_ptr<Furniture> createTileEntity(ItemID id, std::string name, MoneyCount base_price, std::function<bool(const Place &)> placer);
+			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
+			bool drag(Slot, ItemStack &, const Place &, Modifiers) override;
+
+			virtual bool preCheck(const Place &) const;
+			virtual Layer getLayer() const = 0;
+			virtual bool apply(const Place &) = 0;
+
+			static std::shared_ptr<Furniture> createSimple(ItemID id, std::string name, MoneyCount base_price, Layer, Identifier tilename);
+			static std::shared_ptr<Furniture> createMarchable(ItemID id, std::string name, MoneyCount base_price, Layer, Identifier start, Identifier autotile);
+			static std::shared_ptr<Furniture> createCustom(ItemID id, std::string name, MoneyCount base_price, std::function<bool(const Place &)> placer);
+			static std::shared_ptr<Furniture> createTileEntity(ItemID id, std::string name, MoneyCount base_price, std::function<bool(const Place &)> placer);
 	};
 
 	struct SimpleFurniture: Furniture {

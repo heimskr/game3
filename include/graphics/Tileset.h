@@ -21,6 +21,7 @@ namespace Game3 {
 	struct AutotileSet {
 		Identifier identifier;
 		std::unordered_set<Identifier> members;
+		bool omni = false;
 	};
 
 	struct MarchableInfo {

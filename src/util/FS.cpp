@@ -12,6 +12,8 @@ namespace Game3 {
 #endif
 
 	std::string readFile(const std::filesystem::path &path) {
+		if (std::filesystem::is_directory(path))
+			throw std::runtime_error("Can't read directory");
 		std::ifstream stream;
 		stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 		stream.open(path);

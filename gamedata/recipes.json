@@ -138,6 +138,10 @@
 				"output": [["base:item/cabinet", 1]]
 			}],
 			["base:crafting_recipe", {
+				"input": [["base:item/plank", 2]],
+				"output": [["base:item/fence", 1]]
+			}],
+			["base:crafting_recipe", {
 				"input": [["base:item/plank", 1], ["base:item/knife", 1]],
 				"output": [["base:item/cutting_board", 1]]
 			}],

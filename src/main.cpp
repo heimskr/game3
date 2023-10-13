@@ -25,6 +25,7 @@
 namespace Game3 {
 	void test();
 	void splitter();
+	void omniOptOut();
 }
 
 int main(int argc, char **argv) {
@@ -121,6 +122,11 @@ int main(int argc, char **argv) {
 				std::cout << std::endl;
 			}
 
+			return 0;
+		}
+
+		if (strcmp(argv[1], "--omni-opt-out") == 0) {
+			Game3::omniOptOut();
 			return 0;
 		}
 

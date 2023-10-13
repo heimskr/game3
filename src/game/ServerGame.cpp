@@ -625,6 +625,7 @@ namespace Game3 {
 				for (const Layer layer: allLayers)
 					if (auto tile = realm.tryTile(layer, player->position))
 						INFO(getIndex(layer) << " \e[2m→\e[22m " << *tile << " \e[2m/\e[22m " << tileset[*tile]);
+				return {true, ""};
 			}
 
 		} catch (const std::exception &err) {

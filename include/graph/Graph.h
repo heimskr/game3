@@ -3,6 +3,7 @@
 #include "graph/UncolorableError.h"
 
 #include <cassert>
+#include <fstream>
 #include <functional>
 #include <list>
 #include <vector>
