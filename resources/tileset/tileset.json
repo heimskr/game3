@@ -14,7 +14,8 @@
 		"base:autotile/stone":             "base:tile/stone",
 		"base:autotile/kitchen_counters":  "base:tile/kitchen_counter",
 		"base:autotile/dining_tables":     "base:tile/dining_table",
-		"base:autotile/fences":            "base:tile/fence"
+		"base:autotile/fences":            "base:tile/fence",
+		"base:autotile/carpets":           "base:category/autotiled_carpets"
 	},
 	"omnitiles": [
 		"base:autotile/fences"
