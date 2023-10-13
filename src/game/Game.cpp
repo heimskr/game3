@@ -219,7 +219,6 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/dirt",            "Dirt",                1, 64));
 		add(std::make_shared<Item>("base:item/brick",           "Brick",               3, 64));
 		add(std::make_shared<Item>("base:item/pot",             "Pot",                24, 64));
-		add(std::make_shared<Item>("base:item/honey",           "Honey",               5, 64));
 		add(std::make_shared<Item>("base:item/ash",             "Ash",                 1, 64));
 		add(std::make_shared<Item>("base:item/silicon",         "Silicon",             2, 64));
 		add(std::make_shared<Item>("base:item/electronics",     "Electronics",        32, 64));
@@ -393,6 +392,7 @@ namespace Game3 {
 		add(std::make_shared<FilledFlask>("base:item/lava_flask",  "Lava Flask",  4, "base:fluid/lava"));
 		add(std::make_shared<FilledFlask>("base:item/milk_flask",  "Milk Flask",  4, "base:fluid/milk"));
 		add(std::make_shared<FilledFlask>("base:item/brine_flask", "Brine Flask", 4, "base:fluid/brine"));
+		add(std::make_shared<FilledFlask>("base:item/honey",       "Honey",       5, "base:fluid/honey"));
 
 		add(std::make_shared<VoidPickaxe>("base:item/void_pickaxe",    "Void Pickaxe",    1000,  0.f,  -1, "base:attribute/void_pickaxe"));
 

@@ -34,6 +34,12 @@
 				"tileset":  "base:tileset/monomap",
 				"tilename": "base:tile/brine",
 				"flask":    "base:item/brine_flask"
+			}],
+			["base:fluid/honey", {
+				"name":     "Honey",
+				"tileset":  "base:tileset/monomap",
+				"tilename": "base:tile/honey",
+				"flask":    "base:item/honey"
 			}]
 		]]
 	]
