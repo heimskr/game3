@@ -86,7 +86,6 @@ namespace Game3 {
 	void Grassland::postgen(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &perlin, const WorldGenParams &params) {
 		Realm &realm = *getRealm();
 		constexpr double factor = 10;
-		static std::uniform_int_distribution distribution(0, 99);
 
 		if (params.antiforestThreshold > perlin.GetValue(row / Biome::NOISE_ZOOM * factor, column / Biome::NOISE_ZOOM * factor, 0.))
 			if (auto tile = realm.tryTile(Layer::Submerged, {row, column}); tile && trees.contains(realm.getTileset()[*tile]))
@@ -96,7 +95,7 @@ namespace Game3 {
 		const auto tile1 = tileset[realm.getTile(Layer::Terrain, {row, column})];
 
 		if (grassSet.contains(tile1) && realm.middleEmpty({row, column})) {
-			if (distribution(rng) < 2)
+			if (std::uniform_int_distribution(0, 99)(rng) < 2)
 				realm.setTile(Layer::Submerged, {row, column}, choose(tileset.getCategoryIDs("base:category/flowers"), rng), false);
 
 			std::shared_ptr<Animal> animal;
