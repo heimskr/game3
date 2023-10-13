@@ -19,5 +19,6 @@ namespace Game3 {
 
 		private:
 			std::shared_ptr<noise::module::Perlin> forestPerlin;
+			FluidID water = -1;
 	};
 }

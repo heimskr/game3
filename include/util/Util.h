@@ -19,6 +19,7 @@
 #include <span>
 #include <sstream>
 #include <stdexcept>
+#include <string>
 #include <unordered_set>
 #include <vector>
 
@@ -300,6 +301,18 @@ namespace Game3 {
 			so_far += weight;
 		}
 		throw std::logic_error("Unable to select item from map of weights");
+	}
+
+	template <typename O, typename I>
+	O safeCast(I input) {
+		if (static_cast<I>(std::numeric_limits<O>::max()) < input)
+			throw std::invalid_argument("Input number too high: " + std::to_string(input) + " > " + std::to_string(static_cast<I>(std::numeric_limits<O>::max())));
+
+		if constexpr (std::is_signed_v<I> && std::is_signed_v<O>)
+			if (static_cast<I>(std::numeric_limits<O>::min()) > input)
+				throw std::invalid_argument("Input number too low");
+
+		return static_cast<O>(input);
 	}
 
 	struct FreeDeleter {

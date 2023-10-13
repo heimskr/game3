@@ -1,4 +1,5 @@
 #include "util/Lz.h"
+#include "util/Util.h"
 
 #include <limits>
 #include <memory>
@@ -7,19 +8,7 @@
 #include <lz4.h>
 
 namespace LZ4 {
-	namespace {
-		template <typename O, typename I>
-		O safeCast(I input) {
-			if (static_cast<I>(std::numeric_limits<O>::max()) < input)
-				throw std::invalid_argument("Input number too high: " + std::to_string(input) + " > " + std::to_string(static_cast<I>(std::numeric_limits<O>::max())));
-
-			if constexpr (std::is_signed_v<I> && std::is_signed_v<O>)
-				if (static_cast<I>(std::numeric_limits<O>::min()) > input)
-					throw std::invalid_argument("Input number too low");
-
-			return static_cast<O>(input);
-		}
-	}
+	using Game3::safeCast;
 
 	std::vector<uint8_t> compress(std::span<const uint8_t> input) {
 		if (static_cast<size_t>(std::numeric_limits<int>::max()) < input.size_bytes())

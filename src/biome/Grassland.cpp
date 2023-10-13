@@ -32,6 +32,32 @@ namespace Game3 {
 		};
 
 		const std::unordered_set<Identifier> grassSet{grasses.begin(), grasses.end()};
+
+		/** Tries to generate a lilypad starting with the given location as the top left corner. */
+		bool generateLilypad(const Place &place, bool flowerful) {
+			Realm &realm = *place.realm;
+			Tileset &tileset = realm.getTileset();
+
+			constexpr static Layer layer = Layer::Objects;
+			const TileID empty = tileset.getEmptyID();
+			const FluidID water = safeCast<FluidID>(realm.getGame().registry<FluidRegistry>().at("base:fluid/water")->registryID);
+
+			for (Index y_offset = 0; y_offset <= 1; ++y_offset) {
+				for (Index x_offset = 0; x_offset <= 1; ++x_offset) {
+					Position position = place.position + Position{y_offset, x_offset};
+					if (auto fluid = realm.tryFluid(position); !fluid || fluid->id != water)
+						return false;
+					if (auto tile = realm.tryTile(layer, position); !tile || tile != empty)
+						return false;
+				}
+			}
+
+			realm.setTile(layer, place.position, flowerful? "base:tile/lilypad_flowerful_nw" : "base:tile/lilypad_flowerless_nw");
+			realm.setTile(layer, place.position + Position{0, 1}, flowerful? "base:tile/lilypad_flowerful_ne" : "base:tile/lilypad_flowerless_ne");
+			realm.setTile(layer, place.position + Position{1, 0}, flowerful? "base:tile/lilypad_flowerful_sw" : "base:tile/lilypad_flowerless_sw");
+			realm.setTile(layer, place.position + Position{1, 1}, "base:tile/lilypad_se");
+			return true;
+		}
 	}
 
 	void Grassland::init(Realm &realm, int noise_seed) {
@@ -94,8 +120,18 @@ namespace Game3 {
 		const auto &tileset = realm.getTileset();
 		const auto tile1 = tileset[realm.getTile(Layer::Terrain, {row, column})];
 
+		if (water == FluidID(-1))
+			water = safeCast<FluidID>(realm.getGame().registry<FluidRegistry>().at("base:fluid/water")->registryID);
+
+		if (const auto fluid = realm.tryFluid({row, column}); fluid && fluid->id == water)
+			if (const int reeds_rand = std::uniform_int_distribution(1, 1500)(rng); reeds_rand <= 2)
+				realm.setTile(Layer::Objects, {row, column}, reeds_rand == 1? "base:tile/reeds_1" : "base:tile/reeds_2");
+
+		if (const int lilypad_rand = std::uniform_int_distribution(1, 2000)(rng); lilypad_rand <= 4)
+			generateLilypad(Place({row, column}, realm.shared_from_this()), lilypad_rand <= 2);
+
 		if (grassSet.contains(tile1) && realm.middleEmpty({row, column})) {
-			if (std::uniform_int_distribution(0, 99)(rng) < 2)
+			if (std::uniform_int_distribution(1, 100)(rng) <= 2)
 				realm.setTile(Layer::Submerged, {row, column}, choose(tileset.getCategoryIDs("base:category/flowers"), rng), false);
 
 			std::shared_ptr<Animal> animal;
