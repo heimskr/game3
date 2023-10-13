@@ -221,12 +221,14 @@ namespace Game3 {
 		if (getSide() != Side::Server)
 			return false;
 
-		if (auto *active = getInventory()->getActive())
+		if (ItemStack *active = getInventory()->getActive()) {
 			if (auto tool = std::dynamic_pointer_cast<Tool>(active->item)) {
 				tooldown = multiplier * tool->baseCooldown;
 				increaseUpdateCounter();
 				return true;
 			}
+		}
+
 		return false;
 	}
 

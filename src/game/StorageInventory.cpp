@@ -239,11 +239,15 @@ namespace Game3 {
 	}
 
 	ItemStack * StorageInventory::getActive() {
-		return storage.contains(activeSlot)? &storage.at(activeSlot) : nullptr;
+		if (auto iter = storage.find(activeSlot); iter != storage.end())
+			return &iter->second;
+		return nullptr;
 	}
 
 	const ItemStack * StorageInventory::getActive() const {
-		return storage.contains(activeSlot)? &storage.at(activeSlot) : nullptr;
+		if (auto iter = storage.find(activeSlot); iter != storage.end())
+			return &iter->second;
+		return nullptr;
 	}
 
 	bool StorageInventory::contains(const ItemStack &needle) const {

@@ -10,11 +10,9 @@
 
 namespace Game3 {
 	bool Sapling::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
-		auto &player = *place.player;
-		auto &realm  = *place.realm;
+		Player &player = *place.player;
+		Realm &realm = *place.realm;
 		assert(realm.getSide() == Side::Server);
-		if (realm.type != getRealmType())
-			return false;
 
 		Tileset &tileset = realm.getTileset();
 
