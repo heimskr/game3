@@ -123,9 +123,13 @@ namespace Game3 {
 		if (water == FluidID(-1))
 			water = safeCast<FluidID>(realm.getGame().registry<FluidRegistry>().at("base:fluid/water")->registryID);
 
-		if (const auto fluid = realm.tryFluid({row, column}); fluid && fluid->id == water)
-			if (const int reeds_rand = std::uniform_int_distribution(1, 1500)(rng); reeds_rand <= 2)
+		if (const auto fluid = realm.tryFluid({row, column}); fluid && fluid->id == water) {
+			const double probability = 0.01 * std::pow(std::cos(std::min(1.6, 8.0 * (double(fluid->level) / FluidTile::FULL - 0.7))), 5.);
+			if (std::uniform_real_distribution(0.0, 1.0)(rng) <= probability) {
+				const int reeds_rand = std::uniform_int_distribution(1, 2)(rng);
 				realm.setTile(Layer::Objects, {row, column}, reeds_rand == 1? "base:tile/reeds_1" : "base:tile/reeds_2");
+			}
+		}
 
 		if (const int lilypad_rand = std::uniform_int_distribution(1, 2000)(rng); lilypad_rand <= 4)
 			generateLilypad(Place({row, column}, realm.shared_from_this()), lilypad_rand <= 2);
