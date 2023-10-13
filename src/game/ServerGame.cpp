@@ -628,6 +628,28 @@ namespace Game3 {
 				return {true, ""};
 			}
 
+			if (first == "regen") {
+				if (player->username != "heimskr")
+					return {false, "No thanks."};
+				if (words.size() != 3)
+					return {false, "Incorrect parameter count."};
+
+				ChunkPosition chunk_position;
+				try {
+					chunk_position.x = parseNumber<ChunkPosition::IntType>(words[1]);
+					chunk_position.y = parseNumber<ChunkPosition::IntType>(words[2]);
+				} catch (const std::invalid_argument &) {
+					return {false, "Couldn't parse chunk position."};
+				}
+
+				if (player->getChunk() == chunk_position) {
+					player->getRealm()->generateChunk(chunk_position);
+					return {true, "Regenerated chunk."};
+				}
+
+				return {false, "Incorrect chunk position."};
+			}
+
 		} catch (const std::exception &err) {
 			return {false, err.what()};
 		}

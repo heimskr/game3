@@ -31,10 +31,18 @@ namespace Game3::WorldGen {
 		const auto height = range.tileHeight();
 
 		TileProvider &provider = realm->tileProvider;
+		const Tileset &tileset = realm->getTileset();
 
-		for (auto y = range.topLeft.y; y <= range.bottomRight.y; ++y)
-			for (auto x = range.topLeft.x; x <= range.bottomRight.x; ++x)
+		for (auto y = range.topLeft.y; y <= range.bottomRight.y; ++y) {
+			for (auto x = range.topLeft.x; x <= range.bottomRight.x; ++x) {
 				provider.ensureAllChunks(ChunkPosition{x, y});
+				for (const Layer layer: allLayers) {
+					TileChunk &chunk = provider.getTileChunk(layer, ChunkPosition{x, y});
+					auto lock = chunk.uniqueLock();
+					chunk.assign(chunk.size(), tileset.getEmptyID());
+				}
+			}
+		}
 
 		const size_t regions_x = updiv(width,  CHUNK_SIZE);
 		const size_t regions_y = updiv(height, CHUNK_SIZE);
@@ -42,8 +50,6 @@ namespace Game3::WorldGen {
 
 		noise::module::Perlin p2;
 		p2.SetSeed(noise_seed * 3 - 1);
-
-		const Tileset &tileset = realm->getTileset();
 
 		auto biomes = Biome::getMap(*realm, noise_seed);
 		auto get_biome = [&](Index row, Index column) -> Biome & {
