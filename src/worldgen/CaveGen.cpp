@@ -85,7 +85,17 @@ namespace Game3::WorldGen {
 		} else if (noise < .13) {
 			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_coal", false);
 		} else {
-			realm->setTile(Layer::Terrain, {row, column}, "base:tile/cave_dirt", false);
+
+			// TODO: move to mushroom caves
+			constexpr static double extra_zoom = 5.;
+			const double brine_noise = std::abs(perlin.GetValue(row / (extra_zoom * noise_zoom), column / (extra_zoom * noise_zoom), 541713.));
+			if (0.666 < noise && brine_noise < 0.05) {
+				realm->setTile(Layer::Terrain, {row, column}, "base:tile/stone", false);
+				if (brine_noise < 0.03)
+					realm->setFluid({row, column}, "base:fluid/brine", FluidTile::FULL, true);
+			} else
+				realm->setTile(Layer::Terrain, {row, column}, "base:tile/cave_dirt", false);
+
 			return true;
 		}
 
