@@ -5,6 +5,7 @@
 #include "entity/ItemEntity.h"
 #include "entity/ServerPlayer.h"
 #include "game/ServerGame.h"
+#include "graphics/Tileset.h"
 #include "net/Server.h"
 #include "net/RemoteClient.h"
 #include "packet/ChatMessageSentPacket.h"
@@ -616,6 +617,14 @@ namespace Game3 {
 				}
 
 				return {true, ""};
+			}
+
+			if (first == "tiles") {
+				Realm &realm = *player->getRealm();
+				Tileset &tileset = realm.getTileset();
+				for (const Layer layer: allLayers)
+					if (auto tile = realm.tryTile(layer, player->position))
+						INFO(getIndex(layer) << " \e[2m→\e[22m " << *tile << " \e[2m/\e[22m " << tileset[*tile]);
 			}
 
 		} catch (const std::exception &err) {
