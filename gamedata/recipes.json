@@ -146,7 +146,7 @@
 				"output": [["base:item/knife", 1]]
 			}],
 			["base:crafting_recipe", {
-				"input": [["base:item/flour", 1]],
+				"input": [["base:item/flour", 1], ["base:item/sugar", 1]],
 				"output": [["base:item/dough", 1]],
 				"station": "base:station/sink"
 			}],
