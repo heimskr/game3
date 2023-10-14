@@ -21,8 +21,6 @@ namespace Game3 {
 		scrolled.add_css_class("crafting-tab");
 		scrolled.set_child(vbox);
 
-		popoverMenu.set_parent(vbox);
-
 		gmenu = Gio::Menu::create();
 		gmenu->append("Craft _1", "crafting_popup.craft_one");
 		gmenu->append("Craft _X", "crafting_popup.craft_x");
@@ -34,6 +32,10 @@ namespace Game3 {
 		group->add_action("craft_all", [this] { craftAll(lastGame, lastRegistryID); });
 
 		mainWindow.insert_action_group("crafting_popup", group);
+
+		popoverMenu.set_parent(mainWindow);
+		popoverMenu.set_menu_model(gmenu);
+		popoverMenu.set_has_arrow(true);
 	}
 
 	void CraftingTab::update(const std::shared_ptr<ClientGame> &game) {
@@ -160,15 +162,15 @@ namespace Game3 {
 	}
 
 	void CraftingTab::rightClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *widget, size_t registry_id, double x, double y) {
-		// mainWindow.onBlur();
+		mainWindow.onBlur();
 
-		const auto allocation = widget->get_allocation();
-		x += allocation.get_x();
-		y += allocation.get_y();
+		do {
+			const auto allocation = widget->get_allocation();
+			x += allocation.get_x();
+			y += allocation.get_y();
+			widget = widget->get_parent();
+		} while (widget);
 
-		popoverMenu.set_parent(vbox);
-		popoverMenu.set_menu_model(gmenu);
-		popoverMenu.set_has_arrow(true);
 		popoverMenu.set_pointing_to({int(x), int(y), 1, 1});
 		lastGame = game;
 		lastRegistryID = registry_id;

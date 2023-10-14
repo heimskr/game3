@@ -42,5 +42,7 @@ namespace Game3 {
 
 			void leftClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, size_t registry_id, int n, double x, double y);
 			void rightClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, size_t registry_id, double x, double y);
+
+			void reconfigurePopover();
 	};
 }
