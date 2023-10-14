@@ -21,7 +21,6 @@ namespace Game3 {
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			void teleport(const std::shared_ptr<Entity> &);
-			void render(SpriteRenderer &) override;
 			std::shared_ptr<Realm> getInnerRealm() const;
 
 			void encode(Game &, Buffer &) override;

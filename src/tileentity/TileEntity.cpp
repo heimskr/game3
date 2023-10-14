@@ -67,6 +67,9 @@ namespace Game3 {
 			}
 		}
 
+		if (cachedTile == 0)
+			return;
+
 		const auto tilesize = tileset.getTileSize();
 		const auto texture = tileset.getTexture(realm->getGame());
 		const auto x = (cachedTile % (texture->width / tilesize)) * tilesize;

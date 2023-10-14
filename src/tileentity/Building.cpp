@@ -53,28 +53,4 @@ namespace Game3 {
 		buffer >> innerRealmID;
 		buffer >> entrance;
 	}
-
-	void Building::render(SpriteRenderer &sprite_renderer) {
-		if (!isVisible())
-			return;
-
-		auto realm = getRealm();
-		auto &tileset = realm->getTileset();
-
-		if (tileID != tileset.getEmpty()) {
-			const auto tilesize = tileset.getTileSize();
-			const auto tile_num = tileset[tileID];
-			const auto texture = tileset.getTexture(realm->getGame());
-			const auto x = (tile_num % (texture->width / tilesize)) * tilesize;
-			const auto y = (tile_num / (texture->width / tilesize)) * tilesize;
-			sprite_renderer(*texture, {
-				.x = static_cast<float>(position.column),
-				.y = static_cast<float>(position.row),
-				.xOffset = x / 2.f,
-				.yOffset = y / 2.f,
-				.sizeX = static_cast<float>(tilesize),
-				.sizeY = static_cast<float>(tilesize),
-			});
-		}
-	}
 }

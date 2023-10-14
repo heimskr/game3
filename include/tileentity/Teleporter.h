@@ -19,7 +19,6 @@ namespace Game3 {
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			void onOverlap(const std::shared_ptr<Entity> &) override;
-			void render(SpriteRenderer &) override;
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
