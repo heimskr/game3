@@ -8,8 +8,7 @@
 #include "registry/Registries.h"
 #include "threading/ThreadContext.h"
 #include "ui/MainWindow.h"
-#include "ui/gtk/EntryDialog.h"
-#include "ui/gtk/NumericEntry.h"
+#include "ui/gtk/CraftXDialog.h"
 #include "ui/gtk/Util.h"
 #include "ui/tab/CraftingTab.h"
 #include "ui/tab/InventoryTab.h"
@@ -28,7 +27,7 @@ namespace Game3 {
 
 		auto group = Gio::SimpleActionGroup::create();
 		group->add_action("craft_one", [this] { craftOne(lastGame, lastRegistryID); });
-		group->add_action("craft_x",   []     { INFO("Craft X");                    });
+		group->add_action("craft_x",   [this] { craftX  (lastGame, lastRegistryID); });
 		group->add_action("craft_all", [this] { craftAll(lastGame, lastRegistryID); });
 
 		mainWindow.insert_action_group("crafting_popup", group);
@@ -59,7 +58,6 @@ namespace Game3 {
 		removeChildren(vbox);
 		widgets.clear();
 
-		// size_t index = 0;
 		const InventoryPtr inventory = game->player->getInventory();
 		if (!inventory)
 			return;
@@ -149,6 +147,16 @@ namespace Game3 {
 
 	void CraftingTab::craftOne(const std::shared_ptr<ClientGame> &game, size_t registry_id) {
 		game->player->send(CraftPacket(threadContext.rng(), registry_id, 1));
+	}
+
+	void CraftingTab::craftX(const std::shared_ptr<ClientGame> &game, size_t registry_id) {
+		auto dialog = std::make_unique<CraftXDialog>(mainWindow);
+		dialog->signal_submit().connect([this, weak_game = std::weak_ptr(game), registry_id](int count) {
+			if (count <= 0)
+				if (auto game = weak_game.lock())
+					game->player->send(CraftPacket(threadContext.rng(), registry_id, static_cast<uint64_t>(count)));
+		});
+		mainWindow.queueDialog(std::move(dialog));
 	}
 
 	void CraftingTab::craftAll(const std::shared_ptr<ClientGame> &game, size_t registry_id) {

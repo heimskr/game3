@@ -13,8 +13,8 @@ namespace Game3 {
 
 		private:
 			sigc::signal<void(const Glib::ustring &, uint16_t)> signal_submit_;
-			Gtk::Label hostnameLabel {"Host"};
-			Gtk::Label portLabel {"Port"};
+			Gtk::Label hostnameLabel{"Host"};
+			Gtk::Label portLabel{"Port"};
 			Gtk::Entry hostnameEntry;
 			NumericEntry portEntry;
 

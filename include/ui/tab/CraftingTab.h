@@ -38,6 +38,7 @@ namespace Game3 {
 			size_t lastRegistryID = 0;
 
 			void craftOne(const std::shared_ptr<ClientGame> &, size_t registry_id);
+			void craftX(const std::shared_ptr<ClientGame> &, size_t registry_id);
 			void craftAll(const std::shared_ptr<ClientGame> &, size_t registry_id);
 
 			void leftClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, size_t registry_id, int n, double x, double y);
