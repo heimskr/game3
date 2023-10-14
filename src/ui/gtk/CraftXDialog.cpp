@@ -7,14 +7,11 @@ namespace Game3 {
 		auto *area = get_message_area();
 		countLabel.set_halign(Gtk::Align::START);
 		countSpin.set_adjustment(Gtk::Adjustment::create(1., 1., 1920., 1., 64.));
-		// countSpin.set_value(1);
 		countSpin.set_digits(0);
 
-		// hostnameEntry.signal_activate().connect(sigc::mem_fun(*this, &CraftXDialog::submit));
 		area->append(countLabel);
 		area->append(countSpin);
 
-		// add_button("C_onnect", Gtk::ResponseType::OK);
 		int width, height;
 		get_default_size(width, height);
 		if (width < 200)
