@@ -103,12 +103,17 @@ namespace Game3 {
 	}
 
 	bool Server::close(RemoteClient &client) {
+		if (client.isClosed())
+			return false;
+
+		client.setClosed();
+
 		try {
 			client.socket.shutdown();
 		} catch (const asio::system_error &err) {
 			// Who really cares if SSL doesn't shut down properly?
 			// Who decided that the client is worthy of a proper shutdown?
-			ERROR("Shutdown: " << err.what() << " (" << err.code() << ')');
+			ERROR("Shutdown (" << client.ip << "): " << err.what() << " (" << err.code() << ')');
 		}
 
 		client.socket.lowest_layer().close();

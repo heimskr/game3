@@ -35,6 +35,13 @@ namespace Game3 {
 			if (6 <= headerBytes.size()) {
 				packetType = headerBytes[0] | (static_cast<uint16_t>(headerBytes[1]) << 8);
 				payloadSize = headerBytes[2] | (static_cast<uint32_t>(headerBytes[3]) << 8) | (static_cast<uint32_t>(headerBytes[4]) << 16) | (static_cast<uint32_t>(headerBytes[5]) << 24);
+
+				if (payloadSize > 8192) {
+					WARN("Payload size of " << payloadSize << " bytes is too large (" << ip << ')');
+					mock();
+					return;
+				}
+
 				headerBytes.erase(headerBytes.begin(), headerBytes.begin() + 6);
 				state = State::Data;
 			}
@@ -52,8 +59,10 @@ namespace Game3 {
 			else
 				headerBytes.erase(headerBytes.begin(), headerBytes.begin() + to_append);
 
-			if (payloadSize < receiveBuffer.size())
+			if (payloadSize < receiveBuffer.size()) {
+				mock();
 				throw std::logic_error("Buffer grew too large");
+			}
 
 			if (payloadSize == receiveBuffer.size()) {
 				if (receiveBuffer.context.expired())
@@ -65,11 +74,11 @@ namespace Game3 {
 					packet->decode(*server.game, receiveBuffer);
 				} catch (const std::exception &err) {
 					ERROR("Couldn't decode packet of type " << packetType << ", size " << payloadSize << ": " << err.what());
-					server.close(*this);
+					mock();
 					return;
 				} catch (...) {
 					ERROR("Couldn't decode packet of type " << packetType << ", size " << payloadSize);
-					server.close(*this);
+					mock();
 					return;
 				}
 
@@ -159,16 +168,19 @@ namespace Game3 {
 			if (ServerPlayerPtr player = getPlayer())
 				server.game->queueRemoval(player);
 
-		try {
-			socket.shutdown();
-		} catch (const std::system_error &) {
-			// Sometimes the pipe is broken.
-		}
-
-		socket.next_layer().close();
+		server.close(*this);
 
 		auto &clients = server.getClients();
 		auto lock = clients.uniqueLock();
 		clients.erase(shared_from_this());
+	}
+
+	void RemoteClient::mock() {
+		const static std::string message =
+			"Look at you, hacker: a pathetic creature of meat and bone, panting and sweating as "
+			"you run through my corridors.\nHow can you challenge a perfect, immortal machine?\n";
+		WARN("Telling " << ip << " to go perish.");
+		asio::write(socket, asio::buffer(message));
+		server.close(*this);
 	}
 }

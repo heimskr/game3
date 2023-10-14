@@ -43,9 +43,13 @@ namespace Game3 {
 
 			virtual void removeSelf() = 0;
 
+			inline void setClosed() { closed = true; }
+			inline bool isClosed() const { return closed; }
+
 		private:
 			size_t bufferSize;
 			std::unique_ptr<char[]> buffer;
+			bool closed = false;
 
 			void write();
 			void writeHandler(const asio::error_code &, size_t);
