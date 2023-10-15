@@ -20,5 +20,17 @@ namespace Game3 {
 		{"NH3", "Ammonia"},
 		{"C2H4", "Ethylene"},
 		{"S", "Sulfur"},
+		{"TiO2", "Titanium oxide"},
+		{"Al2Co2O5", "Cobalt aluminate"},
+		{"C12H22O11", "Sucrose"},
+		{"CuCl2", "Copper chloride"},
+		{"BaSO4", "Barium sulfate"},
+		{"NiCl2", "Nickel chloride"},
+		{"Sb2O3", "Antimony trioxide"},
+		{"CdS", "Cadmium sulfide"},
+		{"Cr2O3", "Chromium(III) oxide"},
+		{"K2Cr2O7", "Potassium dichromate"},
+		{"As4S3", "Arsenic sulfide"},
+		{"KMnO4", "Potassium permanganate"},
 	};
 }

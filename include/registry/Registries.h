@@ -9,6 +9,7 @@ namespace Game3 {
 	class Item;
 	class ItemSet;
 	class ItemStack;
+	class ItemTexture;
 	class LocalCommandFactory;
 	class ModuleFactory;
 	class PacketFactory;
@@ -19,7 +20,6 @@ namespace Game3 {
 	class TileEntityFactory;
 	struct EntityTexture;
 	struct Fluid;
-	struct ItemTexture;
 	struct Ore;
 	struct RealmDetails;
 

@@ -38,6 +38,9 @@ namespace Game3 {
 			struct Member {
 				double weight;
 				std::unique_ptr<ChemistryResult> result;
+
+				Member(double weight_, std::unique_ptr<ChemistryResult> &&result_):
+					weight(weight_), result(std::move(result_)) {}
 			};
 
 			std::vector<Member> members;
