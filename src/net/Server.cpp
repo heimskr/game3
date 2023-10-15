@@ -250,7 +250,7 @@ namespace Game3 {
 		if (signal(SIGINT, +[](int) { running = false; stopCV.notify_all(); saveCV.notify_all(); }) == SIG_ERR)
 			throw std::runtime_error("Couldn't register SIGINT handler");
 
-		auto game = std::dynamic_pointer_cast<ServerGame>(Game::create(Side::Server, global_server));
+		auto game = std::dynamic_pointer_cast<ServerGame>(Game::create(Side::Server, std::make_pair(global_server, size_t(8))));
 
 		global_server->onStop = [] {
 			running = false;

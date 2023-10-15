@@ -62,4 +62,8 @@ namespace Game3 {
 
 		return false;
 	}
+
+	size_t ThreadPool::jobCount() const {
+		return workQueue.size();
+	}
 }

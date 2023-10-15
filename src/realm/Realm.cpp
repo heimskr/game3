@@ -311,7 +311,8 @@ namespace Game3 {
 	}
 
 	void Realm::tick(float delta) {
-		ticking = true;
+		if (ticking.exchange(true))
+			return;
 
 		for (const auto &[entity, position]: entityInitializationQueue.steal())
 			initEntity(entity, position);
@@ -372,8 +373,6 @@ namespace Game3 {
 				}
 			}
 
-			ticking = false;
-
 			for (const auto &stolen: entityRemovalQueue.steal())
 				if (auto locked = stolen.lock())
 					remove(locked);
@@ -431,6 +430,7 @@ namespace Game3 {
 					chunkRequests.erase(iter);
 				}
 			}
+
 		} else {
 
 			auto player = getGame().toClient().player;
@@ -501,6 +501,8 @@ namespace Game3 {
 				}
 			}
 		}
+
+		ticking = false;
 	}
 
 	std::vector<EntityPtr> Realm::findEntities(const Position &position) {

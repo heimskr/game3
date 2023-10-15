@@ -316,7 +316,7 @@ namespace Game3 {
 			};
 
 			Game &game;
-			bool ticking = false;
+			std::atomic_bool ticking = false;
 			MTQueue<std::weak_ptr<Entity>> entityRemovalQueue;
 			MTQueue<std::weak_ptr<Entity>> entityDestructionQueue;
 			MTQueue<std::pair<std::shared_ptr<Entity>, Position>> entityAdditionQueue;

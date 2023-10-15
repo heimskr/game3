@@ -28,6 +28,8 @@ namespace Game3 {
 			void join();
 			bool add(const Function &);
 
+			size_t jobCount() const;
+
 		protected:
 			const size_t size;
 			MTQueue<Function> workQueue;

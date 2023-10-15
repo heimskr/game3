@@ -130,10 +130,12 @@ namespace Game3 {
 
 	GamePtr Game::create(Side side, const GameArgument &argument) {
 		GamePtr out;
-		if (side == Side::Client)
+		if (side == Side::Client) {
 			out = GamePtr(new ClientGame(*std::get<Canvas *>(argument)));
-		else
-			out = GamePtr(new ServerGame(std::get<std::shared_ptr<Server>>(argument)));
+		} else {
+			const auto [server_ptr, pool_size] = std::get<std::pair<std::shared_ptr<Server>, size_t>>(argument);
+			out = GamePtr(new ServerGame(server_ptr, pool_size));
+		}
 		out->initialSetup();
 		return out;
 	}

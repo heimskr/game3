@@ -7,6 +7,7 @@
 #include "net/RemoteClient.h"
 #include "threading/Lockable.h"
 #include "threading/MTQueue.h"
+#include "threading/ThreadPool.h"
 
 #include <filesystem>
 #include <memory>
@@ -32,8 +33,7 @@ namespace Game3 {
 			GameDB database{*this};
 			float lastGarbageCollection = 0.f;
 
-			ServerGame(const std::shared_ptr<Server> &server_):
-				weakServer(server_) {}
+			ServerGame(const std::shared_ptr<Server> &, size_t pool_size);
 
 			~ServerGame() override;
 
@@ -77,6 +77,7 @@ namespace Game3 {
 			MTQueue<std::pair<std::weak_ptr<RemoteClient>, std::shared_ptr<Packet>>> packetQueue;
 			MTQueue<std::weak_ptr<ServerPlayer>> playerRemovalQueue;
 			double timeSinceTimeUpdate = 0.;
+			ThreadPool pool;
 
 			void handlePacket(RemoteClient &, Packet &);
 			std::tuple<bool, std::string> commandHelper(RemoteClient &, const std::string &);

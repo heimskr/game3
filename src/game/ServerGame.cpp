@@ -26,12 +26,16 @@
 #include <iomanip>
 
 namespace Game3 {
+	ServerGame::ServerGame(const std::shared_ptr<Server> &server_, size_t pool_size):
+		weakServer(server_), pool(pool_size) { pool.start(); }
+
 	void ServerGame::addEntityFactories() {
 		Game::addEntityFactories();
 		add(EntityFactory::create<ServerPlayer>());
 	}
 
 	ServerGame::~ServerGame() {
+		pool.join();
 		INFO("Saving realms and users...");
 		database.writeAllRealms();
 		database.writeUsers(players);
@@ -55,8 +59,16 @@ namespace Game3 {
 			if (auto client = weak_client.lock())
 				handlePacket(*client, *packet);
 
-		for (auto &[id, realm]: realms)
-			realm->tick(delta);
+		const size_t max_jobs = realms.size() * 2;
+
+		for (auto &[id, realm]: realms) {
+			if (max_jobs <= pool.jobCount())
+				break;
+			pool.add([weak_realm = std::weak_ptr(realm), delta = delta](ThreadPool &, size_t) {
+				if (RealmPtr realm = weak_realm.lock())
+					realm->tick(delta);
+			});
+		}
 
 		std::optional<TimePacket> time_packet;
 		timeSinceTimeUpdate += delta;

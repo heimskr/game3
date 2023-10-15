@@ -198,7 +198,7 @@ namespace Game3 {
 			return false;
 
 		std::shared_ptr<Inventory> inventory_copy = inventory->copy();
-		inventory_copy->weakOwner = {};
+		auto suppressor = inventory_copy->suppress();
 
 		std::optional<std::vector<ItemStack>> leftovers;
 
