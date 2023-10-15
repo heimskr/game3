@@ -32,5 +32,8 @@ namespace Game3 {
 		{"K2Cr2O7", "Potassium dichromate"},
 		{"As4S3", "Arsenic sulfide"},
 		{"KMnO4", "Potassium permanganate"},
+		{"HgS", "Mercury sulfide"},
+		{"Ca5(PO4)3OH", "Hydroxyapatite"},
+		{"PbI2", "Lead iodide"},
 	};
 }
