@@ -59,7 +59,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `list<u16, 4*64**2>` Tile IDs (layer 1, then 2, then 3, then 4)
 	- `list<u64, 64**2>` Fluid Tiles
 
-	Note that the entire payload above is compressed. The compressed data is sent as a `list<u8>`.
+	Note that the entire payload above is compressed with lz4. The compressed data is sent as a `list<u8>`.
 
 9. **Realm Notice**: informs a client of the existence of a realm.
 
