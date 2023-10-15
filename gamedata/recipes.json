@@ -6,72 +6,72 @@
 	"data": [
 		["base:recipe_list", [
 			["base:registry/crafting_recipe", {
-				"input":  [["base:item/iron_bar", 8], ["base:item/wood", 4]],
+				"input":  [["base:item/iron_bar", 2], ["base:item/wood", 1]],
 				"output": [["base:item/iron_pickaxe", 1, "with_durability"]],
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
-				"input":  [["base:item/iron_bar", 6], ["base:item/wood", 4]],
+				"input":  [["base:item/iron_bar", 1], ["base:item/wood", 1]],
 				"output": [["base:item/iron_shovel", 1, "with_durability"]],
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
-				"input":  [["base:item/iron_bar", 8], ["base:item/wood", 4]],
+				"input":  [["base:item/iron_bar", 2], ["base:item/wood", 1]],
 				"output": [["base:item/iron_axe", 1, "with_durability"]],
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
-				"input":  [["base:item/iron_bar", 8], ["base:item/wood", 4]],
+				"input":  [["base:item/iron_bar", 2], ["base:item/wood", 1]],
 				"output": [["base:item/iron_hammer", 1, "with_durability"]],
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
-				"input":  [["base:item/iron_bar", 4]],
+				"input":  [["base:item/iron_bar", 2]],
 				"output": [["base:item/wrench", 1]],
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
-				"input":  [["base:item/iron_bar", 4], ["base:item/wood", 4]],
+				"input":  [["base:item/iron_bar", 2], ["base:item/wood", 1]],
 				"output": [["base:item/iron_hoe", 1, "with_durability"]],
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
-				"input":  [["base:item/gold_bar", 8], ["base:item/wood", 4]],
+				"input":  [["base:item/gold_bar", 2], ["base:item/wood", 1]],
 				"output": [["base:item/gold_pickaxe", 1, "with_durability"]],
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
-				"input":  [["base:item/gold_bar", 6], ["base:item/wood", 4]],
+				"input":  [["base:item/gold_bar", 1], ["base:item/wood", 1]],
 				"output": [["base:item/gold_shovel", 1, "with_durability"]],
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
-				"input":  [["base:item/gold_bar", 8], ["base:item/wood", 4]],
+				"input":  [["base:item/gold_bar", 2], ["base:item/wood", 1]],
 				"output": [["base:item/gold_axe", 1, "with_durability"]],
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
-				"input":  [["base:item/gold_bar", 8], ["base:item/wood", 4]],
+				"input":  [["base:item/gold_bar", 2], ["base:item/wood", 1]],
 				"output": [["base:item/gold_hammer", 1, "with_durability"]],
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
-				"input":  [["base:item/diamond",  8], ["base:item/wood", 4]],
+				"input":  [["base:item/diamond", 2], ["base:item/wood", 1]],
 				"output": [["base:item/diamond_pickaxe", 1, "with_durability"]],
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
-				"input":  [["base:item/diamond",  6], ["base:item/wood", 4]],
+				"input":  [["base:item/diamond", 1], ["base:item/wood", 1]],
 				"output": [["base:item/diamond_shovel", 1, "with_durability"]],
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
-				"input":  [["base:item/diamond",  8], ["base:item/wood", 4]],
+				"input":  [["base:item/diamond", 2], ["base:item/wood", 1]],
 				"output": [["base:item/diamond_axe", 1, "with_durability"]],
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
-				"input":  [["base:item/diamond",  8], ["base:item/wood", 4]],
+				"input":  [["base:item/diamond", 2], ["base:item/wood", 1]],
 				"output": [["base:item/diamond_hammer", 1, "with_durability"]],
 				"station": "base:station/anvil"
 			}],
@@ -83,6 +83,11 @@
 			["base:registry/crafting_recipe", {
 				"input":  [["base:item/iron_ore", 1], ["base:item/coal", 1]],
 				"output": [["base:item/iron_bar", 1]],
+				"station": "base:station/furnace"
+			}],
+			["base:registry/crafting_recipe", {
+				"input":  [["base:item/copper_ore", 1], ["base:item/coal", 1]],
+				"output": [["base:item/copper_bar", 1]],
 				"station": "base:station/furnace"
 			}],
 			["base:registry/crafting_recipe", {
@@ -138,12 +143,20 @@
 				"output": [["base:item/cabinet", 1]]
 			}],
 			["base:registry/crafting_recipe", {
+				"input": [["base:item/plank", 4]],
+				"output": [["base:item/dining_table", 1]]
+			}],
+			["base:registry/crafting_recipe", {
 				"input": [["base:item/plank", 2]],
 				"output": [["base:item/fence", 1]]
 			}],
 			["base:registry/crafting_recipe", {
 				"input": [["base:item/plank", 1], ["base:item/knife", 1]],
 				"output": [["base:item/cutting_board", 1]]
+			}],
+			["base:registry/crafting_recipe", {
+				"input": [["base:item/plank", 1], ["base:item/knife", 3]],
+				"output": [["base:item/knives", 1]]
 			}],
 			["base:registry/crafting_recipe", {
 				"input": [["base:item/wood", 1], ["base:item/iron_bar", 1]],

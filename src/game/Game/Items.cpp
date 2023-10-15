@@ -54,6 +54,7 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/cactus",          "Cactus",              4, 64));
 		add(std::make_shared<Item>("base:item/iron_bar",        "Iron Bar",           16, 64));
 		add(std::make_shared<Item>("base:item/gold_bar",        "Gold Bar",           45, 64));
+		add(std::make_shared<Item>("base:item/copper_bar",      "Copper Bar",         10, 64));
 		add(std::make_shared<Item>("base:item/plank",           "Plank",               4, 64));
 		add(std::make_shared<Item>("base:item/brick",           "Brick",               3, 64));
 		add(std::make_shared<Item>("base:item/pot",             "Pot",                24, 64));

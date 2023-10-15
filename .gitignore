@@ -43,3 +43,4 @@ pvs-analysis.log
 /pvs-report
 /core.*
 vgcore.*
+/*.core
