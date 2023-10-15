@@ -234,7 +234,9 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i32` Realm ID
 	- `i64` Position Y
 	- `i64` Position X
-	- `u32` Fluid ID and level
+	- `u64` Fluid ID, level and infiniteness
+
+	The lower 16 bits of the `u64` are the fluid ID, the next 16 bits are the fluid level and the bit after that indicates whether the fluid tile is infinite.
 
 34. **Held Item Set**: tells a client that an entity's held item changed.
 

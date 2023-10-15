@@ -23,10 +23,10 @@ namespace Game3 {
 	FluidTile::FluidTile(FluidInt packed):
 		id(packed & 0xffff),
 		level((packed >> 16) & 0xffff),
-		infinite((packed >> 17) & 1) {}
+		infinite((packed >> 32) & 1) {}
 
 	FluidTile::operator FluidInt() const {
-		return static_cast<FluidInt>(id) | (static_cast<FluidInt>(level) << 16) | (static_cast<FluidInt>(infinite) << 17);
+		return static_cast<FluidInt>(id) | (static_cast<FluidInt>(level) << 16) | (static_cast<FluidInt>(infinite) << 32);
 	}
 
 	FluidTile::operator std::string() const {
