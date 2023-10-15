@@ -12,7 +12,6 @@
 #include "net/Buffer.h"
 #include "packet/InventoryPacket.h"
 #include "packet/SetActiveSlotPacket.h"
-#include "packet/ActiveSlotSetPacket.h"
 #include "packet/DropItemPacket.h"
 #include "realm/Realm.h"
 #include "recipe/CraftingRecipe.h"

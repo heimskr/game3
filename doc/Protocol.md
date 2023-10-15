@@ -192,9 +192,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `i32` Slot
 
-26. **Active Slot Set**: tells a client that the player's active inventory slot changed.
-
-	- `i32` Slot
+26. Unused.
 
 27. **Destroy Tile Entity**: tells a client to remove a tile entity.
 

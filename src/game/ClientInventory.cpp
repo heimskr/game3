@@ -9,7 +9,6 @@
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
 #include "net/Buffer.h"
-#include "packet/ActiveSlotSetPacket.h"
 #include "packet/DropItemPacket.h"
 #include "packet/InventoryPacket.h"
 #include "packet/SetActiveSlotPacket.h"
