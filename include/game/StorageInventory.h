@@ -84,8 +84,8 @@ namespace Game3 {
 
 			inline auto & getStorage() { return storage; }
 			inline const auto & getStorage() const { return storage; }
-			inline void setStorage(Lockable<Storage> &&new_storage) { storage = std::forward<Lockable<Storage>>(new_storage); }
-			inline void setStorage(Storage &&new_storage) { storage = std::forward<Storage>(new_storage); }
+			inline void setStorage(Lockable<Storage> &&new_storage) { storage = std::move(new_storage); }
+			inline void setStorage(Storage &&new_storage) { storage = std::move(new_storage); }
 
 		protected:
 			/** Removes every slot whose item count is zero from the storage map. */

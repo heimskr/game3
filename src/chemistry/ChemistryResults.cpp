@@ -1,3 +1,4 @@
+#include "Log.h"
 #include "chemistry/ChemistryResults.h"
 #include "item/Item.h"
 #include "threading/ThreadContext.h"
@@ -111,15 +112,10 @@ namespace Game3 {
 	}
 
 	MultiChemicalResult::MultiChemicalResult(const nlohmann::json &json):
-		formula(json.at(1).is_null()? "" : json.at(1)), count(json.at(0)) {}
+		result(ChemistryResult::fromJSON(json.at(1))), count(json.at(0)) {}
 
 	void MultiChemicalResult::add(Game &game, std::vector<ItemStack> &stacks) {
-		if (formula.empty())
-			return;
-
-		if (formula.find(':') == std::string::npos)
-			stacks.emplace_back(game, "base:item/chemical", count, nlohmann::json{{"formula", formula}});
-		else
-			stacks.emplace_back(game, Identifier(formula), count);
+		for (size_t i = 0; i < count; ++i)
+			result->add(game, stacks);
 	}
 }

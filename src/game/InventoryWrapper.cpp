@@ -2,7 +2,12 @@
 
 namespace Game3 {
 	InventoryWrapper::InventoryWrapper(std::shared_ptr<Inventory> inventory_):
-		inventory(std::move(inventory_)) {}
+	inventory(std::move(inventory_)) {
+		weakOwner = inventory->weakOwner;
+		slotCount = inventory->slotCount.load();
+		// TODO!: getter method for active slot
+		activeSlot = inventory->activeSlot.load();
+	}
 
 	std::unique_ptr<Inventory> InventoryWrapper::copy() const {
 		return std::make_unique<InventoryWrapper>(inventory->copy());

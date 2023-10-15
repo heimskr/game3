@@ -70,7 +70,7 @@ namespace Game3 {
 			void add(Game &, std::vector<ItemStack> &) override;
 
 		private:
-			std::string formula;
+			std::unique_ptr<ChemistryResult> result;
 			ItemCount count;
 	};
 }

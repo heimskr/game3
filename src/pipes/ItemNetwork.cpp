@@ -98,7 +98,7 @@ namespace Game3 {
 						// Also, because the source inventory changed, we need to cancel the suppressor.
 						WARN("Can't put leftovers back into source inventory.");
 						suppressor.cancel(true);
-						overflowQueue.push_back(std::move(*extracted));
+						overflowQueue.push_back(std::move(*new_leftover));
 						// Because we're in a weird situation here, it might be safer to just cancel the iteration now.
 						failed = true;
 						return true;

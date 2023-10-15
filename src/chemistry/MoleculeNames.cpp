@@ -22,7 +22,7 @@ namespace Game3 {
 		{"S", "Sulfur"},
 		{"TiO2", "Titanium oxide"},
 		{"Al2Co2O5", "Cobalt aluminate"},
-		{"C12H22O11", "Sucrose"},
+		// {"C12H22O11", "Sucrose"}, // nvm. Lactose has the same formula, so we're just going to leave it nameless
 		{"CuCl2", "Copper chloride"},
 		{"BaSO4", "Barium sulfate"},
 		{"NiCl2", "Nickel chloride"},
@@ -35,5 +35,7 @@ namespace Game3 {
 		{"HgS", "Mercury sulfide"},
 		{"Ca5(PO4)3OH", "Hydroxyapatite"},
 		{"PbI2", "Lead iodide"},
+		{"NO3", "Nitrate"},
+		{"C40H56", "Beta carotene"},
 	};
 }

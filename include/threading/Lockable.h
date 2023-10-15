@@ -27,6 +27,8 @@ namespace Game3 {
 		Lockable(T &&other): T(other) {}
 
 		Lockable<T, M> & operator=(const Lockable<T, M> &other) {
+			if (this == &other)
+				return *this;
 			auto this_lock = uniqueLock();
 			auto other_lock = other.sharedLock();
 			T::operator=(other.getBase());
@@ -34,6 +36,8 @@ namespace Game3 {
 		}
 
 		Lockable<T, M> & operator=(Lockable<T, M> &&other) {
+			if (this == &other)
+				return *this;
 			auto this_lock = uniqueLock();
 			auto other_lock = other.uniqueLock();
 			T::operator=(std::move(other.getBase()));

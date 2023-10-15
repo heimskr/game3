@@ -2,10 +2,14 @@
 
 namespace Game3 {
 	InventorySpan::InventorySpan(std::shared_ptr<Inventory> inventory_, SlotRange range_):
-		InventoryWrapper(std::move(inventory_)), range(range_) {}
+	InventoryWrapper(std::move(inventory_)), range(range_) {
+		slotCount = range.size();
+	}
 
 	InventorySpan::InventorySpan(std::shared_ptr<Inventory> inventory_, Slot min, Slot max):
-		InventoryWrapper(std::move(inventory_)), range{min, max} {}
+	InventoryWrapper(std::move(inventory_)), range{min, max} {
+		slotCount = range.size();
+	}
 
 	bool InventorySpan::validateSlot(Slot slot) const {
 		return range.contains(slot);

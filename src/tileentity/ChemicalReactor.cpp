@@ -1,4 +1,5 @@
 #include "Log.h"
+#include "SlotRange.h"
 #include "game/ClientGame.h"
 #include "game/EnergyContainer.h"
 #include "game/ServerInventory.h"
@@ -288,6 +289,7 @@ namespace Game3 {
 		assert(storage_inventory);
 		inventory_copy->weakOwner = shared_from_this();
 		*storage_inventory = std::move(dynamic_cast<StorageInventory &>(*inventory_copy));
+		inventory->notifyOwner();
 
 		return true;
 	}

@@ -127,6 +127,7 @@ namespace Game3 {
 		private:
 			const Game *game = nullptr;
 			Glib::RefPtr<Gdk::Pixbuf> cachedImage;
+
 			void absorbGame(const Game &);
 	};
 

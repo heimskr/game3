@@ -18,14 +18,6 @@ namespace Game3 {
 	class Buffer;
 	struct CraftingRecipe;
 
-	struct SlotRange {
-		Slot min;
-		Slot max;
-		inline bool contains(Slot slot) const {
-			return min <= slot && slot <= max;
-		}
-	};
-
 	/** Inventories should be locked appropriately (see HasMutex) when something is calling Inventory methods. The Inventory will not lock itself. */
 	class Inventory: public Container, public HasMutex<> {
 		protected:
