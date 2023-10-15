@@ -162,6 +162,7 @@
 			"base:item/snowy_sapling":    "C12H20O10",
 			"base:item/pride_flag":       "HoMo",
 			"base:item/nb_flag":          "NoNbInArY",
+			"base:item/ace_flag":         "AcEs",
 			"base:item/ash":              ["+", "C", "Ca"]
 		}]
 	]
