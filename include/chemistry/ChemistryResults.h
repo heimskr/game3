@@ -13,6 +13,7 @@ namespace Game3 {
 
 	class ChemistryResult {
 		public:
+			virtual ~ChemistryResult() = default;
 			virtual void add(Game &, std::vector<ItemStack> &) = 0;
 			std::vector<ItemStack> getResult(Game &);
 			static std::vector<ItemStack> getResult(Game &, const nlohmann::json &);

@@ -21,9 +21,6 @@
 				[0.5, "Ni"],
 				[0.5, "Ga"],
 				[1.0, "Al"]]
-		}],
-		["base:ignore/dissolver_map", {
-
 		}]
 	]
 }

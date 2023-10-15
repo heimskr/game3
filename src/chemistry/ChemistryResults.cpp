@@ -59,7 +59,7 @@ namespace Game3 {
 	WeightedChemistryResult::WeightedChemistryResult(const nlohmann::json &json) {
 		for (size_t i = 1; i < json.size(); ++i) {
 			const nlohmann::json &item = json.at(i);
-			members.emplace_back(item.at(0), ChemistryResult::fromJSON(item.at(1)));
+			members.emplace_back(item.at(0).get<double>(), ChemistryResult::fromJSON(item.at(1)));
 		}
 	}
 
