@@ -348,16 +348,22 @@ namespace Game3 {
 				for (const auto &chunk: visibleChunks) {
 					{
 						auto by_chunk_lock = entitiesByChunk.sharedLock();
-						if (auto iter = entitiesByChunk.find(chunk); iter != entitiesByChunk.end() && iter->second)
+						if (auto iter = entitiesByChunk.find(chunk); iter != entitiesByChunk.end() && iter->second) {
+							auto set_lock = iter->second->sharedLock();
+							by_chunk_lock.unlock();
 							for (const auto &entity: *iter->second)
 								if (!entity->isPlayer())
 									entity->tick(game, delta);
+						}
 					}
 					{
 						auto by_chunk_lock = tileEntitiesByChunk.sharedLock();
-						if (auto iter = tileEntitiesByChunk.find(chunk); iter != tileEntitiesByChunk.end() && iter->second)
+						if (auto iter = tileEntitiesByChunk.find(chunk); iter != tileEntitiesByChunk.end() && iter->second) {
+							auto set_lock = iter->second->sharedLock();
+							by_chunk_lock.unlock();
 							for (const auto &tile_entity: *iter->second)
 								tile_entity->tick(game, delta);
+						}
 					}
 					std::uniform_int_distribution<int64_t> distribution{0, CHUNK_SIZE - 1};
 					auto &tileset = getTileset();
@@ -1087,7 +1093,7 @@ namespace Game3 {
 	}
 
 	void Realm::attach(const TileEntityPtr &tile_entity) {
-		auto lock = tileEntitiesByChunk.uniqueLock();
+		auto shared_lock = tileEntitiesByChunk.sharedLock();
 		const auto chunk_position = tile_entity->getChunk();
 		if (auto iter = tileEntitiesByChunk.find(chunk_position); iter != tileEntitiesByChunk.end()) {
 			assert(iter->second);
@@ -1097,6 +1103,8 @@ namespace Game3 {
 		} else {
 			auto set = std::make_shared<Lockable<std::unordered_set<TileEntityPtr>>>();
 			set->insert(tile_entity);
+			shared_lock.unlock();
+			auto unique_lock = tileEntitiesByChunk.uniqueLock();
 			tileEntitiesByChunk.emplace(chunk_position, std::move(set));
 		}
 	}
