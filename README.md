@@ -33,7 +33,6 @@ If you'd like to contribute, here are some ideas, ordered roughly from easiest t
 - Improve the shading of the flower sprites (rows 1 and 5) in `/resources/tileset.png`.
 - Make animals useful.
 	- For example, add a shears tool that can be used to get wool from sheep.
-	- Chickens could lay eggs periodically.
 - Add a plugin system similar to that of [Algiz](https://github.com/heimskr/algiz)
 	(see [PluginHost.cpp](https://github.com/heimskr/algiz/blob/master/src/PluginHost.cpp),
 	[PluginHost.h](https://github.com/heimskr/algiz/blob/master/include/plugins/PluginHost.h),
