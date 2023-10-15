@@ -36,7 +36,23 @@
 			"base:item/red_dye":        [4, "HgS"],
 			"base:item/white_dye":      [4, "Ca5(PO4)3OH"],
 			"base:item/yellow_dye":     [4, "PbI2"],
-			"base:item/ash": ["+", "C", "Ca"]
+			"base:item/iron_ore":       [4, "Fe"],
+			"base:item/iron_bar":       [4, "Fe"],
+			"base:item/gold_ore":       [4, "Au"],
+			"base:item/gold_bar":       [4, "Au"],
+			"base:item/clay":           [4, "Al2Si2O5(OH)4"],
+			"base:item/brick":          [4, "Al2Si2O5(OH)4"],
+			"base:item/cabbage":        ["*", [0.9, "H2O", 0.1, "C12H20O10"]],
+			"base:item/cactus":         ["*", [0.9, "H2O"], [0.1, ["+", "C12H20O10", "C12H22O11", "NO3"]]],
+			"base:item/carrot":         ["*", [0.8, ""], [0.2, "C40H56"]],
+			"base:item/cauldron":       [42, "Fe"],
+			"base:item/cave_entrance":  ["+", [10, "C12H20O10"], [10, ["*", [5.0, "SiO2"], [2.0, "Fe"], [0.7, "Au"], [0.3, "Dy"], [0.6, "Zi"], [0.5, "W" ], [0.5, "Ni"], [0.5, "Ga"], [1.0, "Al"]]]],
+			"base:item/cheese":         ["*", [0.5, "C12H22O11"], [0.5, "base:item/protein"]],
+			"base:item/chest":          [8, "C12H20O10"],
+			"base:item/coal":           "C8",
+			"base:item/diamond_ore":    "C64",
+			"base:item/diamond":        "C64",
+			"base:item/ash":            ["+", "C", "Ca"]
 		}]
 	]
 }
