@@ -106,8 +106,8 @@ namespace Game3 {
 
 	Buffer & operator+=(Buffer &buffer, const FluidStack &fluid_stack) {
 		buffer.appendType(fluid_stack);
-		buffer += fluid_stack.id;
-		buffer += fluid_stack.amount;
+		buffer << fluid_stack.id;
+		buffer << fluid_stack.amount;
 		return buffer;
 	}
 
@@ -121,8 +121,8 @@ namespace Game3 {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected FluidStack)");
 		}
-		popBuffer(buffer, fluid_stack.id);
-		popBuffer(buffer, fluid_stack.amount);
+		fluid_stack.id = buffer.take<FluidID>();
+		fluid_stack.amount = buffer.take<FluidAmount>();
 		return buffer;
 	}
 

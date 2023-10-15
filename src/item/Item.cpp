@@ -274,9 +274,9 @@ namespace Game3 {
 	Buffer & operator+=(Buffer &buffer, const ItemStack &stack) {
 		assert(stack.item);
 		buffer.appendType(stack);
-		buffer += stack.item->identifier;
-		buffer += stack.count;
-		buffer += stack.data.dump(); // TODO: Buffer::operator+= for json
+		buffer << stack.item->identifier;
+		buffer << stack.count;
+		buffer << stack.data.dump(); // TODO: Buffer::operator+= for json
 		return buffer;
 	}
 
@@ -291,9 +291,9 @@ namespace Game3 {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected Inventory)");
 		}
-		const auto item_id = popBuffer<Identifier>(buffer);
-		popBuffer(buffer, stack.count);
-		const auto raw_json = popBuffer<std::string>(buffer); // TODO: popBuffer for json
+		const auto item_id = buffer.take<Identifier>();
+		stack.count = buffer.take<ItemCount>();
+		const auto raw_json = buffer.take<std::string>(); // TODO: popBuffer for json
 		stack.data = nlohmann::json::parse(raw_json);
 		stack.item = stack.getGame().registry<ItemRegistry>().at(item_id);
 		return buffer;

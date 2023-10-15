@@ -306,15 +306,15 @@ namespace Game3 {
 	Buffer & operator+=(Buffer &buffer, const ServerInventory &inventory) {
 		buffer.appendType(inventory);
 		if (auto locked = inventory.weakOwner.lock())
-			buffer += locked->getGID();
+			buffer << locked->getGID();
 		else
-			buffer += static_cast<GlobalID>(-1);
-		buffer += inventory.slotCount.load();
-		buffer += inventory.activeSlot.load();
+			buffer << static_cast<GlobalID>(-1);
+		buffer << inventory.slotCount.load();
+		buffer << inventory.activeSlot.load();
 		{
 			auto &storage = inventory.getStorage();
 			auto lock = storage.sharedLock();
-			buffer += storage.getBase();
+			buffer << storage.getBase();
 		}
 		return buffer;
 	}
@@ -329,12 +329,12 @@ namespace Game3 {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected inventory)");
 		}
-		const auto gid = popBuffer<GlobalID>(buffer);
+		const auto gid = buffer.take<GlobalID>();
 		if (auto locked = inventory.weakOwner.lock())
 			locked->setGID(gid);
-		inventory.slotCount = popBuffer<Slot>(buffer);
-		inventory.activeSlot = popBuffer<Slot>(buffer);
-		inventory.setStorage(popBuffer<std::decay_t<decltype(inventory.getStorage())>>(buffer));
+		inventory.slotCount = buffer.take<Slot>();
+		inventory.activeSlot = buffer.take<Slot>();
+		inventory.setStorage(buffer.take<std::decay_t<decltype(inventory.getStorage())>>());
 		return buffer;
 	}
 

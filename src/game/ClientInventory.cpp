@@ -156,12 +156,12 @@ namespace Game3 {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected inventory)");
 		}
-		const auto gid = popBuffer<GlobalID>(buffer);
+		const auto gid = buffer.take<GlobalID>();
 		if (auto locked = inventory.weakOwner.lock())
 			locked->setGID(gid);
-		inventory.slotCount = popBuffer<Slot>(buffer);
-		inventory.activeSlot = popBuffer<Slot>(buffer);
-		inventory.setStorage(popBuffer<std::decay_t<decltype(inventory.getStorage())>>(buffer));
+		inventory.slotCount = buffer.take<Slot>();
+		inventory.activeSlot = buffer.take<Slot>();
+		inventory.setStorage(buffer.take<std::decay_t<decltype(inventory.getStorage())>>());
 		return buffer;
 	}
 
