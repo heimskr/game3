@@ -91,6 +91,21 @@
 				"station": "base:station/furnace"
 			}],
 			["base:registry/crafting_recipe", {
+				"input": [["base:item/gold_bar", 1]],
+				"output": [["base:item/energy_pipe", 2]],
+				"station": "base:station/anvil"
+			}],
+			["base:registry/crafting_recipe", {
+				"input": [["base:item/copper_bar", 1]],
+				"output": [["base:item/fluid_pipe", 2]],
+				"station": "base:station/anvil"
+			}],
+			["base:registry/crafting_recipe", {
+				"input": [["base:item/iron_bar", 1]],
+				"output": [["base:item/item_pipe", 2]],
+				"station": "base:station/anvil"
+			}],
+			["base:registry/crafting_recipe", {
 				"input":  [["base:item/sand", 1]],
 				"output": [["base:item/glass", 1]],
 				"station": "base:station/furnace"
@@ -163,6 +178,10 @@
 				"output": [["base:item/knife", 1]]
 			}],
 			["base:registry/crafting_recipe", {
+				"input": [["base:item/iron_bar", 4]],
+				"output": [["base:item/fridge", 1]]
+			}],
+			["base:registry/crafting_recipe", {
 				"input": [["base:item/flour", 1], ["base:item/sugar", 1]],
 				"output": [["base:item/dough", 1]],
 				"station": "base:station/sink"
@@ -227,7 +246,7 @@
 				"output": [["base:item/wooden_wall", 1]]
 			}],
 			["base:registry/crafting_recipe", {
-				"input":  [["base:item/plank", 8]],
+				"input":  [["base:item/plank", 8], ["base:item/iron_bar", 2]],
 				"output": [["base:item/chest", 1]]
 			}],
 			["base:registry/crafting_recipe", {"input": [["base:attribute/flower_red",    1]], "output": [["base:item/red_dye",    1]]}],
@@ -305,6 +324,10 @@
 			["base:registry/crafting_recipe", {
 				"input":  [["base:item/stone", 1]],
 				"output": [["base:item/floor", 2]]
+			}],
+			["base:registry/crafting_recipe", {
+				"input":  [["base:item/glass", 1]],
+				"output": [["base:item/flask", 1]]
 			}],
 			["base:registry/crafting_recipe", {
 				"input":  [["base:item/baguette", 1]],

@@ -37,5 +37,9 @@ namespace Game3 {
 		{"PbI2", "Lead iodide"},
 		{"NO3", "Nitrate"},
 		{"C40H56", "Beta carotene"},
+		{"C32H44O8", "Cucurbitacin E"},
+		{"C40H56", "Lycopene"},
+		{"C4H10", "Butane"},
+		{"C5H12", "Pentane"},
 	};
 }
