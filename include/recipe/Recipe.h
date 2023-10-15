@@ -13,10 +13,12 @@ namespace Game3 {
 		virtual ~RecipeBase() = default;
 	};
 
-	template <typename I, typename O>
-	struct Recipe: Registerable {
+	template <typename I, typename O, typename R = Registerable>
+	struct Recipe: R {
 		using Input  = I;
 		using Output = O;
+
+		using R::R;
 
 		virtual ~Recipe() = default;
 

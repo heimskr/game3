@@ -79,12 +79,12 @@ namespace Game3 {
 		throw std::logic_error("ClientInventory::remove(const ItemStack &, Slot) unimplemented");
 	}
 
-	ItemCount ClientInventory::remove(const CraftingRequirement &) {
-		throw std::logic_error("ClientInventory::remove(const CraftingRequirement &) unimplemented");
+	ItemCount ClientInventory::remove(const CraftingRequirement &, const ConstPredicate &) {
+		throw std::logic_error("ClientInventory::remove(const CraftingRequirement &, const ConstPredicate &) unimplemented");
 	}
 
-	ItemCount ClientInventory::remove(const AttributeRequirement &) {
-		throw std::logic_error("ClientInventory::remove(const AttributeRequirement &) unimplemented");
+	ItemCount ClientInventory::remove(const AttributeRequirement &, const ConstPredicate &) {
+		throw std::logic_error("ClientInventory::remove(const AttributeRequirement &, const ConstPredicate &) unimplemented");
 	}
 
 	void ClientInventory::setActive(Slot new_active, bool force) {

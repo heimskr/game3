@@ -33,8 +33,8 @@ namespace Game3 {
 			ItemCount remove(const ItemStack &) override;
 			ItemCount remove(const ItemStack &, const std::function<bool(Slot)> &) override;
 			ItemCount remove(const ItemStack &, Slot) override;
-			ItemCount remove(const CraftingRequirement &) override;
-			ItemCount remove(const AttributeRequirement &) override;
+			ItemCount remove(const CraftingRequirement &, const ConstPredicate &) override;
+			ItemCount remove(const AttributeRequirement &, const ConstPredicate &) override;
 
 			void setActive(Slot, bool force) override;
 

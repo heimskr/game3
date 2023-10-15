@@ -24,14 +24,16 @@ namespace Game3 {
 			StorageInventory & operator=(const StorageInventory &);
 			StorageInventory & operator=(StorageInventory &&);
 
-			ItemStack * operator[](size_t) override;
-			const ItemStack * operator[](size_t) const override;
+			ItemStack * operator[](Slot) override;
+			const ItemStack * operator[](Slot) const override;
 
-			void iterate(const std::function<bool(const ItemStack &, Slot)> &) override;
+			void iterate(const std::function<bool(const ItemStack &, Slot)> &) const override;
+			void iterate(const std::function<bool(ItemStack &, Slot)> &) override;
 
 			ItemStack * firstItem(Slot *slot_out) override;
+			ItemStack * firstItem(Slot *slot_out, const std::function<bool(const ItemStack &, Slot)> &) override;
 
-			bool canInsert(const ItemStack &) const override;
+			bool canInsert(const ItemStack &, const std::function<bool(Slot)> &) const override;
 			bool canInsert(const ItemStack &, Slot) const override;
 
 			bool canExtract(Slot) const override;
@@ -63,14 +65,14 @@ namespace Game3 {
 
 			bool contains(Slot) const override;
 
-			/** Returns whether the inventory contains at least a minimum amount of a given item. */
-			bool contains(const ItemStack &) const override;
+			/** Returns whether the inventory contains at least a minimum amount of a given item, given a predicate. */
+			bool contains(const ItemStack &, const ConstPredicate &) const override;
 
 			/** Returns the slot containing a given item ID if one exists. */
-			std::optional<Slot> find(const ItemID &) const override;
+			std::optional<Slot> find(const ItemID &, const ConstPredicate &) const override;
 
 			/** Returns the first slot containing an item with the given attribute if one exists. */
-			std::optional<Slot> findAttribute(const Identifier &) const override;
+			std::optional<Slot> findAttribute(const Identifier &, const ConstPredicate &) const override;
 
 			ItemStack * getActive() override;
 

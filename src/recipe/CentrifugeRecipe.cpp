@@ -54,12 +54,4 @@ namespace Game3 {
 
 		return recipe;
 	}
-
-	void to_json(nlohmann::json &json, const CentrifugeRecipe &recipe) {
-		json["input"] = recipe.input;
-		std::vector<std::pair<double, nlohmann::json>> weight_pairs;
-		for (const auto &[item_json, weight]: recipe.weightMap)
-			weight_pairs.emplace_back(weight, item_json);
-		json["output"] = std::move(weight_pairs);
-	}
 }

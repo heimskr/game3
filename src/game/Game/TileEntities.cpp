@@ -4,6 +4,7 @@
 #include "tileentity/ChemicalReactor.h"
 #include "tileentity/Chest.h"
 #include "tileentity/CraftingStation.h"
+#include "tileentity/Dissolver.h"
 #include "tileentity/GeothermalGenerator.h"
 #include "tileentity/ItemSpawner.h"
 #include "tileentity/OreDeposit.h"
@@ -28,6 +29,7 @@ namespace Game3 {
 		add(TileEntityFactory::create<ChemicalReactor>());
 		add(TileEntityFactory::create<Chest>());
 		add(TileEntityFactory::create<CraftingStation>());
+		add(TileEntityFactory::create<Dissolver>());
 		add(TileEntityFactory::create<GeothermalGenerator>());
 		add(TileEntityFactory::create<ItemSpawner>());
 		add(TileEntityFactory::create<OreDeposit>());

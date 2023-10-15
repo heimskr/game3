@@ -29,7 +29,7 @@ namespace Game3 {
 	void to_json(nlohmann::json &, const CraftingRecipe &);
 
 	struct CraftingRecipeRegistry: UnnamedJSONRegistry<CraftingRecipe> {
-		static Identifier ID() { return {"base", "crafting_recipe"}; }
+		static Identifier ID() { return {"base", "registry/crafting_recipe"}; }
 		CraftingRecipeRegistry(): UnnamedJSONRegistry(ID()) {}
 	};
 }

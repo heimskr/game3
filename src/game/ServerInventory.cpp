@@ -234,19 +234,19 @@ namespace Game3 {
 		return to_remove;
 	}
 
-	ItemCount ServerInventory::remove(const CraftingRequirement &requirement) {
+	ItemCount ServerInventory::remove(const CraftingRequirement &requirement, const ConstPredicate &predicate) {
 		if (requirement.is<ItemStack>())
-			return remove(requirement.get<ItemStack>());
-		return remove(requirement.get<AttributeRequirement>());
+			return remove(requirement.get<ItemStack>(), predicate);
+		return remove(requirement.get<AttributeRequirement>(), predicate);
 	}
 
-	ItemCount ServerInventory::remove(const AttributeRequirement &requirement) {
+	ItemCount ServerInventory::remove(const AttributeRequirement &requirement, const ConstPredicate &predicate) {
 		const Identifier &attribute = requirement.attribute;
 		ItemCount count_remaining = requirement.count;
 		ItemCount count_removed = 0;
 
 		for (Slot slot = 0; slot < slotCount && 0 < count_remaining; ++slot) {
-			if (auto *stack = (*this)[slot]; stack && stack->hasAttribute(attribute)) {
+			if (auto *stack = (*this)[slot]; stack && predicate(*stack, slot) && stack->hasAttribute(attribute)) {
 				const ItemCount to_remove = std::min(stack->count, count_remaining);
 				stack->count  -= to_remove;
 				count_removed += to_remove;

@@ -7,6 +7,7 @@
 #include "item/ChemicalItem.h"
 #include "item/ChemicalReactorItem.h"
 #include "item/ContainmentOrb.h"
+#include "item/DissolverItem.h"
 #include "item/EmptyFlask.h"
 #include "item/FilledFlask.h"
 #include "item/Floor.h"
@@ -104,6 +105,7 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/glass",           "Glass",               2, 64));
 		add(std::make_shared<Item>("base:item/salt",            "Salt",                4, 64));
 		add(std::make_shared<Item>("base:item/sugar",           "Sugar",               5, 64));
+		add(std::make_shared<Item>("base:item/protein",         "Protein",            12, 64));
 
 		add(std::make_shared<Mead>("base:item/mead", "Mead", 10, 16));
 
@@ -246,6 +248,8 @@ namespace Game3 {
 		add(std::make_shared<ChemicalItem>("base:item/chemical", "Chemical", 0));
 
 		add(std::make_shared<ItemPipeItem>(4));
+
+		add(std::make_shared<DissolverItem>("base:item/dissolver", "Dissolver", 999, 64)); // TODO: cost
 
 		add(std::make_shared<FluidPipeItem>(4));
 

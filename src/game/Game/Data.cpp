@@ -1,6 +1,7 @@
 #include "game/Crop.h"
 #include "game/Game.h"
 #include "graph/Graph.h"
+#include "recipe/DissolverRecipe.h"
 #include "tileentity/OreDeposit.h"
 #include "tools/ItemStitcher.h"
 #include "tools/TileStitcher.h"
@@ -159,6 +160,14 @@ namespace Game3 {
 
 			for (const auto &recipe_json: json.at(1))
 				addRecipe(recipe_json);
+
+		} else if (type == "base:dissolver_map") {
+
+			auto &dissolver_recipes = registry<DissolverRecipeRegistry>();
+			for (const auto &[input, result_json]: json.at(1).items()) {
+				const Identifier identifier(input);
+				dissolver_recipes.add(identifier, DissolverRecipe(identifier, ItemStack(*this, identifier, 1), result_json));
+			}
 
 		} else if (type == "base:fluid_list") {
 

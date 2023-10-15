@@ -17,5 +17,8 @@ namespace Game3 {
 		{"SiO2", "Silica"},
 		{"Al2Si2O5(OH)4", "Kaolinite"},
 		{"C39H35O10NS", "Lignite"},
+		{"NH3", "Ammonia"},
+		{"C2H4", "Ethylene"},
+		{"S", "Sulfur"},
 	};
 }

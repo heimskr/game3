@@ -17,7 +17,6 @@ namespace Game3 {
 	class Tile;
 	class Tileset;
 	class TileEntityFactory;
-	struct CraftingRecipe;
 	struct EntityTexture;
 	struct Fluid;
 	struct ItemTexture;

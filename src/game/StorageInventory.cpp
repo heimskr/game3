@@ -43,19 +43,26 @@ namespace Game3 {
 		return *this;
 	}
 
-	ItemStack * StorageInventory::operator[](size_t slot) {
+	ItemStack * StorageInventory::operator[](Slot slot) {
 		if (auto iter = storage.find(slot); iter != storage.end())
 			return &iter->second;
 		return nullptr;
 	}
 
-	const ItemStack * StorageInventory::operator[](size_t slot) const {
+	const ItemStack * StorageInventory::operator[](Slot slot) const {
 		if (auto iter = storage.find(slot); iter != storage.end())
 			return &iter->second;
 		return nullptr;
 	}
 
-	void StorageInventory::iterate(const std::function<bool(const ItemStack &, Slot)> &function) {
+	void StorageInventory::iterate(const std::function<bool(const ItemStack &, Slot)> &function) const {
+		for (Slot slot = 0; slot < slotCount; ++slot)
+			if (auto iter = storage.find(slot); iter != storage.end())
+				if (function(iter->second, slot))
+					return;
+	}
+
+	void StorageInventory::iterate(const std::function<bool(ItemStack &, Slot)> &function) {
 		for (Slot slot = 0; slot < slotCount; ++slot)
 			if (auto iter = storage.find(slot); iter != storage.end())
 				if (function(iter->second, slot))
@@ -75,11 +82,25 @@ namespace Game3 {
 		return &stack;
 	}
 
-	bool StorageInventory::canInsert(const ItemStack &stack) const {
+	ItemStack * StorageInventory::firstItem(Slot *slot_out, const std::function<bool(const ItemStack &, Slot)> &predicate) {
+		for (auto &[slot, stack]: storage) {
+			if (predicate(stack, slot)) {
+				if (slot_out)
+					*slot_out = slot;
+				return &stack;
+			}
+		}
+
+		if (slot_out)
+			*slot_out = -1;
+		return nullptr;
+	}
+
+	bool StorageInventory::canInsert(const ItemStack &stack, const std::function<bool(Slot)> &predicate) const {
 		ssize_t remaining = stack.count;
 
 		for (const auto &[slot, stored]: storage) {
-			if (!stored.canMerge(stack))
+			if (!predicate(slot) || !stored.canMerge(stack))
 				continue;
 			const ssize_t storable = ssize_t(stored.item->maxCount) - ssize_t(stored.count);
 			if (0 < storable) {
@@ -90,7 +111,7 @@ namespace Game3 {
 			}
 		}
 
-		if (0 < remaining)
+		if (0 < remaining) {
 			for (Slot slot = 0; slot < slotCount; ++slot) {
 				if (storage.contains(slot))
 					continue;
@@ -98,6 +119,7 @@ namespace Game3 {
 				if (remaining <= 0)
 					break;
 			}
+		}
 
 		if (remaining < 0)
 			throw std::logic_error("How'd we end up with " + std::to_string(remaining) + " items remaining?");
@@ -153,9 +175,9 @@ namespace Game3 {
 
 		ItemCount out = 0;
 
-		for (const auto &[slot, stored_stack]: storage)
-			if (stored_stack.item->identifier == id)
-				out += stored_stack.count;
+		for (const auto &[slot, stack]: storage)
+			if (stack.item->identifier == id)
+				out += stack.count;
 
 		return out;
 	}
@@ -163,9 +185,9 @@ namespace Game3 {
 	ItemCount StorageInventory::count(const Item &item) const {
 		ItemCount out = 0;
 
-		for (const auto &[slot, stored_stack]: storage)
-			if (stored_stack.item->identifier == item.identifier)
-				out += stored_stack.count;
+		for (const auto &[slot, stack]: storage)
+			if (stack.item->identifier == item.identifier)
+				out += stack.count;
 
 		return out;
 	}
@@ -224,16 +246,16 @@ namespace Game3 {
 		return storage.contains(slot);
 	}
 
-	std::optional<Slot> StorageInventory::find(const ItemID &id) const {
+	std::optional<Slot> StorageInventory::find(const ItemID &id, const ConstPredicate &predicate) const {
 		for (const auto &[slot, stack]: storage)
-			if (stack.item->identifier == id)
+			if (predicate(stack, slot) && stack.item->identifier == id)
 				return slot;
 		return std::nullopt;
 	}
 
-	std::optional<Slot> StorageInventory::findAttribute(const Identifier &attribute) const {
+	std::optional<Slot> StorageInventory::findAttribute(const Identifier &attribute, const ConstPredicate &predicate) const {
 		for (const auto &[slot, stack]: storage)
-			if (stack.item->attributes.contains(attribute))
+			if (predicate(stack, slot) && stack.item->attributes.contains(attribute))
 				return slot;
 		return std::nullopt;
 	}
@@ -250,10 +272,10 @@ namespace Game3 {
 		return nullptr;
 	}
 
-	bool StorageInventory::contains(const ItemStack &needle) const {
+	bool StorageInventory::contains(const ItemStack &needle, const ConstPredicate &predicate) const {
 		ItemCount remaining = needle.count;
 		for (const auto &[slot, stack]: storage) {
-			if (!needle.canMerge(stack))
+			if (!predicate(stack, slot) || !needle.canMerge(stack))
 				continue;
 			if (remaining <= stack.count)
 				return true;

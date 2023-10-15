@@ -35,6 +35,10 @@ namespace Game3 {
 			Inventory(Inventory &&);
 
 		public:
+			using SlotPredicate = std::function<bool(Slot)>;
+			using ConstPredicate = std::function<bool(const ItemStack &, Slot)>;
+			using Predicate = std::function<bool(ItemStack &, Slot)>;
+
 			std::weak_ptr<Agent> weakOwner;
 			Atomic<Slot> slotCount = 0;
 			Atomic<Slot> activeSlot = 0;
@@ -52,26 +56,30 @@ namespace Game3 {
 
 			virtual std::unique_ptr<Inventory> copy() const = 0;
 
-			virtual ItemStack * operator[](size_t) = 0;
-			virtual const ItemStack * operator[](size_t) const = 0;
+			virtual ItemStack * operator[](Slot) = 0;
+			virtual const ItemStack * operator[](Slot) const = 0;
 
 			inline bool operator==(const Inventory &other) const { return this == &other; }
 
 			/** Iterates over all items in the inventory until all have been iterated or the iteration function returns true. */
-			virtual void iterate(const std::function<bool(const ItemStack &, Slot)> &) = 0;
+			virtual void iterate(const ConstPredicate &) const = 0;
+			/** Iterates over all items in the inventory until all have been iterated or the iteration function returns true. */
+			virtual void iterate(const Predicate &) = 0;
 
 			virtual ItemStack * firstItem(Slot *slot_out) = 0;
+			virtual ItemStack * firstItem(Slot *slot_out, const ConstPredicate &) = 0;
 
 			/** If the ItemStack couldn't be inserted into the inventory, this function returns an ItemStack
 			 *  containing the leftovers that couldn't be inserted. Otherwise, this function returns nothing.
 			 *  The predicate will be used to determine which slots can be inserted into. */
-			virtual std::optional<ItemStack> add(const ItemStack &, const std::function<bool(Slot)> &predicate, Slot start) = 0;
-			virtual std::optional<ItemStack> add(const ItemStack &stack, const std::function<bool(Slot)> &predicate) { return add(stack, predicate, -1); }
+			virtual std::optional<ItemStack> add(const ItemStack &, const SlotPredicate &predicate, Slot start) = 0;
+			virtual std::optional<ItemStack> add(const ItemStack &stack, const SlotPredicate &predicate) { return add(stack, predicate, -1); }
 			virtual std::optional<ItemStack> add(const ItemStack &stack, Slot start) { return add(stack, [](Slot) { return true; }, start); }
 			virtual std::optional<ItemStack> add(const ItemStack &stack) { return add(stack, [](Slot) { return true; }, -1); }
 
-			virtual bool canInsert(const ItemStack &) const = 0;
+			virtual bool canInsert(const ItemStack &, const SlotPredicate &predicate) const = 0;
 			virtual bool canInsert(const ItemStack &, Slot) const = 0;
+			virtual bool canInsert(const ItemStack &stack) const { return canInsert(stack, [](Slot) { return true; }); }
 
 			virtual bool canExtract(Slot) const = 0;
 
@@ -108,7 +116,7 @@ namespace Game3 {
 
 			/** Counts the number of an item in the inventory, given a predicate to select the slots read from.
 			 *  This takes ItemStack data into account but ignores the given ItemStack's count. */
-			virtual ItemCount count(const ItemStack &, const std::function<bool(Slot)> &) const = 0;
+			virtual ItemCount count(const ItemStack &, const SlotPredicate &) const = 0;
 
 			/** Counts the number of items with a given attribute in the inventory. */
 			virtual ItemCount countAttribute(const Identifier &) const = 0;
@@ -127,25 +135,34 @@ namespace Game3 {
 			/** Attempts to remove a given amount of an item from the inventory.
 			 *  Uses a predicate to determine which slots can be removed from.
 			 *  Returns the count removed. */
-			virtual ItemCount remove(const ItemStack &, const std::function<bool(Slot)> &) = 0;
+			virtual ItemCount remove(const ItemStack &, const SlotPredicate &) = 0;
 
 			/** Attempts to remove a given amount of an item from a specific slot. Returns the count removed. */
 			virtual ItemCount remove(const ItemStack &, Slot) = 0;
 
-			virtual ItemCount remove(const CraftingRequirement &) = 0;
+			virtual ItemCount remove(const CraftingRequirement &, const ConstPredicate &) = 0;
+			virtual ItemCount remove(const CraftingRequirement &requirement) { return remove(requirement, [](const ItemStack &, Slot) { return true; }); }
 
-			virtual ItemCount remove(const AttributeRequirement &) = 0;
+			virtual ItemCount remove(const AttributeRequirement &, const ConstPredicate &) = 0;
+			virtual ItemCount remove(const AttributeRequirement &requirement) { return remove(requirement, [](const ItemStack &, Slot) { return true; }); }
 
 			virtual bool contains(Slot) const = 0;
 
 			/** Returns whether the inventory contains at least a minimum amount of a given item. */
-			virtual bool contains(const ItemStack &) const = 0;
+			virtual bool contains(const ItemStack &stack) const { return contains(stack, [](const ItemStack &, Slot) { return true; }); }
+
+			/** Returns whether the inventory contains at least a minimum amount of a given item, given a predicate. */
+			virtual bool contains(const ItemStack &, const ConstPredicate &) const = 0;
 
 			/** Returns the slot containing a given item ID if one exists. */
-			virtual std::optional<Slot> find(const ItemID &) const = 0;
+			virtual std::optional<Slot> find(const ItemID &id) const { return find(id, [](const ItemStack &, Slot) { return true; }); }
+			/** Returns the slot containing a given item ID if one exists and matches a predicate. */
+			virtual std::optional<Slot> find(const ItemID &, const ConstPredicate &) const = 0;
 
 			/** Returns the first slot containing an item with the given attribute if one exists. */
-			virtual std::optional<Slot> findAttribute(const Identifier &) const = 0;
+			virtual std::optional<Slot> findAttribute(const Identifier &attribute) const { return findAttribute(attribute, [](const ItemStack &, Slot) { return true; }); }
+			/** Returns the first slot containing an item with the given attribute if one exists and matches a predicate. */
+			virtual std::optional<Slot> findAttribute(const Identifier &, const ConstPredicate &) const = 0;
 
 			virtual ItemStack * getActive() = 0;
 
@@ -199,6 +216,8 @@ namespace Game3 {
 			Suppressor suppress() {
 				return Suppressor(*this);
 			}
+
+		friend class InventoryWrapper;
 	};
 
 	using InventoryPtr = std::shared_ptr<Inventory>;

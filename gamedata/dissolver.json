@@ -1,0 +1,29 @@
+{
+	"name": "base_chemistry",
+	"dependencies": [],
+	"data": [
+		["base:dissolver_map", {
+			"base:item/wood":    "C12H20O10",
+			"base:item/plank":   "C12H20O10",
+			"base:item/wheat":   "(C6H10O5)(H2O)",
+			"base:item/flour":   "(C6H10O5)(H2O)",
+			"base:item/sugar":   "C12H22O11",
+			"base:item/protein": ["+", "NH3", "CO2", "C2H4", "S"],
+			"base:item/egg":     "base:item/protein",
+			"base:item/bean":    "base:item/protein",
+			"base:item/stone":   ["*",
+				[5.0, "SiO2"],
+				[2.0, "Fe"],
+				[0.7, "Au"],
+				[0.3, "Dy"],
+				[0.6, "Zi"],
+				[0.5, "W" ],
+				[0.5, "Ni"],
+				[0.5, "Ga"],
+				[1.0, "Al"]]
+		}],
+		["base:ignore/dissolver_map", {
+
+		}]
+	]
+}
