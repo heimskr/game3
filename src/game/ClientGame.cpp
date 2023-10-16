@@ -254,7 +254,7 @@ namespace Game3 {
 					break;
 				}
 
-				std::this_thread::sleep_for(std::chrono::milliseconds(TICK_PERIOD));
+				std::this_thread::sleep_for(std::chrono::milliseconds(CLIENT_TICK_PERIOD));
 			}
 
 			if (stoppedByError && errorCallback)

@@ -12,7 +12,7 @@
 			"base:item/sugar":    "C12H22O11",
 			"base:item/honey":    "C12H22O11",
 			"base:item/protein":  ["+", "NH3", "CO2", "C2H4", "S"],
-			"base:item/egg":      "base:item/protein",
+			"base:item/egg":      ["+", "Ca", "base:item/protein"],
 			"base:item/bean":     "base:item/protein",
 			"base:item/stone":    ["*",
 				[5.0, "SiO2"],

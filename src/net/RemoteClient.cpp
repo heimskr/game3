@@ -36,7 +36,7 @@ namespace Game3 {
 				packetType = headerBytes[0] | (static_cast<uint16_t>(headerBytes[1]) << 8);
 				payloadSize = headerBytes[2] | (static_cast<uint32_t>(headerBytes[3]) << 8) | (static_cast<uint32_t>(headerBytes[4]) << 16) | (static_cast<uint32_t>(headerBytes[5]) << 24);
 
-				if (payloadSize > 8192) {
+				if (payloadSize > 32768) {
 					WARN("Payload size of " << payloadSize << " bytes for packet type " << packetType << " is too large (" << ip << ')');
 					mock();
 					return;

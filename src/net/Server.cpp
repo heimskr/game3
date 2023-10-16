@@ -302,7 +302,7 @@ namespace Game3 {
 			while (running) {
 				if (!game->tickingPaused)
 					game->tick();
-				std::this_thread::sleep_for(std::chrono::milliseconds(TICK_PERIOD));
+				std::this_thread::sleep_for(std::chrono::milliseconds(SERVER_TICK_PERIOD));
 			}
 		});
 

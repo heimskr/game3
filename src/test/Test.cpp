@@ -1,7 +1,6 @@
 #include "Log.h"
 #include "container/Quadtree.h"
 #include "entity/ServerPlayer.h"
-// #include "game/Game.h"
 #include "game/TileProvider.h"
 #include "net/Buffer.h"
 #include "threading/LockableSharedPtr.h"

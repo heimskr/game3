@@ -83,6 +83,6 @@ namespace Game3 {
 			red(red_), green(green_), blue(blue_), alpha(alpha_) {}
 	};
 
-	enum class PipeType {Item, Fluid, Energy};
+	enum class PipeType: uint8_t {Invalid = 0, Item, Fluid, Energy};
 	std::ostream & operator<<(std::ostream &, PipeType);
 }
