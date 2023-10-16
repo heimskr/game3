@@ -249,12 +249,18 @@ namespace Game3 {
 				renderer.reupload();
 	}
 
-	EntityPtr Realm::addUnsafe(const EntityPtr &entity, const Position &position) {
+	EntityPtr Realm::add(const EntityPtr &entity, const Position &position) {
 		if (auto found = getEntity(entity->getGID()))
 			return found;
 		auto shared = shared_from_this();
-		entities.insert(entity);
-		entitiesByGID[entity->globalID] = entity;
+		{
+			auto lock = entities.uniqueLock();
+			entities.insert(entity);
+		}
+		{
+			auto lock = entitiesByGID.uniqueLock();
+			entitiesByGID[entity->globalID] = entity;
+		}
 		entity->firstTeleport = true;
 		if (entity->isPlayer() && entity->weakRealm.lock())
 			std::static_pointer_cast<Player>(entity)->stopMoving();
@@ -272,19 +278,23 @@ namespace Game3 {
 		return entity;
 	}
 
-	EntityPtr Realm::add(const EntityPtr &entity, const Position &position) {
-		auto lock = entities.uniqueLock();
-		return addUnsafe(entity, position);
-	}
-
-	TileEntityPtr Realm::addUnsafe(const TileEntityPtr &tile_entity) {
-		if (tileEntities.contains(tile_entity->position))
-			return nullptr;
+	TileEntityPtr Realm::add(const TileEntityPtr &tile_entity) {
+		{
+			auto lock = tileEntities.sharedLock();
+			if (tileEntities.contains(tile_entity->position))
+				return nullptr;
+		}
 		tile_entity->setRealm(shared_from_this());
 		if (!tile_entity->initialized)
 			tile_entity->init(game);
-		tileEntities.emplace(tile_entity->position, tile_entity);
-		tileEntitiesByGID[tile_entity->globalID] = tile_entity;
+		{
+			auto lock = tileEntities.uniqueLock();
+			tileEntities.emplace(tile_entity->position, tile_entity);
+		}
+		{
+			auto lock = tileEntitiesByGID.uniqueLock();
+			tileEntitiesByGID[tile_entity->globalID] = tile_entity;
+		}
 		attach(tile_entity);
 		if (tile_entity->solid) {
 			std::unique_lock<std::shared_mutex> path_lock;
@@ -292,11 +302,6 @@ namespace Game3 {
 		}
 		tile_entity->onSpawn();
 		return tile_entity;
-	}
-
-	TileEntityPtr Realm::add(const TileEntityPtr &tile_entity) {
-		auto lock = tileEntities.uniqueLock();
-		return addUnsafe(tile_entity);
 	}
 
 	void Realm::initEntities() {
@@ -359,9 +364,10 @@ namespace Game3 {
 					{
 						auto by_chunk_lock = tileEntitiesByChunk.sharedLock();
 						if (auto iter = tileEntitiesByChunk.find(chunk); iter != tileEntitiesByChunk.end() && iter->second) {
-							auto set_lock = iter->second->sharedLock();
+							auto set = iter->second;
+							auto set_lock = set->sharedLock();
 							by_chunk_lock.unlock();
-							for (const auto &tile_entity: *iter->second)
+							for (const auto &tile_entity: *set)
 								tile_entity->tick(game, delta);
 						}
 					}
@@ -1097,9 +1103,9 @@ namespace Game3 {
 		const auto chunk_position = tile_entity->getChunk();
 		if (auto iter = tileEntitiesByChunk.find(chunk_position); iter != tileEntitiesByChunk.end()) {
 			assert(iter->second);
-			auto &set = *iter->second;
-			auto set_lock = set.uniqueLock();
-			set.insert(tile_entity);
+			auto set = iter->second;
+			auto set_lock = set->uniqueLock();
+			set->insert(tile_entity);
 		} else {
 			auto set = std::make_shared<Lockable<std::unordered_set<TileEntityPtr>>>();
 			set->insert(tile_entity);

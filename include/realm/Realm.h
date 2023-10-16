@@ -116,10 +116,8 @@ namespace Game3 {
 			void render(int width, int height, const std::pair<double, double> &center, float scale, SpriteRenderer &, TextRenderer &, float game_time);
 			/** Reuploads fluids and terrain in all layers. */
 			void reupload();
-			EntityPtr addUnsafe(const EntityPtr &, const Position &);
 			EntityPtr add(const EntityPtr &, const Position &);
 			TileEntityPtr add(const TileEntityPtr &);
-			TileEntityPtr addUnsafe(const TileEntityPtr &);
 			void initEntities();
 			void tick(float delta);
 			std::vector<EntityPtr> findEntities(const Position &);
