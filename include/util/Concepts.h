@@ -12,6 +12,8 @@
 #include <unordered_set>
 #include <vector>
 
+#include <nlohmann/json_fwd.hpp>
+
 namespace Game3 {
 	template <typename T>
 	concept Map =
@@ -32,6 +34,7 @@ namespace Game3 {
 		requires !Set<T>;
 		requires !std::same_as<T, std::string>;
 		requires !std::same_as<T, std::string_view>;
+		requires !std::same_as<T, nlohmann::json>;
 	};
 
 	template <typename T>

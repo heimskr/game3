@@ -18,6 +18,8 @@
 #include <span>
 #include <vector>
 
+#include <nlohmann/json_fwd.hpp>
+
 namespace Game3 {
 	class Buffer;
 
@@ -79,15 +81,16 @@ namespace Game3 {
 				return item.has_value()? "\x0b" : "\x0c";
 			}
 
-			Buffer & operator+=(bool);
-			Buffer & operator+=(char);
-			Buffer & operator+=(uint8_t);
-			Buffer & operator+=(uint16_t);
-			Buffer & operator+=(uint32_t);
-			Buffer & operator+=(uint64_t);
-			Buffer & operator+=(float);
-			Buffer & operator+=(double);
-			Buffer & operator+=(std::string_view);
+			Buffer & operator+=(std::same_as<bool> auto);
+			Buffer & operator+=(std::same_as<uint8_t> auto);
+			Buffer & operator+=(std::same_as<uint16_t> auto);
+			Buffer & operator+=(std::same_as<uint32_t> auto);
+			Buffer & operator+=(std::same_as<uint64_t> auto);
+			Buffer & operator+=(std::same_as<float> auto);
+			Buffer & operator+=(std::same_as<double> auto);
+			Buffer & operator+=(std::same_as<std::string_view> auto);
+			Buffer & operator+=(std::same_as<std::string> auto const &);
+			Buffer & operator+=(std::same_as<nlohmann::json> auto const &);
 
 			template <std::signed_integral T>
 			Buffer & operator+=(T item) {
@@ -370,4 +373,7 @@ namespace Game3 {
 	}
 
 	std::ostream & operator<<(std::ostream &, const Buffer &);
+
+	Buffer & operator<<(Buffer &, std::same_as<nlohmann::json> auto const &);
+	Buffer & operator>>(Buffer &, std::same_as<nlohmann::json> auto &);
 }

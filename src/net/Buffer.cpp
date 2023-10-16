@@ -1,10 +1,12 @@
+#include "Log.h"
+#include "net/Buffer.h"
+#include "util/Util.h"
+
 #include <cassert>
 #include <cstring>
 #include <iomanip>
 
-#include "Log.h"
-#include "net/Buffer.h"
-#include "util/Util.h"
+#include <nlohmann/json.hpp>
 
 namespace Game3 {
 	Buffer::Buffer(Buffer &&other):
@@ -65,21 +67,24 @@ namespace Game3 {
 		return getType(std::string_view(string));
 	}
 
+	template <>
+	std::string Buffer::getType<nlohmann::json>(const nlohmann::json &) {
+		return getType(std::string());
+	}
+
+	template<>
 	Buffer & Buffer::operator+=(bool item) {
 		bytes.insert(bytes.end(), static_cast<uint8_t>(item));
 		return *this;
 	}
 
-	Buffer & Buffer::operator+=(char item) {
-		bytes.insert(bytes.end(), static_cast<uint8_t>(item));
-		return *this;
-	}
-
+	template<>
 	Buffer & Buffer::operator+=(uint8_t item) {
 		bytes.insert(bytes.end(), item);
 		return *this;
 	}
 
+	template<>
 	Buffer & Buffer::operator+=(uint16_t item) {
 		if constexpr (std::endian::native == std::endian::little) {
 			const auto *raw = reinterpret_cast<uint8_t *>(&item);
@@ -89,6 +94,7 @@ namespace Game3 {
 		return *this;
 	}
 
+	template<>
 	Buffer & Buffer::operator+=(uint32_t item) {
 		if constexpr (std::endian::native == std::endian::little) {
 			const auto *raw = reinterpret_cast<uint8_t *>(&item);
@@ -98,6 +104,7 @@ namespace Game3 {
 		return *this;
 	}
 
+	template<>
 	Buffer & Buffer::operator+=(uint64_t item) {
 		if constexpr (std::endian::native == std::endian::little) {
 			const auto *raw = reinterpret_cast<uint8_t *>(&item);
@@ -117,6 +124,7 @@ namespace Game3 {
 		return *this;
 	}
 
+	template<>
 	Buffer & Buffer::operator+=(float item) {
 		static_assert(sizeof(item) == 4 && sizeof(item) == sizeof(uint32_t));
 		uint32_t to_add{};
@@ -124,6 +132,7 @@ namespace Game3 {
 		return *this += to_add;
 	}
 
+	template<>
 	Buffer & Buffer::operator+=(double item) {
 		static_assert(sizeof(item) == 8 && sizeof(item) == sizeof(uint64_t));
 		uint64_t to_add{};
@@ -131,6 +140,7 @@ namespace Game3 {
 		return *this += to_add;
 	}
 
+	template<>
 	Buffer & Buffer::operator+=(std::string_view string) {
 		const auto type = getType(string);
 		bytes.insert(bytes.end(), type.begin(), type.end());
@@ -148,6 +158,16 @@ namespace Game3 {
 		*this += static_cast<uint32_t>(string.size());
 		bytes.insert(bytes.end(), string.begin(), string.end());
 		return *this;
+	}
+
+	template<>
+	Buffer & Buffer::operator+=(const std::string &string) {
+		return *this += std::string_view(string);
+	}
+
+	template<>
+	Buffer & Buffer::operator+=(const nlohmann::json &json) {
+		return *this += json.dump();
 	}
 
 	template <>
@@ -192,6 +212,11 @@ namespace Game3 {
 	template <>
 	std::string popBuffer<std::string>(Buffer &buffer) {
 		return buffer.take<std::string>();
+	}
+
+	template <>
+	nlohmann::json popBuffer<nlohmann::json>(Buffer &buffer) {
+		return buffer.take<nlohmann::json>();
 	}
 
 	std::string Buffer::popType() {
@@ -340,5 +365,16 @@ namespace Game3 {
 		bytes.clear();
 		skip = 0;
 		return *this;
+	}
+
+	template<>
+	Buffer & operator<<(Buffer &buffer, const nlohmann::json &json) {
+		return buffer << json.dump();;
+	}
+
+	template<>
+	Buffer & operator>>(Buffer &buffer, nlohmann::json &json) {
+		json = nlohmann::json::parse(buffer.take<std::string>());
+		return buffer;
 	}
 }

@@ -53,7 +53,6 @@ SOURCES      := $(shell find -L src -name \*.cpp) src/gtk_resources.cpp
 OBJECTS      := $(SOURCES:.cpp=.o) src/resources.o
 RESXML       := src/$(OUTPUT).gresource.xml
 CLOC_OPTIONS := . --exclude-dir=pvs-report,discord,subprojects,*build*,_build,po,vscode,stb,eigen,json,data,.github,.idea,vcpkg_installed,build,builddir,.flatpak-builder,libnoise --fullpath --not-match-f='^\.\/((src\/(gtk_)?resources\.cpp|include\/resources\.h|analysis\.txt|include\/lib\/.*|.*\.(json|txt|md|xml))|(chemskr\/src\/chemskr/(NuclideMasses|yylex|yyparse)\.cpp|chemskr\/(include|src)\/chemskr\/yyparse\.h))$$'
-RESGEN       := ./resgen
 
 .PHONY: all clean flags test
 
@@ -91,20 +90,13 @@ flags:
 src/gtk_resources.cpp: $(RESXML) $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=resources --generate-dependencies $(RESXML))
 	$(GLIB_COMPILE_RESOURCES) --target=$@ --sourcedir=resources --generate-source $<
 
-%.o: %.cpp include/resources.h
+%.o: %.cpp
 	@ printf "\e[2m[\e[22;32mc++\e[39;2m]\e[22m $< \e[2m$(strip $(BUILDFLAGS) $(LTO))\e[22m\n"
 	@ $(COMPILER) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
 
 src/resources.o: src/resources.zig
 	@ printf "\e[2m[\e[22;32mzig\e[39;2m]\e[22m $< \e[2m$(ZIGFLAGS)\e[22m\n"
 	@ $(ZIG) build-obj $(ZIGFLAGS) $<  -femit-bin=$@
-
-$(RESGEN): src/resgen.zig src/resources.zig
-	@ printf "\e[2m[\e[22;32mzig\e[39;2m]\e[22m $< \e[2m$(ZIGFLAGS)\e[22m\n"
-	@ $(ZIG) build-exe $(ZIGFLAGS) $<
-
-include/resources.h: $(RESGEN)
-	$(RESGEN) -h > $@
 
 $(OUTPUT): $(OBJECTS) chemskr/libchemskr.a $(NOISE_OBJ)
 	@ printf "\e[2m[\e[22;36mld\e[39;2m]\e[22m $@ \e[2m$(LTO)\e[22m\n"
@@ -171,7 +163,7 @@ reverse = $(if $(wordlist 2,2,$(1)),$(call reverse,$(wordlist 2,$(words $(1)),$(
 tidy: $(foreach source,$(call reverse,$(SOURCES)),$(source:.cpp=.tidy))
 
 clean:
-	@ rm -f $(shell find -L src -name \*.o) $(OUTPUT) src/gtk_resources.cpp include/resources.h $(RESGEN) $(RESGEN).o
+	@ rm -f $(shell find -L src -name \*.o) $(OUTPUT) src/gtk_resources.cpp
 
 count:
 	cloc $(CLOC_OPTIONS)
@@ -185,10 +177,9 @@ analyze:
 DEPFILE  := .dep
 DEPTOKEN := "\# MAKEDEPENDS"
 
-depend: $(RESGEN) include/resources.h
+depend:
 	@ echo $(DEPTOKEN) > $(DEPFILE)
 	makedepend -f $(DEPFILE) -s $(DEPTOKEN) -Y -- $(COMPILER) $(CPPFLAGS) -- $(SOURCES) 2>/dev/null
-	$(RESGEN) -d >> $(DEPFILE)
 	@ rm $(DEPFILE).bak
 
 sinclude $(DEPFILE)
