@@ -14,6 +14,7 @@ namespace Game3 {
 	class Agent;
 	class HasFluids;
 	class InventoryTab;
+	class ItemFilter;
 
 	class ItemFilterModule: public Module {
 		public:
@@ -32,6 +33,7 @@ namespace Game3 {
 			DirectedPlace place;
 			std::vector<std::unique_ptr<Gtk::Widget>> widgets;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
+			ItemFilter *filter = nullptr;
 
 			void populate();
 	};
