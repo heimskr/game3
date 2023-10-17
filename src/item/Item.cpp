@@ -198,6 +198,11 @@ namespace Game3 {
 		return pair.first / pair.second;
 	}
 
+	std::string ItemStack::getTooltip() const {
+		assert(item);
+		return item->getTooltip(*this);
+	}
+
 	void ItemStack::spawn(const std::shared_ptr<Realm> &realm, const Position &position) const {
 		realm->spawn<ItemEntity>(position, *this);
 	}

@@ -109,6 +109,7 @@ namespace Game3 {
 			bool hasAttribute(const Identifier &) const;
 			bool hasDurability() const;
 			double getDurabilityFraction() const;
+			std::string getTooltip() const;
 
 			void spawn(const std::shared_ptr<Realm> &, const Position &) const;
 

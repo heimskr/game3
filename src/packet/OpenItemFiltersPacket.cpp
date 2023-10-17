@@ -27,6 +27,9 @@ namespace Game3 {
 			});
 		}
 
+		// Force a fresh module construction instead of an update
+		window.inventoryTab->removeModule();
+
 		DirectedPlace place{direction, Place(position, realm, {})};
 
 		window.queue([&window, place = std::move(place)] {

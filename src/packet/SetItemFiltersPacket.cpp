@@ -24,5 +24,7 @@ namespace Game3 {
 			*pipe->itemFilters[direction] = std::move(itemFilter);
 		else
 			pipe->itemFilters[direction] = std::make_shared<ItemFilter>(std::move(itemFilter));
+
+		pipe->queueBroadcast();
 	}
 }

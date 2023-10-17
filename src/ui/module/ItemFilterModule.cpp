@@ -13,6 +13,7 @@ namespace Game3 {
 	ItemFilterModule::ItemFilterModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
 	game(std::move(game_)),
 	place(std::any_cast<DirectedPlace>(argument)) {
+		INFO("construct(" << place.position << ")");
 		auto target = Gtk::DropTarget::create(Glib::Value<DragSource>::value_type(), Gdk::DragAction::MOVE);
 		target->signal_drop().connect([this](const Glib::ValueBase &base, double, double) {
 			if (!filter || base.gobj()->g_type != Glib::Value<DragSource>::value_type())
@@ -27,8 +28,10 @@ namespace Game3 {
 			}
 
 			if (stack) {
+				setFilter();
 				filter->addItem(*stack);
 				populate();
+				upload();
 			}
 
 			return true;
@@ -88,10 +91,12 @@ namespace Game3 {
 	}
 
 	void ItemFilterModule::update() {
+		INFO("update");
 		populate();
 	}
 
 	void ItemFilterModule::reset() {
+		INFO("reset");
 		populate();
 	}
 
@@ -100,6 +105,7 @@ namespace Game3 {
 	}
 
 	void ItemFilterModule::setMode(bool allow) {
+		setFilter();
 		if (filter) {
 			filter->setAllowMode(allow);
 			upload();
@@ -107,6 +113,7 @@ namespace Game3 {
 	}
 
 	void ItemFilterModule::setStrict(bool strict) {
+		setFilter();
 		if (filter) {
 			filter->setStrict(strict);
 			upload();
@@ -138,7 +145,10 @@ namespace Game3 {
 		auto &filter_ref = pipe->itemFilters[place.direction];
 		if (!filter_ref)
 			filter_ref = std::make_shared<ItemFilter>();
-		filter = filter_ref;
+		if (filter != filter_ref) {
+			INFO(filter << " → " << filter_ref);
+			filter = filter_ref;
+		}
 	}
 
 	void ItemFilterModule::populate() {
@@ -152,30 +162,57 @@ namespace Game3 {
 
 		std::shared_lock<DefaultMutex> data_lock;
 		auto &data = filter->getData(data_lock);
-		for (const auto &[id, set]: data) {
-			for (const nlohmann::json &json: set) {
-				auto hbox = std::make_unique<Gtk::Box>(Gtk::Orientation::HORIZONTAL);
-				ItemStack stack(*game, id, 1, json);
+		for (const auto &[id, set]: data)
+			for (const nlohmann::json &json: set)
+				addHbox(ItemStack(*game, id, 1, json));
+	}
 
-				auto image_ptr = std::make_unique<Gtk::Image>(stack.getImage(*game));
-				image_ptr->set_margin(10);
-				image_ptr->set_margin_top(6);
-				image_ptr->set_size_request(32, 32);
+	void ItemFilterModule::addHbox(ItemStack stack) {
+		auto hbox = std::make_unique<Gtk::Box>(Gtk::Orientation::HORIZONTAL);
+		auto image = makeImage(stack);
+		auto label = makeLabel(stack);
+		auto button = makeButton(std::move(stack));
+		hbox->set_margin_top(10);
+		hbox->append(*image);
+		hbox->append(*label);
+		hbox->append(*button);
+		vbox.append(*hbox);
+		widgets.push_back(std::move(button));
+		widgets.push_back(std::move(label));
+		widgets.push_back(std::move(image));
+		widgets.push_back(std::move(hbox));
+	}
 
-				auto entry = std::make_unique<Gtk::Entry>();
-				if (std::string text = json.dump(); text != "null")
-					entry->set_text(text);
-				entry->set_hexpand(true);
-				entry->set_margin_end(10);
+	std::unique_ptr<Gtk::Image> ItemFilterModule::makeImage(ItemStack &stack) {
+		auto image = std::make_unique<Gtk::Image>(stack.getImage(*game));
+		image->set_margin(10);
+		image->set_margin_top(6);
+		image->set_size_request(32, 32);
+		return image;
+	}
 
-				hbox->set_margin_top(10);
-				hbox->append(*image_ptr);
-				hbox->append(*entry);
-				vbox.append(*hbox);
-				widgets.push_back(std::move(entry));
-				widgets.push_back(std::move(image_ptr));
-				widgets.push_back(std::move(hbox));
+	std::unique_ptr<Gtk::Label> ItemFilterModule::makeLabel(const ItemStack &stack) {
+		auto label = std::make_unique<Gtk::Label>(stack.getTooltip());
+		label->set_halign(Gtk::Align::START);
+		label->set_hexpand(true);
+		label->set_margin_end(10);
+		return label;
+	}
+
+	std::unique_ptr<Gtk::Button> ItemFilterModule::makeButton(ItemStack stack) {
+		auto button = std::make_unique<Gtk::Button>();
+		button->set_icon_name("list-remove-symbolic");
+		button->set_vexpand(false);
+		button->set_has_frame(false);
+		button->set_margin_end(10);
+		button->signal_clicked().connect([this, stack = std::move(stack)] {
+			setFilter();
+			if (filter) {
+				filter->removeItem(stack);
+				populate();
+				upload();
 			}
-		}
+		});
+		return button;
 	}
 }

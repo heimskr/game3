@@ -44,7 +44,6 @@ namespace Game3 {
 			Gtk::Switch strictSwitch;
 			Gtk::Box modeHbox{Gtk::Orientation::HORIZONTAL};
 			Gtk::Box strictHbox{Gtk::Orientation::HORIZONTAL};
-
 			Gtk::Box switchesHbox{Gtk::Orientation::HORIZONTAL};
 
 			void setMode(bool allow);
@@ -52,5 +51,11 @@ namespace Game3 {
 			void upload();
 			void setFilter();
 			void populate();
+
+			void addHbox(ItemStack);
+
+			std::unique_ptr<Gtk::Image> makeImage(ItemStack &);
+			std::unique_ptr<Gtk::Label> makeLabel(const ItemStack &);
+			std::unique_ptr<Gtk::Button> makeButton(ItemStack);
 	};
 }
