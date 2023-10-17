@@ -76,7 +76,7 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "te/pipe"}; }
 
-			DirectionalContainer<ItemFilter> itemFilters;
+			DirectionalContainer<ItemFilterPtr> itemFilters;
 
 			Pipe() = default;
 			Pipe(Position);

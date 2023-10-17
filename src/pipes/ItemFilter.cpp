@@ -54,15 +54,26 @@ namespace Game3 {
 		dataByItem.clear();
 	}
 
+	template <>
+	std::string Buffer::getType(const ItemFilter &) {
+		return {'\xe3'};
+	}
+
 	Buffer & operator+=(Buffer &buffer, const ItemFilter &filter) {
 		return buffer << filter;
 	}
 
 	Buffer & operator<<(Buffer &buffer, const ItemFilter &filter) {
+		buffer.appendType(filter);
 		return buffer << filter.allowMode << filter.strict << filter.items << filter.dataByItem;
 	}
 
 	Buffer & operator>>(Buffer &buffer, ItemFilter &filter) {
+		const auto type = buffer.popType();
+		if (!Buffer::typesMatch(type, buffer.getType(filter))) {
+			buffer.debug();
+			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected ItemFilter)");
+		}
 		return buffer >> filter.allowMode >> filter.strict >> filter.items >> filter.dataByItem;
 	}
 }

@@ -290,7 +290,8 @@ namespace Game3 {
 
 			template <typename T>
 			Buffer & operator>>(std::shared_ptr<T> &out) {
-				assert(out);
+				if (!out)
+					out = std::make_shared<T>();
 				return *this >> *out;
 			}
 

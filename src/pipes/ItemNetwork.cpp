@@ -67,12 +67,12 @@ namespace Game3 {
 			bool failed = false;
 			auto inventory_lock = inventory->uniqueLock();
 
-			const ItemFilter *filter = nullptr;
+			std::shared_ptr<ItemFilter> filter;
 			if (const auto pipe = std::dynamic_pointer_cast<Pipe>(realm->tileEntityAt(position + direction)))
-				filter = &pipe->itemFilters[flipDirection(direction)];
+				filter = pipe->itemFilters[flipDirection(direction)];
 
 			inventoried->iterateExtractableItems(direction, [&, direction = direction](const ItemStack &stack, Slot slot) {
-				if (!filter->isAllowed(stack))
+				if (filter && !filter->isAllowed(stack))
 					return false;
 
 				// It's possible we'll extract an item and put it right back.

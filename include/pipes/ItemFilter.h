@@ -68,6 +68,8 @@ namespace Game3 {
 		friend Buffer & operator>>(Buffer &, ItemFilter &);
 	};
 
+	using ItemFilterPtr = std::shared_ptr<ItemFilter>;
+
 	Buffer & operator+=(Buffer &, const ItemFilter &);
 	Buffer & operator<<(Buffer &, const ItemFilter &);
 	Buffer & operator>>(Buffer &, ItemFilter &);

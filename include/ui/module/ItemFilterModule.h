@@ -33,8 +33,21 @@ namespace Game3 {
 			DirectedPlace place;
 			std::vector<std::unique_ptr<Gtk::Widget>> widgets;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
-			ItemFilter *filter = nullptr;
+			std::shared_ptr<ItemFilter> filter;
+			Gtk::Fixed fixed;
 
+			Gtk::Label modeLabel{"Whitelist"};
+			Gtk::Label strictLabel{"Strict"};
+			Gtk::Switch modeSwitch;
+			Gtk::Switch strictSwitch;
+			Gtk::Box modeHbox{Gtk::Orientation::HORIZONTAL};
+			Gtk::Box strictHbox{Gtk::Orientation::HORIZONTAL};
+
+			Gtk::Box switchesHbox{Gtk::Orientation::HORIZONTAL};
+
+			void setMode(bool allow);
+			void setStrict(bool strict);
+			void upload();
 			void populate();
 	};
 }

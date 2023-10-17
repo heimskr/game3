@@ -289,7 +289,7 @@ namespace Game3 {
 		const auto type = buffer.popType();
 		if (!Buffer::typesMatch(type, buffer.getType(stack))) {
 			buffer.debug();
-			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected Inventory)");
+			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected ItemStack)");
 		}
 		const auto item_id = buffer.take<Identifier>();
 		stack.count = buffer.take<ItemCount>();
