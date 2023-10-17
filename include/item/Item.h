@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Types.h"
+#include "types/Types.h"
 #include "data/Identifier.h"
 #include "registry/Registerable.h"
 #include "ui/Modifiers.h"

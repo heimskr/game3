@@ -33,6 +33,7 @@ namespace Game3 {
 		inline bool onlySuper() const { return !shift && !ctrl && !alt && super; }
 
 		Modifiers operator|(Modifiers) const;
+		bool operator==(Modifiers) const;
 	};
 
 	std::ostream & operator<<(std::ostream &, Modifiers);

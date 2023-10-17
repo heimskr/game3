@@ -192,7 +192,13 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `i32` Slot
 
-26. Unused.
+26. **Open Item Filters**: tells a client to open the item filters module.
+
+	- `i32` Realm ID
+	- `i64` Position Y
+	- `i64` Position X
+	- `u8` Direction
+	- `bool` Remove on move
 
 27. **Destroy Tile Entity**: tells a client to remove a tile entity.
 

@@ -1,4 +1,4 @@
-#include "Position.h"
+#include "types/Position.h"
 #include "game/Game.h"
 #include "graphics/Tileset.h"
 #include "item/VoidPickaxe.h"

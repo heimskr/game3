@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Position.h"
-#include "Types.h"
+#include "types/Position.h"
+#include "types/Types.h"
 #include "game/Agent.h"
 #include "net/Broadcastable.h"
 #include "threading/Lockable.h"

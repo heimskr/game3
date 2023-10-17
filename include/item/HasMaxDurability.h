@@ -1,4 +1,4 @@
-#include "Types.h"
+#include "types/Types.h"
 
 namespace Game3 {
 	struct HasMaxDurability {

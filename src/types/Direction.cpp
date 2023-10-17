@@ -1,4 +1,4 @@
-#include "Direction.h"
+#include "types/Direction.h"
 #include "threading/ThreadContext.h"
 #include "net/Buffer.h"
 

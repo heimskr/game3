@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-#include "Types.h"
+#include "types/Types.h"
 #include "threading/LockableSharedPtr.h"
 #include "ui/Modifiers.h"
 #include "ui/tab/Tab.h"

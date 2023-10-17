@@ -1,7 +1,7 @@
 #pragma once
 
 #include "graphics/Shader.h"
-#include "Types.h"
+#include "types/Types.h"
 #include "game/TileProvider.h"
 #include "graphics/GL.h"
 #include "graphics/RectangleRenderer.h"

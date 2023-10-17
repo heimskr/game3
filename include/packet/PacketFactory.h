@@ -3,7 +3,7 @@
 #include <functional>
 #include <memory>
 
-#include "Types.h"
+#include "types/Types.h"
 #include "packet/Packet.h"
 #include "registry/Registerable.h"
 

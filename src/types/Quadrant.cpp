@@ -1,4 +1,4 @@
-#include "Quadrant.h"
+#include "types/Quadrant.h"
 
 #include <array>
 #include <stdexcept>

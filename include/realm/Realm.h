@@ -11,7 +11,7 @@
 
 #include <nlohmann/json_fwd.hpp>
 
-#include "Types.h"
+#include "types/Types.h"
 #include "entity/EntityZCompare.h"
 #include "error/MultipleFoundError.h"
 #include "error/NoneFoundError.h"

@@ -1,5 +1,5 @@
 #include "Log.h"
-#include "Position.h"
+#include "types/Position.h"
 #include "realm/Cave.h"
 #include "tile/CaveTile.h"
 

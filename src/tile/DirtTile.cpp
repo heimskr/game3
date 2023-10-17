@@ -1,5 +1,5 @@
 #include "Log.h"
-#include "Position.h"
+#include "types/Position.h"
 #include "graphics/Tileset.h"
 #include "realm/Realm.h"
 #include "threading/ThreadContext.h"

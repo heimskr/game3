@@ -50,6 +50,10 @@ namespace Game3 {
 		};
 	}
 
+	bool Modifiers::operator==(Modifiers other) const {
+		return shift == other.shift && ctrl == other.ctrl && alt == other.alt && super == other.super;
+	}
+
 	std::ostream & operator<<(std::ostream &os, Modifiers modifiers) {
 		return os << static_cast<std::string>(modifiers);
 	}

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Types.h"
+#include "types/Types.h"
 #include "data/ChunkSet.h"
 #include "game/Chunk.h"
 #include "game/ChunkPosition.h"

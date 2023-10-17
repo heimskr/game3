@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "Position.h"
+#include "types/Position.h"
 
 namespace Game3 {
 	class Realm;

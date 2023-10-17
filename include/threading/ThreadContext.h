@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Layer.h"
-#include "Types.h"
+#include "types/Types.h"
 
 #include <chrono>
 #include <memory>

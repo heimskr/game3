@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Directions.h"
+#include "types/Directions.h"
 #include "Log.h"
-#include "Position.h"
-#include "Quadrant.h"
+#include "types/Position.h"
+#include "types/Quadrant.h"
 #include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/Inventory.h"
@@ -20,6 +20,10 @@ namespace Game3 {
 		protected:
 			PipeItem(Identifier identifier_, const char *display_name, MoneyCount base_price):
 				Item(std::move(identifier_), display_name, base_price, 64) {}
+
+			virtual std::optional<bool> customUse(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) {
+				return std::nullopt;
+			}
 
 		public:
 			bool use(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) override{
@@ -48,6 +52,9 @@ namespace Game3 {
 				auto pipe = std::dynamic_pointer_cast<Pipe>(tile_entity);
 				if (!pipe)
 					return false;
+
+				if (std::optional<bool> return_value = customUse(slot, stack, place, modifiers, offsets))
+					return *return_value;
 
 				if (modifiers.onlyShift()) {
 					Game &game = place.getGame();
@@ -103,6 +110,9 @@ namespace Game3 {
 			static Identifier ID() { return {"base", "item/item_pipe"}; }
 			ItemPipeItem(MoneyCount base_price):
 				PipeItem(ID(), "Item Pipe", base_price) {}
+
+		protected:
+			std::optional<bool> customUse(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float> offsets) override;
 	};
 
 	class FluidPipeItem: public PipeItem<PipeType::Fluid> {

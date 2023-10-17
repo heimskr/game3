@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Position.h"
-#include "Types.h"
+#include "types/Position.h"
+#include "types/Types.h"
 #include "threading/Lockable.h"
 #include "util/PairHash.h"
 #include "container/WeakSet.h"

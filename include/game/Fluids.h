@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Chunk.h"
-#include "Types.h"
+#include "types/Types.h"
 #include "data/Identifier.h"
 
 #include <nlohmann/json_fwd.hpp>

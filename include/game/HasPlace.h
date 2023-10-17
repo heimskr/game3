@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Position.h"
+#include "types/Position.h"
 #include "game/ChunkPosition.h"
 #include "game/HasRealm.h"
 

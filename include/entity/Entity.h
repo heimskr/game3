@@ -3,10 +3,10 @@
 #include "lib/Eigen.h"
 #include <nlohmann/json_fwd.hpp>
 
-#include "Direction.h"
-#include "Position.h"
+#include "types/Direction.h"
+#include "types/Position.h"
 #include "graphics/Texture.h"
-#include "Types.h"
+#include "types/Types.h"
 #include "container/WeakSet.h"
 #include "game/Agent.h"
 #include "game/ChunkPosition.h"

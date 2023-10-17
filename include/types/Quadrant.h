@@ -4,7 +4,7 @@
 #include <ostream>
 #include <string>
 
-#include "Direction.h"
+#include "types/Direction.h"
 
 namespace Game3 {
 	/** 4 isoceles triangles in a square, with two points at adjacent corners and another point at the center of the square. */

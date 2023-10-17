@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Layer.h"
-#include "Types.h"
+#include "types/Types.h"
 #include "data/Identifier.h"
 #include "item/Item.h"
 #include "ui/Modifiers.h"

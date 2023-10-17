@@ -6,8 +6,8 @@
 #include <utility>
 #include <vector>
 
-#include "Direction.h"
-#include "Quadrant.h"
+#include "types/Direction.h"
+#include "types/Quadrant.h"
 
 namespace Game3 {
 	class Buffer;

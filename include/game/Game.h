@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Types.h"
+#include "types/Types.h"
 #include "entity/Player.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"

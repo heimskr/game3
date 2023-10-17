@@ -1,4 +1,4 @@
-#include "Position.h"
+#include "types/Position.h"
 #include "entity/Player.h"
 #include "graphics/Tileset.h"
 #include "net/Buffer.h"
@@ -26,8 +26,18 @@ namespace Game3 {
 			case Direction::Down:  return *this + Position( 1,  0);
 			case Direction::Left:  return *this + Position( 0, -1);
 			default:
-				ERROR("Direction " << static_cast<int>(direction) << " is invalid");
-				std::terminate();
+				throw std::invalid_argument("Direction " + std::to_string(static_cast<int>(direction)) + " is invalid");
+		}
+	}
+
+	Position Position::operator-(Direction direction) const {
+		switch (direction) {
+			case Direction::Up:    return *this - Position(-1,  0);
+			case Direction::Right: return *this - Position( 0,  1);
+			case Direction::Down:  return *this - Position( 1,  0);
+			case Direction::Left:  return *this - Position( 0, -1);
+			default:
+				throw std::invalid_argument("Direction " + std::to_string(static_cast<int>(direction)) + " is invalid");
 		}
 	}
 
@@ -38,8 +48,18 @@ namespace Game3 {
 			case Direction::Down:  return *this += Position( 1,  0);
 			case Direction::Left:  return *this += Position( 0, -1);
 			default:
-				ERROR("Direction " << static_cast<int>(direction) << " is invalid");
-				std::terminate();
+				throw std::invalid_argument("Direction " + std::to_string(static_cast<int>(direction)) + " is invalid");
+		}
+	}
+
+	Position & Position::operator-=(Direction direction) {
+		switch (direction) {
+			case Direction::Up:    return *this -= Position(-1,  0);
+			case Direction::Right: return *this -= Position( 0,  1);
+			case Direction::Down:  return *this -= Position( 1,  0);
+			case Direction::Left:  return *this -= Position( 0, -1);
+			default:
+				throw std::invalid_argument("Direction " + std::to_string(static_cast<int>(direction)) + " is invalid");
 		}
 	}
 
@@ -82,6 +102,10 @@ namespace Game3 {
 
 	bool Place::isPathable() const {
 		return realm->isPathable(position);
+	}
+
+	std::shared_ptr<TileEntity> Place::getTileEntity() const {
+		return realm->tileEntityAt(position);
 	}
 
 	Game & Place::getGame() const {

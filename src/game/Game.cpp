@@ -10,6 +10,7 @@
 #include "ui/module/ExternalInventoryModule.h"
 #include "ui/module/EnergyLevelModule.h"
 #include "ui/module/FluidLevelsModule.h"
+#include "ui/module/ItemFilterModule.h"
 #include "ui/module/ModuleFactory.h"
 #include "util/AStar.h"
 #include "util/FS.h"
@@ -39,6 +40,7 @@ namespace Game3 {
 		add(ModuleFactory::create<FluidLevelsModule>());
 		add(ModuleFactory::create<ChemicalReactorModule>());
 		add(ModuleFactory::create<EnergyLevelModule>());
+		add(ModuleFactory::create<ItemFilterModule>());
 	}
 
 	void Game::initialSetup(const std::filesystem::path &dir) {

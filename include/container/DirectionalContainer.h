@@ -1,19 +1,21 @@
 #pragma once
 
-#include "Direction.h"
+#include "types/Direction.h"
 #include "Log.h"
+#include "net/Buffer.h"
 
 namespace Game3 {
+	class Buffer;
+
 	template <typename T>
 	class DirectionalContainer {
-		private:
+		public:
 			std::optional<T> north;
 			std::optional<T> east;
 			std::optional<T> south;
 			std::optional<T> west;
 
-		// Sorry for all the duplication.
-		public:
+			// Sorry for all the duplication.
 			inline T & operator[](Direction direction) {
 				std::optional<T> *item = nullptr;
 				switch (direction) {
@@ -82,4 +84,19 @@ namespace Game3 {
 				return **item;
 			}
 	};
+
+	template <typename T>
+	Buffer & operator+=(Buffer &buffer, const DirectionalContainer<T> &container) {
+		return buffer << container;
+	}
+
+	template <typename T>
+	Buffer & operator<<(Buffer &buffer, const DirectionalContainer<T> &container) {
+		return buffer << container.north << container.east << container.south << container.west;
+	}
+
+	template <typename T>
+	Buffer & operator>>(Buffer &buffer, DirectionalContainer<T> &container) {
+		return buffer >> container.north >> container.east >> container.south >> container.west;
+	}
 }

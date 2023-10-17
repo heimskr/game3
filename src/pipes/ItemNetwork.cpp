@@ -1,9 +1,11 @@
 #include "Log.h"
 #include "game/HasInventory.h"
 #include "game/StorageInventory.h"
+#include "pipes/ItemFilter.h"
 #include "pipes/ItemNetwork.h"
 #include "realm/Realm.h"
 #include "tileentity/InventoriedTileEntity.h"
+#include "tileentity/Pipe.h"
 
 namespace Game3 {
 	void ItemNetwork::tick(Tick tick_id) {
@@ -65,7 +67,14 @@ namespace Game3 {
 			bool failed = false;
 			auto inventory_lock = inventory->uniqueLock();
 
-			inventoried->iterateExtractableItems(direction, [&, direction = direction](const ItemStack &, Slot slot) {
+			const ItemFilter *filter = nullptr;
+			if (const auto pipe = std::dynamic_pointer_cast<Pipe>(realm->tileEntityAt(position + direction)))
+				filter = &pipe->itemFilters[flipDirection(direction)];
+
+			inventoried->iterateExtractableItems(direction, [&, direction = direction](const ItemStack &stack, Slot slot) {
+				if (!filter->isAllowed(stack))
+					return false;
+
 				// It's possible we'll extract an item and put it right back.
 				// If that happens, we don't want to notify the owner and potentially queue a broadcast.
 				auto suppressor = inventory->suppress();

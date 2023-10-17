@@ -5,9 +5,9 @@
 #include <gdkmm/rectangle.h>
 #include "lib/Eigen.h"
 
-#include "Position.h"
+#include "types/Position.h"
 #include "graphics/Texture.h"
-#include "Types.h"
+#include "types/Types.h"
 #include "graphics/GL.h"
 #include "graphics/Multiplier.h"
 #include "graphics/RectangleRenderer.h"
@@ -21,7 +21,7 @@ namespace Game3 {
 
 	class Canvas {
 		public:
-			constexpr static double DEFAULT_SCALE = 2.;
+			constexpr static double DEFAULT_SCALE = 8.;
 			constexpr static int AUTOFOCUS_DELAY = 1;
 
 			MainWindow &window;

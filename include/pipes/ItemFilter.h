@@ -32,7 +32,7 @@ namespace Game3 {
 			inline bool isAllowMode() { return allowMode; }
 			inline bool isStrict() { return strict; }
 
-			inline const auto & getItems(std::shared_lock<DefaultMutex> &lock) {
+			inline const auto & getItems(std::shared_lock<DefaultMutex> &lock) const {
 				lock = items.sharedLock();
 				return items;
 			}
@@ -42,18 +42,33 @@ namespace Game3 {
 				return items;
 			}
 
+			inline const auto & getData(std::shared_lock<DefaultMutex> &lock) const {
+				lock = dataByItem.sharedLock();
+				return dataByItem;
+			}
+
+			inline auto & getData(std::unique_lock<DefaultMutex> &lock) {
+				lock = dataByItem.uniqueLock();
+				return dataByItem;
+			}
+
 		private:
 			/** If true, only the item types contained in this filter will be allowed.
 			 *  If false, they will be blocked and everything else will be allowed. */
-			bool allowMode = true;
+			bool allowMode = false;
 
 			/** If false, stack data will be ignored. */
-			bool strict = true;
+			bool strict = false;
 
 			Lockable<std::set<Identifier>> items;
 			Lockable<std::map<Identifier, std::set<nlohmann::json>>> dataByItem;
 
-			void encode(Buffer &);
-			void decode(Buffer &);
+		friend Buffer & operator+=(Buffer &, const ItemFilter &);
+		friend Buffer & operator<<(Buffer &, const ItemFilter &);
+		friend Buffer & operator>>(Buffer &, ItemFilter &);
 	};
+
+	Buffer & operator+=(Buffer &, const ItemFilter &);
+	Buffer & operator<<(Buffer &, const ItemFilter &);
+	Buffer & operator>>(Buffer &, ItemFilter &);
 }

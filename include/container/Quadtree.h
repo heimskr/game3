@@ -7,7 +7,7 @@
 #include <ostream>
 #include <string>
 
-#include "Types.h"
+#include "types/Types.h"
 
 namespace Game3 {
 	struct Box {

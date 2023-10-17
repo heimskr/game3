@@ -10,7 +10,7 @@
 #include <shared_mutex>
 #include <string>
 
-#include "Types.h"
+#include "types/Types.h"
 #include "net/Buffer.h"
 #include "net/Sock.h"
 #include "threading/Lockable.h"

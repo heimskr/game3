@@ -8,8 +8,8 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include "Constants.h"
-#include "Position.h"
-#include "Types.h"
+#include "types/Position.h"
+#include "types/Types.h"
 #include "data/ChunkSet.h"
 #include "game/ChunkPosition.h"
 #include "game/Fluids.h"

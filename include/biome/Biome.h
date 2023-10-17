@@ -4,7 +4,7 @@
 #include <memory>
 #include <random>
 
-#include "Types.h"
+#include "types/Types.h"
 
 namespace noise::module {
 	class Perlin;

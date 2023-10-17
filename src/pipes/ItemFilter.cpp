@@ -1,4 +1,5 @@
 #include "item/Item.h"
+#include "net/Buffer.h"
 #include "pipes/ItemFilter.h"
 
 namespace Game3 {
@@ -51,5 +52,17 @@ namespace Game3 {
 		auto data_lock = dataByItem.uniqueLock();
 		items.clear();
 		dataByItem.clear();
+	}
+
+	Buffer & operator+=(Buffer &buffer, const ItemFilter &filter) {
+		return buffer << filter;
+	}
+
+	Buffer & operator<<(Buffer &buffer, const ItemFilter &filter) {
+		return buffer << filter.allowMode << filter.strict << filter.items << filter.dataByItem;
+	}
+
+	Buffer & operator>>(Buffer &buffer, ItemFilter &filter) {
+		return buffer >> filter.allowMode >> filter.strict >> filter.items >> filter.dataByItem;
 	}
 }

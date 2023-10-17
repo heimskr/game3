@@ -4,7 +4,7 @@
 #include <optional>
 #include <utility>
 
-#include "Position.h"
+#include "types/Position.h"
 #include "item/Item.h"
 
 namespace Game3 {

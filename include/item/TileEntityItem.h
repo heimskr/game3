@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Position.h"
+#include "types/Position.h"
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "item/Item.h"

@@ -3,7 +3,7 @@
 #include <functional>
 #include <memory>
 
-#include "Types.h"
+#include "types/Types.h"
 #include "command/local/LocalCommand.h"
 #include "registry/Registerable.h"
 

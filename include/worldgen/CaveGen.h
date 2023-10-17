@@ -3,7 +3,7 @@
 #include <memory>
 #include <random>
 
-#include "Types.h"
+#include "types/Types.h"
 #include "lib/noise.h"
 
 namespace Game3 {

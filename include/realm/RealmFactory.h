@@ -5,7 +5,7 @@
 
 #include <nlohmann/json_fwd.hpp>
 
-#include "Types.h"
+#include "types/Types.h"
 #include "realm/Realm.h"
 #include "registry/Registerable.h"
 

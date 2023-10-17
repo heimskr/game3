@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "Position.h"
+#include "types/Position.h"
 #include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "biome/Biome.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Types.h"
+#include "types/Types.h"
 #include "registry/Registry.h"
 
 namespace Game3 {

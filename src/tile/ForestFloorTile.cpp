@@ -1,5 +1,5 @@
 #include "Log.h"
-#include "Position.h"
+#include "types/Position.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
 #include "game/Inventory.h"

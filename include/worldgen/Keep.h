@@ -3,7 +3,7 @@
 #include <memory>
 #include <random>
 
-#include "Types.h"
+#include "types/Types.h"
 
 namespace Game3 {
 	class Keep;

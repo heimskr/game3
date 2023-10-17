@@ -1,5 +1,5 @@
 #include "MarchingSquares.h"
-#include "Position.h"
+#include "types/Position.h"
 #include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/Inventory.h"

@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Directions.h"
-#include "Types.h"
+#include "types/Directions.h"
+#include "types/Types.h"
 #include "container/DirectionalContainer.h"
+#include "pipes/ItemFilter.h"
 #include "tileentity/TileEntity.h"
 
 #include <optional>
@@ -74,6 +75,8 @@ namespace Game3 {
 
 		public:
 			static Identifier ID() { return {"base", "te/pipe"}; }
+
+			DirectionalContainer<ItemFilter> itemFilters;
 
 			Pipe() = default;
 			Pipe(Position);

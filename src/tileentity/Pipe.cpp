@@ -157,6 +157,7 @@ namespace Game3 {
 		buffer << directions;
 		buffer << extractors;
 		buffer << present;
+		buffer << itemFilters;
 	}
 
 	void Pipe::decode(Game &game, Buffer &buffer) {
@@ -164,6 +165,7 @@ namespace Game3 {
 		buffer >> directions;
 		buffer >> extractors;
 		buffer >> present;
+		buffer >> itemFilters;
 		tileIDs = {};
 		extractorsCorners = {};
 		loaded = {};

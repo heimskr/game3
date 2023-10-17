@@ -4,8 +4,8 @@
 #include <functional>
 #include <unordered_map>
 
-#include "Position.h"
-#include "Types.h"
+#include "types/Position.h"
+#include "types/Types.h"
 
 namespace Game3 {
 	extern std::unordered_map<int, int> marchingMap8;

@@ -25,6 +25,7 @@
 #include "packet/DestroyEntityPacket.h"
 #include "packet/InventoryPacket.h"
 #include "packet/SetActiveSlotPacket.h"
+#include "packet/OpenItemFiltersPacket.h"
 #include "packet/DestroyTileEntityPacket.h"
 #include "packet/ClickPacket.h"
 #include "packet/TimePacket.h"
@@ -80,6 +81,7 @@ namespace Game3 {
 		add(PacketFactory::create<DestroyEntityPacket>());
 		add(PacketFactory::create<InventoryPacket>());
 		add(PacketFactory::create<SetActiveSlotPacket>());
+		add(PacketFactory::create<OpenItemFiltersPacket>());
 		add(PacketFactory::create<DestroyTileEntityPacket>());
 		add(PacketFactory::create<ClickPacket>());
 		add(PacketFactory::create<TimePacket>());

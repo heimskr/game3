@@ -3,8 +3,8 @@
 #include <memory>
 #include <random>
 
-#include "Types.h"
-#include "Position.h"
+#include "types/Types.h"
+#include "types/Position.h"
 
 namespace Game3 {
 	class Realm;

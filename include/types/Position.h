@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Direction.h"
+#include "types/Direction.h"
 #include "Layer.h"
-#include "Types.h"
+#include "types/Types.h"
 
 #include <cmath>
 #include <functional>
@@ -17,6 +17,7 @@ namespace Game3 {
 	class Buffer;
 	class Game;
 	class Realm;
+	class TileEntity;
 
 	struct Position {
 		using value_type = Index;
@@ -34,7 +35,9 @@ namespace Game3 {
 		inline Position & operator+=(const Position &other) { row += other.row; column += other.column; return *this; }
 		inline Position & operator-=(const Position &other) { row -= other.row; column -= other.column; return *this; }
 		Position operator+(Direction) const;
+		Position operator-(Direction) const;
 		Position & operator+=(Direction);
+		Position & operator-=(Direction);
 		explicit inline operator std::string() const { return '(' + std::to_string(row) + ", " + std::to_string(column) + ')'; }
 		explicit operator Direction() const;
 		inline double distance(const Position &other) const { return std::sqrt(std::pow(row - other.row, 2) + std::pow(column - other.column, 2)); }
@@ -65,6 +68,7 @@ namespace Game3 {
 		void set(Layer, TileID) const;
 		void set(Layer, const Identifier &) const;
 		bool isPathable() const;
+		std::shared_ptr<TileEntity> getTileEntity() const;
 
 		Game & getGame() const;
 

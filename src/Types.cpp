@@ -1,4 +1,4 @@
-#include "Types.h"
+#include "types/Types.h"
 
 namespace Game3 {
 	Index operator""_idx(unsigned long long value) {

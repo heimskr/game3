@@ -7,9 +7,9 @@
 
 #include <nlohmann/json_fwd.hpp>
 
-#include "Position.h"
+#include "types/Position.h"
 #include "graphics/Texture.h"
-#include "Types.h"
+#include "types/Types.h"
 
 namespace Game3 {
 	struct BiomeMap {

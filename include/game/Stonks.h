@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "Types.h"
+#include "types/Types.h"
 
 /** Base prices go through multiple stages of modification before they're used by merchants. This namespace contains
  *  functions to transform prices through various steps of modification. A buy price is the amount of money the player

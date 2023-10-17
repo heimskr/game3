@@ -1,4 +1,4 @@
-#include "Directions.h"
+#include "types/Directions.h"
 #include "pipes/ItemNetwork.h"
 #include "pipes/PipeLoader.h"
 #include "pipes/PipeNetwork.h"
