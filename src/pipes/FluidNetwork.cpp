@@ -15,6 +15,8 @@ namespace Game3 {
 
 		PipeNetwork::tick(tick_id);
 
+		auto this_lock = uniqueLock();
+
 		auto realm = weakRealm.lock();
 		if (!realm || insertions.empty())
 			return;

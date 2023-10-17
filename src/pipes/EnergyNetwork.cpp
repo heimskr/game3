@@ -14,6 +14,8 @@ namespace Game3 {
 
 		PipeNetwork::tick(tick_id);
 
+		auto this_lock = uniqueLock();
+
 		RealmPtr realm = weakRealm.lock();
 		if (!realm || insertions.empty())
 			return;
@@ -91,17 +93,10 @@ namespace Game3 {
 		size_t insertions_remaining = accepting_insertions.size();
 
 		for (const auto &[insertion, direction]: accepting_insertions) {
-			EnergyAmount to_distribute = amount / insertions_remaining;
-
-			if (insertions_remaining == 1) {
-				const EnergyAmount remainder = amount % insertions_remaining;
-				to_distribute += remainder;
-			}
-
+			const EnergyAmount to_distribute = amount / insertions_remaining;
 			const EnergyAmount leftover = insertion->addEnergy(to_distribute, direction);
 			const EnergyAmount distributed = to_distribute - leftover;
 			amount -= distributed;
-
 			--insertions_remaining;
 		}
 

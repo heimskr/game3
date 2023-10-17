@@ -2,6 +2,7 @@
 
 #include "types/Position.h"
 #include "types/Types.h"
+#include "threading/HasMutex.h"
 #include "threading/Lockable.h"
 #include "util/PairHash.h"
 #include "container/WeakSet.h"
@@ -15,7 +16,7 @@ namespace Game3 {
 	class Realm;
 	class TileEntity;
 
-	class PipeNetwork: public std::enable_shared_from_this<PipeNetwork> {
+	class PipeNetwork: public std::enable_shared_from_this<PipeNetwork>, public HasMutex<> {
 		protected:
 			using PairSet = std::unordered_set<std::pair<Position, Direction>, PairHash<Position, Direction>>;
 

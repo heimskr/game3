@@ -85,6 +85,9 @@ namespace Game3 {
 
 		std::optional<ssize_t> return_value;
 
+		if (!ssl)
+			throw std::runtime_error("SSL handle is null");
+
 		if (FD_ISSET(netFD, &fds_copy)) {
 			bool read_blocked = false;
 			size_t bytes_read = 0;

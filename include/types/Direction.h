@@ -17,6 +17,7 @@ namespace Game3 {
 	Direction rotateCounterClockwise(Direction);
 	Direction flipDirection(Direction);
 	Direction randomDirection();
+	bool validateDirection(Direction);
 
 	std::string toString(Direction);
 	std::ostream & operator<<(std::ostream &, Direction);

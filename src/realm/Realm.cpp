@@ -551,7 +551,7 @@ namespace Game3 {
 		return {};
 	}
 
-	TileEntityPtr Realm::tileEntityAt(const Position &position) {
+	TileEntityPtr Realm::tileEntityAt(Position position) {
 		auto lock = tileEntities.sharedLock();
 		if (auto iter = tileEntities.find(position); iter != tileEntities.end())
 			return iter->second;

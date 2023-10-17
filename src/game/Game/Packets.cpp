@@ -48,6 +48,7 @@
 #include "packet/ChatMessageSentPacket.h"
 #include "packet/OpenTextTabPacket.h"
 #include "packet/DragPacket.h"
+#include "packet/SetItemFiltersPacket.h"
 
 namespace Game3 {
 	void Game::add(PacketFactory &&factory) {
@@ -104,5 +105,6 @@ namespace Game3 {
 		add(PacketFactory::create<ChatMessageSentPacket>());
 		add(PacketFactory::create<OpenTextTabPacket>());
 		add(PacketFactory::create<DragPacket>());
+		add(PacketFactory::create<SetItemFiltersPacket>());
 	}
 }

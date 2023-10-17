@@ -64,7 +64,7 @@ namespace Game3 {
 
 		FluidLevel to_remove = std::min<FluidLevel>(amount, fluid->level);
 
-		if (ENERGY_PER_UNIT > 0)
+		if (ENERGY_PER_UNIT > 0.)
 			to_remove = std::min<FluidLevel>(energyContainer->energy / ENERGY_PER_UNIT, to_remove);
 
 		if (to_remove == 0)

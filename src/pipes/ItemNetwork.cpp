@@ -14,9 +14,14 @@ namespace Game3 {
 
 		PipeNetwork::tick(tick_id);
 
-		auto realm = weakRealm.lock();
-		if (!realm || insertions.empty())
-			return;
+		auto this_lock = uniqueLock();
+
+		auto insertions_lock = insertions.uniqueLock();
+		RealmPtr realm = weakRealm.lock();
+		{
+			if (!realm || insertions.empty())
+				return;
+		}
 
 		auto overflow_lock = overflowQueue.uniqueLock();
 		auto round_robin_lock = roundRobinIterator.uniqueLock();
@@ -43,6 +48,7 @@ namespace Game3 {
 
 		// Doing this instead of std::erase_if so that perhaps later I could do something special on each removal.
 		std::vector<PairSet::iterator> to_erase;
+		auto extractions_lock = extractions.uniqueLock();
 
 		for (auto iter = extractions.begin(), end = extractions.end(); iter != end; ++iter) {
 			const auto &[position, direction] = *iter;
@@ -155,6 +161,7 @@ namespace Game3 {
 
 	void ItemNetwork::advanceRoundRobin() {
 		RealmPtr realm = weakRealm.lock();
+		auto insertions_lock = insertions.sharedLock();
 
 		if (!realm) {
 			roundRobinIterator.getBase() = insertions.end();
@@ -182,7 +189,16 @@ namespace Game3 {
 		do {
 			if (++*roundRobinIterator == insertions.end())
 				roundRobinIterator.getBase() = insertions.begin();
-			has_inventory = std::dynamic_pointer_cast<HasInventory>(realm->tileEntityAt((*roundRobinIterator)->first)) != nullptr;
+
+			assert(!insertions.empty());
+			assert(roundRobinIterator);
+
+			auto iter = *roundRobinIterator;
+			assert(iter != insertions.end());
+			auto pair = *iter;
+			auto pos = pair.first;
+
+			has_inventory = std::dynamic_pointer_cast<HasInventory>(realm->tileEntityAt(pos)) != nullptr;
 		} while (*roundRobinIterator != old_iter && !has_inventory);
 
 		// If we haven't found an inventoried tile entity by this point, it means none exists among the insertion set;
@@ -195,8 +211,11 @@ namespace Game3 {
 		if (!roundRobinIterator)
 			advanceRoundRobin();
 
-		if (*roundRobinIterator == insertions.end())
-			return {nullptr, Direction::Invalid};
+		{
+			auto lock = insertions.sharedLock();
+			if (*roundRobinIterator == insertions.end())
+				return {nullptr, Direction::Invalid};
+		}
 
 		RealmPtr realm = weakRealm.lock();
 		if (!realm)

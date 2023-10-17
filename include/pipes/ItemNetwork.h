@@ -28,12 +28,9 @@ namespace Game3 {
 			Lockable<std::optional<PairSet::iterator>> roundRobinIterator;
 			Lockable<std::deque<ItemStack>> overflowQueue;
 
-			/** Doesn't lock anything. */
 			void advanceRoundRobin();
-			/** Doesn't lock anything. */
 			std::pair<std::shared_ptr<InventoriedTileEntity>, Direction> getRoundRobin();
-			/** Doesn't lock anything.
-			 *  Iteration stops once the function returns true or a full loop of all insertions has happened. */
+			/** Iteration stops once the function returns true or a full loop of all insertions has happened. */
 			void iterateRoundRobin(const std::function<bool(const std::shared_ptr<InventoriedTileEntity> &, Direction)> &, const std::shared_ptr<TileEntity> &avoid = nullptr);
 	};
 }

@@ -64,10 +64,10 @@ namespace Game3 {
 		for (auto &[id, realm]: realms) {
 			if (max_jobs <= pool.jobCount())
 				break;
-			pool.add([weak_realm = std::weak_ptr(realm), delta = delta](ThreadPool &, size_t) {
-				if (RealmPtr realm = weak_realm.lock())
+			// pool.add([weak_realm = std::weak_ptr(realm), delta = delta](ThreadPool &, size_t) {
+			// 	if (RealmPtr realm = weak_realm.lock())
 					realm->tick(delta);
-			});
+			// });
 		}
 
 		std::optional<TimePacket> time_packet;
@@ -632,10 +632,10 @@ namespace Game3 {
 			}
 
 			if (first == "tiles") {
-				Realm &realm = *player->getRealm();
-				Tileset &tileset = realm.getTileset();
+				RealmPtr realm = player->getRealm();
+				Tileset &tileset = realm->getTileset();
 				for (const Layer layer: allLayers)
-					if (auto tile = realm.tryTile(layer, player->position))
+					if (auto tile = realm->tryTile(layer, player->position))
 						INFO(getIndex(layer) << " \e[2m→\e[22m " << *tile << " \e[2m/\e[22m " << tileset[*tile]);
 				return {true, ""};
 			}

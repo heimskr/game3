@@ -1,7 +1,9 @@
 #include "Log.h"
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
+#include "entity/ClientPlayer.h"
 #include "item/Item.h"
+#include "packet/SetItemFiltersPacket.h"
 #include "tileentity/Pipe.h"
 #include "types/DirectedPlace.h"
 #include "ui/gtk/UITypes.h"
@@ -37,10 +39,14 @@ namespace Game3 {
 		fixed.set_halign(Gtk::Align::CENTER);
 		fixed.add_css_class("item-slot");
 
+		setFilter();
+
 		auto mode_click = Gtk::GestureClick::create();
 		mode_click->signal_released().connect([this](int, double, double) {
 			modeSwitch.set_active(!modeSwitch.get_active());
 		});
+		if (filter)
+			modeSwitch.set_active(filter->isAllowMode());
 		modeSwitch.signal_state_set().connect([this](bool value) {
 			setMode(value);
 			return false;
@@ -56,6 +62,8 @@ namespace Game3 {
 		strict_click->signal_released().connect([this](int, double, double) {
 			strictSwitch.set_active(!strictSwitch.get_active());
 		});
+		if (filter)
+			strictSwitch.set_active(filter->isStrict());
 		strictSwitch.signal_state_set().connect([this](bool value) {
 			setStrict(value);
 			return false;
@@ -109,25 +117,38 @@ namespace Game3 {
 		if (!filter)
 			return;
 
-		INFO("upload()");
+		if (!pipe) {
+			WARN("Pipe is missing in ItemFilterModule::upload");
+			return;
+		}
+
+		if (!game)
+			throw std::runtime_error("Game is missing in ItemFilterModule::upload");
+
+		game->player->send(SetItemFiltersPacket(pipe->getGID(), place.direction, *filter));
+	}
+
+	void ItemFilterModule::setFilter() {
+		if (!pipe)
+			pipe = std::dynamic_pointer_cast<Pipe>(place.getTileEntity());
+
+		if (!pipe)
+			return;
+
+		auto &filter_ref = pipe->itemFilters[place.direction];
+		if (!filter_ref)
+			filter_ref = std::make_shared<ItemFilter>();
+		filter = filter_ref;
 	}
 
 	void ItemFilterModule::populate() {
 		removeChildren(vbox);
 		widgets.clear();
 
-		auto pipe = std::dynamic_pointer_cast<Pipe>(place.getTileEntity());
-		if (!pipe)
-			return;
-
 		vbox.append(fixed);
 		vbox.append(switchesHbox);
 
-		auto &filter_ref = pipe->itemFilters[place.direction];
-		if (!filter_ref)
-			filter_ref = std::make_shared<ItemFilter>();
-
-		filter = filter_ref;
+		setFilter();
 
 		std::shared_lock<DefaultMutex> data_lock;
 		auto &data = filter->getData(data_lock);

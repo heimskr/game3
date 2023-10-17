@@ -124,7 +124,7 @@ namespace Game3 {
 			std::vector<EntityPtr> findEntities(const Position &, const EntityPtr &except);
 			EntityPtr findEntity(const Position &);
 			EntityPtr findEntity(const Position &, const EntityPtr &except);
-			TileEntityPtr tileEntityAt(const Position &);
+			TileEntityPtr tileEntityAt(Position);
 			void remove(const EntityPtr &);
 			void removeSafe(const EntityPtr &);
 			void remove(const TileEntityPtr &, bool run_helper = true);

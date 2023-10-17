@@ -345,6 +345,12 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i64` Position Y
 	- `i64` Position X
 
+50. **Set Item Filters**: tells the server to set the item filters for an edge of a pipe.
+
+	- `u64` Pipe global ID
+	- `u8` Direction
+	- `ItemFilter` Item filter data
+
 # Message Format
 
 All values are little endian. Strings are not null-terminated.

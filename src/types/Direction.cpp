@@ -52,6 +52,10 @@ namespace Game3 {
 		return static_cast<Direction>(std::uniform_int_distribution(0, 3)(threadContext.rng));
 	}
 
+	bool validateDirection(Direction direction) {
+		return direction == Direction::Down || direction == Direction::Up || direction == Direction::Right || direction == Direction::Left;
+	}
+
 	std::string toString(Direction direction) {
 		switch (direction) {
 			case Game3::Direction::Up:    return "up";

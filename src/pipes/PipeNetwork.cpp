@@ -51,6 +51,10 @@ namespace Game3 {
 		if (this == other.get())
 			return;
 
+		// Absorbing while either network is ticking would be unadvisable.
+		auto this_lock = uniqueLock();
+		auto other_lock = other->uniqueLock();
+
 		assert(other);
 
 		const PipeType type = getType();
@@ -70,12 +74,14 @@ namespace Game3 {
 			auto lock = other->insertions.uniqueLock();
 			for (const auto &[position, direction]: other->insertions)
 				addInsertion(position, direction);
+			other->insertions.clear();
 		}
 
 		{
 			auto lock = other->extractions.uniqueLock();
 			for (const auto &[position, direction]: other->extractions)
 				addExtraction(position, direction);
+			other->extractions.clear();
 		}
 	}
 
@@ -83,9 +89,13 @@ namespace Game3 {
 		auto realm = weakRealm.lock();
 		assert(realm);
 
+		auto this_lock = uniqueLock();
+
 		const PipeType type = getType();
 
 		std::shared_ptr<PipeNetwork> new_network = PipeNetwork::create(type, realm->pipeLoader.newID(), realm);
+
+		auto new_lock = new_network->uniqueLock();
 
 		std::unordered_set visited{start};
 		std::vector queue{start};
@@ -133,7 +143,6 @@ namespace Game3 {
 			throw std::runtime_error("Couldn't lock realm");
 
 		PipeType type = getType();
-		std::unordered_set<Direction> found;
 
 		if (!canWorkWith(realm->tileEntityAt(position))) {
 			for (const Direction direction: ALL_DIRECTIONS) {

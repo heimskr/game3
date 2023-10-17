@@ -15,6 +15,7 @@ namespace Game3 {
 	class HasFluids;
 	class InventoryTab;
 	class ItemFilter;
+	class Pipe;
 
 	class ItemFilterModule: public Module {
 		public:
@@ -33,6 +34,7 @@ namespace Game3 {
 			DirectedPlace place;
 			std::vector<std::unique_ptr<Gtk::Widget>> widgets;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
+			std::shared_ptr<Pipe> pipe;
 			std::shared_ptr<ItemFilter> filter;
 			Gtk::Fixed fixed;
 
@@ -48,6 +50,7 @@ namespace Game3 {
 			void setMode(bool allow);
 			void setStrict(bool strict);
 			void upload();
+			void setFilter();
 			void populate();
 	};
 }

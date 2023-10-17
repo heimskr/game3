@@ -46,7 +46,7 @@ namespace Game3 {
 					using USet = std::unordered_set<Node *>;
 					using Map  = std::map<Node *, Set, NodeLess>;
 
-					T data;
+					T data{};
 					std::unordered_set<Color> colors;
 					Color colorsNeeded = 1;
 
@@ -875,7 +875,7 @@ namespace Game3 {
 					out_path = (std::filesystem::current_path() / out_path.substr(2)).string();
 
 				std::string type = "png";
-				const size_t pos = out_path.find_last_of(".");
+				const size_t pos = out_path.find_last_of('.');
 				if (pos != std::string::npos && pos != out_path.size() - 1) {
 					type = out_path.substr(pos + 1);
 					for (const char ch: type)
