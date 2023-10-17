@@ -83,6 +83,8 @@ namespace Game3 {
 				addExtraction(position, direction);
 			other->extractions.clear();
 		}
+
+		reset();
 	}
 
 	std::shared_ptr<PipeNetwork> PipeNetwork::partition(const std::shared_ptr<Pipe> &start) {
@@ -112,29 +114,46 @@ namespace Game3 {
 			});
 		}
 
+		reset();
 		return new_network;
 	}
 
 	void PipeNetwork::addExtraction(Position position, Direction direction) {
 		removeInsertion(position, direction);
-		auto lock = extractions.uniqueLock();
-		extractions.emplace(position, direction);
+		{
+			auto lock = extractions.uniqueLock();
+			extractions.emplace(position, direction);
+		}
+		reset();
 	}
 
 	void PipeNetwork::addInsertion(Position position, Direction direction) {
 		removeExtraction(position, direction);
-		auto lock = insertions.uniqueLock();
-		insertions.emplace(position, direction);
+		{
+			auto lock = insertions.uniqueLock();
+			insertions.emplace(position, direction);
+		}
+		reset();
 	}
 
 	bool PipeNetwork::removeExtraction(Position position, Direction direction) {
-		auto lock = extractions.uniqueLock();
-		return 1 == extractions.erase(std::make_pair(position, direction));
+		bool out{};
+		{
+			auto lock = extractions.uniqueLock();
+			out = 1 == extractions.erase(std::make_pair(position, direction));
+		}
+		reset();
+		return out;
 	}
 
 	bool PipeNetwork::removeInsertion(Position position, Direction direction) {
-		auto lock = insertions.uniqueLock();
-		return 1 == insertions.erase(std::make_pair(position, direction));
+		bool out{};
+		{
+			auto lock = insertions.uniqueLock();
+			out = 1 == insertions.erase(std::make_pair(position, direction));
+		}
+		reset();
+		return out;
 	}
 
 	void PipeNetwork::reconsiderPoints(Position position) {

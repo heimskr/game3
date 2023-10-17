@@ -28,6 +28,9 @@ namespace Game3 {
 			Lockable<PairSet> extractions;
 			Lockable<PairSet> insertions;
 
+			/** Clears internal state that might be invalidated by a merge or partition or by the addition or removal of an insertion or extraction. */
+			virtual void reset() {}
+
 		public:
 			PipeNetwork(size_t id_, const std::shared_ptr<Realm> &);
 

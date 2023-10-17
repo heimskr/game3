@@ -159,6 +159,10 @@ namespace Game3 {
 		return std::dynamic_pointer_cast<InventoriedTileEntity>(tile_entity) != nullptr;
 	}
 
+	void ItemNetwork::reset() {
+		roundRobinIterator = std::nullopt;
+	}
+
 	void ItemNetwork::advanceRoundRobin() {
 		RealmPtr realm = weakRealm.lock();
 		auto insertions_lock = insertions.sharedLock();
