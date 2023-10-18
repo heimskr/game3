@@ -13,6 +13,9 @@
 #include <deque>
 
 namespace Game3 {
+	Pipe::Pipe():
+		Pipe(Position(-1, -1)) {}
+
 	Pipe::Pipe(Position position_):
 		TileEntity("base:tile/missing"_id, ID(), position_, false) {}
 

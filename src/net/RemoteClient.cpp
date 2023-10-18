@@ -10,6 +10,7 @@
 #include "packet/Packet.h"
 #include "packet/PacketError.h"
 #include "packet/PacketFactory.h"
+#include "util/Demangle.h"
 #include "util/Math.h"
 #include "util/Util.h"
 
@@ -92,11 +93,15 @@ namespace Game3 {
 
 	bool RemoteClient::send(const Packet &packet) {
 		if (!packet.valid) {
-			WARN("Dropping invalid packet of type " << typeid(packet).name());
+			WARN("Dropping invalid packet of type " << DEMANGLE(packet));
 			return false;
 		}
 
-		assert(server.game);
+		if (!server.game) {
+			WARN("Dropping packet of type " << DEMANGLE(packet) << ": game unavailable");
+			return false;
+		}
+
 		Buffer send_buffer;
 		packet.encode(*server.game, send_buffer);
 		assert(send_buffer.size() < UINT32_MAX);

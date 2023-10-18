@@ -78,7 +78,7 @@ namespace Game3 {
 
 			DirectionalContainer<ItemFilterPtr> itemFilters;
 
-			Pipe() = default;
+			Pipe();
 			Pipe(Position);
 
 			DirectionalContainer<std::shared_ptr<Pipe>> getConnected(PipeType) const;

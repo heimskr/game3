@@ -318,7 +318,7 @@ namespace Game3 {
 					return !running || save_period <= std::chrono::system_clock::now() - last_save;
 				});
 
-				if (save_period <= std::chrono::system_clock::now() - last_save) {
+				if (running && save_period <= std::chrono::system_clock::now() - last_save) {
 					INFO("Autosaving...");
 					game->tickingPaused = true;
 					game->database.writeAllRealms();

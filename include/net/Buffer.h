@@ -2,6 +2,7 @@
 
 #include "Log.h"
 #include "util/Concepts.h"
+#include "util/Demangle.h"
 
 #include <bit>
 #include <cassert>
@@ -58,15 +59,15 @@ namespace Game3 {
 			template <typename T>
 			std::string getType(const T &);
 
-			// Inelegant how it requires an instance of the type as an argument.
 			template <Map M>
 			std::string getType(const M &) {
+				// Inelegant how it requires an instance of the type as an argument.
 				return '\x21' + getType(typename M::key_type()) + getType(typename M::mapped_type());
 			}
 
-			// Same here.
 			template <LinearOrSet T>
 			std::string getType(const T &) {
+				// Same here.
 				return '\x20' + getType(typename T::value_type());
 			}
 
@@ -132,8 +133,7 @@ namespace Game3 {
 
 			template <typename T>
 			Buffer & operator+=(const std::shared_ptr<T> &item) {
-				assert(item);
-				return *this += *item;
+				return *this << item;
 			}
 
 			std::string popType();
@@ -225,8 +225,9 @@ namespace Game3 {
 
 			template <typename T>
 			Buffer & operator<<(const std::shared_ptr<T> &item) {
-				assert(item);
-				return *this += *item;
+				if (item)
+					return (*this += '\x0b') << *item;
+				return *this += '\x0c';
 			}
 
 			friend std::ostream & operator<<(std::ostream &, const Buffer &);
@@ -279,8 +280,8 @@ namespace Game3 {
 			template <typename T>
 			Buffer & operator>>(std::optional<T> &out) {
 				const auto type = popType();
-				if (!typesMatch(type, getType(std::make_optional<T>())))
-					throw std::invalid_argument("Invalid type in buffer (expected " + std::string(typeid(T).name()) + ": " + hexString(getType(std::make_optional<T>()), true) + ')');
+				if (!typesMatch(type, getType(std::optional<T>())))
+					throw std::invalid_argument("Invalid type in buffer (expected optional<" + DEMANGLE(T) + ">: " + hexString(getType(std::make_optional<T>()), true) + "): " + hexString(type, true));
 				if (type == "\x0c")
 					out = std::nullopt;
 				else
@@ -290,9 +291,17 @@ namespace Game3 {
 
 			template <typename T>
 			Buffer & operator>>(std::shared_ptr<T> &out) {
-				if (!out)
-					out = std::make_shared<T>();
-				return *this >> *out;
+				const auto type = popType();
+				if (!typesMatch(type, getType(std::optional<T>())))
+					throw std::invalid_argument("Invalid type in buffer (expected optional<" + DEMANGLE(T) + ">: " + hexString(getType(std::make_optional<T>()), true) + "): " + hexString(type, true));
+				if (type == "\x0c") {
+					out = {};
+				} else {
+					if (!out)
+						out = std::make_shared<T>();
+					*this >> *out;
+				}
+				return *this;
 			}
 
 			template <typename T>

@@ -10,15 +10,14 @@ namespace Game3 {
 	}
 
 	void HasInventory::encode(Buffer &buffer) {
-		std::optional<std::shared_ptr<ServerInventory>> optional;
+		std::shared_ptr<ServerInventory> server_inventory;
 		if (inventory) {
-			auto server_inventory = std::dynamic_pointer_cast<ServerInventory>(inventory);
+			server_inventory = std::dynamic_pointer_cast<ServerInventory>(inventory);
 			assert(server_inventory);
-			optional = server_inventory;
 			buffer << inventory->slotCount.load();
 		} else
 			buffer << Slot(-1);
-		buffer << optional;
+		buffer << server_inventory;
 	}
 
 	namespace {
@@ -26,17 +25,16 @@ namespace Game3 {
 		void decodeHasInventory(HasInventory &has_inventory, Buffer &buffer) {
 			Slot slot_count = -1;
 			buffer >> slot_count;
-			std::optional<T> optional;
+			std::shared_ptr<T> inventory;
 			if (slot_count == -1) {
 				has_inventory.setInventory(nullptr);
 				has_inventory.inventoryUpdated();
-				buffer >> optional;
-				assert(!optional);
+				buffer >> inventory;
+				assert(!inventory);
 			} else {
-				buffer >> optional;
-				assert(optional);
-				if (optional) { // This is unnecessary but I want PVS-Studio to be happy.
-					const auto inventory = std::make_shared<T>(std::move(*optional));
+				buffer >> inventory;
+				assert(inventory);
+				if (inventory) { // This is unnecessary but I want PVS-Studio to be happy.
 					inventory->weakOwner = has_inventory.getSharedAgent();
 					inventory->slotCount = slot_count; // Maybe not necessary? Try an assert before.
 					has_inventory.setInventory(inventory);

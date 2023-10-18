@@ -13,7 +13,6 @@ namespace Game3 {
 	ItemFilterModule::ItemFilterModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
 	game(std::move(game_)),
 	place(std::any_cast<DirectedPlace>(argument)) {
-		INFO("construct(" << place.position << ")");
 		auto target = Gtk::DropTarget::create(Glib::Value<DragSource>::value_type(), Gdk::DragAction::MOVE);
 		target->signal_drop().connect([this](const Glib::ValueBase &base, double, double) {
 			if (!filter || base.gobj()->g_type != Glib::Value<DragSource>::value_type())
@@ -91,12 +90,10 @@ namespace Game3 {
 	}
 
 	void ItemFilterModule::update() {
-		INFO("update");
 		populate();
 	}
 
 	void ItemFilterModule::reset() {
-		INFO("reset");
 		populate();
 	}
 
@@ -145,10 +142,8 @@ namespace Game3 {
 		auto &filter_ref = pipe->itemFilters[place.direction];
 		if (!filter_ref)
 			filter_ref = std::make_shared<ItemFilter>();
-		if (filter != filter_ref) {
-			INFO(filter << " → " << filter_ref);
+		if (filter != filter_ref)
 			filter = filter_ref;
-		}
 	}
 
 	void ItemFilterModule::populate() {

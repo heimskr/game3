@@ -73,12 +73,12 @@ namespace Game3 {
 			bool failed = false;
 			auto inventory_lock = inventory->uniqueLock();
 
-			std::shared_ptr<ItemFilter> filter;
+			std::shared_ptr<ItemFilter> extraction_filter;
 			if (const auto pipe = std::dynamic_pointer_cast<Pipe>(realm->tileEntityAt(position + direction)))
-				filter = pipe->itemFilters[flipDirection(direction)];
+				extraction_filter = pipe->itemFilters[flipDirection(direction)];
 
 			inventoried->iterateExtractableItems(direction, [&, direction = direction](const ItemStack &stack, Slot slot) {
-				if (filter && !filter->isAllowed(stack))
+				if (extraction_filter && !extraction_filter->isAllowed(stack))
 					return false;
 
 				// It's possible we'll extract an item and put it right back.
@@ -98,6 +98,10 @@ namespace Game3 {
 				// Try to insert the extracted item into insertion points until we either finish inserting all of it
 				// or we run out of insertion points.
 				iterateRoundRobin([&](const std::shared_ptr<InventoriedTileEntity> &round_robin, Direction round_robin_direction) -> bool {
+					if (const auto pipe = std::dynamic_pointer_cast<Pipe>(realm->tileEntityAt(round_robin->getPosition() + round_robin_direction)))
+						if (std::shared_ptr<ItemFilter> insertion_filter = pipe->itemFilters[flipDirection(round_robin_direction)]; insertion_filter && !insertion_filter->isAllowed(*extracted))
+							return false;
+
 					auto lock = round_robin->getInventory()->uniqueLock();
 					round_robin->insertItem(*extracted, round_robin_direction, &extracted);
 					return !extracted.has_value();
