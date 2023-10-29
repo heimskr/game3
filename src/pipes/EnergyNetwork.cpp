@@ -46,7 +46,7 @@ namespace Game3 {
 
 				energy += energetic->extractEnergy(direction, true, capacity - energy);
 				if (capacity <= energy)
-					break;
+					energy = distribute(energy);
 			}
 
 			for (const auto &iter: to_erase)
