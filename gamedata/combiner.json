@@ -2,7 +2,7 @@
 	"name": "base_combiner",
 	"dependencies": [],
 	"data": [
-		["base:ignore/combiner_map", {
+		["base:combiner_map", {
 			"base:item/wood":     [1, "C12H20O10"],
 			"base:item/plank":    [1, "C12H20O10"],
 			"base:item/wheat":    [1, "(C6H10O5)(H2O)"],

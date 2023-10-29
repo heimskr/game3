@@ -1,5 +1,6 @@
 #include "game/Game.h"
 #include "recipe/CentrifugeRecipe.h"
+#include "recipe/CombinerRecipe.h"
 #include "recipe/CraftingRecipe.h"
 #include "recipe/DissolverRecipe.h"
 #include "recipe/GeothermalRecipe.h"
@@ -30,5 +31,6 @@ namespace Game3 {
 		registries.add<ModuleFactoryRegistry>();
 		registries.add<ItemSetRegistry>();
 		registries.add<DissolverRecipeRegistry>();
+		registries.add<CombinerRecipeRegistry>();
 	}
 }

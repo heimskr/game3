@@ -11,51 +11,51 @@ namespace Game3 {
 	class Game;
 	class ItemStack;
 
-	class ChemistryResult {
+	class DissolverResult {
 		public:
-			virtual ~ChemistryResult() = default;
+			virtual ~DissolverResult() = default;
 			virtual void add(Game &, std::vector<ItemStack> &) = 0;
 			std::vector<ItemStack> getResult(Game &);
 			static std::vector<ItemStack> getResult(Game &, const nlohmann::json &);
-			static std::unique_ptr<ChemistryResult> fromJSON(const nlohmann::json &);
+			static std::unique_ptr<DissolverResult> fromJSON(const nlohmann::json &);
 	};
 
-	class UnionChemistryResult: public ChemistryResult {
+	class UnionDissolverResult: public DissolverResult {
 		public:
-			UnionChemistryResult(const nlohmann::json &);
+			UnionDissolverResult(const nlohmann::json &);
 			void add(Game &, std::vector<ItemStack> &) override;
 
 		private:
-			std::vector<std::unique_ptr<ChemistryResult>> members;
+			std::vector<std::unique_ptr<DissolverResult>> members;
 	};
 
-	class WeightedChemistryResult: public ChemistryResult {
+	class WeightedDissolverResult: public DissolverResult {
 		public:
-			WeightedChemistryResult(const nlohmann::json &);
+			WeightedDissolverResult(const nlohmann::json &);
 			void add(Game &, std::vector<ItemStack> &) override;
 
 		private:
 			struct Member {
 				double weight;
-				std::unique_ptr<ChemistryResult> result;
+				std::unique_ptr<DissolverResult> result;
 
-				Member(double weight_, std::unique_ptr<ChemistryResult> &&result_):
+				Member(double weight_, std::unique_ptr<DissolverResult> &&result_):
 					weight(weight_), result(std::move(result_)) {}
 			};
 
 			std::vector<Member> members;
 	};
 
-	class RandomChemistryResult: public ChemistryResult {
+	class RandomDissolverResult: public DissolverResult {
 		public:
-			RandomChemistryResult(const nlohmann::json &);
+			RandomDissolverResult(const nlohmann::json &);
 			void add(Game &, std::vector<ItemStack> &) override;
 
 		private:
-			std::vector<std::unique_ptr<ChemistryResult>> members;
+			std::vector<std::unique_ptr<DissolverResult>> members;
 	};
 
-	class ChemicalResult: public ChemistryResult {
+	class ChemicalResult: public DissolverResult {
 		public:
 			ChemicalResult(const nlohmann::json &);
 			void add(Game &, std::vector<ItemStack> &) override;
@@ -64,13 +64,13 @@ namespace Game3 {
 			std::string formula;
 	};
 
-	class MultiChemicalResult: public ChemistryResult {
+	class MultiChemicalResult: public DissolverResult {
 		public:
 			MultiChemicalResult(const nlohmann::json &);
 			void add(Game &, std::vector<ItemStack> &) override;
 
 		private:
-			std::unique_ptr<ChemistryResult> result;
+			std::unique_ptr<DissolverResult> result;
 			ItemCount count;
 	};
 }

@@ -25,14 +25,14 @@ namespace Game3 {
 		Recipe(std::move(identifier_)) {}
 
 	DissolverRecipe::DissolverRecipe(Identifier identifier_, Input input_, const nlohmann::json &json):
-		Recipe(std::move(identifier_)), input(std::move(input_)), chemistryResult(ChemistryResult::fromJSON(json)) {}
+		Recipe(std::move(identifier_)), input(std::move(input_)), dissolverResult(DissolverResult::fromJSON(json)) {}
 
 	DissolverRecipe::Input DissolverRecipe::getInput(Game &) {
 		return input;
 	}
 
 	DissolverRecipe::Output DissolverRecipe::getOutput(const Input &, Game &game) {
-		return chemistryResult->getResult(game);
+		return dissolverResult->getResult(game);
 	}
 
 	bool DissolverRecipe::canCraft(const std::shared_ptr<Container> &container) {

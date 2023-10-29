@@ -1,6 +1,6 @@
 #pragma once
 
-#include "chemistry/ChemistryResults.h"
+#include "chemistry/DissolverResults.h"
 #include "data/Identifier.h"
 #include "item/Item.h"
 #include "recipe/Recipe.h"
@@ -9,11 +9,11 @@
 #include <nlohmann/json_fwd.hpp>
 
 namespace Game3 {
-	class ChemistryResult;
+	class DissolverResult;
 
 	struct DissolverRecipe: Recipe<ItemStack, std::vector<ItemStack>, NamedRegisterable> {
 		Input input;
-		std::unique_ptr<ChemistryResult> chemistryResult;
+		std::unique_ptr<DissolverResult> dissolverResult;
 
 		DissolverRecipe(Identifier);
 		DissolverRecipe(Identifier, Input, const nlohmann::json &);
