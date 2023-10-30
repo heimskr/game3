@@ -7,8 +7,9 @@
 #include "packet/OpenModuleForAgentPacket.h"
 #include "packet/SetTileEntityEnergyPacket.h"
 #include "realm/Realm.h"
-#include "recipe/DissolverRecipe.h"
-#include "tileentity/Dissolver.h"
+#include "recipe/CombinerRecipe.h"
+#include "tileentity/Combiner.h"
+#include "ui/module/CombinerModule.h"
 
 #include <cassert>
 #include <numeric>
@@ -19,41 +20,61 @@ namespace Game3 {
 		constexpr float PERIOD = 0.25;
 		constexpr ItemCount INPUT_CAPACITY  = 5;
 		constexpr ItemCount OUTPUT_CAPACITY = 10;
-		constexpr EnergyAmount ENERGY_PER_ATOM = 100;
+		constexpr EnergyAmount ENERGY_PER_OPERATION = 500;
 	}
 
-	Dissolver::Dissolver():
+	Combiner::Combiner():
 		EnergeticTileEntity(ENERGY_CAPACITY) {}
 
-	Dissolver::Dissolver(Identifier tile_id, Position position_):
+	Combiner::Combiner(Identifier tile_id, Position position_):
 		TileEntity(std::move(tile_id), ID(), position_, true), EnergeticTileEntity(ENERGY_CAPACITY) {}
 
-	Dissolver::Dissolver(Position position_):
-		Dissolver("base:tile/dissolver"_id, position_) {}
+	Combiner::Combiner(Position position_):
+		Combiner("base:tile/combiner"_id, position_) {}
 
-	bool Dissolver::mayInsertItem(const ItemStack &stack, Direction, Slot slot) {
+	bool Combiner::mayInsertItem(const ItemStack &stack, Direction, Slot slot) {
 		if (slot != Slot(-1) && slot >= Slot(INPUT_CAPACITY))
 			return false;
 
 		return std::dynamic_pointer_cast<ChemicalItem>(stack.item) == nullptr;
 	}
 
-	bool Dissolver::mayExtractItem(Direction, Slot slot) {
+	bool Combiner::mayExtractItem(Direction, Slot slot) {
 		return Slot(INPUT_CAPACITY) <= slot && slot < Slot(INPUT_CAPACITY + OUTPUT_CAPACITY);
 	}
 
-	EnergyAmount Dissolver::getEnergyCapacity() {
+	EnergyAmount Combiner::getEnergyCapacity() {
 		assert(energyContainer);
 		auto lock = energyContainer->sharedLock();
 		return energyContainer->capacity;
 	}
 
-	void Dissolver::init(Game &game) {
+	void Combiner::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
+		if (name == "SetTarget") {
+
+			auto *buffer = std::any_cast<Buffer>(&data);
+			assert(buffer != nullptr);
+			bool success = false;
+
+			Identifier new_target;
+
+			try {
+				new_target = buffer->take<Identifier>();
+				success = setTarget(new_target);
+			} catch (const std::invalid_argument &) {}
+
+			if (source)
+				sendMessage(source, "ModuleMessage", CombinerModule::ID(), "TargetSet", success, new_target);
+
+		}
+	}
+
+	void Combiner::init(Game &game) {
 		TileEntity::init(game);
 		HasInventory::setInventory(Inventory::create(shared_from_this(), INPUT_CAPACITY + OUTPUT_CAPACITY));
 	}
 
-	void Dissolver::tick(Game &game, float delta) {
+	void Combiner::tick(Game &game, float delta) {
 		RealmPtr realm = weakRealm.lock();
 		if (!realm || realm->getSide() != Side::Server)
 			return;
@@ -66,16 +87,16 @@ namespace Game3 {
 			return;
 
 		accumulatedTime = 0.f;
-		dissolve();
+		combine();
 	}
 
-	void Dissolver::toJSON(nlohmann::json &json) const {
+	void Combiner::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
 		InventoriedTileEntity::toJSON(json);
 		EnergeticTileEntity::toJSON(json);
 	}
 
-	bool Dissolver::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
+	bool Combiner::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
 		if (getSide() == Side::Client)
 			return false;
 
@@ -90,41 +111,43 @@ namespace Game3 {
 			}
 			RealmPtr realm = getRealm();
 			realm->queueDestruction(getSelf());
-			player->give(ItemStack(realm->getGame(), "base:item/dissolver"_id));
+			player->give(ItemStack(realm->getGame(), "base:item/combiner"_id));
 			return true;
 		}
 
 		if (modifiers.onlyShift()) {
 			EnergeticTileEntity::addObserver(player, false);
 		} else {
-			// player->send(OpenModuleForAgentPacket(DissolverModule::ID(), getGID()));
-			InventoriedTileEntity::addObserver(player, false);
+			player->send(OpenModuleForAgentPacket(CombinerModule::ID(), getGID()));
+			InventoriedTileEntity::addObserver(player, true);
 		}
 
 		auto lock = energyContainer->sharedLock();
-		INFO("Energy: " << energyContainer->energy);
+		INFO("Combiner energy: " << energyContainer->energy);
 		return true;
 	}
 
-	void Dissolver::absorbJSON(Game &game, const nlohmann::json &json) {
+	void Combiner::absorbJSON(Game &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);
 	}
 
-	void Dissolver::encode(Game &game, Buffer &buffer) {
+	void Combiner::encode(Game &game, Buffer &buffer) {
 		TileEntity::encode(game, buffer);
 		InventoriedTileEntity::encode(game, buffer);
 		EnergeticTileEntity::encode(game, buffer);
+		buffer << target;
 	}
 
-	void Dissolver::decode(Game &game, Buffer &buffer) {
+	void Combiner::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
 		InventoriedTileEntity::decode(game, buffer);
 		EnergeticTileEntity::decode(game, buffer);
+		setTarget(buffer.take<Identifier>());
 	}
 
-	void Dissolver::broadcast(bool force) {
+	void Combiner::broadcast(bool force) {
 		assert(getSide() == Side::Server);
 
 		if (force) {
@@ -158,11 +181,11 @@ namespace Game3 {
 		});
 	}
 
-	Game & Dissolver::getGame() const {
+	Game & Combiner::getGame() const {
 		return TileEntity::getGame();
 	}
 
-	bool Dissolver::dissolve() {
+	bool Combiner::combine() {
 		const InventoryPtr inventory = getInventory();
 
 		assert(inventory);
@@ -170,24 +193,24 @@ namespace Game3 {
 
 		{
 			auto energy_lock = energyContainer->sharedLock();
-			if (energyContainer->energy < ENERGY_PER_ATOM)
+			if (energyContainer->energy < ENERGY_PER_OPERATION)
 				return false;
 		}
 
 		auto inventory_lock = inventory->uniqueLock();
 
 		Game &game = getGame();
-		DissolverRecipeRegistry &dissolver_registry = game.registry<DissolverRecipeRegistry>();
+		CombinerRecipeRegistry &combiner_registry = game.registry<CombinerRecipeRegistry>();
 
 		ItemStack *stack_ptr = nullptr;
-		std::shared_ptr<DissolverRecipe> recipe;
+		std::shared_ptr<CombinerRecipe> recipe;
 
 		for (size_t i = 0; i < INPUT_CAPACITY; ++i) {
 			stack_ptr = (*inventory)[currentSlot = (currentSlot + 1) % INPUT_CAPACITY];
 			if (!stack_ptr)
 				continue;
 
-			if (auto optional_recipe = dissolver_registry.maybe(stack_ptr->item->identifier)) {
+			if (auto optional_recipe = combiner_registry.maybe(stack_ptr->item->identifier)) {
 				recipe = std::move(optional_recipe);
 				break;
 			}
@@ -199,18 +222,16 @@ namespace Game3 {
 		std::shared_ptr<Inventory> inventory_copy = inventory->copy();
 		auto suppressor = inventory_copy->suppress();
 
-		std::optional<std::vector<ItemStack>> leftovers;
+		std::optional<ItemStack> leftover;
 
 		auto input_span  = std::make_shared<InventorySpan>(inventory_copy, 0, INPUT_CAPACITY - 1);
 		auto output_span = std::make_shared<InventorySpan>(inventory_copy, INPUT_CAPACITY, INPUT_CAPACITY + OUTPUT_CAPACITY - 1);
 
-		size_t atom_count{};
-
-		if (!recipe->craft(game, input_span, output_span, leftovers, &atom_count) || leftovers)
+		if (!recipe->craft(game, input_span, output_span, leftover) || leftover)
 			return false;
 
 		{
-			const EnergyAmount to_consume = atom_count * ENERGY_PER_ATOM;
+			const EnergyAmount to_consume = ENERGY_PER_OPERATION;
 			auto energy_lock = energyContainer->uniqueLock();
 			if (!energyContainer->remove(to_consume))
 				return false;
@@ -225,5 +246,17 @@ namespace Game3 {
 		inventory->notifyOwner();
 
 		return true;
+	}
+
+	bool Combiner::setTarget(Identifier new_target) {
+		auto &registry = getGame().registry<CombinerRecipeRegistry>();
+
+		if (std::shared_ptr<CombinerRecipe> maybe = registry.maybe(new_target)) {
+			recipe = std::move(maybe);
+			target = std::move(new_target);
+			return true;
+		}
+
+		return false;
 	}
 }

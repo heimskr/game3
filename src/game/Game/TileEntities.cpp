@@ -3,6 +3,7 @@
 #include "tileentity/Centrifuge.h"
 #include "tileentity/ChemicalReactor.h"
 #include "tileentity/Chest.h"
+#include "tileentity/Combiner.h"
 #include "tileentity/CraftingStation.h"
 #include "tileentity/Dissolver.h"
 #include "tileentity/GeothermalGenerator.h"
@@ -28,6 +29,7 @@ namespace Game3 {
 		add(TileEntityFactory::create<Centrifuge>());
 		add(TileEntityFactory::create<ChemicalReactor>());
 		add(TileEntityFactory::create<Chest>());
+		add(TileEntityFactory::create<Combiner>());
 		add(TileEntityFactory::create<CraftingStation>());
 		add(TileEntityFactory::create<Dissolver>());
 		add(TileEntityFactory::create<GeothermalGenerator>());

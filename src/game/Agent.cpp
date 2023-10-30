@@ -24,8 +24,8 @@ namespace Game3 {
 		return out;
 	}
 
-	void Agent::handleMessage(const std::shared_ptr<Agent> &, const std::string &, std::any &) {
-		throw std::runtime_error("Agent of type " + std::string(typeid(*this).name()) + " has no message handler");
+	void Agent::handleMessage(const std::shared_ptr<Agent> &, const std::string &name, std::any &) {
+		throw std::runtime_error("Agent of type " + DEMANGLE(*this) + " has no message handler and can't handle message with name \"" + name + '"');
 	}
 
 	void Agent::sendMessage(const std::shared_ptr<Agent> &destination, const std::string &name, std::any &data) {

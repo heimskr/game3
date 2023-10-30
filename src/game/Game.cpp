@@ -7,6 +7,7 @@
 #include "game/ServerGame.h"
 #include "graphics/ItemTexture.h"
 #include "ui/module/ChemicalReactorModule.h"
+#include "ui/module/CombinerModule.h"
 #include "ui/module/ExternalInventoryModule.h"
 #include "ui/module/EnergyLevelModule.h"
 #include "ui/module/FluidLevelsModule.h"
@@ -41,6 +42,7 @@ namespace Game3 {
 		add(ModuleFactory::create<ChemicalReactorModule>());
 		add(ModuleFactory::create<EnergyLevelModule>());
 		add(ModuleFactory::create<ItemFilterModule>());
+		add(ModuleFactory::create<CombinerModule>());
 	}
 
 	void Game::initialSetup(const std::filesystem::path &dir) {
