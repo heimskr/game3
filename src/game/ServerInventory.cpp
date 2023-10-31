@@ -85,7 +85,7 @@ namespace Game3 {
 		if (remaining == 0)
 			return std::nullopt;
 
-		return ItemStack(getOwner()->getRealm()->getGame(), stack.item, remaining, stack.data);
+		return ItemStack(stack.hasGame()? stack.getGame() : getOwner()->getRealm()->getGame(), stack.item, remaining, stack.data);
 	}
 
 	void ServerInventory::drop(Slot slot) {
