@@ -240,12 +240,20 @@ namespace Game3 {
 
 	void ItemNetwork::iterateRoundRobin(const std::function<bool(const std::shared_ptr<InventoriedTileEntity> &, Direction)> &function, const std::shared_ptr<TileEntity> &avoid) {
 		auto old_iter = roundRobinIterator;
+		size_t counter = 0;
+		size_t max = 0;
+
+		{
+			auto lock = insertions.sharedLock();
+			max = insertions.size();
+		}
+
 		do {
 			advanceRoundRobin();
 			if (const auto [tile_entity, direction] = getRoundRobin(); tile_entity) {
 				if (tile_entity != avoid && function(tile_entity, direction))
 					return;
 			}
-		} while (old_iter != roundRobinIterator.getBase());
+		} while (old_iter != roundRobinIterator.getBase() && ++counter < max);
 	}
 }
