@@ -36,7 +36,7 @@ namespace Game3 {
 		if (slot != Slot(-1) && slot >= Slot(INPUT_CAPACITY))
 			return false;
 
-		return std::dynamic_pointer_cast<ChemicalItem>(stack.item) == nullptr;
+		return std::dynamic_pointer_cast<ChemicalItem>(stack.item) != nullptr;
 	}
 
 	bool Combiner::mayExtractItem(Direction, Slot slot) {
