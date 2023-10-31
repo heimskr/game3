@@ -17,7 +17,7 @@
 namespace Game3 {
 	namespace {
 		constexpr float ENERGY_CAPACITY = 100'000;
-		constexpr float PERIOD = 0.25;
+		constexpr float PERIOD = 0.1;
 		constexpr ItemCount INPUT_CAPACITY  = 5;
 		constexpr ItemCount OUTPUT_CAPACITY = 10;
 		constexpr EnergyAmount ENERGY_PER_OPERATION = 500;
@@ -204,8 +204,6 @@ namespace Game3 {
 		if (!recipe)
 			return false;
 
-		CombinerRecipeRegistry &combiner_registry = game.registry<CombinerRecipeRegistry>();
-
 		std::shared_ptr<Inventory> inventory_copy = inventory->copy();
 		auto suppressor = inventory_copy->suppress();
 
@@ -229,6 +227,7 @@ namespace Game3 {
 		auto storage_inventory = std::dynamic_pointer_cast<StorageInventory>(inventory);
 		assert(storage_inventory);
 		inventory_copy->weakOwner = shared_from_this();
+		suppressor.cancel();
 		*storage_inventory = std::move(dynamic_cast<StorageInventory &>(*inventory_copy));
 		inventory->notifyOwner();
 
