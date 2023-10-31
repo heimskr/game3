@@ -349,6 +349,19 @@
 					[1.0, ["base:item/sugar", 1]]
 				]
 			}],
+			["base:centrifuge_recipe", {
+				"input":  ["base:fluid/brine", 1000],
+				"output": [
+					[1.0, ["base:item/salt", 1]]
+				]
+			}],
+			["base:centrifuge_recipe", {
+				"input":  ["base:fluid/milk", 1000],
+				"output": [
+					[0.2, ["base:item/chemical", 1, {"formula": "Ca"}]],
+					[0.8, ["base:item/protein", 1]]
+				]
+			}],
 			["base:geothermal_recipe", {
 				"input":  ["base:fluid/lava", 100],
 				"output": 500
