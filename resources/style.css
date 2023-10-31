@@ -55,3 +55,8 @@ progressbar.item-durability.horizontal > trough {
 .equation_success {
 	color: green;
 }
+
+.comparator-button {
+	padding-left: 10px;
+	padding-right: 10px;
+}

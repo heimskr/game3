@@ -57,6 +57,7 @@ namespace Game3 {
 			std::unique_ptr<Gtk::Image> makeImage(ItemStack &);
 			std::unique_ptr<Gtk::Label> makeLabel(const ItemStack &);
 			std::unique_ptr<Gtk::Button> makeComparator(const Identifier &, const ItemFilter::Config &);
+			std::unique_ptr<Gtk::SpinButton> makeThreshold(const Identifier &, const ItemFilter::Config &);
 			std::unique_ptr<Gtk::Button> makeButton(ItemStack);
 	};
 }

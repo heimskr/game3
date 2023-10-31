@@ -142,10 +142,8 @@ namespace Game3 {
 		auto &filter_ref = pipe->itemFilters[place.direction];
 		if (!filter_ref)
 			filter_ref = std::make_shared<ItemFilter>();
-		if (filter != filter_ref) {
-			INFO(filter << " → " << filter_ref);
+		if (filter != filter_ref)
 			filter = filter_ref;
-		}
 	}
 
 	void ItemFilterModule::populate() {
@@ -170,18 +168,24 @@ namespace Game3 {
 		auto image = makeImage(stack);
 		auto label = makeLabel(stack);
 		auto comparator = makeComparator(id, config);
+		auto threshold = makeThreshold(id, config);
 		auto button = makeButton(std::move(stack));
 		hbox->set_margin_top(10);
 		hbox->append(*image);
 		hbox->append(*label);
 		hbox->append(*comparator);
-		auto spacer = std::make_unique<Gtk::Label>();
-		spacer->set_hexpand(true);
-		hbox->append(*spacer);
+		if (threshold) {
+			hbox->append(*threshold);
+			widgets.push_back(std::move(threshold));
+		} else {
+			auto spacer = std::make_unique<Gtk::Label>();
+			spacer->set_hexpand(true);
+			hbox->append(*spacer);
+			widgets.push_back(std::move(spacer));
+		}
 		hbox->append(*button);
 		vbox.append(*hbox);
 		widgets.push_back(std::move(button));
-		widgets.push_back(std::move(spacer));
 		widgets.push_back(std::move(comparator));
 		widgets.push_back(std::move(label));
 		widgets.push_back(std::move(image));
@@ -205,6 +209,8 @@ namespace Game3 {
 
 	std::unique_ptr<Gtk::Button> ItemFilterModule::makeComparator(const Identifier &id, const ItemFilter::Config &config) {
 		auto button = std::make_unique<Gtk::Button>();
+		button->set_expand(false);
+		button->set_has_frame(false);
 
 		if (config.comparator == ItemFilter::Comparator::Less)
 			button->set_label("<");
@@ -213,7 +219,9 @@ namespace Game3 {
 		else
 			button->set_label("~");
 
-		button->signal_clicked().connect([this, id = id, config = config, button = button.get()] {
+		button->add_css_class("comparator-button");
+
+		button->signal_clicked().connect([this, id = id, config = config] {
 			setFilter();
 			{
 				std::unique_lock<DefaultMutex> lock;
@@ -238,10 +246,36 @@ namespace Game3 {
 		return button;
 	}
 
+	std::unique_ptr<Gtk::SpinButton> ItemFilterModule::makeThreshold(const Identifier &id, const ItemFilter::Config &config) {
+		if (config.comparator == ItemFilter::Comparator::None)
+			return {};
+
+		auto spin = std::make_unique<Gtk::SpinButton>();
+		spin->set_adjustment(Gtk::Adjustment::create(0., 0., 1e9));
+		spin->set_digits(0);
+		spin->set_value(config.count);
+		spin->set_hexpand(true);
+
+		spin->signal_value_changed().connect([this, id = id, config = config, spin = spin.get()]() mutable {
+			setFilter();
+			{
+				std::unique_lock<DefaultMutex> lock;
+				auto &configs = filter->getConfigs(lock);
+				auto &set = configs[id];
+				config = std::move(set.extract(config).value());
+				config.count = spin->get_value();
+				set.insert(config);
+			}
+			upload();
+		});
+
+		return spin;
+	}
+
 	std::unique_ptr<Gtk::Button> ItemFilterModule::makeButton(ItemStack stack) {
 		auto button = std::make_unique<Gtk::Button>();
 		button->set_icon_name("list-remove-symbolic");
-		button->set_vexpand(false);
+		button->set_expand(false);
 		button->set_has_frame(false);
 		button->set_margin_end(10);
 		button->signal_clicked().connect([this, stack = std::move(stack)] {
