@@ -200,24 +200,11 @@ namespace Game3 {
 		auto inventory_lock = inventory->uniqueLock();
 
 		Game &game = getGame();
-		CombinerRecipeRegistry &combiner_registry = game.registry<CombinerRecipeRegistry>();
-
-		ItemStack *stack_ptr = nullptr;
-		std::shared_ptr<CombinerRecipe> recipe;
-
-		for (size_t i = 0; i < INPUT_CAPACITY; ++i) {
-			stack_ptr = (*inventory)[currentSlot = (currentSlot + 1) % INPUT_CAPACITY];
-			if (!stack_ptr)
-				continue;
-
-			if (auto optional_recipe = combiner_registry.maybe(stack_ptr->item->identifier)) {
-				recipe = std::move(optional_recipe);
-				break;
-			}
-		}
 
 		if (!recipe)
 			return false;
+
+		CombinerRecipeRegistry &combiner_registry = game.registry<CombinerRecipeRegistry>();
 
 		std::shared_ptr<Inventory> inventory_copy = inventory->copy();
 		auto suppressor = inventory_copy->suppress();

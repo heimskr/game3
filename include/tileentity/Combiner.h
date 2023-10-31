@@ -3,6 +3,7 @@
 #include "tileentity/EnergeticTileEntity.h"
 #include "tileentity/InventoriedTileEntity.h"
 #include "threading/Lockable.h"
+#include "threading/LockableSharedPtr.h"
 
 namespace Game3 {
 	struct CombinerRecipe;
@@ -35,7 +36,7 @@ namespace Game3 {
 			float accumulatedTime = 0.f;
 			Slot currentSlot = 0;
 			Lockable<Identifier> target;
-			std::shared_ptr<CombinerRecipe> recipe;
+			LockableSharedPtr<CombinerRecipe> recipe;
 
 			Combiner();
 			Combiner(Identifier tile_id, Position);

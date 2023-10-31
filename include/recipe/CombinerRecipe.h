@@ -13,8 +13,8 @@ namespace Game3 {
 	class Game;
 
 	struct CombinerRecipe: Recipe<std::vector<ItemStack>, ItemStack, NamedRegisterable> {
-		Input input;
 		ItemCount outputCount{};
+		Input input;
 
 		CombinerRecipe(Identifier);
 		CombinerRecipe(Identifier, Game &, const nlohmann::json &);
