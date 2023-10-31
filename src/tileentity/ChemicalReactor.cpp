@@ -73,6 +73,11 @@ namespace Game3 {
 			return;
 
 		accumulatedTime = 0.f;
+
+		InventoryPtr inventory = getInventory();
+		if (inventory->weakOwner.expired())
+			inventory->weakOwner = shared_from_this();
+
 		react();
 	}
 
