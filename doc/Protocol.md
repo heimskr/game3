@@ -381,6 +381,7 @@ All values are little endian. Strings are not null-terminated.
 | `0xe1`                           | Inventory                    |
 | `0xe2`                           | FluidStack                   |
 | `0xe3`                           | ItemFilter                   |
+| `0xe4`                           | ItemFilter::Config           |
 
 Note that string types are always encoded as `0x1f` when used as a subtype of a list or a map, and optional types are always encoded as `0x0b` followed by the subtype in the same scenario.
 

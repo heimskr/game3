@@ -5,7 +5,7 @@
 
 namespace Game3 {
 	struct ProtocolVersionPacket: Packet {
-		constexpr static Version PROTOCOL_VERSION = 10;
+		constexpr static Version PROTOCOL_VERSION = 11;
 
 		static PacketID ID() { return 1; }
 

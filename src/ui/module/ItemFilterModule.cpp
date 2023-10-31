@@ -142,8 +142,10 @@ namespace Game3 {
 		auto &filter_ref = pipe->itemFilters[place.direction];
 		if (!filter_ref)
 			filter_ref = std::make_shared<ItemFilter>();
-		if (filter != filter_ref)
+		if (filter != filter_ref) {
+			INFO(filter << " → " << filter_ref);
 			filter = filter_ref;
+		}
 	}
 
 	void ItemFilterModule::populate() {
@@ -155,24 +157,32 @@ namespace Game3 {
 
 		setFilter();
 
-		std::shared_lock<DefaultMutex> data_lock;
-		auto &data = filter->getData(data_lock);
-		for (const auto &[id, set]: data)
-			for (const nlohmann::json &json: set)
-				addHbox(ItemStack(*game, id, 1, json));
+		std::shared_lock<DefaultMutex> configs_lock;
+		auto &configs = filter->getConfigs(configs_lock);
+		for (const auto &[id, set]: configs)
+			for (const auto &config: set)
+				addHbox(id, config);
 	}
 
-	void ItemFilterModule::addHbox(ItemStack stack) {
+	void ItemFilterModule::addHbox(const Identifier &id, const ItemFilter::Config &config) {
+		ItemStack stack(*game, id, 1, config.data);
 		auto hbox = std::make_unique<Gtk::Box>(Gtk::Orientation::HORIZONTAL);
 		auto image = makeImage(stack);
 		auto label = makeLabel(stack);
+		auto comparator = makeComparator(id, config);
 		auto button = makeButton(std::move(stack));
 		hbox->set_margin_top(10);
 		hbox->append(*image);
 		hbox->append(*label);
+		hbox->append(*comparator);
+		auto spacer = std::make_unique<Gtk::Label>();
+		spacer->set_hexpand(true);
+		hbox->append(*spacer);
 		hbox->append(*button);
 		vbox.append(*hbox);
 		widgets.push_back(std::move(button));
+		widgets.push_back(std::move(spacer));
+		widgets.push_back(std::move(comparator));
 		widgets.push_back(std::move(label));
 		widgets.push_back(std::move(image));
 		widgets.push_back(std::move(hbox));
@@ -189,9 +199,43 @@ namespace Game3 {
 	std::unique_ptr<Gtk::Label> ItemFilterModule::makeLabel(const ItemStack &stack) {
 		auto label = std::make_unique<Gtk::Label>(stack.getTooltip());
 		label->set_halign(Gtk::Align::START);
-		label->set_hexpand(true);
 		label->set_margin_end(10);
 		return label;
+	}
+
+	std::unique_ptr<Gtk::Button> ItemFilterModule::makeComparator(const Identifier &id, const ItemFilter::Config &config) {
+		auto button = std::make_unique<Gtk::Button>();
+
+		if (config.comparator == ItemFilter::Comparator::Less)
+			button->set_label("<");
+		else if (config.comparator == ItemFilter::Comparator::Greater)
+			button->set_label(">");
+		else
+			button->set_label("~");
+
+		button->signal_clicked().connect([this, id = id, config = config, button = button.get()] {
+			setFilter();
+			{
+				std::unique_lock<DefaultMutex> lock;
+				auto &configs = filter->getConfigs(lock);
+				auto &set = configs[id];
+				ItemFilter::Config new_config = std::move(set.extract(config).value());
+
+				if (new_config.comparator == ItemFilter::Comparator::Less) {
+					new_config.comparator = ItemFilter::Comparator::None;
+				} else if (new_config.comparator == ItemFilter::Comparator::Greater) {
+					new_config.comparator = ItemFilter::Comparator::Less;
+				} else {
+					new_config.comparator = ItemFilter::Comparator::Greater;
+				}
+
+				set.insert(std::move(new_config));
+			}
+			populate();
+			upload();
+		});
+
+		return button;
 	}
 
 	std::unique_ptr<Gtk::Button> ItemFilterModule::makeButton(ItemStack stack) {

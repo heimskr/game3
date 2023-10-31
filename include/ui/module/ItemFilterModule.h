@@ -1,5 +1,6 @@
 #pragma once
 
+#include "pipes/ItemFilter.h"
 #include "types/DirectedPlace.h"
 #include "types/Types.h"
 #include "ui/gtk/Util.h"
@@ -52,10 +53,10 @@ namespace Game3 {
 			void setFilter();
 			void populate();
 
-			void addHbox(ItemStack);
-
+			void addHbox(const Identifier &, const ItemFilter::Config &);
 			std::unique_ptr<Gtk::Image> makeImage(ItemStack &);
 			std::unique_ptr<Gtk::Label> makeLabel(const ItemStack &);
+			std::unique_ptr<Gtk::Button> makeComparator(const Identifier &, const ItemFilter::Config &);
 			std::unique_ptr<Gtk::Button> makeButton(ItemStack);
 	};
 }

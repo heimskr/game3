@@ -221,7 +221,7 @@ namespace Game3 {
 
 	std::string Buffer::popType() {
 		const char first = popBuffer<char>(*this);
-		if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first <= '\x1f') || ('\xe0' <= first && first <= '\xe3'))
+		if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first <= '\x1f') || ('\xe0' <= first && first <= '\xe4'))
 			return {first};
 		if (first == '\x20' || ('\x30' <= first && first <= '\x3f'))
 			return first + popType();
@@ -369,7 +369,7 @@ namespace Game3 {
 
 	template<>
 	Buffer & operator<<(Buffer &buffer, const nlohmann::json &json) {
-		return buffer << json.dump();;
+		return buffer << json.dump();
 	}
 
 	template<>

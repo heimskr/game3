@@ -18,6 +18,17 @@ namespace Game3 {
 
 	class ItemFilter {
 		public:
+			enum class Comparator: uint8_t {None = 0, Less, Greater};
+
+			struct Config {
+				nlohmann::json data;
+				Comparator comparator{};
+				ItemCount count{};
+
+				bool operator()(const ItemStack &) const;
+				bool operator<(const Config &) const;
+			};
+
 			ItemFilter();
 			ItemFilter(bool allow_mode, bool strict_);
 
@@ -42,14 +53,14 @@ namespace Game3 {
 				return items;
 			}
 
-			inline const auto & getData(std::shared_lock<DefaultMutex> &lock) const {
-				lock = dataByItem.sharedLock();
-				return dataByItem;
+			inline const auto & getConfigs(std::shared_lock<DefaultMutex> &lock) const {
+				lock = configsByItem.sharedLock();
+				return configsByItem;
 			}
 
-			inline auto & getData(std::unique_lock<DefaultMutex> &lock) {
-				lock = dataByItem.uniqueLock();
-				return dataByItem;
+			inline auto & getConfigs(std::unique_lock<DefaultMutex> &lock) {
+				lock = configsByItem.uniqueLock();
+				return configsByItem;
 			}
 
 		private:
@@ -61,7 +72,7 @@ namespace Game3 {
 			bool strict = false;
 
 			Lockable<std::set<Identifier>> items;
-			Lockable<std::map<Identifier, std::set<nlohmann::json>>> dataByItem;
+			Lockable<std::map<Identifier, std::set<Config>>> configsByItem;
 
 		friend Buffer & operator+=(Buffer &, const ItemFilter &);
 		friend Buffer & operator<<(Buffer &, const ItemFilter &);
@@ -69,6 +80,15 @@ namespace Game3 {
 	};
 
 	using ItemFilterPtr = std::shared_ptr<ItemFilter>;
+
+	template <typename T>
+	T popBuffer(Buffer &);
+
+	template <>
+	ItemStack popBuffer<ItemStack>(Buffer &);
+	Buffer & operator+=(Buffer &, const ItemFilter::Config &);
+	Buffer & operator<<(Buffer &, const ItemFilter::Config &);
+	Buffer & operator>>(Buffer &, ItemFilter::Config &);
 
 	Buffer & operator+=(Buffer &, const ItemFilter &);
 	Buffer & operator<<(Buffer &, const ItemFilter &);
