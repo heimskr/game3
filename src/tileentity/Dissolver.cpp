@@ -102,7 +102,6 @@ namespace Game3 {
 		}
 
 		auto lock = energyContainer->sharedLock();
-		INFO("Energy: " << energyContainer->energy);
 		return true;
 	}
 
