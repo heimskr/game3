@@ -127,7 +127,7 @@ namespace Game3 {
 			/** Attempts to remove a given amount of an item from the inventory.
 			 *  Uses a predicate to determine which slots can be removed from.
 			 *  Returns the count removed. */
-			virtual ItemCount remove(const ItemStack &, const SlotPredicate &) = 0;
+			virtual ItemCount remove(const ItemStack &, const ConstPredicate &) = 0;
 
 			/** Attempts to remove a given amount of an item from a specific slot. Returns the count removed. */
 			virtual ItemCount remove(const ItemStack &, Slot) = 0;

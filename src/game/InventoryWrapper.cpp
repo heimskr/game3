@@ -185,14 +185,14 @@ namespace Game3 {
 	}
 
 	ItemCount InventoryWrapper::remove(const ItemStack &stack) {
-		return inventory->remove(stack, [this](Slot slot) {
+		return inventory->remove(stack, [this](const ItemStack &, Slot slot) {
 			return validateSlot(slot);
 		});
 	}
 
-	ItemCount InventoryWrapper::remove(const ItemStack &stack, const std::function<bool(Slot)> &predicate) {
-		return inventory->remove(stack, [&](Slot slot) {
-			return validateSlot(slot) && predicate(slot);
+	ItemCount InventoryWrapper::remove(const ItemStack &stack, const ConstPredicate &predicate) {
+		return inventory->remove(stack, [&](const ItemStack &candidate, Slot slot) {
+			return validateSlot(slot) && predicate(candidate, slot);
 		});
 	}
 

@@ -25,7 +25,7 @@ namespace Game3 {
 			void erase(Slot) override;
 
 			ItemCount remove(const ItemStack &) override;
-			ItemCount remove(const ItemStack &, const std::function<bool(Slot)> &) override;
+			ItemCount remove(const ItemStack &, const ConstPredicate &) override;
 			ItemCount remove(const ItemStack &, Slot) override;
 			ItemCount remove(const CraftingRequirement &, const ConstPredicate &) override;
 			ItemCount remove(const AttributeRequirement &, const ConstPredicate &) override;

@@ -181,7 +181,7 @@ namespace Game3 {
 		return removed;
 	}
 
-	ItemCount ServerInventory::remove(const ItemStack &stack_to_remove, const std::function<bool(Slot)> &predicate) {
+	ItemCount ServerInventory::remove(const ItemStack &stack_to_remove, const ConstPredicate &predicate) {
 		ItemCount count_to_remove = stack_to_remove.count;
 		ItemCount removed = 0;
 
@@ -191,7 +191,7 @@ namespace Game3 {
 
 			auto &[slot, stack] = item;
 
-			if (predicate(slot) && stack.canMerge(stack_to_remove)) {
+			if (predicate(stack, slot) && stack.canMerge(stack_to_remove)) {
 				const ItemCount to_remove = std::min(stack.count, count_to_remove);
 				// See above for the reasoning behind this const_cast.
 				const_cast<ItemStack &>(stack).count -= to_remove;

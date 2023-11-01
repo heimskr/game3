@@ -248,13 +248,17 @@ namespace Game3 {
 		{
 			auto reactant_lock = reactants.sharedLock();
 			std::vector<ItemStack> stacks;
-			auto predicate = [range = SlotRange{0, INPUT_CAPACITY - 1}](Slot slot) {
+			auto predicate = [range = SlotRange{0, INPUT_CAPACITY - 1}](const ItemStack &, Slot slot) {
+				return range.contains(slot);
+			};
+
+			auto slot_predicate = [range = SlotRange{0, INPUT_CAPACITY - 1}](Slot slot) {
 				return range.contains(slot);
 			};
 
 			for (const auto &[reactant, count]: reactants) {
 				stacks.emplace_back(game, chemical_item, count, nlohmann::json{{"formula", reactant}});
-				const ItemCount in_inventory = inventory_copy->count(stacks.back(), predicate);
+				const ItemCount in_inventory = inventory_copy->count(stacks.back(), slot_predicate);
 				if (in_inventory < count)
 					return false;
 			}
