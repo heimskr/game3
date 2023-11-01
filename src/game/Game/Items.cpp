@@ -75,6 +75,7 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/cabbage",         "Cabbage",             8, 64));
 		add(std::make_shared<Item>("base:item/onion",           "Onion",               8, 64));
 		add(std::make_shared<Item>("base:item/bean",            "Bean",                8, 64));
+		add(std::make_shared<Item>("base:item/chili",           "Chili",               9, 64));
 		add(std::make_shared<Item>("base:item/red_dye",         "Red Dye",            12, 64));
 		add(std::make_shared<Item>("base:item/orange_dye",      "Orange Dye",         12, 64));
 		add(std::make_shared<Item>("base:item/yellow_dye",      "Yellow Dye",         12, 64));
@@ -108,6 +109,7 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/salt",            "Salt",                4, 64));
 		add(std::make_shared<Item>("base:item/sugar",           "Sugar",               5, 64));
 		add(std::make_shared<Item>("base:item/protein",         "Protein",            12, 64));
+		add(std::make_shared<Item>("base:item/chili_crisp",     "Chili Crisp",        32, 64));
 
 		add(std::make_shared<Mead>("base:item/mead", "Mead", 10, 16));
 
@@ -123,6 +125,7 @@ namespace Game3 {
 		add(std::make_shared<Seed>("base:item/cabbage_seeds",    "Cabbage Seeds",     "base:tile/cabbage_0",    4));
 		add(std::make_shared<Seed>("base:item/onion_seeds",      "Onion Seeds",       "base:tile/onion_0",      4));
 		add(std::make_shared<Seed>("base:item/bean_seeds",       "Bean Seeds",        "base:tile/bean_0",       4));
+		add(std::make_shared<Seed>("base:item/chili_seeds",      "Chili Seeds",       "base:tile/chili_0",      5));
 
 		add(std::make_shared<Tool>("base:item/iron_shovel",     "Iron Shovel",      120,  3.f,  64, "base:attribute/shovel"));
 		add(std::make_shared<Tool>("base:item/iron_axe",        "Iron Axe",         150,  3.f, 128, "base:attribute/axe"));

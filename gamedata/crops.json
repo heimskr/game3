@@ -113,6 +113,15 @@
 				"chance": 1.0
 			},
 
+			"base:crop/chili": {
+				"stages": ["base:tile/chili_0", "base:tile/chili_1", "base:tile/chili_2", "base:tile/chili_3", "base:tile/chili_4"],
+				"products": [
+					["constant", ["base:item/chili"], 1],
+					["exponential", ["base:item/chili_seeds"], 1, 0.25]
+				],
+				"chance": 1.0
+			},
+
 			"base:crop/tree1": {
 				"type": "base:tile/tree",
 				"stages": ["base:tile/tree1_stump", "base:tile/tree1"],
