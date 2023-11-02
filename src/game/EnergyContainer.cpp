@@ -25,9 +25,16 @@ namespace Game3 {
 		return 0;
 	}
 
-	bool EnergyContainer::remove(EnergyAmount to_remove) {
-		if (energy < to_remove)
+	bool EnergyContainer::remove(EnergyAmount to_remove, bool force) {
+		if (energy < to_remove) {
+			if (force) {
+				energy = 0;
+				return true;
+			}
+
 			return false;
+		}
+
 		energy -= to_remove;
 		return true;
 	}

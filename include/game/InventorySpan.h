@@ -18,5 +18,6 @@ namespace Game3 {
 
 			std::unique_ptr<Inventory> copy() const override;
 			bool empty() const override;
+			SlotRange getRange() const { return range; }
 	};
 }

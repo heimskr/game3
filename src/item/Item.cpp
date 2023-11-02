@@ -86,9 +86,9 @@ namespace Game3 {
 		}
 	}
 
-	std::shared_ptr<Item> Item::addAttribute(Identifier attribute) {
+	Item & Item::addAttribute(Identifier attribute) {
 		attributes.insert(std::move(attribute));
-		return shared_from_this();
+		return *this;
 	}
 
 	std::shared_ptr<Texture> Item::getTexture(const ItemStack &stack) {

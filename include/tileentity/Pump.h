@@ -1,10 +1,11 @@
 #pragma once
 
+#include "tileentity/DirectedTileEntity.h"
 #include "tileentity/EnergeticTileEntity.h"
 #include "tileentity/FluidHoldingTileEntity.h"
 
 namespace Game3 {
-	class Pump: public FluidHoldingTileEntity, public EnergeticTileEntity {
+	class Pump: public FluidHoldingTileEntity, public EnergeticTileEntity, public DirectedTileEntity {
 		public:
 			static Identifier ID() { return {"base", "te/pump"}; }
 
@@ -13,9 +14,6 @@ namespace Game3 {
 			constexpr static float PERIOD = 0.25;
 
 			FluidAmount extractionRate = 250;
-
-			inline Direction getDirection() const { return pumpDirection; }
-			void setDirection(Direction);
 
 			FluidAmount getMaxLevel(FluidID) override;
 
@@ -32,9 +30,11 @@ namespace Game3 {
 
 			Game & getGame() const final;
 
+		protected:
+			std::string getDirectedTileBase() const override { return "base:tile/pump_"; }
+
 		private:
 			float accumulatedTime = 0.f;
-			Direction pumpDirection = Direction::Down;
 
 			Pump();
 			Pump(Identifier tile_id, Position);

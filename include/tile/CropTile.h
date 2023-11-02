@@ -16,5 +16,7 @@ namespace Game3 {
 
 			void randomTick(const Place &) override;
 			bool interact(const Place &, Layer) override;
+
+			bool isRipe(const Identifier &) const;
 	};
 }

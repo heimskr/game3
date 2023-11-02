@@ -44,7 +44,7 @@ namespace Game3 {
 			virtual Glib::RefPtr<Gdk::Pixbuf> makeImage(const Game &, const ItemStack &);
 			virtual Identifier getTextureIdentifier(const ItemStack &);
 			virtual void getOffsets(const Game &, std::shared_ptr<Texture> &, float &x_offset, float &y_offset);
-			std::shared_ptr<Item> addAttribute(Identifier);
+			Item & addAttribute(Identifier);
 			virtual std::shared_ptr<Texture> getTexture(const ItemStack &);
 			virtual std::string getTooltip(const ItemStack &);
 

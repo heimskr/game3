@@ -41,6 +41,11 @@ namespace Game3 {
 		}
 	}
 
+
+	Position Position::operator*(Index factor) const {
+		return {row * factor, column * factor};
+	}
+
 	Position & Position::operator+=(Direction direction) {
 		switch (direction) {
 			case Direction::Up:    return *this += Position(-1,  0);
@@ -61,6 +66,12 @@ namespace Game3 {
 			default:
 				throw std::invalid_argument("Direction " + std::to_string(static_cast<int>(direction)) + " is invalid");
 		}
+	}
+
+	Position & Position::operator*=(Index factor) {
+		row *= factor;
+		column *= factor;
+		return *this;
 	}
 
 	Position::operator Direction() const {

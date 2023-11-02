@@ -58,6 +58,8 @@ namespace Game3 {
 			void notifyOwner() override;
 			bool empty() const override;
 
+			using Inventory::add;
+
 		protected:
 			void compact() override;
 	};

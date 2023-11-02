@@ -1,6 +1,7 @@
-#include "types/Direction.h"
-#include "threading/ThreadContext.h"
 #include "net/Buffer.h"
+#include "threading/ThreadContext.h"
+#include "types/Direction.h"
+#include "types/Position.h"
 
 namespace Game3 {
 	Direction remapDirection(Direction direction, uint16_t configuration) {
@@ -54,6 +55,17 @@ namespace Game3 {
 
 	bool validateDirection(Direction direction) {
 		return direction == Direction::Down || direction == Direction::Up || direction == Direction::Right || direction == Direction::Left;
+	}
+
+	Position toPosition(Direction direction) {
+		switch (direction) {
+			case Direction::Up:    return {-1,  0};
+			case Direction::Right: return { 0,  1};
+			case Direction::Down:  return { 1,  0};
+			case Direction::Left:  return { 0, -1};
+			default:
+				return {};
+		}
 	}
 
 	std::string toString(Direction direction) {

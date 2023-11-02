@@ -1,13 +1,14 @@
 #pragma once
 
-#include "item/Item.h"
+#include "item/Plantable.h"
 
 namespace Game3 {
-	class Sapling: public Item {
+	class Sapling: public Plantable {
 		public:
-			using Item::Item;
+			using Plantable::Plantable;
 			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
 			bool drag(Slot, ItemStack &, const Place &, Modifiers) override;
+			bool plant(InventoryPtr, Slot, ItemStack &, const Place &) override;
 
 			virtual Identifier getRealmType() const { return "base:realm/overworld"; }
 			virtual Identifier getSoilCategory() const { return "base:category/plant_soil"; }

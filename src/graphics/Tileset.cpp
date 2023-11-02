@@ -37,7 +37,9 @@ namespace Game3 {
 	}
 
 	TileID Tileset::getEmptyID() const {
-		return (*this)[empty];
+		if (!emptyID)
+			emptyID = (*this)[empty];
+		return *emptyID;
 	}
 
 	const Identifier & Tileset::getMissing() const {
@@ -129,7 +131,7 @@ namespace Game3 {
 		brightCache.reset();
 	}
 
-	const std::unordered_set<Identifier> Tileset::getCategories(const Identifier &tilename) const {
+	const std::unordered_set<Identifier> & Tileset::getCategories(const Identifier &tilename) const {
 		return inverseCategories.at(tilename);
 	}
 
@@ -140,7 +142,7 @@ namespace Game3 {
 		return out;
 	}
 
-	const std::unordered_set<Identifier> Tileset::getTilesByCategory(const Identifier &category) const {
+	const std::unordered_set<Identifier> & Tileset::getTilesByCategory(const Identifier &category) const {
 		return categories.at(category);
 	}
 

@@ -1,4 +1,5 @@
 #include "game/Game.h"
+#include "tileentity/Autofarmer.h"
 #include "tileentity/Building.h"
 #include "tileentity/Centrifuge.h"
 #include "tileentity/ChemicalReactor.h"
@@ -25,6 +26,7 @@ namespace Game3 {
 	}
 
 	void Game::addTileEntityFactories() {
+		add(TileEntityFactory::create<Autofarmer>());
 		add(TileEntityFactory::create<Building>());
 		add(TileEntityFactory::create<Centrifuge>());
 		add(TileEntityFactory::create<ChemicalReactor>());

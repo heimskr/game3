@@ -36,8 +36,10 @@ namespace Game3 {
 		inline Position & operator-=(const Position &other) { row -= other.row; column -= other.column; return *this; }
 		Position operator+(Direction) const;
 		Position operator-(Direction) const;
+		Position operator*(Index) const;
 		Position & operator+=(Direction);
 		Position & operator-=(Direction);
+		Position & operator*=(Index);
 		explicit inline operator std::string() const { return '(' + std::to_string(row) + ", " + std::to_string(column) + ')'; }
 		explicit operator Direction() const;
 		inline double distance(const Position &other) const { return std::sqrt(std::pow(row - other.row, 2) + std::pow(column - other.column, 2)); }

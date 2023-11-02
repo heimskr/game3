@@ -52,4 +52,8 @@ namespace Game3 {
 
 		return Tile::interact(place, layer);
 	}
+
+	bool CropTile::isRipe(const Identifier &tilename) const {
+		return tilename == crop->stages.back();
+	}
 }

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "item/Item.h"
+#include "item/Plantable.h"
 
 namespace Game3 {
-	class Seed: public Item {
+	class Seed: public Plantable {
 		public:
 			Identifier cropTilename;
 
@@ -11,5 +11,6 @@ namespace Game3 {
 
 			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
 			bool drag(Slot, ItemStack &, const Place &, Modifiers) override;
+			bool plant(InventoryPtr, Slot, ItemStack &, const Place &) override;
 	};
 }

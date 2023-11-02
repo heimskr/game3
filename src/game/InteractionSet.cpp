@@ -4,7 +4,7 @@
 #include "game/Game.h"
 #include "game/InteractionSet.h"
 #include "game/Inventory.h"
-#include "item/Plantable.h"
+#include "item/Flower.h"
 #include "realm/Realm.h"
 #include "threading/ThreadContext.h"
 
@@ -70,7 +70,7 @@ namespace Game3 {
 		if (tileset.isInCategory(*submerged_tile, "base:category/plantable"_id)) {
 			if (auto iter = game.itemsByAttribute.find("base:attribute/plantable"_id); iter != game.itemsByAttribute.end()) {
 				for (const auto &item: iter->second) {
-					if (auto cast = std::dynamic_pointer_cast<Plantable>(item); cast && cast->tilename == *submerged_tile) {
+					if (auto cast = std::dynamic_pointer_cast<Flower>(item); cast && cast->tilename == *submerged_tile) {
 						player.give({game, item});
 						realm.setTile(Layer::Submerged, position, tileset.getEmptyID());
 						return true;

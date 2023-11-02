@@ -21,6 +21,6 @@ namespace Game3 {
 			EnergyAmount add(EnergyAmount);
 
 			/** Doesn't lock the mutex. */
-			bool remove(EnergyAmount);
+			bool remove(EnergyAmount, bool force = false);
 	};
 }

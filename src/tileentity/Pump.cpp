@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/ClientGame.h"
@@ -19,27 +17,12 @@ namespace Game3 {
 	Pump::Pump(Position position_):
 		Pump("base:tile/pump_s"_id, position_) {}
 
-	void Pump::setDirection(Direction new_direction) {
-		pumpDirection = new_direction;
-
-		switch (pumpDirection) {
-			case Direction::Up:    tileID = "base:tile/pump_n"_id; break;
-			case Direction::Right: tileID = "base:tile/pump_e"_id; break;
-			case Direction::Down:  tileID = "base:tile/pump_s"_id; break;
-			case Direction::Left:  tileID = "base:tile/pump_w"_id; break;
-			default:
-				tileID = "base:tile/missing"_id;
-		}
-
-		cachedTile = -1;
-	}
-
 	FluidAmount Pump::getMaxLevel(FluidID) {
 		return 64 * FluidTile::FULL;
 	}
 
 	void Pump::tick(Game &game, float delta) {
-		auto realm = weakRealm.lock();
+		RealmPtr realm = weakRealm.lock();
 		if (!realm || realm->getSide() != Side::Server)
 			return;
 
@@ -56,7 +39,7 @@ namespace Game3 {
 		if (amount == 0)
 			return;
 
-		auto fluid = realm->tryFluid(position + pumpDirection);
+		auto fluid = realm->tryFluid(position + tileDirection);
 		if (!fluid)
 			return;
 
@@ -89,14 +72,15 @@ namespace Game3 {
 
 		if (!fluid->isInfinite()) {
 			fluid->level -= FluidLevel(removed);
-			realm->setFluid(position + pumpDirection, *fluid);
+			realm->setFluid(position + tileDirection, *fluid);
 		}
 	}
 
 	void Pump::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
 		FluidHoldingTileEntity::toJSON(json);
-		json["direction"] = pumpDirection;
+		EnergeticTileEntity::toJSON(json);
+		DirectedTileEntity::toJSON(json);
 	}
 
 	bool Pump::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
@@ -109,9 +93,7 @@ namespace Game3 {
 		}
 
 		if (modifiers.onlyCtrl()) {
-			setDirection(rotateClockwise(getDirection()));
-			increaseUpdateCounter();
-			queueBroadcast(true);
+			rotateClockwise();
 			return true;
 		}
 
@@ -138,21 +120,21 @@ namespace Game3 {
 		TileEntity::absorbJSON(game, json);
 		FluidHoldingTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);
-		setDirection(json.at("direction"));
+		DirectedTileEntity::absorbJSON(game, json);
 	}
 
 	void Pump::encode(Game &game, Buffer &buffer) {
 		TileEntity::encode(game, buffer);
 		FluidHoldingTileEntity::encode(game, buffer);
 		EnergeticTileEntity::encode(game, buffer);
-		buffer << getDirection();
+		DirectedTileEntity::encode(game, buffer);
 	}
 
 	void Pump::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
 		FluidHoldingTileEntity::decode(game, buffer);
 		EnergeticTileEntity::decode(game, buffer);
-		setDirection(buffer.take<Direction>());
+		DirectedTileEntity::decode(game, buffer);
 	}
 
 	void Pump::broadcast(bool force) {

@@ -1,6 +1,7 @@
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
+#include "item/AutofarmerItem.h"
 #include "item/Bomb.h"
 #include "item/CaveEntrance.h"
 #include "item/CentrifugeItem.h"
@@ -12,6 +13,7 @@
 #include "item/EmptyFlask.h"
 #include "item/FilledFlask.h"
 #include "item/Floor.h"
+#include "item/Flower.h"
 #include "item/Furniture.h"
 #include "item/GeothermalGeneratorItem.h"
 #include "item/Hammer.h"
@@ -22,7 +24,6 @@
 #include "item/Mushroom.h"
 #include "item/Pickaxe.h"
 #include "item/PipeItem.h"
-#include "item/Plantable.h"
 #include "item/PumpItem.h"
 #include "item/Sapling.h"
 #include "item/Seed.h"
@@ -228,9 +229,9 @@ namespace Game3 {
 				std::string name = std::string(color) + " Flower";
 				name[0] = std::toupper(name[0]);
 				std::string post = "flower" + std::to_string(i) + "_" + color;
-				add(std::make_shared<Plantable>(Identifier("base:item/" + post), std::move(name), Identifier("base:tile/" + post), "base:category/plant_soil", 10)
-					->addAttribute("base:attribute/flower")
-					->addAttribute(Identifier("base:attribute/flower_" + std::string(color))));
+				auto flower = std::make_shared<Flower>(Identifier("base:item/" + post), std::move(name), Identifier("base:tile/" + post), "base:category/plant_soil", 10);
+				flower->addAttribute(Identifier("base:attribute/flower_" + std::string(color)));
+				add(flower);
 			}
 		}
 
@@ -259,6 +260,8 @@ namespace Game3 {
 		add(std::make_shared<DissolverItem>("base:item/dissolver", "Dissolver", 999, 64)); // TODO: cost
 
 		add(std::make_shared<FluidPipeItem>(4));
+
+		add(std::make_shared<AutofarmerItem>("base:item/autofarmer", "Autofarmer", 999, 64)); // TODO: cost
 
 		add(std::make_shared<CentrifugeItem>("base:item/centrifuge", "Centrifuge", 999, 64)); // TODO: cost
 

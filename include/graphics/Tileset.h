@@ -57,9 +57,9 @@ namespace Game3 {
 			bool isCategoryMarchable(const Identifier &category) const;
 			const MarchableInfo * getMarchableInfo(const Identifier &tilename) const;
 			void clearCache();
-			const std::unordered_set<Identifier> getCategories(const Identifier &) const;
+			const std::unordered_set<Identifier> & getCategories(const Identifier &) const;
 			const std::unordered_set<TileID> getCategoryIDs(const Identifier &) const;
-			const std::unordered_set<Identifier> getTilesByCategory(const Identifier &) const;
+			const std::unordered_set<Identifier> & getTilesByCategory(const Identifier &) const;
 			bool isInCategory(const Identifier &tilename, const Identifier &category) const;
 			bool isInCategory(TileID, const Identifier &category) const;
 			bool hasName(const Identifier &) const;
@@ -99,6 +99,8 @@ namespace Game3 {
 			Identifier empty;
 			Identifier missing;
 			Identifier textureName;
+			mutable std::optional<TileID> emptyID;
+
 			std::shared_ptr<Texture> cachedTexture;
 			// TODO: consider making the sets store TileIDs instead, for performance perhaps
 			std::unordered_set<Identifier> land;

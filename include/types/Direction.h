@@ -6,6 +6,7 @@
 
 namespace Game3 {
 	class Buffer;
+	class Position;
 
 	// TODO: basically a duplicate of Quadrant
 	enum class Direction: uint8_t {Invalid = 0, Down, Up, Right, Left};
@@ -18,6 +19,7 @@ namespace Game3 {
 	Direction flipDirection(Direction);
 	Direction randomDirection();
 	bool validateDirection(Direction);
+	Position toPosition(Direction);
 
 	std::string toString(Direction);
 	std::ostream & operator<<(std::ostream &, Direction);
