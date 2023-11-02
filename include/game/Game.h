@@ -50,7 +50,7 @@ namespace Game3 {
 			std::atomic<double> time = 0.f;
 			Tick currentTick = 0;
 			size_t cavesGenerated = 0;
-			size_t randomTicksPerChunk = 1;
+			size_t randomTicksPerChunk = 2;
 			bool dying = false;
 			std::atomic_bool tickingPaused{false};
 
