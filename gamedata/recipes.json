@@ -351,7 +351,8 @@
 			["base:centrifuge_recipe", {
 				"input":  ["base:fluid/honey", 1000],
 				"output": [
-					[1.0, ["base:item/sugar", 1]]
+					[0.95, ["base:item/sugar", 1]],
+					[0.05, ["base:item/yeast", 1]]
 				]
 			}],
 			["base:centrifuge_recipe", {
