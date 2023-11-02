@@ -40,5 +40,6 @@ namespace Game3 {
 		{"C32H44O8", "Cucurbitacin E"},
 		{"C4H10", "Butane"},
 		{"C5H12", "Pentane"},
+		{"C18H27NO3", "Capsaicin"},
 	};
 }

@@ -99,6 +99,8 @@
 			"base:item/blue_planter":     [1, "C12H20O10"],
 			"base:item/corn":             [10, [7, "(C6H10O5)(H2O)"], "base:item/protein", [2, "H2O"]],
 			"base:item/corn_seeds":       [1, "base:item/protein"],
+			"base:item/chili":            [10, [3, "C18H27NO3"], [2, "base:item/protein"], [5, "H2O"]],
+			"base:item/chili_seeds":      [1, "base:item/protein"],
 			"base:item/cotton":           [1, "C12H20O10"],
 			"base:item/cotton_seeds":     [1, "base:item/protein"],
 			"base:item/potato":           [7, [2, "(C6H10O5)(H2O)"], [5, "K"]],
