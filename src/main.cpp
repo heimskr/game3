@@ -27,6 +27,7 @@ namespace Game3 {
 	void splitter();
 	void omniOptOut();
 	void filterTest();
+	bool chemskrTest(int, char **);
 }
 
 int main(int argc, char **argv) {
@@ -49,7 +50,11 @@ int main(int argc, char **argv) {
 		std::filesystem::create_symlink(Game3::dataRoot / "resources", "resources");
 #endif
 
+
 	if (2 <= argc) {
+		if (Game3::chemskrTest(argc, argv))
+			return 0;
+
 		if (strcmp(argv[1], "--token") == 0 && argc == 3) {
 			if (!std::filesystem::exists(".secret")) {
 				std::cerr << "Can't find .secret\n";

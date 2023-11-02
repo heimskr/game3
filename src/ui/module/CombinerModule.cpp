@@ -118,7 +118,6 @@ namespace Game3 {
 	}
 
 	void CombinerModule::setTarget(const std::string &target) {
-		INFO("setTarget()");
 		if (combiner)
 			game->player->sendMessage(combiner, "SetTarget", target);
 	}
