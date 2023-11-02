@@ -161,10 +161,20 @@ namespace Game3 {
 		bool input_empty = false;
 		size_t operations = 0;
 
+		EnergyAmount current_energy{};
+
+		{
+			auto lock = energyContainer->sharedLock();
+			current_energy = energyContainer->energy;
+		}
+
 		for (Index row = center.row - DIAMETER / 2;
 		           row < center.row + DIAMETER / 2 + odd; ++row) {
 			for (Index column = center.column - DIAMETER / 2;
 			           column < center.column + DIAMETER / 2 + odd; ++column) {
+				if (current_energy <= operations * ENERGY_PER_OPERATION)
+					break;
+
 				if (autofarm(Position{row, column}, input_empty))
 					++operations;
 			}
