@@ -18,8 +18,8 @@ namespace Game3 {
 		constexpr EnergyAmount ENERGY_PER_OPERATION = 50;
 		constexpr ItemCount INPUT_CAPACITY  = 5;
 		constexpr ItemCount OUTPUT_CAPACITY = 20;
-		constexpr float PERIOD = 4.;
 		constexpr Index DIAMETER = 5;
+		constexpr float PERIOD = 4. / (DIAMETER * DIAMETER);
 	}
 
 	Autofarmer::Autofarmer():
@@ -168,16 +168,14 @@ namespace Game3 {
 			current_energy = energyContainer->energy;
 		}
 
-		for (Index row = center.row - DIAMETER / 2;
-		           row < center.row + DIAMETER / 2 + odd; ++row) {
-			for (Index column = center.column - DIAMETER / 2;
-			           column < center.column + DIAMETER / 2 + odd; ++column) {
-				if (current_energy <= operations * ENERGY_PER_OPERATION)
-					break;
+		if (operations * ENERGY_PER_OPERATION <= current_energy)
+			if (autofarm(center + centerOffset, input_empty))
+				++operations;
 
-				if (autofarm(Position{row, column}, input_empty))
-					++operations;
-			}
+		if (++centerOffset.column == DIAMETER / 2 + odd) {
+			centerOffset.column = -DIAMETER / 2;
+			if (++centerOffset.row == DIAMETER / 2 + odd)
+				centerOffset.row = -DIAMETER / 2;
 		}
 
 		return operations;

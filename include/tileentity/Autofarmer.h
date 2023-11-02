@@ -29,6 +29,7 @@ namespace Game3 {
 
 		private:
 			float accumulatedTime = 0.f;
+			Position centerOffset{};
 
 			Autofarmer();
 			Autofarmer(Identifier tile_id, Position);
