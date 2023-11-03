@@ -1,6 +1,7 @@
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
+#include "item/AutocrafterItem.h"
 #include "item/AutofarmerItem.h"
 #include "item/Bomb.h"
 #include "item/CaveEntrance.h"
@@ -176,29 +177,14 @@ namespace Game3 {
 		add(Furniture::createMarchable("base:item/dining_table",    "Dining Table",    10, Layer::Objects,   "base:tile/dining_table",    "base:autotile/dining_tables"));
 		add(Furniture::createMarchable("base:item/fence",           "Fence",           10, Layer::Submerged, "base:tile/fence",           "base:autotile/fences"));
 
-		add(Furniture::createTileEntity("base:item/cauldron", "Cauldron", 175, [](const Place &place) -> bool {
-			return nullptr != TileEntity::spawn<CraftingStation>(place, "base:tile/red_cauldron_full", place.position, "base:station/cauldron", "base:item/cauldron");
-		}));
-
-		add(Furniture::createTileEntity("base:item/purifier", "Purifier", 300, [](const Place &place) -> bool {
-			return nullptr != TileEntity::spawn<CraftingStation>(place, "base:tile/purifier", place.position, "base:station/purifier", "base:item/purifier");
-		}));
-
-		add(Furniture::createTileEntity("base:item/millstone", "Millstone", 20, [](const Place &place) -> bool {
-			return nullptr != TileEntity::spawn<CraftingStation>(place, "base:tile/millstone", place.position, "base:station/millstone", "base:item/millstone");
-		}));
-
-		add(Furniture::createTileEntity("base:item/cutting_board", "Cutting Board", 30, [](const Place &place) -> bool {
-			return nullptr != TileEntity::spawn<CraftingStation>(place, "base:tile/cutting_board", place.position, "base:station/cutting_board", "base:item/cutting_board");
-		}));
-
-		add(Furniture::createTileEntity("base:item/sink", "Sink", 30, [](const Place &place) -> bool {
-			return nullptr != TileEntity::spawn<CraftingStation>(place, "base:tile/sink", place.position, "base:station/sink", "base:item/sink");
-		}));
-
-		add(Furniture::createTileEntity("base:item/oven", "Oven", 200, [](const Place &place) -> bool {
-			return nullptr != TileEntity::spawn<CraftingStation>(place, "base:tile/oven", place.position, "base:station/oven", "base:item/oven");
-		}));
+		add(Furniture::createStation("base:item/furnace",       "Furnace",        12, "base:tile/furnace",           "base:station/furnace"));
+		add(Furniture::createStation("base:item/anvil",         "Anvil",         150, "base:tile/anvil",             "base:station/anvil"));
+		add(Furniture::createStation("base:item/cauldron",      "Cauldron",      175, "base:tile/red_cauldron_full", "base:station/cauldron"));
+		add(Furniture::createStation("base:item/purifier",      "Purifier",      300, "base:tile/purifier",          "base:station/purifier"));
+		add(Furniture::createStation("base:item/millstone",     "Millstone",      20, "base:tile/millstone",         "base:station/millstone"));
+		add(Furniture::createStation("base:item/cutting_board", "Cutting Board",  30, "base:tile/cutting_board",     "base:station/cutting_board"));
+		add(Furniture::createStation("base:item/sink",          "Sink",           30, "base:tile/sink",              "base:station/sink"));
+		add(Furniture::createStation("base:item/oven",          "Oven",          200, "base:tile/oven",              "base:station/oven"));
 
 		add(Furniture::createTileEntity("base:item/chest", "Chest", 100, [](const Place &place) -> bool {
 			auto out = TileEntity::spawn<Chest>(place, "base:tile/chest", place.position, "Chest", "base:item/chest");
@@ -268,6 +254,8 @@ namespace Game3 {
 		add(std::make_shared<ContainmentOrb>("base:item/contorb", "Containment Orb", 64, 1)); // TODO: cost
 
 		add(std::make_shared<EnergyPipeItem>(4));
+
+		add(std::make_shared<AutocrafterItem>("base:item/autocrafter", "Autocrafter", 999, 64)); // TODO: cost
 
 		add(std::make_shared<ChemicalReactorItem>("base:item/chemical_reactor", "Chemical Reactor", 999, 64)); // TODO: cost
 

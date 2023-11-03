@@ -30,6 +30,7 @@ namespace Game3 {
 			static std::shared_ptr<Furniture> createMarchable(ItemID id, std::string name, MoneyCount base_price, Layer, Identifier start, Identifier autotile);
 			static std::shared_ptr<Furniture> createCustom(ItemID id, std::string name, MoneyCount base_price, std::function<bool(const Place &)> placer);
 			static std::shared_ptr<Furniture> createTileEntity(ItemID id, std::string name, MoneyCount base_price, std::function<bool(const Place &)> placer);
+			static std::shared_ptr<Furniture> createStation(ItemID id, std::string name, MoneyCount base_price, Identifier tilename, Identifier station_name);
 	};
 
 	struct SimpleFurniture: Furniture {
@@ -72,5 +73,16 @@ namespace Game3 {
 		public:
 			TileEntityFurniture(ItemID, std::string name_, MoneyCount base_price, std::function<bool(const Place &)> placer_);
 			bool preCheck(const Place &) const override;
+	};
+
+	class StationFurniture: public Furniture {
+		public:
+			Identifier tilename;
+			Identifier stationType;
+
+			StationFurniture(ItemID, std::string name_, MoneyCount base_price, Identifier tilename_, Identifier station_type);
+			bool preCheck(const Place &) const override;
+			Layer getLayer() const override { return Layer::Invalid; }
+			bool apply(const Place &) override;
 	};
 }

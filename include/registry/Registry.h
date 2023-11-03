@@ -272,6 +272,14 @@ namespace Game3 {
 			inline size_t size() const {
 				return items.size();
 			}
+
+			inline auto begin() const {
+				return items.begin();
+			}
+
+			inline auto end() const {
+				return items.end();
+			}
 	};
 
 	template <typename T>

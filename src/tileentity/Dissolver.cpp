@@ -15,11 +15,11 @@
 
 namespace Game3 {
 	namespace {
-		constexpr float ENERGY_CAPACITY = 100'000;
+		constexpr EnergyAmount ENERGY_CAPACITY = 100'000;
+		constexpr EnergyAmount ENERGY_PER_ATOM = 100;
 		constexpr float PERIOD = 0.1;
 		constexpr ItemCount INPUT_CAPACITY  = 5;
 		constexpr ItemCount OUTPUT_CAPACITY = 10;
-		constexpr EnergyAmount ENERGY_PER_ATOM = 100;
 	}
 
 	Dissolver::Dissolver():

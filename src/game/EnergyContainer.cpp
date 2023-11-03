@@ -38,4 +38,14 @@ namespace Game3 {
 		energy -= to_remove;
 		return true;
 	}
+
+	EnergyAmount EnergyContainer::copyEnergy() const {
+		auto lock = sharedLock();
+		return energy;
+	}
+
+	EnergyAmount EnergyContainer::copyCapacity() const {
+		auto lock = sharedLock();
+		return capacity;
+	}
 }

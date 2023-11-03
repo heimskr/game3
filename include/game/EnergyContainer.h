@@ -22,5 +22,8 @@ namespace Game3 {
 
 			/** Doesn't lock the mutex. */
 			bool remove(EnergyAmount, bool force = false);
+
+			EnergyAmount copyEnergy() const;
+			EnergyAmount copyCapacity() const;
 	};
 }

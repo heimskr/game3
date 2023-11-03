@@ -41,7 +41,7 @@ namespace Game3::WorldGen {
 
 		switch(std::uniform_int_distribution(0, 1)(rng)) {
 			case 0: {
-				std::array<const char *, 14> texts {
+				std::array<const char *, 15> texts {
 					"Express ideas directly in code.",
 					"Write in ISO Standard C++.",
 					"Express intent.",
@@ -56,6 +56,7 @@ namespace Game3::WorldGen {
 					"Use supporting tools as appropriate.",
 					"Use support libraries as appropriate.",
 					"haha!\ntrapped in my furniture hellscape\nit's all so wrong and I made it just for you!\ngood luck!", // Credit: Louie Zong
+					"This is a work of nonfiction and any resemblance to actual events, locales or persons, living or dead, is entirely intentional. We are in your walls.",
 				};
 
 				std::shuffle(texts.begin(), texts.end(), rng);

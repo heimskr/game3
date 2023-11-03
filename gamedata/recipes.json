@@ -31,6 +31,15 @@
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
+				"input":  [["base:item/iron_bar", 8]],
+				"output": [["base:item/anvil", 1]],
+				"station": "base:station/anvil"
+			}],
+			["base:registry/crafting_recipe", {
+				"input":  [["base:item/stone", 8]],
+				"output": [["base:item/furnace", 1]]
+			}],
+			["base:registry/crafting_recipe", {
 				"input":  [["base:item/iron_bar", 2], ["base:item/wood", 1]],
 				"output": [["base:item/iron_hoe", 1, "with_durability"]],
 				"station": "base:station/anvil"

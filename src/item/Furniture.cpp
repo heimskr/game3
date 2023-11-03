@@ -1,10 +1,11 @@
 #include "MarchingSquares.h"
-#include "types/Position.h"
-#include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/Inventory.h"
+#include "graphics/Tileset.h"
 #include "item/Furniture.h"
 #include "realm/Realm.h"
+#include "tileentity/CraftingStation.h"
+#include "types/Position.h"
 
 namespace Game3 {
 	bool Furniture::preCheck(const Place &place) const {
@@ -47,6 +48,10 @@ namespace Game3 {
 
 	std::shared_ptr<Furniture> Furniture::createTileEntity(ItemID id, std::string name, MoneyCount base_price, std::function<bool(const Place &)> placer) {
 		return std::make_shared<TileEntityFurniture>(std::move(id), std::move(name), base_price, std::move(placer));
+	}
+
+	std::shared_ptr<Furniture> Furniture::createStation(ItemID id, std::string name, MoneyCount base_price, Identifier tilename, Identifier station_name) {
+		return std::make_shared<StationFurniture>(std::move(id), std::move(name), base_price, std::move(tilename), std::move(station_name));
 	}
 
 	SimpleFurniture::SimpleFurniture(ItemID id_, std::string name_, MoneyCount base_price, Layer layer_, Identifier tilename_):
@@ -97,5 +102,18 @@ namespace Game3 {
 
 	bool TileEntityFurniture::preCheck(const Place &place) const {
 		return !place.realm->tileEntityAt(place.position);
+	}
+
+	bool StationFurniture::preCheck(const Place &place) const {
+		return !place.realm->tileEntityAt(place.position);
+	}
+
+	StationFurniture::StationFurniture(ItemID item_id, std::string name_, MoneyCount base_price, Identifier tilename_, Identifier station_type):
+		Furniture(std::move(item_id), std::move(name_), base_price, 64),
+		tilename(std::move(tilename_)),
+		stationType(std::move(station_type)) {}
+
+	bool StationFurniture::apply(const Place &place) {
+		return TileEntity::spawn<CraftingStation>(place, tilename, place.position, stationType, identifier) != nullptr;
 	}
 }
