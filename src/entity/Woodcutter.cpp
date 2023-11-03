@@ -66,7 +66,7 @@ namespace Game3 {
 				tab.removeModule();
 				return true;
 			});
-			window.showExternalInventory(std::dynamic_pointer_cast<ClientInventory>(getInventory()));
+			window.showExternalInventory(std::dynamic_pointer_cast<ClientInventory>(getInventory(0)));
 		}
 		return true;
 	}
@@ -178,7 +178,7 @@ namespace Game3 {
 			auto realm = getRealm();
 			auto &deposit = dynamic_cast<OreDeposit &>(*realm->tileEntityAt(*chosenResource));
 			const ItemStack stack = deposit.getOre(getGame()).stack;
-			const auto leftover = getInventory()->add(stack);
+			const auto leftover = getInventory(0)->add(stack);
 			if (leftover == stack)
 				setPhase(4);
 		} else
@@ -189,7 +189,7 @@ namespace Game3 {
 		phase = 7;
 		auto &keep_realm = dynamic_cast<Keep &>(*keep->getInnerRealm());
 		MoneyCount new_money = money;
-		const InventoryPtr inventory = getInventory();
+		const InventoryPtr inventory = getInventory(0);
 
 		for (Slot slot = 0; slot < inventory->slotCount; ++slot) {
 			if (!inventory->contains(slot))

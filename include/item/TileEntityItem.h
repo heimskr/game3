@@ -20,7 +20,7 @@ namespace Game3 {
 				const Position  &position = place.position;
 
 				auto existing = std::dynamic_pointer_cast<T>(realm.tileEntityAt(position));
-				const InventoryPtr inventory = player->getInventory();
+				const InventoryPtr inventory = player->getInventory(0);
 				auto inventory_lock = inventory->uniqueLock();
 
 				if (modifiers.onlyShift()) {

@@ -77,7 +77,7 @@ namespace Game3 {
 		json["realmID"]   = realmID;
 		json["direction"] = direction;
 		json["health"]    = health;
-		if (const InventoryPtr inventory = getInventory()) {
+		if (const InventoryPtr inventory = getInventory(0)) {
 			// TODO: move JSONification to StorageInventory
 			if (getSide() == Side::Client)
 				json["inventory"] = static_cast<ClientInventory &>(*inventory);
@@ -118,7 +118,7 @@ namespace Game3 {
 		if (auto iter = json.find("health"); iter != json.end())
 			health = *iter;
 		if (auto iter = json.find("inventory"); iter != json.end())
-			setInventory(std::make_shared<ServerInventory>(ServerInventory::fromJSON(game, *iter, shared_from_this())));
+			setInventory(std::make_shared<ServerInventory>(ServerInventory::fromJSON(game, *iter, shared_from_this())), 0);
 		if (auto iter = json.find("path"); iter != json.end()) {
 			auto path_lock = path.uniqueLock();
 			path = iter->get<std::list<Direction>>();
@@ -206,17 +206,17 @@ namespace Game3 {
 				texture = getTexture();
 		}
 
-		InventoryPtr inventory = getInventory();
+		InventoryPtr inventory = getInventory(0);
 
 		if (!inventory) {
-			setInventory(Inventory::create(getSide(), shared, DEFAULT_INVENTORY_SIZE));
-			inventory = getInventory();
+			setInventory(Inventory::create(getSide(), shared, DEFAULT_INVENTORY_SIZE), 0);
+			inventory = getInventory(0);
 		} else
 			inventory->weakOwner = shared;
 
 		if (getSide() == Side::Server) {
 			inventory->onSwap = [this](Inventory &here, Slot here_slot, Inventory &there, Slot there_slot) {
-				InventoryPtr this_inventory = getInventory();
+				InventoryPtr this_inventory = getInventory(0);
 				assert(here == *this_inventory || there == *this_inventory);
 
 				return [this, &here, here_slot, &there, there_slot, this_inventory] {
@@ -226,9 +226,14 @@ namespace Game3 {
 				};
 			};
 
-			inventory->onMove = [this](Inventory &source, Slot source_slot, Inventory &destination, Slot destination_slot, bool consumed) {
-				return [this, &source, source_slot, &destination, destination_slot, consumed, this_inventory = getInventory()] {
-					if (source == *this_inventory && destination == *this_inventory) {
+			inventory->onMove = [this, weak_inventory = std::weak_ptr(inventory)](Inventory &source, Slot source_slot, Inventory &destination, Slot destination_slot, bool consumed) -> std::function<void()> {
+				InventoryPtr inventory = weak_inventory.lock();
+
+				if (!inventory)
+					return [] {};
+
+				return [this, &source, source_slot, &destination, destination_slot, consumed, inventory] {
+					if (source == *inventory && destination == *inventory) {
 						for (Held &held: {std::ref(heldLeft), std::ref(heldRight)}) {
 							if (source_slot == held.slot) {
 								INFO(__FILE__ << ':' << __LINE__ << ": setHeld(destination_slot{" << destination_slot << "}, " << (held.isLeft? "left" : "right") << ')');
@@ -238,7 +243,7 @@ namespace Game3 {
 								setHeld(source_slot, held);
 							}
 						}
-					} else if (source == *this_inventory) {
+					} else if (source == *inventory) {
 						for (Held &held: {std::ref(heldLeft), std::ref(heldRight)}) {
 							if (source_slot == held.slot) {
 								INFO(__FILE__ << ':' << __LINE__ << ": setHeld(-1, " << (held.isLeft? "left" : "right") << ')');
@@ -246,7 +251,7 @@ namespace Game3 {
 							}
 						}
 					} else {
-						assert(destination == *this_inventory);
+						assert(destination == *inventory);
 						for (Held &held: {std::ref(heldLeft), std::ref(heldRight)}) {
 							if (destination_slot == held.slot) {
 								INFO(__FILE__ << ':' << __LINE__ << ": setHeld(-1, " << (held.isLeft? "left" : "right") << ')');
@@ -909,7 +914,8 @@ namespace Game3 {
 		buffer << path;
 		buffer << money;
 		buffer << health;
-		HasInventory::encode(buffer);
+		// TODO: support multiple entity inventories
+		HasInventory::encode(buffer, 0);
 		buffer << heldLeft.slot;
 		buffer << heldRight.slot;
 		buffer << customTexture;
@@ -933,7 +939,8 @@ namespace Game3 {
 		buffer >> path;
 		buffer >> money;
 		buffer >> health;
-		HasInventory::decode(buffer);
+		// TODO: support multiple entity inventories
+		HasInventory::decode(buffer, 0);
 		const auto left_slot  = buffer.take<Slot>();
 		const auto right_slot = buffer.take<Slot>();
 
@@ -974,7 +981,7 @@ namespace Game3 {
 			return true;
 		}
 
-		const InventoryPtr inventory = getInventory();
+		const InventoryPtr inventory = getInventory(0);
 
 		if (!inventory->contains(new_value)) {
 			WARN("Can't equip slot " << new_value << ": no item in inventory");

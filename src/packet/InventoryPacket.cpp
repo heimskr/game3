@@ -18,8 +18,8 @@ namespace Game3 {
 	void InventoryPacket::handle(ClientGame &game) {
 		if (game.player) {
 			inventory->weakOwner = game.player;
-			game.player->setInventory(inventory);
-			game.player->getInventory()->notifyOwner();
+			game.player->setInventory(inventory, 0);
+			game.player->getInventory(0)->notifyOwner();
 		} else {
 			ERROR("InventoryPacket::handle: player is missing");
 			assert(game.player);

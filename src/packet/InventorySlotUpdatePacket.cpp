@@ -8,7 +8,7 @@
 namespace Game3 {
 	void InventorySlotUpdatePacket::handle(ClientGame &game) {
 		if (auto player = game.player) {
-			if (const InventoryPtr inventory = player->getInventory()) {
+			if (const InventoryPtr inventory = player->getInventory(0)) {
 				auto inventory_lock = inventory->uniqueLock();
 				if (auto stack_pointer = (*inventory)[slot])
 					*stack_pointer = stack;

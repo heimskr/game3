@@ -20,7 +20,7 @@ namespace Game3 {
 		assert(realm);
 		PlayerPtr player = place.player;
 		assert(player);
-		InventoryPtr inventory = player->getInventory();
+		InventoryPtr inventory = player->getInventory(0);
 		assert(inventory);
 
 		auto lock = inventory->uniqueLock();

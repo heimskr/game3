@@ -21,8 +21,8 @@ namespace Game3 {
 	/** Inventories should be locked appropriately (see HasMutex) when something is calling Inventory methods. The Inventory will not lock itself. */
 	class Inventory: public Container, public HasMutex<> {
 		protected:
-			Inventory() = default;
-			Inventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot = 0);
+			Inventory();
+			Inventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot = 0, InventoryID index_ = 0);
 			Inventory(const Inventory &);
 			Inventory(Inventory &&);
 
@@ -34,6 +34,7 @@ namespace Game3 {
 			std::weak_ptr<Agent> weakOwner;
 			Atomic<Slot> slotCount = 0;
 			Atomic<Slot> activeSlot = 0;
+			Atomic<InventoryID> index = -1;
 			/** Called before the swap occurs. The first argument always refers to this object.
 			 *  Returns (optionally) a function to call after the swap has occurred. */
 			std::function<std::function<void()>(Inventory &, Slot, Inventory &, Slot)> onSwap;
@@ -174,8 +175,8 @@ namespace Game3 {
 			 *  Doesn't take the output of the recipe into account. */
 			virtual ItemCount craftable(const CraftingRecipe &) const;
 
-			static std::shared_ptr<Inventory> create(Side side, std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot = 0, std::map<Slot, ItemStack> storage = {});
-			static std::shared_ptr<Inventory> create(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot = 0, std::map<Slot, ItemStack> storage = {});
+			static std::shared_ptr<Inventory> create(Side side, std::shared_ptr<Agent> owner, Slot slot_count, InventoryID index = 0, Slot active_slot = 0, std::map<Slot, ItemStack> storage = {});
+			static std::shared_ptr<Inventory> create(std::shared_ptr<Agent> owner, Slot slot_count, InventoryID index = 0, Slot active_slot = 0, std::map<Slot, ItemStack> storage = {});
 
 		protected:
 			/** Removes every slot whose item count is zero from the storage map. */

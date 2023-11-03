@@ -30,8 +30,8 @@ namespace Game3 {
 			return;
 		}
 
-		if (firstGID == secondGID) {
-			first_has_inventory->getInventory()->swap(firstSlot, secondSlot);
+		if (firstGID == secondGID && firstInventory == secondInventory) {
+			first_has_inventory->getInventory(firstInventory)->swap(firstSlot, secondSlot);
 			return;
 		}
 
@@ -47,8 +47,8 @@ namespace Game3 {
 			return;
 		}
 
-		Inventory &first_inventory  = *first_has_inventory->getInventory();
-		Inventory &second_inventory = *second_has_inventory->getInventory();
+		Inventory &first_inventory  = *first_has_inventory->getInventory(firstInventory);
+		Inventory &second_inventory = *second_has_inventory->getInventory(secondInventory);
 
 		auto first_inventoried  = std::dynamic_pointer_cast<InventoriedTileEntity>(first_has_inventory);
 		auto second_inventoried = std::dynamic_pointer_cast<InventoriedTileEntity>(second_has_inventory);

@@ -16,7 +16,7 @@ namespace Game3 {
 
 		if (place.getName(Layer::Terrain) == tileset.getEmpty()) {
 			place.set(Layer::Terrain, tilename);
-			const InventoryPtr inventory = place.player->getInventory();
+			const InventoryPtr inventory = place.player->getInventory(0);
 			auto inventory_lock = inventory->uniqueLock();
 			if (--stack.count == 0)
 				inventory->erase(slot);

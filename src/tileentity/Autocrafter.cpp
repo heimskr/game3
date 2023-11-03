@@ -26,6 +26,23 @@ namespace Game3 {
 	Autocrafter::Autocrafter(Position position_):
 		TileEntity("base:tile/autocrafter", ID(), position_, true), EnergeticTileEntity(ENERGY_CAPACITY) {}
 
+	const InventoryPtr & Autocrafter::getInventory(InventoryID index) const {
+		if (index == 0)
+			return HasInventory::getInventory(0);
+		if (index == 1)
+			return stationInventory;
+		throw std::invalid_argument("Couldn't retrieve inventory with index " + std::to_string(index));
+	}
+
+	void Autocrafter::setInventory(InventoryPtr inventory, InventoryID index) {
+		if (index == 0)
+			HasInventory::setInventory(inventory, 0);
+		else if (index == 1)
+			stationInventory = inventory;
+		else
+			throw std::invalid_argument("Couldn't set inventory with index " + std::to_string(index));
+	}
+
 	bool Autocrafter::mayInsertItem(const ItemStack &, Direction, Slot slot) {
 		return slot == Slot(-1) || slot < Slot(INPUT_CAPACITY);
 	}
@@ -41,7 +58,8 @@ namespace Game3 {
 
 	void Autocrafter::init(Game &game) {
 		TileEntity::init(game);
-		HasInventory::setInventory(Inventory::create(shared_from_this(), INPUT_CAPACITY + OUTPUT_CAPACITY));
+		HasInventory::setInventory(Inventory::create(shared_from_this(), INPUT_CAPACITY + OUTPUT_CAPACITY), 0);
+		stationInventory = Inventory::create(shared_from_this(), 1, 1);
 	}
 
 	void Autocrafter::tick(Game &game, float delta) {
@@ -66,15 +84,18 @@ namespace Game3 {
 
 		if (modifiers.onlyAlt()) {
 			{
-				const InventoryPtr inventory = getInventory();
+				const InventoryPtr inventory = getInventory(0);
 				auto lock = inventory->sharedLock();
 				inventory->iterate([&](const ItemStack &stack, Slot) {
 					player->give(stack);
 					return false;
 				});
 			}
-			if (auto lock = stationStack.uniqueLock(); stationStack)
-				player->give(std::move(*stationStack));
+			{
+				auto lock = stationInventory.uniqueLock();
+				if (ItemStack *station_stack = (*stationInventory)[0])
+					player->give(std::move(*station_stack));
+			}
 			RealmPtr realm = getRealm();
 			realm->queueDestruction(getSelf());
 			player->give(ItemStack(realm->getGame(), "base:item/autocrafter"_id));
@@ -96,30 +117,33 @@ namespace Game3 {
 		TileEntity::toJSON(json);
 		InventoriedTileEntity::toJSON(json);
 		EnergeticTileEntity::toJSON(json);
-		if (stationStack)
-			json["stationStack"] = *stationStack;
+		auto station_lock = stationInventory.sharedLock();
+		json["stationInventory"] = dynamic_cast<ServerInventory &>(*stationInventory);
 	}
 
 	void Autocrafter::absorbJSON(Game &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);
-		if (auto iter = json.find("stationStack"); iter != json.end())
-			stationStack = ItemStack::fromJSON(game, *iter);
+		if (auto iter = json.find("stationInventory"); iter != json.end()) {
+			auto station_lock = stationInventory.sharedLock();
+			stationInventory = std::make_shared<ServerInventory>(ServerInventory::fromJSON(game, *iter, shared_from_this()));
+		}
 	}
 
 	void Autocrafter::encode(Game &game, Buffer &buffer) {
 		TileEntity::encode(game, buffer);
-		InventoriedTileEntity::encode(game, buffer);
+		HasInventory::encode(buffer, 0);
+		HasInventory::encode(buffer, 1);
 		EnergeticTileEntity::encode(game, buffer);
-		buffer << stationStack;
 	}
 
 	void Autocrafter::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
-		InventoriedTileEntity::decode(game, buffer);
+		HasInventory::decode(buffer, 0);
+		HasInventory::decode(buffer, 1);
 		EnergeticTileEntity::decode(game, buffer);
-		setStation(buffer.take<std::optional<ItemStack>>());
+		stationSet();
 	}
 
 	void Autocrafter::broadcast(bool force) {
@@ -184,7 +208,7 @@ namespace Game3 {
 		if (cachedRecipes.empty())
 			return;
 
-		InventoryPtr inventory = getInventory();
+		InventoryPtr inventory = getInventory(0);
 		const ItemCount input_capacity = INPUT_CAPACITY;
 		auto input_span = std::make_shared<InventorySpan>(inventory, 0, input_capacity - 1);
 		auto output_span = std::make_shared<InventorySpan>(inventory, input_capacity, input_capacity + OUTPUT_CAPACITY - 1);
@@ -200,6 +224,12 @@ namespace Game3 {
 		}
 	}
 
+	bool Autocrafter::setTarget(Identifier new_target) {
+		target = std::move(new_target);
+		cacheRecipes();
+		return true;
+	}
+
 	void Autocrafter::cacheRecipes() {
 		auto lock = cachedRecipes.uniqueLock();
 		cachedRecipes.clear();
@@ -208,17 +238,15 @@ namespace Game3 {
 				cachedRecipes.push_back(recipe);
 	}
 
-	bool Autocrafter::setStation(std::optional<ItemStack> stack) {
-		auto stack_lock = stationStack.uniqueLock();
-		stationStack.getBase() = std::move(stack);
+	bool Autocrafter::stationSet() {
+		auto station_lock = stationInventory.uniqueLock();
 
 		bool out = true;
 
-		if (stationStack) {
-			if (auto station_item = std::dynamic_pointer_cast<StationFurniture>(stationStack->item)) {
+		if (ItemStack *stack = (*stationInventory)[0]) {
+			if (auto station_item = std::dynamic_pointer_cast<StationFurniture>(stack->item)) {
 				station = station_item->stationType;
 			} else {
-				stationStack.reset();
 				station = {};
 				out = false;
 			}

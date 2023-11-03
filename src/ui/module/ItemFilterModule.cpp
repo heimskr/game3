@@ -20,11 +20,8 @@ namespace Game3 {
 
 			const DragSource source = static_cast<const Glib::Value<DragSource> &>(base).get();
 
-			ItemStack *stack = nullptr;
-			{
-				auto lock = source.inventory->sharedLock();
-				stack = (*source.inventory)[source.slot];
-			}
+			auto source_lock = source.inventory->sharedLock();
+			ItemStack *stack = (*source.inventory)[source.slot];
 
 			if (stack) {
 				setFilter();

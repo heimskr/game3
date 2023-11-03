@@ -57,7 +57,7 @@ namespace Game3 {
 
 	void ChemicalReactor::init(Game &game) {
 		TileEntity::init(game);
-		HasInventory::setInventory(Inventory::create(shared_from_this(), INPUT_CAPACITY + OUTPUT_CAPACITY));
+		HasInventory::setInventory(Inventory::create(shared_from_this(), INPUT_CAPACITY + OUTPUT_CAPACITY), 0);
 	}
 
 	void ChemicalReactor::tick(Game &game, float delta) {
@@ -74,7 +74,7 @@ namespace Game3 {
 
 		accumulatedTime = 0.f;
 
-		InventoryPtr inventory = getInventory();
+		InventoryPtr inventory = getInventory(0);
 		if (inventory->weakOwner.expired())
 			inventory->weakOwner = shared_from_this();
 
@@ -217,7 +217,7 @@ namespace Game3 {
 	}
 
 	bool ChemicalReactor::react() {
-		const InventoryPtr inventory = getInventory();
+		const InventoryPtr inventory = getInventory(0);
 
 		assert(inventory);
 		assert(energyContainer);

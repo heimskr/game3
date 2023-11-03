@@ -16,7 +16,7 @@ namespace Game3 {
 			Lockable<Storage> storage;
 
 			StorageInventory() = default;
-			StorageInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, Storage);
+			StorageInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, InventoryID, Storage);
 			StorageInventory(const StorageInventory &);
 			StorageInventory(StorageInventory &&);
 

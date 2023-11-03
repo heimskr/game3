@@ -19,7 +19,7 @@ namespace Game3 {
 		money = json.at("money");
 		greed = json.at("greed");
 		try {
-			stockpileInventory = getTileEntity<Chest>([](const auto &chest) { return chest->name == "Stockpile"; })->getInventory();
+			stockpileInventory = getTileEntity<Chest>([](const auto &chest) { return chest->name == "Stockpile"; })->getInventory(0);
 		} catch (const NoneFoundError &) {
 			stockpileInventory = nullptr;
 		}

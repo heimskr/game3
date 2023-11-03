@@ -65,7 +65,7 @@ namespace Game3 {
 		if (getSide() != Side::Server)
 			return false;
 
-		const InventoryPtr inventory = player->getInventory();
+		const InventoryPtr inventory = player->getInventory(0);
 		auto inventory_lock = inventory->uniqueLock();
 		const Slot active_slot = inventory->activeSlot;
 		if (auto *active_stack = (*inventory)[active_slot]) {

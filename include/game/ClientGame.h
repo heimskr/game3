@@ -75,7 +75,7 @@ namespace Game3 {
 		private:
 			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update_;
 			sigc::signal<void(const PlayerPtr &)> signal_player_money_update_;
-			sigc::signal<void(const std::shared_ptr<Agent> &)> signal_other_inventory_update_;
+			sigc::signal<void(const std::shared_ptr<Agent> &, InventoryID)> signal_other_inventory_update_;
 			sigc::signal<void(const std::shared_ptr<HasFluids> &)> signal_fluid_update_;
 			sigc::signal<void(const std::shared_ptr<HasEnergy> &)> signal_energy_update_;
 			std::atomic_bool active{false};

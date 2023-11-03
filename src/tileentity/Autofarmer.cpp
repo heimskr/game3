@@ -33,7 +33,7 @@ namespace Game3 {
 
 	void Autofarmer::init(Game &game) {
 		TileEntity::init(game);
-		HasInventory::setInventory(Inventory::create(shared_from_this(), INPUT_CAPACITY + OUTPUT_CAPACITY));
+		HasInventory::setInventory(Inventory::create(shared_from_this(), INPUT_CAPACITY + OUTPUT_CAPACITY), 0);
 	}
 
 	void Autofarmer::tick(Game &game, float delta) {
@@ -182,7 +182,7 @@ namespace Game3 {
 	}
 
 	bool Autofarmer::autofarm(Position where, bool &input_empty) {
-		InventoryPtr inventory = getInventory();
+		InventoryPtr inventory = getInventory(0);
 		if (!inventory)
 			return false;
 

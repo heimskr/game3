@@ -16,7 +16,7 @@ namespace Game3 {
 
 		if (auto tile = realm.tryTile(Layer::Terrain, place.position); tile && tileset.isInCategory(*tile, "base:category/farmland"_id)) {
 			if (auto submerged = realm.tryTile(Layer::Submerged, place.position); !submerged || *submerged == tileset.getEmptyID()) {
-				const InventoryPtr inventory = place.player->getInventory();
+				const InventoryPtr inventory = place.player->getInventory(0);
 				auto inventory_lock = inventory->uniqueLock();
 				return plant(inventory, slot, stack, place);
 			}

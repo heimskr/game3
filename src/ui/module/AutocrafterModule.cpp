@@ -2,6 +2,7 @@
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
 #include "net/Buffer.h"
+#include "packet/SwapSlotsPacket.h"
 #include "recipe/CraftingRecipe.h"
 #include "tileentity/Autocrafter.h"
 #include "ui/gtk/UITypes.h"
@@ -18,7 +19,7 @@ namespace Game3 {
 	AutocrafterModule::AutocrafterModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<Autocrafter> autocrafter_):
 	game(std::move(game_)),
 	autocrafter(std::move(autocrafter_)),
-	inventoryModule(std::make_unique<ExternalInventoryModule>(game, std::static_pointer_cast<ClientInventory>(autocrafter->getInventory()))) {
+	inventoryModule(std::make_unique<ExternalInventoryModule>(game, std::static_pointer_cast<ClientInventory>(autocrafter->getInventory(0)))) {
 		assert(autocrafter);
 		vbox.set_hexpand();
 
@@ -68,6 +69,9 @@ namespace Game3 {
 			entry.remove_css_class("equation_success");
 		});
 
+		configureFixed();
+
+		vbox.append(fixed);
 		vbox.append(entry);
 		vbox.append(inventoryModule->getWidget());
 	}
@@ -129,5 +133,34 @@ namespace Game3 {
 	void AutocrafterModule::setTarget(const std::string &target) {
 		if (autocrafter)
 			game->player->sendMessage(autocrafter, "SetTarget", target);
+	}
+
+	void AutocrafterModule::configureFixed() {
+		auto target = Gtk::DropTarget::create(Glib::Value<DragSource>::value_type(), Gdk::DragAction::MOVE);
+
+		target->signal_drop().connect([this](const Glib::ValueBase &base, double, double) {
+			if (!autocrafter || base.gobj()->g_type != Glib::Value<DragSource>::value_type())
+				return false;
+
+			const DragSource source = static_cast<const Glib::Value<DragSource> &>(base).get();
+
+			auto source_lock = source.inventory->uniqueLock();
+			ItemStack *stack = (*source.inventory)[source.slot];
+
+			if (stack) {
+				// game->player->send(SwapSlotsPacket(source.inventory->getOwner()->getGID(), autocrafter->getGID(), source.slot, 0));
+				// setFilter();
+				// filter->addItem(*stack);
+				// populate();
+				// upload();
+			}
+
+			return true;
+		}, false);
+
+		fixed.add_controller(target);
+		fixed.set_size_request(68, 68);
+		fixed.set_halign(Gtk::Align::CENTER);
+		fixed.add_css_class("item-slot");
 	}
 }

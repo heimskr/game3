@@ -21,7 +21,7 @@ namespace Game3 {
 
 			realm.setFluid(place.position, FluidTile(fluid->registryID, FluidTile::FULL));
 
-			const InventoryPtr inventory = player.getInventory();
+			const InventoryPtr inventory = player.getInventory(0);
 
 			{
 				auto lock = inventory->uniqueLock();

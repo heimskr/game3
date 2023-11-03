@@ -22,7 +22,7 @@ namespace Game3 {
 
 		if (realm.isPathable(position) && realm.middleEmpty(position))
 			if (!validGround || tileset.isInCategory(tileset[realm.getTile(Layer::Terrain, position)], validGround))
-				return plant(place.player->getInventory(), slot, stack, place);
+				return plant(place.player->getInventory(0), slot, stack, place);
 
 		return false;
 	}

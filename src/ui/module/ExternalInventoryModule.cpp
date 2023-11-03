@@ -7,14 +7,16 @@
 #include "ui/module/ExternalInventoryModule.h"
 #include "ui/tab/InventoryTab.h"
 #include "ui/MainWindow.h"
+#include "util/Demangle.h"
 
 namespace Game3 {
 	ExternalInventoryModule::ExternalInventoryModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
-		ExternalInventoryModule(std::move(game_), std::dynamic_pointer_cast<ClientInventory>(std::dynamic_pointer_cast<HasInventory>(std::any_cast<AgentPtr>(argument))->getInventory())) {}
+		ExternalInventoryModule(std::move(game_), getInventory(argument), getInventoryIndex(argument)) {}
 
-	ExternalInventoryModule::ExternalInventoryModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<ClientInventory> inventory_):
+	ExternalInventoryModule::ExternalInventoryModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<ClientInventory> inventory_, InventoryID inventory_index):
 	game(std::move(game_)),
-	inventory(std::move(inventory_)) {
+	inventory(std::move(inventory_)),
+	inventoryIndex(inventory_index) {
 		assert(inventory);
 		label.set_hexpand();
 		grid.set_hexpand();
@@ -44,7 +46,7 @@ namespace Game3 {
 
 			Glib::Value<DragSource> value;
 			value.init(value.value_type());
-			value.set({widgetMap.at(item), inventory});
+			value.set({widgetMap.at(item), inventory, inventoryIndex});
 			return Gdk::ContentProvider::create(value);
 		}, false);
 
@@ -61,7 +63,7 @@ namespace Game3 {
 					destination = destination->get_parent();
 
 				const DragSource source = value.get();
-				game->player->send(MoveSlotsPacket(source.inventory->getOwner()->getGID(), inventory->getOwner()->getGID(), source.slot, widgetMap.at(destination)));
+				game->player->send(MoveSlotsPacket(source.inventory->getOwner()->getGID(), inventory->getOwner()->getGID(), source.slot, widgetMap.at(destination), source.index, inventoryIndex));
 			}
 
 			return true;
@@ -69,6 +71,21 @@ namespace Game3 {
 
 		grid.add_controller(source);
 		grid.add_controller(target);
+	}
+
+	ClientInventoryPtr ExternalInventoryModule::getInventory(const std::any &any) {
+		const Argument *argument = std::any_cast<Argument>(&any);
+		if (!argument)
+			throw std::invalid_argument("Invalid std::any argument given to ExternalInventoryModule: " + demangle(any.type().name()));
+		const auto [agent, index] = *argument;
+		return std::dynamic_pointer_cast<ClientInventory>(std::dynamic_pointer_cast<HasInventory>(agent)->getInventory(index));
+	}
+
+	InventoryID ExternalInventoryModule::getInventoryIndex(const std::any &any) {
+		const Argument *argument = std::any_cast<Argument>(&any);
+		if (!argument)
+			throw std::invalid_argument("Invalid std::any argument given to ExternalInventoryModule: " + demangle(any.type().name()));
+		return argument->index;
 	}
 
 	Gtk::Widget & ExternalInventoryModule::getWidget() {
@@ -213,7 +230,7 @@ namespace Game3 {
 		if (!game || !modifiers.onlyShift() || !inventory->contains(slot))
 			return;
 
-		InventoryPtr player_inventory = game->player->getInventory();
+		InventoryPtr player_inventory = game->player->getInventory(0);
 		if (!player_inventory)
 			return;
 
@@ -221,7 +238,7 @@ namespace Game3 {
 		if (!owner)
 			return;
 
-		game->player->send(MoveSlotsPacket(owner->getGID(), game->player->getGID(), slot, -1));
+		game->player->send(MoveSlotsPacket(owner->getGID(), game->player->getGID(), slot, -1, inventoryIndex, 0));
 	}
 
 	void ExternalInventoryModule::rightClick(Gtk::Widget *widget, int, Slot slot, Modifiers, double x, double y) {

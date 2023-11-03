@@ -81,7 +81,7 @@ namespace Game3 {
 			if (!wasFound)
 				game.getRealm(realmID)->add(tileEntity);
 			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(tileEntity)) {
-				if (InventoryPtr inventory = has_inventory->getInventory()) {
+				if (InventoryPtr inventory = has_inventory->getInventory(0)) {
 					inventory->notifyOwner();
 				}
 			}

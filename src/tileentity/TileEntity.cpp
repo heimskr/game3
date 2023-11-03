@@ -221,6 +221,7 @@ namespace Game3 {
 	}
 
 	void TileEntity::absorbJSON(Game &, const nlohmann::json &json) {
+		assert(getSide() == Side::Server);
 		tileEntityID = json.at("id");
 		globalID     = json.at("gid");
 		tileID       = json.at("tileID");

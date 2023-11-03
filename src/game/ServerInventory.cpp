@@ -19,8 +19,8 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	ServerInventory::ServerInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, Storage storage_):
-		StorageInventory(std::move(owner), slot_count, active_slot, std::move(storage_)) {}
+	ServerInventory::ServerInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, InventoryID index_, Storage storage_):
+		StorageInventory(std::move(owner), slot_count, active_slot, index_, std::move(storage_)) {}
 
 	std::unique_ptr<Inventory> ServerInventory::copy() const {
 		return std::make_unique<ServerInventory>(*this);
@@ -310,6 +310,7 @@ namespace Game3 {
 			buffer << static_cast<GlobalID>(-1);
 		buffer << inventory.slotCount.load();
 		buffer << inventory.activeSlot.load();
+		buffer << inventory.index.load();
 		{
 			auto &storage = inventory.getStorage();
 			auto lock = storage.sharedLock();
@@ -333,6 +334,7 @@ namespace Game3 {
 			locked->setGID(gid);
 		inventory.slotCount = buffer.take<Slot>();
 		inventory.activeSlot = buffer.take<Slot>();
+		inventory.index = buffer.take<InventoryID>();
 		inventory.setStorage(buffer.take<std::decay_t<decltype(inventory.getStorage())>>());
 		return buffer;
 	}

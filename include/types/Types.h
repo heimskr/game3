@@ -33,6 +33,7 @@ namespace Game3 {
 	using UpdateCounter  = uint64_t;
 	using Tick           = uint64_t;
 	using EnergyAmount   = uint64_t;
+	using InventoryID    = uint16_t;
 
 	using ItemID     = Identifier;
 	using EntityType = Identifier;

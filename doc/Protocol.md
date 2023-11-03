@@ -294,6 +294,8 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u64` Second agent global ID
 	- `i32` First slot
 	- `i32` Second slot
+	- `u16` First inventory index (usually 0)
+	- `u16` Second inventory index (usually 0)
 
 42. **Move Slots**: tells the server to move a slot in one agent's inventory into a slot in another agent's inventory.
 
@@ -301,6 +303,8 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u64` Second agent global ID
 	- `i32` First slot
 	- `i32` Second slot
+	- `u16` First inventory index (usually 0)
+	- `u16` Second inventory index (usually 0)
 
 	This differs from Swap Slots in that compatible stacks will be merged instead of swapped
 	and that the first slot has to have something in it.

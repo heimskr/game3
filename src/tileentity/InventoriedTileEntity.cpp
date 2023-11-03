@@ -13,21 +13,24 @@ namespace Game3 {
 		HasInventory(std::move(inventory_)) {}
 
 	bool InventoriedTileEntity::canInsertItem(const ItemStack &stack, Direction direction, Slot slot) {
-		const InventoryPtr inventory = getInventory();
+		// TODO: support multiple inventories with canInsertItem
+		const InventoryPtr inventory = getInventory(0);
 		if (!inventory || !mayInsertItem(stack, direction, slot))
 			return false;
 		return inventory->canInsert(stack);
 	}
 
 	bool InventoriedTileEntity::canExtractItem(Direction direction, Slot slot) {
-		const InventoryPtr inventory = getInventory();
+		// TODO: support multiple inventories with canExtractItem
+		const InventoryPtr inventory = getInventory(0);
 		if (!inventory || !mayExtractItem(direction, slot))
 			return false;
 		return inventory->canExtract(slot);
 	}
 
 	std::optional<ItemStack> InventoriedTileEntity::extractItem(Direction, bool remove, Slot slot) {
-		const InventoryPtr inventory = getInventory();
+		// TODO: support multiple inventories with extractItem
+		const InventoryPtr inventory = getInventory(0);
 
 		if (!inventory)
 			return std::nullopt;
@@ -77,7 +80,8 @@ namespace Game3 {
 			return mayInsertItem(stack, direction, slot);
 		};
 
-		const InventoryPtr inventory = getInventory();
+		// TODO: support multiple inventories with insertItem
+		const InventoryPtr inventory = getInventory(0);
 		assert(inventory);
 		auto inventory_lock = inventory->uniqueLock();
 
@@ -93,24 +97,28 @@ namespace Game3 {
 		if (!mayInsertItem(stack, direction))
 			return 0;
 
-		return getInventory()->insertable(stack, slot);
+		// TODO: support multiple inventories with itemsInsertable
+		return getInventory(0)->insertable(stack, slot);
 	}
 
 	void InventoriedTileEntity::iterateExtractableItems(Direction direction, const std::function<bool(const ItemStack &, Slot)> &function) {
-		getInventory()->iterate([&](const ItemStack &stack, Slot slot) {
+		// TODO: support multiple inventories with iterateExtractableItems
+		getInventory(0)->iterate([&](const ItemStack &stack, Slot slot) {
 			return canExtractItem(direction, slot) && function(stack, slot);
 		});
 	}
 
 	bool InventoriedTileEntity::empty() const {
-		const InventoryPtr inventory = getInventory();
+		// TODO: support multiple inventories with empty
+		const InventoryPtr inventory = getInventory(0);
 		return !inventory || inventory->empty();
 	}
 
 	void InventoriedTileEntity::setInventory(Slot slot_count) {
 		auto realm = weakRealm.lock();
 		assert(realm);
-		HasInventory::setInventory(Inventory::create(realm->getSide(), shared_from_this(), slot_count));
+		// TODO: support multiple inventories with setInventory
+		HasInventory::setInventory(Inventory::create(realm->getSide(), shared_from_this(), slot_count), 0);
 		inventoryUpdated();
 	}
 
@@ -139,11 +147,11 @@ namespace Game3 {
 	void InventoriedTileEntity::absorbJSON(Game &, const nlohmann::json &) {}
 
 	void InventoriedTileEntity::encode(Game &, Buffer &buffer) {
-		HasInventory::encode(buffer);
+		HasInventory::encode(buffer, 0);
 	}
 
 	void InventoriedTileEntity::decode(Game &, Buffer &buffer) {
-		HasInventory::decode(buffer);
+		HasInventory::decode(buffer, 0);
 	}
 
 	void InventoriedTileEntity::broadcast(bool force) {

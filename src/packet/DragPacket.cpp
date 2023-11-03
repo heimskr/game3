@@ -15,7 +15,7 @@ namespace Game3 {
 		if (!player)
 			return;
 
-		const InventoryPtr inventory = player->getInventory();
+		const InventoryPtr inventory = player->getInventory(0);
 		if (auto *stack = inventory->getActive())
 			stack->item->drag(inventory->activeSlot, *stack, {position, player->getRealm(), player}, modifiers);
 	}

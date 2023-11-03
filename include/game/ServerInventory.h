@@ -10,7 +10,7 @@ namespace Game3 {
 	class ServerInventory: public StorageInventory {
 		public:
 			ServerInventory() = default;
-			ServerInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot = 0, Storage = {});
+			ServerInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot = 0, InventoryID = 0, Storage = {});
 
 			std::unique_ptr<Inventory> copy() const override;
 

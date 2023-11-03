@@ -22,7 +22,7 @@ namespace Game3 {
 		if (!place.isPathable() || place.get(Layer::Submerged) != 0)
 			return false;
 
-		const InventoryPtr inventory = player.getInventory();
+		const InventoryPtr inventory = player.getInventory(0);
 		auto inventory_lock = inventory->uniqueLock();
 		return plant(inventory, slot, stack, place);
 	}

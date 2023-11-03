@@ -156,7 +156,7 @@ namespace Game3 {
 		// player->direction = Direction::Right;
 		overworld->add(player, Position(-25, -36));
 		player->init(*game);
-		const InventoryPtr inventory = player->getInventory();
+		const InventoryPtr inventory = player->getInventory(0);
 		{
 			auto inventory_lock = inventory->uniqueLock();
 			inventory->add(ItemStack::withDurability(*game, "base:item/iron_pickaxe"));

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "types/Types.h"
+
 #include <memory>
 
 namespace Game3 {
@@ -15,11 +17,11 @@ namespace Game3 {
 
 			virtual ~HasInventory() = default;
 
-			inline const auto & getInventory() const { return inventory; }
-			void setInventory(std::shared_ptr<Inventory>);
+			virtual const std::shared_ptr<Inventory> & getInventory(InventoryID) const;
+			virtual void setInventory(std::shared_ptr<Inventory>, InventoryID);
 
-			void encode(Buffer &);
-			void decode(Buffer &);
+			void encode(Buffer &, InventoryID);
+			void decode(Buffer &, InventoryID);
 
 			virtual void inventoryUpdated() {}
 			virtual std::shared_ptr<Agent> getSharedAgent() = 0;

@@ -13,7 +13,7 @@ namespace Game3 {
 			return;
 		}
 
-		const InventoryPtr inventory = player->getInventory();
+		const InventoryPtr inventory = player->getInventory(0);
 		if (!inventory) {
 			client.send(ErrorPacket("Can't set held item: no inventory"));
 			return;

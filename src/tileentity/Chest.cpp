@@ -23,7 +23,7 @@ namespace Game3 {
 
 	void Chest::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
-		const InventoryPtr inventory = getInventory();
+		const InventoryPtr inventory = getInventory(0);
 		if (inventory)
 			json["inventory"] = dynamic_cast<ServerInventory &>(*inventory);
 		json["name"] = name;
@@ -34,7 +34,7 @@ namespace Game3 {
 		assert(getSide() == Side::Server);
 
 		if (modifiers.onlyAlt()) {
-			getInventory()->iterate([&](const ItemStack &stack, Slot) {
+			getInventory(0)->iterate([&](const ItemStack &stack, Slot) {
 				stack.spawn(getRealm(), getPosition());
 				return false;
 			});
@@ -51,7 +51,7 @@ namespace Game3 {
 		TileEntity::absorbJSON(game, json);
 		assert(getSide() == Side::Server);
 		if (json.contains("inventory"))
-			HasInventory::setInventory(std::make_shared<ServerInventory>(ServerInventory::fromJSON(game, json.at("inventory"), shared_from_this())));
+			HasInventory::setInventory(std::make_shared<ServerInventory>(ServerInventory::fromJSON(game, json.at("inventory"), shared_from_this())), 0);
 		name = json.at("name");
 		itemName = json.at("itemName");
 	}

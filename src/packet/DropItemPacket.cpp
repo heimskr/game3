@@ -7,7 +7,7 @@
 
 namespace Game3 {
 	void DropItemPacket::handle(ServerGame &, RemoteClient &client) {
-		const InventoryPtr inventory = client.getPlayer()->getInventory();
+		const InventoryPtr inventory = client.getPlayer()->getInventory(0);
 
 		if (!inventory) {
 			client.send(ErrorPacket("Can't drop/discard item: no inventory"));

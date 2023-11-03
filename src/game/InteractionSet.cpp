@@ -14,7 +14,7 @@ namespace Game3 {
 		Player &player = *place.player;
 		Realm &realm = *place.realm;
 		Game &game = realm.getGame();
-		Inventory &inventory = *player.getInventory();
+		InventoryPtr inventory = player.getInventory(0);
 
 		Tileset &tileset = realm.getTileset();
 		const auto terrain_tile   = place.getName(Layer::Terrain);
@@ -23,8 +23,8 @@ namespace Game3 {
 		if (!terrain_tile || !submerged_tile)
 			return false;
 
-		if (auto *active = inventory.getActive()) {
-			if (active->item->canUseOnWorld() && active->item->use(inventory.activeSlot, *active, place, modifiers, {0.f, 0.f}))
+		if (auto *active = inventory->getActive()) {
+			if (active->item->canUseOnWorld() && active->item->use(inventory->activeSlot, *active, place, modifiers, {0.f, 0.f}))
 				return true;
 
 			if (active->hasAttribute("base:attribute/shovel"_id)) {
@@ -55,13 +55,13 @@ namespace Game3 {
 		}
 
 		if (item && attribute && !player.hasTooldown()) {
-			if (auto *stack = inventory.getActive()) {
-				if (stack->hasAttribute(*attribute) && !inventory.add({game, *item, 1})) {
+			if (auto *stack = inventory->getActive()) {
+				if (stack->hasAttribute(*attribute) && !inventory->add({game, *item, 1})) {
 					player.setTooldown(1.f);
 					if (stack->reduceDurability())
-						inventory.erase(inventory.activeSlot);
+						inventory->erase(inventory->activeSlot);
 					// setTooldown doesn't call notifyOwner on the player's inventory, so we have to do it here.
-					inventory.notifyOwner();
+					inventory->notifyOwner();
 					return true;
 				}
 			}

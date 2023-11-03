@@ -58,7 +58,7 @@ namespace Game3 {
 		removeChildren(vbox);
 		widgets.clear();
 
-		const InventoryPtr inventory = game->player->getInventory();
+		const InventoryPtr inventory = game->player->getInventory(0);
 		if (!inventory)
 			return;
 

@@ -59,7 +59,7 @@ namespace Game3 {
 				continue;
 			}
 
-			const InventoryPtr inventory = inventoried->getInventory();
+			const InventoryPtr inventory = inventoried->getInventory(0);
 
 			{
 				auto inventory_lock = inventory->sharedLock();
@@ -102,7 +102,8 @@ namespace Game3 {
 						if (std::shared_ptr<ItemFilter> insertion_filter = pipe->itemFilters[flipDirection(round_robin_direction)]; insertion_filter && !insertion_filter->isAllowed(*extracted))
 							return false;
 
-					auto lock = round_robin->getInventory()->uniqueLock();
+					// TODO?: support multiple inventories in item networks
+					auto lock = round_robin->getInventory(0)->uniqueLock();
 					round_robin->insertItem(*extracted, round_robin_direction, &extracted);
 					return !extracted.has_value();
 				}, inventoried);

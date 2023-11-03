@@ -19,8 +19,8 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	ClientInventory::ClientInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, Storage storage_):
-		StorageInventory(std::move(owner), slot_count, active_slot, std::move(storage_)) {}
+	ClientInventory::ClientInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, InventoryID index_, Storage storage_):
+		StorageInventory(std::move(owner), slot_count, active_slot, index_, std::move(storage_)) {}
 
 	std::optional<ItemStack> ClientInventory::add(const ItemStack &, const std::function<bool(Slot)> &, Slot) {
 		throw std::logic_error("Clients cannot add items to inventories");
@@ -31,7 +31,6 @@ namespace Game3 {
 
 	ClientInventory::ClientInventory(ClientInventory &&other):
 		StorageInventory(std::move(other)) {}
-
 
 	ClientInventory & ClientInventory::operator=(const ClientInventory &other) {
 		StorageInventory::operator=(other);
@@ -58,7 +57,7 @@ namespace Game3 {
 	void ClientInventory::swap(Slot source, Slot destination) {
 		if (auto owner = weakOwner.lock()) {
 			GlobalID gid = owner->getGID();
-			send(SwapSlotsPacket(gid, gid, source, destination));
+			send(SwapSlotsPacket(gid, gid, source, destination, index, index));
 		}
 	}
 
@@ -99,12 +98,12 @@ namespace Game3 {
 	void ClientInventory::notifyOwner() {
 		if (auto owner = weakOwner.lock()) {
 			ClientGame &game = owner->getRealm()->getGame().toClient();
-			game.getWindow().queue([&game, weak = weakOwner] {
+			game.getWindow().queue([&game, weak = weakOwner, index = index.load()] {
 				if (auto owner = weak.lock()) {
 					if (auto player = std::dynamic_pointer_cast<Player>(owner)) {
 						game.signal_player_inventory_update().emit(player);
 					} else {
-						game.signal_other_inventory_update().emit(owner);
+						game.signal_other_inventory_update().emit(owner, index);
 					}
 				} else {
 					ERROR("Expired in " << __FILE__ << ':' << __LINE__);
@@ -137,6 +136,7 @@ namespace Game3 {
 			buffer += static_cast<GlobalID>(-1);
 		buffer += inventory.slotCount.load();
 		buffer += inventory.activeSlot.load();
+		buffer += inventory.index.load();
 		{
 			auto &storage = inventory.getStorage();
 			auto lock = storage.sharedLock();
@@ -160,6 +160,7 @@ namespace Game3 {
 			locked->setGID(gid);
 		inventory.slotCount = buffer.take<Slot>();
 		inventory.activeSlot = buffer.take<Slot>();
+		inventory.index = buffer.take<InventoryID>();
 		inventory.setStorage(buffer.take<std::decay_t<decltype(inventory.getStorage())>>());
 		return buffer;
 	}

@@ -11,7 +11,7 @@ namespace Game3 {
 	class ClientInventory: public StorageInventory {
 		public:
 			ClientInventory() = default;
-			ClientInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot = 0, Storage = {});
+			ClientInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot = 0, InventoryID = 0, Storage = {});
 			ClientInventory(const ClientInventory &);
 			ClientInventory(ClientInventory &&);
 

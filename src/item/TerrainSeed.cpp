@@ -26,7 +26,7 @@ namespace Game3 {
 			match = tileset[*tile] == targetTilename;
 
 		if (match) {
-			const InventoryPtr inventory = place.player->getInventory();
+			const InventoryPtr inventory = place.player->getInventory(0);
 			{
 				auto inventory_lock = inventory->uniqueLock();
 				inventory->decrease(stack, slot);

@@ -50,7 +50,7 @@ namespace Game3 {
 
 	void Dissolver::init(Game &game) {
 		TileEntity::init(game);
-		HasInventory::setInventory(Inventory::create(shared_from_this(), INPUT_CAPACITY + OUTPUT_CAPACITY));
+		HasInventory::setInventory(Inventory::create(shared_from_this(), INPUT_CAPACITY + OUTPUT_CAPACITY), 0);
 	}
 
 	void Dissolver::tick(Game &game, float delta) {
@@ -81,7 +81,7 @@ namespace Game3 {
 
 		if (modifiers.onlyAlt()) {
 			{
-				const InventoryPtr inventory = getInventory();
+				const InventoryPtr inventory = getInventory(0);
 				auto lock = inventory->sharedLock();
 				inventory->iterate([&](const ItemStack &stack, Slot) {
 					player->give(stack);
@@ -162,7 +162,7 @@ namespace Game3 {
 	}
 
 	bool Dissolver::dissolve() {
-		const InventoryPtr inventory = getInventory();
+		const InventoryPtr inventory = getInventory(0);
 
 		assert(inventory);
 		assert(energyContainer);

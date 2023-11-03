@@ -17,7 +17,7 @@ namespace Game3 {
 		FluidRegistry &registry = game.registry<FluidRegistry>();
 
 		auto yield_flask = [&](const Identifier &fluid_name) {
-			const InventoryPtr inventory = player->getInventory();
+			const InventoryPtr inventory = player->getInventory(0);
 
 			{
 				auto lock = inventory->uniqueLock();

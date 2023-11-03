@@ -18,7 +18,7 @@ namespace Game3 {
 	CombinerModule::CombinerModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<Combiner> combiner_):
 	game(std::move(game_)),
 	combiner(std::move(combiner_)),
-	inventoryModule(std::make_unique<ExternalInventoryModule>(game, std::static_pointer_cast<ClientInventory>(combiner->getInventory()))) {
+	inventoryModule(std::make_unique<ExternalInventoryModule>(game, std::static_pointer_cast<ClientInventory>(combiner->getInventory(0)))) {
 		assert(combiner);
 		vbox.set_hexpand();
 

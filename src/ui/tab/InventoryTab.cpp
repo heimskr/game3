@@ -48,14 +48,14 @@ namespace Game3 {
 
 		group->add_action("drop", [this] {
 			if (lastGame)
-				lastGame->player->getInventory()->drop(lastSlot);
+				lastGame->player->getInventory(0)->drop(lastSlot);
 			else
 				WARN(__FILE__ << ':' << __LINE__ << ": no lastGame");
 		});
 
 		group->add_action("discard", [this] {
 			if (lastGame)
-				lastGame->player->getInventory()->discard(lastSlot);
+				lastGame->player->getInventory(0)->discard(lastSlot);
 			else
 				WARN(__FILE__ << ':' << __LINE__ << ": no lastGame");
 		});
@@ -79,7 +79,7 @@ namespace Game3 {
 
 			Glib::Value<DragSource> value;
 			value.init(value.value_type());
-			value.set({widgetMap.at(item), std::static_pointer_cast<ClientInventory>(mainWindow.game->player->getInventory())});
+			value.set({widgetMap.at(item), std::static_pointer_cast<ClientInventory>(mainWindow.game->player->getInventory(0)), 0});
 			return Gdk::ContentProvider::create(value);
 		}, false);
 
@@ -96,7 +96,7 @@ namespace Game3 {
 					destination = destination->get_parent();
 				const DragSource source = value.get();
 				ClientPlayer &player = *mainWindow.game->player;
-				player.send(MoveSlotsPacket(source.inventory->getOwner()->getGID(), player.getGID(), source.slot, widgetMap.at(destination)));
+				player.send(MoveSlotsPacket(source.inventory->getOwner()->getGID(), player.getGID(), source.slot, widgetMap.at(destination), source.index, 0));
 			}
 
 			return true;
@@ -127,7 +127,7 @@ namespace Game3 {
 		lastGame = game;
 
 		mainWindow.queue([this, game] {
-			if (const InventoryPtr inventory = game->player->getInventory())
+			if (const InventoryPtr inventory = game->player->getInventory(0))
 				populate(grid, std::static_pointer_cast<ClientInventory>(inventory));
 
 			auto lock = currentModule.trySharedLock();
@@ -151,7 +151,7 @@ namespace Game3 {
 		mainWindow.queue([this, game] {
 			clear();
 
-			if (const InventoryPtr inventory = game->player->getInventory())
+			if (const InventoryPtr inventory = game->player->getInventory(0))
 				populate(grid, std::static_pointer_cast<ClientInventory>(inventory));
 
 			auto lock = currentModule.sharedLock();
@@ -312,7 +312,7 @@ namespace Game3 {
 		if (modifiers.onlyShift()) {
 			shiftClick(game, slot);
 		} else {
-			game->player->getInventory()->setActive(slot, false);
+			game->player->getInventory(0)->setActive(slot, false);
 			updatePlayerClasses(game);
 		}
 	}
@@ -320,7 +320,7 @@ namespace Game3 {
 	void InventoryTab::rightClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *widget, int, Slot slot, Modifiers, double x, double y) {
 		mainWindow.onBlur();
 
-		if (!game->player->getInventory()->contains(slot))
+		if (!game->player->getInventory(0)->contains(slot))
 			return;
 
 		const auto allocation = widget->get_allocation();
@@ -339,7 +339,7 @@ namespace Game3 {
 		if (!game)
 			return;
 
-		InventoryPtr inventory = game->player->getInventory();
+		InventoryPtr inventory = game->player->getInventory(0);
 		if (!inventory || !inventory->contains(slot))
 			return;
 
@@ -356,11 +356,11 @@ namespace Game3 {
 		if (!owner)
 			return;
 
-		game->player->send(MoveSlotsPacket(game->player->getGID(), owner->getGID(), slot, -1));
+		game->player->send(MoveSlotsPacket(game->player->getGID(), owner->getGID(), slot, -1, 0, external->getInventoryIndex()));
 	}
 
 	void InventoryTab::updatePlayerClasses(const std::shared_ptr<ClientGame> &game) {
-		const Slot active_slot = game->player->getInventory()->activeSlot;
+		const Slot active_slot = game->player->getInventory(0)->activeSlot;
 
 		if (widgetsBySlot.contains(active_slot))
 			widgetsBySlot.at(active_slot)->add_css_class("active-slot");

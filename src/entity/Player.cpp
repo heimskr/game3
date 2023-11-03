@@ -91,7 +91,7 @@ namespace Game3 {
 			tooldown -= delta;
 			if (tooldown < 0.f) {
 				tooldown = 0;
-				getInventory()->notifyOwner();
+				getInventory(0)->notifyOwner();
 			}
 		}
 
@@ -221,7 +221,7 @@ namespace Game3 {
 		if (getSide() != Side::Server)
 			return false;
 
-		if (ItemStack *active = getInventory()->getActive()) {
+		if (ItemStack *active = getInventory(0)->getActive()) {
 			if (auto tool = std::dynamic_pointer_cast<Tool>(active->item)) {
 				tooldown = multiplier * tool->baseCooldown;
 				increaseUpdateCounter();
@@ -243,7 +243,7 @@ namespace Game3 {
 	}
 
 	void Player::give(const ItemStack &stack, Slot start) {
-		const InventoryPtr inventory = getInventory();
+		const InventoryPtr inventory = getInventory(0);
 		auto lock = inventory->uniqueLock();
 		if (auto leftover = inventory->add(stack, start)) {
 			lock.unlock();

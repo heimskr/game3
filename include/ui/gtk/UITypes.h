@@ -12,5 +12,6 @@ namespace Game3 {
 	struct DragSource {
 		Slot slot;
 		std::shared_ptr<ClientInventory> inventory;
+		InventoryID index;
 	};
 }

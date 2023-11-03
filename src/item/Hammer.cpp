@@ -22,7 +22,7 @@ namespace Game3 {
 					game.removeRealm(realm_id);
 				realm.remove(building);
 				if (stack.reduceDurability())
-					place.player->getInventory()->erase(slot);
+					place.player->getInventory(0)->erase(slot);
 				return true;
 			}
 
@@ -30,7 +30,7 @@ namespace Game3 {
 		}
 
 		Player &player = *place.player;
-		Inventory &inventory = *player.getInventory();
+		Inventory &inventory = *player.getInventory(0);
 		Tileset &tileset = place.realm->getTileset();
 
 		for (auto iter = mainLayers.rbegin(); iter != mainLayers.rend(); ++iter) {

@@ -15,7 +15,7 @@ namespace Game3 {
 		PlayerPtr player = place.player;
 		Game &game = player->getGame();
 
-		const InventoryPtr inventory = player->getInventory();
+		const InventoryPtr inventory = player->getInventory(0);
 		auto inventory_lock = inventory->uniqueLock();
 
 		if (ItemStack *active_stack = inventory->getActive()) {

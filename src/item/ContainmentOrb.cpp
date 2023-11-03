@@ -52,7 +52,7 @@ namespace Game3 {
 				selected->queueDestruction();
 			}
 
-			player->getInventory()->notifyOwner();
+			player->getInventory(0)->notifyOwner();
 			SUCCESS("Captured " << selected->type);
 			return true;
 		}
@@ -73,7 +73,7 @@ namespace Game3 {
 			INFO("Spawned entity of type " << type << " with new GID " << new_gid);
 		}
 		stack.data.clear();
-		player->getInventory()->notifyOwner();
+		player->getInventory(0)->notifyOwner();
 		return true;
 	}
 

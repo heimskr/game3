@@ -13,6 +13,9 @@ namespace Game3 {
 
 			std::string getName() const override { return "Autocrafter"; }
 
+			const std::shared_ptr<Inventory> & getInventory(InventoryID) const override;
+			void setInventory(std::shared_ptr<Inventory>, InventoryID) override;
+
 			bool mayInsertItem(const ItemStack &, Direction, Slot) override;
 			bool mayExtractItem(Direction, Slot) override;
 			EnergyAmount getEnergyCapacity() override;
@@ -31,12 +34,13 @@ namespace Game3 {
 			void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) override;
 
 			const auto & getTarget() const { return target; }
+			const auto & getStationInventory() const { return stationInventory; }
 
 		private:
 			float accumulatedTime = 0.f;
 			Lockable<std::vector<std::shared_ptr<CraftingRecipe>>> cachedRecipes;
 			Lockable<Identifier> target;
-			Lockable<std::optional<ItemStack>> stationStack;
+			Lockable<std::shared_ptr<Inventory>> stationInventory;
 			Lockable<Identifier> station;
 
 			Autocrafter();
@@ -46,7 +50,7 @@ namespace Game3 {
 			void autocraft();
 			bool setTarget(Identifier);
 			void cacheRecipes();
-			bool setStation(std::optional<ItemStack>);
+			bool stationSet();
 			bool validateRecipe(const CraftingRecipe &) const;
 
 			friend class TileEntity;

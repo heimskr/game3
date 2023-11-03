@@ -17,7 +17,7 @@ namespace Game3 {
 
 		if (auto tile = realm.tryTile(Layer::Terrain, place.position); tile && tileset.isInCategory(*tile, "base:category/farmable")) {
 			{
-				InventoryPtr inventory = place.player->getInventory();
+				InventoryPtr inventory = place.player->getInventory(0);
 				auto lock = inventory->uniqueLock();
 				if (stack.reduceDurability())
 					inventory->erase(slot);

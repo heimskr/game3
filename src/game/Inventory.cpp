@@ -19,14 +19,17 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	Inventory::Inventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot):
-		weakOwner(owner), slotCount(slot_count), activeSlot(active_slot) {}
+	Inventory::Inventory() = default;
+
+	Inventory::Inventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, InventoryID index_):
+		weakOwner(owner), slotCount(slot_count), activeSlot(active_slot), index(index_) {}
 
 	Inventory::Inventory(const Inventory &other) {
 		auto lock = other.sharedLock();
 		weakOwner = other.weakOwner;
 		slotCount = other.slotCount.load();
 		activeSlot = other.activeSlot.load();
+		index = other.index.load();
 		suppressInventoryNotifications = other.suppressInventoryNotifications.load();
 		onSwap = other.onSwap;
 		onMove = other.onMove;
@@ -37,6 +40,7 @@ namespace Game3 {
 		weakOwner = std::move(other.weakOwner);
 		slotCount = other.slotCount.exchange(0);
 		activeSlot = other.activeSlot.exchange(0);
+		index = other.index.load();
 		suppressInventoryNotifications = other.suppressInventoryNotifications.exchange(false);
 		onSwap = std::move(other.onSwap);
 		onMove = std::move(other.onMove);
@@ -51,6 +55,7 @@ namespace Game3 {
 		weakOwner = other.weakOwner;
 		slotCount = other.slotCount.load();
 		activeSlot = other.activeSlot.load();
+		index = other.index.load();
 		suppressInventoryNotifications = other.suppressInventoryNotifications.load();
 		onSwap = other.onSwap;
 		onMove = other.onMove;
@@ -66,6 +71,7 @@ namespace Game3 {
 		weakOwner = std::move(other.weakOwner);
 		slotCount = other.slotCount.exchange(0);
 		activeSlot = other.activeSlot.exchange(0);
+		index = other.index.load();
 		suppressInventoryNotifications = other.suppressInventoryNotifications.exchange(false);
 		onSwap = std::move(other.onSwap);
 		onMove = std::move(other.onMove);
@@ -121,15 +127,15 @@ namespace Game3 {
 		return out;
 	}
 
-	std::shared_ptr<Inventory> Inventory::create(Side side, std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, std::map<Slot, ItemStack> storage) {
+	std::shared_ptr<Inventory> Inventory::create(Side side, std::shared_ptr<Agent> owner, Slot slot_count, InventoryID index, Slot active_slot, std::map<Slot, ItemStack> storage) {
 		if (side == Side::Server)
-			return std::make_shared<ServerInventory>(owner, slot_count, active_slot, std::move(storage));
+			return std::make_shared<ServerInventory>(owner, slot_count, active_slot, index, std::move(storage));
 		if (side == Side::Client)
-			return std::make_shared<ClientInventory>(owner, slot_count, active_slot, std::move(storage));
+			return std::make_shared<ClientInventory>(owner, slot_count, active_slot, index, std::move(storage));
 		throw std::invalid_argument("Can't create inventory for side " + std::to_string(static_cast<int>(side)));
 	}
 
-	std::shared_ptr<Inventory> Inventory::create(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, std::map<Slot, ItemStack> storage) {
-		return create(owner->getSide(), owner, slot_count, active_slot, std::move(storage));
+	std::shared_ptr<Inventory> Inventory::create(std::shared_ptr<Agent> owner, Slot slot_count, InventoryID index, Slot active_slot, std::map<Slot, ItemStack> storage) {
+		return create(owner->getSide(), owner, slot_count, active_slot, index, std::move(storage));
 	}
 }

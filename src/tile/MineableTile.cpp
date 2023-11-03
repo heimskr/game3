@@ -21,7 +21,7 @@ namespace Game3 {
 		if (!player)
 			return false;
 
-		InventoryPtr inventory = player->getInventory();
+		InventoryPtr inventory = player->getInventory(0);
 		if (!inventory)
 			return false;
 

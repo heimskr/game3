@@ -238,13 +238,13 @@ namespace Game3 {
 		backward->set_button(8);
 		forward->signal_pressed().connect([this](int, double, double) {
 			if (game && game->player) {
-				game->player->getInventory()->nextSlot();
+				game->player->getInventory(0)->nextSlot();
 				inventoryTab->update(game);
 			}
 		});
 		backward->signal_pressed().connect([this](int, double, double) {
 			if (game && game->player) {
-				game->player->getInventory()->prevSlot();
+				game->player->getInventory(0)->prevSlot();
 				inventoryTab->update(game);
 			}
 		});
@@ -390,9 +390,9 @@ namespace Game3 {
 			craftingTab->update(game);
 		});
 
-		game->signal_other_inventory_update().connect([this](const std::shared_ptr<Agent> &owner) {
-			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner); has_inventory && has_inventory->getInventory()) {
-				auto client_inventory = std::dynamic_pointer_cast<ClientInventory>(has_inventory->getInventory());
+		game->signal_other_inventory_update().connect([this](const std::shared_ptr<Agent> &owner, InventoryID inventory_id) {
+			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner); has_inventory && has_inventory->getInventory(inventory_id)) {
+				auto client_inventory = std::dynamic_pointer_cast<ClientInventory>(has_inventory->getInventory(inventory_id));
 				queue([this, owner, client_inventory] {
 					if (owner->getGID() == getExternalGID()) {
 						std::unique_lock<DefaultMutex> lock;
@@ -855,7 +855,7 @@ namespace Game3 {
 				case GDK_KEY_0: case GDK_KEY_1: case GDK_KEY_2: case GDK_KEY_3: case GDK_KEY_4:
 				case GDK_KEY_5: case GDK_KEY_6: case GDK_KEY_7: case GDK_KEY_8: case GDK_KEY_9:
 					if (game && game->player)
-						game->player->getInventory()->setActive(keyval == GDK_KEY_0? 9 : keyval - 0x31);
+						game->player->getInventory(0)->setActive(keyval == GDK_KEY_0? 9 : keyval - 0x31);
 					return;
 			}
 		}

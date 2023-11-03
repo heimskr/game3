@@ -48,7 +48,7 @@ namespace Game3 {
 		if (slot != 0 && slot != Slot(-1))
 			return false;
 
-		return mayInsertItem(stack, direction, 0) && getInventory()->canInsert(stack, 0);
+		return mayInsertItem(stack, direction, 0) && getInventory(0)->canInsert(stack, 0);
 	}
 
 	FluidAmount GeothermalGenerator::getMaxLevel(FluidID id) {
@@ -76,7 +76,7 @@ namespace Game3 {
 
 	void GeothermalGenerator::init(Game &game) {
 		TileEntity::init(game);
-		HasInventory::setInventory(Inventory::create(shared_from_this(), 2));
+		HasInventory::setInventory(Inventory::create(shared_from_this(), 2), 0);
 	}
 
 	void GeothermalGenerator::tick(Game &game, float delta) {
@@ -252,7 +252,7 @@ namespace Game3 {
 	}
 
 	void GeothermalGenerator::slurpFlasks() {
-		const InventoryPtr inventory = getInventory();
+		const InventoryPtr inventory = getInventory(0);
 		assert(inventory);
 		auto inventory_lock = inventory->uniqueLock();
 

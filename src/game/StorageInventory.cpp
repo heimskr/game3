@@ -2,8 +2,8 @@
 #include "recipe/CraftingRecipe.h"
 
 namespace Game3 {
-	StorageInventory::StorageInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, Storage storage_):
-		Inventory(std::move(owner), slot_count, active_slot), storage(std::move(storage_)) {}
+	StorageInventory::StorageInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, InventoryID index_, Storage storage_):
+		Inventory(std::move(owner), slot_count, active_slot, index_), storage(std::move(storage_)) {}
 
 	StorageInventory::StorageInventory(const StorageInventory &other):
 	Inventory(other) {

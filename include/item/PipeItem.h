@@ -28,7 +28,7 @@ namespace Game3 {
 		public:
 			bool use(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) override{
 				Realm &realm = *place.realm;
-				const InventoryPtr inventory = place.player->getInventory();
+				const InventoryPtr inventory = place.player->getInventory(0);
 
 				TileEntityPtr tile_entity = realm.tileEntityAt(place.position);
 

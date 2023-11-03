@@ -51,5 +51,6 @@ namespace Game3 {
 
 			void populate();
 			void setTarget(const std::string &);
+			void configureFixed();
 	};
 }

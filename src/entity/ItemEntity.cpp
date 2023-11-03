@@ -99,7 +99,7 @@ namespace Game3 {
 		if (getSide() != Side::Server)
 			return true;
 
-		auto leftover = player->getInventory()->add(stack);
+		auto leftover = player->getInventory(0)->add(stack);
 		if (leftover) {
 			stack = std::move(*leftover);
 			increaseUpdateCounter();
