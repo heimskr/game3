@@ -28,13 +28,15 @@ namespace Game3 {
 			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
 			void setInventory(std::shared_ptr<ClientInventory>) override;
 
+			void updateEntry();
+
 		private:
 			std::shared_ptr<ClientGame> game;
 			std::shared_ptr<Autocrafter> autocrafter;
 			std::unique_ptr<ExternalInventoryModule> inventoryModule;
+			std::unique_ptr<ExternalInventoryModule> stationInventoryModule;
 			Gtk::Label header;
 			Gtk::Entry entry;
-			Gtk::Fixed fixed;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
 			Glib::RefPtr<Gtk::EntryCompletion> completion;
 
@@ -51,6 +53,5 @@ namespace Game3 {
 
 			void populate();
 			void setTarget(const std::string &);
-			void configureFixed();
 	};
 }

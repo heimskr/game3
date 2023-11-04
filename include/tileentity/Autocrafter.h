@@ -34,6 +34,8 @@ namespace Game3 {
 			void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) override;
 
 			const auto & getTarget() const { return target; }
+			bool setTarget(Identifier);
+
 			const auto & getStationInventory() const { return stationInventory; }
 
 		private:
@@ -48,7 +50,6 @@ namespace Game3 {
 			Autocrafter(Position);
 
 			void autocraft();
-			bool setTarget(Identifier);
 			void cacheRecipes();
 			bool stationSet();
 			bool validateRecipe(const CraftingRecipe &) const;

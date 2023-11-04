@@ -19,7 +19,8 @@ namespace Game3 {
 	AutocrafterModule::AutocrafterModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<Autocrafter> autocrafter_):
 	game(std::move(game_)),
 	autocrafter(std::move(autocrafter_)),
-	inventoryModule(std::make_unique<ExternalInventoryModule>(game, std::static_pointer_cast<ClientInventory>(autocrafter->getInventory(0)))) {
+	inventoryModule(std::make_unique<ExternalInventoryModule>(game, std::static_pointer_cast<ClientInventory>(autocrafter->getInventory(0)))),
+	stationInventoryModule(std::make_unique<ExternalInventoryModule>(game, std::static_pointer_cast<ClientInventory>(autocrafter->getInventory(1)))) {
 		assert(autocrafter);
 		vbox.set_hexpand();
 
@@ -29,15 +30,7 @@ namespace Game3 {
 		vbox.append(header);
 
 		entry.set_placeholder_text("Target");
-		{
-			const auto &target = autocrafter->getTarget();
-			auto lock = target.sharedLock();
-			if (target.empty())
-				entry.set_text({});
-			else
-				entry.set_text(target.str());
-
-		}
+		updateEntry();
 		entry.set_margin(5);
 
 		std::set<Identifier> item_names;
@@ -69,10 +62,8 @@ namespace Game3 {
 			entry.remove_css_class("equation_success");
 		});
 
-		configureFixed();
-
-		vbox.append(fixed);
 		vbox.append(entry);
+		vbox.append(stationInventoryModule->getWidget());
 		vbox.append(inventoryModule->getWidget());
 	}
 
@@ -81,14 +72,19 @@ namespace Game3 {
 	}
 
 	void AutocrafterModule::reset() {
+		stationInventoryModule->reset();
 		inventoryModule->reset();
+		updateEntry();
 	}
 
 	void AutocrafterModule::update() {
+		stationInventoryModule->update();
 		inventoryModule->update();
+		updateEntry();
 	}
 
 	void AutocrafterModule::onResize(int width) {
+		stationInventoryModule->onResize(width);
 		inventoryModule->onResize(width);
 	}
 
@@ -98,7 +94,7 @@ namespace Game3 {
 			auto *buffer = std::any_cast<Buffer>(&data);
 			assert(buffer != nullptr);
 			const bool success = buffer->take<bool>();
-			const Identifier id = buffer->take<Identifier>();
+			Identifier id = buffer->take<Identifier>();
 
 			if (success) {
 				entry.set_text(id.str());
@@ -107,9 +103,12 @@ namespace Game3 {
 				entry.set_text({});
 			}
 
+			autocrafter->setTarget(std::move(id));
+
 		} else if (name == "TileEntityRemoved") {
 
 			if (source && source->getGID() == autocrafter->getGID()) {
+				stationInventoryModule->handleMessage(source, name, data);
 				inventoryModule->handleMessage(source, name, data);
 				MainWindow &window = game->getWindow();
 				window.queue([&window] { window.removeModule(); });
@@ -127,40 +126,26 @@ namespace Game3 {
 	}
 
 	void AutocrafterModule::setInventory(std::shared_ptr<ClientInventory> inventory) {
-		inventoryModule->setInventory(std::move(inventory));
+		if (inventory->index == 0)
+			inventoryModule->setInventory(std::move(inventory));
+		else if (inventory->index == 1)
+			inventoryModule->setInventory(std::move(inventory));
+		else
+			throw std::invalid_argument("Can't set AutocrafterModule inventory at index " + std::to_string(inventory->index));
+	}
+
+
+	void AutocrafterModule::updateEntry() {
+		const auto &target = autocrafter->getTarget();
+		auto lock = target.sharedLock();
+		if (target.empty())
+			entry.set_text({});
+		else
+			entry.set_text(target.str());
 	}
 
 	void AutocrafterModule::setTarget(const std::string &target) {
 		if (autocrafter)
 			game->player->sendMessage(autocrafter, "SetTarget", target);
-	}
-
-	void AutocrafterModule::configureFixed() {
-		auto target = Gtk::DropTarget::create(Glib::Value<DragSource>::value_type(), Gdk::DragAction::MOVE);
-
-		target->signal_drop().connect([this](const Glib::ValueBase &base, double, double) {
-			if (!autocrafter || base.gobj()->g_type != Glib::Value<DragSource>::value_type())
-				return false;
-
-			const DragSource source = static_cast<const Glib::Value<DragSource> &>(base).get();
-
-			auto source_lock = source.inventory->uniqueLock();
-			ItemStack *stack = (*source.inventory)[source.slot];
-
-			if (stack) {
-				// game->player->send(SwapSlotsPacket(source.inventory->getOwner()->getGID(), autocrafter->getGID(), source.slot, 0));
-				// setFilter();
-				// filter->addItem(*stack);
-				// populate();
-				// upload();
-			}
-
-			return true;
-		}, false);
-
-		fixed.add_controller(target);
-		fixed.set_size_request(68, 68);
-		fixed.set_halign(Gtk::Align::CENTER);
-		fixed.add_css_class("item-slot");
 	}
 }

@@ -23,7 +23,7 @@ namespace Game3 {
 			static Identifier ID() { return {"base", "module/external_inventory"}; }
 
 			ExternalInventoryModule(std::shared_ptr<ClientGame>, const std::any &);
-			ExternalInventoryModule(std::shared_ptr<ClientGame>, std::shared_ptr<ClientInventory>, InventoryID);
+			ExternalInventoryModule(std::shared_ptr<ClientGame>, std::shared_ptr<ClientInventory>);
 
 			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;
@@ -35,12 +35,9 @@ namespace Game3 {
 			inline auto getInventory() const { return inventory; }
 			void setInventory(std::shared_ptr<ClientInventory>) override;
 
-			inline auto getInventoryIndex() const { return inventoryIndex; }
-
 		private:
 			std::shared_ptr<ClientGame> game;
 			std::shared_ptr<ClientInventory> inventory;
-			InventoryID inventoryIndex;
 			Glib::RefPtr<Gio::Menu> gmenu;
 			Glib::RefPtr<Gtk::DragSource> source;
 			Glib::ustring name;

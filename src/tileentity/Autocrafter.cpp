@@ -13,8 +13,8 @@ namespace Game3 {
 		constexpr EnergyAmount ENERGY_CAPACITY = 100'000;
 		constexpr EnergyAmount ENERGY_PER_ACTION = 200;
 		constexpr float PERIOD = 0.1;
-		constexpr ItemCount INPUT_CAPACITY  = 15;
-		constexpr ItemCount OUTPUT_CAPACITY = 15;
+		constexpr ItemCount INPUT_CAPACITY  = 10;
+		constexpr ItemCount OUTPUT_CAPACITY = 10;
 	}
 
 	Autocrafter::Autocrafter():
@@ -136,6 +136,7 @@ namespace Game3 {
 		HasInventory::encode(buffer, 0);
 		HasInventory::encode(buffer, 1);
 		EnergeticTileEntity::encode(game, buffer);
+		buffer << target;
 	}
 
 	void Autocrafter::decode(Game &game, Buffer &buffer) {
@@ -143,6 +144,7 @@ namespace Game3 {
 		HasInventory::decode(buffer, 0);
 		HasInventory::decode(buffer, 1);
 		EnergeticTileEntity::decode(game, buffer);
+		target = buffer.take<Identifier>();
 		stationSet();
 	}
 
