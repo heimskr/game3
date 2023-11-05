@@ -51,7 +51,7 @@ namespace Game3 {
 			return;
 
 		RealmPtr realm = getRealm();
-		auto &tileset = realm->getTileset();
+		Tileset &tileset = realm->getTileset();
 
 		if (cachedTile == TileID(-1) || tileLookupFailed) {
 			if (tileID.empty()) {

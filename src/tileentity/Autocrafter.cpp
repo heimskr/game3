@@ -2,6 +2,8 @@
 #include "game/Game.h"
 #include "game/InventorySpan.h"
 #include "game/ServerInventory.h"
+#include "graphics/SpriteRenderer.h"
+#include "graphics/Tileset.h"
 #include "item/Furniture.h"
 #include "packet/OpenModuleForAgentPacket.h"
 #include "recipe/CraftingRecipe.h"
@@ -24,7 +26,7 @@ namespace Game3 {
 		TileEntity(std::move(tile_id), ID(), position_, true), EnergeticTileEntity(ENERGY_CAPACITY) {}
 
 	Autocrafter::Autocrafter(Position position_):
-		TileEntity("base:tile/autocrafter", ID(), position_, true), EnergeticTileEntity(ENERGY_CAPACITY) {}
+		TileEntity("base:tile/autocrafter_base", ID(), position_, true), EnergeticTileEntity(ENERGY_CAPACITY) {}
 
 	const InventoryPtr & Autocrafter::getInventory(InventoryID index) const {
 		if (index == 0)
@@ -113,6 +115,98 @@ namespace Game3 {
 
 		auto lock = energyContainer->sharedLock();
 		return true;
+	}
+
+	void Autocrafter::render(SpriteRenderer &sprite_renderer) {
+		if (!isVisible())
+			return;
+
+		RealmPtr realm = getRealm();
+		Tileset &tileset = realm->getTileset();
+
+		if (cachedTile == TileID(-1) || tileLookupFailed) {
+			if (tileID.empty()) {
+				tileLookupFailed = true;
+				cachedTile = 0;
+				cachedUpperTile = 0;
+			} else {
+				tileLookupFailed = false;
+				cachedTile = tileset["base:tile/autocrafter_base"_id];
+				cachedUpperTile = tileset.getUpper(cachedTile);
+				cachedArmLower = tileset["base:tile/autocrafter_arm"_id];
+				cachedArmUpper = tileset.getUpper(cachedArmLower);
+				if (cachedUpperTile == 0)
+					cachedUpperTile = -1;
+			}
+		}
+
+		if (cachedTile == 0)
+			return;
+
+		const auto tilesize = tileset.getTileSize();
+		const auto texture = tileset.getTexture(realm->getGame());
+		const auto base_x = (cachedTile % (texture->width / tilesize)) * tilesize;
+		const auto base_y = (cachedTile / (texture->width / tilesize)) * tilesize;
+
+		sprite_renderer(*texture, {
+			.x = float(position.column),
+			.y = float(position.row),
+			.xOffset = base_x / 2.f,
+			.yOffset = base_y / 2.f,
+			.sizeX = float(tilesize),
+			.sizeY = float(tilesize),
+		});
+	}
+
+	void Autocrafter::renderUpper(SpriteRenderer &sprite_renderer) {
+		if (!isVisible({-1, 0}))
+			return;
+
+		RealmPtr realm = getRealm();
+		Tileset &tileset = realm->getTileset();
+
+		if (cachedUpperTile == TileID(-1) || cachedUpperTile == 0)
+			return;
+
+		const auto tilesize = tileset.getTileSize();
+		const auto texture = tileset.getTexture(realm->getGame());
+		const auto base_x = (cachedUpperTile % (texture->width / tilesize)) * tilesize;
+		const auto base_y = (cachedUpperTile / (texture->width / tilesize)) * tilesize;
+
+		sprite_renderer(*texture, {
+			.x = float(position.column),
+			.y = float(position.row - 1),
+			.xOffset = base_x / 2.f,
+			.yOffset = base_y / 2.f,
+			.sizeX = float(tilesize),
+			.sizeY = float(tilesize),
+		});
+
+		// TODO!: render station
+
+		const auto arm_upper_x = (cachedArmUpper % (texture->width / tilesize)) * tilesize;
+		const auto arm_upper_y = (cachedArmUpper / (texture->width / tilesize)) * tilesize;
+
+		sprite_renderer(*texture, {
+			.x = float(position.column),
+			.y = float(position.row - 1),
+			.xOffset = arm_upper_x / 2.f,
+			.yOffset = arm_upper_y / 2.f,
+			.sizeX = float(tilesize),
+			.sizeY = float(tilesize),
+		});
+
+		const auto arm_lower_x = (cachedArmLower % (texture->width / tilesize)) * tilesize;
+		const auto arm_lower_y = (cachedArmLower / (texture->width / tilesize)) * tilesize;
+
+		sprite_renderer(*texture, {
+			.x = float(position.column),
+			.y = float(position.row),
+			.xOffset = arm_lower_x / 2.f,
+			.yOffset = arm_lower_y / 2.f,
+			.sizeX = float(tilesize),
+			.sizeY = float(tilesize),
+		});
 	}
 
 	void Autocrafter::toJSON(nlohmann::json &json) const {

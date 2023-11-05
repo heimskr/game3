@@ -25,6 +25,9 @@ namespace Game3 {
 			void tick(Game &, float) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) override;
 
+			void render(SpriteRenderer &) override;
+			void renderUpper(SpriteRenderer &) override;
+
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 
@@ -45,6 +48,8 @@ namespace Game3 {
 			Lockable<Identifier> target;
 			Lockable<std::shared_ptr<Inventory>> stationInventory;
 			Lockable<Identifier> station;
+			TileID cachedArmLower = -1;
+			TileID cachedArmUpper = -1;
 
 			Autocrafter();
 			Autocrafter(Identifier tile_id, Position);
