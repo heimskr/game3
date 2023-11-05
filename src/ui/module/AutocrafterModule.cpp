@@ -129,7 +129,7 @@ namespace Game3 {
 		if (inventory->index == 0)
 			inventoryModule->setInventory(std::move(inventory));
 		else if (inventory->index == 1)
-			inventoryModule->setInventory(std::move(inventory));
+			stationInventoryModule->setInventory(std::move(inventory));
 		else
 			throw std::invalid_argument("Can't set AutocrafterModule inventory at index " + std::to_string(inventory->index));
 	}

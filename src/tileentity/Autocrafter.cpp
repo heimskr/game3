@@ -36,9 +36,9 @@ namespace Game3 {
 
 	void Autocrafter::setInventory(InventoryPtr inventory, InventoryID index) {
 		if (index == 0)
-			HasInventory::setInventory(inventory, 0);
+			HasInventory::setInventory(std::move(inventory), 0);
 		else if (index == 1)
-			stationInventory = inventory;
+			stationInventory = std::move(inventory);
 		else
 			throw std::invalid_argument("Couldn't set inventory with index " + std::to_string(index));
 	}

@@ -80,11 +80,10 @@ namespace Game3 {
 		if (tileEntity) {
 			if (!wasFound)
 				game.getRealm(realmID)->add(tileEntity);
-			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(tileEntity)) {
-				if (InventoryPtr inventory = has_inventory->getInventory(0)) {
-					inventory->notifyOwner();
-				}
-			}
+			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(tileEntity))
+				for (InventoryID i = 0, max = has_inventory->getInventoryCount(); i < max; ++i)
+					if (InventoryPtr inventory = has_inventory->getInventory(i))
+						inventory->notifyOwner();
 		}
 	}
 }

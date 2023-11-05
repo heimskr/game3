@@ -10,7 +10,7 @@
 
 namespace Game3 {
 	void SwapSlotsPacket::handle(ServerGame &game, RemoteClient &client) {
-		if (firstGID == secondGID && firstSlot == secondSlot)
+		if (firstGID == secondGID && firstInventory == secondInventory && firstSlot == secondSlot)
 			return;
 
 		if (!Agent::validateGID(firstGID) || !Agent::validateGID(secondGID)) {

@@ -19,6 +19,7 @@ namespace Game3 {
 
 			virtual const std::shared_ptr<Inventory> & getInventory(InventoryID) const;
 			virtual void setInventory(std::shared_ptr<Inventory>, InventoryID);
+			virtual InventoryID getInventoryCount() const { return 1; }
 
 			void encode(Buffer &, InventoryID);
 			void decode(Buffer &, InventoryID);
