@@ -1,4 +1,5 @@
 #include "game/ClientGame.h"
+#include "game/ServerInventory.h"
 #include "pipes/ItemFilter.h"
 #include "util/Demangle.h"
 #include "util/Timer.h"
@@ -30,6 +31,7 @@ namespace Game3 {
 
 		Timer timer{"FilterTest"};
 
+		ServerInventory inventory(nullptr, 30);
 		ItemFilter filter(true, true);
 
 		std::vector<ItemStack> stacks;
@@ -48,7 +50,7 @@ namespace Game3 {
 
 		for (size_t i = 0; i < 1'000'000; ++i) {
 			for (const ItemStack &stack: stacks) {
-				sum += filter.isAllowed(stack);
+				sum += filter.isAllowed(stack, inventory);
 				++total;
 			}
 		}

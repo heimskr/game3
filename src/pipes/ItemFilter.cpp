@@ -1,3 +1,4 @@
+#include "game/Inventory.h"
 #include "item/Item.h"
 #include "net/Buffer.h"
 #include "pipes/ItemFilter.h"
@@ -6,8 +7,8 @@
 
 namespace Game3 {
 	namespace {
-		bool isMatch(std::reference_wrapper<const ItemStack> stack, const ItemFilter::Config &config) {
-			return config(stack);
+		bool isMatch(std::reference_wrapper<const ItemStack> stack, std::reference_wrapper<const Inventory> source, bool strict, const ItemFilter::Config &config) {
+			return config(stack, source, strict);
 		}
 	}
 
@@ -17,17 +18,12 @@ namespace Game3 {
 		allowMode(allow_mode),
 		strict(strict_) {}
 
-	bool ItemFilter::isAllowed(const ItemStack &stack) const {
+	bool ItemFilter::isAllowed(const ItemStack &stack, const Inventory &inventory) const {
 		auto lock = configsByItem.sharedLock();
 
-		if (strict) {
-			if (auto iter = configsByItem.find(stack.item->identifier); iter != configsByItem.end() && std::ranges::any_of(iter->second, std::bind(&isMatch, std::cref(stack), std::placeholders::_1)))
+		if (auto iter = configsByItem.find(stack.item->identifier); iter != configsByItem.end())
+			if (std::ranges::any_of(iter->second, std::bind(&isMatch, std::cref(stack), std::cref(inventory), strict, std::placeholders::_1)))
 				return allowMode;
-			return !allowMode;
-		}
-
-		if (configsByItem.contains(stack.item->identifier))
-			return allowMode;
 
 		return !allowMode;
 	}
@@ -66,15 +62,16 @@ namespace Game3 {
 		configsByItem.clear();
 	}
 
-	bool ItemFilter::Config::operator()(const ItemStack &stack) const {
-		if (stack.data != data)
+	bool ItemFilter::Config::operator()(const ItemStack &stack, const Inventory &inventory, bool strict) const {
+		if (strict && stack.data != data)
 			return false;
 
-		if (comparator == Comparator::Less)
-			return stack.count < count;
-
-		if (comparator == Comparator::Greater)
-			return stack.count > count;
+		if (comparator != Comparator::None) {
+			const ItemCount inventory_count = strict? inventory.count(stack) : inventory.count(*stack.item);
+			if (comparator == Comparator::Less)
+				return inventory_count < count;
+			return inventory_count > count;
+		}
 
 		return true;
 	}

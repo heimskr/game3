@@ -13,6 +13,7 @@
 
 namespace Game3 {
 	class Buffer;
+	class Inventory;
 	class Item;
 	class ItemStack;
 
@@ -25,14 +26,14 @@ namespace Game3 {
 				Comparator comparator{};
 				ItemCount count{};
 
-				bool operator()(const ItemStack &) const;
+				bool operator()(const ItemStack &, const Inventory &, bool strict) const;
 				bool operator<(const Config &) const;
 			};
 
 			ItemFilter();
 			ItemFilter(bool allow_mode, bool strict_);
 
-			bool isAllowed(const ItemStack &) const;
+			bool isAllowed(const ItemStack &, const Inventory &) const;
 			void addItem(const ItemStack &);
 			void removeItem(const ItemStack &);
 			void clear();

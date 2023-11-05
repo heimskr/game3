@@ -78,7 +78,7 @@ namespace Game3 {
 				extraction_filter = pipe->itemFilters[flipDirection(direction)];
 
 			inventoried->iterateExtractableItems(direction, [&, direction = direction](const ItemStack &stack, Slot slot) {
-				if (extraction_filter && !extraction_filter->isAllowed(stack))
+				if (extraction_filter && !extraction_filter->isAllowed(stack, *inventory))
 					return false;
 
 				// It's possible we'll extract an item and put it right back.
@@ -98,9 +98,12 @@ namespace Game3 {
 				// Try to insert the extracted item into insertion points until we either finish inserting all of it
 				// or we run out of insertion points.
 				iterateRoundRobin([&](const std::shared_ptr<InventoriedTileEntity> &round_robin, Direction round_robin_direction) -> bool {
-					if (const auto pipe = std::dynamic_pointer_cast<Pipe>(realm->tileEntityAt(round_robin->getPosition() + round_robin_direction)))
-						if (std::shared_ptr<ItemFilter> insertion_filter = pipe->itemFilters[flipDirection(round_robin_direction)]; insertion_filter && !insertion_filter->isAllowed(*extracted))
+					if (const auto pipe = std::dynamic_pointer_cast<Pipe>(realm->tileEntityAt(round_robin->getPosition() + round_robin_direction))) {
+						InventoryPtr round_robin_inventory = round_robin->getInventory(0);
+						auto round_robin_inventory_lock = round_robin_inventory->sharedLock();
+						if (std::shared_ptr<ItemFilter> insertion_filter = pipe->itemFilters[flipDirection(round_robin_direction)]; insertion_filter && !insertion_filter->isAllowed(*extracted, *round_robin_inventory))
 							return false;
+					}
 
 					// TODO?: support multiple inventories in item networks
 					auto lock = round_robin->getInventory(0)->uniqueLock();
