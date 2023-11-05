@@ -1,10 +1,12 @@
 #pragma once
 
 #include "threading/Lockable.h"
+#include "threading/LockableSharedPtr.h"
 #include "tileentity/EnergeticTileEntity.h"
 #include "tileentity/InventoriedTileEntity.h"
 
 namespace Game3 {
+	class Texture;
 	struct CraftingRecipe;
 
 	class Autocrafter: public InventoriedTileEntity, public EnergeticTileEntity {
@@ -50,6 +52,11 @@ namespace Game3 {
 			Lockable<Identifier> station;
 			TileID cachedArmLower = -1;
 			TileID cachedArmUpper = -1;
+			LockableSharedPtr<Texture> stationTexture;
+			float stationXOffset{};
+			float stationYOffset{};
+			float stationSizeX{};
+			float stationSizeY{};
 
 			Autocrafter();
 			Autocrafter(Identifier tile_id, Position);
@@ -58,6 +65,8 @@ namespace Game3 {
 			void autocraft();
 			void cacheRecipes();
 			bool stationSet();
+			void setStationTexture(const ItemStack &);
+			void resetStationTexture();
 			bool validateRecipe(const CraftingRecipe &) const;
 			void connectStationInventory();
 

@@ -2,6 +2,7 @@
 #include "game/Game.h"
 #include "game/InventorySpan.h"
 #include "game/ServerInventory.h"
+#include "graphics/ItemTexture.h"
 #include "graphics/SpriteRenderer.h"
 #include "graphics/Tileset.h"
 #include "item/Furniture.h"
@@ -182,7 +183,18 @@ namespace Game3 {
 			.sizeY = float(tilesize),
 		});
 
-		// TODO!: render station
+		if (stationTexture) {
+			sprite_renderer(*stationTexture, {
+				.x = position.column + .125f,
+				.y = position.row    - .2f,
+				.xOffset = stationXOffset,
+				.yOffset = stationYOffset,
+				.sizeX = stationSizeX,
+				.sizeY = stationSizeY,
+				.scaleX = .75f * 16.f / stationSizeX,
+				.scaleY = .75f * 16.f / stationSizeY,
+			});
+		}
 
 		const auto arm_upper_x = (cachedArmUpper % (texture->width / tilesize)) * tilesize;
 		const auto arm_upper_y = (cachedArmUpper / (texture->width / tilesize)) * tilesize;
@@ -344,16 +356,42 @@ namespace Game3 {
 		if (ItemStack *stack = (*stationInventory)[0]) {
 			if (auto station_item = std::dynamic_pointer_cast<StationFurniture>(stack->item)) {
 				station = station_item->stationType;
+				setStationTexture(*stack);
 			} else {
 				station = {};
 				out = false;
+				resetStationTexture();
 			}
 		} else {
 			station = {};
+			resetStationTexture();
 		}
 
 		cacheRecipes();
 		return out;
+	}
+
+	void Autocrafter::setStationTexture(const ItemStack &stack) {
+		Game &game = getGame();
+		if (game.getSide() != Side::Client)
+			return;
+		std::shared_ptr<ItemTexture> item_texture = game.registry<ItemTextureRegistry>().at(stack.item->identifier);
+		stationTexture = stack.getTexture(game);
+		stationTexture->init();
+		stationXOffset = item_texture->x / 2.f;
+		stationYOffset = item_texture->y / 2.f;
+		stationSizeX   = float(item_texture->width);
+		stationSizeY   = float(item_texture->height);
+	}
+
+	void Autocrafter::resetStationTexture() {
+		if (getSide() != Side::Client)
+			return;
+		stationTexture = {};
+		stationXOffset = {};
+		stationYOffset = {};
+		stationSizeX   = {};
+		stationSizeY   = {};
 	}
 
 	bool Autocrafter::validateRecipe(const CraftingRecipe &recipe) const {
