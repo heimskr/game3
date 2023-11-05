@@ -35,11 +35,12 @@ namespace Game3 {
 	}
 
 	void Autocrafter::setInventory(InventoryPtr inventory, InventoryID index) {
-		if (index == 0)
+		if (index == 0) {
 			HasInventory::setInventory(std::move(inventory), 0);
-		else if (index == 1)
+		} else if (index == 1) {
 			stationInventory = std::move(inventory);
-		else
+			connectStationInventory();
+		} else
 			throw std::invalid_argument("Couldn't set inventory with index " + std::to_string(index));
 	}
 
@@ -60,6 +61,7 @@ namespace Game3 {
 		TileEntity::init(game);
 		HasInventory::setInventory(Inventory::create(shared_from_this(), INPUT_CAPACITY + OUTPUT_CAPACITY), 0);
 		stationInventory = Inventory::create(shared_from_this(), 1, 1);
+		connectStationInventory();
 	}
 
 	void Autocrafter::tick(Game &game, float delta) {
@@ -271,5 +273,19 @@ namespace Game3 {
 				return true;
 
 		return false;
+	}
+
+	void Autocrafter::connectStationInventory() {
+		stationInventory->onMove = [this](Inventory &, Slot, Inventory &, Slot, bool) {
+			return [this] {
+				stationSet();
+			};
+		};
+
+		stationInventory->onSwap = [this](Inventory &, Slot, Inventory &, Slot) {
+			return [this] {
+				stationSet();
+			};
+		};
 	}
 }

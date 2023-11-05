@@ -54,6 +54,7 @@ namespace Game3 {
 			void cacheRecipes();
 			bool stationSet();
 			bool validateRecipe(const CraftingRecipe &) const;
+			void connectStationInventory();
 
 			friend class TileEntity;
 	};
