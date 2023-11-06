@@ -15,6 +15,7 @@ namespace Game3 {
 			HasMutex() = default;
 
 		public:
+			virtual ~HasMutex() = default;
 			virtual std::shared_lock<M> sharedLock() const { return std::shared_lock(internalMutex); }
 			virtual std::unique_lock<M> uniqueLock() const { return std::unique_lock(internalMutex); }
 	};
