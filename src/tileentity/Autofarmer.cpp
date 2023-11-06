@@ -233,6 +233,51 @@ namespace Game3 {
 
 		auto input_span = std::make_shared<InventorySpan>(inventory, 0, INPUT_CAPACITY - 1);
 
+		if (!submerged_empty) {
+			// Try to harvest.
+			auto crop_tile = std::dynamic_pointer_cast<CropTile>(getGame().getTile(tileset[submerged]));
+			if (!crop_tile || !crop_tile->isRipe(tileset[submerged]))
+				return operated;
+
+			InventorySpan output_span(inventory, INPUT_CAPACITY, inventory->slotCount - 1);
+
+			bool any_added = false;
+
+			std::vector<ItemStack> inputs, outputs;
+
+			for (ItemStack &stack: crop_tile->crop->products.getStacks()) {
+				if (stack.hasAttribute("base:attribute/plantable"))
+					inputs.push_back(std::move(stack));
+				else
+					outputs.push_back(std::move(stack));
+			}
+
+			for (const ItemStack &input: inputs) {
+				if (std::optional<ItemStack> leftover = input_span->add(input)) {
+					if (leftover->count < input.count)
+						any_added = true;
+					break;
+				} else {
+					any_added = true;
+				}
+			}
+
+			for (const ItemStack &output: outputs) {
+				if (std::optional<ItemStack> leftover = output_span.add(output)) {
+					if (leftover->count < output.count)
+						any_added = true;
+					break;
+				} else {
+					any_added = true;
+				}
+			}
+
+			if (any_added) {
+				place.set(Layer::Submerged, 0);
+				submerged_empty = true;
+			}
+		}
+
 		if (submerged_empty) {
 			// Try to plant.
 			if (input_empty)
@@ -254,48 +299,6 @@ namespace Game3 {
 			plantable->plant(input_span, slot, *stack, place);
 			return true;
 		}
-
-		// Try to harvest.
-
-		auto crop_tile = std::dynamic_pointer_cast<CropTile>(getGame().getTile(tileset[submerged]));
-		if (!crop_tile || !crop_tile->isRipe(tileset[submerged]))
-			return operated;
-
-		InventorySpan output_span(inventory, INPUT_CAPACITY, inventory->slotCount - 1);
-
-		bool any_added = false;
-
-		std::vector<ItemStack> inputs, outputs;
-
-		for (ItemStack &stack: crop_tile->crop->products.getStacks()) {
-			if (stack.hasAttribute("base:attribute/plantable"))
-				inputs.push_back(std::move(stack));
-			else
-				outputs.push_back(std::move(stack));
-		}
-
-		for (const ItemStack &input: inputs) {
-			if (std::optional<ItemStack> leftover = input_span->add(input)) {
-				if (leftover->count < input.count)
-					any_added = true;
-				break;
-			} else {
-				any_added = true;
-			}
-		}
-
-		for (const ItemStack &output: outputs) {
-			if (std::optional<ItemStack> leftover = output_span.add(output)) {
-				if (leftover->count < output.count)
-					any_added = true;
-				break;
-			} else {
-				any_added = true;
-			}
-		}
-
-		if (any_added)
-			place.set(Layer::Submerged, 0);
 
 		return true;
 	}
