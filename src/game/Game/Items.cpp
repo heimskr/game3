@@ -19,6 +19,7 @@
 #include "item/GeothermalGeneratorItem.h"
 #include "item/Hammer.h"
 #include "item/Hoe.h"
+#include "item/IncineratorItem.h"
 #include "item/Item.h"
 #include "item/Landfill.h"
 #include "item/Mead.h"
@@ -256,6 +257,8 @@ namespace Game3 {
 		add(std::make_shared<EnergyPipeItem>(4));
 
 		add(std::make_shared<AutocrafterItem>("base:item/autocrafter", "Autocrafter", 999, 64)); // TODO: cost
+
+		add(std::make_shared<IncineratorItem>("base:item/incinerator", "Incinerator", 999, 64)); // TODO: cost
 
 		add(std::make_shared<ChemicalReactorItem>("base:item/chemical_reactor", "Chemical Reactor", 999, 64)); // TODO: cost
 

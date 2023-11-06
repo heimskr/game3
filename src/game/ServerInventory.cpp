@@ -147,6 +147,11 @@ namespace Game3 {
 			after();
 	}
 
+	void ServerInventory::clear() {
+		// TODO: some kind of callback?
+		storage.clear();
+	}
+
 	ItemCount ServerInventory::remove(const ItemStack &stack_to_remove) {
 		// Could just use a simple call to remove(const ItemStack &, const std::function<bool(Slot)> &) with [](Slot) { return true; },
 		// but that would be slightly slower so we'll just spam a near copy of that function here.

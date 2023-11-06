@@ -95,6 +95,8 @@ namespace Game3 {
 			/** Erases the active slot. Doesn't notify the owner! */
 			virtual void erase();
 
+			virtual void clear() = 0;
+
 			virtual bool empty() const = 0;
 
 			/** Counts the number of an item in the inventory. */

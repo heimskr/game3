@@ -65,6 +65,10 @@ namespace Game3 {
 		throw std::logic_error("ClientInventory::erase(Slot) unimplemented");
 	}
 
+	void ClientInventory::clear() {
+		throw std::logic_error("ClientInventory::clear() unimplemented");
+	}
+
 	ItemCount ClientInventory::remove(const ItemStack &) {
 		throw std::logic_error("ClientInventory::remove(const ItemStack &) unimplemented");
 	}

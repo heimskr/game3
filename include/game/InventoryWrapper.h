@@ -32,6 +32,7 @@ namespace Game3 {
 			void discard(Slot) override;
 			void swap(Slot, Slot) override;
 			void erase(Slot) override;
+			void clear() override;
 			ItemCount count(const ItemID &) const override;
 			ItemCount count(const Item &) const override;
 			ItemCount count(const ItemStack &) const override;
@@ -59,6 +60,9 @@ namespace Game3 {
 			bool empty() const override;
 
 			using Inventory::add;
+
+			std::unique_lock<DefaultMutex> uniqueLock() const override;
+			std::shared_lock<DefaultMutex> sharedLock() const override;
 
 		protected:
 			void compact() override;

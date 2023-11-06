@@ -30,6 +30,8 @@ namespace Game3 {
 
 			void erase(Slot) override;
 
+			void clear() override;
+
 			ItemCount remove(const ItemStack &) override;
 			ItemCount remove(const ItemStack &, const ConstPredicate &) override;
 			ItemCount remove(const ItemStack &, Slot) override;

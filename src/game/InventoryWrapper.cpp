@@ -95,6 +95,13 @@ namespace Game3 {
 			inventory->erase(slot);
 	}
 
+	void InventoryWrapper::clear() {
+		for (Slot slot = 0; slot < inventory->slotCount; ++slot) {
+			if (validateSlot(slot))
+				inventory->erase(slot);
+		}
+	}
+
 	ItemCount InventoryWrapper::count(const ItemID &id) const {
 		if (id.getPathStart() == "attribute")
 			return countAttribute(id);
@@ -271,6 +278,14 @@ namespace Game3 {
 
 	bool InventoryWrapper::empty() const {
 		return inventory->empty();
+	}
+
+	std::unique_lock<DefaultMutex> InventoryWrapper::uniqueLock() const {
+		return inventory->uniqueLock();
+	}
+
+	std::shared_lock<DefaultMutex> InventoryWrapper::sharedLock() const {
+		return inventory->sharedLock();
 	}
 
 	void InventoryWrapper::compact() {
