@@ -10,6 +10,7 @@
 #include "item/ChemicalReactorItem.h"
 #include "item/CombinerItem.h"
 #include "item/ContainmentOrb.h"
+#include "item/CreativeGeneratorItem.h"
 #include "item/DissolverItem.h"
 #include "item/EmptyFlask.h"
 #include "item/FilledFlask.h"
@@ -261,6 +262,8 @@ namespace Game3 {
 		add(std::make_shared<IncineratorItem>("base:item/incinerator", "Incinerator", 999, 64)); // TODO: cost
 
 		add(std::make_shared<ChemicalReactorItem>("base:item/chemical_reactor", "Chemical Reactor", 999, 64)); // TODO: cost
+
+		add(std::make_shared<CreativeGeneratorItem>("base:item/creative_generator", "Creative Generator", 999, 64)); // TODO: cost
 
 		add(std::make_shared<GeothermalGeneratorItem>("base:item/geothermal_generator", "Geothermal Generator", 999, 64)); // TODO: cost
 
