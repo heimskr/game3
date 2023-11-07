@@ -87,7 +87,7 @@ namespace Game3 {
 		reset();
 	}
 
-	std::shared_ptr<PipeNetwork> PipeNetwork::partition(const std::shared_ptr<Pipe> &start_pipe, Direction start_direction) {
+	std::shared_ptr<PipeNetwork> PipeNetwork::partition(const std::shared_ptr<Pipe> &start) {
 		auto realm = weakRealm.lock();
 		assert(realm);
 
@@ -99,18 +99,18 @@ namespace Game3 {
 
 		auto new_lock = new_network->uniqueLock();
 
-		std::unordered_set visited{start_pipe};
-		std::vector<std::pair<std::shared_ptr<Pipe>, Direction>> queue{{start_pipe, start_direction}};
+		std::unordered_set visited{start};
+		std::vector queue{start};
 
 		while (!queue.empty()) {
-			auto [pipe, in_direction] = queue.back();
+			auto pipe = queue.back();
 			queue.pop_back();
 			visited.insert(pipe);
 			new_network->add(pipe);
 
 			pipe->getDirections()[type].iterate([&](Direction direction) {
-				if (std::shared_ptr<Pipe> neighbor = pipe->getConnected(type, direction, in_direction); neighbor && !neighbor->dying[type] && !visited.contains(neighbor))
-					queue.emplace_back(neighbor, flipDirection(direction)); // Reason for flipping: if the pipe is to the south, we came to it from the north.
+				if (std::shared_ptr<Pipe> neighbor = pipe->getConnected(type, direction); neighbor && !neighbor->dying[type] && !visited.contains(neighbor))
+					queue.push_back(neighbor);
 			});
 		}
 

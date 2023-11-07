@@ -19,16 +19,6 @@ namespace Game3 {
 	Pipe::Pipe(Position position_):
 		TileEntity("base:tile/missing"_id, ID(), position_, false) {}
 
-	Pipe::Mode Pipe::nextMode(Mode mode) {
-		switch (mode) {
-			case Mode::Normal: return Mode::NS;
-			case Mode::NS:     return Mode::NE;
-			case Mode::NE:     return Mode::NW;
-			default:
-				return Mode::Normal;
-		}
-	}
-
 	Identifier Pipe::Corner(PipeType type) {
 		switch (type) {
 			case PipeType::Item:   return ItemCorner();
@@ -47,9 +37,9 @@ namespace Game3 {
 		}
 	}
 
-	DirectionalContainer<std::shared_ptr<Pipe>> Pipe::getAllConnected(PipeType pipe_type) const {
+	DirectionalContainer<std::shared_ptr<Pipe>> Pipe::getConnected(PipeType pipe_type) const {
 		DirectionalContainer<std::shared_ptr<Pipe>> out;
-		RealmPtr realm = getRealm();
+		auto realm = getRealm();
 
 		directions[pipe_type].iterate([&](Direction direction) {
 			if (auto neighbor = realm->tileEntityAt(position + direction))
@@ -61,55 +51,12 @@ namespace Game3 {
 		return out;
 	}
 
-	std::shared_ptr<Pipe> Pipe::getConnected(PipeType pipe_type, Direction out_direction) const {
-		RealmPtr realm = getRealm();
+	std::shared_ptr<Pipe> Pipe::getConnected(PipeType pipe_type, Direction direction) const {
+		auto realm = getRealm();
 
-		if (auto neighbor = realm->tileEntityAt(position + out_direction))
+		if (auto neighbor = realm->tileEntityAt(position + direction))
 			if (auto neighbor_pipe = std::dynamic_pointer_cast<Pipe>(neighbor))
-				if (neighbor_pipe->directions[pipe_type].has(flipDirection(out_direction)))
-					return neighbor_pipe;
-
-		return nullptr;
-	}
-
-	std::shared_ptr<Pipe> Pipe::getConnected(PipeType pipe_type, Direction out_direction, Direction in_direction) const {
-		RealmPtr realm = getRealm();
-
-		Mode mode{};
-		{
-			auto lock = modes.sharedLock();
-			mode = modes[pipe_type];
-		}
-
-		if (mode == Mode::Normal) {
-			if (!directions[pipe_type].has(in_direction))
-				return nullptr;
-		} else if (mode == Mode::NS) {
-			if (in_direction != flipDirection(out_direction))
-				return nullptr;
-		} else if (mode == Mode::NE) {
-			switch (in_direction) {
-				case Direction::Up:    if (out_direction != Direction::Right) return nullptr; else break;
-				case Direction::Right: if (out_direction != Direction::Up)    return nullptr; else break;
-				case Direction::Down:  if (out_direction != Direction::Left)  return nullptr; else break;
-				case Direction::Left:  if (out_direction != Direction::Down)  return nullptr; else break;
-				default:
-					return nullptr;
-			}
-		} else if (mode == Mode::NW) {
-			switch (in_direction) {
-				case Direction::Up:    if (out_direction != Direction::Left)  return nullptr; else break;
-				case Direction::Right: if (out_direction != Direction::Down)  return nullptr; else break;
-				case Direction::Down:  if (out_direction != Direction::Right) return nullptr; else break;
-				case Direction::Left:  if (out_direction != Direction::Up)    return nullptr; else break;
-				default:
-					return nullptr;
-			}
-		}
-
-		if (auto neighbor = realm->tileEntityAt(position + out_direction))
-			if (auto neighbor_pipe = std::dynamic_pointer_cast<Pipe>(neighbor))
-				if (neighbor_pipe->directions[pipe_type].has(flipDirection(out_direction)))
+				if (neighbor_pipe->directions[pipe_type].has(flipDirection(direction)))
 					return neighbor_pipe;
 
 		return nullptr;
@@ -143,22 +90,8 @@ namespace Game3 {
 		const auto tilesize = tileset.getTileSize();
 		const auto texture  = tileset.getTexture(game);
 
-		if (!alternativesLoaded) {
-			nsTiles.item  = tileset["base:tile/item_ns"];
-			neTiles.item  = tileset["base:tile/item_ne"];
-			nwTiles.item  = tileset["base:tile/item_nw"];
-			nsTiles.fluid = tileset["base:tile/fluid_ns"];
-			neTiles.fluid = tileset["base:tile/fluid_ne"];
-			nwTiles.fluid = tileset["base:tile/fluid_nw"];
-			alternativesLoaded = true;
-		}
-
-		auto modes_lock = modes.sharedLock();
-
 		for (const PipeType pipe_type: reverse(PIPE_TYPES)) {
 			std::optional<TileID> &tile_id = tileIDs[pipe_type];
-
-			const Mode mode = modes[pipe_type];
 
 			if (!tile_id && present[pipe_type])
 				updateTileID(pipe_type);
@@ -168,33 +101,18 @@ namespace Game3 {
 			if (!extractors_corner)
 				extractors_corner = tileset[ExtractorsCorner(pipe_type)];
 
-			float x{}, y{};
-
-			if (pipe_type != PipeType::Energy && mode != Mode::Normal) {
-				TileID alternative{};
-
-				if (mode == Mode::NS)
-					alternative = nsTiles[pipe_type];
-				else if (mode == Mode::NE)
-					alternative = neTiles[pipe_type];
-				else if (mode == Mode::NW)
-					alternative = nwTiles[pipe_type];
-
-				x = (alternative % (texture->width / tilesize)) * tilesize;
-				y = (alternative / (texture->width / tilesize)) * tilesize;
-			} else if (tile_id && *tile_id != 0) {
-				x = (*tile_id % (texture->width / tilesize)) * tilesize;
-				y = (*tile_id / (texture->width / tilesize)) * tilesize;
+			if (tile_id && *tile_id != 0) {
+				const float x = (*tile_id % (texture->width / tilesize)) * tilesize;
+				const float y = (*tile_id / (texture->width / tilesize)) * tilesize;
+				sprite_renderer(*texture, {
+					.x = float(position.column),
+					.y = float(position.row),
+					.xOffset = x / 2,
+					.yOffset = y / 2,
+					.sizeX = float(tilesize),
+					.sizeY = float(tilesize),
+				});
 			}
-
-			sprite_renderer(*texture, {
-				.x = float(position.column),
-				.y = float(position.row),
-				.xOffset = x / 2,
-				.yOffset = y / 2,
-				.sizeX = float(tilesize),
-				.sizeY = float(tilesize),
-			});
 
 			if (const auto extractors_march = extractors[pipe_type].getMarchIndex()) {
 				const TileID extractor_tile = *extractors_corner + extractors_march;
@@ -243,7 +161,6 @@ namespace Game3 {
 		buffer << extractors;
 		buffer << present;
 		buffer << itemFilters;
-		buffer << modes;
 	}
 
 	void Pipe::decode(Game &game, Buffer &buffer) {
@@ -252,7 +169,6 @@ namespace Game3 {
 		buffer >> extractors;
 		buffer >> present;
 		buffer >> itemFilters;
-		buffer >> modes;
 		tileIDs = {};
 		extractorsCorners = {};
 		loaded = {};
@@ -271,7 +187,7 @@ namespace Game3 {
 	void Pipe::onSpawn() {
 		TileEntity::onSpawn();
 
-		RealmPtr realm = getRealm();
+		auto realm = getRealm();
 		auto shared = std::static_pointer_cast<Pipe>(shared_from_this());
 		for (const PipeType pipe_type: PIPE_TYPES)
 			realm->pipeLoader.floodFill(pipe_type, shared);
@@ -357,15 +273,6 @@ namespace Game3 {
 		}
 
 		increaseUpdateCounter();
-		queueBroadcast();
-	}
-
-	void Pipe::toggleMode(PipeType pipe_type) {
-		if (!present[pipe_type])
-			return;
-		auto lock = modes.uniqueLock();
-		Mode &mode = modes[pipe_type];
-		mode = nextMode(mode);
 		queueBroadcast();
 	}
 

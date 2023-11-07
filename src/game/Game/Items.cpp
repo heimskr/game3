@@ -35,7 +35,6 @@
 #include "item/Tool.h"
 #include "item/VoidFlask.h"
 #include "item/VoidPickaxe.h"
-#include "item/Wrench.h"
 #include "tileentity/Chest.h"
 #include "tileentity/CraftingStation.h"
 
@@ -138,14 +137,13 @@ namespace Game3 {
 		add(std::make_shared<Tool>("base:item/gold_axe",        "Gold Axe",         400, .75f,  64, "base:attribute/axe"));
 		add(std::make_shared<Tool>("base:item/diamond_shovel",  "Diamond Shovel",   700,  1.f, 512, "base:attribute/shovel"));
 		add(std::make_shared<Tool>("base:item/diamond_axe",     "Diamond Axe",      900,  1.f, 512, "base:attribute/axe"));
+		add(std::make_shared<Tool>("base:item/wrench",          "Wrench",            72,  0.f,  -1, "base:attribute/wrench"));
 
 		add(std::make_shared<Floor>("base:item/floor", "Floor", "base:tile/floor", 4, 64));
 
 		add(std::make_shared<Hammer>("base:item/iron_hammer",    "Iron Hammer",    150,  3.f, 128));
 		add(std::make_shared<Hammer>("base:item/gold_hammer",    "Gold Hammer",    400, .75f, 128));
 		add(std::make_shared<Hammer>("base:item/diamond_hammer", "Diamond Hammer", 900,  1.f, 128));
-
-		add(std::make_shared<Wrench>("base:item/wrench", "Wrench", 72));
 
 		add(std::make_shared<Pickaxe>("base:item/iron_pickaxe",    "Iron Pickaxe",     150,  3.f,  64));
 		add(std::make_shared<Pickaxe>("base:item/gold_pickaxe",    "Gold Pickaxe",     400, .75f,  64));
