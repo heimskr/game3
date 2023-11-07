@@ -1,11 +1,11 @@
-#include "types/Direction.h"
 #include "Log.h"
-#include "types/Position.h"
-#include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/Inventory.h"
+#include "graphics/Tileset.h"
 #include "item/Pickaxe.h"
 #include "realm/Realm.h"
+#include "types/Direction.h"
+#include "types/Position.h"
 
 namespace Game3 {
 	Pickaxe::Pickaxe(ItemID id_, std::string name_, MoneyCount base_price, float base_cooldown, Durability max_durability):

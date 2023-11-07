@@ -48,6 +48,11 @@ namespace Game3 {
 		friend class PipeLoader;
 		friend class PipeNetwork;
 
+		public:
+			enum class Mode: uint8_t {Normal, NS, NE, NW};
+
+			static Mode nextMode(Mode);
+
 		private:
 			static Identifier ItemCorner()   { return {"base", "tile/item_pipe"};   }
 			static Identifier FluidCorner()  { return {"base", "tile/fluid_pipe"};  }
@@ -64,9 +69,14 @@ namespace Game3 {
 			PipeTuple<std::optional<TileID>> tileIDs;
 			PipeTuple<bool> present;
 			PipeTuple<std::shared_ptr<PipeNetwork>> networks;
+			Lockable<PipeTuple<Mode>> modes;
 			PipeTuple<std::optional<TileID>> extractorsCorners;
 			PipeTuple<bool> loaded;
 			PipeTuple<bool> dying;
+			bool alternativesLoaded = false;
+			PipeTuple<TileID> nsTiles;
+			PipeTuple<TileID> neTiles;
+			PipeTuple<TileID> nwTiles;
 
 			void updateTileID(PipeType);
 			bool get(PipeType, Direction);
@@ -81,8 +91,9 @@ namespace Game3 {
 			Pipe();
 			Pipe(Position);
 
-			DirectionalContainer<std::shared_ptr<Pipe>> getConnected(PipeType) const;
-			std::shared_ptr<Pipe> getConnected(PipeType, Direction) const;
+			DirectionalContainer<std::shared_ptr<Pipe>> getAllConnected(PipeType) const;
+			std::shared_ptr<Pipe> getConnected(PipeType, Direction out_direction) const;
+			std::shared_ptr<Pipe> getConnected(PipeType, Direction out_direction, Direction in_direction) const;
 
 			void tick(Game &, float) override;
 			void render(SpriteRenderer &) override;
@@ -118,6 +129,8 @@ namespace Game3 {
 
 			/** Attaches the pipe to adjacent machines and pipes. */
 			void autopipe(PipeType);
+
+			void toggleMode(PipeType);
 	};
 
 	template <typename T>

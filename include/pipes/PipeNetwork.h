@@ -41,7 +41,7 @@ namespace Game3 {
 			void add(std::weak_ptr<Pipe>);
 			void absorb(std::shared_ptr<PipeNetwork>);
 			/** Cuts the network into two pieces by setting all pipes reachable from the given pipe to a new network. */
-			std::shared_ptr<PipeNetwork> partition(const std::shared_ptr<Pipe> &);
+			std::shared_ptr<PipeNetwork> partition(const std::shared_ptr<Pipe> &, Direction start_direction);
 			virtual void addExtraction(Position, Direction);
 			virtual void addInsertion(Position, Direction);
 			virtual bool removeExtraction(Position, Direction);
