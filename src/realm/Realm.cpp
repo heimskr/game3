@@ -588,8 +588,8 @@ namespace Game3 {
 			WARN("Tile entity use count: " << count);
 
 		if (run_helper) {
-			setLayerHelper(position.row, position.column, Layer::Submerged, false);
-			setLayerHelper(position.row, position.column, Layer::Objects, false);
+			setLayerHelper(position.row, position.column, Layer::Submerged);
+			setLayerHelper(position.row, position.column, Layer::Objects);
 		}
 
 		updateNeighbors(position, Layer::Submerged);
@@ -656,11 +656,11 @@ namespace Game3 {
 		entity->teleport(position);
 	}
 
-	void Realm::setTile(Layer layer, Index row, Index column, TileID tile_id, bool run_helper) {
-		setTile(layer, Position(row, column), tile_id, run_helper);
+	void Realm::setTile(Layer layer, Index row, Index column, TileID tile_id, bool run_helper, TileUpdateContext context) {
+		setTile(layer, Position(row, column), tile_id, run_helper, context);
 	}
 
-	void Realm::setTile(Layer layer, const Position &position, TileID tile_id, bool run_helper) {
+	void Realm::setTile(Layer layer, const Position &position, TileID tile_id, bool run_helper, TileUpdateContext context) {
 		{
 			std::unique_lock<std::shared_mutex> tile_lock;
 			auto &tile = tileProvider.findTile(layer, position, &tile_lock, TileProvider::TileMode::Create);
@@ -675,12 +675,12 @@ namespace Game3 {
 				getGame().toServer().broadcastTileUpdate(id, layer, position, tile_id);
 			}
 			if (run_helper)
-				setLayerHelper(position.row, position.column, layer);
+				setLayerHelper(position.row, position.column, layer, context);
 		}
 	}
 
-	void Realm::setTile(Layer layer, const Position &position, const Identifier &tilename, bool run_helper) {
-		setTile(layer, position, getTileset()[tilename], run_helper);
+	void Realm::setTile(Layer layer, const Position &position, const Identifier &tilename, bool run_helper, TileUpdateContext context) {
+		setTile(layer, position, getTileset()[tilename], run_helper, context);
 	}
 
 	void Realm::setFluid(const Position &position, FluidTile tile) {
@@ -775,8 +775,8 @@ namespace Game3 {
 		return false;
 	}
 
-	void Realm::updateNeighbors(const Position &position, Layer layer) {
-		if (updatesPaused)
+	void Realm::updateNeighbors(const Position &position, Layer layer, TileUpdateContext context) {
+		if (updatesPaused || context--.limit == 0)
 			return;
 
 		++threadContext.updateNeighborsDepth;
@@ -787,7 +787,7 @@ namespace Game3 {
 					const Position offset_position = position + Position(row_offset, column_offset);
 					if (auto neighbor = tileEntityAt(offset_position))
 						neighbor->onNeighborUpdated(Position(-row_offset, -column_offset));
-					autotile(offset_position, layer);
+					autotile(offset_position, layer, context);
 				}
 			}
 		}
@@ -853,7 +853,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Realm::setLayerHelper(Index row, Index column, Layer layer, bool) {
+	void Realm::setLayerHelper(Index row, Index column, Layer layer, TileUpdateContext context) {
 		const auto &tileset = getTileset();
 		const Position position(row, column);
 
@@ -862,7 +862,7 @@ namespace Game3 {
 			tileProvider.findPathState(position, &path_lock) = isWalkable(row, column, tileset);
 		}
 
-		updateNeighbors(position, layer);
+		updateNeighbors(position, layer, context);
 	}
 
 	Realm::ChunkPackets Realm::getChunkPackets(ChunkPosition chunk_position) {
@@ -1184,15 +1184,14 @@ namespace Game3 {
 		}
 	}
 
-	void Realm::autotile(const Position &position, Layer layer) {
+	void Realm::autotile(const Position &position, Layer layer, TileUpdateContext context) {
 		const Tileset &tileset = getTileset();
 		const TileID tile = tileProvider.copyTile(layer, position, TileProvider::TileMode::ReturnEmpty);
-		const auto &tilename = tileset[tile];
+		const Identifier &tilename = tileset[tile];
 
 		if (const MarchableInfo *info = tileset.getMarchableInfo(tilename)) {
-			const auto &members = info->autotileSet->members;
-
-			TileID march_result;
+			const std::unordered_set<Identifier> &members = info->autotileSet->members;
+			TileID march_result{};
 
 			if (info->autotileSet->omni) {
 				const TileID empty = tileset.getEmptyID();
@@ -1216,7 +1215,7 @@ namespace Game3 {
 			const TileID marched = tileset[info->start] + (info->tall? 2 * march_result : march_result);
 
 			if (marched != tile) {
-				setTile(layer, position, marched, true);
+				setTile(layer, position, marched, true, context);
 				threadContext.updatedLayers.insert(layer);
 			}
 		}

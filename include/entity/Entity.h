@@ -11,7 +11,6 @@
 #include "game/Agent.h"
 #include "game/ChunkPosition.h"
 #include "game/HasInventory.h"
-#include "game/MovementContext.h"
 #include "item/Item.h"
 #include "threading/Atomic.h"
 #include "threading/HasMutex.h"
@@ -19,6 +18,7 @@
 #include "threading/LockableSharedPtr.h"
 #include "threading/LockableWeakPtr.h"
 #include "threading/SharedRecursiveMutex.h"
+#include "types/MovementContext.h"
 #include "ui/Modifiers.h"
 
 #include <atomic>
