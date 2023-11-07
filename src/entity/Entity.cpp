@@ -538,6 +538,9 @@ namespace Game3 {
 		else if (context.clearOffset)
 			offset = Offset{0.f, 0.f, offset.z};
 
+		if (context.facingDirection)
+			direction = *context.facingDirection;
+
 		if (is_server)
 			increaseUpdateCounter();
 

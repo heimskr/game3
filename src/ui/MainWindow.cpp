@@ -858,23 +858,23 @@ namespace Game3 {
 						game->player->getInventory(0)->setActive(keyval == GDK_KEY_0? 9 : keyval - 0x31);
 					return;
 			}
-		}
 
-		switch (keyval) {
-			case GDK_KEY_Down:
-				game->player->face(Direction::Down);
-				break;
-			case GDK_KEY_Up:
-				game->player->face(Direction::Up);
-				break;
-			case GDK_KEY_Left:
-				game->player->face(Direction::Left);
-				break;
-			case GDK_KEY_Right:
-				game->player->face(Direction::Right);
-				break;
-			default:
-				break;
+			switch (keyval) {
+				case GDK_KEY_Down:
+					game->player->face(Direction::Down);
+					break;
+				case GDK_KEY_Up:
+					game->player->face(Direction::Up);
+					break;
+				case GDK_KEY_Left:
+					game->player->face(Direction::Left);
+					break;
+				case GDK_KEY_Right:
+					game->player->face(Direction::Right);
+					break;
+				default:
+					break;
+			}
 		}
 
 		if (!autofocus) {
