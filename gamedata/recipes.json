@@ -101,17 +101,17 @@
 			}],
 			["base:registry/crafting_recipe", {
 				"input": [["base:item/gold_bar", 1]],
-				"output": [["base:item/energy_pipe", 2]],
+				"output": [["base:item/energy_pipe", 8]],
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
 				"input": [["base:item/copper_bar", 1]],
-				"output": [["base:item/fluid_pipe", 2]],
+				"output": [["base:item/fluid_pipe", 8]],
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
 				"input": [["base:item/iron_bar", 1]],
-				"output": [["base:item/item_pipe", 2]],
+				"output": [["base:item/item_pipe", 8]],
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
@@ -157,6 +157,42 @@
 			["base:registry/crafting_recipe", {
 				"input": [["base:item/electronics", 1], ["base:item/wood", 4]],
 				"output": [["base:item/electric_guitar", 1]]
+			}],
+			["base:registry/crafting_recipe", {
+				"input": [["base:item/electronics", 4], ["base:item/iron_bar", 16]],
+				"output": [["base:item/dissolver", 1]]
+			}],
+			["base:registry/crafting_recipe", {
+				"input": [["base:item/electronics", 4], ["base:item/gold_bar", 16]],
+				"output": [["base:item/combiner", 1]]
+			}],
+			["base:registry/crafting_recipe", {
+				"input": [["base:item/electronics", 8], ["base:item/iron_bar", 20], ["base:item/gold_bar", 20], ["base:item/diamond", 4], ["base:item/chemical", 64, {"formula": "U"}]],
+				"output": [["base:item/autocrafter", 1]]
+			}],
+			["base:registry/crafting_recipe", {
+				"input": [["base:item/electronics", 4], ["base:item/iron_bar", 16], ["base:item/gold_bar", 16], ["base:item/copper_bar", 16], ["base:item/chemical", 32, {"formula": "U"}]],
+				"output": [["base:item/centrifuge", 1]]
+			}],
+			["base:registry/crafting_recipe", {
+				"input": [["base:item/electronics", 8], ["base:item/iron_bar", 20], ["base:item/diamond", 2]],
+				"output": [["base:item/chemical_reactor", 1]]
+			}],
+			["base:registry/crafting_recipe", {
+				"input": [["base:item/iron_bar", 4], ["base:item/copper_bar", 4], ["base:item/glass", 4]],
+				"output": [["base:item/tank", 1]]
+				}],
+			["base:registry/crafting_recipe", {
+				"input": [["base:item/iron_bar", 4], ["base:item/copper_bar", 8]],
+				"output": [["base:item/pump", 1]]
+			}],
+			["base:registry/crafting_recipe", {
+				"input": [["base:item/lava_flask", 4], ["base:item/diamond", 1], ["base:item/iron_bar", 4]],
+				"output": [["base:item/geothermal_generator", 1]]
+			}],
+			["base:registry/crafting_recipe", {
+				"input": [["base:item/electronics", 4], ["base:item/gold_bar", 8], ["base:item/copper_bar", 8]],
+				"output": [["base:item/autofarmer", 1]]
 			}],
 			["base:registry/crafting_recipe", {
 				"input": [["base:item/stone", 8], ["base:item/iron_bar", 1]],
