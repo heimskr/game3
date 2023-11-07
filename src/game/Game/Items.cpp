@@ -181,7 +181,7 @@ namespace Game3 {
 
 		add(Furniture::createStation("base:item/furnace",       "Furnace",        12, "base:tile/furnace",           "base:station/furnace"));
 		add(Furniture::createStation("base:item/anvil",         "Anvil",         150, "base:tile/anvil",             "base:station/anvil"));
-		add(Furniture::createStation("base:item/cauldron",      "Cauldron",      175, "base:tile/red_cauldron_full", "base:station/cauldron"));
+		add(Furniture::createStation("base:item/cauldron",      "Cauldron",      175, "base:tile/cauldron_red_full", "base:station/cauldron"));
 		add(Furniture::createStation("base:item/purifier",      "Purifier",      300, "base:tile/purifier",          "base:station/purifier"));
 		add(Furniture::createStation("base:item/millstone",     "Millstone",      20, "base:tile/millstone",         "base:station/millstone"));
 		add(Furniture::createStation("base:item/cutting_board", "Cutting Board",  30, "base:tile/cutting_board",     "base:station/cutting_board"));
