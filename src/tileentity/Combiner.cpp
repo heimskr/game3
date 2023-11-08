@@ -32,11 +32,11 @@ namespace Game3 {
 	Combiner::Combiner(Position position_):
 		Combiner("base:tile/combiner"_id, position_) {}
 
-	bool Combiner::mayInsertItem(const ItemStack &stack, Direction, Slot slot) {
+	bool Combiner::mayInsertItem(const ItemStack &, Direction, Slot slot) {
 		if (slot != Slot(-1) && slot >= Slot(INPUT_CAPACITY))
 			return false;
 
-		return std::dynamic_pointer_cast<ChemicalItem>(stack.item) != nullptr;
+		return true;
 	}
 
 	bool Combiner::mayExtractItem(Direction, Slot slot) {
