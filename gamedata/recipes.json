@@ -195,6 +195,10 @@
 				"output": [["base:item/autofarmer", 1]]
 			}],
 			["base:registry/crafting_recipe", {
+				"input": [["base:item/furnace", 1], ["base:item/electronics", 1], ["base:item/iron_bar", 8]],
+				"output": [["base:item/incinerator", 1]]
+			}],
+			["base:registry/crafting_recipe", {
 				"input": [["base:item/stone", 8], ["base:item/iron_bar", 1]],
 				"output": [["base:item/sink", 1]]
 			}],
@@ -388,6 +392,7 @@
 				"input":  ["base:fluid/lava", 1000],
 				"output": [
 					[1.0, ["base:item/stone", 1]],
+					[0.4, ["base:item/copper_ore", 1]],
 					[0.3, ["base:item/iron_ore", 1]],
 					[0.2, ["base:item/gold_ore", 1]],
 					[0.1, ["base:item/diamond_ore", 1]]

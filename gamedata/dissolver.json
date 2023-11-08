@@ -134,7 +134,7 @@
 			"base:item/dough":            ["+", "(C6H10O5)(H2O)", "C12H22O11"],
 			"base:item/eggplant":         "base:item/protein",
 			"base:item/eggplant_seeds":   "base:item/protein",
-			"base:item/silicon":          [10, "Si"],
+			"base:item/silicon":          [2, "Si"],
 			"base:item/electronics":      ["+", [4, "Fe"], [40, "Si"], "C8"],
 			"base:item/electric_guitar":  ["+", [4, "Fe"], [40, "Si"], "C8", [4, "C12H20O10"]],
 			"base:item/item_pipe":        [2, "Fe"],
