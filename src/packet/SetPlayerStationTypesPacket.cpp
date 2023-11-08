@@ -9,14 +9,14 @@
 namespace Game3 {
 	void SetPlayerStationTypesPacket::handle(ClientGame &game) {
 		game.player->stationTypes = std::move(stationTypes);
-		auto tab = game.getWindow().craftingTab;
-		tab->reset(std::static_pointer_cast<ClientGame>(game.shared_from_this()));
-		if (focus) {
-			tab->show();
-		} else {
-			MainWindow &window = game.getWindow();
-			if (window.getActiveTab() == tab)
+		MainWindow &window = game.getWindow();
+		window.queue([&window, &game, focus = focus] {
+			auto tab = window.craftingTab;
+			tab->reset(std::static_pointer_cast<ClientGame>(game.shared_from_this()));
+			if (focus)
+				tab->show();
+			else if (window.getActiveTab() == tab)
 				window.inventoryTab->show();
-		}
+		});
 	}
 }

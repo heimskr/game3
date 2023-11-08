@@ -22,22 +22,13 @@ namespace Game3 {
 	}
 
 	bool CraftingStation::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers modifiers) {
+		if (player->getSide() != Side::Server)
+			return false;
+
 		if (modifiers.onlyAlt()) {
-			if (player->getSide() == Side::Server) {
-				getRealm()->queueDestruction(getSelf());
-				if (itemName)
-					player->give(ItemStack(getGame(), itemName));
-			}
-		} else if (player->getSide() == Side::Client) {
-			auto &game = getRealm()->getGame().toClient();
-			auto tab = game.canvas.window.craftingTab;
-			tab->reset(game.toClientPointer());
-			tab->show();
-			player->queueForMove([&game, tab, station_type = stationType](const auto &) {
-				tab->reset(game.toClientPointer());
-				game.getWindow().inventoryTab->show();
-				return true;
-			});
+			getRealm()->queueDestruction(getSelf());
+			if (itemName)
+				player->give(ItemStack(getGame(), itemName));
 		} else {
 			player->addStationType(stationType);
 			player->queueForMove([station_type = stationType](const EntityPtr &player) {
