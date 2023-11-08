@@ -168,7 +168,7 @@ namespace Game3 {
 			current_energy = energyContainer->energy;
 		}
 
-		if (operations * ENERGY_PER_OPERATION <= current_energy)
+		if (ENERGY_PER_OPERATION <= current_energy)
 			if (autofarm(center + centerOffset, input_empty))
 				++operations;
 
