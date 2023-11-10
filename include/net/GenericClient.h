@@ -3,6 +3,7 @@
 #include "net/SendBuffer.h"
 #include "threading/Lockable.h"
 
+#include <condition_variable>
 #include <cstddef>
 #include <memory>
 #include <string>
@@ -23,14 +24,14 @@ namespace Game3 {
 			std::mutex networkMutex;
 			asio::ssl::stream<asio::ip::tcp::socket> socket;
 			asio::io_context::strand strand;
-			Lockable<std::deque<std::string>> outbox;
+			Lockable<std::deque<std::string>, std::shared_mutex> outbox;
 
 			GenericClient() = delete;
 			GenericClient(const GenericClient &) = delete;
 			GenericClient(GenericClient &&) = delete;
 			GenericClient(Server &server_, std::string_view ip_, int id_, asio::ip::tcp::socket &&socket_);
 
-			virtual ~GenericClient() = default;
+			virtual ~GenericClient();
 
 			GenericClient & operator=(const GenericClient &) = delete;
 			GenericClient & operator=(GenericClient &&) = delete;
@@ -50,6 +51,10 @@ namespace Game3 {
 			size_t bufferSize;
 			std::unique_ptr<char[]> buffer;
 			bool closed = false;
+
+			std::atomic_bool writing = false;
+			std::condition_variable writeCV;
+			std::mutex writeMutex;
 
 			void write();
 			void writeHandler(const asio::error_code &, size_t);

@@ -12,12 +12,23 @@ namespace Game3 {
 		bufferSize(server_.getChunkSize()),
 		buffer(std::make_unique<char[]>(bufferSize)) {}
 
+	GenericClient::~GenericClient() {
+		{
+			auto lock = outbox.uniqueLock();
+			outbox.clear();
+		}
+
+		std::unique_lock lock(writeMutex);
+		writeCV.wait(lock, [this] { return !writing.load(); });
+	}
+
 	void GenericClient::start() {
 		doHandshake();
 	}
 
 	void GenericClient::queue(std::string message) {
 		{
+			writing = true;
 			auto lock = outbox.uniqueLock();
 			outbox.push_back(std::move(message));
 			if (1 < outbox.size())
@@ -28,7 +39,7 @@ namespace Game3 {
 	}
 
 	void GenericClient::write() {
-		auto lock = outbox.sharedLock();
+		auto lock = outbox.uniqueLock();
 		const std::string &message = outbox.front();
 		asio::async_write(socket, asio::buffer(message), strand.wrap(std::bind(&GenericClient::writeHandler, this, std::placeholders::_1, std::placeholders::_2)));
 	}
@@ -46,7 +57,10 @@ namespace Game3 {
 			return;
 		}
 
-		if (!empty)
+		if (empty) {
+			writing = false;
+			writeCV.notify_all();
+		} else
 			write();
 	}
 
