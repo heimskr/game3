@@ -62,7 +62,7 @@ namespace Game3 {
 			return;
 		}
 
-		std::weak_ptr weak_client(client.shared_from_this());
+		std::weak_ptr weak_client(std::static_pointer_cast<RemoteClient>(client.shared_from_this()));
 
 		client.strand.post([this, weak_client, message = std::move(message)]() mutable {
 			if (std::shared_ptr<RemoteClient> client = weak_client.lock())
@@ -177,7 +177,7 @@ namespace Game3 {
 		auto player = client.getPlayer();
 		auto realm = player->getRealm();
 		INFO("Setting up player");
-		player->weakClient = client.shared_from_this();
+		player->weakClient = std::static_pointer_cast<RemoteClient>(client.shared_from_this());
 		player->notifyOfRealm(*realm);
 		auto guard = client.bufferGuard();
 		client.send(SelfTeleportedPacket(realm->id, player->getPosition()));

@@ -18,8 +18,7 @@ namespace Game3 {
 			outbox.clear();
 		}
 
-		std::unique_lock lock(writeMutex);
-		writeCV.wait(lock, [this] { return !writing.load(); });
+		INFO("\e[31m~GenericClient\e[39m(" << this << ")");
 	}
 
 	void GenericClient::start() {
@@ -28,7 +27,6 @@ namespace Game3 {
 
 	void GenericClient::queue(std::string message) {
 		{
-			writing = true;
 			auto lock = outbox.uniqueLock();
 			outbox.push_back(std::move(message));
 			if (1 < outbox.size())
@@ -41,7 +39,9 @@ namespace Game3 {
 	void GenericClient::write() {
 		auto lock = outbox.uniqueLock();
 		const std::string &message = outbox.front();
-		asio::async_write(socket, asio::buffer(message), strand.wrap(std::bind(&GenericClient::writeHandler, this, std::placeholders::_1, std::placeholders::_2)));
+		asio::async_write(socket, asio::buffer(message), strand.wrap([shared = shared_from_this()](const asio::error_code &errc, size_t size) {
+			shared->writeHandler(errc, size);
+		}));
 	}
 
 	void GenericClient::writeHandler(const asio::error_code &errc, size_t) {
@@ -57,15 +57,12 @@ namespace Game3 {
 			return;
 		}
 
-		if (empty) {
-			writing = false;
-			writeCV.notify_all();
-		} else
+		if (!empty)
 			write();
 	}
 
 	void GenericClient::doHandshake() {
-		socket.async_handshake(asio::ssl::stream_base::server, [this](const asio::error_code &errc) {
+		socket.async_handshake(asio::ssl::stream_base::server, [this, shared = shared_from_this()](const asio::error_code &errc) {
 			if (errc) {
 				ERROR("Client handshake (" << ip << "): " << errc.message());
 				return;
@@ -78,7 +75,7 @@ namespace Game3 {
 
 	void GenericClient::doRead() {
 		asio::post(strand, [this] {
-			socket.async_read_some(asio::buffer(buffer.get(), bufferSize), asio::bind_executor(strand, [this](const asio::error_code &errc, size_t length) {
+			socket.async_read_some(asio::buffer(buffer.get(), bufferSize), asio::bind_executor(strand, [this, shared = shared_from_this()](const asio::error_code &errc, size_t length) {
 				if (errc) {
 					if (errc.value() != 1) // "stream truncated"
 						ERROR("Client read (" << ip << "): " << errc.message() << " (" << errc << ')');

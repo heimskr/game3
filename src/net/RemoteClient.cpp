@@ -85,7 +85,7 @@ namespace Game3 {
 
 				assert(receiveBuffer.empty());
 				receiveBuffer.clear();
-				server.game->queuePacket(shared_from_this(), packet);
+				server.game->queuePacket(std::static_pointer_cast<RemoteClient>(shared_from_this()), packet);
 				state = State::Begin;
 			}
 		}
@@ -129,7 +129,7 @@ namespace Game3 {
 		} catch (const std::out_of_range &) {
 			if (!can_request)
 				throw;
-			realm.requestChunk(chunk_position, shared_from_this());
+			realm.requestChunk(chunk_position, std::static_pointer_cast<RemoteClient>(shared_from_this()));
 		}
 	}
 
@@ -177,7 +177,7 @@ namespace Game3 {
 
 		auto &clients = server.getClients();
 		auto lock = clients.uniqueLock();
-		clients.erase(shared_from_this());
+		clients.erase(std::static_pointer_cast<RemoteClient>(shared_from_this()));
 	}
 
 	void RemoteClient::mock() {

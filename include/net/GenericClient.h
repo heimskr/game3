@@ -15,7 +15,7 @@ namespace Game3 {
 	class Packet;
 	class Server;
 
-	class GenericClient {
+	class GenericClient: public std::enable_shared_from_this<GenericClient> {
 		public:
 			Server &server;
 			int id = -1;
@@ -51,10 +51,6 @@ namespace Game3 {
 			size_t bufferSize;
 			std::unique_ptr<char[]> buffer;
 			bool closed = false;
-
-			std::atomic_bool writing = false;
-			std::condition_variable writeCV;
-			std::mutex writeMutex;
 
 			void write();
 			void writeHandler(const asio::error_code &, size_t);

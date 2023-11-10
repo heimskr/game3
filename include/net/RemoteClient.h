@@ -11,13 +11,13 @@ namespace Game3 {
 	class ServerPlayer;
 	struct ChunkPosition;
 
-	class RemoteClient: public GenericClient, public std::enable_shared_from_this<RemoteClient> {
+	class RemoteClient: public GenericClient {
 		public:
 			struct BufferGuard {
 				std::weak_ptr<RemoteClient> parent;
 
 				BufferGuard(RemoteClient &parent_):
-					BufferGuard(parent_.shared_from_this()) {}
+					BufferGuard(std::static_pointer_cast<RemoteClient>(parent_.shared_from_this())) {}
 
 				BufferGuard(const std::shared_ptr<RemoteClient> &parent_): parent(parent_) {
 					parent_->startBuffering();
