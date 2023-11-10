@@ -157,7 +157,7 @@ namespace Game3 {
 		const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
 
 		Timer timer{"FluidVBOInit"};
-		vbo.init<float, 4>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, chunk_x = chunk_x, chunk_y = chunk_y, &game, set_width, divisor, t_size, missing](size_t x, size_t y) {
+		vbo.init<float, 4>(CHUNK_SIZE, CHUNK_SIZE, GL_DYNAMIC_DRAW, [this, chunk_x = chunk_x, chunk_y = chunk_y, &game, set_width, divisor, t_size, missing](size_t x, size_t y) {
 			const auto fluid_opt = realm->tileProvider.copyFluidTile({
 				Index(y) + CHUNK_SIZE * (chunk_y + 1), // why `+ 1`?
 				Index(x) + CHUNK_SIZE * (chunk_x + 1)  // here too

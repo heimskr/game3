@@ -75,11 +75,11 @@ namespace Game3 {
 		const auto x = (cachedTile % (texture->width / tilesize)) * tilesize;
 		const auto y = (cachedTile / (texture->width / tilesize)) * tilesize;
 
-		sprite_renderer(*texture, {
+		sprite_renderer(texture, {
 			.x = float(position.column),
 			.y = float(position.row),
-			.xOffset = x / 2.f,
-			.yOffset = y / 2.f,
+			.offsetX = x / 2.f,
+			.offsetY = y / 2.f,
 			.sizeX = float(tilesize),
 			.sizeY = float(tilesize),
 		});
@@ -100,11 +100,11 @@ namespace Game3 {
 		const auto x = (cachedUpperTile % (texture->width / tilesize)) * tilesize;
 		const auto y = (cachedUpperTile / (texture->width / tilesize)) * tilesize;
 
-		sprite_renderer(*texture, {
+		sprite_renderer(texture, {
 			.x = float(position.column),
 			.y = float(position.row - 1),
-			.xOffset = x / 2.f,
-			.yOffset = y / 2.f,
+			.offsetX = x / 2.f,
+			.offsetY = y / 2.f,
 			.sizeX = float(tilesize),
 			.sizeY = float(tilesize),
 		});

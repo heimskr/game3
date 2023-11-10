@@ -4,6 +4,8 @@
 
 #include "graphics/Shader.h"
 
+#include <map>
+
 namespace GL {
 	class Texture;
 }
@@ -15,14 +17,14 @@ namespace Game3 {
 	struct RenderOptions {
 		double x = 0.f;
 		double y = 0.f;
-		double xOffset = 0.f;
-		double yOffset = 0.f;
+		double offsetX = 0.f;
+		double offsetY = 0.f;
 		double sizeX = 16.f;
 		double sizeY = 16.f;
 		double scaleX = 1.f;
 		double scaleY = 1.f;
 		double angle = 0.f;
-		double alpha = 1.f;
+		Color color{1.f, 1.f, 1.f, 1.f};
 		bool hackY = true;
 		bool invertY = true;
 	};
@@ -39,42 +41,53 @@ namespace Game3 {
 
 			SpriteRenderer(Canvas &);
 			SpriteRenderer(const SpriteRenderer &) = delete;
-			SpriteRenderer(SpriteRenderer &&);
+			SpriteRenderer(SpriteRenderer &&) = delete;
 
 			~SpriteRenderer();
 
 			SpriteRenderer & operator=(const SpriteRenderer &) = delete;
-			SpriteRenderer & operator=(SpriteRenderer &&);
+			SpriteRenderer & operator=(SpriteRenderer &&) = delete;
 
 			void remove();
-			void update(int backbuffer_width, int backbuffer_height);
+			void update(const Canvas &);
 
-			void drawOnMap(Texture &, double x, double y, double scale = 1.f, double angle = 0.f, double alpha = 1.f);
-			void drawOnMap(Texture &, RenderOptions = {});
-			void drawOnMap(GL::Texture &, RenderOptions = {});
-
-			void drawOnScreen(Texture &, double x, double y, double scale = 1.f, double angle = 0.f, double alpha = 1.f);
-			void drawOnScreen(Texture &, RenderOptions = {});
-			void drawOnScreen(GL::Texture &, RenderOptions = {});
-
-			// void drawOnMap(Texture &, double x, double y, double x_offset, double y_offset, double size_x, double size_y, double scale = 1.f, double angle = 0.f, double alpha = 1.f);
-			// void drawOnMap(GL::Texture &, double x, double y, double x_offset, double y_offset, double size_x, double size_y, double scale = 1.f, double angle = 0.f, double alpha = 1.f);
-			// void drawOnScreen(Texture &, double x, double y, double x_offset, double y_offset, double size_x, double size_y, double scale = 1.f, double angle = 0.f, double alpha = 1.f);
-			// void drawOnScreen(GL::Texture &, double x, double y, double x_offset, double y_offset, double size_x, double size_y, double scale = 1.f, double angle = 0.f, double alpha = 1.f);
+			void drawOnMap(const std::shared_ptr<Texture> &, double x, double y, double scale = 1.f, double angle = 0.f, double alpha = 1.f);
+			void drawOnMap(const std::shared_ptr<Texture> &, RenderOptions = {});
 
 			template <typename T>
 			void operator()(T &texture, RenderOptions options) {
 				drawOnMap(texture, std::move(options));
 			}
 
+			void renderNow();
+
 			void reset();
 
 		private:
 			GLuint quadVAO = 0;
 			bool initialized = false;
+			double canvasScale = -1.;
+
+			struct BatchItem {
+				std::shared_ptr<Texture> texture;
+				RenderOptions options;
+			};
+
+			struct Atlas {
+				std::shared_ptr<Texture> texture;
+				GL::VBO vbo;
+				GL::FloatVAO vao;
+			};
+
+			std::vector<BatchItem> batchItems;
+			std::map<GLuint, Atlas> atlases;
 
 			void initRenderData();
-			void setupShader(int texture_width, int texture_height, const RenderOptions &);
-			void hackY(double &y, double y_offset, double scale);
+			void flush(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &);
+			double hackY(double y, double y_offset, double scale);
+			void draw(const Atlas &atlas);
+
+			Atlas generateAtlas(std::shared_ptr<Texture>, const std::vector<const RenderOptions *> &);
+			std::vector<float> generateData(std::shared_ptr<Texture>, const std::vector<const RenderOptions *> &);
 	};
 }

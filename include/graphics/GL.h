@@ -169,7 +169,9 @@ namespace GL {
 
 	class VBO {
 		public:
-			VBO(GLuint handle_ = 0): handle(handle_) {}
+			VBO(): handle(0) {}
+
+			VBO(GLuint handle_): handle(handle_) {}
 
 			template <typename... Args>
 			VBO(Args &&...args) {
@@ -177,15 +179,26 @@ namespace GL {
 			}
 
 			VBO(const VBO &) = delete;
-			VBO(VBO &&) = delete;
+			VBO(VBO &&other): handle(other.handle) {
+				other.handle = 0;
+			}
 
 			VBO & operator=(const VBO &) = delete;
-			VBO & operator=(VBO &&) = delete;
+			VBO & operator=(VBO &&other) {
+				handle = other.handle;
+				other.handle = 0;
+				return *this;
+			}
 
 			template <typename T>
 			void init(const T *data, size_t count, GLenum usage) {
 				reset();
 				handle = makeBufferObject(GL_ARRAY_BUFFER, data, count, usage);
+			}
+
+			template <typename T>
+			void update(const std::vector<T> &data, bool sub = true, GLenum usage = GL_DYNAMIC_DRAW) {
+				update(data.data(), sizeof(T) * data.size(), sub, usage);
 			}
 
 			template <typename T, size_t N>
@@ -217,10 +230,24 @@ namespace GL {
 
 		protected:
 			GLuint handle = 0;
+
+			void update(const void *, GLsizeiptr, bool sub = true, GLenum usage = GL_DYNAMIC_DRAW);
 	};
 
 	class VAO {
 		public:
+			VAO(const VAO &) = delete;
+			VAO(VAO &&other): handle(other.handle) {
+				other.handle = 0;
+			}
+
+			VAO & operator=(const VAO &) = delete;
+			VAO & operator=(VAO &&other) {
+				handle = other.handle;
+				other.handle = 0;
+				return *this;
+			}
+
 			~VAO() {
 				reset();
 			}
@@ -245,12 +272,6 @@ namespace GL {
 		protected:
 			GLuint handle = 0;
 			VAO(GLuint handle_ = 0): handle(handle_) {}
-
-			VAO(const VAO &) = delete;
-			VAO(VAO &&) = delete;
-
-			VAO & operator=(const VAO &) = delete;
-			VAO & operator=(VAO &&) = delete;
 	};
 
 	class FloatVAO: public VAO {

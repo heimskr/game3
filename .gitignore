@@ -30,7 +30,6 @@
 /vcpkg_installed
 /build
 /builddir
-/_build
 /src/resgen
 *~
 /*.flatpak
@@ -44,3 +43,4 @@ pvs-analysis.log
 /core.*
 vgcore.*
 /*.core
+/_*

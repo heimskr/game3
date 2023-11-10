@@ -200,8 +200,8 @@ namespace Game3 {
 			struct Held {
 				Slot slot = -1;
 				bool isLeft;
-				float xOffset = 0.f;
-				float yOffset = 0.f;
+				float offsetX = 0.f;
+				float offsetY = 0.f;
 				std::shared_ptr<Texture> texture;
 				Held() = delete;
 				Held(bool is_left): isLeft(is_left) {}

@@ -27,18 +27,18 @@ namespace Game3 {
 		initRenderData();
 	}
 
-	SpriteRenderer::SpriteRenderer(SpriteRenderer &&other): SpriteRenderer(*other.canvas) {
-		other.canvas = nullptr;
-		shader = std::move(other.shader);
-		quadVAO = other.quadVAO;
-		initialized = other.initialized;
-		backbufferWidth = other.backbufferWidth;
-		backbufferHeight = other.backbufferHeight;
-		other.quadVAO = 0;
-		other.initialized = false;
-		other.backbufferWidth = -1;
-		other.backbufferHeight = -1;
-	}
+	// SpriteRenderer::SpriteRenderer(SpriteRenderer &&other): SpriteRenderer(*other.canvas) {
+	// 	other.canvas = nullptr;
+	// 	shader = std::move(other.shader);
+	// 	quadVAO = other.quadVAO;
+	// 	initialized = other.initialized;
+	// 	backbufferWidth = other.backbufferWidth;
+	// 	backbufferHeight = other.backbufferHeight;
+	// 	other.quadVAO = 0;
+	// 	other.initialized = false;
+	// 	other.backbufferWidth = -1;
+	// 	other.backbufferHeight = -1;
+	// }
 
 	SpriteRenderer::~SpriteRenderer() {
 		remove();
@@ -52,23 +52,27 @@ namespace Game3 {
 		}
 	}
 
-	SpriteRenderer & SpriteRenderer::operator=(SpriteRenderer &&other) {
-		canvas = other.canvas;
-		other.canvas = nullptr;
-		shader.reset();
-		shader = std::move(other.shader);
-		quadVAO = other.quadVAO;
-		initialized = other.initialized;
-		backbufferWidth = other.backbufferWidth;
-		backbufferHeight = other.backbufferHeight;
-		other.quadVAO = 0;
-		other.initialized = false;
-		other.backbufferWidth = -1;
-		other.backbufferHeight = -1;
-		return *this;
-	}
+	// SpriteRenderer & SpriteRenderer::operator=(SpriteRenderer &&other) {
+	// 	canvas = other.canvas;
+	// 	other.canvas = nullptr;
+	// 	shader.reset();
+	// 	shader = std::move(other.shader);
+	// 	quadVAO = other.quadVAO;
+	// 	initialized = other.initialized;
+	// 	backbufferWidth = other.backbufferWidth;
+	// 	backbufferHeight = other.backbufferHeight;
+	// 	other.quadVAO = 0;
+	// 	other.initialized = false;
+	// 	other.backbufferWidth = -1;
+	// 	other.backbufferHeight = -1;
+	// 	return *this;
+	// }
 
-	void SpriteRenderer::update(int backbuffer_width, int backbuffer_height) {
+	void SpriteRenderer::update(const Canvas &canvas) {
+		const int backbuffer_width  = canvas.width();
+		const int backbuffer_height = canvas.height();
+		const double scale = canvas.scale;
+
 		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
 			backbufferWidth = backbuffer_width;
 			backbufferHeight = backbuffer_height;
@@ -76,25 +80,32 @@ namespace Game3 {
 			shader.bind();
 			shader.set("projection", projection);
 		}
+
+		if (scale != canvasScale) {
+			canvasScale = scale;
+		}
 	}
 
-	void SpriteRenderer::drawOnMap(Texture &texture, double x, double y, double scale, double angle, double alpha) {
+	void SpriteRenderer::drawOnMap(const std::shared_ptr<Texture> &texture, double x, double y, double scale, double angle, double alpha) {
 		drawOnMap(texture, RenderOptions {
 			.x = x,
 			.y = y,
-			.sizeX = double(texture.width),
-			.sizeY = double(texture.height),
+			.sizeX = double(texture->width),
+			.sizeY = double(texture->height),
 			.scaleX = scale,
 			.scaleY = scale,
 			.angle = angle,
-			.alpha = alpha
+			.color = {1.f, 1.f, 1.f, float(alpha)}
 		});
 	}
 
-	void SpriteRenderer::drawOnMap(Texture &texture, RenderOptions options) {
+	void SpriteRenderer::drawOnMap(const std::shared_ptr<Texture> &texture, RenderOptions options) {
 		if (!initialized)
 			return;
 
+		batchItems.emplace_back(texture, options);
+
+		/*
 		if (options.sizeX < 0)
 			options.sizeX = texture.width;
 		if (options.sizeY < 0)
@@ -121,7 +132,7 @@ namespace Game3 {
 
 		glm::mat4 model = glm::mat4(1.);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(options.x - options.xOffset * canvas->scale * options.scaleX, options.y - options.yOffset * canvas->scale * options.scaleY, 0.));
+		model = glm::translate(model, glm::vec3(options.x - options.offsetX * canvas->scale * options.scaleX, options.y - options.offsetY * canvas->scale * options.scaleY, 0.));
 		model = glm::translate(model, glm::vec3(.5 * texture.width, .5 * texture.height, 0.)); // move origin of rotation to center of quad
 		model = glm::rotate(model, float(glm::radians(options.angle)), glm::vec3(0., 0., 1.)); // then rotate
 		model = glm::translate(model, glm::vec3(-.5 * texture.width, -.5 * texture.height, 0.)); // move origin back
@@ -130,7 +141,7 @@ namespace Game3 {
 		shader.set("model", model);
 		shader.set("spriteColor", 1., 1., 1., options.alpha);
 		const double multiplier = 2. / texture.width;
-		shader.set("texturePosition", options.xOffset * multiplier, options.yOffset * multiplier, options.sizeX / texture.width, options.sizeY / texture.width);
+		shader.set("texturePosition", options.offsetX * multiplier, options.offsetY * multiplier, options.sizeX / texture.width, options.sizeY / texture.width);
 		// shader.set("divisor", divisor);
 
 		glActiveTexture(GL_TEXTURE0);
@@ -141,117 +152,33 @@ namespace Game3 {
 		glBindVertexArray(quadVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindVertexArray(0);
+		*/
 	}
 
-	void SpriteRenderer::drawOnMap(GL::Texture &texture, RenderOptions options) {
-		if (!initialized)
+	void SpriteRenderer::renderNow() {
+		if (!initialized || batchItems.empty())
 			return;
 
-		const auto texture_width = texture.getWidth();
-		const auto texture_height = texture.getHeight();
+		std::shared_ptr<Texture> last_texture = batchItems.front().texture;
 
-		if (options.sizeX < 0)
-			options.sizeX = texture_width;
-		if (options.sizeY < 0)
-			options.sizeY = texture_height;
+		std::vector<const RenderOptions *> buffer;
 
-		TileProvider &provider = canvas->game->activeRealm->tileProvider;
-		TilesetPtr tileset     = provider.getTileset(*canvas->game);
-		const auto tile_size   = tileset->getTileSize();
-		const auto map_length  = CHUNK_SIZE * REALM_DIAMETER;
+		constexpr static size_t BUFFER_CAPACITY = 1024;
 
-		options.x *= tile_size * canvas->scale / 2.;
-		options.y *= tile_size * canvas->scale / 2.;
+		for (const auto &[texture, options]: batchItems) {
+			if (texture != last_texture || buffer.size() >= BUFFER_CAPACITY) {
+				flush(last_texture, buffer);
+				buffer.clear();
+				last_texture = texture;
+			}
 
-		options.x += canvas->width() / 2.;
-		options.x -= map_length * tile_size * canvas->scale / canvas->magic * 2.; // TODO: the math here is a little sus... things might cancel out
-		options.x += centerX * canvas->scale * tile_size / 2.;
+			buffer.push_back(&options);
+		}
 
-		options.y += canvas->height() / 2.;
-		options.y -= map_length * tile_size * canvas->scale / canvas->magic * 2.;
-		options.y += centerY * canvas->scale * tile_size / 2.;
+		if (!buffer.empty())
+			flush(last_texture, buffer);
 
-		shader.bind();
-
-		glm::mat4 model(1.);
-		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(options.x - options.xOffset * canvas->scale * options.scaleX, options.y - options.yOffset * canvas->scale * options.scaleY, 0.));
-		model = glm::translate(model, glm::vec3(.5 * texture_width, .5 * texture_height, 0.)); // move origin of rotation to center of quad
-		model = glm::rotate(model, float(glm::radians(options.angle)), glm::vec3(0., 0., 1.)); // then rotate
-		model = glm::translate(model, glm::vec3(-.5 * texture_width, -.5 * texture_height, 0.)); // move origin back
-		model = glm::scale(model, glm::vec3(texture_width * options.scaleX * canvas->scale / 2., texture_height * options.scaleY * canvas->scale / 2., 2.)); // last scale
-
-		shader.set("model", model);
-		shader.set("spriteColor", 1., 1., 1., options.alpha);
-		const double multiplier = 2. / texture_width;
-		shader.set("texturePosition", options.xOffset * multiplier, options.yOffset * multiplier, options.sizeX / texture_width, options.sizeY / texture_width);
-		// shader.set("divisor", divisor);
-
-		texture.bind(0);
-
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glBindVertexArray(quadVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glBindVertexArray(0);
-	}
-
-	void SpriteRenderer::drawOnScreen(Texture &texture, double x, double y, double scale, double angle, double alpha) {
-		drawOnScreen(texture, RenderOptions {
-			.x = x,
-			.y = y,
-			.sizeX = static_cast<double>(texture.width),
-			.sizeY = static_cast<double>(texture.height),
-			.scaleX = scale,
-			.scaleY = scale,
-			.angle = angle,
-			.alpha = alpha
-		});
-	}
-
-	void SpriteRenderer::drawOnScreen(Texture &texture, RenderOptions options) {
-		if (!initialized)
-			return;
-
-		const auto texture_width  = texture.width;
-		const auto texture_height = texture.height;
-		if (options.hackY)
-			hackY(options.y, options.yOffset, options.scaleY);
-
-		options.sizeX = options.sizeX < 0.? -options.sizeX * texture_width  : options.sizeX;
-		options.sizeY = options.sizeY < 0.? -options.sizeY * texture_height : options.sizeY;
-		setupShader(texture_width, texture_height, options);
-
-		glActiveTexture(GL_TEXTURE0);
-		texture.bind();
-
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glBindVertexArray(quadVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glBindVertexArray(0);
-	}
-
-	void SpriteRenderer::drawOnScreen(GL::Texture &texture, RenderOptions options) {
-		if (!initialized)
-			return;
-
-		const auto texture_width  = texture.getWidth();
-		const auto texture_height = texture.getHeight();
-		if (options.hackY)
-			hackY(options.y, options.yOffset, options.scaleY);
-
-		options.sizeX = options.sizeX < 0.? -options.sizeX * texture_width  : options.sizeX;
-		options.sizeY = options.sizeY < 0.? -options.sizeY * texture_height : options.sizeY;
-		setupShader(texture_width, texture_height, options);
-
-		texture.bind(0);
-
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glBindVertexArray(quadVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glBindVertexArray(0);
+		batchItems.clear();
 	}
 
 	void SpriteRenderer::reset() {
@@ -263,7 +190,7 @@ namespace Game3 {
 		if (initialized)
 			glDeleteVertexArrays(1, &quadVAO);
 
-		unsigned int vbo;
+		GLuint vbo;
 		static const float vertices[] {
 			// pos    // tex
 			0., 1., 0., 1.,
@@ -289,28 +216,83 @@ namespace Game3 {
 		initialized = true;
 	}
 
-	void SpriteRenderer::setupShader(int texture_width, int texture_height, const RenderOptions &options) {
-		glm::mat4 model = glm::mat4(1.);
-		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(options.x * 16.f - options.xOffset * 2. * options.scaleX, options.y * 16.f - options.yOffset * 2. * options.scaleY, 0.0f));
-		if (options.invertY)
-			model = glm::scale(model, glm::vec3(1., -1., 1.));
-		model = glm::translate(model, glm::vec3(.5 * texture_width, .5 * texture_height, 0.0f));
-		model = glm::rotate   (model, float(glm::radians(options.angle)), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::translate(model, glm::vec3(-.5 * texture_width, -.5 * texture_height, 0.0f));
-		model = glm::scale    (model, glm::vec3(texture_width * options.scaleX, texture_height * options.scaleY, 1.0f));
+	void SpriteRenderer::flush(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &options) {
+		Atlas *atlas_ptr = nullptr;
 
+		if (auto iter = atlases.find(texture->id); iter != atlases.end()) {
+			atlas_ptr = &iter->second;
+			std::vector<float> data = generateData(atlas_ptr->texture, options);
+			// INFO("options<" << options.size() << "> → data<" << data.size() << ">");
+			atlas_ptr->vbo.update(data, false);
+		} else
+			atlas_ptr = &(atlases[texture->id] = generateAtlas(texture, options));
+
+		if (!atlas_ptr)
+			throw std::runtime_error("Couldn't find or initialize Atlas in SpriteRenderer::flush");
+
+		Atlas &atlas = *atlas_ptr;
 		shader.bind();
-		shader.set("model", model);
-		shader.set("spriteColor", 1., 1., 1., options.alpha);
-		const double multiplier = 2.;
-		const double multiplier_x = multiplier / texture_width;
-		const double multiplier_y = multiplier / texture_height;
-		shader.set("texturePosition", options.xOffset * multiplier_x, options.yOffset * multiplier_y, options.sizeX / texture_width, options.sizeY / texture_height);
-		// shader.set("divisor", divisor);
+		shader.set("atlasSize", Eigen::Vector2f(atlas.texture->width, atlas.texture->height));
+		glActiveTexture(GL_TEXTURE0);
+		texture->bind(0);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBindVertexArray(atlas.vao.getHandle());
+		glDrawArrays(GL_TRIANGLES, 0, 6 * options.size());
+		glBindVertexArray(0);
 	}
 
-	void SpriteRenderer::hackY(double &y, double yOffset, double scale) {
-		y = backbufferHeight / 16. - y + yOffset / 4. * scale; // Four?!
+	double SpriteRenderer::hackY(double y, double offsetY, double scale) {
+		return backbufferHeight / 16. - y + offsetY / 4. * scale; // Four?!
+	}
+
+	void SpriteRenderer::draw(const Atlas &atlas) {
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBindVertexArray(atlas.vao.getHandle());
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindVertexArray(0);
+	}
+
+	auto SpriteRenderer::generateAtlas(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &options) -> Atlas {
+		Atlas atlas;
+		atlas.texture = texture;
+		std::vector<float> data = generateData(texture, options);
+		atlas.vbo.init(data.data(), data.size(), GL_DYNAMIC_DRAW);
+		atlas.vao.init(atlas.vbo, {2, 2, 2, 2, 1, 1, 4, 4});
+		return atlas;
+	}
+
+	std::vector<float> SpriteRenderer::generateData(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &options) {
+		std::vector<float> data;
+		data.reserve(options.size() * 18);
+
+		const int texture_width  = texture->width;
+		const int texture_height = texture->height;
+
+		for (const RenderOptions *item: options) {
+			for (const auto &[x, y]: std::initializer_list<std::pair<float, float>>{{0.f, 1.f}, {1.f, 0.f}, {0.f, 0.f}, {0.f, 1.f}, {1.f, 1.f}, {1.f, 0.f}}) {
+				data.push_back(x);
+				data.push_back(y);
+				data.push_back(item->x);
+				data.push_back(item->y);
+				data.push_back(item->offsetX);
+				data.push_back(item->offsetY);
+				data.push_back(item->scaleX);
+				data.push_back(item->scaleY);
+				data.push_back(item->invertY? -1.f : 1.f);
+				data.push_back(item->angle);
+				data.push_back(item->color.red);
+				data.push_back(item->color.green);
+				data.push_back(item->color.blue);
+				data.push_back(item->color.alpha);
+				data.push_back(item->offsetX * 2. / texture_width);
+				data.push_back(item->offsetY * 2. / texture_height);
+				data.push_back(item->sizeX / texture_width);
+				data.push_back(item->sizeY / texture_height);
+			}
+		}
+
+		return data;
 	}
 }

@@ -193,17 +193,17 @@ namespace Game3 {
 
 		sprite_renderer.centerX = center.first;
 		sprite_renderer.centerY = center.second;
-		sprite_renderer.update(bb_width, bb_height);
 		sprite_renderer.divisor = outdoors? game_time : 1;
 		text_renderer.centerX = center.first;
 		text_renderer.centerY = center.second;
-		text_renderer.update(bb_width, bb_height);
 
 		{
 			auto lock = tileEntities.sharedLock();
 			for (const auto &[index, tile_entity]: tileEntities)
 				tile_entity->render(sprite_renderer);
 		}
+
+		sprite_renderer.renderNow();
 
 		ChunkRange(client_game.player->getChunk()).iterate([&](ChunkPosition chunk_position) {
 			if (auto entities_in_chunk = getEntities(chunk_position)) {
@@ -215,6 +215,8 @@ namespace Game3 {
 		});
 
 		client_game.player->render(sprite_renderer, text_renderer);
+
+		sprite_renderer.renderNow();
 
 		if (upperRenderers) {
 			for (auto &row: *upperRenderers) {
@@ -230,6 +232,8 @@ namespace Game3 {
 			for (const auto &[index, tile_entity]: tileEntities)
 				tile_entity->renderUpper(sprite_renderer);
 		}
+
+		sprite_renderer.renderNow();
 	}
 
 	void Realm::reupload() {

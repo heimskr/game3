@@ -146,6 +146,11 @@ namespace Game3 {
 		return *this;
 	}
 
+	Shader & Shader::set(const char *uniform_name, const Eigen::Vector2f &vector) {
+		glUniform2f(uniform(uniform_name), vector.x(), vector.y()); CHECKGL
+		return *this;
+	}
+
 	Shader & Shader::set(const char *uniform_name, const Eigen::Vector4f &vector) {
 		glUniform4f(uniform(uniform_name), vector.x(), vector.y(), vector.z(), vector.w()); CHECKGL
 		return *this;

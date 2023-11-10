@@ -8,6 +8,21 @@ namespace GL {
 		}
 	}
 
+	void VBO::update(const void *data, GLsizeiptr size, bool sub, GLenum usage) {
+		if (bind()) {
+			if (sub) {
+				glBufferSubData(GL_ARRAY_BUFFER, 0, size, data); CHECKGL_SET
+				if (gl_err) {
+					GLint64 d = -64;
+					glGetBufferParameteri64v(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &d);
+					INFO("size[" << size << "], d[" << d << "]");
+				}
+			} else {
+				glBufferData(GL_ARRAY_BUFFER, size, data, usage); CHECKGL
+			}
+		}
+	}
+
 	GLuint makeFloatVAO(GLuint vbo, std::initializer_list<int> sizes) {
 		GLuint vao = -1;
 

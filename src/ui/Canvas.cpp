@@ -21,7 +21,7 @@ namespace Game3 {
 			return;
 
 		game->activateContext();
-		spriteRenderer.update(width(), height());
+		spriteRenderer.update(*this);
 		rectangleRenderer.update(width(), height());
 		textRenderer.update(width(), height());
 

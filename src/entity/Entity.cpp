@@ -313,24 +313,24 @@ namespace Game3 {
 		RenderOptions main_options{
 			.x = x,
 			.y = y,
-			.xOffset = texture_x_offset,
-			.yOffset = texture_y_offset,
+			.offsetX = texture_x_offset,
+			.offsetY = texture_y_offset,
 			.sizeX = 16.f,
 			.sizeY = std::min(16.f, renderHeight + 8.f * offset_z),
 		};
 
 		if (!heldLeft && !heldRight) {
-			sprite_renderer(*texture, main_options);
+			sprite_renderer(texture, main_options);
 			return;
 		}
 
 		auto render_held = [&](const Held &held, float x_o, float y_o, bool flip = false, float degrees = 0.f) {
 			if (held) {
-				sprite_renderer(*held.texture, {
+				sprite_renderer(held.texture, {
 					.x = x + x_o,
 					.y = y + y_o,
-					.xOffset = held.xOffset,
-					.yOffset = held.yOffset,
+					.offsetX = held.offsetX,
+					.offsetY = held.offsetY,
 					.sizeX = 16.f,
 					.sizeY = 16.f,
 					.scaleX = .5f * (flip? -1 : 1),
@@ -357,7 +357,7 @@ namespace Game3 {
 				break;
 		}
 
-		sprite_renderer(*texture, main_options);
+		sprite_renderer(texture, main_options);
 
 		switch (direction) {
 			case Direction::Down:
@@ -997,8 +997,8 @@ namespace Game3 {
 		held.slot = new_value;
 		auto item_texture = getGame().registry<ItemTextureRegistry>().at((*inventory)[held.slot]->item->identifier);
 		held.texture = item_texture->getTexture();
-		held.xOffset = item_texture->x / 2.f;
-		held.yOffset = item_texture->y / 2.f;
+		held.offsetX = item_texture->x / 2.f;
+		held.offsetY = item_texture->y / 2.f;
 		return true;
 	}
 

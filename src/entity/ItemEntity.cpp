@@ -29,8 +29,8 @@ namespace Game3 {
 		std::shared_ptr<ItemTexture> item_texture = game.registry<ItemTextureRegistry>().at(stack.item->identifier);
 		texture = stack.getTexture(game);
 		texture->init();
-		xOffset = item_texture->x / 2.f;
-		yOffset = item_texture->y / 2.f;
+		offsetX = item_texture->x / 2.f;
+		offsetY = item_texture->y / 2.f;
 		sizeX = float(item_texture->width);
 		sizeY = float(item_texture->height);
 	}
@@ -59,7 +59,7 @@ namespace Game3 {
 	void ItemEntity::init(Game &game) {
 		Entity::init(game);
 		if (stack.item && getSide() == Side::Client)
-			stack.item->getOffsets(game, texture, xOffset, yOffset);
+			stack.item->getOffsets(game, texture, offsetX, offsetY);
 	}
 
 	void ItemEntity::tick(Game &, float delta) {
@@ -83,11 +83,11 @@ namespace Game3 {
 		const float x = position.column + offset.x;
 		const float y = position.row + offset.y;
 
-		sprite_renderer(*texture, {
+		sprite_renderer(texture, {
 			.x = x + .125f,
 			.y = y + .125f,
-			.xOffset = xOffset,
-			.yOffset = yOffset,
+			.offsetX = offsetX,
+			.offsetY = offsetY,
 			.sizeX = sizeX,
 			.sizeY = sizeY,
 			.scaleX = .75f * 16.f / sizeX,

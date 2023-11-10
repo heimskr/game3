@@ -35,8 +35,8 @@ namespace Game3 {
 			ItemEntity(): Entity(ID()) {}
 			ItemEntity(const Game &, const nlohmann::json &);
 			ItemEntity(ItemStack);
-			float xOffset = 0.f;
-			float yOffset = 0.f;
+			float offsetX = 0.f;
+			float offsetY = 0.f;
 			float sizeX = 16.f;
 			float sizeY = 16.f;
 			bool needsTexture = true;

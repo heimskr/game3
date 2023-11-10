@@ -104,11 +104,11 @@ namespace Game3 {
 			if (tile_id && *tile_id != 0) {
 				const float x = (*tile_id % (texture->width / tilesize)) * tilesize;
 				const float y = (*tile_id / (texture->width / tilesize)) * tilesize;
-				sprite_renderer(*texture, {
+				sprite_renderer(texture, {
 					.x = float(position.column),
 					.y = float(position.row),
-					.xOffset = x / 2,
-					.yOffset = y / 2,
+					.offsetX = x / 2,
+					.offsetY = y / 2,
 					.sizeX = float(tilesize),
 					.sizeY = float(tilesize),
 				});
@@ -118,11 +118,11 @@ namespace Game3 {
 				const TileID extractor_tile = *extractors_corner + extractors_march;
 				const float x = (extractor_tile % (texture->width / tilesize)) * tilesize;
 				const float y = (extractor_tile / (texture->width / tilesize)) * tilesize;
-				sprite_renderer(*texture, {
+				sprite_renderer(texture, {
 					.x = float(position.column),
 					.y = float(position.row),
-					.xOffset = x / 2,
-					.yOffset = y / 2,
+					.offsetX = x / 2,
+					.offsetY = y / 2,
 					.sizeX = float(tilesize),
 					.sizeY = float(tilesize),
 				});
