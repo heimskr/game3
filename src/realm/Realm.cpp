@@ -1152,14 +1152,15 @@ namespace Game3 {
 	}
 
 	void Realm::sendToOne(RemoteClient &client, ChunkPosition chunk_position) {
-		const auto [chunk_tiles, entity_packets, tile_entity_packets] = getChunkPackets(chunk_position);
-
-		client.getPlayer()->notifyOfRealm(*this);
-		client.send(chunk_tiles);
-		for (const auto &packet: entity_packets)
-			client.send(packet);
-		for (const auto &packet: tile_entity_packets)
-			client.send(packet);
+		if (ServerPlayerPtr player = client.getPlayer()) {
+			const auto [chunk_tiles, entity_packets, tile_entity_packets] = getChunkPackets(chunk_position);
+			player->notifyOfRealm(*this);
+			client.send(chunk_tiles);
+			for (const auto &packet: entity_packets)
+				client.send(packet);
+			for (const auto &packet: tile_entity_packets)
+				client.send(packet);
+		}
 	}
 
 	void Realm::recalculateVisibleChunks() {
