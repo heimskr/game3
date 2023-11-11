@@ -83,11 +83,10 @@ namespace Game3 {
 			std::map<GLuint, Atlas> atlases;
 
 			void initRenderData();
-			void flush(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &);
+			void flush(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &, size_t tile_size);
 			double hackY(double y, double y_offset, double scale);
-			void draw(const Atlas &atlas);
 
-			Atlas generateAtlas(std::shared_ptr<Texture>, const std::vector<const RenderOptions *> &);
-			std::vector<float> generateData(std::shared_ptr<Texture>, const std::vector<const RenderOptions *> &);
+			Atlas generateAtlas(std::shared_ptr<Texture>, const std::vector<const RenderOptions *> &, size_t tile_size);
+			std::vector<float> generateData(std::shared_ptr<Texture>, const std::vector<const RenderOptions *> &, size_t tile_size);
 	};
 }

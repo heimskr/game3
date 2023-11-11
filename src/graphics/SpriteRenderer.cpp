@@ -27,19 +27,6 @@ namespace Game3 {
 		initRenderData();
 	}
 
-	// SpriteRenderer::SpriteRenderer(SpriteRenderer &&other): SpriteRenderer(*other.canvas) {
-	// 	other.canvas = nullptr;
-	// 	shader = std::move(other.shader);
-	// 	quadVAO = other.quadVAO;
-	// 	initialized = other.initialized;
-	// 	backbufferWidth = other.backbufferWidth;
-	// 	backbufferHeight = other.backbufferHeight;
-	// 	other.quadVAO = 0;
-	// 	other.initialized = false;
-	// 	other.backbufferWidth = -1;
-	// 	other.backbufferHeight = -1;
-	// }
-
 	SpriteRenderer::~SpriteRenderer() {
 		remove();
 	}
@@ -51,22 +38,6 @@ namespace Game3 {
 			initialized = false;
 		}
 	}
-
-	// SpriteRenderer & SpriteRenderer::operator=(SpriteRenderer &&other) {
-	// 	canvas = other.canvas;
-	// 	other.canvas = nullptr;
-	// 	shader.reset();
-	// 	shader = std::move(other.shader);
-	// 	quadVAO = other.quadVAO;
-	// 	initialized = other.initialized;
-	// 	backbufferWidth = other.backbufferWidth;
-	// 	backbufferHeight = other.backbufferHeight;
-	// 	other.quadVAO = 0;
-	// 	other.initialized = false;
-	// 	other.backbufferWidth = -1;
-	// 	other.backbufferHeight = -1;
-	// 	return *this;
-	// }
 
 	void SpriteRenderer::update(const Canvas &canvas) {
 		const int backbuffer_width  = canvas.width();
@@ -83,6 +54,8 @@ namespace Game3 {
 
 		if (scale != canvasScale) {
 			canvasScale = scale;
+			shader.bind();
+			shader.uniform("canvasScale", scale);
 		}
 	}
 
@@ -102,6 +75,11 @@ namespace Game3 {
 	void SpriteRenderer::drawOnMap(const std::shared_ptr<Texture> &texture, RenderOptions options) {
 		if (!initialized)
 			return;
+
+		if (options.sizeX < 0)
+			options.sizeX = texture->width;
+		if (options.sizeY < 0)
+			options.sizeY = texture->height;
 
 		batchItems.emplace_back(texture, options);
 
@@ -165,9 +143,11 @@ namespace Game3 {
 
 		constexpr static size_t BUFFER_CAPACITY = 1024;
 
+		const size_t tile_size = canvas->game->activeRealm->getTileset().getTileSize();
+
 		for (const auto &[texture, options]: batchItems) {
 			if (texture != last_texture || buffer.size() >= BUFFER_CAPACITY) {
-				flush(last_texture, buffer);
+				flush(last_texture, buffer, tile_size);
 				buffer.clear();
 				last_texture = texture;
 			}
@@ -176,7 +156,7 @@ namespace Game3 {
 		}
 
 		if (!buffer.empty())
-			flush(last_texture, buffer);
+			flush(last_texture, buffer, tile_size);
 
 		batchItems.clear();
 	}
@@ -216,16 +196,16 @@ namespace Game3 {
 		initialized = true;
 	}
 
-	void SpriteRenderer::flush(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &options) {
+	void SpriteRenderer::flush(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &options, size_t tile_size) {
 		Atlas *atlas_ptr = nullptr;
 
 		if (auto iter = atlases.find(texture->id); iter != atlases.end()) {
 			atlas_ptr = &iter->second;
-			std::vector<float> data = generateData(atlas_ptr->texture, options);
+			std::vector<float> data = generateData(atlas_ptr->texture, options, tile_size);
 			// INFO("options<" << options.size() << "> → data<" << data.size() << ">");
 			atlas_ptr->vbo.update(data, false);
 		} else
-			atlas_ptr = &(atlases[texture->id] = generateAtlas(texture, options));
+			atlas_ptr = &(atlases[texture->id] = generateAtlas(texture, options, tile_size));
 
 		if (!atlas_ptr)
 			throw std::runtime_error("Couldn't find or initialize Atlas in SpriteRenderer::flush");
@@ -233,37 +213,32 @@ namespace Game3 {
 		Atlas &atlas = *atlas_ptr;
 		shader.bind();
 		shader.set("atlasSize", Eigen::Vector2f(atlas.texture->width, atlas.texture->height));
-		glActiveTexture(GL_TEXTURE0);
+		atlas.vao.bind();
+		atlas.vbo.bind();
+		glActiveTexture(GL_TEXTURE0); CHECKGL
 		texture->bind(0);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glBindVertexArray(atlas.vao.getHandle());
-		glDrawArrays(GL_TRIANGLES, 0, 6 * options.size());
-		glBindVertexArray(0);
+		shader.set("sprite", 0);
+		glEnable(GL_BLEND); CHECKGL
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); CHECKGL
+		// glBindVertexArray(atlas.vao.getHandle());
+		glDrawArrays(GL_TRIANGLES, 0, 6 * options.size()); CHECKGL
+		glBindVertexArray(0); CHECKGL
 	}
 
 	double SpriteRenderer::hackY(double y, double offsetY, double scale) {
 		return backbufferHeight / 16. - y + offsetY / 4. * scale; // Four?!
 	}
 
-	void SpriteRenderer::draw(const Atlas &atlas) {
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glBindVertexArray(atlas.vao.getHandle());
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glBindVertexArray(0);
-	}
-
-	auto SpriteRenderer::generateAtlas(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &options) -> Atlas {
+	auto SpriteRenderer::generateAtlas(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &options, size_t tile_size) -> Atlas {
 		Atlas atlas;
 		atlas.texture = texture;
-		std::vector<float> data = generateData(texture, options);
+		std::vector<float> data = generateData(texture, options, tile_size);
 		atlas.vbo.init(data.data(), data.size(), GL_DYNAMIC_DRAW);
-		atlas.vao.init(atlas.vbo, {2, 2, 2, 2, 1, 1, 4, 4});
+		atlas.vao.init(atlas.vbo, {2, 2, 2, 2, 2, 1, 1, 4, 4});
 		return atlas;
 	}
 
-	std::vector<float> SpriteRenderer::generateData(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &options) {
+	std::vector<float> SpriteRenderer::generateData(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &options, size_t tile_size) {
 		std::vector<float> data;
 		data.reserve(options.size() * 18);
 
@@ -271,15 +246,35 @@ namespace Game3 {
 		const int texture_height = texture->height;
 
 		for (const RenderOptions *item: options) {
+			auto x_option = item->x;
+			auto y_option = item->y;
+
+			x_option *= tile_size * canvas->scale / 2.;
+			y_option *= tile_size * canvas->scale / 2.;
+
+			x_option += canvas->width() / 2.;
+			x_option -= CHUNK_SIZE * REALM_DIAMETER * tile_size * canvas->scale / canvas->magic * 2.; // TODO: the math here is a little sus... things might cancel out
+			x_option += centerX * canvas->scale * tile_size / 2.;
+
+			y_option += canvas->height() / 2.;
+			y_option -= CHUNK_SIZE * REALM_DIAMETER * tile_size * canvas->scale / canvas->magic * 2.;
+			y_option += centerY * canvas->scale * tile_size / 2.;
+
 			for (const auto &[x, y]: std::initializer_list<std::pair<float, float>>{{0.f, 1.f}, {1.f, 0.f}, {0.f, 0.f}, {0.f, 1.f}, {1.f, 1.f}, {1.f, 0.f}}) {
 				data.push_back(x);
 				data.push_back(y);
-				data.push_back(item->x);
-				data.push_back(item->y);
+				data.push_back(x);
+				data.push_back(y);
+
+				data.push_back(x_option); // data.push_back(y_option);
+				// data.push_back(0.f); data.push_back(0.f);
+				// data.push_back(item->x); // data.push_back(item->y);
+
 				data.push_back(item->offsetX);
 				data.push_back(item->offsetY);
 				data.push_back(item->scaleX);
 				data.push_back(item->scaleY);
+				// data.push_back(/*item->invertY? -1.f :*/ 1.f);
 				data.push_back(item->invertY? -1.f : 1.f);
 				data.push_back(item->angle);
 				data.push_back(item->color.red);

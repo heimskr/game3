@@ -2,15 +2,15 @@
 
 #version 330 core
 
-layout (location = 0) in vec2  position;
-// layout (location = 1) in vec2  inTexCoords;
-layout (location = 1) in vec2  mapPosition;   // options.{x, y}
-layout (location = 2) in vec2  textureOffset; // options.offset{X, Y}
-layout (location = 3) in vec2  textureScale;  // options.scale{X, Y}
-layout (location = 4) in float invertY;       // options.invertY? -1 : 1
-layout (location = 5) in float spriteDegrees; // options.angle
-layout (location = 6) in vec4  inSpriteColor; // options.color
-layout (location = 7) in vec4  inSpecialPosition;
+layout(location = 0) in vec2  position;
+layout(location = 1) in vec2  inTexCoords;
+layout(location = 2) in vec2  mapPosition;   // options.{x, y}
+layout(location = 3) in vec2  textureOffset; // options.offset{X, Y}
+layout(location = 4) in vec2  textureScale;  // options.scale{X, Y}
+layout(location = 5) in float invertY;       // options.invertY? -1 : 1
+layout(location = 6) in float spriteDegrees; // options.angle
+layout(location = 7) in vec4  inSpriteColor; // options.color
+layout(location = 8) in vec4  inSpecialPosition;
 
 out vec2 texCoords;
 out vec4 spriteColor;
@@ -18,12 +18,13 @@ out vec4 specialPosition;
 
 uniform mat4 projection;
 uniform vec2 atlasSize; // texture_{width, height}
+uniform float canvasScale;
 
 mat4 translate(mat4 matrix, vec3 delta) {
 
-	mat4 transp = transpose(matrix);
+	mat4 transp = (matrix);
 	transp[3] = transp[0] * delta[0] + transp[1] * delta[1] + transp[2] * delta[2] + transp[3];
-	return transpose(transp);
+	return (transp);
 
 	// vec4 row0 = vec4(matrix[0][0], matrix[1][0], matrix[2][0], matrix[3][0]) * delta[0];
 	// vec4 row1 = vec4(matrix[0][1], matrix[1][1], matrix[2][1], matrix[3][1]) * delta[1];
@@ -37,11 +38,11 @@ mat4 translate(mat4 matrix, vec3 delta) {
 }
 
 mat4 scale(mat4 matrix, vec3 scale_vec) {
-	mat4 transp = transpose(matrix);
+	mat4 transp = (matrix);
 	transp[0] *= scale_vec[0];
 	transp[1] *= scale_vec[1];
 	transp[2] *= scale_vec[2];
-	return transpose(transp);
+	return (transp);
 }
 
 vec3 normalize3(vec3 vec) {
@@ -77,17 +78,23 @@ mat4 rotate(mat4 matrix, float angle, vec3 axis) {
 
 void main() {
 	mat4 model = mat4(1.0);
-	model = translate(model, vec3(mapPosition.x * 16.0 - textureOffset.x * 2.0 * textureScale.x,
-	                              mapPosition.y * 16.0 - textureOffset.y * 2.0 * textureScale.y,
+	model = translate(model, vec3(mapPosition.x - textureOffset.x * canvasScale * textureScale.x,
+	                              mapPosition.y - textureOffset.y * canvasScale * textureScale.y,
 	                              0.0));
-	model = scale(model, vec3(1.0, invertY, 1.0));
+	// model = scale(model, vec3(1.0, invertY, 1.0));
+
 	// model = translate(model, vec3(0.5 * atlasSize.x, 0.5 * atlasSize.y, 0.0));
 	// model = rotate(model, radians(spriteDegrees), vec3(0.0, 0.0, 1.0));
 	// model = translate(model, vec3(-0.5 * atlasSize.x, -0.5 * atlasSize.y, 0.0));
-	model = scale(model, vec3(atlasSize.x * textureScale.x, atlasSize.y * textureScale.y, 1.0));
-	// texCoords = inTexCoords;
-	texCoords = position;
+
+	model = scale(model, vec3(atlasSize.x * textureScale.x * canvasScale / 2.0, atlasSize.y * textureScale.y * canvasScale / 2.0, 2.0));
+
+	texCoords = inTexCoords;
+	// texCoords = position;
 	spriteColor = inSpriteColor;
 	specialPosition = inSpecialPosition;
-	gl_Position = projection * model * vec4(position, 0.0, 1.0);
+	// gl_Position = projection * model * vec4(position, 0.0, 1.0);
+	gl_Position = model * projection * vec4(position, 0.0, 1.0);
+	// gl_Position = model * vec4(position, 0.0, 1.0);
+	// gl_Position = projection * vec4(position, 0.0, 1.0);
 }
