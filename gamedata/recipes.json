@@ -187,7 +187,7 @@
 				"output": [["base:item/pump", 1]]
 			}],
 			["base:registry/crafting_recipe", {
-				"input": [["base:item/lava_flask", 4], ["base:item/diamond", 1], ["base:item/iron_bar", 4]],
+				"input": [["base:item/fire_opal", 4], ["base:item/diamond", 1], ["base:item/iron_bar", 4]],
 				"output": [["base:item/geothermal_generator", 1]]
 			}],
 			["base:registry/crafting_recipe", {
