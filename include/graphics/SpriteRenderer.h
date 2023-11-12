@@ -25,7 +25,6 @@ namespace Game3 {
 		double scaleY = 1.f;
 		double angle = 0.f;
 		Color color{1.f, 1.f, 1.f, 1.f};
-		bool hackY = true;
 		bool invertY = true;
 	};
 
@@ -83,7 +82,6 @@ namespace Game3 {
 
 			void initRenderData();
 			void flush(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &, size_t tile_size);
-			double hackY(double y, double y_offset, double scale);
 
 			Atlas generateAtlas(std::shared_ptr<Texture>, const std::vector<const RenderOptions *> &);
 			std::vector<float> generateData(std::shared_ptr<Texture>, const std::vector<const RenderOptions *> &);

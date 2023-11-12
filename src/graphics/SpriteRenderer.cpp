@@ -153,10 +153,6 @@ namespace Game3 {
 		glBindVertexArray(0); CHECKGL
 	}
 
-	double SpriteRenderer::hackY(double y, double offsetY, double scale) {
-		return backbufferHeight / 16. - y + offsetY / 4. * scale; // Four?!
-	}
-
 	auto SpriteRenderer::generateAtlas(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &options) -> Atlas {
 		Atlas atlas;
 		atlas.texture = texture;
@@ -168,7 +164,7 @@ namespace Game3 {
 
 	std::vector<float> SpriteRenderer::generateData(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &options) {
 		std::vector<float> data;
-		data.reserve(options.size() * 18);
+		data.reserve(options.size() * 20);
 
 		const int texture_width  = texture->width;
 		const int texture_height = texture->height;
