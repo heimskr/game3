@@ -1,5 +1,3 @@
-// Credit: https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/3.2d_game/0.full_source/sprite.vs
-
 #version 330 core
 
 layout(location = 0) in vec2  position;
@@ -75,7 +73,7 @@ void main() {
 	model = rotate(model, radians(spriteDegrees), vec3(0.0, 0.0, 1.0));
 	model = translate(model, vec3(-spriteSize / 2, 0.0));
 	model = translate(model, vec3(-textureOffset.x * 2.0 * textureScale.x, -textureOffset.y * 2.0 * textureScale.y, 0.0));
-	model = scale(model, vec3(atlasSize, 1.0));
+	model = scale(model, vec3(atlasSize * textureScale, 1.0));
 
 	texCoords = position;
 	spriteColor = inSpriteColor;
