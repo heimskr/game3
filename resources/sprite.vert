@@ -21,6 +21,8 @@ uniform vec2 atlasSize; // texture_{width, height}
 uniform float canvasScale;
 uniform vec2 screenSize;
 uniform vec2 center;
+uniform float tileSize;
+uniform float mapLength;
 
 mat4 translate(mat4 matrix, vec3 delta) {
 
@@ -80,15 +82,17 @@ mat4 rotate(mat4 matrix, float angle, vec3 axis) {
 
 void main() {
 	mat4 model = mat4(1.0);
-	// model = translate(model, vec3(-0.5, 0.5, 0.0) * canvasScale);
-	model = scale(model, vec3(canvasScale / screenSize.x, -canvasScale / screenSize.y, 1.0));
+	// model = translate(model, vec3(-0.7, 1.0, 0.0) * canvasScale);
+	model = scale(model, vec3(canvasScale / screenSize.x,  invertY * canvasScale / screenSize.y, 1.0)); // TODO: verify invertY correctness
+	model = translate(model, vec3(-192 * 8, -192 * 8, 0.0));
+	// model = scale(model, vec3(canvasScale / 500.0, -canvasScale / 500.0, 1.0));
 	// model = scale(model, vec3(canvasScale, -canvasScale, 1.0));
 	// model = translate(model, vec3(1, -1, 1) * vec3(center * 16.0, 0.0));
 	model = translate(model, vec3(center * 16.0, 0.0));
-	model = translate(model, vec3(mapPosition.x * 32.0 - textureOffset.x * 1.0 * textureScale.x,
-	                              mapPosition.y * 32.0 - textureOffset.y * 1.0 * textureScale.y,
+	model = translate(model, vec3(mapPosition.x * 16.0 - textureOffset.x * 2.0 * textureScale.x,
+	                              mapPosition.y * 16.0 - textureOffset.y * 2.0 * textureScale.y,
 	                              0.0));
-	model = scale(model, vec3(0.5, 0.5, 0.5));
+	// model = scale(model, vec3(0.5, 0.5, 0.5));
 	// model = translate(model, vec3(-50, 0.0, 0.0));
 
 	// model = scale(model, vec3(screenSize, 1.0));
@@ -110,7 +114,11 @@ void main() {
 	// model = scale(model, vec3(0.5, 0.5, 1.0));
 
 	// model = scale(model, vec3(1 / screenSize.x, 1 / screenSize.y, 1.0));
-	model = scale(model, vec3(screenSize, 1.0));
+
+	// model = scale(model, vec3(atlasSize / screenSize, 1.0));
+	// model = scale(model, vec3(screenSize, 1.0));
+	model = scale(model, vec3(atlasSize, 1.0));
+	// model = scale(model, vec3(screenSize, 1.0));
 
 	texCoords = inTexCoords;
 	// texCoords = position;

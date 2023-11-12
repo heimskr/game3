@@ -49,7 +49,7 @@ namespace Game3 {
 			backbufferHeight = backbuffer_height;
 			glm::mat4 projection = glm::ortho(0., double(backbuffer_width), double(backbuffer_height), 0., -1., 1.);
 			shader.bind();
-			shader.set("projection", projection);
+			// shader.set("projection", projection);
 			shader.set("screenSize", Eigen::Vector2f(backbuffer_width, backbuffer_height));
 		}
 
@@ -254,35 +254,17 @@ namespace Game3 {
 		const int texture_height = texture->height;
 
 		for (const RenderOptions *item: options) {
-			auto x_option = item->x;
-			auto y_option = item->y;
-
-			x_option *= tile_size * canvas->scale / 2.;
-			y_option *= tile_size * canvas->scale / 2.;
-
-			x_option += canvas->width() / 2.;
-			x_option -= CHUNK_SIZE * REALM_DIAMETER * tile_size * canvas->scale / canvas->magic * 2.; // TODO: the math here is a little sus... things might cancel out
-			x_option += centerX * canvas->scale * tile_size / 2.;
-
-			y_option += canvas->height() / 2.;
-			y_option -= CHUNK_SIZE * REALM_DIAMETER * tile_size * canvas->scale / canvas->magic * 2.;
-			y_option += centerY * canvas->scale * tile_size / 2.;
-
 			for (const auto &[x, y]: std::initializer_list<std::pair<float, float>>{{0.f, 1.f}, {1.f, 0.f}, {0.f, 0.f}, {0.f, 1.f}, {1.f, 1.f}, {1.f, 0.f}}) {
 				data.push_back(x);
 				data.push_back(y);
 				data.push_back(x);
 				data.push_back(y);
-
-				// data.push_back(x_option); data.push_back(y_option);
-				// data.push_back(0.f); data.push_back(0.f);
-				data.push_back(item->x); data.push_back(item->y);
-
+				data.push_back(item->x);
+				data.push_back(item->y);
 				data.push_back(item->offsetX);
 				data.push_back(item->offsetY);
 				data.push_back(item->scaleX);
 				data.push_back(item->scaleY);
-				// data.push_back(/*item->invertY? -1.f :*/ 1.f);
 				data.push_back(item->invertY? -1.f : 1.f);
 				data.push_back(item->angle);
 				data.push_back(item->color.red);
