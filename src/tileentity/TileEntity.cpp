@@ -143,7 +143,6 @@ namespace Game3 {
 		const Position pos = getPosition();
 		RealmPtr realm = getRealm();
 		if (getSide() == Side::Client) {
-			return true;
 			ClientGame &client_game = realm->getGame().toClient();
 			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.player->getChunk()).contains(getChunkPosition(pos));
 		}
@@ -154,7 +153,6 @@ namespace Game3 {
 		const Position pos = getPosition() + offset;
 		RealmPtr realm = getRealm();
 		if (getSide() == Side::Client) {
-			return true;
 			ClientGame &client_game = realm->getGame().toClient();
 			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.player->getChunk()).contains(getChunkPosition(pos));
 		}
