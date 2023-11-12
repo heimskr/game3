@@ -131,7 +131,12 @@ namespace Game3 {
 		if (auto iter = atlases.find(texture->id); iter != atlases.end()) {
 			atlas_ptr = &iter->second;
 			std::vector<float> data = generateData(atlas_ptr->texture, options);
-			atlas_ptr->vbo.update(data, false);
+			if (atlas_ptr->lastDataCount < data.size()) {
+				atlas_ptr->lastDataCount = data.size();
+				atlas_ptr->vbo.update(data, false);
+			} else {
+				atlas_ptr->vbo.update(data, true);
+			}
 		} else
 			atlas_ptr = &(atlases[texture->id] = generateAtlas(texture, options));
 
@@ -158,6 +163,7 @@ namespace Game3 {
 		atlas.texture = texture;
 		std::vector<float> data = generateData(texture, options);
 		atlas.vbo.init(data.data(), data.size(), GL_DYNAMIC_DRAW);
+		atlas.lastDataCount = data.size();
 		atlas.vao.init(atlas.vbo, {2, 2, 2, 2, 1, 1, 4, 2, 4});
 		return atlas;
 	}

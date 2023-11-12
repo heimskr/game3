@@ -75,6 +75,7 @@ namespace Game3 {
 				std::shared_ptr<Texture> texture;
 				GL::VBO vbo;
 				GL::FloatVAO vao;
+				size_t lastDataCount = 0;
 			};
 
 			std::vector<BatchItem> batchItems;
