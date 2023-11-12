@@ -50,12 +50,20 @@ namespace Game3 {
 			glm::mat4 projection = glm::ortho(0., double(backbuffer_width), double(backbuffer_height), 0., -1., 1.);
 			shader.bind();
 			shader.set("projection", projection);
+			shader.set("screenSize", Eigen::Vector2f(backbuffer_width, backbuffer_height));
 		}
 
 		if (scale != canvasScale) {
 			canvasScale = scale;
 			shader.bind();
-			shader.uniform("canvasScale", scale);
+			shader.set("canvasScale", float(scale));
+		}
+
+		if (canvas.center.first != centerX || canvas.center.second != centerY) {
+			centerX = canvas.center.first;
+			centerY = canvas.center.second;
+			shader.bind();
+			shader.set("center", Eigen::Vector2f(float(centerX), float(centerY)));
 		}
 	}
 
@@ -266,9 +274,9 @@ namespace Game3 {
 				data.push_back(x);
 				data.push_back(y);
 
-				data.push_back(x_option); // data.push_back(y_option);
+				// data.push_back(x_option); data.push_back(y_option);
 				// data.push_back(0.f); data.push_back(0.f);
-				// data.push_back(item->x); // data.push_back(item->y);
+				data.push_back(item->x); data.push_back(item->y);
 
 				data.push_back(item->offsetX);
 				data.push_back(item->offsetY);

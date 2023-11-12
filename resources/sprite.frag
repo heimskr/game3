@@ -25,7 +25,7 @@ void main() {
 	// color = vec4(1.0, 1.0, 0.0, 1.0);
 
 	if (texCoords.x < specialPosition.x || texCoords.y < specialPosition.y || specialPosition.x + specialPosition.z < texCoords.x || specialPosition.y + specialPosition.w < texCoords.y) {
-		// discard;
+		discard;
 	// } else {
 		// color.r /= divisor;
 		// color.g /= divisor;

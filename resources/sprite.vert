@@ -19,6 +19,8 @@ out vec4 specialPosition;
 uniform mat4 projection;
 uniform vec2 atlasSize; // texture_{width, height}
 uniform float canvasScale;
+uniform vec2 screenSize;
+uniform vec2 center;
 
 mat4 translate(mat4 matrix, vec3 delta) {
 
@@ -78,23 +80,47 @@ mat4 rotate(mat4 matrix, float angle, vec3 axis) {
 
 void main() {
 	mat4 model = mat4(1.0);
-	model = translate(model, vec3(mapPosition.x - textureOffset.x * canvasScale * textureScale.x,
-	                              mapPosition.y - textureOffset.y * canvasScale * textureScale.y,
+	// model = translate(model, vec3(-0.5, 0.5, 0.0) * canvasScale);
+	model = scale(model, vec3(canvasScale / screenSize.x, -canvasScale / screenSize.y, 1.0));
+	// model = scale(model, vec3(canvasScale, -canvasScale, 1.0));
+	// model = translate(model, vec3(1, -1, 1) * vec3(center * 16.0, 0.0));
+	model = translate(model, vec3(center * 16.0, 0.0));
+	model = translate(model, vec3(mapPosition.x * 32.0 - textureOffset.x * 1.0 * textureScale.x,
+	                              mapPosition.y * 32.0 - textureOffset.y * 1.0 * textureScale.y,
 	                              0.0));
+	model = scale(model, vec3(0.5, 0.5, 0.5));
+	// model = translate(model, vec3(-50, 0.0, 0.0));
+
+	// model = scale(model, vec3(screenSize, 1.0));
+
+	// float tfactor = 4.0 / canvasScale;
+	// model = translate(model, vec3((mapPosition.x * 16.0 - textureOffset.x) * tfactor, (mapPosition.y * 16.0 - textureOffset.y) * tfactor, 0.0));
+
 	// model = scale(model, vec3(1.0, invertY, 1.0));
+
+	// model = scale(model, vec3(screenSize.x, screenSize.y, 1.0));
 
 	// model = translate(model, vec3(0.5 * atlasSize.x, 0.5 * atlasSize.y, 0.0));
 	// model = rotate(model, radians(spriteDegrees), vec3(0.0, 0.0, 1.0));
 	// model = translate(model, vec3(-0.5 * atlasSize.x, -0.5 * atlasSize.y, 0.0));
 
-	model = scale(model, vec3(atlasSize.x * textureScale.x * canvasScale / 2.0, atlasSize.y * textureScale.y * canvasScale / 2.0, 2.0));
+	// model = scale(model, vec3(atlasSize.x * textureScale.x * canvasScale / 2.0, atlasSize.y * textureScale.y * canvasScale / 2.0, 2.0));
+	// const float A = 1.0;
+	// model = scale(model, vec3(atlasSize.x * textureScale.x * canvasScale / 2.0, atlasSize.y * textureScale.y * canvasScale / 2.0, 2.0 * A) / A);
+	// model = scale(model, vec3(0.5, 0.5, 1.0));
+
+	// model = scale(model, vec3(1 / screenSize.x, 1 / screenSize.y, 1.0));
+	model = scale(model, vec3(screenSize, 1.0));
 
 	texCoords = inTexCoords;
 	// texCoords = position;
 	spriteColor = inSpriteColor;
 	specialPosition = inSpecialPosition;
+
 	// gl_Position = projection * model * vec4(position, 0.0, 1.0);
-	gl_Position = model * projection * vec4(position, 0.0, 1.0);
-	// gl_Position = model * vec4(position, 0.0, 1.0);
+	gl_Position = model * vec4(position, 0.0, 1.0);
+	// gl_Position = projection * model * vec4(0.5, 0.5, 0.0, 1.0);
+	// gl_Position = vec4(position, 0.0, 1.0);
+	// gl_Position = model * projection * vec4(position, 0.0, 1.0);
 	// gl_Position = projection * vec4(position, 0.0, 1.0);
 }
