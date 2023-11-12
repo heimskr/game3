@@ -32,11 +32,7 @@ namespace Game3 {
 	}
 
 	void SpriteRenderer::remove() {
-		if (initialized) {
-			glDeleteVertexArrays(1, &quadVAO);
-			quadVAO = 0;
-			initialized = false;
-		}
+		initialized = false;
 	}
 
 	void SpriteRenderer::update(const Canvas &canvas) {
@@ -124,33 +120,6 @@ namespace Game3 {
 	}
 
 	void SpriteRenderer::initRenderData() {
-		if (initialized)
-			glDeleteVertexArrays(1, &quadVAO);
-
-		GLuint vbo;
-		static const float vertices[] {
-			// pos    // tex
-			0., 1., 0., 1.,
-			1., 0., 1., 0.,
-			0., 0., 0., 0.,
-
-			0., 1., 0., 1.,
-			1., 1., 1., 1.,
-			1., 0., 1., 0.
-		};
-
-		glGenVertexArrays(1, &quadVAO);
-		glGenBuffers(1, &vbo);
-
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-		glBindVertexArray(quadVAO);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-
 		shader.bind();
 		shader.set("mapLength", float(CHUNK_SIZE * REALM_DIAMETER));
 		initialized = true;
@@ -162,7 +131,6 @@ namespace Game3 {
 		if (auto iter = atlases.find(texture->id); iter != atlases.end()) {
 			atlas_ptr = &iter->second;
 			std::vector<float> data = generateData(atlas_ptr->texture, options);
-			// INFO("options<" << options.size() << "> → data<" << data.size() << ">");
 			atlas_ptr->vbo.update(data, false);
 		} else
 			atlas_ptr = &(atlases[texture->id] = generateAtlas(texture, options));
@@ -173,7 +141,6 @@ namespace Game3 {
 		Atlas &atlas = *atlas_ptr;
 		shader.bind();
 		shader.set("atlasSize", Eigen::Vector2f(atlas.texture->width, atlas.texture->height));
-		// INFO(atlas.texture->width << ", " << atlas.texture->height << " @ " << atlas.texture->path);
 		shader.set("tileSize", float(tile_size));
 		atlas.vao.bind();
 		atlas.vbo.bind();
@@ -195,7 +162,7 @@ namespace Game3 {
 		atlas.texture = texture;
 		std::vector<float> data = generateData(texture, options);
 		atlas.vbo.init(data.data(), data.size(), GL_DYNAMIC_DRAW);
-		atlas.vao.init(atlas.vbo, {2, 2, 2, 2, 2, 1, 1, 4, 2, 4});
+		atlas.vao.init(atlas.vbo, {2, 2, 2, 2, 1, 1, 4, 2, 4});
 		return atlas;
 	}
 
@@ -208,8 +175,6 @@ namespace Game3 {
 
 		for (const RenderOptions *item: options) {
 			for (const auto &[x, y]: std::initializer_list<std::pair<float, float>>{{0.f, 1.f}, {1.f, 0.f}, {0.f, 0.f}, {0.f, 1.f}, {1.f, 1.f}, {1.f, 0.f}}) {
-				data.push_back(x);
-				data.push_back(y);
 				data.push_back(x);
 				data.push_back(y);
 				data.push_back(item->x);

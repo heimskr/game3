@@ -64,7 +64,6 @@ namespace Game3 {
 			void reset();
 
 		private:
-			GLuint quadVAO = 0;
 			bool initialized = false;
 			double canvasScale = -1.;
 
