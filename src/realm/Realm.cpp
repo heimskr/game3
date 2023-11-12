@@ -193,7 +193,7 @@ namespace Game3 {
 
 		sprite_renderer.centerX = center.first;
 		sprite_renderer.centerY = center.second;
-		sprite_renderer.divisor = outdoors? game_time : 1;
+		// sprite_renderer.divisor = outdoors? game_time : 1;
 		text_renderer.centerX = center.first;
 		text_renderer.centerY = center.second;
 

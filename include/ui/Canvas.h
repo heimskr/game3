@@ -28,7 +28,7 @@ namespace Game3 {
 			std::shared_ptr<ClientGame> game;
 			std::pair<double, double> center{0., 0.};
 			double scale = DEFAULT_SCALE;
-			SpriteRenderer spriteRenderer{*this};
+			std::unique_ptr<SpriteRenderer> spriteRenderer;
 			TextRenderer textRenderer{*this};
 			RectangleRenderer rectangleRenderer;
 			GL::Texture textureA;

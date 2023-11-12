@@ -1,14 +1,7 @@
 #pragma once
 
-// Credit: https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/3.2d_game/0.full_source/sprite_renderer.h
-
 #include "graphics/Shader.h"
-
-#include <map>
-
-namespace GL {
-	class Texture;
-}
+#include "types/Types.h"
 
 namespace Game3 {
 	class Canvas;
@@ -29,62 +22,31 @@ namespace Game3 {
 	};
 
 	class SpriteRenderer {
+		protected:
+			SpriteRenderer(Canvas &);
+
 		public:
-			Canvas *canvas = nullptr;
-			Shader shader;
-			double divisor = 1.f;
+			Canvas *canvas;
 			double centerX = 0.f;
 			double centerY = 0.f;
 			int backbufferWidth = -1;
 			int backbufferHeight = -1;
 
-			SpriteRenderer(Canvas &);
-			SpriteRenderer(const SpriteRenderer &) = delete;
-			SpriteRenderer(SpriteRenderer &&) = delete;
+			virtual ~SpriteRenderer() = default;
 
-			~SpriteRenderer();
+			virtual void update(const Canvas &) = 0;
+			virtual void drawOnMap(const std::shared_ptr<Texture> &, double x, double y, double scale, double angle, double alpha) = 0;
+			virtual void drawOnMap(const std::shared_ptr<Texture> &, RenderOptions) = 0;
+			void drawOnMap(const std::shared_ptr<Texture> &, double x, double y);
+			void drawOnMap(const std::shared_ptr<Texture> &);
 
-			SpriteRenderer & operator=(const SpriteRenderer &) = delete;
-			SpriteRenderer & operator=(SpriteRenderer &&) = delete;
+			virtual void renderNow() {}
 
-			void remove();
-			void update(const Canvas &);
-
-			void drawOnMap(const std::shared_ptr<Texture> &, double x, double y, double scale = 1.f, double angle = 0.f, double alpha = 1.f);
-			void drawOnMap(const std::shared_ptr<Texture> &, RenderOptions = {});
+			virtual void reset() = 0;
 
 			template <typename T>
 			void operator()(T &texture, RenderOptions options) {
 				drawOnMap(texture, std::move(options));
 			}
-
-			void renderNow();
-
-			void reset();
-
-		private:
-			bool initialized = false;
-			double canvasScale = -1.;
-
-			struct BatchItem {
-				std::shared_ptr<Texture> texture;
-				RenderOptions options;
-			};
-
-			struct Atlas {
-				std::shared_ptr<Texture> texture;
-				GL::VBO vbo;
-				GL::FloatVAO vao;
-				size_t lastDataCount = 0;
-			};
-
-			std::vector<BatchItem> batchItems;
-			std::map<GLuint, Atlas> atlases;
-
-			void initRenderData();
-			void flush(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &, size_t tile_size);
-
-			Atlas generateAtlas(std::shared_ptr<Texture>, const std::vector<const RenderOptions *> &);
-			std::vector<float> generateData(std::shared_ptr<Texture>, const std::vector<const RenderOptions *> &);
 	};
 }

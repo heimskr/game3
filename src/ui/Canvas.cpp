@@ -8,10 +8,12 @@
 #include "util/Timer.h"
 #include "util/Util.h"
 
+#include "graphics/BatchSpriteRenderer.h"
+#include "graphics/SingleSpriteRenderer.h"
 #include "graphics/Tileset.h"
 
 namespace Game3 {
-	Canvas::Canvas(MainWindow &window_): window(window_) {
+	Canvas::Canvas(MainWindow &window_): window(window_), spriteRenderer(std::make_unique<BatchSpriteRenderer>(*this)) {
 		magic = 16 / 2;
 		fbo.init();
 	}
@@ -21,7 +23,7 @@ namespace Game3 {
 			return;
 
 		game->activateContext();
-		spriteRenderer.update(*this);
+		spriteRenderer->update(*this);
 		rectangleRenderer.update(width(), height());
 		textRenderer.update(width(), height());
 
@@ -51,7 +53,7 @@ namespace Game3 {
 		});
 
 		if (RealmPtr realm = game->activeRealm.copyBase()) {
-			realm->render(width(), height(), center, scale, spriteRenderer, textRenderer, game->getDivisor()); CHECKGL
+			realm->render(width(), height(), center, scale, *spriteRenderer, textRenderer, game->getDivisor()); CHECKGL
 			realmBounds = game->getVisibleRealmBounds();
 		}
 	}
