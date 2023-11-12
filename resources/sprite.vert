@@ -10,7 +10,8 @@ layout(location = 4) in vec2  textureScale;  // options.scale{X, Y}
 layout(location = 5) in float invertY;       // options.invertY? -1 : 1
 layout(location = 6) in float spriteDegrees; // options.angle
 layout(location = 7) in vec4  inSpriteColor; // options.color
-layout(location = 8) in vec4  inSpecialPosition;
+layout(location = 8) in vec2  spriteSize;    // options.size{X, Y}
+layout(location = 9) in vec4  inSpecialPosition;
 
 out vec2 texCoords;
 out vec4 spriteColor;
@@ -25,20 +26,8 @@ uniform float tileSize;
 uniform float mapLength;
 
 mat4 translate(mat4 matrix, vec3 delta) {
-
-	mat4 transp = (matrix);
-	transp[3] = transp[0] * delta[0] + transp[1] * delta[1] + transp[2] * delta[2] + transp[3];
-	return (transp);
-
-	// vec4 row0 = vec4(matrix[0][0], matrix[1][0], matrix[2][0], matrix[3][0]) * delta[0];
-	// vec4 row1 = vec4(matrix[0][1], matrix[1][1], matrix[2][1], matrix[3][1]) * delta[1];
-	// vec4 row2 = vec4(matrix[0][2], matrix[1][2], matrix[2][2], matrix[3][2]) * delta[2];
-	// vec4 row3 = vec4(matrix[0][3], matrix[1][3], matrix[2][3], matrix[3][3]);
-	// matrix[0][3] = row0[0] + row1[0] + row2[0] + row3[0];
-	// matrix[1][3] = row0[1] + row1[1] + row2[1] + row3[1];
-	// matrix[2][3] = row0[2] + row1[2] + row2[2] + row3[2];
-	// matrix[3][3] = row0[3] + row1[3] + row2[3] + row3[3];
-	// return matrix;
+	matrix[3] = matrix[0] * delta[0] + matrix[1] * delta[1] + matrix[2] * delta[2] + matrix[3];
+	return matrix;
 }
 
 mat4 scale(mat4 matrix, vec3 scale_vec) {
@@ -70,28 +59,33 @@ mat4 rotate(mat4 matrix, float angle, vec3 axis) {
 	rotation[1][2] = temp[2] * axis[1] - s * axis[0];
 	rotation[2][2] = c + temp[2] * axis[2];
 
-	mat4 transp = transpose(matrix);
+	mat4 transp = (matrix);
 
 	mat4 result = mat4(0.0);
 	result[0] = transp[0] * rotation[0][0] + transp[1] * rotation[1][0] + transp[2] * rotation[2][0];
 	result[1] = transp[0] * rotation[0][1] + transp[1] * rotation[1][1] + transp[2] * rotation[2][1];
 	result[2] = transp[0] * rotation[0][2] + transp[1] * rotation[1][2] + transp[2] * rotation[2][2];
 	result[3] = transp[3];
-	return transpose(result);
+	return (result);
 }
 
 void main() {
 	mat4 model = mat4(1.0);
 	// model = translate(model, vec3(-0.7, 1.0, 0.0) * canvasScale);
 	model = scale(model, vec3(canvasScale / screenSize.x,  invertY * canvasScale / screenSize.y, 1.0)); // TODO: verify invertY correctness
-	model = translate(model, vec3(-192 * 8, -192 * 8, 0.0));
+	model = translate(model, vec3(-mapLength * tileSize / 2, -mapLength * tileSize / 2, 0.0));
 	// model = scale(model, vec3(canvasScale / 500.0, -canvasScale / 500.0, 1.0));
 	// model = scale(model, vec3(canvasScale, -canvasScale, 1.0));
 	// model = translate(model, vec3(1, -1, 1) * vec3(center * 16.0, 0.0));
-	model = translate(model, vec3(center * 16.0, 0.0));
-	model = translate(model, vec3(mapPosition.x * 16.0 - textureOffset.x * 2.0 * textureScale.x,
-	                              mapPosition.y * 16.0 - textureOffset.y * 2.0 * textureScale.y,
-	                              0.0));
+	model = translate(model, vec3(center * tileSize, 0.0));
+	// model = translate(model, vec3(mapPosition.x * tileSize - textureOffset.x * 2.0 * textureScale.x,
+	//                               mapPosition.y * tileSize - textureOffset.y * 2.0 * textureScale.y,
+	//                               0.0));
+	model = translate(model, vec3(mapPosition.x * tileSize, mapPosition.y * tileSize, 0.0));
+	model = translate(model, vec3(spriteSize / 2, 0.0));
+	model = rotate(model, radians(spriteDegrees), vec3(0.0, 0.0, 1.0));
+	model = translate(model, vec3(-spriteSize / 2, 0.0));
+	model = translate(model, vec3(-textureOffset.x * 2.0 * textureScale.x, -textureOffset.y * 2.0 * textureScale.y, 0.0));
 	// model = scale(model, vec3(0.5, 0.5, 0.5));
 	// model = translate(model, vec3(-50, 0.0, 0.0));
 
@@ -104,8 +98,9 @@ void main() {
 
 	// model = scale(model, vec3(screenSize.x, screenSize.y, 1.0));
 
-	// model = translate(model, vec3(0.5 * atlasSize.x, 0.5 * atlasSize.y, 0.0));
 	// model = rotate(model, radians(spriteDegrees), vec3(0.0, 0.0, 1.0));
+	// model = translate(model, vec3(0.5 * atlasSize.x, 0.5 * atlasSize.y, 0.0));
+	// model = rotate(model, radians(45.0), vec3(0.0, 0.0, 1.0));
 	// model = translate(model, vec3(-0.5 * atlasSize.x, -0.5 * atlasSize.y, 0.0));
 
 	// model = scale(model, vec3(atlasSize.x * textureScale.x * canvasScale / 2.0, atlasSize.y * textureScale.y * canvasScale / 2.0, 2.0));
@@ -118,6 +113,9 @@ void main() {
 	// model = scale(model, vec3(atlasSize / screenSize, 1.0));
 	// model = scale(model, vec3(screenSize, 1.0));
 	model = scale(model, vec3(atlasSize, 1.0));
+	// model = translate(model, vec3(0.5, 0.5, 0.0));
+	// model = rotate(model, radians(45.0), vec3(0.0,0.0, 1.0));
+	// model = translate(model, vec3(-0.5, -0.5, 0.0));
 	// model = scale(model, vec3(screenSize, 1.0));
 
 	texCoords = inTexCoords;

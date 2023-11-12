@@ -86,7 +86,7 @@ namespace Game3 {
 			void flush(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &, size_t tile_size);
 			double hackY(double y, double y_offset, double scale);
 
-			Atlas generateAtlas(std::shared_ptr<Texture>, const std::vector<const RenderOptions *> &, size_t tile_size);
-			std::vector<float> generateData(std::shared_ptr<Texture>, const std::vector<const RenderOptions *> &, size_t tile_size);
+			Atlas generateAtlas(std::shared_ptr<Texture>, const std::vector<const RenderOptions *> &);
+			std::vector<float> generateData(std::shared_ptr<Texture>, const std::vector<const RenderOptions *> &);
 	};
 }

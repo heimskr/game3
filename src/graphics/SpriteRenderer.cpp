@@ -47,9 +47,7 @@ namespace Game3 {
 		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
 			backbufferWidth = backbuffer_width;
 			backbufferHeight = backbuffer_height;
-			glm::mat4 projection = glm::ortho(0., double(backbuffer_width), double(backbuffer_height), 0., -1., 1.);
 			shader.bind();
-			// shader.set("projection", projection);
 			shader.set("screenSize", Eigen::Vector2f(backbuffer_width, backbuffer_height));
 		}
 
@@ -90,55 +88,6 @@ namespace Game3 {
 			options.sizeY = texture->height;
 
 		batchItems.emplace_back(texture, options);
-
-		/*
-		if (options.sizeX < 0)
-			options.sizeX = texture.width;
-		if (options.sizeY < 0)
-			options.sizeY = texture.height;
-
-		RealmPtr realm = canvas->game->activeRealm.copyBase();
-		TileProvider &provider = realm->tileProvider;
-		TilesetPtr tileset     = provider.getTileset(*canvas->game);
-		const auto tile_size   = tileset->getTileSize();
-		const auto map_length  = CHUNK_SIZE * REALM_DIAMETER;
-
-		options.x *= tile_size * canvas->scale / 2.;
-		options.y *= tile_size * canvas->scale / 2.;
-
-		options.x += canvas->width() / 2.;
-		options.x -= map_length * tile_size * canvas->scale / canvas->magic * 2.; // TODO: the math here is a little sus... things might cancel out
-		options.x += centerX * canvas->scale * tile_size / 2.;
-
-		options.y += canvas->height() / 2.;
-		options.y -= map_length * tile_size * canvas->scale / canvas->magic * 2.;
-		options.y += centerY * canvas->scale * tile_size / 2.;
-
-		shader.bind();
-
-		glm::mat4 model = glm::mat4(1.);
-		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(options.x - options.offsetX * canvas->scale * options.scaleX, options.y - options.offsetY * canvas->scale * options.scaleY, 0.));
-		model = glm::translate(model, glm::vec3(.5 * texture.width, .5 * texture.height, 0.)); // move origin of rotation to center of quad
-		model = glm::rotate(model, float(glm::radians(options.angle)), glm::vec3(0., 0., 1.)); // then rotate
-		model = glm::translate(model, glm::vec3(-.5 * texture.width, -.5 * texture.height, 0.)); // move origin back
-		model = glm::scale(model, glm::vec3(texture.width * options.scaleX * canvas->scale / 2., texture.height * options.scaleY * canvas->scale / 2., 2.)); // last scale
-
-		shader.set("model", model);
-		shader.set("spriteColor", 1., 1., 1., options.alpha);
-		const double multiplier = 2. / texture.width;
-		shader.set("texturePosition", options.offsetX * multiplier, options.offsetY * multiplier, options.sizeX / texture.width, options.sizeY / texture.width);
-		// shader.set("divisor", divisor);
-
-		glActiveTexture(GL_TEXTURE0);
-		texture.bind();
-
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glBindVertexArray(quadVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glBindVertexArray(0);
-		*/
 	}
 
 	void SpriteRenderer::renderNow() {
@@ -201,6 +150,9 @@ namespace Game3 {
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
+
+		shader.bind();
+		shader.set("mapLength", float(CHUNK_SIZE * REALM_DIAMETER));
 		initialized = true;
 	}
 
@@ -209,11 +161,11 @@ namespace Game3 {
 
 		if (auto iter = atlases.find(texture->id); iter != atlases.end()) {
 			atlas_ptr = &iter->second;
-			std::vector<float> data = generateData(atlas_ptr->texture, options, tile_size);
+			std::vector<float> data = generateData(atlas_ptr->texture, options);
 			// INFO("options<" << options.size() << "> → data<" << data.size() << ">");
 			atlas_ptr->vbo.update(data, false);
 		} else
-			atlas_ptr = &(atlases[texture->id] = generateAtlas(texture, options, tile_size));
+			atlas_ptr = &(atlases[texture->id] = generateAtlas(texture, options));
 
 		if (!atlas_ptr)
 			throw std::runtime_error("Couldn't find or initialize Atlas in SpriteRenderer::flush");
@@ -221,6 +173,8 @@ namespace Game3 {
 		Atlas &atlas = *atlas_ptr;
 		shader.bind();
 		shader.set("atlasSize", Eigen::Vector2f(atlas.texture->width, atlas.texture->height));
+		// INFO(atlas.texture->width << ", " << atlas.texture->height << " @ " << atlas.texture->path);
+		shader.set("tileSize", float(tile_size));
 		atlas.vao.bind();
 		atlas.vbo.bind();
 		glActiveTexture(GL_TEXTURE0); CHECKGL
@@ -228,7 +182,6 @@ namespace Game3 {
 		shader.set("sprite", 0);
 		glEnable(GL_BLEND); CHECKGL
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); CHECKGL
-		// glBindVertexArray(atlas.vao.getHandle());
 		glDrawArrays(GL_TRIANGLES, 0, 6 * options.size()); CHECKGL
 		glBindVertexArray(0); CHECKGL
 	}
@@ -237,16 +190,16 @@ namespace Game3 {
 		return backbufferHeight / 16. - y + offsetY / 4. * scale; // Four?!
 	}
 
-	auto SpriteRenderer::generateAtlas(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &options, size_t tile_size) -> Atlas {
+	auto SpriteRenderer::generateAtlas(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &options) -> Atlas {
 		Atlas atlas;
 		atlas.texture = texture;
-		std::vector<float> data = generateData(texture, options, tile_size);
+		std::vector<float> data = generateData(texture, options);
 		atlas.vbo.init(data.data(), data.size(), GL_DYNAMIC_DRAW);
-		atlas.vao.init(atlas.vbo, {2, 2, 2, 2, 2, 1, 1, 4, 4});
+		atlas.vao.init(atlas.vbo, {2, 2, 2, 2, 2, 1, 1, 4, 2, 4});
 		return atlas;
 	}
 
-	std::vector<float> SpriteRenderer::generateData(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &options, size_t tile_size) {
+	std::vector<float> SpriteRenderer::generateData(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &options) {
 		std::vector<float> data;
 		data.reserve(options.size() * 18);
 
@@ -271,6 +224,8 @@ namespace Game3 {
 				data.push_back(item->color.green);
 				data.push_back(item->color.blue);
 				data.push_back(item->color.alpha);
+				data.push_back(item->sizeX);
+				data.push_back(item->sizeY);
 				data.push_back(item->offsetX * 2. / texture_width);
 				data.push_back(item->offsetY * 2. / texture_height);
 				data.push_back(item->sizeX / texture_width);
