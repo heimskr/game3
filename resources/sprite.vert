@@ -2,7 +2,7 @@
 
 layout(location = 0) in vec2  position;
 layout(location = 1) in vec2  mapPosition;   // options.{x, y}
-layout(location = 2) in vec2  textureOffset; // options.offset{X, Y}
+layout(location = 2) in vec2  spriteOffset;  // options.offset{X, Y}
 layout(location = 3) in vec2  textureScale;  // options.scale{X, Y}
 layout(location = 4) in float invertY;       // options.invertY? -1 : 1
 layout(location = 5) in float spriteDegrees; // options.angle
@@ -72,7 +72,7 @@ void main() {
 	model = translate(model, vec3(spriteSize / 2, 0.0));
 	model = rotate(model, radians(spriteDegrees), vec3(0.0, 0.0, 1.0));
 	model = translate(model, vec3(-spriteSize / 2, 0.0));
-	model = translate(model, vec3(-textureOffset.x * 2.0 * textureScale.x, -textureOffset.y * 2.0 * textureScale.y, 0.0));
+	model = translate(model, vec3(-spriteOffset.x * 2.0 * textureScale.x, -spriteOffset.y * 2.0 * textureScale.y, 0.0));
 	model = scale(model, vec3(atlasSize * textureScale, 1.0));
 
 	texCoords = position;
