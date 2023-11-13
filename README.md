@@ -11,6 +11,12 @@ A 2D game made with OpenGL. No engine because I'd prefer to do things my own way
 
 ![Players constructing machines near lava](https://github.com/heimskr/game3/blob/master/screenshots/3.png?raw=true)
 
+![Players chatting in the water](https://github.com/heimskr/game3/blob/master/screenshots/4.png?raw=true)
+
+![Player standing in a field](https://github.com/heimskr/game3/blob/master/screenshots/5.png?raw=true)
+
+![Player inspecting a factory](https://github.com/heimskr/game3/blob/master/screenshots/6.png?raw=true)
+
 ## Credits
 Huge thanks to [Shade](https://merchant-shade.itch.io/) for creating [Mini World Sprites](https://merchant-shade.itch.io/16x16-mini-world-sprites),
 which features heavily in this project, and for creating custom anvil and furnace tiles at my request.
