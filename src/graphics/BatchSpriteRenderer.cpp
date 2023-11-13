@@ -147,11 +147,10 @@ namespace Game3 {
 		shader.bind();
 		shader.set("atlasSize", Eigen::Vector2f(atlas.texture->width, atlas.texture->height));
 		shader.set("tileSize", float(tile_size));
+		shader.set("sprite", 0);
 		atlas.vao.bind();
 		atlas.vbo.bind();
-		glActiveTexture(GL_TEXTURE0); CHECKGL
 		texture->bind(0);
-		shader.set("sprite", 0);
 		glEnable(GL_BLEND); CHECKGL
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); CHECKGL
 		glDrawArrays(GL_TRIANGLES, 0, 6 * options.size()); CHECKGL
