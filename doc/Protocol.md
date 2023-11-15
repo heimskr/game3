@@ -355,6 +355,15 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u8` Direction
 	- `ItemFilter` Item filter data
 
+51. **Tileset Request**: asks the server for the tileset data.
+
+	- `i32` Realm ID
+
+52. **Tileset Response**: gives the client a map of numeric tile IDs to string tile IDs
+
+	- `i32` Realm ID
+	- `map<u16, string>` Tileset data
+
 # Message Format
 
 All values are little endian. Strings are not null-terminated.
