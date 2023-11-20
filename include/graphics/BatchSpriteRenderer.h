@@ -39,6 +39,9 @@ namespace Game3 {
 			struct BatchItem {
 				std::shared_ptr<Texture> texture;
 				RenderOptions options;
+
+				BatchItem(std::shared_ptr<Texture> texture_, const RenderOptions &options_):
+					texture(std::move(texture_)), options(options_) {}
 			};
 
 			struct Atlas {
