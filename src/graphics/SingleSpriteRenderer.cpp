@@ -90,7 +90,7 @@ namespace Game3 {
 			.scaleX = scale,
 			.scaleY = scale,
 			.angle = angle,
-			.color = {1.f, 1.f, 1.f, alpha},
+			.color = {1.f, 1.f, 1.f, float(alpha)},
 		});
 	}
 
