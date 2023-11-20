@@ -23,14 +23,14 @@ namespace Game3 {
 			BatchSpriteRenderer & operator=(BatchSpriteRenderer &&) = delete;
 
 			void remove();
-			void update(const Canvas &);
+			void update(const Canvas &) override;
 
-			void drawOnMap(const std::shared_ptr<Texture> &, double x, double y, double scale = 1.f, double angle = 0.f, double alpha = 1.f);
-			void drawOnMap(const std::shared_ptr<Texture> &, RenderOptions = {});
+			void drawOnMap(const std::shared_ptr<Texture> &, double x, double y, double scale = 1.f, double angle = 0.f, double alpha = 1.f) override;
+			void drawOnMap(const std::shared_ptr<Texture> &, RenderOptions = {}) override;
 
 			void renderNow() override;
 
-			void reset();
+			void reset() override;
 
 		private:
 			bool initialized = false;
