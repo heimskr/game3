@@ -6,7 +6,7 @@
 
 namespace Game3 {
 	class Buffer;
-	class Position;
+	struct Position;
 
 	// TODO: basically a duplicate of Quadrant
 	enum class Direction: uint8_t {Invalid = 0, Down, Up, Right, Left};

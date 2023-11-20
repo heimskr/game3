@@ -26,6 +26,9 @@ namespace Game3 {
 				Comparator comparator{};
 				ItemCount count{};
 
+				Config(nlohmann::json data_ = {}, Comparator comparator_ = {}, ItemCount count_ = {}):
+					data(std::move(data_)), comparator(comparator_), count(count_) {}
+
 				bool operator()(const ItemStack &, const Inventory &, bool strict) const;
 				bool operator<(const Config &) const;
 			};

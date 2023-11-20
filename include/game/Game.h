@@ -29,13 +29,13 @@ namespace Game3 {
 	class ClientGame;
 	class MainWindow;
 	class Menu;
+	class Plantable;
 	class Player;
 	class Server;
 	class ServerGame;
 	class Tile;
 	class Tileset;
 	struct InteractionSet;
-	struct Plantable;
 
 	class Game: public std::enable_shared_from_this<Game>, public BufferContext {
 		public:
