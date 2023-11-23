@@ -98,6 +98,17 @@ namespace Game3 {
 		return std::nullopt;
 	}
 
+	bool ItemFilterModule::handleShiftClick(std::shared_ptr<Inventory> source_inventory, Slot source_slot) {
+		if (ItemStack *stack = (*source_inventory)[source_slot]) {
+			setFilter();
+			filter->addItem(*stack);
+			populate();
+			upload();
+		}
+
+		return true;
+	}
+
 	void ItemFilterModule::setMode(bool allow) {
 		setFilter();
 		if (filter) {

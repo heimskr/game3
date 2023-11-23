@@ -343,8 +343,15 @@ namespace Game3 {
 		if (!inventory || !inventory->contains(slot))
 			return;
 
-		std::shared_lock<DefaultMutex> lock;
-		ExternalInventoryModule *external = dynamic_cast<ExternalInventoryModule *>(getModule(lock));
+		std::unique_lock<DefaultMutex> lock;
+		Module *module_ = getModule(lock);
+		if (!module_)
+			return;
+
+		if (module_->handleShiftClick(inventory, slot))
+			return;
+
+		auto *external = dynamic_cast<ExternalInventoryModule *>(module_);
 		if (!external)
 			return;
 

@@ -4,6 +4,7 @@
 #include "net/Buffer.h"
 
 #include <any>
+#include <memory>
 #include <optional>
 
 #include <gtkmm.h>
@@ -13,6 +14,8 @@ namespace Game3 {
 	class Buffer;
 	class ClientGame;
 	class ClientInventory;
+	class ExternalInventoryModule;
+	class Inventory;
 	class InventoryTab;
 
 	/** Displayed below the inventory in the inventory tab. */
@@ -30,5 +33,8 @@ namespace Game3 {
 			virtual void onResize(int /* width */) {}
 			virtual std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &, const std::string &, std::any &) { return {}; }
 			virtual void setInventory(std::shared_ptr<ClientInventory>) {}
+			virtual std::shared_ptr<ExternalInventoryModule> getPrimaryInventoryModule() { return nullptr; }
+			/** Returns false if the default shift click behavior should occur, or true otherwise. */
+			virtual bool handleShiftClick(std::shared_ptr<Inventory> /* source_inventory */, Slot) { return false; }
 	};
 }

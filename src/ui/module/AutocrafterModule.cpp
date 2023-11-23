@@ -19,8 +19,8 @@ namespace Game3 {
 	AutocrafterModule::AutocrafterModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<Autocrafter> autocrafter_):
 	game(std::move(game_)),
 	autocrafter(std::move(autocrafter_)),
-	inventoryModule(std::make_unique<ExternalInventoryModule>(game, std::static_pointer_cast<ClientInventory>(autocrafter->getInventory(0)))),
-	stationInventoryModule(std::make_unique<ExternalInventoryModule>(game, std::static_pointer_cast<ClientInventory>(autocrafter->getInventory(1)))) {
+	inventoryModule(std::make_shared<ExternalInventoryModule>(game, std::static_pointer_cast<ClientInventory>(autocrafter->getInventory(0)))),
+	stationInventoryModule(std::make_shared<ExternalInventoryModule>(game, std::static_pointer_cast<ClientInventory>(autocrafter->getInventory(1)))) {
 		assert(autocrafter);
 		vbox.set_hexpand();
 
