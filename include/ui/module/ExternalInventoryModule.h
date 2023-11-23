@@ -13,7 +13,7 @@ namespace Game3 {
 	class ClientInventory;
 	class InventoryTab;
 
-	class ExternalInventoryModule: public Module {
+	class ExternalInventoryModule: public Module, public std::enable_shared_from_this<ExternalInventoryModule> {
 		public:
 			struct Argument {
 				AgentPtr agent;
@@ -31,6 +31,7 @@ namespace Game3 {
 			void update() final;
 			void onResize(int) final;
 			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
+			std::shared_ptr<ExternalInventoryModule> getPrimaryInventoryModule() final { return shared_from_this(); }
 
 			inline auto getInventory() const { return inventory; }
 			void setInventory(std::shared_ptr<ClientInventory>) override;

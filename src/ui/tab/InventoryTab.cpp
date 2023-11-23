@@ -263,11 +263,11 @@ namespace Game3 {
 		}
 	}
 
-	void InventoryTab::setModule(std::unique_ptr<Module> &&module_) {
+	void InventoryTab::setModule(std::shared_ptr<Module> module_) {
 		assert(module_);
 		removeModule();
 		auto lock = currentModule.uniqueLock();
-		currentModule.std::unique_ptr<Module>::operator=(std::move(module_));
+		currentModule.std::shared_ptr<Module>::operator=(std::move(module_));
 		vbox.append(currentModule->getWidget());
 		currentModule->onResize(grid.get_width());
 		currentModule->reset();
@@ -351,11 +351,11 @@ namespace Game3 {
 		if (module_->handleShiftClick(inventory, slot))
 			return;
 
-		auto *external = dynamic_cast<ExternalInventoryModule *>(module_);
-		if (!external)
+		std::shared_ptr<ExternalInventoryModule> external_module = module_->getPrimaryInventoryModule();
+		if (!external_module)
 			return;
 
-		InventoryPtr external_inventory = external->getInventory();
+		InventoryPtr external_inventory = external_module->getInventory();
 		if (!external_inventory)
 			return;
 

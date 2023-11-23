@@ -595,7 +595,7 @@ namespace Game3 {
 	}
 
 	void MainWindow::showExternalInventory(const std::shared_ptr<ClientInventory> &inventory) {
-		inventoryTab->setModule(std::make_unique<ExternalInventoryModule>(game, inventory));
+		inventoryTab->setModule(std::make_shared<ExternalInventoryModule>(game, inventory));
 	}
 
 	GlobalID MainWindow::getExternalGID() const {

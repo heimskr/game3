@@ -12,8 +12,10 @@
 namespace Game3 {
 	// Magnificent code duplication.
 	void MoveSlotsPacket::handle(ServerGame &game, RemoteClient &client) {
-		if (firstGID == secondGID && firstInventory == secondInventory && firstSlot == secondSlot)
+		if (firstGID == secondGID && firstInventory == secondInventory && firstSlot == secondSlot) {
+			client.send(ErrorPacket("Not performing redundant move"));
 			return;
+		}
 
 		if (!Agent::validateGID(firstGID) || !Agent::validateGID(secondGID)) {
 			client.send(ErrorPacket("Can't move slots: invalid GID(s)"));

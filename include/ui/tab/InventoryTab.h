@@ -43,7 +43,7 @@ namespace Game3 {
 			void onResize(const std::shared_ptr<ClientGame> &) override;
 			void update(const std::shared_ptr<ClientGame> &) override;
 			void reset(const std::shared_ptr<ClientGame> &) override;
-			void setModule(std::unique_ptr<Module> &&);
+			void setModule(std::shared_ptr<Module>);
 			Module & getModule() const;
 			Module * getModule(std::shared_lock<DefaultMutex> &);
 			Module * getModule(std::unique_lock<DefaultMutex> &);
@@ -60,7 +60,7 @@ namespace Game3 {
 			std::unordered_map<Gtk::Widget *, Slot> widgetMap;
 			std::unordered_map<Slot, Gtk::Widget *> widgetsBySlot;
 			Glib::RefPtr<Gio::Menu> gmenu;
-			Lockable<std::unique_ptr<Module>> currentModule;
+			Lockable<std::shared_ptr<Module>> currentModule;
 			std::unordered_map<Gtk::Widget *, std::pair<Glib::RefPtr<Gtk::GestureClick>, Glib::RefPtr<Gtk::GestureClick>>> clickGestures;
 
 			/** We can't store state in a popover, so we have to store it here. */
