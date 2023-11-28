@@ -52,6 +52,14 @@ namespace Game3 {
 		return true;
 	}
 
+	void CraftingRecipe::toJSON(nlohmann::json &json) const {
+		json["type"] = CraftingRecipeRegistry::ID();
+		json["input"] = input;
+		json["output"] = output;
+		if (stationType)
+			json["station"] = stationType;
+	}
+
 	CraftingRecipe CraftingRecipe::fromJSON(const Game &game, const nlohmann::json &json) {
 		CraftingRecipe recipe;
 
@@ -67,9 +75,6 @@ namespace Game3 {
 	}
 
 	void to_json(nlohmann::json &json, const CraftingRecipe &recipe) {
-		json["input"] = recipe.input;
-		json["output"] = recipe.output;
-		if (recipe.stationType)
-			json["station"] = recipe.stationType;
+		recipe.toJSON(json);
 	}
 }

@@ -27,8 +27,12 @@ namespace Game3 {
 		/** Doesn't lock either container. */
 		bool craft(Game &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) override;
 
+		void toJSON(nlohmann::json &) const override;
+
 		static DissolverRecipe fromJSON(const Game &, const Identifier &, const nlohmann::json &);
 	};
+
+	void to_json(nlohmann::json &, const DissolverRecipe &);
 
 	struct DissolverRecipeRegistry: NamedRegistry<DissolverRecipe> {
 		static Identifier ID() { return {"base", "registry/dissolver"}; }

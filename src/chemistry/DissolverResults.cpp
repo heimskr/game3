@@ -47,6 +47,10 @@ namespace Game3 {
 		throw std::invalid_argument("Invalid DissolverResult JSON");
 	}
 
+	void to_json(nlohmann::json &json, const DissolverResult &result) {
+		result.toJSON(json);
+	}
+
 	UnionDissolverResult::UnionDissolverResult(const nlohmann::json &json) {
 		for (size_t i = 1; i < json.size(); ++i)
 			members.push_back(DissolverResult::fromJSON(json.at(i)));
@@ -55,6 +59,15 @@ namespace Game3 {
 	void UnionDissolverResult::add(Game &game, std::vector<ItemStack> &stacks) {
 		for (const std::unique_ptr<DissolverResult> &member: members)
 			member->add(game, stacks);
+	}
+
+	void UnionDissolverResult::toJSON(nlohmann::json &json) const {
+		json.push_back("+");
+		for (const auto &member: members) {
+			nlohmann::json subjson;
+			member->toJSON(subjson);
+			json.push_back(std::move(subjson));
+		}
 	}
 
 	WeightedDissolverResult::WeightedDissolverResult(const nlohmann::json &json) {
@@ -88,6 +101,15 @@ namespace Game3 {
 		throw std::logic_error("Impossible condition reached");
 	}
 
+	void WeightedDissolverResult::toJSON(nlohmann::json &json) const {
+		json.push_back("*");
+		for (const auto &[weight, result]: members) {
+			nlohmann::json subjson{weight, nlohmann::json{}};
+			result->toJSON(subjson.at(1));
+			json.push_back(std::move(subjson));
+		}
+	}
+
 	RandomDissolverResult::RandomDissolverResult(const nlohmann::json &json) {
 		for (size_t i = 1; i < json.size(); ++i)
 			members.push_back(DissolverResult::fromJSON(json.at(i)));
@@ -96,6 +118,15 @@ namespace Game3 {
 	void RandomDissolverResult::add(Game &game, std::vector<ItemStack> &stacks) {
 		if (!members.empty())
 			choose(members)->add(game, stacks);
+	}
+
+	void RandomDissolverResult::toJSON(nlohmann::json &json) const {
+		json.push_back("?");
+		for (const auto &member: members) {
+			nlohmann::json subjson;
+			member->toJSON(subjson);
+			json.push_back(std::move(subjson));
+		}
 	}
 
 	ChemicalResult::ChemicalResult(const nlohmann::json &json):
@@ -111,11 +142,22 @@ namespace Game3 {
 			stacks.emplace_back(game, Identifier(formula), 1);
 	}
 
+	void ChemicalResult::toJSON(nlohmann::json &json) const {
+		json = formula;
+	}
+
 	MultiChemicalResult::MultiChemicalResult(const nlohmann::json &json):
 		result(DissolverResult::fromJSON(json.at(1))), count(json.at(0)) {}
 
 	void MultiChemicalResult::add(Game &game, std::vector<ItemStack> &stacks) {
 		for (size_t i = 0; i < count; ++i)
 			result->add(game, stacks);
+	}
+
+	void MultiChemicalResult::toJSON(nlohmann::json &json) const {
+		json.push_back(count);
+		nlohmann::json subjson;
+		result->toJSON(subjson);
+		json.push_back(std::move(subjson));
 	}
 }

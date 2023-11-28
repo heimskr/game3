@@ -7,18 +7,18 @@
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
-	CombinerRecipe::CombinerRecipe(Identifier identifier_):
-		Recipe(std::move(identifier_)) {}
+	CombinerRecipe::CombinerRecipe(Identifier output_):
+		Recipe(output_), outputID(std::move(output_)) {}
 
-	CombinerRecipe::CombinerRecipe(Identifier identifier_, Game &game, const nlohmann::json &json):
-		Recipe(std::move(identifier_)), input(CombinerInput::fromJSON(json, &outputCount).getStacks(game)) {}
+	CombinerRecipe::CombinerRecipe(Identifier output_, Game &game, const nlohmann::json &json):
+		Recipe(output_), input(CombinerInput::fromJSON(json, &outputCount).getStacks(game)), outputID(std::move(output_)) {}
 
 	CombinerRecipe::Input CombinerRecipe::getInput(Game &) {
 		return input;
 	}
 
 	CombinerRecipe::Output CombinerRecipe::getOutput(const Input &, Game &game) {
-		return ItemStack(game, identifier, outputCount);
+		return ItemStack(game, outputID, outputCount);
 	}
 
 	bool CombinerRecipe::canCraft(const std::shared_ptr<Container> &container) {
@@ -55,5 +55,15 @@ namespace Game3 {
 			leftover.reset();
 
 		return true;
+	}
+
+	void CombinerRecipe::toJSON(nlohmann::json &json) const {
+		json["type"] = CombinerRecipeRegistry::ID();
+		json["input"] = input;
+		json["output"] = {outputID, outputCount};
+	}
+
+	void to_json(nlohmann::json &json, const CombinerRecipe &recipe) {
+		recipe.toJSON(json);
 	}
 }

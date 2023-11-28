@@ -82,4 +82,15 @@ namespace Game3 {
 	DissolverRecipe DissolverRecipe::fromJSON(const Game &game, const Identifier &identifier, const nlohmann::json &json) {
 		return DissolverRecipe(identifier, ItemStack(game, identifier, 1), json);
 	}
+
+	void DissolverRecipe::toJSON(nlohmann::json &json) const {
+		json["type"] = DissolverRecipeRegistry::ID();
+		json["input"] = input;
+		assert(dissolverResult);
+		json["output"] = *dissolverResult;
+	}
+
+	void to_json(nlohmann::json &json, const DissolverRecipe &recipe) {
+		recipe.toJSON(json);
+	}
 }

@@ -1,17 +1,15 @@
 #pragma once
 
+#include "registry/Registerable.h"
+
+#include <nlohmann/json_fwd.hpp>
+
 #include <memory>
 #include <optional>
-
-#include "registry/Registerable.h"
 
 namespace Game3 {
 	class Game;
 	struct Container;
-
-	struct RecipeBase {
-		virtual ~RecipeBase() = default;
-	};
 
 	template <typename I, typename O, typename R = Registerable>
 	struct Recipe: R {
@@ -32,6 +30,8 @@ namespace Game3 {
 
 		/** Attempts to produce the result of the recipe, removing any ingredients from the given container as necessary. */
 		virtual bool craft(Game &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) = 0;
+
+		virtual void toJSON(nlohmann::json &) const = 0;
 
 		virtual bool operator==(const Recipe &other) {
 			return this == &other;

@@ -22,6 +22,7 @@ namespace Game3 {
 		bool canCraft(const std::shared_ptr<Container> &) override;
 		/** Doesn't lock either container. */
 		bool craft(Game &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) override;
+		void toJSON(nlohmann::json &) const override;
 
 		static CentrifugeRecipe fromJSON(const Game &, const nlohmann::json &);
 	};

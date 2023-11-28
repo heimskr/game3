@@ -44,12 +44,17 @@ namespace Game3 {
 		return true;
 	}
 
+	void GeothermalRecipe::toJSON(nlohmann::json &json) const {
+		json["type"] = GeothermalRecipeRegistry::ID();
+		json["input"] = input;
+		json["output"] = output;
+	}
+
 	GeothermalRecipe GeothermalRecipe::fromJSON(const Game &game, const nlohmann::json &json) {
 		return {FluidStack::fromJSON(game, json.at("input")), json.at("output")};
 	}
 
 	void to_json(nlohmann::json &json, const GeothermalRecipe &recipe) {
-		json["input"] = recipe.input;
-		json["output"] = recipe.output;
+		recipe.toJSON(json);
 	}
 }

@@ -15,15 +15,19 @@ namespace Game3 {
 		public:
 			virtual ~DissolverResult() = default;
 			virtual void add(Game &, std::vector<ItemStack> &) = 0;
+			virtual void toJSON(nlohmann::json &) const = 0;
 			std::vector<ItemStack> getResult(Game &);
 			static std::vector<ItemStack> getResult(Game &, const nlohmann::json &);
 			static std::unique_ptr<DissolverResult> fromJSON(const nlohmann::json &);
 	};
 
+	void to_json(nlohmann::json &, const DissolverResult &);
+
 	class UnionDissolverResult: public DissolverResult {
 		public:
 			UnionDissolverResult(const nlohmann::json &);
 			void add(Game &, std::vector<ItemStack> &) override;
+			void toJSON(nlohmann::json &) const override;
 
 		private:
 			std::vector<std::unique_ptr<DissolverResult>> members;
@@ -33,6 +37,7 @@ namespace Game3 {
 		public:
 			WeightedDissolverResult(const nlohmann::json &);
 			void add(Game &, std::vector<ItemStack> &) override;
+			void toJSON(nlohmann::json &) const override;
 
 		private:
 			struct Member {
@@ -50,6 +55,7 @@ namespace Game3 {
 		public:
 			RandomDissolverResult(const nlohmann::json &);
 			void add(Game &, std::vector<ItemStack> &) override;
+			void toJSON(nlohmann::json &) const override;
 
 		private:
 			std::vector<std::unique_ptr<DissolverResult>> members;
@@ -59,6 +65,7 @@ namespace Game3 {
 		public:
 			ChemicalResult(const nlohmann::json &);
 			void add(Game &, std::vector<ItemStack> &) override;
+			void toJSON(nlohmann::json &) const override;
 
 		private:
 			std::string formula;
@@ -68,6 +75,7 @@ namespace Game3 {
 		public:
 			MultiChemicalResult(const nlohmann::json &);
 			void add(Game &, std::vector<ItemStack> &) override;
+			void toJSON(nlohmann::json &) const override;
 
 		private:
 			std::unique_ptr<DissolverResult> result;
