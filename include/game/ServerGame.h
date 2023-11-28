@@ -55,7 +55,7 @@ namespace Game3 {
 			bool hasPlayer(const std::string &username) const;
 			void queueRemoval(const ServerPlayerPtr &);
 			void openDatabase(std::filesystem::path);
-			void broadcast(const Packet &);
+			void broadcast(const Packet &, bool include_non_players = false);
 			void releasePlayer(const std::string &username, const Place &);
 
 			inline auto getServer() const {

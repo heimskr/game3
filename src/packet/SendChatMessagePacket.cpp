@@ -8,6 +8,7 @@
 
 namespace Game3 {
 	void SendChatMessagePacket::handle(ServerGame &game, RemoteClient &client) {
-		game.broadcast(ChatMessageSentPacket{client.getPlayer()->getGID(), message});
+		if (ServerPlayerPtr player = client.getPlayer())
+			game.broadcast(ChatMessageSentPacket{player->getGID(), message}, true);
 	}
 }

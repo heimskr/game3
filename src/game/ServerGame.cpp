@@ -290,10 +290,18 @@ namespace Game3 {
 		database.open(std::move(path));
 	}
 
-	void ServerGame::broadcast(const Packet &packet) {
-		auto lock = players.sharedLock();
-		for (const ServerPlayerPtr &player: players)
-			player->send(packet);
+	void ServerGame::broadcast(const Packet &packet, bool include_non_players) {
+		if (include_non_players) {
+			std::shared_ptr<Server> server = getServer();
+			auto &clients = server->getClients();
+			auto lock = clients.sharedLock();
+			for (const RemoteClientPtr &client: clients)
+				client->send(packet);
+		} else {
+			auto lock = players.sharedLock();
+			for (const ServerPlayerPtr &player: players)
+				player->send(packet);
+		}
 	}
 
 	void ServerGame::releasePlayer(const std::string &username, const Place &place) {
@@ -480,7 +488,7 @@ namespace Game3 {
 			if (first == "say" || first == ":") {
 				std::string_view message = std::string_view(command).substr(first.size() + 1);
 				INFO('[' << player->username << "] " << message);
-				broadcast(ChatMessageSentPacket{player->getGID(), std::string(message)});
+				broadcast(ChatMessageSentPacket{player->getGID(), std::string(message)}, true);
 				return {true, ""};
 			}
 
