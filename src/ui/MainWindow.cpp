@@ -322,7 +322,7 @@ namespace Game3 {
 
 		set_child(paned);
 		delay([this] {
-			paned.set_position(paned.get_width() - 344);
+			paned.set_position(paned.get_width() - 360);
 		}, 2);
 
 		if (std::filesystem::exists("settings.json"))

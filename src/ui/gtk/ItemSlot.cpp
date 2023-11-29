@@ -1,12 +1,19 @@
+#include "entity/ClientPlayer.h"
+#include "game/Agent.h"
+#include "game/ClientGame.h"
+#include "game/ClientInventory.h"
 #include "item/Item.h"
+#include "packet/MoveSlotsPacket.h"
 #include "ui/gtk/ItemSlot.h"
+#include "ui/gtk/UITypes.h"
 
 namespace Game3 {
 	namespace {
 		constexpr int TILE_SIZE = 64;
 	}
 
-	ItemSlot::ItemSlot() {
+	ItemSlot::ItemSlot(std::shared_ptr<ClientGame> game_, Slot slot_, std::shared_ptr<ClientInventory> inventory_):
+	game(std::move(game_)), slot(slot_), inventory(std::move(inventory_)) {
 		label.set_xalign(1.f);
 		label.set_yalign(1.f);
 		label.set_expand(true);
@@ -15,18 +22,32 @@ namespace Game3 {
 		image.set_size_request(TILE_SIZE, TILE_SIZE);
 		durabilityBar.add_css_class("item-durability");
 		add_css_class("item-slot");
-		set_size_request(TILE_SIZE, TILE_SIZE);
-		put(label, 0, 0);
 		put(image, 0, 0);
-	}
+		put(label, 0, 0);
+		set_size_request(TILE_SIZE, TILE_SIZE);
 
-	void ItemSlot::reset() {
-		set_tooltip_text({});
-		label.set_text({});
-		image.clear();
-		remove(durabilityBar);
-		durabilityVisible = false;
-		isEmpty = true;
+		auto source = Gtk::DragSource::create();
+		source->set_actions(Gdk::DragAction::MOVE);
+		source->signal_prepare().connect([this](double, double) -> Glib::RefPtr<Gdk::ContentProvider> {
+			Glib::Value<DragSource> value;
+			value.init(value.value_type());
+			value.set({slot, inventory, inventory->index});
+			return Gdk::ContentProvider::create(value);
+		}, false);
+
+		auto target = Gtk::DropTarget::create(Glib::Value<DragSource>::value_type(), Gdk::DragAction::MOVE);
+		target->signal_drop().connect([this](const Glib::ValueBase &base, double, double) {
+			if (base.gobj()->g_type != Glib::Value<DragSource>::value_type())
+				return false;
+
+			const auto &value = static_cast<const Glib::Value<DragSource> &>(base);
+			const DragSource source = value.get();
+			game->player->send(MoveSlotsPacket(source.inventory->getOwner()->getGID(), inventory->getOwner()->getGID(), source.slot, slot, source.index, inventory->index));
+			return true;
+		}, false);
+
+		add_controller(source);
+		add_controller(target);
 	}
 
 	void ItemSlot::setStack(const ItemStack &stack) {
@@ -49,6 +70,15 @@ namespace Game3 {
 
 		set_tooltip_text(tooltip);
 		isEmpty = false;
+	}
+
+	void ItemSlot::reset() {
+		set_tooltip_text({});
+		label.set_text({});
+		image.clear();
+		remove(durabilityBar);
+		durabilityVisible = false;
+		isEmpty = true;
 	}
 
 	bool ItemSlot::empty() const {

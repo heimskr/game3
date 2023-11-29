@@ -2,6 +2,7 @@
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
 #include "packet/MoveSlotsPacket.h"
+#include "ui/gtk/ItemSlot.h"
 #include "ui/gtk/UITypes.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/ExternalInventoryModule.h"
@@ -18,58 +19,21 @@ namespace Game3 {
 	inventory(std::move(inventory_)) {
 		assert(inventory);
 		label.set_hexpand();
-		grid.set_hexpand();
+		flowBox.set_hexpand();
+		flowBox.set_vexpand(false);
+		flowBox.set_max_children_per_line(20);
+		// These take guints so this feels kinda wrong.
+		flowBox.set_row_spacing(-2);
+		flowBox.set_column_spacing(-2);
 		hbox.append(label);
 		vbox.append(hbox);
-		vbox.append(grid);
+		vbox.append(flowBox);
 
 		gmenu = Gio::Menu::create();
 		gmenu->append("_Drop", "inventory_popup.drop");
 		gmenu->append("D_iscard", "inventory_popup.discard");
 
 		popoverMenu.set_parent(vbox);
-
-		source = Gtk::DragSource::create();
-		source->set_actions(Gdk::DragAction::MOVE);
-		source->signal_prepare().connect([this](double x, double y) -> Glib::RefPtr<Gdk::ContentProvider> {
-			auto *item = grid.pick(x, y);
-
-			if (dynamic_cast<Gtk::Fixed *>(item->get_parent()))
-				item = item->get_parent();
-
-			if (auto *label = dynamic_cast<Gtk::Label *>(item)) {
-				if (label->get_text().empty())
-					return nullptr;
-			} else if (!dynamic_cast<Gtk::Fixed *>(item))
-				return nullptr;
-
-			Glib::Value<DragSource> value;
-			value.init(value.value_type());
-			value.set({widgetMap.at(item), inventory, inventory->index});
-			return Gdk::ContentProvider::create(value);
-		}, false);
-
-		auto target = Gtk::DropTarget::create(Glib::Value<DragSource>::value_type(), Gdk::DragAction::MOVE);
-		target->signal_drop().connect([this](const Glib::ValueBase &base, double x, double y) {
-			if (base.gobj()->g_type != Glib::Value<DragSource>::value_type())
-				return false;
-
-			const auto &value = static_cast<const Glib::Value<DragSource> &>(base);
-			auto *destination = grid.pick(x, y);
-
-			if (destination != nullptr && destination != &grid) {
-				if (dynamic_cast<Gtk::Fixed *>(destination->get_parent()))
-					destination = destination->get_parent();
-
-				const DragSource source = value.get();
-				game->player->send(MoveSlotsPacket(source.inventory->getOwner()->getGID(), inventory->getOwner()->getGID(), source.slot, widgetMap.at(destination), source.index, inventory->index));
-			}
-
-			return true;
-		}, false);
-
-		grid.add_controller(source);
-		grid.add_controller(target);
 	}
 
 	ClientInventoryPtr ExternalInventoryModule::getInventory(const std::any &any) {
@@ -99,11 +63,9 @@ namespace Game3 {
 	}
 
 	void ExternalInventoryModule::reset() {
-		clickGestures.clear();
-		widgetMap.clear();
-		removeChildren(grid);
-		widgets.clear();
-		widgetsBySlot.clear();
+		removeChildren(flowBox);
+		itemSlots.clear();
+		lastSlotCount = -1;
 		update();
 	}
 
@@ -113,7 +75,7 @@ namespace Game3 {
 			label.show();
 		}
 
-		populate();
+		repopulate();
 	}
 
 	void ExternalInventoryModule::onResize(int width) {
@@ -149,89 +111,51 @@ namespace Game3 {
 
 	void ExternalInventoryModule::populate() {
 		assert(inventory);
-		const int grid_width = gridWidth();
-		const int tile_size  = InventoryTab::TILE_SIZE <= tabWidth? tabWidth / (tabWidth / InventoryTab::TILE_SIZE) : InventoryTab::TILE_SIZE;
-
-		for (Slot slot = 0; slot < inventory->slotCount; ++slot) {
-			const int row    = slot / grid_width;
-			const int column = slot % grid_width;
-			std::unique_ptr<Gtk::Widget> widget_ptr;
-
-			ItemStack *stack = (*inventory)[slot];
-
-			if (stack) {
-				Glib::ustring label_text = stack->getTooltip();
-				if (stack->count != 1)
-					label_text += " \u00d7 " + std::to_string(stack->count);
-				if (stack->hasDurability())
-					label_text += "\n(" + std::to_string(stack->data.at("durability").at(0).get<Durability>()) + '/' + std::to_string(stack->data.at("durability").at(1).get<Durability>()) + ')';
-				auto fixed_ptr = std::make_unique<Gtk::Fixed>();
-				auto image_ptr = std::make_unique<Gtk::Image>(inventory->getImage(*game, slot));
-				auto label_ptr = std::make_unique<Gtk::Label>(std::to_string(stack->count));
-				label_ptr->set_xalign(1.f);
-				label_ptr->set_yalign(1.f);
-				auto &fixed = *fixed_ptr;
-				if (stack->hasDurability()) {
-					auto progress_ptr = std::make_unique<Gtk::ProgressBar>();
-					progress_ptr->set_fraction(stack->getDurabilityFraction());
-					progress_ptr->add_css_class("item-durability");
-					progress_ptr->set_size_request(tile_size - InventoryTab::TILE_MAGIC, -1);
-					fixed.put(*progress_ptr, 0, 0);
-					widgets.push_back(std::move(progress_ptr));
-				}
-				fixed.put(*image_ptr, 0, 0);
-				fixed.put(*label_ptr, 0, 0);
-				fixed.set_tooltip_text(label_text);
-				widget_ptr = std::move(fixed_ptr);
-				image_ptr->set_size_request(tile_size - InventoryTab::TILE_MAGIC, tile_size - InventoryTab::TILE_MAGIC);
-				label_ptr->set_size_request(tile_size - InventoryTab::TILE_MAGIC, tile_size - InventoryTab::TILE_MAGIC);
-				widgets.push_back(std::move(image_ptr));
-				widgets.push_back(std::move(label_ptr));
-			} else
-				widget_ptr = std::make_unique<Gtk::Label>("");
-
-			if (auto label = dynamic_cast<Gtk::Label *>(widget_ptr.get())) {
-				label->set_wrap(true);
-				label->set_wrap_mode(Pango::WrapMode::CHAR);
-			}
-
-			widget_ptr->set_size_request(tile_size, tile_size);
-			widget_ptr->add_css_class("item-slot");
-
-			Gtk::Widget *old_widget = nullptr;
-			if (auto iter = widgetsBySlot.find(slot); iter != widgetsBySlot.end()) {
-				old_widget = iter->second;
-				widgetMap.erase(iter->second);
-			}
-			widgetsBySlot[slot] = widget_ptr.get();
-
-			auto left_click = Gtk::GestureClick::create();
-			left_click->set_button(1);
-			left_click->signal_released().connect([this, slot, widget = widget_ptr.get()](int n, double x, double y) {
-				const auto mods = clickGestures[widget].first->get_current_event_state();
-				leftClick(widget, n, slot, Modifiers{mods}, x, y);
-			});
-
-			auto right_click = Gtk::GestureClick::create();
-			right_click->set_button(3);
-			right_click->signal_pressed().connect([this, slot, widget = widget_ptr.get()](int n, double x, double y) {
-				const auto mods = clickGestures[widget].second->get_current_event_state();
-				rightClick(widget, n, slot, Modifiers{mods}, x, y);
-			});
-
-			widget_ptr->add_controller(left_click);
-			widget_ptr->add_controller(right_click);
-
-			clickGestures[widget_ptr.get()] = {std::move(left_click), std::move(right_click)};
-			widgetMap[widget_ptr.get()] = slot;
-
-			if (old_widget != nullptr)
-				grid.remove(*old_widget);
-			grid.attach(*widget_ptr, column, row);
-			widgets.push_back(std::move(widget_ptr));
-		}
+		auto lock = inventory->sharedLock();
 
 		lastSlotCount = inventory->slotCount;
+		itemSlots.clear();
+
+		for (Slot slot = 0; slot < lastSlotCount; ++slot) {
+			auto item_slot = std::make_unique<ItemSlot>(game, slot, inventory);
+
+			if (ItemStack *stack = (*inventory)[slot])
+				item_slot->setStack(*stack);
+
+			item_slot->setLeftClick([this, slot, item_slot = item_slot.get()](Modifiers modifiers, int n, double x, double y) {
+				leftClick(item_slot, n, slot, modifiers, x, y);
+			});
+
+			item_slot->setRightClick([this, slot, item_slot = item_slot.get()](Modifiers modifiers, int n, double x, double y) {
+				rightClick(item_slot, n, slot, modifiers, x, y);
+			});
+
+			flowBox.append(*item_slot);
+			itemSlots.push_back(std::move(item_slot));
+		}
+	}
+
+	void ExternalInventoryModule::repopulate() {
+		assert(inventory);
+
+		// Possibly thread-safe.
+		if (inventory->slotCount.load() != lastSlotCount) {
+			populate();
+			return;
+		}
+
+		auto lock = inventory->sharedLock();
+		lastSlotCount = inventory->slotCount;
+
+		for (Slot slot = 0; slot < lastSlotCount; ++slot) {
+			ItemStack *stack = (*inventory)[slot];
+			ItemSlot &item_slot = *itemSlots.at(slot);
+
+			if (stack)
+				item_slot.setStack(*stack);
+			else
+				item_slot.reset();
+		}
 	}
 
 	void ExternalInventoryModule::leftClick(Gtk::Widget *, int, Slot slot, Modifiers modifiers, double, double) {

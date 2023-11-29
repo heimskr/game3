@@ -2,6 +2,7 @@
 
 #include "types/Types.h"
 #include "ui/Modifiers.h"
+#include "ui/gtk/ItemSlot.h"
 #include "ui/module/Module.h"
 
 #include <any>
@@ -42,14 +43,11 @@ namespace Game3 {
 			Glib::RefPtr<Gio::Menu> gmenu;
 			Glib::RefPtr<Gtk::DragSource> source;
 			Glib::ustring name;
-			std::unordered_map<Gtk::Widget *, Slot> widgetMap;
-			std::unordered_map<Gtk::Widget *, std::pair<Glib::RefPtr<Gtk::GestureClick>, Glib::RefPtr<Gtk::GestureClick>>> clickGestures;
-			std::unordered_map<Slot, Gtk::Widget *> widgetsBySlot;
-			std::vector<std::unique_ptr<Gtk::Widget>> widgets;
+			std::vector<std::unique_ptr<ItemSlot>> itemSlots;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
 			Gtk::Box hbox{Gtk::Orientation::HORIZONTAL};
 			Gtk::PopoverMenu popoverMenu;
-			Gtk::Grid grid;
+			Gtk::FlowBox flowBox;
 			Gtk::Label label;
 			Slot lastSlot = -1;
 			Slot lastSlotCount = -1;
@@ -59,6 +57,7 @@ namespace Game3 {
 			static InventoryID getInventoryIndex(const std::any &);
 			int gridWidth() const;
 			void populate();
+			void repopulate();
 			void leftClick(Gtk::Widget *, int click_count, Slot, Modifiers, double x, double y);
 			void rightClick(Gtk::Widget *, int click_count, Slot, Modifiers, double x, double y);
 	};

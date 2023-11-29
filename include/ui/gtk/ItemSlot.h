@@ -5,15 +5,19 @@
 #include <gtkmm.h>
 
 #include <functional>
+#include <memory>
 
 namespace Game3 {
+	class ClientGame;
+	class ClientInventory;
 	class ItemStack;
 
 	class ItemSlot: public Gtk::Fixed {
 		public:
 			using ClickFn = std::function<void(Modifiers, int, double, double)>;
 
-			ItemSlot();
+			ItemSlot() = delete;
+			ItemSlot(std::shared_ptr<ClientGame>, Slot, std::shared_ptr<ClientInventory>);
 
 			void setStack(const ItemStack &);
 			void reset();
@@ -22,6 +26,9 @@ namespace Game3 {
 			void setRightClick(ClickFn);
 
 		private:
+			std::shared_ptr<ClientGame> game;
+			Slot slot;
+			std::shared_ptr<ClientInventory> inventory;
 			bool isEmpty = true;
 			bool durabilityVisible = false;
 
