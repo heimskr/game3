@@ -7,10 +7,12 @@
 #include "net/Server.h"
 #include "net/GenericClient.h"
 #include "net/RemoteClient.h"
+#include "packet/RecipeListPacket.h"
 #include "packet/SelfTeleportedPacket.h"
 #include "packet/TimePacket.h"
 #include "realm/Overworld.h"
 #include "realm/ShadowRealm.h"
+#include "recipe/CraftingRecipe.h"
 #include "util/Crypto.h"
 #include "util/FS.h"
 #include "util/Timer.h"
@@ -182,6 +184,7 @@ namespace Game3 {
 		auto guard = client.bufferGuard();
 		client.send(SelfTeleportedPacket(realm->id, player->getPosition()));
 		client.send(TimePacket(game->time));
+		client.send(RecipeListPacket(CraftingRecipeRegistry::ID(), game->registry<CraftingRecipeRegistry>()));
 		auto lock = game->players.sharedLock();
 		const EntityPacket packet(player);
 		for (const auto &other_player: game->players) {

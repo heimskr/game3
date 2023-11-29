@@ -78,6 +78,22 @@ namespace Game3 {
 			inline size_t size() const {
 				return items.size();
 			}
+
+			inline auto begin() const {
+				return items.begin();
+			}
+
+			inline auto end() const {
+				return items.end();
+			}
+
+			inline auto rbegin() const {
+				return items.rbegin();
+			}
+
+			inline auto rend() const {
+				return items.rend();
+			}
 	};
 
 	struct NamedRegistryBase: Registry {
@@ -192,6 +208,14 @@ namespace Game3 {
 			inline auto end() const {
 				return items.end();
 			}
+
+			inline auto rbegin() const {
+				return items.rbegin();
+			}
+
+			inline auto rend() const {
+				return items.rend();
+			}
 	};
 
 	struct UnnamedRegistryBase: Registry {
@@ -274,11 +298,19 @@ namespace Game3 {
 			}
 
 			inline auto begin() const {
-				return items.begin();
+				return byCounter.begin();
 			}
 
 			inline auto end() const {
-				return items.end();
+				return byCounter.end();
+			}
+
+			inline auto rbegin() const {
+				return byCounter.rbegin();
+			}
+
+			inline auto rend() const {
+				return byCounter.rend();
 			}
 	};
 

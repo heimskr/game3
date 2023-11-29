@@ -359,10 +359,17 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `i32` Realm ID
 
-52. **Tileset Response**: gives the client a map of numeric tile IDs to string tile IDs
+52. **Tileset Response**: gives the client a map of numeric tile IDs to string tile IDs.
 
 	- `i32` Realm ID
 	- `map<u16, string>` Tileset data
+
+53. **Recipe List**: gives the client a list of the recipes the server knows.
+
+	- `string` Recipe type identifier
+	- `list<string>` Recipe JSONs
+
+	The order of the list is important because the client and server have to agree on the order of the recipes.
 
 # Message Format
 

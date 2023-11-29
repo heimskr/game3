@@ -51,6 +51,7 @@
 #include "packet/SetItemFiltersPacket.h"
 #include "packet/TilesetRequestPacket.h"
 #include "packet/TilesetResponsePacket.h"
+#include "packet/RecipeListPacket.h"
 
 namespace Game3 {
 	void Game::add(PacketFactory &&factory) {
@@ -110,5 +111,6 @@ namespace Game3 {
 		add(PacketFactory::create<SetItemFiltersPacket>());
 		add(PacketFactory::create<TilesetRequestPacket>());
 		add(PacketFactory::create<TilesetResponsePacket>());
+		add(PacketFactory::create<RecipeListPacket>());
 	}
 }
