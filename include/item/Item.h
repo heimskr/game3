@@ -40,9 +40,9 @@ namespace Game3 {
 
 			virtual bool isTextureCacheable() const { return true; }
 
-			virtual Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &, const ItemStack &);
-			virtual Glib::RefPtr<Gdk::Pixbuf> makeImage(const Game &, const ItemStack &);
-			virtual Identifier getTextureIdentifier(const ItemStack &);
+			virtual Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &, const ItemStack &) const;
+			virtual Glib::RefPtr<Gdk::Pixbuf> makeImage(const Game &, const ItemStack &) const;
+			virtual Identifier getTextureIdentifier(const ItemStack &) const;
 			virtual void getOffsets(const Game &, std::shared_ptr<Texture> &, float &x_offset, float &y_offset);
 			Item & addAttribute(Identifier);
 			virtual std::shared_ptr<Texture> getTexture(const ItemStack &);
@@ -60,9 +60,9 @@ namespace Game3 {
 			virtual bool canUseOnWorld() const { return false; }
 
 		protected:
-			std::unique_ptr<uint8_t[]> rawImage;
-			Glib::RefPtr<Gdk::Pixbuf> cachedImage;
-			std::shared_ptr<Texture> cachedTexture;
+			mutable std::unique_ptr<uint8_t[]> rawImage;
+			mutable Glib::RefPtr<Gdk::Pixbuf> cachedImage;
+			mutable std::shared_ptr<Texture> cachedTexture;
 	};
 
 	class ItemStack {
@@ -79,8 +79,8 @@ namespace Game3 {
 			ItemStack(const Game &, const ItemID &, ItemCount, nlohmann::json data_);
 
 			bool canMerge(const ItemStack &) const;
-			Glib::RefPtr<Gdk::Pixbuf> getImage();
-			Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &);
+			Glib::RefPtr<Gdk::Pixbuf> getImage() const;
+			Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &) const;
 			/** Returns a copy of the ItemStack with a different count. */
 			ItemStack withCount(ItemCount) const;
 
@@ -127,7 +127,7 @@ namespace Game3 {
 
 		private:
 			const Game *game = nullptr;
-			Glib::RefPtr<Gdk::Pixbuf> cachedImage;
+			mutable Glib::RefPtr<Gdk::Pixbuf> cachedImage;
 
 			void absorbGame(const Game &);
 	};

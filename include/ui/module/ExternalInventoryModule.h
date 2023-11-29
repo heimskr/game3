@@ -52,6 +52,7 @@ namespace Game3 {
 			Gtk::Grid grid;
 			Gtk::Label label;
 			Slot lastSlot = -1;
+			Slot lastSlotCount = -1;
 			int tabWidth = 0;
 
 			static std::shared_ptr<ClientInventory> getInventory(const std::any &);

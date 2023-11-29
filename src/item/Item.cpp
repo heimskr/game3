@@ -39,13 +39,13 @@ namespace Game3 {
 	Item::Item(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count):
 		NamedRegisterable(std::move(id_)), name(std::move(name_)), basePrice(base_price), maxCount(max_count) {}
 
-	Glib::RefPtr<Gdk::Pixbuf> Item::getImage(const Game &game, const ItemStack &stack) {
+	Glib::RefPtr<Gdk::Pixbuf> Item::getImage(const Game &game, const ItemStack &stack) const {
 		if (!isTextureCacheable() || !cachedImage)
 			cachedImage = makeImage(game, stack);
 		return cachedImage;
 	}
 
-	Glib::RefPtr<Gdk::Pixbuf> Item::makeImage(const Game &game, const ItemStack &stack) {
+	Glib::RefPtr<Gdk::Pixbuf> Item::makeImage(const Game &game, const ItemStack &stack) const {
 		auto item_texture = game.registry<ItemTextureRegistry>().at(getTextureIdentifier(stack));
 		auto texture = item_texture->getTexture();
 		texture->init();
@@ -69,7 +69,7 @@ namespace Game3 {
 		       ->scale_simple(width << doublings, height << doublings, Gdk::InterpType::NEAREST);
 	}
 
-	Identifier Item::getTextureIdentifier(const ItemStack &) {
+	Identifier Item::getTextureIdentifier(const ItemStack &) const {
 		return identifier;
 	}
 
@@ -144,12 +144,12 @@ namespace Game3 {
 		return *item == *other.item && data == other.data;
 	}
 
-	Glib::RefPtr<Gdk::Pixbuf> ItemStack::getImage() {
+	Glib::RefPtr<Gdk::Pixbuf> ItemStack::getImage() const {
 		assert(game);
 		return getImage(*game);
 	}
 
-	Glib::RefPtr<Gdk::Pixbuf> ItemStack::getImage(const Game &game_) {
+	Glib::RefPtr<Gdk::Pixbuf> ItemStack::getImage(const Game &game_) const {
 		if (!(item && !item->isTextureCacheable()) && cachedImage)
 			return cachedImage;
 

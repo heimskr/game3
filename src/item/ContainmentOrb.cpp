@@ -83,7 +83,7 @@ namespace Game3 {
 		return "Containment Orb";
 	}
 
-	Identifier ContainmentOrb::getTextureIdentifier(const ItemStack &stack) {
+	Identifier ContainmentOrb::getTextureIdentifier(const ItemStack &stack) const {
 		return stack.data.empty()? "base:item/contorb" : "base:item/contorb_full";
 	}
 }

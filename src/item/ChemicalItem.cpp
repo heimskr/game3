@@ -7,7 +7,7 @@
 namespace Game3 {
 	Lockable<std::unordered_map<std::string, Glib::RefPtr<Gdk::Pixbuf>>> ChemicalItem::imageCache{};
 
-	Glib::RefPtr<Gdk::Pixbuf> ChemicalItem::getImage(const Game &game, const ItemStack &stack) {
+	Glib::RefPtr<Gdk::Pixbuf> ChemicalItem::getImage(const Game &game, const ItemStack &stack) const {
 		const std::string formula = getFormula(stack);
 
 		{
@@ -22,7 +22,7 @@ namespace Game3 {
 		return image;
 	}
 
-	Glib::RefPtr<Gdk::Pixbuf> ChemicalItem::makeImage(const Game &, const ItemStack &stack) {
+	Glib::RefPtr<Gdk::Pixbuf> ChemicalItem::makeImage(const Game &, const ItemStack &stack) const {
 		const std::string formula = getFormula(stack);
 
 		uint16_t hue = 0;

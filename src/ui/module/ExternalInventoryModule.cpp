@@ -149,7 +149,6 @@ namespace Game3 {
 
 	void ExternalInventoryModule::populate() {
 		assert(inventory);
-		auto &storage = inventory->getStorage();
 		const int grid_width = gridWidth();
 		const int tile_size  = InventoryTab::TILE_SIZE <= tabWidth? tabWidth / (tabWidth / InventoryTab::TILE_SIZE) : InventoryTab::TILE_SIZE;
 
@@ -158,22 +157,23 @@ namespace Game3 {
 			const int column = slot % grid_width;
 			std::unique_ptr<Gtk::Widget> widget_ptr;
 
-			if (storage.contains(slot)) {
-				auto &stack = storage.at(slot);
-				Glib::ustring label_text = stack.item->getTooltip(stack);
-				if (stack.count != 1)
-					label_text += " \u00d7 " + std::to_string(stack.count);
-				if (stack.hasDurability())
-					label_text += "\n(" + std::to_string(stack.data.at("durability").at(0).get<Durability>()) + "/" + std::to_string(stack.data.at("durability").at(1).get<Durability>()) + ")";
+			ItemStack *stack = (*inventory)[slot];
+
+			if (stack) {
+				Glib::ustring label_text = stack->getTooltip();
+				if (stack->count != 1)
+					label_text += " \u00d7 " + std::to_string(stack->count);
+				if (stack->hasDurability())
+					label_text += "\n(" + std::to_string(stack->data.at("durability").at(0).get<Durability>()) + '/' + std::to_string(stack->data.at("durability").at(1).get<Durability>()) + ')';
 				auto fixed_ptr = std::make_unique<Gtk::Fixed>();
 				auto image_ptr = std::make_unique<Gtk::Image>(inventory->getImage(*game, slot));
-				auto label_ptr = std::make_unique<Gtk::Label>(std::to_string(stack.count));
+				auto label_ptr = std::make_unique<Gtk::Label>(std::to_string(stack->count));
 				label_ptr->set_xalign(1.f);
 				label_ptr->set_yalign(1.f);
 				auto &fixed = *fixed_ptr;
-				if (stack.hasDurability()) {
+				if (stack->hasDurability()) {
 					auto progress_ptr = std::make_unique<Gtk::ProgressBar>();
-					progress_ptr->set_fraction(stack.getDurabilityFraction());
+					progress_ptr->set_fraction(stack->getDurabilityFraction());
 					progress_ptr->add_css_class("item-durability");
 					progress_ptr->set_size_request(tile_size - InventoryTab::TILE_MAGIC, -1);
 					fixed.put(*progress_ptr, 0, 0);
@@ -230,6 +230,8 @@ namespace Game3 {
 			grid.attach(*widget_ptr, column, row);
 			widgets.push_back(std::move(widget_ptr));
 		}
+
+		lastSlotCount = inventory->slotCount;
 	}
 
 	void ExternalInventoryModule::leftClick(Gtk::Widget *, int, Slot slot, Modifiers modifiers, double, double) {
