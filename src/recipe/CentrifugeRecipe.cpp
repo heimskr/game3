@@ -47,7 +47,9 @@ namespace Game3 {
 	void CentrifugeRecipe::toJSON(nlohmann::json &json) const {
 		json["type"] = CentrifugeRecipeRegistry::ID();
 		json["input"] = input;
-		json["weightMap"] = weightMap;
+		nlohmann::json &output = json["output"];
+		for (const auto &[item, weight]: weightMap)
+			output.push_back(nlohmann::json{weight, item});
 	}
 
 	CentrifugeRecipe CentrifugeRecipe::fromJSON(const Game &game, const nlohmann::json &json) {
