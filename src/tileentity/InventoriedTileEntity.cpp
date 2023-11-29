@@ -6,7 +6,7 @@
 #include "packet/TileEntityPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/InventoriedTileEntity.h"
-#include "ui/module/ExternalInventoryModule.h"
+#include "ui/module/InventoryModule.h"
 
 namespace Game3 {
 	InventoriedTileEntity::InventoriedTileEntity(InventoryPtr inventory_):
@@ -136,7 +136,7 @@ namespace Game3 {
 		player->send(TileEntityPacket(getSelf()));
 
 		if (!silent)
-			player->send(OpenModuleForAgentPacket(ExternalInventoryModule::ID(), getGID()));
+			player->send(OpenModuleForAgentPacket(InventoryModule::ID(), getGID()));
 
 		player->queueForMove([this, self = shared_from_this()](const EntityPtr &entity) {
 			removeObserver(std::static_pointer_cast<Player>(entity));

@@ -22,7 +22,7 @@
 #include "ui/gtk/ConnectDialog.h"
 #include "ui/gtk/ConnectionSuccessDialog.h"
 #include "ui/gtk/JSONDialog.h"
-#include "ui/module/ExternalInventoryModule.h"
+#include "ui/module/InventoryModule.h"
 #include "ui/module/FluidLevelsModule.h"
 #include "ui/module/ModuleFactory.h"
 #include "ui/tab/CraftingTab.h"
@@ -595,7 +595,7 @@ namespace Game3 {
 	}
 
 	void MainWindow::showExternalInventory(const std::shared_ptr<ClientInventory> &inventory) {
-		inventoryTab->setModule(std::make_shared<ExternalInventoryModule>(game, inventory));
+		inventoryTab->setModule(std::make_shared<InventoryModule>(game, inventory));
 	}
 
 	GlobalID MainWindow::getExternalGID() const {

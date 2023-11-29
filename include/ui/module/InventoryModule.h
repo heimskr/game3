@@ -14,17 +14,17 @@ namespace Game3 {
 	class ClientInventory;
 	class InventoryTab;
 
-	class ExternalInventoryModule: public Module, public std::enable_shared_from_this<ExternalInventoryModule> {
+	class InventoryModule: public Module, public std::enable_shared_from_this<InventoryModule> {
 		public:
 			struct Argument {
-				AgentPtr agent;
+				std::shared_ptr<Agent> agent;
 				InventoryID index;
 			};
 
-			static Identifier ID() { return {"base", "module/external_inventory"}; }
+			static Identifier ID() { return {"base", "module/inventory"}; }
 
-			ExternalInventoryModule(std::shared_ptr<ClientGame>, const std::any &);
-			ExternalInventoryModule(std::shared_ptr<ClientGame>, std::shared_ptr<ClientInventory>);
+			InventoryModule(std::shared_ptr<ClientGame>, const std::any &);
+			InventoryModule(std::shared_ptr<ClientGame>, std::shared_ptr<ClientInventory>);
 
 			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;
@@ -32,7 +32,7 @@ namespace Game3 {
 			void update() final;
 			void onResize(int) final;
 			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
-			std::shared_ptr<ExternalInventoryModule> getPrimaryInventoryModule() final { return shared_from_this(); }
+			std::shared_ptr<InventoryModule> getPrimaryInventoryModule() final { return shared_from_this(); }
 
 			inline auto getInventory() const { return inventory; }
 			void setInventory(std::shared_ptr<ClientInventory>) override;

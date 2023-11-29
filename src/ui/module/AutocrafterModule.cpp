@@ -8,7 +8,7 @@
 #include "ui/gtk/UITypes.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/AutocrafterModule.h"
-#include "ui/module/ExternalInventoryModule.h"
+#include "ui/module/InventoryModule.h"
 #include "ui/tab/InventoryTab.h"
 #include "ui/MainWindow.h"
 
@@ -19,8 +19,8 @@ namespace Game3 {
 	AutocrafterModule::AutocrafterModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<Autocrafter> autocrafter_):
 	game(std::move(game_)),
 	autocrafter(std::move(autocrafter_)),
-	inventoryModule(std::make_shared<ExternalInventoryModule>(game, std::static_pointer_cast<ClientInventory>(autocrafter->getInventory(0)))),
-	stationInventoryModule(std::make_shared<ExternalInventoryModule>(game, std::static_pointer_cast<ClientInventory>(autocrafter->getInventory(1)))) {
+	inventoryModule(std::make_shared<InventoryModule>(game, std::static_pointer_cast<ClientInventory>(autocrafter->getInventory(0)))),
+	stationInventoryModule(std::make_shared<InventoryModule>(game, std::static_pointer_cast<ClientInventory>(autocrafter->getInventory(1)))) {
 		assert(autocrafter);
 		vbox.set_hexpand();
 

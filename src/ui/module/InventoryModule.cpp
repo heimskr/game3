@@ -5,16 +5,16 @@
 #include "ui/gtk/ItemSlot.h"
 #include "ui/gtk/UITypes.h"
 #include "ui/gtk/Util.h"
-#include "ui/module/ExternalInventoryModule.h"
+#include "ui/module/InventoryModule.h"
 #include "ui/tab/InventoryTab.h"
 #include "ui/MainWindow.h"
 #include "util/Demangle.h"
 
 namespace Game3 {
-	ExternalInventoryModule::ExternalInventoryModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
-		ExternalInventoryModule(std::move(game_), getInventory(argument)) {}
+	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
+		InventoryModule(std::move(game_), getInventory(argument)) {}
 
-	ExternalInventoryModule::ExternalInventoryModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<ClientInventory> inventory_):
+	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<ClientInventory> inventory_):
 	game(std::move(game_)),
 	inventory(std::move(inventory_)) {
 		assert(inventory);
@@ -36,40 +36,40 @@ namespace Game3 {
 		popoverMenu.set_parent(vbox);
 	}
 
-	ClientInventoryPtr ExternalInventoryModule::getInventory(const std::any &any) {
+	ClientInventoryPtr InventoryModule::getInventory(const std::any &any) {
 		const Argument *argument = std::any_cast<Argument>(&any);
 		if (!argument) {
 			const AgentPtr *agent = std::any_cast<AgentPtr>(&any);
 			if (!agent)
-				throw std::invalid_argument("Invalid std::any argument given to ExternalInventoryModule: " + demangle(any.type().name()));
+				throw std::invalid_argument("Invalid std::any argument given to InventoryModule: " + demangle(any.type().name()));
 			auto has_inventory = std::dynamic_pointer_cast<HasInventory>(*agent);
 			if (!has_inventory)
-				throw std::invalid_argument("Agent supplied to ExternalInventoryModule isn't castable to HasInventory");
+				throw std::invalid_argument("Agent supplied to InventoryModule isn't castable to HasInventory");
 			return std::dynamic_pointer_cast<ClientInventory>(has_inventory->getInventory(0));
 		}
 		const auto [agent, index] = *argument;
 		return std::dynamic_pointer_cast<ClientInventory>(std::dynamic_pointer_cast<HasInventory>(agent)->getInventory(index));
 	}
 
-	InventoryID ExternalInventoryModule::getInventoryIndex(const std::any &any) {
+	InventoryID InventoryModule::getInventoryIndex(const std::any &any) {
 		const Argument *argument = std::any_cast<Argument>(&any);
 		if (!argument)
-			throw std::invalid_argument("Invalid std::any argument given to ExternalInventoryModule: " + demangle(any.type().name()));
+			throw std::invalid_argument("Invalid std::any argument given to InventoryModule: " + demangle(any.type().name()));
 		return argument->index;
 	}
 
-	Gtk::Widget & ExternalInventoryModule::getWidget() {
+	Gtk::Widget & InventoryModule::getWidget() {
 		return vbox;
 	}
 
-	void ExternalInventoryModule::reset() {
+	void InventoryModule::reset() {
 		removeChildren(flowBox);
 		itemSlots.clear();
 		lastSlotCount = -1;
 		update();
 	}
 
-	void ExternalInventoryModule::update() {
+	void InventoryModule::update() {
 		if (!name.empty()) {
 			label.set_text(name);
 			label.show();
@@ -78,17 +78,17 @@ namespace Game3 {
 		repopulate();
 	}
 
-	void ExternalInventoryModule::onResize(int width) {
+	void InventoryModule::onResize(int width) {
 		tabWidth = width;
 		update();
 	}
 
-	void ExternalInventoryModule::setInventory(std::shared_ptr<ClientInventory> new_inventory) {
+	void InventoryModule::setInventory(std::shared_ptr<ClientInventory> new_inventory) {
 		inventory = std::move(new_inventory);
 		update();
 	}
 
-	std::optional<Buffer> ExternalInventoryModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &) {
+	std::optional<Buffer> InventoryModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &) {
 		if (name == "TileEntityRemoved") {
 
 			if (source && source->getGID() == inventory->getOwner()->getGID()) {
@@ -105,11 +105,11 @@ namespace Game3 {
 		return {};
 	}
 
-	int ExternalInventoryModule::gridWidth() const {
+	int InventoryModule::gridWidth() const {
 		return tabWidth / (InventoryTab::TILE_SIZE + 2 * InventoryTab::TILE_MARGIN);
 	}
 
-	void ExternalInventoryModule::populate() {
+	void InventoryModule::populate() {
 		assert(inventory);
 		auto lock = inventory->sharedLock();
 
@@ -135,16 +135,15 @@ namespace Game3 {
 		}
 	}
 
-	void ExternalInventoryModule::repopulate() {
+	void InventoryModule::repopulate() {
 		assert(inventory);
+		auto lock = inventory->sharedLock();
 
-		// Possibly thread-safe.
 		if (inventory->slotCount.load() != lastSlotCount) {
 			populate();
 			return;
 		}
 
-		auto lock = inventory->sharedLock();
 		lastSlotCount = inventory->slotCount;
 
 		for (Slot slot = 0; slot < lastSlotCount; ++slot) {
@@ -158,7 +157,7 @@ namespace Game3 {
 		}
 	}
 
-	void ExternalInventoryModule::leftClick(Gtk::Widget *, int, Slot slot, Modifiers modifiers, double, double) {
+	void InventoryModule::leftClick(Gtk::Widget *, int, Slot slot, Modifiers modifiers, double, double) {
 		if (!game || !modifiers.onlyShift() || !inventory->contains(slot))
 			return;
 
@@ -173,7 +172,7 @@ namespace Game3 {
 		game->player->send(MoveSlotsPacket(owner->getGID(), game->player->getGID(), slot, -1, inventory->index, 0));
 	}
 
-	void ExternalInventoryModule::rightClick(Gtk::Widget *widget, int, Slot slot, Modifiers, double x, double y) {
+	void InventoryModule::rightClick(Gtk::Widget *widget, int, Slot slot, Modifiers, double x, double y) {
 		// mainWindow.onBlur();
 
 		if (!inventory->contains(slot))

@@ -9,7 +9,7 @@
 #include "ui/module/AutocrafterModule.h"
 #include "ui/module/ChemicalReactorModule.h"
 #include "ui/module/CombinerModule.h"
-#include "ui/module/ExternalInventoryModule.h"
+#include "ui/module/InventoryModule.h"
 #include "ui/module/EnergyLevelModule.h"
 #include "ui/module/FluidLevelsModule.h"
 #include "ui/module/ItemFilterModule.h"
@@ -38,7 +38,7 @@ namespace Game3 {
 	}
 
 	void Game::addModuleFactories() {
-		add(ModuleFactory::create<ExternalInventoryModule>());
+		add(ModuleFactory::create<InventoryModule>());
 		add(ModuleFactory::create<FluidLevelsModule>());
 		add(ModuleFactory::create<ChemicalReactorModule>());
 		add(ModuleFactory::create<EnergyLevelModule>());

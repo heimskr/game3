@@ -7,7 +7,7 @@
 #include "ui/gtk/UITypes.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/CombinerModule.h"
-#include "ui/module/ExternalInventoryModule.h"
+#include "ui/module/InventoryModule.h"
 #include "ui/tab/InventoryTab.h"
 #include "ui/MainWindow.h"
 
@@ -18,7 +18,7 @@ namespace Game3 {
 	CombinerModule::CombinerModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<Combiner> combiner_):
 	game(std::move(game_)),
 	combiner(std::move(combiner_)),
-	inventoryModule(std::make_shared<ExternalInventoryModule>(game, std::static_pointer_cast<ClientInventory>(combiner->getInventory(0)))) {
+	inventoryModule(std::make_shared<InventoryModule>(game, std::static_pointer_cast<ClientInventory>(combiner->getInventory(0)))) {
 		assert(combiner);
 		vbox.set_hexpand();
 

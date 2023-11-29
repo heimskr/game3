@@ -10,7 +10,7 @@
 namespace Game3 {
 	class Agent;
 	class ChemicalReactor;
-	class ExternalInventoryModule;
+	class InventoryModule;
 	class InventoryTab;
 
 	class ChemicalReactorModule: public Module {
@@ -27,12 +27,12 @@ namespace Game3 {
 			void onResize(int) final;
 			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
 			void setInventory(std::shared_ptr<ClientInventory>) final;
-			std::shared_ptr<ExternalInventoryModule> getPrimaryInventoryModule() final { return inventoryModule; }
+			std::shared_ptr<InventoryModule> getPrimaryInventoryModule() final { return inventoryModule; }
 
 		private:
 			std::shared_ptr<ClientGame> game;
 			std::shared_ptr<ChemicalReactor> reactor;
-			std::shared_ptr<ExternalInventoryModule> inventoryModule;
+			std::shared_ptr<InventoryModule> inventoryModule;
 			Gtk::Label header;
 			Gtk::Entry entry;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};

@@ -13,7 +13,7 @@
 #include "ui/gtk/UITypes.h"
 #include "ui/gtk/Util.h"
 #include "ui/tab/InventoryTab.h"
-#include "ui/module/ExternalInventoryModule.h"
+#include "ui/module/InventoryModule.h"
 #include "ui/module/Module.h"
 #include "util/Util.h"
 
@@ -351,7 +351,7 @@ namespace Game3 {
 		if (module_->handleShiftClick(inventory, slot))
 			return;
 
-		std::shared_ptr<ExternalInventoryModule> external_module = module_->getPrimaryInventoryModule();
+		std::shared_ptr<InventoryModule> external_module = module_->getPrimaryInventoryModule();
 		if (!external_module)
 			return;
 
