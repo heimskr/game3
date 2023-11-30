@@ -1,0 +1,10 @@
+These textures are from Pixel-boy (https://pixel-boy.itch.io/):
+- cyclops.png
+- dragon.png
+- eye.png
+- fish.png
+- flame.png
+- mushroom.png
+- skull.png
+- slime_blue.png
+- slime_green.png
