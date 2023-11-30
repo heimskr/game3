@@ -19,7 +19,6 @@
 
 namespace Game3 {
 	InventoryTab::InventoryTab(MainWindow &main_window): Tab(main_window.notebook), mainWindow(main_window) {
-		// vbox.append(grid);
 		scrolled.set_child(vbox);
 		scrolled.set_hexpand();
 		scrolled.set_vexpand();
@@ -57,11 +56,6 @@ namespace Game3 {
 		mainWindow.insert_action_group("inventory_popup", group);
 		popoverMenu.set_parent(vbox);
 
-		// grid.add_controller(source);
-		// grid.add_controller(target);
-		// grid.set_row_homogeneous();
-		// grid.set_column_homogeneous();
-		// grid.set_hexpand();
 		vbox.set_hexpand();
 		vbox.set_vexpand();
 	}
@@ -72,10 +66,6 @@ namespace Game3 {
 			lastWidth = new_width;
 			currentModule->onResize(new_width);
 		}
-		// if (gridWidth() != lastGridWidth) {
-		// 	reset(game);
-		// 	auto lock = currentModule.sharedLock();
-		// }
 	}
 
 	void InventoryTab::update(const std::shared_ptr<ClientGame> &game) {
@@ -93,8 +83,6 @@ namespace Game3 {
 	}
 
 	void InventoryTab::reset(const std::shared_ptr<ClientGame> &game) {
-		INFO("InventoryTab::reset(" << game << ')');
-
 		if (!game) {
 			clear();
 			lastGame = nullptr;
@@ -178,6 +166,10 @@ namespace Game3 {
 		}
 	}
 
+	void InventoryTab::activeSlotSet() {
+		updatePlayerClasses(lastGame);
+	}
+
 	int InventoryTab::gridWidth() const {
 		return scrolled.get_width() / (TILE_SIZE + 2 * TILE_MARGIN);
 	}
@@ -192,7 +184,6 @@ namespace Game3 {
 			shiftClick(lastGame, slot);
 		} else {
 			lastGame->player->getInventory(0)->setActive(slot, false);
-			updatePlayerClasses(lastGame);
 		}
 	}
 
@@ -233,7 +224,6 @@ namespace Game3 {
 
 		const Slot active_slot = game->player->getInventory(0)->activeSlot;
 
-		INFO("active_slot = " << active_slot);
 		inventoryModule->removeCSSClass("active-slot");
 		inventoryModule->addCSSClass("active-slot", active_slot);
 	}

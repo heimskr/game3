@@ -6,6 +6,8 @@
 #include "game/ServerGame.h"
 #include "net/RemoteClient.h"
 #include "packet/SetActiveSlotPacket.h"
+#include "ui/MainWindow.h"
+#include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
 	void SetActiveSlotPacket::handle(ServerGame &, RemoteClient &client) {
@@ -16,5 +18,6 @@ namespace Game3 {
 
 	void SetActiveSlotPacket::handle(ClientGame &game) {
 		game.player->getInventory(0)->setActive(slot, true);
+		game.getWindow().inventoryTab->activeSlotSet();
 	}
 }

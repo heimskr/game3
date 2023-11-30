@@ -66,7 +66,6 @@ namespace Game3 {
 			int gridWidth() const;
 			void populate();
 			void repopulate();
-			void leftClick(Gtk::Widget *, int click_count, Slot, Modifiers, double x, double y);
-			// void rightClick(Gtk::Widget *, int click_count, Slot, Modifiers, double x, double y);
+			void leftClick(Slot, Modifiers);
 	};
 }

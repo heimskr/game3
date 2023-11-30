@@ -148,8 +148,8 @@ namespace Game3 {
 			if (ItemStack *stack = (*inventory)[slot])
 				item_slot->setStack(*stack);
 
-			item_slot->setLeftClick([this, slot, item_slot = item_slot.get()](Modifiers modifiers, int n, double x, double y) {
-				leftClick(item_slot, n, slot, modifiers, x, y);
+			item_slot->setLeftClick([this, slot](Modifiers modifiers, int, double, double) {
+				leftClick(slot, modifiers);
 			});
 
 			item_slot->setGmenu(gmenu);
@@ -181,8 +181,8 @@ namespace Game3 {
 		}
 	}
 
-	void InventoryModule::leftClick(Gtk::Widget *, int, Slot slot, Modifiers modifiers, double, double) {
-		if (!game || !modifiers.onlyShift() || !inventory->contains(slot))
+	void InventoryModule::leftClick(Slot slot, Modifiers modifiers) {
+		if (!game || !modifiers.onlyShift() || (parent && parent->suppressLeftClick()) || !inventory->contains(slot))
 			return;
 
 		InventoryPtr player_inventory = game->player->getInventory(0);
@@ -195,21 +195,4 @@ namespace Game3 {
 
 		game->player->send(MoveSlotsPacket(owner->getGID(), game->player->getGID(), slot, -1, inventory->index, 0));
 	}
-
-	// void InventoryModule::rightClick(Gtk::Widget *widget, int, Slot slot, Modifiers, double x, double y) {
-	// 	// mainWindow.onBlur();
-
-	// 	if (!inventory->contains(slot))
-	// 		return;
-
-	// 	const auto allocation = widget->get_allocation();
-	// 	x += allocation.get_x();
-	// 	y += allocation.get_y();
-
-	// 	popoverMenu.set_has_arrow(true);
-	// 	popoverMenu.set_pointing_to({int(x), int(y), 1, 1});
-	// 	popoverMenu.set_menu_model(gmenu);
-	// 	lastSlot = slot;
-	// 	popoverMenu.popup();
-	// }
 }

@@ -53,10 +53,11 @@ namespace Game3 {
 			GlobalID getExternalGID() const;
 
 			void slotClicked(Slot, bool is_right_click, Modifiers) override;
+			bool suppressLeftClick() const override { return true; }
+			void activeSlotSet();
 
 		private:
 			Gtk::ScrolledWindow scrolled;
-			// Gtk::Grid grid;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
 			Gtk::PopoverMenu popoverMenu;
 			Lockable<std::shared_ptr<Module>> currentModule;
