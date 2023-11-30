@@ -13,7 +13,6 @@ namespace Game3 {
 	// Magnificent code duplication.
 	void MoveSlotsPacket::handle(ServerGame &game, RemoteClient &client) {
 		if (firstGID == secondGID && firstInventory == secondInventory && firstSlot == secondSlot) {
-			client.send(ErrorPacket("Not performing redundant move"));
 			return;
 		}
 
@@ -63,7 +62,6 @@ namespace Game3 {
 			ItemStack *second_stack = second_inventory[secondSlot];
 
 			if (first_stack == nullptr) {
-				client.send(ErrorPacket("Can't move slots: first slot is invalid or empty"));
 				return;
 			}
 
