@@ -86,6 +86,7 @@ namespace Game3 {
 		if (!game) {
 			clear();
 			lastGame = nullptr;
+			inventoryModule.reset();
 			return;
 		}
 

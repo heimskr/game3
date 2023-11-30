@@ -18,7 +18,7 @@ namespace Game3 {
 			using ClickFn = std::function<void(Modifiers, int, double, double)>;
 
 			ItemSlot() = delete;
-			ItemSlot(std::shared_ptr<ClientGame>, Slot, std::shared_ptr<ClientInventory>, ItemSlotParent * = nullptr);
+			ItemSlot(const std::shared_ptr<ClientGame> &, Slot, std::shared_ptr<ClientInventory>, ItemSlotParent * = nullptr);
 
 			void setStack(const ItemStack &);
 			void reset();
@@ -27,7 +27,7 @@ namespace Game3 {
 			void setGmenu(Glib::RefPtr<Gio::Menu>);
 
 		private:
-			std::shared_ptr<ClientGame> game;
+			std::weak_ptr<ClientGame> weakGame;
 			Slot slot;
 			std::shared_ptr<ClientInventory> inventory;
 			bool isEmpty = true;

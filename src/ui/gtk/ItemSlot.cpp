@@ -13,8 +13,8 @@ namespace Game3 {
 		constexpr int TILE_SIZE = 64;
 	}
 
-	ItemSlot::ItemSlot(std::shared_ptr<ClientGame> game_, Slot slot_, std::shared_ptr<ClientInventory> inventory_, ItemSlotParent *parent_):
-	game(std::move(game_)), slot(slot_), inventory(std::move(inventory_)), parent(parent_) {
+	ItemSlot::ItemSlot(const ClientGamePtr &game, Slot slot_, ClientInventoryPtr inventory_, ItemSlotParent *parent_):
+	weakGame(game), slot(slot_), inventory(std::move(inventory_)), parent(parent_) {
 		label.set_xalign(1.f);
 		label.set_yalign(1.f);
 		label.set_expand(true);
@@ -44,7 +44,8 @@ namespace Game3 {
 
 			const auto &value = static_cast<const Glib::Value<DragSource> &>(base);
 			const DragSource source = value.get();
-			game->player->send(MoveSlotsPacket(source.inventory->getOwner()->getGID(), inventory->getOwner()->getGID(), source.slot, slot, source.index, inventory->index));
+			if (ClientGamePtr game = weakGame.lock())
+				game->player->send(MoveSlotsPacket(source.inventory->getOwner()->getGID(), inventory->getOwner()->getGID(), source.slot, slot, source.index, inventory->index));
 			return true;
 		}, false);
 

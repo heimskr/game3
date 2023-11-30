@@ -554,6 +554,7 @@ namespace Game3 {
 			if (dialog)
 				dialog->close();
 
+			inventoryTab->reset(nullptr);
 			removeModule();
 			game->stopThread();
 			canvas->game = nullptr;
