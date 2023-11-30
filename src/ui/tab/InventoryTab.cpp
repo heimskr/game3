@@ -170,38 +170,31 @@ namespace Game3 {
 		throw std::logic_error("InventoryTab::getExternalGID() needs to be replaced");
 	}
 
+	void InventoryTab::slotClicked(Slot slot, bool is_right_click, Modifiers modifiers) {
+		if (is_right_click) {
+			lastSlot = slot;
+		} else {
+			leftClick(slot, modifiers);
+		}
+	}
+
 	int InventoryTab::gridWidth() const {
 		return scrolled.get_width() / (TILE_SIZE + 2 * TILE_MARGIN);
 	}
 
-	void InventoryTab::leftClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *, int, Slot slot, Modifiers modifiers, double, double) {
+	void InventoryTab::leftClick(Slot slot, Modifiers modifiers) {
 		mainWindow.onBlur();
 
+		if (!lastGame)
+			return;
+
 		if (modifiers.onlyShift()) {
-			shiftClick(game, slot);
+			shiftClick(lastGame, slot);
 		} else {
-			game->player->getInventory(0)->setActive(slot, false);
-			updatePlayerClasses(game);
+			lastGame->player->getInventory(0)->setActive(slot, false);
+			updatePlayerClasses(lastGame);
 		}
 	}
-
-	// void InventoryTab::rightClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *widget, int, Slot slot, Modifiers, double x, double y) {
-	// 	mainWindow.onBlur();
-
-	// 	if (!game->player->getInventory(0)->contains(slot))
-	// 		return;
-
-	// 	const auto allocation = widget->get_allocation();
-	// 	x += allocation.get_x();
-	// 	y += allocation.get_y();
-
-	// 	popoverMenu.set_has_arrow(true);
-	// 	popoverMenu.set_pointing_to({int(x), int(y), 1, 1});
-	// 	popoverMenu.set_menu_model(gmenu);
-	// 	lastGame = game;
-	// 	lastSlot = slot;
-	// 	popoverMenu.popup();
-	// }
 
 	void InventoryTab::shiftClick(const std::shared_ptr<ClientGame> &game, Slot slot) {
 		if (!game)
@@ -256,7 +249,7 @@ namespace Game3 {
 		if (const InventoryPtr inventory = game->player->getInventory(0)) {
 			auto client_inventory = std::static_pointer_cast<ClientInventory>(inventory);
 			if (!inventoryModule) {
-				inventoryModule.emplace(game, client_inventory, sigc::mem_fun(*this, &InventoryTab::gmenuSetup));
+				inventoryModule.emplace(game, client_inventory, this, sigc::mem_fun(*this, &InventoryTab::gmenuSetup));
 				vbox.prepend(inventoryModule->getWidget());
 			}
 			populate(client_inventory);

@@ -8,6 +8,7 @@
 #include <utility>
 #include <vector>
 
+#include "interface/ItemSlotParent.h"
 #include "types/Types.h"
 #include "threading/LockableSharedPtr.h"
 #include "ui/Modifiers.h"
@@ -22,7 +23,7 @@ namespace Game3 {
 	class Module;
 	class TileEntity;
 
-	class InventoryTab: public Tab {
+	class InventoryTab: public Tab, public ItemSlotParent {
 		public:
 			constexpr static int TILE_MARGIN = 2;
 			constexpr static int TILE_SIZE = 64;
@@ -51,6 +52,8 @@ namespace Game3 {
 			void removeModule();
 			GlobalID getExternalGID() const;
 
+			void slotClicked(Slot, bool is_right_click, Modifiers) override;
+
 		private:
 			Gtk::ScrolledWindow scrolled;
 			// Gtk::Grid grid;
@@ -66,8 +69,7 @@ namespace Game3 {
 			int lastWidth = -1;
 
 			int gridWidth() const;
-			void leftClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, Modifiers, double x, double y);
-			// void rightClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, Modifiers, double x, double y);
+			void leftClick(Slot, Modifiers);
 			void shiftClick(const std::shared_ptr<ClientGame> &, Slot);
 			void updatePlayerClasses(const std::shared_ptr<ClientGame> &);
 			void populate(std::shared_ptr<ClientInventory>);

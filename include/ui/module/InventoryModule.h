@@ -16,7 +16,7 @@ namespace Game3 {
 	class ClientInventory;
 	class InventoryTab;
 
-	class InventoryModule: public Module, public std::enable_shared_from_this<InventoryModule> {
+	class InventoryModule: public Module, public ItemSlotParent, public std::enable_shared_from_this<InventoryModule> {
 		public:
 			struct Argument {
 				std::shared_ptr<Agent> agent;
@@ -27,8 +27,8 @@ namespace Game3 {
 
 			using GmenuFn = std::function<void(InventoryModule &, Glib::RefPtr<Gio::Menu>)>;
 
-			InventoryModule(std::shared_ptr<ClientGame>, const std::any &, const GmenuFn & = {});
-			InventoryModule(std::shared_ptr<ClientGame>, std::shared_ptr<ClientInventory>, const GmenuFn & = {});
+			InventoryModule(std::shared_ptr<ClientGame>, const std::any &, ItemSlotParent * = nullptr, const GmenuFn & = {});
+			InventoryModule(std::shared_ptr<ClientGame>, std::shared_ptr<ClientInventory>, ItemSlotParent * = nullptr, const GmenuFn & = {});
 
 			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;
@@ -42,6 +42,7 @@ namespace Game3 {
 			void removeCSSClass(const Glib::ustring &, Slot = -1);
 			inline auto getInventory() const { return inventory; }
 			void setInventory(std::shared_ptr<ClientInventory>) override;
+			void slotClicked(Slot, bool is_right_click, Modifiers) override;
 
 		private:
 			std::shared_ptr<ClientGame> game;
@@ -58,6 +59,7 @@ namespace Game3 {
 			Slot lastSlot = -1;
 			Slot lastSlotCount = -1;
 			int tabWidth = 0;
+			ItemSlotParent *parent = nullptr;
 
 			static std::shared_ptr<ClientInventory> getInventory(const std::any &);
 			static InventoryID getInventoryIndex(const std::any &);

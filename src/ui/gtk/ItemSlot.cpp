@@ -1,4 +1,5 @@
 #include "entity/ClientPlayer.h"
+#include "interface/ItemSlotParent.h"
 #include "game/Agent.h"
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
@@ -12,8 +13,8 @@ namespace Game3 {
 		constexpr int TILE_SIZE = 64;
 	}
 
-	ItemSlot::ItemSlot(std::shared_ptr<ClientGame> game_, Slot slot_, std::shared_ptr<ClientInventory> inventory_):
-	game(std::move(game_)), slot(slot_), inventory(std::move(inventory_)) {
+	ItemSlot::ItemSlot(std::shared_ptr<ClientGame> game_, Slot slot_, std::shared_ptr<ClientInventory> inventory_, ItemSlotParent *parent_):
+	game(std::move(game_)), slot(slot_), inventory(std::move(inventory_)), parent(parent_) {
 		label.set_xalign(1.f);
 		label.set_yalign(1.f);
 		label.set_expand(true);
@@ -47,10 +48,11 @@ namespace Game3 {
 			return true;
 		}, false);
 
-		auto right_click = Gtk::GestureClick::create();
-		right_click->set_button(3);
-		right_click->signal_released().connect([this](int, double x, double y) {
-			INFO("right clicked. failure conditions: " << empty() << ", " << !gmenu);
+		rightGesture = Gtk::GestureClick::create();
+		rightGesture->set_button(3);
+		rightGesture->signal_released().connect([this](int, double x, double y) {
+			if (parent)
+				parent->slotClicked(slot, true, Modifiers{rightGesture->get_current_event_state()});
 			if (empty() || !gmenu)
 				return;
 			const auto allocation = get_allocation();
@@ -62,9 +64,22 @@ namespace Game3 {
 			popoverMenu.popup();
 		});
 
+		leftGesture = Gtk::GestureClick::create();
+		leftGesture->set_button(1);
+		leftGesture->signal_released().connect([this](int n, double x, double y) {
+			const Modifiers mods{leftGesture->get_current_event_state()};
+
+			if (parent)
+				parent->slotClicked(slot, false, mods);
+
+			if (leftClick)
+				leftClick(mods, n, x, y);
+		});
+
 		add_controller(source);
 		add_controller(target);
-		add_controller(right_click);
+		add_controller(leftGesture);
+		add_controller(rightGesture);
 	}
 
 	void ItemSlot::setStack(const ItemStack &stack) {
@@ -105,19 +120,7 @@ namespace Game3 {
 	}
 
 	void ItemSlot::setLeftClick(ClickFn click) {
-		if (leftGesture)
-			remove_controller(leftGesture);
-
 		leftClick = std::move(click);
-
-		leftGesture = Gtk::GestureClick::create();
-		leftGesture->set_button(1);
-		leftGesture->signal_released().connect([this](int n, double x, double y) {
-			const Gdk::ModifierType mods = leftGesture->get_current_event_state();
-			leftClick(Modifiers{mods}, n, x, y);
-		});
-
-		add_controller(leftGesture);
 	}
 
 	void ItemSlot::setGmenu(Glib::RefPtr<Gio::Menu> new_gmenu) {

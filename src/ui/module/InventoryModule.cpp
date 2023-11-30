@@ -11,12 +11,13 @@
 #include "util/Demangle.h"
 
 namespace Game3 {
-	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game_, const std::any &argument, const GmenuFn &gmenu_fn):
-		InventoryModule(std::move(game_), getInventory(argument), gmenu_fn) {}
+	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game_, const std::any &argument, ItemSlotParent *parent_, const GmenuFn &gmenu_fn):
+		InventoryModule(std::move(game_), getInventory(argument), parent_, gmenu_fn) {}
 
-	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<ClientInventory> inventory_, const GmenuFn &gmenu_fn):
+	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<ClientInventory> inventory_, ItemSlotParent *parent_, const GmenuFn &gmenu_fn):
 	game(std::move(game_)),
-	inventory(std::move(inventory_)) {
+	inventory(std::move(inventory_)),
+	parent(parent_) {
 		assert(inventory);
 		label.set_hexpand();
 		flowBox.set_hexpand();
@@ -32,12 +33,8 @@ namespace Game3 {
 		vbox.append(flowBox);
 
 		gmenu = Gio::Menu::create();
-		if (gmenu_fn) {
+		if (gmenu_fn)
 			gmenu_fn(*this, gmenu);
-		} else {
-			gmenu->append("_Drop", "inventory_popup.drop");
-			gmenu->append("D_iscard", "inventory_popup.discard");
-		}
 
 		popoverMenu.set_parent(vbox);
 	}
@@ -94,6 +91,11 @@ namespace Game3 {
 		update();
 	}
 
+	void InventoryModule::slotClicked(Slot slot, bool is_right_click, Modifiers modifiers) {
+		if (parent)
+			parent->slotClicked(slot, is_right_click, modifiers);
+	}
+
 	std::optional<Buffer> InventoryModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &) {
 		if (name == "TileEntityRemoved") {
 
@@ -141,7 +143,7 @@ namespace Game3 {
 		itemSlots.clear();
 
 		for (Slot slot = 0; slot < lastSlotCount; ++slot) {
-			auto item_slot = std::make_unique<ItemSlot>(game, slot, inventory);
+			auto item_slot = std::make_unique<ItemSlot>(game, slot, inventory, this);
 
 			if (ItemStack *stack = (*inventory)[slot])
 				item_slot->setStack(*stack);
@@ -151,10 +153,6 @@ namespace Game3 {
 			});
 
 			item_slot->setGmenu(gmenu);
-
-			// item_slot->setRightClick([this, slot, item_slot = item_slot.get()](Modifiers modifiers, int n, double x, double y) {
-			// 	rightClick(item_slot, n, slot, modifiers, x, y);
-			// });
 
 			flowBox.append(*item_slot);
 			itemSlots.push_back(std::move(item_slot));

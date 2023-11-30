@@ -11,13 +11,14 @@ namespace Game3 {
 	class ClientGame;
 	class ClientInventory;
 	class ItemStack;
+	struct ItemSlotParent;
 
 	class ItemSlot: public Gtk::Fixed {
 		public:
 			using ClickFn = std::function<void(Modifiers, int, double, double)>;
 
 			ItemSlot() = delete;
-			ItemSlot(std::shared_ptr<ClientGame>, Slot, std::shared_ptr<ClientInventory>);
+			ItemSlot(std::shared_ptr<ClientGame>, Slot, std::shared_ptr<ClientInventory>, ItemSlotParent * = nullptr);
 
 			void setStack(const ItemStack &);
 			void reset();
@@ -31,6 +32,7 @@ namespace Game3 {
 			std::shared_ptr<ClientInventory> inventory;
 			bool isEmpty = true;
 			bool durabilityVisible = false;
+			ItemSlotParent *parent = nullptr;
 
 			Gtk::Image image;
 			Gtk::Label label;
@@ -41,6 +43,7 @@ namespace Game3 {
 			ClickFn leftClick;
 
 			Glib::RefPtr<Gtk::GestureClick> leftGesture;
+			Glib::RefPtr<Gtk::GestureClick> rightGesture;
 
 			void addDurabilityBar(double fraction);
 	};
