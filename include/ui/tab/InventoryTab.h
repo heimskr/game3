@@ -11,6 +11,7 @@
 #include "types/Types.h"
 #include "threading/LockableSharedPtr.h"
 #include "ui/Modifiers.h"
+#include "ui/module/InventoryModule.h"
 #include "ui/tab/Tab.h"
 
 namespace Game3 {
@@ -52,27 +53,26 @@ namespace Game3 {
 
 		private:
 			Gtk::ScrolledWindow scrolled;
-			Gtk::Grid grid;
+			// Gtk::Grid grid;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
 			Gtk::PopoverMenu popoverMenu;
-			std::vector<std::unique_ptr<Gtk::Widget>> widgets;
-			int lastGridWidth = 0;
-			std::unordered_map<Gtk::Widget *, Slot> widgetMap;
-			std::unordered_map<Slot, Gtk::Widget *> widgetsBySlot;
-			Glib::RefPtr<Gio::Menu> gmenu;
 			Lockable<std::shared_ptr<Module>> currentModule;
-			std::unordered_map<Gtk::Widget *, std::pair<Glib::RefPtr<Gtk::GestureClick>, Glib::RefPtr<Gtk::GestureClick>>> clickGestures;
+			std::optional<InventoryModule> inventoryModule;
 
 			/** We can't store state in a popover, so we have to store it here. */
 			LockableSharedPtr<ClientGame> lastGame;
 			Slot lastSlot = -1;
 
+			int lastWidth = -1;
+
 			int gridWidth() const;
 			void leftClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, Modifiers, double x, double y);
-			void rightClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, Modifiers, double x, double y);
+			// void rightClick(const std::shared_ptr<ClientGame> &, Gtk::Widget *, int click_count, Slot, Modifiers, double x, double y);
 			void shiftClick(const std::shared_ptr<ClientGame> &, Slot);
 			void updatePlayerClasses(const std::shared_ptr<ClientGame> &);
-			void populate(Gtk::Grid &, std::shared_ptr<ClientInventory>);
+			void populate(std::shared_ptr<ClientInventory>);
 			void clear();
+			void gmenuSetup(InventoryModule &, Glib::RefPtr<Gio::Menu>);
+			void updateInventory(const std::shared_ptr<ClientGame> &);
 	};
 }

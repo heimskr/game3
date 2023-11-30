@@ -25,6 +25,7 @@ namespace Game3 {
 		put(image, 0, 0);
 		put(label, 0, 0);
 		set_size_request(TILE_SIZE, TILE_SIZE);
+		popoverMenu.set_parent(*this);
 
 		auto source = Gtk::DragSource::create();
 		source->set_actions(Gdk::DragAction::MOVE);
@@ -46,8 +47,24 @@ namespace Game3 {
 			return true;
 		}, false);
 
+		auto right_click = Gtk::GestureClick::create();
+		right_click->set_button(3);
+		right_click->signal_released().connect([this](int, double x, double y) {
+			INFO("right clicked. failure conditions: " << empty() << ", " << !gmenu);
+			if (empty() || !gmenu)
+				return;
+			const auto allocation = get_allocation();
+			x += allocation.get_x();
+			y += allocation.get_y();
+			popoverMenu.set_has_arrow(true);
+			popoverMenu.set_pointing_to({int(x), int(y), 1, 1});
+			popoverMenu.set_menu_model(gmenu);
+			popoverMenu.popup();
+		});
+
 		add_controller(source);
 		add_controller(target);
+		add_controller(right_click);
 	}
 
 	void ItemSlot::setStack(const ItemStack &stack) {
@@ -76,8 +93,10 @@ namespace Game3 {
 		set_tooltip_text({});
 		label.set_text({});
 		image.clear();
-		remove(durabilityBar);
-		durabilityVisible = false;
+		if (durabilityVisible) {
+			remove(durabilityBar);
+			durabilityVisible = false;
+		}
 		isEmpty = true;
 	}
 
@@ -86,11 +105,23 @@ namespace Game3 {
 	}
 
 	void ItemSlot::setLeftClick(ClickFn click) {
-		setClick(std::move(click), &ItemSlot::leftClick, &ItemSlot::leftGesture, 1);
+		if (leftGesture)
+			remove_controller(leftGesture);
+
+		leftClick = std::move(click);
+
+		leftGesture = Gtk::GestureClick::create();
+		leftGesture->set_button(1);
+		leftGesture->signal_released().connect([this](int n, double x, double y) {
+			const Gdk::ModifierType mods = leftGesture->get_current_event_state();
+			leftClick(Modifiers{mods}, n, x, y);
+		});
+
+		add_controller(leftGesture);
 	}
 
-	void ItemSlot::setRightClick(ClickFn click) {
-		setClick(std::move(click), &ItemSlot::rightClick, &ItemSlot::rightGesture, 3);
+	void ItemSlot::setGmenu(Glib::RefPtr<Gio::Menu> new_gmenu) {
+		gmenu = std::move(new_gmenu);
 	}
 
 	void ItemSlot::addDurabilityBar(double fraction) {
@@ -100,21 +131,5 @@ namespace Game3 {
 			durabilityVisible = true;
 			put(durabilityBar, 0, 0);
 		}
-	}
-
-	void ItemSlot::setClick(ClickFn new_click, ClickFn ItemSlot::*click, Glib::RefPtr<Gtk::GestureClick> ItemSlot::*gesture, int button) {
-		if (this->*gesture)
-			remove_controller(this->*gesture);
-
-		this->*click = std::move(new_click);
-
-		this->*gesture = Gtk::GestureClick::create();
-		(this->*gesture)->set_button(button);
-		(this->*gesture)->signal_released().connect([this, click, gesture](int n, double x, double y) {
-			const auto mods = (this->*gesture)->get_current_event_state();
-			(this->*click)(Modifiers{mods}, n, x, y);
-		});
-
-		add_controller(this->*gesture);
 	}
 }

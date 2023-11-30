@@ -64,7 +64,10 @@ namespace Game3 {
 
 		auto lock = inventory->sharedLock();
 
-		for (const auto &recipe: game->registries.get<CraftingRecipeRegistry>().items) {
+		auto &recipe_registry = game->registries.get<CraftingRecipeRegistry>();
+		auto registry_lock = recipe_registry.sharedLock();
+
+		for (const auto &recipe: recipe_registry.items) {
 			if (game->player->stationTypes.contains(recipe->stationType) && recipe->canCraft(inventory)) {
 				auto hbox = std::make_unique<Gtk::Box>(Gtk::Orientation::HORIZONTAL);
 				auto left_vbox = std::make_unique<Gtk::Box>(Gtk::Orientation::VERTICAL);

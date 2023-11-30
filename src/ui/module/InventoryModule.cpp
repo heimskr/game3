@@ -11,10 +11,10 @@
 #include "util/Demangle.h"
 
 namespace Game3 {
-	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
-		InventoryModule(std::move(game_), getInventory(argument)) {}
+	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game_, const std::any &argument, const GmenuFn &gmenu_fn):
+		InventoryModule(std::move(game_), getInventory(argument), gmenu_fn) {}
 
-	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<ClientInventory> inventory_):
+	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<ClientInventory> inventory_, const GmenuFn &gmenu_fn):
 	game(std::move(game_)),
 	inventory(std::move(inventory_)) {
 		assert(inventory);
@@ -22,6 +22,8 @@ namespace Game3 {
 		flowBox.set_hexpand();
 		flowBox.set_vexpand(false);
 		flowBox.set_max_children_per_line(20);
+		flowBox.set_can_focus(false);
+		flowBox.set_selection_mode(Gtk::SelectionMode::NONE);
 		// These take guints so this feels kinda wrong.
 		flowBox.set_row_spacing(-2);
 		flowBox.set_column_spacing(-2);
@@ -30,8 +32,12 @@ namespace Game3 {
 		vbox.append(flowBox);
 
 		gmenu = Gio::Menu::create();
-		gmenu->append("_Drop", "inventory_popup.drop");
-		gmenu->append("D_iscard", "inventory_popup.discard");
+		if (gmenu_fn) {
+			gmenu_fn(*this, gmenu);
+		} else {
+			gmenu->append("_Drop", "inventory_popup.drop");
+			gmenu->append("D_iscard", "inventory_popup.discard");
+		}
 
 		popoverMenu.set_parent(vbox);
 	}
@@ -105,6 +111,24 @@ namespace Game3 {
 		return {};
 	}
 
+	bool InventoryModule::addCSSClass(const Glib::ustring &css_class, Slot slot) {
+		if (0 <= slot && slot < std::ssize(itemSlots)) {
+			itemSlots.at(slot)->add_css_class(css_class);
+			return true;
+		}
+
+		return false;
+	}
+
+	void InventoryModule::removeCSSClass(const Glib::ustring &css_class, Slot slot) {
+		if (slot == -1) {
+			for (const auto &item_slot: itemSlots)
+				item_slot->remove_css_class(css_class);
+		} else {
+			itemSlots.at(slot)->remove_css_class(css_class);
+		}
+	}
+
 	int InventoryModule::gridWidth() const {
 		return tabWidth / (InventoryTab::TILE_SIZE + 2 * InventoryTab::TILE_MARGIN);
 	}
@@ -126,9 +150,11 @@ namespace Game3 {
 				leftClick(item_slot, n, slot, modifiers, x, y);
 			});
 
-			item_slot->setRightClick([this, slot, item_slot = item_slot.get()](Modifiers modifiers, int n, double x, double y) {
-				rightClick(item_slot, n, slot, modifiers, x, y);
-			});
+			item_slot->setGmenu(gmenu);
+
+			// item_slot->setRightClick([this, slot, item_slot = item_slot.get()](Modifiers modifiers, int n, double x, double y) {
+			// 	rightClick(item_slot, n, slot, modifiers, x, y);
+			// });
 
 			flowBox.append(*item_slot);
 			itemSlots.push_back(std::move(item_slot));
@@ -172,20 +198,20 @@ namespace Game3 {
 		game->player->send(MoveSlotsPacket(owner->getGID(), game->player->getGID(), slot, -1, inventory->index, 0));
 	}
 
-	void InventoryModule::rightClick(Gtk::Widget *widget, int, Slot slot, Modifiers, double x, double y) {
-		// mainWindow.onBlur();
+	// void InventoryModule::rightClick(Gtk::Widget *widget, int, Slot slot, Modifiers, double x, double y) {
+	// 	// mainWindow.onBlur();
 
-		if (!inventory->contains(slot))
-			return;
+	// 	if (!inventory->contains(slot))
+	// 		return;
 
-		const auto allocation = widget->get_allocation();
-		x += allocation.get_x();
-		y += allocation.get_y();
+	// 	const auto allocation = widget->get_allocation();
+	// 	x += allocation.get_x();
+	// 	y += allocation.get_y();
 
-		popoverMenu.set_has_arrow(true);
-		popoverMenu.set_pointing_to({int(x), int(y), 1, 1});
-		popoverMenu.set_menu_model(gmenu);
-		lastSlot = slot;
-		popoverMenu.popup();
-	}
+	// 	popoverMenu.set_has_arrow(true);
+	// 	popoverMenu.set_pointing_to({int(x), int(y), 1, 1});
+	// 	popoverMenu.set_menu_model(gmenu);
+	// 	lastSlot = slot;
+	// 	popoverMenu.popup();
+	// }
 }

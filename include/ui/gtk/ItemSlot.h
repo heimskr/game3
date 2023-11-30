@@ -23,7 +23,7 @@ namespace Game3 {
 			void reset();
 			bool empty() const;
 			void setLeftClick(ClickFn);
-			void setRightClick(ClickFn);
+			void setGmenu(Glib::RefPtr<Gio::Menu>);
 
 		private:
 			std::shared_ptr<ClientGame> game;
@@ -35,14 +35,13 @@ namespace Game3 {
 			Gtk::Image image;
 			Gtk::Label label;
 			Gtk::ProgressBar durabilityBar;
+			Gtk::PopoverMenu popoverMenu;
+			Glib::RefPtr<Gio::Menu> gmenu;
 
 			ClickFn leftClick;
-			ClickFn rightClick;
 
 			Glib::RefPtr<Gtk::GestureClick> leftGesture;
-			Glib::RefPtr<Gtk::GestureClick> rightGesture;
 
 			void addDurabilityBar(double fraction);
-			void setClick(ClickFn, ClickFn ItemSlot::*, Glib::RefPtr<Gtk::GestureClick> ItemSlot::*, int button);
 	};
 }

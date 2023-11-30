@@ -7,6 +7,7 @@
 namespace Game3 {
 	void RecipeListPacket::handle(ClientGame &game) {
 		auto &registry = game.registry<CraftingRecipeRegistry>();
+		auto lock = registry.uniqueLock();
 		registry.clear();
 		for (const auto &json: recipes)
 			registry.add(game, json);
@@ -14,6 +15,7 @@ namespace Game3 {
 
 	std::vector<nlohmann::json> RecipeListPacket::getRecipes(const CraftingRecipeRegistry &registry) {
 		std::vector<nlohmann::json> out;
+		auto lock = registry.sharedLock();
 		for (const auto &recipe: registry) {
 			out.emplace_back(*recipe);
 			out.back().erase("type");

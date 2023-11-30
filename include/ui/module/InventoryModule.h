@@ -1,11 +1,13 @@
 #pragma once
 
+#include "interface/ItemSlotParent.h"
 #include "types/Types.h"
 #include "ui/Modifiers.h"
 #include "ui/gtk/ItemSlot.h"
 #include "ui/module/Module.h"
 
 #include <any>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -23,8 +25,10 @@ namespace Game3 {
 
 			static Identifier ID() { return {"base", "module/inventory"}; }
 
-			InventoryModule(std::shared_ptr<ClientGame>, const std::any &);
-			InventoryModule(std::shared_ptr<ClientGame>, std::shared_ptr<ClientInventory>);
+			using GmenuFn = std::function<void(InventoryModule &, Glib::RefPtr<Gio::Menu>)>;
+
+			InventoryModule(std::shared_ptr<ClientGame>, const std::any &, const GmenuFn & = {});
+			InventoryModule(std::shared_ptr<ClientGame>, std::shared_ptr<ClientInventory>, const GmenuFn & = {});
 
 			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;
@@ -34,6 +38,8 @@ namespace Game3 {
 			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
 			std::shared_ptr<InventoryModule> getPrimaryInventoryModule() final { return shared_from_this(); }
 
+			bool addCSSClass(const Glib::ustring &, Slot);
+			void removeCSSClass(const Glib::ustring &, Slot = -1);
 			inline auto getInventory() const { return inventory; }
 			void setInventory(std::shared_ptr<ClientInventory>) override;
 
@@ -59,6 +65,6 @@ namespace Game3 {
 			void populate();
 			void repopulate();
 			void leftClick(Gtk::Widget *, int click_count, Slot, Modifiers, double x, double y);
-			void rightClick(Gtk::Widget *, int click_count, Slot, Modifiers, double x, double y);
+			// void rightClick(Gtk::Widget *, int click_count, Slot, Modifiers, double x, double y);
 	};
 }
