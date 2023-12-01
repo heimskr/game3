@@ -15,8 +15,11 @@ namespace Game3 {
 			void onCreate() override;
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
+			void render(const RendererSet &) override;
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;
+
+			virtual bool canShowHealthBar() const;
 
 		protected:
 			LivingEntity();

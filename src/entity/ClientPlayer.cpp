@@ -27,7 +27,6 @@ namespace Game3 {
 	}
 
 	void ClientPlayer::render(const RendererSet &renderers) {
-		RectangleRenderer &rectangle = renderers.rectangle;
 		TextRenderer &text = renderers.text;
 
 		if (!isVisible())
@@ -39,47 +38,9 @@ namespace Game3 {
 		const auto [x, y, z] = offset.copyBase();
 
 		const bool show_message = lastMessageAge.load() < 7;
-		const bool show_health = !isInvincible() && 0 < getMaxHealth();
-		float name_offset = show_message? -1 : 0;
+		const float name_offset = (canShowHealthBar()? -.5 : 0) + (show_message? -1 : 0);
 
-		if (show_health) {
-			name_offset -= .5;
-
-			constexpr static float bar_offset = .15f;
-			constexpr static float bar_width  = 1.5f;
-			constexpr static float bar_height = .18f;
-			constexpr static float thickness  = .05f;
-
-			const float bar_x = float(column) + x - (bar_width - 1) / 2;
-			const float bar_y = float(row) + y - z - bar_offset - bar_height;
-			const float fraction = double(health) / getMaxHealth();
-
-			rectangle.drawOnMap(RenderOptions {
-				.x = bar_x - thickness,
-				.y = bar_y - thickness,
-				.sizeX = bar_width  + thickness * 2,
-				.sizeY = bar_height + thickness * 2,
-				.color = {.1, .1, .1, .9},
-			});
-
-			rectangle.drawOnMap(RenderOptions {
-				.x = bar_x,
-				.y = bar_y,
-				.sizeX = bar_width * fraction,
-				.sizeY = bar_height,
-				.color = {0, 1, 0, 1},
-			});
-
-			if (fraction < 0.9999f) {
-				rectangle.drawOnMap(RenderOptions {
-					.x = bar_x + fraction * bar_width,
-					.y = bar_y,
-					.sizeX = bar_width * (1 - fraction),
-					.sizeY = bar_height,
-					.color = {1, 0, 0, 1},
-				});
-			}
-		}
+		LivingEntity::render(renderers);
 
 		if (show_message) {
 			text.drawOnMap(lastMessage, {
