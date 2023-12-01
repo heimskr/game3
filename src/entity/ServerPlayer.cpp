@@ -7,7 +7,7 @@
 
 namespace Game3 {
 	ServerPlayer::ServerPlayer():
-		Player() {}
+		Entity(ID()), Player() {}
 
 	ServerPlayer::~ServerPlayer() {
 		Game &game = getGame();

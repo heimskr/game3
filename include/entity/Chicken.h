@@ -30,7 +30,8 @@ namespace Game3 {
 			void decode(Buffer &) override;
 
 		protected:
-			Chicken(): Animal(ID()) {}
+			Chicken():
+				Entity(ID()), Animal() {}
 
 		friend class Entity;
 	};

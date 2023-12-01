@@ -22,11 +22,12 @@ namespace Game3 {
 			std::string getName() const override { return "Dog"; }
 
 			/** You do not get to kill the dog. */
-			HitPoints maxHealth() const override { return INVINCIBLE; }
+			HitPoints getMaxHealth() const override { return INVINCIBLE; }
 
 			friend class Entity;
 
 		protected:
-			Dog(): Animal(ID()) {}
+			Dog():
+				Entity(ID()), Animal() {}
 	};
 }

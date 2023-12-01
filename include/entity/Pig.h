@@ -24,6 +24,7 @@ namespace Game3 {
 			friend class Entity;
 
 		protected:
-			Pig(): Animal(ID()) {}
+			Pig():
+				Entity(ID()), Animal() {}
 	};
 }

@@ -14,7 +14,8 @@
 #include "ui/MainWindow.h"
 
 namespace Game3 {
-	ClientPlayer::ClientPlayer(): Player() {}
+	ClientPlayer::ClientPlayer():
+		Entity(ID()), Player() {}
 
 	std::shared_ptr<ClientPlayer> ClientPlayer::create(Game &) {
 		return Entity::create<ClientPlayer>();
@@ -38,7 +39,7 @@ namespace Game3 {
 		const auto [x, y, z] = offset.copyBase();
 
 		const bool show_message = lastMessageAge.load() < 7;
-		const bool show_health = !isInvincible() && 0 < maxHealth();
+		const bool show_health = !isInvincible() && 0 < getMaxHealth();
 		float name_offset = show_message? -1 : 0;
 
 		if (show_health) {
@@ -51,7 +52,7 @@ namespace Game3 {
 
 			const float bar_x = float(column) + x - (bar_width - 1) / 2;
 			const float bar_y = float(row) + y - z - bar_offset - bar_height;
-			const float fraction = double(health) / maxHealth();
+			const float fraction = double(health) / getMaxHealth();
 
 			rectangle.drawOnMap(RenderOptions {
 				.x = bar_x - thickness,

@@ -9,6 +9,7 @@
 #include "tileentity/TileEntity.h"
 #include "tileentity/TileEntityFactory.h"
 #include "ui/Canvas.h"
+#include "util/Cast.h"
 
 namespace Game3 {
 	void TileEntity::destroy() {
@@ -215,7 +216,7 @@ namespace Game3 {
 				auto lock = entities->sharedLock();
 				for (const auto &entity: *entities)
 					if (entity->isPlayer())
-						std::static_pointer_cast<Player>(entity)->send(packet);
+						safeDynamicCast<Player>(entity)->send(packet);
 			}
 		});
 	}

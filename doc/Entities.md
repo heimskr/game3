@@ -65,7 +65,6 @@ Feel free to add parameters to the constructor as necessary. Your class is not r
 ### Optional Overrides
 
 There are some virtual methods that are optional to override. These include:
-- `HitPoints maxHealth() const`: returns the number of hitpoints the entity has when it's at full health.
 - `void render(SpriteRenderer &)`: responsible for rendering the entity every frame.
 - `void tick(Game &, float delta)`: called every frame. `delta` is the time (in seconds) since the previous frame.
 - `void remove()`: called when the entity should be removed. If you want to override this to run some code before the entity is removed, make sure you include `Entity::remove();` *after* your code. If you don't include `Entity::remove();` at all, your entity won't be removed.
@@ -75,6 +74,9 @@ There are some virtual methods that are optional to override. These include:
 - `void initAfterLoad(Game &)`: called after the game is loaded from a save file.
 - `float getSpeed() const`: returns how many tiles the entity can move per second.
 - `Glib::ustring getName()`: returns the display name for the entity. If not overridden, it'll return something like `"Unknown Entity (base:entity/my_entity)"`.
+
+For LivingEntity:
+- `HitPoints getMaxHealth() const`: returns the number of hitpoints the entity has when it's at full health.
 
 ### Textures
 

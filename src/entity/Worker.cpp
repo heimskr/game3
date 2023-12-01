@@ -20,7 +20,7 @@ namespace Game3 {
 		keepPosition(keep->position) {}
 
 	void Worker::toJSON(nlohmann::json &json) const {
-		Entity::toJSON(json);
+		LivingEntity::toJSON(json);
 		json["phase"] = phase;
 		json["overworldRealm"] = overworldRealm;
 		json["house"][0] = houseRealm;
@@ -32,7 +32,7 @@ namespace Game3 {
 	}
 
 	void Worker::absorbJSON(Game &game, const nlohmann::json &json) {
-		Entity::absorbJSON(game, json);
+		LivingEntity::absorbJSON(game, json);
 		phase          = json.at("phase");
 		overworldRealm = json.at("overworldRealm");
 		houseRealm     = json.at("house").at(0);
@@ -50,6 +50,7 @@ namespace Game3 {
 	}
 
 	void Worker::encode(Buffer &buffer) {
+		LivingEntity::encode(buffer);
 		buffer << phase;
 		buffer << overworldRealm;
 		buffer << houseRealm;
@@ -60,6 +61,7 @@ namespace Game3 {
 	}
 
 	void Worker::decode(Buffer &buffer) {
+		LivingEntity::decode(buffer);
 		buffer >> phase;
 		buffer >> overworldRealm;
 		buffer >> houseRealm;

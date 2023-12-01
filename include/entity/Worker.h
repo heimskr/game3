@@ -1,12 +1,12 @@
 #pragma once
 
-#include "entity/Entity.h"
+#include "entity/LivingEntity.h"
 
 namespace Game3 {
 	class Building;
 
 	/** Lives in a town. */
-	class Worker: public virtual Entity {
+	class Worker: public LivingEntity {
 		public:
 			static Identifier ID() { return {"base", "entity/worker"}; }
 			constexpr static float WORK_START_HOUR = 8.f;
@@ -37,7 +37,7 @@ namespace Game3 {
 			Worker(EntityType);
 			Worker(EntityType, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_);
 
-			HitPoints maxHealth() const override { return MAX_HEALTH; }
+			HitPoints getMaxHealth() const override { return MAX_HEALTH; }
 			bool stillStuck(float delta);
 			void goToKeep(Phase new_phase);
 			void goToStockpile(Phase new_phase);

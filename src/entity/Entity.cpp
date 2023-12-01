@@ -23,6 +23,7 @@
 #include "registry/Registries.h"
 #include "ui/Canvas.h"
 #include "util/AStar.h"
+#include "util/Cast.h"
 #include "util/Util.h"
 
 #include <cassert>
@@ -77,7 +78,6 @@ namespace Game3 {
 		json["position"]  = position;
 		json["realmID"]   = realmID;
 		json["direction"] = direction;
-		json["health"]    = health;
 		if (const InventoryPtr inventory = getInventory(0)) {
 			// TODO: move JSONification to StorageInventory
 			if (getSide() == Side::Client)
@@ -116,8 +116,6 @@ namespace Game3 {
 			realmID = *iter;
 		if (auto iter = json.find("direction"); iter != json.end())
 			direction = *iter;
-		if (auto iter = json.find("health"); iter != json.end())
-			health = *iter;
 		if (auto iter = json.find("inventory"); iter != json.end())
 			setInventory(std::make_shared<ServerInventory>(ServerInventory::fromJSON(game, *iter, shared_from_this())), 0);
 		if (auto iter = json.find("path"); iter != json.end()) {
@@ -792,7 +790,7 @@ namespace Game3 {
 					}
 
 					if (visible->isPlayer())
-						players_to_erase.emplace_back(std::dynamic_pointer_cast<Player>(visible));
+						players_to_erase.emplace_back(safeDynamicCast<Player>(visible));
 				}
 			}
 		}
@@ -820,7 +818,7 @@ namespace Game3 {
 						assert(visible->getGID() != getGID());
 						visibleEntities.insert(visible);
 						if (visible->isPlayer())
-							visiblePlayers.emplace(std::dynamic_pointer_cast<Player>(visible));
+							visiblePlayers.emplace(safeDynamicCast<Player>(visible));
 						if (visible->otherEntityToLock != globalID) {
 							otherEntityToLock = visible->globalID;
 							{
@@ -918,7 +916,6 @@ namespace Game3 {
 		buffer << zSpeed;
 		buffer << path;
 		buffer << money;
-		buffer << health;
 		// TODO: support multiple entity inventories
 		HasInventory::encode(buffer, 0);
 		buffer << heldLeft.slot;
@@ -943,7 +940,6 @@ namespace Game3 {
 		buffer >> zSpeed;
 		buffer >> path;
 		buffer >> money;
-		buffer >> health;
 		// TODO: support multiple entity inventories
 		HasInventory::decode(buffer, 0);
 		const auto left_slot  = buffer.take<Slot>();

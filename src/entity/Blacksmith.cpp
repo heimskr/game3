@@ -42,6 +42,7 @@ namespace Game3 {
 	}
 
 	void Blacksmith::toJSON(nlohmann::json &json) const {
+		Entity::toJSON(json);
 		Worker::toJSON(json);
 		Merchant::toJSON(json);
 		if (0.f < actionTime)
@@ -49,6 +50,7 @@ namespace Game3 {
 	}
 
 	void Blacksmith::absorbJSON(Game &game, const nlohmann::json &json) {
+		Entity::absorbJSON(game, json);
 		Worker::absorbJSON(game, json);
 		Merchant::absorbJSON(game, json);
 		if (json.contains("actionTime"))

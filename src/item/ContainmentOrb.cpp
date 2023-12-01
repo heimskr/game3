@@ -7,6 +7,7 @@
 #include "game/ServerGame.h"
 #include "item/ContainmentOrb.h"
 #include "realm/Realm.h"
+#include "util/Cast.h"
 
 namespace Game3 {
 	bool ContainmentOrb::use(Slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
@@ -44,7 +45,7 @@ namespace Game3 {
 			stack.data["containedName"] = selected->getName();
 
 			if (selected->isPlayer()) {
-				auto player = std::static_pointer_cast<ServerPlayer>(selected);
+				auto player = safeDynamicCast<ServerPlayer>(selected);
 				player->teleport({32, 32}, game.getRealm(-1), MovementContext{.isTeleport = true});
 				stack.data["containedUsername"] = player->username;
 			} else {

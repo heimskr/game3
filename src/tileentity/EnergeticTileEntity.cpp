@@ -5,6 +5,7 @@
 #include "realm/Realm.h"
 #include "tileentity/EnergeticTileEntity.h"
 #include "ui/module/EnergyLevelModule.h"
+#include "util/Cast.h"
 
 namespace Game3 {
 	EnergeticTileEntity::EnergeticTileEntity(EnergyAmount capacity, EnergyAmount energy):
@@ -55,7 +56,7 @@ namespace Game3 {
 			player->send(OpenModuleForAgentPacket(EnergyLevelModule::ID(), getGID(), true));
 
 		player->queueForMove([this, self = shared_from_this()](const EntityPtr &entity) {
-			removeObserver(std::static_pointer_cast<Player>(entity));
+			removeObserver(safeDynamicCast<Player>(entity));
 			return true;
 		});
 	}

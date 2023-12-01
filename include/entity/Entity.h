@@ -54,7 +54,6 @@ namespace Game3 {
 			constexpr static Slot DEFAULT_INVENTORY_SIZE = 30;
 			/** The reciprocal of this is how many seconds it takes to move one square. */
 			constexpr static float MAX_SPEED = 10.f;
-			constexpr static HitPoints INVINCIBLE = 0;
 
 			EntityType type;
 			Lockable<Position> position{0, 0};
@@ -68,7 +67,6 @@ namespace Game3 {
 			Atomic<float> zSpeed = 0.f;
 			Lockable<std::list<Direction>> path;
 			Atomic<MoneyCount> money = 0;
-			Atomic<HitPoints> health = 0;
 			Lockable<WeakSet<Entity>> visibleEntities;
 			Lockable<WeakSet<Player>> visiblePlayers;
 			/** Set when an entity is beginning to teleport so that an EntityMovedPacket can be sent with the proper realm ID
@@ -81,12 +79,13 @@ namespace Game3 {
 			Identifier customTexture;
 
 			virtual void destroy();
+			virtual void onCreate() {}
 
 			/** This won't call init() on the Entity. You need to do that yourself. */
 			template <typename T = Entity, typename... Args>
 			static std::shared_ptr<T> create(Args &&...args) {
 				auto out = std::shared_ptr<T>(new T(std::forward<Args>(args)...));
-				out->health = out->maxHealth();
+				out->onCreate();
 				return out;
 			}
 
@@ -95,9 +94,6 @@ namespace Game3 {
 			virtual void absorbJSON(Game &, const nlohmann::json &);
 			virtual void toJSON(nlohmann::json &) const;
 			virtual bool isPlayer() const { return false; }
-			/** Returns the maximum number of hitpoints this entity can have. If 0, the entity is invincible. */
-			virtual HitPoints maxHealth() const { return 0; }
-			bool isInvincible() const { return maxHealth() == INVINCIBLE; }
 			virtual void render(const RendererSet &);
 			virtual void tick(Game &, float delta);
 			/** Removes the entity from existence. */

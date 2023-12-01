@@ -10,6 +10,7 @@
 #include "ui/MainWindow.h"
 #include "ui/tab/CraftingTab.h"
 #include "ui/tab/InventoryTab.h"
+#include "util/Cast.h"
 
 namespace Game3 {
 	CraftingStation::CraftingStation(Identifier tile_id, const Position &position_, Identifier station_type, Identifier item_name):
@@ -32,7 +33,7 @@ namespace Game3 {
 		} else {
 			player->addStationType(stationType);
 			player->queueForMove([station_type = stationType](const EntityPtr &player) {
-				std::static_pointer_cast<Player>(player)->removeStationType(station_type);
+				safeDynamicCast<Player>(player)->removeStationType(station_type);
 				return true;
 			});
 		}

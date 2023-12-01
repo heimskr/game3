@@ -21,10 +21,11 @@
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "ui/tab/TextTab.h"
+#include "util/Cast.h"
 
 namespace Game3 {
 	Player::Player():
-		Entity(ID()) {}
+		Entity(ID()), LivingEntity() {}
 
 	Player::~Player() {
 		INFO("\e[31m~Player\e[39m(" << this << ", " << (username.empty()? "[unknown username]" : username) << ", " << globalID << ')');
@@ -275,6 +276,8 @@ namespace Game3 {
 
 	void Player::encode(Buffer &buffer) {
 		Entity::encode(buffer);
+		LivingEntity::encode(buffer);
+		auto this_lock = sharedLock();
 		buffer << displayName;
 		buffer << tooldown;
 		buffer << stationTypes;
@@ -283,6 +286,8 @@ namespace Game3 {
 
 	void Player::decode(Buffer &buffer) {
 		Entity::decode(buffer);
+		LivingEntity::decode(buffer);
+		auto this_lock = uniqueLock();
 		buffer >> displayName;
 		buffer >> tooldown;
 		buffer >> stationTypes;
@@ -461,7 +466,7 @@ namespace Game3 {
 	}
 
 	PlayerPtr Player::getShared() {
-		return std::dynamic_pointer_cast<Player>(shared_from_this());
+		return safeDynamicCast<Player>(shared_from_this());
 	}
 
 	std::shared_ptr<ClientPlayer> Player::toClient() {

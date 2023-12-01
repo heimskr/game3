@@ -11,8 +11,8 @@
 namespace Game3 {
 	ThreadPool Animal::threadPool{2};
 
-	Animal::Animal(EntityType type_):
-		Entity(std::move(type_)) {}
+	Animal::Animal():
+		Entity("base:invalid/Animal") {}
 
 	bool Animal::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
 		INFO(typeid(*this).name() << ' ' << getGID() << ':');
@@ -84,6 +84,7 @@ namespace Game3 {
 
 	void Animal::encode(Buffer &buffer) {
 		Entity::encode(buffer);
+		LivingEntity::encode(buffer);
 		buffer << destination;
 		buffer << timeUntilWander.load();
 		buffer << wanderRadius;
@@ -91,6 +92,7 @@ namespace Game3 {
 
 	void Animal::decode(Buffer &buffer) {
 		Entity::decode(buffer);
+		LivingEntity::decode(buffer);
 		buffer >> destination;
 		timeUntilWander = buffer.take<float>();
 		buffer >> wanderRadius;

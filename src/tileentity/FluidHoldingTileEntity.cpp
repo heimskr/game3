@@ -4,6 +4,7 @@
 #include "realm/Realm.h"
 #include "tileentity/FluidHoldingTileEntity.h"
 #include "ui/module/FluidLevelsModule.h"
+#include "util/Cast.h"
 
 namespace Game3 {
 	FluidHoldingTileEntity::FluidHoldingTileEntity(FluidContainer::Map map):
@@ -87,7 +88,7 @@ namespace Game3 {
 			player->send(OpenModuleForAgentPacket(FluidLevelsModule::ID(), getGID(), true));
 
 		player->queueForMove([this, self = shared_from_this()](const EntityPtr &entity) {
-			removeObserver(std::static_pointer_cast<Player>(entity));
+			removeObserver(safeDynamicCast<Player>(entity));
 			return true;
 		});
 	}

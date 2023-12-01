@@ -4,6 +4,7 @@
 
 #include "data/Identifier.h"
 #include "entity/Entity.h"
+#include "entity/LivingEntity.h"
 #include "ui/Modifiers.h"
 
 namespace Game3 {
@@ -12,7 +13,7 @@ namespace Game3 {
 	class ServerPlayer;
 	class TileEntity;
 
-	class Player: public Entity {
+	class Player: public LivingEntity {
 		public:
 			static Identifier ID() { return {"base", "entity/player"}; }
 			constexpr static HitPoints MAX_HEALTH = 64;
@@ -39,7 +40,7 @@ namespace Game3 {
 			~Player() override = 0;
 			void destroy() override;
 
-			HitPoints maxHealth() const override { return MAX_HEALTH; }
+			HitPoints getMaxHealth() const override { return MAX_HEALTH; }
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			bool isPlayer() const override { return true; }

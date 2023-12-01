@@ -16,6 +16,7 @@
 #include "realm/Realm.h"
 #include "recipe/CraftingRecipe.h"
 #include "tileentity/InventoriedTileEntity.h"
+#include "util/Cast.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -270,8 +271,7 @@ namespace Game3 {
 		}
 
 		auto owner = getOwner();
-		auto player = std::dynamic_pointer_cast<Player>(owner);
-		assert(player);
+		auto player = safeDynamicCast<Player>(owner);
 		activeSlot = new_active;
 		player->send(SetActiveSlotPacket(new_active));
 		notifyOwner();

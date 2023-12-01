@@ -7,6 +7,7 @@
 #include "realm/Realm.h"
 #include "tileentity/InventoriedTileEntity.h"
 #include "ui/module/InventoryModule.h"
+#include "util/Cast.h"
 
 namespace Game3 {
 	InventoriedTileEntity::InventoriedTileEntity(InventoryPtr inventory_):
@@ -139,7 +140,7 @@ namespace Game3 {
 			player->send(OpenModuleForAgentPacket(InventoryModule::ID(), getGID()));
 
 		player->queueForMove([this, self = shared_from_this()](const EntityPtr &entity) {
-			removeObserver(std::static_pointer_cast<Player>(entity));
+			removeObserver(safeDynamicCast<Player>(entity));
 			return true;
 		});
 	}

@@ -19,6 +19,7 @@
 #include "packet/TileEntityPacket.h"
 #include "packet/TileUpdatePacket.h"
 #include "packet/TimePacket.h"
+#include "util/Cast.h"
 #include "util/Demangle.h"
 #include "util/Timer.h"
 #include "util/Util.h"
@@ -244,7 +245,7 @@ namespace Game3 {
 				auto lock = entities->sharedLock();
 				for (const auto &entity: *entities)
 					if (entity->isPlayer())
-						std::static_pointer_cast<ServerPlayer>(entity)->send(packet);
+						safeDynamicCast<ServerPlayer>(entity)->send(packet);
 			}
 		});
 	}
@@ -631,7 +632,7 @@ namespace Game3 {
 
 				for (const EntityPtr &entity: entities) {
 					Entity &entity_ref = *entity;
-					INFO((entity->isPlayer()? "\e[1m(" + std::dynamic_pointer_cast<Player>(entity)->username + ") \e[22;2m" : "\e[2m") << std::setw(20) << std::right
+					INFO((entity->isPlayer()? "\e[1m(" + safeDynamicCast<Player>(entity)->username + ") \e[22;2m" : "\e[2m") << std::setw(20) << std::right
 						<< entity->getGID() << "\e[22m  " << DEMANGLE(entity_ref) << "  \e[32m" << entity->getName() << "\e[39m  Realm \e[31m" << entity->getRealm()->id
 						<< "\e[39m  Position \e[33m" << entity->getPosition() << "\e[39m");
 				}

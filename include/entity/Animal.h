@@ -5,13 +5,13 @@
 #include <optional>
 #include <random>
 
-#include "entity/Entity.h"
+#include "entity/LivingEntity.h"
 #include "threading/ThreadPool.h"
 
 namespace Game3 {
 	class Building;
 
-	class Animal: public Entity {
+	class Animal: public LivingEntity {
 		public:
 			static Identifier ID() { return {"base", "entity/animal"}; }
 			constexpr static HitPoints MAX_HEALTH = 20;
@@ -31,13 +31,13 @@ namespace Game3 {
 			void init(Game &) override;
 			void tick(Game &, float) override;
 			float getSpeed() const override { return 5.f; }
-			HitPoints maxHealth() const override { return MAX_HEALTH; }
+			HitPoints getMaxHealth() const override { return MAX_HEALTH; }
 			bool wander();
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;
 
 		protected:
-			Animal(EntityType);
+			Animal();
 
 			std::optional<std::list<Direction>> wanderPath;
 			std::atomic_bool attemptingWander = false;

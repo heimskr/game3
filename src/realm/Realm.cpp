@@ -22,6 +22,7 @@
 #include "tile/Tile.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
+#include "util/Cast.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 #include "worldgen/Carpet.h"
@@ -272,7 +273,7 @@ namespace Game3 {
 		}
 		entity->firstTeleport = true;
 		if (entity->isPlayer() && entity->weakRealm.lock())
-			std::static_pointer_cast<Player>(entity)->stopMoving();
+			safeDynamicCast<Player>(entity)->stopMoving();
 		entity->setRealm(shared);
 		entity->teleport(position, MovementContext{.excludePlayerSelf = true, .isTeleport = true});
 		entity->firstTeleport = false;
@@ -280,7 +281,7 @@ namespace Game3 {
 		if (entity->isPlayer()) {
 			{
 				auto lock = players.uniqueLock();
-				players.emplace(std::static_pointer_cast<Player>(entity));
+				players.emplace(safeDynamicCast<Player>(entity));
 			}
 			recalculateVisibleChunks();
 		}

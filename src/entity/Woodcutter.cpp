@@ -44,6 +44,7 @@ namespace Game3 {
 	}
 
 	void Woodcutter::toJSON(nlohmann::json &json) const {
+		Entity::toJSON(json);
 		Worker::toJSON(json);
 		json["harvestingTime"] = harvestingTime;
 		if (chosenResource)
@@ -51,6 +52,7 @@ namespace Game3 {
 	}
 
 	void Woodcutter::absorbJSON(Game &game, const nlohmann::json &json) {
+		Entity::absorbJSON(game, json);
 		Worker::absorbJSON(game, json);
 		harvestingTime = json.at("harvestingTime");
 		if (json.contains("chosenResource"))

@@ -26,6 +26,7 @@ namespace Game3 {
 			friend class Entity;
 
 		protected:
-			Sheep(): Animal(ID()) {}
+			Sheep():
+				Entity(ID()), Animal() {}
 	};
 }
