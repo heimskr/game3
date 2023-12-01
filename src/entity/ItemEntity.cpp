@@ -4,6 +4,7 @@
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "graphics/ItemTexture.h"
+#include "graphics/RendererSet.h"
 #include "graphics/SpriteRenderer.h"
 #include "item/Item.h"
 #include "net/Buffer.h"
@@ -68,7 +69,9 @@ namespace Game3 {
 			queueDestruction();
 	}
 
-	void ItemEntity::render(SpriteRenderer &sprite_renderer, TextRenderer &) {
+	void ItemEntity::render(const RendererSet &renderers) {
+		SpriteRenderer &sprite_renderer = renderers.sprite;
+
 		if (!isVisible())
 			return;
 

@@ -9,6 +9,7 @@
 #include "util/Util.h"
 
 #include "graphics/BatchSpriteRenderer.h"
+#include "graphics/RendererSet.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/Tileset.h"
 
@@ -53,7 +54,7 @@ namespace Game3 {
 		});
 
 		if (RealmPtr realm = game->activeRealm.copyBase()) {
-			realm->render(width(), height(), center, scale, *spriteRenderer, textRenderer, game->getDivisor()); CHECKGL
+			realm->render(width(), height(), center, scale, {rectangleRenderer, *spriteRenderer, textRenderer}, game->getDivisor()); CHECKGL
 			realmBounds = game->getVisibleRealmBounds();
 		}
 	}

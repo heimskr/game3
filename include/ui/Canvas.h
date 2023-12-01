@@ -30,7 +30,7 @@ namespace Game3 {
 			double scale = DEFAULT_SCALE;
 			std::unique_ptr<SpriteRenderer> spriteRenderer;
 			TextRenderer textRenderer{*this};
-			RectangleRenderer rectangleRenderer;
+			RectangleRenderer rectangleRenderer{*this};
 			GL::Texture textureA;
 			GL::Texture textureB;
 			GL::FBO fbo;

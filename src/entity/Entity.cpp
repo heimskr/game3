@@ -12,6 +12,7 @@
 #include "game/ServerGame.h"
 #include "game/ServerInventory.h"
 #include "graphics/ItemTexture.h"
+#include "graphics/RendererSet.h"
 #include "graphics/SpriteRenderer.h"
 #include "net/Buffer.h"
 #include "net/RemoteClient.h"
@@ -271,7 +272,8 @@ namespace Game3 {
 		movedToNewChunk(std::nullopt);
 	}
 
-	void Entity::render(SpriteRenderer &sprite_renderer, TextRenderer &) {
+	void Entity::render(const RendererSet &renderers) {
+		SpriteRenderer &sprite_renderer = renderers.sprite;
 		if (texture == nullptr || !isVisible())
 			return;
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "graphics/RenderOptions.h"
 #include "graphics/Shader.h"
 #include "types/Types.h"
 
@@ -7,28 +8,14 @@ namespace Game3 {
 	class Canvas;
 	class Texture;
 
-	struct RenderOptions {
-		double x = 0.f;
-		double y = 0.f;
-		double offsetX = 0.f;
-		double offsetY = 0.f;
-		double sizeX = 16.f;
-		double sizeY = 16.f;
-		double scaleX = 1.f;
-		double scaleY = 1.f;
-		double angle = 0.f;
-		Color color{1.f, 1.f, 1.f, 1.f};
-		bool invertY = true;
-	};
-
 	class SpriteRenderer {
 		protected:
 			SpriteRenderer(Canvas &);
 
 		public:
-			Canvas *canvas;
-			double centerX = 0.f;
-			double centerY = 0.f;
+			Canvas *canvas = nullptr;
+			double centerX = 0;
+			double centerY = 0;
 			int backbufferWidth = -1;
 			int backbufferHeight = -1;
 
@@ -36,7 +23,7 @@ namespace Game3 {
 
 			virtual void update(const Canvas &) = 0;
 			virtual void drawOnMap(const std::shared_ptr<Texture> &, double x, double y, double scale, double angle, double alpha) = 0;
-			virtual void drawOnMap(const std::shared_ptr<Texture> &, RenderOptions) = 0;
+			virtual void drawOnMap(const std::shared_ptr<Texture> &, const RenderOptions &) = 0;
 			void drawOnMap(const std::shared_ptr<Texture> &, double x, double y);
 			void drawOnMap(const std::shared_ptr<Texture> &);
 
@@ -45,8 +32,8 @@ namespace Game3 {
 			virtual void reset() = 0;
 
 			template <typename T>
-			void operator()(T &texture, RenderOptions options) {
-				drawOnMap(texture, std::move(options));
+			void operator()(T &texture, const RenderOptions &options) {
+				drawOnMap(texture, options);
 			}
 	};
 }

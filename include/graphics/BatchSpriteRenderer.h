@@ -26,7 +26,7 @@ namespace Game3 {
 			void update(const Canvas &) override;
 
 			void drawOnMap(const std::shared_ptr<Texture> &, double x, double y, double scale = 1.f, double angle = 0.f, double alpha = 1.f) override;
-			void drawOnMap(const std::shared_ptr<Texture> &, RenderOptions = {}) override;
+			void drawOnMap(const std::shared_ptr<Texture> &, const RenderOptions & = {}) override;
 
 			void renderNow() override;
 

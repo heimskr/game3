@@ -8,6 +8,8 @@
 #include <glm/glm.hpp>
 
 namespace Game3 {
+	struct Color;
+
 	class Shader {
 		public:
 			Shader() = delete;
@@ -31,6 +33,7 @@ namespace Game3 {
 			Shader & set(const char *, const Eigen::Vector2f &);
 			Shader & set(const char *, const Eigen::Vector4f &);
 			Shader & set(const char *, float x, float y, float z, float w);
+			Shader & set(const char *, const Color &);
 
 			template <template <typename...> typename C>
 			Shader & set(const char *uniform_name, const C<GLint> &data) {

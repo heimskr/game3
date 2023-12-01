@@ -94,46 +94,53 @@ namespace Game3 {
 		});
 	}
 
-	void SingleSpriteRenderer::drawOnMap(const std::shared_ptr<Texture> &texture, RenderOptions options) {
+	void SingleSpriteRenderer::drawOnMap(const std::shared_ptr<Texture> &texture, const RenderOptions &options) {
 		if (!initialized)
 			return;
 
-		if (options.sizeX < 0)
-			options.sizeX = texture->width;
-		if (options.sizeY < 0)
-			options.sizeY = texture->height;
+		auto size_x = options.sizeX;
+		auto size_y = options.sizeY;
+		auto x = options.x;
+		auto y = options.y;
 
+		if (size_x < 0)
+			size_x = texture->width;
+		if (size_y < 0)
+			size_y = texture->height;
+
+		assert(canvas != nullptr);
 		RealmPtr realm = canvas->game->activeRealm.copyBase();
 		TileProvider &provider = realm->tileProvider;
 		TilesetPtr tileset     = provider.getTileset(*canvas->game);
 		const auto tile_size   = tileset->getTileSize();
 		const auto map_length  = CHUNK_SIZE * REALM_DIAMETER;
 
-		options.x *= tile_size * canvas->scale / 2.;
-		options.y *= tile_size * canvas->scale / 2.;
 
-		options.x += canvas->width() / 2.;
-		options.x -= map_length * tile_size * canvas->scale / canvas->magic * 2.; // TODO: the math here is a little sus... things might cancel out
-		options.x += centerX * canvas->scale * tile_size / 2.;
+		x *= tile_size * canvas->scale / 2.;
+		y *= tile_size * canvas->scale / 2.;
 
-		options.y += canvas->height() / 2.;
-		options.y -= map_length * tile_size * canvas->scale / canvas->magic * 2.;
-		options.y += centerY * canvas->scale * tile_size / 2.;
+		x += canvas->width() / 2.;
+		x -= map_length * tile_size * canvas->scale / canvas->magic * 2.; // TODO: the math here is a little sus... things might cancel out
+		x += centerX * canvas->scale * tile_size / 2.;
+
+		y += canvas->height() / 2.;
+		y -= map_length * tile_size * canvas->scale / canvas->magic * 2.;
+		y += centerY * canvas->scale * tile_size / 2.;
 
 		shader.bind();
 
 		glm::mat4 model = glm::mat4(1.);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(options.x - options.offsetX * canvas->scale * options.scaleX, options.y - options.offsetY * canvas->scale * options.scaleY, 0.));
+		model = glm::translate(model, glm::vec3(x - options.offsetX * canvas->scale * options.scaleX, y - options.offsetY * canvas->scale * options.scaleY, 0.));
 		model = glm::translate(model, glm::vec3(.5 * texture->width, .5 * texture->height, 0.)); // move origin of rotation to center of quad
 		model = glm::rotate(model, float(glm::radians(options.angle)), glm::vec3(0., 0., 1.)); // then rotate
 		model = glm::translate(model, glm::vec3(-.5 * texture->width, -.5 * texture->height, 0.)); // move origin back
 		model = glm::scale(model, glm::vec3(texture->width * options.scaleX * canvas->scale / 2., texture->height * options.scaleY * canvas->scale / 2., 2.)); // last scale
 
 		shader.set("model", model);
-		shader.set("spriteColor", options.color.red, options.color.green, options.color.blue, options.color.alpha);
+		shader.set("spriteColor", options.color);
 		const double multiplier = 2. / texture->width;
-		shader.set("texturePosition", options.offsetX * multiplier, options.offsetY * multiplier, options.sizeX / texture->width, options.sizeY / texture->width);
+		shader.set("texturePosition", options.offsetX * multiplier, options.offsetY * multiplier, size_x / texture->width, size_y / texture->width);
 
 		glActiveTexture(GL_TEXTURE0);
 		texture->bind();

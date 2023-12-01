@@ -74,16 +74,18 @@ namespace Game3 {
 		});
 	}
 
-	void BatchSpriteRenderer::drawOnMap(const std::shared_ptr<Texture> &texture, RenderOptions options) {
+	void BatchSpriteRenderer::drawOnMap(const std::shared_ptr<Texture> &texture, const RenderOptions &options) {
 		if (!initialized)
 			return;
 
-		if (options.sizeX < 0)
-			options.sizeX = texture->width;
-		if (options.sizeY < 0)
-			options.sizeY = texture->height;
+		RenderOptions modified = options;
 
-		batchItems.emplace_back(texture, options);
+		if (modified.sizeX < 0)
+			modified.sizeX = texture->width;
+		if (modified.sizeY < 0)
+			modified.sizeY = texture->height;
+
+		batchItems.emplace_back(texture, modified);
 	}
 
 	void BatchSpriteRenderer::renderNow() {

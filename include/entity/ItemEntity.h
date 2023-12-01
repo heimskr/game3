@@ -23,7 +23,7 @@ namespace Game3 {
 			void toJSON(nlohmann::json &) const override;
 			void init(Game &) override;
 			void tick(Game &, float) override;
-			void render(SpriteRenderer &, TextRenderer &) override;
+			void render(const RendererSet &) override;
 			virtual bool onInteractOn    (const std::shared_ptr<Player> &player, Modifiers) override { return interact(player); }
 			virtual bool onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) override { return interact(player); }
 			std::string getName() const override;

@@ -8,6 +8,8 @@
 #include <unordered_set>
 
 namespace Game3 {
+	struct RendererSet;
+
 	class ClientPlayer: public Player {
 		private:
 			Lockable<std::string> lastMessage;
@@ -21,7 +23,7 @@ namespace Game3 {
 			static std::shared_ptr<ClientPlayer> create(Game &);
 
 			void tick(Game &, float delta) override;
-			void render(SpriteRenderer &, TextRenderer &) override;
+			void render(const RendererSet &) override;
 			void stopContinuousInteraction();
 			void setContinuousInteraction(bool, Modifiers);
 			void jump() override;

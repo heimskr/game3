@@ -26,7 +26,6 @@ namespace Game3 {
 			Index wanderRadius = 8;
 
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) override;
-			void render(SpriteRenderer &, TextRenderer &) override;
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			void init(Game &) override;

@@ -14,22 +14,6 @@ namespace Game3 {
 	Animal::Animal(EntityType type_):
 		Entity(std::move(type_)) {}
 
-	void Animal::render(SpriteRenderer &sprite, TextRenderer &text) {
-		if (!isVisible())
-			return;
-
-		Entity::render(sprite, text);
-
-		if constexpr (false) {
-			text.drawOnMap(std::to_string(getGID()), {
-				.x = float(position.column) + offset.x + .5f,
-				.y = float(position.row)    + offset.y,
-				.color = {path.empty()? 0.f : 1.f, 0.f, 0.f, 1.f},
-				.align = TextAlign::Center,
-			});
-		}
-	}
-
 	bool Animal::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
 		INFO(typeid(*this).name() << ' ' << getGID() << ':');
 		INFO("  Path length is " << path.size());

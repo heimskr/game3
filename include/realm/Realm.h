@@ -1,16 +1,5 @@
 #pragma once
 
-#include <memory>
-#include <mutex>
-#include <optional>
-#include <random>
-#include <set>
-#include <thread>
-#include <unordered_map>
-#include <unordered_set>
-
-#include <nlohmann/json_fwd.hpp>
-
 #include "types/Types.h"
 #include "entity/EntityZCompare.h"
 #include "error/MultipleFoundError.h"
@@ -33,14 +22,24 @@
 #include "util/RWLock.h"
 #include "container/WeakSet.h"
 
+#include <nlohmann/json_fwd.hpp>
+
+#include <memory>
+#include <mutex>
+#include <optional>
+#include <random>
+#include <set>
+#include <thread>
+#include <unordered_map>
+#include <unordered_set>
+
 namespace Game3 {
 	constexpr int64_t REALM_DIAMETER = 3;
 
 	class Entity;
 	class Game;
 	class RemoteClient;
-	class SpriteRenderer;
-	class TextRenderer;
+	struct RendererSet;
 
 	using EntityPtr = std::shared_ptr<Entity>;
 
@@ -114,7 +113,7 @@ namespace Game3 {
 			/** Called when the realm is to be removed from the game. */
 			virtual void onRemove();
 			void createRenderers();
-			void render(int width, int height, const std::pair<double, double> &center, float scale, SpriteRenderer &, TextRenderer &, float game_time);
+			void render(int width, int height, const std::pair<double, double> &center, float scale, const RendererSet &, float game_time);
 			/** Reuploads fluids and terrain in all layers. */
 			void reupload();
 			EntityPtr add(const EntityPtr &, const Position &);

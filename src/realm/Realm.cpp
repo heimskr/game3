@@ -8,7 +8,9 @@
 #include "game/Game.h"
 #include "game/InteractionSet.h"
 #include "game/ServerGame.h"
+#include "graphics/RendererSet.h"
 #include "graphics/SpriteRenderer.h"
+#include "graphics/TextRenderer.h"
 #include "graphics/Tileset.h"
 #include "net/RemoteClient.h"
 #include "packet/ErrorPacket.h"
@@ -169,7 +171,7 @@ namespace Game3 {
 		upperRenderers.emplace();
 	}
 
-	void Realm::render(const int width, const int height, const std::pair<double, double> &center, float scale, SpriteRenderer &sprite_renderer, TextRenderer &text_renderer, float game_time) {
+	void Realm::render(const int width, const int height, const std::pair<double, double> &center, float scale, const RendererSet &renderers, float game_time) {
 		if (getSide() != Side::Client)
 			return;
 
@@ -191,6 +193,9 @@ namespace Game3 {
 			}
 		}
 
+		auto &[rectangle_renderer, sprite_renderer, text_renderer] = renderers;
+
+		rectangle_renderer.update(bb_width, bb_height);
 		sprite_renderer.centerX = center.first;
 		sprite_renderer.centerY = center.second;
 		// sprite_renderer.divisor = outdoors? game_time : 1;
@@ -210,11 +215,11 @@ namespace Game3 {
 				auto lock = entities_in_chunk->sharedLock();
 				for (const EntityPtr &entity: *entities_in_chunk)
 					if (entity != client_game.player)
-						entity->render(sprite_renderer, text_renderer);
+						entity->render(renderers);
 			}
 		});
 
-		client_game.player->render(sprite_renderer, text_renderer);
+		client_game.player->render(renderers);
 
 		sprite_renderer.renderNow();
 

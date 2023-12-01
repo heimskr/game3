@@ -5,6 +5,7 @@
 #include "Log.h"
 #include "graphics/GL.h"
 #include "graphics/Shader.h"
+#include "types/Types.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -158,6 +159,11 @@ namespace Game3 {
 
 	Shader & Shader::set(const char *uniform_name, float x, float y, float z, float w) {
 		glUniform4f(uniform(uniform_name), x, y, z, w); CHECKGL
+		return *this;
+	}
+
+	Shader & Shader::set(const char *uniform_name, const Color &color) {
+		glUniform4f(uniform(uniform_name), color.red, color.green, color.blue, color.alpha); CHECKGL
 		return *this;
 	}
 }
