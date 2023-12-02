@@ -48,7 +48,7 @@ namespace Game3 {
 		EnergeticTileEntity::toJSON(json);
 	}
 
-	bool CreativeGenerator::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
+	bool CreativeGenerator::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *) {
 		if (modifiers.onlyAlt()) {
 			RealmPtr realm = getRealm();
 			realm->queueDestruction(getSelf());

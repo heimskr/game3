@@ -14,7 +14,10 @@ namespace Game3 {
 	Animal::Animal():
 		Entity("base:invalid/Animal") {}
 
-	bool Animal::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
+	bool Animal::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, ItemStack *used_item) {
+		if (!used_item || used_item->item->identifier != "base:item/wrench")
+			return false;
+
 		INFO(typeid(*this).name() << ' ' << getGID() << ':');
 		INFO("  Path length is " << path.size());
 		auto realm = getRealm();

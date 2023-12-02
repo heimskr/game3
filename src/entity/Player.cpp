@@ -134,7 +134,7 @@ namespace Game3 {
 				Place place = getPlace();
 				if (!lastContinuousInteraction || *lastContinuousInteraction != place) {
 					interactOn(Modifiers());
-					getRealm()->interactGround(getShared(), position, continuousInteractionModifiers);
+					getRealm()->interactGround(getShared(), position, continuousInteractionModifiers, nullptr);
 					lastContinuousInteraction = std::move(place);
 				}
 			} else {
@@ -143,28 +143,28 @@ namespace Game3 {
 		}
 	}
 
-	bool Player::interactOn(Modifiers modifiers) {
+	bool Player::interactOn(Modifiers modifiers, ItemStack *used_item) {
 		auto realm = getRealm();
 		auto player = getShared();
 		auto entity = realm->findEntity(position, player);
 		if (!entity)
 			return false;
-		return entity->onInteractOn(player, modifiers);
+		return entity->onInteractOn(player, modifiers, used_item);
 	}
 
-	void Player::interactNextTo(Modifiers modifiers) {
+	void Player::interactNextTo(Modifiers modifiers, ItemStack *used_item) {
 		auto realm = getRealm();
 		const Position next_to = nextTo();
 		auto player = getShared();
 		auto entity = realm->findEntity(next_to, player);
 		bool interesting = false;
 		if (entity)
-			interesting = entity->onInteractNextTo(player, modifiers);
+			interesting = entity->onInteractNextTo(player, modifiers, used_item);
 		if (!interesting)
 			if (auto tileEntity = realm->tileEntityAt(next_to))
-				interesting = tileEntity->onInteractNextTo(player, modifiers);
+				interesting = tileEntity->onInteractNextTo(player, modifiers, used_item);
 		if (!interesting)
-			realm->interactGround(player, next_to, modifiers);
+			realm->interactGround(player, next_to, modifiers, used_item);
 	}
 
 	void Player::teleport(const Position &position, const std::shared_ptr<Realm> &new_realm, MovementContext context) {

@@ -57,7 +57,7 @@ namespace Game3 {
 			chosenResource = json.at("chosenResource");
 	}
 
-	bool Miner::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
+	bool Miner::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, ItemStack *) {
 		std::cout << "Miner: money = " << money << ", phase = " << static_cast<int>(phase) << ", stuck = " << stuck << '\n';
 
 		if (getSide() == Side::Client) {

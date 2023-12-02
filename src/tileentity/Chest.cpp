@@ -30,7 +30,7 @@ namespace Game3 {
 		json["itemName"] = itemName;
 	}
 
-	bool Chest::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
+	bool Chest::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *) {
 		assert(getSide() == Side::Server);
 
 		if (modifiers.onlyAlt()) {

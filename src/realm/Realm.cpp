@@ -740,19 +740,19 @@ namespace Game3 {
 		return tileProvider.copyFluidTile(position);
 	}
 
-	bool Realm::interactGround(const PlayerPtr &player, const Position &position, Modifiers modifiers) {
+	bool Realm::interactGround(const PlayerPtr &player, const Position &position, Modifiers modifiers, ItemStack *used_item) {
 		const Place place(position, shared_from_this(), player);
 		auto &game = getGame();
 
 		if (auto iter = game.interactionSets.find(type); iter != game.interactionSets.end())
-			if (iter->second->interact(place, modifiers))
+			if (iter->second->interact(place, modifiers, used_item))
 				return true;
 
 		Tileset &tileset = getTileset();
 
 		for (const Layer layer: reverse(mainLayers))
 			if (std::optional<TileID> tile = tryTile(layer, position))
-				if (game.getTile(tileset[*tile])->interact(place, layer))
+				if (game.getTile(tileset[*tile])->interact(place, layer, used_item))
 					return true;
 
 		return false;
@@ -1258,10 +1258,7 @@ namespace Game3 {
 				// TODO: Can you escape underscores?
 				gmenu->append(agent->getName(), "agent_menu.agent" + std::to_string(i));
 				group->add_action("agent" + std::to_string(i), [agent, overlap, player] {
-					if (overlap)
-						player->send(InteractPacket(true, Modifiers{}, agent->getGID(), player->direction));
-					else
-						player->send(InteractPacket(false, Modifiers{}, agent->getGID(), player->direction));
+					player->send(InteractPacket(overlap, Hand::None, Modifiers{}, agent->getGID(), player->direction));
 				});
 			}
 

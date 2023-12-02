@@ -83,7 +83,7 @@ namespace Game3 {
 		autocraft();
 	}
 
-	bool Autocrafter::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
+	bool Autocrafter::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *) {
 		if (getSide() == Side::Client)
 			return false;
 

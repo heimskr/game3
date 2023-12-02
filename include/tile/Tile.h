@@ -4,6 +4,7 @@
 #include "registry/Registerable.h"
 
 namespace Game3 {
+	class ItemStack;
 	struct Place;
 
 	class Tile: public NamedRegisterable {
@@ -13,6 +14,6 @@ namespace Game3 {
 
 			virtual void randomTick(const Place &) {}
 			/** Returns false to continue propagation to lower layers, true to stop it. */
-			virtual bool interact(const Place &, Layer) { return false; }
+			virtual bool interact(const Place &, Layer, ItemStack *used_item);
 	};
 }

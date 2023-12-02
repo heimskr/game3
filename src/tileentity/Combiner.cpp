@@ -96,7 +96,7 @@ namespace Game3 {
 		EnergeticTileEntity::toJSON(json);
 	}
 
-	bool Combiner::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
+	bool Combiner::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *) {
 		if (getSide() == Side::Client)
 			return false;
 

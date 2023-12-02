@@ -24,6 +24,14 @@ namespace Game3 {
 		return out;
 	}
 
+	bool Agent::onInteractOn(const std::shared_ptr<Player> &, Modifiers, ItemStack *) {
+		return false;
+	}
+
+	bool Agent::onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *) {
+		return false;
+	}
+
 	void Agent::handleMessage(const std::shared_ptr<Agent> &, const std::string &name, std::any &) {
 		throw std::runtime_error("Agent of type " + DEMANGLE(*this) + " has no message handler and can't handle message with name \"" + name + '"');
 	}

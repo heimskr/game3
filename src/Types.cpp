@@ -14,4 +14,14 @@ namespace Game3 {
 				return os << "Invalid";
 		}
 	}
+
+	std::ostream & operator<<(std::ostream &os, Hand hand) {
+		switch (hand) {
+			case Hand::None:  return os << "None";
+			case Hand::Left:  return os << "Left";
+			case Hand::Right: return os << "Right";
+			default:
+				return os << "Invalid";
+		}
+	}
 }

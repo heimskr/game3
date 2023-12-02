@@ -130,8 +130,8 @@ namespace Game3 {
 			bool isVisible() const;
 			bool setHeldLeft(Slot);
 			bool setHeldRight(Slot);
-			inline auto getHeldLeft()  const { return heldLeft.slot;  }
-			inline auto getHeldRight() const { return heldRight.slot; }
+			inline Slot getHeldLeft()  const { return heldLeft.slot;  }
+			inline Slot getHeldRight() const { return heldRight.slot; }
 			void unhold(Slot);
 			Side getSide() const override final;
 			Type getAgentType() const override final { return Agent::Type::Entity; }
@@ -158,6 +158,7 @@ namespace Game3 {
 			void changeTexture(const Identifier &);
 			virtual int getZIndex() const { return 0; }
 			virtual Identifier getMilk() const { return {}; }
+			ItemStack * getHeld(Hand) const;
 
 			virtual void encode(Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */

@@ -40,7 +40,7 @@ namespace Game3 {
 			WARN("Couldn't find " << tilename << " in crop stages for crop " << crop->identifier);
 	}
 
-	bool CropTile::interact(const Place &place, Layer layer) {
+	bool CropTile::interact(const Place &place, Layer layer, ItemStack *used_item) {
 		assert(!crop->stages.empty());
 
 		if (auto tilename = place.getName(layer); tilename && *tilename == crop->stages.back()) {
@@ -50,7 +50,7 @@ namespace Game3 {
 			return true;
 		}
 
-		return Tile::interact(place, layer);
+		return Tile::interact(place, layer, used_item);
 	}
 
 	bool CropTile::isRipe(const Identifier &tilename) const {

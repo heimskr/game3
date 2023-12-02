@@ -9,7 +9,7 @@
 #include "threading/ThreadContext.h"
 
 namespace Game3 {
-	bool StandardInteractions::interact(const Place &place, Modifiers modifiers) const {
+	bool StandardInteractions::interact(const Place &place, Modifiers modifiers, ItemStack *used_item) const {
 		const Position position = place.position;
 		Player &player = *place.player;
 		Realm &realm = *place.realm;
@@ -23,16 +23,24 @@ namespace Game3 {
 		if (!terrain_tile || !submerged_tile)
 			return false;
 
-		if (auto *active = inventory->getActive()) {
-			if (active->item->canUseOnWorld() && active->item->use(inventory->activeSlot, *active, place, modifiers, {0.f, 0.f}))
-				return true;
+		auto inventory_lock = inventory->uniqueLock();
 
-			if (active->hasAttribute("base:attribute/shovel"_id)) {
-				if (*submerged_tile == "base:tile/ash"_id) {
-					realm.setTile(Layer::Submerged, position, "base:tile/empty"_id);
-					player.give({game, "base:item/ash"_id, 1});
-					realm.reupload();
+		auto get_active = [&] {
+			return used_item? used_item : inventory->getActive();
+		};
+
+		if (!used_item) {
+			if (ItemStack *active = get_active()) {
+				if (active->item->canUseOnWorld() && active->item->use(inventory->activeSlot, *active, place, modifiers, {0.f, 0.f}))
 					return true;
+
+				if (active->hasAttribute("base:attribute/shovel"_id)) {
+					if (*submerged_tile == "base:tile/ash"_id) {
+						realm.setTile(Layer::Submerged, position, "base:tile/empty"_id);
+						player.give({game, "base:item/ash"_id, 1});
+						realm.reupload();
+						return true;
+					}
 				}
 			}
 		}
@@ -54,8 +62,8 @@ namespace Game3 {
 			attribute.emplace("base:attribute/shovel"_id);
 		}
 
-		if (item && attribute && !player.hasTooldown()) {
-			if (auto *stack = inventory->getActive()) {
+		if (!used_item && item && attribute && !player.hasTooldown()) {
+			if (ItemStack *stack = get_active()) {
 				if (stack->hasAttribute(*attribute) && !inventory->add({game, *item, 1})) {
 					player.setTooldown(1.f);
 					if (stack->reduceDurability())
@@ -69,7 +77,7 @@ namespace Game3 {
 
 		if (tileset.isInCategory(*submerged_tile, "base:category/plantable"_id)) {
 			if (auto iter = game.itemsByAttribute.find("base:attribute/plantable"_id); iter != game.itemsByAttribute.end()) {
-				for (const auto &item: iter->second) {
+				for (const ItemPtr &item: iter->second) {
 					if (auto cast = std::dynamic_pointer_cast<Flower>(item); cast && cast->tilename == *submerged_tile) {
 						player.give({game, item});
 						realm.setTile(Layer::Submerged, position, tileset.getEmptyID());

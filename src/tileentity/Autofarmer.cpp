@@ -62,7 +62,7 @@ namespace Game3 {
 		DirectedTileEntity::toJSON(json);
 	}
 
-	bool Autofarmer::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
+	bool Autofarmer::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *) {
 		RealmPtr realm = getRealm();
 
 		if (modifiers.onlyAlt()) {

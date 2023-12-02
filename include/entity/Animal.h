@@ -25,7 +25,7 @@ namespace Game3 {
 			std::atomic<float> timeUntilWander = 0.f;
 			Index wanderRadius = 8;
 
-			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *) override;
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			void init(Game &) override;

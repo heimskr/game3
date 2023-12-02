@@ -45,28 +45,30 @@ namespace Game3 {
 	static std::chrono::milliseconds jumpTime {50};
 	static std::chrono::milliseconds slowTime {1000};
 	std::unordered_map<guint, std::chrono::milliseconds> MainWindow::customKeyRepeatTimes {
-		{GDK_KEY_Up,     arrowTime},
-		{GDK_KEY_Down,   arrowTime},
-		{GDK_KEY_Left,   arrowTime},
-		{GDK_KEY_Right,  arrowTime},
-		{GDK_KEY_e,      interactTime},
-		{GDK_KEY_E,      interactTime},
-		{GDK_KEY_r,      interactTime},
-		{GDK_KEY_R,      interactTime},
-		{GDK_KEY_o,      interactTime},
-		{GDK_KEY_Return, interactTime},
-		{GDK_KEY_space,  jumpTime},
-		{GDK_KEY_g,      slowTime},
-		{GDK_KEY_0,      slowTime},
-		{GDK_KEY_1,      slowTime},
-		{GDK_KEY_2,      slowTime},
-		{GDK_KEY_3,      slowTime},
-		{GDK_KEY_4,      slowTime},
-		{GDK_KEY_5,      slowTime},
-		{GDK_KEY_6,      slowTime},
-		{GDK_KEY_7,      slowTime},
-		{GDK_KEY_8,      slowTime},
-		{GDK_KEY_9,      slowTime},
+		{GDK_KEY_Up,           arrowTime},
+		{GDK_KEY_Down,         arrowTime},
+		{GDK_KEY_Left,         arrowTime},
+		{GDK_KEY_Right,        arrowTime},
+		{GDK_KEY_e,            interactTime},
+		{GDK_KEY_E,            interactTime},
+		{GDK_KEY_bracketleft,  interactTime},
+		{GDK_KEY_bracketright, interactTime},
+		{GDK_KEY_r,            interactTime},
+		{GDK_KEY_R,            interactTime},
+		{GDK_KEY_o,            interactTime},
+		{GDK_KEY_Return,       interactTime},
+		{GDK_KEY_space,        jumpTime},
+		{GDK_KEY_g,            slowTime},
+		{GDK_KEY_0,            slowTime},
+		{GDK_KEY_1,            slowTime},
+		{GDK_KEY_2,            slowTime},
+		{GDK_KEY_3,            slowTime},
+		{GDK_KEY_4,            slowTime},
+		{GDK_KEY_5,            slowTime},
+		{GDK_KEY_6,            slowTime},
+		{GDK_KEY_7,            slowTime},
+		{GDK_KEY_8,            slowTime},
+		{GDK_KEY_9,            slowTime},
 	};
 
 	MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &builder_):
@@ -763,6 +765,12 @@ namespace Game3 {
 				case GDK_KEY_e:
 				case GDK_KEY_Return:
 					game->interactNextTo(Modifiers(modifiers));
+					return;
+				case GDK_KEY_bracketleft:
+					game->interactNextTo(Modifiers(modifiers) | Modifiers(true, false, false, false), Hand::Left);
+					return;
+				case GDK_KEY_bracketright:
+					game->interactNextTo(Modifiers(modifiers) | Modifiers(true, false, false, false), Hand::Right);
 					return;
 				case GDK_KEY_R:
 					game->interactOn(Modifiers(modifiers) | Modifiers(true, false, false, false));

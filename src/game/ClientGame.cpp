@@ -198,14 +198,14 @@ namespace Game3 {
 		missingChunks.erase(chunk_position);
 	}
 
-	void ClientGame::interactOn(Modifiers modifiers) {
+	void ClientGame::interactOn(Modifiers modifiers, Hand hand) {
 		assert(client);
-		client->send(InteractPacket(true, modifiers, {}, client->getGame()->player->direction));
+		client->send(InteractPacket(true, hand, modifiers, {}, client->getGame()->player->direction));
 	}
 
-	void ClientGame::interactNextTo(Modifiers modifiers) {
+	void ClientGame::interactNextTo(Modifiers modifiers, Hand hand) {
 		assert(client);
-		client->send(InteractPacket(false, modifiers, {}, client->getGame()->player->direction));
+		client->send(InteractPacket(false, hand, modifiers, {}, client->getGame()->player->direction));
 	}
 
 	void ClientGame::putInLimbo(EntityPtr entity, RealmID next_realm_id, const Position &next_position) {

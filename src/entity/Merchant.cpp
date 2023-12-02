@@ -32,20 +32,19 @@ namespace Game3 {
 		greed = json.at("greed");
 	}
 
-	bool Merchant::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers) {
-		(void) player;
-		if (getSide() == Side::Client) {
-			// auto &window = getRealm()->getGame().toClient().canvas.window;
-			// auto &tab = *window.merchantTab;
-			// player->queueForMove([&tab](const auto &) {
-			// 	tab.hide();
-			// 	return true;
-			// });
-			// tab.show();
-			// window.delay([this, &tab] {
-			// 	tab.setMerchantInventory("Merchant", std::dynamic_pointer_cast<ClientInventory>(inventory), greed);
-			// }, 2);
-		}
+	bool Merchant::onInteractNextTo(const PlayerPtr &, Modifiers, ItemStack *) {
+		// if (getSide() == Side::Client) {
+		// 	auto &window = getRealm()->getGame().toClient().canvas.window;
+		// 	auto &tab = *window.merchantTab;
+		// 	player->queueForMove([&tab](const auto &) {
+		// 		tab.hide();
+		// 		return true;
+		// 	});
+		// 	tab.show();
+		// 	window.delay([this, &tab] {
+		// 		tab.setMerchantInventory("Merchant", std::dynamic_pointer_cast<ClientInventory>(inventory), greed);
+		// 	}, 2);
+		// }
 		return true;
 	}
 

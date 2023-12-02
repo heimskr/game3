@@ -1077,6 +1077,17 @@ namespace Game3 {
 		return inLimboFor != 0;
 	}
 
+	ItemStack * Entity::getHeld(Hand hand) const {
+		InventoryPtr inventory = getInventory(0);
+		auto lock = inventory->sharedLock();
+		switch (hand) {
+			case Hand::Left:  return (*inventory)[heldLeft.slot];
+			case Hand::Right: return (*inventory)[heldRight.slot];
+			default:
+				return nullptr;
+		}
+	}
+
 	void Entity::changeTexture(const Identifier &identifier) {
 		Game &game_ref = getGame();
 		auto entity_texture = game_ref.registry<EntityTextureRegistry>().at(identifier);

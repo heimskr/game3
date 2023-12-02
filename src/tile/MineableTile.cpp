@@ -11,7 +11,7 @@ namespace Game3 {
 	MineableTile::MineableTile(Identifier identifier_, ItemStack stack_, bool consumable_):
 		Tile(std::move(identifier_)), stack(std::move(stack_)), consumable(consumable_) {}
 
-	bool MineableTile::interact(const Place &place, Layer layer) {
+	bool MineableTile::interact(const Place &place, Layer layer, ItemStack *) {
 		if (layer == Layer::Terrain) {
 			// Terrain isn't mineable.
 			return false;

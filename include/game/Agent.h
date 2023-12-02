@@ -11,6 +11,7 @@
 
 namespace Game3 {
 	class Game;
+	class ItemStack;
 	class Player;
 
 	struct AgentMeta {
@@ -35,9 +36,9 @@ namespace Game3 {
 			virtual std::string getName() const = 0;
 
 			/** Handles when the player interacts with the tile they're on and that tile contains this agent. Returns whether anything interesting happened. */
-			virtual bool onInteractOn(const std::shared_ptr<Player> &, Modifiers) { return false; }
+			virtual bool onInteractOn(const std::shared_ptr<Player> &, Modifiers, ItemStack *used_item);
 			/** Handles when the player interacts with the tile in front of them and that tile contains this agent. Returns whether anything interesting happened. */
-			virtual bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) { return false; }
+			virtual bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *used_item);
 
 			virtual bool populateMenu(const PlayerPtr &, bool overlap, const std::string &id, Glib::RefPtr<Gio::Menu>, Glib::RefPtr<Gio::SimpleActionGroup>) { (void) overlap; (void) id; return false; }
 

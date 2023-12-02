@@ -22,7 +22,7 @@ namespace Game3 {
 		FluidHoldingTileEntity::toJSON(json);
 	}
 
-	bool Tank::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
+	bool Tank::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *) {
 		RealmPtr realm = getRealm();
 
 		if (modifiers.onlyAlt()) {

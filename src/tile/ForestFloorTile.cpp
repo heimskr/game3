@@ -12,7 +12,7 @@ namespace Game3 {
 	ForestFloorTile::ForestFloorTile():
 		Tile(ID()) {}
 
-	bool ForestFloorTile::interact(const Place &place, Layer layer) {
+	bool ForestFloorTile::interact(const Place &place, Layer layer, ItemStack *) {
 		if (layer != Layer::Terrain)
 			return false;
 

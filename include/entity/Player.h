@@ -46,8 +46,8 @@ namespace Game3 {
 			bool isPlayer() const override { return true; }
 			void tick(Game &, float delta) override;
 			void remove() override {}
-			bool interactOn(Modifiers);
-			void interactNextTo(Modifiers);
+			bool interactOn(Modifiers, ItemStack *used_item = nullptr);
+			void interactNextTo(Modifiers, ItemStack *used_item = nullptr);
 			using Entity::teleport;
 			void teleport(const Position &, const std::shared_ptr<Realm> &, MovementContext) override;
 			void addMoney(MoneyCount);

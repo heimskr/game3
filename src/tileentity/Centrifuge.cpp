@@ -65,7 +65,7 @@ namespace Game3 {
 		InventoriedTileEntity::toJSON(json);
 	}
 
-	bool Centrifuge::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers) {
+	bool Centrifuge::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *) {
 		RealmPtr realm = getRealm();
 
 		if (modifiers.onlyAlt()) {

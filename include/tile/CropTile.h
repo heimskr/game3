@@ -15,7 +15,7 @@ namespace Game3 {
 			CropTile(std::shared_ptr<Crop>);
 
 			void randomTick(const Place &) override;
-			bool interact(const Place &, Layer) override;
+			bool interact(const Place &, Layer, ItemStack *) override;
 
 			bool isRipe(const Identifier &) const;
 	};

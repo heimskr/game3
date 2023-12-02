@@ -25,7 +25,7 @@ namespace Game3 {
 
 			void init(Game &) override;
 			void tick(Game &, float) override;
-			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *) override;
 
 			void render(SpriteRenderer &) override;
 			void renderUpper(SpriteRenderer &) override;

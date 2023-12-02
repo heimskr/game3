@@ -168,6 +168,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 21. **Interact**: tells the server to perform an interaction.
 
 	- `bool` Direct: whether to interact with the tile the player is on, rather than one tile in front of the player
+	- `u8` Use item: which hand's held item to use (e.g., for attacking) (0 = neither, 1 = left, 2 = right)
 	- `u8` Modifiers: bitfield (1 = shift, 2 = ctrl, 4 = alt, 8 = super)
 	- `optional<u64>` Global ID of specific agent to interact with
 	- `optional<u8>` Facing direction

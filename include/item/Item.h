@@ -132,6 +132,8 @@ namespace Game3 {
 			void absorbGame(const Game &);
 	};
 
+	using ItemPtr = std::shared_ptr<Item>;
+
 	template <typename T>
 	T popBuffer(Buffer &);
 	template <>

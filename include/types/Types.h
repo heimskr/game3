@@ -86,4 +86,7 @@ namespace Game3 {
 
 	enum class PipeType: uint8_t {Invalid = 0, Item, Fluid, Energy};
 	std::ostream & operator<<(std::ostream &, PipeType);
+
+	enum class Hand: uint8_t {None = 0, Left, Right};
+	std::ostream & operator<<(std::ostream &, Hand);
 }
