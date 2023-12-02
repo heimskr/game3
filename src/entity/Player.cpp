@@ -158,11 +158,19 @@ namespace Game3 {
 		auto player = getShared();
 		auto entity = realm->findEntity(next_to, player);
 		bool interesting = false;
+
+		if (hand != Hand::None && used_item) {
+			used_item->item->use(getHeldSlot(hand), *used_item, getPlace(), modifiers, {0.f, 0.f}, hand);
+			return;
+		}
+
 		if (entity)
 			interesting = entity->onInteractNextTo(player, modifiers, used_item, hand);
+
 		if (!interesting)
 			if (auto tileEntity = realm->tileEntityAt(next_to))
 				interesting = tileEntity->onInteractNextTo(player, modifiers, used_item, hand);
+
 		if (!interesting)
 			realm->interactGround(player, next_to, modifiers, used_item, hand);
 	}

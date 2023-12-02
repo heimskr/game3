@@ -24,6 +24,7 @@
 #include "item/Item.h"
 #include "item/Landfill.h"
 #include "item/Mead.h"
+#include "item/MeleeWeapon.h"
 #include "item/Mushroom.h"
 #include "item/Pickaxe.h"
 #include "item/PipeItem.h"
@@ -233,6 +234,8 @@ namespace Game3 {
 		add(std::make_shared<FilledFlask>("base:item/brine_flask", "Brine Flask", 4, "base:fluid/brine"));
 		add(std::make_shared<FilledFlask>("base:item/honey",       "Honey",       5, "base:fluid/honey"));
 
+		add(std::make_shared<MeleeWeapon>("base:item/iron_sword", "Iron Sword", 150, 3, 1, 64));
+
 		add(std::make_shared<TerrainSeed>("base:item/moss", "Moss", "base:tile/dirt", "base:tile/forest_floor", 2));
 
 		add(std::make_shared<VoidPickaxe>("base:item/void_pickaxe",    "Void Pickaxe",    1000,  0.f,  -1, "base:attribute/void_pickaxe"));
@@ -266,6 +269,7 @@ namespace Game3 {
 		add(std::make_shared<CreativeGeneratorItem>("base:item/creative_generator", "Creative Generator", 999, 64)); // TODO: cost
 
 		add(std::make_shared<GeothermalGeneratorItem>("base:item/geothermal_generator", "Geothermal Generator", 999, 64)); // TODO: cost
+
 
 		add(std::make_shared<SnowySapling>("base:item/snowy_sapling", "Snowy Sapling", 5, 64));
 		add(std::make_shared<DesertSapling>("base:item/desert_sapling", "Cactus Sapling", 5, 64));

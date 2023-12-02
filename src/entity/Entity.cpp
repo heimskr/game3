@@ -1088,6 +1088,15 @@ namespace Game3 {
 		}
 	}
 
+	Slot Entity::getHeldSlot(Hand hand) const {
+		switch (hand) {
+			case Hand::Left:  return heldLeft.slot;
+			case Hand::Right: return heldRight.slot;
+			default:
+				return -1;
+		}
+	}
+
 	void Entity::changeTexture(const Identifier &identifier) {
 		Game &game_ref = getGame();
 		auto entity_texture = game_ref.registry<EntityTextureRegistry>().at(identifier);

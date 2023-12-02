@@ -159,6 +159,7 @@ namespace Game3 {
 			virtual int getZIndex() const { return 0; }
 			virtual Identifier getMilk() const { return {}; }
 			ItemStack * getHeld(Hand) const;
+			Slot getHeldSlot(Hand) const;
 
 			virtual void encode(Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */

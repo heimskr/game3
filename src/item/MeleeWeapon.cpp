@@ -1,3 +1,4 @@
+#include "algorithm/DamageCalculation.h"
 #include "entity/Player.h"
 #include "item/MeleeWeapon.h"
 #include "realm/Realm.h"
@@ -6,18 +7,27 @@
 #include <random>
 
 namespace Game3 {
-	MeleeWeapon::MeleeWeapon(ItemID id_, std::string name_, MoneyCount base_price, HitPoints base_damage, Durability max_durability):
-	Weapon(id_, std::move(name_), base_price, base_damage, max_durability) {
+	MeleeWeapon::MeleeWeapon(ItemID id_, std::string name_, MoneyCount base_price, HitPoints base_damage, int variability_, Durability max_durability):
+	Weapon(id_, std::move(name_), base_price, base_damage, variability_, max_durability) {
 		attributes.emplace("base:attribute/melee_weapon");
 	}
 
-	bool MeleeWeapon::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>, Hand hand) {
+	bool MeleeWeapon::use(Slot, ItemStack &, const Place &place, Modifiers, std::pair<float, float>, Hand hand) {
+		if (hand == Hand::None)
+			return false;
+
 		const Position faced_tile = place.position + place.player->direction;
+
 		for (const EntityPtr &entity: place.realm->findEntities(faced_tile)) {
 			if (auto living = std::dynamic_pointer_cast<LivingEntity>(entity)) {
 				if (living->isInvincible())
 					continue;
+
+				INFO("Damage to " << living->getName() << ": " << calculateDamage(baseDamage, 1, variability, 0, 0));
+				return true;
 			}
 		}
+
+		return false;
 	}
 }

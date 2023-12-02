@@ -43,6 +43,8 @@ namespace Game3 {
 					}
 				}
 			}
+		} else if (used_item->item->use(player.getHeldSlot(hand), *used_item, place, modifiers, {0.f, 0.f}, hand)) {
+			return true;
 		}
 
 		std::optional<Identifier> item;
