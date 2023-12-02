@@ -86,7 +86,10 @@ namespace Game3 {
 		if (!game) {
 			clear();
 			lastGame = nullptr;
-			inventoryModule.reset();
+			if (inventoryModule) {
+				vbox.remove(inventoryModule->getWidget());
+				inventoryModule.reset();
+			}
 			return;
 		}
 
