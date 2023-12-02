@@ -28,6 +28,8 @@ namespace Game3 {
 	void omniOptOut();
 	void filterTest();
 	bool chemskrTest(int, char **);
+	void skewTest(double location, double scale, double shape);
+	void damageTest(HitPoints weapon_damage, int defense, int variability, double attacker_luck, double defender_luck);
 }
 
 int main(int argc, char **argv) {
@@ -55,7 +57,9 @@ int main(int argc, char **argv) {
 		if (Game3::chemskrTest(argc, argv))
 			return 0;
 
-		if (strcmp(argv[1], "--token") == 0 && argc == 3) {
+		const std::string_view arg1{argv[1]};
+
+		if (arg1 == "--token" && argc == 3) {
 			if (!std::filesystem::exists(".secret")) {
 				std::cerr << "Can't find .secret\n";
 				return 1;
@@ -66,7 +70,7 @@ int main(int argc, char **argv) {
 			return 0;
 		}
 
-		if (strcmp(argv[1], "--is-flatpak") == 0) {
+		if (arg1 == "--is-flatpak") {
 #ifdef IS_FLATPAK
 			std::cout << "Is Flatpak: \e[1;32mtrue\e[22;39m\n";
 #else
@@ -75,23 +79,41 @@ int main(int argc, char **argv) {
 			return 0;
 		}
 
-		if (strcmp(argv[1], "-s") == 0) {
+		if (arg1 == "-s") {
 			const auto out = Game3::Server::main(argc, argv);
 			Game3::Timer::summary();
 			return out;
 		}
 
-		if (strcmp(argv[1], "-t") == 0) {
+		if (arg1 == "-t") {
 			Game3::test();
 			return 0;
 		}
 
-		if (strcmp(argv[1], "--split") == 0) {
+		if (arg1 == "--skew" && argc == 5) {
+			const double location = Game3::parseNumber<double>(argv[2]);
+			const double scale = Game3::parseNumber<double>(argv[3]);
+			const double shape = Game3::parseNumber<double>(argv[4]);
+			Game3::skewTest(location, scale, shape);
+			return 0;
+		}
+
+		if (arg1 == "--damage" && argc == 7) {
+			const auto weapon_damage = Game3::parseNumber<Game3::HitPoints>(argv[2]);
+			const auto defense = Game3::parseNumber<int>(argv[3]);
+			const auto variability = Game3::parseNumber<int>(argv[4]);
+			const auto attacker_luck = Game3::parseNumber<double>(argv[5]);
+			const auto defender_luck = Game3::parseNumber<double>(argv[6]);
+			Game3::damageTest(weapon_damage, defense, variability, attacker_luck, defender_luck);
+			return 0;
+		}
+
+		if (arg1 == "--split") {
 			Game3::splitter();
 			return 0;
 		}
 
-		if (strcmp(argv[1], "--tile-stitch") == 0) {
+		if (arg1 == "--tile-stitch") {
 			if (argc == 3) {
 				const auto count = Game3::parseNumber<size_t>(argv[2]);
 				size_t dimension = 16;
@@ -107,21 +129,21 @@ int main(int argc, char **argv) {
 			return 0;
 		}
 
-		if (strcmp(argv[1], "--item-stitch") == 0) {
+		if (arg1 == "--item-stitch") {
 			std::string png;
 			Game3::itemStitcher(nullptr, "resources/items", "base:itemset/items", &png);
 			std::cout << png;
 			return 0;
 		}
 
-		if (strcmp(argv[1], "--migrate") == 0) {
+		if (arg1 == "--migrate") {
 			std::vector<std::string> args;
 			for (int i = 2; i < argc; ++i)
 				args.emplace_back(argv[i]);
 			return Game3::migrate(args);
 		}
 
-		if (strcmp(argv[1], "--maze") == 0) {
+		if (arg1 == "--maze") {
 			for (const auto &row: Game3::Mazer({32, 32}, 666, {2, 0}).getRows(false)) {
 				for (const auto column: row)
 					std::cout << (column? "\u2588" : " ");
@@ -131,12 +153,12 @@ int main(int argc, char **argv) {
 			return 0;
 		}
 
-		if (strcmp(argv[1], "--omni-opt-out") == 0) {
+		if (arg1 == "--omni-opt-out") {
 			Game3::omniOptOut();
 			return 0;
 		}
 
-		if (strcmp(argv[1], "--filter-test") == 0) {
+		if (arg1 == "--filter-test") {
 			Game3::filterTest();
 			return 0;
 		}

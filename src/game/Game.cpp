@@ -14,7 +14,7 @@
 #include "ui/module/FluidLevelsModule.h"
 #include "ui/module/ItemFilterModule.h"
 #include "ui/module/ModuleFactory.h"
-#include "util/AStar.h"
+#include "algorithm/AStar.h"
 #include "util/FS.h"
 #include "util/Timer.h"
 #include "util/Util.h"

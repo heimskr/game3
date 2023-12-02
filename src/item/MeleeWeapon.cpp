@@ -1,4 +1,9 @@
+#include "entity/Player.h"
 #include "item/MeleeWeapon.h"
+#include "realm/Realm.h"
+#include "types/Position.h"
+
+#include <random>
 
 namespace Game3 {
 	MeleeWeapon::MeleeWeapon(ItemID id_, std::string name_, MoneyCount base_price, HitPoints base_damage, Durability max_durability):
@@ -7,6 +12,12 @@ namespace Game3 {
 	}
 
 	bool MeleeWeapon::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>, Hand hand) {
-		return true;
+		const Position faced_tile = place.position + place.player->direction;
+		for (const EntityPtr &entity: place.realm->findEntities(faced_tile)) {
+			if (auto living = std::dynamic_pointer_cast<LivingEntity>(entity)) {
+				if (living->isInvincible())
+					continue;
+			}
+		}
 	}
 }

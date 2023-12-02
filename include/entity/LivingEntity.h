@@ -11,6 +11,7 @@ namespace Game3 {
 			/** Returns the maximum number of hitpoints this entity can have. If 0, the entity is invincible. */
 			virtual HitPoints getMaxHealth() const { return 0; }
 			bool isInvincible() const { return getMaxHealth() == INVINCIBLE; }
+			virtual HitPoints getDefense() const { return 0; }
 
 			void onCreate() override;
 			void toJSON(nlohmann::json &) const override;

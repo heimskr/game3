@@ -22,7 +22,7 @@
 #include "realm/Realm.h"
 #include "registry/Registries.h"
 #include "ui/Canvas.h"
-#include "util/AStar.h"
+#include "algorithm/AStar.h"
 #include "util/Cast.h"
 #include "util/Util.h"
 

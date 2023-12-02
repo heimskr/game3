@@ -1,6 +1,6 @@
 #include "Log.h"
 #include "realm/Realm.h"
-#include "util/AStar.h"
+#include "algorithm/AStar.h"
 
 #include <algorithm>
 #include <queue>
