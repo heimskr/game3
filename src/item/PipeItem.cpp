@@ -14,7 +14,7 @@ namespace Game3 {
 		}
 	}
 
-	std::optional<bool> ItemPipeItem::customUse(Slot, ItemStack &, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) {
+	std::optional<bool> ItemPipeItem::customUse(Slot, ItemStack &, const Place &place, Modifiers modifiers, std::pair<float, float> offsets, Hand) {
 		if (modifiers == Modifiers(true, true, false, false)) {
 			PlayerPtr player = place.player;
 			assert(player);

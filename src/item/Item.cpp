@@ -103,7 +103,7 @@ namespace Game3 {
 		return name;
 	}
 
-	bool Item::use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) {
+	bool Item::use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>, Hand) {
 		return false;
 	}
 

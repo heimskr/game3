@@ -9,7 +9,7 @@
 #include "threading/ThreadContext.h"
 
 namespace Game3 {
-	bool StandardInteractions::interact(const Place &place, Modifiers modifiers, ItemStack *used_item) const {
+	bool StandardInteractions::interact(const Place &place, Modifiers modifiers, ItemStack *used_item, Hand hand) const {
 		const Position position = place.position;
 		Player &player = *place.player;
 		Realm &realm = *place.realm;
@@ -31,7 +31,7 @@ namespace Game3 {
 
 		if (!used_item) {
 			if (ItemStack *active = get_active()) {
-				if (active->item->canUseOnWorld() && active->item->use(inventory->activeSlot, *active, place, modifiers, {0.f, 0.f}))
+				if (active->item->canUseOnWorld() && active->item->use(inventory->activeSlot, *active, place, modifiers, {0.f, 0.f}, hand))
 					return true;
 
 				if (active->hasAttribute("base:attribute/shovel"_id)) {

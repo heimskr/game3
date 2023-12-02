@@ -52,7 +52,8 @@ namespace Game3 {
 
 			virtual void initStack(const Game &, ItemStack &) {}
 
-			virtual bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float> offsets);
+			/** Returns true iff propagation should stop. */
+			virtual bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float> offsets, Hand);
 
 			virtual bool drag(Slot, ItemStack &, const Place &, Modifiers);
 

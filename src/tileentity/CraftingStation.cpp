@@ -22,7 +22,7 @@ namespace Game3 {
 		json["itemName"] = itemName;
 	}
 
-	bool CraftingStation::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers modifiers, ItemStack *) {
+	bool CraftingStation::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers modifiers, ItemStack *, Hand) {
 		if (player->getSide() != Side::Server)
 			return false;
 

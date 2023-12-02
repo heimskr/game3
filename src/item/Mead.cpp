@@ -8,7 +8,7 @@
 #include "realm/Realm.h"
 
 namespace Game3 {
-	bool Mead::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
+	bool Mead::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>, Hand) {
 		Realm  &realm  = *place.realm;
 		assert(realm.getSide() == Side::Server);
 		Game   &game   = realm.getGame();

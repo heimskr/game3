@@ -64,7 +64,7 @@ namespace Game3 {
 		InventoriedTileEntity::toJSON(json);
 	}
 
-	bool Incinerator::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *) {
+	bool Incinerator::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *, Hand) {
 		if (modifiers.onlyAlt()) {
 			RealmPtr realm = getRealm();
 			realm->queueDestruction(getSelf());

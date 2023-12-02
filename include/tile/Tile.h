@@ -2,6 +2,7 @@
 
 #include "Layer.h"
 #include "registry/Registerable.h"
+#include "types/Types.h"
 
 namespace Game3 {
 	class ItemStack;
@@ -14,6 +15,6 @@ namespace Game3 {
 
 			virtual void randomTick(const Place &) {}
 			/** Returns false to continue propagation to lower layers, true to stop it. */
-			virtual bool interact(const Place &, Layer, ItemStack *used_item);
+			virtual bool interact(const Place &, Layer, ItemStack *used_item, Hand);
 	};
 }

@@ -740,19 +740,19 @@ namespace Game3 {
 		return tileProvider.copyFluidTile(position);
 	}
 
-	bool Realm::interactGround(const PlayerPtr &player, const Position &position, Modifiers modifiers, ItemStack *used_item) {
+	bool Realm::interactGround(const PlayerPtr &player, const Position &position, Modifiers modifiers, ItemStack *used_item, Hand hand) {
 		const Place place(position, shared_from_this(), player);
 		auto &game = getGame();
 
 		if (auto iter = game.interactionSets.find(type); iter != game.interactionSets.end())
-			if (iter->second->interact(place, modifiers, used_item))
+			if (iter->second->interact(place, modifiers, used_item, hand))
 				return true;
 
 		Tileset &tileset = getTileset();
 
 		for (const Layer layer: reverse(mainLayers))
 			if (std::optional<TileID> tile = tryTile(layer, position))
-				if (game.getTile(tileset[*tile])->interact(place, layer, used_item))
+				if (game.getTile(tileset[*tile])->interact(place, layer, used_item, hand))
 					return true;
 
 		return false;

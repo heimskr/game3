@@ -24,8 +24,8 @@ namespace Game3 {
 			void init(Game &) override;
 			void tick(Game &, float) override;
 			void render(const RendererSet &) override;
-			bool onInteractOn    (const std::shared_ptr<Player> &player, Modifiers, ItemStack *) override { return interact(player); }
-			bool onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, ItemStack *) override { return interact(player); }
+			bool onInteractOn    (const std::shared_ptr<Player> &player, Modifiers, ItemStack *, Hand) override { return interact(player); }
+			bool onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, ItemStack *, Hand) override { return interact(player); }
 			std::string getName() const override;
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;

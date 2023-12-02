@@ -21,12 +21,12 @@ namespace Game3 {
 			PipeItem(Identifier identifier_, const char *display_name, MoneyCount base_price):
 				Item(std::move(identifier_), display_name, base_price, 64) {}
 
-			virtual std::optional<bool> customUse(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) {
+			virtual std::optional<bool> customUse(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>, Hand) {
 				return std::nullopt;
 			}
 
 		public:
-			bool use(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) override{
+			bool use(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets, Hand hand) override{
 				Realm &realm = *place.realm;
 				const InventoryPtr inventory = place.player->getInventory(0);
 
@@ -53,7 +53,7 @@ namespace Game3 {
 				if (!pipe)
 					return false;
 
-				if (std::optional<bool> return_value = customUse(slot, stack, place, modifiers, offsets))
+				if (std::optional<bool> return_value = customUse(slot, stack, place, modifiers, offsets, hand))
 					return *return_value;
 
 				if (modifiers.onlyShift()) {
@@ -112,7 +112,7 @@ namespace Game3 {
 				PipeItem(ID(), "Item Pipe", base_price) {}
 
 		protected:
-			std::optional<bool> customUse(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float> offsets) override;
+			std::optional<bool> customUse(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float> offsets, Hand) override;
 	};
 
 	class FluidPipeItem: public PipeItem<PipeType::Fluid> {

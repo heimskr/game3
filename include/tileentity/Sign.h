@@ -17,7 +17,7 @@ namespace Game3 {
 			Sign & operator=(Sign &&) = default;
 
 			void toJSON(nlohmann::json &) const override;
-			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			// void render(SpriteRenderer &) const override;
 

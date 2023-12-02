@@ -1,11 +1,11 @@
 #pragma once
 
-#include "item/Tool.h"
+#include "item/Weapon.h"
 
 namespace Game3 {
-	class Pickaxe: public Tool {
+	class MeleeWeapon: public Weapon {
 		public:
-			Pickaxe(ItemID id_, std::string name_, MoneyCount base_price, float base_cooldown, Durability max_durability);
+			MeleeWeapon(ItemID id_, std::string name_, MoneyCount base_price, HitPoints base_damage, Durability max_durability);
 
 			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>, Hand) override;
 			bool drag(Slot, ItemStack &, const Place &, Modifiers) override;

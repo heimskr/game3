@@ -13,7 +13,7 @@ namespace Game3 {
 			Stockpile & operator=(const Stockpile &) = delete;
 			Stockpile & operator=(Stockpile &&) = default;
 
-			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 
 		protected:
 			Stockpile() = default;

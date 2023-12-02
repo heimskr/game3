@@ -14,7 +14,7 @@ namespace Game3 {
 	Animal::Animal():
 		Entity("base:invalid/Animal") {}
 
-	bool Animal::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, ItemStack *used_item) {
+	bool Animal::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, ItemStack *used_item, Hand) {
 		if (!used_item || used_item->item->identifier != "base:item/wrench")
 			return false;
 

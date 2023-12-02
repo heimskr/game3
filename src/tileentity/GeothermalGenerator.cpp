@@ -122,7 +122,7 @@ namespace Game3 {
 		EnergeticTileEntity::toJSON(json);
 	}
 
-	bool GeothermalGenerator::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *) {
+	bool GeothermalGenerator::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *, Hand) {
 		RealmPtr realm = getRealm();
 
 		if (modifiers.onlyAlt()) {

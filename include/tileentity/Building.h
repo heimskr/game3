@@ -17,8 +17,8 @@ namespace Game3 {
 			Building & operator=(Building &&) = default;
 
 			void toJSON(nlohmann::json &) const override;
-			bool onInteractOn(const std::shared_ptr<Player> &, Modifiers, ItemStack *) override;
-			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *) override;
+			bool onInteractOn(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			void teleport(const std::shared_ptr<Entity> &);
 			std::shared_ptr<Realm> getInnerRealm() const;

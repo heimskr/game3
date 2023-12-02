@@ -11,7 +11,7 @@ namespace Game3 {
 	class TileEntityItem: public Item {
 		public:
 			using Item::Item;
-			bool use(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers, std::pair<float, float>) override {
+			bool use(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers, std::pair<float, float>, Hand) override {
 				Realm &realm = *place.realm;
 				Game  &game  = realm.getGame();
 				assert(game.getSide() == Side::Server);

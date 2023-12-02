@@ -10,8 +10,8 @@ namespace Game3 {
 		MineableTile(std::move(identifier_), std::move(stack_), true),
 		floor(std::move(floor_)) {}
 
-	bool CaveTile::interact(const Place &place, Layer layer, ItemStack *used_item) {
-		if (!MineableTile::interact(place, layer, used_item))
+	bool CaveTile::interact(const Place &place, Layer layer, ItemStack *used_item, Hand hand) {
+		if (!MineableTile::interact(place, layer, used_item, hand))
 			return false;
 
 		if (auto terrain = place.get(Layer::Terrain); !terrain || *terrain == 0)

@@ -15,12 +15,12 @@ namespace Game3 {
 		tileEntityID = ID();
 	}
 
-	bool Stockpile::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers modifiers, ItemStack *used_item) {
+	bool Stockpile::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers modifiers, ItemStack *used_item, Hand hand) {
 		auto keep = std::dynamic_pointer_cast<Keep>(getRealm());
 		if (!keep)
 			throw std::runtime_error("Stockpile must be placed inside a Keep realm");
 		std::cout << "Keep: money = " << keep->money << ", greed = " << keep->greed << '\n';
-		Chest::onInteractNextTo(player, modifiers, used_item);
+		Chest::onInteractNextTo(player, modifiers, used_item, hand);
 		return true;
 	}
 }

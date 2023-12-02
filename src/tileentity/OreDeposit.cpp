@@ -61,7 +61,7 @@ namespace Game3 {
 		TileEntity::tick(game, delta);
 	}
 
-	bool OreDeposit::onInteractNextTo(const PlayerPtr &player, Modifiers, ItemStack *) {
+	bool OreDeposit::onInteractNextTo(const PlayerPtr &player, Modifiers, ItemStack *, Hand) {
 		if (getSide() != Side::Server)
 			return false;
 

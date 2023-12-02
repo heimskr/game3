@@ -90,7 +90,7 @@ namespace Game3 {
 			json["equation"] = equation->getText();
 	}
 
-	bool ChemicalReactor::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *) {
+	bool ChemicalReactor::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *, Hand) {
 		if (getSide() == Side::Client)
 			return false;
 

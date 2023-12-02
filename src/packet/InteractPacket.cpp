@@ -21,16 +21,16 @@ namespace Game3 {
 			if (globalID) {
 				if (AgentPtr agent = game.getAgent<Agent>(*globalID)) {
 					if (direct)
-						agent->onInteractOn(player, modifiers, held_item);
+						agent->onInteractOn(player, modifiers, held_item, hand);
 					else
-						agent->onInteractNextTo(player, modifiers, held_item);
+						agent->onInteractNextTo(player, modifiers, held_item, hand);
 				} else {
 					client.send(ErrorPacket("Can't interact: agent " + std::to_string(*globalID) + " not found"));
 				}
 			} else if (direct) {
-				player->interactOn(modifiers, held_item);
+				player->interactOn(modifiers, held_item, hand);
 			} else {
-				player->interactNextTo(modifiers, held_item);
+				player->interactNextTo(modifiers, held_item, hand);
 			}
 		} else {
 			WARN("Can't interact: client " << client.id << " has no player");

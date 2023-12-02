@@ -12,6 +12,6 @@ namespace Game3 {
 		public:
 			MineableTile(Identifier, ItemStack, bool consumable_);
 
-			bool interact(const Place &, Layer, ItemStack *) override;
+			bool interact(const Place &, Layer, ItemStack *, Hand) override;
 	};
 }
