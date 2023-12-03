@@ -133,8 +133,7 @@ namespace Game3 {
 		}
 
 		RealmPtr realm = getRealm();
-
-		const Direction facing = position.getFacing(target->getPosition());
+		const Direction facing = target->getPosition().getFacing(position);
 
 		// First try to pathfind to the closest position that's adjacent to the player.
 		Position destination = target->getPosition() + facing;
