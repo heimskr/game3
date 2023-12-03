@@ -80,6 +80,7 @@ namespace Game3 {
 
 			virtual void destroy();
 			virtual void onCreate() {}
+			virtual void onSpawn() {}
 
 			/** This won't call init() on the Entity. You need to do that yourself. */
 			template <typename T = Entity, typename... Args>

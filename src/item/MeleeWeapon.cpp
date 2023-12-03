@@ -23,7 +23,8 @@ namespace Game3 {
 				if (living->isInvincible())
 					continue;
 
-				INFO("Damage to " << living->getName() << ": " << calculateDamage(baseDamage, 1, variability, 0, 0));
+				const HitPoints damage = calculateDamage(baseDamage, variability, place.player->getLuck());
+				living->takeDamage(damage);
 				return true;
 			}
 		}

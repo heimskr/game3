@@ -1292,6 +1292,7 @@ namespace Game3 {
 		add(entity, position);
 		entity->calculateVisibleEntities();
 		entity->spawning = false;
+		entity->onSpawn();
 
 		if (getSide() == Side::Server) {
 			auto lock = entity->visiblePlayers.sharedLock();

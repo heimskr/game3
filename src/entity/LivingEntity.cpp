@@ -2,18 +2,21 @@
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererSet.h"
 #include "graphics/RenderOptions.h"
+#include "threading/ThreadContext.h"
 
 namespace Game3 {
 	LivingEntity::LivingEntity():
 		Entity("base:invalid/LivingEntity") {}
 
-	void LivingEntity::onCreate() {
+	void LivingEntity::onSpawn() {
+		Entity::onSpawn();
 		health = getMaxHealth();
 	}
 
 	void LivingEntity::toJSON(nlohmann::json &json) const {
 		auto this_lock = sharedLock();
 		json["health"] = health;
+		json["luck"] = luckStat;
 	}
 
 	void LivingEntity::absorbJSON(Game &, const nlohmann::json &json) {
@@ -24,6 +27,9 @@ namespace Game3 {
 
 		if (auto iter = json.find("health"); iter != json.end())
 			health = *iter;
+
+		if (auto iter = json.find("luck"); iter != json.end())
+			luckStat = *iter;
 	}
 
 	void LivingEntity::render(const RendererSet &renderers) {
@@ -74,15 +80,60 @@ namespace Game3 {
 	void LivingEntity::encode(Buffer &buffer) {
 		auto this_lock = sharedLock();
 		buffer << health;
+		buffer << defenseStat;
+		buffer << luckStat;
 	}
 
 	void LivingEntity::decode(Buffer &buffer) {
 		auto this_lock = uniqueLock();
 		buffer >> health;
+		buffer >> defenseStat;
+		buffer >> luckStat;
 	}
 
 	bool LivingEntity::canShowHealthBar() const {
 		const auto max = getMaxHealth();
 		return !isInvincible() && max != 0 && health != max;
+	}
+
+	int LivingEntity::getDefense() const {
+		return defenseStat;
+	}
+
+	double LivingEntity::getLuck() const {
+		return luckStat;
+	}
+
+	void LivingEntity::takeDamage(HitPoints damage) {
+		std::uniform_int_distribution<int> defense_distribution(0, 99);
+
+		const int defense = getDefense();
+		const double luck = getLuck();
+
+		for (int i = 0; i < defense; ++i) {
+			if (damage == 0)
+				break;
+
+			if (defense_distribution(threadContext.rng) < 10 * luck)
+				--damage;
+		}
+
+		INFO("Damage to " << getName() << ": " << damage);
+
+		if (damage == 0)
+			return;
+
+		if (health.fetch_sub(damage) <= damage) {
+			health = 0;
+			kill();
+		} else {
+
+		}
+
+		INFO("Health is now " << health);
+	}
+
+	void LivingEntity::kill() {
+		INFO("RIP " << getName());
 	}
 }

@@ -11,9 +11,8 @@ namespace Game3 {
 			/** Returns the maximum number of hitpoints this entity can have. If 0, the entity is invincible. */
 			virtual HitPoints getMaxHealth() const { return 0; }
 			bool isInvincible() const { return getMaxHealth() == INVINCIBLE; }
-			virtual HitPoints getDefense() const { return 0; }
 
-			void onCreate() override;
+			void onSpawn() override;
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			void render(const RendererSet &) override;
@@ -21,8 +20,15 @@ namespace Game3 {
 			void decode(Buffer &) override;
 
 			virtual bool canShowHealthBar() const;
+			virtual int getDefense() const;
+			virtual double getLuck() const;
+			virtual void takeDamage(HitPoints);
+			virtual void kill();
 
 		protected:
+			int defenseStat = 0;
+			double luckStat = 0;
+
 			LivingEntity();
 	};
 }

@@ -153,11 +153,12 @@ namespace Game3 {
 		player->username = username;
 		player->displayName = display_name;
 		player->token = generateToken(player->username);
-		// overworld->add(player, overworld->randomLand);
+		overworld->add(player, overworld->randomLand);
 		// overworld->add(player, Position(31, 82));
 		// player->direction = Direction::Right;
-		overworld->add(player, Position(-25, -36));
+		// overworld->add(player, Position(-25, -36));
 		player->init(*game);
+		player->onSpawn();
 		const InventoryPtr inventory = player->getInventory(0);
 		{
 			auto inventory_lock = inventory->uniqueLock();
@@ -165,6 +166,7 @@ namespace Game3 {
 			inventory->add(ItemStack::withDurability(*game, "base:item/iron_shovel"));
 			inventory->add(ItemStack::withDurability(*game, "base:item/iron_axe"));
 			inventory->add(ItemStack::withDurability(*game, "base:item/iron_hammer"));
+			inventory->add(ItemStack::withDurability(*game, "base:item/iron_sword"));
 			inventory->add(ItemStack(*game, "base:item/cave_entrance"));
 		}
 		game->addPlayer(player);
