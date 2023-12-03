@@ -3,6 +3,7 @@
 #include "graphics/Tileset.h"
 #include "biome/Grassland.h"
 #include "entity/Chicken.h"
+#include "entity/Cyclops.h"
 #include "entity/Dog.h"
 #include "entity/Pig.h"
 #include "entity/Sheep.h"
@@ -138,28 +139,32 @@ namespace Game3 {
 			if (std::uniform_int_distribution(1, 100)(rng) <= 2)
 				realm.setTile(Layer::Submerged, {row, column}, choose(tileset.getCategoryIDs("base:category/flowers"), rng), false);
 
-			std::shared_ptr<Animal> animal;
+			std::shared_ptr<LivingEntity> spawned_entity;
 
 			switch (std::uniform_int_distribution(1, 600)(rng)) {
 				case 1:
 				case 2:
-					animal = realm.spawn<Sheep>({row, column});
+					spawned_entity = realm.spawn<Sheep>({row, column});
 					break;
 				case 3:
 				case 4:
-					animal = realm.spawn<Pig>({row, column});
+					spawned_entity = realm.spawn<Pig>({row, column});
 					break;
 				case 5:
 				case 6:
-					animal = realm.spawn<Chicken>({row, column});
+					spawned_entity = realm.spawn<Chicken>({row, column});
 					break;
 				case 7:
-					animal = realm.spawn<Dog>({row, column});
+					spawned_entity = realm.spawn<Dog>({row, column});
+					break;
+				case 8:
+				case 9:
+					spawned_entity = realm.spawn<Cyclops>({row, column});
 					break;
 			}
 
-			if (animal)
-				animal->direction = randomDirection();
+			if (spawned_entity)
+				spawned_entity->direction = randomDirection();
 		}
 	}
 }

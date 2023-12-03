@@ -88,7 +88,6 @@ namespace Game3 {
 	void Animal::encode(Buffer &buffer) {
 		Entity::encode(buffer);
 		LivingEntity::encode(buffer);
-		buffer << destination;
 		buffer << timeUntilWander.load();
 		buffer << wanderRadius;
 	}
@@ -96,7 +95,6 @@ namespace Game3 {
 	void Animal::decode(Buffer &buffer) {
 		Entity::decode(buffer);
 		LivingEntity::decode(buffer);
-		buffer >> destination;
 		timeUntilWander = buffer.take<float>();
 		buffer >> wanderRadius;
 	}

@@ -11,6 +11,7 @@
 #include "entity/Sheep.h"
 #include "entity/Woodcutter.h"
 #include "entity/Worker.h"
+#include "entity/Cyclops.h"
 
 namespace Game3 {
 	void Game::add(EntityFactory &&factory) {
@@ -28,5 +29,6 @@ namespace Game3 {
 		add(EntityFactory::create<Pig>());
 		add(EntityFactory::create<Sheep>());
 		add(EntityFactory::create<Woodcutter>());
+		add(EntityFactory::create<Cyclops>());
 	}
 }

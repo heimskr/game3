@@ -25,6 +25,7 @@ namespace Game3 {
 
 				const HitPoints damage = calculateDamage(baseDamage, variability, place.player->getLuck());
 				living->takeDamage(damage);
+				living->onAttack(place.player);
 				return true;
 			}
 		}

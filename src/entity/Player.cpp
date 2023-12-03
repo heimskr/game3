@@ -68,6 +68,10 @@ namespace Game3 {
 		Entity::destroy();
 	}
 
+	HitPoints Player::getMaxHealth() const {
+		return MAX_HEALTH;
+	}
+
 	void Player::toJSON(nlohmann::json &json) const {
 		Entity::toJSON(json);
 		json["isPlayer"] = true;

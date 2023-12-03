@@ -13,7 +13,6 @@ namespace Game3 {
 
 	class Animal: public LivingEntity {
 		public:
-			static Identifier ID() { return {"base", "entity/animal"}; }
 			constexpr static HitPoints MAX_HEALTH = 20;
 			constexpr static float RETRY_TIME = 30.f;
 
@@ -21,7 +20,6 @@ namespace Game3 {
 				return std::uniform_real_distribution(10.f, 20.f);
 			}
 
-			Position destination = {-1, -1};
 			std::atomic<float> timeUntilWander = 0.f;
 			Index wanderRadius = 8;
 

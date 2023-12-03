@@ -23,8 +23,10 @@ namespace Game3 {
 			virtual int getDefense() const;
 			virtual double getLuck() const;
 			virtual void setHealth(HitPoints);
-			virtual void takeDamage(HitPoints);
+			/** Returns whether the entity died. */
+			virtual bool takeDamage(HitPoints);
 			virtual void kill();
+			virtual void onAttack(const std::shared_ptr<LivingEntity> &attacker);
 
 		protected:
 			int defenseStat = 0;
@@ -32,4 +34,6 @@ namespace Game3 {
 
 			LivingEntity();
 	};
+
+	using LivingEntityPtr = std::shared_ptr<LivingEntity>;
 }

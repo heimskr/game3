@@ -40,7 +40,7 @@ namespace Game3 {
 			~Player() override = 0;
 			void destroy() override;
 
-			HitPoints getMaxHealth() const override { return MAX_HEALTH; }
+			HitPoints getMaxHealth() const override;
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			bool isPlayer() const override { return true; }

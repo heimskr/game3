@@ -110,7 +110,7 @@ namespace Game3 {
 		health = new_health;
 	}
 
-	void LivingEntity::takeDamage(HitPoints damage) {
+	bool LivingEntity::takeDamage(HitPoints damage) {
 		assert(getSide() == Side::Server);
 
 		std::uniform_int_distribution<int> defense_distribution(0, 99);
@@ -118,7 +118,7 @@ namespace Game3 {
 		const int defense = getDefense();
 		const double luck = getLuck();
 
-		for (int i = 0; i < defense; ++i) {
+		for (int roll = 0; roll < defense; ++roll) {
 			if (damage == 0)
 				break;
 
@@ -127,18 +127,22 @@ namespace Game3 {
 		}
 
 		if (damage == 0)
-			return;
+			return false;
 
 		if (health.fetch_sub(damage) <= damage) {
 			health = 0;
 			kill();
-		} else {
-			game->toServer().broadcast(LivingEntityHealthChangedPacket(*this));
+			return true;
 		}
+
+		game->toServer().broadcast(LivingEntityHealthChangedPacket(*this));
+		return false;
 	}
 
 	void LivingEntity::kill() {
 		assert(getSide() == Side::Server);
 		queueDestruction();
 	}
+
+	void LivingEntity::onAttack(const std::shared_ptr<LivingEntity> &) {}
 }
