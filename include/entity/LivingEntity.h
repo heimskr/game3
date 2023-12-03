@@ -22,6 +22,7 @@ namespace Game3 {
 			virtual bool canShowHealthBar() const;
 			virtual int getDefense() const;
 			virtual double getLuck() const;
+			virtual void setHealth(HitPoints);
 			virtual void takeDamage(HitPoints);
 			virtual void kill();
 

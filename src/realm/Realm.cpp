@@ -582,6 +582,40 @@ namespace Game3 {
 		remove(entity);
 	}
 
+	void Realm::eviscerate(const EntityPtr &entity, bool can_warn) {
+		{
+			auto lock = entities.uniqueLock();
+			if (auto iter = entities.find(entity); iter != entities.end()) {
+				if (can_warn)
+					WARN("Still present in Realm " << id << "'s entities");
+				entities.erase(iter);
+			}
+		}
+
+		{
+			auto lock = entitiesByGID.uniqueLock();
+			if (auto iter = entitiesByGID.find(entity->getGID()); iter != entitiesByGID.end()) {
+				if (can_warn)
+					WARN("Still present in Realm " << id << "'s entitiesByGID");
+				entitiesByGID.erase(iter);
+			}
+		}
+
+		{
+			auto lock = entitiesByChunk.sharedLock();
+			for (const auto &[chunk_position, set]: entitiesByChunk) {
+				if (!set)
+					continue;
+				auto set_lock = set->uniqueLock();
+				if (auto iter = set->find(entity); iter != set->end()) {
+					if (can_warn)
+						WARN("Still present in Realm " << id << "'s entitiesByChunk at chunk position " << chunk_position);
+					set->erase(iter);
+				}
+			}
+		}
+	}
+
 	void Realm::remove(const TileEntityPtr &tile_entity, bool run_helper) {
 		const Position position = tile_entity->getPosition();
 		auto iter = tileEntities.find(position);

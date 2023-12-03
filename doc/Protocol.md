@@ -372,6 +372,11 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	The order of the list is important because the client and server have to agree on the order of the recipes.
 
+54. **Living Entity Health Changed**: informs the client of a living entity's new health.
+
+	- `u64` Entity global ID
+	- `u32` New health
+
 # Message Format
 
 All values are little endian. Strings are not null-terminated.

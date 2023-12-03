@@ -127,6 +127,8 @@ namespace Game3 {
 			TileEntityPtr tileEntityAt(Position);
 			void remove(const EntityPtr &);
 			void removeSafe(const EntityPtr &);
+			/** I'm evidently terrible at keeping things clean, so this is a last resort to make sure an entity is truly gone. */
+			void eviscerate(const EntityPtr &, bool can_warn = false);
 			void remove(const TileEntityPtr &, bool run_helper = true);
 			void removeSafe(const TileEntityPtr &);
 			void onMoved(const EntityPtr &, const Position &);

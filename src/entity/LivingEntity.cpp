@@ -1,7 +1,9 @@
 #include "entity/LivingEntity.h"
+#include "game/ServerGame.h"
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererSet.h"
 #include "graphics/RenderOptions.h"
+#include "packet/LivingEntityHealthChangedPacket.h"
 #include "threading/ThreadContext.h"
 
 namespace Game3 {
@@ -41,7 +43,7 @@ namespace Game3 {
 		RectangleRenderer &rectangle = renderers.rectangle;
 
 		constexpr static float bar_offset = .15f;
-		constexpr static float bar_width  = 1.5f;
+		constexpr static float bar_width  = .8f;
 		constexpr static float bar_height = .18f;
 		constexpr static float thickness  = .05f;
 
@@ -104,7 +106,13 @@ namespace Game3 {
 		return luckStat;
 	}
 
+	void LivingEntity::setHealth(HitPoints new_health) {
+		health = new_health;
+	}
+
 	void LivingEntity::takeDamage(HitPoints damage) {
+		assert(getSide() == Side::Server);
+
 		std::uniform_int_distribution<int> defense_distribution(0, 99);
 
 		const int defense = getDefense();
@@ -118,8 +126,6 @@ namespace Game3 {
 				--damage;
 		}
 
-		INFO("Damage to " << getName() << ": " << damage);
-
 		if (damage == 0)
 			return;
 
@@ -127,13 +133,12 @@ namespace Game3 {
 			health = 0;
 			kill();
 		} else {
-
+			game->toServer().broadcast(LivingEntityHealthChangedPacket(*this));
 		}
-
-		INFO("Health is now " << health);
 	}
 
 	void LivingEntity::kill() {
-		INFO("RIP " << getName());
+		assert(getSide() == Side::Server);
+		queueDestruction();
 	}
 }

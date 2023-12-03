@@ -56,6 +56,8 @@ namespace Game3 {
 			all_agents.erase(globalID);
 		}
 
+		realm->eviscerate(shared);
+
 		if (getSide() == Side::Server) {
 			{
 				auto lock = visibleEntities.sharedLock();
