@@ -20,11 +20,10 @@ namespace Game3 {
 		if (!isAttacking())
 			return;
 
-		if (!tryAttack()) {
-			timeSinceAttack += delta;
-			if (getPatience() < timeSinceAttack)
-				giveUp();
-		}
+		timeSinceAttack += delta;
+
+		if (!tryAttack() && getPatience() < timeSinceAttack)
+			giveUp();
 	}
 
 	void Monster::encode(Buffer &buffer) {
@@ -133,7 +132,9 @@ namespace Game3 {
 		}
 
 		RealmPtr realm = getRealm();
-		const Direction facing = target->getPosition().getFacing(position);
+		Direction facing = target->getPosition().getFacing(position);
+		if (facing == Direction::Invalid)
+			facing = Direction::Right;
 
 		// First try to pathfind to the closest position that's adjacent to the player.
 		Position destination = target->getPosition() + facing;

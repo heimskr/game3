@@ -75,6 +75,7 @@ namespace Game3 {
 
 	void Player::toJSON(nlohmann::json &json) const {
 		Entity::toJSON(json);
+		LivingEntity::toJSON(json);
 		json["isPlayer"] = true;
 		json["displayName"] = displayName;
 		json["spawnPosition"] = spawnPosition.copyBase();
@@ -85,6 +86,7 @@ namespace Game3 {
 
 	void Player::absorbJSON(Game &game, const nlohmann::json &json) {
 		Entity::absorbJSON(game, json);
+		LivingEntity::absorbJSON(game, json);
 		displayName = json.at("displayName");
 		spawnPosition = json.at("spawnPosition");
 		spawnRealmID = json.at("spawnRealmID");

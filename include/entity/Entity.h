@@ -75,7 +75,7 @@ namespace Game3 {
 			Atomic<bool> spawning = false;
 			/** Whether the entity is currently teleporting to its first position on realm change. */
 			Atomic<bool> firstTeleport = false;
-			Atomic<RealmID> inLimboFor{-1};
+			Atomic<RealmID> inLimboFor{0};
 			Identifier customTexture;
 
 			virtual void destroy();

@@ -107,9 +107,6 @@ namespace Game3 {
 	}
 
 	void LivingEntity::setHealth(HitPoints new_health) {
-		if (health == new_health)
-			return;
-
 		health = new_health;
 
 		if (getSide() == Side::Server)

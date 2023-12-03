@@ -4,6 +4,7 @@
 #include "net/RemoteClient.h"
 #include "packet/AgentMessagePacket.h"
 #include "packet/EntityPacket.h"
+#include "util/Cast.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -106,12 +107,17 @@ namespace Game3 {
 		}
 
 		setHealth(getMaxHealth());
-		RealmPtr realm = game.getRealm(spawnRealmID);
-		if (!realm) {
-			WARN("Couldn't find spawn realm " << spawnRealmID << " for player " << username);
-			return;
-		}
 
-		teleport(spawnPosition.copyBase(), realm, MovementContext{.facingDirection = Direction::Down});
+		// Can't do this immediately due to visibleChunks locking shenanigans.
+		getRealm()->queue([&game, weak_player = std::weak_ptr(safeDynamicCast<ServerPlayer>(getSelf()))] {
+			if (auto player = weak_player.lock()) {
+				RealmPtr realm = game.getRealm(player->spawnRealmID);
+				if (!realm) {
+					WARN("Couldn't find spawn realm " << player->spawnRealmID << " for player " << player->username);
+					return;
+				}
+				player->teleport(player->spawnPosition.copyBase(), realm, MovementContext{.facingDirection = Direction::Down, .isTeleport = true});
+			}
+		});
 	}
 }
