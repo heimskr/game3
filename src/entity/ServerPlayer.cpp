@@ -1,3 +1,4 @@
+#include "game/Inventory.h"
 #include "game/ServerGame.h"
 #include "entity/ServerPlayer.h"
 #include "net/RemoteClient.h"
@@ -86,5 +87,31 @@ namespace Game3 {
 			send(AgentMessagePacket(source->getGID(), name, std::move(*buffer)));
 		else
 			throw std::runtime_error("Expected data to be a Buffer in ServerPlayer::handleMessage");
+	}
+
+	void ServerPlayer::kill() {
+		WARN("Killing server player.");
+		ServerGame &game = getGame().toServer();
+
+		const bool keep_inventory = game.getRule("keepInventory").value_or(1) != 0;
+
+		if (!keep_inventory) {
+			InventoryPtr inventory = getInventory(0);
+			auto lock = inventory->uniqueLock();
+			inventory->iterate([&](ItemStack &stack, Slot) {
+				stack.spawn(getRealm(), getPosition());
+				return false;
+			});
+			inventory->clear();
+		}
+
+		setHealth(getMaxHealth());
+		RealmPtr realm = game.getRealm(spawnRealmID);
+		if (!realm) {
+			WARN("Couldn't find spawn realm " << spawnRealmID << " for player " << username);
+			return;
+		}
+
+		teleport(spawnPosition.copyBase(), realm, MovementContext{.facingDirection = Direction::Down});
 	}
 }

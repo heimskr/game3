@@ -9,6 +9,7 @@ namespace Game3 {
 		public:
 			Lockable<WeakSet<Entity>> knownEntities;
 			std::weak_ptr<RemoteClient> weakClient;
+			bool inventoryUpdated = false;
 
 			~ServerPlayer() override;
 
@@ -21,7 +22,7 @@ namespace Game3 {
 
 			void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
 
-			bool inventoryUpdated = false;
+			void kill() override;
 
 		private:
 			ServerPlayer();

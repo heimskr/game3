@@ -24,7 +24,7 @@ namespace Game3 {
 
 			HitPoints getBaseDamage() const override { return 2; }
 			int getVariability() const override { return 1; }
-			float getAttackPeriod() const override { return 2.f; }
+			float getAttackPeriod() const override { return 1.f; }
 
 		protected:
 			Cyclops():

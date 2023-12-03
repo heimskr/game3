@@ -118,7 +118,7 @@ namespace Game3 {
 		}
 
 		assert(getSide() == Side::Server);
-		getGame().toServer().entityTeleported(*this, MovementContext {
+		getGame().toServer().entityTeleported(*this, MovementContext{
 			.facingDirection = direction
 		});
 	}
@@ -134,7 +134,20 @@ namespace Game3 {
 
 		RealmPtr realm = getRealm();
 
+		const Direction facing = position.getFacing(target->getPosition());
+
+		// First try to pathfind to the closest position that's adjacent to the player.
+		Position destination = target->getPosition() + facing;
+		if (realm->isPathable(destination)) {
+			pathfind(destination, 256);
+			return;
+		}
+
+		// If that doesn't work, try all the other directions.
 		for (const Direction offset: ALL_DIRECTIONS) {
+			if (offset == facing)
+				continue;
+
 			const Position destination = target->getPosition() + offset;
 			if (realm->isPathable(destination)) {
 				pathfind(destination, 256);

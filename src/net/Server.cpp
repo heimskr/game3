@@ -157,6 +157,9 @@ namespace Game3 {
 		// overworld->add(player, Position(31, 82));
 		// player->direction = Direction::Right;
 		// overworld->add(player, Position(-25, -36));
+		player->spawnPosition = player->getPosition();
+		player->spawnRealmID = player->getRealm()->getID();
+		INFO("Setting player spawn realm ID to " << player->spawnRealmID);
 		player->init(*game);
 		player->onSpawn();
 		const InventoryPtr inventory = player->getInventory(0);
@@ -266,10 +269,10 @@ namespace Game3 {
 		}
 
 		if (database_existed) {
-			game->database.readAllRealms();
+			game->database.readAll();
 			Timer::summary();
 			Timer::clear();
-			INFO("Finished reading all realms from database.");
+			INFO("Finished reading all data from database.");
 		} else {
 			RealmPtr realm = Realm::create<Overworld>(*game, 1, Overworld::ID(), "base:tileset/monomap", seed);
 			realm->outdoors = true;
@@ -314,9 +317,7 @@ namespace Game3 {
 				if (running && save_period <= std::chrono::system_clock::now() - last_save) {
 					INFO("Autosaving...");
 					game->tickingPaused = true;
-					game->database.writeAllRealms();
-					auto player_lock = game->players.sharedLock();
-					game->database.writeUsers(game->players);
+					game->database.writeAll();
 					game->tickingPaused = false;
 					INFO("Autosaved.");
 					last_save = std::chrono::system_clock::now();

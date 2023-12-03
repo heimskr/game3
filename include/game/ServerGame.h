@@ -29,6 +29,7 @@ namespace Game3 {
 
 			Lockable<std::unordered_set<ServerPlayerPtr>> players;
 			Lockable<std::unordered_map<std::string, ServerPlayerPtr>> playerMap;
+			Lockable<std::map<std::string, ssize_t>> gameRules;
 			std::weak_ptr<Server> weakServer;
 			GameDB database{*this};
 			float lastGarbageCollection = 0.f;
@@ -57,6 +58,8 @@ namespace Game3 {
 			void openDatabase(std::filesystem::path);
 			void broadcast(const Packet &, bool include_non_players = false);
 			void releasePlayer(const std::string &username, const Place &);
+			void setRule(const std::string &, ssize_t);
+			std::optional<ssize_t> getRule(const std::string &) const;
 
 			inline auto getServer() const {
 				auto out = weakServer.lock();

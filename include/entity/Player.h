@@ -33,6 +33,8 @@ namespace Game3 {
 			/** When moving with shift held, the player will interact with each spot moved to. */
 			bool continuousInteraction = false;
 			bool ticked = false;
+			Atomic<RealmID> spawnRealmID;
+			Lockable<Position> spawnPosition;
 
 			std::optional<Place> lastContinuousInteraction;
 			Modifiers continuousInteractionModifiers;

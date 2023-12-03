@@ -108,6 +108,7 @@ namespace Game3 {
 
 			static std::shared_ptr<Realm> fromJSON(Game &, const nlohmann::json &, bool full_data = false);
 
+			RealmID getID() const;
 			virtual void onFocus();
 			virtual void onBlur();
 			/** Called when the realm is to be removed from the game. */

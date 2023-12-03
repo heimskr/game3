@@ -6,6 +6,7 @@
 #include "entity/Player.h"
 #include "entity/ServerPlayer.h"
 #include "game/ClientGame.h"
+#include "game/ServerGame.h"
 #include "game/Inventory.h"
 #include "item/Tool.h"
 #include "net/Buffer.h"
@@ -76,6 +77,8 @@ namespace Game3 {
 		Entity::toJSON(json);
 		json["isPlayer"] = true;
 		json["displayName"] = displayName;
+		json["spawnPosition"] = spawnPosition.copyBase();
+		json["spawnRealmID"] = spawnRealmID;
 		if (0.f < tooldown)
 			json["tooldown"] = tooldown;
 	}
@@ -83,6 +86,8 @@ namespace Game3 {
 	void Player::absorbJSON(Game &game, const nlohmann::json &json) {
 		Entity::absorbJSON(game, json);
 		displayName = json.at("displayName");
+		spawnPosition = json.at("spawnPosition");
+		spawnRealmID = json.at("spawnRealmID");
 		if (auto iter = json.find("tooldown"); iter != json.end())
 			tooldown = *iter;
 		else
@@ -294,6 +299,8 @@ namespace Game3 {
 		buffer << tooldown;
 		buffer << stationTypes;
 		buffer << speed;
+		buffer << spawnRealmID;
+		buffer << spawnPosition;
 	}
 
 	void Player::decode(Buffer &buffer) {
@@ -304,6 +311,8 @@ namespace Game3 {
 		buffer >> tooldown;
 		buffer >> stationTypes;
 		buffer >> speed;
+		buffer >> spawnRealmID;
+		buffer >> spawnPosition;
 		resetEphemeral();
 	}
 

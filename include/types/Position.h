@@ -40,6 +40,8 @@ namespace Game3 {
 		Position & operator+=(Direction);
 		Position & operator-=(Direction);
 		Position & operator*=(Index);
+		/** Has a bias for horizontal directions when the difference is diagonal. */
+		Direction getFacing(const Position &other) const;
 		explicit inline operator std::string() const { return '(' + std::to_string(row) + ", " + std::to_string(column) + ')'; }
 		explicit operator Direction() const;
 		inline double distance(const Position &other) const { return std::sqrt(std::pow(row - other.row, 2) + std::pow(column - other.column, 2)); }

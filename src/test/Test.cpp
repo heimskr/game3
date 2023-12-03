@@ -189,10 +189,37 @@ namespace Game3 {
 		t2.join();
 	}
 
+	void testGetFacing() {
+		Position base(0, 0);
+		auto check = [&base](Index row, Index column, Direction expected) {
+			const Direction facing = base.getFacing({row, column});
+			if (facing == expected)
+				SUCCESS("(" << row << ", " << column << ") → " << facing);
+			else
+				ERROR("(" << row << ", " << column << ") → " << facing << ", expected " << expected);
+		};
+
+		check( 0,  0, Direction::Invalid);
+		check( 0, -1, Direction::Left);
+		check( 0, -2, Direction::Left);
+		check(-1, -1, Direction::Left);
+		check(-2, -1, Direction::Up);
+		check( 2, -1, Direction::Down);
+		check( 0,  1, Direction::Right);
+		check( 0,  2, Direction::Right);
+		check(-1,  1, Direction::Right);
+		check(-2,  1, Direction::Up);
+		check( 2,  1, Direction::Down);
+		check( 1, -1, Direction::Left);
+		check( 1,  1, Direction::Right);
+		check( 1,  0, Direction::Down);
+		check(-1,  0, Direction::Up);
+	}
+
 	void test() {
 		// testPlayerJSON();
-		testLockableWeakPtr();
-
-		LockableSharedPtr<int> lsp = std::make_shared<int>(42);
+		// testLockableWeakPtr();
+		// LockableSharedPtr<int> lsp = std::make_shared<int>(42);
+		testGetFacing();
 	}
 }

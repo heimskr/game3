@@ -74,6 +74,23 @@ namespace Game3 {
 		return *this;
 	}
 
+	Direction Position::getFacing(const Position &other) const {
+		Position difference = other - *this;
+
+		if (difference.row == 0 && difference.column == 0)
+			return Direction::Invalid;
+
+		if (difference.column < 0) {
+			if (std::abs(difference.column) >= std::abs(difference.row))
+				return Direction::Left;
+		} else if (difference.column > 0) {
+			if (std::abs(difference.column) >= std::abs(difference.row))
+				return Direction::Right;
+		}
+
+		return difference.row < 0? Direction::Up : Direction::Down;
+	}
+
 	Position::operator Direction() const {
 		// Diagonals and zero are invalid.
 		if ((row == 0) == (column == 0))

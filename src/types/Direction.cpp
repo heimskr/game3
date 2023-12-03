@@ -70,10 +70,11 @@ namespace Game3 {
 
 	std::string toString(Direction direction) {
 		switch (direction) {
-			case Game3::Direction::Up:    return "up";
-			case Game3::Direction::Down:  return "down";
-			case Game3::Direction::Left:  return "left";
-			case Game3::Direction::Right: return "right";
+			case Game3::Direction::Up:      return "up";
+			case Game3::Direction::Down:    return "down";
+			case Game3::Direction::Left:    return "left";
+			case Game3::Direction::Right:   return "right";
+			case Game3::Direction::Invalid: return "invalid";
 			default:
 				return "?";
 		}

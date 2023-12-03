@@ -2,7 +2,7 @@
 #include "entity/EntityFactory.h"
 #include "entity/Player.h"
 #include "error/FailedMigrationError.h"
-#include "game/Game.h"
+#include "game/ServerGame.h"
 #include "graphics/Tileset.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
@@ -19,7 +19,7 @@
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
-	GameDB::GameDB(Game &game_):
+	GameDB::GameDB(ServerGame &game_):
 		game(game_) {}
 
 	void GameDB::open(std::filesystem::path path_) {
@@ -82,11 +82,53 @@ namespace Game3 {
 				hash VARCHAR(128) PRIMARY KEY,
 				json MEDIUMTEXT
 			);
+
+			CREATE TABLE IF NOT EXISTS rules (
+				key VARCHAR(64) PRIMARY KEY,
+				value INT8
+			);
 		)");
 	}
 
 	void GameDB::close() {
 		database.reset();
+	}
+
+	void GameDB::writeAll() {
+		writeRules();
+		writeAllRealms();
+		auto player_lock = game.players.sharedLock();
+		writeUsers(game.players);
+	}
+
+	void GameDB::readAll() {
+		readRules();
+		readAllRealms();
+	}
+
+	void GameDB::writeRules() {
+		auto rules_lock = game.gameRules.sharedLock();
+		if (game.gameRules.empty())
+			return;
+		auto lock = database.uniqueLock();
+		SQLite::Transaction transaction{*database};
+		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO rules VALUES (?, ?)"};
+		for (const auto &[key, value]: game.gameRules) {
+			statement.bind(1, key);
+			statement.bind(2, value);
+			statement.exec();
+		}
+		transaction.commit();
+	}
+
+	void GameDB::readRules() {
+		auto lock = database.uniqueLock();
+		auto rules_lock = game.gameRules.uniqueLock();
+
+		SQLite::Statement query{*database, "SELECT * FROM rules"};
+		while (query.executeStep()) {
+			game.gameRules[query.getColumn(0)] = query.getColumn(1);
+		}
 	}
 
 	void GameDB::writeAllRealms() {

@@ -18,15 +18,15 @@
 
 namespace Game3 {
 	class Entity;
-	class Game;
 	class Player;
 	class Realm;
+	class ServerGame;
 	class Tileset;
 	class TileEntity;
 
 	class GameDB {
 		private:
-			Game &game;
+			ServerGame &game;
 			std::filesystem::path path;
 
 			void bind(SQLite::Statement &, const std::shared_ptr<Player> &);
@@ -34,10 +34,16 @@ namespace Game3 {
 		public:
 			Lockable<std::unique_ptr<SQLite::Database>, std::recursive_mutex> database;
 
-			GameDB(Game &);
+			GameDB(ServerGame &);
 
 			void open(std::filesystem::path);
 			void close();
+
+			void writeAll();
+			void readAll();
+
+			void writeRules();
+			void readRules();
 
 			/** Writes metadata, chunk data, entity data and tile entity data for all realms. */
 			void writeAllRealms();

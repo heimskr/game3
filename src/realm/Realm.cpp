@@ -151,6 +151,10 @@ namespace Game3 {
 		}
 	}
 
+	RealmID Realm::getID() const {
+		return id;
+	}
+
 	void Realm::onFocus() {
 		if (getSide() == Side::Client && !focused.exchange(true))
 			wakeupPending = true;

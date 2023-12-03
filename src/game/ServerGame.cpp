@@ -286,6 +286,18 @@ namespace Game3 {
 		}
 	}
 
+	void ServerGame::setRule(const std::string &key, ssize_t value) {
+		auto lock = gameRules.uniqueLock();
+		gameRules[key] = value;
+	}
+
+	std::optional<ssize_t> ServerGame::getRule(const std::string &key) const {
+		auto lock = gameRules.sharedLock();
+		if (auto iter = gameRules.find(key); iter != gameRules.end())
+			return std::make_optional(iter->second);
+		return std::nullopt;
+	}
+
 	void ServerGame::handlePacket(RemoteClient &client, Packet &packet) {
 		packet.handle(*this, client);
 	}
@@ -640,6 +652,29 @@ namespace Game3 {
 				}
 
 				return {false, "Incorrect chunk position."};
+			}
+
+			if (first == "rule") {
+				if (words.size() != 3)
+					return {false, "Incorrect parameter count."};
+
+				std::string value_word{};
+				if (words[2] == "true")
+					value_word = "1";
+				else if (words[2] == "false")
+					value_word = "0";
+				else
+					value_word = words[2];
+
+				ssize_t value{};
+				try {
+					value = parseNumber<ssize_t>(value_word);
+				} catch (const std::invalid_argument &) {
+					return {false, "Couldn't parse value."};
+				}
+
+				setRule(std::string(words[1]), value);
+				return {true, "Rule set."};
 			}
 
 		} catch (const std::exception &err) {
