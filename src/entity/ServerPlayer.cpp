@@ -97,6 +97,8 @@ namespace Game3 {
 		const bool keep_inventory = game.getRule("keepInventory").value_or(1) != 0;
 
 		if (!keep_inventory) {
+			setHeldLeft(-1);
+			setHeldRight(-1);
 			InventoryPtr inventory = getInventory(0);
 			auto lock = inventory->uniqueLock();
 			inventory->iterate([&](ItemStack &stack, Slot) {
@@ -104,6 +106,7 @@ namespace Game3 {
 				return false;
 			});
 			inventory->clear();
+			inventory->notifyOwner();
 		}
 
 		setHealth(getMaxHealth());
