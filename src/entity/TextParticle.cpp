@@ -40,10 +40,7 @@ namespace Game3 {
 		offset.z = std::max(offset.z + delta * velocity.z, depth);
 
 		if (offset.z <= depth) {
-			{
-				auto velocity_lock = velocity.uniqueLock();
-				velocity = {};
-			}
+			velocity = {};
 			age += delta;
 			if (lingerTime <= age)
 				queueDestruction();
