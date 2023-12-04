@@ -91,7 +91,7 @@ namespace Game3 {
 	}
 
 	void ServerPlayer::kill() {
-		WARN("Killing server player.");
+		WARN("Killing server player \e[1m" << username << "\e[22m.");
 		ServerGame &game = getGame().toServer();
 
 		const bool keep_inventory = game.getRule("keepInventory").value_or(1) != 0;

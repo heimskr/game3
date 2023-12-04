@@ -11,6 +11,11 @@
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
+				"input":  [["base:item/iron_bar", 2], ["base:item/wood", 1]],
+				"output": [["base:item/iron_sword", 1, "with_durability"]],
+				"station": "base:station/anvil"
+			}],
+			["base:registry/crafting_recipe", {
 				"input":  [["base:item/iron_bar", 1], ["base:item/wood", 1]],
 				"output": [["base:item/iron_shovel", 1, "with_durability"]],
 				"station": "base:station/anvil"
@@ -50,6 +55,11 @@
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
+				"input":  [["base:item/gold_bar", 2], ["base:item/wood", 1]],
+				"output": [["base:item/gold_sword", 1, "with_durability"]],
+				"station": "base:station/anvil"
+			}],
+			["base:registry/crafting_recipe", {
 				"input":  [["base:item/gold_bar", 1], ["base:item/wood", 1]],
 				"output": [["base:item/gold_shovel", 1, "with_durability"]],
 				"station": "base:station/anvil"
@@ -67,6 +77,16 @@
 			["base:registry/crafting_recipe", {
 				"input":  [["base:item/diamond", 2], ["base:item/wood", 1]],
 				"output": [["base:item/diamond_pickaxe", 1, "with_durability"]],
+				"station": "base:station/anvil"
+			}],
+			["base:registry/crafting_recipe", {
+				"input":  [["base:item/diamond", 2], ["base:item/wood", 1]],
+				"output": [["base:item/diamond_sword", 1, "with_durability"]],
+				"station": "base:station/anvil"
+			}],
+			["base:registry/crafting_recipe", {
+				"input":  [["base:item/copper_bar", 2], ["base:item/wood", 1]],
+				"output": [["base:item/copper_sword", 1, "with_durability"]],
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
