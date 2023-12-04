@@ -12,7 +12,7 @@ namespace Game3 {
 		bool clearOffset = true;
 		std::optional<Direction> facingDirection{};
 		std::optional<Position> forcedPosition{};
-		std::optional<Offset> forcedOffset{};
+		std::optional<Vector3> forcedOffset{};
 		bool isTeleport = false;
 	};
 }

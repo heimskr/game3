@@ -17,7 +17,7 @@ namespace Game3 {
 			void setStack(ItemStack);
 
 			static std::shared_ptr<ItemEntity> create(Game &);
-			static std::shared_ptr<ItemEntity> create(Game &, const ItemStack &);
+			static std::shared_ptr<ItemEntity> create(Game &, ItemStack);
 			static std::shared_ptr<ItemEntity> fromJSON(Game &, const nlohmann::json &);
 
 			void toJSON(nlohmann::json &) const override;
@@ -33,7 +33,7 @@ namespace Game3 {
 
 		private:
 			ItemEntity(): Entity(ID()) {}
-			ItemEntity(const Game &, const nlohmann::json &);
+			ItemEntity(const Game &);
 			ItemEntity(ItemStack);
 			float offsetX = 0.f;
 			float offsetY = 0.f;

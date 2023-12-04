@@ -26,8 +26,10 @@ namespace Game3 {
 		float scaleX = 1.f;
 		float scaleY = 1.f;
 		float angle  = 0.f;
-		Color color {0.f, 0.f, 0.f, 1.f};
+		Color color{1.f, 1.f, 1.f, 1.f};
 		TextAlign align = TextAlign::Left;
+		Color shadow{0.f, 0.f, 0.f, 1.f};
+		Vector2 shadowOffset{.025f, .025f};
 	};
 
 	class TextRenderer {

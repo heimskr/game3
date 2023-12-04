@@ -12,10 +12,10 @@ namespace Game3 {
 		Position position;
 		Direction movementDirection = Direction::Invalid;
 		std::optional<Direction> facingDirection;
-		std::optional<Offset> offset;
+		std::optional<Vector3> offset;
 
 		MovePlayerPacket() = default;
-		MovePlayerPacket(const Position &position_, Direction movement_direction, std::optional<Direction> facing_direction = {}, std::optional<Offset> offset_ = std::nullopt);
+		MovePlayerPacket(const Position &position_, Direction movement_direction, std::optional<Direction> facing_direction = {}, std::optional<Vector3> offset_ = std::nullopt);
 
 		PacketID getID() const override { return ID(); }
 

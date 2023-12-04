@@ -1,3 +1,4 @@
+#include "net/Buffer.h"
 #include "types/Types.h"
 
 namespace Game3 {
@@ -23,5 +24,37 @@ namespace Game3 {
 			default:
 				return os << "Invalid";
 		}
+	}
+
+	// Color should be moved to its own header/.cpp honestly.
+
+	template <>
+	std::string Buffer::getType(const Color &) {
+		return std::string{'\x33'} + getType(float{});
+	}
+
+	std::ostream & operator<<(std::ostream &stream, const Color &color) {
+		return stream << '(' << color.red << ", " << color.green << ", " << color.blue << " @ " << color.alpha << ')';
+	}
+
+	Buffer & operator+=(Buffer &buffer, const Color &color) {
+		return (((buffer.appendType(color) += color.red) += color.green) += color.blue) += color.alpha;
+	}
+
+	Buffer & operator<<(Buffer &buffer, const Color &color) {
+		return buffer += color;
+	}
+
+	Buffer & operator>>(Buffer &buffer, Color &color) {
+		const auto type = buffer.popType();
+		if (!Buffer::typesMatch(type, buffer.getType(color))) {
+			buffer.debug();
+			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected shortlist<f32, 4> for Color)");
+		}
+		popBuffer(buffer, color.red);
+		popBuffer(buffer, color.green);
+		popBuffer(buffer, color.blue);
+		popBuffer(buffer, color.alpha);
+		return buffer;
 	}
 }

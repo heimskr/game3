@@ -5,14 +5,14 @@
 
 namespace Game3 {
 	EntityMovedPacket::EntityMovedPacket(const Entity &entity):
-		EntityMovedPacket(Args{entity.globalID, entity.nextRealm == 0? entity.realmID : entity.nextRealm, entity.getPosition(), entity.direction, entity.offset, entity.zSpeed, true, false}) {}
+		EntityMovedPacket(Args{entity.globalID, entity.nextRealm == 0? entity.realmID : entity.nextRealm, entity.getPosition(), entity.direction, entity.offset, entity.velocity, true, false}) {}
 
 	void EntityMovedPacket::encode(Game &, Buffer &buffer) const {
-		buffer << arguments.globalID << arguments.realmID << arguments.position << arguments.facing << arguments.offset << arguments.zSpeed << arguments.adjustOffset << arguments.isTeleport;
+		buffer << arguments.globalID << arguments.realmID << arguments.position << arguments.facing << arguments.offset << arguments.velocity << arguments.adjustOffset << arguments.isTeleport;
 	}
 
 	void EntityMovedPacket::decode(Game &, Buffer &buffer) {
-		buffer >> arguments.globalID >> arguments.realmID >> arguments.position >> arguments.facing >> arguments.offset >> arguments.zSpeed >> arguments.adjustOffset >> arguments.isTeleport;
+		buffer >> arguments.globalID >> arguments.realmID >> arguments.position >> arguments.facing >> arguments.offset >> arguments.velocity >> arguments.adjustOffset >> arguments.isTeleport;
 	}
 
 	void EntityMovedPacket::handle(ClientGame &game) {
@@ -28,7 +28,7 @@ namespace Game3 {
 			return;
 		}
 
-		const Offset offset = entity->offset.copyBase();
+		const Vector3 offset = entity->offset.copyBase();
 		Position position = entity->getPosition();
 		const double apparent_x = offset.x + static_cast<double>(position.column);
 		const double apparent_y = offset.y + static_cast<double>(position.row);
@@ -52,7 +52,7 @@ namespace Game3 {
 				entity->offset = *arguments.offset;
 		}
 
-		if (arguments.zSpeed)
-			entity->zSpeed = *arguments.zSpeed;
+		if (arguments.velocity)
+			entity->velocity = *arguments.velocity;
 	}
 }

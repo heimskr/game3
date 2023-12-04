@@ -63,8 +63,9 @@ namespace Game3 {
 			/** When the entity moves a square, its position field is immediately updated but this field is set to an offset
 			 *  such that the sum of the new position and the offset is equal to the old offset. The offset is moved closer
 			 *  to zero each tick to achieve smooth movement instead of teleportation from one tile to the next. */
-			Lockable<Offset> offset;
-			Atomic<float> zSpeed = 0.f;
+			Lockable<Vector3> offset;
+			/** Only the z component is handled in the default Entity tick method. */
+			Lockable<Vector3> velocity;
 			Lockable<std::list<Direction>> path;
 			Atomic<MoneyCount> money = 0;
 			Lockable<WeakSet<Entity>> visibleEntities;
@@ -79,8 +80,6 @@ namespace Game3 {
 			Identifier customTexture;
 
 			virtual void destroy();
-			virtual void onCreate() {}
-			virtual void onSpawn() {}
 
 			/** This won't call init() on the Entity. You need to do that yourself. */
 			template <typename T = Entity, typename... Args>
@@ -94,16 +93,22 @@ namespace Game3 {
 
 			virtual void absorbJSON(Game &, const nlohmann::json &);
 			virtual void toJSON(nlohmann::json &) const;
-			virtual bool isPlayer() const { return false; }
+			virtual void init(Game &);
 			virtual void render(const RendererSet &);
 			virtual void tick(Game &, float delta);
+			/** Whether the entity should be included in save data. */
+			virtual bool shouldPersist() const { return true; }
+			virtual void onCreate() {}
+			virtual void onSpawn() {}
+			std::string getName() const override { return "Unknown Entity (" + std::string(type) + ')'; }
+
+			virtual bool isPlayer() const { return false; }
 			/** Removes the entity from existence. */
 			virtual void remove();
 			inline const Position::value_type & getRow()    const { return position.row;    }
 			inline const Position::value_type & getColumn() const { return position.column; }
 			inline Position::value_type getRow()    { auto lock = position.sharedLock(); return position.row;    }
 			inline Position::value_type getColumn() { auto lock = position.sharedLock(); return position.column; }
-			virtual void init(Game &);
 			virtual void initAfterLoad(Game &) {}
 			/** Returns whether the entity actually moved. */
 			virtual bool move(Direction, MovementContext);
@@ -125,7 +130,6 @@ namespace Game3 {
 			PathResult pathfind(const Position &start, const Position &goal, std::list<Direction> &, size_t loop_max = 1'000);
 			bool pathfind(const Position &goal, size_t loop_max = 1'000);
 			virtual float getMovementSpeed() const { return MAX_SPEED; }
-			std::string getName() const override { return "Unknown Entity (" + std::string(type) + ')'; }
 			Game & getGame();
 			Game & getGame() const;
 			bool isVisible() const;

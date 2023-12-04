@@ -1,4 +1,5 @@
 #include "entity/LivingEntity.h"
+#include "entity/TextParticle.h"
 #include "game/ServerGame.h"
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererSet.h"
@@ -128,6 +129,12 @@ namespace Game3 {
 			if (defense_distribution(threadContext.rng) < 10 * luck)
 				--damage;
 		}
+
+		Color color{1, 0, 0, 1};
+		if (damage == 0)
+			color = {0, 0, 1, 1};
+
+		getRealm()->spawn<TextParticle>(getPosition(), std::to_string(damage), color, .666f);
 
 		if (damage == 0)
 			return false;

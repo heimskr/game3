@@ -15,8 +15,8 @@ namespace Game3 {
 			RealmID realmID = -1;
 			Position position;
 			Direction facing = Direction::Invalid;
-			std::optional<Offset> offset;
-			std::optional<float> zSpeed;
+			std::optional<Vector3> offset;
+			std::optional<Vector3> velocity;
 			bool adjustOffset = false;
 			bool isTeleport = false;
 		};

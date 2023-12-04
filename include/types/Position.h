@@ -83,16 +83,26 @@ namespace Game3 {
 
 	std::ostream & operator<<(std::ostream &, const Place &);
 
-	struct Offset {
+	struct Vector3 {
 		float x = 0.f;
 		float y = 0.f;
 		float z = 0.f;
 	};
 
-	std::ostream & operator<<(std::ostream &, const Offset &);
-	Buffer & operator+=(Buffer &, const Offset &);
-	Buffer & operator<<(Buffer &, const Offset &);
-	Buffer & operator>>(Buffer &, Offset &);
+	std::ostream & operator<<(std::ostream &, const Vector3 &);
+	Buffer & operator+=(Buffer &, const Vector3 &);
+	Buffer & operator<<(Buffer &, const Vector3 &);
+	Buffer & operator>>(Buffer &, Vector3 &);
+
+	struct Vector2 {
+		float x = 0.f;
+		float y = 0.f;
+	};
+
+	std::ostream & operator<<(std::ostream &, const Vector2 &);
+	Buffer & operator+=(Buffer &, const Vector2 &);
+	Buffer & operator<<(Buffer &, const Vector2 &);
+	Buffer & operator>>(Buffer &, Vector2 &);
 }
 
 namespace std {

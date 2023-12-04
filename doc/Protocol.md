@@ -115,10 +115,11 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `f32` Offset X
 	- `f32` Offset Y
 	- `f32` Offset Z
-	- `f32` Z-speed
+	- `f32` Velocity X
+	- `f32` Velocity Y
+	- `f32` Velocity Z
 	- `list<u8>` Path
 	- `u64` Money
-	- `u32` Hitpoints
 
 15. **Move Player**: tells the server to move the player to a given location.
 
@@ -375,7 +376,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 54. **Living Entity Health Changed**: informs the client of a living entity's new health.
 
 	- `u64` Entity global ID
-	- `u32` New health
+	- `i32` New health
 
 # Message Format
 

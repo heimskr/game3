@@ -6,7 +6,7 @@
 #include "packet/PacketError.h"
 
 namespace Game3 {
-	MovePlayerPacket::MovePlayerPacket(const Position &position_, Direction movement_direction, std::optional<Direction> facing_direction, std::optional<Offset> offset_):
+	MovePlayerPacket::MovePlayerPacket(const Position &position_, Direction movement_direction, std::optional<Direction> facing_direction, std::optional<Vector3> offset_):
 		position(position_),
 		movementDirection(movement_direction),
 		facingDirection(facing_direction),

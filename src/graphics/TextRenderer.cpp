@@ -123,6 +123,22 @@ namespace Game3 {
 		if (!initialized)
 			initRenderData();
 
+		if (0.f < options.shadow.alpha) {
+			Color color = options.shadow;
+			Color shadow{0.f, 0.f, 0.f, 0.f};
+			float x = options.x + options.shadowOffset.x;
+			float y = options.y + options.shadowOffset.y;
+			std::swap(options.color, color);
+			std::swap(options.shadow, shadow);
+			std::swap(options.x, x);
+			std::swap(options.y, y);
+			drawOnMap(text, options);
+			std::swap(options.color, color);
+			std::swap(options.shadow, shadow);
+			std::swap(options.x, x);
+			std::swap(options.y, y);
+		}
+
 		RealmPtr realm = canvas->game->activeRealm.copyBase();
 		TileProvider &provider = realm->tileProvider;
 		TilesetPtr tileset     = provider.getTileset(*canvas->game);

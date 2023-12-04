@@ -21,7 +21,7 @@ namespace Game3 {
 	using Durability     =  int32_t;
 	using BiomeType      = uint16_t;
 	/** Number of quarter-hearts. */
-	using HitPoints      = uint32_t;
+	using HitPoints      =  int32_t;
 	/** 1-based. */
 	using PacketID       = uint16_t;
 	using Version        = uint32_t;
@@ -83,6 +83,13 @@ namespace Game3 {
 		Color(float red_, float green_, float blue_, float alpha_ = 1.f):
 			red(red_), green(green_), blue(blue_), alpha(alpha_) {}
 	};
+
+	class Buffer;
+
+	std::ostream & operator<<(std::ostream &, const Color &);
+	Buffer & operator+=(Buffer &, const Color &);
+	Buffer & operator<<(Buffer &, const Color &);
+	Buffer & operator>>(Buffer &, Color &);
 
 	enum class PipeType: uint8_t {Invalid = 0, Item, Fluid, Energy};
 	std::ostream & operator<<(std::ostream &, PipeType);

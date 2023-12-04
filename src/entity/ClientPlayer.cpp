@@ -27,10 +27,10 @@ namespace Game3 {
 	}
 
 	void ClientPlayer::render(const RendererSet &renderers) {
-		TextRenderer &text = renderers.text;
-
 		if (!isVisible())
 			return;
+
+		TextRenderer &text = renderers.text;
 
 		Player::render(renderers);
 
@@ -44,35 +44,17 @@ namespace Game3 {
 
 		if (show_message) {
 			text.drawOnMap(lastMessage, {
-				.x = float(column) + x + .525f,
-				.y = float(row) + y - z - 0.225f,
-				.scaleX = .75f,
-				.scaleY = .75f,
-				.color = {0.f, 0.f, 0.f, 1.f},
-				.align = TextAlign::Center,
-			});
-
-			text.drawOnMap(lastMessage, {
 				.x = float(column) + x + .5f,
 				.y = float(row) + y - z - 0.25f,
 				.scaleX = .75f,
 				.scaleY = .75f,
-				.color = {1.f, 1.f, 1.f, 1.f},
 				.align = TextAlign::Center,
 			});
 		}
 
 		text.drawOnMap(displayName, {
-			.x = float(column) + x + .525f,
-			.y = float(row) + y - z + name_offset + .025f,
-			.color = {0.f, 0.f, 0.f, 1.f},
-			.align = TextAlign::Center,
-		});
-
-		text.drawOnMap(displayName, {
 			.x = float(column) + x + .5f,
 			.y = float(row) + y - z + name_offset,
-			.color = {1.f, 1.f, 1.f, 1.f},
 			.align = TextAlign::Center,
 		});
 	}
@@ -100,7 +82,10 @@ namespace Game3 {
 			z = offset.z;
 		}
 		if (std::abs(z) <= 0.001f) {
-			zSpeed = getJumpSpeed();
+			{
+				auto lock = velocity.uniqueLock();
+				velocity.z = getJumpSpeed();
+			}
 			send(JumpPacket());
 		}
 	}

@@ -148,7 +148,7 @@ namespace Game3 {
 			}
 		}
 
-		auto lock = offset.uniqueLock();
+		auto offset_lock = offset.uniqueLock();
 
 		auto &x = offset.x;
 		auto &y = offset.y;
@@ -165,13 +165,14 @@ namespace Game3 {
 		else if (0.f < y)
 			y = std::max(y - delta * speed, 0.f);
 
-		z = std::max(z + delta * zSpeed, 0.f);
+		auto velocity_lock = velocity.uniqueLock();
+
+		z = std::max(z + delta * velocity.z, 0.f);
 
 		if (z == 0.f)
-			zSpeed = 0.f;
+			velocity.z = 0;
 		else
-			// Not all platforms support += and -= for atomic floating point types, unfortunately.
-			zSpeed = zSpeed - 32.f * delta;
+			velocity.z -= 32 * delta;
 	}
 
 	void Entity::remove() {
@@ -536,9 +537,9 @@ namespace Game3 {
 		position = new_position;
 
 		if (firstTeleport)
-			offset = Offset{0.f, 0.f, 0.f};
+			offset = Vector3{0.f, 0.f, 0.f};
 		else if (context.clearOffset)
-			offset = Offset{0.f, 0.f, offset.z};
+			offset = Vector3{0.f, 0.f, offset.z};
 
 		if (context.facingDirection)
 			direction = *context.facingDirection;
@@ -912,10 +913,8 @@ namespace Game3 {
 		buffer << position;
 		buffer << direction.load();
 		buffer << getUpdateCounter();
-		buffer << offset.x;
-		buffer << offset.y;
-		buffer << offset.z;
-		buffer << zSpeed;
+		buffer << offset;
+		buffer << velocity;
 		buffer << path;
 		buffer << money;
 		// TODO: support multiple entity inventories
@@ -933,13 +932,8 @@ namespace Game3 {
 		buffer >> position;
 		buffer >> direction;
 		setUpdateCounter(buffer.take<UpdateCounter>());
-		{
-			auto offset_lock = offset.uniqueLock();
-			buffer >> offset.x;
-			buffer >> offset.y;
-			buffer >> offset.z;
-		}
-		buffer >> zSpeed;
+		buffer >> offset;
+		buffer >> velocity;
 		buffer >> path;
 		buffer >> money;
 		// TODO: support multiple entity inventories
@@ -1051,10 +1045,17 @@ namespace Game3 {
 	}
 
 	void Entity::jump() {
-		if (getSide() != Side::Server || zSpeed != 0.f || offset.z != 0.f)
+		auto velocity_lock = velocity.uniqueLock();
+		if (getSide() != Side::Server || velocity.z != 0.f)
 			return;
 
-		zSpeed = getJumpSpeed();
+		{
+			auto offset_lock = offset.sharedLock();
+			if (offset.z != 0.f)
+				return;
+		}
+
+		velocity.z = getJumpSpeed();
 		increaseUpdateCounter();
 		getGame().toServer().entityTeleported(*this, MovementContext{.excludePlayerSelf = true});
 	}

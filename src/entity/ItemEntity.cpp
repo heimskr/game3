@@ -13,7 +13,7 @@
 #include "ui/Canvas.h"
 
 namespace Game3 {
-	ItemEntity::ItemEntity(const Game &game, const nlohmann::json &):
+	ItemEntity::ItemEntity(const Game &game):
 		Entity(ID()), stack(game) {}
 
 	ItemEntity::ItemEntity(ItemStack stack_):
@@ -40,8 +40,8 @@ namespace Game3 {
 		return Entity::create<ItemEntity>();
 	}
 
-	std::shared_ptr<ItemEntity> ItemEntity::create(Game &, const ItemStack &stack) {
-		return Entity::create<ItemEntity>(stack);
+	std::shared_ptr<ItemEntity> ItemEntity::create(Game &, ItemStack stack) {
+		return Entity::create<ItemEntity>(std::move(stack));
 	}
 
 	std::shared_ptr<ItemEntity> ItemEntity::fromJSON(Game &game, const nlohmann::json &json) {

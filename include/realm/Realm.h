@@ -102,7 +102,7 @@ namespace Game3 {
 			Realm & operator=(Realm &&) = delete;
 
 			template <typename T = Realm, typename... Args>
-			static std::shared_ptr<T> create(Args && ...args) {
+			static std::shared_ptr<T> create(Args &&...args) {
 				return std::shared_ptr<T>(new T(std::forward<Args>(args)...));
 			}
 
@@ -214,10 +214,10 @@ namespace Game3 {
 
 			void queueEntityInit(EntityPtr, const Position &);
 
-			template <typename T, typename... Args>
-			std::shared_ptr<T> spawn(const Position &position, Args && ...args) {
+			template <typename E, typename... Args>
+			std::shared_ptr<E> spawn(const Position &position, Args &&...args) {
 				Game &game_ref = getGame();
-				auto entity = T::create(game_ref, std::forward<Args>(args)...);
+				auto entity = E::create(game_ref, std::forward<Args>(args)...);
 				entity->spawning = true;
 				entity->setRealm(shared_from_this());
 				entityInitializationQueue.emplace(entity, position);

@@ -192,31 +192,59 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const Offset &) {
+	std::string Buffer::getType(const Vector3 &) {
 		return std::string{'\x32'} + getType(float{});
 	}
 
-	std::ostream & operator<<(std::ostream &stream, const Offset &offset) {
-		return stream << '(' << offset.x << ", " << offset.y << ", " << offset.z << ')';
+	std::ostream & operator<<(std::ostream &stream, const Vector3 &vector) {
+		return stream << '(' << vector.x << ", " << vector.y << ", " << vector.z << ')';
 	}
 
-	Buffer & operator+=(Buffer &buffer, const Offset &offset) {
-		return ((buffer.appendType(offset) += offset.x) += offset.y) += offset.z;
+	Buffer & operator+=(Buffer &buffer, const Vector3 &vector) {
+		return ((buffer.appendType(vector) += vector.x) += vector.y) += vector.z;
 	}
 
-	Buffer & operator<<(Buffer &buffer, const Offset &offset) {
-		return buffer += offset;
+	Buffer & operator<<(Buffer &buffer, const Vector3 &vector) {
+		return buffer += vector;
 	}
 
-	Buffer & operator>>(Buffer &buffer, Offset &offset) {
+	Buffer & operator>>(Buffer &buffer, Vector3 &vector) {
 		const auto type = buffer.popType();
-		if (!Buffer::typesMatch(type, buffer.getType(offset))) {
+		if (!Buffer::typesMatch(type, buffer.getType(vector))) {
 			buffer.debug();
-			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected shortlist<f32, 3>)");
+			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected shortlist<f32, 3> for Vector3)");
 		}
-		popBuffer(buffer, offset.x);
-		popBuffer(buffer, offset.y);
-		popBuffer(buffer, offset.z);
+		popBuffer(buffer, vector.x);
+		popBuffer(buffer, vector.y);
+		popBuffer(buffer, vector.z);
+		return buffer;
+	}
+
+	template <>
+	std::string Buffer::getType(const Vector2 &) {
+		return std::string{'\x31'} + getType(float{});
+	}
+
+	std::ostream & operator<<(std::ostream &stream, const Vector2 &vector) {
+		return stream << '(' << vector.x << ", " << vector.y << ')';
+	}
+
+	Buffer & operator+=(Buffer &buffer, const Vector2 &vector) {
+		return (buffer.appendType(vector) += vector.x) += vector.y;
+	}
+
+	Buffer & operator<<(Buffer &buffer, const Vector2 &vector) {
+		return buffer += vector;
+	}
+
+	Buffer & operator>>(Buffer &buffer, Vector2 &vector) {
+		const auto type = buffer.popType();
+		if (!Buffer::typesMatch(type, buffer.getType(vector))) {
+			buffer.debug();
+			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected shortlist<f32, 2> for Vector2)");
+		}
+		popBuffer(buffer, vector.x);
+		popBuffer(buffer, vector.y);
 		return buffer;
 	}
 }
