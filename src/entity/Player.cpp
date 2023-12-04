@@ -80,6 +80,7 @@ namespace Game3 {
 		json["displayName"] = displayName;
 		json["spawnPosition"] = spawnPosition.copyBase();
 		json["spawnRealmID"] = spawnRealmID;
+		json["timeSinceAttack"] = timeSinceAttack;
 		if (0.f < tooldown)
 			json["tooldown"] = tooldown;
 	}
@@ -90,6 +91,7 @@ namespace Game3 {
 		displayName = json.at("displayName");
 		spawnPosition = json.at("spawnPosition");
 		spawnRealmID = json.at("spawnRealmID");
+		timeSinceAttack = json.at("timeSinceAttack");
 		if (auto iter = json.find("tooldown"); iter != json.end())
 			tooldown = *iter;
 		else
@@ -106,6 +108,9 @@ namespace Game3 {
 				getInventory(0)->notifyOwner();
 			}
 		}
+
+		if (timeSinceAttack < 1'000'000.f)
+			timeSinceAttack += delta;
 
 		if (getSide() == Side::Client) {
 			Direction final_direction = direction;
@@ -300,9 +305,10 @@ namespace Game3 {
 		buffer << displayName;
 		buffer << tooldown;
 		buffer << stationTypes;
-		buffer << speed;
+		buffer << movementSpeed;
 		buffer << spawnRealmID;
 		buffer << spawnPosition;
+		buffer << timeSinceAttack;
 	}
 
 	void Player::decode(Buffer &buffer) {
@@ -312,9 +318,10 @@ namespace Game3 {
 		buffer >> displayName;
 		buffer >> tooldown;
 		buffer >> stationTypes;
-		buffer >> speed;
+		buffer >> movementSpeed;
 		buffer >> spawnRealmID;
 		buffer >> spawnPosition;
+		buffer >> timeSinceAttack;
 		resetEphemeral();
 	}
 
@@ -327,9 +334,6 @@ namespace Game3 {
 			default:
 				return;
 		}
-
-		// if (getSide() == Side::Client)
-		// 	getGame().toClient().client->send(StartPlayerMovementPacket(direction));
 	}
 
 	void Player::stopMoving() {
@@ -337,9 +341,6 @@ namespace Game3 {
 		movingRight = false;
 		movingDown  = false;
 		movingLeft  = false;
-
-		// if (getSide() == Side::Client)
-		// 	getGame().toClient().client->send(StopPlayerMovementPacket());
 	}
 
 	void Player::stopMoving(Direction direction) {
@@ -351,9 +352,6 @@ namespace Game3 {
 			default:
 				return;
 		}
-
-		// if (getSide() == Side::Client)
-		// 	getGame().toClient().client->send(StopPlayerMovementPacket(direction));
 	}
 
 	void Player::movedToNewChunk(const std::optional<ChunkPosition> &old_position) {
@@ -515,6 +513,16 @@ namespace Game3 {
 			return;
 		send(RealmNoticePacket(realm));
 		addKnownRealm(realm.id);
+	}
+
+	float Player::getAttackPeriod() const {
+		if (speedStat == 0)
+			return std::numeric_limits<float>::infinity();
+		return 1 / speedStat;
+	}
+
+	bool Player::canAttack() const {
+		return getAttackPeriod() <= timeSinceAttack;
 	}
 
 	void Player::resetEphemeral() {

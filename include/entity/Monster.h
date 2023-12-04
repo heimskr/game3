@@ -16,7 +16,7 @@ namespace Game3 {
 			void onAttack(const std::shared_ptr<LivingEntity> &) override;
 
 		protected:
-			float timeSinceAttack = 0.f;
+			float timeSinceAttack = 0;
 			GlobalID targetGID = -1;
 			std::weak_ptr<LivingEntity> weakTarget;
 

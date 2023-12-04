@@ -13,9 +13,6 @@ namespace Game3 {
 
 	class Animal: public LivingEntity {
 		public:
-			constexpr static HitPoints MAX_HEALTH = 20;
-			constexpr static float RETRY_TIME = 30.f;
-
 			static inline auto getWanderDistribution() {
 				return std::uniform_real_distribution(10.f, 20.f);
 			}
@@ -28,8 +25,8 @@ namespace Game3 {
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			void init(Game &) override;
 			void tick(Game &, float) override;
-			float getSpeed() const override { return 5.f; }
-			HitPoints getMaxHealth() const override { return MAX_HEALTH; }
+			float getMovementSpeed() const override { return 5.f; }
+			HitPoints getMaxHealth() const override;
 			bool wander();
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;

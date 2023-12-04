@@ -23,9 +23,10 @@ namespace Game3 {
 			/** Definitely not encoded. */
 			Token token = -1;
 			std::string displayName;
-			float tooldown = 0.f;
+			float tooldown = 0;
 			Lockable<std::unordered_set<Identifier>> stationTypes{{}};
-			float speed = 10.f;
+			float movementSpeed = 10;
+			float timeSinceAttack = 0;
 			std::atomic_bool movingUp = false;
 			std::atomic_bool movingRight = false;
 			std::atomic_bool movingDown = false;
@@ -53,7 +54,7 @@ namespace Game3 {
 			using Entity::teleport;
 			void teleport(const Position &, const std::shared_ptr<Realm> &, MovementContext) override;
 			void addMoney(MoneyCount);
-			float getSpeed() const override { return speed; }
+			float getMovementSpeed() const override { return movementSpeed; }
 			bool setTooldown(float multiplier);
 			inline bool hasTooldown() const { return 0.f < tooldown; }
 			void showText(const Glib::ustring &text, const Glib::ustring &name);
@@ -79,6 +80,8 @@ namespace Game3 {
 			bool knowsRealm(RealmID) const;
 			void notifyOfRealm(Realm &);
 			int getZIndex() const override { return 1; }
+			float getAttackPeriod() const;
+			bool canAttack() const;
 
 			friend class Entity;
 

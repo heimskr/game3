@@ -16,16 +16,22 @@ namespace Game3 {
 		if (hand == Hand::None)
 			return false;
 
-		const Position faced_tile = place.position + place.player->direction;
+		PlayerPtr player = place.player;
+
+		if (!player->canAttack())
+			return false;
+
+		const Position faced_tile = place.position + player->direction;
 
 		for (const EntityPtr &entity: place.realm->findEntities(faced_tile)) {
 			if (auto living = std::dynamic_pointer_cast<LivingEntity>(entity)) {
 				if (living->isInvincible())
 					continue;
 
-				const HitPoints damage = calculateDamage(baseDamage, variability, place.player->getLuck());
+				player->timeSinceAttack = 0;
+				const HitPoints damage = calculateDamage(baseDamage, variability, player->getLuck());
 				living->takeDamage(damage);
-				living->onAttack(place.player);
+				living->onAttack(player);
 				return true;
 			}
 		}

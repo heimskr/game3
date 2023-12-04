@@ -153,7 +153,7 @@ namespace Game3 {
 		auto &x = offset.x;
 		auto &y = offset.y;
 		auto &z = offset.z;
-		const auto speed = getSpeed();
+		const auto speed = getMovementSpeed();
 
 		if (x < 0.f)
 			x = std::min(x + delta * speed, 0.f);

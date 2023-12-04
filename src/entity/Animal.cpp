@@ -11,6 +11,11 @@
 namespace Game3 {
 	ThreadPool Animal::threadPool{2};
 
+	namespace {
+		constexpr HitPoints MAX_HEALTH = 40;
+		constexpr float RETRY_TIME = 30;
+	}
+
 	Animal::Animal():
 		Entity("base:invalid/Animal") {}
 
@@ -65,6 +70,10 @@ namespace Game3 {
 			if (!attemptingWander && timeUntilWander <= 0.f)
 				wander();
 		}
+	}
+
+	HitPoints Animal::getMaxHealth() const {
+		return MAX_HEALTH;
 	}
 
 	bool Animal::wander() {

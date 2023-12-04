@@ -20,7 +20,7 @@ namespace Game3 {
 			}
 
 			std::string getName() const override { return "Cyclops"; }
-			float getSpeed() const override { return 8.f; }
+			float getMovementSpeed() const override { return 8.f; }
 
 			HitPoints getBaseDamage() const override { return 2; }
 			int getVariability() const override { return 1; }

@@ -148,4 +148,8 @@ namespace Game3 {
 	}
 
 	void LivingEntity::onAttack(const std::shared_ptr<LivingEntity> &) {}
+
+	float LivingEntity::getBaseSpeed() {
+		return 1.5;
+	}
 }

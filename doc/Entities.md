@@ -72,7 +72,7 @@ There are some virtual methods that are optional to override. These include:
 - `bool onInteractNextTo(const PlayerPtr &)`: called when the player is standing one square from your entity facing your entity and presses the interaction key (`e` by default). Returns true iff anything interesting happened as a result.
 - `void init(Game &)`: called when the entity is created with the static `create` method.
 - `void initAfterLoad(Game &)`: called after the game is loaded from a save file.
-- `float getSpeed() const`: returns how many tiles the entity can move per second.
+- `float getMovementSpeed() const`: returns how many tiles the entity can move per second.
 - `Glib::ustring getName()`: returns the display name for the entity. If not overridden, it'll return something like `"Unknown Entity (base:entity/my_entity)"`.
 
 For LivingEntity:

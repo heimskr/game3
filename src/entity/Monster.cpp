@@ -45,7 +45,6 @@ namespace Game3 {
 	void Monster::onAttack(const std::shared_ptr<LivingEntity> &attacker) {
 		weakTarget = attacker;
 		targetGID = attacker->getGID();
-		timeSinceAttack = 0.f;
 	}
 
 	float Monster::getPatience() const {
