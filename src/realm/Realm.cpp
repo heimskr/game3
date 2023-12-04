@@ -256,8 +256,6 @@ namespace Game3 {
 			for (auto &renderer: row)
 				renderer.reupload();
 
-		getGame().toClient().activateContext();
-
 		for (auto &row: *upperRenderers)
 			for (auto &renderer: row)
 				renderer.reupload();
