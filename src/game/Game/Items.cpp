@@ -41,9 +41,55 @@
 
 namespace Game3 {
 	void Game::addItems() {
-		add(std::make_shared<Hoe>("base:item/iron_hoe", "Iron Hoe", 40, 128));
+		add(std::make_shared<AutocrafterItem>("base:item/autocrafter", "Autocrafter", 999, 64)); // TODO: cost
+
+		add(std::make_shared<AutofarmerItem>("base:item/autofarmer", "Autofarmer", 999, 64)); // TODO: cost
 
 		add(std::make_shared<Bomb>("base:item/bomb", "Bomb", 32, 64));
+
+		add(std::make_shared<CaveEntrance>("base:item/cave_entrance", "Cave Entrance", 50, 1));
+
+		add(std::make_shared<CentrifugeItem>("base:item/centrifuge", "Centrifuge", 999, 64)); // TODO: cost
+
+		add(std::make_shared<ChemicalItem>("base:item/chemical", "Chemical", 0));
+
+		add(std::make_shared<ChemicalReactorItem>("base:item/chemical_reactor", "Chemical Reactor", 999, 64)); // TODO: cost
+
+		add(std::make_shared<CombinerItem>("base:item/combiner", "Combiner", 999, 64)); // TODO: cost
+
+		add(std::make_shared<ContainmentOrb>("base:item/contorb", "Containment Orb", 64, 1)); // TODO: cost
+
+		add(std::make_shared<CreativeGeneratorItem>("base:item/creative_generator", "Creative Generator", 999, 64)); // TODO: cost
+
+		add(std::make_shared<DesertSapling>("base:item/desert_sapling", "Cactus Sapling", 5, 64));
+
+		add(std::make_shared<DissolverItem>("base:item/dissolver", "Dissolver", 999, 64)); // TODO: cost
+
+		add(std::make_shared<EmptyFlask>("base:item/flask", "Flask", 2, 64));
+
+		add(std::make_shared<EnergyPipeItem>(4));
+
+		add(std::make_shared<FilledFlask>("base:item/water_flask", "Water Flask", 3, "base:fluid/water"));
+		add(std::make_shared<FilledFlask>("base:item/lava_flask",  "Lava Flask",  4, "base:fluid/lava"));
+		add(std::make_shared<FilledFlask>("base:item/milk_flask",  "Milk Flask",  4, "base:fluid/milk"));
+		add(std::make_shared<FilledFlask>("base:item/brine_flask", "Brine Flask", 4, "base:fluid/brine"));
+		add(std::make_shared<FilledFlask>("base:item/honey",       "Honey",       5, "base:fluid/honey"));
+
+		add(std::make_shared<Floor>("base:item/floor", "Floor", "base:tile/floor", 4, 64));
+
+		add(std::make_shared<FluidPipeItem>(4));
+
+		add(std::make_shared<GeothermalGeneratorItem>("base:item/geothermal_generator", "Geothermal Generator", 999, 64)); // TODO: cost
+
+		add(std::make_shared<GrasslandSapling>("base:item/sapling", "Sapling", 5, 64));
+
+		add(std::make_shared<Hammer>("base:item/iron_hammer",    "Iron Hammer",     40,  3.f, 128));
+		add(std::make_shared<Hammer>("base:item/gold_hammer",    "Gold Hammer",    100, .75f, 128));
+		add(std::make_shared<Hammer>("base:item/diamond_hammer", "Diamond Hammer", 210,  1.f, 128));
+
+		add(std::make_shared<Hoe>("base:item/iron_hoe", "Iron Hoe", 40, 128));
+
+		add(std::make_shared<IncineratorItem>("base:item/incinerator", "Incinerator", 999, 64)); // TODO: cost
 
 		add(std::make_shared<Item>("base:item/shortsword",      "Shortsword",        100,  1));
 		add(std::make_shared<Item>("base:item/red_potion",      "Red Potion",         20,  8));
@@ -116,7 +162,26 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/protein",         "Protein",            12, 64));
 		add(std::make_shared<Item>("base:item/chili_crisp",     "Chili Crisp",        32, 64));
 
+		add(std::make_shared<ItemPipeItem>(4));
+
+		add(std::make_shared<Landfill>("base:item/sand",          "Sand",          1, 64, "base:tile/sand"));
+		add(std::make_shared<Landfill>("base:item/volcanic_sand", "Volcanic Sand", 3, 64, "base:tile/volcanic_sand"));
+		add(std::make_shared<Landfill>("base:item/stone",         "Stone",         1, 64, "base:tile/stone", "base:tile/cave_wall"));
+		add(std::make_shared<Landfill>("base:item/grimstone",     "Grimstone",     2, 64, "base:tile/grimstone"));
+		add(std::make_shared<Landfill>("base:item/dirt",          "Dirt",          1, 64, "base:tile/dirt"));
+
 		add(std::make_shared<Mead>("base:item/mead", "Mead", 10, 16));
+
+		add(std::make_shared<MeleeWeapon>("base:item/iron_sword",    "Iron Sword",    150, 3, 1, 128));
+		add(std::make_shared<MeleeWeapon>("base:item/gold_sword",    "Iron Sword",    400, 8, 3,  64));
+		add(std::make_shared<MeleeWeapon>("base:item/diamond_sword", "Diamond Sword", 900, 6, 2, 256));
+		add(std::make_shared<MeleeWeapon>("base:item/copper_sword",  "Copper Sword",   32, 6, 2, 256));
+
+		add(std::make_shared<Pickaxe>("base:item/iron_pickaxe",    "Iron Pickaxe",      40,  3.f,  64));
+		add(std::make_shared<Pickaxe>("base:item/gold_pickaxe",    "Gold Pickaxe",     100, .75f,  64));
+		add(std::make_shared<Pickaxe>("base:item/diamond_pickaxe", "Diamond Pickaxe",  210,  1.f, 512));
+
+		add(std::make_shared<PumpItem>("base:item/pump", "Pump", 999, 64)); // TODO: cost
 
 		add(std::make_shared<Seed>("base:item/cotton_seeds",     "Cotton Seeds",      "base:tile/cotton_0",     4));
 		add(std::make_shared<Seed>("base:item/wheat_seeds",      "Wheat Seeds",       "base:tile/wheat_0",      4));
@@ -132,6 +197,12 @@ namespace Game3 {
 		add(std::make_shared<Seed>("base:item/bean_seeds",       "Bean Seeds",        "base:tile/bean_0",       4));
 		add(std::make_shared<Seed>("base:item/chili_seeds",      "Chili Seeds",       "base:tile/chili_0",      5));
 
+		add(std::make_shared<SnowySapling>("base:item/snowy_sapling", "Snowy Sapling", 5, 64));
+
+		add(std::make_shared<TankItem>("base:item/tank", "Tank", 999, 64)); // TODO: cost
+
+		add(std::make_shared<TerrainSeed>("base:item/moss", "Moss", "base:tile/dirt", "base:tile/forest_floor", 2));
+
 		add(std::make_shared<Tool>("base:item/iron_shovel",    "Iron Shovel",     20,  3.f,  64, "base:attribute/shovel"));
 		add(std::make_shared<Tool>("base:item/iron_axe",       "Iron Axe",        40,  3.f, 128, "base:attribute/axe"));
 		add(std::make_shared<Tool>("base:item/gold_shovel",    "Gold Shovel",     50, .75f, 512, "base:attribute/shovel"));
@@ -140,77 +211,9 @@ namespace Game3 {
 		add(std::make_shared<Tool>("base:item/diamond_axe",    "Diamond Axe",    210,  1.f, 512, "base:attribute/axe"));
 		add(std::make_shared<Tool>("base:item/wrench",         "Wrench",          72,  0.f,  -1, "base:attribute/wrench"));
 
-		add(std::make_shared<Floor>("base:item/floor", "Floor", "base:tile/floor", 4, 64));
-
-		add(std::make_shared<Hammer>("base:item/iron_hammer",    "Iron Hammer",     40,  3.f, 128));
-		add(std::make_shared<Hammer>("base:item/gold_hammer",    "Gold Hammer",    100, .75f, 128));
-		add(std::make_shared<Hammer>("base:item/diamond_hammer", "Diamond Hammer", 210,  1.f, 128));
-
-		add(std::make_shared<Pickaxe>("base:item/iron_pickaxe",    "Iron Pickaxe",      40,  3.f,  64));
-		add(std::make_shared<Pickaxe>("base:item/gold_pickaxe",    "Gold Pickaxe",     100, .75f,  64));
-		add(std::make_shared<Pickaxe>("base:item/diamond_pickaxe", "Diamond Pickaxe",  210,  1.f, 512));
-
-		add(std::make_shared<Landfill>("base:item/sand",          "Sand",          1, 64, "base:tile/sand"));
-		add(std::make_shared<Landfill>("base:item/volcanic_sand", "Volcanic Sand", 3, 64, "base:tile/volcanic_sand"));
-		add(std::make_shared<Landfill>("base:item/stone",         "Stone",         1, 64, "base:tile/stone", "base:tile/cave_wall"));
-		add(std::make_shared<Landfill>("base:item/grimstone",     "Grimstone",     2, 64, "base:tile/grimstone"));
-		add(std::make_shared<Landfill>("base:item/dirt",          "Dirt",          1, 64, "base:tile/dirt"));
-
-		add(std::make_shared<PumpItem>("base:item/pump", "Pump", 999, 64)); // TODO: cost
-		add(std::make_shared<TankItem>("base:item/tank", "Tank", 999, 64)); // TODO: cost
-
 		add(std::make_shared<VoidFlask>("base:item/void_flask", "Void Flask", 128, 1));
 
-		add(std::make_shared<EmptyFlask>("base:item/flask", "Flask", 2, 64));
-
-		add(std::make_shared<FilledFlask>("base:item/water_flask", "Water Flask", 3, "base:fluid/water"));
-		add(std::make_shared<FilledFlask>("base:item/lava_flask",  "Lava Flask",  4, "base:fluid/lava"));
-		add(std::make_shared<FilledFlask>("base:item/milk_flask",  "Milk Flask",  4, "base:fluid/milk"));
-		add(std::make_shared<FilledFlask>("base:item/brine_flask", "Brine Flask", 4, "base:fluid/brine"));
-		add(std::make_shared<FilledFlask>("base:item/honey",       "Honey",       5, "base:fluid/honey"));
-
-		add(std::make_shared<MeleeWeapon>("base:item/iron_sword",    "Iron Sword",    150, 3, 1, 128));
-		add(std::make_shared<MeleeWeapon>("base:item/gold_sword",    "Iron Sword",    400, 8, 3,  64));
-		add(std::make_shared<MeleeWeapon>("base:item/diamond_sword", "Diamond Sword", 900, 6, 2, 256));
-		add(std::make_shared<MeleeWeapon>("base:item/copper_sword",  "Copper Sword",   32, 6, 2, 256));
-
-		add(std::make_shared<TerrainSeed>("base:item/moss", "Moss", "base:tile/dirt", "base:tile/forest_floor", 2));
-
 		add(std::make_shared<VoidPickaxe>("base:item/void_pickaxe", "Void Pickaxe", 1000, 0.f, -1, "base:attribute/void_pickaxe"));
-
-		add(std::make_shared<CaveEntrance>("base:item/cave_entrance", "Cave Entrance", 50, 1));
-
-		add(std::make_shared<ChemicalItem>("base:item/chemical", "Chemical", 0));
-
-		add(std::make_shared<CombinerItem>("base:item/combiner", "Combiner", 999, 64)); // TODO: cost
-
-		add(std::make_shared<ItemPipeItem>(4));
-
-		add(std::make_shared<DissolverItem>("base:item/dissolver", "Dissolver", 999, 64)); // TODO: cost
-
-		add(std::make_shared<FluidPipeItem>(4));
-
-		add(std::make_shared<AutofarmerItem>("base:item/autofarmer", "Autofarmer", 999, 64)); // TODO: cost
-
-		add(std::make_shared<CentrifugeItem>("base:item/centrifuge", "Centrifuge", 999, 64)); // TODO: cost
-
-		add(std::make_shared<ContainmentOrb>("base:item/contorb", "Containment Orb", 64, 1)); // TODO: cost
-
-		add(std::make_shared<EnergyPipeItem>(4));
-
-		add(std::make_shared<AutocrafterItem>("base:item/autocrafter", "Autocrafter", 999, 64)); // TODO: cost
-
-		add(std::make_shared<IncineratorItem>("base:item/incinerator", "Incinerator", 999, 64)); // TODO: cost
-
-		add(std::make_shared<ChemicalReactorItem>("base:item/chemical_reactor", "Chemical Reactor", 999, 64)); // TODO: cost
-
-		add(std::make_shared<CreativeGeneratorItem>("base:item/creative_generator", "Creative Generator", 999, 64)); // TODO: cost
-
-		add(std::make_shared<GeothermalGeneratorItem>("base:item/geothermal_generator", "Geothermal Generator", 999, 64)); // TODO: cost
-
-		add(std::make_shared<SnowySapling>("base:item/snowy_sapling", "Snowy Sapling", 5, 64));
-		add(std::make_shared<DesertSapling>("base:item/desert_sapling", "Cactus Sapling", 5, 64));
-		add(std::make_shared<GrasslandSapling>("base:item/sapling", "Sapling", 5, 64));
 
 		add(Furniture::createSimple("base:item/pride_flag",       "Pride Flag",        80, Layer::Highest,   "base:tile/pride_flag"));
 		add(Furniture::createSimple("base:item/ace_flag",         "Asexual Flag",      80, Layer::Highest,   "base:tile/ace_flag"));
