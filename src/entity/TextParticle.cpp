@@ -33,7 +33,7 @@ namespace Game3 {
 	}
 
 	void TextParticle::tick(Game &, float delta) {
-		constexpr static float depth = -1.f;
+		constexpr static float depth = -1.666f;
 
 		auto offset_lock = offset.uniqueLock();
 
@@ -59,7 +59,7 @@ namespace Game3 {
 	void TextParticle::onSpawn() {
 		Entity::onSpawn();
 		auto lock = velocity.uniqueLock();
-		velocity.x = std::uniform_real_distribution(2.f,  8.f)(threadContext.rng) * (std::uniform_int_distribution(0, 1)(threadContext.rng) == 1? 1 : -1);
+		velocity.x = std::uniform_real_distribution(2.f,  4.f)(threadContext.rng) * (std::uniform_int_distribution(0, 1)(threadContext.rng) == 1? 1 : -1);
 		velocity.z = std::uniform_real_distribution(8.f, 12.f)(threadContext.rng);
 	}
 
