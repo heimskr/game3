@@ -1,5 +1,6 @@
 #include "algorithm/DamageCalculation.h"
 #include "entity/Player.h"
+#include "game/Inventory.h"
 #include "item/MeleeWeapon.h"
 #include "realm/Realm.h"
 #include "types/Position.h"
@@ -12,7 +13,7 @@ namespace Game3 {
 		attributes.emplace("base:attribute/melee_weapon");
 	}
 
-	bool MeleeWeapon::use(Slot, ItemStack &, const Place &place, Modifiers, std::pair<float, float>, Hand hand) {
+	bool MeleeWeapon::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>, Hand hand) {
 		if (hand == Hand::None)
 			return false;
 
@@ -32,6 +33,12 @@ namespace Game3 {
 				const HitPoints damage = calculateDamage(baseDamage, variability, player->getLuck());
 				living->takeDamage(damage);
 				living->onAttack(player);
+
+				InventoryPtr inventory = player->getInventory(0);
+				auto lock = inventory->uniqueLock();
+				if (stack.reduceDurability())
+					inventory->erase(slot);
+				inventory->notifyOwner();
 				return true;
 			}
 		}

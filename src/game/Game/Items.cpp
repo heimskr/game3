@@ -132,13 +132,13 @@ namespace Game3 {
 		add(std::make_shared<Seed>("base:item/bean_seeds",       "Bean Seeds",        "base:tile/bean_0",       4));
 		add(std::make_shared<Seed>("base:item/chili_seeds",      "Chili Seeds",       "base:tile/chili_0",      5));
 
-		add(std::make_shared<Tool>("base:item/iron_shovel",     "Iron Shovel",       20,  3.f,  64, "base:attribute/shovel"));
-		add(std::make_shared<Tool>("base:item/iron_axe",        "Iron Axe",          40,  3.f, 128, "base:attribute/axe"));
-		add(std::make_shared<Tool>("base:item/gold_shovel",     "Gold Shovel",       50, .75f, 512, "base:attribute/shovel"));
-		add(std::make_shared<Tool>("base:item/gold_axe",        "Gold Axe",         100, .75f,  64, "base:attribute/axe"));
-		add(std::make_shared<Tool>("base:item/diamond_shovel",  "Diamond Shovel",   110,  1.f, 512, "base:attribute/shovel"));
-		add(std::make_shared<Tool>("base:item/diamond_axe",     "Diamond Axe",      210,  1.f, 512, "base:attribute/axe"));
-		add(std::make_shared<Tool>("base:item/wrench",          "Wrench",            72,  0.f,  -1, "base:attribute/wrench"));
+		add(std::make_shared<Tool>("base:item/iron_shovel",    "Iron Shovel",     20,  3.f,  64, "base:attribute/shovel"));
+		add(std::make_shared<Tool>("base:item/iron_axe",       "Iron Axe",        40,  3.f, 128, "base:attribute/axe"));
+		add(std::make_shared<Tool>("base:item/gold_shovel",    "Gold Shovel",     50, .75f, 512, "base:attribute/shovel"));
+		add(std::make_shared<Tool>("base:item/gold_axe",       "Gold Axe",       100, .75f,  64, "base:attribute/axe"));
+		add(std::make_shared<Tool>("base:item/diamond_shovel", "Diamond Shovel", 110,  1.f, 512, "base:attribute/shovel"));
+		add(std::make_shared<Tool>("base:item/diamond_axe",    "Diamond Axe",    210,  1.f, 512, "base:attribute/axe"));
+		add(std::make_shared<Tool>("base:item/wrench",         "Wrench",          72,  0.f,  -1, "base:attribute/wrench"));
 
 		add(std::make_shared<Floor>("base:item/floor", "Floor", "base:tile/floor", 4, 64));
 
@@ -169,14 +169,14 @@ namespace Game3 {
 		add(std::make_shared<FilledFlask>("base:item/brine_flask", "Brine Flask", 4, "base:fluid/brine"));
 		add(std::make_shared<FilledFlask>("base:item/honey",       "Honey",       5, "base:fluid/honey"));
 
-		add(std::make_shared<MeleeWeapon>("base:item/iron_sword",     "Iron Sword",   150, 3, 1,  64));
-		add(std::make_shared<MeleeWeapon>("base:item/gold_sword",     "Iron Sword",   400, 8, 3,  32));
-		add(std::make_shared<MeleeWeapon>("base:item/diamond_sword", "Diamond Sword", 900, 6, 2, 128));
-		add(std::make_shared<MeleeWeapon>("base:item/copper_sword",  "Copper Sword",   32, 6, 2, 128));
+		add(std::make_shared<MeleeWeapon>("base:item/iron_sword",    "Iron Sword",    150, 3, 1, 128));
+		add(std::make_shared<MeleeWeapon>("base:item/gold_sword",    "Iron Sword",    400, 8, 3,  64));
+		add(std::make_shared<MeleeWeapon>("base:item/diamond_sword", "Diamond Sword", 900, 6, 2, 256));
+		add(std::make_shared<MeleeWeapon>("base:item/copper_sword",  "Copper Sword",   32, 6, 2, 256));
 
 		add(std::make_shared<TerrainSeed>("base:item/moss", "Moss", "base:tile/dirt", "base:tile/forest_floor", 2));
 
-		add(std::make_shared<VoidPickaxe>("base:item/void_pickaxe",    "Void Pickaxe",    1000,  0.f,  -1, "base:attribute/void_pickaxe"));
+		add(std::make_shared<VoidPickaxe>("base:item/void_pickaxe", "Void Pickaxe", 1000, 0.f, -1, "base:attribute/void_pickaxe"));
 
 		add(std::make_shared<CaveEntrance>("base:item/cave_entrance", "Cave Entrance", 50, 1));
 
