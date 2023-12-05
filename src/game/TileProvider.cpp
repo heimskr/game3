@@ -110,7 +110,7 @@ namespace Game3 {
 		was_empty = false;
 		validateLayer(layer);
 
-		const ChunkPosition chunk_position = getChunkPosition(position);
+		const ChunkPosition chunk_position = position.getChunk();
 
 		const ChunkMap &map = chunkMaps[getIndex(layer)];
 
@@ -495,7 +495,7 @@ namespace Game3 {
 	}
 
 	FluidTile & TileProvider::findFluid(Position position, std::shared_lock<std::shared_mutex> *lock_out, FluidMode mode) {
-		const auto chunk_position = getChunkPosition(position);
+		const auto chunk_position = position.getChunk();
 		std::shared_lock shared_lock(fluidMutex);
 
 		if (auto iter = fluidMap.find(chunk_position); iter != fluidMap.end()) {
@@ -524,7 +524,7 @@ namespace Game3 {
 	}
 
 	FluidTile & TileProvider::findFluid(Position position, std::unique_lock<std::shared_mutex> *lock_out, FluidMode mode) {
-		const auto chunk_position = getChunkPosition(position);
+		const auto chunk_position = position.getChunk();
 		std::shared_lock shared_lock(fluidMutex);
 
 		if (auto iter = fluidMap.find(chunk_position); iter != fluidMap.end()) {
@@ -663,7 +663,7 @@ namespace Game3 {
 	}
 
 	void TileProvider::ensureAllChunks(Position position) {
-		ensureAllChunks(getChunkPosition(position));
+		ensureAllChunks(position.getChunk());
 	}
 
 	void TileProvider::validateLayer(Layer layer) const {
@@ -785,9 +785,5 @@ namespace Game3 {
 				}
 			}
 		}
-	}
-
-	ChunkPosition getChunkPosition(Position position) {
-		return {TileProvider::divide<int32_t>(position.column), TileProvider::divide<int32_t>(position.row)};
 	}
 }

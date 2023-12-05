@@ -1,7 +1,7 @@
-#include "game/ChunkPosition.h"
+#include "game/TileProvider.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
-#include "game/TileProvider.h"
+#include "types/ChunkPosition.h"
 
 namespace Game3 {
 	ChunkPosition::ChunkPosition(IntType x_, IntType y_):

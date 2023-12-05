@@ -1,9 +1,11 @@
 #include "types/Position.h"
 #include "entity/Player.h"
+#include "game/TileProvider.h"
 #include "graphics/Tileset.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "util/Util.h"
+#include "types/ChunkPosition.h"
 
 namespace Game3 {
 	Position::Position(std::string_view string) {
@@ -74,6 +76,10 @@ namespace Game3 {
 		return *this;
 	}
 
+	ChunkPosition Position::getChunk() const {
+		return {TileProvider::divide<ChunkPosition::IntType>(column), TileProvider::divide<ChunkPosition::IntType>(row)};
+	}
+
 	Direction Position::getFacing(const Position &other) const {
 		Position difference = other - *this;
 
@@ -100,6 +106,10 @@ namespace Game3 {
 			return column < 0? Direction::Left : Direction::Right;
 
 		return row < 0? Direction::Up : Direction::Down;
+	}
+
+	uint64_t Position::maximumAxisDistance(const Position &other) const {
+		return uint64_t(std::max(std::abs(row - other.row), std::abs(column - other.column)));
 	}
 
 	bool Position::operator<(const Position &other) const {

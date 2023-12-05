@@ -850,8 +850,8 @@ namespace Game3 {
 						std::cout << "Player GID: " << game->player->getGID() << '\n';
 						std::cout << "Realm ID: " << game->player->getRealm()->id << " or perhaps " << game->activeRealm.copyBase()->id << '\n';
 						std::cout << "Position: " << game->player->getPosition() << '\n';
-						std::cout << "Chunk position: " << std::string(getChunkPosition(game->player->getPosition())) << '\n';
-						std::cout << "Update counter: " << game->player->getRealm()->tileProvider.getUpdateCounter(getChunkPosition(game->player->getPosition())) << '\n';
+						std::cout << "Chunk position: " << std::string(game->player->getPosition().getChunk()) << '\n';
+						std::cout << "Update counter: " << game->player->getRealm()->tileProvider.getUpdateCounter(game->player->getPosition().getChunk()) << '\n';
 						std::cout << "Canvas scale: " << canvas->scale << '\n';
 					}
 					return;

@@ -3,7 +3,7 @@
 #include "types/Types.h"
 #include "data/ChunkSet.h"
 #include "game/Chunk.h"
-#include "game/ChunkPosition.h"
+#include "types/ChunkPosition.h"
 #include "threading/Lockable.h"
 
 #include <filesystem>

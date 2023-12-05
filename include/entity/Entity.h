@@ -9,7 +9,7 @@
 #include "types/Types.h"
 #include "container/WeakSet.h"
 #include "game/Agent.h"
-#include "game/ChunkPosition.h"
+#include "types/ChunkPosition.h"
 #include "game/HasInventory.h"
 #include "item/Item.h"
 #include "threading/Atomic.h"

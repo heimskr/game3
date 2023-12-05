@@ -4,8 +4,8 @@
 
 namespace Game3 {
 	ChunkRange HasPlace::getRange() const {
-		auto top_left = getChunkPosition(getPosition());
-		auto bottom_right = getChunkPosition(getPosition());
+		auto top_left = getPosition().getChunk();
+		auto bottom_right = getPosition().getChunk();
 		const auto distance = REALM_DIAMETER / 2;
 		top_left.x -= distance;
 		top_left.y -= distance;

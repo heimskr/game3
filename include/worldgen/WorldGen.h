@@ -7,7 +7,7 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include "types/Types.h"
-#include "game/ChunkPosition.h"
+#include "types/ChunkPosition.h"
 #include "game/Fluids.h"
 #include "threading/ThreadPool.h"
 

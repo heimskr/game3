@@ -1,10 +1,10 @@
 #pragma once
 
-#include "ChunkPosition.h"
 #include "container/WeakSet.h"
 #include "game/HasPlace.h"
 #include "net/Buffer.h"
 #include "threading/Lockable.h"
+#include "types/ChunkPosition.h"
 #include "ui/Modifiers.h"
 
 #include <gtkmm.h>

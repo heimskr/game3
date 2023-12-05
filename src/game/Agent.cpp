@@ -14,7 +14,7 @@ namespace Game3 {
 	static bool agent_rng_seeded = false;
 
 	std::vector<ChunkPosition> Agent::getVisibleChunks() const {
-		ChunkPosition original_position = getChunkPosition(getPosition());
+		ChunkPosition original_position = getPosition().getChunk();
 		std::vector<ChunkPosition> out;
 		out.reserve(REALM_DIAMETER * REALM_DIAMETER);
 		constexpr int32_t half = REALM_DIAMETER / 2;

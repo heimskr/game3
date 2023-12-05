@@ -2,7 +2,7 @@
 
 #include <set>
 
-#include "game/ChunkPosition.h"
+#include "types/ChunkPosition.h"
 #include "packet/Packet.h"
 
 namespace Game3 {

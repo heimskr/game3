@@ -20,9 +20,9 @@ namespace Game3 {
 			return true;
 
 		if (stack.data.empty()) {
-			auto entities = realm->getEntities(getChunkPosition(place.position));
+			auto entities = realm->getEntities(place.position.getChunk());
 			if (!entities) {
-				WARN("No entities found in chunk " << getChunkPosition(place.position));
+				WARN("No entities found in chunk " << place.position.getChunk());
 				return true;
 			}
 

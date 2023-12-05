@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/ChunkPosition.h"
+#include "types/ChunkPosition.h"
 #include "threading/Lockable.h"
 
 #include <atomic>

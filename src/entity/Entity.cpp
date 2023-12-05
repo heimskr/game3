@@ -527,8 +527,8 @@ namespace Game3 {
 	}
 
 	bool Entity::teleport(const Position &new_position, MovementContext context) {
-		const auto old_chunk_position = getChunkPosition(position);
-		const bool in_different_chunk = firstTeleport || old_chunk_position != getChunkPosition(new_position);
+		const auto old_chunk_position = position.getChunk();
+		const bool in_different_chunk = firstTeleport || old_chunk_position != new_position.getChunk();
 		const bool is_server = getSide() == Side::Server;
 
 		if (2 < position.taxiDistance(new_position))
@@ -692,7 +692,7 @@ namespace Game3 {
 		auto realm = getRealm();
 		if (getSide() == Side::Client) {
 			ClientGame &client_game = realm->getGame().toClient();
-			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.player->getChunk()).contains(getChunkPosition(pos));
+			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.player->getChunk()).contains(pos.getChunk());
 		}
 		return realm->isVisible(pos);
 	}
@@ -727,7 +727,7 @@ namespace Game3 {
 	}
 
 	ChunkPosition Entity::getChunk() const {
-		return getChunkPosition(getPosition());
+		return getPosition().getChunk();
 	}
 
 	bool Entity::canSee(RealmID realm_id, const Position &pos) const {
@@ -737,7 +737,7 @@ namespace Game3 {
 			return false;
 
 		const auto this_position = getChunk();
-		const auto other_position = getChunkPosition(pos);
+		const auto other_position = pos.getChunk();
 
 		if (this_position.x - REALM_DIAMETER / 2 <= other_position.x && other_position.x <= this_position.x + REALM_DIAMETER / 2)
 			if (this_position.y - REALM_DIAMETER / 2 <= other_position.y && other_position.y <= this_position.y + REALM_DIAMETER / 2)

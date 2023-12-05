@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types/Position.h"
-#include "game/ChunkPosition.h"
+#include "types/ChunkPosition.h"
 #include "game/HasRealm.h"
 
 namespace Game3 {

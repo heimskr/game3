@@ -461,7 +461,7 @@ namespace Game3 {
 			if (!player)
 				return;
 
-			const auto player_cpos = getChunkPosition(player->getPosition());
+			const auto player_cpos = player->getPosition().getChunk();
 
 			{
 				auto lock = entities.sharedLock();
@@ -530,11 +530,42 @@ namespace Game3 {
 	}
 
 	std::vector<EntityPtr> Realm::findEntities(const Position &position) {
+		EntitySet entity_set = getEntities(position.getChunk());
+
+		if (!entity_set)
+			return {};
+
 		std::vector<EntityPtr> out;
-		auto lock = entities.sharedLock();
-		for (const auto &entity: entities)
-			if (entity->position == position)
+		auto lock = entity_set->sharedLock();
+
+		for (const EntityPtr &entity: *entity_set)
+			if (entity->position.copyBase() == position)
 				out.push_back(entity);
+
+		return out;
+	}
+
+	std::vector<EntityPtr> Realm::findEntitiesSquare(const Position &position, uint64_t radius) {
+		if (radius == 1)
+			return findEntities(position);
+
+		if (radius == 0)
+			return {};
+
+		std::vector<EntityPtr> out;
+
+		const Position offset(radius - 1, radius - 1);
+		ChunkRange((position - offset).getChunk(), (position + offset).getChunk()).iterate([this, &out, position, radius](ChunkPosition chunk_position) {
+			EntitySet entity_set = getEntities(chunk_position);
+			if (!entity_set)
+				return;
+
+			auto lock = entity_set->sharedLock();
+			for (const EntityPtr &entity: *entity_set)
+				if (entity->position.copyBase().maximumAxisDistance(position) < radius)
+					out.push_back(entity);
+		});
+
 		return out;
 	}
 
@@ -717,7 +748,7 @@ namespace Game3 {
 
 		if (isServer()) {
 			if (!isGenerating()) {
-				tileProvider.updateChunk(getChunkPosition(position));
+				tileProvider.updateChunk(position.getChunk());
 				getGame().toServer().broadcastTileUpdate(id, layer, position, tile_id);
 			}
 			if (run_helper)
@@ -739,7 +770,7 @@ namespace Game3 {
 		}
 
 		if (isServer() && !isGenerating()) {
-			tileProvider.updateChunk(getChunkPosition(position));
+			tileProvider.updateChunk(position.getChunk());
 			getGame().toServer().broadcastFluidUpdate(id, position, tile);
 		}
 	}
@@ -957,7 +988,7 @@ namespace Game3 {
 
 	void Realm::remakePathMap(Position position) {
 		const auto &tileset = getTileset();
-		auto &path_chunk = tileProvider.getPathChunk(getChunkPosition(position));
+		auto &path_chunk = tileProvider.getPathChunk(position.getChunk());
 		auto lock = path_chunk.uniqueLock();
 		path_chunk[position.row * CHUNK_SIZE + position.column] = isWalkable(position.row, position.column, tileset);
 	}
@@ -973,11 +1004,11 @@ namespace Game3 {
 	}
 
 	bool Realm::isVisible(const Position &position) {
-		const auto chunk_pos = getChunkPosition(position);
+		const auto chunk_pos = position.getChunk();
 		auto lock = players.sharedLock();
 		for (const auto &weak_player: players) {
 			if (auto player = weak_player.lock()) {
-				const auto player_chunk_pos = getChunkPosition(player->getPosition());
+				const auto player_chunk_pos = player->getPosition().getChunk();
 				if (player_chunk_pos.x - REALM_DIAMETER / 2 <= chunk_pos.x && chunk_pos.x <= player_chunk_pos.x + REALM_DIAMETER / 2)
 					if (player_chunk_pos.y - REALM_DIAMETER / 2 <= chunk_pos.y && chunk_pos.y <= player_chunk_pos.y + REALM_DIAMETER / 2)
 						return true;
@@ -1020,7 +1051,7 @@ namespace Game3 {
 		std::set<ChunkPosition> out;
 		const auto &player = getGame().toClient().player;
 
-		auto chunk_pos = getChunkPosition(player->getPosition());
+		auto chunk_pos = player->getPosition().getChunk();
 		chunk_pos.y -= REALM_DIAMETER / 2;
 		chunk_pos.x -= REALM_DIAMETER / 2;
 

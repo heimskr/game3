@@ -11,7 +11,7 @@
 #include "types/Position.h"
 #include "types/Types.h"
 #include "data/ChunkSet.h"
-#include "game/ChunkPosition.h"
+#include "types/ChunkPosition.h"
 #include "game/Fluids.h"
 #include "threading/Lockable.h"
 #include "threading/MTQueue.h"
@@ -229,6 +229,4 @@ namespace Game3 {
 			void initPathChunk(Chunk<uint8_t> &, ChunkPosition);
 			void initFluidChunk(Chunk<FluidTile> &, ChunkPosition);
 	};
-
-	ChunkPosition getChunkPosition(Position);
 }

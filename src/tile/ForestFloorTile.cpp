@@ -55,7 +55,7 @@ namespace Game3 {
 			return;
 
 		// If there are any adjacent or overlapping items, give up and don't spawn anything.
-		if (auto entities = realm.getEntities(getChunkPosition(place.position))) {
+		if (auto entities = realm.getEntities(place.position.getChunk())) {
 			auto lock = entities->sharedLock();
 			for (const EntityPtr &entity: *entities)
 				if (entity->position.taxiDistance(place.position) <= 3 && std::dynamic_pointer_cast<ItemEntity>(entity))

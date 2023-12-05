@@ -145,7 +145,7 @@ namespace Game3 {
 		RealmPtr realm = getRealm();
 		if (getSide() == Side::Client) {
 			ClientGame &client_game = realm->getGame().toClient();
-			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.player->getChunk()).contains(getChunkPosition(pos));
+			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.player->getChunk()).contains(pos.getChunk());
 		}
 		return realm->isVisible(pos);
 	}
@@ -155,7 +155,7 @@ namespace Game3 {
 		RealmPtr realm = getRealm();
 		if (getSide() == Side::Client) {
 			ClientGame &client_game = realm->getGame().toClient();
-			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.player->getChunk()).contains(getChunkPosition(pos));
+			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.player->getChunk()).contains(pos.getChunk());
 		}
 		return realm->isVisible(pos);
 	}
@@ -165,7 +165,7 @@ namespace Game3 {
 	}
 
 	ChunkPosition TileEntity::getChunk() const {
-		return getChunkPosition(getPosition());
+		return getPosition().getChunk();
 	}
 
 	Game & TileEntity::getGame() const {

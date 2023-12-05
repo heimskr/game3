@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/ChunkPosition.h"
+#include "types/ChunkPosition.h"
 #include "net/Buffer.h"
 #include "packet/Packet.h"
 
