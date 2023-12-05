@@ -151,10 +151,20 @@ namespace Game3 {
 
 	void LivingEntity::kill() {
 		assert(getSide() == Side::Server);
+
+		RealmPtr realm = getRealm();
+
+		for (const ItemStack &stack: getDrops())
+			stack.spawn(realm, getPosition());
+
 		queueDestruction();
 	}
 
 	void LivingEntity::onAttack(const std::shared_ptr<LivingEntity> &) {}
+
+	std::vector<ItemStack> LivingEntity::getDrops() {
+		return {};
+	}
 
 	float LivingEntity::getBaseSpeed() {
 		return 1.5;

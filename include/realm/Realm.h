@@ -159,6 +159,7 @@ namespace Game3 {
 			bool middleEmpty(const Position &);
 			std::optional<Position> getPathableAdjacent(const Position &) const;
 			bool isPathable(const Position &) const;
+			void setPathable(const Position &, bool);
 			bool hasTileEntityAt(const Position &) const;
 			void damageGround(const Position &);
 			Tileset & getTileset();

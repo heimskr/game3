@@ -39,14 +39,9 @@ namespace Game3 {
 		}
 
 		place.set(Layer::Submerged, choose(getTreeTypes()));
-		{
-			std::unique_lock<std::shared_mutex> lock;
-			place.realm->tileProvider.findPathState(place.position, &lock) = 0;
-		}
+		place.realm->setPathable(place.position, false);
 
-		if (--stack.count == 0)
-			inventory->erase(slot);
-		inventory->notifyOwner();
+		inventory->decrease(stack, slot);
 		return true;
 	}
 }

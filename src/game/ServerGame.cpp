@@ -677,6 +677,30 @@ namespace Game3 {
 				return {true, "Rule set."};
 			}
 
+			if (first == "spawn") {
+				if (words.size() != 2)
+					return {false, "Incorrect parameter count."};
+
+				Identifier entity_id;
+				std::string_view name = words[1];
+
+				if (name.find(':') == std::string::npos)
+					entity_id = Identifier("base:entity/" + std::string(name));
+				else
+					entity_id = name;
+
+				auto factory = registry<EntityFactoryRegistry>().maybe(entity_id);
+				if (!factory)
+					return {false, "Unknown entity type."};
+
+				RealmPtr realm = player->getRealm();
+				EntityPtr entity = (*factory)(*this);
+				entity->spawning = true;
+				entity->setRealm(realm);
+				realm->queueEntityInit(std::move(entity), player->getPosition());
+				return {true, ""};
+			}
+
 		} catch (const std::exception &err) {
 			return {false, err.what()};
 		}

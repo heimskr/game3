@@ -876,6 +876,11 @@ namespace Game3 {
 		return false;
 	}
 
+	void Realm::setPathable(const Position &position, bool pathable) {
+		std::unique_lock<std::shared_mutex> lock;
+		tileProvider.findPathState(position, &lock) = pathable;
+	}
+
 	void Realm::updateNeighbors(const Position &position, Layer layer, TileUpdateContext context) {
 		if (updatesPaused || context--.limit == 0)
 			return;
