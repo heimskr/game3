@@ -80,7 +80,7 @@ namespace Game3 {
 				if (!energetic)
 					return true;
 
-				if (energetic->canInsertEnergy(amount, direction))
+				if (energetic->canInsertEnergy(1, direction))
 					accepting_insertions.emplace_back(energetic, direction);
 
 				return false;
