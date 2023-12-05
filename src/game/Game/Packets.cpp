@@ -53,14 +53,17 @@
 #include "packet/TilesetResponsePacket.h"
 #include "packet/RecipeListPacket.h"
 #include "packet/LivingEntityHealthChangedPacket.h"
+#include "packet/UseItemPacket.h"
 
 namespace Game3 {
-	void Game::add(PacketFactory &&factory) {
-		auto shared = std::make_shared<PacketFactory>(std::move(factory));
-		registry<PacketFactoryRegistry>().add(shared->number, shared);
-	}
-
 	void Game::addPacketFactories() {
+		auto &reg = registry<PacketFactoryRegistry>();
+
+		auto add = [&reg](auto &&factory) {
+			auto shared = std::make_shared<PacketFactory>(std::move(factory));
+			reg.add(shared->number, shared);
+		};
+
 		add(PacketFactory::create<ProtocolVersionPacket>());
 		add(PacketFactory::create<TileEntityPacket>());
 		add(PacketFactory::create<ChunkRequestPacket>());
@@ -114,5 +117,6 @@ namespace Game3 {
 		add(PacketFactory::create<TilesetResponsePacket>());
 		add(PacketFactory::create<RecipeListPacket>());
 		add(PacketFactory::create<LivingEntityHealthChangedPacket>());
+		add(PacketFactory::create<UseItemPacket>());
 	}
 }

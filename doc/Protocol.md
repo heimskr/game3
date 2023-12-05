@@ -233,7 +233,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 32. **Continuous Interaction**: tells the server to start or stop continuous interaction.
 
-	- `optional<u8>` Modifiers
+	- `optional<u8>` Modifiers: bitfield (1 = shift, 2 = ctrl, 4 = alt, 8 = super)
 
 	Continuous interaction starts if Modifiers is present, stops if not.
 
@@ -377,6 +377,11 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `u64` Entity global ID
 	- `i32` New health
+
+55. **Use Item**: tells the server to use an item.
+
+	- `i32` Slot
+	- `u8` Modifiers: bitfield (1 = shift, 2 = ctrl, 4 = alt, 8 = super)
 
 # Message Format
 

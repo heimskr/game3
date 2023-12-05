@@ -3,7 +3,6 @@
 #include "types/Position.h"
 #include "net/Buffer.h"
 #include "packet/Packet.h"
-#include "ui/Modifiers.h"
 
 namespace Game3 {
 	struct TilesetRequestPacket: Packet {

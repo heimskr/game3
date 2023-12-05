@@ -7,6 +7,7 @@
 #include "item/Tool.h"
 #include "packet/MoveSlotsPacket.h"
 #include "packet/SetHeldItemPacket.h"
+#include "packet/UseItemPacket.h"
 #include "ui/MainWindow.h"
 #include "ui/gtk/EntryDialog.h"
 #include "ui/gtk/NumericEntry.h"
@@ -24,6 +25,13 @@ namespace Game3 {
 		scrolled.set_vexpand();
 
 		auto group = Gio::SimpleActionGroup::create();
+
+		group->add_action("use", [this] {
+			if (lastGame)
+				lastGame->player->send(UseItemPacket(lastSlot, Modifiers{}));
+			else
+				WARN(__FILE__ << ':' << __LINE__ << ": no lastGame");
+		});
 
 		group->add_action("hold_left", [this] {
 			if (lastGame)
@@ -233,6 +241,7 @@ namespace Game3 {
 	}
 
 	void InventoryTab::gmenuSetup(InventoryModule &, Glib::RefPtr<Gio::Menu> gmenu) {
+		gmenu->append("_Use", "inventory_popup.use");
 		gmenu->append("Hold (_Left)", "inventory_popup.hold_left");
 		gmenu->append("Hold (_Right)", "inventory_popup.hold_right");
 		gmenu->append("_Drop", "inventory_popup.drop");

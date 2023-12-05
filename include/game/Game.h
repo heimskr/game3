@@ -91,7 +91,6 @@ namespace Game3 {
 			void add(EntityFactory &&);
 			void add(TileEntityFactory &&);
 			void add(RealmFactory &&);
-			void add(PacketFactory &&);
 			void add(LocalCommandFactory &&);
 			void add(ModuleFactory &&);
 			void traverseData(const std::filesystem::path &);
