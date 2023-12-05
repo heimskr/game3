@@ -36,7 +36,7 @@ namespace Game3 {
 					if (modifiers.onlyShift())
 						return false;
 
-					inventory->decrease(stack, slot);
+					inventory->decrease(stack, slot, 1, true);
 
 					auto pipe = TileEntity::create<Pipe>(place.position);
 					pipe->setPresent(P, true);
@@ -87,7 +87,7 @@ namespace Game3 {
 				const Direction direction = toDirection(getQuadrant(x, y));
 
 				if (!pipe->getPresent(P)) {
-					inventory->decrease(stack, slot);
+					inventory->decrease(stack, slot, 1, true);
 					pipe->setPresent(P, true);
 					if (!modifiers.onlyCtrl())
 						pipe->autopipe(P);

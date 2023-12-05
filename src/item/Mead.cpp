@@ -8,36 +8,29 @@
 #include "realm/Realm.h"
 
 namespace Game3 {
-	bool Mead::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
-		Realm  &realm  = *place.realm;
-		assert(realm.getSide() == Side::Server);
-		Game   &game   = realm.getGame();
-		Player &player = *place.player;
+	bool Mead::use(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers, std::pair<float, float>) {
+		RealmPtr realm = place.realm;
+		PlayerPtr player = place.player;
+		Game &game = realm->getGame();
+		assert(game.getSide() == Side::Server);
 
-		if (place.position == player.getPosition()) {
-			// TODO: implement drinking mead
-			return true;
-		}
+		if (place.position == player->getPosition())
+			return use(slot, stack, player, modifiers);
 
-		if (std::optional<FluidTile> tile = realm.tryFluid(place.position); !tile || tile->level == 0) {
+		if (std::optional<FluidTile> tile = realm->tryFluid(place.position); !tile || tile->level == 0) {
 			std::shared_ptr<Fluid> fluid = game.registry<FluidRegistry>().at("base:fluid/mead"_id);
 			if (!fluid)
 				return false;
 
-			realm.setFluid(place.position, FluidTile(fluid->registryID, FluidTile::FULL));
-
-			const InventoryPtr inventory = player.getInventory(0);
-
-			{
-				auto lock = inventory->uniqueLock();
-				if (--stack.count == 0)
-					inventory->erase(slot);
-			}
-
-			inventory->notifyOwner();
+			realm->setFluid(place.position, FluidTile(fluid->registryID, FluidTile::FULL));
+			player->getInventory(0)->decrease(stack, slot, 1, true);
 			return true;
 		}
 
 		return false;
+	}
+
+	HitPoints Mead::getHealedPoints(const PlayerPtr &player) {
+		return (player->getMaxHealth() - player->getHealth()) / 4;
 	}
 }

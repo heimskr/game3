@@ -1,12 +1,15 @@
 #pragma once
 
-#include "item/Item.h"
+#include "item/Food.h"
 
 namespace Game3 {
-	class Mead: public Item {
+	class Mead: public Food {
 		public:
-			using Item::Item;
+			using Food::Food;
 
 			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
+			HitPoints getHealedPoints(const std::shared_ptr<Player> &) override;
+
+			using Food::use;
 	};
 }

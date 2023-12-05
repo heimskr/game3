@@ -111,7 +111,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool Item::use(Slot, ItemStack &, Modifiers) {
+	bool Item::use(Slot, ItemStack &, const PlayerPtr &, Modifiers) {
 		return false;
 	}
 

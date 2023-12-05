@@ -29,7 +29,7 @@ namespace Game3 {
 		if (stack.count < requiredCount)
 			return false;
 
-		player->getInventory(0)->decrease(stack, slot, requiredCount);
+		player->getInventory(0)->decrease(stack, slot, requiredCount, true);
 		place.set(layer, layer == Layer::Objects? objectsName : terrainName);
 		return true;
 	}

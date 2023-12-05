@@ -79,7 +79,7 @@ namespace Game3 {
 			virtual ItemCount insertable(const ItemStack &, Slot) const = 0;
 
 			/** Does notify the owner. */
-			virtual bool decrease(ItemStack &, Slot, ItemCount amount = 1);
+			virtual bool decrease(ItemStack &, Slot, ItemCount amount, bool do_lock);
 
 			/** Removes an item from the inventory and drops it at the owner's location. */
 			virtual void drop(Slot) = 0;

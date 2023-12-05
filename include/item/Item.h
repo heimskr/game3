@@ -59,7 +59,7 @@ namespace Game3 {
 			virtual bool use(Slot, ItemStack &, const Place &, Modifiers, Hand hand);
 
 			/** Called when the user uses the item via the context menu or via a keyboard shortcut. Returns true iff propagation should stop. */
-			virtual bool use(Slot, ItemStack &, Modifiers);
+			virtual bool use(Slot, ItemStack &, const std::shared_ptr<Player> &, Modifiers);
 
 			virtual bool drag(Slot, ItemStack &, const Place &, Modifiers);
 

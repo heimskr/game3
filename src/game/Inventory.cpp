@@ -78,15 +78,20 @@ namespace Game3 {
 		return *this;
 	}
 
-	bool Inventory::decrease(ItemStack &stack, Slot slot, ItemCount amount) {
+	bool Inventory::decrease(ItemStack &stack, Slot slot, ItemCount amount, bool do_lock) {
+		auto lock = do_lock? uniqueLock() : std::unique_lock<DefaultMutex>{};
+
 		if (stack.count < amount)
 			throw std::runtime_error("Can't decrease stack count " + std::to_string(stack.count) + " by " + std::to_string(amount));
+
 		stack.count -= amount;
+
 		bool erased = false;
 		if (stack.count == 0) {
 			erase(slot);
 			erased = true;
 		}
+
 		notifyOwner();
 		return erased;
 	}

@@ -107,11 +107,19 @@ namespace Game3 {
 		return luckStat;
 	}
 
-	void LivingEntity::setHealth(HitPoints new_health) {
+	bool LivingEntity::setHealth(HitPoints new_health) {
+		new_health = std::min(getMaxHealth(), new_health);
+		const bool changed = new_health != health;
 		health = new_health;
 
 		if (getSide() == Side::Server)
 			game->toServer().broadcast(LivingEntityHealthChangedPacket(*this));
+
+		return changed;
+	}
+
+	bool LivingEntity::heal(HitPoints to_heal) {
+		return setHealth(health + to_heal);
 	}
 
 	bool LivingEntity::takeDamage(HitPoints damage) {

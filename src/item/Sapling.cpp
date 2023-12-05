@@ -33,6 +33,7 @@ namespace Game3 {
 
 	bool Sapling::plant(InventoryPtr inventory, Slot slot, ItemStack &stack, const Place &place) {
 		if (stack.count == 0) {
+			auto lock = inventory->uniqueLock();
 			inventory->erase(slot);
 			inventory->notifyOwner();
 			return false;
@@ -41,7 +42,7 @@ namespace Game3 {
 		place.set(Layer::Submerged, choose(getTreeTypes()));
 		place.realm->setPathable(place.position, false);
 
-		inventory->decrease(stack, slot);
+		inventory->decrease(stack, slot, 1, true);
 		return true;
 	}
 }

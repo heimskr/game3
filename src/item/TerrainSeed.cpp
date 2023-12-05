@@ -26,11 +26,7 @@ namespace Game3 {
 			match = tileset[*tile] == targetTilename;
 
 		if (match) {
-			const InventoryPtr inventory = place.player->getInventory(0);
-			{
-				auto inventory_lock = inventory->uniqueLock();
-				inventory->decrease(stack, slot);
-			}
+			place.player->getInventory(0)->decrease(stack, slot, 1, true);
 			place.set(Layer::Terrain, replacementTilename);
 			return true;
 		}

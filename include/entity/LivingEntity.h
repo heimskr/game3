@@ -22,7 +22,11 @@ namespace Game3 {
 			virtual bool canShowHealthBar() const;
 			virtual int getDefense() const;
 			virtual double getLuck() const;
-			virtual void setHealth(HitPoints);
+			virtual HitPoints getHealth() const { return health; }
+			/** Returns whether the health actually changed. */
+			virtual bool setHealth(HitPoints);
+			/** Returns whether the entity was healed at all. */
+			virtual bool heal(HitPoints);
 			/** Returns whether the entity died. */
 			virtual bool takeDamage(HitPoints);
 			virtual void kill();
