@@ -214,7 +214,7 @@ namespace Game3 {
 	typename T::value_type & choose(T &container, R &rng) {
 		if (container.empty())
 			throw std::invalid_argument("Container is empty");
-		return container.at(std::uniform_int_distribution(static_cast<size_t>(0), container.size() - 1)(rng));
+		return container.at(std::uniform_int_distribution<size_t>(0, container.size() - 1)(rng));
 	}
 
 	// Here be ugly duplication

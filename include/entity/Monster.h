@@ -16,8 +16,12 @@ namespace Game3 {
 			void onAttack(const std::shared_ptr<LivingEntity> &) override;
 
 		protected:
-			float timeSinceAttack = 0;
+			// Synchronized
 			GlobalID targetGID = -1;
+
+			// Not synchronized
+			float timeSinceAttack = 0;
+			float timeSinceSearch = 0;
 			std::weak_ptr<LivingEntity> weakTarget;
 
 			Monster();
@@ -26,9 +30,11 @@ namespace Game3 {
 			virtual int getVariability() const = 0;
 			virtual float getAttackPeriod() const = 0;
 			virtual float getPatience() const;
+			virtual uint64_t getSearchRadius() const;
 
 			std::shared_ptr<LivingEntity> getTarget();
-			bool isAttacking();
+			void setTarget(const std::shared_ptr<LivingEntity> &);
+			bool hasTarget();
 			void giveUp();
 			bool isNearTarget();
 			bool isFacingTarget();
@@ -36,5 +42,6 @@ namespace Game3 {
 			void followTarget();
 			bool tryAttack();
 			void attack(const std::shared_ptr<LivingEntity> &);
+			void search();
 	};
 }

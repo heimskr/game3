@@ -569,6 +569,30 @@ namespace Game3 {
 		return out;
 	}
 
+	std::vector<EntityPtr> Realm::findEntitiesSquare(const Position &position, uint64_t radius, const std::function<bool(const EntityPtr &)> &filter) {
+		if (radius == 1)
+			return findEntities(position);
+
+		if (radius == 0)
+			return {};
+
+		std::vector<EntityPtr> out;
+
+		const Position offset(radius - 1, radius - 1);
+		ChunkRange((position - offset).getChunk(), (position + offset).getChunk()).iterate([this, &out, &filter, position, radius](ChunkPosition chunk_position) {
+			EntitySet entity_set = getEntities(chunk_position);
+			if (!entity_set)
+				return;
+
+			auto lock = entity_set->sharedLock();
+			for (const EntityPtr &entity: *entity_set)
+				if (entity->position.copyBase().maximumAxisDistance(position) < radius && filter(entity))
+					out.push_back(entity);
+		});
+
+		return out;
+	}
+
 	std::vector<EntityPtr> Realm::findEntities(const Position &position, const EntityPtr &except) {
 		std::vector<EntityPtr> out;
 		auto lock = entities.sharedLock();

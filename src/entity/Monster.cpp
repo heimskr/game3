@@ -2,6 +2,9 @@
 #include "entity/Monster.h"
 #include "game/ServerGame.h"
 #include "realm/Realm.h"
+#include "threading/ThreadContext.h"
+#include "util/Cast.h"
+#include "util/Util.h"
 
 #include <cassert>
 
@@ -9,6 +12,8 @@ namespace Game3 {
 	namespace {
 		constexpr float PATIENCE = 10.f;
 		constexpr HitPoints MAX_HEALTH = 30;
+		constexpr float SEARCH_PERIOD = 1;
+		constexpr uint64_t SEARCH_RADIUS = 8;
 	}
 
 	Monster::Monster():
@@ -17,13 +22,19 @@ namespace Game3 {
 	void Monster::tick(Game &game, float delta) {
 		Entity::tick(game, delta);
 
-		if (!isAttacking())
+		if (getSide() != Side::Server)
 			return;
 
-		timeSinceAttack += delta;
+		if (hasTarget()) {
+			timeSinceAttack += delta;
 
-		if (!tryAttack() && getPatience() < timeSinceAttack)
-			giveUp();
+			if (!tryAttack() && getPatience() < timeSinceAttack)
+				giveUp();
+		} else {
+			timeSinceSearch += delta;
+			if (SEARCH_PERIOD <= timeSinceSearch)
+				search();
+		}
 	}
 
 	void Monster::encode(Buffer &buffer) {
@@ -43,15 +54,21 @@ namespace Game3 {
 	}
 
 	void Monster::onAttack(const std::shared_ptr<LivingEntity> &attacker) {
-		weakTarget = attacker;
-		targetGID = attacker->getGID();
+		setTarget(attacker);
 	}
 
 	float Monster::getPatience() const {
 		return PATIENCE;
 	}
 
+	uint64_t Monster::getSearchRadius() const {
+		return SEARCH_RADIUS;
+	}
+
 	LivingEntityPtr Monster::getTarget() {
+		if (targetGID == GlobalID(-1))
+			return nullptr;
+
 		if (auto locked = weakTarget.lock())
 			return locked;
 
@@ -59,13 +76,19 @@ namespace Game3 {
 		return nullptr;
 	}
 
-	bool Monster::isAttacking() {
+	void Monster::setTarget(const std::shared_ptr<LivingEntity> &new_target) {
+		weakTarget = new_target;
+		targetGID = new_target->getGID();
+	}
+
+	bool Monster::hasTarget() {
 		return getTarget() != nullptr;
 	}
 
 	void Monster::giveUp() {
 		weakTarget.reset();
 		targetGID = -1;
+		timeSinceSearch = 0;
 	}
 
 	bool Monster::isNearTarget() {
@@ -182,6 +205,20 @@ namespace Game3 {
 		const HitPoints damage = calculateDamage(getBaseDamage(), getVariability(), getLuck());
 		if (to_attack->takeDamage(damage))
 			giveUp();
-		timeSinceAttack = 0.f;
+		timeSinceAttack = 0;
+	}
+
+	void Monster::search() {
+		timeSinceSearch = 0;
+		RealmPtr realm = getRealm();
+
+		std::vector<EntityPtr> in_range = realm->findEntitiesSquare(getPosition(), getSearchRadius(), [](const EntityPtr &entity) {
+			return entity->isPlayer();
+		});
+
+		if (in_range.empty())
+			return;
+
+		setTarget(safeDynamicCast<LivingEntity>(choose(in_range, threadContext.rng)));
 	}
 }

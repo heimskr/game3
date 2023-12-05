@@ -124,6 +124,7 @@ namespace Game3 {
 			std::vector<EntityPtr> findEntities(const Position &);
 			/** The side length of the square is equal to 2*radius-1; i.e., a radius of 1 corresponds to a single tile. */
 			std::vector<EntityPtr> findEntitiesSquare(const Position &, uint64_t radius);
+			std::vector<EntityPtr> findEntitiesSquare(const Position &, uint64_t radius, const std::function<bool(const EntityPtr &)> &filter);
 			std::vector<EntityPtr> findEntities(const Position &, const EntityPtr &except);
 			EntityPtr findEntity(const Position &);
 			EntityPtr findEntity(const Position &, const EntityPtr &except);
