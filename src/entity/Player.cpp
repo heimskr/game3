@@ -176,7 +176,7 @@ namespace Game3 {
 		bool interesting = false;
 
 		if (hand != Hand::None && used_item) {
-			used_item->item->use(getHeldSlot(hand), *used_item, getPlace(), modifiers, {0.f, 0.f}, hand);
+			used_item->item->use(getHeldSlot(hand), *used_item, getPlace(), modifiers, hand);
 			return;
 		}
 

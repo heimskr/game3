@@ -17,7 +17,7 @@ namespace Game3 {
 			objectsName = terrainName;
 	}
 
-	bool Landfill::use(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers, std::pair<float, float>, Hand) {
+	bool Landfill::use(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers, std::pair<float, float>) {
 		PlayerPtr player = place.player;
 		RealmPtr  realm  = place.realm;
 
@@ -35,7 +35,7 @@ namespace Game3 {
 	}
 
 	bool Landfill::drag(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers) {
-		return use(slot, stack, place, modifiers, {0.f, 0.f}, Hand::None);
+		return use(slot, stack, place, modifiers, {0.f, 0.f});
 	}
 
 	bool Landfill::canUseOnWorld() const {

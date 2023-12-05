@@ -10,7 +10,7 @@
 #include "tileentity/Building.h"
 
 namespace Game3 {
-	bool Hammer::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>, Hand) {
+	bool Hammer::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		auto &realm = *place.realm;
 
 		if (auto building = std::dynamic_pointer_cast<Building>(realm.tileEntityAt(place.position)); building && building->tileID == "base:tile/cave"_id) {

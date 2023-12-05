@@ -9,7 +9,7 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	bool Sapling::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>, Hand) {
+	bool Sapling::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		Player &player = *place.player;
 		Realm &realm = *place.realm;
 		assert(realm.getSide() == Side::Server);
@@ -28,7 +28,7 @@ namespace Game3 {
 	}
 
 	bool Sapling::drag(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers) {
-		return use(slot, stack, place, modifiers, {0.f, 0.f}, Hand::None);
+		return use(slot, stack, place, modifiers, {0.f, 0.f});
 	}
 
 	bool Sapling::plant(InventoryPtr inventory, Slot slot, ItemStack &stack, const Place &place) {

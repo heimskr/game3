@@ -10,7 +10,7 @@ namespace Game3 {
 	Hoe::Hoe(ItemID id_, std::string name_, MoneyCount base_price, Durability max_durability):
 		Tool(id_, std::move(name_), base_price, 0.f, max_durability, "base:attribute/hoe"_id) {}
 
-	bool Hoe::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>, Hand) {
+	bool Hoe::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		Realm &realm = *place.realm;
 		Tileset &tileset = realm.getTileset();
 
@@ -26,6 +26,6 @@ namespace Game3 {
 	}
 
 	bool Hoe::drag(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers) {
-		return use(slot, stack, place, modifiers, {0.f, 0.f}, Hand::None);
+		return use(slot, stack, place, modifiers, {0.f, 0.f});
 	}
 }

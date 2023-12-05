@@ -14,7 +14,7 @@ namespace Game3 {
 		return true;
 	}
 
-	bool Furniture::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>, Hand) {
+	bool Furniture::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		if (!preCheck(place))
 			return false;
 
@@ -31,7 +31,7 @@ namespace Game3 {
 	}
 
 	bool Furniture::drag(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers) {
-		return use(slot, stack, place, modifiers, {0.f, 0.f}, Hand::None);
+		return use(slot, stack, place, modifiers, {0.f, 0.f});
 	}
 
 	std::shared_ptr<Furniture> Furniture::createSimple(ItemID id, std::string name, MoneyCount base_price, Layer layer, Identifier tilename) {

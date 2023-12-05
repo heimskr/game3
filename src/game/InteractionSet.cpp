@@ -31,7 +31,7 @@ namespace Game3 {
 
 		if (!used_item) {
 			if (ItemStack *active = get_active()) {
-				if (active->item->canUseOnWorld() && active->item->use(inventory->activeSlot, *active, place, modifiers, {0.f, 0.f}, hand))
+				if (active->item->canUseOnWorld() && active->item->use(inventory->activeSlot, *active, place, modifiers, {0.f, 0.f}))
 					return true;
 
 				if (active->hasAttribute("base:attribute/shovel"_id)) {
@@ -43,7 +43,7 @@ namespace Game3 {
 					}
 				}
 			}
-		} else if (used_item->item->use(player.getHeldSlot(hand), *used_item, place, modifiers, {0.f, 0.f}, hand)) {
+		} else if (used_item->item->use(player.getHeldSlot(hand), *used_item, place, modifiers, hand)) {
 			return true;
 		}
 

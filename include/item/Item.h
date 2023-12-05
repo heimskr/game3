@@ -52,8 +52,14 @@ namespace Game3 {
 
 			virtual void initStack(const Game &, ItemStack &) {}
 
-			/** Returns true iff propagation should stop. */
-			virtual bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float> offsets, Hand);
+			/** Called when the user clicks on a tile with the item selected. Returns true iff propagation should stop. */
+			virtual bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float> offsets);
+
+			/** Called when the user uses a held item via a keyboard shortcut. Returns true iff propagation should stop. */
+			virtual bool use(Slot, ItemStack &, const Place &, Modifiers, Hand hand);
+
+			/** Called when the user uses the item via the context menu or via a keyboard shortcut. Returns true iff propagation should stop. */
+			virtual bool use(Slot, ItemStack &, Modifiers);
 
 			virtual bool drag(Slot, ItemStack &, const Place &, Modifiers);
 
