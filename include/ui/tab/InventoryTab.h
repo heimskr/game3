@@ -53,6 +53,7 @@ namespace Game3 {
 			GlobalID getExternalGID() const;
 
 			void slotClicked(Slot, bool is_right_click, Modifiers) override;
+			void slotDoubleClicked(Slot) override;
 			bool suppressLeftClick() const override { return true; }
 			void activeSlotSet();
 

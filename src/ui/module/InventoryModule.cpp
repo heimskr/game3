@@ -148,8 +148,8 @@ namespace Game3 {
 			if (ItemStack *stack = (*inventory)[slot])
 				item_slot->setStack(*stack);
 
-			item_slot->setLeftClick([this, slot](Modifiers modifiers, int, double, double) {
-				leftClick(slot, modifiers);
+			item_slot->setLeftClick([this, slot](Modifiers modifiers, int count, double, double) {
+				leftClick(slot, modifiers, count);
 			});
 
 			item_slot->setGmenu(gmenu);
@@ -181,9 +181,12 @@ namespace Game3 {
 		}
 	}
 
-	void InventoryModule::leftClick(Slot slot, Modifiers modifiers) {
-		if (!game || !modifiers.onlyShift() || (parent && parent->suppressLeftClick()) || !inventory->contains(slot))
+	void InventoryModule::leftClick(Slot slot, Modifiers modifiers, int count) {
+		if (!game || !modifiers.onlyShift() || (parent && parent->suppressLeftClick()) || !inventory->contains(slot)) {
+			if (count % 2 == 0)
+				parent->slotDoubleClicked(slot);
 			return;
+		}
 
 		InventoryPtr player_inventory = game->player->getInventory(0);
 		if (!player_inventory)

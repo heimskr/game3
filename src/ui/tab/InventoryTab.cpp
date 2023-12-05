@@ -178,6 +178,28 @@ namespace Game3 {
 		}
 	}
 
+	void InventoryTab::slotDoubleClicked(Slot slot) {
+		InventoryPtr inventory;
+		PlayerPtr player;
+		{
+			auto game_lock = lastGame.sharedLock();
+			if (!lastGame)
+				return;
+			auto player_lock = lastGame->player.sharedLock();
+			player = lastGame->player;
+			if (player)
+				inventory = player->getInventory(0);
+		}
+
+		{
+			auto lock = inventory->sharedLock();
+			if (!inventory->contains(slot))
+				return;
+		}
+
+		player->send(UseItemPacket(slot, Modifiers{}));
+	}
+
 	void InventoryTab::activeSlotSet() {
 		updatePlayerClasses(lastGame);
 	}

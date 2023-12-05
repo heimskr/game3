@@ -8,6 +8,7 @@ namespace Game3 {
 		virtual ~ItemSlotParent() = default;
 
 		virtual void slotClicked(Slot, bool is_right_click, Modifiers) = 0;
+		virtual void slotDoubleClicked(Slot) {}
 		virtual bool suppressLeftClick() const { return false; }
 	};
 }

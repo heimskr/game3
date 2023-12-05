@@ -66,6 +66,6 @@ namespace Game3 {
 			int gridWidth() const;
 			void populate();
 			void repopulate();
-			void leftClick(Slot, Modifiers);
+			void leftClick(Slot, Modifiers, int count);
 	};
 }
