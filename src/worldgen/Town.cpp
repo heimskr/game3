@@ -143,6 +143,7 @@ namespace Game3::WorldGen {
 		keep_realm->outdoors = false;
 		game.addRealm(keep_realm_id, keep_realm);
 		WorldGen::generateKeep(keep_realm, rng, realm->id, keep_width, keep_height, keep_exit);
+		keep_realm->remakePathMap(ChunkRange({-1, -1}, {1, 1}));
 
 		auto create_keep = [&](const Identifier &tilename) {
 			realm->setTile(Layer::Objects, keep_position, tilename, false);
