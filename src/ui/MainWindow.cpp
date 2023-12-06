@@ -17,6 +17,7 @@
 #include "net/NetError.h"
 #include "packet/ContinuousInteractionPacket.h"
 #include "packet/LoginPacket.h"
+#include "packet/SetHeldItemPacket.h"
 #include "realm/Overworld.h"
 #include "ui/gtk/CommandDialog.h"
 #include "ui/gtk/ConnectDialog.h"
@@ -40,10 +41,13 @@
 // #define USE_CBOR
 
 namespace Game3 {
-	static std::chrono::milliseconds arrowTime {100};
-	static std::chrono::milliseconds interactTime {250};
-	static std::chrono::milliseconds jumpTime {50};
-	static std::chrono::milliseconds slowTime {1000};
+	namespace {
+		constexpr std::chrono::milliseconds arrowTime {100};
+		constexpr std::chrono::milliseconds interactTime {250};
+		constexpr std::chrono::milliseconds jumpTime {50};
+		constexpr std::chrono::milliseconds slowTime {1000};
+	}
+
 	std::unordered_map<guint, std::chrono::milliseconds> MainWindow::customKeyRepeatTimes {
 		{GDK_KEY_Up,           arrowTime},
 		{GDK_KEY_Down,         arrowTime},
@@ -69,6 +73,8 @@ namespace Game3 {
 		{GDK_KEY_7,            slowTime},
 		{GDK_KEY_8,            slowTime},
 		{GDK_KEY_9,            slowTime},
+		{GDK_KEY_braceleft,    slowTime},
+		{GDK_KEY_braceright,   slowTime},
 	};
 
 	MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &builder_):
@@ -771,6 +777,10 @@ namespace Game3 {
 					return;
 				case GDK_KEY_bracketright:
 					game->interactNextTo(Modifiers(modifiers) | Modifiers(true, false, false, false), Hand::Right);
+					return;
+				case GDK_KEY_braceleft:
+				case GDK_KEY_braceright:
+					player.send(SetHeldItemPacket(keyval == GDK_KEY_braceleft, player.getActiveSlot()));
 					return;
 				case GDK_KEY_R:
 					game->interactOn(Modifiers(modifiers) | Modifiers(true, false, false, false));

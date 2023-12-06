@@ -1100,6 +1100,12 @@ namespace Game3 {
 		}
 	}
 
+	Slot Entity::getActiveSlot() const {
+		InventoryPtr inventory = getInventory(0);
+		auto lock = inventory->sharedLock();
+		return inventory->activeSlot;
+	}
+
 	void Entity::changeTexture(const Identifier &identifier) {
 		Game &game_ref = getGame();
 		auto entity_texture = game_ref.registry<EntityTextureRegistry>().at(identifier);
