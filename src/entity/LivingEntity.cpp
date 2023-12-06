@@ -112,8 +112,12 @@ namespace Game3 {
 		const bool changed = new_health != health;
 		health = new_health;
 
-		if (getSide() == Side::Server)
-			game->toServer().broadcast(LivingEntityHealthChangedPacket(*this));
+		if (getSide() == Side::Server) {
+			if (health <= 0)
+				kill();
+			else
+				game->toServer().broadcast(LivingEntityHealthChangedPacket(*this));
+		}
 
 		return changed;
 	}
