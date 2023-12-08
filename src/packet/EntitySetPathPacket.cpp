@@ -20,7 +20,14 @@ namespace Game3 {
 		}
 
 		if (entity->position.copyBase() != position) {
+			const Position current_position = entity->getPosition();
+
+			Vector3 offset = entity->offset.copyBase();
+			offset.x += current_position.column - position.column;
+			offset.y += current_position.row - position.row;
+
 			entity->teleport(position, MovementContext{
+				.forcedOffset = offset,
 				.isTeleport = true
 			});
 		}

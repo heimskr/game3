@@ -22,6 +22,7 @@ namespace Game3 {
 			// Not synchronized
 			float timeSinceAttack = 0;
 			float timeSinceSearch = 0;
+			float timeSinceAdjustment = 0;
 			std::weak_ptr<LivingEntity> weakTarget;
 
 			Monster();

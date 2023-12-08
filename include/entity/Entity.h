@@ -78,6 +78,7 @@ namespace Game3 {
 			Atomic<bool> firstTeleport = false;
 			Atomic<RealmID> inLimboFor{0};
 			Identifier customTexture;
+			Lockable<std::optional<Position>> pathfindGoal;
 
 			virtual void destroy();
 
@@ -167,6 +168,7 @@ namespace Game3 {
 			ItemStack * getHeld(Hand) const;
 			Slot getHeldSlot(Hand) const;
 			Slot getActiveSlot() const;
+			bool isOffsetZero() const;
 
 			virtual void encode(Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */

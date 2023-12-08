@@ -14,6 +14,7 @@ namespace Game3 {
 		constexpr HitPoints MAX_HEALTH = 30;
 		constexpr float SEARCH_PERIOD = 1;
 		constexpr uint64_t SEARCH_RADIUS = 8;
+		constexpr float ADJUSTMENT_PERIOD = 1;
 	}
 
 	Monster::Monster():
@@ -27,6 +28,21 @@ namespace Game3 {
 
 		if (hasTarget()) {
 			timeSinceAttack += delta;
+
+			LivingEntityPtr target = getTarget();
+
+			if (std::optional<Position> goal = pathfindGoal.copyBase(); goal && target) {
+				if (*goal != target->getPosition()) {
+					path = {};
+					timeSinceAdjustment += delta;
+					if (ADJUSTMENT_PERIOD <= timeSinceAdjustment) {
+						timeSinceAdjustment = 0;
+						followTarget();
+					}
+				} else {
+					timeSinceAdjustment = 0;
+				}
+			}
 
 			if (!tryAttack() && getPatience() < timeSinceAttack)
 				giveUp();

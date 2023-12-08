@@ -538,7 +538,9 @@ namespace Game3 {
 
 		position = new_position;
 
-		if (firstTeleport)
+		if (context.forcedOffset)
+			offset = *context.forcedOffset;
+		else if (firstTeleport)
 			offset = Vector3{0.f, 0.f, 0.f};
 		else if (context.clearOffset)
 			offset = Vector3{0.f, 0.f, offset.z};
@@ -649,6 +651,7 @@ namespace Game3 {
 				throw std::runtime_error("Invalid path offset: " + std::string(next - prev));
 		}
 
+		pathfindGoal = goal;
 		return PathResult::Success;
 	}
 
@@ -1106,6 +1109,12 @@ namespace Game3 {
 		InventoryPtr inventory = getInventory(0);
 		auto lock = inventory->sharedLock();
 		return inventory->activeSlot;
+	}
+
+	bool Entity::isOffsetZero() const {
+		constexpr static float EPSILON = 0.001f;
+		auto lock = offset.sharedLock();
+		return offset.x < EPSILON && offset.y < EPSILON && offset.z < EPSILON;
 	}
 
 	void Entity::changeTexture(const Identifier &identifier) {
