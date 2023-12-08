@@ -26,9 +26,9 @@ namespace Game3 {
 			HitPoints getBaseDamage() const override { return 2; }
 			int getVariability() const override { return 1; }
 			float getAttackPeriod() const override { return 1.f; }
-			// std::vector<ItemStack> getDrops() override {
-			// 	return {ItemStack{getGame(), "base:item/eye"}};
-			// }
+			std::vector<ItemStack> getDrops() override {
+				return {ItemStack{getGame(), "base:item/eye"}};
+			}
 
 		protected:
 			Eye():
