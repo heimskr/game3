@@ -32,6 +32,7 @@ namespace Game3 {
 			virtual float getAttackPeriod() const = 0;
 			virtual float getPatience() const;
 			virtual uint64_t getSearchRadius() const;
+			virtual uint64_t getTenacity() const;
 
 			std::shared_ptr<LivingEntity> getTarget();
 			void setTarget(const std::shared_ptr<LivingEntity> &);

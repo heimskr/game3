@@ -11,10 +11,11 @@
 namespace Game3 {
 	namespace {
 		constexpr float PATIENCE = 10.f;
-		constexpr HitPoints MAX_HEALTH = 30;
 		constexpr float SEARCH_PERIOD = 1;
-		constexpr uint64_t SEARCH_RADIUS = 8;
 		constexpr float ADJUSTMENT_PERIOD = 0.5;
+		constexpr uint64_t SEARCH_RADIUS = 8;
+		constexpr uint64_t TENACITY = 16;
+		constexpr HitPoints MAX_HEALTH = 30;
 	}
 
 	Monster::Monster():
@@ -36,7 +37,7 @@ namespace Game3 {
 				if (*goal != target_position) {
 					path = {};
 					timeSinceAdjustment += delta;
-					if (target_position.taxiDistance(getPosition()) > SEARCH_RADIUS) {
+					if (target_position.taxiDistance(getPosition()) > getTenacity()) {
 						giveUp();
 					} else if (ADJUSTMENT_PERIOD <= timeSinceAdjustment) {
 						timeSinceAdjustment = 0;
@@ -82,6 +83,10 @@ namespace Game3 {
 
 	uint64_t Monster::getSearchRadius() const {
 		return SEARCH_RADIUS;
+	}
+
+	uint64_t Monster::getTenacity() const {
+		return TENACITY;
 	}
 
 	LivingEntityPtr Monster::getTarget() {
