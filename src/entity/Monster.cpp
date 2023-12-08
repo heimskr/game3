@@ -14,7 +14,7 @@ namespace Game3 {
 		constexpr HitPoints MAX_HEALTH = 30;
 		constexpr float SEARCH_PERIOD = 1;
 		constexpr uint64_t SEARCH_RADIUS = 8;
-		constexpr float ADJUSTMENT_PERIOD = 0.2;
+		constexpr float ADJUSTMENT_PERIOD = 0.5;
 	}
 
 	Monster::Monster():
@@ -36,12 +36,11 @@ namespace Game3 {
 				if (*goal != target_position) {
 					path = {};
 					timeSinceAdjustment += delta;
-					if (ADJUSTMENT_PERIOD <= timeSinceAdjustment) {
+					if (target_position.taxiDistance(getPosition()) > SEARCH_RADIUS) {
+						giveUp();
+					} else if (ADJUSTMENT_PERIOD <= timeSinceAdjustment) {
 						timeSinceAdjustment = 0;
-						if (target_position.taxiDistance(getPosition()) > SEARCH_RADIUS)
-							giveUp();
-						else
-							followTarget();
+						followTarget();
 					}
 				} else {
 					timeSinceAdjustment = 0;
@@ -109,6 +108,7 @@ namespace Game3 {
 		weakTarget.reset();
 		targetGID = -1;
 		timeSinceSearch = 0;
+		timeSinceAdjustment = 0;
 	}
 
 	bool Monster::isNearTarget() {
