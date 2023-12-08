@@ -215,12 +215,17 @@ namespace Game3 {
 
 		sprite_renderer.renderNow();
 
+		std::set<EntityPtr, EntityZCompare> rendered_entities;
+
 		ChunkRange(client_game.player->getChunk()).iterate([&](ChunkPosition chunk_position) {
 			if (auto entities_in_chunk = getEntities(chunk_position)) {
 				auto lock = entities_in_chunk->sharedLock();
-				for (const EntityPtr &entity: *entities_in_chunk)
-					if (entity != client_game.player)
+				for (const EntityPtr &entity: *entities_in_chunk) {
+					if (entity != client_game.player) {
+						rendered_entities.insert(entity);
 						entity->render(renderers);
+					}
+				}
 			}
 		});
 
@@ -243,6 +248,10 @@ namespace Game3 {
 				tile_entity->renderUpper(sprite_renderer);
 		}
 
+		for (const EntityPtr &entity: rendered_entities)
+			entity->renderUpper(renderers);
+
+		client_game.player->renderUpper(renderers);
 		sprite_renderer.renderNow();
 	}
 

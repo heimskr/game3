@@ -10,7 +10,6 @@ namespace Game3 {
 
 	void RealmNoticePacket::handle(ClientGame &game) {
 		if (!game.hasRealm(realmID)) {
-			INFO("Adding realm " << realmID << " of type " << type << " with tileset " << tileset);
 			auto realm = Realm::create(game, realmID, type, tileset, seed);
 			realm->outdoors = outdoors;
 			game.addRealm(realmID, realm);

@@ -35,8 +35,8 @@ namespace Game3 {
 			luckStat = *iter;
 	}
 
-	void LivingEntity::render(const RendererSet &renderers) {
-		Entity::render(renderers);
+	void LivingEntity::renderUpper(const RendererSet &renderers) {
+		Entity::renderUpper(renderers);
 
 		if (!canShowHealthBar())
 			return;
