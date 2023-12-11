@@ -27,7 +27,9 @@ namespace Game3 {
 			int getVariability() const override { return 1; }
 			float getAttackPeriod() const override { return 1.f; }
 			std::vector<ItemStack> getDrops() override {
-				return {ItemStack{getGame(), "base:item/eye"}};
+				std::vector<ItemStack> out = Monster::getDrops();
+				out.emplace_back(getGame(), "base:item/eye");
+				return out;
 			}
 
 		protected:

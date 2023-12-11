@@ -46,22 +46,23 @@ namespace Game3 {
 
 		add(std::make_shared<AutofarmerItem>("base:item/autofarmer", "Autofarmer", 999, 64)); // TODO: cost
 
-		add(std::make_shared<BasicFood>("base:item/tomato",      "Tomato",       8));
-		add(std::make_shared<BasicFood>("base:item/corn",        "Corn",         8));
-		add(std::make_shared<BasicFood>("base:item/pumpkin",     "Pumpkin",      8));
-		add(std::make_shared<BasicFood>("base:item/carrot",      "Carrot",       8));
-		add(std::make_shared<BasicFood>("base:item/potato",      "Potato",       8));
-		add(std::make_shared<BasicFood>("base:item/strawberry",  "Strawberry",   8));
-		add(std::make_shared<BasicFood>("base:item/eggplant",    "Eggplant",     8));
-		add(std::make_shared<BasicFood>("base:item/cabbage",     "Cabbage",      8));
-		add(std::make_shared<BasicFood>("base:item/onion",       "Onion",        8));
-		add(std::make_shared<BasicFood>("base:item/bean",        "Bean",         8));
-		add(std::make_shared<BasicFood>("base:item/chili",       "Chili",        9));
-		add(std::make_shared<BasicFood>("base:item/cactus",      "Cactus",       4, -1));
-		add(std::make_shared<BasicFood>("base:item/baguette",    "Baguette",    12,  8));
-		add(std::make_shared<BasicFood>("base:item/bread",       "Bread",        6,  4));
-		add(std::make_shared<BasicFood>("base:item/cheese",      "Cheese",       8, 10));
-		add(std::make_shared<BasicFood>("base:item/chili_crisp", "Chili Crisp", 32, 10));
+		add(std::make_shared<BasicFood>("base:item/tomato",      "Tomato",          8));
+		add(std::make_shared<BasicFood>("base:item/corn",        "Corn",            8));
+		add(std::make_shared<BasicFood>("base:item/pumpkin",     "Pumpkin",         8));
+		add(std::make_shared<BasicFood>("base:item/carrot",      "Carrot",          8));
+		add(std::make_shared<BasicFood>("base:item/potato",      "Potato",          8));
+		add(std::make_shared<BasicFood>("base:item/strawberry",  "Strawberry",      8));
+		add(std::make_shared<BasicFood>("base:item/eggplant",    "Eggplant",        8));
+		add(std::make_shared<BasicFood>("base:item/cabbage",     "Cabbage",         8));
+		add(std::make_shared<BasicFood>("base:item/onion",       "Onion",           8));
+		add(std::make_shared<BasicFood>("base:item/bean",        "Bean",            8));
+		add(std::make_shared<BasicFood>("base:item/chili",       "Chili",           9));
+		add(std::make_shared<BasicFood>("base:item/cactus",      "Cactus",          4, -1));
+		add(std::make_shared<BasicFood>("base:item/baguette",    "Baguette",       24,  8));
+		add(std::make_shared<BasicFood>("base:item/bread",       "Bread",          12,  4));
+		add(std::make_shared<BasicFood>("base:item/cheese",      "Cheese",         32, 10));
+		add(std::make_shared<BasicFood>("base:item/chili_crisp", "Chili Crisp",    32, 10));
+		add(std::make_shared<BasicFood>("base:item/morsel",      "Monster Morsel", 10,  2));
 
 		add(std::make_shared<Bomb>("base:item/bomb", "Bomb", 32, 64));
 
