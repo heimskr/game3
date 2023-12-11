@@ -25,6 +25,9 @@ namespace Game3 {
 
 			virtual bool canSpawnMonsters(const Place &) const;
 
+			/** Should be between 0 and 1 (inclusive). */
+			virtual float getMonsterSpawnProbability() const;
+
 		private:
 			Lockable<std::optional<std::vector<std::shared_ptr<EntityFactory>>>> monsterFactories;
 

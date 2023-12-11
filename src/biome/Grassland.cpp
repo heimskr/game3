@@ -157,10 +157,6 @@ namespace Game3 {
 				case 7:
 					spawned_entity = realm.spawn<Dog>({row, column});
 					break;
-				case 8:
-				case 9:
-					spawned_entity = realm.spawn<Cyclops>({row, column});
-					break;
 			}
 
 			if (spawned_entity)

@@ -33,6 +33,8 @@ namespace Game3 {
 			virtual float getPatience() const;
 			virtual uint64_t getSearchRadius() const;
 			virtual uint64_t getTenacity() const;
+			virtual bool canDespawn() const;
+			virtual float getMinimumAgeForDespawn() const;
 
 			bool isSpawnableMonster() const override { return true; }
 			std::shared_ptr<LivingEntity> getTarget();

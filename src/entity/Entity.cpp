@@ -80,6 +80,7 @@ namespace Game3 {
 		json["position"]  = position;
 		json["realmID"]   = realmID;
 		json["direction"] = direction;
+		json["age"]       = age;
 		if (const InventoryPtr inventory = getInventory(0)) {
 			// TODO: move JSONification to StorageInventory
 			if (getSide() == Side::Client)
@@ -132,6 +133,8 @@ namespace Game3 {
 			heldRight.slot = *iter;
 		if (auto iter = json.find("customTexture"); iter != json.end())
 			customTexture = *iter;
+		if (auto iter = json.find("age"); iter != json.end())
+			age = *iter;
 
 		increaseUpdateCounter();
 	}
@@ -173,6 +176,9 @@ namespace Game3 {
 			velocity.z = 0;
 		else
 			velocity.z -= 32 * delta;
+
+		// Not all platforms support std::atomic<float>::operator+=.
+		age = age + delta;
 	}
 
 	void Entity::remove() {
@@ -922,6 +928,7 @@ namespace Game3 {
 		buffer << velocity;
 		buffer << path;
 		buffer << money;
+		buffer << age;
 		// TODO: support multiple entity inventories
 		HasInventory::encode(buffer, 0);
 		buffer << heldLeft.slot;
@@ -941,6 +948,7 @@ namespace Game3 {
 		buffer >> velocity;
 		buffer >> path;
 		buffer >> money;
+		buffer >> age;
 		// TODO: support multiple entity inventories
 		HasInventory::decode(buffer, 0);
 		const auto left_slot  = buffer.take<Slot>();

@@ -3,6 +3,7 @@
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "realm/Realm.h"
+#include "threading/ThreadContext.h"
 #include "tile/Tile.h"
 #include "util/Util.h"
 
@@ -34,6 +35,10 @@ namespace Game3 {
 	bool Tile::canSpawnMonsters(const Place &place) const {
 		RealmPtr realm = place.realm;
 
+		// Don't spawn indoors.
+		if (!realm->outdoors)
+			return false;
+
 		// Don't spawn on fluids.
 		if (realm->hasFluid(place.position))
 			return false;
@@ -43,7 +48,15 @@ namespace Game3 {
 			return entity->isPlayer() || std::dynamic_pointer_cast<Monster>(entity);
 		});
 
-		return !any_in_range;
+		if (any_in_range)
+			return false;
+
+		std::uniform_real_distribution<float> distribution(0, 1);
+		return distribution(threadContext.rng) < getMonsterSpawnProbability();
+	}
+
+	float Tile::getMonsterSpawnProbability() const {
+		return 0.1;
 	}
 
 	void Tile::makeMonsterFactories(Game &game) {

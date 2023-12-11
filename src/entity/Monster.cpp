@@ -55,6 +55,9 @@ namespace Game3 {
 			if (SEARCH_PERIOD <= timeSinceSearch)
 				search();
 		}
+
+		if (canDespawn())
+			queueDestruction();
 	}
 
 	void Monster::encode(Buffer &buffer) {
@@ -87,6 +90,26 @@ namespace Game3 {
 
 	uint64_t Monster::getTenacity() const {
 		return TENACITY;
+	}
+
+	bool Monster::canDespawn() const {
+		if (targetGID != GlobalID(-1))
+			return false;
+
+		RealmPtr realm = getRealm();
+
+		const bool in_range = realm->hasEntitiesSquare(getPosition(), getSearchRadius(), [](const EntityPtr &entity) {
+			return entity->isPlayer();
+		});
+
+		if (in_range)
+			return false;
+
+		return getMinimumAgeForDespawn() < age;
+	}
+
+	float Monster::getMinimumAgeForDespawn() const {
+		return 30;
 	}
 
 	LivingEntityPtr Monster::getTarget() {

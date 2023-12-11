@@ -79,6 +79,7 @@ namespace Game3 {
 			Atomic<RealmID> inLimboFor{0};
 			Identifier customTexture;
 			Lockable<std::optional<Position>> pathfindGoal;
+			Atomic<float> age;
 
 			virtual void destroy();
 
