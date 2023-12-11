@@ -55,6 +55,10 @@ namespace Game3 {
 		if (any_in_range)
 			return false;
 
+		const double hour = place.getGame().getHour();
+		if (5. <= hour && hour < 21.)
+			return false;
+
 		std::uniform_real_distribution<float> distribution(0, 1);
 		return distribution(threadContext.rng) < getMonsterSpawnProbability();
 	}
@@ -64,11 +68,12 @@ namespace Game3 {
 	}
 
 	void Tile::makeMonsterFactories(Game &game) {
-		auto shared = monsterFactories.sharedLock();
-		if (monsterFactories)
-			return;
+		{
+			auto shared = monsterFactories.sharedLock();
+			if (monsterFactories)
+				return;
+		}
 
-		shared.unlock();
 		auto unique = monsterFactories.uniqueLock();
 		if (monsterFactories) // Just in case it was somehow made between unlocking the shared lock and acquiring the unique lock.
 			return;
