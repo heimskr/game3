@@ -47,4 +47,9 @@ namespace Game3 {
 
 	template <typename T>
 	concept Numeric = std::integral<T> || std::floating_point<T>;
+
+	template <typename T, typename R, typename... Args>
+	concept Returns = requires(T t, Args &&...args) {
+		requires std::is_same_v<std::invoke_result_t<T, Args...>, R>;
+	};
 }

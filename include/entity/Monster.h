@@ -34,6 +34,7 @@ namespace Game3 {
 			virtual uint64_t getSearchRadius() const;
 			virtual uint64_t getTenacity() const;
 
+			bool isSpawnableMonster() const override { return true; }
 			std::shared_ptr<LivingEntity> getTarget();
 			void setTarget(const std::shared_ptr<LivingEntity> &);
 			bool hasTarget();

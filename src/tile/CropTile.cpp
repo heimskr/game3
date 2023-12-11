@@ -16,6 +16,8 @@ namespace Game3 {
 		Tile(ID()), crop(std::move(crop_)) {}
 
 	void CropTile::randomTick(const Place &place) {
+		Tile::randomTick(place);
+
 		assert(!crop->stages.empty());
 
 		auto &realm = *place.realm;

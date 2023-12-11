@@ -11,6 +11,8 @@ namespace Game3 {
 		Tile(ID()) {}
 
 	void DirtTile::randomTick(const Place &place) {
+		Tile::randomTick(place);
+
 		std::uniform_int_distribution distribution{1, 100};
 		if (distribution(threadContext.rng) <= 50)
 			return;

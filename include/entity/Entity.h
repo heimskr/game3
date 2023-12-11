@@ -105,6 +105,7 @@ namespace Game3 {
 			std::string getName() const override { return "Unknown Entity (" + std::string(type) + ')'; }
 
 			virtual bool isPlayer() const { return false; }
+			virtual bool isSpawnableMonster() const { return false; }
 			/** Removes the entity from existence. */
 			virtual void remove();
 			inline const Position::value_type & getRow()    const { return position.row;    }

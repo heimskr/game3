@@ -12,21 +12,23 @@ namespace Game3 {
 		Tile(ID()) {}
 
 	void GrassTile::randomTick(const Place &place) {
-		auto &realm = *place.realm;
+		Tile::randomTick(place);
+
+		Realm &realm = *place.realm;
 
 		std::uniform_int_distribution distribution{0, 99};
 		if (distribution(threadContext.rng) != 0)
 			return;
 
 		const auto [row, column] = place.position;
-		auto &tileset = realm.getTileset();
+		const Tileset &tileset = realm.getTileset();
 
 		// Don't overwrite existing tiles.
 		if (place.get(Layer::Submerged) != 0)
 			return;
 
 		// If there are any adjacent or overlapping flowers, give up and don't spawn anything.
-		constexpr Index radius = 3;
+		constexpr static Index radius = 3;
 		for (Index y = row - radius; y <= row + radius; ++y)
 			for (Index x = column - radius; x <= column + radius; ++x)
 				if (auto tile_id = realm.tryTile(Layer::Submerged, {y, x}); tile_id && tileset.isInCategory(tileset[*tile_id], "base:category/flowers"))

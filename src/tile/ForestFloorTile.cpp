@@ -47,6 +47,8 @@ namespace Game3 {
 	}
 
 	void ForestFloorTile::randomTick(const Place &place) {
+		Tile::randomTick(place);
+
 		Realm &realm = *place.realm;
 		Game &game = realm.getGame();
 

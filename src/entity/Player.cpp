@@ -29,6 +29,8 @@ namespace Game3 {
 		Entity(ID()), LivingEntity() {}
 
 	Player::~Player() {
+		if (spawning)
+			return;
 		INFO("\e[31m~Player\e[39m(" << this << ", " << (username.empty()? "[unknown username]" : username) << ", " << globalID << ')');
 	}
 

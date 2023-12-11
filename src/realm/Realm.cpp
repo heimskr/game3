@@ -538,7 +538,7 @@ namespace Game3 {
 		ticking = false;
 	}
 
-	std::vector<EntityPtr> Realm::findEntities(const Position &position) {
+	std::vector<EntityPtr> Realm::findEntities(const Position &position) const {
 		EntitySet entity_set = getEntities(position.getChunk());
 
 		if (!entity_set)
@@ -554,7 +554,7 @@ namespace Game3 {
 		return out;
 	}
 
-	std::vector<EntityPtr> Realm::findEntitiesSquare(const Position &position, uint64_t radius) {
+	std::vector<EntityPtr> Realm::findEntitiesSquare(const Position &position, uint64_t radius) const {
 		if (radius == 1)
 			return findEntities(position);
 
@@ -578,7 +578,7 @@ namespace Game3 {
 		return out;
 	}
 
-	std::vector<EntityPtr> Realm::findEntitiesSquare(const Position &position, uint64_t radius, const std::function<bool(const EntityPtr &)> &filter) {
+	std::vector<EntityPtr> Realm::findEntitiesSquare(const Position &position, uint64_t radius, const std::function<bool(const EntityPtr &)> &filter) const {
 		if (radius == 1)
 			return findEntities(position);
 
@@ -597,6 +597,32 @@ namespace Game3 {
 			for (const EntityPtr &entity: *entity_set)
 				if (entity->position.copyBase().maximumAxisDistance(position) < radius && filter(entity))
 					out.push_back(entity);
+		});
+
+		return out;
+	}
+
+	bool Realm::hasEntitiesSquare(const Position &position, uint64_t radius, const std::function<bool(const EntityPtr &)> &predicate) const {
+		if (radius == 0)
+			return false;
+
+		bool out = false;
+
+		const Position offset(radius - 1, radius - 1);
+		ChunkRange((position - offset).getChunk(), (position + offset).getChunk()).iterate([this, &out, &predicate, position, radius](ChunkPosition chunk_position) {
+			EntitySet entity_set = getEntities(chunk_position);
+			if (!entity_set)
+				return false;
+
+			auto lock = entity_set->sharedLock();
+			for (const EntityPtr &entity: *entity_set) {
+				if (entity->position.copyBase().maximumAxisDistance(position) < radius && predicate(entity)) {
+					out = true;
+					return true;
+				}
+			}
+
+			return false;
 		});
 
 		return out;
@@ -958,6 +984,12 @@ namespace Game3 {
 		entityInitializationQueue.emplace(std::move(entity), position);
 	}
 
+	void Realm::spawn(const EntityPtr &entity, const Position &position) {
+		entity->spawning = true;
+		entity->setRealm(shared_from_this());
+		queueEntityInit(entity, position);
+	}
+
 	bool Realm::isWalkable(Index row, Index column, const Tileset &tileset) {
 		for (const Layer layer: collidingLayers)
 			if (std::optional<TileID> tile = tryTile(layer, {row, column}); !tile || !tileset.isWalkable(*tile) || tileset.isSolid(*tile))
@@ -1197,7 +1229,7 @@ namespace Game3 {
 		}
 	}
 
-	Realm::EntitySet Realm::getEntities(ChunkPosition chunk_position) {
+	Realm::EntitySet Realm::getEntities(ChunkPosition chunk_position) const {
 		auto lock = entitiesByChunk.sharedLock();
 		if (auto iter = entitiesByChunk.find(chunk_position); iter != entitiesByChunk.end())
 			return iter->second;

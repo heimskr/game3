@@ -12,6 +12,14 @@ namespace Game3 {
 		Entity(ID()), Player() {}
 
 	ServerPlayer::~ServerPlayer() {
+		// In Tile::makeMonsterFactories, temporary entities are created so their virtual methods can be called.
+		// Specifically, we want to check whether the entity is a type of monster. The entity is discarded
+		// immediately after the check. It's marked as spawning before the check to indicate that it's in a
+		// weird state. Therefore, we check here whether it's spawning to decide whether we should skip the
+		// regular ServerPlayer destruction process.
+		if (spawning)
+			return;
+
 		Game &game = getGame();
 
 		// If the game is being destroyed right now, we can't cast it.

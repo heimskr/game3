@@ -11,6 +11,7 @@
 #include "Constants.h"
 #include "types/Position.h"
 #include "types/Types.h"
+#include "util/Concepts.h"
 
 namespace Game3 {
 	class Buffer;
@@ -66,34 +67,46 @@ namespace Game3 {
 	void to_json(nlohmann::json &, const ChunkPosition &);
 
 	struct ChunkRange {
-		ChunkPosition topLeft;
-		ChunkPosition bottomRight;
+		public:
+			ChunkPosition topLeft;
+			ChunkPosition bottomRight;
 
-		ChunkRange(ChunkPosition top_left, ChunkPosition bottom_right);
-		ChunkRange(ChunkPosition);
+			ChunkRange(ChunkPosition top_left, ChunkPosition bottom_right);
+			ChunkRange(ChunkPosition);
 
-		inline Index tileWidth() const  { return (bottomRight.x - topLeft.x + 1) * CHUNK_SIZE; }
-		inline Index tileHeight() const { return (bottomRight.y - topLeft.y + 1) * CHUNK_SIZE; }
+			inline Index tileWidth() const  { return (bottomRight.x - topLeft.x + 1) * CHUNK_SIZE; }
+			inline Index tileHeight() const { return (bottomRight.y - topLeft.y + 1) * CHUNK_SIZE; }
 
-		inline Index rowMin() const { return topLeft.y * CHUNK_SIZE; }
-		/** Compare with <=, not <. */
-		inline Index rowMax() const { return (bottomRight.y + 1) * CHUNK_SIZE - 1; }
-		inline Index columnMin() const { return topLeft.x * CHUNK_SIZE; }
-		/** Compare with <=, not <. */
-		inline Index columnMax() const { return (bottomRight.x + 1) * CHUNK_SIZE - 1; }
+			inline Index rowMin() const { return topLeft.y * CHUNK_SIZE; }
+			/** Compare with <=, not <. */
+			inline Index rowMax() const { return (bottomRight.y + 1) * CHUNK_SIZE - 1; }
+			inline Index columnMin() const { return topLeft.x * CHUNK_SIZE; }
+			/** Compare with <=, not <. */
+			inline Index columnMax() const { return (bottomRight.x + 1) * CHUNK_SIZE - 1; }
 
-		inline bool contains(ChunkPosition chunk_position) const {
-			return topLeft.x <= chunk_position.x && chunk_position.x <= bottomRight.x && topLeft.y <= chunk_position.y && chunk_position.y <= bottomRight.y;
-		}
+			inline bool contains(ChunkPosition chunk_position) const {
+				return topLeft.x <= chunk_position.x && chunk_position.x <= bottomRight.x && topLeft.y <= chunk_position.y && chunk_position.y <= bottomRight.y;
+			}
 
-		auto operator<=>(const ChunkRange &) const = default;
+			auto operator<=>(const ChunkRange &) const = default;
 
-		template <typename Fn>
-		void iterate(const Fn &fn) const {
-			for (auto y = topLeft.y; y <= bottomRight.y; ++y)
-				for (auto x = topLeft.x; x <= bottomRight.x; ++x)
-					fn(ChunkPosition{x, y});
-		}
+			template <typename Fn>
+			requires(Returns<Fn, void, ChunkPosition>)
+			void iterate(const Fn &fn) const {
+				for (auto y = topLeft.y; y <= bottomRight.y; ++y)
+					for (auto x = topLeft.x; x <= bottomRight.x; ++x)
+						fn(ChunkPosition{x, y});
+			}
+
+			/** Stops iterating if the function returns true. */
+			template <typename Fn>
+			requires(Returns<Fn, bool, ChunkPosition>)
+			void iterate(const Fn &fn) const {
+				for (auto y = topLeft.y; y <= bottomRight.y; ++y)
+					for (auto x = topLeft.x; x <= bottomRight.x; ++x)
+						if (fn(ChunkPosition{x, y}))
+							return;
+			}
 	};
 
 	void from_json(const nlohmann::json &, ChunkRange &);

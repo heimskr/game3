@@ -121,10 +121,11 @@ namespace Game3 {
 			TileEntityPtr add(const TileEntityPtr &);
 			void initEntities();
 			void tick(float delta);
-			std::vector<EntityPtr> findEntities(const Position &);
+			std::vector<EntityPtr> findEntities(const Position &) const;
 			/** The side length of the square is equal to 2*radius-1; i.e., a radius of 1 corresponds to a single tile. */
-			std::vector<EntityPtr> findEntitiesSquare(const Position &, uint64_t radius);
-			std::vector<EntityPtr> findEntitiesSquare(const Position &, uint64_t radius, const std::function<bool(const EntityPtr &)> &filter);
+			std::vector<EntityPtr> findEntitiesSquare(const Position &, uint64_t radius) const;
+			std::vector<EntityPtr> findEntitiesSquare(const Position &, uint64_t radius, const std::function<bool(const EntityPtr &)> &filter) const;
+			bool hasEntitiesSquare(const Position &, uint64_t radius, const std::function<bool(const EntityPtr &)> &predicate) const;
 			std::vector<EntityPtr> findEntities(const Position &, const EntityPtr &except);
 			EntityPtr findEntity(const Position &);
 			EntityPtr findEntity(const Position &, const EntityPtr &except);
@@ -222,11 +223,11 @@ namespace Game3 {
 			std::shared_ptr<E> spawn(const Position &position, Args &&...args) {
 				Game &game_ref = getGame();
 				auto entity = E::create(game_ref, std::forward<Args>(args)...);
-				entity->spawning = true;
-				entity->setRealm(shared_from_this());
-				entityInitializationQueue.emplace(entity, position);
+				spawn(entity, position);
 				return entity;
 			}
+
+			void spawn(const EntityPtr &, const Position &);
 
 			template <typename T>
 			std::shared_ptr<T> getTileEntity() const {
@@ -351,7 +352,7 @@ namespace Game3 {
 
 		public:
 			using EntitySet = decltype(entitiesByChunk)::Base::mapped_type;
-			EntitySet getEntities(ChunkPosition);
+			EntitySet getEntities(ChunkPosition) const;
 	};
 
 	using RealmPtr = std::shared_ptr<Realm>;
