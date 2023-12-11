@@ -213,6 +213,7 @@ namespace Game3 {
 			virtual bool rightClick(const Position &, double x, double y);
 			/** Generates additional chunks for the infinite map after the initial worldgen of the realm. */
 			virtual void generateChunk(const ChunkPosition &) {}
+			virtual bool canSpawnMonsters() const;
 
 			/** Full data doesn't include terrain, entities or tile entities. */
 			virtual void toJSON(nlohmann::json &, bool full_data) const;

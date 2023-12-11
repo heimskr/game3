@@ -22,6 +22,7 @@ namespace Game3 {
 			void onRemove() override;
 			void reveal(const Position &, bool force = false);
 			void generateChunk(const ChunkPosition &) override;
+			bool canSpawnMonsters() const override { return true; }
 
 			friend class Realm;
 

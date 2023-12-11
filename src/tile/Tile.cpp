@@ -35,8 +35,8 @@ namespace Game3 {
 	bool Tile::canSpawnMonsters(const Place &place) const {
 		RealmPtr realm = place.realm;
 
-		// Don't spawn indoors.
-		if (!realm->outdoors)
+		// Don't spawn in certain realms.
+		if (!realm->canSpawnMonsters())
 			return false;
 
 		// Don't spawn on fluids.
@@ -49,14 +49,10 @@ namespace Game3 {
 
 		// Don't spawn too close to players or other monsters.
 		const bool any_in_range = realm->hasEntitiesSquare(place.position, 16, [](const EntityPtr &entity) {
-			return entity->isPlayer() || std::dynamic_pointer_cast<Monster>(entity);
+			return entity->isPlayer() || entity->isSpawnableMonster();
 		});
 
 		if (any_in_range)
-			return false;
-
-		const double hour = place.getGame().getHour();
-		if (5. <= hour && hour < 21.)
 			return false;
 
 		std::uniform_real_distribution<float> distribution(0, 1);

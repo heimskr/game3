@@ -1424,6 +1424,14 @@ namespace Game3 {
 		return false;
 	}
 
+	bool Realm::canSpawnMonsters() const {
+		if (!outdoors)
+			return false;
+
+		const double hour = getGame().getHour();
+		return !(5. <= hour && hour < 21.);
+	}
+
 	void Realm::initEntity(const EntityPtr &entity, const Position &position) {
 		entity->init(getGame());
 		add(entity, position);
