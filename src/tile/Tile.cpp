@@ -43,6 +43,10 @@ namespace Game3 {
 		if (realm->hasFluid(place.position))
 			return false;
 
+		// Don't spawn on a tile that can't be walked on.
+		if (!realm->isPathable(place.position))
+			return false;
+
 		// Don't spawn too close to players or other monsters.
 		const bool any_in_range = realm->hasEntitiesSquare(place.position, 16, [](const EntityPtr &entity) {
 			return entity->isPlayer() || std::dynamic_pointer_cast<Monster>(entity);
