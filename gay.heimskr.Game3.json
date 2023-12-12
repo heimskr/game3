@@ -302,6 +302,19 @@
 			}]
 		},
 		{
+			"name": "boost",
+			"buildsystem": "simple",
+			"build-commands": [
+				"./bootstrap.sh --prefix=/app",
+				"./b2 install"
+			],
+			"sources": [{
+				"type": "archive",
+				"url": "https://boostorg.jfrog.io/artifactory/main/release/1.83.0/source/boost_1_83_0.tar.bz2",
+				"sha256": "6478edfe2f3305127cffe8caf73ea0176c53769f4bf1585be237eb30798c3b8e"
+			}]
+		},
+		{
 			"name": "game3-data",
 			"buildsystem": "simple",
 			"build-commands": [
@@ -349,6 +362,9 @@
 			"build-options": {
 				"strip": true
 			},
+			"post-install": [
+				"rm -rf /app/{include,lib/{libboost_*,cmake,mkspecs,pkgconfig}}"
+			],
 			"sources": [{
 				"type": "dir",
 				"path": "."
