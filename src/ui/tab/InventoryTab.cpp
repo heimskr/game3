@@ -25,7 +25,6 @@ namespace Game3 {
 		scrolled.set_vexpand();
 
 		vbox.set_spacing(0);
-		vbox.append(actionBox);
 		actionBox.set_hexpand(true);
 		actionBox.set_halign(Gtk::Align::CENTER);
 		actionBox.set_margin_top(5);
@@ -128,6 +127,7 @@ namespace Game3 {
 			lastGame = nullptr;
 			if (inventoryModule) {
 				vbox.remove(inventoryModule->getWidget());
+				vbox.remove(actionBox);
 				inventoryModule.reset();
 			}
 			return;
@@ -308,7 +308,8 @@ namespace Game3 {
 			if (!inventoryModule) {
 				inventoryModule.emplace(game, client_inventory, this, sigc::mem_fun(*this, &InventoryTab::gmenuSetup));
 				inventoryModule->setShowLabel(false);
-				vbox.insert_child_after(inventoryModule->getWidget(), actionBox);
+				vbox.prepend(inventoryModule->getWidget());
+				vbox.prepend(actionBox);
 			}
 			populate(client_inventory);
 		}
