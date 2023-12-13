@@ -16,15 +16,13 @@ namespace Game3 {
 
 	void SoundProvider::play(const std::filesystem::path &path) {
 		auto lock = soundMap.uniqueLock();
-
 		std::vector<Sound> &sounds = soundMap[path];
+
 		if (Sound *sound = findNotPlaying(sounds)) {
-			INFO("Playing existing sound.");
 			sound->play();
 			return;
 		}
 
-		INFO("Allocating new sound.");
 		sounds.emplace_back(path);
 		sounds.back().play();
 	}
