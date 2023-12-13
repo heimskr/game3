@@ -86,6 +86,7 @@ namespace Game3 {
 				auto lock = velocity.uniqueLock();
 				velocity.z = getJumpSpeed();
 			}
+			getGame().toClient().sounds.play("resources/sounds/jump.ogg");
 			send(JumpPacket());
 		}
 	}

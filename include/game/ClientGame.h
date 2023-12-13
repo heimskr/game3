@@ -3,6 +3,7 @@
 #include "game/Game.h"
 #include "threading/LockableSharedPtr.h"
 #include "ui/Modifiers.h"
+#include "ui/Sound.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -25,6 +26,7 @@ namespace Game3 {
 			LockableSharedPtr<Realm> activeRealm;
 			bool stoppedByError = false;
 			std::function<void()> errorCallback;
+			SoundProvider sounds;
 
 			ClientGame(Canvas &canvas_): Game(), canvas(canvas_) {}
 
