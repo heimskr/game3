@@ -1,1 +1,2 @@
-jump.wav: https://freesound.org/people/LloydEvans09/sounds/187024/
+jump.opus: https://freesound.org/people/LloydEvans09/sounds/187024/
+pop.opus:  https://freesound.org/people/unfa/sounds/245645/

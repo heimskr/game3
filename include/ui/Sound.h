@@ -18,6 +18,8 @@ namespace Game3 {
 			bool isReady();
 
 		private:
+			bool sought = true;
+			bool seekStarted = false;
 			Glib::RefPtr<Gtk::MediaFile> mediaFile;
 			std::chrono::system_clock::time_point lastPlayed;
 	};

@@ -5,11 +5,30 @@ namespace Game3 {
 		mediaFile(Gtk::MediaFile::create_for_filename(path.string())) {}
 
 	void Sound::play() {
+		sought = false;
 		mediaFile->play();
+		lastPlayed = std::chrono::system_clock::now();
 	}
 
 	bool Sound::isReady() {
-		return !mediaFile->get_playing();
+		if (mediaFile->get_playing())
+			return false;
+
+		if (sought)
+			return true;
+
+		if (seekStarted) {
+			if (mediaFile->is_seeking())
+				return false;
+
+			seekStarted = false;
+			sought = true;
+			return true;
+		}
+
+		seekStarted = true;
+		mediaFile->seek(0);
+		return false;
 	}
 
 	SoundProvider::SoundProvider() = default;
