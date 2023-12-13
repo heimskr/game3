@@ -28,8 +28,7 @@ namespace Game3 {
 		// These take guints so this feels kinda wrong.
 		flowBox.set_row_spacing(-2);
 		flowBox.set_column_spacing(-2);
-		hbox.append(label);
-		vbox.append(hbox);
+		vbox.append(label);
 		vbox.append(flowBox);
 
 		gmenu = Gio::Menu::create();
@@ -94,6 +93,10 @@ namespace Game3 {
 	void InventoryModule::slotClicked(Slot slot, bool is_right_click, Modifiers modifiers) {
 		if (parent)
 			parent->slotClicked(slot, is_right_click, modifiers);
+	}
+
+	void InventoryModule::setShowLabel(bool show) {
+		label.set_visible(show);
 	}
 
 	std::optional<Buffer> InventoryModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &) {

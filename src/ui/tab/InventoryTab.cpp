@@ -24,39 +24,71 @@ namespace Game3 {
 		scrolled.set_hexpand();
 		scrolled.set_vexpand();
 
+		vbox.set_spacing(0);
+		vbox.append(actionBox);
+		actionBox.set_hexpand(true);
+		actionBox.set_halign(Gtk::Align::CENTER);
+		actionBox.set_margin_top(5);
+		actionBox.set_margin_bottom(5);
+
+		auto use_function = [this](Slot slot) {
+			lastGame->player->send(UseItemPacket(slot, Modifiers{}));
+		};
+
+		auto hold_left_function = [this](Slot slot) {
+			lastGame->player->send(SetHeldItemPacket(true, slot));
+		};
+
+		auto hold_right_function = [this](Slot slot) {
+			lastGame->player->send(SetHeldItemPacket(false, slot));
+		};
+
+		auto drop_function = [this](Slot slot) {
+			lastGame->player->getInventory(0)->drop(slot);
+		};
+
+		auto discard_function = [this](Slot slot) {
+			lastGame->player->getInventory(0)->discard(slot);
+		};
+
+		initAction(holdLeftAction,  "pan-start-symbolic",  "Hold Left",  hold_left_function);
+		initAction(holdRightAction, "pan-end-symbolic",    "Hold Right", hold_right_function);
+		initAction(dropAction,      "pan-down-symbolic",   "Drop",       drop_function);
+		initAction(discardAction,   "user-trash-symbolic", "Discard",    discard_function);
+
 		auto group = Gio::SimpleActionGroup::create();
 
-		group->add_action("use", [this] {
+		group->add_action("use", [this, use_function] {
 			if (lastGame)
-				lastGame->player->send(UseItemPacket(lastSlot, Modifiers{}));
+				use_function(lastSlot);
 			else
 				WARN(__FILE__ << ':' << __LINE__ << ": no lastGame");
 		});
 
-		group->add_action("hold_left", [this] {
+		group->add_action("hold_left", [this, hold_left_function] {
 			if (lastGame)
-				lastGame->player->send(SetHeldItemPacket(true, lastSlot));
+				hold_left_function(lastSlot);
 			else
 				WARN(__FILE__ << ':' << __LINE__ << ": no lastGame");
 		});
 
-		group->add_action("hold_right", [this] {
+		group->add_action("hold_right", [this, hold_right_function] {
 			if (lastGame)
-				lastGame->player->send(SetHeldItemPacket(false, lastSlot));
+				hold_right_function(lastSlot);
 			else
 				WARN(__FILE__ << ':' << __LINE__ << ": no lastGame");
 		});
 
-		group->add_action("drop", [this] {
+		group->add_action("drop", [this, drop_function] {
 			if (lastGame)
-				lastGame->player->getInventory(0)->drop(lastSlot);
+				drop_function(lastSlot);
 			else
 				WARN(__FILE__ << ':' << __LINE__ << ": no lastGame");
 		});
 
-		group->add_action("discard", [this] {
+		group->add_action("discard", [this, discard_function] {
 			if (lastGame)
-				lastGame->player->getInventory(0)->discard(lastSlot);
+				discard_function(lastSlot);
 			else
 				WARN(__FILE__ << ':' << __LINE__ << ": no lastGame");
 		});
@@ -275,9 +307,33 @@ namespace Game3 {
 			auto client_inventory = std::static_pointer_cast<ClientInventory>(inventory);
 			if (!inventoryModule) {
 				inventoryModule.emplace(game, client_inventory, this, sigc::mem_fun(*this, &InventoryTab::gmenuSetup));
-				vbox.prepend(inventoryModule->getWidget());
+				inventoryModule->setShowLabel(false);
+				vbox.insert_child_after(inventoryModule->getWidget(), actionBox);
 			}
 			populate(client_inventory);
 		}
+	}
+
+	void InventoryTab::initAction(Gtk::Image &action, const Glib::ustring &icon, const Glib::ustring &tooltip, std::function<void(Slot)> function) {
+		action.set_margin_start(5);
+		action.set_margin_end(5);
+		action.set_from_icon_name(icon);
+		action.set_icon_size(Gtk::IconSize::LARGE);
+		action.set_tooltip_text(tooltip);
+
+		auto target = Gtk::DropTarget::create(Glib::Value<DragSource>::value_type(), Gdk::DragAction::MOVE);
+		target->signal_drop().connect([this, function = std::move(function)](const Glib::ValueBase &base, double, double) {
+			if (base.gobj()->g_type != Glib::Value<DragSource>::value_type())
+				return false;
+
+			const auto &value = static_cast<const Glib::Value<DragSource> &>(base);
+			const DragSource source = value.get();
+			if (lastGame && lastGame->player && *source.inventory == *lastGame->player->getInventory(0))
+				function(source.slot);
+			return true;
+		}, false);
+
+		action.add_controller(target);
+		actionBox.append(action);
 	}
 }

@@ -52,7 +52,7 @@ namespace Game3 {
 			virtual ItemStack * operator[](Slot) = 0;
 			virtual const ItemStack * operator[](Slot) const = 0;
 
-			inline bool operator==(const Inventory &other) const { return this == &other; }
+			bool operator==(const Inventory &other) const;
 
 			/** Iterates over all items in the inventory until all have been iterated or the iteration function returns true. */
 			virtual void iterate(const ConstPredicate &) const = 0;

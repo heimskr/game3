@@ -78,6 +78,14 @@ namespace Game3 {
 		return *this;
 	}
 
+	bool Inventory::operator==(const Inventory &other) const {
+		if (this == &other)
+			return true;
+
+		auto owner = weakOwner.lock();
+		return owner && index != InventoryID(-1) && owner == other.weakOwner.lock() && index == other.index;
+	}
+
 	bool Inventory::decrease(ItemStack &stack, Slot slot, ItemCount amount, bool do_lock) {
 		auto lock = do_lock? uniqueLock() : std::unique_lock<DefaultMutex>{};
 

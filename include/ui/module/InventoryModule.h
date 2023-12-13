@@ -43,6 +43,7 @@ namespace Game3 {
 			inline auto getInventory() const { return inventory; }
 			void setInventory(std::shared_ptr<ClientInventory>) override;
 			void slotClicked(Slot, bool is_right_click, Modifiers) override;
+			void setShowLabel(bool);
 
 		private:
 			std::shared_ptr<ClientGame> game;
@@ -52,7 +53,6 @@ namespace Game3 {
 			Glib::ustring name;
 			std::vector<std::unique_ptr<ItemSlot>> itemSlots;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
-			Gtk::Box hbox{Gtk::Orientation::HORIZONTAL};
 			Gtk::PopoverMenu popoverMenu;
 			Gtk::FlowBox flowBox;
 			Gtk::Label label;

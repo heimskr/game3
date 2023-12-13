@@ -63,6 +63,11 @@ namespace Game3 {
 			Gtk::PopoverMenu popoverMenu;
 			Lockable<std::shared_ptr<Module>> currentModule;
 			std::optional<InventoryModule> inventoryModule;
+			Gtk::Box actionBox{Gtk::Orientation::HORIZONTAL};
+			Gtk::Image holdLeftAction;
+			Gtk::Image holdRightAction;
+			Gtk::Image dropAction;
+			Gtk::Image discardAction;
 
 			/** We can't store state in a popover, so we have to store it here. */
 			LockableSharedPtr<ClientGame> lastGame;
@@ -78,5 +83,6 @@ namespace Game3 {
 			void clear();
 			void gmenuSetup(InventoryModule &, Glib::RefPtr<Gio::Menu>);
 			void updateInventory(const std::shared_ptr<ClientGame> &);
+			void initAction(Gtk::Image &, const Glib::ustring &icon, const Glib::ustring &tooltip, std::function<void(Slot)>);
 	};
 }
