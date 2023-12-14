@@ -32,5 +32,6 @@ namespace Game3 {
 		registries.add<ItemSetRegistry>();
 		registries.add<DissolverRecipeRegistry>();
 		registries.add<CombinerRecipeRegistry>();
+		registries.add<SoundRegistry>();
 	}
 }

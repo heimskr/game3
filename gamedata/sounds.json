@@ -1,0 +1,7 @@
+{
+	"name": "base_sounds",
+	"dependencies": [],
+	"data": [
+		["base:soundset", "resources/sounds"]
+	]
+}

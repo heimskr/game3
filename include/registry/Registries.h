@@ -22,6 +22,7 @@ namespace Game3 {
 	struct Fluid;
 	struct Ore;
 	struct RealmDetails;
+	struct SoundPath;
 
 	struct RegistryRegistry: NamedRegistry<Registry> {
 		static Identifier ID() { return {"base", "registry/registry"}; }
@@ -118,5 +119,10 @@ namespace Game3 {
 	struct ItemSetRegistry: NamedRegistry<ItemSet> {
 		static Identifier ID() { return {"base", "registry/itemset"}; }
 		ItemSetRegistry(): NamedRegistry(ID()) {}
+	};
+
+	struct SoundRegistry: NamedRegistry<SoundPath> {
+		static Identifier ID() { return {"base", "registry/sound"}; }
+		SoundRegistry(): NamedRegistry(ID()) {}
 	};
 }

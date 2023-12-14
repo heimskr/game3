@@ -83,6 +83,7 @@ namespace Game3 {
 			void addPacketFactories();
 			void addLocalCommandFactories();
 			void addTiles();
+			size_t addSounds(const std::filesystem::path &);
 			void addModuleFactories();
 			void initialSetup(const std::filesystem::path &dir = "gamedata");
 			void initEntities();
@@ -105,6 +106,7 @@ namespace Game3 {
 			std::optional<TileID> getFluidTileID(FluidID);
 			std::shared_ptr<Fluid> getFluid(FluidID) const;
 			std::shared_ptr<Tile> getTile(const Identifier &);
+			const std::filesystem::path * getSound(const Identifier &);
 			RealmPtr tryRealm(RealmID) const;
 			RealmPtr getRealm(RealmID) const;
 			/** Tries to return the realm corresponding to a given realm ID. If one doesn't exist, one is created via the given function, added to the realm container and returned. */

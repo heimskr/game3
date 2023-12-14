@@ -157,6 +157,10 @@ namespace Game3 {
 			auto &itemsets = registry<ItemSetRegistry>();
 			itemsets.add(identifier, itemStitcher(&registry<ItemTextureRegistry>(), base_dir, identifier));
 
+		} else if (type == "base:soundset") {
+
+			addSounds(json.at(1));
+
 		} else if (type == "base:recipe_list") {
 
 			for (const auto &recipe_json: json.at(1))
