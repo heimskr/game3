@@ -232,8 +232,6 @@ namespace Game3 {
 				return;
 			}
 		}
-
-		WARN("Couldn't find any position to move to.");
 	}
 
 	bool Monster::tryAttack() {
