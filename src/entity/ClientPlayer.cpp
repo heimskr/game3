@@ -59,6 +59,24 @@ namespace Game3 {
 		});
 	}
 
+	void ClientPlayer::renderLighting(const RendererSet &renderers) {
+		if (!isVisible())
+			return;
+
+		const auto [row, column] = getPosition();
+		const auto [x, y, z] = offset.copyBase();
+
+		constexpr static float radius = 8;
+
+		renderers.circle.drawOnMap(RenderOptions{
+			.x = column + x + .5f,
+			.y = row + y - z + .5f,
+			.sizeX = radius,
+			.sizeY = radius,
+			.color = {1, 1, 1, 1},
+		}, 0.5);
+	}
+
 	void ClientPlayer::stopContinuousInteraction() {
 		send(ContinuousInteractionPacket());
 	}

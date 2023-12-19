@@ -115,6 +115,8 @@ namespace Game3 {
 			virtual void onRemove();
 			void createRenderers();
 			void render(int width, int height, const std::pair<double, double> &center, float scale, const RendererSet &, float game_time);
+			void renderLighting(int width, int height, const std::pair<double, double> &center, float scale, const RendererSet &, float game_time);
+			virtual void clearLighting(float game_time);
 			/** Reuploads fluids and terrain in all layers. */
 			void reupload();
 			EntityPtr add(const EntityPtr &, const Position &);

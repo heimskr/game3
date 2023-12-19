@@ -63,11 +63,6 @@ namespace Game3 {
 		if (mainTexture.getWidth() != width || mainTexture.getHeight() != height) {
 			mainTexture.initRGBA(width, height, GL_NEAREST);
 			lightingTexture.initRGBA(width, height, GL_NEAREST);
-			fbo.bind();
-			lightingTexture.useInFB();
-			glClearColor(1.f, 1.f, 1.f, 1.f); CHECKGL
-			glClear(GL_COLOR_BUFFER_BIT); CHECKGL
-			fbo.undo();
 		}
 
 		if (RealmPtr realm = game->activeRealm.copyBase()) {
@@ -77,11 +72,14 @@ namespace Game3 {
 			batchSpriteRenderer.update(width, height);
 			glClearColor(.2f, .2f, .2f, 1.f); CHECKGL
 			glClear(GL_COLOR_BUFFER_BIT); CHECKGL
-			realm->render(width, height, center, scale, {rectangleRenderer, batchSpriteRenderer, textRenderer, circleRenderer}, game->getDivisor()); CHECKGL
+			RendererSet renderers{rectangleRenderer, batchSpriteRenderer, textRenderer, circleRenderer};
+			realm->render(width, height, center, scale, renderers, game->getDivisor()); CHECKGL
 			viewport.reset();
+			lightingTexture.useInFB();
+			realm->renderLighting(width, height, center, scale, renderers, game->getDivisor()); CHECKGL
 			fbo.undo();
 			multiplier(mainTexture, lightingTexture);
-			realmBounds = game->getVisibleRealmBounds(width, height);
+			realmBounds = game->getVisibleRealmBounds();
 		}
 	}
 

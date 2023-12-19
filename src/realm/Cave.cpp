@@ -12,6 +12,11 @@ namespace Game3 {
 	Cave::Cave(Game &game_, RealmID id_, RealmID parent_realm, int seed_):
 		Realm(game_, id_, ID(), "base:tileset/monomap", seed_), parentRealm(parent_realm) {}
 
+	void Cave::clearLighting(float) {
+		glClearColor(0.117, 0.117, 0.235, 1); CHECKGL
+		glClear(GL_COLOR_BUFFER_BIT); CHECKGL
+	}
+
 	void Cave::onRemove() {
 		// Assumptions:
 		// - All entrances to a given cave realm appear in exactly one realm.

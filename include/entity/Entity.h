@@ -98,6 +98,7 @@ namespace Game3 {
 			virtual void init(Game &);
 			virtual void render(const RendererSet &);
 			virtual void renderUpper(const RendererSet &);
+			virtual void renderLighting(const RendererSet &);
 			virtual void tick(Game &, float delta);
 			/** Whether the entity should be included in save data. */
 			virtual bool shouldPersist() const { return true; }

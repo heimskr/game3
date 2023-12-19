@@ -24,6 +24,7 @@ namespace Game3 {
 
 			void tick(Game &, float delta) override;
 			void render(const RendererSet &) override;
+			void renderLighting(const RendererSet &) override;
 			void stopContinuousInteraction();
 			void setContinuousInteraction(bool, Modifiers);
 			void jump() override;

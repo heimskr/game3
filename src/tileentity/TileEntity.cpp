@@ -111,6 +111,8 @@ namespace Game3 {
 		});
 	}
 
+	void TileEntity::renderLighting(const RendererSet &) {}
+
 	void TileEntity::onSpawn() {
 		Game &game = getRealm()->getGame();
 		if (game.getSide() == Side::Server)

@@ -3,6 +3,7 @@
 #include "game/ClientGame.h"
 #include "packet/RealmNoticePacket.h"
 #include "realm/Realm.h"
+#include "realm/RealmFactory.h"
 
 namespace Game3 {
 	RealmNoticePacket::RealmNoticePacket(Realm &realm):
@@ -10,7 +11,13 @@ namespace Game3 {
 
 	void RealmNoticePacket::handle(ClientGame &game) {
 		if (!game.hasRealm(realmID)) {
-			auto realm = Realm::create(game, realmID, type, tileset, seed);
+			auto factory = game.registry<RealmFactoryRegistry>().at(type);
+			assert(factory);
+			auto realm = (*factory)(game);
+			realm->id = realmID;
+			realm->type = type;
+			realm->tileProvider.tilesetID = tileset;
+			realm->seed = seed;
 			realm->outdoors = outdoors;
 			game.addRealm(realmID, realm);
 		}

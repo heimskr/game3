@@ -386,6 +386,8 @@ namespace Game3 {
 
 	void Entity::renderUpper(const RendererSet &) {}
 
+	void Entity::renderLighting(const RendererSet &) {}
+
 	bool Entity::move(Direction move_direction, MovementContext context) {
 		auto self_lock = uniqueLock();
 

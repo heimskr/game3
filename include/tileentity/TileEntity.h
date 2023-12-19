@@ -21,6 +21,7 @@ namespace Game3 {
 	class RemoteClient;
 	class SpriteRenderer;
 	struct Place;
+	struct RendererSet;
 
 	class TileEntity: public Agent, public Broadcastable {
 		public:
@@ -69,6 +70,7 @@ namespace Game3 {
 			inline Identifier getID() const { return tileEntityID; }
 			virtual void render(SpriteRenderer &);
 			virtual void renderUpper(SpriteRenderer &);
+			virtual void renderLighting(const RendererSet &);
 			/** Handles when an entity steps on this tile entity's position. */
 			virtual void onOverlap(const std::shared_ptr<Entity> &) {}
 			void setRealm(const std::shared_ptr<Realm> &);

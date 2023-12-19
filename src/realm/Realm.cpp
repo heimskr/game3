@@ -254,6 +254,40 @@ namespace Game3 {
 		sprite_renderer.renderNow();
 	}
 
+	void Realm::renderLighting(const int, const int, const std::pair<double, double> &, float, const RendererSet &renderers, float game_time) {
+		if (getSide() != Side::Client)
+			return;
+
+		clearLighting(game_time);
+
+		auto &client_game = game.toClient();
+		assert(client_game.player);
+
+		{
+			auto lock = tileEntities.sharedLock();
+			for (const auto &[index, tile_entity]: tileEntities)
+				tile_entity->renderLighting(renderers);
+		}
+
+		ChunkRange(client_game.player->getChunk()).iterate([&](ChunkPosition chunk_position) {
+			if (auto entities_in_chunk = getEntities(chunk_position)) {
+				auto lock = entities_in_chunk->sharedLock();
+				for (const EntityPtr &entity: *entities_in_chunk)
+					if (entity != client_game.player)
+						entity->renderLighting(renderers);
+			}
+		});
+
+		client_game.player->renderLighting(renderers);
+
+		renderers.sprite.renderNow();
+	}
+
+	void Realm::clearLighting(float game_time) {
+		glClearColor(1.f, 1.f, 1.f, 1.f); CHECKGL
+		glClear(GL_COLOR_BUFFER_BIT); CHECKGL
+	}
+
 	void Realm::reupload() {
 		if (getSide() != Side::Client)
 			return;

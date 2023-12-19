@@ -68,12 +68,8 @@ namespace Game3 {
 	}
 
 	Gdk::Rectangle ClientGame::getVisibleRealmBounds() const {
-		return getVisibleRealmBounds(canvas.getWidth(), canvas.getHeight());
-	}
-
-	Gdk::Rectangle ClientGame::getVisibleRealmBounds(int width, int height) const {
-		const auto [top,     left] = translateCanvasCoordinates(0., 0., nullptr, nullptr, width, height);
-		const auto [bottom, right] = translateCanvasCoordinates(width, height, nullptr, nullptr, width, height);
+		const auto [top,     left] = translateCanvasCoordinates(0., 0., nullptr, nullptr);
+		const auto [bottom, right] = translateCanvasCoordinates(canvas.getWidth(), canvas.getHeight(), nullptr, nullptr);
 		return {
 			static_cast<int>(left),
 			static_cast<int>(top),
@@ -86,22 +82,18 @@ namespace Game3 {
 		return canvas.window;
 	}
 
-	Position ClientGame::translateCanvasCoordinates(double x, double y, double *x_offset_out, double *y_offset_out, int width, int height) const {
+	Position ClientGame::translateCanvasCoordinates(double x, double y, double *x_offset_out, double *y_offset_out) const {
 		RealmPtr realm = activeRealm.copyBase();
 
 		if (!realm)
 			return {};
 
-		if (width == -1)
-			width = canvas.getWidth();
+		const int width = canvas.getWidth();
+		const int height = canvas.getHeight();
 
-		if (height == -1)
-			height = canvas.getHeight();
-
-		const auto scale = canvas.scale;
+		const auto scale = canvas.scale / canvas.getFactor();
 		const auto tile_size = realm->getTileset().getTileSize();
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
-
 		x -= width  / 2. - (map_length * tile_size / 4.) * scale + canvas.center.first  * canvas.magic * scale;
 		y -= height / 2. - (map_length * tile_size / 4.) * scale + canvas.center.second * canvas.magic * scale;
 		const double sub_x = x < 0.? 1. : 0.;
