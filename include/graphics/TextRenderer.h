@@ -36,7 +36,6 @@ namespace Game3 {
 		public:
 			Canvas *canvas = nullptr;
 			Shader shader;
-			float divisor = 1.f;
 			float centerX = 0.f;
 			float centerY = 0.f;
 			uint32_t fontScale = 48.f;

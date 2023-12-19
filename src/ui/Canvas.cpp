@@ -14,7 +14,7 @@
 #include "graphics/Tileset.h"
 
 namespace Game3 {
-	Canvas::Canvas(MainWindow &window_): window(window_), spriteRenderer(std::make_unique<BatchSpriteRenderer>(*this)) {
+	Canvas::Canvas(MainWindow &window_): window(window_) {
 		magic = 16 / 2;
 		fbo.init();
 	}
@@ -23,11 +23,17 @@ namespace Game3 {
 		if (!game)
 			return;
 
+		const int factor = getFactor();
+		int width  = getWidth() * factor;
+		int height = getHeight() * factor;
+
 		game->activateContext();
-		spriteRenderer->update(*this);
-		rectangleRenderer.update(width(), height());
-		textRenderer.update(width(), height());
-		circleRenderer.update(width(), height());
+		batchSpriteRenderer.update(*this);
+		singleSpriteRenderer.update(*this);
+		rectangleRenderer.update(width, height);
+		textRenderer.update(width, height);
+		circleRenderer.update(width, height);
+		multiplier.update(width, height);
 
 		game->iterateRealms([](const RealmPtr &realm) {
 			if (!realm->renderersReady)
@@ -54,18 +60,41 @@ namespace Game3 {
 			}
 		});
 
+		if (mainTexture.getWidth() != width || mainTexture.getHeight() != height) {
+			mainTexture.initRGBA(width, height, GL_NEAREST);
+			lightingTexture.initRGBA(width, height, GL_NEAREST);
+			fbo.bind();
+			lightingTexture.useInFB();
+			glClearColor(1.f, 1.f, 1.f, 1.f); CHECKGL
+			glClear(GL_COLOR_BUFFER_BIT); CHECKGL
+			fbo.undo();
+		}
+
 		if (RealmPtr realm = game->activeRealm.copyBase()) {
-			realm->render(width(), height(), center, scale, {rectangleRenderer, *spriteRenderer, textRenderer, circleRenderer}, game->getDivisor()); CHECKGL
-			realmBounds = game->getVisibleRealmBounds();
+			fbo.bind();
+			mainTexture.useInFB();
+			GL::Viewport viewport(0, 0, width, height);
+			batchSpriteRenderer.update(width, height);
+			glClearColor(.2f, .2f, .2f, 1.f); CHECKGL
+			glClear(GL_COLOR_BUFFER_BIT); CHECKGL
+			realm->render(width, height, center, scale, {rectangleRenderer, batchSpriteRenderer, textRenderer, circleRenderer}, game->getDivisor()); CHECKGL
+			viewport.reset();
+			fbo.undo();
+			multiplier(mainTexture, lightingTexture);
+			realmBounds = game->getVisibleRealmBounds(width, height);
 		}
 	}
 
-	int Canvas::width() const {
+	int Canvas::getWidth() const {
 		return window.glArea.get_width();
 	}
 
-	int Canvas::height() const {
+	int Canvas::getHeight() const {
 		return window.glArea.get_height();
+	}
+
+	int Canvas::getFactor() const {
+		return 2;
 	}
 
 	bool Canvas::inBounds(const Position &pos) const {

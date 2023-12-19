@@ -15,7 +15,7 @@ void main() {
 	float max_alpha = max(base.a, overlay.a);
 
 	if (0.01 <= overlay.a) {
-		FragColor = base * 2.0 * overlay;
+		FragColor = base * overlay;
 		FragColor.a = max_alpha;
 	} else {
 		FragColor = base;

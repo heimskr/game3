@@ -9,10 +9,11 @@
 #include "graphics/Texture.h"
 #include "types/Types.h"
 #include "graphics/GL.h"
+#include "graphics/BatchSpriteRenderer.h"
 #include "graphics/CircleRenderer.h"
 #include "graphics/Multiplier.h"
 #include "graphics/RectangleRenderer.h"
-#include "graphics/SpriteRenderer.h"
+#include "graphics/SingleSpriteRenderer.h"
 #include "graphics/TextRenderer.h"
 
 namespace Game3 {
@@ -29,12 +30,13 @@ namespace Game3 {
 			std::shared_ptr<ClientGame> game;
 			std::pair<double, double> center{0., 0.};
 			double scale = DEFAULT_SCALE;
-			std::unique_ptr<SpriteRenderer> spriteRenderer;
+			BatchSpriteRenderer  batchSpriteRenderer{*this};
+			SingleSpriteRenderer singleSpriteRenderer{*this};
 			TextRenderer textRenderer{*this};
 			RectangleRenderer rectangleRenderer{*this};
 			CircleRenderer circleRenderer{*this};
-			GL::Texture textureA;
-			GL::Texture textureB;
+			GL::Texture mainTexture;
+			GL::Texture lightingTexture;
 			GL::FBO fbo;
 			Multiplier multiplier;
 			float magic = 8.f;
@@ -46,8 +48,9 @@ namespace Game3 {
 
 			void drawGL();
 			// bool mouseButtonEvent(const Eigen::Vector2i &p, int button, bool down, int modifiers) override;
-			int width() const;
-			int height() const;
+			int getWidth() const;
+			int getHeight() const;
+			int getFactor() const;
 
 			bool inBounds(const Position &) const;
 	};

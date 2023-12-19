@@ -79,8 +79,8 @@ namespace Game3 {
 		glBindTexture(GL_TEXTURE_2D, texture1); CHECKGL
 		shader.set("texture1", 6);
 
-		// glEnable(GL_BLEND);
-		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glBindVertexArray(quadVAO); CHECKGL
 		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
 		glBindVertexArray(0); CHECKGL

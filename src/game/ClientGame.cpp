@@ -68,8 +68,12 @@ namespace Game3 {
 	}
 
 	Gdk::Rectangle ClientGame::getVisibleRealmBounds() const {
-		const auto [top,     left] = translateCanvasCoordinates(0., 0.);
-		const auto [bottom, right] = translateCanvasCoordinates(canvas.width(), canvas.height());
+		return getVisibleRealmBounds(canvas.getWidth(), canvas.getHeight());
+	}
+
+	Gdk::Rectangle ClientGame::getVisibleRealmBounds(int width, int height) const {
+		const auto [top,     left] = translateCanvasCoordinates(0., 0., nullptr, nullptr, width, height);
+		const auto [bottom, right] = translateCanvasCoordinates(width, height, nullptr, nullptr, width, height);
 		return {
 			static_cast<int>(left),
 			static_cast<int>(top),
@@ -82,21 +86,28 @@ namespace Game3 {
 		return canvas.window;
 	}
 
-	Position ClientGame::translateCanvasCoordinates(double x, double y, double *x_offset_out, double *y_offset_out) const {
+	Position ClientGame::translateCanvasCoordinates(double x, double y, double *x_offset_out, double *y_offset_out, int width, int height) const {
 		RealmPtr realm = activeRealm.copyBase();
 
 		if (!realm)
 			return {};
 
+		if (width == -1)
+			width = canvas.getWidth();
+
+		if (height == -1)
+			height = canvas.getHeight();
+
 		const auto scale = canvas.scale;
 		const auto tile_size = realm->getTileset().getTileSize();
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
-		x -= canvas.width()  / 2. - (map_length * tile_size / 4.) * scale + canvas.center.first  * canvas.magic * scale;
-		y -= canvas.height() / 2. - (map_length * tile_size / 4.) * scale + canvas.center.second * canvas.magic * scale;
+
+		x -= width  / 2. - (map_length * tile_size / 4.) * scale + canvas.center.first  * canvas.magic * scale;
+		y -= height / 2. - (map_length * tile_size / 4.) * scale + canvas.center.second * canvas.magic * scale;
 		const double sub_x = x < 0.? 1. : 0.;
 		const double sub_y = y < 0.? 1. : 0.;
-		x /= tile_size * scale / 2.f;
-		y /= tile_size * scale / 2.f;
+		x /= tile_size * scale / 2.;
+		y /= tile_size * scale / 2.;
 
 		double intpart = 0.;
 

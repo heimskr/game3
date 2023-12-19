@@ -68,14 +68,24 @@ namespace Game3 {
 		return *this;
 	}
 
-	void SingleSpriteRenderer::update(const Canvas &) {
-		const int backbuffer_width  = canvas->width();
-		const int backbuffer_height = canvas->height();
+	void SingleSpriteRenderer::update(const Canvas &canvas) {
+		const int backbuffer_width  = canvas.getWidth();
+		const int backbuffer_height = canvas.getHeight();
 
 		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
 			backbufferWidth = backbuffer_width;
 			backbufferHeight = backbuffer_height;
 			glm::mat4 projection = glm::ortho(0., double(backbuffer_width), double(backbuffer_height), 0., -1., 1.);
+			shader.bind();
+			shader.set("projection", projection);
+		}
+	}
+
+	void SingleSpriteRenderer::update(int width, int height) {
+		if (width != backbufferWidth || height != backbufferHeight) {
+			backbufferWidth = width;
+			backbufferHeight = height;
+			glm::mat4 projection = glm::ortho(0., double(width), double(height), 0., -1., 1.);
 			shader.bind();
 			shader.set("projection", projection);
 		}
@@ -115,15 +125,14 @@ namespace Game3 {
 		const auto tile_size   = tileset->getTileSize();
 		const auto map_length  = CHUNK_SIZE * REALM_DIAMETER;
 
-
 		x *= tile_size * canvas->scale / 2.;
 		y *= tile_size * canvas->scale / 2.;
 
-		x += canvas->width() / 2.;
+		x += canvas->getWidth() / 2.;
 		x -= map_length * tile_size * canvas->scale / canvas->magic * 2.; // TODO: the math here is a little sus... things might cancel out
 		x += centerX * canvas->scale * tile_size / 2.;
 
-		y += canvas->height() / 2.;
+		y += canvas->getHeight() / 2.;
 		y -= map_length * tile_size * canvas->scale / canvas->magic * 2.;
 		y += centerY * canvas->scale * tile_size / 2.;
 
@@ -185,6 +194,29 @@ namespace Game3 {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 		initialized = true;
+	}
+
+	void SingleSpriteRenderer::drawOnScreen(GL::Texture &texture, const RenderOptions &options_ref) {
+		if (!initialized)
+			return;
+
+		const auto texture_width  = texture.getWidth();
+		const auto texture_height = texture.getHeight();
+		// if (options.hackY)
+
+		RenderOptions options = options_ref;
+		options.sizeX = options.sizeX < 0.f? -options.sizeX * texture_width  : options.sizeX;
+		options.sizeY = options.sizeY < 0.f? -options.sizeY * texture_height : options.sizeY;
+		options.y = backbufferHeight / 16.f - options.y + options.offsetY / 4.f * options.scaleY; // Four?!
+		setupShader(texture_width, texture_height, options);
+
+		texture.bind(0);
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBindVertexArray(quadVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindVertexArray(0);
 	}
 
 	void SingleSpriteRenderer::setupShader(int texture_width, int texture_height, const RenderOptions &options) {

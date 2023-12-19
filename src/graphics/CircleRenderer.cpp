@@ -91,7 +91,7 @@ namespace Game3 {
 
 		shader.set("model", model); CHECKGL
 		shader.set("circleColor", options.color); CHECKGL
-		shader.set("radius", width, height); CHECKGL
+		// shader.set("radius", width, height); CHECKGL
 		shader.set("cutoff", cutoff);
 
 		glBindVertexArray(quadVAO); CHECKGL
@@ -119,7 +119,7 @@ namespace Game3 {
 
 		shader.set("model", model); CHECKGL
 		shader.set("circleColor", color); CHECKGL
-		shader.set("radius", width, height);
+		// shader.set("radius", width, height);
 		shader.set("cutoff", cutoff);
 
 		glBindVertexArray(quadVAO); CHECKGL

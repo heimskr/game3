@@ -60,15 +60,43 @@ namespace GL {
 		return fb;
 	}
 
-	inline GLuint makeFloatTexture(GLsizei width, GLsizei height, GLint filter = GL_LINEAR) {
+	inline GLuint makeFloatTexture(GLsizei width, GLsizei height, GLint min_filter = GL_LINEAR, GLint mag_filter = GL_LINEAR) {
 		GLuint texture = -1;
 		glGenTextures(1, &texture); CHECKGL
 		if (texture == static_cast<GLuint>(-1))
 			throw std::runtime_error("Couldn't generate float texture");
 		glBindTexture(GL_TEXTURE_2D, texture); CHECKGL
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag_filter); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); CHECKGL
+		return texture;
+	}
+
+	inline GLuint makeRGBATexture(GLsizei width, GLsizei height, GLint min_filter = GL_LINEAR, GLint mag_filter = GL_LINEAR) {
+		GLuint texture = -1;
+		glGenTextures(1, &texture); CHECKGL
+		if (texture == static_cast<GLuint>(-1))
+			throw std::runtime_error("Couldn't generate RGBA texture");
+		glBindTexture(GL_TEXTURE_2D, texture); CHECKGL
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag_filter); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); CHECKGL
+		return texture;
+	}
+
+	inline GLuint makeTexture(GLenum texture_type, GLenum data_type, GLsizei width, GLsizei height, GLint min_filter = GL_LINEAR, GLint mag_filter = GL_LINEAR) {
+		GLuint texture = -1;
+		glGenTextures(1, &texture); CHECKGL
+		if (texture == static_cast<GLuint>(-1))
+			throw std::runtime_error("Couldn't generate texture");
+		glBindTexture(GL_TEXTURE_2D, texture); CHECKGL
+		glTexImage2D(GL_TEXTURE_2D, 0, texture_type, width, height, 0, GL_RGBA, data_type, nullptr); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag_filter); CHECKGL
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); CHECKGL
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); CHECKGL
 		return texture;
@@ -437,10 +465,25 @@ namespace GL {
 				return true;
 			}
 
-			inline bool initFloat(GLsizei width_, GLsizei height_, GLint filter = GL_LINEAR) {
+			inline bool initFloat(GLsizei width_, GLsizei height_, GLint min_filter = GL_LINEAR, GLint mag_filter = GL_LINEAR) {
 				reset();
-				// std::cout << "Texture::initFloat(" << width_ << ", " << height_ << ")\n";
-				handle = GL::makeFloatTexture(width_, height_, filter);
+				handle = GL::makeFloatTexture(width_, height_, min_filter, mag_filter);
+				width  = width_;
+				height = height_;
+				return true;
+			}
+
+			inline bool initRGBA(GLsizei width_, GLsizei height_, GLint min_filter = GL_LINEAR, GLint mag_filter = GL_LINEAR) {
+				reset();
+				handle = GL::makeRGBATexture(width_, height_, min_filter, mag_filter);
+				width  = width_;
+				height = height_;
+				return true;
+			}
+
+			inline bool init(GLenum texture_type, GLenum data_type, GLsizei width_, GLsizei height_, GLint min_filter = GL_LINEAR, GLint mag_filter = GL_LINEAR) {
+				reset();
+				handle = GL::makeTexture(texture_type, data_type, width_, height_, min_filter, mag_filter);
 				width  = width_;
 				height = height_;
 				return true;

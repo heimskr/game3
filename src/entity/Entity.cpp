@@ -529,8 +529,8 @@ namespace Game3 {
 			canvas.center.second = -(row    - map_length / 2. + .5) - offset.y;
 		}
 		if (adjust) {
-			canvas.center.first  -= canvas.width()  / 32. / canvas.scale;
-			canvas.center.second += canvas.height() / 32. / canvas.scale;
+			canvas.center.first  -= canvas.getWidth()  / 32. / canvas.scale;
+			canvas.center.second += canvas.getHeight() / 32. / canvas.scale;
 		}
 	}
 

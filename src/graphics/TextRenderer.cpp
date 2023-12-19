@@ -156,8 +156,8 @@ namespace Game3 {
 		x *= 8.f;
 		y *= -8.f;
 
-		x += canvas->width() / 2.f / canvas->scale;
-		y += canvas->height() / 2.f / canvas->scale;
+		x += backbufferWidth / 2.f / canvas->scale;
+		y += backbufferHeight / 2.f / canvas->scale;
 
 		x -= map_length * tile_size / 4.f;
 		y += map_length * tile_size / 4.f;

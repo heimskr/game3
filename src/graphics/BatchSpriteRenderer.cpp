@@ -36,8 +36,8 @@ namespace Game3 {
 	}
 
 	void BatchSpriteRenderer::update(const Canvas &canvas) {
-		const int backbuffer_width  = canvas.width();
-		const int backbuffer_height = canvas.height();
+		const int backbuffer_width  = canvas.getWidth();
+		const int backbuffer_height = canvas.getHeight();
 		const double scale = canvas.scale;
 
 		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
@@ -58,6 +58,15 @@ namespace Game3 {
 			centerY = canvas.center.second;
 			shader.bind();
 			shader.set("center", Eigen::Vector2f(float(centerX), float(centerY)));
+		}
+	}
+
+	void BatchSpriteRenderer::update(int width, int height) {
+		if (width != backbufferWidth || height != backbufferHeight) {
+			backbufferWidth = width;
+			backbufferHeight = height;
+			shader.bind();
+			shader.set("screenSize", Eigen::Vector2f(width, height));
 		}
 	}
 

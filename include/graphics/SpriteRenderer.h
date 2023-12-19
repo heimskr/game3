@@ -21,11 +21,13 @@ namespace Game3 {
 
 			virtual ~SpriteRenderer() = default;
 
-			virtual void update(const Canvas &) = 0;
+			virtual void update(const Canvas &);
+			virtual void update(int width, int height) = 0;
 			virtual void drawOnMap(const std::shared_ptr<Texture> &, double x, double y, double scale, double angle, double alpha) = 0;
 			virtual void drawOnMap(const std::shared_ptr<Texture> &, const RenderOptions &) = 0;
 			void drawOnMap(const std::shared_ptr<Texture> &, double x, double y);
 			void drawOnMap(const std::shared_ptr<Texture> &);
+			virtual void drawOnScreen(GL::Texture &, const RenderOptions &) = 0;
 
 			virtual void renderNow() {}
 

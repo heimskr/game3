@@ -189,8 +189,8 @@ namespace Game3 {
 			lastDragX = x;
 			lastDragY = y;
 			if (canvas) {
-				canvas->center.first  += delta_x / (canvas->magic * canvas->scale);
-				canvas->center.second += delta_y / (canvas->magic * canvas->scale);
+				canvas->center.first  += delta_x / (canvas->magic * canvas->scale / canvas->getFactor());
+				canvas->center.second += delta_y / (canvas->magic * canvas->scale / canvas->getFactor());
 			}
 		});
 		glArea.add_controller(drag);
@@ -278,11 +278,11 @@ namespace Game3 {
 
 			const auto difference_x = w / old_scale - w / canvas->scale;
 			const auto side_ratio_x = (glAreaMouseX - w / 2.f) / w;
-			canvas->center.first -= difference_x * side_ratio_x / 8.f;
+			canvas->center.first -= difference_x * side_ratio_x / 8.f * canvas->getFactor();
 
 			const auto difference_y = h / old_scale - h / canvas->scale;
 			const auto side_ratio_y = (glAreaMouseY - h / 2.f) / h;
-			canvas->center.second -= difference_y * side_ratio_y / 8.f;
+			canvas->center.second -= difference_y * side_ratio_y / 8.f * canvas->getFactor();
 
 			return true;
 		}, false);

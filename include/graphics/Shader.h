@@ -28,11 +28,11 @@ namespace Game3 {
 			Shader & set(const char *, GLint);
 			Shader & set(const char *, GLfloat);
 			Shader & set(const char *, GLfloat, GLfloat);
+			Shader & set(const char *, GLfloat, GLfloat, GLfloat, GLfloat);
 			Shader & set(const char *, const GLint *, GLsizei);
 			Shader & set(const char *, const glm::mat4 &);
 			Shader & set(const char *, const Eigen::Vector2f &);
 			Shader & set(const char *, const Eigen::Vector4f &);
-			Shader & set(const char *, float x, float y, float z, float w);
 			Shader & set(const char *, const Color &);
 
 			template <template <typename...> typename C>
