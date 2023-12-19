@@ -33,6 +33,8 @@ namespace Game3 {
 	}
 
 	bool Tile::canSpawnMonsters(const Place &place) const {
+		return false;
+
 		RealmPtr realm = place.realm;
 
 		// Don't spawn in certain realms.
