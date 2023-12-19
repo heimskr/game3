@@ -284,7 +284,37 @@ namespace Game3 {
 	}
 
 	void Realm::clearLighting(float game_time) {
-		glClearColor(1.f, 1.f, 1.f, 1.f); CHECKGL
+		Color color{1, 1, 1, 1};
+
+		if (outdoors) {
+			const double hour = game.getHour();
+
+			if (hour <= 4) {
+				color = Color(0x2a3273ff);
+			} else if (hour < 4.375) {
+				color = lerp(Color(0x2a3273ff), Color(0x863e7eff), (hour - 4.0) / 0.375);
+			} else if (hour < 4.75) {
+				color = lerp(Color(0x863e7eff), Color(0xca6262ff), (hour - 4.375) / 0.375);
+			} else if (hour < 5.125) {
+				color = lerp(Color(0xca6262ff), Color(0xebb59eff), (hour - 4.75) / 0.375);
+			} else if (hour < 5.5) {
+				color = lerp(Color(0xebb59eff), Color(0xffffffff), (hour - 5.125) / 0.375);
+			} else if (hour <= 19.5) {
+				color = Color(0xffffffff);
+			} else if (hour < 19.875) {
+				color = lerp(Color(0xffffffff), Color(0xebb59eff), (hour - 19.5) / 0.375);
+			} else if (hour < 20.25) {
+				color = lerp(Color(0xebb59eff), Color(0xca6262ff), (hour - 19.875) / 0.375);
+			} else if (hour < 20.625) {
+				color = lerp(Color(0xca6262ff), Color(0x863e7eff), (hour - 20.25) / 0.375);
+			} else if (hour < 21) {
+				color = lerp(Color(0x863e7eff), Color(0x2a3273ff), (hour - 20.625) / 0.375);
+			} else {
+				color = Color(0x2a3273ff);
+			}
+		}
+
+		glClearColor(color.red, color.green, color.blue, color.alpha); CHECKGL
 		glClear(GL_COLOR_BUFFER_BIT); CHECKGL
 	}
 

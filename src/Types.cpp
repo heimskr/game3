@@ -28,6 +28,10 @@ namespace Game3 {
 
 	// Color should be moved to its own header/.cpp honestly.
 
+	Color Color::fromBytes(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha) {
+		return Color{red / 255.f, green / 255.f, blue / 255.f, alpha / 255.f};
+	}
+
 	template <>
 	std::string Buffer::getType(const Color &) {
 		return std::string{'\x33'} + getType(float{});

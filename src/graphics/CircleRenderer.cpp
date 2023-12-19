@@ -24,7 +24,7 @@ namespace Game3 {
 
 	CircleRenderer::CircleRenderer(Canvas &canvas_): shader("CircleRenderer"), canvas(canvas_) {
 		shader.init(rectangleVert(), rectangleFrag()); CHECKGL
-		initRenderData(24); CHECKGL
+		initRenderData(32); CHECKGL
 	}
 
 	CircleRenderer::~CircleRenderer() {

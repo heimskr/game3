@@ -47,4 +47,8 @@ namespace Game3 {
 			return in;
 		return swapBytes(in);
 	}
+
+	constexpr float lerp(float from, float to, float progress) {
+		return from + (to - from) * progress;
+	}
 }

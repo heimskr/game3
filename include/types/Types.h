@@ -8,6 +8,7 @@
 
 #include "data/Identifier.h"
 #include "registry/Registerable.h"
+#include "util/Math.h"
 
 namespace Game3 {
 	using Index          =  int64_t;
@@ -79,10 +80,27 @@ namespace Game3 {
 		float blue  = 0.f;
 		float alpha = 1.f;
 
-		Color() = default;
-		Color(float red_, float green_, float blue_, float alpha_ = 1.f):
+		constexpr Color() = default;
+		constexpr Color(float red_, float green_, float blue_, float alpha_ = 1.f):
 			red(red_), green(green_), blue(blue_), alpha(alpha_) {}
+
+		explicit constexpr Color(uint32_t packed):
+			red((packed >> 24) / 255.f),
+			green(((packed >> 16) & 0xff) / 255.f),
+			blue(((packed >> 8) & 0xff) / 255.f),
+			alpha((packed & 0xff) / 255.f) {}
+
+		static Color fromBytes(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha = 255);
 	};
+
+	constexpr Color lerp(const Color &from, const Color &to, float progress) {
+		return Color{
+			lerp(from.red,   to.red,   progress),
+			lerp(from.green, to.green, progress),
+			lerp(from.blue,  to.blue,  progress),
+			lerp(from.alpha, to.alpha, progress),
+		};
+	}
 
 	class Buffer;
 
