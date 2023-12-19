@@ -8,6 +8,7 @@
 #include "tile/ForestFloorTile.h"
 #include "tile/GrassTile.h"
 #include "tile/Tile.h"
+#include "tile/TorchTile.h"
 #include "tile/TreeTile.h"
 
 namespace Game3 {
@@ -25,6 +26,7 @@ namespace Game3 {
 		reg.add<DirtTile>();
 		reg.add<FarmlandTile>();
 		reg.add<ForestFloorTile>();
+		reg.add<TorchTile>();
 		reg.addMineable("base:tile/stone", ItemStack(*this, "base:item/stone"), true);
 		reg.add("base:tile/cave_coal",     std::make_shared<CaveTile>("base:tile/cave_coal",     ItemStack(*this, "base:item/coal"),        "base:tile/cave_dirt"));
 		reg.add("base:tile/cave_copper",   std::make_shared<CaveTile>("base:tile/cave_copper",   ItemStack(*this, "base:item/copper_ore"),  "base:tile/cave_dirt"));

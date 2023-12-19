@@ -18,6 +18,10 @@ namespace GL {
 		}
 	}
 
+	FBOBinder FBO::getBinder() {
+		return FBOBinder(*this);
+	}
+
 	GLuint makeFloatVAO(GLuint vbo, std::initializer_list<int> sizes) {
 		GLuint vao = -1;
 

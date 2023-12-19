@@ -786,6 +786,7 @@ namespace Game3 {
 		if (run_helper) {
 			setLayerHelper(position.row, position.column, Layer::Submerged);
 			setLayerHelper(position.row, position.column, Layer::Objects);
+			queueStaticLightingTexture();
 		}
 
 		updateNeighbors(position, Layer::Submerged);
@@ -872,6 +873,8 @@ namespace Game3 {
 			}
 			if (run_helper)
 				setLayerHelper(position.row, position.column, layer, context);
+		} else if (run_helper) {
+			queueStaticLightingTexture();
 		}
 	}
 
@@ -1061,15 +1064,19 @@ namespace Game3 {
 	}
 
 	void Realm::setLayerHelper(Index row, Index column, Layer layer, TileUpdateContext context) {
-		const auto &tileset = getTileset();
-		const Position position(row, column);
+		if (isServer()) {
+			const auto &tileset = getTileset();
+			const Position position(row, column);
 
-		{
-			std::unique_lock<std::shared_mutex> path_lock;
-			tileProvider.findPathState(position, &path_lock) = isWalkable(row, column, tileset);
+			{
+				std::unique_lock<std::shared_mutex> path_lock;
+				tileProvider.findPathState(position, &path_lock) = isWalkable(row, column, tileset);
+			}
+
+			updateNeighbors(position, layer, context);
+		} else if (isActive()) {
+			remakeStaticLightingTexture();
 		}
-
-		updateNeighbors(position, layer, context);
 	}
 
 	Realm::ChunkPackets Realm::getChunkPackets(ChunkPosition chunk_position) {
@@ -1429,6 +1436,44 @@ namespace Game3 {
 		}
 	}
 
+	void Realm::remakeStaticLightingTexture() {
+		assert(isClient());
+		Timer timer("RemakeStaticLightingTexture");
+		ClientGame &client_game = game.toClient();
+		Canvas &canvas = client_game.canvas;
+		GL::Texture &texture = canvas.staticLightingTexture;
+		client_game.activateContext();
+		GL::FBOBinder binder = canvas.fbo.getBinder();
+		texture.useInFB();
+		GL::clear(0, 0, 0, 0);
+		const auto [top,     left] = client_game.translateCanvasCoordinates(0, 0);
+		const auto [bottom, right] = client_game.translateCanvasCoordinates(canvas.getWidth(), canvas.getHeight());
+		Tileset &tileset = getTileset();
+		RealmPtr shared = shared_from_this();
+		RendererSet renderers = canvas.getRenderers();
+		for (Index row = top - 2; row <= bottom + 2; ++row) {
+			for (Index column = left - 2; column <= right + 2; ++column) {
+				Place place{Position(row, column), shared};
+				for (const Layer layer: allLayers) {
+					if (std::optional<TileID> tile_id = tryTile(layer, place.position)) {
+						std::shared_ptr<Tile> tile = game.getTile(tileset[*tile_id]);
+						tile->renderStaticLighting(place, layer, renderers);
+					}
+				}
+			}
+		}
+	}
+
+	void Realm::queueStaticLightingTexture() {
+		if (!isClient())
+			return;
+
+		game.toClient().getWindow().queue([weak = weak_from_this()] {
+			if (RealmPtr realm = weak.lock())
+				realm->remakeStaticLightingTexture();
+		});
+	}
+
 	bool Realm::rightClick(const Position &position, double x, double y) {
 		if (getSide() != Side::Client)
 			return false;
@@ -1511,6 +1556,11 @@ namespace Game3 {
 				}
 			}
 		}
+	}
+
+	bool Realm::isActive() const {
+		assert(isClient());
+		return game.toClient().activeRealm.get() == this;
 	}
 
 	BiomeType Realm::getBiome(int64_t seed) {

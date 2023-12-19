@@ -7,7 +7,7 @@ namespace Game3 {
 		uint32_t limit;
 
 		TileUpdateContext();
-		TileUpdateContext(uint32_t);
+		explicit TileUpdateContext(uint32_t);
 
 		TileUpdateContext & operator--() {
 			--limit;

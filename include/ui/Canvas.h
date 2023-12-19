@@ -12,6 +12,7 @@
 #include "graphics/BatchSpriteRenderer.h"
 #include "graphics/CircleRenderer.h"
 #include "graphics/Multiplier.h"
+#include "graphics/Overlayer.h"
 #include "graphics/RectangleRenderer.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/TextRenderer.h"
@@ -20,6 +21,7 @@ namespace Game3 {
 	class ClientGame;
 	class MainWindow;
 	class Realm;
+	struct RendererSet;
 
 	class Canvas {
 		public:
@@ -36,9 +38,11 @@ namespace Game3 {
 			RectangleRenderer rectangleRenderer{*this};
 			CircleRenderer circleRenderer{*this};
 			GL::Texture mainTexture;
-			GL::Texture lightingTexture;
+			GL::Texture staticLightingTexture;
+			GL::Texture dynamicLightingTexture;
 			GL::FBO fbo;
 			Multiplier multiplier;
+			Overlayer overlayer;
 			float magic = 8.f;
 			int autofocusCounter = 0;
 			Gdk::Rectangle realmBounds;
@@ -53,5 +57,10 @@ namespace Game3 {
 			int getFactor() const;
 
 			bool inBounds(const Position &) const;
+
+			RendererSet getRenderers();
+
+		private:
+			GL::Texture scratchTexture;
 	};
 }

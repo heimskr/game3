@@ -364,6 +364,8 @@ namespace GL {
 			GLuint handle = 0;
 	};
 
+	class FBOBinder;
+
 	class FBO {
 		public:
 			FBO() = default;
@@ -391,6 +393,8 @@ namespace GL {
 				return true;
 			}
 
+			FBOBinder getBinder();
+
 			inline bool undo() {
 				if (handle == 0 || oldBuffer < 0)
 					return false;
@@ -415,6 +419,20 @@ namespace GL {
 		private:
 			GLint oldBuffer = -1;
 			GLuint handle = 0;
+	};
+
+	class FBOBinder {
+		public:
+			explicit FBOBinder(FBO &fbo_): fbo(fbo_) {
+				fbo.bind();
+			}
+
+			~FBOBinder() {
+				fbo.undo();
+			}
+
+		private:
+			FBO &fbo;
 	};
 
 	class Texture {

@@ -34,6 +34,7 @@ namespace Game3 {
 		textRenderer.update(width, height);
 		circleRenderer.update(width, height);
 		multiplier.update(width, height);
+		overlayer.update(width, height);
 
 		game->iterateRealms([](const RealmPtr &realm) {
 			if (!realm->renderersReady)
@@ -62,7 +63,13 @@ namespace Game3 {
 
 		if (mainTexture.getWidth() != width || mainTexture.getHeight() != height) {
 			mainTexture.initRGBA(width, height, GL_NEAREST);
-			lightingTexture.initRGBA(width, height, GL_NEAREST);
+			staticLightingTexture.initRGBA(width, height, GL_NEAREST);
+			dynamicLightingTexture.initRGBA(width, height, GL_NEAREST);
+			scratchTexture.initRGBA(width, height, GL_NEAREST);
+			fbo.bind();
+			dynamicLightingTexture.useInFB();
+			GL::clear(1, 1, 1);
+			fbo.undo();
 		}
 
 		if (RealmPtr realm = game->activeRealm.copyBase()) {
@@ -72,13 +79,15 @@ namespace Game3 {
 			batchSpriteRenderer.update(width, height);
 			glClearColor(.2f, .2f, .2f, 1.f); CHECKGL
 			glClear(GL_COLOR_BUFFER_BIT); CHECKGL
-			RendererSet renderers{rectangleRenderer, batchSpriteRenderer, textRenderer, circleRenderer};
+			RendererSet renderers = getRenderers();
 			realm->render(width, height, center, scale, renderers, game->getDivisor()); CHECKGL
 			viewport.reset();
-			lightingTexture.useInFB();
+			dynamicLightingTexture.useInFB();
 			realm->renderLighting(width, height, center, scale, renderers, game->getDivisor()); CHECKGL
+			scratchTexture.useInFB();
+			overlayer(dynamicLightingTexture, staticLightingTexture);
 			fbo.undo();
-			multiplier(mainTexture, lightingTexture);
+			multiplier(mainTexture, scratchTexture);
 			realmBounds = game->getVisibleRealmBounds();
 		}
 	}
@@ -98,5 +107,9 @@ namespace Game3 {
 	bool Canvas::inBounds(const Position &pos) const {
 		return realmBounds.get_x() <= pos.column && pos.column < realmBounds.get_x() + realmBounds.get_width()
 		    && realmBounds.get_y() <= pos.row    && pos.row    < realmBounds.get_y() + realmBounds.get_height();
+	}
+
+	RendererSet Canvas::getRenderers() {
+		return {rectangleRenderer, batchSpriteRenderer, textRenderer, circleRenderer};
 	}
 }

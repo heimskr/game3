@@ -3,8 +3,8 @@
 #include "graphics/TextureCombiner.h"
 
 namespace Game3 {
-	class Multiplier: public TextureCombiner {
+	class Overlayer: public TextureCombiner {
 		public:
-			Multiplier();
+			Overlayer();
 	};
 }

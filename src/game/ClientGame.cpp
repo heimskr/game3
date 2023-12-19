@@ -68,8 +68,8 @@ namespace Game3 {
 	}
 
 	Gdk::Rectangle ClientGame::getVisibleRealmBounds() const {
-		const auto [top,     left] = translateCanvasCoordinates(0., 0., nullptr, nullptr);
-		const auto [bottom, right] = translateCanvasCoordinates(canvas.getWidth(), canvas.getHeight(), nullptr, nullptr);
+		const auto [top,     left] = translateCanvasCoordinates(0, 0);
+		const auto [bottom, right] = translateCanvasCoordinates(canvas.getWidth(), canvas.getHeight());
 		return {
 			static_cast<int>(left),
 			static_cast<int>(top),

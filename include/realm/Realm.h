@@ -201,6 +201,9 @@ namespace Game3 {
 			void recalculateVisibleChunks();
 			void queueReupload();
 			void autotile(const Position &, Layer, TileUpdateContext = {});
+			/** Should be called in the UI thread. */
+			void remakeStaticLightingTexture();
+			void queueStaticLightingTexture();
 
 			inline const auto & getPlayers() const { return players; }
 			inline void markGenerated(auto x, auto y) { generatedChunks.emplace(x, y); }
@@ -350,6 +353,7 @@ namespace Game3 {
 			void setLayerHelper(Index row, Index col, Layer, TileUpdateContext = {});
 			ChunkPackets getChunkPackets(ChunkPosition);
 			void initEntity(const EntityPtr &, const Position &);
+			bool isActive() const;
 
 			static BiomeType getBiome(int64_t seed);
 
