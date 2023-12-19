@@ -863,6 +863,7 @@ namespace Game3 {
 						std::cout << "Chunk position: " << std::string(game->player->getPosition().getChunk()) << '\n';
 						std::cout << "Update counter: " << game->player->getRealm()->tileProvider.getUpdateCounter(game->player->getPosition().getChunk()) << '\n';
 						std::cout << "Canvas scale: " << canvas->scale << '\n';
+						std::cout << "Outdoors: " << std::boolalpha << game->player->getRealm()->outdoors << '\n';
 					}
 					return;
 				}
