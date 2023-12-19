@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iostream>
 
 #include "graphics/Shader.h"
@@ -7,7 +8,7 @@
 #include "game/ClientGame.h"
 #include "game/TileProvider.h"
 #include "graphics/GL.h"
-#include "graphics/RectangleRenderer.h"
+#include "graphics/CircleRenderer.h"
 #include "graphics/RenderOptions.h"
 #include "graphics/Tileset.h"
 #include "realm/Realm.h"
@@ -17,28 +18,28 @@
 
 namespace Game3 {
 	namespace {
-		const std::string & rectangleFrag() { static auto out = readFile("resources/rectangle.frag"); return out; }
-		const std::string & rectangleVert() { static auto out = readFile("resources/rectangle.vert"); return out; }
+		const std::string & rectangleFrag() { static auto out = readFile("resources/circle.frag"); return out; }
+		const std::string & rectangleVert() { static auto out = readFile("resources/circle.vert"); return out; }
 	}
 
-	RectangleRenderer::RectangleRenderer(Canvas &canvas_): shader("RectangleRenderer"), canvas(canvas_) {
+	CircleRenderer::CircleRenderer(Canvas &canvas_): shader("CircleRenderer"), canvas(canvas_) {
 		shader.init(rectangleVert(), rectangleFrag()); CHECKGL
-		initRenderData(); CHECKGL
+		initRenderData(24); CHECKGL
 	}
 
-	RectangleRenderer::~RectangleRenderer() {
+	CircleRenderer::~CircleRenderer() {
 		reset();
 	}
 
-	void RectangleRenderer::reset() {
-		if (initialized) {
+	void CircleRenderer::reset() {
+		if (initializedTo <= 0) {
 			glDeleteVertexArrays(1, &quadVAO); CHECKGL
 			quadVAO = 0;
-			initialized = false;
+			initializedTo = 0;
 		}
 	}
 
-	void RectangleRenderer::update(int backbuffer_width, int backbuffer_height) {
+	void CircleRenderer::update(int backbuffer_width, int backbuffer_height) {
 		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
 			backbufferWidth = backbuffer_width;
 			backbufferHeight = backbuffer_height;
@@ -48,8 +49,8 @@ namespace Game3 {
 		}
 	}
 
-	void RectangleRenderer::drawOnMap(const RenderOptions &options) {
-		if (!initialized)
+	void CircleRenderer::drawOnMap(const RenderOptions &options, float cutoff) {
+		if (!isInitialized())
 			return;
 
 		auto width  = options.sizeX * 16;
@@ -89,18 +90,20 @@ namespace Game3 {
 		model = glm::scale(model, glm::vec3(width * canvas.scale / 2., height * canvas.scale / 2., 1.f)); // last scale
 
 		shader.set("model", model); CHECKGL
-		shader.set("rectColor", options.color); CHECKGL
+		shader.set("circleColor", options.color); CHECKGL
+		shader.set("radius", width, height); CHECKGL
+		shader.set("cutoff", cutoff);
 
 		glBindVertexArray(quadVAO); CHECKGL
-		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
+		glDrawArrays(GL_TRIANGLES, 0, initializedTo * 3); CHECKGL
 		glBindVertexArray(0); CHECKGL
 	}
 
-	void RectangleRenderer::drawOnScreen(const Eigen::Vector4f &color, float x, float y, float width, float height, float angle) {
-		if (!initialized)
+	void CircleRenderer::drawOnScreen(const Eigen::Vector4f &color, float x, float y, float width, float height, float cutoff, float angle) {
+		if (!isInitialized())
 			return;
 
-		y = backbufferHeight - y - height;
+		y = backbufferHeight - y;
 
 		shader.bind(); CHECKGL
 
@@ -115,29 +118,20 @@ namespace Game3 {
 		model = glm::scale(model, glm::vec3(width, height, 1.f)); // last scale
 
 		shader.set("model", model); CHECKGL
-		shader.set("rectColor", color); CHECKGL
+		shader.set("circleColor", color); CHECKGL
+		shader.set("radius", width, height);
+		shader.set("cutoff", cutoff);
 
 		glBindVertexArray(quadVAO); CHECKGL
-		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
+		glDrawArrays(GL_TRIANGLES, 0, initializedTo * 3); CHECKGL
 		glBindVertexArray(0); CHECKGL
 	}
 
-	void RectangleRenderer::operator()(const Eigen::Vector4f &color, float x, float y, float width, float height, float angle) {
-		drawOnScreen(color, x, y, width, height, angle);
-	}
-
-	void RectangleRenderer::initRenderData() {
+	void CircleRenderer::initRenderData(int sides) {
 		GLuint vbo;
 
-		static const float vertices[] {
-			0.f, 1.f, 0.f, 1.f,
-			1.f, 0.f, 1.f, 0.f,
-			0.f, 0.f, 0.f, 0.f,
-
-			0.f, 1.f, 0.f, 1.f,
-			1.f, 1.f, 1.f, 1.f,
-			1.f, 0.f, 1.f, 0.f,
-		};
+		std::shared_lock<DefaultMutex> shared_lock;
+		const std::vector<float> &vertices = getVertices(sides, shared_lock);
 
 		glGenVertexArrays(1, &quadVAO); CHECKGL
 		glGenBuffers(1, &vbo); CHECKGL
@@ -146,13 +140,51 @@ namespace Game3 {
 		glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &old_abb); CHECKGL
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo); CHECKGL
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); CHECKGL
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW); CHECKGL
 
 		glBindVertexArray(quadVAO); CHECKGL
 		glEnableVertexAttribArray(0); CHECKGL
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr); CHECKGL
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr); CHECKGL
 		glBindBuffer(GL_ARRAY_BUFFER, old_abb); CHECKGL
 		glBindVertexArray(0); CHECKGL
-		initialized = true;
+		initializedTo = sides;
+	}
+
+	const std::vector<float> & CircleRenderer::getVertices(int sides, std::shared_lock<DefaultMutex> &shared_lock) {
+		shared_lock = vertexMap.sharedLock();
+		if (auto iter = vertexMap.find(sides); iter != vertexMap.end())
+			return iter->second;
+
+		shared_lock = {};
+		auto unique_lock = vertexMap.uniqueLock();
+		if (auto iter = vertexMap.find(sides); iter != vertexMap.end()) {
+			unique_lock = {};
+			shared_lock = vertexMap.sharedLock();
+			return iter->second;
+		}
+
+		std::vector<float> &vertices = vertexMap[sides];
+		for (int i = 0; i < sides; ++i) {
+			const float rad1 = 2. * M_PI * i / sides;
+			const float rad2 = 2. * M_PI * (i + 1) / sides;
+			const float x1 = cos(rad1);
+			const float y1 = sin(rad1);
+			const float x2 = cos(rad2);
+			const float y2 = sin(rad2);
+			vertices.push_back(0.f);
+			vertices.push_back(0.f);
+			vertices.push_back(x1);
+			vertices.push_back(y1);
+			vertices.push_back(x2);
+			vertices.push_back(y2);
+		}
+
+		unique_lock = {};
+		shared_lock = vertexMap.sharedLock();
+		return vertices;
+	}
+
+	bool CircleRenderer::isInitialized() const {
+		return 0 < initializedTo;
 	}
 }

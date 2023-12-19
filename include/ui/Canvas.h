@@ -9,6 +9,7 @@
 #include "graphics/Texture.h"
 #include "types/Types.h"
 #include "graphics/GL.h"
+#include "graphics/CircleRenderer.h"
 #include "graphics/Multiplier.h"
 #include "graphics/RectangleRenderer.h"
 #include "graphics/SpriteRenderer.h"
@@ -31,6 +32,7 @@ namespace Game3 {
 			std::unique_ptr<SpriteRenderer> spriteRenderer;
 			TextRenderer textRenderer{*this};
 			RectangleRenderer rectangleRenderer{*this};
+			CircleRenderer circleRenderer{*this};
 			GL::Texture textureA;
 			GL::Texture textureB;
 			GL::FBO fbo;

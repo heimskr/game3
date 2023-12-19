@@ -198,9 +198,8 @@ namespace Game3 {
 			}
 		}
 
-		auto &[rectangle_renderer, sprite_renderer, text_renderer] = renderers;
+		auto &[rectangle_renderer, sprite_renderer, text_renderer, circle_renderer] = renderers;
 
-		rectangle_renderer.update(bb_width, bb_height);
 		sprite_renderer.centerX = center.first;
 		sprite_renderer.centerY = center.second;
 		// sprite_renderer.divisor = outdoors? game_time : 1;

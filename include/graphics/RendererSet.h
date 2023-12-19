@@ -1,6 +1,7 @@
 #pragma once
 
 namespace Game3 {
+	class CircleRenderer;
 	class RectangleRenderer;
 	class SpriteRenderer;
 	class TextRenderer;
@@ -9,8 +10,9 @@ namespace Game3 {
 		RectangleRenderer &rectangle;
 		SpriteRenderer &sprite;
 		TextRenderer &text;
+		CircleRenderer &circle;
 
-		RendererSet(RectangleRenderer &rectangle_, SpriteRenderer &sprite_, TextRenderer &text_):
-			rectangle(rectangle_), sprite(sprite_), text(text_) {}
+		RendererSet(RectangleRenderer &rectangle_, SpriteRenderer &sprite_, TextRenderer &text_, CircleRenderer &circle_):
+			rectangle(rectangle_), sprite(sprite_), text(text_), circle(circle_) {}
 	};
 }

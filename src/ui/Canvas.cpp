@@ -27,6 +27,7 @@ namespace Game3 {
 		spriteRenderer->update(*this);
 		rectangleRenderer.update(width(), height());
 		textRenderer.update(width(), height());
+		circleRenderer.update(width(), height());
 
 		game->iterateRealms([](const RealmPtr &realm) {
 			if (!realm->renderersReady)
@@ -54,7 +55,7 @@ namespace Game3 {
 		});
 
 		if (RealmPtr realm = game->activeRealm.copyBase()) {
-			realm->render(width(), height(), center, scale, {rectangleRenderer, *spriteRenderer, textRenderer}, game->getDivisor()); CHECKGL
+			realm->render(width(), height(), center, scale, {rectangleRenderer, *spriteRenderer, textRenderer, circleRenderer}, game->getDivisor()); CHECKGL
 			realmBounds = game->getVisibleRealmBounds();
 		}
 	}
