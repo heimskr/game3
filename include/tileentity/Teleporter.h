@@ -9,12 +9,7 @@ namespace Game3 {
 			RealmID targetRealm;
 			Position targetPosition;
 
-			Teleporter(const Teleporter &) = delete;
-			Teleporter(Teleporter &&) = default;
-			~Teleporter() override = default;
-
-			Teleporter & operator=(const Teleporter &) = delete;
-			Teleporter & operator=(Teleporter &&) = default;
+			std::string getName() const override { return "Teleporter"; }
 
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;

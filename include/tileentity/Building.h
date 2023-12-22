@@ -9,12 +9,7 @@ namespace Game3 {
 			RealmID innerRealmID = 0;
 			Position entrance;
 
-			Building(const Building &) = delete;
-			Building(Building &&) = default;
-			~Building() override = default;
-
-			Building & operator=(const Building &) = delete;
-			Building & operator=(Building &&) = default;
+			std::string getName() const override { return "Building"; }
 
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractOn(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;

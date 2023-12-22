@@ -9,11 +9,11 @@ namespace Game3 {
 
 			FluidAmount getMaxLevel(FluidID) override;
 
+			std::string getName() const override { return "Tank"; }
+
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
-
-			std::string getName() const override { return "Tank"; }
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;

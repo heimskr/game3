@@ -25,12 +25,7 @@ namespace Game3 {
 			Atomic<float> timeRemaining = 0.f;
 			Atomic<uint32_t> uses = 0;
 
-			OreDeposit(const OreDeposit &) = delete;
-			OreDeposit(OreDeposit &&) = default;
-			~OreDeposit() override = default;
-
-			OreDeposit & operator=(const OreDeposit &) = delete;
-			OreDeposit & operator=(OreDeposit &&) = default;
+			std::string getName() const override { return "Ore Deposit"; }
 
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;

@@ -12,16 +12,8 @@ namespace Game3 {
 			float chancePerTenth;
 			std::vector<ItemStack> spawnables;
 
-			ItemSpawner(const ItemSpawner &) = delete;
-			ItemSpawner(ItemSpawner &&) = default;
-			~ItemSpawner() override = default;
-
-			ItemSpawner & operator=(const ItemSpawner &) = delete;
-			ItemSpawner & operator=(ItemSpawner &&) = default;
-
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
-			using TileEntity::init;
 			void tick(Game &, float) override;
 			void render(SpriteRenderer &) override;
 

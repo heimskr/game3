@@ -9,17 +9,11 @@ namespace Game3 {
 			std::string text;
 			std::string name;
 
-			Sign(const Sign &) = delete;
-			Sign(Sign &&) = default;
-			~Sign() override = default;
-
-			Sign & operator=(const Sign &) = delete;
-			Sign & operator=(Sign &&) = default;
+			std::string getName() const override { return name.empty()? "Sign" : name; }
 
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
-			// void render(SpriteRenderer &) const override;
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;

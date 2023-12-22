@@ -11,6 +11,8 @@ namespace Game3 {
 			size_t getMaxFluidTypes() const override;
 			FluidAmount getMaxLevel(FluidID) override;
 
+			std::string getName() const override { return "Incinerator"; }
+
 			void init(Game &) override;
 			void tick(Game &, float) override;
 			void toJSON(nlohmann::json &) const override;
