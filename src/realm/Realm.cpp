@@ -33,6 +33,8 @@
 #include <thread>
 #include <unordered_set>
 
+// #define PROFILE_TICKS
+
 namespace Game3 {
 	void from_json(const nlohmann::json &json, RealmDetails &details) {
 		details.tilesetName = json.at("tileset");
@@ -400,6 +402,10 @@ namespace Game3 {
 		if (ticking.exchange(true))
 			return;
 
+#ifdef PROFILE_TICKS
+		Timer realm_timer{"TickRealm"};
+#endif
+
 		for (const auto &[entity, position]: entityInitializationQueue.steal())
 			initEntity(entity, position);
 
@@ -437,9 +443,14 @@ namespace Game3 {
 						if (auto iter = entitiesByChunk.find(chunk); iter != entitiesByChunk.end() && iter->second) {
 							auto set_lock = iter->second->sharedLock();
 							by_chunk_lock.unlock();
-							for (const auto &entity: *iter->second)
-								if (!entity->isPlayer())
+							for (const auto &entity: *iter->second) {
+								if (!entity->isPlayer()) {
+#ifdef PROFILE_TICKS
+									Timer timer{"TickEntity"};
+#endif
 									entity->tick(game, delta);
+								}
+							}
 						}
 					}
 					{
@@ -448,14 +459,21 @@ namespace Game3 {
 							auto set = iter->second;
 							auto set_lock = set->sharedLock();
 							by_chunk_lock.unlock();
-							for (const auto &tile_entity: *set)
+							for (const auto &tile_entity: *set) {
+#ifdef PROFILE_TICKS
+								Timer timer{"TickTileEntity"};
+#endif
 								tile_entity->tick(game, delta);
+							}
 						}
 					}
 					std::uniform_int_distribution<int64_t> distribution{0, CHUNK_SIZE - 1};
 					auto &tileset = getTileset();
 					auto shared = shared_from_this();
 
+#ifdef PROFILE_TICKS
+					Timer timer{"RandomTicks"};
+#endif
 					for (size_t i = 0; i < game.randomTicksPerChunk; ++i) {
 						const Position position(chunk.y * CHUNK_SIZE + distribution(threadContext.rng), chunk.x * CHUNK_SIZE + distribution(threadContext.rng));
 
@@ -1031,9 +1049,10 @@ namespace Game3 {
 		tileProvider.toJSON(json["provider"], full_data);
 
 		if (full_data) {
-			json["tileEntities"] = std::unordered_map<std::string, nlohmann::json>();
+			auto &tile_entities = json["tileEntities"];
+			tile_entities = std::unordered_map<std::string, nlohmann::json>{};
 			for (const auto &[position, tile_entity]: tileEntities)
-				json["tileEntities"][position.simpleString()] = *tile_entity;
+				tile_entities[position.simpleString()] = *tile_entity;
 			json["entities"] = std::vector<nlohmann::json>();
 			for (const auto &entity: entities) {
 				nlohmann::json entity_json;
