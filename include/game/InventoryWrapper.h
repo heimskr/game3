@@ -15,6 +15,9 @@ namespace Game3 {
 		public:
 			InventoryWrapper(std::shared_ptr<Inventory>);
 
+			Slot getSlotCount() const override;
+			void setSlotCount(Slot) override;
+			void set(Slot, ItemStack) override;
 			std::unique_ptr<Inventory> copy() const override;
 			ItemStack * operator[](Slot) override;
 			const ItemStack * operator[](Slot) const override;
@@ -58,6 +61,8 @@ namespace Game3 {
 			void setActive(Slot, bool force) override;
 			void notifyOwner() override;
 			bool empty() const override;
+			void replace(const Inventory &) override;
+			void replace(Inventory &&) override;
 
 			using Inventory::add;
 

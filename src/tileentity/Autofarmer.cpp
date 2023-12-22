@@ -239,7 +239,7 @@ namespace Game3 {
 			if (!crop_tile || !crop_tile->isRipe(tileset[submerged]))
 				return operated;
 
-			InventorySpan output_span(inventory, INPUT_CAPACITY, inventory->slotCount - 1);
+			InventorySpan output_span(inventory, INPUT_CAPACITY, inventory->getSlotCount() - 1);
 
 			bool any_added = false;
 

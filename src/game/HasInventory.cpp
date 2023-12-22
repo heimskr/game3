@@ -23,7 +23,7 @@ namespace Game3 {
 		if (subinventory) {
 			server_inventory = std::dynamic_pointer_cast<ServerInventory>(subinventory);
 			assert(server_inventory);
-			buffer << subinventory->slotCount.load();
+			buffer << subinventory->getSlotCount();
 		} else
 			buffer << Slot(-1);
 		buffer << server_inventory;
@@ -45,7 +45,7 @@ namespace Game3 {
 				assert(inventory);
 				if (inventory) { // This is unnecessary but I want PVS-Studio to be happy.
 					inventory->weakOwner = has_inventory.getSharedAgent();
-					inventory->slotCount = slot_count; // Maybe not necessary? Try an assert before.
+					inventory->setSlotCount(slot_count); // Maybe not necessary? Try an assert before.
 					inventory->index = index;
 					has_inventory.setInventory(inventory, index);
 					has_inventory.inventoryUpdated();

@@ -138,7 +138,7 @@ namespace Game3 {
 			buffer += locked->getGID();
 		else
 			buffer += static_cast<GlobalID>(-1);
-		buffer += inventory.slotCount.load();
+		buffer += inventory.getSlotCount();
 		buffer += inventory.activeSlot.load();
 		buffer += inventory.index.load();
 		{
@@ -162,7 +162,7 @@ namespace Game3 {
 		const auto gid = buffer.take<GlobalID>();
 		if (auto locked = inventory.weakOwner.lock())
 			locked->setGID(gid);
-		inventory.slotCount = buffer.take<Slot>();
+		inventory.setSlotCount(buffer.take<Slot>());
 		inventory.activeSlot = buffer.take<Slot>();
 		inventory.index = buffer.take<InventoryID>();
 		inventory.setStorage(buffer.take<std::decay_t<decltype(inventory.getStorage())>>());
@@ -172,7 +172,7 @@ namespace Game3 {
 	void to_json(nlohmann::json &json, const ClientInventory &inventory) {
 		for (const auto &[key, val]: inventory.getStorage())
 			json["storage"][std::to_string(key)] = val;
-		json["slotCount"]  = inventory.slotCount.load();
+		json["slotCount"]  = inventory.getSlotCount();
 		json["activeSlot"] = inventory.activeSlot.load();
 	}
 }

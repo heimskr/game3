@@ -13,8 +13,8 @@ namespace Game3 {
 		return output;
 	}
 
-	bool CraftingRecipe::canCraft(const std::shared_ptr<Container> &container) {
-		auto inventory = std::dynamic_pointer_cast<Inventory>(container);
+	bool CraftingRecipe::canCraft(const std::shared_ptr<Container> &input_container) {
+		auto inventory = std::dynamic_pointer_cast<Inventory>(input_container);
 		if (!inventory)
 			return false;
 
@@ -40,15 +40,52 @@ namespace Game3 {
 		if (!inventory_in || !inventory_out || !canCraft(input_container))
 			return false;
 
-		leftovers.emplace();
+		// We need to check whether the output inventory has enough space to hold the outputs.
+		// How we do this depends on the number of outputs as well as whether the input and output inventory are the same.
+
+		if (inventory_in == inventory_out) {
+			// If they're the same, we need to copy the inventory early to check for
+			// removability and insertability, regardless of the number of outputs.
+			std::unique_ptr<Inventory> copy = inventory_in->copy();
+			for (const CraftingRequirement &requirement: input)
+				copy->remove(requirement);
+
+			for (const ItemStack &stack: output)
+				if (copy->add(stack).has_value())
+					return false;
+
+			inventory_in->replace(std::move(*copy));
+			leftovers.emplace();
+			return true;
+		}
+
+		if (output.size() == 1) {
+			// If there's just one output, we can check whether it's insertable without having to copy the output inventory.
+			if (!inventory_out->canInsert(output[0]))
+				return false;
+
+			for (const CraftingRequirement &requirement: input)
+				inventory_in->remove(requirement);
+
+			inventory_out->add(output[0]);
+			leftovers.emplace();
+			return true;
+		}
+
+		// At this point the input and output inventories are different and there are multiple outputs.
+		// Make a copy of the output inventory and try to insert all the outputs in it.
+		// If that succeeds, proceed to remove the ingredients from the input inventory and replace
+		// the output inventory with the copy.
+		auto out_copy = inventory_out->copy();
+		for (const ItemStack &stack: output)
+			if (out_copy->add(stack).has_value())
+				return false;
 
 		for (const CraftingRequirement &requirement: input)
 			inventory_in->remove(requirement);
 
-		for (const ItemStack &stack: output)
-			if (std::optional<ItemStack> leftover = inventory_out->add(stack))
-				leftovers->push_back(std::move(*leftover));
-
+		inventory_out->replace(std::move(*out_copy));
+		leftovers.emplace();
 		return true;
 	}
 

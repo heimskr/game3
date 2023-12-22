@@ -193,7 +193,7 @@ namespace Game3 {
 		MoneyCount new_money = money;
 		const InventoryPtr inventory = getInventory(0);
 
-		for (Slot slot = 0; slot < inventory->slotCount; ++slot) {
+		for (Slot slot = 0; slot < inventory->getSlotCount(); ++slot) {
 			if (!inventory->contains(slot))
 				continue;
 

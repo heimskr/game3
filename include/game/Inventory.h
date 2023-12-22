@@ -22,9 +22,7 @@ namespace Game3 {
 	class Inventory: public Container, public HasMutex<> {
 		protected:
 			Inventory();
-			Inventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot = 0, InventoryID index_ = 0);
-			Inventory(const Inventory &);
-			Inventory(Inventory &&);
+			Inventory(std::shared_ptr<Agent> owner, Slot active_slot = 0, InventoryID index_ = 0);
 
 		public:
 			using SlotPredicate = std::function<bool(Slot)>;
@@ -32,7 +30,6 @@ namespace Game3 {
 			using Predicate = std::function<bool(ItemStack &, Slot)>;
 
 			std::weak_ptr<Agent> weakOwner;
-			Atomic<Slot> slotCount = 0;
 			Atomic<Slot> activeSlot = 0;
 			Atomic<InventoryID> index = -1;
 			/** Called before the swap occurs. The first argument always refers to this object.
@@ -53,6 +50,11 @@ namespace Game3 {
 			virtual const ItemStack * operator[](Slot) const = 0;
 
 			bool operator==(const Inventory &other) const;
+
+			virtual void set(Slot, ItemStack) = 0;
+
+			virtual Slot getSlotCount() const = 0;
+			virtual void setSlotCount(Slot) = 0;
 
 			/** Iterates over all items in the inventory until all have been iterated or the iteration function returns true. */
 			virtual void iterate(const ConstPredicate &) const = 0;
@@ -177,6 +179,9 @@ namespace Game3 {
 			/** Returns the number of times a recipe can be crafted with the inventory's items.
 			 *  Doesn't take the output of the recipe into account. */
 			virtual ItemCount craftable(const CraftingRecipe &) const;
+
+			virtual void replace(const Inventory &) = 0;
+			virtual void replace(Inventory &&) = 0;
 
 			static std::shared_ptr<Inventory> create(Side side, std::shared_ptr<Agent> owner, Slot slot_count, InventoryID index = 0, Slot active_slot = 0, std::map<Slot, ItemStack> storage = {});
 			static std::shared_ptr<Inventory> create(std::shared_ptr<Agent> owner, Slot slot_count, InventoryID index = 0, Slot active_slot = 0, std::map<Slot, ItemStack> storage = {});

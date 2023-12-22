@@ -4,9 +4,20 @@ namespace Game3 {
 	InventoryWrapper::InventoryWrapper(std::shared_ptr<Inventory> inventory_):
 	inventory(std::move(inventory_)) {
 		weakOwner = inventory->weakOwner;
-		slotCount = inventory->slotCount.load();
 		// TODO!: getter method for active slot
 		activeSlot = inventory->activeSlot.load();
+	}
+
+	Slot InventoryWrapper::getSlotCount() const {
+		return inventory->getSlotCount();
+	}
+
+	void InventoryWrapper::setSlotCount(Slot new_count) {
+		inventory->setSlotCount(new_count);
+	}
+
+	void InventoryWrapper::set(Slot slot, ItemStack stack) {
+		inventory->set(slot, std::move(stack));
 	}
 
 	std::unique_ptr<Inventory> InventoryWrapper::copy() const {
@@ -96,7 +107,7 @@ namespace Game3 {
 	}
 
 	void InventoryWrapper::clear() {
-		for (Slot slot = 0; slot < inventory->slotCount; ++slot) {
+		for (Slot slot = 0, slot_max = inventory->getSlotCount(); slot < slot_max; ++slot) {
 			if (validateSlot(slot))
 				inventory->erase(slot);
 		}
@@ -278,6 +289,14 @@ namespace Game3 {
 
 	bool InventoryWrapper::empty() const {
 		return inventory->empty();
+	}
+
+	void InventoryWrapper::replace(const Inventory &other) {
+		inventory->replace(other);
+	}
+
+	void InventoryWrapper::replace(Inventory &&other) {
+		inventory->replace(std::move(other));
 	}
 
 	std::unique_lock<DefaultMutex> InventoryWrapper::uniqueLock() const {

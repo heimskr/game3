@@ -27,6 +27,11 @@ namespace Game3 {
 			ItemStack * operator[](Slot) override;
 			const ItemStack * operator[](Slot) const override;
 
+			void set(Slot, ItemStack) override;
+
+			Slot getSlotCount() const override;
+			void setSlotCount(Slot) override;
+
 			void iterate(const std::function<bool(const ItemStack &, Slot)> &) const override;
 			void iterate(const std::function<bool(ItemStack &, Slot)> &) override;
 
@@ -82,12 +87,17 @@ namespace Game3 {
 
 			void nextSlot() override;
 
+			void replace(const Inventory &) override;
+			void replace(Inventory &&) override;
+
 			inline auto & getStorage() { return storage; }
 			inline const auto & getStorage() const { return storage; }
 			inline void setStorage(Lockable<Storage> &&new_storage) { storage = std::move(new_storage); }
 			inline void setStorage(Storage &&new_storage) { storage = std::move(new_storage); }
 
 		protected:
+			Atomic<Slot> slotCount = 0;
+
 			/** Removes every slot whose item count is zero from the storage map. */
 			void compact() override;
 	};

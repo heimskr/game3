@@ -16,7 +16,7 @@ namespace Game3 {
 
 		auto inventory_lock = inventory->uniqueLock();
 
-		if (slot < 0 || inventory->slotCount <= slot) {
+		if (!inventory->hasSlot(slot)) {
 			client.send(ErrorPacket("Can't drop/discard item: invalid slot"));
 			return;
 		}

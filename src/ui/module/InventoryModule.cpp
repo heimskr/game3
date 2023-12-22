@@ -142,7 +142,7 @@ namespace Game3 {
 		assert(inventory);
 		auto lock = inventory->sharedLock();
 
-		lastSlotCount = inventory->slotCount;
+		lastSlotCount = inventory->getSlotCount();
 		itemSlots.clear();
 
 		for (Slot slot = 0; slot < lastSlotCount; ++slot) {
@@ -166,12 +166,12 @@ namespace Game3 {
 		assert(inventory);
 		auto lock = inventory->sharedLock();
 
-		if (inventory->slotCount.load() != lastSlotCount) {
+		if (inventory->getSlotCount() != lastSlotCount) {
 			populate();
 			return;
 		}
 
-		lastSlotCount = inventory->slotCount;
+		lastSlotCount = inventory->getSlotCount();
 
 		for (Slot slot = 0; slot < lastSlotCount; ++slot) {
 			ItemStack *stack = (*inventory)[slot];

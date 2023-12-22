@@ -19,7 +19,7 @@ namespace Game3 {
 			return;
 		}
 
-		if (inventory->slotCount <= slot) {
+		if (!inventory->hasSlot(slot)) {
 			client.send(ErrorPacket("Can't set held item: invalid slot"));
 			return;
 		}

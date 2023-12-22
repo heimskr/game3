@@ -3,20 +3,30 @@
 
 namespace Game3 {
 	StorageInventory::StorageInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, InventoryID index_, Storage storage_):
-		Inventory(std::move(owner), slot_count, active_slot, index_), storage(std::move(storage_)) {}
+		Inventory(std::move(owner), active_slot, index_), storage(std::move(storage_)), slotCount(slot_count) {}
 
-	StorageInventory::StorageInventory(const StorageInventory &other):
-	Inventory(other) {
+	StorageInventory::StorageInventory(const StorageInventory &other): Inventory() {
 		auto lock = other.sharedLock();
-		storage = other.storage;
+		weakOwner = other.weakOwner;
+		slotCount = other.slotCount.load();
+		activeSlot = other.activeSlot.load();
+		index = other.index.load();
+		suppressInventoryNotifications = other.suppressInventoryNotifications.load();
 		onSwap = other.onSwap;
+		onMove = other.onMove;
+		storage = other.storage;
 	}
 
-	StorageInventory::StorageInventory(StorageInventory &&other):
-	Inventory(std::forward<Inventory>(other)) {
+	StorageInventory::StorageInventory(StorageInventory &&other): Inventory() {
 		auto lock = other.uniqueLock();
-		storage = std::move(other.storage);
+		weakOwner = std::move(other.weakOwner);
+		slotCount = other.slotCount.exchange(0);
+		activeSlot = other.activeSlot.exchange(0);
+		index = other.index.load();
+		suppressInventoryNotifications = other.suppressInventoryNotifications.exchange(false);
 		onSwap = std::move(other.onSwap);
+		onMove = std::move(other.onMove);
+		storage = std::move(other.storage);
 	}
 
 	StorageInventory & StorageInventory::operator=(const StorageInventory &other) {
@@ -53,6 +63,20 @@ namespace Game3 {
 		if (auto iter = storage.find(slot); iter != storage.end())
 			return &iter->second;
 		return nullptr;
+	}
+
+	void StorageInventory::set(Slot slot, ItemStack stack) {
+		if (!hasSlot(slot))
+			throw std::out_of_range("Slot out of range: " + std::to_string(slot));
+		storage[slot] = std::move(stack);
+	}
+
+	Slot StorageInventory::getSlotCount() const {
+		return slotCount.load();
+	}
+
+	void StorageInventory::setSlotCount(Slot new_count) {
+		slotCount.store(new_count);
 	}
 
 	void StorageInventory::iterate(const std::function<bool(const ItemStack &, Slot)> &function) const {
@@ -113,7 +137,7 @@ namespace Game3 {
 
 		if (0 < remaining) {
 			for (Slot slot = 0; slot < slotCount; ++slot) {
-				if (storage.contains(slot))
+				if (!predicate(slot) || storage.contains(slot))
 					continue;
 				remaining -= std::min(ItemCount(remaining), stack.item->maxCount);
 				if (remaining <= 0)
@@ -293,6 +317,28 @@ namespace Game3 {
 	void StorageInventory::nextSlot() {
 		if (activeSlot < slotCount - 1)
 			setActive(activeSlot + 1, false);
+	}
+
+	void StorageInventory::replace(const Inventory &other) {
+		if (this == &other)
+			return;
+
+		if (const auto *other_storage = dynamic_cast<const StorageInventory *>(&other)) {
+			*this = *other_storage;
+		} else {
+			throw std::invalid_argument("StorageInventory::replace expected a StorageInventory");
+		}
+	}
+
+	void StorageInventory::replace(Inventory &&other) {
+		if (this == &other)
+			return;
+
+		if (auto *other_storage = dynamic_cast<StorageInventory *>(&other)) {
+			*this = std::move(*other_storage);
+		} else {
+			throw std::invalid_argument("StorageInventory::replace expected a StorageInventory");
+		}
 	}
 
 	void StorageInventory::compact() {

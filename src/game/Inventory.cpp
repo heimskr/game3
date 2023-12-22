@@ -21,30 +21,8 @@
 namespace Game3 {
 	Inventory::Inventory() = default;
 
-	Inventory::Inventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, InventoryID index_):
-		weakOwner(owner), slotCount(slot_count), activeSlot(active_slot), index(index_) {}
-
-	Inventory::Inventory(const Inventory &other) {
-		auto lock = other.sharedLock();
-		weakOwner = other.weakOwner;
-		slotCount = other.slotCount.load();
-		activeSlot = other.activeSlot.load();
-		index = other.index.load();
-		suppressInventoryNotifications = other.suppressInventoryNotifications.load();
-		onSwap = other.onSwap;
-		onMove = other.onMove;
-	}
-
-	Inventory::Inventory(Inventory &&other) {
-		auto lock = other.uniqueLock();
-		weakOwner = std::move(other.weakOwner);
-		slotCount = other.slotCount.exchange(0);
-		activeSlot = other.activeSlot.exchange(0);
-		index = other.index.load();
-		suppressInventoryNotifications = other.suppressInventoryNotifications.exchange(false);
-		onSwap = std::move(other.onSwap);
-		onMove = std::move(other.onMove);
-	}
+	Inventory::Inventory(std::shared_ptr<Agent> owner, Slot active_slot, InventoryID index_):
+		weakOwner(owner), activeSlot(active_slot), index(index_) {}
 
 	Inventory & Inventory::operator=(const Inventory &other) {
 		if (this == &other)
@@ -53,7 +31,7 @@ namespace Game3 {
 		auto this_lock = uniqueLock();
 		auto other_lock = other.sharedLock();
 		weakOwner = other.weakOwner;
-		slotCount = other.slotCount.load();
+		setSlotCount(other.getSlotCount());
 		activeSlot = other.activeSlot.load();
 		index = other.index.load();
 		suppressInventoryNotifications = other.suppressInventoryNotifications.load();
@@ -69,7 +47,8 @@ namespace Game3 {
 		auto this_lock = uniqueLock();
 		auto other_lock = other.uniqueLock();
 		weakOwner = std::move(other.weakOwner);
-		slotCount = other.slotCount.exchange(0);
+		setSlotCount(other.getSlotCount());
+		other.setSlotCount(0);
 		activeSlot = other.activeSlot.exchange(0);
 		index = other.index.load();
 		suppressInventoryNotifications = other.suppressInventoryNotifications.exchange(false);
@@ -120,7 +99,7 @@ namespace Game3 {
 	}
 
 	void Inventory::nextSlot() {
-		if (activeSlot < slotCount - 1)
+		if (activeSlot < getSlotCount() - 1)
 			setActive(activeSlot + 1, false);
 	}
 
