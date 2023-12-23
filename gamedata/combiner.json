@@ -156,7 +156,8 @@
 			"base:item/pride_flag":       [1, "HoMo"],
 			"base:item/nb_flag":          [1, "NoNbInArY"],
 			"base:item/ace_flag":         [1, "AcEs"],
-			"base:item/ash":              [1, "C", "Ca"]
+			"base:item/ash":              [1, "C", "Ca"],
+			"base:item/bleach":           [1, [4, "NaOCl"]]
 		}]
 	]
 }
