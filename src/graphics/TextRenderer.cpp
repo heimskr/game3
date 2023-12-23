@@ -122,11 +122,11 @@ namespace Game3 {
 		if (!initialized)
 			initRenderData();
 
-		if (0.f < options.shadow.alpha) {
+		if (0 < options.shadow.alpha) {
 			Color color = options.shadow;
-			Color shadow{0.f, 0.f, 0.f, 0.f};
-			float x = options.x + options.shadowOffset.x;
-			float y = options.y + options.shadowOffset.y;
+			Color shadow{0, 0, 0, 0};
+			double x = options.x + options.shadowOffset.x;
+			double y = options.y + options.shadowOffset.y;
 			std::swap(options.color, color);
 			std::swap(options.shadow, shadow);
 			std::swap(options.x, x);
@@ -149,26 +149,26 @@ namespace Game3 {
 		auto &scale_x = options.scaleX;
 		auto &scale_y = options.scaleY;
 
-		scale_x *= canvas->scale * 6.f / fontScale;
-		scale_y *= canvas->scale * 6.f / fontScale;
+		scale_x *= canvas->scale * 6 / fontScale;
+		scale_y *= canvas->scale * 6 / fontScale;
 
-		x *= 8.f;
-		y *= -8.f;
+		x *= 8;
+		y *= -8;
 
-		x += backbufferWidth / 2.f / canvas->scale;
-		y += backbufferHeight / 2.f / canvas->scale;
+		x += backbufferWidth / 2 / canvas->scale;
+		y += backbufferHeight / 2 / canvas->scale;
 
-		x -= map_length * tile_size / 4.f;
-		y += map_length * tile_size / 4.f;
+		x -= map_length * tile_size / 4;
+		y += map_length * tile_size / 4;
 
-		x += centerX * 8.f;
-		y -= centerY * 8.f;
+		x += centerX * 8;
+		y -= centerY * 8;
 
 		x *= canvas->scale;
 		y *= canvas->scale;
 
 		if (options.align == TextAlign::Center)
-			x -= textWidth(text, scale_x) / 2.f;
+			x -= textWidth(text, scale_x) / 2;
 		else if (options.align == TextAlign::Right)
 			x -= textWidth(text, scale_x);
 
@@ -188,13 +188,13 @@ namespace Game3 {
 
 			// Update VBO for each character
 			const float vertices[6][4] = {
-				{ xpos,     ypos + h,   0.0f, 0.0f },
-				{ xpos,     ypos,       0.0f, 1.0f },
-				{ xpos + w, ypos,       1.0f, 1.0f },
+				{xpos,     ypos + h, 0.0f, 0.0f},
+				{xpos,     ypos,     0.0f, 1.0f},
+				{xpos + w, ypos,     1.0f, 1.0f},
 
-				{ xpos,     ypos + h,   0.0f, 0.0f },
-				{ xpos + w, ypos,       1.0f, 1.0f },
-				{ xpos + w, ypos + h,   1.0f, 0.0f }
+				{xpos,     ypos + h, 0.0f, 0.0f},
+				{xpos + w, ypos,     1.0f, 1.0f},
+				{xpos + w, ypos + h, 1.0f, 0.0f}
 			};
 
 			// Render glyph texture over quad

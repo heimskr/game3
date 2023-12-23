@@ -22,14 +22,14 @@ namespace Game3 {
 	enum class TextAlign {Left, Center, Right};
 
 	struct TextRenderOptions {
-		float x      = 0.f;
-		float y      = 0.f;
-		float scaleX = 1.f;
-		float scaleY = 1.f;
-		float angle  = 0.f;
-		Color color{1.f, 1.f, 1.f, 1.f};
+		double x      = 0;
+		double y      = 0;
+		double scaleX = 1;
+		double scaleY = 1;
+		double angle  = 0;
+		Color color{1, 1, 1, 1};
 		TextAlign align = TextAlign::Left;
-		Color shadow{0.f, 0.f, 0.f, 1.f};
+		Color shadow{0, 0, 0, 1};
 		Vector2 shadowOffset{.025f, .025f};
 	};
 
@@ -37,9 +37,9 @@ namespace Game3 {
 		public:
 			Canvas *canvas = nullptr;
 			Shader shader;
-			float centerX = 0.f;
-			float centerY = 0.f;
-			uint32_t fontScale = 48.f;
+			double centerX = 0;
+			double centerY = 0;
+			uint32_t fontScale = 48;
 
 			struct Character {
 				GLuint     textureID; // ID handle of the glyph texture
@@ -87,8 +87,6 @@ namespace Game3 {
 			GLuint vao = 0;
 			GLuint vbo = 0;
 			bool initialized = false;
-			int backbufferWidth = -1;
-			int backbufferHeight = -1;
 
 			glm::mat4 projection;
 
