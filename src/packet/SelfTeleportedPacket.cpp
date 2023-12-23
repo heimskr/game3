@@ -9,7 +9,8 @@ namespace Game3 {
 		if (!game.player)
 			throw PlayerMissingError("Can't teleport self: player missing");
 
-		game.player->teleport(position, game.getRealm(realmID));
+		RealmPtr realm = game.getRealm(realmID);
+		game.player->teleport(position, realm);
 		game.player->focus(game.canvas, true);
 	}
 }

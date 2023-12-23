@@ -47,6 +47,7 @@ namespace Game3 {
 				initRendererRealms();
 				initRendererTileProviders();
 				renderersReady = true;
+				queueStaticLightingTexture();
 			});
 		}
 	}
@@ -60,6 +61,7 @@ namespace Game3 {
 				initTexture();
 				initRendererTileProviders();
 				renderersReady = true;
+				queueStaticLightingTexture();
 			});
 		}
 	}
@@ -1467,15 +1469,19 @@ namespace Game3 {
 
 	void Realm::remakeStaticLightingTexture() {
 		assert(isClient());
-		Timer timer("RemakeStaticLightingTexture");
 		ClientGame &client_game = game.toClient();
+		PlayerPtr player = client_game.player;
+
+		if (!player)
+			return;
+
+		Timer timer("RemakeStaticLightingTexture");
 		Canvas &canvas = client_game.canvas;
 		GL::Texture &texture = canvas.staticLightingTexture;
 		client_game.activateContext();
 		GL::FBOBinder binder = canvas.fbo.getBinder();
 		texture.useInFB();
 		GL::clear(0, 0, 0, 0);
-		PlayerPtr player = client_game.player;
 		const ChunkPosition chunk = player->getChunk();
 
 		const auto [top,     left] = (chunk - ChunkPosition(1, 1)).topLeft();

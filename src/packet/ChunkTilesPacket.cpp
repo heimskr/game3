@@ -68,5 +68,6 @@ namespace Game3 {
 
 		game.chunkReceived(chunkPosition);
 		realm->queueReupload();
+		realm->queueStaticLightingTexture();
 	}
 }

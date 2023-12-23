@@ -45,16 +45,16 @@ namespace Game3 {
 
 		if (show_message) {
 			text.drawOnMap(lastMessage, {
-				.x = float(column) + x + .5f,
-				.y = float(row) + y - z + health_offset - 0.25f,
-				.scaleX = .75f,
-				.scaleY = .75f,
+				.x = float(column) + x + .5,
+				.y = float(row) + y - z + health_offset - .25,
+				.scaleX = .75,
+				.scaleY = .75,
 				.align = TextAlign::Center,
 			});
 		}
 
 		text.drawOnMap(displayName, {
-			.x = float(column) + x + .5f,
+			.x = float(column) + x + .5,
 			.y = float(row) + y - z + name_offset,
 			.align = TextAlign::Center,
 		});
@@ -70,8 +70,8 @@ namespace Game3 {
 		constexpr static float radius = 8;
 
 		renderers.circle.drawOnMap(RenderOptions{
-			.x = column + x + .5f,
-			.y = row + y - z + .5f,
+			.x = column + x + .5,
+			.y = row + y - z + .5,
 			.sizeX = radius,
 			.sizeY = radius,
 			.color = {1, 1, 1, 1},
@@ -100,7 +100,7 @@ namespace Game3 {
 			auto lock = offset.sharedLock();
 			z = offset.z;
 		}
-		if (std::abs(z) <= 0.001f) {
+		if (std::abs(z) <= 0.001) {
 			{
 				auto lock = velocity.uniqueLock();
 				velocity.z = getJumpSpeed();

@@ -75,13 +75,18 @@ namespace Game3 {
 			staticLightingTexture.initRGBA(static_size, static_size, GL_NEAREST);
 			dynamicLightingTexture.initRGBA(width, height, GL_NEAREST);
 			scratchTexture.initRGBA(width, height, GL_NEAREST);
+
 			fbo.bind();
 			dynamicLightingTexture.useInFB();
 			GL::clear(1, 1, 1);
 			fbo.undo();
+
+			if (realm) {
+				realm->remakeStaticLightingTexture();
+			}
 		}
 
-		if (RealmPtr realm = game->activeRealm.copyBase()) {
+		if (realm) {
 			fbo.bind();
 
 			mainTexture.useInFB();
