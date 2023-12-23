@@ -13,7 +13,7 @@ namespace Game3 {
 	class Game;
 	class ItemStack;
 	struct Place;
-	struct RendererSet;
+	struct RendererContext;
 
 	class Tile: public NamedRegisterable {
 		public:
@@ -29,7 +29,7 @@ namespace Game3 {
 			/** Should be between 0 and 1 (inclusive). */
 			virtual float getMonsterSpawnProbability() const;
 
-			virtual void renderStaticLighting(const Place &, Layer, const RendererSet &);
+			virtual void renderStaticLighting(const Place &, Layer, const RendererContext &);
 
 		private:
 			Lockable<std::optional<std::vector<std::shared_ptr<EntityFactory>>>> monsterFactories;

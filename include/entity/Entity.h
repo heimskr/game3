@@ -41,7 +41,7 @@ namespace Game3 {
 	class Realm;
 	class RemoteClient;
 	class TileEntity;
-	struct RendererSet;
+	struct RendererContext;
 
 	struct EntityTexture: NamedRegisterable {
 		Identifier textureID;
@@ -96,9 +96,9 @@ namespace Game3 {
 			virtual void absorbJSON(Game &, const nlohmann::json &);
 			virtual void toJSON(nlohmann::json &) const;
 			virtual void init(Game &);
-			virtual void render(const RendererSet &);
-			virtual void renderUpper(const RendererSet &);
-			virtual void renderLighting(const RendererSet &);
+			virtual void render(const RendererContext &);
+			virtual void renderUpper(const RendererContext &);
+			virtual void renderLighting(const RendererContext &);
 			virtual void tick(Game &, float delta);
 			/** Whether the entity should be included in save data. */
 			virtual bool shouldPersist() const { return true; }

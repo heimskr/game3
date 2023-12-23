@@ -24,6 +24,7 @@
 
 #include <nlohmann/json_fwd.hpp>
 
+#include <climits>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -39,7 +40,7 @@ namespace Game3 {
 	class Entity;
 	class Game;
 	class RemoteClient;
-	struct RendererSet;
+	struct RendererContext;
 
 	using EntityPtr = std::shared_ptr<Entity>;
 
@@ -114,8 +115,8 @@ namespace Game3 {
 			/** Called when the realm is to be removed from the game. */
 			virtual void onRemove();
 			void createRenderers();
-			void render(int width, int height, const std::pair<double, double> &center, float scale, const RendererSet &, float game_time);
-			void renderLighting(int width, int height, const std::pair<double, double> &center, float scale, const RendererSet &, float game_time);
+			void render(int width, int height, const std::pair<double, double> &center, float scale, const RendererContext &, float game_time);
+			void renderLighting(int width, int height, const std::pair<double, double> &center, float scale, const RendererContext &, float game_time);
 			virtual void clearLighting(float game_time);
 			/** Reuploads fluids and terrain in all layers. */
 			void reupload();
@@ -340,6 +341,7 @@ namespace Game3 {
 			MTQueue<std::function<void()>> generalQueue;
 			Lockable<std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::set<EntityPtr, EntityZCompare>>>>> entitiesByChunk;
 			Lockable<std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::unordered_set<TileEntityPtr>>>>> tileEntitiesByChunk;
+			ChunkPosition lastPlayerChunk{INT32_MIN, INT32_MIN};
 
 			friend class ServerGame;
 

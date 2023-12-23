@@ -15,7 +15,7 @@ namespace Game3 {
 			static std::shared_ptr<TextParticle> create(Game &);
 			static std::shared_ptr<TextParticle> create(Game &, Glib::ustring text, Color = {1, 1, 1, 1}, float linger_time = DEFAULT_LINGER_TIME, TextAlign = DEFAULT_ALIGN);
 
-			void render(const RendererSet &) override;
+			void render(const RendererContext &) override;
 			void tick(Game &, float delta) override;
 			bool shouldPersist() const override { return false; }
 			void onSpawn() override;

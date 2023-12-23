@@ -4,12 +4,13 @@
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 
+#include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 
 #include "graphics/BatchSpriteRenderer.h"
-#include "graphics/RendererSet.h"
+#include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/Tileset.h"
 
@@ -61,9 +62,17 @@ namespace Game3 {
 			}
 		});
 
+		GLsizei tile_size = 16;
+		RealmPtr realm = game->activeRealm.copyBase();
+
+		if (realm)
+			tile_size = static_cast<GLsizei>(realm->getTileset().getTileSize());
+
+		const auto static_size = static_cast<GLsizei>(REALM_DIAMETER * CHUNK_SIZE * tile_size * factor);
+
 		if (mainTexture.getWidth() != width || mainTexture.getHeight() != height) {
 			mainTexture.initRGBA(width, height, GL_NEAREST);
-			staticLightingTexture.initRGBA(width, height, GL_NEAREST);
+			staticLightingTexture.initRGBA(static_size, static_size, GL_NEAREST);
 			dynamicLightingTexture.initRGBA(width, height, GL_NEAREST);
 			scratchTexture.initRGBA(width, height, GL_NEAREST);
 			fbo.bind();
@@ -74,19 +83,46 @@ namespace Game3 {
 
 		if (RealmPtr realm = game->activeRealm.copyBase()) {
 			fbo.bind();
+
 			mainTexture.useInFB();
 			GL::Viewport viewport(0, 0, width, height);
-			batchSpriteRenderer.update(width, height);
-			glClearColor(.2f, .2f, .2f, 1.f); CHECKGL
-			glClear(GL_COLOR_BUFFER_BIT); CHECKGL
-			RendererSet renderers = getRenderers();
-			realm->render(width, height, center, scale, renderers, game->getDivisor()); CHECKGL
-			viewport.reset();
+			GL::clear(.2, .2, .2);
+			RendererContext context = getRendererContext();
+			context.updateSize(width, height);
+			realm->render(width, height, center, scale, context, game->getDivisor()); CHECKGL
+
 			dynamicLightingTexture.useInFB();
-			realm->renderLighting(width, height, center, scale, renderers, game->getDivisor()); CHECKGL
+			realm->renderLighting(width, height, center, scale, context, game->getDivisor()); CHECKGL
+
 			scratchTexture.useInFB();
-			overlayer(dynamicLightingTexture, staticLightingTexture);
+			GL::clear(1, 1, 1, 1);
+
+			singleSpriteRenderer.drawOnScreen(dynamicLightingTexture, RenderOptions{
+				.x = 0.0,
+				.y = 0.0,
+				.sizeX = -1.0,
+				.sizeY = -1.0,
+				.scaleX = 1.,
+				.scaleY = 1.,
+			});
+
+			ChunkPosition chunk = game->player->getChunk() - ChunkPosition(1, 1);
+			const auto [static_y, static_x] = chunk.topLeft();
+			singleSpriteRenderer.drawOnMap(staticLightingTexture, RenderOptions{
+				.x = double(static_x),
+				.y = double(static_y),
+				.sizeX = -1.0,
+				.sizeY = -1.0,
+				.scaleX = 1. / factor,
+				.scaleY = 1. / factor,
+				.viewportX = -double(factor),
+				.viewportY = -double(factor),
+			});
+
+			viewport.reset();
 			fbo.undo();
+
+			context.updateSize(getWidth(), getHeight());
 			multiplier(mainTexture, scratchTexture);
 			realmBounds = game->getVisibleRealmBounds();
 		}
@@ -109,7 +145,7 @@ namespace Game3 {
 		    && realmBounds.get_y() <= pos.row    && pos.row    < realmBounds.get_y() + realmBounds.get_height();
 	}
 
-	RendererSet Canvas::getRenderers() {
-		return {rectangleRenderer, batchSpriteRenderer, textRenderer, circleRenderer};
+	RendererContext Canvas::getRendererContext() {
+		return {rectangleRenderer, singleSpriteRenderer, batchSpriteRenderer, textRenderer, circleRenderer, getFactor()};
 	}
 }

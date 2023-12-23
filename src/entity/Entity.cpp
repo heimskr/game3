@@ -12,7 +12,7 @@
 #include "game/ServerGame.h"
 #include "game/ServerInventory.h"
 #include "graphics/ItemTexture.h"
-#include "graphics/RendererSet.h"
+#include "graphics/RendererContext.h"
 #include "graphics/SpriteRenderer.h"
 #include "net/Buffer.h"
 #include "net/RemoteClient.h"
@@ -279,8 +279,8 @@ namespace Game3 {
 		movedToNewChunk(std::nullopt);
 	}
 
-	void Entity::render(const RendererSet &renderers) {
-		SpriteRenderer &sprite_renderer = renderers.sprite;
+	void Entity::render(const RendererContext &renderers) {
+		SpriteRenderer &sprite_renderer = renderers.batchSprite;
 		if (texture == nullptr || !isVisible())
 			return;
 
@@ -384,9 +384,9 @@ namespace Game3 {
 		}
 	}
 
-	void Entity::renderUpper(const RendererSet &) {}
+	void Entity::renderUpper(const RendererContext &) {}
 
-	void Entity::renderLighting(const RendererSet &) {}
+	void Entity::renderLighting(const RendererContext &) {}
 
 	bool Entity::move(Direction move_direction, MovementContext context) {
 		auto self_lock = uniqueLock();

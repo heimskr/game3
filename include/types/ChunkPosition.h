@@ -34,6 +34,11 @@ namespace Game3 {
 
 		auto operator<=>(const ChunkPosition &) const = default;
 
+		ChunkPosition operator+(const ChunkPosition &) const;
+		ChunkPosition operator-(const ChunkPosition &) const;
+		ChunkPosition & operator+=(const ChunkPosition &);
+		ChunkPosition & operator-=(const ChunkPosition &);
+
 		explicit operator std::string() const;
 
 		template <typename Fn>
@@ -45,6 +50,10 @@ namespace Game3 {
 
 		Position topLeft() const {
 			return {y * CHUNK_SIZE, x * CHUNK_SIZE};
+		}
+
+		Position bottomRight() const {
+			return {(y + 1) * CHUNK_SIZE - 1, (x + 1) * CHUNK_SIZE - 1};
 		}
 	};
 

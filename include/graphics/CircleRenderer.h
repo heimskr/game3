@@ -2,6 +2,7 @@
 
 #include "lib/Eigen.h"
 
+#include "graphics/HasBackbuffer.h"
 #include "graphics/Shader.h"
 #include "threading/Lockable.h"
 
@@ -9,7 +10,7 @@ namespace Game3 {
 	class Canvas;
 	struct RenderOptions;
 
-	class CircleRenderer {
+	class CircleRenderer: public HasBackbuffer {
 		public:
 			Shader shader;
 
@@ -18,18 +19,19 @@ namespace Game3 {
 			~CircleRenderer();
 
 			void reset();
-			void update(int backbuffer_width, int backbuffer_height);
+			void update(int width, int height) override;
 
 			void drawOnMap(const RenderOptions &, float cutoff = -1.f);
-			void drawOnScreen(const Eigen::Vector4f &color, float x, float y, float width, float height, float cutoff = -1.f, float angle = 0.f);
+			void drawOnScreen(const Color &color, float x, float y, float width, float height, float cutoff = -1.f, float angle = 0.f);
+
+			inline auto getWidth()  const { return backbufferWidth;  }
+			inline auto getHeight() const { return backbufferHeight; }
 
 		private:
 			Canvas &canvas;
 			glm::mat4 projection;
 			GLuint quadVAO = 0;
 			int initializedTo = 0;
-			int backbufferWidth = -1;
-			int backbufferHeight = -1;
 
 			Lockable<std::map<int, std::vector<float>>> vertexMap;
 

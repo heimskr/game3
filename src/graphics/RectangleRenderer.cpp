@@ -38,11 +38,11 @@ namespace Game3 {
 		}
 	}
 
-	void RectangleRenderer::update(int backbuffer_width, int backbuffer_height) {
-		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
-			backbufferWidth = backbuffer_width;
-			backbufferHeight = backbuffer_height;
-			projection = glm::ortho(0.f, float(backbuffer_width), float(backbuffer_height), 0.f, -1.f, 1.f);
+	void RectangleRenderer::update(int width, int height) {
+		if (width != backbufferWidth || height != backbufferHeight) {
+			backbufferWidth = width;
+			backbufferHeight = height;
+			projection = glm::ortho(0.f, float(width), float(height), 0.f, -1.f, 1.f);
 			shader.bind(); CHECKGL
 			shader.set("projection", projection); CHECKGL
 		}

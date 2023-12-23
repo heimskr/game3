@@ -31,6 +31,26 @@ namespace Game3 {
 		return buffer >> chunk_position.x >> chunk_position.y;
 	}
 
+	ChunkPosition ChunkPosition::operator+(const ChunkPosition &other) const {
+		return {x + other.x, y + other.y};
+	}
+
+	ChunkPosition ChunkPosition::operator-(const ChunkPosition &other) const {
+		return {x - other.x, y - other.y};
+	}
+
+	ChunkPosition & ChunkPosition::operator+=(const ChunkPosition &other) {
+		x += other.x;
+		y += other.y;
+		return *this;
+	}
+
+	ChunkPosition & ChunkPosition::operator-=(const ChunkPosition &other) {
+		x -= other.x;
+		y -= other.y;
+		return *this;
+	}
+
 	ChunkPosition::operator std::string() const {
 		return '(' + std::to_string(x) + ", " + std::to_string(y) + ')';
 	}

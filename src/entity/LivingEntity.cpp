@@ -2,7 +2,7 @@
 #include "entity/TextParticle.h"
 #include "game/ServerGame.h"
 #include "graphics/RectangleRenderer.h"
-#include "graphics/RendererSet.h"
+#include "graphics/RendererContext.h"
 #include "graphics/RenderOptions.h"
 #include "packet/LivingEntityHealthChangedPacket.h"
 #include "threading/ThreadContext.h"
@@ -35,7 +35,7 @@ namespace Game3 {
 			luckStat = *iter;
 	}
 
-	void LivingEntity::renderUpper(const RendererSet &renderers) {
+	void LivingEntity::renderUpper(const RendererContext &renderers) {
 		Entity::renderUpper(renderers);
 
 		if (!canShowHealthBar())

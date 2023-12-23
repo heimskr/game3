@@ -111,7 +111,7 @@ namespace Game3 {
 		});
 	}
 
-	void TileEntity::renderLighting(const RendererSet &) {}
+	void TileEntity::renderLighting(const RendererContext &) {}
 
 	void TileEntity::onSpawn() {
 		Game &game = getRealm()->getGame();

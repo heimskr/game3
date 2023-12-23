@@ -8,7 +8,7 @@
 #include "game/Game.h"
 #include "game/InteractionSet.h"
 #include "game/ServerGame.h"
-#include "graphics/RendererSet.h"
+#include "graphics/RendererContext.h"
 #include "graphics/SpriteRenderer.h"
 #include "graphics/TextRenderer.h"
 #include "graphics/Tileset.h"
@@ -177,7 +177,7 @@ namespace Game3 {
 		upperRenderers.emplace();
 	}
 
-	void Realm::render(const int width, const int height, const std::pair<double, double> &center, float scale, const RendererSet &renderers, float game_time) {
+	void Realm::render(const int width, const int height, const std::pair<double, double> &center, float scale, const RendererContext &renderers, float game_time) {
 		if (getSide() != Side::Client)
 			return;
 
@@ -186,6 +186,13 @@ namespace Game3 {
 
 		auto &client_game = game.toClient();
 		assert(client_game.player);
+
+
+		const ChunkPosition current_chunk = client_game.player->getChunk();
+		if (lastPlayerChunk != current_chunk) {
+			lastPlayerChunk = current_chunk;
+			queueStaticLightingTexture();
+		}
 
 		const auto bb_width  = width;
 		const auto bb_height = height;
@@ -199,21 +206,21 @@ namespace Game3 {
 			}
 		}
 
-		auto &[rectangle_renderer, sprite_renderer, text_renderer, circle_renderer] = renderers;
+		auto &[rectangle_renderer, single_sprite, batch_sprite, text_renderer, circle_renderer, factor] = renderers;
 
-		sprite_renderer.centerX = center.first;
-		sprite_renderer.centerY = center.second;
-		// sprite_renderer.divisor = outdoors? game_time : 1;
+		batch_sprite.centerX = center.first;
+		batch_sprite.centerY = center.second;
+		// batch_sprite.divisor = outdoors? game_time : 1;
 		text_renderer.centerX = center.first;
 		text_renderer.centerY = center.second;
 
 		{
 			auto lock = tileEntities.sharedLock();
 			for (const auto &[index, tile_entity]: tileEntities)
-				tile_entity->render(sprite_renderer);
+				tile_entity->render(batch_sprite);
 		}
 
-		sprite_renderer.renderNow();
+		batch_sprite.renderNow();
 
 		std::set<EntityPtr, EntityZCompare> rendered_entities;
 
@@ -231,7 +238,7 @@ namespace Game3 {
 
 		client_game.player->render(renderers);
 
-		sprite_renderer.renderNow();
+		batch_sprite.renderNow();
 
 		if (upperRenderers) {
 			for (auto &row: *upperRenderers) {
@@ -245,17 +252,17 @@ namespace Game3 {
 		{
 			auto lock = tileEntities.sharedLock();
 			for (const auto &[index, tile_entity]: tileEntities)
-				tile_entity->renderUpper(sprite_renderer);
+				tile_entity->renderUpper(batch_sprite);
 		}
 
 		for (const EntityPtr &entity: rendered_entities)
 			entity->renderUpper(renderers);
 
 		client_game.player->renderUpper(renderers);
-		sprite_renderer.renderNow();
+		batch_sprite.renderNow();
 	}
 
-	void Realm::renderLighting(const int, const int, const std::pair<double, double> &, float, const RendererSet &renderers, float game_time) {
+	void Realm::renderLighting(const int, const int, const std::pair<double, double> &, float, const RendererContext &renderers, float game_time) {
 		if (getSide() != Side::Client)
 			return;
 
@@ -281,7 +288,7 @@ namespace Game3 {
 
 		client_game.player->renderLighting(renderers);
 
-		renderers.sprite.renderNow();
+		renderers.batchSprite.renderNow();
 	}
 
 	void Realm::clearLighting(float) {
@@ -1465,22 +1472,32 @@ namespace Game3 {
 		GL::FBOBinder binder = canvas.fbo.getBinder();
 		texture.useInFB();
 		GL::clear(0, 0, 0, 0);
-		const auto [top,     left] = client_game.translateCanvasCoordinates(0, 0);
-		const auto [bottom, right] = client_game.translateCanvasCoordinates(canvas.getWidth(), canvas.getHeight());
+		PlayerPtr player = client_game.player;
+		const ChunkPosition chunk = player->getChunk();
+
+		const auto [top,     left] = (chunk - ChunkPosition(1, 1)).topLeft();
+		const auto [bottom, right] = (chunk + ChunkPosition(1, 1)).bottomRight();
+
 		Tileset &tileset = getTileset();
 		RealmPtr shared = shared_from_this();
-		RendererSet renderers = canvas.getRenderers();
-		for (Index row = top - 2; row <= bottom + 2; ++row) {
-			for (Index column = left - 2; column <= right + 2; ++column) {
-				Place place{Position(row, column), shared};
+		RendererContext context = canvas.getRendererContext();
+		auto saver = context.getSaver();
+		context.updateSize(texture.getWidth(), texture.getHeight());
+		GL::Viewport viewport(0, 0, texture.getWidth(), texture.getHeight());
+
+		for (Index row = top; row <= bottom; ++row) {
+			for (Index column = left; column <= right; ++column) {
+				Place place{Position(row, column), shared, player};
 				for (const Layer layer: allLayers) {
 					if (std::optional<TileID> tile_id = tryTile(layer, place.position)) {
 						std::shared_ptr<Tile> tile = game.getTile(tileset[*tile_id]);
-						tile->renderStaticLighting(place, layer, renderers);
+						tile->renderStaticLighting(place, layer, context);
 					}
 				}
 			}
 		}
+
+		viewport.reset();
 	}
 
 	void Realm::queueStaticLightingTexture() {

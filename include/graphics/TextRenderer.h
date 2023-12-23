@@ -3,8 +3,9 @@
 // Credit: https://learnopengl.com/In-Practice/Text-Rendering
 
 #include "graphics/GL.h"
-
+#include "graphics/HasBackbuffer.h"
 #include "graphics/Shader.h"
+#include "types/Position.h"
 #include "types/Types.h"
 
 #include <memory>
@@ -32,7 +33,7 @@ namespace Game3 {
 		Vector2 shadowOffset{.025f, .025f};
 	};
 
-	class TextRenderer {
+	class TextRenderer: public HasBackbuffer {
 		public:
 			Canvas *canvas = nullptr;
 			Shader shader;
@@ -52,10 +53,8 @@ namespace Game3 {
 			TextRenderer(Canvas &, uint32_t font_scale = 96);
 			~TextRenderer();
 
-			// TextRenderer & operator=(TextRenderer &&);
-
 			void remove();
-			void update(int backbuffer_width, int backbuffer_height);
+			void update(int width, int height) override;
 
 			void drawOnMap(Glib::ustring text, float x, float y, TextAlign align, float scale, float angle, float alpha);
 			void drawOnMap(Glib::ustring text, TextRenderOptions = {});

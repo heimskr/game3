@@ -467,8 +467,9 @@ namespace Game3 {
 
 		glArea.throw_if_error();
 
-		glClearColor(.2f, .2f, .2f, 1.f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClearColor(.2f, .2f, .2f, 1.f); CHECKGL
+		glClear(GL_COLOR_BUFFER_BIT); CHECKGL
+
 		if (autofocus && game)
 			if (PlayerPtr player = game->player.copyBase())
 				player->focus(*canvas, true);
@@ -867,6 +868,10 @@ namespace Game3 {
 					}
 					return;
 				}
+				case GDK_KEY_l:
+					if (game->activeRealm)
+						game->activeRealm->queueStaticLightingTexture();
+					break;
 				case GDK_KEY_minus:
 					canvas->scale /= 1.08f;
 					return;

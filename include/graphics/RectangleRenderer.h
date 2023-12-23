@@ -2,13 +2,14 @@
 
 #include "lib/Eigen.h"
 
+#include "graphics/HasBackbuffer.h"
 #include "graphics/Shader.h"
 
 namespace Game3 {
 	class Canvas;
 	struct RenderOptions;
 
-	class RectangleRenderer {
+	class RectangleRenderer: public HasBackbuffer {
 		public:
 			Shader shader;
 
@@ -17,7 +18,7 @@ namespace Game3 {
 			~RectangleRenderer();
 
 			void reset();
-			void update(int backbuffer_width, int backbuffer_height);
+			void update(int width, int height) override;
 
 			void drawOnMap(const RenderOptions &);
 			void drawOnScreen(const Eigen::Vector4f &color, float x, float y, float width, float height, float angle = 0.f);

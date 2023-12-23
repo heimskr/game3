@@ -69,22 +69,14 @@ namespace Game3 {
 	}
 
 	void SingleSpriteRenderer::update(const Canvas &canvas) {
-		const int backbuffer_width  = canvas.getWidth();
-		const int backbuffer_height = canvas.getHeight();
-
-		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
-			backbufferWidth = backbuffer_width;
-			backbufferHeight = backbuffer_height;
-			glm::mat4 projection = glm::ortho(0., double(backbuffer_width), double(backbuffer_height), 0., -1., 1.);
-			shader.bind();
-			shader.set("projection", projection);
-		}
+		centerX = canvas.center.first;
+		centerY = canvas.center.second;
+		update(canvas.getWidth(), canvas.getHeight());
 	}
 
 	void SingleSpriteRenderer::update(int width, int height) {
 		if (width != backbufferWidth || height != backbufferHeight) {
-			backbufferWidth = width;
-			backbufferHeight = height;
+			HasBackbuffer::update(width, height);
 			glm::mat4 projection = glm::ortho(0., double(width), double(height), 0., -1., 1.);
 			shader.bind();
 			shader.set("projection", projection);
@@ -130,35 +122,112 @@ namespace Game3 {
 
 		x += canvas->getWidth() / 2.;
 		x -= map_length * tile_size * canvas->scale / canvas->magic * 2.; // TODO: the math here is a little sus... things might cancel out
-		x += centerX * canvas->scale * tile_size / 2.;
+		x += canvas->center.first * canvas->scale * tile_size / 2.;
 
 		y += canvas->getHeight() / 2.;
 		y -= map_length * tile_size * canvas->scale / canvas->magic * 2.;
-		y += centerY * canvas->scale * tile_size / 2.;
+		y += canvas->center.second * canvas->scale * tile_size / 2.;
 
 		shader.bind();
 
 		glm::mat4 model = glm::mat4(1.);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
 		model = glm::translate(model, glm::vec3(x - options.offsetX * canvas->scale * options.scaleX, y - options.offsetY * canvas->scale * options.scaleY, 0.));
-		model = glm::translate(model, glm::vec3(.5 * texture->width, .5 * texture->height, 0.)); // move origin of rotation to center of quad
-		model = glm::rotate(model, float(glm::radians(options.angle)), glm::vec3(0., 0., 1.)); // then rotate
-		model = glm::translate(model, glm::vec3(-.5 * texture->width, -.5 * texture->height, 0.)); // move origin back
+		if (options.angle != 0) {
+			model = glm::translate(model, glm::vec3(.5 * texture->width, .5 * texture->height, 0.)); // move origin of rotation to center of quad
+			model = glm::rotate(model, float(glm::radians(options.angle)), glm::vec3(0., 0., 1.)); // then rotate
+			model = glm::translate(model, glm::vec3(-.5 * texture->width, -.5 * texture->height, 0.)); // move origin back
+		}
 		model = glm::scale(model, glm::vec3(texture->width * options.scaleX * canvas->scale / 2., texture->height * options.scaleY * canvas->scale / 2., 2.)); // last scale
 
 		shader.set("model", model);
 		shader.set("spriteColor", options.color);
-		const double multiplier = 2. / texture->width;
-		shader.set("texturePosition", options.offsetX * multiplier, options.offsetY * multiplier, size_x / texture->width, size_y / texture->width);
+		const double multiplier_x = 2. / texture->width;
+		const double multiplier_y = 2. / texture->height;
+		shader.set("texturePosition", options.offsetX * multiplier_x, options.offsetY * multiplier_y, size_x / texture->width, size_y / texture->width);
 
-		glActiveTexture(GL_TEXTURE0);
+		glActiveTexture(GL_TEXTURE0); CHECKGL
 		texture->bind();
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glBindVertexArray(quadVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glBindVertexArray(0);
+		glEnable(GL_BLEND); CHECKGL
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); CHECKGL
+		glBindVertexArray(quadVAO); CHECKGL
+		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
+		glBindVertexArray(0); CHECKGL
+	}
+
+	// TODO: share the bulk of the code with the `const std::shared_ptr<Texture> &` override.
+	void SingleSpriteRenderer::drawOnMap(GL::Texture &texture, const RenderOptions &options) {
+		if (!initialized)
+			return;
+
+		auto size_x = options.sizeX;
+		auto size_y = options.sizeY;
+		auto x = options.x;
+		auto y = options.y;
+
+		const GLsizei texture_width = texture.getWidth();
+		const GLsizei texture_height = texture.getHeight();
+
+		if (size_x < 0)
+			size_x = texture_width;
+		if (size_y < 0)
+			size_y = texture_height;
+
+		assert(canvas != nullptr);
+		RealmPtr realm = canvas->game->activeRealm.copyBase();
+		TileProvider &provider = realm->tileProvider;
+		TilesetPtr tileset     = provider.getTileset(*canvas->game);
+		const auto tile_size   = tileset->getTileSize();
+		const auto map_length  = CHUNK_SIZE * REALM_DIAMETER;
+
+		x *= tile_size * canvas->scale / 2.;
+		y *= tile_size * canvas->scale / 2.;
+
+		const double x_scale = options.scaleX;
+		const double y_scale = options.scaleY;
+		auto viewport_x = options.viewportX;
+		auto viewport_y = options.viewportY;
+
+		if (viewport_x < 0)
+			viewport_x *= -canvas->getWidth();
+
+		if (viewport_y < 0)
+			viewport_y *= -canvas->getHeight();
+
+		x += viewport_x / 2.;
+		x -= map_length * tile_size * canvas->scale / 4.; // TODO: the math here is a little sus... things might cancel out
+		x += canvas->center.first * canvas->scale * tile_size / 2.;
+
+		y += viewport_y / 2.;
+		y -= map_length * tile_size * canvas->scale / 4.;
+		y += canvas->center.second * canvas->scale * tile_size / 2.;
+
+		shader.bind();
+
+		glm::mat4 model = glm::mat4(1.);
+		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
+		model = glm::translate(model, glm::vec3(x - options.offsetX * canvas->scale * x_scale, y - options.offsetY * canvas->scale * y_scale, 0.));
+		if (options.angle != 0) {
+			model = glm::translate(model, glm::vec3(.5 * texture_width, .5 * texture_height, 0.)); // move origin of rotation to center of quad
+			model = glm::rotate(model, float(glm::radians(options.angle)), glm::vec3(0., 0., 1.)); // then rotate
+			model = glm::translate(model, glm::vec3(-.5 * texture_width, -.5 * texture_height, 0.)); // move origin back
+		}
+		model = glm::scale(model, glm::vec3(texture_width * x_scale * canvas->scale / 2., texture_height * y_scale * canvas->scale / 2., 2.)); // last scale
+
+		shader.set("model", model);
+		shader.set("spriteColor", options.color);
+		const double multiplier_x = 2. / texture_width;
+		const double multiplier_y = 2. / texture_height;
+		shader.set("texturePosition", options.offsetX * multiplier_x, options.offsetY * multiplier_y, size_x / texture_width, size_y / texture_width);
+
+		texture.bind(0);
+
+		glEnable(GL_BLEND); CHECKGL
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); CHECKGL
+		glBindVertexArray(quadVAO); CHECKGL
+		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
+		glBindVertexArray(0); CHECKGL
 	}
 
 	void SingleSpriteRenderer::reset() {
@@ -182,17 +251,17 @@ namespace Game3 {
 			1., 0., 1., 0.
 		};
 
-		glGenVertexArrays(1, &quadVAO);
-		glGenBuffers(1, &vbo);
+		glGenVertexArrays(1, &quadVAO); CHECKGL
+		glGenBuffers(1, &vbo); CHECKGL
 
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo); CHECKGL
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); CHECKGL
 
-		glBindVertexArray(quadVAO);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
+		glBindVertexArray(quadVAO); CHECKGL
+		glEnableVertexAttribArray(0); CHECKGL
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr); CHECKGL
+		glBindBuffer(GL_ARRAY_BUFFER, 0); CHECKGL
+		glBindVertexArray(0); CHECKGL
 		initialized = true;
 	}
 
@@ -202,33 +271,34 @@ namespace Game3 {
 
 		const auto texture_width  = texture.getWidth();
 		const auto texture_height = texture.getHeight();
-		// if (options.hackY)
 
 		RenderOptions options = options_ref;
 		options.sizeX = options.sizeX < 0.f? -options.sizeX * texture_width  : options.sizeX;
 		options.sizeY = options.sizeY < 0.f? -options.sizeY * texture_height : options.sizeY;
-		options.y = backbufferHeight / 16.f - options.y + options.offsetY / 4.f * options.scaleY; // Four?!
+		options.y = backbufferHeight - options.y + options.offsetY / 4.f * options.scaleY; // Four?!
 		setupShader(texture_width, texture_height, options);
 
 		texture.bind(0);
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glBindVertexArray(quadVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glBindVertexArray(0);
+		glEnable(GL_BLEND); CHECKGL
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); CHECKGL
+		glBindVertexArray(quadVAO); CHECKGL
+		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
+		glBindVertexArray(0); CHECKGL
 	}
 
 	void SingleSpriteRenderer::setupShader(int texture_width, int texture_height, const RenderOptions &options) {
 		glm::mat4 model = glm::mat4(1.);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(options.x * 16.f - options.offsetX * 2. * options.scaleX, options.y * 16.f - options.offsetY * 2. * options.scaleY, 0.0f));
+		model = glm::translate(model, glm::vec3(options.x - options.offsetX * 2. * options.scaleX, options.y - options.offsetY * 2. * options.scaleY, 0.f));
 		if (options.invertY)
 			model = glm::scale(model, glm::vec3(1., -1., 1.));
-		model = glm::translate(model, glm::vec3(.5 * texture_width, .5 * texture_height, 0.0f));
-		model = glm::rotate   (model, float(glm::radians(options.angle)), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::translate(model, glm::vec3(-.5 * texture_width, -.5 * texture_height, 0.0f));
-		model = glm::scale    (model, glm::vec3(texture_width * options.scaleX, texture_height * options.scaleY, 1.0f));
+		if (options.angle != 0)  {
+			model = glm::translate(model, glm::vec3(.5 * texture_width, .5 * texture_height, 0.f));
+			model = glm::rotate   (model, float(glm::radians(options.angle)), glm::vec3(0.f, 0.f, 1.f));
+			model = glm::translate(model, glm::vec3(-.5 * texture_width, -.5 * texture_height, 0.f));
+		}
+		model = glm::scale(model, glm::vec3(texture_width * options.scaleX, texture_height * options.scaleY, 1.f));
 
 		shader.bind();
 		shader.set("model", model);
@@ -237,5 +307,6 @@ namespace Game3 {
 		const double multiplier_x = multiplier / texture_width;
 		const double multiplier_y = multiplier / texture_height;
 		shader.set("texturePosition", options.offsetX * multiplier_x, options.offsetY * multiplier_y, options.sizeX / texture_width, options.sizeY / texture_height);
+		shader.set("sprite", 0);
 	}
 }

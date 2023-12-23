@@ -8,7 +8,7 @@
 #include <unordered_set>
 
 namespace Game3 {
-	struct RendererSet;
+	struct RendererContext;
 
 	class ClientPlayer: public Player {
 		private:
@@ -23,8 +23,8 @@ namespace Game3 {
 			static std::shared_ptr<ClientPlayer> create(Game &);
 
 			void tick(Game &, float delta) override;
-			void render(const RendererSet &) override;
-			void renderLighting(const RendererSet &) override;
+			void render(const RendererContext &) override;
+			void renderLighting(const RendererContext &) override;
 			void stopContinuousInteraction();
 			void setContinuousInteraction(bool, Modifiers);
 			void jump() override;

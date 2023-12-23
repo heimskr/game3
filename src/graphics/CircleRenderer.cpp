@@ -39,11 +39,10 @@ namespace Game3 {
 		}
 	}
 
-	void CircleRenderer::update(int backbuffer_width, int backbuffer_height) {
-		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
-			backbufferWidth = backbuffer_width;
-			backbufferHeight = backbuffer_height;
-			projection = glm::ortho(0.f, float(backbuffer_width), float(backbuffer_height), 0.f, -1.f, 1.f);
+	void CircleRenderer::update(int width, int height) {
+		if (width != backbufferWidth || height != backbufferHeight) {
+			HasBackbuffer::update(width, height);
+			projection = glm::ortho(0.f, float(width), float(height), 0.f, -1.f, 1.f);
 			shader.bind(); CHECKGL
 			shader.set("projection", projection); CHECKGL
 		}
@@ -98,7 +97,7 @@ namespace Game3 {
 		glBindVertexArray(0); CHECKGL
 	}
 
-	void CircleRenderer::drawOnScreen(const Eigen::Vector4f &color, float x, float y, float width, float height, float cutoff, float angle) {
+	void CircleRenderer::drawOnScreen(const Color &color, float x, float y, float width, float height, float cutoff, float angle) {
 		if (!isInitialized())
 			return;
 

@@ -65,7 +65,7 @@ namespace Game3 {
 		return 0.1;
 	}
 
-	void Tile::renderStaticLighting(const Place &, Layer, const RendererSet &) {}
+	void Tile::renderStaticLighting(const Place &, Layer, const RendererContext &) {}
 
 	void Tile::makeMonsterFactories(Game &game) {
 		{

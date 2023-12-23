@@ -95,11 +95,10 @@ namespace Game3 {
 		initialized = true;
 	}
 
-	void TextRenderer::update(int backbuffer_width, int backbuffer_height) {
-		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
-			backbufferWidth = backbuffer_width;
-			backbufferHeight = backbuffer_height;
-			projection = glm::ortho(0.f, static_cast<float>(backbuffer_width), 0.f, static_cast<float>(backbuffer_height), -1.f, 1.f);
+	void TextRenderer::update(int width, int height) {
+		if (width != backbufferWidth || height != backbufferHeight) {
+			HasBackbuffer::update(width, height);
+			projection = glm::ortho(0.f, static_cast<float>(width), 0.f, static_cast<float>(height), -1.f, 1.f);
 			shader.bind();
 			shader.set("projection", projection);
 		}

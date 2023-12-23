@@ -41,8 +41,7 @@ namespace Game3 {
 		const double scale = canvas.scale;
 
 		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
-			backbufferWidth = backbuffer_width;
-			backbufferHeight = backbuffer_height;
+			HasBackbuffer::update(backbuffer_width, backbuffer_height);
 			shader.bind();
 			shader.set("screenSize", Eigen::Vector2f(backbuffer_width, backbuffer_height));
 		}

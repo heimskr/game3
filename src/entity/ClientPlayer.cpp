@@ -2,7 +2,7 @@
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "graphics/RectangleRenderer.h"
-#include "graphics/RendererSet.h"
+#include "graphics/RendererContext.h"
 #include "graphics/TextRenderer.h"
 #include "net/LocalClient.h"
 #include "packet/AgentMessagePacket.h"
@@ -26,7 +26,7 @@ namespace Game3 {
 		Player::tick(game, delta);
 	}
 
-	void ClientPlayer::render(const RendererSet &renderers) {
+	void ClientPlayer::render(const RendererContext &renderers) {
 		if (!isVisible())
 			return;
 
@@ -59,7 +59,7 @@ namespace Game3 {
 		});
 	}
 
-	void ClientPlayer::renderLighting(const RendererSet &renderers) {
+	void ClientPlayer::renderLighting(const RendererContext &renderers) {
 		if (!isVisible())
 			return;
 

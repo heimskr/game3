@@ -21,7 +21,7 @@ namespace Game3 {
 	class ClientGame;
 	class MainWindow;
 	class Realm;
-	struct RendererSet;
+	struct RendererContext;
 
 	class Canvas {
 		public:
@@ -58,7 +58,7 @@ namespace Game3 {
 
 			bool inBounds(const Position &) const;
 
-			RendererSet getRenderers();
+			RendererContext getRendererContext();
 
 		private:
 			GL::Texture scratchTexture;

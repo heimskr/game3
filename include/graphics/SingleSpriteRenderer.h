@@ -31,6 +31,7 @@ namespace Game3 {
 
 			void drawOnMap(const std::shared_ptr<Texture> &, double x, double y, double scale, double angle, double alpha) override;
 			void drawOnMap(const std::shared_ptr<Texture> &, const RenderOptions &) override;
+			void drawOnMap(GL::Texture &, const RenderOptions &);
 
 			void drawOnScreen(GL::Texture &, const RenderOptions &) override;
 

@@ -1,5 +1,5 @@
 #include "entity/TextParticle.h"
-#include "graphics/RendererSet.h"
+#include "graphics/RendererContext.h"
 #include "threading/ThreadContext.h"
 
 namespace Game3 {
@@ -17,7 +17,7 @@ namespace Game3 {
 		return Entity::create<TextParticle>(std::move(text), color, linger_time, align);
 	}
 
-	void TextParticle::render(const RendererSet &renderers) {
+	void TextParticle::render(const RendererContext &renderers) {
 		if (!isVisible() || text.empty())
 			return;
 
