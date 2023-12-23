@@ -38,14 +38,15 @@ namespace Game3 {
 		const auto [x, y, z] = offset.copyBase();
 
 		const bool show_message = lastMessageAge.load() < 7;
-		const float name_offset = (canShowHealthBar()? -.5 : 0) + (show_message? -1 : 0);
+		const float health_offset = canShowHealthBar()? -.5 : 0;
+		const float name_offset = health_offset + (show_message? -1 : 0);
 
 		LivingEntity::render(renderers);
 
 		if (show_message) {
 			text.drawOnMap(lastMessage, {
 				.x = float(column) + x + .5f,
-				.y = float(row) + y - z - 0.25f,
+				.y = float(row) + y - z + health_offset - 0.25f,
 				.scaleX = .75f,
 				.scaleY = .75f,
 				.align = TextAlign::Center,
