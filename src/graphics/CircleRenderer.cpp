@@ -20,6 +20,7 @@ namespace Game3 {
 	namespace {
 		const std::string & rectangleFrag() { static auto out = readFile("resources/circle.frag"); return out; }
 		const std::string & rectangleVert() { static auto out = readFile("resources/circle.vert"); return out; }
+		constexpr GLenum BLEND_MODE = GL_ONE;
 	}
 
 	CircleRenderer::CircleRenderer(Canvas &canvas_): shader("CircleRenderer"), canvas(canvas_) {
@@ -92,6 +93,8 @@ namespace Game3 {
 		shader.set("circleColor", options.color); CHECKGL
 		shader.set("cutoff", cutoff);
 
+		glEnable(GL_BLEND); CHECKGL
+		glBlendFunc(GL_SRC_ALPHA, BLEND_MODE); CHECKGL
 		glBindVertexArray(quadVAO); CHECKGL
 		glDrawArrays(GL_TRIANGLES, 0, initializedTo * 3); CHECKGL
 		glBindVertexArray(0); CHECKGL
@@ -119,6 +122,9 @@ namespace Game3 {
 		shader.set("circleColor", color); CHECKGL
 		shader.set("cutoff", cutoff);
 
+
+		glEnable(GL_BLEND); CHECKGL
+		glBlendFunc(GL_SRC_ALPHA, BLEND_MODE); CHECKGL
 		glBindVertexArray(quadVAO); CHECKGL
 		glDrawArrays(GL_TRIANGLES, 0, initializedTo * 3); CHECKGL
 		glBindVertexArray(0); CHECKGL
