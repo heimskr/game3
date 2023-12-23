@@ -44,8 +44,7 @@ namespace Game3 {
 		CHECKGL
 
 		if (handle != 0) {
-			glDeleteProgram(handle);
-			CHECKGL
+			glDeleteProgram(handle); CHECKGL
 		}
 
 		const GLchar *vert_ptr = reinterpret_cast<const GLchar *>(vertex.begin());

@@ -271,16 +271,22 @@ namespace Game3 {
 	void UpperRenderer::check(int handle, bool is_link) {
 		int success;
 		std::array<char, 2048> info{};
-		if (is_link)
-			glGetProgramiv(handle, GL_LINK_STATUS, &success);
-		else
-			glGetShaderiv(handle, GL_COMPILE_STATUS, &success);
+
+		if (is_link) {
+			glGetProgramiv(handle, GL_LINK_STATUS, &success); CHECKGL
+		} else {
+			glGetShaderiv(handle, GL_COMPILE_STATUS, &success); CHECKGL
+		}
+
 		if (!success) {
 			GLsizei len = 666;
-			if (is_link)
-				glGetProgramInfoLog(handle, GL_INFO_LOG_LENGTH, &len, info.data());
-			else
-				glGetShaderInfoLog(handle, info.size(), &len, info.data());
+
+			if (is_link) {
+				glGetProgramInfoLog(handle, GL_INFO_LOG_LENGTH, &len, info.data()); CHECKGL
+			} else {
+				glGetShaderInfoLog(handle, info.size(), &len, info.data()); CHECKGL
+			}
+
 			std::cerr << "Error with " << handle << " (l=" << len << "): " << info.data() << '\n';
 		}
 	}

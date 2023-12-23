@@ -467,6 +467,8 @@ namespace Game3 {
 
 		glArea.throw_if_error();
 
+		CHECKGL
+
 		glClearColor(.2f, .2f, .2f, 1.f); CHECKGL
 		glClear(GL_COLOR_BUFFER_BIT); CHECKGL
 

@@ -25,7 +25,7 @@ namespace Game3 {
 
 	void Reshader::reset() {
 		if (initialized) {
-			glDeleteBuffers(1, &vbo);
+			glDeleteBuffers(1, &vbo); CHECKGL
 			glDeleteVertexArrays(1, &quadVAO); CHECKGL
 			vbo = 0;
 			quadVAO = 0;

@@ -187,7 +187,6 @@ namespace Game3 {
 		auto &client_game = game.toClient();
 		assert(client_game.player);
 
-
 		const ChunkPosition current_chunk = client_game.player->getChunk();
 		if (lastPlayerChunk != current_chunk) {
 			lastPlayerChunk = current_chunk;
@@ -201,7 +200,7 @@ namespace Game3 {
 			for (auto &row: *baseRenderers) {
 				for (auto &renderer: row) {
 					renderer.onBackbufferResized(bb_width, bb_height);
-					renderer.render(outdoors? game_time : 1, scale, center.first, center.second);
+					renderer.render(outdoors? game_time : 1, scale, center.first, center.second); CHECKGL
 				}
 			}
 		}
@@ -216,8 +215,9 @@ namespace Game3 {
 
 		{
 			auto lock = tileEntities.sharedLock();
-			for (const auto &[index, tile_entity]: tileEntities)
-				tile_entity->render(batch_sprite);
+			for (const auto &[index, tile_entity]: tileEntities) {
+				tile_entity->render(batch_sprite); CHECKGL
+			}
 		}
 
 		batch_sprite.renderNow();
@@ -230,7 +230,7 @@ namespace Game3 {
 				for (const EntityPtr &entity: *entities_in_chunk) {
 					if (entity != client_game.player) {
 						rendered_entities.insert(entity);
-						entity->render(renderers);
+						entity->render(renderers); CHECKGL
 					}
 				}
 			}
@@ -244,19 +244,21 @@ namespace Game3 {
 			for (auto &row: *upperRenderers) {
 				for (auto &renderer: row) {
 					renderer.onBackbufferResized(bb_width, bb_height);
-					renderer.render(outdoors? game_time : 1, scale, center.first, center.second);
+					renderer.render(outdoors? game_time : 1, scale, center.first, center.second); CHECKGL
 				}
 			}
 		}
 
 		{
 			auto lock = tileEntities.sharedLock();
-			for (const auto &[index, tile_entity]: tileEntities)
-				tile_entity->renderUpper(batch_sprite);
+			for (const auto &[index, tile_entity]: tileEntities) {
+				tile_entity->renderUpper(batch_sprite); CHECKGL
+			}
 		}
 
-		for (const EntityPtr &entity: rendered_entities)
-			entity->renderUpper(renderers);
+		for (const EntityPtr &entity: rendered_entities) {
+			entity->renderUpper(renderers); CHECKGL
+		}
 
 		client_game.player->renderUpper(renderers);
 		batch_sprite.renderNow();
@@ -795,6 +797,7 @@ namespace Game3 {
 
 	void Realm::remove(const TileEntityPtr &tile_entity, bool run_helper) {
 		const Position position = tile_entity->getPosition();
+		INFO("Removing " << tile_entity->getName() << " at " << position << ", run_helper = " << run_helper);
 		auto iter = tileEntities.find(position);
 		if (iter == tileEntities.end()) {
 			WARN("Can't remove tile entity: not found");
@@ -1101,7 +1104,7 @@ namespace Game3 {
 
 			updateNeighbors(position, layer, context);
 		} else if (isActive()) {
-			remakeStaticLightingTexture();
+			queueStaticLightingTexture();
 		}
 	}
 
@@ -1504,9 +1507,14 @@ namespace Game3 {
 		if (!isClient())
 			return;
 
+		if (staticLightingQueued.exchange(true))
+			return;
+
 		game.toClient().getWindow().queue([weak = weak_from_this()] {
-			if (RealmPtr realm = weak.lock())
+			if (RealmPtr realm = weak.lock()) {
 				realm->remakeStaticLightingTexture();
+				realm->staticLightingQueued = false;
+			}
 		});
 	}
 

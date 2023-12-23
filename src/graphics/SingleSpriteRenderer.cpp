@@ -46,7 +46,7 @@ namespace Game3 {
 
 	void SingleSpriteRenderer::remove() {
 		if (initialized) {
-			glDeleteVertexArrays(1, &quadVAO);
+			glDeleteVertexArrays(1, &quadVAO); CHECKGL
 			quadVAO = 0;
 			initialized = false;
 		}
@@ -146,8 +146,7 @@ namespace Game3 {
 		const double multiplier_y = 2. / texture->height;
 		shader.set("texturePosition", options.offsetX * multiplier_x, options.offsetY * multiplier_y, size_x / texture->width, size_y / texture->width);
 
-		glActiveTexture(GL_TEXTURE0); CHECKGL
-		texture->bind();
+		texture->bind(0);
 
 		glEnable(GL_BLEND); CHECKGL
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); CHECKGL
@@ -236,8 +235,9 @@ namespace Game3 {
 	}
 
 	void SingleSpriteRenderer::initRenderData() {
-		if (initialized)
-			glDeleteVertexArrays(1, &quadVAO);
+		if (initialized) {
+			glDeleteVertexArrays(1, &quadVAO); CHECKGL
+		}
 
 		unsigned int vbo;
 		static const float vertices[] {

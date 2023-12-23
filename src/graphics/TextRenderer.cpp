@@ -32,8 +32,8 @@ namespace Game3 {
 
 	void TextRenderer::remove() {
 		if (initialized) {
-			glDeleteVertexArrays(1, &vao);
-			glDeleteBuffers(1, &vbo);
+			glDeleteVertexArrays(1, &vao); CHECKGL
+			glDeleteBuffers(1, &vbo); CHECKGL
 			vao = 0;
 			vbo = 0;
 			initialized = false;

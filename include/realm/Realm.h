@@ -330,6 +330,7 @@ namespace Game3 {
 
 			Game &game;
 			std::atomic_bool ticking = false;
+			std::atomic_bool staticLightingQueued = false;
 			MTQueue<std::weak_ptr<Entity>> entityRemovalQueue;
 			MTQueue<std::weak_ptr<Entity>> entityDestructionQueue;
 			MTQueue<std::pair<std::shared_ptr<Entity>, Position>> entityAdditionQueue;
@@ -358,6 +359,7 @@ namespace Game3 {
 			bool isActive() const;
 
 			static BiomeType getBiome(int64_t seed);
+
 
 		public:
 			using EntitySet = decltype(entitiesByChunk)::Base::mapped_type;
