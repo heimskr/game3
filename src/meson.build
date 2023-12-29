@@ -1,6 +1,6 @@
 game3_sources = run_command('grabber.sh', check: true).stdout().strip().split('\n')
 
-if get_option('no_discord') != true
+if get_option('discord_rich_prescence') == true
 	game3_sources += run_command('discord-grabber.sh', check: true).stdout().strip().split('\n')
 endif
 
@@ -48,7 +48,7 @@ else
 	link_args += '-lnoise'
 endif
 
-if get_option('no_discord') == false
+if get_option('discord_rich_prescence') == true
 	game3_deps += cxx.find_library('discord_game_sdk', required: true, dirs: ['/app/lib'])
 	inc_dirs += include_directories('..' / 'discord')
 endif
