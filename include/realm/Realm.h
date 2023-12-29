@@ -94,6 +94,8 @@ namespace Game3 {
 			std::atomic_bool reuploadPending = false;
 			std::atomic_bool renderersReady = false;
 
+			std::atomic_bool staticLightingQueued = false;
+
 			Realm(const Realm &) = delete;
 			Realm(Realm &&) = delete;
 
@@ -330,7 +332,6 @@ namespace Game3 {
 
 			Game &game;
 			std::atomic_bool ticking = false;
-			std::atomic_bool staticLightingQueued = false;
 			MTQueue<std::weak_ptr<Entity>> entityRemovalQueue;
 			MTQueue<std::weak_ptr<Entity>> entityDestructionQueue;
 			MTQueue<std::pair<std::shared_ptr<Entity>, Position>> entityAdditionQueue;

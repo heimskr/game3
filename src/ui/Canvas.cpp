@@ -82,11 +82,16 @@ namespace Game3 {
 			fbo.undo();
 
 			if (realm) {
-				realm->remakeStaticLightingTexture();
+				realm->queueStaticLightingTexture();
 			}
 		}
 
 		if (realm) {
+			if (realm->staticLightingQueued.exchange(false)) {
+				realm->remakeStaticLightingTexture();
+				return;
+			}
+
 			fbo.bind();
 
 			mainTexture.useInFB();
