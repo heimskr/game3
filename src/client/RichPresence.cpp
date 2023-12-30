@@ -7,7 +7,7 @@ namespace Game3 {
 	}
 
 	bool Discord::init(discord::Result *result_out) {
-#ifndef DISCORD_RICH_PRESENCEE
+#ifndef DISCORD_RICH_PRESENCE
 		(void) result_out;
 		return false;
 #else
