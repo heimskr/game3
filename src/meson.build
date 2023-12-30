@@ -49,7 +49,11 @@ else
 endif
 
 if get_option('discord_rich_prescence') == true
-	game3_deps += cxx.find_library('discord_game_sdk', required: true, dirs: ['/app/lib'])
+	if get_option('is_flatpak') == true
+		game3_deps += cxx.find_library('discord_game_sdk', required: true, dirs: ['/app/lib'])
+	else
+		game3_deps += cxx.find_library('discord_game_sdk', required: true)
+	endif
 	inc_dirs += include_directories('..' / 'discord')
 endif
 
