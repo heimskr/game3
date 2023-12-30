@@ -7,7 +7,7 @@ namespace Game3 {
 	}
 
 	bool Discord::init(discord::Result *result_out) {
-#ifdef NO_DISCORD
+#ifndef DISCORD_RICH_PRESENCEE
 		(void) result_out;
 		return false;
 #else
@@ -28,7 +28,7 @@ namespace Game3 {
 	}
 
 	std::function<void(discord::Result)> Discord::makeActivityCallback(std::function<void(discord::Result)> callback) const {
-#ifndef NO_DISCORD
+#ifdef DISCORD_RICH_PRESENCE
 		return [callback = std::move(callback)](discord::Result result) {
 			if (result != discord::Result::Ok)
 				ERROR("Couldn't set activity: " << int(result));
@@ -42,7 +42,7 @@ namespace Game3 {
 	}
 
 	bool Discord::updateActivity(std::function<void(discord::Result)> callback) {
-#ifndef NO_DISCORD
+#ifdef DISCORD_RICH_PRESENCE
 		if (!core)
 			return false;
 
@@ -60,7 +60,7 @@ namespace Game3 {
 			return false;
 
 		details = defaultDetails();
-#ifndef NO_DISCORD
+#ifdef DISCORD_RICH_PRESENCE
 		activity.SetDetails(details.c_str());
 		auto &assets = activity.GetAssets();
 		assets.SetLargeImage("gangblanc");
@@ -75,7 +75,7 @@ namespace Game3 {
 	bool Discord::tick() {
 		if (!core)
 			return false;
-#ifndef NO_DISCORD
+#ifdef DISCORD_RICH_PRESENCE
 		core->RunCallbacks();
 #endif
 		return true;
@@ -83,7 +83,7 @@ namespace Game3 {
 
 	bool Discord::setActivityDetails(const char *new_details, bool update) {
 		details = new_details;
-#ifndef NO_DISCORD
+#ifdef DISCORD_RICH_PRESENCE
 		activity.SetDetails(new_details);
 #endif
 		return update? updateActivity() : true;
@@ -91,7 +91,7 @@ namespace Game3 {
 
 	bool Discord::setActivityDetails(std::string new_details, bool update) {
 		details = std::move(new_details);
-#ifndef NO_DISCORD
+#ifdef DISCORD_RICH_PRESENCE
 		activity.SetDetails(details.c_str());
 #endif
 		return update? updateActivity() : true;
@@ -99,7 +99,7 @@ namespace Game3 {
 
 	bool Discord::setActivityStartTime(std::chrono::system_clock::time_point when, bool update) {
 		startingTime = when;
-#ifndef NO_DISCORD
+#ifdef DISCORD_RICH_PRESENCE
 		activity.GetTimestamps().SetStart(std::chrono::duration_cast<std::chrono::seconds>(when.time_since_epoch()).count());
 #endif
 		return update? updateActivity() : true;
