@@ -6,11 +6,19 @@
 	<project_license>GPL-3.0-or-later</project_license>
 	<name>Game3</name>
 	<developer_name>Heimskr</developer_name>
+	<summary>A silly little game.</summary>
 	<description>
 		<p>A silly little game.</p>
 	</description>
 	<url type="homepage">https://github.com/heimskr/game3</url>
 	<launchable type="desktop-id">gay.heimskr.Game3.desktop</launchable>
+	<content_rating type="oars-1.1">
+		<content_attribute id="violence-cartoon">moderate</content_attribute>
+		<content_attribute id="violence-fantasy">moderate</content_attribute>
+		<content_attribute id="drugs-alcohol">moderate</content_attribute>
+		<content_attribute id="language-humor">mild</content_attribute>
+		<content_attribute id="social-chat">intense</content_attribute>
+	</content_rating>
 	<screenshots>
 		<screenshot type="default">
 			<image>https://github.com/heimskr/game3/blob/master/screenshots/1_small.png?raw=true</image>
@@ -19,4 +27,28 @@
 			<image>https://github.com/heimskr/game3/blob/master/screenshots/2_small.png?raw=true</image>
 		</screenshot>
 	</screenshots>
+	<releases>
+		<release version="0.33.1" date="2023-12-12" urgency="low">
+			<description>
+				<p>Added a set of drag targets to the inventory tab that have the same function as the right click menu. This is useful if you're using WSL and right click menus are broken.</p>
+			</description>
+
+			<url>https://github.com/heimskr/game3/releases/tag/v0.33.1</url>
+
+			<issues>
+			</issues>
+
+			<artifacts>
+				<artifact type="binary" platform="x86_64-linux-gnu">
+					<location>https://github.com/heimskr/game3/releases/download/v0.33.1/gay.heimskr.Game3.flatpak</location>
+					<checksum type="sha256">72d516b6ff8b05a4d35fad4c363ac29be0c757e2d120be7425f71f9d8b94f73a</checksum>
+					<size type="download">18269296</size>
+				</artifact>
+				<artifact type="source">
+					<location>https://github.com/heimskr/game3/archive/refs/tags/v0.33.1.tar.gz</location>
+					<checksum type="sha256">a829f01db75f03d3d0bb04edbe2ec81bbdd0e2a096c667fe6ec58e12d46e72d5</checksum>
+				</artifact>
+			</artifacts>
+		</release>
+	</releases>
 </component>
