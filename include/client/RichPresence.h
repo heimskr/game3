@@ -7,7 +7,7 @@
 #include <memory>
 #include <string>
 
-#ifndef NO_DISCORD
+#ifdef DISCORD_RICH_PRESENCE
 #include "discord.h"
 #else
 namespace discord {
