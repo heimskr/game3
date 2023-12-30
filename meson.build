@@ -29,8 +29,8 @@ if get_option('vcpkg_triplet') != ''
 	config_h.set('USING_VCPKG', '1')
 endif
 
-if get_option('discord_rich_prescence')
-	config_h.set('DISCORD_RICH_PRESCENCE', '1')
+if get_option('discord_rich_presence')
+	config_h.set('DISCORD_RICH_PRESENCE', '1')
 endif
 
 if get_option('buildtype') != 'plain'
