@@ -92,7 +92,7 @@ replacing `base` with your plugin namespace if necessary and `my_entity` with yo
 "base:entity/my_entity": ["base:texture/my_entity", 3]
 ```
 Replace `3` with the "texture variety" of the entity. A "texture variety" indicates how the sprite sheet for the entity is laid out.
-Use `0` if you've overriden the `render` method, `1` if your entity looks like [this](https://github.com/heimskr/game3/blob/master/resources/characters/champions/Gangblanc.png?raw=true)
+Use `0` if you've overridden the `render` method, `1` if your entity looks like [this](https://github.com/heimskr/game3/blob/master/resources/characters/champions/Gangblanc.png?raw=true)
 (five frames of animation), `2` if your entity looks like [this](https://github.com/heimskr/game3/blob/master/resources/characters/blacksmith.png?raw=true) (five frames of animation, with diagonals)
 or `3` if your entity looks like [this](https://github.com/heimskr/game3/blob/master/resources/animals/chicken.png?raw=true) (four frames of animation).
 

@@ -90,7 +90,7 @@ namespace Game3 {
 
 			Player();
 
-			/** Resets client-side things like movingUp and the continous interaction fields that aren't transferred over the network. */
+			/** Resets client-side things like movingUp and the continuous interaction fields that aren't transferred over the network. */
 			void resetEphemeral();
 	};
 

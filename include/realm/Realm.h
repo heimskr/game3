@@ -190,7 +190,7 @@ namespace Game3 {
 			void requestChunk(ChunkPosition, const std::shared_ptr<RemoteClient> &);
 			/** Removes the entity from entitiesByChunk. */
 			void detach(const EntityPtr &, ChunkPosition);
-			/** Removes the entity from entitiesByChunk based on the entitiy's current chunk position. */
+			/** Removes the entity from entitiesByChunk based on the entity's current chunk position. */
 			void detach(const EntityPtr &);
 			/** Adds the entity to entitiesByChunk. */
 			void attach(const EntityPtr &);
