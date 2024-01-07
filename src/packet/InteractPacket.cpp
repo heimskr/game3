@@ -7,7 +7,7 @@
 
 namespace Game3 {
 	void InteractPacket::handle(ServerGame &game, RemoteClient &client) {
-		if (auto player = client.getPlayer()) {
+		if (ServerPlayerPtr player = client.getPlayer()) {
 			if (direction && *direction != player->direction) {
 				player->teleport(player->position, MovementContext{
 					.excludePlayerSelf = true,

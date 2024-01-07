@@ -203,7 +203,7 @@ namespace Game3 {
 		TileEntity::onRemove();
 	}
 
-	bool Pipe::onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *used_item, Hand) {
+	bool Pipe::onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack */*used_item*/, Hand) {
 		// if (!used_item || used_item->item->identifier != "base:item/wrench")
 		// 	return false;
 

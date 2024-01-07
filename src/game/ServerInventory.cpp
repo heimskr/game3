@@ -140,6 +140,9 @@ namespace Game3 {
 	}
 
 	void ServerInventory::erase(Slot slot) {
+		if (slot < 0)
+			throw std::invalid_argument("Can't erase invalid slot " + std::to_string(slot));
+
 		std::function<void()> after;
 		if (onRemove)
 			after = onRemove(slot);

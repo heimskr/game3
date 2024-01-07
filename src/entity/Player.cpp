@@ -171,16 +171,14 @@ namespace Game3 {
 	}
 
 	void Player::interactNextTo(Modifiers modifiers, ItemStack *used_item, Hand hand) {
-		auto realm = getRealm();
-		const Position next_to = nextTo();
-		auto player = getShared();
-		auto entity = realm->findEntity(next_to, player);
+		RealmPtr realm = getRealm();
+		Position next_to = nextTo();
+		PlayerPtr player = getShared();
+		EntityPtr entity = realm->findEntity(next_to, player);
 		bool interesting = false;
 
-		if (hand != Hand::None && used_item) {
-			used_item->item->use(getHeldSlot(hand), *used_item, getPlace(), modifiers, hand);
+		if (hand != Hand::None && used_item && used_item->item->use(getHeldSlot(hand), *used_item, getPlace(), modifiers, hand))
 			return;
-		}
 
 		if (entity)
 			interesting = entity->onInteractNextTo(player, modifiers, used_item, hand);

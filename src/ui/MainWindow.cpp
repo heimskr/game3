@@ -53,6 +53,8 @@ namespace Game3 {
 		{GDK_KEY_Down,         arrowTime},
 		{GDK_KEY_Left,         arrowTime},
 		{GDK_KEY_Right,        arrowTime},
+		{GDK_KEY_q,            interactTime},
+		{GDK_KEY_Q,            interactTime},
 		{GDK_KEY_e,            interactTime},
 		{GDK_KEY_E,            interactTime},
 		{GDK_KEY_bracketleft,  interactTime},
@@ -769,17 +771,17 @@ namespace Game3 {
 						player.send(ContinuousInteractionPacket(player.continuousInteractionModifiers));
 					return;
 				case GDK_KEY_E:
-					game->interactNextTo(Modifiers(modifiers) | Modifiers(true, false, false, false));
+					game->interactNextTo(Modifiers(modifiers) | Modifiers(true, false, false, false), Hand::Right);
 					return;
 				case GDK_KEY_e:
 				case GDK_KEY_Return:
-					game->interactNextTo(Modifiers(modifiers));
+					game->interactNextTo(Modifiers(modifiers), Hand::Right);
 					return;
-				case GDK_KEY_bracketleft:
+				case GDK_KEY_Q:
 					game->interactNextTo(Modifiers(modifiers) | Modifiers(true, false, false, false), Hand::Left);
 					return;
-				case GDK_KEY_bracketright:
-					game->interactNextTo(Modifiers(modifiers) | Modifiers(true, false, false, false), Hand::Right);
+				case GDK_KEY_q:
+					game->interactNextTo(Modifiers(modifiers), Hand::Left);
 					return;
 				case GDK_KEY_braceleft:
 				case GDK_KEY_braceright:
