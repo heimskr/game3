@@ -159,8 +159,10 @@ namespace Game3 {
 	}
 
 	void Realm::onFocus() {
-		if (getSide() == Side::Client && !focused.exchange(true))
+		if (getSide() == Side::Client && !focused.exchange(true)) {
+			queueStaticLightingTexture();
 			wakeupPending = true;
+		}
 	}
 
 	void Realm::onBlur() {
