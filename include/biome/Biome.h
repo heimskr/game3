@@ -25,8 +25,6 @@ namespace Game3 {
 			constexpr static BiomeType GRIMSTONE = 6;
 			constexpr static BiomeType COUNT     = GRIMSTONE + 1;
 
-			constexpr static double NOISE_ZOOM = 100.;
-
 			const BiomeType type;
 
 			Biome() = delete;

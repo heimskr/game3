@@ -72,12 +72,8 @@ namespace Game3 {
 		const auto wetness    = params.wetness;
 		const auto stoneLevel = params.stoneLevel;
 		auto &tileset = realm.getTileset();
-		const double noise = perlin.GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.666);
+		const double noise = perlin.GetValue(row / params.noiseZoom, column / params.noiseZoom, 0.666);
 
-		static const Identifier deeper_water  = "base:tile/deeper_water";
-		static const Identifier deep_water    = "base:tile/deep_water";
-		static const Identifier water         = "base:tile/water";
-		static const Identifier shallow_water = "base:tile/shallow_water";
 		static const Identifier sand          = "base:tile/sand";
 		static const Identifier light_grass   = "base:tile/light_grass";
 		static const Identifier stone         = "base:tile/stone";
@@ -98,7 +94,7 @@ namespace Game3 {
 				realm.setTile(Layer::Terrain, {row, column}, choose(tileset.getTilesByCategory("base:category/small_flowers"), rng), false);
 			else
 				realm.setTile(Layer::Terrain, {row, column}, choose(grasses, rng), false);
-			const double forest_noise = forestPerlin->GetValue(row / Biome::NOISE_ZOOM, column / Biome::NOISE_ZOOM, 0.5);
+			const double forest_noise = forestPerlin->GetValue(row / params.noiseZoom, column / params.noiseZoom, 0.5);
 			if (params.forestThreshold < forest_noise) {
 				std::default_random_engine tree_rng(static_cast<uint_fast32_t>(forest_noise * 1'000'000'000.));
 				if ((abs(row) % 2) == (std::uniform_int_distribution(0, 39)(tree_rng) < 20))
@@ -114,7 +110,7 @@ namespace Game3 {
 		Realm &realm = *getRealm();
 		constexpr double factor = 10;
 
-		if (params.antiforestThreshold > perlin.GetValue(row / Biome::NOISE_ZOOM * factor, column / Biome::NOISE_ZOOM * factor, 0.))
+		if (params.antiforestThreshold > perlin.GetValue(row / params.noiseZoom * factor, column / params.noiseZoom * factor, 0.))
 			if (auto tile = realm.tryTile(Layer::Submerged, {row, column}); tile && trees.contains(realm.getTileset()[*tile]))
 				realm.setTile(Layer::Submerged, {row, column}, 0, false);
 

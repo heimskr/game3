@@ -202,7 +202,7 @@ namespace Game3 {
 
 		if (baseRenderers) {
 			for (auto &row: *baseRenderers) {
-				for (auto &renderer: row) {
+				for (ElementBufferedRenderer &renderer: row) {
 					renderer.onBackbufferResized(bb_width, bb_height);
 					renderer.render(outdoors? game_time : 1, scale, center.first, center.second); CHECKGL
 				}
@@ -246,7 +246,7 @@ namespace Game3 {
 
 		if (upperRenderers) {
 			for (auto &row: *upperRenderers) {
-				for (auto &renderer: row) {
+				for (UpperRenderer &renderer: row) {
 					renderer.onBackbufferResized(bb_width, bb_height);
 					renderer.render(outdoors? game_time : 1, scale, center.first, center.second); CHECKGL
 				}

@@ -23,6 +23,7 @@ namespace Game3 {
 		double forestThreshold = 0.5;
 		double antiforestThreshold = -0.4;
 		double biomeZoom = 1000.;
+		double noiseZoom = 100.;
 
 		/** noise ∈ [-1, 1] */
 		FluidAmount getFluidLevel(double noise, double threshold = 0.3) const {
