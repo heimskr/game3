@@ -12,6 +12,8 @@ namespace Game3 {
 
 			HasBackbuffer() = default;
 
+			virtual ~HasBackbuffer() = default;
+
 			virtual void update(const Canvas &);
 			virtual void update(int width, int height);
 
