@@ -21,34 +21,34 @@
 	</content_rating>
 	<screenshots>
 		<screenshot type="default">
-			<image>https://ucsc.io/game3/1.png</image>
+			<image>https://github.com/heimskr/game3/blob/master/screenshots/1_small.png?raw=true</image>
 		</screenshot>
 		<screenshot type="default">
-			<image>https://ucsc.io/game3/2.png</image>
+			<image>https://github.com/heimskr/game3/blob/master/screenshots/2_small.png?raw=true</image>
 		</screenshot>
 	</screenshots>
 	<releases>
-		<release version="0.33.1" date="2023-12-12" urgency="low">
+		<release version="0.34.0" date="2024-01-09" urgency="low">
 			<description>
-				<p>Added a set of drag targets to the inventory tab that have the same function as the right click menu. This is useful if you're using WSL and right click menus are broken.</p>
+				<p>
+					Added a number of features, e.g.:
+					<ul>
+						<li>Initial work on sound</li>
+						<li>Fixed a monster warning when the target teleports into a wall</li>
+						<li>Outdoors color depends on time of day</li>
+						<li>Added torches and lighting</li>
+						<li>Fixed autocrafter overflow bug</li>
+						<li>Added bleach (edible!)</li>
+						<li>Fixed chat y offset</li>
+						<li>Better naming in meson.build (thanks nmarks413)</li>
+						<li>Fixed appdata.xml</li>
+						<li>Fixed typos (thanks lino-levan)</li>
+						<li>Unified interaction a bit (mining now requires the pickaxe to be held)</li>
+					</ul>
+				</p>
 			</description>
 
-			<url>https://github.com/heimskr/game3/releases/tag/v0.33.1</url>
-
-			<issues>
-			</issues>
-
-			<artifacts>
-				<artifact type="binary" platform="x86_64-linux-gnu">
-					<location>https://github.com/heimskr/game3/releases/download/v0.33.1/gay.heimskr.Game3.flatpak</location>
-					<checksum type="sha256">72d516b6ff8b05a4d35fad4c363ac29be0c757e2d120be7425f71f9d8b94f73a</checksum>
-					<size type="download">18269296</size>
-				</artifact>
-				<artifact type="source">
-					<location>https://github.com/heimskr/game3/archive/refs/tags/v0.33.1.tar.gz</location>
-					<checksum type="sha256">a829f01db75f03d3d0bb04edbe2ec81bbdd0e2a096c667fe6ec58e12d46e72d5</checksum>
-				</artifact>
-			</artifacts>
+			<url>https://github.com/heimskr/game3/releases/tag/v0.34.0</url>
 		</release>
 	</releases>
 </component>
