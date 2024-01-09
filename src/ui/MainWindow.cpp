@@ -158,7 +158,6 @@ namespace Game3 {
 				timeLabel.set_text(std::to_string(int(game->getHour())) + (minute < 10? ":0" : ":") + std::to_string(minute));
 			}
 
-			static std::deque<double> fpses;
 			fpses.push_back(lastFPS.load());
 			if (100 < fpses.size())
 				fpses.pop_front();
@@ -470,9 +469,6 @@ namespace Game3 {
 		glArea.throw_if_error();
 
 		CHECKGL
-
-		glClearColor(.2f, .2f, .2f, 1.f); CHECKGL
-		glClear(GL_COLOR_BUFFER_BIT); CHECKGL
 
 		if (autofocus && game)
 			if (PlayerPtr player = game->player.copyBase())

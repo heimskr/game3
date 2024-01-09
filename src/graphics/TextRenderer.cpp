@@ -95,6 +95,11 @@ namespace Game3 {
 		initialized = true;
 	}
 
+	void TextRenderer::update(const Canvas &canvas) {
+		centerX = canvas.center.first;
+		centerY = canvas.center.second;
+	}
+
 	void TextRenderer::update(int width, int height) {
 		if (width != backbufferWidth || height != backbufferHeight) {
 			HasBackbuffer::update(width, height);

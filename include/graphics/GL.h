@@ -2,8 +2,10 @@
 
 #include <array>
 #include <csignal>
+#include <filesystem>
 #include <functional>
 #include <iostream>
+#include <memory>
 #include <numeric>
 
 #define GL_GLEXT_PROTOTYPES
@@ -17,6 +19,9 @@
 #include <GL/glu.h>
 #endif
 #include <GLFW/glfw3.h>
+
+#include <stb/stb_image.h>
+#include <stb/stb_image_write.h>
 
 // #define HIDE_CHECKGL
 
@@ -398,7 +403,7 @@ namespace GL {
 			inline bool undo() {
 				if (handle == 0 || oldBuffer < 0)
 					return false;
-				// unbindFBTexture();
+				unbindFBTexture();
 				bindFB(oldBuffer);
 				oldBuffer = -1;
 				return true;
@@ -414,7 +419,13 @@ namespace GL {
 				return true;
 			}
 
-			inline auto getHandle() const { return handle; }
+			inline auto getHandle() const {
+				return handle;
+			}
+
+			inline bool isBound() const {
+				return 0 <= oldBuffer;
+			}
 
 		private:
 			GLint oldBuffer = -1;
@@ -424,16 +435,30 @@ namespace GL {
 	class FBOBinder {
 		public:
 			explicit FBOBinder(FBO &fbo_): fbo(fbo_) {
-				fbo.bind();
+				if (fbo.isBound())
+					active = false;
+				else
+					fbo.bind();
 			}
 
 			~FBOBinder() {
-				fbo.undo();
+				if (active)
+					fbo.undo();
+			}
+
+			void undo() {
+				if (active) {
+					active = false;
+					fbo.undo();
+				}
 			}
 
 		private:
 			FBO &fbo;
+			bool active = true;
 	};
+
+	class TextureFBOBinder;
 
 	class Texture {
 		public:
@@ -483,6 +508,8 @@ namespace GL {
 				return true;
 			}
 
+			TextureFBOBinder getBinder();
+
 			inline bool initFloat(GLsizei width_, GLsizei height_, GLint min_filter = GL_LINEAR, GLint mag_filter = GL_LINEAR) {
 				reset();
 				handle = GL::makeFloatTexture(width_, height_, min_filter, mag_filter);
@@ -529,17 +556,54 @@ namespace GL {
 				return out;
 			}
 
+			inline bool dump(FBO &fbo, const std::filesystem::path &path) {
+				auto pixels = std::make_unique<uint8_t[]>(width * height * 4);
+				fbo.bind();
+				useInFB();
+				glReadBuffer(GL_COLOR_ATTACHMENT0);
+				glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get());
+				const bool out = stbi_write_png(path.c_str(), width, height, 4, pixels.get(), width * 4);
+				fbo.undo();
+				return out;
+			}
+
 		private:
 			GLuint handle = 0;
 			GLsizei width = 0;
 			GLsizei height = 0;
 	};
 
+	class TextureFBOBinder {
+		public:
+			TextureFBOBinder(Texture &texture) {
+				save();
+				texture.useInFB();
+			}
+
+			~TextureFBOBinder() {
+				restore();
+			}
+
+		private:
+			GLuint handle = 0;
+
+			void save();
+			void restore();
+	};
+
 	struct Viewport {
 		GLint saved[4];
 
+		Viewport() {
+			glGetIntegerv(GL_VIEWPORT, saved); CHECKGL
+		}
+
 		Viewport(GLint x, GLint y, GLsizei width, GLsizei height) {
 			glGetIntegerv(GL_VIEWPORT, saved); CHECKGL
+			reframe(x, y, width, height);
+		}
+
+		inline void reframe(GLint x, GLint y, GLsizei width, GLsizei height) {
 			glViewport(x, y, width, height); CHECKGL
 		}
 

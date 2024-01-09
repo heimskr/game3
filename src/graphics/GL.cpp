@@ -22,6 +22,10 @@ namespace GL {
 		return FBOBinder(*this);
 	}
 
+	TextureFBOBinder Texture::getBinder() {
+		return TextureFBOBinder(*this);
+	}
+
 	GLuint makeFloatVAO(GLuint vbo, std::initializer_list<int> sizes) {
 		GLuint vao = -1;
 
@@ -42,5 +46,17 @@ namespace GL {
 		}
 
 		return vao;
+	}
+
+	void TextureFBOBinder::save() {
+		static_assert(sizeof(GLuint) == sizeof(GLint));
+		glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, reinterpret_cast<GLint *>(&handle)); CHECKGL
+	}
+
+	void TextureFBOBinder::restore() {
+		if (handle == 0)
+			unbindFBTexture();
+		else
+			useTextureInFB(handle);
 	}
 }

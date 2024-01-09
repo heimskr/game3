@@ -133,6 +133,7 @@ namespace Game3 {
 			Lockable<std::deque<std::unique_ptr<Gtk::Dialog>>> dialogQueue;
 			std::chrono::system_clock::time_point lastRenderTime = std::chrono::system_clock::now();
 			std::atomic<double> lastFPS = 0;
+			std::deque<double> fpses;
 
 			struct KeyInfo {
 				guint code;

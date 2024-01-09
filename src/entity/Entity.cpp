@@ -519,20 +519,14 @@ namespace Game3 {
 			return;
 
 		canvas.autofocusCounter = 0;
-		auto &tileset = realm->getTileset();
-		const auto texture = tileset.getTexture(realm->getGame());
-		// TODO: fix
-		constexpr bool adjust = false; // Render-to-texture silliness
+		Tileset &tileset = realm->getTileset();
+		TexturePtr texture = tileset.getTexture(realm->getGame());
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
 		{
 			auto lock = offset.sharedLock();
 			const auto [row, column] = getPosition();
 			canvas.center.first  = -(column - map_length / 2. + .5) - offset.x;
 			canvas.center.second = -(row    - map_length / 2. + .5) - offset.y;
-		}
-		if (adjust) {
-			canvas.center.first  -= canvas.getWidth()  / 32. / canvas.scale;
-			canvas.center.second += canvas.getHeight() / 32. / canvas.scale;
 		}
 	}
 

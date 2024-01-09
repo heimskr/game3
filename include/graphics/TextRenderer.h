@@ -54,6 +54,7 @@ namespace Game3 {
 			~TextRenderer();
 
 			void remove();
+			void update(const Canvas &);
 			void update(int width, int height) override;
 
 			void drawOnMap(Glib::ustring text, float x, float y, TextAlign align, float scale, float angle, float alpha);

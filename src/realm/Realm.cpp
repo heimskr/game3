@@ -181,7 +181,27 @@ namespace Game3 {
 		upperRenderers.emplace();
 	}
 
-	void Realm::render(const int width, const int height, const std::pair<double, double> &center, float scale, const RendererContext &renderers, float game_time) {
+	bool Realm::prerender(int, int, const std::pair<double, double> &, float, RendererContext &renderers, float) {
+		if (getSide() != Side::Client)
+			return false;
+
+		if (!focused)
+			onFocus();
+
+		auto &client_game = game.toClient();
+		assert(client_game.player);
+
+		const ChunkPosition current_chunk = client_game.player->getChunk();
+		if (staticLightingQueued.exchange(false) || lastPlayerChunk != current_chunk) {
+			lastPlayerChunk = current_chunk;
+			remakeStaticLightingTexture();
+			return true;
+		}
+
+		return false;
+	}
+
+	void Realm::render(const int width, const int height, const std::pair<double, double> &center, float scale, RendererContext &renderers, float game_time) {
 		if (getSide() != Side::Client)
 			return;
 
@@ -191,19 +211,10 @@ namespace Game3 {
 		auto &client_game = game.toClient();
 		assert(client_game.player);
 
-		const ChunkPosition current_chunk = client_game.player->getChunk();
-		if (lastPlayerChunk != current_chunk) {
-			lastPlayerChunk = current_chunk;
-			queueStaticLightingTexture();
-		}
-
-		const auto bb_width  = width;
-		const auto bb_height = height;
-
 		if (baseRenderers) {
 			for (auto &row: *baseRenderers) {
 				for (ElementBufferedRenderer &renderer: row) {
-					renderer.onBackbufferResized(bb_width, bb_height);
+					renderer.onBackbufferResized(width, height);
 					renderer.render(outdoors? game_time : 1, scale, center.first, center.second); CHECKGL
 				}
 			}
@@ -247,7 +258,7 @@ namespace Game3 {
 		if (upperRenderers) {
 			for (auto &row: *upperRenderers) {
 				for (UpperRenderer &renderer: row) {
-					renderer.onBackbufferResized(bb_width, bb_height);
+					renderer.onBackbufferResized(width, height);
 					renderer.render(outdoors? game_time : 1, scale, center.first, center.second); CHECKGL
 				}
 			}
@@ -268,7 +279,7 @@ namespace Game3 {
 		batch_sprite.renderNow();
 	}
 
-	void Realm::renderLighting(const int, const int, const std::pair<double, double> &, float, const RendererContext &renderers, float game_time) {
+	void Realm::renderLighting(const int, const int, const std::pair<double, double> &, float, RendererContext &renderers, float game_time) {
 		if (getSide() != Side::Client)
 			return;
 
@@ -1482,7 +1493,7 @@ namespace Game3 {
 		GL::Texture &texture = canvas.staticLightingTexture;
 		client_game.activateContext();
 		GL::FBOBinder binder = canvas.fbo.getBinder();
-		texture.useInFB();
+		GL::TextureFBOBinder texture_binder = texture.getBinder();
 		GL::clear(0, 0, 0, 0);
 		const ChunkPosition chunk = player->getChunk();
 
@@ -1512,18 +1523,8 @@ namespace Game3 {
 	}
 
 	void Realm::queueStaticLightingTexture() {
-		if (!isClient())
-			return;
-
-		if (staticLightingQueued.exchange(true))
-			return;
-
-		game.toClient().getWindow().queue([weak = weak_from_this()] {
-			if (RealmPtr realm = weak.lock()) {
-				realm->remakeStaticLightingTexture();
-				realm->staticLightingQueued = false;
-			}
-		});
+		if (isClient())
+			staticLightingQueued = true;
 	}
 
 	bool Realm::rightClick(const Position &position, double x, double y) {

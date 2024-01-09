@@ -117,8 +117,9 @@ namespace Game3 {
 			/** Called when the realm is to be removed from the game. */
 			virtual void onRemove();
 			void createRenderers();
-			void render(int width, int height, const std::pair<double, double> &center, float scale, const RendererContext &, float game_time);
-			void renderLighting(int width, int height, const std::pair<double, double> &center, float scale, const RendererContext &, float game_time);
+			bool prerender(int width, int height, const std::pair<double, double> &center, float scale, RendererContext &, float game_time);
+			void render(int width, int height, const std::pair<double, double> &center, float scale, RendererContext &, float game_time);
+			void renderLighting(int width, int height, const std::pair<double, double> &center, float scale, RendererContext &, float game_time);
 			virtual void clearLighting(float game_time);
 			/** Reuploads fluids and terrain in all layers. */
 			void reupload();

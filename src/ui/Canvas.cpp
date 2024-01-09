@@ -14,6 +14,13 @@
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/Tileset.h"
 
+
+
+#include <stb/stb_image.h>
+#include <stb/stb_image_write.h>
+
+
+
 namespace Game3 {
 	Canvas::Canvas(MainWindow &window_): window(window_) {
 		magic = 16 / 2;
@@ -25,12 +32,13 @@ namespace Game3 {
 			return;
 
 		const int factor = getFactor();
-		int width  = getWidth() * factor;
+		int width  = getWidth()  * factor;
 		int height = getHeight() * factor;
 
 		game->activateContext();
 		batchSpriteRenderer.update(*this);
 		singleSpriteRenderer.update(*this);
+		textRenderer.update(*this);
 		rectangleRenderer.update(width, height);
 		textRenderer.update(width, height);
 		circleRenderer.update(width, height);
@@ -76,10 +84,9 @@ namespace Game3 {
 			dynamicLightingTexture.initRGBA(width, height, GL_NEAREST);
 			scratchTexture.initRGBA(width, height, GL_NEAREST);
 
-			fbo.bind();
+			GL::FBOBinder binder = fbo.getBinder();
 			dynamicLightingTexture.useInFB();
 			GL::clear(1, 1, 1);
-			fbo.undo();
 
 			if (realm) {
 				realm->queueStaticLightingTexture();
@@ -87,33 +94,37 @@ namespace Game3 {
 		}
 
 		if (realm) {
-			if (realm->staticLightingQueued.exchange(false)) {
-				realm->remakeStaticLightingTexture();
-				return;
-			}
-
-			fbo.bind();
-
+			GL::FBOBinder binder = fbo.getBinder();
 			mainTexture.useInFB();
-			GL::Viewport viewport(0, 0, width, height);
+			glViewport(0, 0, width, height); CHECKGL
 			GL::clear(.2, .2, .2);
 			RendererContext context = getRendererContext();
 			context.updateSize(width, height);
+
+			if (realm->prerender(width, height, center, scale, context, game->getDivisor())) {
+				mainTexture.useInFB();
+				batchSpriteRenderer.update(*this);
+				singleSpriteRenderer.update(*this);
+				textRenderer.update(*this);
+				context.updateSize(width, height);
+				glViewport(0, 0, width, height); CHECKGL
+			}
+
 			realm->render(width, height, center, scale, context, game->getDivisor()); CHECKGL
 
 			dynamicLightingTexture.useInFB();
 			realm->renderLighting(width, height, center, scale, context, game->getDivisor()); CHECKGL
 
 			scratchTexture.useInFB();
-			GL::clear(1, 1, 1, 1);
+			GL::clear(1, 1, 1);
 
 			singleSpriteRenderer.drawOnScreen(dynamicLightingTexture, RenderOptions{
-				.x = 0.0,
-				.y = 0.0,
-				.sizeX = -1.0,
-				.sizeY = -1.0,
-				.scaleX = 1.,
-				.scaleY = 1.,
+				.x = 0,
+				.y = 0,
+				.sizeX = -1,
+				.sizeY = -1,
+				.scaleX = 1,
+				.scaleY = 1,
 			});
 
 			ChunkPosition chunk = game->player->getChunk() - ChunkPosition(1, 1);
@@ -121,18 +132,18 @@ namespace Game3 {
 			singleSpriteRenderer.drawOnMap(staticLightingTexture, RenderOptions{
 				.x = double(static_x),
 				.y = double(static_y),
-				.sizeX = -1.0,
-				.sizeY = -1.0,
+				.sizeX = -1,
+				.sizeY = -1,
 				.scaleX = 1. / factor,
 				.scaleY = 1. / factor,
 				.viewportX = -double(factor),
 				.viewportY = -double(factor),
 			});
 
-			viewport.reset();
-			fbo.undo();
+			binder.undo();
 
 			context.updateSize(getWidth(), getHeight());
+			glViewport(0, 0, width, height); CHECKGL
 			multiplier(mainTexture, scratchTexture);
 			realmBounds = game->getVisibleRealmBounds();
 		}
