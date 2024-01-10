@@ -67,10 +67,10 @@ vcpkg_zip: all_install zip
 
 macos_setup:
 	- vcpkg install
-	PKG_CONFIG_PATH=vcpkg_installed/arm64-osx/lib/pkgconfig meson setup -Dbuildtype=debugoptimized -Dno_discord=true -Dvcpkg_triplet=arm64-osx builddir .
+	PKG_CONFIG_PATH=vcpkg_installed/arm64-osx/lib/pkgconfig meson setup -Dbuildtype=debugoptimized -Ddiscord_rich_presence=false -Dvcpkg_triplet=arm64-osx builddir .
 
 macos_reconf:
-	PKG_CONFIG_PATH=vcpkg_installed/arm64-osx/lib/pkgconfig meson setup -Dbuildtype=debugoptimized -Dno_discord=true -Dvcpkg_triplet=arm64-osx --reconfigure builddir .
+	PKG_CONFIG_PATH=vcpkg_installed/arm64-osx/lib/pkgconfig meson setup -Dbuildtype=debugoptimized -Ddiscord_rich_presence=false -Dvcpkg_triplet=arm64-osx --reconfigure builddir .
 
 flat:
 	flatpak-builder --force-clean --arch=x86_64 --ccache --state-dir .flatpak-builder staging gay.heimskr.Game3.json
