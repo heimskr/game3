@@ -6,6 +6,10 @@
 #include <string>
 #include <vector>
 
+#ifdef __MINGW64__
+#include <winsock.h>
+#endif
+
 namespace Game3 {
 	class Sock {
 		friend class SocketBuffer;
