@@ -18,7 +18,6 @@ game3_deps = [
 	dependency('sqlite3'),
 	dependency('gl'),
 	dependency('glfw3'),
-	dependency('x11'),
 	dependency('asio'),
 	dependency('liblz4'),
 	dependency('nlohmann_json'),
@@ -27,7 +26,7 @@ game3_deps = [
 	sqlitecpp.get_variable('sqlitecpp_dep'),
 ]
 
-if build_machine.system() != 'darwin'
+if build_machine.system() == 'linux'
 	game3_deps += dependency('glu')
 endif
 
