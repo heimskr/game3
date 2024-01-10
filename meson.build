@@ -19,8 +19,6 @@ test_cpp_args = [
 	'-Wno-volatile'
 ]
 
-game3_config_data = configuration_data()
-
 if get_option('is_flatpak')
 	config_h.set('IS_FLATPAK', '1')
 endif
@@ -51,11 +49,11 @@ endforeach
 
 add_project_arguments(project_cpp_args, language: 'cpp')
 
-subdir('data')
 subdir('src')
-subdir('po')
 
-if build_machine.system() != 'darwin'
+if build_machine.system() == 'linux'
+	subdir('data')
+	subdir('po')
 	gnome.post_install(
 		glib_compile_schemas: true,
 		gtk_update_icon_cache: true,
