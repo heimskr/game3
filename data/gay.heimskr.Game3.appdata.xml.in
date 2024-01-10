@@ -44,6 +44,7 @@
 						<li>Fixed appdata.xml</li>
 						<li>Fixed typos (thanks lino-levan)</li>
 						<li>Unified interaction a bit (mining now requires the pickaxe to be held)</li>
+						<li>Added a farm in the top-left quadrant of the town</li>
 					</ul>
 				</p>
 			</description>
