@@ -4,3 +4,6 @@
 [submodule "subprojects/sqlitecpp"]
 	path = subprojects/sqlitecpp
 	url = https://github.com/SRombauts/SQLiteCpp.git
+[submodule "stb"]
+	path = stb
+	url = https://github.com/nothings/stb.git

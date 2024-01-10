@@ -14,11 +14,11 @@
 #include <nlohmann/json.hpp>
 
 #ifdef USING_VCPKG
-#include <stb_image.h>
-#include <stb_image_write.h>
+#include "lib/stb/stb_image.h"
+#include "lib/stb/stb_image_write.h"
 #else
-#include <stb/stb_image.h>
-#include <stb/stb_image_write.h>
+#include "lib/stb/stb_image.h"
+#include "lib/stb/stb_image_write.h"
 #endif
 
 namespace Game3 {
