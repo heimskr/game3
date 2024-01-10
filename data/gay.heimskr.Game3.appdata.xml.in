@@ -38,7 +38,7 @@
 						<li>Outdoors color depends on time of day</li>
 						<li>Added torches and lighting</li>
 						<li>Fixed autocrafter overflow bug</li>
-						<li>Added bleach (edible!)</li>
+						<li>Added bleach (edible!) (thanks Fayabella)</li>
 						<li>Fixed chat y offset</li>
 						<li>Better naming in meson.build (thanks nmarks413)</li>
 						<li>Fixed appdata.xml</li>
