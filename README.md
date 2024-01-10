@@ -36,7 +36,7 @@ See `/resources/CREDIT.txt` for more credits.
 ## Contribution Ideas
 If you'd like to contribute, here are some ideas, ordered roughly from easiest to hardest.
 
-- Improve the shading of the flower sprites (rows 1 and 5) in `/resources/tileset.png`.
+- Improve the shading of the flower sprites `flower1_*` and `flower5_*` in `/resources/tileset`.
 - Make animals useful.
 	- For example, add a shears tool that can be used to get wool from sheep.
 - Add a plugin system similar to that of [Algiz](https://github.com/heimskr/algiz)
