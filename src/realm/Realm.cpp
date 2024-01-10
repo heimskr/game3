@@ -181,7 +181,7 @@ namespace Game3 {
 		upperRenderers.emplace();
 	}
 
-	bool Realm::prerender(int, int, const std::pair<double, double> &, float, RendererContext &renderers, float) {
+	bool Realm::prerender() {
 		if (getSide() != Side::Client)
 			return false;
 
@@ -901,11 +901,18 @@ namespace Game3 {
 	}
 
 	void Realm::setTile(Layer layer, const Position &position, TileID tile_id, bool run_helper, TileUpdateContext context) {
+		bool affected_lighting = false;
+
 		{
 			std::unique_lock<std::shared_mutex> tile_lock;
 			auto &tile = tileProvider.findTile(layer, position, &tile_lock, TileProvider::TileMode::Create);
 			if (tile == tile_id)
 				return;
+
+			if (isClient())
+				if (auto tile_object = game.getTile(getTileset()[tile]); tile_object)
+					affected_lighting = tile_object->hasStaticLighting();
+
 			tile = tile_id;
 		}
 
@@ -917,7 +924,10 @@ namespace Game3 {
 			if (run_helper)
 				setLayerHelper(position.row, position.column, layer, context);
 		} else if (run_helper) {
-			queueStaticLightingTexture();
+			if (affected_lighting)
+				queueStaticLightingTexture();
+			else if (auto tile = game.getTile(getTileset()[tile_id]); tile && tile->hasStaticLighting())
+				queueStaticLightingTexture();
 		}
 	}
 
@@ -1119,7 +1129,7 @@ namespace Game3 {
 
 			updateNeighbors(position, layer, context);
 		} else if (isActive()) {
-			queueStaticLightingTexture();
+			// queueStaticLightingTexture();
 		}
 	}
 

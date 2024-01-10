@@ -101,7 +101,7 @@ namespace Game3 {
 			RendererContext context = getRendererContext();
 			context.updateSize(width, height);
 
-			if (realm->prerender(width, height, center, scale, context, game->getDivisor())) {
+			if (realm->prerender()) {
 				mainTexture.useInFB();
 				batchSpriteRenderer.update(*this);
 				singleSpriteRenderer.update(*this);

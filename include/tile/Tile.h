@@ -31,6 +31,9 @@ namespace Game3 {
 
 			virtual void renderStaticLighting(const Place &, Layer, const RendererContext &);
 
+			/** Returns true iff renderStaticLighting actually does anything. */
+			virtual bool hasStaticLighting() const { return false; }
+
 		private:
 			Lockable<std::optional<std::vector<std::shared_ptr<EntityFactory>>>> monsterFactories;
 

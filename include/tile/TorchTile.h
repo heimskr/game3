@@ -10,5 +10,7 @@ namespace Game3 {
 			TorchTile();
 
 			void renderStaticLighting(const Place &, Layer, const RendererContext &) override;
+
+			bool hasStaticLighting() const override { return true; }
 	};
 }
