@@ -1,5 +1,6 @@
-#include "graphics/Tileset.h"
+#include "game/Crop.h"
 #include "game/Game.h"
+#include "graphics/Tileset.h"
 #include "realm/Keep.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
@@ -85,6 +86,8 @@ namespace Game3::WorldGen {
 			set_terrain("base:tile/road");
 			--row;
 		}
+
+
 		column = position.column;
 		set_objects("base:tile/empty");
 		--row;
@@ -112,6 +115,21 @@ namespace Game3::WorldGen {
 			set_terrain("base:tile/road");
 			--column;
 		}
+
+		auto &crop_registry = game.registry<CropRegistry>();
+		std::vector<std::shared_ptr<Crop>> crops;
+		for (const auto &[key, crop]: crop_registry)
+			if (crop->canSpawnInTown)
+				crops.push_back(crop);
+
+		for (row = position.row + 1; row < position.row + height / 2 - 1; ++row) {
+			for (column = position.column + 1; column < position.column + width / 2 - 1; ++column) {
+				buildable_set.erase({row, column});
+				set_terrain("base:tile/farmland");
+				set_submerged({row, column}, choose(crops, rng)->getLastStage());
+			}
+		}
+
 		row = position.row;
 		set_objects("base:tile/empty");
 		--column;

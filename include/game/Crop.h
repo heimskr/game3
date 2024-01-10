@@ -15,14 +15,19 @@ namespace Game3 {
 			std::vector<Identifier> stages;
 			Products products;
 			double chance;
+			bool canSpawnInTown;
 			// TODO: refactor into subclasses with CropFactory
 			nlohmann::json customData;
 
-			Crop(Identifier, Identifier custom_type, std::vector<Identifier> stages_, Products products_, double chance_, nlohmann::json custom_data);
+			Crop(Identifier, Identifier custom_type, std::vector<Identifier> stages_, Products products_, double chance_, bool can_spawn_in_town, nlohmann::json custom_data);
 			Crop(Identifier, Game &, const nlohmann::json &);
+
+			const Identifier & getFirstStage() const;
+			const Identifier & getLastStage() const;
 
 		private:
 			static Identifier getCustomType(const nlohmann::json &);
 			static nlohmann::json getCustomData(const nlohmann::json &);
+			static bool getCanSpawnInTown(const nlohmann::json &);
 	};
 }

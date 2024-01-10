@@ -11,7 +11,8 @@
 					["constant", ["base:item/cotton"], 1],
 					["exponential", ["base:item/cotton_seeds"], 1, 0.25]
 				],
-				"chance": 1.0
+				"chance": 1.0,
+				"canSpawnInTown": true
 			},
 
 			"base:crop/wheat": {
@@ -20,7 +21,8 @@
 					["constant", ["base:item/wheat"], 1],
 					["exponential", ["base:item/wheat_seeds"], 1, 0.25]
 				],
-				"chance": 1.0
+				"chance": 1.0,
+				"canSpawnInTown": true
 			},
 
 			"base:crop/tomato": {
@@ -29,7 +31,8 @@
 					["constant", ["base:item/tomato"], 1],
 					["exponential", ["base:item/tomato_seeds"], 1, 0.25]
 				],
-				"chance": 1.0
+				"chance": 1.0,
+				"canSpawnInTown": true
 			},
 
 			"base:crop/corn": {
@@ -38,7 +41,8 @@
 					["constant", ["base:item/corn"], 1],
 					["exponential", ["base:item/corn_seeds"], 1, 0.25]
 				],
-				"chance": 1.0
+				"chance": 1.0,
+				"canSpawnInTown": true
 			},
 
 			"base:crop/pumpkin": {
@@ -47,7 +51,8 @@
 					["constant", ["base:item/pumpkin"], 1],
 					["exponential", ["base:item/pumpkin_seeds"], 1, 0.25]
 				],
-				"chance": 1.0
+				"chance": 1.0,
+				"canSpawnInTown": true
 			},
 
 			"base:crop/carrot": {
@@ -56,7 +61,8 @@
 					["constant", ["base:item/carrot"], 1],
 					["exponential", ["base:item/carrot_seeds"], 1, 0.25]
 				],
-				"chance": 1.0
+				"chance": 1.0,
+				"canSpawnInTown": true
 			},
 
 			"base:crop/potato": {
@@ -65,7 +71,8 @@
 					["constant", ["base:item/potato"], 1],
 					["exponential", ["base:item/potato_seeds"], 1, 0.25]
 				],
-				"chance": 1.0
+				"chance": 1.0,
+				"canSpawnInTown": true
 			},
 
 			"base:crop/strawberry": {
@@ -74,7 +81,8 @@
 					["constant", ["base:item/strawberry"], 1],
 					["exponential", ["base:item/strawberry_seeds"], 1, 0.25]
 				],
-				"chance": 1.0
+				"chance": 1.0,
+				"canSpawnInTown": true
 			},
 
 			"base:crop/eggplant": {
@@ -83,7 +91,8 @@
 					["constant", ["base:item/eggplant"], 1],
 					["exponential", ["base:item/eggplant_seeds"], 1, 0.25]
 				],
-				"chance": 1.0
+				"chance": 1.0,
+				"canSpawnInTown": true
 			},
 
 			"base:crop/cabbage": {
@@ -92,7 +101,8 @@
 					["constant", ["base:item/cabbage"], 1],
 					["exponential", ["base:item/cabbage_seeds"], 1, 0.25]
 				],
-				"chance": 1.0
+				"chance": 1.0,
+				"canSpawnInTown": true
 			},
 
 			"base:crop/onion": {
@@ -101,7 +111,8 @@
 					["constant", ["base:item/onion"], 1],
 					["exponential", ["base:item/onion_seeds"], 1, 0.25]
 				],
-				"chance": 1.0
+				"chance": 1.0,
+				"canSpawnInTown": true
 			},
 
 			"base:crop/bean": {
@@ -110,7 +121,8 @@
 					["constant", ["base:item/bean"], 1],
 					["exponential", ["base:item/bean_seeds"], 1, 0.25]
 				],
-				"chance": 1.0
+				"chance": 1.0,
+				"canSpawnInTown": true
 			},
 
 			"base:crop/chili": {
@@ -119,7 +131,8 @@
 					["constant", ["base:item/chili"], 1],
 					["exponential", ["base:item/chili_seeds"], 1, 0.25]
 				],
-				"chance": 1.0
+				"chance": 1.0,
+				"canSpawnInTown": true
 			},
 
 			"base:crop/tree1": {
