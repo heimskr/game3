@@ -115,7 +115,7 @@ namespace Game3 {
 		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO rules VALUES (?, ?)"};
 		for (const auto &[key, value]: game.gameRules) {
 			statement.bind(1, key);
-			statement.bind(2, value);
+			statement.bind(2, int64_t(value));
 			statement.exec();
 		}
 		transaction.commit();
@@ -127,7 +127,7 @@ namespace Game3 {
 
 		SQLite::Statement query{*database, "SELECT * FROM rules"};
 		while (query.executeStep()) {
-			game.gameRules[query.getColumn(0)] = query.getColumn(1);
+			game.gameRules[query.getColumn(0)] = query.getColumn(1).getInt64();
 		}
 	}
 
