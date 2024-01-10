@@ -22,6 +22,7 @@ game3_deps = [
 	dependency('liblz4'),
 	dependency('nlohmann_json'),
 	dependency('glm'),
+	dependency('boost'),
 	chemskr.get_variable('chemskr'),
 	sqlitecpp.get_variable('sqlitecpp_dep'),
 ]
