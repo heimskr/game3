@@ -18,8 +18,6 @@ namespace Game3 {
 			double centerX = 0;
 			double centerY = 0;
 
-			virtual ~SpriteRenderer() = default;
-
 			virtual void drawOnMap(const std::shared_ptr<Texture> &, double x, double y, double scale, double angle, double alpha) = 0;
 			virtual void drawOnMap(const std::shared_ptr<Texture> &, const RenderOptions &) = 0;
 			void drawOnMap(const std::shared_ptr<Texture> &, double x, double y);

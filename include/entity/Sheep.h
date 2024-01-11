@@ -23,6 +23,12 @@ namespace Game3 {
 
 			Identifier getMilk() const override { return {"base", "fluid/milk"}; }
 
+			std::vector<ItemStack> getDrops() override {
+				std::vector<ItemStack> out = Animal::getDrops();
+				out.emplace_back(getGame(), "base:item/raw_meat");
+				return out;
+			}
+
 			friend class Entity;
 
 		protected:

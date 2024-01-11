@@ -114,8 +114,8 @@ namespace Game3 {
 	void Shader::reset() {
 		if (handle != 0) {
 			glDeleteProgram(handle); CHECKGL
+			handle = 0;
 		}
-		handle = 0;
 	}
 
 	Shader & Shader::set(const char *uniform_name, GLint value) {

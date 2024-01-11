@@ -21,6 +21,12 @@ namespace Game3 {
 
 			std::string getName() const override { return "Pig"; }
 
+			std::vector<ItemStack> getDrops() override {
+				std::vector<ItemStack> out = Animal::getDrops();
+				out.emplace_back(getGame(), "base:item/raw_meat");
+				return out;
+			}
+
 			friend class Entity;
 
 		protected:
