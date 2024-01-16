@@ -23,6 +23,7 @@ game3_deps = [
 	dependency('nlohmann_json'),
 	dependency('glm'),
 	dependency('boost'),
+	dependency('FastNoise2', modules: ['FastNoise2::FastNoise']),
 	chemskr.get_variable('chemskr'),
 	sqlitecpp.get_variable('sqlitecpp_dep'),
 ]

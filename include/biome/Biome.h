@@ -6,11 +6,8 @@
 
 #include "types/Types.h"
 
-namespace noise::module {
-	class Perlin;
-}
-
 namespace Game3 {
+	class NoiseGenerator;
 	class Realm;
 	struct WorldGenParams;
 
@@ -34,12 +31,12 @@ namespace Game3 {
 			virtual void init(Realm &realm_, int noise_seed);
 
 			/** Returns the noise value generated for the position. */
-			virtual double generate(Index row, Index column, std::default_random_engine &, const noise::module::Perlin &, const WorldGenParams &) {
+			virtual double generate(Index row, Index column, std::default_random_engine &, const NoiseGenerator &, const WorldGenParams &) {
 				(void) row; (void) column;
 				return 0.;
 			}
 
-			virtual void postgen(Index row, Index column, std::default_random_engine &, const noise::module::Perlin &, const WorldGenParams &) {
+			virtual void postgen(Index row, Index column, std::default_random_engine &, const NoiseGenerator &, const WorldGenParams &) {
 				(void) row; (void) column;
 			}
 

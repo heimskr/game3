@@ -3,7 +3,6 @@
 #include "Log.h"
 #include "graphics/Tileset.h"
 #include "game/Game.h"
-#include "lib/noise.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
 #include "util/Timer.h"
@@ -16,8 +15,7 @@ namespace Game3::WorldGen {
 	void generateCave(const std::shared_ptr<Realm> &realm, std::default_random_engine &, int noise_seed, const ChunkRange &range) {
 		auto guard = realm->guardGeneration();
 		realm->markGenerated(range);
-		noise::module::Perlin perlin;
-		perlin.SetSeed(noise_seed);
+		DefaultNoiseGenerator noisegen(noise_seed);
 
 		const Index row_min = CHUNK_SIZE * range.topLeft.y;
 		const Index row_max = CHUNK_SIZE * (range.bottomRight.y + 1) - 1;
@@ -29,7 +27,7 @@ namespace Game3::WorldGen {
 
 		for (Index row = row_min; row <= row_max; ++row)
 			for (Index column = column_min; column <= column_max; ++column)
-				layers.push_back(generateCaveTile(realm, row, column, perlin)? Layer::Terrain : Layer::Objects);
+				layers.push_back(generateCaveTile(realm, row, column, noisegen)? Layer::Terrain : Layer::Objects);
 
 		for (Index row = row_max; row >= row_min; --row) {
 			for (Index column = column_max; column >= column_min; --column) {
@@ -39,8 +37,8 @@ namespace Game3::WorldGen {
 		}
 	}
 
-	bool generateNormalCaveTile(const std::shared_ptr<Realm> &realm, Index row, Index column, const noise::module::Perlin &perlin) {
-		const double noise = perlin.GetValue(row / noise_zoom, column / noise_zoom, 0.1);
+	bool generateNormalCaveTile(const std::shared_ptr<Realm> &realm, Index row, Index column, const NoiseGenerator &noisegen) {
+		const double noise = noisegen(row / noise_zoom, column / noise_zoom, 0.1);
 
 		if (noise < -.95) {
 			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_iron", false);
@@ -88,7 +86,7 @@ namespace Game3::WorldGen {
 
 			// TODO: move to mushroom caves
 			constexpr static double extra_zoom = 5.;
-			const double brine_noise = std::abs(perlin.GetValue(row / (extra_zoom * noise_zoom), column / (extra_zoom * noise_zoom), 541713.));
+			const double brine_noise = std::abs(noisegen(row / (extra_zoom * noise_zoom), column / (extra_zoom * noise_zoom), 541713.));
 			if (0.666 < noise && brine_noise < 0.05) {
 				realm->setTile(Layer::Terrain, {row, column}, "base:tile/stone", false);
 				if (brine_noise < 0.03)
@@ -102,8 +100,8 @@ namespace Game3::WorldGen {
 		return false;
 	}
 
-	bool generateGrimCaveTile(const std::shared_ptr<Realm> &realm, Index row, Index column, const noise::module::Perlin &perlin) {
-		const double noise = perlin.GetValue(row / noise_zoom, column / noise_zoom, 0.1);
+	bool generateGrimCaveTile(const std::shared_ptr<Realm> &realm, Index row, Index column, const NoiseGenerator &noisegen) {
+		const double noise = noisegen(row / noise_zoom, column / noise_zoom, 0.1);
 
 		if (noise < -.95) {
 			realm->setTile(Layer::Objects, {row, column}, "base:tile/grimstone", false);
@@ -151,7 +149,7 @@ namespace Game3::WorldGen {
 			realm->setTile(Layer::Terrain, {row, column}, "base:tile/grimdirt", false);
 
 			constexpr static double extra_zoom = 6.66;
-			const double lava_noise = std::abs(perlin.GetValue(row / (extra_zoom * noise_zoom), column / (extra_zoom * noise_zoom), 1474.));
+			const double lava_noise = std::abs(noisegen(row / (extra_zoom * noise_zoom), column / (extra_zoom * noise_zoom), 1474.));
 			if (lava_noise < 0.0666)
 				realm->setFluid({row, column}, "base:fluid/lava", FluidTile::FULL, true);
 
@@ -161,22 +159,21 @@ namespace Game3::WorldGen {
 		return false;
 	}
 
-	bool generateCaveTile(const std::shared_ptr<Realm> &realm, Index row, Index column, const noise::module::Perlin &perlin) {
+	bool generateCaveTile(const std::shared_ptr<Realm> &realm, Index row, Index column, const NoiseGenerator &noisegen) {
 		constexpr static double biome_zoom = noise_zoom * 10.;
-		const double biome_noise = perlin.GetValue(row / biome_zoom, column / biome_zoom, 5.0);
+		const double biome_noise = noisegen(row / biome_zoom, column / biome_zoom, 5.0);
 
 		if (biome_noise < -0.5)
-			return generateGrimCaveTile(realm, row, column, perlin);
+			return generateGrimCaveTile(realm, row, column, noisegen);
 
-		return generateNormalCaveTile(realm, row, column, perlin);
+		return generateNormalCaveTile(realm, row, column, noisegen);
 	}
 
 	void generateCaveFull(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, int noise_seed, const Position &exit_position, Position &entrance, RealmID parent_realm, const ChunkRange &range) {
 		Timer timer{"CaveGenFull"};
 		auto guard = realm->guardGeneration();
 		realm->markGenerated(range);
-		noise::module::Perlin perlin;
-		perlin.SetSeed(noise_seed);
+		DefaultNoiseGenerator noisegen(noise_seed);
 
 		const Index row_min = CHUNK_SIZE * range.topLeft.y;
 		const Index row_max = CHUNK_SIZE * (range.bottomRight.y + 1) - 1;
@@ -195,7 +192,7 @@ namespace Game3::WorldGen {
 
 		for (Index row = row_min; row <= row_max; ++row) {
 			for (Index column = column_min; column <= column_max; ++column) {
-				if (generateCaveTile(realm, row, column, perlin)) {
+				if (generateCaveTile(realm, row, column, noisegen)) {
 					inside.emplace_back(row, column);
 					layers.push_back(Layer::Terrain);
 				} else

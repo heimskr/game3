@@ -23,7 +23,7 @@
 #include "lib/stb/stb_image.h"
 #include "lib/stb/stb_image_write.h"
 
-// #define HIDE_CHECKGL
+#define HIDE_CHECKGL
 
 #ifdef HIDE_CHECKGL
 #define CHECKGL
@@ -35,7 +35,6 @@
 
 namespace GL {
 	// TODO: makeRGBTexture
-	// TODO: makeRGBATexture
 
 	void checkGL(GLenum err, const char *file, int line);
 

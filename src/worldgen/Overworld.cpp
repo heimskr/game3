@@ -48,8 +48,7 @@ namespace Game3::WorldGen {
 		const size_t regions_y = updiv(height, CHUNK_SIZE);
 		const size_t job_count = regions_x * regions_y;
 
-		noise::module::Perlin p2;
-		p2.SetSeed(noise_seed * 3 - 1);
+		DefaultNoiseGenerator noisegen2(noise_seed * 3 - 1);
 
 		auto biomes = Biome::getMap(*realm, noise_seed);
 		auto get_biome = [&](Index row, Index column) -> Biome & {
@@ -58,9 +57,6 @@ namespace Game3::WorldGen {
 			throw std::runtime_error("Couldn't get biome type at (" + std::to_string(row) + ", " + std::to_string(column) + ')');
 		};
 
-		p2.SetNoiseQuality(noise::NoiseQuality::QUALITY_BEST);
-		p2.SetFrequency(0.8);
-
 		const Index range_row_min = range.rowMin();
 		const Index range_row_max = range.rowMax();
 		const Index range_column_min = range.columnMin();
@@ -68,7 +64,7 @@ namespace Game3::WorldGen {
 
 		for (Index row = range_row_min; row <= range_row_max; ++row) {
 			for (Index column = range_column_min; column <= range_column_max; ++column) {
-				const double noise = std::min(1., std::max(-1., p2.GetValue(row / params.biomeZoom, column / params.biomeZoom, 0.0) * 5.));
+				const double noise = std::min(1., std::max(-1., noisegen2(row / params.biomeZoom, column / params.biomeZoom, 0.0) * 5.));
 				std::unique_lock<std::shared_mutex> lock;
 				auto &type = provider.findBiomeType(Position(row, column), &lock);
 				if (noise < -0.8)
@@ -82,12 +78,10 @@ namespace Game3::WorldGen {
 			}
 		}
 
-		noise::module::Perlin perlin;
-		perlin.SetSeed(noise_seed);
+		DefaultNoiseGenerator noisegen(noise_seed);
 
 #ifdef GENERATE_RIVERS
-		noise::module::Perlin river_perlin;
-		river_perlin.SetSeed(-5 * noise_seed + 1);
+		DefaultNoiseGenerator river_noise(-5 * noise_seed + 1);
 #endif
 
 		const GamePtr game_ptr = realm->getGame().shared_from_this();
@@ -118,10 +112,10 @@ namespace Game3::WorldGen {
 					for (auto row = row_min; row < row_max; ++row) {
 						for (auto column = col_min; column < col_max; ++column) {
 							auto &biome = get_biome(row, column);
-							saved_noise[noise_index++] = biome.generate(row, column, threadContext.rng, perlin, params);
+							saved_noise[noise_index++] = biome.generate(row, column, threadContext.rng, noisegen, params);
 #ifdef GENERATE_RIVERS
 							constexpr double river_zoom = 400.;
-							const auto river = river_perlin.GetValue(row / river_zoom, column / river_zoom, 0.5);
+							const auto river = river_noise(row / river_zoom, column / river_zoom, 0.5);
 							constexpr double range = 0.05;
 							constexpr double start = -range / 2;
 							if (start <= river && river <= start + range) {
@@ -247,12 +241,12 @@ namespace Game3::WorldGen {
 				const Index col_min = range_column_min + thread_col * CHUNK_SIZE;
 				// Compare with <, not <=
 				const Index col_max = col_min + CHUNK_SIZE;
-				pool.add([realm, &waiter, &get_biome, &perlin, &params, noise_seed, row_min, row_max, col_min, col_max](ThreadPool &, size_t) {
+				pool.add([realm, &waiter, &get_biome, &noisegen, &params, noise_seed, row_min, row_max, col_min, col_max](ThreadPool &, size_t) {
 					threadContext = {realm->getGame().shared_from_this(), static_cast<uint_fast32_t>(noise_seed - 1'000'000ul * row_min + col_min), row_min, row_max, col_min, col_max};
 					for (Index row = row_min; row < row_max; ++row) {
 						for (Index column = col_min; column < col_max; ++column) {
 							realm->autotile({row, column}, Layer::Terrain);
-							get_biome(row, column).postgen(row, column, threadContext.rng, perlin, params);
+							get_biome(row, column).postgen(row, column, threadContext.rng, noisegen, params);
 						}
 					}
 					--waiter;

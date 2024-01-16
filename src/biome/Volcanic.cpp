@@ -13,10 +13,10 @@ namespace Game3 {
 		Biome::init(realm, noise_seed);
 	}
 
-	double Volcanic::generate(Index row, Index column, std::default_random_engine &, const noise::module::Perlin &perlin, const WorldGenParams &params) {
+	double Volcanic::generate(Index row, Index column, std::default_random_engine &, const NoiseGenerator &noisegen, const WorldGenParams &params) {
 		Realm &realm = *getRealm();
 		const auto wetness = params.wetness;
-		const double noise = perlin.GetValue(row / params.noiseZoom, column / params.noiseZoom, 0.666);
+		const double noise = noisegen(row / params.noiseZoom, column / params.noiseZoom, 0.666);
 
 		static const Identifier volcanic_sand = "base:tile/volcanic_sand"_id;
 		static const Identifier volcanic_rock = "base:tile/volcanic_rock"_id;
@@ -38,7 +38,7 @@ namespace Game3 {
 		return noise;
 	}
 
-	void Volcanic::postgen(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &, const WorldGenParams &) {
+	void Volcanic::postgen(Index row, Index column, std::default_random_engine &rng, const NoiseGenerator &, const WorldGenParams &) {
 		Realm &realm = *getRealm();
 		std::uniform_int_distribution distribution{0, 199};
 

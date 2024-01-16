@@ -1,7 +1,7 @@
 #pragma once
 
+#include "algorithm/NoiseGenerator.h"
 #include "biome/Biome.h"
-#include "lib/noise.h"
 
 namespace Game3 {
 	class Snowy: public Biome {
@@ -11,13 +11,13 @@ namespace Game3 {
 			Snowy(): Biome(Biome::SNOWY) {}
 
 			void init(Realm &, int noise_seed) override;
-			double generate(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &, const WorldGenParams &) override;
-			void postgen(Index row, Index column, std::default_random_engine &rng, const noise::module::Perlin &, const WorldGenParams &) override;
+			double generate(Index row, Index column, std::default_random_engine &, const NoiseGenerator &, const WorldGenParams &) override;
+			void postgen(Index row, Index column, std::default_random_engine &, const NoiseGenerator &, const WorldGenParams &) override;
 
 		protected:
 			std::shared_ptr<Biome> clone() const override { return std::make_shared<Snowy>(*this); }
 
 		private:
-			std::shared_ptr<noise::module::Perlin> forestPerlin;
+			DefaultNoiseGenerator forestNoise;
 	};
 }
