@@ -62,9 +62,17 @@ namespace Game3::WorldGen {
 		const Index range_column_min = range.columnMin();
 		const Index range_column_max = range.columnMax();
 
+		std::vector<float> biome_noise;
+
+		{
+			const float zoom = params.biomeZoom;
+			noisegen2.fill(biome_noise, range_column_min, range_row_min, range_column_max - range_column_min + 1, range_row_max - range_row_min + 1, 1.f / zoom);
+		}
+		size_t biome_noise_index = 0;
+
 		for (Index row = range_row_min; row <= range_row_max; ++row) {
 			for (Index column = range_column_min; column <= range_column_max; ++column) {
-				const double noise = std::min(1., std::max(-1., noisegen2(row / params.biomeZoom, column / params.biomeZoom, 0.0) * 5.));
+				const double noise = std::min(1., std::max(-1., biome_noise[biome_noise_index++] * 5.));
 				std::unique_lock<std::shared_mutex> lock;
 				BiomeType &type = provider.findBiomeType(Position(row, column), &lock);
 
