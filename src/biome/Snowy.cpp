@@ -18,12 +18,10 @@ namespace Game3 {
 		forestNoise.setSeed(-noise_seed * 3);
 	}
 
-	double Snowy::generate(Index row, Index column, std::default_random_engine &rng, const NoiseGenerator &noisegen, const WorldGenParams &params) {
+	double Snowy::generate(Index row, Index column, std::default_random_engine &rng, const NoiseGenerator &noisegen, const WorldGenParams &params, double suggested_noise) {
 		Realm &realm = *getRealm();
 		const auto wetness    = params.wetness;
 		const auto stoneLevel = params.stoneLevel;
-
-		const double noise = noisegen(row / params.noiseZoom, column / params.noiseZoom, 0.666);
 
 		static const Identifier sand          = "base:tile/sand";
 		static const Identifier dark_ice      = "base:tile/dark_ice";
@@ -32,16 +30,16 @@ namespace Game3 {
 		static const Identifier stone         = "base:tile/stone";
 		static const Identifier water_fluid   = "base:fluid/water";
 
-		if (noise < wetness + 0.3) {
+		if (suggested_noise < wetness + 0.3) {
 			realm.setTile(Layer::Terrain, {row, column}, sand, false);
-			realm.setFluid({row, column}, water_fluid, params.getFluidLevel(noise, 0.3), true);
-		} else if (noise < wetness + 0.39) {
+			realm.setFluid({row, column}, water_fluid, params.getFluidLevel(suggested_noise, 0.3), true);
+		} else if (suggested_noise < wetness + 0.39) {
 			realm.setTile(Layer::Terrain, {row, column}, sand, false);
-		} else if (noise < wetness + 0.42) {
+		} else if (suggested_noise < wetness + 0.42) {
 			realm.setTile(Layer::Terrain, {row, column}, dark_ice, false);
-		} else if (noise < wetness + 0.5) {
+		} else if (suggested_noise < wetness + 0.5) {
 			realm.setTile(Layer::Terrain, {row, column}, light_ice, false);
-		} else if (stoneLevel < noise) {
+		} else if (stoneLevel < suggested_noise) {
 			realm.setTile(Layer::Terrain, {row, column}, stone, false);
 		} else {
 			realm.setTile(Layer::Terrain, {row, column}, snow, false);
@@ -56,7 +54,7 @@ namespace Game3 {
 			}
 		}
 
-		return noise;
+		return suggested_noise;
 	}
 
 	void Snowy::postgen(Index row, Index column, std::default_random_engine &, const NoiseGenerator &noisegen, const WorldGenParams &params) {

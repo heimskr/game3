@@ -13,29 +13,28 @@ namespace Game3 {
 		Biome::init(realm, noise_seed);
 	}
 
-	double Volcanic::generate(Index row, Index column, std::default_random_engine &, const NoiseGenerator &noisegen, const WorldGenParams &params) {
+	double Volcanic::generate(Index row, Index column, std::default_random_engine &, const NoiseGenerator &noisegen, const WorldGenParams &params, double suggested_noise) {
 		Realm &realm = *getRealm();
 		const auto wetness = params.wetness;
-		const double noise = noisegen(row / params.noiseZoom, column / params.noiseZoom, 0.666);
 
 		static const Identifier volcanic_sand = "base:tile/volcanic_sand"_id;
 		static const Identifier volcanic_rock = "base:tile/volcanic_rock"_id;
 		static const Identifier water_fluid   = "base:fluid/water"_id;
 		static const Identifier lava_fluid    = "base:fluid/lava"_id;
 
-		if (noise < wetness + 0.3) {
+		if (suggested_noise < wetness + 0.3) {
 			realm.setTile(Layer::Terrain, {row, column}, volcanic_sand, false);
-			realm.setFluid({row, column}, water_fluid, params.getFluidLevel(noise, 0.3), true);
-		} else if (noise < wetness + 0.4) {
+			realm.setFluid({row, column}, water_fluid, params.getFluidLevel(suggested_noise, 0.3), true);
+		} else if (suggested_noise < wetness + 0.4) {
 			realm.setTile(Layer::Terrain, {row, column}, volcanic_sand, false);
-		} else if (0.85 < noise) {
+		} else if (0.85 < suggested_noise) {
 			realm.setTile(Layer::Terrain, {row, column}, volcanic_rock, false);
 			realm.setFluid({row, column}, lava_fluid, FluidTile::FULL, true);
 		} else {
 			realm.setTile(Layer::Terrain, {row, column}, volcanic_rock, false);
 		}
 
-		return noise;
+		return suggested_noise;
 	}
 
 	void Volcanic::postgen(Index row, Index column, std::default_random_engine &rng, const NoiseGenerator &, const WorldGenParams &) {

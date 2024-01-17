@@ -11,7 +11,7 @@ namespace Game3 {
 			Snowy(): Biome(Biome::SNOWY) {}
 
 			void init(Realm &, int noise_seed) override;
-			double generate(Index row, Index column, std::default_random_engine &, const NoiseGenerator &, const WorldGenParams &) override;
+			double generate(Index row, Index column, std::default_random_engine &, const NoiseGenerator &, const WorldGenParams &, double suggested_noise) override;
 			void postgen(Index row, Index column, std::default_random_engine &, const NoiseGenerator &, const WorldGenParams &) override;
 
 		protected:

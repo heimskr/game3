@@ -66,7 +66,8 @@ namespace Game3::WorldGen {
 			for (Index column = range_column_min; column <= range_column_max; ++column) {
 				const double noise = std::min(1., std::max(-1., noisegen2(row / params.biomeZoom, column / params.biomeZoom, 0.0) * 5.));
 				std::unique_lock<std::shared_mutex> lock;
-				auto &type = provider.findBiomeType(Position(row, column), &lock);
+				BiomeType &type = provider.findBiomeType(Position(row, column), &lock);
+
 				if (noise < -0.8)
 					type = Biome::VOLCANIC;
 				else if (noise < -0.5)
@@ -109,10 +110,14 @@ namespace Game3::WorldGen {
 					size_t noise_index = 0;
 
 					// Timer noise_timer("BiomeGeneration");
+					std::vector<float> suggested_noise;
+					noisegen.fill(suggested_noise, col_min, row_min, col_max - col_min, row_max - row_min, 1.f / params.noiseZoom);
+
 					for (auto row = row_min; row < row_max; ++row) {
 						for (auto column = col_min; column < col_max; ++column) {
 							auto &biome = get_biome(row, column);
-							saved_noise[noise_index++] = biome.generate(row, column, threadContext.rng, noisegen, params);
+							saved_noise[noise_index] = biome.generate(row, column, threadContext.rng, noisegen, params, suggested_noise[noise_index]);
+							++noise_index;
 #ifdef GENERATE_RIVERS
 							constexpr double river_zoom = 400.;
 							const auto river = river_noise(row / river_zoom, column / river_zoom, 0.5);

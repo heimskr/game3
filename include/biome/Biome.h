@@ -31,8 +31,8 @@ namespace Game3 {
 			virtual void init(Realm &realm_, int noise_seed);
 
 			/** Returns the noise value generated for the position. */
-			virtual double generate(Index row, Index column, std::default_random_engine &, const NoiseGenerator &, const WorldGenParams &) {
-				(void) row; (void) column;
+			virtual double generate(Index row, Index column, std::default_random_engine &, const NoiseGenerator &, const WorldGenParams &, double suggested_noise) {
+				(void) row; (void) column; (void) suggested_noise;
 				return 0.;
 			}
 

@@ -17,8 +17,10 @@ namespace Game3 {
 
 	using BuildingGenerator = std::function<void(const std::shared_ptr<Realm> &, std::default_random_engine &, const std::shared_ptr<Realm> &, Index width, Index height, const Position &)>;
 
+	double getDefaultWetness();
+
 	struct WorldGenParams {
-		double wetness = -.05;
+		double wetness = getDefaultWetness();
 		double stoneLevel = 0.8;
 		double forestThreshold = 0.5;
 		double antiforestThreshold = -0.4;

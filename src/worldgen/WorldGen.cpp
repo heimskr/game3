@@ -7,6 +7,10 @@ namespace Game3 {
 		ThreadPool pool{5};
 	}
 
+	double getDefaultWetness() {
+		return -.05;
+	}
+
 	void from_json(const nlohmann::json &json, WorldGenParams &params) {
 		params.wetness = json.at("wetness");
 		params.stoneLevel = json.at("stoneLevel");

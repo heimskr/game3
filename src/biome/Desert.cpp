@@ -23,22 +23,21 @@ namespace Game3 {
 		forestNoise.setSeed(-noise_seed * 3);
 	}
 
-	double Desert::generate(Index row, Index column, std::default_random_engine &rng, const NoiseGenerator &noisegen, const WorldGenParams &params) {
+	double Desert::generate(Index row, Index column, std::default_random_engine &rng, const NoiseGenerator &noisegen, const WorldGenParams &params, double suggested_noise) {
 		Realm &realm = *getRealm();
 		const auto wetness    = params.wetness;
 		const auto stoneLevel = params.stoneLevel;
-		const double noise = noisegen(row / params.noiseZoom, column / params.noiseZoom, 0.666);
 
 		static const Identifier sand          = "base:tile/sand"_id;
 		static const Identifier stone         = "base:tile/stone"_id;
 		static const Identifier water_fluid   = "base:fluid/water"_id;
 
-		if (noise < wetness + 0.3) {
+		if (suggested_noise < wetness + 0.3) {
 			realm.setTile(Layer::Terrain, {row, column}, sand, false);
-			realm.setFluid({row, column}, water_fluid, params.getFluidLevel(noise, 0.3), true);
-		} else if (noise < wetness + 0.4) {
+			realm.setFluid({row, column}, water_fluid, params.getFluidLevel(suggested_noise, 0.3), true);
+		} else if (suggested_noise < wetness + 0.4) {
 			realm.setTile(Layer::Terrain, {row, column}, sand, false);
-		} else if (stoneLevel < noise) {
+		} else if (stoneLevel < suggested_noise) {
 			realm.setTile(Layer::Terrain, {row, column}, stone, false);
 		} else {
 			realm.setTile(Layer::Terrain, {row, column}, sand, false);
@@ -47,7 +46,7 @@ namespace Game3 {
 				std::default_random_engine tree_rng(static_cast<uint_fast32_t>(forest_noise * 1'000'000'000.));
 				std::uniform_int_distribution hundred{0, 99};
 				if (hundred(tree_rng) < 75)
-					return noise;
+					return suggested_noise;
 				uint8_t mod = abs(column) % 2;
 				if (hundred(tree_rng) < 50)
 					mod = 1 - mod;
@@ -56,7 +55,7 @@ namespace Game3 {
 			}
 		}
 
-		return noise;
+		return suggested_noise;
 	}
 
 	void Desert::postgen(Index row, Index column, std::default_random_engine &, const NoiseGenerator &noisegen, const WorldGenParams &params) {
