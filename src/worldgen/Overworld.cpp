@@ -13,6 +13,7 @@
 #include "util/Util.h"
 #include "worldgen/Overworld.h"
 #include "worldgen/Town.h"
+#include "worldgen/VillageGen.h"
 #include "worldgen/WorldGen.h"
 
 #include <semaphore>
@@ -182,63 +183,27 @@ namespace Game3::WorldGen {
 
 		std::default_random_engine rng(noise_seed);
 
-		if (initial_generation) {
-			constexpr int m = 26, n = 34, pad = 2;
-			Timer land_timer("GetLand");
-			const auto starts = provider.getLand(*game_ptr, range, m + pad * 2, n + pad * 2);
-			land_timer.stop();
-			constexpr size_t chunk_size = 512;
+		{
+			constexpr static int m = 26, n = 34, pad = 2;
+			const VillageOptions village_options{n, m, pad};
 
-			if (!starts.empty()) {
-				Timer candidate_timer("Candidates");
-
-				std::vector<Position> candidates;
-				candidates.reserve(starts.size() / 16);
-				const size_t chunk_max = updiv(starts.size(), chunk_size);
-
-				std::mutex candidates_mutex;
-				realm->randomLand = choose(starts, rng);
-
-				waiter.reset(chunk_max);
-
-				for (size_t chunk = 0; chunk < chunk_max; ++chunk) {
-					pool.add([&, chunk](ThreadPool &, size_t) {
-						std::vector<Position> thread_candidates;
-
-						for (size_t i = chunk * chunk_size, max = std::min((chunk + 1) * chunk_size, starts.size()); i < max; ++i) {
-							const auto position = starts[i];
-							const Index row_start = position.row + pad;
-							const Index row_end = row_start + m;
-							const Index column_start = position.column + pad;
-							const Index column_end = column_start + n;
-
-							for (Index row = row_start; row < row_end; row += 2) {
-								for (Index column = column_start; column < column_end; column += 2) {
-									if (auto tile = provider.tryTile(Layer::Terrain, {row, column}); !tile || !tileset.isLand(*tile))
-										goto failed;
-									if (realm->hasFluid({row, column}))
-										goto failed;
-								}
-							}
-
-							thread_candidates.push_back(position);
-							failed: continue;
-						}
-
-						std::unique_lock lock(candidates_mutex);
-						candidates.insert(candidates.end(), thread_candidates.begin(), thread_candidates.end());
-						--waiter;
-					});
-				}
-
-				waiter.wait();
-				candidate_timer.stop();
-
-				if (!candidates.empty()) {
+			if (initial_generation) {
+				if (std::optional<Position> village_position = getVillagePosition(*realm, range, village_options, pool)) {
 					std::default_random_engine town_rng(noise_seed + 1);
-					std::sort(candidates.begin(), candidates.end());
-					WorldGen::generateTown(realm, town_rng, choose(candidates, town_rng) + Position(pad + 1, 0), n, m, pad, noise_seed);
+					INFO("Generating starter village at " << *village_position);
+					WorldGen::generateTown(realm, town_rng, *village_position + Position(pad + 1, 0), n, m, pad, noise_seed);
+				} else {
+					WARN("Couldn't find a position for a starter village in chunk range " << range);
 				}
+			} else {
+				range.iterate([&](ChunkPosition chunk_position) {
+					if (std::optional<Position> village_position = getVillagePosition(*realm, chunk_position, village_options, pool)) {
+						const int town_seed(noise_seed + std::hash<ChunkPosition>{}(chunk_position));
+						std::default_random_engine town_rng(town_seed);
+						INFO("Generating secondary village at " << *village_position);
+						WorldGen::generateTown(realm, town_rng, *village_position + Position(pad + 1, 0), n, m, pad, town_seed);
+					}
+				});
 			}
 		}
 

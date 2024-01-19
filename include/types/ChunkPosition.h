@@ -98,6 +98,7 @@ namespace Game3 {
 			}
 
 			auto operator<=>(const ChunkRange &) const = default;
+			explicit operator std::string() const;
 
 			template <typename Fn>
 			requires(Returns<Fn, void, ChunkPosition>)
@@ -118,6 +119,7 @@ namespace Game3 {
 			}
 	};
 
+	std::ostream & operator<<(std::ostream &, const ChunkRange &);
 	void from_json(const nlohmann::json &, ChunkRange &);
 	void to_json(nlohmann::json &, const ChunkRange &);
 }

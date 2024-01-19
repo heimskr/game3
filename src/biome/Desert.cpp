@@ -28,13 +28,13 @@ namespace Game3 {
 		const auto wetness    = params.wetness;
 		const auto stoneLevel = params.stoneLevel;
 
-		static const Identifier sand          = "base:tile/sand"_id;
-		static const Identifier stone         = "base:tile/stone"_id;
-		static const Identifier water_fluid   = "base:fluid/water"_id;
+		static const Identifier sand  = "base:tile/sand"_id;
+		static const Identifier stone = "base:tile/stone"_id;
+		static const Identifier water = "base:fluid/water"_id;
 
 		if (suggested_noise < wetness + 0.3) {
 			realm.setTile(Layer::Terrain, {row, column}, sand, false);
-			realm.setFluid({row, column}, water_fluid, params.getFluidLevel(suggested_noise, 0.3), true);
+			realm.setFluid({row, column}, water, params.getFluidLevel(suggested_noise, 0.3), true);
 		} else if (suggested_noise < wetness + 0.4) {
 			realm.setTile(Layer::Terrain, {row, column}, sand, false);
 		} else if (stoneLevel < suggested_noise) {

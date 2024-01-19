@@ -4,6 +4,8 @@
 #include "threading/ThreadPool.h"
 #include "threading/Waiter.h"
 #include "types/ChunkPosition.h"
+#include "util/Timer.h"
+#include "util/Util.h"
 #include "worldgen/VillageGen.h"
 
 #include <boost/functional/hash.hpp>
@@ -15,10 +17,39 @@ namespace Game3 {
 	VillageOptions::VillageOptions(int width_, int height_, int padding_):
 		width(width_), height(height_), padding(padding_) {}
 
+	std::optional<Position> getVillagePosition(const Realm &realm, const ChunkRange &chunk_range, const VillageOptions &options, ThreadPool &pool) {
+		std::optional<Position> out;
+
+		chunk_range.iterate([&](ChunkPosition chunk_position) {
+			if (auto position = getVillagePosition(realm, chunk_position,options, pool)) {
+				out = std::move(position);
+				return true;
+			}
+
+			return false;
+		});
+
+		return out;
+	}
+
+	std::optional<Position> getVillagePosition(const Realm &realm, const ChunkPosition &chunk_position, const VillageOptions &options, ThreadPool &pool, std::optional<std::vector<Position>> starts) {
+		if (!chunkValidForVillage(chunk_position, realm.seed))
+			return std::nullopt;
+
+		std::vector<Position> candidates = getVillageCandidates(realm, chunk_position, options, pool, std::move(starts));
+
+		if (candidates.empty())
+			return std::nullopt;
+
+		std::sort(candidates.begin(), candidates.end());
+		std::mt19937 prng(-realm.seed ^ 0x1234);
+		return choose(candidates, prng);
+	}
+
 	bool chunkValidForVillage(const ChunkPosition &chunk_position, int realm_seed) {
 		// Credit: https://github.com/crbednarz/AMIDST/blob/6c0cd3394268fb6570798ffbbbb9e23d053a98f4/src/amidst/map/layers/VillageLayer.java
 
-		constexpr static int32_t SUPERCHUNK_SIZE = 4;
+		constexpr static int32_t SUPERCHUNK_SIZE = 2;
 		constexpr static int32_t SUPERCHUNK_OFFSET = 1;
 
 		const auto [original_x, original_y] = chunk_position;
@@ -49,6 +80,8 @@ namespace Game3 {
 
 		const TileProvider &provider = realm.tileProvider;
 		const Tileset &tileset = realm.getTileset();
+
+		Timer timer{"VillageCandidates"};
 
 		if (!starts)
 			starts.emplace(provider.getLand(realm.getGame(), ChunkRange(chunk_position, chunk_position), options.height + options.padding * 2, options.width + options.padding * 2));

@@ -15,10 +15,6 @@ namespace Game3 {
 		return std::default_random_engine(static_cast<uint_fast32_t>(std::hash<ChunkPosition>()(*this)));
 	}
 
-	std::ostream & operator<<(std::ostream &os, ChunkPosition chunk_position) {
-		return os << static_cast<std::string>(chunk_position);
-	}
-
 	Buffer & operator+=(Buffer &buffer, const ChunkPosition &chunk_position) {
 		return (buffer += chunk_position.x) += chunk_position.y;
 	}
@@ -55,12 +51,9 @@ namespace Game3 {
 		return '(' + std::to_string(x) + ", " + std::to_string(y) + ')';
 	}
 
-	ChunkRange::ChunkRange(ChunkPosition top_left, ChunkPosition bottom_right):
-		topLeft(top_left), bottomRight(bottom_right) {}
-
-	ChunkRange::ChunkRange(ChunkPosition chunk_position):
-		topLeft    {chunk_position.x - ChunkPosition::IntType(REALM_DIAMETER / 2), chunk_position.y - ChunkPosition::IntType(REALM_DIAMETER / 2)},
-		bottomRight{chunk_position.x + ChunkPosition::IntType(REALM_DIAMETER / 2), chunk_position.y + ChunkPosition::IntType(REALM_DIAMETER / 2)} {}
+	std::ostream & operator<<(std::ostream &os, ChunkPosition chunk_position) {
+		return os << '(' << chunk_position.x << ", " << chunk_position.y << ')';
+	}
 
 	void from_json(const nlohmann::json &json, ChunkPosition &position) {
 		position.x = json.at(0);
@@ -70,6 +63,21 @@ namespace Game3 {
 	void to_json(nlohmann::json &json, const ChunkPosition &position) {
 		json.push_back(position.x);
 		json.push_back(position.y);
+	}
+
+	ChunkRange::ChunkRange(ChunkPosition top_left, ChunkPosition bottom_right):
+		topLeft(top_left), bottomRight(bottom_right) {}
+
+	ChunkRange::ChunkRange(ChunkPosition chunk_position):
+		topLeft    {chunk_position.x - ChunkPosition::IntType(REALM_DIAMETER / 2), chunk_position.y - ChunkPosition::IntType(REALM_DIAMETER / 2)},
+		bottomRight{chunk_position.x + ChunkPosition::IntType(REALM_DIAMETER / 2), chunk_position.y + ChunkPosition::IntType(REALM_DIAMETER / 2)} {}
+
+	ChunkRange::operator std::string() const {
+		return '[' + std::string(topLeft) + ", " + std::string(bottomRight) + ']';
+	}
+
+	std::ostream & operator<<(std::ostream &os, const ChunkRange &range) {
+		return os << '[' << range.topLeft << ", " << range.bottomRight << ']';
 	}
 
 	void from_json(const nlohmann::json &json, ChunkRange &range) {
