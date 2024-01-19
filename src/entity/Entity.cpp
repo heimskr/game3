@@ -514,7 +514,7 @@ namespace Game3 {
 			return;
 
 		if (!is_autofocus)
-			canvas.scale = 4.f;
+			canvas.scale = 8.f;
 		else if (++canvas.autofocusCounter < Canvas::AUTOFOCUS_DELAY)
 			return;
 

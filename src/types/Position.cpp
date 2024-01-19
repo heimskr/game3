@@ -43,9 +43,12 @@ namespace Game3 {
 		}
 	}
 
-
 	Position Position::operator*(Index factor) const {
 		return {row * factor, column * factor};
+	}
+
+	Position Position::operator/(Index divisor) const {
+		return {row / divisor, column / divisor};
 	}
 
 	Position & Position::operator+=(Direction direction) {
@@ -73,6 +76,12 @@ namespace Game3 {
 	Position & Position::operator*=(Index factor) {
 		row *= factor;
 		column *= factor;
+		return *this;
+	}
+
+	Position & Position::operator/=(Index divisor) {
+		row /= divisor;
+		column /= divisor;
 		return *this;
 	}
 

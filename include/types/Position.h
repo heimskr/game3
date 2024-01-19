@@ -38,9 +38,11 @@ namespace Game3 {
 		Position operator+(Direction) const;
 		Position operator-(Direction) const;
 		Position operator*(Index) const;
+		Position operator/(Index) const;
 		Position & operator+=(Direction);
 		Position & operator-=(Direction);
 		Position & operator*=(Index);
+		Position & operator/=(Index);
 		ChunkPosition getChunk() const;
 		/** Has a bias for horizontal directions when the difference is diagonal. */
 		Direction getFacing(const Position &other) const;

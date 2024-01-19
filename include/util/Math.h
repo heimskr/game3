@@ -2,6 +2,7 @@
 
 #include <bit>
 #include <cmath>
+#include <concepts>
 #include <type_traits>
 
 namespace Game3 {
@@ -50,5 +51,24 @@ namespace Game3 {
 
 	constexpr float lerp(float from, float to, float progress) {
 		return from + (to - from) * progress;
+	}
+
+	template <std::integral I>
+	I sqrt(I n) {
+		// Credit: https://stackoverflow.com/a/63457507
+		uint8_t shift(std::bit_width(n));
+
+		shift += shift & 1; // round up to next multiple of 2
+
+		I result = 0;
+
+		do {
+			shift -= 2;
+			result <<= 1; // make space for the next guessed bit
+			result |= 1;  // guess that the next bit is 1
+			result ^= result * result > (n >> shift); // revert if guess too high
+		} while (shift != 0);
+
+		return result;
 	}
 }
