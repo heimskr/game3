@@ -181,20 +181,9 @@ namespace Game3::WorldGen {
 
 		waiter.wait();
 
-		std::default_random_engine rng(noise_seed);
-
-		{
-			constexpr static int m = 26, n = 34, pad = 2;
-			const VillageOptions village_options{n, m, pad};
-			range.iterate([&](ChunkPosition chunk_position) {
-				if (std::optional<Position> village_position = getVillagePosition(*realm, chunk_position, village_options, pool)) {
-					const int town_seed(noise_seed + std::hash<ChunkPosition>{}(chunk_position));
-					std::default_random_engine town_rng(town_seed);
-					INFO("Generating village at " << *village_position);
-					WorldGen::generateTown(realm, town_rng, *village_position + Position(pad + 1, 0), n, m, pad, town_seed);
-				}
-			});
-		}
+		range.iterate([&](ChunkPosition chunk_position) {
+			tryGenerateVillage(realm, chunk_position, pool);
+		});
 
 		Timer postgen_timer("Postgen");
 

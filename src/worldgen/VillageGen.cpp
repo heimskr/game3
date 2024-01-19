@@ -6,6 +6,7 @@
 #include "types/ChunkPosition.h"
 #include "util/Timer.h"
 #include "util/Util.h"
+#include "worldgen/Town.h"
 #include "worldgen/VillageGen.h"
 
 #include <boost/functional/hash.hpp>
@@ -16,6 +17,32 @@
 namespace Game3 {
 	VillageOptions::VillageOptions(int width_, int height_, int padding_):
 		width(width_), height(height_), padding(padding_) {}
+
+	std::optional<Position> tryGenerateVillage(const RealmPtr &realm, const ChunkPosition &chunk_position, ThreadPool &pool) {
+		constexpr static int MIN_WIDTH  = 16, MAX_WIDTH  = 32;
+		constexpr static int MIN_HEIGHT = 16, MAX_HEIGHT = 32;
+		constexpr static int PADDING = 2;
+
+		const int seed(std::hash<ChunkPosition>{}(chunk_position));
+
+		std::default_random_engine prng(seed);
+		std::uniform_int_distribution width_distribution(MIN_WIDTH / 2, MAX_WIDTH / 2);
+		std::uniform_int_distribution height_distribution(MIN_HEIGHT / 2, MAX_HEIGHT / 2);
+		int width  = 2 * width_distribution(prng);
+		int height = 2 * height_distribution(prng);
+
+		if (width < height)
+			std::swap(width, height);
+
+		const VillageOptions village_options{width, height, PADDING};
+
+		std::optional<Position> village_position = getVillagePosition(*realm, chunk_position, village_options, pool);
+		if (!village_position)
+			return std::nullopt;
+
+		WorldGen::generateTown(realm, prng, *village_position + Position(PADDING + 1, 0), width, height, PADDING, seed);
+		return village_position;
+	}
 
 	std::optional<Position> getVillagePosition(const Realm &realm, const ChunkRange &chunk_range, const VillageOptions &options, ThreadPool &pool) {
 		std::optional<Position> out;
