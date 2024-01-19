@@ -3,6 +3,7 @@
 #include "data/Identifier.h"
 
 #include <map>
+#include <optional>
 
 namespace Game3 {
 	class Game;
@@ -11,7 +12,9 @@ namespace Game3 {
 		public:
 			Richness() = default;
 
-			static Richness getRandom(const Game &);
+			std::optional<double> operator[](const Identifier &);
+
+			static Richness makeRandom(const Game &);
 
 		private:
 			std::map<Identifier, double> richnesses;

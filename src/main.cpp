@@ -131,7 +131,7 @@ int main(int argc, char **argv) {
 
 		if (arg1 == "--item-stitch") {
 			std::string png;
-			Game3::itemStitcher(nullptr, "resources/items", "base:itemset/items", &png);
+			Game3::itemStitcher(nullptr, nullptr, "resources/items", "base:itemset/items", &png);
 			std::cout << png;
 			return 0;
 		}
