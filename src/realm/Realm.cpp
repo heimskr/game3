@@ -813,7 +813,6 @@ namespace Game3 {
 
 	void Realm::remove(const TileEntityPtr &tile_entity, bool run_helper) {
 		const Position position = tile_entity->getPosition();
-		INFO("Removing " << tile_entity->getName() << " at " << position << ", run_helper = " << run_helper);
 		auto iter = tileEntities.find(position);
 		if (iter == tileEntities.end()) {
 			WARN("Can't remove tile entity: not found");

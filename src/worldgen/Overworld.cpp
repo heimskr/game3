@@ -186,25 +186,14 @@ namespace Game3::WorldGen {
 		{
 			constexpr static int m = 26, n = 34, pad = 2;
 			const VillageOptions village_options{n, m, pad};
-
-			if (initial_generation) {
-				if (std::optional<Position> village_position = getVillagePosition(*realm, range, village_options, pool)) {
-					std::default_random_engine town_rng(noise_seed + 1);
-					INFO("Generating starter village at " << *village_position);
-					WorldGen::generateTown(realm, town_rng, *village_position + Position(pad + 1, 0), n, m, pad, noise_seed);
-				} else {
-					WARN("Couldn't find a position for a starter village in chunk range " << range);
+			range.iterate([&](ChunkPosition chunk_position) {
+				if (std::optional<Position> village_position = getVillagePosition(*realm, chunk_position, village_options, pool)) {
+					const int town_seed(noise_seed + std::hash<ChunkPosition>{}(chunk_position));
+					std::default_random_engine town_rng(town_seed);
+					INFO("Generating village at " << *village_position);
+					WorldGen::generateTown(realm, town_rng, *village_position + Position(pad + 1, 0), n, m, pad, town_seed);
 				}
-			} else {
-				range.iterate([&](ChunkPosition chunk_position) {
-					if (std::optional<Position> village_position = getVillagePosition(*realm, chunk_position, village_options, pool)) {
-						const int town_seed(noise_seed + std::hash<ChunkPosition>{}(chunk_position));
-						std::default_random_engine town_rng(town_seed);
-						INFO("Generating secondary village at " << *village_position);
-						WorldGen::generateTown(realm, town_rng, *village_position + Position(pad + 1, 0), n, m, pad, town_seed);
-					}
-				});
-			}
+			});
 		}
 
 		Timer postgen_timer("Postgen");
