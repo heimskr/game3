@@ -1,1 +1,7 @@
-{"credit":"Fayabella","id":"base:item/iron_ore"}
+{
+	"credit": "Fayabella",
+	"id": "base:item/iron_ore",
+	"resource": {
+		"richnessRange": [5, 20]
+	}
+}

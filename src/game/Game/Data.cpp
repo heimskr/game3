@@ -155,7 +155,7 @@ namespace Game3 {
 			Identifier identifier = json.at(1);
 			std::filesystem::path base_dir = json.at(2);
 			auto &itemsets = registry<ItemSetRegistry>();
-			itemsets.add(identifier, itemStitcher(&registry<ItemTextureRegistry>(), base_dir, identifier));
+			itemsets.add(identifier, itemStitcher(&registry<ItemTextureRegistry>(), &registry<ResourceRegistry>(), base_dir, identifier));
 
 		} else if (type == "base:soundset") {
 

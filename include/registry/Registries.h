@@ -14,6 +14,7 @@ namespace Game3 {
 	class ModuleFactory;
 	class PacketFactory;
 	class RealmFactory;
+	class Resource;
 	class Texture;
 	class Tile;
 	class Tileset;
@@ -124,5 +125,10 @@ namespace Game3 {
 	struct SoundRegistry: NamedRegistry<SoundPath> {
 		static Identifier ID() { return {"base", "registry/sound"}; }
 		SoundRegistry(): NamedRegistry(ID()) {}
+	};
+
+	struct ResourceRegistry: NamedRegistry<Resource> {
+		static Identifier ID() { return {"base", "registry/resource"}; }
+		ResourceRegistry(): NamedRegistry(ID()) {}
 	};
 }

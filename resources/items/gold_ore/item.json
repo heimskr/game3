@@ -1,1 +1,7 @@
-{"credit":"https://butterymilk.itch.io/tiny-wonder-farm-asset-pack","id":"base:item/gold_ore"}
+{
+	"credit": "https://butterymilk.itch.io/tiny-wonder-farm-asset-pack",
+	"id": "base:item/gold_ore",
+	"resource": {
+		"richnessRange": [0, 15]
+	}
+}

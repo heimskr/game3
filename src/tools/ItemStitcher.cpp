@@ -1,5 +1,6 @@
 #include "config.h"
 #include "Log.h"
+#include "game/Resource.h"
 #include "graphics/GL.h"
 #include "graphics/ItemSet.h"
 #include "graphics/Texture.h"
@@ -22,7 +23,7 @@
 #endif
 
 namespace Game3 {
-	ItemSet itemStitcher(ItemTextureRegistry *registry, const std::filesystem::path &base_dir, Identifier itemset_name, std::string *png_out) {
+	ItemSet itemStitcher(ItemTextureRegistry *texture_registry, ResourceRegistry *resource_registry, const std::filesystem::path &base_dir, Identifier itemset_name, std::string *png_out) {
 		std::set<std::filesystem::path> dirs;
 
 		for (const std::filesystem::directory_entry &entry: std::filesystem::directory_iterator(base_dir))
@@ -104,6 +105,19 @@ namespace Game3 {
 			}
 		};
 
+		auto handle_json = [&](const std::string &name, int scale) {
+			if (auto iter = jsons.find(name); iter != jsons.end()) {
+				const nlohmann::json &json = iter->second;
+				hasher += json.dump();
+				Identifier id = json.at("id");
+				if (texture_registry)
+					texture_registry->add(id, ItemTexture{id, texture, int(x_index), int(y_index), scale * base_size, scale * base_size});
+
+				if (resource_registry)
+					resource_registry->add(id, Resource{id, json});
+			}
+		};
+
 		for (const std::string &name: names_2x2) {
 			hasher += name;
 
@@ -117,14 +131,7 @@ namespace Game3 {
 				}
 			}
 
-			if (auto iter = jsons.find(name); iter != jsons.end()) {
-				const nlohmann::json &json = iter->second;
-				hasher += json.dump();
-				Identifier id = json.at("id");
-				if (registry)
-					registry->add(id, ItemTexture{id, texture, int(x_index), int(y_index), 2 * base_size, 2 * base_size});
-			}
-
+			handle_json(name, 2);
 			next(2 * base_size);
 		}
 
@@ -141,14 +148,7 @@ namespace Game3 {
 				}
 			}
 
-			if (auto iter = jsons.find(name); iter != jsons.end()) {
-				const nlohmann::json &json = iter->second;
-				hasher += json.dump();
-				Identifier id = json.at("id");
-				if (registry)
-					registry->add(id, ItemTexture{id, texture, int(x_index), int(y_index), base_size, base_size});
-			}
-
+			handle_json(name, 1);
 			next(base_size);
 		}
 

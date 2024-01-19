@@ -128,7 +128,7 @@ namespace std {
 	template <>
 	struct hash<Game3::ChunkPosition> {
 		size_t operator()(const Game3::ChunkPosition &chunk_position) const {
-			return (static_cast<uint64_t>(chunk_position.x) << 32) | static_cast<uint64_t>(chunk_position.y);
+			return std::hash<uint64_t>{}((static_cast<uint64_t>(chunk_position.x) << 32) | static_cast<uint64_t>(chunk_position.y));
 		}
 	};
 }

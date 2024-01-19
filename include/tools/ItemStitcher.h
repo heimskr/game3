@@ -8,6 +8,7 @@
 
 namespace Game3 {
 	struct ItemTextureRegistry;
+	struct ResourceRegistry;
 
-	ItemSet itemStitcher(ItemTextureRegistry *, const std::filesystem::path &base_dir, Identifier tileset_name, std::string *png_out = nullptr);
+	ItemSet itemStitcher(ItemTextureRegistry *, ResourceRegistry *, const std::filesystem::path &base_dir, Identifier tileset_name, std::string *png_out = nullptr);
 }

@@ -157,5 +157,4 @@ namespace Game3 {
 		waiter.wait();
 		return candidates;
 	}
-
 }

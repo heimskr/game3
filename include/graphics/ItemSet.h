@@ -19,6 +19,7 @@ namespace Game3 {
 	class ItemStack;
 	class Texture;
 	struct ItemTextureRegistry;
+	struct ResourceRegistry;
 
 	class ItemSet: public NamedRegisterable {
 		public:
@@ -31,7 +32,7 @@ namespace Game3 {
 			std::string hash;
 			std::shared_ptr<Texture> cachedTexture;
 
-		friend ItemSet itemStitcher(ItemTextureRegistry *, const std::filesystem::path &, Identifier, std::string *);
+		friend ItemSet itemStitcher(ItemTextureRegistry *, ResourceRegistry *, const std::filesystem::path &, Identifier, std::string *);
 	};
 
 	using ItemSetPtr = std::shared_ptr<ItemSet>;
