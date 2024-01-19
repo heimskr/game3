@@ -3,6 +3,6 @@
 #include "types/Position.h"
 
 namespace Game3 {
-	uint64_t getSpiralIndex(const Position &);
-	Position getSpiralPosition(uint64_t);
+	[[deprecated]] uint64_t getSpiralIndex(const Position &);
+	[[deprecated]] Position getSpiralPosition(uint64_t);
 }

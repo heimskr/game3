@@ -13,7 +13,7 @@ namespace Game3 {
 		Biome::init(realm, noise_seed);
 	}
 
-	double Volcanic::generate(Index row, Index column, std::default_random_engine &, const NoiseGenerator &noisegen, const WorldGenParams &params, double suggested_noise) {
+	double Volcanic::generate(Index row, Index column, std::default_random_engine &, const NoiseGenerator &, const WorldGenParams &params, double suggested_noise) {
 		Realm &realm = *getRealm();
 		const auto wetness = params.wetness;
 

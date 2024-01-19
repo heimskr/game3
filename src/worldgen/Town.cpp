@@ -70,11 +70,12 @@ namespace Game3::WorldGen {
 
 		std::unordered_set<Position> buildable_set;
 
-		for (row = position.row + 1; row < position.row + height - 1; ++row)
+		for (row = position.row + 1; row < position.row + height - 1; ++row) {
 			for (column = position.column + 1; column < position.column + width - 1; ++column) {
 				buildable_set.insert({row, column});
 				set_terrain("base:tile/town_dirt", true);
 			}
+		}
 
 		row = position.row + height / 2 - 1;
 		for (column = position.column - pad; column < position.column + width + pad; ++column) {
@@ -86,7 +87,6 @@ namespace Game3::WorldGen {
 			set_terrain("base:tile/road");
 			--row;
 		}
-
 
 		column = position.column;
 		set_objects("base:tile/empty");
@@ -107,6 +107,7 @@ namespace Game3::WorldGen {
 		set_objects("base:tile/tower", true);
 		--row;
 		column = position.column + width / 2 - 1;
+
 		for (row = position.row - pad; row < position.row + height + pad; ++row) {
 			buildable_set.erase({row, column});
 			set_terrain("base:tile/road");

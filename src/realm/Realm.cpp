@@ -312,7 +312,8 @@ namespace Game3 {
 		Color color{1, 1, 1, 1};
 
 		if (outdoors) {
-			const double hour = game.getHour();
+			// const double hour = game.getHour();
+			const double hour = 0;
 			if (hour <= 4)
 				color = Color(0x2a3273ff);
 			else if (hour < 4.375)
@@ -956,7 +957,7 @@ namespace Game3 {
 		setFluid(position, FluidTile(fluid->registryID, level, infinite));
 	}
 
-	bool Realm::hasFluid(const Position &position, FluidLevel minimum) {
+	bool Realm::hasFluid(const Position &position, FluidLevel minimum) const {
 		if (auto fluid = tileProvider.copyFluidTile(position))
 			return minimum <= fluid->level;
 		return false;
@@ -1068,7 +1069,7 @@ namespace Game3 {
 			iter->second->damageGround(place);
 	}
 
-	Tileset & Realm::getTileset() {
+	Tileset & Realm::getTileset() const {
 		return *tileProvider.getTileset(getGame());
 	}
 

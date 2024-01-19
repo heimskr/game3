@@ -18,7 +18,7 @@ namespace Game3 {
 		forestNoise.setSeed(-noise_seed * 3);
 	}
 
-	double Snowy::generate(Index row, Index column, std::default_random_engine &rng, const NoiseGenerator &noisegen, const WorldGenParams &params, double suggested_noise) {
+	double Snowy::generate(Index row, Index column, std::default_random_engine &rng, const NoiseGenerator &, const WorldGenParams &params, double suggested_noise) {
 		Realm &realm = *getRealm();
 		const auto wetness    = params.wetness;
 		const auto stoneLevel = params.stoneLevel;

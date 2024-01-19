@@ -73,7 +73,7 @@ namespace Game3 {
 		updateChunk(chunk_position);
 	}
 
-	std::shared_ptr<Tileset> TileProvider::getTileset(const Game &game) {
+	std::shared_ptr<Tileset> TileProvider::getTileset(const Game &game) const {
 		if (cachedTileset)
 			return cachedTileset;
 
@@ -83,8 +83,8 @@ namespace Game3 {
 		return cachedTileset = game.registry<TilesetRegistry>().at(tilesetID);
 	}
 
-	std::vector<Position> TileProvider::getLand(const Game &game, const ChunkRange &range, Index right_pad, Index bottom_pad) {
-		const auto tileset = getTileset(game);
+	std::vector<Position> TileProvider::getLand(const Game &game, const ChunkRange &range, Index right_pad, Index bottom_pad) const {
+		TilesetPtr tileset = getTileset(game);
 		std::vector<Position> land_tiles;
 		land_tiles.resize((range.tileWidth() - right_pad) * (range.tileHeight() - bottom_pad));
 

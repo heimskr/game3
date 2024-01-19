@@ -159,7 +159,7 @@ namespace Game3 {
 			void setTile(Layer, const Position &, const Identifier &, bool run_helper = true, TileUpdateContext = {});
 			void setFluid(const Position &, FluidTile);
 			void setFluid(const Position &, const Identifier &, FluidLevel, bool infinite = false);
-			bool hasFluid(const Position &, FluidLevel minimum = 1);
+			bool hasFluid(const Position &, FluidLevel minimum = 1) const;
 			TileID getTile(Layer, const Position &) const;
 			std::optional<TileID> tryTile(Layer, const Position &) const;
 			std::optional<FluidTile> tryFluid(const Position &) const;
@@ -169,7 +169,7 @@ namespace Game3 {
 			void setPathable(const Position &, bool);
 			bool hasTileEntityAt(const Position &) const;
 			void damageGround(const Position &);
-			Tileset & getTileset();
+			Tileset & getTileset() const;
 			/** Redoes the pathmap for the entire stored map, not just the visible chunks! Can be very expensive. */
 			void remakePathMap();
 			void remakePathMap(const ChunkRange &);

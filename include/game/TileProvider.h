@@ -68,9 +68,9 @@ namespace Game3 {
 			 *  Doesn't lock any of the ChunkSet object's mutexes. */
 			void absorb(ChunkPosition, ChunkSet);
 
-			std::shared_ptr<Tileset> getTileset(const Game &);
+			std::shared_ptr<Tileset> getTileset(const Game &) const;
 
-			std::vector<Position> getLand(const Game &, const ChunkRange &, Index right_pad, Index bottom_pad);
+			std::vector<Position> getLand(const Game &, const ChunkRange &, Index right_pad, Index bottom_pad) const;
 
 			/** Returns a copy of the given tile. The Create mode will be treated as Throw. */
 			TileID copyTile(Layer, Position, bool &was_empty, TileMode = TileMode::Throw) const;
@@ -220,7 +220,7 @@ namespace Game3 {
 			}
 
 		private:
-			std::shared_ptr<Tileset> cachedTileset;
+			mutable std::shared_ptr<Tileset> cachedTileset;
 			MetaMap metaMap;
 
 			void validateLayer(Layer) const;
