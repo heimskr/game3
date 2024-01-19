@@ -4,6 +4,7 @@
 #include "entity/ServerPlayer.h"
 #include "game/Fluids.h"
 #include "game/Game.h"
+#include "game/HasVillages.h"
 #include "net/RemoteClient.h"
 #include "threading/Lockable.h"
 #include "threading/MTQueue.h"
@@ -23,17 +24,16 @@ namespace Game3 {
 	class RemoteClient;
 	class Server;
 
-	class ServerGame: public Game {
+	class ServerGame: public Game, public HasVillages {
 		public:
-			constexpr static float GARBAGE_COLLECTION_TIME = 60.f;
+			constexpr static float GARBAGE_COLLECTION_TIME = 60;
 
 			Lockable<std::unordered_set<ServerPlayerPtr>> players;
 			Lockable<std::unordered_map<std::string, ServerPlayerPtr>> playerMap;
 			Lockable<std::map<std::string, ssize_t>> gameRules;
 			std::weak_ptr<Server> weakServer;
 			GameDB database{*this};
-			float lastGarbageCollection = 0.f;
-			std::atomic_size_t lastVillageID = 0;
+			float lastGarbageCollection = 0;
 
 			ServerGame(const std::shared_ptr<Server> &, size_t pool_size);
 
@@ -80,7 +80,7 @@ namespace Game3 {
 		private:
 			MTQueue<std::pair<std::weak_ptr<RemoteClient>, std::shared_ptr<Packet>>> packetQueue;
 			MTQueue<std::weak_ptr<ServerPlayer>> playerRemovalQueue;
-			double timeSinceTimeUpdate = 0.;
+			double timeSinceTimeUpdate = 0;
 			ThreadPool pool;
 
 			void handlePacket(RemoteClient &, Packet &);

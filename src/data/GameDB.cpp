@@ -3,6 +3,7 @@
 #include "entity/Player.h"
 #include "error/FailedMigrationError.h"
 #include "game/ServerGame.h"
+#include "game/Village.h"
 #include "graphics/Tileset.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
@@ -56,7 +57,7 @@ namespace Game3 {
 				releasePosition VARCHAR(42),
 				releaseRealm INT
 			);
-		)" + Realm::getSQL() + TileEntity::getSQL() + Entity::getSQL() + Tileset::getSQL());
+		)" + Realm::getSQL() + TileEntity::getSQL() + Entity::getSQL() + Tileset::getSQL() + Village::getSQL());
 	}
 
 	void GameDB::close() {
@@ -135,6 +136,10 @@ namespace Game3 {
 			const Tileset &tileset = realm->getTileset();
 			if (!hasTileset(tileset.getHash(), false))
 				writeTilesetMeta(tileset, false);
+		}
+		{
+			Timer timer{"WriteVillages"};
+			game.saveVillages(*database, false);
 		}
 
 		Timer timer{"WriteRealmCommit"};

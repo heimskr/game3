@@ -15,9 +15,6 @@
 #include <tuple>
 
 namespace Game3 {
-	VillageOptions::VillageOptions(int width_, int height_, int padding_):
-		width(width_), height(height_), padding(padding_) {}
-
 	std::optional<Position> tryGenerateVillage(const RealmPtr &realm, const ChunkPosition &chunk_position, ThreadPool &pool) {
 		constexpr static int MIN_WIDTH  = 16, MAX_WIDTH  = 32;
 		constexpr static int MIN_HEIGHT = 16, MAX_HEIGHT = 32;
