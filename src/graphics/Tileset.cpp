@@ -225,6 +225,16 @@ namespace Game3 {
 		json["autotiles"] = std::move(autotiles);
 	}
 
+
+	std::string Tileset::getSQL() {
+		return R"(
+			CREATE TABLE IF NOT EXISTS tilesets (
+				hash VARCHAR(128) PRIMARY KEY,
+				json MEDIUMTEXT
+			);
+		)";
+	}
+
 	void Tileset::setAutotile(const Identifier &tilename, const Identifier &autotile_name) {
 		if (auto iter = autotileSets.find(autotile_name); iter != autotileSets.end()) {
 			autotileSetMap[tilename] = iter->second;

@@ -90,6 +90,8 @@ namespace Game3 {
 			/** Produces a limited amount of JSON about the tileset. */
 			void getMeta(nlohmann::json &) const;
 
+			static std::string getSQL();
+
 		private:
 			Tileset(Identifier identifier_);
 

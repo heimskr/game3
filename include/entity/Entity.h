@@ -93,6 +93,8 @@ namespace Game3 {
 
 			static std::shared_ptr<Entity> fromJSON(Game &, const nlohmann::json &);
 
+			static std::string getSQL();
+
 			virtual void absorbJSON(Game &, const nlohmann::json &);
 			virtual void toJSON(nlohmann::json &) const;
 			virtual void init(Game &);

@@ -59,6 +59,8 @@ namespace Game3 {
 
 			static std::shared_ptr<TileEntity> fromJSON(Game &, const nlohmann::json &);
 
+			static std::string getSQL();
+
 			virtual void init(Game &);
 			virtual void tick(Game &, float);
 			virtual void onSpawn();

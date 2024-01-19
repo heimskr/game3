@@ -44,6 +44,20 @@ namespace Game3 {
 		return out;
 	}
 
+	std::string Entity::getSQL() {
+		return R"(
+			CREATE TABLE IF NOT EXISTS entities (
+				globalID INT8 PRIMARY KEY,
+				realmID INT,
+				row INT8,
+				column INT8,
+				entityType VARCHAR(255),
+				direction TINYINT(1),
+				encoded MEDIUMBLOB
+			);
+		)";
+	}
+
 	void Entity::destroy() {
 		clearQueues();
 		auto realm = getRealm();

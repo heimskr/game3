@@ -44,10 +44,9 @@ namespace Game3 {
 				PRIMARY KEY (realmID, x, y)
 			);
 
-			CREATE TABLE IF NOT EXISTS realms (
-				realmID INT PRIMARY KEY,
-				json MEDIUMTEXT,
-				tilesetHash VARCHAR(128)
+			CREATE TABLE IF NOT EXISTS rules (
+				key VARCHAR(64) PRIMARY KEY,
+				value INT8
 			);
 
 			CREATE TABLE IF NOT EXISTS users (
@@ -57,37 +56,7 @@ namespace Game3 {
 				releasePosition VARCHAR(42),
 				releaseRealm INT
 			);
-
-			CREATE TABLE IF NOT EXISTS tileEntities (
-				globalID INT8 PRIMARY KEY,
-				realmID INT,
-				row INT8,
-				column INT8,
-				tileID VARCHAR(255),
-				tileEntityID VARCHAR(255),
-				encoded MEDIUMBLOB
-			);
-
-			CREATE TABLE IF NOT EXISTS entities (
-				globalID INT8 PRIMARY KEY,
-				realmID INT,
-				row INT8,
-				column INT8,
-				entityType VARCHAR(255),
-				direction TINYINT(1),
-				encoded MEDIUMBLOB
-			);
-
-			CREATE TABLE IF NOT EXISTS tilesets (
-				hash VARCHAR(128) PRIMARY KEY,
-				json MEDIUMTEXT
-			);
-
-			CREATE TABLE IF NOT EXISTS rules (
-				key VARCHAR(64) PRIMARY KEY,
-				value INT8
-			);
-		)");
+		)" + Realm::getSQL() + TileEntity::getSQL() + Entity::getSQL() + Tileset::getSQL());
 	}
 
 	void GameDB::close() {

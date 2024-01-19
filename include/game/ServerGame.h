@@ -33,6 +33,7 @@ namespace Game3 {
 			std::weak_ptr<Server> weakServer;
 			GameDB database{*this};
 			float lastGarbageCollection = 0.f;
+			std::atomic_size_t lastVillageID = 0;
 
 			ServerGame(const std::shared_ptr<Server> &, size_t pool_size);
 

@@ -33,6 +33,20 @@ namespace Game3 {
 		return out;
 	}
 
+	std::string TileEntity::getSQL() {
+		return R"(
+			CREATE TABLE IF NOT EXISTS tileEntities (
+				globalID INT8 PRIMARY KEY,
+				realmID INT,
+				row INT8,
+				column INT8,
+				tileID VARCHAR(255),
+				tileEntityID VARCHAR(255),
+				encoded MEDIUMBLOB
+			);
+		)";
+	}
+
 	void TileEntity::init(Game &game) {
 		assert(!initialized);
 		initialized = true;

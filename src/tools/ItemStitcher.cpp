@@ -110,11 +110,13 @@ namespace Game3 {
 				const nlohmann::json &json = iter->second;
 				hasher += json.dump();
 				Identifier id = json.at("id");
+
 				if (texture_registry)
-					texture_registry->add(id, ItemTexture{id, texture, int(x_index), int(y_index), scale * base_size, scale * base_size});
+					texture_registry->add(id, ItemTexture{id, texture, int(x_index), int(y_index), int(scale * base_size), int(scale * base_size)});
 
 				if (resource_registry)
-					resource_registry->add(id, Resource{id, json});
+					if (auto iter = json.find("resource"); iter != json.end())
+						resource_registry->add(id, Resource{id, *iter});
 			}
 		};
 

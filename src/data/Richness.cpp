@@ -17,4 +17,12 @@ namespace Game3 {
 
 		return out;
 	}
+
+	void to_json(nlohmann::json &json, const Richness &richness) {
+		json = richness.richnesses;
+	}
+
+	void from_json(const nlohmann::json &json, Richness &richness) {
+		richness.richnesses = json;
+	}
 }

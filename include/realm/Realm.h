@@ -111,6 +111,8 @@ namespace Game3 {
 
 			static std::shared_ptr<Realm> fromJSON(Game &, const nlohmann::json &, bool full_data = false);
 
+			static std::string getSQL();
+
 			RealmID getID() const;
 			virtual void onFocus();
 			virtual void onBlur();

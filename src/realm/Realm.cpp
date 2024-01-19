@@ -109,6 +109,16 @@ namespace Game3 {
 		return out;
 	}
 
+	std::string Realm::getSQL() {
+		return R"(
+			CREATE TABLE IF NOT EXISTS realms (
+				realmID INT PRIMARY KEY,
+				json MEDIUMTEXT,
+				tilesetHash VARCHAR(128)
+			);
+		)";
+	}
+
 	void Realm::absorbJSON(const nlohmann::json &json, bool full_data) {
 		auto shared = shared_from_this();
 		id = json.at("id");
