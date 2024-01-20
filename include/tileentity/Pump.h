@@ -11,7 +11,6 @@ namespace Game3 {
 
 			constexpr static EnergyAmount ENERGY_CAPACITY = 16'000;
 			constexpr static double ENERGY_PER_UNIT = 0.5;
-			constexpr static float PERIOD = 0.25;
 
 			FluidAmount extractionRate = 250;
 
@@ -34,8 +33,6 @@ namespace Game3 {
 			std::string getDirectedTileBase() const override { return "base:tile/pump_"; }
 
 		private:
-			float accumulatedTime = 0.f;
-
 			Pump();
 			Pump(Identifier tile_id, Position);
 			Pump(Position);

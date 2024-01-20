@@ -9,6 +9,10 @@
 #include "tileentity/GeothermalGenerator.h"
 
 namespace Game3 {
+	namespace {
+		constexpr std::chrono::milliseconds PERIOD{250};
+	}
+
 	GeothermalGenerator::GeothermalGenerator():
 		EnergeticTileEntity(ENERGY_CAPACITY) {}
 
@@ -86,12 +90,7 @@ namespace Game3 {
 
 		Ticker ticker{*this, game, delta};
 
-		accumulatedTime += delta;
-
-		if (accumulatedTime < PERIOD)
-			return;
-
-		accumulatedTime = 0.f;
+		game.enqueue(sigc::mem_fun(*this, &GeothermalGenerator::tick), PERIOD);
 
 		assert(fluidContainer);
 		assert(energyContainer);
@@ -104,7 +103,6 @@ namespace Game3 {
 		if (levels.empty())
 			return;
 
-		// assert(levels.contains(game.registry<FluidRegistry>()["base:fluid/lava"_id]->registryID));
 		auto &registry = game.registry<GeothermalRecipeRegistry>();
 
 		std::optional<EnergyAmount> leftovers;
@@ -133,7 +131,7 @@ namespace Game3 {
 
 		if (modifiers.onlyCtrl())
 			FluidHoldingTileEntity::addObserver(player, false);
-		else if (modifiers.ctrl && modifiers.shift)
+		else if (modifiers.onlyShift())
 			EnergeticTileEntity::addObserver(player, false);
 		else
 			InventoriedTileEntity::addObserver(player, false);

@@ -9,8 +9,10 @@
 
 namespace Game3 {
 	void ItemNetwork::tick(Game &game, Tick tick_id) {
-		if (!canTick(tick_id))
+		if (!canTick(tick_id)) {
+			PipeNetwork::tick(game, tick_id);
 			return;
+		}
 
 		PipeNetwork::tick(game, tick_id);
 

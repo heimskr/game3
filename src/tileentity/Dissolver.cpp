@@ -17,7 +17,7 @@ namespace Game3 {
 	namespace {
 		constexpr EnergyAmount ENERGY_CAPACITY = 100'000;
 		constexpr EnergyAmount ENERGY_PER_ATOM = 100;
-		constexpr float PERIOD = 0.1;
+		constexpr std::chrono::milliseconds PERIOD{100};
 		constexpr ItemCount INPUT_CAPACITY  = 5;
 		constexpr ItemCount OUTPUT_CAPACITY = 10;
 	}
@@ -59,14 +59,8 @@ namespace Game3 {
 			return;
 
 		Ticker ticker{*this, game, delta};
-
-		accumulatedTime += delta;
-
-		if (accumulatedTime < PERIOD)
-			return;
-
-		accumulatedTime = 0.f;
 		dissolve();
+		game.enqueue(sigc::mem_fun(*this, &Dissolver::tick), PERIOD);
 	}
 
 	void Dissolver::toJSON(nlohmann::json &json) const {

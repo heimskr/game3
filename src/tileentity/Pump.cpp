@@ -8,6 +8,10 @@
 #include "tileentity/Pump.h"
 
 namespace Game3 {
+	namespace {
+		constexpr float PERIOD = 0.25;
+	}
+
 	Pump::Pump():
 		EnergeticTileEntity(ENERGY_CAPACITY) {}
 
@@ -28,13 +32,9 @@ namespace Game3 {
 
 		Ticker ticker{*this, game, delta};
 
-		accumulatedTime += delta;
+		game.enqueue(sigc::mem_fun(*this, &Pump::tick), std::chrono::milliseconds(int64_t(1000 * PERIOD)));
 
-		if (accumulatedTime < PERIOD)
-			return;
-
-		const FluidAmount amount = std::min<FluidAmount>(std::numeric_limits<FluidLevel>::max(), extractionRate * accumulatedTime);
-		accumulatedTime = 0.f;
+		const FluidAmount amount = std::min<FluidAmount>(std::numeric_limits<FluidLevel>::max(), extractionRate * PERIOD);
 
 		if (amount == 0)
 			return;

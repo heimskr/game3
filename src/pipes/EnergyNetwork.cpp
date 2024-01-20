@@ -9,8 +9,10 @@ namespace Game3 {
 		PipeNetwork(id_, realm), HasEnergy(CAPACITY, 0) {}
 
 	void EnergyNetwork::tick(Game &game, Tick tick_id) {
-		if (!canTick(tick_id))
+		if (!canTick(tick_id)) {
+			PipeNetwork::tick(game, tick_id);
 			return;
+		}
 
 		PipeNetwork::tick(game, tick_id);
 

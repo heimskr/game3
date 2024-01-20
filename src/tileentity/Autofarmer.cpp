@@ -1,5 +1,4 @@
 #include "Log.h"
-#include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/Crop.h"
@@ -7,6 +6,7 @@
 #include "game/InventorySpan.h"
 #include "game/ServerInventory.h"
 #include "graphics/SpriteRenderer.h"
+#include "graphics/Tileset.h"
 #include "item/Plantable.h"
 #include "realm/Realm.h"
 #include "tile/CropTile.h"
@@ -19,7 +19,7 @@ namespace Game3 {
 		constexpr ItemCount INPUT_CAPACITY  = 5;
 		constexpr ItemCount OUTPUT_CAPACITY = 20;
 		constexpr Index DIAMETER = 5;
-		constexpr float PERIOD = 4. / (DIAMETER * DIAMETER);
+		constexpr std::chrono::microseconds PERIOD{int64_t(4e6 / (DIAMETER * DIAMETER))};
 	}
 
 	Autofarmer::Autofarmer():
@@ -43,16 +43,10 @@ namespace Game3 {
 
 		Ticker ticker{*this, game, delta};
 
-		accumulatedTime += delta;
-
-		if (accumulatedTime < PERIOD)
-			return;
-
-		accumulatedTime = 0.f;
 		const EnergyAmount to_consume = ENERGY_PER_OPERATION * autofarm();
-
 		auto energy_lock = energyContainer->uniqueLock();
 		energyContainer->remove(to_consume, true);
+		game.enqueue(sigc::mem_fun(*this, &Autofarmer::tick), PERIOD);
 	}
 
 	void Autofarmer::toJSON(nlohmann::json &json) const {

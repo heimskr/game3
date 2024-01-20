@@ -322,8 +322,7 @@ namespace Game3 {
 		Color color{1, 1, 1, 1};
 
 		if (outdoors) {
-			// const double hour = game.getHour();
-			const double hour = 0;
+			const double hour = game.getHour();
 			if (hour <= 4)
 				color = Color(0x2a3273ff);
 			else if (hour < 4.375)

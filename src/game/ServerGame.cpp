@@ -433,9 +433,11 @@ namespace Game3 {
 
 			if (first == "saveall") {
 				INFO("Writing...");
-				database.writeAllRealms();
+				tickingPaused = true;
+				database.writeAll();
+				tickingPaused = false;
 				INFO("Writing done.");
-				return {true, "Wrote all chunks."};
+				return {true, "Wrote all data."};
 			}
 
 			if (first == "pos") {

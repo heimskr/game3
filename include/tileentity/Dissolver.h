@@ -27,7 +27,6 @@ namespace Game3 {
 			Game & getGame() const final;
 
 		private:
-			float accumulatedTime = 0.f;
 			Slot currentSlot = 0;
 
 			Dissolver();

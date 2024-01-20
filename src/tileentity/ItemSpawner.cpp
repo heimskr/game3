@@ -14,20 +14,23 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	ItemSpawner::ItemSpawner(Position position_, float chance_per_tenth, std::vector<ItemStack> spawnables_):
+	ItemSpawner::ItemSpawner(Position position_, float minimum_time, float maximum_time, std::vector<ItemStack> spawnables_):
 		TileEntity("base:tile/empty", ID(), position_, false),
-		chancePerTenth(chance_per_tenth),
+		minimumTime(minimum_time),
+		maximumTime(maximum_time),
 		spawnables(std::move(spawnables_)) {}
 
 	void ItemSpawner::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
-		json["chance"] = chancePerTenth;
-		json["spawnables"] = spawnables;
+		json["minimumTime"] = minimumTime;
+		json["maximumTime"] = maximumTime;
+		json["spawnables"]  = spawnables;
 	}
 
 	void ItemSpawner::absorbJSON(Game &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
-		chancePerTenth = json.at("chance");
+		minimumTime = json.at("minimumTime");
+		maximumTime = json.at("maximumTime");
 		for (const auto &spawnable: json.at("spawnables"))
 			spawnables.emplace_back(ItemStack::fromJSON(game, spawnable));
 	}
@@ -38,29 +41,35 @@ namespace Game3 {
 
 		Ticker ticker{*this, game, delta};
 
-		std::uniform_real_distribution distribution{0., 1.};
-		for (float i = 0.f; i < delta; i += .1f) {
-			if (distribution(threadContext.rng) < chancePerTenth) {
-				for (const auto &entity: getRealm()->findEntities(getPosition()))
-					if (entity->is("base:entity/item"))
-						return;
-				choose(spawnables).spawn(getRealm(), getPosition());
-				return;
+		bool can_spawn = true;
+
+		for (const auto &entity: getRealm()->findEntities(getPosition())) {
+			if (entity->is("base:entity/item")) {
+				can_spawn = false;
+				break;
 			}
 		}
+
+		if (can_spawn)
+			choose(spawnables).spawn(getRealm(), getPosition());
+
+		std::uniform_real_distribution distribution{minimumTime, maximumTime};
+		game.enqueue(sigc::mem_fun(*this, &ItemSpawner::tick), std::chrono::microseconds(int64_t(1e6 * distribution(threadContext.rng))));
 	}
 
 	void ItemSpawner::render(SpriteRenderer &) {}
 
 	void ItemSpawner::encode(Game &game, Buffer &buffer) {
 		TileEntity::encode(game, buffer);
-		// buffer << chancePerTenth;
-		// buffer << spawnables;
+		buffer << minimumTime;
+		buffer << maximumTime;
+		buffer << spawnables;
 	}
 
 	void ItemSpawner::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
-		// buffer >> chancePerTenth;
-		// buffer >> spawnables;
+		buffer >> minimumTime;
+		buffer >> maximumTime;
+		buffer >> spawnables;
 	}
 }

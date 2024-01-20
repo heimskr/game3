@@ -13,6 +13,10 @@
 #include <cassert>
 
 namespace Game3 {
+	namespace {
+		constexpr std::chrono::milliseconds PERIOD{250};
+	}
+
 	ChemicalReactor::ChemicalReactor():
 		EnergeticTileEntity(ENERGY_CAPACITY) {}
 
@@ -67,12 +71,7 @@ namespace Game3 {
 
 		Ticker ticker{*this, game, delta};
 
-		accumulatedTime += delta;
-
-		if (accumulatedTime < PERIOD)
-			return;
-
-		accumulatedTime = 0.f;
+		game.enqueue(sigc::mem_fun(*this, &ChemicalReactor::tick), PERIOD);
 
 		InventoryPtr inventory = getInventory(0);
 		if (inventory->weakOwner.expired())

@@ -12,7 +12,6 @@ namespace Game3 {
 
 			constexpr static EnergyAmount ENERGY_CAPACITY = 64'000;
 			constexpr static FluidAmount  FLUID_CAPACITY  = 16 * FluidTile::FULL;
-			constexpr static float PERIOD = 0.25;
 
 			bool mayInsertItem(const ItemStack &, Direction, Slot) override;
 			bool mayExtractItem(Direction, Slot) override;
@@ -36,7 +35,6 @@ namespace Game3 {
 			Game & getGame() const final;
 
 		private:
-			float accumulatedTime = 0.f;
 			Lockable<std::optional<std::unordered_set<FluidID>>> supportedFluids;
 
 			GeothermalGenerator();

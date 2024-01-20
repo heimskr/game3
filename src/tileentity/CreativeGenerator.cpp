@@ -8,6 +8,7 @@
 namespace Game3 {
 	namespace {
 		constexpr EnergyAmount ENERGY_CAPACITY = 1'000'000;
+		constexpr std::chrono::milliseconds PERIOD{50};
 	}
 
 	CreativeGenerator::CreativeGenerator():
@@ -41,6 +42,8 @@ namespace Game3 {
 			auto lock = energyContainer->uniqueLock();
 			energyContainer->energy = ENERGY_CAPACITY;
 		}
+
+		game.enqueue(sigc::mem_fun(*this, &CreativeGenerator::tick), PERIOD);
 	}
 
 	void CreativeGenerator::toJSON(nlohmann::json &json) const {

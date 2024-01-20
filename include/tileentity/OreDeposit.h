@@ -22,7 +22,7 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "te/ore_deposit"}; }
 			Lockable<Identifier> oreType;
-			Atomic<float> timeRemaining = 0.f;
+			Atomic<bool> ready = true;
 			Atomic<uint32_t> uses = 0;
 
 			std::string getName() const override { return "Ore Deposit"; }
@@ -39,7 +39,7 @@ namespace Game3 {
 
 		protected:
 			OreDeposit() = default;
-			OreDeposit(const Ore &ore, const Position &position_, float time_remaining = 0.f, uint32_t uses_ = 0);
+			OreDeposit(const Ore &ore, const Position &position_, uint32_t uses_ = 0);
 
 			friend class TileEntity;
 	};

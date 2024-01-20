@@ -33,17 +33,15 @@ namespace Game3 {
 		};
 	}
 
-	OreDeposit::OreDeposit(const Ore &ore, const Position &position_, float time_remaining, uint32_t uses_):
+	OreDeposit::OreDeposit(const Ore &ore, const Position &position_, uint32_t uses_):
 		TileEntity(ore.tilename, ID(), position_, true),
 		oreType(ore.identifier),
-		timeRemaining(time_remaining),
 		uses(uses_) {}
 
 	void OreDeposit::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
 		json["oreType"] = oreType;
-		if (0.f < timeRemaining)
-			json["timeRemaining"] = timeRemaining;
+		json["ready"] = ready;
 		if (uses != 0)
 			json["uses"] = uses;
 	}
@@ -52,13 +50,13 @@ namespace Game3 {
 		TileEntity::absorbJSON(game, json);
 		oreType = json.at("oreType");
 		tileID = getOre(game).tilename;
-		timeRemaining = json.contains("timeRemaining")? json.at("timeRemaining").get<float>() : 0.f;
+		ready = json.contains("ready");
 		uses = json.contains("uses")? json.at("uses").get<uint32_t>() : 0;
 	}
 
 	void OreDeposit::tick(Game &game, float delta) {
-		timeRemaining = std::max(timeRemaining - delta, 0.f);
 		TileEntity::tick(game, delta);
+		ready = true;
 	}
 
 	bool OreDeposit::onInteractNextTo(const PlayerPtr &player, Modifiers, ItemStack *, Hand) {
@@ -69,7 +67,7 @@ namespace Game3 {
 		auto inventory_lock = inventory->uniqueLock();
 		const Slot active_slot = inventory->activeSlot;
 		if (auto *active_stack = (*inventory)[active_slot]) {
-			if (0.f < timeRemaining || 0.f < player->tooldown)
+			if (ready || 0.f < player->tooldown)
 				return true;
 			if (active_stack->hasAttribute("base:attribute/pickaxe"_id)) {
 				const auto &tool = dynamic_cast<Tool &>(*active_stack->item);
@@ -79,7 +77,8 @@ namespace Game3 {
 					player->tooldown = ore.tooldownMultiplier * tool.baseCooldown;
 
 					if (ore.maxUses <= ++uses) {
-						timeRemaining = ore.cooldown;
+						ready = false;
+						getGame().enqueue(sigc::mem_fun(*this, &OreDeposit::tick), std::chrono::microseconds(int64_t(1e6 * ore.cooldown)));
 						uses = 0;
 					}
 
@@ -106,17 +105,17 @@ namespace Game3 {
 		if (tileID != tileset.getEmpty()) {
 			const Ore &ore = getOre(realm->getGame());
 			const auto tilesize = tileset.getTileSize();
-			const TileID tile_id = tileset[0.f < timeRemaining? ore.regenTilename : tileID];
+			const TileID tile_id = tileset[ready? ore.regenTilename : tileID];
 			const auto texture = tileset.getTexture(realm->getGame());
 			const auto x = (tile_id % (texture->width / tilesize)) * tilesize;
 			const auto y = (tile_id / (texture->width / tilesize)) * tilesize;
 			sprite_renderer(texture, {
-				.x = static_cast<float>(position.column),
-				.y = static_cast<float>(position.row),
-				.offsetX = static_cast<float>(x) / 2.f,
-				.offsetY = static_cast<float>(y) / 2.f,
-				.sizeX = static_cast<float>(tilesize),
-				.sizeY = static_cast<float>(tilesize),
+				.x       = float(position.column),
+				.y       = float(position.row),
+				.offsetX = float(x / 2.f),
+				.offsetY = float(y / 2.f),
+				.sizeX   = float(tilesize),
+				.sizeY   = float(tilesize),
 			});
 		}
 	}
@@ -129,14 +128,14 @@ namespace Game3 {
 	void OreDeposit::encode(Game &game, Buffer &buffer) {
 		TileEntity::encode(game, buffer);
 		buffer << oreType;
-		buffer << timeRemaining;
+		buffer << ready;
 		buffer << uses;
 	}
 
 	void OreDeposit::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
 		buffer >> oreType;
-		buffer >> timeRemaining;
+		buffer >> ready;
 		buffer >> uses;
 	}
 }

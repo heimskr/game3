@@ -10,7 +10,7 @@
 
 namespace Game3 {
 	namespace {
-		constexpr float PERIOD = 0.1;
+		constexpr std::chrono::milliseconds PERIOD{100};
 	}
 
 	Incinerator::Incinerator(Identifier tile_id, Position position_):
@@ -39,12 +39,7 @@ namespace Game3 {
 
 		Ticker ticker{*this, game, delta};
 
-		accumulatedTime += delta;
-
-		if (accumulatedTime < PERIOD)
-			return;
-
-		accumulatedTime = 0.f;
+		game.enqueue(sigc::mem_fun(*this, &Incinerator::tick), PERIOD);
 
 		{
 			auto lock = fluidContainer->levels.uniqueLock();

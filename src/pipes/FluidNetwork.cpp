@@ -10,8 +10,10 @@ namespace Game3 {
 		HasFluids(std::make_shared<FluidContainer>()) {}
 
 	void FluidNetwork::tick(Game &game, Tick tick_id) {
-		if (!canTick(tick_id))
+		if (!canTick(tick_id)) {
+			PipeNetwork::tick(game, tick_id);
 			return;
+		}
 
 		PipeNetwork::tick(game, tick_id);
 

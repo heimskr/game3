@@ -10,7 +10,6 @@ namespace Game3 {
 			static Identifier ID() { return {"base", "te/chemical_reactor"}; }
 
 			constexpr static float ENERGY_CAPACITY = 100'000;
-			constexpr static float PERIOD = 0.25;
 			constexpr static ItemCount INPUT_CAPACITY  = 5;
 			constexpr static ItemCount OUTPUT_CAPACITY = 5;
 			constexpr static EnergyAmount ENERGY_PER_ATOM = 100;
@@ -43,7 +42,6 @@ namespace Game3 {
 			Lockable<std::optional<Chemskr::Equation>> equation;
 			Lockable<std::unordered_map<std::string, size_t>> reactants;
 			Lockable<std::unordered_map<std::string, size_t>> products;
-			float accumulatedTime = 0.f;
 
 			ChemicalReactor();
 			ChemicalReactor(Identifier tile_id, Position);

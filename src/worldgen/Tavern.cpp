@@ -52,15 +52,17 @@ namespace Game3::WorldGen {
 			// Table interior + chairs above/below tables
 			for (Index col = table_padding_x + 2; col < width - table_padding_x - 2; ++col) {
 				set(Position(row, col), "base:tile/table_we"_id);
+
 				if (rng() % 3 == 0) {
 					Game &game = realm->getGame();
 					realm->spawn<ItemEntity>({row, col}, ItemStack(game, "base:item/mead"_id));
 					static const std::vector<ItemStack> spawnables {{game, "base:item/mead"_id}};
-					TileEntity::spawn<ItemSpawner>(realm, Position(row, col), 0.0001f, spawnables);
+					TileEntity::spawn<ItemSpawner>(realm, Position(row, col), 10, 30, spawnables);
 				}
 
 				if (2 < table_spacing)
 					set(Position(row - 1, col), "base:tile/chair_n"_id);
+
 				if (3 < table_spacing)
 					set(Position(row + 1, col), "base:tile/chair_s"_id);
 			}

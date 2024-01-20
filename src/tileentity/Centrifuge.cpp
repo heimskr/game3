@@ -10,6 +10,10 @@
 #include "tileentity/Centrifuge.h"
 
 namespace Game3 {
+	namespace {
+		constexpr std::chrono::milliseconds PERIOD{250};
+	}
+
 	Centrifuge::Centrifuge(Identifier tile_id, Position position_):
 		TileEntity(std::move(tile_id), ID(), position_, true) {}
 
@@ -36,12 +40,7 @@ namespace Game3 {
 
 		Ticker ticker{*this, game, delta};
 
-		accumulatedTime += delta;
-
-		if (accumulatedTime < PERIOD)
-			return;
-
-		accumulatedTime = 0.f;
+		game.enqueue(sigc::mem_fun(*this, &Centrifuge::tick), PERIOD);
 
 		auto &levels = fluidContainer->levels;
 		auto fluids_lock = levels.uniqueLock();

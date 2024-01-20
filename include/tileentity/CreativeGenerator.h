@@ -25,7 +25,6 @@ namespace Game3 {
 			void broadcast(bool force) override;
 
 		private:
-			float accumulatedTime = 0.f;
 			Lockable<std::optional<std::unordered_set<FluidID>>> supportedFluids;
 
 			CreativeGenerator();

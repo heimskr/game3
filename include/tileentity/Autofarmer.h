@@ -28,7 +28,6 @@ namespace Game3 {
 			std::string getDirectedTileBase() const override { return "base:tile/autofarmer_"; }
 
 		private:
-			float accumulatedTime = 0.f;
 			Position centerOffset{};
 
 			Autofarmer();
