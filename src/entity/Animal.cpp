@@ -49,19 +49,17 @@ namespace Game3 {
 	}
 
 	void Animal::tick(Game &game, float delta) {
-		Entity::tick(game, delta);
-
-		if (getSide() != Side::Server)
-			return;
-
-		if (firstWander) {
-			firstWander = false;
-		} else if (wanderTick <= game.getCurrentTick()) {
-			// The check here is to avoid spurious wanders if something else causes the animal to tick earlier than scheduled.
-			wander();
+		if (getSide() == Side::Server) {
+			if (firstWander) {
+				firstWander = false;
+			} else if (wanderTick <= game.getCurrentTick()) {
+				// The check here is to avoid spurious wanders if something else causes the animal to tick earlier than scheduled.
+				wander();
+				wanderTick = tickEnqueued(enqueueTick(std::chrono::milliseconds(int64_t(1000 * getWanderDistribution()(threadContext.rng)))));
+			}
 		}
 
-		wanderTick = enqueueTick(std::chrono::milliseconds(int64_t(1000 * getWanderDistribution()(threadContext.rng))));
+		Entity::tick(game, delta);
 	}
 
 	HitPoints Animal::getMaxHealth() const {

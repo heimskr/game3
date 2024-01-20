@@ -7,18 +7,16 @@ namespace Game3 {
 	}
 
 	void Chicken::tick(Game &game, float delta) {
-		Animal::tick(game, delta);
-
-		if (getSide() != Side::Server)
-			return;
-
-		if (firstEgg) {
-			firstEgg = false;
-		} else if (eggTick <= game.getCurrentTick()) {
-			layEgg();
+		if (getSide() == Side::Server) {
+			if (firstEgg) {
+				firstEgg = false;
+			} else if (eggTick <= game.getCurrentTick()) {
+				layEgg();
+				eggTick = tickEnqueued(enqueueTick(EGG_PERIOD));
+			}
 		}
 
-		eggTick = enqueueTick(EGG_PERIOD);
+		Animal::tick(game, delta);
 	}
 
 	void Chicken::layEgg() {

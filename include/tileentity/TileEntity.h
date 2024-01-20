@@ -1,10 +1,11 @@
 #pragma once
 
-#include "types/Position.h"
-#include "types/Types.h"
 #include "game/Agent.h"
+#include "game/Tickable.h"
 #include "net/Broadcastable.h"
 #include "threading/Lockable.h"
+#include "types/Position.h"
+#include "types/Types.h"
 #include "ui/Modifiers.h"
 
 #include <memory>
@@ -23,7 +24,7 @@ namespace Game3 {
 	struct Place;
 	struct RendererContext;
 
-	class TileEntity: public Agent, public Broadcastable {
+	class TileEntity: public Agent, public Broadcastable, public Tickable {
 		public:
 			RealmID realmID = 0;std::weak_ptr<Realm> weakRealm;
 			Identifier tileID;
@@ -89,6 +90,7 @@ namespace Game3 {
 			inline bool is(const Identifier &check) const { return getID() == check; }
 			std::string getName() const override { return "Unknown TileEntity (" + std::string(tileEntityID) + ')'; }
 			virtual Game & getGame() const;
+			Game & getGame() override;
 			std::shared_ptr<TileEntity> getSelf();
 			std::weak_ptr<TileEntity> getWeakSelf();
 
@@ -122,7 +124,7 @@ namespace Game3 {
 			}
 
 			Tick enqueueTick(std::chrono::nanoseconds);
-			Tick enqueueTick();
+			Tick enqueueTick() override;
 
 			virtual void absorbJSON(Game &, const nlohmann::json &);
 

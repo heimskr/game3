@@ -588,16 +588,18 @@ namespace Game3 {
 			{
 				auto lock = entities.sharedLock();
 				for (const auto &entity: entities) {
-					if (!entity->initialTickDone.exchange(true))
+					if (!entity->initialTickDone.exchange(true)) {
 						entity->tick(game, delta);
+					}
 				}
 			}
 
 			{
 				auto lock = tileEntities.sharedLock();
 				for (auto &[index, tile_entity]: tileEntities) {
-					if (!tile_entity->initialTickDone.exchange(true))
+					if (!tile_entity->initialTickDone.exchange(true)) {
 						tile_entity->tick(game, delta);
+					}
 				}
 			}
 

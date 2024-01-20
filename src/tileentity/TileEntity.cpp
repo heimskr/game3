@@ -189,6 +189,12 @@ namespace Game3 {
 		throw std::runtime_error("Couldn't get Game from TileEntity: couldn't lock Realm");
 	}
 
+	Game & TileEntity::getGame() {
+		if (RealmPtr realm = weakRealm.lock())
+			return realm->getGame();
+		throw std::runtime_error("Couldn't get Game from TileEntity: couldn't lock Realm");
+	}
+
 	std::shared_ptr<TileEntity> TileEntity::getSelf() {
 		return std::static_pointer_cast<TileEntity>(shared_from_this());
 	}

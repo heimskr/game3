@@ -165,36 +165,38 @@ namespace Game3 {
 			}
 		}
 
-		auto offset_lock = offset.uniqueLock();
+		{
+			auto offset_lock = offset.uniqueLock();
 
-		auto &x = offset.x;
-		auto &y = offset.y;
-		auto &z = offset.z;
-		const auto speed = getMovementSpeed();
+			auto &x = offset.x;
+			auto &y = offset.y;
+			auto &z = offset.z;
+			const auto speed = getMovementSpeed();
 
-		if (x < 0.f)
-			x = std::min(x + delta * speed, 0.f);
-		else if (0.f < x)
-			x = std::max(x - delta * speed, 0.f);
+			if (x < 0.f)
+				x = std::min(x + delta * speed, 0.f);
+			else if (0.f < x)
+				x = std::max(x - delta * speed, 0.f);
 
-		if (y < 0.f)
-			y = std::min(y + delta * speed, 0.f);
-		else if (0.f < y)
-			y = std::max(y - delta * speed, 0.f);
+			if (y < 0.f)
+				y = std::min(y + delta * speed, 0.f);
+			else if (0.f < y)
+				y = std::max(y - delta * speed, 0.f);
 
-		auto velocity_lock = velocity.uniqueLock();
+			auto velocity_lock = velocity.uniqueLock();
 
-		z = std::max(z + delta * velocity.z, 0.f);
+			z = std::max(z + delta * velocity.z, 0.f);
 
-		if (z == 0.f)
-			velocity.z = 0;
-		else
-			velocity.z -= 32 * delta;
+			if (z == 0.f)
+				velocity.z = 0;
+			else
+				velocity.z -= 32 * delta;
+		}
 
 		// Not all platforms support std::atomic<float>::operator+=.
 		age = age + delta;
 
-		enqueueTick();
+		tryEnqueueTick();
 	}
 
 	void Entity::remove() {

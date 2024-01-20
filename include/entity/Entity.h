@@ -1,16 +1,10 @@
 #pragma once
 
-#include "lib/Eigen.h"
-#include <nlohmann/json_fwd.hpp>
-
-#include "types/Direction.h"
-#include "types/Position.h"
-#include "graphics/Texture.h"
-#include "types/Types.h"
 #include "container/WeakSet.h"
 #include "game/Agent.h"
-#include "types/ChunkPosition.h"
 #include "game/HasInventory.h"
+#include "game/Tickable.h"
+#include "graphics/Texture.h"
 #include "item/Item.h"
 #include "threading/Atomic.h"
 #include "threading/HasMutex.h"
@@ -18,8 +12,15 @@
 #include "threading/LockableSharedPtr.h"
 #include "threading/LockableWeakPtr.h"
 #include "threading/SharedRecursiveMutex.h"
+#include "types/ChunkPosition.h"
+#include "types/Direction.h"
 #include "types/MovementContext.h"
+#include "types/Position.h"
+#include "types/Types.h"
 #include "ui/Modifiers.h"
+
+#include "lib/Eigen.h"
+#include <nlohmann/json_fwd.hpp>
 
 #include <atomic>
 #include <functional>
@@ -49,7 +50,7 @@ namespace Game3 {
 		EntityTexture(Identifier identifier_, Identifier texture_id, uint8_t variety_);
 	};
 
-	class Entity: public Agent, public HasInventory, public HasMutex<SharedRecursiveMutex> {
+	class Entity: public Agent, public HasInventory, public Tickable, public HasMutex<SharedRecursiveMutex> {
 		public:
 			constexpr static Slot DEFAULT_INVENTORY_SIZE = 30;
 			/** The reciprocal of this is how many seconds it takes to move one square. */
@@ -138,7 +139,7 @@ namespace Game3 {
 			PathResult pathfind(const Position &start, const Position &goal, std::list<Direction> &, size_t loop_max = 1'000);
 			bool pathfind(const Position &goal, size_t loop_max = 1'000);
 			virtual float getMovementSpeed() const { return MAX_SPEED; }
-			Game & getGame();
+			Game & getGame() override;
 			Game & getGame() const;
 			bool isVisible() const;
 			bool setHeldLeft(Slot);
@@ -218,7 +219,7 @@ namespace Game3 {
 			}
 
 			Tick enqueueTick(std::chrono::nanoseconds);
-			Tick enqueueTick();
+			Tick enqueueTick() override;
 
 		private:
 			struct Held {
