@@ -57,8 +57,7 @@ namespace Game3 {
 	}
 
 	void TileEntity::tick(Game &, float) {
-		if (needsBroadcast.exchange(false))
-			broadcast(forceBroadcast.exchange(false));
+		tryBroadcast();
 	}
 
 	void TileEntity::render(SpriteRenderer &sprite_renderer) {
@@ -219,6 +218,16 @@ namespace Game3 {
 			client.send(TileEntityPacket(getSelf()));
 			onSend(client.getPlayer());
 		}
+	}
+
+	void TileEntity::queueBroadcast(bool force) {
+		Broadcastable::queueBroadcast(force);
+		getGame().enqueue([this](Game &, float) { tryBroadcast(); });
+	}
+
+	void TileEntity::tryBroadcast() {
+		if (needsBroadcast.exchange(false))
+			broadcast(forceBroadcast.exchange(false));
 	}
 
 	void TileEntity::broadcast(bool) {

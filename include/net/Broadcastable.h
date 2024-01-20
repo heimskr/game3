@@ -9,7 +9,9 @@ namespace Game3 {
 
 			virtual ~Broadcastable() = default;
 
-			void queueBroadcast(bool force = false);
+			virtual void queueBroadcast(bool force);
+
+			void queueBroadcast() { queueBroadcast(false); }
 
 		protected:
 			Atomic<bool> needsBroadcast{false};

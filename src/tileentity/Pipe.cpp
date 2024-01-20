@@ -138,14 +138,14 @@ namespace Game3 {
 
 		const Position neighbor_position = position + offset;
 
-		auto tile_entity = getRealm()->tileEntityAt(neighbor_position);
+		TileEntityPtr tile_entity = getRealm()->tileEntityAt(neighbor_position);
 
 		if (!tile_entity)
 			return;
 
 		for (const PipeType pipe_type: PIPE_TYPES) {
 			if (directions[pipe_type][direction]) {
-				if (const auto &network = networks[pipe_type]; network && network->canWorkWith(tile_entity)) {
+				if (const std::shared_ptr<PipeNetwork> &network = networks[pipe_type]; network && network->canWorkWith(tile_entity)) {
 					if (extractors[pipe_type][direction])
 						network->addExtraction(neighbor_position, flipDirection(direction));
 					else
@@ -386,7 +386,7 @@ namespace Game3 {
 	}
 
 	void Pipe::setExtractor(PipeType pipe_type, Direction direction, bool value) {
-		if (auto network = networks[pipe_type]) {
+		if (std::shared_ptr<PipeNetwork> network = networks[pipe_type]) {
 			extractors[pipe_type][direction] = value;
 
 			if (value)

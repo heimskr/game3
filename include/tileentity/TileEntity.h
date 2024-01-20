@@ -97,6 +97,9 @@ namespace Game3 {
 			virtual void decode(Game &, Buffer &);
 
 			void sendTo(RemoteClient &, UpdateCounter threshold = 0);
+			using Broadcastable::queueBroadcast;
+			void queueBroadcast(bool force) override;
+			void tryBroadcast();
 			virtual void broadcast(bool force);
 
 			virtual void toJSON(nlohmann::json &) const;
