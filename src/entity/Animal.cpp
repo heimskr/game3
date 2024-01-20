@@ -12,8 +12,8 @@ namespace Game3 {
 	ThreadPool Animal::threadPool{2};
 
 	namespace {
-		constexpr HitPoints MAX_HEALTH = 40;
-		constexpr float RETRY_TIME = 30;
+		constexpr HitPoints MAX_HEALTH   = 40;
+		constexpr size_t    PATHFIND_MAX = 256;
 	}
 
 	Animal::Animal():
@@ -38,23 +38,9 @@ namespace Game3 {
 			SUCCESS("  In chunk.");
 		else
 			ERROR("  Not in chunk.");
-		INFO("  Time until wander: " << timeUntilWander.load());
+		INFO("  First wander: " << firstWander);
 		INFO("  Attempting wander: " << std::boolalpha << attemptingWander.load());
 		return true;
-	}
-
-	void Animal::toJSON(nlohmann::json &json) const {
-		Entity::toJSON(json);
-
-		if (0.f < timeUntilWander)
-			json["timeUntilWander"] = timeUntilWander.load();
-	}
-
-	void Animal::absorbJSON(Game &game, const nlohmann::json &json) {
-		Entity::absorbJSON(game, json);
-
-		if (auto iter = json.find("timeUntilWander"); iter != json.end())
-			timeUntilWander = *iter;
 	}
 
 	void Animal::init(Game &game) {
@@ -65,11 +51,17 @@ namespace Game3 {
 	void Animal::tick(Game &game, float delta) {
 		Entity::tick(game, delta);
 
-		if (getSide() == Side::Server) {
-			timeUntilWander = timeUntilWander - delta;
-			if (!attemptingWander && timeUntilWander <= 0.f)
-				wander();
+		if (getSide() != Side::Server)
+			return;
+
+		if (firstWander) {
+			firstWander = false;
+		} else if (wanderTick <= game.getCurrentTick()) {
+			// The check here is to avoid spurious wanders if something else causes the animal to tick earlier than scheduled.
+			wander();
 		}
+
+		wanderTick = game.enqueue(sigc::mem_fun(*this, &Animal::tick), std::chrono::milliseconds(int64_t(1000 * getWanderDistribution()(threadContext.rng))));
 	}
 
 	HitPoints Animal::getMaxHealth() const {
@@ -84,9 +76,8 @@ namespace Game3 {
 				pathfind({
 					threadContext.random(int64_t(row    - wanderRadius), int64_t(row    + wanderRadius)),
 					threadContext.random(int64_t(column - wanderRadius), int64_t(column + wanderRadius))
-				}, 256);
+				}, PATHFIND_MAX);
 
-				timeUntilWander = getWanderDistribution()(threadContext.rng);
 				attemptingWander = false;
 			});
 		}
@@ -97,14 +88,12 @@ namespace Game3 {
 	void Animal::encode(Buffer &buffer) {
 		Entity::encode(buffer);
 		LivingEntity::encode(buffer);
-		buffer << timeUntilWander.load();
 		buffer << wanderRadius;
 	}
 
 	void Animal::decode(Buffer &buffer) {
 		Entity::decode(buffer);
 		LivingEntity::decode(buffer);
-		timeUntilWander = buffer.take<float>();
 		buffer >> wanderRadius;
 	}
 }

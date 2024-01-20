@@ -1,25 +1,27 @@
 #include "entity/Chicken.h"
+#include "game/Game.h"
 
 namespace Game3 {
-	void Chicken::tick(Game &game, float delta) {
-		timeUntilEgg -= delta;
+	namespace {
+		constexpr std::chrono::seconds EGG_PERIOD{150};
+	}
 
-		if (timeUntilEgg <= 0.f) {
-			timeUntilEgg = EGG_PERIOD;
-			if (getSide() == Side::Server)
-				ItemStack(game, "base:item/egg").spawn(getRealm(), position);
+	void Chicken::tick(Game &game, float delta) {
+		Animal::tick(game, delta);
+
+		if (getSide() != Side::Server)
+			return;
+
+		if (firstEgg) {
+			firstEgg = false;
+		} else if (eggTick <= game.getCurrentTick()) {
+			layEgg();
 		}
 
-		Animal::tick(game, delta);
+		eggTick = game.enqueue(sigc::mem_fun(*this, &Animal::tick), EGG_PERIOD);
 	}
 
-	void Chicken::encode(Buffer &buffer) {
-		Animal::encode(buffer);
-		buffer << timeUntilEgg;
-	}
-
-	void Chicken::decode(Buffer &buffer) {
-		Animal::decode(buffer);
-		buffer >> timeUntilEgg;
+	void Chicken::layEgg() {
+		ItemStack(*game, "base:item/egg").spawn(getRealm(), position);
 	}
 }

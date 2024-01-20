@@ -32,31 +32,37 @@ namespace Game3 {
 				return currentTick;
 			}
 
-			void enqueue(std::function<void(FunctionArgs...)> function) {
+			Tick enqueue(std::function<void(FunctionArgs...)> function) {
 				tickQueue.emplace(currentTick + 1, std::move(function));
+				return currentTick + 1;
 			}
 
 			template <Duration D>
-			void enqueue(std::function<void(FunctionArgs...)> function, D delay) {
-				tickQueue.emplace(currentTick + getDelayTicks(delay), std::move(function));
+			Tick enqueue(std::function<void(FunctionArgs...)> function, D delay) {
+				const Tick tick = currentTick + getDelayTicks(delay);
+				tickQueue.emplace(tick, std::move(function));
+				return tick;
 			}
 
 			template <typename Function, Duration D>
 			requires (!std::is_same_v<Function, std::function<void(FunctionArgs...)>>)
-			void enqueue(Function function, D delay) {
+			Tick enqueue(Function function, D delay) {
 				auto lock = tickQueue.uniqueLock();
-				tickQueue.emplace(currentTick + getDelayTicks(delay), [function = std::move(function)](FunctionArgs &&...args) {
+				const Tick tick = currentTick + getDelayTicks(delay);
+				tickQueue.emplace(tick, [function = std::move(function)](FunctionArgs &&...args) {
 					function(std::forward<FunctionArgs>(args)...);
 				});
+				return tick;
 			}
 
 			template <typename Function>
 			requires (!std::is_same_v<Function, std::function<void(FunctionArgs...)>>)
-			void enqueue(Function function) {
+			Tick enqueue(Function function) {
 				auto lock = tickQueue.uniqueLock();
 				tickQueue.emplace(currentTick + 1, [function = std::move(function)](FunctionArgs &&...args) {
 					function(std::forward<FunctionArgs>(args)...);
 				});
+				return currentTick + 1;
 			}
 
 		private:

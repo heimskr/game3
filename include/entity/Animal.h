@@ -17,12 +17,9 @@ namespace Game3 {
 				return std::uniform_real_distribution(10.f, 20.f);
 			}
 
-			std::atomic<float> timeUntilWander = 0.f;
 			Index wanderRadius = 8;
 
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
-			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(Game &, const nlohmann::json &) override;
 			void init(Game &) override;
 			void tick(Game &, float) override;
 			float getMovementSpeed() const override { return 5.f; }
@@ -34,6 +31,8 @@ namespace Game3 {
 		protected:
 			Animal();
 
+			bool firstWander = true;
+			Tick wanderTick = 0;
 			std::optional<std::list<Direction>> wanderPath;
 			std::atomic_bool attemptingWander = false;
 

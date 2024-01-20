@@ -67,8 +67,9 @@ namespace Game3 {
 		auto inventory_lock = inventory->uniqueLock();
 		const Slot active_slot = inventory->activeSlot;
 		if (auto *active_stack = (*inventory)[active_slot]) {
-			if (ready || 0.f < player->tooldown)
+			if (!ready || 0 < player->tooldown)
 				return true;
+
 			if (active_stack->hasAttribute("base:attribute/pickaxe"_id)) {
 				const auto &tool = dynamic_cast<Tool &>(*active_stack->item);
 				const Ore &ore = getOre(player->getGame());
@@ -105,7 +106,7 @@ namespace Game3 {
 		if (tileID != tileset.getEmpty()) {
 			const Ore &ore = getOre(realm->getGame());
 			const auto tilesize = tileset.getTileSize();
-			const TileID tile_id = tileset[ready? ore.regenTilename : tileID];
+			const TileID tile_id = tileset[ready? tileID : ore.regenTilename];
 			const auto texture = tileset.getTexture(realm->getGame());
 			const auto x = (tile_id % (texture->width / tilesize)) * tilesize;
 			const auto y = (tile_id / (texture->width / tilesize)) * tilesize;

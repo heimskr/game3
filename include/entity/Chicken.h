@@ -7,10 +7,6 @@ namespace Game3 {
 
 	class Chicken: public Animal {
 		public:
-			static constexpr float EGG_PERIOD = 150.f;
-
-			float timeUntilEgg = EGG_PERIOD;
-
 			static Identifier ID() { return {"base", "entity/chicken"}; }
 
 			static std::shared_ptr<Chicken> create(Game &) {
@@ -32,12 +28,16 @@ namespace Game3 {
 			}
 
 			void tick(Game &, float) override;
-			void encode(Buffer &) override;
-			void decode(Buffer &) override;
 
 		protected:
 			Chicken():
 				Entity(ID()), Animal() {}
+
+		private:
+			bool firstEgg = true;
+			Tick eggTick{};
+
+			void layEgg();
 
 		friend class Entity;
 	};
