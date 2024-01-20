@@ -3,9 +3,9 @@
 
 namespace Game3 {
 	void Tickable::tryEnqueueTick() {
-		Game &game = getGame();
+		didTick();
 
-		const Tick next_tick = game.getCurrentTick() + 1;
+		const Tick next_tick = getGame().getCurrentTick() + 1;
 
 		if (tickSet.contains(next_tick))
 			return;

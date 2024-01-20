@@ -497,8 +497,9 @@ namespace Game3 {
 #ifdef PROFILE_TICKS
 								Timer timer{"TickTileEntity"};
 #endif
-								if (!tile_entity->initialTickDone.exchange(true))
+								if (!tile_entity->initialTickDone.exchange(true)) {
 									tile_entity->tick(game, delta);
+								}
 							}
 						}
 					}
