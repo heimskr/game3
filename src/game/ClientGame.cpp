@@ -1,6 +1,4 @@
 #include "Log.h"
-#include "threading/ThreadContext.h"
-#include "graphics/Tileset.h"
 #include "command/local/LocalCommandFactory.h"
 #include "entity/ClientPlayer.h"
 #include "entity/EntityFactory.h"
@@ -8,6 +6,7 @@
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "game/SimulationOptions.h"
+#include "graphics/Tileset.h"
 #include "net/DisconnectedError.h"
 #include "net/LocalClient.h"
 #include "packet/CommandPacket.h"
@@ -18,12 +17,17 @@
 #include "packet/InteractPacket.h"
 #include "packet/RegisterPlayerPacket.h"
 #include "packet/TeleportSelfPacket.h"
+#include "threading/ThreadContext.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "ui/tab/TextTab.h"
 #include "util/Util.h"
 
 namespace Game3 {
+	double ClientGame::getFrequency() const {
+		return CLIENT_TICK_FREQUENCY;
+	}
+
 	void ClientGame::addEntityFactories() {
 		Game::addEntityFactories();
 		add(EntityFactory::create<ClientPlayer>());

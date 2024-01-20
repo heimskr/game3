@@ -39,6 +39,7 @@ namespace Game3 {
 
 			~ServerGame() override;
 
+			double getFrequency() const override;
 			void addEntityFactories() override;
 			bool tick() final;
 			void garbageCollect();

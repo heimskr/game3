@@ -30,6 +30,10 @@ namespace Game3 {
 	ServerGame::ServerGame(const std::shared_ptr<Server> &server_, size_t pool_size):
 		weakServer(server_), pool(pool_size) { pool.start(); }
 
+	double ServerGame::getFrequency() const {
+		return SERVER_TICK_FREQUENCY;
+	}
+
 	void ServerGame::addEntityFactories() {
 		Game::addEntityFactories();
 		add(EntityFactory::create<ServerPlayer>());

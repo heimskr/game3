@@ -2,6 +2,7 @@
 
 #include "types/Types.h"
 #include "entity/Player.h"
+#include "game/HasTickQueue.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
@@ -37,7 +38,7 @@ namespace Game3 {
 	class Tileset;
 	struct InteractionSet;
 
-	class Game: public std::enable_shared_from_this<Game>, public BufferContext {
+	class Game: public std::enable_shared_from_this<Game>, public BufferContext, public HasTickQueue {
 		public:
 			static constexpr const char *DEFAULT_PATH = "game.g3";
 
@@ -48,11 +49,10 @@ namespace Game3 {
 			/** 12 because the game starts at noon */
 			float hourOffset = 12.;
 			std::atomic<double> time = 0.f;
-			Tick currentTick = 0;
 			size_t cavesGenerated = 0;
 			size_t randomTicksPerChunk = 2;
 			bool dying = false;
-			std::atomic_bool tickingPaused{false};
+			std::atomic_bool tickingPaused = false;
 
 			std::map<RealmType, std::shared_ptr<InteractionSet>> interactionSets;
 			std::map<Identifier, std::unordered_set<std::shared_ptr<Item>>> itemsByAttribute;
@@ -75,6 +75,7 @@ namespace Game3 {
 
 			/** Returns true if ticking should continue, false if the game needs to stop. */
 			virtual bool tick();
+			virtual double getFrequency() const = 0;
 			void initRegistries();
 			void addItems();
 			virtual void addEntityFactories();

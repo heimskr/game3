@@ -30,6 +30,7 @@ namespace Game3 {
 
 			ClientGame(Canvas &canvas_): Game(), canvas(canvas_) {}
 
+			double getFrequency() const override;
 			void addEntityFactories() override;
 			void click(int button, int n, double pos_x, double pos_y, Modifiers);
 			void dragStart(const Position &, Modifiers);

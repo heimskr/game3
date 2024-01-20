@@ -16,8 +16,9 @@ namespace Game3 {
 			using Function = std::function<void(Tick)>;
 
 			void tick();
-
 			void tick(double delta, double frequency);
+
+			inline Tick getCurrentTick() const { return currentTick; }
 
 			template <chrono_duration D>
 			void enqueueServer(Function function, D delay) {
