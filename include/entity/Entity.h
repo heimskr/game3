@@ -112,10 +112,10 @@ namespace Game3 {
 			virtual bool isSpawnableMonster() const { return false; }
 			/** Removes the entity from existence. */
 			virtual void remove();
-			inline const Position::value_type & getRow()    const { return position.row;    }
-			inline const Position::value_type & getColumn() const { return position.column; }
-			inline Position::value_type getRow()    { auto lock = position.sharedLock(); return position.row;    }
-			inline Position::value_type getColumn() { auto lock = position.sharedLock(); return position.column; }
+			inline const Position::IntType & getRow()    const { return position.row;    }
+			inline const Position::IntType & getColumn() const { return position.column; }
+			inline Position::IntType getRow()    { auto lock = position.sharedLock(); return position.row;    }
+			inline Position::IntType getColumn() { auto lock = position.sharedLock(); return position.column; }
 			virtual void initAfterLoad(Game &) {}
 			/** Returns whether the entity actually moved. */
 			virtual bool move(Direction, MovementContext);

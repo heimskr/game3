@@ -9,11 +9,24 @@
 
 namespace Game3 {
 	Position::Position(std::string_view string) {
-		const size_t comma = string.find(',');
-		if (comma == std::string::npos)
-			throw std::invalid_argument("Invalid position: \"" + std::string(string) + '"');
-		row = parseLong(string.substr(0, comma));
-		column = parseLong(string.substr(comma + 1));
+		if (string.size() < 6 || string.front() != '(' || string.back() != ')')
+			throw std::invalid_argument("Invalid Position string");
+
+		string.remove_prefix(1);
+		string.remove_suffix(1);
+
+		size_t comma_size = 2;
+		size_t comma = string.find(", ");
+
+		if (comma == std::string_view::npos) {
+			comma = string.find(',');
+			comma_size = 1;
+			if (comma == std::string_view::npos)
+				throw std::invalid_argument("Invalid Position string");
+		}
+
+		row = parseNumber<IntType>(string.substr(0, comma));
+		column = parseNumber<IntType>(string.substr(comma + comma_size));
 	}
 
 	bool Position::adjacent4(const Position &other) const {

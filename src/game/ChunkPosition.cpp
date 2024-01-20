@@ -2,6 +2,7 @@
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "types/ChunkPosition.h"
+#include "util/Util.h"
 
 namespace Game3 {
 	ChunkPosition::ChunkPosition(IntType x_, IntType y_):
@@ -10,6 +11,27 @@ namespace Game3 {
 	ChunkPosition::ChunkPosition(const Position &position):
 		x(TileProvider::divide<IntType>(position.column)),
 		y(TileProvider::divide<IntType>(position.row)) {}
+
+	ChunkPosition::ChunkPosition(std::string_view string) {
+		if (string.size() < 6 || string.front() != '(' || string.back() != ')')
+			throw std::invalid_argument("Invalid ChunkPosition string");
+
+		string.remove_prefix(1);
+		string.remove_suffix(1);
+
+		size_t comma_size = 2;
+		size_t comma = string.find(", ");
+
+		if (comma == std::string_view::npos) {
+			comma = string.find(',');
+			comma_size = 1;
+			if (comma == std::string_view::npos)
+				throw std::invalid_argument("Invalid ChunkPosition string");
+		}
+
+		x = parseNumber<IntType>(string.substr(0, comma));
+		y = parseNumber<IntType>(string.substr(comma + comma_size));
+	}
 
 	std::default_random_engine ChunkPosition::getRNG() const {
 		return std::default_random_engine(static_cast<uint_fast32_t>(std::hash<ChunkPosition>()(*this)));

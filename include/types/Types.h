@@ -49,6 +49,8 @@ namespace Game3 {
 	class ClientPlayer;
 	using ClientPlayerPtr = std::shared_ptr<ClientPlayer>;
 
+	using Resources = std::map<Identifier, double>;
+
 	struct Place;
 
 	enum class Side {Invalid = 0, Server, Client};

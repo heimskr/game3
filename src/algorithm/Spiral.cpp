@@ -31,24 +31,26 @@ namespace Game3 {
 	}
 
 	Position getSpiralPosition(uint64_t index) {
+		using IntType = Position::IntType;
+
 		// Credit: https://gamedev.stackexchange.com/q/157291
 		const double k = std::ceil((std::sqrt(index + 1) - 1) / 2);
 		double t = 2 * k;
 		double m = (t + 1) * (t + 1);
 
 		if (index + 1 >= m - t)
-			return {m - index - k - 1, -k};
+			return {IntType(m - index - k - 1), IntType(-k)};
 
 		m -= t;
 
 		if (index + 1 >= m - t)
-			return {k, m - index - k - 1};
+			return {IntType(k), IntType(m - index - k - 1)};
 
 		m -= t;
 
 		if (index + 1 >= m - t)
-			return {k - m + index + 1, k};
+			return {IntType(k - m + index + 1), IntType(k)};
 
-		return {-k, k - m + index + 1 + t};
+		return {IntType(-k), IntType(k - m + index + 1 + t)};
 	}
 }

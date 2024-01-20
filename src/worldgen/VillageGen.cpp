@@ -1,3 +1,4 @@
+#include "game/ServerGame.h"
 #include "game/TileProvider.h"
 #include "graphics/Tileset.h"
 #include "realm/Realm.h"
@@ -16,6 +17,8 @@
 
 namespace Game3 {
 	std::optional<Position> tryGenerateVillage(const RealmPtr &realm, const ChunkPosition &chunk_position, ThreadPool &pool) {
+		assert(realm->isServer());
+
 		constexpr static int MIN_WIDTH  = 16, MAX_WIDTH  = 32;
 		constexpr static int MIN_HEIGHT = 16, MAX_HEIGHT = 32;
 		constexpr static int PADDING = 2;
@@ -38,6 +41,10 @@ namespace Game3 {
 			return std::nullopt;
 
 		WorldGen::generateTown(realm, prng, *village_position + Position(PADDING + 1, 0), width, height, PADDING, seed);
+
+		ServerGame &game = realm->getGame().toServer();
+
+
 		return village_position;
 	}
 

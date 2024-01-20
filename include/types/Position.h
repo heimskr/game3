@@ -21,12 +21,12 @@ namespace Game3 {
 	struct ChunkPosition;
 
 	struct Position {
-		using value_type = Index;
-		value_type row = 0;
-		value_type column = 0;
+		using IntType = Index;
+		IntType row = 0;
+		IntType column = 0;
 
 		Position() = default;
-		Position(value_type row_, value_type column_): row(row_), column(column_) {}
+		Position(IntType row_, IntType column_): row(row_), column(column_) {}
 		Position(std::string_view);
 
 		inline bool operator==(const Position &other) const { return this == &other || (row == other.row && column == other.column); }

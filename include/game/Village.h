@@ -9,22 +9,31 @@ namespace Game3 {
 
 	class Village {
 		public:
-			Village(ServerGame &, ChunkPosition, const Position &);
-			Village(ServerGame &, const Position &);
+			Village() = default;
+			Village(ServerGame &, const Place &, const VillageOptions &);
+			Village(ServerGame &, RealmID, ChunkPosition, const Position &, const VillageOptions &);
+			Village(size_t, RealmID, ChunkPosition, const Position &, const VillageOptions &, Richness, Resources);
 
+			inline auto getID() const { return id; }
+			inline auto getRealmID() const { return realmID; }
 			inline auto getChunkPosition() const { return chunkPosition; }
 			inline auto getPosition() const { return position; }
+			inline const auto & getOptions() const { return options; }
+			inline const auto & getRichness() const { return richness; }
+			inline const auto & getResources() const { return resources; }
+
 			std::optional<double> getRichness(const Identifier &);
 
 			static std::string getSQL();
 
 		private:
 			size_t id;
-			VillageOptions options;
+			RealmID realmID;
 			ChunkPosition chunkPosition;
 			Position position;
+			VillageOptions options;
 			Richness richness;
-			std::map<Identifier, double> resources;
+			Resources resources;
 
 		friend class HasVillages;
 	};

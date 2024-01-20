@@ -27,6 +27,7 @@ namespace Game3 {
 		ChunkPosition() = default;
 		ChunkPosition(IntType x_, IntType y_);
 		explicit ChunkPosition(const Position &);
+		explicit ChunkPosition(std::string_view);
 
 		inline bool operator==(const ChunkPosition &other) const {
 			return this == &other || (x == other.x && y == other.y);
