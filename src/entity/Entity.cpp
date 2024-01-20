@@ -194,8 +194,7 @@ namespace Game3 {
 		// Not all platforms support std::atomic<float>::operator+=.
 		age = age + delta;
 
-		if (getSide() == Side::Client)
-			enqueueTick();
+		enqueueTick();
 	}
 
 	void Entity::remove() {

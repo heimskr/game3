@@ -158,10 +158,7 @@ namespace Game3 {
 			} else {
 				lastContinuousInteraction.reset();
 			}
-
-			game.enqueue(getTickFunction());
 		}
-
 	}
 
 	bool Player::interactOn(Modifiers modifiers, ItemStack *used_item, Hand hand) {
