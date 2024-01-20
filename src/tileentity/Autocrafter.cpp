@@ -15,7 +15,7 @@ namespace Game3 {
 	namespace {
 		constexpr EnergyAmount ENERGY_CAPACITY = 100'000;
 		constexpr EnergyAmount ENERGY_PER_ACTION = 200;
-		constexpr float PERIOD = 0.1;
+		constexpr std::chrono::milliseconds PERIOD{100};
 		constexpr ItemCount INPUT_CAPACITY  = 10;
 		constexpr ItemCount OUTPUT_CAPACITY = 10;
 	}
@@ -74,13 +74,8 @@ namespace Game3 {
 
 		Ticker ticker{*this, game, delta};
 
-		accumulatedTime += delta;
-
-		if (accumulatedTime < PERIOD)
-			return;
-
-		accumulatedTime = 0.f;
 		autocraft();
+		game.enqueue(sigc::mem_fun(*this, &Autocrafter::tick), PERIOD);
 	}
 
 	bool Autocrafter::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *, Hand) {

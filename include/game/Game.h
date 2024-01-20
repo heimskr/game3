@@ -38,7 +38,7 @@ namespace Game3 {
 	class Tileset;
 	struct InteractionSet;
 
-	class Game: public std::enable_shared_from_this<Game>, public BufferContext, public HasTickQueue {
+	class Game: public std::enable_shared_from_this<Game>, public BufferContext, public HasTickQueue<float, Game &, float> {
 		public:
 			static constexpr const char *DEFAULT_PATH = "game.g3";
 
@@ -75,7 +75,6 @@ namespace Game3 {
 
 			/** Returns true if ticking should continue, false if the game needs to stop. */
 			virtual bool tick();
-			virtual double getFrequency() const = 0;
 			void initRegistries();
 			void addItems();
 			virtual void addEntityFactories();

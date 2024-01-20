@@ -55,12 +55,12 @@ namespace Game3 {
 	};
 
 	// Credit: https://stackoverflow.com/a/77263021
-	template <typename T>
+	template <typename>
 	struct is_chrono_duration: std::false_type {};
 
 	template <typename Rep, typename Period>
 	struct is_chrono_duration<std::chrono::duration<Rep, Period>>: std::true_type {};
 
 	template <typename T>
-	concept chrono_duration = is_chrono_duration<std::decay<T>>::value;
+	concept Duration = is_chrono_duration<T>::value;
 }

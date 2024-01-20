@@ -45,7 +45,6 @@ namespace Game3 {
 			const auto & getStationInventory() const { return stationInventory; }
 
 		private:
-			float accumulatedTime = 0.f;
 			Lockable<std::vector<std::shared_ptr<CraftingRecipe>>> cachedRecipes;
 			Lockable<Identifier> target;
 			Lockable<std::shared_ptr<Inventory>> stationInventory;

@@ -11,43 +11,58 @@
 #include <map>
 
 namespace Game3 {
+	template <Numeric Delta = double, typename... Args>
 	class HasTickQueue {
 		public:
-			using Function = std::function<void(Tick)>;
+			virtual double getFrequency() const = 0;
 
-			void tick();
-			void tick(double delta, double frequency);
-
-			inline Tick getCurrentTick() const { return currentTick; }
-
-			template <chrono_duration D>
-			void enqueueServer(Function function, D delay) {
-				enqueueAt(std::move(function), currentTick + getDelayTicks(delay, SERVER_TICK_FREQUENCY));
+			void tick(Args &&...args) {
+				++currentTick;
+				dequeueAll(std::forward<Args>(args)...);
 			}
 
-			template <chrono_duration D>
-			void enqueueClient(Function function, D delay) {
-				enqueueAt(std::move(function), currentTick + getDelayTicks(delay, CLIENT_TICK_FREQUENCY));
+			template <typename... TickArgs>
+			void tick(Delta delta, TickArgs &&...args) {
+				currentTick += Tick(std::max(1.0, delta * getFrequency()));
+				dequeueAll(std::forward<TickArgs>(args)...);
 			}
 
-			template <chrono_duration D>
-			void enqueue(Function function, D delay, bool is_server) {
-				if (is_server)
-					enqueueServer(std::move(function), delay);
-				else
-					enqueueClient(std::move(function), delay);
+			inline Tick getCurrentTick() const {
+				return currentTick;
+			}
+
+			template <Duration D>
+			void enqueue(std::function<void(Args...)> function, D delay) {
+				tickQueue.emplace(currentTick + getDelayTicks(delay), std::move(function));
+			}
+
+			template <typename Function, Duration D>
+			requires (!std::is_same_v<Function, std::function<void(Args...)>>)
+			void enqueue(Function function, D delay) {
+				auto lock = tickQueue.uniqueLock();
+				tickQueue.emplace(currentTick + getDelayTicks(delay), [function = std::move(function)](Args &&...args) {
+					function(std::forward<Args>(args)...);
+				});
 			}
 
 		private:
 			Atomic<Tick> currentTick = 0;
-			Lockable<std::multimap<Tick, Function>> tickQueue;
+			Lockable<std::multimap<Tick, std::function<void(Args...)>>> tickQueue;
 
-			void enqueueAt(Function, Tick);
-			void dequeueAll();
+			template <typename... DequeueArgs>
+			void dequeueAll(DequeueArgs &&...args) {
+				auto lock = tickQueue.uniqueLock();
 
-			template <chrono_duration D>
-			constexpr static Tick getDelayTicks(D delay, int64_t frequency) {
-				return std::chrono::duration_cast<std::chrono::seconds>(delay).count() * frequency;
+				// Call and remove all queued functions that should execute now or should've been executed by now.
+				for (auto iter = tickQueue.begin(); iter != tickQueue.end() && iter->first <= currentTick;) {
+					iter->second(std::forward<DequeueArgs>(args)...);
+					iter = tickQueue.erase(iter);
+				}
+			}
+
+			template <Duration D>
+			Tick getDelayTicks(D delay) {
+				return Tick(std::chrono::duration_cast<std::chrono::seconds>(delay).count() * getFrequency());
 			}
 	};
 }
