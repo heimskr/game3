@@ -27,8 +27,8 @@ namespace Game3 {
 			static std::string getSQL();
 
 		private:
-			size_t id;
-			RealmID realmID;
+			size_t id{};
+			RealmID realmID{};
 			ChunkPosition chunkPosition;
 			Position position;
 			VillageOptions options;
