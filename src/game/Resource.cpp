@@ -9,7 +9,7 @@ namespace Game3 {
 		richnessRange(json.at("richnessRange")) {}
 
 	double Resource::sampleRichness(double factor) const {
-		std::uniform_int_distribution<int> distribution{factor * richnessRange.first, factor * richnessRange.second};
+		std::uniform_int_distribution distribution{int(factor * richnessRange.first), int(factor * richnessRange.second)};
 		return distribution(threadContext.rng) / factor;
 	}
 }

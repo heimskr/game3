@@ -252,6 +252,12 @@ namespace Game3 {
 				}
 			}
 			query_timer.restart();
+
+		}
+
+		{
+			Timer villages_timer{"LoadVillages"};
+			game.loadVillages(*database);
 		}
 
 		const bool force_migrate = std::filesystem::exists(".force-migrate");

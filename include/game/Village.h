@@ -12,6 +12,7 @@ namespace Game3 {
 			Village() = default;
 			Village(ServerGame &, const Place &, const VillageOptions &);
 			Village(ServerGame &, RealmID, ChunkPosition, const Position &, const VillageOptions &);
+			Village(ServerGame &, size_t, RealmID, ChunkPosition, const Position &, const VillageOptions &);
 			Village(size_t, RealmID, ChunkPosition, const Position &, const VillageOptions &, Richness, Resources);
 
 			inline auto getID() const { return id; }

@@ -6,7 +6,10 @@ namespace Game3 {
 		Village(game, place.realm->id, ChunkPosition(place.position), place.position, options_) {}
 
 	Village::Village(ServerGame &game, RealmID realm_id, ChunkPosition chunk_position, const Position &position_, const VillageOptions &options_):
-		id(game.getNewVillageID()),
+		Village(game, game.getNewVillageID(), realm_id, chunk_position, position_, options_) {}
+
+	Village::Village(ServerGame &game, size_t id_, RealmID realm_id, ChunkPosition chunk_position, const Position &position_, const VillageOptions &options_):
+		id(id_),
 		realmID(realm_id),
 		chunkPosition(chunk_position),
 		position(position_),

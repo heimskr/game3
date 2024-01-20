@@ -21,7 +21,9 @@ namespace Game3 {
 
 	void HasVillages::addVillage(ServerGame &game, ChunkPosition chunk_position, const Place &place, const VillageOptions &options) {
 		auto lock = villageMap.uniqueLock();
-		villageMap[getNewVillageID()] = Village(game, place.realm->getID(), chunk_position, place.position, options);
+		const auto new_id = getNewVillageID();
+		villageMap[new_id] = Village(game, new_id, place.realm->getID(), chunk_position, place.position, options);
+		INFO("Added new village " << new_id << " in realm " << place.realm->getID() << " at chunk position " << chunk_position << ", position " << place.position << " with options " << nlohmann::json(options).dump());
 	}
 
 	void HasVillages::saveVillages(SQLite::Database &database, bool use_transaction) {
@@ -65,6 +67,8 @@ namespace Game3 {
 			Richness richness(nlohmann::json::parse(query.getColumn(5).getString()));
 			Resources resources(nlohmann::json::parse(query.getColumn(6).getString()));
 			villageMap[id] = Village(id, realm_id, chunk_position, position, options, std::move(richness), std::move(resources));
+			lastVillageID = std::max(lastVillageID.load(), id);
+			INFO("Loading village " << id << " in realm " << realm_id << " at chunk position " << chunk_position << ", position " << position << " with options " << nlohmann::json(options).dump());
 		}
 	}
 }

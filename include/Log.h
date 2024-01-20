@@ -4,6 +4,8 @@
 #include <mutex>
 #include <string>
 
+// #define NO_LOGS
+
 namespace Game3 {
 	struct Logger {
 		std::mutex mutex;
@@ -35,6 +37,13 @@ namespace Game3 {
 	extern Logger log;
 }
 
+#ifdef NO_LOGS
+#define INFO(message)    do {} while (false)
+#define WARN(message)    do {} while (false)
+#define ERROR(message)   do {} while (false)
+#define SPAM(message)    do {} while (false)
+#define SUCCESS(message) do {} while (false)
+#else
 #define INFO(message) \
 	do { std::unique_lock lock(Game3::log.mutex); \
 	     ::Game3::log << "\e[2m[\e[1m" << ::Game3::Logger::getTimestamp() \
@@ -64,6 +73,7 @@ namespace Game3 {
 	     ::Game3::log << "\e[2m[\e[1m" << ::Game3::Logger::getTimestamp() \
 	                  << "\e[22;2m]\e[22m (\e[22;1;32m🗸\e[22;39m)\e[2m :: \e[22;32m" \
 	                  << message << "\e[39m" << std::endl; } while (false)
+#endif
 
 #undef SPAM
 #define SPAM(message)
