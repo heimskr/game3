@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <climits>
 #include <cstddef>
 #include <cstdint>
@@ -52,4 +53,14 @@ namespace Game3 {
 	concept Returns = requires(T t, Args &&...args) {
 		requires std::is_same_v<std::invoke_result_t<T, Args...>, R>;
 	};
+
+	// Credit: https://stackoverflow.com/a/77263021
+	template <typename T>
+	struct is_chrono_duration: std::false_type {};
+
+	template <typename Rep, typename Period>
+	struct is_chrono_duration<std::chrono::duration<Rep, Period>>: std::true_type {};
+
+	template <typename T>
+	concept chrono_duration = is_chrono_duration<std::decay<T>>::value;
 }
