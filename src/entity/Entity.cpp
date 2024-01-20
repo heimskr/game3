@@ -193,6 +193,9 @@ namespace Game3 {
 
 		// Not all platforms support std::atomic<float>::operator+=.
 		age = age + delta;
+
+		if (getSide() == Side::Client)
+			enqueueTick();
 	}
 
 	void Entity::remove() {
@@ -509,13 +512,13 @@ namespace Game3 {
 		if (!realm)
 			return false;
 
-		const auto &tileset = realm->getTileset();
+		const Tileset &tileset = realm->getTileset();
 
-		for (const auto layer: {Layer::Submerged, Layer::Objects, Layer::Highest})
-			if (auto tile = realm->tryTile(layer, new_position); !tile || tileset.isSolid(*tile))
+		for (const Layer layer: {Layer::Submerged, Layer::Objects, Layer::Highest})
+			if (std::optional<TileID> tile = realm->tryTile(layer, new_position); !tile || tileset.isSolid(*tile))
 				return false;
 
-		if (auto tile_entity = realm->tileEntityAt(new_position))
+		if (TileEntityPtr tile_entity = realm->tileEntityAt(new_position))
 			if (tile_entity->solid)
 				return false;
 
@@ -1026,6 +1029,21 @@ namespace Game3 {
 		return game_ref.registry<TextureRegistry>().at(entity_texture->textureID);
 	}
 
+	std::function<void(Game &, float)> Entity::getTickFunction() {
+		return [weak = getWeakSelf()](Game &game, float delta) {
+			if (EntityPtr entity = weak.lock())
+				entity->tick(game, delta);
+		};
+	}
+
+	Tick Entity::enqueueTick(std::chrono::nanoseconds delay) {
+		return getGame().enqueue(getTickFunction(), delay);
+	}
+
+	Tick Entity::enqueueTick() {
+		return getGame().enqueue(getTickFunction());
+	}
+
 	template <>
 	std::vector<Direction> Entity::copyPath<std::vector>() {
 		std::vector<Direction> out;
@@ -1092,6 +1110,10 @@ namespace Game3 {
 
 	std::shared_ptr<Entity> Entity::getSelf() {
 		return std::static_pointer_cast<Entity>(shared_from_this());
+	}
+
+	std::weak_ptr<Entity> Entity::getWeakSelf() {
+		return std::weak_ptr(getSelf());
 	}
 
 	void Entity::clearQueues() {

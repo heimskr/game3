@@ -75,7 +75,7 @@ namespace Game3 {
 		Ticker ticker{*this, game, delta};
 
 		autocraft();
-		game.enqueue(sigc::mem_fun(*this, &Autocrafter::tick), PERIOD);
+		enqueueTick(PERIOD);
 	}
 
 	bool Autocrafter::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *, Hand) {

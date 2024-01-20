@@ -71,7 +71,7 @@ namespace Game3 {
 
 		Ticker ticker{*this, game, delta};
 
-		game.enqueue(sigc::mem_fun(*this, &ChemicalReactor::tick), PERIOD);
+		enqueueTick(PERIOD);
 
 		InventoryPtr inventory = getInventory(0);
 		if (inventory->weakOwner.expired())

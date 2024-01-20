@@ -90,7 +90,7 @@ namespace Game3 {
 
 		Ticker ticker{*this, game, delta};
 
-		game.enqueue(sigc::mem_fun(*this, &GeothermalGenerator::tick), PERIOD);
+		enqueueTick(PERIOD);
 
 		assert(fluidContainer);
 		assert(energyContainer);

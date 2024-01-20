@@ -32,7 +32,7 @@ namespace Game3 {
 
 		Ticker ticker{*this, game, delta};
 
-		game.enqueue(sigc::mem_fun(*this, &Pump::tick), std::chrono::milliseconds(int64_t(1000 * PERIOD)));
+		enqueueTick(std::chrono::milliseconds(int64_t(1000 * PERIOD)));
 
 		const FluidAmount amount = std::min<FluidAmount>(std::numeric_limits<FluidLevel>::max(), extractionRate * PERIOD);
 

@@ -61,7 +61,7 @@ namespace Game3 {
 			wander();
 		}
 
-		wanderTick = game.enqueue(sigc::mem_fun(*this, &Animal::tick), std::chrono::milliseconds(int64_t(1000 * getWanderDistribution()(threadContext.rng))));
+		wanderTick = enqueueTick(std::chrono::milliseconds(int64_t(1000 * getWanderDistribution()(threadContext.rng))));
 	}
 
 	HitPoints Animal::getMaxHealth() const {

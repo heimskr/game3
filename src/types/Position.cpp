@@ -223,6 +223,14 @@ namespace Game3 {
 		return buffer >> position.row >> position.column;
 	}
 
+	double Vector3::magnitude() const {
+		return std::sqrt(std::pow(x, 2) + std::pow(y, 2) + std::pow(z, 2));
+	}
+
+	double Vector3::magnitude2D() const {
+		return std::sqrt(std::pow(x, 2) + std::pow(y, 2));
+	}
+
 	template <>
 	std::string Buffer::getType(const Vector3 &) {
 		return std::string{'\x32'} + getType(float{});

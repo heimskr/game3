@@ -39,7 +39,7 @@ namespace Game3 {
 
 		Ticker ticker{*this, game, delta};
 
-		game.enqueue(sigc::mem_fun(*this, &Incinerator::tick), PERIOD);
+		enqueueTick(PERIOD);
 
 		{
 			auto lock = fluidContainer->levels.uniqueLock();

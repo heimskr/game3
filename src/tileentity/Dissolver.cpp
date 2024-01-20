@@ -60,7 +60,7 @@ namespace Game3 {
 
 		Ticker ticker{*this, game, delta};
 		dissolve();
-		game.enqueue(sigc::mem_fun(*this, &Dissolver::tick), PERIOD);
+		enqueueTick(PERIOD);
 	}
 
 	void Dissolver::toJSON(nlohmann::json &json) const {

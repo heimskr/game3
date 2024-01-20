@@ -25,8 +25,7 @@ namespace Game3 {
 
 	class TileEntity: public Agent, public Broadcastable {
 		public:
-			RealmID realmID = 0;
-			std::weak_ptr<Realm> weakRealm;
+			RealmID realmID = 0;std::weak_ptr<Realm> weakRealm;
 			Identifier tileID;
 			Identifier tileEntityID;
 			Lockable<Position> position{-1, -1};
@@ -91,6 +90,7 @@ namespace Game3 {
 			std::string getName() const override { return "Unknown TileEntity (" + std::string(tileEntityID) + ')'; }
 			virtual Game & getGame() const;
 			std::shared_ptr<TileEntity> getSelf();
+			std::weak_ptr<TileEntity> getWeakSelf();
 
 			virtual void encode(Game &, Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */
@@ -112,6 +112,17 @@ namespace Game3 {
 			TileEntity() = default;
 			TileEntity(Identifier tile_id, Identifier tile_entity_id, Position position_, bool solid_):
 				tileID(std::move(tile_id)), tileEntityID(std::move(tile_entity_id)), position(std::move(position_)), solid(solid_) {}
+
+			std::function<void(Game &, float)> getTickFunction();
+
+			template <Duration D>
+			requires (!std::is_same_v<D, std::chrono::nanoseconds>)
+			Tick enqueueTick(D delay) {
+				return enqueueTick(std::chrono::duration_cast<std::chrono::nanoseconds>(delay));
+			}
+
+			Tick enqueueTick(std::chrono::nanoseconds);
+			Tick enqueueTick();
 
 			virtual void absorbJSON(Game &, const nlohmann::json &);
 

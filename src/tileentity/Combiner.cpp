@@ -81,7 +81,7 @@ namespace Game3 {
 
 		Ticker ticker{*this, game, delta};
 		combine();
-		game.enqueue(sigc::mem_fun(*this, &Combiner::tick), PERIOD);
+		enqueueTick(PERIOD);
 	}
 
 	void Combiner::toJSON(nlohmann::json &json) const {

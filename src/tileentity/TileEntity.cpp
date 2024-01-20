@@ -193,6 +193,10 @@ namespace Game3 {
 		return std::static_pointer_cast<TileEntity>(shared_from_this());
 	}
 
+	std::weak_ptr<TileEntity> TileEntity::getWeakSelf() {
+		return std::weak_ptr(getSelf());
+	}
+
 	void TileEntity::encode(Game &, Buffer &buffer) {
 		buffer << tileEntityID;
 		buffer << tileID;
@@ -244,6 +248,21 @@ namespace Game3 {
 						safeDynamicCast<Player>(entity)->send(packet);
 			}
 		});
+	}
+
+	std::function<void(Game &, float)> TileEntity::getTickFunction() {
+		return [weak = getWeakSelf()](Game &game, float delta) {
+			if (TileEntityPtr tile_entity = weak.lock())
+				tile_entity->tick(game, delta);
+		};
+	}
+
+	Tick TileEntity::enqueueTick(std::chrono::nanoseconds delay) {
+		return getGame().enqueue(getTickFunction(), delay);
+	}
+
+	Tick TileEntity::enqueueTick() {
+		return getGame().enqueue(getTickFunction());
 	}
 
 	void TileEntity::absorbJSON(Game &, const nlohmann::json &json) {

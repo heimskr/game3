@@ -18,7 +18,7 @@ namespace Game3 {
 			layEgg();
 		}
 
-		eggTick = game.enqueue(sigc::mem_fun(*this, &Animal::tick), EGG_PERIOD);
+		eggTick = enqueueTick(EGG_PERIOD);
 	}
 
 	void Chicken::layEgg() {

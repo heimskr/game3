@@ -43,7 +43,7 @@ namespace Game3 {
 			energyContainer->energy = ENERGY_CAPACITY;
 		}
 
-		game.enqueue(sigc::mem_fun(*this, &CreativeGenerator::tick), PERIOD);
+		enqueueTick(PERIOD);
 	}
 
 	void CreativeGenerator::toJSON(nlohmann::json &json) const {

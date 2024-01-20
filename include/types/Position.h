@@ -92,6 +92,9 @@ namespace Game3 {
 		float x = 0.f;
 		float y = 0.f;
 		float z = 0.f;
+
+		double magnitude() const;
+		double magnitude2D() const;
 	};
 
 	std::ostream & operator<<(std::ostream &, const Vector3 &);

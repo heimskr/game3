@@ -79,7 +79,7 @@ namespace Game3 {
 
 					if (ore.maxUses <= ++uses) {
 						ready = false;
-						getGame().enqueue(sigc::mem_fun(*this, &OreDeposit::tick), std::chrono::microseconds(int64_t(1e6 * ore.cooldown)));
+						getGame().enqueue(getTickFunction(), std::chrono::microseconds(int64_t(1e6 * ore.cooldown)));
 						uses = 0;
 					}
 

@@ -129,9 +129,9 @@ namespace Game3 {
 			if (movingDown && !movingUp)
 				final_direction = Direction::Down;
 
-			const MovementContext context {
+			const MovementContext context{
 				.clearOffset = false,
-				.facingDirection = final_direction
+				.facingDirection = final_direction,
 			};
 
 			if (movingLeft && !movingRight)
@@ -158,7 +158,10 @@ namespace Game3 {
 			} else {
 				lastContinuousInteraction.reset();
 			}
+
+			game.enqueue(getTickFunction());
 		}
+
 	}
 
 	bool Player::interactOn(Modifiers modifiers, ItemStack *used_item, Hand hand) {

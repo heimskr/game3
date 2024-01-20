@@ -54,7 +54,7 @@ namespace Game3 {
 			choose(spawnables).spawn(getRealm(), getPosition());
 
 		std::uniform_real_distribution distribution{minimumTime, maximumTime};
-		game.enqueue(sigc::mem_fun(*this, &ItemSpawner::tick), std::chrono::microseconds(int64_t(1e6 * distribution(threadContext.rng))));
+		enqueueTick(std::chrono::microseconds(int64_t(1e6 * distribution(threadContext.rng))));
 	}
 
 	void ItemSpawner::render(SpriteRenderer &) {}

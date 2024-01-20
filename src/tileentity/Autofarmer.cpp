@@ -46,7 +46,7 @@ namespace Game3 {
 		const EnergyAmount to_consume = ENERGY_PER_OPERATION * autofarm();
 		auto energy_lock = energyContainer->uniqueLock();
 		energyContainer->remove(to_consume, true);
-		game.enqueue(sigc::mem_fun(*this, &Autofarmer::tick), PERIOD);
+		enqueueTick(PERIOD);
 	}
 
 	void Autofarmer::toJSON(nlohmann::json &json) const {

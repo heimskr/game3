@@ -165,6 +165,7 @@ namespace Game3 {
 			void clearOffset();
 			inline bool is(const Identifier &check) const { return type == check; }
 			std::shared_ptr<Entity> getSelf();
+			std::weak_ptr<Entity> getWeakSelf();
 			void clearQueues();
 			bool isInLimbo() const;
 			virtual float getJumpSpeed() const { return 8.f; }
@@ -207,6 +208,17 @@ namespace Game3 {
 			inline auto getHeldRightTexture() const { return heldRight.texture; }
 
 			std::shared_ptr<Agent> getSharedAgent() override { return shared_from_this(); }
+
+			std::function<void(Game &, float)> getTickFunction();
+
+			template <Duration D>
+			requires (!std::is_same_v<D, std::chrono::nanoseconds>)
+			Tick enqueueTick(D delay) {
+				return enqueueTick(std::chrono::duration_cast<std::chrono::nanoseconds>(delay));
+			}
+
+			Tick enqueueTick(std::chrono::nanoseconds);
+			Tick enqueueTick();
 
 		private:
 			struct Held {

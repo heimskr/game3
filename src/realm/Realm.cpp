@@ -478,12 +478,11 @@ namespace Game3 {
 							auto set_lock = iter->second->sharedLock();
 							by_chunk_lock.unlock();
 							for (const auto &entity: *iter->second) {
-								if (!entity->isPlayer()) {
+								if (!entity->isPlayer() && !entity->initialTickDone.exchange(true)) {
 #ifdef PROFILE_TICKS
 									Timer timer{"TickEntity"};
 #endif
-									if (!entity->initialTickDone.exchange(true))
-										entity->tick(game, delta);
+									entity->tick(game, delta);
 								}
 							}
 						}
@@ -588,14 +587,18 @@ namespace Game3 {
 
 			{
 				auto lock = entities.sharedLock();
-				for (const auto &entity: entities)
-					entity->tick(game, delta);
+				for (const auto &entity: entities) {
+					if (!entity->initialTickDone.exchange(true))
+						entity->tick(game, delta);
+				}
 			}
 
 			{
 				auto lock = tileEntities.sharedLock();
-				for (auto &[index, tile_entity]: tileEntities)
-					tile_entity->tick(game, delta);
+				for (auto &[index, tile_entity]: tileEntities) {
+					if (!tile_entity->initialTickDone.exchange(true))
+						tile_entity->tick(game, delta);
+				}
 			}
 
 			ticking = false;
