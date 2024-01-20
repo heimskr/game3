@@ -55,7 +55,7 @@ namespace Game3 {
 			} else if (wanderTick <= game.getCurrentTick()) {
 				// The check here is to avoid spurious wanders if something else causes the animal to tick earlier than scheduled.
 				wander();
-				wanderTick = tickEnqueued(enqueueTick(std::chrono::milliseconds(int64_t(1000 * getWanderDistribution()(threadContext.rng)))));
+				wanderTick = enqueueTick(std::chrono::milliseconds(int64_t(1000 * getWanderDistribution()(threadContext.rng))));
 			}
 		}
 

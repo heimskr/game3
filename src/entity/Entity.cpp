@@ -1038,11 +1038,11 @@ namespace Game3 {
 	}
 
 	Tick Entity::enqueueTick(std::chrono::nanoseconds delay) {
-		return getGame().enqueue(getTickFunction(), delay);
+		return tickEnqueued(getGame().enqueue(getTickFunction(), delay));
 	}
 
 	Tick Entity::enqueueTick() {
-		return getGame().enqueue(getTickFunction());
+		return tickEnqueued(getGame().enqueue(getTickFunction()));
 	}
 
 	template <>

@@ -10,7 +10,6 @@ namespace Game3 {
 		if (tickSet.contains(next_tick))
 			return;
 
-		tickSet.insert(next_tick);
 		enqueueTick();
 	}
 
