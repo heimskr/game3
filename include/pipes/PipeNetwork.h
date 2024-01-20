@@ -12,6 +12,7 @@
 #include <utility>
 
 namespace Game3 {
+	class Game;
 	class Pipe;
 	class Realm;
 	class TileEntity;
@@ -60,7 +61,7 @@ namespace Game3 {
 			inline auto getID() const { return id; }
 
 			virtual PipeType getType() const = 0;
-			virtual void tick(Tick);
+			virtual void tick(Game &, Tick);
 			bool canTick(Tick);
 	};
 }

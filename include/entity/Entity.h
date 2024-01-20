@@ -80,6 +80,7 @@ namespace Game3 {
 			Identifier customTexture;
 			Lockable<std::optional<Position>> pathfindGoal;
 			Atomic<float> age;
+			Atomic<bool> initialTickDone = false;
 
 			virtual void destroy();
 

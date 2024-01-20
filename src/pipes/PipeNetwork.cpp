@@ -1,4 +1,5 @@
 #include "container/FriendSet.h"
+#include "game/Game.h"
 #include "pipes/EnergyNetwork.h"
 #include "pipes/FluidNetwork.h"
 #include "pipes/ItemNetwork.h"
@@ -244,8 +245,12 @@ namespace Game3 {
 		}
 	}
 
-	void PipeNetwork::tick(Tick tick) {
+	void PipeNetwork::tick(Game &game, Tick tick) {
 		lastTick = tick;
+		game.enqueue([weak = weak_from_this()](Game &game, float) {
+			if (auto network = weak.lock())
+				network->tick(game, game.getCurrentTick());
+		});
 	}
 
 	bool PipeNetwork::canTick(Tick tick) {

@@ -11,51 +11,65 @@
 #include <map>
 
 namespace Game3 {
-	template <Numeric Delta = double, typename... Args>
+	template <Numeric Delta = double, typename... FunctionArgs>
 	class HasTickQueue {
 		public:
 			virtual double getFrequency() const = 0;
 
+			template <typename... Args>
 			void tick(Args &&...args) {
 				++currentTick;
 				dequeueAll(std::forward<Args>(args)...);
 			}
 
-			template <typename... TickArgs>
-			void tick(Delta delta, TickArgs &&...args) {
+			template <typename... Args>
+			void tick(Delta delta, Args &&...args) {
 				currentTick += Tick(std::max(1.0, delta * getFrequency()));
-				dequeueAll(std::forward<TickArgs>(args)...);
+				dequeueAll(std::forward<Args>(args)...);
 			}
 
 			inline Tick getCurrentTick() const {
 				return currentTick;
 			}
 
+			void enqueue(std::function<void(FunctionArgs...)> function) {
+				tickQueue.emplace(currentTick + 1, std::move(function));
+			}
+
 			template <Duration D>
-			void enqueue(std::function<void(Args...)> function, D delay) {
+			void enqueue(std::function<void(FunctionArgs...)> function, D delay) {
 				tickQueue.emplace(currentTick + getDelayTicks(delay), std::move(function));
 			}
 
 			template <typename Function, Duration D>
-			requires (!std::is_same_v<Function, std::function<void(Args...)>>)
+			requires (!std::is_same_v<Function, std::function<void(FunctionArgs...)>>)
 			void enqueue(Function function, D delay) {
 				auto lock = tickQueue.uniqueLock();
-				tickQueue.emplace(currentTick + getDelayTicks(delay), [function = std::move(function)](Args &&...args) {
-					function(std::forward<Args>(args)...);
+				tickQueue.emplace(currentTick + getDelayTicks(delay), [function = std::move(function)](FunctionArgs &&...args) {
+					function(std::forward<FunctionArgs>(args)...);
+				});
+			}
+
+			template <typename Function>
+			requires (!std::is_same_v<Function, std::function<void(FunctionArgs...)>>)
+			void enqueue(Function function) {
+				auto lock = tickQueue.uniqueLock();
+				tickQueue.emplace(currentTick + 1, [function = std::move(function)](FunctionArgs &&...args) {
+					function(std::forward<FunctionArgs>(args)...);
 				});
 			}
 
 		private:
 			Atomic<Tick> currentTick = 0;
-			Lockable<std::multimap<Tick, std::function<void(Args...)>>> tickQueue;
+			Lockable<std::multimap<Tick, std::function<void(FunctionArgs...)>>> tickQueue;
 
-			template <typename... DequeueArgs>
-			void dequeueAll(DequeueArgs &&...args) {
+			template <typename... Args>
+			void dequeueAll(Args &&...args) {
 				auto lock = tickQueue.uniqueLock();
 
 				// Call and remove all queued functions that should execute now or should've been executed by now.
 				for (auto iter = tickQueue.begin(); iter != tickQueue.end() && iter->first <= currentTick;) {
-					iter->second(std::forward<DequeueArgs>(args)...);
+					iter->second(std::forward<Args>(args)...);
 					iter = tickQueue.erase(iter);
 				}
 			}

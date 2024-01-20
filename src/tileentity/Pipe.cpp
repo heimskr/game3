@@ -73,7 +73,7 @@ namespace Game3 {
 		if (getSide() == Side::Server) {
 			for (const PipeType pipe_type: PIPE_TYPES)
 				if (auto network = networks[pipe_type])
-					network->tick(game.getCurrentTick());
+					network->tick(game, game.getCurrentTick());
 			TileEntity::tick(game, delta);
 		}
 	}

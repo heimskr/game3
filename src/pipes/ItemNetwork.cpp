@@ -8,11 +8,11 @@
 #include "tileentity/Pipe.h"
 
 namespace Game3 {
-	void ItemNetwork::tick(Tick tick_id) {
+	void ItemNetwork::tick(Game &game, Tick tick_id) {
 		if (!canTick(tick_id))
 			return;
 
-		PipeNetwork::tick(tick_id);
+		PipeNetwork::tick(game, tick_id);
 
 		auto this_lock = uniqueLock();
 

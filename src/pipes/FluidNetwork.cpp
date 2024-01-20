@@ -9,11 +9,11 @@ namespace Game3 {
 		PipeNetwork(id_, realm_),
 		HasFluids(std::make_shared<FluidContainer>()) {}
 
-	void FluidNetwork::tick(Tick tick_id) {
+	void FluidNetwork::tick(Game &game, Tick tick_id) {
 		if (!canTick(tick_id))
 			return;
 
-		PipeNetwork::tick(tick_id);
+		PipeNetwork::tick(game, tick_id);
 
 		auto this_lock = uniqueLock();
 

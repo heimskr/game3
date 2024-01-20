@@ -8,11 +8,11 @@ namespace Game3 {
 	EnergyNetwork::EnergyNetwork(size_t id_, const std::shared_ptr<Realm> &realm):
 		PipeNetwork(id_, realm), HasEnergy(CAPACITY, 0) {}
 
-	void EnergyNetwork::tick(Tick tick_id) {
+	void EnergyNetwork::tick(Game &game, Tick tick_id) {
 		if (!canTick(tick_id))
 			return;
 
-		PipeNetwork::tick(tick_id);
+		PipeNetwork::tick(game, tick_id);
 
 		auto this_lock = uniqueLock();
 

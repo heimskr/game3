@@ -462,7 +462,7 @@ namespace Game3 {
 						if (auto client = player->toServer()->weakClient.lock())
 							guards.emplace_back(client);
 
-						if (!player->ticked) {
+						if (!player->ticked && !player->initialTickDone.exchange(true)) {
 							player->ticked = true;
 							player->tick(game, delta);
 						}
@@ -483,7 +483,8 @@ namespace Game3 {
 #ifdef PROFILE_TICKS
 									Timer timer{"TickEntity"};
 #endif
-									entity->tick(game, delta);
+									if (!entity->initialTickDone.exchange(true))
+										entity->tick(game, delta);
 								}
 							}
 						}
@@ -498,12 +499,13 @@ namespace Game3 {
 #ifdef PROFILE_TICKS
 								Timer timer{"TickTileEntity"};
 #endif
-								tile_entity->tick(game, delta);
+								if (!tile_entity->initialTickDone.exchange(true))
+									tile_entity->tick(game, delta);
 							}
 						}
 					}
 					std::uniform_int_distribution<int64_t> distribution{0, CHUNK_SIZE - 1};
-					auto &tileset = getTileset();
+					Tileset &tileset = getTileset();
 					auto shared = shared_from_this();
 
 #ifdef PROFILE_TICKS
