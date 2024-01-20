@@ -11,7 +11,7 @@
 #include <map>
 
 namespace Game3 {
-	template <Numeric Delta = double, typename... FunctionArgs>
+	template <typename... FunctionArgs>
 	class HasTickQueue {
 		public:
 			virtual double getFrequency() const = 0;
@@ -22,7 +22,7 @@ namespace Game3 {
 				dequeueAll(std::forward<Args>(args)...);
 			}
 
-			template <typename... Args>
+			template <Numeric Delta = double, typename... Args>
 			void tick(Delta delta, Args &&...args) {
 				currentTick += Tick(std::max(1.0, delta * getFrequency()));
 				dequeueAll(std::forward<Args>(args)...);
@@ -76,7 +76,7 @@ namespace Game3 {
 
 			template <Duration D>
 			Tick getDelayTicks(D delay) {
-				return Tick(std::chrono::duration_cast<std::chrono::seconds>(delay).count() * getFrequency());
+				return Tick(std::max(1.0, std::chrono::duration_cast<std::chrono::seconds>(delay).count() * getFrequency()));
 			}
 	};
 }

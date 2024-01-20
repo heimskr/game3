@@ -38,7 +38,7 @@ namespace Game3 {
 	class Tileset;
 	struct InteractionSet;
 
-	class Game: public std::enable_shared_from_this<Game>, public BufferContext, public HasTickQueue<float, Game &, float> {
+	class Game: public std::enable_shared_from_this<Game>, public BufferContext, public HasTickQueue<Game &, float> {
 		public:
 			static constexpr const char *DEFAULT_PATH = "game.g3";
 
