@@ -96,7 +96,8 @@ namespace Game3 {
 		add(std::make_shared<FilledFlask>("base:item/brine_flask", "Brine Flask", 4, "base:fluid/brine"));
 		add(std::make_shared<FilledFlask>("base:item/honey",       "Honey",       5, "base:fluid/honey"));
 
-		add(std::make_shared<Floor>("base:item/floor", "Floor", "base:tile/floor", 4, 64));
+		add(std::make_shared<Floor>("base:item/floor",       "Floor",       "base:tile/floor",       4, 64));
+		add(std::make_shared<Floor>("base:item/stone_tiles", "Stone Tiles", "base:tile/stone_tiles", 4, 64));
 
 		add(std::make_shared<FluidPipeItem>(4));
 

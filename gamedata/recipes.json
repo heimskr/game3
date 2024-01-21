@@ -395,6 +395,10 @@
 				"output": [["base:item/floor", 2]]
 			}],
 			["base:registry/crafting_recipe", {
+				"input":  [["base:item/stone", 1]],
+				"output": [["base:item/stone_tiles", 2]]
+			}],
+			["base:registry/crafting_recipe", {
 				"input":  [["base:item/glass", 1]],
 				"output": [["base:item/flask", 1]]
 			}],
