@@ -88,6 +88,7 @@ namespace Game3 {
 
 					inventory->notifyOwner();
 					increaseUpdateCounter();
+					queueBroadcast();
 					return true;
 				}
 			}
