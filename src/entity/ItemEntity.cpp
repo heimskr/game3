@@ -70,7 +70,7 @@ namespace Game3 {
 			--secondsLeft;
 
 		if (secondsLeft <= 0)
-			queueDestruction();
+			remove();
 		else
 			enqueueTick(std::chrono::seconds(1));
 	}
@@ -108,8 +108,7 @@ namespace Game3 {
 		if (getSide() != Side::Server)
 			return true;
 
-		std::optional<ItemStack> leftover = player->getInventory(0)->add(stack);
-		if (leftover) {
+		if (std::optional<ItemStack> leftover = player->getInventory(0)->add(stack)) {
 			stack = std::move(*leftover);
 			increaseUpdateCounter();
 		} else

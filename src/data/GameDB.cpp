@@ -87,6 +87,7 @@ namespace Game3 {
 			statement.bind(1, key);
 			statement.bind(2, int64_t(value));
 			statement.exec();
+			statement.reset();
 		}
 		transaction.commit();
 	}
@@ -469,7 +470,7 @@ namespace Game3 {
 		query.bind(2, chunk_position.x);
 		query.bind(3, chunk_position.y);
 
-		while (query.executeStep()) {
+		if (query.executeStep()) {
 			const void *terrain = query.getColumn(0);
 			const void *biomes  = query.getColumn(1);
 			const void *fluids  = query.getColumn(2);
@@ -493,7 +494,7 @@ namespace Game3 {
 
 		query.bind(1, username);
 
-		while (query.executeStep()) {
+		if (query.executeStep()) {
 			if (display_name_out != nullptr)
 				*display_name_out = std::string(query.getColumn(0));
 
@@ -581,7 +582,7 @@ namespace Game3 {
 
 		query.bind(1, username);
 
-		while (query.executeStep()) {
+		if (query.executeStep()) {
 			if (query.isColumnNull(0) || query.isColumnNull(1))
 				return std::nullopt;
 			const std::string concatenated = query.getColumn(0).getString();
@@ -714,7 +715,7 @@ namespace Game3 {
 
 		query.bind(1, realm_id);
 
-		while (query.executeStep())
+		if (query.executeStep())
 			return query.getColumn(0).getString();
 
 		throw std::out_of_range("Can't find tileset hash for realm " + std::to_string(realm_id));
@@ -767,7 +768,7 @@ namespace Game3 {
 
 		query.bind(1, hash);
 
-		while (query.executeStep()) {
+		if (query.executeStep()) {
 			json = nlohmann::json::parse(query.getColumn(0).getString());
 			return true;
 		}
