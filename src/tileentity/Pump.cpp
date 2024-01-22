@@ -25,12 +25,12 @@ namespace Game3 {
 		return 64 * FluidTile::FULL;
 	}
 
-	void Pump::tick(Game &game, float delta) {
+	void Pump::tick(const TickArgs &args) {
 		RealmPtr realm = weakRealm.lock();
 		if (!realm || realm->getSide() != Side::Server)
 			return;
 
-		Ticker ticker{*this, game, delta};
+		Ticker ticker{*this, args};
 
 		enqueueTick(std::chrono::milliseconds(int64_t(1000 * PERIOD)));
 

@@ -14,6 +14,10 @@
 #include "ui/MainWindow.h"
 
 namespace Game3 {
+	namespace {
+		constexpr Tick MAX_MESSAGE_AGE = 7 * CLIENT_TICK_FREQUENCY;
+	}
+
 	ClientPlayer::ClientPlayer():
 		Entity(ID()), Player() {}
 
@@ -21,9 +25,9 @@ namespace Game3 {
 		return Entity::create<ClientPlayer>();
 	}
 
-	void ClientPlayer::tick(Game &game, float delta) {
-		lastMessageAge = lastMessageAge + delta;
-		Player::tick(game, delta);
+	void ClientPlayer::tick(const TickArgs &args) {
+		++lastMessageAge;
+		Player::tick(args);
 	}
 
 	void ClientPlayer::render(const RendererContext &renderers) {
@@ -37,7 +41,7 @@ namespace Game3 {
 		const auto [row, column] = getPosition();
 		const auto [x, y, z] = offset.copyBase();
 
-		const bool show_message = lastMessageAge.load() < 7;
+		const bool show_message = lastMessageAge.load() < MAX_MESSAGE_AGE;
 		const float health_offset = canShowHealthBar()? -.5 : 0;
 		const float name_offset = health_offset + (show_message? -1 : 0);
 

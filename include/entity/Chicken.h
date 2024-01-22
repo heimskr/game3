@@ -27,7 +27,7 @@ namespace Game3 {
 				return out;
 			}
 
-			void tick(Game &, float) override;
+			void tick(const TickArgs &) override;
 
 		protected:
 			Chicken():

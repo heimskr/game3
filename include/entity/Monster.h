@@ -8,7 +8,7 @@
 namespace Game3 {
 	class Monster: public LivingEntity {
 		public:
-			void tick(Game &, float) override;
+			void tick(const TickArgs &) override;
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;
 

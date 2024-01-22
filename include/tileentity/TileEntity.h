@@ -5,6 +5,7 @@
 #include "net/Broadcastable.h"
 #include "threading/Lockable.h"
 #include "types/Position.h"
+#include "types/TickArgs.h"
 #include "types/Types.h"
 #include "ui/Modifiers.h"
 
@@ -63,7 +64,7 @@ namespace Game3 {
 			static std::string getSQL();
 
 			virtual void init(Game &);
-			virtual void tick(Game &, float);
+			virtual void tick(const TickArgs &);
 			virtual void onSpawn();
 			/** Called after the tile entity is loaded from disk. */
 			virtual void onLoad() {}
@@ -115,7 +116,7 @@ namespace Game3 {
 			TileEntity(Identifier tile_id, Identifier tile_entity_id, Position position_, bool solid_):
 				tileID(std::move(tile_id)), tileEntityID(std::move(tile_entity_id)), position(std::move(position_)), solid(solid_) {}
 
-			std::function<void(Game &, float)> getTickFunction();
+			std::function<void(const TickArgs &)> getTickFunction();
 
 			template <Duration D>
 			requires (!std::is_same_v<D, std::chrono::nanoseconds>)
@@ -136,9 +137,8 @@ namespace Game3 {
 		public:
 			struct Ticker {
 				TileEntity &parent;
-				Game &game;
-				float delta;
-				~Ticker() { parent.TileEntity::tick(game, delta); }
+				TickArgs args;
+				~Ticker() { parent.TileEntity::tick(args); }
 			};
 	};
 

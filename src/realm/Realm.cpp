@@ -450,6 +450,8 @@ namespace Game3 {
 			if (auto locked = stolen.lock())
 				add(locked);
 
+		const TickArgs args{game, game.getCurrentTick(), delta};
+
 		if (isServer()) {
 			std::vector<RemoteClient::BufferGuard> guards;
 
@@ -463,7 +465,7 @@ namespace Game3 {
 
 						if (!player->ticked && !player->initialTickDone.exchange(true)) {
 							player->ticked = true;
-							player->tick(game, delta);
+							player->tick(args);
 						}
 					}
 				}
@@ -482,7 +484,7 @@ namespace Game3 {
 #ifdef PROFILE_TICKS
 									Timer timer{"TickEntity"};
 #endif
-									entity->tick(game, delta);
+									entity->tick(args);
 								}
 							}
 						}
@@ -498,7 +500,7 @@ namespace Game3 {
 								Timer timer{"TickTileEntity"};
 #endif
 								if (!tile_entity->initialTickDone.exchange(true)) {
-									tile_entity->tick(game, delta);
+									tile_entity->tick(args);
 								}
 							}
 						}
@@ -590,7 +592,7 @@ namespace Game3 {
 				auto lock = entities.sharedLock();
 				for (const auto &entity: entities) {
 					if (!entity->initialTickDone.exchange(true)) {
-						entity->tick(game, delta);
+						entity->tick(args);
 					}
 				}
 			}
@@ -599,7 +601,7 @@ namespace Game3 {
 				auto lock = tileEntities.sharedLock();
 				for (auto &[index, tile_entity]: tileEntities) {
 					if (!tile_entity->initialTickDone.exchange(true)) {
-						tile_entity->tick(game, delta);
+						tile_entity->tick(args);
 					}
 				}
 			}

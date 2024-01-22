@@ -33,7 +33,7 @@ namespace Game3 {
 		lastTime = now;
 		delta = std::chrono::duration_cast<std::chrono::nanoseconds>(difference).count() / 1e9;
 		time = time + delta;
-		HasTickQueue::tick(delta, *this, delta);
+		HasTickQueue::tick(delta, TickArgs{*this, getCurrentTick(), delta});
 		return true;
 	}
 

@@ -24,7 +24,7 @@ namespace Game3 {
 			EnergyAmount getEnergyCapacity() override;
 
 			void init(Game &) override;
-			void tick(Game &, float) override;
+			void tick(const TickArgs &) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 
 			void render(SpriteRenderer &) override;

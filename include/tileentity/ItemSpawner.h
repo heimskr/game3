@@ -13,7 +13,7 @@ namespace Game3 {
 
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
-			void tick(Game &, float) override;
+			void tick(const TickArgs &) override;
 			void render(SpriteRenderer &) override;
 
 			void encode(Game &, Buffer &) override;

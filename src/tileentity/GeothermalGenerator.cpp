@@ -83,12 +83,12 @@ namespace Game3 {
 		HasInventory::setInventory(Inventory::create(shared_from_this(), 2), 0);
 	}
 
-	void GeothermalGenerator::tick(Game &game, float delta) {
+	void GeothermalGenerator::tick(const TickArgs &args) {
 		RealmPtr realm = weakRealm.lock();
 		if (!realm || realm->getSide() != Side::Server)
 			return;
 
-		Ticker ticker{*this, game, delta};
+		Ticker ticker{*this, args};
 
 		enqueueTick(PERIOD);
 
@@ -103,13 +103,13 @@ namespace Game3 {
 		if (levels.empty())
 			return;
 
-		auto &registry = game.registry<GeothermalRecipeRegistry>();
+		auto &registry = args.game.registry<GeothermalRecipeRegistry>();
 
 		std::optional<EnergyAmount> leftovers;
 		auto energy_lock = energyContainer->uniqueLock();
 
 		for (const std::shared_ptr<GeothermalRecipe> &recipe: registry.items)
-			if (recipe->craft(game, fluidContainer, energyContainer, leftovers))
+			if (recipe->craft(args.game, fluidContainer, energyContainer, leftovers))
 				return;
 	}
 

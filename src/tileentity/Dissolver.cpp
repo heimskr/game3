@@ -53,12 +53,12 @@ namespace Game3 {
 		HasInventory::setInventory(Inventory::create(shared_from_this(), INPUT_CAPACITY + OUTPUT_CAPACITY), 0);
 	}
 
-	void Dissolver::tick(Game &game, float delta) {
+	void Dissolver::tick(const TickArgs &args) {
 		RealmPtr realm = weakRealm.lock();
 		if (!realm || realm->getSide() != Side::Server)
 			return;
 
-		Ticker ticker{*this, game, delta};
+		Ticker ticker{*this, args};
 		dissolve();
 		enqueueTick(PERIOD);
 	}

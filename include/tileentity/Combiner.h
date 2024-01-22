@@ -20,7 +20,7 @@ namespace Game3 {
 			void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) override;
 
 			void init(Game &) override;
-			void tick(Game &, float) override;
+			void tick(const TickArgs &) override;
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 			void absorbJSON(Game &, const nlohmann::json &) override;

@@ -48,18 +48,18 @@ namespace Game3 {
 		threadPool.start();
 	}
 
-	void Animal::tick(Game &game, float delta) {
+	void Animal::tick(const TickArgs &args) {
 		if (getSide() == Side::Server) {
 			if (firstWander) {
 				firstWander = false;
-			} else if (wanderTick <= game.getCurrentTick()) {
+			} else if (wanderTick <= args.game.getCurrentTick()) {
 				// The check here is to avoid spurious wanders if something else causes the animal to tick earlier than scheduled.
 				wander();
 				wanderTick = enqueueTick(std::chrono::milliseconds(int64_t(1000 * getWanderDistribution()(threadContext.rng))));
 			}
 		}
 
-		Entity::tick(game, delta);
+		Entity::tick(args);
 	}
 
 	HitPoints Animal::getMaxHealth() const {

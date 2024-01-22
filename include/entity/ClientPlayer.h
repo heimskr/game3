@@ -13,7 +13,7 @@ namespace Game3 {
 	class ClientPlayer: public Player {
 		private:
 			Lockable<std::string> lastMessage;
-			Atomic<float> lastMessageAge = std::numeric_limits<float>::infinity();
+			Atomic<Tick> lastMessageAge = 0;
 
 			ClientPlayer();
 
@@ -22,7 +22,7 @@ namespace Game3 {
 
 			static std::shared_ptr<ClientPlayer> create(Game &);
 
-			void tick(Game &, float delta) override;
+			void tick(const TickArgs &) override;
 			void render(const RendererContext &) override;
 			void renderLighting(const RendererContext &) override;
 			void stopContinuousInteraction();

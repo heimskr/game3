@@ -69,12 +69,12 @@ namespace Game3 {
 		tileIDs[pipe_type] = tileset[Corner(pipe_type)] + march_index;
 	}
 
-	void Pipe::tick(Game &game, float delta) {
+	void Pipe::tick(const TickArgs &args) {
 		if (getSide() == Side::Server) {
 			for (const PipeType pipe_type: PIPE_TYPES)
 				if (auto network = networks[pipe_type])
-					network->tick(game, game.getCurrentTick());
-			TileEntity::tick(game, delta);
+					network->tick(args.game, args.game.getCurrentTick());
+			TileEntity::tick(args);
 		}
 	}
 

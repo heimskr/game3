@@ -22,7 +22,7 @@ namespace Game3 {
 
 			void toJSON(nlohmann::json &) const override;
 			void init(Game &) override;
-			void tick(Game &, float) override;
+			void tick(const TickArgs &) override;
 			void render(const RendererContext &) override;
 			bool onInteractOn    (const std::shared_ptr<Player> &player, Modifiers, ItemStack *, Hand) override { return interact(player); }
 			bool onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, ItemStack *, Hand) override { return interact(player); }
@@ -40,7 +40,8 @@ namespace Game3 {
 			float sizeX = 16.f;
 			float sizeY = 16.f;
 			bool needsTexture = true;
-			Atomic<float> secondsLeft = 5 * 60;
+			Atomic<int> secondsLeft = 5 * 60;
+			bool firstTick = true;
 
 			ItemStack stack;
 

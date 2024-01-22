@@ -32,25 +32,24 @@ namespace Game3 {
 		});
 	}
 
-	void TextParticle::tick(Game &, float delta) {
+	void TextParticle::tick(const TickArgs &args) {
 		constexpr static float depth = -1.666f;
 
 		auto offset_lock = offset.uniqueLock();
 
-		offset.z = std::max(offset.z + delta * velocity.z, depth);
+		offset.z = std::max(offset.z + args.delta * velocity.z, depth);
 
 		if (offset.z <= depth) {
 			velocity = {};
-			age += delta;
+			age += args.delta;
 			if (lingerTime <= age)
 				queueDestruction();
 			return;
 		}
 
-
 		auto velocity_lock = velocity.uniqueLock();
-		velocity.z -= 32 * delta;
-		offset.x += delta * velocity.x;
+		velocity.z -= 32 * args.delta;
+		offset.x += args.delta * velocity.x;
 	}
 
 	void TextParticle::onSpawn() {

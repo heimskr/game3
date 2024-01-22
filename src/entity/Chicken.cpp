@@ -6,17 +6,17 @@ namespace Game3 {
 		constexpr std::chrono::seconds EGG_PERIOD{150};
 	}
 
-	void Chicken::tick(Game &game, float delta) {
+	void Chicken::tick(const TickArgs &args) {
 		if (getSide() == Side::Server) {
 			if (firstEgg) {
 				firstEgg = false;
-			} else if (eggTick <= game.getCurrentTick()) {
+			} else if (eggTick <= args.game.getCurrentTick()) {
 				layEgg();
 				eggTick = enqueueTick(EGG_PERIOD);
 			}
 		}
 
-		Animal::tick(game, delta);
+		Animal::tick(args);
 	}
 
 	void Chicken::layEgg() {

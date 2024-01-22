@@ -33,12 +33,13 @@ namespace Game3 {
 		HasInventory::setInventory(Inventory::create(shared_from_this(), 10), 0);
 	}
 
-	void Centrifuge::tick(Game &game, float delta) {
+	void Centrifuge::tick(const TickArgs &args) {
 		RealmPtr realm = weakRealm.lock();
 		if (!realm || realm->getSide() != Side::Server)
 			return;
 
-		Ticker ticker{*this, game, delta};
+		Ticker ticker{*this, args};
+		Game &game = args.game;
 
 		enqueueTick(PERIOD);
 

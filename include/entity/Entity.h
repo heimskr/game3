@@ -16,6 +16,7 @@
 #include "types/Direction.h"
 #include "types/MovementContext.h"
 #include "types/Position.h"
+#include "types/TickArgs.h"
 #include "types/Types.h"
 #include "ui/Modifiers.h"
 
@@ -103,7 +104,7 @@ namespace Game3 {
 			virtual void render(const RendererContext &);
 			virtual void renderUpper(const RendererContext &);
 			virtual void renderLighting(const RendererContext &);
-			virtual void tick(Game &, float delta);
+			virtual void tick(const TickArgs &);
 			/** Whether the entity should be included in save data. */
 			virtual bool shouldPersist() const { return true; }
 			virtual void onCreate() {}
@@ -210,7 +211,7 @@ namespace Game3 {
 
 			std::shared_ptr<Agent> getSharedAgent() override { return shared_from_this(); }
 
-			std::function<void(Game &, float)> getTickFunction();
+			std::function<void(const TickArgs &)> getTickFunction();
 
 			template <Duration D>
 			requires (!std::is_same_v<D, std::chrono::nanoseconds>)

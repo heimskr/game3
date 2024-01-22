@@ -21,7 +21,7 @@ namespace Game3 {
 
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 			void init(Game &) override;
-			void tick(Game &, float) override;
+			void tick(const TickArgs &) override;
 			float getMovementSpeed() const override { return 5.f; }
 			HitPoints getMaxHealth() const override;
 			bool wander();

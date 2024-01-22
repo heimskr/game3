@@ -47,7 +47,7 @@ namespace Game3 {
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 			bool isPlayer() const override { return true; }
-			void tick(Game &, float delta) override;
+			void tick(const TickArgs &) override;
 			void remove() override {}
 			bool interactOn(Modifiers, ItemStack *used_item = nullptr, Hand = Hand::None);
 			void interactNextTo(Modifiers, ItemStack *used_item = nullptr, Hand = Hand::None);

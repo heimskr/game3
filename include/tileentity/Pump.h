@@ -18,7 +18,7 @@ namespace Game3 {
 
 			std::string getName() const override { return "Pump"; }
 
-			void tick(Game &, float) override;
+			void tick(const TickArgs &) override;
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 			void absorbJSON(Game &, const nlohmann::json &) override;

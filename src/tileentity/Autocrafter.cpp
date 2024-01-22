@@ -67,12 +67,12 @@ namespace Game3 {
 		connectStationInventory();
 	}
 
-	void Autocrafter::tick(Game &game, float delta) {
+	void Autocrafter::tick(const TickArgs &args) {
 		RealmPtr realm = weakRealm.lock();
 		if (!realm || realm->getSide() != Side::Server)
 			return;
 
-		Ticker ticker{*this, game, delta};
+		Ticker ticker{*this, args};
 
 		autocraft();
 		enqueueTick(PERIOD);

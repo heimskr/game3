@@ -56,7 +56,7 @@ namespace Game3 {
 		game.allAgents[globalID] = shared_from_this();
 	}
 
-	void TileEntity::tick(Game &, float) {
+	void TileEntity::tick(const TickArgs &) {
 		tryBroadcast();
 	}
 
@@ -232,7 +232,7 @@ namespace Game3 {
 
 	void TileEntity::queueBroadcast(bool force) {
 		Broadcastable::queueBroadcast(force);
-		getGame().enqueue([this](Game &, float) { tryBroadcast(); });
+		getGame().enqueue([this](const TickArgs &) { tryBroadcast(); });
 	}
 
 	void TileEntity::tryBroadcast() {
@@ -256,10 +256,10 @@ namespace Game3 {
 		});
 	}
 
-	std::function<void(Game &, float)> TileEntity::getTickFunction() {
-		return [weak = getWeakSelf()](Game &game, float delta) {
+	std::function<void(const TickArgs &)> TileEntity::getTickFunction() {
+		return [weak = getWeakSelf()](const TickArgs &args) {
 			if (TileEntityPtr tile_entity = weak.lock())
-				tile_entity->tick(game, delta);
+				tile_entity->tick(args);
 		};
 	}
 

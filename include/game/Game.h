@@ -1,6 +1,5 @@
 #pragma once
 
-#include "types/Types.h"
 #include "entity/Player.h"
 #include "game/HasTickQueue.h"
 #include "net/Buffer.h"
@@ -8,6 +7,8 @@
 #include "registry/Registries.h"
 #include "registry/Registry.h"
 #include "threading/Lockable.h"
+#include "types/TickArgs.h"
+#include "types/Types.h"
 
 #include <chrono>
 #include <filesystem>
@@ -38,7 +39,7 @@ namespace Game3 {
 	class Tileset;
 	struct InteractionSet;
 
-	class Game: public std::enable_shared_from_this<Game>, public BufferContext, public HasTickQueue<Game &, float> {
+	class Game: public std::enable_shared_from_this<Game>, public BufferContext, public HasTickQueue<const TickArgs &> {
 		public:
 			static constexpr const char *DEFAULT_PATH = "game.g3";
 

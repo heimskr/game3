@@ -63,10 +63,16 @@ namespace Game3 {
 			stack.item->getOffsets(game, texture, offsetX, offsetY);
 	}
 
-	void ItemEntity::tick(Game &, float delta) {
-		secondsLeft = secondsLeft - delta;
+	void ItemEntity::tick(const TickArgs &) {
+		if (firstTick)
+			firstTick = false;
+		else
+			--secondsLeft;
+
 		if (secondsLeft <= 0)
 			queueDestruction();
+		else
+			enqueueTick(std::chrono::seconds(1));
 	}
 
 	void ItemEntity::render(const RendererContext &renderers) {

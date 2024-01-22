@@ -35,11 +35,11 @@ namespace Game3 {
 			spawnables.emplace_back(ItemStack::fromJSON(game, spawnable));
 	}
 
-	void ItemSpawner::tick(Game &game, float delta) {
+	void ItemSpawner::tick(const TickArgs &args) {
 		if (getSide() != Side::Server)
 			return;
 
-		Ticker ticker{*this, game, delta};
+		Ticker ticker{*this, args};
 
 		bool can_spawn = true;
 

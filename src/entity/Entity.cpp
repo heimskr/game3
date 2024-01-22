@@ -153,7 +153,7 @@ namespace Game3 {
 		increaseUpdateCounter();
 	}
 
-	void Entity::tick(Game &, float delta) {
+	void Entity::tick(const TickArgs &args) {
 		{
 			auto shared_lock = path.sharedLock();
 			if (!path.empty() && move(path.front())) {
@@ -164,6 +164,8 @@ namespace Game3 {
 					path.pop_front();
 			}
 		}
+
+		const auto delta = args.delta;
 
 		{
 			auto offset_lock = offset.uniqueLock();
@@ -1030,10 +1032,10 @@ namespace Game3 {
 		return game_ref.registry<TextureRegistry>().at(entity_texture->textureID);
 	}
 
-	std::function<void(Game &, float)> Entity::getTickFunction() {
-		return [weak = getWeakSelf()](Game &game, float delta) {
+	std::function<void(const TickArgs &)> Entity::getTickFunction() {
+		return [weak = getWeakSelf()](const TickArgs &args) {
 			if (EntityPtr entity = weak.lock())
-				entity->tick(game, delta);
+				entity->tick(args);
 		};
 	}
 

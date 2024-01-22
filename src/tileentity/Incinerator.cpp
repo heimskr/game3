@@ -32,12 +32,12 @@ namespace Game3 {
 		HasInventory::setInventory(Inventory::create(shared_from_this(), 64), 0);
 	}
 
-	void Incinerator::tick(Game &game, float delta) {
+	void Incinerator::tick(const TickArgs &args) {
 		RealmPtr realm = weakRealm.lock();
 		if (!realm || realm->getSide() != Side::Server)
 			return;
 
-		Ticker ticker{*this, game, delta};
+		Ticker ticker{*this, args};
 
 		enqueueTick(PERIOD);
 

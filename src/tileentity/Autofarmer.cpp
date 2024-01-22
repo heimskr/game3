@@ -36,12 +36,12 @@ namespace Game3 {
 		HasInventory::setInventory(Inventory::create(shared_from_this(), INPUT_CAPACITY + OUTPUT_CAPACITY), 0);
 	}
 
-	void Autofarmer::tick(Game &game, float delta) {
+	void Autofarmer::tick(const TickArgs &args) {
 		RealmPtr realm = weakRealm.lock();
 		if (!realm || realm->getSide() != Side::Server)
 			return;
 
-		Ticker ticker{*this, game, delta};
+		Ticker ticker{*this, args};
 
 		const EnergyAmount to_consume = ENERGY_PER_OPERATION * autofarm();
 		auto energy_lock = energyContainer->uniqueLock();

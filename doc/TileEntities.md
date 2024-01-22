@@ -43,7 +43,7 @@ MyTileEntity() = default;
 
 There are some virtual methods that are optional to override. These include:
 - `void init(Game &)`: called when the tile entity is created with the static `create` method.
-- `void tick(Game &, float delta)`: called every frame. `delta` is the time (in seconds) since the previous frame.
+- `void tick(const TickArgs &)`: called once at first. The tile entity is responsible for queueing further ticks with `enqueueTick`. The `delta` member of `TickArgs` is the time (in seconds) since the previous frame.
 - `void onSpawn()`: called when the tile entity is spawned new in a realm or added to a realm while the realm is being loaded from JSON.
 - `void onRemove()`: called when the tile entity is removed.
 - `void onNeighborUpdated(Index row_offset, Index column_offset)`: called when a neighbor is updated. The offsets are in the range [-1, 1]. An "update" is either a tile entity being removed or a tile ID changing.

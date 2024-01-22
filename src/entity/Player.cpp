@@ -100,8 +100,10 @@ namespace Game3 {
 			tooldown = 0.f;
 	}
 
-	void Player::tick(Game &game, float delta) {
-		Entity::tick(game, delta);
+	void Player::tick(const TickArgs &args) {
+		Entity::tick(args);
+
+		const auto delta = args.delta;
 
 		if (0.f < tooldown) {
 			tooldown -= delta;

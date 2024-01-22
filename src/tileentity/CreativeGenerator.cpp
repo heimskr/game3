@@ -30,12 +30,12 @@ namespace Game3 {
 		TileEntity::init(game);
 	}
 
-	void CreativeGenerator::tick(Game &game, float delta) {
+	void CreativeGenerator::tick(const TickArgs &args) {
 		RealmPtr realm = weakRealm.lock();
 		if (!realm || realm->getSide() != Side::Server)
 			return;
 
-		Ticker ticker{*this, game, delta};
+		Ticker ticker{*this, args};
 
 		{
 			assert(energyContainer);

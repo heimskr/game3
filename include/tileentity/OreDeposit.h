@@ -29,7 +29,7 @@ namespace Game3 {
 
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
-			void tick(Game &, float) override;
+			void tick(const TickArgs &) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 			void render(SpriteRenderer &) override;
 			const Ore & getOre(const Game &) const;

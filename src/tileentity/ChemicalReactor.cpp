@@ -64,12 +64,12 @@ namespace Game3 {
 		HasInventory::setInventory(Inventory::create(shared_from_this(), INPUT_CAPACITY + OUTPUT_CAPACITY), 0);
 	}
 
-	void ChemicalReactor::tick(Game &game, float delta) {
+	void ChemicalReactor::tick(const TickArgs &args) {
 		RealmPtr realm = weakRealm.lock();
 		if (!realm || realm->getSide() != Side::Server)
 			return;
 
-		Ticker ticker{*this, game, delta};
+		Ticker ticker{*this, args};
 
 		enqueueTick(PERIOD);
 

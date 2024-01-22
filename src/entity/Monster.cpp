@@ -21,8 +21,10 @@ namespace Game3 {
 	Monster::Monster():
 		Entity("base:invalid/Monster") {}
 
-	void Monster::tick(Game &game, float delta) {
-		Entity::tick(game, delta);
+	void Monster::tick(const TickArgs &args) {
+		Entity::tick(args);
+
+		const auto delta = args.delta;
 
 		if (getSide() != Side::Server)
 			return;

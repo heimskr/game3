@@ -68,8 +68,8 @@ Feel free to add parameters to the constructor as necessary. Your class is not r
 ### Optional Overrides
 
 There are some virtual methods that are optional to override. These include:
-- `void render(SpriteRenderer &)`: responsible for rendering the entity every frame.
-- `void tick(Game &, float delta)`: called every frame. `delta` is the time (in seconds) since the previous frame.
+- `void render(const RendererContext &)`: responsible for rendering the entity every frame.
+- `void tick(const TickArgs &)`: called every frame unless overridden. The `delta` member of `TickArgs` is the time (in seconds) since the previous frame.
 - `void remove()`: called when the entity should be removed. If you want to override this to run some code before the entity is removed, make sure you include `Entity::remove();` *after* your code.
                    If you don't include `Entity::remove();` at all, your entity won't be removed.
 - `bool onInteractOn(const PlayerPtr &)`: called when the player is standing on the same square as your entity and presses the same-square interaction key (`E` by default).
@@ -79,7 +79,7 @@ There are some virtual methods that are optional to override. These include:
 - `void init(Game &)`: called when the entity is created with the static `create` method.
 - `void initAfterLoad(Game &)`: called after the game is loaded from a save file.
 - `float getMovementSpeed() const`: returns how many tiles the entity can move per second.
-- `Glib::ustring getName()`: returns the display name for the entity. If not overridden, it'll return something like `"Unknown Entity (base:entity/my_entity)"`.
+- `std::string getName() const`: returns the display name for the entity. If not overridden, it'll return something like `"Unknown Entity (base:entity/my_entity)"`.
 
 For LivingEntity:
 - `HitPoints getMaxHealth() const`: returns the number of hitpoints the entity has when it's at full health.

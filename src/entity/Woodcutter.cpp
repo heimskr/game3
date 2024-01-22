@@ -73,8 +73,11 @@ namespace Game3 {
 		return true;
 	}
 
-	void Woodcutter::tick(Game &game, float delta) {
-		Worker::tick(game, delta);
+	void Woodcutter::tick(const TickArgs &args) {
+		Worker::tick(args);
+
+		Game &game = args.game;
+		const auto delta = args.delta;
 
 		if (getSide() == Side::Client || stillStuck(delta))
 			return;

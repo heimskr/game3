@@ -54,8 +54,8 @@ namespace Game3 {
 		uses = json.contains("uses")? json.at("uses").get<uint32_t>() : 0;
 	}
 
-	void OreDeposit::tick(Game &game, float delta) {
-		TileEntity::tick(game, delta);
+	void OreDeposit::tick(const TickArgs &args) {
+		TileEntity::tick(args);
 		ready = true;
 	}
 
