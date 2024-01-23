@@ -11,7 +11,7 @@ namespace Game3 {
 		tileEntityID = ID();
 	}
 
-	bool Stockpile::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers modifiers, ItemStack *used_item, Hand hand) {
+	bool Stockpile::onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) {
 		if (getSide() != Side::Server)
 			return false;
 

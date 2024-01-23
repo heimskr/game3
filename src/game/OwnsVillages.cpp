@@ -27,7 +27,7 @@ namespace Game3 {
 		if (use_transaction)
 			transaction.emplace(database);
 
-		SQLite::Statement statement{database, "INSERT OR REPLACE INTO villages VALUES (?, ?, ?, ?, ?, ?, ?)"};
+		SQLite::Statement statement{database, "INSERT OR REPLACE INTO villages VALUES (?, ?, ?, ?, ?, ?, ?, ?)"};
 
 		auto lock = villageMap.sharedLock();
 		for (const auto &[id, village]: villageMap) {
@@ -38,6 +38,7 @@ namespace Game3 {
 			statement.bind(5, nlohmann::json(village->options).dump());
 			statement.bind(6, nlohmann::json(village->getRichness()).dump());
 			statement.bind(7, nlohmann::json(village->getResources()).dump());
+			statement.bind(8, village->getName());
 			statement.exec();
 			statement.reset();
 		}
@@ -62,9 +63,13 @@ namespace Game3 {
 			VillageOptions options(nlohmann::json::parse(query.getColumn(4).getString()));
 			Richness richness(nlohmann::json::parse(query.getColumn(5).getString()));
 			Resources resources(nlohmann::json::parse(query.getColumn(6).getString()));
-			auto village = std::make_shared<Village>(id, realm_id, chunk_position, position, options, std::move(richness), std::move(resources));
+			std::string name(query.getColumn(7));
+
+			auto village = std::make_shared<Village>(id, realm_id, std::move(name), chunk_position, position, options, std::move(richness), std::move(resources));
+
 			villageMap[id] = village;
 			lastVillageID = std::max(lastVillageID.load(), id);
+
 			village->setGame(game);
 			associateWithRealm(village, realm_id);
 		}

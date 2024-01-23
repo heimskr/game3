@@ -2,6 +2,8 @@
 #include "game/ServerGame.h"
 #include "game/Village.h"
 
+#include "NameGen.h"
+
 namespace Game3 {
 	namespace {
 		constexpr std::chrono::seconds PERIOD{1};
@@ -17,17 +19,19 @@ namespace Game3 {
 	Village::Village(ServerGame &game, RealmID realm_id, ChunkPosition chunk_position, const Position &position_, const VillageOptions &options_):
 		Village(game, game.getNewVillageID(), realm_id, chunk_position, position_, options_) {}
 
-	Village::Village(ServerGame &game, size_t id_, RealmID realm_id, ChunkPosition chunk_position, const Position &position_, const VillageOptions &options_):
+	Village::Village(ServerGame &game, VillageID id_, RealmID realm_id, ChunkPosition chunk_position, const Position &position_, const VillageOptions &options_):
 		HasGame(game.toServerPointer()),
 		id(id_),
+		name(NameGen::makeRandomLanguage().makeName()),
 		realmID(realm_id),
 		chunkPosition(chunk_position),
 		position(position_),
 		options(options_),
 		richness(Richness::makeRandom(game)) {}
 
-	Village::Village(size_t id_, RealmID realm_id, ChunkPosition chunk_position, const Position &position_, const VillageOptions &options_, Richness richness_, Resources resources_):
+	Village::Village(VillageID id_, RealmID realm_id, std::string name_, ChunkPosition chunk_position, const Position &position_, const VillageOptions &options_, Richness richness_, Resources resources_):
 		id(id_),
+		name(std::move(name_)),
 		realmID(realm_id),
 		chunkPosition(chunk_position),
 		position(position_),
@@ -55,9 +59,9 @@ namespace Game3 {
 	void Village::tick(const TickArgs &) {
 		addResources();
 
-		if (id == 1) {
-			INFO("Village " << id << " resources: " << nlohmann::json(resources).dump());
-		}
+		// if (id == 1) {
+			INFO("Village " << id << " (" << name << ") resources: " << nlohmann::json(resources).dump());
+		// }
 
 		getGame().enqueue(sigc::mem_fun(*this, &Village::tick), PERIOD);
 	}
@@ -76,6 +80,7 @@ namespace Game3 {
 				options VARCHAR(255),
 				richness MEDIUMTEXT,
 				resources MEDIUMTEXT,
+				name VARCHAR(255),
 
 				PRIMARY KEY(realmID, id)
 			);
