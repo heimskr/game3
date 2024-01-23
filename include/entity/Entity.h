@@ -134,7 +134,8 @@ namespace Game3 {
 			/** Returns the position of the tile in front of the entity. */
 			Position nextTo() const;
 			std::string debug() const;
-			void queueForMove(const std::function<bool(const std::shared_ptr<Entity> &)> &);
+			/** The second parameter to the function indicates whether the call is because the queue is being cleared, rather than because the entity actually moved. */
+			void queueForMove(std::function<bool(const std::shared_ptr<Entity> &, bool)>);
 			void queueDestruction();
 			PathResult pathfind(const Position &start, const Position &goal, std::list<Direction> &, size_t loop_max = 1'000);
 			bool pathfind(const Position &goal, size_t loop_max = 1'000);
@@ -203,7 +204,7 @@ namespace Game3 {
 
 			bool canMoveTo(const Position &) const;
 			/** A list of functions to call the next time the entity moves. Each function returns whether it should be removed from the queue. */
-			Lockable<std::list<std::function<bool(const std::shared_ptr<Entity> &)>>> moveQueue;
+			Lockable<std::list<std::function<bool(const std::shared_ptr<Entity> &, bool)>>> moveQueue;
 			std::shared_ptr<Texture> getTexture();
 			inline auto getHeldLeftTexture()  const { return heldLeft.texture;  }
 			inline auto getHeldRightTexture() const { return heldRight.texture; }

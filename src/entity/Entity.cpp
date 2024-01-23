@@ -582,7 +582,7 @@ namespace Game3 {
 		{
 			auto move_lock = moveQueue.uniqueLock();
 			std::erase_if(moveQueue, [shared](const auto &function) {
-				return function(shared);
+				return function(shared, false);
 			});
 		}
 
@@ -633,9 +633,9 @@ namespace Game3 {
 		return sstream.str();
 	}
 
-	void Entity::queueForMove(const std::function<bool(const std::shared_ptr<Entity> &)> &function) {
+	void Entity::queueForMove(std::function<bool(const std::shared_ptr<Entity> &, bool)> function) {
 		auto lock = moveQueue.uniqueLock();
-		moveQueue.push_back(function);
+		moveQueue.push_back(std::move(function));
 	}
 
 	void Entity::queueDestruction() {
@@ -1120,8 +1120,15 @@ namespace Game3 {
 	}
 
 	void Entity::clearQueues() {
-		auto lock = moveQueue.uniqueLock();
-		moveQueue.clear();
+		decltype(moveQueue)::Base old_queue;
+		{
+			auto lock = moveQueue.uniqueLock();
+			old_queue = std::move(moveQueue.getBase());
+		}
+
+		std::ranges::for_each(old_queue, [shared = getSelf()](const auto &fn) {
+			fn(shared, true);
+		});
 	}
 
 	bool Entity::isInLimbo() const {

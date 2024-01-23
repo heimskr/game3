@@ -32,7 +32,7 @@ namespace Game3 {
 				player->give(ItemStack(getGame(), itemName));
 		} else {
 			player->addStationType(stationType);
-			player->queueForMove([station_type = stationType](const EntityPtr &player) {
+			player->queueForMove([station_type = stationType](const EntityPtr &player, bool) {
 				safeDynamicCast<Player>(player)->removeStationType(station_type);
 				return true;
 			});

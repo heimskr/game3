@@ -60,11 +60,11 @@ namespace Game3 {
 
 	bool Woodcutter::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, ItemStack *, Hand) {
 		if (getSide() == Side::Client) {
-			auto &window = getRealm()->getGame().toClient().getWindow();
-			auto &tab = *window.inventoryTab;
+			MainWindow &window = getRealm()->getGame().toClient().getWindow();
+			std::shared_ptr<InventoryTab> tab = window.inventoryTab;
 			std::cout << "Woodcutter: money = " << money << ", phase = " << int(phase) << ", stuck = " << stuck << '\n';
-			player->queueForMove([&tab](const auto &) {
-				tab.removeModule();
+			player->queueForMove([tab](const auto &, bool) {
+				tab->removeModule();
 				return true;
 			});
 			window.showExternalInventory(std::dynamic_pointer_cast<ClientInventory>(getInventory(0)));

@@ -58,11 +58,6 @@ namespace Game3 {
 
 	void Village::tick(const TickArgs &) {
 		addResources();
-
-		// if (id == 1) {
-			INFO("Village " << id << " (" << name << ") resources: " << nlohmann::json(resources).dump());
-		// }
-
 		getGame().enqueue(sigc::mem_fun(*this, &Village::tick), PERIOD);
 	}
 

@@ -55,8 +55,9 @@ namespace Game3 {
 		if (!silent)
 			player->send(OpenModuleForAgentPacket(EnergyLevelModule::ID(), getGID(), true));
 
-		player->queueForMove([this, self = shared_from_this()](const EntityPtr &entity) {
-			removeObserver(safeDynamicCast<Player>(entity));
+		player->queueForMove([weak_self = getWeakSelf()](const EntityPtr &entity, bool) {
+			if (auto self = weak_self.lock())
+				safeDynamicCast<EnergeticTileEntity>(self)->removeObserver(safeDynamicCast<Player>(entity));
 			return true;
 		});
 	}
