@@ -1,11 +1,12 @@
 #pragma once
 
-#include "types/Types.h"
+#include "container/WeakSet.h"
 #include "entity/EntityZCompare.h"
 #include "error/MultipleFoundError.h"
 #include "error/NoneFoundError.h"
 #include "game/BiomeMap.h"
 #include "game/TileProvider.h"
+#include "game/Village.h"
 #include "graphics/ElementBufferedRenderer.h"
 #include "graphics/UpperRenderer.h"
 #include "packet/ChunkTilesPacket.h"
@@ -18,9 +19,9 @@
 #include "threading/SharedRecursiveMutex.h"
 #include "tileentity/TileEntity.h"
 #include "types/TileUpdateContext.h"
+#include "types/Types.h"
 #include "ui/Modifiers.h"
 #include "util/RWLock.h"
-#include "container/WeakSet.h"
 
 #include <nlohmann/json_fwd.hpp>
 
@@ -347,6 +348,7 @@ namespace Game3 {
 			Lockable<std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::set<EntityPtr, EntityZCompare>>>>> entitiesByChunk;
 			Lockable<std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::unordered_set<TileEntityPtr>>>>> tileEntitiesByChunk;
 			ChunkPosition lastPlayerChunk{INT32_MIN, INT32_MIN};
+			std::unordered_set<VillagePtr> villages;
 
 			friend class ServerGame;
 

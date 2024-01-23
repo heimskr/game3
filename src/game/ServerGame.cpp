@@ -302,6 +302,11 @@ namespace Game3 {
 		return std::nullopt;
 	}
 
+	void ServerGame::associateWithRealm(const VillagePtr &village, RealmID realm_id) {
+		RealmPtr realm = getRealm(realm_id);
+		realm->villages.insert(village);
+	}
+
 	void ServerGame::handlePacket(RemoteClient &client, Packet &packet) {
 		packet.handle(*this, client);
 	}

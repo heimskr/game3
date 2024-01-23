@@ -1,4 +1,4 @@
-#include "game/HasVillages.h"
+#include "game/OwnsVillages.h"
 #include "realm/Realm.h"
 
 #include <nlohmann/json.hpp>
@@ -7,25 +7,21 @@
 #include <optional>
 
 namespace Game3 {
-	size_t HasVillages::getNewVillageID() {
+	size_t OwnsVillages::getNewVillageID() {
 		return ++lastVillageID;
 	}
 
-	Village & HasVillages::getVillage(size_t id) {
+	VillagePtr OwnsVillages::getVillage(size_t id) const {
 		return villageMap.at(id);
 	}
 
-	const Village & HasVillages::getVillage(size_t id) const {
-		return villageMap.at(id);
-	}
-
-	void HasVillages::addVillage(ServerGame &game, ChunkPosition chunk_position, const Place &place, const VillageOptions &options) {
+	void OwnsVillages::addVillage(ServerGame &game, ChunkPosition chunk_position, const Place &place, const VillageOptions &options) {
 		auto lock = villageMap.uniqueLock();
 		const auto new_id = getNewVillageID();
-		villageMap[new_id] = Village(game, new_id, place.realm->getID(), chunk_position, place.position, options);
+		villageMap[new_id] = std::make_shared<Village>(game, new_id, place.realm->getID(), chunk_position, place.position, options);
 	}
 
-	void HasVillages::saveVillages(SQLite::Database &database, bool use_transaction) {
+	void OwnsVillages::saveVillages(SQLite::Database &database, bool use_transaction) {
 		std::optional<SQLite::Transaction> transaction;
 		if (use_transaction)
 			transaction.emplace(database);
@@ -34,13 +30,13 @@ namespace Game3 {
 
 		auto lock = villageMap.sharedLock();
 		for (const auto &[id, village]: villageMap) {
-			statement.bind(1, int64_t(village.getID()));
-			statement.bind(2, village.getRealmID());
-			statement.bind(3, std::string(village.getChunkPosition()));
-			statement.bind(4, std::string(village.getPosition()));
-			statement.bind(5, nlohmann::json(village.options).dump());
-			statement.bind(6, nlohmann::json(village.getRichness()).dump());
-			statement.bind(7, nlohmann::json(village.getResources()).dump());
+			statement.bind(1, int64_t(village->getID()));
+			statement.bind(2, village->getRealmID());
+			statement.bind(3, std::string(village->getChunkPosition()));
+			statement.bind(4, std::string(village->getPosition()));
+			statement.bind(5, nlohmann::json(village->options).dump());
+			statement.bind(6, nlohmann::json(village->getRichness()).dump());
+			statement.bind(7, nlohmann::json(village->getResources()).dump());
 			statement.exec();
 			statement.reset();
 		}
@@ -50,7 +46,7 @@ namespace Game3 {
 			transaction->commit();
 	}
 
-	void HasVillages::loadVillages(SQLite::Database &database) {
+	void OwnsVillages::loadVillages(SQLite::Database &database) {
 		SQLite::Statement query{database, "SELECT * FROM villages"};
 
 		auto lock = villageMap.uniqueLock();
@@ -65,8 +61,10 @@ namespace Game3 {
 			VillageOptions options(nlohmann::json::parse(query.getColumn(4).getString()));
 			Richness richness(nlohmann::json::parse(query.getColumn(5).getString()));
 			Resources resources(nlohmann::json::parse(query.getColumn(6).getString()));
-			villageMap[id] = Village(id, realm_id, chunk_position, position, options, std::move(richness), std::move(resources));
+			auto village = std::make_shared<Village>(id, realm_id, chunk_position, position, options, std::move(richness), std::move(resources));
+			villageMap[id] = village;
 			lastVillageID = std::max(lastVillageID.load(), id);
+			associateWithRealm(village, realm_id);
 		}
 	}
 }

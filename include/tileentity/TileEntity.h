@@ -33,7 +33,6 @@ namespace Game3 {
 			Lockable<Position> position{-1, -1};
 			bool solid = false;
 			nlohmann::json extraData;
-			std::atomic_bool initialTickDone = false;
 
 			template <typename T, typename... Args>
 			static std::shared_ptr<T> create(Args &&...args) {

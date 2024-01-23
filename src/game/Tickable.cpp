@@ -2,6 +2,10 @@
 #include "game/Tickable.h"
 
 namespace Game3 {
+	bool Tickable::tryInitialTick() {
+		return !initialTickDone.exchange(true);
+	}
+
 	void Tickable::tryEnqueueTick() {
 		didTick();
 

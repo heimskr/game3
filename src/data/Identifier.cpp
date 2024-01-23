@@ -16,21 +16,21 @@ namespace Game3 {
 		Identifier(std::string_view(combined)) {}
 
 	std::string Identifier::getPath() const {
-		const auto slash = name.find_last_of('/');
+		const size_t slash = name.find_last_of('/');
 		if (slash == std::string::npos)
 			return "";
 		return name.substr(0, slash);
 	}
 
 	std::string Identifier::getPathStart() const {
-		const auto slash = name.find('/');
+		const size_t slash = name.find('/');
 		if (slash == std::string::npos)
 			return "";
 		return name.substr(0, slash);
 	}
 
 	std::string Identifier::getPostPath() const {
-		const auto slash = name.find_last_of('/');
+		const size_t slash = name.find_last_of('/');
 		if (slash == std::string::npos)
 			return name;
 		return name.substr(slash + 1);

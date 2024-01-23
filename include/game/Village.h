@@ -1,13 +1,20 @@
 #pragma once
 
 #include "data/Richness.h"
+#include "game/HasGame.h"
+#include "game/Tickable.h"
 #include "types/ChunkPosition.h"
+#include "types/TickArgs.h"
 #include "types/VillageOptions.h"
+
+#include <memory>
+#include <optional>
+#include <string>
 
 namespace Game3 {
 	class ServerGame;
 
-	class Village {
+	class Village: public Tickable, public HasGame {
 		public:
 			Village() = default;
 			Village(ServerGame &, const Place &, const VillageOptions &);
@@ -25,6 +32,11 @@ namespace Game3 {
 
 			std::optional<double> getRichness(const Identifier &);
 
+			Tick enqueueTick() override;
+			void tick(const TickArgs &);
+
+			Game & getGame() override;
+
 			static std::string getSQL();
 
 		private:
@@ -36,6 +48,8 @@ namespace Game3 {
 			Richness richness;
 			Resources resources;
 
-		friend class HasVillages;
+		friend class OwnsVillages;
 	};
+
+	using VillagePtr = std::shared_ptr<Village>;
 }

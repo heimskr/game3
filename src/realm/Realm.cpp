@@ -463,7 +463,7 @@ namespace Game3 {
 						if (auto client = player->toServer()->weakClient.lock())
 							guards.emplace_back(client);
 
-						if (!player->ticked && !player->initialTickDone.exchange(true)) {
+						if (!player->ticked && player->tryInitialTick()) {
 							player->ticked = true;
 							player->tick(args);
 						}
@@ -480,7 +480,7 @@ namespace Game3 {
 							auto set_lock = iter->second->sharedLock();
 							by_chunk_lock.unlock();
 							for (const auto &entity: *iter->second) {
-								if (!entity->isPlayer() && !entity->initialTickDone.exchange(true)) {
+								if (!entity->isPlayer() && entity->tryInitialTick()) {
 #ifdef PROFILE_TICKS
 									Timer timer{"TickEntity"};
 #endif
@@ -499,7 +499,7 @@ namespace Game3 {
 #ifdef PROFILE_TICKS
 								Timer timer{"TickTileEntity"};
 #endif
-								if (!tile_entity->initialTickDone.exchange(true)) {
+								if (tile_entity->tryInitialTick()) {
 									tile_entity->tick(args);
 								}
 							}
@@ -591,7 +591,7 @@ namespace Game3 {
 			{
 				auto lock = entities.sharedLock();
 				for (const auto &entity: entities) {
-					if (!entity->initialTickDone.exchange(true)) {
+					if (entity->tryInitialTick()) {
 						entity->tick(args);
 					}
 				}
@@ -600,7 +600,7 @@ namespace Game3 {
 			{
 				auto lock = tileEntities.sharedLock();
 				for (auto &[index, tile_entity]: tileEntities) {
-					if (!tile_entity->initialTickDone.exchange(true)) {
+					if (tile_entity->tryInitialTick()) {
 						tile_entity->tick(args);
 					}
 				}

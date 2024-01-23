@@ -14,19 +14,21 @@ namespace SQLite {
 namespace Game3 {
 	struct Place;
 
-	class HasVillages {
+	class OwnsVillages {
 		public:
-			HasVillages() = default;
+			OwnsVillages() = default;
 
 			size_t getNewVillageID();
-			Village & getVillage(size_t id);
-			const Village & getVillage(size_t id) const;
+			VillagePtr getVillage(size_t id) const;
 			void addVillage(ServerGame &, ChunkPosition, const Place &, const VillageOptions &);
 			void saveVillages(SQLite::Database &, bool use_transaction = true);
 			void loadVillages(SQLite::Database &);
 
+		protected:
+			virtual void associateWithRealm(const VillagePtr &, RealmID) = 0;
+
 		private:
-			Lockable<std::map<size_t, Village>> villageMap;
+			Lockable<std::map<size_t, VillagePtr>> villageMap;
 			std::atomic_size_t lastVillageID = 0;
 	};
 }
