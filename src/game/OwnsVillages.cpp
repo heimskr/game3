@@ -1,4 +1,5 @@
 #include "game/OwnsVillages.h"
+#include "game/ServerGame.h"
 #include "realm/Realm.h"
 
 #include <nlohmann/json.hpp>
@@ -46,7 +47,7 @@ namespace Game3 {
 			transaction->commit();
 	}
 
-	void OwnsVillages::loadVillages(SQLite::Database &database) {
+	void OwnsVillages::loadVillages(const std::shared_ptr<ServerGame> &game, SQLite::Database &database) {
 		SQLite::Statement query{database, "SELECT * FROM villages"};
 
 		auto lock = villageMap.uniqueLock();
@@ -64,6 +65,7 @@ namespace Game3 {
 			auto village = std::make_shared<Village>(id, realm_id, chunk_position, position, options, std::move(richness), std::move(resources));
 			villageMap[id] = village;
 			lastVillageID = std::max(lastVillageID.load(), id);
+			village->setGame(game);
 			associateWithRealm(village, realm_id);
 		}
 	}

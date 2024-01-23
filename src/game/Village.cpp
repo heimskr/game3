@@ -2,6 +2,10 @@
 #include "game/Village.h"
 
 namespace Game3 {
+	namespace {
+		constexpr std::chrono::seconds PERIOD{1};
+	}
+
 	Village::Village(ServerGame &game, const Place &place, const VillageOptions &options_):
 		Village(game, place.realm->id, ChunkPosition(place.position), place.position, options_) {}
 
@@ -35,7 +39,7 @@ namespace Game3 {
 	}
 
 	void Village::tick(const TickArgs &) {
-
+		getGame().enqueue(sigc::mem_fun(*this, &Village::tick), PERIOD);
 	}
 
 	Game & Village::getGame() {

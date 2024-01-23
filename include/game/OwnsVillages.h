@@ -12,6 +12,7 @@ namespace SQLite {
 }
 
 namespace Game3 {
+	class ServerGame;
 	struct Place;
 
 	class OwnsVillages {
@@ -22,7 +23,7 @@ namespace Game3 {
 			VillagePtr getVillage(size_t id) const;
 			void addVillage(ServerGame &, ChunkPosition, const Place &, const VillageOptions &);
 			void saveVillages(SQLite::Database &, bool use_transaction = true);
-			void loadVillages(SQLite::Database &);
+			void loadVillages(const std::shared_ptr<ServerGame> &, SQLite::Database &);
 
 		protected:
 			virtual void associateWithRealm(const VillagePtr &, RealmID) = 0;

@@ -347,8 +347,8 @@ namespace Game3 {
 			MTQueue<std::function<void()>> generalQueue;
 			Lockable<std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::set<EntityPtr, EntityZCompare>>>>> entitiesByChunk;
 			Lockable<std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::unordered_set<TileEntityPtr>>>>> tileEntitiesByChunk;
+			Lockable<std::unordered_set<VillagePtr>> villages;
 			ChunkPosition lastPlayerChunk{INT32_MIN, INT32_MIN};
-			std::unordered_set<VillagePtr> villages;
 
 			friend class ServerGame;
 

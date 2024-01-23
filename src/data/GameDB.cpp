@@ -258,7 +258,7 @@ namespace Game3 {
 
 		{
 			Timer villages_timer{"LoadVillages"};
-			game.loadVillages(*database);
+			game.loadVillages(game.toServerPointer(), *database);
 		}
 
 		const bool force_migrate = std::filesystem::exists(".force-migrate");

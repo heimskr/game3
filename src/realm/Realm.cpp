@@ -472,6 +472,14 @@ namespace Game3 {
 			}
 
 			{
+				auto lock = villages.sharedLock();
+				for (const VillagePtr &village: villages) {
+					if (village->tryInitialTick())
+						village->tick(args);
+				}
+			}
+
+			{
 				auto visible_lock = visibleChunks.sharedLock();
 				for (const auto &chunk: visibleChunks) {
 					{
@@ -505,6 +513,7 @@ namespace Game3 {
 							}
 						}
 					}
+
 					std::uniform_int_distribution<int64_t> distribution{0, CHUNK_SIZE - 1};
 					Tileset &tileset = getTileset();
 					auto shared = shared_from_this();
