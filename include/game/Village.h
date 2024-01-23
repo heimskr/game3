@@ -48,6 +48,8 @@ namespace Game3 {
 			Richness richness;
 			Resources resources;
 
+			void addResources();
+
 		friend class OwnsVillages;
 	};
 

@@ -4,7 +4,6 @@
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "game/Stonks.h"
-#include "realm/Keep.h"
 
 namespace Game3 {
 	double buyPriceToSellPrice(double buy_price, double greed) {
@@ -59,10 +58,6 @@ namespace Game3 {
 		return totalSellPrice(*merchant.getInventory(0), merchant.money, merchant.greed, stack, out);
 	}
 
-	bool totalSellPrice(const Keep &keep, const ItemStack &stack, MoneyCount &out) {
-		return totalSellPrice(*keep.stockpileInventory, keep.money, keep.greed, stack, out);
-	}
-
 	size_t totalBuyPrice(const Inventory &inventory, MoneyCount money, const ItemStack &stack) {
 		double merchant_amount = inventory.count(stack);
 		const double base = stack.item->basePrice;
@@ -87,9 +82,5 @@ namespace Game3 {
 
 	size_t totalBuyPrice(const Merchant &merchant, const ItemStack &stack) {
 		return totalBuyPrice(*merchant.getInventory(0), merchant.money, stack);
-	}
-
-	size_t totalBuyPrice(const Keep &keep, const ItemStack &stack) {
-		return totalBuyPrice(*keep.stockpileInventory, keep.money, stack);
 	}
 }

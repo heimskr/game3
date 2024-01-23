@@ -7,3 +7,6 @@
 [submodule "stb"]
 	path = stb
 	url = https://github.com/nothings/stb.git
+[submodule "subprojects/namegen"]
+	path = subprojects/namegen
+	url = https://github.com/heimskr/namegen.git

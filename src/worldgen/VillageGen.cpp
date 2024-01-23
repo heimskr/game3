@@ -40,10 +40,9 @@ namespace Game3 {
 		if (!village_position)
 			return std::nullopt;
 
-		WorldGen::generateTown(realm, prng, *village_position + Position(PADDING + 1, 0), width, height, PADDING, seed);
-
 		ServerGame &game = realm->getGame().toServer();
-		game.addVillage(game, chunk_position, Place{*village_position, realm}, village_options);
+		VillagePtr village = game.addVillage(game, chunk_position, Place{*village_position, realm}, village_options);
+		WorldGen::generateTown(realm, prng, *village_position + Position(PADDING + 1, 0), width, height, PADDING, seed, village);
 
 		return village_position;
 	}

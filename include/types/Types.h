@@ -35,6 +35,7 @@ namespace Game3 {
 	using Tick           = uint64_t;
 	using EnergyAmount   = uint64_t;
 	using InventoryID    = uint16_t;
+	using VillageID      = uint64_t;
 
 	using ItemID     = Identifier;
 	using EntityType = Identifier;

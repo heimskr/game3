@@ -11,8 +11,14 @@ namespace Game3 {
 			Resource(Identifier, const nlohmann::json &);
 
 			double sampleRichness(double factor = 10) const;
+			bool sampleLikelihood() const;
+			inline auto getCap() const { return cap; }
 
 		private:
 			std::pair<double, double> richnessRange;
+			double likelihood{};
+			double cap{};
+
+			static double findCap(const nlohmann::json &);
 	};
 }

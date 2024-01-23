@@ -1,7 +1,6 @@
 #include "game/Game.h"
 #include "realm/Cave.h"
 #include "realm/House.h"
-#include "realm/Keep.h"
 #include "realm/Overworld.h"
 #include "realm/RealmFactory.h"
 #include "realm/ShadowRealm.h"
@@ -28,7 +27,7 @@ namespace Game3 {
 		addRealm.operator()<Realm>("base:realm/blacksmith");
 		addRealm.operator()<Cave>(Cave::ID());
 		addRealm.operator()<Realm>("base:realm/tavern");
-		addRealm.operator()<Keep>(Keep::ID());
+		addRealm.operator()<Realm>("base:realm/keep");
 	}
 
 	RealmPtr Game::tryRealm(RealmID realm_id) const {

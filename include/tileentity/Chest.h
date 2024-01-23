@@ -12,13 +12,6 @@ namespace Game3 {
 			std::string name;
 			Identifier itemName{"base", "item/chest"};
 
-			Chest(const Chest &) = delete;
-			Chest(Chest &&) = default;
-			~Chest() override = default;
-
-			Chest & operator=(const Chest &) = delete;
-			Chest & operator=(Chest &&) = default;
-
 			std::string getName() const override;
 
 			void toJSON(nlohmann::json &) const override;

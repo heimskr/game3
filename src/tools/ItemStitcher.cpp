@@ -5,6 +5,7 @@
 #include "graphics/ItemSet.h"
 #include "graphics/Texture.h"
 #include "registry/Registries.h"
+#include "threading/ThreadContext.h"
 #include "tools/ItemStitcher.h"
 #include "util/Crypto.h"
 #include "util/FS.h"

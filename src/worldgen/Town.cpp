@@ -1,7 +1,6 @@
 #include "game/Crop.h"
 #include "game/Game.h"
 #include "graphics/Tileset.h"
-#include "realm/Keep.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
 #include "util/Timer.h"
@@ -13,7 +12,7 @@
 #include "worldgen/WorldGen.h"
 
 namespace Game3::WorldGen {
-	void generateTown(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const Position &position, Index width, Index height, Index pad, int seed) {
+	void generateTown(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const Position &position, Index width, Index height, Index pad, int seed, const VillagePtr &village) {
 		Index row = 0;
 		Index column = 0;
 
@@ -158,10 +157,10 @@ namespace Game3::WorldGen {
 		const Position keep_entrance(keep_height - 2, keep_width / 2);
 		const Position keep_exit = keep_position + Position(2, 0);
 		auto keep_biomemap = std::make_shared<BiomeMap>(keep_width, keep_height);
-		auto keep_realm = Realm::create<Keep>(game, keep_realm_id, town_origin, width, height, -seed);
+		auto keep_realm = Realm::create(game, keep_realm_id, "base:realm/keep"_id, "base:tileset/monomap"_id, -seed);
 		keep_realm->outdoors = false;
 		game.addRealm(keep_realm_id, keep_realm);
-		WorldGen::generateKeep(keep_realm, rng, realm->id, keep_width, keep_height, keep_exit);
+		WorldGen::generateKeep(keep_realm, rng, realm->id, keep_width, keep_height, keep_exit, village->getID());
 		keep_realm->remakePathMap(ChunkRange({-1, -1}, {1, 1}));
 
 		auto create_keep = [&](const Identifier &tilename) {

@@ -5,6 +5,7 @@ if get_option('discord_rich_presence') == true
 endif
 
 chemskr = subproject('chemskr')
+namegen = subproject('namegen')
 sqlitecpp = subproject('sqlitecpp', default_options: 'default_library=static')
 
 game3_deps = [
@@ -25,6 +26,7 @@ game3_deps = [
 	dependency('boost'),
 	dependency('FastNoise2', modules: ['FastNoise2::FastNoise']),
 	chemskr.get_variable('chemskr'),
+	namegen.get_variable('namegen'),
 	sqlitecpp.get_variable('sqlitecpp_dep'),
 ]
 
@@ -62,7 +64,7 @@ endif
 
 executable('game3', game3_sources,
 	dependencies: game3_deps,
-	link_with: [chemskr.get_variable('chemskr_lib')],
+	link_with: [chemskr.get_variable('chemskr_lib'), namegen.get_variable('namegen_lib')],
 	link_args: link_args,
 	install: true,
 	include_directories: [inc_dirs])

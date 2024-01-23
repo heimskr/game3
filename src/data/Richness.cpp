@@ -13,7 +13,8 @@ namespace Game3 {
 		Richness out;
 
 		for (const auto &[identifier, resource]: game.registry<ResourceRegistry>())
-			out.richnesses[identifier] = resource->sampleRichness();
+			if (resource->sampleLikelihood())
+				out.richnesses[identifier] = resource->sampleRichness();
 
 		return out;
 	}

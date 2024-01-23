@@ -18,6 +18,11 @@ namespace Game3 {
 
 			static Richness makeRandom(const Game &);
 
+			inline auto begin() { return richnesses.begin(); }
+			inline auto end()   { return richnesses.end();   }
+			inline auto begin() const { return richnesses.begin(); }
+			inline auto end()   const { return richnesses.end();   }
+
 		private:
 			std::map<Identifier, double> richnesses;
 

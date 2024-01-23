@@ -6,9 +6,10 @@
 #include "types/Types.h"
 
 namespace Game3 {
-	class Keep;
+	class Realm;
+	struct Position;
 
 	namespace WorldGen {
-		void generateKeep(const std::shared_ptr<Keep> &, std::default_random_engine &, RealmID parent_realm, Index width, Index height, const Position &entrance);
+		void generateKeep(const std::shared_ptr<Realm> &, std::default_random_engine &, RealmID parent_realm, Index width, Index height, const Position &entrance, VillageID village_id);
 	}
 }

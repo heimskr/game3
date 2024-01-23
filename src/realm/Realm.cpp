@@ -15,7 +15,6 @@
 #include "net/RemoteClient.h"
 #include "packet/ErrorPacket.h"
 #include "packet/InteractPacket.h"
-#include "realm/Keep.h"
 #include "realm/Realm.h"
 #include "realm/RealmFactory.h"
 #include "threading/ThreadContext.h"
@@ -25,9 +24,6 @@
 #include "util/Cast.h"
 #include "util/Timer.h"
 #include "util/Util.h"
-#include "worldgen/Carpet.h"
-#include "worldgen/House.h"
-#include "worldgen/Keep.h"
 
 #include <iostream>
 #include <thread>

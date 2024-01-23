@@ -2,7 +2,6 @@
 #include "entity/Worker.h"
 #include "game/Game.h"
 #include "net/Buffer.h"
-#include "realm/Keep.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
 #include "tileentity/Teleporter.h"
@@ -105,16 +104,16 @@ namespace Game3 {
 	}
 
 	void Worker::leaveKeep(Phase new_phase) {
-		setPhase(new_phase);
-		auto &keep_realm = dynamic_cast<Keep &>(*keep->getInnerRealm());
-		auto door = keep_realm.getTileEntity<Teleporter>([](const auto &door) {
-			return door->extraData.contains("exit") && door->extraData.at("exit") == true;
-		});
-		if (!pathfind(destination = door->position)) {
-			// throw std::runtime_error("Worker couldn't pathfind to keep door");
-			stuck = true;
-			return;
-		}
+		// setPhase(new_phase);
+		// auto &keep_realm = dynamic_cast<Keep &>(*keep->getInnerRealm());
+		// auto door = keep_realm.getTileEntity<Teleporter>([](const auto &door) {
+		// 	return door->extraData.contains("exit") && door->extraData.at("exit") == true;
+		// });
+		// if (!pathfind(destination = door->position)) {
+		// 	// throw std::runtime_error("Worker couldn't pathfind to keep door");
+		// 	stuck = true;
+		// 	return;
+		// }
 	}
 
 	void Worker::goToHouse(Phase new_phase) {

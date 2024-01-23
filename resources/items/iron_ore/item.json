@@ -2,6 +2,7 @@
 	"credit": "Fayabella",
 	"id": "base:item/iron_ore",
 	"resource": {
-		"richnessRange": [5, 20]
+		"richnessRange": [5, 20],
+		"likelihood": 90
 	}
 }

@@ -9,7 +9,6 @@
 #include "game/Inventory.h"
 #include "game/Stonks.h"
 #include "net/Buffer.h"
-#include "realm/Keep.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
@@ -191,42 +190,42 @@ namespace Game3 {
 	}
 
 	void Woodcutter::sellInventory() {
-		phase = 7;
-		auto &keep_realm = dynamic_cast<Keep &>(*keep->getInnerRealm());
-		MoneyCount new_money = money;
-		const InventoryPtr inventory = getInventory(0);
+		// phase = 7;
+		// auto &keep_realm = dynamic_cast<Keep &>(*keep->getInnerRealm());
+		// MoneyCount new_money = money;
+		// const InventoryPtr inventory = getInventory(0);
 
-		for (Slot slot = 0; slot < inventory->getSlotCount(); ++slot) {
-			if (!inventory->contains(slot))
-				continue;
+		// for (Slot slot = 0; slot < inventory->getSlotCount(); ++slot) {
+		// 	if (!inventory->contains(slot))
+		// 		continue;
 
-			ItemStack stack = inventory->front();
-			MoneyCount sell_price = 0;
+		// 	ItemStack stack = inventory->front();
+		// 	MoneyCount sell_price = 0;
 
-			while (0 < stack.count && !totalSellPrice(keep_realm, stack, sell_price))
-				--stack.count;
+		// 	while (0 < stack.count && !totalSellPrice(keep_realm, stack, sell_price))
+		// 		--stack.count;
 
-			if (stack.count == 0) // Couldn't sell any
-				continue;
+		// 	if (stack.count == 0) // Couldn't sell any
+		// 		continue;
 
-			auto leftover = keep_realm.stockpileInventory->add(stack);
+		// 	auto leftover = keep_realm.stockpileInventory->add(stack);
 
-			if (leftover) {
-				stack.count -= leftover->count;
-				if (!totalSellPrice(keep_realm, stack, sell_price))
-					throw std::runtime_error("Sell price calculation failed after reducing stack");
-				new_money += sell_price;
-				inventory->remove(stack, slot);
-				keep_realm.money -= sell_price;
-				break;
-			} else {
-				new_money += sell_price;
-				inventory->remove(stack, slot);
-				keep_realm.money -= sell_price;
-			}
-		}
+		// 	if (leftover) {
+		// 		stack.count -= leftover->count;
+		// 		if (!totalSellPrice(keep_realm, stack, sell_price))
+		// 			throw std::runtime_error("Sell price calculation failed after reducing stack");
+		// 		new_money += sell_price;
+		// 		inventory->remove(stack, slot);
+		// 		keep_realm.money -= sell_price;
+		// 		break;
+		// 	} else {
+		// 		new_money += sell_price;
+		// 		inventory->remove(stack, slot);
+		// 		keep_realm.money -= sell_price;
+		// 	}
+		// }
 
-		setMoney(new_money);
+		// setMoney(new_money);
 	}
 
 	void to_json(nlohmann::json &json, const Woodcutter &woodcutter) {

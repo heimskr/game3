@@ -16,10 +16,10 @@ namespace Game3 {
 		return villageMap.at(id);
 	}
 
-	void OwnsVillages::addVillage(ServerGame &game, ChunkPosition chunk_position, const Place &place, const VillageOptions &options) {
+	VillagePtr OwnsVillages::addVillage(ServerGame &game, ChunkPosition chunk_position, const Place &place, const VillageOptions &options) {
 		auto lock = villageMap.uniqueLock();
 		const auto new_id = getNewVillageID();
-		villageMap[new_id] = std::make_shared<Village>(game, new_id, place.realm->getID(), chunk_position, place.position, options);
+		return villageMap[new_id] = std::make_shared<Village>(game, new_id, place.realm->getID(), chunk_position, place.position, options);
 	}
 
 	void OwnsVillages::saveVillages(SQLite::Database &database, bool use_transaction) {

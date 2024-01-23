@@ -9,7 +9,6 @@
 #include "game/Inventory.h"
 #include "game/Stonks.h"
 #include "net/Buffer.h"
-#include "realm/Keep.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
@@ -187,51 +186,51 @@ namespace Game3 {
 	}
 
 	void Blacksmith::buyResources() {
-		auto &keep_realm = dynamic_cast<Keep &>(*keep->getInnerRealm());
+		// auto &keep_realm = dynamic_cast<Keep &>(*keep->getInnerRealm());
 
-		actionTime = 0.f;
-		phase = 4;
+		// actionTime = 0.f;
+		// phase = 4;
 
-		const ItemCount iron_ore    = std::min(keep_realm.stockpileInventory->count(Identifier("base", "item/iron_ore")), ironOreNeeded);
-		const ItemCount gold_ore    = std::min(keep_realm.stockpileInventory->count(Identifier("base", "item/gold_ore")), goldOreNeeded);
-		const ItemCount diamond_ore = std::min(keep_realm.stockpileInventory->count(Identifier("base", "item/gold_ore")), diamondOreNeeded);
-		const ItemCount coal        = std::min(keep_realm.stockpileInventory->count(Identifier("base", "item/coal")),     coalNeeded);
+		// const ItemCount iron_ore    = std::min(keep_realm.stockpileInventory->count(Identifier("base", "item/iron_ore")), ironOreNeeded);
+		// const ItemCount gold_ore    = std::min(keep_realm.stockpileInventory->count(Identifier("base", "item/gold_ore")), goldOreNeeded);
+		// const ItemCount diamond_ore = std::min(keep_realm.stockpileInventory->count(Identifier("base", "item/gold_ore")), diamondOreNeeded);
+		// const ItemCount coal        = std::min(keep_realm.stockpileInventory->count(Identifier("base", "item/coal")),     coalNeeded);
 
-		Game &game = getGame();
-		std::array<ItemStack, 4> stacks {
-			ItemStack(game, "base:item/iron_ore", iron_ore),
-			ItemStack(game, "base:item/gold_ore", gold_ore),
-			ItemStack(game, "base:item/gold_ore", diamond_ore),
-			ItemStack(game, "base:item/coal",     coal),
-		};
+		// Game &game = getGame();
+		// std::array<ItemStack, 4> stacks {
+		// 	ItemStack(game, "base:item/iron_ore", iron_ore),
+		// 	ItemStack(game, "base:item/gold_ore", gold_ore),
+		// 	ItemStack(game, "base:item/gold_ore", diamond_ore),
+		// 	ItemStack(game, "base:item/coal",     coal),
+		// };
 
-		MoneyCount new_money = money;
+		// MoneyCount new_money = money;
 
-		for (ItemStack &stack: stacks) {
-			MoneyCount buy_price = 0;
-			while (0 < stack.count && new_money < (buy_price = totalBuyPrice(keep_realm, stack)))
-				--stack.count;
-			if (stack.count == 0)
-				continue;
-			auto leftover = getInventory(0)->add(stack);
-			if (leftover) {
-				stack.count -= leftover->count;
-				if (new_money < totalBuyPrice(keep_realm, stack))
-					throw std::runtime_error("Buy price calculation failed after reducing stack");
-				new_money -= buy_price;
-				keep_realm.money += buy_price;
-				if (stack.count != keep_realm.stockpileInventory->remove(stack))
-					throw std::runtime_error("Couldn't remove enough resources from the stockpile");
-				break;
-			} else {
-				new_money -= buy_price;
-				keep_realm.money += buy_price;
-				if (stack.count != keep_realm.stockpileInventory->remove(stack))
-					throw std::runtime_error("Couldn't remove enough resources from the stockpile");
-			}
-		}
+		// for (ItemStack &stack: stacks) {
+		// 	MoneyCount buy_price = 0;
+		// 	while (0 < stack.count && new_money < (buy_price = totalBuyPrice(keep_realm, stack)))
+		// 		--stack.count;
+		// 	if (stack.count == 0)
+		// 		continue;
+		// 	auto leftover = getInventory(0)->add(stack);
+		// 	if (leftover) {
+		// 		stack.count -= leftover->count;
+		// 		if (new_money < totalBuyPrice(keep_realm, stack))
+		// 			throw std::runtime_error("Buy price calculation failed after reducing stack");
+		// 		new_money -= buy_price;
+		// 		keep_realm.money += buy_price;
+		// 		if (stack.count != keep_realm.stockpileInventory->remove(stack))
+		// 			throw std::runtime_error("Couldn't remove enough resources from the stockpile");
+		// 		break;
+		// 	} else {
+		// 		new_money -= buy_price;
+		// 		keep_realm.money += buy_price;
+		// 		if (stack.count != keep_realm.stockpileInventory->remove(stack))
+		// 			throw std::runtime_error("Couldn't remove enough resources from the stockpile");
+		// 	}
+		// }
 
-		setMoney(new_money);
+		// setMoney(new_money);
 	}
 
 	void Blacksmith::goToForge() {

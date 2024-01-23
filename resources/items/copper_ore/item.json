@@ -2,6 +2,7 @@
 	"credit": "Fayabella",
 	"id": "base:item/copper_ore",
 	"resource": {
-		"richnessRange": [10, 25]
+		"richnessRange": [10, 25],
+		"likelihood": 80
 	}
 }

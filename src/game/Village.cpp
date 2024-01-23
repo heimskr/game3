@@ -1,9 +1,14 @@
+#include "game/Resource.h"
 #include "game/ServerGame.h"
 #include "game/Village.h"
 
 namespace Game3 {
 	namespace {
 		constexpr std::chrono::seconds PERIOD{1};
+
+		constexpr auto getMultiplier() {
+			return std::chrono::duration_cast<std::chrono::milliseconds>(PERIOD).count() / 1e6;
+		}
 	}
 
 	Village::Village(ServerGame &game, const Place &place, const VillageOptions &options_):
@@ -38,7 +43,22 @@ namespace Game3 {
 		return getGame().enqueue(sigc::mem_fun(*this, &Village::tick));
 	}
 
+	void Village::addResources() {
+		auto &registry = getGame().registry<ResourceRegistry>();
+
+		for (const auto &[resource, value]: richness) {
+			auto &in_map = resources[resource];
+			in_map = std::min(registry.at(resource)->getCap(), in_map + value * getMultiplier());
+		}
+	}
+
 	void Village::tick(const TickArgs &) {
+		addResources();
+
+		if (id == 1) {
+			INFO("Village " << id << " resources: " << nlohmann::json(resources).dump());
+		}
+
 		getGame().enqueue(sigc::mem_fun(*this, &Village::tick), PERIOD);
 	}
 

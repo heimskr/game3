@@ -21,7 +21,7 @@ namespace Game3 {
 
 			size_t getNewVillageID();
 			VillagePtr getVillage(size_t id) const;
-			void addVillage(ServerGame &, ChunkPosition, const Place &, const VillageOptions &);
+			VillagePtr addVillage(ServerGame &, ChunkPosition, const Place &, const VillageOptions &);
 			void saveVillages(SQLite::Database &, bool use_transaction = true);
 			void loadVillages(const std::shared_ptr<ServerGame> &, SQLite::Database &);
 

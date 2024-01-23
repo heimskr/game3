@@ -3,7 +3,6 @@
 #include "game/Game.h"
 #include "graphics/TextRenderer.h"
 #include "net/Buffer.h"
-#include "realm/Keep.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
 #include "tileentity/Teleporter.h"

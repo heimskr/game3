@@ -1,5 +1,5 @@
 #include "graphics/Tileset.h"
-#include "realm/Keep.h"
+#include "realm/Realm.h"
 #include "tileentity/Stockpile.h"
 #include "tileentity/Teleporter.h"
 #include "util/Timer.h"
@@ -8,7 +8,7 @@
 #include "worldgen/Keep.h"
 
 namespace Game3::WorldGen {
-	void generateKeep(const std::shared_ptr<Keep> &realm, std::default_random_engine &rng, RealmID parent_realm, Index width, Index height, const Position &entrance) {
+	void generateKeep(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, RealmID parent_realm, Index width, Index height, const Position &entrance, VillageID village_id) {
 		Timer timer("GenerateKeep");
 		realm->markGenerated(0, 0);
 		realm->tileProvider.ensureAllChunks(ChunkPosition{0, 0});
@@ -47,10 +47,8 @@ namespace Game3::WorldGen {
 		realm->setTile(Layer::Objects, Position(height - 2, 1), "base:tile/stockpile_w", false);
 		realm->setTile(Layer::Objects, Position(height - 2, 2), "base:tile/stockpile_e", false);
 		// TODO: the identifier here used to inexplicably be 48 so I'm putting in a silly tile temporarily to see whether it does anything.
-		auto stockpile = TileEntity::spawn<Stockpile>(realm, "base:tile/stockpile_e", Position(height - 2, 2));
+		auto stockpile = TileEntity::spawn<Stockpile>(realm, "base:tile/stockpile_e", Position(height - 2, 2), village_id);
 		assert(stockpile);
-		stockpile->setInventory(40);
-		realm->stockpileInventory = stockpile->getInventory(0);
 
 		WorldGen::generateCarpet(realm, rng, width, height);
 	}
