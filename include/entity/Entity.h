@@ -134,7 +134,8 @@ namespace Game3 {
 			/** Returns the position of the tile in front of the entity. */
 			Position nextTo() const;
 			std::string debug() const;
-			/** The second parameter to the function indicates whether the call is because the queue is being cleared, rather than because the entity actually moved. */
+			/** The second parameter to the function indicates whether the call is because the queue is being cleared, rather than because the entity actually moved.
+			 *  The function returns true if it should be removed from the move queue. */
 			void queueForMove(std::function<bool(const std::shared_ptr<Entity> &, bool)>);
 			void queueDestruction();
 			PathResult pathfind(const Position &start, const Position &goal, std::list<Direction> &, size_t loop_max = 1'000);

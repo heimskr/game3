@@ -10,6 +10,9 @@ namespace Game3 {
 			std::string getName() const override { return "Stockpile"; }
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 
+			void encode(Game &, Buffer &) override;
+			void decode(Game &, Buffer &) override;
+
 		protected:
 			VillageID villageID{};
 

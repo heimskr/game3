@@ -3,6 +3,7 @@
 #include "data/Richness.h"
 #include "game/HasGame.h"
 #include "game/Tickable.h"
+#include "threading/Lockable.h"
 #include "types/ChunkPosition.h"
 #include "types/TickArgs.h"
 #include "types/VillageOptions.h"
@@ -38,6 +39,9 @@ namespace Game3 {
 
 			Game & getGame() override;
 
+			void addSubscriber(PlayerPtr);
+			void removeSubscriber(const PlayerPtr &);
+
 			static std::string getSQL();
 
 		private:
@@ -50,7 +54,10 @@ namespace Game3 {
 			Richness richness;
 			Resources resources;
 
+			Lockable<std::unordered_set<PlayerPtr>> subscribedPlayers;
+
 			void addResources();
+			void sendUpdates();
 
 		friend class OwnsVillages;
 	};

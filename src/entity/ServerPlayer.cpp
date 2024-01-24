@@ -131,4 +131,16 @@ namespace Game3 {
 			}
 		});
 	}
+
+	void ServerPlayer::unsubscribeVillages() {
+		if (auto village = subscribedVillage.lock())
+			village->removeSubscriber(safeDynamicCast<ServerPlayer>(shared_from_this()));
+		subscribedVillage.reset();
+	}
+
+	void ServerPlayer::subscribeVillage(const std::shared_ptr<Village> &village) {
+		assert(village);
+		village->addSubscriber(safeDynamicCast<ServerPlayer>(shared_from_this()));
+		subscribedVillage = village;
+	}
 }

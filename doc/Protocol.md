@@ -383,6 +383,15 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i32` Slot
 	- `u8` Modifiers: bitfield (1 = shift, 2 = ctrl, 4 = alt, 8 = super)
 
+56. **Subscribe to Village Updates**: tells the server to start/stop sending village updates to the client.
+
+	- `optional<u64>` Village ID: if false, unsubscribe
+
+57. **Village Update**: informs the client of a village's latest data.
+
+	- `u64` Village ID
+	- `map<string, f64>` Resources
+
 # Message Format
 
 All values are little endian. Strings are not null-terminated.

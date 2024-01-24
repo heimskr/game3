@@ -5,6 +5,8 @@
 #include "container/WeakSet.h"
 
 namespace Game3 {
+	class Village;
+
 	class ServerPlayer: public Player {
 		public:
 			Lockable<WeakSet<Entity>> knownEntities;
@@ -24,7 +26,12 @@ namespace Game3 {
 
 			void kill() override;
 
+			void unsubscribeVillages();
+			void subscribeVillage(const std::shared_ptr<Village> &);
+
 		private:
+			std::weak_ptr<Village> subscribedVillage;
+
 			ServerPlayer();
 
 			friend class Entity;

@@ -1,6 +1,7 @@
 #include "game/Resource.h"
 #include "game/ServerGame.h"
 #include "game/Village.h"
+#include "packet/VillageUpdatePacket.h"
 
 #include "NameGen.h"
 
@@ -56,13 +57,36 @@ namespace Game3 {
 		}
 	}
 
+	void Village::sendUpdates() {
+		auto lock = subscribedPlayers.sharedLock();
+
+		if (subscribedPlayers.empty())
+			return;
+
+		const VillageUpdatePacket packet(*this);
+
+		for (const PlayerPtr &player: subscribedPlayers)
+			player->send(packet);
+	}
+
 	void Village::tick(const TickArgs &) {
 		addResources();
+		sendUpdates();
 		getGame().enqueue(sigc::mem_fun(*this, &Village::tick), PERIOD);
 	}
 
 	Game & Village::getGame() {
 		return HasGame::getGame();
+	}
+
+	void Village::addSubscriber(PlayerPtr player) {
+		auto lock = subscribedPlayers.uniqueLock();
+		subscribedPlayers.insert(std::move(player));
+	}
+
+	void Village::removeSubscriber(const PlayerPtr &player) {
+		auto lock = subscribedPlayers.uniqueLock();
+		subscribedPlayers.erase(player);
 	}
 
 	std::string Village::getSQL() {

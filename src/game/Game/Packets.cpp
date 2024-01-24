@@ -54,6 +54,8 @@
 #include "packet/RecipeListPacket.h"
 #include "packet/LivingEntityHealthChangedPacket.h"
 #include "packet/UseItemPacket.h"
+#include "packet/SubscribeToVillageUpdatesPacket.h"
+#include "packet/VillageUpdatePacket.h"
 
 namespace Game3 {
 	void Game::addPacketFactories() {
@@ -118,5 +120,7 @@ namespace Game3 {
 		add(PacketFactory::create<RecipeListPacket>());
 		add(PacketFactory::create<LivingEntityHealthChangedPacket>());
 		add(PacketFactory::create<UseItemPacket>());
+		add(PacketFactory::create<SubscribeToVillageUpdatesPacket>());
+		add(PacketFactory::create<VillageUpdatePacket>());
 	}
 }
