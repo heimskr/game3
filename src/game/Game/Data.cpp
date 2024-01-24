@@ -1,3 +1,4 @@
+#include "data/ProductionRule.h"
 #include "game/Crop.h"
 #include "game/Game.h"
 #include "graph/Graph.h"
@@ -185,7 +186,7 @@ namespace Game3 {
 		} else if (type == "base:fluid_list") {
 
 			auto &fluids = registry<FluidRegistry>();
-			for (const auto &pair: json.at(1)) {
+			for (const nlohmann::json &pair: json.at(1)) {
 				const Identifier fluid_name = pair.at(0);
 				const nlohmann::json value = pair.at(1);
 				if (auto iter = value.find("flask"); iter != value.end())
@@ -193,6 +194,11 @@ namespace Game3 {
 				else
 					fluids.add(fluid_name, Fluid(fluid_name, value.at("name"), value.at("tileset"), value.at("tilename")));
 			}
+		} else if (type == "base:production_list") {
+
+			auto &rules = registry<ProductionRuleRegistry>();
+			for (const nlohmann::json &rule: json.at(1))
+				rules.add(*this, rule);
 
 		} else if (type == "base:crop_map") {
 

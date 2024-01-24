@@ -1,3 +1,4 @@
+#include "data/ProductionRule.h"
 #include "game/Game.h"
 #include "recipe/CentrifugeRecipe.h"
 #include "recipe/CombinerRecipe.h"
@@ -34,5 +35,6 @@ namespace Game3 {
 		registries.add<CombinerRecipeRegistry>();
 		registries.add<SoundRegistry>();
 		registries.add<ResourceRegistry>();
+		registries.add<ProductionRuleRegistry>();
 	}
 }
