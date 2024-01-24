@@ -1,3 +1,4 @@
+#include "data/ConsumptionRule.h"
 #include "data/ProductionRule.h"
 #include "game/Crop.h"
 #include "game/Game.h"
@@ -194,9 +195,16 @@ namespace Game3 {
 				else
 					fluids.add(fluid_name, Fluid(fluid_name, value.at("name"), value.at("tileset"), value.at("tilename")));
 			}
+
 		} else if (type == "base:production_list") {
 
 			auto &rules = registry<ProductionRuleRegistry>();
+			for (const nlohmann::json &rule: json.at(1))
+				rules.add(*this, rule);
+
+		} else if (type == "base:consumption_list") {
+
+			auto &rules = registry<ConsumptionRuleRegistry>();
 			for (const nlohmann::json &rule: json.at(1))
 				rules.add(*this, rule);
 

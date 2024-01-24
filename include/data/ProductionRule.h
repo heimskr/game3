@@ -35,8 +35,6 @@ namespace Game3 {
 			std::optional<double> cap;
 			std::optional<std::set<BiomeType>> biomes;
 			std::optional<std::pair<double, double>> randomRange;
-
-		friend void to_json(nlohmann::json &, const ProductionRule &);
 	};
 
 	void to_json(nlohmann::json &, const ProductionRule &);

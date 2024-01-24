@@ -21,19 +21,19 @@ namespace Game3 {
 	}
 
 	void to_json(nlohmann::json &json, const ProductionRule &rule) {
-		if (!rule.inputs.empty())
-			json["in"]  = rule.inputs;
+		if (auto &inputs = rule.getInputs(); !inputs.empty())
+			json["in"]  = inputs;
 
-		json["out"] = rule.output;
-		json["labor"] = rule.labor;
+		json["out"] = rule.getOutput();
+		json["labor"] = rule.getLabor();
 
-		if (rule.cap)
-			json["cap"] = *rule.cap;
+		if (auto cap = rule.getCap())
+			json["cap"] = *cap;
 
-		if (rule.biomes)
-			json["biomes"] = *rule.biomes;
+		if (auto &biomes = rule.getBiomes())
+			json["biomes"] = *biomes;
 
-		if (rule.randomRange)
-			json["randomRange"] = *rule.randomRange;
+		if (auto &range = rule.getRandomRange())
+			json["randomRange"] = *range;
 	}
 }
