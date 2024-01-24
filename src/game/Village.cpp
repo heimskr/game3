@@ -23,7 +23,7 @@ namespace Game3 {
 	Village::Village(ServerGame &game, VillageID id_, RealmID realm_id, ChunkPosition chunk_position, const Position &position_, const VillageOptions &options_):
 		HasGame(game.toServerPointer()),
 		id(id_),
-		name(NameGen::makeRandomLanguage().makeName()),
+		name(NameGen::makeRandomLanguage(threadContext.rng).makeName()),
 		realmID(realm_id),
 		chunkPosition(chunk_position),
 		position(position_),
