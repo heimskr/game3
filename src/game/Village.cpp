@@ -14,7 +14,7 @@ namespace Game3 {
 		constexpr std::chrono::seconds PERIOD{30};
 
 		constexpr auto getMultiplier() {
-			return std::chrono::duration_cast<std::chrono::milliseconds>(PERIOD).count() / 1e6;
+			return std::chrono::duration_cast<std::chrono::milliseconds>(PERIOD).count() / 60e3;
 		}
 	}
 
@@ -62,17 +62,14 @@ namespace Game3 {
 
 		auto lock = resources.uniqueLock();
 
-		double multiplier = 1;
+		double multiplier = getMultiplier();
 
 		if (auto effect = rule.getRichnessEffect()) {
 			if (auto richness = getRichness(rule.getOutput().getID())) {
 				multiplier = *effect * *richness;
-				if (multiplier <= 0) {
-					WARN("Can't produce " << rule.getOutput().getID() << ": multiplier too low (" << multiplier << ')');
+				if (multiplier <= 0)
 					return;
-				}
 			} else {
-				WARN("Can't produce " << rule.getOutput().getID() << ": no richness found");
 				return;
 			}
 		}
@@ -103,6 +100,7 @@ namespace Game3 {
 		}
 
 		for (const ItemStack &stack: rule.getInputs()) {
+			INFO("Subtract " << multiplier << " * " << stack.count << " from " << stack.getID());
 			resources.at(stack.getID()) -= multiplier * stack.count;
 		}
 
@@ -180,6 +178,11 @@ namespace Game3 {
 	void Village::removeSubscriber(const PlayerPtr &player) {
 		auto lock = subscribedPlayers.uniqueLock();
 		subscribedPlayers.erase(player);
+	}
+
+	size_t Village::getSubscriberCount() const {
+		auto lock = subscribedPlayers.sharedLock();
+		return subscribedPlayers.size();
 	}
 
 	double Village::chooseRandomValue() {

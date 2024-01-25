@@ -11,6 +11,6 @@ namespace Game3 {
 	void VillageUpdatePacket::handle(ClientGame &) {
 		INFO("Resources for village " << villageID << ":");
 		for (const auto &[key, value]: resources)
-			INFO(key << " => " << value);
+			INFO("    " << key << " => " << value);
 	}
 }

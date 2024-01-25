@@ -24,11 +24,13 @@ namespace Game3 {
 
 		INFO("Village " << village->getID() << " (" << village->getName() << ") resources:");
 		for (const auto &[key, value]: village->getResources())
-			INFO(key << " => " << value);
+			INFO("    " << key << " => " << value);
 
 		INFO("Village " << village->getID() << " (" << village->getName() << ") richness:");
 		for (const auto &[key, value]: village->getRichness())
-			INFO(key << " => " << value);
+			INFO("    " << key << " => " << value);
+
+		INFO("Subscriber count: " << village->getSubscriberCount());
 
 		return true;
 	}

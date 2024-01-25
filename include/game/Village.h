@@ -48,6 +48,7 @@ namespace Game3 {
 
 			void addSubscriber(PlayerPtr);
 			void removeSubscriber(const PlayerPtr &);
+			size_t getSubscriberCount() const;
 
 			static std::string getSQL();
 
