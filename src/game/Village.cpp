@@ -95,8 +95,10 @@ namespace Game3 {
 			consume(*choose(candidates, threadContext.rng));
 	}
 
-	void Village::tick(const TickArgs &) {
-		addResources();
+	void Village::tick(const TickArgs &args) {
+		Game &game = args.game;
+		consume(game.registry<ConsumptionRuleRegistry>());
+		produce(game.registry<ProductionRuleRegistry>());
 		sendUpdates();
 		getGame().enqueue(sigc::mem_fun(*this, &Village::tick), PERIOD);
 	}

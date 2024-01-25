@@ -1,5 +1,6 @@
 #pragma once
 
+#include "container/RandomSet.h"
 #include "item/Item.h"
 #include "registry/Registry.h"
 #include "types/Types.h"
@@ -44,7 +45,7 @@ namespace Game3 {
 
 	void to_json(nlohmann::json &, const ProductionRule &);
 
-	struct ProductionRuleRegistry: UnnamedJSONRegistry<ProductionRule> {
+	struct ProductionRuleRegistry: UnnamedJSONRegistry<ProductionRule, RandomSet> {
 		static Identifier ID() { return {"base", "registry/production_rule"}; }
 		ProductionRuleRegistry(): UnnamedJSONRegistry(ID()) {}
 	};

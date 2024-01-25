@@ -225,14 +225,14 @@ namespace Game3 {
 		virtual void add(const Game &, const nlohmann::json &) = 0;
 	};
 
-	template <typename T>
+	template <typename T, template <typename...> typename Set = std::unordered_set>
 	class UnnamedRegistry: public UnnamedRegistryBase {
 #ifdef REGISTRY_ASSERTS
 		static_assert(std::is_base_of_v<Registerable, T>);
 #endif
 
 		public:
-			std::unordered_set<std::shared_ptr<T>> items;
+			Set<std::shared_ptr<T>> items;
 			std::vector<std::shared_ptr<T>> byCounter;
 
 			using UnnamedRegistryBase::UnnamedRegistryBase;
@@ -315,13 +315,13 @@ namespace Game3 {
 			}
 	};
 
-	template <typename T>
-	class UnnamedJSONRegistry: public UnnamedRegistry<T> {
+	template <typename T, template <typename...> typename Set = std::unordered_set>
+	class UnnamedJSONRegistry: public UnnamedRegistry<T, Set> {
 		public:
-			using UnnamedRegistry<T>::UnnamedRegistry;
+			using UnnamedRegistry<T, Set>::UnnamedRegistry;
 
 			void add(const Game &game, const nlohmann::json &json) override {
-				UnnamedRegistry<T>::add(T::fromJSON(game, json));
+				UnnamedRegistry<T, Set>::add(T::fromJSON(game, json));
 			}
 	};
 
