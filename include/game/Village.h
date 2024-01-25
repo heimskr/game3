@@ -65,7 +65,6 @@ namespace Game3 {
 
 			Lockable<std::unordered_set<PlayerPtr>> subscribedPlayers;
 
-			void addResources();
 			void produce(BiomeType, const ProductionRule &);
 			void produce(BiomeType, const ProductionRuleRegistry &);
 			bool consume(const ConsumptionRule &);
@@ -73,6 +72,7 @@ namespace Game3 {
 			void sendUpdates();
 
 			static double chooseRandomValue();
+			static Resources getDefaultResources();
 
 		friend class OwnsVillages;
 	};

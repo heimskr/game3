@@ -11,7 +11,7 @@
 
 namespace Game3 {
 	namespace {
-		constexpr std::chrono::seconds PERIOD{1};
+		constexpr std::chrono::seconds PERIOD{30};
 
 		constexpr auto getMultiplier() {
 			return std::chrono::duration_cast<std::chrono::milliseconds>(PERIOD).count() / 1e6;
@@ -33,6 +33,7 @@ namespace Game3 {
 		position(position_),
 		options(options_),
 		richness(Richness::makeRandom(game)),
+		resources(getDefaultResources()),
 		randomValue(chooseRandomValue()) {}
 
 	Village::Village(VillageID id_, RealmID realm_id, std::string name_, ChunkPosition chunk_position, const Position &position_, const VillageOptions &options_, Richness richness_, Resources resources_, LaborAmount labor_, double random_value):
@@ -55,16 +56,6 @@ namespace Game3 {
 		return getGame().enqueue(sigc::mem_fun(*this, &Village::tick));
 	}
 
-	void Village::addResources() {
-		auto &registry = getGame().registry<ResourceRegistry>();
-
-		for (const auto &[resource, value]: richness) {
-			auto resources_lock = resources.uniqueLock();
-			auto &in_map = resources[resource];
-			in_map = std::min(registry.at(resource)->getCap(), in_map + value * getMultiplier());
-		}
-	}
-
 	void Village::produce(BiomeType biome, const ProductionRule &rule) {
 		if (const auto &biomes = rule.getBiomes(); biomes && !biomes->contains(biome))
 			return;
@@ -76,8 +67,13 @@ namespace Game3 {
 		if (auto effect = rule.getRichnessEffect()) {
 			if (auto richness = getRichness(rule.getOutput().getID())) {
 				multiplier = *effect * *richness;
-				if (multiplier <= 0)
+				if (multiplier <= 0) {
+					WARN("Can't produce " << rule.getOutput().getID() << ": multiplier too low (" << multiplier << ')');
 					return;
+				}
+			} else {
+				WARN("Can't produce " << rule.getOutput().getID() << ": no richness found");
+				return;
 			}
 		}
 
@@ -188,6 +184,12 @@ namespace Game3 {
 
 	double Village::chooseRandomValue() {
 		return std::uniform_real_distribution(0.0, 1.0)(threadContext.rng);
+	}
+
+	Resources Village::getDefaultResources() {
+		return {
+			{"base:item/iron_pickaxe", 2.0}
+		};
 	}
 
 	std::string Village::getSQL() {

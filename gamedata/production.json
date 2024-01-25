@@ -9,6 +9,7 @@
 			{"in": [["base:item/diamond_ore"]], "out": ["base:item/diamond"], "cap": 32, "labor": 1},
 			{"in": [["base:item/stone"]], "out": ["base:item/furnace"], "cap": 4, "labor": 1},
 			{"in": [["base:item/iron_pickaxe", 0.01]], "richnessEffect": 0.5, "out": ["base:item/iron_ore"], "cap": 64, "labor": 2},
+			{"in": [["base:item/iron_pickaxe", 0.01]], "richnessEffect": 0.5, "out": ["base:item/gold_ore"], "cap": 64, "labor": 2},
 			{"in": [["base:item/iron_pickaxe", 0.01]], "richnessEffect": 0.5, "out": ["base:item/copper_ore"], "cap": 64, "labor": 2},
 			{"in": [["base:item/iron_pickaxe", 0.01]], "richnessEffect": 0.5, "out": ["base:item/diamond_ore"], "cap": 64, "labor": 2},
 			{"in": [["base:item/iron_pickaxe", 0.01]], "richnessEffect": 0.5, "out": ["base:item/coal"], "cap": 64, "labor": 2},

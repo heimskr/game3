@@ -1,1 +1,8 @@
-{"credit":"Fayabella","id":"base:item/fire_opal"}
+{
+	"credit": "Fayabella",
+	"id": "base:item/fire_opal",
+	"resource": {
+		"richnessRange": [1, 10],
+		"likelihood": 10
+	}
+}
