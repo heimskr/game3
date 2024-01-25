@@ -44,12 +44,16 @@ namespace Game3 {
 			age += args.delta;
 			if (lingerTime <= age)
 				queueDestruction();
+			else
+				enqueueTick();
 			return;
 		}
 
 		auto velocity_lock = velocity.uniqueLock();
 		velocity.z -= 32 * args.delta;
 		offset.x += args.delta * velocity.x;
+
+		enqueueTick();
 	}
 
 	void TextParticle::onSpawn() {
