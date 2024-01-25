@@ -15,6 +15,7 @@
 
 namespace Game3 {
 	class ConsumptionRule;
+	class ProductionRule;
 	class ServerGame;
 	struct ConsumptionRuleRegistry;
 	struct ProductionRuleRegistry;
@@ -25,13 +26,14 @@ namespace Game3 {
 			Village(ServerGame &, const Place &, const VillageOptions &);
 			Village(ServerGame &, RealmID, ChunkPosition, const Position &, const VillageOptions &);
 			Village(ServerGame &, VillageID, RealmID, ChunkPosition, const Position &, const VillageOptions &);
-			Village(VillageID, RealmID, std::string name_, ChunkPosition, const Position &, const VillageOptions &, Richness, Resources, LaborAmount);
+			Village(VillageID, RealmID, std::string name_, ChunkPosition, const Position &, const VillageOptions &, Richness, Resources, LaborAmount, double);
 
 			inline auto getID() const { return id; }
 			inline auto getRealmID() const { return realmID; }
 			inline auto getChunkPosition() const { return chunkPosition; }
 			inline auto getPosition() const { return position; }
 			inline auto getLabor() const { return labor; }
+			inline auto getRandomValue() const { return randomValue; }
 			inline const auto & getName() const { return name; }
 			inline const auto & getOptions() const { return options; }
 			inline const auto & getRichness() const { return richness; }
@@ -59,14 +61,18 @@ namespace Game3 {
 			Richness richness;
 			Lockable<Resources> resources;
 			Atomic<LaborAmount> labor{};
+			double randomValue;
 
 			Lockable<std::unordered_set<PlayerPtr>> subscribedPlayers;
 
 			void addResources();
-			void produce(const ProductionRuleRegistry &);
+			void produce(BiomeType, const ProductionRule &);
+			void produce(BiomeType, const ProductionRuleRegistry &);
 			bool consume(const ConsumptionRule &);
 			void consume(const ConsumptionRuleRegistry &);
 			void sendUpdates();
+
+			static double chooseRandomValue();
 
 		friend class OwnsVillages;
 	};

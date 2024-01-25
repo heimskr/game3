@@ -36,7 +36,7 @@ namespace Game3 {
 	using EnergyAmount   = uint64_t;
 	using InventoryID    = uint16_t;
 	using VillageID      = uint64_t;
-	using LaborAmount    = uint32_t;
+	using LaborAmount    = double;
 
 	using ItemID     = Identifier;
 	using EntityType = Identifier;

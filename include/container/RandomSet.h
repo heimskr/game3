@@ -111,17 +111,14 @@ namespace Game3 {
 				const size_t back_index = iterators.size() - 1;
 				const size_t old_index = iter.mapped->second;
 
-				if (old_index == back_index) {
-					map.erase(iter.mapped);
-					iterators.pop_back();
-					return 1;
+				if (old_index < back_index) {
+					map_iterator &other_iter = iterators.back();
+					other_iter->second = old_index;
+					std::swap(iterators.at(old_index), other_iter);
 				}
 
-				map_iterator &other_iter = iterators.back();
-				other_iter->second = old_index;
-				std::swap(iterators.at(old_index), other_iter);
-				iterators.pop_back();
 				map.erase(iter.mapped);
+				iterators.pop_back();
 				return 1;
 			}
 
@@ -172,6 +169,13 @@ namespace Game3 {
 				// Especially because you can't use this method to insert something with no move constructor...
 				// Though maybe map keys are required to be movable anyway?
 				return insert(T(std::forward<Args>(args)...));
+			}
+
+			const T & at(size_t index) const {
+				if (iterators.size() <= index)
+					throw std::out_of_range("Index out of range");
+
+				return iterators.at(index)->first;
 			}
 	};
 }

@@ -118,6 +118,8 @@ namespace Game3 {
 			double getDurabilityFraction() const;
 			std::string getTooltip() const;
 
+			inline const auto & getID() const { return item->identifier; }
+
 			void spawn(const std::shared_ptr<Realm> &, const Position &) const;
 
 			std::shared_ptr<Texture> getTexture(const Game &) const;

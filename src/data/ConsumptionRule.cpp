@@ -3,7 +3,7 @@
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
-	ConsumptionRule::ConsumptionRule(const Game &game, const nlohmann::json &json) {
+	ConsumptionRule::ConsumptionRule(const Game &, const nlohmann::json &json) {
 		input = json.at("in");
 		laborOut = json.at("laborOut");
 		always = json.at("always");

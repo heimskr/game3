@@ -298,6 +298,10 @@ namespace Game3 {
 				return items.size();
 			}
 
+			inline bool empty() const {
+				return items.empty();
+			}
+
 			inline auto begin() const {
 				return byCounter.begin();
 			}
