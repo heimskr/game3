@@ -23,8 +23,11 @@ namespace Game3 {
 			inline const auto & getOutput() const { return output; }
 			inline auto getCap()   const { return cap;   }
 			inline auto getLabor() const { return labor; }
-			inline const auto & getBiomes()      const { return biomes;      }
+			inline auto getRichnessEffect() const { return richnessEffect;   }
+			inline const auto & getBiomes() const { return biomes;           }
 			inline const auto & getRandomRange() const { return randomRange; }
+
+			bool doesBiomeMatch(BiomeType) const;
 
 			static ProductionRule fromJSON(const Game &, const nlohmann::json &);
 
@@ -32,6 +35,8 @@ namespace Game3 {
 			std::vector<ItemStack> inputs;
 			ItemStack output;
 			LaborAmount labor = 0;
+			/** If present, the richness of the resource is multiplied by this and then used as a multiplier for the production rule. */
+			std::optional<double> richnessEffect;
 			std::optional<double> cap;
 			std::optional<std::set<BiomeType>> biomes;
 			std::optional<std::pair<double, double>> randomRange;
