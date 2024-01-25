@@ -26,7 +26,7 @@ namespace Game3 {
 			static ConsumptionRule fromJSON(const Game &, const nlohmann::json &);
 
 		private:
-			ItemStack input;
+			Identifier input;
 			LaborAmount laborOut{};
 			bool always{};
 	};

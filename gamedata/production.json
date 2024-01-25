@@ -35,22 +35,22 @@
 			{"out": ["base:item/bean"],       "cap": 64, "labor": 0, "biomes": [1], "randomRange": [0.65, 0.85]}
 		]],
 		["base:consumption_list", [
-			{"in": ["base:item/eggplant"],   "laborOut": 1, "always":  true},
-			{"in": ["base:item/strawberry"], "laborOut": 1, "always":  true},
-			{"in": ["base:item/tomato"],     "laborOut": 1, "always":  true},
-			{"in": ["base:item/corn"],       "laborOut": 1, "always":  true},
-			{"in": ["base:item/potato"],     "laborOut": 1, "always":  true},
-			{"in": ["base:item/onion"],      "laborOut": 1, "always":  true},
-			{"in": ["base:item/chili"],      "laborOut": 1, "always":  true},
-			{"in": ["base:item/wheat"],      "laborOut": 1, "always":  true},
-			{"in": ["base:item/pumpkin"],    "laborOut": 1, "always":  true},
-			{"in": ["base:item/cabbage"],    "laborOut": 1, "always":  true},
-			{"in": ["base:item/bean"],       "laborOut": 1, "always":  true},
-			{"in": ["base:item/baguette"],   "laborOut": 2, "always": false},
-			{"in": ["base:item/bread"],      "laborOut": 1, "always": false},
-			{"in": ["base:item/cheese"],     "laborOut": 1, "always": false},
-			{"in": ["base:item/bleach"],     "laborOut": 0, "always": false},
-			{"in": ["base:item/morsel"],     "laborOut": 1, "always": false}
+			{"in": "base:item/eggplant",   "laborOut": 1, "always":  true},
+			{"in": "base:item/strawberry", "laborOut": 1, "always":  true},
+			{"in": "base:item/tomato",     "laborOut": 1, "always":  true},
+			{"in": "base:item/corn",       "laborOut": 1, "always":  true},
+			{"in": "base:item/potato",     "laborOut": 1, "always":  true},
+			{"in": "base:item/onion",      "laborOut": 1, "always":  true},
+			{"in": "base:item/chili",      "laborOut": 1, "always":  true},
+			{"in": "base:item/wheat",      "laborOut": 1, "always":  true},
+			{"in": "base:item/pumpkin",    "laborOut": 1, "always":  true},
+			{"in": "base:item/cabbage",    "laborOut": 1, "always":  true},
+			{"in": "base:item/bean",       "laborOut": 1, "always":  true},
+			{"in": "base:item/baguette",   "laborOut": 2, "always": false},
+			{"in": "base:item/bread",      "laborOut": 1, "always": false},
+			{"in": "base:item/cheese",     "laborOut": 1, "always": false},
+			{"in": "base:item/bleach",     "laborOut": 0, "always": false},
+			{"in": "base:item/morsel",     "laborOut": 1, "always": false}
 		]]
 	]
 }

@@ -3,6 +3,7 @@
 #include "data/Richness.h"
 #include "game/HasGame.h"
 #include "game/Tickable.h"
+#include "threading/Atomic.h"
 #include "threading/Lockable.h"
 #include "types/ChunkPosition.h"
 #include "types/TickArgs.h"
@@ -13,7 +14,10 @@
 #include <string>
 
 namespace Game3 {
+	class ConsumptionRule;
 	class ServerGame;
+	struct ConsumptionRuleRegistry;
+	struct ProductionRuleRegistry;
 
 	class Village: public Tickable, public HasGame {
 		public:
@@ -21,12 +25,13 @@ namespace Game3 {
 			Village(ServerGame &, const Place &, const VillageOptions &);
 			Village(ServerGame &, RealmID, ChunkPosition, const Position &, const VillageOptions &);
 			Village(ServerGame &, VillageID, RealmID, ChunkPosition, const Position &, const VillageOptions &);
-			Village(VillageID, RealmID, std::string name_, ChunkPosition, const Position &, const VillageOptions &, Richness, Resources);
+			Village(VillageID, RealmID, std::string name_, ChunkPosition, const Position &, const VillageOptions &, Richness, Resources, LaborAmount);
 
 			inline auto getID() const { return id; }
 			inline auto getRealmID() const { return realmID; }
 			inline auto getChunkPosition() const { return chunkPosition; }
 			inline auto getPosition() const { return position; }
+			inline auto getLabor() const { return labor; }
 			inline const auto & getName() const { return name; }
 			inline const auto & getOptions() const { return options; }
 			inline const auto & getRichness() const { return richness; }
@@ -52,11 +57,15 @@ namespace Game3 {
 			Position position;
 			VillageOptions options;
 			Richness richness;
-			Resources resources;
+			Lockable<Resources> resources;
+			Atomic<LaborAmount> labor{};
 
 			Lockable<std::unordered_set<PlayerPtr>> subscribedPlayers;
 
 			void addResources();
+			void produce(const ProductionRuleRegistry &);
+			bool consume(const ConsumptionRule &);
+			void consume(const ConsumptionRuleRegistry &);
 			void sendUpdates();
 
 		friend class OwnsVillages;

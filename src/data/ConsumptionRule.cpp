@@ -4,7 +4,7 @@
 
 namespace Game3 {
 	ConsumptionRule::ConsumptionRule(const Game &game, const nlohmann::json &json) {
-		input = ItemStack::fromJSON(game, json.at("in"));
+		input = json.at("in");
 		laborOut = json.at("laborOut");
 		always = json.at("always");
 	}

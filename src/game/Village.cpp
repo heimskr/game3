@@ -1,7 +1,10 @@
+#include "data/ConsumptionRule.h"
+#include "data/ProductionRule.h"
 #include "game/Resource.h"
 #include "game/ServerGame.h"
 #include "game/Village.h"
 #include "packet/VillageUpdatePacket.h"
+#include "util/Util.h"
 
 #include "NameGen.h"
 
@@ -30,7 +33,7 @@ namespace Game3 {
 		options(options_),
 		richness(Richness::makeRandom(game)) {}
 
-	Village::Village(VillageID id_, RealmID realm_id, std::string name_, ChunkPosition chunk_position, const Position &position_, const VillageOptions &options_, Richness richness_, Resources resources_):
+	Village::Village(VillageID id_, RealmID realm_id, std::string name_, ChunkPosition chunk_position, const Position &position_, const VillageOptions &options_, Richness richness_, Resources resources_, LaborAmount labor_):
 		id(id_),
 		name(std::move(name_)),
 		realmID(realm_id),
@@ -38,7 +41,8 @@ namespace Game3 {
 		position(position_),
 		options(options_),
 		richness(std::move(richness_)),
-		resources(std::move(resources_)) {}
+		resources(std::move(resources_)),
+		labor(labor_) {}
 
 	std::optional<double> Village::getRichness(const Identifier &identifier) {
 		return richness[identifier];
@@ -52,9 +56,49 @@ namespace Game3 {
 		auto &registry = getGame().registry<ResourceRegistry>();
 
 		for (const auto &[resource, value]: richness) {
+			auto resources_lock = resources.uniqueLock();
 			auto &in_map = resources[resource];
 			in_map = std::min(registry.at(resource)->getCap(), in_map + value * getMultiplier());
 		}
+	}
+
+	void Village::produce(const ProductionRuleRegistry &rules) {
+
+	}
+
+	bool Village::consume(const ConsumptionRule &rule) {
+		auto resources_lock = resources.uniqueLock();
+		auto iter = resources.find(rule.getInput());
+
+		if (iter == resources.end())
+			return false;
+
+		if (iter->second < 1.0)
+			return false;
+
+		--iter->second;
+		++labor;
+		return true;
+	}
+
+	void Village::consume(const ConsumptionRuleRegistry &rules) {
+		std::vector<std::shared_ptr<ConsumptionRule>> candidates;
+
+		for (const auto &rule: rules) {
+			if (rule->getAlways())
+				consume(*rule);
+			else
+				candidates.push_back(rule);
+		}
+
+		if (!candidates.empty())
+			consume(*choose(candidates, threadContext.rng));
+	}
+
+	void Village::tick(const TickArgs &) {
+		addResources();
+		sendUpdates();
+		getGame().enqueue(sigc::mem_fun(*this, &Village::tick), PERIOD);
 	}
 
 	void Village::sendUpdates() {
@@ -67,12 +111,6 @@ namespace Game3 {
 
 		for (const PlayerPtr &player: subscribedPlayers)
 			player->send(packet);
-	}
-
-	void Village::tick(const TickArgs &) {
-		addResources();
-		sendUpdates();
-		getGame().enqueue(sigc::mem_fun(*this, &Village::tick), PERIOD);
 	}
 
 	Game & Village::getGame() {
@@ -100,6 +138,7 @@ namespace Game3 {
 				richness MEDIUMTEXT,
 				resources MEDIUMTEXT,
 				name VARCHAR(255),
+				labor INT8,
 
 				PRIMARY KEY(realmID, id)
 			);

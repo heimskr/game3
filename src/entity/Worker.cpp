@@ -103,7 +103,7 @@ namespace Game3 {
 		increaseUpdateCounter();
 	}
 
-	void Worker::leaveKeep(Phase new_phase) {
+	void Worker::leaveKeep(Phase) {
 		// setPhase(new_phase);
 		// auto &keep_realm = dynamic_cast<Keep &>(*keep->getInnerRealm());
 		// auto door = keep_realm.getTileEntity<Teleporter>([](const auto &door) {
