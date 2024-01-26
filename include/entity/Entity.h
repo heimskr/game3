@@ -193,6 +193,15 @@ namespace Game3 {
 				return {path.begin(), path.end()};
 			}
 
+			template <Duration D>
+			requires (!std::is_same_v<D, std::chrono::nanoseconds>)
+			Tick enqueueTick(D delay) {
+				return enqueueTick(std::chrono::duration_cast<std::chrono::nanoseconds>(delay));
+			}
+
+			Tick enqueueTick(std::chrono::nanoseconds);
+			Tick enqueueTick() override;
+
 		protected:
 			Game *game = nullptr;
 			LockableSharedPtr<Texture> texture;
@@ -213,15 +222,6 @@ namespace Game3 {
 			std::shared_ptr<Agent> getSharedAgent() override { return shared_from_this(); }
 
 			std::function<void(const TickArgs &)> getTickFunction();
-
-			template <Duration D>
-			requires (!std::is_same_v<D, std::chrono::nanoseconds>)
-			Tick enqueueTick(D delay) {
-				return enqueueTick(std::chrono::duration_cast<std::chrono::nanoseconds>(delay));
-			}
-
-			Tick enqueueTick(std::chrono::nanoseconds);
-			Tick enqueueTick() override;
 
 		private:
 			struct Held {

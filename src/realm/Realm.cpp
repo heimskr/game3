@@ -1643,6 +1643,8 @@ namespace Game3 {
 				}
 			}
 		}
+
+		entity->enqueueTick();
 	}
 
 	bool Realm::isActive() const {
