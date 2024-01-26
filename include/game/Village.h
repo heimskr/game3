@@ -15,17 +15,17 @@
 
 namespace Game3 {
 	class ConsumptionRule;
+	class Game;
 	class ProductionRule;
-	class ServerGame;
 	struct ConsumptionRuleRegistry;
 	struct ProductionRuleRegistry;
 
 	class Village: public Tickable, public HasGame {
 		public:
 			Village() = default;
-			Village(ServerGame &, const Place &, const VillageOptions &);
-			Village(ServerGame &, RealmID, ChunkPosition, const Position &, const VillageOptions &);
-			Village(ServerGame &, VillageID, RealmID, ChunkPosition, const Position &, const VillageOptions &);
+			Village(Game &, const Place &, const VillageOptions &);
+			Village(Game &, RealmID, ChunkPosition, const Position &, const VillageOptions &);
+			Village(Game &, VillageID, RealmID, ChunkPosition, const Position &, const VillageOptions &);
 			Village(VillageID, RealmID, std::string name_, ChunkPosition, const Position &, const VillageOptions &, Richness, Resources, LaborAmount, double);
 
 			inline auto getID() const { return id; }
@@ -38,6 +38,9 @@ namespace Game3 {
 			inline const auto & getOptions() const { return options; }
 			inline const auto & getRichness() const { return richness; }
 			inline const auto & getResources() const { return resources; }
+
+			inline void setLabor(auto value) { labor = value; }
+			inline void setResources(auto value) { resources = std::move(value); }
 
 			std::optional<double> getRichness(const Identifier &);
 

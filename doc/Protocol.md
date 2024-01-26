@@ -390,8 +390,19 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 57. **Village Update**: informs the client of a village's latest data.
 
 	- `u64` Village ID
-	- `f64` Available Labor
+	- `i32` Realm ID
+	- `i32` Chunk position X
+	- `i32` Chunk position Y
+	- `i64` Position Y
+	- `i64` Position X
+	- `string` Village name
+	- `f64` Available labor
 	- `map<string, f64>` Resources
+
+58. **Open Village Trade**: tells a client to open the village trade module.
+
+	- `u64` Village ID
+	- `bool` Remove on move
 
 # Message Format
 

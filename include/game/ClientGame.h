@@ -61,11 +61,12 @@ namespace Game3 {
 				moduleMessageBuffer(module_id, source, name, Buffer{std::forward<Args>(args)...});
 			}
 
-			auto signal_player_inventory_update() const { return signal_player_inventory_update_; }
-			auto signal_player_money_update()     const { return signal_player_money_update_;     }
-			auto signal_other_inventory_update()  const { return signal_other_inventory_update_;  }
-			auto signal_fluid_update()            const { return signal_fluid_update_;            }
-			auto signal_energy_update()           const { return signal_energy_update_;           }
+			auto signalPlayerInventoryUpdate() const { return signal_player_inventory_update; }
+			auto signalPlayerMoneyUpdate()     const { return signal_player_money_update;     }
+			auto signalOtherInventoryUpdate()  const { return signal_other_inventory_update;  }
+			auto signalFluidUpdate()           const { return signal_fluid_update;            }
+			auto signalEnergyUpdate()          const { return signal_energy_update;           }
+			auto signalVillageUpdate()         const { return signal_village_update;          }
 
 			Side getSide() const final { return Side::Client; }
 
@@ -77,11 +78,12 @@ namespace Game3 {
 			std::shared_ptr<const ClientGame> getSelf() const { return std::static_pointer_cast<const ClientGame>(shared_from_this()); }
 
 		private:
-			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update_;
-			sigc::signal<void(const PlayerPtr &)> signal_player_money_update_;
-			sigc::signal<void(const std::shared_ptr<Agent> &, InventoryID)> signal_other_inventory_update_;
-			sigc::signal<void(const std::shared_ptr<HasFluids> &)> signal_fluid_update_;
-			sigc::signal<void(const std::shared_ptr<HasEnergy> &)> signal_energy_update_;
+			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update;
+			sigc::signal<void(const PlayerPtr &)> signal_player_money_update;
+			sigc::signal<void(const std::shared_ptr<Agent> &, InventoryID)> signal_other_inventory_update;
+			sigc::signal<void(const std::shared_ptr<HasFluids> &)> signal_fluid_update;
+			sigc::signal<void(const std::shared_ptr<HasEnergy> &)> signal_energy_update;
+			sigc::signal<void(const std::shared_ptr<Village> &)> signal_village_update;
 			std::atomic_bool active{false};
 			std::thread tickThread;
 			std::optional<Position> lastDragPosition;

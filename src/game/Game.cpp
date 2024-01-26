@@ -14,6 +14,7 @@
 #include "ui/module/FluidLevelsModule.h"
 #include "ui/module/ItemFilterModule.h"
 #include "ui/module/ModuleFactory.h"
+#include "ui/module/VillageTradeModule.h"
 #include "algorithm/AStar.h"
 #include "util/FS.h"
 #include "util/Timer.h"
@@ -45,6 +46,7 @@ namespace Game3 {
 		add(ModuleFactory::create<ItemFilterModule>());
 		add(ModuleFactory::create<CombinerModule>());
 		add(ModuleFactory::create<AutocrafterModule>());
+		add(ModuleFactory::create<VillageTradeModule>());
 	}
 
 	void Game::initialSetup(const std::filesystem::path &dir) {
@@ -210,5 +212,10 @@ namespace Game3 {
 		}
 
 		return nullptr;
+	}
+
+	void Game::associateWithRealm(const VillagePtr &village, RealmID realm_id) {
+		RealmPtr realm = getRealm(realm_id);
+		realm->villages.insert(village);
 	}
 }

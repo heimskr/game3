@@ -105,9 +105,9 @@ namespace Game3 {
 			game.getWindow().queue([&game, weak = weakOwner, index = index.load()] {
 				if (auto owner = weak.lock()) {
 					if (auto player = std::dynamic_pointer_cast<Player>(owner)) {
-						game.signal_player_inventory_update().emit(player);
+						game.signalPlayerInventoryUpdate().emit(player);
 					} else {
-						game.signal_other_inventory_update().emit(owner, index);
+						game.signalOtherInventoryUpdate().emit(owner, index);
 					}
 				} else {
 					ERROR("Expired in " << __FILE__ << ':' << __LINE__);

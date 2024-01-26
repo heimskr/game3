@@ -2,6 +2,7 @@
 
 #include "entity/Player.h"
 #include "game/HasTickQueue.h"
+#include "game/OwnsVillages.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
@@ -39,7 +40,7 @@ namespace Game3 {
 	class Tileset;
 	struct InteractionSet;
 
-	class Game: public std::enable_shared_from_this<Game>, public BufferContext, public HasTickQueue<const TickArgs &> {
+	class Game: public std::enable_shared_from_this<Game>, public OwnsVillages, public BufferContext, public HasTickQueue<const TickArgs &> {
 		public:
 			static constexpr const char *DEFAULT_PATH = "game.g3";
 
@@ -156,6 +157,8 @@ namespace Game3 {
 			Lockable<std::unordered_map<RealmID, RealmPtr>> realms;
 
 			Game() = default;
+
+			void associateWithRealm(const VillagePtr &, RealmID) override;
 
 		private:
 			std::unordered_map<FluidID, TileID> fluidCache;

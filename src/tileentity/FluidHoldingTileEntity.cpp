@@ -75,7 +75,7 @@ namespace Game3 {
 			increaseUpdateCounter();
 			queueBroadcast();
 		} else {
-			getRealm()->getGame().toClient().signal_fluid_update().emit(std::dynamic_pointer_cast<HasFluids>(shared_from_this()));
+			getRealm()->getGame().toClient().signalFluidUpdate().emit(std::dynamic_pointer_cast<HasFluids>(shared_from_this()));
 		}
 	}
 

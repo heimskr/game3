@@ -239,7 +239,7 @@ namespace Game3 {
 		money += to_add;
 		auto &game = getRealm()->getGame();
 		if (game.getSide() == Side::Client)
-			game.toClient().signal_player_money_update().emit(getShared());
+			game.toClient().signalPlayerMoneyUpdate().emit(getShared());
 		else
 			increaseUpdateCounter();
 	}

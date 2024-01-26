@@ -2,9 +2,10 @@
 #include "data/ConsumptionRule.h"
 #include "data/ProductionRule.h"
 #include "game/Resource.h"
-#include "game/ServerGame.h"
+#include "game/Game.h"
 #include "game/Village.h"
 #include "packet/VillageUpdatePacket.h"
+#include "threading/ThreadContext.h"
 #include "util/Util.h"
 
 #include "NameGen.h"
@@ -18,14 +19,14 @@ namespace Game3 {
 		}
 	}
 
-	Village::Village(ServerGame &game, const Place &place, const VillageOptions &options_):
+	Village::Village(Game &game, const Place &place, const VillageOptions &options_):
 		Village(game, place.realm->id, ChunkPosition(place.position), place.position, options_) {}
 
-	Village::Village(ServerGame &game, RealmID realm_id, ChunkPosition chunk_position, const Position &position_, const VillageOptions &options_):
+	Village::Village(Game &game, RealmID realm_id, ChunkPosition chunk_position, const Position &position_, const VillageOptions &options_):
 		Village(game, game.getNewVillageID(), realm_id, chunk_position, position_, options_) {}
 
-	Village::Village(ServerGame &game, VillageID id_, RealmID realm_id, ChunkPosition chunk_position, const Position &position_, const VillageOptions &options_):
-		HasGame(game.toServerPointer()),
+	Village::Village(Game &game, VillageID id_, RealmID realm_id, ChunkPosition chunk_position, const Position &position_, const VillageOptions &options_):
+		HasGame(game.shared_from_this()),
 		id(id_),
 		name(NameGen::makeRandomLanguage(threadContext.rng).makeName()),
 		realmID(realm_id),

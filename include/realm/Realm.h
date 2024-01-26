@@ -350,7 +350,7 @@ namespace Game3 {
 			Lockable<std::unordered_set<VillagePtr>> villages;
 			ChunkPosition lastPlayerChunk{INT32_MIN, INT32_MIN};
 
-			friend class ServerGame;
+			friend class Game;
 
 			Lockable<std::map<ChunkPosition, WeakSet<RemoteClient>>> chunkRequests;
 

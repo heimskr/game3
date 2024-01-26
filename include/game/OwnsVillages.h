@@ -1,10 +1,10 @@
 #pragma once
 
-#include "game/Village.h"
+#include "threading/Atomic.h"
 #include "threading/Lockable.h"
+#include "types/ChunkPosition.h"
 
 #include <atomic>
-#include <cstddef>
 #include <map>
 
 namespace SQLite {
@@ -12,24 +12,30 @@ namespace SQLite {
 }
 
 namespace Game3 {
-	class ServerGame;
+	class Game;
+	class Village;
 	struct Place;
+	struct VillageOptions;
+
+	using VillagePtr = std::shared_ptr<Village>;
 
 	class OwnsVillages {
 		public:
 			OwnsVillages() = default;
+			virtual ~OwnsVillages() = default;
 
-			size_t getNewVillageID();
-			VillagePtr getVillage(size_t id) const;
-			VillagePtr addVillage(ServerGame &, ChunkPosition, const Place &, const VillageOptions &);
+			VillageID getNewVillageID();
+			VillagePtr getVillage(VillageID id) const;
+			VillagePtr addVillage(Game &, ChunkPosition, const Place &, const VillageOptions &);
+			VillagePtr addVillage(Game &, VillageID, std::string name, RealmID, ChunkPosition, const Position &, Resources = {});
 			void saveVillages(SQLite::Database &, bool use_transaction = true);
-			void loadVillages(const std::shared_ptr<ServerGame> &, SQLite::Database &);
+			void loadVillages(const std::shared_ptr<Game> &, SQLite::Database &);
 
 		protected:
 			virtual void associateWithRealm(const VillagePtr &, RealmID) = 0;
 
 		private:
-			Lockable<std::map<size_t, VillagePtr>> villageMap;
-			std::atomic_size_t lastVillageID = 0;
+			Lockable<std::map<VillageID, VillagePtr>> villageMap;
+			Atomic<VillageID> lastVillageID = 0;
 	};
 }

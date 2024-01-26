@@ -11,18 +11,22 @@ namespace Game3 {
 		static PacketID ID() { return 57; }
 
 		VillageID villageID{};
+		RealmID realmID{};
+		ChunkPosition chunkPosition;
+		Position position;
+		std::string name;
 		LaborAmount labor{};
 		Resources resources{};
 
 		VillageUpdatePacket() = default;
 		explicit VillageUpdatePacket(const Village &);
-		VillageUpdatePacket(VillageID village_id, LaborAmount labor_, Resources resources_):
-			villageID(village_id), labor(labor_), resources(std::move(resources_)) {}
+		VillageUpdatePacket(VillageID village_id, RealmID realm_id, ChunkPosition chunk_position, const Position &position_, std::string name_, LaborAmount labor_, Resources resources_):
+			villageID(village_id), realmID(realm_id), chunkPosition(chunk_position), position(position_), name(std::move(name_)), labor(labor_), resources(std::move(resources_)) {}
 
 		PacketID getID() const override { return ID(); }
 
-		void encode(Game &, Buffer &buffer) const override { buffer << villageID << labor << resources; }
-		void decode(Game &, Buffer &buffer)       override { buffer >> villageID >> labor >> resources; }
+		void encode(Game &, Buffer &buffer) const override { buffer << villageID << realmID << chunkPosition << position << name << labor << resources; }
+		void decode(Game &, Buffer &buffer)       override { buffer >> villageID >> realmID >> chunkPosition >> position >> name >> labor >> resources; }
 
 		void handle(ClientGame &) override;
 	};

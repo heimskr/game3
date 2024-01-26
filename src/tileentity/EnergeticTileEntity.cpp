@@ -43,7 +43,7 @@ namespace Game3 {
 			increaseUpdateCounter();
 			queueBroadcast();
 		} else {
-			getRealm()->getGame().toClient().signal_energy_update().emit(std::dynamic_pointer_cast<HasEnergy>(shared_from_this()));
+			getRealm()->getGame().toClient().signalEnergyUpdate().emit(std::dynamic_pointer_cast<HasEnergy>(shared_from_this()));
 		}
 	}
 

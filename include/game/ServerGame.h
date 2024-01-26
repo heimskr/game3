@@ -4,7 +4,6 @@
 #include "entity/ServerPlayer.h"
 #include "game/Fluids.h"
 #include "game/Game.h"
-#include "game/OwnsVillages.h"
 #include "net/RemoteClient.h"
 #include "threading/Lockable.h"
 #include "threading/MTQueue.h"
@@ -24,7 +23,7 @@ namespace Game3 {
 	class RemoteClient;
 	class Server;
 
-	class ServerGame: public Game, public OwnsVillages {
+	class ServerGame: public Game {
 		public:
 			constexpr static float GARBAGE_COLLECTION_TIME = 60;
 
@@ -77,9 +76,6 @@ namespace Game3 {
 						if (std::shared_ptr<RemoteClient> client = player->toServer()->weakClient.lock())
 							client->send(packet);
 			}
-
-		protected:
-			void associateWithRealm(const VillagePtr &, RealmID) override;
 
 		private:
 			MTQueue<std::pair<std::weak_ptr<RemoteClient>, std::shared_ptr<Packet>>> packetQueue;

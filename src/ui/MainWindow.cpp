@@ -26,6 +26,7 @@
 #include "ui/module/InventoryModule.h"
 #include "ui/module/FluidLevelsModule.h"
 #include "ui/module/ModuleFactory.h"
+#include "ui/module/VillageTradeModule.h"
 #include "ui/tab/CraftingTab.h"
 #include "ui/tab/InventoryTab.h"
 #include "ui/tab/TextTab.h"
@@ -393,14 +394,14 @@ namespace Game3 {
 		for (auto &[widget, tab]: tabMap)
 			tab->reset(game);
 
-		game->signal_player_inventory_update().connect([this](const PlayerPtr &player) {
+		game->signalPlayerInventoryUpdate().connect([this](const PlayerPtr &player) {
 			if (player != game->player)
 				return;
 			inventoryTab->update(game);
 			craftingTab->update(game);
 		});
 
-		game->signal_other_inventory_update().connect([this](const std::shared_ptr<Agent> &owner, InventoryID inventory_id) {
+		game->signalOtherInventoryUpdate().connect([this](const std::shared_ptr<Agent> &owner, InventoryID inventory_id) {
 			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner); has_inventory && has_inventory->getInventory(inventory_id)) {
 				auto client_inventory = std::dynamic_pointer_cast<ClientInventory>(has_inventory->getInventory(inventory_id));
 				queue([this, owner, client_inventory] {
@@ -413,13 +414,13 @@ namespace Game3 {
 			}
 		});
 
-		game->signal_player_money_update().connect([this](const PlayerPtr &) {
+		game->signalPlayerMoneyUpdate().connect([this](const PlayerPtr &) {
 			queue([this] {
 				inventoryTab->update(game);
 			});
 		});
 
-		game->signal_fluid_update().connect([this](const std::shared_ptr<HasFluids> &has_fluids) {
+		game->signalFluidUpdate().connect([this](const std::shared_ptr<HasFluids> &has_fluids) {
 			queue([this, has_fluids] {
 				std::unique_lock<DefaultMutex> lock;
 				if (Module *module_ = inventoryTab->getModule(lock)) {
@@ -429,12 +430,22 @@ namespace Game3 {
 			});
 		});
 
-		game->signal_energy_update().connect([this](const std::shared_ptr<HasEnergy> &has_energy) {
+		game->signalEnergyUpdate().connect([this](const std::shared_ptr<HasEnergy> &has_energy) {
 			queue([this, has_energy] {
 				std::unique_lock<DefaultMutex> lock;
 				if (Module *module_ = inventoryTab->getModule(lock)) {
 					std::any data(has_energy);
 					module_->handleMessage({}, "UpdateEnergy", data);
+				}
+			});
+		});
+
+		game->signalVillageUpdate().connect([this](const VillagePtr &village) {
+			queue([this, village] {
+				std::unique_lock<DefaultMutex> lock;
+				if (Module *module_ = inventoryTab->getModule(lock)) {
+					std::any data(village);
+					module_->handleMessage({}, "VillageUpdate", data);
 				}
 			});
 		});

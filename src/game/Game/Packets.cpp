@@ -56,6 +56,7 @@
 #include "packet/UseItemPacket.h"
 #include "packet/SubscribeToVillageUpdatesPacket.h"
 #include "packet/VillageUpdatePacket.h"
+#include "packet/OpenVillageTradePacket.h"
 
 namespace Game3 {
 	void Game::addPacketFactories() {
@@ -122,5 +123,6 @@ namespace Game3 {
 		add(PacketFactory::create<UseItemPacket>());
 		add(PacketFactory::create<SubscribeToVillageUpdatesPacket>());
 		add(PacketFactory::create<VillageUpdatePacket>());
+		add(PacketFactory::create<OpenVillageTradePacket>());
 	}
 }

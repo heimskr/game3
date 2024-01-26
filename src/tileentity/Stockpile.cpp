@@ -1,7 +1,10 @@
 #include "entity/Player.h"
 #include "game/ServerGame.h"
+#include "packet/OpenVillageTradePacket.h"
+#include "packet/VillageUpdatePacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Stockpile.h"
+#include "ui/module/VillageTradeModule.h"
 #include "util/Cast.h"
 
 namespace Game3 {
@@ -12,10 +15,16 @@ namespace Game3 {
 		if (getSide() != Side::Server)
 			return false;
 
-		VillagePtr village = getGame().toServer().getVillage(villageID);
+		Game &game = getGame();
+
+		VillagePtr village = game.getVillage(villageID);
 		ServerPlayerPtr server_player = player->toServer();
 
 		server_player->subscribeVillage(village);
+
+		player->notifyOfRealm(*game.getRealm(village->getRealmID()));
+		player->send(VillageUpdatePacket(*village));
+		player->send(OpenVillageTradePacket(villageID));
 
 		server_player->queueForMove([](const EntityPtr &entity, bool) {
 			safeDynamicCast<ServerPlayer>(entity)->unsubscribeVillages();

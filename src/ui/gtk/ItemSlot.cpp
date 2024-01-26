@@ -31,6 +31,8 @@ namespace Game3 {
 		auto source = Gtk::DragSource::create();
 		source->set_actions(Gdk::DragAction::MOVE);
 		source->signal_prepare().connect([this](double, double) -> Glib::RefPtr<Gdk::ContentProvider> {
+			if (!inventory)
+				return {};
 			Glib::Value<DragSource> value;
 			value.init(value.value_type());
 			value.set({slot, inventory, inventory->index});
@@ -39,7 +41,7 @@ namespace Game3 {
 
 		auto target = Gtk::DropTarget::create(Glib::Value<DragSource>::value_type(), Gdk::DragAction::MOVE);
 		target->signal_drop().connect([this](const Glib::ValueBase &base, double, double) {
-			if (base.gobj()->g_type != Glib::Value<DragSource>::value_type())
+			if (!inventory || base.gobj()->g_type != Glib::Value<DragSource>::value_type())
 				return false;
 
 			const auto &value = static_cast<const Glib::Value<DragSource> &>(base);
