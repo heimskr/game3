@@ -265,6 +265,11 @@
 				"station": "base:station/oven"
 			}],
 			["base:registry/crafting_recipe", {
+				"input": [["base:item/raw_meat", 1]],
+				"output": [["base:item/meat", 1]],
+				"station": "base:station/oven"
+			}],
+			["base:registry/crafting_recipe", {
 				"input":  [["base:item/electronics", 4], ["base:item/iron_bar", 8]],
 				"output": [["base:item/purifier", 1]],
 				"station": "base:station/anvil"

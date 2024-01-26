@@ -6,6 +6,7 @@
 
 #include <nlohmann/json_fwd.hpp>
 
+#include <limits>
 #include <optional>
 #include <set>
 #include <utility>
@@ -20,6 +21,7 @@ namespace Game3 {
 			ConsumptionRule(const Game &, const nlohmann::json &);
 
 			inline const auto & getInput() const { return input; }
+			inline const auto & getLaborRange() const { return laborRange; }
 			inline auto getLaborOut() const { return laborOut; }
 			inline auto getAlways() const { return always; }
 
@@ -29,6 +31,7 @@ namespace Game3 {
 			Identifier input;
 			LaborAmount laborOut{};
 			bool always{};
+			std::pair<double, double> laborRange{-std::numeric_limits<double>::infinity(), 100};
 	};
 
 	void to_json(nlohmann::json &, const ConsumptionRule &);

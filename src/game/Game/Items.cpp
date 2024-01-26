@@ -64,6 +64,7 @@ namespace Game3 {
 		add(std::make_shared<BasicFood>("base:item/chili_crisp", "Chili Crisp",    32, 10));
 		add(std::make_shared<BasicFood>("base:item/morsel",      "Monster Morsel", 10,  2));
 		add(std::make_shared<BasicFood>("base:item/raw_meat",    "Raw Meat",       10,  2));
+		add(std::make_shared<BasicFood>("base:item/meat",        "Meat",           20,  4));
 		add(std::make_shared<BasicFood>("base:item/bleach",      "Bleach",         16, -8));
 
 		add(std::make_shared<Bomb>("base:item/bomb", "Bomb", 32, 64));

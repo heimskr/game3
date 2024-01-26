@@ -9,7 +9,7 @@ namespace Game3 {
 		VillageUpdatePacket(village.getID(), village.getLabor(), village.getResources()) {}
 
 	void VillageUpdatePacket::handle(ClientGame &) {
-		INFO("Resources for village " << villageID << ":");
+		INFO("Resources for village " << villageID << " (labor = " << labor << "):");
 		for (const auto &[key, value]: resources)
 			INFO("    " << key << " => " << value);
 	}

@@ -11,7 +11,7 @@
 
 namespace Game3 {
 	namespace {
-		constexpr std::chrono::seconds PERIOD{30};
+		constexpr std::chrono::seconds PERIOD{1};
 
 		constexpr auto getMultiplier() {
 			return std::chrono::duration_cast<std::chrono::milliseconds>(PERIOD).count() / 60e3;
@@ -99,12 +99,14 @@ namespace Game3 {
 			labor_needed = labor;
 		}
 
-		for (const ItemStack &stack: rule.getInputs()) {
-			INFO("Subtract " << multiplier << " * " << stack.count << " from " << stack.getID());
+		if (multiplier == 0)
+			return;
+
+		for (const ItemStack &stack: rule.getInputs())
 			resources.at(stack.getID()) -= multiplier * stack.count;
-		}
 
 		output_count += add_count;
+		labor -= labor_needed;
 	}
 
 	void Village::produce(BiomeType biome, const ProductionRuleRegistry &rules) {
@@ -120,6 +122,11 @@ namespace Game3 {
 			return false;
 
 		if (iter->second < 1.0)
+			return false;
+
+		const auto [min, max] = rule.getLaborRange();
+
+		if (labor < min || max < labor)
 			return false;
 
 		--iter->second;
