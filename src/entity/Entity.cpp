@@ -330,14 +330,18 @@ namespace Game3 {
 
 		const auto [row, column] = position.copyBase();
 
-		if (auto fluid_tile = getRealm()->tileProvider.copyFluidTile({row, column}); fluid_tile && 0 < fluid_tile->level)
-			renderHeight = 10.f;
-		else
+		float fluid_offset = 0.f;
+
+		if (auto fluid_tile = getRealm()->tileProvider.copyFluidTile({row, column}); fluid_tile && 0 < fluid_tile->level) {
+			fluid_offset = std::sin(float(getGame().time) * 1.5f) + 0.5f;
+			renderHeight = 10.f + fluid_offset;
+		} else {
 			renderHeight = 16.f;
+		}
 
 
 		const float x = column + offset_x;
-		const float y = row    + offset_y - offset_z;
+		const float y = row    + offset_y - offset_z - fluid_offset / 16.f;
 
 		RenderOptions main_options{
 			.x = x,
