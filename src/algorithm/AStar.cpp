@@ -27,32 +27,24 @@ namespace Game3 {
 		}
 	};
 
-	static inline size_t heuristic(const Position &a, const Position &b) {
-		return std::abs(a.row - b.row) + std::abs(a.column - b.column);
-	}
+	namespace {
+		inline size_t heuristic(const Position &a, const Position &b) {
+			return std::abs(a.row - b.row) + std::abs(a.column - b.column);
+		}
 
-	static inline void getNeighbors(const std::shared_ptr<Realm> &realm, const Position &position, std::vector<Position> &next) {
-		next.clear();
+		inline void getNeighbors(const std::shared_ptr<Realm> &realm, const Position &position, std::vector<Position> &next) {
+			next.clear();
 
-		Position next_pos(position.row - 1, position.column);
+			auto check = [&](const Position &pos) {
+				if (auto state = realm->tileProvider.copyPathState(pos); state && *state != 0 && !realm->hasFluid(pos))
+					next.emplace_back(pos);
+			};
 
-		if (auto state = realm->tileProvider.copyPathState(next_pos); state && *state != 0)
-			next.emplace_back(next_pos);
-
-		next_pos = {position.row, position.column - 1};
-
-		if (auto state = realm->tileProvider.copyPathState(next_pos); state && *state != 0)
-			next.emplace_back(next_pos);
-
-		next_pos = {position.row + 1, position.column};
-
-		if (auto state = realm->tileProvider.copyPathState(next_pos); state && *state != 0)
-			next.emplace_back(next_pos);
-
-		next_pos = {position.row, position.column + 1};
-
-		if (auto state = realm->tileProvider.copyPathState(next_pos); state && *state != 0)
-			next.emplace_back(next_pos);
+			check({position.row - 1, position.column});
+			check({position.row, position.column - 1});
+			check({position.row + 1, position.column});
+			check({position.row, position.column + 1});
+		}
 	}
 
 	// Credit: https://www.redblobgames.com/pathfinding/a-star/implementation.html#cplusplus
