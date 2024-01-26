@@ -390,6 +390,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 57. **Village Update**: informs the client of a village's latest data.
 
 	- `u64` Village ID
+	- `f64` Available Labor
 	- `map<string, f64>` Resources
 
 # Message Format

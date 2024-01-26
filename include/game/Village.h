@@ -32,7 +32,7 @@ namespace Game3 {
 			inline auto getRealmID() const { return realmID; }
 			inline auto getChunkPosition() const { return chunkPosition; }
 			inline auto getPosition() const { return position; }
-			inline auto getLabor() const { return labor; }
+			inline auto getLabor() const { return labor.load(); }
 			inline auto getRandomValue() const { return randomValue; }
 			inline const auto & getName() const { return name; }
 			inline const auto & getOptions() const { return options; }

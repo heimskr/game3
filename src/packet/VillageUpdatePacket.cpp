@@ -6,7 +6,7 @@
 
 namespace Game3 {
 	VillageUpdatePacket::VillageUpdatePacket(const Village &village):
-		VillageUpdatePacket(village.getID(), village.getResources()) {}
+		VillageUpdatePacket(village.getID(), village.getLabor(), village.getResources()) {}
 
 	void VillageUpdatePacket::handle(ClientGame &) {
 		INFO("Resources for village " << villageID << ":");

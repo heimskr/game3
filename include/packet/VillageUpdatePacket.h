@@ -10,18 +10,19 @@ namespace Game3 {
 	struct VillageUpdatePacket: Packet {
 		static PacketID ID() { return 57; }
 
-		VillageID villageID;
-		Resources resources;
+		VillageID villageID{};
+		LaborAmount labor{};
+		Resources resources{};
 
 		VillageUpdatePacket() = default;
 		explicit VillageUpdatePacket(const Village &);
-		VillageUpdatePacket(VillageID village_id, Resources resources_):
-			villageID(village_id), resources(std::move(resources_)) {}
+		VillageUpdatePacket(VillageID village_id, LaborAmount labor_, Resources resources_):
+			villageID(village_id), labor(labor_), resources(std::move(resources_)) {}
 
 		PacketID getID() const override { return ID(); }
 
-		void encode(Game &, Buffer &buffer) const override { buffer << villageID << resources; }
-		void decode(Game &, Buffer &buffer)       override { buffer >> villageID >> resources; }
+		void encode(Game &, Buffer &buffer) const override { buffer << villageID << labor << resources; }
+		void decode(Game &, Buffer &buffer)       override { buffer >> villageID >> labor >> resources; }
 
 		void handle(ClientGame &) override;
 	};
