@@ -87,11 +87,15 @@ namespace Game3 {
 
 	void ItemSlot::setStack(const ItemStack &stack) {
 		image.set(stack.getImage());
-		label.set_text(std::to_string(stack.count));
+
+		if (stack.count == ItemCount(-1))
+			label.set_text({});
+		else
+			label.set_text(std::to_string(stack.count));
 
 		Glib::ustring tooltip = stack.item->getTooltip(stack);
 
-		if (stack.count != 1)
+		if (stack.count != 1 && stack.count != ItemCount(-1))
 			tooltip += " \u00d7 " + std::to_string(stack.count);
 
 		if (stack.hasDurability()) {

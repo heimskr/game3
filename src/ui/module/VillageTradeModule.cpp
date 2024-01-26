@@ -34,12 +34,8 @@ namespace Game3 {
 		if (name == "VillageUpdate") {
 
 			VillagePtr updated_village = std::any_cast<VillagePtr>(data);
-			if (updated_village == village) {
-				INFO("Updating village module");
+			if (updated_village == village)
 				update();
-			} else {
-				INFO("Not updating village module");
-			}
 
 		}
 
@@ -62,7 +58,7 @@ namespace Game3 {
 		for (const auto &[resource, amount]: village->getResources()) {
 			auto hbox = std::make_unique<Gtk::Box>(Gtk::Orientation::HORIZONTAL);
 			auto item_slot = std::make_unique<ItemSlot>(game, -1, nullptr);
-			item_slot->setStack({*game, resource});
+			item_slot->setStack({*game, resource, ItemCount(-1)});
 			item_slot->set_hexpand(false);
 			auto label = std::make_unique<Gtk::Label>(std::format("× {:.2f}", amount));
 			hbox->append(*item_slot);
