@@ -190,9 +190,7 @@ namespace Game3 {
 	}
 
 	Resources Village::getDefaultResources() {
-		return {
-			{"base:item/iron_pickaxe", 2.0}
-		};
+		return {};
 	}
 
 	std::string Village::getSQL() {
