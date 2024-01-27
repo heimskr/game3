@@ -54,6 +54,7 @@ namespace Game3 {
 			using Entity::teleport;
 			void teleport(const Position &, const std::shared_ptr<Realm> &, MovementContext) override;
 			void addMoney(MoneyCount);
+			void removeMoney(MoneyCount);
 			float getMovementSpeed() const override { return movementSpeed; }
 			bool setTooldown(float multiplier);
 			inline bool hasTooldown() const { return 0.f < tooldown; }

@@ -1,13 +1,13 @@
 #include <iostream>
 
-#include "graphics/Tileset.h"
+#include "algorithm/Stonks.h"
 #include "entity/Blacksmith.h"
 #include "entity/Merchant.h"
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
-#include "game/Stonks.h"
+#include "graphics/Tileset.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"

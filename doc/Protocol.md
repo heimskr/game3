@@ -404,6 +404,13 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u64` Village ID
 	- `bool` Remove on move
 
+59. **Do Village Trade**: tells the server to perform a village trade.
+
+	- `u64` Village ID
+	- `string` Resource
+	- `u64` Amount
+	- `bool` Is sell (true = sell, false = buy)
+
 # Message Format
 
 All values are little endian. Strings are not null-terminated.

@@ -1,15 +1,15 @@
 #include <iostream>
 
-#include "threading/ThreadContext.h"
-#include "graphics/Tileset.h"
+#include "algorithm/Stonks.h"
 #include "entity/Woodcutter.h"
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
-#include "game/Stonks.h"
+#include "graphics/Tileset.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
+#include "threading/ThreadContext.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
 #include "tileentity/OreDeposit.h"

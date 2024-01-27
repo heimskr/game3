@@ -5,6 +5,7 @@
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
 #include "entity/ServerPlayer.h"
+#include "error/InsufficientFundsError.h"
 #include "game/ClientGame.h"
 #include "game/ServerGame.h"
 #include "game/Inventory.h"
@@ -237,7 +238,23 @@ namespace Game3 {
 
 	void Player::addMoney(MoneyCount to_add) {
 		money += to_add;
-		auto &game = getRealm()->getGame();
+
+		Game &game = getRealm()->getGame();
+
+		if (game.getSide() == Side::Client)
+			game.toClient().signalPlayerMoneyUpdate().emit(getShared());
+		else
+			increaseUpdateCounter();
+	}
+
+	void Player::removeMoney(MoneyCount to_remove) {
+		if (money < to_remove)
+			throw InsufficientFundsError("Player lacks enough money for transaction");
+
+		money -= to_remove;
+
+		Game &game = getRealm()->getGame();
+
 		if (game.getSide() == Side::Client)
 			game.toClient().signalPlayerMoneyUpdate().emit(getShared());
 		else

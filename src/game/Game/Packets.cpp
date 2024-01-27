@@ -57,6 +57,7 @@
 #include "packet/SubscribeToVillageUpdatesPacket.h"
 #include "packet/VillageUpdatePacket.h"
 #include "packet/OpenVillageTradePacket.h"
+#include "packet/DoVillageTradePacket.h"
 
 namespace Game3 {
 	void Game::addPacketFactories() {
@@ -124,5 +125,6 @@ namespace Game3 {
 		add(PacketFactory::create<SubscribeToVillageUpdatesPacket>());
 		add(PacketFactory::create<VillageUpdatePacket>());
 		add(PacketFactory::create<OpenVillageTradePacket>());
+		add(PacketFactory::create<DoVillageTradePacket>());
 	}
 }

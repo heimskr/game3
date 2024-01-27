@@ -69,7 +69,6 @@ namespace Game3 {
 			/** Only the z component is handled in the default Entity tick method. */
 			Lockable<Vector3> velocity;
 			Lockable<std::list<Direction>> path;
-			Atomic<MoneyCount> money = 0;
 			Lockable<WeakSet<Entity>> visibleEntities;
 			Lockable<WeakSet<Player>> visiblePlayers;
 			/** Set when an entity is beginning to teleport so that an EntityMovedPacket can be sent with the proper realm ID
@@ -184,6 +183,9 @@ namespace Game3 {
 			/** More work needs to be done after this to initialize weakRealm. */
 			virtual void decode(Buffer &);
 
+			inline MoneyCount getMoney() const { return money; }
+			inline void setMoney(MoneyCount new_value) { money = new_value; }
+
 			void sendTo(RemoteClient &, UpdateCounter threshold = 0);
 			void sendToVisible();
 
@@ -208,6 +210,7 @@ namespace Game3 {
 			int variety = 0;
 			float renderHeight = 16.f;
 			std::atomic_bool awaitingDestruction = false;
+			Atomic<MoneyCount> money = 0;
 
 			Entity() = delete;
 			Entity(EntityType);

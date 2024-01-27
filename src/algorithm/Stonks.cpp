@@ -1,9 +1,9 @@
 #include <cmath>
 
+#include "algorithm/Stonks.h"
 #include "entity/Merchant.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
-#include "game/Stonks.h"
 
 namespace Game3 {
 	double buyPriceToSellPrice(double buy_price, double greed) {
@@ -55,7 +55,7 @@ namespace Game3 {
 	}
 
 	bool totalSellPrice(const Merchant &merchant, const ItemStack &stack, MoneyCount &out) {
-		return totalSellPrice(*merchant.getInventory(0), merchant.money, merchant.greed, stack, out);
+		return totalSellPrice(*merchant.getInventory(0), merchant.getMoney(), merchant.greed, stack, out);
 	}
 
 	size_t totalBuyPrice(const Inventory &inventory, MoneyCount money, const ItemStack &stack) {
@@ -81,6 +81,6 @@ namespace Game3 {
 	}
 
 	size_t totalBuyPrice(const Merchant &merchant, const ItemStack &stack) {
-		return totalBuyPrice(*merchant.getInventory(0), merchant.money, stack);
+		return totalBuyPrice(*merchant.getInventory(0), merchant.getMoney(), stack);
 	}
 }

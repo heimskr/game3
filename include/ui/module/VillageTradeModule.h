@@ -28,16 +28,21 @@ namespace Game3 {
 		private:
 			class Row: public Gtk::Box {
 				public:
-					Row(const std::shared_ptr<ClientGame> &, const Identifier &resource, double amount);
+					Row(const std::shared_ptr<ClientGame> &, VillageID, Identifier resource_, double amount);
 
 					void update(double amount);
 
 				private:
+					VillageID villageID{};
+					Identifier resource;
 					ItemSlot itemSlot;
 					Gtk::Label quantityLabel;
 					Gtk::SpinButton transferAmount;
 					Gtk::Button buyButton{"Buy"};
 					Gtk::Button sellButton{"Sell"};
+
+					void buy(const std::shared_ptr<ClientGame> &, ItemCount);
+					void sell(const std::shared_ptr<ClientGame> &, ItemCount);
 			};
 
 			std::shared_ptr<ClientGame> game;
