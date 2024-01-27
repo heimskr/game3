@@ -42,6 +42,17 @@ namespace Game3 {
 			return;
 		}
 
+		// Find resource count
+
+		ItemCount resource_count{};
+
+		if (auto found_count = village->getResourceAmount(resource)) {
+			resource_count = *found_count;
+		} else {
+			client.sendError("Resource not found in village {}: {}", *village, resource);
+			return;
+		}
+
 		// Handle selling
 
 		if (isSell) {
@@ -50,25 +61,33 @@ namespace Game3 {
 				return;
 			}
 
-			inventory->remove(ItemStack(game, resource, amount));
-			const MoneyCount sell_price(std::floor(sellPrice(item->basePrice, amount, -1, 0.0)));
-			player->addMoney(sell_price);
-			INFO("Sold {} for {} from {}", ItemStack(game, resource, amount), sell_price, *village);
+			if (std::optional<MoneyCount> sell_price = totalSellPrice(resource_count, -1, item->basePrice, amount)) {
+				player->addMoney(*sell_price);
+				inventory->remove(ItemStack(game, resource, amount));
+				INFO("Sold {} for {} from {}", ItemStack(game, resource, amount), *sell_price, *village);
+			} else {
+				client.sendError("Can't sell {} x {}: village doesn't have enough money", amount, resource);
+			}
+
 			return;
 		}
 
 		// Handle buying
 
-		const MoneyCount buy_price(std::ceil(buyPrice(item->basePrice, amount, -1)));
+		if (std::optional<MoneyCount> buy_price = totalBuyPrice(resource_count, -1, item->basePrice, amount)) {
+			if (!player->removeMoney(*buy_price)) {
+				client.sendError("Village trade failed: insufficient funds (have {}, need {})", player->getMoney(), *buy_price);
+				return;
+			}
 
-		if (!player->removeMoney(buy_price)) {
-			client.sendError("Village trade failed: insufficient funds (have {}, need {})", player->getMoney(), buy_price);
+			INFO("Bought {} for {} from {}", ItemStack(game, resource, amount), *buy_price, *village);
+
+			if (auto leftover = inventory->add(ItemStack(game, resource, amount)))
+				leftover->spawn(player->getRealm(), player->getPosition());
+
 			return;
 		}
 
-		INFO("Bought {} for {} from {}", ItemStack(game, resource, amount), buy_price, *village);
-
-		if (auto leftover = inventory->add(ItemStack(game, resource, amount)))
-			leftover->spawn(player->getRealm(), player->getPosition());
+		client.sendError("Can't buy {} x {}: village doesn't have enough", amount, resource);
 	}
 }

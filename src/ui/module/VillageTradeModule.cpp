@@ -1,3 +1,4 @@
+#include "algorithm/Stonks.h"
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
 #include "game/Village.h"
@@ -70,26 +71,28 @@ namespace Game3 {
 
 		for (const auto &[resource, amount]: resources) {
 			if (auto iter = rows.find(resource); iter != rows.end()) {
-				iter->second->update(amount);
+				iter->second->setAmount(amount);
+				iter->second->updateLabel();
 			} else {
-				auto row = std::make_unique<Row>(game, village->getID(), resource, amount);
+				auto row = std::make_unique<Row>(game, village->getID(), *game->getItem(resource), amount);
 				vbox.append(*row);
 				rows[resource] = std::move(row);
 			}
 		}
 	}
 
-	VillageTradeModule::Row::Row(const ClientGamePtr &game, VillageID village_id, Identifier resource_, double amount):
-	Gtk::Box(Gtk::Orientation::HORIZONTAL), villageID(village_id), resource(std::move(resource_)), itemSlot(game, -1, nullptr) {
+	VillageTradeModule::Row::Row(const ClientGamePtr &game, VillageID village_id, const Item &item, double amount_):
+	Gtk::Box(Gtk::Orientation::HORIZONTAL), villageID(village_id), resource(item.identifier), itemSlot(game, -1, nullptr), basePrice(item.basePrice), amount(amount_) {
 		itemSlot.setStack({*game, resource, ItemCount(-1)});
-		update(amount);
+		updateLabel();
+		updateTooltips(1);
 		itemSlot.set_hexpand(false);
 		itemSlot.set_margin_start(3);
 		quantityLabel.set_size_request(64, -1);
 		quantityLabel.set_xalign(0.0);
 		quantityLabel.set_margin_start(5);
 		transferAmount.set_valign(Gtk::Align::CENTER);
-		transferAmount.set_adjustment(Gtk::Adjustment::create(1.0, 1.0, 999.0));
+		transferAmount.set_adjustment(Gtk::Adjustment::create(1.0, 1.0, std::min(amount, 999.0)));
 		transferAmount.set_digits(0);
 		buyButton.set_valign(Gtk::Align::CENTER);
 		sellButton.set_valign(Gtk::Align::CENTER);
@@ -99,6 +102,10 @@ namespace Game3 {
 		buyButton.add_css_class("buy-sell-button");
 		sellButton.add_css_class("buy-sell-button");
 		set_margin_top(5);
+
+		transferAmount.signal_changed().connect([this] {
+			updateTooltips(getCount());
+		});
 
 		buyButton.signal_clicked().connect([this, weak_game = std::weak_ptr(game)]() {
 			if (ClientGamePtr game = weak_game.lock())
@@ -117,8 +124,33 @@ namespace Game3 {
 		append(sellButton);
 	}
 
-	void VillageTradeModule::Row::update(double amount) {
+	void VillageTradeModule::Row::setAmount(double amount_) {
+		if (amount == amount_)
+			return;
+		amount = amount_;
+		const ItemCount old_count = getCount();
+		transferAmount.set_adjustment(Gtk::Adjustment::create(1.0, 1.0, std::min(amount, 999.0)));
+		transferAmount.set_value(std::min({double(old_count), amount, 999.0}));
+	}
+
+	void VillageTradeModule::Row::updateLabel() {
 		quantityLabel.set_text(std::format("× {:.2f}", amount));
+	}
+
+	void VillageTradeModule::Row::updateTooltips(ItemCount count) {
+		if (std::optional<MoneyCount> buy_price = totalBuyPrice(ItemCount(amount), -1, basePrice, count))
+			buyButton.set_tooltip_text(std::format("Price: {}", *buy_price));
+		else
+			buyButton.set_tooltip_text("Village doesn't have that many!");
+
+		if (std::optional<MoneyCount> sell_price = totalSellPrice(ItemCount(amount), -1, basePrice, count))
+			sellButton.set_tooltip_text(std::format("Price: {}", *sell_price));
+		else
+			sellButton.set_tooltip_text("Village lacks funds!");
+	}
+
+	ItemCount VillageTradeModule::Row::getCount() const {
+		return ItemCount(transferAmount.get_value());
 	}
 
 	void VillageTradeModule::Row::buy(const ClientGamePtr &game, ItemCount amount) {

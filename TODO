@@ -11,3 +11,4 @@
 [2023/04/24 20:20:58] Add a plugin system.
 [2023/05/30 11:01:00] Update Entity/TileEntity documentation: add encode/decode.
 [2023/07/22 02:06:50] Lock inventories as appropriate.
+[2024/01/27 00:35:48] Investigate buy/sell prices. Broken?

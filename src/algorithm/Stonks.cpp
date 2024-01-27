@@ -4,25 +4,28 @@
 #include "entity/Merchant.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
+#include "item/Item.h"
 
 namespace Game3 {
 	double buyPriceToSellPrice(double buy_price, double greed) {
 		return buy_price / (1. + greed);
 	}
 
-	double applyMoney(double base_price, size_t merchant_money) {
-		return base_price / (1. + (1. / pow(E, -merchant_money / 50.)));
+	double applyMoney(double base_price, MoneyCount merchant_money) {
+		if (merchant_money == MoneyCount(-1))
+			return base_price;
+		return base_price / pow(E, merchant_money / 50.);
 	}
 
 	double applyScarcity(double base_price, ItemCount item_count) {
-		return base_price / (1. + (1. / pow(E, -item_count / 100.)));
+		return base_price / pow(E, item_count / 100.);
 	}
 
-	double buyPrice(double base_price, ItemCount item_count, size_t merchant_money) {
+	double buyPrice(double base_price, ItemCount item_count, MoneyCount merchant_money) {
 		return applyScarcity(applyMoney(base_price, merchant_money), item_count);
 	}
 
-	double sellPrice(double base_price, ItemCount item_count, size_t merchant_money, double greed) {
+	double sellPrice(double base_price, ItemCount item_count, MoneyCount merchant_money, double greed) {
 		return buyPriceToSellPrice(buyPrice(base_price, item_count, merchant_money), greed);
 	}
 
@@ -58,29 +61,51 @@ namespace Game3 {
 		return totalSellPrice(*merchant.getInventory(0), merchant.getMoney(), merchant.greed, stack, out);
 	}
 
-	size_t totalBuyPrice(const Inventory &inventory, MoneyCount money, const ItemStack &stack) {
-		double merchant_amount = inventory.count(stack);
-		const double base = stack.item->basePrice;
+	std::optional<MoneyCount> totalSellPrice(ItemCount merchant_count, MoneyCount merchant_money, double base_price, ItemCount count, double greed) {
 		double price = 0.;
-		auto amount = stack.count;
-		while (1 <= amount) {
-			const double unit_price = buyPrice(base, merchant_amount--, money);
-			money += unit_price;
+		double money(merchant_money);
+
+		while (1 <= count) {
+			const double unit_price = sellPrice(base_price, merchant_count++, money < 0? MoneyCount(-1) : MoneyCount(money), greed);
+
+			if (0 <= money) {
+				money -= unit_price;
+				if (money < 0)
+					return std::nullopt;
+			}
+
 			price += unit_price;
-			--amount;
+			--count;
 		}
 
-		// if (0 < amount) {
-		// 	const double subunit_price = amount * buyPrice(base, merchant_amount, money);
-		// 	money += subunit_price;
-		// 	price += subunit_price;
-		// }
+		return MoneyCount(std::floor(price));
+	}
 
-		// It's assumed the caller will check whether the player has enough money.
+	std::optional<MoneyCount> totalBuyPrice(ItemCount merchant_count, MoneyCount merchant_money, double base_price, ItemCount count) {
+		double price = 0.;
+		double money(merchant_money);
+
+		while (1 <= count) {
+			if (merchant_count == 0)
+				return std::nullopt;
+
+			const double unit_price = buyPrice(base_price, merchant_count--, money < 0? MoneyCount(-1) : MoneyCount(money));
+
+			if (0 <= money)
+				money += unit_price;
+
+			price += unit_price;
+			--count;
+		}
+
 		return std::ceil(price);
 	}
 
-	size_t totalBuyPrice(const Merchant &merchant, const ItemStack &stack) {
+	std::optional<MoneyCount> totalBuyPrice(const Inventory &inventory, MoneyCount merchant_money, const ItemStack &stack) {
+		return totalBuyPrice(inventory.count(stack), merchant_money, stack.item->basePrice, stack.count);
+	}
+
+	std::optional<MoneyCount> totalBuyPrice(const Merchant &merchant, const ItemStack &stack) {
 		return totalBuyPrice(*merchant.getInventory(0), merchant.getMoney(), stack);
 	}
 }

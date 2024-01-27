@@ -3,7 +3,7 @@
 #include "game/Resource.h"
 
 namespace Game3 {
-	std::optional<double> Richness::operator[](const Identifier &identifier) {
+	std::optional<double> Richness::operator[](const Identifier &identifier) const {
 		if (auto iter = richnesses.find(identifier); iter != richnesses.end())
 			return iter->second;
 		return std::nullopt;

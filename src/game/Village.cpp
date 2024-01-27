@@ -49,8 +49,15 @@ namespace Game3 {
 		labor(labor_),
 		randomValue(random_value) {}
 
-	std::optional<double> Village::getRichness(const Identifier &identifier) {
+	std::optional<double> Village::getRichness(const Identifier &identifier) const {
 		return richness[identifier];
+	}
+
+	std::optional<double> Village::getResourceAmount(const Identifier &identifier) const {
+		auto lock = resources.sharedLock();
+		if (auto iter = resources.find(identifier); iter != resources.end())
+			return iter->second;
+		return std::nullopt;
 	}
 
 	Tick Village::enqueueTick() {

@@ -14,7 +14,7 @@ namespace Game3 {
 		public:
 			Richness() = default;
 
-			std::optional<double> operator[](const Identifier &);
+			std::optional<double> operator[](const Identifier &) const;
 
 			static Richness makeRandom(const Game &);
 

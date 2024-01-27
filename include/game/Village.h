@@ -42,7 +42,8 @@ namespace Game3 {
 			inline void setLabor(auto value) { labor = value; }
 			inline void setResources(auto value) { resources = std::move(value); }
 
-			std::optional<double> getRichness(const Identifier &);
+			std::optional<double> getRichness(const Identifier &) const;
+			std::optional<double> getResourceAmount(const Identifier &) const;
 
 			Tick enqueueTick() override;
 			void tick(const TickArgs &);
