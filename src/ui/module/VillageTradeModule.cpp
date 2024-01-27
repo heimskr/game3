@@ -17,7 +17,8 @@ namespace Game3 {
 	VillageTradeModule::VillageTradeModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
 	game(std::move(game_)),
 	village(std::any_cast<VillagePtr>(argument)) {
-		vbox.set_hexpand();
+		vbox.set_hexpand(true);
+		vbox.set_vexpand(false);
 		villageName.set_xalign(0.5);
 		villageName.set_hexpand(true);
 		villageName.set_margin_top(10);
