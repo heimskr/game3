@@ -69,10 +69,10 @@ namespace Game3 {
 		buffer << static_cast<uint8_t>(0x10) << static_cast<uint16_t>(0x2030) << static_cast<uint32_t>(0x40506070) << static_cast<uint64_t>(0x8090a0b0c0d0e0f0);
 		buffer << -100000;
 
-		std::cout << buffer << '\n';
+		std::cout << std::format("{}\n", buffer);
 		decltype(test_vector) popped_vector;
 		buffer >> popped_vector;
-		std::cout << buffer << '\n';
+		std::cout << std::format("{}\n", buffer);
 
 		std::cout << '{';
 		for (const size_t item: popped_vector)
@@ -81,7 +81,7 @@ namespace Game3 {
 
 		decltype(test_map) popped_map;
 		buffer >> popped_map;
-		std::cout << buffer << '\n';
+		std::cout << std::format("{}\n", buffer);
 
 		for (const auto &[key, value]: popped_map) {
 			std::cout << "- " << key << " => {";
@@ -92,42 +92,42 @@ namespace Game3 {
 
 		decltype(test_string1) popped_string1;
 		buffer >> popped_string1;
-		std::cout << buffer << '\n';
+		std::cout << std::format("{}\n", buffer);
 		std::cout << popped_string1 << '\n';
 
 		decltype(test_string2) popped_string2;
 		buffer >> popped_string2;
-		std::cout << buffer << '\n';
+		std::cout << std::format("{}\n", buffer);
 		std::cout << popped_string2 << '\n';
 
 		decltype(test_string3) popped_string3;
 		buffer >> popped_string3;
-		std::cout << buffer << '\n';
+		std::cout << std::format("{}\n", buffer);
 		std::cout << '[' << popped_string3 << "]\n";
 
 		uint8_t popped8;
 		buffer >> popped8;
-		std::cout << buffer << '\n';
+		std::cout << std::format("{}\n", buffer);
 		std::cout << "0x" << std::hex << popped8 << std::dec << '\n';
 
 		uint16_t popped16;
 		buffer >> popped16;
-		std::cout << buffer << '\n';
+		std::cout << std::format("{}\n", buffer);
 		std::cout << "0x" << std::hex << popped16 << std::dec << '\n';
 
 		uint32_t popped32;
 		buffer >> popped32;
-		std::cout << buffer << '\n';
+		std::cout << std::format("{}\n", buffer);
 		std::cout << "0x" << std::hex << popped32 << std::dec << '\n';
 
 		uint64_t popped64;
 		buffer >> popped64;
-		std::cout << buffer << '\n';
+		std::cout << std::format("{}\n", buffer);
 		std::cout << "0x" << std::hex << popped64 << std::dec << '\n';
 
 		int32_t popped32i;
 		buffer >> popped32i;
-		std::cout << buffer << '\n';
+		std::cout << std::format("{}\n", buffer);
 		std::cout << popped32i << '\n';
 	}
 

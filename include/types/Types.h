@@ -109,7 +109,6 @@ namespace Game3 {
 
 	class Buffer;
 
-	std::ostream & operator<<(std::ostream &, const Color &);
 	Buffer & operator+=(Buffer &, const Color &);
 	Buffer & operator<<(Buffer &, const Color &);
 	Buffer & operator>>(Buffer &, Color &);

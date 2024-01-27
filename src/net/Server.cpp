@@ -269,7 +269,9 @@ namespace Game3 {
 		}
 
 		if (database_existed) {
+			Timer timer{"ReadAll"};
 			game->database.readAll();
+			timer.stop();
 			Timer::summary();
 			Timer::clear();
 			INFO_("Finished reading all data from database.");

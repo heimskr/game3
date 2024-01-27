@@ -230,8 +230,6 @@ namespace Game3 {
 				return *this += '\x0c';
 			}
 
-			friend std::ostream & operator<<(std::ostream &, const Buffer &);
-
 			template <typename T>
 			Buffer & operator>>(T &);
 
@@ -382,8 +380,29 @@ namespace Game3 {
 		return static_cast<T>(popBuffer<std::underlying_type_t<T>>(buffer));
 	}
 
-	std::ostream & operator<<(std::ostream &, const Buffer &);
-
 	Buffer & operator<<(Buffer &, std::same_as<nlohmann::json> auto const &);
 	Buffer & operator>>(Buffer &, std::same_as<nlohmann::json> auto &);
 }
+
+template <>
+struct std::formatter<Game3::Buffer> {
+	constexpr auto parse(std::format_parse_context &ctx) {
+		return ctx.begin();
+    }
+
+	auto format(const auto &buffer, std::format_context &ctx) const {
+		std::stringstream ss;
+		ss << "Buffer<";
+
+		for (bool first = true; const uint16_t byte: buffer.bytes) {
+			if (first)
+				first = false;
+			else
+				ss << ' ';
+			ss << std::hex << std::setw(2) << std::setfill('0') << std::right << byte << std::dec;
+		}
+
+		ss << ">[" << buffer.size() << ']';
+		return std::format_to(ctx.out(), "{}", ss.str());
+	}
+};

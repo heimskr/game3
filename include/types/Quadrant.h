@@ -24,5 +24,4 @@ namespace Game3 {
 	Quadrant getQuadrant(float x, float y);
 
 	std::string_view toString(Quadrant);
-	std::ostream & operator<<(std::ostream &, Quadrant);
 }

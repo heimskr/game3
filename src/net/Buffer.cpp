@@ -324,20 +324,6 @@ namespace Game3 {
 		return *this;
 	}
 
-	std::ostream & operator<<(std::ostream &os, const Buffer &buffer) {
-		os << "Buffer<";
-
-		for (bool first = true; const uint16_t byte: buffer.bytes) {
-			if (first)
-				first = false;
-			else
-				os << ' ';
-			os << std::hex << std::setw(2) << std::setfill('0') << std::right << byte << std::dec;
-		}
-
-		return os << ">[" << buffer.size() << ']';
-	}
-
 	template <>
 	Buffer & Buffer::operator>><std::string>(std::string &out) {
 		const std::string type = popType();

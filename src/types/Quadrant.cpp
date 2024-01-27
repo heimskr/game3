@@ -116,8 +116,4 @@ namespace Game3 {
 				return "invalid";
 		}
 	}
-
-	std::ostream & operator<<(std::ostream &os, Quadrant quadrant) {
-		return os << toString(quadrant);
-	}
 }

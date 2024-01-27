@@ -109,12 +109,6 @@ namespace Game3 {
 	}
 
 	template <typename T, typename M>
-	std::ostream & operator<<(std::ostream &os, const Lockable<T, M> &lockable) {
-		auto lock = lockable.sharedLock();
-		return os << lockable.getBase();
-	}
-
-	template <typename T, typename M>
 	Buffer & operator+=(Buffer &buffer, const Lockable<T, M> &lockable) {
 		auto lock = lockable.sharedLock();
 		return buffer += lockable.getBase();

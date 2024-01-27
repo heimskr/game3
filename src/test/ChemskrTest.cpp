@@ -54,7 +54,7 @@ namespace Game3 {
 void testNuclear() {
 	size_t i = 0;
 	for (const auto &[atom, daltons]: std::map(Chemskr::nuclideMasses.begin(), Chemskr::nuclideMasses.end())) {
-		std::cout << atom << " binding energy: " << atom.calculateBindingEnergy() << " MeV\n";
+		std::cout << std::format("{} binding energy: {} MeV\n", atom, atom.calculateBindingEnergy());
 		if (++i == 15)
 			break;
 	}

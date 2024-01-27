@@ -191,13 +191,14 @@ namespace Game3 {
 				if (player.get() != cast_player && player->getRealm() && player->canSee(entity))
 					if (auto client = player->toServer()->weakClient.lock())
 						client->send(packet);
-		} else {
-			auto lock = players.sharedLock();
-			for (const auto &player: players)
-				if (player->getRealm() && player->canSee(entity))
-					if (auto client = player->toServer()->weakClient.lock())
-						client->send(packet);
+			return;
 		}
+
+		auto lock = players.sharedLock();
+		for (const auto &player: players)
+			if (player->getRealm() && player->canSee(entity))
+				if (auto client = player->toServer()->weakClient.lock())
+					client->send(packet);
 	}
 
 	void ServerGame::entityDestroyed(const Entity &entity) {
@@ -231,8 +232,8 @@ namespace Game3 {
 		assert(server);
 		auto &clients = server->getClients();
 		auto lock = clients.sharedLock();
-		for (const auto &client: clients)
-			std::dynamic_pointer_cast<RemoteClient>(client)->send(packet);
+		for (const RemoteClientPtr &client: clients)
+			client->send(packet);
 	}
 
 	void ServerGame::remove(const ServerPlayerPtr &player) {
