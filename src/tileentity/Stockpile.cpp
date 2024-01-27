@@ -39,7 +39,7 @@ namespace Game3 {
 		for (const auto &[key, value]: village->getRichness())
 			INFO("    {} => {}", key, value);
 
-		INFO("Subscriber count: {}", village->getSubscriberCount());
+		INFO("Subscriber count: {}, labor: {}", village->getSubscriberCount(), village->getLabor());
 
 		return true;
 	}

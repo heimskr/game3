@@ -9,10 +9,6 @@ namespace Game3 {
 		VillageUpdatePacket(village.getID(), village.getRealmID(), village.getChunkPosition(), village.getPosition(), village.getName(), village.getLabor(), village.getResources()) {}
 
 	void VillageUpdatePacket::handle(ClientGame &game) {
-		// INFO_("Resources for village " << villageID << " (labor = " << labor << "):");
-		// for (const auto &[key, value]: resources)
-		// 	INFO_("    " << key << " => " << value);
-
 		VillagePtr village;
 
 		try {

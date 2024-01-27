@@ -477,7 +477,7 @@ namespace Game3 {
 	}
 
 	void MainWindow::updateMoneyLabel(MoneyCount money) {
-		moneyLabel.set_text(std::format("{} BQL", money));
+		moneyLabel.set_text(std::format("฿ {}", money));
 	}
 
 	bool MainWindow::render(const Glib::RefPtr<Gdk::GLContext> &context) {

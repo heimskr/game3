@@ -52,9 +52,9 @@ namespace Game3 {
 
 			std::shared_ptr<ClientGame> game;
 			std::shared_ptr<Village> village;
-			std::vector<std::unique_ptr<Gtk::Widget>> widgets;
 			std::map<Identifier, std::unique_ptr<Row>> rows;
 			Gtk::Label villageName;
+			Gtk::Label laborLabel;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
 
 			void populate();

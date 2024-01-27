@@ -23,6 +23,9 @@ namespace Game3 {
 		villageName.set_hexpand(true);
 		villageName.set_margin_top(10);
 		villageName.set_margin_bottom(5);
+		laborLabel.set_xalign(0.5);
+		laborLabel.set_hexpand(true);
+		laborLabel.set_margin_bottom(5);
 	}
 
 	Gtk::Widget & VillageTradeModule::getWidget() {
@@ -32,13 +35,14 @@ namespace Game3 {
 	void VillageTradeModule::reset() {
 		removeChildren(vbox);
 		vbox.append(villageName);
-		widgets.clear();
+		vbox.append(laborLabel);
 		rows.clear();
 		update();
 	}
 
 	void VillageTradeModule::update() {
 		villageName.set_text(village->getName());
+		laborLabel.set_text(std::format("Available labor: {:.2f}", village->getLabor()));
 		populate();
 	}
 
