@@ -53,6 +53,7 @@ namespace Game3 {
 			inventory->remove(ItemStack(game, resource, amount));
 			const MoneyCount sell_price(std::floor(sellPrice(item->basePrice, amount, -1, 0.0)));
 			player->addMoney(sell_price);
+			INFO("Sold {} for {} from {}", ItemStack(game, resource, amount), sell_price, *village);
 			return;
 		}
 

@@ -99,25 +99,22 @@ namespace Game3 {
 		buyButton.add_css_class("buy-sell-button");
 		sellButton.add_css_class("buy-sell-button");
 		set_margin_top(5);
+
+		buyButton.signal_clicked().connect([this, weak_game = std::weak_ptr(game)]() {
+			if (ClientGamePtr game = weak_game.lock())
+				buy(game, ItemCount(transferAmount.get_value()));
+		});
+
+		sellButton.signal_clicked().connect([this, weak_game = std::weak_ptr(game)]() {
+			if (ClientGamePtr game = weak_game.lock())
+				sell(game, ItemCount(transferAmount.get_value()));
+		});
+
 		append(itemSlot);
 		append(quantityLabel);
 		append(transferAmount);
 		append(buyButton);
 		append(sellButton);
-
-		auto buy_click = Gtk::GestureClick::create();
-		buy_click->signal_released().connect([this, weak_game = std::weak_ptr(game)](int, double, double) {
-			if (ClientGamePtr game = weak_game.lock())
-				buy(game, ItemCount(transferAmount.get_value()));
-		});
-		buyButton.add_controller(buy_click);
-
-		auto sell_click = Gtk::GestureClick::create();
-		sell_click->signal_released().connect([this, weak_game = std::weak_ptr(game)](int, double, double) {
-			if (ClientGamePtr game = weak_game.lock())
-				sell(game, ItemCount(transferAmount.get_value()));
-		});
-		sellButton.add_controller(sell_click);
 	}
 
 	void VillageTradeModule::Row::update(double amount) {
@@ -125,10 +122,10 @@ namespace Game3 {
 	}
 
 	void VillageTradeModule::Row::buy(const ClientGamePtr &game, ItemCount amount) {
-		game->player->send(DoVillageTradePacket(villageID, resource, amount, true));
+		game->player->send(DoVillageTradePacket(villageID, resource, amount, false));
 	}
 
 	void VillageTradeModule::Row::sell(const ClientGamePtr &game, ItemCount amount) {
-		game->player->send(DoVillageTradePacket(villageID, resource, amount, false));
+		game->player->send(DoVillageTradePacket(villageID, resource, amount, true));
 	}
 }
