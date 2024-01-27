@@ -7,6 +7,7 @@
 #include "net/Server.h"
 #include "net/GenericClient.h"
 #include "net/RemoteClient.h"
+#include "packet/EntityMoneyChangedPacket.h"
 #include "packet/RecipeListPacket.h"
 #include "packet/SelfTeleportedPacket.h"
 #include "packet/TimePacket.h"
@@ -186,6 +187,7 @@ namespace Game3 {
 		INFO_("Setting up player");
 		player->weakClient = std::static_pointer_cast<RemoteClient>(client.shared_from_this());
 		player->notifyOfRealm(*realm);
+		player->send(EntityMoneyChangedPacket(*player));
 		auto guard = client.bufferGuard();
 		client.send(SelfTeleportedPacket(realm->id, player->getPosition()));
 		client.send(TimePacket(game->time));

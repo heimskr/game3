@@ -53,11 +53,19 @@ namespace Game3 {
 		return richness[identifier];
 	}
 
-	std::optional<double> Village::getResourceAmount(const Identifier &identifier) const {
+	std::optional<double> Village::getResourceAmount(const Identifier &resource) const {
 		auto lock = resources.sharedLock();
-		if (auto iter = resources.find(identifier); iter != resources.end())
+		if (auto iter = resources.find(resource); iter != resources.end())
 			return iter->second;
 		return std::nullopt;
+	}
+
+	void Village::setResourceAmount(const Identifier &resource, double amount) {
+		{
+			auto lock = resources.uniqueLock();
+			resources[resource] = amount;
+		}
+		sendUpdates();
 	}
 
 	Tick Village::enqueueTick() {

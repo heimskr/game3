@@ -114,6 +114,7 @@ namespace Game3 {
 			Gtk::Box statusBox {Gtk::Orientation::HORIZONTAL};
 			Gtk::GLArea glArea;
 			Gtk::Label statusbar;
+			Gtk::Label moneyLabel;
 			Gtk::Label timeLabel;
 			Glib::RefPtr<Gio::SimpleAction> debugAction;
 			std::unique_ptr<Canvas> canvas;
@@ -170,6 +171,7 @@ namespace Game3 {
 			void onGameLoaded();
 			bool isFocused(const std::shared_ptr<Tab> &) const;
 			void connectClose(Gtk::Dialog &);
+			void updateMoneyLabel(MoneyCount);
 
 			template <typename T>
 			T & initTab(std::shared_ptr<T> &tab) {

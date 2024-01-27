@@ -65,3 +65,7 @@ progressbar.item-durability.horizontal > trough {
 	padding-left: 10px;
 	padding-right: 10px;
 }
+
+.red-bg {
+	background: red;
+}

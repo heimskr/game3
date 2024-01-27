@@ -300,16 +300,22 @@ namespace Game3 {
 		statusbar.set_margin_start(10);
 		statusbar.set_hexpand(true);
 		statusBox.append(statusbar);
-		timeLabel.set_margin_start(10);
-		timeLabel.set_margin_end(5);
+
+		moneyLabel.set_xalign(0.0);
+		moneyLabel.set_size_request(128, -1);
+		statusBox.append(moneyLabel);
+
+		timeLabel.set_xalign(1.0);
+		timeLabel.set_size_request(42, -1);
+		timeLabel.set_margin_end(10);
 		statusBox.append(timeLabel);
+
 		vbox.append(statusBox);
+
 		paned.set_orientation(Gtk::Orientation::HORIZONTAL);
 		paned.set_start_child(vbox);
 		paned.set_end_child(notebook);
-		glArea.set_expand(true);
-		notebook.set_hexpand(false);
-		notebook.set_vexpand(true);
+
 		paned.set_resize_start_child(true);
 		paned.set_shrink_start_child(false);
 		paned.set_resize_end_child(false);
@@ -317,6 +323,11 @@ namespace Game3 {
 		paned.property_position().signal_changed().connect([this] {
 			tabMap.at(notebook.get_nth_page(notebook.get_current_page()))->onResize(game);
 		});
+
+		glArea.set_expand(true);
+
+		notebook.set_hexpand(false);
+		notebook.set_vexpand(true);
 		notebook.property_page().signal_changed().connect([this] {
 			if (activeTab)
 				activeTab->onBlur();
@@ -331,7 +342,7 @@ namespace Game3 {
 
 		set_child(paned);
 		delay([this] {
-			paned.set_position(paned.get_width() - 360);
+			paned.set_position(paned.get_width() - 365);
 		}, 2);
 
 		if (std::filesystem::exists("settings.json"))
@@ -413,10 +424,8 @@ namespace Game3 {
 			}
 		});
 
-		game->signalPlayerMoneyUpdate().connect([this](const PlayerPtr &) {
-			queue([this] {
-				inventoryTab->update(game);
-			});
+		game->signalPlayerMoneyUpdate().connect([this](const PlayerPtr &player) {
+			updateMoneyLabel(player->getMoney());
 		});
 
 		game->signalFluidUpdate().connect([this](const std::shared_ptr<HasFluids> &has_fluids) {
@@ -465,6 +474,10 @@ namespace Game3 {
 				closeDialog();
 			});
 		}, true);
+	}
+
+	void MainWindow::updateMoneyLabel(MoneyCount money) {
+		moneyLabel.set_text(std::format("{} BQL", money));
 	}
 
 	bool MainWindow::render(const Glib::RefPtr<Gdk::GLContext> &context) {

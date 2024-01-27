@@ -45,6 +45,7 @@ namespace Game3 {
 		// Find resource count
 
 		ItemCount resource_count{};
+		auto resources_lock = village->getResources().uniqueLock();
 
 		if (auto found_count = village->getResourceAmount(resource)) {
 			resource_count = *found_count;
@@ -64,6 +65,7 @@ namespace Game3 {
 			if (std::optional<MoneyCount> sell_price = totalSellPrice(resource_count, -1, item->basePrice, amount)) {
 				player->addMoney(*sell_price);
 				inventory->remove(ItemStack(game, resource, amount));
+				village->setResourceAmount(resource, resource_count + amount);
 				return;
 			}
 
@@ -78,6 +80,8 @@ namespace Game3 {
 				client.sendError("Village trade failed: insufficient funds (have {}, need {})", player->getMoney(), *buy_price);
 				return;
 			}
+
+			village->setResourceAmount(resource, resource_count - amount);
 
 			if (auto leftover = inventory->add(ItemStack(game, resource, amount)))
 				leftover->spawn(player->getRealm(), player->getPosition());

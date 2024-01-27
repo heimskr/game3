@@ -44,6 +44,7 @@ namespace Game3 {
 
 			std::optional<double> getRichness(const Identifier &) const;
 			std::optional<double> getResourceAmount(const Identifier &) const;
+			void setResourceAmount(const Identifier &, double);
 
 			Tick enqueueTick() override;
 			void tick(const TickArgs &);
