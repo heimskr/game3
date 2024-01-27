@@ -33,8 +33,6 @@ namespace Game3 {
 		// Force a fresh module construction instead of an update
 		window.inventoryTab->removeModule();
 
-		INFO("Going to open village trade module");
-
 		window.queue([&window, village = std::move(village)] {
 			window.openModule(VillageTradeModule::ID(), std::any(village));
 		});

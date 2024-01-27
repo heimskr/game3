@@ -1,9 +1,11 @@
 #pragma once
 
 #include "types/Types.h"
+#include "ui/gtk/ItemSlot.h"
 #include "ui/module/Module.h"
 
 #include <any>
+#include <map>
 #include <memory>
 #include <vector>
 
@@ -24,9 +26,25 @@ namespace Game3 {
 			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
 
 		private:
+			class Row: public Gtk::Box {
+				public:
+					Row(const std::shared_ptr<ClientGame> &, const Identifier &resource, double amount);
+
+					void update(double amount);
+
+				private:
+					ItemSlot itemSlot;
+					Gtk::Label quantityLabel;
+					Gtk::SpinButton transferAmount;
+					Gtk::Button buyButton{"Buy"};
+					Gtk::Button sellButton{"Sell"};
+			};
+
 			std::shared_ptr<ClientGame> game;
 			std::shared_ptr<Village> village;
 			std::vector<std::unique_ptr<Gtk::Widget>> widgets;
+			std::map<Identifier, std::unique_ptr<Row>> rows;
+			Gtk::Label villageName;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
 
 			void populate();

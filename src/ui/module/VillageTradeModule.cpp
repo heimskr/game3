@@ -1,5 +1,6 @@
 #include "game/ClientGame.h"
 #include "game/Village.h"
+#include "item/Item.h"
 #include "ui/gtk/UITypes.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/VillageTradeModule.h"
@@ -14,6 +15,10 @@ namespace Game3 {
 	game(std::move(game_)),
 	village(std::any_cast<VillagePtr>(argument)) {
 		vbox.set_hexpand();
+		villageName.set_xalign(0.5);
+		villageName.set_hexpand(true);
+		villageName.set_margin_top(10);
+		villageName.set_margin_bottom(5);
 	}
 
 	Gtk::Widget & VillageTradeModule::getWidget() {
@@ -22,12 +27,15 @@ namespace Game3 {
 
 	void VillageTradeModule::reset() {
 		removeChildren(vbox);
+		vbox.append(villageName);
 		widgets.clear();
-		populate();
+		rows.clear();
+		update();
 	}
 
 	void VillageTradeModule::update() {
-		reset();
+		villageName.set_text(village->getName());
+		populate();
 	}
 
 	std::optional<Buffer> VillageTradeModule::handleMessage(const std::shared_ptr<Agent> &, const std::string &name, std::any &data) {
@@ -45,30 +53,57 @@ namespace Game3 {
 	void VillageTradeModule::populate() {
 		assert(village);
 
-		{
-			auto label = std::make_unique<Gtk::Label>(village->getName());
-			vbox.append(*label);
-			label->set_xalign(0.5);
-			label->set_hexpand(true);
-			label->set_margin_top(10);
-			label->set_margin_bottom(5);
-			widgets.push_back(std::move(label));
+		const auto &resources = village->getResources();
+		const auto lock = resources.sharedLock();
+
+		for (auto iter = rows.begin(); iter != rows.end();) {
+			const auto &[resource, row] = *iter;
+			if (!resources.contains(resource)) {
+				vbox.remove(*row);
+				rows.erase(iter++);
+			} else {
+				++iter;
+			}
 		}
 
-		for (const auto &[resource, amount]: village->getResources()) {
-			auto hbox = std::make_unique<Gtk::Box>(Gtk::Orientation::HORIZONTAL);
-			auto item_slot = std::make_unique<ItemSlot>(game, -1, nullptr);
-			item_slot->setStack({*game, resource, ItemCount(-1)});
-			item_slot->set_hexpand(false);
-			auto label = std::make_unique<Gtk::Label>(std::format("× {:.2f}", amount));
-			hbox->append(*item_slot);
-			hbox->append(*label);
-			label->set_margin_start(5);
-			hbox->set_margin_top(5);
-			vbox.append(*hbox);
-			widgets.push_back(std::move(label));
-			widgets.push_back(std::move(item_slot));
-			widgets.push_back(std::move(hbox));
+		for (const auto &[resource, amount]: resources) {
+			if (auto iter = rows.find(resource); iter != rows.end()) {
+				iter->second->update(amount);
+			} else {
+				auto row = std::make_unique<Row>(game, resource, amount);
+				vbox.append(*row);
+				rows[resource] = std::move(row);
+			}
 		}
+	}
+
+	VillageTradeModule::Row::Row(const ClientGamePtr &game, const Identifier &resource, double amount):
+	Gtk::Box(Gtk::Orientation::HORIZONTAL), itemSlot(game, -1, nullptr) {
+		itemSlot.setStack({*game, resource, ItemCount(-1)});
+		update(amount);
+		itemSlot.set_hexpand(false);
+		quantityLabel.set_size_request(64, -1);
+		quantityLabel.set_xalign(0.0);
+		quantityLabel.set_margin_start(5);
+		transferAmount.set_valign(Gtk::Align::CENTER);
+		transferAmount.set_adjustment(Gtk::Adjustment::create(1.0, 1.0, 999.0));
+		transferAmount.set_digits(0);
+		buyButton.set_valign(Gtk::Align::CENTER);
+		sellButton.set_valign(Gtk::Align::CENTER);
+		buyButton.set_margin_start(5);
+		sellButton.set_margin_start(5);
+		sellButton.set_margin_end(5);
+		buyButton.add_css_class("buy-sell-button");
+		sellButton.add_css_class("buy-sell-button");
+		set_margin_top(5);
+		append(itemSlot);
+		append(quantityLabel);
+		append(transferAmount);
+		append(buyButton);
+		append(sellButton);
+	}
+
+	void VillageTradeModule::Row::update(double amount) {
+		quantityLabel.set_text(std::format("× {:.2f}", amount));
 	}
 }
