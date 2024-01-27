@@ -980,6 +980,25 @@ namespace Game3 {
 		setHeldRight(right_slot);
 	}
 
+	void Entity::setMoney(MoneyCount new_value) {
+		money = new_value;
+		if (getSide() == Side::Server) {
+			broadcastMoney();
+			increaseUpdateCounter();
+		}
+	}
+
+	void Entity::broadcastMoney() {
+		auto lock = visiblePlayers.sharedLock();
+		if (visiblePlayers.empty())
+			return;
+
+		EntityMoneyChangedPacket packet(*this);
+		for (const auto &weak_player: visiblePlayers)
+			if (PlayerPtr player = weak_player.lock())
+				player->send(packet);
+	}
+
 	void Entity::sendTo(RemoteClient &client, UpdateCounter threshold) {
 		if (threshold == 0 || getUpdateCounter() < threshold) {
 			RealmPtr realm = getRealm();

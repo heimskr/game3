@@ -24,6 +24,10 @@ namespace Game3 {
 
 			void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
 
+			void addMoney(MoneyCount) final;
+			bool removeMoney(MoneyCount) final;
+			void broadcastMoney() final;
+
 			void kill() override;
 
 			void unsubscribeVillages();

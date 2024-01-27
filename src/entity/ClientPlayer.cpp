@@ -126,6 +126,26 @@ namespace Game3 {
 		return moved;
 	}
 
+	void ClientPlayer::addMoney(MoneyCount to_add) {
+		setMoney(money + to_add);
+	}
+
+	bool ClientPlayer::removeMoney(MoneyCount to_remove) {
+		if (money < to_remove)
+			return false;
+
+		setMoney(money - to_remove);
+		return true;
+	}
+
+	void ClientPlayer::setMoney(MoneyCount new_value) {
+		Entity::setMoney(new_value);
+		auto shared = getShared();
+		if (getGame().toClient().player == shared) {
+			getRealm()->getGame().toClient().signalPlayerMoneyUpdate().emit(getShared());
+		}
+	}
+
 	void ClientPlayer::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
 		if (name == "ModuleMessage") {
 			auto *buffer = std::any_cast<Buffer>(&data);

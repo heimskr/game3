@@ -236,33 +236,6 @@ namespace Game3 {
 		}
 	}
 
-	void Player::addMoney(MoneyCount to_add) {
-		money += to_add;
-
-		Game &game = getRealm()->getGame();
-
-		if (game.getSide() == Side::Client)
-			game.toClient().signalPlayerMoneyUpdate().emit(getShared());
-		else
-			increaseUpdateCounter();
-	}
-
-	bool Player::removeMoney(MoneyCount to_remove) {
-		if (money < to_remove)
-			return false;
-
-		money -= to_remove;
-
-		Game &game = getRealm()->getGame();
-
-		if (game.getSide() == Side::Client)
-			game.toClient().signalPlayerMoneyUpdate().emit(getShared());
-		else
-			increaseUpdateCounter();
-
-		return true;
-	}
-
 	bool Player::setTooldown(float multiplier) {
 		if (getSide() != Side::Server)
 			return false;

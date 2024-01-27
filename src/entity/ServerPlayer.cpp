@@ -3,6 +3,7 @@
 #include "entity/ServerPlayer.h"
 #include "net/RemoteClient.h"
 #include "packet/AgentMessagePacket.h"
+#include "packet/EntityMoneyChangedPacket.h"
 #include "packet/EntityPacket.h"
 #include "util/Cast.h"
 #include "util/Util.h"
@@ -96,6 +97,23 @@ namespace Game3 {
 			send(AgentMessagePacket(source->getGID(), name, std::move(*buffer)));
 		else
 			throw std::runtime_error("Expected data to be a Buffer in ServerPlayer::handleMessage");
+	}
+
+	void ServerPlayer::addMoney(MoneyCount to_add) {
+		setMoney(money + to_add);
+	}
+
+	bool ServerPlayer::removeMoney(MoneyCount to_remove) {
+		if (money < to_remove)
+			return false;
+
+		setMoney(money - to_remove);
+		return true;
+	}
+
+	void ServerPlayer::broadcastMoney() {
+		Entity::broadcastMoney();
+		send(EntityMoneyChangedPacket(*this));
 	}
 
 	void ServerPlayer::kill() {

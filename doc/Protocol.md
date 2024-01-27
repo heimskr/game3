@@ -411,6 +411,11 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u64` Amount
 	- `bool` Is sell (true = sell, false = buy)
 
+60. **Entity Money Changed**: tells a client that an entity's owned money changed.
+
+	- `u64` Global ID
+	- `u64` Money count
+
 # Message Format
 
 All values are little endian. Strings are not null-terminated.

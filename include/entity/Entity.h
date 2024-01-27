@@ -6,6 +6,7 @@
 #include "game/Tickable.h"
 #include "graphics/Texture.h"
 #include "item/Item.h"
+#include "packet/EntityMoneyChangedPacket.h"
 #include "threading/Atomic.h"
 #include "threading/HasMutex.h"
 #include "threading/Lockable.h"
@@ -184,7 +185,8 @@ namespace Game3 {
 			virtual void decode(Buffer &);
 
 			inline MoneyCount getMoney() const { return money; }
-			inline void setMoney(MoneyCount new_value) { money = new_value; }
+			virtual void setMoney(MoneyCount);
+			virtual void broadcastMoney();
 
 			void sendTo(RemoteClient &, UpdateCounter threshold = 0);
 			void sendToVisible();

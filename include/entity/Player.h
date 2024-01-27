@@ -53,9 +53,9 @@ namespace Game3 {
 			void interactNextTo(Modifiers, ItemStack *used_item = nullptr, Hand = Hand::None);
 			using Entity::teleport;
 			void teleport(const Position &, const std::shared_ptr<Realm> &, MovementContext) override;
-			void addMoney(MoneyCount);
+			virtual void addMoney(MoneyCount) = 0;
 			/** Returns whether the player had enough money. If false, no change was made. */
-			bool removeMoney(MoneyCount);
+			virtual bool removeMoney(MoneyCount) = 0;
 			float getMovementSpeed() const override { return movementSpeed; }
 			bool setTooldown(float multiplier);
 			inline bool hasTooldown() const { return 0.f < tooldown; }
