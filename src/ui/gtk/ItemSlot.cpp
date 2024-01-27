@@ -28,9 +28,9 @@ namespace Game3 {
 		set_size_request(TILE_SIZE, TILE_SIZE);
 		popoverMenu.set_parent(*this);
 
-		auto source = Gtk::DragSource::create();
-		source->set_actions(Gdk::DragAction::MOVE);
-		source->signal_prepare().connect([this](double, double) -> Glib::RefPtr<Gdk::ContentProvider> {
+		dragSource = Gtk::DragSource::create();
+		dragSource->set_actions(Gdk::DragAction::MOVE);
+		dragSource->signal_prepare().connect([this](double, double) -> Glib::RefPtr<Gdk::ContentProvider> {
 			if (!inventory)
 				return {};
 			Glib::Value<DragSource> value;
@@ -38,6 +38,11 @@ namespace Game3 {
 			value.set({slot, inventory, inventory->index});
 			return Gdk::ContentProvider::create(value);
 		}, false);
+
+		dragSource->signal_drag_begin().connect([this](const Glib::RefPtr<Gdk::Drag> &) {
+			// This is what you have to do to disable the drag icon? Kinda silly.
+			dragSource->set_icon(Gdk::Texture::create_for_pixbuf(Gdk::Pixbuf::create(Gdk::Colorspace::RGB, true, 8, 1, 1)), 0, 0);
+		});
 
 		auto target = Gtk::DropTarget::create(Glib::Value<DragSource>::value_type(), Gdk::DragAction::MOVE);
 		target->signal_drop().connect([this](const Glib::ValueBase &base, double, double) {
@@ -79,7 +84,7 @@ namespace Game3 {
 				leftClick(mods, n, x, y);
 		});
 
-		add_controller(source);
+		add_controller(dragSource);
 		add_controller(target);
 		add_controller(leftGesture);
 		add_controller(rightGesture);

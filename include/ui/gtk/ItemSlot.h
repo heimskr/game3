@@ -42,6 +42,7 @@ namespace Game3 {
 
 			ClickFn leftClick;
 
+			Glib::RefPtr<Gtk::DragSource> dragSource;
 			Glib::RefPtr<Gtk::GestureClick> leftGesture;
 			Glib::RefPtr<Gtk::GestureClick> rightGesture;
 

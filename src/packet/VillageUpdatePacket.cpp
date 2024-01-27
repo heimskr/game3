@@ -25,8 +25,8 @@ namespace Game3 {
 				return;
 			}
 
-			INFO_("Adding new village " << villageID << " (" << name << ')');
 			village = game.addVillage(game, villageID, name, realmID, chunkPosition, position);
+			INFO("Added new village {}", *village);
 		}
 
 		village->setResources(std::move(resources));
