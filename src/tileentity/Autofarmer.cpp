@@ -77,7 +77,7 @@ namespace Game3 {
 
 		{
 			auto lock = energyContainer->sharedLock();
-			INFO("Energy: " << energyContainer->energy);
+			INFO_("Energy: " << energyContainer->energy);
 		}
 
 		return false;
@@ -203,7 +203,7 @@ namespace Game3 {
 
 				if (!warned) {
 					warned = true;
-					WARN("No tiles found in category base:category/farmland");
+					WARN_("No tiles found in category base:category/farmland");
 				}
 
 				return false;

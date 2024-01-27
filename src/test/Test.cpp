@@ -34,8 +34,8 @@ namespace Game3 {
 			return tiles[row][column];
 		});
 
-		auto visit = [](const Box &box) {
-			std::cout << box << '\n';
+		auto visit = [](const Box &) {
+			// std::cout << box << '\n';
 			return false;
 		};
 
@@ -179,7 +179,7 @@ namespace Game3 {
 				sum += lwp.use_count();
 				lwp.reset();
 			}
-			INFO("sum[" << sum << ']');
+			INFO_("sum[" << sum << ']');
 		};
 
 		std::thread t1 = std::thread(lambda);
@@ -194,9 +194,9 @@ namespace Game3 {
 		auto check = [&base](Index row, Index column, Direction expected) {
 			const Direction facing = base.getFacing({row, column});
 			if (facing == expected)
-				SUCCESS("(" << row << ", " << column << ") → " << facing);
+				SUCCESS("({}, {}) → {}", row, column, facing);
 			else
-				ERROR("(" << row << ", " << column << ") → " << facing << ", expected " << expected);
+				ERROR("({}, {}) → {}, expected {}", row, column, facing, expected);
 		};
 
 		check( 0,  0, Direction::Invalid);

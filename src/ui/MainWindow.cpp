@@ -1,7 +1,3 @@
-#include <deque>
-#include <fstream>
-#include <iostream>
-
 #include "Log.h"
 #include "graphics/Shader.h"
 #include "graphics/Tileset.h"
@@ -38,6 +34,9 @@
 #include "util/Util.h"
 #include "worldgen/Overworld.h"
 #include "worldgen/WorldGen.h"
+
+#include <deque>
+#include <fstream>
 
 // #define USE_CBOR
 
@@ -826,9 +825,9 @@ namespace Game3 {
 							ss << move;
 						}
 						ss << ". Offset: " << player.offset.x << ", " << player.offset.y << ", " << player.offset.z;
-						INFO(ss.str());
+						INFO_(ss.str());
 					} else {
-						INFO("Player isn't moving. Offset: " << player.offset.x << ", " << player.offset.y << ", " << player.offset.z);
+						INFO_("Player isn't moving. Offset: " << player.offset.x << ", " << player.offset.y << ", " << player.offset.z);
 					}
 					return;
 				}
@@ -860,22 +859,23 @@ namespace Game3 {
 					auto realm = game->player->getRealm();
 					const Position where = game->player->getPosition() + game->player->direction.load();
 					if (auto tile_entity = realm->tileEntityAt(where))
-						INFO("TileEntity: " << tile_entity->tileEntityID << " " << tile_entity->getGID());
+						INFO("TileEntity: {} {}", tile_entity->tileEntityID, tile_entity->getGID());
 					else
-						INFO("No TileEntity found at " << where);
+						INFO("No TileEntity found at {}", where);
 					return;
 				}
 				case GDK_KEY_p: {
 					if (Modifiers(modifiers).ctrl) {
 						game->runCommand("pm");
 					} else {
-						std::cout << "Player GID: " << game->player->getGID() << '\n';
-						std::cout << "Realm ID: " << game->player->getRealm()->id << " or perhaps " << game->activeRealm.copyBase()->id << '\n';
-						std::cout << "Position: " << game->player->getPosition() << '\n';
-						std::cout << "Chunk position: " << std::string(game->player->getPosition().getChunk()) << '\n';
-						std::cout << "Update counter: " << game->player->getRealm()->tileProvider.getUpdateCounter(game->player->getPosition().getChunk()) << '\n';
-						std::cout << "Canvas scale: " << canvas->scale << '\n';
-						std::cout << "Outdoors: " << std::boolalpha << game->player->getRealm()->outdoors << '\n';
+						const ClientPlayer &player = *game->player;
+						std::cout << std::format("Player GID: {}\n", player.getGID());
+						std::cout << std::format("Realm ID: {} or perhaps {}\n", player.getRealm()->getID(), game->activeRealm.copyBase()->getID());
+						std::cout << std::format("Position: {}\n", player.getPosition());
+						std::cout << std::format("Chunk position: {}\n", player.getPosition().getChunk());
+						std::cout << std::format("Update counter: {}\n", player.getRealm()->tileProvider.getUpdateCounter(player.getPosition().getChunk()));
+						std::cout << std::format("Canvas scale: {}\n", canvas->scale);
+						std::cout << std::format("Outdoors: {}\n", player.getRealm()->outdoors);
 					}
 					return;
 				}

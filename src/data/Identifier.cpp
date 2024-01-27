@@ -100,8 +100,4 @@ namespace Game3 {
 		identifier = std::string_view(str);
 		return buffer;
 	}
-
-	std::ostream & operator<<(std::ostream &os, const Identifier &id) {
-		return os << id.str();
-	}
 }

@@ -110,7 +110,7 @@ namespace Game3 {
 						game.signalOtherInventoryUpdate().emit(owner, index);
 					}
 				} else {
-					ERROR("Expired in " << __FILE__ << ':' << __LINE__);
+					ERROR_("Expired in " << __FILE__ << ':' << __LINE__);
 				}
 			});
 		}

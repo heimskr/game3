@@ -30,7 +30,7 @@ namespace Game3 {
 		if (!success)
 			throw AuthenticationError("Login failed");
 
-		SUCCESS("Login succeeded");
+		SUCCESS_("Login succeeded");
 		MainWindow &window = game.getWindow();
 		{
 			auto lock = window.settings.uniqueLock();
@@ -39,7 +39,7 @@ namespace Game3 {
 		window.saveSettings();
 		game.player = Entity::create<ClientPlayer>();
 		game.player->setGID(globalID);
-		INFO("Setting player GID to " << globalID);
+		INFO_("Setting player GID to " << globalID);
 		game.player->init(game);
 		game.player->decode(playerDataBuffer);
 		game.player->setupRealm(game);

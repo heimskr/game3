@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 
 #include <atomic>
+#include <format>
 
 namespace Game3 {
 	template <typename T>
@@ -57,3 +58,14 @@ namespace Game3 {
 		return buffer;
 	}
 }
+
+template <typename T>
+struct std::formatter<Game3::Atomic<T>> {
+	constexpr auto parse(std::format_parse_context &ctx) {
+		return ctx.begin();
+    }
+
+	auto format(const auto &atomic, std::format_context &ctx) const {
+		return std::format_to(ctx.out(), "{}", atomic.load());
+	}
+};

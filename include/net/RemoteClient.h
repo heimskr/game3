@@ -1,9 +1,11 @@
 #pragma once
 
+#include <format>
 #include <memory>
 
 #include "net/Buffer.h"
 #include "net/GenericClient.h"
+#include "packet/ErrorPacket.h"
 #include "packet/Packet.h"
 
 namespace Game3 {
@@ -54,6 +56,11 @@ namespace Game3 {
 			bool isBuffering() const;
 
 			void removeSelf() override;
+
+			template <typename... Args>
+			void sendError(const char *format, Args &&...args) {
+				send(ErrorPacket(std::vformat(format, std::make_format_args(std::forward<Args>(args)...))));
+			}
 
 		private:
 			enum class State {Begin, Data};

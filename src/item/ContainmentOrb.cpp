@@ -22,7 +22,7 @@ namespace Game3 {
 		if (stack.data.empty()) {
 			auto entities = realm->getEntities(place.position.getChunk());
 			if (!entities) {
-				WARN("No entities found in chunk " << place.position.getChunk());
+				WARN("No entities found in chunk {}", place.position.getChunk());
 				return true;
 			}
 
@@ -54,7 +54,7 @@ namespace Game3 {
 			}
 
 			player->getInventory(0)->notifyOwner();
-			SUCCESS("Captured " << selected->type);
+			SUCCESS("Captured {}", selected->type);
 			return true;
 		}
 
@@ -71,7 +71,7 @@ namespace Game3 {
 			entity->spawning = true;
 			entity->setRealm(realm);
 			realm->queueEntityInit(std::move(entity), place.position);
-			INFO("Spawned entity of type " << type << " with new GID " << new_gid);
+			INFO("Spawned entity of type {} with new GID {}", type, new_gid);
 		}
 		stack.data.clear();
 		player->getInventory(0)->notifyOwner();

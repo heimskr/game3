@@ -32,7 +32,7 @@ namespace Game3 {
 	Player::~Player() {
 		if (spawning)
 			return;
-		INFO("\e[31m~Player\e[39m(" << this << ", " << (username.empty()? "[unknown username]" : username) << ", " << globalID << ')');
+		INFO_("\e[31m~Player\e[39m(" << this << ", " << (username.empty()? "[unknown username]" : username) << ", " << globalID << ')');
 	}
 
 	void Player::destroy() {
@@ -49,7 +49,7 @@ namespace Game3 {
 			}
 		}
 
-		INFO("Removed " << username << " from visible sets " << times << " time" << (times == 1? "" : "s"));
+		INFO_("Removed " << username << " from visible sets " << times << " time" << (times == 1? "" : "s"));
 
 		size_t remaining = 0;
 
@@ -65,9 +65,9 @@ namespace Game3 {
 		}
 
 		if (remaining == 0)
-			SUCCESS("No longer present in any visible sets.");
+			SUCCESS_("No longer present in any visible sets.");
 		else
-			ERROR("Still present in " << remaining << " visible set" << (remaining == 1? "!" : "s!"));
+			ERROR_("Still present in " << remaining << " visible set" << (remaining == 1? "!" : "s!"));
 
 		Entity::destroy();
 	}
@@ -229,7 +229,7 @@ namespace Game3 {
 				auto locked_client = toServer()->weakClient.lock();
 				assert(locked_client);
 				if (!locked_client->getPlayer()->knowsRealm(new_realm->id)) {
-					INFO("Sending " << new_realm->id << " to client for the first time");
+					INFO_("Sending " << new_realm->id << " to client for the first time");
 					new_realm->sendTo(*locked_client);
 				}
 			}
@@ -247,9 +247,9 @@ namespace Game3 {
 			increaseUpdateCounter();
 	}
 
-	void Player::removeMoney(MoneyCount to_remove) {
+	bool Player::removeMoney(MoneyCount to_remove) {
 		if (money < to_remove)
-			throw InsufficientFundsError("Player lacks enough money for transaction");
+			return false;
 
 		money -= to_remove;
 
@@ -259,6 +259,8 @@ namespace Game3 {
 			game.toClient().signalPlayerMoneyUpdate().emit(getShared());
 		else
 			increaseUpdateCounter();
+
+		return true;
 	}
 
 	bool Player::setTooldown(float multiplier) {
@@ -425,7 +427,7 @@ namespace Game3 {
 				for (const auto &weak_visible: visibleEntities) {
 					if (auto visible = weak_visible.lock()) {
 						if (!visible->path.empty() && visible->hasSeenPath(shared)) {
-							// INFO("Late sending EntitySetPathPacket (Player)");
+							// INFO_("Late sending EntitySetPathPacket (Player)");
 							toServer()->ensureEntity(visible);
 							send(EntitySetPathPacket(*visible));
 							visible->setSeenPath(shared);

@@ -18,11 +18,11 @@ namespace Game3 {
 			auto game = std::dynamic_pointer_cast<ServerGame>(Game::create(Side::Server, std::make_pair(ssl_server, size_t(1))));
 			game->openDatabase(1 < args.size()? args[1] : "world.db");
 			ssl_server->game = game;
-			INFO("Reading...");
+			INFO_("Reading...");
 			game->database.readAllRealms();
-			INFO("Writing...");
+			INFO_("Writing...");
 			game->database.writeAllRealms();
-			SUCCESS("Done.");
+			SUCCESS_("Done.");
 			Timer::summary();
 			Timer::clear();
 			return 0;

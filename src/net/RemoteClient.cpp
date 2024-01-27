@@ -38,7 +38,7 @@ namespace Game3 {
 				payloadSize = headerBytes[2] | (static_cast<uint32_t>(headerBytes[3]) << 8) | (static_cast<uint32_t>(headerBytes[4]) << 16) | (static_cast<uint32_t>(headerBytes[5]) << 24);
 
 				if (payloadSize > 32768) {
-					WARN("Payload size of " << payloadSize << " bytes for packet type " << packetType << " is too large (" << ip << ')');
+					WARN("Payload size of {} bytes for packet type {} is too large ({})", payloadSize, packetType, ip);
 					mock();
 					return;
 				}
@@ -74,11 +74,11 @@ namespace Game3 {
 				try {
 					packet->decode(*server.game, receiveBuffer);
 				} catch (const std::exception &err) {
-					ERROR("Couldn't decode packet of type " << packetType << ", size " << payloadSize << ": " << err.what());
+					ERROR("Couldn't decode packet of type {}, size {}: {}", packetType, payloadSize, err.what());
 					mock();
 					return;
 				} catch (...) {
-					ERROR("Couldn't decode packet of type " << packetType << ", size " << payloadSize);
+					ERROR("Couldn't decode packet of type {}, size {}", packetType, payloadSize);
 					mock();
 					return;
 				}
@@ -93,12 +93,12 @@ namespace Game3 {
 
 	bool RemoteClient::send(const Packet &packet) {
 		if (!packet.valid) {
-			WARN("Dropping invalid packet of type " << DEMANGLE(packet));
+			WARN("Dropping invalid packet of type {}", DEMANGLE(packet));
 			return false;
 		}
 
 		if (!server.game) {
-			WARN("Dropping packet of type " << DEMANGLE(packet) << ": game unavailable");
+			WARN("Dropping packet of type {}: game unavailable", DEMANGLE(packet));
 			return false;
 		}
 
@@ -167,7 +167,7 @@ namespace Game3 {
 	}
 
 	void RemoteClient::removeSelf() {
-		INFO("Removing client from IP " << ip);
+		INFO("Removing client from IP {}", ip);
 
 		if (server.game)
 			if (ServerPlayerPtr player = getPlayer())
@@ -184,7 +184,7 @@ namespace Game3 {
 		const static std::string message =
 			"Look at you, hacker: a pathetic creature of meat and bone, panting and sweating as "
 			"you run through my corridors.\nHow can you challenge a perfect, immortal machine?\n";
-		WARN("Telling " << ip << " to go perish.");
+		WARN("Telling {} to go perish.", ip);
 		asio::write(socket, asio::buffer(message));
 		server.close(*this);
 	}

@@ -61,35 +61,35 @@ namespace Game3 {
 			if (lastGame)
 				use_function(lastSlot);
 			else
-				WARN(__FILE__ << ':' << __LINE__ << ": no lastGame");
+				WARN_(__FILE__ << ':' << __LINE__ << ": no lastGame");
 		});
 
 		group->add_action("hold_left", [this, hold_left_function] {
 			if (lastGame)
 				hold_left_function(lastSlot);
 			else
-				WARN(__FILE__ << ':' << __LINE__ << ": no lastGame");
+				WARN_(__FILE__ << ':' << __LINE__ << ": no lastGame");
 		});
 
 		group->add_action("hold_right", [this, hold_right_function] {
 			if (lastGame)
 				hold_right_function(lastSlot);
 			else
-				WARN(__FILE__ << ':' << __LINE__ << ": no lastGame");
+				WARN_(__FILE__ << ':' << __LINE__ << ": no lastGame");
 		});
 
 		group->add_action("drop", [this, drop_function] {
 			if (lastGame)
 				drop_function(lastSlot);
 			else
-				WARN(__FILE__ << ':' << __LINE__ << ": no lastGame");
+				WARN_(__FILE__ << ':' << __LINE__ << ": no lastGame");
 		});
 
 		group->add_action("discard", [this, discard_function] {
 			if (lastGame)
 				discard_function(lastSlot);
 			else
-				WARN(__FILE__ << ':' << __LINE__ << ": no lastGame");
+				WARN_(__FILE__ << ':' << __LINE__ << ": no lastGame");
 		});
 
 		mainWindow.insert_action_group("inventory_popup", group);

@@ -9,13 +9,13 @@ namespace Game3 {
 	void EntitySetPathPacket::handle(ClientGame &game) {
 		RealmPtr realm = game.tryRealm(realmID);
 		if (!realm) {
-			ERROR("EntitySetPathPacket: can't find realm " << realmID);
+			ERROR_("EntitySetPathPacket: can't find realm " << realmID);
 			return;
 		}
 
 		EntityPtr entity = game.getAgent<Entity>(globalID);
 		if (!entity) {
-			ERROR("EntitySetPathPacket: can't find entity " << globalID);
+			ERROR_("EntitySetPathPacket: can't find entity " << globalID);
 			return;
 		}
 

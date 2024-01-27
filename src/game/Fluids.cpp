@@ -40,10 +40,6 @@ namespace Game3 {
 		return out;
 	}
 
-	std::ostream & operator<<(std::ostream &os, FluidTile fluid_tile) {
-		return os << "FluidTile(" << fluid_tile.id << ", " << fluid_tile.level << ')';
-	}
-
 // FluidStack
 
 	FluidStack::FluidStack(FluidID id_, FluidAmount amount_):
@@ -61,10 +57,6 @@ namespace Game3 {
 	FluidStack FluidStack::fromJSON(const Game &game, const nlohmann::json &json) {
 		const auto &registry = game.registry<FluidRegistry>();
 		return FluidStack(registry.at(json.at(0).get<Identifier>())->registryID, json.at(1));
-	}
-
-	std::ostream & operator<<(std::ostream &os, FluidStack fluid_stack) {
-		return os << "FluidStack(" << fluid_stack.id << ", " << fluid_stack.amount << ')';
 	}
 
 // Buffer specializations

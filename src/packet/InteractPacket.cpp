@@ -33,7 +33,7 @@ namespace Game3 {
 				player->interactNextTo(modifiers, held_item, hand);
 			}
 		} else {
-			WARN("Can't interact: client " << client.id << " has no player");
+			WARN_("Can't interact: client " << client.id << " has no player");
 		}
 	}
 }

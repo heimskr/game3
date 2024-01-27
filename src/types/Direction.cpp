@@ -80,10 +80,6 @@ namespace Game3 {
 		}
 	}
 
-	std::ostream & operator<<(std::ostream &os, Direction direction) {
-		return os << toString(direction);
-	}
-
 	Buffer & operator+=(Buffer &buffer, Direction direction) {
 		return buffer += static_cast<uint8_t>(direction);
 	}

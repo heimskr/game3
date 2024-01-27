@@ -54,23 +54,23 @@ namespace Game3 {
 			tileEntity->decode(game, storedBuffer);
 
 			if (weak_agent) {
-				ERROR("Found TileEntity " << globalID << " in allAgents, even though getAgent<TileEntity> returned null!");
+				ERROR_("Found TileEntity " << globalID << " in allAgents, even though getAgent<TileEntity> returned null!");
 				if (auto entity = std::dynamic_pointer_cast<Entity>(weak_agent->lock())) {
 					nlohmann::json entity_json;
 					entity->toJSON(entity_json);
-					INFO("Entity found with same global ID:\n\e[32m" << entity_json.dump() << "\e[39m");
+					INFO_("Entity found with same global ID:\n\e[32m" << entity_json.dump() << "\e[39m");
 				} else {
 					if (auto agent_ptr = weak_agent->lock()) {
 						Agent &agent = *agent_ptr;
-						INFO("Agent typeid: " << typeid(agent).name());
+						INFO_("Agent typeid: " << typeid(agent).name());
 					} else {
-						INFO("Agent is expired.");
+						INFO_("Agent is expired.");
 					}
 				}
 
 				nlohmann::json tile_entity_json;
 				tileEntity->toJSON(tile_entity_json);
-				INFO("Tile entity data:\n\e[31m" << tile_entity_json.dump() << "\e[39m");
+				INFO_("Tile entity data:\n\e[31m" << tile_entity_json.dump() << "\e[39m");
 				assert(false);
 			}
 

@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <format>
 #include <ostream>
 #include <shared_mutex>
 #include <utility>
@@ -114,8 +115,50 @@ namespace Game3 {
 	Buffer & operator>>(Buffer &, Color &);
 
 	enum class PipeType: uint8_t {Invalid = 0, Item, Fluid, Energy};
-	std::ostream & operator<<(std::ostream &, PipeType);
-
 	enum class Hand: uint8_t {None = 0, Left, Right};
-	std::ostream & operator<<(std::ostream &, Hand);
 }
+
+template <>
+struct std::formatter<Game3::PipeType> {
+	constexpr auto parse(std::format_parse_context &ctx) {
+		return ctx.begin();
+    }
+
+	auto format(const auto &pipe_type, std::format_context &ctx) const {
+		switch (pipe_type) {
+			case Game3::PipeType::Item:   return std::format_to(ctx.out(), "Item");
+			case Game3::PipeType::Fluid:  return std::format_to(ctx.out(), "Fluid");
+			case Game3::PipeType::Energy: return std::format_to(ctx.out(), "Energy");
+			default:
+				return std::format_to(ctx.out(), "Invalid");
+		}
+	}
+};
+
+template <>
+struct std::formatter<Game3::Hand> {
+	constexpr auto parse(std::format_parse_context &ctx) {
+		return ctx.begin();
+    }
+
+	auto format(const auto &hand, std::format_context &ctx) const {
+		switch (hand) {
+			case Game3::Hand::None:  return std::format_to(ctx.out(), "None");
+			case Game3::Hand::Left:  return std::format_to(ctx.out(), "Left");
+			case Game3::Hand::Right: return std::format_to(ctx.out(), "Right");
+			default:
+				return std::format_to(ctx.out(), "Invalid");
+		}
+	}
+};
+
+template <>
+struct std::formatter<Game3::Color> {
+	constexpr auto parse(std::format_parse_context &ctx) {
+		return ctx.begin();
+    }
+
+	auto format(const auto &color, std::format_context &ctx) const {
+		return std::format_to(ctx.out(), "({}, {}, {} @ {})", color.red, color.green, color.blue, color.alpha);
+	}
+};

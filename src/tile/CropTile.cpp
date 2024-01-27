@@ -39,7 +39,7 @@ namespace Game3 {
 		if (iter != crop->stages.end())
 			place.set(Layer::Submerged, *++iter);
 		else
-			WARN("Couldn't find " << tilename << " in crop stages for crop " << crop->identifier);
+			WARN("Couldn't find {} in crop stages for crop {}", tilename, crop->identifier);
 	}
 
 	bool CropTile::interact(const Place &place, Layer layer, ItemStack *used_item, Hand hand) {

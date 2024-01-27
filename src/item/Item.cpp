@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "graphics/Texture.h"
 #include "graphics/Tileset.h"
 #include "entity/ItemEntity.h"
@@ -317,9 +315,5 @@ namespace Game3 {
 		json[1] = stack.count;
 		if (!stack.data.empty())
 			json[2] = stack.data;
-	}
-
-	std::ostream & operator<<(std::ostream &os, const Game3::ItemStack &stack) {
-		return os << stack.item->getTooltip(stack) << " x " << stack.count;
 	}
 }

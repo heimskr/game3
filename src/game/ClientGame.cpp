@@ -131,7 +131,7 @@ namespace Game3 {
 				tab.show();
 			tab.reset(toClientPointer());
 		} else {
-			WARN("Text tab not found");
+			WARN_("Text tab not found");
 		}
 	}
 
@@ -168,7 +168,7 @@ namespace Game3 {
 				canvas.window.error(warning.what());
 			} catch (const std::exception &err) {
 				auto &packet_ref = *packet;
-				ERROR("Couldn't handle packet of type " << typeid(packet_ref).name() << " (" << packet->getID() << "): " << err.what());
+				ERROR_("Couldn't handle packet of type " << typeid(packet_ref).name() << " (" << packet->getID() << "): " << err.what());
 				throw;
 			}
 		}
@@ -190,7 +190,7 @@ namespace Game3 {
 					client->send(ChunkRequestPacket(*realm, missingChunks, true));
 			}
 		} else {
-			WARN("No realm");
+			WARN_("No realm");
 		}
 
 		return true;
@@ -281,6 +281,6 @@ namespace Game3 {
 			active = false;
 			tickThread.join();
 		} else
-			WARN("Trying to stop an unjoinable ClientGame");
+			WARN_("Trying to stop an unjoinable ClientGame");
 	}
 }

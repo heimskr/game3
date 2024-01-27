@@ -44,8 +44,6 @@ namespace Game3 {
 		inline bool isInfinite() const { return infinite; }
 	};
 
-	std::ostream & operator<<(std::ostream &, FluidTile);
-
 	struct FluidStack {
 		FluidID id = 0;
 		FluidAmount amount = 0;
@@ -59,8 +57,6 @@ namespace Game3 {
 
 		static FluidStack fromJSON(const Game &, const nlohmann::json &);
 	};
-
-	std::ostream & operator<<(std::ostream &, FluidStack);
 
 	template <typename T>
 	T popBuffer(Buffer &);
@@ -79,3 +75,25 @@ namespace Game3 {
 
 	using FluidChunk = Chunk<FluidTile>;
 }
+
+template <>
+struct std::formatter<Game3::FluidTile> {
+	constexpr auto parse(std::format_parse_context &ctx) {
+		return ctx.begin();
+    }
+
+	auto format(const Game3::FluidTile &fluid_tile, std::format_context &ctx) const {
+		return std::format_to(ctx.out(), "FluidTile({}, {})", fluid_tile.id, fluid_tile.level);
+	}
+};
+
+template <>
+struct std::formatter<Game3::FluidStack> {
+	constexpr auto parse(std::format_parse_context &ctx) {
+		return ctx.begin();
+    }
+
+	auto format(const Game3::FluidStack &fluid_stack, std::format_context &ctx) const {
+		return std::format_to(ctx.out(), "FluidStack({}, {})", fluid_stack.id, fluid_stack.amount);
+	}
+};

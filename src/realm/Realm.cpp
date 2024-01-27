@@ -806,7 +806,7 @@ namespace Game3 {
 			auto lock = entities.uniqueLock();
 			if (auto iter = entities.find(entity); iter != entities.end()) {
 				if (can_warn)
-					WARN("Still present in Realm " << id << "'s entities");
+					WARN("Still present in Realm {}'s entities", id);
 				entities.erase(iter);
 			}
 		}
@@ -815,7 +815,7 @@ namespace Game3 {
 			auto lock = entitiesByGID.uniqueLock();
 			if (auto iter = entitiesByGID.find(entity->getGID()); iter != entitiesByGID.end()) {
 				if (can_warn)
-					WARN("Still present in Realm " << id << "'s entitiesByGID");
+					WARN("Still present in Realm {}'s entitiesByGID", id);
 				entitiesByGID.erase(iter);
 			}
 		}
@@ -828,7 +828,7 @@ namespace Game3 {
 				auto set_lock = set->uniqueLock();
 				if (auto iter = set->find(entity); iter != set->end()) {
 					if (can_warn)
-						WARN("Still present in Realm " << id << "'s entitiesByChunk at chunk position " << chunk_position);
+						WARN("Still present in Realm {}'s entitiesByChunk at chunk position {}", id, chunk_position);
 					set->erase(iter);
 				}
 			}
@@ -839,7 +839,7 @@ namespace Game3 {
 		const Position position = tile_entity->getPosition();
 		auto iter = tileEntities.find(position);
 		if (iter == tileEntities.end()) {
-			WARN("Can't remove tile entity: not found");
+			WARN_("Can't remove tile entity: not found");
 			return; // Probably already destroyed. Could happen if the tile entity was queued for removal multiple times in the same tick.
 		}
 		iter->second->onRemove();
@@ -848,7 +848,7 @@ namespace Game3 {
 		detach(tile_entity);
 
 		if (const auto count = tile_entity.use_count(); 3 < count)
-			WARN("Tile entity use count: " << count);
+			WARN_("Tile entity use count: " << count);
 
 		if (run_helper) {
 			setLayerHelper(position.row, position.column, Layer::Submerged);
@@ -888,7 +888,7 @@ namespace Game3 {
 
 	void Realm::queueDestruction(const EntityPtr &entity) {
 		if (entity->isPlayer())
-			INFO("Queueing player " << entity->getGID() << " for entity destruction.");
+			INFO_("Queueing player " << entity->getGID() << " for entity destruction.");
 		entityDestructionQueue.push(entity);
 	}
 
@@ -1471,7 +1471,7 @@ namespace Game3 {
 					shared->reupload();
 					shared->reuploadPending = false;
 				} else {
-					ERROR("Expired in " << __FILE__ << ':' << __LINE__);
+					ERROR_("Expired in " << __FILE__ << ':' << __LINE__);
 				}
 			});
 		}

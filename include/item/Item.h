@@ -6,12 +6,13 @@
 #include "ui/Modifiers.h"
 
 #include <gtkmm.h>
+#include <nlohmann/json.hpp>
+
+#include <format>
 #include <map>
 #include <memory>
 #include <ostream>
 #include <unordered_set>
-
-#include <nlohmann/json.hpp>
 
 namespace Game3 {
 	class Game;
@@ -152,6 +153,26 @@ namespace Game3 {
 	Buffer & operator>>(Buffer &, ItemStack &);
 
 	void to_json(nlohmann::json &, const ItemStack &);
-
-	std::ostream & operator<<(std::ostream &, const Game3::ItemStack &);
 }
+
+template <>
+struct std::formatter<Game3::Item> {
+	constexpr auto parse(std::format_parse_context &ctx) {
+		return ctx.begin();
+    }
+
+	auto format(const Game3::Item &item, std::format_context &ctx) const {
+		return std::format_to(ctx.out(), "{}", item.name);
+	}
+};
+
+template <>
+struct std::formatter<Game3::ItemStack> {
+	constexpr auto parse(std::format_parse_context &ctx) {
+		return ctx.begin();
+    }
+
+	auto format(const Game3::ItemStack &stack, std::format_context &ctx) const {
+		return std::format_to(ctx.out(), "{} x {}", stack.item->getTooltip(stack), stack.count);
+	}
+};

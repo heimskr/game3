@@ -54,7 +54,8 @@ namespace Game3 {
 			using Entity::teleport;
 			void teleport(const Position &, const std::shared_ptr<Realm> &, MovementContext) override;
 			void addMoney(MoneyCount);
-			void removeMoney(MoneyCount);
+			/** Returns whether the player had enough money. If false, no change was made. */
+			bool removeMoney(MoneyCount);
 			float getMovementSpeed() const override { return movementSpeed; }
 			bool setTooldown(float multiplier);
 			inline bool hasTooldown() const { return 0.f < tooldown; }
@@ -84,7 +85,7 @@ namespace Game3 {
 			float getAttackPeriod() const;
 			bool canAttack() const;
 
-			friend class Entity;
+			inline std::string getUsername() const { return username.copyBase(); }
 
 		protected:
 			Lockable<std::unordered_set<RealmID>> knownRealms;
@@ -93,6 +94,8 @@ namespace Game3 {
 
 			/** Resets client-side things like movingUp and the continuous interaction fields that aren't transferred over the network. */
 			void resetEphemeral();
+
+		friend class Entity;
 	};
 
 	void to_json(nlohmann::json &, const Player &);

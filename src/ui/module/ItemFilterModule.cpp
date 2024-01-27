@@ -130,7 +130,7 @@ namespace Game3 {
 			return;
 
 		if (!pipe) {
-			WARN("Pipe is missing in ItemFilterModule::upload");
+			WARN_("Pipe is missing in ItemFilterModule::upload");
 			return;
 		}
 

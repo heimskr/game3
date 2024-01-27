@@ -224,9 +224,9 @@ namespace Game3 {
 		auto iter = storage.find(slot);
 		if (iter == storage.end()) {
 			if (auto owner = weakOwner.lock())
-				WARN("Trying to remove from empty slot " << slot << " in " << owner->getName() << ' ' << owner->getGID() << "'s inventory");
+				WARN_("Trying to remove from empty slot " << slot << " in " << owner->getName() << ' ' << owner->getGID() << "'s inventory");
 			else
-				WARN("Trying to remove from empty slot " << slot << " in an unowned inventory");
+				WARN_("Trying to remove from empty slot " << slot << " in an unowned inventory");
 			return 0;
 		}
 
@@ -269,7 +269,7 @@ namespace Game3 {
 
 	void ServerInventory::setActive(Slot new_active, bool) {
 		if (!(0 <= new_active && new_active < slotCount)) {
-			WARN("Bad slot: " << new_active << " (slot count: " << slotCount << ")");
+			WARN_("Bad slot: " << new_active << " (slot count: " << slotCount << ")");
 			return;
 		}
 

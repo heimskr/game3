@@ -34,7 +34,7 @@ namespace Game3 {
 		secondary << realmID << chunkPosition << updateCounter << tiles << fluids;
 		auto compressed = LZ4::compress(secondary.getSpan());
 #ifdef DEBUG_COMPRESSION
-		INFO("Compression: " << secondary.getSpan().size_bytes() << " → " << compressed.size() << " (" << (double(secondary.getSpan().size_bytes()) / compressed.size()) << ')');
+		INFO_("Compression: " << secondary.getSpan().size_bytes() << " → " << compressed.size() << " (" << (double(secondary.getSpan().size_bytes()) / compressed.size()) << ')');
 #endif
 		buffer << compressed;
 	}

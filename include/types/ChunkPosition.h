@@ -2,7 +2,6 @@
 
 #include <cstdint>
 #include <functional>
-#include <ostream>
 #include <random>
 #include <string>
 
@@ -58,7 +57,6 @@ namespace Game3 {
 		}
 	};
 
-	std::ostream & operator<<(std::ostream &, ChunkPosition);
 	Buffer & operator+=(Buffer &, const ChunkPosition &);
 	Buffer & operator<<(Buffer &, const ChunkPosition &);
 	Buffer & operator>>(Buffer &, ChunkPosition &);
@@ -120,16 +118,35 @@ namespace Game3 {
 			}
 	};
 
-	std::ostream & operator<<(std::ostream &, const ChunkRange &);
 	void from_json(const nlohmann::json &, ChunkRange &);
 	void to_json(nlohmann::json &, const ChunkRange &);
 }
 
-namespace std {
-	template <>
-	struct hash<Game3::ChunkPosition> {
-		size_t operator()(const Game3::ChunkPosition &chunk_position) const {
-			return std::hash<uint64_t>{}((static_cast<uint64_t>(chunk_position.x) << 32) | static_cast<uint64_t>(chunk_position.y));
-		}
-	};
-}
+template <>
+struct std::hash<Game3::ChunkPosition> {
+	size_t operator()(const Game3::ChunkPosition &chunk_position) const {
+		return std::hash<uint64_t>{}((static_cast<uint64_t>(chunk_position.x) << 32) | static_cast<uint64_t>(chunk_position.y));
+	}
+};
+
+template <>
+struct std::formatter<Game3::ChunkPosition> {
+	constexpr auto parse(std::format_parse_context &ctx) {
+		return ctx.begin();
+    }
+
+	auto format(const auto &chunk_position, std::format_context &ctx) const {
+		return std::format_to(ctx.out(), "({}, {})", chunk_position.x, chunk_position.y);
+	}
+};
+
+template <>
+struct std::formatter<Game3::ChunkRange> {
+	constexpr auto parse(std::format_parse_context &ctx) {
+		return ctx.begin();
+    }
+
+	auto format(const auto &range, std::format_context &ctx) const {
+		return std::format_to(ctx.out(), "[{}, {}]", range.topLeft, range.bottomRight);
+	}
+};

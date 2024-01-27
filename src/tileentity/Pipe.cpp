@@ -213,35 +213,35 @@ namespace Game3 {
 			if (auto network = networks[pipe_type]) {
 				if (first) {
 					first = false;
-					INFO("================================");
+					INFO_("================================");
 				} else {
-					INFO("--------------------------------");
+					INFO_("--------------------------------");
 				}
 
-				INFO(pipe_type << " network ID: " << network->getID() << ", loaded: " << std::boolalpha << loaded[pipe_type]);
+				INFO("{} network ID: {}, loaded: {}", pipe_type, network->getID(), loaded[pipe_type]);
 
 				if (const auto &insertions = network->getInsertions(); !insertions.empty()) {
-					INFO(pipe_type << " insertion points (" << insertions.size() << "):");
+					INFO("{} insertion points ({}):", pipe_type, insertions.size());
 					for (const auto &[pos, direction]: insertions)
-						INFO("- " << pos << ", " << direction);
+						INFO("- {}, {}", pos, direction);
 				} else {
-					INFO("No " << pipe_type << " insertion points.");
+					INFO("No {} insertion points.", pipe_type);
 				}
 
 				if (const auto &extractions = network->getExtractions(); !extractions.empty()) {
-					INFO(pipe_type << " extraction points (" << extractions.size() << "):");
+					INFO("{} extraction points ({}):", pipe_type, extractions.size());
 					for (const auto &[pos, direction]: extractions)
-						INFO("- " << pos << ", " << direction);
+						INFO("- {}, {}", pos, direction);
 				} else {
-					INFO("No " << pipe_type << " extraction points.");
+					INFO("No {} extraction points.", pipe_type);
 				}
 
 				if (pipe_type == PipeType::Item)
-					INFO("Overflow queue size: " << std::dynamic_pointer_cast<ItemNetwork>(network)->overflowCount());
+					INFO("Overflow queue size: {}", std::dynamic_pointer_cast<ItemNetwork>(network)->overflowCount());
 				else if (pipe_type == PipeType::Energy)
-					INFO("Stored energy: " << std::dynamic_pointer_cast<EnergyNetwork>(network)->energyContainer->energy);
+					INFO("Stored energy: {}", std::dynamic_pointer_cast<EnergyNetwork>(network)->energyContainer->energy);
 			} else
-				INFO("Pipe not connected to a(n) " << pipe_type << " network.");
+				INFO("Pipe not connected to a(n) {} network.", pipe_type);
 		}
 
 		return false;

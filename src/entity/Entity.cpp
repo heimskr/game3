@@ -218,9 +218,9 @@ namespace Game3 {
 			if (game->allAgents.contains(globalID)) {
 				if (auto locked = game->allAgents.at(globalID).lock()) {
 					auto &locked_ref = *locked;
-					ERROR("globalID[" << globalID << "], allAgents<" << game->allAgents.size() << ">, type[this=" << typeid(*this).name() << ", other=" << typeid(locked_ref).name() << "], this=" << this << ", other=" << locked.get());
+					ERROR_("globalID[" << globalID << "], allAgents<" << game->allAgents.size() << ">, type[this=" << typeid(*this).name() << ", other=" << typeid(locked_ref).name() << "], this=" << this << ", other=" << locked.get());
 				} else {
-					ERROR("globalID[" << globalID << "], allAgents<" << game->allAgents.size() << ">, type[this=" << typeid(*this).name() << ", other=expired]");
+					ERROR_("globalID[" << globalID << "], allAgents<" << game->allAgents.size() << ">, type[this=" << typeid(*this).name() << ", other=expired]");
 				}
 				assert(!game->allAgents.contains(globalID));
 			}
@@ -264,17 +264,17 @@ namespace Game3 {
 					if (source == *inventory && destination == *inventory) {
 						for (Held &held: {std::ref(heldLeft), std::ref(heldRight)}) {
 							if (source_slot == held.slot) {
-								INFO(__FILE__ << ':' << __LINE__ << ": setHeld(destination_slot{" << destination_slot << "}, " << (held.isLeft? "left" : "right") << ')');
+								INFO_(__FILE__ << ':' << __LINE__ << ": setHeld(destination_slot{" << destination_slot << "}, " << (held.isLeft? "left" : "right") << ')');
 								setHeld(destination_slot, held);
 							} else if (destination_slot == held.slot) {
-								INFO(__FILE__ << ':' << __LINE__ << ": setHeld(source_slot{" << destination_slot << "}, " << (held.isLeft? "left" : "right") << ')');
+								INFO_(__FILE__ << ':' << __LINE__ << ": setHeld(source_slot{" << destination_slot << "}, " << (held.isLeft? "left" : "right") << ')');
 								setHeld(source_slot, held);
 							}
 						}
 					} else if (source == *inventory) {
 						for (Held &held: {std::ref(heldLeft), std::ref(heldRight)}) {
 							if (source_slot == held.slot) {
-								INFO(__FILE__ << ':' << __LINE__ << ": setHeld(-1, " << (held.isLeft? "left" : "right") << ')');
+								INFO_(__FILE__ << ':' << __LINE__ << ": setHeld(-1, " << (held.isLeft? "left" : "right") << ')');
 								setHeld(-1, held);
 							}
 						}
@@ -282,7 +282,7 @@ namespace Game3 {
 						assert(destination == *inventory);
 						for (Held &held: {std::ref(heldLeft), std::ref(heldRight)}) {
 							if (destination_slot == held.slot) {
-								INFO(__FILE__ << ':' << __LINE__ << ": setHeld(-1, " << (held.isLeft? "left" : "right") << ')');
+								INFO_(__FILE__ << ':' << __LINE__ << ": setHeld(-1, " << (held.isLeft? "left" : "right") << ')');
 								setHeld(-1, held);
 							}
 						}
@@ -417,7 +417,7 @@ namespace Game3 {
 
 		RealmPtr realm = weakRealm.lock();
 		if (!realm) {
-			WARN("Can't move entity " << getGID() << ": no realm");
+			WARN_("Can't move entity " << getGID() << ": no realm");
 			return false;
 		}
 
@@ -454,7 +454,7 @@ namespace Game3 {
 		if (context.forcedPosition) {
 			new_position = *context.forcedPosition;
 		} else if ((horizontal && offset.x != 0) || (!horizontal && offset.y != 0)) {
-			// WARN("Can't move entity " << globalID << ": improper offsets [" << (horizontal? "horizontal" : "vertical") << " : (" << offset.x << ", " << offset.y << ")]");
+			// WARN_("Can't move entity " << globalID << ": improper offsets [" << (horizontal? "horizontal" : "vertical") << " : (" << offset.x << ", " << offset.y << ")]");
 			return false;
 		}
 
@@ -632,9 +632,7 @@ namespace Game3 {
 	}
 
 	std::string Entity::debug() const {
-		std::stringstream sstream;
-		sstream << "Entity[type=" << type << ", position=" << position << ", realm=" << realmID << ", direction=" << direction << ']';
-		return sstream.str();
+		return std::format("Entity[type={}, position={}, realm={}, direction={}]", type, position, realmID, direction);
 	}
 
 	void Entity::queueForMove(std::function<bool(const std::shared_ptr<Entity> &, bool)> function) {
@@ -883,7 +881,7 @@ namespace Game3 {
 				const EntitySetPathPacket packet(*this);
 				for (const auto &weak_player: visiblePlayers) {
 					if (auto player = weak_player.lock(); player && !hasSeenPath(player)) {
-						// INFO("Late sending EntitySetPathPacket (Entity)");
+						// INFO_("Late sending EntitySetPathPacket (Entity)");
 						player->toServer()->ensureEntity(shared);
 						player->send(packet);
 						setSeenPath(player);
@@ -1014,7 +1012,7 @@ namespace Game3 {
 		const InventoryPtr inventory = getInventory(0);
 
 		if (!inventory->contains(new_value)) {
-			WARN("Can't equip slot " << new_value << ": no item in inventory");
+			WARN_("Can't equip slot " << new_value << ": no item in inventory");
 			held.slot = -1;
 			if (is_client)
 				held.texture.reset();

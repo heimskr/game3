@@ -18,7 +18,7 @@ namespace Game3 {
 			*result_out = result;
 
 		if (result != discord::Result::Ok) {
-			ERROR("Couldn't initialize Discord: " << int(result));
+			ERROR_("Couldn't initialize Discord: " << int(result));
 			return false;
 		}
 
@@ -31,7 +31,7 @@ namespace Game3 {
 #ifdef DISCORD_RICH_PRESENCE
 		return [callback = std::move(callback)](discord::Result result) {
 			if (result != discord::Result::Ok)
-				ERROR("Couldn't set activity: " << int(result));
+				ERROR_("Couldn't set activity: " << int(result));
 			if (callback)
 				callback(result);
 		};

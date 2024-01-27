@@ -139,15 +139,16 @@ namespace Game3 {
 		{
 			assert(fluidContainer);
 			auto lock = fluidContainer->levels.sharedLock();
-			if (fluidContainer->levels.empty())
-				WARN("No fluids.");
-			else
+			if (fluidContainer->levels.empty()) {
+				WARN_("No fluids.");
+			} else {
 				for (const auto &[id, amount]: fluidContainer->levels)
-					INFO(realm->getGame().getFluid(id)->identifier << " = " << amount);
+					INFO("{} = {}", realm->getGame().getFluid(id)->identifier, amount);
+			}
 		}
 
 		auto lock = energyContainer->sharedLock();
-		INFO("Energy: " << energyContainer->energy);
+		INFO("Energy: {}", energyContainer->energy);
 		return true;
 	}
 

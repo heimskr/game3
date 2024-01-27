@@ -174,11 +174,11 @@ namespace Game3 {
 	char popBuffer<char>(Buffer &buffer) {
 		std::span span = buffer.getSpan();
 		if (span.empty()) {
-			ERROR("Buffer size: " << buffer.bytes.size());
-			ERROR("Skip: " << buffer.skip);
-			ERROR("Span size: " << span.size());
-			ERROR("Span size_bytes: " << span.size_bytes());
-			INFO(hexString(buffer.bytes, true));
+			ERROR_("Buffer size: " << buffer.bytes.size());
+			ERROR_("Skip: " << buffer.skip);
+			ERROR_("Span size: " << span.size());
+			ERROR_("Span size_bytes: " << span.size_bytes());
+			INFO_(hexString(buffer.bytes, true));
 			throw std::out_of_range("Buffer is empty");
 		}
 		const char out = span[0];
@@ -258,9 +258,9 @@ namespace Game3 {
 
 	void Buffer::debug() const {
 		if (skip == 0)
-			INFO("Buffer: " << hexString(bytes, true));
+			INFO_("Buffer: " << hexString(bytes, true));
 		else
-			INFO("Buffer: \e[2m" << hexString(std::span(bytes.begin(), bytes.begin() + skip), true) << "\e[22m " << hexString(std::span(bytes.begin() + skip, bytes.end()), true));
+			INFO_("Buffer: \e[2m" << hexString(std::span(bytes.begin(), bytes.begin() + skip), true) << "\e[22m " << hexString(std::span(bytes.begin() + skip, bytes.end()), true));
 	}
 
 	Buffer & Buffer::operator<<(bool item) {

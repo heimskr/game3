@@ -2,7 +2,7 @@
 
 #include <array>
 #include <cstdint>
-#include <ostream>
+#include <format>
 
 namespace Game3 {
 	class Buffer;
@@ -22,5 +22,23 @@ namespace Game3 {
 	Position toPosition(Direction);
 
 	std::string toString(Direction);
-	std::ostream & operator<<(std::ostream &, Direction);
 }
+
+template <>
+struct std::formatter<Game3::Direction> {
+	constexpr auto parse(std::format_parse_context &ctx) {
+		return ctx.begin();
+    }
+
+	auto format(const auto &direction, std::format_context &ctx) const {
+		switch (direction) {
+			case Game3::Direction::Up:      return std::format_to(ctx.out(), "up");
+			case Game3::Direction::Down:    return std::format_to(ctx.out(), "down");
+			case Game3::Direction::Left:    return std::format_to(ctx.out(), "left");
+			case Game3::Direction::Right:   return std::format_to(ctx.out(), "right");
+			case Game3::Direction::Invalid: return std::format_to(ctx.out(), "invalid");
+			default:
+				return std::format_to(ctx.out(), "?");
+		}
+	}
+};

@@ -31,7 +31,7 @@ namespace Game3 {
 		GameDB &database = game.toServer().database;
 		if (database.isOpen()) {
 			database.writeUser(*this);
-			INFO("Persisted ServerPlayer with username " << username << '.');
+			INFO_("Persisted ServerPlayer with username " << username << '.');
 
 			std::vector<std::string> usernames;
 
@@ -39,7 +39,7 @@ namespace Game3 {
 				const auto &players = game.toServer().players;
 				auto lock = players.sharedLock();
 				if (players.empty()) {
-					INFO("No remaining players.");
+					INFO_("No remaining players.");
 					return;
 				}
 
@@ -47,7 +47,7 @@ namespace Game3 {
 					usernames.push_back(player->username);
 			}
 
-			INFO("Remaining player" << (usernames.size() == 1? "" : "s") << ": " << join(usernames, ", "));
+			INFO_("Remaining player" << (usernames.size() == 1? "" : "s") << ": " << join(usernames, ", "));
 		}
 	}
 
@@ -99,7 +99,7 @@ namespace Game3 {
 	}
 
 	void ServerPlayer::kill() {
-		WARN("Killing server player \e[1m" << username << "\e[22m.");
+		WARN_("Killing server player \e[1m" << username << "\e[22m.");
 		ServerGame &game = getGame().toServer();
 
 		const bool keep_inventory = game.getRule("keepInventory").value_or(1) != 0;
@@ -124,7 +124,7 @@ namespace Game3 {
 			if (auto player = weak_player.lock()) {
 				RealmPtr realm = game.getRealm(player->spawnRealmID);
 				if (!realm) {
-					WARN("Couldn't find spawn realm " << player->spawnRealmID << " for player " << player->username);
+					WARN_("Couldn't find spawn realm " << player->spawnRealmID << " for player " << player->username);
 					return;
 				}
 				player->teleport(player->spawnPosition.copyBase(), realm, MovementContext{.facingDirection = Direction::Down, .isTeleport = true});

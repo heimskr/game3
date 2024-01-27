@@ -187,7 +187,7 @@ namespace Game3 {
 				try {
 					return items.at(id);
 				} catch (const std::out_of_range &) {
-					ERROR("Couldn't find \"" << id << "\" in registry " << identifier);
+					ERROR("Couldn't find \"{}\" in registry {}", id, identifier);
 					return {};
 				}
 			}
@@ -382,7 +382,7 @@ namespace Game3 {
 				try {
 					return items.at(number);
 				} catch (const std::out_of_range &) {
-					ERROR("Couldn't find \"" << number << "\" in registry " << identifier);
+					ERROR("Couldn't find \"{}\" in registry {}", number, identifier);
 					return {};
 				}
 			}
@@ -456,7 +456,7 @@ namespace Game3 {
 				try {
 					return items.at(name);
 				} catch (const std::out_of_range &) {
-					ERROR("Couldn't find \"" << name << "\" in registry " << identifier);
+					ERROR("Couldn't find \"{}\" in registry {}", name, identifier);
 					return {};
 				}
 			}

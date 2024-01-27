@@ -25,7 +25,7 @@ namespace Game3 {
 			try {
 				source->send(&byte, 1, false);
 			} catch (const NetError &err) {
-				ERROR("Network error in overflow(): " << err.what());
+				ERROR_("Network error in overflow(): " << err.what());
 				return EOF;
 			}
 		}
@@ -37,7 +37,7 @@ namespace Game3 {
 		try {
 			return source->send(src, size, false);
 		} catch (const NetError &err) {
-			ERROR("Network error in xsputn(): " << err.what());
+			ERROR_("Network error in xsputn(): " << err.what());
 			return EOF;
 		}
 	}
@@ -53,7 +53,7 @@ namespace Game3 {
 		try {
 			bytes_read = source->recv(buffer + putbackSize, bufferSize - putbackSize);
 		} catch (const NetError &err) {
-			ERROR("Network error in underflow(): " << err.what());
+			ERROR_("Network error in underflow(): " << err.what());
 			return EOF;
 		}
 

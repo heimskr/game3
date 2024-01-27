@@ -26,7 +26,7 @@ namespace Game3 {
 				player->setRealm(realm);
 				player->weakClient = std::static_pointer_cast<RemoteClient>(client.shared_from_this());
 				player->notifyOfRealm(*realm);
-				SUCCESS("Player " << username << "'s GID is " << player->globalID);
+				SUCCESS_("Player " << username << "'s GID is " << player->globalID);
 				player->init(game);
 				client.send(LoginStatusPacket(true, player->globalID, username, display_name, player));
 				server->setupPlayer(client);

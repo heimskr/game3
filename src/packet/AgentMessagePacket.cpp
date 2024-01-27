@@ -26,13 +26,13 @@ namespace Game3 {
 
 	void AgentMessagePacket::handle(ClientGame &game) {
 		if (!Agent::validateGID(globalID)) {
-			ERROR("Can't send message to player: invalid GID");
+			ERROR_("Can't send message to player: invalid GID");
 			return;
 		}
 
 		AgentPtr source = game.getAgent(globalID);
 		if (!source) {
-			ERROR("Can't send message to player: agent not found");
+			ERROR_("Can't send message to player: agent not found");
 			return;
 		}
 

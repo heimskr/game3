@@ -116,7 +116,7 @@ namespace Game3 {
 				if (auto iter = credits.find(texture_id); iter != credits.end())
 					meta["credit"] = iter->second;
 				else
-					WARN("No credit for " << id << " in texture " << texture_id);
+					WARN("No credit for {} in texture {}", id, texture_id);
 			}
 
 			std::ofstream(dir / "item.json") << meta.dump();

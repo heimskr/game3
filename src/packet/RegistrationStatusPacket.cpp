@@ -13,7 +13,7 @@ namespace Game3 {
 			return;
 		}
 
-		SUCCESS("Registration succeeded: token = " << token);
+		SUCCESS_("Registration succeeded: token = " << token);
 
 		auto &client = *game.client;
 		client.setToken(client.getHostname(), username, token);

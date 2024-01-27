@@ -73,10 +73,6 @@ namespace Game3 {
 		return '(' + std::to_string(x) + ", " + std::to_string(y) + ')';
 	}
 
-	std::ostream & operator<<(std::ostream &os, ChunkPosition chunk_position) {
-		return os << '(' << chunk_position.x << ", " << chunk_position.y << ')';
-	}
-
 	void from_json(const nlohmann::json &json, ChunkPosition &position) {
 		position.x = json.at(0);
 		position.y = json.at(1);
@@ -96,10 +92,6 @@ namespace Game3 {
 
 	ChunkRange::operator std::string() const {
 		return '[' + std::string(topLeft) + ", " + std::string(bottomRight) + ']';
-	}
-
-	std::ostream & operator<<(std::ostream &os, const ChunkRange &range) {
-		return os << '[' << range.topLeft << ", " << range.bottomRight << ']';
 	}
 
 	void from_json(const nlohmann::json &json, ChunkRange &range) {

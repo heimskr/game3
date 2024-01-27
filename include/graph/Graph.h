@@ -912,23 +912,4 @@ namespace Game3 {
 				return labelMap.cend();
 			}
 	};
-
-	template <typename T, typename Color>
-	std::ostream & operator<<(std::ostream &os, const typename Graph<T, Color>::Node &node) {
-		return os << node.getLabel();
-	}
-
-	template <typename T, typename Color>
-	std::ostream & operator<<(std::ostream &os, const typename Graph<T, Color>::DFSResult &result) {
-		os << "Parents    [";
-		for (const auto &pair: result.parents)
-			os << " " << pair.first->getLabel() << "<-" << pair.second->getLabel();
-		os << " ]\nDiscovered [";
-		for (const auto &pair: result.discovered)
-			os << " " << pair.first->getLabel() << ":" << pair.second;
-		os << " ]\nFinished   [";
-		for (const auto &pair: result.finished)
-			os << " " << pair.first->getLabel() << ":" << pair.second;
-		return os << "]\n";
-	}
 }

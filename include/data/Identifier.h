@@ -1,5 +1,6 @@
 #pragma once
 
+#include <format>
 #include <ostream>
 #include <stdexcept>
 #include <string>
@@ -66,14 +67,22 @@ namespace Game3 {
 	Buffer & operator+=(Buffer &, const Identifier &);
 	Buffer & operator<<(Buffer &, const Identifier &);
 	Buffer & operator>>(Buffer &, Identifier &);
-	std::ostream & operator<<(std::ostream &, const Identifier &);
 }
 
-namespace std {
-	template <>
-	struct hash<Game3::Identifier> {
-		size_t operator()(const Game3::Identifier &identifier) const {
-			return std::hash<std::string>()(static_cast<std::string>(identifier));
-		}
-	};
-}
+template <>
+struct std::hash<Game3::Identifier> {
+	size_t operator()(const Game3::Identifier &identifier) const {
+		return std::hash<std::string>()(static_cast<std::string>(identifier));
+	}
+};
+
+template <>
+struct std::formatter<Game3::Identifier> {
+	constexpr auto parse(std::format_parse_context &ctx) {
+		return ctx.begin();
+    }
+
+	auto format(const auto &identifier, std::format_context &ctx) const {
+		return std::format_to(ctx.out(), "{}:{}", identifier.space, identifier.name);
+	}
+};

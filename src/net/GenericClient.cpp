@@ -18,7 +18,7 @@ namespace Game3 {
 			outbox.clear();
 		}
 
-		INFO("\e[31m~GenericClient\e[39m(" << this << ")");
+		INFO_("\e[31m~GenericClient\e[39m(" << this << ")");
 	}
 
 	void GenericClient::start() {
@@ -53,7 +53,7 @@ namespace Game3 {
 		}
 
 		if (errc) {
-			ERROR("Client write (" << ip << "): " << errc.message() << " (" << errc.value() << ')');
+			ERROR_("Client write (" << ip << "): " << errc.message() << " (" << errc.value() << ')');
 			return;
 		}
 
@@ -64,11 +64,11 @@ namespace Game3 {
 	void GenericClient::doHandshake() {
 		socket.async_handshake(asio::ssl::stream_base::server, [this, shared = shared_from_this()](const asio::error_code &errc) {
 			if (errc) {
-				ERROR("Client handshake (" << ip << "): " << errc.message());
+				ERROR_("Client handshake (" << ip << "): " << errc.message());
 				return;
 			}
 
-			INFO("Handshake succeeded for " << ip);
+			INFO_("Handshake succeeded for " << ip);
 			doRead();
 		});
 	}
@@ -78,7 +78,7 @@ namespace Game3 {
 			socket.async_read_some(asio::buffer(buffer.get(), bufferSize), asio::bind_executor(strand, [this, shared = shared_from_this()](const asio::error_code &errc, size_t length) {
 				if (errc) {
 					if (errc.value() != 1) // "stream truncated"
-						ERROR("Client read (" << ip << "): " << errc.message() << " (" << errc << ')');
+						ERROR_("Client read (" << ip << "): " << errc.message() << " (" << errc << ')');
 					removeSelf();
 					return;
 				}

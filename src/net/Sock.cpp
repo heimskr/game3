@@ -33,7 +33,7 @@ namespace Game3 {
 		if (connected) {
 			ControlMessage message = ControlMessage::Close;
 			if (-1 == ::write(controlWrite, &message, sizeof(message)))
-				WARN("Couldn't write control message to Sock pipe");
+				WARN_("Couldn't write control message to Sock pipe");
 			::close(netFD);
 			connected = false;
 		}
@@ -46,26 +46,26 @@ namespace Game3 {
 		int status = ::connect(netFD, info->ai_addr, info->ai_addrlen);
 
 		if (status != 0) {
-			ERROR("connect(): " << strerror(errno));
+			ERROR_("connect(): " << strerror(errno));
 			throw NetError(errno);
 		}
 
 		int flags = fcntl(netFD, F_GETFL, 0);
 		if (flags == -1) {
-			ERROR("fcntl (get): " << strerror(errno));
+			ERROR_("fcntl (get): " << strerror(errno));
 			throw NetError(errno);
 		}
 
 		flags = fcntl(netFD, F_SETFL, blocking? (flags & ~O_NONBLOCK) : (flags | O_NONBLOCK));
 		if (flags == -1) {
-			ERROR("fcntl (set): " << strerror(errno));
+			ERROR_("fcntl (set): " << strerror(errno));
 			throw NetError(errno);
 		}
 
 		int control_pipe[2];
 		status = pipe(control_pipe);
 		if (status != 0) {
-			ERROR("pipe(): " << strerror(errno));
+			ERROR_("pipe(): " << strerror(errno));
 			throw NetError(errno);
 		}
 
@@ -84,12 +84,12 @@ namespace Game3 {
 			ControlMessage message = ControlMessage::Close;
 
 			if (-1 == ::write(controlWrite, &message, sizeof(message)))
-				WARN("Couldn't write to control pipe");
+				WARN_("Couldn't write to control pipe");
 
 			if (force)
 				::close(netFD);
 		} else
-			WARN("Can't close: not connected");
+			WARN_("Can't close: not connected");
 	}
 
 	ssize_t Sock::send(const void *data, size_t bytes, bool force) {
@@ -109,7 +109,7 @@ namespace Game3 {
 		timeval timeout {.tv_sec = 0, .tv_usec = 100};
 		int status = select(FD_SETSIZE, &fds_copy, nullptr, nullptr, &timeout);
 		if (status < 0) {
-			ERROR("select status: " << strerror(status));
+			ERROR_("select status: " << strerror(status));
 			throw NetError(errno);
 		}
 
@@ -125,19 +125,19 @@ namespace Game3 {
 			ControlMessage message;
 			status = ::read(controlRead, &message, 1);
 			if (status < 0) {
-				ERROR("control_fd status: " << strerror(status));
+				ERROR_("control_fd status: " << strerror(status));
 				throw NetError(errno);
 			}
 
 			if (message != ControlMessage::Close) {
-				ERROR("Unknown control message: '" << static_cast<char>(message) << "'");
+				ERROR_("Unknown control message: '" << static_cast<char>(message) << "'");
 			}
 
 			::close(netFD);
 			return 0;
 		}
 
-		SPAM("No file descriptor is ready.");
+		SPAM_("No file descriptor is ready.");
 		return -1;
 	}
 

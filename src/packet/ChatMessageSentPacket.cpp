@@ -7,11 +7,11 @@ namespace Game3 {
 	void ChatMessageSentPacket::handle(ClientGame &game) {
 		auto player = game.getAgent<ClientPlayer>(globalID);
 		if (!player) {
-			WARN("Couldn't find player with GID " << globalID << " in ChatMessageSentPacket handler");
+			WARN_("Couldn't find player with GID " << globalID << " in ChatMessageSentPacket handler");
 			return;
 		}
 
-		INFO("[" << player->displayName << "] " << message);
+		INFO_("[" << player->displayName << "] " << message);
 		player->setLastMessage(std::move(message));
 	}
 }

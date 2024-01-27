@@ -58,7 +58,6 @@ namespace Game3 {
 
 	void to_json(nlohmann::json &, const Position &);
 	void from_json(const nlohmann::json &, Position &);
-	std::ostream & operator<<(std::ostream &, const Position &);
 	Buffer & operator+=(Buffer &, const Position &);
 	Buffer & operator<<(Buffer &, const Position &);
 	Buffer & operator>>(Buffer &, Position &);
@@ -86,8 +85,6 @@ namespace Game3 {
 		bool operator==(const Place &) const;
 	};
 
-	std::ostream & operator<<(std::ostream &, const Place &);
-
 	struct Vector3 {
 		float x = 0.f;
 		float y = 0.f;
@@ -97,7 +94,6 @@ namespace Game3 {
 		double magnitude2D() const;
 	};
 
-	std::ostream & operator<<(std::ostream &, const Vector3 &);
 	Buffer & operator+=(Buffer &, const Vector3 &);
 	Buffer & operator<<(Buffer &, const Vector3 &);
 	Buffer & operator>>(Buffer &, Vector3 &);
@@ -107,17 +103,66 @@ namespace Game3 {
 		float y = 0.f;
 	};
 
-	std::ostream & operator<<(std::ostream &, const Vector2 &);
 	Buffer & operator+=(Buffer &, const Vector2 &);
 	Buffer & operator<<(Buffer &, const Vector2 &);
 	Buffer & operator>>(Buffer &, Vector2 &);
 }
 
-namespace std {
-	template <>
-	struct hash<Game3::Position> {
-		size_t operator()(const Game3::Position &position) const noexcept {
-			return (static_cast<size_t>(position.row) * 1298758219ul) ^ static_cast<size_t>(position.column);
+template <>
+struct std::hash<Game3::Position> {
+	size_t operator()(const Game3::Position &position) const noexcept {
+		return (static_cast<size_t>(position.row) * 1298758219ul) ^ static_cast<size_t>(position.column);
+	}
+};
+
+template <>
+struct std::formatter<Game3::Position> {
+	constexpr auto parse(std::format_parse_context &ctx) {
+		return ctx.begin();
+    }
+
+	auto format(const auto &position, std::format_context &ctx) const {
+		return std::format_to(ctx.out(), "({}, {})", position.row, position.column);
+	}
+};
+
+template <>
+struct std::formatter<Game3::Place> {
+	constexpr auto parse(std::format_parse_context &ctx) {
+		return ctx.begin();
+    }
+
+	auto format(const auto &place, std::format_context &ctx) const {
+		if (place.realm) {
+			if (place.player)
+				return std::format_to(ctx.out(), "{}:{}:{}", place.position, place.realm->getID(), place.player->getUsername());
+			return std::format_to(ctx.out(), "{}:{}:?", place.position, place.realm->getID());
 		}
-	};
-}
+
+		if (place.player)
+			return std::format_to(ctx.out(), "{}:?:{}", place.position, place.player->getUsername());
+		return std::format_to(ctx.out(), "{}:?:?", place.position);
+	}
+};
+
+template <>
+struct std::formatter<Game3::Vector3> {
+	constexpr auto parse(std::format_parse_context &ctx) {
+		return ctx.begin();
+    }
+
+	auto format(const auto &vector, std::format_context &ctx) const {
+		return std::format_to(ctx.out(), "({}, {}, {})", vector.x, vector.y, vector.z);
+	}
+};
+
+template <>
+struct std::formatter<Game3::Vector2> {
+	constexpr auto parse(std::format_parse_context &ctx) {
+		return ctx.begin();
+    }
+
+	auto format(const auto &vector, std::format_context &ctx) const {
+		return std::format_to(ctx.out(), "({}, {})", vector.x, vector.y);
+	}
+};

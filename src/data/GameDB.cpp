@@ -286,7 +286,7 @@ namespace Game3 {
 			const std::unordered_map<TileID, Identifier> old_map = meta.at("names");
 			const std::unordered_map<Identifier, Identifier> autotiles = meta.at("autotiles");
 
-			INFO("Auto-migrating tiles for realm " << realm->id);
+			INFO_("Auto-migrating tiles for realm " << realm->id);
 
 			Timer migration_timer{"TileMigration"};
 			std::unordered_map<TileID, TileID> migration_map;
@@ -318,21 +318,21 @@ namespace Game3 {
 
 							tile_id = new_tile;
 							if (new_tile != old_tile && covered.insert(old_tile).second)
-								INFO(old_map.at(old_tile) << " (" << old_tile << ") → " << tileset.getNames().at(new_tile) << " (" << new_tile << ')');
+								INFO("{} ({}) → {} ({})", old_map.at(old_tile), old_tile, tileset.getNames().at(new_tile), new_tile);
 						} else if (force_migrate) {
 							if (warned.insert(old_tile).second)
-								WARN("Replacing tile " << old_map.at(old_tile) << " (" << old_tile << ") with nothing.");
+								WARN("Replacing tile {} ({}) with nothing.", old_map.at(old_tile), old_tile);
 							tile_id = 0;
 						} else {
 							Identifier tilename = old_map.at(old_tile);
-							ERROR("Canceling tile migration; tile " << tilename << " (" << old_tile << ") is missing from the new tileset. Create .force-migrate to force migration.");
+							ERROR("Canceling tile migration; tile {} ({}) is missing from the new tileset. Create .force-migrate to force migration.", tilename, old_tile);
 							throw FailedMigrationError("Migration failed due to missing tile " + tilename.str() + " (" + std::to_string(old_tile) + ')');
 						}
 					}
 				}
 			}
 
-			SUCCESS("Finished tile migration for realm " << realm->id);
+			SUCCESS("Finished tile migration for realm {}", realm->getID());
 		});
 	}
 

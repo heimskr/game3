@@ -18,19 +18,19 @@ namespace Game3 {
 		}
 
 		if (game.database.hasName(username, displayName)) {
-			WARN("Failed to register user " << username);
+			WARN_("Failed to register user " << username);
 			client.send(RegistrationStatusPacket());
 			return;
 		}
 
 		auto player = server->loadPlayer(username, displayName);
-		SUCCESS("Registered user " << username << " with token " << player->token << '.');
+		SUCCESS_("Registered user " << username << " with token " << player->token << '.');
 		client.send(RegistrationStatusPacket(username, displayName, player->token));
 		client.setPlayer(player);
 		auto realm = player->getRealm();
 		player->weakClient = std::static_pointer_cast<RemoteClient>(client.shared_from_this());
 		player->notifyOfRealm(*realm);
-		INFO("Player GID is " << player->globalID);
+		INFO_("Player GID is " << player->globalID);
 		client.send(LoginStatusPacket(true, player->globalID, username, displayName, player));
 		server->setupPlayer(client);
 		realm->addPlayer(player);

@@ -22,23 +22,23 @@ namespace Game3 {
 		if (!used_item || used_item->item->identifier != "base:item/wrench")
 			return false;
 
-		INFO(typeid(*this).name() << ' ' << getGID() << ':');
-		INFO("  Path length is " << path.size());
+		INFO_(typeid(*this).name() << ' ' << getGID() << ':');
+		INFO_("  Path length is " << path.size());
 		auto realm = getRealm();
 		{
 			auto lock = visibleEntities.sharedLock();
-			INFO("  Player is visible? " << std::boolalpha << visiblePlayers.contains(player));
+			INFO_("  Player is visible? " << std::boolalpha << visiblePlayers.contains(player));
 		}
 		{
 			auto lock = player->visibleEntities.sharedLock();
-			INFO("  Visible to player? " << std::boolalpha << player->visibleEntities.contains(getSelf()));
+			INFO_("  Visible to player? " << std::boolalpha << player->visibleEntities.contains(getSelf()));
 		}
 		if (auto ptr = realm->getEntities(getChunk()); ptr && ptr->contains(getSelf()))
-			SUCCESS("  In chunk.");
+			SUCCESS_("  In chunk.");
 		else
-			ERROR("  Not in chunk.");
-		INFO("  First wander: " << firstWander);
-		INFO("  Attempting wander: " << std::boolalpha << attemptingWander.load());
+			ERROR_("  Not in chunk.");
+		INFO_("  First wander: " << firstWander);
+		INFO_("  Attempting wander: " << std::boolalpha << attemptingWander.load());
 		return true;
 	}
 

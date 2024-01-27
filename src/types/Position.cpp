@@ -185,18 +185,6 @@ namespace Game3 {
 		return this == &other || (position == other.position && realm == other.realm && player == other.player);
 	}
 
-	std::ostream & operator<<(std::ostream &os, const Place &place) {
-		if (place.realm) {
-			if (place.player)
-				return os << place.position << ':' << place.realm->id << ':' << place.player->username;
-			return os << place.position << ':' << place.realm->id << ":?";
-		}
-
-		if (place.player)
-			return os << place.position << ":?:" << place.player->username;
-		return os << place.position << ":?:?";
-	}
-
 	void to_json(nlohmann::json &json, const Position &position) {
 		json[0] = position.row;
 		json[1] = position.column;
@@ -205,10 +193,6 @@ namespace Game3 {
 	void from_json(const nlohmann::json &json, Position &position) {
 		position.row = json.at(0);
 		position.column = json.at(1);
-	}
-
-	std::ostream & operator<<(std::ostream &stream, const Position &position) {
-		return stream << '(' << position.row << ", " << position.column << ')';
 	}
 
 	Buffer & operator+=(Buffer &buffer, const Position &position) {
@@ -236,10 +220,6 @@ namespace Game3 {
 		return std::string{'\x32'} + getType(float{});
 	}
 
-	std::ostream & operator<<(std::ostream &stream, const Vector3 &vector) {
-		return stream << '(' << vector.x << ", " << vector.y << ", " << vector.z << ')';
-	}
-
 	Buffer & operator+=(Buffer &buffer, const Vector3 &vector) {
 		return ((buffer.appendType(vector) += vector.x) += vector.y) += vector.z;
 	}
@@ -263,10 +243,6 @@ namespace Game3 {
 	template <>
 	std::string Buffer::getType(const Vector2 &) {
 		return std::string{'\x31'} + getType(float{});
-	}
-
-	std::ostream & operator<<(std::ostream &stream, const Vector2 &vector) {
-		return stream << '(' << vector.x << ", " << vector.y << ')';
 	}
 
 	Buffer & operator+=(Buffer &buffer, const Vector2 &vector) {

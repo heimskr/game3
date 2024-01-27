@@ -10,7 +10,7 @@ namespace Game3 {
 	void PlayersCommand::operator()(LocalClient &client) {
 		auto game = client.weakGame.lock();
 		if (!game) {
-			WARN("No game.");
+			WARN_("No game.");
 			return;
 		}
 
@@ -24,25 +24,25 @@ namespace Game3 {
 		}
 
 		if (players.empty()) {
-			WARN("No players.");
+			WARN_("No players.");
 		}
 
-		INFO(players.size() << " player" << (players.size() == 1? ":" : "s:"));
+		INFO("{} player{}", players.size(), players.size() == 1? ":" : "s:");
 		for (const PlayerPtr &player: players) {
 			if (auto realm = player->weakRealm.lock()) {
-				INFO("- GID[\e[1m" << player->getGID() << "\e[22m], Position[\e[1m" << player->getPosition() << "\e[22m], RealmID[\e[1m" << player->realmID << "\e[22m], Offsets[\e[1m" << player->offset << "\e[22m], Realm->ID[\e[3"
-					<< (player->realmID == realm->id? '2' : '3') << 'm' << realm->id << "\e[39m]");
+				INFO("- GID[\e[1m{}\e[22m], Position[\e[1m{}\e[22m], RealmID[\e[1m{}\e[22m], Offsets[\e[1m{}\e[22m], Realm->ID[\e[3{}m{}\e[39m]",
+					player->getGID(), player->getPosition(), player->realmID, player->offset, player->realmID == realm->id? '2' : '3', realm->id);
 				if (!realm->hasEntity(player->getGID()))
-					WARN("  \e[33mSeemingly not present in realm!\e[39m");
+					WARN_("  \e[33mSeemingly not present in realm!\e[39m");
 				else
-					SUCCESS("  Present in realm.");
+					SUCCESS_("  Present in realm.");
 			} else
-				WARN("- GID[\e[1m" << player->getGID() << "\e[22m], Position[\e[1m" << player->getPosition() << "\e[22m], RealmID[\e[1m" << player->realmID << "\e[22m], Offsets[\e[1m" << player->offset << "\e[22m], no realm pointer");
+				WARN("- GID[\e[1m{}\e[22m], Position[\e[1m{}\e[22m], RealmID[\e[1m{}\e[22m], Offsets[\e[1m{}\e[22m], no realm pointer", player->getGID(), player->getPosition(), player->realmID, player->offset);
 		}
 
 		if (game->player)
-			INFO("Self ID: " << game->player->getGID());
+			INFO("Self ID: {}", game->player->getGID());
 		else
-			WARN("Couldn't find self.");
+			WARN_("Couldn't find self.");
 	}
 }

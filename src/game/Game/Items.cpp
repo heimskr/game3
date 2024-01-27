@@ -290,4 +290,8 @@ namespace Game3 {
 			}
 		}
 	}
+
+	ItemPtr Game::getItem(const ItemID &id) const {
+		return registry<ItemRegistry>().maybe(id);
+	}
 }

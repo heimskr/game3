@@ -73,10 +73,10 @@ namespace Game3 {
 	}
 
 	void Server::accept() {
-		INFO("Accepting.");
+		INFO_("Accepting.");
 		acceptor.async_accept([this](const asio::error_code &errc, asio::ip::tcp::socket socket) {
 			if (errc) {
-				ERROR("Server accept: " << errc.message());
+				ERROR_("Server accept: " << errc.message());
 			} else {
 				std::string ip = socket.remote_endpoint().address().to_string();
 				auto client = std::make_shared<RemoteClient>(*this, ip, ++lastID, std::move(socket));
@@ -115,7 +115,7 @@ namespace Game3 {
 		} catch (const asio::system_error &err) {
 			// Who really cares if SSL doesn't shut down properly?
 			// Who decided that the client is worthy of a proper shutdown?
-			ERROR("Shutdown (" << client.ip << "): " << err.what() << " (" << err.code() << ')');
+			ERROR_("Shutdown (" << client.ip << "): " << err.what() << " (" << err.code() << ')');
 		}
 
 		client.socket.lowest_layer().close();
@@ -159,7 +159,7 @@ namespace Game3 {
 		// overworld->add(player, Position(-25, -36));
 		player->spawnPosition = player->getPosition();
 		player->spawnRealmID = player->getRealm()->getID();
-		INFO("Setting player spawn realm ID to " << player->spawnRealmID);
+		INFO_("Setting player spawn realm ID to " << player->spawnRealmID);
 		player->init(*game);
 		player->onSpawn();
 		const InventoryPtr inventory = player->getInventory(0);
@@ -183,7 +183,7 @@ namespace Game3 {
 	void Server::setupPlayer(RemoteClient &client) {
 		auto player = client.getPlayer();
 		auto realm = player->getRealm();
-		INFO("Setting up player");
+		INFO_("Setting up player");
 		player->weakClient = std::static_pointer_cast<RemoteClient>(client.shared_from_this());
 		player->notifyOfRealm(*realm);
 		auto guard = client.bufferGuard();
@@ -265,14 +265,14 @@ namespace Game3 {
 		size_t seed = 1621;
 		if (std::filesystem::exists(".seed")) {
 			seed = parseNumber<size_t>(strip(readFile(".seed")));
-			INFO("Using custom seed \e[1m" << seed << "\e[22m");
+			INFO_("Using custom seed \e[1m" << seed << "\e[22m");
 		}
 
 		if (database_existed) {
 			game->database.readAll();
 			Timer::summary();
 			Timer::clear();
-			INFO("Finished reading all data from database.");
+			INFO_("Finished reading all data from database.");
 		} else {
 			RealmPtr realm = Realm::create<Overworld>(*game, 1, Overworld::ID(), "base:tileset/monomap", seed);
 			realm->outdoors = true;
@@ -315,11 +315,11 @@ namespace Game3 {
 				});
 
 				if (running && save_period <= std::chrono::system_clock::now() - last_save) {
-					INFO("Autosaving...");
+					INFO_("Autosaving...");
 					game->tickingPaused = true;
 					game->database.writeAll();
 					game->tickingPaused = false;
-					INFO("Autosaved.");
+					INFO_("Autosaved.");
 					last_save = std::chrono::system_clock::now();
 				}
 			}

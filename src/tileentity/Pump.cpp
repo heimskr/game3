@@ -104,13 +104,13 @@ namespace Game3 {
 
 		{
 			auto lock = energyContainer->sharedLock();
-			INFO("Energy: " << energyContainer->energy);
+			INFO("Energy: {}", energyContainer->energy);
 		}
 
 		{
 			auto lock = fluidContainer->levels.sharedLock();
 			for (const auto &[id, amount]: fluidContainer->levels)
-				INFO(realm->getGame().getFluid(id)->identifier << " = " << amount);
+				INFO("{} = {}", realm->getGame().getFluid(id)->identifier, amount);
 		}
 
 		return false;

@@ -41,10 +41,10 @@ namespace Game3 {
 
 	ServerGame::~ServerGame() {
 		pool.join();
-		INFO("Saving realms and users...");
+		INFO_("Saving realms and users...");
 		database.writeAllRealms();
 		database.writeUsers(players);
-		SUCCESS("Saved realms and users.");
+		SUCCESS_("Saved realms and users.");
 		Timer::summary();
 		Timer::clear();
 	}
@@ -105,7 +105,7 @@ namespace Game3 {
 					realm->eviscerate(player, true);
 
 				if (auto count = player.use_count(); count != 1) {
-					WARN("Player " << player.get() << " ref count: " << count << " (should be 1). Current realm: "
+					WARN_("Player " << player.get() << " ref count: " << count << " (should be 1). Current realm: "
 						<< player->realmID << " (realmID) or " << player->getRealm()->id << " (getRealm()->id)");
 				}
 			}
@@ -337,7 +337,7 @@ namespace Game3 {
 					try {
 						data = nlohmann::json::parse(join(std::span(words.begin() + 3, words.end()), " "));
 					} catch (const std::exception &err) {
-						ERROR(err.what());
+						ERROR_(err.what());
 						return {false, "Couldn't parse data as JSON."};
 					}
 				}
@@ -432,17 +432,17 @@ namespace Game3 {
 			}
 
 			if (first == "saveall") {
-				INFO("Writing...");
+				INFO_("Writing...");
 				tickingPaused = true;
 				database.writeAll();
 				tickingPaused = false;
-				INFO("Writing done.");
+				INFO_("Writing done.");
 				return {true, "Wrote all data."};
 			}
 
 			if (first == "pos") {
-				INFO("Player " << player->getGID() << " position: " << player->getPosition());
-				INFO("Player " << player->getGID() << " chunk position: " << player->getChunk());
+				INFO("Player {} position: {}", player->getGID(), player->getPosition());
+				INFO("Player {} chunk position: {}", player->getGID(), player->getChunk());
 				return {true, "Position = " + std::string(player->getPosition()) + ", chunk position = " + std::string(player->getChunk())};
 			}
 
@@ -477,7 +477,7 @@ namespace Game3 {
 
 			if (first == "say" || first == ":") {
 				std::string_view message = std::string_view(command).substr(first.size() + 1);
-				INFO('[' << player->username << "] " << message);
+				INFO_('[' << player->username << "] " << message);
 				broadcast(ChatMessageSentPacket{player->getGID(), std::string(message)}, true);
 				return {true, ""};
 			}
@@ -592,7 +592,7 @@ namespace Game3 {
 				for (const auto &[gid, weak_agent]: allAgents) {
 					if (AgentPtr agent = weak_agent.lock()) {
 						if (GlobalID agent_gid = agent->getGID(); gid != agent_gid)
-							WARN("Agent " << agent_gid << " is stored in allAgents with key " << gid);
+							WARN_("Agent " << agent_gid << " is stored in allAgents with key " << gid);
 						if (auto entity = std::dynamic_pointer_cast<Entity>(agent))
 							if (!exclude_animals || !std::dynamic_pointer_cast<Animal>(entity))
 								if (!exclude_items || !std::dynamic_pointer_cast<ItemEntity>(entity))
@@ -624,9 +624,14 @@ namespace Game3 {
 
 				for (const EntityPtr &entity: entities) {
 					Entity &entity_ref = *entity;
-					INFO((entity->isPlayer()? "\e[1m(" + safeDynamicCast<Player>(entity)->username + ") \e[22;2m" : "\e[2m") << std::setw(20) << std::right
-						<< entity->getGID() << "\e[22m  " << DEMANGLE(entity_ref) << "  \e[32m" << entity->getName() << "\e[39m  Realm \e[31m" << entity->getRealm()->id
-						<< "\e[39m  Position \e[33m" << entity->getPosition() << "\e[39m");
+
+					if (entity->isPlayer()) {
+						INFO("\e[1m({}) \e[22;2m {:<20}\e[22m {} \e[32m{}\e[39m Realm \e[31m{}\e[39m Position \e[33m{}\e[39m",
+							safeDynamicCast<Player>(entity)->getUsername(), entity->getGID(), DEMANGLE(entity_ref), entity->getName(), entity->getRealm()->getID(), entity->getPosition());
+					} else {
+						INFO("\e[2m {:<20}\e[22m {} \e[32m{}\e[39m Realm \e[31m{}\e[39m Position \e[33m{}\e[39m",
+							entity->getGID(), DEMANGLE(entity_ref), entity->getName(), entity->getRealm()->getID(), entity->getPosition());
+					}
 				}
 
 				return {true, ""};
@@ -637,7 +642,7 @@ namespace Game3 {
 				Tileset &tileset = realm->getTileset();
 				for (const Layer layer: allLayers)
 					if (auto tile = realm->tryTile(layer, player->position))
-						INFO(getIndex(layer) << " \e[2m→\e[22m " << *tile << " \e[2m/\e[22m " << tileset[*tile]);
+						INFO("{} \e[2m→\e[22m {} \e[2m/\e[22m {}", getIndex(layer), *tile, tileset[*tile]);
 				return {true, ""};
 			}
 

@@ -31,15 +31,15 @@ namespace Game3 {
 			return true;
 		});
 
-		INFO("Village " << village->getID() << " (" << village->getName() << ") resources:");
+		INFO("Village {} resources:", *village);
 		for (const auto &[key, value]: village->getResources())
-			INFO("    " << key << " => " << value);
+			INFO("    {} => {}", key, value);
 
-		INFO("Village " << village->getID() << " (" << village->getName() << ") richness:");
+		INFO("Village {} richness:", *village);
 		for (const auto &[key, value]: village->getRichness())
-			INFO("    " << key << " => " << value);
+			INFO("    {} => {}", key, value);
 
-		INFO("Subscriber count: " << village->getSubscriberCount());
+		INFO("Subscriber count: {}", village->getSubscriberCount());
 
 		return true;
 	}

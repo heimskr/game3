@@ -81,7 +81,7 @@ namespace Game3 {
 
 		auto lock = fluidContainer->levels.sharedLock();
 		for (const auto &[id, amount]: fluidContainer->levels)
-			INFO(realm->getGame().getFluid(id)->identifier << " = " << amount);
+			INFO("{} = {}", realm->getGame().getFluid(id)->identifier, amount);
 		return true;
 	}
 

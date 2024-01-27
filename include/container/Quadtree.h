@@ -45,8 +45,6 @@ namespace Game3 {
 			friend class Quadtree;
 	};
 
-	std::ostream & operator<<(std::ostream &, const Box &);
-
 	class Quadtree {
 		private:
 			Box root;

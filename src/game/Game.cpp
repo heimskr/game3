@@ -24,7 +24,7 @@
 
 namespace Game3 {
 	Game::~Game() {
-		INFO("\e[31m~Game\e[39m(" << this << ')');
+		INFO_("\e[31m~Game\e[39m(" << this << ')');
 		dying = true;
 	}
 

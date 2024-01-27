@@ -99,10 +99,6 @@ namespace Game3 {
 		return "Box[(" + std::to_string(top) + ", " + std::to_string(left) + "), " + std::to_string(height) + "h x " + std::to_string(width) + "w]";
 	}
 
-	std::ostream & operator<<(std::ostream &os, const Box &box) {
-		return os << static_cast<std::string>(box);
-	}
-
 	Quadtree::Quadtree(Index width, Index height):
 		root{0, 0, width, height} {}
 

@@ -91,7 +91,7 @@ namespace Game3 {
 
 				// This would be a little strange.
 				if (!extracted) {
-					WARN("Couldn't extract item indicated to be extractable from slot " << slot << '.');
+					WARN_("Couldn't extract item indicated to be extractable from slot " << slot << '.');
 					return false;
 				}
 
@@ -121,7 +121,7 @@ namespace Game3 {
 						// If there's still anything left over, move it to the overflowQueue so we can try to insert it somewhere another time.
 						// Theoretically this should never happen because we've locked the source inventory.
 						// Also, because the source inventory changed, we need to cancel the suppressor.
-						WARN("Can't put leftovers back into source inventory.");
+						WARN_("Can't put leftovers back into source inventory.");
 						suppressor.cancel(true);
 						overflowQueue.push_back(std::move(*new_leftover));
 						// Because we're in a weird situation here, it might be safer to just cancel the iteration now.
@@ -154,7 +154,7 @@ namespace Game3 {
 
 		RealmPtr realm = weakRealm.lock();
 		if (!realm) {
-			WARN("Item network destroyed while unable to drop overflow");
+			WARN_("Item network destroyed while unable to drop overflow");
 			return;
 		}
 
