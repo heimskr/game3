@@ -117,6 +117,9 @@ namespace Game3 {
 	void VillageTradeModule::setSellStack(ItemStack stack) {
 		stack.count = game->player->getInventory(0)->count(stack);
 		sellSlot.setStack(stack);
+		const double max(stack.count);
+		sellCount.set_adjustment(Gtk::Adjustment::create(max, 1.0, max));
+		sellCount.set_value(max);
 		updateSell(stack);
 	}
 
@@ -127,7 +130,8 @@ namespace Game3 {
 		}
 
 		const double old_value = sellCount.get_value();
-		sellCount.set_adjustment(Gtk::Adjustment::create(1.0, 1.0, game->player->getInventory(0)->count(stack)));
+		const double max(game->player->getInventory(0)->count(stack));
+		sellCount.set_adjustment(Gtk::Adjustment::create(max, 1.0, max));
 		sellCount.set_value(old_value);
 
 		std::optional<double> amount = village->getResourceAmount(stack.getID());

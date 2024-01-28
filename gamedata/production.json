@@ -38,24 +38,25 @@
 			{"out": ["base:item/bean"],       "cap": 64, "labor": 0, "biomes": [1], "randomRange": [0.65, 0.85]}
 		]],
 		["base:consumption_list", [
-			{"in": "base:item/eggplant",   "laborOut": 25, "always":  true},
-			{"in": "base:item/strawberry", "laborOut": 25, "always":  true},
-			{"in": "base:item/tomato",     "laborOut": 25, "always":  true},
-			{"in": "base:item/corn",       "laborOut": 25, "always":  true},
-			{"in": "base:item/potato",     "laborOut": 25, "always":  true},
-			{"in": "base:item/onion",      "laborOut": 25, "always":  true},
-			{"in": "base:item/chili",      "laborOut": 25, "always":  true},
-			{"in": "base:item/wheat",      "laborOut": 25, "always":  true},
-			{"in": "base:item/pumpkin",    "laborOut": 25, "always":  true},
-			{"in": "base:item/cabbage",    "laborOut": 25, "always":  true},
-			{"in": "base:item/bean",       "laborOut": 25, "always":  true},
-			{"in": "base:item/baguette",   "laborOut": 50, "always": false},
-			{"in": "base:item/bread",      "laborOut": 25, "always": false},
-			{"in": "base:item/cheese",     "laborOut": 25, "always": false},
-			{"in": "base:item/morsel",     "laborOut": 25, "always": false},
-			{"in": "base:item/raw_meat",   "laborOut": 25, "always": false, "laborMax": 0.0001},
-			{"in": "base:item/meat",       "laborOut": 50, "always": false, "laborMin": 0.0001},
-			{"in": "base:item/bleach",     "laborOut": 0, "always": false}
+			{"in": "base:item/eggplant",    "laborOut": 25, "always":  true},
+			{"in": "base:item/strawberry",  "laborOut": 25, "always":  true},
+			{"in": "base:item/tomato",      "laborOut": 25, "always":  true},
+			{"in": "base:item/corn",        "laborOut": 25, "always":  true},
+			{"in": "base:item/potato",      "laborOut": 25, "always":  true},
+			{"in": "base:item/onion",       "laborOut": 25, "always":  true},
+			{"in": "base:item/chili",       "laborOut": 25, "always":  true},
+			{"in": "base:item/wheat",       "laborOut": 25, "always":  true},
+			{"in": "base:item/pumpkin",     "laborOut": 25, "always":  true},
+			{"in": "base:item/cabbage",     "laborOut": 25, "always":  true},
+			{"in": "base:item/bean",        "laborOut": 25, "always":  true},
+			{"in": "base:item/chili_crisp", "laborOut": 50, "always":  true},
+			{"in": "base:item/baguette",    "laborOut": 50, "always": false},
+			{"in": "base:item/bread",       "laborOut": 25, "always": false},
+			{"in": "base:item/cheese",      "laborOut": 25, "always": false},
+			{"in": "base:item/morsel",      "laborOut": 25, "always": false},
+			{"in": "base:item/raw_meat",    "laborOut": 25, "always": false, "laborMax": 0.0001},
+			{"in": "base:item/meat",        "laborOut": 50, "always": false, "laborMin": 0.0001},
+			{"in": "base:item/bleach",      "laborOut": 0,  "always": false, "laborMax": "inf"}
 		]]
 	]
 }

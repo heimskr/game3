@@ -3,16 +3,30 @@
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
+	namespace {
+		double getNumber(const nlohmann::json &json) {
+			if (json.is_string()) {
+				if (json == "inf")
+					return std::numeric_limits<LaborAmount>::infinity();
+				if (json == "-inf")
+					return -std::numeric_limits<LaborAmount>::infinity();
+				throw std::invalid_argument("Invalid laborMax: " + json.dump());
+			}
+
+			return json;
+		}
+	}
+
 	ConsumptionRule::ConsumptionRule(const Game &, const nlohmann::json &json) {
 		input = json.at("in");
 		laborOut = json.at("laborOut");
 		always = json.at("always");
 
 		if (auto iter = json.find("laborMin"); iter != json.end())
-			laborRange.first = *iter;
+			laborRange.first = getNumber(*iter);
 
 		if (auto iter = json.find("laborMax"); iter != json.end())
-			laborRange.second = *iter;
+			laborRange.second = getNumber(*iter);
 	}
 
 	ConsumptionRule ConsumptionRule::fromJSON(const Game &game, const nlohmann::json &json) {

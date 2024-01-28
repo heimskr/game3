@@ -417,6 +417,10 @@
 				"output": [["base:item/chili_crisp", 1]],
 				"station": "base:station/cutting_board"
 			}],
+			["base:registry/crafting_recipe", {
+				"input":  [["base:item/wood", 1], ["base:item/coal", 1]],
+				"output": [["base:item/torch", 4]]
+			}],
 			["base:centrifuge_recipe", {
 				"input":  ["base:fluid/lava", 1000],
 				"output": [
