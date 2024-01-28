@@ -35,9 +35,10 @@ namespace Game3 {
 		options(options_),
 		richness(Richness::makeRandom(game)),
 		resources(getDefaultResources()),
-		randomValue(chooseRandomValue()) {}
+		randomValue(chooseRandomValue()),
+		greed(chooseGreed()) {}
 
-	Village::Village(VillageID id_, RealmID realm_id, std::string name_, ChunkPosition chunk_position, const Position &position_, const VillageOptions &options_, Richness richness_, Resources resources_, LaborAmount labor_, double random_value):
+	Village::Village(VillageID id_, RealmID realm_id, std::string name_, ChunkPosition chunk_position, const Position &position_, const VillageOptions &options_, Richness richness_, Resources resources_, LaborAmount labor_, double random_value, double greed_):
 		id(id_),
 		name(std::move(name_)),
 		realmID(realm_id),
@@ -47,7 +48,8 @@ namespace Game3 {
 		richness(std::move(richness_)),
 		resources(std::move(resources_)),
 		labor(labor_),
-		randomValue(random_value) {}
+		randomValue(random_value),
+		greed(greed_) {}
 
 	std::optional<double> Village::getRichness(const Identifier &identifier) const {
 		return richness[identifier];
@@ -212,8 +214,14 @@ namespace Game3 {
 		return std::uniform_real_distribution(0.0, 1.0)(threadContext.rng);
 	}
 
+	double Village::chooseGreed() {
+		return std::uniform_real_distribution(0.2, 1.0)(threadContext.rng);
+	}
+
 	Resources Village::getDefaultResources() {
-		return {};
+		return {
+			{"base:item/meat", 10}
+		};
 	}
 
 	std::string Village::getSQL() {
@@ -228,7 +236,8 @@ namespace Game3 {
 				resources MEDIUMTEXT,
 				name VARCHAR(255),
 				labor INT8,
-				randomValue INT,
+				randomValue DOUBLE,
+				greed DOUBLE,
 
 				PRIMARY KEY(realmID, id)
 			);

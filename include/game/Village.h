@@ -26,7 +26,7 @@ namespace Game3 {
 			Village(Game &, const Place &, const VillageOptions &);
 			Village(Game &, RealmID, ChunkPosition, const Position &, const VillageOptions &);
 			Village(Game &, VillageID, RealmID, ChunkPosition, const Position &, const VillageOptions &);
-			Village(VillageID, RealmID, std::string name_, ChunkPosition, const Position &, const VillageOptions &, Richness, Resources, LaborAmount, double);
+			Village(VillageID, RealmID, std::string name_, ChunkPosition, const Position &, const VillageOptions &, Richness, Resources, LaborAmount, double random_value, double greed_);
 
 			inline auto getID() const { return id; }
 			inline auto getRealmID() const { return realmID; }
@@ -34,12 +34,14 @@ namespace Game3 {
 			inline auto getPosition() const { return position; }
 			inline auto getLabor() const { return labor.load(); }
 			inline auto getRandomValue() const { return randomValue; }
+			inline auto getGreed() const { return greed; }
 			inline const auto & getName() const { return name; }
 			inline const auto & getOptions() const { return options; }
 			inline const auto & getRichness() const { return richness; }
 			inline const auto & getResources() const { return resources; }
 
 			inline void setLabor(auto value) { labor = value; }
+			inline void setGreed(auto value) { greed = value; }
 			inline void setResources(auto value) { resources = std::move(value); }
 
 			std::optional<double> getRichness(const Identifier &) const;
@@ -67,7 +69,8 @@ namespace Game3 {
 			Richness richness;
 			Lockable<Resources> resources;
 			Atomic<LaborAmount> labor{};
-			double randomValue;
+			double randomValue{};
+			double greed{};
 
 			Lockable<std::unordered_set<PlayerPtr>> subscribedPlayers;
 
@@ -78,6 +81,7 @@ namespace Game3 {
 			void sendUpdates();
 
 			static double chooseRandomValue();
+			static double chooseGreed();
 			static Resources getDefaultResources();
 
 		friend class OwnsVillages;

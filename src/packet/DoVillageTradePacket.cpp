@@ -55,7 +55,7 @@ namespace Game3 {
 				return;
 			}
 
-			if (std::optional<MoneyCount> sell_price = totalSellPrice(resource_count, -1, item->basePrice, amount)) {
+			if (std::optional<MoneyCount> sell_price = totalSellPrice(resource_count, -1, item->basePrice, amount, village->getGreed())) {
 				player->addMoney(*sell_price);
 				inventory->remove(ItemStack(game, resource, amount));
 				village->setResourceAmount(resource, resource_count + amount);

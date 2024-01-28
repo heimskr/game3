@@ -26,7 +26,7 @@ namespace Game3 {
 	}
 
 	VillagePtr OwnsVillages::addVillage(Game &game, VillageID village_id, std::string name, RealmID realm_id, ChunkPosition chunk_position, const Position &position, Resources resources) {
-		VillagePtr new_village = std::make_shared<Village>(village_id, realm_id, std::move(name), chunk_position, position, VillageOptions{}, Richness{}, std::move(resources), LaborAmount{}, double{});
+		VillagePtr new_village = std::make_shared<Village>(village_id, realm_id, std::move(name), chunk_position, position, VillageOptions{}, Richness{}, std::move(resources), LaborAmount{}, double{}, double{});
 
 		villageMap[village_id] = new_village;
 		lastVillageID = std::max(lastVillageID.load(), village_id);
@@ -41,7 +41,7 @@ namespace Game3 {
 		if (use_transaction)
 			transaction.emplace(database);
 
-		SQLite::Statement statement{database, "INSERT OR REPLACE INTO villages VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"};
+		SQLite::Statement statement{database, "INSERT OR REPLACE INTO villages VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"};
 
 		auto lock = villageMap.sharedLock();
 		for (const auto &[id, village]: villageMap) {
@@ -54,7 +54,8 @@ namespace Game3 {
 			statement.bind(7, nlohmann::json(village->getResources()).dump());
 			statement.bind(8, village->getName());
 			statement.bind(9, int64_t(village->getLabor()));
-			statement.bind(10, int(village->getRandomValue() * 1e9));
+			statement.bind(10, village->getRandomValue());
+			statement.bind(11, village->getGreed());
 			statement.exec();
 			statement.reset();
 		}
@@ -81,9 +82,10 @@ namespace Game3 {
 			Resources resources(nlohmann::json::parse(query.getColumn(6).getString()));
 			std::string name(query.getColumn(7));
 			LaborAmount labor(query.getColumn(8).getInt64());
-			double randomValue(query.getColumn(9).getInt() / 1e9);
+			double randomValue(query.getColumn(9).getDouble());
+			double greed(query.getColumn(10).getDouble());
 
-			auto village = std::make_shared<Village>(id, realm_id, std::move(name), chunk_position, position, options, std::move(richness), std::move(resources), labor, randomValue);
+			auto village = std::make_shared<Village>(id, realm_id, std::move(name), chunk_position, position, options, std::move(richness), std::move(resources), labor, randomValue, greed);
 
 			villageMap[id] = village;
 			lastVillageID = std::max(lastVillageID.load(), id);

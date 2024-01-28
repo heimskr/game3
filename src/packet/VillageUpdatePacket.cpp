@@ -6,7 +6,7 @@
 
 namespace Game3 {
 	VillageUpdatePacket::VillageUpdatePacket(const Village &village):
-		VillageUpdatePacket(village.getID(), village.getRealmID(), village.getChunkPosition(), village.getPosition(), village.getName(), village.getLabor(), village.getResources()) {}
+		VillageUpdatePacket(village.getID(), village.getRealmID(), village.getChunkPosition(), village.getPosition(), village.getName(), village.getLabor(), village.getGreed(), village.getResources()) {}
 
 	void VillageUpdatePacket::handle(ClientGame &game) {
 		VillagePtr village;
@@ -18,9 +18,9 @@ namespace Game3 {
 			try {
 				realm = game.getRealm(realmID);
 			} catch (const std::out_of_range &) {
-				WARN_("Couldn't find realm " << realmID << " when handling village update packet for village " << villageID);
+				WARN("Couldn't find realm {} when handling village update packet for village {}", realmID, villageID);
 				game.iterateRealms([](const RealmPtr &realm) {
-					INFO_("Realm: " << realm->getID());
+					INFO("Realm: {}", realm->getID());
 				});
 				return;
 			}
@@ -31,6 +31,7 @@ namespace Game3 {
 
 		village->setResources(std::move(resources));
 		village->setLabor(labor);
+		village->setGreed(greed);
 		game.signalVillageUpdate().emit(village);
 	}
 }

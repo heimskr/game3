@@ -397,6 +397,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i64` Position X
 	- `string` Village name
 	- `f64` Available labor
+	- `f64` Greed factor
 	- `map<string, f64>` Resources
 
 58. **Open Village Trade**: tells a client to open the village trade module.

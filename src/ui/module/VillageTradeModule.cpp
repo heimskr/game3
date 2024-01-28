@@ -127,7 +127,7 @@ namespace Game3 {
 
 		std::optional<double> amount = village->getResourceAmount(stack.getID());
 
-		if (std::optional<MoneyCount> sell_price = totalSellPrice(amount.value_or(0.0), -1, stack.item->basePrice, ItemCount(sellCount.get_value())))
+		if (std::optional<MoneyCount> sell_price = totalSellPrice(amount.value_or(0.0), -1, stack.item->basePrice, ItemCount(sellCount.get_value()), village->getGreed()))
 			sellButton.set_tooltip_text(std::format("Price: {}", *sell_price));
 		else
 			sellButton.set_tooltip_text("Village lacks funds!");
@@ -197,15 +197,21 @@ namespace Game3 {
 				iter->second->setAmount(amount);
 				iter->second->updateLabel();
 			} else {
-				auto row = std::make_unique<Row>(game, village->getID(), *game->getItem(resource), amount);
+				auto row = std::make_unique<Row>(game, village->getID(), *game->getItem(resource), amount, village->getGreed());
 				vbox.append(*row);
 				rows[resource] = std::move(row);
 			}
 		}
 	}
 
-	VillageTradeModule::Row::Row(const ClientGamePtr &game, VillageID village_id, const Item &item, double amount_):
-	Gtk::Box(Gtk::Orientation::HORIZONTAL), villageID(village_id), resource(item.identifier), itemSlot(game, -1, nullptr), basePrice(item.basePrice), amount(amount_) {
+	VillageTradeModule::Row::Row(const ClientGamePtr &game, VillageID village_id, const Item &item, double amount_, double greed_):
+	Gtk::Box(Gtk::Orientation::HORIZONTAL),
+	villageID(village_id),
+	resource(item.identifier),
+	itemSlot(game, -1, nullptr),
+	basePrice(item.basePrice),
+	amount(amount_),
+	greed(greed_) {
 		itemSlot.setStack({*game, resource, ItemCount(-1)});
 		updateLabel();
 		updateTooltips(1);
@@ -266,7 +272,7 @@ namespace Game3 {
 		else
 			buyButton.set_tooltip_text("Village doesn't have that many!");
 
-		if (std::optional<MoneyCount> sell_price = totalSellPrice(ItemCount(amount), -1, basePrice, count))
+		if (std::optional<MoneyCount> sell_price = totalSellPrice(ItemCount(amount), -1, basePrice, count, greed))
 			sellButton.set_tooltip_text(std::format("Price: {}", *sell_price));
 		else
 			sellButton.set_tooltip_text("Village lacks funds!");
