@@ -65,7 +65,10 @@ namespace Game3 {
 	void Village::setResourceAmount(const Identifier &resource, double amount) {
 		{
 			auto lock = resources.uniqueLock();
-			resources[resource] = amount;
+			if (std::abs(amount) < 0.00001)
+				resources.erase(resource);
+			else
+				resources[resource] = amount;
 		}
 		sendUpdates();
 	}
