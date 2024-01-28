@@ -66,13 +66,17 @@ namespace Game3 {
 		dropTarget = Gtk::DropTarget::create(Glib::Value<DragSource>::value_type(), Gdk::DragAction::MOVE);
 
 		dropTarget->signal_enter().connect([this](double, double) {
-			showSell();
+			game->getWindow().queue([this] {
+				showSell();
+			});
 			return Gdk::DragAction::MOVE;
 		}, false);
 
 		dropTarget->signal_leave().connect([this] {
-			if (sellSlot.empty())
-				hideSell();
+			game->getWindow().queue([this] {
+				if (sellSlot.empty())
+					hideSell();
+			});
 		}, true);
 
 		vbox.add_controller(dropTarget);
