@@ -41,6 +41,7 @@ namespace Game3 {
 		sellButton.set_hexpand(true);
 		sellButton.set_halign(Gtk::Align::START);
 		sellButton.set_valign(Gtk::Align::CENTER);
+		sellButton.add_css_class("buy-sell-button");
 		sellRow.append(sellSlot);
 		sellRow.append(sellCount);
 		sellRow.append(sellButton);
