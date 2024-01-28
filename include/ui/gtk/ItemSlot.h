@@ -26,6 +26,7 @@ namespace Game3 {
 			bool empty() const;
 			void setLeftClick(ClickFn);
 			void setGmenu(Glib::RefPtr<Gio::Menu>);
+			void setInventory(std::shared_ptr<ClientInventory>);
 
 			void setStack(ItemStack);
 			inline auto & getStack() { return storedStack; }

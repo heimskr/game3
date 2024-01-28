@@ -87,6 +87,10 @@ namespace Game3 {
 
 	void InventoryModule::setInventory(std::shared_ptr<ClientInventory> new_inventory) {
 		inventory = std::move(new_inventory);
+
+		for (const auto &slot: itemSlots)
+			slot->setInventory(inventory);
+
 		update();
 	}
 

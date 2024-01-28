@@ -305,12 +305,16 @@ namespace Game3 {
 	void InventoryTab::updateInventory(const ClientGamePtr &game) {
 		if (const InventoryPtr inventory = game->player->getInventory(0)) {
 			auto client_inventory = std::static_pointer_cast<ClientInventory>(inventory);
+
 			if (!inventoryModule) {
 				inventoryModule.emplace(game, client_inventory, this, sigc::mem_fun(*this, &InventoryTab::gmenuSetup));
 				inventoryModule->setShowLabel(false);
 				vbox.prepend(inventoryModule->getWidget());
 				vbox.prepend(actionBox);
+			} else {
+				inventoryModule->setInventory(client_inventory);
 			}
+
 			populate(client_inventory);
 		}
 	}

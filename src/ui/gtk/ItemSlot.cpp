@@ -146,6 +146,10 @@ namespace Game3 {
 		gmenu = std::move(new_gmenu);
 	}
 
+	void ItemSlot::setInventory(std::shared_ptr<ClientInventory> new_inventory) {
+		inventory = new_inventory;
+	}
+
 	void ItemSlot::addDurabilityBar(double fraction) {
 		durabilityBar.set_fraction(fraction);
 		durabilityBar.set_size_request(TILE_SIZE, -1);
