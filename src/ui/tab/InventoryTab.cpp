@@ -11,7 +11,7 @@
 #include "ui/MainWindow.h"
 #include "ui/gtk/EntryDialog.h"
 #include "ui/gtk/NumericEntry.h"
-#include "ui/gtk/UITypes.h"
+#include "ui/gtk/DragSource.h"
 #include "ui/gtk/Util.h"
 #include "ui/tab/InventoryTab.h"
 #include "ui/module/InventoryModule.h"

@@ -3,7 +3,7 @@
 #include "game/ClientInventory.h"
 #include "net/Buffer.h"
 #include "tileentity/ChemicalReactor.h"
-#include "ui/gtk/UITypes.h"
+#include "ui/gtk/DragSource.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/ChemicalReactorModule.h"
 #include "ui/module/InventoryModule.h"

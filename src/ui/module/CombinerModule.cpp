@@ -4,7 +4,7 @@
 #include "net/Buffer.h"
 #include "recipe/CombinerRecipe.h"
 #include "tileentity/Combiner.h"
-#include "ui/gtk/UITypes.h"
+#include "ui/gtk/DragSource.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/CombinerModule.h"
 #include "ui/module/InventoryModule.h"

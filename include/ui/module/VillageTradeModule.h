@@ -56,7 +56,19 @@ namespace Game3 {
 			Gtk::Label villageName;
 			Gtk::Label laborLabel;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
+			Glib::RefPtr<Gtk::DropTarget> dropTarget;
 
+			Gtk::Box sellRow{Gtk::Orientation::HORIZONTAL};
+			bool sellRowShown = false;
+			ItemSlot sellSlot;
+			Gtk::SpinButton sellCount;
+			Gtk::Button sellButton{"Sell"};
+
+			void setSellStack(ItemStack);
+			void updateSell(const ItemStack &);
+			void sell();
+			void showSell();
+			void hideSell();
 			void populate();
 	};
 }

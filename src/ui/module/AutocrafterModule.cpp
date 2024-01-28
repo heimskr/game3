@@ -5,7 +5,7 @@
 #include "packet/SwapSlotsPacket.h"
 #include "recipe/CraftingRecipe.h"
 #include "tileentity/Autocrafter.h"
-#include "ui/gtk/UITypes.h"
+#include "ui/gtk/DragSource.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/AutocrafterModule.h"
 #include "ui/module/InventoryModule.h"

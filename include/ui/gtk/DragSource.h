@@ -8,10 +8,12 @@
 
 namespace Game3 {
 	class ClientInventory;
+	class ItemStack;
 
 	struct DragSource {
 		Slot slot;
 		std::shared_ptr<ClientInventory> inventory;
 		InventoryID index;
+		ItemStack * getStack() const;
 	};
 }

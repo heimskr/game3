@@ -5,8 +5,8 @@
 #include "game/ClientInventory.h"
 #include "item/Item.h"
 #include "packet/MoveSlotsPacket.h"
+#include "ui/gtk/DragSource.h"
 #include "ui/gtk/ItemSlot.h"
-#include "ui/gtk/UITypes.h"
 
 namespace Game3 {
 	namespace {
@@ -46,11 +46,18 @@ namespace Game3 {
 
 		auto target = Gtk::DropTarget::create(Glib::Value<DragSource>::value_type(), Gdk::DragAction::MOVE);
 		target->signal_drop().connect([this](const Glib::ValueBase &base, double, double) {
-			if (!inventory || base.gobj()->g_type != Glib::Value<DragSource>::value_type())
+			if (base.gobj()->g_type != Glib::Value<DragSource>::value_type())
 				return false;
 
 			const auto &value = static_cast<const Glib::Value<DragSource> &>(base);
 			const DragSource source = value.get();
+
+			if (onDrop)
+				return onDrop(source.getStack());
+
+			if (!inventory)
+				return false;
+
 			if (ClientGamePtr game = weakGame.lock())
 				game->player->send(MoveSlotsPacket(source.inventory->getOwner()->getGID(), inventory->getOwner()->getGID(), source.slot, slot, source.index, inventory->index));
 			return true;
@@ -90,7 +97,7 @@ namespace Game3 {
 		add_controller(rightGesture);
 	}
 
-	void ItemSlot::setStack(const ItemStack &stack) {
+	void ItemSlot::setStack(ItemStack stack) {
 		image.set(stack.getImage());
 
 		if (stack.count == ItemCount(-1))
@@ -113,7 +120,7 @@ namespace Game3 {
 		}
 
 		set_tooltip_text(tooltip);
-		isEmpty = false;
+		storedStack.emplace(std::move(stack));
 	}
 
 	void ItemSlot::reset() {
@@ -124,11 +131,11 @@ namespace Game3 {
 			remove(durabilityBar);
 			durabilityVisible = false;
 		}
-		isEmpty = true;
+		storedStack.reset();
 	}
 
 	bool ItemSlot::empty() const {
-		return isEmpty;
+		return !storedStack.has_value();
 	}
 
 	void ItemSlot::setLeftClick(ClickFn click) {

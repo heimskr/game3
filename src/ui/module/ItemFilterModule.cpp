@@ -6,7 +6,7 @@
 #include "packet/SetItemFiltersPacket.h"
 #include "tileentity/Pipe.h"
 #include "types/DirectedPlace.h"
-#include "ui/gtk/UITypes.h"
+#include "ui/gtk/DragSource.h"
 #include "ui/module/ItemFilterModule.h"
 
 namespace Game3 {

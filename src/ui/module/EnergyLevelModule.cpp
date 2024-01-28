@@ -1,7 +1,7 @@
 #include "game/ClientGame.h"
 #include "game/EnergyContainer.h"
 #include "game/HasEnergy.h"
-#include "ui/gtk/UITypes.h"
+#include "ui/gtk/DragSource.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/EnergyLevelModule.h"
 #include "ui/tab/InventoryTab.h"

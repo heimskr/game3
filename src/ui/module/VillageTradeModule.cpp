@@ -1,10 +1,11 @@
 #include "algorithm/Stonks.h"
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
+#include "game/ClientInventory.h"
 #include "game/Village.h"
 #include "item/Item.h"
 #include "packet/DoVillageTradePacket.h"
-#include "ui/gtk/UITypes.h"
+#include "ui/gtk/DragSource.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/VillageTradeModule.h"
 #include "ui/tab/InventoryTab.h"
@@ -16,7 +17,8 @@
 namespace Game3 {
 	VillageTradeModule::VillageTradeModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
 	game(std::move(game_)),
-	village(std::any_cast<VillagePtr>(argument)) {
+	village(std::any_cast<VillagePtr>(argument)),
+	sellSlot(game, -1, {}, {}) {
 		vbox.set_hexpand(true);
 		vbox.set_vexpand(false);
 		villageName.set_xalign(0.5);
@@ -26,6 +28,53 @@ namespace Game3 {
 		laborLabel.set_xalign(0.5);
 		laborLabel.set_hexpand(true);
 		laborLabel.set_margin_bottom(5);
+
+		sellRow.set_hexpand(true);
+		sellRow.set_vexpand(false);
+		sellSlot.set_hexpand(true);
+		sellSlot.set_halign(Gtk::Align::END);
+		sellCount.set_halign(Gtk::Align::CENTER);
+		sellCount.set_valign(Gtk::Align::CENTER);
+		sellCount.set_margin_start(20);
+		sellCount.set_margin_end(20);
+		sellCount.set_adjustment(Gtk::Adjustment::create(0.0, 0.0, 0.0));
+		sellButton.set_hexpand(true);
+		sellButton.set_halign(Gtk::Align::START);
+		sellButton.set_valign(Gtk::Align::CENTER);
+		sellRow.append(sellSlot);
+		sellRow.append(sellCount);
+		sellRow.append(sellButton);
+		sellButton.signal_clicked().connect(sigc::mem_fun(*this, &VillageTradeModule::sell));
+
+		sellSlot.onDrop = [this](ItemStack *stack) {
+			if (stack)
+				setSellStack(*stack);
+			else
+				WARN_("No stack in sellSlot.onDrop");
+			return true;
+		};
+
+		auto right_click = Gtk::GestureClick::create();
+		right_click->set_button(3);
+		right_click->signal_released().connect([this](int, double, double) {
+			sellSlot.reset();
+			hideSell();
+		});
+		sellSlot.add_controller(right_click);
+
+		dropTarget = Gtk::DropTarget::create(Glib::Value<DragSource>::value_type(), Gdk::DragAction::MOVE);
+
+		dropTarget->signal_enter().connect([this](double, double) {
+			showSell();
+			return Gdk::DragAction::MOVE;
+		}, false);
+
+		dropTarget->signal_leave().connect([this] {
+			if (sellSlot.empty())
+				hideSell();
+		}, true);
+
+		vbox.add_controller(dropTarget);
 	}
 
 	Gtk::Widget & VillageTradeModule::getWidget() {
@@ -43,6 +92,8 @@ namespace Game3 {
 	void VillageTradeModule::update() {
 		villageName.set_text(village->getName());
 		laborLabel.set_text(std::format("Available labor: {:.2f}", village->getLabor()));
+		if (const auto &stack = sellSlot.getStack())
+			updateSell(*stack);
 		populate();
 	}
 
@@ -56,6 +107,73 @@ namespace Game3 {
 		}
 
 		return {};
+	}
+
+	void VillageTradeModule::setSellStack(ItemStack stack) {
+		stack.count = game->player->getInventory(0)->count(stack);
+		sellSlot.setStack(stack);
+		updateSell(stack);
+	}
+
+	void VillageTradeModule::updateSell(const ItemStack &stack) {
+		if (!village) {
+			WARN_("No village in VillageTradeModule::setSellStack");
+			return;
+		}
+
+		const double old_value = sellCount.get_value();
+		sellCount.set_adjustment(Gtk::Adjustment::create(1.0, 1.0, game->player->getInventory(0)->count(stack)));
+		sellCount.set_value(old_value);
+
+		std::optional<double> amount = village->getResourceAmount(stack.getID());
+
+		if (std::optional<MoneyCount> sell_price = totalSellPrice(amount.value_or(0.0), -1, stack.item->basePrice, ItemCount(sellCount.get_value())))
+			sellButton.set_tooltip_text(std::format("Price: {}", *sell_price));
+		else
+			sellButton.set_tooltip_text("Village lacks funds!");
+	}
+
+	void VillageTradeModule::sell() {
+		if (!village)
+			return;
+
+		std::optional<ItemStack> &stack = sellSlot.getStack();
+		if (!stack)
+			return;
+
+		const ItemCount sell_count(sellCount.get_value());
+
+		ItemCount inventory_count = game->player->getInventory(0)->count(*stack);
+
+		if (inventory_count <= sell_count) {
+			sellSlot.reset();
+			hideSell();
+		} else {
+			// If the inventory count is less than the displayed stack count, update the displayed stack count.
+			inventory_count -= sell_count;
+			if (inventory_count < stack->count) {
+				stack->count = inventory_count;
+				sellSlot.setStack(std::move(*stack));
+			}
+		}
+
+		game->player->send(DoVillageTradePacket(village->getID(), stack->getID(), sell_count, true));
+	}
+
+	void VillageTradeModule::showSell() {
+		if (sellRowShown)
+			return;
+
+		sellRowShown = true;
+		vbox.insert_child_after(sellRow, laborLabel);
+	}
+
+	void VillageTradeModule::hideSell() {
+		if (!sellRowShown)
+			return;
+
+		sellRowShown = false;
+		vbox.remove(sellRow);
 	}
 
 	void VillageTradeModule::populate() {

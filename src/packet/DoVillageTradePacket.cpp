@@ -44,15 +44,8 @@ namespace Game3 {
 
 		// Find resource count
 
-		ItemCount resource_count{};
 		auto resources_lock = village->getResources().uniqueLock();
-
-		if (auto found_count = village->getResourceAmount(resource)) {
-			resource_count = *found_count;
-		} else {
-			client.sendError("Resource not found in village {}: {}", *village, resource);
-			return;
-		}
+		ItemCount resource_count = village->getResourceAmount(resource).value_or(0.0);
 
 		// Handle selling
 

@@ -1,7 +1,7 @@
 
 #include "game/ClientGame.h"
 #include "game/HasFluids.h"
-#include "ui/gtk/UITypes.h"
+#include "ui/gtk/DragSource.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/FluidLevelsModule.h"
 #include "ui/tab/InventoryTab.h"

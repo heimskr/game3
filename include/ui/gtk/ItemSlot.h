@@ -17,14 +17,19 @@ namespace Game3 {
 		public:
 			using ClickFn = std::function<void(Modifiers, int, double, double)>;
 
+			std::function<bool(ItemStack *)> onDrop;
+
 			ItemSlot() = delete;
 			ItemSlot(const std::shared_ptr<ClientGame> &, Slot, std::shared_ptr<ClientInventory>, ItemSlotParent * = nullptr);
 
-			void setStack(const ItemStack &);
 			void reset();
 			bool empty() const;
 			void setLeftClick(ClickFn);
 			void setGmenu(Glib::RefPtr<Gio::Menu>);
+
+			void setStack(ItemStack);
+			inline auto & getStack() { return storedStack; }
+			inline const auto & getStack() const { return storedStack; }
 
 		private:
 			std::weak_ptr<ClientGame> weakGame;
@@ -33,6 +38,7 @@ namespace Game3 {
 			bool isEmpty = true;
 			bool durabilityVisible = false;
 			ItemSlotParent *parent = nullptr;
+			std::optional<ItemStack> storedStack;
 
 			Gtk::Image image;
 			Gtk::Label label;
