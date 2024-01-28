@@ -31,16 +31,6 @@ namespace Game3 {
 			return true;
 		});
 
-		INFO("Village {} resources:", *village);
-		for (const auto &[key, value]: village->getResources())
-			INFO("    {} => {}", key, value);
-
-		INFO("Village {} richness:", *village);
-		for (const auto &[key, value]: village->getRichness())
-			INFO("    {} => {}", key, value);
-
-		INFO("Subscriber count: {}, labor: {}", village->getSubscriberCount(), village->getLabor());
-
 		return true;
 	}
 
