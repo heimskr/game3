@@ -24,6 +24,8 @@ namespace Game3 {
 			inline const auto & getLaborRange() const { return laborRange; }
 			inline auto getLaborOut() const { return laborOut; }
 			inline auto getAlways() const { return always; }
+			inline auto getRate() const { return rate; }
+			inline auto getIgnoreLabor() const { return ignoreLabor; }
 
 			static ConsumptionRule fromJSON(const Game &, const nlohmann::json &);
 
@@ -32,6 +34,8 @@ namespace Game3 {
 			LaborAmount laborOut{};
 			bool always{};
 			std::pair<double, double> laborRange{-std::numeric_limits<double>::infinity(), 100};
+			double rate = 1.0;
+			bool ignoreLabor = false;
 	};
 
 	void to_json(nlohmann::json &, const ConsumptionRule &);

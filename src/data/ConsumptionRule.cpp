@@ -27,6 +27,12 @@ namespace Game3 {
 
 		if (auto iter = json.find("laborMax"); iter != json.end())
 			laborRange.second = getNumber(*iter);
+
+		if (auto iter = json.find("rate"); iter != json.end())
+			rate = *iter;
+
+		if (auto iter = json.find("ignoreLabor"); iter != json.end())
+			ignoreLabor = *iter;
 	}
 
 	ConsumptionRule ConsumptionRule::fromJSON(const Game &game, const nlohmann::json &json) {
@@ -45,5 +51,11 @@ namespace Game3 {
 
 		if (max < std::numeric_limits<double>::infinity())
 			json["laborMax"] = max;
+
+		if (auto rate = rule.getRate(); rate != 1.0)
+			json["rate"] = rate;
+
+		if (auto ignore = rule.getIgnoreLabor())
+			json["ignoreLabor"] = ignore;
 	}
 }

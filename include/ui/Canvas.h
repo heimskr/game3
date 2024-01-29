@@ -47,6 +47,7 @@ namespace Game3 {
 			int autofocusCounter = 0;
 			Gdk::Rectangle realmBounds;
 			const Realm *lastRealm = nullptr;
+			double sizeDivisor = 1.0;
 
 			Canvas(MainWindow &);
 

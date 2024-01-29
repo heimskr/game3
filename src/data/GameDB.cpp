@@ -253,7 +253,6 @@ namespace Game3 {
 				}
 			}
 			query_timer.restart();
-
 		}
 
 		{

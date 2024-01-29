@@ -1,25 +1,16 @@
-#include <iostream>
-#include <unordered_set>
-
-#include "ui/Canvas.h"
-#include "ui/MainWindow.h"
-
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
-#include "util/Timer.h"
-#include "util/Util.h"
-
 #include "graphics/BatchSpriteRenderer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/Tileset.h"
-
-
+#include "ui/Canvas.h"
+#include "ui/MainWindow.h"
+#include "util/Timer.h"
+#include "util/Util.h"
 
 #include "lib/stb/stb_image.h"
 #include "lib/stb/stb_image_write.h"
-
-
 
 namespace Game3 {
 	Canvas::Canvas(MainWindow &window_): window(window_) {
@@ -150,11 +141,11 @@ namespace Game3 {
 	}
 
 	int Canvas::getWidth() const {
-		return window.glArea.get_width();
+		return window.glArea.get_width() / sizeDivisor;
 	}
 
 	int Canvas::getHeight() const {
-		return window.glArea.get_height();
+		return window.glArea.get_height() / sizeDivisor;
 	}
 
 	int Canvas::getFactor() const {
@@ -162,8 +153,10 @@ namespace Game3 {
 	}
 
 	bool Canvas::inBounds(const Position &pos) const {
-		return realmBounds.get_x() <= pos.column && pos.column < realmBounds.get_x() + realmBounds.get_width()
-		    && realmBounds.get_y() <= pos.row    && pos.row    < realmBounds.get_y() + realmBounds.get_height();
+		const auto x = realmBounds.get_x();
+		const auto y = realmBounds.get_y();
+		return x <= pos.column && pos.column < x + realmBounds.get_width()
+		    && y <= pos.row    && pos.row    < y + realmBounds.get_height();
 	}
 
 	RendererContext Canvas::getRendererContext() {

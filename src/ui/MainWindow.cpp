@@ -817,7 +817,7 @@ namespace Game3 {
 					return;
 				case GDK_KEY_b: {
 					const auto rect = game->getVisibleRealmBounds();
-					std::cout << '(' << rect.get_x() << ", " << rect.get_y() << " | " << rect.get_width() << " x " << rect.get_height() << ")\n";
+					INFO("({}y, {}x) x ({}h, {}w)", rect.get_y(), rect.get_x(), rect.get_height(), rect.get_width());
 					return;
 				}
 				case GDK_KEY_m: {

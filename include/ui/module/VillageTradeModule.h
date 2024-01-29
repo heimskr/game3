@@ -24,6 +24,7 @@ namespace Game3 {
 			void reset()  final;
 			void update() final;
 			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
+			bool handleShiftClick(std::shared_ptr<Inventory>, Slot) override;
 
 		private:
 			class Row: public Gtk::Box {

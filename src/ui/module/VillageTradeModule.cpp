@@ -114,8 +114,16 @@ namespace Game3 {
 		return {};
 	}
 
+	bool VillageTradeModule::handleShiftClick(std::shared_ptr<Inventory> source_inventory, Slot slot) {
+		if (ItemStack *stack = (*source_inventory)[slot]) {
+			setSellStack(*stack);
+			showSell();
+		}
+
+		return true;
+	}
+
 	void VillageTradeModule::setSellStack(ItemStack stack) {
-		stack.count = game->player->getInventory(0)->count(stack);
 		sellSlot.setStack(stack);
 		const double max(stack.count);
 		sellCount.set_adjustment(Gtk::Adjustment::create(max, 1.0, max));

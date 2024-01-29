@@ -73,7 +73,7 @@ namespace Game3 {
 
 	Gdk::Rectangle ClientGame::getVisibleRealmBounds() const {
 		const auto [top,     left] = translateCanvasCoordinates(0, 0);
-		const auto [bottom, right] = translateCanvasCoordinates(canvas.getWidth(), canvas.getHeight());
+		const auto [bottom, right] = translateCanvasCoordinates(canvas.getWidth() * canvas.sizeDivisor, canvas.getHeight() * canvas.sizeDivisor);
 		return {
 			static_cast<int>(left),
 			static_cast<int>(top),
@@ -95,11 +95,11 @@ namespace Game3 {
 		const int width = canvas.getWidth();
 		const int height = canvas.getHeight();
 
-		const auto scale = canvas.scale / canvas.getFactor();
+		const auto scale = canvas.scale / canvas.getFactor() * canvas.sizeDivisor;
 		const auto tile_size = realm->getTileset().getTileSize();
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
-		x -= width  / 2. - (map_length * tile_size / 4.) * scale + canvas.center.first  * canvas.magic * scale;
-		y -= height / 2. - (map_length * tile_size / 4.) * scale + canvas.center.second * canvas.magic * scale;
+		x -= width  / 2. * canvas.sizeDivisor - (map_length * tile_size / 4.) * scale + canvas.center.first  * canvas.magic * scale;
+		y -= height / 2. * canvas.sizeDivisor - (map_length * tile_size / 4.) * scale + canvas.center.second * canvas.magic * scale;
 		const double sub_x = x < 0.? 1. : 0.;
 		const double sub_y = y < 0.? 1. : 0.;
 		x /= tile_size * scale / 2.;

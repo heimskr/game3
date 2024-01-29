@@ -136,22 +136,35 @@ namespace Game3 {
 	}
 
 	bool Village::consume(const ConsumptionRule &rule) {
+		const double rate = rule.getRate();
 		auto resources_lock = resources.uniqueLock();
 		auto iter = resources.find(rule.getInput());
 
 		if (iter == resources.end())
 			return false;
 
-		if (iter->second < 1.0)
+		double &amount = iter->second;
+
+		if (amount < rate)
 			return false;
 
 		const auto [min, max] = rule.getLaborRange();
 
-		if (labor < min || max < labor)
-			return false;
+		const bool in_range = min <= labor && labor <= max;
 
-		--iter->second;
-		labor += rule.getLaborOut();
+		if (rule.getIgnoreLabor()) {
+			if (in_range)
+				labor += rule.getLaborOut() * rate;
+		} else {
+			if (!in_range)
+				return false;
+			labor += rule.getLaborOut() * rate;
+		}
+
+		amount -= rate;
+		if (amount < 0.0001)
+			resources.erase(iter);
+
 		return true;
 	}
 
