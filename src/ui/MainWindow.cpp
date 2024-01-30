@@ -203,14 +203,19 @@ namespace Game3 {
 		});
 		glArea.add_controller(motion);
 
-		leftClick  = Gtk::GestureClick::create();
-		rightClick = Gtk::GestureClick::create();
+		leftClick   = Gtk::GestureClick::create();
+		middleClick = Gtk::GestureClick::create();
+		rightClick  = Gtk::GestureClick::create();
 		leftClick->set_button(1);
+		middleClick->set_button(2);
 		rightClick->set_button(3);
 		leftClick->signal_released().connect([this](int n, double x, double y) {
 			glArea.grab_focus();
 			if (game)
 				game->click(1, n, x, y, Modifiers(leftClick->get_current_event_state()));
+		});
+		middleClick->signal_released().connect([this](int, double, double) {
+			glArea.grab_focus();
 		});
 		rightClick->signal_released().connect([this](int n, double x, double y) {
 			glArea.grab_focus();
@@ -218,6 +223,7 @@ namespace Game3 {
 				game->click(3, n, x, y, Modifiers(rightClick->get_current_event_state()));
 		});
 		glArea.add_controller(leftClick);
+		glArea.add_controller(middleClick);
 		glArea.add_controller(rightClick);
 
 		dragGesture = Gtk::GestureDrag::create();
