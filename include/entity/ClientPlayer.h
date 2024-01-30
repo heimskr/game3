@@ -1,6 +1,7 @@
 #pragma once
 
 #include "entity/Player.h"
+#include "pipes/ItemFilter.h"
 #include "threading/Atomic.h"
 #include "threading/Lockable.h"
 #include "ui/Modifiers.h"
@@ -14,6 +15,7 @@ namespace Game3 {
 		private:
 			Lockable<std::string> lastMessage;
 			Atomic<Tick> lastMessageAge = 0;
+			std::optional<ItemFilter> copiedItemFilter;
 
 			ClientPlayer();
 
@@ -39,6 +41,9 @@ namespace Game3 {
 			void setLastMessage(std::string);
 
 			void face(Direction);
+
+			inline void copyItemFilter(ItemFilter filter) { copiedItemFilter = std::move(filter); }
+			inline const auto & pasteItemFilter() const { return copiedItemFilter; }
 
 			using Agent::sendMessage;
 

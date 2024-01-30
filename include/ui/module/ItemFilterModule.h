@@ -38,7 +38,11 @@ namespace Game3 {
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
 			std::shared_ptr<Pipe> pipe;
 			std::shared_ptr<ItemFilter> filter;
+
+			Gtk::Box topBox{Gtk::Orientation::HORIZONTAL};
 			Gtk::Fixed fixed;
+			Gtk::Button copyButton;
+			Gtk::Button pasteButton;
 
 			Gtk::Label modeLabel{"Whitelist"};
 			Gtk::Label strictLabel{"Strict"};
@@ -51,7 +55,8 @@ namespace Game3 {
 			void setMode(bool allow);
 			void setStrict(bool strict);
 			void upload();
-			void setFilter();
+			bool setFilter();
+			bool saveFilter();
 			void populate();
 
 			void addHbox(const Identifier &, const ItemFilter::Config &);

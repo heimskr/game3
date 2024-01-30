@@ -7,6 +7,7 @@
 #include "tileentity/Pipe.h"
 #include "types/DirectedPlace.h"
 #include "ui/gtk/DragSource.h"
+#include "ui/gtk/Util.h"
 #include "ui/module/ItemFilterModule.h"
 
 namespace Game3 {
@@ -38,38 +39,73 @@ namespace Game3 {
 		fixed.set_halign(Gtk::Align::CENTER);
 		fixed.add_css_class("item-slot");
 
+		copyButton.set_hexpand(true);
+		copyButton.set_valign(Gtk::Align::CENTER);
+		copyButton.set_halign(Gtk::Align::START);
+		copyButton.set_margin_start(10);
+		copyButton.set_icon_name("edit-copy-symbolic");
+
+		pasteButton.set_hexpand(true);
+		pasteButton.set_valign(Gtk::Align::CENTER);
+		pasteButton.set_halign(Gtk::Align::END);
+		pasteButton.set_margin_end(10);
+		pasteButton.set_icon_name("edit-paste-symbolic");
+
+		topBox.append(copyButton);
+		topBox.append(fixed);
+		topBox.append(pasteButton);
+
+		copyButton.add_controller(createClick([this] {
+			INFO_("Clicked Copy");
+			if (filter) {
+				game->player->copyItemFilter(*filter);
+				pasteButton.set_sensitive(true);
+			}
+		}, true));
+
+		pasteButton.add_controller(createClick([this] {
+			if (auto pasted = game->player->pasteItemFilter()) {
+				filter = std::make_shared<ItemFilter>(*pasted);
+				modeSwitch.set_active(filter->isAllowMode());
+				strictSwitch.set_active(filter->isStrict());
+				saveFilter();
+				populate();
+				upload();
+			}
+		}, true));
+
+		pasteButton.set_sensitive(game->player->pasteItemFilter().has_value());
+
 		setFilter();
 
-		auto mode_click = Gtk::GestureClick::create();
-		mode_click->signal_released().connect([this](int, double, double) {
-			modeSwitch.set_active(!modeSwitch.get_active());
-		});
 		if (filter)
 			modeSwitch.set_active(filter->isAllowMode());
+
 		modeSwitch.signal_state_set().connect([this](bool value) {
 			setMode(value);
 			return false;
 		}, false);
 		modeSwitch.set_margin_start(10);
 		modeLabel.set_margin_start(10);
-		modeLabel.add_controller(mode_click);
+		modeLabel.add_controller(createClick([this] {
+			modeSwitch.set_active(!modeSwitch.get_active());
+		}));
 		modeHbox.set_margin_top(10);
 		modeHbox.append(modeSwitch);
 		modeHbox.append(modeLabel);
 
-		auto strict_click = Gtk::GestureClick::create();
-		strict_click->signal_released().connect([this](int, double, double) {
-			strictSwitch.set_active(!strictSwitch.get_active());
-		});
 		if (filter)
 			strictSwitch.set_active(filter->isStrict());
+
 		strictSwitch.signal_state_set().connect([this](bool value) {
 			setStrict(value);
 			return false;
 		}, false);
 		strictSwitch.set_margin_start(10);
 		strictLabel.set_margin_start(10);
-		strictLabel.add_controller(strict_click);
+		strictLabel.add_controller(createClick([this] {
+			strictSwitch.set_active(!strictSwitch.get_active());
+		}));
 		strictHbox.set_margin_top(10);
 		strictHbox.append(strictSwitch);
 		strictHbox.append(strictLabel);
@@ -140,25 +176,40 @@ namespace Game3 {
 		game->player->send(SetItemFiltersPacket(pipe->getGID(), place.direction, *filter));
 	}
 
-	void ItemFilterModule::setFilter() {
+	bool ItemFilterModule::setFilter() {
 		if (!pipe)
 			pipe = std::dynamic_pointer_cast<Pipe>(place.getTileEntity());
 
 		if (!pipe)
-			return;
+			return false;
 
 		auto &filter_ref = pipe->itemFilters[place.direction];
+
 		if (!filter_ref)
 			filter_ref = std::make_shared<ItemFilter>();
+
 		if (filter != filter_ref)
 			filter = filter_ref;
+
+		return true;
+	}
+
+	bool ItemFilterModule::saveFilter() {
+		if (!pipe)
+			pipe = std::dynamic_pointer_cast<Pipe>(place.getTileEntity());
+
+		if (!pipe)
+			return false;
+
+		pipe->itemFilters[place.direction] = filter;
+		return true;
 	}
 
 	void ItemFilterModule::populate() {
 		removeChildren(vbox);
 		widgets.clear();
 
-		vbox.append(fixed);
+		vbox.append(topBox);
 		vbox.append(switchesHbox);
 
 		setFilter();
