@@ -55,24 +55,25 @@ namespace Game3 {
 		topBox.append(fixed);
 		topBox.append(pasteButton);
 
-		copyButton.add_controller(createClick([this] {
+		copyButton.signal_clicked().connect([this] {
 			INFO_("Clicked Copy");
 			if (filter) {
 				game->player->copyItemFilter(*filter);
 				pasteButton.set_sensitive(true);
 			}
-		}, true));
+		});
 
-		pasteButton.add_controller(createClick([this] {
+		pasteButton.signal_clicked().connect([this] {
 			if (auto pasted = game->player->pasteItemFilter()) {
-				filter = std::make_shared<ItemFilter>(*pasted);
+				auto shared_filter = std::make_shared<ItemFilter>(*pasted);
+				filter = shared_filter;
 				modeSwitch.set_active(filter->isAllowMode());
 				strictSwitch.set_active(filter->isStrict());
 				saveFilter();
-				populate();
-				upload();
+				populate(shared_filter);
+				upload(shared_filter);
 			}
-		}, true));
+		});
 
 		pasteButton.set_sensitive(game->player->pasteItemFilter().has_value());
 
@@ -161,8 +162,11 @@ namespace Game3 {
 		}
 	}
 
-	void ItemFilterModule::upload() {
-		if (!filter)
+	void ItemFilterModule::upload(ItemFilterPtr filter_to_use) {
+		if (!filter_to_use)
+			filter_to_use = filter;
+
+		if (!filter_to_use)
 			return;
 
 		if (!pipe) {
@@ -173,7 +177,7 @@ namespace Game3 {
 		if (!game)
 			throw std::runtime_error("Game is missing in ItemFilterModule::upload");
 
-		game->player->send(SetItemFiltersPacket(pipe->getGID(), place.direction, *filter));
+		game->player->send(SetItemFiltersPacket(pipe->getGID(), place.direction, *filter_to_use));
 	}
 
 	bool ItemFilterModule::setFilter() {
@@ -205,17 +209,20 @@ namespace Game3 {
 		return true;
 	}
 
-	void ItemFilterModule::populate() {
+	void ItemFilterModule::populate(ItemFilterPtr filter_to_use) {
 		removeChildren(vbox);
 		widgets.clear();
 
 		vbox.append(topBox);
 		vbox.append(switchesHbox);
 
-		setFilter();
+		if (!filter_to_use) {
+			setFilter();
+			filter_to_use = filter;
+		}
 
 		std::shared_lock<DefaultMutex> configs_lock;
-		auto &configs = filter->getConfigs(configs_lock);
+		auto &configs = filter_to_use->getConfigs(configs_lock);
 		for (const auto &[id, set]: configs)
 			for (const auto &config: set)
 				addHbox(id, config);

@@ -54,10 +54,10 @@ namespace Game3 {
 
 			void setMode(bool allow);
 			void setStrict(bool strict);
-			void upload();
+			void upload(ItemFilterPtr = {});
 			bool setFilter();
 			bool saveFilter();
-			void populate();
+			void populate(ItemFilterPtr = {});
 
 			void addHbox(const Identifier &, const ItemFilter::Config &);
 			std::unique_ptr<Gtk::Image> makeImage(ItemStack &);
