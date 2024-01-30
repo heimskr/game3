@@ -65,6 +65,9 @@ namespace Game3 {
 			ItemSlot sellSlot;
 			Gtk::SpinButton sellCount;
 			Gtk::Button sellButton{"Sell"};
+			Gtk::Box sellLabelBox{Gtk::Orientation::VERTICAL};
+			Gtk::Label totalPriceLabel;
+			Gtk::Label unitPriceLabel;
 
 			void setSellStack(ItemStack);
 			void updateSell(const ItemStack &);

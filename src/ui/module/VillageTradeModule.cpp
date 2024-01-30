@@ -31,20 +31,30 @@ namespace Game3 {
 
 		sellRow.set_hexpand(true);
 		sellRow.set_vexpand(false);
+		sellRow.set_margin_start(3);
 		sellSlot.set_hexpand(true);
-		sellSlot.set_halign(Gtk::Align::END);
+		sellSlot.set_halign(Gtk::Align::START);
 		sellCount.set_halign(Gtk::Align::CENTER);
 		sellCount.set_valign(Gtk::Align::CENTER);
-		sellCount.set_margin_start(20);
-		sellCount.set_margin_end(20);
+		sellCount.set_margin_start(10);
+		sellCount.set_margin_end(10);
 		sellCount.set_adjustment(Gtk::Adjustment::create(0.0, 0.0, 0.0));
 		sellButton.set_hexpand(true);
 		sellButton.set_halign(Gtk::Align::START);
 		sellButton.set_valign(Gtk::Align::CENTER);
 		sellButton.add_css_class("buy-sell-button");
+		sellLabelBox.set_hexpand(true);
+		sellLabelBox.set_vexpand(true);
+		sellLabelBox.set_margin_start(5);
+		totalPriceLabel.set_halign(Gtk::Align::START);
+		unitPriceLabel.set_halign(Gtk::Align::START);
+		sellLabelBox.set_valign(Gtk::Align::CENTER);
+		sellLabelBox.append(totalPriceLabel);
+		sellLabelBox.append(unitPriceLabel);
 		sellRow.append(sellSlot);
 		sellRow.append(sellCount);
 		sellRow.append(sellButton);
+		sellRow.append(sellLabelBox);
 		sellButton.signal_clicked().connect(sigc::mem_fun(*this, &VillageTradeModule::sell));
 
 		sellSlot.onDrop = [this](ItemStack *stack) {
@@ -144,10 +154,13 @@ namespace Game3 {
 
 		std::optional<double> amount = village->getResourceAmount(stack.getID());
 
-		if (std::optional<MoneyCount> sell_price = totalSellPrice(amount.value_or(0.0), -1, stack.item->basePrice, ItemCount(sellCount.get_value()), village->getGreed()))
+		if (std::optional<MoneyCount> sell_price = totalSellPrice(amount.value_or(0.0), -1, stack.item->basePrice, ItemCount(sellCount.get_value()), village->getGreed())) {
 			sellButton.set_tooltip_text(std::format("Price: {}", *sell_price));
-		else
+			totalPriceLabel.set_text(std::format("Total: {}", *sell_price));
+			unitPriceLabel.set_text(std::format("Unit: {:.2f}", *sell_price / sellCount.get_value()));
+		} else {
 			sellButton.set_tooltip_text("Village lacks funds!");
+		}
 	}
 
 	void VillageTradeModule::sell() {
