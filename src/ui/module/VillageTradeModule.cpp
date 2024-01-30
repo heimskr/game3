@@ -212,7 +212,7 @@ namespace Game3 {
 
 		for (auto iter = rows.begin(); iter != rows.end();) {
 			const auto &[resource, row] = *iter;
-			if (!resources.contains(resource)) {
+			if (auto resource_iter = resources.find(resource); resource_iter == resources.end() || resource_iter->second < 1.0) {
 				vbox.remove(*row);
 				rows.erase(iter++);
 			} else {
@@ -224,7 +224,7 @@ namespace Game3 {
 			if (auto iter = rows.find(resource); iter != rows.end()) {
 				iter->second->setAmount(amount);
 				iter->second->updateLabel();
-			} else {
+			} else if (1.0 <= amount) {
 				auto row = std::make_unique<Row>(game, village->getID(), *game->getItem(resource), amount, village->getGreed());
 				vbox.append(*row);
 				rows[resource] = std::move(row);
