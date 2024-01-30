@@ -32,14 +32,12 @@ namespace Game3 {
 		sellRow.set_hexpand(true);
 		sellRow.set_vexpand(false);
 		sellRow.set_margin_start(3);
-		sellSlot.set_hexpand(true);
 		sellSlot.set_halign(Gtk::Align::START);
 		sellCount.set_halign(Gtk::Align::CENTER);
 		sellCount.set_valign(Gtk::Align::CENTER);
 		sellCount.set_margin_start(10);
 		sellCount.set_margin_end(10);
 		sellCount.set_adjustment(Gtk::Adjustment::create(0.0, 0.0, 0.0));
-		sellButton.set_hexpand(true);
 		sellButton.set_halign(Gtk::Align::START);
 		sellButton.set_valign(Gtk::Align::CENTER);
 		sellButton.add_css_class("buy-sell-button");
@@ -254,13 +252,10 @@ namespace Game3 {
 		transferAmount.set_adjustment(Gtk::Adjustment::create(1.0, 1.0, std::min(amount, 999.0)));
 		transferAmount.set_digits(0);
 		buyButton.set_valign(Gtk::Align::CENTER);
-		sellButton.set_valign(Gtk::Align::CENTER);
 		buyButton.set_margin_start(5);
-		sellButton.set_margin_start(5);
-		sellButton.set_margin_end(5);
 		buyButton.add_css_class("buy-sell-button");
-		sellButton.add_css_class("buy-sell-button");
 		set_margin_top(5);
+		set_halign(Gtk::Align::CENTER);
 
 		transferAmount.signal_changed().connect([this] {
 			updateTooltips(getCount());
@@ -271,16 +266,10 @@ namespace Game3 {
 				buy(game, ItemCount(transferAmount.get_value()));
 		});
 
-		sellButton.signal_clicked().connect([this, weak_game = std::weak_ptr(game)]() {
-			if (ClientGamePtr game = weak_game.lock())
-				sell(game, ItemCount(transferAmount.get_value()));
-		});
-
 		append(itemSlot);
 		append(quantityLabel);
 		append(transferAmount);
 		append(buyButton);
-		append(sellButton);
 	}
 
 	void VillageTradeModule::Row::setAmount(double amount_) {
@@ -301,11 +290,6 @@ namespace Game3 {
 			buyButton.set_tooltip_text(std::format("Price: {}", *buy_price));
 		else
 			buyButton.set_tooltip_text("Village doesn't have that many!");
-
-		if (std::optional<MoneyCount> sell_price = totalSellPrice(ItemCount(amount), -1, basePrice, count, greed))
-			sellButton.set_tooltip_text(std::format("Price: {}", *sell_price));
-		else
-			sellButton.set_tooltip_text("Village lacks funds!");
 	}
 
 	ItemCount VillageTradeModule::Row::getCount() const {

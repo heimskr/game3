@@ -45,7 +45,6 @@ namespace Game3 {
 					Gtk::Label quantityLabel;
 					Gtk::SpinButton transferAmount;
 					Gtk::Button buyButton{"Buy"};
-					Gtk::Button sellButton{"Sell"};
 
 					ItemCount getCount() const;
 					void buy(const std::shared_ptr<ClientGame> &, ItemCount);
