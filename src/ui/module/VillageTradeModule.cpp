@@ -31,13 +31,16 @@ namespace Game3 {
 
 		sellRow.set_hexpand(true);
 		sellRow.set_vexpand(false);
-		sellRow.set_margin_start(3);
+		sellRow.set_margin_start(10);
+		sellSlot.set_hexpand(false);
 		sellSlot.set_halign(Gtk::Align::START);
+		sellCount.set_hexpand(false);
 		sellCount.set_halign(Gtk::Align::CENTER);
 		sellCount.set_valign(Gtk::Align::CENTER);
 		sellCount.set_margin_start(10);
 		sellCount.set_margin_end(10);
 		sellCount.set_adjustment(Gtk::Adjustment::create(0.0, 0.0, 0.0));
+		sellButton.set_hexpand(false);
 		sellButton.set_halign(Gtk::Align::START);
 		sellButton.set_valign(Gtk::Align::CENTER);
 		sellButton.add_css_class("buy-sell-button");
@@ -124,19 +127,25 @@ namespace Game3 {
 
 	bool VillageTradeModule::handleShiftClick(std::shared_ptr<Inventory> source_inventory, Slot slot) {
 		if (ItemStack *stack = (*source_inventory)[slot]) {
-			setSellStack(*stack);
-			showSell();
+			if (setSellStack(*stack)) {
+				showSell();
+				return true;
+			}
 		}
 
-		return true;
+		return false;
 	}
 
-	void VillageTradeModule::setSellStack(ItemStack stack) {
+	bool VillageTradeModule::setSellStack(ItemStack stack) {
+		if (!isSellable(stack))
+			return false;
+
 		sellSlot.setStack(stack);
 		const double max(stack.count);
 		sellCount.set_adjustment(Gtk::Adjustment::create(max, 1.0, max));
 		sellCount.set_value(max);
 		updateSell(stack);
+		return true;
 	}
 
 	void VillageTradeModule::updateSell(const ItemStack &stack) {

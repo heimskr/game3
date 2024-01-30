@@ -13,7 +13,7 @@ namespace Game3 {
 	class ItemStack;
 	class Merchant;
 
-	constexpr double E = 2.71828182845904523536;
+	bool isSellable(const ItemStack &);
 
 	/** Returns the price for which a merchant will buy a resource, given the resource's sell price. */
 	double buyPriceToSellPrice(double buy_price, double greed);

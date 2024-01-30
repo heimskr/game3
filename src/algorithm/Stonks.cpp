@@ -7,6 +7,14 @@
 #include "item/Item.h"
 
 namespace Game3 {
+	namespace {
+		constexpr double E = 2.71828182845904523536;
+	}
+
+	bool isSellable(const ItemStack &stack) {
+		return stack.data.empty();
+	}
+
 	double buyPriceToSellPrice(double buy_price, double greed) {
 		return buy_price / (1. + greed);
 	}
