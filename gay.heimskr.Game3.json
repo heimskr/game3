@@ -1,7 +1,7 @@
 {
 	"app-id": "gay.heimskr.Game3",
 	"runtime": "org.gnome.Platform",
-	"runtime-version": "44",
+	"runtime-version": "45",
 	"sdk": "org.gnome.Sdk",
 	"command": "game3",
 	"finish-args": [
@@ -59,23 +59,8 @@
 			],
 			"sources": [{
 				"type": "archive",
-				"url": "https://download.gnome.org/sources/mm-common/1.0/mm-common-1.0.5.tar.xz",
-				"sha256": "705c6d29f4116a29bde4e36cfc1b046c92b6ef8c6dae4eaec85018747e6da5aa"
-			}]
-		},
-		{
-			"name": "sigc++-2.0",
-			"buildsystem": "meson",
-			"config-opts": [
-				"-Dmaintainer-mode=true",
-				"-Dbuild-examples=false",
-				"-Dbuild-documentation=false",
-				"-Dbuild-tests=false"
-			],
-			"sources": [{
-				"type": "archive",
-				"url": "https://download.gnome.org/sources/libsigc++/2.12/libsigc++-2.12.0.tar.xz",
-				"sha256": "1c466d2e64b34f9b118976eb21b138c37ed124d0f61497df2a90ce6c3d9fa3b5"
+				"url": "https://download.gnome.org/sources/mm-common/1.0/mm-common-1.0.6.tar.xz",
+				"sha256": "b55c46037dbcdabc5cee3b389ea11cc3910adb68ebe883e9477847aa660862e7"
 			}]
 		},
 		{
@@ -89,8 +74,8 @@
 			],
 			"sources": [{
 				"type": "archive",
-				"url": "https://download.gnome.org/sources/libsigc++/3.4/libsigc++-3.4.0.tar.xz",
-				"sha256": "02e2630ffb5ce93cd52c38423521dfe7063328863a6e96d41d765a6116b8707e"
+				"url": "https://download.gnome.org/sources/libsigc++/3.6/libsigc++-3.6.0.tar.xz",
+				"sha256": "c3d23b37dfd6e39f2e09f091b77b1541fbfa17c4f0b6bf5c89baef7229080e17"
 			}]
 		},
 		{
@@ -101,8 +86,8 @@
 			"sources": [
 				{
 					"type": "archive",
-					"url": "https://www.cairographics.org/releases/cairomm-1.16.2.tar.xz",
-					"sha256": "6a63bf98a97dda2b0f55e34d1b5f3fb909ef8b70f9b8d382cb1ff3978e7dc13f"
+					"url": "https://cairographics.org/releases/cairomm-1.18.0.tar.xz",
+					"sha256": "b81255394e3ea8e8aa887276d22afa8985fc8daef60692eb2407d23049f03cfb"
 				},
 				{
 					"type": "shell",
@@ -111,20 +96,6 @@
 					]
 				}
 			]
-		},
-		{
-			"name": "glibmm-2.4",
-			"buildsystem": "meson",
-			"config-opts": [
-				"-Dmaintainer-mode=true",
-				"-Dbuild-examples=false",
-				"-Dbuild-documentation=false"
-			],
-			"sources": [{
-				"type": "archive",
-				"url": "https://download.gnome.org/sources/glibmm/2.66/glibmm-2.66.6.tar.xz",
-				"sha256": "5358742598181e5351d7bf8da072bf93e6dd5f178d27640d4e462bc8f14e152f"
-			}]
 		},
 		{
 			"name": "glibmm-2.68",
@@ -136,8 +107,8 @@
 			],
 			"sources": [{
 				"type": "archive",
-				"url": "https://download.gnome.org/sources/glibmm/2.76/glibmm-2.76.0.tar.xz",
-				"sha256": "8637d80ceabd94fddd6e48970a082a264558d4ab82684e15ffc87e7ef3462ab2"
+				"url": "https://download.gnome.org/sources/glibmm/2.78/glibmm-2.78.0.tar.xz",
+				"sha256": "5d2e872564996f02a06d8bbac3677e7c394af8b00dd1526aebd47af842a3ef50"
 			}]
 		},
 		{
@@ -149,8 +120,8 @@
 			],
 			"sources": [{
 				"type": "archive",
-				"url": "https://download.gnome.org/sources/pangomm/2.50/pangomm-2.50.1.tar.xz",
-				"sha256": "ccc9923413e408c2bff637df663248327d72822f11e394b423e1c5652b7d9214"
+				"url": "https://download.gnome.org/sources/pangomm/2.50/pangomm-2.50.2.tar.xz",
+				"sha256": "1bc5ab4ea3280442580d68318226dab36ceedfc3288f9d83711cf7cfab50a9fb"
 			}]
 		},
 		{
@@ -162,8 +133,39 @@
 			],
 			"sources": [{
 				"type": "archive",
-				"url": "https://download.gnome.org/sources/atkmm/2.28/atkmm-2.28.3.tar.xz",
-				"sha256": "7c2088b486a909be8da2b18304e56c5f90884d1343c8da7367ea5cd3258b9969"
+				"url": "https://download.gnome.org/sources/atkmm/2.36/atkmm-2.36.3.tar.xz",
+				"sha256": "6ec264eaa0c4de0adb7202c600170bde9a7fbe4d466bfbe940eaf7faaa6c5974"
+			}]
+		},
+		{
+			"name": "glslc",
+			"buildsystem": "cmake",
+			"builddir": true,
+			"config-opts": [
+				"-DCMAKE_BUILD_TYPE=Release",
+				"-DSHADERC_SKIP_TESTS=ON",
+				"-DSHADERC_SKIP_EXAMPLES=ON",
+				"-DSPIRV_SKIP_TESTS=ON"
+			],
+			"sources": [{
+				"type": "archive",
+				"url": "https://github.com/google/shaderc/archive/refs/tags/v2023.8.tar.gz",
+				"sha256": "dfec5045f30d8f6d3d3914ab5b3cc2695947f266d41261b1459177cd789308d1"
+			}, {
+				"type": "git",
+				"url": "https://github.com/KhronosGroup/SPIRV-Tools.git",
+				"branch": "main",
+				"dest": "third_party/spirv-tools"
+			}, {
+				"type": "git",
+				"url": "https://github.com/KhronosGroup/SPIRV-Headers.git",
+				"branch": "main",
+				"dest": "third_party/spirv-headers"
+			}, {
+				"type": "git",
+				"url": "https://github.com/KhronosGroup/glslang.git",
+				"branch": "main",
+				"dest": "third_party/glslang"
 			}]
 		},
 		{
@@ -176,12 +178,12 @@
 				"-Dbuild-tests=false"
 			],
 			"build-options": {
-				"cxxflags": "-O2 -g -std=c++20"
+				"cxxflags": "-O3 -std=c++20"
 			},
 			"sources": [{
 				"type": "archive",
-				"url": "https://download.gnome.org/sources/gtk/4.12/gtk-4.12.1.tar.xz",
-				"sha256": "b8b61d6cf94fac64bf3a0bfc7af137c9dd2f8360033fdeb0cfe9612b77a99a72"
+				"url": "https://download.gnome.org/sources/gtk/4.13/gtk-4.13.6.tar.xz",
+				"sha256": "9adc386caa205724fc5e4866775797902ff6ead7d2b3720d613dd80c2f6aae77"
 			}]
 		},
 		{
@@ -194,12 +196,12 @@
 				"-Dbuild-tests=false"
 			],
 			"build-options": {
-				"cxxflags": "-O2 -g -std=c++20"
+				"cxxflags": "-O3 -std=c++20"
 			},
 			"sources": [{
 				"type": "archive",
-				"url": "https://download.gnome.org/sources/gtkmm/4.12/gtkmm-4.12.0.tar.xz",
-				"sha256": "fbc3e7618123345c0148ef71abb6548d421f52bb224fbda34875b677dc032c92"
+				"url": "https://download.gnome.org/sources/gtkmm/4.13/gtkmm-4.13.2.tar.xz",
+				"sha256": "f8e952ec14ad87ced84720886dd8ec6e3dbadf8c6357baf1959a8abfbe26e9d5"
 			}]
 		},
 		{
@@ -289,6 +291,18 @@
 			}]
 		},
 		{
+			"name": "FastNoise2",
+			"buildsystem": "cmake",
+			"builddir": true,
+			"config-opts": [
+				"-DFASTNOISE2_NOISETOOL=OFF", "-DFASTNOISE2_TESTS=OFF", "-DBUILD_SHARED_LIBS=ON"
+			],
+			"sources": [{
+				"type": "git",
+				"url": "https://github.com/Auburn/FastNoise2.git"
+			}]
+		},
+		{
 			"name": "asio",
 			"buildsystem": "simple",
 			"build-commands": [
@@ -360,10 +374,13 @@
 				"-Dbuildtype=release"
 			],
 			"build-options": {
-				"strip": true
+				"strip": true,
+				"env": {
+					"LDFLAGS": "-Wl,-lX11"
+				}
 			},
 			"post-install": [
-				"rm -rf /app/{include,lib/{libboost_*,cmake,mkspecs,pkgconfig}}"
+				"rm -rf /app/{include,lib/{libboost_*,cmake,mkspecs,pkgconfig,libSPIRV*,libshaderc*}}"
 			],
 			"sources": [{
 				"type": "dir",

@@ -43,7 +43,7 @@ inc_dirs = [
 	include_directories('..' / 'include'),
 ]
 
-link_args = []
+link_args = ['-lX11']
 
 if get_option('vcpkg_triplet') != ''
 	vcpkg_root = 'vcpkg_installed' / get_option('vcpkg_triplet')
