@@ -135,8 +135,6 @@ namespace Game3 {
 		}));
 
 		glArea.set_expand(true);
-		glArea.set_required_version(3, 3);
-		glArea.set_has_stencil_buffer(true);
 		glArea.signal_realize().connect([this] {
 			glArea.make_current();
 			glArea.throw_if_error();
