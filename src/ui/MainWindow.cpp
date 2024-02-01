@@ -135,8 +135,10 @@ namespace Game3 {
 		}));
 
 		glArea.set_expand(true);
+		glArea.set_use_es(false);
 		glArea.signal_realize().connect([this] {
 			glArea.make_current();
+			INFO("Using ES: {}", glArea.get_context()->get_use_es());
 			glArea.throw_if_error();
 			canvas = std::make_unique<Canvas>(*this);
 		});
@@ -148,25 +150,27 @@ namespace Game3 {
 		glArea.set_auto_render(true);
 		glArea.add_tick_callback([this](const Glib::RefPtr<Gdk::FrameClock> &) {
 			glArea.queue_render();
+
 			if (game) {
 				PlayerPtr player = game->player.copyBase();
 				if (autofocus && player)
 					player->focus(*canvas, true);
-				const int minute = game->getMinute();
-				timeLabel.set_text(std::to_string(int(game->getHour())) + (minute < 10? ":0" : ":") + std::to_string(minute));
+				timeLabel.set_text(std::format("{}:{:02}", int(game->getHour()), int(game->getMinute())));
 			}
 
 			fpses.push_back(lastFPS.load());
 			if (100 < fpses.size())
 				fpses.pop_front();
-			double sum = 0;
-			for (const double fps: fpses)
-				sum += fps;
+
+			const double sum = std::ranges::fold_left(fpses, 0.0, std::plus<>{});
+
 			statusbar.set_text(std::to_string(int(sum / fpses.size())) + " FPS");
+
 			if (statusbarWaiting && statusbarExpirationTime <= getTime() - statusbarSetTime) {
 				statusbarWaiting = false;
 				statusbar.set_text({});
 			}
+
 			return true;
 		});
 		glArea.set_focusable(true);

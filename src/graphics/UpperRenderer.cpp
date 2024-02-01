@@ -269,8 +269,8 @@ namespace Game3 {
 	}
 
 	void UpperRenderer::check(int handle, bool is_link) {
-		int success;
-		std::array<char, 2048> info{};
+		int success{};
+		std::array<char, 2048> info{"No info available"};
 
 		if (is_link) {
 			glGetProgramiv(handle, GL_LINK_STATUS, &success); CHECKGL
@@ -287,7 +287,7 @@ namespace Game3 {
 				glGetShaderInfoLog(handle, info.size(), &len, info.data()); CHECKGL
 			}
 
-			std::cerr << "Error with " << handle << " (l=" << len << "): " << info.data() << '\n';
+			INFO("UpperRenderer.cpp: error with handle {} (len={}): {}", handle, len, info.data());
 		}
 	}
 }

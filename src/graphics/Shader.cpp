@@ -9,6 +9,34 @@
 #include "util/Util.h"
 
 namespace Game3 {
+	namespace {
+		void check(const std::string &name, int handle, bool is_link = false) {
+			int success{};
+			std::array<char, 2048> info{"No info available"};
+
+			if (is_link) {
+				glGetProgramiv(handle, GL_LINK_STATUS, &success); CHECKGL
+			} else {
+				glGetShaderiv(handle, GL_COMPILE_STATUS, &success); CHECKGL
+			}
+
+			if (!success) {
+				GLsizei len{};
+
+				if (is_link) {
+					glGetProgramInfoLog(handle, GL_INFO_LOG_LENGTH, &len, info.data()); CHECKGL
+				} else {
+					glGetShaderInfoLog(handle, 2048, &len, info.data()); CHECKGL
+				}
+
+				if (is_link)
+					ERROR("Shader.cpp: error with handle {} (name = \"{}\", linking): {}", handle, name, info.data());
+				else
+					ERROR("Shader.cpp: error with handle {} (name = \"{}\"): {}", handle, name, info.data());
+			}
+		}
+	}
+
 	Shader::~Shader() {
 		reset();
 	}
@@ -19,25 +47,6 @@ namespace Game3 {
 		handle = other.handle;
 		other.handle = 0;
 		return *this;
-	}
-
-	static void check(int handle, bool is_link = false) {
-		int success;
-		char info[1024] {"No info available"};
-		if (is_link) {
-			glGetProgramiv(handle, GL_LINK_STATUS, &success); CHECKGL
-		} else {
-			glGetShaderiv(handle, GL_COMPILE_STATUS, &success); CHECKGL
-		}
-		if (!success) {
-			GLsizei len = 0;
-			if (is_link) {
-				glGetProgramInfoLog(handle, GL_INFO_LOG_LENGTH, &len, info); CHECKGL
-			} else {
-				glGetShaderInfoLog(handle, 1024, &len, info); CHECKGL
-			}
-			std::cerr << "Error with " << handle << " (l=" << len << "): " << info << '\n';
-		}
 	}
 
 	void Shader::init(std::string_view vertex, std::string_view fragment, std::string_view geometry) {
@@ -52,14 +61,14 @@ namespace Game3 {
 		const GLint vertex_size = vertex.size();
 		glShaderSource(vert_handle, 1, &vert_ptr, &vertex_size); CHECKGL
 		glCompileShader(vert_handle); CHECKGL
-		check(vert_handle); CHECKGL
+		check(name, vert_handle); CHECKGL
 
 		const GLchar *frag_ptr = reinterpret_cast<const GLchar *>(fragment.begin());
 		const GLuint frag_handle = glCreateShader(GL_FRAGMENT_SHADER); CHECKGL
 		const GLint frag_size = fragment.size();
 		glShaderSource(frag_handle, 1, &frag_ptr, &frag_size); CHECKGL
 		glCompileShader(frag_handle); CHECKGL
-		check(frag_handle); CHECKGL
+		check(name, frag_handle); CHECKGL
 
 		GLuint geom_handle = 0;
 
@@ -69,7 +78,7 @@ namespace Game3 {
 			const GLint geom_size = geometry.size();
 			glShaderSource(geom_handle, 1, &geom_ptr, &geom_size); CHECKGL
 			glCompileShader(geom_handle); CHECKGL
-			check(geom_handle); CHECKGL
+			check(name, geom_handle); CHECKGL
 		}
 
 		handle = glCreateProgram(); CHECKGL
@@ -79,7 +88,7 @@ namespace Game3 {
 			glAttachShader(handle, geom_handle); CHECKGL
 		}
 		glLinkProgram(handle); CHECKGL
-		check(handle, true); CHECKGL
+		check(name, handle, true); CHECKGL
 
 		glDetachShader(handle, vert_handle); CHECKGL
 		glDeleteShader(vert_handle); CHECKGL
