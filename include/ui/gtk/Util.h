@@ -35,7 +35,7 @@ namespace Game3 {
 
 	template <typename Fn>
 	requires CallableWith<Fn, int, double, double>
-	Glib::RefPtr<Gtk::GestureClick> createClick(Fn &&fn, bool press = false) {
+	Glib::RefPtr<Gtk::GestureClick> createClick(Fn &&fn, int button = -1, bool press = false) {
 		auto click = Gtk::GestureClick::create();
 
 		if (press) {
@@ -44,12 +44,15 @@ namespace Game3 {
 			click->signal_released().connect(std::move(fn));
 		}
 
+		if (0 <= button)
+			click->set_button(button);
+
 		return click;
 	}
 
 	template <typename Fn>
 	requires (CallableWith<Fn> && !CallableWith<Fn, int, double, double>)
-	Glib::RefPtr<Gtk::GestureClick> createClick(Fn &&fn, bool press = false) {
+	Glib::RefPtr<Gtk::GestureClick> createClick(Fn &&fn, int button = -1, bool press = false) {
 		auto click = Gtk::GestureClick::create();
 
 		auto wrapped = [fn = std::move(fn)](int, double, double) {
@@ -61,6 +64,9 @@ namespace Game3 {
 		} else {
 			click->signal_released().connect(std::move(wrapped));
 		}
+
+		if (0 <= button)
+			click->set_button(button);
 
 		return click;
 	}

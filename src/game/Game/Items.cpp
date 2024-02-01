@@ -170,6 +170,7 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/protein",         "Protein",            12, 64));
 		add(std::make_shared<Item>("base:item/eye",             "Eye",                24, 64));
 		add(std::make_shared<Item>("base:item/chromatin",       "Chromatin",           2, 64));
+		add(std::make_shared<Item>("base:item/fabric",          "Fabric",             20, 64));
 
 		add(std::make_shared<ItemPipeItem>(4));
 
@@ -238,7 +239,10 @@ namespace Game3 {
 		add(Furniture::createSimple("base:item/red_carpet",       "Red Carpet",        24, Layer::Submerged, "base:tile/red_carpet"));
 		add(Furniture::createSimple("base:item/blue_carpet",      "Blue Carpet",       24, Layer::Submerged, "base:tile/blue_carpet"));
 		add(Furniture::createSimple("base:item/purple_carpet",    "Purple Carpet",     24, Layer::Submerged, "base:tile/purple_carpet"));
-		add(Furniture::createSimple("base:item/torch",            "Torch",            999, Layer::Objects,   "base:tile/torch")); // TODO: cost
+		add(Furniture::createSimple("base:item/torch",            "Torch",              2, Layer::Objects,   "base:tile/torch"));
+		add(Furniture::createSimple("base:item/blue_bed",         "Blue Bed",          90, Layer::Objects,   "base:tile/bed1"));
+		add(Furniture::createSimple("base:item/red_bed",          "Red Bed",           90, Layer::Objects,   "base:tile/bed2"));
+		add(Furniture::createSimple("base:item/purple_bed",       "Purple Bed",        90, Layer::Objects,   "base:tile/bed3"));
 
 		add(Furniture::createMarchable("base:item/wooden_wall",     "Wooden Wall",      9, Layer::Objects,   "base:tile/wooden_wall",     "base:autotile/wooden_walls"));
 		add(Furniture::createMarchable("base:item/tower",           "Tower",           10, Layer::Objects,   "base:tile/tower",           "base:autotile/towers"));

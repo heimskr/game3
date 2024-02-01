@@ -421,6 +421,22 @@
 				"input":  [["base:item/wood", 1], ["base:item/coal", 1]],
 				"output": [["base:item/torch", 4]]
 			}],
+			["base:registry/crafting_recipe", {
+				"input":  [["base:item/cotton", 2]],
+				"output": [["base:item/fabric", 1]]
+			}],
+			["base:registry/crafting_recipe", {
+				"input":  [["base:item/wood", 3, "base:item/fabric", 3], ["base:item/red_dye", 1]],
+				"output": [["base:item/red_bed", 1]]
+			}],
+			["base:registry/crafting_recipe", {
+				"input":  [["base:item/wood", 3, "base:item/fabric", 3], ["base:item/blue_dye", 1]],
+				"output": [["base:item/blue_bed", 1]]
+			}],
+			["base:registry/crafting_recipe", {
+				"input":  [["base:item/wood", 3, "base:item/fabric", 3], ["base:item/purple_dye", 1]],
+				"output": [["base:item/purple_bed", 1]]
+			}],
 			["base:centrifuge_recipe", {
 				"input":  ["base:fluid/lava", 1000],
 				"output": [

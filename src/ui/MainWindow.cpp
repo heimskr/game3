@@ -19,6 +19,7 @@
 #include "ui/gtk/ConnectDialog.h"
 #include "ui/gtk/ConnectionSuccessDialog.h"
 #include "ui/gtk/JSONDialog.h"
+#include "ui/gtk/Util.h"
 #include "ui/module/InventoryModule.h"
 #include "ui/module/FluidLevelsModule.h"
 #include "ui/module/ModuleFactory.h"
@@ -122,7 +123,6 @@ namespace Game3 {
 
 		add_action("settings", Gio::ActionMap::ActivateSlot([this] {
 			auto dialog = settings.makeDialog(*this, [this](const ClientSettings &new_settings) {
-				INFO("Settings: {} -> {}", nlohmann::json(settings).dump(), nlohmann::json(new_settings).dump());
 				settings = new_settings;
 				if (game)
 					settings.apply(*game);
@@ -247,24 +247,19 @@ namespace Game3 {
 		});
 		glArea.add_controller(dragGesture);
 
-		auto forward  = Gtk::GestureClick::create();
-		auto backward = Gtk::GestureClick::create();
-		forward->set_button(9);
-		backward->set_button(8);
-		forward->signal_pressed().connect([this](int, double, double) {
+		glArea.add_controller(createClick([this] {
 			if (game && game->player) {
 				game->player->getInventory(0)->nextSlot();
 				inventoryTab->update(game);
 			}
-		});
-		backward->signal_pressed().connect([this](int, double, double) {
+		}, 9));
+
+		glArea.add_controller(createClick([this] {
 			if (game && game->player) {
 				game->player->getInventory(0)->prevSlot();
 				inventoryTab->update(game);
 			}
-		});
-		glArea.add_controller(forward);
-		glArea.add_controller(backward);
+		}, 8));
 
 		auto scroll = Gtk::EventControllerScroll::create();
 		scroll->set_flags(Gtk::EventControllerScroll::Flags::VERTICAL);
