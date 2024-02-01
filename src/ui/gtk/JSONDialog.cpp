@@ -34,6 +34,7 @@ namespace Game3 {
 			} else if (type == "slider") {
 
 				auto label_widget = std::make_shared<Gtk::Label>(label);
+				label_widget->set_halign(Gtk::Align::START);
 				auto slider = std::make_shared<Gtk::Scale>();
 				if (auto iter = meta.find("digits"); iter != meta.end())
 					slider->set_digits(iter->get<int>());
