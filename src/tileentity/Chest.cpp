@@ -38,7 +38,7 @@ namespace Game3 {
 				stack.spawn(getRealm(), getPosition());
 				return false;
 			});
-			destroy();
+			queueDestruction();
 			player->give(ItemStack(getGame(), itemName));
 		} else {
 			addObserver(player, false);
@@ -50,8 +50,8 @@ namespace Game3 {
 	void Chest::absorbJSON(Game &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		assert(getSide() == Side::Server);
-		if (json.contains("inventory"))
-			HasInventory::setInventory(std::make_shared<ServerInventory>(ServerInventory::fromJSON(game, json.at("inventory"), shared_from_this())), 0);
+		if (auto iter = json.find("inventory"); iter != json.end())
+			HasInventory::setInventory(std::make_shared<ServerInventory>(ServerInventory::fromJSON(game, *iter, shared_from_this())), 0);
 		name = json.at("name");
 		itemName = json.at("itemName");
 	}

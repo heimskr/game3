@@ -27,7 +27,8 @@ namespace Game3 {
 
 	class TileEntity: public Agent, public Broadcastable, public Tickable {
 		public:
-			RealmID realmID = 0;std::weak_ptr<Realm> weakRealm;
+			RealmID realmID = 0;
+			std::weak_ptr<Realm> weakRealm;
 			Identifier tileID;
 			Identifier tileEntityID;
 			Lockable<Position> position{-1, -1};
@@ -93,6 +94,7 @@ namespace Game3 {
 			Game & getGame() override;
 			std::shared_ptr<TileEntity> getSelf();
 			std::weak_ptr<TileEntity> getWeakSelf();
+			void queueDestruction();
 
 			virtual void encode(Game &, Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */

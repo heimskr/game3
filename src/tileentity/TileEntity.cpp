@@ -203,6 +203,10 @@ namespace Game3 {
 		return std::weak_ptr(getSelf());
 	}
 
+	void TileEntity::queueDestruction() {
+		getRealm()->queueDestruction(getSelf());
+	}
+
 	void TileEntity::encode(Game &, Buffer &buffer) {
 		buffer << tileEntityID;
 		buffer << tileID;

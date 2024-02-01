@@ -27,11 +27,11 @@ namespace Game3 {
 			virtual bool canInsertItem(const ItemStack &, Direction, Slot);
 			virtual bool canExtractItem(Direction, Slot);
 			/** Returns the extracted item. */
-			virtual std::optional<ItemStack> extractItem(Direction, bool remove, Slot slot = -1);
+			virtual std::optional<ItemStack> extractItem(Direction, bool remove, Slot slot);
 			/** Returns whether the item was insertable at all. */
-			virtual bool insertItem(const ItemStack &, Direction, std::optional<ItemStack> *);
+			virtual bool insertItem(const ItemStack &, Direction, std::optional<ItemStack> *leftover);
 			virtual ItemCount itemsInsertable(const ItemStack &, Direction, Slot);
-			/** Iterates over each extractable item until there all have been iterated or the iteration function returns true. */
+			/** Iterates over each extractable item until they all have been iterated or the iteration function returns true. */
 			virtual void iterateExtractableItems(Direction, const std::function<bool(const ItemStack &, Slot)> &);
 
 			virtual bool empty() const;

@@ -7,6 +7,7 @@
 #include "tileentity/Chest.h"
 #include "tileentity/Combiner.h"
 #include "tileentity/CraftingStation.h"
+#include "tileentity/Crate.h"
 #include "tileentity/CreativeGenerator.h"
 #include "tileentity/Dissolver.h"
 #include "tileentity/GeothermalGenerator.h"
@@ -37,6 +38,7 @@ namespace Game3 {
 		add(TileEntityFactory::create<Chest>());
 		add(TileEntityFactory::create<Combiner>());
 		add(TileEntityFactory::create<CraftingStation>());
+		add(TileEntityFactory::create<Crate>());
 		add(TileEntityFactory::create<CreativeGenerator>());
 		add(TileEntityFactory::create<Dissolver>());
 		add(TileEntityFactory::create<GeothermalGenerator>());
