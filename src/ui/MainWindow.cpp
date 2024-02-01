@@ -120,18 +120,15 @@ namespace Game3 {
 			}
 		}, false);
 
-		add_action("json", Gio::ActionMap::ActivateSlot([this] {
-			auto json_dialog = std::make_unique<JSONDialog>(*this, "JSON Test", nlohmann::json{
-				{"thing1", "text", "Text", {{"initial", "Hello"}}},
-				{"0", "number", "Numeric", {{"initial", "42"}}},
-				{"slider", "slider", "Slider", {{"range", {-10, 20.5}}, {"increments", {0.1, 1}}, {"initial", 1.2}, {"digits", 4}}},
-				{"ok", "ok", "T_est"},
+		add_action("settings", Gio::ActionMap::ActivateSlot([this] {
+			auto dialog = settings.makeDialog(*this, [this](const ClientSettings &new_settings) {
+				INFO("Settings: {} -> {}", nlohmann::json(settings).dump(), nlohmann::json(new_settings).dump());
+				settings = new_settings;
+				if (game)
+					settings.apply(*game);
+				saveSettings();
 			});
-			json_dialog->set_transient_for(*this);
-			json_dialog->signal_submit().connect([](const nlohmann::json &json) {
-				std::cout << json.dump() << '\n';
-			});
-			queueDialog(std::move(json_dialog));
+			queueDialog(std::move(dialog));
 		}));
 
 		glArea.set_expand(true);

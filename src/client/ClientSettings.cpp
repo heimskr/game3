@@ -1,9 +1,33 @@
 #include "Log.h"
 #include "client/ClientSettings.h"
+#include "game/ClientGame.h"
+#include "ui/gtk/JSONDialog.h"
+#include "ui/Canvas.h"
 
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
+	void ClientSettings::apply(ClientGame &game) const {
+		game.canvas.sizeDivisor = sizeDivisor;
+	}
+
+	std::unique_ptr<JSONDialog> ClientSettings::makeDialog(Gtk::Window &parent, std::function<void(const ClientSettings &)> submit) const {
+		auto dialog = std::make_unique<JSONDialog>(parent, "Settings", nlohmann::json{
+			{"hostname",          "text",    "Default Hostname",    {{"initial", hostname}}},
+			{"port",              "number",  "Default Port",        {{"initial", std::to_string(port)}}},
+			{"username",          "text",    "Default Username",    {{"initial", username}}},
+			{"alertOnConnection", "bool",    "Alert on Connection", {{"initial", alertOnConnection}}},
+			{"sizeDivisor",       "slider", "Size Divisor",         {{"range", {-0.5, 4.0}}, {"increments", {0.1, 0.5}}, {"initial", sizeDivisor}, {"digits", 1}}},
+			{"ok", "ok", "OK"},
+		});
+
+		dialog->signal_submit().connect([submit = std::move(submit)](const nlohmann::json &json) {
+			submit(json.get<ClientSettings>());
+		});
+
+		return dialog;
+	}
+
 	void from_json(const nlohmann::json &json, ClientSettings &settings) {
 		if (auto iter = json.find("hostname"); iter != json.end())
 			settings.hostname = *iter;
@@ -13,6 +37,8 @@ namespace Game3 {
 			settings.username = *iter;
 		if (auto iter = json.find("alertOnConnection"); iter != json.end())
 			settings.alertOnConnection = *iter;
+		if (auto iter = json.find("sizeDivisor"); iter != json.end())
+			settings.sizeDivisor = *iter;
 	}
 
 	void to_json(nlohmann::json &json, const ClientSettings &settings) {
@@ -21,5 +47,6 @@ namespace Game3 {
 		if (!settings.username.empty())
 			json["username"] = settings.username;
 		json["alertOnConnection"] = settings.alertOnConnection;
+		json["sizeDivisor"] = settings.sizeDivisor;
 	}
 }

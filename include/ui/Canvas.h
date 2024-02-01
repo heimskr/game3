@@ -52,7 +52,6 @@ namespace Game3 {
 			Canvas(MainWindow &);
 
 			void drawGL();
-			// bool mouseButtonEvent(const Eigen::Vector2i &p, int button, bool down, int modifiers) override;
 			int getWidth() const;
 			int getHeight() const;
 			int getFactor() const;

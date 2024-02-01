@@ -18,8 +18,14 @@ namespace Game3 {
 				auto label_widget = std::make_shared<Gtk::Label>(label);
 				auto entry = type == "text"? std::make_shared<Gtk::Entry>() : std::make_shared<NumericEntry>();
 				label_widget->set_halign(Gtk::Align::START);
-				if (auto iter = meta.find("initial"); iter != meta.end())
-					entry->set_text(iter->get<std::string>());
+				if (auto iter = meta.find("initial"); iter != meta.end()) {
+					if (iter->is_string())
+						entry->set_text(iter->get<std::string>());
+					else if (iter->is_number())
+						entry->set_text(std::to_string(iter->get<double>()));
+					else
+						throw std::invalid_argument("Invalid JSON type for initial value of " + label);
+				}
 				entry->signal_activate().connect(sigc::mem_fun(*this, &JSONDialog::submit));
 				area->append(*label_widget);
 				area->append(*entry);
@@ -46,6 +52,15 @@ namespace Game3 {
 				area->append(*label_widget);
 				area->append(*slider);
 				widgets.push_back({label_widget, slider});
+
+			} else if (type == "bool") {
+
+				// auto label_widget = std::make_shared<Gtk::Label>(label);
+				auto check = std::make_shared<Gtk::CheckButton>(label);
+				if (auto iter = meta.find("initial"); iter != meta.end())
+					check->set_active(iter->get<bool>());
+				area->append(*check);
+				widgets.push_back({check});
 
 			} else if (type == "ok") {
 
@@ -93,6 +108,8 @@ namespace Game3 {
 				} catch (const std::invalid_argument &) {
 					// Intentionally leave out the data.
 				}
+			} else if (type == "bool") {
+				data[name] = std::static_pointer_cast<Gtk::CheckButton>(widgets.at(i++).at(0))->get_active();
 			} else if (type == "slider") {
 				data[name] = std::dynamic_pointer_cast<Gtk::Scale>(widgets.at(i++).at(1))->get_value();
 			}
