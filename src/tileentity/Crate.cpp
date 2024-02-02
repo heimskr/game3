@@ -48,7 +48,7 @@ namespace Game3 {
 			queueDestruction();
 			player->give(ItemStack(getGame(), ITEM_NAME));
 		} else {
-			// addObserver(player, false);
+			addObserver(player, false);
 		}
 
 		return true;
@@ -73,14 +73,12 @@ namespace Game3 {
 	void Crate::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
 
-		if (getSide() == Side::Server)
-			setInventory(1);
+		setInventory(1);
 
 		buffer >> name;
 		buffer >> storedStack;
 
-		if (getSide() == Side::Server)
-			setInventoryStack();
+		setInventoryStack();
 	}
 
 	bool Crate::mayInsertItem(const ItemStack &stack, Direction, Slot) {

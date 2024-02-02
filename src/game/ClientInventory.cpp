@@ -66,7 +66,7 @@ namespace Game3 {
 	}
 
 	void ClientInventory::clear() {
-		throw std::logic_error("ClientInventory::clear() unimplemented");
+		storage.clear();
 	}
 
 	ItemCount ClientInventory::remove(const ItemStack &) {
