@@ -27,6 +27,8 @@ namespace Game3 {
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
 
+			void inventoryUpdated() override;
+
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
 
@@ -37,6 +39,9 @@ namespace Game3 {
 
 		private:
 			Lockable<std::optional<ItemStack>> storedStack;
+
+			void setInventoryStack();
+			void absorbStackFromInventory();
 
 		friend class TileEntity;
 	};

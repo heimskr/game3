@@ -36,6 +36,12 @@ namespace Game3 {
 	bool Crate::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *, Hand) {
 		assert(getSide() == Side::Server);
 
+		if (auto lock = storedStack.sharedLock(); storedStack) {
+			INFO("Crate stack: {}", *storedStack);
+		} else {
+			INFO_("Crate has no stack.");
+		}
+
 		if (modifiers.onlyAlt()) {
 			if (storedStack)
 				storedStack->spawn(getRealm(), getPosition());
@@ -52,8 +58,10 @@ namespace Game3 {
 		TileEntity::absorbJSON(game, json);
 		assert(getSide() == Side::Server);
 		name = json.at("name");
-		if (auto iter = json.find("storedStack"); iter != json.end())
+		if (auto iter = json.find("storedStack"); iter != json.end()) {
 			storedStack = ItemStack::fromJSON(game, *iter);
+			setInventoryStack();
+		}
 	}
 
 	void Crate::encode(Game &game, Buffer &buffer) {
@@ -64,8 +72,15 @@ namespace Game3 {
 
 	void Crate::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
+
+		if (getSide() == Side::Server)
+			setInventory(1);
+
 		buffer >> name;
 		buffer >> storedStack;
+
+		if (getSide() == Side::Server)
+			setInventoryStack();
 	}
 
 	bool Crate::mayInsertItem(const ItemStack &stack, Direction, Slot) {
@@ -88,9 +103,17 @@ namespace Game3 {
 	}
 
 	std::optional<ItemStack> Crate::extractItem(Direction, bool remove, Slot) {
-		auto lock = storedStack.uniqueLock();
-		if (remove)
+		auto stack_lock = storedStack.uniqueLock();
+
+		if (remove) {
+			{
+				InventoryPtr inventory = getInventory(0);
+				auto inventory_lock = inventory->uniqueLock();
+				inventory->clear();
+			}
 			return std::move(storedStack.getBase());
+		}
+
 		return storedStack.getBase();
 	}
 
@@ -107,7 +130,10 @@ namespace Game3 {
 			} else {
 				storedStack = stack;
 			}
+
 		}
+
+		setInventoryStack();
 
 		if (leftover)
 			*leftover = std::nullopt;
@@ -128,13 +154,48 @@ namespace Game3 {
 	}
 
 	void Crate::iterateExtractableItems(Direction, const std::function<bool(const ItemStack &, Slot)> &function) {
-		auto lock = storedStack.sharedLock();
-		if (storedStack)
-			function(*storedStack, 0);
+		if (std::optional<ItemStack> stack = storedStack.copyBase())
+			function(*stack, 0);
 	}
 
 	bool Crate::empty() const {
 		auto lock = storedStack.sharedLock();
-		return storedStack && 0 < storedStack->count;
+		return !storedStack || storedStack->count == 0;
+	}
+
+	void Crate::setInventoryStack() {
+		InventoryPtr inventory = getInventory(0);
+		if (!inventory)
+			return;
+
+		auto stack_lock = storedStack.sharedLock();
+		auto inventory_lock = inventory->uniqueLock();
+		if (storedStack)
+			inventory->set(0, *storedStack);
+		else
+			inventory->clear();
+	}
+
+	void Crate::inventoryUpdated() {
+		InventoriedTileEntity::inventoryUpdated();
+
+		if (getSide() != Side::Server)
+			return;
+
+		absorbStackFromInventory();
+	}
+
+	void Crate::absorbStackFromInventory() {
+		InventoryPtr inventory = getInventory(0);
+		if (!inventory)
+			return;
+
+		auto stack_lock = storedStack.uniqueLock();
+		auto inventory_lock = inventory->sharedLock();
+
+		if (ItemStack *stack = (*inventory)[0])
+			storedStack.getBase() = *stack;
+		else
+			storedStack.reset();
 	}
 }

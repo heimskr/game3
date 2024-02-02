@@ -124,6 +124,8 @@ namespace Game3 {
 	}
 
 	void InventoriedTileEntity::inventoryUpdated() {
+		if (getSide() != Side::Server)
+			return;
 		increaseUpdateCounter();
 	}
 

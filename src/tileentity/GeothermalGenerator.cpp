@@ -286,7 +286,6 @@ namespace Game3 {
 
 		inventory_lock.unlock();
 		inventoryUpdated();
-		inventory->notifyOwner(); // Necessary?
 		fluidsUpdated();
 	}
 }

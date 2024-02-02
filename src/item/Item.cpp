@@ -316,4 +316,13 @@ namespace Game3 {
 		if (!stack.data.empty())
 			json[2] = stack.data;
 	}
+
+	template <>
+	ItemStack makeForBuffer<ItemStack>(Buffer &buffer) {
+		auto context = buffer.context.lock();
+		assert(context);
+		auto game = std::dynamic_pointer_cast<Game>(context);
+		assert(game);
+		return ItemStack(*game);
+	}
 }

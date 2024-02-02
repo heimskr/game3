@@ -28,6 +28,11 @@ namespace Game3 {
 	T popBuffer(Buffer &);
 
 	template <typename T>
+	T makeForBuffer(Buffer &) {
+		return T();
+	}
+
+	template <typename T>
 	void popBuffer(Buffer &buffer, T &item) {
 		item = popBuffer<T>(buffer);
 	}
@@ -304,7 +309,7 @@ namespace Game3 {
 
 			template <typename T>
 			T take() {
-				T out;
+				T out = makeForBuffer<T>(*this);
 				*this >> out;
 				return out;
 			}

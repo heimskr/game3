@@ -63,6 +63,11 @@ namespace Game3 {
 
 			const InventoryPtr inventory = inventoried->getInventory(0);
 
+			if (!inventory) {
+				WARN("{} has no inventory 0.", inventoried->getName());
+				return;
+			}
+
 			{
 				auto inventory_lock = inventory->sharedLock();
 				if (inventoried->empty())
@@ -100,15 +105,19 @@ namespace Game3 {
 				// Try to insert the extracted item into insertion points until we either finish inserting all of it
 				// or we run out of insertion points.
 				iterateRoundRobin([&](const std::shared_ptr<InventoriedTileEntity> &round_robin, Direction round_robin_direction) -> bool {
+					InventoryPtr round_robin_inventory = round_robin->getInventory(0);
+
+					if (!round_robin_inventory)
+						return false;
+
 					if (const auto pipe = std::dynamic_pointer_cast<Pipe>(realm->tileEntityAt(round_robin->getPosition() + round_robin_direction))) {
-						InventoryPtr round_robin_inventory = round_robin->getInventory(0);
 						auto round_robin_inventory_lock = round_robin_inventory->sharedLock();
 						if (std::shared_ptr<ItemFilter> insertion_filter = pipe->itemFilters[flipDirection(round_robin_direction)]; insertion_filter && !insertion_filter->isAllowed(*extracted, *round_robin_inventory))
 							return false;
 					}
 
 					// TODO?: support multiple inventories in item networks
-					auto lock = round_robin->getInventory(0)->uniqueLock();
+					auto lock = round_robin_inventory->uniqueLock();
 					round_robin->insertItem(*extracted, round_robin_direction, &extracted);
 					return !extracted.has_value();
 				}, inventoried);

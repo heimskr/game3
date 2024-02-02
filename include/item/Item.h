@@ -151,6 +151,10 @@ namespace Game3 {
 	Buffer & operator+=(Buffer &, const ItemStack &);
 	Buffer & operator<<(Buffer &, const ItemStack &);
 	Buffer & operator>>(Buffer &, ItemStack &);
+	template <typename T>
+	T makeForBuffer(Buffer &);
+	template <>
+	ItemStack makeForBuffer<ItemStack>(Buffer &);
 
 	void to_json(nlohmann::json &, const ItemStack &);
 }

@@ -39,6 +39,7 @@
 #include "item/VoidPickaxe.h"
 #include "tileentity/Chest.h"
 #include "tileentity/CraftingStation.h"
+#include "tileentity/Crate.h"
 
 namespace Game3 {
 	void Game::addItems() {
@@ -264,6 +265,14 @@ namespace Game3 {
 			if (!out)
 				return false;
 			out->setInventory(30);
+			return true;
+		}));
+
+		add(Furniture::createTileEntity("base:item/crate", "Crate", 999, [](const Place &place) -> bool { // TODO: cost
+			auto out = TileEntity::spawn<Crate>(place, "base:tile/crate", place.position, "Crate");
+			if (!out)
+				return false;
+			out->setInventory(1);
 			return true;
 		}));
 
