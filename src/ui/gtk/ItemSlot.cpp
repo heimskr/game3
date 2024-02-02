@@ -15,6 +15,8 @@ namespace Game3 {
 
 	ItemSlot::ItemSlot(const ClientGamePtr &game, Slot slot_, ClientInventoryPtr inventory_, ItemSlotParent *parent_):
 	weakGame(game), slot(slot_), inventory(std::move(inventory_)), parent(parent_) {
+		set_hexpand(false);
+		set_halign(Gtk::Align::START);
 		label.set_xalign(1.f);
 		label.set_yalign(1.f);
 		label.set_expand(true);

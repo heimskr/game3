@@ -20,7 +20,7 @@ namespace Game3 {
 	parent(parent_) {
 		assert(inventory);
 		label.set_hexpand();
-		flowBox.set_hexpand();
+		flowBox.set_hexpand(true);
 		flowBox.set_vexpand(false);
 		flowBox.set_max_children_per_line(20);
 		flowBox.set_can_focus(false);
