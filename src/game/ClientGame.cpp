@@ -25,7 +25,7 @@
 
 namespace Game3 {
 	double ClientGame::getFrequency() const {
-		return CLIENT_TICK_FREQUENCY;
+		return getWindow().settings.tickFrequency;
 	}
 
 	void ClientGame::addEntityFactories() {
@@ -82,7 +82,7 @@ namespace Game3 {
 		};
 	}
 
-	MainWindow & ClientGame::getWindow() {
+	MainWindow & ClientGame::getWindow() const {
 		return canvas.window;
 	}
 
@@ -266,7 +266,7 @@ namespace Game3 {
 					break;
 				}
 
-				std::this_thread::sleep_for(std::chrono::milliseconds(CLIENT_TICK_PERIOD));
+				std::this_thread::sleep_for(std::chrono::milliseconds(1000 / getWindow().settings.tickFrequency));
 			}
 
 			if (stoppedByError && errorCallback)

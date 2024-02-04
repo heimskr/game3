@@ -15,7 +15,9 @@
 
 namespace Game3 {
 	namespace {
-		constexpr Tick MAX_MESSAGE_AGE = 7 * CLIENT_TICK_FREQUENCY;
+		constexpr Tick getMaxMessageAge(ClientGame &game) {
+			return 7 * game.getWindow().settings.tickFrequency;
+		}
 	}
 
 	ClientPlayer::ClientPlayer():
@@ -41,7 +43,7 @@ namespace Game3 {
 		const auto [row, column] = getPosition();
 		const auto [x, y, z] = offset.copyBase();
 
-		const bool show_message = lastMessageAge.load() < MAX_MESSAGE_AGE;
+		const bool show_message = lastMessageAge.load() < getMaxMessageAge(game->toClient());
 		const float health_offset = canShowHealthBar()? -.5 : 0;
 		const float name_offset = health_offset + (show_message? -1 : 0);
 

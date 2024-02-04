@@ -38,7 +38,7 @@ namespace Game3 {
 			void dragEnd(const Position &, Modifiers);
 			void drag(const Position &, Modifiers);
 			Gdk::Rectangle getVisibleRealmBounds() const;
-			MainWindow & getWindow();
+			MainWindow & getWindow() const;
 			/** Translates coordinates relative to the top left corner of the canvas to realm coordinates. */
 			Position translateCanvasCoordinates(double x, double y, double *x_offset_out = nullptr, double *y_offset_out = nullptr) const;
 			void activateContext();

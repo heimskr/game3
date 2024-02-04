@@ -1,9 +1,12 @@
 #pragma once
 
-#include <functional>
-#include <string>
+#include "game/SimulationOptions.h"
+#include "types/Types.h"
 
 #include <nlohmann/json_fwd.hpp>
+
+#include <functional>
+#include <string>
 
 namespace Gtk {
 	class Window;
@@ -19,6 +22,7 @@ namespace Game3 {
 		std::string username;
 		bool alertOnConnection = true;
 		double sizeDivisor = 1.0;
+		Tick tickFrequency = DEFAULT_CLIENT_TICK_FREQUENCY;
 
 		void apply(ClientGame &) const;
 		std::unique_ptr<JSONDialog> makeDialog(Gtk::Window &parent, std::function<void(const ClientSettings &)> submit) const;
