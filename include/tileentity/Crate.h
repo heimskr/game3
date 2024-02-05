@@ -9,6 +9,8 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "te/crate"}; }
 
+			~Crate() override = default;
+
 			std::string name;
 
 			std::string getName() const override;

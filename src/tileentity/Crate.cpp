@@ -36,12 +36,6 @@ namespace Game3 {
 	bool Crate::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *, Hand) {
 		assert(getSide() == Side::Server);
 
-		if (auto lock = storedStack.sharedLock(); storedStack) {
-			INFO("Crate stack: {}", *storedStack);
-		} else {
-			INFO_("Crate has no stack.");
-		}
-
 		if (modifiers.onlyAlt()) {
 			if (storedStack)
 				storedStack->spawn(getRealm(), getPosition());
@@ -79,6 +73,9 @@ namespace Game3 {
 		buffer >> storedStack;
 
 		setInventoryStack();
+		InventoryPtr inventory = getInventory(0);
+		auto lock = inventory->uniqueLock();
+		inventory->notifyOwner();
 	}
 
 	bool Crate::mayInsertItem(const ItemStack &stack, Direction, Slot) {
@@ -108,6 +105,7 @@ namespace Game3 {
 				InventoryPtr inventory = getInventory(0);
 				auto inventory_lock = inventory->uniqueLock();
 				inventory->clear();
+				inventory->notifyOwner();
 			}
 			return std::move(storedStack.getBase());
 		}

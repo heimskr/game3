@@ -39,8 +39,6 @@
 #include <deque>
 #include <fstream>
 
-// #define USE_CBOR
-
 namespace Game3 {
 	namespace {
 		constexpr std::chrono::milliseconds arrowTime {100};
@@ -252,14 +250,14 @@ namespace Game3 {
 				game->player->getInventory(0)->nextSlot();
 				inventoryTab->update(game);
 			}
-		}, 9));
+		}, 9, true));
 
 		glArea.add_controller(createClick([this] {
 			if (game && game->player) {
 				game->player->getInventory(0)->prevSlot();
 				inventoryTab->update(game);
 			}
-		}, 8));
+		}, 8, true));
 
 		auto scroll = Gtk::EventControllerScroll::create();
 		scroll->set_flags(Gtk::EventControllerScroll::Flags::VERTICAL);

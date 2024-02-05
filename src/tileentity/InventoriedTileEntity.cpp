@@ -91,6 +91,7 @@ namespace Game3 {
 		else
 			inventory->add(stack, predicate);
 
+		inventory->notifyOwner();
 		return true;
 	}
 
