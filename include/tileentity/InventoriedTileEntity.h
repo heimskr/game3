@@ -36,8 +36,7 @@ namespace Game3 {
 
 			virtual bool empty() const;
 
-			/** Server-side only. */
-			void setInventory(Slot slot_count);
+			virtual void setInventory(Slot slot_count);
 
 			void inventoryUpdated() override;
 			std::shared_ptr<Agent> getSharedAgent() final;

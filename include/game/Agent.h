@@ -74,6 +74,9 @@ namespace Game3 {
 			bool hasBeenSentTo(const std::shared_ptr<Player> &);
 			void onSend(const std::shared_ptr<Player> &);
 
+			/** Called by Inventory::notifyOwner even if inventory updates are suppressed. */
+			virtual void inventoryUpdated(InventoryID) {}
+
 			static GlobalID generateGID();
 
 		private:

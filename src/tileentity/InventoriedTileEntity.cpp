@@ -117,7 +117,7 @@ namespace Game3 {
 	}
 
 	void InventoriedTileEntity::setInventory(Slot slot_count) {
-		auto realm = weakRealm.lock();
+		RealmPtr realm = weakRealm.lock();
 		assert(realm);
 		// TODO: support multiple inventories with setInventory
 		HasInventory::setInventory(Inventory::create(realm->getSide(), shared_from_this(), slot_count), 0);

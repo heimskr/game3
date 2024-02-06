@@ -4,6 +4,8 @@
 #include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/ClientGame.h"
+#include "game/ClientInventory.h"
+#include "game/ExpandedServerInventory.h"
 #include "game/ServerInventory.h"
 #include "graphics/SpriteRenderer.h"
 #include "realm/Realm.h"
@@ -79,7 +81,7 @@ namespace Game3 {
 	}
 
 	bool Crate::mayInsertItem(const ItemStack &stack, Direction, Slot) {
-		auto lock = storedStack.uniqueLock();
+		auto stack_lock = storedStack.sharedLock();
 		if (!storedStack)
 			return true;
 		return storedStack->canMerge(stack);
@@ -99,14 +101,12 @@ namespace Game3 {
 
 	std::optional<ItemStack> Crate::extractItem(Direction, bool remove, Slot) {
 		auto stack_lock = storedStack.uniqueLock();
+		InventoryPtr inventory = getInventory(0);
+		auto inventory_lock = inventory->uniqueLock();
 
 		if (remove) {
-			{
-				InventoryPtr inventory = getInventory(0);
-				auto inventory_lock = inventory->uniqueLock();
-				inventory->clear();
-				inventory->notifyOwner();
-			}
+			inventory->clear();
+			inventory->notifyOwner();
 			std::optional<ItemStack> out = std::move(storedStack.getBase());
 			storedStack.reset();
 			return out;
@@ -175,26 +175,46 @@ namespace Game3 {
 		auto stack_lock = storedStack.sharedLock();
 		auto inventory_lock = inventory->uniqueLock();
 		if (storedStack) {
+			INFO("\e[35msetInventoryStack\e[39m({})", *storedStack);
 			assert(storedStack->item);
 			inventory->set(0, *storedStack);
 		} else {
+			INFO_("\e[35msetInventoryStack\e[39m(0)");
 			inventory->clear();
 		}
 	}
 
 	void Crate::inventoryUpdated() {
 		InventoriedTileEntity::inventoryUpdated();
+		INFO("Crate inventory updated (GID = {})", getGID());
 
 		if (getSide() != Side::Server)
 			return;
 
+		std::string json = "?";
+		if (auto inv = std::dynamic_pointer_cast<ServerInventory>(getInventory(0))) {
+			auto lock = inv->sharedLock();
+			json = nlohmann::json(inv->getStorage()).dump();
+		}
+
+		INFO("Absorbing stack from inventory ({})", json);
 		absorbStackFromInventory();
+	}
+
+	void Crate::setInventory(Slot slot_count) {
+		if (getSide() == Side::Client)
+			HasInventory::setInventory(std::make_shared<ClientInventory>(shared_from_this(), slot_count), 0);
+		else
+			HasInventory::setInventory(std::make_shared<ExpandedServerInventory>(shared_from_this(), slot_count), 0);
+		inventoryUpdated();
 	}
 
 	void Crate::absorbStackFromInventory() {
 		InventoryPtr inventory = getInventory(0);
 		if (!inventory)
 			return;
+
+		INFO_("\e[36mabsorbStackFromInventory\e[39m");
 
 		auto stack_lock = storedStack.uniqueLock();
 		auto inventory_lock = inventory->sharedLock();

@@ -32,9 +32,10 @@ namespace Game3 {
 
 		if (0 <= start) {
 			if (slotCount <= start)
-				throw std::out_of_range("Can't start at slot " + std::to_string(start) + ": out of range");
-			if (storage.contains(start) && predicate(start)) {
-				auto &stored = storage.at(start);
+				throw std::out_of_range(std::format("Can't start at slot {}: out of range", start));
+
+			if (auto iter = storage.find(start); iter != storage.end() && predicate(start)) {
+				ItemStack &stored = iter->second;
 				if (stored.canMerge(stack)) {
 					const ssize_t storable = ssize_t(stored.item->maxCount) - ssize_t(stored.count);
 					if (0 < storable) {
@@ -281,10 +282,14 @@ namespace Game3 {
 	}
 
 	void ServerInventory::notifyOwner() {
-		if (suppressInventoryNotifications)
-			return;
+		AgentPtr owner = weakOwner.lock();
 
-		if (auto owner = weakOwner.lock()) {
+		if (owner) {
+			owner->inventoryUpdated(index);
+
+			if (suppressInventoryNotifications)
+				return;
+
 			owner->increaseUpdateCounter();
 			if (auto tile_entity = std::dynamic_pointer_cast<InventoriedTileEntity>(owner)) {
 				tile_entity->inventoryUpdated();

@@ -101,17 +101,20 @@ namespace Game3 {
 
 	void ClientInventory::notifyOwner() {
 		if (auto owner = weakOwner.lock()) {
+			owner->inventoryUpdated(index);
+
 			ClientGame &game = owner->getRealm()->getGame().toClient();
+
 			game.getWindow().queue([&game, weak = weakOwner, index = index.load()] {
 				if (auto owner = weak.lock()) {
-					if (auto player = std::dynamic_pointer_cast<Player>(owner)) {
+					if (auto player = std::dynamic_pointer_cast<Player>(owner))
 						game.signalPlayerInventoryUpdate().emit(player);
-					} else {
+					else
 						game.signalOtherInventoryUpdate().emit(owner, index);
-					}
-				} else {
-					ERROR_("Expired in " << __FILE__ << ':' << __LINE__);
+					return;
 				}
+
+				ERROR("Expired in {}:{}", __FILE__, __LINE__);
 			});
 		}
 	}

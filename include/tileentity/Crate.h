@@ -31,6 +31,8 @@ namespace Game3 {
 
 			void inventoryUpdated() override;
 
+			void setInventory(Slot slot_count) override;
+
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
 

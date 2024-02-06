@@ -38,7 +38,7 @@ namespace Game3 {
 
 			static ServerInventory fromJSON(Game &, const nlohmann::json &, const std::shared_ptr<Agent> &);
 
-			friend void to_json(nlohmann::json &, const Inventory &);
+			friend void to_json(nlohmann::json &, const ServerInventory &);
 	};
 
 	template <typename T>
