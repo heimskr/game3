@@ -27,6 +27,30 @@ namespace Game3 {
 			virtual void inventoryUpdated() {}
 			virtual std::shared_ptr<Agent> getSharedAgent() = 0;
 
+
+			template <typename T>
+			void decodeSpecific(Buffer &buffer, InventoryID index) {
+				Slot slot_count = -1;
+				buffer >> slot_count;
+				std::shared_ptr<T> inventory;
+				if (slot_count == -1) {
+					setInventory(nullptr, index);
+					inventoryUpdated();
+					buffer >> inventory;
+					assert(!inventory);
+				} else {
+					buffer >> inventory;
+					assert(inventory);
+					if (inventory) { // This is unnecessary but I want PVS-Studio to be happy.
+						inventory->weakOwner = getSharedAgent();
+						inventory->setSlotCount(slot_count); // Maybe not necessary? Try an assert before.
+						inventory->index = index;
+						setInventory(inventory, index);
+						inventoryUpdated();
+					}
+				}
+			}
+
 		private:
 			std::shared_ptr<Inventory> inventory;
 	};

@@ -1,4 +1,6 @@
 #include "Log.h"
+#include "net/Buffer.h"
+
 #include "game/HasInventory.h"
 #include "game/StorageInventory.h"
 #include "pipes/ItemFilter.h"
@@ -130,7 +132,7 @@ namespace Game3 {
 						// If there's still anything left over, move it to the overflowQueue so we can try to insert it somewhere another time.
 						// Theoretically this should never happen because we've locked the source inventory.
 						// Also, because the source inventory changed, we need to cancel the suppressor.
-						WARN_("Can't put leftovers back into source inventory.");
+						WARN("Can't put leftovers back into source inventory of type {}.", DEMANGLE(*inventory));
 						suppressor.cancel(true);
 						overflowQueue.push_back(std::move(*new_leftover));
 						// Because we're in a weird situation here, it might be safer to just cancel the iteration now.

@@ -9,8 +9,6 @@ namespace Game3 {
 	std::optional<ItemStack> ExpandedServerInventory::add(const ItemStack &stack, const std::function<bool(Slot)> &predicate, Slot start) {
 		bool done = false;
 
-		INFO("ExpandedServerInventory::add({}): storage = {}", stack, nlohmann::json(storage).dump());
-
 		// TODO: avoid overflow or whatever, in case someone tries to store more than 19+ quintillion of something
 
 		if (0 <= start) {
@@ -22,44 +20,77 @@ namespace Game3 {
 					ItemStack &stored = iter->second;
 					stored.count += stack.count;
 					done = true;
-					INFO("{}:{}", __FILE__, __LINE__);
 				}
 			}
 		}
 
 		if (!done) {
 			for (auto &[slot, stored]: storage) {
-				if (slot == start || !stored.canMerge(stack) || !predicate(slot)) {
-					INFO("{}:{}: {}, {}, {}", __FILE__, __LINE__, slot == start, !stored.canMerge(stack), !predicate(slot));
+				if (slot == start || !stored.canMerge(stack) || !predicate(slot))
 					continue;
-				}
+
 				stored.count += stack.count;
 				done = true;
-				INFO("{}:{}", __FILE__, __LINE__);
 				break;
 			}
 		}
 
 		if (!done) {
 			for (Slot slot = 0; slot < slotCount; ++slot) {
-				if (storage.contains(slot) || !predicate(slot)) {
-					INFO("{}:{}: {}, {}", __FILE__, __LINE__, storage.contains(slot), !predicate(slot));
+				if (storage.contains(slot) || !predicate(slot))
 					continue;
-				}
+
 				storage.emplace(slot, stack);
 				done = true;
-				INFO("{}:{}", __FILE__, __LINE__);
 				break;
 			}
 		}
 
 		if (done) {
-			INFO("{}:{}: {}", __FILE__, __LINE__, nlohmann::json(storage).dump());
 			notifyOwner();
 			return std::nullopt;
 		}
 
-		INFO("{}:{}", __FILE__, __LINE__);
 		return std::make_optional(stack);
+	}
+
+	bool ExpandedServerInventory::canInsert(const ItemStack &stack, const std::function<bool(Slot)> &predicate) const {
+		for (Slot slot = 0; slot < slotCount; ++slot) {
+			if (!predicate(slot))
+				continue;
+
+			if (auto iter = storage.find(slot); iter != storage.end()) {
+				if (iter->second.canMerge(stack))
+					return true;
+			} else {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	bool ExpandedServerInventory::canInsert(const ItemStack &stack, Slot slot) const {
+		auto iter = storage.find(slot);
+		if (iter == storage.end())
+			return true;
+		return iter->second.canMerge(stack);
+	}
+
+	template <>
+	std::string Buffer::getType(const ExpandedServerInventory &) {
+		return "\xe1";
+	}
+
+	Buffer & operator+=(Buffer &buffer, const ExpandedServerInventory &inventory) {
+		return buffer += static_cast<const ServerInventory &>(inventory);
+	}
+
+	Buffer & operator<<(Buffer &buffer, const ExpandedServerInventory &inventory) {
+		return buffer += static_cast<const ServerInventory &>(inventory);
+	}
+
+	Buffer & operator>>(Buffer &buffer, ExpandedServerInventory &inventory) {
+		return buffer >> static_cast<ServerInventory &>(inventory);
 	}
 }
