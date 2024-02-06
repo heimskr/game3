@@ -147,6 +147,8 @@ namespace Game3 {
 	}
 
 	bool ItemStack::canMerge(const ItemStack &other) const {
+		if (!item || !other.item)
+			return false;
 		return *item == *other.item && data == other.data;
 	}
 

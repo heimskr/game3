@@ -32,7 +32,7 @@ namespace Game3 {
 		GameDB &database = game.toServer().database;
 		if (database.isOpen()) {
 			database.writeUser(*this);
-			INFO_("Persisted ServerPlayer with username " << username << '.');
+			INFO("Persisted {}.", username);
 
 			std::vector<std::string> usernames;
 
@@ -48,7 +48,7 @@ namespace Game3 {
 					usernames.push_back(player->username);
 			}
 
-			INFO_("Remaining player" << (usernames.size() == 1? "" : "s") << ": " << join(usernames, ", "));
+			INFO("Remaining player{}: {}", usernames.size() == 1? "" : "s", join(usernames));
 		}
 	}
 
