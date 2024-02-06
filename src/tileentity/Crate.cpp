@@ -107,7 +107,9 @@ namespace Game3 {
 				inventory->clear();
 				inventory->notifyOwner();
 			}
-			return std::move(storedStack.getBase());
+			std::optional<ItemStack> out = std::move(storedStack.getBase());
+			storedStack.reset();
+			return out;
 		}
 
 		return storedStack.getBase();
@@ -120,13 +122,16 @@ namespace Game3 {
 			auto lock = storedStack.uniqueLock();
 
 			if (storedStack) {
-				if (!storedStack->canMerge(stack))
+				if (!storedStack->canMerge(stack)) {
+					if (leftover)
+						*leftover = stack;
 					return false;
+				}
+
 				storedStack->count += stack.count;
 			} else {
 				storedStack = stack;
 			}
-
 		}
 
 		setInventoryStack();
@@ -150,8 +155,11 @@ namespace Game3 {
 	}
 
 	void Crate::iterateExtractableItems(Direction, const std::function<bool(const ItemStack &, Slot)> &function) {
-		if (std::optional<ItemStack> stack = storedStack.copyBase())
+		if (std::optional<ItemStack> stack = storedStack.copyBase()) {
+			assert(storedStack->item);
+			assert(stack->item);
 			function(*stack, 0);
+		}
 	}
 
 	bool Crate::empty() const {
@@ -166,10 +174,12 @@ namespace Game3 {
 
 		auto stack_lock = storedStack.sharedLock();
 		auto inventory_lock = inventory->uniqueLock();
-		if (storedStack)
+		if (storedStack) {
+			assert(storedStack->item);
 			inventory->set(0, *storedStack);
-		else
+		} else {
 			inventory->clear();
+		}
 	}
 
 	void Crate::inventoryUpdated() {
@@ -189,9 +199,11 @@ namespace Game3 {
 		auto stack_lock = storedStack.uniqueLock();
 		auto inventory_lock = inventory->sharedLock();
 
-		if (ItemStack *stack = (*inventory)[0])
+		if (ItemStack *stack = (*inventory)[0]) {
 			storedStack.getBase() = *stack;
-		else
+			assert(storedStack->item);
+		} else {
 			storedStack.reset();
+		}
 	}
 }
