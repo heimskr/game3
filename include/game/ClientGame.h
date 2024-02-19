@@ -1,7 +1,7 @@
 #pragma once
 
 #include "game/Game.h"
-#include "threading/LockableSharedPtr.h"
+#include "threading/Atomic.h"
 #include "ui/Modifiers.h"
 #include "ui/Sound.h"
 
@@ -21,9 +21,6 @@ namespace Game3 {
 	class ClientGame: public Game {
 		public:
 			Canvas &canvas;
-			LockableSharedPtr<ClientPlayer> player;
-			LockableSharedPtr<LocalClient> client;
-			LockableSharedPtr<Realm> activeRealm;
 			bool stoppedByError = false;
 			std::function<void()> errorCallback;
 			SoundProvider sounds;
@@ -70,6 +67,14 @@ namespace Game3 {
 
 			Side getSide() const final { return Side::Client; }
 
+			inline ClientPlayerPtr getPlayer() const { return player.load(); }
+			inline std::shared_ptr<LocalClient> getClient() const { return client.load(); }
+			inline RealmPtr getActiveRealm() const { return activeRealm.load(); }
+
+			void setPlayer(ClientPlayerPtr);
+			void setClient(std::shared_ptr<LocalClient>);
+			void setActiveRealm(RealmPtr);
+
 			/** Returns whether the thread could be started. The thread can't be started if the thread is already running. */
 			bool startThread();
 			void stopThread();
@@ -78,6 +83,9 @@ namespace Game3 {
 			std::shared_ptr<const ClientGame> getSelf() const { return std::static_pointer_cast<const ClientGame>(shared_from_this()); }
 
 		private:
+			Atomic<ClientPlayerPtr> player;
+			Atomic<std::shared_ptr<LocalClient>> client;
+			Atomic<RealmPtr> activeRealm;
 			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update;
 			sigc::signal<void(const PlayerPtr &)> signal_player_money_update;
 			sigc::signal<void(const std::shared_ptr<Agent> &, InventoryID)> signal_other_inventory_update;

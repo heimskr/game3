@@ -15,7 +15,7 @@ namespace Game3 {
 
 		SUCCESS_("Registration succeeded: token = " << token);
 
-		auto &client = *game.client;
+		auto &client = *game.getClient();
 		client.setToken(client.getHostname(), username, token);
 		client.saveTokens();
 	}

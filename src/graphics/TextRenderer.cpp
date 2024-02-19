@@ -6,8 +6,6 @@
 #include <unordered_map>
 #include <utility>
 
-#include <glm/gtx/string_cast.hpp>
-
 #include "Log.h"
 #include "graphics/Tileset.h"
 #include "game/ClientGame.h"
@@ -143,7 +141,7 @@ namespace Game3 {
 			std::swap(options.y, y);
 		}
 
-		RealmPtr realm = canvas->game->activeRealm.copyBase();
+		RealmPtr realm = canvas->game->getActiveRealm();
 		TileProvider &provider = realm->tileProvider;
 		TilesetPtr tileset     = provider.getTileset(*canvas->game);
 		const auto tile_size   = tileset->getTileSize();

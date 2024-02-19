@@ -40,8 +40,8 @@ namespace Game3 {
 				WARN("- GID[\e[1m{}\e[22m], Position[\e[1m{}\e[22m], RealmID[\e[1m{}\e[22m], Offsets[\e[1m{}\e[22m], no realm pointer", player->getGID(), player->getPosition(), player->realmID, player->offset);
 		}
 
-		if (game->player)
-			INFO("Self ID: {}", game->player->getGID());
+		if (auto player = game->getPlayer())
+			INFO("Self ID: {}", player->getGID());
 		else
 			WARN_("Couldn't find self.");
 	}

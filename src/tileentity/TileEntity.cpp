@@ -160,7 +160,7 @@ namespace Game3 {
 		RealmPtr realm = getRealm();
 		if (getSide() == Side::Client) {
 			ClientGame &client_game = realm->getGame().toClient();
-			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.player->getChunk()).contains(pos.getChunk());
+			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.getPlayer()->getChunk()).contains(pos.getChunk());
 		}
 		return realm->isVisible(pos);
 	}
@@ -170,7 +170,7 @@ namespace Game3 {
 		RealmPtr realm = getRealm();
 		if (getSide() == Side::Client) {
 			ClientGame &client_game = realm->getGame().toClient();
-			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.player->getChunk()).contains(pos.getChunk());
+			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.getPlayer()->getChunk()).contains(pos.getChunk());
 		}
 		return realm->isVisible(pos);
 	}

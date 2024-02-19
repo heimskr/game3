@@ -16,13 +16,13 @@ namespace Game3 {
 	}
 
 	void InventoryPacket::handle(ClientGame &game) {
-		if (game.player) {
-			inventory->weakOwner = game.player;
-			game.player->setInventory(inventory, 0);
-			game.player->getInventory(0)->notifyOwner();
+		if (auto player = game.getPlayer()) {
+			inventory->weakOwner = player;
+			player->setInventory(inventory, 0);
+			player->getInventory(0)->notifyOwner();
 		} else {
 			ERROR_("InventoryPacket::handle: player is missing");
-			assert(game.player);
+			assert(player);
 		}
 	}
 }

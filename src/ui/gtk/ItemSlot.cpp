@@ -61,7 +61,7 @@ namespace Game3 {
 				return false;
 
 			if (ClientGamePtr game = weakGame.lock())
-				game->player->send(MoveSlotsPacket(source.inventory->getOwner()->getGID(), inventory->getOwner()->getGID(), source.slot, slot, source.index, inventory->index));
+				game->getPlayer()->send(MoveSlotsPacket(source.inventory->getOwner()->getGID(), inventory->getOwner()->getGID(), source.slot, slot, source.index, inventory->index));
 			return true;
 		}, false);
 

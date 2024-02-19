@@ -5,7 +5,7 @@
 
 namespace Game3 {
 	void EntityChangingRealmsPacket::handle(ClientGame &game) {
-		if (globalID == game.player->getGID())
+		if (globalID == game.getPlayer()->getGID())
 			return;
 
 		EntityPtr entity = game.getAgent<Entity>(globalID);

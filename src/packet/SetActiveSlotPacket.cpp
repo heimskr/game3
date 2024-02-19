@@ -17,7 +17,7 @@ namespace Game3 {
 	}
 
 	void SetActiveSlotPacket::handle(ClientGame &game) {
-		game.player->getInventory(0)->setActive(slot, true);
+		game.getPlayer()->getInventory(0)->setActive(slot, true);
 		game.getWindow().inventoryTab->activeSlotSet();
 	}
 }

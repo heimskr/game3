@@ -4,9 +4,6 @@
 
 #include "graphics/Shader.h"
 
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/string_cast.hpp>
-
 #include "graphics/Texture.h"
 #include "graphics/Tileset.h"
 #include "game/ClientGame.h"
@@ -106,7 +103,7 @@ namespace Game3 {
 
 		constexpr static size_t BUFFER_CAPACITY = 1024;
 
-		const size_t tile_size = canvas->game->activeRealm->getTileset().getTileSize();
+		const size_t tile_size = canvas->game->getActiveRealm()->getTileset().getTileSize();
 
 		for (const auto &[texture, options]: batchItems) {
 			if (texture != last_texture || buffer.size() >= BUFFER_CAPACITY) {

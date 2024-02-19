@@ -34,7 +34,7 @@ namespace Game3 {
 	}
 
 	void ClientGame::click(int button, int, double pos_x, double pos_y, Modifiers modifiers) {
-		RealmPtr realm = activeRealm.copyBase();
+		RealmPtr realm = activeRealm.load();
 
 		if (!realm)
 			return;
@@ -44,15 +44,17 @@ namespace Game3 {
 
 		const Position translated = translateCanvasCoordinates(pos_x, pos_y, &fractional_x, &fractional_y);
 
+		auto client = getClient();
+
 		if (button == 1)
 			client->send(ClickPacket(translated, fractional_x, fractional_y, modifiers));
-		else if (button == 3 && player && !realm->rightClick(translated, pos_x, pos_y) && debugMode && client && client->isConnected())
+		else if (button == 3 && getPlayer() && !realm->rightClick(translated, pos_x, pos_y) && debugMode && client && client->isConnected())
 			client->send(TeleportSelfPacket(realm->id, translated));
 	}
 
 	void ClientGame::dragStart(const Position &position, Modifiers modifiers) {
 		lastDragPosition = position;
-		client->send(DragPacket(DragPacket::Action::Start, position, modifiers));
+		getClient()->send(DragPacket(DragPacket::Action::Start, position, modifiers));
 	}
 
 	void ClientGame::dragUpdate(const Position &position, Modifiers modifiers) {
@@ -64,11 +66,11 @@ namespace Game3 {
 
 	void ClientGame::dragEnd(const Position &position, Modifiers modifiers) {
 		lastDragPosition.reset();
-		client->send(DragPacket(DragPacket::Action::End, position, modifiers));
+		getClient()->send(DragPacket(DragPacket::Action::End, position, modifiers));
 	}
 
 	void ClientGame::drag(const Position &position, Modifiers modifiers) {
-		client->send(DragPacket(DragPacket::Action::Update, position, modifiers));
+		getClient()->send(DragPacket(DragPacket::Action::Update, position, modifiers));
 	}
 
 	Gdk::Rectangle ClientGame::getVisibleRealmBounds() const {
@@ -87,7 +89,7 @@ namespace Game3 {
 	}
 
 	Position ClientGame::translateCanvasCoordinates(double x, double y, double *x_offset_out, double *y_offset_out) const {
-		RealmPtr realm = activeRealm.copyBase();
+		RealmPtr realm = activeRealm.load();
 
 		if (!realm)
 			return {};
@@ -150,16 +152,16 @@ namespace Game3 {
 		if (auto factory = registry<LocalCommandFactoryRegistry>().maybe(pieces.front())) {
 			auto command = (*factory)();
 			command->pieces = std::move(pieces);
-			(*command)(*client);
+			(*command)(*getClient());
 		} else
-			client->send(CommandPacket(threadContext.rng(), command));
+			getClient()->send(CommandPacket(threadContext.rng(), command));
 	}
 
 	bool ClientGame::tick() {
 		if (!Game::tick())
 			return false;
 
-		client->read();
+		getClient()->read();
 
 		for (const auto &packet: packetQueue.steal()) {
 			try {
@@ -173,13 +175,13 @@ namespace Game3 {
 			}
 		}
 
-		if (!player)
+		if (!getPlayer())
 			return true;
 
 		for (const auto &[realm_id, realm]: realms)
 			realm->tick(delta);
 
-		if (auto realm = player->getRealm()) {
+		if (auto realm = getPlayer()->getRealm()) {
 			auto missing_chunks_lock = missingChunks.sharedLock();
 			if (missingChunks.empty()) {
 				auto new_missing_chunks = realm->getMissingChunks();
@@ -187,7 +189,7 @@ namespace Game3 {
 				missingChunks = std::move(new_missing_chunks);
 				missing_chunks_lock.lock();
 				if (!missingChunks.empty())
-					client->send(ChunkRequestPacket(*realm, missingChunks, true));
+					getClient()->send(ChunkRequestPacket(*realm, missingChunks, true));
 			}
 		} else {
 			WARN_("No realm");
@@ -206,13 +208,15 @@ namespace Game3 {
 	}
 
 	void ClientGame::interactOn(Modifiers modifiers, Hand hand) {
+		auto client = getClient();
 		assert(client);
-		client->send(InteractPacket(true, hand, modifiers, {}, client->getGame()->player->direction));
+		client->send(InteractPacket(true, hand, modifiers, {}, getPlayer()->direction));
 	}
 
 	void ClientGame::interactNextTo(Modifiers modifiers, Hand hand) {
+		auto client = getClient();
 		assert(client);
-		client->send(InteractPacket(false, hand, modifiers, {}, client->getGame()->player->direction));
+		client->send(InteractPacket(false, hand, modifiers, {}, getPlayer()->direction));
 	}
 
 	void ClientGame::putInLimbo(EntityPtr entity, RealmID next_realm_id, const Position &next_position) {
@@ -234,7 +238,7 @@ namespace Game3 {
 			// Safe in the sense that we aren't erasing something we shouldn't erase.
 			entityLimbo.erase(iter);
 			lock.unlock();
-			player->send(EntityRequestPacket(realm_id, std::move(requests)));
+			getPlayer()->send(EntityRequestPacket(realm_id, std::move(requests)));
 		}
 	}
 
@@ -245,6 +249,18 @@ namespace Game3 {
 
 	void ClientGame::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data) {
 		getWindow().moduleMessageBuffer(module_id, source, name, std::move(data));
+	}
+
+	void ClientGame::setPlayer(ClientPlayerPtr new_player) {
+		player = std::move(new_player);
+	}
+
+	void ClientGame::setClient(std::shared_ptr<LocalClient> new_client) {
+		client = std::move(new_client);
+	}
+
+	void ClientGame::setActiveRealm(RealmPtr new_realm) {
+		activeRealm = std::move(new_realm);
 	}
 
 	bool ClientGame::startThread() {

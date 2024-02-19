@@ -1,12 +1,6 @@
 // Credit: https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/3.2d_game/0.ull_source/sprite_renderer.cpp
 
-#include <iostream>
-
 #include "graphics/Shader.h"
-
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/string_cast.hpp>
-
 #include "graphics/Texture.h"
 #include "graphics/Tileset.h"
 #include "game/ClientGame.h"
@@ -15,6 +9,8 @@
 #include "ui/Canvas.h"
 #include "util/FS.h"
 #include "util/Util.h"
+
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace Game3 {
 	namespace {
@@ -111,7 +107,7 @@ namespace Game3 {
 			size_y = texture->height;
 
 		assert(canvas != nullptr);
-		RealmPtr realm = canvas->game->activeRealm.copyBase();
+		RealmPtr realm = canvas->game->getActiveRealm();
 		TileProvider &provider = realm->tileProvider;
 		TilesetPtr tileset     = provider.getTileset(*canvas->game);
 		const auto tile_size   = tileset->getTileSize();
@@ -174,7 +170,7 @@ namespace Game3 {
 			size_y = texture_height;
 
 		assert(canvas != nullptr);
-		RealmPtr realm = canvas->game->activeRealm.copyBase();
+		RealmPtr realm = canvas->game->getActiveRealm();
 		TileProvider &provider = realm->tileProvider;
 		TilesetPtr tileset     = provider.getTileset(*canvas->game);
 		const auto tile_size   = tileset->getTileSize();

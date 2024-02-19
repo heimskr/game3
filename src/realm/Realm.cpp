@@ -195,9 +195,9 @@ namespace Game3 {
 			onFocus();
 
 		auto &client_game = game.toClient();
-		assert(client_game.player);
+		assert(client_game.getPlayer());
 
-		const ChunkPosition current_chunk = client_game.player->getChunk();
+		const ChunkPosition current_chunk = client_game.getPlayer()->getChunk();
 		if (staticLightingQueued.exchange(false) || lastPlayerChunk != current_chunk) {
 			lastPlayerChunk = current_chunk;
 			remakeStaticLightingTexture();
@@ -215,7 +215,7 @@ namespace Game3 {
 			onFocus();
 
 		auto &client_game = game.toClient();
-		assert(client_game.player);
+		assert(client_game.getPlayer());
 
 		if (baseRenderers) {
 			for (auto &row: *baseRenderers) {
@@ -245,11 +245,13 @@ namespace Game3 {
 
 		std::set<EntityPtr, EntityZCompare> rendered_entities;
 
-		ChunkRange(client_game.player->getChunk()).iterate([&](ChunkPosition chunk_position) {
+		auto player = client_game.getPlayer();
+
+		ChunkRange(player->getChunk()).iterate([&](ChunkPosition chunk_position) {
 			if (auto entities_in_chunk = getEntities(chunk_position)) {
 				auto lock = entities_in_chunk->sharedLock();
 				for (const EntityPtr &entity: *entities_in_chunk) {
-					if (entity != client_game.player) {
+					if (entity != player) {
 						rendered_entities.insert(entity);
 						entity->render(renderers); CHECKGL
 					}
@@ -257,7 +259,7 @@ namespace Game3 {
 			}
 		});
 
-		client_game.player->render(renderers);
+		player->render(renderers);
 
 		batch_sprite.renderNow();
 
@@ -281,7 +283,7 @@ namespace Game3 {
 			entity->renderUpper(renderers); CHECKGL
 		}
 
-		client_game.player->renderUpper(renderers);
+		player->renderUpper(renderers);
 		batch_sprite.renderNow();
 	}
 
@@ -292,7 +294,8 @@ namespace Game3 {
 		clearLighting(game_time);
 
 		auto &client_game = game.toClient();
-		assert(client_game.player);
+		auto player = client_game.getPlayer();
+		assert(player);
 
 		{
 			auto lock = tileEntities.sharedLock();
@@ -300,16 +303,16 @@ namespace Game3 {
 				tile_entity->renderLighting(renderers);
 		}
 
-		ChunkRange(client_game.player->getChunk()).iterate([&](ChunkPosition chunk_position) {
+		ChunkRange(player->getChunk()).iterate([&](ChunkPosition chunk_position) {
 			if (auto entities_in_chunk = getEntities(chunk_position)) {
 				auto lock = entities_in_chunk->sharedLock();
 				for (const EntityPtr &entity: *entities_in_chunk)
-					if (entity != client_game.player)
+					if (entity != player)
 						entity->renderLighting(renderers);
 			}
 		});
 
-		client_game.player->renderLighting(renderers);
+		player->renderLighting(renderers);
 
 		renderers.batchSprite.renderNow();
 	}
@@ -587,7 +590,7 @@ namespace Game3 {
 
 		} else {
 
-			auto player = getGame().toClient().player;
+			auto player = getGame().toClient().getPlayer();
 			if (!player)
 				return;
 
@@ -1264,7 +1267,7 @@ namespace Game3 {
 	std::set<ChunkPosition> Realm::getMissingChunks() const {
 		assert(getSide() == Side::Client);
 		std::set<ChunkPosition> out;
-		const auto &player = getGame().toClient().player;
+		auto player = getGame().toClient().getPlayer();
 
 		auto chunk_pos = player->getPosition().getChunk();
 		chunk_pos.y -= REALM_DIAMETER / 2;
@@ -1517,7 +1520,7 @@ namespace Game3 {
 	void Realm::remakeStaticLightingTexture() {
 		assert(isClient());
 		ClientGame &client_game = game.toClient();
-		PlayerPtr player = client_game.player;
+		PlayerPtr player = client_game.getPlayer();
 
 		if (!player)
 			return;
@@ -1566,7 +1569,7 @@ namespace Game3 {
 			return false;
 
 		auto &game = getGame().toClient();
-		const auto player     = game.player;
+		const auto player     = game.getPlayer();
 		const auto player_pos = player->getPosition();
 		const bool overlap    = player_pos == position;
 		const bool adjacent   = position.adjacent4(player_pos);
@@ -1649,7 +1652,7 @@ namespace Game3 {
 
 	bool Realm::isActive() const {
 		assert(isClient());
-		return game.toClient().activeRealm.get() == this;
+		return game.toClient().getActiveRealm().get() == this;
 	}
 
 	BiomeType Realm::getBiome(int64_t seed) {

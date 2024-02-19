@@ -8,7 +8,7 @@
 
 namespace Game3 {
 	void SetPlayerStationTypesPacket::handle(ClientGame &game) {
-		game.player->stationTypes = std::move(stationTypes);
+		game.getPlayer()->stationTypes = std::move(stationTypes);
 		MainWindow &window = game.getWindow();
 		window.queue([&window, &game, focus = focus] {
 			auto tab = window.craftingTab;

@@ -62,7 +62,7 @@ namespace Game3 {
 		});
 
 		GLsizei tile_size = 16;
-		RealmPtr realm = game->activeRealm.copyBase();
+		RealmPtr realm = game->getActiveRealm();
 
 		if (realm)
 			tile_size = static_cast<GLsizei>(realm->getTileset().getTileSize());
@@ -118,7 +118,7 @@ namespace Game3 {
 				.scaleY = 1,
 			});
 
-			ChunkPosition chunk = game->player->getChunk() - ChunkPosition(1, 1);
+			ChunkPosition chunk = game->getPlayer()->getChunk() - ChunkPosition(1, 1);
 			const auto [static_y, static_x] = chunk.topLeft();
 			singleSpriteRenderer.drawOnMap(staticLightingTexture, RenderOptions{
 				.x = double(static_x),

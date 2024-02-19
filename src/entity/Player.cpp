@@ -215,11 +215,12 @@ namespace Game3 {
 				auto &client_game = game.toClient();
 				// Second condition is a hack. Sometimes the player gets interrealm teleported twice in the same tick.
 				// TODO: figure out the reason for the above double interrealm teleportation.
-				if (getGID() == client_game.player->getGID() && client_game.activeRealm != new_realm) {
-					client_game.activeRealm->onBlur();
-					client_game.activeRealm->queuePlayerRemoval(getShared());
-					client_game.activeRealm = new_realm;
-					client_game.activeRealm->onFocus();
+				RealmPtr active_realm = client_game.getActiveRealm();
+				if (getGID() == client_game.getPlayer()->getGID() && active_realm != new_realm) {
+					active_realm->onBlur();
+					active_realm->queuePlayerRemoval(getShared());
+					active_realm = new_realm;
+					active_realm->onFocus();
 					focus(game.toClient().canvas, true);
 					client_game.requestFromLimbo(new_realm->id);
 				}
@@ -452,7 +453,7 @@ namespace Game3 {
 				return true;
 			}
 		} else {
-			getGame().toClient().client->send(packet);
+			getGame().toClient().getClient()->send(packet);
 			return true;
 		}
 

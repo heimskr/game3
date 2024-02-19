@@ -155,7 +155,7 @@ namespace Game3 {
 		}
 
 		const double old_value = sellCount.get_value();
-		const double max(game->player->getInventory(0)->count(stack));
+		const double max(game->getPlayer()->getInventory(0)->count(stack));
 		sellCount.set_adjustment(Gtk::Adjustment::create(max, 1.0, max));
 		sellCount.set_value(old_value);
 
@@ -180,7 +180,7 @@ namespace Game3 {
 
 		const ItemCount sell_count(sellCount.get_value());
 
-		ItemCount inventory_count = game->player->getInventory(0)->count(*stack);
+		ItemCount inventory_count = game->getPlayer()->getInventory(0)->count(*stack);
 
 		if (inventory_count <= sell_count) {
 			sellSlot.reset();
@@ -194,7 +194,7 @@ namespace Game3 {
 			}
 		}
 
-		game->player->send(DoVillageTradePacket(village->getID(), stack->getID(), sell_count, true));
+		game->getPlayer()->send(DoVillageTradePacket(village->getID(), stack->getID(), sell_count, true));
 	}
 
 	void VillageTradeModule::showSell() {
@@ -306,10 +306,10 @@ namespace Game3 {
 	}
 
 	void VillageTradeModule::Row::buy(const ClientGamePtr &game, ItemCount amount) {
-		game->player->send(DoVillageTradePacket(villageID, resource, amount, false));
+		game->getPlayer()->send(DoVillageTradePacket(villageID, resource, amount, false));
 	}
 
 	void VillageTradeModule::Row::sell(const ClientGamePtr &game, ItemCount amount) {
-		game->player->send(DoVillageTradePacket(villageID, resource, amount, true));
+		game->getPlayer()->send(DoVillageTradePacket(villageID, resource, amount, true));
 	}
 }

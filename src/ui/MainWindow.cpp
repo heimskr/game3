@@ -147,7 +147,7 @@ namespace Game3 {
 			glArea.queue_render();
 
 			if (game) {
-				PlayerPtr player = game->player.copyBase();
+				PlayerPtr player = game->getPlayer();
 				if (autofocus && player)
 					player->focus(*canvas, true);
 				timeLabel.set_text(std::format("{}:{:02}", int(game->getHour()), int(game->getMinute())));
@@ -246,15 +246,21 @@ namespace Game3 {
 		glArea.add_controller(dragGesture);
 
 		glArea.add_controller(createClick([this] {
-			if (game && game->player) {
-				game->player->getInventory(0)->nextSlot();
+			if (!game)
+				return;
+
+			if (PlayerPtr player = game->getPlayer()) {
+				player->getInventory(0)->nextSlot();
 				inventoryTab->update(game);
 			}
 		}, 9, true));
 
 		glArea.add_controller(createClick([this] {
-			if (game && game->player) {
-				game->player->getInventory(0)->prevSlot();
+			if (!game)
+				return;
+
+			if (PlayerPtr player = game->getPlayer()) {
+				player->getInventory(0)->prevSlot();
 				inventoryTab->update(game);
 			}
 		}, 8, true));
@@ -356,15 +362,16 @@ namespace Game3 {
 		glArea.get_context()->make_current();
 		closeGame();
 		game = std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, canvas.get()));
-		game->client = std::make_shared<LocalClient>();
+		auto client = std::make_shared<LocalClient>();
+		game->setClient(client);
 		try {
-			game->client->connect(hostname.raw(), port);
+			client->connect(hostname.raw(), port);
 		} catch (const NetError &err) {
 			closeGame();
 			error(err.what());
 			return false;
 		}
-		game->client->weakGame = game;
+		client->weakGame = game;
 		game->initEntities();
 
 		// It's assumed that the caller already owns a unique lock on the settings.
@@ -372,9 +379,9 @@ namespace Game3 {
 		settings.port = port;
 
 		if (std::filesystem::exists("tokens.json"))
-			game->client->readTokens("tokens.json");
+			client->readTokens("tokens.json");
 		else
-			game->client->saveTokens("tokens.json");
+			client->saveTokens("tokens.json");
 
 		onGameLoaded();
 
@@ -403,7 +410,7 @@ namespace Game3 {
 			tab->reset(game);
 
 		game->signalPlayerInventoryUpdate().connect([this](const PlayerPtr &player) {
-			if (player != game->player)
+			if (player != game->getPlayer())
 				return;
 			inventoryTab->update(game);
 			craftingTab->update(game);
@@ -492,7 +499,7 @@ namespace Game3 {
 		CHECKGL
 
 		if (autofocus && game)
-			if (PlayerPtr player = game->player.copyBase())
+			if (PlayerPtr player = game->getPlayer())
 				player->focus(*canvas, true);
 		canvas->drawGL();
 		return true;
@@ -607,8 +614,11 @@ namespace Game3 {
 	void MainWindow::onBlur() {
 		keyTimes.clear();
 
-		if (game && game->player)
-			game->player->stopMoving();
+		if (!game)
+			return;
+
+		if (PlayerPtr player = game->getPlayer())
+			player->stopMoving();
 	}
 
 	void MainWindow::activateContext() {
@@ -684,20 +694,20 @@ namespace Game3 {
 	void MainWindow::onKeyReleased(guint keyval, guint, Gdk::ModifierType) {
 		keyTimes.erase(keyval);
 
-		if (game && game->player) {
-			auto &player = *game->player;
+		if (game && game->getPlayer()) {
+			ClientPlayerPtr player = game->getPlayer();
 			switch (keyval) {
-				case GDK_KEY_w: player.stopMoving(Direction::Up);    player.stopContinuousInteraction(); keyTimes.erase(GDK_KEY_W); break;
-				case GDK_KEY_d: player.stopMoving(Direction::Right); player.stopContinuousInteraction(); keyTimes.erase(GDK_KEY_D); break;
-				case GDK_KEY_s: player.stopMoving(Direction::Down);  player.stopContinuousInteraction(); keyTimes.erase(GDK_KEY_S); break;
-				case GDK_KEY_a: player.stopMoving(Direction::Left);  player.stopContinuousInteraction(); keyTimes.erase(GDK_KEY_A); break;
-				case GDK_KEY_W: player.stopMoving(Direction::Up);    player.stopContinuousInteraction(); keyTimes.erase(GDK_KEY_w); break;
-				case GDK_KEY_D: player.stopMoving(Direction::Right); player.stopContinuousInteraction(); keyTimes.erase(GDK_KEY_d); break;
-				case GDK_KEY_S: player.stopMoving(Direction::Down);  player.stopContinuousInteraction(); keyTimes.erase(GDK_KEY_s); break;
-				case GDK_KEY_A: player.stopMoving(Direction::Left);  player.stopContinuousInteraction(); keyTimes.erase(GDK_KEY_a); break;
+				case GDK_KEY_w: player->stopMoving(Direction::Up);    player->stopContinuousInteraction(); keyTimes.erase(GDK_KEY_W); break;
+				case GDK_KEY_d: player->stopMoving(Direction::Right); player->stopContinuousInteraction(); keyTimes.erase(GDK_KEY_D); break;
+				case GDK_KEY_s: player->stopMoving(Direction::Down);  player->stopContinuousInteraction(); keyTimes.erase(GDK_KEY_S); break;
+				case GDK_KEY_a: player->stopMoving(Direction::Left);  player->stopContinuousInteraction(); keyTimes.erase(GDK_KEY_A); break;
+				case GDK_KEY_W: player->stopMoving(Direction::Up);    player->stopContinuousInteraction(); keyTimes.erase(GDK_KEY_w); break;
+				case GDK_KEY_D: player->stopMoving(Direction::Right); player->stopContinuousInteraction(); keyTimes.erase(GDK_KEY_d); break;
+				case GDK_KEY_S: player->stopMoving(Direction::Down);  player->stopContinuousInteraction(); keyTimes.erase(GDK_KEY_s); break;
+				case GDK_KEY_A: player->stopMoving(Direction::Left);  player->stopContinuousInteraction(); keyTimes.erase(GDK_KEY_a); break;
 				case GDK_KEY_Shift_L:
 				case GDK_KEY_Shift_R:
-					player.continuousInteraction = false;
+					player->continuousInteraction = false;
 					break;
 				case GDK_KEY_E:
 					keyTimes.erase(GDK_KEY_e);
@@ -755,14 +765,14 @@ namespace Game3 {
 			}
 		}
 
-		if (game && game->player) {
-			auto &player = *game->player;
+		if (game && game->getPlayer()) {
+			ClientPlayerPtr player = game->getPlayer();
 
 			auto handle_movement = [&](guint kv, Direction direction) {
-				if (!player.isMoving())
-					player.setContinuousInteraction(keyval == kv, Modifiers(modifiers));
-				if (!player.isMoving(direction))
-					player.startMoving(direction);
+				if (!player->isMoving())
+					player->setContinuousInteraction(keyval == kv, Modifiers(modifiers));
+				if (!player->isMoving(direction))
+					player->startMoving(direction);
 			};
 
 			switch (keyval) {
@@ -784,8 +794,8 @@ namespace Game3 {
 					return;
 				case GDK_KEY_Shift_L:
 				case GDK_KEY_Shift_R:
-					if (player.isMoving())
-						player.send(ContinuousInteractionPacket(player.continuousInteractionModifiers));
+					if (player->isMoving())
+						player->send(ContinuousInteractionPacket(player->continuousInteractionModifiers));
 					return;
 				case GDK_KEY_E:
 					game->interactNextTo(Modifiers(modifiers) | Modifiers(true, false, false, false), Hand::Right);
@@ -802,7 +812,7 @@ namespace Game3 {
 					return;
 				case GDK_KEY_braceleft:
 				case GDK_KEY_braceright:
-					player.send(SetHeldItemPacket(keyval == GDK_KEY_braceleft, player.getActiveSlot()));
+					player->send(SetHeldItemPacket(keyval == GDK_KEY_braceleft, player->getActiveSlot()));
 					return;
 				case GDK_KEY_R:
 					game->interactOn(Modifiers(modifiers) | Modifiers(true, false, false, false));
@@ -811,7 +821,7 @@ namespace Game3 {
 					game->interactOn(Modifiers(modifiers));
 					return;
 				case GDK_KEY_space:
-					player.jump();
+					player->jump();
 					return;
 				case GDK_KEY_b: {
 					const auto rect = game->getVisibleRealmBounds();
@@ -819,14 +829,15 @@ namespace Game3 {
 					return;
 				}
 				case GDK_KEY_m: {
-					if (player.isMoving()) {
+					if (player->isMoving()) {
 						std::vector<const char *> moves;
-						if (player.movingUp) moves.push_back("up");
-						if (player.movingDown) moves.push_back("down");
-						if (player.movingLeft) moves.push_back("left");
-						if (player.movingRight) moves.push_back("right");
+						if (player->movingUp) moves.push_back("up");
+						if (player->movingDown) moves.push_back("down");
+						if (player->movingLeft) moves.push_back("left");
+						if (player->movingRight) moves.push_back("right");
+						if (moves.empty())
+							moves.push_back("nowhere");
 						std::stringstream ss;
-						ss << "Player is moving ";
 						bool first = true;
 						for (const char *move: moves) {
 							if (first)
@@ -835,27 +846,26 @@ namespace Game3 {
 								ss << ", ";
 							ss << move;
 						}
-						ss << ". Offset: " << player.offset.x << ", " << player.offset.y << ", " << player.offset.z;
-						INFO_(ss.str());
+						INFO("Player is moving {}. Offset: {}", ss.str(), player->offset);
 					} else {
-						INFO_("Player isn't moving. Offset: " << player.offset.x << ", " << player.offset.y << ", " << player.offset.z);
+						INFO("Player isn't moving. Offset: {}", player->offset);
 					}
 					return;
 				}
 				case GDK_KEY_u:
 					glArea.get_context()->make_current();
-					game->activeRealm.copyBase()->reupload();
+					game->getActiveRealm()->reupload();
 					return;
 				case GDK_KEY_f:
 					if (control)
 						autofocus = !autofocus;
 					else
-						game->player->focus(*canvas, false);
+						game->getPlayer()->focus(*canvas, false);
 					return;
 				case GDK_KEY_t:
 					if (Modifiers(modifiers).ctrl) {
-						RealmPtr realm = game->player->getRealm();
-						const auto &chunk = realm->tileProvider.getTileChunk(Layer::Terrain, game->player->getChunk());
+						RealmPtr realm = game->getPlayer()->getRealm();
+						const auto &chunk = realm->tileProvider.getTileChunk(Layer::Terrain, game->getPlayer()->getChunk());
 						auto lock = chunk.sharedLock();
 						for (size_t row = 0; row < CHUNK_SIZE; ++row) {
 							for (size_t column = 0; column < CHUNK_SIZE; ++column)
@@ -867,8 +877,8 @@ namespace Game3 {
 					}
 					return;
 				case GDK_KEY_T: {
-					auto realm = game->player->getRealm();
-					const Position where = game->player->getPosition() + game->player->direction.load();
+					auto realm = game->getPlayer()->getRealm();
+					const Position where = game->getPlayer()->getPosition() + game->getPlayer()->direction.load();
 					if (auto tile_entity = realm->tileEntityAt(where))
 						INFO("TileEntity: {} {}", tile_entity->tileEntityID, tile_entity->getGID());
 					else
@@ -879,20 +889,20 @@ namespace Game3 {
 					if (Modifiers(modifiers).ctrl) {
 						game->runCommand("pm");
 					} else {
-						const ClientPlayer &player = *game->player;
-						std::cout << std::format("Player GID: {}\n", player.getGID());
-						std::cout << std::format("Realm ID: {} or perhaps {}\n", player.getRealm()->getID(), game->activeRealm.copyBase()->getID());
-						std::cout << std::format("Position: {}\n", player.getPosition());
-						std::cout << std::format("Chunk position: {}\n", player.getPosition().getChunk());
-						std::cout << std::format("Update counter: {}\n", player.getRealm()->tileProvider.getUpdateCounter(player.getPosition().getChunk()));
+						ClientPlayerPtr player = game->getPlayer();
+						std::cout << std::format("Player GID: {}\n", player->getGID());
+						std::cout << std::format("Realm ID: {} or perhaps {}\n", player->getRealm()->getID(), game->getActiveRealm()->getID());
+						std::cout << std::format("Position: {}\n", player->getPosition());
+						std::cout << std::format("Chunk position: {}\n", player->getPosition().getChunk());
+						std::cout << std::format("Update counter: {}\n", player->getRealm()->tileProvider.getUpdateCounter(player->getPosition().getChunk()));
 						std::cout << std::format("Canvas scale: {}\n", canvas->scale);
-						std::cout << std::format("Outdoors: {}\n", player.getRealm()->outdoors);
+						std::cout << std::format("Outdoors: {}\n", player->getRealm()->outdoors);
 					}
 					return;
 				}
 				case GDK_KEY_l:
-					if (game->activeRealm)
-						game->activeRealm->queueStaticLightingTexture();
+					if (RealmPtr active_realm = game->getActiveRealm())
+						active_realm->queueStaticLightingTexture();
 					break;
 				case GDK_KEY_minus:
 					canvas->scale /= 1.08f;
@@ -903,23 +913,23 @@ namespace Game3 {
 					return;
 				case GDK_KEY_0: case GDK_KEY_1: case GDK_KEY_2: case GDK_KEY_3: case GDK_KEY_4:
 				case GDK_KEY_5: case GDK_KEY_6: case GDK_KEY_7: case GDK_KEY_8: case GDK_KEY_9:
-					if (game && game->player)
-						game->player->getInventory(0)->setActive(keyval == GDK_KEY_0? 9 : keyval - 0x31);
+					if (game && game->getPlayer())
+						game->getPlayer()->getInventory(0)->setActive(keyval == GDK_KEY_0? 9 : keyval - 0x31);
 					return;
 			}
 
 			switch (keyval) {
 				case GDK_KEY_Down:
-					game->player->face(Direction::Down);
+					game->getPlayer()->face(Direction::Down);
 					break;
 				case GDK_KEY_Up:
-					game->player->face(Direction::Up);
+					game->getPlayer()->face(Direction::Up);
 					break;
 				case GDK_KEY_Left:
-					game->player->face(Direction::Left);
+					game->getPlayer()->face(Direction::Left);
 					break;
 				case GDK_KEY_Right:
-					game->player->face(Direction::Right);
+					game->getPlayer()->face(Direction::Right);
 					break;
 				default:
 					break;
@@ -967,11 +977,12 @@ namespace Game3 {
 		if (!connect(settings.hostname, settings.port))
 			return;
 
-		const std::string &hostname = game->client->getHostname();
-		if (std::optional<Token> token = game->client->getToken(hostname, settings.username)) {
-			queueBool([this, token, hostname, username = settings.username] {
-				if (game && game->client && game->client->isReady()) {
-					game->client->send(LoginPacket(username, *token));
+		LocalClientPtr client = game->getClient();
+		const std::string &hostname = client->getHostname();
+		if (std::optional<Token> token = client->getToken(hostname, settings.username)) {
+			queueBool([this, client, token, hostname, username = settings.username] {
+				if (game && client && client->isReady()) {
+					client->send(LoginPacket(username, *token));
 					return true;
 				}
 

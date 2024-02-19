@@ -146,6 +146,6 @@ namespace Game3 {
 
 	void AutocrafterModule::setTarget(const std::string &target) {
 		if (autocrafter)
-			game->player->sendMessage(autocrafter, "SetTarget", target);
+			game->getPlayer()->sendMessage(autocrafter, "SetTarget", target);
 	}
 }

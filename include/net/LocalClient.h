@@ -76,4 +76,6 @@ namespace Game3 {
 
 			friend struct UsageCommand;
 	};
+
+	using LocalClientPtr = std::shared_ptr<LocalClient>;
 }

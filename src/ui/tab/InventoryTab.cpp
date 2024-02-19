@@ -31,23 +31,23 @@ namespace Game3 {
 		actionBox.set_margin_bottom(5);
 
 		auto use_function = [this](Slot slot) {
-			lastGame->player->send(UseItemPacket(slot, Modifiers{}));
+			lastGame->getPlayer()->send(UseItemPacket(slot, Modifiers{}));
 		};
 
 		auto hold_left_function = [this](Slot slot) {
-			lastGame->player->send(SetHeldItemPacket(true, slot));
+			lastGame->getPlayer()->send(SetHeldItemPacket(true, slot));
 		};
 
 		auto hold_right_function = [this](Slot slot) {
-			lastGame->player->send(SetHeldItemPacket(false, slot));
+			lastGame->getPlayer()->send(SetHeldItemPacket(false, slot));
 		};
 
 		auto drop_function = [this](Slot slot) {
-			lastGame->player->getInventory(0)->drop(slot);
+			lastGame->getPlayer()->getInventory(0)->drop(slot);
 		};
 
 		auto discard_function = [this](Slot slot) {
-			lastGame->player->getInventory(0)->discard(slot);
+			lastGame->getPlayer()->getInventory(0)->discard(slot);
 		};
 
 		initAction(holdLeftAction,  "pan-start-symbolic",  "Hold Left",  hold_left_function);
@@ -108,7 +108,7 @@ namespace Game3 {
 	}
 
 	void InventoryTab::update(const std::shared_ptr<ClientGame> &game) {
-		if (!game || !game->player)
+		if (!game || !game->getPlayer())
 			return;
 
 		lastGame = game;
@@ -133,7 +133,7 @@ namespace Game3 {
 			return;
 		}
 
-		if (!game->player)
+		if (!game->getPlayer())
 			return;
 
 		lastGame = game;
@@ -217,8 +217,7 @@ namespace Game3 {
 			auto game_lock = lastGame.sharedLock();
 			if (!lastGame)
 				return;
-			auto player_lock = lastGame->player.sharedLock();
-			player = lastGame->player;
+			player = lastGame->getPlayer();
 			if (player)
 				inventory = player->getInventory(0);
 		}
@@ -249,7 +248,7 @@ namespace Game3 {
 		if (modifiers.onlyShift()) {
 			shiftClick(lastGame, slot);
 		} else {
-			lastGame->player->getInventory(0)->setActive(slot, false);
+			lastGame->getPlayer()->getInventory(0)->setActive(slot, false);
 		}
 	}
 
@@ -257,7 +256,7 @@ namespace Game3 {
 		if (!game)
 			return;
 
-		InventoryPtr inventory = game->player->getInventory(0);
+		InventoryPtr inventory = game->getPlayer()->getInventory(0);
 		if (!inventory || !inventory->contains(slot))
 			return;
 
@@ -281,14 +280,14 @@ namespace Game3 {
 		if (!owner)
 			return;
 
-		game->player->send(MoveSlotsPacket(game->player->getGID(), owner->getGID(), slot, -1, 0, external_inventory->index));
+		game->getPlayer()->send(MoveSlotsPacket(game->getPlayer()->getGID(), owner->getGID(), slot, -1, 0, external_inventory->index));
 	}
 
 	void InventoryTab::updatePlayerClasses(const std::shared_ptr<ClientGame> &game) {
 		if (!inventoryModule)
 			return;
 
-		const Slot active_slot = game->player->getInventory(0)->activeSlot;
+		const Slot active_slot = game->getPlayer()->getInventory(0)->activeSlot;
 
 		inventoryModule->removeCSSClass("active-slot");
 		inventoryModule->addCSSClass("active-slot", active_slot);
@@ -303,7 +302,7 @@ namespace Game3 {
 	}
 
 	void InventoryTab::updateInventory(const ClientGamePtr &game) {
-		if (const InventoryPtr inventory = game->player->getInventory(0)) {
+		if (const InventoryPtr inventory = game->getPlayer()->getInventory(0)) {
 			auto client_inventory = std::static_pointer_cast<ClientInventory>(inventory);
 
 			if (!inventoryModule) {
@@ -333,7 +332,7 @@ namespace Game3 {
 
 			const auto &value = static_cast<const Glib::Value<DragSource> &>(base);
 			const DragSource source = value.get();
-			if (lastGame && lastGame->player && *source.inventory == *lastGame->player->getInventory(0))
+			if (lastGame && lastGame->getPlayer() && *source.inventory == *lastGame->getPlayer()->getInventory(0))
 				function(source.slot);
 			return true;
 		}, false);

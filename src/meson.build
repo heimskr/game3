@@ -24,6 +24,7 @@ game3_deps = [
 	dependency('nlohmann_json'),
 	dependency('glm'),
 	dependency('boost'),
+	dependency('alsa'),
 	dependency('FastNoise2', modules: ['FastNoise2::FastNoise']),
 	chemskr.get_variable('chemskr'),
 	namegen.get_variable('namegen'),
@@ -43,7 +44,7 @@ inc_dirs = [
 	include_directories('..' / 'include'),
 ]
 
-link_args = ['-lX11']
+link_args = ['-lX11', '-lsoloud']
 
 if get_option('vcpkg_triplet') != ''
 	vcpkg_root = 'vcpkg_installed' / get_option('vcpkg_triplet')

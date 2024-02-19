@@ -32,7 +32,7 @@ namespace Game3 {
 
 		entry.signal_activate().connect([this] {
 			if (reactor)
-				game->player->sendMessage(reactor, "SetEquation", entry.get_text().raw());
+				game->getPlayer()->sendMessage(reactor, "SetEquation", entry.get_text().raw());
 		});
 
 		entry.signal_changed().connect([this] {

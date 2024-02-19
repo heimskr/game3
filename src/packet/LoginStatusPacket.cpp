@@ -37,18 +37,17 @@ namespace Game3 {
 			window.settings.username = username;
 		}
 		window.saveSettings();
-		game.player = Entity::create<ClientPlayer>();
-		game.player->setGID(globalID);
+		auto player = Entity::create<ClientPlayer>();
+		game.setPlayer(player);
+		player->setGID(globalID);
 		INFO_("Setting player GID to " << globalID);
-		game.player->init(game);
-		game.player->decode(playerDataBuffer);
-		game.player->setupRealm(game);
-		game.activeRealm = game.player->getRealm();
-		{
-			auto lock = game.activeRealm.sharedLock();
-			game.activeRealm->add(game.player, game.player->getPosition());
-			game.activeRealm->addPlayer(game.player);
-		}
-		game.player->getInventory(0)->notifyOwner();
+		player->init(game);
+		player->decode(playerDataBuffer);
+		player->setupRealm(game);
+		RealmPtr realm = player->getRealm();
+		game.setActiveRealm(realm);
+		realm->add(player, player->getPosition());
+		realm->addPlayer(player);
+		player->getInventory(0)->notifyOwner();
 	}
 }

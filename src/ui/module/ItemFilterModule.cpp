@@ -58,13 +58,13 @@ namespace Game3 {
 		copyButton.signal_clicked().connect([this] {
 			INFO_("Clicked Copy");
 			if (filter) {
-				game->player->copyItemFilter(*filter);
+				game->getPlayer()->copyItemFilter(*filter);
 				pasteButton.set_sensitive(true);
 			}
 		});
 
 		pasteButton.signal_clicked().connect([this] {
-			if (auto pasted = game->player->pasteItemFilter()) {
+			if (auto pasted = game->getPlayer()->pasteItemFilter()) {
 				auto shared_filter = std::make_shared<ItemFilter>(*pasted);
 				filter = shared_filter;
 				modeSwitch.set_active(filter->isAllowMode());
@@ -75,7 +75,7 @@ namespace Game3 {
 			}
 		});
 
-		pasteButton.set_sensitive(game->player->pasteItemFilter().has_value());
+		pasteButton.set_sensitive(game->getPlayer()->pasteItemFilter().has_value());
 
 		setFilter();
 
@@ -177,7 +177,7 @@ namespace Game3 {
 		if (!game)
 			throw std::runtime_error("Game is missing in ItemFilterModule::upload");
 
-		game->player->send(SetItemFiltersPacket(pipe->getGID(), place.direction, *filter_to_use));
+		game->getPlayer()->send(SetItemFiltersPacket(pipe->getGID(), place.direction, *filter_to_use));
 	}
 
 	bool ItemFilterModule::setFilter() {

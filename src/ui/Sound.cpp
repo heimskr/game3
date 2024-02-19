@@ -31,25 +31,22 @@ namespace Game3 {
 		return false;
 	}
 
-	SoundProvider::SoundProvider() = default;
+	SoundProvider::SoundProvider() {
+		soloud.init();
+	}
+
+	SoundProvider::~SoundProvider() {
+		soloud.deinit();
+	}
 
 	void SoundProvider::play(const std::filesystem::path &path) {
 		auto lock = soundMap.uniqueLock();
-		std::vector<Sound> &sounds = soundMap[path];
+		auto [iter, inserted] = soundMap.try_emplace(path);
+		SoLoud::Wav &sound = iter->second;
 
-		if (Sound *sound = findNotPlaying(sounds)) {
-			sound->play();
-			return;
-		}
+		if (inserted)
+			sound.load(path.c_str());
 
-		sounds.emplace_back(path);
-		sounds.back().play();
-	}
-
-	Sound * SoundProvider::findNotPlaying(std::vector<Sound> &sounds) {
-		for (Sound &sound: sounds)
-			if (sound.isReady())
-				return &sound;
-		return nullptr;
+		soloud.play(sound);
 	}
 }

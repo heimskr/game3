@@ -37,6 +37,6 @@ namespace Game3 {
 		}
 
 		std::any data{std::move(messageData)};
-		game.player->handleMessage(source, messageName, data);
+		game.getPlayer()->handleMessage(source, messageName, data);
 	}
 }

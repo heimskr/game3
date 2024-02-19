@@ -22,7 +22,7 @@ namespace Game3 {
 		}
 
 		if (removeOnMove) {
-			game.player->queueForMove([&window, tab = window.inventoryTab](const auto &, bool) {
+			game.getPlayer()->queueForMove([&window, tab = window.inventoryTab](const auto &, bool) {
 				window.queue([tab] {
 					tab->removeModule();
 				});

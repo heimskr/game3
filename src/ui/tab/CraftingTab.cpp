@@ -49,7 +49,9 @@ namespace Game3 {
 			return;
 		}
 
-		if (!game->player)
+		ClientPlayerPtr player = game->getPlayer();
+
+		if (!player)
 			return;
 
 		lastGame = game;
@@ -58,7 +60,7 @@ namespace Game3 {
 		removeChildren(vbox);
 		widgets.clear();
 
-		const InventoryPtr inventory = game->player->getInventory(0);
+		const InventoryPtr inventory = player->getInventory(0);
 		if (!inventory)
 			return;
 
@@ -68,7 +70,7 @@ namespace Game3 {
 		auto registry_lock = recipe_registry.sharedLock();
 
 		for (const auto &recipe: recipe_registry.items) {
-			if (game->player->stationTypes.contains(recipe->stationType) && recipe->canCraft(inventory)) {
+			if (player->stationTypes.contains(recipe->stationType) && recipe->canCraft(inventory)) {
 				auto hbox = std::make_unique<Gtk::Box>(Gtk::Orientation::HORIZONTAL);
 				auto left_vbox = std::make_unique<Gtk::Box>(Gtk::Orientation::VERTICAL);
 				auto right_vbox = std::make_unique<Gtk::Box>(Gtk::Orientation::VERTICAL);
@@ -149,7 +151,7 @@ namespace Game3 {
 	}
 
 	void CraftingTab::craftOne(const std::shared_ptr<ClientGame> &game, size_t registry_id) {
-		game->player->send(CraftPacket(threadContext.rng(), registry_id, 1));
+		game->getPlayer()->send(CraftPacket(threadContext.rng(), registry_id, 1));
 	}
 
 	void CraftingTab::craftX(const std::shared_ptr<ClientGame> &game, size_t registry_id) {
@@ -157,13 +159,13 @@ namespace Game3 {
 		dialog->signal_submit().connect([this, weak_game = std::weak_ptr(game), registry_id](int count) {
 			if (count <= 0)
 				if (auto game = weak_game.lock())
-					game->player->send(CraftPacket(threadContext.rng(), registry_id, static_cast<uint64_t>(count)));
+					game->getPlayer()->send(CraftPacket(threadContext.rng(), registry_id, static_cast<uint64_t>(count)));
 		});
 		mainWindow.queueDialog(std::move(dialog));
 	}
 
 	void CraftingTab::craftAll(const std::shared_ptr<ClientGame> &game, size_t registry_id) {
-		game->player->send(CraftPacket(threadContext.rng(), registry_id, -1));
+		game->getPlayer()->send(CraftPacket(threadContext.rng(), registry_id, -1));
 	}
 
 	void CraftingTab::leftClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *, size_t registry_id, int n, double, double) {

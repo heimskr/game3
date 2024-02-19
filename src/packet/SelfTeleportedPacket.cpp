@@ -6,11 +6,13 @@
 
 namespace Game3 {
 	void SelfTeleportedPacket::handle(ClientGame &game) {
-		if (!game.player)
+		auto player = game.getPlayer();
+
+		if (!player)
 			throw PlayerMissingError("Can't teleport self: player missing");
 
 		RealmPtr realm = game.getRealm(realmID);
-		game.player->teleport(position, realm);
-		game.player->focus(game.canvas, true);
+		player->teleport(position, realm);
+		player->focus(game.canvas, true);
 	}
 }

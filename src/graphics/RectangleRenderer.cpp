@@ -59,7 +59,7 @@ namespace Game3 {
 		auto y = options.y;
 
 		const auto [center_x, center_y] = canvas.center;
-		RealmPtr realm = canvas.game->activeRealm.copyBase();
+		RealmPtr realm = canvas.game->getActiveRealm();
 		TileProvider &provider = realm->tileProvider;
 		TilesetPtr tileset     = provider.getTileset(*canvas.game);
 		const auto tile_size   = tileset->getTileSize();

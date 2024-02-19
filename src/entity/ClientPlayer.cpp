@@ -143,7 +143,7 @@ namespace Game3 {
 	void ClientPlayer::setMoney(MoneyCount new_value) {
 		Entity::setMoney(new_value);
 		auto shared = getShared();
-		if (getGame().toClient().player == shared) {
+		if (getGame().toClient().getPlayer() == shared) {
 			getRealm()->getGame().toClient().signalPlayerMoneyUpdate().emit(getShared());
 		}
 	}
@@ -161,7 +161,7 @@ namespace Game3 {
 	void ClientPlayer::sendMessage(const std::shared_ptr<Agent> &destination, const std::string &name, std::any &data) {
 		assert(destination);
 		if (auto *buffer = std::any_cast<Buffer>(&data))
-			getGame().toClient().client->send(AgentMessagePacket(destination->getGID(), name, *buffer));
+			getGame().toClient().getClient()->send(AgentMessagePacket(destination->getGID(), name, *buffer));
 		else
 			throw std::runtime_error("Expected data to be a Buffer in ClientPlayer::sendMessage");
 	}

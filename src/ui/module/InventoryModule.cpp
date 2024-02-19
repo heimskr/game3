@@ -195,7 +195,7 @@ namespace Game3 {
 			return;
 		}
 
-		InventoryPtr player_inventory = game->player->getInventory(0);
+		InventoryPtr player_inventory = game->getPlayer()->getInventory(0);
 		if (!player_inventory)
 			return;
 
@@ -203,6 +203,6 @@ namespace Game3 {
 		if (!owner)
 			return;
 
-		game->player->send(MoveSlotsPacket(owner->getGID(), game->player->getGID(), slot, -1, inventory->index, 0));
+		game->getPlayer()->send(MoveSlotsPacket(owner->getGID(), game->getPlayer()->getGID(), slot, -1, inventory->index, 0));
 	}
 }

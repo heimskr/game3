@@ -33,6 +33,8 @@ namespace Game3 {
 		static_assert(sizeof(BiomeType) * CHUNK_SIZE * CHUNK_SIZE < 65536);
 		static_assert(sizeof(FluidInt) * CHUNK_SIZE * CHUNK_SIZE < 65536);
 
+		// std::p
+
 		database->exec(R"(
 			CREATE TABLE IF NOT EXISTS chunks (
 				realmID INT,
