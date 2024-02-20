@@ -221,6 +221,7 @@ namespace Game3 {
 					active_realm->queuePlayerRemoval(getShared());
 					active_realm = new_realm;
 					active_realm->onFocus();
+					client_game.setActiveRealm(std::move(active_realm));
 					focus(game.toClient().canvas, true);
 					client_game.requestFromLimbo(new_realm->id);
 				}
