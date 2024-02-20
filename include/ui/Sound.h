@@ -3,8 +3,7 @@
 #include "threading/Lockable.h"
 
 #include <gtkmm.h>
-#include <soloud/soloud.h>
-#include <soloud/soloud_wav.h>
+#include <miniaudio/miniaudio.h>
 
 #include <chrono>
 #include <filesystem>
@@ -12,33 +11,15 @@
 #include <vector>
 
 namespace Game3 {
-	class Sound {
+	class SoundEngine {
 		public:
-			Sound(const std::filesystem::path &);
-
-			void play();
-			bool isReady();
-
-		private:
-			bool sought = true;
-			bool seekStarted = false;
-			Glib::RefPtr<Gtk::MediaFile> mediaFile;
-			std::chrono::system_clock::time_point lastPlayed;
-
-		friend class SoundProvider;
-	};
-
-	class SoundProvider {
-		public:
-			SoundProvider();
-			~SoundProvider();
+			SoundEngine();
+			~SoundEngine();
 
 			void play(const std::filesystem::path &);
 
 		private:
-			Lockable<std::map<std::filesystem::path, SoLoud::Wav>> soundMap;
-
-			// MAKE IT STOP
-			SoLoud::Soloud soloud;
+			ma_resource_manager resourceManager;
+			ma_engine engine;
 	};
 }

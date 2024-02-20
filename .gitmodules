@@ -10,3 +10,6 @@
 [submodule "subprojects/namegen"]
 	path = subprojects/namegen
 	url = https://github.com/heimskr/namegen.git
+[submodule "subprojects/miniaudio"]
+	path = subprojects/miniaudio
+	url = https://github.com/heimskr/miniaudio.git

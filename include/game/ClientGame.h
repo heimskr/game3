@@ -23,7 +23,7 @@ namespace Game3 {
 			Canvas &canvas;
 			bool stoppedByError = false;
 			std::function<void()> errorCallback;
-			SoundProvider sounds;
+			SoundEngine sounds;
 
 			ClientGame(Canvas &canvas_): Game(), canvas(canvas_) {}
 

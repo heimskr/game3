@@ -7,6 +7,7 @@ endif
 chemskr = subproject('chemskr')
 namegen = subproject('namegen')
 sqlitecpp = subproject('sqlitecpp', default_options: 'default_library=static')
+miniaudio = subproject('miniaudio')
 
 game3_deps = [
 	dependency('gtk4'),
@@ -24,10 +25,10 @@ game3_deps = [
 	dependency('nlohmann_json'),
 	dependency('glm'),
 	dependency('boost'),
-	dependency('alsa'),
 	dependency('FastNoise2', modules: ['FastNoise2::FastNoise']),
 	chemskr.get_variable('chemskr'),
 	namegen.get_variable('namegen'),
+	miniaudio.get_variable('miniaudio'),
 	sqlitecpp.get_variable('sqlitecpp_dep'),
 ]
 
@@ -44,7 +45,7 @@ inc_dirs = [
 	include_directories('..' / 'include'),
 ]
 
-link_args = ['-lX11', '-lsoloud']
+link_args = ['-lX11']
 
 if get_option('vcpkg_triplet') != ''
 	vcpkg_root = 'vcpkg_installed' / get_option('vcpkg_triplet')
