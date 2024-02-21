@@ -22,7 +22,9 @@ namespace Game3 {
 			bool ensureEntity(const std::shared_ptr<Entity> &);
 			std::shared_ptr<RemoteClient> getClient() const;
 
+			void tick(const TickArgs &) final;
 			void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
+			void movedToNewChunk(const std::optional<ChunkPosition> &) override;
 
 			void addMoney(MoneyCount) final;
 			bool removeMoney(MoneyCount) final;

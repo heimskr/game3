@@ -71,7 +71,6 @@ namespace Game3 {
 			void startMoving(Direction);
 			void stopMoving();
 			void stopMoving(Direction);
-			void movedToNewChunk(const std::optional<ChunkPosition> &) override;
 			bool send(const Packet &);
 			void addStationType(Identifier);
 			void removeStationType(const Identifier &);

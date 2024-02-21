@@ -13,12 +13,8 @@
 #include "net/Buffer.h"
 #include "net/LocalClient.h"
 #include "net/RemoteClient.h"
-#include "packet/ChunkRequestPacket.h"
-#include "packet/EntityRequestPacket.h"
-#include "packet/EntitySetPathPacket.h"
 #include "packet/RealmNoticePacket.h"
 #include "packet/SetPlayerStationTypesPacket.h"
-#include "packet/TileEntityRequestPacket.h"
 #include "realm/Realm.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
@@ -116,52 +112,6 @@ namespace Game3 {
 
 		if (timeSinceAttack < 1'000'000.f)
 			timeSinceAttack += delta;
-
-		if (getSide() == Side::Client) {
-			Direction final_direction = direction;
-
-			if (movingLeft && !movingRight)
-				final_direction = Direction::Left;
-
-			if (movingRight && !movingLeft)
-				final_direction = Direction::Right;
-
-			if (movingUp && !movingDown)
-				final_direction = Direction::Up;
-
-			if (movingDown && !movingUp)
-				final_direction = Direction::Down;
-
-			const MovementContext context{
-				.clearOffset = false,
-				.facingDirection = final_direction,
-			};
-
-			if (movingLeft && !movingRight)
-				move(Direction::Left, context);
-
-			if (movingRight && !movingLeft)
-				move(Direction::Right, context);
-
-			if (movingUp && !movingDown)
-				move(Direction::Up, context);
-
-			if (movingDown && !movingUp)
-				move(Direction::Down, context);
-
-			direction = final_direction;
-		} else {
-			if (continuousInteraction) {
-				Place place = getPlace();
-				if (!lastContinuousInteraction || *lastContinuousInteraction != place) {
-					interactOn(Modifiers());
-					getRealm()->interactGround(getShared(), position, continuousInteractionModifiers, nullptr, Hand::None);
-					lastContinuousInteraction = std::move(place);
-				}
-			} else {
-				lastContinuousInteraction.reset();
-			}
-		}
 	}
 
 	bool Player::interactOn(Modifiers modifiers, ItemStack *used_item, Hand hand) {
@@ -348,103 +298,6 @@ namespace Game3 {
 			default:
 				return;
 		}
-	}
-
-	void Player::movedToNewChunk(const std::optional<ChunkPosition> &old_position) {
-		if (getSide() == Side::Client) {
-			if (auto realm = weakRealm.lock()) {
-				std::set<ChunkPosition> chunk_requests;
-				std::vector<EntityRequest> entity_requests;
-				std::vector<TileEntityRequest> tile_entity_requests;
-
-				auto process_chunk = [&](ChunkPosition chunk_position) {
-					chunk_requests.insert(chunk_position);
-
-					if (auto entities = realm->getEntities(chunk_position)) {
-						auto lock = entities->sharedLock();
-						for (const auto &entity: *entities)
-							entity_requests.emplace_back(*entity);
-					}
-
-					if (auto tile_entities = realm->getTileEntities(chunk_position)) {
-						auto lock = tile_entities->sharedLock();
-						for (const auto &tile_entity: *tile_entities)
-							tile_entity_requests.emplace_back(*tile_entity);
-					}
-				};
-
-				if (old_position) {
-					const ChunkRange old_range(*old_position);
-					ChunkRange(getChunk()).iterate([&process_chunk, old_range](ChunkPosition chunk_position) {
-						if (!old_range.contains(chunk_position))
-							process_chunk(chunk_position);
-					});
-				} else {
-					ChunkRange(getChunk()).iterate(process_chunk);
-				}
-
-				if (!chunk_requests.empty())
-					send(ChunkRequestPacket(*realm, chunk_requests));
-
-				if (!entity_requests.empty())
-					send(EntityRequestPacket(realm->id, std::move(entity_requests)));
-
-				if (!tile_entity_requests.empty())
-					send(TileEntityRequestPacket(realm->id, std::move(tile_entity_requests)));
-			}
-
-			Entity::movedToNewChunk(old_position);
-		} else {
-			auto shared = getShared();
-
-			{
-				auto lock = visibleEntities.sharedLock();
-				for (const auto &weak_visible: visibleEntities) {
-					if (auto visible = weak_visible.lock()) {
-						if (!visible->path.empty() && visible->hasSeenPath(shared)) {
-							// INFO_("Late sending EntitySetPathPacket (Player)");
-							toServer()->ensureEntity(visible);
-							send(EntitySetPathPacket(*visible));
-							visible->setSeenPath(shared);
-						}
-
-						if (!canSee(*visible)) {
-							auto visible_lock = visible->visibleEntities.uniqueLock();
-							visible->visiblePlayers.erase(shared);
-							visible->visibleEntities.erase(shared);
-						}
-					}
-				}
-			}
-
-			if (auto realm = weakRealm.lock()) {
-				if (const auto client_ptr = toServer()->weakClient.lock()) {
-					const auto chunk = getChunk();
-					auto &client = *client_ptr;
-
-					if (auto tile_entities = realm->getTileEntities(chunk)) {
-						auto lock = tile_entities->sharedLock();
-						for (const auto &tile_entity: *tile_entities)
-							if (!tile_entity->hasBeenSentTo(shared))
-								tile_entity->sendTo(client);
-					}
-
-					if (auto entities = realm->getEntities(chunk)) {
-						auto lock = entities->sharedLock();
-						for (const auto &entity: *entities)
-							if (!entity->hasBeenSentTo(shared))
-								entity->sendTo(client);
-					}
-				}
-
-				Entity::movedToNewChunk(old_position);
-
-				realm->recalculateVisibleChunks();
-			} else {
-				Entity::movedToNewChunk(old_position);
-			}
-		}
-
 	}
 
 	bool Player::send(const Packet &packet) {

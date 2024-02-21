@@ -5,6 +5,7 @@
 #include "packet/AgentMessagePacket.h"
 #include "packet/EntityMoneyChangedPacket.h"
 #include "packet/EntityPacket.h"
+#include "packet/EntitySetPathPacket.h"
 #include "util/Cast.h"
 #include "util/Util.h"
 
@@ -91,12 +92,77 @@ namespace Game3 {
 		return locked;
 	}
 
+	void ServerPlayer::tick(const TickArgs &args) {
+		Player::tick(args);
+		if (continuousInteraction) {
+			Place place = getPlace();
+			if (!lastContinuousInteraction || *lastContinuousInteraction != place) {
+				interactOn(Modifiers());
+				getRealm()->interactGround(getShared(), position, continuousInteractionModifiers, nullptr, Hand::None);
+				lastContinuousInteraction = std::move(place);
+			}
+		} else {
+			lastContinuousInteraction.reset();
+		}
+	}
+
 	void ServerPlayer::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
 		assert(source);
 		if (auto *buffer = std::any_cast<Buffer>(&data))
 			send(AgentMessagePacket(source->getGID(), name, std::move(*buffer)));
 		else
 			throw std::runtime_error("Expected data to be a Buffer in ServerPlayer::handleMessage");
+	}
+
+	void ServerPlayer::movedToNewChunk(const std::optional<ChunkPosition> &old_position) {
+		auto shared = getShared();
+
+		{
+			auto lock = visibleEntities.sharedLock();
+			for (const auto &weak_visible: visibleEntities) {
+				if (auto visible = weak_visible.lock()) {
+					if (!visible->path.empty() && visible->hasSeenPath(shared)) {
+						// INFO_("Late sending EntitySetPathPacket (Player)");
+						toServer()->ensureEntity(visible);
+						send(EntitySetPathPacket(*visible));
+						visible->setSeenPath(shared);
+					}
+
+					if (!canSee(*visible)) {
+						auto visible_lock = visible->visibleEntities.uniqueLock();
+						visible->visiblePlayers.erase(shared);
+						visible->visibleEntities.erase(shared);
+					}
+				}
+			}
+		}
+
+		if (auto realm = weakRealm.lock()) {
+			if (const auto client_ptr = toServer()->weakClient.lock()) {
+				const auto chunk = getChunk();
+				auto &client = *client_ptr;
+
+				if (auto tile_entities = realm->getTileEntities(chunk)) {
+					auto lock = tile_entities->sharedLock();
+					for (const auto &tile_entity: *tile_entities)
+						if (!tile_entity->hasBeenSentTo(shared))
+							tile_entity->sendTo(client);
+				}
+
+				if (auto entities = realm->getEntities(chunk)) {
+					auto lock = entities->sharedLock();
+					for (const auto &entity: *entities)
+						if (!entity->hasBeenSentTo(shared))
+							entity->sendTo(client);
+				}
+			}
+
+			Entity::movedToNewChunk(old_position);
+
+			realm->recalculateVisibleChunks();
+		} else {
+			Entity::movedToNewChunk(old_position);
+		}
 	}
 
 	void ServerPlayer::addMoney(MoneyCount to_add) {

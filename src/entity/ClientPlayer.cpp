@@ -6,9 +6,12 @@
 #include "graphics/TextRenderer.h"
 #include "net/LocalClient.h"
 #include "packet/AgentMessagePacket.h"
+#include "packet/ChunkRequestPacket.h"
 #include "packet/ContinuousInteractionPacket.h"
+#include "packet/EntityRequestPacket.h"
 #include "packet/JumpPacket.h"
 #include "packet/MovePlayerPacket.h"
+#include "packet/TileEntityRequestPacket.h"
 #include "threading/ThreadContext.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
@@ -30,6 +33,39 @@ namespace Game3 {
 	void ClientPlayer::tick(const TickArgs &args) {
 		++lastMessageAge;
 		Player::tick(args);
+
+		Direction final_direction = direction;
+
+		if (movingLeft && !movingRight)
+			final_direction = Direction::Left;
+
+		if (movingRight && !movingLeft)
+			final_direction = Direction::Right;
+
+		if (movingUp && !movingDown)
+			final_direction = Direction::Up;
+
+		if (movingDown && !movingUp)
+			final_direction = Direction::Down;
+
+		const MovementContext context{
+			.clearOffset = false,
+			.facingDirection = final_direction,
+		};
+
+		if (movingLeft && !movingRight)
+			move(Direction::Left, context);
+
+		if (movingRight && !movingLeft)
+			move(Direction::Right, context);
+
+		if (movingUp && !movingDown)
+			move(Direction::Up, context);
+
+		if (movingDown && !movingUp)
+			move(Direction::Down, context);
+
+		direction = final_direction;
 	}
 
 	void ClientPlayer::render(const RendererContext &renderers) {
@@ -146,6 +182,51 @@ namespace Game3 {
 		if (getGame().toClient().getPlayer() == shared) {
 			getRealm()->getGame().toClient().signalPlayerMoneyUpdate().emit(getShared());
 		}
+	}
+
+	void ClientPlayer::movedToNewChunk(const std::optional<ChunkPosition> &old_position) {
+		if (auto realm = weakRealm.lock()) {
+			std::set<ChunkPosition> chunk_requests;
+			std::vector<EntityRequest> entity_requests;
+			std::vector<TileEntityRequest> tile_entity_requests;
+
+			auto process_chunk = [&](ChunkPosition chunk_position) {
+				chunk_requests.insert(chunk_position);
+
+				if (auto entities = realm->getEntities(chunk_position)) {
+					auto lock = entities->sharedLock();
+					for (const auto &entity: *entities)
+						entity_requests.emplace_back(*entity);
+				}
+
+				if (auto tile_entities = realm->getTileEntities(chunk_position)) {
+					auto lock = tile_entities->sharedLock();
+					for (const auto &tile_entity: *tile_entities)
+						tile_entity_requests.emplace_back(*tile_entity);
+				}
+			};
+
+			if (old_position) {
+				const ChunkRange old_range(*old_position);
+				ChunkRange(getChunk()).iterate([&process_chunk, old_range](ChunkPosition chunk_position) {
+					if (!old_range.contains(chunk_position))
+						process_chunk(chunk_position);
+				});
+			} else {
+				ChunkRange(getChunk()).iterate(process_chunk);
+			}
+
+			if (!chunk_requests.empty())
+				send(ChunkRequestPacket(*realm, chunk_requests));
+
+			if (!entity_requests.empty())
+				send(EntityRequestPacket(realm->id, std::move(entity_requests)));
+
+			if (!tile_entity_requests.empty())
+				send(TileEntityRequestPacket(realm->id, std::move(tile_entity_requests)));
+		}
+
+		Entity::movedToNewChunk(old_position);
 	}
 
 	void ClientPlayer::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
