@@ -34,38 +34,40 @@ namespace Game3 {
 		++lastMessageAge;
 		Player::tick(args);
 
-		Direction final_direction = direction;
+		if (!getRidden()) {
+			Direction final_direction = direction;
 
-		if (movingLeft && !movingRight)
-			final_direction = Direction::Left;
+			if (movingLeft && !movingRight)
+				final_direction = Direction::Left;
 
-		if (movingRight && !movingLeft)
-			final_direction = Direction::Right;
+			if (movingRight && !movingLeft)
+				final_direction = Direction::Right;
 
-		if (movingUp && !movingDown)
-			final_direction = Direction::Up;
+			if (movingUp && !movingDown)
+				final_direction = Direction::Up;
 
-		if (movingDown && !movingUp)
-			final_direction = Direction::Down;
+			if (movingDown && !movingUp)
+				final_direction = Direction::Down;
 
-		const MovementContext context{
-			.clearOffset = false,
-			.facingDirection = final_direction,
-		};
+			const MovementContext context{
+				.clearOffset = false,
+				.facingDirection = final_direction,
+			};
 
-		if (movingLeft && !movingRight)
-			move(Direction::Left, context);
+			if (movingLeft && !movingRight)
+				move(Direction::Left, context);
 
-		if (movingRight && !movingLeft)
-			move(Direction::Right, context);
+			if (movingRight && !movingLeft)
+				move(Direction::Right, context);
 
-		if (movingUp && !movingDown)
-			move(Direction::Up, context);
+			if (movingUp && !movingDown)
+				move(Direction::Up, context);
 
-		if (movingDown && !movingUp)
-			move(Direction::Down, context);
+			if (movingDown && !movingUp)
+				move(Direction::Down, context);
 
-		direction = final_direction;
+			direction = final_direction;
+		}
 	}
 
 	void ClientPlayer::render(const RendererContext &renderers) {

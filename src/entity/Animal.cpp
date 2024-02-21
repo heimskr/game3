@@ -15,12 +15,32 @@ namespace Game3 {
 		constexpr size_t    PATHFIND_MAX = 256;
 	}
 
+	std::uniform_real_distribution<float> Animal::getWanderDistribution() {
+		// return std::uniform_real_distribution(10.f, 20.f);
+		return std::uniform_real_distribution(5.f, 5.f);
+	}
+
 	Animal::Animal():
 		Entity("base:invalid/Animal") {}
 
+	void Animal::updateRiderOffset(const std::shared_ptr<Entity> &rider) {
+		rider->setOffset(getOffset() + Vector3{0.f, 0.f, .3f});
+	}
+
+	bool Animal::onInteractOn(const std::shared_ptr<Player> &player, Modifiers, ItemStack *, Hand) {
+		if (getRider() == player) {
+			setRider(nullptr);
+			return true;
+		}
+
+		return false;
+	}
+
 	bool Animal::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, ItemStack *used_item, Hand) {
-		if (!used_item || used_item->item->identifier != "base:item/wrench")
-			return false;
+		if (!used_item || used_item->item->identifier != "base:item/wrench") {
+			setRider(player);
+			return true;
+		}
 
 		INFO_(typeid(*this).name() << ' ' << getGID() << ':');
 		INFO_("  Path length is " << path.size());

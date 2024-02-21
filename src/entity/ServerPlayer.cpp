@@ -94,6 +94,7 @@ namespace Game3 {
 
 	void ServerPlayer::tick(const TickArgs &args) {
 		Player::tick(args);
+
 		if (continuousInteraction) {
 			Place place = getPlace();
 			if (!lastContinuousInteraction || *lastContinuousInteraction != place) {

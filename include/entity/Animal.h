@@ -13,12 +13,12 @@ namespace Game3 {
 
 	class Animal: public LivingEntity {
 		public:
-			static inline auto getWanderDistribution() {
-				return std::uniform_real_distribution(10.f, 20.f);
-			}
+			static std::uniform_real_distribution<float> getWanderDistribution();
 
 			Index wanderRadius = 8;
 
+			void updateRiderOffset(const std::shared_ptr<Entity> &rider) override;
+			bool onInteractOn(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 			void init(Game &) override;
 			void tick(const TickArgs &) override;

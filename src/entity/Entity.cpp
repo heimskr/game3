@@ -167,7 +167,7 @@ namespace Game3 {
 
 		const auto delta = args.delta;
 
-		{
+		if (!getRidden()) {
 			auto offset_lock = offset.uniqueLock();
 
 			auto &x = offset.x;
@@ -198,12 +198,52 @@ namespace Game3 {
 		// Not all platforms support std::atomic<float>::operator+=.
 		age = age + delta;
 
+		if (EntityPtr rider = getRider())
+			updateRider(rider);
+
 		tryEnqueueTick();
 	}
 
 	void Entity::remove() {
 		clearQueues();
 		getRealm()->queueDestruction(getSelf());
+	}
+
+	void Entity::updateRider(const EntityPtr &rider) {
+		updateRiderOffset(rider);
+
+		if (getSide() == Side::Server) {
+			updateRiderPosition(rider);
+		}
+	}
+
+	void Entity::updateRiderPosition(const EntityPtr &rider) {
+		const Position position = getPosition();
+		const RealmPtr realm = getRealm();
+
+		if (rider->getPosition() != position || rider->getRealm() != realm) {
+			rider->teleport(position, realm, MovementContext{
+				.clearOffset = false,
+				.forcedOffset = getOffset(),
+			});
+		}
+	}
+
+	void Entity::updateRiderOffset(const EntityPtr &rider) {
+		rider->setOffset(offset.copyBase());
+	}
+
+	void Entity::setRider(const EntityPtr &rider) {
+		if (EntityPtr current_rider = getRider()) {
+			current_rider->setRidden(nullptr);
+		}
+
+		weakRider = rider;
+		rider->setRidden(getSelf());
+	}
+
+	void Entity::setRidden(const EntityPtr &ridden) {
+		weakRidden = ridden;
 	}
 
 	void Entity::init(Game &game_) {
@@ -1186,6 +1226,14 @@ namespace Game3 {
 		constexpr static float EPSILON = 0.001f;
 		auto lock = offset.sharedLock();
 		return offset.x < EPSILON && offset.y < EPSILON && offset.z < EPSILON;
+	}
+
+	Vector3 Entity::getOffset() const {
+		return offset.copyBase();
+	}
+
+	void Entity::setOffset(const Vector3 &new_offset) {
+		offset = new_offset;
 	}
 
 	void Entity::changeTexture(const Identifier &identifier) {

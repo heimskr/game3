@@ -82,6 +82,8 @@ namespace Game3 {
 			Identifier customTexture;
 			Lockable<std::optional<Position>> pathfindGoal;
 			Atomic<float> age;
+			Atomic<std::weak_ptr<Entity>> weakRider;
+			Atomic<std::weak_ptr<Entity>> weakRidden;
 
 			virtual void destroy();
 
@@ -114,8 +116,16 @@ namespace Game3 {
 			virtual bool isSpawnableMonster() const { return false; }
 			/** Removes the entity from existence. */
 			virtual void remove();
-			inline const Position::IntType & getRow()    const { return position.row;    }
-			inline const Position::IntType & getColumn() const { return position.column; }
+			/** Updates the offset and position (if on the server) or just the offset (if on the client) of the entity's rider. */
+			void updateRider(const std::shared_ptr<Entity> &rider);
+			/** Updates the position of the entity's rider. Entity subclasses can override this to adjust the position differently, but this is rarely necessary. */
+			virtual void updateRiderPosition(const std::shared_ptr<Entity> &rider);
+			/** Updates the offset of the entity's rider. Entity subclasses can override this to adjust the offset differently. */
+			virtual void updateRiderOffset(const std::shared_ptr<Entity> &rider);
+			virtual void setRider(const std::shared_ptr<Entity> &);
+			virtual void setRidden(const std::shared_ptr<Entity> &);
+			inline std::shared_ptr<Entity> getRider()  const { return weakRider.load().lock();  }
+			inline std::shared_ptr<Entity> getRidden() const { return weakRidden.load().lock(); }
 			inline Position::IntType getRow()    { auto lock = position.sharedLock(); return position.row;    }
 			inline Position::IntType getColumn() { auto lock = position.sharedLock(); return position.column; }
 			virtual void initAfterLoad(Game &) {}
@@ -179,6 +189,8 @@ namespace Game3 {
 			Slot getHeldSlot(Hand) const;
 			Slot getActiveSlot() const;
 			bool isOffsetZero() const;
+			virtual Vector3 getOffset() const;
+			virtual void setOffset(const Vector3 &);
 
 			virtual void encode(Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */
