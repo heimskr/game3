@@ -8,7 +8,6 @@ namespace Game3 {
 	}
 
 	SoundEngine::~SoundEngine() {
-		ma_resource_manager_uninit(&resourceManager);
 		ma_engine_uninit(&engine);
 	}
 
