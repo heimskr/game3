@@ -64,7 +64,7 @@ namespace Game3 {
 			Gtk::Image discardAction;
 
 			/** We can't store state in a popover, so we have to store it here. */
-			LockableSharedPtr<ClientGame> lastGame;
+			Atomic<std::shared_ptr<ClientGame>> lastGame;
 			Slot lastSlot = -1;
 
 			int lastWidth = -1;
