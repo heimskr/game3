@@ -17,6 +17,7 @@
 #include "net/Buffer.h"
 #include "net/RemoteClient.h"
 #include "packet/EntityPacket.h"
+#include "packet/EntityRiddenPacket.h"
 #include "packet/EntitySetPathPacket.h"
 #include "packet/HeldItemSetPacket.h"
 #include "realm/Realm.h"
@@ -239,8 +240,14 @@ namespace Game3 {
 		}
 
 		weakRider = rider;
-		if (rider)
+
+		if (rider) {
 			rider->setRidden(getSelf());
+		}
+
+		if (getSide() == Side::Server) {
+			getGame().toServer().broadcast(EntityRiddenPacket(rider, *this));
+		}
 	}
 
 	void Entity::setRidden(const EntityPtr &ridden) {
@@ -533,7 +540,7 @@ namespace Game3 {
 		return move(direction, MovementContext{.clearOffset = false});
 	}
 
-	bool Entity::moveFromRider(Direction direction, MovementContext context) {
+	bool Entity::moveFromRider(Direction, MovementContext) {
 		return false;
 	}
 

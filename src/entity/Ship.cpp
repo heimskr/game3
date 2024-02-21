@@ -9,7 +9,7 @@ namespace Game3 {
 		Entity(ID()) {}
 
 	void Ship::updateRiderOffset(const std::shared_ptr<Entity> &rider) {
-		rider->setOffset(getOffset() + Vector3{8.f, -8.f, 0.f});
+		rider->setOffset(getOffset() + Vector3{.5f, .5f, 0.f});
 	}
 
 	bool Ship::onInteractOn(const std::shared_ptr<Player> &player, Modifiers, ItemStack *, Hand) {

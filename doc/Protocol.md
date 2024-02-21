@@ -417,6 +417,11 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u64` Global ID
 	- `u64` Money count
 
+61. **Entity Ridden**: tells a client that one entity has started riding another.
+
+	- `optional<u64>` Riding entity's global ID
+	- `u64` Ridden entity's global ID
+
 # Message Format
 
 All values are little endian. Strings are not null-terminated.
