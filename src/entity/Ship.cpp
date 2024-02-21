@@ -12,6 +12,11 @@ namespace Game3 {
 		rider->setOffset(getOffset() + Vector3{.5f, .5f, 0.f});
 	}
 
+	bool Ship::moveFromRider(Direction move_direction, MovementContext context) {
+		INFO("Ship::moveFromRider({})", move_direction);
+		return move(move_direction, context);
+	}
+
 	bool Ship::onInteractOn(const std::shared_ptr<Player> &player, Modifiers, ItemStack *, Hand) {
 		if (getRider() == player) {
 			setRider(nullptr);

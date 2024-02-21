@@ -11,8 +11,11 @@ namespace Game3 {
 				return Entity::create<Ship>();
 			}
 
+			std::string getName() const override { return "Ship"; }
+
 			void updateRiderOffset(const std::shared_ptr<Entity> &rider) override;
 			RideType getRideType() const override { return RideType::Hidden; }
+			bool moveFromRider(Direction, MovementContext) override;
 			bool onInteractOn(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 			void render(const RendererContext &) override;

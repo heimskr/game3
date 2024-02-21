@@ -462,6 +462,10 @@ namespace Game3 {
 	void Entity::renderLighting(const RendererContext &) {}
 
 	bool Entity::move(Direction move_direction, MovementContext context) {
+		if (EntityPtr ridden = getRidden()) {
+			return ridden->moveFromRider(move_direction, context);
+		}
+
 		auto self_lock = uniqueLock();
 
 		RealmPtr realm = weakRealm.lock();
@@ -501,6 +505,7 @@ namespace Game3 {
 			context.facingDirection = move_direction;
 
 		if (context.forcedPosition) {
+			if (getName() == "Ship") INFO("Forcing position from {} to {}.", new_position, *context.forcedPosition);
 			new_position = *context.forcedPosition;
 		} else if ((horizontal && offset.x != 0) || (!horizontal && offset.y != 0)) {
 			// WARN_("Can't move entity " << globalID << ": improper offsets [" << (horizontal? "horizontal" : "vertical") << " : (" << offset.x << ", " << offset.y << ")]");
@@ -508,6 +513,7 @@ namespace Game3 {
 		}
 
 		const bool can_move = canMoveTo(new_position);
+
 		const bool direction_changed = *context.facingDirection != direction;
 
 		if (can_move || direction_changed) {
@@ -527,8 +533,10 @@ namespace Game3 {
 				auto lock = path.sharedLock();
 				context.fromPath = !path.empty();
 			}
-			teleport(can_move? new_position : position, context);
 
+			if (getName() == "Ship") INFO("Old: {}, New: {}, can move: {}", position, new_position, can_move);
+
+			teleport(can_move? new_position : position, context);
 			return true;
 		}
 
@@ -633,6 +641,7 @@ namespace Game3 {
 		if (2 < position.taxiDistance(new_position))
 			context.isTeleport = true;
 
+		if (getName() == "Ship") INFO("{} → {}", position, new_position);
 		position = new_position;
 
 		if (context.forcedOffset)

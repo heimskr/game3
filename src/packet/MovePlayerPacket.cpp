@@ -15,7 +15,12 @@ namespace Game3 {
 	void MovePlayerPacket::handle(ServerGame &, RemoteClient &client) {
 		if (auto player = client.getPlayer()) {
 			player->path.clear();
-			player->move(movementDirection, {.excludePlayerSelf = true, .clearOffset = false, .facingDirection = facingDirection, .forcedPosition = position, .forcedOffset = offset});
+
+			std::optional<Position> forced_position;
+			if (!player->getRidden())
+				forced_position = position;
+
+			player->move(movementDirection, {.excludePlayerSelf = true, .clearOffset = false, .facingDirection = facingDirection, .forcedPosition = forced_position, .forcedOffset = offset});
 			return;
 		}
 
