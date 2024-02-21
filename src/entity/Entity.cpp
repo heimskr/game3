@@ -788,12 +788,17 @@ namespace Game3 {
 	}
 
 	bool Entity::isVisible() const {
+		if (EntityPtr ridden = getRidden(); ridden && ridden->getRideType() == RideType::Hidden)
+			return false;
+
 		const auto pos = getPosition();
 		auto realm = getRealm();
+
 		if (getSide() == Side::Client) {
 			ClientGame &client_game = realm->getGame().toClient();
 			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.getPlayer()->getChunk()).contains(pos.getChunk());
 		}
+
 		return realm->isVisible(pos);
 	}
 

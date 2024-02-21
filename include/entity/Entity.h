@@ -47,6 +47,10 @@ namespace Game3 {
 	class TileEntity;
 	struct RendererContext;
 
+	enum class RideType {
+		Visible, Hidden
+	};
+
 	struct EntityTexture: NamedRegisterable {
 		Identifier textureID;
 		uint8_t variety;
@@ -125,6 +129,7 @@ namespace Game3 {
 			virtual void setRidden(const std::shared_ptr<Entity> &);
 			inline std::shared_ptr<Entity> getRider()  const { return weakRider.load().lock();  }
 			inline std::shared_ptr<Entity> getRidden() const { return weakRidden.load().lock(); }
+			virtual RideType getRideType() const { return RideType::Visible; }
 			inline Position::IntType getRow()    { auto lock = position.sharedLock(); return position.row;    }
 			inline Position::IntType getColumn() { auto lock = position.sharedLock(); return position.column; }
 			virtual void initAfterLoad(Game &) {}
