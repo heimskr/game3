@@ -212,10 +212,7 @@ namespace Game3 {
 
 	void Entity::updateRider(const EntityPtr &rider) {
 		updateRiderOffset(rider);
-
-		if (getSide() == Side::Server) {
-			updateRiderPosition(rider);
-		}
+		updateRiderPosition(rider);
 	}
 
 	void Entity::updateRiderPosition(const EntityPtr &rider) {
@@ -223,9 +220,11 @@ namespace Game3 {
 		const RealmPtr realm = getRealm();
 
 		if (rider->getPosition() != position || rider->getRealm() != realm) {
+			// const Position difference = position - rider->getPosition();
 			rider->teleport(position, realm, MovementContext{
 				.clearOffset = false,
 				.forcedOffset = getOffset(),
+				.suppressPackets = true,
 			});
 		}
 	}
@@ -662,7 +661,7 @@ namespace Game3 {
 			});
 		}
 
-		if (is_server && !context.fromPath)
+		if (is_server && !context.fromPath && !context.suppressPackets)
 			getGame().toServer().entityTeleported(*this, context);
 
 		return in_different_chunk;
@@ -676,7 +675,7 @@ namespace Game3 {
 			nextRealm = new_realm->id;
 			auto shared = getSelf();
 
-			if (getSide() == Side::Server && old_realm != new_realm)
+			if (getSide() == Side::Server && old_realm != new_realm && !context.suppressPackets)
 				getGame().toServer().entityChangingRealms(*this, new_realm, new_position);
 
 			if (old_realm && old_realm != new_realm) {

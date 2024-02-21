@@ -14,5 +14,6 @@ namespace Game3 {
 		std::optional<Position> forcedPosition{};
 		std::optional<Vector3> forcedOffset{};
 		bool isTeleport = false;
+		bool suppressPackets = false;
 	};
 }

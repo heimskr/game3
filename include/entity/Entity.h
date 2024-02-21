@@ -115,7 +115,7 @@ namespace Game3 {
 			virtual bool isSpawnableMonster() const { return false; }
 			/** Removes the entity from existence. */
 			virtual void remove();
-			/** Updates the offset and position (if on the server) or just the offset (if on the client) of the entity's rider. */
+			/** Updates the offset and position of the entity's rider. */
 			void updateRider(const std::shared_ptr<Entity> &rider);
 			/** Updates the position of the entity's rider. Entity subclasses can override this to adjust the position differently, but this is rarely necessary. */
 			virtual void updateRiderPosition(const std::shared_ptr<Entity> &rider);
