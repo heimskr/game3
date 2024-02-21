@@ -31,7 +31,9 @@ namespace Game3 {
 	}
 
 	void ClientPlayer::tick(const TickArgs &args) {
-		++lastMessageAge;
+		if (lastMessageAge < std::numeric_limits<decltype(lastMessageAge)>::max())
+			++lastMessageAge;
+
 		Player::tick(args);
 
 		if (!getRidden()) {

@@ -239,7 +239,8 @@ namespace Game3 {
 		}
 
 		weakRider = rider;
-		rider->setRidden(getSelf());
+		if (rider)
+			rider->setRidden(getSelf());
 	}
 
 	void Entity::setRidden(const EntityPtr &ridden) {
@@ -340,15 +341,17 @@ namespace Game3 {
 	}
 
 	void Entity::render(const RendererContext &renderers) {
-		SpriteRenderer &sprite_renderer = renderers.batchSprite;
 		if (texture == nullptr || !isVisible())
 			return;
 
+		SpriteRenderer &sprite_renderer = renderers.batchSprite;
 		const auto [offset_x, offset_y, offset_z] = offset.copyBase();
 
 		float texture_x_offset = 0.f;
 		float texture_y_offset = 0.f;
+		// Animate if the offset is nonzero.
 		if (offset_x != 0.f || offset_y != 0.f) {
+			// Choose an animation frame based on the time.
 			switch (variety) {
 				case 3:
 					texture_x_offset = 8.f * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - getRealm()->getGame().startTime).count() / 200) % 4);
@@ -530,6 +533,14 @@ namespace Game3 {
 		return move(direction, MovementContext{.clearOffset = false});
 	}
 
+	bool Entity::moveFromRider(Direction direction, MovementContext context) {
+		return false;
+	}
+
+	bool Entity::moveFromRider(Direction direction) {
+		return moveFromRider(direction, MovementContext{});
+	}
+
 	std::shared_ptr<Realm> Entity::getRealm() const {
 		auto out = weakRealm.lock();
 		if (!out)
@@ -561,15 +572,29 @@ namespace Game3 {
 
 		const Tileset &tileset = realm->getTileset();
 
-		for (const Layer layer: {Layer::Submerged, Layer::Objects, Layer::Highest})
-			if (std::optional<TileID> tile = realm->tryTile(layer, new_position); !tile || tileset.isSolid(*tile))
-				return false;
+		bool out = true;
 
-		if (TileEntityPtr tile_entity = realm->tileEntityAt(new_position))
-			if (tile_entity->solid)
-				return false;
+		iterateTiles([&, position_offset = new_position - getPosition()](const Position &occupied) {
+			const Position candidate = occupied + position_offset;
 
-		return true;
+			for (const Layer layer: {Layer::Submerged, Layer::Objects, Layer::Highest}) {
+				if (std::optional<TileID> tile = realm->tryTile(layer, candidate); !tile || tileset.isSolid(*tile)) {
+					out = false;
+					return true;
+				}
+			}
+
+			if (TileEntityPtr tile_entity = realm->tileEntityAt(candidate)) {
+				if (tile_entity->solid) {
+					out = false;
+					return true;
+				}
+			}
+
+			return false;
+		});
+
+		return out;
 	}
 
 	void Entity::focus(Canvas &canvas, bool is_autofocus) {

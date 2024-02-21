@@ -136,8 +136,7 @@ namespace Game3 {
 			std::vector<EntityPtr> findEntitiesSquare(const Position &, uint64_t radius, const std::function<bool(const EntityPtr &)> &filter) const;
 			bool hasEntitiesSquare(const Position &, uint64_t radius, const std::function<bool(const EntityPtr &)> &predicate) const;
 			std::vector<EntityPtr> findEntities(const Position &, const EntityPtr &except);
-			EntityPtr findEntity(const Position &);
-			EntityPtr findEntity(const Position &, const EntityPtr &except);
+			EntityPtr findEntity(const Position &, const EntityPtr &except = {}, bool single_chunk = false);
 			TileEntityPtr tileEntityAt(Position);
 			void remove(const EntityPtr &);
 			void removeSafe(const EntityPtr &);

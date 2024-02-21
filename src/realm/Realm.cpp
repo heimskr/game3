@@ -678,7 +678,7 @@ namespace Game3 {
 		auto lock = entity_set->sharedLock();
 
 		for (const EntityPtr &entity: *entity_set)
-			if (entity->position.copyBase() == position)
+			if (entity->occupies(position))
 				out.push_back(entity);
 
 		return out;
@@ -761,24 +761,33 @@ namespace Game3 {
 	std::vector<EntityPtr> Realm::findEntities(const Position &position, const EntityPtr &except) {
 		std::vector<EntityPtr> out;
 		auto lock = entities.sharedLock();
-		for (const auto &entity: entities)
-			if (entity->position == position && entity != except)
+		for (const EntityPtr &entity: entities)
+			if (entity->occupies(position) && entity != except)
 				out.push_back(entity);
 		return out;
 	}
 
-	EntityPtr Realm::findEntity(const Position &position) {
-		auto lock = entities.sharedLock();
-		for (const auto &entity: entities)
-			if (entity->position == position)
-				return entity;
-		return {};
-	}
+	EntityPtr Realm::findEntity(const Position &position, const EntityPtr &except, bool single_chunk) {
+		if (!single_chunk) {
+			auto lock = entities.sharedLock();
+			for (const EntityPtr &entity: entities)
+				if (entity->occupies(position) && entity != except)
+					return entity;
+			return {};
+		}
 
-	EntityPtr Realm::findEntity(const Position &position, const EntityPtr &except) {
-		auto lock = entities.sharedLock();
-		for (const auto &entity: entities)
-			if (entity->position == position && entity != except)
+		auto by_chunk_lock = entitiesByChunk.sharedLock();
+		auto iter = entitiesByChunk.find(position.getChunk());
+		if (iter == entitiesByChunk.end())
+			return {};
+		auto found_entities = iter->second;
+		if (!found_entities)
+			return {};
+		by_chunk_lock.unlock();
+
+		auto found_lock = found_entities->sharedLock();
+		for (const EntityPtr &entity: *found_entities)
+			if (entity->occupies(position) && entity != except)
 				return entity;
 		return {};
 	}

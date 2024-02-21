@@ -2,6 +2,7 @@
 
 #include "container/WeakSet.h"
 #include "game/Agent.h"
+#include "game/HasDimensions.h"
 #include "game/HasInventory.h"
 #include "game/Tickable.h"
 #include "graphics/Texture.h"
@@ -52,7 +53,7 @@ namespace Game3 {
 		EntityTexture(Identifier identifier_, Identifier texture_id, uint8_t variety_);
 	};
 
-	class Entity: public Agent, public HasInventory, public Tickable, public HasMutex<SharedRecursiveMutex> {
+	class Entity: public Agent, public HasDimensions, public HasInventory, public Tickable, public HasMutex<SharedRecursiveMutex> {
 		public:
 			constexpr static Slot DEFAULT_INVENTORY_SIZE = 30;
 			/** The reciprocal of this is how many seconds it takes to move one square. */
@@ -82,8 +83,6 @@ namespace Game3 {
 			Identifier customTexture;
 			Lockable<std::optional<Position>> pathfindGoal;
 			Atomic<float> age;
-			Atomic<std::weak_ptr<Entity>> weakRider;
-			Atomic<std::weak_ptr<Entity>> weakRidden;
 
 			virtual void destroy();
 
@@ -132,8 +131,11 @@ namespace Game3 {
 			/** Returns whether the entity actually moved. */
 			virtual bool move(Direction, MovementContext);
 			bool move(Direction direction);
+			/** Called whenever the riding entity tries to move. Returns whether the move request was accepted. */
+			virtual bool moveFromRider(Direction, MovementContext);
+			bool moveFromRider(Direction);
 			std::shared_ptr<Realm> getRealm() const override final;
-			inline Position getPosition() const override { return position.copyBase(); }
+			Position getPosition() const override { return position.copyBase(); }
 			Entity & setRealm(const Game &, RealmID);
 			Entity & setRealm(const std::shared_ptr<Realm>);
 			void focus(Canvas &, bool is_autofocus);
@@ -225,6 +227,8 @@ namespace Game3 {
 			float renderHeight = 16.f;
 			std::atomic_bool awaitingDestruction = false;
 			Atomic<MoneyCount> money = 0;
+			Atomic<std::weak_ptr<Entity>> weakRider;
+			Atomic<std::weak_ptr<Entity>> weakRidden;
 
 			Entity() = delete;
 			Entity(EntityType);

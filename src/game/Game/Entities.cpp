@@ -11,6 +11,7 @@
 #include "entity/Pig.h"
 #include "entity/Player.h"
 #include "entity/Sheep.h"
+#include "entity/Ship.h"
 #include "entity/TextParticle.h"
 #include "entity/Woodcutter.h"
 #include "entity/Worker.h"
@@ -39,6 +40,7 @@ namespace Game3 {
 		add(EntityFactory::create<Miner>());
 		add(EntityFactory::create<Pig>());
 		add(EntityFactory::create<Sheep>());
+		add(EntityFactory::create<Ship>());
 		add(EntityFactory::create<TextParticle>());
 		add(EntityFactory::create<Woodcutter>());
 	}

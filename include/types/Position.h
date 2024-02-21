@@ -103,14 +103,23 @@ namespace Game3 {
 	Buffer & operator<<(Buffer &, const Vector3 &);
 	Buffer & operator>>(Buffer &, Vector3 &);
 
-	struct Vector2 {
+	struct Vector2f {
 		float x = 0.f;
 		float y = 0.f;
 	};
 
-	Buffer & operator+=(Buffer &, const Vector2 &);
-	Buffer & operator<<(Buffer &, const Vector2 &);
-	Buffer & operator>>(Buffer &, Vector2 &);
+	Buffer & operator+=(Buffer &, const Vector2f &);
+	Buffer & operator<<(Buffer &, const Vector2f &);
+	Buffer & operator>>(Buffer &, Vector2f &);
+
+	struct Vector2i {
+		int x = 0;
+		int y = 0;
+	};
+
+	Buffer & operator+=(Buffer &, const Vector2i &);
+	Buffer & operator<<(Buffer &, const Vector2i &);
+	Buffer & operator>>(Buffer &, Vector2i &);
 }
 
 template <>
@@ -162,7 +171,18 @@ struct std::formatter<Game3::Vector3> {
 };
 
 template <>
-struct std::formatter<Game3::Vector2> {
+struct std::formatter<Game3::Vector2f> {
+	constexpr auto parse(std::format_parse_context &ctx) {
+		return ctx.begin();
+    }
+
+	auto format(const auto &vector, std::format_context &ctx) const {
+		return std::format_to(ctx.out(), "({}, {})", vector.x, vector.y);
+	}
+};
+
+template <>
+struct std::formatter<Game3::Vector2i> {
 	constexpr auto parse(std::format_parse_context &ctx) {
 		return ctx.begin();
     }

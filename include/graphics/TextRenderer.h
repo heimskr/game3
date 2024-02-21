@@ -30,7 +30,7 @@ namespace Game3 {
 		Color color{1, 1, 1, 1};
 		TextAlign align = TextAlign::Left;
 		Color shadow{0, 0, 0, 1};
-		Vector2 shadowOffset{.025f, .025f};
+		Vector2f shadowOffset{.025f, .025f};
 	};
 
 	class TextRenderer: public HasBackbuffer {
