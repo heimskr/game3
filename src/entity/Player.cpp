@@ -28,6 +28,7 @@ namespace Game3 {
 	Player::~Player() {
 		if (spawning)
 			return;
+
 		INFO_("\e[31m~Player\e[39m(" << this << ", " << (username.empty()? "[unknown username]" : username) << ", " << globalID << ')');
 	}
 
@@ -45,7 +46,8 @@ namespace Game3 {
 			}
 		}
 
-		INFO_("Removed " << username << " from visible sets " << times << " time" << (times == 1? "" : "s"));
+		if (times != 0)
+			INFO_("Removed " << username << " from visible sets " << times << " time" << (times == 1? "" : "s"));
 
 		size_t remaining = 0;
 
@@ -60,9 +62,7 @@ namespace Game3 {
 			}
 		}
 
-		if (remaining == 0)
-			SUCCESS_("No longer present in any visible sets.");
-		else
+		if (remaining != 0)
 			ERROR_("Still present in " << remaining << " visible set" << (remaining == 1? "!" : "s!"));
 
 		Entity::destroy();
