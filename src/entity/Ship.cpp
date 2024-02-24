@@ -5,6 +5,10 @@
 #include "graphics/SingleSpriteRenderer.h"
 
 namespace Game3 {
+	namespace {
+		constexpr float MOVEMENT_SPEED = 20;
+	}
+
 	Ship::Ship():
 		Entity(ID()) {}
 
@@ -15,6 +19,10 @@ namespace Game3 {
 	bool Ship::moveFromRider(const EntityPtr &rider, Direction move_direction, MovementContext context) {
 		context.excludePlayer = rider->getGID();
 		return move(move_direction, context);
+	}
+
+	float Ship::getMovementSpeed() const {
+		return MOVEMENT_SPEED;
 	}
 
 	bool Ship::onInteractOn(const std::shared_ptr<Player> &player, Modifiers, ItemStack *, Hand) {
