@@ -463,7 +463,13 @@ namespace Game3 {
 
 	bool Entity::move(Direction move_direction, MovementContext context) {
 		if (EntityPtr ridden = getRidden()) {
-			return ridden->moveFromRider(getSelf(), move_direction, context);
+			EntityPtr self = getSelf();
+			if (ridden->moveFromRider(self, move_direction, context)) {
+				ridden->updateRider(self);
+				return true;
+			}
+
+			return false;
 		}
 
 		auto self_lock = uniqueLock();
