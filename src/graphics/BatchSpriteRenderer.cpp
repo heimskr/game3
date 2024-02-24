@@ -182,7 +182,7 @@ namespace Game3 {
 		const int texture_height = texture->height;
 
 		for (const RenderOptions *item: options) {
-			for (const auto &[x, y]: std::initializer_list<std::pair<double, double>>{{0.f, 1.f}, {1.f, 0.f}, {0.f, 0.f}, {0.f, 1.f}, {1.f, 1.f}, {1.f, 0.f}}) {
+			for (const auto &[x, y]: std::initializer_list<std::pair<double, double>>{{0, 1}, {1, 0}, {0, 0}, {0, 1}, {1, 1}, {1, 0}}) {
 				data.push_back(x);
 				data.push_back(y);
 				data.push_back(item->x);

@@ -66,7 +66,6 @@ namespace Game3 {
 	}
 
 	void ElementBufferedRenderer::setup(TileProvider &provider_) {
-		// layer = layer_;
 		provider = &provider_;
 	}
 
@@ -210,8 +209,8 @@ namespace Game3 {
 		if (set_width == 0)
 			return false;
 
-		const double divisor = set_width;
-		const double t_size = 1. / divisor - TILE_TEXTURE_PADDING * 2;
+		const float divisor(set_width);
+		const float t_size = 1. / divisor - TILE_TEXTURE_PADDING * 2;
 
 		isMissing = false;
 
@@ -219,7 +218,7 @@ namespace Game3 {
 		Game &game = realm->getGame();
 
 		Timer timer{"BufferedVBOInit"};
-		vbo.init<double, 11>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, &game, &tileset, set_width, divisor, t_size, missing](size_t x, size_t y) {
+		vbo.init<float, 11>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, &game, &tileset, set_width, divisor, t_size, missing](size_t x, size_t y) {
 			const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
 
 			std::array<TileID, LAYER_COUNT> tiles{};
@@ -245,7 +244,7 @@ namespace Game3 {
 			});
 
 			TileID fluid_tile = -1;
-			double fluid_opacity;
+			float fluid_opacity;
 
 			if (fluid_opt) {
 				if (auto tile_opt = game.getFluidTileID(fluid_opt->id)) {
@@ -253,7 +252,7 @@ namespace Game3 {
 					if (FluidTile::FULL <= fluid_opt->level)
 						fluid_opacity = 1.;
 					else
-						fluid_opacity = double(fluid_opt->level) / FluidTile::FULL;
+						fluid_opacity = float(fluid_opt->level) / FluidTile::FULL;
 				}
 			}
 
@@ -267,13 +266,13 @@ namespace Game3 {
 
 			// Texture coordinates for the base tile
 #define T_DEFS(I) \
-			const double tx##I = (tiles[I] % set_width) / divisor + TILE_TEXTURE_PADDING; \
-			const double ty##I = (tiles[I] / set_width) / divisor + TILE_TEXTURE_PADDING;
+			const float tx##I = (tiles[I] % set_width) / divisor + TILE_TEXTURE_PADDING; \
+			const float ty##I = (tiles[I] / set_width) / divisor + TILE_TEXTURE_PADDING;
 
 			T_DEFS(0); T_DEFS(1); T_DEFS(2); T_DEFS(3);
 
-			const double fx0 = (fluid_tile % set_width) / divisor + TILE_TEXTURE_PADDING;
-			const double fy0 = (fluid_tile / set_width) / divisor + TILE_TEXTURE_PADDING;
+			const float fx0 = (fluid_tile % set_width) / divisor + TILE_TEXTURE_PADDING;
+			const float fy0 = (fluid_tile / set_width) / divisor + TILE_TEXTURE_PADDING;
 
 #define T_ARR_0(I) tx##I, ty##I
 #define T_ARR_1(I) tx##I + t_size, ty##I

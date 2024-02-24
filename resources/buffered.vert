@@ -20,7 +20,7 @@ out vec2 fluidTexCoord;
 flat out float fluidOpacity;
 
 void main() {
-	gl_Position = projection * vec4(position, 0.0, 1.0);
+	gl_Position = vec4(projection * vec4(position, 0.0, 1.0));
 	texCoordBase0 = inTexCoordBase0;
 	texCoordBase1 = inTexCoordBase1;
 	texCoordBase2 = inTexCoordBase2;

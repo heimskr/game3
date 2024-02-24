@@ -7,7 +7,7 @@ out vec4 color;
 
 uniform sampler2D sprite;
 uniform vec4 spriteColor;
-uniform vec4 texturePosition;
+uniform dvec4 texturePosition;
 
 void main() {
 	color = spriteColor * texture(sprite, TexCoords);

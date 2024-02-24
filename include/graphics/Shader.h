@@ -46,7 +46,9 @@ namespace Game3 {
 				return set(uniform_name, data.data(), data.size());
 			}
 
-			GLuint getHandle() const { return handle; }
+			inline auto getHandle() const { return handle; }
+
+			inline const auto & getName() const { return name; }
 
 		private:
 			std::string name;

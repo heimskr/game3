@@ -206,11 +206,11 @@ namespace Game3 {
 		if (set_width == 0)
 			return false;
 
-		const double divisor(set_width);
-		const double t_size = 1. / divisor - TILE_TEXTURE_PADDING * 2;
+		const float divisor(set_width);
+		const float t_size = 1. / divisor - TILE_TEXTURE_PADDING * 2;
 
 		Timer timer{"UpperVBOInit"};
-		vbo.init<double, 8>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, &tileset, set_width, divisor, t_size](size_t x, size_t y) {
+		vbo.init<float, 8>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, &tileset, set_width, divisor, t_size](size_t x, size_t y) {
 			const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
 
 			std::array<TileID, LAYER_COUNT> uppers{};
@@ -231,8 +231,8 @@ namespace Game3 {
 
 			// Texture coordinates for the upper portion of the below tile
 #define U_DEFS(I) \
-			const double ux##I = (uppers[I] % set_width) / divisor + TILE_TEXTURE_PADDING; \
-			const double uy##I = (uppers[I] / set_width) / divisor + TILE_TEXTURE_PADDING;
+			const float ux##I = (uppers[I] % set_width) / divisor + TILE_TEXTURE_PADDING; \
+			const float uy##I = (uppers[I] / set_width) / divisor + TILE_TEXTURE_PADDING;
 
 			U_DEFS(0); U_DEFS(1); U_DEFS(2); U_DEFS(3);
 

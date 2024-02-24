@@ -45,8 +45,8 @@ namespace Game3 {
 
 		private:
 			bool initialized = false;
-			Shader shader{"terrain"};
-			GL::DoubleVAO vao;
+			Shader shader{"upper"};
+			GL::FloatVAO vao;
 			GL::VBO vbo;
 			GL::EBO ebo;
 			GL::FBO fbo;

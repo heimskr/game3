@@ -1,3 +1,4 @@
+#include "Log.h"
 #include "graphics/GL.h"
 #include "graphics/Shader.h"
 #include "graphics/Texture.h"
@@ -10,7 +11,9 @@
 
 namespace Game3 {
 	TextureCombiner::TextureCombiner(const std::string &name, const std::string &vertex, const std::string &fragment): shader(name) {
+		INFO("Initialized TextureCombiner \"{}\"; shader name is \"{}\"", name, shader.getName());
 		shader.init(vertex, fragment); CHECKGL
+		INFO("Shader handle is {}", shader.getHandle());
 		initRenderData(); CHECKGL
 	}
 
@@ -19,14 +22,15 @@ namespace Game3 {
 	}
 
 	void TextureCombiner::reset() {
-		if (initialized) {
-			glDeleteBuffers(1, &vbo); CHECKGL
-			glDeleteVertexArrays(1, &quadVAO); CHECKGL
-			vbo = 0;
-			quadVAO = 0;
-			shader.reset();
-			initialized = false;
-		}
+		if (!initialized)
+			return;
+
+		glDeleteBuffers(1, &vbo); CHECKGL
+		glDeleteVertexArrays(1, &quadVAO); CHECKGL
+		vbo = 0;
+		quadVAO = 0;
+		shader.reset();
+		initialized = false;
 	}
 
 	void TextureCombiner::update(int backbuffer_width, int backbuffer_height) {
@@ -83,13 +87,13 @@ namespace Game3 {
 
 	void TextureCombiner::initRenderData() {
 		static const float vertices[] {
-			0., 1., 0., 1.,
-			1., 0., 1., 0.,
-			0., 0., 0., 0.,
+			0, 1, 0, 1,
+			1, 0, 1, 0,
+			0, 0, 0, 0,
 
-			0., 1., 0., 1.,
-			1., 1., 1., 1.,
-			1., 0., 1., 0.,
+			0, 1, 0, 1,
+			1, 1, 1, 1,
+			1, 0, 1, 0,
 		};
 
 		glGenVertexArrays(1, &quadVAO); CHECKGL

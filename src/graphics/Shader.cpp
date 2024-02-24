@@ -18,20 +18,21 @@ namespace Game3 {
 				glGetShaderiv(handle, GL_COMPILE_STATUS, &success); CHECKGL
 			}
 
-			if (!success) {
-				GLsizei len{};
+			if (success)
+				return;
 
-				if (is_link) {
-					glGetProgramInfoLog(handle, GL_INFO_LOG_LENGTH, &len, info.data()); CHECKGL
-				} else {
-					glGetShaderInfoLog(handle, 2048, &len, info.data()); CHECKGL
-				}
+			GLsizei len{};
 
-				if (is_link)
-					ERROR("Shader.cpp: error with handle {} (name = \"{}\", linking): {}", handle, name, info.data());
-				else
-					ERROR("Shader.cpp: error with handle {} (name = \"{}\"): {}", handle, name, info.data());
+			if (is_link) {
+				glGetProgramInfoLog(handle, GL_INFO_LOG_LENGTH, &len, info.data()); CHECKGL
+			} else {
+				glGetShaderInfoLog(handle, 2048, &len, info.data()); CHECKGL
 			}
+
+			if (is_link)
+				ERROR("Shader.cpp: error with handle {} (name = \"{}\", linking): {}", handle, name, info.data());
+			else
+				ERROR("Shader.cpp: error with handle {} (name = \"{}\"): {}", handle, name, info.data());
 		}
 	}
 
@@ -80,6 +81,7 @@ namespace Game3 {
 		}
 
 		handle = glCreateProgram(); CHECKGL
+		assert(handle != 0);
 		glAttachShader(handle, vert_handle); CHECKGL
 		glAttachShader(handle, frag_handle); CHECKGL
 		if (geom_handle != 0) {
@@ -103,7 +105,7 @@ namespace Game3 {
 	void Shader::bind() {
 		CHECKGL
 		if (handle == 0)
-			throw std::runtime_error("Can't bind uninitialized shader");
+			throw std::runtime_error("Can't bind uninitialized shader \"" + name + '"');
 		glUseProgram(handle); CHECKGL
 	}
 
@@ -120,6 +122,7 @@ namespace Game3 {
 
 	void Shader::reset() {
 		if (handle != 0) {
+			INFO("Resetting shader {}", name);
 			glDeleteProgram(handle); CHECKGL
 			handle = 0;
 		}

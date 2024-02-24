@@ -46,7 +46,7 @@ namespace Game3 {
 		private:
 			std::atomic_bool initialized = false;
 			Shader shader {"fluids"};
-			GL::DoubleVAO vao;
+			GL::FloatVAO vao;
 			GL::VBO vbo;
 			GL::EBO ebo;
 			GL::FBO fbo;

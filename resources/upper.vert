@@ -16,7 +16,7 @@ out vec2 texCoordUpper2;
 out vec2 texCoordUpper3;
 
 void main() {
-	gl_Position = projection * vec4(position, 0.0, 1.0);
+	gl_Position = vec4(projection * vec4(position, 0.0, 1.0));
 	texCoordUpper0 = inTexCoordUpper0;
 	texCoordUpper1 = inTexCoordUpper1;
 	texCoordUpper2 = inTexCoordUpper2;
