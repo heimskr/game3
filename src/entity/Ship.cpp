@@ -8,12 +8,12 @@ namespace Game3 {
 	Ship::Ship():
 		Entity(ID()) {}
 
-	void Ship::updateRiderOffset(const std::shared_ptr<Entity> &rider) {
+	void Ship::updateRiderOffset(const EntityPtr &rider) {
 		rider->setOffset(getOffset() + Vector3{.5f, .5f, 0.f});
 	}
 
-	bool Ship::moveFromRider(Direction move_direction, MovementContext context) {
-		INFO("Ship::moveFromRider({})", move_direction);
+	bool Ship::moveFromRider(const EntityPtr &rider, Direction move_direction, MovementContext context) {
+		context.excludePlayer = rider->getGID();
 		return move(move_direction, context);
 	}
 

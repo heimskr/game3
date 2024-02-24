@@ -160,19 +160,9 @@ namespace Game3 {
 	}
 
 	bool ClientPlayer::move(Direction direction, MovementContext context) {
-		// const bool moved = Entity::move(direction, context);
-		// if (moved)
-		// 	send(MovePlayerPacket(position, direction, context.facingDirection, offset));
-		// return moved;
-
-		bool moved = true;
-
-		if (!getRidden())
-			moved = Entity::move(direction, context);
-
+		const bool moved = Entity::move(direction, context);
 		if (moved)
 			send(MovePlayerPacket(position, direction, context.facingDirection, offset));
-
 		return moved;
 	}
 

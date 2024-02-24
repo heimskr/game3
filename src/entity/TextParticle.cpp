@@ -6,14 +6,14 @@ namespace Game3 {
 	TextParticle::TextParticle():
 		Entity(ID()) {}
 
-	TextParticle::TextParticle(Glib::ustring text_, Color color_, float linger_time, TextAlign align_):
+	TextParticle::TextParticle(Glib::ustring text_, Color color_, double linger_time, TextAlign align_):
 		Entity(ID()), text(std::move(text_)), color(color_), lingerTime(linger_time), align(align_) {}
 
 	std::shared_ptr<TextParticle> TextParticle::create(Game &) {
 		return Entity::create<TextParticle>();
 	}
 
-	std::shared_ptr<TextParticle> TextParticle::create(Game &, Glib::ustring text, Color color, float linger_time, TextAlign align) {
+	std::shared_ptr<TextParticle> TextParticle::create(Game &, Glib::ustring text, Color color, double linger_time, TextAlign align) {
 		return Entity::create<TextParticle>(std::move(text), color, linger_time, align);
 	}
 
@@ -25,15 +25,15 @@ namespace Game3 {
 		const auto [x, y, z] = offset.copyBase();
 
 		renderers.text.drawOnMap(text.raw(), {
-			.x = float(column) + x + .5f,
-			.y = float(row) + y - z,
+			.x = double(column) + x + .5,
+			.y = double(row) + y - z,
 			.color = color,
 			.align = align,
 		});
 	}
 
 	void TextParticle::tick(const TickArgs &args) {
-		constexpr static float depth = -1.666f;
+		constexpr static double depth = -1.666;
 
 		auto offset_lock = offset.uniqueLock();
 
@@ -59,8 +59,8 @@ namespace Game3 {
 	void TextParticle::onSpawn() {
 		Entity::onSpawn();
 		auto lock = velocity.uniqueLock();
-		velocity.x = std::uniform_real_distribution(2.f,  4.f)(threadContext.rng) * (std::uniform_int_distribution(0, 1)(threadContext.rng) == 1? 1 : -1);
-		velocity.z = std::uniform_real_distribution(8.f, 12.f)(threadContext.rng);
+		velocity.x = std::uniform_real_distribution(2.,  4.)(threadContext.rng) * (std::uniform_int_distribution(0, 1)(threadContext.rng) == 1? 1 : -1);
+		velocity.z = std::uniform_real_distribution(8., 12.)(threadContext.rng);
 	}
 
 	int TextParticle::getZIndex() const {

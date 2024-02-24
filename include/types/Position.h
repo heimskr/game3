@@ -86,9 +86,9 @@ namespace Game3 {
 	};
 
 	struct Vector3 {
-		float x = 0.f;
-		float y = 0.f;
-		float z = 0.f;
+		double x = 0.f;
+		double y = 0.f;
+		double z = 0.f;
 
 		double magnitude() const;
 		double magnitude2D() const;
@@ -104,8 +104,8 @@ namespace Game3 {
 	Buffer & operator>>(Buffer &, Vector3 &);
 
 	struct Vector2f {
-		float x = 0.f;
-		float y = 0.f;
+		double x = 0.f;
+		double y = 0.f;
 	};
 
 	Buffer & operator+=(Buffer &, const Vector2f &);

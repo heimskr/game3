@@ -184,7 +184,7 @@ namespace Game3 {
 			packet.arguments.adjustOffset = false;
 
 		if (auto cast_player = dynamic_cast<Player *>(&entity)) {
-			if (!context.excludePlayerSelf)
+			if (context.excludePlayer != cast_player->getGID())
 				cast_player->send(packet);
 			auto lock = players.sharedLock();
 			for (const auto &player: players)
@@ -196,7 +196,7 @@ namespace Game3 {
 
 		auto lock = players.sharedLock();
 		for (const auto &player: players)
-			if (player->getRealm() && player->canSee(entity))
+			if (player->getRealm() && player->canSee(entity) && player->getGID() != context.excludePlayer)
 				if (auto client = player->toServer()->weakClient.lock())
 					client->send(packet);
 	}

@@ -6,14 +6,14 @@
 namespace Game3 {
 	class TextParticle: public Entity {
 		private:
-			static constexpr float DEFAULT_LINGER_TIME = 1;
+			static constexpr double DEFAULT_LINGER_TIME = 1;
 			static constexpr TextAlign DEFAULT_ALIGN = TextAlign::Center;
 
 		public:
 			static Identifier ID() { return {"base", "entity/text_particle"}; }
 
 			static std::shared_ptr<TextParticle> create(Game &);
-			static std::shared_ptr<TextParticle> create(Game &, Glib::ustring text, Color = {1, 1, 1, 1}, float linger_time = DEFAULT_LINGER_TIME, TextAlign = DEFAULT_ALIGN);
+			static std::shared_ptr<TextParticle> create(Game &, Glib::ustring text, Color = {1, 1, 1, 1}, double linger_time = DEFAULT_LINGER_TIME, TextAlign = DEFAULT_ALIGN);
 
 			void render(const RendererContext &) override;
 			void tick(const TickArgs &) override;
@@ -29,12 +29,12 @@ namespace Game3 {
 		private:
 			Glib::ustring text;
 			Color color;
-			float lingerTime = DEFAULT_LINGER_TIME;
+			double lingerTime = DEFAULT_LINGER_TIME;
 			TextAlign align = DEFAULT_ALIGN;
-			float age = 0;
+			double age = 0;
 
 			TextParticle();
-			TextParticle(Glib::ustring, Color = {1, 1, 1, 1}, float linger_time = DEFAULT_LINGER_TIME, TextAlign = DEFAULT_ALIGN);
+			TextParticle(Glib::ustring, Color = {1, 1, 1, 1}, double linger_time = DEFAULT_LINGER_TIME, TextAlign = DEFAULT_ALIGN);
 
 		friend class Entity;
 	};

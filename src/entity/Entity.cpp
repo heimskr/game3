@@ -176,21 +176,21 @@ namespace Game3 {
 			auto &z = offset.z;
 			const auto speed = getMovementSpeed();
 
-			if (x < 0.f)
-				x = std::min(x + delta * speed, 0.f);
-			else if (0.f < x)
-				x = std::max(x - delta * speed, 0.f);
+			if (x < 0.)
+				x = std::min(x + delta * speed, 0.);
+			else if (0. < x)
+				x = std::max(x - delta * speed, 0.);
 
-			if (y < 0.f)
-				y = std::min(y + delta * speed, 0.f);
-			else if (0.f < y)
-				y = std::max(y - delta * speed, 0.f);
+			if (y < 0.)
+				y = std::min(y + delta * speed, 0.);
+			else if (0. < y)
+				y = std::max(y - delta * speed, 0.);
 
 			auto velocity_lock = velocity.uniqueLock();
 
-			z = std::max(z + delta * velocity.z, 0.f);
+			z = std::max(z + delta * velocity.z, 0.);
 
-			if (z == 0.f)
+			if (z == 0.)
 				velocity.z = 0;
 			else
 				velocity.z -= 32 * delta;
@@ -353,52 +353,52 @@ namespace Game3 {
 		SpriteRenderer &sprite_renderer = renderers.batchSprite;
 		const auto [offset_x, offset_y, offset_z] = offset.copyBase();
 
-		float texture_x_offset = 0.f;
-		float texture_y_offset = 0.f;
+		double texture_x_offset = 0.;
+		double texture_y_offset = 0.;
 		// Animate if the offset is nonzero.
-		if (offset_x != 0.f || offset_y != 0.f) {
+		if (offset_x != 0. || offset_y != 0.) {
 			// Choose an animation frame based on the time.
 			switch (variety) {
 				case 3:
-					texture_x_offset = 8.f * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - getRealm()->getGame().startTime).count() / 200) % 4);
+					texture_x_offset = 8. * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - getRealm()->getGame().startTime).count() / 200) % 4);
 					break;
 				default:
-					texture_x_offset = 8.f * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - getRealm()->getGame().startTime).count() / 100) % 5);
+					texture_x_offset = 8. * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - getRealm()->getGame().startTime).count() / 100) % 5);
 			}
 		}
 
 		switch (variety) {
 			case 1:
 			case 3:
-				texture_y_offset = 8.f * (int(direction.load()) - 1);
+				texture_y_offset = 8. * (int(direction.load()) - 1);
 				break;
 			case 2:
-				texture_y_offset = 16.f * (static_cast<int>(remapDirection(direction, 0x1324)) - 1);
+				texture_y_offset = 16. * (static_cast<int>(remapDirection(direction, 0x1324)) - 1);
 				break;
 		}
 
 		const auto [row, column] = position.copyBase();
 
-		float fluid_offset = 0.f;
+		double fluid_offset = 0.;
 
 		if (auto fluid_tile = getRealm()->tileProvider.copyFluidTile({row, column}); fluid_tile && 0 < fluid_tile->level) {
-			fluid_offset = std::sin(float(getGame().time) * 1.5f) + 0.5f;
-			renderHeight = 10.f + fluid_offset;
+			fluid_offset = std::sin(getGame().time * 1.5) + .5;
+			renderHeight = 10. + fluid_offset;
 		} else {
-			renderHeight = 16.f;
+			renderHeight = 16.;
 		}
 
 
-		const float x = column + offset_x;
-		const float y = row    + offset_y - offset_z - fluid_offset / 16.f;
+		const double x = column + offset_x;
+		const double y = row    + offset_y - offset_z - fluid_offset / 16.;
 
 		RenderOptions main_options{
 			.x = x,
 			.y = y,
 			.offsetX = texture_x_offset,
 			.offsetY = texture_y_offset,
-			.sizeX = 16.f,
-			.sizeY = std::min(16.f, renderHeight + 8.f * offset_z),
+			.sizeX = 16.,
+			.sizeY = std::min(16., renderHeight + 8. * offset_z),
 		};
 
 		if (!heldLeft && !heldRight) {
@@ -406,34 +406,34 @@ namespace Game3 {
 			return;
 		}
 
-		auto render_held = [&](const Held &held, float x_o, float y_o, bool flip = false, float degrees = 0.f) {
+		auto render_held = [&](const Held &held, double x_o, double y_o, bool flip = false, double degrees = 0.) {
 			if (held) {
 				sprite_renderer(held.texture, {
 					.x = x + x_o,
 					.y = y + y_o,
 					.offsetX = held.offsetX,
 					.offsetY = held.offsetY,
-					.sizeX = 16.f,
-					.sizeY = 16.f,
-					.scaleX = .5f * (flip? -1 : 1),
-					.scaleY = .5f,
+					.sizeX = 16.,
+					.sizeY = 16.,
+					.scaleX = flip? -.5 : .5,
+					.scaleY = .5,
 					.angle = degrees,
 				});
 			}
 		};
 
-		constexpr float rotation = 0.f;
+		constexpr static double rotation = 0.;
 
 		switch (direction) {
 			case Direction::Up:
-				render_held(heldLeft,  -.1f, .4f, false, -rotation);
-				render_held(heldRight, 1.1f, .4f, true,   rotation);
+				render_held(heldLeft,  -.1, .4, false, -rotation);
+				render_held(heldRight, 1.1, .4, true,   rotation);
 				break;
 			case Direction::Left:
-				render_held(heldRight, 0.f, .5f);
+				render_held(heldRight, 0., .5);
 				break;
 			case Direction::Right:
-				render_held(heldLeft, .5f, .5f);
+				render_held(heldLeft, .5, .5);
 				break;
 			default:
 				break;
@@ -443,14 +443,14 @@ namespace Game3 {
 
 		switch (direction) {
 			case Direction::Down:
-				render_held(heldRight, -.1f, .5f, false, -rotation);
-				render_held(heldLeft,  1.1f, .5f, true,   rotation);
+				render_held(heldRight, -.1, .5, false, -rotation);
+				render_held(heldLeft,  1.1, .5, true,   rotation);
 				break;
 			case Direction::Left:
-				render_held(heldLeft, .5f, .5f, true);
+				render_held(heldLeft, .5, .5, true);
 				break;
 			case Direction::Right:
-				render_held(heldRight, 1.f, .5f, true);
+				render_held(heldRight, 1., .5, true);
 				break;
 			default:
 				break;
@@ -463,7 +463,7 @@ namespace Game3 {
 
 	bool Entity::move(Direction move_direction, MovementContext context) {
 		if (EntityPtr ridden = getRidden()) {
-			return ridden->moveFromRider(move_direction, context);
+			return ridden->moveFromRider(getSelf(), move_direction, context);
 		}
 
 		auto self_lock = uniqueLock();
@@ -475,26 +475,26 @@ namespace Game3 {
 		}
 
 		Position new_position = position;
-		float x_offset = 0.f;
-		float y_offset = 0.f;
+		double x_offset = 0.;
+		double y_offset = 0.;
 		bool horizontal = false;
 		switch (move_direction) {
 			case Direction::Down:
 				++new_position.row;
-				y_offset = -1.f;
+				y_offset = -1.;
 				break;
 			case Direction::Up:
 				--new_position.row;
-				y_offset = 1.f;
+				y_offset = 1.;
 				break;
 			case Direction::Left:
 				--new_position.column;
-				x_offset = 1.f;
+				x_offset = 1.;
 				horizontal = true;
 				break;
 			case Direction::Right:
 				++new_position.column;
-				x_offset = -1.f;
+				x_offset = -1.;
 				horizontal = true;
 				break;
 			default:
@@ -547,12 +547,12 @@ namespace Game3 {
 		return move(direction, MovementContext{.clearOffset = false});
 	}
 
-	bool Entity::moveFromRider(Direction, MovementContext) {
+	bool Entity::moveFromRider(const EntityPtr &, Direction, MovementContext) {
 		return false;
 	}
 
-	bool Entity::moveFromRider(Direction direction) {
-		return moveFromRider(direction, MovementContext{});
+	bool Entity::moveFromRider(const EntityPtr &rider, Direction direction) {
+		return moveFromRider(rider, direction, MovementContext{});
 	}
 
 	std::shared_ptr<Realm> Entity::getRealm() const {
@@ -617,7 +617,7 @@ namespace Game3 {
 			return;
 
 		if (!is_autofocus)
-			canvas.scale = 8.f;
+			canvas.scale = 8.;
 		else if (++canvas.autofocusCounter < Canvas::AUTOFOCUS_DELAY)
 			return;
 
@@ -647,9 +647,9 @@ namespace Game3 {
 		if (context.forcedOffset)
 			offset = *context.forcedOffset;
 		else if (firstTeleport)
-			offset = Vector3{0.f, 0.f, 0.f};
+			offset = Vector3{0., 0., 0.};
 		else if (context.clearOffset)
-			offset = Vector3{0.f, 0.f, offset.z};
+			offset = Vector3{0., 0., offset.z};
 
 		if (context.facingDirection)
 			direction = *context.facingDirection;
@@ -1126,8 +1126,8 @@ namespace Game3 {
 		held.slot = new_value;
 		auto item_texture = getGame().registry<ItemTextureRegistry>().at((*inventory)[held.slot]->item->identifier);
 		held.texture = item_texture->getTexture();
-		held.offsetX = item_texture->x / 2.f;
-		held.offsetY = item_texture->y / 2.f;
+		held.offsetX = item_texture->x / 2.;
+		held.offsetY = item_texture->y / 2.;
 		return true;
 	}
 
@@ -1196,25 +1196,25 @@ namespace Game3 {
 
 	void Entity::jump() {
 		auto velocity_lock = velocity.uniqueLock();
-		if (getSide() != Side::Server || velocity.z != 0.f)
+		if (getSide() != Side::Server || velocity.z != 0.)
 			return;
 
 		{
 			auto offset_lock = offset.sharedLock();
-			if (offset.z != 0.f)
+			if (offset.z != 0.)
 				return;
 		}
 
 		velocity.z = getJumpSpeed();
 		increaseUpdateCounter();
-		getGame().toServer().entityTeleported(*this, MovementContext{.excludePlayerSelf = true});
+		getGame().toServer().entityTeleported(*this, MovementContext{.excludePlayer = getGID()});
 	}
 
 	void Entity::clearOffset() {
 		auto lock = offset.uniqueLock();
-		offset.x = 0.f;
-		offset.y = 0.f;
-		offset.z = 0.f;
+		offset.x = 0.;
+		offset.y = 0.;
+		offset.z = 0.;
 	}
 
 	std::shared_ptr<Entity> Entity::getSelf() {
@@ -1268,7 +1268,7 @@ namespace Game3 {
 	}
 
 	bool Entity::isOffsetZero() const {
-		constexpr static float EPSILON = 0.001f;
+		constexpr static double EPSILON = 0.001;
 		auto lock = offset.sharedLock();
 		return offset.x < EPSILON && offset.y < EPSILON && offset.z < EPSILON;
 	}

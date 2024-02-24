@@ -137,8 +137,8 @@ namespace Game3 {
 			virtual bool move(Direction, MovementContext);
 			bool move(Direction direction);
 			/** Called whenever the riding entity tries to move. Returns whether the move request was accepted. */
-			virtual bool moveFromRider(Direction, MovementContext);
-			bool moveFromRider(Direction);
+			virtual bool moveFromRider(const std::shared_ptr<Entity> &rider, Direction, MovementContext);
+			bool moveFromRider(const std::shared_ptr<Entity> &rider, Direction);
 			std::shared_ptr<Realm> getRealm() const override final;
 			Position getPosition() const override { return position.copyBase(); }
 			Entity & setRealm(const Game &, RealmID);

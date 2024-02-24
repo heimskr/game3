@@ -20,7 +20,7 @@ namespace Game3 {
 			if (!player->getRidden())
 				forced_position = position;
 
-			player->move(movementDirection, {.excludePlayerSelf = true, .clearOffset = false, .facingDirection = facingDirection, .forcedPosition = forced_position, .forcedOffset = offset});
+			player->move(movementDirection, {.excludePlayer = player->getGID(), .clearOffset = false, .facingDirection = facingDirection, .forcedPosition = position, .forcedOffset = offset});
 			return;
 		}
 

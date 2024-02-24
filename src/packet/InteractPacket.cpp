@@ -10,7 +10,7 @@ namespace Game3 {
 		if (ServerPlayerPtr player = client.getPlayer()) {
 			if (direction && *direction != player->direction) {
 				player->teleport(player->position, MovementContext{
-					.excludePlayerSelf = true,
+					.excludePlayer = player->getGID(),
 					.clearOffset = false,
 					.facingDirection = direction
 				});

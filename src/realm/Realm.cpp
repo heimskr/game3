@@ -381,7 +381,7 @@ namespace Game3 {
 		if (entity->isPlayer() && entity->weakRealm.lock())
 			safeDynamicCast<Player>(entity)->stopMoving();
 		entity->setRealm(shared);
-		entity->teleport(position, MovementContext{.excludePlayerSelf = true, .isTeleport = true});
+		entity->teleport(position, MovementContext{.excludePlayer = entity->getGID(), .isTeleport = true});
 		entity->firstTeleport = false;
 		attach(entity);
 		if (entity->isPlayer()) {

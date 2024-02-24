@@ -7,7 +7,7 @@
 
 namespace Game3 {
 	struct MovementContext {
-		bool excludePlayerSelf = false;
+		GlobalID excludePlayer = -1;
 		bool fromPath = false;
 		bool clearOffset = true;
 		std::optional<Direction> facingDirection{};
