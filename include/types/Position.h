@@ -93,6 +93,8 @@ namespace Game3 {
 		double magnitude() const;
 		double magnitude2D() const;
 
+		bool operator==(const Vector3 &) const;
+
 		Vector3 & operator+=(const Vector3 &);
 		Vector3 & operator-=(const Vector3 &);
 		Vector3 operator+(const Vector3 &) const;

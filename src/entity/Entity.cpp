@@ -1193,8 +1193,11 @@ namespace Game3 {
 	}
 
 	void Entity::jump() {
+		if (getSide() != Side::Server || getRidden())
+			return;
+
 		auto velocity_lock = velocity.uniqueLock();
-		if (getSide() != Side::Server || velocity.z != 0.)
+		if (velocity.z != 0.)
 			return;
 
 		{

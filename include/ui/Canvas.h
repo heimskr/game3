@@ -26,7 +26,6 @@ namespace Game3 {
 	class Canvas {
 		public:
 			constexpr static double DEFAULT_SCALE = 8.;
-			constexpr static int AUTOFOCUS_DELAY = 1;
 
 			MainWindow &window;
 			std::shared_ptr<ClientGame> game;
@@ -44,7 +43,6 @@ namespace Game3 {
 			Multiplier multiplier;
 			Overlayer overlayer;
 			float magic = 8.f;
-			int autofocusCounter = 0;
 			Gdk::Rectangle realmBounds;
 			const Realm *lastRealm = nullptr;
 			double sizeDivisor = 1.0;

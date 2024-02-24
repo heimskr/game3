@@ -139,7 +139,10 @@ namespace Game3 {
 	}
 
 	void ClientPlayer::jump() {
-		float z{};
+		if (getRidden())
+			return;
+
+		double z{};
 		{
 			auto lock = offset.sharedLock();
 			z = offset.z;
