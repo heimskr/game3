@@ -867,9 +867,6 @@ namespace Game3 {
 	}
 
 	void Entity::movedToNewChunk(const std::optional<ChunkPosition> &old_chunk_position) {
-		if (getSide() != Side::Server)
-			return;
-
 		auto shared = getSelf();
 
 		if (auto realm = weakRealm.lock()) {
@@ -952,6 +949,9 @@ namespace Game3 {
 				}
 			});
 		}
+
+		if (getSide() != Side::Server)
+			return;
 
 		auto path_lock = path.sharedLock();
 
