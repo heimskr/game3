@@ -5,9 +5,9 @@
 namespace Game3 {
 	class Pickaxe: public Tool {
 		public:
-			Pickaxe(ItemID id_, std::string name_, MoneyCount base_price, double base_cooldown, Durability max_durability);
+			Pickaxe(ItemID id_, std::string name_, MoneyCount base_price, float base_cooldown, Durability max_durability);
 
-			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<double, double>) override;
+			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
 			bool drag(Slot, ItemStack &, const Place &, Modifiers) override;
 
 		private:

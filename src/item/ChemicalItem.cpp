@@ -34,7 +34,7 @@ namespace Game3 {
 			hue = hash % 360;
 			saturation = (hash / double(std::numeric_limits<size_t>::max())) / 2.f + .5f;
 			std::default_random_engine rng(hash);
-			std::normal_distribution normal(.0f, .1f);
+			std::normal_distribution<float> normal(0, 0.1);
 			value_difference = normal(rng);
 		}
 

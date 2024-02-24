@@ -27,7 +27,7 @@ namespace Game3 {
 			virtual bool canSpawnMonsters(const Place &) const;
 
 			/** Should be between 0 and 1 (inclusive). */
-			virtual double getMonsterSpawnProbability() const;
+			virtual float getMonsterSpawnProbability() const;
 
 			virtual void renderStaticLighting(const Place &, Layer, const RendererContext &);
 

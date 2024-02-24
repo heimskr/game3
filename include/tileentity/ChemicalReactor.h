@@ -9,7 +9,7 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "te/chemical_reactor"}; }
 
-			constexpr static double ENERGY_CAPACITY = 100'000.;
+			constexpr static float ENERGY_CAPACITY = 100'000;
 			constexpr static ItemCount INPUT_CAPACITY  = 5;
 			constexpr static ItemCount OUTPUT_CAPACITY = 5;
 			constexpr static EnergyAmount ENERGY_PER_ATOM = 100;

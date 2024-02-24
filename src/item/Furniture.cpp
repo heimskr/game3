@@ -14,7 +14,7 @@ namespace Game3 {
 		return true;
 	}
 
-	bool Furniture::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<double, double>) {
+	bool Furniture::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		if (!preCheck(place))
 			return false;
 

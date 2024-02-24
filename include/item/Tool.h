@@ -6,9 +6,9 @@
 namespace Game3 {
 	class Tool: public Item, public HasMaxDurability {
 		public:
-			double baseCooldown;
+			float baseCooldown;
 
-			Tool(ItemID id_, std::string name_, MoneyCount base_price, double base_cooldown, Durability max_durability, Identifier attribute):
+			Tool(ItemID id_, std::string name_, MoneyCount base_price, float base_cooldown, Durability max_durability, Identifier attribute):
 			Item(id_, std::move(name_), base_price, 1), HasMaxDurability(max_durability), baseCooldown(base_cooldown) {
 				attributes.insert(std::move(attribute));
 			}

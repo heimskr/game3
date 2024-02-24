@@ -121,15 +121,15 @@ namespace Game3 {
 			virtual void onRemove();
 			void createRenderers();
 			bool prerender();
-			void render(int width, int height, const std::pair<double, double> &center, double scale, RendererContext &, double game_time);
-			void renderLighting(int width, int height, const std::pair<double, double> &center, double scale, RendererContext &, double game_time);
-			virtual void clearLighting(double game_time);
+			void render(int width, int height, const std::pair<double, double> &center, float scale, RendererContext &, float game_time);
+			void renderLighting(int width, int height, const std::pair<double, double> &center, float scale, RendererContext &, float game_time);
+			virtual void clearLighting(float game_time);
 			/** Reuploads fluids and terrain in all layers. */
 			void reupload();
 			EntityPtr add(const EntityPtr &, const Position &);
 			TileEntityPtr add(const TileEntityPtr &);
 			void initEntities();
-			void tick(double delta);
+			void tick(float delta);
 			std::vector<EntityPtr> findEntities(const Position &) const;
 			/** The side length of the square is equal to 2*radius-1; i.e., a radius of 1 corresponds to a single tile. */
 			std::vector<EntityPtr> findEntitiesSquare(const Position &, uint64_t radius) const;

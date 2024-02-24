@@ -102,29 +102,29 @@ namespace Game3 {
 				extractors_corner = tileset[ExtractorsCorner(pipe_type)];
 
 			if (tile_id && *tile_id != 0) {
-				const double x = (*tile_id % (texture->width / tilesize)) * tilesize;
-				const double y = (*tile_id / (texture->width / tilesize)) * tilesize;
+				const float x = (*tile_id % (texture->width / tilesize)) * tilesize;
+				const float y = (*tile_id / (texture->width / tilesize)) * tilesize;
 				sprite_renderer(texture, {
-					.x = double(position.column),
-					.y = double(position.row),
-					.offsetX = x / 2.,
-					.offsetY = y / 2.,
-					.sizeX = double(tilesize),
-					.sizeY = double(tilesize),
+					.x = float(position.column),
+					.y = float(position.row),
+					.offsetX = x / 2,
+					.offsetY = y / 2,
+					.sizeX = float(tilesize),
+					.sizeY = float(tilesize),
 				});
 			}
 
 			if (const auto extractors_march = extractors[pipe_type].getMarchIndex()) {
 				const TileID extractor_tile = *extractors_corner + extractors_march;
-				const double x = (extractor_tile % (texture->width / tilesize)) * tilesize;
-				const double y = (extractor_tile / (texture->width / tilesize)) * tilesize;
+				const float x = (extractor_tile % (texture->width / tilesize)) * tilesize;
+				const float y = (extractor_tile / (texture->width / tilesize)) * tilesize;
 				sprite_renderer(texture, {
-					.x = double(position.column),
-					.y = double(position.row),
-					.offsetX = x / 2.,
-					.offsetY = y / 2.,
-					.sizeX = double(tilesize),
-					.sizeY = double(tilesize),
+					.x = float(position.column),
+					.y = float(position.row),
+					.offsetX = x / 2,
+					.offsetY = y / 2,
+					.sizeX = float(tilesize),
+					.sizeY = float(tilesize),
 				});
 			}
 		}

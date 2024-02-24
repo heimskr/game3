@@ -196,7 +196,7 @@ namespace Game3 {
 				velocity.z -= 32 * delta;
 		}
 
-		// Not all platforms support std::atomic<double>::operator+=.
+		// Not all platforms support std::atomic<float>::operator+=.
 		age = age + delta;
 
 		if (EntityPtr rider = getRider())

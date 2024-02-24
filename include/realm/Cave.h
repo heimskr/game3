@@ -19,7 +19,7 @@ namespace Game3 {
 			Cave & operator=(const Cave &) = delete;
 			Cave & operator=(Cave &&) = delete;
 
-			void clearLighting(double) override;
+			void clearLighting(float) override;
 			void onRemove() override;
 			void reveal(const Position &, bool force = false);
 			void generateChunk(const ChunkPosition &) override;

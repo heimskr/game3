@@ -6,7 +6,7 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	bool VoidPickaxe::use(Slot slot, ItemStack &, const Place &place, Modifiers, std::pair<double, double>) {
+	bool VoidPickaxe::use(Slot slot, ItemStack &, const Place &place, Modifiers, std::pair<float, float>) {
 		PlayerPtr player = place.player;
 		RealmPtr  realm  = place.realm;
 		Game &game = realm->getGame();

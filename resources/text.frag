@@ -1,6 +1,6 @@
 // Credit: https://learnopengl.com/In-Practice/Text-Rendering
 
-#version 410 core
+#version 330 core
 
 in vec2 TexCoords;
 out vec4 color;

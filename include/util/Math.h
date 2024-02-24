@@ -49,8 +49,7 @@ namespace Game3 {
 		return swapBytes(in);
 	}
 
-	template <std::floating_point F>
-	constexpr F lerp(F from, F to, F progress) {
+	constexpr float lerp(float from, float to, float progress) {
 		return from + (to - from) * progress;
 	}
 

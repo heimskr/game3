@@ -70,12 +70,12 @@ namespace Game3 {
 		buffer >> stuckTime;
 	}
 
-	bool Worker::stillStuck(double delta) {
+	bool Worker::stillStuck(float delta) {
 		if (stuck) {
 			if ((stuckTime += delta) < RETRY_TIME)
 				return true;
 			stuck = false;
-			stuckTime = std::uniform_real_distribution(0., RETRY_TIME * .8)(threadContext.rng);
+			stuckTime = std::uniform_real_distribution(0.f, RETRY_TIME * .8f)(threadContext.rng);
 		}
 
 		return false;

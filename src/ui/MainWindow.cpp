@@ -937,7 +937,7 @@ namespace Game3 {
 		}
 
 		if (!autofocus) {
-			const double delta = canvas->scale / 20.;
+			const float delta = canvas->scale / 20.f;
 			switch (keyval) {
 				case GDK_KEY_Down:
 					canvas->center.second -= delta;

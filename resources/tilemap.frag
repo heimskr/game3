@@ -1,4 +1,4 @@
-#version 410 core
+#version 330 core
 
 // Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Resources/GeometryRenderer.frag
 

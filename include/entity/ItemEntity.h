@@ -35,10 +35,10 @@ namespace Game3 {
 			ItemEntity(): Entity(ID()) {}
 			ItemEntity(const Game &);
 			ItemEntity(ItemStack);
-			double offsetX = 0.;
-			double offsetY = 0.;
-			double sizeX = 16.;
-			double sizeY = 16.;
+			float offsetX = 0.f;
+			float offsetY = 0.f;
+			float sizeX = 16.f;
+			float sizeY = 16.f;
 			bool needsTexture = true;
 			Atomic<int> secondsLeft = 5 * 60;
 			bool firstTick = true;

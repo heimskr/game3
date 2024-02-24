@@ -10,7 +10,7 @@ namespace Game3 {
 		Item(std::move(identifier_), std::move(name_), base_price, max_count),
 		tilename(std::move(tilename_)) {}
 
-	bool Floor::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<double, double>) {
+	bool Floor::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		auto &realm = *place.realm;
 		const auto &tileset = realm.getTileset();
 

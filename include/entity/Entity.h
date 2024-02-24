@@ -61,7 +61,7 @@ namespace Game3 {
 		public:
 			constexpr static Slot DEFAULT_INVENTORY_SIZE = 30;
 			/** The reciprocal of this is how many seconds it takes to move one square. */
-			constexpr static double MAX_SPEED = 10.;
+			constexpr static float MAX_SPEED = 10.f;
 
 			EntityType type;
 			Lockable<Position> position{0, 0};
@@ -86,7 +86,7 @@ namespace Game3 {
 			Atomic<RealmID> inLimboFor{0};
 			Identifier customTexture;
 			Lockable<std::optional<Position>> pathfindGoal;
-			Atomic<double> age;
+			Atomic<float> age;
 
 			virtual void destroy();
 
@@ -157,7 +157,7 @@ namespace Game3 {
 			void queueDestruction();
 			PathResult pathfind(const Position &start, const Position &goal, std::list<Direction> &, size_t loop_max = 1'000);
 			bool pathfind(const Position &goal, size_t loop_max = 1'000);
-			virtual double getMovementSpeed() const { return MAX_SPEED; }
+			virtual float getMovementSpeed() const { return MAX_SPEED; }
 			Game & getGame() override;
 			Game & getGame() const;
 			bool isVisible() const;
@@ -188,7 +188,7 @@ namespace Game3 {
 			std::weak_ptr<Entity> getWeakSelf();
 			void clearQueues();
 			bool isInLimbo() const;
-			virtual double getJumpSpeed() const { return 8.; }
+			virtual float getJumpSpeed() const { return 8.f; }
 			void changeTexture(const Identifier &);
 			virtual int getZIndex() const { return 0; }
 			virtual Identifier getMilk() const { return {}; }
@@ -229,7 +229,7 @@ namespace Game3 {
 			Game *game = nullptr;
 			LockableSharedPtr<Texture> texture;
 			int variety = 0;
-			double renderHeight = 16.;
+			float renderHeight = 16.f;
 			std::atomic_bool awaitingDestruction = false;
 			Atomic<MoneyCount> money = 0;
 			Atomic<std::weak_ptr<Entity>> weakRider;
@@ -253,8 +253,8 @@ namespace Game3 {
 			struct Held {
 				Slot slot = -1;
 				bool isLeft;
-				double offsetX = 0.;
-				double offsetY = 0.;
+				float offsetX = 0.f;
+				float offsetY = 0.f;
 				std::shared_ptr<Texture> texture;
 				Held() = delete;
 				Held(bool is_left): isLeft(is_left) {}

@@ -1,11 +1,13 @@
 // Credit: https://github.com/Jam3/glsl-fast-gaussian-blur
 
-#version 410 core
+#version 330 core
+
+precision mediump float;
 
 out vec4 FragColor;    // fragment output color
 uniform sampler2D txr; // texture to blur
-uniform double xs, ys;  // texture resolution
-uniform double r;       // blur radius
+uniform float xs, ys;  // texture resolution
+uniform float r;       // blur radius
 uniform int axis;
 
 vec4 blur9(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {

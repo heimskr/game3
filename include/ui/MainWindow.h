@@ -156,10 +156,10 @@ namespace Game3 {
 			bool prevRight = false;
 			bool prevRightPad = false;
 			bool prevAutofocus = true;
-			double rightPadStartX = 0;
-			double rightPadStartY = 0;
-			double rightPadStartCanvasX = 0;
-			double rightPadStartCanvasY = 0;
+			float rightPadStartX = 0.f;
+			float rightPadStartY = 0.f;
+			float rightPadStartCanvasX = 0.f;
+			float rightPadStartCanvasY = 0.f;
 
 			bool connect(const Glib::ustring &hostname, uint16_t port);
 			bool render(const Glib::RefPtr<Gdk::GLContext> &);

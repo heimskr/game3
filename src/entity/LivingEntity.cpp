@@ -43,17 +43,17 @@ namespace Game3 {
 
 		RectangleRenderer &rectangle = renderers.rectangle;
 
-		constexpr static double bar_offset = .15;
-		constexpr static double bar_width  = .8;
-		constexpr static double bar_height = .18;
-		constexpr static double thickness  = .05;
+		constexpr static float bar_offset = .15f;
+		constexpr static float bar_width  = .8f;
+		constexpr static float bar_height = .18f;
+		constexpr static float thickness  = .05f;
 
 		const auto [row, column] = getPosition();
 		const auto [x, y, z] = offset.copyBase();
 
-		const double bar_x = double(column) + x - (bar_width - 1) / 2;
-		const double bar_y = double(row) + y - z - bar_offset - bar_height;
-		const double fraction = double(health) / getMaxHealth();
+		const float bar_x = float(column) + x - (bar_width - 1) / 2;
+		const float bar_y = float(row) + y - z - bar_offset - bar_height;
+		const float fraction = double(health) / getMaxHealth();
 
 		rectangle.drawOnMap(RenderOptions {
 			.x = bar_x - thickness,
@@ -178,7 +178,7 @@ namespace Game3 {
 		return {};
 	}
 
-	double LivingEntity::getBaseSpeed() {
+	float LivingEntity::getBaseSpeed() {
 		return 1.5;
 	}
 }

@@ -21,6 +21,7 @@ namespace Game3 {
 			virtual ~NoiseGenerator() = default;
 			virtual double operator()(double x, double y) const = 0;
 			virtual double operator()(double x, double y, double z) const = 0;
+			// virtual void fill(std::vector<float> &, double x, double y,
 			virtual void setSeed(int) = 0;
 	};
 

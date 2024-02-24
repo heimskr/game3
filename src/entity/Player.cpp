@@ -188,7 +188,7 @@ namespace Game3 {
 		}
 	}
 
-	bool Player::setTooldown(double multiplier) {
+	bool Player::setTooldown(float multiplier) {
 		if (getSide() != Side::Server)
 			return false;
 
@@ -364,10 +364,10 @@ namespace Game3 {
 		addKnownRealm(realm.id);
 	}
 
-	double Player::getAttackPeriod() const {
+	float Player::getAttackPeriod() const {
 		if (speedStat == 0)
-			return std::numeric_limits<double>::infinity();
-		return 1. / speedStat;
+			return std::numeric_limits<float>::infinity();
+		return 1 / speedStat;
 	}
 
 	bool Player::canAttack() const {

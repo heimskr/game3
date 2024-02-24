@@ -1,14 +1,14 @@
-#version 410 core
+#version 330 core
 
-flat in dvec2 texCoords;
-flat in dvec4 spriteColor;
-flat in dvec4 specialPosition;
+in vec2 texCoords;
+in vec4 spriteColor;
+in vec4 specialPosition;
 out vec4 color;
 
 uniform sampler2D sprite;
 
 void main() {
-	color = vec4(spriteColor * texture(sprite, vec2(texCoords)));
+	color = spriteColor * texture(sprite, texCoords);
 	if (texCoords.x < specialPosition.x || texCoords.y < specialPosition.y || specialPosition.x + specialPosition.z < texCoords.x || specialPosition.y + specialPosition.w < texCoords.y) {
 		discard;
 	}

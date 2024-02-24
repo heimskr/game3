@@ -21,7 +21,7 @@ namespace Game3 {
 	Quadrant toQuadrant(Direction);
 
 	/** x and y are expected to be in the range [0, 1). */
-	Quadrant getQuadrant(double x, double y);
+	Quadrant getQuadrant(float x, float y);
 
 	std::string_view toString(Quadrant);
 }

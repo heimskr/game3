@@ -243,7 +243,7 @@ namespace Game3 {
 
 	template <>
 	std::string Buffer::getType(const Vector3 &) {
-		return std::string{'\x32'} + getType(double{});
+		return std::string{'\x32'} + getType(float{});
 	}
 
 	Buffer & operator+=(Buffer &buffer, const Vector3 &vector) {
@@ -267,23 +267,23 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const Vector2d &) {
-		return std::string{'\x31'} + getType(double{});
+	std::string Buffer::getType(const Vector2f &) {
+		return std::string{'\x31'} + getType(float{});
 	}
 
-	Buffer & operator+=(Buffer &buffer, const Vector2d &vector) {
+	Buffer & operator+=(Buffer &buffer, const Vector2f &vector) {
 		return (buffer.appendType(vector) += vector.x) += vector.y;
 	}
 
-	Buffer & operator<<(Buffer &buffer, const Vector2d &vector) {
+	Buffer & operator<<(Buffer &buffer, const Vector2f &vector) {
 		return buffer += vector;
 	}
 
-	Buffer & operator>>(Buffer &buffer, Vector2d &vector) {
+	Buffer & operator>>(Buffer &buffer, Vector2f &vector) {
 		const auto type = buffer.popType();
 		if (!Buffer::typesMatch(type, buffer.getType(vector))) {
 			buffer.debug();
-			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected shortlist<f32, 2> for Vector2d)");
+			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected shortlist<f32, 2> for Vector2f)");
 		}
 		popBuffer(buffer, vector.x);
 		popBuffer(buffer, vector.y);

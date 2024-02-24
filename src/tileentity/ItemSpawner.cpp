@@ -14,7 +14,7 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	ItemSpawner::ItemSpawner(Position position_, double minimum_time, double maximum_time, std::vector<ItemStack> spawnables_):
+	ItemSpawner::ItemSpawner(Position position_, float minimum_time, float maximum_time, std::vector<ItemStack> spawnables_):
 		TileEntity("base:tile/empty", ID(), position_, false),
 		minimumTime(minimum_time),
 		maximumTime(maximum_time),

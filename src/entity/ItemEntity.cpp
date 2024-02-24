@@ -30,10 +30,10 @@ namespace Game3 {
 		std::shared_ptr<ItemTexture> item_texture = game.registry<ItemTextureRegistry>().at(stack.item->identifier);
 		texture = stack.getTexture(game);
 		texture->init();
-		offsetX = item_texture->x / 2.;
-		offsetY = item_texture->y / 2.;
-		sizeX = double(item_texture->width);
-		sizeY = double(item_texture->height);
+		offsetX = item_texture->x / 2.f;
+		offsetY = item_texture->y / 2.f;
+		sizeX = float(item_texture->width);
+		sizeY = float(item_texture->height);
 	}
 
 	std::shared_ptr<ItemEntity> ItemEntity::create(Game &) {
@@ -89,18 +89,18 @@ namespace Game3 {
 				return;
 		}
 
-		const double x = position.column + offset.x;
-		const double y = position.row + offset.y;
+		const float x = position.column + offset.x;
+		const float y = position.row + offset.y;
 
 		sprite_renderer(texture, {
-			.x = x + .125,
-			.y = y + .125,
+			.x = x + .125f,
+			.y = y + .125f,
 			.offsetX = offsetX,
 			.offsetY = offsetY,
 			.sizeX = sizeX,
 			.sizeY = sizeY,
-			.scaleX = .75 * 16. / sizeX,
-			.scaleY = .75 * 16. / sizeY,
+			.scaleX = .75f * 16.f / sizeX,
+			.scaleY = .75f * 16.f / sizeY,
 		});
 	}
 

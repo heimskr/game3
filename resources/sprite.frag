@@ -1,4 +1,4 @@
-#version 410 core
+#version 330 core
 
 // Credit: https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/3.2d_game/0.full_source/sprite.fs
 
@@ -7,7 +7,7 @@ out vec4 color;
 
 uniform sampler2D sprite;
 uniform vec4 spriteColor;
-uniform dvec4 texturePosition;
+uniform vec4 texturePosition;
 
 void main() {
 	color = spriteColor * texture(sprite, TexCoords);

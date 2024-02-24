@@ -4,7 +4,7 @@
 #include "util/BufferUtil.h"
 
 namespace Game3 {
-	template <typename T = double>
+	template <typename T = float>
 	struct TimeAccumulator {
 		Atomic<T> accumulatedTime = 0;
 

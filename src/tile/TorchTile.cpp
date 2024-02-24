@@ -17,7 +17,7 @@ namespace Game3 {
 	void TorchTile::renderStaticLighting(const Place &place, Layer, const RendererContext &context) {
 		assert(place.realm->isClient());
 		const size_t tile_size = place.realm->getTileset().getTileSize();
-		const double radius = 64. * tile_size;
+		const float radius = 64 * tile_size;
 		const int factor = context.factor;
 
 		const ChunkPosition chunk = place.player->getChunk() - ChunkPosition(1, 1);

@@ -32,8 +32,8 @@ namespace Game3 {
 			void reset();
 			void init();
 			void setup(TileProvider &);
-			void render(double divisor, double scale, double center_x, double center_y);
-			void render(double divisor);
+			void render(float divisor, float scale, float center_x, float center_y);
+			void render(float divisor);
 			bool reupload();
 			std::future<bool> queueReupload();
 			bool onBackbufferResized(int width, int height);

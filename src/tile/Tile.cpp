@@ -57,12 +57,12 @@ namespace Game3 {
 		if (any_in_range)
 			return false;
 
-		std::uniform_real_distribution distribution(0., 1.);
+		std::uniform_real_distribution<float> distribution(0, 1);
 		return distribution(threadContext.rng) < getMonsterSpawnProbability();
 	}
 
-	double Tile::getMonsterSpawnProbability() const {
-		return .1;
+	float Tile::getMonsterSpawnProbability() const {
+		return 0.1;
 	}
 
 	void Tile::renderStaticLighting(const Place &, Layer, const RendererContext &) {}

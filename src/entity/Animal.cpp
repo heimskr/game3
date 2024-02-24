@@ -15,15 +15,16 @@ namespace Game3 {
 		constexpr size_t    PATHFIND_MAX = 256;
 	}
 
-	std::uniform_real_distribution<double> Animal::getWanderDistribution() {
-		return std::uniform_real_distribution(10., 20.);
+	std::uniform_real_distribution<float> Animal::getWanderDistribution() {
+		// return std::uniform_real_distribution(10.f, 20.f);
+		return std::uniform_real_distribution(5.f, 5.f);
 	}
 
 	Animal::Animal():
 		Entity("base:invalid/Animal") {}
 
 	void Animal::updateRiderOffset(const std::shared_ptr<Entity> &rider) {
-		rider->setOffset(getOffset() + Vector3{0., 0., .3});
+		rider->setOffset(getOffset() + Vector3{0.f, 0.f, .3f});
 	}
 
 	bool Animal::onInteractOn(const std::shared_ptr<Player> &player, Modifiers, ItemStack *, Hand) {

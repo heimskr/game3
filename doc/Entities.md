@@ -78,7 +78,7 @@ There are some virtual methods that are optional to override. These include:
                                               Returns true iff anything interesting happened as a result.
 - `void init(Game &)`: called when the entity is created with the static `create` method.
 - `void initAfterLoad(Game &)`: called after the game is loaded from a save file.
-- `double getMovementSpeed() const`: returns how many tiles the entity can move per second.
+- `float getMovementSpeed() const`: returns how many tiles the entity can move per second.
 - `std::string getName() const`: returns the display name for the entity. If not overridden, it'll return something like `"Unknown Entity (base:entity/my_entity)"`.
 
 For LivingEntity:

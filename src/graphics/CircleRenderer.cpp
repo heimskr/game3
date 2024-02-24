@@ -43,7 +43,7 @@ namespace Game3 {
 	void CircleRenderer::update(int width, int height) {
 		if (width != backbufferWidth || height != backbufferHeight) {
 			HasBackbuffer::update(width, height);
-			projection = glm::ortho(0., double(width), double(height), 0., -1., 1.);
+			projection = glm::ortho(0.f, float(width), float(height), 0.f, -1.f, 1.f);
 			shader.bind(); CHECKGL
 			shader.set("projection", projection); CHECKGL
 		}
@@ -53,8 +53,8 @@ namespace Game3 {
 		if (!isInitialized())
 			return;
 
-		auto width  = options.sizeX * 16.;
-		auto height = options.sizeY * 16.;
+		auto width  = options.sizeX * 16;
+		auto height = options.sizeY * 16;
 		auto angle  = options.angle;
 		auto x = options.x;
 		auto y = options.y;
@@ -79,15 +79,15 @@ namespace Game3 {
 
 		shader.bind(); CHECKGL
 
-		glm::dmat4 model(1.);
+		glm::mat4 model = glm::mat4(1.f);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::dvec3(x, y, 0.));
+		model = glm::translate(model, glm::vec3(x, y, 0.f));
 		if (angle != 0) {
-			model = glm::translate(model, glm::dvec3(.5 * width, .5 * height, 0.)); // move origin of rotation to center of quad
-			model = glm::rotate(model, glm::radians(angle), glm::dvec3(0., 0., 1.)); // then rotate
-			model = glm::translate(model, glm::dvec3(-.5 * width, -.5 * height, 0.)); // move origin back
+			model = glm::translate(model, glm::vec3(0.5f * width, 0.5f * height, 0.f)); // move origin of rotation to center of quad
+			model = glm::rotate(model, float(glm::radians(angle)), glm::vec3(0.f, 0.f, 1.f)); // then rotate
+			model = glm::translate(model, glm::vec3(-0.5f * width, -0.5f * height, 0.f)); // move origin back
 		}
-		model = glm::scale(model, glm::dvec3(width * canvas.scale / 2., height * canvas.scale / 2., 1.)); // last scale
+		model = glm::scale(model, glm::vec3(width * canvas.scale / 2., height * canvas.scale / 2., 1.f)); // last scale
 
 		shader.set("model", model); CHECKGL
 		shader.set("circleColor", options.color); CHECKGL
@@ -100,7 +100,7 @@ namespace Game3 {
 		glBindVertexArray(0); CHECKGL
 	}
 
-	void CircleRenderer::drawOnScreen(const Color &color, double x, double y, double width, double height, float cutoff, double angle) {
+	void CircleRenderer::drawOnScreen(const Color &color, float x, float y, float width, float height, float cutoff, float angle) {
 		if (!isInitialized())
 			return;
 
@@ -108,19 +108,20 @@ namespace Game3 {
 
 		shader.bind(); CHECKGL
 
-		glm::dmat4 model(1.);
+		glm::mat4 model = glm::mat4(1.f);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::dvec3(x, y, 0.));
+		model = glm::translate(model, glm::vec3(x, y, 0.f));
 		if (angle != 0) {
-			model = glm::translate(model, glm::dvec3(.5 * width, .5 * height, 0.)); // move origin of rotation to center of quad
-			model = glm::rotate(model, glm::radians(angle), glm::dvec3(0., 0., 1.)); // then rotate
-			model = glm::translate(model, glm::dvec3(-.5 * width, -.5 * height, 0.)); // move origin back
+			model = glm::translate(model, glm::vec3(0.5f * width, 0.5f * height, 0.f)); // move origin of rotation to center of quad
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
+			model = glm::translate(model, glm::vec3(-0.5f * width, -0.5f * height, 0.f)); // move origin back
 		}
-		model = glm::scale(model, glm::dvec3(width, height, 1.)); // last scale
+		model = glm::scale(model, glm::vec3(width, height, 1.f)); // last scale
 
 		shader.set("model", model); CHECKGL
 		shader.set("circleColor", color); CHECKGL
 		shader.set("cutoff", cutoff);
+
 
 		glEnable(GL_BLEND); CHECKGL
 		glBlendFunc(GL_SRC_ALPHA, BLEND_MODE); CHECKGL
@@ -133,7 +134,7 @@ namespace Game3 {
 		GLuint vbo;
 
 		std::shared_lock<DefaultMutex> shared_lock;
-		const std::vector<double> &vertices = getVertices(sides, shared_lock);
+		const std::vector<float> &vertices = getVertices(sides, shared_lock);
 
 		glGenVertexArrays(1, &quadVAO); CHECKGL
 		glGenBuffers(1, &vbo); CHECKGL
@@ -142,17 +143,17 @@ namespace Game3 {
 		glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &old_abb); CHECKGL
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo); CHECKGL
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(double), vertices.data(), GL_STATIC_DRAW); CHECKGL
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW); CHECKGL
 
 		glBindVertexArray(quadVAO); CHECKGL
 		glEnableVertexAttribArray(0); CHECKGL
-		GL::vertexAttribPointer<double>(0, 2, GL_FALSE, 2 * sizeof(double), nullptr); CHECKGL
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr); CHECKGL
 		glBindBuffer(GL_ARRAY_BUFFER, old_abb); CHECKGL
 		glBindVertexArray(0); CHECKGL
 		initializedTo = sides;
 	}
 
-	const std::vector<double> & CircleRenderer::getVertices(int sides, std::shared_lock<DefaultMutex> &shared_lock) {
+	const std::vector<float> & CircleRenderer::getVertices(int sides, std::shared_lock<DefaultMutex> &shared_lock) {
 		shared_lock = vertexMap.sharedLock();
 		if (auto iter = vertexMap.find(sides); iter != vertexMap.end())
 			return iter->second;
@@ -165,16 +166,16 @@ namespace Game3 {
 			return iter->second;
 		}
 
-		std::vector<double> &vertices = vertexMap[sides];
+		std::vector<float> &vertices = vertexMap[sides];
 		for (int i = 0; i < sides; ++i) {
-			const double rad1 = 2. * M_PI * i / sides;
-			const double rad2 = 2. * M_PI * (i + 1) / sides;
-			const double x1 = std::cos(rad1);
-			const double y1 = std::sin(rad1);
-			const double x2 = std::cos(rad2);
-			const double y2 = std::sin(rad2);
-			vertices.push_back(0.);
-			vertices.push_back(0.);
+			const float rad1 = 2. * M_PI * i / sides;
+			const float rad2 = 2. * M_PI * (i + 1) / sides;
+			const float x1 = cos(rad1);
+			const float y1 = sin(rad1);
+			const float x2 = cos(rad2);
+			const float y2 = sin(rad2);
+			vertices.push_back(0.f);
+			vertices.push_back(0.f);
 			vertices.push_back(x1);
 			vertices.push_back(y1);
 			vertices.push_back(x2);

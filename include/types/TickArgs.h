@@ -8,9 +8,9 @@ namespace Game3 {
 	struct TickArgs {
 		Game &game;
 		Tick tick;
-		double delta;
+		float delta;
 
-		TickArgs(Game &game_, Tick tick_, double delta_):
+		TickArgs(Game &game_, Tick tick_, float delta_):
 			game(game_), tick(tick_), delta(delta_) {}
 	};
 }

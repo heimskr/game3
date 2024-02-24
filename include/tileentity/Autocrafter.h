@@ -52,10 +52,10 @@ namespace Game3 {
 			TileID cachedArmLower = -1;
 			TileID cachedArmUpper = -1;
 			LockableSharedPtr<Texture> stationTexture;
-			double stationXOffset{};
-			double stationYOffset{};
-			double stationSizeX{};
-			double stationSizeY{};
+			float stationXOffset{};
+			float stationYOffset{};
+			float stationSizeX{};
+			float stationSizeY{};
 
 			Autocrafter();
 			Autocrafter(Identifier tile_id, Position);

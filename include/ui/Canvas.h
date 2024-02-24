@@ -42,10 +42,10 @@ namespace Game3 {
 			GL::FBO fbo;
 			Multiplier multiplier;
 			Overlayer overlayer;
-			double magic = 8.;
+			float magic = 8.f;
 			Gdk::Rectangle realmBounds;
 			const Realm *lastRealm = nullptr;
-			double sizeDivisor = 1.;
+			double sizeDivisor = 1.0;
 
 			Canvas(MainWindow &);
 

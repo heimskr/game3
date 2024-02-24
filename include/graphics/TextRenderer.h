@@ -30,7 +30,7 @@ namespace Game3 {
 		Color color{1, 1, 1, 1};
 		TextAlign align = TextAlign::Left;
 		Color shadow{0, 0, 0, 1};
-		Vector2d shadowOffset{.025, .025};
+		Vector2f shadowOffset{.025f, .025f};
 	};
 
 	class TextRenderer: public HasBackbuffer {
@@ -57,11 +57,11 @@ namespace Game3 {
 			void update(const Canvas &);
 			void update(int width, int height) override;
 
-			void drawOnMap(Glib::ustring text, double x, double y, TextAlign align, double scale, double angle, double alpha);
+			void drawOnMap(Glib::ustring text, float x, float y, TextAlign align, float scale, float angle, float alpha);
 			void drawOnMap(Glib::ustring text, TextRenderOptions = {});
 			void drawOnScreen(Glib::ustring text, const TextRenderOptions & = {});
-			double textWidth(Glib::ustring, double scale = 1.);
-			double textHeight(Glib::ustring, double scale = 1.);
+			float textWidth(Glib::ustring, float scale = 1.f);
+			float textHeight(Glib::ustring, float scale = 1.f);
 
 			template <typename... Args>
 			void operator()(Args &&...args) {
@@ -89,7 +89,7 @@ namespace Game3 {
 			GLuint vbo = 0;
 			bool initialized = false;
 
-			glm::dmat4 projection;
+			glm::mat4 projection;
 
 			std::unique_ptr<FT_Library, FreeLibrary> freetypeLibrary;
 			std::unique_ptr<FT_Face, FreeFace> freetypeFace;

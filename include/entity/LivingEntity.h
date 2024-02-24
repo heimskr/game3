@@ -37,11 +37,11 @@ namespace Game3 {
 			int defenseStat = 0;
 			double luckStat = 0;
 			/** Affects attack speed. */
-			double speedStat = getBaseSpeed();
+			float speedStat = getBaseSpeed();
 
 			LivingEntity();
 
-			static double getBaseSpeed();
+			static float getBaseSpeed();
 	};
 
 	using LivingEntityPtr = std::shared_ptr<LivingEntity>;

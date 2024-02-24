@@ -45,12 +45,12 @@ namespace Game3 {
 			static constexpr const char *DEFAULT_PATH = "game.g3";
 
 			/** Seconds since the last tick */
-			double delta = 0.;
+			float delta = 0.f;
 			std::chrono::system_clock::time_point startTime = std::chrono::system_clock::now();
 			bool debugMode = true;
 			/** 12 because the game starts at noon */
-			double hourOffset = 12.;
-			std::atomic<double> time = 0.;
+			float hourOffset = 12.;
+			std::atomic<double> time = 0.f;
 			size_t cavesGenerated = 0;
 			size_t randomTicksPerChunk = 2;
 			bool dying = false;

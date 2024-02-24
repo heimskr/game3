@@ -50,7 +50,7 @@ namespace Game3 {
 			struct Atlas {
 				std::shared_ptr<Texture> texture;
 				GL::VBO vbo;
-				GL::DoubleVAO vao;
+				GL::FloatVAO vao;
 				size_t lastDataCount = 0;
 			};
 
@@ -61,6 +61,6 @@ namespace Game3 {
 			void flush(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &, size_t tile_size);
 
 			Atlas generateAtlas(std::shared_ptr<Texture>, const std::vector<const RenderOptions *> &);
-			std::vector<double> generateData(std::shared_ptr<Texture>, const std::vector<const RenderOptions *> &);
+			std::vector<float> generateData(std::shared_ptr<Texture>, const std::vector<const RenderOptions *> &);
 	};
 }
