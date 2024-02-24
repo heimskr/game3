@@ -10,7 +10,7 @@ namespace Game3 {
 
 			TerrainSeed(ItemID id_, std::string name_, Identifier target_tilename, Identifier replacement_tilename, MoneyCount base_price, ItemCount max_count = 64);
 
-			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
+			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<double, double>) override;
 			bool drag(Slot, ItemStack &, const Place &, Modifiers) override;
 	};
 }

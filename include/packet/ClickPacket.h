@@ -10,12 +10,12 @@ namespace Game3 {
 		static PacketID ID() { return 29; }
 
 		Position position;
-		float offsetX = 0.f;
-		float offsetY = 0.f;
+		double offsetX = 0.;
+		double offsetY = 0.;
 		Modifiers modifiers;
 
 		ClickPacket() = default;
-		ClickPacket(const Position &position_, float offset_x, float offset_y, Modifiers modifiers_):
+		ClickPacket(const Position &position_, double offset_x, double offset_y, Modifiers modifiers_):
 			position(position_), offsetX(offset_x), offsetY(offset_y), modifiers(modifiers_) {}
 
 		PacketID getID() const override { return ID(); }

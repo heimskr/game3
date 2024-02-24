@@ -1,4 +1,4 @@
-#version 330 core
+#version 410 core
 
 // Credit: https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/3.2d_game/0.full_source/sprite.fs
 

@@ -97,7 +97,7 @@ namespace Game3 {
 		}
 	}
 
-	Quadrant getQuadrant(float x, float y) {
+	Quadrant getQuadrant(double x, double y) {
 		// Garbage variable names, but the original useful names weren't quite correct.
 		const bool one = x <= y;
 		const bool two = (1. - x) <= y;

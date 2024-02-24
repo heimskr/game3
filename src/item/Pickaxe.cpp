@@ -8,10 +8,10 @@
 #include "realm/Realm.h"
 
 namespace Game3 {
-	Pickaxe::Pickaxe(ItemID id_, std::string name_, MoneyCount base_price, float base_cooldown, Durability max_durability):
+	Pickaxe::Pickaxe(ItemID id_, std::string name_, MoneyCount base_price, double base_cooldown, Durability max_durability):
 		Tool(id_, std::move(name_), base_price, base_cooldown, max_durability, "base:attribute/pickaxe"_id) {}
 
-	bool Pickaxe::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
+	bool Pickaxe::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<double, double>) {
 		Realm &realm = *place.realm;
 		Tileset &tileset = realm.getTileset();
 

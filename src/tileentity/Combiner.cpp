@@ -16,7 +16,7 @@
 
 namespace Game3 {
 	namespace {
-		constexpr float ENERGY_CAPACITY = 100'000;
+		constexpr double ENERGY_CAPACITY = 100'000;
 		constexpr std::chrono::milliseconds PERIOD{100};
 		constexpr ItemCount INPUT_CAPACITY  = 5;
 		constexpr ItemCount OUTPUT_CAPACITY = 10;

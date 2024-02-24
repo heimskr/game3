@@ -10,9 +10,9 @@
 
 namespace Game3 {
 	namespace {
-		constexpr float PATIENCE = 10.f;
-		constexpr float SEARCH_PERIOD = 1;
-		constexpr float ADJUSTMENT_PERIOD = 0.5;
+		constexpr double PATIENCE = 10.;
+		constexpr double SEARCH_PERIOD = 1.;
+		constexpr double ADJUSTMENT_PERIOD = 0.5;
 		constexpr uint64_t SEARCH_RADIUS = 8;
 		constexpr uint64_t TENACITY = 16;
 		constexpr HitPoints MAX_HEALTH = 30;
@@ -82,7 +82,7 @@ namespace Game3 {
 		setTarget(attacker);
 	}
 
-	float Monster::getPatience() const {
+	double Monster::getPatience() const {
 		return PATIENCE;
 	}
 
@@ -110,8 +110,8 @@ namespace Game3 {
 		return getMinimumAgeForDespawn() < age;
 	}
 
-	float Monster::getMinimumAgeForDespawn() const {
-		return 30;
+	double Monster::getMinimumAgeForDespawn() const {
+		return 30.;
 	}
 
 	std::vector<ItemStack> Monster::getDrops() {

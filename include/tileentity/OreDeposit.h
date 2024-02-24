@@ -9,11 +9,11 @@ namespace Game3 {
 		ItemStack stack;
 		Identifier tilename;
 		Identifier regenTilename;
-		float tooldownMultiplier;
+		double tooldownMultiplier;
 		uint32_t maxUses;
-		float cooldown;
+		double cooldown;
 
-		Ore(Identifier, ItemStack, Identifier tilename_, Identifier regen_tilename, float tooldown_multiplier, uint32_t max_uses, float cooldown_);
+		Ore(Identifier, ItemStack, Identifier tilename_, Identifier regen_tilename, double tooldown_multiplier, uint32_t max_uses, double cooldown_);
 
 		static Ore fromJSON(const Game &, const nlohmann::json &);
 	};

@@ -9,7 +9,7 @@ namespace Game3 {
 		Entity(ID()) {}
 
 	void Ship::updateRiderOffset(const EntityPtr &rider) {
-		rider->setOffset(getOffset() + Vector3{.5f, .5f, 0.f});
+		rider->setOffset(getOffset() + Vector3{.5, .5, .0});
 	}
 
 	bool Ship::moveFromRider(const EntityPtr &rider, Direction move_direction, MovementContext context) {
@@ -40,18 +40,18 @@ namespace Game3 {
 		const auto [x_dimension, y_dimension] = getDimensions();
 		const auto [row, column] = position.copyBase();
 
-		float texture_x_offset = 16 * (int(direction.load()) - 1);
+		double texture_x_offset = 16 * (int(direction.load()) - 1);
 
-		const float x = column + offset_x;
-		const float y = row    + offset_y - offset_z;
+		const double x = column + offset_x;
+		const double y = row    + offset_y - offset_z;
 
 		sprite_renderer(texture, RenderOptions{
 			.x = x,
 			.y = y,
 			.offsetX = texture_x_offset,
-			.offsetY = 0.f,
-			.sizeX = 16.f * x_dimension,
-			.sizeY = 16.f * y_dimension,
+			.offsetY = 0.,
+			.sizeX = 16. * x_dimension,
+			.sizeY = 16. * y_dimension,
 		});
 	}
 

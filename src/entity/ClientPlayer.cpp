@@ -82,15 +82,15 @@ namespace Game3 {
 		const auto [x, y, z] = offset.copyBase();
 
 		const bool show_message = lastMessageAge.load() < getMaxMessageAge(game->toClient());
-		const float health_offset = canShowHealthBar()? -.5 : 0;
-		const float name_offset = health_offset + (show_message? -1 : 0);
+		const double health_offset = canShowHealthBar()? -.5 : 0;
+		const double name_offset = health_offset + (show_message? -1 : 0);
 
 		LivingEntity::render(renderers);
 
 		if (show_message) {
 			text.drawOnMap(lastMessage, {
-				.x = float(column) + x + .5,
-				.y = float(row) + y - z + health_offset - .25,
+				.x = double(column) + x + .5,
+				.y = double(row) + y - z + health_offset - .25,
 				.scaleX = .75,
 				.scaleY = .75,
 				.align = TextAlign::Center,
@@ -98,8 +98,8 @@ namespace Game3 {
 		}
 
 		text.drawOnMap(displayName, {
-			.x = float(column) + x + .5,
-			.y = float(row) + y - z + name_offset,
+			.x = double(column) + x + .5,
+			.y = double(row) + y - z + name_offset,
 			.align = TextAlign::Center,
 		});
 	}
@@ -111,7 +111,7 @@ namespace Game3 {
 		const auto [row, column] = getPosition();
 		const auto [x, y, z] = offset.copyBase();
 
-		constexpr static float radius = 8;
+		constexpr static double radius = 8;
 
 		renderers.circle.drawOnMap(RenderOptions{
 			.x = column + x + .5,

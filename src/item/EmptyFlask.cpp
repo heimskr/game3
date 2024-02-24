@@ -8,7 +8,7 @@
 #include "realm/Realm.h"
 
 namespace Game3 {
-	bool EmptyFlask::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
+	bool EmptyFlask::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<double, double>) {
 		PlayerPtr player = place.player;
 		RealmPtr  realm  = place.realm;
 		Game &game = realm->getGame();

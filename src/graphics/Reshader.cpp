@@ -38,7 +38,7 @@ namespace Game3 {
 		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
 			backbufferWidth = backbuffer_width;
 			backbufferHeight = backbuffer_height;
-			glm::mat4 projection = glm::ortho(0.f, float(backbuffer_width), float(backbuffer_height), 0.f, -1.f, 1.f);
+			glm::dmat4 projection = glm::ortho(0., double(backbuffer_width), double(backbuffer_height), 0., -1., 1.);
 			shader.bind(); CHECKGL
 			shader.set("projection", projection); CHECKGL
 		}
@@ -54,10 +54,10 @@ namespace Game3 {
 
 		shader.bind(); CHECKGL
 
-		const float width  = backbufferWidth;
-		const float height = backbufferHeight;
+		const double width(backbufferWidth);
+		const double height(backbufferHeight);
 
-		glm::mat4 model = glm::scale(glm::mat4(1.f), glm::vec3(width, height, 1.f));
+		glm::dmat4 model = glm::scale(glm::dmat4(1.), glm::dvec3(width, height, 1.));
 
 		shader.set("model", model);
 
@@ -77,13 +77,13 @@ namespace Game3 {
 
 	void Reshader::initRenderData() {
 		static const float vertices[] {
-			0.f, 1.f, 0.f, 1.f,
-			1.f, 0.f, 1.f, 0.f,
-			0.f, 0.f, 0.f, 0.f,
+			0, 1, 0, 1,
+			1, 0, 1, 0,
+			0, 0, 0, 0,
 
-			0.f, 1.f, 0.f, 1.f,
-			1.f, 1.f, 1.f, 1.f,
-			1.f, 0.f, 1.f, 0.f,
+			0, 1, 0, 1,
+			1, 1, 1, 1,
+			1, 0, 1, 0,
 		};
 
 		glGenVertexArrays(1, &quadVAO); CHECKGL
@@ -97,7 +97,7 @@ namespace Game3 {
 
 		glBindVertexArray(quadVAO); CHECKGL
 		glEnableVertexAttribArray(0); CHECKGL
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr); CHECKGL
+		GL::vertexAttribPointer<float>(0, 4, GL_FALSE, 4 * sizeof(float), nullptr); CHECKGL
 		glBindBuffer(GL_ARRAY_BUFFER, old_abb); CHECKGL_SET
 		if (gl_err)
 			WARN_("old_abb = " << old_abb);

@@ -9,7 +9,7 @@
 #include "realm/Realm.h"
 
 namespace Game3 {
-	bool Bomb::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
+	bool Bomb::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<double, double>) {
 		constexpr Index  DIAMETER = 5;
 		constexpr double RADIUS = DIAMETER / 2.;
 

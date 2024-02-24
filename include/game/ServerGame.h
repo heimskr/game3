@@ -25,14 +25,14 @@ namespace Game3 {
 
 	class ServerGame: public Game {
 		public:
-			constexpr static float GARBAGE_COLLECTION_TIME = 60;
+			constexpr static double GARBAGE_COLLECTION_TIME = 60.;
 
 			Lockable<std::unordered_set<ServerPlayerPtr>> players;
 			Lockable<std::unordered_map<std::string, ServerPlayerPtr>> playerMap;
 			Lockable<std::map<std::string, ssize_t>> gameRules;
 			std::weak_ptr<Server> weakServer;
 			GameDB database{*this};
-			float lastGarbageCollection = 0;
+			double lastGarbageCollection = 0.;
 
 			ServerGame(const std::shared_ptr<Server> &, size_t pool_size);
 

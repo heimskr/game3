@@ -9,9 +9,9 @@ namespace Game3 {
 	class Worker: public LivingEntity {
 		public:
 			static Identifier ID() { return {"base", "entity/worker"}; }
-			constexpr static float WORK_START_HOUR = 8.f;
-			constexpr static float WORK_END_HOUR = 18.f;
-			constexpr static float RETRY_TIME = 30.f;
+			constexpr static double WORK_START_HOUR = 8.;
+			constexpr static double WORK_END_HOUR = 18.;
+			constexpr static double RETRY_TIME = 30.;
 			constexpr static HitPoints MAX_HEALTH = 40;
 
 			Phase phase = 0;
@@ -21,7 +21,7 @@ namespace Game3 {
 			std::shared_ptr<Building> keep;
 			Position destination = {-1, -1};
 			bool stuck = false;
-			float stuckTime = 0.f;
+			double stuckTime = 0.;
 
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(Game &, const nlohmann::json &) override;
@@ -38,7 +38,7 @@ namespace Game3 {
 			Worker(EntityType, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_);
 
 			HitPoints getMaxHealth() const override { return MAX_HEALTH; }
-			bool stillStuck(float delta);
+			bool stillStuck(double delta);
 			void goToKeep(Phase new_phase);
 			void goToStockpile(Phase new_phase);
 			void leaveKeep(Phase new_phase);

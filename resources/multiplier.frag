@@ -1,9 +1,6 @@
-#version 330 core
-
-precision mediump float;
+#version 410 core
 
 in vec2 TexCoords;
-in vec4 Position;
 out vec4 FragColor;
 uniform sampler2D texture0;
 uniform sampler2D texture1;
@@ -20,6 +17,4 @@ void main() {
 	} else {
 		FragColor = base;
 	}
-
-	// FragColor = Position;
 }

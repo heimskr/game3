@@ -23,8 +23,8 @@ namespace Game3 {
 	namespace {
 		const std::string & upperFrag() { static auto out = readFile("resources/upper.frag"); return out; }
 		const std::string & upperVert() { static auto out = readFile("resources/upper.vert"); return out; }
-		constexpr float TEXTURE_SCALE = 2.f;
-		constexpr float TILE_TEXTURE_PADDING = 1.f / 16384.f;
+		constexpr double TEXTURE_SCALE = 2.;
+		constexpr double TILE_TEXTURE_PADDING = 1. / 16384.;
 	}
 
 	UpperRenderer::UpperRenderer() {}
@@ -66,7 +66,7 @@ namespace Game3 {
 		provider = &provider_;
 	}
 
-	void UpperRenderer::render(float /* divisor */, float scale, float center_x, float center_y) {
+	void UpperRenderer::render(double /* divisor */, double scale, double center_x, double center_y) {
 		if (!initialized)
 			return;
 
@@ -83,13 +83,13 @@ namespace Game3 {
 		const auto tilesize = tileset.getTileSize();
 		auto texture = tileset.getTexture(realm->getGame());
 
-		glm::mat4 projection(1.f);
-		projection = glm::scale(projection, {float(tilesize), -float(tilesize), 1.f}) *
-		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1.f}) *
+		glm::dmat4 projection(1.);
+		projection = glm::scale(projection, {double(tilesize), -double(tilesize), 1.}) *
+		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1.}) *
 		             glm::translate(projection, {
-		                 center_x - CHUNK_SIZE / 2.f + chunk_x * CHUNK_SIZE,
-		                 center_y - CHUNK_SIZE / 2.f + chunk_y * CHUNK_SIZE,
-		                 0.f
+		                 center_x - CHUNK_SIZE / 2. + chunk_x * CHUNK_SIZE,
+		                 center_y - CHUNK_SIZE / 2. + chunk_y * CHUNK_SIZE,
+		                 0.
 		             });
 
 		CHECKGL
@@ -108,7 +108,7 @@ namespace Game3 {
 		GL::triangles(CHUNK_SIZE * CHUNK_SIZE);
 	}
 
-	void UpperRenderer::render(float /* divisor */) {
+	void UpperRenderer::render(double /* divisor */) {
 		if (!initialized)
 			return;
 
@@ -123,10 +123,10 @@ namespace Game3 {
 		auto &tileset = realm->getTileset();
 		const auto tilesize = tileset.getTileSize();
 
-		glm::mat4 projection(1.f);
-		projection = glm::scale(projection, {tilesize, tilesize, 1.f}) *
-		             glm::scale(projection, {2.f / backbufferWidth, 2.f / backbufferHeight, 1.f}) *
-		             glm::translate(projection, {-CHUNK_SIZE, -CHUNK_SIZE, 0.f});
+		glm::dmat4 projection(1.);
+		projection = glm::scale(projection, {tilesize, tilesize, 1.}) *
+		             glm::scale(projection, {2. / backbufferWidth, 2. / backbufferHeight, 1.}) *
+		             glm::translate(projection, {-CHUNK_SIZE, -CHUNK_SIZE, 0.});
 
 		shader.bind();
 		vao.bind();
@@ -206,11 +206,11 @@ namespace Game3 {
 		if (set_width == 0)
 			return false;
 
-		const float divisor = set_width;
-		const float t_size = 1.f / divisor - TILE_TEXTURE_PADDING * 2;
+		const double divisor(set_width);
+		const double t_size = 1. / divisor - TILE_TEXTURE_PADDING * 2;
 
 		Timer timer{"UpperVBOInit"};
-		vbo.init<float, 8>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, &tileset, set_width, divisor, t_size](size_t x, size_t y) {
+		vbo.init<double, 8>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, &tileset, set_width, divisor, t_size](size_t x, size_t y) {
 			const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
 
 			std::array<TileID, LAYER_COUNT> uppers{};
@@ -231,8 +231,8 @@ namespace Game3 {
 
 			// Texture coordinates for the upper portion of the below tile
 #define U_DEFS(I) \
-			const float ux##I = (uppers[I] % set_width) / divisor + TILE_TEXTURE_PADDING; \
-			const float uy##I = (uppers[I] / set_width) / divisor + TILE_TEXTURE_PADDING;
+			const double ux##I = (uppers[I] % set_width) / divisor + TILE_TEXTURE_PADDING; \
+			const double uy##I = (uppers[I] / set_width) / divisor + TILE_TEXTURE_PADDING;
 
 			U_DEFS(0); U_DEFS(1); U_DEFS(2); U_DEFS(3);
 

@@ -8,11 +8,11 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "entity/woodcutter"}; }
 			constexpr static Index RADIUS = 50;
-			constexpr static float HARVESTING_TIME = 5.f;
-			constexpr static float SELLING_TIME = 5.f;
+			constexpr static double HARVESTING_TIME = 5.;
+			constexpr static double SELLING_TIME = 5.;
 
 			std::optional<Position> chosenResource;
-			float harvestingTime = 0.f;
+			double harvestingTime = 0.;
 
 			static std::shared_ptr<Woodcutter> create(Game &);
 			static std::shared_ptr<Woodcutter> create(Game &, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_);
@@ -29,7 +29,7 @@ namespace Game3 {
 			friend class Entity;
 
 		protected:
-			float sellTime = 0.f;
+			double sellTime = 0.;
 
 			Woodcutter();
 			Woodcutter(RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_);
@@ -40,7 +40,7 @@ namespace Game3 {
 			void wakeUp();
 			void goToResource();
 			void startHarvesting();
-			void harvest(float delta);
+			void harvest(double delta);
 			void sellInventory();
 	};
 

@@ -29,8 +29,8 @@ namespace Game3 {
 			void reset();
 			void init();
 			void setup(TileProvider &);
-			void render(float divisor, float scale, float center_x, float center_y);
-			void render(float divisor);
+			void render(double divisor, double scale, double center_x, double center_y);
+			void render(double divisor);
 			bool reupload();
 			std::future<bool> queueReupload();
 			bool onBackbufferResized(int width, int height);
@@ -46,7 +46,7 @@ namespace Game3 {
 		private:
 			bool initialized = false;
 			Shader shader{"terrain"};
-			GL::FloatVAO vao;
+			GL::DoubleVAO vao;
 			GL::VBO vbo;
 			GL::EBO ebo;
 			GL::FBO fbo;

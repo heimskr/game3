@@ -42,7 +42,7 @@ namespace Game3 {
 		if (width != backbufferWidth || height != backbufferHeight) {
 			backbufferWidth = width;
 			backbufferHeight = height;
-			projection = glm::ortho(0.f, float(width), float(height), 0.f, -1.f, 1.f);
+			projection = glm::ortho(0., double(width), double(height), 0., -1., 1.);
 			shader.bind(); CHECKGL
 			shader.set("projection", projection); CHECKGL
 		}
@@ -78,15 +78,15 @@ namespace Game3 {
 
 		shader.bind(); CHECKGL
 
-		glm::mat4 model = glm::mat4(1.f);
+		glm::dmat4 model(1.);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(x, y, 0.f));
+		model = glm::translate(model, glm::dvec3(x, y, 0.));
 		if (angle != 0) {
-			model = glm::translate(model, glm::vec3(0.5f * width, 0.5f * height, 0.f)); // move origin of rotation to center of quad
-			model = glm::rotate(model, float(glm::radians(angle)), glm::vec3(0.f, 0.f, 1.f)); // then rotate
-			model = glm::translate(model, glm::vec3(-0.5f * width, -0.5f * height, 0.f)); // move origin back
+			model = glm::translate(model, glm::dvec3(.5 * width, .5 * height, 0.)); // move origin of rotation to center of quad
+			model = glm::rotate(model, double(glm::radians(angle)), glm::dvec3(0., 0., 1.)); // then rotate
+			model = glm::translate(model, glm::dvec3(-.5 * width, -.5 * height, 0.)); // move origin back
 		}
-		model = glm::scale(model, glm::vec3(width * canvas.scale / 2., height * canvas.scale / 2., 1.f)); // last scale
+		model = glm::scale(model, glm::dvec3(width * canvas.scale / 2., height * canvas.scale / 2., 1.)); // last scale
 
 		shader.set("model", model); CHECKGL
 		shader.set("rectColor", options.color); CHECKGL
@@ -96,7 +96,7 @@ namespace Game3 {
 		glBindVertexArray(0); CHECKGL
 	}
 
-	void RectangleRenderer::drawOnScreen(const Eigen::Vector4f &color, float x, float y, float width, float height, float angle) {
+	void RectangleRenderer::drawOnScreen(const Eigen::Vector4f &color, double x, double y, double width, double height, double angle) {
 		if (!initialized)
 			return;
 
@@ -104,15 +104,15 @@ namespace Game3 {
 
 		shader.bind(); CHECKGL
 
-		glm::mat4 model = glm::mat4(1.f);
+		glm::dmat4 model(1.);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(x, y, 0.f));
+		model = glm::translate(model, glm::dvec3(x, y, 0.));
 		if (angle != 0) {
-			model = glm::translate(model, glm::vec3(0.5f * width, 0.5f * height, 0.f)); // move origin of rotation to center of quad
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(0.f, 0.f, 1.f)); // then rotate
-			model = glm::translate(model, glm::vec3(-0.5f * width, -0.5f * height, 0.f)); // move origin back
+			model = glm::translate(model, glm::dvec3(.5 * width, .5 * height, 0.)); // move origin of rotation to center of quad
+			model = glm::rotate(model, glm::radians(angle), glm::dvec3(0., 0., 1.)); // then rotate
+			model = glm::translate(model, glm::dvec3(-.5 * width, -.5 * height, 0.)); // move origin back
 		}
-		model = glm::scale(model, glm::vec3(width, height, 1.f)); // last scale
+		model = glm::scale(model, glm::dvec3(width, height, 1.)); // last scale
 
 		shader.set("model", model); CHECKGL
 		shader.set("rectColor", color); CHECKGL
@@ -122,7 +122,7 @@ namespace Game3 {
 		glBindVertexArray(0); CHECKGL
 	}
 
-	void RectangleRenderer::operator()(const Eigen::Vector4f &color, float x, float y, float width, float height, float angle) {
+	void RectangleRenderer::operator()(const Eigen::Vector4f &color, double x, double y, double width, double height, double angle) {
 		drawOnScreen(color, x, y, width, height, angle);
 	}
 
@@ -130,13 +130,13 @@ namespace Game3 {
 		GLuint vbo;
 
 		static const float vertices[] {
-			0.f, 1.f, 0.f, 1.f,
-			1.f, 0.f, 1.f, 0.f,
-			0.f, 0.f, 0.f, 0.f,
+			0, 1, 0, 1,
+			1, 0, 1, 0,
+			0, 0, 0, 0,
 
-			0.f, 1.f, 0.f, 1.f,
-			1.f, 1.f, 1.f, 1.f,
-			1.f, 0.f, 1.f, 0.f,
+			0, 1, 0, 1,
+			1, 1, 1, 1,
+			1, 0, 1, 0,
 		};
 
 		glGenVertexArrays(1, &quadVAO); CHECKGL
@@ -150,7 +150,7 @@ namespace Game3 {
 
 		glBindVertexArray(quadVAO); CHECKGL
 		glEnableVertexAttribArray(0); CHECKGL
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr); CHECKGL
+		GL::vertexAttribPointer<float>(0, 4, GL_FALSE, 4 * sizeof(float), nullptr); CHECKGL
 		glBindBuffer(GL_ARRAY_BUFFER, old_abb); CHECKGL
 		glBindVertexArray(0); CHECKGL
 		initialized = true;

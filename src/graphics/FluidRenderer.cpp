@@ -59,7 +59,7 @@ namespace Game3 {
 		provider = &provider_;
 	}
 
-	void FluidRenderer::render(float /* divisor */, float scale, float center_x, float center_y) {
+	void FluidRenderer::render(double /* divisor */, double scale, double center_x, double center_y) {
 		if (!initialized)
 			return;
 
@@ -72,17 +72,17 @@ namespace Game3 {
 		}
 
 		auto &tileset = realm->getTileset();
-		const auto tilesize = static_cast<float>(tileset.getTileSize());
+		const double tilesize(tileset.getTileSize());
 		auto texture = tileset.getTexture(realm->getGame());
 		const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
 
-		glm::mat4 projection(1.f);
-		projection = glm::scale(projection, {tilesize, -tilesize, 1.f}) *
-		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1.f}) *
+		glm::dmat4 projection(1.);
+		projection = glm::scale(projection, {tilesize, -tilesize, 1.}) *
+		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1.}) *
 		             glm::translate(projection, {
-		                 center_x - CHUNK_SIZE / 2.f + chunk_x * CHUNK_SIZE,
-		                 center_y - CHUNK_SIZE / 2.f + chunk_y * CHUNK_SIZE,
-		                 0.f
+		                 center_x - CHUNK_SIZE / 2. + chunk_x * CHUNK_SIZE,
+		                 center_y - CHUNK_SIZE / 2. + chunk_y * CHUNK_SIZE,
+		                 0.
 		             });
 
 		shader.bind();
@@ -148,8 +148,8 @@ namespace Game3 {
 		if (set_width == 0)
 			return false;
 
-		const float divisor = set_width;
-		const float t_size = 1.f / divisor - TILE_TEXTURE_PADDING * 2;
+		const double divisor = set_width;
+		const double t_size = 1. / divisor - TILE_TEXTURE_PADDING * 2;
 
 		isMissing = false;
 		const TileID missing = tileset["base:tile/missing"];
@@ -157,34 +157,34 @@ namespace Game3 {
 		const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
 
 		Timer timer{"FluidVBOInit"};
-		vbo.init<float, 4>(CHUNK_SIZE, CHUNK_SIZE, GL_DYNAMIC_DRAW, [this, chunk_x = chunk_x, chunk_y = chunk_y, &game, set_width, divisor, t_size, missing](size_t x, size_t y) {
+		vbo.init<double, 4>(CHUNK_SIZE, CHUNK_SIZE, GL_DYNAMIC_DRAW, [this, chunk_x = chunk_x, chunk_y = chunk_y, &game, set_width, divisor, t_size, missing](size_t x, size_t y) {
 			const auto fluid_opt = realm->tileProvider.copyFluidTile({
 				Index(y) + CHUNK_SIZE * (chunk_y + 1), // why `+ 1`?
 				Index(x) + CHUNK_SIZE * (chunk_x + 1)  // here too
 			});
 
 			TileID tile = -1;
-			float opacity;
+			double opacity;
 
 			if (fluid_opt) {
 				if (auto tile_opt = game.getFluidTileID(fluid_opt->id)) {
 					tile = *tile_opt;
 					if (FluidTile::FULL <= fluid_opt->level)
-						opacity = 1.f;
+						opacity = 1.;
 					else
-						opacity = float(fluid_opt->level) / FluidTile::FULL;
+						opacity = double(fluid_opt->level) / FluidTile::FULL;
 				}
 			}
 
 			if (tile == static_cast<TileID>(-1)) {
 				isMissing = true;
 				tile = missing;
-				opacity = 0.f;
+				opacity = 0.;
 			}
 
-			const float tx0 = (tile % set_width) / divisor + TILE_TEXTURE_PADDING;
-			const float ty0 = (tile / set_width) / divisor + TILE_TEXTURE_PADDING;
-			const float tile_f = static_cast<float>(tile);
+			const double tx0 = (tile % set_width) / divisor + TILE_TEXTURE_PADDING;
+			const double ty0 = (tile / set_width) / divisor + TILE_TEXTURE_PADDING;
+			const double tile_f(tile);
 			return std::array {
 				std::array {tx0,          ty0,          tile_f, opacity},
 				std::array {tx0 + t_size, ty0,          tile_f, opacity},

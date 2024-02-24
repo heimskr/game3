@@ -17,7 +17,7 @@ namespace Game3 {
 			objectsName = terrainName;
 	}
 
-	bool Landfill::use(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers, std::pair<float, float>) {
+	bool Landfill::use(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers, std::pair<double, double>) {
 		PlayerPtr player = place.player;
 		RealmPtr  realm  = place.realm;
 

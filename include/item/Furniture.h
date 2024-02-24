@@ -19,7 +19,7 @@ namespace Game3 {
 		public:
 			using Item::Item;
 
-			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
+			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<double, double>) override;
 			bool drag(Slot, ItemStack &, const Place &, Modifiers) override;
 
 			virtual bool preCheck(const Place &) const;

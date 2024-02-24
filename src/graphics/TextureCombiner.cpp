@@ -33,7 +33,7 @@ namespace Game3 {
 		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
 			backbufferWidth = backbuffer_width;
 			backbufferHeight = backbuffer_height;
-			projection = glm::ortho(0.f, float(backbuffer_width), float(backbuffer_height), 0.f, -1.f, 1.f);
+			projection = glm::ortho(0., double(backbuffer_width), double(backbuffer_height), 0., -1., 1.);
 			shader.bind();
 			shader.set("projection", projection);
 		}
@@ -51,10 +51,10 @@ namespace Game3 {
 		assert(texture1 != 0);
 		shader.bind(); CHECKGL
 
-		glm::mat4 model = glm::mat4(1.f);
-		model = glm::scale(model, glm::vec3(1.f, -1.f, 1.f));
-		model = glm::translate(model, glm::vec3(0, -backbufferHeight, 0.f));
-		model = glm::scale(model, glm::vec3(backbufferWidth, backbufferHeight, 1.f));
+		glm::dmat4 model(1.);
+		model = glm::scale(model, glm::dvec3(1., -1., 1.));
+		model = glm::translate(model, glm::dvec3(0, -backbufferHeight, 0.));
+		model = glm::scale(model, glm::dvec3(backbufferWidth, backbufferHeight, 1.));
 
 		shader.set("model", model);
 
@@ -83,13 +83,13 @@ namespace Game3 {
 
 	void TextureCombiner::initRenderData() {
 		static const float vertices[] {
-			0.f, 1.f, 0.f, 1.f,
-			1.f, 0.f, 1.f, 0.f,
-			0.f, 0.f, 0.f, 0.f,
+			0., 1., 0., 1.,
+			1., 0., 1., 0.,
+			0., 0., 0., 0.,
 
-			0.f, 1.f, 0.f, 1.f,
-			1.f, 1.f, 1.f, 1.f,
-			1.f, 0.f, 1.f, 0.f,
+			0., 1., 0., 1.,
+			1., 1., 1., 1.,
+			1., 0., 1., 0.,
 		};
 
 		glGenVertexArrays(1, &quadVAO); CHECKGL
@@ -100,7 +100,7 @@ namespace Game3 {
 
 		glBindVertexArray(quadVAO); CHECKGL
 		glEnableVertexAttribArray(0); CHECKGL
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr); CHECKGL
+		GL::vertexAttribPointer<float>(0, 4, GL_FALSE, 4 * sizeof(float), nullptr); CHECKGL
 		glBindBuffer(GL_ARRAY_BUFFER, 0); CHECKGL
 		glBindVertexArray(0); CHECKGL
 		initialized = true;

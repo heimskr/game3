@@ -21,13 +21,13 @@ namespace Game3 {
 			void update(int width, int height) override;
 
 			void drawOnMap(const RenderOptions &);
-			void drawOnScreen(const Eigen::Vector4f &color, float x, float y, float width, float height, float angle = 0.f);
+			void drawOnScreen(const Eigen::Vector4f &color, double x, double y, double width, double height, double angle = 0.);
 
-			void operator()(const Eigen::Vector4f &color, float x, float y, float width, float height, float angle = 0.f);
+			void operator()(const Eigen::Vector4f &color, double x, double y, double width, double height, double angle = 0.);
 
 		private:
 			Canvas &canvas;
-			glm::mat4 projection;
+			glm::dmat4 projection;
 			GLuint quadVAO = 0;
 			bool initialized = false;
 			int backbufferWidth = -1;

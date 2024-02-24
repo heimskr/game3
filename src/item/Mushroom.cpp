@@ -12,11 +12,11 @@ namespace Game3 {
 		Item(std::move(id_), std::move(name_), base_price, 64),
 		subID(sub_id) {}
 
-	void Mushroom::getOffsets(const Game &game, std::shared_ptr<Texture> &texture, float &x_offset, float &y_offset) {
+	void Mushroom::getOffsets(const Game &game, std::shared_ptr<Texture> &texture, double &x_offset, double &y_offset) {
 		texture = game.registry<TextureRegistry>().at("base:texture/mushrooms");
 		texture->init();
-		x_offset = float(subID % 6) * 8.f;
-		y_offset = float(subID / 6) * 8.f;
+		x_offset = (subID % 6) * 8.;
+		y_offset = (subID / 6) * 8.;
 	}
 
 	Glib::RefPtr<Gdk::Pixbuf> Mushroom::makeImage(const Game &game, const ItemStack &) const {

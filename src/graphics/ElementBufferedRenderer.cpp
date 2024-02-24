@@ -24,8 +24,8 @@ namespace Game3 {
 		const std::string & blurFrag()     { static auto out = readFile("resources/blur.frag");     return out; }
 		const std::string & bufferedFrag() { static auto out = readFile("resources/buffered.frag"); return out; }
 		const std::string & bufferedVert() { static auto out = readFile("resources/buffered.vert"); return out; }
-		constexpr float TEXTURE_SCALE = 2.f;
-		constexpr float TILE_TEXTURE_PADDING = 1.f / 16384.f;
+		constexpr double TEXTURE_SCALE = 2.;
+		constexpr double TILE_TEXTURE_PADDING = 1. / 16384.;
 	}
 
 	ElementBufferedRenderer::ElementBufferedRenderer():
@@ -70,7 +70,7 @@ namespace Game3 {
 		provider = &provider_;
 	}
 
-	void ElementBufferedRenderer::render(float /* divisor */, float scale, float center_x, float center_y) {
+	void ElementBufferedRenderer::render(double /* divisor */, double scale, double center_x, double center_y) {
 		if (!initialized)
 			return;
 
@@ -87,13 +87,13 @@ namespace Game3 {
 		const auto tilesize = tileset.getTileSize();
 		auto texture = tileset.getTexture(realm->getGame());
 
-		glm::mat4 projection(1.f);
-		projection = glm::scale(projection, {float(tilesize), -float(tilesize), 1.f}) *
-		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1.f}) *
+		glm::dmat4 projection(1.);
+		projection = glm::scale(projection, {double(tilesize), -double(tilesize), 1.}) *
+		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1.}) *
 		             glm::translate(projection, {
-		                 center_x - CHUNK_SIZE / 2.f + chunk_x * CHUNK_SIZE,
-		                 center_y - CHUNK_SIZE / 2.f + chunk_y * CHUNK_SIZE,
-		                 0.f
+		                 center_x - CHUNK_SIZE / 2. + chunk_x * CHUNK_SIZE,
+		                 center_y - CHUNK_SIZE / 2. + chunk_y * CHUNK_SIZE,
+		                 0.
 		             });
 
 		CHECKGL
@@ -112,7 +112,7 @@ namespace Game3 {
 		GL::triangles(CHUNK_SIZE * CHUNK_SIZE);
 	}
 
-	void ElementBufferedRenderer::render(float /* divisor */) {
+	void ElementBufferedRenderer::render(double /* divisor */) {
 		if (!initialized)
 			return;
 
@@ -127,10 +127,10 @@ namespace Game3 {
 		auto &tileset = realm->getTileset();
 		const auto tilesize = tileset.getTileSize();
 
-		glm::mat4 projection(1.f);
-		projection = glm::scale(projection, {tilesize, tilesize, 1.f}) *
-		             glm::scale(projection, {2.f / backbufferWidth, 2.f / backbufferHeight, 1.f}) *
-		             glm::translate(projection, {-CHUNK_SIZE, -CHUNK_SIZE, 0.f});
+		glm::dmat4 projection(1.);
+		projection = glm::scale(projection, {tilesize, tilesize, 1.}) *
+		             glm::scale(projection, {2. / backbufferWidth, 2. / backbufferHeight, 1.}) *
+		             glm::translate(projection, {-CHUNK_SIZE, -CHUNK_SIZE, 0.});
 
 		shader.bind();
 		vao.bind();
@@ -210,8 +210,8 @@ namespace Game3 {
 		if (set_width == 0)
 			return false;
 
-		const float divisor = set_width;
-		const float t_size = 1.f / divisor - TILE_TEXTURE_PADDING * 2;
+		const double divisor = set_width;
+		const double t_size = 1. / divisor - TILE_TEXTURE_PADDING * 2;
 
 		isMissing = false;
 
@@ -219,7 +219,7 @@ namespace Game3 {
 		Game &game = realm->getGame();
 
 		Timer timer{"BufferedVBOInit"};
-		vbo.init<float, 11>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, &game, &tileset, set_width, divisor, t_size, missing](size_t x, size_t y) {
+		vbo.init<double, 11>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, &game, &tileset, set_width, divisor, t_size, missing](size_t x, size_t y) {
 			const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
 
 			std::array<TileID, LAYER_COUNT> tiles{};
@@ -245,35 +245,35 @@ namespace Game3 {
 			});
 
 			TileID fluid_tile = -1;
-			float fluid_opacity;
+			double fluid_opacity;
 
 			if (fluid_opt) {
 				if (auto tile_opt = game.getFluidTileID(fluid_opt->id)) {
 					fluid_tile = *tile_opt;
 					if (FluidTile::FULL <= fluid_opt->level)
-						fluid_opacity = 1.f;
+						fluid_opacity = 1.;
 					else
-						fluid_opacity = float(fluid_opt->level) / FluidTile::FULL;
+						fluid_opacity = double(fluid_opt->level) / FluidTile::FULL;
 				}
 			}
 
 			if (fluid_tile == static_cast<TileID>(-1)) {
 				isMissing = true;
 				fluid_tile = missing;
-				fluid_opacity = 0.f;
+				fluid_opacity = 0.;
 			}
 
 			static_assert(LAYER_COUNT == 4);
 
 			// Texture coordinates for the base tile
 #define T_DEFS(I) \
-			const float tx##I = (tiles[I] % set_width) / divisor + TILE_TEXTURE_PADDING; \
-			const float ty##I = (tiles[I] / set_width) / divisor + TILE_TEXTURE_PADDING;
+			const double tx##I = (tiles[I] % set_width) / divisor + TILE_TEXTURE_PADDING; \
+			const double ty##I = (tiles[I] / set_width) / divisor + TILE_TEXTURE_PADDING;
 
 			T_DEFS(0); T_DEFS(1); T_DEFS(2); T_DEFS(3);
 
-			const float fx0 = (fluid_tile % set_width) / divisor + TILE_TEXTURE_PADDING;
-			const float fy0 = (fluid_tile / set_width) / divisor + TILE_TEXTURE_PADDING;
+			const double fx0 = (fluid_tile % set_width) / divisor + TILE_TEXTURE_PADDING;
+			const double fy0 = (fluid_tile / set_width) / divisor + TILE_TEXTURE_PADDING;
 
 #define T_ARR_0(I) tx##I, ty##I
 #define T_ARR_1(I) tx##I + t_size, ty##I

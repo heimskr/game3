@@ -207,7 +207,7 @@ namespace Game3 {
 		return false;
 	}
 
-	void Realm::render(const int width, const int height, const std::pair<double, double> &center, float scale, RendererContext &renderers, float game_time) {
+	void Realm::render(const int width, const int height, const std::pair<double, double> &center, double scale, RendererContext &renderers, double game_time) {
 		if (getSide() != Side::Client)
 			return;
 
@@ -287,7 +287,7 @@ namespace Game3 {
 		batch_sprite.renderNow();
 	}
 
-	void Realm::renderLighting(const int, const int, const std::pair<double, double> &, float, RendererContext &renderers, float game_time) {
+	void Realm::renderLighting(const int, const int, const std::pair<double, double> &, double, RendererContext &renderers, double game_time) {
 		if (getSide() != Side::Client)
 			return;
 
@@ -317,7 +317,7 @@ namespace Game3 {
 		renderers.batchSprite.renderNow();
 	}
 
-	void Realm::clearLighting(float) {
+	void Realm::clearLighting(double) {
 		Color color{1, 1, 1, 1};
 
 		if (outdoors) {
@@ -431,7 +431,7 @@ namespace Game3 {
 		}
 	}
 
-	void Realm::tick(float delta) {
+	void Realm::tick(double delta) {
 		if (ticking.exchange(true))
 			return;
 

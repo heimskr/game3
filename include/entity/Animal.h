@@ -13,7 +13,7 @@ namespace Game3 {
 
 	class Animal: public LivingEntity {
 		public:
-			static std::uniform_real_distribution<float> getWanderDistribution();
+			static std::uniform_real_distribution<double> getWanderDistribution();
 
 			Index wanderRadius = 8;
 
@@ -22,7 +22,7 @@ namespace Game3 {
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 			void init(Game &) override;
 			void tick(const TickArgs &) override;
-			float getMovementSpeed() const override { return 5.f; }
+			double getMovementSpeed() const override { return 5.; }
 			HitPoints getMaxHealth() const override;
 			bool wander();
 			void encode(Buffer &) override;

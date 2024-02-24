@@ -6,7 +6,7 @@ namespace Game3 {
 	class Sapling: public Plantable {
 		public:
 			using Plantable::Plantable;
-			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
+			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<double, double>) override;
 			bool drag(Slot, ItemStack &, const Place &, Modifiers) override;
 			bool plant(InventoryPtr, Slot, ItemStack &, const Place &) override;
 

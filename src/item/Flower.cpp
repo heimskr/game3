@@ -15,7 +15,7 @@ namespace Game3 {
 		attributes.insert("base:attribute/flower"_id);
 	}
 
-	bool Flower::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
+	bool Flower::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<double, double>) {
 		auto &realm = *place.realm;
 		const auto &position = place.position;
 		const auto &tileset = realm.getTileset();

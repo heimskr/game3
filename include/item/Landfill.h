@@ -14,7 +14,7 @@ namespace Game3 {
 
 			Landfill(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count, Identifier terrain_name, Identifier objects_name = {}, ItemCount required_count = DEFAULT_COUNT);
 
-			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
+			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<double, double>) override;
 			bool drag(Slot, ItemStack &, const Place &, Modifiers) override;
 			bool canUseOnWorld() const override;
 

@@ -37,7 +37,7 @@ namespace Game3 {
 			void initRenderData();
 			GLuint vbo = 0;
 			GLuint quadVAO = 0;
-			glm::mat4 projection;
+			glm::dmat4 projection;
 			bool initialized = false;
 			int backbufferWidth = -1;
 			int backbufferHeight = -1;

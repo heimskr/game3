@@ -36,6 +36,19 @@
 namespace GL {
 	// TODO: makeRGBTexture
 
+	template <std::floating_point F>
+	struct GLEnum;
+
+	template<>
+	struct GLEnum<float> {
+		constexpr static GLenum value = GL_FLOAT;
+	};
+
+	template<>
+	struct GLEnum<double> {
+		constexpr static GLenum value = GL_DOUBLE;
+	};
+
 	void checkGL(GLenum err, const char *file, int line);
 
 	inline void useTextureInFB(GLuint texture) {
@@ -120,7 +133,41 @@ namespace GL {
 		return fb;
 	}
 
-	GLuint makeFloatVAO(GLuint vbo, std::initializer_list<int> sizes);
+	template <std::floating_point F>
+	inline void vertexAttribPointer(GLuint index, GLint size, GLboolean normalized, GLsizei stride, const void *pointer);
+
+	template <>
+	inline void vertexAttribPointer<float>(GLuint index, GLint size, GLboolean normalized, GLsizei stride, const void *pointer) {
+		glVertexAttribPointer(index, size, GL_FLOAT, normalized, stride, pointer);
+	}
+
+	template <>
+	inline void vertexAttribPointer<double>(GLuint index, GLint size, GLboolean, GLsizei stride, const void *pointer) {
+		glVertexAttribLPointer(index, size, GL_DOUBLE, stride, pointer);
+	}
+
+	template <std::floating_point F>
+	GLuint makeFpVAO(GLuint vbo, std::initializer_list<int> sizes) {
+		GLuint vao = -1;
+
+		glGenVertexArrays(1, &vao); CHECKGL
+		if (vao == static_cast<GLuint>(-1))
+			throw std::runtime_error("Couldn't generate float VAO");
+
+		glBindVertexArray(vao); CHECKGL
+		glBindBuffer(GL_ARRAY_BUFFER, vbo); CHECKGL
+
+		int offset = 0;
+		const auto stride = static_cast<GLsizei>(sizeof(F) * std::accumulate(sizes.begin(), sizes.end(), 0));
+
+		for (size_t i = 0, n = sizes.size(); i < n; ++i)  {
+			glEnableVertexAttribArray(i); CHECKGL
+			vertexAttribPointer<F>(i, sizes.begin()[i], GL_FALSE, stride, reinterpret_cast<GLvoid *>(sizeof(F) * offset)); CHECKGL
+			offset += sizes.begin()[i];
+		}
+
+		return vao;
+	}
 
 	template <typename T>
 	inline GLuint makeBufferObject(GLenum target, const T *data, size_t count, GLenum usage)  {
@@ -306,21 +353,25 @@ namespace GL {
 			VAO(GLuint handle_ = 0): handle(handle_) {}
 	};
 
-	class FloatVAO: public VAO {
+	template <std::floating_point F>
+	class FpVAO: public VAO {
 		public:
-			FloatVAO(): VAO() {}
-			FloatVAO(GLuint vbo, std::initializer_list<int> sizes): VAO(makeFloatVAO(vbo, sizes)) {}
-			FloatVAO(const VBO &vbo, std::initializer_list<int> sizes): FloatVAO(vbo.getHandle(), sizes) {}
+			FpVAO(): VAO() {}
+			FpVAO(GLuint vbo, std::initializer_list<int> sizes): VAO(makeFpVAO<F>(vbo, sizes)) {}
+			FpVAO(const VBO &vbo, std::initializer_list<int> sizes): FpVAO(vbo.getHandle(), sizes) {}
 
 			inline void init(GLuint vbo, std::initializer_list<int> sizes) {
 				reset();
-				handle = makeFloatVAO(vbo, sizes);
+				handle = makeFpVAO<F>(vbo, sizes);
 			}
 
 			inline void init(const VBO &vbo, std::initializer_list<int> sizes) {
 				init(vbo.getHandle(), sizes);
 			}
 	};
+
+	using FloatVAO  = FpVAO<float>;
+	using DoubleVAO = FpVAO<double>;
 
 	class EBO {
 		public:

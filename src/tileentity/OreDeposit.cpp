@@ -12,7 +12,7 @@
 #include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
-	Ore::Ore(Identifier identifier_, ItemStack stack_, Identifier tilename_, Identifier regen_tilename, float tooldown_multiplier, uint32_t max_uses, float cooldown_):
+	Ore::Ore(Identifier identifier_, ItemStack stack_, Identifier tilename_, Identifier regen_tilename, double tooldown_multiplier, uint32_t max_uses, double cooldown_):
 		NamedRegisterable(std::move(identifier_)),
 		stack(std::move(stack_)),
 		tilename(std::move(tilename_)),
@@ -112,12 +112,12 @@ namespace Game3 {
 			const auto x = (tile_id % (texture->width / tilesize)) * tilesize;
 			const auto y = (tile_id / (texture->width / tilesize)) * tilesize;
 			sprite_renderer(texture, {
-				.x       = float(position.column),
-				.y       = float(position.row),
-				.offsetX = float(x / 2.f),
-				.offsetY = float(y / 2.f),
-				.sizeX   = float(tilesize),
-				.sizeY   = float(tilesize),
+				.x       = double(position.column),
+				.y       = double(position.row),
+				.offsetX = x / 2.,
+				.offsetY = y / 2.,
+				.sizeX   = double(tilesize),
+				.sizeY   = double(tilesize),
 			});
 		}
 	}

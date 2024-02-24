@@ -9,7 +9,7 @@
 
 namespace Game3 {
 	namespace {
-		constexpr float PERIOD = 0.25;
+		constexpr double PERIOD = 0.25;
 	}
 
 	Pump::Pump():

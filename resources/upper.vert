@@ -1,6 +1,6 @@
 // Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Resources/BufferedRenderer.vert
 
-#version 330 core
+#version 410 core
 
 layout (location = 0) in vec2 position;
 layout (location = 1) in vec2 inTexCoordUpper0;
@@ -8,7 +8,7 @@ layout (location = 2) in vec2 inTexCoordUpper1;
 layout (location = 3) in vec2 inTexCoordUpper2;
 layout (location = 4) in vec2 inTexCoordUpper3;
 
-uniform mat4 projection;
+uniform dmat4 projection;
 
 out vec2 texCoordUpper0;
 out vec2 texCoordUpper1;

@@ -16,8 +16,8 @@ namespace Game3 {
 
 	class FluidRenderer {
 		public:
-			constexpr static float TEXTURE_SCALE = 2.f;
-			constexpr static float TILE_TEXTURE_PADDING = 1.f / 2048.f;
+			constexpr static double TEXTURE_SCALE = 2.;
+			constexpr static double TILE_TEXTURE_PADDING = 1. / 2048.;
 			std::atomic_int backbufferWidth = -1;
 			std::atomic_int backbufferHeight = -1;
 			std::atomic_bool isMissing = false;
@@ -31,7 +31,7 @@ namespace Game3 {
 			void reset();
 			void init();
 			void setup(TileProvider &);
-			void render(float divisor, float scale, float center_x, float center_y);
+			void render(double divisor, double scale, double center_x, double center_y);
 			bool reupload();
 			bool onBackbufferResized(int width, int height);
 			void setChunk(FluidChunk &, bool can_reupload = true);
@@ -46,7 +46,7 @@ namespace Game3 {
 		private:
 			std::atomic_bool initialized = false;
 			Shader shader {"fluids"};
-			GL::FloatVAO vao;
+			GL::DoubleVAO vao;
 			GL::VBO vbo;
 			GL::EBO ebo;
 			GL::FBO fbo;

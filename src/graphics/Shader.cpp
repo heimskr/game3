@@ -1,12 +1,10 @@
-#include <iostream>
-
-#include <glm/gtc/type_ptr.hpp>
-
 #include "Log.h"
 #include "graphics/GL.h"
 #include "graphics/Shader.h"
 #include "types/Types.h"
 #include "util/Util.h"
+
+#include <glm/gtc/type_ptr.hpp>
 
 namespace Game3 {
 	namespace {
@@ -129,49 +127,91 @@ namespace Game3 {
 
 	Shader & Shader::set(const char *uniform_name, GLint value) {
 		glUniform1i(uniform(uniform_name), value);
-		if (auto err = glGetError()) { std::cerr << "\e[31mError at " << __FILE__ << ':' << (__LINE__-1) << ": " << gluErrorString(err) << "\e[39m, \"" << uniform_name << "\" -> " << value << '\n'; }
+		if (auto err = glGetError()) { ERROR("Error at {}:{}: {}, \"{}\" → {}", __FILE__, __LINE__ - 1, reinterpret_cast<const char *>(gluErrorString(err)), uniform_name, value); }
 		return *this;
 	}
 
 	Shader & Shader::set(const char *uniform_name, GLfloat value) {
 		glUniform1f(uniform(uniform_name), value);
-		if (auto err = glGetError()) { std::cerr << "\e[31mError at " << __FILE__ << ':' << (__LINE__-1) << ": " << gluErrorString(err) << "\e[39m, \"" << uniform_name << "\" -> " << value << '\n'; }
+		if (auto err = glGetError()) { ERROR("Error at {}:{}: {}, \"{}\" → {:f}", __FILE__, __LINE__ - 1, reinterpret_cast<const char *>(gluErrorString(err)), uniform_name, value); }
 		return *this;
 	}
 
 	Shader & Shader::set(const char *uniform_name, GLfloat first, GLfloat second) {
 		glUniform2f(uniform(uniform_name), first, second);
-		if (auto err = glGetError()) { std::cerr << "\e[31mError at " << __FILE__ << ':' << (__LINE__-1) << ": " << gluErrorString(err) << "\e[39m, \"" << uniform_name << "\" -> (" << first << ", " << second << ")\n"; }
+		if (auto err = glGetError()) { ERROR("Error at {}:{}: {}, \"{}\" → ({}, {})", __FILE__, __LINE__ - 1, reinterpret_cast<const char *>(gluErrorString(err)), uniform_name, first, second); }
 		return *this;
 	}
 
 	Shader & Shader::set(const char *uniform_name, GLfloat x, GLfloat y, GLfloat z, GLfloat w) {
-		glUniform4f(uniform(uniform_name), x, y, z, w); CHECKGL
+		glUniform4f(uniform(uniform_name), x, y, z, w);
+		if (auto err = glGetError()) { ERROR("Error at {}:{}: {}, \"{}\" → ({}, {}, {}, {})", __FILE__, __LINE__ - 1, reinterpret_cast<const char *>(gluErrorString(err)), uniform_name, x, y, z, w); }
+		return *this;
+	}
+
+	Shader & Shader::set(const char *uniform_name, GLdouble value) {
+		glUniform1d(uniform(uniform_name), value);
+		if (auto err = glGetError()) { ERROR("Error at {}:{}: {}, \"{}\" → {}", __FILE__, __LINE__ - 1, reinterpret_cast<const char *>(gluErrorString(err)), uniform_name, value); }
+		return *this;
+	}
+
+	Shader & Shader::set(const char *uniform_name, GLdouble first, GLdouble second) {
+		glUniform2d(uniform(uniform_name), first, second);
+		if (auto err = glGetError()) { ERROR("Error at {}:{}: {}, \"{}\" → ({}, {})", __FILE__, __LINE__ - 1, reinterpret_cast<const char *>(gluErrorString(err)), uniform_name, first, second); }
+		return *this;
+	}
+
+	Shader & Shader::set(const char *uniform_name, GLdouble x, GLdouble y, GLdouble z, GLdouble w) {
+		glUniform4d(uniform(uniform_name), x, y, z, w);
+		if (auto err = glGetError()) { ERROR("Error at {}:{}: {}, \"{}\" → ({}, {}, {}, {})", __FILE__, __LINE__ - 1, reinterpret_cast<const char *>(gluErrorString(err)), uniform_name, x, y, z, w); }
 		return *this;
 	}
 
 	Shader & Shader::set(const char *uniform_name, const GLint *data, GLsizei count) {
-		glUniform1iv(uniform(uniform_name), count, data); CHECKGL
+		glUniform1iv(uniform(uniform_name), count, data);
+		if (auto err = glGetError()) { ERROR("Error at {}:{}: {}, \"{}\" → data x {}", __FILE__, __LINE__ - 1, reinterpret_cast<const char *>(gluErrorString(err)), uniform_name, count); }
 		return *this;
 	}
 
 	Shader & Shader::set(const char *uniform_name, const glm::mat4 &matrix) {
-		glUniformMatrix4fv(uniform(uniform_name), 1, GL_FALSE, glm::value_ptr(matrix)); CHECKGL
+		glUniformMatrix4fv(uniform(uniform_name), 1, GL_FALSE, glm::value_ptr(matrix));
+		if (auto err = glGetError()) { ERROR("Error at {}:{}: {}, \"{}\" → mat4", __FILE__, __LINE__ - 1, reinterpret_cast<const char *>(gluErrorString(err)), uniform_name); }
+		return *this;
+	}
+
+	Shader & Shader::set(const char *uniform_name, const glm::dmat4 &matrix) {
+		glUniformMatrix4dv(uniform(uniform_name), 1, GL_FALSE, glm::value_ptr(matrix));
+		if (auto err = glGetError()) { ERROR("Error at {}:{}: {}, \"{}\" → dmat4", __FILE__, __LINE__ - 1, reinterpret_cast<const char *>(gluErrorString(err)), uniform_name); }
 		return *this;
 	}
 
 	Shader & Shader::set(const char *uniform_name, const Eigen::Vector2f &vector) {
-		glUniform2f(uniform(uniform_name), vector.x(), vector.y()); CHECKGL
+		glUniform2f(uniform(uniform_name), vector.x(), vector.y());
+		if (auto err = glGetError()) { ERROR("Error at {}:{}: {}, \"{}\" → ({}, {})", __FILE__, __LINE__ - 1, reinterpret_cast<const char *>(gluErrorString(err)), uniform_name, vector.x(), vector.y()); }
+		return *this;
+	}
+
+	Shader & Shader::set(const char *uniform_name, const Eigen::Vector2d &vector) {
+		glUniform2d(uniform(uniform_name), vector.x(), vector.y());
+		if (auto err = glGetError()) { ERROR("Error at {}:{}: {}, \"{}\" → ({}, {})", __FILE__, __LINE__ - 1, reinterpret_cast<const char *>(gluErrorString(err)), uniform_name, vector.x(), vector.y()); }
 		return *this;
 	}
 
 	Shader & Shader::set(const char *uniform_name, const Eigen::Vector4f &vector) {
-		glUniform4f(uniform(uniform_name), vector.x(), vector.y(), vector.z(), vector.w()); CHECKGL
+		glUniform4f(uniform(uniform_name), vector.x(), vector.y(), vector.z(), vector.w());
+		if (auto err = glGetError()) { ERROR("Error at {}:{}: {}, \"{}\" → ({}, {}, {}, {})", __FILE__, __LINE__ - 1, reinterpret_cast<const char *>(gluErrorString(err)), uniform_name, vector.x(), vector.y(), vector.z(), vector.w()); }
+		return *this;
+	}
+
+	Shader & Shader::set(const char *uniform_name, const Eigen::Vector4d &vector) {
+		glUniform4d(uniform(uniform_name), vector.x(), vector.y(), vector.z(), vector.w());
+		if (auto err = glGetError()) { ERROR("Error at {}:{}: {}, \"{}\" → ({}, {}, {}, {})", __FILE__, __LINE__ - 1, reinterpret_cast<const char *>(gluErrorString(err)), uniform_name, vector.x(), vector.y(), vector.z(), vector.w()); }
 		return *this;
 	}
 
 	Shader & Shader::set(const char *uniform_name, const Color &color) {
-		glUniform4f(uniform(uniform_name), color.red, color.green, color.blue, color.alpha); CHECKGL
+		glUniform4f(uniform(uniform_name), color.red, color.green, color.blue, color.alpha);
+		if (auto err = glGetError()) { ERROR("Error at {}:{}: {}, \"{}\" → color({}, {}, {}, {})", __FILE__, __LINE__ - 1, reinterpret_cast<const char *>(gluErrorString(err)), uniform_name, color.red, color.green, color.blue, color.alpha); }
 		return *this;
 	}
 }

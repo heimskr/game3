@@ -44,7 +44,7 @@ namespace Game3 {
 			virtual Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &, const ItemStack &) const;
 			virtual Glib::RefPtr<Gdk::Pixbuf> makeImage(const Game &, const ItemStack &) const;
 			virtual Identifier getTextureIdentifier(const ItemStack &) const;
-			virtual void getOffsets(const Game &, std::shared_ptr<Texture> &, float &x_offset, float &y_offset);
+			virtual void getOffsets(const Game &, std::shared_ptr<Texture> &, double &x_offset, double &y_offset);
 			Item & addAttribute(Identifier);
 			virtual std::shared_ptr<Texture> getTexture(const ItemStack &);
 			virtual std::string getTooltip(const ItemStack &);
@@ -54,7 +54,7 @@ namespace Game3 {
 			virtual void initStack(const Game &, ItemStack &) {}
 
 			/** Called when the user clicks on a tile with the item selected. Returns true iff propagation should stop. */
-			virtual bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float> offsets);
+			virtual bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<double, double> offsets);
 
 			/** Called when the user uses a held item via a keyboard shortcut. Returns true iff propagation should stop. */
 			virtual bool use(Slot, ItemStack &, const Place &, Modifiers, Hand hand);

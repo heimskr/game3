@@ -27,7 +27,7 @@ namespace Game3 {
 			void interact(const Position &);
 
 		private:
-			float accumulatedTime = 0.f;
+			double accumulatedTime = 0.;
 	};
 
 	void to_json(nlohmann::json &, const Merchant &);

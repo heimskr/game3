@@ -20,11 +20,11 @@ namespace Game3 {
 			}
 
 			std::string getName() const override { return "Cyclops"; }
-			float getMovementSpeed() const override { return 8.f; }
+			double getMovementSpeed() const override { return 8.; }
 
 			HitPoints getBaseDamage() const override { return 2; }
 			int getVariability() const override { return 1; }
-			float getAttackPeriod() const override { return 1.f; }
+			double getAttackPeriod() const override { return 1.; }
 
 		protected:
 			Cyclops():

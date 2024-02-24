@@ -71,16 +71,16 @@ namespace Game3 {
 		return identifier;
 	}
 
-	void Item::getOffsets(const Game &game, std::shared_ptr<Texture> &texture, float &x_offset, float &y_offset) {
+	void Item::getOffsets(const Game &game, std::shared_ptr<Texture> &texture, double &x_offset, double &y_offset) {
 		const auto &registry = game.registry<ItemTextureRegistry>();
 		if (registry.contains(identifier)) {
 			auto item_texture = registry.at(identifier);
 			texture  = item_texture->texture.lock();
-			x_offset = static_cast<float>(item_texture->x) / 2.f;
-			y_offset = static_cast<float>(item_texture->y) / 2.f;
+			x_offset = item_texture->x / 2.;
+			y_offset = item_texture->y / 2.;
 		} else {
-			x_offset = 0.f;
-			y_offset = 0.f;
+			x_offset = 0.;
+			y_offset = 0.;
 		}
 	}
 
@@ -101,7 +101,7 @@ namespace Game3 {
 		return name;
 	}
 
-	bool Item::use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) {
+	bool Item::use(Slot, ItemStack &, const Place &, Modifiers, std::pair<double, double>) {
 		return false;
 	}
 

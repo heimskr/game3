@@ -1,8 +1,8 @@
-#version 330 core
+#version 410 core
 
 // Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Resources/GeometryRenderer.geom
 
-uniform mat4 projection;
+uniform dmat4 projection;
 uniform ivec2 mapSize; // Number of tiles in the tilemap, not the tileset
 uniform ivec2 setSize; // Number of tiles in the tileset, not the tilemap
 

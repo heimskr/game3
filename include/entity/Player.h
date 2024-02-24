@@ -23,10 +23,10 @@ namespace Game3 {
 			/** Definitely not encoded. */
 			Token token = -1;
 			std::string displayName;
-			float tooldown = 0;
+			double tooldown = 0;
 			Lockable<std::unordered_set<Identifier>> stationTypes{{}};
-			float movementSpeed = 10;
-			float timeSinceAttack = 0;
+			double movementSpeed = 10;
+			double timeSinceAttack = 0;
 			std::atomic_bool movingUp = false;
 			std::atomic_bool movingRight = false;
 			std::atomic_bool movingDown = false;
@@ -56,9 +56,9 @@ namespace Game3 {
 			virtual void addMoney(MoneyCount) = 0;
 			/** Returns whether the player had enough money. If false, no change was made. */
 			virtual bool removeMoney(MoneyCount) = 0;
-			float getMovementSpeed() const override { return movementSpeed; }
-			bool setTooldown(float multiplier);
-			inline bool hasTooldown() const { return 0.f < tooldown; }
+			double getMovementSpeed() const override { return movementSpeed; }
+			bool setTooldown(double multiplier);
+			inline bool hasTooldown() const { return 0. < tooldown; }
 			void showText(const Glib::ustring &text, const Glib::ustring &name);
 			std::string getName() const override { return "Player"; }
 			void give(const ItemStack &, Slot start = -1);
@@ -81,7 +81,7 @@ namespace Game3 {
 			bool knowsRealm(RealmID) const;
 			void notifyOfRealm(Realm &);
 			int getZIndex() const override { return 1; }
-			float getAttackPeriod() const;
+			double getAttackPeriod() const;
 			bool canAttack() const;
 
 			inline std::string getUsername() const { return username.copyBase(); }

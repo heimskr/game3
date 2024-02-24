@@ -1,4 +1,4 @@
-#version 330 core
+#version 410 core
 
 in float centerDistance;
 out vec4 color;

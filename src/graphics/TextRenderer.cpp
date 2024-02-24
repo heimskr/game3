@@ -84,9 +84,9 @@ namespace Game3 {
 		glGenBuffers(1, &vbo); CHECKGL
 		glBindVertexArray(vao); CHECKGL
 		glBindBuffer(GL_ARRAY_BUFFER, vbo); CHECKGL
-		glBufferData(GL_ARRAY_BUFFER, 4 * 6 * sizeof(float), nullptr, GL_DYNAMIC_DRAW); CHECKGL
+		glBufferData(GL_ARRAY_BUFFER, 4 * 6 * sizeof(double), nullptr, GL_DYNAMIC_DRAW); CHECKGL
 		glEnableVertexAttribArray(0); CHECKGL
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0); CHECKGL
+		GL::vertexAttribPointer<double>(0, 4, GL_FALSE, 4 * sizeof(double), 0); CHECKGL
 		glBindBuffer(GL_ARRAY_BUFFER, 0); CHECKGL
 		glBindVertexArray(0); CHECKGL
 
@@ -101,25 +101,23 @@ namespace Game3 {
 	void TextRenderer::update(int width, int height) {
 		if (width != backbufferWidth || height != backbufferHeight) {
 			HasBackbuffer::update(width, height);
-			projection = glm::ortho(0.f, static_cast<float>(width), 0.f, static_cast<float>(height), -1.f, 1.f);
+			projection = glm::ortho(0., double(width), 0., double(height), -1., 1.);
 			shader.bind();
 			shader.set("projection", projection);
 		}
 	}
 
-	void TextRenderer::drawOnMap(Glib::ustring text, float x, float y, TextAlign align, float scale, float angle, float alpha) {
+	void TextRenderer::drawOnMap(Glib::ustring text, double x, double y, TextAlign align, double scale, double angle, double alpha) {
 		drawOnMap(text, TextRenderOptions {
 			.x = x,
 			.y = y,
 			.scaleX = scale,
 			.scaleY = scale,
 			.angle = angle,
-			.color = {0.f, 0.f, 0.f, alpha},
+			.color = {0., 0., 0., float(alpha)},
 			.align = align,
 		});
 	}
-
-	extern float xHax;
 
 	void TextRenderer::drawOnMap(Glib::ustring text, TextRenderOptions options) {
 		if (!initialized)
@@ -191,13 +189,13 @@ namespace Game3 {
 
 			// Update VBO for each character
 			const float vertices[6][4] = {
-				{xpos,     ypos + h, 0.0f, 0.0f},
-				{xpos,     ypos,     0.0f, 1.0f},
-				{xpos + w, ypos,     1.0f, 1.0f},
+				{xpos,     ypos + h, 0., 0.},
+				{xpos,     ypos,     0., 1.},
+				{xpos + w, ypos,     1., 1.},
 
-				{xpos,     ypos + h, 0.0f, 0.0f},
-				{xpos + w, ypos,     1.0f, 1.0f},
-				{xpos + w, ypos + h, 1.0f, 0.0f}
+				{xpos,     ypos + h, 0., 0.},
+				{xpos + w, ypos,     1., 1.},
+				{xpos + w, ypos + h, 1., 0.}
 			};
 
 			// Render glyph texture over quad
@@ -216,15 +214,15 @@ namespace Game3 {
 		glBindTexture(GL_TEXTURE_2D, 0); CHECKGL
 	}
 
-	float TextRenderer::textWidth(Glib::ustring text, float scale) {
-		float out = 0.f;
+	double TextRenderer::textWidth(Glib::ustring text, double scale) {
+		double out = 0.;
 		for (const char ch: text)
 			out += scale * (getCharacter(ch).advance >> 6);
 		return out;
 	}
 
-	float TextRenderer::textHeight(Glib::ustring text, float scale) {
-		float out = 0.f;
+	double TextRenderer::textHeight(Glib::ustring text, double scale) {
+		double out = 0.;
 		for (const char ch: text)
 			out = std::max(out, getCharacter(ch).size.y * scale);
 		return out;

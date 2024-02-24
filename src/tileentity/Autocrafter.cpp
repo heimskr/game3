@@ -145,12 +145,12 @@ namespace Game3 {
 		const auto base_y = (cachedTile / (texture->width / tilesize)) * tilesize;
 
 		sprite_renderer(texture, {
-			.x = float(position.column),
-			.y = float(position.row),
-			.offsetX = base_x / 2.f,
-			.offsetY = base_y / 2.f,
-			.sizeX = float(tilesize),
-			.sizeY = float(tilesize),
+			.x = double(position.column),
+			.y = double(position.row),
+			.offsetX = base_x / 2.,
+			.offsetY = base_y / 2.,
+			.sizeX = double(tilesize),
+			.sizeY = double(tilesize),
 		});
 	}
 
@@ -170,24 +170,24 @@ namespace Game3 {
 		const auto base_y = (cachedUpperTile / (texture->width / tilesize)) * tilesize;
 
 		sprite_renderer(texture, {
-			.x = float(position.column),
-			.y = float(position.row - 1),
-			.offsetX = base_x / 2.f,
-			.offsetY = base_y / 2.f,
-			.sizeX = float(tilesize),
-			.sizeY = float(tilesize),
+			.x = double(position.column),
+			.y = double(position.row - 1),
+			.offsetX = base_x / 2.,
+			.offsetY = base_y / 2.,
+			.sizeX = double(tilesize),
+			.sizeY = double(tilesize),
 		});
 
 		if (stationTexture) {
 			sprite_renderer(stationTexture, {
-				.x = position.column + .125f,
-				.y = position.row    - .2f,
+				.x = position.column + .125,
+				.y = position.row    - .2,
 				.offsetX = stationXOffset,
 				.offsetY = stationYOffset,
 				.sizeX = stationSizeX,
 				.sizeY = stationSizeY,
-				.scaleX = .75f * 16.f / stationSizeX,
-				.scaleY = .75f * 16.f / stationSizeY,
+				.scaleX = .75 * 16. / stationSizeX,
+				.scaleY = .75 * 16. / stationSizeY,
 			});
 		}
 
@@ -195,24 +195,24 @@ namespace Game3 {
 		const auto arm_upper_y = (cachedArmUpper / (texture->width / tilesize)) * tilesize;
 
 		sprite_renderer(texture, {
-			.x = float(position.column),
-			.y = float(position.row - 1),
-			.offsetX = arm_upper_x / 2.f,
-			.offsetY = arm_upper_y / 2.f,
-			.sizeX = float(tilesize),
-			.sizeY = float(tilesize),
+			.x = double(position.column),
+			.y = double(position.row - 1),
+			.offsetX = arm_upper_x / 2.,
+			.offsetY = arm_upper_y / 2.,
+			.sizeX = double(tilesize),
+			.sizeY = double(tilesize),
 		});
 
 		const auto arm_lower_x = (cachedArmLower % (texture->width / tilesize)) * tilesize;
 		const auto arm_lower_y = (cachedArmLower / (texture->width / tilesize)) * tilesize;
 
 		sprite_renderer(texture, {
-			.x = float(position.column),
-			.y = float(position.row),
-			.offsetX = arm_lower_x / 2.f,
-			.offsetY = arm_lower_y / 2.f,
-			.sizeX = float(tilesize),
-			.sizeY = float(tilesize),
+			.x = double(position.column),
+			.y = double(position.row),
+			.offsetX = arm_lower_x / 2.,
+			.offsetY = arm_lower_y / 2.,
+			.sizeX = double(tilesize),
+			.sizeY = double(tilesize),
 		});
 	}
 
@@ -375,8 +375,8 @@ namespace Game3 {
 		stationTexture->init();
 		stationXOffset = item_texture->x / 2.f;
 		stationYOffset = item_texture->y / 2.f;
-		stationSizeX   = float(item_texture->width);
-		stationSizeY   = float(item_texture->height);
+		stationSizeX   = double(item_texture->width);
+		stationSizeY   = double(item_texture->height);
 	}
 
 	void Autocrafter::resetStationTexture() {

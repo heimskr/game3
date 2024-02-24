@@ -20,21 +20,21 @@ namespace Game3 {
 			GlobalID targetGID = -1;
 
 			// Not synchronized
-			float timeSinceAttack = 0;
-			float timeSinceSearch = 0;
-			float timeSinceAdjustment = 0;
+			double timeSinceAttack = 0;
+			double timeSinceSearch = 0;
+			double timeSinceAdjustment = 0;
 			std::weak_ptr<LivingEntity> weakTarget;
 
 			Monster();
 
 			virtual HitPoints getBaseDamage() const = 0;
 			virtual int getVariability() const = 0;
-			virtual float getAttackPeriod() const = 0;
-			virtual float getPatience() const;
+			virtual double getAttackPeriod() const = 0;
+			virtual double getPatience() const;
 			virtual uint64_t getSearchRadius() const;
 			virtual uint64_t getTenacity() const;
 			virtual bool canDespawn() const;
-			virtual float getMinimumAgeForDespawn() const;
+			virtual double getMinimumAgeForDespawn() const;
 
 			bool isSpawnableMonster() const override { return true; }
 			std::vector<ItemStack> getDrops() override;

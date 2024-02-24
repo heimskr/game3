@@ -21,11 +21,11 @@ namespace Game3 {
 			}
 
 			std::string getName() const override { return "Eye"; }
-			float getMovementSpeed() const override { return 7.f; }
+			double getMovementSpeed() const override { return 7.; }
 
 			HitPoints getBaseDamage() const override { return 2; }
 			int getVariability() const override { return 1; }
-			float getAttackPeriod() const override { return 1.f; }
+			double getAttackPeriod() const override { return 1.; }
 			std::vector<ItemStack> getDrops() override {
 				std::vector<ItemStack> out = Monster::getDrops();
 				out.emplace_back(getGame(), "base:item/eye");

@@ -187,7 +187,7 @@ namespace Game3 {
 		harvestingTime = 0.f;
 	}
 
-	void Miner::harvest(float delta) {
+	void Miner::harvest(double delta) {
 		if (HARVESTING_TIME <= harvestingTime) {
 			harvestingTime = 0.f;
 			auto realm = getRealm();

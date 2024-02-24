@@ -40,7 +40,7 @@ namespace Game3 {
 		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
 			HasBackbuffer::update(backbuffer_width, backbuffer_height);
 			shader.bind();
-			shader.set("screenSize", Eigen::Vector2f(backbuffer_width, backbuffer_height));
+			shader.set("screenSize", Eigen::Vector2d(backbuffer_width, backbuffer_height));
 		}
 
 		if (scale != canvasScale) {
@@ -53,7 +53,7 @@ namespace Game3 {
 			centerX = canvas.center.first;
 			centerY = canvas.center.second;
 			shader.bind();
-			shader.set("center", Eigen::Vector2f(float(centerX), float(centerY)));
+			shader.set("center", Eigen::Vector2d(centerX, centerY));
 		}
 	}
 
@@ -62,7 +62,7 @@ namespace Game3 {
 			backbufferWidth = width;
 			backbufferHeight = height;
 			shader.bind();
-			shader.set("screenSize", Eigen::Vector2f(width, height));
+			shader.set("screenSize", Eigen::Vector2d(width, height));
 		}
 	}
 
@@ -137,7 +137,7 @@ namespace Game3 {
 
 		if (auto iter = atlases.find(texture->id); iter != atlases.end()) {
 			atlas_ptr = &iter->second;
-			std::vector<float> data = generateData(atlas_ptr->texture, options);
+			std::vector<double> data = generateData(atlas_ptr->texture, options);
 			if (atlas_ptr->lastDataCount < data.size()) {
 				atlas_ptr->lastDataCount = data.size();
 				atlas_ptr->vbo.update(data, false);
@@ -167,22 +167,22 @@ namespace Game3 {
 	auto BatchSpriteRenderer::generateAtlas(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &options) -> Atlas {
 		Atlas atlas;
 		atlas.texture = texture;
-		std::vector<float> data = generateData(texture, options);
+		std::vector<double> data = generateData(texture, options);
 		atlas.vbo.init(data.data(), data.size(), GL_DYNAMIC_DRAW);
 		atlas.lastDataCount = data.size();
 		atlas.vao.init(atlas.vbo, {2, 2, 2, 2, 1, 1, 4, 2, 4});
 		return atlas;
 	}
 
-	std::vector<float> BatchSpriteRenderer::generateData(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &options) {
-		std::vector<float> data;
+	std::vector<double> BatchSpriteRenderer::generateData(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &options) {
+		std::vector<double> data;
 		data.reserve(options.size() * 20);
 
 		const int texture_width  = texture->width;
 		const int texture_height = texture->height;
 
 		for (const RenderOptions *item: options) {
-			for (const auto &[x, y]: std::initializer_list<std::pair<float, float>>{{0.f, 1.f}, {1.f, 0.f}, {0.f, 0.f}, {0.f, 1.f}, {1.f, 1.f}, {1.f, 0.f}}) {
+			for (const auto &[x, y]: std::initializer_list<std::pair<double, double>>{{0.f, 1.f}, {1.f, 0.f}, {0.f, 0.f}, {0.f, 1.f}, {1.f, 1.f}, {1.f, 0.f}}) {
 				data.push_back(x);
 				data.push_back(y);
 				data.push_back(item->x);
@@ -191,7 +191,7 @@ namespace Game3 {
 				data.push_back(item->offsetY);
 				data.push_back(item->scaleX);
 				data.push_back(item->scaleY);
-				data.push_back(item->invertY? -1.f : 1.f);
+				data.push_back(item->invertY? -1. : 1.);
 				data.push_back(item->angle);
 				data.push_back(item->color.red);
 				data.push_back(item->color.green);

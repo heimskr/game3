@@ -1,6 +1,6 @@
 // Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Resources/BufferedRenderer.frag
 
-#version 330 core
+#version 410 core
 
 out vec4 FragColor;
 in vec2 texCoordUpper0;

@@ -12,7 +12,7 @@ namespace Game3 {
 	Cave::Cave(Game &game_, RealmID id_, RealmID parent_realm, int seed_):
 		Realm(game_, id_, ID(), "base:tileset/monomap", seed_), parentRealm(parent_realm) {}
 
-	void Cave::clearLighting(float) {
+	void Cave::clearLighting(double) {
 		glClearColor(0.117, 0.117, 0.235, 1); CHECKGL
 		// glClearColor(1, 1, 1, 1); CHECKGL
 		glClear(GL_COLOR_BUFFER_BIT); CHECKGL

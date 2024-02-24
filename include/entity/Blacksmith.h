@@ -8,8 +8,8 @@ namespace Game3 {
 	class Blacksmith: public Worker, public Merchant {
 		public:
 			static Identifier ID() { return {"base", "entity/blacksmith"}; }
-			constexpr static float BUYING_TIME = 5.f;
-			constexpr static float CRAFTING_TIME = 5.f;
+			constexpr static double BUYING_TIME = 5.;
+			constexpr static double CRAFTING_TIME = 5.;
 			/** The number of iron bars, gold bars and diamonds that the blacksmith will try to maintain. */
 			constexpr static ItemCount RESOURCE_TARGET = 64;
 
@@ -28,7 +28,7 @@ namespace Game3 {
 			friend class Entity;
 
 		protected:
-			float actionTime = 0.f;
+			double actionTime = 0.;
 
 			Blacksmith();
 			Blacksmith(RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_);
