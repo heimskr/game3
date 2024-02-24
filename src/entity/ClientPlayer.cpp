@@ -76,8 +76,6 @@ namespace Game3 {
 
 		TextRenderer &text = renderers.text;
 
-		Player::render(renderers);
-
 		const auto [row, column] = getPosition();
 		const auto [x, y, z] = offset.copyBase();
 
