@@ -505,7 +505,6 @@ namespace Game3 {
 			context.facingDirection = move_direction;
 
 		if (context.forcedPosition) {
-			if (getName() == "Ship") INFO("Forcing position from {} to {}.", new_position, *context.forcedPosition);
 			new_position = *context.forcedPosition;
 		} else if ((horizontal && offset.x != 0) || (!horizontal && offset.y != 0)) {
 			// WARN_("Can't move entity " << globalID << ": improper offsets [" << (horizontal? "horizontal" : "vertical") << " : (" << offset.x << ", " << offset.y << ")]");
@@ -533,8 +532,6 @@ namespace Game3 {
 				auto lock = path.sharedLock();
 				context.fromPath = !path.empty();
 			}
-
-			if (getName() == "Ship") INFO("Old: {}, New: {}, can move: {}", position, new_position, can_move);
 
 			teleport(can_move? new_position : position, context);
 			return true;
@@ -612,16 +609,18 @@ namespace Game3 {
 	}
 
 	void Entity::focus(Canvas &canvas, bool is_autofocus) {
-		auto realm = weakRealm.lock();
+		if (EntityPtr ridden = getRidden()) {
+			ridden->focus(canvas, is_autofocus);
+			return;
+		}
+
+		RealmPtr realm = weakRealm.lock();
 		if (!realm)
 			return;
 
 		if (!is_autofocus)
 			canvas.scale = 8.;
-		else if (++canvas.autofocusCounter < Canvas::AUTOFOCUS_DELAY)
-			return;
 
-		canvas.autofocusCounter = 0;
 		Tileset &tileset = realm->getTileset();
 		TexturePtr texture = tileset.getTexture(realm->getGame());
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
@@ -641,7 +640,6 @@ namespace Game3 {
 		if (2 < position.taxiDistance(new_position))
 			context.isTeleport = true;
 
-		if (getName() == "Ship") INFO("{} → {}", position, new_position);
 		position = new_position;
 
 		if (context.forcedOffset)
