@@ -67,6 +67,8 @@ namespace Game3 {
 			/** Whether the item's use function (see Item::use) should be called when the user interacts with a floor tile and this item is selected in the inventory tab. */
 			virtual bool canUseOnWorld() const { return false; }
 
+			virtual void onDestroy(Game &, ItemStack &) {}
+
 		protected:
 			mutable std::unique_ptr<uint8_t[]> rawImage;
 			mutable Glib::RefPtr<Gdk::Pixbuf> cachedImage;
@@ -80,11 +82,11 @@ namespace Game3 {
 			nlohmann::json data;
 
 			ItemStack() = default;
-			ItemStack(const Game &);
-			ItemStack(const Game &, std::shared_ptr<Item> item_, ItemCount count_ = 1);
-			ItemStack(const Game &, std::shared_ptr<Item> item_, ItemCount count_, nlohmann::json data_);
-			ItemStack(const Game &, const ItemID &, ItemCount = 1);
-			ItemStack(const Game &, const ItemID &, ItemCount, nlohmann::json data_);
+			ItemStack(const std::shared_ptr<Game> &);
+			ItemStack(const std::shared_ptr<Game> &, std::shared_ptr<Item> item_, ItemCount count_ = 1);
+			ItemStack(const std::shared_ptr<Game> &, std::shared_ptr<Item> item_, ItemCount count_, nlohmann::json data_);
+			ItemStack(const std::shared_ptr<Game> &, const ItemID &, ItemCount = 1);
+			ItemStack(const std::shared_ptr<Game> &, const ItemID &, ItemCount, nlohmann::json data_);
 
 			bool canMerge(const ItemStack &) const;
 			Glib::RefPtr<Gdk::Pixbuf> getImage() const;
@@ -94,23 +96,23 @@ namespace Game3 {
 
 			inline operator std::string() const { return item->getTooltip(*this) + " x " + std::to_string(count); }
 
-			/** Returns true iff the other stack is mergeable with this one and has an equal count. */
+			/** Returns true if the other stack is mergeable with this one and has an equal count. */
 			inline bool operator==(const ItemStack &other) const { return canMerge(other) && count == other.count; }
 
-			/** Returns true iff the other stack is mergeable with this one and has a lesser count. */
+			/** Returns true if the other stack is mergeable with this one and has a lesser count. */
 			inline bool operator<(const ItemStack &other)  const { return canMerge(other) && count <  other.count; }
 
-			/** Returns true iff the other stack is mergeable with this one and has a lesser or equal count. */
+			/** Returns true if the other stack is mergeable with this one and has a lesser or equal count. */
 			inline bool operator<=(const ItemStack &other) const { return canMerge(other) && count <= other.count; }
 
-			/** Returns true iff the other stack is mergeable with this one and has a greater count. */
+			/** Returns true if the other stack is mergeable with this one and has a greater count. */
 			inline bool operator>(const ItemStack &other)  const { return canMerge(other) && count >  other.count; }
 
-			/** Returns true iff the other stack is mergeable with this one and has a greater or equal count. */
+			/** Returns true if the other stack is mergeable with this one and has a greater or equal count. */
 			inline bool operator>=(const ItemStack &other) const { return canMerge(other) && count >= other.count; }
 
-			static ItemStack withDurability(const Game &, const ItemID &, Durability durability);
-			static ItemStack withDurability(const Game &, const ItemID &);
+			static ItemStack withDurability(const std::shared_ptr<Game> &, const ItemID &, Durability durability);
+			static ItemStack withDurability(const std::shared_ptr<Game> &, const ItemID &);
 
 			/** Decreases the durability by a given amount if the ItemStack has durability data. Returns true if the durability was present and reduced to zero or false otherwise. */
 			bool reduceDurability(Durability = 1);
@@ -123,23 +125,26 @@ namespace Game3 {
 
 			void spawn(const std::shared_ptr<Realm> &, const Position &) const;
 
-			std::shared_ptr<Texture> getTexture(const Game &) const;
+			std::shared_ptr<Texture> getTexture(Game &) const;
 
-			static void fromJSON(const Game &, const nlohmann::json &, ItemStack &);
-			static ItemStack fromJSON(const Game &, const nlohmann::json &);
-			static std::vector<ItemStack> manyFromJSON(const Game &, const nlohmann::json &);
+			static void fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &, ItemStack &);
+			static ItemStack fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
+			static std::vector<ItemStack> manyFromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
+
+			void onDestroy();
+			void onDestroy(Game &);
 
 			void encode(Game &, Buffer &);
 			void decode(Game &, Buffer &);
 
-			inline const Game & getGame() const { assert(game); return *game; }
-			inline bool hasGame() const { return game != nullptr; }
+			inline std::shared_ptr<Game> getGame() const { auto locked = weakGame.lock(); assert(locked); return locked; }
+			inline bool hasGame() const { return !weakGame.expired(); }
 
 		private:
-			const Game *game = nullptr;
+			std::weak_ptr<Game> weakGame;
 			mutable Glib::RefPtr<Gdk::Pixbuf> cachedImage;
 
-			void absorbGame(const Game &);
+			void absorbGame(Game &);
 	};
 
 	using ItemPtr = std::shared_ptr<Item>;

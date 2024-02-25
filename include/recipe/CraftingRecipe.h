@@ -24,7 +24,7 @@ namespace Game3 {
 		bool craft(Game &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) override;
 		void toJSON(nlohmann::json &) const override;
 
-		static CraftingRecipe fromJSON(const Game &, const nlohmann::json &);
+		static CraftingRecipe fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
 	};
 
 	void to_json(nlohmann::json &, const CraftingRecipe &);

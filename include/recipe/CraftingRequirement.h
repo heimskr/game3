@@ -15,7 +15,7 @@ namespace Game3 {
 	struct CraftingRequirement: std::variant<ItemStack, AttributeRequirement> {
 		using std::variant<ItemStack, AttributeRequirement>::variant;
 
-		static CraftingRequirement fromJSON(const Game &, const nlohmann::json &);
+		static CraftingRequirement fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
 
 		template <typename T>
 		constexpr inline bool is() const {

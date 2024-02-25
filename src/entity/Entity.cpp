@@ -64,16 +64,17 @@ namespace Game3 {
 		auto realm = getRealm();
 		auto shared = getSelf();
 		realm->removeSafe(shared);
+		GamePtr game = getGame();
 
 		{
-			auto &all_agents = getGame().allAgents;
+			auto &all_agents = game->allAgents;
 			auto lock = all_agents.uniqueLock();
 			all_agents.erase(globalID);
 		}
 
 		realm->eviscerate(shared);
 
-		if (getSide() == Side::Server) {
+		if (game->getSide() == Side::Server) {
 			{
 				auto lock = visibleEntities.sharedLock();
 				if (!visibleEntities.empty()) {
@@ -83,9 +84,9 @@ namespace Game3 {
 				}
 			}
 
-			ServerGame &game = getGame().toServer();
-			game.database.deleteEntity(shared);
-			game.entityDestroyed(*this);
+			ServerGame &server_game = game->toServer();
+			server_game.database.deleteEntity(shared);
+			server_game.entityDestroyed(*this);
 		}
 	}
 
@@ -244,20 +245,21 @@ namespace Game3 {
 			rider->setRidden(getSelf());
 		}
 
-		if (getSide() == Side::Server) {
-			getGame().toServer().broadcast(EntityRiddenPacket(rider, *this));
-		}
+		GamePtr game = getGame();
+
+		if (game->getSide() == Side::Server)
+			game->toServer().broadcast(EntityRiddenPacket(rider, *this));
 	}
 
 	void Entity::setRidden(const EntityPtr &ridden) {
 		weakRidden = ridden;
 	}
 
-	void Entity::init(Game &game_) {
+	void Entity::init(const std::shared_ptr<Game> &game) {
 		assert(!initialized);
 		initialized = true;
 
-		game = &game_;
+		weakGame = game;
 		auto shared = shared_from_this();
 
 		{
@@ -274,7 +276,7 @@ namespace Game3 {
 			game->allAgents[globalID] = shared;
 		}
 
-		if (texture == nullptr && getSide() == Side::Client) {
+		if (texture == nullptr && game->getSide() == Side::Client) {
 			if (customTexture)
 				changeTexture(customTexture);
 			else
@@ -289,7 +291,7 @@ namespace Game3 {
 		} else
 			inventory->weakOwner = shared;
 
-		if (getSide() == Side::Server) {
+		if (game->getSide() == Side::Server) {
 			inventory->onSwap = [this](Inventory &here, Slot here_slot, Inventory &there, Slot there_slot) {
 				InventoryPtr this_inventory = getInventory(0);
 				assert(here == *this_inventory || there == *this_inventory);
@@ -350,6 +352,7 @@ namespace Game3 {
 		if (texture == nullptr || !isVisible())
 			return;
 
+		GamePtr game = getGame();
 		SpriteRenderer &sprite_renderer = renderers.batchSprite;
 		const auto [offset_x, offset_y, offset_z] = offset.copyBase();
 
@@ -360,10 +363,10 @@ namespace Game3 {
 			// Choose an animation frame based on the time.
 			switch (variety) {
 				case 3:
-					texture_x_offset = 8. * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - getRealm()->getGame().startTime).count() / 200) % 4);
+					texture_x_offset = 8. * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - game->startTime).count() / 200) % 4);
 					break;
 				default:
-					texture_x_offset = 8. * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - getRealm()->getGame().startTime).count() / 100) % 5);
+					texture_x_offset = 8. * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - game->startTime).count() / 100) % 5);
 			}
 		}
 
@@ -382,7 +385,7 @@ namespace Game3 {
 		double fluid_offset = 0.;
 
 		if (auto fluid_tile = getRealm()->tileProvider.copyFluidTile({row, column}); fluid_tile && 0 < fluid_tile->level) {
-			fluid_offset = std::sin(getGame().time * 1.5) + .5;
+			fluid_offset = std::sin(game->time * 1.5) + .5;
 			renderHeight = 10. + fluid_offset;
 		} else {
 			renderHeight = 16.;
@@ -504,7 +507,7 @@ namespace Game3 {
 				horizontal = true;
 				break;
 			default:
-				throw std::invalid_argument("Invalid direction: " + std::to_string(int(move_direction)));
+				throw std::invalid_argument(std::format("Invalid direction: {}", move_direction));
 		}
 
 		if (!context.facingDirection)
@@ -628,7 +631,8 @@ namespace Game3 {
 			canvas.scale = 8.;
 
 		Tileset &tileset = realm->getTileset();
-		TexturePtr texture = tileset.getTexture(realm->getGame());
+		GamePtr game = getGame();
+		TexturePtr texture = tileset.getTexture(*game);
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
 		{
 			auto lock = offset.sharedLock();
@@ -674,8 +678,10 @@ namespace Game3 {
 			});
 		}
 
-		if (is_server && !context.fromPath && !context.suppressPackets)
-			getGame().toServer().entityTeleported(*this, context);
+		if (is_server && !context.fromPath && !context.suppressPackets) {
+			GamePtr game = getGame();
+			game->toServer().entityTeleported(*this, context);
+		}
 
 		return in_different_chunk;
 	}
@@ -688,8 +694,9 @@ namespace Game3 {
 			nextRealm = new_realm->id;
 			auto shared = getSelf();
 
-			if (getSide() == Side::Server && old_realm != new_realm && !context.suppressPackets)
-				getGame().toServer().entityChangingRealms(*this, new_realm, new_position);
+			GamePtr game = getGame();
+			if (game->getSide() == Side::Server && old_realm != new_realm && !context.suppressPackets)
+				game->toServer().entityChangingRealms(*this, new_realm, new_position);
 
 			if (old_realm && old_realm != new_realm) {
 				old_realm->detach(shared);
@@ -787,17 +794,13 @@ namespace Game3 {
 		return out == PathResult::Trivial || out == PathResult::Success;
 	}
 
-	Game & Entity::getGame() {
-		if (game == nullptr)
-			game = &getRealm()->getGame();
-		return *game;
-	}
+	std::shared_ptr<Game> Entity::getGame() const {
+		if (auto locked = weakGame.lock())
+			return locked;
 
-	Game & Entity::getGame() const {
-		if (game != nullptr)
-			return *game;
-
-		return getRealm()->getGame();
+		GamePtr game = getRealm()->getGame();
+		weakGame = game;
+		return game;
 	}
 
 	bool Entity::isVisible() const {
@@ -807,8 +810,10 @@ namespace Game3 {
 		const auto pos = getPosition();
 		auto realm = getRealm();
 
-		if (getSide() == Side::Client) {
-			ClientGame &client_game = realm->getGame().toClient();
+		GamePtr game = getGame();
+
+		if (game->getSide() == Side::Client) {
+			ClientGame &client_game = game->toClient();
 			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.getPlayer()->getChunk()).contains(pos.getChunk());
 		}
 
@@ -837,7 +842,8 @@ namespace Game3 {
 	}
 
 	Side Entity::getSide() const {
-		return getGame().getSide();
+		GamePtr game = getGame();
+		return game->getSide();
 	}
 
 	void Entity::inventoryUpdated() {
@@ -1105,10 +1111,11 @@ namespace Game3 {
 	}
 
 	bool Entity::setHeld(Slot new_value, Held &held) {
-		const bool is_client = getSide() == Side::Client;
+		GamePtr game = getGame();
+		const bool is_client = game->getSide() == Side::Client;
 
 		if (!is_client)
-			getGame().toServer().broadcast({position, getRealm(), nullptr}, HeldItemSetPacket(getRealm()->id, getGID(), held.isLeft, new_value, increaseUpdateCounter()));
+			game->toServer().broadcast({position, getRealm(), nullptr}, HeldItemSetPacket(getRealm()->id, getGID(), held.isLeft, new_value, increaseUpdateCounter()));
 
 		if (new_value < 0) {
 			held.slot = -1;
@@ -1128,7 +1135,7 @@ namespace Game3 {
 		}
 
 		held.slot = new_value;
-		auto item_texture = getGame().registry<ItemTextureRegistry>().at((*inventory)[held.slot]->item->identifier);
+		auto item_texture = game->registry<ItemTextureRegistry>().at((*inventory)[held.slot]->item->identifier);
 		held.texture = item_texture->getTexture();
 		held.offsetX = item_texture->x / 2.;
 		held.offsetY = item_texture->y / 2.;
@@ -1136,10 +1143,10 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Texture> Entity::getTexture() {
-		Game &game_ref = getGame();
-		auto entity_texture = game_ref.registry<EntityTextureRegistry>().at(type);
+		GamePtr game = getGame();
+		auto entity_texture = game->registry<EntityTextureRegistry>().at(type);
 		variety = entity_texture->variety;
-		return game_ref.registry<TextureRegistry>().at(entity_texture->textureID);
+		return game->registry<TextureRegistry>().at(entity_texture->textureID);
 	}
 
 	std::function<void(const TickArgs &)> Entity::getTickFunction() {
@@ -1150,11 +1157,13 @@ namespace Game3 {
 	}
 
 	Tick Entity::enqueueTick(std::chrono::nanoseconds delay) {
-		return tickEnqueued(getGame().enqueue(getTickFunction(), delay));
+		GamePtr game = getGame();
+		return tickEnqueued(game->enqueue(getTickFunction(), delay));
 	}
 
 	Tick Entity::enqueueTick() {
-		return tickEnqueued(getGame().enqueue(getTickFunction()));
+		GamePtr game = getGame();
+		return tickEnqueued(game->enqueue(getTickFunction()));
 	}
 
 	template <>
@@ -1199,7 +1208,8 @@ namespace Game3 {
 	}
 
 	void Entity::jump() {
-		if (getSide() != Side::Server || getRidden())
+		GamePtr game = getGame();
+		if (game->getSide() != Side::Server || getRidden())
 			return;
 
 		auto velocity_lock = velocity.uniqueLock();
@@ -1214,7 +1224,7 @@ namespace Game3 {
 
 		velocity.z = getJumpSpeed();
 		increaseUpdateCounter();
-		getGame().toServer().entityTeleported(*this, MovementContext{.excludePlayer = getGID()});
+		game->toServer().entityTeleported(*this, MovementContext{.excludePlayer = getGID()});
 	}
 
 	void Entity::clearOffset() {
@@ -1289,10 +1299,10 @@ namespace Game3 {
 	}
 
 	void Entity::changeTexture(const Identifier &identifier) {
-		Game &game_ref = getGame();
-		auto entity_texture = game_ref.registry<EntityTextureRegistry>().at(identifier);
+		GamePtr game = getGame();
+		auto entity_texture = game->registry<EntityTextureRegistry>().at(identifier);
 		variety = entity_texture->variety;
-		texture = game_ref.registry<TextureRegistry>().at(entity_texture->textureID);
+		texture = game->registry<TextureRegistry>().at(entity_texture->textureID);
 		customTexture = identifier;
 	}
 

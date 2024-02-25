@@ -222,7 +222,7 @@ namespace Game3 {
 	struct UnnamedRegistryBase: Registry {
 		using Registry::Registry;
 
-		virtual void add(const Game &, const nlohmann::json &) = 0;
+		virtual void add(const std::shared_ptr<Game> &, const nlohmann::json &) = 0;
 	};
 
 	template <typename T, template <typename...> typename Set = std::unordered_set>
@@ -270,7 +270,7 @@ namespace Game3 {
 				return false;
 			}
 
-			void add(const Game &, const nlohmann::json &) override {
+			void add(const std::shared_ptr<Game> &, const nlohmann::json &) override {
 				throw std::runtime_error("Adding from JSON unimplemented");
 			}
 
@@ -324,7 +324,7 @@ namespace Game3 {
 		public:
 			using UnnamedRegistry<T, Set>::UnnamedRegistry;
 
-			void add(const Game &game, const nlohmann::json &json) override {
+			void add(const std::shared_ptr<Game> &game, const nlohmann::json &json) override {
 				UnnamedRegistry<T, Set>::add(T::fromJSON(game, json));
 			}
 	};

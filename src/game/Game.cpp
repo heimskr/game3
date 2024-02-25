@@ -88,7 +88,7 @@ namespace Game3 {
 	void Game::addRecipe(const nlohmann::json &json) {
 		const Identifier identifier = json.at(0);
 		if (identifier.getPathStart() != "ignore")
-			registries.at(identifier)->toUnnamed()->add(*this, json.at(1));
+			registries.at(identifier)->toUnnamed()->add(shared_from_this(), json.at(1));
 	}
 
 	RealmID Game::newRealmID() const {

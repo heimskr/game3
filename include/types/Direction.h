@@ -30,7 +30,7 @@ struct std::formatter<Game3::Direction> {
 		return ctx.begin();
     }
 
-	auto format(const auto &direction, std::format_context &ctx) const {
+	auto format(auto direction, std::format_context &ctx) const {
 		switch (direction) {
 			case Game3::Direction::Up:      return std::format_to(ctx.out(), "up");
 			case Game3::Direction::Down:    return std::format_to(ctx.out(), "down");
@@ -38,7 +38,7 @@ struct std::formatter<Game3::Direction> {
 			case Game3::Direction::Right:   return std::format_to(ctx.out(), "right");
 			case Game3::Direction::Invalid: return std::format_to(ctx.out(), "invalid");
 			default:
-				return std::format_to(ctx.out(), "?");
+				return std::format_to(ctx.out(), "{}?", int(direction));
 		}
 	}
 };

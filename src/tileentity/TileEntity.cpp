@@ -19,7 +19,7 @@ namespace Game3 {
 		realm->removeSafe(self);
 
 		if (getSide() == Side::Server) {
-			ServerGame &game = realm->getGame().toServer();
+			ServerGame &game = realm->getGame()->toServer();
 			game.database.deleteTileEntity(self);
 			game.tileEntityDestroyed(*this);
 		}
@@ -84,8 +84,9 @@ namespace Game3 {
 		if (cachedTile == 0)
 			return;
 
+		GamePtr game = realm->getGame();
 		const auto tilesize = tileset.getTileSize();
-		const auto texture = tileset.getTexture(realm->getGame());
+		const auto texture = tileset.getTexture(*game);
 		const auto x = (cachedTile % (texture->width / tilesize)) * tilesize;
 		const auto y = (cachedTile / (texture->width / tilesize)) * tilesize;
 
@@ -109,8 +110,9 @@ namespace Game3 {
 		if (cachedUpperTile == TileID(-1) || cachedUpperTile == 0)
 			return;
 
+		GamePtr game = realm->getGame();
 		const auto tilesize = tileset.getTileSize();
-		const auto texture = tileset.getTexture(realm->getGame());
+		const auto texture = tileset.getTexture(*game);
 		const auto x = (cachedUpperTile % (texture->width / tilesize)) * tilesize;
 		const auto y = (cachedUpperTile / (texture->width / tilesize)) * tilesize;
 
@@ -127,15 +129,15 @@ namespace Game3 {
 	void TileEntity::renderLighting(const RendererContext &) {}
 
 	void TileEntity::onSpawn() {
-		Game &game = getRealm()->getGame();
-		if (game.getSide() == Side::Server)
-			game.toServer().tileEntitySpawned(getSelf());
+		GamePtr game = getRealm()->getGame();
+		if (game->getSide() == Side::Server)
+			game->toServer().tileEntitySpawned(getSelf());
 	}
 
 	void TileEntity::onRemove() {
-		Game &game = getRealm()->getGame();
-		if (game.getSide() == Side::Client)
-			game.toClient().moduleMessage({}, shared_from_this(), "TileEntityRemoved");
+		GamePtr game = getRealm()->getGame();
+		if (game->getSide() == Side::Client)
+			game->toClient().moduleMessage({}, shared_from_this(), "TileEntityRemoved");
 	}
 
 	void TileEntity::setRealm(const RealmPtr &realm) {
@@ -159,7 +161,8 @@ namespace Game3 {
 		const Position pos = getPosition();
 		RealmPtr realm = getRealm();
 		if (getSide() == Side::Client) {
-			ClientGame &client_game = realm->getGame().toClient();
+			GamePtr game = realm->getGame();
+			ClientGame &client_game = game->toClient();
 			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.getPlayer()->getChunk()).contains(pos.getChunk());
 		}
 		return realm->isVisible(pos);
@@ -169,27 +172,22 @@ namespace Game3 {
 		const Position pos = getPosition() + offset;
 		RealmPtr realm = getRealm();
 		if (getSide() == Side::Client) {
-			ClientGame &client_game = realm->getGame().toClient();
+			GamePtr game = realm->getGame();
+			ClientGame &client_game = game->toClient();
 			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.getPlayer()->getChunk()).contains(pos.getChunk());
 		}
 		return realm->isVisible(pos);
 	}
 
 	Side TileEntity::getSide() const {
-		return getRealm()->getGame().getSide();
+		return getRealm()->getGame()->getSide();
 	}
 
 	ChunkPosition TileEntity::getChunk() const {
 		return getPosition().getChunk();
 	}
 
-	Game & TileEntity::getGame() const {
-		if (RealmPtr realm = weakRealm.lock())
-			return realm->getGame();
-		throw std::runtime_error("Couldn't get Game from TileEntity: couldn't lock Realm");
-	}
-
-	Game & TileEntity::getGame() {
+	GamePtr TileEntity::getGame() const {
 		if (RealmPtr realm = weakRealm.lock())
 			return realm->getGame();
 		throw std::runtime_error("Couldn't get Game from TileEntity: couldn't lock Realm");
@@ -236,7 +234,11 @@ namespace Game3 {
 
 	void TileEntity::queueBroadcast(bool force) {
 		Broadcastable::queueBroadcast(force);
-		getGame().enqueue([this](const TickArgs &) { tryBroadcast(); });
+
+		getGame()->enqueue([weak = getWeakSelf()](const TickArgs &) {
+			if (auto tile_entity = weak.lock())
+				tile_entity->tryBroadcast();
+		});
 	}
 
 	void TileEntity::tryBroadcast() {
@@ -268,11 +270,11 @@ namespace Game3 {
 	}
 
 	Tick TileEntity::enqueueTick(std::chrono::nanoseconds delay) {
-		return getGame().enqueue(getTickFunction(), delay);
+		return getGame()->enqueue(getTickFunction(), delay);
 	}
 
 	Tick TileEntity::enqueueTick() {
-		return getGame().enqueue(getTickFunction());
+		return getGame()->enqueue(getTickFunction());
 	}
 
 	void TileEntity::absorbJSON(Game &, const nlohmann::json &json) {

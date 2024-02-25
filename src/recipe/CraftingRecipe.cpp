@@ -97,7 +97,7 @@ namespace Game3 {
 			json["station"] = stationType;
 	}
 
-	CraftingRecipe CraftingRecipe::fromJSON(const Game &game, const nlohmann::json &json) {
+	CraftingRecipe CraftingRecipe::fromJSON(const std::shared_ptr<Game> &game, const nlohmann::json &json) {
 		CraftingRecipe recipe;
 
 		for (const auto &item: json.at("input"))

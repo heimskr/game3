@@ -9,7 +9,8 @@ namespace Game3 {
 	void Tickable::tryEnqueueTick() {
 		didTick();
 
-		const Tick next_tick = getGame().getCurrentTick() + 1;
+		GamePtr game = getGame();
+		const Tick next_tick = game->getCurrentTick() + 1;
 
 		if (tickSet.contains(next_tick))
 			return;
@@ -18,7 +19,8 @@ namespace Game3 {
 	}
 
 	void Tickable::didTick() {
-		tickSet.erase(getGame().getCurrentTick());
+		GamePtr game = getGame();
+		tickSet.erase(game->getCurrentTick());
 	}
 
 	Tick Tickable::tickEnqueued(Tick tick) {

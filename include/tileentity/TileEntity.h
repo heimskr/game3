@@ -90,8 +90,7 @@ namespace Game3 {
 			virtual bool kill() { return false; }
 			inline bool is(const Identifier &check) const { return getID() == check; }
 			std::string getName() const override { return "Unknown TileEntity (" + std::string(tileEntityID) + ')'; }
-			virtual Game & getGame() const;
-			Game & getGame() override;
+			std::shared_ptr<Game> getGame() const override;
 			std::shared_ptr<TileEntity> getSelf();
 			std::weak_ptr<TileEntity> getWeakSelf();
 			void queueDestruction();

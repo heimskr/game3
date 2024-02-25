@@ -14,7 +14,7 @@ namespace Game3 {
 
 			virtual ~Tickable() = default;
 
-			virtual Game & getGame() = 0;
+			virtual std::shared_ptr<Game> getGame() const = 0;
 			virtual Tick enqueueTick() = 0;
 
 			/** If the initial tick has occurred, this simply returns false.

@@ -1,7 +1,8 @@
+#include "game/Game.h"
 #include "recipe/CraftingRequirement.h"
 
 namespace Game3 {
-	CraftingRequirement CraftingRequirement::fromJSON(const Game &game, const nlohmann::json &json) {
+	CraftingRequirement CraftingRequirement::fromJSON(const GamePtr &game, const nlohmann::json &json) {
 		Identifier id = json.at(0);
 		if (id.getPath() == "attribute")
 			return AttributeRequirement{std::move(id), json.size() == 0? 1 : json.at(1).get<ItemCount>()};

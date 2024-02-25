@@ -145,8 +145,7 @@ namespace Game3 {
 			void remove(const TileEntityPtr &, bool run_helper = true);
 			void removeSafe(const TileEntityPtr &);
 			void onMoved(const EntityPtr &, const Position &);
-			Game & getGame();
-			const Game & getGame() const;
+			std::shared_ptr<Game> getGame() const;
 			void queueRemoval(const EntityPtr &);
 			void queueRemoval(const TileEntityPtr &);
 			void queueDestruction(const EntityPtr &);
@@ -318,8 +317,8 @@ namespace Game3 {
 			std::atomic_int generationDepth = 0;
 			bool isGenerating() const { return generationDepth > 0; }
 
-			Realm(Game &);
-			Realm(Game &, RealmID, RealmType, Identifier tileset_id, int64_t seed_);
+			Realm(const std::shared_ptr<Game> &);
+			Realm(const std::shared_ptr<Game> &, RealmID, RealmType, Identifier tileset_id, int64_t seed_);
 
 			void initTexture();
 
@@ -333,7 +332,7 @@ namespace Game3 {
 				std::vector<TileEntityPacket> tileEntityPackets;
 			};
 
-			Game &game;
+			std::weak_ptr<Game> weakGame;
 			std::atomic_bool ticking = false;
 			MTQueue<std::weak_ptr<Entity>> entityRemovalQueue;
 			MTQueue<std::weak_ptr<Entity>> entityDestructionQueue;
@@ -348,8 +347,6 @@ namespace Game3 {
 			Lockable<std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::unordered_set<TileEntityPtr>>>>> tileEntitiesByChunk;
 			Lockable<std::unordered_set<VillagePtr>> villages;
 			ChunkPosition lastPlayerChunk{INT32_MIN, INT32_MIN};
-
-			friend class Game;
 
 			Lockable<std::map<ChunkPosition, WeakSet<RemoteClient>>> chunkRequests;
 
@@ -369,6 +366,8 @@ namespace Game3 {
 		public:
 			using EntitySet = decltype(entitiesByChunk)::Base::mapped_type;
 			EntitySet getEntities(ChunkPosition) const;
+
+		friend class Game;
 	};
 
 	using RealmPtr = std::shared_ptr<Realm>;

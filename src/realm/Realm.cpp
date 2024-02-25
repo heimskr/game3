@@ -36,9 +36,9 @@ namespace Game3 {
 		details.tilesetName = json.at("tileset");
 	}
 
-	Realm::Realm(Game &game_): game(game_) {
-		if (game.getSide() == Side::Client) {
-			game.toClient().getWindow().queue([this] {
+	Realm::Realm(const GamePtr &game): weakGame(game) {
+		if (game->getSide() == Side::Client) {
+			game->toClient().getWindow().queue([this] {
 				createRenderers();
 				initRendererRealms();
 				initRendererTileProviders();
@@ -48,10 +48,10 @@ namespace Game3 {
 		}
 	}
 
-	Realm::Realm(Game &game_, RealmID id_, RealmType type_, Identifier tileset_id, int64_t seed_):
-	id(id_), type(std::move(type_)), tileProvider(std::move(tileset_id)), seed(seed_), game(game_) {
-		if (game.getSide() == Side::Client) {
-			game.toClient().getWindow().queue([this] {
+	Realm::Realm(const GamePtr &game, RealmID id_, RealmType type_, Identifier tileset_id, int64_t seed_):
+	id(id_), type(std::move(type_)), tileProvider(std::move(tileset_id)), seed(seed_), weakGame(game) {
+		if (game->getSide() == Side::Client) {
+			game->toClient().getWindow().queue([this] {
 				createRenderers();
 				initRendererRealms();
 				initTexture();
@@ -133,11 +133,13 @@ namespace Game3 {
 		tileProvider.absorbJSON(json.at("provider"), full_data);
 
 		if (full_data) {
+			GamePtr game = getGame();
+
 			{
 				auto tile_entities_lock = tileEntities.uniqueLock();
 				auto by_gid_lock = tileEntitiesByGID.uniqueLock();
 				for (const auto &[position_string, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>()) {
-					auto tile_entity = TileEntity::fromJSON(game, tile_entity_json);
+					auto tile_entity = TileEntity::fromJSON(*game, tile_entity_json);
 					tileEntities.emplace(Position(position_string), tile_entity);
 					tileEntitiesByGID[tile_entity->globalID] = tile_entity;
 					attach(tile_entity);
@@ -151,7 +153,7 @@ namespace Game3 {
 				auto by_gid_lock = entitiesByGID.uniqueLock();
 				entities.clear();
 				for (const auto &entity_json: json.at("entities")) {
-					auto entity = *entities.insert(Entity::fromJSON(game, entity_json)).first;
+					auto entity = *entities.insert(Entity::fromJSON(*game, entity_json)).first;
 					entity->setRealm(shared);
 					entitiesByGID[entity->globalID] = entity;
 					attach(entity);
@@ -182,7 +184,7 @@ namespace Game3 {
 		if (getSide() != Side::Client)
 			return;
 
-		game.toClient().activateContext();
+		getGame()->toClient().activateContext();
 		baseRenderers.emplace();
 		upperRenderers.emplace();
 	}
@@ -194,10 +196,11 @@ namespace Game3 {
 		if (!focused)
 			onFocus();
 
-		auto &client_game = game.toClient();
-		assert(client_game.getPlayer());
+		ClientGame &game = getGame()->toClient();
+		PlayerPtr player = game.getPlayer();
+		assert(player);
 
-		const ChunkPosition current_chunk = client_game.getPlayer()->getChunk();
+		const ChunkPosition current_chunk = player->getChunk();
 		if (staticLightingQueued.exchange(false) || lastPlayerChunk != current_chunk) {
 			lastPlayerChunk = current_chunk;
 			remakeStaticLightingTexture();
@@ -214,8 +217,9 @@ namespace Game3 {
 		if (!focused)
 			onFocus();
 
-		auto &client_game = game.toClient();
-		assert(client_game.getPlayer());
+		ClientGame &game = getGame()->toClient();
+		PlayerPtr player = game.getPlayer();
+		assert(player);
 
 		if (baseRenderers) {
 			for (auto &row: *baseRenderers) {
@@ -244,8 +248,6 @@ namespace Game3 {
 		batch_sprite.renderNow();
 
 		std::set<EntityPtr, EntityZCompare> rendered_entities;
-
-		auto player = client_game.getPlayer();
 
 		ChunkRange(player->getChunk()).iterate([&](ChunkPosition chunk_position) {
 			if (auto entities_in_chunk = getEntities(chunk_position)) {
@@ -293,8 +295,8 @@ namespace Game3 {
 
 		clearLighting(game_time);
 
-		auto &client_game = game.toClient();
-		auto player = client_game.getPlayer();
+		ClientGame &game = getGame()->toClient();
+		auto player = game.getPlayer();
 		assert(player);
 
 		{
@@ -321,7 +323,7 @@ namespace Game3 {
 		Color color{1, 1, 1, 1};
 
 		if (outdoors) {
-			const double hour = game.getHour();
+			const double hour = getGame()->getHour();
 			if (hour <= 4)
 				color = Color(0x2a3273ff);
 			else if (hour < 4.375)
@@ -354,7 +356,7 @@ namespace Game3 {
 		if (getSide() != Side::Client)
 			return;
 
-		getGame().toClient().activateContext();
+		getGame()->toClient().activateContext();
 
 		for (auto &row: *baseRenderers)
 			for (auto &renderer: row)
@@ -401,8 +403,10 @@ namespace Game3 {
 				return nullptr;
 		}
 		tile_entity->setRealm(shared_from_this());
-		if (!tile_entity->initialized)
-			tile_entity->init(game);
+		if (!tile_entity->initialized) {
+			GamePtr game = getGame();
+			tile_entity->init(*game);
+		}
 		{
 			auto lock = tileEntities.uniqueLock();
 			tileEntities.emplace(tile_entity->position, tile_entity);
@@ -449,7 +453,8 @@ namespace Game3 {
 			if (auto locked = stolen.lock())
 				add(locked);
 
-		const TickArgs args{game, game.getCurrentTick(), delta};
+		GamePtr game = getGame();
+		const TickArgs args{*game, game->getCurrentTick(), delta};
 
 		if (isServer()) {
 			std::vector<RemoteClient::BufferGuard> guards;
@@ -520,12 +525,12 @@ namespace Game3 {
 #ifdef PROFILE_TICKS
 					Timer timer{"RandomTicks"};
 #endif
-					for (size_t i = 0; i < game.randomTicksPerChunk; ++i) {
+					for (size_t i = 0; i < game->randomTicksPerChunk; ++i) {
 						const Position position(chunk.y * CHUNK_SIZE + distribution(threadContext.rng), chunk.x * CHUNK_SIZE + distribution(threadContext.rng));
 
 						for (const Layer layer: mainLayers)
 							if (auto tile_id = tileProvider.tryTile(layer, position); tile_id && *tile_id != 0)
-								game.getTile(tileset[*tile_id])->randomTick({position, shared, nullptr});
+								game->getTile(tileset[*tile_id])->randomTick({position, shared, nullptr});
 					}
 				}
 			}
@@ -590,7 +595,7 @@ namespace Game3 {
 
 		} else {
 
-			auto player = getGame().toClient().getPlayer();
+			auto player = getGame()->toClient().getPlayer();
 			if (!player)
 				return;
 
@@ -882,12 +887,8 @@ namespace Game3 {
 			tile_entity->onOverlap(entity);
 	}
 
-	Game & Realm::getGame() {
-		return game;
-	}
-
-	const Game & Realm::getGame() const {
-		return game;
+	GamePtr Realm::getGame() const {
+		return weakGame.lock();
 	}
 
 	void Realm::queueRemoval(const EntityPtr &entity) {
@@ -928,7 +929,8 @@ namespace Game3 {
 		if (auto realm = entity->weakRealm.lock())
 			realm->remove(entity);
 		entity->setRealm(shared_from_this());
-		entity->init(getGame());
+		GamePtr game = getGame();
+		entity->init(*game);
 		entity->teleport(position);
 	}
 
@@ -938,6 +940,7 @@ namespace Game3 {
 
 	void Realm::setTile(Layer layer, const Position &position, TileID tile_id, bool run_helper, TileUpdateContext context) {
 		bool affected_lighting = false;
+		GamePtr game = getGame();
 
 		{
 			std::unique_lock<std::shared_mutex> tile_lock;
@@ -946,7 +949,7 @@ namespace Game3 {
 				return;
 
 			if (isClient())
-				if (auto tile_object = game.getTile(getTileset()[tile]); tile_object)
+				if (auto tile_object = game->getTile(getTileset()[tile]); tile_object)
 					affected_lighting = tile_object->hasStaticLighting();
 
 			tile = tile_id;
@@ -955,14 +958,14 @@ namespace Game3 {
 		if (isServer()) {
 			if (!isGenerating()) {
 				tileProvider.updateChunk(position.getChunk());
-				getGame().toServer().broadcastTileUpdate(id, layer, position, tile_id);
+				game->toServer().broadcastTileUpdate(id, layer, position, tile_id);
 			}
 			if (run_helper)
 				setLayerHelper(position.row, position.column, layer, context);
 		} else if (run_helper) {
 			if (affected_lighting)
 				queueStaticLightingTexture();
-			else if (auto tile = game.getTile(getTileset()[tile_id]); tile && tile->hasStaticLighting())
+			else if (auto tile = game->getTile(getTileset()[tile_id]); tile && tile->hasStaticLighting())
 				queueStaticLightingTexture();
 		}
 	}
@@ -982,12 +985,12 @@ namespace Game3 {
 
 		if (isServer() && !isGenerating()) {
 			tileProvider.updateChunk(position.getChunk());
-			getGame().toServer().broadcastFluidUpdate(id, position, tile);
+			getGame()->toServer().broadcastFluidUpdate(id, position, tile);
 		}
 	}
 
 	void Realm::setFluid(const Position &position, const Identifier &fluidname, FluidLevel level, bool infinite) {
-		std::shared_ptr<Fluid> fluid = getGame().registry<FluidRegistry>().at(fluidname);
+		std::shared_ptr<Fluid> fluid = getGame()->registry<FluidRegistry>().at(fluidname);
 		assert(fluid);
 		setFluid(position, FluidTile(fluid->registryID, level, infinite));
 	}
@@ -1020,9 +1023,9 @@ namespace Game3 {
 
 	bool Realm::interactGround(const PlayerPtr &player, const Position &position, Modifiers modifiers, ItemStack *used_item, Hand hand) {
 		const Place place(position, shared_from_this(), player);
-		auto &game = getGame();
+		GamePtr game = getGame();
 
-		if (auto iter = game.interactionSets.find(type); iter != game.interactionSets.end())
+		if (auto iter = game->interactionSets.find(type); iter != game->interactionSets.end())
 			if (iter->second->interact(place, modifiers, used_item, hand))
 				return true;
 
@@ -1030,7 +1033,7 @@ namespace Game3 {
 
 		for (const Layer layer: reverse(mainLayers))
 			if (std::optional<TileID> tile = tryTile(layer, position))
-				if (game.getTile(tileset[*tile])->interact(place, layer, used_item, hand))
+				if (game->getTile(tileset[*tile])->interact(place, layer, used_item, hand))
 					return true;
 
 		return false;
@@ -1098,14 +1101,15 @@ namespace Game3 {
 
 	void Realm::damageGround(const Position &position) {
 		const Place place(position, shared_from_this(), nullptr);
-		auto &game = getGame();
+		GamePtr game = getGame();
 
-		if (auto iter = game.interactionSets.find(type); iter != game.interactionSets.end())
+		if (auto iter = game->interactionSets.find(type); iter != game->interactionSets.end())
 			iter->second->damageGround(place);
 	}
 
 	Tileset & Realm::getTileset() const {
-		return *tileProvider.getTileset(getGame());
+		GamePtr game = getGame();
+		return *tileProvider.getTileset(*game);
 	}
 
 	void Realm::toJSON(nlohmann::json &json, bool full_data) const {
@@ -1270,13 +1274,13 @@ namespace Game3 {
 	}
 
 	Side Realm::getSide() const {
-		return getGame().getSide();
+		return getGame()->getSide();
 	}
 
 	std::set<ChunkPosition> Realm::getMissingChunks() const {
 		assert(getSide() == Side::Client);
 		std::set<ChunkPosition> out;
-		auto player = getGame().toClient().getPlayer();
+		auto player = getGame()->toClient().getPlayer();
 
 		auto chunk_pos = player->getPosition().getChunk();
 		chunk_pos.y -= REALM_DIAMETER / 2;
@@ -1478,7 +1482,7 @@ namespace Game3 {
 	void Realm::queueReupload() {
 		assert(getSide() == Side::Client);
 		if (!reuploadPending.exchange(true)) {
-			getGame().toClient().getWindow().queue([weak = std::weak_ptr(shared_from_this())] {
+			getGame()->toClient().getWindow().queue([weak = std::weak_ptr(shared_from_this())] {
 				if (auto shared = weak.lock()) {
 					shared->reupload();
 					shared->reuploadPending = false;
@@ -1528,16 +1532,16 @@ namespace Game3 {
 
 	void Realm::remakeStaticLightingTexture() {
 		assert(isClient());
-		ClientGame &client_game = game.toClient();
-		PlayerPtr player = client_game.getPlayer();
+		ClientGame &game = getGame()->toClient();
+		PlayerPtr player = game.getPlayer();
 
 		if (!player)
 			return;
 
 		Timer timer("RemakeStaticLightingTexture");
-		Canvas &canvas = client_game.canvas;
+		Canvas &canvas = game.canvas;
 		GL::Texture &texture = canvas.staticLightingTexture;
-		client_game.activateContext();
+		game.activateContext();
 		GL::FBOBinder binder = canvas.fbo.getBinder();
 		GL::TextureFBOBinder texture_binder = texture.getBinder();
 		GL::clear(0, 0, 0, 0);
@@ -1577,7 +1581,7 @@ namespace Game3 {
 		if (getSide() != Side::Client)
 			return false;
 
-		auto &game = getGame().toClient();
+		ClientGame &game = getGame()->toClient();
 		const auto player     = game.getPlayer();
 		const auto player_pos = player->getPosition();
 		const bool overlap    = player_pos == position;
@@ -1632,12 +1636,13 @@ namespace Game3 {
 		if (!outdoors)
 			return false;
 
-		const double hour = getGame().getHour();
+		const double hour = getGame()->getHour();
 		return !(5. <= hour && hour < 21.);
 	}
 
 	void Realm::initEntity(const EntityPtr &entity, const Position &position) {
-		entity->init(getGame());
+		GamePtr game = getGame();
+		entity->init(*game);
 		add(entity, position);
 		entity->calculateVisibleEntities();
 		entity->spawning = false;
@@ -1661,7 +1666,8 @@ namespace Game3 {
 
 	bool Realm::isActive() const {
 		assert(isClient());
-		return game.toClient().getActiveRealm().get() == this;
+		GamePtr game = getGame();
+		return game->toClient().getActiveRealm().get() == this;
 	}
 
 	BiomeType Realm::getBiome(int64_t seed) {

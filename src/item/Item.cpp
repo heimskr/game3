@@ -93,8 +93,8 @@ namespace Game3 {
 		if (isTextureCacheable() && cachedTexture)
 			return cachedTexture;
 
-		const Game &game = stack.getGame();
-		return cachedTexture = game.registry<ItemTextureRegistry>().at(identifier)->getTexture();
+		GamePtr game = stack.getGame();
+		return cachedTexture = game->registry<ItemTextureRegistry>().at(identifier)->getTexture();
 	}
 
 	std::string Item::getTooltip(const ItemStack &) {
@@ -119,31 +119,31 @@ namespace Game3 {
 
 // ItemStack
 
-	ItemStack::ItemStack(const Game &game_):
-		game(&game_) {}
+	ItemStack::ItemStack(const GamePtr &game):
+		weakGame(game) {}
 
-	ItemStack::ItemStack(const Game &game_, std::shared_ptr<Item> item_, ItemCount count_):
-	item(std::move(item_)), count(count_), game(&game_) {
+	ItemStack::ItemStack(const GamePtr &game, std::shared_ptr<Item> item_, ItemCount count_):
+	item(std::move(item_)), count(count_), weakGame(game) {
 		assert(item);
-		item->initStack(game_, *this);
+		item->initStack(*game, *this);
 	}
 
-	ItemStack::ItemStack(const Game &game_, std::shared_ptr<Item> item_, ItemCount count_, nlohmann::json data_):
-	item(std::move(item_)), count(count_), data(std::move(data_)), game(&game_) {
+	ItemStack::ItemStack(const GamePtr &game, std::shared_ptr<Item> item_, ItemCount count_, nlohmann::json data_):
+	item(std::move(item_)), count(count_), data(std::move(data_)), weakGame(game) {
 		assert(item);
-		item->initStack(game_, *this);
+		item->initStack(*game, *this);
 	}
 
-	ItemStack::ItemStack(const Game &game_, const ItemID &id, ItemCount count_):
-	item(game_.registry<ItemRegistry>().at(id)), count(count_), game(&game_) {
+	ItemStack::ItemStack(const GamePtr &game, const ItemID &id, ItemCount count_):
+	item(game->registry<ItemRegistry>().at(id)), count(count_), weakGame(game) {
 		assert(item);
-		item->initStack(game_, *this);
+		item->initStack(*game, *this);
 	}
 
-	ItemStack::ItemStack(const Game &game_, const ItemID &id, ItemCount count_, nlohmann::json data_):
-	item(game_.registry<ItemRegistry>().at(id)), count(count_), data(std::move(data_)), game(&game_) {
+	ItemStack::ItemStack(const GamePtr &game, const ItemID &id, ItemCount count_, nlohmann::json data_):
+	item(game->registry<ItemRegistry>().at(id)), count(count_), data(std::move(data_)), weakGame(game) {
 		assert(item);
-		item->initStack(game_, *this);
+		item->initStack(*game, *this);
 	}
 
 	bool ItemStack::canMerge(const ItemStack &other) const {
@@ -153,7 +153,7 @@ namespace Game3 {
 	}
 
 	Glib::RefPtr<Gdk::Pixbuf> ItemStack::getImage() const {
-		assert(game);
+		GamePtr game = getGame();
 		return getImage(*game);
 	}
 
@@ -168,18 +168,18 @@ namespace Game3 {
 	}
 
 	ItemStack ItemStack::withCount(ItemCount new_count) const {
-		assert(game);
-		return {*game, item, new_count};
+		GamePtr game = getGame();
+		return {game, item, new_count};
 	}
 
-	ItemStack ItemStack::withDurability(const Game &game, const ItemID &id, Durability durability) {
+	ItemStack ItemStack::withDurability(const GamePtr &game, const ItemID &id, Durability durability) {
 		ItemStack out(game, id, 1);
 		out.data["durability"] = std::make_pair(durability, durability);
 		return out;
 	}
 
-	ItemStack ItemStack::withDurability(const Game &game, const ItemID &id) {
-		return withDurability(game, id, dynamic_cast<HasMaxDurability &>(*game.registry<ItemRegistry>()[id]).maxDurability);
+	ItemStack ItemStack::withDurability(const GamePtr &game, const ItemID &id) {
+		return withDurability(game, id, dynamic_cast<HasMaxDurability &>(*game->registry<ItemRegistry>()[id]).maxDurability);
 	}
 
 	bool ItemStack::reduceDurability(Durability amount) {
@@ -215,13 +215,13 @@ namespace Game3 {
 		realm->spawn<ItemEntity>(position, *this);
 	}
 
-	std::shared_ptr<Texture> ItemStack::getTexture(const Game &) const {
+	std::shared_ptr<Texture> ItemStack::getTexture(Game &) const {
 		return item->getTexture(*this);
 	}
 
-	void ItemStack::fromJSON(const Game &game, const nlohmann::json &json, ItemStack &stack) {
+	void ItemStack::fromJSON(const GamePtr &game, const nlohmann::json &json, ItemStack &stack) {
 		const Identifier id = json.at(0);
-		stack.item = game.registry<ItemRegistry>()[id];
+		stack.item = game->registry<ItemRegistry>()[id];
 		stack.count = 1 < json.size()? json.at(1).get<ItemCount>() : 1;
 		if (2 < json.size()) {
 			const auto &extra = json.at(2);
@@ -232,41 +232,52 @@ namespace Game3 {
 				stack.data = extra;
 			}
 		}
-		stack.item->initStack(game, stack);
+		stack.item->initStack(*game, stack);
 	}
 
-	ItemStack ItemStack::fromJSON(const Game &game, const nlohmann::json &json) {
+	ItemStack ItemStack::fromJSON(const GamePtr &game, const nlohmann::json &json) {
 		ItemStack out(game);
 		fromJSON(game, json, out);
 		return out;
 	}
 
-	std::vector<ItemStack> ItemStack::manyFromJSON(const Game &game, const nlohmann::json &json) {
+	std::vector<ItemStack> ItemStack::manyFromJSON(const GamePtr &game, const nlohmann::json &json) {
 		std::vector<ItemStack> out;
 		for (const auto &item: json)
 			out.push_back(fromJSON(game, item));
 		return out;
 	}
 
-	void ItemStack::encode(Game &game_, Buffer &buffer) {
-		absorbGame(game_);
+	void ItemStack::onDestroy() {
+		GamePtr game = getGame();
+		item->onDestroy(*game, *this);
+	}
+
+	void ItemStack::onDestroy(Game &game) {
+		item->onDestroy(game, *this);
+	}
+
+	void ItemStack::encode(Game &game, Buffer &buffer) {
+		absorbGame(game);
 		buffer << item->identifier;
 		buffer << count;
 		buffer << data.dump();
 	}
 
-	void ItemStack::decode(Game &game_, Buffer &buffer) {
-		absorbGame(game_);
-		item = game->registry<ItemRegistry>()[buffer.take<Identifier>()];
+	void ItemStack::decode(Game &game, Buffer &buffer) {
+		absorbGame(game);
+		item = game.registry<ItemRegistry>()[buffer.take<Identifier>()];
 		buffer >> count;
 		data = nlohmann::json::parse(buffer.take<std::string>());
 	}
 
-	void ItemStack::absorbGame(const Game &game_) {
-		if (game == nullptr)
-			game = &game_;
-		else
-			assert(game == &game_);
+	void ItemStack::absorbGame(Game &game) {
+		if (weakGame.expired()) {
+			weakGame = game.weak_from_this();
+		} else {
+			// TODO: Game::operator==
+			assert(weakGame.lock().get() == &game);
+		}
 	}
 
 	template <>
@@ -278,8 +289,8 @@ namespace Game3 {
 	ItemStack popBuffer<ItemStack>(Buffer &buffer) {
 		auto context = buffer.context.lock();
 		assert(context);
-		const auto &game = dynamic_cast<Game &>(*context);
-		ItemStack out(game);
+		auto &game = dynamic_cast<Game &>(*context);
+		ItemStack out(game.shared_from_this());
 		buffer >> out;
 		return out;
 	}
@@ -308,7 +319,7 @@ namespace Game3 {
 		stack.count = buffer.take<ItemCount>();
 		const auto raw_json = buffer.take<std::string>(); // TODO: popBuffer for json
 		stack.data = nlohmann::json::parse(raw_json);
-		stack.item = stack.getGame().registry<ItemRegistry>().at(item_id);
+		stack.item = stack.getGame()->registry<ItemRegistry>().at(item_id);
 		return buffer;
 	}
 
@@ -325,6 +336,6 @@ namespace Game3 {
 		assert(context);
 		auto game = std::dynamic_pointer_cast<Game>(context);
 		assert(game);
-		return ItemStack(*game);
+		return ItemStack(game);
 	}
 }

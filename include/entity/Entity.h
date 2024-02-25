@@ -104,7 +104,7 @@ namespace Game3 {
 
 			virtual void absorbJSON(Game &, const nlohmann::json &);
 			virtual void toJSON(nlohmann::json &) const;
-			virtual void init(Game &);
+			virtual void init(const std::shared_ptr<Game> &);
 			virtual void render(const RendererContext &);
 			virtual void renderUpper(const RendererContext &);
 			virtual void renderLighting(const RendererContext &);
@@ -158,8 +158,7 @@ namespace Game3 {
 			PathResult pathfind(const Position &start, const Position &goal, std::list<Direction> &, size_t loop_max = 1'000);
 			bool pathfind(const Position &goal, size_t loop_max = 1'000);
 			virtual float getMovementSpeed() const { return MAX_SPEED; }
-			Game & getGame() override;
-			Game & getGame() const;
+			std::shared_ptr<Game> getGame() const override;
 			bool isVisible() const;
 			bool setHeldLeft(Slot);
 			bool setHeldRight(Slot);
@@ -226,7 +225,7 @@ namespace Game3 {
 			Tick enqueueTick() override;
 
 		protected:
-			Game *game = nullptr;
+			mutable std::weak_ptr<Game> weakGame;
 			LockableSharedPtr<Texture> texture;
 			int variety = 0;
 			float renderHeight = 16.f;
