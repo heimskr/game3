@@ -22,7 +22,15 @@ namespace Game3 {
 		if (spawning)
 			return;
 
-		GamePtr game = getGame();
+		GamePtr game;
+
+		try {
+			game = getGame();
+		} catch (const std::runtime_error &) {
+			// We probably persisted past the death of the server.
+			// This probably happens when a player uses the `stop` command.
+			return;
+		}
 
 		// If the game is being destroyed right now, we can't cast it.
 		// The game is responsible for persisting all players before

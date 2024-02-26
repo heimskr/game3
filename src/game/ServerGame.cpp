@@ -30,16 +30,7 @@ namespace Game3 {
 	ServerGame::ServerGame(const std::shared_ptr<Server> &server_, size_t pool_size):
 		weakServer(server_), pool(pool_size) { pool.start(); }
 
-	double ServerGame::getFrequency() const {
-		return SERVER_TICK_FREQUENCY;
-	}
-
-	void ServerGame::addEntityFactories() {
-		Game::addEntityFactories();
-		add(EntityFactory::create<ServerPlayer>());
-	}
-
-	ServerGame::~ServerGame() {
+	void ServerGame::stop() {
 		pool.join();
 		INFO_("Saving realms and users...");
 		database.writeAllRealms();
@@ -47,6 +38,15 @@ namespace Game3 {
 		SUCCESS_("Saved realms and users.");
 		Timer::summary();
 		Timer::clear();
+	}
+
+	double ServerGame::getFrequency() const {
+		return SERVER_TICK_FREQUENCY;
+	}
+
+	void ServerGame::addEntityFactories() {
+		Game::addEntityFactories();
+		add(EntityFactory::create<ServerPlayer>());
 	}
 
 	bool ServerGame::tick() {

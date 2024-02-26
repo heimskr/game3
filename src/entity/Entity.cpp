@@ -800,6 +800,8 @@ namespace Game3 {
 			return locked;
 
 		GamePtr game = getRealm()->getGame();
+		if (!game)
+			throw std::runtime_error("Can't lock entity's game");
 		weakGame = game;
 		return game;
 	}

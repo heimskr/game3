@@ -402,12 +402,14 @@ namespace Game3 {
 
 			query.bind(1, realm_id);
 
+			GamePtr game_ptr = game.shared_from_this();
+
 			while (query.executeStep()) {
 				const Identifier entity_id{query.getColumn(0).getString()};
 
 				auto factory = game.registry<EntityFactoryRegistry>().at(entity_id);
 				assert(factory);
-				EntityPtr entity = (*factory)(game.shared_from_this());
+				EntityPtr entity = (*factory)(game_ptr);
 
 				const auto *buffer_bytes = reinterpret_cast<const uint8_t *>(query.getColumn(1).getBlob());
 				const size_t buffer_size = query.getColumn(1).getBytes();
@@ -417,7 +419,7 @@ namespace Game3 {
 				Buffer buffer(std::vector<uint8_t>(buffer_bytes, buffer_bytes + buffer_size));
 				buffer.context = game.shared_from_this();
 				entity->decode(buffer);
-				entity->init(game.shared_from_this());
+				entity->init(game_ptr);
 
 				{
 					auto lock = realm->entities.uniqueLock();

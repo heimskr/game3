@@ -98,8 +98,13 @@ namespace Game3 {
 	}
 
 	void Server::stop() {
+		// Game already stopped.
+		if (!game)
+			return;
+
 		workGuard.reset();
 		context.stop();
+		game->stop();
 		if (onStop)
 			onStop();
 		game.reset();
