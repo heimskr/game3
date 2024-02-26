@@ -56,12 +56,10 @@ namespace Game3 {
 
 			for (const std::string *name: names) {
 				const double nanos = times.at(*name).count();
-				std::cerr << "    \e[1m" << *name << std::string(max_length - name->size(), ' ') << "\e[22m took \e[32m"
-				          << (nanos / 1e9) << "\e[39m seconds";
+				std::cerr << std::format("    \e[1m{}{}\e[22m took \e[32m{}\e[39m seconds", *name, std::string(max_length - name->size(), ' '), nanos / 1e9);
 				const size_t count = counts.at(*name);
 				if (1 < count)
-					std::cerr << " (average: \e[33m" << (nanos / double(count) / 1e9) << "\e[39m over \e[1m" << count
-					          << "\e[22m instances)";
+					std::cerr << std::format(" (average: \e[33m{}\e[39m over \e[1m{}\e[22m instances)", nanos / count / 1e9, count);
 				std::cerr << '\n';
 			}
 		}
