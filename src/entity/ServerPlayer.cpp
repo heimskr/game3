@@ -38,7 +38,7 @@ namespace Game3 {
 		if (game->dying)
 			return;
 
-		GameDB &database = game->toServer().database;
+		GameDB &database = game->toServer().getDatabase();
 		if (database.isOpen()) {
 			database.writeUser(*this);
 			INFO("Persisted {}.", username);

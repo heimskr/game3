@@ -26,8 +26,7 @@ namespace Game3 {
 
 	class GameDB {
 		private:
-			// TODO: weak_ptr
-			ServerGame &game;
+			std::weak_ptr<ServerGame> weakGame;
 			std::filesystem::path path;
 
 			void bind(SQLite::Statement &, const std::shared_ptr<Player> &);
@@ -35,7 +34,7 @@ namespace Game3 {
 		public:
 			Lockable<std::unique_ptr<SQLite::Database>, std::recursive_mutex> database;
 
-			GameDB(ServerGame &);
+			GameDB(const std::shared_ptr<ServerGame> &);
 
 			void open(std::filesystem::path);
 			void close();
@@ -86,6 +85,12 @@ namespace Game3 {
 
 			inline bool isOpen() {
 				return database != nullptr;
+			}
+
+			inline std::shared_ptr<ServerGame> getGame() const {
+				auto game = weakGame.lock();
+				assert(game);
+				return game;
 			}
 
 			template <typename C>

@@ -85,7 +85,7 @@ namespace Game3 {
 			}
 
 			ServerGame &server_game = game->toServer();
-			server_game.database.deleteEntity(shared);
+			server_game.getDatabase().deleteEntity(shared);
 			server_game.entityDestroyed(*this);
 		}
 	}

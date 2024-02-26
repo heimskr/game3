@@ -131,7 +131,8 @@ namespace Game3 {
 	void Server::saveUserData() {
 		auto lock = game->players.sharedLock();
 
-		game->database.writeUsers(game->players);
+		GameDB &database = game->getDatabase();
+		database.writeUsers(game->players);
 
 		for (const ServerPlayerPtr &player: game->players) {
 			nlohmann::json json;
@@ -139,7 +140,7 @@ namespace Game3 {
 				auto player_lock = player->sharedLock();
 				player->toJSON(json);
 			}
-			game->database.writeUser(player->username, json, std::nullopt);
+			database.writeUser(player->username, json, std::nullopt);
 		}
 	}
 
@@ -149,7 +150,7 @@ namespace Game3 {
 
 		{
 			nlohmann::json json;
-			if (game->database.readUser(std::string(username), nullptr, &json, nullptr))
+			if (game->getDatabase().readUser(std::string(username), nullptr, &json, nullptr))
 				return ServerPlayer::fromJSON(game, json);
 		}
 
@@ -277,7 +278,7 @@ namespace Game3 {
 
 		if (database_existed) {
 			Timer timer{"ReadAll"};
-			game->database.readAll();
+			game->getDatabase().readAll();
 			timer.stop();
 			Timer::summary();
 			Timer::clear();
@@ -326,7 +327,7 @@ namespace Game3 {
 				if (running && save_period <= std::chrono::system_clock::now() - last_save) {
 					INFO_("Autosaving...");
 					game->tickingPaused = true;
-					game->database.writeAll();
+					game->getDatabase().writeAll();
 					game->tickingPaused = false;
 					INFO_("Autosaved.");
 					last_save = std::chrono::system_clock::now();

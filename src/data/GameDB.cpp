@@ -20,8 +20,8 @@
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
-	GameDB::GameDB(ServerGame &game_):
-		game(game_) {}
+	GameDB::GameDB(const ServerGamePtr &game):
+		weakGame(game) {}
 
 	void GameDB::open(std::filesystem::path path_) {
 		close();
@@ -69,8 +69,9 @@ namespace Game3 {
 	void GameDB::writeAll() {
 		writeRules();
 		writeAllRealms();
-		auto player_lock = game.players.sharedLock();
-		writeUsers(game.players);
+		ServerGamePtr game = getGame();
+		auto player_lock = game->players.sharedLock();
+		writeUsers(game->players);
 	}
 
 	void GameDB::readAll() {
@@ -79,13 +80,14 @@ namespace Game3 {
 	}
 
 	void GameDB::writeRules() {
-		auto rules_lock = game.gameRules.sharedLock();
-		if (game.gameRules.empty())
+		ServerGamePtr game = getGame();
+		auto rules_lock = game->gameRules.sharedLock();
+		if (game->gameRules.empty())
 			return;
 		auto lock = database.uniqueLock();
 		SQLite::Transaction transaction{*database};
 		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO rules VALUES (?, ?)"};
-		for (const auto &[key, value]: game.gameRules) {
+		for (const auto &[key, value]: game->gameRules) {
 			statement.bind(1, key);
 			statement.bind(2, int64_t(value));
 			statement.exec();
@@ -95,23 +97,26 @@ namespace Game3 {
 	}
 
 	void GameDB::readRules() {
+		ServerGamePtr game = getGame();
 		auto lock = database.uniqueLock();
-		auto rules_lock = game.gameRules.uniqueLock();
+		auto rules_lock = game->gameRules.uniqueLock();
 
 		SQLite::Statement query{*database, "SELECT * FROM rules"};
 		while (query.executeStep()) {
-			game.gameRules[query.getColumn(0)] = query.getColumn(1).getInt64();
+			game->gameRules[query.getColumn(0)] = query.getColumn(1).getInt64();
 		}
 	}
 
 	void GameDB::writeAllRealms() {
 		Timer timer{"WriteAllRealms"};
-		game.iterateRealms([this](const RealmPtr &realm) {
+		ServerGamePtr game = getGame();
+		game->iterateRealms([this](const RealmPtr &realm) {
 			writeRealm(realm);
 		});
 	}
 
 	void GameDB::writeRealm(const RealmPtr &realm) {
+		ServerGamePtr game = getGame();
 		auto lock = database.uniqueLock();
 		SQLite::Transaction transaction{*database};
 
@@ -142,7 +147,7 @@ namespace Game3 {
 		}
 		{
 			Timer timer{"WriteVillages"};
-			game.saveVillages(*database, false);
+			game->saveVillages(*database, false);
 		}
 
 		Timer timer{"WriteRealmCommit"};
@@ -219,6 +224,7 @@ namespace Game3 {
 
 	void GameDB::readAllRealms() {
 		assert(database);
+		ServerGamePtr game = getGame();
 		auto db_lock = database.uniqueLock();
 
 		SQLite::Statement query{*database, "SELECT * FROM chunks"};
@@ -247,7 +253,7 @@ namespace Game3 {
 				RealmPtr realm;
 				{
 					Timer get_realm_timer{"GetRealm"};
-					realm = game.getRealm(realm_id, [&] { return loadRealm(realm_id, false); });
+					realm = game->getRealm(realm_id, [&] { return loadRealm(realm_id, false); });
 				}
 				{
 					Timer absorb_timer{"Absorb"};
@@ -259,7 +265,7 @@ namespace Game3 {
 
 		{
 			Timer villages_timer{"LoadVillages"};
-			game.loadVillages(game.toServerPointer(), *database);
+			game->loadVillages(game->toServerPointer(), *database);
 		}
 
 		const bool force_migrate = std::filesystem::exists(".force-migrate");
@@ -276,7 +282,7 @@ namespace Game3 {
 			return meta_cache[hash] = std::move(json);
 		};
 
-		game.iterateRealms([&](const RealmPtr &realm) {
+		game->iterateRealms([&](const RealmPtr &realm) {
 			Tileset &tileset = realm->getTileset();
 
 			const std::string realm_tileset_hash = readRealmTilesetHash(realm->id, false);
@@ -339,6 +345,7 @@ namespace Game3 {
 
 	RealmPtr GameDB::loadRealm(RealmID realm_id, bool do_lock) {
 		assert(database);
+		ServerGamePtr game = getGame();
 
 		std::unique_lock<std::recursive_mutex> db_lock;
 		if (do_lock)
@@ -357,7 +364,7 @@ namespace Game3 {
 			raw_json = query.getColumn(0).getString();
 		}
 
-		RealmPtr realm = Realm::fromJSON(game.shared_from_this(), nlohmann::json::parse(raw_json), false);
+		RealmPtr realm = Realm::fromJSON(game, nlohmann::json::parse(raw_json), false);
 
 		{
 			SQLite::Statement query{*database, "SELECT tileEntityID, encoded, globalID FROM tileEntities WHERE realmID = ?"};
@@ -366,7 +373,7 @@ namespace Game3 {
 
 			while (query.executeStep()) {
 				const Identifier tile_entity_id{query.getColumn(0).getString()};
-				auto factory = game.registry<TileEntityFactoryRegistry>().at(tile_entity_id);
+				auto factory = game->registry<TileEntityFactoryRegistry>().at(tile_entity_id);
 				assert(factory);
 				TileEntityPtr tile_entity = (*factory)();
 				tile_entity->setGID(GlobalID(query.getColumn(2).getInt64()));
@@ -377,9 +384,9 @@ namespace Game3 {
 				tile_entity->setRealm(realm);
 
 				Buffer buffer(std::vector<uint8_t>(buffer_bytes, buffer_bytes + buffer_size));
-				buffer.context = game.shared_from_this();
-				tile_entity->init(game);
-				tile_entity->decode(game, buffer);
+				buffer.context = game;
+				tile_entity->init(*game);
+				tile_entity->decode(*game, buffer);
 
 				// TODO: functionize this
 				{
@@ -402,14 +409,12 @@ namespace Game3 {
 
 			query.bind(1, realm_id);
 
-			GamePtr game_ptr = game.shared_from_this();
-
 			while (query.executeStep()) {
 				const Identifier entity_id{query.getColumn(0).getString()};
 
-				auto factory = game.registry<EntityFactoryRegistry>().at(entity_id);
+				auto factory = game->registry<EntityFactoryRegistry>().at(entity_id);
 				assert(factory);
-				EntityPtr entity = (*factory)(game_ptr);
+				EntityPtr entity = (*factory)(game);
 
 				const auto *buffer_bytes = reinterpret_cast<const uint8_t *>(query.getColumn(1).getBlob());
 				const size_t buffer_size = query.getColumn(1).getBytes();
@@ -417,9 +422,9 @@ namespace Game3 {
 				entity->setRealm(realm);
 
 				Buffer buffer(std::vector<uint8_t>(buffer_bytes, buffer_bytes + buffer_size));
-				buffer.context = game.shared_from_this();
+				buffer.context = game;
 				entity->decode(buffer);
-				entity->init(game_ptr);
+				entity->init(game);
 
 				{
 					auto lock = realm->entities.uniqueLock();
@@ -505,10 +510,12 @@ namespace Game3 {
 				*json_out = nlohmann::json::parse(std::string(query.getColumn(1)));
 
 			if (release_place != nullptr) {
-				if (query.isColumnNull(2) || query.isColumnNull(3))
+				if (query.isColumnNull(2) || query.isColumnNull(3)) {
 					*release_place = std::nullopt;
-				else
-					*release_place = Place{Position{query.getColumn(2).getString()}, game.getRealm(query.getColumn(3).getInt()), nullptr};
+				} else {
+					ServerGamePtr game = getGame();
+					*release_place = Place{Position{query.getColumn(2).getString()}, game->getRealm(query.getColumn(3).getInt()), nullptr};
+				}
 			}
 
 			return true;
@@ -591,7 +598,8 @@ namespace Game3 {
 			const std::string concatenated = query.getColumn(0).getString();
 			if (concatenated.empty())
 				return std::nullopt;
-			return Place{Position{concatenated}, game.getRealm(query.getColumn(1).getInt())};
+			ServerGamePtr game = getGame();
+			return Place{Position{concatenated}, game->getRealm(query.getColumn(1).getInt())};
 		}
 
 		return std::nullopt;

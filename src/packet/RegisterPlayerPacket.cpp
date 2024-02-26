@@ -17,7 +17,7 @@ namespace Game3 {
 			return;
 		}
 
-		if (game->database.hasName(username, displayName)) {
+		if (game->getDatabase().hasName(username, displayName)) {
 			WARN_("Failed to register user " << username);
 			client.send(RegistrationStatusPacket());
 			return;

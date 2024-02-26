@@ -28,13 +28,20 @@
 
 namespace Game3 {
 	ServerGame::ServerGame(const std::shared_ptr<Server> &server_, size_t pool_size):
-		weakServer(server_), pool(pool_size) { pool.start(); }
+	weakServer(server_), pool(pool_size) {
+		pool.start();
+	}
+
+	void ServerGame::init() {
+		database = std::make_unique<GameDB>(getSelf());
+	}
 
 	void ServerGame::stop() {
 		pool.join();
 		INFO_("Saving realms and users...");
-		database.writeAllRealms();
-		database.writeUsers(players);
+		assert(database);
+		database->writeAllRealms();
+		database->writeUsers(players);
 		SUCCESS_("Saved realms and users.");
 		Timer::summary();
 		Timer::clear();
@@ -264,7 +271,8 @@ namespace Game3 {
 	}
 
 	void ServerGame::openDatabase(std::filesystem::path path) {
-		database.open(std::move(path));
+		assert(database);
+		database->open(std::move(path));
 	}
 
 	void ServerGame::broadcast(const Packet &packet, bool include_non_players) {
@@ -282,12 +290,13 @@ namespace Game3 {
 	}
 
 	void ServerGame::releasePlayer(const std::string &username, const Place &place) {
+		assert(database);
 		auto lock = playerMap.sharedLock();
 		if (auto iter = playerMap.find(username); iter != playerMap.end()) {
 			iter->second->teleport(place.position, place.realm, MovementContext{.isTeleport = true});
 		} else {
 			lock.unlock();
-			database.writeReleasePlace(username, place);
+			database->writeReleasePlace(username, place);
 		}
 	}
 
@@ -434,8 +443,9 @@ namespace Game3 {
 
 			if (first == "saveall") {
 				INFO_("Writing...");
+				assert(database);
 				tickingPaused = true;
-				database.writeAll();
+				database->writeAll();
 				tickingPaused = false;
 				INFO_("Writing done.");
 				return {true, "Wrote all data."};

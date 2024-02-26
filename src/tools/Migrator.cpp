@@ -19,9 +19,10 @@ namespace Game3 {
 			game->openDatabase(1 < args.size()? args[1] : "world.db");
 			ssl_server->game = game;
 			INFO_("Reading...");
-			game->database.readAllRealms();
+			GameDB &database = game->getDatabase();
+			database.readAllRealms();
 			INFO_("Writing...");
-			game->database.writeAllRealms();
+			database.writeAllRealms();
 			SUCCESS_("Done.");
 			Timer::summary();
 			Timer::clear();

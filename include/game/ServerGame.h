@@ -31,11 +31,11 @@ namespace Game3 {
 			Lockable<std::unordered_map<std::string, ServerPlayerPtr>> playerMap;
 			Lockable<std::map<std::string, ssize_t>> gameRules;
 			std::weak_ptr<Server> weakServer;
-			GameDB database{*this};
 			float lastGarbageCollection = 0;
 
 			ServerGame(const std::shared_ptr<Server> &, size_t pool_size);
 
+			void init();
 			void stop();
 			double getFrequency() const override;
 			void addEntityFactories() override;
@@ -70,6 +70,11 @@ namespace Game3 {
 				return out;
 			}
 
+			inline GameDB & getDatabase() {
+				assert(database);
+				return *database;
+			}
+
 			template <typename P>
 			void broadcast(const Place &place, const P &packet) {
 				auto lock = players.sharedLock();
@@ -84,8 +89,11 @@ namespace Game3 {
 			MTQueue<std::weak_ptr<ServerPlayer>> playerRemovalQueue;
 			double timeSinceTimeUpdate = 0;
 			ThreadPool pool;
+			std::unique_ptr<GameDB> database;
 
 			void handlePacket(RemoteClient &, Packet &);
 			std::tuple<bool, std::string> commandHelper(RemoteClient &, const std::string &);
 	};
+
+	using ServerGamePtr = std::shared_ptr<ServerGame>;
 }

@@ -20,7 +20,7 @@ namespace Game3 {
 
 		if (getSide() == Side::Server) {
 			ServerGame &game = realm->getGame()->toServer();
-			game.database.deleteTileEntity(self);
+			game.getDatabase().deleteTileEntity(self);
 			game.tileEntityDestroyed(*this);
 		}
 	}

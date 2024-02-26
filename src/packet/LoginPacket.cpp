@@ -17,7 +17,9 @@ namespace Game3 {
 			nlohmann::json json;
 			std::optional<Place> release_place;
 
-			if (!game->hasPlayer(username) && server->generateToken(username) == token && game->database.readUser(username, &display_name, &json, &release_place)) {
+			GameDB &database = game->getDatabase();
+
+			if (!game->hasPlayer(username) && server->generateToken(username) == token && database.readUser(username, &display_name, &json, &release_place)) {
 				auto player = ServerPlayer::fromJSON(game, json);
 				player->username = username;
 				client.setPlayer(player);
@@ -33,7 +35,7 @@ namespace Game3 {
 				realm->addPlayer(player);
 				if (release_place) {
 					player->teleport(release_place->position, release_place->realm, MovementContext{.isTeleport = true});
-					game->database.writeReleasePlace(username, std::nullopt);
+					database.writeReleasePlace(username, std::nullopt);
 				}
 				return;
 			}
