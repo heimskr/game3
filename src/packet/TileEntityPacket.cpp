@@ -28,30 +28,30 @@ namespace Game3 {
 		tileEntity->encode(game, buffer);
 	}
 
-	void TileEntityPacket::handle(ClientGame &game) {
-		RealmPtr realm = game.tryRealm(realmID);
+	void TileEntityPacket::handle(const ClientGamePtr &game) {
+		RealmPtr realm = game->tryRealm(realmID);
 		if (!realm)
 			throw PacketError("Couldn't find realm " + std::to_string(realmID) + " in TileEntityPacket");
 
-		if (auto found = game.getAgent<TileEntity>(globalID)) {
+		if (auto found = game->getAgent<TileEntity>(globalID)) {
 			wasFound = true;
-			(tileEntity = found)->decode(game, storedBuffer);
+			(tileEntity = found)->decode(*game, storedBuffer);
 		} else {
 			std::optional<std::weak_ptr<Agent>> weak_agent;
 			{
-				auto lock = game.allAgents.sharedLock();
-				if (auto iter = game.allAgents.find(globalID); iter != game.allAgents.end())
+				auto lock = game->allAgents.sharedLock();
+				if (auto iter = game->allAgents.find(globalID); iter != game->allAgents.end())
 					weak_agent = iter->second;
 			}
 
 			wasFound = false;
-			auto factory = game.registry<TileEntityFactoryRegistry>()[identifier];
+			auto factory = game->registry<TileEntityFactoryRegistry>()[identifier];
 			tileEntity = (*factory)();
 			tileEntity->setGID(globalID);
 			tileEntity->tileEntityID = identifier;
 			tileEntity->setRealm(realm);
-			tileEntity->init(game);
-			tileEntity->decode(game, storedBuffer);
+			tileEntity->init(*game);
+			tileEntity->decode(*game, storedBuffer);
 
 			if (weak_agent) {
 				ERROR_("Found TileEntity " << globalID << " in allAgents, even though getAgent<TileEntity> returned null!");
@@ -79,7 +79,7 @@ namespace Game3 {
 
 		if (tileEntity) {
 			if (!wasFound)
-				game.getRealm(realmID)->add(tileEntity);
+				game->getRealm(realmID)->add(tileEntity);
 			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(tileEntity))
 				for (InventoryID i = 0, max = has_inventory->getInventoryCount(); i < max; ++i)
 					if (InventoryPtr inventory = has_inventory->getInventory(i))

@@ -9,7 +9,7 @@
 #include "worldgen/CaveGen.h"
 
 namespace Game3 {
-	Cave::Cave(Game &game_, RealmID id_, RealmID parent_realm, int seed_):
+	Cave::Cave(const GamePtr &game_, RealmID id_, RealmID parent_realm, int seed_):
 		Realm(game_, id_, ID(), "base:tileset/monomap", seed_), parentRealm(parent_realm) {}
 
 	void Cave::clearLighting(float) {
@@ -24,16 +24,18 @@ namespace Game3 {
 		//    -> If we find a cave entrance in one realm, we don't need to search other realms for another entrance to the same cave.
 		// - All cave entrances in a given realm lead to the same cave.
 		//    -> If we find one cave entrance in a realm, we can stop after destroying its linked cave and we don't have to look for more entrances.
-		Game &game = getGame();
+		GamePtr game = getGame();
 		auto lock = tileEntities.sharedLock();
 		for (const auto &[index, tile_entity]: tileEntities) {
 			if (tile_entity->tileID != "base:tile/cave")
 				continue;
+
 			if (auto building = std::dynamic_pointer_cast<Building>(tile_entity)) {
-				if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game.getRealm(building->innerRealmID)))
-					game.removeRealm(building->innerRealmID);
+				if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game->getRealm(building->innerRealmID)))
+					game->removeRealm(building->innerRealmID);
 				else
 					WARN_("Cave entrance leads to realm " << building->innerRealmID << ", which isn't a cave. Not erasing.");
+
 				break;
 			}
 		}

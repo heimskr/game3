@@ -27,7 +27,7 @@ namespace Game3 {
 		json["spawnables"]  = spawnables;
 	}
 
-	void ItemSpawner::absorbJSON(Game &game, const nlohmann::json &json) {
+	void ItemSpawner::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		minimumTime = json.at("minimumTime");
 		maximumTime = json.at("maximumTime");

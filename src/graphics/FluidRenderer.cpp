@@ -73,7 +73,8 @@ namespace Game3 {
 
 		auto &tileset = realm->getTileset();
 		const auto tilesize = static_cast<float>(tileset.getTileSize());
-		auto texture = tileset.getTexture(realm->getGame());
+		GamePtr game = realm->getGame();
+		auto texture = tileset.getTexture(*game);
 		const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
 
 		glm::mat4 projection(1.f);
@@ -138,10 +139,10 @@ namespace Game3 {
 	bool FluidRenderer::generateVertexBufferObject() {
 		assert(realm);
 
-		auto &game = realm->getGame();
-		auto &tileset = realm->getTileset();
+		GamePtr game = realm->getGame();
+		Tileset &tileset = realm->getTileset();
 		const auto tilesize = tileset.getTileSize();
-		const auto tileset_width = tileset.getTexture(realm->getGame())->width;
+		const auto tileset_width = tileset.getTexture(*game)->width;
 
 		const auto set_width = tileset_width / tilesize;
 
@@ -167,7 +168,7 @@ namespace Game3 {
 			float opacity;
 
 			if (fluid_opt) {
-				if (auto tile_opt = game.getFluidTileID(fluid_opt->id)) {
+				if (auto tile_opt = game->getFluidTileID(fluid_opt->id)) {
 					tile = *tile_opt;
 					if (FluidTile::FULL <= fluid_opt->level)
 						opacity = 1.f;

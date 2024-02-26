@@ -25,8 +25,8 @@ namespace Game3 {
 		}
 	}
 
-	std::shared_ptr<TileEntity> TileEntity::fromJSON(Game &game, const nlohmann::json &json) {
-		auto factory = game.registry<TileEntityFactoryRegistry>().at(json.at("id").get<Identifier>());
+	std::shared_ptr<TileEntity> TileEntity::fromJSON(const GamePtr &game, const nlohmann::json &json) {
+		auto factory = game->registry<TileEntityFactoryRegistry>().at(json.at("id").get<Identifier>());
 		assert(factory);
 		auto out = (*factory)();
 		out->absorbJSON(game, json);
@@ -277,7 +277,7 @@ namespace Game3 {
 		return getGame()->enqueue(getTickFunction());
 	}
 
-	void TileEntity::absorbJSON(Game &, const nlohmann::json &json) {
+	void TileEntity::absorbJSON(const GamePtr &, const nlohmann::json &json) {
 		assert(getSide() == Side::Server);
 		tileEntityID = json.at("id");
 		globalID     = json.at("gid");

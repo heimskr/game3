@@ -6,8 +6,8 @@
 #include "packet/InventorySlotUpdatePacket.h"
 
 namespace Game3 {
-	void InventorySlotUpdatePacket::handle(ClientGame &game) {
-		if (auto player = game.getPlayer()) {
+	void InventorySlotUpdatePacket::handle(const ClientGamePtr &game) {
+		if (auto player = game->getPlayer()) {
 			if (const InventoryPtr inventory = player->getInventory(0)) {
 				auto inventory_lock = inventory->uniqueLock();
 				if (auto stack_pointer = (*inventory)[slot])

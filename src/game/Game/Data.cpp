@@ -121,9 +121,10 @@ namespace Game3 {
 
 		} else if (type == "base:ore_map") {
 
+			GamePtr self = shared_from_this();
 			auto &ores = registry<OreRegistry>();
 			for (const auto &[key, value]: json.at(1).items())
-				ores.add(Identifier(key), Ore(Identifier(key), ItemStack::fromJSON(*this, value.at(0)), value.at(1), value.at(2), value.at(3), value.at(4), value.at(5)));
+				ores.add(Identifier(key), Ore(Identifier(key), ItemStack::fromJSON(self, value.at(0)), value.at(1), value.at(2), value.at(3), value.at(4), value.at(5)));
 
 		} else if (type == "base:realm_details_map") {
 
@@ -170,18 +171,20 @@ namespace Game3 {
 
 		} else if (type == "base:dissolver_map") {
 
+			GamePtr self = shared_from_this();
 			auto &dissolver_recipes = registry<DissolverRecipeRegistry>();
 			for (const auto &[input, result_json]: json.at(1).items()) {
 				const Identifier identifier(input);
-				dissolver_recipes.add(identifier, DissolverRecipe(identifier, ItemStack(*this, identifier, 1), result_json));
+				dissolver_recipes.add(identifier, DissolverRecipe(identifier, ItemStack(self, identifier, 1), result_json));
 			}
 
 		} else if (type == "base:combiner_map") {
 
+			GamePtr self = shared_from_this();
 			auto &combiner_recipes = registry<CombinerRecipeRegistry>();
 			for (const auto &[input, input_json]: json.at(1).items()) {
 				const Identifier identifier(input);
-				combiner_recipes.add(identifier, CombinerRecipe(identifier, *this, input_json));
+				combiner_recipes.add(identifier, CombinerRecipe(identifier, self, input_json));
 			}
 
 		} else if (type == "base:fluid_list") {
@@ -198,21 +201,24 @@ namespace Game3 {
 
 		} else if (type == "base:production_list") {
 
+			GamePtr self = shared_from_this();
 			auto &rules = registry<ProductionRuleRegistry>();
 			for (const nlohmann::json &rule: json.at(1))
-				rules.add(*this, rule);
+				rules.add(self, rule);
 
 		} else if (type == "base:consumption_list") {
 
+			GamePtr self = shared_from_this();
 			auto &rules = registry<ConsumptionRuleRegistry>();
 			for (const nlohmann::json &rule: json.at(1))
-				rules.add(*this, rule);
+				rules.add(self, rule);
 
 		} else if (type == "base:crop_map") {
 
+			GamePtr self = shared_from_this();
 			auto &crops = registry<CropRegistry>();
 			for (const auto &[key, value]: json.at(1).items())
-				crops.add(Identifier(key), Crop(Identifier(key), *this, value));
+				crops.add(Identifier(key), Crop(Identifier(key), self, value));
 
 		} else if (type.getPathStart() == "ignore") {
 

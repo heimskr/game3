@@ -51,7 +51,7 @@ namespace Game3 {
 			Tick enqueueTick() override;
 			void tick(const TickArgs &);
 
-			Game & getGame() override;
+			std::shared_ptr<Game> getGame() const override;
 
 			void addSubscriber(PlayerPtr);
 			void removeSubscriber(const PlayerPtr &);

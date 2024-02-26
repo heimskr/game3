@@ -13,7 +13,7 @@ namespace Game3 {
 		assert(!success || (!username.empty() && !display_name.empty()));
 		if (player) {
 			player->encode(playerDataBuffer);
-			playerDataBuffer.context = player->getGame().shared_from_this();
+			playerDataBuffer.context = player->getGame();
 		}
 	}
 
@@ -26,26 +26,26 @@ namespace Game3 {
 		buffer >> success >> globalID >> username >> displayName >> playerDataBuffer;
 	}
 
-	void LoginStatusPacket::handle(ClientGame &game) {
+	void LoginStatusPacket::handle(const ClientGamePtr &game) {
 		if (!success)
 			throw AuthenticationError("Login failed");
 
 		SUCCESS_("Login succeeded");
-		MainWindow &window = game.getWindow();
+		MainWindow &window = game->getWindow();
 		{
 			auto lock = window.settings.uniqueLock();
 			window.settings.username = username;
 		}
 		window.saveSettings();
 		auto player = Entity::create<ClientPlayer>();
-		game.setPlayer(player);
+		game->setPlayer(player);
 		player->setGID(globalID);
 		INFO_("Setting player GID to " << globalID);
 		player->init(game);
 		player->decode(playerDataBuffer);
-		player->setupRealm(game);
+		player->setupRealm(*game);
 		RealmPtr realm = player->getRealm();
-		game.setActiveRealm(realm);
+		game->setActiveRealm(realm);
 		realm->add(player, player->getPosition());
 		realm->addPlayer(player);
 		player->getInventory(0)->notifyOwner();

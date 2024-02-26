@@ -39,15 +39,15 @@ namespace Game3 {
 		if (fluidContainer->levels.empty()) {
 			WARN_("No fluids.");
 		} else {
-			Game &game = realm->getGame();
+			GamePtr game = realm->getGame();
 			for (const auto &[id, amount]: fluidContainer->levels)
-				INFO("{} = {}", game.getFluid(id)->identifier, amount);
+				INFO("{} = {}", game->getFluid(id)->identifier, amount);
 		}
 
 		return false;
 	}
 
-	void Tank::absorbJSON(Game &game, const nlohmann::json &json) {
+	void Tank::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		FluidHoldingTileEntity::absorbJSON(game, json);
 	}
@@ -62,7 +62,7 @@ namespace Game3 {
 		FluidHoldingTileEntity::decode(game, buffer);
 	}
 
-	Game & Tank::getGame() const {
+	GamePtr Tank::getGame() const {
 		return TileEntity::getGame();
 	}
 }

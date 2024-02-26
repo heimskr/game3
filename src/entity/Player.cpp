@@ -84,7 +84,7 @@ namespace Game3 {
 			json["tooldown"] = tooldown;
 	}
 
-	void Player::absorbJSON(Game &game, const nlohmann::json &json) {
+	void Player::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		Entity::absorbJSON(game, json);
 		LivingEntity::absorbJSON(game, json);
 		displayName = json.at("displayName");
@@ -145,7 +145,7 @@ namespace Game3 {
 	}
 
 	void Player::teleport(const Position &position, const std::shared_ptr<Realm> &new_realm, MovementContext context) {
-		auto &game = new_realm->getGame();
+		GamePtr game = new_realm->getGame();
 
 		if ((firstTeleport || weakRealm.lock() != new_realm) && getSide() == Side::Server) {
 			clearOffset();
@@ -161,8 +161,8 @@ namespace Game3 {
 		Entity::teleport(position, new_realm, context);
 
 		if ((old_realm_id == 0 || old_realm_id != nextRealm) && nextRealm != 0) {
-			if (getSide() == Side::Client) {
-				auto &client_game = game.toClient();
+			if (game->getSide() == Side::Client) {
+				ClientGame &client_game = game->toClient();
 				// Second condition is a hack. Sometimes the player gets interrealm teleported twice in the same tick.
 				// TODO: figure out the reason for the above double interrealm teleportation.
 				RealmPtr active_realm = client_game.getActiveRealm();
@@ -172,7 +172,7 @@ namespace Game3 {
 					active_realm = new_realm;
 					active_realm->onFocus();
 					client_game.setActiveRealm(std::move(active_realm));
-					focus(game.toClient().canvas, true);
+					focus(client_game.canvas, true);
 					client_game.requestFromLimbo(new_realm->id);
 				}
 			} else {
@@ -205,9 +205,9 @@ namespace Game3 {
 
 	void Player::showText(const Glib::ustring &text, const Glib::ustring &name) {
 		if (getSide() == Side::Client) {
-			getRealm()->getGame().toClient().setText(text, name, true, true);
+			getGame()->toClient().setText(text, name, true, true);
 			queueForMove([](const EntityPtr &player, bool) {
-				player->getRealm()->getGame().toClient().canvas.window.textTab->hide();
+				player->getGame()->toClient().canvas.window.textTab->hide();
 				return true;
 			});
 		}
@@ -307,7 +307,7 @@ namespace Game3 {
 				return true;
 			}
 		} else {
-			getGame().toClient().getClient()->send(packet);
+			getGame()->toClient().getClient()->send(packet);
 			return true;
 		}
 

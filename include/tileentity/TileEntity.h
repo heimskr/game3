@@ -59,7 +59,7 @@ namespace Game3 {
 			~TileEntity() override = default;
 			virtual void destroy();
 
-			static std::shared_ptr<TileEntity> fromJSON(Game &, const nlohmann::json &);
+			static std::shared_ptr<TileEntity> fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
 
 			static std::string getSQL();
 
@@ -127,7 +127,7 @@ namespace Game3 {
 			Tick enqueueTick(std::chrono::nanoseconds);
 			Tick enqueueTick() override;
 
-			virtual void absorbJSON(Game &, const nlohmann::json &);
+			virtual void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
 
 			friend void to_json(nlohmann::json &, const TileEntity &);
 

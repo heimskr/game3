@@ -8,13 +8,13 @@
 #include "packet/AgentMessagePacket.h"
 
 namespace Game3 {
-	void AgentMessagePacket::handle(ServerGame &game, RemoteClient &client) {
+	void AgentMessagePacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
 		if (!Agent::validateGID(globalID)) {
 			client.send(ErrorPacket("Can't send message to agent: invalid GID"));
 			return;
 		}
 
-		AgentPtr destination = game.getAgent(globalID);
+		AgentPtr destination = game->getAgent(globalID);
 		if (!destination) {
 			client.send(ErrorPacket("Can't send message to agent: agent not found"));
 			return;
@@ -24,19 +24,19 @@ namespace Game3 {
 		destination->handleMessage(client.getPlayer(), messageName, data);
 	}
 
-	void AgentMessagePacket::handle(ClientGame &game) {
+	void AgentMessagePacket::handle(const ClientGamePtr &game) {
 		if (!Agent::validateGID(globalID)) {
 			ERROR_("Can't send message to player: invalid GID");
 			return;
 		}
 
-		AgentPtr source = game.getAgent(globalID);
+		AgentPtr source = game->getAgent(globalID);
 		if (!source) {
 			ERROR_("Can't send message to player: agent not found");
 			return;
 		}
 
 		std::any data{std::move(messageData)};
-		game.getPlayer()->handleMessage(source, messageName, data);
+		game->getPlayer()->handleMessage(source, messageName, data);
 	}
 }

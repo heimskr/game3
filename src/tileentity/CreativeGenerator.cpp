@@ -62,7 +62,7 @@ namespace Game3 {
 		return false;
 	}
 
-	void CreativeGenerator::absorbJSON(Game &game, const nlohmann::json &json) {
+	void CreativeGenerator::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);
 	}

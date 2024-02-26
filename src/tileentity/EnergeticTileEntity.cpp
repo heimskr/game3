@@ -43,7 +43,8 @@ namespace Game3 {
 			increaseUpdateCounter();
 			queueBroadcast();
 		} else {
-			getRealm()->getGame().toClient().signalEnergyUpdate().emit(std::dynamic_pointer_cast<HasEnergy>(shared_from_this()));
+			GamePtr game = realm->getGame();
+			game->toClient().signalEnergyUpdate().emit(std::dynamic_pointer_cast<HasEnergy>(shared_from_this()));
 		}
 	}
 
@@ -67,7 +68,7 @@ namespace Game3 {
 		json["energy"] = energyContainer->energy;
 	}
 
-	void EnergeticTileEntity::absorbJSON(Game &, const nlohmann::json &json) {
+	void EnergeticTileEntity::absorbJSON(const GamePtr &, const nlohmann::json &json) {
 		const EnergyAmount amount = json.at("energy");
 		auto lock = energyContainer->uniqueLock();
 		energyContainer->energy = amount;

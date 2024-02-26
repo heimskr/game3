@@ -21,7 +21,7 @@ namespace Game3 {
 		maxUses(max_uses),
 		cooldown(cooldown_) {}
 
-	Ore Ore::fromJSON(const Game &game, const nlohmann::json &json) {
+	Ore Ore::fromJSON(const GamePtr &game, const nlohmann::json &json) {
 		return {
 			Identifier(), // Should be filled in later by the registry add methods
 			ItemStack::fromJSON(game, json.at(0)),
@@ -46,10 +46,10 @@ namespace Game3 {
 			json["uses"] = uses;
 	}
 
-	void OreDeposit::absorbJSON(Game &game, const nlohmann::json &json) {
+	void OreDeposit::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		oreType = json.at("oreType");
-		tileID = getOre(game).tilename;
+		tileID = getOre(*game).tilename;
 		ready = json.contains("ready");
 		uses = json.contains("uses")? json.at("uses").get<uint32_t>() : 0;
 	}
@@ -72,14 +72,15 @@ namespace Game3 {
 
 			if (active_stack->hasAttribute("base:attribute/pickaxe"_id)) {
 				const auto &tool = dynamic_cast<Tool &>(*active_stack->item);
-				const Ore &ore = getOre(player->getGame());
+				GamePtr game = player->getGame();
+				const Ore &ore = getOre(*game);
 
 				if (!inventory->add(ore.stack)) {
 					player->tooldown = ore.tooldownMultiplier * tool.baseCooldown;
 
 					if (ore.maxUses <= ++uses) {
 						ready = false;
-						getGame().enqueue(getTickFunction(), std::chrono::microseconds(int64_t(1e6 * ore.cooldown)));
+						game->enqueue(getTickFunction(), std::chrono::microseconds(int64_t(1e6 * ore.cooldown)));
 						uses = 0;
 					}
 
@@ -101,14 +102,15 @@ namespace Game3 {
 		if (!isVisible())
 			return;
 
-		auto realm = getRealm();
-		auto &tileset = realm->getTileset();
+		RealmPtr realm = getRealm();
+		Tileset &tileset = realm->getTileset();
+		GamePtr game = realm->getGame();
 
 		if (tileID != tileset.getEmpty()) {
-			const Ore &ore = getOre(realm->getGame());
+			const Ore &ore = getOre(*game);
 			const auto tilesize = tileset.getTileSize();
 			const TileID tile_id = tileset[ready? tileID : ore.regenTilename];
-			const auto texture = tileset.getTexture(realm->getGame());
+			const auto texture = tileset.getTexture(*game);
 			const auto x = (tile_id % (texture->width / tilesize)) * tilesize;
 			const auto y = (tile_id / (texture->width / tilesize)) * tilesize;
 			sprite_renderer(texture, {

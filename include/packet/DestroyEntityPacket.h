@@ -27,6 +27,6 @@ namespace Game3 {
 		void encode(Game &, Buffer &buffer) const override { buffer << globalID << realmRequirement; }
 		void decode(Game &, Buffer &buffer)       override { buffer >> globalID >> realmRequirement; }
 
-		void handle(ClientGame &) override;
+		void handle(const std::shared_ptr<ClientGame> &) override;
 	};
 }

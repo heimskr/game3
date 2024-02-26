@@ -18,7 +18,6 @@ namespace Game3::WorldGen {
 
 		// auto pauser = realm->pauseUpdates();
 		auto guard = realm->guardGeneration();
-		Game &game = realm->getGame();
 
 		const auto cleanup = [&](Index row, Index column) {
 			if (auto tile_entity = realm->tileEntityAt({row, column}))
@@ -116,7 +115,8 @@ namespace Game3::WorldGen {
 			--column;
 		}
 
-		auto &crop_registry = game.registry<CropRegistry>();
+		GamePtr game = realm->getGame();
+		auto &crop_registry = game->registry<CropRegistry>();
 		std::vector<std::shared_ptr<Crop>> crops;
 		for (const auto &[key, crop]: crop_registry)
 			if (crop->canSpawnInTown)
@@ -151,7 +151,7 @@ namespace Game3::WorldGen {
 
 		Position keep_position(position.row + height / 2 - 1, position.column + width / 2 - 1);
 		const Position town_origin(position.row - pad, position.column - pad);
-		const RealmID keep_realm_id = game.newRealmID();
+		const RealmID keep_realm_id = game->newRealmID();
 		const Index keep_width = 15;
 		const Index keep_height = 15;
 		const Position keep_entrance(keep_height - 2, keep_width / 2);
@@ -159,7 +159,7 @@ namespace Game3::WorldGen {
 		auto keep_biomemap = std::make_shared<BiomeMap>(keep_width, keep_height);
 		auto keep_realm = Realm::create(game, keep_realm_id, "base:realm/keep"_id, "base:tileset/monomap"_id, -seed);
 		keep_realm->outdoors = false;
-		game.addRealm(keep_realm_id, keep_realm);
+		game->addRealm(keep_realm_id, keep_realm);
 		WorldGen::generateKeep(keep_realm, rng, realm->id, keep_width, keep_height, keep_exit, village->getID());
 		keep_realm->remakePathMap(ChunkRange({-1, -1}, {1, 1}));
 
@@ -195,14 +195,14 @@ namespace Game3::WorldGen {
 
 			auto gen_building = [&](const Identifier &tilename, Index realm_width, Index realm_height, RealmType realm_type, const BuildingGenerator &gen_fn, std::optional<Position> entrance = std::nullopt) {
 				realm->setTile(Layer::Objects, building_position, tilename, false);
-				const RealmID realm_id = game.newRealmID();
+				const RealmID realm_id = game->newRealmID();
 				auto building = TileEntity::spawn<Building>(realm, tilename, building_position, realm_id, entrance? *entrance : Position(realm_height - 2, realm_width - 3));
 				assert(building);
-				auto details = game.registry<RealmDetailsRegistry>()[realm_type];
+				auto details = game->registry<RealmDetailsRegistry>()[realm_type];
 				auto new_realm = Realm::create(game, realm_id, realm_type, details->tilesetName, -seed);
 				new_realm->outdoors = false;
 				gen_fn(new_realm, rng, realm, realm_width, realm_height, building_position + Position(1, 0));
-				game.addRealm(realm_id, new_realm);
+				game->addRealm(realm_id, new_realm);
 				new_realm->remakePathMap(ChunkRange({-1, -1}, {1, 1}));
 				realm->add(building);
 			};

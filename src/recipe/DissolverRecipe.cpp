@@ -27,11 +27,11 @@ namespace Game3 {
 	DissolverRecipe::DissolverRecipe(Identifier identifier_, Input input_, const nlohmann::json &json):
 		Recipe(std::move(identifier_)), input(std::move(input_)), dissolverResult(DissolverResult::fromJSON(json)) {}
 
-	DissolverRecipe::Input DissolverRecipe::getInput(Game &) {
+	DissolverRecipe::Input DissolverRecipe::getInput(const GamePtr &) {
 		return input;
 	}
 
-	DissolverRecipe::Output DissolverRecipe::getOutput(const Input &, Game &game) {
+	DissolverRecipe::Output DissolverRecipe::getOutput(const Input &, const GamePtr &game) {
 		return dissolverResult->getResult(game);
 	}
 
@@ -42,7 +42,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool DissolverRecipe::craft(Game &game, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers, size_t *atoms_out) {
+	bool DissolverRecipe::craft(const GamePtr &game, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers, size_t *atoms_out) {
 		auto input_inventory  = std::dynamic_pointer_cast<Inventory>(input_container);
 		auto output_inventory = std::dynamic_pointer_cast<Inventory>(output_container);
 
@@ -75,11 +75,11 @@ namespace Game3 {
 		return true;
 	}
 
-	bool DissolverRecipe::craft(Game &game, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) {
+	bool DissolverRecipe::craft(const GamePtr &game, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) {
 		return craft(game, input_container, output_container, leftovers, nullptr);
 	}
 
-	DissolverRecipe DissolverRecipe::fromJSON(const Game &game, const Identifier &identifier, const nlohmann::json &json) {
+	DissolverRecipe DissolverRecipe::fromJSON(const GamePtr &game, const Identifier &identifier, const nlohmann::json &json) {
 		return DissolverRecipe(identifier, ItemStack(game, identifier, 1), json);
 	}
 

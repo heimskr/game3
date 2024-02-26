@@ -20,7 +20,7 @@ namespace Game3 {
 		void encode(Game &, Buffer &buffer) const final { buffer << globalID << messageName << messageData; }
 		void decode(Game &, Buffer &buffer)       final { buffer >> globalID >> messageName >> messageData; }
 
-		void handle(ServerGame &, RemoteClient &) final;
-		void handle(ClientGame &) final;
+		void handle(const std::shared_ptr<ServerGame> &, RemoteClient &) final;
+		void handle(const std::shared_ptr<ClientGame> &) final;
 	};
 }

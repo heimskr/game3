@@ -18,7 +18,7 @@ namespace Game3 {
 	class ConsumptionRule: public Registerable {
 		public:
 			using Registerable::Registerable;
-			ConsumptionRule(const Game &, const nlohmann::json &);
+			ConsumptionRule(const std::shared_ptr<Game> &, const nlohmann::json &);
 
 			inline const auto & getInput() const { return input; }
 			inline const auto & getLaborRange() const { return laborRange; }
@@ -27,7 +27,7 @@ namespace Game3 {
 			inline auto getRate() const { return rate; }
 			inline auto getIgnoreLabor() const { return ignoreLabor; }
 
-			static ConsumptionRule fromJSON(const Game &, const nlohmann::json &);
+			static ConsumptionRule fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
 
 		private:
 			Identifier input;

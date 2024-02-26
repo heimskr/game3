@@ -74,7 +74,8 @@ namespace Game3 {
 	}
 
 	Tick Village::enqueueTick() {
-		return getGame().enqueue(sigc::mem_fun(*this, &Village::tick));
+		GamePtr game = getGame();
+		return game->enqueue(sigc::mem_fun(*this, &Village::tick));
 	}
 
 	void Village::produce(BiomeType biome, const ProductionRule &rule) {
@@ -183,16 +184,16 @@ namespace Game3 {
 	}
 
 	void Village::tick(const TickArgs &args) {
-		Game &game = args.game;
+		const GamePtr &game = args.game;
 
 		BiomeType biome = Biome::VOID;
-		if (std::optional<BiomeType> found_biome = game.getRealm(realmID)->tileProvider.copyBiomeType(position))
+		if (std::optional<BiomeType> found_biome = game->getRealm(realmID)->tileProvider.copyBiomeType(position))
 			biome = *found_biome;
 
-		consume(game.registry<ConsumptionRuleRegistry>());
-		produce(biome, game.registry<ProductionRuleRegistry>());
+		consume(game->registry<ConsumptionRuleRegistry>());
+		produce(biome, game->registry<ProductionRuleRegistry>());
 		sendUpdates();
-		getGame().enqueue(sigc::mem_fun(*this, &Village::tick), PERIOD);
+		game->enqueue(sigc::mem_fun(*this, &Village::tick), PERIOD);
 	}
 
 	void Village::sendUpdates() {
@@ -207,7 +208,7 @@ namespace Game3 {
 			player->send(packet);
 	}
 
-	Game & Village::getGame() {
+	GamePtr Village::getGame() const {
 		return HasGame::getGame();
 	}
 

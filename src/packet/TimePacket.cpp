@@ -2,7 +2,7 @@
 #include "packet/TimePacket.h"
 
 namespace Game3 {
-	void TimePacket::handle(ClientGame &game) {
-		game.time = time;
+	void TimePacket::handle(const ClientGamePtr &game) {
+		game->time = time;
 	}
 }

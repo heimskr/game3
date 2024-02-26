@@ -30,7 +30,7 @@ namespace Game3 {
 		json["destination"] = destination;
 	}
 
-	void Worker::absorbJSON(Game &game, const nlohmann::json &json) {
+	void Worker::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		LivingEntity::absorbJSON(game, json);
 		phase          = json.at("phase");
 		overworldRealm = json.at("overworldRealm");
@@ -130,12 +130,14 @@ namespace Game3 {
 	}
 
 	void Worker::goToBed(Phase new_phase) {
-		auto house = std::dynamic_pointer_cast<Building>(getRealm()->getGame().getRealm(overworldRealm)->tileEntityAt(housePosition));
+		RealmPtr realm = getRealm();
+		GamePtr game = realm->getGame();
+
+		auto house = std::dynamic_pointer_cast<Building>(game->getRealm(overworldRealm)->tileEntityAt(housePosition));
 		if (!house)
 			throw std::runtime_error("Worker of type " + type.str() + " couldn't find house at " + std::string(housePosition));
 		house->teleport(getSelf());
 
-		auto realm = getRealm();
 		if (realm->id != houseRealm) {
 			// throw std::runtime_error("Worker couldn't teleport to house");
 			stuck = true;

@@ -9,11 +9,11 @@ namespace Game3 {
 	TextParticle::TextParticle(Glib::ustring text_, Color color_, double linger_time, TextAlign align_):
 		Entity(ID()), text(std::move(text_)), color(color_), lingerTime(linger_time), align(align_) {}
 
-	std::shared_ptr<TextParticle> TextParticle::create(Game &) {
+	std::shared_ptr<TextParticle> TextParticle::create(const std::shared_ptr<Game> &) {
 		return Entity::create<TextParticle>();
 	}
 
-	std::shared_ptr<TextParticle> TextParticle::create(Game &, Glib::ustring text, Color color, double linger_time, TextAlign align) {
+	std::shared_ptr<TextParticle> TextParticle::create(const std::shared_ptr<Game> &, Glib::ustring text, Color color, double linger_time, TextAlign align) {
 		return Entity::create<TextParticle>(std::move(text), color, linger_time, align);
 	}
 

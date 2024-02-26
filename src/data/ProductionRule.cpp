@@ -3,7 +3,7 @@
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
-	ProductionRule::ProductionRule(const Game &game, const nlohmann::json &json) {
+	ProductionRule::ProductionRule(const std::shared_ptr<Game> &game, const nlohmann::json &json) {
 		output = ItemStack::fromJSON(game, json["out"]);
 		labor  = json["labor"];
 
@@ -27,7 +27,7 @@ namespace Game3 {
 		return !biomes || biomes->contains(biome);
 	}
 
-	ProductionRule ProductionRule::fromJSON(const Game &game, const nlohmann::json &json) {
+	ProductionRule ProductionRule::fromJSON(const std::shared_ptr<Game> &game, const nlohmann::json &json) {
 		return ProductionRule(game, json);
 	}
 

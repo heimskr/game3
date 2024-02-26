@@ -5,8 +5,8 @@
 #include "recipe/CraftingRecipe.h"
 
 namespace Game3 {
-	void RecipeListPacket::handle(ClientGame &game) {
-		auto &registry = game.registry<CraftingRecipeRegistry>();
+	void RecipeListPacket::handle(const ClientGamePtr &game) {
+		auto &registry = game->registry<CraftingRecipeRegistry>();
 		auto lock = registry.uniqueLock();
 		registry.clear();
 		for (const auto &json: recipes)

@@ -7,10 +7,10 @@ namespace Game3 {
 	}
 
 	void Chicken::tick(const TickArgs &args) {
-		if (getSide() == Side::Server) {
+		if (args.game->getSide() == Side::Server) {
 			if (firstEgg) {
 				firstEgg = false;
-			} else if (eggTick <= args.game.getCurrentTick()) {
+			} else if (eggTick <= args.game->getCurrentTick()) {
 				layEgg();
 				eggTick = enqueueTick(EGG_PERIOD);
 			}
@@ -20,6 +20,7 @@ namespace Game3 {
 	}
 
 	void Chicken::layEgg() {
-		ItemStack(*game, "base:item/egg").spawn(getRealm(), position);
+		RealmPtr realm = getRealm();
+		ItemStack(realm->getGame(), "base:item/egg").spawn(realm, position);
 	}
 }

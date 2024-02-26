@@ -4,8 +4,8 @@
 #include "packet/ChatMessageSentPacket.h"
 
 namespace Game3 {
-	void ChatMessageSentPacket::handle(ClientGame &game) {
-		auto player = game.getAgent<ClientPlayer>(globalID);
+	void ChatMessageSentPacket::handle(const ClientGamePtr &game) {
+		auto player = game->getAgent<ClientPlayer>(globalID);
 		if (!player) {
 			WARN_("Couldn't find player with GID " << globalID << " in ChatMessageSentPacket handler");
 			return;

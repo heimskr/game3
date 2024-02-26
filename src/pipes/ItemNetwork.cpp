@@ -10,7 +10,7 @@
 #include "tileentity/Pipe.h"
 
 namespace Game3 {
-	void ItemNetwork::tick(Game &game, Tick tick_id) {
+	void ItemNetwork::tick(const std::shared_ptr<Game> &game, Tick tick_id) {
 		if (!canTick(tick_id)) {
 			PipeNetwork::tick(game, tick_id);
 			return;

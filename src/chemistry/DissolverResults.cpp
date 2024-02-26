@@ -9,13 +9,13 @@
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
-	std::vector<ItemStack> DissolverResult::getResult(Game &game) {
+	std::vector<ItemStack> DissolverResult::getResult(const std::shared_ptr<Game> &game) {
 		std::vector<ItemStack> out;
 		add(game, out);
 		return out;
 	}
 
-	std::vector<ItemStack> DissolverResult::getResult(Game &game, const nlohmann::json &json) {
+	std::vector<ItemStack> DissolverResult::getResult(const std::shared_ptr<Game> &game, const nlohmann::json &json) {
 		auto result = fromJSON(json);
 		assert(result);
 		std::vector<ItemStack> out;
@@ -56,7 +56,7 @@ namespace Game3 {
 			members.push_back(DissolverResult::fromJSON(json.at(i)));
 	}
 
-	void UnionDissolverResult::add(Game &game, std::vector<ItemStack> &stacks) {
+	void UnionDissolverResult::add(const std::shared_ptr<Game> &game, std::vector<ItemStack> &stacks) {
 		for (const std::unique_ptr<DissolverResult> &member: members)
 			member->add(game, stacks);
 	}
@@ -77,7 +77,7 @@ namespace Game3 {
 		}
 	}
 
-	void WeightedDissolverResult::add(Game &game, std::vector<ItemStack> &stacks) {
+	void WeightedDissolverResult::add(const std::shared_ptr<Game> &game, std::vector<ItemStack> &stacks) {
 		if (members.empty())
 			return;
 
@@ -115,7 +115,7 @@ namespace Game3 {
 			members.push_back(DissolverResult::fromJSON(json.at(i)));
 	}
 
-	void RandomDissolverResult::add(Game &game, std::vector<ItemStack> &stacks) {
+	void RandomDissolverResult::add(const std::shared_ptr<Game> &game, std::vector<ItemStack> &stacks) {
 		if (!members.empty())
 			choose(members)->add(game, stacks);
 	}
@@ -132,7 +132,7 @@ namespace Game3 {
 	ChemicalResult::ChemicalResult(const nlohmann::json &json):
 		formula(json.is_null()? "" : json) {}
 
-	void ChemicalResult::add(Game &game, std::vector<ItemStack> &stacks) {
+	void ChemicalResult::add(const std::shared_ptr<Game> &game, std::vector<ItemStack> &stacks) {
 		if (formula.empty())
 			return;
 
@@ -149,7 +149,7 @@ namespace Game3 {
 	MultiChemicalResult::MultiChemicalResult(const nlohmann::json &json):
 		result(DissolverResult::fromJSON(json.at(1))), count(json.at(0)) {}
 
-	void MultiChemicalResult::add(Game &game, std::vector<ItemStack> &stacks) {
+	void MultiChemicalResult::add(const std::shared_ptr<Game> &game, std::vector<ItemStack> &stacks) {
 		for (size_t i = 0; i < count; ++i)
 			result->add(game, stacks);
 	}

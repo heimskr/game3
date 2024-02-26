@@ -13,7 +13,7 @@ namespace Game3 {
 		assert(!crop->stages.empty());
 
 		PlayerPtr player = place.player;
-		Game &game = player->getGame();
+		std::shared_ptr<Game> game = player->getGame();
 
 		const InventoryPtr inventory = player->getInventory(0);
 		auto inventory_lock = inventory->uniqueLock();

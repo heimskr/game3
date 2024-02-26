@@ -40,7 +40,7 @@ namespace Game3 {
 		if (!village_position)
 			return std::nullopt;
 
-		ServerGame &game = realm->getGame().toServer();
+		ServerGame &game = realm->getGame()->toServer();
 		VillagePtr village = game.addVillage(game, chunk_position, Place{*village_position, realm}, village_options);
 		WorldGen::generateTown(realm, prng, *village_position + Position(PADDING + 1, 0), width, height, PADDING, seed, village);
 
@@ -114,7 +114,7 @@ namespace Game3 {
 		Timer timer{"VillageCandidates"};
 
 		if (!starts)
-			starts.emplace(provider.getLand(realm.getGame(), ChunkRange(chunk_position, chunk_position), options.height + options.padding * 2, options.width + options.padding * 2));
+			starts.emplace(provider.getLand(*realm.getGame(), ChunkRange(chunk_position, chunk_position), options.height + options.padding * 2, options.width + options.padding * 2));
 
 		std::vector<Position> candidates;
 		std::mutex candidates_mutex;

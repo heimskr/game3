@@ -28,7 +28,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Building::absorbJSON(Game &game, const nlohmann::json &json) {
+	void Building::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		innerRealmID = json.at("innerRealmID");
 		entrance = json.at("entrance");
@@ -39,7 +39,8 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Realm> Building::getInnerRealm() const {
-		return getRealm()->getGame().getRealm(innerRealmID);
+		GamePtr game = getGame();
+		return game->getRealm(innerRealmID);
 	}
 
 	void Building::encode(Game &game, Buffer &buffer) {

@@ -54,7 +54,7 @@ namespace Game3::WorldGen {
 				set(Position(row, col), "base:tile/table_we"_id);
 
 				if (rng() % 3 == 0) {
-					Game &game = realm->getGame();
+					GamePtr game = realm->getGame();
 					realm->spawn<ItemEntity>({row, col}, ItemStack(game, "base:item/mead"_id));
 					static const std::vector<ItemStack> spawnables {{game, "base:item/mead"_id}};
 					TileEntity::spawn<ItemSpawner>(realm, Position(row, col), 10, 30, spawnables);

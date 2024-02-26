@@ -23,6 +23,6 @@ namespace Game3 {
 		void encode(Game &, Buffer &buffer) const override { buffer << firstGID << secondGID << firstSlot << secondSlot << firstInventory << secondInventory; }
 		void decode(Game &, Buffer &buffer)       override { buffer >> firstGID >> secondGID >> firstSlot >> secondSlot >> firstInventory >> secondInventory; }
 
-		void handle(ServerGame &, RemoteClient &) override;
+		void handle(const std::shared_ptr<ServerGame> &, RemoteClient &) override;
 	};
 }

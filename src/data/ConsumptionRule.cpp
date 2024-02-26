@@ -17,7 +17,7 @@ namespace Game3 {
 		}
 	}
 
-	ConsumptionRule::ConsumptionRule(const Game &, const nlohmann::json &json) {
+	ConsumptionRule::ConsumptionRule(const std::shared_ptr<Game> &, const nlohmann::json &json) {
 		input = json.at("in");
 		laborOut = json.at("laborOut");
 		always = json.at("always");
@@ -35,7 +35,7 @@ namespace Game3 {
 			ignoreLabor = *iter;
 	}
 
-	ConsumptionRule ConsumptionRule::fromJSON(const Game &game, const nlohmann::json &json) {
+	ConsumptionRule ConsumptionRule::fromJSON(const std::shared_ptr<Game> &game, const nlohmann::json &json) {
 		return ConsumptionRule(game, json);
 	}
 

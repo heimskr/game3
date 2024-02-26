@@ -14,12 +14,12 @@ namespace Game3 {
 			std::optional<Position> chosenResource;
 			float harvestingTime = 0.f;
 
-			static std::shared_ptr<Woodcutter> create(Game &);
-			static std::shared_ptr<Woodcutter> create(Game &, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_);
-			static std::shared_ptr<Woodcutter> fromJSON(Game &, const nlohmann::json &);
+			static std::shared_ptr<Woodcutter> create(const std::shared_ptr<Game> &);
+			static std::shared_ptr<Woodcutter> create(const std::shared_ptr<Game> &, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_);
+			static std::shared_ptr<Woodcutter> fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
 
 			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(Game &, const nlohmann::json &) override;
+			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 			void tick(const TickArgs &) override;
 			std::string getName() const override { return "Woodcutter"; }

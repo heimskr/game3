@@ -50,16 +50,16 @@ namespace Game3 {
 		}
 	}
 
-	void ChunkRequestPacket::handle(ServerGame &game, RemoteClient &client) {
+	void ChunkRequestPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
 		if (generateMissing) {
 			for (const ChunkRequest &request: requests)
-				client.sendChunk(*game.getRealm(realmID), request.position, true, request.counterThreshold);
+				client.sendChunk(*game->getRealm(realmID), request.position, true, request.counterThreshold);
 			return;
 		}
 
 		for (const ChunkRequest &request: requests) {
 			try {
-				client.sendChunk(*game.getRealm(realmID), request.position, false, request.counterThreshold);
+				client.sendChunk(*game->getRealm(realmID), request.position, false, request.counterThreshold);
 			} catch (const std::out_of_range &) {}
 		}
 	}

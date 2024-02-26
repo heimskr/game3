@@ -10,19 +10,19 @@
 #include "packet/PacketError.h"
 
 namespace Game3 {
-	void LoginPacket::handle(ServerGame &game, RemoteClient &client) {
+	void LoginPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
 		if (!client.getPlayer()) {
-			auto server = game.getServer();
+			auto server = game->getServer();
 			std::string display_name;
 			nlohmann::json json;
 			std::optional<Place> release_place;
 
-			if (!game.hasPlayer(username) && server->generateToken(username) == token && game.database.readUser(username, &display_name, &json, &release_place)) {
+			if (!game->hasPlayer(username) && server->generateToken(username) == token && game->database.readUser(username, &display_name, &json, &release_place)) {
 				auto player = ServerPlayer::fromJSON(game, json);
 				player->username = username;
 				client.setPlayer(player);
-				game.addPlayer(player);
-				RealmPtr realm = game.getRealm(player->realmID);
+				game->addPlayer(player);
+				RealmPtr realm = game->getRealm(player->realmID);
 				player->setRealm(realm);
 				player->weakClient = std::static_pointer_cast<RemoteClient>(client.shared_from_this());
 				player->notifyOfRealm(*realm);
@@ -33,7 +33,7 @@ namespace Game3 {
 				realm->addPlayer(player);
 				if (release_place) {
 					player->teleport(release_place->position, release_place->realm, MovementContext{.isTeleport = true});
-					game.database.writeReleasePlace(username, std::nullopt);
+					game->database.writeReleasePlace(username, std::nullopt);
 				}
 				return;
 			}

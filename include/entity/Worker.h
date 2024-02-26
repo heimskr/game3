@@ -24,7 +24,7 @@ namespace Game3 {
 			float stuckTime = 0.f;
 
 			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(Game &, const nlohmann::json &) override;
+			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
 			void initAfterLoad(Game &) override;
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;

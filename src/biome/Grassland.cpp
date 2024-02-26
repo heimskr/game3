@@ -36,27 +36,27 @@ namespace Game3 {
 
 		/** Tries to generate a lilypad starting with the given location as the top left corner. */
 		bool generateLilypad(const Place &place, bool flowerful) {
-			Realm &realm = *place.realm;
-			Tileset &tileset = realm.getTileset();
+			RealmPtr realm = place.realm;
+			Tileset &tileset = realm->getTileset();
 
 			constexpr static Layer layer = Layer::Objects;
 			const TileID empty = tileset.getEmptyID();
-			const FluidID water = safeCast<FluidID>(realm.getGame().registry<FluidRegistry>().at("base:fluid/water")->registryID);
+			const FluidID water = safeCast<FluidID>(realm->getGame()->registry<FluidRegistry>().at("base:fluid/water")->registryID);
 
 			for (Index y_offset = 0; y_offset <= 1; ++y_offset) {
 				for (Index x_offset = 0; x_offset <= 1; ++x_offset) {
 					Position position = place.position + Position{y_offset, x_offset};
-					if (auto fluid = realm.tryFluid(position); !fluid || fluid->id != water)
+					if (auto fluid = realm->tryFluid(position); !fluid || fluid->id != water)
 						return false;
-					if (auto tile = realm.tryTile(layer, position); !tile || tile != empty)
+					if (auto tile = realm->tryTile(layer, position); !tile || tile != empty)
 						return false;
 				}
 			}
 
-			realm.setTile(layer, place.position, flowerful? "base:tile/lilypad_flowerful_nw" : "base:tile/lilypad_flowerless_nw");
-			realm.setTile(layer, place.position + Position{0, 1}, flowerful? "base:tile/lilypad_flowerful_ne" : "base:tile/lilypad_flowerless_ne");
-			realm.setTile(layer, place.position + Position{1, 0}, flowerful? "base:tile/lilypad_flowerful_sw" : "base:tile/lilypad_flowerless_sw");
-			realm.setTile(layer, place.position + Position{1, 1}, "base:tile/lilypad_se");
+			realm->setTile(layer, place.position, flowerful? "base:tile/lilypad_flowerful_nw" : "base:tile/lilypad_flowerless_nw");
+			realm->setTile(layer, place.position + Position{0, 1}, flowerful? "base:tile/lilypad_flowerful_ne" : "base:tile/lilypad_flowerless_ne");
+			realm->setTile(layer, place.position + Position{1, 0}, flowerful? "base:tile/lilypad_flowerful_sw" : "base:tile/lilypad_flowerless_sw");
+			realm->setTile(layer, place.position + Position{1, 1}, "base:tile/lilypad_se");
 			return true;
 		}
 	}
@@ -107,16 +107,16 @@ namespace Game3 {
 	void Grassland::postgen(Index row, Index column, std::default_random_engine &rng, const NoiseGenerator &noisegen, const WorldGenParams &params) {
 		Realm &realm = *getRealm();
 		constexpr double factor = 10;
+		const Tileset &tileset = realm.getTileset();
 
 		if (params.antiforestThreshold > noisegen(row / params.noiseZoom * factor, column / params.noiseZoom * factor, 0.))
-			if (auto tile = realm.tryTile(Layer::Submerged, {row, column}); tile && trees.contains(realm.getTileset()[*tile]))
+			if (auto tile = realm.tryTile(Layer::Submerged, {row, column}); tile && trees.contains(tileset[*tile]))
 				realm.setTile(Layer::Submerged, {row, column}, 0, false);
 
-		const auto &tileset = realm.getTileset();
 		const auto tile1 = tileset[realm.getTile(Layer::Terrain, {row, column})];
 
 		if (water == FluidID(-1))
-			water = safeCast<FluidID>(realm.getGame().registry<FluidRegistry>().at("base:fluid/water")->registryID);
+			water = safeCast<FluidID>(realm.getGame()->registry<FluidRegistry>().at("base:fluid/water")->registryID);
 
 		if (const auto fluid = realm.tryFluid({row, column}); fluid && fluid->id == water) {
 			const double probability = 0.01 * std::pow(std::cos(std::min(1.6, 8.0 * (double(fluid->level) / FluidTile::FULL - 0.7))), 5.);

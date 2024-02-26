@@ -25,14 +25,14 @@ namespace Game3 {
 			void tick(const TickArgs &) override;
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
-			void absorbJSON(Game &, const nlohmann::json &) override;
+			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
 			bool populateMenu(const PlayerPtr &, bool overlap, const std::string &id, Glib::RefPtr<Gio::Menu>, Glib::RefPtr<Gio::SimpleActionGroup>) override;
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
 			void broadcast(bool force) override;
 
-			Game & getGame() const final;
+			GamePtr getGame() const final;
 
 		private:
 			Lockable<std::optional<std::unordered_set<FluidID>>> supportedFluids;

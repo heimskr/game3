@@ -10,14 +10,14 @@ namespace Game3 {
 	CombinerRecipe::CombinerRecipe(Identifier output_):
 		Recipe(output_), outputID(std::move(output_)) {}
 
-	CombinerRecipe::CombinerRecipe(Identifier output_, Game &game, const nlohmann::json &json):
+	CombinerRecipe::CombinerRecipe(Identifier output_, const std::shared_ptr<Game> &game, const nlohmann::json &json):
 		Recipe(output_), input(CombinerInput::fromJSON(json, &outputCount).getStacks(game)), outputID(std::move(output_)) {}
 
-	CombinerRecipe::Input CombinerRecipe::getInput(Game &) {
+	CombinerRecipe::Input CombinerRecipe::getInput(const std::shared_ptr<Game> &) {
 		return input;
 	}
 
-	CombinerRecipe::Output CombinerRecipe::getOutput(const Input &, Game &game) {
+	CombinerRecipe::Output CombinerRecipe::getOutput(const Input &, const std::shared_ptr<Game> &game) {
 		return ItemStack(game, outputID, outputCount);
 	}
 
@@ -32,7 +32,7 @@ namespace Game3 {
 		return true;
 	}
 
-	bool CombinerRecipe::craft(Game &game, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftover) {
+	bool CombinerRecipe::craft(const std::shared_ptr<Game> &game, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftover) {
 		auto input_inventory  = std::dynamic_pointer_cast<Inventory>(input_container);
 		auto output_inventory = std::dynamic_pointer_cast<Inventory>(output_container);
 

@@ -149,7 +149,7 @@ namespace Game3 {
 		});
 	}
 
-	void InventoriedTileEntity::absorbJSON(Game &, const nlohmann::json &) {}
+	void InventoriedTileEntity::absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) {}
 
 	void InventoriedTileEntity::encode(Game &, Buffer &buffer) {
 		HasInventory::encode(buffer, 0);

@@ -26,15 +26,15 @@ namespace Game3 {
 		Entity(ID()),
 		Worker(ID(), overworld_realm, house_realm, house_position, keep_) {}
 
-	std::shared_ptr<Miner> Miner::create(Game &) {
+	std::shared_ptr<Miner> Miner::create(const std::shared_ptr<Game> &) {
 		return Entity::create<Miner>();
 	}
 
-	std::shared_ptr<Miner> Miner::create(Game &, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_) {
+	std::shared_ptr<Miner> Miner::create(const std::shared_ptr<Game> &, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_) {
 		return Entity::create<Miner>(overworld_realm, house_realm, house_position, keep_);
 	}
 
-	std::shared_ptr<Miner> Miner::fromJSON(Game &game, const nlohmann::json &json) {
+	std::shared_ptr<Miner> Miner::fromJSON(const GamePtr &game, const nlohmann::json &json) {
 		auto out = Entity::create<Miner>();
 		out->absorbJSON(game, json);
 		return out;
@@ -48,7 +48,7 @@ namespace Game3 {
 			json["chosenResource"] = *chosenResource;
 	}
 
-	void Miner::absorbJSON(Game &game, const nlohmann::json &json) {
+	void Miner::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		Entity::absorbJSON(game, json);
 		Worker::absorbJSON(game, json);
 		harvestingTime = json.at("harvestingTime");
@@ -60,10 +60,10 @@ namespace Game3 {
 		std::cout << "Miner: money = " << money << ", phase = " << static_cast<int>(phase) << ", stuck = " << stuck << '\n';
 
 		if (getSide() == Side::Client) {
-			auto &window = getRealm()->getGame().toClient().getWindow();
-			auto &tab = *window.inventoryTab;
-			player->queueForMove([&tab](const auto &, bool) {
-				tab.removeModule();
+			MainWindow &window = getRealm()->getGame()->toClient().getWindow();
+			const auto &tab = window.inventoryTab;
+			player->queueForMove([tab](const auto &, bool) {
+				tab->removeModule();
 				return true;
 			});
 			window.showExternalInventory(std::dynamic_pointer_cast<ClientInventory>(getInventory(0)));
@@ -75,13 +75,13 @@ namespace Game3 {
 	void Miner::tick(const TickArgs &args) {
 		Worker::tick(args);
 
-		Game &game = args.game;
+		const GamePtr &game = args.game;
 		const auto delta = args.delta;
 
 		if (getSide() == Side::Client || stillStuck(delta))
 			return;
 
-		const auto hour = game.getHour();
+		const auto hour = game->getHour();
 
 		if (phase == 0 && WORK_START_HOUR <= hour)
 			wakeUp();
@@ -148,9 +148,9 @@ namespace Game3 {
 
 	void Miner::wakeUp() {
 		setPhase(1);
-		auto &game = getRealm()->getGame();
-		RealmPtr overworld = game.getRealm(overworldRealm);
-		RealmPtr house     = game.getRealm(houseRealm);
+		GamePtr game = getRealm()->getGame();
+		RealmPtr overworld = game->getRealm(overworldRealm);
+		RealmPtr house     = game->getRealm(houseRealm);
 		// Detect all resources within a given radius of the house
 		std::vector<Position> resource_choices;
 		for (const auto &[te_position, tile_entity]: overworld->tileEntities)
@@ -190,9 +190,10 @@ namespace Game3 {
 	void Miner::harvest(float delta) {
 		if (HARVESTING_TIME <= harvestingTime) {
 			harvestingTime = 0.f;
-			auto realm = getRealm();
+			RealmPtr realm = getRealm();
 			auto &deposit = dynamic_cast<OreDeposit &>(*realm->tileEntityAt(*chosenResource));
-			const ItemStack &stack = deposit.getOre(realm->getGame()).stack;
+			GamePtr game = realm->getGame();
+			const ItemStack &stack = deposit.getOre(*game).stack;
 			const auto leftover = getInventory(0)->add(stack);
 			if (leftover == stack)
 				setPhase(4);

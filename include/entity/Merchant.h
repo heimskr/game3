@@ -6,13 +6,13 @@ namespace Game3 {
 	class Merchant: public virtual Entity {
 		public:
 			static Identifier ID() { return {"base", "entity/merchant"}; }
-			static std::shared_ptr<Merchant> create(Game &, EntityType = ID());
-			static std::shared_ptr<Merchant> fromJSON(Game &, const nlohmann::json &);
+			static std::shared_ptr<Merchant> create(const std::shared_ptr<Game> &, EntityType = ID());
+			static std::shared_ptr<Merchant> fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
 
 			double greed = .1;
 
 			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(Game &, const nlohmann::json &) override;
+			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 			std::string getName() const override { return "Blacksmith"; }
 			void encode(Buffer &) override;

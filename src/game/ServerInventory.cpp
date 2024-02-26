@@ -300,7 +300,7 @@ namespace Game3 {
 		}
 	}
 
-	ServerInventory ServerInventory::fromJSON(Game &game, const nlohmann::json &json, const std::shared_ptr<Agent> &owner) {
+	ServerInventory ServerInventory::fromJSON(const GamePtr &game, const nlohmann::json &json, const std::shared_ptr<Agent> &owner) {
 		ServerInventory out(owner, 0);
 
 		if (auto iter = json.find("storage"); iter != json.end())

@@ -37,6 +37,6 @@ namespace Game3 {
 		private:
 			Lockable<std::optional<std::vector<std::shared_ptr<EntityFactory>>>> monsterFactories;
 
-			void makeMonsterFactories(Game &);
+			void makeMonsterFactories(const std::shared_ptr<Game> &);
 	};
 }

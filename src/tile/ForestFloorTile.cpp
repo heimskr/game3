@@ -34,7 +34,7 @@ namespace Game3 {
 			if (active->reduceDurability())
 				inventory->erase(inventory->activeSlot);
 
-			Game &game = realm->getGame();
+			std::shared_ptr<Game> game = realm->getGame();
 			player->give(ItemStack(game, "base:item/dirt"));
 			if (std::uniform_int_distribution(1, 10)(threadContext.rng) <= 2)
 				player->give(ItemStack(game, "base:item/moss"));
@@ -50,7 +50,7 @@ namespace Game3 {
 		Tile::randomTick(place);
 
 		Realm &realm = *place.realm;
-		Game &game = realm.getGame();
+		std::shared_ptr<Game> game = realm.getGame();
 
 		std::uniform_int_distribution distribution{0, 99};
 		if (distribution(threadContext.rng) != 0)

@@ -51,7 +51,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Crate::absorbJSON(Game &game, const nlohmann::json &json) {
+	void Crate::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		assert(getSide() == Side::Server);
 		name = json.at("name");

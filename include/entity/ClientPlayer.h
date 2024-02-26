@@ -22,7 +22,7 @@ namespace Game3 {
 		public:
 			~ClientPlayer() override = default;
 
-			static std::shared_ptr<ClientPlayer> create(Game &);
+			static std::shared_ptr<ClientPlayer> create(const std::shared_ptr<Game> &);
 
 			void tick(const TickArgs &) override;
 			void render(const RendererContext &) override;

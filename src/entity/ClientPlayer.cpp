@@ -26,7 +26,7 @@ namespace Game3 {
 	ClientPlayer::ClientPlayer():
 		Entity(ID()), Player() {}
 
-	std::shared_ptr<ClientPlayer> ClientPlayer::create(Game &) {
+	std::shared_ptr<ClientPlayer> ClientPlayer::create(const std::shared_ptr<Game> &) {
 		return Entity::create<ClientPlayer>();
 	}
 
@@ -79,6 +79,7 @@ namespace Game3 {
 		const auto [row, column] = getPosition();
 		const auto [x, y, z] = offset.copyBase();
 
+		GamePtr game = getGame();
 		const bool show_message = lastMessageAge.load() < getMaxMessageAge(game->toClient());
 		const float health_offset = canShowHealthBar()? -.5 : 0;
 		const float name_offset = health_offset + (show_message? -1 : 0);
@@ -150,7 +151,8 @@ namespace Game3 {
 				auto lock = velocity.uniqueLock();
 				velocity.z = getJumpSpeed();
 			}
-			getGame().toClient().playSound("base:sound/jump");
+			GamePtr game = getGame();
+			game->toClient().playSound("base:sound/jump");
 			send(JumpPacket());
 		}
 	}
@@ -161,10 +163,12 @@ namespace Game3 {
 	}
 
 	bool ClientPlayer::move(Direction direction, MovementContext context) {
-		const bool moved = Entity::move(direction, context);
-		if (moved)
+		if (Entity::move(direction, context)) {
 			send(MovePlayerPacket(position, direction, context.facingDirection, offset));
-		return moved;
+			return true;
+		}
+
+		return false;
 	}
 
 	void ClientPlayer::addMoney(MoneyCount to_add) {
@@ -182,8 +186,10 @@ namespace Game3 {
 	void ClientPlayer::setMoney(MoneyCount new_value) {
 		Entity::setMoney(new_value);
 		auto shared = getShared();
-		if (getGame().toClient().getPlayer() == shared) {
-			getRealm()->getGame().toClient().signalPlayerMoneyUpdate().emit(getShared());
+		GamePtr game = getGame();
+		ClientGame &client_game = game->toClient();
+		if (client_game.getPlayer() == shared) {
+			client_game.signalPlayerMoneyUpdate().emit(getShared());
 		}
 	}
 
@@ -238,15 +244,17 @@ namespace Game3 {
 			assert(buffer != nullptr);
 			const auto module_name = buffer->take<Identifier>();
 			const auto message_name = buffer->take<std::string>();
-			getGame().toClient().getWindow().moduleMessageBuffer(module_name, source, message_name, std::move(*buffer));
+			GamePtr game = getGame();
+			game->toClient().getWindow().moduleMessageBuffer(module_name, source, message_name, std::move(*buffer));
 		}
 	}
 
 	void ClientPlayer::sendMessage(const std::shared_ptr<Agent> &destination, const std::string &name, std::any &data) {
 		assert(destination);
-		if (auto *buffer = std::any_cast<Buffer>(&data))
-			getGame().toClient().getClient()->send(AgentMessagePacket(destination->getGID(), name, *buffer));
-		else
+		if (auto *buffer = std::any_cast<Buffer>(&data)) {
+			GamePtr game = getGame();
+			game->toClient().getClient()->send(AgentMessagePacket(destination->getGID(), name, *buffer));
+		} else
 			throw std::runtime_error("Expected data to be a Buffer in ClientPlayer::sendMessage");
 	}
 

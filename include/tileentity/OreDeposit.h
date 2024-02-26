@@ -15,7 +15,7 @@ namespace Game3 {
 
 		Ore(Identifier, ItemStack, Identifier tilename_, Identifier regen_tilename, float tooldown_multiplier, uint32_t max_uses, float cooldown_);
 
-		static Ore fromJSON(const Game &, const nlohmann::json &);
+		static Ore fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
 	};
 
 	class OreDeposit: public TileEntity {
@@ -28,7 +28,7 @@ namespace Game3 {
 			std::string getName() const override { return "Ore Deposit"; }
 
 			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(Game &, const nlohmann::json &) override;
+			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
 			void tick(const TickArgs &) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 			void render(SpriteRenderer &) override;

@@ -8,13 +8,13 @@
 #include "tileentity/Pipe.h"
 
 namespace Game3 {
-	void SetItemFiltersPacket::handle(ServerGame &game, RemoteClient &client) {
+	void SetItemFiltersPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
 		if (!validateDirection(direction)) {
 			client.send(ErrorPacket("Can't set item filters: invalid direction"));
 			return;
 		}
 
-		auto pipe = game.getAgent<Pipe>(pipeGID);
+		auto pipe = game->getAgent<Pipe>(pipeGID);
 		if (!pipe) {
 			client.send(ErrorPacket("Can't set item filters for pipe " + std::to_string(pipeGID) + ": pipe not found"));
 			return;

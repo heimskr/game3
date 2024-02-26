@@ -37,8 +37,8 @@ namespace Game3 {
 		textureID(std::move(texture_id)),
 		variety(variety_) {}
 
-	std::shared_ptr<Entity> Entity::fromJSON(Game &game, const nlohmann::json &json) {
-		auto factory = game.registry<EntityFactoryRegistry>().at(json.at("type").get<EntityType>());
+	std::shared_ptr<Entity> Entity::fromJSON(const GamePtr &game, const nlohmann::json &json) {
+		auto factory = game->registry<EntityFactoryRegistry>().at(json.at("type").get<EntityType>());
 		assert(factory);
 		auto out = (*factory)(game, json);
 		out->absorbJSON(game, json);
@@ -121,7 +121,7 @@ namespace Game3 {
 			json["customTexture"] = customTexture;
 	}
 
-	void Entity::absorbJSON(Game &game, const nlohmann::json &json) {
+	void Entity::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		if (json.is_null())
 			return; // Hopefully this is because the Entity is being constructed in EntityPacket::decode.
 

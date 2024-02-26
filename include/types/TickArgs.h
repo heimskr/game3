@@ -6,11 +6,11 @@ namespace Game3 {
 	class Game;
 
 	struct TickArgs {
-		Game &game;
+		std::shared_ptr<Game> game;
 		Tick tick;
 		float delta;
 
-		TickArgs(Game &game_, Tick tick_, float delta_):
-			game(game_), tick(tick_), delta(delta_) {}
+		TickArgs(std::shared_ptr<Game> game_, Tick tick_, float delta_):
+			game(std::move(game_)), tick(tick_), delta(delta_) {}
 	};
 }

@@ -3,8 +3,8 @@
 #include "ui/MainWindow.h"
 
 namespace Game3 {
-	void CommandResultPacket::handle(ClientGame &game) {
-		MainWindow &window = game.getWindow();
+	void CommandResultPacket::handle(const ClientGamePtr &game) {
+		MainWindow &window = game->getWindow();
 		if (message.empty())
 			return;
 		if (success)

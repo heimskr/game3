@@ -16,15 +16,15 @@ namespace Game3 {
 		CentrifugeRecipe() = default;
 		CentrifugeRecipe(Input, std::map<nlohmann::json, double>);
 
-		Input getInput(Game &) override;
-		Output getOutput(const Input &, Game &) override;
+		Input getInput(const std::shared_ptr<Game> &) override;
+		Output getOutput(const Input &, const std::shared_ptr<Game> &) override;
 		/** Doesn't lock the container. */
 		bool canCraft(const std::shared_ptr<Container> &) override;
 		/** Doesn't lock either container. */
-		bool craft(Game &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) override;
+		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) override;
 		void toJSON(nlohmann::json &) const override;
 
-		static CentrifugeRecipe fromJSON(const Game &, const nlohmann::json &);
+		static CentrifugeRecipe fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
 	};
 
 	struct CentrifugeRecipeRegistry: UnnamedJSONRegistry<CentrifugeRecipe> {

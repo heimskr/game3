@@ -14,12 +14,12 @@ namespace Game3 {
 		auto &realm = *place.realm;
 
 		if (auto building = std::dynamic_pointer_cast<Building>(realm.tileEntityAt(place.position)); building && building->tileID == "base:tile/cave"_id) {
-			Game &game = realm.getGame();
+			GamePtr game = realm.getGame();
 			const RealmID realm_id = building->innerRealmID;
 
-			if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game.getRealm(realm_id))) {
+			if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game->getRealm(realm_id))) {
 				if (--cave_realm->entranceCount == 0)
-					game.removeRealm(realm_id);
+					game->removeRealm(realm_id);
 				realm.queueDestruction(building);
 				if (stack.reduceDurability())
 					place.player->getInventory(0)->erase(slot);

@@ -20,11 +20,11 @@ namespace Game3 {
 			virtual void decode(Game &, Buffer &) = 0;
 			virtual PacketID getID() const = 0;
 
-			virtual void handle(ServerGame &, RemoteClient &) {
+			virtual void handle(const std::shared_ptr<ServerGame> &, RemoteClient &) {
 				throw std::runtime_error("Packet " + std::to_string(getID()) + " cannot be handled server-side");
 			}
 
-			virtual void handle(ClientGame &) {
+			virtual void handle(const std::shared_ptr<ClientGame> &) {
 				throw std::runtime_error("Packet " + std::to_string(getID()) + " cannot be handled client-side");
 			}
 	};

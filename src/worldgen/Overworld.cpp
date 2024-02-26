@@ -94,7 +94,7 @@ namespace Game3::WorldGen {
 		DefaultNoiseGenerator river_noise(-5 * noise_seed + 1);
 #endif
 
-		const GamePtr game_ptr = realm->getGame().shared_from_this();
+		GamePtr game_ptr = realm->getGame();
 
 		pool.start();
 		Waiter waiter(job_count);
@@ -152,8 +152,8 @@ namespace Game3::WorldGen {
 								resource_starts.push_back({row, column});
 
 					std::shuffle(resource_starts.begin(), resource_starts.end(), threadContext.rng);
-					Game &game = realm->getGame();
-					auto &ores = game.registry<OreRegistry>();
+					GamePtr game = realm->getGame();
+					auto &ores = game->registry<OreRegistry>();
 
 					auto add_resources = [&](double threshold, const Identifier &ore_name) {
 						auto ore = ores.at(ore_name);
@@ -198,7 +198,7 @@ namespace Game3::WorldGen {
 				// Compare with <, not <=
 				const Index col_max = col_min + CHUNK_SIZE;
 				pool.add([realm, &waiter, &get_biome, &noisegen, &params, noise_seed, row_min, row_max, col_min, col_max](ThreadPool &, size_t) {
-					threadContext = {realm->getGame().shared_from_this(), static_cast<uint_fast32_t>(noise_seed - 1'000'000ul * row_min + col_min), row_min, row_max, col_min, col_max};
+					threadContext = {realm->getGame(), uint_fast32_t(noise_seed - 1'000'000ul * row_min + col_min), row_min, row_max, col_min, col_max};
 					for (Index row = row_min; row < row_max; ++row) {
 						for (Index column = col_min; column < col_max; ++column) {
 							realm->autotile({row, column}, Layer::Terrain);

@@ -15,16 +15,16 @@ namespace Game3 {
 		buffer >> arguments.globalID >> arguments.realmID >> arguments.position >> arguments.facing >> arguments.offset >> arguments.velocity >> arguments.adjustOffset >> arguments.isTeleport;
 	}
 
-	void EntityMovedPacket::handle(ClientGame &game) {
-		RealmPtr realm = game.tryRealm(arguments.realmID);
+	void EntityMovedPacket::handle(const ClientGamePtr &game) {
+		RealmPtr realm = game->tryRealm(arguments.realmID);
 		if (!realm) {
 			WARN_("EntityMovedPacket: Couldn't find realm " << arguments.realmID << " in EntityMovedPacket.");
 			return;
 		}
 
-		EntityPtr entity = game.getAgent<Entity>(arguments.globalID);
+		EntityPtr entity = game->getAgent<Entity>(arguments.globalID);
 		if (!entity) {
-			// WARN_("EntityMovedPacket: Couldn't find entity " << arguments.globalID << ". Player is " << game.getPlayer()->getGID());
+			// WARN_("EntityMovedPacket: Couldn't find entity " << arguments.globalID << ". Player is " << game->getPlayer()->getGID());
 			return;
 		}
 

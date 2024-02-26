@@ -110,7 +110,7 @@ namespace Game3 {
 				return std::shared_ptr<T>(new T(std::forward<Args>(args)...));
 			}
 
-			static std::shared_ptr<Realm> fromJSON(Game &, const nlohmann::json &, bool full_data = false);
+			static std::shared_ptr<Realm> fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &, bool full_data = false);
 
 			static std::string getSQL();
 
@@ -232,8 +232,8 @@ namespace Game3 {
 
 			template <typename E, typename... Args>
 			std::shared_ptr<E> spawn(const Position &position, Args &&...args) {
-				Game &game_ref = getGame();
-				auto entity = E::create(game_ref, std::forward<Args>(args)...);
+				std::shared_ptr<Game> game = getGame();
+				auto entity = E::create(game, std::forward<Args>(args)...);
 				spawn(entity, position);
 				return entity;
 			}

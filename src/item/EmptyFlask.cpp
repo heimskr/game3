@@ -11,10 +11,10 @@ namespace Game3 {
 	bool EmptyFlask::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		PlayerPtr player = place.player;
 		RealmPtr  realm  = place.realm;
-		Game &game = realm->getGame();
+		GamePtr game = realm->getGame();
 		assert(realm->getSide() == Side::Server);
 
-		FluidRegistry &registry = game.registry<FluidRegistry>();
+		FluidRegistry &registry = game->registry<FluidRegistry>();
 
 		auto yield_flask = [&](const Identifier &fluid_name) {
 			const InventoryPtr inventory = player->getInventory(0);

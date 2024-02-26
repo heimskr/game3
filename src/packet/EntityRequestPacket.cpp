@@ -53,7 +53,7 @@ namespace Game3 {
 			requests.emplace_back(data[i], data[i + 1]);
 	}
 
-	void EntityRequestPacket::handle(ServerGame &game, RemoteClient &client) {
+	void EntityRequestPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
 		RealmPtr realm = game.tryRealm(realmID);
 		if (!realm) {
 			client.send(ErrorPacket("Invalid realm"));

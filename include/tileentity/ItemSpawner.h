@@ -12,7 +12,7 @@ namespace Game3 {
 			std::vector<ItemStack> spawnables;
 
 			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(Game &, const nlohmann::json &) override;
+			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
 			void tick(const TickArgs &) override;
 			void render(SpriteRenderer &) override;
 

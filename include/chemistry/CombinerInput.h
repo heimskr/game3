@@ -17,7 +17,7 @@ namespace Game3 {
 
 			CombinerInput() = default;
 
-			std::vector<ItemStack> getStacks(Game &);
+			std::vector<ItemStack> getStacks(const std::shared_ptr<Game> &);
 
 			static CombinerInput fromJSON(const nlohmann::json &, ItemCount *output_count_out = nullptr);
 	};

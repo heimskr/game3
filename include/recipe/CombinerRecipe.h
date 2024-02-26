@@ -19,14 +19,14 @@ namespace Game3 {
 
 		CombinerRecipe() = default;
 		CombinerRecipe(Identifier);
-		CombinerRecipe(Identifier, Game &, const nlohmann::json &);
+		CombinerRecipe(Identifier, const std::shared_ptr<Game> &, const nlohmann::json &);
 
-		Input getInput(Game &) override;
-		Output getOutput(const Input &, Game &) override;
+		Input getInput(const std::shared_ptr<Game> &) override;
+		Output getOutput(const Input &, const std::shared_ptr<Game> &) override;
 		/** Doesn't lock the container. */
 		bool canCraft(const std::shared_ptr<Container> &) override;
 		/** Doesn't lock either container. */
-		bool craft(Game &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftover) override;
+		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftover) override;
 		void toJSON(nlohmann::json &) const override;
 	};
 

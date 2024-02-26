@@ -81,7 +81,7 @@ namespace Game3 {
 		const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
 		auto &tileset = realm->getTileset();
 		const auto tilesize = tileset.getTileSize();
-		auto texture = tileset.getTexture(realm->getGame());
+		auto texture = tileset.getTexture(*realm->getGame());
 
 		glm::mat4 projection(1.f);
 		projection = glm::scale(projection, {float(tilesize), -float(tilesize), 1.f}) *
@@ -132,7 +132,7 @@ namespace Game3 {
 		vao.bind();
 		vbo.bind();
 		ebo.bind();
-		tileset.getTexture(realm->getGame())->bind(0);
+		tileset.getTexture(*realm->getGame())->bind(0);
 		shader.set("texture0", 0);
 		shader.set("projection", projection);
 
@@ -150,7 +150,7 @@ namespace Game3 {
 
 		auto promise = std::make_shared<std::promise<bool>>();
 		std::future<bool> future = promise->get_future();
-		ClientGamePtr client_game = realm->getGame().toClientPointer();
+		ClientGamePtr client_game = realm->getGame()->toClientPointer();
 
 		client_game->getWindow().queue([this, promise, client_game]() {
 			client_game->activateContext();
@@ -197,9 +197,9 @@ namespace Game3 {
 	bool UpperRenderer::generateVertexBufferObject() {
 		assert(realm);
 
-		auto &tileset = realm->getTileset();
+		Tileset &tileset = realm->getTileset();
 		const auto tilesize = tileset.getTileSize();
-		const auto tileset_width = tileset.getTexture(realm->getGame())->width;
+		const auto tileset_width = tileset.getTexture(*realm->getGame())->width;
 
 		const auto set_width = tileset_width / tilesize;
 

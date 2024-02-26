@@ -31,7 +31,7 @@ namespace Game3 {
 			using Realm::Realm;
 
 			Cave() = delete;
-			Cave(Game &, RealmID, RealmID parent_realm, int seed_);
+			Cave(const std::shared_ptr<Game> &, RealmID, RealmID parent_realm, int seed_);
 
 			void absorbJSON(const nlohmann::json &, bool full_data) override;
 			void toJSON(nlohmann::json &, bool full_data) const override;

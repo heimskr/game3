@@ -7,8 +7,8 @@ namespace Game3 {
 		globalID(entity.getGID()),
 		realmRequirement(require_realm? std::make_optional(entity.getRealm()->id) : std::nullopt) {}
 
-	void DestroyEntityPacket::handle(ClientGame &game) {
-		if (auto entity = game.getAgent<Entity>(globalID)) {
+	void DestroyEntityPacket::handle(const ClientGamePtr &game) {
+		if (auto entity = game->getAgent<Entity>(globalID)) {
 			if (realmRequirement && entity->getRealm()->id != *realmRequirement)
 				return;
 			if (entity->isPlayer())

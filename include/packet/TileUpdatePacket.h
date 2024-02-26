@@ -22,6 +22,6 @@ namespace Game3 {
 		void encode(Game &, Buffer &buffer) const override { buffer << realmID << layer << position << tileID; }
 		void decode(Game &, Buffer &buffer)       override { buffer >> realmID >> layer >> position >> tileID; }
 
-		void handle(ClientGame &) override;
+		void handle(const std::shared_ptr<ClientGame> &) override;
 	};
 }

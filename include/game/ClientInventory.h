@@ -47,7 +47,7 @@ namespace Game3 {
 		private:
 			void send(const Packet &);
 
-			static ClientInventory fromJSON(Game &, const nlohmann::json &, const std::shared_ptr<Agent> &);
+			static ClientInventory fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &, const std::shared_ptr<Agent> &);
 
 			friend void to_json(nlohmann::json &, const Inventory &);
 	};

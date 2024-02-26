@@ -20,6 +20,6 @@ namespace Game3 {
 		void encode(Game &, Buffer &buffer) const override;
 		void decode(Game &, Buffer &buffer)       override;
 
-		void handle(ClientGame &) override;
+		void handle(const std::shared_ptr<ClientGame> &) override;
 	};
 }

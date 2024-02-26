@@ -120,7 +120,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Combiner::absorbJSON(Game &game, const nlohmann::json &json) {
+	void Combiner::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);
@@ -174,7 +174,7 @@ namespace Game3 {
 		});
 	}
 
-	Game & Combiner::getGame() const {
+	GamePtr Combiner::getGame() const {
 		return TileEntity::getGame();
 	}
 
@@ -192,7 +192,7 @@ namespace Game3 {
 
 		auto inventory_lock = inventory->uniqueLock();
 
-		Game &game = getGame();
+		GamePtr game = getGame();
 
 		if (!recipe)
 			return false;
@@ -228,7 +228,8 @@ namespace Game3 {
 	}
 
 	bool Combiner::setTarget(Identifier new_target) {
-		auto &registry = getGame().registry<CombinerRecipeRegistry>();
+		GamePtr game = getGame();
+		auto &registry = game->registry<CombinerRecipeRegistry>();
 
 		if (std::shared_ptr<CombinerRecipe> maybe = registry.maybe(new_target)) {
 			recipe = std::move(maybe);

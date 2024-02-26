@@ -83,7 +83,7 @@ namespace Game3 {
 		return false;
 	}
 
-	void Autofarmer::absorbJSON(Game &game, const nlohmann::json &json) {
+	void Autofarmer::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);
@@ -229,7 +229,8 @@ namespace Game3 {
 
 		if (!submerged_empty) {
 			// Try to harvest.
-			auto crop_tile = std::dynamic_pointer_cast<CropTile>(getGame().getTile(tileset[submerged]));
+			GamePtr game = realm->getGame();
+			auto crop_tile = std::dynamic_pointer_cast<CropTile>(game->getTile(tileset[submerged]));
 			if (!crop_tile || !crop_tile->isRipe(tileset[submerged]))
 				return operated;
 

@@ -23,14 +23,14 @@ namespace Game3 {
 			void tick(const TickArgs &) override;
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
-			void absorbJSON(Game &, const nlohmann::json &) override;
+			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
 			const auto & getTarget() const { return target; }
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
 			void broadcast(bool force) override;
 
-			Game & getGame() const final;
+			GamePtr getGame() const final;
 
 		private:
 			Slot currentSlot = 0;

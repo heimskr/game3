@@ -36,7 +36,7 @@ namespace Game3 {
 		return out;
 	}
 
-	std::vector<ItemStack> CombinerInput::getStacks(Game &game) {
+	std::vector<ItemStack> CombinerInput::getStacks(const std::shared_ptr<Game> &game) {
 		std::vector<ItemStack> out;
 
 		for (const auto &[count, string]: inputs) {

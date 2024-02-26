@@ -9,7 +9,7 @@
 // #define CHECK_SLOT_COMPATIBILITY
 
 namespace Game3 {
-	void SwapSlotsPacket::handle(ServerGame &game, RemoteClient &client) {
+	void SwapSlotsPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
 		if (firstGID == secondGID && firstInventory == secondInventory && firstSlot == secondSlot)
 			return;
 

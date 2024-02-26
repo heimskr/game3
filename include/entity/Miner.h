@@ -17,12 +17,12 @@ namespace Game3 {
 			std::optional<Position> chosenResource;
 			float harvestingTime = 0.f;
 
-			static std::shared_ptr<Miner> create(Game &);
-			static std::shared_ptr<Miner> create(Game &, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_);
-			static std::shared_ptr<Miner> fromJSON(Game &, const nlohmann::json &);
+			static std::shared_ptr<Miner> create(const std::shared_ptr<Game> &);
+			static std::shared_ptr<Miner> create(const std::shared_ptr<Game> &, RealmID overworld_realm, RealmID house_realm, const Position &house_position, const std::shared_ptr<Building> &keep_);
+			static std::shared_ptr<Miner> fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
 
 			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(Game &, const nlohmann::json &) override;
+			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 			void tick(const TickArgs &) override;
 			std::string getName() const override { return "Miner"; }

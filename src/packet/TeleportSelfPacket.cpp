@@ -5,12 +5,12 @@
 #include "packet/TeleportSelfPacket.h"
 
 namespace Game3 {
-	void TeleportSelfPacket::handle(ServerGame &game, RemoteClient &client) {
+	void TeleportSelfPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
 		auto player = client.getPlayer();
 		if (!player)
 			return;
 
-		RealmPtr realm = game.tryRealm(realmID);
+		RealmPtr realm = game->tryRealm(realmID);
 		if (!realm)
 			return;
 

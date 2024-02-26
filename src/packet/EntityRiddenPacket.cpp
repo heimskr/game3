@@ -7,8 +7,8 @@ namespace Game3 {
 	EntityRiddenPacket::EntityRiddenPacket(const EntityPtr &rider, const Entity &ridden):
 		EntityRiddenPacket(rider? std::make_optional(rider->getGID()) : std::nullopt, ridden.getGID()) {}
 
-	void EntityRiddenPacket::handle(ClientGame &game) {
-		EntityPtr ridden = game.getAgent<Entity>(riddenID);
+	void EntityRiddenPacket::handle(const ClientGamePtr &game) {
+		EntityPtr ridden = game->getAgent<Entity>(riddenID);
 		if (!ridden) {
 			WARN("Couldn't find ridden entity with GID {}", riddenID);
 			return;
@@ -19,7 +19,7 @@ namespace Game3 {
 			return;
 		}
 
-		EntityPtr rider = game.getAgent<Entity>(*riderID);
+		EntityPtr rider = game->getAgent<Entity>(*riderID);
 		if (!rider) {
 			WARN("Couldn't find rider entity with GID {}", *riderID);
 			return;

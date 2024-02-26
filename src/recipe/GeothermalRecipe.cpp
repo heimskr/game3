@@ -10,11 +10,11 @@ namespace Game3 {
 	GeothermalRecipe::GeothermalRecipe(Input input_, Output output_):
 		input(std::move(input_)), output(output_) {}
 
-	GeothermalRecipe::Input GeothermalRecipe::getInput(Game &) {
+	GeothermalRecipe::Input GeothermalRecipe::getInput(const GamePtr &) {
 		return input;
 	}
 
-	GeothermalRecipe::Output GeothermalRecipe::getOutput(const Input &input_, Game &) {
+	GeothermalRecipe::Output GeothermalRecipe::getOutput(const Input &input_, const GamePtr &) {
 		return input_.id == input.id && input.amount <= input_.amount? output : 0;
 	}
 
@@ -26,7 +26,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool GeothermalRecipe::craft(Game &game, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) {
+	bool GeothermalRecipe::craft(const GamePtr &game, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) {
 		auto fluids = std::dynamic_pointer_cast<FluidContainer>(input_container);
 		auto energy = std::dynamic_pointer_cast<EnergyContainer>(output_container);
 
@@ -50,8 +50,8 @@ namespace Game3 {
 		json["output"] = output;
 	}
 
-	GeothermalRecipe GeothermalRecipe::fromJSON(const Game &game, const nlohmann::json &json) {
-		return {FluidStack::fromJSON(game, json.at("input")), json.at("output")};
+	GeothermalRecipe GeothermalRecipe::fromJSON(const GamePtr &game, const nlohmann::json &json) {
+		return {FluidStack::fromJSON(*game, json.at("input")), json.at("output")};
 	}
 
 	void to_json(nlohmann::json &json, const GeothermalRecipe &recipe) {

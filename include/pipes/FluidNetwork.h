@@ -13,10 +13,10 @@ namespace Game3 {
 
 			PipeType getType() const final { return PipeType::Fluid; }
 
-			void tick(Game &, Tick) final;
+			void tick(const std::shared_ptr<Game> &, Tick) final;
 			bool canWorkWith(const std::shared_ptr<TileEntity> &) const final;
 
-			Game & getGame() const override;
+			std::shared_ptr<Game> getGame() const override;
 
 		private:
 			/** Returns the amount not distributed. */

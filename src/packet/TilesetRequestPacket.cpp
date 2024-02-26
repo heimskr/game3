@@ -7,8 +7,8 @@
 #include "packet/TilesetResponsePacket.h"
 
 namespace Game3 {
-	void TilesetRequestPacket::handle(ServerGame &game, RemoteClient &client) {
-		RealmPtr realm = game.getRealm(realmID);
+	void TilesetRequestPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
+		RealmPtr realm = game->getRealm(realmID);
 		if (!realm) {
 			client.send(ErrorPacket("Invalid realm ID"));
 			return;

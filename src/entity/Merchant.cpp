@@ -12,11 +12,11 @@ namespace Game3 {
 	Merchant::Merchant(EntityType type_):
 		Entity(std::move(type_)) {}
 
-	std::shared_ptr<Merchant> Merchant::create(Game &, EntityType type) {
+	std::shared_ptr<Merchant> Merchant::create(const std::shared_ptr<Game> &, EntityType type) {
 		return Entity::create<Merchant>(std::move(type));
 	}
 
-	std::shared_ptr<Merchant> Merchant::fromJSON(Game &game, const nlohmann::json &json) {
+	std::shared_ptr<Merchant> Merchant::fromJSON(const GamePtr &game, const nlohmann::json &json) {
 		auto out = Entity::create<Merchant>(json.at("id"));
 		out->absorbJSON(game, json);
 		return out;
@@ -27,7 +27,7 @@ namespace Game3 {
 		json["greed"] = greed;
 	}
 
-	void Merchant::absorbJSON(Game &game, const nlohmann::json &json) {
+	void Merchant::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		Entity::absorbJSON(game, json);
 		greed = json.at("greed");
 	}

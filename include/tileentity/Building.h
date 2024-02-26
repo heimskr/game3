@@ -14,7 +14,7 @@ namespace Game3 {
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractOn(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
-			void absorbJSON(Game &, const nlohmann::json &) override;
+			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
 			void teleport(const std::shared_ptr<Entity> &);
 			std::shared_ptr<Realm> getInnerRealm() const;
 

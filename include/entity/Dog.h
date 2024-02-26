@@ -9,11 +9,11 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "entity/dog"}; }
 
-			static std::shared_ptr<Dog> create(Game &) {
+			static std::shared_ptr<Dog> create(const std::shared_ptr<Game> &) {
 				return Entity::create<Dog>();
 			}
 
-			static std::shared_ptr<Dog> fromJSON(Game &game, const nlohmann::json &json) {
+			static std::shared_ptr<Dog> fromJSON(const std::shared_ptr<Game> &game, const nlohmann::json &json) {
 				auto out = Entity::create<Dog>();
 				out->absorbJSON(game, json);
 				return out;

@@ -10,14 +10,14 @@
 #include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
-	void SetActiveSlotPacket::handle(ServerGame &, RemoteClient &client) {
+	void SetActiveSlotPacket::handle(const std::shared_ptr<ServerGame> &, RemoteClient &client) {
 		if (const PlayerPtr player = client.getPlayer())
 			if (const InventoryPtr inventory = player->getInventory(0))
 				inventory->setActive(slot);
 	}
 
-	void SetActiveSlotPacket::handle(ClientGame &game) {
-		game.getPlayer()->getInventory(0)->setActive(slot, true);
-		game.getWindow().inventoryTab->activeSlotSet();
+	void SetActiveSlotPacket::handle(const ClientGamePtr &game) {
+		game->getPlayer()->getInventory(0)->setActive(slot, true);
+		game->getWindow().inventoryTab->activeSlotSet();
 	}
 }

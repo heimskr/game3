@@ -22,15 +22,15 @@ namespace Game3 {
 		if (spawning)
 			return;
 
-		Game &game = getGame();
+		GamePtr game = getGame();
 
 		// If the game is being destroyed right now, we can't cast it.
 		// The game is responsible for persisting all players before
 		// the compiler-generated part of its destructor begins.
-		if (game.dying)
+		if (game->dying)
 			return;
 
-		GameDB &database = game.toServer().database;
+		GameDB &database = game->toServer().database;
 		if (database.isOpen()) {
 			database.writeUser(*this);
 			INFO("Persisted {}.", username);
@@ -38,7 +38,7 @@ namespace Game3 {
 			std::vector<std::string> usernames;
 
 			{
-				const auto &players = game.toServer().players;
+				const auto &players = game->toServer().players;
 				auto lock = players.sharedLock();
 				if (players.empty()) {
 					INFO_("No remaining players.");
@@ -53,11 +53,11 @@ namespace Game3 {
 		}
 	}
 
-	std::shared_ptr<ServerPlayer> ServerPlayer::create(Game &) {
+	std::shared_ptr<ServerPlayer> ServerPlayer::create(const std::shared_ptr<Game> &) {
 		return Entity::create<ServerPlayer>();
 	}
 
-	std::shared_ptr<ServerPlayer> ServerPlayer::fromJSON(Game &game, const nlohmann::json &json) {
+	std::shared_ptr<ServerPlayer> ServerPlayer::fromJSON(const GamePtr &game, const nlohmann::json &json) {
 		auto out = Entity::create<ServerPlayer>();
 		out->absorbJSON(game, json);
 		return out;
@@ -185,7 +185,7 @@ namespace Game3 {
 
 	void ServerPlayer::kill() {
 		WARN_("Killing server player \e[1m" << username << "\e[22m.");
-		ServerGame &game = getGame().toServer();
+		ServerGame &game = getGame()->toServer();
 
 		const bool keep_inventory = game.getRule("keepInventory").value_or(1) != 0;
 

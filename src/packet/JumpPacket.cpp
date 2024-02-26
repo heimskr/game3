@@ -7,7 +7,7 @@
 #include "packet/JumpPacket.h"
 
 namespace Game3 {
-	void JumpPacket::handle(ServerGame &, RemoteClient &client) {
+	void JumpPacket::handle(const std::shared_ptr<ServerGame> &, RemoteClient &client) {
 		if (auto player = client.getPlayer()) {
 			player->jump();
 		} else {

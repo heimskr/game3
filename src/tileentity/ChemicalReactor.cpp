@@ -113,7 +113,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void ChemicalReactor::absorbJSON(Game &game, const nlohmann::json &json) {
+	void ChemicalReactor::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);
@@ -178,7 +178,7 @@ namespace Game3 {
 		});
 	}
 
-	Game & ChemicalReactor::getGame() const {
+	GamePtr ChemicalReactor::getGame() const {
 		return TileEntity::getGame();
 	}
 
@@ -238,8 +238,8 @@ namespace Game3 {
 
 		auto shared_inventory_lock = inventory->sharedLock();
 
-		Game &game = getGame();
-		auto &item_registry = game.registry<ItemRegistry>();
+		GamePtr game = getGame();
+		auto &item_registry = game->registry<ItemRegistry>();
 		std::shared_ptr<Item> chemical_item = item_registry["base:item/chemical"_id];
 		std::unique_ptr<Inventory> inventory_copy = inventory->copy();
 		inventory_copy->weakOwner = {};

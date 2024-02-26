@@ -5,7 +5,7 @@
 #include "packet/PacketError.h"
 
 namespace Game3 {
-	void CommandPacket::handle(ServerGame &game, RemoteClient &client) {
+	void CommandPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
 		game.runCommand(client, command, commandID);
 	}
 }

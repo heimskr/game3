@@ -15,20 +15,20 @@ namespace Game3 {
 
 	class EntityFactory: public NamedRegisterable {
 		private:
-			std::function<std::shared_ptr<Entity>(Game &)> defaultFunction;
-			std::function<std::shared_ptr<Entity>(Game &, const nlohmann::json &)> jsonFunction;
+			std::function<std::shared_ptr<Entity>(const std::shared_ptr<Game> &)> defaultFunction;
+			std::function<std::shared_ptr<Entity>(const std::shared_ptr<Game> &, const nlohmann::json &)> jsonFunction;
 
 		public:
 			EntityFactory(Identifier, decltype(defaultFunction), decltype(jsonFunction));
 
-			std::shared_ptr<Entity> operator()(Game &);
-			std::shared_ptr<Entity> operator()(Game &, const nlohmann::json &);
+			std::shared_ptr<Entity> operator()(const std::shared_ptr<Game> &);
+			std::shared_ptr<Entity> operator()(const std::shared_ptr<Game> &, const nlohmann::json &);
 
 			template <typename T>
 			static EntityFactory create(const Identifier &id = T::ID()) {
-				return {id, [](Game &game) {
+				return {id, [](const std::shared_ptr<Game> &game) {
 					return T::create(game);
-				}, [](Game &game, const nlohmann::json &json) {
+				}, [](const std::shared_ptr<Game> &game, const nlohmann::json &json) {
 					return T::fromJSON(game, json);
 				}};
 			}

@@ -14,10 +14,10 @@ namespace Game3 {
 	class DissolverResult {
 		public:
 			virtual ~DissolverResult() = default;
-			virtual void add(Game &, std::vector<ItemStack> &) = 0;
+			virtual void add(const std::shared_ptr<Game> &, std::vector<ItemStack> &) = 0;
 			virtual void toJSON(nlohmann::json &) const = 0;
-			std::vector<ItemStack> getResult(Game &);
-			static std::vector<ItemStack> getResult(Game &, const nlohmann::json &);
+			std::vector<ItemStack> getResult(const std::shared_ptr<Game> &);
+			static std::vector<ItemStack> getResult(const std::shared_ptr<Game> &, const nlohmann::json &);
 			static std::unique_ptr<DissolverResult> fromJSON(const nlohmann::json &);
 	};
 
@@ -26,7 +26,7 @@ namespace Game3 {
 	class UnionDissolverResult: public DissolverResult {
 		public:
 			UnionDissolverResult(const nlohmann::json &);
-			void add(Game &, std::vector<ItemStack> &) override;
+			void add(const std::shared_ptr<Game> &, std::vector<ItemStack> &) override;
 			void toJSON(nlohmann::json &) const override;
 
 		private:
@@ -36,7 +36,7 @@ namespace Game3 {
 	class WeightedDissolverResult: public DissolverResult {
 		public:
 			WeightedDissolverResult(const nlohmann::json &);
-			void add(Game &, std::vector<ItemStack> &) override;
+			void add(const std::shared_ptr<Game> &, std::vector<ItemStack> &) override;
 			void toJSON(nlohmann::json &) const override;
 
 		private:
@@ -54,7 +54,7 @@ namespace Game3 {
 	class RandomDissolverResult: public DissolverResult {
 		public:
 			RandomDissolverResult(const nlohmann::json &);
-			void add(Game &, std::vector<ItemStack> &) override;
+			void add(const std::shared_ptr<Game> &, std::vector<ItemStack> &) override;
 			void toJSON(nlohmann::json &) const override;
 
 		private:
@@ -64,7 +64,7 @@ namespace Game3 {
 	class ChemicalResult: public DissolverResult {
 		public:
 			ChemicalResult(const nlohmann::json &);
-			void add(Game &, std::vector<ItemStack> &) override;
+			void add(const std::shared_ptr<Game> &, std::vector<ItemStack> &) override;
 			void toJSON(nlohmann::json &) const override;
 
 		private:
@@ -74,7 +74,7 @@ namespace Game3 {
 	class MultiChemicalResult: public DissolverResult {
 		public:
 			MultiChemicalResult(const nlohmann::json &);
-			void add(Game &, std::vector<ItemStack> &) override;
+			void add(const std::shared_ptr<Game> &, std::vector<ItemStack> &) override;
 			void toJSON(nlohmann::json &) const override;
 
 		private:

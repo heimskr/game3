@@ -18,18 +18,18 @@ namespace Game3 {
 		DissolverRecipe(Identifier);
 		DissolverRecipe(Identifier, Input, const nlohmann::json &);
 
-		Input getInput(Game &) override;
-		Output getOutput(const Input &, Game &) override;
+		Input getInput(const std::shared_ptr<Game> &) override;
+		Output getOutput(const Input &, const std::shared_ptr<Game> &) override;
 		/** Doesn't lock the container. */
 		bool canCraft(const std::shared_ptr<Container> &) override;
 		/** Doesn't lock either container. */
-		bool craft(Game &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers, size_t *atoms_out);
+		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers, size_t *atoms_out);
 		/** Doesn't lock either container. */
-		bool craft(Game &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) override;
+		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) override;
 
 		void toJSON(nlohmann::json &) const override;
 
-		static DissolverRecipe fromJSON(const Game &, const Identifier &, const nlohmann::json &);
+		static DissolverRecipe fromJSON(const std::shared_ptr<Game> &, const Identifier &, const nlohmann::json &);
 	};
 
 	void to_json(nlohmann::json &, const DissolverRecipe &);

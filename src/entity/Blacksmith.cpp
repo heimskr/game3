@@ -26,15 +26,15 @@ namespace Game3 {
 	Blacksmith::Blacksmith(RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_):
 		Entity(ID()), Worker(ID(), overworld_realm, house_realm, std::move(house_position), std::move(keep_)), Merchant(ID()) {}
 
-	std::shared_ptr<Blacksmith> Blacksmith::create(Game &) {
+	std::shared_ptr<Blacksmith> Blacksmith::create(const std::shared_ptr<Game> &) {
 		return Entity::create<Blacksmith>();
 	}
 
-	std::shared_ptr<Blacksmith> Blacksmith::create(Game &, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_) {
+	std::shared_ptr<Blacksmith> Blacksmith::create(const std::shared_ptr<Game> &, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_) {
 		return Entity::create<Blacksmith>(overworld_realm, house_realm, std::move(house_position), std::move(keep_));
 	}
 
-	std::shared_ptr<Blacksmith> Blacksmith::fromJSON(Game &game, const nlohmann::json &json) {
+	std::shared_ptr<Blacksmith> Blacksmith::fromJSON(const GamePtr &game, const nlohmann::json &json) {
 		auto out = Entity::create<Blacksmith>();
 		out->absorbJSON(game, json);
 		return out;
@@ -48,7 +48,7 @@ namespace Game3 {
 			json["actionTime"] = actionTime;
 	}
 
-	void Blacksmith::absorbJSON(Game &game, const nlohmann::json &json) {
+	void Blacksmith::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		Entity::absorbJSON(game, json);
 		Worker::absorbJSON(game, json);
 		Merchant::absorbJSON(game, json);
@@ -80,13 +80,12 @@ namespace Game3 {
 	void Blacksmith::tick(const TickArgs &args) {
 		Worker::tick(args);
 
-		Game &game = args.game;
 		const auto delta = args.delta;
 
-		if (getSide() == Side::Client || stillStuck(delta))
+		if (args.game->getSide() == Side::Client || stillStuck(delta))
 			return;
 
-		const auto hour = game.getHour();
+		const auto hour = args.game->getHour();
 
 		if (phase == 0 && WORK_START_HOUR <= hour)
 			wakeUp();
@@ -173,8 +172,8 @@ namespace Game3 {
 		else
 			coalNeeded = 0;
 
-		Game &game = getRealm()->getGame();
-		RealmPtr house = game.getRealm(houseRealm);
+		GamePtr game = getRealm()->getGame();
+		RealmPtr house = game->getRealm(houseRealm);
 
 		if (0 < coalNeeded || diamonds < RESOURCE_TARGET) {
 			phase = 1;

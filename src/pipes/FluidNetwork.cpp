@@ -9,7 +9,7 @@ namespace Game3 {
 		PipeNetwork(id_, realm_),
 		HasFluids(std::make_shared<FluidContainer>()) {}
 
-	void FluidNetwork::tick(Game &game, Tick tick_id) {
+	void FluidNetwork::tick(const std::shared_ptr<Game> &game, Tick tick_id) {
 		if (!canTick(tick_id)) {
 			PipeNetwork::tick(game, tick_id);
 			return;
@@ -65,7 +65,7 @@ namespace Game3 {
 		return std::dynamic_pointer_cast<FluidHoldingTileEntity>(tile_entity) != nullptr;
 	}
 
-	Game & FluidNetwork::getGame() const {
+	std::shared_ptr<Game> FluidNetwork::getGame() const {
 		if (auto realm = weakRealm.lock())
 			return realm->getGame();
 		throw std::runtime_error("Couldn't get Game from FluidNetwork: couldn't lock Realm");

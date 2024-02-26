@@ -46,14 +46,14 @@ namespace Game3 {
 		secondary >> realmID >> chunkPosition >> updateCounter >> tiles >> fluids;
 	}
 
-	void ChunkTilesPacket::handle(ClientGame &game) {
+	void ChunkTilesPacket::handle(const ClientGamePtr &game) {
 		if (tiles.size() != CHUNK_SIZE * CHUNK_SIZE * LAYER_COUNT)
 			throw PacketError("Invalid tile count in ChunkTilesPacket: " + std::to_string(tiles.size()));
 
 		if (fluids.size() != CHUNK_SIZE * CHUNK_SIZE)
 			throw PacketError("Invalid fluid count in ChunkTilesPacket: " + std::to_string(fluids.size()));
 
-		RealmPtr realm = game.getRealm(realmID);
+		RealmPtr realm = game->getRealm(realmID);
 		TileProvider &provider = realm->tileProvider;
 
 		for (const Layer layer: allLayers) {
@@ -66,7 +66,7 @@ namespace Game3 {
 
 		provider.setUpdateCounter(chunkPosition, updateCounter);
 
-		game.chunkReceived(chunkPosition);
+		game->chunkReceived(chunkPosition);
 		realm->queueReupload();
 		realm->queueStaticLightingTexture();
 	}

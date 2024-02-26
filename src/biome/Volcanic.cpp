@@ -43,7 +43,7 @@ namespace Game3 {
 
 		if (realm.getTile(Layer::Terrain, {row, column}) == realm.getTileset()["base:tile/volcanic_sand"_id]) {
 			if (distribution(rng) < 1) {
-				Game &game = realm.getGame();
+				std::shared_ptr<Game> game = realm.getGame();
 				std::vector<ItemStack> mushrooms {
 					{game, "base:item/indigo_milkcap"_id},
 					{game, "base:item/black_trumpet"_id},

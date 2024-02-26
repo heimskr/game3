@@ -15,14 +15,15 @@ namespace Game3 {
 		if (getSide() != Side::Server)
 			return false;
 
-		Game &game = getGame();
+		GamePtr game = getGame();
 
-		VillagePtr village = game.getVillage(villageID);
+		VillagePtr village = game->getVillage(villageID);
 		ServerPlayerPtr server_player = player->toServer();
 
 		server_player->subscribeVillage(village);
 
-		player->notifyOfRealm(*game.getRealm(village->getRealmID()));
+		RealmPtr realm = game->getRealm(village->getRealmID());
+		player->notifyOfRealm(*realm);
 		player->send(VillageUpdatePacket(*village));
 		player->send(OpenVillageTradePacket(villageID));
 

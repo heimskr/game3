@@ -19,6 +19,6 @@ namespace Game3 {
 		void encode(Game &, Buffer &buffer) const override { buffer << error; }
 		void decode(Game &, Buffer &buffer)       override { buffer >> error; }
 
-		void handle(ClientGame &) override;
+		void handle(const std::shared_ptr<ClientGame> &) override;
 	};
 }

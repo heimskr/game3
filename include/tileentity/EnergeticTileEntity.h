@@ -27,7 +27,7 @@ namespace Game3 {
 			void addObserver(const std::shared_ptr<Player> &, bool silent) override;
 
 			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(Game &, const nlohmann::json &) override;
+			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
 			void broadcast(bool force) override;

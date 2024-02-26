@@ -9,15 +9,15 @@
 #include "packet/PacketError.h"
 
 namespace Game3 {
-	void RegisterPlayerPacket::handle(ServerGame &game, RemoteClient &client) {
-		auto server = game.getServer();
+	void RegisterPlayerPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
+		auto server = game->getServer();
 
 		if (username.empty() || displayName.empty()) {
 			client.send(RegistrationStatusPacket());
 			return;
 		}
 
-		if (game.database.hasName(username, displayName)) {
+		if (game->database.hasName(username, displayName)) {
 			WARN_("Failed to register user " << username);
 			client.send(RegistrationStatusPacket());
 			return;

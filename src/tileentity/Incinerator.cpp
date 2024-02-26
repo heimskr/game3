@@ -70,7 +70,7 @@ namespace Game3 {
 		return false;
 	}
 
-	void Incinerator::absorbJSON(Game &game, const nlohmann::json &json) {
+	void Incinerator::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		FluidHoldingTileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
@@ -90,7 +90,7 @@ namespace Game3 {
 		TileEntity::broadcast(force);
 	}
 
-	Game & Incinerator::getGame() const {
+	GamePtr Incinerator::getGame() const {
 		return TileEntity::getGame();
 	}
 }

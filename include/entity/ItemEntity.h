@@ -16,12 +16,12 @@ namespace Game3 {
 			const ItemStack & getStack() const { return stack; }
 			void setStack(ItemStack);
 
-			static std::shared_ptr<ItemEntity> create(Game &);
-			static std::shared_ptr<ItemEntity> create(Game &, ItemStack);
-			static std::shared_ptr<ItemEntity> fromJSON(Game &, const nlohmann::json &);
+			static std::shared_ptr<ItemEntity> create(const std::shared_ptr<Game> &);
+			static std::shared_ptr<ItemEntity> create(const std::shared_ptr<Game> &, ItemStack);
+			static std::shared_ptr<ItemEntity> fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
 
 			void toJSON(nlohmann::json &) const override;
-			void init(Game &) override;
+			void init(const std::shared_ptr<Game> &) override;
 			void tick(const TickArgs &) override;
 			void render(const RendererContext &) override;
 			bool onInteractOn    (const std::shared_ptr<Player> &player, Modifiers, ItemStack *, Hand) override { return interact(player); }
@@ -33,7 +33,7 @@ namespace Game3 {
 
 		private:
 			ItemEntity(): Entity(ID()) {}
-			ItemEntity(const Game &);
+			ItemEntity(const std::shared_ptr<Game> &);
 			ItemEntity(ItemStack);
 			float offsetX = 0.f;
 			float offsetY = 0.f;
@@ -45,7 +45,7 @@ namespace Game3 {
 
 			ItemStack stack;
 
-			void setTexture(const Game &);
+			void setTexture(const std::shared_ptr<Game> &);
 			bool interact(const std::shared_ptr<Player> &);
 
 		friend class Entity;

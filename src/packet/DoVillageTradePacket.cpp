@@ -9,7 +9,7 @@
 #include "packet/DoVillageTradePacket.h"
 
 namespace Game3 {
-	void DoVillageTradePacket::handle(ServerGame &game, RemoteClient &client) {
+	void DoVillageTradePacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
 		// Validate player
 
 		ServerPlayerPtr player = client.getPlayer();
@@ -57,7 +57,7 @@ namespace Game3 {
 
 			if (std::optional<MoneyCount> sell_price = totalSellPrice(resource_count, -1, item->basePrice, amount, village->getGreed())) {
 				player->addMoney(*sell_price);
-				inventory->remove(ItemStack(game, resource, amount));
+				inventory->remove(ItemStack(game.shared_from_this(), resource, amount));
 				village->setResourceAmount(resource, resource_count + amount);
 				return;
 			}
@@ -76,7 +76,7 @@ namespace Game3 {
 
 			village->setResourceAmount(resource, resource_count - amount);
 
-			if (auto leftover = inventory->add(ItemStack(game, resource, amount)))
+			if (auto leftover = inventory->add(ItemStack(game.shared_from_this(), resource, amount)))
 				leftover->spawn(player->getRealm(), player->getPosition());
 
 			return;

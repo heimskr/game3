@@ -14,7 +14,7 @@ namespace Game3 {
 
 			void onSpawn() override;
 			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(Game &, const nlohmann::json &) override;
+			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
 			void renderUpper(const RendererContext &) override;
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;

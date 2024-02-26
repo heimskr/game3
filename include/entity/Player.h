@@ -45,7 +45,7 @@ namespace Game3 {
 
 			HitPoints getMaxHealth() const override;
 			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(Game &, const nlohmann::json &) override;
+			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
 			bool isPlayer() const override { return true; }
 			void tick(const TickArgs &) override;
 			void remove() override {}

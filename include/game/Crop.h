@@ -20,7 +20,7 @@ namespace Game3 {
 			nlohmann::json customData;
 
 			Crop(Identifier, Identifier custom_type, std::vector<Identifier> stages_, Products products_, double chance_, bool can_spawn_in_town, nlohmann::json custom_data);
-			Crop(Identifier, Game &, const nlohmann::json &);
+			Crop(Identifier, const std::shared_ptr<Game> &, const nlohmann::json &);
 
 			const Identifier & getFirstStage() const;
 			const Identifier & getLastStage() const;

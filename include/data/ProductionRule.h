@@ -18,7 +18,7 @@ namespace Game3 {
 	class ProductionRule: public Registerable {
 		public:
 			using Registerable::Registerable;
-			ProductionRule(const Game &, const nlohmann::json &);
+			ProductionRule(const std::shared_ptr<Game> &, const nlohmann::json &);
 
 			inline const auto & getInputs() const { return inputs; }
 			inline const auto & getOutput() const { return output; }
@@ -30,7 +30,7 @@ namespace Game3 {
 
 			bool doesBiomeMatch(BiomeType) const;
 
-			static ProductionRule fromJSON(const Game &, const nlohmann::json &);
+			static ProductionRule fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
 
 		private:
 			std::vector<ItemStack> inputs;

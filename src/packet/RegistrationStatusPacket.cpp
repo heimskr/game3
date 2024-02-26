@@ -7,16 +7,16 @@
 #include "ui/MainWindow.h"
 
 namespace Game3 {
-	void RegistrationStatusPacket::handle(ClientGame &game) {
+	void RegistrationStatusPacket::handle(const ClientGamePtr &game) {
 		if (token == 0) {
-			game.getWindow().error("Registration failed.");
+			game->getWindow().error("Registration failed.");
 			return;
 		}
 
 		SUCCESS_("Registration succeeded: token = " << token);
 
-		auto &client = *game.getClient();
-		client.setToken(client.getHostname(), username, token);
-		client.saveTokens();
+		LocalClientPtr client = game->getClient();
+		client->setToken(client->getHostname(), username, token);
+		client->saveTokens();
 	}
 }

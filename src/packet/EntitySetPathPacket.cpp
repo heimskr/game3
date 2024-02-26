@@ -6,14 +6,14 @@ namespace Game3 {
 	EntitySetPathPacket::EntitySetPathPacket(Entity &entity):
 		EntitySetPathPacket(entity.globalID, entity.realmID, entity.position.copyBase(), entity.copyPath<std::vector>(), entity.getUpdateCounter()) {}
 
-	void EntitySetPathPacket::handle(ClientGame &game) {
-		RealmPtr realm = game.tryRealm(realmID);
+	void EntitySetPathPacket::handle(const ClientGamePtr &game) {
+		RealmPtr realm = game->tryRealm(realmID);
 		if (!realm) {
 			ERROR_("EntitySetPathPacket: can't find realm " << realmID);
 			return;
 		}
 
-		EntityPtr entity = game.getAgent<Entity>(globalID);
+		EntityPtr entity = game->getAgent<Entity>(globalID);
 		if (!entity) {
 			ERROR_("EntitySetPathPacket: can't find entity " << globalID);
 			return;

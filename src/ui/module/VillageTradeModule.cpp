@@ -249,7 +249,7 @@ namespace Game3 {
 	basePrice(item.basePrice),
 	amount(amount_),
 	greed(greed_) {
-		itemSlot.setStack({*game, resource, ItemCount(-1)});
+		itemSlot.setStack({game, resource, ItemCount(-1)});
 		updateLabel();
 		updateTooltips(1);
 		itemSlot.set_hexpand(false);

@@ -29,6 +29,6 @@ namespace Game3 {
 		void encode(Game &, Buffer &buffer) const override { buffer << villageID << realmID << chunkPosition << position << name << labor << greed << resources; }
 		void decode(Game &, Buffer &buffer)       override { buffer >> villageID >> realmID >> chunkPosition >> position >> name >> labor >> greed >> resources; }
 
-		void handle(ClientGame &) override;
+		void handle(const std::shared_ptr<ClientGame> &) override;
 	};
 }

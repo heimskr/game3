@@ -28,15 +28,15 @@ namespace Game3 {
 		Entity(ID()),
 		Worker(ID(), overworld_realm, house_realm, std::move(house_position), std::move(keep_)) {}
 
-	std::shared_ptr<Woodcutter> Woodcutter::create(Game &) {
+	std::shared_ptr<Woodcutter> Woodcutter::create(const std::shared_ptr<Game> &) {
 		return Entity::create<Woodcutter>();
 	}
 
-	std::shared_ptr<Woodcutter> Woodcutter::create(Game &, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_) {
+	std::shared_ptr<Woodcutter> Woodcutter::create(const std::shared_ptr<Game> &, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_) {
 		return Entity::create<Woodcutter>(overworld_realm, house_realm, std::move(house_position), std::move(keep_));
 	}
 
-	std::shared_ptr<Woodcutter> Woodcutter::fromJSON(Game &game, const nlohmann::json &json) {
+	std::shared_ptr<Woodcutter> Woodcutter::fromJSON(const GamePtr &game, const nlohmann::json &json) {
 		auto out = Entity::create<Woodcutter>();
 		out->absorbJSON(game, json);
 		return out;
@@ -50,7 +50,7 @@ namespace Game3 {
 			json["chosenResource"] = *chosenResource;
 	}
 
-	void Woodcutter::absorbJSON(Game &game, const nlohmann::json &json) {
+	void Woodcutter::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		Entity::absorbJSON(game, json);
 		Worker::absorbJSON(game, json);
 		harvestingTime = json.at("harvestingTime");
@@ -60,7 +60,8 @@ namespace Game3 {
 
 	bool Woodcutter::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, ItemStack *, Hand) {
 		if (getSide() == Side::Client) {
-			MainWindow &window = getRealm()->getGame().toClient().getWindow();
+			GamePtr game = getGame();
+			MainWindow &window = game->toClient().getWindow();
 			std::shared_ptr<InventoryTab> tab = window.inventoryTab;
 			std::cout << "Woodcutter: money = " << money << ", phase = " << int(phase) << ", stuck = " << stuck << '\n';
 			player->queueForMove([tab](const auto &, bool) {
@@ -75,13 +76,13 @@ namespace Game3 {
 	void Woodcutter::tick(const TickArgs &args) {
 		Worker::tick(args);
 
-		Game &game = args.game;
+		const GamePtr &game = args.game;
 		const auto delta = args.delta;
 
 		if (getSide() == Side::Client || stillStuck(delta))
 			return;
 
-		const auto hour = game.getHour();
+		const auto hour = game->getHour();
 
 		if (phase == 0 && WORK_START_HOUR <= hour)
 			wakeUp();
@@ -140,9 +141,9 @@ namespace Game3 {
 
 	void Woodcutter::wakeUp() {
 		phase = 1;
-		auto &game = getRealm()->getGame();
-		auto overworld = game.getRealm(overworldRealm);
-		auto house     = game.getRealm(houseRealm);
+		GamePtr game = getRealm()->getGame();
+		auto overworld = game->getRealm(overworldRealm);
+		auto house     = game->getRealm(houseRealm);
 		// Detect all resources within a given radius of the house
 		std::vector<Position> resource_choices;
 		for (const auto &[te_position, tile_entity]: overworld->tileEntities)
@@ -181,7 +182,8 @@ namespace Game3 {
 			harvestingTime = 0.f;
 			auto realm = getRealm();
 			auto &deposit = dynamic_cast<OreDeposit &>(*realm->tileEntityAt(*chosenResource));
-			const ItemStack stack = deposit.getOre(getGame()).stack;
+			GamePtr game = getGame();
+			const ItemStack stack = deposit.getOre(*game).stack;
 			const auto leftover = getInventory(0)->add(stack);
 			if (leftover == stack)
 				setPhase(4);

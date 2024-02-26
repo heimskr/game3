@@ -165,7 +165,7 @@ namespace Game3 {
 
 		for (const auto &packet: packetQueue.steal()) {
 			try {
-				packet->handle(*this);
+				packet->handle(getSelf());
 			} catch (const Warning &warning) {
 				canvas.window.error(warning.what());
 			} catch (const std::exception &err) {

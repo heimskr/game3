@@ -15,7 +15,7 @@ namespace Game3 {
 		assert(!stages.empty());
 	}
 
-	Crop::Crop(Identifier identifier_, Game &game, const nlohmann::json &json):
+	Crop::Crop(Identifier identifier_, const GamePtr &game, const nlohmann::json &json):
 		Crop(std::move(identifier_), getCustomType(json), json.at("stages"), Products::fromJSON(game, json.at("products")), json.at("chance"), getCanSpawnInTown(json), getCustomData(json)) {}
 
 	const Identifier & Crop::getFirstStage() const {

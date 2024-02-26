@@ -20,7 +20,7 @@ namespace Game3 {
 			void updateRiderOffset(const std::shared_ptr<Entity> &rider) override;
 			bool onInteractOn(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
-			void init(Game &) override;
+			void init(const std::shared_ptr<Game> &) override;
 			void tick(const TickArgs &) override;
 			float getMovementSpeed() const override { return 5.f; }
 			HitPoints getMaxHealth() const override;

@@ -9,20 +9,20 @@
 #include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
-	void OpenVillageTradePacket::handle(ClientGame &game) {
-		MainWindow &window = game.getWindow();
+	void OpenVillageTradePacket::handle(const ClientGamePtr &game) {
+		MainWindow &window = game->getWindow();
 
 		VillagePtr village;
 
 		try {
-			village = game.getVillage(villageID);
+			village = game->getVillage(villageID);
 		} catch (const std::out_of_range &) {
 			WARN_("Couldn't find village " << villageID);
 			return;
 		}
 
 		if (removeOnMove) {
-			game.getPlayer()->queueForMove([&window, tab = window.inventoryTab](const auto &, bool) {
+			game->getPlayer()->queueForMove([&window, tab = window.inventoryTab](const auto &, bool) {
 				window.queue([tab] {
 					tab->removeModule();
 				});

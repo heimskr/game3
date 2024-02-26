@@ -196,8 +196,9 @@ namespace Game3 {
 			return;
 		}
 
-		assert(getSide() == Side::Server);
-		getGame().toServer().entityTeleported(*this, MovementContext{
+		GamePtr game = getGame();
+		assert(game->getSide() == Side::Server);
+		game->toServer().entityTeleported(*this, MovementContext{
 			.facingDirection = direction
 		});
 	}

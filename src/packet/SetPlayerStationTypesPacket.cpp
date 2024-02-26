@@ -7,12 +7,12 @@
 #include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
-	void SetPlayerStationTypesPacket::handle(ClientGame &game) {
-		game.getPlayer()->stationTypes = std::move(stationTypes);
-		MainWindow &window = game.getWindow();
-		window.queue([&window, &game, focus = focus] {
+	void SetPlayerStationTypesPacket::handle(const ClientGamePtr &game) {
+		game->getPlayer()->stationTypes = std::move(stationTypes);
+		MainWindow &window = game->getWindow();
+		window.queue([&window, game, focus = focus] {
 			auto tab = window.craftingTab;
-			tab->reset(std::static_pointer_cast<ClientGame>(game.shared_from_this()));
+			tab->reset(std::static_pointer_cast<ClientGame>(game));
 			if (focus)
 				tab->show();
 			else if (window.getActiveTab() == tab)

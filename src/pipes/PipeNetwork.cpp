@@ -245,11 +245,11 @@ namespace Game3 {
 		}
 	}
 
-	void PipeNetwork::tick(Game &game, Tick tick) {
+	void PipeNetwork::tick(const GamePtr &game, Tick tick) {
 		lastTick = tick;
-		game.enqueue([weak = weak_from_this()](const TickArgs &args) {
+		game->enqueue([weak = weak_from_this()](const TickArgs &args) {
 			if (auto network = weak.lock())
-				network->tick(args.game, args.game.getCurrentTick());
+				network->tick(args.game, args.game->getCurrentTick());
 		});
 	}
 

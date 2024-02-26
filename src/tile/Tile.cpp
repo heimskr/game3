@@ -15,7 +15,7 @@ namespace Game3 {
 		if (!canSpawnMonsters(place))
 			return;
 
-		Game &game = place.getGame();
+		GamePtr game = place.getGame();
 
 		makeMonsterFactories(game);
 
@@ -67,7 +67,7 @@ namespace Game3 {
 
 	void Tile::renderStaticLighting(const Place &, Layer, const RendererContext &) {}
 
-	void Tile::makeMonsterFactories(Game &game) {
+	void Tile::makeMonsterFactories(const GamePtr &game) {
 		{
 			auto shared = monsterFactories.sharedLock();
 			if (monsterFactories)
@@ -78,7 +78,7 @@ namespace Game3 {
 		if (monsterFactories) // Just in case it was somehow made between unlocking the shared lock and acquiring the unique lock.
 			return;
 
-		auto &registry = game.registry<EntityFactoryRegistry>();
+		auto &registry = game->registry<EntityFactoryRegistry>();
 		monsterFactories.emplace();
 
 		for (const auto &[identifier, factory]: registry) {

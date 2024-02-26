@@ -14,7 +14,7 @@ namespace Game3 {
 
 			PipeType getType() const final { return PipeType::Energy; }
 
-			void tick(Game &, Tick) final;
+			void tick(const std::shared_ptr<Game> &, Tick) final;
 			bool canWorkWith(const std::shared_ptr<TileEntity> &) const final;
 
 			EnergyAmount distribute(EnergyAmount);

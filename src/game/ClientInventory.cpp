@@ -100,10 +100,10 @@ namespace Game3 {
 	}
 
 	void ClientInventory::notifyOwner() {
-		if (auto owner = weakOwner.lock()) {
+		if (AgentPtr owner = weakOwner.lock()) {
 			owner->inventoryUpdated(index);
 
-			ClientGame &game = owner->getRealm()->getGame().toClient();
+			ClientGame &game = owner->getRealm()->getGame()->toClient();
 
 			game.getWindow().queue([&game, weak = weakOwner, index = index.load()] {
 				if (auto owner = weak.lock()) {

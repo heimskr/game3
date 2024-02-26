@@ -99,7 +99,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Dissolver::absorbJSON(Game &game, const nlohmann::json &json) {
+	void Dissolver::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);
@@ -151,7 +151,7 @@ namespace Game3 {
 		});
 	}
 
-	Game & Dissolver::getGame() const {
+	GamePtr Dissolver::getGame() const {
 		return TileEntity::getGame();
 	}
 
@@ -169,8 +169,8 @@ namespace Game3 {
 
 		auto inventory_lock = inventory->uniqueLock();
 
-		Game &game = getGame();
-		DissolverRecipeRegistry &dissolver_registry = game.registry<DissolverRecipeRegistry>();
+		GamePtr game = getGame();
+		DissolverRecipeRegistry &dissolver_registry = game->registry<DissolverRecipeRegistry>();
 
 		ItemStack *stack_ptr = nullptr;
 		std::shared_ptr<DissolverRecipe> recipe;

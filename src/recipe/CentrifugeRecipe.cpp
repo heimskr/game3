@@ -9,11 +9,11 @@ namespace Game3 {
 	CentrifugeRecipe::CentrifugeRecipe(Input input_, std::map<nlohmann::json, double> weight_map):
 		input(std::move(input_)), weightMap(std::move(weight_map)) {}
 
-	CentrifugeRecipe::Input CentrifugeRecipe::getInput(Game &) {
+	CentrifugeRecipe::Input CentrifugeRecipe::getInput(const GamePtr &) {
 		return input;
 	}
 
-	CentrifugeRecipe::Output CentrifugeRecipe::getOutput(const Input &, Game &game) {
+	CentrifugeRecipe::Output CentrifugeRecipe::getOutput(const Input &, const GamePtr &game) {
 		return ItemStack::fromJSON(game, weightedChoice(weightMap, threadContext.rng));
 	}
 
@@ -25,7 +25,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool CentrifugeRecipe::craft(Game &game, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) {
+	bool CentrifugeRecipe::craft(const GamePtr &game, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) {
 		auto fluids = std::dynamic_pointer_cast<FluidContainer>(input_container);
 		auto inventory = std::dynamic_pointer_cast<Inventory>(output_container);
 
@@ -52,10 +52,10 @@ namespace Game3 {
 			output.push_back(nlohmann::json{weight, item});
 	}
 
-	CentrifugeRecipe CentrifugeRecipe::fromJSON(const Game &game, const nlohmann::json &json) {
+	CentrifugeRecipe CentrifugeRecipe::fromJSON(const GamePtr &game, const nlohmann::json &json) {
 		CentrifugeRecipe recipe;
 
-		recipe.input = FluidStack::fromJSON(game, json.at("input"));
+		recipe.input = FluidStack::fromJSON(*game, json.at("input"));
 
 		for (const auto &item: json.at("output"))
 			recipe.weightMap[item.at(1)] = item.at(0);

@@ -6,7 +6,7 @@
 #include "packet/UseItemPacket.h"
 
 namespace Game3 {
-	void UseItemPacket::handle(ServerGame &, RemoteClient &client) {
+	void UseItemPacket::handle(const std::shared_ptr<ServerGame> &, RemoteClient &client) {
 		ServerPlayerPtr player = client.getPlayer();
 		if (!player) {
 			client.send(ErrorPacket("No player."));

@@ -12,7 +12,7 @@ namespace Game3 {
 			std::string getName() const override { return "Teleporter"; }
 
 			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(Game &, const nlohmann::json &) override;
+			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
 			void onOverlap(const std::shared_ptr<Entity> &) override;
 
 			void encode(Game &, Buffer &) override;

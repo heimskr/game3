@@ -4,8 +4,8 @@
 #include "packet/HeldItemSetPacket.h"
 
 namespace Game3 {
-	void HeldItemSetPacket::handle(ClientGame &game) {
-		RealmPtr realm = game.tryRealm(realmID);
+	void HeldItemSetPacket::handle(const ClientGamePtr &game) {
+		RealmPtr realm = game->tryRealm(realmID);
 		if (!realm) {
 			ERROR_("Couldn't find realm " << realmID << " in HeldItemSetPacket handler");
 			return;

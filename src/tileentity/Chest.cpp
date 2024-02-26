@@ -47,7 +47,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Chest::absorbJSON(Game &game, const nlohmann::json &json) {
+	void Chest::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		assert(getSide() == Side::Server);
 		if (auto iter = json.find("inventory"); iter != json.end())

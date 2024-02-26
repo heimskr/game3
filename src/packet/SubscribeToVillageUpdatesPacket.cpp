@@ -6,7 +6,7 @@
 #include "packet/SubscribeToVillageUpdatesPacket.h"
 
 namespace Game3 {
-	void SubscribeToVillageUpdatesPacket::handle(ServerGame &game, RemoteClient &client) {
+	void SubscribeToVillageUpdatesPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
 		ServerPlayerPtr player = client.getPlayer();
 		if (!player) {
 			client.send(ErrorPacket("No player."));
@@ -21,7 +21,7 @@ namespace Game3 {
 		VillagePtr village;
 
 		try {
-			village = game.getVillage(*villageID);
+			village = game->getVillage(*villageID);
 		} catch (const std::out_of_range &) {
 			client.send(ErrorPacket("Village " + std::to_string(*villageID) + " not found."));
 			return;

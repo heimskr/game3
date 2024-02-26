@@ -108,15 +108,16 @@ namespace Game3 {
 		}
 
 		{
+			GamePtr game = realm->getGame();
 			auto lock = fluidContainer->levels.sharedLock();
 			for (const auto &[id, amount]: fluidContainer->levels)
-				INFO("{} = {}", realm->getGame().getFluid(id)->identifier, amount);
+				INFO("{} = {}", game->getFluid(id)->identifier, amount);
 		}
 
 		return false;
 	}
 
-	void Pump::absorbJSON(Game &game, const nlohmann::json &json) {
+	void Pump::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		FluidHoldingTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);
@@ -171,7 +172,7 @@ namespace Game3 {
 		});
 	}
 
-	Game & Pump::getGame() const {
+	GamePtr Pump::getGame() const {
 		return TileEntity::getGame();
 	}
 }

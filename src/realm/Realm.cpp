@@ -96,7 +96,7 @@ namespace Game3 {
 
 	void Realm::initTexture() {}
 
-	RealmPtr Realm::fromJSON(Game &game, const nlohmann::json &json, bool full_data) {
+	RealmPtr Realm::fromJSON(const GamePtr &game, const nlohmann::json &json, bool full_data) {
 		const RealmType type = json.at("type");
 		auto factory = game.registry<RealmFactoryRegistry>().at(type);
 		assert(factory);
@@ -930,7 +930,7 @@ namespace Game3 {
 			realm->remove(entity);
 		entity->setRealm(shared_from_this());
 		GamePtr game = getGame();
-		entity->init(*game);
+		entity->init(game);
 		entity->teleport(position);
 	}
 
@@ -1642,7 +1642,7 @@ namespace Game3 {
 
 	void Realm::initEntity(const EntityPtr &entity, const Position &position) {
 		GamePtr game = getGame();
-		entity->init(*game);
+		entity->init(game);
 		add(entity, position);
 		entity->calculateVisibleEntities();
 		entity->spawning = false;

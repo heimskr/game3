@@ -8,8 +8,8 @@
 namespace Game3 {
 	bool VoidPickaxe::use(Slot slot, ItemStack &, const Place &place, Modifiers, std::pair<float, float>) {
 		PlayerPtr player = place.player;
-		RealmPtr  realm  = place.realm;
-		Game &game = realm->getGame();
+		RealmPtr realm = place.realm;
+		GamePtr game = realm->getGame();
 		Tileset &tileset = realm->getTileset();
 
 		for (const Layer layer: reverse(allLayers)) {

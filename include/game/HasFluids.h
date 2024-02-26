@@ -41,6 +41,6 @@ namespace Game3 {
 			void decode(Buffer &);
 
 		protected:
-			virtual Game & getGame() const = 0;
+			virtual std::shared_ptr<Game> getGame() const = 0;
 	};
 }

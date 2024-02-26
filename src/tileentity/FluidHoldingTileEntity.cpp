@@ -75,7 +75,8 @@ namespace Game3 {
 			increaseUpdateCounter();
 			queueBroadcast();
 		} else {
-			getRealm()->getGame().toClient().signalFluidUpdate().emit(std::dynamic_pointer_cast<HasFluids>(shared_from_this()));
+			GamePtr game = TileEntity::getGame();
+			game->toClient().signalFluidUpdate().emit(std::dynamic_pointer_cast<HasFluids>(shared_from_this()));
 		}
 	}
 
@@ -99,7 +100,7 @@ namespace Game3 {
 		json["fluidLevels"] = fluidContainer->levels.getBase();
 	}
 
-	void FluidHoldingTileEntity::absorbJSON(Game &, const nlohmann::json &json) {
+	void FluidHoldingTileEntity::absorbJSON(const GamePtr &, const nlohmann::json &json) {
 		fluidContainer->levels = json.at("fluidLevels").get<FluidContainer::Map>();
 	}
 

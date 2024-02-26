@@ -11,17 +11,17 @@ namespace Game3 {
 	bool FilledFlask::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		Realm  &realm  = *place.realm;
 		assert(realm.getSide() == Side::Server);
-		Game   &game   = realm.getGame();
-		Player &player = *place.player;
+		GamePtr game = realm.getGame();
+		PlayerPtr player = place.player;
 
 		if (std::optional<FluidTile> tile = realm.tryFluid(place.position); !tile || tile->level == 0) {
-			std::shared_ptr<Fluid> fluid = game.registry<FluidRegistry>().at(fluidName);
+			std::shared_ptr<Fluid> fluid = game->registry<FluidRegistry>().at(fluidName);
 			if (!fluid)
 				return false;
 
 			realm.setFluid(place.position, FluidTile(fluid->registryID, FluidTile::FULL));
 
-			const InventoryPtr inventory = player.getInventory(0);
+			const InventoryPtr inventory = player->getInventory(0);
 
 			{
 				auto lock = inventory->uniqueLock();
@@ -29,7 +29,7 @@ namespace Game3 {
 					inventory->erase(slot);
 			}
 
-			player.give(ItemStack(realm.getGame(), "base:item/flask", 1), slot);
+			player->give(ItemStack(realm.getGame(), "base:item/flask", 1), slot);
 			inventory->notifyOwner();
 			return true;
 		}

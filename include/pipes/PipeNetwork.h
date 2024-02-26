@@ -61,7 +61,7 @@ namespace Game3 {
 			inline auto getID() const { return id; }
 
 			virtual PipeType getType() const = 0;
-			virtual void tick(Game &, Tick);
+			virtual void tick(const std::shared_ptr<Game> &, Tick);
 			bool canTick(Tick);
 	};
 }

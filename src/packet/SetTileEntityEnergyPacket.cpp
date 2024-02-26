@@ -5,8 +5,8 @@
 #include "tileentity/EnergeticTileEntity.h"
 
 namespace Game3 {
-	void SetTileEntityEnergyPacket::handle(ClientGame &game) {
-		AgentPtr agent = game.getAgent(agentGID);
+	void SetTileEntityEnergyPacket::handle(const ClientGamePtr &game) {
+		AgentPtr agent = game->getAgent(agentGID);
 		if (!agent) {
 			ERROR_("Couldn't find agent " << agentGID << " in SetTileEntityEnergyPacket handler");
 			return;

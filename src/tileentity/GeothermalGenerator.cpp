@@ -34,13 +34,13 @@ namespace Game3 {
 		if (!realm)
 			return false;
 
-		Game &game = realm->getGame();
-		auto &geothermal_registry = game.registry<GeothermalRecipeRegistry>();
-		auto &fluid_registry = game.registry<FluidRegistry>();
+		GamePtr game = realm->getGame();
+		auto &fluid_registry = game->registry<FluidRegistry>();
 		std::shared_ptr<Fluid> fluid = fluid_registry.at(flask->fluidName);
 		if (!fluid)
 			return false;
 
+		auto &geothermal_registry = game->registry<GeothermalRecipeRegistry>();
 		return geothermal_registry.fluidIDs.contains(fluid->registryID);
 	}
 
@@ -64,7 +64,8 @@ namespace Game3 {
 		auto unique_lock = supportedFluids.uniqueLock();
 		supportedFluids.emplace();
 		FluidAmount out = 0;
-		for (const std::shared_ptr<GeothermalRecipe> &recipe: getGame().registry<GeothermalRecipeRegistry>().items) {
+		GamePtr game = getGame();
+		for (const std::shared_ptr<GeothermalRecipe> &recipe: game->registry<GeothermalRecipeRegistry>().items) {
 			supportedFluids->emplace(recipe->input.id);
 			if (recipe->input.id == id)
 				out = FLUID_CAPACITY;
@@ -103,7 +104,7 @@ namespace Game3 {
 		if (levels.empty())
 			return;
 
-		auto &registry = args.game.registry<GeothermalRecipeRegistry>();
+		auto &registry = args.game->registry<GeothermalRecipeRegistry>();
 
 		std::optional<EnergyAmount> leftovers;
 		auto energy_lock = energyContainer->uniqueLock();
@@ -142,8 +143,9 @@ namespace Game3 {
 			if (fluidContainer->levels.empty()) {
 				WARN_("No fluids.");
 			} else {
+				GamePtr game = realm->getGame();
 				for (const auto &[id, amount]: fluidContainer->levels)
-					INFO("{} = {}", realm->getGame().getFluid(id)->identifier, amount);
+					INFO("{} = {}", game->getFluid(id)->identifier, amount);
 			}
 		}
 
@@ -152,7 +154,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void GeothermalGenerator::absorbJSON(Game &game, const nlohmann::json &json) {
+	void GeothermalGenerator::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
 		FluidHoldingTileEntity::absorbJSON(game, json);
@@ -246,7 +248,7 @@ namespace Game3 {
 		});
 	}
 
-	Game & GeothermalGenerator::getGame() const {
+	GamePtr GeothermalGenerator::getGame() const {
 		return TileEntity::getGame();
 	}
 
@@ -263,9 +265,9 @@ namespace Game3 {
 		if (!flask)
 			return;
 
-		const Game &game = getGame();
-		auto &geothermal_registry = game.registry<GeothermalRecipeRegistry>();
-		auto &fluid_registry = game.registry<FluidRegistry>();
+		GamePtr game = getGame();
+		auto &geothermal_registry = game->registry<GeothermalRecipeRegistry>();
+		auto &fluid_registry = game->registry<FluidRegistry>();
 		std::shared_ptr<Fluid> fluid = fluid_registry.at(flask->fluidName);
 		if (!fluid || !geothermal_registry.fluidIDs.contains(fluid->registryID))
 			return;

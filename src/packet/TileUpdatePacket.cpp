@@ -4,8 +4,8 @@
 #include "packet/TileUpdatePacket.h"
 
 namespace Game3 {
-	void TileUpdatePacket::handle(ClientGame &game) {
-		auto realm = game.getRealm(realmID);
+	void TileUpdatePacket::handle(const ClientGamePtr &game) {
+		auto realm = game->getRealm(realmID);
 		realm->setTile(layer, position, tileID, true);
 		realm->queueReupload();
 	}

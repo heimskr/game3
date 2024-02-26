@@ -7,17 +7,17 @@
 #include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
-	void OpenModuleForAgentPacket::handle(ClientGame &game) {
-		AgentPtr agent = game.getAgent(agentGID);
+	void OpenModuleForAgentPacket::handle(const ClientGamePtr &game) {
+		AgentPtr agent = game->getAgent(agentGID);
 		if (!agent) {
 			ERROR_("Couldn't find agent " << agentGID << " in OpenModuleForAgentPacket handler");
 			return;
 		}
 
-		MainWindow &window = game.getWindow();
+		MainWindow &window = game->getWindow();
 
 		if (removeOnMove) {
-			game.getPlayer()->queueForMove([&window, tab = window.inventoryTab](const auto &, bool) {
+			game->getPlayer()->queueForMove([&window, tab = window.inventoryTab](const auto &, bool) {
 				window.queue([tab] {
 					tab->removeModule();
 				});

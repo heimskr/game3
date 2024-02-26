@@ -5,11 +5,11 @@ namespace Game3 {
 	CraftingRecipe::CraftingRecipe(Input input_, Output output_, Identifier station_type):
 		input(std::move(input_)), output(std::move(output_)), stationType(std::move(station_type)) {}
 
-	CraftingRecipe::Input CraftingRecipe::getInput(Game &) {
+	CraftingRecipe::Input CraftingRecipe::getInput(const std::shared_ptr<Game> &) {
 		return input;
 	}
 
-	CraftingRecipe::Output CraftingRecipe::getOutput(const Input &, Game &) {
+	CraftingRecipe::Output CraftingRecipe::getOutput(const Input &, const std::shared_ptr<Game> &) {
 		return output;
 	}
 
@@ -33,7 +33,7 @@ namespace Game3 {
 		return true;
 	}
 
-	bool CraftingRecipe::craft(Game &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) {
+	bool CraftingRecipe::craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) {
 		auto inventory_in  = std::dynamic_pointer_cast<Inventory>(input_container);
 		auto inventory_out = std::dynamic_pointer_cast<Inventory>(output_container);
 

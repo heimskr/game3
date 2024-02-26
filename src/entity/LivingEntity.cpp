@@ -22,7 +22,7 @@ namespace Game3 {
 		json["luck"] = luckStat;
 	}
 
-	void LivingEntity::absorbJSON(Game &, const nlohmann::json &json) {
+	void LivingEntity::absorbJSON(const GamePtr &, const nlohmann::json &json) {
 		if (json.is_null())
 			return;
 
@@ -113,10 +113,12 @@ namespace Game3 {
 		health = new_health;
 
 		if (getSide() == Side::Server) {
-			if (health <= 0)
+			if (health <= 0) {
 				kill();
-			else
+			} else {
+				GamePtr game = getGame();
 				game->toServer().broadcast(LivingEntityHealthChangedPacket(*this));
+			}
 		}
 
 		return changed;
@@ -146,7 +148,8 @@ namespace Game3 {
 		if (damage == 0)
 			color = {0, 0, 1, 1};
 
-		getRealm()->spawn<TextParticle>(getPosition(), std::to_string(damage), color, .666f);
+		RealmPtr realm = getRealm();
+		realm->spawn<TextParticle>(getPosition(), std::to_string(damage), color, .666f);
 
 		if (damage == 0)
 			return false;
@@ -157,6 +160,7 @@ namespace Game3 {
 			return true;
 		}
 
+		GamePtr game = realm->getGame();
 		game->toServer().broadcast(LivingEntityHealthChangedPacket(*this));
 		return false;
 	}

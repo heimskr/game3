@@ -15,8 +15,8 @@ namespace Game3 {
 		inventory = std::make_shared<ClientInventory>(buffer.take<ClientInventory>());
 	}
 
-	void InventoryPacket::handle(ClientGame &game) {
-		if (auto player = game.getPlayer()) {
+	void InventoryPacket::handle(const ClientGamePtr &game) {
+		if (PlayerPtr player = game->getPlayer()) {
 			inventory->weakOwner = player;
 			player->setInventory(inventory, 0);
 			player->getInventory(0)->notifyOwner();

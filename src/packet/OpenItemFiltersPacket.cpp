@@ -9,17 +9,17 @@
 #include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
-	void OpenItemFiltersPacket::handle(ClientGame &game) {
-		RealmPtr realm = game.getRealm(realmID);
+	void OpenItemFiltersPacket::handle(const ClientGamePtr &game) {
+		RealmPtr realm = game->getRealm(realmID);
 		if (!realm) {
 			ERROR_("Couldn't find realm " << realmID << " in OpenItemFiltersPacket handler");
 			return;
 		}
 
-		MainWindow &window = game.getWindow();
+		MainWindow &window = game->getWindow();
 
 		if (removeOnMove) {
-			game.getPlayer()->queueForMove([&window, tab = window.inventoryTab](const auto &, bool) {
+			game->getPlayer()->queueForMove([&window, tab = window.inventoryTab](const auto &, bool) {
 				window.queue([tab] {
 					tab->removeModule();
 				});

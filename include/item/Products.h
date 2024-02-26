@@ -50,7 +50,7 @@ namespace Game3 {
 
 			std::vector<ItemStack> getStacks() const;
 
-			static Products fromJSON(Game &, const nlohmann::json &);
+			static Products fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
 
 		private:
 			std::vector<std::unique_ptr<Product>> products;

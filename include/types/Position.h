@@ -78,7 +78,7 @@ namespace Game3 {
 		bool isPathable() const;
 		std::shared_ptr<TileEntity> getTileEntity() const;
 
-		Game & getGame() const;
+		std::shared_ptr<Game> getGame() const;
 
 		Place operator+(Direction) const;
 		Place & operator+=(Direction);

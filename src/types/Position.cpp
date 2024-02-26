@@ -168,7 +168,7 @@ namespace Game3 {
 		return realm->tileEntityAt(position);
 	}
 
-	Game & Place::getGame() const {
+	std::shared_ptr<Game> Place::getGame() const {
 		return realm->getGame();
 	}
 

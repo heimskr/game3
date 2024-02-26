@@ -24,7 +24,7 @@ namespace Game3 {
 			void encode(Game &, Buffer &buffer) const override { buffer << recipeType << recipes; }
 			void decode(Game &, Buffer &buffer)       override { buffer >> recipeType >> recipes; }
 
-			void handle(ClientGame &) override;
+			void handle(const std::shared_ptr<ClientGame> &) override;
 
 		private:
 			static std::vector<nlohmann::json> getRecipes(const CraftingRecipeRegistry &);

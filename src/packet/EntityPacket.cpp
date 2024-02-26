@@ -29,19 +29,19 @@ namespace Game3 {
 		entity->encode(buffer);
 	}
 
-	void EntityPacket::handle(ClientGame &game) {
-		RealmPtr realm = game.tryRealm(realmID);
+	void EntityPacket::handle(const ClientGamePtr &game) {
+		RealmPtr realm = game->tryRealm(realmID);
 
 		if (!realm)
 			throw PacketError("Couldn't find realm " + std::to_string(realmID) + " in EntityPacket");
 
-		if (EntityPtr found = game.getAgent<Entity>(globalID)) {
+		if (EntityPtr found = game->getAgent<Entity>(globalID)) {
 			wasFound = true;
 			(entity = found)->decode(storedBuffer);
 		} else {
-			{ auto lock = game.allAgents.sharedLock(); assert(!game.allAgents.contains(globalID)); }
+			{ auto lock = game->allAgents.sharedLock(); assert(!game->allAgents.contains(globalID)); }
 			wasFound = false;
-			auto factory = game.registry<EntityFactoryRegistry>()[identifier];
+			auto factory = game->registry<EntityFactoryRegistry>()[identifier];
 			entity = (*factory)(game);
 			entity->type = identifier;
 			entity->setGID(globalID);
@@ -57,9 +57,6 @@ namespace Game3 {
 		if (wasFound)
 			return;
 
-		if (RealmPtr realm = game.tryRealm(realmID))
-			realm->add(entity, entity->getPosition());
-		else
-			throw PacketError("Couldn't find realm " + std::to_string(realmID) + " in EntityPacket");
+		realm->add(entity, entity->getPosition());
 	}
 }

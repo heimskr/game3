@@ -7,11 +7,11 @@
 #include "ui/tab/TextTab.h"
 
 namespace Game3 {
-	void OpenTextTabPacket::handle(ClientGame &game) {
-		MainWindow &window = game.getWindow();
+	void OpenTextTabPacket::handle(const ClientGamePtr &game) {
+		MainWindow &window = game->getWindow();
 
 		if (removeOnMove) {
-			game.getPlayer()->queueForMove([&window](const auto &, bool) {
+			game->getPlayer()->queueForMove([&window](const auto &, bool) {
 				window.queue([&window] {
 					window.inventoryTab->show();
 				});
@@ -24,7 +24,7 @@ namespace Game3 {
 			tab.name = std::move(name);
 			tab.text = std::move(message);
 			tab.ephemeral = ephemeral;
-			tab.reset(game.getSelf());
+			tab.reset(game);
 			tab.show();
 		});
 	}

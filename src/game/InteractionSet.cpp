@@ -11,12 +11,12 @@
 namespace Game3 {
 	bool StandardInteractions::interact(const Place &place, Modifiers modifiers, ItemStack *used_item, Hand hand) const {
 		const Position position = place.position;
-		Player &player = *place.player;
-		Realm &realm = *place.realm;
-		Game &game = realm.getGame();
-		InventoryPtr inventory = player.getInventory(0);
+		PlayerPtr player = place.player;
+		RealmPtr realm = place.realm;
+		GamePtr game = realm->getGame();
+		InventoryPtr inventory = player->getInventory(0);
 
-		Tileset &tileset = realm.getTileset();
+		Tileset &tileset = realm->getTileset();
 		const auto terrain_tile   = place.getName(Layer::Terrain);
 		const auto submerged_tile = place.getName(Layer::Submerged);
 
@@ -36,14 +36,14 @@ namespace Game3 {
 
 				if (active->hasAttribute("base:attribute/shovel"_id)) {
 					if (*submerged_tile == "base:tile/ash"_id) {
-						realm.setTile(Layer::Submerged, position, "base:tile/empty"_id);
-						player.give({game, "base:item/ash"_id, 1});
-						realm.reupload();
+						realm->setTile(Layer::Submerged, position, "base:tile/empty"_id);
+						player->give({game, "base:item/ash"_id, 1});
+						realm->reupload();
 						return true;
 					}
 				}
 			}
-		} else if (used_item->item->use(player.getHeldSlot(hand), *used_item, place, modifiers, hand)) {
+		} else if (used_item->item->use(player->getHeldSlot(hand), *used_item, place, modifiers, hand)) {
 			return true;
 		}
 
@@ -64,10 +64,10 @@ namespace Game3 {
 			attribute.emplace("base:attribute/shovel"_id);
 		}
 
-		if (!used_item && item && attribute && !player.hasTooldown()) {
+		if (!used_item && item && attribute && !player->hasTooldown()) {
 			if (ItemStack *stack = get_active()) {
 				if (stack->hasAttribute(*attribute) && !inventory->add({game, *item, 1})) {
-					player.setTooldown(1.f);
+					player->setTooldown(1.f);
 					if (stack->reduceDurability())
 						inventory->erase(inventory->activeSlot);
 					// setTooldown doesn't call notifyOwner on the player's inventory, so we have to do it here.
@@ -78,11 +78,11 @@ namespace Game3 {
 		}
 
 		if (tileset.isInCategory(*submerged_tile, "base:category/plantable"_id)) {
-			if (auto iter = game.itemsByAttribute.find("base:attribute/plantable"_id); iter != game.itemsByAttribute.end()) {
+			if (auto iter = game->itemsByAttribute.find("base:attribute/plantable"_id); iter != game->itemsByAttribute.end()) {
 				for (const ItemPtr &item: iter->second) {
 					if (auto cast = std::dynamic_pointer_cast<Flower>(item); cast && cast->tilename == *submerged_tile) {
-						player.give({game, item});
-						realm.setTile(Layer::Submerged, position, tileset.getEmptyID());
+						player->give({game, item});
+						realm->setTile(Layer::Submerged, position, tileset.getEmptyID());
 						return true;
 					}
 				}

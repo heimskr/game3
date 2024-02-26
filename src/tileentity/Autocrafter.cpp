@@ -140,7 +140,7 @@ namespace Game3 {
 			return;
 
 		const auto tilesize = tileset.getTileSize();
-		const auto texture = tileset.getTexture(realm->getGame());
+		const auto texture = tileset.getTexture(*realm->getGame());
 		const auto base_x = (cachedTile % (texture->width / tilesize)) * tilesize;
 		const auto base_y = (cachedTile / (texture->width / tilesize)) * tilesize;
 
@@ -165,7 +165,7 @@ namespace Game3 {
 			return;
 
 		const auto tilesize = tileset.getTileSize();
-		const auto texture = tileset.getTexture(realm->getGame());
+		const auto texture = tileset.getTexture(*realm->getGame());
 		const auto base_x = (cachedUpperTile % (texture->width / tilesize)) * tilesize;
 		const auto base_y = (cachedUpperTile / (texture->width / tilesize)) * tilesize;
 
@@ -224,7 +224,7 @@ namespace Game3 {
 		json["stationInventory"] = dynamic_cast<ServerInventory &>(*stationInventory);
 	}
 
-	void Autocrafter::absorbJSON(Game &game, const nlohmann::json &json) {
+	void Autocrafter::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);
@@ -317,7 +317,7 @@ namespace Game3 {
 		const ItemCount input_capacity = INPUT_CAPACITY;
 		auto input_span = std::make_shared<InventorySpan>(inventory, 0, input_capacity - 1);
 		auto output_span = std::make_shared<InventorySpan>(inventory, input_capacity, input_capacity + OUTPUT_CAPACITY - 1);
-		Game &game = getGame();
+		GamePtr game = getGame();
 
 		std::optional<std::vector<ItemStack>> leftovers;
 		for (const std::shared_ptr<CraftingRecipe> &recipe: cachedRecipes) {
@@ -338,7 +338,7 @@ namespace Game3 {
 	void Autocrafter::cacheRecipes() {
 		auto lock = cachedRecipes.uniqueLock();
 		cachedRecipes.clear();
-		for (const std::shared_ptr<CraftingRecipe> &recipe: getGame().registry<CraftingRecipeRegistry>())
+		for (const std::shared_ptr<CraftingRecipe> &recipe: getGame()->registry<CraftingRecipeRegistry>())
 			if (validateRecipe(*recipe))
 				cachedRecipes.push_back(recipe);
 	}
@@ -367,11 +367,11 @@ namespace Game3 {
 	}
 
 	void Autocrafter::setStationTexture(const ItemStack &stack) {
-		Game &game = getGame();
-		if (game.getSide() != Side::Client)
+		GamePtr game = getGame();
+		if (game->getSide() != Side::Client)
 			return;
-		std::shared_ptr<ItemTexture> item_texture = game.registry<ItemTextureRegistry>().at(stack.item->identifier);
-		stationTexture = stack.getTexture(game);
+		std::shared_ptr<ItemTexture> item_texture = game->registry<ItemTextureRegistry>().at(stack.item->identifier);
+		stationTexture = stack.getTexture(*game);
 		stationTexture->init();
 		stationXOffset = item_texture->x / 2.f;
 		stationYOffset = item_texture->y / 2.f;

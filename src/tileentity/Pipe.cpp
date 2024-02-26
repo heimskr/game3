@@ -73,7 +73,7 @@ namespace Game3 {
 		if (getSide() == Side::Server) {
 			for (const PipeType pipe_type: PIPE_TYPES)
 				if (auto network = networks[pipe_type])
-					network->tick(args.game, args.game.getCurrentTick());
+					network->tick(args.game, args.game->getCurrentTick());
 			TileEntity::tick(args);
 		}
 	}
@@ -85,10 +85,10 @@ namespace Game3 {
 		RealmPtr realm = getRealm();
 		Tileset &tileset = realm->getTileset();
 
-		Game &game = realm->getGame();
+		GamePtr game = realm->getGame();
 
 		const auto tilesize = tileset.getTileSize();
-		const auto texture  = tileset.getTexture(game);
+		const auto texture  = tileset.getTexture(*game);
 
 		for (const PipeType pipe_type: reverse(PIPE_TYPES)) {
 			std::optional<TileID> &tile_id = tileIDs[pipe_type];

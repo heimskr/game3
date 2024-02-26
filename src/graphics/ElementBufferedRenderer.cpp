@@ -85,7 +85,7 @@ namespace Game3 {
 		const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
 		auto &tileset = realm->getTileset();
 		const auto tilesize = tileset.getTileSize();
-		auto texture = tileset.getTexture(realm->getGame());
+		auto texture = tileset.getTexture(*realm->getGame());
 
 		glm::mat4 projection(1.f);
 		projection = glm::scale(projection, {float(tilesize), -float(tilesize), 1.f}) *
@@ -136,7 +136,7 @@ namespace Game3 {
 		vao.bind();
 		vbo.bind();
 		ebo.bind();
-		tileset.getTexture(realm->getGame())->bind(0);
+		tileset.getTexture(*realm->getGame())->bind(0);
 		shader.set("texture0", 0);
 		shader.set("projection", projection);
 
@@ -154,7 +154,7 @@ namespace Game3 {
 
 		auto promise = std::make_shared<std::promise<bool>>();
 		std::future<bool> future = promise->get_future();
-		ClientGamePtr client_game = realm->getGame().toClientPointer();
+		ClientGamePtr client_game = realm->getGame()->toClientPointer();
 
 		client_game->getWindow().queue([this, promise, client_game]() {
 			client_game->activateContext();
@@ -203,7 +203,7 @@ namespace Game3 {
 
 		auto &tileset = realm->getTileset();
 		const auto tilesize = tileset.getTileSize();
-		const auto tileset_width = tileset.getTexture(realm->getGame())->width;
+		const auto tileset_width = tileset.getTexture(*realm->getGame())->width;
 
 		const auto set_width = tileset_width / tilesize;
 
@@ -216,10 +216,10 @@ namespace Game3 {
 		isMissing = false;
 
 		const TileID missing = tileset["base:tile/void"];
-		Game &game = realm->getGame();
+		GamePtr game = realm->getGame();
 
 		Timer timer{"BufferedVBOInit"};
-		vbo.init<float, 11>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, &game, &tileset, set_width, divisor, t_size, missing](size_t x, size_t y) {
+		vbo.init<float, 11>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, game, &tileset, set_width, divisor, t_size, missing](size_t x, size_t y) {
 			const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
 
 			std::array<TileID, LAYER_COUNT> tiles{};
@@ -248,7 +248,7 @@ namespace Game3 {
 			float fluid_opacity;
 
 			if (fluid_opt) {
-				if (auto tile_opt = game.getFluidTileID(fluid_opt->id)) {
+				if (auto tile_opt = game->getFluidTileID(fluid_opt->id)) {
 					fluid_tile = *tile_opt;
 					if (FluidTile::FULL <= fluid_opt->level)
 						fluid_opacity = 1.f;

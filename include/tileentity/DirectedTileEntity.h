@@ -12,7 +12,7 @@ namespace Game3 {
 			void rotateCounterClockwise();
 
 			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(Game &, const nlohmann::json &) override;
+			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
 

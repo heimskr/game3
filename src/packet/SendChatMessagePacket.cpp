@@ -7,8 +7,8 @@
 #include "packet/SendChatMessagePacket.h"
 
 namespace Game3 {
-	void SendChatMessagePacket::handle(ServerGame &game, RemoteClient &client) {
+	void SendChatMessagePacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
 		if (ServerPlayerPtr player = client.getPlayer())
-			game.broadcast(ChatMessageSentPacket{player->getGID(), message}, true);
+			game->broadcast(ChatMessageSentPacket{player->getGID(), message}, true);
 	}
 }

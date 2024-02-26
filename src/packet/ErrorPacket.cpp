@@ -3,7 +3,7 @@
 #include "ui/MainWindow.h"
 
 namespace Game3 {
-	void ErrorPacket::handle(ClientGame &game) {
-		game.getWindow().error(error);
+	void ErrorPacket::handle(const ClientGamePtr &game) {
+		game->getWindow().error(error);
 	}
 }

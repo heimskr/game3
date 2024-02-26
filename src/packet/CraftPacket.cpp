@@ -7,7 +7,7 @@
 #include "recipe/CraftingRecipe.h"
 
 namespace Game3 {
-	void CraftPacket::handle(ServerGame &game, RemoteClient &client) {
+	void CraftPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
 		if (count == 0)
 			return;
 
@@ -24,7 +24,7 @@ namespace Game3 {
 		std::optional<std::vector<ItemStack>> leftovers;
 
 		for (size_t i = 0; i < count; ++i) {
-			if (!recipe->craft(game, inventory, inventory, leftovers))
+			if (!recipe->craft(game.shared_from_this(), inventory, inventory, leftovers))
 				break;
 
 			if (leftovers) {

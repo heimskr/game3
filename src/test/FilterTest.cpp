@@ -39,7 +39,7 @@ namespace Game3 {
 		for (const auto &id: ids) {
 			int i = 0;
 			for (const auto &data: datas) {
-				stacks.emplace_back(*game, id, 1, data);
+				stacks.emplace_back(game, id, 1, data);
 				if (++i % 2 == 0)
 					filter.addItem(stacks.back());
 			}

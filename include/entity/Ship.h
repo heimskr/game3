@@ -7,7 +7,7 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "entity/ship"}; }
 
-			static std::shared_ptr<Ship> create(Game &) {
+			static std::shared_ptr<Ship> create(const std::shared_ptr<Game> &) {
 				return Entity::create<Ship>();
 			}
 

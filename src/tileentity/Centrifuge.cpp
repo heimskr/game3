@@ -39,7 +39,7 @@ namespace Game3 {
 			return;
 
 		Ticker ticker{*this, args};
-		Game &game = args.game;
+		const GamePtr &game = args.game;
 
 		enqueueTick(PERIOD);
 
@@ -49,7 +49,7 @@ namespace Game3 {
 		if (levels.empty())
 			return;
 
-		auto &registry = game.registry<CentrifugeRecipeRegistry>();
+		auto &registry = game->registry<CentrifugeRecipeRegistry>();
 
 		std::optional<ItemStack> leftovers;
 		const InventoryPtr inventory = getInventory(0);
@@ -79,13 +79,14 @@ namespace Game3 {
 		else
 			InventoriedTileEntity::addObserver(player, false);
 
+		GamePtr game = realm->getGame();
 		auto lock = fluidContainer->levels.sharedLock();
 		for (const auto &[id, amount]: fluidContainer->levels)
-			INFO("{} = {}", realm->getGame().getFluid(id)->identifier, amount);
+			INFO("{} = {}", game->getFluid(id)->identifier, amount);
 		return true;
 	}
 
-	void Centrifuge::absorbJSON(Game &game, const nlohmann::json &json) {
+	void Centrifuge::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		FluidHoldingTileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
@@ -137,7 +138,7 @@ namespace Game3 {
 		});
 	}
 
-	Game & Centrifuge::getGame() const {
+	GamePtr Centrifuge::getGame() const {
 		return TileEntity::getGame();
 	}
 }

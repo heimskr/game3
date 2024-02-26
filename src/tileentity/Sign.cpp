@@ -26,7 +26,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Sign::absorbJSON(Game &game, const nlohmann::json &json) {
+	void Sign::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		text = json.at("text");
 		name = json.at("name");

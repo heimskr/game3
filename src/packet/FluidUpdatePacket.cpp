@@ -4,8 +4,8 @@
 #include "packet/FluidUpdatePacket.h"
 
 namespace Game3 {
-	void FluidUpdatePacket::handle(ClientGame &game) {
-		auto realm = game.getRealm(realmID);
+	void FluidUpdatePacket::handle(const ClientGamePtr &game) {
+		auto realm = game->getRealm(realmID);
 		realm->setFluid(position, fluidTile);
 		realm->queueReupload();
 	}

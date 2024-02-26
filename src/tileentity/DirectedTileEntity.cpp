@@ -35,7 +35,7 @@ namespace Game3 {
 		json["direction"] = tileDirection;
 	}
 
-	void DirectedTileEntity::absorbJSON(Game &, const nlohmann::json &json) {
+	void DirectedTileEntity::absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &json) {
 		setDirection(json.at("direction"));
 	}
 

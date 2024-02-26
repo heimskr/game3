@@ -30,7 +30,7 @@ namespace Game3 {
 		return out;
 	}
 
-	Products Products::fromJSON(Game &game, const nlohmann::json &json) {
+	Products Products::fromJSON(const std::shared_ptr<Game> &game, const nlohmann::json &json) {
 		Products out;
 
 		for (const nlohmann::json &item: json) {

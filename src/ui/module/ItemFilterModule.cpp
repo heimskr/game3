@@ -229,7 +229,7 @@ namespace Game3 {
 	}
 
 	void ItemFilterModule::addHbox(const Identifier &id, const ItemFilter::Config &config) {
-		ItemStack stack(*game, id, 1, config.data);
+		ItemStack stack(game, id, 1, config.data);
 		auto hbox = std::make_unique<Gtk::Box>(Gtk::Orientation::HORIZONTAL);
 		auto image = makeImage(stack);
 		auto label = makeLabel(stack);

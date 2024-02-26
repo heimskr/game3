@@ -9,9 +9,9 @@ namespace Game3 {
 		public:
 			virtual ~HasGame() = default;
 
-			virtual Game & getGame() {
+			virtual std::shared_ptr<Game> getGame() const {
 				if (auto game = weakGame.lock())
-					return *game;
+					return game;
 				throw std::runtime_error("Couldn't lock game");
 			}
 

@@ -6,7 +6,7 @@
 #include "packet/InteractPacket.h"
 
 namespace Game3 {
-	void InteractPacket::handle(ServerGame &game, RemoteClient &client) {
+	void InteractPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
 		if (ServerPlayerPtr player = client.getPlayer()) {
 			if (direction && *direction != player->direction) {
 				player->teleport(player->position, MovementContext{
