@@ -157,9 +157,10 @@ namespace Game3 {
 			void queueDestruction();
 			PathResult pathfind(const Position &start, const Position &goal, std::list<Direction> &, size_t loop_max = 1'000);
 			bool pathfind(const Position &goal, size_t loop_max = 1'000);
-			virtual float getMovementSpeed() const { return MAX_SPEED; }
+			virtual float getMovementSpeed() const;
 			std::shared_ptr<Game> getGame() const override;
 			bool isVisible() const;
+			bool isInFluid() const;
 			bool setHeldLeft(Slot);
 			bool setHeldRight(Slot);
 			inline Slot getHeldLeft()  const { return heldLeft.slot;  }

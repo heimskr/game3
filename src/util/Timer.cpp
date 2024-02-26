@@ -20,12 +20,12 @@ namespace Game3 {
 	}
 
 	void Timer::stop() {
-		if (!stopped) {
-			auto lock = uniqueLock();
-			times[name] += difference();
-			++counts[name];
-			stopped = true;
-		}
+		if (stopped)
+			return;
+		auto lock = uniqueLock();
+		times[name] += difference();
+		++counts[name];
+		stopped = true;
 	}
 
 	void Timer::restart() {

@@ -56,7 +56,7 @@ namespace Game3 {
 			virtual void addMoney(MoneyCount) = 0;
 			/** Returns whether the player had enough money. If false, no change was made. */
 			virtual bool removeMoney(MoneyCount) = 0;
-			float getMovementSpeed() const override { return movementSpeed; }
+			float getMovementSpeed() const override;
 			bool setTooldown(float multiplier);
 			inline bool hasTooldown() const { return 0.f < tooldown; }
 			void showText(const Glib::ustring &text, const Glib::ustring &name);

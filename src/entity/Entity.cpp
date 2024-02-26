@@ -795,6 +795,10 @@ namespace Game3 {
 		return out == PathResult::Trivial || out == PathResult::Success;
 	}
 
+	float Entity::getMovementSpeed() const {
+		return isInFluid()? MAX_SPEED * .5f : MAX_SPEED;
+	}
+
 	std::shared_ptr<Game> Entity::getGame() const {
 		if (auto locked = weakGame.lock())
 			return locked;
@@ -821,6 +825,10 @@ namespace Game3 {
 		}
 
 		return realm->isVisible(pos);
+	}
+
+	bool Entity::isInFluid() const {
+		return getRealm()->hasFluid(getPosition());
 	}
 
 	bool Entity::setHeldLeft(Slot new_value) {

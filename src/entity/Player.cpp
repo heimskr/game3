@@ -63,7 +63,7 @@ namespace Game3 {
 		}
 
 		if (remaining != 0)
-			ERROR_("Still present in " << remaining << " visible set" << (remaining == 1? "!" : "s!"));
+			ERROR_("Player was still present in " << remaining << " visible set" << (remaining == 1? "!" : "s!"));
 
 		Entity::destroy();
 	}
@@ -201,6 +201,10 @@ namespace Game3 {
 		}
 
 		return false;
+	}
+
+	float Player::getMovementSpeed() const {
+		return isInFluid()? movementSpeed * .5f : movementSpeed;
 	}
 
 	void Player::showText(const Glib::ustring &text, const Glib::ustring &name) {
