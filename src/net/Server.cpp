@@ -145,7 +145,7 @@ namespace Game3 {
 		{
 			nlohmann::json json;
 			if (game->database.readUser(std::string(username), nullptr, &json, nullptr))
-				return ServerPlayer::fromJSON(*game, json);
+				return ServerPlayer::fromJSON(game, json);
 		}
 
 		RealmPtr overworld = game->getRealm(1);
@@ -161,17 +161,17 @@ namespace Game3 {
 		player->spawnPosition = player->getPosition();
 		player->spawnRealmID = player->getRealm()->getID();
 		INFO_("Setting player spawn realm ID to " << player->spawnRealmID);
-		player->init(*game);
+		player->init(game);
 		player->onSpawn();
 		const InventoryPtr inventory = player->getInventory(0);
 		{
 			auto inventory_lock = inventory->uniqueLock();
-			inventory->add(ItemStack::withDurability(*game, "base:item/iron_pickaxe"));
-			inventory->add(ItemStack::withDurability(*game, "base:item/iron_shovel"));
-			inventory->add(ItemStack::withDurability(*game, "base:item/iron_axe"));
-			inventory->add(ItemStack::withDurability(*game, "base:item/iron_hammer"));
-			inventory->add(ItemStack::withDurability(*game, "base:item/iron_sword"));
-			inventory->add(ItemStack(*game, "base:item/cave_entrance"));
+			inventory->add(ItemStack::withDurability(game, "base:item/iron_pickaxe"));
+			inventory->add(ItemStack::withDurability(game, "base:item/iron_shovel"));
+			inventory->add(ItemStack::withDurability(game, "base:item/iron_axe"));
+			inventory->add(ItemStack::withDurability(game, "base:item/iron_hammer"));
+			inventory->add(ItemStack::withDurability(game, "base:item/iron_sword"));
+			inventory->add(ItemStack(game, "base:item/cave_entrance"));
 		}
 		game->addPlayer(player);
 		return player;
@@ -278,7 +278,7 @@ namespace Game3 {
 			Timer::clear();
 			INFO_("Finished reading all data from database.");
 		} else {
-			RealmPtr realm = Realm::create<Overworld>(*game, 1, Overworld::ID(), "base:tileset/monomap", seed);
+			RealmPtr realm = Realm::create<Overworld>(game, 1, Overworld::ID(), "base:tileset/monomap", seed);
 			realm->outdoors = true;
 			std::default_random_engine rng;
 			rng.seed(seed);
@@ -287,7 +287,7 @@ namespace Game3 {
 		}
 
 		if (!game->hasRealm(-1)) {
-			RealmPtr shadow = Realm::create<ShadowRealm>(*game, -1, ShadowRealm::ID(), "base:tileset/monomap", seed);
+			RealmPtr shadow = Realm::create<ShadowRealm>(game, -1, ShadowRealm::ID(), "base:tileset/monomap", seed);
 			shadow->outdoors = false;
 			std::default_random_engine rng;
 			rng.seed(seed);

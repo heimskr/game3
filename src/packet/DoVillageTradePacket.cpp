@@ -20,7 +20,7 @@ namespace Game3 {
 
 		// Validate item
 
-		ItemPtr item = game.getItem(resource);
+		ItemPtr item = game->getItem(resource);
 		if (!item) {
 			client.sendError("Resource {} not found.", resource);
 			return;
@@ -36,7 +36,7 @@ namespace Game3 {
 		VillagePtr village;
 
 		try {
-			village = game.getVillage(villageID);
+			village = game->getVillage(villageID);
 		} catch (const std::out_of_range &) {
 			client.sendError("Village {} not found.", villageID);
 			return;
@@ -57,7 +57,7 @@ namespace Game3 {
 
 			if (std::optional<MoneyCount> sell_price = totalSellPrice(resource_count, -1, item->basePrice, amount, village->getGreed())) {
 				player->addMoney(*sell_price);
-				inventory->remove(ItemStack(game.shared_from_this(), resource, amount));
+				inventory->remove(ItemStack(game, resource, amount));
 				village->setResourceAmount(resource, resource_count + amount);
 				return;
 			}
@@ -76,7 +76,7 @@ namespace Game3 {
 
 			village->setResourceAmount(resource, resource_count - amount);
 
-			if (auto leftover = inventory->add(ItemStack(game.shared_from_this(), resource, amount)))
+			if (auto leftover = inventory->add(ItemStack(game, resource, amount)))
 				leftover->spawn(player->getRealm(), player->getPosition());
 
 			return;

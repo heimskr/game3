@@ -62,6 +62,9 @@ namespace Game3 {
 			void setRule(const std::string &, ssize_t);
 			std::optional<ssize_t> getRule(const std::string &) const;
 
+			std::shared_ptr<ServerGame> getSelf() { return std::static_pointer_cast<ServerGame>(shared_from_this()); }
+			std::shared_ptr<const ServerGame> getSelf() const { return std::static_pointer_cast<const ServerGame>(shared_from_this()); }
+
 			inline auto getServer() const {
 				auto out = weakServer.lock();
 				assert(out);

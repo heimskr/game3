@@ -13,7 +13,7 @@ namespace Game3 {
 	bool ContainmentOrb::use(Slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		RealmPtr realm = place.realm;
 		assert(realm->getSide() == Side::Server);
-		Game &game = realm->getGame();
+		GamePtr game = realm->getGame();
 		PlayerPtr player = place.player;
 
 		if (place.realm->type == "base:realm/shadow")
@@ -46,7 +46,7 @@ namespace Game3 {
 
 			if (selected->isPlayer()) {
 				auto player = safeDynamicCast<ServerPlayer>(selected);
-				player->teleport({32, 32}, game.getRealm(-1), MovementContext{.isTeleport = true});
+				player->teleport({32, 32}, game->getRealm(-1), MovementContext{.isTeleport = true});
 				stack.data["containedUsername"] = player->username;
 			} else {
 				selected->toJSON(stack.data);
@@ -63,10 +63,10 @@ namespace Game3 {
 
 		Identifier type = stack.data.at("containedEntity");
 		if (type == "base:entity/player") {
-			game.toServer().releasePlayer(stack.data.at("containedUsername"), place);
+			game->toServer().releasePlayer(stack.data.at("containedUsername"), place);
 		} else {
 			const GlobalID new_gid = Agent::generateGID();
-			const std::shared_ptr<EntityFactory> &factory = game.registry<EntityFactoryRegistry>()[type];
+			const std::shared_ptr<EntityFactory> &factory = game->registry<EntityFactoryRegistry>()[type];
 			EntityPtr entity = (*factory)(game, stack.data);
 			entity->spawning = true;
 			entity->setRealm(realm);

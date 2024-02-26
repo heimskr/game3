@@ -98,7 +98,7 @@ namespace Game3 {
 
 	RealmPtr Realm::fromJSON(const GamePtr &game, const nlohmann::json &json, bool full_data) {
 		const RealmType type = json.at("type");
-		auto factory = game.registry<RealmFactoryRegistry>().at(type);
+		auto factory = game->registry<RealmFactoryRegistry>().at(type);
 		assert(factory);
 		auto out = (*factory)(game);
 		out->absorbJSON(json, full_data);
@@ -139,7 +139,7 @@ namespace Game3 {
 				auto tile_entities_lock = tileEntities.uniqueLock();
 				auto by_gid_lock = tileEntitiesByGID.uniqueLock();
 				for (const auto &[position_string, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>()) {
-					auto tile_entity = TileEntity::fromJSON(*game, tile_entity_json);
+					auto tile_entity = TileEntity::fromJSON(game, tile_entity_json);
 					tileEntities.emplace(Position(position_string), tile_entity);
 					tileEntitiesByGID[tile_entity->globalID] = tile_entity;
 					attach(tile_entity);
@@ -153,7 +153,7 @@ namespace Game3 {
 				auto by_gid_lock = entitiesByGID.uniqueLock();
 				entities.clear();
 				for (const auto &entity_json: json.at("entities")) {
-					auto entity = *entities.insert(Entity::fromJSON(*game, entity_json)).first;
+					auto entity = *entities.insert(Entity::fromJSON(game, entity_json)).first;
 					entity->setRealm(shared);
 					entitiesByGID[entity->globalID] = entity;
 					attach(entity);
@@ -454,7 +454,7 @@ namespace Game3 {
 				add(locked);
 
 		GamePtr game = getGame();
-		const TickArgs args{*game, game->getCurrentTick(), delta};
+		const TickArgs args{game, game->getCurrentTick(), delta};
 
 		if (isServer()) {
 			std::vector<RemoteClient::BufferGuard> guards;

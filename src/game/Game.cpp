@@ -34,7 +34,7 @@ namespace Game3 {
 		lastTime = now;
 		delta = std::chrono::duration_cast<std::chrono::nanoseconds>(difference).count() / 1e9;
 		time = time + delta;
-		HasTickQueue::tick(delta, TickArgs{*this, getCurrentTick(), delta});
+		HasTickQueue::tick(delta, TickArgs{shared_from_this(), getCurrentTick(), delta});
 		return true;
 	}
 
@@ -154,7 +154,7 @@ namespace Game3 {
 		{
 			auto lock = out->realms.uniqueLock();
 			for (const auto &[string, realm_json]: json.at("realms").get<std::unordered_map<std::string, nlohmann::json>>())
-				out->realms.emplace(parseUlong(string), Realm::fromJSON(*out, realm_json));
+				out->realms.emplace(parseUlong(string), Realm::fromJSON(out, realm_json));
 		}
 		out->hourOffset = json.contains("hourOffset")? json.at("hourOffset").get<float>() : 0.f;
 		out->debugMode = json.contains("debugMode")? json.at("debugMode").get<bool>() : false;

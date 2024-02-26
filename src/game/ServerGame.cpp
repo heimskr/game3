@@ -304,7 +304,7 @@ namespace Game3 {
 	}
 
 	void ServerGame::handlePacket(RemoteClient &client, Packet &packet) {
-		packet.handle(*this, client);
+		packet.handle(getSelf(), client);
 	}
 
 	std::tuple<bool, std::string> ServerGame::commandHelper(RemoteClient &client, const std::string &command) {
@@ -350,7 +350,7 @@ namespace Game3 {
 					item_name = "base:item/" + std::string(item_name);
 
 				if (auto item = registry<ItemRegistry>()[Identifier(item_name)]) {
-					player->give(ItemStack(*this, item, count, std::move(data)));
+					player->give(ItemStack(shared_from_this(), item, count, std::move(data)));
 					return {true, "Gave " + std::to_string(count) + " x " + item->name};
 				}
 
@@ -709,7 +709,7 @@ namespace Game3 {
 					return {false, "Unknown entity type."};
 
 				RealmPtr realm = player->getRealm();
-				EntityPtr entity = (*factory)(*this);
+				EntityPtr entity = (*factory)(shared_from_this());
 				entity->spawning = true;
 				entity->setRealm(realm);
 				realm->queueEntityInit(std::move(entity), player->getPosition());

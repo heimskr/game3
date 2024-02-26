@@ -21,13 +21,13 @@ namespace Game3 {
 			return;
 		}
 
-		AgentPtr first_agent = game.getAgent(firstGID);
+		AgentPtr first_agent = game->getAgent(firstGID);
 		if (!first_agent) {
 			client.send(ErrorPacket("Can't move slots: first agent not found (" + std::to_string(firstGID) + ')'));
 			return;
 		}
 
-		AgentPtr second_agent = game.getAgent(secondGID);
+		AgentPtr second_agent = game->getAgent(secondGID);
 		if (!second_agent) {
 			client.send(ErrorPacket("Can't move slots: second agent not found"));
 			return;

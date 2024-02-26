@@ -26,6 +26,7 @@ namespace Game3 {
 
 	class GameDB {
 		private:
+			// TODO: weak_ptr
 			ServerGame &game;
 			std::filesystem::path path;
 

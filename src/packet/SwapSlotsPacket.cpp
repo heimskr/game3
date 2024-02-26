@@ -18,7 +18,7 @@ namespace Game3 {
 			return;
 		}
 
-		AgentPtr first_agent = game.getAgent(firstGID);
+		AgentPtr first_agent = game->getAgent(firstGID);
 		if (!first_agent) {
 			client.send(ErrorPacket("Can't swap slots: first agent not found"));
 			return;
@@ -35,7 +35,7 @@ namespace Game3 {
 			return;
 		}
 
-		AgentPtr second_agent = game.getAgent(secondGID);
+		AgentPtr second_agent = game->getAgent(secondGID);
 		if (!second_agent) {
 			client.send(ErrorPacket("Can't swap slots: second agent not found"));
 			return;

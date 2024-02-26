@@ -15,7 +15,7 @@ namespace Game3 {
 		if (!player)
 			return;
 
-		auto recipe = game.registry<CraftingRecipeRegistry>().maybe(recipeIndex);
+		auto recipe = game->registry<CraftingRecipeRegistry>().maybe(recipeIndex);
 		if (!recipe)
 			return;
 
@@ -24,7 +24,7 @@ namespace Game3 {
 		std::optional<std::vector<ItemStack>> leftovers;
 
 		for (size_t i = 0; i < count; ++i) {
-			if (!recipe->craft(game.shared_from_this(), inventory, inventory, leftovers))
+			if (!recipe->craft(game, inventory, inventory, leftovers))
 				break;
 
 			if (leftovers) {

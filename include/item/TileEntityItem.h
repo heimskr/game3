@@ -13,8 +13,8 @@ namespace Game3 {
 			using Item::Item;
 			bool use(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers, std::pair<float, float>) override {
 				Realm &realm = *place.realm;
-				Game  &game  = realm.getGame();
-				assert(game.getSide() == Side::Server);
+				GamePtr game = realm.getGame();
+				assert(game->getSide() == Side::Server);
 
 				const PlayerPtr &player   = place.player;
 				const Position  &position = place.position;
@@ -37,7 +37,7 @@ namespace Game3 {
 					return false;
 
 				if (std::shared_ptr<T> tile_entity = TileEntity::spawn<T>(place.realm, position)) {
-					game.toServer().tileEntitySpawned(tile_entity);
+					game->toServer().tileEntitySpawned(tile_entity);
 					if (--stack.count == 0)
 						inventory->erase(slot);
 					inventory->notifyOwner();

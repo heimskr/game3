@@ -357,7 +357,7 @@ namespace Game3 {
 			raw_json = query.getColumn(0).getString();
 		}
 
-		RealmPtr realm = Realm::fromJSON(game, nlohmann::json::parse(raw_json), false);
+		RealmPtr realm = Realm::fromJSON(game.shared_from_this(), nlohmann::json::parse(raw_json), false);
 
 		{
 			SQLite::Statement query{*database, "SELECT tileEntityID, encoded, globalID FROM tileEntities WHERE realmID = ?"};
@@ -407,7 +407,7 @@ namespace Game3 {
 
 				auto factory = game.registry<EntityFactoryRegistry>().at(entity_id);
 				assert(factory);
-				EntityPtr entity = (*factory)(game);
+				EntityPtr entity = (*factory)(game.shared_from_this());
 
 				const auto *buffer_bytes = reinterpret_cast<const uint8_t *>(query.getColumn(1).getBlob());
 				const size_t buffer_size = query.getColumn(1).getBytes();
@@ -417,7 +417,7 @@ namespace Game3 {
 				Buffer buffer(std::vector<uint8_t>(buffer_bytes, buffer_bytes + buffer_size));
 				buffer.context = game.shared_from_this();
 				entity->decode(buffer);
-				entity->init(game);
+				entity->init(game.shared_from_this());
 
 				{
 					auto lock = realm->entities.uniqueLock();
@@ -614,7 +614,7 @@ namespace Game3 {
 			statement.bind(5, tile_entity->tileID.str());
 			statement.bind(6, tile_entity->tileEntityID.str());
 			Buffer buffer;
-			tile_entity->encode(tile_entity->getGame(), buffer);
+			tile_entity->encode(*tile_entity->getGame(), buffer);
 			statement.bind(7, buffer.bytes.data(), buffer.bytes.size());
 			statement.exec();
 			statement.reset();

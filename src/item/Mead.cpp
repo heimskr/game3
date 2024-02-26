@@ -11,14 +11,14 @@ namespace Game3 {
 	bool Mead::use(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers, std::pair<float, float>) {
 		RealmPtr realm = place.realm;
 		PlayerPtr player = place.player;
-		Game &game = realm->getGame();
-		assert(game.getSide() == Side::Server);
+		GamePtr game = realm->getGame();
+		assert(game->getSide() == Side::Server);
 
 		if (place.position == player->getPosition())
 			return use(slot, stack, player, modifiers);
 
 		if (std::optional<FluidTile> tile = realm->tryFluid(place.position); !tile || tile->level == 0) {
-			std::shared_ptr<Fluid> fluid = game.registry<FluidRegistry>().at("base:fluid/mead"_id);
+			std::shared_ptr<Fluid> fluid = game->registry<FluidRegistry>().at("base:fluid/mead"_id);
 			if (!fluid)
 				return false;
 

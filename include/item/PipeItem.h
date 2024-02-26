@@ -57,7 +57,7 @@ namespace Game3 {
 					return *return_value;
 
 				if (modifiers.onlyShift()) {
-					Game &game = place.getGame();
+					GamePtr game = place.getGame();
 
 					bool self_present = false;
 					bool others_present = false;
@@ -66,10 +66,11 @@ namespace Game3 {
 						if (pipe->getPresent(pipe_type)) {
 							if (pipe_type == P) {
 								self_present = true;
-								place.player->give(ItemStack(game, getPipeItem(game, pipe_type), 1));
+								place.player->give(ItemStack(game, getPipeItem(*game, pipe_type), 1));
 								pipe->setPresent(P, false);
-							} else
+							} else {
 								others_present = true;
+							}
 						}
 					}
 

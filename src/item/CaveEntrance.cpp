@@ -18,8 +18,8 @@
 namespace Game3 {
 	bool CaveEntrance::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		Realm &realm = *place.realm;
-		Game  &game  = realm.getGame();
-		assert(game.getSide() == Side::Server);
+		GamePtr game = realm.getGame();
+		assert(game->getSide() == Side::Server);
 
 		const PlayerPtr &player   = place.player;
 		const Position  &position = place.position;
@@ -36,7 +36,7 @@ namespace Game3 {
 			if (tile_entity->tileID == "base:tile/cave"_id && tile_entity->is("base:te/building"_id)) {
 				if (auto building = std::dynamic_pointer_cast<Building>(tile_entity)) {
 					realm_id = building->innerRealmID;
-					if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game.getRealm(*realm_id)))
+					if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game->getRealm(*realm_id)))
 						++cave_realm->entranceCount;
 					else
 						throw std::runtime_error("Cave entrance leads to realm " + std::to_string(*realm_id) + ", which isn't a cave");
@@ -49,20 +49,20 @@ namespace Game3 {
 		bool emplaced = false;
 
 		if (!realm_id) {
-			realm_id = game.newRealmID();
-			const int cave_seed = -2 * realm.seed - 5 + game.cavesGenerated;
+			realm_id = game->newRealmID();
+			const int cave_seed = -2 * realm.seed - 5 + game->cavesGenerated;
 			auto new_realm = Realm::create<Cave>(game, *realm_id, realm.id, cave_seed);
 			new_realm->outdoors = false;
 			Position entrance_position;
 			WorldGen::generateCaveFull(new_realm, threadContext.rng, cave_seed, exit_position, entrance_position, realm.id, {{-1, -1}, {1, 1}});
 			entrance = entrance_position;
-			game.addRealm(*realm_id, new_realm);
-			++game.cavesGenerated;
+			game->addRealm(*realm_id, new_realm);
+			++game->cavesGenerated;
 			emplaced = true;
 		}
 
 		if (auto tile_entity = TileEntity::spawn<Building>(place.realm, "base:tile/cave"_id, position, *realm_id, entrance)) {
-			game.toServer().tileEntitySpawned(tile_entity);
+			game->toServer().tileEntitySpawned(tile_entity);
 			const InventoryPtr inventory = player->getInventory(0);
 			auto inventory_lock = inventory->uniqueLock();
 			if (--stack.count == 0)
@@ -72,7 +72,7 @@ namespace Game3 {
 		}
 
 		if (emplaced)
-			game.removeRealm(*realm_id);
+			game->removeRealm(*realm_id);
 
 		return false;
 	}

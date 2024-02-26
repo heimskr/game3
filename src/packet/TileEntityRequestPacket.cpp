@@ -54,7 +54,7 @@ namespace Game3 {
 	}
 
 	void TileEntityRequestPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
-		RealmPtr realm = game.tryRealm(realmID);
+		RealmPtr realm = game->tryRealm(realmID);
 		if (!realm) {
 			client.send(ErrorPacket("Invalid realm"));
 			return;

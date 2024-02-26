@@ -54,7 +54,7 @@ namespace Game3 {
 	}
 
 	void EntityRequestPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
-		RealmPtr realm = game.tryRealm(realmID);
+		RealmPtr realm = game->tryRealm(realmID);
 		if (!realm) {
 			client.send(ErrorPacket("Invalid realm"));
 			return;
@@ -69,7 +69,7 @@ namespace Game3 {
 			if (auto iter = realm->entitiesByGID.find(entity_id); iter != realm->entitiesByGID.end()) {
 				iter->second->sendTo(client, threshold);
 			} else {
-				auto entity = game.getAgent<Entity>(entity_id);
+				auto entity = game->getAgent<Entity>(entity_id);
 				if (!entity) {
 					WARN_("Can't tell client to destroy entity " << entity_id << ": entity not found.");
 				} else if (entity->realmID != realmID && entity != client.getPlayer()) {

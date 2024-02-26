@@ -6,6 +6,6 @@
 
 namespace Game3 {
 	void CommandPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
-		game.runCommand(client, command, commandID);
+		game->runCommand(client, command, commandID);
 	}
 }

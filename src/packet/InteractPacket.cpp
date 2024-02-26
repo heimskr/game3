@@ -19,7 +19,7 @@ namespace Game3 {
 			ItemStack *held_item = player->getHeld(hand);
 
 			if (globalID) {
-				if (AgentPtr agent = game.getAgent<Agent>(*globalID)) {
+				if (AgentPtr agent = game->getAgent<Agent>(*globalID)) {
 					if (direct)
 						agent->onInteractOn(player, modifiers, held_item, hand);
 					else
