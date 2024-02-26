@@ -237,7 +237,7 @@ namespace Game3 {
 			Entity() = delete;
 			Entity(EntityType);
 
-			bool canMoveTo(const Position &) const;
+			virtual bool canMoveTo(const Position &) const;
 			/** A list of functions to call the next time the entity moves. Each function returns whether it should be removed from the queue. */
 			Lockable<std::list<std::function<bool(const std::shared_ptr<Entity> &, bool)>>> moveQueue;
 			std::shared_ptr<Texture> getTexture();

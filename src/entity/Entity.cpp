@@ -586,7 +586,8 @@ namespace Game3 {
 		type(type_) {}
 
 	bool Entity::canMoveTo(const Position &new_position) const {
-		auto realm = weakRealm.lock();
+		RealmPtr realm = weakRealm.lock();
+
 		if (!realm)
 			return false;
 

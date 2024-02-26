@@ -3,6 +3,7 @@
 #include "graphics/BatchSpriteRenderer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
+#include "realm/Realm.h"
 
 namespace Game3 {
 	namespace {
@@ -23,6 +24,26 @@ namespace Game3 {
 
 	float Ship::getMovementSpeed() const {
 		return MOVEMENT_SPEED;
+	}
+
+	bool Ship::canMoveTo(const Position &new_position) const {
+		if (!Entity::canMoveTo(new_position))
+			return false;
+
+		RealmPtr realm = getRealm();
+		Position position = getPosition();
+		bool out = true;
+
+		iterateTiles([&](const Position &iterated_position) {
+			if (!realm->hasFluid(new_position + (iterated_position - position))) {
+				out = false;
+				return true;
+			}
+
+			return false;
+		});
+
+		return out;
 	}
 
 	bool Ship::onInteractOn(const std::shared_ptr<Player> &player, Modifiers, ItemStack *, Hand) {
