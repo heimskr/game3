@@ -195,10 +195,11 @@ namespace Game3 {
 		});
 		glArea.add_controller(drag);
 
-		auto motion = Gtk::EventControllerMotion::create();
+		motion = Gtk::EventControllerMotion::create();
 		motion->signal_motion().connect([this](double x, double y) {
 			glAreaMouseX = x;
 			glAreaMouseY = y;
+			glAreaModifiers = Modifiers(motion->get_current_event_state());
 		});
 		glArea.add_controller(motion);
 
@@ -651,6 +652,11 @@ namespace Game3 {
 		}
 
 		return -1;
+	}
+
+	Position MainWindow::getHoveredPosition() const {
+		assert(game);
+		return game->translateCanvasCoordinates(glAreaMouseX, glAreaMouseY);
 	}
 
 	void MainWindow::openModule(const Identifier &module_id, const std::any &argument) {

@@ -71,7 +71,7 @@ namespace Game3 {
 
 			virtual void onDestroy(Game &, ItemStack &) const {}
 
-			virtual void renderEffects(const RendererContext &, ItemStack &) const {}
+			virtual void renderEffects(const RendererContext &, const Position &, Modifiers, ItemStack &) const {}
 
 		protected:
 			mutable std::unique_ptr<uint8_t[]> rawImage;
@@ -138,7 +138,7 @@ namespace Game3 {
 			void onDestroy();
 			void onDestroy(Game &);
 
-			void renderEffects(const RendererContext &);
+			void renderEffects(const RendererContext &, const Position &, Modifiers);
 
 			void encode(Game &, Buffer &);
 			void decode(Game &, Buffer &);

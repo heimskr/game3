@@ -1,9 +1,10 @@
 #pragma once
 
-#include "types/Types.h"
 #include "client/ClientSettings.h"
 #include "threading/MTQueue.h"
 #include "threading/Lockable.h"
+#include "types/Types.h"
+#include "ui/Modifiers.h"
 
 #include <atomic>
 #include <chrono>
@@ -30,6 +31,7 @@ namespace Game3 {
 	class InventoryTab;
 	class TextTab;
 	class Tab;
+	struct Position;
 	struct WorldGenParams;
 
 	class MainWindow: public Gtk::ApplicationWindow {
@@ -85,6 +87,9 @@ namespace Game3 {
 
 			inline auto getActiveTab() const { return activeTab; }
 
+			inline Modifiers getModifiers() const { return glAreaModifiers; }
+			Position getHoveredPosition() const;
+
 			void openModule(const Identifier &, const std::any &);
 			void removeModule();
 			void showFluids(const std::shared_ptr<HasFluids> &);
@@ -95,8 +100,6 @@ namespace Game3 {
 			void moduleMessage(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Args &&...args) {
 				moduleMessageBuffer(module_id, source, name, Buffer{std::forward<Args>(args)...});
 			}
-
-			friend class Canvas;
 
 		private:
 			constexpr static std::chrono::milliseconds keyRepeatTime {100};
@@ -124,6 +127,7 @@ namespace Game3 {
 			double lastDragY = 0.;
 			double glAreaMouseX = 0.;
 			double glAreaMouseY = 0.;
+			Modifiers glAreaModifiers;
 			bool autofocus = true;
 			bool statusbarWaiting = false;
 			std::chrono::system_clock::time_point statusbarSetTime;
@@ -131,6 +135,7 @@ namespace Game3 {
 			Glib::RefPtr<Gtk::GestureClick> middleClick;
 			Glib::RefPtr<Gtk::GestureClick> rightClick;
 			Glib::RefPtr<Gtk::GestureDrag> dragGesture;
+			Glib::RefPtr<Gtk::EventControllerMotion> motion;
 			std::optional<std::pair<double, double>> dragStart;
 			Lockable<std::deque<std::unique_ptr<Gtk::Dialog>>> dialogQueue;
 			std::chrono::system_clock::time_point lastRenderTime = std::chrono::system_clock::now();
@@ -187,5 +192,7 @@ namespace Game3 {
 				tabMap.emplace(&tab->getWidget(), tab);
 				return *tab;
 			}
+
+		friend class Canvas;
 	};
 }

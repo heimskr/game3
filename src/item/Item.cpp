@@ -259,8 +259,8 @@ namespace Game3 {
 		item->onDestroy(game, *this);
 	}
 
-	void ItemStack::renderEffects(const RendererContext &context) {
-		item->renderEffects(context, *this);
+	void ItemStack::renderEffects(const RendererContext &context, const Position &position, Modifiers modifiers) {
+		item->renderEffects(context, position, modifiers, *this);
 	}
 
 	void ItemStack::encode(Game &game, Buffer &buffer) {

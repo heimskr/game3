@@ -143,20 +143,46 @@ namespace Game3 {
 			auto lock = stack.data.uniqueLock();
 
 			if (modifiers.onlyCtrl()) {
-				stack.data.erase("positions");
+				if (!stack.data.is_null()) {
+					stack.data.erase("positions");
+					stack.data.erase("min");
+				}
 			} else {
+				const Position &position = place.position;
 				std::unordered_set<Position> positions;
 
 				if (auto iter = stack.data.find("positions"); iter != stack.data.end())
 					positions = *iter;
 
-				if (auto iter = positions.find(place.position); iter != positions.end()) {
+				if (auto iter = positions.find(position); iter != positions.end()) {
 					positions.erase(iter);
+					if (positions.empty()) {
+						stack.data.erase("min");
+					} else if (auto iter = stack.data.find("min"); iter != stack.data.end()) {
+						auto &min = *iter;
+						if (position.row == min[0] || position.column == min[1]) {
+							std::optional<Position> minimums = computeMinimums(positions);
+							assert(minimums);
+							stack.data["min"] = *minimums;
+						}
+					}
 				} else {
-					positions.insert(place.position);
+					positions.insert(position);
+					if (auto iter = stack.data.find("min"); iter != stack.data.end()) {
+						auto &min = *iter;
+						min[0] = std::min(min[0].get<Index>(), position.row);
+						min[1] = std::min(min[1].get<Index>(), position.column);
+					} else {
+						stack.data["min"] = position;
+					}
 				}
 
-				stack.data["positions"] = std::move(positions);
+				if (positions.empty()) {
+					stack.data.erase("min");
+					stack.data.erase("positions");
+				} else {
+					stack.data["positions"] = std::move(positions);
+				}
 			}
 		}
 
@@ -164,7 +190,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Copier::renderEffects(const RendererContext &context, ItemStack &stack) const {
+	void Copier::renderEffects(const RendererContext &context, const Position &mouse_position, Modifiers modifiers, ItemStack &stack) const {
 		RectangleRenderer &rectangle = context.rectangle;
 
 		std::unordered_set<Position> positions = getPositions(stack);
@@ -178,5 +204,38 @@ namespace Game3 {
 				.color = {1.f, 1.f, 0.f, .5f},
 			});
 		}
+
+		if (modifiers == Modifiers(true, true, false, false)) {
+			auto iter = stack.data.find("min");
+			if (iter == stack.data.end())
+				return;
+
+			Position anchor = *iter;
+
+			for (const Position &position: positions) {
+				Position adjusted = position - anchor + mouse_position;
+				rectangle.drawOnMap(RenderOptions{
+					.x = double(adjusted.column),
+					.y = double(adjusted.row),
+					.sizeX = 1.,
+					.sizeY = 1.,
+					.color = {.5f, .5f, .5f, .5f},
+				});
+			}
+		}
+	}
+
+	std::optional<Position> Copier::computeMinimums(const std::unordered_set<Position> &positions) {
+		if (positions.empty())
+			return std::nullopt;
+
+		Position out = *positions.begin();
+
+		for (const Position &position: positions) {
+			out.row = std::min(out.row, position.row);
+			out.column = std::min(out.column, position.column);
+		}
+
+		return out;
 	}
 }

@@ -102,9 +102,12 @@ namespace Game3 {
 			.align = TextAlign::Center,
 		});
 
-		if (InventoryPtr inventory = getInventory(0))
-			if (ItemStack *active = inventory->getActive())
-				active->renderEffects(renderers);
+		if (InventoryPtr inventory = getInventory(0)) {
+			if (ItemStack *active = inventory->getActive()) {
+				MainWindow &window = getGame()->toClient().getWindow();
+				active->renderEffects(renderers, window.getHoveredPosition(), window.getModifiers());
+			}
+		}
 	}
 
 	void ClientPlayer::renderLighting(const RendererContext &renderers) {
