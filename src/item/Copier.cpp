@@ -127,22 +127,26 @@ namespace Game3 {
 		return true;
 	}
 
-	bool Copier::drag(Slot, ItemStack &stack, const Place &place, Modifiers) {
-
+	bool Copier::drag(Slot, ItemStack &stack, const Place &place, Modifiers modifiers) {
 		auto lock = stack.data.uniqueLock();
 
-		std::unordered_set<Position> positions;
-
-		if (auto iter = stack.data.find("positions"); iter != stack.data.end())
-			positions = *iter;
-
-		if (auto iter = positions.find(place.position); iter != positions.end()) {
-			positions.erase(iter);
+		if (modifiers.onlyCtrl()) {
+			stack.data.erase("positions");
 		} else {
-			positions.insert(place.position);
+			std::unordered_set<Position> positions;
+
+			if (auto iter = stack.data.find("positions"); iter != stack.data.end())
+				positions = *iter;
+
+			if (auto iter = positions.find(place.position); iter != positions.end()) {
+				positions.erase(iter);
+			} else {
+				positions.insert(place.position);
+			}
+
+			stack.data["positions"] = std::move(positions);
 		}
 
-		stack.data["positions"] = std::move(positions);
 		place.player->getInventory(0)->notifyOwner();
 		return true;
 	}
