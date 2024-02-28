@@ -20,7 +20,8 @@ namespace Game3 {
 			constexpr static BiomeType DESERT    = 4;
 			constexpr static BiomeType CAVE      = 5;
 			constexpr static BiomeType GRIMSTONE = 6;
-			constexpr static BiomeType COUNT     = GRIMSTONE + 1;
+			constexpr static BiomeType SHIP      = 7;
+			constexpr static BiomeType COUNT     = SHIP + 1;
 
 			const BiomeType type;
 

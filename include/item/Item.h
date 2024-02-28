@@ -1,8 +1,9 @@
 #pragma once
 
-#include "types/Types.h"
 #include "data/Identifier.h"
 #include "registry/Registerable.h"
+#include "threading/Lockable.h"
+#include "types/Types.h"
 #include "ui/Modifiers.h"
 
 #include <gtkmm.h>
@@ -21,6 +22,7 @@ namespace Game3 {
 	class Realm;
 	class Texture;
 	struct Position;
+	struct RendererContext;
 
 	class Item: public NamedRegisterable, public std::enable_shared_from_this<Item> {
 		public:
@@ -67,7 +69,9 @@ namespace Game3 {
 			/** Whether the item's use function (see Item::use) should be called when the user interacts with a floor tile and this item is selected in the inventory tab. */
 			virtual bool canUseOnWorld() const { return false; }
 
-			virtual void onDestroy(Game &, ItemStack &) {}
+			virtual void onDestroy(Game &, ItemStack &) const {}
+
+			virtual void renderEffects(const RendererContext &, ItemStack &) const {}
 
 		protected:
 			mutable std::unique_ptr<uint8_t[]> rawImage;
@@ -79,7 +83,7 @@ namespace Game3 {
 		public:
 			std::shared_ptr<Item> item;
 			ItemCount count = 1;
-			nlohmann::json data;
+			Lockable<nlohmann::json> data;
 
 			ItemStack() = default;
 			ItemStack(const std::shared_ptr<Game> &);
@@ -133,6 +137,8 @@ namespace Game3 {
 
 			void onDestroy();
 			void onDestroy(Game &);
+
+			void renderEffects(const RendererContext &);
 
 			void encode(Game &, Buffer &);
 			void decode(Game &, Buffer &);

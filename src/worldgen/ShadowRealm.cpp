@@ -4,6 +4,7 @@
 #include "realm/ShadowRealm.h"
 #include "realm/Realm.h"
 #include "tools/Mazer.h"
+#include "util/Cast.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 #include "worldgen/ShadowRealm.h"
@@ -90,7 +91,7 @@ namespace Game3::WorldGen {
 		});
 
 		if (initial_generation)
-			std::dynamic_pointer_cast<ShadowRealm>(realm)->worldgenParams = params;
+			safeDynamicCast<ShadowRealm>(realm)->worldgenParams = params;
 
 		{
 			Timer pathmap_timer("RemakePathMap");

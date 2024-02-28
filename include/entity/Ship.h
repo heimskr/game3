@@ -13,6 +13,7 @@ namespace Game3 {
 
 			std::string getName() const override { return "Ship"; }
 
+			void onSpawn() override;
 			void updateRiderOffset(const EntityPtr &rider) override;
 			RideType getRideType() const override { return RideType::Hidden; }
 			bool moveFromRider(const EntityPtr &, Direction, MovementContext) override;
@@ -27,7 +28,12 @@ namespace Game3 {
 			Vector2i getDimensions() const override { return {2, 2}; }
 
 		protected:
+			RealmID internalRealmID = -1;
+			Position realmOrigin{CHUNK_SIZE / 2, CHUNK_SIZE / 2};
+
 			Ship();
+
+			void teleportToRealm(const std::shared_ptr<Player> &);
 
 		friend class Entity;
 	};

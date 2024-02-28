@@ -20,4 +20,10 @@ namespace Game3 {
 
 		return false;
 	}
+
+	bool VoidFlask::drag(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers) {
+		if (modifiers.onlyShift())
+			return use(slot, stack, place, modifiers, {0.f, 0.f});
+		return false;
+	}
 }

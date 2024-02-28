@@ -101,6 +101,10 @@ namespace Game3 {
 			.y = float(row) + y - z + name_offset,
 			.align = TextAlign::Center,
 		});
+
+		if (InventoryPtr inventory = getInventory(0))
+			if (ItemStack *active = inventory->getActive())
+				active->renderEffects(renderers);
 	}
 
 	void ClientPlayer::renderLighting(const RendererContext &renderers) {

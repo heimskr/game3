@@ -1,19 +1,19 @@
 #include <iostream>
 
-#include "types/Position.h"
-#include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
+#include "graphics/Tileset.h"
 #include "item/Bomb.h"
 #include "realm/Realm.h"
+#include "types/Position.h"
 
 namespace Game3 {
 	bool Bomb::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
-		constexpr Index  DIAMETER = 5;
-		constexpr double RADIUS = DIAMETER / 2.;
+		constexpr static Index DIAMETER = 5;
+		constexpr static double RADIUS = DIAMETER / 2.;
 
-		auto &realm  = *place.realm;
+		Realm &realm = *place.realm;
 		const auto [prow, pcol] = place.position;
 
 		for (Index row = prow - DIAMETER; row <= prow + DIAMETER; ++row) {
@@ -28,11 +28,7 @@ namespace Game3 {
 		}
 
 		const InventoryPtr inventory = place.player->getInventory(0);
-		auto inventory_lock = inventory->uniqueLock();
-		if (--stack.count == 0)
-			inventory->erase(slot);
-		inventory->notifyOwner();
-
+		inventory->decrease(stack, slot, 1, true);
 		return true;
 	}
 }

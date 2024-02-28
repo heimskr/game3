@@ -7,5 +7,6 @@ namespace Game3 {
 		public:
 			using Item::Item;
 			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
+			bool drag(Slot, ItemStack &, const Place &, Modifiers) override;
 	};
 }

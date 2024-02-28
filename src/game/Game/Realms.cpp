@@ -4,6 +4,7 @@
 #include "realm/Overworld.h"
 #include "realm/RealmFactory.h"
 #include "realm/ShadowRealm.h"
+#include "realm/ShipRealm.h"
 
 namespace Game3 {
 	void Game::add(RealmFactory &&factory) {
@@ -28,6 +29,7 @@ namespace Game3 {
 		addRealm.operator()<Cave>(Cave::ID());
 		addRealm.operator()<Realm>("base:realm/tavern");
 		addRealm.operator()<Realm>("base:realm/keep");
+		addRealm.operator()<ShipRealm>(ShipRealm::ID());
 	}
 
 	RealmPtr Game::tryRealm(RealmID realm_id) const {

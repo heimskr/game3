@@ -1,9 +1,11 @@
 #include "entity/Player.h"
 #include "entity/Ship.h"
+#include "game/Game.h"
 #include "graphics/BatchSpriteRenderer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "realm/Realm.h"
+#include "realm/ShipRealm.h"
 
 namespace Game3 {
 	namespace {
@@ -12,6 +14,17 @@ namespace Game3 {
 
 	Ship::Ship():
 		Entity(ID()) {}
+
+	void Ship::onSpawn() {
+		GamePtr game = getGame();
+
+		if (game->getSide() != Side::Server)
+			return;
+
+		internalRealmID = game->newRealmID();
+		RealmPtr ship_realm = Realm::create<ShipRealm>(game, internalRealmID, ShipRealm::ID(), "base:tileset/monomap", 0);
+		game->addRealm(ship_realm);
+	}
 
 	void Ship::updateRiderOffset(const EntityPtr &rider) {
 		rider->setOffset(getOffset() + Vector3{.5f, .5f, 0.f});
@@ -46,17 +59,29 @@ namespace Game3 {
 		return out;
 	}
 
-	bool Ship::onInteractOn(const std::shared_ptr<Player> &player, Modifiers, ItemStack *, Hand) {
+	bool Ship::onInteractOn(const std::shared_ptr<Player> &player, Modifiers modifiers, ItemStack *, Hand) {
+		bool out = false;
+
 		if (getRider() == player) {
 			setRider(nullptr);
-			return true;
+			out = true;
 		}
 
-		return false;
+		if (modifiers.onlyCtrl()) {
+			teleportToRealm(player);
+			out = true;
+		}
+
+		return out;
 	}
 
-	bool Ship::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, ItemStack *, Hand) {
-		setRider(player);
+	bool Ship::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers modifiers, ItemStack *, Hand) {
+		if (modifiers.onlyCtrl()) {
+			teleportToRealm(player);
+		} else {
+			setRider(player);
+		}
+
 		return true;
 	}
 
@@ -86,9 +111,29 @@ namespace Game3 {
 
 	void Ship::encode(Buffer &buffer) {
 		Entity::encode(buffer);
+		buffer << internalRealmID;
+		buffer << realmOrigin;
 	}
 
 	void Ship::decode(Buffer &buffer) {
 		Entity::decode(buffer);
+		buffer >> internalRealmID;
+		buffer >> realmOrigin;
+	}
+
+	void Ship::teleportToRealm(const std::shared_ptr<Player> &player) {
+		if (internalRealmID == RealmID(-1))
+			throw std::runtime_error("Ship is missing internal realm");
+
+		RealmPtr internal_realm = getGame()->getRealm(internalRealmID);
+
+		if (!internal_realm)
+			throw std::runtime_error("Ship is missing internal realm");
+
+		INFO("Teleporting player to ship realm {}", internalRealmID);
+
+		player->teleport(realmOrigin, internal_realm, MovementContext{
+			.isTeleport = true,
+		});
 	}
 }

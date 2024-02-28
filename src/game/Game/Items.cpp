@@ -11,6 +11,7 @@
 #include "item/ChemicalReactorItem.h"
 #include "item/CombinerItem.h"
 #include "item/ContainmentOrb.h"
+#include "item/Copier.h"
 #include "item/CreativeGeneratorItem.h"
 #include "item/DissolverItem.h"
 #include "item/EmptyFlask.h"
@@ -81,6 +82,8 @@ namespace Game3 {
 		add(std::make_shared<CombinerItem>("base:item/combiner", "Combiner", 999, 64)); // TODO: cost
 
 		add(std::make_shared<ContainmentOrb>("base:item/contorb", "Containment Orb", 64, 1)); // TODO: cost
+
+		add(std::make_shared<Copier>("base:item/copier", "Copier", 0, 1));
 
 		add(std::make_shared<CreativeGeneratorItem>("base:item/creative_generator", "Creative Generator", 999, 64)); // TODO: cost
 
@@ -230,6 +233,8 @@ namespace Game3 {
 		add(Furniture::createSimple("base:item/ace_flag",         "Asexual Flag",      80, Layer::Highest,   "base:tile/ace_flag"));
 		add(Furniture::createSimple("base:item/nb_flag",          "Nonbinary Flag",    80, Layer::Highest,   "base:tile/nb_flag"));
 		add(Furniture::createSimple("base:item/knives",           "Knives",            10, Layer::Highest,   "base:tile/knives"));
+		add(Furniture::createSimple("base:item/planks",           "Planks",           999, Layer::Terrain,   "base:tile/planks")); // TODO: cost
+		add(Furniture::createSimple("base:item/ship_wheel",       "Ship Wheel",       999, Layer::Objects,   "base:tile/ship_wheel")); // TODO: cost
 		add(Furniture::createSimple("base:item/kitchen_utensils", "Kitchen Utensils",  10, Layer::Highest,   "base:tile/kitchen_utensils"));
 		add(Furniture::createSimple("base:item/plant_pot1",       "Plant Pot",         32, Layer::Submerged, "base:tile/plant1"));
 		add(Furniture::createSimple("base:item/plant_pot2",       "Plant Pot",         32, Layer::Submerged, "base:tile/plant2"));
