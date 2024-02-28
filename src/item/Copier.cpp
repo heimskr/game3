@@ -9,6 +9,7 @@
 #include "item/Copier.h"
 #include "realm/Realm.h"
 #include "types/Position.h"
+#include "tools/Paster.h"
 #include "util/Util.h"
 
 #include <sstream>
@@ -25,12 +26,18 @@ namespace Game3 {
 	}
 
 	bool Copier::use(Slot, ItemStack &stack, const std::shared_ptr<Player> &player, Modifiers) {
+		std::cout << getTiles(stack, player->getRealm()) << '\n';
+		return true;
+	}
+
+	std::string Copier::getTiles(const ItemStack &stack, const RealmPtr &realm) const {
+		// TODO: fluids
+
 		std::set<Position> positions = getPositions<std::set>(stack);
 
 		if (positions.empty())
-			return true;
+			return {};
 
-		RealmPtr realm = player->getRealm();
 		Tileset &tileset = realm->getTileset();
 		std::map<Position, size_t> spans;
 		std::optional<Position> last_position;
@@ -122,29 +129,35 @@ namespace Game3 {
 		if (!combined.empty() && combined.back() == '\n')
 			combined.pop_back();
 
-		std::cout << combined << '\n';
-
-		return true;
+		return combined;
 	}
 
 	bool Copier::drag(Slot, ItemStack &stack, const Place &place, Modifiers modifiers) {
-		auto lock = stack.data.uniqueLock();
+		if (modifiers == Modifiers(true, true, false, false)) {
+			std::string tiles = getTiles(stack, place.realm);
+			Paster(std::string_view(tiles)).paste(*place.realm, place.position);
+			return true;
+		}
 
-		if (modifiers.onlyCtrl()) {
-			stack.data.erase("positions");
-		} else {
-			std::unordered_set<Position> positions;
+		{
+			auto lock = stack.data.uniqueLock();
 
-			if (auto iter = stack.data.find("positions"); iter != stack.data.end())
-				positions = *iter;
-
-			if (auto iter = positions.find(place.position); iter != positions.end()) {
-				positions.erase(iter);
+			if (modifiers.onlyCtrl()) {
+				stack.data.erase("positions");
 			} else {
-				positions.insert(place.position);
-			}
+				std::unordered_set<Position> positions;
 
-			stack.data["positions"] = std::move(positions);
+				if (auto iter = stack.data.find("positions"); iter != stack.data.end())
+					positions = *iter;
+
+				if (auto iter = positions.find(place.position); iter != positions.end()) {
+					positions.erase(iter);
+				} else {
+					positions.insert(place.position);
+				}
+
+				stack.data["positions"] = std::move(positions);
+			}
 		}
 
 		place.player->getInventory(0)->notifyOwner();
