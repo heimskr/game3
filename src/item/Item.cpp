@@ -43,6 +43,8 @@ namespace Game3 {
 		return cachedImage;
 	}
 
+	Item::~Item() = default;
+
 	Glib::RefPtr<Gdk::Pixbuf> Item::makeImage(const Game &game, const ItemStack &stack) const {
 		auto item_texture = game.registry<ItemTextureRegistry>().at(getTextureIdentifier(stack));
 		auto texture = item_texture->getTexture();

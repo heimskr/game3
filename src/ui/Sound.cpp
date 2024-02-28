@@ -9,6 +9,7 @@ namespace Game3 {
 
 	SoundEngine::~SoundEngine() {
 		ma_engine_uninit(&engine);
+		ma_resource_manager_uninit(&resourceManager);
 	}
 
 	void SoundEngine::play(const std::filesystem::path &path) {

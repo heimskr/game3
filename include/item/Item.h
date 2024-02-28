@@ -33,7 +33,7 @@ namespace Game3 {
 
 			Item() = delete;
 			Item(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count = 64);
-			virtual ~Item() = default;
+			virtual ~Item();
 
 			Item(const Item &) = delete;
 			Item(Item &&) = default;
