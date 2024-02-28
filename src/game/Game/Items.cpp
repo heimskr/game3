@@ -250,11 +250,12 @@ namespace Game3 {
 		add(Furniture::createSimple("base:item/red_bed",          "Red Bed",           90, Layer::Objects,   "base:tile/bed2"));
 		add(Furniture::createSimple("base:item/purple_bed",       "Purple Bed",        90, Layer::Objects,   "base:tile/bed3"));
 
-		add(Furniture::createMarchable("base:item/wooden_wall",     "Wooden Wall",      9, Layer::Objects,   "base:tile/wooden_wall",     "base:autotile/wooden_walls"));
-		add(Furniture::createMarchable("base:item/tower",           "Tower",           10, Layer::Objects,   "base:tile/tower",           "base:autotile/towers"));
-		add(Furniture::createMarchable("base:item/kitchen_counter", "Kitchen Counter", 10, Layer::Objects,   "base:tile/kitchen_counter", "base:autotile/kitchen_counters"));
-		add(Furniture::createMarchable("base:item/dining_table",    "Dining Table",    10, Layer::Objects,   "base:tile/dining_table",    "base:autotile/dining_tables"));
-		add(Furniture::createMarchable("base:item/fence",           "Fence",           10, Layer::Submerged, "base:tile/fence",           "base:autotile/fences"));
+		add(Furniture::createMarchable("base:item/wooden_wall",      "Wooden Wall",       9, Layer::Objects,   "base:tile/wooden_wall",      "base:autotile/wooden_walls"));
+		add(Furniture::createMarchable("base:item/tall_wooden_wall", "Tall Wooden Wall",  9, Layer::Objects,   "base:tile/tall_wooden_wall", "base:autotile/tall_wooden_walls"));
+		add(Furniture::createMarchable("base:item/tower",            "Tower",            10, Layer::Objects,   "base:tile/tower",            "base:autotile/towers"));
+		add(Furniture::createMarchable("base:item/kitchen_counter",  "Kitchen Counter",  10, Layer::Objects,   "base:tile/kitchen_counter",  "base:autotile/kitchen_counters"));
+		add(Furniture::createMarchable("base:item/dining_table",     "Dining Table",     10, Layer::Objects,   "base:tile/dining_table",     "base:autotile/dining_tables"));
+		add(Furniture::createMarchable("base:item/fence",            "Fence",            10, Layer::Submerged, "base:tile/fence",            "base:autotile/fences"));
 
 		add(Furniture::createStation("base:item/furnace",       "Furnace",        12, "base:tile/furnace",           "base:station/furnace"));
 		add(Furniture::createStation("base:item/anvil",         "Anvil",         150, "base:tile/anvil",             "base:station/anvil"));

@@ -9,13 +9,14 @@
 		"base:autotile/fluid_extractors":  "base:tile/fluid_extractors",
 		"base:autotile/item_extractors":   "base:tile/item_extractors",
 		"base:autotile/towers":            "base:tile/tower",
-		"base:autotile/wooden_walls":      "base:tile/wooden_wall",
+		"base:autotile/wooden_walls":      "base:category/wooden_walls",
 		"base:autotile/town_dirt":         "base:tile/town_dirt",
 		"base:autotile/stone":             "base:tile/stone",
 		"base:autotile/kitchen_counters":  "base:tile/kitchen_counter",
 		"base:autotile/dining_tables":     "base:tile/dining_table",
 		"base:autotile/fences":            "base:tile/fence",
-		"base:autotile/carpets":           "base:category/autotiled_carpets"
+		"base:autotile/carpets":           "base:category/autotiled_carpets",
+		"base:autotile/tall_wooden_walls": "base:tile/tall_wooden_wall"
 	},
 	"omnitiles": [
 		"base:autotile/fences"
