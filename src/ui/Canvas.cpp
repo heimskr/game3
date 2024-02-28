@@ -84,7 +84,16 @@ namespace Game3 {
 			}
 		}
 
-		if (realm) {
+		bool do_lighting{};
+		{
+			auto lock = window.settings.sharedLock();
+			do_lighting = window.settings.renderLighting;
+		}
+
+		if (!realm)
+			return;
+
+		if (do_lighting) {
 			GL::FBOBinder binder = fbo.getBinder();
 			mainTexture.useInFB();
 			glViewport(0, 0, width, height); CHECKGL
@@ -136,8 +145,23 @@ namespace Game3 {
 			context.updateSize(getWidth(), getHeight());
 			glViewport(0, 0, width, height); CHECKGL
 			multiplier(mainTexture, scratchTexture);
-			realmBounds = game->getVisibleRealmBounds();
+
+		} else {
+			RendererContext context = getRendererContext();
+			GL::clear(.2, .2, .2);
+			context.updateSize(getWidth(), getHeight());
+
+			if (realm->prerender()) {
+				batchSpriteRenderer.update(*this);
+				singleSpriteRenderer.update(*this);
+				textRenderer.update(*this);
+				context.updateSize(width, height);
+			}
+
+			realm->render(getWidth() / getFactor(), getHeight() / getFactor(), center, scale / getFactor(), context, 1.f); CHECKGL
 		}
+
+		realmBounds = game->getVisibleRealmBounds();
 	}
 
 	int Canvas::getWidth() const {
@@ -160,6 +184,6 @@ namespace Game3 {
 	}
 
 	RendererContext Canvas::getRendererContext() {
-		return {rectangleRenderer, singleSpriteRenderer, batchSpriteRenderer, textRenderer, circleRenderer, getFactor()};
+		return {rectangleRenderer, singleSpriteRenderer, batchSpriteRenderer, textRenderer, circleRenderer, window.settings, getFactor()};
 	}
 }

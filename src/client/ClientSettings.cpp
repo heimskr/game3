@@ -13,12 +13,13 @@ namespace Game3 {
 
 	std::unique_ptr<JSONDialog> ClientSettings::makeDialog(Gtk::Window &parent, std::function<void(const ClientSettings &)> submit) const {
 		auto dialog = std::make_unique<JSONDialog>(parent, "Settings", nlohmann::json{
-			{"hostname",          "text",    "Default Hostname",    {{"initial", hostname}}},
-			{"port",              "number",  "Default Port",        {{"initial", std::to_string(port)}}},
-			{"username",          "text",    "Default Username",    {{"initial", username}}},
-			{"alertOnConnection", "bool",    "Alert on Connection", {{"initial", alertOnConnection}}},
-			{"sizeDivisor",       "slider", "Size Divisor",         {{"range", {-0.5, 4.0}},  {"increments", {0.1, 0.5}}, {"initial", sizeDivisor},   {"digits", 1}}},
-			{"tickFrequency",     "slider", "Tick Frequency",       {{"range", {1.0, 240.0}}, {"increments", {1.0, 4.0}}, {"initial", tickFrequency}, {"digits", 0}}},
+			{"hostname",          "text",   "Default Hostname",    {{"initial", hostname}}},
+			{"port",              "number", "Default Port",        {{"initial", std::to_string(port)}}},
+			{"username",          "text",   "Default Username",    {{"initial", username}}},
+			{"alertOnConnection", "bool",   "Alert on Connection", {{"initial", alertOnConnection}}},
+			{"renderLighting",    "bool",   "Render Lighting",     {{"initial", renderLighting}}},
+			{"sizeDivisor",       "slider", "Size Divisor",        {{"range", {-0.5, 4.0}},  {"increments", {0.1, 0.5}}, {"initial", sizeDivisor},   {"digits", 1}}},
+			{"tickFrequency",     "slider", "Tick Frequency",      {{"range", {1.0, 240.0}}, {"increments", {1.0, 4.0}}, {"initial", tickFrequency}, {"digits", 0}}},
 			{"ok", "ok", "OK"},
 		});
 
@@ -42,6 +43,8 @@ namespace Game3 {
 			settings.sizeDivisor = *iter;
 		if (auto iter = json.find("tickFrequency"); iter != json.end())
 			settings.tickFrequency = *iter;
+		if (auto iter = json.find("renderLighting"); iter != json.end())
+			settings.renderLighting = *iter;
 	}
 
 	void to_json(nlohmann::json &json, const ClientSettings &settings) {
@@ -52,5 +55,6 @@ namespace Game3 {
 		json["alertOnConnection"] = settings.alertOnConnection;
 		json["sizeDivisor"] = settings.sizeDivisor;
 		json["tickFrequency"] = settings.tickFrequency;
+		json["renderLighting"] = settings.renderLighting;
 	}
 }

@@ -221,16 +221,24 @@ namespace Game3 {
 		PlayerPtr player = game.getPlayer();
 		assert(player);
 
+		auto &[rectangle_renderer, single_sprite, batch_sprite, text_renderer, circle_renderer, settings, factor] = renderers;
+
+		float effective_time = outdoors? game_time : 1;
+
 		if (baseRenderers) {
+			{
+				auto lock = settings.sharedLock();
+				if (!settings.renderLighting)
+					effective_time = 1;
+			}
+
 			for (auto &row: *baseRenderers) {
 				for (ElementBufferedRenderer &renderer: row) {
 					renderer.onBackbufferResized(width, height);
-					renderer.render(outdoors? game_time : 1, scale, center.first, center.second); CHECKGL
+					renderer.render(effective_time, scale, center.first, center.second); CHECKGL
 				}
 			}
 		}
-
-		auto &[rectangle_renderer, single_sprite, batch_sprite, text_renderer, circle_renderer, factor] = renderers;
 
 		batch_sprite.centerX = center.first;
 		batch_sprite.centerY = center.second;
@@ -269,7 +277,7 @@ namespace Game3 {
 			for (auto &row: *upperRenderers) {
 				for (UpperRenderer &renderer: row) {
 					renderer.onBackbufferResized(width, height);
-					renderer.render(outdoors? game_time : 1, scale, center.first, center.second); CHECKGL
+					renderer.render(effective_time, scale, center.first, center.second); CHECKGL
 				}
 			}
 		}
