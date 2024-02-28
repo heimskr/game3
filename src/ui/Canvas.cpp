@@ -106,13 +106,16 @@ namespace Game3 {
 				batchSpriteRenderer.update(*this);
 				singleSpriteRenderer.update(*this);
 				textRenderer.update(*this);
-				context.updateSize(width, height);
+				context.updateSize(getWidth(), getHeight());
 				glViewport(0, 0, width, height); CHECKGL
+				// Skip a frame to avoid glitchiness
+				return;
 			}
 
 			realm->render(width, height, center, scale, context, game->getDivisor()); CHECKGL
 
 			dynamicLightingTexture.useInFB();
+
 			realm->renderLighting(width, height, center, scale, context, game->getDivisor()); CHECKGL
 
 			scratchTexture.useInFB();

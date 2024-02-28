@@ -1549,7 +1549,6 @@ namespace Game3 {
 		Timer timer("RemakeStaticLightingTexture");
 		Canvas &canvas = game.canvas;
 		GL::Texture &texture = canvas.staticLightingTexture;
-		game.activateContext();
 		GL::FBOBinder binder = canvas.fbo.getBinder();
 		GL::TextureFBOBinder texture_binder = texture.getBinder();
 		GL::clear(0, 0, 0, 0);
