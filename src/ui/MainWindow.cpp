@@ -178,8 +178,10 @@ namespace Game3 {
 		add_controller(key_controller);
 
 		auto drag = Gtk::GestureDrag::create();
+		drag->set_button(2);
 		drag->signal_drag_begin().connect([this](double, double) {
 			lastDragX = lastDragY = 0;
+			autofocus = false;
 		});
 		drag->signal_drag_update().connect([this](double x, double y) {
 			double delta_x = x - lastDragX;
