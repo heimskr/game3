@@ -56,6 +56,8 @@ namespace Game3 {
 		bool operator<(const Identifier &) const;
 	};
 
+	std::ostream & operator<<(std::ostream &, const Identifier &);
+
 	void from_json(const nlohmann::json &, Identifier &);
 	void to_json(nlohmann::json &, const Identifier &);
 

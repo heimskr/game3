@@ -56,6 +56,8 @@ namespace Game3 {
 		std::string simpleString() const { return std::to_string(row) + ',' + std::to_string(column); }
 	};
 
+	std::ostream & operator<<(std::ostream &, const Position &);
+
 	void to_json(nlohmann::json &, const Position &);
 	void from_json(const nlohmann::json &, Position &);
 	Buffer & operator+=(Buffer &, const Position &);

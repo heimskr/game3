@@ -185,6 +185,10 @@ namespace Game3 {
 		return this == &other || (position == other.position && realm == other.realm && player == other.player);
 	}
 
+	std::ostream & operator<<(std::ostream &os, const Position &position) {
+		return os << '(' << position.row << ", " << position.column << ')';
+	}
+
 	void to_json(nlohmann::json &json, const Position &position) {
 		json[0] = position.row;
 		json[1] = position.column;

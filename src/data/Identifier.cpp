@@ -64,6 +64,10 @@ namespace Game3 {
 		return name < other.name;
 	}
 
+	std::ostream & operator<<(std::ostream &os, const Identifier &identifier) {
+		return os << identifier.space << ':' << identifier.name;
+	}
+
 	void from_json(const nlohmann::json &json, Identifier &identifier) {
 		identifier = std::string_view(json.get<std::string>());
 	}
