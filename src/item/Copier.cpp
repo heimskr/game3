@@ -86,7 +86,7 @@ namespace Game3 {
 		}
 
 		std::stringstream ss;
-		ss << join(identifiers, ";") << '\n';
+		ss << join(identifiers, ";") << '/';
 		for (const auto [anchor, span_length]: spans) {
 			ss << (anchor.row - min_row) << ',' << (anchor.column - min_column) << '=';
 			Position position = anchor;
@@ -122,11 +122,11 @@ namespace Game3 {
 				++position.column;
 			}
 
-			ss << '\n';
+			ss << '/';
 		}
 
 		std::string combined = ss.str();
-		if (!combined.empty() && combined.back() == '\n')
+		if (!combined.empty() && combined.back() == '/')
 			combined.pop_back();
 
 		return combined;
