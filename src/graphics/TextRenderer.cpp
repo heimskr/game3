@@ -96,6 +96,7 @@ namespace Game3 {
 	void TextRenderer::update(const Canvas &canvas) {
 		centerX = canvas.center.first;
 		centerY = canvas.center.second;
+		update(canvas.getWidth(), canvas.getHeight());
 	}
 
 	void TextRenderer::update(int width, int height) {
