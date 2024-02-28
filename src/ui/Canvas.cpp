@@ -148,8 +148,9 @@ namespace Game3 {
 
 		} else {
 			RendererContext context = getRendererContext();
+			glViewport(0, 0, width, height); CHECKGL
 			GL::clear(.2, .2, .2);
-			context.updateSize(getWidth(), getHeight());
+			context.updateSize(width, height);
 
 			if (realm->prerender()) {
 				batchSpriteRenderer.update(*this);
@@ -158,7 +159,7 @@ namespace Game3 {
 				context.updateSize(width, height);
 			}
 
-			realm->render(getWidth() / getFactor(), getHeight() / getFactor(), center, scale / getFactor(), context, 1.f); CHECKGL
+			realm->render(width, height, center, scale, context, 1.f); CHECKGL
 		}
 
 		realmBounds = game->getVisibleRealmBounds();
