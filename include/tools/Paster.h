@@ -13,8 +13,10 @@ namespace Game3 {
 
 	class Paster {
 		public:
+			Paster() = default;
 			Paster(std::string_view);
 
+			void ingest(std::string_view);
 			void paste(Realm &, const Position &anchor);
 
 		private:

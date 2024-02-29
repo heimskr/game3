@@ -9,6 +9,13 @@ namespace Game3 {
 	class RemoteClient;
 
 	Paster::Paster(std::string_view string) {
+		ingest(string);
+	}
+
+	void Paster::ingest(std::string_view string) {
+		identifiers.clear();
+		tiles.clear();
+
 		std::vector<std::string_view> lines = split(string, "/", true);
 		if (lines.empty())
 			throw std::invalid_argument("Invalid Paster input: no lines");

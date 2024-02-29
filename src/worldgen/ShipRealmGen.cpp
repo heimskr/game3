@@ -3,6 +3,7 @@
 #include "game/Game.h"
 #include "realm/ShipRealm.h"
 #include "realm/Realm.h"
+#include "tools/Paster.h"
 #include "util/Cast.h"
 #include "util/Timer.h"
 #include "util/Util.h"
@@ -31,6 +32,8 @@ namespace Game3::WorldGen {
 			}
 		}
 
+		Paster paster;
+
 		range.iterate([&](ChunkPosition chunk_position) {
 			chunk_position.iterate([&](const Position &position) {
 				realm->setTile(Layer::Terrain, position, "base:tile/sand", false);
@@ -43,6 +46,11 @@ namespace Game3::WorldGen {
 			for (Index i = 1; i < CHUNK_SIZE; ++i) {
 				realm->setTile(Layer::Objects, top_left + Position{0, i}, "base:tile/barrier", false);
 				realm->setTile(Layer::Objects, top_left + Position{i, 0}, "base:tile/barrier", false);
+			}
+
+			if (chunk_position == ChunkPosition{0, 0}) {
+				paster.ingest("empty;planks;tall_wooden_wall;sand;wooden_wall;bed2;grate_nw;grate_ne;ship_wheel;grate_mw;grate_me;barrier;grate_sw;grate_se/0,0=1:0:2,,3:0:2,,,,,1:0:2,1:0:4,,,,,,,,,,,,,/1,0=1:0:2,1:0:5,,,,,,1:0:2,1,,,,,,,,,,,,,1:0:4,/2,0=1:0:2,1,,,,,,1:0:2,1,,,,,,,,,1:6,1:7,1,,,1:0:4,/3,0=1:0:2,1,,,,,,,,,1:0:8,1,,,,,,1:9,1:10,1,,,,1:0:4,/4,0=1:0:2,1,,,,,,1:11,1,,,,,,,,,1:12,1:13,1,,,1:0:4,/5,0=1:0:2,1,,,,,,1:0:4,1,,,,,,,,,,,,,1:0:4,/6,0=1:0:4,,3:0:4,,,,,1:0:4,,,,,,,,,,,,,,");
+				paster.paste(*realm, chunk_position.topLeft() + Position{29, 23});
 			}
 
 			provider.updateChunk(chunk_position);
