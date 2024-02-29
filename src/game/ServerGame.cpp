@@ -434,11 +434,18 @@ namespace Game3 {
 				return {true, ss.str()};
 			}
 
-			if (first == "submerge" || first == "terrain") {
+			if (first == "submerge" || first == "terrain" || first == "objects" || first == "obj") {
 				if (words.size() != 2)
 					return {false, "Invalid number of arguments."};
-				player->getRealm()->setTile(first == "submerge"? Layer::Submerged : Layer::Terrain, player->getPosition(), words.at(1));
-				return {true, "Set tile."};
+				std::string_view word = words.at(1);
+				Identifier identifier = word.find(':') == std::string_view::npos? "base:tile/" + std::string(word) : word;
+				Layer layer = Layer::Objects;
+				if (first == "submerge")
+					layer = Layer::Submerged;
+				else if (first == "terrain")
+					layer = Layer::Terrain;
+				player->getRealm()->setTile(layer, player->getPosition(), identifier);
+				return {true, ""};
 			}
 
 			if (first == "saveall") {
