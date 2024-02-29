@@ -11,6 +11,7 @@ namespace Game3 {
 
 			~Crate() override = default;
 
+			Identifier itemName;
 			std::string name;
 
 			std::string getName() const override;
@@ -28,7 +29,7 @@ namespace Game3 {
 
 		protected:
 			Crate() = default;
-			Crate(Identifier tile_id, const Position &, std::string name_);
+			Crate(Identifier tile_id, const Position &, Identifier item_name, std::string name_);
 			Crate(const Position &);
 
 		friend class TileEntity;

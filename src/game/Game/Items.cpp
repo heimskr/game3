@@ -275,7 +275,15 @@ namespace Game3 {
 		}));
 
 		add(Furniture::createTileEntity("base:item/crate", "Crate", 999, [](const Place &place) -> bool { // TODO: cost
-			auto out = TileEntity::spawn<Crate>(place, "base:tile/crate", place.position, "Crate");
+			auto out = TileEntity::spawn<Crate>(place, "base:tile/crate", place.position, "base:item/crate", "Crate");
+			if (!out)
+				return false;
+			out->setInventory(1);
+			return true;
+		}));
+
+		add(Furniture::createTileEntity("base:item/barrel", "Barrel", 999, [](const Place &place) -> bool { // TODO: cost
+			auto out = TileEntity::spawn<Crate>(place, "base:tile/barrel", place.position, "base:item/barrel", "Barrel");
 			if (!out)
 				return false;
 			out->setInventory(1);

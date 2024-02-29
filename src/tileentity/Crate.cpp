@@ -13,15 +13,11 @@
 #include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
-	namespace {
-		constexpr Identifier ITEM_NAME{"base", "te/crate"};
-	}
-
-	Crate::Crate(Identifier tile_id, const Position &position_, std::string name_):
-		TileEntity(std::move(tile_id), ID(), position_, true), name(std::move(name_)) {}
+	Crate::Crate(Identifier tile_id, const Position &position_, Identifier item_name, std::string name_):
+		TileEntity(std::move(tile_id), ID(), position_, true), itemName(std::move(item_name)), name(std::move(name_)) {}
 
 	Crate::Crate(const Position &position_):
-		Crate("base:tile/crate"_id, position_, "Crate") {}
+		Crate("base:tile/crate"_id, position_, "base:item/crate", "Crate") {}
 
 	std::string Crate::getName() const {
 		return name;
@@ -30,6 +26,7 @@ namespace Game3 {
 	void Crate::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
 		json["name"] = name;
+		json["itemName"] = itemName;
 		if (InventoryPtr inventory = getInventory(0))
 			json["inventory"] = dynamic_cast<ExpandedServerInventory &>(*inventory);
 	}
@@ -43,7 +40,7 @@ namespace Game3 {
 				return false;
 			});
 			queueDestruction();
-			player->give(ItemStack(getGame(), ITEM_NAME));
+			player->give(ItemStack(getGame(), itemName));
 		} else {
 			addObserver(player, false);
 		}
@@ -55,6 +52,7 @@ namespace Game3 {
 		TileEntity::absorbJSON(game, json);
 		assert(getSide() == Side::Server);
 		name = json.at("name");
+		itemName = json.at("itemName");
 		if (auto iter = json.find("inventory"); iter != json.end())
 			HasInventory::setInventory(std::make_shared<ExpandedServerInventory>(ServerInventory::fromJSON(game, *iter, shared_from_this())), 0);
 	}
@@ -62,6 +60,7 @@ namespace Game3 {
 	void Crate::encode(Game &game, Buffer &buffer) {
 		TileEntity::encode(game, buffer);
 		InventoriedTileEntity::encode(game, buffer);
+		buffer << itemName;
 		buffer << name;
 	}
 
@@ -72,6 +71,7 @@ namespace Game3 {
 			decodeSpecific<ClientInventory>(buffer, 0);
 		else
 			decodeSpecific<ExpandedServerInventory>(buffer, 0);
+		buffer >> itemName;
 		buffer >> name;
 	}
 
