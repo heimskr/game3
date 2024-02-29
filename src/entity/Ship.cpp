@@ -26,6 +26,16 @@ namespace Game3 {
 		game->addRealm(ship_realm);
 	}
 
+	void Ship::onDestroy() {
+		INFO_("Ship::onDestroy()");
+		GamePtr game = getGame();
+
+		if (game->getSide() == Side::Server && internalRealmID != RealmID(-1)) {
+			INFO("Removing ship realm {}", internalRealmID);
+			game->removeRealm(internalRealmID);
+		}
+	}
+
 	void Ship::updateRiderOffset(const EntityPtr &rider) {
 		rider->setOffset(getOffset() + Vector3{.5f, .5f, 0.f});
 	}
@@ -61,6 +71,11 @@ namespace Game3 {
 
 	bool Ship::onInteractOn(const std::shared_ptr<Player> &player, Modifiers modifiers, ItemStack *, Hand) {
 		bool out = false;
+
+		if (modifiers == Modifiers{false, true, true, false}) {
+			remove();
+			return true;
+		}
 
 		if (getRider() == player) {
 			setRider(nullptr);

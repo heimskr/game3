@@ -14,6 +14,7 @@ namespace Game3 {
 			std::string getName() const override { return "Ship"; }
 
 			void onSpawn() override;
+			void onDestroy() override;
 			void updateRiderOffset(const EntityPtr &rider) override;
 			RideType getRideType() const override { return RideType::Hidden; }
 			bool moveFromRider(const EntityPtr &, Direction, MovementContext) override;

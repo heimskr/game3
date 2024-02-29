@@ -113,6 +113,8 @@ namespace Game3 {
 			virtual bool shouldPersist() const { return true; }
 			virtual void onCreate() {}
 			virtual void onSpawn() {}
+			/** Called at the beginning of destroy(). */
+			virtual void onDestroy() {}
 			std::string getName() const override { return "Unknown Entity (" + std::string(type) + ')'; }
 
 			virtual bool isPlayer() const { return false; }

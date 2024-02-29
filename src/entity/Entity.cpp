@@ -61,8 +61,9 @@ namespace Game3 {
 
 	void Entity::destroy() {
 		clearQueues();
-		auto realm = getRealm();
-		auto shared = getSelf();
+		onDestroy();
+		RealmPtr realm = getRealm();
+		EntityPtr shared = getSelf();
 		realm->removeSafe(shared);
 		GamePtr game = getGame();
 
