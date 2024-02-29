@@ -13,12 +13,6 @@ namespace Game3 {
 			RealmID parentRealm;
 			std::atomic_size_t entranceCount = 1;
 
-			Cave(const Cave &) = delete;
-			Cave(Cave &&) = delete;
-
-			Cave & operator=(const Cave &) = delete;
-			Cave & operator=(Cave &&) = delete;
-
 			void clearLighting(float) override;
 			void onRemove() override;
 			void reveal(const Position &, bool force = false);

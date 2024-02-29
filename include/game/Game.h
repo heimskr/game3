@@ -140,14 +140,12 @@ namespace Game3 {
 			std::shared_ptr<T> getAgent(GlobalID gid) {
 				auto shared_lock = allAgents.sharedLock();
 				if (auto iter = allAgents.find(gid); iter != allAgents.end()) {
-					if (auto agent = iter->second.lock()) {
+					if (auto agent = iter->second.lock())
 						return std::dynamic_pointer_cast<T>(agent);
-					} else {
-						// This should *probably* not result in a data race in practice...
-						shared_lock.unlock();
-						auto unique_lock = allAgents.uniqueLock();
-						allAgents.erase(gid);
-					}
+					// This should *probably* not result in a bad data race in practice...
+					shared_lock.unlock();
+					auto unique_lock = allAgents.uniqueLock();
+					allAgents.erase(gid);
 				}
 
 				return nullptr;

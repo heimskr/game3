@@ -10,11 +10,11 @@ namespace Game3 {
 
 			WorldGenParams worldgenParams;
 
-			using Realm::Realm;
-
 			void generateChunk(const ChunkPosition &) override;
 
 		protected:
+			using Realm::Realm;
+
 			void absorbJSON(const nlohmann::json &, bool full_data) override;
 			void toJSON(nlohmann::json &, bool full_data) const override;
 	};

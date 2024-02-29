@@ -22,7 +22,7 @@ namespace Game3 {
 			return;
 
 		internalRealmID = game->newRealmID();
-		RealmPtr ship_realm = Realm::create<ShipRealm>(game, internalRealmID, ShipRealm::ID(), "base:tileset/monomap", 0);
+		auto ship_realm = Realm::create<ShipRealm>(game, internalRealmID, getGID(), 0);
 		game->addRealm(ship_realm);
 	}
 
