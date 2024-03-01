@@ -48,8 +48,8 @@ namespace Game3 {
 			throw std::invalid_argument("Invalid slot count");
 
 		for (Slot slot = range.min; slot <= range.max; ++slot) {
-			if (const ItemStack *stack = other[slot])
-				set(slot, *stack);
+			if (ItemStackPtr stack = other[slot])
+				set(slot, stack);
 			else
 				erase(slot);
 		}
@@ -60,8 +60,8 @@ namespace Game3 {
 			throw std::invalid_argument("Invalid slot count");
 
 		for (Slot slot = range.min; slot <= range.max; ++slot) {
-			if (ItemStack *stack = other[slot])
-				set(slot, std::move(*stack));
+			if (ItemStackPtr stack = other[slot])
+				set(slot, std::move(stack));
 			else
 				erase(slot);
 		}

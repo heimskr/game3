@@ -10,7 +10,7 @@ namespace Game3 {
 	TerrainSeed::TerrainSeed(ItemID id_, std::string name_, Identifier target_tilename, Identifier replacement_tilename, MoneyCount base_price, ItemCount max_count):
 		Item(id_, std::move(name_), base_price, max_count), targetTilename(std::move(target_tilename)), replacementTilename(std::move(replacement_tilename)) {}
 
-	bool TerrainSeed::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
+	bool TerrainSeed::use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		Realm &realm = *place.realm;
 		Tileset &tileset = realm.getTileset();
 
@@ -34,7 +34,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool TerrainSeed::drag(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers) {
+	bool TerrainSeed::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers) {
 		return use(slot, stack, place, modifiers, {0.f, 0.f});
 	}
 }

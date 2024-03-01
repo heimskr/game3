@@ -14,7 +14,7 @@ namespace Game3 {
 
 		const InventoryPtr inventory = player->getInventory(0);
 
-		if (auto *stack = inventory->getActive())
-			stack->item->use(inventory->activeSlot, *stack, {position, player->getRealm(), player}, modifiers, {offsetX, offsetY});
+		if (ItemStackPtr stack = inventory->getActive())
+			stack->item->use(inventory->activeSlot, *stack, Place{position, player->getRealm(), player}, modifiers, {offsetX, offsetY});
 	}
 }

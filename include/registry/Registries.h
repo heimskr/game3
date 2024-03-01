@@ -103,8 +103,7 @@ namespace Game3 {
 	struct TileRegistry: NamedRegistry<Tile> {
 		static Identifier ID() { return {"base", "registry/tile"}; }
 		TileRegistry(): NamedRegistry(ID()) {}
-		void addMineable(Identifier, const ItemStack &, bool consumable);
-		void addMineable(Identifier, ItemStack &&, bool consumable);
+		void addMineable(Identifier, const ItemStackPtr &, bool consumable);
 	};
 
 	struct CropRegistry: NamedRegistry<Crop> {

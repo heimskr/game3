@@ -238,18 +238,18 @@ namespace Game3 {
 
 			bool any_added = false;
 
-			std::vector<ItemStack> inputs, outputs;
+			std::vector<ItemStackPtr> inputs, outputs;
 
-			for (ItemStack &stack: crop_tile->crop->products.getStacks()) {
-				if (stack.hasAttribute("base:attribute/plantable"))
-					inputs.push_back(std::move(stack));
+			for (const ItemStackPtr &stack: crop_tile->crop->products.getStacks()) {
+				if (stack->hasAttribute("base:attribute/plantable"))
+					inputs.push_back(stack);
 				else
-					outputs.push_back(std::move(stack));
+					outputs.push_back(stack);
 			}
 
-			for (const ItemStack &input: inputs) {
-				if (std::optional<ItemStack> leftover = input_span->add(input)) {
-					if (leftover->count < input.count)
+			for (const ItemStackPtr &input: inputs) {
+				if (ItemStackPtr leftover = input_span->add(input)) {
+					if (leftover->count < input->count)
 						any_added = true;
 					break;
 				} else {
@@ -257,9 +257,9 @@ namespace Game3 {
 				}
 			}
 
-			for (const ItemStack &output: outputs) {
-				if (std::optional<ItemStack> leftover = output_span.add(output)) {
-					if (leftover->count < output.count)
+			for (const ItemStackPtr &output: outputs) {
+				if (ItemStackPtr leftover = output_span.add(output)) {
+					if (leftover->count < output->count)
 						any_added = true;
 					break;
 				} else {
@@ -281,8 +281,8 @@ namespace Game3 {
 			std::shared_ptr<Plantable> plantable;
 			Slot slot{};
 
-			ItemStack *stack = input_span->firstItem(&slot, [&](const ItemStack &stack, Slot) -> bool {
-				plantable = std::dynamic_pointer_cast<Plantable>(stack.item);
+			ItemStackPtr stack = input_span->firstItem(&slot, [&](const ItemStackPtr &stack, Slot) -> bool {
+				plantable = std::dynamic_pointer_cast<Plantable>(stack->item);
 				return plantable != nullptr;
 			});
 

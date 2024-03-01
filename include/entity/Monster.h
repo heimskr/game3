@@ -37,7 +37,7 @@ namespace Game3 {
 			virtual float getMinimumAgeForDespawn() const;
 
 			bool isSpawnableMonster() const override { return true; }
-			std::vector<ItemStack> getDrops() override;
+			std::vector<ItemStackPtr> getDrops() override;
 
 			std::shared_ptr<LivingEntity> getTarget();
 			void setTarget(const std::shared_ptr<LivingEntity> &);

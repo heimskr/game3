@@ -16,7 +16,7 @@ namespace Game3 {
 
 			std::string getName() const override;
 
-			ItemCount itemsInsertable(const ItemStack &, Direction, Slot) override;
+			ItemCount itemsInsertable(const ItemStackPtr &, Direction, Slot) override;
 
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;

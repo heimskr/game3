@@ -51,7 +51,7 @@ namespace Game3 {
 
 		auto &registry = game->registry<CentrifugeRecipeRegistry>();
 
-		std::optional<ItemStack> leftovers;
+		std::optional<ItemStackPtr> leftovers;
 		const InventoryPtr inventory = getInventory(0);
 		auto inventory_lock = inventory->uniqueLock();
 		for (const std::shared_ptr<CentrifugeRecipe> &recipe: registry.items)

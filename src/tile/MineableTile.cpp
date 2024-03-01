@@ -8,10 +8,10 @@
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
-	MineableTile::MineableTile(Identifier identifier_, ItemStack stack_, bool consumable_):
+	MineableTile::MineableTile(Identifier identifier_, ItemStackPtr stack_, bool consumable_):
 		Tile(std::move(identifier_)), stack(std::move(stack_)), consumable(consumable_) {}
 
-	bool MineableTile::interact(const Place &place, Layer layer, ItemStack *held_item, Hand hand) {
+	bool MineableTile::interact(const Place &place, Layer layer, const ItemStackPtr &held_item, Hand hand) {
 		if (layer == Layer::Terrain) {
 			// Terrain isn't mineable.
 			return false;
@@ -40,11 +40,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void TileRegistry::addMineable(Identifier tilename, const ItemStack &stack, bool consumable) {
-		add(tilename, std::make_unique<MineableTile>(tilename, stack, consumable));
-	}
-
-	void TileRegistry::addMineable(Identifier tilename, ItemStack &&stack, bool consumable) {
-		add(tilename, std::make_unique<MineableTile>(tilename, std::move(stack), consumable));
+	void TileRegistry::addMineable(Identifier tilename, const ItemStackPtr &stack, bool consumable) {
+		add(tilename, std::make_unique<MineableTile>(tilename, stack->copy(), consumable));
 	}
 }

@@ -15,10 +15,10 @@ namespace Game3 {
 				ServerInventory(std::move(other)) {}
 
 			std::unique_ptr<Inventory> copy() const override;
-			std::optional<ItemStack> add(const ItemStack &, const std::function<bool(Slot)> &, Slot start) override;
+			ItemStackPtr add(const ItemStackPtr &, const SlotPredicate &, Slot start) override;
 
-			bool canInsert(const ItemStack &, const std::function<bool(Slot)> &) const override;
-			bool canInsert(const ItemStack &, Slot) const override;
+			bool canInsert(const ItemStackPtr &, const SlotPredicate &) const override;
+			bool canInsert(const ItemStackPtr &, Slot) const override;
 	};
 
 	template <typename T>

@@ -37,7 +37,7 @@ namespace Game3 {
 	Item::Item(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count):
 		NamedRegisterable(std::move(id_)), name(std::move(name_)), basePrice(base_price), maxCount(max_count) {}
 
-	Glib::RefPtr<Gdk::Pixbuf> Item::getImage(const Game &game, const ItemStack &stack) const {
+	Glib::RefPtr<Gdk::Pixbuf> Item::getImage(const Game &game, const ConstItemStackPtr &stack) const {
 		if (!isTextureCacheable() || !cachedImage)
 			cachedImage = makeImage(game, stack);
 		return cachedImage;
@@ -45,7 +45,7 @@ namespace Game3 {
 
 	Item::~Item() = default;
 
-	Glib::RefPtr<Gdk::Pixbuf> Item::makeImage(const Game &game, const ItemStack &stack) const {
+	Glib::RefPtr<Gdk::Pixbuf> Item::makeImage(const Game &game, const ConstItemStackPtr &stack) const {
 		auto item_texture = game.registry<ItemTextureRegistry>().at(getTextureIdentifier(stack));
 		auto texture = item_texture->getTexture();
 		texture->init();
@@ -69,7 +69,7 @@ namespace Game3 {
 		       ->scale_simple(width << doublings, height << doublings, Gdk::InterpType::NEAREST);
 	}
 
-	Identifier Item::getTextureIdentifier(const ItemStack &) const {
+	Identifier Item::getTextureIdentifier(const ConstItemStackPtr &) const {
 		return identifier;
 	}
 
@@ -91,31 +91,31 @@ namespace Game3 {
 		return *this;
 	}
 
-	std::shared_ptr<Texture> Item::getTexture(const ItemStack &stack) {
+	std::shared_ptr<Texture> Item::getTexture(const ConstItemStackPtr &stack) {
 		if (isTextureCacheable() && cachedTexture)
 			return cachedTexture;
 
-		GamePtr game = stack.getGame();
+		GamePtr game = stack->getGame();
 		return cachedTexture = game->registry<ItemTextureRegistry>().at(identifier)->getTexture();
 	}
 
-	std::string Item::getTooltip(const ItemStack &) {
+	std::string Item::getTooltip(const ConstItemStackPtr &) {
 		return name;
 	}
 
-	bool Item::use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) {
+	bool Item::use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) {
 		return false;
 	}
 
-	bool Item::use(Slot, ItemStack &, const Place &, Modifiers, Hand) {
+	bool Item::use(Slot, const ItemStackPtr &, const Place &, Modifiers, Hand) {
 		return false;
 	}
 
-	bool Item::use(Slot, ItemStack &, const PlayerPtr &, Modifiers) {
+	bool Item::use(Slot, const ItemStackPtr &, const PlayerPtr &, Modifiers) {
 		return false;
 	}
 
-	bool Item::drag(Slot, ItemStack &, const Place &, Modifiers) {
+	bool Item::drag(Slot, const ItemStackPtr &, const Place &, Modifiers) {
 		return false;
 	}
 
@@ -127,25 +127,25 @@ namespace Game3 {
 	ItemStack::ItemStack(const GamePtr &game, std::shared_ptr<Item> item_, ItemCount count_):
 	item(std::move(item_)), count(count_), weakGame(game) {
 		assert(item);
-		item->initStack(*game, *this);
+		item->initStack(*game, shared_from_this());
 	}
 
 	ItemStack::ItemStack(const GamePtr &game, std::shared_ptr<Item> item_, ItemCount count_, nlohmann::json data_):
 	item(std::move(item_)), count(count_), data(std::move(data_)), weakGame(game) {
 		assert(item);
-		item->initStack(*game, *this);
+		item->initStack(*game, shared_from_this());
 	}
 
 	ItemStack::ItemStack(const GamePtr &game, const ItemID &id, ItemCount count_):
 	item(game->registry<ItemRegistry>().at(id)), count(count_), weakGame(game) {
 		assert(item);
-		item->initStack(*game, *this);
+		item->initStack(*game, shared_from_this());
 	}
 
 	ItemStack::ItemStack(const GamePtr &game, const ItemID &id, ItemCount count_, nlohmann::json data_):
 	item(game->registry<ItemRegistry>().at(id)), count(count_), data(std::move(data_)), weakGame(game) {
 		assert(item);
-		item->initStack(*game, *this);
+		item->initStack(*game, shared_from_this());
 	}
 
 	bool ItemStack::canMerge(const ItemStack &other) const {
@@ -164,23 +164,22 @@ namespace Game3 {
 			return cachedImage;
 
 		if (item)
-			return cachedImage = item->getImage(game_, *this);
+			return cachedImage = item->getImage(game_, shared_from_this());
 
 		return {};
 	}
 
-	ItemStack ItemStack::withCount(ItemCount new_count) const {
-		GamePtr game = getGame();
-		return {game, item, new_count};
+	ItemStackPtr ItemStack::withCount(ItemCount new_count) const {
+		return ItemStack::create(getGame(), item, new_count);
 	}
 
-	ItemStack ItemStack::withDurability(const GamePtr &game, const ItemID &id, Durability durability) {
-		ItemStack out(game, id, 1);
-		out.data["durability"] = std::make_pair(durability, durability);
+	ItemStackPtr ItemStack::withDurability(const GamePtr &game, const ItemID &id, Durability durability) {
+		ItemStackPtr out = ItemStack::create(game, id, 1);
+		out->data["durability"] = std::make_pair(durability, durability);
 		return out;
 	}
 
-	ItemStack ItemStack::withDurability(const GamePtr &game, const ItemID &id) {
+	ItemStackPtr ItemStack::withDurability(const GamePtr &game, const ItemID &id) {
 		return withDurability(game, id, dynamic_cast<HasMaxDurability &>(*game->registry<ItemRegistry>()[id]).maxDurability);
 	}
 
@@ -210,7 +209,7 @@ namespace Game3 {
 
 	std::string ItemStack::getTooltip() const {
 		assert(item);
-		return item->getTooltip(*this);
+		return item->getTooltip(shared_from_this());
 	}
 
 	void ItemStack::spawn(const Place &place) const {
@@ -219,7 +218,7 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Texture> ItemStack::getTexture(Game &) const {
-		return item->getTexture(*this);
+		return item->getTexture(shared_from_this());
 	}
 
 	void ItemStack::fromJSON(const GamePtr &game, const nlohmann::json &json, ItemStack &stack) {
@@ -235,7 +234,7 @@ namespace Game3 {
 				stack.data = extra;
 			}
 		}
-		stack.item->initStack(*game, stack);
+		stack.item->initStack(*game, stack.shared_from_this());
 	}
 
 	ItemStackPtr ItemStack::fromJSON(const GamePtr &game, const nlohmann::json &json) {
@@ -253,15 +252,15 @@ namespace Game3 {
 
 	void ItemStack::onDestroy() {
 		GamePtr game = getGame();
-		item->onDestroy(*game, *this);
+		item->onDestroy(*game, shared_from_this());
 	}
 
 	void ItemStack::onDestroy(Game &game) {
-		item->onDestroy(game, *this);
+		item->onDestroy(game, shared_from_this());
 	}
 
 	void ItemStack::renderEffects(const RendererContext &context, const Position &position, Modifiers modifiers) {
-		item->renderEffects(context, position, modifiers, *this);
+		item->renderEffects(context, position, modifiers, shared_from_this());
 	}
 
 	void ItemStack::encode(Game &game, Buffer &buffer) {

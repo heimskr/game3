@@ -2,31 +2,31 @@
 #include "threading/ThreadContext.h"
 
 namespace Game3 {
-	ConstantProduct::ConstantProduct(ItemStack stack_, ItemCount count_):
+	ConstantProduct::ConstantProduct(ItemStackPtr stack_, ItemCount count_):
 		stack(std::move(stack_)), count(count_) {}
 
-	std::vector<ItemStack> ConstantProduct::sample() const {
-		return {stack.withCount(count)};
+	std::vector<ItemStackPtr> ConstantProduct::sample() const {
+		return {stack->withCount(count)};
 	}
 
-	ExponentialProduct::ExponentialProduct(ItemStack stack_, ItemCount start_, double chance_):
+	ExponentialProduct::ExponentialProduct(ItemStackPtr stack_, ItemCount start_, double chance_):
 		stack(std::move(stack_)), start(start_), chance(chance_) {}
 
-	std::vector<ItemStack> ExponentialProduct::sample() const {
+	std::vector<ItemStackPtr> ExponentialProduct::sample() const {
 		ItemCount count = start;
 
 		while (std::uniform_real_distribution(0., 1.)(threadContext.rng) <= chance)
 			++count;
 
-		return {stack.withCount(count)};
+		return {stack->withCount(count)};
 	}
 
-	std::vector<ItemStack> Products::getStacks() const {
-		std::vector<ItemStack> out;
+	std::vector<ItemStackPtr> Products::getStacks() const {
+		std::vector<ItemStackPtr> out;
 		out.reserve(products.size());
 		for (const auto &product: products)
-			for (ItemStack &stack: product->sample())
-				out.push_back(std::move(stack));
+			for (const ItemStackPtr &stack: product->sample())
+				out.push_back(stack);
 		return out;
 	}
 

@@ -8,7 +8,7 @@
 #include "realm/Realm.h"
 
 namespace Game3 {
-	bool VoidFlask::use(Slot, ItemStack &, const Place &place, Modifiers, std::pair<float, float>) {
+	bool VoidFlask::use(Slot, const ItemStackPtr &, const Place &place, Modifiers, std::pair<float, float>) {
 		auto &realm  = *place.realm;
 		assert(realm.getSide() == Side::Server);
 
@@ -21,7 +21,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool VoidFlask::drag(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers) {
+	bool VoidFlask::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers) {
 		if (modifiers.onlyShift())
 			return use(slot, stack, place, modifiers, {0.f, 0.f});
 		return false;

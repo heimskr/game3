@@ -32,11 +32,13 @@ namespace Game3 {
 	}
 
 	void to_json(nlohmann::json &json, const ProductionRule &rule) {
-		json["out"] = rule.getOutput();
+		json["out"] = *rule.getOutput();
 		json["labor"] = rule.getLabor();
 
-		if (auto &inputs = rule.getInputs(); !inputs.empty())
-			json["in"]  = inputs;
+		if (const auto &inputs = rule.getInputs(); !inputs.empty()) {
+			for (const ItemStackPtr &input: inputs)
+				json["in"].push_back(*input);
+		}
 
 		if (auto cap = rule.getCap())
 			json["cap"] = *cap;

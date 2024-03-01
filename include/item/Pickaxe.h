@@ -7,8 +7,8 @@ namespace Game3 {
 		public:
 			Pickaxe(ItemID id_, std::string name_, MoneyCount base_price, float base_cooldown, Durability max_durability);
 
-			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
-			bool drag(Slot, ItemStack &, const Place &, Modifiers) override;
+			bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
+			bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers) override;
 
 		private:
 			static Identifier findDirtTilename(const Place &);

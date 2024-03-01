@@ -57,6 +57,7 @@ namespace Game3 {
 
 	class ItemStack;
 	using ItemStackPtr = std::shared_ptr<ItemStack>;
+	using ConstItemStackPtr = std::shared_ptr<const ItemStack>;
 
 	using Resources = std::map<Identifier, double>;
 

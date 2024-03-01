@@ -10,7 +10,7 @@
 #include "util/Cast.h"
 
 namespace Game3 {
-	bool ContainmentOrb::use(Slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
+	bool ContainmentOrb::use(Slot, const ItemStackPtr &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		RealmPtr realm = place.realm;
 		assert(realm->getSide() == Side::Server);
 		GamePtr game = realm->getGame();

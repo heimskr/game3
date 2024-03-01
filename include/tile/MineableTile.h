@@ -6,11 +6,11 @@
 namespace Game3 {
 	class MineableTile: public Tile {
 		private:
-			ItemStack stack;
+			ItemStackPtr stack;
 			bool consumable = false;
 
 		public:
-			MineableTile(Identifier, ItemStack, bool consumable_);
+			MineableTile(Identifier, ItemStackPtr, bool consumable_);
 
 			bool interact(const Place &, Layer, const ItemStackPtr &, Hand) override;
 	};

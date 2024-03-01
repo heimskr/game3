@@ -98,7 +98,7 @@ namespace Game3 {
 			{
 				const InventoryPtr inventory = getInventory(0);
 				auto lock = inventory->sharedLock();
-				inventory->iterate([&](const ItemStack &stack, Slot) {
+				inventory->iterate([&](const ItemStackPtr &stack, Slot) {
 					player->give(stack);
 					return false;
 				});
@@ -200,7 +200,7 @@ namespace Game3 {
 		std::shared_ptr<Inventory> inventory_copy = inventory->copy();
 		auto suppressor = inventory_copy->suppress();
 
-		std::optional<ItemStack> leftover;
+		std::optional<ItemStackPtr> leftover;
 
 		auto input_span  = std::make_shared<InventorySpan>(inventory_copy, 0, INPUT_CAPACITY - 1);
 		auto output_span = std::make_shared<InventorySpan>(inventory_copy, INPUT_CAPACITY, INPUT_CAPACITY + OUTPUT_CAPACITY - 1);

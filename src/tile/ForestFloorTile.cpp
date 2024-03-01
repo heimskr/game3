@@ -28,7 +28,7 @@ namespace Game3 {
 		if (player->hasTooldown())
 			return false;
 
-		if (ItemStack *active = inventory->getActive(); active && active->hasAttribute("base:attribute/shovel")) {
+		if (ItemStackPtr active = inventory->getActive(); active && active->hasAttribute("base:attribute/shovel")) {
 			player->setTooldown(1.f);
 
 			if (active->reduceDurability())
@@ -67,15 +67,15 @@ namespace Game3 {
 		if (!place.isPathable())
 			return;
 
-		std::vector<ItemStack> mushrooms {
-			{game, "base:item/saffron_milkcap"},
-			{game, "base:item/saffron_milkcap"},
-			{game, "base:item/saffron_milkcap"},
-			{game, "base:item/honey_fungus"},
-			{game, "base:item/honey_fungus"},
-			{game, "base:item/brittlegill"},
+		static std::vector<const char *> mushrooms {
+			"base:item/saffron_milkcap",
+			"base:item/saffron_milkcap",
+			"base:item/saffron_milkcap",
+			"base:item/honey_fungus",
+			"base:item/honey_fungus",
+			"base:item/brittlegill",
 		};
 
-		choose(mushrooms, threadContext.rng).spawn(place.realm, place.position);
+		ItemStack::spawn(place, game, choose(mushrooms));
 	}
 }

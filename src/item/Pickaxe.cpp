@@ -11,7 +11,7 @@ namespace Game3 {
 	Pickaxe::Pickaxe(ItemID id_, std::string name_, MoneyCount base_price, float base_cooldown, Durability max_durability):
 		Tool(id_, std::move(name_), base_price, base_cooldown, max_durability, "base:attribute/pickaxe"_id) {}
 
-	bool Pickaxe::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
+	bool Pickaxe::use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		Realm &realm = *place.realm;
 		Tileset &tileset = realm.getTileset();
 
@@ -30,7 +30,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool Pickaxe::drag(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers) {
+	bool Pickaxe::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers) {
 		return use(slot, stack, place, modifiers, {0.f, 0.f});
 	}
 

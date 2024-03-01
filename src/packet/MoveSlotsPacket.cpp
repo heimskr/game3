@@ -58,8 +58,8 @@ namespace Game3 {
 			// Just in case there's some trickery with shared inventories or something.
 			auto second_lock = &first_inventory == &second_inventory? std::unique_lock<DefaultMutex>() : second_inventory.uniqueLock();
 
-			ItemStack *first_stack  = first_inventory[firstSlot];
-			ItemStack *second_stack = second_inventory[secondSlot];
+			ItemStackPtr first_stack  = first_inventory[firstSlot];
+			ItemStackPtr second_stack = second_inventory[secondSlot];
 
 			if (first_stack == nullptr) {
 				return;
@@ -81,7 +81,7 @@ namespace Game3 {
 
 				if (first_inventory == second_inventory) {
 					client.send(ErrorPacket("Can't move slot to an indeterminate slot in the same inventory"));
-				} else if (std::optional<ItemStack> leftovers = second_inventory.add(*first_stack, secondSlot)) {
+				} else if (ItemStackPtr leftovers = second_inventory.add(first_stack, secondSlot)) {
 					*first_stack = std::move(*leftovers);
 				} else {
 					first_inventory.erase(firstSlot);
@@ -89,7 +89,7 @@ namespace Game3 {
 
 			} else if (second_stack != nullptr && first_stack->canMerge(*second_stack)) {
 
-				if (!second_inventory.canInsert(*first_stack)) {
+				if (!second_inventory.canInsert(first_stack)) {
 					client.send(ErrorPacket("Can't move slots: not enough room in second inventory"));
 					return;
 				}
@@ -111,7 +111,7 @@ namespace Game3 {
 						if (first_stack->count == 0)
 							first_inventory.erase(firstSlot);
 					}
-				} else if (std::optional<ItemStack> leftovers = second_inventory.add(*first_stack, secondSlot)) {
+				} else if (ItemStackPtr leftovers = second_inventory.add(first_stack, secondSlot)) {
 					*first_stack = std::move(*leftovers);
 				} else {
 					first_inventory.erase(firstSlot);
@@ -130,7 +130,7 @@ namespace Game3 {
 				if (&first_inventory != &second_inventory && second_inventory.onMove)
 					second_action = second_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, true);
 
-				if (std::optional<ItemStack> leftovers = second_inventory.add(*first_stack, secondSlot)) {
+				if (ItemStackPtr leftovers = second_inventory.add(first_stack, secondSlot)) {
 					*first_stack = std::move(*leftovers);
 				} else {
 					first_inventory.erase(firstSlot);

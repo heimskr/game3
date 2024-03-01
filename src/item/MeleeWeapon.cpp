@@ -13,7 +13,7 @@ namespace Game3 {
 		attributes.emplace("base:attribute/melee_weapon");
 	}
 
-	bool MeleeWeapon::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, Hand hand) {
+	bool MeleeWeapon::use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers, Hand hand) {
 		if (hand == Hand::None)
 			return false;
 

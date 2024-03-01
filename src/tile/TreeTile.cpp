@@ -18,7 +18,7 @@ namespace Game3 {
 		const InventoryPtr inventory = player->getInventory(0);
 		auto inventory_lock = inventory->uniqueLock();
 
-		if (ItemStack *active_stack = inventory->getActive()) {
+		if (ItemStackPtr active_stack = inventory->getActive()) {
 			if (active_stack->hasAttribute("base:attribute/axe")) {
 				auto tilename = place.getName(layer);
 
@@ -31,9 +31,9 @@ namespace Game3 {
 
 				// Make sure tree is fully grown before giving any products
 				if (tilename && tilename->get() == crop->stages.back())
-					for (const ItemStack &stack: crop->products.getStacks())
-						if (std::optional<ItemStack> leftover = inventory->add(stack))
-							leftover->spawn(place.realm, place.position);
+					for (const ItemStackPtr &stack: crop->products.getStacks())
+						if (ItemStackPtr leftover = inventory->add(stack))
+							leftover->spawn(Place{place.position, place.realm});
 
 				inventory->notifyOwner();
 				return true;
@@ -42,7 +42,7 @@ namespace Game3 {
 
 		if (auto honey = crop->customData.find("honey"); honey != crop->customData.end()) {
 			if (auto tilename = place.getName(layer); tilename && tilename->get() == honey->at("full").get<Identifier>()) {
-				if (!inventory->add({game, honey->at("item").get<Identifier>()})) {
+				if (!inventory->add(ItemStack::create(game, honey->at("item").get<Identifier>()))) {
 					place.set(layer, honey->at("empty").get<Identifier>());
 					return true;
 				}

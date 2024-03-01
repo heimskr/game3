@@ -114,8 +114,8 @@ namespace Game3 {
 		return 30;
 	}
 
-	std::vector<ItemStack> Monster::getDrops() {
-		std::vector<ItemStack> out = LivingEntity::getDrops();
+	std::vector<ItemStackPtr> Monster::getDrops() {
+		std::vector<ItemStackPtr> out = LivingEntity::getDrops();
 		std::uniform_int_distribution distribution(0, 9);
 		if (distribution(threadContext.rng) < 2)
 			out.emplace_back(getGame(), "base:item/morsel");

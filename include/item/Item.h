@@ -44,37 +44,37 @@ namespace Game3 {
 
 			virtual bool isTextureCacheable() const { return true; }
 
-			virtual Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &, const ItemStack &) const;
-			virtual Glib::RefPtr<Gdk::Pixbuf> makeImage(const Game &, const ItemStack &) const;
-			virtual Identifier getTextureIdentifier(const ItemStack &) const;
+			virtual Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &, const ConstItemStackPtr &) const;
+			virtual Glib::RefPtr<Gdk::Pixbuf> makeImage(const Game &, const ConstItemStackPtr &) const;
+			virtual Identifier getTextureIdentifier(const ConstItemStackPtr &) const;
 			virtual void getOffsets(const Game &, std::shared_ptr<Texture> &, float &x_offset, float &y_offset);
 			Item & addAttribute(Identifier);
-			virtual std::shared_ptr<Texture> getTexture(const ItemStack &);
-			virtual std::string getTooltip(const ItemStack &);
+			virtual std::shared_ptr<Texture> getTexture(const ConstItemStackPtr &);
+			virtual std::string getTooltip(const ConstItemStackPtr &);
 
 			inline bool operator==(const Item &other) const { return identifier == other.identifier; }
 
-			virtual void initStack(const Game &, ItemStack &) {}
+			virtual void initStack(const Game &, const ItemStackPtr &) {}
 
 			/** Called when the user clicks on a tile with the item selected. Returns true iff propagation should stop. */
-			virtual bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float> offsets);
+			virtual bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float> offsets);
 
 			/** Called when the user uses a held item via a keyboard shortcut. Returns true iff propagation should stop. */
-			virtual bool use(Slot, ItemStack &, const Place &, Modifiers, Hand hand);
+			virtual bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, Hand hand);
 
 			/** Called when the user uses the item via the context menu or via a keyboard shortcut. Returns true iff propagation should stop. */
-			virtual bool use(Slot, ItemStack &, const std::shared_ptr<Player> &, Modifiers);
+			virtual bool use(Slot, const ItemStackPtr &, const std::shared_ptr<Player> &, Modifiers);
 
-			virtual bool drag(Slot, ItemStack &, const Place &, Modifiers);
+			virtual bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers);
 
 			/** Whether the item's use function (see Item::use) should be called when the user interacts with a floor tile and this item is selected in the inventory tab. */
 			virtual bool canUseOnWorld() const { return false; }
 
-			virtual void onDestroy(Game &, ItemStack &) const {}
+			virtual void onDestroy(Game &, const ItemStackPtr &) const {}
 
-			virtual void renderEffects(const RendererContext &, const Position &, Modifiers, ItemStack &) const {}
+			virtual void renderEffects(const RendererContext &, const Position &, Modifiers, const ItemStackPtr &) const {}
 
-			virtual bool populateMenu(ItemStack &, Glib::RefPtr<Gio::Menu>, Glib::RefPtr<Gio::SimpleActionGroup>) const { return false; }
+			virtual bool populateMenu(const ItemStackPtr &, Glib::RefPtr<Gio::Menu>, Glib::RefPtr<Gio::SimpleActionGroup>) const { return false; }
 
 		protected:
 			mutable std::unique_ptr<uint8_t[]> rawImage;
@@ -106,9 +106,9 @@ namespace Game3 {
 			Glib::RefPtr<Gdk::Pixbuf> getImage() const;
 			Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &) const;
 			/** Returns a copy of the ItemStack with a different count. */
-			ItemStack withCount(ItemCount) const;
+			ItemStackPtr withCount(ItemCount) const;
 
-			inline operator std::string() const { return item->getTooltip(*this) + " x " + std::to_string(count); }
+			inline operator std::string() const { return getTooltip() + " x " + std::to_string(count); }
 
 			/** Returns true if the other stack is mergeable with this one and has an equal count. */
 			inline bool operator==(const ItemStack &other) const { return canMerge(other) && count == other.count; }
@@ -125,8 +125,8 @@ namespace Game3 {
 			/** Returns true if the other stack is mergeable with this one and has a greater or equal count. */
 			inline bool operator>=(const ItemStack &other) const { return canMerge(other) && count >= other.count; }
 
-			static ItemStack withDurability(const std::shared_ptr<Game> &, const ItemID &, Durability durability);
-			static ItemStack withDurability(const std::shared_ptr<Game> &, const ItemID &);
+			static ItemStackPtr withDurability(const std::shared_ptr<Game> &, const ItemID &, Durability durability);
+			static ItemStackPtr withDurability(const std::shared_ptr<Game> &, const ItemID &);
 
 			/** Decreases the durability by a given amount if the ItemStack has durability data. Returns true if the durability was present and reduced to zero or false otherwise. */
 			bool reduceDurability(Durability = 1);
@@ -208,6 +208,17 @@ struct std::formatter<Game3::ItemStack> {
     }
 
 	auto format(const Game3::ItemStack &stack, std::format_context &ctx) const {
-		return std::format_to(ctx.out(), "{} x {}", stack.item->getTooltip(stack), stack.count);
+		return std::format_to(ctx.out(), "{} x {}", stack.getTooltip(), stack.count);
+	}
+};
+
+template <>
+struct std::formatter<Game3::ItemStackPtr> {
+	constexpr auto parse(std::format_parse_context &ctx) {
+		return ctx.begin();
+    }
+
+	auto format(const Game3::ItemStackPtr &stack, std::format_context &ctx) const {
+		return std::format_to(ctx.out(), "{} x {}", stack->getTooltip(), stack->count);
 	}
 };

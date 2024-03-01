@@ -17,7 +17,7 @@ namespace Game3 {
 			objectsName = terrainName;
 	}
 
-	bool Landfill::use(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers, std::pair<float, float>) {
+	bool Landfill::use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float>) {
 		PlayerPtr player = place.player;
 		RealmPtr  realm  = place.realm;
 
@@ -26,7 +26,7 @@ namespace Game3 {
 		if (std::optional<TileID> tile_id = place.get(layer); tile_id && *tile_id != 0)
 			return false;
 
-		if (stack.count < requiredCount)
+		if (stack->count < requiredCount)
 			return false;
 
 		player->getInventory(0)->decrease(stack, slot, requiredCount, true);
@@ -34,7 +34,7 @@ namespace Game3 {
 		return true;
 	}
 
-	bool Landfill::drag(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers) {
+	bool Landfill::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers) {
 		return use(slot, stack, place, modifiers, {0.f, 0.f});
 	}
 

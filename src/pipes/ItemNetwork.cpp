@@ -32,20 +32,21 @@ namespace Game3 {
 
 		// Every so often, if there's anything in the overflowQueue, we try to insert that somewhere instead of extracting anything more.
 		if (overflowPeriod != 0 && tick_id % overflowPeriod == 0 && !overflowQueue.empty()) {
-			std::optional<ItemStack> stack = std::move(overflowQueue.front());
+			ItemStackPtr stack = std::move(overflowQueue.front());
 			overflowQueue.pop_front();
 
 			if (!roundRobinIterator)
 				advanceRoundRobin();
 
 			iterateRoundRobin([&](const std::shared_ptr<InventoriedTileEntity> &inventoried, Direction direction) {
-				inventoried->insertItem(*stack, direction, &stack);
-				return !stack.has_value();
+				inventoried->insertItem(stack, direction, &stack);
+				return !stack;
 			});
 
 			// If the stack couldn't be fully inserted, put the remainder at the end of the overflow queue.
+			// TODO!: copy here?
 			if (stack)
-				overflowQueue.push_back(std::move(*stack));
+				overflowQueue.push_back(std::move(stack));
 
 			return;
 		}
@@ -86,7 +87,7 @@ namespace Game3 {
 			if (const auto pipe = std::dynamic_pointer_cast<Pipe>(realm->tileEntityAt(position + direction)))
 				extraction_filter = pipe->itemFilters[flipDirection(direction)];
 
-			inventoried->iterateExtractableItems(direction, [&, direction = direction](const ItemStack &stack, Slot slot) {
+			inventoried->iterateExtractableItems(direction, [&, direction = direction](const ItemStackPtr &stack, Slot slot) {
 				if (extraction_filter && !extraction_filter->isAllowed(stack, *inventory))
 					return false;
 
@@ -94,7 +95,7 @@ namespace Game3 {
 				// If that happens, we don't want to notify the owner and potentially queue a broadcast.
 				auto suppressor = inventory->suppress();
 
-				std::optional<ItemStack> extracted = inventoried->extractItem(direction, true, slot);
+				ItemStackPtr extracted = inventoried->extractItem(direction, true, slot);
 
 				// This would be a little strange.
 				if (!extracted) {
@@ -114,27 +115,27 @@ namespace Game3 {
 
 					if (const auto pipe = std::dynamic_pointer_cast<Pipe>(realm->tileEntityAt(round_robin->getPosition() + round_robin_direction))) {
 						auto round_robin_inventory_lock = round_robin_inventory->sharedLock();
-						if (std::shared_ptr<ItemFilter> insertion_filter = pipe->itemFilters[flipDirection(round_robin_direction)]; insertion_filter && !insertion_filter->isAllowed(*extracted, *round_robin_inventory))
+						if (std::shared_ptr<ItemFilter> insertion_filter = pipe->itemFilters[flipDirection(round_robin_direction)]; insertion_filter && !insertion_filter->isAllowed(extracted, *round_robin_inventory))
 							return false;
 					}
 
 					// TODO?: support multiple inventories in item networks
 					auto lock = round_robin_inventory->uniqueLock();
-					round_robin->insertItem(*extracted, round_robin_direction, &extracted);
-					return !extracted.has_value();
+					round_robin->insertItem(extracted, round_robin_direction, &extracted);
+					return !extracted;
 				}, inventoried);
 
 				if (extracted) {
 					const bool changed = extracted->count != original_count;
 
 					// If there's anything left over, try putting it back into the inventory it was extracted from.
-					if (std::optional<ItemStack> new_leftover = inventory->add(*extracted, slot)) {
+					if (ItemStackPtr new_leftover = inventory->add(extracted, slot)) {
 						// If there's still anything left over, move it to the overflowQueue so we can try to insert it somewhere another time.
 						// Theoretically this should never happen because we've locked the source inventory.
 						// Also, because the source inventory changed, we need to cancel the suppressor.
 						WARN("Can't put leftovers back into source inventory of type {}.", DEMANGLE(*inventory));
 						suppressor.cancel(true);
-						overflowQueue.push_back(std::move(*new_leftover));
+						overflowQueue.push_back(std::move(new_leftover)); // TODO!: copy?
 						// Because we're in a weird situation here, it might be safer to just cancel the iteration now.
 						failed = true;
 						return true;
@@ -169,8 +170,8 @@ namespace Game3 {
 			return;
 		}
 
-		for (const ItemStack &stack: overflowQueue)
-			stack.spawn(realm, where);
+		for (const ItemStackPtr &stack: overflowQueue)
+			stack->spawn(Place{where, realm});
 
 		// Just in case.
 		overflowQueue.clear();

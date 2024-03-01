@@ -2,6 +2,7 @@
 
 #include "data/Identifier.h"
 #include "threading/Lockable.h"
+#include "types/Types.h"
 
 #include <map>
 #include <memory>
@@ -14,8 +15,6 @@
 namespace Game3 {
 	class Buffer;
 	class Inventory;
-	class Item;
-	class ItemStack;
 
 	class ItemFilter {
 		public:
@@ -29,16 +28,16 @@ namespace Game3 {
 				Config(nlohmann::json data_ = {}, Comparator comparator_ = {}, ItemCount count_ = {}):
 					data(std::move(data_)), comparator(comparator_), count(count_) {}
 
-				bool operator()(const ItemStack &, const Inventory &, bool strict) const;
+				bool operator()(const ItemStackPtr &, const Inventory &, bool strict) const;
 				bool operator<(const Config &) const;
 			};
 
 			ItemFilter();
 			ItemFilter(bool allow_mode, bool strict_);
 
-			bool isAllowed(const ItemStack &, const Inventory &) const;
-			void addItem(const ItemStack &);
-			void removeItem(const ItemStack &);
+			bool isAllowed(const ItemStackPtr &, const Inventory &) const;
+			void addItem(const ItemStackPtr &);
+			void removeItem(const ItemStackPtr &);
 			void clear();
 
 			void setAllowMode(bool value = true) { allowMode = value; }

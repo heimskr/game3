@@ -9,7 +9,7 @@
 #include "types/Position.h"
 
 namespace Game3 {
-	bool Bomb::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
+	bool Bomb::use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		constexpr static Index DIAMETER = 5;
 		constexpr static double RADIUS = DIAMETER / 2.;
 

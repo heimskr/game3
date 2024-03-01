@@ -20,7 +20,7 @@ namespace Game3 {
 
 			std::unique_ptr<Inventory> copy() const override;
 
-			std::optional<ItemStack> add(const ItemStack &, const std::function<bool(Slot)> &, Slot start) override;
+			ItemStackPtr add(const ItemStackPtr &, const SlotPredicate &, Slot start) override;
 
 			void drop(Slot) override;
 
@@ -32,17 +32,17 @@ namespace Game3 {
 
 			void clear() override;
 
-			ItemCount remove(const ItemStack &) override;
-			ItemCount remove(const ItemStack &, const ConstPredicate &) override;
-			ItemCount remove(const ItemStack &, Slot) override;
-			ItemCount remove(const CraftingRequirement &, const ConstPredicate &) override;
-			ItemCount remove(const AttributeRequirement &, const ConstPredicate &) override;
+			ItemCount remove(const ItemStackPtr &) override;
+			ItemCount remove(const ItemStackPtr &, const Predicate &) override;
+			ItemCount remove(const ItemStackPtr &, Slot) override;
+			ItemCount remove(const CraftingRequirement &, const Predicate &) override;
+			ItemCount remove(const AttributeRequirement &, const Predicate &) override;
 
 			void setActive(Slot, bool force) override;
 
 			void notifyOwner() override;
 
-			inline Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &game, Slot slot) { return storage.at(slot).getImage(game); }
+			inline Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &game, Slot slot) { return storage.at(slot)->getImage(game); }
 
 		private:
 			void send(const Packet &);

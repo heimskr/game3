@@ -8,7 +8,7 @@
 #include "realm/Realm.h"
 
 namespace Game3 {
-	bool Mead::use(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers, std::pair<float, float>) {
+	bool Mead::use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float>) {
 		RealmPtr realm = place.realm;
 		PlayerPtr player = place.player;
 		GamePtr game = realm->getGame();

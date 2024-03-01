@@ -7,7 +7,7 @@ namespace Game3 {
 		public:
 			using Food::Food;
 
-			bool use(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) override;
+			bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
 			HitPoints getHealedPoints(const std::shared_ptr<Player> &) override;
 
 			using Food::use;

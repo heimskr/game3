@@ -12,7 +12,7 @@ namespace Game3 {
 		public:
 			using Item::Item;
 			bool use(Slot, ItemStack &, const std::shared_ptr<Player> &, Modifiers) override;
-			bool drag(Slot, ItemStack &, const Place &, Modifiers) override;
+			bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers) override;
 			void renderEffects(const RendererContext &, const Position &, Modifiers, ItemStack &) const override;
 			bool populateMenu(ItemStack &, Glib::RefPtr<Gio::Menu>, Glib::RefPtr<Gio::SimpleActionGroup>) const override;
 

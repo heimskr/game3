@@ -16,7 +16,7 @@ namespace Game3 {
 		InventoryPtr inventory = player->getInventory(0);
 		assert(inventory);
 
-		ItemStack *stack = (*inventory)[slot];
+		ItemStackPtr stack = (*inventory)[slot];
 
 		if (!stack) {
 			client.send(ErrorPacket("Can't use empty slot."));

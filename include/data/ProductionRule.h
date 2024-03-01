@@ -33,8 +33,8 @@ namespace Game3 {
 			static ProductionRule fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
 
 		private:
-			std::vector<ItemStack> inputs;
-			ItemStack output;
+			std::vector<ItemStackPtr> inputs;
+			ItemStackPtr output;
 			LaborAmount labor = 0;
 			/** If present, the richness of the resource is multiplied by this and then used as a multiplier for the production rule. */
 			std::optional<double> richnessEffect;

@@ -193,7 +193,7 @@ namespace Game3 {
 			RealmPtr realm = getRealm();
 			auto &deposit = dynamic_cast<OreDeposit &>(*realm->tileEntityAt(*chosenResource));
 			GamePtr game = realm->getGame();
-			const ItemStack &stack = deposit.getOre(*game).stack;
+			const ItemStackPtr &stack = deposit.getOre(*game).stack;
 			const auto leftover = getInventory(0)->add(stack);
 			if (leftover == stack)
 				setPhase(4);

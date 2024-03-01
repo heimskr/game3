@@ -16,7 +16,7 @@ namespace Game3 {
 				});
 			}
 
-			ItemStack *held_item = player->getHeld(hand);
+			const ItemStackPtr &held_item = player->getHeld(hand);
 
 			if (globalID) {
 				if (AgentPtr agent = game->getAgent<Agent>(*globalID)) {

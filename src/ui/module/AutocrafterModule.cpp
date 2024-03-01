@@ -35,8 +35,8 @@ namespace Game3 {
 
 		std::set<Identifier> item_names;
 		for (const auto &recipe: game->registry<CraftingRecipeRegistry>())
-			for (const ItemStack &stack: recipe->output)
-				item_names.insert(stack.item->identifier);
+			for (const ItemStackPtr &stack: recipe->output)
+				item_names.insert(stack->item->identifier);
 
 		store = Gtk::ListStore::create(columns);
 		for (const Identifier &item_name: item_names) {

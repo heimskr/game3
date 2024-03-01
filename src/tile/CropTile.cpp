@@ -47,7 +47,7 @@ namespace Game3 {
 
 		if (auto tilename = place.getName(layer); tilename && *tilename == crop->stages.back()) {
 			place.set(layer, 0);
-			for (const ItemStack &stack: crop->products.getStacks())
+			for (const ItemStackPtr &stack: crop->products.getStacks())
 				place.player->give(stack);
 			return true;
 		}

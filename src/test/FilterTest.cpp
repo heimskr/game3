@@ -34,12 +34,12 @@ namespace Game3 {
 		ServerInventory inventory(nullptr, 30);
 		ItemFilter filter(true, true);
 
-		std::vector<ItemStack> stacks;
+		std::vector<ItemStackPtr> stacks;
 
 		for (const auto &id: ids) {
 			int i = 0;
 			for (const auto &data: datas) {
-				stacks.emplace_back(game, id, 1, data);
+				stacks.push_back(ItemStack::create(game, id, 1, data));
 				if (++i % 2 == 0)
 					filter.addItem(stacks.back());
 			}
@@ -49,7 +49,7 @@ namespace Game3 {
 		size_t total = 0;
 
 		for (size_t i = 0; i < 1'000'000; ++i) {
-			for (const ItemStack &stack: stacks) {
+			for (const ItemStackPtr &stack: stacks) {
 				sum += filter.isAllowed(stack, inventory);
 				++total;
 			}

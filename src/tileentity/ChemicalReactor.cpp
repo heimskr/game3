@@ -30,8 +30,8 @@ namespace Game3 {
 		if (slot != Slot(-1) && Slot(INPUT_CAPACITY) <= slot)
 			return false;
 
-		if (auto chemical = std::dynamic_pointer_cast<ChemicalItem>(stack.item))
-			return stack.data.contains("formula");
+		if (auto chemical = std::dynamic_pointer_cast<ChemicalItem>(stack->item))
+			return stack->data.contains("formula");
 
 		return false;
 	}
@@ -246,8 +246,8 @@ namespace Game3 {
 
 		{
 			auto reactant_lock = reactants.sharedLock();
-			std::vector<ItemStack> stacks;
-			auto predicate = [range = SlotRange{0, INPUT_CAPACITY - 1}](const ItemStack &, Slot slot) {
+			std::vector<ItemStackPtr> stacks;
+			auto predicate = [range = SlotRange{0, INPUT_CAPACITY - 1}](const ItemStackPtr &, Slot slot) {
 				return range.contains(slot);
 			};
 
@@ -256,16 +256,16 @@ namespace Game3 {
 			};
 
 			for (const auto &[reactant, count]: reactants) {
-				stacks.emplace_back(game, chemical_item, count, nlohmann::json{{"formula", reactant}});
+				stacks.push_back(ItemStack::create(game, chemical_item, count, nlohmann::json{{"formula", reactant}}));
 				const ItemCount in_inventory = inventory_copy->count(stacks.back(), slot_predicate);
 				if (in_inventory < count)
 					return false;
 			}
 
-			for (const ItemStack &stack: stacks) {
+			for (const ItemStackPtr &stack: stacks) {
 				const ItemCount removed = inventory_copy->remove(stack, predicate);
-				if (stack.count != removed)
-					throw std::runtime_error("Couldn't remove stack from ChemicalReactor (" + std::to_string(stack.count) + " in stack != " + std::to_string(removed) + " removed)");
+				if (stack->count != removed)
+					throw std::runtime_error("Couldn't remove stack from ChemicalReactor (" + std::to_string(stack->count) + " in stack != " + std::to_string(removed) + " removed)");
 			}
 		}
 
@@ -276,7 +276,7 @@ namespace Game3 {
 			};
 
 			for (const auto &[product, count]: products)
-				if (auto leftover = inventory_copy->add(ItemStack(game, chemical_item, count, nlohmann::json{{"formula", product}}), predicate))
+				if (auto leftover = inventory_copy->add(ItemStack::create(game, chemical_item, count, nlohmann::json{{"formula", product}}), predicate))
 					return false;
 		}
 

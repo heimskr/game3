@@ -6,7 +6,7 @@
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
-	CaveTile::CaveTile(Identifier identifier_, ItemStack stack_, Identifier floor_):
+	CaveTile::CaveTile(Identifier identifier_, ItemStackPtr stack_, Identifier floor_):
 		MineableTile(std::move(identifier_), std::move(stack_), true),
 		floor(std::move(floor_)) {}
 

@@ -14,7 +14,7 @@ namespace Game3 {
 		return true;
 	}
 
-	bool Furniture::use(Slot slot, ItemStack &stack, const Place &place, Modifiers, std::pair<float, float>) {
+	bool Furniture::use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		if (!preCheck(place))
 			return false;
 
@@ -30,7 +30,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool Furniture::drag(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers) {
+	bool Furniture::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers) {
 		return use(slot, stack, place, modifiers, {0.f, 0.f});
 	}
 

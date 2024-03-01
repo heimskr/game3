@@ -2,7 +2,7 @@
 #include "ui/gtk/DragSource.h"
 
 namespace Game3 {
-	ItemStack * DragSource::getStack() const {
+	ItemStackPtr DragSource::getStack() const {
 		if (!inventory)
 			return nullptr;
 

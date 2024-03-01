@@ -14,6 +14,6 @@ namespace Game3 {
 		Slot slot;
 		std::shared_ptr<ClientInventory> inventory;
 		InventoryID index;
-		ItemStack * getStack() const;
+		ItemStackPtr getStack() const;
 	};
 }

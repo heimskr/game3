@@ -35,8 +35,8 @@ namespace Game3 {
 		assert(getSide() == Side::Server);
 
 		if (modifiers.onlyAlt()) {
-			getInventory(0)->iterate([&](const ItemStack &stack, Slot) {
-				stack.spawn(getRealm(), getPosition());
+			getInventory(0)->iterate([this](const ItemStackPtr &stack, Slot) {
+				stack->spawn(getPlace());
 				return false;
 			});
 			queueDestruction();
@@ -75,14 +75,14 @@ namespace Game3 {
 		buffer >> name;
 	}
 
-	ItemCount Crate::itemsInsertable(const ItemStack &stack, Direction, Slot) {
+	ItemCount Crate::itemsInsertable(const ItemStackPtr &stack, Direction, Slot) {
 		InventoryPtr inventory = getInventory(0);
 
-		ItemStack *stored = (*inventory)[0];
+		ItemStackPtr stored = (*inventory)[0];
 		if (!stored)
-			return stack.count;
+			return stack->count;
 
-		return stored->canMerge(stack)? stack.count : 0;
+		return stored->canMerge(*stack)? stack->count : 0;
 	}
 
 	void Crate::setInventory(Slot slot_count) {

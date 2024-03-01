@@ -22,7 +22,7 @@ namespace Game3 {
 	ClientInventory::ClientInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, InventoryID index_, Storage storage_):
 		StorageInventory(std::move(owner), slot_count, active_slot, index_, std::move(storage_)) {}
 
-	std::optional<ItemStack> ClientInventory::add(const ItemStack &, const std::function<bool(Slot)> &, Slot) {
+	ItemStackPtr ClientInventory::add(const ItemStackPtr &, const SlotPredicate &, Slot) {
 		throw std::logic_error("Clients cannot add items to inventories");
 	}
 
@@ -69,24 +69,24 @@ namespace Game3 {
 		storage.clear();
 	}
 
-	ItemCount ClientInventory::remove(const ItemStack &) {
-		throw std::logic_error("ClientInventory::remove(const ItemStack &) unimplemented");
+	ItemCount ClientInventory::remove(const ItemStackPtr &) {
+		throw std::logic_error("ClientInventory::remove(const ItemStackPtr &) unimplemented");
 	}
 
-	ItemCount ClientInventory::remove(const ItemStack &, const ConstPredicate &) {
-		throw std::logic_error("ClientInventory::remove(const ItemStack &, const ConstPredicate &) unimplemented");
+	ItemCount ClientInventory::remove(const ItemStackPtr &, const Predicate &) {
+		throw std::logic_error("ClientInventory::remove(const ItemStackPtr &, const Predicate &) unimplemented");
 	}
 
-	ItemCount ClientInventory::remove(const ItemStack &, Slot) {
-		throw std::logic_error("ClientInventory::remove(const ItemStack &, Slot) unimplemented");
+	ItemCount ClientInventory::remove(const ItemStackPtr &, Slot) {
+		throw std::logic_error("ClientInventory::remove(const ItemStackPtr &, Slot) unimplemented");
 	}
 
-	ItemCount ClientInventory::remove(const CraftingRequirement &, const ConstPredicate &) {
-		throw std::logic_error("ClientInventory::remove(const CraftingRequirement &, const ConstPredicate &) unimplemented");
+	ItemCount ClientInventory::remove(const CraftingRequirement &, const Predicate &) {
+		throw std::logic_error("ClientInventory::remove(const CraftingRequirement &, const Predicate &) unimplemented");
 	}
 
-	ItemCount ClientInventory::remove(const AttributeRequirement &, const ConstPredicate &) {
-		throw std::logic_error("ClientInventory::remove(const AttributeRequirement &, const ConstPredicate &) unimplemented");
+	ItemCount ClientInventory::remove(const AttributeRequirement &, const Predicate &) {
+		throw std::logic_error("ClientInventory::remove(const AttributeRequirement &, const Predicate &) unimplemented");
 	}
 
 	void ClientInventory::setActive(Slot new_active, bool force) {
@@ -174,7 +174,7 @@ namespace Game3 {
 
 	void to_json(nlohmann::json &json, const ClientInventory &inventory) {
 		for (const auto &[key, val]: inventory.getStorage())
-			json["storage"][std::to_string(key)] = val;
+			json["storage"][std::to_string(key)] = *val;
 		json["slotCount"]  = inventory.getSlotCount();
 		json["activeSlot"] = inventory.activeSlot.load();
 	}

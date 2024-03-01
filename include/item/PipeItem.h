@@ -21,12 +21,12 @@ namespace Game3 {
 			PipeItem(Identifier identifier_, const char *display_name, MoneyCount base_price):
 				Item(std::move(identifier_), display_name, base_price, 64) {}
 
-			virtual std::optional<bool> customUse(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float>) {
+			virtual std::optional<bool> customUse(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) {
 				return std::nullopt;
 			}
 
 		public:
-			bool use(Slot slot, ItemStack &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) override{
+			bool use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) override{
 				Realm &realm = *place.realm;
 				const InventoryPtr inventory = place.player->getInventory(0);
 
@@ -113,7 +113,7 @@ namespace Game3 {
 				PipeItem(ID(), "Item Pipe", base_price) {}
 
 		protected:
-			std::optional<bool> customUse(Slot, ItemStack &, const Place &, Modifiers, std::pair<float, float> offsets) override;
+			std::optional<bool> customUse(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float> offsets) override;
 	};
 
 	class FluidPipeItem: public PipeItem<PipeType::Fluid> {

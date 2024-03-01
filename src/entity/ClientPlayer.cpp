@@ -103,7 +103,7 @@ namespace Game3 {
 		});
 
 		if (InventoryPtr inventory = getInventory(0)) {
-			if (ItemStack *active = inventory->getActive()) {
+			if (ItemStackPtr active = inventory->getActive()) {
 				MainWindow &window = getGame()->toClient().getWindow();
 				active->renderEffects(renderers, window.getHoveredPosition(), window.getModifiers());
 			}
