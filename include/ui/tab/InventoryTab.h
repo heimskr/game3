@@ -62,6 +62,7 @@ namespace Game3 {
 			Gtk::Image holdRightAction;
 			Gtk::Image dropAction;
 			Gtk::Image discardAction;
+			Glib::RefPtr<Gio::SimpleActionGroup> group;
 
 			/** We can't store state in a popover, so we have to store it here. */
 			Atomic<std::shared_ptr<ClientGame>> lastGame;
@@ -75,7 +76,7 @@ namespace Game3 {
 			void updatePlayerClasses(const std::shared_ptr<ClientGame> &);
 			void populate(std::shared_ptr<ClientInventory>);
 			void clear();
-			void gmenuSetup(InventoryModule &, Glib::RefPtr<Gio::Menu>);
+			void gmenuSetup(InventoryModule &, Glib::RefPtr<Gio::Menu>, Slot, const ItemStackPtr &);
 			void updateInventory(const std::shared_ptr<ClientGame> &);
 			void initAction(Gtk::Image &, const Glib::ustring &icon, const Glib::ustring &tooltip, std::function<void(Slot)>);
 	};

@@ -1,5 +1,7 @@
 #include "Layer.h"
+#include "entity/ClientPlayer.h"
 #include "entity/Player.h"
+#include "game/ClientGame.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "graphics/RectangleRenderer.h"
@@ -7,6 +9,8 @@
 #include "graphics/RenderOptions.h"
 #include "graphics/Tileset.h"
 #include "item/Copier.h"
+#include "packet/SetCopierConfigurationPacket.h"
+#include "packet/UseItemPacket.h"
 #include "realm/Realm.h"
 #include "types/Position.h"
 #include "tools/Paster.h"
@@ -26,14 +30,14 @@ namespace Game3 {
 	}
 
 	bool Copier::use(Slot, const ItemStackPtr &stack, const std::shared_ptr<Player> &player, Modifiers) {
-		std::cout << getTiles(stack, player->getRealm()) << '\n';
+		std::cout << getString(stack, player->getRealm()) << '\n';
 		return true;
 	}
 
-	std::string Copier::getTiles(const ItemStackPtr &stack, const RealmPtr &realm) const {
+	std::string Copier::getString(const ItemStackPtr &stack, const RealmPtr &realm) {
 		// TODO: fluids
 
-		std::set<Position> positions = getPositions<std::set>(*stack);
+		const std::set<Position> positions = getPositions<std::set>(*stack);
 
 		if (positions.empty())
 			return {};
@@ -129,12 +133,34 @@ namespace Game3 {
 		if (!combined.empty() && combined.back() == '/')
 			combined.pop_back();
 
+		if (auto iter = stack->data.find("includeTileEntities"); iter == stack->data.end() || !iter->get<bool>())
+			return combined;
+
+		combined += '\n';
+		ss = {};
+
+		for (const Position &position: positions) {
+			TileEntityPtr tile_entity = realm->tileEntityAt(position);
+			if (!tile_entity)
+				continue;
+			nlohmann::json json;
+			tile_entity->toJSON(json);
+			json.erase("gid");
+			json.erase("position");
+			ss << (position.row - min_row) << ',' << (position.column - min_column) << '=' << json.dump() << '\n';
+		}
+
+		combined += ss.str();
+
+		while (combined.back() == '\n')
+			combined.pop_back();
+
 		return combined;
 	}
 
 	bool Copier::drag(Slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers) {
 		if (modifiers == Modifiers(true, true, false, false)) {
-			std::string tiles = getTiles(stack, place.realm);
+			std::string tiles = getString(stack, place.realm);
 			Paster(std::string_view(tiles)).paste(*place.realm, place.position);
 			return true;
 		}
@@ -225,12 +251,34 @@ namespace Game3 {
 		}
 	}
 
-	bool Copier::populateMenu(const ItemStackPtr &, Glib::RefPtr<Gio::Menu> menu, Glib::RefPtr<Gio::SimpleActionGroup> group) const {
-		// auto submenu = Gio::Menu::create();
+	bool Copier::populateMenu(const InventoryPtr &inventory, Slot slot, const ItemStackPtr &stack, Glib::RefPtr<Gio::Menu> menu, Glib::RefPtr<Gio::SimpleActionGroup> group) const {
+		std::weak_ptr<Player> weak_player(stack->getGame()->toClient().getPlayer());
 
-		// submenu->append("Copy", "item_menu.copy");
-		// group->add_action("copy", [weak = shared_from_this()
-		return false;
+		group->add_action("copier_copy", [slot, weak_player] {
+			if (PlayerPtr player = weak_player.lock())
+				player->send(UseItemPacket(slot, Modifiers{}));
+		});
+
+		group->add_action("copier_include_tile_entities", [slot, weak_player] {
+			if (PlayerPtr player = weak_player.lock())
+				player->send(SetCopierConfigurationPacket(slot, true));
+		});
+
+		group->add_action("copier_exclude_tile_entities", [slot, weak_player] {
+			if (PlayerPtr player = weak_player.lock())
+				player->send(SetCopierConfigurationPacket(slot, false));
+		});
+
+		if (inventory == stack->getGame()->toClient().getPlayer()->getInventory(0)) {
+			menu->append("Copy", "inventory_popup.copier_copy");
+
+			if (auto iter = stack->data.find("includeTileEntities"); iter != stack->data.end() && iter->get<bool>())
+				menu->append("Exclude Tile Entities", "inventory_popup.copier_exclude_tile_entities");
+			else
+				menu->append("Include Tile Entities", "inventory_popup.copier_include_tile_entities");
+		}
+
+		return true;
 	}
 
 	std::optional<Position> Copier::computeMinimums(const std::unordered_set<Position> &positions) {

@@ -74,7 +74,7 @@ namespace Game3 {
 
 			virtual void renderEffects(const RendererContext &, const Position &, Modifiers, const ItemStackPtr &) const {}
 
-			virtual bool populateMenu(const ItemStackPtr &, Glib::RefPtr<Gio::Menu>, Glib::RefPtr<Gio::SimpleActionGroup>) const { return false; }
+			virtual bool populateMenu(const InventoryPtr &, Slot, const ItemStackPtr &, Glib::RefPtr<Gio::Menu>, Glib::RefPtr<Gio::SimpleActionGroup>) const { return false; }
 
 		protected:
 			mutable std::unique_ptr<uint8_t[]> rawImage;

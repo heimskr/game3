@@ -11,10 +11,10 @@
 #include "util/Demangle.h"
 
 namespace Game3 {
-	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game_, const std::any &argument, ItemSlotParent *parent_, const GmenuFn &gmenu_fn):
+	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game_, const std::any &argument, ItemSlotParent *parent_, const GmenuFn gmenu_fn):
 		InventoryModule(std::move(game_), getInventory(argument), parent_, gmenu_fn) {}
 
-	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<ClientInventory> inventory_, ItemSlotParent *parent_, const GmenuFn &gmenu_fn):
+	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<ClientInventory> inventory_, ItemSlotParent *parent_, const GmenuFn gmenu_fn):
 	game(std::move(game_)),
 	inventory(std::move(inventory_)),
 	parent(parent_) {
@@ -31,9 +31,7 @@ namespace Game3 {
 		vbox.append(label);
 		vbox.append(flowBox);
 
-		gmenu = Gio::Menu::create();
-		if (gmenu_fn)
-			gmenu_fn(*this, gmenu);
+		gmenuFunction = std::move(gmenu_fn);
 
 		popoverMenu.set_parent(vbox);
 	}
@@ -152,12 +150,18 @@ namespace Game3 {
 		for (Slot slot = 0; slot < lastSlotCount; ++slot) {
 			auto item_slot = std::make_unique<ItemSlot>(game, slot, inventory, this);
 
-			if (ItemStackPtr stack = (*inventory)[slot])
+			ItemStackPtr stack = (*inventory)[slot];
+
+			if (stack)
 				item_slot->setStack(stack);
 
 			item_slot->setLeftClick([this, slot](Modifiers modifiers, int count, double, double) {
 				leftClick(slot, modifiers, count);
 			});
+
+			auto gmenu = Gio::Menu::create();
+			if (gmenuFunction)
+				gmenuFunction(*this, gmenu, slot, stack);
 
 			item_slot->setGmenu(gmenu);
 

@@ -55,7 +55,7 @@ namespace Game3 {
 		initAction(dropAction,      "pan-down-symbolic",   "Drop",       drop_function);
 		initAction(discardAction,   "user-trash-symbolic", "Discard",    discard_function);
 
-		auto group = Gio::SimpleActionGroup::create();
+		group = Gio::SimpleActionGroup::create();
 
 		group->add_action("use", [this, use_function] {
 			if (lastGame.load())
@@ -294,8 +294,9 @@ namespace Game3 {
 		inventoryModule->addCSSClass("active-slot", active_slot);
 	}
 
-	void InventoryTab::gmenuSetup(InventoryModule &, Glib::RefPtr<Gio::Menu> gmenu) {
-		gmenu->append("_Use", "inventory_popup.use");
+	void InventoryTab::gmenuSetup(InventoryModule &module_, Glib::RefPtr<Gio::Menu> gmenu, Slot slot, const ItemStackPtr &stack) {
+		if (!stack || !stack->item->populateMenu(module_.getInventory(), slot, stack, gmenu, group))
+			gmenu->append("_Use", "inventory_popup.use");
 		gmenu->append("Hold (_Left)", "inventory_popup.hold_left");
 		gmenu->append("Hold (_Right)", "inventory_popup.hold_right");
 		gmenu->append("_Drop", "inventory_popup.drop");

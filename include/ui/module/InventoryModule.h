@@ -25,10 +25,10 @@ namespace Game3 {
 
 			static Identifier ID() { return {"base", "module/inventory"}; }
 
-			using GmenuFn = std::function<void(InventoryModule &, Glib::RefPtr<Gio::Menu>)>;
+			using GmenuFn = std::function<void(InventoryModule &, Glib::RefPtr<Gio::Menu>, Slot, const ItemStackPtr &)>;
 
-			InventoryModule(std::shared_ptr<ClientGame>, const std::any &, ItemSlotParent * = nullptr, const GmenuFn & = {});
-			InventoryModule(std::shared_ptr<ClientGame>, std::shared_ptr<ClientInventory>, ItemSlotParent * = nullptr, const GmenuFn & = {});
+			InventoryModule(std::shared_ptr<ClientGame>, const std::any &, ItemSlotParent * = nullptr, GmenuFn = {});
+			InventoryModule(std::shared_ptr<ClientGame>, std::shared_ptr<ClientInventory>, ItemSlotParent * = nullptr, GmenuFn = {});
 
 			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;
@@ -48,7 +48,6 @@ namespace Game3 {
 		private:
 			std::shared_ptr<ClientGame> game;
 			std::shared_ptr<ClientInventory> inventory;
-			Glib::RefPtr<Gio::Menu> gmenu;
 			Glib::RefPtr<Gtk::DragSource> source;
 			Glib::ustring name;
 			std::vector<std::unique_ptr<ItemSlot>> itemSlots;
@@ -60,6 +59,7 @@ namespace Game3 {
 			Slot lastSlotCount = -1;
 			int tabWidth = 0;
 			ItemSlotParent *parent = nullptr;
+			GmenuFn gmenuFunction;
 
 			static std::shared_ptr<ClientInventory> getInventory(const std::any &);
 			static InventoryID getInventoryIndex(const std::any &);

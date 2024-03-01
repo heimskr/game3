@@ -60,6 +60,7 @@
 #include "packet/DoVillageTradePacket.h"
 #include "packet/EntityMoneyChangedPacket.h"
 #include "packet/EntityRiddenPacket.h"
+#include "packet/SetCopierConfigurationPacket.h"
 
 namespace Game3 {
 	void Game::addPacketFactories() {
@@ -130,5 +131,6 @@ namespace Game3 {
 		add(PacketFactory::create<DoVillageTradePacket>());
 		add(PacketFactory::create<EntityMoneyChangedPacket>());
 		add(PacketFactory::create<EntityRiddenPacket>());
+		add(PacketFactory::create<SetCopierConfigurationPacket>());
 	}
 }

@@ -55,6 +55,9 @@ namespace Game3 {
 	class ClientPlayer;
 	using ClientPlayerPtr = std::shared_ptr<ClientPlayer>;
 
+	class Inventory;
+	using InventoryPtr = std::shared_ptr<Inventory>;
+
 	class ItemStack;
 	using ItemStackPtr = std::shared_ptr<ItemStack>;
 	using ConstItemStackPtr = std::shared_ptr<const ItemStack>;

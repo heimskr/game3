@@ -422,6 +422,11 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `optional<u64>` Riding entity's global ID
 	- `u64` Ridden entity's global ID
 
+62. **Set Copier Configuration**: tells the server to change the configuration of a copier tool in the player's inventory.
+
+	- `i32` Slot
+	- `bool` Include tile entities
+
 # Message Format
 
 All values are little endian. Strings are not null-terminated.
