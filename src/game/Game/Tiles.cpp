@@ -28,17 +28,17 @@ namespace Game3 {
 		reg.add<FarmlandTile>();
 		reg.add<ForestFloorTile>();
 		reg.add<TorchTile>();
-		reg.addMineable("base:tile/stone", ItemStack(self, "base:item/stone"), true);
-		reg.add("base:tile/cave_coal",     std::make_shared<CaveTile>("base:tile/cave_coal",     ItemStack(self, "base:item/coal"),        "base:tile/cave_dirt"));
-		reg.add("base:tile/cave_copper",   std::make_shared<CaveTile>("base:tile/cave_copper",   ItemStack(self, "base:item/copper_ore"),  "base:tile/cave_dirt"));
-		reg.add("base:tile/cave_diamond",  std::make_shared<CaveTile>("base:tile/cave_diamond",  ItemStack(self, "base:item/diamond_ore"), "base:tile/cave_dirt"));
-		reg.add("base:tile/cave_gold",     std::make_shared<CaveTile>("base:tile/cave_gold",     ItemStack(self, "base:item/gold_ore"),    "base:tile/cave_dirt"));
-		reg.add("base:tile/cave_iron",     std::make_shared<CaveTile>("base:tile/cave_iron",     ItemStack(self, "base:item/iron_ore"),    "base:tile/cave_dirt"));
-		reg.add("base:tile/cave_wall",     std::make_shared<CaveTile>("base:tile/cave_wall",     ItemStack(self, "base:item/stone"),       "base:tile/cave_dirt"));
-		reg.add("base:tile/grimstone",     std::make_shared<CaveTile>("base:tile/grimstone",     ItemStack(self, "base:item/grimstone"),   "base:tile/grimdirt"));
-		reg.add("base:tile/grim_diamond",  std::make_shared<CaveTile>("base:tile/grim_diamond",  ItemStack(self, "base:item/diamond_ore"), "base:tile/grimdirt"));
-		reg.add("base:tile/grim_uranium",  std::make_shared<CaveTile>("base:tile/grim_uranium",  ItemStack(self, "base:item/uranium_ore"), "base:tile/grimdirt"));
-		reg.add("base:tile/grim_fireopal", std::make_shared<CaveTile>("base:tile/grim_fireopal", ItemStack(self, "base:item/fire_opal"),   "base:tile/grimdirt"));
+		reg.addMineable("base:tile/stone", ItemStack::create(self, "base:item/stone"), true);
+		reg.add("base:tile/cave_coal",     std::make_shared<CaveTile>("base:tile/cave_coal",     ItemStack::create(self, "base:item/coal"),        "base:tile/cave_dirt"));
+		reg.add("base:tile/cave_copper",   std::make_shared<CaveTile>("base:tile/cave_copper",   ItemStack::create(self, "base:item/copper_ore"),  "base:tile/cave_dirt"));
+		reg.add("base:tile/cave_diamond",  std::make_shared<CaveTile>("base:tile/cave_diamond",  ItemStack::create(self, "base:item/diamond_ore"), "base:tile/cave_dirt"));
+		reg.add("base:tile/cave_gold",     std::make_shared<CaveTile>("base:tile/cave_gold",     ItemStack::create(self, "base:item/gold_ore"),    "base:tile/cave_dirt"));
+		reg.add("base:tile/cave_iron",     std::make_shared<CaveTile>("base:tile/cave_iron",     ItemStack::create(self, "base:item/iron_ore"),    "base:tile/cave_dirt"));
+		reg.add("base:tile/cave_wall",     std::make_shared<CaveTile>("base:tile/cave_wall",     ItemStack::create(self, "base:item/stone"),       "base:tile/cave_dirt"));
+		reg.add("base:tile/grimstone",     std::make_shared<CaveTile>("base:tile/grimstone",     ItemStack::create(self, "base:item/grimstone"),   "base:tile/grimdirt"));
+		reg.add("base:tile/grim_diamond",  std::make_shared<CaveTile>("base:tile/grim_diamond",  ItemStack::create(self, "base:item/diamond_ore"), "base:tile/grimdirt"));
+		reg.add("base:tile/grim_uranium",  std::make_shared<CaveTile>("base:tile/grim_uranium",  ItemStack::create(self, "base:item/uranium_ore"), "base:tile/grimdirt"));
+		reg.add("base:tile/grim_fireopal", std::make_shared<CaveTile>("base:tile/grim_fireopal", ItemStack::create(self, "base:item/fire_opal"),   "base:tile/grimdirt"));
 
 		const auto monomap = registry<TilesetRegistry>().at("base:tileset/monomap");
 		auto grass = std::make_shared<GrassTile>();

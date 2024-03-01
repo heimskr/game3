@@ -1270,7 +1270,7 @@ namespace Game3 {
 		return inLimboFor != 0;
 	}
 
-	ItemStack * Entity::getHeld(Hand hand) const {
+	ItemStackPtr Entity::getHeld(Hand hand) const {
 		InventoryPtr inventory = getInventory(0);
 		auto lock = inventory->sharedLock();
 		switch (hand) {

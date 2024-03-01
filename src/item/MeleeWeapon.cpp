@@ -36,7 +36,7 @@ namespace Game3 {
 
 				InventoryPtr inventory = player->getInventory(0);
 				auto lock = inventory->uniqueLock();
-				if (stack.reduceDurability())
+				if (stack->reduceDurability())
 					inventory->erase(slot);
 				inventory->notifyOwner();
 				return true;

@@ -177,7 +177,7 @@ namespace Game3 {
 			inventory->add(ItemStack::withDurability(game, "base:item/iron_axe"));
 			inventory->add(ItemStack::withDurability(game, "base:item/iron_hammer"));
 			inventory->add(ItemStack::withDurability(game, "base:item/iron_sword"));
-			inventory->add(ItemStack(game, "base:item/cave_entrance"));
+			inventory->add(ItemStack::create(game, "base:item/cave_entrance"));
 		}
 		game->addPlayer(player);
 		return player;

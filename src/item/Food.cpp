@@ -8,7 +8,7 @@
 #include "realm/Realm.h"
 
 namespace Game3 {
-	bool Food::use(Slot slot, ItemStack &stack, const PlayerPtr &player, Modifiers) {
+	bool Food::use(Slot slot, const ItemStackPtr &stack, const PlayerPtr &player, Modifiers) {
 		assert(player->getSide() == Side::Server);
 
 		if (player->heal(getHealedPoints(player)) || getConsumptionForced())

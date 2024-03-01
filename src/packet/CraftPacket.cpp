@@ -21,15 +21,15 @@ namespace Game3 {
 
 		const InventoryPtr inventory = player->getInventory(0);
 		RealmPtr realm = player->getRealm();
-		std::optional<std::vector<ItemStack>> leftovers;
+		std::optional<std::vector<ItemStackPtr>> leftovers;
 
 		for (size_t i = 0; i < count; ++i) {
 			if (!recipe->craft(game, inventory, inventory, leftovers))
 				break;
 
 			if (leftovers) {
-				for (const auto &leftover: *leftovers)
-					leftover.spawn(realm, player->position);
+				for (const ItemStackPtr &leftover: *leftovers)
+					leftover->spawn(player->getPlace());
 				leftovers.reset();
 			}
 		}

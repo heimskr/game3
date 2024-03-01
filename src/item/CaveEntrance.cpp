@@ -63,11 +63,9 @@ namespace Game3 {
 
 		if (auto tile_entity = TileEntity::spawn<Building>(place.realm, "base:tile/cave"_id, position, *realm_id, entrance)) {
 			game->toServer().tileEntitySpawned(tile_entity);
-			const InventoryPtr inventory = player->getInventory(0);
-			auto inventory_lock = inventory->uniqueLock();
-			if (--stack.count == 0)
-				inventory->erase(slot);
-			inventory->notifyOwner();
+			InventoryPtr inventory = player->getInventory(0);
+			assert(inventory);
+			inventory->decrease(stack, slot, 1, true);
 			return true;
 		}
 

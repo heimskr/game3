@@ -18,13 +18,8 @@ namespace Game3 {
 
 		auto yield_flask = [&](const Identifier &fluid_name) {
 			const InventoryPtr inventory = player->getInventory(0);
-
-			{
-				auto lock = inventory->uniqueLock();
-				if (--stack.count == 0)
-					inventory->erase(slot);
-			}
-
+			assert(inventory);
+			inventory->decrease(stack, slot, 1, true);
 			player->give(ItemStack::create(game, fluid_name, 1), slot);
 			inventory->notifyOwner();
 		};

@@ -152,8 +152,8 @@ namespace Game3 {
 		for (Slot slot = 0; slot < lastSlotCount; ++slot) {
 			auto item_slot = std::make_unique<ItemSlot>(game, slot, inventory, this);
 
-			if (ItemStack *stack = (*inventory)[slot])
-				item_slot->setStack(*stack);
+			if (ItemStackPtr stack = (*inventory)[slot])
+				item_slot->setStack(stack);
 
 			item_slot->setLeftClick([this, slot](Modifiers modifiers, int count, double, double) {
 				leftClick(slot, modifiers, count);
@@ -178,11 +178,11 @@ namespace Game3 {
 		lastSlotCount = inventory->getSlotCount();
 
 		for (Slot slot = 0; slot < lastSlotCount; ++slot) {
-			ItemStack *stack = (*inventory)[slot];
+			ItemStackPtr stack = (*inventory)[slot];
 			ItemSlot &item_slot = *itemSlots.at(slot);
 
 			if (stack)
-				item_slot.setStack(*stack);
+				item_slot.setStack(stack);
 			else
 				item_slot.reset();
 		}

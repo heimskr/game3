@@ -19,7 +19,7 @@ namespace Game3 {
 		if (place.realm->type == "base:realm/shadow")
 			return true;
 
-		if (stack.data.empty()) {
+		if (stack->data.empty()) {
 			auto entities = realm->getEntities(place.position.getChunk());
 			if (!entities) {
 				WARN("No entities found in chunk {}", place.position.getChunk());
@@ -41,15 +41,15 @@ namespace Game3 {
 			if (!selected)
 				return true;
 
-			stack.data["containedEntity"] = selected->type;
-			stack.data["containedName"] = selected->getName();
+			stack->data["containedEntity"] = selected->type;
+			stack->data["containedName"] = selected->getName();
 
 			if (selected->isPlayer()) {
 				auto player = safeDynamicCast<ServerPlayer>(selected);
 				player->teleport({32, 32}, game->getRealm(-1), MovementContext{.isTeleport = true});
-				stack.data["containedUsername"] = player->username;
+				stack->data["containedUsername"] = player->username;
 			} else {
-				selected->toJSON(stack.data);
+				selected->toJSON(stack->data);
 				selected->queueDestruction();
 			}
 
@@ -61,30 +61,30 @@ namespace Game3 {
 		if (!place.realm->isPathable(place.position))
 			return true;
 
-		Identifier type = stack.data.at("containedEntity");
+		Identifier type = stack->data.at("containedEntity");
 		if (type == "base:entity/player") {
-			game->toServer().releasePlayer(stack.data.at("containedUsername"), place);
+			game->toServer().releasePlayer(stack->data.at("containedUsername"), place);
 		} else {
 			const GlobalID new_gid = Agent::generateGID();
 			const std::shared_ptr<EntityFactory> &factory = game->registry<EntityFactoryRegistry>()[type];
-			EntityPtr entity = (*factory)(game, stack.data);
+			EntityPtr entity = (*factory)(game, stack->data);
 			entity->spawning = true;
 			entity->setRealm(realm);
 			realm->queueEntityInit(std::move(entity), place.position);
 			INFO("Spawned entity of type {} with new GID {}", type, new_gid);
 		}
-		stack.data.clear();
+		stack->data.clear();
 		player->getInventory(0)->notifyOwner();
 		return true;
 	}
 
-	std::string ContainmentOrb::getTooltip(const ItemStack &stack) {
-		if (auto iter = stack.data.find("containedName"); iter != stack.data.end())
+	std::string ContainmentOrb::getTooltip(const ConstItemStackPtr &stack) {
+		if (auto iter = stack->data.find("containedName"); iter != stack->data.end())
 			return "Containment Orb (" + iter->get<std::string>() + ')';
 		return "Containment Orb";
 	}
 
-	Identifier ContainmentOrb::getTextureIdentifier(const ItemStack &stack) const {
-		return stack.data.empty()? "base:item/contorb" : "base:item/contorb_full";
+	Identifier ContainmentOrb::getTextureIdentifier(const ConstItemStackPtr &stack) const {
+		return stack->data.empty()? "base:item/contorb" : "base:item/contorb_full";
 	}
 }

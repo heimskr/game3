@@ -130,7 +130,7 @@ namespace Game3 {
 		EntityPtr entity = realm->findEntity(next_to, player);
 		bool interesting = false;
 
-		if (hand != Hand::None && used_item && used_item->item->use(getHeldSlot(hand), *used_item, getPlace(), modifiers, hand))
+		if (hand != Hand::None && used_item && used_item->item->use(getHeldSlot(hand), used_item, getPlace(), modifiers, hand))
 			return;
 
 		if (entity)

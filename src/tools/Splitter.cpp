@@ -70,7 +70,7 @@ namespace Game3 {
 			std::filesystem::path dir = base / id.getPostPath();
 			std::filesystem::create_directory(dir);
 
-			auto image = item->getImage(*game, ItemStack(game, item));
+			auto image = item->getImage(*game, ItemStack::create(game, item));
 
 			// The images returned by Item::getImage are scaled up by a factor of 8.
 			constexpr static int scale = 8;
@@ -112,7 +112,7 @@ namespace Game3 {
 			} else if (credit_override_vadim.contains(end)) {
 				meta["credit"] = "Vadim";
 			} else {
-				const Identifier texture_id = item->getTexture(ItemStack(game, item))->identifier;
+				const Identifier texture_id = item->getTexture(ItemStack::create(game, item))->identifier;
 				if (auto iter = credits.find(texture_id); iter != credits.end())
 					meta["credit"] = iter->second;
 				else

@@ -21,8 +21,10 @@ namespace Game3 {
 				if (--cave_realm->entranceCount == 0)
 					game->removeRealm(realm_id);
 				realm.queueDestruction(building);
-				if (stack.reduceDurability())
-					place.player->getInventory(0)->erase(slot);
+				InventoryPtr inventory = place.player->getInventory(0);
+				assert(inventory);
+				if (stack->reduceDurability())
+					inventory->erase(slot);
 				return true;
 			}
 
@@ -30,18 +32,18 @@ namespace Game3 {
 		}
 
 		Player &player = *place.player;
-		Inventory &inventory = *player.getInventory(0);
+		InventoryPtr inventory = player.getInventory(0);
 		Tileset &tileset = place.realm->getTileset();
 
 		for (auto iter = mainLayers.rbegin(); iter != mainLayers.rend(); ++iter) {
 			const auto tile = place.getName(*iter);
-			ItemStack equivalent;
+			ItemStackPtr equivalent;
 			if (tile && tileset.getItemStack(place.getGame(), *tile, equivalent)) {
 				place.set(*iter, tileset.getEmpty());
-				if (stack.reduceDurability())
-					inventory.erase(slot);
+				if (stack->reduceDurability())
+					inventory->erase(slot);
 				player.give(equivalent);
-				inventory.notifyOwner();
+				inventory->notifyOwner();
 				return true;
 			}
 		}

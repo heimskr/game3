@@ -60,8 +60,8 @@ namespace Game3 {
 			// Just in case there's some trickery with shared inventories or something.
 			auto second_lock = &first_inventory == &second_inventory? std::unique_lock<DefaultMutex>() : second_inventory.uniqueLock();
 
-			ItemStack *first_stack  = first_inventory[firstSlot];
-			ItemStack *second_stack = second_inventory[secondSlot];
+			ItemStackPtr first_stack  = first_inventory[firstSlot];
+			ItemStackPtr second_stack = second_inventory[secondSlot];
 
 			if (first_stack == nullptr && second_stack == nullptr) {
 				client.send(ErrorPacket("Can't swap slots: both slots are invalid or empty"));
@@ -80,7 +80,7 @@ namespace Game3 {
 			}
 #endif
 
-			if (first_stack == nullptr) {
+			if (!first_stack) {
 
 				if (!first_inventory.hasSlot(firstSlot)) {
 					client.send(ErrorPacket("Can't swap slots: first slot is invalid"));
@@ -93,10 +93,10 @@ namespace Game3 {
 				if (&first_inventory != &second_inventory && second_inventory.onMove)
 					second_action = second_inventory.onMove(second_inventory, secondSlot, first_inventory, firstSlot, true);
 
-				first_inventory.add(*second_stack, firstSlot);
+				first_inventory.add(second_stack, firstSlot);
 				second_inventory.erase(secondSlot);
 
-			} else if (second_stack == nullptr) {
+			} else if (!second_stack) {
 
 				if (!second_inventory.hasSlot(secondSlot)) {
 					client.send(ErrorPacket("Can't swap slots: second slot is invalid"));
@@ -109,7 +109,7 @@ namespace Game3 {
 				if (&first_inventory != &second_inventory && second_inventory.onMove)
 					second_action = second_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, true);
 
-				second_inventory.add(*first_stack, secondSlot);
+				second_inventory.add(first_stack, secondSlot);
 				first_inventory.erase(firstSlot);
 
 			} else {

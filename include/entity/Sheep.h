@@ -23,9 +23,9 @@ namespace Game3 {
 
 			Identifier getMilk() const override { return {"base", "fluid/milk"}; }
 
-			std::vector<ItemStack> getDrops() override {
-				std::vector<ItemStack> out = Animal::getDrops();
-				out.emplace_back(getGame(), "base:item/raw_meat");
+			std::vector<ItemStackPtr> getDrops() override {
+				std::vector<ItemStackPtr> out = Animal::getDrops();
+				out.push_back(ItemStack::create(getGame(), "base:item/raw_meat"));
 				return out;
 			}
 

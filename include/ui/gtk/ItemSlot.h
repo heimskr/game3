@@ -17,7 +17,7 @@ namespace Game3 {
 		public:
 			using ClickFn = std::function<void(Modifiers, int, double, double)>;
 
-			std::function<bool(ItemStack *)> onDrop;
+			std::function<bool(const ItemStackPtr &)> onDrop;
 
 			ItemSlot() = delete;
 			ItemSlot(const std::shared_ptr<ClientGame> &, Slot, std::shared_ptr<ClientInventory>, ItemSlotParent * = nullptr);
@@ -28,7 +28,7 @@ namespace Game3 {
 			void setGmenu(Glib::RefPtr<Gio::Menu>);
 			void setInventory(std::shared_ptr<ClientInventory>);
 
-			void setStack(ItemStack);
+			void setStack(const ItemStackPtr &);
 			inline auto & getStack() { return storedStack; }
 			inline const auto & getStack() const { return storedStack; }
 
@@ -39,7 +39,7 @@ namespace Game3 {
 			bool isEmpty = true;
 			bool durabilityVisible = false;
 			ItemSlotParent *parent = nullptr;
-			std::optional<ItemStack> storedStack;
+			ItemStackPtr storedStack;
 
 			Gtk::Image image;
 			Gtk::Label label;

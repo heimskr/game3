@@ -44,10 +44,10 @@ namespace Game3 {
 		if (realm.getTile(Layer::Terrain, {row, column}) == realm.getTileset()["base:tile/volcanic_sand"_id]) {
 			if (distribution(rng) < 1) {
 				std::shared_ptr<Game> game = realm.getGame();
-				std::vector<ItemStack> mushrooms {
-					{game, "base:item/indigo_milkcap"_id},
-					{game, "base:item/black_trumpet"_id},
-					{game, "base:item/grey_knight"_id},
+				static std::vector<Identifier> mushrooms {
+					"base:item/indigo_milkcap",
+					"base:item/black_trumpet",
+					"base:item/grey_knight",
 				};
 
 				// TODO: use random ticks to spawn mushrooms

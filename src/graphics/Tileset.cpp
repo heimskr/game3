@@ -72,21 +72,22 @@ namespace Game3 {
 		return cachedTexture = game.registry<TextureRegistry>()[textureName];
 	}
 
-	bool Tileset::getItemStack(const GamePtr &game, const Identifier &id, ItemStack &stack) const {
+	bool Tileset::getItemStack(const GamePtr &game, const Identifier &id, ItemStackPtr &stack) const {
 		if (auto iter = inverseCategories.find(id); iter != inverseCategories.end()) {
 			for (const auto &category: iter->second) {
 				if (auto subiter = stackCategories.find(category); subiter != stackCategories.end()) {
-					stack = ItemStack(game, subiter->second);
+					stack = ItemStack::create(game, subiter->second);
 					return true;
 				}
 			}
 		}
 
 		if (auto iter = stackNames.find(id); iter != stackNames.end()) {
-			stack = ItemStack(game, iter->second);
+			stack = ItemStack::create(game, iter->second);
 			return true;
 		}
 
+		stack = nullptr;
 		return false;
 	}
 

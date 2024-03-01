@@ -68,8 +68,8 @@ namespace Game3 {
 			Gtk::Label totalPriceLabel;
 			Gtk::Label unitPriceLabel;
 
-			bool setSellStack(ItemStack);
-			void updateSell(const ItemStack &);
+			bool setSellStack(ItemStackPtr);
+			void updateSell(const ItemStackPtr &);
 			void sell();
 			void showSell();
 			void hideSell();

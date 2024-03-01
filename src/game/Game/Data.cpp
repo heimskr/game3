@@ -175,7 +175,7 @@ namespace Game3 {
 			auto &dissolver_recipes = registry<DissolverRecipeRegistry>();
 			for (const auto &[input, result_json]: json.at(1).items()) {
 				const Identifier identifier(input);
-				dissolver_recipes.add(identifier, DissolverRecipe(identifier, ItemStack(self, identifier, 1), result_json));
+				dissolver_recipes.add(identifier, DissolverRecipe(identifier, ItemStack::create(self, identifier, 1), result_json));
 			}
 
 		} else if (type == "base:combiner_map") {

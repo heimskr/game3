@@ -202,8 +202,8 @@ namespace Game3 {
 			setHeldRight(-1);
 			InventoryPtr inventory = getInventory(0);
 			auto lock = inventory->uniqueLock();
-			inventory->iterate([&](ItemStack &stack, Slot) {
-				stack.spawn(getRealm(), getPosition());
+			inventory->iterate([&](const ItemStackPtr &stack, Slot) {
+				stack->spawn(getPlace());
 				return false;
 			});
 			inventory->clear();

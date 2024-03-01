@@ -118,7 +118,7 @@ namespace Game3 {
 		std::vector<ItemStackPtr> out = LivingEntity::getDrops();
 		std::uniform_int_distribution distribution(0, 9);
 		if (distribution(threadContext.rng) < 2)
-			out.emplace_back(getGame(), "base:item/morsel");
+			out.push_back(ItemStack::create(getGame(), "base:item/morsel"));
 		return out;
 	}
 

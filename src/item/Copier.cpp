@@ -25,15 +25,15 @@ namespace Game3 {
 		}
 	}
 
-	bool Copier::use(Slot, ItemStack &stack, const std::shared_ptr<Player> &player, Modifiers) {
+	bool Copier::use(Slot, const ItemStackPtr &stack, const std::shared_ptr<Player> &player, Modifiers) {
 		std::cout << getTiles(stack, player->getRealm()) << '\n';
 		return true;
 	}
 
-	std::string Copier::getTiles(const ItemStack &stack, const RealmPtr &realm) const {
+	std::string Copier::getTiles(const ItemStackPtr &stack, const RealmPtr &realm) const {
 		// TODO: fluids
 
-		std::set<Position> positions = getPositions<std::set>(stack);
+		std::set<Position> positions = getPositions<std::set>(*stack);
 
 		if (positions.empty())
 			return {};
@@ -140,48 +140,48 @@ namespace Game3 {
 		}
 
 		{
-			auto lock = stack.data.uniqueLock();
+			auto lock = stack->data.uniqueLock();
 
 			if (modifiers.onlyCtrl()) {
-				if (!stack.data.is_null()) {
-					stack.data.erase("positions");
-					stack.data.erase("min");
+				if (!stack->data.is_null()) {
+					stack->data.erase("positions");
+					stack->data.erase("min");
 				}
 			} else {
 				const Position &position = place.position;
 				std::unordered_set<Position> positions;
 
-				if (auto iter = stack.data.find("positions"); iter != stack.data.end())
+				if (auto iter = stack->data.find("positions"); iter != stack->data.end())
 					positions = *iter;
 
 				if (auto iter = positions.find(position); iter != positions.end()) {
 					positions.erase(iter);
 					if (positions.empty()) {
-						stack.data.erase("min");
-					} else if (auto iter = stack.data.find("min"); iter != stack.data.end()) {
+						stack->data.erase("min");
+					} else if (auto iter = stack->data.find("min"); iter != stack->data.end()) {
 						auto &min = *iter;
 						if (position.row == min[0] || position.column == min[1]) {
 							std::optional<Position> minimums = computeMinimums(positions);
 							assert(minimums);
-							stack.data["min"] = *minimums;
+							stack->data["min"] = *minimums;
 						}
 					}
 				} else {
 					positions.insert(position);
-					if (auto iter = stack.data.find("min"); iter != stack.data.end()) {
+					if (auto iter = stack->data.find("min"); iter != stack->data.end()) {
 						auto &min = *iter;
 						min[0] = std::min(min[0].get<Index>(), position.row);
 						min[1] = std::min(min[1].get<Index>(), position.column);
 					} else {
-						stack.data["min"] = position;
+						stack->data["min"] = position;
 					}
 				}
 
 				if (positions.empty()) {
-					stack.data.erase("min");
-					stack.data.erase("positions");
+					stack->data.erase("min");
+					stack->data.erase("positions");
 				} else {
-					stack.data["positions"] = std::move(positions);
+					stack->data["positions"] = std::move(positions);
 				}
 			}
 		}
@@ -190,10 +190,10 @@ namespace Game3 {
 		return true;
 	}
 
-	void Copier::renderEffects(const RendererContext &context, const Position &mouse_position, Modifiers modifiers, ItemStack &stack) const {
+	void Copier::renderEffects(const RendererContext &context, const Position &mouse_position, Modifiers modifiers, const ItemStackPtr &stack) const {
 		RectangleRenderer &rectangle = context.rectangle;
 
-		std::unordered_set<Position> positions = getPositions(stack);
+		std::unordered_set<Position> positions = getPositions(*stack);
 
 		for (const Position &position: positions) {
 			rectangle.drawOnMap(RenderOptions{
@@ -206,8 +206,8 @@ namespace Game3 {
 		}
 
 		if (modifiers == Modifiers(true, true, false, false)) {
-			auto iter = stack.data.find("min");
-			if (iter == stack.data.end())
+			auto iter = stack->data.find("min");
+			if (iter == stack->data.end())
 				return;
 
 			Position anchor = *iter;
@@ -225,7 +225,7 @@ namespace Game3 {
 		}
 	}
 
-	bool Copier::populateMenu(ItemStack &, Glib::RefPtr<Gio::Menu> menu, Glib::RefPtr<Gio::SimpleActionGroup> group) const {
+	bool Copier::populateMenu(const ItemStackPtr &, Glib::RefPtr<Gio::Menu> menu, Glib::RefPtr<Gio::SimpleActionGroup> group) const {
 		// auto submenu = Gio::Menu::create();
 
 		// submenu->append("Copy", "item_menu.copy");

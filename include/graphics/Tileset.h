@@ -14,8 +14,6 @@
 #include <nlohmann/json_fwd.hpp>
 
 namespace Game3 {
-	class Game;
-	class ItemStack;
 	class Texture;
 
 	struct AutotileSet {
@@ -52,7 +50,7 @@ namespace Game3 {
 			std::string getName() const;
 			std::shared_ptr<Texture> getTexture(const Game &);
 			const Identifier & getTextureName() const { return textureName; }
-			bool getItemStack(const std::shared_ptr<Game> &, const Identifier &, ItemStack &) const;
+			bool getItemStack(const std::shared_ptr<Game> &, const Identifier &, ItemStackPtr &) const;
 			bool isMarchable(TileID);
 			bool isCategoryMarchable(const Identifier &category) const;
 			const MarchableInfo * getMarchableInfo(const Identifier &tilename) const;

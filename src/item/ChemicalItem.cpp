@@ -7,8 +7,8 @@
 namespace Game3 {
 	Lockable<std::unordered_map<std::string, Glib::RefPtr<Gdk::Pixbuf>>> ChemicalItem::imageCache{};
 
-	Glib::RefPtr<Gdk::Pixbuf> ChemicalItem::getImage(const Game &game, const ItemStack &stack) const {
-		const std::string formula = getFormula(stack);
+	Glib::RefPtr<Gdk::Pixbuf> ChemicalItem::getImage(const Game &game, const ConstItemStackPtr &stack) const {
+		const std::string formula = getFormula(*stack);
 
 		{
 			auto shared_lock = imageCache.sharedLock();
@@ -22,8 +22,8 @@ namespace Game3 {
 		return image;
 	}
 
-	Glib::RefPtr<Gdk::Pixbuf> ChemicalItem::makeImage(const Game &, const ItemStack &stack) const {
-		const std::string formula = getFormula(stack);
+	Glib::RefPtr<Gdk::Pixbuf> ChemicalItem::makeImage(const Game &, const ConstItemStackPtr &stack) const {
+		const std::string formula = getFormula(*stack);
 
 		uint16_t hue = 0;
 		float saturation = 1.f;
@@ -46,8 +46,8 @@ namespace Game3 {
 		return Gdk::Pixbuf::create_from_data(rawImage.get(), Gdk::Colorspace::RGB, true, 8, width, height, 4 * width)->scale_simple(width << 3, height << 3, Gdk::InterpType::NEAREST);
 	}
 
-	std::string ChemicalItem::getTooltip(const ItemStack &stack) {
-		const std::string formula = getFormula(stack);
+	std::string ChemicalItem::getTooltip(const ConstItemStackPtr &stack) {
+		const std::string formula = getFormula(*stack);
 		if (formula.empty())
 			return "Unknown Chemical";
 		if (auto iter = moleculeNames.find(formula); iter != moleculeNames.end())

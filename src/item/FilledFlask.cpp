@@ -25,7 +25,7 @@ namespace Game3 {
 
 			{
 				auto lock = inventory->uniqueLock();
-				if (--stack.count == 0)
+				if (--stack->count == 0)
 					inventory->erase(slot);
 			}
 

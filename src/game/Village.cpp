@@ -87,7 +87,7 @@ namespace Game3 {
 		double multiplier = getMultiplier();
 
 		if (auto effect = rule.getRichnessEffect()) {
-			if (auto richness = getRichness(rule.getOutput().getID())) {
+			if (auto richness = getRichness(rule.getOutput()->getID())) {
 				multiplier = *effect * *richness;
 				if (multiplier <= 0)
 					return;
@@ -96,16 +96,16 @@ namespace Game3 {
 			}
 		}
 
-		for (const ItemStack &stack: rule.getInputs()) {
-			auto iter = resources.find(stack.getID());
-			if (iter == resources.end() || iter->second < multiplier * stack.count)
+		for (const ItemStackPtr &stack: rule.getInputs()) {
+			auto iter = resources.find(stack->getID());
+			if (iter == resources.end() || iter->second < multiplier * stack->count)
 				return;
 		}
 
-		double &output_count = resources[rule.getOutput().getID()];
+		double &output_count = resources[rule.getOutput()->getID()];
 
 		// Don't surpass the output cap.
-		double add_count = rule.getOutput().count * multiplier;
+		double add_count = rule.getOutput()->count * multiplier;
 		if (auto cap = rule.getCap(); cap && *cap < output_count + add_count) {
 			double new_add = *cap - output_count;
 			// TODO: is /= the right operation?
@@ -124,8 +124,8 @@ namespace Game3 {
 		if (multiplier == 0)
 			return;
 
-		for (const ItemStack &stack: rule.getInputs())
-			resources.at(stack.getID()) -= multiplier * stack.count;
+		for (const ItemStackPtr &stack: rule.getInputs())
+			resources.at(stack->getID()) -= multiplier * stack->count;
 
 		output_count += add_count;
 		labor -= labor_needed;

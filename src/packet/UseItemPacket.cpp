@@ -23,6 +23,6 @@ namespace Game3 {
 			return;
 		}
 
-		stack->item->use(slot, *stack, player, modifiers);
+		stack->item->use(slot, stack, player, modifiers);
 	}
 }

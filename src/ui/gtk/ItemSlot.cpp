@@ -99,30 +99,30 @@ namespace Game3 {
 		add_controller(rightGesture);
 	}
 
-	void ItemSlot::setStack(ItemStack stack) {
-		image.set(stack.getImage());
+	void ItemSlot::setStack(const ItemStackPtr &stack) {
+		image.set(stack->getImage());
 
-		if (stack.count == ItemCount(-1))
+		if (stack->count == ItemCount(-1))
 			label.set_text({});
 		else
-			label.set_text(std::to_string(stack.count));
+			label.set_text(std::to_string(stack->count));
 
-		Glib::ustring tooltip = stack.item->getTooltip(stack);
+		Glib::ustring tooltip = stack->item->getTooltip(stack);
 
-		if (stack.count != 1 && stack.count != ItemCount(-1))
-			tooltip += " \u00d7 " + std::to_string(stack.count);
+		if (stack->count != 1 && stack->count != ItemCount(-1))
+			tooltip += " \u00d7 " + std::to_string(stack->count);
 
-		if (stack.hasDurability()) {
-			const nlohmann::json &durability = stack.data.at("durability");
+		if (stack->hasDurability()) {
+			const nlohmann::json &durability = stack->data.at("durability");
 			tooltip += "\n(" + std::to_string(durability.at(0).get<Durability>()) + '/' + std::to_string(durability.at(1).get<Durability>()) + ')';
-			addDurabilityBar(stack.getDurabilityFraction());
+			addDurabilityBar(stack->getDurabilityFraction());
 		} else if (durabilityVisible) {
 			durabilityVisible = false;
 			remove(durabilityBar);
 		}
 
 		set_tooltip_text(tooltip);
-		storedStack.emplace(std::move(stack));
+		storedStack = std::move(stack); // TODO!: copy?
 	}
 
 	void ItemSlot::reset() {
@@ -137,7 +137,7 @@ namespace Game3 {
 	}
 
 	bool ItemSlot::empty() const {
-		return !storedStack.has_value();
+		return !storedStack;
 	}
 
 	void ItemSlot::setLeftClick(ClickFn click) {

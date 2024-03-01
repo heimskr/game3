@@ -291,7 +291,7 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const ItemStack &) {
+	std::string Buffer::getType(const ItemStackPtr &) {
 		return {'\xe0'};
 	}
 
@@ -305,31 +305,36 @@ namespace Game3 {
 		return out;
 	}
 
-	Buffer & operator+=(Buffer &buffer, const ItemStack &stack) {
-		assert(stack.item);
+	Buffer & operator+=(Buffer &buffer, const ItemStackPtr &stack) {
+		assert(stack->item);
 		buffer.appendType(stack);
-		buffer << stack.item->identifier;
-		buffer << stack.count;
-		buffer << stack.data.dump(); // TODO: Buffer::operator+= for json
+		buffer << stack->item->identifier;
+		buffer << stack->count;
+		buffer << stack->data.dump(); // TODO: Buffer::operator+= for json
 		return buffer;
 	}
 
-	Buffer & operator<<(Buffer &buffer, const ItemStack &stack) {
+	Buffer & operator<<(Buffer &buffer, const ItemStackPtr &stack) {
 		return buffer += stack;
 	}
 
-	Buffer & operator>>(Buffer &buffer, ItemStack &stack) {
-		assert(stack.hasGame());
+	Buffer & operator>>(Buffer &buffer, ItemStackPtr &stack) {
+		if (!stack) {
+			GamePtr game = std::dynamic_pointer_cast<Game>(buffer.context.lock());
+			assert(game);
+			stack = ItemStack::create(game);
+		}
+
 		const auto type = buffer.popType();
 		if (!Buffer::typesMatch(type, buffer.getType(stack))) {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected ItemStack)");
 		}
 		const auto item_id = buffer.take<Identifier>();
-		stack.count = buffer.take<ItemCount>();
+		stack->count = buffer.take<ItemCount>();
 		const auto raw_json = buffer.take<std::string>(); // TODO: popBuffer for json
-		stack.data = nlohmann::json::parse(raw_json);
-		stack.item = stack.getGame()->registry<ItemRegistry>().at(item_id);
+		stack->data = nlohmann::json::parse(raw_json);
+		stack->item = stack->getGame()->registry<ItemRegistry>().at(item_id);
 		return buffer;
 	}
 

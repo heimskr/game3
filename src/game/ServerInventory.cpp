@@ -46,7 +46,7 @@ namespace Game3 {
 				}
 			} else {
 				const ItemCount to_store = std::min(ItemCount(stack->item->maxCount), ItemCount(remaining));
-				const bool emplaced = storage.try_emplace(start, stack->getGame(), stack->item, to_store, stack->data).second;
+				const bool emplaced = storage.try_emplace(start, ItemStack::create(stack->getGame(), stack->item, to_store, stack->data)).second;
 				assert(emplaced);
 				remaining -= to_store;
 			}

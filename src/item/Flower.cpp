@@ -28,16 +28,16 @@ namespace Game3 {
 	}
 
 	bool Flower::plant(InventoryPtr inventory, Slot slot, const ItemStackPtr &stack, const Place &place) {
-		if (stack.count == 0) {
+		if (stack->count == 0) {
+			auto lock = inventory->uniqueLock();
 			inventory->erase(slot);
 			inventory->notifyOwner();
 			return false;
 		}
 
 		place.set(Layer::Submerged, tilename);
-		if (--stack.count == 0)
-			inventory->erase(slot);
-		inventory->notifyOwner();
+
+		inventory->decrease(stack, slot, 1, true);
 		return true;
 	}
 }

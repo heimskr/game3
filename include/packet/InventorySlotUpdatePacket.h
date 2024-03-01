@@ -11,10 +11,10 @@ namespace Game3 {
 		static PacketID ID() { return 22; }
 
 		Slot slot = -1;
-		ItemStack stack;
+		ItemStackPtr stack;
 
 		InventorySlotUpdatePacket() = default;
-		InventorySlotUpdatePacket(Slot, const ItemStack &);
+		InventorySlotUpdatePacket(Slot, const ItemStackPtr &);
 
 		PacketID getID() const override { return ID(); }
 

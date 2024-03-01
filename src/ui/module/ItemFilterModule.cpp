@@ -22,11 +22,11 @@ namespace Game3 {
 			const DragSource source = static_cast<const Glib::Value<DragSource> &>(base).get();
 
 			auto source_lock = source.inventory->sharedLock();
-			ItemStack *stack = (*source.inventory)[source.slot];
+			ItemStackPtr stack = (*source.inventory)[source.slot];
 
 			if (stack) {
 				setFilter();
-				filter->addItem(*stack);
+				filter->addItem(stack);
 				populate();
 				upload();
 			}
@@ -136,9 +136,9 @@ namespace Game3 {
 	}
 
 	bool ItemFilterModule::handleShiftClick(std::shared_ptr<Inventory> source_inventory, Slot source_slot) {
-		if (ItemStack *stack = (*source_inventory)[source_slot]) {
+		if (ItemStackPtr stack = (*source_inventory)[source_slot]) {
 			setFilter();
-			filter->addItem(*stack);
+			filter->addItem(stack);
 			populate();
 			upload();
 		}
@@ -229,13 +229,13 @@ namespace Game3 {
 	}
 
 	void ItemFilterModule::addHbox(const Identifier &id, const ItemFilter::Config &config) {
-		ItemStack stack(game, id, 1, config.data);
+		ItemStackPtr stack = ItemStack::create(game, id, 1, config.data);
 		auto hbox = std::make_unique<Gtk::Box>(Gtk::Orientation::HORIZONTAL);
-		auto image = makeImage(stack);
-		auto label = makeLabel(stack);
+		auto image = makeImage(*stack);
+		auto label = makeLabel(*stack);
 		auto comparator = makeComparator(id, config);
 		auto threshold = makeThreshold(id, config);
-		auto button = makeButton(std::move(stack));
+		auto button = makeButton(stack);
 		hbox->set_margin_top(10);
 		hbox->append(*image);
 		hbox->append(*label);
@@ -338,13 +338,13 @@ namespace Game3 {
 		return spin;
 	}
 
-	std::unique_ptr<Gtk::Button> ItemFilterModule::makeButton(ItemStack stack) {
+	std::unique_ptr<Gtk::Button> ItemFilterModule::makeButton(const ItemStackPtr &stack) {
 		auto button = std::make_unique<Gtk::Button>();
 		button->set_icon_name("list-remove-symbolic");
 		button->set_expand(false);
 		button->set_has_frame(false);
 		button->set_margin_end(10);
-		button->signal_clicked().connect([this, stack = std::move(stack)] {
+		button->signal_clicked().connect([this, stack = stack->copy()] {
 			setFilter();
 			if (filter) {
 				filter->removeItem(stack);

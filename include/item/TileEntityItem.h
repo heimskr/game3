@@ -28,7 +28,7 @@ namespace Game3 {
 						return false;
 
 					realm.queueDestruction(existing);
-					inventory->add(stack.withCount(1));
+					inventory->add(stack->withCount(1));
 					inventory->notifyOwner();
 					return true;
 				}
@@ -38,7 +38,7 @@ namespace Game3 {
 
 				if (std::shared_ptr<T> tile_entity = TileEntity::spawn<T>(place.realm, position)) {
 					game->toServer().tileEntitySpawned(tile_entity);
-					if (--stack.count == 0)
+					if (--stack->count == 0)
 						inventory->erase(slot);
 					inventory->notifyOwner();
 					return true;

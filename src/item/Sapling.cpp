@@ -32,7 +32,7 @@ namespace Game3 {
 	}
 
 	bool Sapling::plant(InventoryPtr inventory, Slot slot, const ItemStackPtr &stack, const Place &place) {
-		if (stack.count == 0) {
+		if (stack->count == 0) {
 			auto lock = inventory->uniqueLock();
 			inventory->erase(slot);
 			inventory->notifyOwner();

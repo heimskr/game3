@@ -291,7 +291,7 @@ namespace Game3 {
 				return operated;
 			}
 
-			plantable->plant(input_span, slot, *stack, place);
+			plantable->plant(input_span, slot, stack, place);
 			return true;
 		}
 

@@ -58,9 +58,9 @@ namespace Game3 {
 		sellRow.append(sellLabelBox);
 		sellButton.signal_clicked().connect(sigc::mem_fun(*this, &VillageTradeModule::sell));
 
-		sellSlot.onDrop = [this](ItemStack *stack) {
+		sellSlot.onDrop = [this](const ItemStackPtr &stack) {
 			if (stack)
-				setSellStack(*stack);
+				setSellStack(stack);
 			else
 				WARN_("No stack in sellSlot.onDrop");
 			return true;
@@ -108,8 +108,8 @@ namespace Game3 {
 	void VillageTradeModule::update() {
 		villageName.set_text(village->getName());
 		laborLabel.set_text(std::format("Available labor: {:.2f}", village->getLabor()));
-		if (const auto &stack = sellSlot.getStack())
-			updateSell(*stack);
+		if (const ItemStackPtr &stack = sellSlot.getStack())
+			updateSell(stack);
 		populate();
 	}
 
@@ -126,8 +126,8 @@ namespace Game3 {
 	}
 
 	bool VillageTradeModule::handleShiftClick(std::shared_ptr<Inventory> source_inventory, Slot slot) {
-		if (ItemStack *stack = (*source_inventory)[slot]) {
-			if (setSellStack(*stack)) {
+		if (ItemStackPtr stack = (*source_inventory)[slot]) {
+			if (setSellStack(stack)) {
 				showSell();
 				return true;
 			}
@@ -136,19 +136,19 @@ namespace Game3 {
 		return false;
 	}
 
-	bool VillageTradeModule::setSellStack(ItemStack stack) {
+	bool VillageTradeModule::setSellStack(ItemStackPtr stack) {
 		if (!isSellable(stack))
 			return false;
 
 		sellSlot.setStack(stack);
-		const double max(stack.count);
+		const double max(stack->count);
 		sellCount.set_adjustment(Gtk::Adjustment::create(max, 1.0, max));
 		sellCount.set_value(max);
 		updateSell(stack);
 		return true;
 	}
 
-	void VillageTradeModule::updateSell(const ItemStack &stack) {
+	void VillageTradeModule::updateSell(const ItemStackPtr &stack) {
 		if (!village) {
 			WARN_("No village in VillageTradeModule::setSellStack");
 			return;
@@ -159,9 +159,9 @@ namespace Game3 {
 		sellCount.set_adjustment(Gtk::Adjustment::create(max, 1.0, max));
 		sellCount.set_value(old_value);
 
-		std::optional<double> amount = village->getResourceAmount(stack.getID());
+		std::optional<double> amount = village->getResourceAmount(stack->getID());
 
-		if (std::optional<MoneyCount> sell_price = totalSellPrice(amount.value_or(0.0), -1, stack.item->basePrice, ItemCount(sellCount.get_value()), village->getGreed())) {
+		if (std::optional<MoneyCount> sell_price = totalSellPrice(amount.value_or(0.0), -1, stack->item->basePrice, ItemCount(sellCount.get_value()), village->getGreed())) {
 			sellButton.set_tooltip_text(std::format("Price: {}", *sell_price));
 			totalPriceLabel.set_text(std::format("Total: {}", *sell_price));
 			unitPriceLabel.set_text(std::format("Unit: {:.2f}", *sell_price / sellCount.get_value()));
@@ -174,13 +174,13 @@ namespace Game3 {
 		if (!village)
 			return;
 
-		std::optional<ItemStack> &stack = sellSlot.getStack();
+		ItemStackPtr &stack = sellSlot.getStack();
 		if (!stack)
 			return;
 
 		const ItemCount sell_count(sellCount.get_value());
 
-		ItemCount inventory_count = game->getPlayer()->getInventory(0)->count(*stack);
+		ItemCount inventory_count = game->getPlayer()->getInventory(0)->count(stack);
 
 		if (inventory_count <= sell_count) {
 			sellSlot.reset();
@@ -190,7 +190,7 @@ namespace Game3 {
 			inventory_count -= sell_count;
 			if (inventory_count < stack->count) {
 				stack->count = inventory_count;
-				sellSlot.setStack(std::move(*stack));
+				sellSlot.setStack(stack);
 			}
 		}
 
@@ -249,7 +249,7 @@ namespace Game3 {
 	basePrice(item.basePrice),
 	amount(amount_),
 	greed(greed_) {
-		itemSlot.setStack({game, resource, ItemCount(-1)});
+		itemSlot.setStack(ItemStack::create(game, resource, ItemCount(-1)));
 		updateLabel();
 		updateTooltips(1);
 		itemSlot.set_hexpand(false);

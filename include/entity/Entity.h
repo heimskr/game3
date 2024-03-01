@@ -194,7 +194,7 @@ namespace Game3 {
 			void changeTexture(const Identifier &);
 			virtual int getZIndex() const { return 0; }
 			virtual Identifier getMilk() const { return {}; }
-			ItemStack * getHeld(Hand) const;
+			ItemStackPtr getHeld(Hand) const;
 			Slot getHeldSlot(Hand) const;
 			Slot getActiveSlot() const;
 			bool isOffsetZero() const;
