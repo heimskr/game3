@@ -25,7 +25,7 @@ namespace Game3 {
 
 			void init(Game &) override;
 			void tick(const TickArgs &) override;
-			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
 
 			void render(SpriteRenderer &) override;
 			void renderUpper(SpriteRenderer &) override;
@@ -64,7 +64,7 @@ namespace Game3 {
 			void autocraft();
 			void cacheRecipes();
 			bool stationSet();
-			void setStationTexture(const ItemStack &);
+			void setStationTexture(const ItemStackPtr &);
 			void resetStationTexture();
 			bool validateRecipe(const CraftingRecipe &) const;
 			void connectStationInventory();

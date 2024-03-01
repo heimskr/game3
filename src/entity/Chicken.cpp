@@ -21,6 +21,6 @@ namespace Game3 {
 
 	void Chicken::layEgg() {
 		RealmPtr realm = getRealm();
-		ItemStack(realm->getGame(), "base:item/egg").spawn(realm, position);
+		ItemStack::spawn(Place{position, realm}, realm->getGame(), "base:item/egg");
 	}
 }

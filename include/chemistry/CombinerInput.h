@@ -8,16 +8,13 @@
 #include <nlohmann/json_fwd.hpp>
 
 namespace Game3 {
-	class Game;
-	class ItemStack;
-
 	class CombinerInput {
 		public:
 			std::vector<std::pair<ItemCount, std::string>> inputs;
 
 			CombinerInput() = default;
 
-			std::vector<ItemStack> getStacks(const std::shared_ptr<Game> &);
+			std::vector<ItemStackPtr> getStacks(const GamePtr &);
 
 			static CombinerInput fromJSON(const nlohmann::json &, ItemCount *output_count_out = nullptr);
 	};

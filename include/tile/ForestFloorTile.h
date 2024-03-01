@@ -10,6 +10,6 @@ namespace Game3 {
 			ForestFloorTile();
 
 			void randomTick(const Place &) override;
-			bool interact(const Place &, Layer, ItemStack *, Hand) override;
+			bool interact(const Place &, Layer, const ItemStackPtr &, Hand) override;
 	};
 }

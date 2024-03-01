@@ -58,7 +58,7 @@ namespace Game3 {
 			chosenResource = json.at("chosenResource");
 	}
 
-	bool Woodcutter::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, ItemStack *, Hand) {
+	bool Woodcutter::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, const ItemStackPtr &, Hand) {
 		if (getSide() == Side::Client) {
 			GamePtr game = getGame();
 			MainWindow &window = game->toClient().getWindow();

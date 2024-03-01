@@ -36,14 +36,14 @@ namespace Game3 {
 		return out;
 	}
 
-	std::vector<ItemStack> CombinerInput::getStacks(const std::shared_ptr<Game> &game) {
-		std::vector<ItemStack> out;
+	std::vector<ItemStackPtr> CombinerInput::getStacks(const std::shared_ptr<Game> &game) {
+		std::vector<ItemStackPtr> out;
 
 		for (const auto &[count, string]: inputs) {
 			if (string.find(':') == std::string::npos)
-				out.emplace_back(game, "base:item/chemical", count, nlohmann::json{{"formula", string}});
+				out.push_back(ItemStack::create(game, "base:item/chemical", count, nlohmann::json{{"formula", string}}));
 			else
-				out.emplace_back(game, Identifier(string), count);
+				out.push_back(ItemStack::create(game, Identifier(string), count));
 		}
 
 		return out;

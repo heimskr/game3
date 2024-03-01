@@ -28,7 +28,7 @@ namespace Game3 {
 		place.realm->spawn(monster, place.position);
 	}
 
-	bool Tile::interact(const Place &, Layer, ItemStack *, Hand) {
+	bool Tile::interact(const Place &, Layer, const ItemStackPtr &, Hand) {
 		return false;
 	}
 

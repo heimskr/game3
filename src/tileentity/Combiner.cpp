@@ -90,7 +90,7 @@ namespace Game3 {
 		EnergeticTileEntity::toJSON(json);
 	}
 
-	bool Combiner::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *, Hand) {
+	bool Combiner::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
 		if (getSide() == Side::Client)
 			return false;
 
@@ -105,7 +105,7 @@ namespace Game3 {
 			}
 			RealmPtr realm = getRealm();
 			realm->queueDestruction(getSelf());
-			player->give(ItemStack(realm->getGame(), "base:item/combiner"_id));
+			player->give(ItemStack::create(realm->getGame(), "base:item/combiner"_id));
 			return true;
 		}
 

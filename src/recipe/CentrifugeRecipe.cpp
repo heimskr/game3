@@ -33,7 +33,7 @@ namespace Game3 {
 			return false;
 
 		auto inventory_lock = inventory->uniqueLock();
-		ItemStack output = getOutput(input, game);
+		ItemStackPtr output = getOutput(input, game);
 
 		if (!inventory->canInsert(output))
 			return false;

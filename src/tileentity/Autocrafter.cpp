@@ -78,7 +78,7 @@ namespace Game3 {
 		enqueueTick(PERIOD);
 	}
 
-	bool Autocrafter::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *, Hand) {
+	bool Autocrafter::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
 		if (getSide() == Side::Client)
 			return false;
 
@@ -86,19 +86,19 @@ namespace Game3 {
 			{
 				const InventoryPtr inventory = getInventory(0);
 				auto lock = inventory->sharedLock();
-				inventory->iterate([&](const ItemStack &stack, Slot) {
+				inventory->iterate([&](const ItemStackPtr &stack, Slot) {
 					player->give(stack);
 					return false;
 				});
 			}
 			{
 				auto lock = stationInventory.uniqueLock();
-				if (ItemStack *station_stack = (*stationInventory)[0])
-					player->give(std::move(*station_stack));
+				if (ItemStackPtr station_stack = (*stationInventory)[0])
+					player->give(station_stack);
 			}
 			RealmPtr realm = getRealm();
 			realm->queueDestruction(getSelf());
-			player->give(ItemStack(realm->getGame(), "base:item/autocrafter"_id));
+			player->give(ItemStack::create(realm->getGame(), "base:item/autocrafter"_id));
 			return true;
 		}
 
@@ -319,7 +319,7 @@ namespace Game3 {
 		auto output_span = std::make_shared<InventorySpan>(inventory, input_capacity, input_capacity + OUTPUT_CAPACITY - 1);
 		GamePtr game = getGame();
 
-		std::optional<std::vector<ItemStack>> leftovers;
+		std::optional<std::vector<ItemStackPtr>> leftovers;
 		for (const std::shared_ptr<CraftingRecipe> &recipe: cachedRecipes) {
 			if (recipe->craft(game, input_span, output_span, leftovers)) {
 				auto energy_lock = energyContainer->sharedLock();
@@ -348,10 +348,10 @@ namespace Game3 {
 
 		bool out = true;
 
-		if (ItemStack *stack = (*stationInventory)[0]) {
+		if (ItemStackPtr stack = (*stationInventory)[0]) {
 			if (auto station_item = std::dynamic_pointer_cast<StationFurniture>(stack->item)) {
 				station = station_item->stationType;
-				setStationTexture(*stack);
+				setStationTexture(stack);
 			} else {
 				station = {};
 				out = false;
@@ -366,12 +366,12 @@ namespace Game3 {
 		return out;
 	}
 
-	void Autocrafter::setStationTexture(const ItemStack &stack) {
+	void Autocrafter::setStationTexture(const ItemStackPtr &stack) {
 		GamePtr game = getGame();
 		if (game->getSide() != Side::Client)
 			return;
-		std::shared_ptr<ItemTexture> item_texture = game->registry<ItemTextureRegistry>().at(stack.item->identifier);
-		stationTexture = stack.getTexture(*game);
+		std::shared_ptr<ItemTexture> item_texture = game->registry<ItemTextureRegistry>().at(stack->item->identifier);
+		stationTexture = stack->getTexture(*game);
 		stationTexture->init();
 		stationXOffset = item_texture->x / 2.f;
 		stationYOffset = item_texture->y / 2.f;
@@ -395,8 +395,8 @@ namespace Game3 {
 
 		auto target_lock = target.sharedLock();
 
-		for (const ItemStack &stack: recipe.output)
-			if (stack.item->identifier == target)
+		for (const ItemStackPtr &stack: recipe.output)
+			if (stack->item->identifier == target)
 				return true;
 
 		return false;

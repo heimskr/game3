@@ -66,7 +66,7 @@ namespace Game3 {
 						if (pipe->getPresent(pipe_type)) {
 							if (pipe_type == P) {
 								self_present = true;
-								place.player->give(ItemStack(game, getPipeItem(*game, pipe_type), 1));
+								place.player->give(ItemStack::create(game, getPipeItem(*game, pipe_type), 1));
 								pipe->setPresent(P, false);
 							} else {
 								others_present = true;

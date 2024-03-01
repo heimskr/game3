@@ -11,8 +11,8 @@ namespace Game3 {
 		constexpr double E = 2.71828182845904523536;
 	}
 
-	bool isSellable(const ItemStack &stack) {
-		return stack.data.empty();
+	bool isSellable(const ItemStackPtr &stack) {
+		return stack->data.empty();
 	}
 
 	double buyPriceToSellPrice(double buy_price, double greed) {
@@ -37,12 +37,12 @@ namespace Game3 {
 		return buyPriceToSellPrice(buyPrice(base_price, item_count, merchant_money), greed);
 	}
 
-	bool totalSellPrice(const Inventory &inventory, MoneyCount money, double greed, const ItemStack &stack, MoneyCount &out) {
+	bool totalSellPrice(const Inventory &inventory, MoneyCount money, double greed, const ItemStackPtr &stack, MoneyCount &out) {
 		auto held_amount = inventory.count(stack);
-		const auto base = stack.item->basePrice;
+		const auto base = stack->item->basePrice;
 		double price = 0.;
 		bool result = true;
-		auto amount = stack.count;
+		auto amount = stack->count;
 		while (1 <= amount) {
 			const double unit_price = sellPrice(base, held_amount++, money, greed);
 			if (money < unit_price)
@@ -65,7 +65,7 @@ namespace Game3 {
 		return result? discrete_price <= money : false;
 	}
 
-	bool totalSellPrice(const Merchant &merchant, const ItemStack &stack, MoneyCount &out) {
+	bool totalSellPrice(const Merchant &merchant, const ItemStackPtr &stack, MoneyCount &out) {
 		return totalSellPrice(*merchant.getInventory(0), merchant.getMoney(), merchant.greed, stack, out);
 	}
 
@@ -109,11 +109,11 @@ namespace Game3 {
 		return std::ceil(price);
 	}
 
-	std::optional<MoneyCount> totalBuyPrice(const Inventory &inventory, MoneyCount merchant_money, const ItemStack &stack) {
-		return totalBuyPrice(inventory.count(stack), merchant_money, stack.item->basePrice, stack.count);
+	std::optional<MoneyCount> totalBuyPrice(const Inventory &inventory, MoneyCount merchant_money, const ItemStackPtr &stack) {
+		return totalBuyPrice(inventory.count(stack), merchant_money, stack->item->basePrice, stack->count);
 	}
 
-	std::optional<MoneyCount> totalBuyPrice(const Merchant &merchant, const ItemStack &stack) {
+	std::optional<MoneyCount> totalBuyPrice(const Merchant &merchant, const ItemStackPtr &stack) {
 		return totalBuyPrice(*merchant.getInventory(0), merchant.getMoney(), stack);
 	}
 }

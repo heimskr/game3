@@ -89,7 +89,7 @@ namespace Game3 {
 			json["equation"] = equation->getText();
 	}
 
-	bool ChemicalReactor::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *, Hand) {
+	bool ChemicalReactor::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
 		if (getSide() == Side::Client)
 			return false;
 
@@ -97,7 +97,7 @@ namespace Game3 {
 		if (modifiers.onlyAlt()) {
 			RealmPtr realm = getRealm();
 			realm->queueDestruction(getSelf());
-			player->give(ItemStack(realm->getGame(), "base:item/chemical_reactor"_id));
+			player->give(ItemStack::create(realm->getGame(), "base:item/chemical_reactor"_id));
 			return true;
 		}
 

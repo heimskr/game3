@@ -27,7 +27,7 @@ namespace Game3 {
 		rider->setOffset(getOffset() + Vector3{0.f, 0.f, .3f});
 	}
 
-	bool Animal::onInteractOn(const std::shared_ptr<Player> &player, Modifiers, ItemStack *, Hand) {
+	bool Animal::onInteractOn(const std::shared_ptr<Player> &player, Modifiers, const ItemStackPtr &, Hand) {
 		if (getRider() == player) {
 			setRider(nullptr);
 			return true;

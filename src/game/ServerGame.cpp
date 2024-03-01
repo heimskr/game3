@@ -359,7 +359,7 @@ namespace Game3 {
 					item_name = "base:item/" + std::string(item_name);
 
 				if (auto item = registry<ItemRegistry>()[Identifier(item_name)]) {
-					player->give(ItemStack(shared_from_this(), item, count, std::move(data)));
+					player->give(ItemStack::create(shared_from_this(), item, count, std::move(data)));
 					return {true, "Gave " + std::to_string(count) + " x " + item->name};
 				}
 

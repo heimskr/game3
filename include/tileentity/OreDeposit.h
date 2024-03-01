@@ -6,14 +6,14 @@
 
 namespace Game3 {
 	struct Ore: NamedRegisterable {
-		ItemStack stack;
+		ItemStackPtr stack;
 		Identifier tilename;
 		Identifier regenTilename;
 		float tooldownMultiplier;
 		uint32_t maxUses;
 		float cooldown;
 
-		Ore(Identifier, ItemStack, Identifier tilename_, Identifier regen_tilename, float tooldown_multiplier, uint32_t max_uses, float cooldown_);
+		Ore(Identifier, ItemStackPtr, Identifier tilename_, Identifier regen_tilename, float tooldown_multiplier, uint32_t max_uses, float cooldown_);
 
 		static Ore fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
 	};
@@ -30,7 +30,7 @@ namespace Game3 {
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
 			void tick(const TickArgs &) override;
-			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
 			void render(SpriteRenderer &) override;
 			const Ore & getOre(const Game &) const;
 

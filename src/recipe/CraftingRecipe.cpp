@@ -18,10 +18,10 @@ namespace Game3 {
 		if (!inventory)
 			return false;
 
-		for (const auto &requirement: input) {
-			if (requirement.is<ItemStack>()) {
-				const auto &stack = requirement.get<ItemStack>();
-				if (0 < stack.count && inventory->count(stack) < stack.count)
+		for (const CraftingRequirement &requirement: input) {
+			if (requirement.is<ItemStackPtr>()) {
+				ItemStackPtr stack = requirement.get<ItemStackPtr>();
+				if (0 < stack->count && inventory->count(stack) < stack->count)
 					return false;
 			} else {
 				const auto &[attribute, count] = requirement.get<AttributeRequirement>();
@@ -50,8 +50,8 @@ namespace Game3 {
 			for (const CraftingRequirement &requirement: input)
 				copy->remove(requirement);
 
-			for (const ItemStack &stack: output)
-				if (copy->add(stack).has_value())
+			for (const ItemStackPtr &stack: output)
+				if (copy->add(stack))
 					return false;
 
 			inventory_in->replace(std::move(*copy));
@@ -77,8 +77,8 @@ namespace Game3 {
 		// If that succeeds, proceed to remove the ingredients from the input inventory and replace
 		// the output inventory with the copy.
 		auto out_copy = inventory_out->copy();
-		for (const ItemStack &stack: output)
-			if (out_copy->add(stack).has_value())
+		for (const ItemStackPtr &stack: output)
+			if (out_copy->add(stack))
 				return false;
 
 		for (const CraftingRequirement &requirement: input)

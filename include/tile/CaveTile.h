@@ -11,6 +11,6 @@ namespace Game3 {
 		public:
 			CaveTile(Identifier, ItemStack, Identifier floor_);
 
-			bool interact(const Place &, Layer, ItemStack *, Hand) override;
+			bool interact(const Place &, Layer, const ItemStackPtr &, Hand) override;
 	};
 }

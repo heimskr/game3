@@ -75,18 +75,18 @@ namespace Game3 {
 				auto left_vbox = std::make_unique<Gtk::Box>(Gtk::Orientation::VERTICAL);
 				auto right_vbox = std::make_unique<Gtk::Box>(Gtk::Orientation::VERTICAL);
 				Glib::ustring output_label_text;
-				for (ItemStack &output: recipe->output) {
+				for (const ItemStackPtr &output: recipe->output) {
 					auto fixed = std::make_unique<Gtk::Fixed>();
-					auto image = std::make_unique<Gtk::Image>(output.getImage(*game));
-					auto label = std::make_unique<Gtk::Label>(std::to_string(output.count));
+					auto image = std::make_unique<Gtk::Image>(output->getImage(*game));
+					auto label = std::make_unique<Gtk::Label>(std::to_string(output->count));
 					if (!output_label_text.empty())
 						output_label_text += " + ";
-					if (output.count != 1)
-						output_label_text += std::to_string(output.count) + ' ';
-					output_label_text += output.item->name;
-					Glib::ustring tooltip = output.item->name;
-					if (output.count != 1)
-						tooltip += " \u00d7 " + std::to_string(output.count);
+					if (output->count != 1)
+						output_label_text += std::to_string(output->count) + ' ';
+					output_label_text += output->item->name;
+					Glib::ustring tooltip = output->item->name;
+					if (output->count != 1)
+						tooltip += " \u00d7 " + std::to_string(output->count);
 					label->set_tooltip_text(tooltip);
 					label->set_xalign(1.f);
 					label->set_yalign(1.f);
@@ -105,12 +105,12 @@ namespace Game3 {
 				output_label->add_css_class("output-label");
 				right_vbox->append(*output_label);
 
-				for (const auto &input: recipe->input) {
+				for (const CraftingRequirement &input: recipe->input) {
 					std::unique_ptr<Gtk::Label> label;
-					if (input.is<ItemStack>()) {
-						const auto &stack = input.get<ItemStack>();
-						Glib::ustring ending = stack.count == 0? " (not consumed)" : "";
-						label = std::make_unique<Gtk::Label>((1 < stack.count? std::to_string(stack.count) + " \u00d7 " : "") + stack.item->name + ending);
+					if (input.is<ItemStackPtr>()) {
+						ItemStackPtr stack = input.get<ItemStackPtr>();
+						Glib::ustring ending = stack->count == 0? " (not consumed)" : "";
+						label = std::make_unique<Gtk::Label>((1 < stack->count? std::to_string(stack->count) + " \u00d7 " : "") + stack->item->name + ending);
 					} else {
 						const auto &[attribute, count] = input.get<AttributeRequirement>();
 						Glib::ustring ending = count == 0? " (not consumed)" : "";

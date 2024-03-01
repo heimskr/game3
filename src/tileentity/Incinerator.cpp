@@ -59,11 +59,11 @@ namespace Game3 {
 		InventoriedTileEntity::toJSON(json);
 	}
 
-	bool Incinerator::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *, Hand) {
+	bool Incinerator::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
 		if (modifiers.onlyAlt()) {
 			RealmPtr realm = getRealm();
 			realm->queueDestruction(getSelf());
-			player->give(ItemStack(realm->getGame(), "base:item/incinerator"_id));
+			player->give(ItemStack::create(realm->getGame(), "base:item/incinerator"_id));
 			return true;
 		}
 

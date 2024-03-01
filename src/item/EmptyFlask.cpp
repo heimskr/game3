@@ -25,7 +25,7 @@ namespace Game3 {
 					inventory->erase(slot);
 			}
 
-			player->give(ItemStack(game, fluid_name, 1), slot);
+			player->give(ItemStack::create(game, fluid_name, 1), slot);
 			inventory->notifyOwner();
 		};
 

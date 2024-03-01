@@ -56,12 +56,12 @@ namespace Game3 {
 		DirectedTileEntity::toJSON(json);
 	}
 
-	bool Autofarmer::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *, Hand) {
+	bool Autofarmer::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
 		RealmPtr realm = getRealm();
 
 		if (modifiers.onlyAlt()) {
 			realm->queueDestruction(getSelf());
-			player->give(ItemStack(realm->getGame(), "base:item/autofarmer"_id));
+			player->give(ItemStack::create(realm->getGame(), "base:item/autofarmer"_id));
 			return true;
 		}
 

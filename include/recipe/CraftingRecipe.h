@@ -9,7 +9,7 @@
 #include "registry/Registries.h"
 
 namespace Game3 {
-	struct CraftingRecipe: Recipe<std::vector<CraftingRequirement>, std::vector<ItemStack>> {
+	struct CraftingRecipe: Recipe<std::vector<CraftingRequirement>, std::vector<ItemStackPtr>> {
 		Input input;
 		Output output;
 		Identifier stationType;

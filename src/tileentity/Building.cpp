@@ -21,7 +21,7 @@ namespace Game3 {
 		return onInteractNextTo(player, modifiers, used_item, hand);
 	}
 
-	bool Building::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, ItemStack *, Hand) {
+	bool Building::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, const ItemStackPtr &, Hand) {
 		if (getSide() == Side::Client)
 			return false;
 		teleport(player);

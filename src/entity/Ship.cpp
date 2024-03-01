@@ -69,7 +69,7 @@ namespace Game3 {
 		return out;
 	}
 
-	bool Ship::onInteractOn(const std::shared_ptr<Player> &player, Modifiers modifiers, ItemStack *, Hand) {
+	bool Ship::onInteractOn(const std::shared_ptr<Player> &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
 		bool out = false;
 
 		if (modifiers == Modifiers{false, true, true, false}) {
@@ -90,7 +90,7 @@ namespace Game3 {
 		return out;
 	}
 
-	bool Ship::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers modifiers, ItemStack *, Hand) {
+	bool Ship::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
 		if (modifiers.onlyCtrl()) {
 			teleportToRealm(player);
 		} else {

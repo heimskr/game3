@@ -22,14 +22,14 @@ namespace Game3 {
 		json["itemName"] = itemName;
 	}
 
-	bool CraftingStation::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers modifiers, ItemStack *, Hand) {
+	bool CraftingStation::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
 		if (player->getSide() != Side::Server)
 			return false;
 
 		if (modifiers.onlyAlt()) {
 			getRealm()->queueDestruction(getSelf());
 			if (itemName)
-				player->give(ItemStack(getGame(), itemName));
+				player->give(ItemStack::create(getGame(), itemName));
 		} else {
 			player->addStationType(stationType);
 			player->queueForMove([station_type = stationType](const EntityPtr &player, bool) {

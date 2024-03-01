@@ -21,7 +21,7 @@ namespace Game3 {
 		json["name"] = name;
 	}
 
-	bool Sign::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, ItemStack *, Hand) {
+	bool Sign::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, const ItemStackPtr &, Hand) {
 		player->send(OpenTextTabPacket(name, text, true, true));
 		return true;
 	}

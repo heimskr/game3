@@ -17,12 +17,12 @@ namespace Game3 {
 		json["targetEntity"] = targetEntity;
 	}
 
-	bool EntityBuilding::onInteractOn(const PlayerPtr &player, Modifiers, ItemStack *, Hand) {
+	bool EntityBuilding::onInteractOn(const PlayerPtr &player, Modifiers, const ItemStackPtr &, Hand) {
 		teleport(player);
 		return true;
 	}
 
-	bool EntityBuilding::onInteractNextTo(const PlayerPtr &player, Modifiers, ItemStack *, Hand) {
+	bool EntityBuilding::onInteractNextTo(const PlayerPtr &player, Modifiers, const ItemStackPtr &, Hand) {
 		teleport(player);
 		return true;
 	}

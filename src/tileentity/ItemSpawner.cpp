@@ -14,7 +14,7 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	ItemSpawner::ItemSpawner(Position position_, float minimum_time, float maximum_time, std::vector<ItemStack> spawnables_):
+	ItemSpawner::ItemSpawner(Position position_, float minimum_time, float maximum_time, std::vector<ItemStackPtr> spawnables_):
 		TileEntity("base:tile/empty", ID(), position_, false),
 		minimumTime(minimum_time),
 		maximumTime(maximum_time),
@@ -24,7 +24,8 @@ namespace Game3 {
 		TileEntity::toJSON(json);
 		json["minimumTime"] = minimumTime;
 		json["maximumTime"] = maximumTime;
-		json["spawnables"]  = spawnables;
+		for (const ItemStackPtr &spawnable: spawnables)
+			json["spawnables"].push_back(*spawnable);
 	}
 
 	void ItemSpawner::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
@@ -51,7 +52,7 @@ namespace Game3 {
 		}
 
 		if (can_spawn)
-			choose(spawnables).spawn(getRealm(), getPosition());
+			choose(spawnables)->spawn(getPlace());
 
 		std::uniform_real_distribution distribution{minimumTime, maximumTime};
 		enqueueTick(std::chrono::microseconds(int64_t(1e6 * distribution(threadContext.rng))));

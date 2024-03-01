@@ -26,7 +26,6 @@ namespace Game3 {
 
 		public:
 			using SlotPredicate = std::function<bool(Slot)>;
-			using ConstPredicate = std::function<bool(const ConstItemStackPtr &, Slot)>;
 			using Predicate = std::function<bool(const ItemStackPtr &, Slot)>;
 
 			std::weak_ptr<Agent> weakOwner;
@@ -46,8 +45,7 @@ namespace Game3 {
 
 			virtual std::unique_ptr<Inventory> copy() const = 0;
 
-			virtual ItemStackPtr operator[](Slot) = 0;
-			virtual ConstItemStackPtr operator[](Slot) const = 0;
+			virtual ItemStackPtr operator[](Slot) const = 0;
 
 			bool operator==(const Inventory &other) const;
 
@@ -57,12 +55,10 @@ namespace Game3 {
 			virtual void setSlotCount(Slot) = 0;
 
 			/** Iterates over all items in the inventory until all have been iterated or the iteration function returns true. */
-			virtual void iterate(const ConstPredicate &) const = 0;
-			/** Iterates over all items in the inventory until all have been iterated or the iteration function returns true. */
-			virtual void iterate(const Predicate &) = 0;
+			virtual void iterate(const Predicate &) const = 0;
 
 			virtual ItemStackPtr firstItem(Slot *slot_out) = 0;
-			virtual ItemStackPtr firstItem(Slot *slot_out, const ConstPredicate &) = 0;
+			virtual ItemStackPtr firstItem(Slot *slot_out, const Predicate &) = 0;
 
 			/** If the ItemStack couldn't be inserted into the inventory, this function returns an ItemStack
 			 *  containing the leftovers that couldn't be inserted. Otherwise, this function returns nothing.
@@ -123,8 +119,7 @@ namespace Game3 {
 
 			std::shared_ptr<Agent> getOwner() const;
 
-			virtual ItemStackPtr front() = 0;
-			virtual ConstItemStackPtr front() const = 0;
+			virtual ItemStackPtr front() const = 0;
 
 			/** Attempts to remove a given amount of an item from the inventory.
 			 *  Returns the count removed. */
@@ -133,45 +128,41 @@ namespace Game3 {
 			/** Attempts to remove a given amount of an item from the inventory.
 			 *  Uses a predicate to determine which slots can be removed from.
 			 *  Returns the count removed. */
-			virtual ItemCount remove(const ItemStackPtr &, const ConstPredicate &) = 0;
+			virtual ItemCount remove(const ItemStackPtr &, const Predicate &) = 0;
 
 			/** Attempts to remove a given amount of an item from a specific slot. Returns the count removed. */
 			virtual ItemCount remove(const ItemStackPtr &, Slot) = 0;
 
-			virtual ItemCount remove(const CraftingRequirement &, const ConstPredicate &) = 0;
-			virtual ItemCount remove(const CraftingRequirement &requirement) { return remove(requirement, [](const ConstItemStackPtr &, Slot) { return true; }); }
+			virtual ItemCount remove(const CraftingRequirement &, const Predicate &) = 0;
+			virtual ItemCount remove(const CraftingRequirement &requirement) { return remove(requirement, [](const ItemStackPtr &, Slot) { return true; }); }
 
-			virtual ItemCount remove(const AttributeRequirement &, const ConstPredicate &) = 0;
-			virtual ItemCount remove(const AttributeRequirement &requirement) { return remove(requirement, [](const ConstItemStackPtr &, Slot) { return true; }); }
+			virtual ItemCount remove(const AttributeRequirement &, const Predicate &) = 0;
+			virtual ItemCount remove(const AttributeRequirement &requirement) { return remove(requirement, [](const ItemStackPtr &, Slot) { return true; }); }
 
 			virtual bool contains(Slot) const = 0;
 
 			/** Returns whether the inventory contains at least a minimum amount of a given item. */
-			virtual bool contains(const ItemStackPtr &stack) const { return contains(stack, [](const ConstItemStackPtr &, Slot) { return true; }); }
+			virtual bool contains(const ItemStackPtr &stack) const { return contains(stack, [](const ItemStackPtr &, Slot) { return true; }); }
 
 			/** Returns whether the inventory contains at least a minimum amount of a given item, given a predicate. */
-			virtual bool contains(const ItemStackPtr &, const ConstPredicate &) const = 0;
+			virtual bool contains(const ItemStackPtr &, const Predicate &) const = 0;
 
 			/** Returns the slot containing a given item ID if one exists. */
-			virtual std::optional<Slot> find(const ItemID &id) const { return find(id, [](const ConstItemStackPtr &, Slot) { return true; }); }
+			virtual std::optional<Slot> find(const ItemID &id) const { return find(id, [](const ItemStackPtr &, Slot) { return true; }); }
 			/** Returns the slot containing a given item ID if one exists and matches a predicate. */
-			virtual std::optional<Slot> find(const ItemID &, const ConstPredicate &) const = 0;
+			virtual std::optional<Slot> find(const ItemID &, const Predicate &) const = 0;
 
 			/** Returns the first slot containing an item with the given attribute if one exists. */
-			virtual std::optional<Slot> findAttribute(const Identifier &attribute) const { return findAttribute(attribute, [](const ConstItemStackPtr &, Slot) { return true; }); }
+			virtual std::optional<Slot> findAttribute(const Identifier &attribute) const { return findAttribute(attribute, [](const ItemStackPtr &, Slot) { return true; }); }
 			/** Returns the first slot containing an item with the given attribute if one exists and matches a predicate. */
-			virtual std::optional<Slot> findAttribute(const Identifier &, const ConstPredicate &) const = 0;
+			virtual std::optional<Slot> findAttribute(const Identifier &, const Predicate &) const = 0;
 
-			virtual ItemStackPtr getActive() = 0;
-
-			virtual ConstItemStackPtr getActive() const = 0;
+			virtual ItemStackPtr getActive() const = 0;
 
 			virtual void setActive(Slot, bool force) = 0;
-
 			virtual void setActive(Slot slot) { setActive(slot, false); }
 
 			virtual void prevSlot();
-
 			virtual void nextSlot();
 
 			virtual void notifyOwner() = 0;

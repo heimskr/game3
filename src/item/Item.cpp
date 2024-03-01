@@ -215,7 +215,7 @@ namespace Game3 {
 
 	void ItemStack::spawn(const Place &place) const {
 		assert(place.realm);
-		place.realm->spawn<ItemEntity>(place.position, shared_from_this());
+		place.realm->spawn<ItemEntity>(place.position, copy());
 	}
 
 	std::shared_ptr<Texture> ItemStack::getTexture(Game &) const {
@@ -276,6 +276,10 @@ namespace Game3 {
 		item = game.registry<ItemRegistry>()[buffer.take<Identifier>()];
 		buffer >> count;
 		data = nlohmann::json::parse(buffer.take<std::string>());
+	}
+
+	ItemStackPtr ItemStack::copy() const {
+		return ItemStack::create(getGame(), item, count, data);
 	}
 
 	void ItemStack::absorbGame(Game &game) {

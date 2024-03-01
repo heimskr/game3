@@ -65,16 +65,16 @@ namespace Game3 {
 		return owner && index != InventoryID(-1) && owner == other.weakOwner.lock() && index == other.index;
 	}
 
-	bool Inventory::decrease(ItemStack &stack, Slot slot, ItemCount amount, bool do_lock) {
+	bool Inventory::decrease(const ItemStackPtr &stack, Slot slot, ItemCount amount, bool do_lock) {
 		auto lock = do_lock? uniqueLock() : std::unique_lock<DefaultMutex>{};
 
-		if (stack.count < amount)
-			throw std::runtime_error("Can't decrease stack count " + std::to_string(stack.count) + " by " + std::to_string(amount));
+		if (stack->count < amount)
+			throw std::runtime_error("Can't decrease stack count " + std::to_string(stack->count) + " by " + std::to_string(amount));
 
-		stack.count -= amount;
+		stack->count -= amount;
 
 		bool erased = false;
-		if (stack.count == 0) {
+		if (stack->count == 0) {
 			erase(slot);
 			erased = true;
 		}
@@ -107,9 +107,9 @@ namespace Game3 {
 		ItemCount out = std::numeric_limits<ItemCount>::max();
 
 		for (const auto &input: recipe.input) {
-			if (input.is<ItemStack>()) {
-				const ItemStack &stack = input.get<ItemStack>();
-				out = std::min(out, count(stack) / stack.count);
+			if (input.is<ItemStackPtr>()) {
+				ItemStackPtr stack = input.get<ItemStackPtr>();
+				out = std::min(out, count(stack) / stack->count);
 			} else {
 				const auto &[attribute, attribute_count] = input.get<AttributeRequirement>();
 				out = std::min(out, countAttribute(attribute) / attribute_count);
@@ -119,7 +119,7 @@ namespace Game3 {
 		return out;
 	}
 
-	std::shared_ptr<Inventory> Inventory::create(Side side, std::shared_ptr<Agent> owner, Slot slot_count, InventoryID index, Slot active_slot, std::map<Slot, ItemStack> storage) {
+	std::shared_ptr<Inventory> Inventory::create(Side side, std::shared_ptr<Agent> owner, Slot slot_count, InventoryID index, Slot active_slot, std::map<Slot, ItemStackPtr> storage) {
 		if (side == Side::Server)
 			return std::make_shared<ServerInventory>(owner, slot_count, active_slot, index, std::move(storage));
 		if (side == Side::Client)
@@ -127,7 +127,7 @@ namespace Game3 {
 		throw std::invalid_argument("Can't create inventory for side " + std::to_string(static_cast<int>(side)));
 	}
 
-	std::shared_ptr<Inventory> Inventory::create(std::shared_ptr<Agent> owner, Slot slot_count, InventoryID index, Slot active_slot, std::map<Slot, ItemStack> storage) {
+	std::shared_ptr<Inventory> Inventory::create(std::shared_ptr<Agent> owner, Slot slot_count, InventoryID index, Slot active_slot, std::map<Slot, ItemStackPtr> storage) {
 		return create(owner->getSide(), owner, slot_count, active_slot, index, std::move(storage));
 	}
 }

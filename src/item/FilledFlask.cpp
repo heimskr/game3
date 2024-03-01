@@ -29,7 +29,7 @@ namespace Game3 {
 					inventory->erase(slot);
 			}
 
-			player->give(ItemStack(realm.getGame(), "base:item/flask", 1), slot);
+			player->give(ItemStack::create(realm.getGame(), "base:item/flask", 1), slot);
 			inventory->notifyOwner();
 			return true;
 		}

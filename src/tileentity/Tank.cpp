@@ -22,12 +22,12 @@ namespace Game3 {
 		FluidHoldingTileEntity::toJSON(json);
 	}
 
-	bool Tank::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *, Hand) {
+	bool Tank::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
 		RealmPtr realm = getRealm();
 
 		if (modifiers.onlyAlt()) {
 			realm->queueDestruction(getSelf());
-			player->give(ItemStack(realm->getGame(), "base:item/tank"_id));
+			player->give(ItemStack::create(realm->getGame(), "base:item/tank"_id));
 			return true;
 		}
 

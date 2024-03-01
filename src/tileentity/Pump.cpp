@@ -83,12 +83,12 @@ namespace Game3 {
 		DirectedTileEntity::toJSON(json);
 	}
 
-	bool Pump::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *, Hand) {
+	bool Pump::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
 		RealmPtr realm = getRealm();
 
 		if (modifiers.onlyAlt()) {
 			realm->queueDestruction(getSelf());
-			player->give(ItemStack(realm->getGame(), "base:item/pump"_id));
+			player->give(ItemStack::create(realm->getGame(), "base:item/pump"_id));
 			return true;
 		}
 

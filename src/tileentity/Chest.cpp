@@ -30,16 +30,16 @@ namespace Game3 {
 		json["itemName"] = itemName;
 	}
 
-	bool Chest::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *, Hand) {
+	bool Chest::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
 		assert(getSide() == Side::Server);
 
 		if (modifiers.onlyAlt()) {
-			getInventory(0)->iterate([&](const ItemStack &stack, Slot) {
-				stack.spawn(getRealm(), getPosition());
+			getInventory(0)->iterate([&](const ItemStackPtr &stack, Slot) {
+				stack->spawn(getPlace());
 				return false;
 			});
 			queueDestruction();
-			player->give(ItemStack(getGame(), itemName));
+			player->give(ItemStack::create(getGame(), itemName));
 		} else {
 			addObserver(player, false);
 		}

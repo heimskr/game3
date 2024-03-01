@@ -18,8 +18,8 @@ namespace Game3 {
 			Index wanderRadius = 8;
 
 			void updateRiderOffset(const std::shared_ptr<Entity> &rider) override;
-			bool onInteractOn(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
-			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
+			bool onInteractOn(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
 			void init(const std::shared_ptr<Game> &) override;
 			void tick(const TickArgs &) override;
 			float getMovementSpeed() const override { return 5.f; }

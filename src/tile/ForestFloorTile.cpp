@@ -12,7 +12,7 @@ namespace Game3 {
 	ForestFloorTile::ForestFloorTile():
 		Tile(ID()) {}
 
-	bool ForestFloorTile::interact(const Place &place, Layer layer, ItemStack *, Hand) {
+	bool ForestFloorTile::interact(const Place &place, Layer layer, const ItemStackPtr &, Hand) {
 		if (layer != Layer::Terrain)
 			return false;
 
@@ -35,9 +35,9 @@ namespace Game3 {
 				inventory->erase(inventory->activeSlot);
 
 			std::shared_ptr<Game> game = realm->getGame();
-			player->give(ItemStack(game, "base:item/dirt"));
+			player->give(ItemStack::create(game, "base:item/dirt"));
 			if (std::uniform_int_distribution(1, 10)(threadContext.rng) <= 2)
-				player->give(ItemStack(game, "base:item/moss"));
+				player->give(ItemStack::create(game, "base:item/moss"));
 
 			inventory->notifyOwner();
 			return true;

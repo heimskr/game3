@@ -18,13 +18,13 @@ namespace Game3 {
 	}
 
 	CombinerRecipe::Output CombinerRecipe::getOutput(const Input &, const std::shared_ptr<Game> &game) {
-		return ItemStack(game, outputID, outputCount);
+		return ItemStack::create(game, outputID, outputCount);
 	}
 
 	bool CombinerRecipe::canCraft(const std::shared_ptr<Container> &container) {
 		if (auto inventory = std::dynamic_pointer_cast<Inventory>(container)) {
 			// Assumption: the same type of item won't be listed multiple times in one CombinerInput::inputs.
-			for (const ItemStack &stack: input)
+			for (const ItemStackPtr &stack: input)
 				if (!inventory->contains(stack))
 					return false;
 		}
@@ -41,15 +41,17 @@ namespace Game3 {
 
 		Output output = getOutput(input, game);
 
-		ItemStack output_stack(game, identifier, outputCount);
+		ItemStackPtr output_stack = ItemStack::create(game, identifier, outputCount);
 
 		if (!output_inventory->canInsert(output_stack))
 			return false;
 
-		for (const ItemStack &input_stack: input)
-			assert(input_stack.count == input_inventory->remove(input_stack));
+		for (const ItemStackPtr &input_stack: input) {
+			const bool matches = input_stack->count == input_inventory->remove(input_stack);
+			assert(matches);
+		}
 
-		if (std::optional<ItemStack> insertion_leftover = output_inventory->add(output_stack))
+		if (ItemStackPtr insertion_leftover = output_inventory->add(output_stack))
 			leftover = std::move(insertion_leftover);
 		else
 			leftover.reset();

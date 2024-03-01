@@ -11,7 +11,7 @@ namespace Game3 {
 	Stockpile::Stockpile(Identifier tilename_, const Position &position_, VillageID village_id):
 		TileEntity(std::move(tilename_), ID(), position_, true), villageID(village_id) {}
 
-	bool Stockpile::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, ItemStack *, Hand) {
+	bool Stockpile::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, const ItemStackPtr &, Hand) {
 		if (getSide() != Side::Server)
 			return false;
 

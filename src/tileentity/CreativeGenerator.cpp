@@ -51,11 +51,11 @@ namespace Game3 {
 		EnergeticTileEntity::toJSON(json);
 	}
 
-	bool CreativeGenerator::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *, Hand) {
+	bool CreativeGenerator::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
 		if (modifiers.onlyAlt()) {
 			RealmPtr realm = getRealm();
 			realm->queueDestruction(getSelf());
-			player->give(ItemStack(realm->getGame(), "base:item/creative_generator"_id));
+			player->give(ItemStack::create(realm->getGame(), "base:item/creative_generator"_id));
 			return true;
 		}
 

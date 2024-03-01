@@ -20,8 +20,8 @@ namespace Game3 {
 			bool moveFromRider(const EntityPtr &, Direction, MovementContext) override;
 			float getMovementSpeed() const override;
 			bool canMoveTo(const Position &) const override;
-			bool onInteractOn(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
-			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
+			bool onInteractOn(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
 			void render(const RendererContext &) override;
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;

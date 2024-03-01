@@ -12,7 +12,7 @@
 #include "ui/tab/InventoryTab.h"
 
 namespace Game3 {
-	Ore::Ore(Identifier identifier_, ItemStack stack_, Identifier tilename_, Identifier regen_tilename, float tooldown_multiplier, uint32_t max_uses, float cooldown_):
+	Ore::Ore(Identifier identifier_, ItemStackPtr stack_, Identifier tilename_, Identifier regen_tilename, float tooldown_multiplier, uint32_t max_uses, float cooldown_):
 		NamedRegisterable(std::move(identifier_)),
 		stack(std::move(stack_)),
 		tilename(std::move(tilename_)),
@@ -59,14 +59,14 @@ namespace Game3 {
 		ready = true;
 	}
 
-	bool OreDeposit::onInteractNextTo(const PlayerPtr &player, Modifiers, ItemStack *, Hand) {
+	bool OreDeposit::onInteractNextTo(const PlayerPtr &player, Modifiers, const ItemStackPtr &, Hand) {
 		if (getSide() != Side::Server)
 			return false;
 
 		const InventoryPtr inventory = player->getInventory(0);
 		auto inventory_lock = inventory->uniqueLock();
 		const Slot active_slot = inventory->activeSlot;
-		if (auto *active_stack = (*inventory)[active_slot]) {
+		if (ItemStackPtr active_stack = (*inventory)[active_slot]) {
 			if (!ready || 0 < player->tooldown)
 				return true;
 

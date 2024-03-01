@@ -9,7 +9,7 @@ namespace Game3 {
 			static Identifier ID() { return {"base", "te/item_spawner"}; }
 			float minimumTime{};
 			float maximumTime{};
-			std::vector<ItemStack> spawnables;
+			std::vector<ItemStackPtr> spawnables;
 
 			void toJSON(nlohmann::json &) const override;
 			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
@@ -21,7 +21,7 @@ namespace Game3 {
 
 		protected:
 			ItemSpawner() = default;
-			ItemSpawner(Position position_, float minimum_time, float maximum_time, std::vector<ItemStack> spawnables_);
+			ItemSpawner(Position position_, float minimum_time, float maximum_time, std::vector<ItemStackPtr> spawnables_);
 
 			friend class TileEntity;
 	};

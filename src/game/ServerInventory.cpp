@@ -27,38 +27,39 @@ namespace Game3 {
 		return std::make_unique<ServerInventory>(*this);
 	}
 
-	std::optional<ItemStack> ServerInventory::add(const ItemStack &stack, const std::function<bool(Slot)> &predicate, Slot start) {
-		ssize_t remaining = stack.count;
+	ItemStackPtr ServerInventory::add(const ItemStackPtr &stack, const std::function<bool(Slot)> &predicate, Slot start) {
+		ssize_t remaining = stack->count;
 
 		if (0 <= start) {
 			if (slotCount <= start)
 				throw std::out_of_range(std::format("Can't start at slot {}: out of range", start));
 
 			if (auto iter = storage.find(start); iter != storage.end() && predicate(start)) {
-				ItemStack &stored = iter->second;
-				if (stored.canMerge(stack)) {
-					const ssize_t storable = ssize_t(stored.item->maxCount) - ssize_t(stored.count);
+				ItemStackPtr stored = iter->second;
+				if (stored->canMerge(*stack)) {
+					const ssize_t storable = ssize_t(stored->item->maxCount) - ssize_t(stored->count);
 					if (0 < storable) {
 						const ItemCount to_store = std::min(ItemCount(remaining), ItemCount(storable));
-						stored.count += to_store;
+						stored->count += to_store;
 						remaining -= to_store;
 					}
 				}
 			} else {
-				const ItemCount to_store = std::min(ItemCount(stack.item->maxCount), ItemCount(remaining));
-				assert(storage.try_emplace(start, stack.getGame(), stack.item, to_store, stack.data).second);
+				const ItemCount to_store = std::min(ItemCount(stack->item->maxCount), ItemCount(remaining));
+				const bool emplaced = storage.try_emplace(start, stack->getGame(), stack->item, to_store, stack->data).second;
+				assert(emplaced);
 				remaining -= to_store;
 			}
 		}
 
 		if (0 < remaining) {
 			for (auto &[slot, stored]: storage) {
-				if (slot == start || !stored.canMerge(stack) || !predicate(slot))
+				if (slot == start || !stored->canMerge(*stack) || !predicate(slot))
 					continue;
-				const ssize_t storable = ssize_t(stored.item->maxCount) - ssize_t(stored.count);
+				const ssize_t storable = ssize_t(stored->item->maxCount) - ssize_t(stored->count);
 				if (0 < storable) {
 					const ItemCount to_store = std::min(ItemCount(remaining), ItemCount(storable));
-					stored.count += to_store;
+					stored->count += to_store;
 					remaining -= to_store;
 					if (remaining <= 0)
 						break;
@@ -70,24 +71,24 @@ namespace Game3 {
 			for (Slot slot = 0; slot < slotCount; ++slot) {
 				if (storage.contains(slot) || !predicate(slot))
 					continue;
-				const ItemCount to_store = std::min(ItemCount(remaining), stack.item->maxCount);
-				storage.emplace(slot, ItemStack(stack.getGame(), stack.item, to_store, stack.data));
+				const ItemCount to_store = std::min(ItemCount(remaining), stack->item->maxCount);
+				storage.emplace(slot, ItemStack::create(stack->getGame(), stack->item, to_store, stack->data));
 				remaining -= to_store;
 				if (remaining <= 0)
 					break;
 			}
 		}
 
-		if (remaining != ssize_t(stack.count))
+		if (remaining != ssize_t(stack->count))
 			notifyOwner();
 
-		if (remaining < 0 || ssize_t(stack.count) < remaining)
+		if (remaining < 0 || ssize_t(stack->count) < remaining)
 			throw std::logic_error("How'd we end up with " + std::to_string(remaining) + " items remaining?");
 
 		if (remaining == 0)
-			return std::nullopt;
+			return nullptr;
 
-		return ItemStack(stack.hasGame()? stack.getGame() : getOwner()->getRealm()->getGame(), stack.item, remaining, stack.data);
+		return ItemStack::create(stack->hasGame()? stack->getGame() : getOwner()->getRealm()->getGame(), stack->item, remaining, stack->data);
 	}
 
 	void ServerInventory::drop(Slot slot) {
@@ -113,7 +114,7 @@ namespace Game3 {
 		if (slotCount <= source || slotCount <= destination || !storage.contains(source))
 			return;
 
-		ItemStack &source_stack = storage.at(source);
+		ItemStackPtr source_stack = storage.at(source);
 
 		std::function<void()> action;
 
@@ -121,11 +122,11 @@ namespace Game3 {
 			action = onSwap(*this, source, *this, destination);
 
 		if (storage.contains(destination)) {
-			ItemStack &destination_stack = storage.at(destination);
-			if (destination_stack.canMerge(source_stack)) {
-				ItemCount to_move = std::min(source_stack.count, destination_stack.item->maxCount - destination_stack.count);
-				destination_stack.count += to_move;
-				if ((source_stack.count -= to_move) == 0)
+			ItemStackPtr destination_stack = storage.at(destination);
+			if (destination_stack->canMerge(*source_stack)) {
+				ItemCount to_move = std::min(source_stack->count, destination_stack->item->maxCount - destination_stack->count);
+				destination_stack->count += to_move;
+				if ((source_stack->count -= to_move) == 0)
 					storage.erase(source);
 			} else
 				std::swap(storage.at(source), storage.at(destination));
@@ -157,11 +158,11 @@ namespace Game3 {
 		storage.clear();
 	}
 
-	ItemCount ServerInventory::remove(const ItemStack &stack_to_remove) {
-		// Could just use a simple call to remove(const ItemStack &, const std::function<bool(Slot)> &) with [](Slot) { return true; },
+	ItemCount ServerInventory::remove(const ItemStackPtr &stack_to_remove) {
+		// Could just use a simple call to remove(const ItemStackPtr &, const SlotPredicate &) with [](Slot) { return true; },
 		// but that would be slightly slower so we'll just spam a near copy of that function here.
 
-		ItemCount count_to_remove = stack_to_remove.count;
+		ItemCount count_to_remove = stack_to_remove->count;
 		ItemCount removed = 0;
 
 		std::erase_if(storage, [&](auto &item) {
@@ -170,15 +171,13 @@ namespace Game3 {
 
 			auto &[slot, stack] = item;
 
-			if (stack.canMerge(stack_to_remove)) {
-				const ItemCount to_remove = std::min(stack.count, count_to_remove);
-				// The const_cast is for certain older compilers (looking at you, gcc) that constify the first argument of the function passed to std::erase_if.
-				// Such behavior doesn't comply with the C++ standard, but I want to support those compilers anyway.
-				const_cast<ItemStack &>(stack).count -= to_remove;
+			if (stack->canMerge(*stack_to_remove)) {
+				const ItemCount to_remove = std::min(stack->count, count_to_remove);
+				stack->count -= to_remove;
 				count_to_remove -= to_remove;
 				removed += to_remove;
 
-				if (stack.count == 0)
+				if (stack->count == 0)
 					return true;
 			}
 
@@ -191,8 +190,8 @@ namespace Game3 {
 		return removed;
 	}
 
-	ItemCount ServerInventory::remove(const ItemStack &stack_to_remove, const ConstPredicate &predicate) {
-		ItemCount count_to_remove = stack_to_remove.count;
+	ItemCount ServerInventory::remove(const ItemStackPtr &stack_to_remove, const Predicate &predicate) {
+		ItemCount count_to_remove = stack_to_remove->count;
 		ItemCount removed = 0;
 
 		std::erase_if(storage, [&](auto &item) {
@@ -201,14 +200,13 @@ namespace Game3 {
 
 			auto &[slot, stack] = item;
 
-			if (predicate(stack, slot) && stack.canMerge(stack_to_remove)) {
-				const ItemCount to_remove = std::min(stack.count, count_to_remove);
-				// See above for the reasoning behind this const_cast.
-				const_cast<ItemStack &>(stack).count -= to_remove;
+			if (predicate(stack, slot) && stack->canMerge(*stack_to_remove)) {
+				const ItemCount to_remove = std::min(stack->count, count_to_remove);
+				stack->count -= to_remove;
 				count_to_remove -= to_remove;
 				removed += to_remove;
 
-				if (stack.count == 0)
+				if (stack->count == 0)
 					return true;
 			}
 
@@ -221,7 +219,7 @@ namespace Game3 {
 		return removed;
 	}
 
-	ItemCount ServerInventory::remove(const ItemStack &stack_to_remove, Slot slot) {
+	ItemCount ServerInventory::remove(const ItemStackPtr &stack_to_remove, Slot slot) {
 		auto iter = storage.find(slot);
 		if (iter == storage.end()) {
 			if (auto owner = weakOwner.lock())
@@ -232,30 +230,30 @@ namespace Game3 {
 		}
 
 		auto &stack = iter->second;
-		if (!stack_to_remove.canMerge(stack))
+		if (!stack_to_remove->canMerge(*stack))
 			return 0;
 
-		const ItemCount to_remove = std::min(stack.count, stack_to_remove.count);
-		if ((stack.count -= to_remove) == 0)
+		const ItemCount to_remove = std::min(stack->count, stack_to_remove->count);
+		if ((stack->count -= to_remove) == 0)
 			storage.erase(slot);
 
 		notifyOwner();
 		return to_remove;
 	}
 
-	ItemCount ServerInventory::remove(const CraftingRequirement &requirement, const ConstPredicate &predicate) {
-		if (requirement.is<ItemStack>())
-			return remove(requirement.get<ItemStack>(), predicate);
+	ItemCount ServerInventory::remove(const CraftingRequirement &requirement, const Predicate &predicate) {
+		if (requirement.is<ItemStackPtr>())
+			return remove(requirement.get<ItemStackPtr>(), predicate);
 		return remove(requirement.get<AttributeRequirement>(), predicate);
 	}
 
-	ItemCount ServerInventory::remove(const AttributeRequirement &requirement, const ConstPredicate &predicate) {
+	ItemCount ServerInventory::remove(const AttributeRequirement &requirement, const Predicate &predicate) {
 		const Identifier &attribute = requirement.attribute;
 		ItemCount count_remaining = requirement.count;
 		ItemCount count_removed = 0;
 
 		for (Slot slot = 0; slot < slotCount && 0 < count_remaining; ++slot) {
-			if (auto *stack = (*this)[slot]; stack && predicate(*stack, slot) && stack->hasAttribute(attribute)) {
+			if (ItemStackPtr stack = (*this)[slot]; stack && predicate(stack, slot) && stack->hasAttribute(attribute)) {
 				const ItemCount to_remove = std::min(stack->count, count_remaining);
 				stack->count  -= to_remove;
 				count_removed += to_remove;
@@ -356,7 +354,7 @@ namespace Game3 {
 
 	void to_json(nlohmann::json &json, const ServerInventory &inventory) {
 		for (const auto &[key, val]: inventory.getStorage())
-			json["storage"][std::to_string(key)] = val;
+			json["storage"][std::to_string(key)] = *val;
 		json["slotCount"]  = inventory.getSlotCount();
 		json["activeSlot"] = inventory.activeSlot.load();
 	}

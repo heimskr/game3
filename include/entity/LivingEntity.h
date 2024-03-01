@@ -31,7 +31,7 @@ namespace Game3 {
 			virtual bool takeDamage(HitPoints);
 			virtual void kill();
 			virtual void onAttack(const std::shared_ptr<LivingEntity> &attacker);
-			virtual std::vector<ItemStack> getDrops();
+			virtual std::vector<ItemStackPtr> getDrops();
 
 		protected:
 			int defenseStat = 0;

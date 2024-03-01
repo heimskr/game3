@@ -22,7 +22,7 @@ namespace Game3 {
 			void init(Game &) override;
 			void tick(const TickArgs &) override;
 			void toJSON(nlohmann::json &) const override;
-			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
 			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
 			const auto & getTarget() const { return target; }
 

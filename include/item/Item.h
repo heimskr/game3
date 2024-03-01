@@ -153,6 +153,8 @@ namespace Game3 {
 			void encode(Game &, Buffer &);
 			void decode(Game &, Buffer &);
 
+			std::shared_ptr<ItemStack> copy() const;
+
 			inline std::shared_ptr<Game> getGame() const { auto locked = weakGame.lock(); assert(locked); return locked; }
 			inline bool hasGame() const { return !weakGame.expired(); }
 

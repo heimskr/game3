@@ -12,7 +12,7 @@ namespace Game3 {
 	class CombinerResult;
 	class Game;
 
-	struct CombinerRecipe: Recipe<std::vector<ItemStack>, ItemStack, NamedRegisterable> {
+	struct CombinerRecipe: Recipe<std::vector<ItemStackPtr>, ItemStackPtr, NamedRegisterable> {
 		ItemCount outputCount{};
 		Input input;
 		Identifier outputID;

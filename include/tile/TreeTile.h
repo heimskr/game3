@@ -9,6 +9,6 @@ namespace Game3 {
 
 			TreeTile(std::shared_ptr<Crop>);
 
-			bool interact(const Place &, Layer, ItemStack *, Hand) override;
+			bool interact(const Place &, Layer, const ItemStackPtr &, Hand) override;
 	};
 }

@@ -24,11 +24,11 @@ namespace Game3 {
 		return out;
 	}
 
-	bool Agent::onInteractOn(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) {
+	bool Agent::onInteractOn(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) {
 		return false;
 	}
 
-	bool Agent::onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) {
+	bool Agent::onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) {
 		return false;
 	}
 

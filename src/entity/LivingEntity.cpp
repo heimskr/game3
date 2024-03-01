@@ -170,15 +170,15 @@ namespace Game3 {
 
 		RealmPtr realm = getRealm();
 
-		for (const ItemStack &stack: getDrops())
-			stack.spawn(realm, getPosition());
+		for (const ItemStackPtr &stack: getDrops())
+			stack->spawn(Place{getPosition(), realm});
 
 		queueDestruction();
 	}
 
 	void LivingEntity::onAttack(const std::shared_ptr<LivingEntity> &) {}
 
-	std::vector<ItemStack> LivingEntity::getDrops() {
+	std::vector<ItemStackPtr> LivingEntity::getDrops() {
 		return {};
 	}
 

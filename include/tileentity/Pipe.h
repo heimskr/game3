@@ -114,7 +114,7 @@ namespace Game3 {
 
 			void onSpawn() override;
 			void onRemove() override;
-			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
 
 			/** Attaches the pipe to adjacent machines and pipes. */
 			void autopipe(PipeType);

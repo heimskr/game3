@@ -29,32 +29,32 @@ namespace Game3 {
 		return inventory->canExtract(slot);
 	}
 
-	std::optional<ItemStack> InventoriedTileEntity::extractItem(Direction, bool remove, Slot slot) {
+	ItemStackPtr InventoriedTileEntity::extractItem(Direction, bool remove, Slot slot) {
 		// TODO: support multiple inventories with extractItem
 		const InventoryPtr inventory = getInventory(0);
 
 		if (!inventory)
-			return std::nullopt;
+			return nullptr;
 
-		ItemStack *stack = nullptr;
+		ItemStackPtr stack;
 
 		auto inventory_lock = inventory->uniqueLock();
 
 		if (remove) {
-			std::optional<ItemStack> out;
+			ItemStackPtr out;
 
 			if (slot == Slot(-1)) {
 				Slot slot_extracted_from = -1;
 				stack = inventory->firstItem(&slot_extracted_from);
-				if (slot_extracted_from == Slot(-1) || stack == nullptr)
-					return std::nullopt;
-				out = std::move(*stack);
+				if (slot_extracted_from == Slot(-1) || !stack)
+					return nullptr;
+				out = std::move(stack);
 				inventory->erase(slot_extracted_from);
 			} else {
 				stack = (*inventory)[slot];
-				if (stack == nullptr)
-					return std::nullopt;
-				out = std::move(*stack);
+				if (!stack)
+					return nullptr;
+				out = std::move(stack);
 				inventory->erase(slot);
 			}
 
@@ -67,13 +67,10 @@ namespace Game3 {
 		else
 			stack = (*inventory)[slot];
 
-		if (stack == nullptr)
-			return std::nullopt;
-
-		return *stack;
+		return stack;
 	}
 
-	bool InventoriedTileEntity::InsertItem(const ItemStackPtr &stack, Direction direction, std::optional<ItemStack> *leftover) {
+	bool InventoriedTileEntity::insertItem(const ItemStackPtr &stack, Direction direction, ItemStackPtr *leftover) {
 		if (!mayInsertItem(stack, direction))
 			return false;
 
@@ -86,7 +83,7 @@ namespace Game3 {
 		assert(inventory);
 		auto inventory_lock = inventory->uniqueLock();
 
-		if (leftover != nullptr)
+		if (!leftover)
 			*leftover = inventory->add(stack, predicate);
 		else
 			inventory->add(stack, predicate);
@@ -95,7 +92,7 @@ namespace Game3 {
 		return true;
 	}
 
-	ItemCount InventoriedTileEntity::itemsInsertable(const ItemStack &stack, Direction direction, Slot slot) {
+	ItemCount InventoriedTileEntity::itemsInsertable(const ItemStackPtr &stack, Direction direction, Slot slot) {
 		if (!mayInsertItem(stack, direction))
 			return 0;
 
@@ -103,10 +100,10 @@ namespace Game3 {
 		return getInventory(0)->insertable(stack, slot);
 	}
 
-	void InventoriedTileEntity::iterateExtractableItems(Direction direction, const std::function<bool(const ItemStack &, Slot)> &function) {
+	void InventoriedTileEntity::iterateExtractableItems(Direction direction, const std::function<bool(const ItemStackPtr &, Slot)> &predicate) {
 		// TODO: support multiple inventories with iterateExtractableItems
-		getInventory(0)->iterate([&](const ItemStack &stack, Slot slot) {
-			return canExtractItem(direction, slot) && function(stack, slot);
+		getInventory(0)->iterate([&](const ItemStackPtr &stack, Slot slot) {
+			return canExtractItem(direction, slot) && predicate(stack, slot);
 		});
 	}
 

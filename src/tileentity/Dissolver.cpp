@@ -35,7 +35,7 @@ namespace Game3 {
 		if (slot != Slot(-1) && slot >= Slot(INPUT_CAPACITY))
 			return false;
 
-		return std::dynamic_pointer_cast<ChemicalItem>(stack.item) == nullptr;
+		return std::dynamic_pointer_cast<ChemicalItem>(stack->item) == nullptr;
 	}
 
 	bool Dissolver::mayExtractItem(Direction, Slot slot) {
@@ -69,7 +69,7 @@ namespace Game3 {
 		EnergeticTileEntity::toJSON(json);
 	}
 
-	bool Dissolver::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *, Hand) {
+	bool Dissolver::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
 		if (getSide() == Side::Client)
 			return false;
 
@@ -77,14 +77,14 @@ namespace Game3 {
 			{
 				const InventoryPtr inventory = getInventory(0);
 				auto lock = inventory->sharedLock();
-				inventory->iterate([&](const ItemStack &stack, Slot) {
+				inventory->iterate([&](const ItemStackPtr &stack, Slot) {
 					player->give(stack);
 					return false;
 				});
 			}
 			RealmPtr realm = getRealm();
 			realm->queueDestruction(getSelf());
-			player->give(ItemStack(realm->getGame(), "base:item/dissolver"_id));
+			player->give(ItemStack::create(realm->getGame(), "base:item/dissolver"_id));
 			return true;
 		}
 
@@ -172,7 +172,7 @@ namespace Game3 {
 		GamePtr game = getGame();
 		DissolverRecipeRegistry &dissolver_registry = game->registry<DissolverRecipeRegistry>();
 
-		ItemStack *stack_ptr = nullptr;
+		ItemStackPtr stack_ptr;
 		std::shared_ptr<DissolverRecipe> recipe;
 
 		for (size_t i = 0; i < INPUT_CAPACITY; ++i) {
@@ -192,7 +192,7 @@ namespace Game3 {
 		std::shared_ptr<Inventory> inventory_copy = inventory->copy();
 		auto suppressor = inventory_copy->suppress();
 
-		std::optional<std::vector<ItemStack>> leftovers;
+		std::optional<std::vector<ItemStackPtr>> leftovers;
 
 		auto input_span  = std::make_shared<InventorySpan>(inventory_copy, 0, INPUT_CAPACITY - 1);
 		auto output_span = std::make_shared<InventorySpan>(inventory_copy, INPUT_CAPACITY, INPUT_CAPACITY + OUTPUT_CAPACITY - 1);

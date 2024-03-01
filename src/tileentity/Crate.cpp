@@ -31,7 +31,7 @@ namespace Game3 {
 			json["inventory"] = dynamic_cast<ExpandedServerInventory &>(*inventory);
 	}
 
-	bool Crate::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *, Hand) {
+	bool Crate::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
 		assert(getSide() == Side::Server);
 
 		if (modifiers.onlyAlt()) {
@@ -40,7 +40,7 @@ namespace Game3 {
 				return false;
 			});
 			queueDestruction();
-			player->give(ItemStack(getGame(), itemName));
+			player->give(ItemStack::create(getGame(), itemName));
 		} else {
 			addObserver(player, false);
 		}

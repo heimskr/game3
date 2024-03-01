@@ -12,8 +12,8 @@ namespace Game3 {
 		ItemCount count = 1;
 	};
 
-	struct CraftingRequirement: std::variant<ItemStack, AttributeRequirement> {
-		using std::variant<ItemStack, AttributeRequirement>::variant;
+	struct CraftingRequirement: std::variant<ItemStackPtr, AttributeRequirement> {
+		using std::variant<ItemStackPtr, AttributeRequirement>::variant;
 
 		static CraftingRequirement fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
 
@@ -43,7 +43,7 @@ namespace Game3 {
 		}
 
 		constexpr inline ItemCount count() const {
-			return is<ItemStack>()? get<ItemStack>().count : get<AttributeRequirement>().count;
+			return is<ItemStackPtr>()? get<ItemStackPtr>()->count : get<AttributeRequirement>().count;
 		}
 	};
 
