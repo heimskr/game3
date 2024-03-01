@@ -143,7 +143,7 @@ namespace Game3 {
 			out = GamePtr(new ClientGame(*std::get<Canvas *>(argument)));
 		} else {
 			const auto [server_ptr, pool_size] = std::get<std::pair<std::shared_ptr<Server>, size_t>>(argument);
-			ServerGamePtr server_game(new ServerGame(server_ptr, pool_size));
+			ServerGamePtr server_game = std::make_shared<ServerGame>(server_ptr, pool_size);
 			server_game->init();
 			out = server_game;
 		}

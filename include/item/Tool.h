@@ -13,6 +13,6 @@ namespace Game3 {
 				attributes.insert(std::move(attribute));
 			}
 
-			void initStack(const Game &, const ItemStackPtr &) override;
+			void initStack(const Game &, ItemStack &) override;
 	};
 }

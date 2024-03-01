@@ -15,7 +15,7 @@ namespace Game3 {
 			json[0] = attribute;
 			json[1] = count;
 		} else {
-			json = requirement.get<ItemStackPtr>();
+			json = *requirement.get<ItemStackPtr>();
 		}
 	}
 }

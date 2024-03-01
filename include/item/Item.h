@@ -54,7 +54,7 @@ namespace Game3 {
 
 			inline bool operator==(const Item &other) const { return identifier == other.identifier; }
 
-			virtual void initStack(const Game &, const ItemStackPtr &) {}
+			virtual void initStack(const Game &, ItemStack &) {}
 
 			/** Called when the user clicks on a tile with the item selected. Returns true iff propagation should stop. */
 			virtual bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float> offsets);

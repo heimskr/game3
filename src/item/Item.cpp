@@ -127,25 +127,25 @@ namespace Game3 {
 	ItemStack::ItemStack(const GamePtr &game, std::shared_ptr<Item> item_, ItemCount count_):
 	item(std::move(item_)), count(count_), weakGame(game) {
 		assert(item);
-		item->initStack(*game, shared_from_this());
+		item->initStack(*game, *this);
 	}
 
 	ItemStack::ItemStack(const GamePtr &game, std::shared_ptr<Item> item_, ItemCount count_, nlohmann::json data_):
 	item(std::move(item_)), count(count_), data(std::move(data_)), weakGame(game) {
 		assert(item);
-		item->initStack(*game, shared_from_this());
+		item->initStack(*game, *this);
 	}
 
 	ItemStack::ItemStack(const GamePtr &game, const ItemID &id, ItemCount count_):
 	item(game->registry<ItemRegistry>().at(id)), count(count_), weakGame(game) {
 		assert(item);
-		item->initStack(*game, shared_from_this());
+		item->initStack(*game, *this);
 	}
 
 	ItemStack::ItemStack(const GamePtr &game, const ItemID &id, ItemCount count_, nlohmann::json data_):
 	item(game->registry<ItemRegistry>().at(id)), count(count_), data(std::move(data_)), weakGame(game) {
 		assert(item);
-		item->initStack(*game, shared_from_this());
+		item->initStack(*game, *this);
 	}
 
 	bool ItemStack::canMerge(const ItemStack &other) const {
@@ -234,7 +234,7 @@ namespace Game3 {
 				stack.data = extra;
 			}
 		}
-		stack.item->initStack(*game, stack.shared_from_this());
+		stack.item->initStack(*game, stack);
 	}
 
 	ItemStackPtr ItemStack::fromJSON(const GamePtr &game, const nlohmann::json &json) {

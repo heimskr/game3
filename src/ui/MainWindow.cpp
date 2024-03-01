@@ -639,6 +639,7 @@ namespace Game3 {
 	}
 
 	void MainWindow::showExternalInventory(const std::shared_ptr<ClientInventory> &inventory) {
+		assert(inventory);
 		inventoryTab->setModule(std::make_shared<InventoryModule>(game, inventory));
 	}
 

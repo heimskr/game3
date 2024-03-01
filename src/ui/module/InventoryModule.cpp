@@ -190,7 +190,7 @@ namespace Game3 {
 
 	void InventoryModule::leftClick(Slot slot, Modifiers modifiers, int count) {
 		if (!game || !modifiers.onlyShift() || (parent && parent->suppressLeftClick()) || !inventory->contains(slot)) {
-			if (count % 2 == 0)
+			if (parent && count % 2 == 0)
 				parent->slotDoubleClicked(slot);
 			return;
 		}

@@ -59,7 +59,9 @@ namespace Game3 {
 
 	void ItemEntity::init(const GamePtr &game) {
 		Entity::init(game);
-		if (stack->item && getSide() == Side::Client)
+		if (!stack)
+			stack = ItemStack::create(game);
+		else if (stack->item && getSide() == Side::Client)
 			stack->item->getOffsets(*game, texture, offsetX, offsetY);
 	}
 
@@ -126,6 +128,8 @@ namespace Game3 {
 	void ItemEntity::encode(Buffer &buffer) {
 		Entity::encode(buffer);
 		GamePtr game = getGame();
+		if (!stack)
+			stack = ItemStack::create(game);
 		stack->encode(*game, buffer);
 		buffer << secondsLeft;
 	}
@@ -133,6 +137,8 @@ namespace Game3 {
 	void ItemEntity::decode(Buffer &buffer) {
 		Entity::decode(buffer);
 		GamePtr game = getGame();
+		if (!stack)
+			stack = ItemStack::create(game);
 		stack->decode(*game, buffer);
 		buffer >> secondsLeft;
 	}
