@@ -9,7 +9,7 @@
 #include "threading/ThreadContext.h"
 
 namespace Game3 {
-	bool StandardInteractions::interact(const Place &place, Modifiers modifiers, ItemStack *used_item, Hand hand) const {
+	bool StandardInteractions::interact(const Place &place, Modifiers modifiers, const ItemStackPtr &used_item, Hand hand) const {
 		const Position position = place.position;
 		PlayerPtr player = place.player;
 		RealmPtr realm = place.realm;
@@ -30,14 +30,14 @@ namespace Game3 {
 		};
 
 		if (!used_item) {
-			if (ItemStack *active = get_active()) {
+			if (ItemStackPtr active = get_active()) {
 				if (active->item->canUseOnWorld() && active->item->use(inventory->activeSlot, *active, place, modifiers, {0.f, 0.f}))
 					return true;
 
 				if (active->hasAttribute("base:attribute/shovel"_id)) {
 					if (*submerged_tile == "base:tile/ash"_id) {
 						realm->setTile(Layer::Submerged, position, "base:tile/empty"_id);
-						player->give({game, "base:item/ash"_id, 1});
+						player->give(ItemStack::create(game, "base:item/ash"_id, 1));
 						realm->reupload();
 						return true;
 					}
@@ -65,8 +65,8 @@ namespace Game3 {
 		}
 
 		if (!used_item && item && attribute && !player->hasTooldown()) {
-			if (ItemStack *stack = get_active()) {
-				if (stack->hasAttribute(*attribute) && !inventory->add({game, *item, 1})) {
+			if (ItemStackPtr stack = get_active()) {
+				if (stack->hasAttribute(*attribute) && !inventory->add(ItemStack::create(game, *item, 1))) {
 					player->setTooldown(1.f);
 					if (stack->reduceDurability())
 						inventory->erase(inventory->activeSlot);
@@ -81,7 +81,7 @@ namespace Game3 {
 			if (auto iter = game->itemsByAttribute.find("base:attribute/plantable"_id); iter != game->itemsByAttribute.end()) {
 				for (const ItemPtr &item: iter->second) {
 					if (auto cast = std::dynamic_pointer_cast<Flower>(item); cast && cast->tilename == *submerged_tile) {
-						player->give({game, item});
+						player->give(ItemStack::create(game, item));
 						realm->setTile(Layer::Submerged, position, tileset.getEmptyID());
 						return true;
 					}
@@ -99,7 +99,7 @@ namespace Game3 {
 			if (std::uniform_real_distribution(0., 1.)(threadContext.rng) < M_PI / 10.)
 				place.set(Layer::Objects, "base:tile/charred_stump");
 			else
-				ItemStack(place.getGame(), "base:item/wood").spawn(place.realm, place.position);
+				ItemStack::spawn(place, place.getGame(), "base:item/wood");
 
 			place.set(Layer::Submerged, "base:tile/ash");
 		}

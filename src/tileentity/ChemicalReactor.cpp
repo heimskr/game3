@@ -26,7 +26,7 @@ namespace Game3 {
 	ChemicalReactor::ChemicalReactor(Position position_):
 		ChemicalReactor("base:tile/chemical_reactor"_id, position_) {}
 
-	bool ChemicalReactor::mayInsertItem(const ItemStack &stack, Direction, Slot slot) {
+	bool ChemicalReactor::mayInsertItem(const ItemStackPtr &stack, Direction, Slot slot) {
 		if (slot != Slot(-1) && Slot(INPUT_CAPACITY) <= slot)
 			return false;
 

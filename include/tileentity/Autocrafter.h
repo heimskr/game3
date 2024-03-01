@@ -19,7 +19,7 @@ namespace Game3 {
 			void setInventory(std::shared_ptr<Inventory>, InventoryID) override;
 			InventoryID getInventoryCount() const override { return 2; }
 
-			bool mayInsertItem(const ItemStack &, Direction, Slot) override;
+			bool mayInsertItem(const ItemStackPtr &, Direction, Slot) override;
 			bool mayExtractItem(Direction, Slot) override;
 			EnergyAmount getEnergyCapacity() override;
 

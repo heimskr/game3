@@ -22,11 +22,11 @@ namespace Game3 {
 	GeothermalGenerator::GeothermalGenerator(Position position_):
 		GeothermalGenerator("base:tile/geothermal_generator"_id, position_) {}
 
-	bool GeothermalGenerator::mayInsertItem(const ItemStack &stack, Direction, Slot slot) {
+	bool GeothermalGenerator::mayInsertItem(const ItemStackPtr &stack, Direction, Slot slot) {
 		if (slot != 0 && slot != Slot(-1))
 			return false;
 
-		auto flask = std::dynamic_pointer_cast<FilledFlask>(stack.item);
+		auto flask = std::dynamic_pointer_cast<FilledFlask>(stack->item);
 		if (!flask)
 			return false;
 
@@ -48,7 +48,7 @@ namespace Game3 {
 		return slot == 1;
 	}
 
-	bool GeothermalGenerator::canInsertItem(const ItemStack &stack, Direction direction, Slot slot) {
+	bool GeothermalGenerator::canInsertItem(const ItemStackPtr &stack, Direction direction, Slot slot) {
 		if (slot != 0 && slot != Slot(-1))
 			return false;
 
@@ -121,12 +121,12 @@ namespace Game3 {
 		EnergeticTileEntity::toJSON(json);
 	}
 
-	bool GeothermalGenerator::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, ItemStack *, Hand) {
+	bool GeothermalGenerator::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
 		RealmPtr realm = getRealm();
 
 		if (modifiers.onlyAlt()) {
 			realm->queueDestruction(getSelf());
-			player->give(ItemStack(realm->getGame(), "base:item/geothermal_generator"_id));
+			player->give(ItemStack::create(realm->getGame(), "base:item/geothermal_generator"_id));
 			return true;
 		}
 
@@ -257,8 +257,8 @@ namespace Game3 {
 		assert(inventory);
 		auto inventory_lock = inventory->uniqueLock();
 
-		ItemStack *stack = (*inventory)[0];
-		if (stack == nullptr)
+		ItemStackPtr stack = (*inventory)[0];
+		if (!stack)
 			return;
 
 		auto flask = std::dynamic_pointer_cast<FilledFlask>(stack->item);

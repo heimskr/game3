@@ -1029,7 +1029,7 @@ namespace Game3 {
 		return tileProvider.copyFluidTile(position);
 	}
 
-	bool Realm::interactGround(const PlayerPtr &player, const Position &position, Modifiers modifiers, ItemStack *used_item, Hand hand) {
+	bool Realm::interactGround(const PlayerPtr &player, const Position &position, Modifiers modifiers, const ItemStackPtr &used_item, Hand hand) {
 		const Place place(position, shared_from_this(), player);
 		GamePtr game = getGame();
 

@@ -8,7 +8,7 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "te/dissolver"}; }
 
-			bool mayInsertItem(const ItemStack &, Direction, Slot) override;
+			bool mayInsertItem(const ItemStackPtr &, Direction, Slot) override;
 			bool mayExtractItem(Direction, Slot) override;
 			EnergyAmount getEnergyCapacity() override;
 

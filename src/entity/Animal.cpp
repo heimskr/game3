@@ -36,7 +36,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool Animal::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, ItemStack *used_item, Hand) {
+	bool Animal::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, const ItemStackPtr &used_item, Hand) {
 		if (!used_item || used_item->item->identifier != "base:item/wrench") {
 			setRider(player);
 			return true;

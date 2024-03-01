@@ -14,12 +14,12 @@
 
 namespace Game3 {
 	ItemEntity::ItemEntity(const GamePtr &game):
-		Entity(ID()), stack(game) {}
+		Entity(ID()), stack(ItemStack::create(game)) {}
 
-	ItemEntity::ItemEntity(ItemStack stack_):
+	ItemEntity::ItemEntity(ItemStackPtr stack_):
 		Entity(ID()), stack(std::move(stack_)) {}
 
-	void ItemEntity::setStack(ItemStack stack_) {
+	void ItemEntity::setStack(ItemStackPtr stack_) {
 		stack = std::move(stack_);
 		setTexture(getRealm()->getGame());
 	}
@@ -27,8 +27,8 @@ namespace Game3 {
 	void ItemEntity::setTexture(const GamePtr &game) {
 		if (getSide() != Side::Client)
 			return;
-		std::shared_ptr<ItemTexture> item_texture = game->registry<ItemTextureRegistry>().at(stack.item->identifier);
-		texture = stack.getTexture(*game);
+		std::shared_ptr<ItemTexture> item_texture = game->registry<ItemTextureRegistry>().at(stack->item->identifier);
+		texture = stack->getTexture(*game);
 		texture->init();
 		offsetX = item_texture->x / 2.f;
 		offsetY = item_texture->y / 2.f;
@@ -40,13 +40,13 @@ namespace Game3 {
 		return Entity::create<ItemEntity>();
 	}
 
-	std::shared_ptr<ItemEntity> ItemEntity::create(const GamePtr &, ItemStack stack) {
+	std::shared_ptr<ItemEntity> ItemEntity::create(const GamePtr &, ItemStackPtr stack) {
 		return Entity::create<ItemEntity>(std::move(stack));
 	}
 
 	std::shared_ptr<ItemEntity> ItemEntity::fromJSON(const GamePtr &game, const nlohmann::json &json) {
 		if (json.is_null())
-			return create(game, ItemStack(game));
+			return create(game, ItemStack::create(game));
 		auto out = create(game, ItemStack::fromJSON(game, json.at("stack")));
 		out->absorbJSON(game, json);
 		return out;
@@ -54,13 +54,13 @@ namespace Game3 {
 
 	void ItemEntity::toJSON(nlohmann::json &json) const {
 		Entity::toJSON(json);
-		json["stack"] = getStack();
+		json["stack"] = *getStack();
 	}
 
 	void ItemEntity::init(const GamePtr &game) {
 		Entity::init(game);
-		if (stack.item && getSide() == Side::Client)
-			stack.item->getOffsets(*game, texture, offsetX, offsetY);
+		if (stack->item && getSide() == Side::Client)
+			stack->item->getOffsets(*game, texture, offsetX, offsetY);
 	}
 
 	void ItemEntity::tick(const TickArgs &) {
@@ -85,8 +85,9 @@ namespace Game3 {
 			if (needsTexture) {
 				setTexture(sprite_renderer.canvas->game);
 				needsTexture = false;
-			} else
+			} else {
 				return;
+			}
 		}
 
 		const float x = position.column + offset.x;
@@ -108,30 +109,31 @@ namespace Game3 {
 		if (getSide() != Side::Server)
 			return true;
 
-		if (std::optional<ItemStack> leftover = player->getInventory(0)->add(stack)) {
-			stack = std::move(*leftover);
+		if (ItemStackPtr leftover = player->getInventory(0)->add(stack)) {
+			stack = std::move(leftover);
 			increaseUpdateCounter();
-		} else
+		} else {
 			remove();
+		}
 
 		return true;
 	}
 
 	std::string ItemEntity::getName() const {
-		return stack.item->name;
+		return stack->item->name;
 	}
 
 	void ItemEntity::encode(Buffer &buffer) {
 		Entity::encode(buffer);
 		GamePtr game = getGame();
-		stack.encode(*game, buffer);
+		stack->encode(*game, buffer);
 		buffer << secondsLeft;
 	}
 
 	void ItemEntity::decode(Buffer &buffer) {
 		Entity::decode(buffer);
 		GamePtr game = getGame();
-		stack.decode(*game, buffer);
+		stack->decode(*game, buffer);
 		buffer >> secondsLeft;
 	}
 

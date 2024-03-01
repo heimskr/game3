@@ -31,7 +31,7 @@ namespace Game3 {
 	Dissolver::Dissolver(Position position_):
 		Dissolver("base:tile/dissolver"_id, position_) {}
 
-	bool Dissolver::mayInsertItem(const ItemStack &stack, Direction, Slot slot) {
+	bool Dissolver::mayInsertItem(const ItemStackPtr &stack, Direction, Slot slot) {
 		if (slot != Slot(-1) && slot >= Slot(INPUT_CAPACITY))
 			return false;
 

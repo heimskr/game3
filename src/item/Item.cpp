@@ -213,8 +213,9 @@ namespace Game3 {
 		return item->getTooltip(*this);
 	}
 
-	void ItemStack::spawn(const std::shared_ptr<Realm> &realm, const Position &position) const {
-		realm->spawn<ItemEntity>(position, *this);
+	void ItemStack::spawn(const Place &place) const {
+		assert(place.realm);
+		place.realm->spawn<ItemEntity>(place.position, shared_from_this());
 	}
 
 	std::shared_ptr<Texture> ItemStack::getTexture(Game &) const {
@@ -237,14 +238,14 @@ namespace Game3 {
 		stack.item->initStack(*game, stack);
 	}
 
-	ItemStack ItemStack::fromJSON(const GamePtr &game, const nlohmann::json &json) {
-		ItemStack out(game);
-		fromJSON(game, json, out);
+	ItemStackPtr ItemStack::fromJSON(const GamePtr &game, const nlohmann::json &json) {
+		auto out = ItemStack::create(game);
+		fromJSON(game, json, *out);
 		return out;
 	}
 
-	std::vector<ItemStack> ItemStack::manyFromJSON(const GamePtr &game, const nlohmann::json &json) {
-		std::vector<ItemStack> out;
+	std::vector<ItemStackPtr> ItemStack::manyFromJSON(const GamePtr &game, const nlohmann::json &json) {
+		std::vector<ItemStackPtr> out;
 		for (const auto &item: json)
 			out.push_back(fromJSON(game, item));
 		return out;
@@ -292,11 +293,11 @@ namespace Game3 {
 	}
 
 	template <>
-	ItemStack popBuffer<ItemStack>(Buffer &buffer) {
+	ItemStackPtr popBuffer<ItemStackPtr>(Buffer &buffer) {
 		auto context = buffer.context.lock();
 		assert(context);
 		auto &game = dynamic_cast<Game &>(*context);
-		ItemStack out(game.shared_from_this());
+		ItemStackPtr out = ItemStack::create(game.shared_from_this());
 		buffer >> out;
 		return out;
 	}
@@ -337,11 +338,11 @@ namespace Game3 {
 	}
 
 	template <>
-	ItemStack makeForBuffer<ItemStack>(Buffer &buffer) {
+	ItemStackPtr makeForBuffer<ItemStackPtr>(Buffer &buffer) {
 		auto context = buffer.context.lock();
 		assert(context);
 		auto game = std::dynamic_pointer_cast<Game>(context);
 		assert(game);
-		return ItemStack(game);
+		return ItemStack::create(game);
 	}
 }

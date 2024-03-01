@@ -17,7 +17,7 @@ namespace Game3 {
 		json["entrance"] = entrance;
 	}
 
-	bool Building::onInteractOn(const std::shared_ptr<Player> &player, Modifiers modifiers, ItemStack *used_item, Hand hand) {
+	bool Building::onInteractOn(const std::shared_ptr<Player> &player, Modifiers modifiers, const ItemStackPtr &used_item, Hand hand) {
 		return onInteractNextTo(player, modifiers, used_item, hand);
 	}
 

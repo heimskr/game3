@@ -21,6 +21,7 @@ namespace Game3 {
 	class Player;
 	class Realm;
 	class Texture;
+	struct Place;
 	struct Position;
 	struct RendererContext;
 
@@ -73,24 +74,33 @@ namespace Game3 {
 
 			virtual void renderEffects(const RendererContext &, const Position &, Modifiers, ItemStack &) const {}
 
+			virtual bool populateMenu(ItemStack &, Glib::RefPtr<Gio::Menu>, Glib::RefPtr<Gio::SimpleActionGroup>) const { return false; }
+
 		protected:
 			mutable std::unique_ptr<uint8_t[]> rawImage;
 			mutable Glib::RefPtr<Gdk::Pixbuf> cachedImage;
 			mutable std::shared_ptr<Texture> cachedTexture;
 	};
 
-	class ItemStack {
+	using ItemPtr = std::shared_ptr<Item>;
+
+	class ItemStack: public std::enable_shared_from_this<ItemStack> {
 		public:
 			std::shared_ptr<Item> item;
 			ItemCount count = 1;
 			Lockable<nlohmann::json> data;
 
-			ItemStack() = default;
-			ItemStack(const std::shared_ptr<Game> &);
-			ItemStack(const std::shared_ptr<Game> &, std::shared_ptr<Item> item_, ItemCount count_ = 1);
-			ItemStack(const std::shared_ptr<Game> &, std::shared_ptr<Item> item_, ItemCount count_, nlohmann::json data_);
-			ItemStack(const std::shared_ptr<Game> &, const ItemID &, ItemCount = 1);
-			ItemStack(const std::shared_ptr<Game> &, const ItemID &, ItemCount, nlohmann::json data_);
+			template <typename... Args>
+			static std::shared_ptr<ItemStack> create(Args &&...args) {
+				return std::shared_ptr<ItemStack>(new ItemStack(std::forward<Args>(args)...));
+			}
+
+			template <typename... Args>
+			static std::shared_ptr<ItemStack> spawn(const Place &place, Args &&...args) {
+				auto stack = ItemStack::create(std::forward<Args>(args)...);
+				stack->spawn(place);
+				return stack;
+			}
 
 			bool canMerge(const ItemStack &) const;
 			Glib::RefPtr<Gdk::Pixbuf> getImage() const;
@@ -127,13 +137,13 @@ namespace Game3 {
 
 			inline const auto & getID() const { return item->identifier; }
 
-			void spawn(const std::shared_ptr<Realm> &, const Position &) const;
+			void spawn(const Place &) const;
 
 			std::shared_ptr<Texture> getTexture(Game &) const;
 
 			static void fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &, ItemStack &);
-			static ItemStack fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
-			static std::vector<ItemStack> manyFromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
+			static ItemStackPtr fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
+			static std::vector<ItemStackPtr> manyFromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
 
 			void onDestroy();
 			void onDestroy(Game &);
@@ -150,22 +160,30 @@ namespace Game3 {
 			std::weak_ptr<Game> weakGame;
 			mutable Glib::RefPtr<Gdk::Pixbuf> cachedImage;
 
+			ItemStack() = default;
+			ItemStack(const std::shared_ptr<Game> &);
+			ItemStack(const std::shared_ptr<Game> &, std::shared_ptr<Item> item_, ItemCount count_ = 1);
+			ItemStack(const std::shared_ptr<Game> &, std::shared_ptr<Item> item_, ItemCount count_, nlohmann::json data_);
+			ItemStack(const std::shared_ptr<Game> &, const ItemID &, ItemCount = 1);
+			ItemStack(const std::shared_ptr<Game> &, const ItemID &, ItemCount, nlohmann::json data_);
+
 			void absorbGame(Game &);
 	};
 
-	using ItemPtr = std::shared_ptr<Item>;
+	using ItemStackPtr = std::shared_ptr<ItemStack>;
+	using ConstItemStackPtr = std::shared_ptr<const ItemStack>;
 
 	template <typename T>
 	T popBuffer(Buffer &);
 	template <>
-	ItemStack popBuffer<ItemStack>(Buffer &);
-	Buffer & operator+=(Buffer &, const ItemStack &);
-	Buffer & operator<<(Buffer &, const ItemStack &);
-	Buffer & operator>>(Buffer &, ItemStack &);
+	ItemStackPtr popBuffer<ItemStackPtr>(Buffer &);
+	Buffer & operator+=(Buffer &, const ItemStackPtr &);
+	Buffer & operator<<(Buffer &, const ItemStackPtr &);
+	Buffer & operator>>(Buffer &, ItemStackPtr &);
 	template <typename T>
 	T makeForBuffer(Buffer &);
 	template <>
-	ItemStack makeForBuffer<ItemStack>(Buffer &);
+	ItemStackPtr makeForBuffer<ItemStackPtr>(Buffer &);
 
 	void to_json(nlohmann::json &, const ItemStack &);
 }

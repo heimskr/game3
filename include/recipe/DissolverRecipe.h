@@ -11,7 +11,7 @@
 namespace Game3 {
 	class DissolverResult;
 
-	struct DissolverRecipe: Recipe<ItemStack, std::vector<ItemStack>, NamedRegisterable> {
+	struct DissolverRecipe: Recipe<ItemStackPtr, std::vector<ItemStackPtr>, NamedRegisterable> {
 		Input input;
 		std::unique_ptr<DissolverResult> dissolverResult;
 

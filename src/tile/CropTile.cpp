@@ -42,7 +42,7 @@ namespace Game3 {
 			WARN("Couldn't find {} in crop stages for crop {}", tilename, crop->identifier);
 	}
 
-	bool CropTile::interact(const Place &place, Layer layer, ItemStack *used_item, Hand hand) {
+	bool CropTile::interact(const Place &place, Layer layer, const ItemStackPtr &used_item, Hand hand) {
 		assert(!crop->stages.empty());
 
 		if (auto tilename = place.getName(layer); tilename && *tilename == crop->stages.back()) {

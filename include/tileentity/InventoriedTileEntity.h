@@ -20,16 +20,16 @@ namespace Game3 {
 		public:
 			InventoriedTileEntity(std::shared_ptr<Inventory> = nullptr);
 
-			virtual bool mayInsertItem(const ItemStack &, Direction, Slot) { return true; }
-			virtual bool mayInsertItem(const ItemStack &stack, Direction direction) { return mayInsertItem(stack, direction, -1); }
+			virtual bool mayInsertItem(const ItemStackPtr &, Direction, Slot) { return true; }
+			virtual bool mayInsertItem(const ItemStackPtr &stack, Direction direction) { return mayInsertItem(stack, direction, -1); }
 			virtual bool mayExtractItem(Direction, Slot) { return true; }
 			virtual bool mayExtractItem(Direction direction) { return mayExtractItem(direction, -1); }
-			virtual bool canInsertItem(const ItemStack &, Direction, Slot);
+			virtual bool canInsertItem(const ItemStackPtr &, Direction, Slot);
 			virtual bool canExtractItem(Direction, Slot);
 			/** Returns the extracted item. */
 			virtual std::optional<ItemStack> extractItem(Direction, bool remove, Slot slot);
 			/** Returns whether the item was insertable at all. */
-			virtual bool insertItem(const ItemStack &, Direction, std::optional<ItemStack> *leftover);
+			virtual bool InsertItem(const ItemStackPtr &, Direction, std::optional<ItemStack> *leftover);
 			virtual ItemCount itemsInsertable(const ItemStack &, Direction, Slot);
 			/** Iterates over each extractable item until they all have been iterated or the iteration function returns true. */
 			virtual void iterateExtractableItems(Direction, const std::function<bool(const ItemStack &, Slot)> &);

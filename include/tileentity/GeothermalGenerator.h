@@ -13,9 +13,9 @@ namespace Game3 {
 			constexpr static EnergyAmount ENERGY_CAPACITY = 64'000;
 			constexpr static FluidAmount  FLUID_CAPACITY  = 16 * FluidTile::FULL;
 
-			bool mayInsertItem(const ItemStack &, Direction, Slot) override;
+			bool mayInsertItem(const ItemStackPtr &, Direction, Slot) override;
 			bool mayExtractItem(Direction, Slot) override;
-			bool canInsertItem(const ItemStack &, Direction, Slot) override;
+			bool canInsertItem(const ItemStackPtr &, Direction, Slot) override;
 			FluidAmount getMaxLevel(FluidID) override;
 			EnergyAmount getEnergyCapacity() override;
 
@@ -24,7 +24,7 @@ namespace Game3 {
 			void init(Game &) override;
 			void tick(const TickArgs &) override;
 			void toJSON(nlohmann::json &) const override;
-			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, ItemStack *, Hand) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
 			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
 			bool populateMenu(const PlayerPtr &, bool overlap, const std::string &id, Glib::RefPtr<Gio::Menu>, Glib::RefPtr<Gio::SimpleActionGroup>) override;
 

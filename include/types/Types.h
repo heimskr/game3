@@ -43,6 +43,9 @@ namespace Game3 {
 	using EntityType = Identifier;
 	using RealmType  = Identifier;
 
+	class Game;
+	using GamePtr = std::shared_ptr<Game>;
+
 	class Player;
 	using PlayerPtr = std::shared_ptr<Player>;
 
@@ -51,6 +54,9 @@ namespace Game3 {
 
 	class ClientPlayer;
 	using ClientPlayerPtr = std::shared_ptr<ClientPlayer>;
+
+	class ItemStack;
+	using ItemStackPtr = std::shared_ptr<ItemStack>;
 
 	using Resources = std::map<Identifier, double>;
 

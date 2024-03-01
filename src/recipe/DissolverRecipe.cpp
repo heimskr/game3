@@ -10,11 +10,12 @@
 
 namespace Game3 {
 	namespace {
-		size_t countAtoms(const ItemStack &chemical) {
-			if (chemical.item->identifier != "base:item/chemical")
+		size_t countAtoms(const ItemStackPtr &chemical) {
+			if (chemical->item->identifier != "base:item/chemical")
 				return 4; // Count non-chemicals as four atoms.
 
-			const auto counts = Chemskr::count(chemical.data.at("formula"));
+			const auto counts = Chemskr::count(chemical->data.at("formula"));
+
 			return std::accumulate(counts.begin(), counts.end(), 0, [](size_t total, const auto &pair) {
 				return total + pair.second;
 			});
@@ -53,19 +54,19 @@ namespace Game3 {
 
 		size_t atom_count = 0;
 
-		for (const ItemStack &stack: output) {
+		for (const ItemStackPtr &stack: output) {
 			if (!output_inventory->canInsert(stack))
 				return false;
 			atom_count += countAtoms(stack);
 		}
 
-		assert(input.count == input_inventory->remove(input));
+		assert(input->count == input_inventory->remove(input));
 
-		for (const ItemStack &stack: output) {
-			if (std::optional<ItemStack> leftover_stack = output_inventory->add(stack)) {
+		for (const ItemStackPtr &stack: output) {
+			if (ItemStackPtr leftover_stack = output_inventory->add(stack)) {
 				if (!leftovers)
 					leftovers.emplace();
-				leftovers->push_back(std::move(*leftover_stack));
+				leftovers->push_back(std::move(leftover_stack));
 			}
 		}
 
@@ -80,12 +81,12 @@ namespace Game3 {
 	}
 
 	DissolverRecipe DissolverRecipe::fromJSON(const GamePtr &game, const Identifier &identifier, const nlohmann::json &json) {
-		return DissolverRecipe(identifier, ItemStack(game, identifier, 1), json);
+		return DissolverRecipe(identifier, ItemStack::create(game, identifier, 1), json);
 	}
 
 	void DissolverRecipe::toJSON(nlohmann::json &json) const {
 		json["type"] = DissolverRecipeRegistry::ID();
-		json["input"] = input;
+		json["input"] = *input;
 		assert(dissolverResult);
 		json["output"] = *dissolverResult;
 	}

@@ -22,7 +22,7 @@ namespace Game3 {
 
 			virtual void randomTick(const Place &);
 			/** Returns false to continue propagation to lower layers, true to stop it. */
-			virtual bool interact(const Place &, Layer, ItemStack *used_item, Hand);
+			virtual bool interact(const Place &, Layer, const ItemStackPtr &used_item, Hand);
 
 			virtual bool canSpawnMonsters(const Place &) const;
 

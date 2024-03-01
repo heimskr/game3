@@ -47,7 +47,7 @@ namespace Game3 {
 			throw std::invalid_argument("Couldn't set inventory with index " + std::to_string(index));
 	}
 
-	bool Autocrafter::mayInsertItem(const ItemStack &, Direction, Slot slot) {
+	bool Autocrafter::mayInsertItem(const ItemStackPtr &, Direction, Slot slot) {
 		return slot == Slot(-1) || slot < Slot(INPUT_CAPACITY);
 	}
 

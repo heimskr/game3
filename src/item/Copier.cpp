@@ -225,6 +225,14 @@ namespace Game3 {
 		}
 	}
 
+	bool Copier::populateMenu(ItemStack &, Glib::RefPtr<Gio::Menu> menu, Glib::RefPtr<Gio::SimpleActionGroup> group) const {
+		// auto submenu = Gio::Menu::create();
+
+		// submenu->append("Copy", "item_menu.copy");
+		// group->add_action("copy", [weak = shared_from_this()
+		return false;
+	}
+
 	std::optional<Position> Copier::computeMinimums(const std::unordered_set<Position> &positions) {
 		if (positions.empty())
 			return std::nullopt;

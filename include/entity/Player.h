@@ -49,8 +49,8 @@ namespace Game3 {
 			bool isPlayer() const override { return true; }
 			void tick(const TickArgs &) override;
 			void remove() override {}
-			bool interactOn(Modifiers, ItemStack *used_item = nullptr, Hand = Hand::None);
-			void interactNextTo(Modifiers, ItemStack *used_item = nullptr, Hand = Hand::None);
+			bool interactOn(Modifiers, const ItemStackPtr &used_item = nullptr, Hand = Hand::None);
+			void interactNextTo(Modifiers, const ItemStackPtr &used_item = nullptr, Hand = Hand::None);
 			using Entity::teleport;
 			void teleport(const Position &, const std::shared_ptr<Realm> &, MovementContext) override;
 			virtual void addMoney(MoneyCount) = 0;
@@ -61,7 +61,7 @@ namespace Game3 {
 			inline bool hasTooldown() const { return 0.f < tooldown; }
 			void showText(const Glib::ustring &text, const Glib::ustring &name);
 			std::string getName() const override { return "Player"; }
-			void give(const ItemStack &, Slot start = -1);
+			void give(const ItemStackPtr &, Slot start = -1);
 			Place getPlace() override;
 			bool isMoving() const;
 			bool isMoving(Direction) const;

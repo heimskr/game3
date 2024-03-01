@@ -114,7 +114,7 @@ namespace Game3 {
 			timeSinceAttack += delta;
 	}
 
-	bool Player::interactOn(Modifiers modifiers, ItemStack *used_item, Hand hand) {
+	bool Player::interactOn(Modifiers modifiers, const ItemStackPtr &used_item, Hand hand) {
 		auto realm = getRealm();
 		auto player = getShared();
 		auto entity = realm->findEntity(position, player);
@@ -123,7 +123,7 @@ namespace Game3 {
 		return entity->onInteractOn(player, modifiers, used_item, hand);
 	}
 
-	void Player::interactNextTo(Modifiers modifiers, ItemStack *used_item, Hand hand) {
+	void Player::interactNextTo(Modifiers modifiers, const ItemStackPtr &used_item, Hand hand) {
 		RealmPtr realm = getRealm();
 		Position next_to = nextTo();
 		PlayerPtr player = getShared();
@@ -192,7 +192,7 @@ namespace Game3 {
 		if (getSide() != Side::Server)
 			return false;
 
-		if (ItemStack *active = getInventory(0)->getActive()) {
+		if (ItemStackPtr active = getInventory(0)->getActive()) {
 			if (auto tool = std::dynamic_pointer_cast<Tool>(active->item)) {
 				tooldown = multiplier * tool->baseCooldown;
 				increaseUpdateCounter();
@@ -217,12 +217,12 @@ namespace Game3 {
 		}
 	}
 
-	void Player::give(const ItemStack &stack, Slot start) {
+	void Player::give(const ItemStackPtr &stack, Slot start) {
 		const InventoryPtr inventory = getInventory(0);
 		auto lock = inventory->uniqueLock();
-		if (auto leftover = inventory->add(stack, start)) {
+		if (ItemStackPtr leftover = inventory->add(stack, start)) {
 			lock.unlock();
-			getRealm()->spawn<ItemEntity>(getPosition(), *leftover);
+			getRealm()->spawn<ItemEntity>(getPosition(), leftover);
 		}
 	}
 

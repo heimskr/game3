@@ -14,7 +14,7 @@ namespace Game3 {
 			constexpr static ItemCount OUTPUT_CAPACITY = 5;
 			constexpr static EnergyAmount ENERGY_PER_ATOM = 100;
 
-			bool mayInsertItem(const ItemStack &, Direction, Slot) override;
+			bool mayInsertItem(const ItemStackPtr &, Direction, Slot) override;
 			bool mayExtractItem(Direction, Slot) override;
 			EnergyAmount getEnergyCapacity() override;
 

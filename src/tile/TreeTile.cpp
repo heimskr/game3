@@ -9,7 +9,7 @@ namespace Game3 {
 	TreeTile::TreeTile(std::shared_ptr<Crop> crop_):
 		CropTile(ID(), std::move(crop_)) {}
 
-	bool TreeTile::interact(const Place &place, Layer layer, ItemStack *used_item, Hand hand) {
+	bool TreeTile::interact(const Place &place, Layer layer, const ItemStackPtr &used_item, Hand hand) {
 		assert(!crop->stages.empty());
 
 		PlayerPtr player = place.player;
