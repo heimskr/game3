@@ -16,6 +16,7 @@ empty;planks;tall_wooden_wall;wooden_wall/0,0=1:0:2,,,,,,,,,,,,,,,,,,,,/1,0=1:0:
 2,1={"id":"base:te/crate","inventory":{"activeSlot":0,"slotCount":1},"itemName":"base:item/barrel","name":"Barrel","solid":true,"tileID":"base:tile/barrel"}
 3,1={"id":"base:te/crate","inventory":{"activeSlot":0,"slotCount":1},"itemName":"base:item/crate","name":"Crate","solid":true,"tileID":"base:tile/crate"}
 3,16={"entrance":[32,38],"id":"base:te/building","innerRealmID":0,"solid":true,"tileID":"base:tile/ladder"}
+3,17={"entrance":[32,38],"id":"base:te/building","innerRealmID":0,"solid":true,"tileID":"base:tile/ladder"}
 4,1={"id":"base:te/crate","inventory":{"activeSlot":0,"slotCount":1},"itemName":"base:item/barrel","name":"Barrel","solid":true,"tileID":"base:tile/barrel"}
 5,2={"id":"base:te/crate","inventory":{"activeSlot":0,"slotCount":1},"itemName":"base:item/barrel","name":"Barrel","solid":true,"tileID":"base:tile/barrel"}
 5,3={"id":"base:te/crate","inventory":{"activeSlot":0,"slotCount":1},"itemName":"base:item/crate","name":"Crate","solid":true,"tileID":"base:tile/crate"}

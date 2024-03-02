@@ -49,7 +49,11 @@ namespace Game3::WorldGen {
 				realm->setFluid(position, "base:fluid/water", FluidTile::FULL, true);
 			});
 
-			Position top_left = chunk_position.topLeft();
+			const Position top_left = chunk_position.topLeft();
+			const Position anchor = top_left + Position{29, 23};
+
+			// Generate invisible barriers at the top and left edges of the chunk
+
 			realm->setTile(Layer::Objects, top_left, "base:tile/barrier", false);
 
 			for (Index i = 1; i < CHUNK_SIZE; ++i) {
@@ -64,19 +68,20 @@ namespace Game3::WorldGen {
 				});
 			};
 
+
 			if (chunk_position == ChunkPosition{0, 0}) {
 				paster.ingest(shipDeckTemplate());
 				patch("/innerRealmID", realm->getID());
 				patch("/targetEntity", parent->getGID());
-				paster.paste(realm, chunk_position.topLeft() + Position{29, 23});
+				paster.paste(realm, anchor);
 			} else if (chunk_position == ChunkPosition{3, 0}) {
 				paster.ingest(shipHoldTemplate());
 				patch("/innerRealmID", realm->getID());
-				paster.paste(realm, chunk_position.topLeft() + Position{29, 23});
+				paster.paste(realm, anchor);
 			} else if (chunk_position == ChunkPosition{6, 0}) {
 				paster.ingest(shipUpperTemplate());
 				patch("/innerRealmID", realm->getID());
-				paster.paste(realm, chunk_position.topLeft() + Position{29, 23}, true, [&] {
+				paster.paste(realm, anchor, true, [&] {
 					for (Index column = 407; column <= 413; ++column)
 						realm->setFluid(Position{36, column}, "base:fluid/water", FluidTile::FULL, true);
 				});
