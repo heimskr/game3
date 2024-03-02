@@ -111,11 +111,13 @@ namespace Game3 {
 
 		} else if (name == "GetAgentGID") {
 
-			return Buffer{inventory->getOwner()->getGID()};
+			if (auto owner = inventory->weakOwner.lock())
+				return Buffer{owner->getGID()};
+			return std::nullopt;
 
 		}
 
-		return {};
+		return std::nullopt;
 	}
 
 	bool InventoryModule::addCSSClass(const Glib::ustring &css_class, Slot slot) {

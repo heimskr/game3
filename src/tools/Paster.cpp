@@ -95,7 +95,7 @@ namespace Game3 {
 		}
 	}
 
-	void Paster::paste(const RealmPtr &realm, const Position &anchor) {
+	void Paster::paste(const RealmPtr &realm, const Position &anchor, bool destructive) {
 		GamePtr game = realm->getGame();
 		assert(game->getSide() == Side::Server);
 
@@ -108,19 +108,32 @@ namespace Game3 {
 				const Position adjusted = anchor + position;
 				chunks.insert(adjusted.getChunk());
 				for (Layer layer: allLayers) {
-					realm->setFluid(adjusted, FluidTile{});
+					if (destructive)
+						realm->setFluid(adjusted, FluidTile{});
 					realm->setTile(layer, adjusted, *layers.at(getIndex(layer)), true);
 				}
 			}
 
 			for (const auto &[position, json]: tileEntityJSON) {
-				TileEntityPtr tile_entity = TileEntity::fromJSON(game, json);
-				tile_entity->position = anchor + position;
-				tile_entity->setRealm(realm);
-				tile_entity->init(*game);
-				realm->addToMaps(tile_entity);
-				realm->attach(tile_entity);
-				tile_entity->onSpawn();
+				auto add = [=] {
+					TileEntityPtr tile_entity = TileEntity::fromJSON(game, json);
+					tile_entity->position = anchor + position;
+					tile_entity->setRealm(realm);
+					tile_entity->init(*game);
+					realm->addToMaps(tile_entity);
+					realm->attach(tile_entity);
+					tile_entity->onSpawn();
+				};
+
+				if (destructive) {
+					if (TileEntityPtr tile_entity = realm->tileEntityAt(anchor + position)) {
+						tile_entity->queueDestruction();
+						realm->queue(std::move(add));
+						continue;
+					}
+				}
+
+				add();
 			}
 		}
 

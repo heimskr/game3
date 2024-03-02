@@ -19,7 +19,7 @@ namespace Game3 {
 			Paster(std::string_view);
 
 			void ingest(std::string_view);
-			void paste(const std::shared_ptr<Realm> &, const Position &anchor);
+			void paste(const std::shared_ptr<Realm> &, const Position &anchor, bool destructive = true);
 
 		private:
 			std::vector<Identifier> identifiers;
