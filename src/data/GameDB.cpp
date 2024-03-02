@@ -387,18 +387,7 @@ namespace Game3 {
 				buffer.context = game;
 				tile_entity->init(*game);
 				tile_entity->decode(*game, buffer);
-
-				// TODO: functionize this
-				{
-					auto lock = realm->tileEntities.uniqueLock();
-					realm->tileEntities.emplace(tile_entity->position, tile_entity);
-				}
-
-				{
-					auto lock = realm->tileEntitiesByGID.uniqueLock();
-					realm->tileEntitiesByGID[tile_entity->globalID] = tile_entity;
-				}
-
+				realm->addToMaps(tile_entity);
 				realm->attach(tile_entity);
 				tile_entity->onSpawn();
 			}

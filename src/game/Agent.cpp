@@ -50,7 +50,9 @@ namespace Game3 {
 
 		if (!agent_rng_seeded) {
 			std::random_device hardware_rng;
-			agent_rng.seed(hardware_rng());
+			uint_fast64_t seed = hardware_rng();
+			seed |= uint_fast64_t(hardware_rng()) << 32;
+			agent_rng.seed(seed);
 			agent_rng_seeded = true;
 		}
 

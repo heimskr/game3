@@ -50,7 +50,7 @@ namespace Game3 {
 
 	void Crate::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
-		assert(getSide() == Side::Server);
+		assert(game->getSide() == Side::Server);
 		name = json.at("name");
 		itemName = json.at("itemName");
 		if (auto iter = json.find("inventory"); iter != json.end())

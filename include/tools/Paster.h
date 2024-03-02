@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include <nlohmann/json.hpp>
+
 namespace Game3 {
 	class Realm;
 	struct Position;
@@ -17,10 +19,11 @@ namespace Game3 {
 			Paster(std::string_view);
 
 			void ingest(std::string_view);
-			void paste(Realm &, const Position &anchor);
+			void paste(const std::shared_ptr<Realm> &, const Position &anchor);
 
 		private:
 			std::vector<Identifier> identifiers;
 			std::map<Position, std::array<Identifier *, LAYER_COUNT>> tiles;
+			std::map<Position, nlohmann::json> tileEntityJSON;
 	};
 }

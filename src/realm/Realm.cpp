@@ -1414,7 +1414,14 @@ namespace Game3 {
 		}
 	}
 
+	void Realm::addToMaps(const TileEntityPtr &tile_entity) {
+		std::scoped_lock lock{tileEntities.mutex, tileEntitiesByGID.mutex};
+		tileEntities.emplace(tile_entity->getPosition(), tile_entity);
+		tileEntitiesByGID.emplace(tile_entity->globalID, tile_entity);
+	}
+
 	void Realm::attach(const TileEntityPtr &tile_entity) {
+		// TODO: consider adding a call to addToMaps here
 		auto shared_lock = tileEntitiesByChunk.sharedLock();
 		const auto chunk_position = tile_entity->getChunk();
 		if (auto iter = tileEntitiesByChunk.find(chunk_position); iter != tileEntitiesByChunk.end()) {

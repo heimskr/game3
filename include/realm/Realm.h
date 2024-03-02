@@ -190,15 +190,17 @@ namespace Game3 {
 			void removePlayer(const PlayerPtr &);
 			void sendTo(RemoteClient &);
 			void requestChunk(ChunkPosition, const std::shared_ptr<RemoteClient> &);
-			/** Removes the entity from entitiesByChunk. */
+			/** Removes an entity from entitiesByChunk. */
 			void detach(const EntityPtr &, ChunkPosition);
-			/** Removes the entity from entitiesByChunk based on the entity's current chunk position. */
+			/** Removes an entity from entitiesByChunk based on the entity's current chunk position. */
 			void detach(const EntityPtr &);
-			/** Adds the entity to entitiesByChunk. */
+			/** Adds an entity to entitiesByChunk. */
 			void attach(const EntityPtr &);
-			/** Removes the tile entity from tileEntitiesByChunk. */
+			/** Removes a tile entity from tileEntitiesByChunk. */
 			void detach(const TileEntityPtr &);
-			/** Adds the tile entity to tileEntitiesByChunk. */
+			/** Adds a tile entity to tileEntities and tileEntitiesByGID. */
+			void addToMaps(const TileEntityPtr &);
+			/** Adds a tile entity to tileEntitiesByChunk. */
 			void attach(const TileEntityPtr &);
 			std::shared_ptr<Lockable<std::unordered_set<TileEntityPtr>>> getTileEntities(ChunkPosition);
 			void sendToMany(const std::unordered_set<std::shared_ptr<RemoteClient>> &, ChunkPosition);

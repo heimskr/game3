@@ -277,15 +277,17 @@ namespace Game3 {
 		return getGame()->enqueue(getTickFunction());
 	}
 
-	void TileEntity::absorbJSON(const GamePtr &, const nlohmann::json &json) {
-		assert(getSide() == Side::Server);
+	void TileEntity::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+		assert(game->getSide() == Side::Server);
 		tileEntityID = json.at("id");
-		globalID     = json.at("gid");
 		tileID       = json.at("tileID");
-		position     = json.at("position");
 		solid        = json.at("solid");
 		if (auto iter = json.find("extra"); iter != json.end())
 			extraData = *iter;
+		if (auto iter = json.find("position"); iter != json.end())
+			position = *iter;
+		if (auto iter = json.find("gid"); iter != json.end())
+			globalID = *iter;
 		increaseUpdateCounter();
 	}
 
