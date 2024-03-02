@@ -68,7 +68,6 @@ namespace Game3::WorldGen {
 				});
 			};
 
-
 			if (chunk_position == ChunkPosition{0, 0}) {
 				paster.ingest(shipDeckTemplate());
 				patch("/innerRealmID", realm->getID());
@@ -107,8 +106,10 @@ namespace Game3::WorldGen {
 		}
 
 		ship_realm_timer.stop();
-		if (initial_generation)
+
+		if (initial_generation) {
 			Timer::summary();
-		Timer::clear();
+			Timer::clear();
+		}
 	}
 }

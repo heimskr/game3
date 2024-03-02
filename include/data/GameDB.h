@@ -49,7 +49,7 @@ namespace Game3 {
 			void writeAllRealms();
 
 			void writeRealm(const std::shared_ptr<Realm> &);
-			void deleteRealm(const std::shared_ptr<Realm> &);
+			void deleteRealm(std::shared_ptr<Realm>);
 
 			void writeChunk(const std::shared_ptr<Realm> &, ChunkPosition, bool use_transaction = true);
 

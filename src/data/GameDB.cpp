@@ -154,7 +154,7 @@ namespace Game3 {
 		transaction.commit();
 	}
 
-	void GameDB::deleteRealm(const RealmPtr &realm) {
+	void GameDB::deleteRealm(RealmPtr realm) {
 		assert(database);
 		auto db_lock = database.uniqueLock();
 
@@ -172,8 +172,9 @@ namespace Game3 {
 			}
 		}
 
+		// Delete all the realm's chunks
 		SQLite::Transaction transaction{*database};
-		SQLite::Statement statement{*database, "DELETE FROM entities WHERE realmID = ?"};
+		SQLite::Statement statement{*database, "DELETE FROM chunks WHERE realmID = ?"};
 		statement.bind(1, std::make_signed_t<RealmID>(realm->getID()));
 		statement.exec();
 		transaction.commit();

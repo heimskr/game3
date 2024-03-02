@@ -127,6 +127,7 @@ namespace Game3 {
 			for (const auto &[position, json]: tileEntityJSON) {
 				auto add = [=] {
 					TileEntityPtr tile_entity = TileEntity::fromJSON(game, json);
+					assert(!game->getAgent(tile_entity->getGID())); // Might just fail if there's no hardware RNG.
 					tile_entity->position = anchor + position;
 					tile_entity->setRealm(realm);
 					tile_entity->init(*game);
