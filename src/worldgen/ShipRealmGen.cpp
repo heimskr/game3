@@ -19,6 +19,7 @@ namespace Game3::WorldGen {
 	namespace {
 		const std::string & shipDeckTemplate() { static auto out = readFile("resources/templates/ship_deck.g3"); return out; }
 		const std::string & shipHoldTemplate() { static auto out = readFile("resources/templates/ship_hold.g3"); return out; }
+		const std::string & shipUpperTemplate() { static auto out = readFile("resources/templates/ship_upper.g3"); return out; }
 	}
 
 	void generateShipRealmChunks(const RealmPtr &realm, size_t, const WorldGenParams &params, const ChunkRange &range, bool initial_generation, const std::shared_ptr<Ship> &parent) {
@@ -43,10 +44,12 @@ namespace Game3::WorldGen {
 		Paster paster;
 
 		range.iterate([&](ChunkPosition chunk_position) {
-			chunk_position.iterate([&](const Position &position) {
-				realm->setTile(Layer::Terrain, position, "base:tile/sand", false);
-				realm->setFluid(position, "base:fluid/water", FluidTile::FULL, true);
-			});
+			if (!ChunkRange{{6, 0}}.contains(chunk_position)) {
+				chunk_position.iterate([&](const Position &position) {
+					realm->setTile(Layer::Terrain, position, "base:tile/sand", false);
+					realm->setFluid(position, "base:fluid/water", FluidTile::FULL, true);
+				});
+			}
 
 			Position top_left = chunk_position.topLeft();
 			realm->setTile(Layer::Objects, top_left, "base:tile/barrier", false);
@@ -56,23 +59,25 @@ namespace Game3::WorldGen {
 				realm->setTile(Layer::Objects, top_left + Position{i, 0}, "base:tile/barrier", false);
 			}
 
+			auto patch = [&](const char *path, auto value) {
+				paster.patch({
+					{{"op", "test"},    {"path", path}, {"value", 0}},
+					{{"op", "replace"}, {"path", path}, {"value", value}},
+				});
+			};
+
 			if (chunk_position == ChunkPosition{0, 0}) {
 				paster.ingest(shipDeckTemplate());
-				paster.patch({
-					{{"op", "test"}, {"path", "/innerRealmID"}, {"value", 0}},
-					{{"op", "replace"}, {"path", "/innerRealmID"}, {"value", realm->getID()}},
-				});
-				paster.patch({
-					{{"op", "test"}, {"path", "/targetEntity"}, {"value", 0}},
-					{{"op", "replace"}, {"path", "/targetEntity"}, {"value", parent->getGID()}},
-				});
+				patch("/innerRealmID", realm->getID());
+				patch("/targetEntity", parent->getGID());
 				paster.paste(realm, chunk_position.topLeft() + Position{29, 23});
-			} else if (chunk_position == ChunkPosition{2, 0}) {
+			} else if (chunk_position == ChunkPosition{3, 0}) {
 				paster.ingest(shipHoldTemplate());
-				paster.patch({
-					{{"op", "test"}, {"path", "/innerRealmID"}, {"value", 0}},
-					{{"op", "replace"}, {"path", "/innerRealmID"}, {"value", realm->getID()}},
-				});
+				patch("/innerRealmID", realm->getID());
+				paster.paste(realm, chunk_position.topLeft() + Position{29, 23});
+			} else if (chunk_position == ChunkPosition{6, 0}) {
+				paster.ingest(shipUpperTemplate());
+				patch("/innerRealmID", realm->getID());
 				paster.paste(realm, chunk_position.topLeft() + Position{29, 23});
 			} else {
 				provider.updateChunk(chunk_position);
