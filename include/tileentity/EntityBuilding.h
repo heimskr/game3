@@ -6,7 +6,7 @@ namespace Game3 {
 	class EntityBuilding: public TileEntity {
 		public:
 			static Identifier ID() { return {"base", "te/entity_building"}; }
-			GlobalID targetEntity;
+			GlobalID targetEntity{};
 
 			std::string getName() const override { return "Entity Building"; }
 

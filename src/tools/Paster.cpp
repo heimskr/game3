@@ -95,6 +95,16 @@ namespace Game3 {
 		}
 	}
 
+	void Paster::patch(const nlohmann::json &patch) {
+		for (auto &[position, json]: tileEntityJSON) {
+			try {
+				json.patch_inplace(patch);
+			} catch (const nlohmann::json::exception &) {
+				// Ignore unsuccessful patches.
+			}
+		}
+	}
+
 	void Paster::paste(const RealmPtr &realm, const Position &anchor, bool destructive) {
 		GamePtr game = realm->getGame();
 		assert(game->getSide() == Side::Server);

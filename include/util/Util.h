@@ -33,7 +33,9 @@ namespace Game3 {
 	template <typename T = std::string_view>
 	std::vector<T> split(std::string_view str, std::string_view delimiter, bool condense = true);
 
-	std::string strip(std::string_view, const char *whitespace = " \t\r\n");
+	std::string_view trimLeft(std::string_view, std::string_view to_remove = " \t\r\n");
+	std::string_view trimRight(std::string_view, std::string_view to_remove = " \t\r\n");
+	std::string_view trim(std::string_view, std::string_view to_remove = " \t\r\n");
 
 	template <typename C>
 	std::string join(const C &container, std::string_view delimiter = " ") {
@@ -48,6 +50,7 @@ namespace Game3 {
 		}
 		return ss.str();
 	}
+
 
 	template <typename S, typename T>
 	void appendSpan(S &raw, const std::span<T> &source) {

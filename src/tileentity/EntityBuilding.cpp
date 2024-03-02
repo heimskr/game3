@@ -50,6 +50,7 @@ namespace Game3 {
 
 	void EntityBuilding::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
+		INFO("EntityBuilding absorb: {}", json.dump());
 		targetEntity = json.at("targetEntity");
 	}
 
@@ -60,6 +61,9 @@ namespace Game3 {
 
 	void EntityBuilding::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
+		INFO_("EntityBuilding decode:");
+		buffer.debug();
 		buffer >> targetEntity;
+		INFO("(Decoded: {})", targetEntity);
 	}
 }

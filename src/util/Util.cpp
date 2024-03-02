@@ -43,17 +43,22 @@ namespace Game3 {
 		return out;
 	}
 
-	std::string strip(std::string_view str, const char *whitespace) {
-		if (str.empty())
-			return {};
-
-		while (!str.empty() && str.find_first_of(whitespace) == 0)
+	std::string_view trimLeft(std::string_view str, std::string_view to_remove) {
+		while (!str.empty() && str.find_first_of(to_remove) == 0)
 			str.remove_prefix(1);
 
-		while (!str.empty() && str.find_last_of(whitespace) == str.size() - 1)
+		return str;
+	}
+
+	std::string_view trimRight(std::string_view str, std::string_view to_remove) {
+		while (!str.empty() && str.find_last_of(to_remove) == str.size() - 1)
 			str.remove_suffix(1);
 
-		return std::string(str);
+		return str;
+	}
+
+	std::string_view trim(std::string_view str, std::string_view to_remove) {
+		return trimLeft(trimRight(str, to_remove), to_remove);
 	}
 
 	long parseLong(const std::string &str, int base) {

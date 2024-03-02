@@ -143,6 +143,7 @@ namespace Game3 {
 			bool moveFromRider(const std::shared_ptr<Entity> &rider, Direction);
 			std::shared_ptr<Realm> getRealm() const override final;
 			Position getPosition() const override { return position.copyBase(); }
+			inline Direction getDirection() const { return direction.load(); }
 			Entity & setRealm(const Game &, RealmID);
 			Entity & setRealm(const std::shared_ptr<Realm>);
 			void focus(Canvas &, bool is_autofocus);

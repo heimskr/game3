@@ -19,6 +19,8 @@ namespace Game3 {
 			Paster(std::string_view);
 
 			void ingest(std::string_view);
+			/** Applies a patch to all the tile entity JSONs. */
+			void patch(const nlohmann::json &);
 			void paste(const std::shared_ptr<Realm> &, const Position &anchor, bool destructive = true);
 
 		private:

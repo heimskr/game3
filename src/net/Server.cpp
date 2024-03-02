@@ -272,7 +272,7 @@ namespace Game3 {
 
 		size_t seed = 1621;
 		if (std::filesystem::exists(".seed")) {
-			seed = parseNumber<size_t>(strip(readFile(".seed")));
+			seed = parseNumber<size_t>(trim(readFile(".seed")));
 			INFO_("Using custom seed \e[1m" << seed << "\e[22m");
 		}
 

@@ -329,6 +329,40 @@ namespace Game3 {
 			return {false, "No player."};
 
 		try {
+			if (command[0] == ':') {
+				std::string_view message = trim(std::string_view(command).substr(1));
+
+				if (message.empty() || message == " ")
+					return {true, ""};
+
+				if (message[0] == ' ')
+					message.remove_prefix(1);
+
+				INFO_('[' << player->username << "] " << message);
+				broadcast(ChatMessageSentPacket{player->getGID(), std::string(message)}, true);
+				return {true, ""};
+			}
+
+			if (command[0] == '!') {
+				// Place a tile entity in front of the player
+				RealmPtr realm = player->getRealm();
+				if (!realm)
+					return {false, "No realm."};
+				const Position position = player->getPosition() + player->getDirection();
+				nlohmann::json json = nlohmann::json::parse(trim(std::string_view(command).substr(1)));
+				if (realm->hasTileEntityAt(position))
+					return {false, "Tile entity already present."};
+				GamePtr game = realm->getGame();
+				TileEntityPtr tile_entity = TileEntity::fromJSON(game, json);
+				tile_entity->position = position;
+				tile_entity->setRealm(realm);
+				tile_entity->init(*game);
+				realm->addToMaps(tile_entity);
+				realm->attach(tile_entity);
+				tile_entity->onSpawn();
+				return {true, ""};
+			}
+
 			if (first == "give") {
 				if (words.size() < 2)
 					return {false, "Not enough arguments."};
@@ -493,7 +527,7 @@ namespace Game3 {
 				return {true, "Stopped server."};
 			}
 
-			if (first == "say" || first == ":") {
+			if (first == "say") {
 				std::string_view message = std::string_view(command).substr(first.size() + 1);
 				INFO_('[' << player->username << "] " << message);
 				broadcast(ChatMessageSentPacket{player->getGID(), std::string(message)}, true);

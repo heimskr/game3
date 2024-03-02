@@ -70,6 +70,7 @@ namespace Game3 {
 	}
 
 	bool Ship::onInteractOn(const std::shared_ptr<Player> &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
+		INFO("Interacted with ship {}", getGID());
 		bool out = false;
 
 		if (modifiers == Modifiers{false, true, true, false}) {
