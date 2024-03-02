@@ -60,6 +60,7 @@ namespace Game3 {
 			void releasePlayer(const std::string &username, const Place &);
 			void setRule(const std::string &, ssize_t);
 			std::optional<ssize_t> getRule(const std::string &) const;
+			void removeRealm(RealmPtr) override;
 
 			std::shared_ptr<ServerGame> getSelf() { return std::static_pointer_cast<ServerGame>(shared_from_this()); }
 			std::shared_ptr<const ServerGame> getSelf() const { return std::static_pointer_cast<const ServerGame>(shared_from_this()); }

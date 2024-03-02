@@ -27,13 +27,9 @@ namespace Game3 {
 	}
 
 	void Ship::onDestroy() {
-		INFO_("Ship::onDestroy()");
 		GamePtr game = getGame();
-
-		if (game->getSide() == Side::Server && internalRealmID != RealmID(-1)) {
-			INFO("Removing ship realm {}", internalRealmID);
-			game->removeRealm(internalRealmID);
-		}
+		if (game->getSide() == Side::Server && internalRealmID != 0)
+			game->removeRealm(game->getRealm(internalRealmID));
 	}
 
 	void Ship::updateRiderOffset(const EntityPtr &rider) {
@@ -70,7 +66,6 @@ namespace Game3 {
 	}
 
 	bool Ship::onInteractOn(const std::shared_ptr<Player> &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
-		INFO("Interacted with ship {}", getGID());
 		bool out = false;
 
 		if (modifiers == Modifiers{false, true, true, false}) {
@@ -78,13 +73,18 @@ namespace Game3 {
 			return true;
 		}
 
-		if (getRider() == player) {
+		const bool player_was_riding = getRider() == player;
+
+		if (player_was_riding) {
 			setRider(nullptr);
 			out = true;
 		}
 
 		if (modifiers.onlyCtrl()) {
 			teleportToRealm(player);
+			out = true;
+		} else if (!player_was_riding) {
+			setRider(player);
 			out = true;
 		}
 
@@ -138,15 +138,13 @@ namespace Game3 {
 	}
 
 	void Ship::teleportToRealm(const std::shared_ptr<Player> &player) {
-		if (internalRealmID == RealmID(-1))
+		if (internalRealmID == 0)
 			throw std::runtime_error("Ship is missing internal realm");
 
 		RealmPtr internal_realm = getGame()->getRealm(internalRealmID);
 
 		if (!internal_realm)
 			throw std::runtime_error("Ship is missing internal realm");
-
-		INFO("Teleporting player to ship realm {}", internalRealmID);
 
 		player->teleport(realmOrigin, internal_realm, MovementContext{
 			.isTeleport = true,

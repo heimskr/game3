@@ -236,15 +236,13 @@ namespace Game3 {
 	}
 
 	void Entity::setRider(const EntityPtr &rider) {
-		if (EntityPtr current_rider = getRider()) {
+		if (EntityPtr current_rider = getRider())
 			current_rider->setRidden(nullptr);
-		}
 
 		weakRider = rider;
 
-		if (rider) {
+		if (rider)
 			rider->setRidden(getSelf());
-		}
 
 		GamePtr game = getGame();
 

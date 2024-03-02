@@ -312,6 +312,23 @@ namespace Game3 {
 		return std::nullopt;
 	}
 
+	void ServerGame::removeRealm(RealmPtr realm) {
+		assert(database);
+		Game::removeRealm(realm);
+
+		{
+			RealmPtr shadow_realm = getRealm(-1);
+			// Teleport players to the shadow realm.
+			auto lock = realm->players.uniqueLock();
+			for (const auto &weak_player: realm->players) {
+				if (PlayerPtr player = weak_player.lock())
+					player->teleport(Position{32, 32}, shadow_realm);
+			}
+		}
+
+		database->deleteRealm(realm);
+	}
+
 	void ServerGame::handlePacket(RemoteClient &client, Packet &packet) {
 		packet.handle(getSelf(), client);
 	}

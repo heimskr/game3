@@ -19,7 +19,7 @@ namespace Game3 {
 
 			if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game->getRealm(realm_id))) {
 				if (--cave_realm->entranceCount == 0)
-					game->removeRealm(realm_id);
+					game->removeRealm(cave_realm);
 				realm.queueDestruction(building);
 				InventoryPtr inventory = place.player->getInventory(0);
 				assert(inventory);

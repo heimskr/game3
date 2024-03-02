@@ -46,19 +46,18 @@ namespace Game3 {
 			}
 		}
 
-		bool emplaced = false;
+		std::shared_ptr<Cave> new_realm;
 
 		if (!realm_id) {
 			realm_id = game->newRealmID();
 			const int cave_seed = -2 * realm.seed - 5 + game->cavesGenerated;
-			auto new_realm = Realm::create<Cave>(game, *realm_id, realm.id, cave_seed);
+			new_realm = Realm::create<Cave>(game, *realm_id, realm.id, cave_seed);
 			new_realm->outdoors = false;
 			Position entrance_position;
 			WorldGen::generateCaveFull(new_realm, threadContext.rng, cave_seed, exit_position, entrance_position, realm.id, {{-1, -1}, {1, 1}});
 			entrance = entrance_position;
 			game->addRealm(*realm_id, new_realm);
 			++game->cavesGenerated;
-			emplaced = true;
 		}
 
 		if (auto tile_entity = TileEntity::spawn<Building>(place.realm, "base:tile/cave"_id, position, *realm_id, entrance)) {
@@ -69,8 +68,8 @@ namespace Game3 {
 			return true;
 		}
 
-		if (emplaced)
-			game->removeRealm(*realm_id);
+		if (new_realm)
+			game->removeRealm(new_realm);
 
 		return false;
 	}

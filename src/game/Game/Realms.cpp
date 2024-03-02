@@ -68,10 +68,9 @@ namespace Game3 {
 		return realms.contains(realm_id);
 	}
 
-	void Game::removeRealm(RealmID realm_id) {
-		RealmPtr realm = getRealm(realm_id);
+	void Game::removeRealm(RealmPtr realm) {
 		realm->onRemove();
 		auto lock = realms.uniqueLock();
-		realms.erase(realm_id);
+		realms.erase(realm->getID());
 	}
 }

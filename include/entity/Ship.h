@@ -29,7 +29,7 @@ namespace Game3 {
 			Vector2i getDimensions() const override { return {2, 2}; }
 
 		protected:
-			RealmID internalRealmID = -1;
+			RealmID internalRealmID = 0;
 			Position realmOrigin{CHUNK_SIZE / 2, CHUNK_SIZE / 2};
 
 			Ship();

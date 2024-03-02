@@ -154,6 +154,31 @@ namespace Game3 {
 		transaction.commit();
 	}
 
+	void GameDB::deleteRealm(const RealmPtr &realm) {
+		assert(database);
+		auto db_lock = database.uniqueLock();
+
+		{
+			auto lock = realm->tileEntities.sharedLock();
+			for (const auto &[position, tile_entity]: realm->tileEntities)
+				deleteTileEntity(tile_entity);
+		}
+
+		{
+			auto lock = realm->entities.sharedLock();
+			for (const EntityPtr &entity: realm->entities) {
+				if (!entity->isPlayer())
+					deleteEntity(entity);
+			}
+		}
+
+		SQLite::Transaction transaction{*database};
+		SQLite::Statement statement{*database, "DELETE FROM entities WHERE realmID = ?"};
+		statement.bind(1, std::make_signed_t<RealmID>(realm->getID()));
+		statement.exec();
+		transaction.commit();
+	}
+
 	void GameDB::writeChunk(const RealmPtr &realm, ChunkPosition chunk_position, bool use_transaction) {
 		assert(database);
 		TileProvider &provider = realm->tileProvider;

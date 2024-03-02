@@ -116,7 +116,7 @@ namespace Game3 {
 			void addRealm(RealmID, RealmPtr);
 			void addRealm(RealmPtr);
 			bool hasRealm(RealmID) const;
-			void removeRealm(RealmID);
+			virtual void removeRealm(RealmPtr);
 			ItemPtr getItem(const ItemID &) const;
 
 			virtual Side getSide() const = 0;

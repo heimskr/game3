@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/Game.h"
@@ -28,29 +26,23 @@ namespace Game3 {
 	}
 
 	void EntityBuilding::teleport(const std::shared_ptr<Entity> &entity) {
+		if (!entity)
+			return;
+
 		GamePtr game = getGame();
 
 		if (game->getSide() != Side::Server)
 			return;
 
-		if (!entity) {
-			INFO_("No entity");
-			return;
-		}
-
 		EntityPtr target = game->getAgent<Entity>(targetEntity);
-		if (!target) {
-			INFO("No target ({})", targetEntity);
+		if (!target)
 			return;
-		}
 
-		INFO("Teleporting to {}", targetEntity);
 		entity->teleport(target->getPosition(), target->getRealm(), MovementContext{.isTeleport = true});
 	}
 
 	void EntityBuilding::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
-		INFO("EntityBuilding absorb: {}", json.dump());
 		targetEntity = json.at("targetEntity");
 	}
 
@@ -61,9 +53,6 @@ namespace Game3 {
 
 	void EntityBuilding::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
-		INFO_("EntityBuilding decode:");
-		buffer.debug();
 		buffer >> targetEntity;
-		INFO("(Decoded: {})", targetEntity);
 	}
 }
