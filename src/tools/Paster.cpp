@@ -105,7 +105,7 @@ namespace Game3 {
 		}
 	}
 
-	void Paster::paste(const RealmPtr &realm, const Position &anchor, bool destructive) {
+	void Paster::paste(const RealmPtr &realm, const Position &anchor, bool destructive, const std::function<void()> &pre_send) {
 		GamePtr game = realm->getGame();
 		assert(game->getSide() == Side::Server);
 
@@ -146,6 +146,9 @@ namespace Game3 {
 				add();
 			}
 		}
+
+		if (pre_send)
+			pre_send();
 
 		TileProvider &provider = realm->tileProvider;
 

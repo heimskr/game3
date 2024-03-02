@@ -1,2 +1,2 @@
-empty;planks;wooden_wall;ship_wheel;sand/0,0=1:0:2,,,,,,/1,0=1:0:2,1,,,,,1:0:2/2,0=1:0:2,1,,,,,1:0:2/3,0=1:0:2,1,,1:0:3,1,,1:0:2/4,0=1:0:2,1,,,,,1:0:2/5,0=1:0:2,1,,,,,1:0:2/6,0=1:0:2,4:0:2,,,,,1:0:2
+empty;planks;wooden_wall;ship_wheel;sand;wooden_wall_fade_left;wooden_wall_fade_middle;wooden_wall_fade_right/0,0=1:0:2,,,,,,/1,0=1:0:2,1,,,,,1:0:2/2,0=1:0:2,1,,,,,1:0:2/3,0=1:0:2,1,,1:0:3,1,,1:0:2/4,0=1:0:2,1,,,,,1:0:2/5,0=1:0:2,1,,,,,1:0:2/6,0=1:0:2,4:0:2,,,,,1:0:2/7,0=4:0:5,4:0:6,,,,,4:0:7
 2,6={"entrance":[31,30],"id":"base:te/building","innerRealmID":0,"solid":false,"tileID":"base:tile/empty"}

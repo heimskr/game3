@@ -22,6 +22,7 @@ namespace Game3 {
 			return;
 
 		internalRealmID = game->newRealmID();
+		INFO("Creating ship realm {}", internalRealmID);
 		auto ship_realm = Realm::create<ShipRealm>(game, internalRealmID, getGID(), 0);
 		game->addRealm(ship_realm);
 	}
@@ -141,7 +142,9 @@ namespace Game3 {
 		if (internalRealmID == 0)
 			throw std::runtime_error("Ship is missing internal realm");
 
-		RealmPtr internal_realm = getGame()->getRealm(internalRealmID);
+		INFO("Internal realm ID: {}", internalRealmID);
+
+		RealmPtr internal_realm = getGame()->tryRealm(internalRealmID);
 
 		if (!internal_realm)
 			throw std::runtime_error("Ship is missing internal realm");

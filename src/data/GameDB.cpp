@@ -252,27 +252,26 @@ namespace Game3 {
 		ServerGamePtr game = getGame();
 		auto db_lock = database.uniqueLock();
 
-		SQLite::Statement query{*database, "SELECT * FROM chunks"};
+		SQLite::Statement chunk_query{*database, "SELECT * FROM chunks"};
+		Timer chunk_query_timer{"ExecuteChunkStep"};
 
-		Timer query_timer{"ExecuteStep"};
-
-		while (query.executeStep()) {
-			query_timer.stop();
+		while (chunk_query.executeStep()) {
+			chunk_query_timer.stop();
 			{
 				Timer iteration_timer{"ChunkLoad"};
-				RealmID realm_id = query.getColumn(0);
-				ChunkPosition::IntType x = query.getColumn(1);
-				ChunkPosition::IntType y = query.getColumn(2);
-				const void *terrain = query.getColumn(3);
-				const void *biomes  = query.getColumn(4);
-				const void *fluids  = query.getColumn(5);
-				const void *pathmap = query.getColumn(6);
+				RealmID realm_id = chunk_query.getColumn(0);
+				ChunkPosition::IntType x = chunk_query.getColumn(1);
+				ChunkPosition::IntType y = chunk_query.getColumn(2);
+				const void *terrain = chunk_query.getColumn(3);
+				const void *biomes  = chunk_query.getColumn(4);
+				const void *fluids  = chunk_query.getColumn(5);
+				const void *pathmap = chunk_query.getColumn(6);
 				Timer chunk_set_timer{"ChunkSet"};
 				ChunkSet chunk_set{
-					std::span<const char>(reinterpret_cast<const char *>(terrain), query.getColumn(3).getBytes()),
-					std::span<const char>(reinterpret_cast<const char *>(biomes),  query.getColumn(4).getBytes()),
-					std::span<const char>(reinterpret_cast<const char *>(fluids),  query.getColumn(5).getBytes()),
-					std::span<const char>(reinterpret_cast<const char *>(pathmap), query.getColumn(6).getBytes())
+					std::span<const char>(reinterpret_cast<const char *>(terrain), chunk_query.getColumn(3).getBytes()),
+					std::span<const char>(reinterpret_cast<const char *>(biomes),  chunk_query.getColumn(4).getBytes()),
+					std::span<const char>(reinterpret_cast<const char *>(fluids),  chunk_query.getColumn(5).getBytes()),
+					std::span<const char>(reinterpret_cast<const char *>(pathmap), chunk_query.getColumn(6).getBytes())
 				};
 				chunk_set_timer.stop();
 				RealmPtr realm;
@@ -285,8 +284,28 @@ namespace Game3 {
 					realm->tileProvider.absorb(ChunkPosition(x, y), std::move(chunk_set));
 				}
 			}
-			query_timer.restart();
+			chunk_query_timer.restart();
 		}
+
+		chunk_query_timer.stop();
+
+		// If a realm has no chunks, it won't get loaded above, so we have to go through all realms
+		// and load the ones that haven't been loaded yet.
+
+		SQLite::Statement realm_query{*database, "SELECT realmID FROM realms"};
+		Timer realm_query_timer{"ExecuteRealmStep"};
+
+		while (realm_query.executeStep()) {
+			realm_query_timer.stop();
+			{
+				Timer iteration_timer{"RealmLoad"};
+				RealmID realm_id = realm_query.getColumn(0);
+				game->getRealm(realm_id, [&] { return loadRealm(realm_id, false); });
+			}
+			realm_query_timer.restart();
+		}
+
+		realm_query_timer.stop();
 
 		{
 			Timer villages_timer{"LoadVillages"};

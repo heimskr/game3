@@ -44,12 +44,10 @@ namespace Game3::WorldGen {
 		Paster paster;
 
 		range.iterate([&](ChunkPosition chunk_position) {
-			if (!ChunkRange{{6, 0}}.contains(chunk_position)) {
-				chunk_position.iterate([&](const Position &position) {
-					realm->setTile(Layer::Terrain, position, "base:tile/sand", false);
-					realm->setFluid(position, "base:fluid/water", FluidTile::FULL, true);
-				});
-			}
+			chunk_position.iterate([&](const Position &position) {
+				realm->setTile(Layer::Terrain, position, "base:tile/sand", false);
+				realm->setFluid(position, "base:fluid/water", FluidTile::FULL, true);
+			});
 
 			Position top_left = chunk_position.topLeft();
 			realm->setTile(Layer::Objects, top_left, "base:tile/barrier", false);
@@ -78,7 +76,10 @@ namespace Game3::WorldGen {
 			} else if (chunk_position == ChunkPosition{6, 0}) {
 				paster.ingest(shipUpperTemplate());
 				patch("/innerRealmID", realm->getID());
-				paster.paste(realm, chunk_position.topLeft() + Position{29, 23});
+				paster.paste(realm, chunk_position.topLeft() + Position{29, 23}, true, [&] {
+					for (Index column = 407; column <= 413; ++column)
+						realm->setFluid(Position{36, column}, "base:fluid/water", FluidTile::FULL, true);
+				});
 			} else {
 				provider.updateChunk(chunk_position);
 				return;
