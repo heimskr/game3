@@ -468,6 +468,7 @@ namespace Game3 {
 
 		game->errorCallback = [this] {
 			queue([this] {
+				get_display()->beep();
 				error("Game disconnected.");
 				closeGame();
 			});
