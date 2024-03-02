@@ -6,10 +6,20 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	bool VoidPickaxe::use(Slot slot, const ItemStackPtr &, const Place &place, Modifiers, std::pair<float, float>) {
+	bool VoidPickaxe::use(Slot slot, const ItemStackPtr &, const Place &place, Modifiers modifiers, std::pair<float, float>) {
 		PlayerPtr player = place.player;
 		RealmPtr realm = place.realm;
 		GamePtr game = realm->getGame();
+
+		if (modifiers.onlyCtrl()) {
+			if (TileEntityPtr tile_entity = realm->tileEntityAt(place.position)) {
+				tile_entity->queueDestruction();
+				return true;
+			}
+
+			return false;
+		}
+
 		Tileset &tileset = realm->getTileset();
 
 		for (const Layer layer: reverse(allLayers)) {
