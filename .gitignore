@@ -4,6 +4,7 @@
 /src/gtk_resources.cpp
 /.dep.bak
 *.g3
+!/resources/templates/*.g3
 /resgen
 /include/resources.h
 *.zst
