@@ -40,11 +40,12 @@ namespace Game3 {
 	size_t SoundEngineImpl::cleanup() {
 		size_t count = 0;
 
-		std::erase_if(sounds, [&](const auto &item) {
-			const auto &[pair, sound] = item;
+		std::erase_if(sounds, [&](auto &item) {
+			auto &[pair, sound] = item;
 			if (ma_sound_is_playing(&sound))
 				return false;
 			++count;
+			ma_sound_uninit(&sound);
 			return true;
 		});
 

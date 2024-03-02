@@ -511,7 +511,7 @@ namespace Game3 {
 
 	MainWindow * MainWindow::create() {
 		auto builder = Gtk::Builder::create_from_resource("/game3/window.ui");
-		auto window = Gtk::Builder::get_widget_derived<MainWindow>(builder, "main_window");
+		auto *window = Gtk::Builder::get_widget_derived<MainWindow>(builder, "main_window");
 		if (!window)
 			throw std::runtime_error("No \"main_window\" object in window.ui");
 		return window;
