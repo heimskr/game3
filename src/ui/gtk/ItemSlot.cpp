@@ -70,7 +70,7 @@ namespace Game3 {
 		rightGesture->signal_released().connect([this](int, double x, double y) {
 			if (parent)
 				parent->slotClicked(slot, true, Modifiers{rightGesture->get_current_event_state()});
-			if (empty() || !gmenu)
+			if (empty() || !gmenu || gmenu->get_n_items() == 0)
 				return;
 			const auto allocation = get_allocation();
 			x += allocation.get_x();

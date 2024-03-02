@@ -187,6 +187,12 @@ namespace Game3 {
 			ItemStackPtr stack = (*inventory)[slot];
 			ItemSlot &item_slot = *itemSlots.at(slot);
 
+			if (gmenuFunction) {
+				auto gmenu = Gio::Menu::create();
+				gmenuFunction(*this, gmenu, slot, stack);
+				item_slot.setGmenu(gmenu);
+			}
+
 			if (stack)
 				item_slot.setStack(stack);
 			else
