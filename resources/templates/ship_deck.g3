@@ -1,6 +1,10 @@
-empty;planks;tall_wooden_wall;sand;wooden_wall;bed2;torch;barrel;rope;grate_nw;grate_ne;ship_wheel;grate_mw;grate_me;grate_sw;grate_se;rowboat_w;rowboat_e/0,0=1:0:2,3:0:2,,,,,1:0:2,1:0:4,,,,,,,,,,,,,/1,0=1:0:2,1:0:5,,,,,1:0:2,1:0:6,1,,,,,,,,1:0:7,1:8,1:0:7,1:0:6,1:0:4,/2,0=1:0:2,1,,,,,1:0:2,1,,,,,,,,,1:9,1:10,1,,,1:0:4,/3,0=1:0:2,1,,,,,,,,,1,,,,,,1:12,1:13,1,,,,1:0:4,/4,0=1:0:2,1,,,,,1:0:4,1,,,,,,,,,1:14,1:15,1,,,1:0:4,/5,0=1:0:2,1,,,,,1:0:4,1:0:6,1:8,1,1:0:7,1,,1:0:16,1:0:17,1,,1:0:7,1,1:0:6,1:0:4,/6,0=1:0:4,3:0:4,,,,,1:0:4,,,,,,,,,,,,,,
+empty;planks;tall_wooden_wall;sand;wooden_wall;bed2;torch;rope;grate_nw;grate_ne;grate_mw;grate_me;grate_sw;grate_se;rowboat_w;rowboat_e/0,0=1:0:2,3:0:2,,,,,1:0:2,1:0:4,,,,,,,,,,,,,/1,0=1:0:2,1:0:5,,,,,1:0:2,1:0:6,1,,,,,,,,,1:7,1,1:0:6,1:0:4,/2,0=1:0:2,1,,,,,1:0:2,1,,,,,,,,,1:8,1:9,1,,,1:0:4,/3,0=1:0:2,1,,,,,,,,,,,,,,,1:10,1:11,1,,,,1:0:4,/4,0=1:0:2,1,,,,,1:0:4,1,,,,,,,,,1:12,1:13,1,,,1:0:4,/5,0=1:0:2,1,,,,,1:0:4,1:0:6,1:7,1,,,,1:0:14,1:0:15,1,,,,1:0:6,1:0:4,/6,0=1:0:4,3:0:4,,,,,1:0:4,,,,,,,,,,,,,,
+1,16={"id":"base:te/crate","inventory":{"activeSlot":0,"slotCount":1},"itemName":"base:item/barrel","name":"Barrel","solid":true,"tileID":"base:tile/barrel"}
+1,18={"id":"base:te/crate","inventory":{"activeSlot":0,"slotCount":1},"itemName":"base:item/barrel","name":"Barrel","solid":true,"tileID":"base:tile/barrel"}
 2,6={"entrance":[31,412],"id":"base:te/building","innerRealmID":0,"solid":false,"tileID":"base:tile/empty"}
 3,16={"entrance":[32,230],"id":"base:te/building","innerRealmID":0,"solid":false,"tileID":"base:tile/empty"}
 3,17={"entrance":[32,230],"id":"base:te/building","innerRealmID":0,"solid":false,"tileID":"base:tile/empty"}
+5,10={"id":"base:te/crate","inventory":{"activeSlot":0,"slotCount":1},"itemName":"base:item/barrel","name":"Barrel","solid":true,"tileID":"base:tile/barrel"}
 5,13={"id":"base:te/entity_building","solid":false,"targetEntity":0,"tileID":"base:tile/rowboat_w"}
 5,14={"id":"base:te/entity_building","solid":false,"targetEntity":0,"tileID":"base:tile/rowboat_e"}
+5,17={"id":"base:te/crate","inventory":{"activeSlot":0,"slotCount":1},"itemName":"base:item/barrel","name":"Barrel","solid":true,"tileID":"base:tile/barrel"}

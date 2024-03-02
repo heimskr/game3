@@ -10,8 +10,6 @@ namespace Game3 {
 		Realm(game_, id_, ID(), "base:tileset/monomap", seed_), shipID(ship_id) {}
 
 	void ShipRealm::generateChunk(const ChunkPosition &chunk_position) {
-		INFO("Generating chunk {} with ship ID {}", chunk_position, shipID);
-		INFO("Ship pointer: {}", getGame()->getAgent<Ship>(shipID) == nullptr? "null" : "not null");
 		WorldGen::generateShipRealmChunks(shared_from_this(), seed, worldgenParams, {chunk_position, chunk_position}, false, getGame()->getAgent<Ship>(shipID));
 		tileProvider.updateChunk(chunk_position);
 	}
