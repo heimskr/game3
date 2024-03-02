@@ -159,7 +159,7 @@ namespace Game3 {
 				velocity.z = getJumpSpeed();
 			}
 			GamePtr game = getGame();
-			game->toClient().playSound("base:sound/jump");
+			game->toClient().playSound("base:sound/jump", std::uniform_real_distribution(.8f, 1.f / .8f)(threadContext.rng));
 			send(JumpPacket());
 		}
 	}

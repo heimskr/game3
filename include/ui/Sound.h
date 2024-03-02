@@ -1,25 +1,20 @@
 #pragma once
 
-#include "threading/Lockable.h"
-
-#include <gtkmm.h>
-#include <miniaudio/miniaudio.h>
-
-#include <chrono>
 #include <filesystem>
-#include <map>
-#include <vector>
+#include <memory>
 
 namespace Game3 {
+	class SoundEngineImpl;
+
 	class SoundEngine {
 		public:
 			SoundEngine();
 			~SoundEngine();
 
-			void play(const std::filesystem::path &);
+			void play(const std::filesystem::path &, float pitch = 1.f);
+			size_t cleanup();
 
 		private:
-			ma_resource_manager resourceManager;
-			ma_engine engine;
+			std::unique_ptr<SoundEngineImpl> impl;
 	};
 }

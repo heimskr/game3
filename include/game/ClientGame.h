@@ -49,7 +49,7 @@ namespace Game3 {
 			void interactNextTo(Modifiers, Hand = Hand::None);
 			void putInLimbo(EntityPtr, RealmID, const Position &);
 			void requestFromLimbo(RealmID);
-			void playSound(const Identifier &);
+			void playSound(const Identifier &, float pitch = 1.f);
 
 			void moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data);
 
@@ -95,11 +95,14 @@ namespace Game3 {
 			std::atomic_bool active{false};
 			std::thread tickThread;
 			std::optional<Position> lastDragPosition;
+			float lastGarbageCollection = 0;
 
 			Lockable<std::set<ChunkPosition>> missingChunks;
 			MTQueue<std::shared_ptr<Packet>> packetQueue;
 			/** Temporarily stores shared pointers to entities that have moved to a realm we're unaware of to prevent destruction. */
 			Lockable<std::unordered_map<RealmID, std::unordered_map<EntityPtr, Position>>> entityLimbo;
+
+			void garbageCollect();
 	};
 
 	using ClientGamePtr = std::shared_ptr<ClientGame>;

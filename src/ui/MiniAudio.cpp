@@ -104,13 +104,18 @@ namespace MiniAudio {
 		std::runtime_error(std::format("MiniAudio error {}", static_cast<int>(result_))),
 		result(result_) {}
 
-	ma_result makeEngine(ma_engine &engine, ma_resource_manager &resource_manager) {
+	ma_result makeEngine(ma_engine &engine, ma_resource_manager &resource_manager, ma_decoding_backend_vtable * (*vtables)[2]) {
 		ma_engine_config engine_config{};
 
 		ma_decoding_backend_vtable *custom_backend_vtables[] = {
 			&g_ma_decoding_backend_vtable_libopus,
 			&g_ma_decoding_backend_vtable_libvorbis,
 		};
+
+		if (vtables) {
+			(*vtables)[0] = custom_backend_vtables[0];
+			(*vtables)[1] = custom_backend_vtables[1];
+		}
 
 		// Using custom decoding backends requires a resource manager.
 		ma_resource_manager_config config = ma_resource_manager_config_init();

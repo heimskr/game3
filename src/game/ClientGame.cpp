@@ -24,6 +24,10 @@
 #include "util/Util.h"
 
 namespace Game3 {
+	namespace {
+		constexpr float GARBAGE_COLLECTION_TIME = 60;
+	}
+
 	double ClientGame::getFrequency() const {
 		return getWindow().settings.tickFrequency;
 	}
@@ -161,6 +165,12 @@ namespace Game3 {
 		if (!Game::tick())
 			return false;
 
+		lastGarbageCollection += delta;
+		if (lastGarbageCollection >= GARBAGE_COLLECTION_TIME) {
+			lastGarbageCollection = 0;
+			garbageCollect();
+		}
+
 		getClient()->read();
 
 		for (const auto &packet: packetQueue.steal()) {
@@ -242,9 +252,9 @@ namespace Game3 {
 		}
 	}
 
-	void ClientGame::playSound(const Identifier &identifier) {
+	void ClientGame::playSound(const Identifier &identifier, float pitch) {
 		if (const std::filesystem::path *path = getSound(identifier))
-			sounds.play(*path);
+			sounds.play(*path, pitch);
 	}
 
 	void ClientGame::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data) {
@@ -298,5 +308,9 @@ namespace Game3 {
 			tickThread.join();
 		} else
 			WARN_("Trying to stop an unjoinable ClientGame");
+	}
+
+	void ClientGame::garbageCollect() {
+		sounds.cleanup();
 	}
 }

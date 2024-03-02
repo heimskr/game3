@@ -12,5 +12,5 @@ namespace MiniAudio {
 		AudioError(ma_result);
 	};
 
-	ma_result makeEngine(ma_engine &, ma_resource_manager &);
+	ma_result makeEngine(ma_engine &, ma_resource_manager &, ma_decoding_backend_vtable * (*vtables)[2] = nullptr);
 }
