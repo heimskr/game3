@@ -29,8 +29,10 @@ namespace Game3 {
 
 	void Ship::onDestroy() {
 		GamePtr game = getGame();
-		if (game->getSide() == Side::Server && internalRealmID != 0)
+		if (game->getSide() == Side::Server && internalRealmID != 0) {
+			INFO("Destroying ship realm {}", internalRealmID);
 			game->removeRealm(game->getRealm(internalRealmID));
+		}
 	}
 
 	void Ship::updateRiderOffset(const EntityPtr &rider) {
@@ -141,8 +143,6 @@ namespace Game3 {
 	void Ship::teleportToRealm(const std::shared_ptr<Player> &player) {
 		if (internalRealmID == 0)
 			throw std::runtime_error("Ship is missing internal realm");
-
-		INFO("Internal realm ID: {}", internalRealmID);
 
 		RealmPtr internal_realm = getGame()->tryRealm(internalRealmID);
 
