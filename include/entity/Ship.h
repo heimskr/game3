@@ -19,7 +19,7 @@ namespace Game3 {
 			RideType getRideType() const override { return RideType::Hidden; }
 			bool moveFromRider(const EntityPtr &, Direction, MovementContext) override;
 			float getMovementSpeed() const override;
-			bool canMoveTo(const Position &) const override;
+			bool canMoveTo(const Place &) const override;
 			bool onInteractOn(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
 			void render(const RendererContext &) override;

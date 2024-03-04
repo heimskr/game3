@@ -46,16 +46,16 @@ namespace Game3 {
 		return MOVEMENT_SPEED;
 	}
 
-	bool Ship::canMoveTo(const Position &new_position) const {
-		if (!Entity::canMoveTo(new_position))
+	bool Ship::canMoveTo(const Place &place) const {
+		if (!Entity::canMoveTo(place))
 			return false;
 
-		RealmPtr realm = getRealm();
+		RealmPtr realm = place.realm;
 		Position position = getPosition();
 		bool out = true;
 
 		iterateTiles([&](const Position &iterated_position) {
-			if (!realm->hasFluid(new_position + (iterated_position - position))) {
+			if (!realm->hasFluid(place.position + (iterated_position - position))) {
 				out = false;
 				return true;
 			}

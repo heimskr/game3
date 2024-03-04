@@ -15,6 +15,7 @@
 #include "item/CreativeGeneratorItem.h"
 #include "item/DissolverItem.h"
 #include "item/EmptyFlask.h"
+#include "item/EntitySpawnItem.h"
 #include "item/FilledFlask.h"
 #include "item/Floor.h"
 #include "item/Flower.h"
@@ -92,6 +93,8 @@ namespace Game3 {
 		add(std::make_shared<DissolverItem>("base:item/dissolver", "Dissolver", 999, 64)); // TODO: cost
 
 		add(std::make_shared<EmptyFlask>("base:item/flask", "Flask", 2, 64));
+
+		add(std::make_shared<EntitySpawnItem>("base:item/ship", "Ship", 999, "base:entity/ship")); // TODO: cost
 
 		add(std::make_shared<EnergyPipeItem>(4));
 

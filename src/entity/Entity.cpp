@@ -519,7 +519,7 @@ namespace Game3 {
 			return false;
 		}
 
-		const bool can_move = canMoveTo(new_position);
+		const bool can_move = canMoveTo({new_position, realm});
 
 		const bool direction_changed = *context.facingDirection != direction;
 
@@ -584,8 +584,8 @@ namespace Game3 {
 	Entity::Entity(EntityType type_):
 		type(type_) {}
 
-	bool Entity::canMoveTo(const Position &new_position) const {
-		RealmPtr realm = weakRealm.lock();
+	bool Entity::canMoveTo(const Place &place) const {
+		RealmPtr realm = place.realm;
 
 		if (!realm)
 			return false;
@@ -594,7 +594,7 @@ namespace Game3 {
 
 		bool out = true;
 
-		iterateTiles([&, position_offset = new_position - getPosition()](const Position &occupied) {
+		iterateTiles([&, position_offset = place.position - getPosition()](const Position &occupied) {
 			const Position candidate = occupied + position_offset;
 
 			for (const Layer layer: {Layer::Submerged, Layer::Objects, Layer::Highest}) {
@@ -615,6 +615,10 @@ namespace Game3 {
 		});
 
 		return out;
+	}
+
+	bool Entity::canSpawnAt(const Place &place) const {
+		return canMoveTo(place);
 	}
 
 	void Entity::focus(Canvas &canvas, bool is_autofocus) {
