@@ -30,24 +30,46 @@ namespace Game3 {
 		actionBox.set_margin_top(5);
 		actionBox.set_margin_bottom(5);
 
-		auto use_function = [this](Slot slot) {
+		motion = Gtk::EventControllerMotion::create();
+		motion->signal_motion().connect([this](double, double) {
+			lastModifiers = Modifiers(motion->get_current_event_state());
+		});
+		scrolled.add_controller(motion);
+
+		auto use_function = [this](Slot slot, Modifiers) {
 			lastGame.load()->getPlayer()->send(UseItemPacket(slot, Modifiers{}));
 		};
 
-		auto hold_left_function = [this](Slot slot) {
+		auto hold_left_function = [this](Slot slot, Modifiers) {
 			lastGame.load()->getPlayer()->send(SetHeldItemPacket(true, slot));
 		};
 
-		auto hold_right_function = [this](Slot slot) {
+		auto hold_right_function = [this](Slot slot, Modifiers) {
 			lastGame.load()->getPlayer()->send(SetHeldItemPacket(false, slot));
 		};
 
-		auto drop_function = [this](Slot slot) {
+		auto drop_function = [this](Slot slot, Modifiers) {
 			lastGame.load()->getPlayer()->getInventory(0)->drop(slot);
 		};
 
-		auto discard_function = [this](Slot slot) {
-			lastGame.load()->getPlayer()->getInventory(0)->discard(slot);
+		auto discard_function = [this](Slot slot, Modifiers modifiers) {
+			InventoryPtr inventory = lastGame.load()->getPlayer()->getInventory(0);
+			auto lock = inventory->uniqueLock();
+			if (modifiers.onlyShift()) {
+				ItemStackPtr stack = (*inventory)[slot];
+				if (!stack)
+					return;
+				std::vector<Slot> slots_to_remove;
+				inventory->iterate([&](const ItemStackPtr &iterated, Slot iterated_slot) -> bool {
+					if (iterated->canMerge(*stack))
+						slots_to_remove.push_back(iterated_slot);
+					return false;
+				});
+				for (Slot slot_to_remove: slots_to_remove)
+					inventory->discard(slot_to_remove);
+			} else {
+				inventory->discard(slot);
+			}
 		};
 
 		initAction(holdLeftAction,  "pan-start-symbolic",  "Hold Left",  hold_left_function);
@@ -59,35 +81,35 @@ namespace Game3 {
 
 		group->add_action("use", [this, use_function] {
 			if (lastGame.load())
-				use_function(lastSlot);
+				use_function(lastSlot, Modifiers{});
 			else
 				WARN_(__FILE__ << ':' << __LINE__ << ": no lastGame");
 		});
 
 		group->add_action("hold_left", [this, hold_left_function] {
 			if (lastGame.load())
-				hold_left_function(lastSlot);
+				hold_left_function(lastSlot, Modifiers{});
 			else
 				WARN_(__FILE__ << ':' << __LINE__ << ": no lastGame");
 		});
 
 		group->add_action("hold_right", [this, hold_right_function] {
 			if (lastGame.load())
-				hold_right_function(lastSlot);
+				hold_right_function(lastSlot, Modifiers{});
 			else
 				WARN_(__FILE__ << ':' << __LINE__ << ": no lastGame");
 		});
 
 		group->add_action("drop", [this, drop_function] {
 			if (lastGame.load())
-				drop_function(lastSlot);
+				drop_function(lastSlot, Modifiers{});
 			else
 				WARN_(__FILE__ << ':' << __LINE__ << ": no lastGame");
 		});
 
 		group->add_action("discard", [this, discard_function] {
 			if (lastGame.load())
-				discard_function(lastSlot);
+				discard_function(lastSlot, Modifiers{});
 			else
 				WARN_(__FILE__ << ':' << __LINE__ << ": no lastGame");
 		});
@@ -320,7 +342,7 @@ namespace Game3 {
 		}
 	}
 
-	void InventoryTab::initAction(Gtk::Image &action, const Glib::ustring &icon, const Glib::ustring &tooltip, std::function<void(Slot)> function) {
+	void InventoryTab::initAction(Gtk::Image &action, const Glib::ustring &icon, const Glib::ustring &tooltip, std::function<void(Slot, Modifiers)> function) {
 		action.set_margin_start(5);
 		action.set_margin_end(5);
 		action.set_from_icon_name(icon);
@@ -335,7 +357,7 @@ namespace Game3 {
 			const auto &value = static_cast<const Glib::Value<DragSource> &>(base);
 			const DragSource source = value.get();
 			if (auto game = lastGame.load(); game && game->getPlayer() && *source.inventory == *game->getPlayer()->getInventory(0))
-				function(source.slot);
+				function(source.slot, lastModifiers);
 			return true;
 		}, false);
 
