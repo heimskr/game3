@@ -167,7 +167,8 @@
 			"base:item/ace_flag":         "AcEs",
 			"base:item/ash":              ["+", "C", "Ca"],
 			"base:item/bleach":           [4, "NaOCl"],
-			"base:item/raw_meat":         [4, "base:item/chromatin"]
+			"base:item/raw_meat":         [4, "base:item/chromatin"],
+			"base:item/sulfuric_acid":    [4, "H2SO4"]
 		}]
 	]
 }
