@@ -31,10 +31,10 @@ namespace Game3 {
 	}
 
 	void ClientPlayer::tick(const TickArgs &args) {
-		if (lastMessageAge < std::numeric_limits<decltype(lastMessageAge)>::max())
-			++lastMessageAge;
-
 		Player::tick(args);
+
+		if (lastMessageAge < std::numeric_limits<decltype(lastMessageAge)::value_type>::max())
+			++lastMessageAge;
 
 		Direction final_direction = direction;
 
