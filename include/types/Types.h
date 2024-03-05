@@ -131,7 +131,7 @@ template <>
 struct std::formatter<Game3::PipeType> {
 	constexpr auto parse(std::format_parse_context &ctx) {
 		return ctx.begin();
-    }
+	}
 
 	auto format(const auto &pipe_type, std::format_context &ctx) const {
 		switch (pipe_type) {
@@ -148,7 +148,7 @@ template <>
 struct std::formatter<Game3::Hand> {
 	constexpr auto parse(std::format_parse_context &ctx) {
 		return ctx.begin();
-    }
+	}
 
 	auto format(const auto &hand, std::format_context &ctx) const {
 		switch (hand) {
@@ -165,7 +165,7 @@ template <>
 struct std::formatter<Game3::Color> {
 	constexpr auto parse(std::format_parse_context &ctx) {
 		return ctx.begin();
-    }
+	}
 
 	auto format(const auto &color, std::format_context &ctx) const {
 		return std::format_to(ctx.out(), "({}, {}, {} @ {})", color.red, color.green, color.blue, color.alpha);

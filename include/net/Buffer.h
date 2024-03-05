@@ -393,7 +393,7 @@ template <>
 struct std::formatter<Game3::Buffer> {
 	constexpr auto parse(std::format_parse_context &ctx) {
 		return ctx.begin();
-    }
+	}
 
 	auto format(const auto &buffer, std::format_context &ctx) const {
 		std::stringstream ss;

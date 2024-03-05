@@ -94,7 +94,7 @@ template <>
 struct std::formatter<Game3::Village> {
 	constexpr auto parse(std::format_parse_context &ctx) {
 		return ctx.begin();
-    }
+	}
 
 	auto format(const Game3::Village &village, std::format_context &ctx) const {
 		return std::format_to(ctx.out(), "{} ({})", village.getName(), village.getID());

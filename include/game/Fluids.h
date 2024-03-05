@@ -80,7 +80,7 @@ template <>
 struct std::formatter<Game3::FluidTile> {
 	constexpr auto parse(std::format_parse_context &ctx) {
 		return ctx.begin();
-    }
+	}
 
 	auto format(const Game3::FluidTile &fluid_tile, std::format_context &ctx) const {
 		return std::format_to(ctx.out(), "FluidTile({}, {})", fluid_tile.id, fluid_tile.level);
@@ -91,7 +91,7 @@ template <>
 struct std::formatter<Game3::FluidStack> {
 	constexpr auto parse(std::format_parse_context &ctx) {
 		return ctx.begin();
-    }
+	}
 
 	auto format(const Game3::FluidStack &fluid_stack, std::format_context &ctx) const {
 		return std::format_to(ctx.out(), "FluidStack({}, {})", fluid_stack.id, fluid_stack.amount);

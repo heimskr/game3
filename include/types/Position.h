@@ -137,7 +137,7 @@ template <>
 struct std::formatter<Game3::Position> {
 	constexpr auto parse(std::format_parse_context &ctx) {
 		return ctx.begin();
-    }
+	}
 
 	auto format(const auto &position, std::format_context &ctx) const {
 		return std::format_to(ctx.out(), "({}, {})", position.row, position.column);
@@ -148,7 +148,7 @@ template <>
 struct std::formatter<Game3::Place> {
 	constexpr auto parse(std::format_parse_context &ctx) {
 		return ctx.begin();
-    }
+	}
 
 	auto format(const auto &place, std::format_context &ctx) const {
 		if (place.realm) {
@@ -167,7 +167,7 @@ template <>
 struct std::formatter<Game3::Vector3> {
 	constexpr auto parse(std::format_parse_context &ctx) {
 		return ctx.begin();
-    }
+	}
 
 	auto format(const auto &vector, std::format_context &ctx) const {
 		return std::format_to(ctx.out(), "({}, {}, {})", vector.x, vector.y, vector.z);
@@ -178,7 +178,7 @@ template <>
 struct std::formatter<Game3::Vector2f> {
 	constexpr auto parse(std::format_parse_context &ctx) {
 		return ctx.begin();
-    }
+	}
 
 	auto format(const auto &vector, std::format_context &ctx) const {
 		return std::format_to(ctx.out(), "({}, {})", vector.x, vector.y);
@@ -189,7 +189,7 @@ template <>
 struct std::formatter<Game3::Vector2i> {
 	constexpr auto parse(std::format_parse_context &ctx) {
 		return ctx.begin();
-    }
+	}
 
 	auto format(const auto &vector, std::format_context &ctx) const {
 		return std::format_to(ctx.out(), "({}, {})", vector.x, vector.y);

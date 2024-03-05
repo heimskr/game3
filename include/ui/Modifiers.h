@@ -49,7 +49,7 @@ template <>
 struct std::formatter<Game3::Modifiers> {
 	constexpr auto parse(std::format_parse_context &ctx) {
 		return ctx.begin();
-    }
+	}
 
 	auto format(const auto &modifiers, std::format_context &ctx) const {
 		return std::format_to(ctx.out(), "{}", std::string(modifiers));

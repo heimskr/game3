@@ -131,7 +131,7 @@ template <typename T>
 struct std::formatter<Game3::Lockable<T>> {
 	constexpr auto parse(std::format_parse_context &ctx) {
 		return ctx.begin();
-    }
+	}
 
 	auto format(const auto &lockable, std::format_context &ctx) const {
 		auto lock = lockable.sharedLock();

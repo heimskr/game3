@@ -28,7 +28,7 @@ template <>
 struct std::formatter<Game3::Direction> {
 	constexpr auto parse(std::format_parse_context &ctx) {
 		return ctx.begin();
-    }
+	}
 
 	auto format(auto direction, std::format_context &ctx) const {
 		switch (direction) {

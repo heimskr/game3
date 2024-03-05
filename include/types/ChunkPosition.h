@@ -133,7 +133,7 @@ template <>
 struct std::formatter<Game3::ChunkPosition> {
 	constexpr auto parse(std::format_parse_context &ctx) {
 		return ctx.begin();
-    }
+	}
 
 	auto format(const auto &chunk_position, std::format_context &ctx) const {
 		return std::format_to(ctx.out(), "({}, {})", chunk_position.x, chunk_position.y);
@@ -144,7 +144,7 @@ template <>
 struct std::formatter<Game3::ChunkRange> {
 	constexpr auto parse(std::format_parse_context &ctx) {
 		return ctx.begin();
-    }
+	}
 
 	auto format(const auto &range, std::format_context &ctx) const {
 		return std::format_to(ctx.out(), "[{}, {}]", range.topLeft, range.bottomRight);
