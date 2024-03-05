@@ -70,7 +70,7 @@ namespace Game3 {
 		return stack;
 	}
 
-	bool InventoriedTileEntity::insertItem(const ItemStackPtr &stack, Direction direction, ItemStackPtr *leftover) {
+	bool InventoriedTileEntity::insertItem(ItemStackPtr stack, Direction direction, ItemStackPtr *leftover) {
 		if (!mayInsertItem(stack, direction))
 			return false;
 
@@ -83,7 +83,7 @@ namespace Game3 {
 		assert(inventory);
 		auto inventory_lock = inventory->uniqueLock();
 
-		if (!leftover)
+		if (leftover)
 			*leftover = inventory->add(stack, predicate);
 		else
 			inventory->add(stack, predicate);

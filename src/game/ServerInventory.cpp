@@ -24,7 +24,11 @@ namespace Game3 {
 		StorageInventory(std::move(owner), slot_count, active_slot, index_, std::move(storage_)) {}
 
 	std::unique_ptr<Inventory> ServerInventory::copy() const {
-		return std::make_unique<ServerInventory>(*this);
+		auto out = std::make_unique<ServerInventory>(*this);
+		for (auto &[slot, stack]: out->storage)
+			if (stack)
+				stack = stack->copy();
+		return out;
 	}
 
 	ItemStackPtr ServerInventory::add(const ItemStackPtr &stack, const std::function<bool(Slot)> &predicate, Slot start) {
