@@ -167,8 +167,10 @@ namespace Game3 {
 		{
 			auto lock = realm->entities.sharedLock();
 			for (const EntityPtr &entity: realm->entities) {
-				if (!entity->isPlayer())
+				if (!entity->isPlayer()) {
+					entity->onDestroy();
 					deleteEntity(entity);
+				}
 			}
 		}
 
