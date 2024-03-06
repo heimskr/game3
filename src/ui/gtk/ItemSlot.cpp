@@ -121,7 +121,9 @@ namespace Game3 {
 			remove(durabilityBar);
 		}
 
-		set_tooltip_text(tooltip);
+		if (get_tooltip_text() != tooltip)
+			set_tooltip_text(tooltip);
+
 		storedStack = std::move(stack); // TODO!: copy?
 	}
 

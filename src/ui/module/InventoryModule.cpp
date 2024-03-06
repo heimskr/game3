@@ -143,8 +143,9 @@ namespace Game3 {
 	}
 
 	void InventoryModule::populate() {
+		auto lock = inventory.sharedLock();
 		assert(inventory);
-		auto lock = inventory->sharedLock();
+		auto inventory_lock = inventory->sharedLock();
 
 		lastSlotCount = inventory->getSlotCount();
 		itemSlots.clear();
@@ -173,8 +174,9 @@ namespace Game3 {
 	}
 
 	void InventoryModule::repopulate() {
+		auto lock = inventory.sharedLock();
 		assert(inventory);
-		auto lock = inventory->sharedLock();
+		auto inventory_lock = inventory->sharedLock();
 
 		if (inventory->getSlotCount() != lastSlotCount) {
 			populate();
@@ -201,6 +203,10 @@ namespace Game3 {
 	}
 
 	void InventoryModule::leftClick(Slot slot, Modifiers modifiers, int count) {
+		auto lock = inventory.sharedLock();
+		assert(inventory);
+		auto inventory_lock = inventory->sharedLock();
+
 		if (!game || !modifiers.onlyShift() || (parent && parent->suppressLeftClick()) || !inventory->contains(slot)) {
 			if (parent && count % 2 == 0)
 				parent->slotDoubleClicked(slot);

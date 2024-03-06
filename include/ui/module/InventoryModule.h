@@ -1,6 +1,7 @@
 #pragma once
 
 #include "interface/ItemSlotParent.h"
+#include "threading/LockableSharedPtr.h"
 #include "types/Types.h"
 #include "ui/Modifiers.h"
 #include "ui/gtk/ItemSlot.h"
@@ -47,7 +48,7 @@ namespace Game3 {
 
 		private:
 			std::shared_ptr<ClientGame> game;
-			std::shared_ptr<ClientInventory> inventory;
+			LockableSharedPtr<ClientInventory> inventory;
 			Glib::RefPtr<Gtk::DragSource> source;
 			Glib::ustring name;
 			std::vector<std::unique_ptr<ItemSlot>> itemSlots;

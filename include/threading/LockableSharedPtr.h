@@ -5,7 +5,7 @@
 #include <memory>
 
 namespace Game3 {
-	template <typename T, typename M = std::shared_mutex>
+	template <typename T, typename M = DefaultMutex>
 	struct LockableSharedPtr: Lockable<std::shared_ptr<T>, M> {
 		using Base = std::shared_ptr<T>;
 
