@@ -11,6 +11,7 @@
 #include "tools/TileStitcher.h"
 #include "util/Crypto.h"
 #include "util/FS.h"
+#include "util/Shell.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 
@@ -159,6 +160,22 @@ int main(int argc, char **argv) {
 
 		if (arg1 == "--filter-test") {
 			Game3::filterTest();
+			return 0;
+		}
+
+		if (arg1 == "--shell-test") {
+			if (argc == 3 && strcmp(argv[2], "print") == 0) {
+				std::cout << "Hello, ";
+				std::cerr << "Here is ";
+				std::cout << "World!";
+				std::cerr << "some text.";
+				std::this_thread::sleep_for(std::chrono::seconds(15));
+				std::cout << " Here's more text after three seconds.";
+				return 0;
+			}
+
+			auto [out, err] = Game3::runCommand("./game3", {"--shell-test", "print"}, std::chrono::seconds(1), SIGINT);
+			std::cout << std::format("stdout[{}], stderr[{}]\n", out, err);
 			return 0;
 		}
 
