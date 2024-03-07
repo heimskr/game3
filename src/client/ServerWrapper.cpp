@@ -59,8 +59,7 @@ namespace Game3 {
 		else
 			std::ofstream(".localsecret") << (secret = generateSecret(8));
 
-		uint16_t port = 12255;
-
+		port = 12255;
 		running = true;
 		server = std::make_shared<Server>("::0", port, CERT_PATH, KEY_PATH, secret, 2);
 
@@ -136,20 +135,22 @@ namespace Game3 {
 			while (running) {
 				std::unique_lock lock{save_mutex};
 				saveCV.wait_for(lock, save_period, [&] {
-					return !running || save_period <= std::chrono::system_clock::now() - last_save;
+					return !running || forceSave || save_period <= std::chrono::system_clock::now() - last_save;
 				});
 
-				if (running && save_period <= std::chrono::system_clock::now() - last_save) {
-					INFO_("Autosaving...");
+				if (running && (forceSave.exchange(false) || save_period <= std::chrono::system_clock::now() - last_save)) {
+					INFO_("Saving...");
 					game->tickingPaused = true;
 					game->getDatabase().writeAll();
 					game->tickingPaused = false;
-					INFO_("Autosaved.");
+					INFO_("Saved.");
 					last_save = std::chrono::system_clock::now();
 				}
 			}
 		});
 
+		started = true;
+		startCV.notify_all();
 		server->run();
 		tick_thread.join();
 		stop_thread.join();
@@ -161,12 +162,36 @@ namespace Game3 {
 			return;
 
 		running = false;
+		started = false;
 		stopCV.notify_all();
 		saveCV.notify_all();
 	}
 
 	bool ServerWrapper::isRunning() const {
 		return running;
+	}
+
+	bool ServerWrapper::waitUntilRunning(std::chrono::milliseconds timeout) {
+		std::unique_lock lock{startMutex};
+
+		if (timeout == std::chrono::milliseconds(0)) {
+			startCV.wait(lock, [this] { return isRunning(); });
+		} else {
+			startCV.wait_for(lock, timeout, [this] { return isRunning(); });
+		}
+
+		return isRunning();
+	}
+
+	Token ServerWrapper::getOmnitoken() const {
+		if (!server || !game)
+			throw std::runtime_error("Can't get omnitoken: server not available");
+		return game->getOmnitoken();
+	}
+
+	void ServerWrapper::save() {
+		forceSave = true;
+		saveCV.notify_all();
 	}
 
 	bool ServerWrapper::generateCertificate(const std::filesystem::path &certificate_path, const std::filesystem::path &key_path) {

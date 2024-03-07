@@ -72,6 +72,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `string` Username
 	- `u64` Token
+	- `optional<string>` Display name (for automatic registration in case the token is the omnitoken and the user doesn't exist)
 
 11. **Login Status**: informs a client of the result of a login attempt.
 

@@ -7,6 +7,7 @@
 #include "packet/LoginPacket.h"
 #include "packet/LoginStatusPacket.h"
 #include "packet/RealmNoticePacket.h"
+#include "packet/RegistrationStatusPacket.h"
 #include "packet/PacketError.h"
 
 namespace Game3 {
@@ -19,7 +20,19 @@ namespace Game3 {
 
 			GameDB &database = game->getDatabase();
 
-			if (!game->hasPlayer(username) && server->generateToken(username) == token && database.readUser(username, &display_name, &json, &release_place)) {
+			if (game->hasPlayer(username)) {
+				client.send(LoginStatusPacket(false));
+				return;
+			}
+
+			const bool was_omnitoken = server->game->compareToken(token);
+
+			if (!was_omnitoken && server->generateToken(username) != token) {
+				client.send(LoginStatusPacket(false));
+				return;
+			}
+
+			if (database.readUser(username, &display_name, &json, &release_place)) {
 				auto player = ServerPlayer::fromJSON(game, json);
 				player->username = username;
 				client.setPlayer(player);
@@ -37,6 +50,26 @@ namespace Game3 {
 					player->teleport(release_place->position, release_place->realm, MovementContext{.isTeleport = true});
 					database.writeReleasePlace(username, std::nullopt);
 				}
+				return;
+			}
+
+			if (was_omnitoken) {
+				if (!displayName || displayName->empty()) {
+					client.sendError("User doesn't exist and a display name wasn't given.");
+					return;
+				}
+
+				auto player = server->loadPlayer(username, *displayName);
+				SUCCESS("Automatically registered user {} with token {}.", username, player->token);
+				client.send(RegistrationStatusPacket(username, *displayName, player->token));
+				client.setPlayer(player);
+				auto realm = player->getRealm();
+				player->weakClient = std::static_pointer_cast<RemoteClient>(client.shared_from_this());
+				player->notifyOfRealm(*realm);
+				INFO_("Player GID is " << player->globalID);
+				client.send(LoginStatusPacket(true, player->globalID, username, *displayName, player));
+				server->setupPlayer(client);
+				realm->addPlayer(player);
 				return;
 			}
 		}

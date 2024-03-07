@@ -9,7 +9,6 @@
 #include "packet/SetHeldItemPacket.h"
 #include "packet/UseItemPacket.h"
 #include "ui/MainWindow.h"
-#include "ui/gtk/EntryDialog.h"
 #include "ui/gtk/NumericEntry.h"
 #include "ui/gtk/DragSource.h"
 #include "ui/gtk/Util.h"

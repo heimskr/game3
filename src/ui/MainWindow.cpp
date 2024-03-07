@@ -15,10 +15,11 @@
 #include "packet/LoginPacket.h"
 #include "packet/SetHeldItemPacket.h"
 #include "realm/Overworld.h"
-#include "ui/gtk/CommandDialog.h"
 #include "ui/gtk/ConnectDialog.h"
 #include "ui/gtk/ConnectionSuccessDialog.h"
+#include "ui/gtk/EntryDialog.h"
 #include "ui/gtk/JSONDialog.h"
+#include "ui/gtk/LoginDialog.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/InventoryModule.h"
 #include "ui/module/FluidLevelsModule.h"
@@ -760,7 +761,7 @@ namespace Game3 {
 			switch (keyval) {
 				case GDK_KEY_c:
 					if (control) {
-						auto command_dialog = std::make_unique<CommandDialog>(*this);
+						auto command_dialog = std::make_unique<EntryDialog>(*this, "Command:");
 						command_dialog->signal_submit().connect([this](const Glib::ustring &command) {
 							try {
 								game->runCommand(command);
@@ -1003,6 +1004,28 @@ namespace Game3 {
 
 	void MainWindow::playLocally() {
 		serverWrapper.runInThread();
+
+		if (!serverWrapper.waitUntilRunning(std::chrono::milliseconds(10'000))) {
+			error("Server failed to start within 10 seconds.");
+			return;
+		}
+
+		serverWrapper.save();
+
+		if (!connect("::1", serverWrapper.getPort())) {
+			error("Failed to connect to local server.");
+			return;
+		}
+
+		assert(game);
+		LocalClientPtr client = game->getClient();
+
+		auto login_dialog = std::make_unique<LoginDialog>(*this, settings.username);
+		login_dialog->signal_submit().connect([this, weak_client = std::weak_ptr(client)](const Glib::ustring &username, const Glib::ustring &display_name) {
+			if (LocalClientPtr client = weak_client.lock())
+				client->send(LoginPacket(username.raw(), serverWrapper.getOmnitoken(), display_name));
+		});
+		queueDialog(std::move(login_dialog));
 	}
 
 	bool MainWindow::isFocused(const std::shared_ptr<Tab> &tab) const {
