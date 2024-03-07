@@ -22,12 +22,8 @@ namespace Game3 {
 	}
 
 	ServerWrapper::~ServerWrapper() {
-		if (running) {
-			INFO_("Stopping in destructor.");
+		if (running)
 			stop();
-		} else {
-			INFO_("Not stopping in destructor.");
-		}
 
 		if (threadActive) {
 			runThread.join();

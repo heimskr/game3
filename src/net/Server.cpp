@@ -127,7 +127,10 @@ namespace Game3 {
 		client.setClosed();
 
 		try {
-			client.socket.shutdown();
+			client.socket.async_shutdown([](const asio::error_code &errc) {
+				if (errc)
+					INFO("SSL client shutdown failed: {}", errc.message());
+			});
 		} catch (const asio::system_error &err) {
 			// Who really cares if SSL doesn't shut down properly?
 			// Who decided that the client is worthy of a proper shutdown?

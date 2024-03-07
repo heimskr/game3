@@ -898,18 +898,14 @@ namespace Game3 {
 					return;
 				}
 				case GDK_KEY_p: {
-					if (Modifiers(modifiers).ctrl) {
-						game->runCommand("pm");
-					} else {
-						ClientPlayerPtr player = game->getPlayer();
-						std::cout << std::format("Player GID: {}\n", player->getGID());
-						std::cout << std::format("Realm ID: {} or perhaps {}\n", player->getRealm()->getID(), game->getActiveRealm()->getID());
-						std::cout << std::format("Position: {}\n", player->getPosition());
-						std::cout << std::format("Chunk position: {}\n", player->getPosition().getChunk());
-						std::cout << std::format("Update counter: {}\n", player->getRealm()->tileProvider.getUpdateCounter(player->getPosition().getChunk()));
-						std::cout << std::format("Canvas scale: {}\n", canvas->scale);
-						std::cout << std::format("Outdoors: {}\n", player->getRealm()->outdoors);
-					}
+					ClientPlayerPtr player = game->getPlayer();
+					std::cout << std::format("Player GID: {}\n", player->getGID());
+					std::cout << std::format("Realm ID: {} or perhaps {}\n", player->getRealm()->getID(), game->getActiveRealm()->getID());
+					std::cout << std::format("Position: {}\n", player->getPosition());
+					std::cout << std::format("Chunk position: {}\n", player->getPosition().getChunk());
+					std::cout << std::format("Update counter: {}\n", player->getRealm()->tileProvider.getUpdateCounter(player->getPosition().getChunk()));
+					std::cout << std::format("Canvas scale: {}\n", canvas->scale);
+					std::cout << std::format("Outdoors: {}\n", player->getRealm()->outdoors);
 					return;
 				}
 				case GDK_KEY_l:
