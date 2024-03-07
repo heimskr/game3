@@ -181,6 +181,7 @@ namespace Game3 {
 			bool isFocused(const std::shared_ptr<Tab> &) const;
 			void connectClose(Gtk::Dialog &);
 			void updateMoneyLabel(MoneyCount);
+			void continueLocalConnection();
 
 			template <typename T>
 			T & initTab(std::shared_ptr<T> &tab) {

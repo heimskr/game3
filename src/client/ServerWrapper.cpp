@@ -22,16 +22,12 @@ namespace Game3 {
 	}
 
 	ServerWrapper::~ServerWrapper() {
-		if (running)
-			stop();
-
-		if (threadActive) {
-			runThread.join();
-			threadActive = false;
-		}
+		stop();
 	}
 
 	void ServerWrapper::runInThread(size_t overworld_seed) {
+		stop();
+
 		runThread =	std::thread([this, overworld_seed] {
 			pthread_setname_np(pthread_self(), "RunThread");
 			threadActive = true;
@@ -59,12 +55,12 @@ namespace Game3 {
 		else
 			std::ofstream(".localsecret") << (secret = generateSecret(8));
 
+		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+			throw std::runtime_error("Couldn't register SIGPIPE handler");
+
 		port = 12255;
 		running = true;
 		server = std::make_shared<Server>("::0", port, CERT_PATH, KEY_PATH, secret, 2);
-
-		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
-			throw std::runtime_error("Couldn't register SIGPIPE handler");
 
 		std::thread stop_thread([this] {
 			pthread_setname_np(pthread_self(), "StopThread");
@@ -152,6 +148,7 @@ namespace Game3 {
 		started = true;
 		startCV.notify_all();
 		server->run();
+		INFO_("Server no longer running.");
 		tick_thread.join();
 		stop_thread.join();
 		save_thread.join();
@@ -165,6 +162,13 @@ namespace Game3 {
 		started = false;
 		stopCV.notify_all();
 		saveCV.notify_all();
+
+		if (threadActive) {
+			runThread.join();
+			threadActive = false;
+		}
+
+		server.reset();
 	}
 
 	bool ServerWrapper::isRunning() const {
@@ -175,9 +179,9 @@ namespace Game3 {
 		std::unique_lock lock{startMutex};
 
 		if (timeout == std::chrono::milliseconds(0)) {
-			startCV.wait(lock, [this] { return isRunning(); });
+			startCV.wait(lock, [this] { return threadActive && isRunning(); });
 		} else {
-			startCV.wait_for(lock, timeout, [this] { return isRunning(); });
+			startCV.wait_for(lock, timeout, [this] { return threadActive && isRunning(); });
 		}
 
 		return isRunning();

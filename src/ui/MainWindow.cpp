@@ -9,6 +9,7 @@
 #include "game/ClientInventory.h"
 #include "game/HasInventory.h"
 #include "game/Inventory.h"
+#include "net/DisconnectedError.h"
 #include "net/LocalClient.h"
 #include "net/NetError.h"
 #include "packet/ContinuousInteractionPacket.h"
@@ -372,7 +373,7 @@ namespace Game3 {
 		game->setClient(client);
 		try {
 			client->connect(hostname.raw(), port);
-		} catch (const NetError &err) {
+		} catch (const std::exception &err) {
 			closeGame();
 			error(err.what());
 			return false;
@@ -470,6 +471,9 @@ namespace Game3 {
 		});
 
 		game->errorCallback = [this] {
+			if (game->suppressDisconnectionMessage)
+				return;
+
 			queue([this] {
 				get_display()->beep();
 				error("Game disconnected.");
@@ -1003,6 +1007,12 @@ namespace Game3 {
 	}
 
 	void MainWindow::playLocally() {
+		const bool was_running = serverWrapper.isRunning();
+
+		if (game) {
+			game->suppressDisconnectionMessage = true;
+		}
+
 		serverWrapper.runInThread();
 
 		if (!serverWrapper.waitUntilRunning(std::chrono::milliseconds(10'000))) {
@@ -1012,6 +1022,15 @@ namespace Game3 {
 
 		serverWrapper.save();
 
+		if (was_running) {
+			// Ugly hack!
+			delay([this] { continueLocalConnection(); }, DEFAULT_CLIENT_TICK_FREQUENCY * 2);
+		} else {
+			continueLocalConnection();
+		}
+	}
+
+	void MainWindow::continueLocalConnection() {
 		if (!connect("::1", serverWrapper.getPort())) {
 			error("Failed to connect to local server.");
 			return;

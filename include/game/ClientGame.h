@@ -24,6 +24,7 @@ namespace Game3 {
 			bool stoppedByError = false;
 			std::function<void()> errorCallback;
 			SoundEngine sounds;
+			bool suppressDisconnectionMessage = false;
 
 			ClientGame(Canvas &canvas_): Game(), canvas(canvas_) {}
 			~ClientGame() override;

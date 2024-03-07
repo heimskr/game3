@@ -17,8 +17,7 @@ namespace Game3 {
 		displayNameEntry.signal_activate().connect(sigc::mem_fun(*this, &LoginDialog::submit));
 		signal_response().connect([this](int response) {
 			if (response == Gtk::ResponseType::OK) {
-				if (!usernameEntry.get_text().empty() && !displayNameEntry.get_text().empty())
-					submit();
+				submit();
 			} else {
 				hide();
 			}
