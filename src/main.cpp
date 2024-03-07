@@ -2,6 +2,7 @@
 #include "App.h"
 #include "Log.h"
 #include "client/RichPresence.h"
+#include "client/ServerWrapper.h"
 #include "net/Server.h"
 #include "net/Sock.h"
 #include "tools/Flasker.h"
@@ -183,6 +184,13 @@ int main(int argc, char **argv) {
 				auto [out, err] = Game3::runCommand("./game3", {"--shell-test", "print"});
 				std::cout << std::format("stdout[{}], stderr[{}]\n", out, err);
 			}
+
+			return 0;
+		}
+
+		if (arg1 == "--wrapper-test") {
+			Game3::ServerWrapper wrapper;
+			wrapper.run();
 			return 0;
 		}
 
