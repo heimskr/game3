@@ -28,6 +28,10 @@ namespace Game3 {
 		constexpr float GARBAGE_COLLECTION_TIME = 60;
 	}
 
+	ClientGame::~ClientGame() {
+		INFO_("\e[31m~ClientGame\e[39m(" << this << ')');
+	}
+
 	double ClientGame::getFrequency() const {
 		return getWindow().settings.tickFrequency;
 	}

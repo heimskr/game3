@@ -32,6 +32,10 @@ namespace Game3 {
 		pool.start();
 	}
 
+	ServerGame::~ServerGame() {
+		INFO_("\e[31m~ServerGame\e[39m(" << this << ')');
+	}
+
 	void ServerGame::init() {
 		database = std::make_unique<GameDB>(getSelf());
 	}

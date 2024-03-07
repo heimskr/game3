@@ -34,6 +34,7 @@ namespace Game3 {
 			float lastGarbageCollection = 0;
 
 			ServerGame(const std::shared_ptr<Server> &, size_t pool_size);
+			~ServerGame() override;
 
 			void init();
 			void stop();

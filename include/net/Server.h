@@ -45,7 +45,6 @@ namespace Game3 {
 
 			Lockable<std::unordered_set<RemoteClientPtr>> allClients;
 
-			bool removeClient(int);
 			void accept();
 
 		public:

@@ -26,6 +26,7 @@ namespace Game3 {
 			SoundEngine sounds;
 
 			ClientGame(Canvas &canvas_): Game(), canvas(canvas_) {}
+			~ClientGame() override;
 
 			double getFrequency() const override;
 			void addEntityFactories() override;

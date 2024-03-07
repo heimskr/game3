@@ -54,6 +54,10 @@
 				<attribute name="label" translatable="yes">_Debug Mode</attribute>
 				<attribute name="action">win.debug</attribute>
 			</item>
+			<item>
+				<attribute name="label" translatable="yes">_Play Locally</attribute>
+				<attribute name="action">win.play_locally</attribute>
+			</item>
 		</section>
 	</menu>
 </interface>

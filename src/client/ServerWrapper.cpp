@@ -21,6 +21,28 @@ namespace Game3 {
 		std::filesystem::path CERT_PATH{"localserver.crt"};
 	}
 
+	ServerWrapper::~ServerWrapper() {
+		if (running) {
+			INFO_("Stopping in destructor.");
+			stop();
+		} else {
+			INFO_("Not stopping in destructor.");
+		}
+
+		if (threadActive) {
+			runThread.join();
+			threadActive = false;
+		}
+	}
+
+	void ServerWrapper::runInThread(size_t overworld_seed) {
+		runThread =	std::thread([this, overworld_seed] {
+			pthread_setname_np(pthread_self(), "RunThread");
+			threadActive = true;
+			run(overworld_seed);
+		});
+	}
+
 	void ServerWrapper::run(size_t overworld_seed) {
 		if (running)
 			throw std::runtime_error("Server is already running");
@@ -31,7 +53,7 @@ namespace Game3 {
 		if (key_exists != cert_exists)
 			throw std::runtime_error("Exactly one of localserver.key, localserver.crt exists (should be both or neither)");
 
-		if (!key_exists && !generateCertificate(KEY_PATH, CERT_PATH))
+		if (!key_exists && !generateCertificate(CERT_PATH, KEY_PATH))
 			throw std::runtime_error("Couldn't generate certificate/private key");
 
 		std::string secret;
@@ -43,12 +65,14 @@ namespace Game3 {
 
 		uint16_t port = 12255;
 
+		running = true;
 		server = std::make_shared<Server>("::1", port, CERT_PATH, KEY_PATH, secret, 2);
 
 		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
 			throw std::runtime_error("Couldn't register SIGPIPE handler");
 
 		std::thread stop_thread([this] {
+			pthread_setname_np(pthread_self(), "StopThread");
 			std::unique_lock lock(stopMutex);
 			stopCV.wait(lock, [this] { return !running.load(); });
 			server->stop();
@@ -98,6 +122,7 @@ namespace Game3 {
 		game->initInteractionSets();
 
 		std::thread tick_thread([&] {
+			pthread_setname_np(pthread_self(), "TickThread");
 			while (running) {
 				if (!game->tickingPaused)
 					game->tick();
@@ -109,6 +134,7 @@ namespace Game3 {
 		std::chrono::seconds save_period{120};
 
 		std::thread save_thread([&] {
+			pthread_setname_np(pthread_self(), "SaveThread");
 			std::chrono::time_point last_save = std::chrono::system_clock::now();
 
 			while (running) {
@@ -135,15 +161,16 @@ namespace Game3 {
 	}
 
 	void ServerWrapper::stop() {
-		if (!game)
+		if (!game || !running)
 			return;
 
 		running = false;
 		stopCV.notify_all();
 		saveCV.notify_all();
+	}
 
-		game->stop();
-		game.reset();
+	bool ServerWrapper::isRunning() const {
+		return running;
 	}
 
 	bool ServerWrapper::generateCertificate(const std::filesystem::path &certificate_path, const std::filesystem::path &key_path) {

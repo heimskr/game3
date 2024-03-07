@@ -1,6 +1,7 @@
 #pragma once
 
 #include "client/ClientSettings.h"
+#include "client/ServerWrapper.h"
 #include "threading/MTQueue.h"
 #include "threading/Lockable.h"
 #include "types/Types.h"
@@ -141,6 +142,7 @@ namespace Game3 {
 			std::chrono::system_clock::time_point lastRenderTime = std::chrono::system_clock::now();
 			std::atomic<double> lastFPS = 0;
 			std::deque<double> fpses;
+			ServerWrapper serverWrapper;
 
 			struct KeyInfo {
 				guint code;
@@ -174,6 +176,7 @@ namespace Game3 {
 			void handleKey(guint keyval, guint keycode, Gdk::ModifierType);
 			void onConnect();
 			void autoConnect();
+			void playLocally();
 			void onGameLoaded();
 			bool isFocused(const std::shared_ptr<Tab> &) const;
 			void connectClose(Gtk::Dialog &);

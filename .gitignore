@@ -45,3 +45,4 @@ pvs-analysis.log
 vgcore.*
 /*.core
 /_*
+/.localsecret

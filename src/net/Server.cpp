@@ -102,6 +102,16 @@ namespace Game3 {
 		if (!game)
 			return;
 
+		{
+			auto lock = allClients.uniqueLock();
+			while (!allClients.empty()) {
+				auto iter = allClients.begin();
+				RemoteClientPtr client = *iter;
+				close(*client);
+				allClients.erase(iter);
+			}
+		}
+
 		workGuard.reset();
 		context.stop();
 		game->stop();

@@ -112,6 +112,8 @@ namespace Game3 {
 
 		add_action("autoconnect", Gio::ActionMap::ActivateSlot(sigc::mem_fun(*this, &MainWindow::autoConnect)));
 
+		add_action("play_locally", Gio::ActionMap::ActivateSlot(sigc::mem_fun(*this, &MainWindow::playLocally)));
+
 		debugAction = add_action_bool("debug", [this] {
 			if (game) {
 				game->debugMode = !game->debugMode;
@@ -1001,6 +1003,10 @@ namespace Game3 {
 		} else {
 			error("Couldn't find token for user " + settings.username + " on host " + hostname);
 		}
+	}
+
+	void MainWindow::playLocally() {
+		serverWrapper.runInThread();
 	}
 
 	bool MainWindow::isFocused(const std::shared_ptr<Tab> &tab) const {
