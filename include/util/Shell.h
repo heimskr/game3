@@ -30,7 +30,7 @@ namespace Game3 {
 			out(std::move(out_)), err(std::move(err_)) {}
 	};
 
-	CommandOutput runCommand(const std::string &path, std::span<const std::string> args, int signal_on_timeout = 0);
+	CommandOutput runCommand(const std::string &path, std::span<const std::string> args);
 	CommandOutput runCommand(const std::string &path, std::span<const std::string> args, std::chrono::microseconds timeout, int signal_on_timeout = 0);
 
 	template <typename Duration>

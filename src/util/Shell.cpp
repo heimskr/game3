@@ -36,8 +36,77 @@ namespace Game3 {
 		isOpen = false;
 	}
 
-	CommandOutput runCommand(const std::string &path, std::span<const std::string> args, std::chrono::microseconds timeout, int signal_on_timeout) {
+	CommandOutput runCommand(const std::string &path, std::span<const std::string> args) {
+		PipeWrapper stdout_pipe;
+		PipeWrapper stderr_pipe;
 
+		for (int i: {0, 1}) {
+			fcntl(stdout_pipe[i],  F_SETFL, fcntl(stdout_pipe[i],  F_GETFL) | O_NONBLOCK);
+			fcntl(stderr_pipe[i],  F_SETFL, fcntl(stderr_pipe[i],  F_GETFL) | O_NONBLOCK);
+		}
+
+		const int child = fork();
+
+		if (child == -1)
+			throw std::runtime_error("Couldn't fork");
+
+		if (child == 0) {
+			std::vector<char *> cstrings{const_cast<char *>(path.c_str())};
+			cstrings.reserve(args.size() + 2);
+
+			for (const std::string &arg: args)
+				cstrings.push_back(const_cast<char *>(arg.data()));
+
+			cstrings.push_back(nullptr);
+
+			stdout_pipe.release();
+			stderr_pipe.release();
+
+			dup2(stdout_pipe[1], STDOUT_FILENO);
+			dup2(stderr_pipe[1], STDERR_FILENO);
+			close(stdout_pipe[1]);
+			close(stderr_pipe[1]);
+
+			if (execv(path.c_str(), cstrings.data()) == -1)
+				throw std::runtime_error("execv failed: " + std::to_string(errno));
+
+			return {};
+		}
+
+		int status{};
+		fd_set fds{};
+
+		std::stringstream stdout_stream, stderr_stream;
+
+		FD_SET(stdout_pipe[0], &fds);
+		FD_SET(stderr_pipe[0], &fds);
+
+		std::array<char, 4096> buffer{};
+		ssize_t bytes_read{};
+
+		auto fds_copy = fds;
+
+		while (select(2, &fds_copy, nullptr, nullptr, nullptr) != -1 || errno == EINTR) {
+			if (FD_ISSET(stdout_pipe[0], &fds)) {
+				while (0 < (bytes_read = read(stdout_pipe[0], buffer.data(), buffer.size())))
+					stdout_stream.write(buffer.data(), bytes_read);
+			}
+
+			if (FD_ISSET(stderr_pipe[0], &fds)) {
+				while (0 < (bytes_read = read(stderr_pipe[0], buffer.data(), buffer.size())))
+					stderr_stream.write(buffer.data(), bytes_read);
+			}
+
+			if (waitpid(child, &status, WNOHANG) != -1)
+				break;
+
+			fds_copy = fds;
+		}
+
+		return {stdout_stream.str(), stderr_stream.str()};
+	}
+
+	CommandOutput runCommand(const std::string &path, std::span<const std::string> args, std::chrono::microseconds timeout, int signal_on_timeout) {
 		static thread_local PipeWrapper control_pipe;
 		PipeWrapper stdout_pipe;
 		PipeWrapper stderr_pipe;
@@ -105,8 +174,10 @@ namespace Game3 {
 			dup2(stderr_pipe[1], STDERR_FILENO);
 			close(stdout_pipe[1]);
 			close(stderr_pipe[1]);
+
 			if (execv(path.c_str(), cstrings.data()) == -1)
 				throw std::runtime_error("execv failed: " + std::to_string(errno));
+
 			return {};
 		}
 

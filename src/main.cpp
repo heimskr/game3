@@ -169,13 +169,20 @@ int main(int argc, char **argv) {
 				std::cerr << "Here is ";
 				std::cout << "World!";
 				std::cerr << "some text.";
-				std::this_thread::sleep_for(std::chrono::seconds(15));
+				std::this_thread::sleep_for(std::chrono::seconds(3));
 				std::cout << " Here's more text after three seconds.";
 				return 0;
 			}
 
-			auto [out, err] = Game3::runCommand("./game3", {"--shell-test", "print"}, std::chrono::seconds(1), SIGINT);
-			std::cout << std::format("stdout[{}], stderr[{}]\n", out, err);
+			{
+				auto [out, err] = Game3::runCommand("./game3", {"--shell-test", "print"}, std::chrono::seconds(1), SIGINT);
+				std::cout << std::format("stdout[{}], stderr[{}]\n", out, err);
+			}
+
+			{
+				auto [out, err] = Game3::runCommand("./game3", {"--shell-test", "print"});
+				std::cout << std::format("stdout[{}], stderr[{}]\n", out, err);
+			}
 			return 0;
 		}
 
