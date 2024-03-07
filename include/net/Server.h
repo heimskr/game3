@@ -61,7 +61,7 @@ namespace Game3 {
 			std::function<void(RemoteClient &)> onClose;
 			std::function<void(RemoteClient &)> onAdd;
 
-			Server(const std::string &ip_, uint16_t port_, const std::filesystem::path &certificate_path, const std::filesystem::path &key_path, std::string_view secret_, size_t thread_count, size_t chunk_size = 1024);
+			Server(const std::string &ip_, uint16_t port_, const std::filesystem::path &certificate_path, const std::filesystem::path &key_path, std::string_view secret_, size_t thread_count, size_t chunk_size = 8192);
 			Server(const Server &) = delete;
 			Server(Server &&) = delete;
 			Server & operator=(const Server &) = delete;

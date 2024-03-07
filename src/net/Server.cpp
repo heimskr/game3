@@ -240,12 +240,12 @@ namespace Game3 {
 			} catch (const std::invalid_argument &) {}
 		}
 
-		global_server = std::make_shared<Server>("::0", port, "private.crt", "private.key", secret, 2, 1024);
+		global_server = std::make_shared<Server>("::0", port, "private.crt", "private.key", secret, 2);
 
 		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
 			throw std::runtime_error("Couldn't register SIGPIPE handler");
 
-		auto stop_thread = std::thread([] {
+		std::thread stop_thread([] {
 			std::unique_lock lock(stopMutex);
 			stopCV.wait(lock, [] { return !running.load(); });
 			global_server->stop();
@@ -286,8 +286,6 @@ namespace Game3 {
 		} else {
 			RealmPtr realm = Realm::create<Overworld>(game, 1, Overworld::ID(), "base:tileset/monomap", seed);
 			realm->outdoors = true;
-			std::default_random_engine rng;
-			rng.seed(seed);
 			WorldGen::generateOverworld(realm, seed, {}, {{-1, -1}, {1, 1}}, true);
 			game->addRealm(realm->id, realm);
 		}
@@ -295,8 +293,6 @@ namespace Game3 {
 		if (!game->hasRealm(-1)) {
 			RealmPtr shadow = Realm::create<ShadowRealm>(game, -1, ShadowRealm::ID(), "base:tileset/monomap", seed);
 			shadow->outdoors = false;
-			std::default_random_engine rng;
-			rng.seed(seed);
 			WorldGen::generateShadowRealm(shadow, seed, {}, {{-1, -1}, {1, 1}}, true);
 			game->addRealm(shadow->id, shadow);
 		}

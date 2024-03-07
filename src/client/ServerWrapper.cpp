@@ -1,8 +1,19 @@
 #include "Log.h"
 #include "client/ServerWrapper.h"
+#include "game/ServerGame.h"
+#include "game/SimulationOptions.h"
+#include "net/Server.h"
+#include "realm/Overworld.h"
+#include "realm/ShadowRealm.h"
+#include "util/Crypto.h"
+#include "util/FS.h"
 #include "util/Shell.h"
+#include "util/Timer.h"
+#include "worldgen/Overworld.h"
+#include "worldgen/ShadowRealm.h"
 
-#include <csignal>
+#include <fstream>
+#include <random>
 
 namespace Game3 {
 	namespace {
@@ -10,7 +21,10 @@ namespace Game3 {
 		std::filesystem::path CERT_PATH{"localserver.crt"};
 	}
 
-	void ServerWrapper::run() {
+	void ServerWrapper::run(size_t overworld_seed) {
+		if (running)
+			throw std::runtime_error("Server is already running");
+
 		const bool key_exists  = std::filesystem::exists(KEY_PATH);
 		const bool cert_exists = std::filesystem::exists(CERT_PATH);
 
@@ -19,6 +33,117 @@ namespace Game3 {
 
 		if (!key_exists && !generateCertificate(KEY_PATH, CERT_PATH))
 			throw std::runtime_error("Couldn't generate certificate/private key");
+
+		std::string secret;
+
+		if (std::filesystem::exists(".localsecret"))
+			secret = readFile(".localsecret");
+		else
+			std::ofstream(".localsecret") << (secret = generateSecret(8));
+
+		uint16_t port = 12255;
+
+		server = std::make_shared<Server>("::1", port, CERT_PATH, KEY_PATH, secret, 2);
+
+		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+			throw std::runtime_error("Couldn't register SIGPIPE handler");
+
+		std::thread stop_thread([this] {
+			std::unique_lock lock(stopMutex);
+			stopCV.wait(lock, [this] { return !running.load(); });
+			server->stop();
+		});
+
+		game = std::dynamic_pointer_cast<ServerGame>(Game::create(Side::Server, std::make_pair(server, size_t(8))));
+
+		server->onStop = [this] {
+			running = false;
+			stopCV.notify_all();
+			saveCV.notify_all();
+		};
+
+		std::filesystem::path world_path = "localworld.db";
+		const bool database_existed = std::filesystem::exists(world_path);
+
+		game->openDatabase(world_path);
+		server->game = game;
+
+		if (overworld_seed == size_t(-1)) {
+			std::random_device rng;
+			overworld_seed = (uint64_t(rng()) << 32) | rng();
+		}
+
+		if (database_existed) {
+			Timer timer{"ReadAll"};
+			game->getDatabase().readAll();
+			timer.stop();
+			Timer::summary();
+			Timer::clear();
+			INFO_("Finished reading all data from database.");
+		} else {
+			RealmPtr realm = Realm::create<Overworld>(game, 1, Overworld::ID(), "base:tileset/monomap", overworld_seed);
+			realm->outdoors = true;
+			WorldGen::generateOverworld(realm, overworld_seed, {}, {{-1, -1}, {1, 1}}, true);
+			game->addRealm(realm->id, realm);
+		}
+
+		if (!game->hasRealm(-1)) {
+			RealmPtr shadow = Realm::create<ShadowRealm>(game, -1, ShadowRealm::ID(), "base:tileset/monomap", overworld_seed);
+			shadow->outdoors = false;
+			WorldGen::generateShadowRealm(shadow, overworld_seed, {}, {{-1, -1}, {1, 1}}, true);
+			game->addRealm(shadow->id, shadow);
+		}
+
+		game->initEntities();
+		game->initInteractionSets();
+
+		std::thread tick_thread([&] {
+			while (running) {
+				if (!game->tickingPaused)
+					game->tick();
+				std::this_thread::sleep_for(std::chrono::milliseconds(SERVER_TICK_PERIOD));
+			}
+		});
+
+		std::mutex save_mutex;
+		std::chrono::seconds save_period{120};
+
+		std::thread save_thread([&] {
+			std::chrono::time_point last_save = std::chrono::system_clock::now();
+
+			while (running) {
+				std::unique_lock lock{save_mutex};
+				saveCV.wait_for(lock, save_period, [&] {
+					return !running || save_period <= std::chrono::system_clock::now() - last_save;
+				});
+
+				if (running && save_period <= std::chrono::system_clock::now() - last_save) {
+					INFO_("Autosaving...");
+					game->tickingPaused = true;
+					game->getDatabase().writeAll();
+					game->tickingPaused = false;
+					INFO_("Autosaved.");
+					last_save = std::chrono::system_clock::now();
+				}
+			}
+		});
+
+		server->run();
+		tick_thread.join();
+		stop_thread.join();
+		save_thread.join();
+	}
+
+	void ServerWrapper::stop() {
+		if (!game)
+			return;
+
+		running = false;
+		stopCV.notify_all();
+		saveCV.notify_all();
+
+		game->stop();
+		game.reset();
 	}
 
 	bool ServerWrapper::generateCertificate(const std::filesystem::path &certificate_path, const std::filesystem::path &key_path) {
