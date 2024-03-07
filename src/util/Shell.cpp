@@ -67,41 +67,27 @@ namespace Game3 {
 			close(stdout_pipe[1]);
 			close(stderr_pipe[1]);
 
-			if (execv(path.c_str(), cstrings.data()) == -1)
+			if (execv(path.c_str(), cstrings.data()) == -1) {
+				ERROR("Path: {}", path.c_str());
 				throw std::runtime_error("execv failed: " + std::to_string(errno));
+			}
 
 			return {};
 		}
 
-		int status{};
-		fd_set fds{};
-
 		std::stringstream stdout_stream, stderr_stream;
 
-		FD_SET(stdout_pipe[0], &fds);
-		FD_SET(stderr_pipe[0], &fds);
+		if (waitpid(child, nullptr, 0) == -1)
+			throw std::runtime_error("waitpid failed: " + std::to_string(errno));
 
 		std::array<char, 4096> buffer{};
 		ssize_t bytes_read{};
 
-		auto fds_copy = fds;
+		while (0 < (bytes_read = read(stdout_pipe[0], buffer.data(), buffer.size())))
+			stdout_stream.write(buffer.data(), bytes_read);
 
-		while (select(2, &fds_copy, nullptr, nullptr, nullptr) != -1 || errno == EINTR) {
-			if (FD_ISSET(stdout_pipe[0], &fds)) {
-				while (0 < (bytes_read = read(stdout_pipe[0], buffer.data(), buffer.size())))
-					stdout_stream.write(buffer.data(), bytes_read);
-			}
-
-			if (FD_ISSET(stderr_pipe[0], &fds)) {
-				while (0 < (bytes_read = read(stderr_pipe[0], buffer.data(), buffer.size())))
-					stderr_stream.write(buffer.data(), bytes_read);
-			}
-
-			if (waitpid(child, &status, WNOHANG) != -1)
-				break;
-
-			fds_copy = fds;
-		}
+		while (0 < (bytes_read = read(stderr_pipe[0], buffer.data(), buffer.size())))
+			stderr_stream.write(buffer.data(), bytes_read);
 
 		return {stdout_stream.str(), stderr_stream.str()};
 	}
@@ -175,8 +161,10 @@ namespace Game3 {
 			close(stdout_pipe[1]);
 			close(stderr_pipe[1]);
 
-			if (execv(path.c_str(), cstrings.data()) == -1)
+			if (execv(path.c_str(), cstrings.data()) == -1) {
+				ERROR("Path: {}", path.c_str());
 				throw std::runtime_error("execv failed: " + std::to_string(errno));
+			}
 
 			return {};
 		}
