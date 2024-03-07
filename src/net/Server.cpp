@@ -174,9 +174,6 @@ namespace Game3 {
 		player->displayName = display_name;
 		player->token = generateToken(player->username);
 		overworld->add(player, overworld->randomLand);
-		// overworld->add(player, Position(31, 82));
-		// player->direction = Direction::Right;
-		// overworld->add(player, Position(-25, -36));
 		player->spawnPosition = player->getPosition();
 		player->spawnRealmID = player->getRealm()->getID();
 		INFO_("Setting player spawn realm ID to " << player->spawnRealmID);

@@ -62,7 +62,7 @@ namespace Game3 {
 		uint16_t port = 12255;
 
 		running = true;
-		server = std::make_shared<Server>("::1", port, CERT_PATH, KEY_PATH, secret, 2);
+		server = std::make_shared<Server>("::0", port, CERT_PATH, KEY_PATH, secret, 2);
 
 		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
 			throw std::runtime_error("Couldn't register SIGPIPE handler");

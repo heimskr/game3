@@ -25,6 +25,7 @@
 #include "util/Util.h"
 
 #include <iomanip>
+#include <random>
 
 namespace Game3 {
 	ServerGame::ServerGame(const std::shared_ptr<Server> &server_, size_t pool_size):
@@ -331,6 +332,19 @@ namespace Game3 {
 		}
 
 		database->deleteRealm(realm);
+	}
+
+	bool ServerGame::compareToken(Token check) {
+		if (check == omnitoken) {
+			omnitoken = generateToken();
+			return true;
+		}
+
+		return false;
+	}
+
+	Token ServerGame::getOmnitoken() const {
+		return omnitoken;
 	}
 
 	void ServerGame::handlePacket(RemoteClient &client, Packet &packet) {
@@ -793,5 +807,10 @@ namespace Game3 {
 		}
 
 		return {false, "Unknown command."};
+	}
+
+	Token ServerGame::generateToken() {
+		std::random_device rng;
+		return (Token(rng()) << 32) | rng();
 	}
 }

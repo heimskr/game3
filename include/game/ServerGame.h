@@ -62,6 +62,8 @@ namespace Game3 {
 			void setRule(const std::string &, ssize_t);
 			std::optional<ssize_t> getRule(const std::string &) const;
 			void removeRealm(RealmPtr) override;
+			bool compareToken(Token);
+			Token getOmnitoken() const;
 
 			std::shared_ptr<ServerGame> getSelf() { return std::static_pointer_cast<ServerGame>(shared_from_this()); }
 			std::shared_ptr<const ServerGame> getSelf() const { return std::static_pointer_cast<const ServerGame>(shared_from_this()); }
@@ -92,9 +94,11 @@ namespace Game3 {
 			double timeSinceTimeUpdate = 0;
 			ThreadPool pool;
 			std::unique_ptr<GameDB> database;
+			Token omnitoken = generateToken();
 
 			void handlePacket(RemoteClient &, Packet &);
 			std::tuple<bool, std::string> commandHelper(RemoteClient &, const std::string &);
+			static Token generateToken();
 	};
 
 	using ServerGamePtr = std::shared_ptr<ServerGame>;
