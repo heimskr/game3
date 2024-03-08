@@ -1,12 +1,13 @@
+#include "Log.h"
+#include "util/Crypto.h"
+#include "util/Math.h"
+
 #include <cassert>
 #include <cstring>
 #include <memory>
 #include <random>
 #include <sstream>
 #include <vector>
-
-#include "util/Crypto.h"
-#include "util/Math.h"
 
 namespace Game3 {
 	template <>
@@ -134,10 +135,12 @@ namespace Game3 {
 
 	std::string generateSecret(size_t count) {
 		std::stringstream ss;
+		ss.imbue(std::locale("C"));
 		std::random_device rng;
 		std::mt19937_64 prng(rng());
 		for (size_t i = 0; i < count; ++i)
 			ss << std::hex << prng();
+		INFO("Secret: {}", ss.str());
 		return ss.str();
 	}
 }

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "SlotRange.h"
 #include "game/InventoryWrapper.h"
+#include "types/SlotRange.h"
 
 namespace Game3 {
 	class InventorySpan: public InventoryWrapper {

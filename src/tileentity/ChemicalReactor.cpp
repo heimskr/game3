@@ -1,5 +1,4 @@
 #include "Log.h"
-#include "SlotRange.h"
 #include "game/ClientGame.h"
 #include "game/EnergyContainer.h"
 #include "game/ServerInventory.h"
@@ -8,6 +7,7 @@
 #include "packet/SetTileEntityEnergyPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/ChemicalReactor.h"
+#include "types/SlotRange.h"
 #include "ui/module/ChemicalReactorModule.h"
 
 #include <cassert>
