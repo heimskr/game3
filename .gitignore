@@ -46,3 +46,4 @@ vgcore.*
 /*.core
 /_*
 /.localsecret
+/game3.log

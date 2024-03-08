@@ -14,6 +14,7 @@
 
 #include <fstream>
 #include <random>
+
 #include <sys/mman.h>
 
 namespace Game3 {
@@ -77,6 +78,8 @@ namespace Game3 {
 			std::array<char, 8192> buffer;
 			ssize_t bytes_read{};
 
+			std::ofstream logstream("game3.log");
+
 			while (select(nfds, &fds_copy, nullptr, nullptr, nullptr) != -1 || errno == EINTR) {
 				if (FD_ISSET(control, &fds_copy)) {
 					bytes_read = read(control, buffer.data(), buffer.size());
@@ -94,8 +97,12 @@ namespace Game3 {
 					if (bytes_read == -1)
 						throw std::runtime_error(std::format("Couldn't read from log data pipe ({})", errno));
 
-					if (0 < bytes_read && onLog)
-						onLog({buffer.data(), size_t(bytes_read)});
+					if (0 < bytes_read) {
+						std::string_view text{buffer.data(), size_t(bytes_read)};
+						logstream << text;
+						if (onLog)
+							onLog(text);
+					}
 				}
 
 				fds_copy = fds;
