@@ -58,6 +58,10 @@
 				<attribute name="label" translatable="yes">_Play Locally</attribute>
 				<attribute name="action">win.play_locally</attribute>
 			</item>
+			<item>
+				<attribute name="label" translatable="yes">T_oggle Log</attribute>
+				<attribute name="action">win.toggle_log</attribute>
+			</item>
 		</section>
 	</menu>
 </interface>

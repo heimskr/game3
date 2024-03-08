@@ -1,23 +1,19 @@
-#include <iostream>
-
-#include "game/Game.h"
-#include "ui/tab/LogTab.h"
+#include "ui/LogOverlay.h"
 
 namespace Game3 {
-	LogTab::LogTab(Gtk::Notebook &notebook_): Tab(notebook_) {
+	LogOverlay::LogOverlay() {
 		terminal = Gtk::manage(Glib::wrap(GTK_WIDGET(vte_terminal_new()), false));
 		terminal->set_expand(true);
 		vte = VTE_TERMINAL(terminal->gobj());
-
-		scrolled.set_child(*terminal);
-		scrolled.set_vexpand(true);
+		set_child(*terminal);
+		set_vexpand(true);
 	}
 
-	void LogTab::reset(const std::shared_ptr<ClientGame> &) {
+	void LogOverlay::reset() {
 		vte_terminal_reset(vte, true, true);
 	}
 
-	void LogTab::print(std::string_view text) {
+	void LogOverlay::print(std::string_view text) {
 		const char *linefeed = "\r\n";
 		size_t newline{};
 

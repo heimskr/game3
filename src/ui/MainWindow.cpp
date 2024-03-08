@@ -28,9 +28,9 @@
 #include "ui/module/VillageTradeModule.h"
 #include "ui/tab/CraftingTab.h"
 #include "ui/tab/InventoryTab.h"
-#include "ui/tab/LogTab.h"
 #include "ui/tab/TextTab.h"
 #include "ui/Canvas.h"
+#include "ui/LogOverlay.h"
 #include "ui/MainWindow.h"
 #include "ui/Modifiers.h"
 #include "util/FS.h"
@@ -86,6 +86,10 @@ namespace Game3 {
 		header = builder->get_widget<Gtk::HeaderBar>("headerbar");
 		set_titlebar(*header);
 
+		toggleLogButton.set_icon_name("utilities-terminal-symbolic");
+		toggleLogButton.signal_clicked().connect([this] { toggleLog(); });
+		header->pack_start(toggleLogButton);
+
 		set_icon_name("game3");
 		set_title("Game3");
 
@@ -116,6 +120,8 @@ namespace Game3 {
 		add_action("autoconnect", Gio::ActionMap::ActivateSlot(sigc::mem_fun(*this, &MainWindow::autoConnect)));
 
 		add_action("play_locally", Gio::ActionMap::ActivateSlot(sigc::mem_fun(*this, &MainWindow::playLocally)));
+
+		add_action("toggle_log", [this] { toggleLog(); });
 
 		debugAction = add_action_bool("debug", [this] {
 			if (game) {
@@ -350,10 +356,12 @@ namespace Game3 {
 		initTab(inventoryTab, *this).add();
 		initTab(craftingTab, *this).add();
 		initTab(textTab, notebook, "", "");
-		initTab(logTab, notebook);
 		activeTab = inventoryTab;
 
-		set_child(paned);
+		stack.add(paned);
+		stack.add(logOverlay);
+
+		set_child(stack);
 		delay([this] {
 			paned.set_position(paned.get_width() - 365);
 		}, 2);
@@ -368,7 +376,6 @@ namespace Game3 {
 	}
 
 	bool MainWindow::connect(const Glib::ustring &hostname, uint16_t port) {
-		glArea.get_context()->make_current();
 		closeGame();
 		game = std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, canvas.get()));
 		auto client = std::make_shared<LocalClient>();
@@ -392,6 +399,7 @@ namespace Game3 {
 		else
 			client->saveTokens("tokens.json");
 
+		activateContext();
 		onGameLoaded();
 
 		if (settings.alertOnConnection) {
@@ -410,7 +418,6 @@ namespace Game3 {
 		richPresence.setActivityStartTime(false);
 		richPresence.setActivityDetails("Playing", true);
 
-		glArea.get_context()->make_current();
 		debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
 		game->initInteractionSets();
 		canvas->game = game;
@@ -634,8 +641,12 @@ namespace Game3 {
 			player->stopMoving();
 	}
 
-	void MainWindow::activateContext() {
+	bool MainWindow::activateContext() {
+		if (stack.get_visible_child() != &paned)
+			return false;
+
 		glArea.get_context()->make_current();
+		return true;
 	}
 
 	void MainWindow::saveSettings() {
@@ -872,8 +883,8 @@ namespace Game3 {
 					return;
 				}
 				case GDK_KEY_u:
-					glArea.get_context()->make_current();
-					game->getActiveRealm()->reupload();
+					if (activateContext())
+						game->getActiveRealm()->reupload();
 					return;
 				case GDK_KEY_f:
 					if (control)
@@ -1015,10 +1026,8 @@ namespace Game3 {
 			game->suppressDisconnectionMessage = true;
 		}
 
-		logTab->add();
-
 		serverWrapper.onLog = [this](std::string_view text) {
-			logTab->print(text);
+			logOverlay.print(text);
 		};
 
 		serverWrapper.runInThread();
@@ -1053,6 +1062,18 @@ namespace Game3 {
 				client->send(LoginPacket(username.raw(), serverWrapper.getOmnitoken(), display_name));
 		});
 		queueDialog(std::move(login_dialog));
+	}
+
+	bool MainWindow::toggleLog() {
+		if (stack.get_visible_child() == &paned) {
+			stack.set_visible_child(logOverlay);
+			toggleLogButton.set_active(true);
+			return true;
+		}
+
+		stack.set_visible_child(paned);
+		toggleLogButton.set_active(false);
+		return false;
 	}
 
 	bool MainWindow::isFocused(const std::shared_ptr<Tab> &tab) const {

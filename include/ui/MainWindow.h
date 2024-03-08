@@ -5,6 +5,7 @@
 #include "threading/MTQueue.h"
 #include "threading/Lockable.h"
 #include "types/Types.h"
+#include "ui/LogOverlay.h"
 #include "ui/Modifiers.h"
 
 #include <atomic>
@@ -30,7 +31,6 @@ namespace Game3 {
 	class CraftingTab;
 	class HasFluids;
 	class InventoryTab;
-	class LogTab;
 	class Tab;
 	class TextTab;
 	struct Position;
@@ -45,7 +45,6 @@ namespace Game3 {
 			std::shared_ptr<TextTab> textTab;
 			std::shared_ptr<InventoryTab> inventoryTab;
 			std::shared_ptr<CraftingTab> craftingTab;
-			std::shared_ptr<LogTab> logTab;
 			Gtk::PopoverMenu glMenu;
 			Lockable<ClientSettings> settings;
 
@@ -81,7 +80,7 @@ namespace Game3 {
 
 			void onBlur();
 
-			void activateContext();
+			bool activateContext();
 
 			void saveSettings();
 
@@ -109,6 +108,8 @@ namespace Game3 {
 			constexpr static std::chrono::seconds statusbarExpirationTime {5};
 			static std::unordered_map<guint, std::chrono::milliseconds> customKeyRepeatTimes;
 
+			Gtk::Stack stack;
+			Gtk::ToggleButton toggleLogButton;
 			Glib::RefPtr<Gtk::Builder> builder;
 			Glib::RefPtr<Gtk::CssProvider> cssProvider;
 			MTQueue<std::function<void()>> functionQueue;
@@ -145,6 +146,7 @@ namespace Game3 {
 			std::atomic<double> lastFPS = 0;
 			std::deque<double> fpses;
 			ServerWrapper serverWrapper;
+			LogOverlay logOverlay;
 
 			struct KeyInfo {
 				guint code;
@@ -184,6 +186,7 @@ namespace Game3 {
 			void connectClose(Gtk::Dialog &);
 			void updateMoneyLabel(MoneyCount);
 			void continueLocalConnection();
+			bool toggleLog();
 
 			template <typename T>
 			T & initTab(std::shared_ptr<T> &tab) {

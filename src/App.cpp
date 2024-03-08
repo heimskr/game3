@@ -22,6 +22,7 @@ namespace Game3 {
 		set_accel_for_action("win.debug",        "<Ctrl>d");
 		set_accel_for_action("win.settings",     "<Ctrl>h");
 		set_accel_for_action("win.play_locally", "<Ctrl>p");
+		set_accel_for_action("win.toggle_log",   "<Ctrl><Shift>l");
 	}
 
 	void App::on_activate() {

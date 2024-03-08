@@ -3,8 +3,6 @@
 #include "ui/tab/Tab.h"
 
 namespace Game3 {
-	class MainWindow;
-
 	class TextTab: public Tab {
 		public:
 			Glib::ustring text;
