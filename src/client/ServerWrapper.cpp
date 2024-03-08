@@ -14,6 +14,7 @@
 
 #include <fstream>
 #include <random>
+#include <sys/mman.h>
 
 namespace Game3 {
 	namespace {
@@ -58,9 +59,48 @@ namespace Game3 {
 		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
 			throw std::runtime_error("Couldn't register SIGPIPE handler");
 
+		logDataPipe.emplace();
+		logFDWrapper.init(logDataPipe->writeEnd(), {STDOUT_FILENO, STDERR_FILENO});
+
 		port = 12255;
 		running = true;
 		server = std::make_shared<Server>("::0", port, CERT_PATH, KEY_PATH, secret, 2);
+
+		logThread = std::thread([this, fd = logDataPipe->readEnd(), control = logControlPipe.readEnd()] {
+			fd_set fds{};
+			FD_ZERO(&fds);
+			FD_SET(control, &fds);
+			FD_SET(fd, &fds);
+			fd_set fds_copy = fds;
+			const int nfds = std::max(fd, control) + 1;
+
+			std::array<char, 8192> buffer;
+			ssize_t bytes_read{};
+
+			while (select(nfds, &fds_copy, nullptr, nullptr, nullptr) != -1 || errno == EINTR) {
+				if (FD_ISSET(control, &fds_copy)) {
+					bytes_read = read(control, buffer.data(), buffer.size());
+
+					if (bytes_read == -1)
+						throw std::runtime_error(std::format("Couldn't read from log control pipe ({})", errno));
+
+					if (0 < bytes_read && buffer[0] == 'r')
+						return;
+				}
+
+				if (FD_ISSET(fd, &fds_copy)) {
+					bytes_read = read(fd, buffer.data(), buffer.size());
+
+					if (bytes_read == -1)
+						throw std::runtime_error(std::format("Couldn't read from log data pipe ({})", errno));
+
+					if (0 < bytes_read && onLog)
+						onLog({buffer.data(), size_t(bytes_read)});
+				}
+
+				fds_copy = fds;
+			}
+		});
 
 		std::thread stop_thread([this] {
 			pthread_setname_np(pthread_self(), "StopThread");
@@ -167,6 +207,13 @@ namespace Game3 {
 			runThread.join();
 			threadActive = false;
 		}
+
+		INFO("{}:{}", __FILE__, __LINE__);
+		write(logControlPipe.writeEnd(), "r", 1);
+		INFO("{}:{}", __FILE__, __LINE__);
+		logThread.join();
+		logFDWrapper.close();
+		logDataPipe.reset();
 
 		server.reset();
 	}

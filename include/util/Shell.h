@@ -5,22 +5,6 @@
 #include <string>
 
 namespace Game3 {
-	class PipeWrapper {
-		public:
-			int fds[2]{};
-
-			PipeWrapper();
-			~PipeWrapper();
-
-			int operator[](size_t) const;
-
-			void close();
-			void release();
-
-		private:
-			bool isOpen = false;
-	};
-
 	struct CommandOutput {
 		std::string out;
 		std::string err;

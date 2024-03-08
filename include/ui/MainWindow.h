@@ -30,8 +30,9 @@ namespace Game3 {
 	class CraftingTab;
 	class HasFluids;
 	class InventoryTab;
-	class TextTab;
+	class LogTab;
 	class Tab;
+	class TextTab;
 	struct Position;
 	struct WorldGenParams;
 
@@ -44,6 +45,7 @@ namespace Game3 {
 			std::shared_ptr<TextTab> textTab;
 			std::shared_ptr<InventoryTab> inventoryTab;
 			std::shared_ptr<CraftingTab> craftingTab;
+			std::shared_ptr<LogTab> logTab;
 			Gtk::PopoverMenu glMenu;
 			Lockable<ClientSettings> settings;
 

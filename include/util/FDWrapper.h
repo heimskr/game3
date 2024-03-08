@@ -3,6 +3,7 @@
 #include <format>
 #include <stdexcept>
 #include <unistd.h>
+#include <vector>
 
 namespace Game3 {
 	class FDWrapper {
@@ -11,8 +12,8 @@ namespace Game3 {
 				descriptor(descriptor_) {}
 
 			~FDWrapper() {
-				if (::close(descriptor) == -1)
-					throw std::runtime_error(std::format("Couldn't close descriptor {} ({})", descriptor, errno));
+				// Let's hope it actually succeeds.
+				::close(descriptor);
 			}
 
 		private:
@@ -21,18 +22,26 @@ namespace Game3 {
 
 	class CloningFDWrapper {
 		public:
-			CloningFDWrapper(int descriptor_, int to_redirect) {
-				init(descriptor_, to_redirect);
+			CloningFDWrapper() = default;
+
+			CloningFDWrapper(int descriptor_, const std::vector<int> &to_redirect) {
+				init(descriptor_, std::move(to_redirect));
 			}
 
-			void init(int descriptor_, int to_redirect) {
-				clone = dup(redirect);
+			void init(int descriptor_, const std::vector<int> &to_redirect) {
+				descriptor = descriptor_;
 
-				if (clone == -1)
-					throw std::runtime_error(std::format("Couldn't clone descriptor {} ({})", descriptor, errno));
+				for (const int redirect: to_redirect) {
+					const int clone = dup(redirect);
 
-				if (dup2(descriptor, redirect) == -1)
-					throw std::runtime_error(std::format("Couldn't dup2({}, {}) ({})", descriptor, redirect, errno));
+					if (clone == -1)
+						throw std::runtime_error(std::format("Couldn't clone descriptor {} ({})", redirect, errno));
+
+					if (dup2(descriptor, redirect) == -1)
+						throw std::runtime_error(std::format("Couldn't dup2({}, {}) ({})", descriptor, redirect, errno));
+
+					redirects.emplace_back(redirect, clone);
+				}
 
 				active = true;
 			}
@@ -47,23 +56,28 @@ namespace Game3 {
 
 				active = false;
 
+				for (const auto [redirected, clone]: redirects) {
+					if (dup2(clone, redirected) == -1)
+						throw std::runtime_error(std::format("Couldn't dup2({}, {}) ({})", clone, redirected, errno));
+
+					if (::close(clone) == -1)
+						throw std::runtime_error(std::format("Couldn't close cloned descriptor {} ({})", clone, errno));
+				}
+
+				redirects.clear();
+
 				if (::close(descriptor) == -1)
 					throw std::runtime_error(std::format("Couldn't close descriptor {} ({})", descriptor, errno));
-
-				if (clone == -1)
-					return;
-
-				if (dup2(clone, redirect) == -1)
-					throw std::runtime_error(std::format("Couldn't dup2({}, {}) ({})", clone, redirect, errno));
-
-				if (::close(clone) == -1)
-					throw std::runtime_error(std::format("Couldn't close cloned descriptor {} ({})", clone, errno));
 			}
 
 		private:
+			struct Redirect {
+				int redirected;
+				int clone;
+			};
+
 			bool active = false;
 			int descriptor{};
-			int redirect{};
-			int clone{};
+			std::vector<Redirect> redirects;
 	};
 }

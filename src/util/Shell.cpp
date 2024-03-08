@@ -1,4 +1,5 @@
 #include "Log.h"
+#include "util/PipeWrapper.h"
 #include "util/Shell.h"
 
 #include <array>
@@ -10,32 +11,6 @@
 #include <thread>
 
 namespace Game3 {
-	PipeWrapper::PipeWrapper() {
-		if (pipe(fds) == -1)
-			throw std::runtime_error("Couldn't create pipe");
-		isOpen = true;
-	}
-
-	PipeWrapper::~PipeWrapper() {
-		close();
-	}
-
-	int PipeWrapper::operator[](size_t index) const {
-		return fds[index];
-	}
-
-	void PipeWrapper::close() {
-		if (isOpen) {
-			::close(fds[0]);
-			::close(fds[1]);
-			isOpen = false;
-		}
-	}
-
-	void PipeWrapper::release() {
-		isOpen = false;
-	}
-
 	CommandOutput runCommand(const std::string &path, std::span<const std::string> args) {
 		PipeWrapper stdout_pipe;
 		PipeWrapper stderr_pipe;
@@ -185,11 +160,13 @@ namespace Game3 {
 		std::array<char, 4096> buffer{};
 		ssize_t bytes_read{};
 
-		auto fds_copy = fds;
-		auto tv_copy = tv;
+		fd_set fds_copy = fds;
+		timeval tv_copy = tv;
 
-		while (select(3, &fds_copy, nullptr, nullptr, &tv_copy) != -1 || errno == EINTR) {
-			if (FD_ISSET(control_pipe[0], &fds)) {
+		const int nfds = std::max({control_pipe[0], stdout_pipe[0], stderr_pipe[0]}) + 1;
+
+		while (select(nfds, &fds_copy, nullptr, nullptr, &tv_copy) != -1 || errno == EINTR) {
+			if (FD_ISSET(control_pipe[0], &fds_copy)) {
 				char dummy;
 				if (0 < read(control_pipe[0], &dummy, 1)) {
 					child_quit = true;
@@ -197,12 +174,12 @@ namespace Game3 {
 				}
 			}
 
-			if (FD_ISSET(stdout_pipe[0], &fds)) {
+			if (FD_ISSET(stdout_pipe[0], &fds_copy)) {
 				while (0 < (bytes_read = read(stdout_pipe[0], buffer.data(), buffer.size())))
 					stdout_stream.write(buffer.data(), bytes_read);
 			}
 
-			if (FD_ISSET(stderr_pipe[0], &fds)) {
+			if (FD_ISSET(stderr_pipe[0], &fds_copy)) {
 				while (0 < (bytes_read = read(stderr_pipe[0], buffer.data(), buffer.size())))
 					stderr_stream.write(buffer.data(), bytes_read);
 			}

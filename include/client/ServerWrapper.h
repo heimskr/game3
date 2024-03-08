@@ -1,12 +1,16 @@
 #pragma once
 
 #include "types/Types.h"
+#include "util/FDWrapper.h"
+#include "util/PipeWrapper.h"
 
 #include <atomic>
 #include <condition_variable>
 #include <filesystem>
+#include <functional>
 #include <memory>
 #include <mutex>
+#include <string>
 #include <thread>
 
 namespace Game3 {
@@ -16,6 +20,8 @@ namespace Game3 {
 	/** Encapsulates a server that runs inside the client to enable local singleplayer gameplay. */
 	class ServerWrapper {
 		public:
+			std::function<void(std::string_view)> onLog;
+
 			ServerWrapper() = default;
 			~ServerWrapper();
 
@@ -31,6 +37,9 @@ namespace Game3 {
 		private:
 			std::shared_ptr<Server> server;
 			std::shared_ptr<ServerGame> game;
+			std::optional<PipeWrapper> logDataPipe;
+			PipeWrapper logControlPipe;
+			CloningFDWrapper logFDWrapper;
 
 			uint16_t port{};
 
@@ -44,6 +53,7 @@ namespace Game3 {
 			std::condition_variable saveCV;
 			std::condition_variable startCV;
 			std::thread runThread;
+			std::thread logThread;
 
 			static bool generateCertificate(const std::filesystem::path &certificate_path, const std::filesystem::path &key_path);
 	};

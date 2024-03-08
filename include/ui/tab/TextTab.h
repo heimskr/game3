@@ -15,12 +15,6 @@ namespace Game3 {
 			TextTab() = delete;
 			TextTab(Gtk::Notebook &, const Glib::ustring &text_, const Glib::ustring &name_);
 
-			TextTab(const TextTab &) = delete;
-			TextTab(TextTab &&) = delete;
-
-			TextTab & operator=(const TextTab &) = delete;
-			TextTab & operator=(TextTab &&) = delete;
-
 			Gtk::Widget & getWidget() override { return scrolled; }
 			std::string getName() override { return name; }
 			void onBlur() override;

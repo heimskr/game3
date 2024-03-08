@@ -28,6 +28,7 @@
 #include "ui/module/VillageTradeModule.h"
 #include "ui/tab/CraftingTab.h"
 #include "ui/tab/InventoryTab.h"
+#include "ui/tab/LogTab.h"
 #include "ui/tab/TextTab.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
@@ -349,6 +350,7 @@ namespace Game3 {
 		initTab(inventoryTab, *this).add();
 		initTab(craftingTab, *this).add();
 		initTab(textTab, notebook, "", "");
+		initTab(logTab, notebook);
 		activeTab = inventoryTab;
 
 		set_child(paned);
@@ -1012,6 +1014,12 @@ namespace Game3 {
 		if (game) {
 			game->suppressDisconnectionMessage = true;
 		}
+
+		logTab->add();
+
+		serverWrapper.onLog = [this](std::string_view text) {
+			logTab->print(text);
+		};
 
 		serverWrapper.runInThread();
 
