@@ -73,7 +73,7 @@ namespace Game3 {
 			void send(RemoteClient &, std::string, bool force = false);
 			void run();
 			void stop();
-			bool close(RemoteClient &);
+			bool close(RemoteClientPtr);
 
 			/** Writes every player's full data to the database. */
 			void saveUserData();

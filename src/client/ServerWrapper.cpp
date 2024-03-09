@@ -215,9 +215,7 @@ namespace Game3 {
 			threadActive = false;
 		}
 
-		INFO("{}:{}", __FILE__, __LINE__);
 		write(logControlPipe.writeEnd(), "r", 1);
-		INFO("{}:{}", __FILE__, __LINE__);
 		logThread.join();
 		logFDWrapper.close();
 		logDataPipe.reset();

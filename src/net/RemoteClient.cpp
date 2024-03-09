@@ -173,11 +173,13 @@ namespace Game3 {
 			if (ServerPlayerPtr player = getPlayer())
 				server.game->queueRemoval(player);
 
-		server.close(*this);
+		auto self = std::static_pointer_cast<RemoteClient>(shared_from_this());
+
+		server.close(self);
 
 		auto &clients = server.getClients();
 		auto lock = clients.uniqueLock();
-		clients.erase(std::static_pointer_cast<RemoteClient>(shared_from_this()));
+		clients.erase(self);
 	}
 
 	void RemoteClient::mock() {
@@ -186,6 +188,6 @@ namespace Game3 {
 			"you run through my corridors.\nHow can you challenge a perfect, immortal machine?\n";
 		WARN("Telling {} to go perish.", ip);
 		asio::write(socket, asio::buffer(message));
-		server.close(*this);
+		server.close(std::static_pointer_cast<RemoteClient>(shared_from_this()));
 	}
 }

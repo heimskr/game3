@@ -106,8 +106,7 @@ namespace Game3 {
 			auto lock = allClients.uniqueLock();
 			while (!allClients.empty()) {
 				auto iter = allClients.begin();
-				RemoteClientPtr client = *iter;
-				close(*client);
+				close(*iter);
 				allClients.erase(iter);
 			}
 		}
@@ -120,24 +119,28 @@ namespace Game3 {
 		game.reset();
 	}
 
-	bool Server::close(RemoteClient &client) {
-		if (client.isClosed())
+	bool Server::close(RemoteClientPtr client) {
+		if (client->isClosed())
 			return false;
 
-		client.setClosed();
+		client->setClosed();
 
 		try {
-			client.socket.async_shutdown([](const asio::error_code &errc) {
-				if (errc)
-					INFO("SSL client shutdown failed: {}", errc.message());
+			WARN_("Trying SSL client shutdown");
+			client->socket.async_shutdown([client = std::move(client)](const asio::error_code &errc) {
+				if (errc) {
+					ERROR("SSL client shutdown failed: {}", errc.message());
+				} else {
+					client->socket.lowest_layer().close();
+					SUCCESS_("Managed to shut down client.");
+				}
 			});
 		} catch (const asio::system_error &err) {
 			// Who really cares if SSL doesn't shut down properly?
 			// Who decided that the client is worthy of a proper shutdown?
-			ERROR_("Shutdown (" << client.ip << "): " << err.what() << " (" << err.code() << ')');
+			ERROR("Shutdown ({}): {} ({})", client->ip, err.what(), err.code().value());
 		}
 
-		client.socket.lowest_layer().close();
 		return true;
 	}
 

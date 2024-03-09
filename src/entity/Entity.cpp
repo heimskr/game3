@@ -157,6 +157,13 @@ namespace Game3 {
 	}
 
 	void Entity::tick(const TickArgs &args) {
+		if (!weakRealm.lock()) {
+			if (args.game->getSide() == Side::Server)
+				teleport(Position{32, 32}, args.game->getRealm(-1));
+			tryEnqueueTick();
+			return;
+		}
+
 		{
 			auto shared_lock = path.sharedLock();
 			if (!path.empty() && move(path.front())) {

@@ -63,7 +63,7 @@ namespace Game3 {
 		}
 
 		if (remaining != 0)
-			ERROR_("Player was still present in " << remaining << " visible set" << (remaining == 1? "!" : "s!"));
+			ERROR("Player was still present in {} visible set{}!", remaining, remaining == 1? "" : "s");
 
 		Entity::destroy();
 	}
