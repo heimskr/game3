@@ -24,6 +24,13 @@ void main() {
 	vec4 upper2 = texture(texture0, texCoordUpper2);
 	vec4 upper3 = texture(texture0, texCoordUpper3);
 
+	if (upper0.a == 0.0) {
+		if (upper1.a == 0.0 && upper2.a == 0.0 && upper3.a == 0.0)
+			discard;
+		else
+			upper0 = vec4(0.2, 0.2, 0.2, 1.0);
+	}
+
 	vec4 mix1 = alphaComposite(upper0, upper1);
 	vec4 mix2 = alphaComposite(mix1,   upper2);
 	vec4 mix3 = alphaComposite(mix2,   upper3);
