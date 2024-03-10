@@ -14,8 +14,8 @@ namespace Game3 {
 		std::string space;
 		std::string name;
 
-		constexpr Identifier() = default;
-		constexpr Identifier(const char *space_, const char *name_): space(space_), name(name_) {}
+		Identifier() = default;
+		Identifier(const char *space_, const char *name_): space(space_), name(name_) {}
 		Identifier(std::string_view);
 		Identifier(const char *);
 

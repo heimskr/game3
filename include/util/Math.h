@@ -3,6 +3,7 @@
 #include <bit>
 #include <cmath>
 #include <concepts>
+#include <cstdint>
 #include <type_traits>
 
 namespace Game3 {

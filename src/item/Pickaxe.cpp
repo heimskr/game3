@@ -12,10 +12,10 @@ namespace Game3 {
 		Tool(id_, std::move(name_), base_price, base_cooldown, max_durability, "base:attribute/pickaxe"_id) {}
 
 	bool Pickaxe::use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers, std::pair<float, float>) {
-		Realm &realm = *place.realm;
-		Tileset &tileset = realm.getTileset();
+		const RealmPtr realm = place.realm;
+		const Tileset &tileset = realm->getTileset();
 
-		if (auto tile = realm.tryTile(Layer::Terrain, place.position); tile && tileset.isInCategory(*tile, "base:category/farmable")) {
+		if (auto tile = realm->tryTile(Layer::Terrain, place.position); tile && tileset.isInCategory(*tile, "base:category/farmable")) {
 			{
 				InventoryPtr inventory = place.player->getInventory(0);
 				auto lock = inventory->uniqueLock();
@@ -35,8 +35,8 @@ namespace Game3 {
 	}
 
 	Identifier Pickaxe::findDirtTilename(const Place &place) {
-		RealmPtr realm = place.realm;
-		Tileset &tileset = realm->getTileset();
+		const RealmPtr realm = place.realm;
+		const Tileset &tileset = realm->getTileset();
 
 		for (const Direction direction: ALL_DIRECTIONS)
 			if (auto tilename = (place + direction).getName(Layer::Terrain); tilename && tileset.isInCategory(*tilename, "base:category/tillable"))

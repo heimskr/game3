@@ -421,6 +421,7 @@ namespace Game3 {
 		debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
 		game->initInteractionSets();
 		canvas->game = game;
+		settings.apply(*game);
 
 		for (auto &[widget, tab]: tabMap)
 			tab->reset(game);
