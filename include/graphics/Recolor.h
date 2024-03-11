@@ -29,7 +29,7 @@ namespace Game3 {
 			void update(const Canvas &);
 			void update(int width, int height);
 
-			void drawOnMap(const std::shared_ptr<Texture> &, const std::shared_ptr<Texture> &mask, const RenderOptions &, float hue);
+			void drawOnMap(const std::shared_ptr<Texture> &, const std::shared_ptr<Texture> &mask, const RenderOptions &, float hue, float saturation);
 
 			void reset();
 

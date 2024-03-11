@@ -10,6 +10,7 @@ uniform sampler2D mask;
 uniform vec4 spriteColor;
 uniform vec4 texturePosition;
 uniform float hue;
+uniform float saturation;
 
 // Copyright(c) 2021 Björn Ottosson
 //
@@ -270,8 +271,13 @@ void main() {
 
 	if (mask_alpha == 1.0 && color.a > 0.0) {
 		vec3 hsv = srgb_to_okhsv(color.rgb);
-		hsv.x = hue;
-		hsv.y = max(hsv.y, 1.0);
+
+		if (0.0 <= hue)
+			hsv.x = hue;
+
+		if (0.0 <= saturation)
+			hsv.y = saturation;
+
 		color.rgb = okhsv_to_srgb(hsv);
 	}
 }

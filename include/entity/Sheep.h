@@ -10,6 +10,7 @@ namespace Game3 {
 	class Sheep: public Animal {
 		public:
 			float hue{};
+			float saturation{};
 
 			static Identifier ID() { return {"base", "entity/sheep"}; }
 
@@ -27,6 +28,9 @@ namespace Game3 {
 
 			void render(const RendererContext &) override;
 			Identifier getMilk() const override { return {"base", "fluid/milk"}; }
+
+			void encode(Buffer &) override;
+			void decode(Buffer &) override;
 
 			std::vector<ItemStackPtr> getDrops() override {
 				std::vector<ItemStackPtr> out = Animal::getDrops();
