@@ -34,7 +34,8 @@ namespace Game3 {
 			void encode(Buffer &) const final;
 			void decode(Buffer &) final;
 
-			inline operator float() const { return value; }
+			explicit inline operator float() const { return value; }
+			inline auto getValue() const { return value; }
 
 		private:
 			float minimum{};
@@ -58,7 +59,8 @@ namespace Game3 {
 			void encode(Buffer &) const final;
 			void decode(Buffer &) final;
 
-			inline operator ValueType() const { return value; }
+			explicit inline operator ValueType() const { return value; }
+			inline auto getValue() const { return value; }
 
 		private:
 			ValueType minimum{};

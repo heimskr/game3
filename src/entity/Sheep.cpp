@@ -10,7 +10,10 @@
 namespace Game3 {
 	Sheep::Sheep():
 		Entity(ID()),
-		Animal() {}
+		Animal(),
+		hue(0.f, 1.f, threadContext.random(0.f, 1.f)),
+		saturation(0.f, 1.f, sample()),
+		valueMultiplier(.1f, 1.f, sample()) {}
 
 	void Sheep::render(const RendererContext &renderers) {
 		if (texture == nullptr || !isVisible())
@@ -112,7 +115,7 @@ namespace Game3 {
 	void Sheep::renderBody(const RendererContext &renderers, const RenderOptions &options) {
 		if (!mask)
 			mask = getGame()->registry<TextureRegistry>().at("base:texture/sheep_mask");
-		renderers.recolor.drawOnMap(texture, mask, options, hue, saturation, valueMultiplier);
+		renderers.recolor.drawOnMap(texture, mask, options, hue.getValue(), saturation.getValue(), valueMultiplier.getValue());
 	}
 
 	void Sheep::encode(Buffer &buffer) {

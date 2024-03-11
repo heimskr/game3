@@ -1,20 +1,20 @@
-#include "types/Position.h"
-#include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
+#include "graphics/Tileset.h"
 #include "item/VoidFlask.h"
 #include "realm/Realm.h"
+#include "types/Position.h"
 
 namespace Game3 {
 	bool VoidFlask::use(Slot, const ItemStackPtr &, const Place &place, Modifiers, std::pair<float, float>) {
-		auto &realm  = *place.realm;
-		assert(realm.getSide() == Side::Server);
+		RealmPtr realm = place.realm;
+		assert(realm->getSide() == Side::Server);
 
-		if (std::optional<FluidTile> tile = realm.tryFluid(place.position); tile && 0 < tile->level) {
+		if (std::optional<FluidTile> tile = realm->tryFluid(place.position); tile && 0 < tile->level) {
 			tile->level = 0;
-			realm.setFluid(place.position, *tile);
+			realm->setFluid(place.position, *tile);
 			return true;
 		}
 

@@ -27,10 +27,11 @@ namespace Game3 {
 		explicit operator uint8_t() const;
 		explicit operator std::string() const;
 
-		inline bool onlyShift() const { return shift && !ctrl && !alt && !super; }
-		inline bool onlyCtrl()  const { return !shift && ctrl && !alt && !super; }
-		inline bool onlyAlt()   const { return !shift && !ctrl && alt && !super; }
-		inline bool onlySuper() const { return !shift && !ctrl && !alt && super; }
+		inline bool onlyShift() const { return  shift && !ctrl && !alt && !super; }
+		inline bool onlyCtrl()  const { return !shift &&  ctrl && !alt && !super; }
+		inline bool onlyAlt()   const { return !shift && !ctrl &&  alt && !super; }
+		inline bool onlySuper() const { return !shift && !ctrl && !alt &&  super; }
+		inline bool empty()     const { return !shift && !ctrl && !alt && !super; }
 
 		Modifiers operator|(Modifiers) const;
 		bool operator==(Modifiers) const;

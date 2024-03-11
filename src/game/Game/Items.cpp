@@ -28,6 +28,7 @@
 #include "item/Landfill.h"
 #include "item/Mead.h"
 #include "item/MeleeWeapon.h"
+#include "item/Mutagen.h"
 #include "item/Mushroom.h"
 #include "item/Pickaxe.h"
 #include "item/PipeItem.h"
@@ -194,6 +195,8 @@ namespace Game3 {
 		add(std::make_shared<MeleeWeapon>("base:item/gold_sword",    "Iron Sword",    400, 8, 3,  64));
 		add(std::make_shared<MeleeWeapon>("base:item/diamond_sword", "Diamond Sword", 900, 6, 2, 256));
 		add(std::make_shared<MeleeWeapon>("base:item/copper_sword",  "Copper Sword",   32, 6, 2, 256));
+
+		add(std::make_shared<Mutagen>("base:item/mutagen", "Mutagen", 999, 1)); // TODO: cost
 
 		add(std::make_shared<Pickaxe>("base:item/iron_pickaxe",    "Iron Pickaxe",      40,  3.f,  64));
 		add(std::make_shared<Pickaxe>("base:item/gold_pickaxe",    "Gold Pickaxe",     100, .75f,  64));

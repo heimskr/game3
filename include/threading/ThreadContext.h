@@ -45,8 +45,9 @@ namespace Game3 {
 				return std::uniform_int_distribution(min, max)(rng);
 			}
 
+			template <std::floating_point T>
 			/** [min, max) */
-			double random(double min, double max) {
+			T random(T min, T max) {
 				return std::uniform_real_distribution(min, max)(rng);
 			}
 

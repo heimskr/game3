@@ -104,6 +104,7 @@ namespace Game3 {
 	}
 
 	Buffer & operator+=(Buffer &buffer, const FloatGene &gene) {
+		buffer.appendType(gene);
 		gene.encode(buffer);
 		return buffer;
 	}
@@ -128,6 +129,7 @@ namespace Game3 {
 	}
 
 	Buffer & operator+=(Buffer &buffer, const LongGene &gene) {
+		buffer.appendType(gene);
 		gene.encode(buffer);
 		return buffer;
 	}

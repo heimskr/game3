@@ -10,9 +10,9 @@ namespace Game3 {
 
 	class Sheep: public Animal {
 		public:
-			FloatGene hue{0.f, 1.f, sample()};
-			FloatGene saturation{0.f, 1.f, sample()};
-			FloatGene valueMultiplier{.1f, 1.f, sample()};
+			FloatGene hue;
+			FloatGene saturation;
+			FloatGene valueMultiplier;
 
 			static Identifier ID() { return {"base", "entity/sheep"}; }
 
