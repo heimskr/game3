@@ -4,9 +4,13 @@
 
 namespace Game3 {
 	class Building;
+	class Recolor;
+	class RenderOptions;
 
 	class Sheep: public Animal {
 		public:
+			float hue{};
+
 			static Identifier ID() { return {"base", "entity/sheep"}; }
 
 			static std::shared_ptr<Sheep> create(const std::shared_ptr<Game> &) {
@@ -21,6 +25,7 @@ namespace Game3 {
 
 			std::string getName() const override { return "Sheep"; }
 
+			void render(const RendererContext &) override;
 			Identifier getMilk() const override { return {"base", "fluid/milk"}; }
 
 			std::vector<ItemStackPtr> getDrops() override {
@@ -32,7 +37,11 @@ namespace Game3 {
 			friend class Entity;
 
 		protected:
-			Sheep():
-				Entity(ID()), Animal() {}
+			Sheep();
+
+		private:
+			std::shared_ptr<Texture> mask;
+
+			void renderBody(const RendererContext &, const RenderOptions &);
 	};
 }

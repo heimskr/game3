@@ -5,14 +5,14 @@ namespace Game3 {
 	Dest convertColor(const Src &);
 
 	template <typename T>
-	struct Color {
+	struct BaseColor {
 		template <typename U>
 		U convert() {
-			return convertColor<U>(*this);
+			return convertColor<T, U>(static_cast<const T &>(*this));
 		}
 	};
 
-	struct OKHsv: Color<OKHsv> {
+	struct OKHsv: BaseColor<OKHsv> {
 		float h{};
 		float s{};
 		float v{};
@@ -21,7 +21,7 @@ namespace Game3 {
 			h(h_), s(s_), v(v_) {}
 	};
 
-	struct RGB: Color<RGB> {
+	struct RGB: BaseColor<RGB> {
 		float r{};
 		float g{};
 		float b{};

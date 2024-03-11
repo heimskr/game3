@@ -14,6 +14,7 @@
 #include "graphics/Multiplier.h"
 #include "graphics/Overlayer.h"
 #include "graphics/RectangleRenderer.h"
+#include "graphics/Recolor.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/TextRenderer.h"
 
@@ -36,6 +37,7 @@ namespace Game3 {
 			TextRenderer textRenderer{*this};
 			RectangleRenderer rectangleRenderer{*this};
 			CircleRenderer circleRenderer{*this};
+			Recolor recolor{*this};
 			GL::Texture mainTexture;
 			GL::Texture staticLightingTexture;
 			GL::Texture dynamicLightingTexture;

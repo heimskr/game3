@@ -28,7 +28,8 @@
 			"base:texture/chicken":     ["resources/animals/chicken.png"],
 			"base:texture/dog":         ["resources/animals/dog.png"],
 			"base:texture/flasks":      ["resources/flasks.png"],
-			"base:texture/ship":        ["resources/ship.png"]
+			"base:texture/ship":        ["resources/ship.png"],
+			"base:texture/sheep_mask":  ["resources/animals/sheep_mask.png"]
 		}]
 	]
 }

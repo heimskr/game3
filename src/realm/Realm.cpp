@@ -221,7 +221,7 @@ namespace Game3 {
 		PlayerPtr player = game.getPlayer();
 		assert(player);
 
-		auto &[rectangle_renderer, single_sprite, batch_sprite, text_renderer, circle_renderer, settings, factor] = renderers;
+		auto &[rectangle_renderer, single_sprite, batch_sprite, text_renderer, circle_renderer, recolor, settings, factor] = renderers;
 
 		float effective_time = outdoors? game_time : 1;
 

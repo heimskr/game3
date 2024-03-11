@@ -29,6 +29,7 @@ namespace Game3 {
 		game->activateContext();
 		batchSpriteRenderer.update(*this);
 		singleSpriteRenderer.update(*this);
+		recolor.update(*this);
 		textRenderer.update(*this);
 		rectangleRenderer.update(width, height);
 		textRenderer.update(width, height);
@@ -105,6 +106,7 @@ namespace Game3 {
 				mainTexture.useInFB();
 				batchSpriteRenderer.update(*this);
 				singleSpriteRenderer.update(*this);
+				recolor.update(*this);
 				textRenderer.update(*this);
 				context.updateSize(getWidth(), getHeight());
 				glViewport(0, 0, width, height); CHECKGL
@@ -158,6 +160,7 @@ namespace Game3 {
 			if (realm->prerender()) {
 				batchSpriteRenderer.update(*this);
 				singleSpriteRenderer.update(*this);
+				recolor.update(*this);
 				textRenderer.update(*this);
 				context.updateSize(width, height);
 			}
@@ -188,6 +191,6 @@ namespace Game3 {
 	}
 
 	RendererContext Canvas::getRendererContext() {
-		return {rectangleRenderer, singleSpriteRenderer, batchSpriteRenderer, textRenderer, circleRenderer, window.settings, getFactor()};
+		return {rectangleRenderer, singleSpriteRenderer, batchSpriteRenderer, textRenderer, circleRenderer, recolor, window.settings, getFactor()};
 	}
 }

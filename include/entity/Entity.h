@@ -230,6 +230,17 @@ namespace Game3 {
 			Tick enqueueTick() override;
 
 		protected:
+			struct Held {
+				Slot slot = -1;
+				bool isLeft;
+				float offsetX = 0.f;
+				float offsetY = 0.f;
+				std::shared_ptr<Texture> texture;
+				Held() = delete;
+				Held(bool is_left): isLeft(is_left) {}
+				inline explicit operator bool() const { return texture != nullptr; }
+			};
+
 			mutable std::weak_ptr<Game> weakGame;
 			LockableSharedPtr<Texture> texture;
 			int variety = 0;
@@ -238,6 +249,8 @@ namespace Game3 {
 			Atomic<MoneyCount> money = 0;
 			Atomic<std::weak_ptr<Entity>> weakRider;
 			Atomic<std::weak_ptr<Entity>> weakRidden;
+			Held heldLeft {true};
+			Held heldRight{false};
 
 			Entity() = delete;
 			Entity(EntityType);
@@ -254,21 +267,9 @@ namespace Game3 {
 			std::function<void(const TickArgs &)> getTickFunction();
 
 		private:
-			struct Held {
-				Slot slot = -1;
-				bool isLeft;
-				float offsetX = 0.f;
-				float offsetY = 0.f;
-				std::shared_ptr<Texture> texture;
-				Held() = delete;
-				Held(bool is_left): isLeft(is_left) {}
-				inline explicit operator bool() const { return texture != nullptr; }
-			};
 
 			Atomic<GlobalID> otherEntityToLock = -1;
 
-			Held heldLeft {true};
-			Held heldRight{false};
 			/** The set of all players who have been sent a packet about the entity's current path. Governed by pathSeersMutex */
 			Lockable<WeakSet<Player>> pathSeers;
 

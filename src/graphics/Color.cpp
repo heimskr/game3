@@ -139,7 +139,7 @@ namespace Game3 {
 			const float L_cusp = cbrtf(1.f / std::max({rgb_at_max.r, rgb_at_max.g, rgb_at_max.b}));
 			const float C_cusp = L_cusp * S_cusp;
 
-			return {L_cusp , C_cusp};
+			return {L_cusp, C_cusp};
 		}
 
 		ST to_ST(LC cusp) {
