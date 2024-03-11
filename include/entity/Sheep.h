@@ -11,6 +11,7 @@ namespace Game3 {
 		public:
 			float hue{};
 			float saturation{};
+			float valueMultiplier{};
 
 			static Identifier ID() { return {"base", "entity/sheep"}; }
 

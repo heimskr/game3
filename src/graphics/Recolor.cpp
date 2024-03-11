@@ -79,7 +79,7 @@ namespace Game3 {
 		}
 	}
 
-	void Recolor::drawOnMap(const std::shared_ptr<Texture> &texture, const std::shared_ptr<Texture> &mask, const RenderOptions &options, float hue, float saturation) {
+	void Recolor::drawOnMap(const std::shared_ptr<Texture> &texture, const std::shared_ptr<Texture> &mask, const RenderOptions &options, float hue, float saturation, float value_multiplier) {
 		if (!initialized)
 			return;
 
@@ -131,6 +131,7 @@ namespace Game3 {
 		shader.set("texturePosition", options.offsetX * multiplier_x, options.offsetY * multiplier_y, size_x / texture->width, size_y / texture->width);
 		shader.set("hue", hue);
 		shader.set("saturation", saturation);
+		shader.set("valueMultiplier", value_multiplier);
 
 		texture->bind(0);
 		mask->bind(1);

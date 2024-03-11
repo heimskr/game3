@@ -11,6 +11,7 @@ uniform vec4 spriteColor;
 uniform vec4 texturePosition;
 uniform float hue;
 uniform float saturation;
+uniform float valueMultiplier;
 
 // Copyright(c) 2021 Björn Ottosson
 //
@@ -277,6 +278,9 @@ void main() {
 
 		if (0.0 <= saturation)
 			hsv.y = saturation;
+
+		if (0.0 <= valueMultiplier)
+			hsv.z *= valueMultiplier;
 
 		color.rgb = okhsv_to_srgb(hsv);
 	}
