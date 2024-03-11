@@ -20,26 +20,6 @@ namespace Game3 {
 		throw std::invalid_argument(std::format("Unknown gene type: \"{}\"", type));
 	}
 
-	std::unique_ptr<Gene> Gene::fromBuffer(Buffer &buffer) {
-		GeneType type = buffer.take<GeneType>();
-		switch (type) {
-			case GeneType::Float: {
-				auto gene = std::make_unique<FloatGene>();
-				gene->decode(buffer);
-				return gene;
-			}
-
-			case GeneType::Long: {
-				auto gene = std::make_unique<FloatGene>();
-				gene->decode(buffer);
-				return gene;
-			}
-
-			default:
-				throw std::invalid_argument(std::format("Unknown gene type: {}", int(type)));
-		}
-	}
-
 	FloatGene::FloatGene(float minimum_, float maximum_, float value_):
 		minimum(minimum_), maximum(maximum_), value(clamp(value_)) {}
 
@@ -61,18 +41,16 @@ namespace Game3 {
 		value = clamp(value + normal * strength / base);
 	}
 
-	void FloatGene::encode(Buffer &buffer) {
-		buffer << GeneType::Float;
-		buffer << value;
+	void FloatGene::encode(Buffer &buffer) const {
 		buffer << minimum;
 		buffer << maximum;
+		buffer << value;
 	}
 
 	void FloatGene::decode(Buffer &buffer) {
-		// It's assumed that the type byte has already been removed.
-		buffer >> value;
 		buffer >> minimum;
 		buffer >> maximum;
+		buffer >> value;
 	}
 
 	float FloatGene::clamp(float f) const {
@@ -98,21 +76,18 @@ namespace Game3 {
 		const float stddev = strength / 6.f;
 		const float normal = std::normal_distribution<float>(0.f, stddev)(threadContext.rng);
 		value = clamp(value + ValueType(normal * strength / base * (maximum - minimum) / 2.f));
-
 	}
 
-	void LongGene::encode(Buffer &buffer) {
-		buffer << GeneType::Long;
-		buffer << value;
+	void LongGene::encode(Buffer &buffer) const {
 		buffer << minimum;
 		buffer << maximum;
+		buffer << value;
 	}
 
 	void LongGene::decode(Buffer &buffer) {
-		// It's assumed that the type byte has already been removed.
-		buffer >> value;
 		buffer >> minimum;
 		buffer >> maximum;
+		buffer >> value;
 	}
 
 	auto LongGene::clamp(ValueType v) const -> ValueType {
@@ -141,7 +116,31 @@ namespace Game3 {
 		const auto type = buffer.popType();
 		if (!Buffer::typesMatch(type, buffer.getType(gene))) {
 			buffer.debug();
-			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected shortlist<i32, 2> for Vector2i)");
+			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected e5 for FloatGene)");
+		}
+		gene.decode(buffer);
+		return buffer;
+	}
+
+	template <>
+	std::string Buffer::getType(const LongGene &) {
+		return std::string{'\xe6'};
+	}
+
+	Buffer & operator+=(Buffer &buffer, const LongGene &gene) {
+		gene.encode(buffer);
+		return buffer;
+	}
+
+	Buffer & operator<<(Buffer &buffer, const LongGene &gene) {
+		return buffer += gene;
+	}
+
+	Buffer & operator>>(Buffer &buffer, LongGene &gene) {
+		const auto type = buffer.popType();
+		if (!Buffer::typesMatch(type, buffer.getType(gene))) {
+			buffer.debug();
+			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected e6 for LongGene)");
 		}
 		gene.decode(buffer);
 		return buffer;

@@ -12,7 +12,6 @@ namespace Game3 {
 	class Gene {
 		public:
 			static std::unique_ptr<Gene> fromJSON(const nlohmann::json &);
-			static std::unique_ptr<Gene> fromBuffer(Buffer &);
 
 			Gene() = default;
 
@@ -34,6 +33,8 @@ namespace Game3 {
 			void mutate(float strength) final;
 			void encode(Buffer &) const final;
 			void decode(Buffer &) final;
+
+			inline operator float() const { return value; }
 
 		private:
 			float minimum{};
@@ -57,6 +58,8 @@ namespace Game3 {
 			void encode(Buffer &) const final;
 			void decode(Buffer &) final;
 
+			inline operator ValueType() const { return value; }
+
 		private:
 			ValueType minimum{};
 			ValueType maximum{};
@@ -64,6 +67,15 @@ namespace Game3 {
 
 			ValueType clamp(ValueType) const;
 	};
+
+
+	Buffer & operator+=(Buffer &, const FloatGene &);
+	Buffer & operator<<(Buffer &, const FloatGene &);
+	Buffer & operator>>(Buffer &, FloatGene &);
+
+	Buffer & operator+=(Buffer &, const LongGene &);
+	Buffer & operator<<(Buffer &, const LongGene &);
+	Buffer & operator>>(Buffer &, LongGene &);
 
 	void to_json(nlohmann::json &, const Gene &);
 }
