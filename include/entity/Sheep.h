@@ -1,5 +1,6 @@
 #pragma once
 
+#include "biology/Gene.h"
 #include "entity/Animal.h"
 
 namespace Game3 {
@@ -9,9 +10,9 @@ namespace Game3 {
 
 	class Sheep: public Animal {
 		public:
-			float hue{};
-			float saturation{};
-			float valueMultiplier{};
+			FloatGene hue{0.f, 1.f, sample()};
+			FloatGene saturation{0.f, 1.f, sample()};
+			FloatGene valueMultiplier{.1f, 1.f, sample()};
 
 			static Identifier ID() { return {"base", "entity/sheep"}; }
 
@@ -48,5 +49,6 @@ namespace Game3 {
 			std::shared_ptr<Texture> mask;
 
 			void renderBody(const RendererContext &, const RenderOptions &);
+			static float sample();
 	};
 }

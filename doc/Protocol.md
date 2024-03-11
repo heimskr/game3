@@ -459,6 +459,8 @@ All values are little endian. Strings are not null-terminated.
 | `0xe2`                           | FluidStack                   |
 | `0xe3`                           | ItemFilter                   |
 | `0xe4`                           | ItemFilter::Config           |
+| `0xe5`                           | FloatGene                    |
+| `0xe6`                           | LongGene                     |
 
 Note that string types are always encoded as `0x1f` when used as a subtype of a list or a map, and optional types are always encoded as `0x0b` followed by the subtype in the same scenario.
 
@@ -510,6 +512,18 @@ To send a map, send `0x21`, followed by the type encoding of the key type, follo
 - `string` Item data JSON
 - `u8` Comparator (none = 0, less = 1, greater = 2)
 - `u64` Item count (for comparisons)
+
+### FloatGene (`0xe5`)
+
+- `f32` Minimum value
+- `f32` Maximum value
+- `f32` Current value
+
+### LongGene (`0xe6`)
+
+- `i64` Minimum value
+- `i64` Maximum value
+- `i64` Current value
 
 # Examples
 

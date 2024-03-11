@@ -10,10 +10,7 @@
 namespace Game3 {
 	Sheep::Sheep():
 		Entity(ID()),
-		Animal(),
-		hue(std::uniform_real_distribution(0.f, 1.f)(threadContext.rng)),
-		saturation(std::uniform_real_distribution(0.f, 1.f)(threadContext.rng)),
-		valueMultiplier(std::uniform_real_distribution(.1f, 1.f)(threadContext.rng)) {}
+		Animal() {}
 
 	void Sheep::render(const RendererContext &renderers) {
 		if (texture == nullptr || !isVisible())
@@ -115,12 +112,6 @@ namespace Game3 {
 	void Sheep::renderBody(const RendererContext &renderers, const RenderOptions &options) {
 		if (!mask)
 			mask = getGame()->registry<TextureRegistry>().at("base:texture/sheep_mask");
-
-		// RenderOptions modified = options;
-		// auto [r, g, b] = OKHsv{hue, 1.0, 1.0}.convert<RGB>();
-		// modified.color = Color{r, g, b, 1.0};
-		// renderers.batchSprite(texture, modified);
-
 		renderers.recolor.drawOnMap(texture, mask, options, hue, saturation, valueMultiplier);
 	}
 
@@ -137,4 +128,8 @@ namespace Game3 {
 		buffer >> saturation;
 		buffer >> valueMultiplier;
 	}
+
+	float Sheep::sample() {
+		return std::min(1.f, std::max(0.f, std::normal_distribution<float>{.75f, .75f / 3.f}(threadContext.rng)));
+	};
 }
