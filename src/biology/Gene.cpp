@@ -17,6 +17,9 @@ namespace Game3 {
 		if (type == "long")
 			return std::make_unique<LongGene>(LongGene::fromJSON(json));
 
+		if (type == "circular")
+			return std::make_unique<CircularGene>(CircularGene::fromJSON(json));
+
 		throw std::invalid_argument(std::format("Unknown gene type: \"{}\"", type));
 	}
 
@@ -94,6 +97,45 @@ namespace Game3 {
 		return std::min(maximum, std::max(minimum, v));
 	}
 
+	CircularGene::CircularGene(float value_):
+		value(clamp(value_)) {}
+
+	CircularGene CircularGene::fromJSON(const nlohmann::json &json) {
+		return CircularGene(json.at("value"));
+	}
+
+	void CircularGene::toJSON(nlohmann::json &json) const {
+		json["type"] = "circular";
+		json["value"] = value;
+	}
+
+	void CircularGene::mutate(float strength) {
+		const static float base = 1.f / std::sqrt(2.f * M_PIf);
+		const float stddev = strength / 6.f;
+		const float normal = std::normal_distribution<float>(0.f, stddev)(threadContext.rng);
+		value = clamp(value + normal * strength / base);
+	}
+
+	void CircularGene::encode(Buffer &buffer) const {
+		buffer << value;
+	}
+
+	void CircularGene::decode(Buffer &buffer) {
+		buffer >> value;
+	}
+
+	float CircularGene::clamp(float f) const {
+		const float mod = std::fmod(f, 1.f);
+
+		if (f < 0.f) {
+			if (mod == 0.f)
+				return 0.f;
+			return 1.f + mod;
+		}
+
+		return mod;
+	}
+
 	void to_json(nlohmann::json &json, const Gene &gene) {
 		gene.toJSON(json);
 	}
@@ -143,6 +185,31 @@ namespace Game3 {
 		if (!Buffer::typesMatch(type, buffer.getType(gene))) {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected e6 for LongGene)");
+		}
+		gene.decode(buffer);
+		return buffer;
+	}
+
+	template <>
+	std::string Buffer::getType(const CircularGene &) {
+		return std::string{'\xe7'};
+	}
+
+	Buffer & operator+=(Buffer &buffer, const CircularGene &gene) {
+		buffer.appendType(gene);
+		gene.encode(buffer);
+		return buffer;
+	}
+
+	Buffer & operator<<(Buffer &buffer, const CircularGene &gene) {
+		return buffer += gene;
+	}
+
+	Buffer & operator>>(Buffer &buffer, CircularGene &gene) {
+		const auto type = buffer.popType();
+		if (!Buffer::typesMatch(type, buffer.getType(gene))) {
+			buffer.debug();
+			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected e7 for CircularGene)");
 		}
 		gene.decode(buffer);
 		return buffer;

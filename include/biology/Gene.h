@@ -7,8 +7,6 @@
 namespace Game3 {
 	class Buffer;
 
-	enum class GeneType: uint8_t {Invalid = 0, Float, Long};
-
 	class Gene {
 		public:
 			static std::unique_ptr<Gene> fromJSON(const nlohmann::json &);
@@ -70,6 +68,27 @@ namespace Game3 {
 			ValueType clamp(ValueType) const;
 	};
 
+	class CircularGene: public Gene {
+		public:
+			static CircularGene fromJSON(const nlohmann::json &);
+
+			CircularGene() = default;
+			CircularGene(float value_);
+
+			void toJSON(nlohmann::json &) const final;
+			void mutate(float strength) final;
+			void encode(Buffer &) const final;
+			void decode(Buffer &) final;
+
+			explicit inline operator float() const { return value; }
+			inline auto getValue() const { return value; }
+
+		private:
+			float value{};
+
+			float clamp(float) const;
+	};
+
 
 	Buffer & operator+=(Buffer &, const FloatGene &);
 	Buffer & operator<<(Buffer &, const FloatGene &);
@@ -78,6 +97,10 @@ namespace Game3 {
 	Buffer & operator+=(Buffer &, const LongGene &);
 	Buffer & operator<<(Buffer &, const LongGene &);
 	Buffer & operator>>(Buffer &, LongGene &);
+
+	Buffer & operator+=(Buffer &, const CircularGene &);
+	Buffer & operator<<(Buffer &, const CircularGene &);
+	Buffer & operator>>(Buffer &, CircularGene &);
 
 	void to_json(nlohmann::json &, const Gene &);
 }

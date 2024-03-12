@@ -10,7 +10,7 @@ namespace Game3 {
 
 	class Sheep: public Animal {
 		public:
-			FloatGene hue;
+			CircularGene hue;
 			FloatGene saturation;
 			FloatGene valueMultiplier;
 

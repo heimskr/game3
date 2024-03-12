@@ -11,7 +11,7 @@ namespace Game3 {
 	Sheep::Sheep():
 		Entity(ID()),
 		Animal(),
-		hue(0.f, 1.f, threadContext.random(0.f, 1.f)),
+		hue(threadContext.random(0.f, 1.f)),
 		saturation(0.f, 1.f, sample()),
 		valueMultiplier(.1f, 1.f, sample()) {}
 
