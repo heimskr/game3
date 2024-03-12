@@ -17,6 +17,8 @@
 
 #include <sys/mman.h>
 
+// #define REDIRECT_LOGS
+
 namespace Game3 {
 	namespace {
 		std::filesystem::path KEY_PATH{"localserver.key"};
@@ -61,7 +63,9 @@ namespace Game3 {
 			throw std::runtime_error("Couldn't register SIGPIPE handler");
 
 		logDataPipe.emplace();
+#ifdef REDIRECT_LOGS
 		logFDWrapper.init(logDataPipe->writeEnd(), {STDOUT_FILENO, STDERR_FILENO});
+#endif
 
 		port = 12255;
 		running = true;
@@ -145,15 +149,15 @@ namespace Game3 {
 		} else {
 			RealmPtr realm = Realm::create<Overworld>(game, 1, Overworld::ID(), "base:tileset/monomap", overworld_seed);
 			realm->outdoors = true;
-			WorldGen::generateOverworld(realm, overworld_seed, {}, {{-1, -1}, {1, 1}}, true);
 			game->addRealm(realm->id, realm);
+			WorldGen::generateOverworld(realm, overworld_seed, {}, {{-1, -1}, {1, 1}}, true);
 		}
 
 		if (!game->hasRealm(-1)) {
 			RealmPtr shadow = Realm::create<ShadowRealm>(game, -1, ShadowRealm::ID(), "base:tileset/monomap", overworld_seed);
 			shadow->outdoors = false;
-			WorldGen::generateShadowRealm(shadow, overworld_seed, {}, {{-1, -1}, {1, 1}}, true);
 			game->addRealm(shadow->id, shadow);
+			WorldGen::generateShadowRealm(shadow, overworld_seed, {}, {{-1, -1}, {1, 1}}, true);
 		}
 
 		game->initEntities();

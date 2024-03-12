@@ -299,15 +299,15 @@ namespace Game3 {
 		} else {
 			RealmPtr realm = Realm::create<Overworld>(game, 1, Overworld::ID(), "base:tileset/monomap", seed);
 			realm->outdoors = true;
-			WorldGen::generateOverworld(realm, seed, {}, {{-1, -1}, {1, 1}}, true);
 			game->addRealm(realm->id, realm);
+			WorldGen::generateOverworld(realm, seed, {}, {{-1, -1}, {1, 1}}, true);
 		}
 
 		if (!game->hasRealm(-1)) {
 			RealmPtr shadow = Realm::create<ShadowRealm>(game, -1, ShadowRealm::ID(), "base:tileset/monomap", seed);
 			shadow->outdoors = false;
-			WorldGen::generateShadowRealm(shadow, seed, {}, {{-1, -1}, {1, 1}}, true);
 			game->addRealm(shadow->id, shadow);
+			WorldGen::generateShadowRealm(shadow, seed, {}, {{-1, -1}, {1, 1}}, true);
 		}
 
 		game->initEntities();
