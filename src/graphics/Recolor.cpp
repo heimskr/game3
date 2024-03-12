@@ -132,6 +132,8 @@ namespace Game3 {
 		shader.set("hue", hue);
 		shader.set("saturation", saturation);
 		shader.set("valueMultiplier", value_multiplier);
+		shader.set("sprite", 0);
+		shader.set("mask", 1);
 
 		texture->bind(0);
 		mask->bind(1);
