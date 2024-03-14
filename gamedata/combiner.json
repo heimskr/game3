@@ -158,7 +158,8 @@
 			"base:item/ace_flag":         [1, "AcEs"],
 			"base:item/ash":              [1, "C", "Ca"],
 			"base:item/bleach":           [1, [4, "NaOCl"]],
-			"base:item/sulfuric_acid":    [1, [4, "H2SO4"]]
+			"base:item/sulfuric_acid":    [1, [4, "H2SO4"]],
+			"base:item/mutagen":          [1, [4, "C3H7N3O2"]]
 		}]
 	]
 }
