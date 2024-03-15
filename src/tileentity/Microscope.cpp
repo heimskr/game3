@@ -11,10 +11,6 @@
 #include "ui/module/MicroscopeModule.h"
 
 namespace Game3 {
-	namespace {
-		constexpr std::chrono::milliseconds PERIOD{100};
-	}
-
 	Microscope::Microscope(Identifier tile_id, Position position_):
 		TileEntity(std::move(tile_id), ID(), position_, true) {}
 

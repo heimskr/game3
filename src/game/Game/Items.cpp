@@ -28,7 +28,9 @@
 #include "item/Landfill.h"
 #include "item/Mead.h"
 #include "item/MeleeWeapon.h"
+#include "item/MicroscopeItem.h"
 #include "item/Mutagen.h"
+#include "item/MutatorItem.h"
 #include "item/Mushroom.h"
 #include "item/Pickaxe.h"
 #include "item/PipeItem.h"
@@ -198,7 +200,11 @@ namespace Game3 {
 		add(std::make_shared<MeleeWeapon>("base:item/diamond_sword", "Diamond Sword", 900, 6, 2, 256));
 		add(std::make_shared<MeleeWeapon>("base:item/copper_sword",  "Copper Sword",   32, 6, 2, 256));
 
-		add(std::make_shared<Mutagen>("base:item/mutagen", "Mutagen", 999, 1)); // TODO: cost
+		add(std::make_shared<MicroscopeItem>("base:item/microscope", "Microscope", 999, 64)); // TODO: cost
+
+		add(std::make_shared<Mutagen>("base:item/mutagen", "Mutagen", 999, 64)); // TODO: cost
+
+		add(std::make_shared<MutatorItem>("base:item/mutator", "Mutator", 999, 64)); // TODO: cost
 
 		add(std::make_shared<Pickaxe>("base:item/iron_pickaxe",    "Iron Pickaxe",      40,  3.f,  64));
 		add(std::make_shared<Pickaxe>("base:item/gold_pickaxe",    "Gold Pickaxe",     100, .75f,  64));
@@ -313,10 +319,6 @@ namespace Game3 {
 				return false;
 			out->setInventory(15);
 			return true;
-		}));
-
-		add(Furniture::createTileEntity("base:item/microscope", "Microscope", 999, [](const Place &place) -> bool { // TODO: cost
-			return bool(TileEntity::spawn<Microscope>(place, "base:tile/microscope", place.position));
 		}));
 
 		for (int i = 1; i <= 5; ++i) {

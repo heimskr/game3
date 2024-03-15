@@ -40,6 +40,12 @@
 				"tileset":  "base:tileset/monomap",
 				"tilename": "base:tile/honey",
 				"flask":    "base:item/honey"
+			}],
+			["base:fluid/mutagen", {
+				"name":     "Mutagen",
+				"tileset":  "base:tileset/monomap",
+				"tilename": "base:tile/mutagen",
+				"flask":    "base:item/mutagen"
 			}]
 		]]
 	]

@@ -25,6 +25,6 @@ namespace Game3 {
 			Microscope(Identifier tile_id, Position);
 			Microscope(Position);
 
-			friend class TileEntity;
+		friend class TileEntity;
 	};
 }
