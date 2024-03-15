@@ -88,7 +88,9 @@ namespace Game3 {
 			return Buffer{reactor->getGID()};
 
 		} else {
+
 			return inventoryModule->handleMessage(source, name, data);
+
 		}
 
 		return {};

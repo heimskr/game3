@@ -43,6 +43,7 @@
 #include "tileentity/Chest.h"
 #include "tileentity/CraftingStation.h"
 #include "tileentity/Crate.h"
+#include "tileentity/Microscope.h"
 
 namespace Game3 {
 	void Game::addItems() {
@@ -312,6 +313,10 @@ namespace Game3 {
 				return false;
 			out->setInventory(15);
 			return true;
+		}));
+
+		add(Furniture::createTileEntity("base:item/microscope", "Microscope", 999, [](const Place &place) -> bool { // TODO: cost
+			return bool(TileEntity::spawn<Microscope>(place, "base:tile/microscope", place.position));
 		}));
 
 		for (int i = 1; i <= 5; ++i) {

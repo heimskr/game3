@@ -48,6 +48,10 @@ namespace Game3 {
 		value = clamp(value + normal * strength / base);
 	}
 
+	std::string FloatGene::describe() const {
+		return std::format("{} (float; minimum: {}, maximum: {})", name, minimum, maximum);
+	}
+
 	void FloatGene::encode(Buffer &buffer) const {
 		buffer << name;
 		buffer << minimum;
@@ -88,6 +92,10 @@ namespace Game3 {
 		value = clamp(value + ValueType(normal * strength / base * (maximum - minimum) / 2.f));
 	}
 
+	std::string LongGene::describe() const {
+		return std::format("{} (long; minimum: {}, maximum: {})", name, minimum, maximum);
+	}
+
 	void LongGene::encode(Buffer &buffer) const {
 		buffer << name;
 		buffer << minimum;
@@ -124,6 +132,10 @@ namespace Game3 {
 		const float stddev = strength / 6.f;
 		const float normal = std::normal_distribution<float>(0.f, stddev)(threadContext.rng);
 		value = clamp(value + normal * strength / base);
+	}
+
+	std::string CircularGene::describe() const {
+		return std::format("{} (circular)", name);
 	}
 
 	void CircularGene::encode(Buffer &buffer) const {

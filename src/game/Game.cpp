@@ -13,6 +13,7 @@
 #include "ui/module/EnergyLevelModule.h"
 #include "ui/module/FluidLevelsModule.h"
 #include "ui/module/ItemFilterModule.h"
+#include "ui/module/MicroscopeModule.h"
 #include "ui/module/ModuleFactory.h"
 #include "ui/module/VillageTradeModule.h"
 #include "algorithm/AStar.h"
@@ -46,6 +47,7 @@ namespace Game3 {
 		add(ModuleFactory::create<CombinerModule>());
 		add(ModuleFactory::create<AutocrafterModule>());
 		add(ModuleFactory::create<VillageTradeModule>());
+		add(ModuleFactory::create<MicroscopeModule>());
 	}
 
 	void Game::initialSetup(const std::filesystem::path &dir) {

@@ -65,13 +65,12 @@ namespace Game3 {
 		if (type == "base:entity/player") {
 			game->toServer().releasePlayer(stack->data.at("containedUsername"), place);
 		} else {
-			const GlobalID new_gid = Agent::generateGID();
 			const std::shared_ptr<EntityFactory> &factory = game->registry<EntityFactoryRegistry>()[type];
 			EntityPtr entity = (*factory)(game, stack->data);
 			entity->spawning = true;
 			entity->setRealm(realm);
 			realm->queueEntityInit(std::move(entity), place.position);
-			INFO("Spawned entity of type {} with new GID {}", type, new_gid);
+			INFO("Spawned entity of type {}", type);
 		}
 		stack->data.clear();
 		player->getInventory(0)->notifyOwner();
@@ -86,5 +85,14 @@ namespace Game3 {
 
 	Identifier ContainmentOrb::getTextureIdentifier(const ConstItemStackPtr &stack) const {
 		return stack->data.empty()? "base:item/contorb" : "base:item/contorb_full";
+	}
+
+	EntityPtr ContainmentOrb::makeEntity(const ItemStackPtr &stack) {
+		GamePtr game = stack->getGame();
+		Identifier type = stack->data.at("containedEntity");
+		const std::shared_ptr<EntityFactory> &factory = game->registry<EntityFactoryRegistry>()[type];
+		EntityPtr entity = (*factory)(game, stack->data);
+		entity->spawning = true;
+		return entity;
 	}
 }

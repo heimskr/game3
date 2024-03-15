@@ -1,10 +1,10 @@
 #include <iostream>
 
-#include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/ServerInventory.h"
 #include "graphics/SpriteRenderer.h"
+#include "graphics/Tileset.h"
 #include "realm/Realm.h"
 #include "tileentity/Incinerator.h"
 

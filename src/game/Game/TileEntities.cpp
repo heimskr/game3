@@ -14,6 +14,7 @@
 #include "tileentity/GeothermalGenerator.h"
 #include "tileentity/Incinerator.h"
 #include "tileentity/ItemSpawner.h"
+#include "tileentity/Microscope.h"
 #include "tileentity/OreDeposit.h"
 #include "tileentity/Pipe.h"
 #include "tileentity/Pump.h"
@@ -46,6 +47,7 @@ namespace Game3 {
 		add(TileEntityFactory::create<GeothermalGenerator>());
 		add(TileEntityFactory::create<Incinerator>());
 		add(TileEntityFactory::create<ItemSpawner>());
+		add(TileEntityFactory::create<Microscope>());
 		add(TileEntityFactory::create<OreDeposit>());
 		add(TileEntityFactory::create<Pipe>());
 		add(TileEntityFactory::create<Pump>());

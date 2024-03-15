@@ -193,6 +193,8 @@ namespace Game3 {
 		return 1.5;
 	}
 
+	void LivingEntity::iterateGenes(const std::function<void(Gene &)> &) {}
+
 	bool LivingEntity::checkGenes(const nlohmann::json &genes, std::unordered_set<std::string> &&names) {
 		if (genes.size() != names.size())
 			return false;

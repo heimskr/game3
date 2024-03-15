@@ -128,6 +128,12 @@ namespace Game3 {
 		absorbGene(valueMultiplier, genes, "valueMultiplier");
 	}
 
+	void Sheep::iterateGenes(const std::function<void(Gene &)> &function) {
+		function(hue);
+		function(saturation);
+		function(valueMultiplier);
+	}
+
 	void Sheep::encode(Buffer &buffer) {
 		Animal::encode(buffer);
 		buffer << hue;

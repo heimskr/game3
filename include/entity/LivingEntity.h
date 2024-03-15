@@ -36,6 +36,7 @@ namespace Game3 {
 			virtual std::vector<ItemStackPtr> getDrops();
 			virtual bool canAbsorbGenes(const nlohmann::json &) const;
 			virtual void absorbGenes(const nlohmann::json &);
+			virtual void iterateGenes(const std::function<void(Gene &)> &);
 
 		protected:
 			int defenseStat = 0;

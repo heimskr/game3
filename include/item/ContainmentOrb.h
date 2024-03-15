@@ -13,5 +13,7 @@ namespace Game3 {
 			std::string getTooltip(const ConstItemStackPtr &) override;
 			Identifier getTextureIdentifier(const ConstItemStackPtr &) const override;
 			bool isTextureCacheable() const override { return false; }
+
+			static EntityPtr makeEntity(const ItemStackPtr &);
 	};
 }
