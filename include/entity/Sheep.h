@@ -31,6 +31,9 @@ namespace Game3 {
 			void render(const RendererContext &) override;
 			Identifier getMilk() const override { return {"base", "fluid/milk"}; }
 
+			bool canAbsorbGenes(const nlohmann::json &) const override;
+			void absorbGenes(const nlohmann::json &) override;
+
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;
 

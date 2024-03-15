@@ -1,3 +1,4 @@
+#include "biology/Gene.h"
 #include "entity/LivingEntity.h"
 #include "entity/TextParticle.h"
 #include "game/ServerGame.h"
@@ -182,7 +183,23 @@ namespace Game3 {
 		return {};
 	}
 
+	bool LivingEntity::canAbsorbGenes(const nlohmann::json &) const {
+		return false;
+	}
+
+	void LivingEntity::absorbGenes(const nlohmann::json &) {}
+
 	float LivingEntity::getBaseSpeed() {
 		return 1.5;
+	}
+
+	bool LivingEntity::checkGenes(const nlohmann::json &genes, std::unordered_set<std::string> &&names) {
+		if (genes.size() != names.size())
+			return false;
+
+		for (const auto &[key, value]: genes.items())
+			names.erase(key);
+
+		return names.size() == 0;
 	}
 }

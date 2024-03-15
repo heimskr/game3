@@ -3,6 +3,8 @@
 #include "entity/Entity.h"
 
 namespace Game3 {
+	class Gene;
+
 	class LivingEntity: public virtual Entity {
 		public:
 			constexpr static HitPoints INVINCIBLE = 0;
@@ -32,6 +34,8 @@ namespace Game3 {
 			virtual void kill();
 			virtual void onAttack(const std::shared_ptr<LivingEntity> &attacker);
 			virtual std::vector<ItemStackPtr> getDrops();
+			virtual bool canAbsorbGenes(const nlohmann::json &) const;
+			virtual void absorbGenes(const nlohmann::json &);
 
 		protected:
 			int defenseStat = 0;
@@ -42,6 +46,12 @@ namespace Game3 {
 			LivingEntity();
 
 			static float getBaseSpeed();
+			static bool checkGenes(const nlohmann::json &, std::unordered_set<std::string> &&);
+
+			template <typename T>
+			inline void absorbGene(T &gene, const nlohmann::json &json, const std::string &name) {
+				gene = T::fromJSON(json.at(name));
+			}
 	};
 
 	using LivingEntityPtr = std::shared_ptr<LivingEntity>;

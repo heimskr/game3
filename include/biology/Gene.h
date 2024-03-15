@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include <nlohmann/json_fwd.hpp>
 
@@ -11,21 +12,26 @@ namespace Game3 {
 		public:
 			static std::unique_ptr<Gene> fromJSON(const nlohmann::json &);
 
-			Gene() = default;
+			Gene(std::string name_);
 
 			virtual void toJSON(nlohmann::json &) const = 0;
 			/** strength ∈ [0.0, 1.0] */
 			virtual void mutate(float strength) = 0;
 			virtual void encode(Buffer &) const = 0;
 			virtual void decode(Buffer &) = 0;
+
+			inline const auto & getName() const { return name; }
+
+		protected:
+			std::string name;
 	};
 
 	class FloatGene: public Gene {
 		public:
 			static FloatGene fromJSON(const nlohmann::json &);
 
-			FloatGene() = default;
-			FloatGene(float minimum_, float maximum_, float value_);
+			using Gene::Gene;
+			FloatGene(std::string name_, float minimum_, float maximum_, float value_);
 
 			void toJSON(nlohmann::json &) const final;
 			void mutate(float strength) final;
@@ -49,8 +55,8 @@ namespace Game3 {
 
 			static LongGene fromJSON(const nlohmann::json &);
 
-			LongGene() = default;
-			LongGene(ValueType minimum_, ValueType maximum_, ValueType value_);
+			using Gene::Gene;
+			LongGene(std::string name_, ValueType minimum_, ValueType maximum_, ValueType value_);
 
 			void toJSON(nlohmann::json &) const final;
 			void mutate(float strength) final;
@@ -72,8 +78,8 @@ namespace Game3 {
 		public:
 			static CircularGene fromJSON(const nlohmann::json &);
 
-			CircularGene() = default;
-			CircularGene(float value_);
+			using Gene::Gene;
+			CircularGene(std::string name_, float value_);
 
 			void toJSON(nlohmann::json &) const final;
 			void mutate(float strength) final;

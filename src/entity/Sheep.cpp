@@ -11,9 +11,9 @@ namespace Game3 {
 	Sheep::Sheep():
 		Entity(ID()),
 		Animal(),
-		hue(threadContext.random(0.f, 1.f)),
-		saturation(0.f, 1.f, sample()),
-		valueMultiplier(.1f, 1.f, sample()) {}
+		hue("hue", threadContext.random(0.f, 1.f)),
+		saturation("saturation", 0.f, 1.f, sample()),
+		valueMultiplier("valueMultiplier", .1f, 1.f, sample()) {}
 
 	void Sheep::render(const RendererContext &renderers) {
 		if (texture == nullptr || !isVisible())
@@ -118,6 +118,16 @@ namespace Game3 {
 		renderers.recolor.drawOnMap(texture, mask, options, hue.getValue(), saturation.getValue(), valueMultiplier.getValue());
 	}
 
+	bool Sheep::canAbsorbGenes(const nlohmann::json &genes) const {
+		return checkGenes(genes, {"hue", "saturation", "valueMultiplier"});
+	}
+
+	void Sheep::absorbGenes(const nlohmann::json &genes) {
+		absorbGene(hue, genes, "hue");
+		absorbGene(saturation, genes, "saturation");
+		absorbGene(valueMultiplier, genes, "valueMultiplier");
+	}
+
 	void Sheep::encode(Buffer &buffer) {
 		Animal::encode(buffer);
 		buffer << hue;
@@ -134,5 +144,5 @@ namespace Game3 {
 
 	float Sheep::sample() {
 		return std::min(1.f, std::max(0.f, std::normal_distribution<float>{.75f, .75f / 3.f}(threadContext.rng)));
-	};
+	}
 }

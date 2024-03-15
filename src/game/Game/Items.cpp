@@ -180,6 +180,7 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/chromatin",       "Chromatin",           2, 64));
 		add(std::make_shared<Item>("base:item/fabric",          "Fabric",             20, 64));
 		add(std::make_shared<Item>("base:item/sulfuric_acid",   "Sulfuric Acid",      16, 64));
+		add(std::make_shared<Item>("base:item/gene",            "Gene",                1,  1));
 
 		add(std::make_shared<ItemPipeItem>(4));
 
