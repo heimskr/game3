@@ -522,7 +522,7 @@ namespace Game3 {
 		if (context.forcedPosition) {
 			new_position = *context.forcedPosition;
 		} else if ((horizontal && offset.x != 0) || (!horizontal && offset.y != 0)) {
-			WARN("Can't move entity {}: improper offsets [{} : ({}, {})]", globalID, horizontal? "horizontal" : "vertical", offset.x, offset.y);
+			// WARN("Can't move entity {}: improper offsets [{} : ({}, {})]", globalID, horizontal? "horizontal" : "vertical", offset.x, offset.y);
 			return false;
 		}
 
