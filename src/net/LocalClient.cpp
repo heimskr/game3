@@ -18,7 +18,7 @@
 
 namespace Game3 {
 	LocalClient::~LocalClient() {
-		INFO_("\e[31m~LocalClient\e[39m(" << this << ')');
+		INFO("\e[31m~LocalClient\e[39m({})", reinterpret_cast<void *>(this));
 		sock->close(true);
 	}
 
@@ -91,7 +91,7 @@ namespace Game3 {
 					packet->decode(*game, buffer);
 
 					if (!buffer.empty()) {
-						INFO_("Bytes left in buffer: " << (buffer.bytes.size() - buffer.skip) << " / " << buffer.bytes.size());
+						INFO("Bytes left in buffer: {} / {}", buffer.bytes.size() - buffer.skip, buffer.bytes.size());
 						assert(buffer.empty());
 					}
 
@@ -190,6 +190,6 @@ namespace Game3 {
 	}
 
 	void LocalClient::printHeaderBytes() const {
-		INFO_("HeaderBytes: (" << hexString(headerBytes, true) << ')');
+		INFO("HeaderBytes: ({})", hexString(headerBytes, true));
 	}
 }

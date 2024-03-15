@@ -16,8 +16,7 @@ namespace Game3 {
 	}
 
 	std::uniform_real_distribution<float> Animal::getWanderDistribution() {
-		// return std::uniform_real_distribution(10.f, 20.f);
-		return std::uniform_real_distribution(5.f, 5.f);
+		return std::uniform_real_distribution(10.f, 20.f);
 	}
 
 	Animal::Animal():
@@ -42,23 +41,23 @@ namespace Game3 {
 			return true;
 		}
 
-		INFO_(typeid(*this).name() << ' ' << getGID() << ':');
-		INFO_("  Path length is " << path.size());
+		INFO("{} {}:", typeid(*this).name(), getGID());
+		INFO("  Path length is {}", path.size());
 		auto realm = getRealm();
 		{
 			auto lock = visibleEntities.sharedLock();
-			INFO_("  Player is visible? " << std::boolalpha << visiblePlayers.contains(player));
+			INFO("  Player is visible? {:s}", visiblePlayers.contains(player));
 		}
 		{
 			auto lock = player->visibleEntities.sharedLock();
-			INFO_("  Visible to player? " << std::boolalpha << player->visibleEntities.contains(getSelf()));
+			INFO("  Visible to player? {:s}", player->visibleEntities.contains(getSelf()));
 		}
 		if (auto ptr = realm->getEntities(getChunk()); ptr && ptr->contains(getSelf()))
 			SUCCESS_("  In chunk.");
 		else
 			ERROR_("  Not in chunk.");
-		INFO_("  First wander: " << firstWander);
-		INFO_("  Attempting wander: " << std::boolalpha << attemptingWander.load());
+		INFO("  First wander: {}", firstWander);
+		INFO("  Attempting wander: {:s}", attemptingWander.load());
 		return true;
 	}
 

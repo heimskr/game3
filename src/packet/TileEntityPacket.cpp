@@ -7,6 +7,7 @@
 #include "packet/TileEntityPacket.h"
 #include "tileentity/TileEntity.h"
 #include "tileentity/TileEntityFactory.h"
+#include "util/Demangle.h"
 
 namespace Game3 {
 	TileEntityPacket::TileEntityPacket(TileEntityPtr tile_entity):
@@ -54,15 +55,15 @@ namespace Game3 {
 			tileEntity->decode(*game, storedBuffer);
 
 			if (weak_agent) {
-				ERROR_("Found TileEntity " << globalID << " in allAgents, even though getAgent<TileEntity> returned null!");
+				ERROR("Found TileEntity {} in allAgents, even though getAgent<TileEntity> returned null!", globalID);
 				if (auto entity = std::dynamic_pointer_cast<Entity>(weak_agent->lock())) {
 					nlohmann::json entity_json;
 					entity->toJSON(entity_json);
-					INFO_("Entity found with same global ID:\n\e[32m" << entity_json.dump() << "\e[39m");
+					INFO("Entity found with same global ID:\n\e[32m{}\e[39m", entity_json.dump());
 				} else {
 					if (auto agent_ptr = weak_agent->lock()) {
 						Agent &agent = *agent_ptr;
-						INFO_("Agent typeid: " << typeid(agent).name());
+						INFO("Agent typeid: {}", DEMANGLE(agent));
 					} else {
 						INFO_("Agent is expired.");
 					}
@@ -70,7 +71,7 @@ namespace Game3 {
 
 				nlohmann::json tile_entity_json;
 				tileEntity->toJSON(tile_entity_json);
-				INFO_("Tile entity data:\n\e[31m" << tile_entity_json.dump() << "\e[39m");
+				INFO("Tile entity data:\n\e[31m{}\e[39m", tile_entity_json.dump());
 				assert(false);
 			}
 

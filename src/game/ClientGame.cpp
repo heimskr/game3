@@ -29,7 +29,7 @@ namespace Game3 {
 	}
 
 	ClientGame::~ClientGame() {
-		INFO_("\e[31m~ClientGame\e[39m(" << this << ')');
+		INFO("\e[31m~ClientGame\e[39m({})", reinterpret_cast<void *>(this));
 	}
 
 	double ClientGame::getFrequency() const {
@@ -184,7 +184,7 @@ namespace Game3 {
 				canvas.window.error(warning.what());
 			} catch (const std::exception &err) {
 				auto &packet_ref = *packet;
-				ERROR_("Couldn't handle packet of type " << typeid(packet_ref).name() << " (" << packet->getID() << "): " << err.what());
+				ERROR("Couldn't handle packet of type {} ({}): {}", DEMANGLE(packet_ref), packet->getID(), err.what());
 				throw;
 			}
 		}

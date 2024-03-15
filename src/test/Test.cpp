@@ -179,7 +179,7 @@ namespace Game3 {
 				sum += lwp.use_count();
 				lwp.reset();
 			}
-			INFO_("sum[" << sum << ']');
+			INFO("sum[{}]", sum);
 		};
 
 		std::thread t1 = std::thread(lambda);

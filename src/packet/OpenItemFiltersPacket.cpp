@@ -12,7 +12,7 @@ namespace Game3 {
 	void OpenItemFiltersPacket::handle(const ClientGamePtr &game) {
 		RealmPtr realm = game->getRealm(realmID);
 		if (!realm) {
-			ERROR_("Couldn't find realm " << realmID << " in OpenItemFiltersPacket handler");
+			ERROR("Couldn't find realm {} in OpenItemFiltersPacket handler", realmID);
 			return;
 		}
 

@@ -7,13 +7,13 @@ namespace Game3 {
 	void HeldItemSetPacket::handle(const ClientGamePtr &game) {
 		RealmPtr realm = game->tryRealm(realmID);
 		if (!realm) {
-			ERROR_("Couldn't find realm " << realmID << " in HeldItemSetPacket handler");
+			ERROR("Couldn't find realm {} in HeldItemSetPacket handler", realmID);
 			return;
 		}
 
 		EntityPtr entity = realm->getEntity(entityID);
 		if (!entity) {
-			ERROR_("Couldn't find entity " << entityID << " in realm " << realmID << " in HeldItemSetPacket handler");
+			ERROR("Couldn't find entity {} in realm {} in HeldItemSetPacket handler", entityID, realmID);
 			return;
 		}
 

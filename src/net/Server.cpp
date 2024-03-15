@@ -77,7 +77,7 @@ namespace Game3 {
 		INFO_("Accepting.");
 		acceptor.async_accept([this](const asio::error_code &errc, asio::ip::tcp::socket socket) {
 			if (errc) {
-				ERROR_("Server accept: " << errc.message());
+				ERROR("Server accept: {}", errc.message());
 			} else {
 				std::string ip = socket.remote_endpoint().address().to_string();
 				auto client = std::make_shared<RemoteClient>(*this, ip, ++lastID, std::move(socket));
@@ -179,7 +179,7 @@ namespace Game3 {
 		overworld->add(player, overworld->randomLand);
 		player->spawnPosition = player->getPosition();
 		player->spawnRealmID = player->getRealm()->getID();
-		INFO_("Setting player spawn realm ID to " << player->spawnRealmID);
+		INFO("Setting player spawn realm ID to {}", player->spawnRealmID);
 		player->init(game);
 		player->onSpawn();
 		const InventoryPtr inventory = player->getInventory(0);
@@ -286,7 +286,7 @@ namespace Game3 {
 		size_t seed = 1621;
 		if (std::filesystem::exists(".seed")) {
 			seed = parseNumber<size_t>(trim(readFile(".seed")));
-			INFO_("Using custom seed \e[1m" << seed << "\e[22m");
+			INFO("Using custom seed \e[1m{}\e[22m", seed);
 		}
 
 		if (database_existed) {

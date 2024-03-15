@@ -71,12 +71,12 @@ namespace Game3 {
 			} else {
 				auto entity = game->getAgent<Entity>(entity_id);
 				if (!entity) {
-					WARN_("Can't tell client to destroy entity " << entity_id << ": entity not found.");
+					WARN("Can't tell client to destroy entity {}: entity not found.", entity_id);
 				} else if (entity->realmID != realmID && entity != client.getPlayer()) {
 					// The condition here is to handle an edge case (likely a bug elsewhere) in which the entity is
 					// missing from Realm::entitiesByGID but still exists in the realm somehow. I encountered the bug
 					// by teleporting around a lot.
-					INFO_("Telling player " << client.getPlayer()->username << " to destroy entity " << entity_id << " (" << entity->getName() << ')');
+					INFO("Telling player {} to destroy entity {} ({})", client.getPlayer()->username, entity_id, entity->getName());
 					client.send(DestroyEntityPacket(entity_id, realm->id));
 				}
 			}

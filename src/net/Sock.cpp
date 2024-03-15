@@ -46,26 +46,26 @@ namespace Game3 {
 		int status = ::connect(netFD, info->ai_addr, info->ai_addrlen);
 
 		if (status != 0) {
-			ERROR_("connect(): " << strerror(errno));
+			ERROR("connect(): {}", strerror(errno));
 			throw NetError(errno);
 		}
 
 		int flags = fcntl(netFD, F_GETFL, 0);
 		if (flags == -1) {
-			ERROR_("fcntl (get): " << strerror(errno));
+			ERROR("fcntl (get): {}", strerror(errno));
 			throw NetError(errno);
 		}
 
 		flags = fcntl(netFD, F_SETFL, blocking? (flags & ~O_NONBLOCK) : (flags | O_NONBLOCK));
 		if (flags == -1) {
-			ERROR_("fcntl (set): " << strerror(errno));
+			ERROR("fcntl (set): {}", strerror(errno));
 			throw NetError(errno);
 		}
 
 		int control_pipe[2];
 		status = pipe(control_pipe);
 		if (status != 0) {
-			ERROR_("pipe(): " << strerror(errno));
+			ERROR("pipe(): {}", strerror(errno));
 			throw NetError(errno);
 		}
 
@@ -109,7 +109,7 @@ namespace Game3 {
 		timeval timeout {.tv_sec = 0, .tv_usec = 100};
 		int status = select(FD_SETSIZE, &fds_copy, nullptr, nullptr, &timeout);
 		if (status < 0) {
-			ERROR_("select status: " << strerror(status));
+			ERROR("select status: {}", strerror(status));
 			throw NetError(errno);
 		}
 
@@ -125,12 +125,12 @@ namespace Game3 {
 			ControlMessage message;
 			status = ::read(controlRead, &message, 1);
 			if (status < 0) {
-				ERROR_("control_fd status: " << strerror(status));
+				ERROR("control_fd status: {}", strerror(status));
 				throw NetError(errno);
 			}
 
 			if (message != ControlMessage::Close) {
-				ERROR_("Unknown control message: '" << static_cast<char>(message) << "'");
+				ERROR("Unknown control message: '{}'", static_cast<char>(message));
 			}
 
 			::close(netFD);

@@ -100,7 +100,7 @@ namespace Game3 {
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr); CHECKGL
 		glBindBuffer(GL_ARRAY_BUFFER, old_abb); CHECKGL_SET
 		if (gl_err)
-			WARN_("old_abb = " << old_abb);
+			WARN("old_abb = {}", old_abb);
 		glBindVertexArray(0); CHECKGL
 		initialized = true;
 	}

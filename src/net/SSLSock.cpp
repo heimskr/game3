@@ -79,7 +79,7 @@ namespace Game3 {
 		timeval timeout {.tv_sec = 0, .tv_usec = 100};
 		int status = select(FD_SETSIZE, &fds_copy, nullptr, nullptr, &timeout);
 		if (status < 0) {
-			ERROR_("select status: " << strerror(status));
+			ERROR("select status: {}", strerror(status));
 			throw NetError(errno);
 		}
 
@@ -149,12 +149,12 @@ namespace Game3 {
 			ControlMessage message;
 			status = ::read(controlRead, &message, 1);
 			if (status < 0) {
-				ERROR_("control_fd status: " << strerror(status));
+				ERROR("control_fd status: {}", strerror(status));
 				throw NetError(errno);
 			}
 
 			if (message != ControlMessage::Close) {
-				ERROR_("Unknown control message: '" << static_cast<char>(message) << "'");
+				ERROR("Unknown control message: '{}'", static_cast<char>(message));
 			}
 
 			if (ssl != nullptr)

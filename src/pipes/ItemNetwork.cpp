@@ -99,7 +99,7 @@ namespace Game3 {
 
 				// This would be a little strange.
 				if (!extracted) {
-					WARN_("Couldn't extract item indicated to be extractable from slot " << slot << '.');
+					WARN("Couldn't extract item indicated to be extractable from slot {}.", slot);
 					return false;
 				}
 

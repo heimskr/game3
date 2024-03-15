@@ -18,13 +18,13 @@ namespace Game3 {
 	void EntityMovedPacket::handle(const ClientGamePtr &game) {
 		RealmPtr realm = game->tryRealm(arguments.realmID);
 		if (!realm) {
-			WARN_("EntityMovedPacket: Couldn't find realm " << arguments.realmID << " in EntityMovedPacket.");
+			WARN("EntityMovedPacket: Couldn't find realm {} in EntityMovedPacket.", arguments.realmID);
 			return;
 		}
 
 		EntityPtr entity = game->getAgent<Entity>(arguments.globalID);
 		if (!entity) {
-			// WARN_("EntityMovedPacket: Couldn't find entity " << arguments.globalID << ". Player is " << game->getPlayer()->getGID());
+			// WARN("EntityMovedPacket: Couldn't find entity {}. Player is {}", arguments.globalID, game->getPlayer()->getGID());
 			return;
 		}
 

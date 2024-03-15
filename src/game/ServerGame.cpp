@@ -34,7 +34,7 @@ namespace Game3 {
 	}
 
 	ServerGame::~ServerGame() {
-		INFO_("\e[31m~ServerGame\e[39m(" << this << ')');
+		INFO("\e[31m~ServerGame\e[39m({})", reinterpret_cast<void *>(this));
 	}
 
 	void ServerGame::init() {
@@ -117,8 +117,7 @@ namespace Game3 {
 					realm->eviscerate(player, true);
 
 				if (auto count = player.use_count(); count != 1) {
-					WARN_("Player " << player.get() << " ref count: " << count << " (should be 1). Current realm: "
-						<< player->realmID << " (realmID) or " << player->getRealm()->id << " (getRealm()->id)");
+					WARN("Player {} ref count: {} (should be 1). Current realm: {} (realmID) or {} (getRealm()->id)", reinterpret_cast<void *>(player.get()), count, player->realmID, player->getRealm()->id);
 				}
 			}
 		}
@@ -373,7 +372,7 @@ namespace Game3 {
 				if (message[0] == ' ')
 					message.remove_prefix(1);
 
-				INFO_('[' << player->username << "] " << message);
+				INFO("[{}] {}", player->username, message);
 				broadcast(ChatMessageSentPacket{player->getGID(), std::string(message)}, true);
 				return {true, ""};
 			}
@@ -564,7 +563,7 @@ namespace Game3 {
 
 			if (first == "say") {
 				std::string_view message = std::string_view(command).substr(first.size() + 1);
-				INFO_('[' << player->username << "] " << message);
+				INFO("[{}] {}", player->username, message);
 				broadcast(ChatMessageSentPacket{player->getGID(), std::string(message)}, true);
 				return {true, ""};
 			}
@@ -679,7 +678,7 @@ namespace Game3 {
 				for (const auto &[gid, weak_agent]: allAgents) {
 					if (AgentPtr agent = weak_agent.lock()) {
 						if (GlobalID agent_gid = agent->getGID(); gid != agent_gid)
-							WARN_("Agent " << agent_gid << " is stored in allAgents with key " << gid);
+							WARN("Agent {} is stored in allAgents with key {}", agent_gid, gid);
 						if (auto entity = std::dynamic_pointer_cast<Entity>(agent))
 							if (!exclude_animals || !std::dynamic_pointer_cast<Animal>(entity))
 								if (!exclude_items || !std::dynamic_pointer_cast<ItemEntity>(entity))

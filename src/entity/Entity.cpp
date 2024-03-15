@@ -273,9 +273,9 @@ namespace Game3 {
 			if (game->allAgents.contains(globalID)) {
 				if (auto locked = game->allAgents.at(globalID).lock()) {
 					auto &locked_ref = *locked;
-					ERROR_("globalID[" << globalID << "], allAgents<" << game->allAgents.size() << ">, type[this=" << typeid(*this).name() << ", other=" << typeid(locked_ref).name() << "], this=" << this << ", other=" << locked.get());
+					ERROR("globalID[{}], allAgents<{}>, type[this={}, other={}], this={}, other={}", globalID, game->allAgents.size(), DEMANGLE(*this), DEMANGLE(locked_ref), reinterpret_cast<void *>(this), reinterpret_cast<void *>(locked.get()));
 				} else {
-					ERROR_("globalID[" << globalID << "], allAgents<" << game->allAgents.size() << ">, type[this=" << typeid(*this).name() << ", other=expired]");
+					ERROR("globalID[{}], allAgents<{}>, type[this={}, other=expired]", globalID, game->allAgents.size(), DEMANGLE(*this));
 				}
 				assert(!game->allAgents.contains(globalID));
 			}
@@ -319,17 +319,17 @@ namespace Game3 {
 					if (source == *inventory && destination == *inventory) {
 						for (Held &held: {std::ref(heldLeft), std::ref(heldRight)}) {
 							if (source_slot == held.slot) {
-								INFO_(__FILE__ << ':' << __LINE__ << ": setHeld(destination_slot{" << destination_slot << "}, " << (held.isLeft? "left" : "right") << ')');
+								INFO("{}:{}: setHeld(destination_slot[{}], {})", __FILE__, __LINE__, destination_slot, held.isLeft? "left" : "right");
 								setHeld(destination_slot, held);
 							} else if (destination_slot == held.slot) {
-								INFO_(__FILE__ << ':' << __LINE__ << ": setHeld(source_slot{" << destination_slot << "}, " << (held.isLeft? "left" : "right") << ')');
+								INFO("{}:{}: setHeld(source_slot[{}], {})", __FILE__, __LINE__, source_slot, held.isLeft? "left" : "right");
 								setHeld(source_slot, held);
 							}
 						}
 					} else if (source == *inventory) {
 						for (Held &held: {std::ref(heldLeft), std::ref(heldRight)}) {
 							if (source_slot == held.slot) {
-								INFO_(__FILE__ << ':' << __LINE__ << ": setHeld(-1, " << (held.isLeft? "left" : "right") << ')');
+								INFO("{}:{}: setHeld(-1, {})", __FILE__, __LINE__, held.isLeft? "left" : "right");
 								setHeld(-1, held);
 							}
 						}
@@ -337,7 +337,7 @@ namespace Game3 {
 						assert(destination == *inventory);
 						for (Held &held: {std::ref(heldLeft), std::ref(heldRight)}) {
 							if (destination_slot == held.slot) {
-								INFO_(__FILE__ << ':' << __LINE__ << ": setHeld(-1, " << (held.isLeft? "left" : "right") << ')');
+								INFO("{}:{}: setHeld(-1, {})", __FILE__, __LINE__, held.isLeft? "left" : "right");
 								setHeld(-1, held);
 							}
 						}
@@ -485,7 +485,7 @@ namespace Game3 {
 
 		RealmPtr realm = weakRealm.lock();
 		if (!realm) {
-			WARN_("Can't move entity " << getGID() << ": no realm");
+			WARN("Can't move entity {}: no realm", getGID());
 			return false;
 		}
 
@@ -522,7 +522,7 @@ namespace Game3 {
 		if (context.forcedPosition) {
 			new_position = *context.forcedPosition;
 		} else if ((horizontal && offset.x != 0) || (!horizontal && offset.y != 0)) {
-			// WARN_("Can't move entity " << globalID << ": improper offsets [" << (horizontal? "horizontal" : "vertical") << " : (" << offset.x << ", " << offset.y << ")]");
+			WARN("Can't move entity {}: improper offsets [{} : ({}, {})]", globalID, horizontal? "horizontal" : "vertical", offset.x, offset.y);
 			return false;
 		}
 
@@ -1148,7 +1148,7 @@ namespace Game3 {
 		const InventoryPtr inventory = getInventory(0);
 
 		if (!inventory->contains(new_value)) {
-			WARN_("Can't equip slot " << new_value << ": no item in inventory");
+			WARN("Can't equip slot {}: no item in inventory", new_value);
 			held.slot = -1;
 			if (is_client)
 				held.texture.reset();

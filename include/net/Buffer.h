@@ -327,11 +327,11 @@ namespace Game3 {
 		std::span span = buffer.getSpan();
 
 		if (span.size_bytes() < sizeof(T)) {
-			ERROR_("Buffer size: " << buffer.bytes.size());
-			ERROR_("Skip: " << buffer.skip);
-			ERROR_("Span size: " << span.size());
-			ERROR_("Span size_bytes: " << span.size_bytes());
-			ERROR_("sizeof(" << typeid(T).name() << "): " << sizeof(T));
+			ERROR("Buffer size: {:L}", buffer.bytes.size());
+			ERROR("Skip: {:L}", buffer.skip);
+			ERROR("Span size: {:L}", span.size());
+			ERROR("Span size_bytes: {:L}", span.size_bytes());
+			ERROR("sizeof({}): {}", DEMANGLE(T), sizeof(T));
 			throw std::out_of_range("Buffer is too empty");
 		}
 

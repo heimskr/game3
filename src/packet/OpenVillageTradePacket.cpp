@@ -17,7 +17,7 @@ namespace Game3 {
 		try {
 			village = game->getVillage(villageID);
 		} catch (const std::out_of_range &) {
-			WARN_("Couldn't find village " << villageID);
+			WARN("Couldn't find village {}", villageID);
 			return;
 		}
 

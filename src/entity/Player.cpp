@@ -29,7 +29,7 @@ namespace Game3 {
 		if (spawning)
 			return;
 
-		INFO_("\e[31m~Player\e[39m(" << this << ", " << (username.empty()? "[unknown username]" : username) << ", " << globalID << ')');
+		INFO("\e[31m~Player\e[39m({}, {}, {})", reinterpret_cast<void *>(this), username.empty()? "[unknown username]" : username, globalID);
 	}
 
 	void Player::destroy() {
@@ -47,7 +47,7 @@ namespace Game3 {
 		}
 
 		if (times != 0)
-			INFO_("Removed " << username << " from visible sets " << times << " time" << (times == 1? "" : "s"));
+			INFO("Removed {} from visible sets {} time{}", username, times, times == 1? "" : "s");
 
 		size_t remaining = 0;
 
@@ -181,7 +181,7 @@ namespace Game3 {
 				auto locked_client = toServer()->weakClient.lock();
 				assert(locked_client);
 				if (!locked_client->getPlayer()->knowsRealm(new_realm->id)) {
-					INFO_("Sending " << new_realm->id << " to client for the first time");
+					INFO("Sending {} to client for the first time", new_realm->id);
 					new_realm->sendTo(*locked_client);
 				}
 			}

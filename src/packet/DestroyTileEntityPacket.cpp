@@ -10,6 +10,6 @@ namespace Game3 {
 		if (auto tile_entity = game->getAgent<TileEntity>(globalID))
 			tile_entity->destroy();
 		else
-			WARN_("DestroyTileEntityPacket: couldn't find tile entity " << globalID << '.');
+			WARN("DestroyTileEntityPacket: couldn't find tile entity {}.", globalID);
 	}
 }

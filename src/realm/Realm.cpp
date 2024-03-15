@@ -873,7 +873,7 @@ namespace Game3 {
 		detach(tile_entity);
 
 		if (const auto count = tile_entity.use_count(); 3 < count)
-			WARN_("Tile entity use count: " << count);
+			WARN("Tile entity use count: {}", count);
 
 		if (run_helper) {
 			setLayerHelper(position.row, position.column, Layer::Submerged);
@@ -909,7 +909,7 @@ namespace Game3 {
 
 	void Realm::queueDestruction(const EntityPtr &entity) {
 		if (entity->isPlayer())
-			INFO_("Queueing player " << entity->getGID() << " for entity destruction.");
+			INFO("Queueing player {} for entity destruction.", entity->getGID());
 		entityDestructionQueue.push(entity);
 	}
 
@@ -1502,7 +1502,7 @@ namespace Game3 {
 					shared->reupload();
 					shared->reuploadPending = false;
 				} else {
-					ERROR_("Expired in " << __FILE__ << ':' << __LINE__);
+					ERROR("Expired in {}:{}", __FILE__, __LINE__);
 				}
 			});
 		}

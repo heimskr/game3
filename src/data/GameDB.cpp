@@ -340,7 +340,7 @@ namespace Game3 {
 			const std::unordered_map<TileID, Identifier> old_map = meta.at("names");
 			const std::unordered_map<Identifier, Identifier> autotiles = meta.at("autotiles");
 
-			INFO_("Auto-migrating tiles for realm " << realm->id);
+			INFO("Auto-migrating tiles for realm {}", realm->id);
 
 			Timer migration_timer{"TileMigration"};
 			std::unordered_map<TileID, TileID> migration_map;

@@ -8,25 +8,24 @@ namespace Game3 {
 	extern Lockable<std::unordered_map<std::string, size_t>> entityUpdates;
 
 	void UsageCommand::operator()(LocalClient &client) {
-		std::cerr.imbue(std::locale(""));
 		INFO_("");
-		INFO_("Header bytes: \e[3" << (client.headerBytes.empty()? '2' : '1') << 'm' << client.headerBytes.size() << "\e[39m");
-		INFO_("Payload size: \e[33m" << client.payloadSize << "\e[39m");
+		INFO("Header bytes: \e[3{}m{:L}\e[39m", client.headerBytes.empty()? '2' : '1', client.headerBytes.size());
+		INFO("Payload size: \e[33m{:L}\e[39m", client.payloadSize);
 		{
 			INFO_("Packets received:");
 			auto lock = client.receivedPacketCounts.sharedLock();
 			for (const auto &[packet_id, count]: client.receivedPacketCounts)
-				INFO_("    " << std::setw(3) << std::right << packet_id << "\e[2m:\e[22m " << count);
+				INFO("    {:3}\e[2m:\e[22m {:L}", packet_id, count);
 		}
 		{
 			INFO_("Packets sent:");
 			auto lock = client.sentPacketCounts.sharedLock();
 			for (const auto &[packet_id, count]: client.sentPacketCounts)
-				INFO_("    " << std::setw(3) << std::right << packet_id << "\e[2m:\e[22m " << count);
+				INFO("    {:3}\e[2m:\e[22m {:L}", packet_id, count);
 		}
 
-		INFO_("Bytes read: \e[36m" << client.bytesRead << "\e[39m");
-		INFO_("Bytes written: \e[35m" << client.bytesWritten << "\e[39m");
+		INFO("Bytes read: \e[36m{:L}\e[39m", client.bytesRead.load());
+		INFO("Bytes written: \e[35m{:L}\e[39m", client.bytesWritten.load());
 
 		{
 			auto lock = entityUpdates.sharedLock();
@@ -34,13 +33,11 @@ namespace Game3 {
 				INFO_("Entity updates:");
 				size_t total = 0;
 				for (const auto &[name, updates]: entityUpdates) {
-					INFO_("- " << name << ": \e[32m" << updates << "\e[39m");
+					INFO("- {}: \e[32m{:L}\e[39m", name, updates);
 					total += updates;
 				}
-				INFO_("Total: \e[32m" << total << "\e[39m");
+				INFO("Total: \e[32m{:L}\e[39m", total);
 			}
 		}
-
-		std::cerr.imbue(std::locale("C"));
 	}
 }

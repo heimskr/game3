@@ -10,7 +10,7 @@ namespace Game3 {
 	void OpenModuleForAgentPacket::handle(const ClientGamePtr &game) {
 		AgentPtr agent = game->getAgent(agentGID);
 		if (!agent) {
-			ERROR_("Couldn't find agent " << agentGID << " in OpenModuleForAgentPacket handler");
+			ERROR("Couldn't find agent {} in OpenModuleForAgentPacket handler", agentGID);
 			return;
 		}
 

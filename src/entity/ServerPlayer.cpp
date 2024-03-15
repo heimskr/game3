@@ -192,7 +192,7 @@ namespace Game3 {
 	}
 
 	void ServerPlayer::kill() {
-		WARN_("Killing server player \e[1m" << username << "\e[22m.");
+		WARN("Killing server player \e[1m{}\e[22m.", username);
 		ServerGame &game = getGame()->toServer();
 
 		const bool keep_inventory = game.getRule("keepInventory").value_or(1) != 0;
@@ -217,7 +217,7 @@ namespace Game3 {
 			if (auto player = weak_player.lock()) {
 				RealmPtr realm = game.getRealm(player->spawnRealmID);
 				if (!realm) {
-					WARN_("Couldn't find spawn realm " << player->spawnRealmID << " for player " << player->username);
+					WARN("Couldn't find spawn realm {} for player {}", player->spawnRealmID, player->username);
 					return;
 				}
 				player->teleport(player->spawnPosition.copyBase(), realm, MovementContext{.facingDirection = Direction::Down, .isTeleport = true});

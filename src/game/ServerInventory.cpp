@@ -227,13 +227,13 @@ namespace Game3 {
 		auto iter = storage.find(slot);
 		if (iter == storage.end()) {
 			if (auto owner = weakOwner.lock())
-				WARN_("Trying to remove from empty slot " << slot << " in " << owner->getName() << ' ' << owner->getGID() << "'s inventory");
+				WARN("Trying to remove from empty slot {} in {} {}'s inventory", slot, owner->getName(), owner->getGID());
 			else
-				WARN_("Trying to remove from empty slot " << slot << " in an unowned inventory");
+				WARN("Trying to remove from empty slot {} in an unowned inventory", slot);
 			return 0;
 		}
 
-		auto &stack = iter->second;
+		ItemStackPtr &stack = iter->second;
 		if (!stack_to_remove->canMerge(*stack))
 			return 0;
 
@@ -272,7 +272,7 @@ namespace Game3 {
 
 	void ServerInventory::setActive(Slot new_active, bool) {
 		if (!(0 <= new_active && new_active < slotCount)) {
-			WARN_("Bad slot: " << new_active << " (slot count: " << slotCount << ")");
+			WARN("Bad slot: {} (slot count: {})", new_active, slotCount);
 			return;
 		}
 

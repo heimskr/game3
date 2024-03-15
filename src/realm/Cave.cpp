@@ -34,8 +34,7 @@ namespace Game3 {
 				if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game->getRealm(building->innerRealmID)))
 					game->removeRealm(cave_realm);
 				else
-					WARN_("Cave entrance leads to realm " << building->innerRealmID << ", which isn't a cave. Not erasing.");
-
+					WARN("Cave entrance leads to realm {}, which isn't a cave. Not erasing.", building->innerRealmID);
 				break;
 			}
 		}

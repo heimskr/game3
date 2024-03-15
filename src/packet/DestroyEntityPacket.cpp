@@ -12,9 +12,9 @@ namespace Game3 {
 			if (realmRequirement && entity->getRealm()->id != *realmRequirement)
 				return;
 			if (entity->isPlayer())
-				INFO_("Destroying player " << entity->getGID());
+				INFO("Destroying player {}", entity->getGID());
 			entity->queueDestruction();
 		}
-		// else WARN_("DestroyEntityPacket: couldn't find entity " << globalID << '.');
+		// else WARN("DestroyEntityPacket: couldn't find entity {}.", globalID);
 	}
 }

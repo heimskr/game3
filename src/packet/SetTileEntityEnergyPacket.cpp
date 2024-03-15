@@ -8,13 +8,13 @@ namespace Game3 {
 	void SetTileEntityEnergyPacket::handle(const ClientGamePtr &game) {
 		AgentPtr agent = game->getAgent(agentGID);
 		if (!agent) {
-			ERROR_("Couldn't find agent " << agentGID << " in SetTileEntityEnergyPacket handler");
+			ERROR("Couldn't find agent {} in SetTileEntityEnergyPacket handler", agentGID);
 			return;
 		}
 
 		auto energetic = std::dynamic_pointer_cast<EnergeticTileEntity>(agent);
 		if (!energetic) {
-			ERROR_("Agent " << agentGID << " isn't an instance of EnergeticTileEntity");
+			ERROR("Agent {} isn't an instance of EnergeticTileEntity", agentGID);
 			return;
 		}
 

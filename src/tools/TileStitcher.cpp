@@ -277,13 +277,13 @@ namespace Game3 {
 
 		if (png_out != nullptr) {
 			for (const std::string &name: tall_autotiles)
-				INFO_(name << " → " << out.ids[json_map.at(name)["tilename"]]);
+				INFO("{} → {}", name, out.ids[json_map.at(name)["tilename"]]);
 
 			for (const std::string &name: short_autotiles)
-				INFO_(name << " → " << out.ids[json_map.at(name)["tilename"]]);
+				INFO("{} → {}", name, out.ids[json_map.at(name)["tilename"]]);
 
 			for (const std::string &name: non_autotiles)
-				INFO_(name << " → " << out.ids[json_map.at(name)["tilename"]]);
+				INFO("{} → {}", name, out.ids[json_map.at(name)["tilename"]]);
 
 			std::stringstream ss;
 
