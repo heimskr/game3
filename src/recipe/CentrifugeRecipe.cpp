@@ -39,7 +39,8 @@ namespace Game3 {
 
 		assert(0. <= (fluids->levels.at(input.id) -= input.amount));
 		leftovers = inventory->add(output);
-		assert(!leftovers.has_value());
+		assert(!*leftovers);
+		leftovers.reset();
 		return true;
 	}
 

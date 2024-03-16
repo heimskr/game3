@@ -1,13 +1,13 @@
-#include <iostream>
-
-#include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/ServerInventory.h"
 #include "graphics/SpriteRenderer.h"
+#include "graphics/Tileset.h"
+#include "packet/OpenModuleForAgentPacket.h"
 #include "realm/Realm.h"
 #include "recipe/CentrifugeRecipe.h"
 #include "tileentity/Centrifuge.h"
+#include "ui/module/MultiModule.h"
 
 namespace Game3 {
 	namespace {
@@ -74,10 +74,9 @@ namespace Game3 {
 			return true;
 		}
 
-		if (modifiers.onlyCtrl())
-			FluidHoldingTileEntity::addObserver(player, false);
-		else
-			InventoriedTileEntity::addObserver(player, false);
+		player->send(OpenModuleForAgentPacket(MultiModule<Substance::Item, Substance::Fluid>::ID(), getGID()));
+		FluidHoldingTileEntity::addObserver(player, true);
+		InventoriedTileEntity::addObserver(player, true);
 
 		GamePtr game = realm->getGame();
 		auto lock = fluidContainer->levels.sharedLock();
