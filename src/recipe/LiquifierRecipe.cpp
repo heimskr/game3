@@ -71,7 +71,6 @@ namespace Game3 {
 		if (!fluids || !inventory || !canCraft(inventory))
 			return false;
 
-
 		std::shared_ptr<HasFluids> fluids_owner = fluids->getOwner();
 		FluidAmount max_level = fluids_owner->getMaxLevel(output.id);
 		if (max_level == 0)

@@ -126,7 +126,6 @@ namespace Game3 {
 		client->setClosed();
 
 		try {
-			WARN_("Trying SSL client shutdown");
 			client->socket.async_shutdown([client = std::move(client)](const asio::error_code &errc) {
 				if (errc) {
 					ERROR("SSL client shutdown failed: {}", errc.message());

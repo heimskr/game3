@@ -199,7 +199,6 @@ namespace Game3 {
 		started = true;
 		startCV.notify_all();
 		server->run();
-		INFO_("Server no longer running.");
 		tick_thread.join();
 		stop_thread.join();
 		save_thread.join();

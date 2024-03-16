@@ -55,7 +55,7 @@ namespace Game3 {
 		auto fluids_lock = fluidContainer->levels.uniqueLock();
 
 		for (const std::shared_ptr<LiquifierRecipe> &recipe: args.game->registry<LiquifierRecipeRegistry>().items) {
-			if (recipe->craft(args.game, fluidContainer, inventory)) {
+			if (recipe->craft(args.game, inventory, fluidContainer)) {
 				energyContainer->energy -= consumed_energy;
 				return;
 			}
@@ -78,27 +78,12 @@ namespace Game3 {
 			return true;
 		}
 
-		if (modifiers.onlyCtrl()) {
-			// rotateClockwise();
-			return true;
-		}
-
-		if (modifiers.shift && modifiers.ctrl)
+		if (modifiers.onlyCtrl())
 			EnergeticTileEntity::addObserver(player, false);
-		else
+		else if (modifiers.onlyShift())
 			FluidHoldingTileEntity::addObserver(player, false);
-
-		{
-			auto lock = energyContainer->sharedLock();
-			INFO("Energy: {}", energyContainer->energy);
-		}
-
-		{
-			GamePtr game = realm->getGame();
-			auto lock = fluidContainer->levels.sharedLock();
-			for (const auto &[id, amount]: fluidContainer->levels)
-				INFO("{} = {}", game->getFluid(id)->identifier, amount);
-		}
+		else if (modifiers.empty())
+			InventoriedTileEntity::addObserver(player, false);
 
 		return false;
 	}
@@ -150,6 +135,18 @@ namespace Game3 {
 		std::erase_if(FluidHoldingTileEntity::observers, [&](const std::weak_ptr<Player> &weak_player) {
 			if (auto player = weak_player.lock()) {
 				if (!EnergeticTileEntity::observers.contains(player))
+					player->send(packet);
+				return false;
+			}
+
+			return true;
+		});
+
+		auto inventoried_lock = InventoriedTileEntity::observers.uniqueLock();
+
+		std::erase_if(InventoriedTileEntity::observers, [&](const std::weak_ptr<Player> &weak_player) {
+			if (auto player = weak_player.lock()) {
+				if (!EnergeticTileEntity::observers.contains(player) && !FluidHoldingTileEntity::observers.contains(player))
 					player->send(packet);
 				return false;
 			}
