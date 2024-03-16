@@ -32,7 +32,6 @@ namespace Game3 {
 		if (!fluids || !inventory || !canCraft(fluids))
 			return false;
 
-		auto inventory_lock = inventory->uniqueLock();
 		ItemStackPtr output = getOutput(input, game);
 
 		if (!inventory->canInsert(output))
@@ -42,6 +41,13 @@ namespace Game3 {
 		leftovers = inventory->add(output);
 		assert(!leftovers.has_value());
 		return true;
+	}
+
+	bool CentrifugeRecipe::craft(const GamePtr &game, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) {
+		std::optional<Output> leftovers;
+		const bool result = craft(game, input_container, output_container, leftovers);
+		assert(!leftovers);
+		return result;
 	}
 
 	void CentrifugeRecipe::toJSON(nlohmann::json &json) const {

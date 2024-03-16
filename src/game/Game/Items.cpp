@@ -26,6 +26,7 @@
 #include "item/IncineratorItem.h"
 #include "item/Item.h"
 #include "item/Landfill.h"
+#include "item/LiquifierItem.h"
 #include "item/Mead.h"
 #include "item/MeleeWeapon.h"
 #include "item/MicroscopeItem.h"
@@ -192,6 +193,8 @@ namespace Game3 {
 		add(std::make_shared<Landfill>("base:item/stone",         "Stone",         1, 64, "base:tile/stone", "base:tile/cave_wall"));
 		add(std::make_shared<Landfill>("base:item/grimstone",     "Grimstone",     2, 64, "base:tile/grimstone"));
 		add(std::make_shared<Landfill>("base:item/dirt",          "Dirt",          1, 64, "base:tile/dirt"));
+
+		add(std::make_shared<LiquifierItem>("base:item/liquifier", "Liquifier", 999, 64)); // TODO: cost
 
 		add(std::make_shared<Mead>("base:item/mead", "Mead", 10, 16));
 

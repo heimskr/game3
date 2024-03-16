@@ -37,7 +37,6 @@ namespace Game3 {
 		auto this_lock = uniqueLock();
 		auto other_lock = other.sharedLock();
 		storage = other.storage;
-		onSwap = other.onSwap;
 		return *this;
 	}
 
@@ -49,7 +48,6 @@ namespace Game3 {
 		auto this_lock = uniqueLock();
 		auto other_lock = other.uniqueLock();
 		storage = std::move(other.storage);
-		onSwap = std::move(other.onSwap);
 		return *this;
 	}
 

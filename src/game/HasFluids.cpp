@@ -6,6 +6,11 @@ namespace Game3 {
 	HasFluids::HasFluids(std::shared_ptr<FluidContainer> fluid_container):
 		fluidContainer(std::move(fluid_container)) {}
 
+	void HasFluids::init(const std::shared_ptr<HasFluids> &self) {
+		if (fluidContainer)
+			fluidContainer->weakOwner = self;
+	}
+
 	FluidAmount HasFluids::getMaxLevel(FluidID) {
 		return std::numeric_limits<FluidLevel>::max();
 	}

@@ -27,6 +27,15 @@ namespace Game3 {
 	}
 
 	bool GeothermalRecipe::craft(const GamePtr &game, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) {
+		if (craft(game, input_container, output_container)) {
+			leftovers.reset();
+			return true;
+		}
+
+		return false;
+	}
+
+	bool GeothermalRecipe::craft(const GamePtr &game, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) {
 		auto fluids = std::dynamic_pointer_cast<FluidContainer>(input_container);
 		auto energy = std::dynamic_pointer_cast<EnergyContainer>(output_container);
 
@@ -39,7 +48,6 @@ namespace Game3 {
 			return false;
 
 		assert(energy->add(output) == 0);
-		leftovers.reset();
 		fluids->levels[input.id] -= input.amount;
 		return true;
 	}

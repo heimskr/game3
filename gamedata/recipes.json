@@ -474,6 +474,10 @@
 			["base:geothermal_recipe", {
 				"input":  ["base:fluid/lava", 100],
 				"output": 500
+			}],
+			["base:liquifier_recipe", {
+				"input":  ["base:item/chemical", 1, {"formula": "C3H7N3O2"}],
+				"output": ["base:fluid/mutagen", 250]
 			}]
 		]]
 	]

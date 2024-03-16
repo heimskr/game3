@@ -28,8 +28,11 @@ namespace Game3 {
 
 		virtual bool canCraft(const std::shared_ptr<Container> &) = 0;
 
-		/** Attempts to produce the result of the recipe, removing any ingredients from the given container as necessary. */
+		/** Attempts to produce the result of the recipe, removing any ingredients from the given container as necessary. May or may not fail (depending on the recipe type) if there would be any leftover output. */
 		virtual bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) = 0;
+
+		/** Attempts to produce the result of the recipe, removing any ingredients from the given container as necessary. Fails without making any changes if there would be any leftover output. */
+		virtual bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) = 0;
 
 		virtual void toJSON(nlohmann::json &) const = 0;
 

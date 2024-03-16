@@ -22,6 +22,8 @@ namespace Game3 {
 		bool canCraft(const std::shared_ptr<Container> &input_container) override;
 		/** Crafting will fail if there's not enough space in the output inventory. */
 		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) override;
+		/** Crafting will fail if there's not enough space in the output inventory. */
+		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) override;
 		void toJSON(nlohmann::json &) const override;
 
 		static CraftingRecipe fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);

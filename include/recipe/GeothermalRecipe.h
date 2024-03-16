@@ -20,8 +20,10 @@ namespace Game3 {
 		Output getOutput(const Input &, const std::shared_ptr<Game> &) override;
 		/** Doesn't lock the container. */
 		bool canCraft(const std::shared_ptr<Container> &) override;
-		/** Doesn't lock either container. */
+		/** Doesn't lock either container. Fails if there would be leftover energy. */
 		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) override;
+		/** Doesn't lock either container. */
+		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) override;
 		void toJSON(nlohmann::json &) const override;
 
 		static GeothermalRecipe fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);

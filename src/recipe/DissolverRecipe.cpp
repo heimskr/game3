@@ -80,6 +80,35 @@ namespace Game3 {
 		return craft(game, input_container, output_container, leftovers, nullptr);
 	}
 
+	bool DissolverRecipe::craft(const GamePtr &game, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) {
+		auto input_inventory  = std::dynamic_pointer_cast<Inventory>(input_container);
+		auto output_inventory = std::dynamic_pointer_cast<Inventory>(output_container);
+
+		if (!input_inventory || !output_inventory || !canCraft(input_inventory))
+			return false;
+
+		Output output = getOutput(input, game);
+
+		auto copy = output_inventory->copy();
+
+		size_t atom_count = 0;
+
+		for (const ItemStackPtr &stack: output) {
+			if (!output_inventory->canInsert(stack))
+				return false;
+			atom_count += countAtoms(stack);
+		}
+
+		assert(input->count == input_inventory->remove(input));
+
+		for (const ItemStackPtr &stack: output)
+			if (ItemStackPtr leftover_stack = output_inventory->add(stack))
+				return false;
+
+		output_inventory->replace(std::move(*copy));
+		return true;
+	}
+
 	DissolverRecipe DissolverRecipe::fromJSON(const GamePtr &game, const Identifier &identifier, const nlohmann::json &json) {
 		return DissolverRecipe(identifier, ItemStack::create(game, identifier, 1), json);
 	}

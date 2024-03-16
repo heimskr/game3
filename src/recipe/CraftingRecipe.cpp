@@ -33,7 +33,16 @@ namespace Game3 {
 		return true;
 	}
 
-	bool CraftingRecipe::craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) {
+	bool CraftingRecipe::craft(const std::shared_ptr<Game> &game, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) {
+		if (craft(game, input_container, output_container)) {
+			leftovers.reset();
+			return true;
+		}
+
+		return false;
+	}
+
+	bool CraftingRecipe::craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) {
 		auto inventory_in  = std::dynamic_pointer_cast<Inventory>(input_container);
 		auto inventory_out = std::dynamic_pointer_cast<Inventory>(output_container);
 
@@ -55,7 +64,6 @@ namespace Game3 {
 					return false;
 
 			inventory_in->replace(std::move(*copy));
-			leftovers.emplace();
 			return true;
 		}
 
@@ -68,7 +76,6 @@ namespace Game3 {
 				inventory_in->remove(requirement);
 
 			inventory_out->add(output[0]);
-			leftovers.emplace();
 			return true;
 		}
 
@@ -85,7 +92,6 @@ namespace Game3 {
 			inventory_in->remove(requirement);
 
 		inventory_out->replace(std::move(*out_copy));
-		leftovers.emplace();
 		return true;
 	}
 

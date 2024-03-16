@@ -26,6 +26,8 @@ namespace Game3 {
 		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers, size_t *atoms_out);
 		/** Doesn't lock either container. */
 		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) override;
+		/** Doesn't lock either container. Computationally expensive (makes a copy of the output inventory). */
+		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) override;
 
 		void toJSON(nlohmann::json &) const override;
 

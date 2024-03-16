@@ -14,6 +14,8 @@ namespace Game3 {
 			ExpandedServerInventory(ServerInventory &&other):
 				ServerInventory(std::move(other)) {}
 
+			using StorageInventory::operator=;
+
 			std::unique_ptr<Inventory> copy() const override;
 			ItemStackPtr add(const ItemStackPtr &, const SlotPredicate &, Slot start) override;
 

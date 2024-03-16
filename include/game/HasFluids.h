@@ -23,6 +23,9 @@ namespace Game3 {
 
 			virtual ~HasFluids() = default;
 
+			/** Sets the owner of the fluid container. */
+			void init(const std::shared_ptr<HasFluids> &self);
+
 			virtual size_t getMaxFluidTypes() const { return 1; }
 			virtual FluidAmount getMaxLevel(FluidID);
 

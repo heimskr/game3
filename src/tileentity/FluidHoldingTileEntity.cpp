@@ -76,7 +76,7 @@ namespace Game3 {
 			queueBroadcast();
 		} else {
 			GamePtr game = TileEntity::getGame();
-			game->toClient().signalFluidUpdate().emit(std::dynamic_pointer_cast<HasFluids>(shared_from_this()));
+			game->toClient().signalFluidUpdate().emit(safeDynamicCast<HasFluids>(shared_from_this()));
 		}
 	}
 

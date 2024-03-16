@@ -59,6 +59,34 @@ namespace Game3 {
 		return true;
 	}
 
+	bool CombinerRecipe::craft(const std::shared_ptr<Game> &game, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) {
+		auto input_inventory  = std::dynamic_pointer_cast<Inventory>(input_container);
+		auto output_inventory = std::dynamic_pointer_cast<Inventory>(output_container);
+
+		if (!input_inventory || !output_inventory || !canCraft(input_inventory))
+			return false;
+
+		Output output = getOutput(input, game);
+
+		ItemStackPtr output_stack = ItemStack::create(game, identifier, outputCount);
+
+		if (!output_inventory->canInsert(output_stack))
+			return false;
+
+		for (const ItemStackPtr &input_stack: input) {
+			const bool matches = input_stack->count == input_inventory->remove(input_stack);
+			assert(matches);
+		}
+
+		auto copy = output_inventory->copy();
+
+		if (ItemStackPtr insertion_leftover = copy->add(output_stack))
+			return false;
+
+		output_inventory->replace(std::move(*copy));
+		return true;
+	}
+
 	void CombinerRecipe::toJSON(nlohmann::json &json) const {
 		json["type"] = CombinerRecipeRegistry::ID();
 		json["input"] = input;
