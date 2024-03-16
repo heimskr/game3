@@ -8,7 +8,10 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "te/mutator"}; }
 
+			void mutate(float strength = .2f);
+
 			std::string getName() const override { return "Mutator"; }
+			void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) override;
 
 			void init(Game &) override;
 			void toJSON(nlohmann::json &) const override;
@@ -34,6 +37,7 @@ namespace Game3 {
 
 			void findMutagen();
 
+		friend class MutatorModule;
 		friend class TileEntity;
 	};
 }

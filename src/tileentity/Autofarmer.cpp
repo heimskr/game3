@@ -8,9 +8,11 @@
 #include "graphics/SpriteRenderer.h"
 #include "graphics/Tileset.h"
 #include "item/Plantable.h"
+#include "packet/OpenModuleForAgentPacket.h"
 #include "realm/Realm.h"
 #include "tile/CropTile.h"
 #include "tileentity/Autofarmer.h"
+#include "ui/module/MultiModule.h"
 
 namespace Game3 {
 	namespace {
@@ -70,15 +72,9 @@ namespace Game3 {
 			return true;
 		}
 
-		if (modifiers.shift && modifiers.ctrl)
-			EnergeticTileEntity::addObserver(player, false);
-		else
-			InventoriedTileEntity::addObserver(player, false);
-
-		{
-			auto lock = energyContainer->sharedLock();
-			INFO("Energy: {}", energyContainer->energy);
-		}
+		player->send(OpenModuleForAgentPacket(MultiModule<Substance::Item, Substance::Energy>::ID(), getGID()));
+		EnergeticTileEntity::addObserver(player, true);
+		InventoriedTileEntity::addObserver(player, true);
 
 		return false;
 	}

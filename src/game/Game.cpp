@@ -16,6 +16,7 @@
 #include "ui/module/MicroscopeModule.h"
 #include "ui/module/ModuleFactory.h"
 #include "ui/module/MultiModule.h"
+#include "ui/module/MutatorModule.h"
 #include "ui/module/VillageTradeModule.h"
 #include "algorithm/AStar.h"
 #include "util/FS.h"
@@ -49,8 +50,10 @@ namespace Game3 {
 		add(ModuleFactory::create<AutocrafterModule>());
 		add(ModuleFactory::create<VillageTradeModule>());
 		add(ModuleFactory::create<MicroscopeModule>());
+		add(ModuleFactory::create<MutatorModule>());
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Energy, Substance::Fluid>>());
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Fluid>>());
+		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Energy>>());
 	}
 
 	void Game::initialSetup(const std::filesystem::path &dir) {

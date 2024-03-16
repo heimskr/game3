@@ -5,26 +5,26 @@
 
 #include <any>
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace Game3 {
 	class Agent;
+	class FluidLevelsModule;
 	class InventoryModule;
-	class InventoryTab;
-	class Microscope;
+	class Mutator;
 
-	class MicroscopeModule: public Module {
+	class MutatorModule: public Module {
 		public:
-			static Identifier ID() { return {"base", "module/microscope"}; }
+			static Identifier ID() { return {"base", "module/mutator"}; }
 
-			MicroscopeModule(std::shared_ptr<ClientGame>, const std::any &);
-			MicroscopeModule(std::shared_ptr<ClientGame>, std::shared_ptr<Microscope>);
+			MutatorModule(std::shared_ptr<ClientGame>, const std::any &);
+			MutatorModule(std::shared_ptr<ClientGame>, std::shared_ptr<Mutator>);
 
 			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;
 			void reset()  final;
 			void update() final;
-			void updateResults();
 			void onResize(int) final;
 			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
 			void setInventory(std::shared_ptr<ClientInventory>) final;
@@ -32,13 +32,14 @@ namespace Game3 {
 
 		private:
 			std::shared_ptr<ClientGame> game;
-			std::shared_ptr<Microscope> microscope;
+			std::shared_ptr<Mutator> mutator;
 			std::shared_ptr<InventoryModule> inventoryModule;
-			Gtk::Label header;
+			std::shared_ptr<FluidLevelsModule> fluidsModule;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
-			Gtk::Box resultsBox{Gtk::Orientation::VERTICAL};
-			std::vector<std::unique_ptr<Gtk::Label>> resultsLabels;
+			Gtk::Label header;
+			Gtk::Button mutateButton{"Mutate"};
+			Gtk::Box hbox{Gtk::Orientation::HORIZONTAL};
 
-			void populate();
+			void mutate();
 	};
 }

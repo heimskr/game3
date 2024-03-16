@@ -53,7 +53,7 @@ namespace Game3 {
 
 		}
 
-		return {};
+		return std::nullopt;
 	}
 
 	void FluidLevelsModule::updateIf(const std::shared_ptr<HasFluids> &has_fluids) {

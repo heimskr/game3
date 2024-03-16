@@ -1,14 +1,12 @@
 #include "biology/Gene.h"
-#include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
 #include "item/ContainmentOrb.h"
 #include "net/Buffer.h"
 #include "tileentity/Microscope.h"
-#include "ui/gtk/DragSource.h"
 #include "ui/gtk/Util.h"
-#include "ui/module/MicroscopeModule.h"
 #include "ui/module/InventoryModule.h"
+#include "ui/module/MicroscopeModule.h"
 #include "ui/tab/InventoryTab.h"
 #include "ui/MainWindow.h"
 
@@ -20,7 +18,6 @@ namespace Game3 {
 	game(std::move(game_)),
 	microscope(std::move(microscope_)),
 	inventoryModule(std::make_shared<InventoryModule>(game, std::static_pointer_cast<ClientInventory>(microscope->getInventory(0)))) {
-		assert(microscope);
 		vbox.set_hexpand();
 
 		header.set_text(microscope->getName());
@@ -121,7 +118,7 @@ namespace Game3 {
 
 		}
 
-		return {};
+		return std::nullopt;
 	}
 
 	void MicroscopeModule::setInventory(std::shared_ptr<ClientInventory> inventory) {
