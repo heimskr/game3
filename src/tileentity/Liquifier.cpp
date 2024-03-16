@@ -80,13 +80,6 @@ namespace Game3 {
 			return true;
 		}
 
-		// if (modifiers.onlyCtrl())
-		// 	EnergeticTileEntity::addObserver(player, false);
-		// else if (modifiers.onlyShift())
-		// 	FluidHoldingTileEntity::addObserver(player, false);
-		// else if (modifiers.empty())
-		// 	InventoriedTileEntity::addObserver(player, false);
-
 		player->send(OpenModuleForAgentPacket(MultiModule<Substance::Item, Substance::Energy, Substance::Fluid>::ID(), getGID()));
 		EnergeticTileEntity::addObserver(player, true);
 		FluidHoldingTileEntity::addObserver(player, true);

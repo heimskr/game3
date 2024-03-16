@@ -41,30 +41,34 @@ namespace Game3 {
 			MultiModule(std::shared_ptr<ClientGame> game, const std::any &argument, ItemSlotParent *item_slot_parent = nullptr, InventoryModule::GmenuFn gmenu_fn = {}) {
 				AgentPtr agent = std::any_cast<AgentPtr>(argument);
 
+				header.set_margin(10);
+				header.set_xalign(0.5);
 				header.set_text(agent->getName());
 				vbox.append(header);
+
+				size_t index = 0;
 
 				for (Substance substance: {S...}) {
 					switch (substance) {
 						case Substance::Item: {
 							auto inventoried = std::dynamic_pointer_cast<InventoriedTileEntity>(agent);
 							assert(inventoried);
-							for (size_t index = 0; index < inventoried->getInventoryCount(); ++index) {
-								auto inventory = safeDynamicCast<ClientInventory>(inventoried->getInventory(index));
-								submodules.push_back(std::make_shared<InventoryModule>(game, std::move(inventory), item_slot_parent, gmenu_fn));
+							for (size_t i = 0; i < inventoried->getInventoryCount(); ++i) {
+								auto inventory = safeDynamicCast<ClientInventory>(inventoried->getInventory(i));
+								submodules[index] = std::make_shared<InventoryModule>(game, std::move(inventory), item_slot_parent, gmenu_fn);
 							}
 							break;
 						}
 
 						case Substance::Fluid: {
 							assert(std::dynamic_pointer_cast<FluidHoldingTileEntity>(agent));
-							submodules.push_back(std::make_shared<FluidLevelsModule>(game, argument, false));
+							submodules[index] = std::make_shared<FluidLevelsModule>(game, argument, false);
 							break;
 						}
 
 						case Substance::Energy: {
 							assert(std::dynamic_pointer_cast<EnergeticTileEntity>(agent));
-							submodules.push_back(std::make_shared<EnergyLevelModule>(game, argument, false));
+							submodules[index] = std::make_shared<EnergyLevelModule>(game, argument, false);
 							break;
 						}
 
@@ -72,7 +76,7 @@ namespace Game3 {
 							throw std::invalid_argument(std::format("Invalid Substance: {}", int(substance)));
 					}
 
-					vbox.append(submodules.back()->getWidget());
+					vbox.append(submodules[index++]->getWidget());
 				}
 			}
 
@@ -120,7 +124,7 @@ namespace Game3 {
 
 		private:
 			Gtk::Label header;
-			std::vector<std::shared_ptr<Module>> submodules;
+			std::array<std::shared_ptr<Module>, sizeof...(S)> submodules;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
 
 			void populate();

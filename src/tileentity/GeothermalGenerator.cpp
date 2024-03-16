@@ -4,9 +4,11 @@
 #include "game/ServerInventory.h"
 #include "item/FilledFlask.h"
 #include "packet/InteractPacket.h"
+#include "packet/OpenModuleForAgentPacket.h"
 #include "realm/Realm.h"
 #include "recipe/GeothermalRecipe.h"
 #include "tileentity/GeothermalGenerator.h"
+#include "ui/module/MultiModule.h"
 
 namespace Game3 {
 	namespace {
@@ -130,12 +132,10 @@ namespace Game3 {
 			return true;
 		}
 
-		if (modifiers.onlyCtrl())
-			FluidHoldingTileEntity::addObserver(player, false);
-		else if (modifiers.onlyShift())
-			EnergeticTileEntity::addObserver(player, false);
-		else
-			InventoriedTileEntity::addObserver(player, false);
+		player->send(OpenModuleForAgentPacket(MultiModule<Substance::Item, Substance::Energy, Substance::Fluid>::ID(), getGID()));
+		EnergeticTileEntity::addObserver(player, true);
+		FluidHoldingTileEntity::addObserver(player, true);
+		InventoriedTileEntity::addObserver(player, true);
 
 		{
 			assert(fluidContainer);
@@ -159,33 +159,6 @@ namespace Game3 {
 		InventoriedTileEntity::absorbJSON(game, json);
 		FluidHoldingTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);
-	}
-
-	bool GeothermalGenerator::populateMenu(const PlayerPtr &player, bool, const std::string &id, Glib::RefPtr<Gio::Menu> menu, Glib::RefPtr<Gio::SimpleActionGroup> group) {
-		auto submenu = Gio::Menu::create();
-
-		Glib::ustring start = "agent" + id;
-
-		Glib::ustring fluid_action = start + ".fluids";
-		submenu->append("Fluids", "agent_menu." + fluid_action);
-		group->add_action(fluid_action, [this, player] {
-			player->send(InteractPacket(false, Hand::None, Modifiers{false, true, false, false}, getGID(), player->direction));
-		});
-
-		Glib::ustring energy_action = start + ".energy";
-		submenu->append("Energy", "agent_menu." + energy_action);
-		group->add_action(energy_action, [this, player] {
-			player->send(InteractPacket(false, Hand::None, Modifiers{true, true, false, false}, getGID(), player->direction));
-		});
-
-		Glib::ustring inventory_action = start + ".inventory";
-		submenu->append("Inventory", "agent_menu." + inventory_action);
-		group->add_action(inventory_action, [this, player] {
-			player->send(InteractPacket(false, Hand::None, Modifiers{}, getGID(), player->direction));
-		});
-
-		menu->append_submenu(getName(), submenu);
-		return true;
 	}
 
 	void GeothermalGenerator::encode(Game &game, Buffer &buffer) {
