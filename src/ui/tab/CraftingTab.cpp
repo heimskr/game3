@@ -83,8 +83,8 @@ namespace Game3 {
 						output_label_text += " + ";
 					if (output->count != 1)
 						output_label_text += std::to_string(output->count) + ' ';
-					output_label_text += output->item->name;
-					Glib::ustring tooltip = output->item->name;
+					output_label_text += output->getTooltip();
+					Glib::ustring tooltip = output->getTooltip();
 					if (output->count != 1)
 						tooltip += " \u00d7 " + std::to_string(output->count);
 					label->set_tooltip_text(tooltip);
@@ -110,7 +110,7 @@ namespace Game3 {
 					if (input.is<ItemStackPtr>()) {
 						ItemStackPtr stack = input.get<ItemStackPtr>();
 						Glib::ustring ending = stack->count == 0? " (not consumed)" : "";
-						label = std::make_unique<Gtk::Label>((1 < stack->count? std::to_string(stack->count) + " \u00d7 " : "") + stack->item->name + ending);
+						label = std::make_unique<Gtk::Label>((1 < stack->count? std::to_string(stack->count) + " \u00d7 " : "") + stack->getTooltip() + ending);
 					} else {
 						const auto &[attribute, count] = input.get<AttributeRequirement>();
 						Glib::ustring ending = count == 0? " (not consumed)" : "";

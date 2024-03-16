@@ -291,7 +291,7 @@ namespace Game3 {
 	}
 
 	void VillageTradeModule::Row::updateLabel() {
-		quantityLabel.set_text(std::format("× {:.2f}", amount));
+		quantityLabel.set_text(std::format("\u00d7 {:.2f}", amount));
 	}
 
 	void VillageTradeModule::Row::updateTooltips(ItemCount count) {

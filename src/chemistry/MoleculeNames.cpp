@@ -14,6 +14,7 @@ namespace Game3 {
 		{"C", "Carbon"},
 		{"N", "Nitrogen"},
 		{"Si", "Silicon"},
+		{"U", "Uranium"},
 		{"SiO2", "Silica"},
 		{"Al2Si2O5(OH)4", "Kaolinite"},
 		{"C39H35O10NS", "Lignite"},
