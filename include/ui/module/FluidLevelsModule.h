@@ -16,7 +16,8 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "module/fluid_levels"}; }
 
-			FluidLevelsModule(std::shared_ptr<ClientGame>, const std::any &);
+			/** The std::any argument is expected to hold an AgentPtr to an Agent that extends HasFluids. */
+			FluidLevelsModule(std::shared_ptr<ClientGame>, const std::any &, bool show_header = true);
 
 			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;
@@ -29,6 +30,7 @@ namespace Game3 {
 		private:
 			std::shared_ptr<ClientGame> game;
 			std::shared_ptr<HasFluids> fluidHaver;
+			bool showHeader{};
 			std::vector<std::unique_ptr<Gtk::Widget>> widgets;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
 

@@ -123,21 +123,21 @@ namespace Game3 {
 	Buffer & operator<<(Buffer &, const Color &);
 	Buffer & operator>>(Buffer &, Color &);
 
-	enum class PipeType: uint8_t {Invalid = 0, Item, Fluid, Energy};
+	enum class Substance: uint8_t {Invalid = 0, Item, Fluid, Energy};
 	enum class Hand: uint8_t {None = 0, Left, Right};
 }
 
 template <>
-struct std::formatter<Game3::PipeType> {
+struct std::formatter<Game3::Substance> {
 	constexpr auto parse(std::format_parse_context &ctx) {
 		return ctx.begin();
 	}
 
-	auto format(const auto &pipe_type, std::format_context &ctx) const {
+	auto format(auto pipe_type, std::format_context &ctx) const {
 		switch (pipe_type) {
-			case Game3::PipeType::Item:   return std::format_to(ctx.out(), "Item");
-			case Game3::PipeType::Fluid:  return std::format_to(ctx.out(), "Fluid");
-			case Game3::PipeType::Energy: return std::format_to(ctx.out(), "Energy");
+			case Game3::Substance::Item:   return std::format_to(ctx.out(), "Item");
+			case Game3::Substance::Fluid:  return std::format_to(ctx.out(), "Fluid");
+			case Game3::Substance::Energy: return std::format_to(ctx.out(), "Energy");
 			default:
 				return std::format_to(ctx.out(), "Invalid");
 		}

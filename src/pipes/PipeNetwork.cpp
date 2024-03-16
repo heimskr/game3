@@ -14,13 +14,13 @@ namespace Game3 {
 	PipeNetwork::PipeNetwork(size_t id_, const std::shared_ptr<Realm> &realm):
 		id(id_), weakRealm(realm) {}
 
-	std::unique_ptr<PipeNetwork> PipeNetwork::create(PipeType type, size_t id, const std::shared_ptr<Realm> &realm) {
+	std::unique_ptr<PipeNetwork> PipeNetwork::create(Substance type, size_t id, const std::shared_ptr<Realm> &realm) {
 		switch (type) {
-			case PipeType::Item:
+			case Substance::Item:
 				return std::make_unique<ItemNetwork>(id, realm);
-			case PipeType::Fluid:
+			case Substance::Fluid:
 				return std::make_unique<FluidNetwork>(id, realm);
-			case PipeType::Energy:
+			case Substance::Energy:
 				return std::make_unique<EnergyNetwork>(id, realm);
 			default:
 				throw std::invalid_argument("Can't create pipe network with type " + std::to_string(static_cast<int>(type)));
@@ -58,7 +58,7 @@ namespace Game3 {
 
 		assert(other);
 
-		const PipeType type = getType();
+		const Substance type = getType();
 		assert(other->getType() == type);
 
 		const std::shared_ptr<PipeNetwork> shared = shared_from_this();
@@ -94,7 +94,7 @@ namespace Game3 {
 
 		auto this_lock = uniqueLock();
 
-		const PipeType type = getType();
+		const Substance type = getType();
 
 		std::shared_ptr<PipeNetwork> new_network = PipeNetwork::create(type, realm->pipeLoader.newID(), realm);
 
@@ -162,7 +162,7 @@ namespace Game3 {
 		if (!realm)
 			throw std::runtime_error("Couldn't lock realm");
 
-		PipeType type = getType();
+		Substance type = getType();
 
 		if (!canWorkWith(realm->tileEntityAt(position))) {
 			for (const Direction direction: ALL_DIRECTIONS) {
@@ -197,7 +197,7 @@ namespace Game3 {
 	}
 
 	void PipeNetwork::removePipe(const std::shared_ptr<Pipe> &member) {
-		const PipeType type = getType();
+		const Substance type = getType();
 		member->dying[type] = true;
 
 		{

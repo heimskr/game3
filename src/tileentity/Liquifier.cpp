@@ -5,9 +5,11 @@
 #include "game/EnergyContainer.h"
 #include "game/ServerInventory.h"
 #include "graphics/SpriteRenderer.h"
+#include "packet/OpenModuleForAgentPacket.h"
 #include "realm/Realm.h"
 #include "recipe/LiquifierRecipe.h"
 #include "tileentity/Liquifier.h"
+#include "ui/module/MultiModule.h"
 #include "util/Cast.h"
 
 namespace Game3 {
@@ -78,12 +80,17 @@ namespace Game3 {
 			return true;
 		}
 
-		if (modifiers.onlyCtrl())
-			EnergeticTileEntity::addObserver(player, false);
-		else if (modifiers.onlyShift())
-			FluidHoldingTileEntity::addObserver(player, false);
-		else if (modifiers.empty())
-			InventoriedTileEntity::addObserver(player, false);
+		// if (modifiers.onlyCtrl())
+		// 	EnergeticTileEntity::addObserver(player, false);
+		// else if (modifiers.onlyShift())
+		// 	FluidHoldingTileEntity::addObserver(player, false);
+		// else if (modifiers.empty())
+		// 	InventoriedTileEntity::addObserver(player, false);
+
+		player->send(OpenModuleForAgentPacket(MultiModule<Substance::Item, Substance::Energy, Substance::Fluid>::ID(), getGID()));
+		EnergeticTileEntity::addObserver(player, true);
+		FluidHoldingTileEntity::addObserver(player, true);
+		InventoriedTileEntity::addObserver(player, true);
 
 		return false;
 	}

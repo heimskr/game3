@@ -16,7 +16,7 @@ namespace Game3 {
 
 			using PipeNetwork::PipeNetwork;
 
-			PipeType getType() const final { return PipeType::Item; }
+			Substance getType() const final { return Substance::Item; }
 
 			void tick(const std::shared_ptr<Game> &, Tick) final;
 			void lastPipeRemoved(Position) final;

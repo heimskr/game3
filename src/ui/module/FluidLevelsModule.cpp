@@ -8,9 +8,10 @@
 #include "ui/MainWindow.h"
 
 namespace Game3 {
-	FluidLevelsModule::FluidLevelsModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
+	FluidLevelsModule::FluidLevelsModule(std::shared_ptr<ClientGame> game_, const std::any &argument, bool show_header):
 	game(std::move(game_)),
-	fluidHaver(std::dynamic_pointer_cast<HasFluids>(std::any_cast<AgentPtr>(argument))) {
+	fluidHaver(std::dynamic_pointer_cast<HasFluids>(std::any_cast<AgentPtr>(argument))),
+	showHeader(show_header) {
 		vbox.set_hexpand();
 	}
 
@@ -68,13 +69,15 @@ namespace Game3 {
 		auto &levels = fluidHaver->fluidContainer->levels;
 		auto lock = levels.sharedLock();
 
-		auto header = std::make_unique<Gtk::Label>("???");
-		if (auto agent = std::dynamic_pointer_cast<Agent>(fluidHaver))
-			header->set_text(agent->getName());
-		header->set_margin(10);
-		header->set_xalign(0.5);
-		vbox.append(*header);
-		widgets.push_back(std::move(header));
+		if (showHeader) {
+			auto header = std::make_unique<Gtk::Label>("???");
+			if (auto agent = std::dynamic_pointer_cast<Agent>(fluidHaver))
+				header->set_text(agent->getName());
+			header->set_margin(10);
+			header->set_xalign(0.5);
+			vbox.append(*header);
+			widgets.push_back(std::move(header));
+		}
 
 		for (const auto &[id, amount]: levels) {
 			const FluidAmount max = fluidHaver->getMaxLevel(id);

@@ -16,7 +16,8 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "module/energy_level"}; }
 
-			EnergyLevelModule(std::shared_ptr<ClientGame>, const std::any &);
+			/** The std::any argument is expected to hold an AgentPtr to an Agent that extends HasEnergy. */
+			EnergyLevelModule(std::shared_ptr<ClientGame>, const std::any &, bool show_header = true);
 
 			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;

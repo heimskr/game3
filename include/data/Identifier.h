@@ -16,6 +16,7 @@ namespace Game3 {
 
 		Identifier() = default;
 		Identifier(const char *space_, const char *name_): space(space_), name(name_) {}
+		Identifier(std::string space_, std::string name_): space(std::move(space_)), name(std::move(name_)) {}
 		Identifier(std::string_view);
 		Identifier(const char *);
 

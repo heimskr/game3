@@ -26,7 +26,7 @@ namespace Game3 {
 			auto lock = by_chunk->sharedLock();
 			for (const TileEntityPtr &tile_entity: *by_chunk)
 				if (auto pipe = std::dynamic_pointer_cast<Pipe>(tile_entity))
-					for (const PipeType pipe_type: PIPE_TYPES)
+					for (const Substance pipe_type: PIPE_TYPES)
 						if (!pipe->loaded[pipe_type])
 							floodFill(pipe_type, pipe);
 		}
@@ -37,7 +37,7 @@ namespace Game3 {
 		}
 	}
 
-	void PipeLoader::floodFill(PipeType pipe_type, const std::shared_ptr<Pipe> &start) {
+	void PipeLoader::floodFill(Substance pipe_type, const std::shared_ptr<Pipe> &start) {
 		// The initial pipe needs to have not been loaded yet, and it can't already have a network.
 		assert(!start->loaded[pipe_type]);
 		// If this assertion ever fails, something is horribly wrong.

@@ -11,7 +11,7 @@ namespace Game3 {
 		public:
 			FluidNetwork(size_t id_, const std::shared_ptr<Realm> &);
 
-			PipeType getType() const final { return PipeType::Fluid; }
+			Substance getType() const final { return Substance::Fluid; }
 
 			void tick(const std::shared_ptr<Game> &, Tick) final;
 			bool canWorkWith(const std::shared_ptr<TileEntity> &) const final;

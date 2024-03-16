@@ -13,9 +13,9 @@
 #include "tileentity/Pipe.h"
 
 namespace Game3 {
-	std::shared_ptr<Item> getPipeItem(const Game &, PipeType);
+	std::shared_ptr<Item> getPipeItem(const Game &, Substance);
 
-	template <PipeType P>
+	template <Substance P>
 	class PipeItem: public Item {
 		protected:
 			PipeItem(Identifier identifier_, const char *display_name, MoneyCount base_price):
@@ -62,7 +62,7 @@ namespace Game3 {
 					bool self_present = false;
 					bool others_present = false;
 
-					for (const PipeType pipe_type: PIPE_TYPES) {
+					for (const Substance pipe_type: PIPE_TYPES) {
 						if (pipe->getPresent(pipe_type)) {
 							if (pipe_type == P) {
 								self_present = true;
@@ -106,7 +106,7 @@ namespace Game3 {
 			}
 	};
 
-	class ItemPipeItem: public PipeItem<PipeType::Item> {
+	class ItemPipeItem: public PipeItem<Substance::Item> {
 		public:
 			static Identifier ID() { return {"base", "item/item_pipe"}; }
 			ItemPipeItem(MoneyCount base_price):
@@ -116,14 +116,14 @@ namespace Game3 {
 			std::optional<bool> customUse(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float> offsets) override;
 	};
 
-	class FluidPipeItem: public PipeItem<PipeType::Fluid> {
+	class FluidPipeItem: public PipeItem<Substance::Fluid> {
 		public:
 			static Identifier ID() { return {"base", "item/fluid_pipe"}; }
 			FluidPipeItem(MoneyCount base_price):
 				PipeItem(ID(), "Fluid Pipe", base_price) {}
 	};
 
-	class EnergyPipeItem: public PipeItem<PipeType::Energy> {
+	class EnergyPipeItem: public PipeItem<Substance::Energy> {
 		public:
 			static Identifier ID() { return {"base", "item/energy_pipe"}; }
 			EnergyPipeItem(MoneyCount base_price):

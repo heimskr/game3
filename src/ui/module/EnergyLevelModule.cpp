@@ -8,7 +8,7 @@
 #include "ui/MainWindow.h"
 
 namespace Game3 {
-	EnergyLevelModule::EnergyLevelModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
+	EnergyLevelModule::EnergyLevelModule(std::shared_ptr<ClientGame> game_, const std::any &argument, bool show_header):
 	game(std::move(game_)),
 	energyHaver(std::dynamic_pointer_cast<HasEnergy>(std::any_cast<AgentPtr>(argument))) {
 		vbox.set_hexpand();
@@ -20,7 +20,8 @@ namespace Game3 {
 		bar.set_valign(Gtk::Align::CENTER);
 		hbox.append(energyLabel);
 		hbox.append(bar);
-		vbox.append(headerLabel);
+		if (show_header)
+			vbox.append(headerLabel);
 		vbox.append(hbox);
 	}
 

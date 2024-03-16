@@ -20,7 +20,7 @@ namespace Game3 {
 			PipeLoader() = default;
 
 			void load(Realm &, ChunkPosition);
-			void floodFill(PipeType, const std::shared_ptr<Pipe> &);
+			void floodFill(Substance, const std::shared_ptr<Pipe> &);
 			size_t newID() { return ++lastID; }
 	};
 }

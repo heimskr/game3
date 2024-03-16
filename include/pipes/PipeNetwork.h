@@ -37,7 +37,7 @@ namespace Game3 {
 
 			virtual ~PipeNetwork() = default;
 
-			static std::unique_ptr<PipeNetwork> create(PipeType, size_t id, const std::shared_ptr<Realm> &);
+			static std::unique_ptr<PipeNetwork> create(Substance, size_t id, const std::shared_ptr<Realm> &);
 
 			void add(std::weak_ptr<Pipe>);
 			void absorb(std::shared_ptr<PipeNetwork>);
@@ -60,7 +60,7 @@ namespace Game3 {
 
 			inline auto getID() const { return id; }
 
-			virtual PipeType getType() const = 0;
+			virtual Substance getType() const = 0;
 			virtual void tick(const std::shared_ptr<Game> &, Tick);
 			bool canTick(Tick);
 	};
