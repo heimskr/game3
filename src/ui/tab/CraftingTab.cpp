@@ -39,11 +39,11 @@ namespace Game3 {
 		popoverMenu.unparent();
 	}
 
-	void CraftingTab::update(const std::shared_ptr<ClientGame> &game) {
+	void CraftingTab::update(const ClientGamePtr &game) {
 		reset(game);
 	}
 
-	void CraftingTab::reset(const std::shared_ptr<ClientGame> &game) {
+	void CraftingTab::reset(const ClientGamePtr &game) {
 		if (!game) {
 			lastGame.reset();
 			removeChildren(vbox);
@@ -152,31 +152,31 @@ namespace Game3 {
 		}
 	}
 
-	void CraftingTab::craftOne(const std::shared_ptr<ClientGame> &game, size_t registry_id) {
+	void CraftingTab::craftOne(const ClientGamePtr &game, size_t registry_id) {
 		game->getPlayer()->send(CraftPacket(threadContext.rng(), registry_id, 1));
 	}
 
-	void CraftingTab::craftX(const std::shared_ptr<ClientGame> &game, size_t registry_id) {
+	void CraftingTab::craftX(const ClientGamePtr &game, size_t registry_id) {
 		auto dialog = std::make_unique<CraftXDialog>(mainWindow);
 		dialog->signal_submit().connect([this, weak_game = std::weak_ptr(game), registry_id](int count) {
-			if (count <= 0)
-				if (auto game = weak_game.lock())
+			if (0 < count)
+				if (ClientGamePtr game = weak_game.lock())
 					game->getPlayer()->send(CraftPacket(threadContext.rng(), registry_id, static_cast<uint64_t>(count)));
 		});
 		mainWindow.queueDialog(std::move(dialog));
 	}
 
-	void CraftingTab::craftAll(const std::shared_ptr<ClientGame> &game, size_t registry_id) {
+	void CraftingTab::craftAll(const ClientGamePtr &game, size_t registry_id) {
 		game->getPlayer()->send(CraftPacket(threadContext.rng(), registry_id, -1));
 	}
 
-	void CraftingTab::leftClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *, size_t registry_id, int n, double, double) {
+	void CraftingTab::leftClick(const ClientGamePtr &game, Gtk::Widget *, size_t registry_id, int n, double, double) {
 		mainWindow.onBlur();
 		if (n % 2 == 0)
 			craftOne(game, registry_id);
 	}
 
-	void CraftingTab::rightClick(const std::shared_ptr<ClientGame> &game, Gtk::Widget *widget, size_t registry_id, double x, double y) {
+	void CraftingTab::rightClick(const ClientGamePtr &game, Gtk::Widget *widget, size_t registry_id, double x, double y) {
 		mainWindow.onBlur();
 
 		do {

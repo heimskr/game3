@@ -66,10 +66,8 @@ namespace Game3 {
 		} catch (const std::exception &err) {
 			ERROR("Gene decoding failed in Mutator::mutate: {}", err.what());
 		}
-		INFO("Old gene: {}", data_iter->dump());
 		gene->mutate(strength);
 		gene->toJSON(*data_iter);
-		INFO("New gene: {}", data_iter->dump());
 		inventory->notifyOwner();
 	}
 
