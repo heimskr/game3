@@ -176,14 +176,15 @@ namespace Game3 {
 	void InventoryModule::repopulate() {
 		auto lock = inventory.sharedLock();
 		assert(inventory);
-		auto inventory_lock = inventory->sharedLock();
+		Inventory &inventory_ref = *inventory;
+		auto inventory_lock = inventory_ref.sharedLock();
 
-		if (inventory->getSlotCount() != lastSlotCount) {
+		if (inventory_ref.getSlotCount() != lastSlotCount) {
 			populate();
 			return;
 		}
 
-		lastSlotCount = inventory->getSlotCount();
+		lastSlotCount = inventory_ref.getSlotCount();
 
 		for (Slot slot = 0; slot < lastSlotCount; ++slot) {
 			ItemStackPtr stack = (*inventory)[slot];
@@ -205,9 +206,10 @@ namespace Game3 {
 	void InventoryModule::leftClick(Slot slot, Modifiers modifiers, int count) {
 		auto lock = inventory.sharedLock();
 		assert(inventory);
-		auto inventory_lock = inventory->sharedLock();
+		Inventory &inventory_ref = *inventory;
+		auto inventory_lock = inventory_ref.sharedLock();
 
-		if (!game || !modifiers.onlyShift() || (parent && parent->suppressLeftClick()) || !inventory->contains(slot)) {
+		if (!game || !modifiers.onlyShift() || (parent && parent->suppressLeftClick()) || !inventory_ref.contains(slot)) {
 			if (parent && count % 2 == 0)
 				parent->slotDoubleClicked(slot);
 			return;
@@ -217,10 +219,10 @@ namespace Game3 {
 		if (!player_inventory)
 			return;
 
-		AgentPtr owner = inventory->weakOwner.lock();
+		AgentPtr owner = inventory_ref.weakOwner.lock();
 		if (!owner)
 			return;
 
-		game->getPlayer()->send(MoveSlotsPacket(owner->getGID(), game->getPlayer()->getGID(), slot, -1, inventory->index, 0));
+		game->getPlayer()->send(MoveSlotsPacket(owner->getGID(), game->getPlayer()->getGID(), slot, -1, inventory_ref.index, 0));
 	}
 }
