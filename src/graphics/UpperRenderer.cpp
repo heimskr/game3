@@ -1,19 +1,17 @@
 // Credit: https://github.com/davudk/OpenGL-TileMap-Demos/blob/master/Renderers/UpperRenderer.cs
 
-#include "graphics/Shader.h"
-#include "graphics/Tileset.h"
-#include "container/Quadtree.h"
 #include "game/ClientGame.h"
 #include "game/Game.h"
+#include "graphics/Shader.h"
+#include "graphics/Tileset.h"
 #include "graphics/UpperRenderer.h"
 #include "realm/Realm.h"
 #include "ui/MainWindow.h"
 #include "util/FS.h"
 #include "util/Timer.h"
-#include "util/Util.h"
 
 #include <array>
-#include <iostream>
+#include <cassert>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -23,11 +21,10 @@ namespace Game3 {
 	namespace {
 		const std::string & upperFrag() { static auto out = readFile("resources/upper.frag"); return out; }
 		const std::string & upperVert() { static auto out = readFile("resources/upper.vert"); return out; }
-		constexpr float TEXTURE_SCALE = 2.f;
 		constexpr float TILE_TEXTURE_PADDING = 1.f / 16384.f;
 	}
 
-	UpperRenderer::UpperRenderer() {}
+	UpperRenderer::UpperRenderer() = default;
 
 	UpperRenderer::UpperRenderer(Realm &realm_):
 		realm(&realm_) {}
@@ -85,10 +82,10 @@ namespace Game3 {
 
 		glm::mat4 projection(1.f);
 		projection = glm::scale(projection, {float(tilesize), -float(tilesize), 1.f}) *
-		             glm::scale(projection, {scale / backbufferWidth, scale / backbufferHeight, 1.f}) *
+		             glm::scale(projection, {scale / float(backbufferWidth), scale / float(backbufferHeight), 1.f}) *
 		             glm::translate(projection, {
-		                 center_x - CHUNK_SIZE / 2.f + chunk_x * CHUNK_SIZE,
-		                 center_y - CHUNK_SIZE / 2.f + chunk_y * CHUNK_SIZE,
+		                 center_x - CHUNK_SIZE / 2.f + float(chunk_x) * CHUNK_SIZE,
+		                 center_y - CHUNK_SIZE / 2.f + float(chunk_y) * CHUNK_SIZE,
 		                 0.f
 		             });
 
@@ -125,7 +122,7 @@ namespace Game3 {
 
 		glm::mat4 projection(1.f);
 		projection = glm::scale(projection, {tilesize, tilesize, 1.f}) *
-		             glm::scale(projection, {2.f / backbufferWidth, 2.f / backbufferHeight, 1.f}) *
+		             glm::scale(projection, {2.f / float(backbufferWidth), 2.f / float(backbufferHeight), 1.f}) *
 		             glm::translate(projection, {-CHUNK_SIZE, -CHUNK_SIZE, 0.f});
 
 		shader.bind();
@@ -206,7 +203,7 @@ namespace Game3 {
 		if (set_width == 0)
 			return false;
 
-		const float divisor = set_width;
+		const float divisor(set_width);
 		const float t_size = 1.f / divisor - TILE_TEXTURE_PADDING * 2;
 
 		Timer timer{"UpperVBOInit"};
@@ -231,8 +228,8 @@ namespace Game3 {
 
 			// Texture coordinates for the upper portion of the below tile
 #define U_DEFS(I) \
-			const float ux##I = (uppers[I] % set_width) / divisor + TILE_TEXTURE_PADDING; \
-			const float uy##I = (uppers[I] / set_width) / divisor + TILE_TEXTURE_PADDING;
+			const float ux##I((uppers[I] % set_width) / divisor + TILE_TEXTURE_PADDING); \
+			const float uy##I((uppers[I] / set_width) / divisor + TILE_TEXTURE_PADDING);
 
 			U_DEFS(0); U_DEFS(1); U_DEFS(2); U_DEFS(3);
 

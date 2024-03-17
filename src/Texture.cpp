@@ -5,7 +5,6 @@
 #include "graphics/Texture.h"
 #include "util/Util.h"
 
-#include <csignal>
 #include <unordered_map>
 
 #define STB_IMAGE_IMPLEMENTATION

@@ -2,6 +2,9 @@
 
 #include "net/Buffer.h"
 #include "packet/Packet.h"
+#include "types/Types.h"
+
+#include <string>
 
 namespace Game3 {
 	struct RegisterPlayerPacket: Packet {
@@ -19,6 +22,6 @@ namespace Game3 {
 		void encode(Game &, Buffer &buffer) const override { buffer << username << displayName; }
 		void decode(Game &, Buffer &buffer)       override { buffer >> username >> displayName; }
 
-		void handle(const std::shared_ptr<ServerGame> &, RemoteClient &) override;
+		void handle(const ServerGamePtr &, RemoteClient &) override;
 	};
 }

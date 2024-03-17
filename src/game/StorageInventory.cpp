@@ -33,7 +33,7 @@ namespace Game3 {
 		if (this == &other)
 			return *this;
 
-		Inventory::operator=(other);
+		static_cast<Inventory &>(*this) = other;
 		auto this_lock = uniqueLock();
 		auto other_lock = other.sharedLock();
 		storage = other.storage;
@@ -44,7 +44,7 @@ namespace Game3 {
 		if (this == &other)
 			return *this;
 
-		Inventory::operator=(std::move(other));
+		static_cast<Inventory &>(*this) = std::move(other);
 		auto this_lock = uniqueLock();
 		auto other_lock = other.uniqueLock();
 		storage = std::move(other.storage);

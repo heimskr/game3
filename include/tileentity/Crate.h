@@ -1,8 +1,12 @@
 #pragma once
 
+#include "data/Identifier.h"
 #include "game/Inventory.h"
 #include "threading/Lockable.h"
 #include "tileentity/InventoriedTileEntity.h"
+#include "types/Types.h"
+
+#include <string>
 
 namespace Game3 {
 	class Crate: public InventoriedTileEntity {
@@ -19,8 +23,8 @@ namespace Game3 {
 			ItemCount itemsInsertable(const ItemStackPtr &, Direction, Slot) override;
 
 			void toJSON(nlohmann::json &) const override;
-			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
-			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
+			bool onInteractNextTo(const PlayerPtr &, Modifiers, const ItemStackPtr &, Hand) override;
+			void absorbJSON(const GamePtr &, const nlohmann::json &) override;
 
 			void setInventory(Slot slot_count) override;
 

@@ -20,7 +20,7 @@ namespace Game3 {
 			int backbufferHeight = -1;
 
 			Eigen::Vector2f center{0.f, 0.f};
-			std::shared_ptr<Tileset> tileset;
+			std::shared_ptr<Tileset> tileset{};
 
 			UpperRenderer();
 			UpperRenderer(Realm &);
@@ -46,16 +46,16 @@ namespace Game3 {
 		private:
 			bool initialized = false;
 			Shader shader{"terrain"};
-			GL::FloatVAO vao;
-			GL::VBO vbo;
-			GL::EBO ebo;
-			GL::FBO fbo;
+			GL::FloatVAO vao{};
+			GL::VBO vbo{};
+			GL::EBO ebo{};
+			GL::FBO fbo{};
 			Realm *realm = nullptr;
 			TileChunk *chunk = nullptr;
 			TileProvider *provider = nullptr;
-			std::vector<TileID> tileCache;
+			std::vector<TileID> tileCache{};
 			std::atomic_bool positionDirty = false;
-			Lockable<ChunkPosition> chunkPosition;
+			Lockable<ChunkPosition> chunkPosition{};
 
 			bool generateVertexBufferObject();
 			bool generateElementBufferObject();

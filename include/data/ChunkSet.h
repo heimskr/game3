@@ -4,6 +4,7 @@
 #include "Layer.h"
 #include "game/Fluids.h"
 #include "threading/HasMutex.h"
+#include "types/Types.h"
 
 #include <array>
 #include <span>

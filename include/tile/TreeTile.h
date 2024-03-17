@@ -1,6 +1,8 @@
 #pragma once
 
+#include "data/Identifier.h"
 #include "tile/CropTile.h"
+#include "types/Types.h"
 
 namespace Game3 {
 	class TreeTile: public CropTile {

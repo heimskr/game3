@@ -1,7 +1,13 @@
 #pragma once
 
+#include "data/Identifier.h"
 #include "game/Fluids.h"
 #include "item/Item.h"
+#include "types/Types.h"
+#include "ui/Modifiers.h"
+
+#include <string>
+#include <utility>
 
 namespace Game3 {
 	class ContainmentOrb: public Item {
