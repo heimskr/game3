@@ -79,8 +79,9 @@ namespace Game3 {
 			ItemStackPtr getActive() const override;
 
 			void prevSlot() override;
-
 			void nextSlot() override;
+
+			Slot slotsOccupied() const override;
 
 			void replace(const Inventory &) override;
 			void replace(Inventory &&) override;

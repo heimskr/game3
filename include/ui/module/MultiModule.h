@@ -38,9 +38,10 @@ namespace Game3 {
 				return {"base", std::move(name)};
 			}
 
-			MultiModule(std::shared_ptr<ClientGame> game, const std::any &argument, ItemSlotParent *item_slot_parent = nullptr, InventoryModule::GmenuFn gmenu_fn = {}) {
-				AgentPtr agent = std::any_cast<AgentPtr>(argument);
+			MultiModule(std::shared_ptr<ClientGame> game, const std::any &argument, ItemSlotParent *item_slot_parent = nullptr, InventoryModule::GmenuFn gmenu_fn = {}):
+				MultiModule(std::move(game), std::any_cast<AgentPtr>(argument), item_slot_parent, std::move(gmenu_fn)) {}
 
+			MultiModule(std::shared_ptr<ClientGame> game, const AgentPtr &agent, ItemSlotParent *item_slot_parent = nullptr, InventoryModule::GmenuFn gmenu_fn = {}) {
 				header.set_margin(10);
 				header.set_xalign(0.5);
 				header.set_text(agent->getName());
@@ -62,13 +63,13 @@ namespace Game3 {
 
 						case Substance::Fluid: {
 							assert(std::dynamic_pointer_cast<FluidHoldingTileEntity>(agent));
-							submodules[index] = std::make_shared<FluidLevelsModule>(game, argument, false);
+							submodules[index] = std::make_shared<FluidLevelsModule>(game, agent, false);
 							break;
 						}
 
 						case Substance::Energy: {
 							assert(std::dynamic_pointer_cast<EnergeticTileEntity>(agent));
-							submodules[index] = std::make_shared<EnergyLevelModule>(game, argument, false);
+							submodules[index] = std::make_shared<EnergyLevelModule>(game, agent, false);
 							break;
 						}
 

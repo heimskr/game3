@@ -95,4 +95,18 @@ namespace Game3 {
 		entity->spawning = true;
 		return entity;
 	}
+
+	bool ContainmentOrb::validate(const ItemStackPtr &stack) {
+		return stack && stack->getID() == "base:item/contorb";
+	}
+
+	bool ContainmentOrb::isEmpty(const ItemStackPtr &stack) {
+		if (!stack)
+			throw std::invalid_argument("Can't evaluate whether null stack is an empty containment orb");
+
+		if (stack->getID() != "base:item/contorb")
+			throw std::invalid_argument("Can't evaluate whether non-containment orb stack is an empty containment orb");
+
+		return stack->data.empty();
+	}
 }

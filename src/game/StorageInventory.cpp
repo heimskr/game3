@@ -1,5 +1,6 @@
 #include "game/StorageInventory.h"
 #include "recipe/CraftingRecipe.h"
+#include "util/Util.h"
 
 namespace Game3 {
 	StorageInventory::StorageInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, InventoryID index_, Storage storage_):
@@ -293,6 +294,10 @@ namespace Game3 {
 	void StorageInventory::nextSlot() {
 		if (activeSlot < slotCount - 1)
 			setActive(activeSlot + 1, false);
+	}
+
+	Slot StorageInventory::slotsOccupied() const {
+		return safeCast<Slot>(storage.size());
 	}
 
 	void StorageInventory::replace(const Inventory &other) {

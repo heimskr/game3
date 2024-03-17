@@ -20,6 +20,7 @@
 #include "tileentity/OreDeposit.h"
 #include "tileentity/Pipe.h"
 #include "tileentity/Pump.h"
+#include "tileentity/Sequencer.h"
 #include "tileentity/Sign.h"
 #include "tileentity/Stockpile.h"
 #include "tileentity/Tank.h"
@@ -55,6 +56,7 @@ namespace Game3 {
 		add(TileEntityFactory::create<OreDeposit>());
 		add(TileEntityFactory::create<Pipe>());
 		add(TileEntityFactory::create<Pump>());
+		add(TileEntityFactory::create<Sequencer>());
 		add(TileEntityFactory::create<Sign>());
 		add(TileEntityFactory::create<Stockpile>());
 		add(TileEntityFactory::create<Tank>());

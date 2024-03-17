@@ -9,8 +9,11 @@
 
 namespace Game3 {
 	EnergyLevelModule::EnergyLevelModule(std::shared_ptr<ClientGame> game_, const std::any &argument, bool show_header):
+		EnergyLevelModule(std::move(game_), std::any_cast<AgentPtr>(argument), show_header) {}
+
+	EnergyLevelModule::EnergyLevelModule(std::shared_ptr<ClientGame> game_, const AgentPtr &agent, bool show_header):
 	game(std::move(game_)),
-	energyHaver(std::dynamic_pointer_cast<HasEnergy>(std::any_cast<AgentPtr>(argument))) {
+	energyHaver(std::dynamic_pointer_cast<HasEnergy>(agent)) {
 		vbox.set_hexpand();
 		headerLabel.set_margin(10);
 		headerLabel.set_xalign(0.5);

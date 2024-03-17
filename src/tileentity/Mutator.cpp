@@ -148,12 +148,7 @@ namespace Game3 {
 	}
 
 	bool Mutator::mayInsertItem(const ItemStackPtr &stack, Direction, Slot slot) {
-		const Identifier id = stack->getID();
-
-		if (id == "base:item/gene")
-			return slot == 0;
-
-		return false;
+		return slot == 0 && stack->getID() == "base:item/gene";
 	}
 
 	void Mutator::encode(Game &game, Buffer &buffer) {

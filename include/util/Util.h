@@ -51,7 +51,6 @@ namespace Game3 {
 		return ss.str();
 	}
 
-
 	template <typename S, typename T>
 	void appendSpan(S &raw, const std::span<T> &source) {
 		const size_t byte_count = source.size() * sizeof(source[0]);

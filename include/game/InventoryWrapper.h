@@ -57,6 +57,7 @@ namespace Game3 {
 			void setActive(Slot, bool force) override;
 			void notifyOwner() override;
 			bool empty() const override;
+			Slot slotsOccupied() const override;
 			void replace(const Inventory &) override;
 			void replace(Inventory &&) override;
 

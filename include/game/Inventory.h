@@ -171,6 +171,8 @@ namespace Game3 {
 			 *  Doesn't take the output of the recipe into account. */
 			virtual ItemCount craftable(const CraftingRecipe &) const;
 
+			virtual Slot slotsOccupied() const = 0;
+
 			virtual void replace(const Inventory &) = 0;
 			virtual void replace(Inventory &&) = 0;
 

@@ -21,5 +21,8 @@ namespace Game3 {
 			bool isTextureCacheable() const override { return false; }
 
 			static EntityPtr makeEntity(const ItemStackPtr &);
+			/** Returns whether the stack contains a valid (empty or otherwise) containment orb. */
+			static bool validate(const ItemStackPtr &);
+			static bool isEmpty(const ItemStackPtr &);
 	};
 }

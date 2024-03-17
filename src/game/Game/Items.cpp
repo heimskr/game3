@@ -37,6 +37,7 @@
 #include "item/PipeItem.h"
 #include "item/PumpItem.h"
 #include "item/Sapling.h"
+#include "item/SequencerItem.h"
 #include "item/Seed.h"
 #include "item/TankItem.h"
 #include "item/TerrainSeed.h"
@@ -229,6 +230,8 @@ namespace Game3 {
 		add(std::make_shared<Seed>("base:item/onion_seeds",      "Onion Seeds",       "base:tile/onion_0",      4));
 		add(std::make_shared<Seed>("base:item/bean_seeds",       "Bean Seeds",        "base:tile/bean_0",       4));
 		add(std::make_shared<Seed>("base:item/chili_seeds",      "Chili Seeds",       "base:tile/chili_0",      5));
+
+		add(std::make_shared<SequencerItem>("base:item/sequencer", "Sequencer", 999, 64)); // TODO: cost
 
 		add(std::make_shared<SnowySapling>("base:item/snowy_sapling", "Snowy Sapling", 5, 64));
 

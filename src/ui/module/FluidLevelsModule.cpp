@@ -9,8 +9,11 @@
 
 namespace Game3 {
 	FluidLevelsModule::FluidLevelsModule(std::shared_ptr<ClientGame> game_, const std::any &argument, bool show_header):
+		FluidLevelsModule(std::move(game_), std::any_cast<AgentPtr>(argument), show_header) {}
+
+	FluidLevelsModule::FluidLevelsModule(std::shared_ptr<ClientGame> game_, const AgentPtr &agent, bool show_header):
 	game(std::move(game_)),
-	fluidHaver(std::dynamic_pointer_cast<HasFluids>(std::any_cast<AgentPtr>(argument))),
+	fluidHaver(std::dynamic_pointer_cast<HasFluids>(agent)),
 	showHeader(show_header) {
 		vbox.set_hexpand();
 	}

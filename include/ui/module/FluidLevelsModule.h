@@ -18,6 +18,7 @@ namespace Game3 {
 
 			/** The std::any argument is expected to hold an AgentPtr to an Agent that extends HasFluids. */
 			FluidLevelsModule(std::shared_ptr<ClientGame>, const std::any &, bool show_header = true);
+			FluidLevelsModule(std::shared_ptr<ClientGame>, const AgentPtr &, bool show_header = true);
 
 			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;

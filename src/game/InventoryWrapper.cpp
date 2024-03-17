@@ -263,6 +263,18 @@ namespace Game3 {
 		return inventory->empty();
 	}
 
+	Slot InventoryWrapper::slotsOccupied() const {
+		Slot out = 0;
+
+		iterate([this, &out](const ItemStackPtr &stack, Slot slot) {
+			if (stack && validateSlot(slot))
+				++out;
+			return false;
+		});
+
+		return out;
+	}
+
 	void InventoryWrapper::replace(const Inventory &other) {
 		inventory->replace(other);
 	}
