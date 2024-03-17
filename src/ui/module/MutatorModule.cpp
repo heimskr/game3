@@ -23,19 +23,25 @@ namespace Game3 {
 	geneInfoModule(nullptr) {
 		vbox.set_hexpand(true);
 
+		mutateButton.set_hexpand(true);
+		mutateButton.set_vexpand(false);
+		mutateButton.set_halign(Gtk::Align::CENTER);
+		mutateButton.set_valign(Gtk::Align::CENTER);
+		mutateButton.signal_clicked().connect([this] {
+			mutate();
+		});
+
 		header.set_text(mutator->getName());
 		header.set_margin(10);
 		header.set_xalign(0.5);
 		vbox.append(header);
-		hbox.append(inventoryModule->getWidget());
+		Gtk::Widget &inventory_widget = inventoryModule->getWidget();
+		inventory_widget.set_hexpand(false);
+		hbox.append(inventory_widget);
 		hbox.append(mutateButton);
 		vbox.append(hbox);
 		vbox.append(fluidsModule->getWidget());
 		vbox.append(geneInfoModule.getWidget());
-
-		mutateButton.signal_clicked().connect([this] {
-			mutate();
-		});
 	}
 
 	Gtk::Widget & MutatorModule::getWidget() {
