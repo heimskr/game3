@@ -36,6 +36,10 @@ namespace Game3 {
 		popoverMenu.set_parent(vbox);
 	}
 
+	InventoryModule::~InventoryModule() {
+		popoverMenu.unparent();
+	}
+
 	ClientInventoryPtr InventoryModule::getInventory(const std::any &any) {
 		const Argument *argument = std::any_cast<Argument>(&any);
 		if (!argument) {

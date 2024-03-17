@@ -34,6 +34,8 @@ namespace Game3 {
 			InventoryTab() = delete;
 			InventoryTab(MainWindow &);
 
+			~InventoryTab() override;
+
 			Gtk::Widget & getWidget() override { return scrolled; }
 			std::string getName() override { return "Inventory"; }
 			void onResize(const std::shared_ptr<ClientGame> &) override;
@@ -54,7 +56,6 @@ namespace Game3 {
 		private:
 			Gtk::ScrolledWindow scrolled;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
-			Gtk::PopoverMenu popoverMenu;
 			Lockable<std::shared_ptr<Module>> currentModule;
 			std::optional<InventoryModule> inventoryModule;
 			Gtk::Box actionBox{Gtk::Orientation::HORIZONTAL};

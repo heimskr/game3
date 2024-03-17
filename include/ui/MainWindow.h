@@ -45,7 +45,6 @@ namespace Game3 {
 			std::shared_ptr<TextTab> textTab;
 			std::shared_ptr<InventoryTab> inventoryTab;
 			std::shared_ptr<CraftingTab> craftingTab;
-			Gtk::PopoverMenu glMenu;
 			Lockable<ClientSettings> settings;
 
 			MainWindow(BaseObjectType *, const Glib::RefPtr<Gtk::Builder> &);
@@ -91,6 +90,7 @@ namespace Game3 {
 
 			inline Modifiers getModifiers() const { return glAreaModifiers; }
 			Position getHoveredPosition() const;
+			inline Gtk::PopoverMenu & getGLMenu() { return glMenu; }
 
 			void openModule(const Identifier &, const std::any &);
 			void removeModule();
@@ -120,6 +120,7 @@ namespace Game3 {
 			Gtk::Box vbox {Gtk::Orientation::VERTICAL};
 			Gtk::Box statusBox {Gtk::Orientation::HORIZONTAL};
 			Gtk::GLArea glArea;
+			Gtk::PopoverMenu glMenu;
 			Gtk::Label statusbar;
 			Gtk::Label moneyLabel;
 			Gtk::Label timeLabel;

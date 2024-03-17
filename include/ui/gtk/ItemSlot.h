@@ -22,6 +22,8 @@ namespace Game3 {
 			ItemSlot() = delete;
 			ItemSlot(const std::shared_ptr<ClientGame> &, Slot, std::shared_ptr<ClientInventory>, ItemSlotParent * = nullptr);
 
+			~ItemSlot() override;
+
 			void reset();
 			bool empty() const;
 			void setLeftClick(ClickFn);

@@ -99,6 +99,10 @@ namespace Game3 {
 		add_controller(rightGesture);
 	}
 
+	ItemSlot::~ItemSlot() {
+		popoverMenu.unparent();
+	}
+
 	void ItemSlot::setStack(const ItemStackPtr &stack) {
 		image.set(stack->getImage());
 

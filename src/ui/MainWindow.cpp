@@ -181,8 +181,6 @@ namespace Game3 {
 		});
 		glArea.set_focusable(true);
 
-		glMenu.set_parent(vbox);
-
 		auto key_controller = Gtk::EventControllerKey::create();
 		key_controller->signal_key_pressed().connect(sigc::mem_fun(*this, &MainWindow::onKeyPressed), false);
 		key_controller->signal_key_released().connect(sigc::mem_fun(*this, &MainWindow::onKeyReleased));
@@ -371,6 +369,7 @@ namespace Game3 {
 	}
 
 	MainWindow::~MainWindow() {
+		glMenu.unparent();
 		if (game)
 			game->stopThread();
 	}

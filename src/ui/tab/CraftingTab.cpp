@@ -33,8 +33,10 @@ namespace Game3 {
 		mainWindow.insert_action_group("crafting_popup", group);
 
 		popoverMenu.set_parent(mainWindow);
-		popoverMenu.set_menu_model(gmenu);
-		popoverMenu.set_has_arrow(true);
+	}
+
+	CraftingTab::~CraftingTab() {
+		popoverMenu.unparent();
 	}
 
 	void CraftingTab::update(const std::shared_ptr<ClientGame> &game) {
@@ -184,9 +186,12 @@ namespace Game3 {
 			widget = widget->get_parent();
 		} while (widget);
 
-		popoverMenu.set_pointing_to({int(x), int(y), 1, 1});
 		lastGame = game;
 		lastRegistryID = registry_id;
+
+		popoverMenu.set_pointing_to({int(x), int(y), 1, 1});
+		popoverMenu.set_menu_model(gmenu);
+		popoverMenu.set_has_arrow(true);
 		popoverMenu.popup();
 	}
 }

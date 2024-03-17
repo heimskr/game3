@@ -114,11 +114,12 @@ namespace Game3 {
 		});
 
 		mainWindow.insert_action_group("inventory_popup", group);
-		popoverMenu.set_parent(vbox);
 
 		vbox.set_hexpand();
 		vbox.set_vexpand();
 	}
+
+	InventoryTab::~InventoryTab() = default;
 
 	void InventoryTab::onResize(const std::shared_ptr<ClientGame> &) {
 		const int new_width = scrolled.get_width();

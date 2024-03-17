@@ -31,6 +31,8 @@ namespace Game3 {
 			InventoryModule(std::shared_ptr<ClientGame>, const std::any &, ItemSlotParent * = nullptr, GmenuFn = {});
 			InventoryModule(std::shared_ptr<ClientGame>, std::shared_ptr<ClientInventory>, ItemSlotParent * = nullptr, GmenuFn = {});
 
+			~InventoryModule() override;
+
 			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;
 			void reset()  final;

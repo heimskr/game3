@@ -1,9 +1,12 @@
 #pragma once
 
+#include "ui/tab/Tab.h"
+
+#include <memory>
+#include <string>
 #include <unordered_map>
 #include <utility>
-
-#include "ui/tab/Tab.h"
+#include <vector>
 
 namespace Game3 {
 	class MainWindow;
@@ -12,14 +15,9 @@ namespace Game3 {
 		public:
 			MainWindow &mainWindow;
 
-			CraftingTab() = delete;
 			CraftingTab(MainWindow &);
 
-			CraftingTab(const CraftingTab &) = delete;
-			CraftingTab(CraftingTab &&) = delete;
-
-			CraftingTab & operator=(const CraftingTab &) = delete;
-			CraftingTab & operator=(CraftingTab &&) = delete;
+			~CraftingTab() override;
 
 			Gtk::Widget & getWidget() override { return scrolled; }
 			std::string getName() override { return "Crafting"; }

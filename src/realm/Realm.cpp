@@ -1631,8 +1631,8 @@ namespace Game3 {
 				add(entity);
 
 		if (show_menu) {
-			auto &window = game.getWindow();
-			auto &menu = window.glMenu;
+			MainWindow &window = game.getWindow();
+			auto &menu = window.getGLMenu();
 			window.remove_action_group("agent_menu");
 			window.insert_action_group("agent_menu", group);
 			menu.set_menu_model(gmenu);
