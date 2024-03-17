@@ -51,6 +51,7 @@ namespace Game3 {
 	void MutatorModule::reset() {
 		inventoryModule->reset();
 		fluidsModule->reset();
+		geneInfoModule.reset();
 	}
 
 	void MutatorModule::update() {
@@ -98,8 +99,9 @@ namespace Game3 {
 
 	void MutatorModule::setInventory(std::shared_ptr<ClientInventory> inventory) {
 		inventoryModule->setInventory(std::move(inventory));
-		std::unique_ptr<Gene> gene = mutator->getGene();
-		if (gene)
+		if (std::unique_ptr<Gene> gene = mutator->getGene())
 			geneInfoModule.update(std::shared_ptr(std::move(gene)));
+		else
+			geneInfoModule.update(nullptr);
 	}
 }
