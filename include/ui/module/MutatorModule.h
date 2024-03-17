@@ -2,6 +2,7 @@
 
 #include "types/Types.h"
 #include "ui/module/Module.h"
+#include "ui/module/GeneInfoModule.h"
 
 #include <any>
 #include <memory>
@@ -35,6 +36,7 @@ namespace Game3 {
 			std::shared_ptr<Mutator> mutator;
 			std::shared_ptr<InventoryModule> inventoryModule;
 			std::shared_ptr<FluidLevelsModule> fluidsModule;
+			GeneInfoModule geneInfoModule;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
 			Gtk::Label header;
 			Gtk::Button mutateButton{"Mutate"};

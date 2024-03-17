@@ -4,11 +4,14 @@
 #include "tileentity/InventoriedTileEntity.h"
 
 namespace Game3 {
+	class Gene;
+
 	class Mutator: public FluidHoldingTileEntity, public InventoriedTileEntity {
 		public:
 			static Identifier ID() { return {"base", "te/mutator"}; }
 
-			void mutate(float strength = .2f);
+			void mutate(float strength);
+			std::unique_ptr<Gene> getGene() const;
 
 			std::string getName() const override { return "Mutator"; }
 			void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) override;

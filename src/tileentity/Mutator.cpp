@@ -60,17 +60,46 @@ namespace Game3 {
 		}
 
 		// Mutate the gene.
+		std::unique_ptr<Gene> gene;
+		try {
+			gene = Gene::fromJSON(*data_iter);
+		} catch (const std::exception &err) {
+			ERROR("Gene decoding failed in Mutator::mutate: {}", err.what());
+		}
 		INFO("Old gene: {}", data_iter->dump());
-		std::unique_ptr<Gene> gene = Gene::fromJSON(*data_iter);
 		gene->mutate(strength);
 		gene->toJSON(*data_iter);
 		INFO("New gene: {}", data_iter->dump());
 		inventory->notifyOwner();
 	}
 
+	std::unique_ptr<Gene> Mutator::getGene() const {
+		InventoryPtr inventory = getInventory(0);
+		if (!inventory)
+			return nullptr;
+
+		auto inventory_lock = inventory->sharedLock();
+
+		ItemStackPtr stack = (*inventory)[0];
+		if (!stack || stack->getID() != "base:item/gene")
+			return nullptr;
+
+		auto data_lock = stack->data.sharedLock();
+		auto iter = stack->data.find("gene");
+		if (iter == stack->data.end())
+			return nullptr;
+
+		try {
+			return Gene::fromJSON(*iter);
+		} catch (const std::exception &err) {
+			ERROR("Gene decoding failed in Mutator::getGene: {}", err.what());
+			return nullptr;
+		}
+	}
+
 	void Mutator::handleMessage(const std::shared_ptr<Agent> &, const std::string &name, std::any &) {
 		if (name == "Mutate")
-			mutate();
+			mutate(.4f);
 	}
 
 	void Mutator::init(Game &game) {

@@ -17,21 +17,17 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "module/gene_info"}; }
 
-			GeneInfoModule(std::shared_ptr<ClientGame>, const std::any &);
-			GeneInfoModule(std::shared_ptr<ClientGame>, std::shared_ptr<Gene>);
+			GeneInfoModule(std::shared_ptr<Gene>);
 
 			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;
 			void reset()  final;
 			void update() final;
-
-			void onResize(int) final;
-			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
+			void update(std::shared_ptr<Gene>);
 
 		private:
-			std::shared_ptr<ClientGame> game;
 			std::shared_ptr<Gene> gene;
+			std::vector<Gtk::Label> labels;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
-			Gtk::Label infoLabel;
 	};
 }

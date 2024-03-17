@@ -75,7 +75,7 @@ namespace Game3 {
 		std::vector<std::string> descriptions;
 
 		living->iterateGenes([&](Gene &gene) {
-			descriptions.push_back(gene.describe());
+			descriptions.push_back(gene.describeShort());
 		});
 
 		if (descriptions.empty()) {

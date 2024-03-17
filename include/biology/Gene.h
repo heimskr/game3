@@ -17,7 +17,8 @@ namespace Game3 {
 			virtual void toJSON(nlohmann::json &) const = 0;
 			/** strength ∈ [0.0, 1.0] */
 			virtual void mutate(float strength) = 0;
-			virtual std::string describe() const = 0;
+			virtual std::string describeShort() const = 0;
+			virtual std::vector<std::string> describeLong() const = 0;
 			virtual void encode(Buffer &) const = 0;
 			virtual void decode(Buffer &) = 0;
 
@@ -26,6 +27,8 @@ namespace Game3 {
 		protected:
 			std::string name;
 	};
+
+	using GenePtr = std::shared_ptr<Gene>;
 
 	class FloatGene: public Gene {
 		public:
@@ -36,7 +39,8 @@ namespace Game3 {
 
 			void toJSON(nlohmann::json &) const final;
 			void mutate(float strength) final;
-			std::string describe() const final;
+			std::string describeShort() const final;
+			std::vector<std::string> describeLong() const final;
 			void encode(Buffer &) const final;
 			void decode(Buffer &) final;
 
@@ -62,7 +66,8 @@ namespace Game3 {
 
 			void toJSON(nlohmann::json &) const final;
 			void mutate(float strength) final;
-			std::string describe() const final;
+			std::string describeShort() const final;
+			std::vector<std::string> describeLong() const final;
 			void encode(Buffer &) const final;
 			void decode(Buffer &) final;
 
@@ -86,7 +91,8 @@ namespace Game3 {
 
 			void toJSON(nlohmann::json &) const final;
 			void mutate(float strength) final;
-			std::string describe() const final;
+			std::string describeShort() const final;
+			std::vector<std::string> describeLong() const final;
 			void encode(Buffer &) const final;
 			void decode(Buffer &) final;
 
@@ -98,7 +104,6 @@ namespace Game3 {
 
 			float clamp(float) const;
 	};
-
 
 	Buffer & operator+=(Buffer &, const FloatGene &);
 	Buffer & operator<<(Buffer &, const FloatGene &);

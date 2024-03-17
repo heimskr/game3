@@ -1,8 +1,8 @@
+#include "biology/Gene.h"
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
 #include "net/Buffer.h"
-#include "packet/AgentMessagePacket.h"
 #include "tileentity/Mutator.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/FluidLevelsModule.h"
@@ -19,7 +19,8 @@ namespace Game3 {
 	game(std::move(game_)),
 	mutator(std::move(mutator_)),
 	inventoryModule(std::make_shared<InventoryModule>(game, std::static_pointer_cast<ClientInventory>(mutator->getInventory(0)))),
-	fluidsModule(std::make_shared<FluidLevelsModule>(game, std::make_any<AgentPtr>(mutator), false)) {
+	fluidsModule(std::make_shared<FluidLevelsModule>(game, std::make_any<AgentPtr>(mutator), false)),
+	geneInfoModule(nullptr) {
 		vbox.set_hexpand(true);
 
 		header.set_text(mutator->getName());
@@ -30,6 +31,7 @@ namespace Game3 {
 		hbox.append(mutateButton);
 		vbox.append(hbox);
 		vbox.append(fluidsModule->getWidget());
+		vbox.append(geneInfoModule.getWidget());
 
 		mutateButton.signal_clicked().connect([this] {
 			mutate();
@@ -48,6 +50,8 @@ namespace Game3 {
 	void MutatorModule::update() {
 		inventoryModule->update();
 		fluidsModule->update();
+		assert(mutator);
+		geneInfoModule.update(std::shared_ptr<Gene>(mutator->getGene()));
 	}
 
 	void MutatorModule::onResize(int width) {
@@ -88,5 +92,8 @@ namespace Game3 {
 
 	void MutatorModule::setInventory(std::shared_ptr<ClientInventory> inventory) {
 		inventoryModule->setInventory(std::move(inventory));
+		std::unique_ptr<Gene> gene = mutator->getGene();
+		if (gene)
+			geneInfoModule.update(std::shared_ptr(std::move(gene)));
 	}
 }

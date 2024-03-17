@@ -48,8 +48,18 @@ namespace Game3 {
 		value = clamp(value + normal * strength / base);
 	}
 
-	std::string FloatGene::describe() const {
+	std::string FloatGene::describeShort() const {
 		return std::format("{} (float; minimum: {}, maximum: {})", name, minimum, maximum);
+	}
+
+	std::vector<std::string> FloatGene::describeLong() const {
+		return {
+			std::format("Name: {}", name),
+			"Type: real",
+			std::format("Minimum: {}", minimum),
+			std::format("Maximum: {}", maximum),
+			std::format("Value: {:.3f}", value),
+		};
 	}
 
 	void FloatGene::encode(Buffer &buffer) const {
@@ -92,8 +102,18 @@ namespace Game3 {
 		value = clamp(value + ValueType(normal * strength / base * (maximum - minimum) / 2.f));
 	}
 
-	std::string LongGene::describe() const {
+	std::string LongGene::describeShort() const {
 		return std::format("{} (long; minimum: {}, maximum: {})", name, minimum, maximum);
+	}
+
+	std::vector<std::string> LongGene::describeLong() const {
+		return {
+			std::format("Name: {}", name),
+			"Type: integer",
+			std::format("Minimum: {}", minimum),
+			std::format("Maximum: {}", maximum),
+			std::format("Value: {}", value),
+		};
 	}
 
 	void LongGene::encode(Buffer &buffer) const {
@@ -134,8 +154,16 @@ namespace Game3 {
 		value = clamp(value + normal * strength / base);
 	}
 
-	std::string CircularGene::describe() const {
+	std::string CircularGene::describeShort() const {
 		return std::format("{} (circular)", name);
+	}
+
+	std::vector<std::string> CircularGene::describeLong() const {
+		return {
+			std::format("Name: {}", name),
+			"Type: circular",
+			std::format("Value: {:.3f}", value),
+		};
 	}
 
 	void CircularGene::encode(Buffer &buffer) const {
