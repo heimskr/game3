@@ -40,5 +40,9 @@ namespace Game3 {
 			std::vector<std::unique_ptr<Gtk::Label>> resultsLabels;
 
 			void populate();
+			void analyzeOrb(const ItemStackPtr &);
+			void analyzeGene(const ItemStackPtr &);
+			void addLabel(const std::string &);
+			void clearText();
 	};
 }
