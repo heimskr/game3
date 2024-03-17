@@ -34,7 +34,7 @@ namespace Game3 {
 	}
 
 	ServerGame::~ServerGame() {
-		INFO("\e[31m~ServerGame\e[39m({})", reinterpret_cast<void *>(this));
+		INFOX(3, "\e[31m~ServerGame\e[39m({})", reinterpret_cast<void *>(this));
 	}
 
 	void ServerGame::init() {
@@ -47,7 +47,7 @@ namespace Game3 {
 		assert(database);
 		database->writeAllRealms();
 		database->writeUsers(players);
-		SUCCESS_("Saved realms and users.");
+		SUCCESSX_(2, "Saved realms and users.");
 		Timer::summary();
 		Timer::clear();
 	}

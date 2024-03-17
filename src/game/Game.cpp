@@ -229,4 +229,8 @@ namespace Game3 {
 		RealmPtr realm = getRealm(realm_id);
 		realm->villages.insert(village);
 	}
+
+	bool Game::canLog(int level) const {
+		return level <= Logger::level;
+	}
 }

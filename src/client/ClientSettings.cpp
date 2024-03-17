@@ -3,6 +3,7 @@
 #include "game/ClientGame.h"
 #include "ui/gtk/JSONDialog.h"
 #include "ui/Canvas.h"
+#include "util/Timer.h"
 
 #include <nlohmann/json.hpp>
 
@@ -11,15 +12,22 @@ namespace Game3 {
 		game.canvas.sizeDivisor = sizeDivisor;
 	}
 
+	void ClientSettings::apply() const {
+		Timer::globalEnabled = !hideTimers;
+		Logger::level = logLevel;
+	}
+
 	std::unique_ptr<JSONDialog> ClientSettings::makeDialog(Gtk::Window &parent, std::function<void(const ClientSettings &)> submit) const {
 		auto dialog = std::make_unique<JSONDialog>(parent, "Settings", nlohmann::json{
-			{"hostname",          "text",   "Default Hostname",    {{"initial", hostname}}},
-			{"port",              "number", "Default Port",        {{"initial", std::to_string(port)}}},
-			{"username",          "text",   "Default Username",    {{"initial", username}}},
-			{"alertOnConnection", "bool",   "Alert on Connection", {{"initial", alertOnConnection}}},
-			{"renderLighting",    "bool",   "Render Lighting",     {{"initial", renderLighting}}},
-			{"sizeDivisor",       "slider", "Size Divisor",        {{"range", {-0.5, 4.0}},  {"increments", {0.1, 0.5}}, {"initial", sizeDivisor},   {"digits", 1}}},
-			{"tickFrequency",     "slider", "Tick Frequency",      {{"range", {1.0, 240.0}}, {"increments", {1.0, 4.0}}, {"initial", tickFrequency}, {"digits", 0}}},
+			{"hostname",          "text",   "Default Hostname",     {{"initial", hostname}}},
+			{"port",              "number", "Default Port",         {{"initial", std::to_string(port)}}},
+			{"username",          "text",   "Default Username",     {{"initial", username}}},
+			{"alertOnConnection", "bool",   "Alert on Connection",  {{"initial", alertOnConnection}}},
+			{"renderLighting",    "bool",   "Render Lighting",      {{"initial", renderLighting}}},
+			{"hideTimers",        "bool",   "Hide Timer Summaries", {{"initial", hideTimers}}},
+			{"logLevel",          "slider", "Log Level",            {{"range", {0,     3}}, {"increments", {1,   1}}, {"initial",      logLevel}, {"digits", 0}}},
+			{"sizeDivisor",       "slider", "Size Divisor",         {{"range", {-.5,  4.}}, {"increments", {.1, .5}}, {"initial",   sizeDivisor}, {"digits", 1}}},
+			{"tickFrequency",     "slider", "Tick Frequency",       {{"range", {1,   240}}, {"increments", {1,   4}}, {"initial", tickFrequency}, {"digits", 0}}},
 			{"ok", "ok", "OK"},
 		});
 
@@ -45,6 +53,10 @@ namespace Game3 {
 			settings.tickFrequency = *iter;
 		if (auto iter = json.find("renderLighting"); iter != json.end())
 			settings.renderLighting = *iter;
+		if (auto iter = json.find("hideTimers"); iter != json.end())
+			settings.hideTimers = *iter;
+		if (auto iter = json.find("logLevel"); iter != json.end())
+			settings.logLevel = *iter;
 	}
 
 	void to_json(nlohmann::json &json, const ClientSettings &settings) {
@@ -56,5 +68,7 @@ namespace Game3 {
 		json["sizeDivisor"] = settings.sizeDivisor;
 		json["tickFrequency"] = settings.tickFrequency;
 		json["renderLighting"] = settings.renderLighting;
+		json["hideTimers"] = settings.hideTimers;
+		json["logLevel"] = settings.logLevel;
 	}
 }

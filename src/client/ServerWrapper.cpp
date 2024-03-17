@@ -145,7 +145,7 @@ namespace Game3 {
 			timer.stop();
 			Timer::summary();
 			Timer::clear();
-			INFO_("Finished reading all data from database.");
+			INFOX_(2, "Finished reading all data from database.");
 		} else {
 			RealmPtr realm = Realm::create<Overworld>(game, 1, Overworld::ID(), "base:tileset/monomap", overworld_seed);
 			realm->outdoors = true;
@@ -186,11 +186,11 @@ namespace Game3 {
 				});
 
 				if (running && (forceSave.exchange(false) || save_period <= std::chrono::system_clock::now() - last_save)) {
-					INFO_("Saving...");
+					INFOX_(2, "Saving...");
 					game->tickingPaused = true;
 					game->getDatabase().writeAll();
 					game->tickingPaused = false;
-					INFO_("Saved.");
+					INFOX_(2, "Saved.");
 					last_save = std::chrono::system_clock::now();
 				}
 			}

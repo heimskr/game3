@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <chrono>
 #include <map>
 #include <mutex>
@@ -13,6 +14,7 @@ namespace Game3 {
 			static std::map<std::string, std::chrono::nanoseconds> times;
 			static std::map<std::string, size_t> counts;
 			static std::shared_mutex mutex;
+			static std::atomic_bool globalEnabled;
 
 			std::chrono::system_clock::time_point start;
 			const std::string name;

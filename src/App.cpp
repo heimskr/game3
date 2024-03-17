@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "App.h"
+#include "ui/App.h"
 #include "ui/MainWindow.h"
 
 namespace Game3 {
@@ -52,7 +52,7 @@ namespace Game3 {
 		return get_text(path, size);
 	}
 
-	void App::on_hide_window(Gtk::Window *window) {
+	void App::on_hide_window(MainWindow *window) {
 		delete window;
 	}
 }

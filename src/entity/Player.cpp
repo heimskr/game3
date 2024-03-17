@@ -29,7 +29,7 @@ namespace Game3 {
 		if (spawning)
 			return;
 
-		INFO("\e[31m~Player\e[39m({}, {}, {})", reinterpret_cast<void *>(this), username.empty()? "[unknown username]" : username, globalID);
+		INFOX(3, "\e[31m~Player\e[39m({}, {}, {})", reinterpret_cast<void *>(this), username.empty()? "[unknown username]" : username, globalID);
 	}
 
 	void Player::destroy() {

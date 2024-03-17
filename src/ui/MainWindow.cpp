@@ -29,6 +29,7 @@
 #include "ui/tab/CraftingTab.h"
 #include "ui/tab/InventoryTab.h"
 #include "ui/tab/TextTab.h"
+#include "ui/App.h"
 #include "ui/Canvas.h"
 #include "ui/LogOverlay.h"
 #include "ui/MainWindow.h"
@@ -135,6 +136,7 @@ namespace Game3 {
 				settings = new_settings;
 				if (game)
 					settings.apply(*game);
+				settings.apply();
 				saveSettings();
 			});
 			queueDialog(std::move(dialog));
@@ -144,7 +146,7 @@ namespace Game3 {
 		glArea.set_use_es(false);
 		glArea.signal_realize().connect([this] {
 			glArea.make_current();
-			INFO("Using ES: {}", glArea.get_context()->get_use_es());
+			INFOX(3, "Using ES: {}", glArea.get_context()->get_use_es());
 			glArea.throw_if_error();
 			canvas = std::make_unique<Canvas>(*this);
 		});
@@ -366,6 +368,8 @@ namespace Game3 {
 
 		if (std::filesystem::exists("settings.json"))
 			settings = nlohmann::json::parse(readFile("settings.json"));
+
+		settings.apply();
 	}
 
 	MainWindow::~MainWindow() {

@@ -40,7 +40,7 @@ namespace Game3 {
 		auto player = Entity::create<ClientPlayer>();
 		game->setPlayer(player);
 		player->setGID(globalID);
-		INFO("Setting player GID to {}", globalID);
+		INFOX(2, "Setting player GID to {}", globalID);
 		player->init(game);
 		player->decode(playerDataBuffer);
 		player->setupRealm(*game);

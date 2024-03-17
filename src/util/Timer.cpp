@@ -7,6 +7,7 @@ namespace Game3 {
 	std::map<std::string, std::chrono::nanoseconds> Timer::times;
 	std::map<std::string, size_t> Timer::counts;
 	std::shared_mutex Timer::mutex;
+	std::atomic_bool Timer::globalEnabled{true};
 
 	Timer::Timer(const std::string &name_):
 		start(std::chrono::system_clock::now()), name(name_) {}
@@ -34,6 +35,9 @@ namespace Game3 {
 	}
 
 	void Timer::summary(double threshold) {
+		if (!globalEnabled)
+			return;
+
 		auto lock = sharedLock();
 
 		if (!times.empty()) {

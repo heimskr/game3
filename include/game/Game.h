@@ -118,6 +118,7 @@ namespace Game3 {
 			bool hasRealm(RealmID) const;
 			virtual void removeRealm(RealmPtr);
 			ItemPtr getItem(const ItemID &) const;
+			bool canLog(int level) const;
 
 			virtual Side getSide() const = 0;
 

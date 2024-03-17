@@ -1,10 +1,10 @@
 #include "config.h"
-#include "App.h"
 #include "Log.h"
 #include "game/Game.h"
 #include "graphics/Tileset.h"
 #include "item/Item.h"
 #include "tools/Flasker.h"
+#include "ui/App.h"
 #include "util/FS.h"
 #include "util/Util.h"
 

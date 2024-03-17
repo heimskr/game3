@@ -18,7 +18,7 @@
 
 namespace Game3 {
 	LocalClient::~LocalClient() {
-		INFO("\e[31m~LocalClient\e[39m({})", reinterpret_cast<void *>(this));
+		INFOX(3, "\e[31m~LocalClient\e[39m({})", reinterpret_cast<void *>(this));
 		sock->close(true);
 	}
 

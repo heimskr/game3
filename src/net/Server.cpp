@@ -74,7 +74,7 @@ namespace Game3 {
 	}
 
 	void Server::accept() {
-		INFO_("Accepting.");
+		INFOX_(3, "Accepting.");
 		acceptor.async_accept([this](const asio::error_code &errc, asio::ip::tcp::socket socket) {
 			if (errc) {
 				ERROR("Server accept: {}", errc.message());
@@ -202,7 +202,7 @@ namespace Game3 {
 	void Server::setupPlayer(RemoteClient &client) {
 		auto player = client.getPlayer();
 		auto realm = player->getRealm();
-		INFO_("Setting up player");
+		INFOX_(2, "Setting up player");
 		player->weakClient = std::static_pointer_cast<RemoteClient>(client.shared_from_this());
 		player->notifyOfRealm(*realm);
 		player->send(EntityMoneyChangedPacket(*player));
@@ -294,7 +294,7 @@ namespace Game3 {
 			timer.stop();
 			Timer::summary();
 			Timer::clear();
-			INFO_("Finished reading all data from database.");
+			INFOX_(2, "Finished reading all data from database.");
 		} else {
 			RealmPtr realm = Realm::create<Overworld>(game, 1, Overworld::ID(), "base:tileset/monomap", seed);
 			realm->outdoors = true;

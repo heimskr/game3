@@ -1,5 +1,4 @@
 #include "config.h"
-#include "App.h"
 #include "Log.h"
 #include "client/RichPresence.h"
 #include "client/ServerWrapper.h"
@@ -10,6 +9,7 @@
 #include "tools/Mazer.h"
 #include "tools/Migrator.h"
 #include "tools/TileStitcher.h"
+#include "ui/App.h"
 #include "util/Crypto.h"
 #include "util/FS.h"
 #include "util/Shell.h"

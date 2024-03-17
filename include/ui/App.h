@@ -1,6 +1,8 @@
 #pragma once
 
 #include <gtkmm.h>
+
+#include <atomic>
 #include <string>
 
 namespace Game3 {
@@ -22,6 +24,6 @@ namespace Game3 {
 			App();
 
 		private:
-			void on_hide_window(Gtk::Window *);
+			void on_hide_window(MainWindow *);
 	};
 }
