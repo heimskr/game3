@@ -1013,7 +1013,7 @@ namespace Game3 {
 		return tileProvider.copyTile(layer, position, TileProvider::TileMode::Throw);
 	}
 
-	bool Realm::middleEmpty(const Position &position) {
+	bool Realm::middleEmpty(const Position &position) const {
 		const auto submerged = tryTile(Layer::Submerged, position);
 		const auto object = tryTile(Layer::Objects, position);
 		const auto empty = getTileset().getEmptyID();
@@ -1239,22 +1239,21 @@ namespace Game3 {
 	}
 
 	void Realm::markGenerated(ChunkPosition chunk_position) {
-		generatedChunks.insert(std::move(chunk_position));
+		generatedChunks.insert(chunk_position);
 	}
 
 	bool Realm::isVisible(const Position &position) {
 		const auto chunk_pos = position.getChunk();
 		auto lock = players.sharedLock();
-		for (const auto &weak_player: players) {
+		return std::ranges::any_of(players, [chunk_pos](const auto &weak_player) {
 			if (auto player = weak_player.lock()) {
 				const auto player_chunk_pos = player->getPosition().getChunk();
 				if (player_chunk_pos.x - REALM_DIAMETER / 2 <= chunk_pos.x && chunk_pos.x <= player_chunk_pos.x + REALM_DIAMETER / 2)
-					if (player_chunk_pos.y - REALM_DIAMETER / 2 <= chunk_pos.y && chunk_pos.y <= player_chunk_pos.y + REALM_DIAMETER / 2)
-						return true;
+					return player_chunk_pos.y - REALM_DIAMETER / 2 <= chunk_pos.y && chunk_pos.y <= player_chunk_pos.y + REALM_DIAMETER / 2;
 			}
-		}
 
-		return false;
+			return false;
+		});
 	}
 
 	bool Realm::hasTileEntity(GlobalID tile_entity_gid) {
