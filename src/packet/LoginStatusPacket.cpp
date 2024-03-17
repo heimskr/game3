@@ -30,7 +30,7 @@ namespace Game3 {
 		if (!success)
 			throw AuthenticationError("Login failed");
 
-		SUCCESS_("Login succeeded");
+		SUCCESSX_(2, "Login succeeded");
 		MainWindow &window = game->getWindow();
 		{
 			auto lock = window.settings.uniqueLock();

@@ -41,7 +41,7 @@ namespace Game3 {
 				player->setRealm(realm);
 				player->weakClient = std::static_pointer_cast<RemoteClient>(client.shared_from_this());
 				player->notifyOfRealm(*realm);
-				SUCCESS_("Player " << username << "'s GID is " << player->globalID);
+				SUCCESS("Player {} logged in \e[2m(GID {})\e[22m", username, player->globalID);
 				player->init(game);
 				client.send(LoginStatusPacket(true, player->globalID, username, display_name, player));
 				server->setupPlayer(client);
@@ -66,7 +66,7 @@ namespace Game3 {
 				auto realm = player->getRealm();
 				player->weakClient = std::static_pointer_cast<RemoteClient>(client.shared_from_this());
 				player->notifyOfRealm(*realm);
-				INFO("Player GID is {}", player->globalID);
+				INFO("Player {}'s GID is {}", username, player->globalID);
 				client.send(LoginStatusPacket(true, player->globalID, username, *displayName, player));
 				server->setupPlayer(client);
 				realm->addPlayer(player);
