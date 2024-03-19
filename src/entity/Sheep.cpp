@@ -120,7 +120,7 @@ namespace Game3 {
 	}
 
 	bool Sheep::canAbsorbGenes(const nlohmann::json &genes) const {
-		return checkGenes(genes, {"hue", "saturation", "valueMultiplier"});
+		return checkGenes(genes, {"hue", "saturation", "valueMultiplier", "species"});
 	}
 
 	void Sheep::absorbGenes(const nlohmann::json &genes) {

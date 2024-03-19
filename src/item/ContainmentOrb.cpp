@@ -41,19 +41,9 @@ namespace Game3 {
 			if (!selected)
 				return true;
 
-			stack->data["containedEntity"] = selected->type;
-			stack->data["containedName"] = selected->getName();
-
-			if (selected->isPlayer()) {
-				auto player = safeDynamicCast<ServerPlayer>(selected);
-				player->teleport({32, 32}, game->getRealm(-1), MovementContext{.isTeleport = true});
-				stack->data["containedUsername"] = player->username;
-			} else {
-				selected->toJSON(stack->data);
-				selected->queueDestruction();
-			}
-
+			saveToJSON(selected, stack->data, true);
 			player->getInventory(0)->notifyOwner();
+
 			SUCCESS("Captured {}", selected->type);
 			return true;
 		}
@@ -108,5 +98,21 @@ namespace Game3 {
 			throw std::invalid_argument("Can't evaluate whether non-containment orb stack is an empty containment orb");
 
 		return stack->data.empty();
+	}
+
+	void ContainmentOrb::saveToJSON(const EntityPtr &entity, nlohmann::json &json, bool can_modify) {
+		json["containedEntity"] = entity->type;
+		json["containedName"] = entity->getName();
+
+		if (entity->isPlayer()) {
+			auto player = safeDynamicCast<ServerPlayer>(entity);
+			json["containedUsername"] = player->username;
+			if (can_modify)
+				player->teleport({32, 32}, entity->getGame()->getRealm(-1), MovementContext{.isTeleport = true});
+		} else {
+			entity->toJSON(json);
+			if (can_modify)
+				entity->queueDestruction();
+		}
 	}
 }
