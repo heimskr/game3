@@ -38,10 +38,12 @@ namespace Game3 {
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
 			Gtk::Box resultsBox{Gtk::Orientation::VERTICAL};
 			std::vector<std::unique_ptr<Gtk::Label>> resultsLabels;
+			std::vector<Gtk::Separator> separators;
 
 			void populate();
 			void analyzeOrb(const ItemStackPtr &);
 			void analyzeGene(const ItemStackPtr &);
+			void analyzeTemplate(const ItemStackPtr &);
 			void addLabel(const std::string &);
 			void clearText();
 	};

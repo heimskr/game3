@@ -59,6 +59,8 @@ namespace Game3 {
 			analyzeOrb(stack);
 		} else if (stack->getID() == "base:item/gene") {
 			analyzeGene(stack);
+		} else if (stack->getID() == "base:item/genetic_template") {
+			analyzeTemplate(stack);
 		}
 	}
 
@@ -145,6 +147,36 @@ namespace Game3 {
 		}
 	}
 
+	void MicroscopeModule::analyzeTemplate(const ItemStackPtr &stack) {
+		auto iter = stack->data.find("genes");
+		if (iter == stack->data.end())
+			return;
+
+		bool first = true;
+
+		for (const nlohmann::json &gene_json: *iter) {
+			std::unique_ptr<Gene> gene;
+			try {
+				gene = Gene::fromJSON(gene_json);
+			} catch (const std::exception &) {
+				continue;
+			}
+
+			if (first) {
+				first = false;
+			} else {
+				Gtk::Separator &separator = separators.emplace_back(Gtk::Orientation::HORIZONTAL);
+				separator.set_margin_top(10);
+				separator.set_margin_bottom(5);
+				resultsBox.append(separator);
+			}
+
+			for (const std::string &line: gene->describeLong()) {
+				addLabel(line);
+			}
+		}
+	}
+
 	void MicroscopeModule::addLabel(const std::string &text) {
 		auto label = std::make_unique<Gtk::Label>(text);
 		label->set_halign(Gtk::Align::START);
@@ -157,5 +189,6 @@ namespace Game3 {
 	void MicroscopeModule::clearText() {
 		removeChildren(resultsBox);
 		resultsLabels.clear();
+		separators.clear();
 	}
 }
