@@ -1,8 +1,9 @@
-#include "threading/ThreadContext.h"
+#include "biology/Gene.h"
 #include "entity/Animal.h"
 #include "game/Game.h"
 #include "graphics/TextRenderer.h"
 #include "net/Buffer.h"
+#include "threading/ThreadContext.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
 #include "tileentity/Teleporter.h"
@@ -21,6 +22,21 @@ namespace Game3 {
 
 	Animal::Animal():
 		Entity("base:invalid/Animal") {}
+
+	void Animal::toJSON(nlohmann::json &json) const {
+		LivingEntity::toJSON(json);
+
+		nlohmann::json &genes = json["genes"];
+		iterateGenes([&](const Gene &gene) {
+			genes[gene.getName()] = gene;
+		});
+	}
+
+	void Animal::absorbJSON(const std::shared_ptr<Game> &game, const nlohmann::json &json) {
+		LivingEntity::absorbJSON(game, json);
+
+		absorbGenes(json.at("genes"));
+	}
 
 	void Animal::updateRiderOffset(const std::shared_ptr<Entity> &rider) {
 		rider->setOffset(getOffset() + Vector3{0.f, 0.f, .3f});

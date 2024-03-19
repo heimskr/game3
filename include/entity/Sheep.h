@@ -35,6 +35,7 @@ namespace Game3 {
 			bool canAbsorbGenes(const nlohmann::json &) const override;
 			void absorbGenes(const nlohmann::json &) override;
 			void iterateGenes(const std::function<void(Gene &)> &) override;
+			void iterateGenes(const std::function<void(const Gene &)> &) const override;
 
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;

@@ -37,6 +37,7 @@ namespace Game3 {
 			virtual bool canAbsorbGenes(const nlohmann::json &) const;
 			virtual void absorbGenes(const nlohmann::json &);
 			virtual void iterateGenes(const std::function<void(Gene &)> &);
+			virtual void iterateGenes(const std::function<void(const Gene &)> &) const;
 
 		protected:
 			int defenseStat = 0;

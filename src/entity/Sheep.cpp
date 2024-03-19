@@ -136,6 +136,13 @@ namespace Game3 {
 		function(species);
 	}
 
+	void Sheep::iterateGenes(const std::function<void(const Gene &)> &function) const {
+		function(hue);
+		function(saturation);
+		function(valueMultiplier);
+		function(species);
+	}
+
 	void Sheep::encode(Buffer &buffer) {
 		Animal::encode(buffer);
 		buffer << hue;
