@@ -1,53 +1,56 @@
+#include "entity/EntityFactory.h"
 #include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/EnergyContainer.h"
 #include "game/ServerInventory.h"
 #include "graphics/SpriteRenderer.h"
 #include "graphics/Tileset.h"
+#include "item/ContainmentOrb.h"
 #include "packet/OpenModuleForAgentPacket.h"
 #include "realm/Realm.h"
-#include "recipe/BiomassLiquefierRecipe.h"
-#include "tileentity/BiomassLiquefier.h"
+#include "tileentity/Incubator.h"
 #include "ui/module/MultiModule.h"
 
 namespace Game3 {
 	namespace {
-		constexpr std::chrono::milliseconds PERIOD{250};
+		constexpr std::chrono::milliseconds PERIOD{1'000};
 		constexpr EnergyAmount ENERGY_CAPACITY = 16'000;
 		constexpr EnergyAmount ENERGY_PER_ACTION = 1'000;
 		constexpr FluidAmount FLUID_CAPACITY = 64 * FluidTile::FULL;
+		constexpr FluidAmount FLUID_PER_ACTION = 8'000;
 	}
 
-	BiomassLiquefier::BiomassLiquefier():
+	Incubator::Incubator():
 		TileEntity(),
 		EnergeticTileEntity(ENERGY_CAPACITY) {}
 
-	BiomassLiquefier::BiomassLiquefier(Identifier tile_id, Position position_):
+	Incubator::Incubator(Identifier tile_id, Position position_):
 		TileEntity(std::move(tile_id), ID(), position_, true),
 		EnergeticTileEntity(ENERGY_CAPACITY) {}
 
-	BiomassLiquefier::BiomassLiquefier(Position position_):
-		BiomassLiquefier("base:tile/biomass_liquefier"_id, position_) {}
+	Incubator::Incubator(Position position_):
+		Incubator("base:tile/incubator"_id, position_) {}
 
-	size_t BiomassLiquefier::getMaxFluidTypes() const {
+	size_t Incubator::getMaxFluidTypes() const {
 		return 1;
 	}
 
-	FluidAmount BiomassLiquefier::getMaxLevel(FluidID) {
+	FluidAmount Incubator::getMaxLevel(FluidID) {
 		return FLUID_CAPACITY;
 	}
 
-	void BiomassLiquefier::init(Game &game) {
+	void Incubator::init(Game &game) {
 		TileEntity::init(game);
 		AgentPtr self = shared_from_this();
-		HasInventory::setInventory(Inventory::create(self, 1), 0);
+		HasInventory::setInventory(Inventory::create(self, 2), 0);
 		HasFluids::init(safeDynamicCast<HasFluids>(self));
 	}
 
-	void BiomassLiquefier::tick(const TickArgs &args) {
+	void Incubator::tick(const TickArgs &args) {
 		RealmPtr realm = weakRealm.lock();
-		if (!realm || realm->getSide() != Side::Server)
+		if (!realm || realm->getSide() != Side::Server) {
 			return;
+		}
 
 		Ticker ticker{*this, args};
 		enqueueTick(PERIOD);
@@ -60,27 +63,43 @@ namespace Game3 {
 		InventoryPtr inventory = getInventory(0);
 		auto inventory_lock = inventory->uniqueLock();
 
-		ItemStackPtr input = (*inventory)[0];
-		if (!input)
+		ItemStackPtr orb = (*inventory)[0];
+		if (!ContainmentOrb::validate(orb) || !ContainmentOrb::isEmpty(orb))
 			return;
 
-		auto &registry = args.game->registry<BiomassLiquefierRecipeRegistry>();
-		auto recipe = registry.maybe(input->getID());
-		if (!recipe)
+		ItemStackPtr genetic_template = (*inventory)[1];
+		if (!genetic_template || genetic_template->getID() != "base:item/genetic_template")
 			return;
+
+		auto genes_iter = genetic_template->data.find("genes");
+		if (genes_iter == genetic_template->data.end())
+			return;
+
+		if (!biomassID)
+			biomassID = args.game->getFluid("base:fluid/liquid_biomass")->registryID;
 
 		auto fluids_lock = fluidContainer->levels.uniqueLock();
-		recipe->craft(args.game, inventory, fluidContainer);
+		auto fluid_iter = fluidContainer->levels.find(*biomassID);
+		if (fluid_iter == fluidContainer->levels.end() || fluid_iter->second < FLUID_PER_ACTION)
+			return;
+
+		LivingEntityPtr entity = makeEntity(args.game, *genes_iter);
+		if (!entity)
+			return;
+
+		ContainmentOrb::saveToJSON(entity, orb->data, false);
+		fluid_iter->second -= FLUID_PER_ACTION;
+		inventory->notifyOwner();
 	}
 
-	void BiomassLiquefier::toJSON(nlohmann::json &json) const {
+	void Incubator::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);
 		FluidHoldingTileEntity::toJSON(json);
 		InventoriedTileEntity::toJSON(json);
 		EnergeticTileEntity::toJSON(json);
 	}
 
-	bool BiomassLiquefier::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
+	bool Incubator::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
 		RealmPtr realm = getRealm();
 
 		if (modifiers.onlyAlt()) {
@@ -89,7 +108,7 @@ namespace Game3 {
 				return false;
 			});
 			realm->queueDestruction(getSelf());
-			player->give(ItemStack::create(realm->getGame(), "base:item/biomass_liquefier"_id));
+			player->give(ItemStack::create(realm->getGame(), "base:item/incubator"_id));
 			return true;
 		}
 
@@ -101,28 +120,28 @@ namespace Game3 {
 		return true;
 	}
 
-	void BiomassLiquefier::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Incubator::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
 		TileEntity::absorbJSON(game, json);
 		FluidHoldingTileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);
 	}
 
-	void BiomassLiquefier::encode(Game &game, Buffer &buffer) {
+	void Incubator::encode(Game &game, Buffer &buffer) {
 		TileEntity::encode(game, buffer);
 		FluidHoldingTileEntity::encode(game, buffer);
 		InventoriedTileEntity::encode(game, buffer);
 		EnergeticTileEntity::encode(game, buffer);
 	}
 
-	void BiomassLiquefier::decode(Game &game, Buffer &buffer) {
+	void Incubator::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
 		FluidHoldingTileEntity::decode(game, buffer);
 		InventoriedTileEntity::decode(game, buffer);
 		EnergeticTileEntity::decode(game, buffer);
 	}
 
-	void BiomassLiquefier::broadcast(bool force) {
+	void Incubator::broadcast(bool force) {
 		assert(getSide() == Side::Server);
 
 		if (force) {
@@ -168,7 +187,32 @@ namespace Game3 {
 		});
 	}
 
-	GamePtr BiomassLiquefier::getGame() const {
+	GamePtr Incubator::getGame() const {
 		return TileEntity::getGame();
+	}
+
+	LivingEntityPtr Incubator::makeEntity(const GamePtr &game, const nlohmann::json &genes) {
+		auto species_iter = genes.find("species");
+		if (species_iter == genes.end())
+			return nullptr;
+
+		Identifier species = species_iter->at("value");
+		if (species.empty())
+			return nullptr;
+
+		auto factory = game->registry<EntityFactoryRegistry>().maybe(species);
+		if (!factory)
+			return nullptr;
+
+		EntityPtr entity = (*factory)(game);
+		if (!entity)
+			return nullptr;
+
+		auto living = std::dynamic_pointer_cast<LivingEntity>(entity);
+		if (!living || !living->canAbsorbGenes(genes))
+			return nullptr;
+
+		living->absorbGenes(genes);
+		return living;
 	}
 }

@@ -25,6 +25,7 @@
 #include "item/Hammer.h"
 #include "item/Hoe.h"
 #include "item/IncineratorItem.h"
+#include "item/IncubatorItem.h"
 #include "item/Item.h"
 #include "item/Landfill.h"
 #include "item/LiquefierItem.h"
@@ -130,6 +131,8 @@ namespace Game3 {
 		add(std::make_shared<Hoe>("base:item/iron_hoe", "Iron Hoe", 40, 128));
 
 		add(std::make_shared<IncineratorItem>("base:item/incinerator", "Incinerator", 999, 64)); // TODO: cost
+
+		add(std::make_shared<IncubatorItem>("base:item/incubator", "Incubator", 999, 64)); // TODO: cost
 
 		add(std::make_shared<Item>("base:item/shortsword",       "Shortsword",        100,  1));
 		add(std::make_shared<Item>("base:item/red_potion",       "Red Potion",         20,  8));

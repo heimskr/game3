@@ -82,42 +82,35 @@ namespace Game3 {
 		bool was_empty = !output;
 
 		if (was_empty) {
-			output = ItemStack::create(getGame(), "base:item/genetic_template", 1, nlohmann::json{{"genes", std::vector<int>()}});
+			output = ItemStack::create(getGame(), "base:item/genetic_template", 1, nlohmann::json{{"genes", std::map<std::string, nlohmann::json>()}});
 		} else if (output->getID() != "base:item/genetic_template") {
 			return false;
 		}
 
-		std::vector<CombinedGene> combined_genes;
+		std::map<std::string, CombinedGene> combined_genes;
 
 		for (const ItemStackPtr &stack: {first, second}) {
 			if (stack->getID() == "base:item/gene") {
-				combined_genes.emplace_back(stack->data.at("gene"), stack == first);
+				nlohmann::json &gene = stack->data.at("gene");
+				combined_genes.try_emplace(gene.at("name"), gene, stack == first);
 			} else {
-				for (const nlohmann::json &gene: stack->data.at("genes"))
-					combined_genes.emplace_back(gene, stack == first);
+				for (const auto &[name, gene]: stack->data.at("genes").items())
+					combined_genes.try_emplace(name, gene, stack == first);
 			}
 		}
 
 		nlohmann::json &genes = output->data.at("genes");
 
-		std::set<std::string> gene_names;
-
-		for (const nlohmann::json &gene: genes)
-			gene_names.insert(gene.at("name"));
-
 		bool any_from_first  = false;
 		bool any_from_second = false;
 
-		for (const auto &[gene, from_first]: combined_genes) {
-			const std::string &name = gene.at("name");
-			if (!gene_names.contains(name)) {
-				gene_names.insert(name);
-				genes.push_back(gene);
-				if (from_first)
-					any_from_first = true;
-				else
-					any_from_second = true;
-			}
+		for (const auto &[name, combined]: combined_genes) {
+			const auto &[gene, from_first] = combined;
+			genes[name] = gene;
+			if (from_first)
+				any_from_first = true;
+			else
+				any_from_second = true;
 		}
 
 		if (any_from_first)

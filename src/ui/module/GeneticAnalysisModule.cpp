@@ -102,7 +102,7 @@ namespace Game3 {
 
 		bool first = true;
 
-		for (const nlohmann::json &gene_json: *iter) {
+		for (const auto &[name, gene_json]: iter->items()) {
 			std::unique_ptr<Gene> gene;
 			try {
 				gene = Gene::fromJSON(gene_json);
