@@ -10,7 +10,7 @@
 #include "realm/Realm.h"
 #include "threading/ThreadContext.h"
 #include "tileentity/Sequencer.h"
-#include "ui/module/MultiModule.h"
+#include "ui/module/MicroscopeModule.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -18,6 +18,7 @@ namespace Game3 {
 		constexpr std::chrono::milliseconds PERIOD{5'000};
 		constexpr EnergyAmount ENERGY_CAPACITY = 16'000;
 		constexpr double ENERGY_PER_ACTION = ENERGY_CAPACITY / 2;
+		constexpr Slot OUTPUT_SLOTS = 1;
 	}
 
 	Sequencer::Sequencer():
@@ -31,7 +32,7 @@ namespace Game3 {
 
 	void Sequencer::init(Game &game) {
 		TileEntity::init(game);
-		HasInventory::setInventory(Inventory::create(shared_from_this(), 5), 0);
+		HasInventory::setInventory(Inventory::create(shared_from_this(), 1 + OUTPUT_SLOTS), 0);
 	}
 
 	void Sequencer::tick(const TickArgs &args) {
@@ -108,7 +109,7 @@ namespace Game3 {
 			return true;
 		}
 
-		player->send(OpenModuleForAgentPacket(MultiModule<Substance::Item, Substance::Energy>::ID(), getGID()));
+		player->send(OpenModuleForAgentPacket(MicroscopeModule<1, Substance::Energy>::ID(), getGID()));
 		InventoriedTileEntity::addObserver(player, true);
 		EnergeticTileEntity::addObserver(player, true);
 
