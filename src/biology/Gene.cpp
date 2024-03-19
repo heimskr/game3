@@ -8,6 +8,9 @@
 #include <random>
 
 namespace Game3 {
+
+// Gene
+
 	Gene::Gene(std::string name_):
 		name(std::move(name_)) {}
 
@@ -23,8 +26,13 @@ namespace Game3 {
 		if (type == "circular")
 			return std::make_unique<CircularGene>(CircularGene::fromJSON(json));
 
+		if (type == "string")
+			return std::make_unique<StringGene>(StringGene::fromJSON(json));
+
 		throw std::invalid_argument(std::format("Unknown gene type: \"{}\"", type));
 	}
+
+// FloatGene
 
 	FloatGene::FloatGene(std::string name_, float minimum_, float maximum_, float value_):
 		Gene(std::move(name_)), minimum(minimum_), maximum(maximum_), value(clamp(value_)) {}
@@ -80,6 +88,8 @@ namespace Game3 {
 		return std::min(maximum, std::max(minimum, f));
 	}
 
+// LongGene
+
 	LongGene::LongGene(std::string name_, ValueType minimum_, ValueType maximum_, ValueType value_):
 		Gene(std::move(name_)), minimum(minimum_), maximum(maximum_), value(clamp(value_)) {}
 
@@ -133,6 +143,8 @@ namespace Game3 {
 	auto LongGene::clamp(ValueType v) const -> ValueType {
 		return std::min(maximum, std::max(minimum, v));
 	}
+
+// CircularGene
 
 	CircularGene::CircularGene(std::string name_, float value_):
 		Gene(std::move(name_)), value(clamp(value_)) {}
@@ -188,9 +200,52 @@ namespace Game3 {
 		return mod;
 	}
 
+// StringGene
+
+	StringGene::StringGene(std::string name_, std::string value_):
+		Gene(std::move(name_)), value(std::move(value_)) {}
+
+	StringGene StringGene::fromJSON(const nlohmann::json &json) {
+		return StringGene(json.at("name"), json.at("value"));
+	}
+
+	void StringGene::toJSON(nlohmann::json &json) const {
+		json["type"] = "string";
+		json["name"] = name;
+		json["value"] = value;
+	}
+
+	void StringGene::mutate(float) {}
+
+	std::string StringGene::describeShort() const {
+		return std::format("{} (string)", name);
+	}
+
+	std::vector<std::string> StringGene::describeLong() const {
+		return {
+			std::format("Name: {}", name),
+			"Type: string",
+			std::format("Value: {}", value),
+		};
+	}
+
+	void StringGene::encode(Buffer &buffer) const {
+		buffer << name;
+		buffer << value;
+	}
+
+	void StringGene::decode(Buffer &buffer) {
+		buffer >> name;
+		buffer >> value;
+	}
+
+// All genes
+
 	void to_json(nlohmann::json &json, const Gene &gene) {
 		gene.toJSON(json);
 	}
+
+// Buffer methods
 
 	template <>
 	std::string Buffer::getType(const FloatGene &) {
@@ -262,6 +317,31 @@ namespace Game3 {
 		if (!Buffer::typesMatch(type, buffer.getType(gene))) {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected e7 for CircularGene)");
+		}
+		gene.decode(buffer);
+		return buffer;
+	}
+
+	template <>
+	std::string Buffer::getType(const StringGene &) {
+		return std::string{'\xe8'};
+	}
+
+	Buffer & operator+=(Buffer &buffer, const StringGene &gene) {
+		buffer.appendType(gene);
+		gene.encode(buffer);
+		return buffer;
+	}
+
+	Buffer & operator<<(Buffer &buffer, const StringGene &gene) {
+		return buffer += gene;
+	}
+
+	Buffer & operator>>(Buffer &buffer, StringGene &gene) {
+		const auto type = buffer.popType();
+		if (!Buffer::typesMatch(type, buffer.getType(gene))) {
+			buffer.debug();
+			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected e8 for StringGene)");
 		}
 		gene.decode(buffer);
 		return buffer;

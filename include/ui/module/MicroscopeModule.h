@@ -20,7 +20,7 @@ namespace Game3 {
 			using Submodule = MultiModule<Substance::Item, ExtraSubstances...>;
 
 		public:
-			static Identifier ID() { return {"base", "module/microscope_" + Submodule::getSuffix()}; }
+			static Identifier ID() { return {"base", std::format("module/microscope_{}{}", S, Submodule::getSuffix())}; }
 
 			MicroscopeModule(ClientGamePtr game_, const std::any &argument):
 				MicroscopeModule(game_, std::dynamic_pointer_cast<InventoriedTileEntity>(std::any_cast<AgentPtr>(argument))) {}

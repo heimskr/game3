@@ -13,7 +13,8 @@ namespace Game3 {
 		Animal(),
 		hue("hue", threadContext.random(0.f, 1.f)),
 		saturation("saturation", 0.f, 1.f, sample()),
-		valueMultiplier("valueMultiplier", .1f, 1.f, sample()) {}
+		valueMultiplier("valueMultiplier", .1f, 1.f, sample()),
+		species("species", ID().str()) {}
 
 	void Sheep::render(const RendererContext &renderers) {
 		if (texture == nullptr || !isVisible())
@@ -132,6 +133,7 @@ namespace Game3 {
 		function(hue);
 		function(saturation);
 		function(valueMultiplier);
+		function(species);
 	}
 
 	void Sheep::encode(Buffer &buffer) {

@@ -13,6 +13,7 @@ namespace Game3 {
 			CircularGene hue;
 			FloatGene saturation;
 			FloatGene valueMultiplier;
+			StringGene species;
 
 			static Identifier ID() { return {"base", "entity/sheep"}; }
 

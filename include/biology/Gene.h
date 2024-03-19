@@ -105,6 +105,27 @@ namespace Game3 {
 			float clamp(float) const;
 	};
 
+	class StringGene: public Gene {
+		public:
+			static StringGene fromJSON(const nlohmann::json &);
+
+			using Gene::Gene;
+			StringGene(std::string name_, std::string value_);
+
+			void toJSON(nlohmann::json &) const final;
+			void mutate(float strength) final;
+			std::string describeShort() const final;
+			std::vector<std::string> describeLong() const final;
+			void encode(Buffer &) const final;
+			void decode(Buffer &) final;
+
+			explicit inline operator const std::string &() const { return value; }
+			inline const auto & getValue() const { return value; }
+
+		private:
+			std::string value{};
+	};
+
 	Buffer & operator+=(Buffer &, const FloatGene &);
 	Buffer & operator<<(Buffer &, const FloatGene &);
 	Buffer & operator>>(Buffer &, FloatGene &);
@@ -116,6 +137,10 @@ namespace Game3 {
 	Buffer & operator+=(Buffer &, const CircularGene &);
 	Buffer & operator<<(Buffer &, const CircularGene &);
 	Buffer & operator>>(Buffer &, CircularGene &);
+
+	Buffer & operator+=(Buffer &, const StringGene &);
+	Buffer & operator<<(Buffer &, const StringGene &);
+	Buffer & operator>>(Buffer &, StringGene &);
 
 	void to_json(nlohmann::json &, const Gene &);
 }
