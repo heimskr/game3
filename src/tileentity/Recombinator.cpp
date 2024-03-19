@@ -79,6 +79,14 @@ namespace Game3 {
 			bool fromFirst{};
 		};
 
+		bool was_empty = !output;
+
+		if (was_empty) {
+			output = ItemStack::create(getGame(), "base:item/genetic_template", 1, nlohmann::json{{"genes", std::vector<int>()}});
+		} else if (output->getID() != "base:item/genetic_template") {
+			return false;
+		}
+
 		std::vector<CombinedGene> combined_genes;
 
 		for (const ItemStackPtr &stack: {first, second}) {
@@ -89,22 +97,6 @@ namespace Game3 {
 					combined_genes.emplace_back(gene, stack == first);
 			}
 		}
-
-		if (!output) {
-			nlohmann::json data;
-			nlohmann::json &data_genes = data["genes"];
-			for (auto &[gene, from_first]: combined_genes)
-				data_genes.push_back(std::move(gene));
-
-			inventory->add(ItemStack::create(getGame(), "base:item/genetic_template", 1, std::move(data)));
-			inventory->erase(0);
-			inventory->erase(1);
-			inventory->notifyOwner();
-			return true;
-		}
-
-		if (output->getID() != "base:item/genetic_template")
-			return false;
 
 		nlohmann::json &genes = output->data.at("genes");
 
@@ -133,6 +125,9 @@ namespace Game3 {
 
 		if (any_from_second)
 			inventory->erase(1);
+
+		if (was_empty)
+			inventory->add(output, 2);
 
 		inventory->notifyOwner();
 		return any_from_first || any_from_second;
