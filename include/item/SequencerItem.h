@@ -1,11 +1,11 @@
 #pragma once
 
 #include "item/TileEntityItem.h"
-#include "tileentity/Sequencer.h"
+#include "tileentity/Recombinator.h"
 
 namespace Game3 {
-	class SequencerItem: public TileEntityItem<Sequencer> {
+	class RecombinatorItem: public TileEntityItem<Recombinator> {
 		public:
-			using TileEntityItem<Sequencer>::TileEntityItem;
+			using TileEntityItem<Recombinator>::TileEntityItem;
 	};
 }

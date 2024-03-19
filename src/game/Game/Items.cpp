@@ -36,6 +36,7 @@
 #include "item/Pickaxe.h"
 #include "item/PipeItem.h"
 #include "item/PumpItem.h"
+#include "item/RecombinatorItem.h"
 #include "item/Sapling.h"
 #include "item/SequencerItem.h"
 #include "item/Seed.h"
@@ -216,6 +217,8 @@ namespace Game3 {
 		add(std::make_shared<Pickaxe>("base:item/diamond_pickaxe", "Diamond Pickaxe",  210,  1.f, 512));
 
 		add(std::make_shared<PumpItem>("base:item/pump", "Pump", 999, 64)); // TODO: cost
+
+		add(std::make_shared<RecombinatorItem>("base:item/recombinator", "Recombinator", 999, 64)); // TODO: cost
 
 		add(std::make_shared<Seed>("base:item/cotton_seeds",     "Cotton Seeds",      "base:tile/cotton_0",     4));
 		add(std::make_shared<Seed>("base:item/wheat_seeds",      "Wheat Seeds",       "base:tile/wheat_0",      4));
