@@ -9,28 +9,28 @@
 #include <nlohmann/json_fwd.hpp>
 
 namespace Game3 {
-	struct CentrifugeRecipe: Recipe<FluidStack, ItemStackPtr> {
+	struct LiquefierRecipe: Recipe<ItemStackPtr, FluidStack> {
 		Input input;
-		std::map<nlohmann::json, double> weightMap;
+		Output output;
 
-		CentrifugeRecipe() = default;
-		CentrifugeRecipe(Input, std::map<nlohmann::json, double>);
+		LiquefierRecipe() = default;
+		LiquefierRecipe(Input, Output);
 
 		Input getInput(const GamePtr &) override;
 		Output getOutput(const Input &, const GamePtr &) override;
 		/** Doesn't lock the container. */
 		bool canCraft(const std::shared_ptr<Container> &) override;
-		/** Doesn't lock either container. Fails if there would be any leftover output. */
+		/** Doesn't lock either container. */
 		bool craft(const GamePtr &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) override;
 		/** Doesn't lock either container. */
 		bool craft(const GamePtr &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) override;
 		void toJSON(nlohmann::json &) const override;
 
-		static CentrifugeRecipe fromJSON(const GamePtr &, const nlohmann::json &);
+		static LiquefierRecipe fromJSON(const GamePtr &, const nlohmann::json &);
 	};
 
-	struct CentrifugeRecipeRegistry: UnnamedJSONRegistry<CentrifugeRecipe> {
-		static Identifier ID() { return {"base", "registry/centrifuge_recipe"}; }
-		CentrifugeRecipeRegistry(): UnnamedJSONRegistry(ID()) {}
+	struct LiquefierRecipeRegistry: UnnamedJSONRegistry<LiquefierRecipe> {
+		static Identifier ID() { return {"base", "registry/liquefier_recipe"}; }
+		LiquefierRecipeRegistry(): UnnamedJSONRegistry(ID()) {}
 	};
 }

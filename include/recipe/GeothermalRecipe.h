@@ -35,7 +35,7 @@ namespace Game3 {
 		public:
 			std::unordered_set<FluidID> fluidIDs;
 
-			static Identifier ID() { return {"base", "geothermal_recipe"}; }
+			static Identifier ID() { return {"base", "registry/geothermal_recipe"}; }
 
 			GeothermalRecipeRegistry(): UnnamedJSONRegistry(ID()) {}
 

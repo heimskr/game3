@@ -107,6 +107,7 @@ namespace Game3 {
 			double getDivisor() const;
 			std::optional<TileID> getFluidTileID(FluidID);
 			std::shared_ptr<Fluid> getFluid(FluidID) const;
+			std::shared_ptr<Fluid> getFluid(const Identifier &) const;
 			std::shared_ptr<Tile> getTile(const Identifier &);
 			const std::filesystem::path * getSound(const Identifier &);
 			RealmPtr tryRealm(RealmID) const;

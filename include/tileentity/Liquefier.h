@@ -5,13 +5,13 @@
 #include "tileentity/InventoriedTileEntity.h"
 
 namespace Game3 {
-	class Liquifier: public FluidHoldingTileEntity, public EnergeticTileEntity, public InventoriedTileEntity {
+	class Liquefier: public FluidHoldingTileEntity, public EnergeticTileEntity, public InventoriedTileEntity {
 		public:
-			static Identifier ID() { return {"base", "te/liquifier"}; }
+			static Identifier ID() { return {"base", "te/liquefier"}; }
 
 			FluidAmount getMaxLevel(FluidID) override;
 
-			std::string getName() const override { return "Liquifier"; }
+			std::string getName() const override { return "Liquefier"; }
 
 			void init(Game &) override;
 			void tick(const TickArgs &) override;
@@ -26,9 +26,9 @@ namespace Game3 {
 			GamePtr getGame() const final;
 
 		private:
-			Liquifier();
-			Liquifier(Identifier tile_id, Position);
-			Liquifier(Position);
+			Liquefier();
+			Liquefier(Identifier tile_id, Position);
+			Liquefier(Position);
 
 			friend class TileEntity;
 	};

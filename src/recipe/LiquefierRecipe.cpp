@@ -2,30 +2,30 @@
 #include "game/Game.h"
 #include "game/HasFluids.h"
 #include "game/Inventory.h"
-#include "recipe/LiquifierRecipe.h"
+#include "recipe/LiquefierRecipe.h"
 #include "threading/ThreadContext.h"
 #include "util/Util.h"
 
 namespace Game3 {
-	LiquifierRecipe::LiquifierRecipe(Input input_, Output output_):
+	LiquefierRecipe::LiquefierRecipe(Input input_, Output output_):
 		input(std::move(input_)), output(std::move(output_)) {}
 
-	LiquifierRecipe::Input LiquifierRecipe::getInput(const GamePtr &) {
+	LiquefierRecipe::Input LiquefierRecipe::getInput(const GamePtr &) {
 		return input;
 	}
 
-	LiquifierRecipe::Output LiquifierRecipe::getOutput(const Input &, const GamePtr &) {
+	LiquefierRecipe::Output LiquefierRecipe::getOutput(const Input &, const GamePtr &) {
 		return output;
 	}
 
-	bool LiquifierRecipe::canCraft(const std::shared_ptr<Container> &container) {
+	bool LiquefierRecipe::canCraft(const std::shared_ptr<Container> &container) {
 		if (auto inventory = std::dynamic_pointer_cast<Inventory>(container))
 			return inventory->contains(input);
 
 		return false;
 	}
 
-	bool LiquifierRecipe::craft(const GamePtr &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) {
+	bool LiquefierRecipe::craft(const GamePtr &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) {
 		auto inventory = std::dynamic_pointer_cast<Inventory>(input_container);
 		auto fluids = std::dynamic_pointer_cast<FluidContainer>(output_container);
 
@@ -64,7 +64,7 @@ namespace Game3 {
 
 	// TODO: deduplicate above and below methods.
 
-	bool LiquifierRecipe::craft(const GamePtr &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) {
+	bool LiquefierRecipe::craft(const GamePtr &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) {
 		auto inventory = std::dynamic_pointer_cast<Inventory>(input_container);
 		auto fluids = std::dynamic_pointer_cast<FluidContainer>(output_container);
 
@@ -95,14 +95,14 @@ namespace Game3 {
 		return true;
 	}
 
-	void LiquifierRecipe::toJSON(nlohmann::json &json) const {
-		json["type"] = LiquifierRecipeRegistry::ID();
+	void LiquefierRecipe::toJSON(nlohmann::json &json) const {
+		json["type"] = LiquefierRecipeRegistry::ID();
 		json["input"] = input;
 		json["output"] = output;
 	}
 
-	LiquifierRecipe LiquifierRecipe::fromJSON(const GamePtr &game, const nlohmann::json &json) {
-		LiquifierRecipe recipe;
+	LiquefierRecipe LiquefierRecipe::fromJSON(const GamePtr &game, const nlohmann::json &json) {
+		LiquefierRecipe recipe;
 		recipe.input = ItemStack::fromJSON(game, json.at("input"));
 		recipe.output = FluidStack::fromJSON(*game, json.at("output"));
 		return recipe;

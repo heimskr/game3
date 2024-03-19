@@ -3,6 +3,7 @@
 #include "game/Crop.h"
 #include "game/Game.h"
 #include "graph/Graph.h"
+#include "recipe/BiomassLiquefierRecipe.h"
 #include "recipe/CombinerRecipe.h"
 #include "recipe/DissolverRecipe.h"
 #include "tileentity/OreDeposit.h"
@@ -172,19 +173,28 @@ namespace Game3 {
 		} else if (type == "base:dissolver_map") {
 
 			GamePtr self = shared_from_this();
-			auto &dissolver_recipes = registry<DissolverRecipeRegistry>();
+			auto &recipes = registry<DissolverRecipeRegistry>();
 			for (const auto &[input, result_json]: json.at(1).items()) {
 				const Identifier identifier(input);
-				dissolver_recipes.add(identifier, DissolverRecipe(identifier, ItemStack::create(self, identifier, 1), result_json));
+				recipes.add(identifier, DissolverRecipe(identifier, ItemStack::create(self, identifier, 1), result_json));
+			}
+
+		} else if (type == "base:biomass_liquefier_map") {
+
+			GamePtr self = shared_from_this();
+			auto &recipes = registry<BiomassLiquefierRecipeRegistry>();
+			for (const auto &[input, result_json]: json.at(1).items()) {
+				const Identifier identifier(input);
+				recipes.add(identifier, BiomassLiquefierRecipe(ItemStack::create(self, identifier, 1), result_json.get<FluidAmount>()));
 			}
 
 		} else if (type == "base:combiner_map") {
 
 			GamePtr self = shared_from_this();
-			auto &combiner_recipes = registry<CombinerRecipeRegistry>();
+			auto &recipes = registry<CombinerRecipeRegistry>();
 			for (const auto &[input, input_json]: json.at(1).items()) {
 				const Identifier identifier(input);
-				combiner_recipes.add(identifier, CombinerRecipe(identifier, self, input_json));
+				recipes.add(identifier, CombinerRecipe(identifier, self, input_json));
 			}
 
 		} else if (type == "base:fluid_list") {

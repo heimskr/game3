@@ -4,6 +4,7 @@
 #include "item/AutocrafterItem.h"
 #include "item/AutofarmerItem.h"
 #include "item/BasicFood.h"
+#include "item/BiomassLiquefierItem.h"
 #include "item/Bomb.h"
 #include "item/CaveEntrance.h"
 #include "item/CentrifugeItem.h"
@@ -26,7 +27,7 @@
 #include "item/IncineratorItem.h"
 #include "item/Item.h"
 #include "item/Landfill.h"
-#include "item/LiquifierItem.h"
+#include "item/LiquefierItem.h"
 #include "item/Mead.h"
 #include "item/MeleeWeapon.h"
 #include "item/MicroscopeItem.h"
@@ -76,6 +77,8 @@ namespace Game3 {
 		add(std::make_shared<BasicFood>("base:item/raw_meat",    "Raw Meat",       10,  2));
 		add(std::make_shared<BasicFood>("base:item/meat",        "Meat",           20,  4));
 		add(std::make_shared<BasicFood>("base:item/bleach",      "Bleach",         16, -8));
+
+		add(std::make_shared<BiomassLiquefierItem>("base:item/biomass_liquefier", "Biomass Liquefier", 999, 64)); // TODO: cost
 
 		add(std::make_shared<Bomb>("base:item/bomb", "Bomb", 32, 64));
 
@@ -197,7 +200,7 @@ namespace Game3 {
 		add(std::make_shared<Landfill>("base:item/grimstone",     "Grimstone",     2, 64, "base:tile/grimstone"));
 		add(std::make_shared<Landfill>("base:item/dirt",          "Dirt",          1, 64, "base:tile/dirt"));
 
-		add(std::make_shared<LiquifierItem>("base:item/liquifier", "Liquifier", 999, 64)); // TODO: cost
+		add(std::make_shared<LiquefierItem>("base:item/liquefier", "Liquefier", 999, 64)); // TODO: cost
 
 		add(std::make_shared<Mead>("base:item/mead", "Mead", 10, 16));
 

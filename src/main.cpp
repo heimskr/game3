@@ -195,8 +195,9 @@ int main(int argc, char **argv) {
 		}
 
 		if (argc == 4) {
-			std::cout << Game3::generateFlask(Game3::dataRoot / "resources" / "erlenmeyerbase.png", Game3::dataRoot / "resources" / "erlenmeyermask.png", argv[1], argv[2], argv[3]);
+			// std::cout << Game3::generateFlask(Game3::dataRoot / "resources" / "erlenmeyerbase.png", Game3::dataRoot / "resources" / "erlenmeyermask.png", argv[1], argv[2], argv[3]);
 			// std::cout << Game3::generateFlask(Game3::dataRoot / "resources" / "testtubebase.png", Game3::dataRoot / "resources" / "testtubemask.png", argv[1], argv[2], argv[3]);
+			std::cout << Game3::generateFlask(Game3::dataRoot / "resources" / "flaskbase.png", Game3::dataRoot / "resources" / "flaskmask.png", argv[1], argv[2], argv[3]);
 			return 0;
 		}
 	}

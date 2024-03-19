@@ -46,6 +46,12 @@
 				"tileset":  "base:tileset/monomap",
 				"tilename": "base:tile/mutagen",
 				"flask":    "base:item/mutagen"
+			}],
+			["base:fluid/liquid_biomass", {
+				"name":     "Liquid Biomass",
+				"tileset":  "base:tileset/monomap",
+				"tilename": "base:tile/liquid_biomass",
+				"flask":    "base:item/liquid_biomass_flask"
 			}]
 		]]
 	]

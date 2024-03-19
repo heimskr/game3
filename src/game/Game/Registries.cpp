@@ -1,12 +1,13 @@
 #include "data/ConsumptionRule.h"
 #include "data/ProductionRule.h"
 #include "game/Game.h"
+#include "recipe/BiomassLiquefierRecipe.h"
 #include "recipe/CentrifugeRecipe.h"
 #include "recipe/CombinerRecipe.h"
 #include "recipe/CraftingRecipe.h"
 #include "recipe/DissolverRecipe.h"
 #include "recipe/GeothermalRecipe.h"
-#include "recipe/LiquifierRecipe.h"
+#include "recipe/LiquefierRecipe.h"
 #include "registry/Registries.h"
 
 namespace Game3 {
@@ -39,6 +40,7 @@ namespace Game3 {
 		registries.add<ResourceRegistry>();
 		registries.add<ProductionRuleRegistry>();
 		registries.add<ConsumptionRuleRegistry>();
-		registries.add<LiquifierRecipeRegistry>();
+		registries.add<LiquefierRecipeRegistry>();
+		registries.add<BiomassLiquefierRecipeRegistry>();
 	}
 }

@@ -1,6 +1,7 @@
 #include "game/Game.h"
 #include "tileentity/Autocrafter.h"
 #include "tileentity/Autofarmer.h"
+#include "tileentity/BiomassLiquefier.h"
 #include "tileentity/Building.h"
 #include "tileentity/Centrifuge.h"
 #include "tileentity/ChemicalReactor.h"
@@ -14,7 +15,7 @@
 #include "tileentity/GeothermalGenerator.h"
 #include "tileentity/Incinerator.h"
 #include "tileentity/ItemSpawner.h"
-#include "tileentity/Liquifier.h"
+#include "tileentity/Liquefier.h"
 #include "tileentity/Microscope.h"
 #include "tileentity/Mutator.h"
 #include "tileentity/OreDeposit.h"
@@ -38,6 +39,7 @@ namespace Game3 {
 	void Game::addTileEntityFactories() {
 		add(TileEntityFactory::create<Autocrafter>());
 		add(TileEntityFactory::create<Autofarmer>());
+		add(TileEntityFactory::create<BiomassLiquefier>());
 		add(TileEntityFactory::create<Building>());
 		add(TileEntityFactory::create<Centrifuge>());
 		add(TileEntityFactory::create<ChemicalReactor>());
@@ -51,7 +53,7 @@ namespace Game3 {
 		add(TileEntityFactory::create<GeothermalGenerator>());
 		add(TileEntityFactory::create<Incinerator>());
 		add(TileEntityFactory::create<ItemSpawner>());
-		add(TileEntityFactory::create<Liquifier>());
+		add(TileEntityFactory::create<Liquefier>());
 		add(TileEntityFactory::create<Microscope>());
 		add(TileEntityFactory::create<Mutator>());
 		add(TileEntityFactory::create<OreDeposit>());

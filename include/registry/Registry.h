@@ -469,4 +469,14 @@ namespace Game3 {
 				return items.size();
 			}
 	};
+
+	template <typename T>
+	class NamedJSONRegistry: public StringRegistry<T> {
+		public:
+			using StringRegistry<T>::StringRegistry;
+
+			void add(const std::shared_ptr<Game> &game, const std::string &name, const nlohmann::json &json) {
+				StringRegistry<T>::add(name, T::fromJSON(game, json));
+			}
+	};
 }

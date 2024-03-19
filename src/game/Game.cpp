@@ -145,6 +145,10 @@ namespace Game3 {
 		return registry<FluidRegistry>().maybe(static_cast<size_t>(fluid_id));
 	}
 
+	std::shared_ptr<Fluid> Game::getFluid(const Identifier &identifier) const {
+		return registry<FluidRegistry>().maybe(identifier);
+	}
+
 	GamePtr Game::create(Side side, const GameArgument &argument) {
 		GamePtr out;
 

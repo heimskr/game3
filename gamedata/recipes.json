@@ -441,7 +441,7 @@
 				"input":  [["base:item/wood", 128], ["base:item/iron_bar", 32], ["base:item/fabric", 64]],
 				"output": [["base:item/ship", 1]]
 			}],
-			["base:centrifuge_recipe", {
+			["base:registry/centrifuge_recipe", {
 				"input":  ["base:fluid/lava", 1000],
 				"output": [
 					[1.0, ["base:item/stone", 1]],
@@ -451,31 +451,31 @@
 					[0.1, ["base:item/diamond_ore", 1]]
 				]
 			}],
-			["base:centrifuge_recipe", {
+			["base:registry/centrifuge_recipe", {
 				"input":  ["base:fluid/honey", 1000],
 				"output": [
 					[0.95, ["base:item/sugar", 1]],
 					[0.05, ["base:item/yeast", 1]]
 				]
 			}],
-			["base:centrifuge_recipe", {
+			["base:registry/centrifuge_recipe", {
 				"input":  ["base:fluid/brine", 1000],
 				"output": [
 					[1.0, ["base:item/salt", 1]]
 				]
 			}],
-			["base:centrifuge_recipe", {
+			["base:registry/centrifuge_recipe", {
 				"input":  ["base:fluid/milk", 1000],
 				"output": [
 					[0.2, ["base:item/chemical", 1, {"formula": "Ca"}]],
 					[0.8, ["base:item/protein", 1]]
 				]
 			}],
-			["base:geothermal_recipe", {
+			["base:registry/geothermal_recipe", {
 				"input":  ["base:fluid/lava", 100],
 				"output": 500
 			}],
-			["base:liquifier_recipe", {
+			["base:registry/liquefier_recipe", {
 				"input":  ["base:item/chemical", 1, {"formula": "C3H7N3O2"}],
 				"output": ["base:fluid/mutagen", 250]
 			}]
