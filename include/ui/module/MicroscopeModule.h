@@ -1,6 +1,7 @@
 #pragma once
 
 #include "types/Types.h"
+#include "ui/module/GeneticAnalysisModule.h"
 #include "ui/module/Module.h"
 
 #include <any>
@@ -17,8 +18,8 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "module/microscope"}; }
 
-			MicroscopeModule(std::shared_ptr<ClientGame>, const std::any &);
-			MicroscopeModule(std::shared_ptr<ClientGame>, std::shared_ptr<Microscope>);
+			MicroscopeModule(ClientGamePtr, const std::any &);
+			MicroscopeModule(ClientGamePtr, std::shared_ptr<Microscope>);
 
 			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;
@@ -31,20 +32,13 @@ namespace Game3 {
 			std::shared_ptr<InventoryModule> getPrimaryInventoryModule() final { return inventoryModule; }
 
 		private:
-			std::shared_ptr<ClientGame> game;
+			ClientGamePtr game;
 			std::shared_ptr<Microscope> microscope;
 			std::shared_ptr<InventoryModule> inventoryModule;
+			GeneticAnalysisModule geneticAnalysisModule;
 			Gtk::Label header;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
-			Gtk::Box resultsBox{Gtk::Orientation::VERTICAL};
-			std::vector<std::unique_ptr<Gtk::Label>> resultsLabels;
-			std::vector<Gtk::Separator> separators;
 
 			void populate();
-			void analyzeOrb(const ItemStackPtr &);
-			void analyzeGene(const ItemStackPtr &);
-			void analyzeTemplate(const ItemStackPtr &);
-			void addLabel(const std::string &);
-			void clearText();
 	};
 }
