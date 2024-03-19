@@ -39,7 +39,7 @@ namespace Game3 {
 			return true;
 		}
 
-		player->send(OpenModuleForAgentPacket(MicroscopeModule::ID(), getGID()));
+		player->send(OpenModuleForAgentPacket(MicroscopeModule<0>::ID(), getGID()));
 		addObserver(player, true);
 
 		return false;

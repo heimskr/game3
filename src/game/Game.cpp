@@ -49,7 +49,8 @@ namespace Game3 {
 		add(ModuleFactory::create<CombinerModule>());
 		add(ModuleFactory::create<AutocrafterModule>());
 		add(ModuleFactory::create<VillageTradeModule>());
-		add(ModuleFactory::create<MicroscopeModule>());
+		add(ModuleFactory::create<MicroscopeModule<0>>());
+		add(ModuleFactory::create<MicroscopeModule<2, Substance::Energy>>());
 		add(ModuleFactory::create<MutatorModule>());
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Energy, Substance::Fluid>>());
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Fluid>>());

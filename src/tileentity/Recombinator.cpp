@@ -10,7 +10,7 @@
 #include "realm/Realm.h"
 #include "threading/ThreadContext.h"
 #include "tileentity/Recombinator.h"
-#include "ui/module/MultiModule.h"
+#include "ui/module/MicroscopeModule.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -152,7 +152,7 @@ namespace Game3 {
 			return true;
 		}
 
-		player->send(OpenModuleForAgentPacket(MultiModule<Substance::Item, Substance::Energy>::ID(), getGID()));
+		player->send(OpenModuleForAgentPacket(MicroscopeModule<2, Substance::Energy>::ID(), getGID()));
 		InventoriedTileEntity::addObserver(player, true);
 		EnergeticTileEntity::addObserver(player, true);
 

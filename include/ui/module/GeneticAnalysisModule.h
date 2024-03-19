@@ -19,7 +19,7 @@ namespace Game3 {
 			Gtk::Widget & getWidget() final;
 			void reset() final;
 			void update() final;
-			void updateResults(const ItemStackPtr &);
+			void update(const ItemStackPtr &);
 
 		private:
 			ClientGamePtr game;

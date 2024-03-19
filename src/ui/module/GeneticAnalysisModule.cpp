@@ -23,12 +23,12 @@ namespace Game3 {
 	}
 
 	void GeneticAnalysisModule::reset() {
-		updateResults(nullptr);
+		update(nullptr);
 	}
 
 	void GeneticAnalysisModule::update() {}
 
-	void GeneticAnalysisModule::updateResults(const ItemStackPtr &stack) {
+	void GeneticAnalysisModule::update(const ItemStackPtr &stack) {
 		clearText();
 
 		if (!stack)

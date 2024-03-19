@@ -52,6 +52,9 @@ namespace Game3 {
 	class ServerGame;
 	using ServerGamePtr = std::shared_ptr<ServerGame>;
 
+	class Agent;
+	using AgentPtr = std::shared_ptr<Agent>;
+
 	class Entity;
 	using EntityPtr = std::shared_ptr<Entity>;
 

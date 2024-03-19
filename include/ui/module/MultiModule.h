@@ -25,17 +25,20 @@ namespace Game3 {
 	class MultiModule: public Module {
 		public:
 			static Identifier ID() {
+				return {"base", "module/multi_" + getSuffix()};
+			}
+
+			static std::string getSuffix() {
 				const static std::map<Substance, char> substances{
 					{Substance::Item,   'i'},
 					{Substance::Fluid,  'f'},
 					{Substance::Energy, 'e'},
 				};
 
-				std::string name = "module/multi_";
+				std::string suffix;
 				for (Substance substance: {S...})
-					name += substances.at(substance);
-
-				return {"base", std::move(name)};
+					suffix += substances.at(substance);
+				return suffix;
 			}
 
 			MultiModule(std::shared_ptr<ClientGame> game, const std::any &argument, ItemSlotParent *item_slot_parent = nullptr, InventoryModule::GmenuFn gmenu_fn = {}):
