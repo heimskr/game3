@@ -9,13 +9,13 @@
 #include "packet/OpenModuleForAgentPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Incubator.h"
-#include "ui/module/MultiModule.h"
+#include "ui/module/MicroscopeModule.h"
 
 namespace Game3 {
 	namespace {
 		constexpr std::chrono::milliseconds PERIOD{1'000};
-		constexpr EnergyAmount ENERGY_CAPACITY = 16'000;
-		constexpr EnergyAmount ENERGY_PER_ACTION = 1'000;
+		constexpr EnergyAmount ENERGY_CAPACITY = 64'000;
+		constexpr EnergyAmount ENERGY_PER_ACTION = 64'000;
 		constexpr FluidAmount FLUID_CAPACITY = 64 * FluidTile::FULL;
 		constexpr FluidAmount FLUID_PER_ACTION = 8'000;
 	}
@@ -112,7 +112,7 @@ namespace Game3 {
 			return true;
 		}
 
-		player->send(OpenModuleForAgentPacket(MultiModule<Substance::Item, Substance::Energy, Substance::Fluid>::ID(), getGID()));
+		player->send(OpenModuleForAgentPacket(MicroscopeModule<1, Substance::Energy, Substance::Fluid>::ID(), getGID()));
 		EnergeticTileEntity::addObserver(player, true);
 		FluidHoldingTileEntity::addObserver(player, true);
 		InventoriedTileEntity::addObserver(player, true);
