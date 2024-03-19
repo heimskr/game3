@@ -19,6 +19,6 @@ namespace Game3 {
 			Stockpile() = default;
 			Stockpile(Identifier tilename, const Position &position_, VillageID);
 
-			friend class TileEntity;
+		friend class TileEntity;
 	};
 }

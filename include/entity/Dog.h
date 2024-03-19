@@ -24,7 +24,7 @@ namespace Game3 {
 			/** You do not get to kill the dog. */
 			HitPoints getMaxHealth() const override { return INVINCIBLE; }
 
-			friend class Entity;
+		friend class Entity;
 
 		protected:
 			Dog():

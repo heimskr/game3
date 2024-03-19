@@ -18,7 +18,7 @@ namespace Game3 {
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;
 
-			friend class Entity;
+		friend class Entity;
 
 		protected:
 			Merchant() = delete;

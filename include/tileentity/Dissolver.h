@@ -35,6 +35,6 @@ namespace Game3 {
 
 			bool dissolve();
 
-			friend class TileEntity;
+		friend class TileEntity;
 	};
 }

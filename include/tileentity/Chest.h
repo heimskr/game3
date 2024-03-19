@@ -25,6 +25,6 @@ namespace Game3 {
 			Chest(Identifier tile_id, const Position &, std::string name_, Identifier item_name = {"base", "item/chest"});
 			Chest(const Position &);
 
-			friend class TileEntity;
+		friend class TileEntity;
 	};
 }

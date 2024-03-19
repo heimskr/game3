@@ -30,6 +30,6 @@ namespace Game3 {
 			Centrifuge(Identifier tile_id, Position);
 			Centrifuge(Position);
 
-			friend class TileEntity;
+		friend class TileEntity;
 	};
 }

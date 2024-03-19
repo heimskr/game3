@@ -23,6 +23,6 @@ namespace Game3 {
 			ItemSpawner() = default;
 			ItemSpawner(Position position_, float minimum_time, float maximum_time, std::vector<ItemStackPtr> spawnables_);
 
-			friend class TileEntity;
+		friend class TileEntity;
 	};
 }

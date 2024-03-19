@@ -42,7 +42,7 @@ namespace Game3 {
 			inline bool full(size_t index) const { return children[index] && children[index]->full(); }
 			bool remove(std::unique_ptr<Box> &, Index row, Index column);
 
-			friend class Quadtree;
+		friend class Quadtree;
 	};
 
 	class Quadtree {

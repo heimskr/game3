@@ -23,6 +23,6 @@ namespace Game3 {
 			EntityBuilding() = default;
 			EntityBuilding(Identifier tilename, Position position_, GlobalID target_entity);
 
-			friend class TileEntity;
+		friend class TileEntity;
 	};
 }

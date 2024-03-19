@@ -42,6 +42,6 @@ namespace Game3 {
 
 			void slurpFlasks();
 
-			friend class TileEntity;
+		friend class TileEntity;
 	};
 }

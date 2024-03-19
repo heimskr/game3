@@ -22,6 +22,6 @@ namespace Game3 {
 			Sign() = default;
 			Sign(Identifier tilename, Position position_, std::string text_, std::string name_);
 
-			friend class TileEntity;
+		friend class TileEntity;
 	};
 }

@@ -19,7 +19,7 @@ namespace Game3 {
 			void generateChunk(const ChunkPosition &) override;
 			bool canSpawnMonsters() const override { return true; }
 
-			friend class Realm;
+		friend class Realm;
 
 		protected:
 			using Realm::Realm;

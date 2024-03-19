@@ -37,6 +37,6 @@ namespace Game3 {
 			Pump(Identifier tile_id, Position);
 			Pump(Position);
 
-			friend class TileEntity;
+		friend class TileEntity;
 	};
 }

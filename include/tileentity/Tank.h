@@ -25,6 +25,6 @@ namespace Game3 {
 			Tank(Identifier tile_id, Position);
 			Tank(Position);
 
-			friend class TileEntity;
+		friend class TileEntity;
 	};
 }

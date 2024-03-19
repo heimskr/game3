@@ -46,7 +46,7 @@ namespace Game3 {
 				return out;
 			}
 
-			friend class Entity;
+		friend class Entity;
 
 		protected:
 			Sheep();

@@ -41,6 +41,6 @@ namespace Game3 {
 			OreDeposit() = default;
 			OreDeposit(const Ore &ore, const Position &position_, uint32_t uses_ = 0);
 
-			friend class TileEntity;
+		friend class TileEntity;
 	};
 }

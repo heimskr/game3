@@ -25,6 +25,6 @@ namespace Game3 {
 			Building() = default;
 			Building(Identifier, Position, RealmID inner_realm_id, Position entrance_);
 
-			friend class TileEntity;
+		friend class TileEntity;
 	};
 }

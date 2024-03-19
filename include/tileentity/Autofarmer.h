@@ -37,6 +37,6 @@ namespace Game3 {
 			/** Returns whether the operation was successful and energy should be consumed. */
 			bool autofarm(Position, bool &input_empty);
 
-			friend class TileEntity;
+		friend class TileEntity;
 	};
 }

@@ -22,6 +22,6 @@ namespace Game3 {
 			Teleporter() = default;
 			Teleporter(Identifier tilename, Position position_, RealmID target_realm, Position target_position);
 
-			friend class TileEntity;
+		friend class TileEntity;
 	};
 }

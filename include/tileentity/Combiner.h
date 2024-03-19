@@ -44,6 +44,6 @@ namespace Game3 {
 			bool combine();
 			bool setTarget(Identifier);
 
-			friend class TileEntity;
+		friend class TileEntity;
 	};
 }

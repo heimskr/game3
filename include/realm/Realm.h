@@ -311,7 +311,7 @@ namespace Game3 {
 				return out;
 			}
 
-			friend class MainWindow;
+		friend class MainWindow;
 
 		protected:
 			std::atomic_bool focused = false;

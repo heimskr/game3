@@ -12,7 +12,7 @@ namespace Game3 {
 			size_t getMaxFluidTypes() const override;
 			FluidAmount getMaxLevel(FluidID) override;
 
-			std::string getName() const override { return "BiomassLiquefier"; }
+			std::string getName() const override { return "Biomass Liquefier"; }
 
 			void init(Game &) override;
 			void tick(const TickArgs &) override;
@@ -31,6 +31,6 @@ namespace Game3 {
 			BiomassLiquefier(Identifier tile_id, Position);
 			BiomassLiquefier(Position);
 
-			friend class TileEntity;
+		friend class TileEntity;
 	};
 }

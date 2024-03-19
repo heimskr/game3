@@ -50,6 +50,6 @@ namespace Game3 {
 			void fillReactants();
 			void fillProducts();
 
-			friend class TileEntity;
+		friend class TileEntity;
 	};
 }

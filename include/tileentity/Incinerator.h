@@ -30,6 +30,6 @@ namespace Game3 {
 			Incinerator(Identifier tile_id, Position);
 			Incinerator(Position);
 
-			friend class TileEntity;
+		friend class TileEntity;
 	};
 }

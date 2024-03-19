@@ -30,6 +30,6 @@ namespace Game3 {
 			Liquefier(Identifier tile_id, Position);
 			Liquefier(Position);
 
-			friend class TileEntity;
+		friend class TileEntity;
 	};
 }

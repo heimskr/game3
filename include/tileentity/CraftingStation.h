@@ -23,7 +23,7 @@ namespace Game3 {
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
 
-			friend class TileEntity;
+		friend class TileEntity;
 
 		protected:
 			CraftingStation() = default;

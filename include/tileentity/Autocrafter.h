@@ -69,6 +69,6 @@ namespace Game3 {
 			bool validateRecipe(const CraftingRecipe &) const;
 			void connectStationInventory();
 
-			friend class TileEntity;
+		friend class TileEntity;
 	};
 }

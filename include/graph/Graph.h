@@ -21,7 +21,7 @@ namespace Game3 {
 			using Label = std::string;
 
 			class Node {
-				friend class Graph;
+			friend class Graph;
 
 				public:
 					struct NodeLess {

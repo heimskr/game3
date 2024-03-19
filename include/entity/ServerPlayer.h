@@ -40,6 +40,6 @@ namespace Game3 {
 
 			ServerPlayer();
 
-			friend class Entity;
+		friend class Entity;
 	};
 }
