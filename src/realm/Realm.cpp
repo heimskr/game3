@@ -1295,6 +1295,10 @@ namespace Game3 {
 
 		const auto original_x = chunk_pos.x;
 
+		if (!baseRenderers) {
+			return out;
+		}
+
 		for (const auto &row: *baseRenderers) {
 			chunk_pos.x = original_x;
 
