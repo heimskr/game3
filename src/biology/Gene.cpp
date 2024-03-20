@@ -107,7 +107,7 @@ namespace Game3 {
 
 	void LongGene::mutate(float strength) {
 		const static float base = 1.f / std::sqrt(2.f * M_PIf);
-		const float stddev = strength * 6.f;
+		const float stddev = strength * 2.f;
 		const float normal = std::normal_distribution<float>(0.f, stddev)(threadContext.rng);
 		value = clamp(value + ValueType(std::round(normal * strength / base * (maximum - minimum) / 2.f)));
 	}

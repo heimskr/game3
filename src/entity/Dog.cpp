@@ -3,12 +3,12 @@
 
 namespace Game3 {
 	std::vector<Identifier> Dog::breeds{
-		"base:entity/dog",
-		"base:entity/hellhound",
+		"base:texture/dog",
+		"base:texture/hellhound",
 	};
 
 	bool Dog::canAbsorbGenes(const nlohmann::json &genes) const {
-		return checkGenes(genes, {"breed"});
+		return checkGenes(genes, {"species", "breed"});
 	}
 
 	void Dog::absorbGenes(const nlohmann::json &genes) {

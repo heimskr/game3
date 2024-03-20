@@ -16,6 +16,7 @@
 		"base:entity/sheep":         ["base:texture/sheep",       3],
 		"base:entity/pig":           ["base:texture/pig",         3],
 		"base:entity/chicken":       ["base:texture/chicken",     3],
+		"base:entity/crab":          ["base:texture/crab",        3],
 		"base:entity/dog":           ["base:texture/dog",         3],
 		"base:entity/cyclops":       ["base:texture/cyclops",     1],
 		"base:entity/dragon":        ["base:texture/dragon",      1],
