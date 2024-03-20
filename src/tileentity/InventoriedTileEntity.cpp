@@ -24,48 +24,69 @@ namespace Game3 {
 	bool InventoriedTileEntity::canExtractItem(Direction direction, Slot slot) {
 		// TODO: support multiple inventories with canExtractItem
 		const InventoryPtr inventory = getInventory(0);
-		if (!inventory || !mayExtractItem(direction, slot))
+
+		if (!inventory || !mayExtractItem(direction, slot)) {
 			return false;
+		}
+
 		return inventory->canExtract(slot);
 	}
 
-	ItemStackPtr InventoriedTileEntity::extractItem(Direction, bool remove, Slot slot) {
+	ItemStackPtr InventoriedTileEntity::extractItem(Direction, bool remove, Slot slot, ItemCount max) {
 		// TODO: support multiple inventories with extractItem
 		const InventoryPtr inventory = getInventory(0);
 
-		if (!inventory)
+		if (!inventory) {
 			return nullptr;
+		}
 
 		ItemStackPtr stack;
 
 		auto inventory_lock = inventory->uniqueLock();
 
 		if (remove) {
-			ItemStackPtr out;
+			Slot slot_extracted_from = -1;
 
 			if (slot == Slot(-1)) {
-				Slot slot_extracted_from = -1;
 				stack = inventory->firstItem(&slot_extracted_from);
-				if (slot_extracted_from == Slot(-1) || !stack)
+				if (slot_extracted_from == Slot(-1) || !stack) {
 					return nullptr;
-				out = std::move(stack);
-				inventory->erase(slot_extracted_from);
+				}
 			} else {
 				stack = (*inventory)[slot];
 				if (!stack)
 					return nullptr;
-				out = std::move(stack);
-				inventory->erase(slot);
+				slot_extracted_from = slot;
+			}
+
+			if (max == ItemCount(-2)) {
+				max = stack->item->maxCount;
+			}
+
+			if (stack->count <= max) {
+				inventory->erase(slot_extracted_from);
+			} else {
+				stack->count -= max;
+				stack = stack->withCount(max);
 			}
 
 			inventory->notifyOwner();
-			return out;
+			return stack;
 		}
 
-		if (slot == Slot(-1))
+		if (slot == Slot(-1)) {
 			stack = inventory->firstItem(nullptr);
-		else
+		} else {
 			stack = (*inventory)[slot];
+		}
+
+		if (max == ItemCount(-2)) {
+			max = stack->item->maxCount;
+		}
+
+		if (max < stack->count) {
+			stack = stack->withCount(max);
+		}
 
 		return stack;
 	}

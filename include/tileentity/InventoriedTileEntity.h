@@ -26,8 +26,9 @@ namespace Game3 {
 			virtual bool mayExtractItem(Direction direction) { return mayExtractItem(direction, -1); }
 			virtual bool canInsertItem(const ItemStackPtr &, Direction, Slot);
 			virtual bool canExtractItem(Direction, Slot);
-			/** Returns the extracted item. */
-			virtual ItemStackPtr extractItem(Direction, bool remove, Slot slot);
+			/** Returns the extracted item. `max` should be -1 for no maximum or -2 to use the extracted stack's typical max.  */
+			virtual ItemStackPtr extractItem(Direction, bool remove, Slot slot, ItemCount max);
+			virtual ItemStackPtr extractItem(Direction direction, bool remove, Slot slot) { return extractItem(direction, remove, slot, -1); }
 			/** Returns whether the item was insertable at all. */
 			virtual bool insertItem(ItemStackPtr, Direction, ItemStackPtr *leftover);
 			virtual ItemCount itemsInsertable(const ItemStackPtr &, Direction, Slot);

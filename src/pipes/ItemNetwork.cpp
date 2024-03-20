@@ -95,7 +95,7 @@ namespace Game3 {
 				// If that happens, we don't want to notify the owner and potentially queue a broadcast.
 				auto suppressor = inventory->suppress();
 
-				ItemStackPtr extracted = inventoried->extractItem(direction, true, slot);
+				ItemStackPtr extracted = inventoried->extractItem(direction, true, slot, -2);
 
 				// This would be a little strange.
 				if (!extracted) {
@@ -115,8 +115,9 @@ namespace Game3 {
 
 					if (const auto pipe = std::dynamic_pointer_cast<Pipe>(realm->tileEntityAt(round_robin->getPosition() + round_robin_direction))) {
 						auto round_robin_inventory_lock = round_robin_inventory->sharedLock();
-						if (std::shared_ptr<ItemFilter> insertion_filter = pipe->itemFilters[flipDirection(round_robin_direction)]; insertion_filter && !insertion_filter->isAllowed(extracted, *round_robin_inventory))
+						if (std::shared_ptr<ItemFilter> insertion_filter = pipe->itemFilters[flipDirection(round_robin_direction)]; insertion_filter && !insertion_filter->isAllowed(extracted, *round_robin_inventory)) {
 							return false;
+						}
 					}
 
 					// TODO?: support multiple inventories in item networks
@@ -142,8 +143,9 @@ namespace Game3 {
 					}
 
 					// If we inserted it back but the size was different (due to partial insertion), we need to update the inventory.
-					if (changed)
+					if (changed) {
 						suppressor.cancel(true);
+					}
 				} else {
 					// Because no leftovers means the extraction was successful and the source inventory changed, we need to undo the effect of the suppressor.
 					suppressor.cancel(true);

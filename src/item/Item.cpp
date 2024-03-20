@@ -170,7 +170,7 @@ namespace Game3 {
 	}
 
 	ItemStackPtr ItemStack::withCount(ItemCount new_count) const {
-		return ItemStack::create(getGame(), item, new_count);
+		return ItemStack::create(getGame(), item, new_count, data);
 	}
 
 	ItemStackPtr ItemStack::withDurability(const GamePtr &game, const ItemID &id, Durability durability) {
