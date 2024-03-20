@@ -1,12 +1,22 @@
 #pragma once
 
 #include "entity/Animal.h"
+#include "biology/Gene.h"
+#include "data/Identifier.h"
+
+#include <map>
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace Game3 {
 	class Building;
 
 	class Dog: public Animal {
 		public:
+			StringGene species{"species", "base:entity/dog"};
+			LongGene breed{"breed", 0, 1, 0};
+
 			static Identifier ID() { return {"base", "entity/dog"}; }
 
 			static std::shared_ptr<Dog> create(const std::shared_ptr<Game> &) {
@@ -24,10 +34,23 @@ namespace Game3 {
 			/** You do not get to kill the dog. */
 			HitPoints getMaxHealth() const override { return INVINCIBLE; }
 
+			bool canAbsorbGenes(const nlohmann::json &) const override;
+			void absorbGenes(const nlohmann::json &) override;
+			void iterateGenes(const std::function<void(Gene &)> &) override;
+			void iterateGenes(const std::function<void(const Gene &)> &) const override;
+
+			void render(const RendererContext &) override;
+			void encode(Buffer &) override;
+			void decode(Buffer &) override;
+
+			void setBreed(LongGene::ValueType);
+
 		friend class Entity;
 
 		protected:
 			Dog():
 				Entity(ID()), Animal() {}
+
+			static std::vector<Identifier> breeds;
 	};
 }

@@ -46,6 +46,7 @@ namespace Game3 {
 
 			explicit inline operator float() const { return value; }
 			inline auto getValue() const { return value; }
+			inline void setValue(float new_value) { value = new_value; }
 
 		private:
 			float minimum{};
@@ -73,6 +74,7 @@ namespace Game3 {
 
 			explicit inline operator ValueType() const { return value; }
 			inline auto getValue() const { return value; }
+			inline void setValue(ValueType new_value) { value = new_value; }
 
 		private:
 			ValueType minimum{};
@@ -98,6 +100,7 @@ namespace Game3 {
 
 			explicit inline operator float() const { return value; }
 			inline auto getValue() const { return value; }
+			inline void setValue(float new_value) { value = new_value; }
 
 		private:
 			float value{};
@@ -121,6 +124,7 @@ namespace Game3 {
 
 			explicit inline operator const std::string &() const { return value; }
 			inline const auto & getValue() const { return value; }
+			inline void setValue(std::string new_value) { value = std::move(new_value); }
 
 		private:
 			std::string value{};

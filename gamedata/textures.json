@@ -29,7 +29,8 @@
 			"base:texture/dog":         ["resources/animals/dog.png"],
 			"base:texture/flasks":      ["resources/flasks.png"],
 			"base:texture/ship":        ["resources/ship.png"],
-			"base:texture/sheep_mask":  ["resources/animals/sheep_mask.png"]
+			"base:texture/sheep_mask":  ["resources/animals/sheep_mask.png"],
+			"base:texture/hellhound":   ["resources/animals/hellhound.png"]
 		}]
 	]
 }
