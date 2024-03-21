@@ -35,7 +35,7 @@ namespace Game3 {
 			return;
 
 		if (ContainmentOrb::validate(stack)) {
-			analyzeOrb(stack);
+			ponderOrb(stack);
 		} else if (stack->getID() == "base:item/gene") {
 			analyzeGene(stack);
 		} else if (stack->getID() == "base:item/genetic_template") {
@@ -43,7 +43,7 @@ namespace Game3 {
 		}
 	}
 
-	void GeneticAnalysisModule::analyzeOrb(const ItemStackPtr &stack) {
+	void GeneticAnalysisModule::ponderOrb(const ItemStackPtr &stack) {
 		EntityPtr entity;
 
 		try {

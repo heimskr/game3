@@ -1,11 +1,11 @@
 #pragma once
 
-#include "item/Item.h"
+#include "item/FilledFlask.h"
 
 namespace Game3 {
-	class Mutagen: public Item {
+	class Mutagen: public FilledFlask {
 		public:
-			using Item::Item;
+			using FilledFlask::FilledFlask;
 			bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
 	};
 }

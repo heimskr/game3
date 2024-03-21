@@ -28,7 +28,7 @@ namespace Game3 {
 			std::vector<Gtk::Separator> separators;
 
 			void populate();
-			void analyzeOrb(const ItemStackPtr &);
+			void ponderOrb(const ItemStackPtr &);
 			void analyzeGene(const ItemStackPtr &);
 			void analyzeTemplate(const ItemStackPtr &);
 			void addLabel(const std::string &);

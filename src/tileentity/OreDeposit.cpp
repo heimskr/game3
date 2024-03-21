@@ -51,7 +51,10 @@ namespace Game3 {
 		oreType = json.at("oreType");
 		tileID = getOre(*game).tilename;
 		ready = json.contains("ready");
-		uses = json.contains("uses")? json.at("uses").get<uint32_t>() : 0;
+		if (auto iter = json.find("uses"); iter != json.end())
+			uses = *iter;
+		else
+			uses = 0;
 	}
 
 	void OreDeposit::tick(const TickArgs &args) {

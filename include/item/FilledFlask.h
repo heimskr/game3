@@ -1,12 +1,13 @@
 #pragma once
 
 #include "game/Fluids.h"
+#include "interface/HasFluidType.h"
 #include "item/Item.h"
 
 namespace Game3 {
 	struct FluidRegistry;
 
-	class FilledFlask: public Item {
+	class FilledFlask: public Item, public HasFluidType {
 		public:
 			Identifier fluidName;
 
@@ -17,5 +18,7 @@ namespace Game3 {
 
 			FluidStack getFluidStack(const Game &) const;
 			FluidStack getFluidStack(const FluidRegistry &) const;
+
+			Identifier getFluidType() const override { return fluidName; }
 	};
 }

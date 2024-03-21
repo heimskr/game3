@@ -17,6 +17,7 @@
 #include "item/DissolverItem.h"
 #include "item/EmptyFlask.h"
 #include "item/EntitySpawnItem.h"
+#include "item/EternalFountainItem.h"
 #include "item/FilledFlask.h"
 #include "item/Floor.h"
 #include "item/Flower.h"
@@ -108,6 +109,8 @@ namespace Game3 {
 		add(std::make_shared<EntitySpawnItem>("base:item/ship", "Ship", 999, "base:entity/ship")); // TODO: cost
 
 		add(std::make_shared<EnergyPipeItem>(4));
+
+		add(std::make_shared<EternalFountainItem>("base:item/eternal_fountain", "Eternal Fountain", 999, 64)); // TODO: cost
 
 		add(std::make_shared<FilledFlask>("base:item/water_flask", "Water Flask", 3, "base:fluid/water"));
 		add(std::make_shared<FilledFlask>("base:item/lava_flask",  "Lava Flask",  4, "base:fluid/lava"));
@@ -214,7 +217,7 @@ namespace Game3 {
 
 		add(std::make_shared<MicroscopeItem>("base:item/microscope", "Microscope", 999, 64)); // TODO: cost
 
-		add(std::make_shared<Mutagen>("base:item/mutagen", "Mutagen", 999, 64)); // TODO: cost
+		add(std::make_shared<Mutagen>("base:item/mutagen", "Mutagen", 999, "base:fluid/mutagen", 64)); // TODO: cost
 
 		add(std::make_shared<MutatorItem>("base:item/mutator", "Mutator", 999, 64)); // TODO: cost
 

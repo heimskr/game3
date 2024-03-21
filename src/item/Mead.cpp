@@ -18,7 +18,7 @@ namespace Game3 {
 			return use(slot, stack, player, modifiers);
 
 		if (std::optional<FluidTile> tile = realm->tryFluid(place.position); !tile || tile->level == 0) {
-			std::shared_ptr<Fluid> fluid = game->registry<FluidRegistry>().at("base:fluid/mead"_id);
+			std::shared_ptr<Fluid> fluid = game->registry<FluidRegistry>().at(getFluidType());
 			if (!fluid)
 				return false;
 
