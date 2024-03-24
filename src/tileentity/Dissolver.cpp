@@ -9,14 +9,15 @@
 #include "realm/Realm.h"
 #include "recipe/DissolverRecipe.h"
 #include "tileentity/Dissolver.h"
+#include "ui/module/MultiModule.h"
 
 #include <cassert>
 #include <numeric>
 
 namespace Game3 {
 	namespace {
-		constexpr EnergyAmount ENERGY_CAPACITY = 100'000;
-		constexpr EnergyAmount ENERGY_PER_ATOM = 100;
+		constexpr EnergyAmount ENERGY_CAPACITY = 128'000;
+		constexpr EnergyAmount ENERGY_PER_ATOM = 64;
 		constexpr std::chrono::milliseconds PERIOD{100};
 		constexpr ItemCount INPUT_CAPACITY  = 5;
 		constexpr ItemCount OUTPUT_CAPACITY = 10;
@@ -88,14 +89,10 @@ namespace Game3 {
 			return true;
 		}
 
-		if (modifiers.onlyShift()) {
-			EnergeticTileEntity::addObserver(player, false);
-		} else {
-			// player->send(OpenModuleForAgentPacket(DissolverModule::ID(), getGID()));
-			InventoriedTileEntity::addObserver(player, false);
-		}
+		player->send(OpenModuleForAgentPacket(MultiModule<Substance::Item, Substance::Energy>::ID(), getGID()));
+		EnergeticTileEntity::addObserver(player, true);
+		InventoriedTileEntity::addObserver(player, true);
 
-		auto lock = energyContainer->sharedLock();
 		return true;
 	}
 

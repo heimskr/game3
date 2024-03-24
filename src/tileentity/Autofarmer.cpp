@@ -76,7 +76,7 @@ namespace Game3 {
 		EnergeticTileEntity::addObserver(player, true);
 		InventoriedTileEntity::addObserver(player, true);
 
-		return false;
+		return true;
 	}
 
 	void Autofarmer::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
