@@ -1,0 +1,8 @@
+{
+	"credit": "Fayabella",
+	"id": "base:item/pyrite_ore",
+	"resource": {
+		"richnessRange": [1, 5],
+		"likelihood": 5
+	}
+}
