@@ -159,7 +159,28 @@
 			"base:item/ash":              [1, "C", "Ca"],
 			"base:item/bleach":           [1, [4, "NaOCl"]],
 			"base:item/sulfuric_acid":    [1, [4, "H2SO4"]],
-			"base:item/mutagen":          [1, [4, "C3H7N3O2"]]
+			"base:item/mutagen":          [1, [4, "C3H7N3O2"]],
+			"base:item/apatite_ore":      [1, [4, "Ca5(PO4)3Cl"]],
+			"base:item/asbestos_ore":     [1, [4, "Mg3Si2H4O9"]],
+			"base:item/bauxite_ore":      [1, [4, "Al2O3"]],
+			"base:item/cassiterite_ore":  [1, [4, "SnO2"]],
+			"base:item/chalcopyrite_ore": [1, [4, "CuFeS2"]],
+			"base:item/chromite_ore":     [1, [4, "FeCr2O4"]],
+			"base:item/chrysoberyl_ore":  [1, [4, "BeAl2O4"]],
+			"base:item/garnet_ore":       [1, [4, "(Al2Mg3Si3O12)3(Al2Fe3Si3O12)5(Al2Mn3Si3O12)8"]],
+			"base:item/ilmenite_ore":     [1, [4, "FeTiO3"]],
+			"base:item/magnetite_ore":    [1, [4, "Fe3O4"]],
+			"base:item/malachite_ore":    [1, [4, "Cu2CH2O5"]],
+			"base:item/mica_ore":         [1, [4, "KAl3Si3F2O10"]],
+			"base:item/olivine_ore":      [1, [4, "Mg2Fe(SiO2)2"]],
+			"base:item/pyrite_ore":       [1, [4, "FeS2"]],
+			"base:item/pyrochlore_ore":   [1, [4, "Ca2Nb2O7"]],
+			"base:item/pyrope_ore":       [1, [4, "Al2Mg3Si3O12"]],
+			"base:item/sodalite_ore":     [1, [4, "Al3Si3Na4Cl"]],
+			"base:item/stibnite_ore":     [1, [4, "Sb2S3"]],
+			"base:item/sulfur_ore":       [1, [16, "S"]],
+			"base:item/tetrahedrite_ore": [1, [4, "Cu3SbS3Fe"]],
+			"base:item/vanadium_magnetite_ore": [1, [4, "(Fe3O4)V"]]
 		}]
 	]
 }
