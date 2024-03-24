@@ -1,3 +1,4 @@
+#include "Log.h"
 #include "util/Math.h"
 
 #include <stb/stb_image.h>
@@ -83,19 +84,20 @@ namespace Game3 {
 				}
 
 				void drawTriangle(const jcv_point &v0, const jcv_point &v1, const jcv_point &v2, Color color) {
-					if (const int area = orient2D(v0, v1, v2); area == 0)
+					if (const int area = orient2D(v0, v1, v2); area == 0) {
 						return;
+					}
 
 					// Compute triangle bounding box
-					int min_x = std::min({int(v0.x), int(v1.x), int(v2.x)});
-					int min_y = std::min({int(v0.y), int(v1.y), int(v2.y)});
-					int max_x = std::min({int(v0.x), int(v1.x), int(v2.x)});
-					int max_y = std::min({int(v0.y), int(v1.y), int(v2.y)});
+					jcv_real min_x = std::min({v0.x, v1.x, v2.x});
+					jcv_real min_y = std::min({v0.y, v1.y, v2.y});
+					jcv_real max_x = std::max({v0.x, v1.x, v2.x});
+					jcv_real max_y = std::max({v0.y, v1.y, v2.y});
 
 					// Rasterize
 					jcv_point p;
-					for (p.y = jcv_real(min_y); p.y <= jcv_real(max_y); p.y++) {
-						for (p.x = jcv_real(min_x); p.x <= jcv_real(max_x); p.x++) {
+					for (p.y = jcv_real(min_y); p.y <= jcv_real(max_y); p.y += 1.0) {
+						for (p.x = jcv_real(min_x); p.x <= jcv_real(max_x); p.x += 1.0) {
 							// Determine barycentric coordinates
 							const int w0 = orient2D(v1, v2, p);
 							const int w1 = orient2D(v2, v0, p);
@@ -127,7 +129,7 @@ namespace Game3 {
 							Color color = (*this)(x, y);
 
 							for (int p = 0; p < 4; ++p) {
-								raw[i + p] = (color >> (8 * p)) & 0xff;
+								raw[i + p] = (color >> (8 * (3 - p))) & 0xff;
 							}
 						}
 					}
@@ -135,11 +137,78 @@ namespace Game3 {
 					return raw;
 				}
 		};
+
+		inline jcv_point remap(const jcv_point &pt, const jcv_point &min, const jcv_point &max, const jcv_point &scale) {
+			return {
+				(pt.x - min.x) / (max.x - min.x) * scale.x,
+				(pt.y - min.y) / (max.y - min.y) * scale.y,
+			};
+		}
 	}
 
 	void voronoiTest() {
 		Grid grid;
-		grid(0, 0) = 0xffffffff;
+
+		std::default_random_engine rng(64);
+
+		int count = 16;
+		auto points = std::make_unique<jcv_point[]>(count);
+
+		std::uniform_real_distribution point_distribution(0.f, 64.f);
+		std::uniform_int_distribution  color_distribution(0, 19);
+
+		std::vector<uint32_t> colors{
+			0x0a4f75ff,
+			0xce7d3eff,
+			0xffe13eff,
+			0xe2a795ff,
+			0xc9eb4aff,
+			0x045f5aff,
+			0x6feb4cff,
+			0xa516bcff,
+			0x300e49ff,
+			0x59fae1ff,
+			0xb74917ff,
+			0x060ea1ff,
+			0x039ae9ff,
+			0xa67fbeff,
+			0xfda380ff,
+			0xc9bf9bff,
+			0x8e66d7ff,
+			0x0cd0d8ff,
+			0x2016b8ff,
+			0xb49904ff,
+		};
+
+		for (int i = 0; i < count; ++i) {
+			points[i].x = point_distribution(rng);
+			points[i].y = point_distribution(rng);
+		}
+
+		const int width(CHUNK_SIZE);
+		const int height(CHUNK_SIZE);
+
+		jcv_diagram diagram{};
+		jcv_point dimensions{jcv_real(width), jcv_real(height)};
+		jcv_rect rect{{0.f, 0.f}, {64.f, 64.f}};
+
+		jcv_diagram_generate(count, points.get(), &rect, nullptr, &diagram);
+
+		const jcv_site *sites = jcv_diagram_get_sites(&diagram);
+		for (int i = 0; i < diagram.numsites; ++i) {
+			const jcv_site &site = sites[i];
+			jcv_point s = remap(site.p, diagram.min, diagram.max, dimensions);
+			const auto index = color_distribution(rng);
+			const auto color = colors.at(index);
+
+			const jcv_graphedge *e = site.edges;
+			while (e) {
+				jcv_point p0 = remap(e->pos[0], diagram.min, diagram.max, dimensions);
+				jcv_point p1 = remap(e->pos[1], diagram.min, diagram.max, dimensions);
+				grid.drawTriangle(s, p0, p1, color);
+				e = e->next;
+			}
+		}
 
 		auto raw = grid.makeRaw();
 
