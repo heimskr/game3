@@ -194,6 +194,11 @@ int main(int argc, char **argv) {
 			return 0;
 		}
 
+		if (arg1 == "--ore" && argc == 5) {
+			std::cout << Game3::generateFlask(Game3::dataRoot / "resources" / "orebase.png", Game3::dataRoot / "resources" / "oremask.png", argv[2], argv[3], argv[4]);
+			return 0;
+		}
+
 		if (argc == 4) {
 			// std::cout << Game3::generateFlask(Game3::dataRoot / "resources" / "erlenmeyerbase.png", Game3::dataRoot / "resources" / "erlenmeyermask.png", argv[1], argv[2], argv[3]);
 			// std::cout << Game3::generateFlask(Game3::dataRoot / "resources" / "testtubebase.png", Game3::dataRoot / "resources" / "testtubemask.png", argv[1], argv[2], argv[3]);
