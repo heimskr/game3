@@ -44,6 +44,7 @@ game3_sources += gnome.compile_resources('game3-resources',
 
 inc_dirs = [
 	include_directories('..' / 'include'),
+	include_directories('..' / 'voronoi' / 'src'),
 ]
 
 link_args = ['-lX11']

@@ -27,12 +27,14 @@ namespace Game3 {
 
 	class FastNoise2Generator: public NoiseGenerator {
 		private:
-			FastNoise::SmartNode<> fastNoise = FastNoise::NewFromEncodedNodeTree(getNodeTree(), FastSIMD::Level_AVX512);
+			FastNoise::SmartNode<> fastNoise;
 
 			static const char * getNodeTree();
 
 		public:
-			using NoiseGenerator::NoiseGenerator;
+			FastNoise2Generator();
+			FastNoise2Generator(int seed_);
+			FastNoise2Generator(int seed_, const char *node_tree);
 
 			double operator()(double x, double y) const override {
 				return fastNoise->GenSingle2D(x, y, seed);

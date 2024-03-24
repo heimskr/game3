@@ -197,6 +197,29 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/sulfuric_acid",    "Sulfuric Acid",      16, 64));
 		add(std::make_shared<Item>("base:item/gene",             "Gene",                1,  1));
 		add(std::make_shared<Item>("base:item/genetic_template", "Genetic Template",    1,  1));
+		add(std::make_shared<Item>("base:item/aluminum_ore",     "Aluminum Ore",       16, 64));
+		add(std::make_shared<Item>("base:item/apatite_ore",      "Apatite Ore",        16, 64));
+		add(std::make_shared<Item>("base:item/asbestos_ore",     "Asbestos Ore",       16, 64));
+		add(std::make_shared<Item>("base:item/bauxite_ore",      "Bauxite Ore",        16, 64));
+		add(std::make_shared<Item>("base:item/bornite_ore",      "Bornite Ore",        16, 64));
+		add(std::make_shared<Item>("base:item/cassiterite_ore",  "Cassiterite Ore",    16, 64));
+		add(std::make_shared<Item>("base:item/chalcopyrite_ore", "Chalcopyrite Ore",   16, 64));
+		add(std::make_shared<Item>("base:item/chromite_ore",     "Chromite Ore",       16, 64));
+		add(std::make_shared<Item>("base:item/chrysoberyl_ore",  "Chrysoberyl Ore",    16, 64));
+		add(std::make_shared<Item>("base:item/garnet_ore",       "Garnet Ore",         16, 64));
+		add(std::make_shared<Item>("base:item/ilmenite_ore",     "Ilmenite Ore",       16, 64));
+		add(std::make_shared<Item>("base:item/magnetite_ore",    "Magnetite Ore",      16, 64));
+		add(std::make_shared<Item>("base:item/malachite_ore",    "Malachite Ore",      16, 64));
+		add(std::make_shared<Item>("base:item/mica_ore",         "Mica Ore",           16, 64));
+		add(std::make_shared<Item>("base:item/olivine_ore",      "Olivine Ore",        16, 64));
+		add(std::make_shared<Item>("base:item/pyrite_ore",       "Pyrite Ore",         16, 64));
+		add(std::make_shared<Item>("base:item/pyrochlore_ore",   "Pyrochlore Ore",     16, 64));
+		add(std::make_shared<Item>("base:item/pyrope_ore",       "Pyrope Ore",         16, 64));
+		add(std::make_shared<Item>("base:item/sodalite_ore",     "Sodalite Ore",       16, 64));
+		add(std::make_shared<Item>("base:item/stibnite_ore",     "Stibnite Ore",       16, 64));
+		add(std::make_shared<Item>("base:item/sulfur_ore",       "Sulfur Ore",         16, 64));
+		add(std::make_shared<Item>("base:item/tetrahedrite_ore", "Tetrahedrite Ore",   16, 64));
+		add(std::make_shared<Item>("base:item/vanadium_magnetite_ore", "Vanadium Magnetite Ore", 16, 64));
 
 		add(std::make_shared<ItemPipeItem>(4));
 
