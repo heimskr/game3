@@ -29,16 +29,38 @@ namespace Game3 {
 		reg.add<ForestFloorTile>();
 		reg.add<TorchTile>();
 		reg.addMineable("base:tile/stone", ItemStack::create(self, "base:item/stone"), true);
+
 		reg.add("base:tile/cave_coal",     std::make_shared<CaveTile>("base:tile/cave_coal",     ItemStack::create(self, "base:item/coal"),        "base:tile/cave_dirt"));
 		reg.add("base:tile/cave_copper",   std::make_shared<CaveTile>("base:tile/cave_copper",   ItemStack::create(self, "base:item/copper_ore"),  "base:tile/cave_dirt"));
 		reg.add("base:tile/cave_diamond",  std::make_shared<CaveTile>("base:tile/cave_diamond",  ItemStack::create(self, "base:item/diamond_ore"), "base:tile/cave_dirt"));
 		reg.add("base:tile/cave_gold",     std::make_shared<CaveTile>("base:tile/cave_gold",     ItemStack::create(self, "base:item/gold_ore"),    "base:tile/cave_dirt"));
 		reg.add("base:tile/cave_iron",     std::make_shared<CaveTile>("base:tile/cave_iron",     ItemStack::create(self, "base:item/iron_ore"),    "base:tile/cave_dirt"));
 		reg.add("base:tile/cave_wall",     std::make_shared<CaveTile>("base:tile/cave_wall",     ItemStack::create(self, "base:item/stone"),       "base:tile/cave_dirt"));
+
 		reg.add("base:tile/grimstone",     std::make_shared<CaveTile>("base:tile/grimstone",     ItemStack::create(self, "base:item/grimstone"),   "base:tile/grimdirt"));
 		reg.add("base:tile/grim_diamond",  std::make_shared<CaveTile>("base:tile/grim_diamond",  ItemStack::create(self, "base:item/diamond_ore"), "base:tile/grimdirt"));
 		reg.add("base:tile/grim_uranium",  std::make_shared<CaveTile>("base:tile/grim_uranium",  ItemStack::create(self, "base:item/uranium_ore"), "base:tile/grimdirt"));
 		reg.add("base:tile/grim_fireopal", std::make_shared<CaveTile>("base:tile/grim_fireopal", ItemStack::create(self, "base:item/fire_opal"),   "base:tile/grimdirt"));
+
+		static std::vector<std::string> rares {
+			"apatite", "asbestos",
+			"bauxite", "bornite",
+			"cassiterite", "chalcopyrite", "chromite", "chrysoberyl",
+			"garnet",
+			"ilmenite",
+			"magnetite", "malachite", "mica",
+			"olivine",
+			"pyrite", "pyrochlore", "pyrope",
+			"sodalite", "stibnite", "sulfur",
+			"tetrahedrite",
+			"vanadium_magnetite",
+		};
+
+		for (const std::string &rare: rares) {
+			Identifier tile("base:tile/cave_" + rare);
+			Identifier item("base:item/" + rare + "_ore");
+			reg.add(tile, std::make_shared<CaveTile>(tile, ItemStack::create(self, item), "base:tile/cave_dirt"));
+		}
 
 		const auto monomap = registry<TilesetRegistry>().at("base:tileset/monomap");
 		auto grass = std::make_shared<GrassTile>();

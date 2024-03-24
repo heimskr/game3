@@ -1,12 +1,14 @@
-#include <iostream>
-
 #include "Log.h"
+#include "algorithm/Voronoi.h"
 #include "graphics/Tileset.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "realm/Cave.h"
 #include "tileentity/Building.h"
+#include "util/Util.h"
 #include "worldgen/CaveGen.h"
+
+#include <ranges>
 
 namespace Game3 {
 	Cave::Cave(const GamePtr &game_, RealmID id_, RealmID parent_realm, int seed_):
@@ -58,6 +60,36 @@ namespace Game3 {
 		tileProvider.ensureAllChunks(chunk_position);
 		WorldGen::generateCave(shared_from_this(), rng, seed, {chunk_position, chunk_position});
 		tileProvider.updateChunk(chunk_position);
+	}
+
+	RectangularVector<uint16_t> & Cave::getOreVoronoi(ChunkPosition chunk_position, std::unique_lock<DefaultMutex> &lock, std::default_random_engine &rng) {
+		auto outer_lock = oreVoronoi.uniqueLock();
+
+		if (auto iter = oreVoronoi.find(chunk_position); iter != oreVoronoi.end()) {
+			lock = iter->second.uniqueLock();
+			return iter->second;
+		}
+
+		Tileset &tileset = getTileset();
+
+		auto [iter, inserted] = oreVoronoi.try_emplace(chunk_position, CHUNK_SIZE, CHUNK_SIZE);
+
+		RectangularVector<uint16_t> &vector = iter->second.getBase();
+
+		const auto &rare_category = tileset.getTilesByCategory("base:category/rare_ores");
+
+		std::vector<TileID> rares;
+		rares.reserve(rare_category.size());
+
+		for (const Identifier &rare_ore: rare_category)
+			rares.push_back(tileset[rare_ore]);
+
+		voronoize<uint16_t>(vector, safeCast<int>(rares.size()), rng, [&] {
+			return safeCast<uint16_t>(choose(rares, rng));
+		});
+
+		lock = iter->second.uniqueLock();
+		return vector;
 	}
 
 	void Cave::absorbJSON(const nlohmann::json &json, bool full_data) {

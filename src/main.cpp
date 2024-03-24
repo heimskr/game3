@@ -16,13 +16,16 @@
 #include "util/Timer.h"
 #include "util/Util.h"
 
+#define JC_VORONOI_IMPLEMENTATION
+#include "jc_voronoi.h"
+#include <GLFW/glfw3.h>
+
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
 #include <random>
 #include <vector>
 
-#include <GLFW/glfw3.h>
 
 namespace Game3 {
 	void test();

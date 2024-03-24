@@ -1,10 +1,10 @@
-#include <iostream>
-
 #include "Log.h"
 #include "graphics/Tileset.h"
 #include "game/Game.h"
+#include "realm/Cave.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
+#include "util/Cast.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 #include "worldgen/CaveGen.h"
@@ -12,7 +12,8 @@
 namespace Game3::WorldGen {
 	constexpr static double noise_zoom = 20.;
 
-	void generateCave(const std::shared_ptr<Realm> &realm, std::default_random_engine &, int noise_seed, const ChunkRange &range) {
+	void generateCave(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, int noise_seed, const ChunkRange &range) {
+		assert(std::dynamic_pointer_cast<Cave>(realm));
 		auto guard = realm->guardGeneration();
 		realm->markGenerated(range);
 		DefaultNoiseGenerator noisegen(noise_seed);
@@ -27,7 +28,7 @@ namespace Game3::WorldGen {
 
 		for (Index row = row_min; row <= row_max; ++row)
 			for (Index column = column_min; column <= column_max; ++column)
-				layers.push_back(generateCaveTile(realm, row, column, noisegen)? Layer::Terrain : Layer::Objects);
+				layers.push_back(generateCaveTile(realm, row, column, noisegen, rng)? Layer::Terrain : Layer::Objects);
 
 		for (Index row = row_max; row >= row_min; --row) {
 			for (Index column = column_max; column >= column_min; --column) {
@@ -37,7 +38,15 @@ namespace Game3::WorldGen {
 		}
 	}
 
-	bool generateNormalCaveTile(const std::shared_ptr<Realm> &realm, Index row, Index column, const NoiseGenerator &noisegen) {
+	namespace {
+		TileID selectRareOre(const std::shared_ptr<Realm> &realm, Index row, Index column, std::default_random_engine &rng) {
+			std::unique_lock<DefaultMutex> lock;
+			auto &voronoi = safeDynamicCast<Cave>(realm)->getOreVoronoi(Position{row, column}.getChunk(), lock, rng);
+			return voronoi[TileProvider::remainder(column), TileProvider::remainder(row)];
+		}
+	}
+
+	bool generateNormalCaveTile(const std::shared_ptr<Realm> &realm, Index row, Index column, const NoiseGenerator &noisegen, std::default_random_engine &rng) {
 		const double noise = noisegen(row / noise_zoom, column / noise_zoom, 0.1);
 
 		if (noise < -.95) {
@@ -67,8 +76,11 @@ namespace Game3::WorldGen {
 		} else if (noise < -.375) {
 			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_coal", false);
 			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
-		} else if (noise < -.1) {
+		} else if (noise < -.15) {
 			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_wall", false);
+			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
+		} else if (noise < -.1) {
+			realm->setTile(Layer::Objects, {row, column}, selectRareOre(realm, row, column, rng), false);
 			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
 		} else if (noise < .1) {
 			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_wall", false);
@@ -82,8 +94,9 @@ namespace Game3::WorldGen {
 			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_gold", false);
 		} else if (noise < .13) {
 			realm->setTile(Layer::Objects, {row, column}, "base:tile/cave_coal", false);
+		} else if (noise < .135) {
+			realm->setTile(Layer::Objects, {row, column}, selectRareOre(realm, row, column, rng), false);
 		} else {
-
 			// TODO: move to mushroom caves
 			constexpr static double extra_zoom = 5.;
 			const double brine_noise = std::abs(noisegen(row / (extra_zoom * noise_zoom), column / (extra_zoom * noise_zoom), 541713.));
@@ -159,14 +172,14 @@ namespace Game3::WorldGen {
 		return false;
 	}
 
-	bool generateCaveTile(const std::shared_ptr<Realm> &realm, Index row, Index column, const NoiseGenerator &noisegen) {
+	bool generateCaveTile(const std::shared_ptr<Realm> &realm, Index row, Index column, const NoiseGenerator &noisegen, std::default_random_engine &rng) {
 		constexpr static double biome_zoom = noise_zoom * 10.;
 		const double biome_noise = noisegen(row / biome_zoom, column / biome_zoom, 5.0);
 
 		if (biome_noise < -0.5)
 			return generateGrimCaveTile(realm, row, column, noisegen);
 
-		return generateNormalCaveTile(realm, row, column, noisegen);
+		return generateNormalCaveTile(realm, row, column, noisegen, rng);
 	}
 
 	void generateCaveFull(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, int noise_seed, const Position &exit_position, Position &entrance, RealmID parent_realm, const ChunkRange &range) {
@@ -192,7 +205,7 @@ namespace Game3::WorldGen {
 
 		for (Index row = row_min; row <= row_max; ++row) {
 			for (Index column = column_min; column <= column_max; ++column) {
-				if (generateCaveTile(realm, row, column, noisegen)) {
+				if (generateCaveTile(realm, row, column, noisegen, rng)) {
 					inside.emplace_back(row, column);
 					layers.push_back(Layer::Terrain);
 				} else

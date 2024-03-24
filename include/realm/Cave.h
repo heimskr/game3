@@ -1,6 +1,8 @@
 #pragma once
 
+#include "container/RectangularVector.h"
 #include "realm/Realm.h"
+#include "threading/Lockable.h"
 
 #include <atomic>
 
@@ -18,10 +20,13 @@ namespace Game3 {
 			void reveal(const Position &, bool force = false);
 			void generateChunk(const ChunkPosition &) override;
 			bool canSpawnMonsters() const override { return true; }
+			RectangularVector<uint16_t> & getOreVoronoi(ChunkPosition, std::unique_lock<DefaultMutex> &, std::default_random_engine &);
 
 		friend class Realm;
 
 		protected:
+			Lockable<std::map<ChunkPosition, Lockable<RectangularVector<uint16_t>>>> oreVoronoi;
+
 			using Realm::Realm;
 
 			Cave() = delete;
