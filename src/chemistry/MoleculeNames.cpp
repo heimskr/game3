@@ -1,7 +1,7 @@
 #include "chemistry/MoleculeNames.h"
 
 namespace Game3 {
-	std::unordered_map<std::string, std::string> moleculeNames {
+	std::unordered_map<std::string, std::string> moleculeNames{
 		{"C12H20O10", "Cellulose"},
 		{"H2O", "Water"},
 		{"CO2", "Carbon Dioxide"},
@@ -46,6 +46,7 @@ namespace Game3 {
 		{"Ca5(PO4)3Cl", "Apatite"},
 		{"Mg3Si2H4O9", "Asbestos"},
 		{"Al2O3", "Bauxite"},
+		{"Cu5FeS4", "Bornite"},
 		{"SnO2", "Cassiterite"},
 		{"CuFeS2", "Chalcopyrite"},
 		{"FeCr2O4", "Chromite"},

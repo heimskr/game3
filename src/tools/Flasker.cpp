@@ -1,4 +1,5 @@
 #include "config.h"
+#include "graphics/HSL.h"
 #include "tools/Flasker.h"
 #include "util/Util.h"
 
@@ -38,18 +39,6 @@
 namespace Game3 {
 	// Credit for RGB to HSL: https://www.programmingalgorithms.com/algorithm/rgb-to-hsl/cpp/
 	// Credit for HSL to RGB: https://www.programmingalgorithms.com/algorithm/hsl-to-rgb/cpp/
-
-	struct HSL {
-		uint16_t h{};
-		float s{};
-		float l{};
-		uint8_t a{};
-
-		HSL() = default;
-
-		HSL(uint16_t h_, float s_, float l_, uint8_t a_ = 255):
-			h(h_), s(s_), l(l_), a(a_) {}
-	};
 
 	struct RGB {
 		uint8_t r{};

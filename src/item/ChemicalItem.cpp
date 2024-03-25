@@ -1,5 +1,7 @@
 #include "tools/Flasker.h"
+#include "chemistry/MoleculeColors.h"
 #include "chemistry/MoleculeNames.h"
+#include "graphics/HSL.h"
 #include "item/ChemicalItem.h"
 
 #include <random>
@@ -25,23 +27,25 @@ namespace Game3 {
 	Glib::RefPtr<Gdk::Pixbuf> ChemicalItem::makeImage(const Game &, const ConstItemStackPtr &stack) const {
 		const std::string formula = getFormula(*stack);
 
-		uint16_t hue = 0;
-		float saturation = 1.f;
-		float value_difference = -1.f;
+		HSL hsl;
 
 		if (!formula.empty()) {
-			const size_t hash = std::hash<std::string>{}(formula);
-			hue = hash % 360;
-			saturation = (hash / double(std::numeric_limits<size_t>::max())) / 2.f + .5f;
-			std::default_random_engine rng(hash);
-			std::normal_distribution<float> normal(0, 0.1);
-			value_difference = normal(rng);
+			if (auto iter = moleculeColors.find(formula); iter != moleculeColors.end()) {
+				hsl = iter->second;
+			} else {
+				const size_t hash = std::hash<std::string>{}(formula);
+				hsl.h = hash % 360;
+				hsl.s = (hash / double(std::numeric_limits<size_t>::max())) / 2.f + .5f;
+				std::default_random_engine rng(hash);
+				std::normal_distribution<float> normal(0, 0.1);
+				hsl.l = normal(rng);
+			}
 		}
 
 		int width{};
 		int height{};
 
-		rawImage = generateFlaskRaw("resources/testtubebase.png", "resources/testtubemask.png", hue, saturation, value_difference, &width, &height);
+		rawImage = generateFlaskRaw("resources/testtubebase.png", "resources/testtubemask.png", hsl.h, hsl.s, hsl.l, &width, &height);
 
 		return Gdk::Pixbuf::create_from_data(rawImage.get(), Gdk::Colorspace::RGB, true, 8, width, height, 4 * width)->scale_simple(width << 3, height << 3, Gdk::InterpType::NEAREST);
 	}
