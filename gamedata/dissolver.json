@@ -173,6 +173,7 @@
 			"base:item/apatite_ore":      [4, "Ca5(PO4)3Cl"],
 			"base:item/asbestos_ore":     [4, "Mg3Si2H4O9"],
 			"base:item/bauxite_ore":      [4, "Al2O3"],
+			"base:item/bornite_ore":      [4, "Cu5FeS4"],
 			"base:item/cassiterite_ore":  [4, "SnO2"],
 			"base:item/chalcopyrite_ore": [4, "CuFeS2"],
 			"base:item/chromite_ore":     [4, "FeCr2O4"],
