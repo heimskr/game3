@@ -181,7 +181,8 @@
 			"base:item/stibnite_ore":     [1, [4, "Sb2S3"]],
 			"base:item/sulfur_ore":       [1, [16, "S"]],
 			"base:item/tetrahedrite_ore": [1, [4, "Cu3SbS3Fe"]],
-			"base:item/vanadium_magnetite_ore": [1, [4, "(Fe3O4)V"]]
+			"base:item/vanadium_magnetite_ore": [1, [4, "(Fe3O4)V"]],
+			"base:item/niobium_bar":      [1, [4, "Nb"]]
 		}]
 	]
 }

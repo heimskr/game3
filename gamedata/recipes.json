@@ -441,6 +441,14 @@
 				"input":  [["base:item/wood", 128], ["base:item/iron_bar", 32], ["base:item/fabric", 64]],
 				"output": [["base:item/ship", 1]]
 			}],
+			["base:registry/crafting_recipe", {
+				"input":  [["base:item/niobium_bar", 4], ["base:item/glass", 4], ["base:item/teleportation_focus", 1]],
+				"output": [["base:item/contorb", 1]]
+			}],
+			["base:registry/crafting_recipe", {
+				"input":  [["base:item/fire_opal", 4], ["base:item/diamond", 4]],
+				"output": [["base:item/teleportation_focus", 1]]
+			}],
 			["base:registry/centrifuge_recipe", {
 				"input":  ["base:fluid/lava", 1000],
 				"output": [
