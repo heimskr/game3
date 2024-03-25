@@ -142,6 +142,7 @@ namespace Game3 {
 			queueDialog(std::move(dialog));
 		}));
 
+		glMenu.set_parent(glArea);
 		glArea.set_expand(true);
 		glArea.set_use_es(false);
 		glArea.signal_realize().connect([this] {
