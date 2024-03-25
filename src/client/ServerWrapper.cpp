@@ -19,6 +19,11 @@
 
 // #define REDIRECT_LOGS
 
+#include "config.h"
+#ifdef IS_FLATPAK
+#define REDIRECT_LOGS
+#endif
+
 namespace Game3 {
 	namespace {
 		std::filesystem::path KEY_PATH{"localserver.key"};
