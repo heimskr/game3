@@ -10,6 +10,7 @@
 #include "tile/Tile.h"
 #include "tile/TorchTile.h"
 #include "tile/TreeTile.h"
+#include "tile/VoidTile.h"
 
 namespace Game3 {
 	std::shared_ptr<Tile> Game::getTile(const Identifier &identifier) {
@@ -28,6 +29,7 @@ namespace Game3 {
 		reg.add<FarmlandTile>();
 		reg.add<ForestFloorTile>();
 		reg.add<TorchTile>();
+		reg.add<VoidTile>();
 		reg.addMineable("base:tile/stone", ItemStack::create(self, "base:item/stone"), true);
 
 		reg.add("base:tile/cave_coal",     std::make_shared<CaveTile>("base:tile/cave_coal",     ItemStack::create(self, "base:item/coal"),        "base:tile/cave_dirt"));
