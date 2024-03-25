@@ -15,6 +15,7 @@ namespace Game3 {
 		{"N", "Nitrogen"},
 		{"Si", "Silicon"},
 		{"U", "Uranium"},
+		{"Fe", "Iron"},
 		{"SiO2", "Silica"},
 		{"Al2Si2O5(OH)4", "Kaolinite"},
 		{"C39H35O10NS", "Lignite"},
@@ -31,7 +32,7 @@ namespace Game3 {
 		{"CdS", "Cadmium sulfide"},
 		{"Cr2O3", "Chromium(III) oxide"},
 		{"K2Cr2O7", "Potassium dichromate"},
-		{"As4S3", "Arsenic sulfide"},
+		{"As4S3", "Dimorphite"},
 		{"KMnO4", "Potassium permanganate"},
 		{"HgS", "Mercury sulfide"},
 		{"Ca5(PO4)3OH", "Hydroxyapatite"},
@@ -64,6 +65,6 @@ namespace Game3 {
 		{"Sb2S3", "Stibnite"},
 		{"S", "Sulfur"},
 		{"Cu3SbS3Fe", "Tetrahedrite"},
-		{"(Fe3O4)V", "Vanadium Magnetite"},
+		{"(Fe3O4)V", "Vanadium magnetite"},
 	};
 }
