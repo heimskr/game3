@@ -8,6 +8,7 @@
 #include "ui/gtk/DragSource.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/AutocrafterModule.h"
+#include "ui/module/EnergyLevelModule.h"
 #include "ui/module/InventoryModule.h"
 #include "ui/tab/InventoryTab.h"
 #include "ui/MainWindow.h"
@@ -20,7 +21,8 @@ namespace Game3 {
 	game(std::move(game_)),
 	autocrafter(std::move(autocrafter_)),
 	inventoryModule(std::make_shared<InventoryModule>(game, std::static_pointer_cast<ClientInventory>(autocrafter->getInventory(0)))),
-	stationInventoryModule(std::make_shared<InventoryModule>(game, std::static_pointer_cast<ClientInventory>(autocrafter->getInventory(1)))) {
+	stationInventoryModule(std::make_shared<InventoryModule>(game, std::static_pointer_cast<ClientInventory>(autocrafter->getInventory(1)))),
+	energyModule(std::make_shared<EnergyLevelModule>(game, std::static_pointer_cast<Agent>(autocrafter), false)) {
 		assert(autocrafter);
 		vbox.set_hexpand();
 
@@ -65,6 +67,7 @@ namespace Game3 {
 		vbox.append(entry);
 		vbox.append(stationInventoryModule->getWidget());
 		vbox.append(inventoryModule->getWidget());
+		vbox.append(energyModule->getWidget());
 	}
 
 	Gtk::Widget & AutocrafterModule::getWidget() {
@@ -74,18 +77,21 @@ namespace Game3 {
 	void AutocrafterModule::reset() {
 		stationInventoryModule->reset();
 		inventoryModule->reset();
+		energyModule->reset();
 		updateEntry();
 	}
 
 	void AutocrafterModule::update() {
 		stationInventoryModule->update();
 		inventoryModule->update();
+		energyModule->update();
 		updateEntry();
 	}
 
 	void AutocrafterModule::onResize(int width) {
 		stationInventoryModule->onResize(width);
 		inventoryModule->onResize(width);
+		energyModule->onResize(width);
 	}
 
 	std::optional<Buffer> AutocrafterModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
@@ -117,6 +123,10 @@ namespace Game3 {
 		} else if (name == "GetAgentGID") {
 
 			return Buffer{autocrafter->getGID()};
+
+		} else if (name == "UpdateEnergy") {
+
+			return energyModule->handleMessage(source, name, data);
 
 		} else {
 			return inventoryModule->handleMessage(source, name, data);

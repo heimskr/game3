@@ -7,6 +7,7 @@
 #include "ui/gtk/DragSource.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/CombinerModule.h"
+#include "ui/module/EnergyLevelModule.h"
 #include "ui/module/InventoryModule.h"
 #include "ui/tab/InventoryTab.h"
 #include "ui/MainWindow.h"
@@ -18,7 +19,8 @@ namespace Game3 {
 	CombinerModule::CombinerModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<Combiner> combiner_):
 	game(std::move(game_)),
 	combiner(std::move(combiner_)),
-	inventoryModule(std::make_shared<InventoryModule>(game, std::static_pointer_cast<ClientInventory>(combiner->getInventory(0)))) {
+	inventoryModule(std::make_shared<InventoryModule>(game, std::static_pointer_cast<ClientInventory>(combiner->getInventory(0)))),
+	energyModule(std::make_shared<EnergyLevelModule>(game, std::static_pointer_cast<Agent>(combiner), false)) {
 		assert(combiner);
 		vbox.set_hexpand();
 
@@ -68,6 +70,7 @@ namespace Game3 {
 
 		vbox.append(entry);
 		vbox.append(inventoryModule->getWidget());
+		vbox.append(energyModule->getWidget());
 	}
 
 	Gtk::Widget & CombinerModule::getWidget() {
@@ -76,14 +79,17 @@ namespace Game3 {
 
 	void CombinerModule::reset() {
 		inventoryModule->reset();
+		energyModule->reset();
 	}
 
 	void CombinerModule::update() {
 		inventoryModule->update();
+		energyModule->update();
 	}
 
 	void CombinerModule::onResize(int width) {
 		inventoryModule->onResize(width);
+		energyModule->onResize(width);
 	}
 
 	std::optional<Buffer> CombinerModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
@@ -112,6 +118,10 @@ namespace Game3 {
 		} else if (name == "GetAgentGID") {
 
 			return Buffer{combiner->getGID()};
+
+		} else if (name == "UpdateEnergy") {
+
+			return energyModule->handleMessage(source, name, data);
 
 		} else {
 			return inventoryModule->handleMessage(source, name, data);

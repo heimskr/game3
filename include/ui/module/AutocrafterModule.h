@@ -10,6 +10,7 @@
 namespace Game3 {
 	class Agent;
 	class Autocrafter;
+	class EnergyLevelModule;
 	class InventoryModule;
 	class InventoryTab;
 
@@ -36,6 +37,7 @@ namespace Game3 {
 			std::shared_ptr<Autocrafter> autocrafter;
 			std::shared_ptr<InventoryModule> inventoryModule;
 			std::shared_ptr<InventoryModule> stationInventoryModule;
+			std::shared_ptr<EnergyLevelModule> energyModule;
 			Gtk::Label header;
 			Gtk::Entry entry;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
