@@ -95,6 +95,14 @@ namespace Game3 {
 
 
 		if (modifiers.onlyAlt()) {
+			{
+				const InventoryPtr inventory = getInventory(0);
+				auto lock = inventory->sharedLock();
+				inventory->iterate([&](const ItemStackPtr &stack, Slot) {
+					player->give(stack);
+					return false;
+				});
+			}
 			RealmPtr realm = getRealm();
 			realm->queueDestruction(getSelf());
 			player->give(ItemStack::create(realm->getGame(), "base:item/chemical_reactor"_id));

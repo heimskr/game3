@@ -66,6 +66,8 @@ namespace Game3 {
 	}
 
 	bool Inventory::decrease(const ItemStackPtr &stack, Slot slot, ItemCount amount, bool do_lock) {
+		assert(stack);
+
 		auto lock = do_lock? uniqueLock() : std::unique_lock<DefaultMutex>{};
 
 		if (stack->count < amount)

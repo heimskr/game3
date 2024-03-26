@@ -7,6 +7,9 @@ namespace Game3 {
 		Slot min;
 		Slot max;
 
+		SlotRange(Slot min_, Slot max_):
+			min(min_), max(max_) {}
+
 		inline bool contains(Slot slot) const {
 			return min <= slot && slot <= max;
 		}

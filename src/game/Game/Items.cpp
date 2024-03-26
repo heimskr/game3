@@ -14,6 +14,7 @@
 #include "item/ContainmentOrb.h"
 #include "item/Copier.h"
 #include "item/CreativeGeneratorItem.h"
+#include "item/DisruptorItem.h"
 #include "item/DissolverItem.h"
 #include "item/EmptyFlask.h"
 #include "item/EntitySpawnItem.h"
@@ -101,6 +102,8 @@ namespace Game3 {
 		add(std::make_shared<CreativeGeneratorItem>("base:item/creative_generator", "Creative Generator", 999, 64)); // TODO: cost
 
 		add(std::make_shared<DesertSapling>("base:item/desert_sapling", "Cactus Sapling", 5, 64));
+
+		add(std::make_shared<DisruptorItem>("base:item/disruptor", "Disruptor", 999, 64)); // TODO: cost
 
 		add(std::make_shared<DissolverItem>("base:item/dissolver", "Dissolver", 999, 64)); // TODO: cost
 

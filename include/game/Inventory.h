@@ -61,12 +61,12 @@ namespace Game3 {
 			virtual ItemStackPtr firstItem(Slot *slot_out, const Predicate &) = 0;
 
 			/** If the ItemStack couldn't be inserted into the inventory, this function returns an ItemStack
-			 *  containing the leftovers that couldn't be inserted. Otherwise, this function returns nothing.
-			 *  The predicate will be used to determine which slots can be inserted into. */
+			 *  containing the leftovers that couldn't be inserted. Otherwise, this function returns a null pointer.
+			 *  The optional predicate will be used to determine which slots can be inserted into. */
+			virtual ItemStackPtr add(const ItemStackPtr &stack) { return add(stack, [](Slot) { return true; }, -1); }
 			virtual ItemStackPtr add(const ItemStackPtr &, const SlotPredicate &predicate, Slot start) = 0;
 			virtual ItemStackPtr add(const ItemStackPtr &stack, const SlotPredicate &predicate) { return add(stack, predicate, -1); }
 			virtual ItemStackPtr add(const ItemStackPtr &stack, Slot start) { return add(stack, [](Slot) { return true; }, start); }
-			virtual ItemStackPtr add(const ItemStackPtr &stack) { return add(stack, [](Slot) { return true; }, -1); }
 
 			virtual bool canInsert(const ItemStackPtr &, const SlotPredicate &predicate) const = 0;
 			virtual bool canInsert(const ItemStackPtr &, Slot) const = 0;

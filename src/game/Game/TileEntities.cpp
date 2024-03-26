@@ -10,6 +10,7 @@
 #include "tileentity/CraftingStation.h"
 #include "tileentity/Crate.h"
 #include "tileentity/CreativeGenerator.h"
+#include "tileentity/Disruptor.h"
 #include "tileentity/Dissolver.h"
 #include "tileentity/EntityBuilding.h"
 #include "tileentity/EternalFountain.h"
@@ -50,6 +51,7 @@ namespace Game3 {
 		add(TileEntityFactory::create<CraftingStation>());
 		add(TileEntityFactory::create<Crate>());
 		add(TileEntityFactory::create<CreativeGenerator>());
+		add(TileEntityFactory::create<Disruptor>());
 		add(TileEntityFactory::create<Dissolver>());
 		add(TileEntityFactory::create<EntityBuilding>());
 		add(TileEntityFactory::create<EternalFountain>());
