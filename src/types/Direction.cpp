@@ -50,7 +50,7 @@ namespace Game3 {
 	}
 
 	Direction randomDirection() {
-		return static_cast<Direction>(std::uniform_int_distribution(0, 3)(threadContext.rng));
+		return static_cast<Direction>(std::uniform_int_distribution(1, 4)(threadContext.rng));
 	}
 
 	bool validateDirection(Direction direction) {
