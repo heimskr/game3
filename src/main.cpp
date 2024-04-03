@@ -4,6 +4,7 @@
 #include "client/ServerWrapper.h"
 #include "net/Server.h"
 #include "net/Sock.h"
+#include "scripting/ScriptEngine.h"
 #include "tools/Flasker.h"
 #include "tools/ItemStitcher.h"
 #include "tools/Mazer.h"
@@ -11,6 +12,7 @@
 #include "tools/TileStitcher.h"
 #include "ui/App.h"
 #include "util/Crypto.h"
+#include "util/Defer.h"
 #include "util/FS.h"
 #include "util/Shell.h"
 #include "util/Timer.h"
@@ -36,9 +38,13 @@ namespace Game3 {
 	void skewTest(double location, double scale, double shape);
 	void damageTest(HitPoints weapon_damage, int defense, int variability, double attacker_luck, double defender_luck);
 	void voronoiTest();
+	void scriptEngineTest();
 }
 
 int main(int argc, char **argv) {
+	Game3::ScriptEngine::init(argv[0]);
+	Game3::Defer v8_deinit(Game3::ScriptEngine::deinit);
+
 #ifdef IS_FLATPAK
 	if (const char *xdg_runtime_dir = std::getenv("XDG_RUNTIME_DIR")) {
 		const auto old_cwd = std::filesystem::current_path();
@@ -200,6 +206,11 @@ int main(int argc, char **argv) {
 
 		if (arg1 == "--voronoi-test") {
 			Game3::voronoiTest();
+			return 0;
+		}
+
+		if (arg1 == "--script-test") {
+			Game3::scriptEngineTest();
 			return 0;
 		}
 

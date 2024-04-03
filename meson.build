@@ -12,7 +12,7 @@ config_h.set_quoted('GETTEXT_PACKAGE', 'game3')
 config_h.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('localedir')))
 add_project_arguments(['-I' + meson.project_build_root()], language: 'cpp')
 
-project_cpp_args = []
+project_cpp_args = ['-DV8_COMPRESS_POINTERS', '-DV8_ENABLE_SANDBOX']
 test_cpp_args = [
 	'-Wall',
 	'-Wextra',

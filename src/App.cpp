@@ -29,8 +29,6 @@ namespace Game3 {
 		try {
 			auto window = create_window();
 			window->present();
-		} catch (const Glib::Error &err) {
-			std::cerr << "App::on_activate(): " << err.what() << std::endl;
 		} catch (const std::exception &err) {
 			std::cerr << "App::on_activate(): " << err.what() << std::endl;
 		}
