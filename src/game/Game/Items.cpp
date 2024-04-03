@@ -101,6 +101,8 @@ namespace Game3 {
 
 		add(std::make_shared<CreativeGeneratorItem>("base:item/creative_generator", "Creative Generator", 999, 64)); // TODO: cost
 
+		add(std::make_shared<DataPipeItem>(4));
+
 		add(std::make_shared<DesertSapling>("base:item/desert_sapling", "Cactus Sapling", 5, 64));
 
 		add(std::make_shared<DisruptorItem>("base:item/disruptor", "Disruptor", 999, 64)); // TODO: cost

@@ -24,6 +24,7 @@ namespace Game3 {
 			case Substance::Item:   return ItemCorner();
 			case Substance::Fluid:  return FluidCorner();
 			case Substance::Energy: return EnergyCorner();
+			case Substance::Data:   return DataCorner();
 			default: return {};
 		}
 	}
@@ -33,6 +34,7 @@ namespace Game3 {
 			case Substance::Item:   return ItemExtractorsCorner();
 			case Substance::Fluid:  return FluidExtractorsCorner();
 			case Substance::Energy: return EnergyExtractorsCorner();
+			case Substance::Data:   return DataExtractorsCorner();
 			default: return {};
 		}
 	}

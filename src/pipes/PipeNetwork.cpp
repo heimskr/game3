@@ -1,5 +1,6 @@
 #include "container/FriendSet.h"
 #include "game/Game.h"
+#include "pipes/DataNetwork.h"
 #include "pipes/EnergyNetwork.h"
 #include "pipes/FluidNetwork.h"
 #include "pipes/ItemNetwork.h"
@@ -22,6 +23,8 @@ namespace Game3 {
 				return std::make_unique<FluidNetwork>(id, realm);
 			case Substance::Energy:
 				return std::make_unique<EnergyNetwork>(id, realm);
+			case Substance::Data:
+				return std::make_unique<DataNetwork>(id, realm);
 			default:
 				throw std::invalid_argument("Can't create pipe network with type " + std::to_string(static_cast<int>(type)));
 		}

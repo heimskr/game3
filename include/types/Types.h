@@ -138,7 +138,7 @@ namespace Game3 {
 	Buffer & operator<<(Buffer &, const Color &);
 	Buffer & operator>>(Buffer &, Color &);
 
-	enum class Substance: uint8_t {Invalid = 0, Item, Fluid, Energy};
+	enum class Substance: uint8_t {Invalid = 0, Item, Fluid, Energy, Data};
 	enum class Hand: uint8_t {None = 0, Left, Right};
 }
 
@@ -153,6 +153,7 @@ struct std::formatter<Game3::Substance> {
 			case Game3::Substance::Item:   return std::format_to(ctx.out(), "Item");
 			case Game3::Substance::Fluid:  return std::format_to(ctx.out(), "Fluid");
 			case Game3::Substance::Energy: return std::format_to(ctx.out(), "Energy");
+			case Game3::Substance::Data:   return std::format_to(ctx.out(), "Data");
 			default:
 				return std::format_to(ctx.out(), "Invalid");
 		}

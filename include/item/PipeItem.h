@@ -129,4 +129,11 @@ namespace Game3 {
 			EnergyPipeItem(MoneyCount base_price):
 				PipeItem(ID(), "Energy Pipe", base_price) {}
 	};
+
+	class DataPipeItem: public PipeItem<Substance::Data> {
+		public:
+			static Identifier ID() { return {"base", "item/data_pipe"}; }
+			DataPipeItem(MoneyCount base_price):
+				PipeItem(ID(), "Data Pipe", base_price) {}
+	};
 }

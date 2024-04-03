@@ -12,7 +12,7 @@
 namespace Game3 {
 	class PipeNetwork;
 
-	constexpr std::array<Substance, 3> PIPE_TYPES{Substance::Item, Substance::Fluid, Substance::Energy};
+	constexpr std::array<Substance, 4> PIPE_TYPES{Substance::Item, Substance::Fluid, Substance::Energy, Substance::Data};
 
 	template <typename T>
 	class PipeTuple {
@@ -20,16 +20,18 @@ namespace Game3 {
 			T item{};
 			T fluid{};
 			T energy{};
+			T data{};
 
 			PipeTuple() = default;
-			PipeTuple(T item_, T fluid_, T energy_):
-				item(std::move(item_)), fluid(std::move(fluid_)), energy(std::move(energy_)) {}
+			PipeTuple(T item_, T fluid_, T energy_, T data_):
+				item(std::move(item_)), fluid(std::move(fluid_)), energy(std::move(energy_)), data(std::move(data_)) {}
 
 			T & operator[](Substance type) {
 				switch (type) {
 					case Substance::Item:   return item;
 					case Substance::Fluid:  return fluid;
 					case Substance::Energy: return energy;
+					case Substance::Data:   return data;
 					default: throw std::invalid_argument("Invalid Substance");
 				}
 			}
@@ -39,6 +41,7 @@ namespace Game3 {
 					case Substance::Item:   return item;
 					case Substance::Fluid:  return fluid;
 					case Substance::Energy: return energy;
+					case Substance::Data:   return data;
 					default: throw std::invalid_argument("Invalid Substance");
 				}
 			}
@@ -52,11 +55,13 @@ namespace Game3 {
 			static Identifier ItemCorner()   { return {"base", "tile/item_pipe"};   }
 			static Identifier FluidCorner()  { return {"base", "tile/fluid_pipe"};  }
 			static Identifier EnergyCorner() { return {"base", "tile/energy_pipe"}; }
+			static Identifier DataCorner()   { return {"base", "tile/data_pipe"};   }
 			static Identifier Corner(Substance);
 
 			static Identifier ItemExtractorsCorner()   { return {"base", "tile/item_extractors"};   }
 			static Identifier FluidExtractorsCorner()  { return {"base", "tile/fluid_extractors"};  }
 			static Identifier EnergyExtractorsCorner() { return {"base", "tile/energy_extractors"}; }
+			static Identifier DataExtractorsCorner()   { return {"base", "tile/data_extractors"};   }
 			static Identifier ExtractorsCorner(Substance);
 
 			PipeTuple<Directions> directions;
@@ -122,16 +127,16 @@ namespace Game3 {
 
 	template <typename T>
 	Buffer & operator+=(Buffer &buffer, const PipeTuple<T> &tuple) {
-		return ((buffer += tuple.item) += tuple.fluid) += tuple.energy;
+		return (((buffer += tuple.item) += tuple.fluid) += tuple.energy) += tuple.data;
 	}
 
 	template <typename T>
 	Buffer & operator<<(Buffer &buffer, const PipeTuple<T> &tuple) {
-		return buffer << tuple.item << tuple.fluid << tuple.energy;
+		return buffer << tuple.item << tuple.fluid << tuple.energy << tuple.data;
 	}
 
 	template <typename T>
 	Buffer & operator>>(Buffer &buffer, PipeTuple<T> &tuple) {
-		return buffer >> tuple.item >> tuple.fluid >> tuple.energy;
+		return buffer >> tuple.item >> tuple.fluid >> tuple.energy >> tuple.data;
 	}
 }

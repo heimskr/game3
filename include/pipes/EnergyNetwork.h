@@ -4,8 +4,6 @@
 #include "pipes/PipeNetwork.h"
 
 namespace Game3 {
-	class Inventory;
-
 	class EnergyNetwork: public PipeNetwork, public HasEnergy {
 		public:
 			constexpr static EnergyAmount CAPACITY = 10'000;
