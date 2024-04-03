@@ -15,8 +15,12 @@ namespace Game3 {
 			using FunctionAdder = std::function<void(std::function<void(const std::string &, v8::FunctionCallback)>)>;
 			using GlobalMutator = std::function<void(v8::Local<v8::ObjectTemplate>)>;
 
+		private:
+			GlobalMutator savedMutator{};
+
+		public:
+
 			struct Value;
-			// using FunctionValue = std::function<v8::Local<v8::Value>(const v8::FunctionCallbackInfo<v8::Value> &)>;
 			using FunctionValue = v8::FunctionCallback;
 			using ObjectValue = std::map<std::string, Value>;
 
@@ -29,8 +33,8 @@ namespace Game3 {
 			};
 
 			ScriptEngine();
-			ScriptEngine(const FunctionAdder &);
-			ScriptEngine(const GlobalMutator &);
+			ScriptEngine(FunctionAdder);
+			ScriptEngine(GlobalMutator);
 
 			std::optional<v8::Local<v8::Value>> execute(const std::string &javascript, bool can_throw = true, const std::function<void(v8::Local<v8::Context>)> &context_mutator = {});
 			std::string string(v8::Local<v8::Value>);
@@ -43,6 +47,8 @@ namespace Game3 {
 			v8::Local<v8::Integer> makeValue(int32_t);
 			v8::Local<v8::Number> makeValue(double);
 			v8::Local<v8::Value> makeValue(const Value &);
+
+			void clearContext();
 
 			inline v8::Isolate * getIsolate() const { return isolate; }
 			inline v8::Local<v8::Context> getContext() const { return globalContext.Get(isolate); }
@@ -61,8 +67,8 @@ namespace Game3 {
 			static v8::Isolate::CreateParams createParams;
 
 			static v8::Isolate * makeIsolate();
-			static v8::Global<v8::Context> makeContext(v8::Isolate *isolate, const GlobalMutator & = {});
-			static v8::Global<v8::Context> makeContext(v8::Isolate *isolate, const FunctionAdder &);
+			v8::Global<v8::Context> makeContext(GlobalMutator = {});
+			v8::Global<v8::Context> makeContext(FunctionAdder);
 			static const char * toCString(const v8::String::Utf8Value &);
 	};
 }

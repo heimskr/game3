@@ -13,17 +13,19 @@ namespace Game3 {
 
 	ScriptEngine::ScriptEngine():
 		isolate(makeIsolate()),
-		globalContext(makeContext(isolate)) {}
+		globalContext(makeContext()) {}
 
-	ScriptEngine::ScriptEngine(const FunctionAdder &function_adder):
+	ScriptEngine::ScriptEngine(FunctionAdder function_adder):
 		isolate(makeIsolate()),
-		globalContext(makeContext(isolate, function_adder)) {}
+		globalContext(makeContext(std::move(function_adder))) {}
 
-	ScriptEngine::ScriptEngine(const GlobalMutator &global_mutator):
+	ScriptEngine::ScriptEngine(GlobalMutator global_mutator):
 		isolate(makeIsolate()),
-		globalContext(makeContext(isolate, global_mutator)) {}
+		globalContext(makeContext(std::move(global_mutator))) {}
 
 	std::optional<v8::Local<v8::Value>> ScriptEngine::execute(const std::string &javascript, bool can_throw, const std::function<void(v8::Local<v8::Context>)> &context_mutator) {
+		v8::Locker locker(isolate);
+		v8::Isolate::Scope isolate_scope(isolate);
 		v8::HandleScope handle_scope(isolate);
 		v8::TryCatch try_catch(isolate);
 		v8::ScriptOrigin origin(v8::String::NewFromUtf8Literal(isolate, "script"));
@@ -57,6 +59,8 @@ namespace Game3 {
 	}
 
 	std::string ScriptEngine::string(v8::Local<v8::Value> value) {
+		v8::Locker locker(isolate);
+		v8::Isolate::Scope isolate_scope(isolate);
 		v8::HandleScope handle_scope(isolate);
 		v8::Context::Scope scope(getContext());
 		return toCString(v8::String::Utf8Value(isolate, value));
@@ -67,6 +71,8 @@ namespace Game3 {
 	}
 
 	v8::Local<v8::Object> ScriptEngine::object(const ObjectValue &map) {
+		v8::Locker locker(isolate);
+		v8::Isolate::Scope isolate_scope(isolate);
 		v8::EscapableHandleScope handle_scope(isolate);
 		v8::Context::Scope context_scope(globalContext.Get(isolate));
 
@@ -80,10 +86,14 @@ namespace Game3 {
 	}
 
 	v8::Local<v8::Function> ScriptEngine::makeValue(const FunctionValue &function) {
+		v8::Locker locker(isolate);
+		v8::Isolate::Scope isolate_scope(isolate);
 		return v8::Function::New(globalContext.Get(isolate), function).ToLocalChecked();
 	}
 
 	v8::Local<v8::Function> ScriptEngine::makeValue(const FunctionValue &function, v8::Local<v8::Value> data) {
+		v8::Locker locker(isolate);
+		v8::Isolate::Scope isolate_scope(isolate);
 		return v8::Function::New(globalContext.Get(isolate), function, data).ToLocalChecked();
 	}
 
@@ -96,10 +106,14 @@ namespace Game3 {
 	}
 
 	v8::Local<v8::Integer> ScriptEngine::makeValue(int32_t value) {
+		v8::Locker locker(isolate);
+		v8::Isolate::Scope isolate_scope(isolate);
 		return v8::Integer::New(isolate, value);
 	}
 
 	v8::Local<v8::Number> ScriptEngine::makeValue(double value) {
+		v8::Locker locker(isolate);
+		v8::Isolate::Scope isolate_scope(isolate);
 		return v8::Number::New(isolate, value);
 	}
 
@@ -127,6 +141,10 @@ namespace Game3 {
 		throw std::invalid_argument("Invalid variant");
 	}
 
+	void ScriptEngine::clearContext() {
+		globalContext = makeContext(std::move(savedMutator));
+	}
+
 	void ScriptEngine::init(const char *argv0) {
 		if (initialized.exchange(true))
 			return;
@@ -136,6 +154,9 @@ namespace Game3 {
 		v8::V8::InitializePlatform(platform.get());
 		v8::V8::Initialize();
 		createParams.array_buffer_allocator = v8::ArrayBuffer::Allocator::NewDefaultAllocator();
+		createParams.oom_error_callback = v8::OOMErrorCallback([](const char *location, const v8::OOMDetails &details) {
+			INFO("OOM @ {}: {} (is heap OOM: {})", location, details.detail, details.is_heap_oom);
+		});
 	}
 
 	void ScriptEngine::deinit() {
@@ -149,6 +170,8 @@ namespace Game3 {
 	}
 
 	void ScriptEngine::throwException(v8::Isolate *isolate, v8::TryCatch *try_catch) {
+		v8::Locker locker(isolate);
+		v8::Isolate::Scope isolate_scope(isolate);
 		v8::HandleScope handle_scope(isolate);
 		v8::String::Utf8Value exception(isolate, try_catch->Exception());
 		const char *exception_string = toCString(exception);
@@ -168,7 +191,9 @@ namespace Game3 {
 		return v8::Isolate::New(createParams);
 	}
 
-	v8::Global<v8::Context> ScriptEngine::makeContext(v8::Isolate *isolate, const GlobalMutator &global_mutator) {
+	v8::Global<v8::Context> ScriptEngine::makeContext(GlobalMutator global_mutator) {
+		v8::Locker locker(isolate);
+		v8::Isolate::Scope isolate_scope(isolate);
 		v8::HandleScope handle_scope(isolate);
 		v8::Local<v8::ObjectTemplate> global = v8::ObjectTemplate::New(isolate);
 
@@ -188,12 +213,14 @@ namespace Game3 {
 		if (global_mutator)
 			global_mutator(global);
 
+		savedMutator = std::move(global_mutator);
+
 		v8::Local<v8::Context> context = v8::Context::New(isolate, nullptr, global);
 		return v8::Global<v8::Context>(isolate, context);
 	}
 
-	v8::Global<v8::Context> ScriptEngine::makeContext(v8::Isolate *isolate, const FunctionAdder &function_adder) {
-		return makeContext(isolate, GlobalMutator([&](v8::Local<v8::ObjectTemplate> global) {
+	v8::Global<v8::Context> ScriptEngine::makeContext(FunctionAdder function_adder) {
+		return makeContext(GlobalMutator([this, function_adder = std::move(function_adder)](v8::Local<v8::ObjectTemplate> global) {
 			if (function_adder) {
 				function_adder([&](const std::string &name, v8::FunctionCallback function) {
 					global->Set(isolate, name.c_str(), v8::FunctionTemplate::New(isolate, function));
