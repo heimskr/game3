@@ -654,6 +654,19 @@ namespace Game3 {
 		return true;
 	}
 
+	void MainWindow::yieldFocus() {
+		glArea.grab_focus();
+	}
+
+	void MainWindow::addYield(Gtk::Widget &widget) {
+		auto controller = Gtk::EventControllerKey::create();
+		controller->signal_key_released().connect([this](guint keyval, guint, Gdk::ModifierType) {
+			if (keyval == GDK_KEY_Escape)
+				game->getWindow().yieldFocus();
+		});
+		widget.add_controller(controller);
+	}
+
 	void MainWindow::saveSettings() {
 		std::ofstream ofs("settings.json");
 		nlohmann::json json;

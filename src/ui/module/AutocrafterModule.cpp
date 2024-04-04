@@ -35,6 +35,8 @@ namespace Game3 {
 		updateEntry();
 		entry.set_margin(5);
 
+		game->getWindow().addYield(entry);
+
 		std::set<Identifier> item_names;
 		for (const auto &recipe: game->registry<CraftingRecipeRegistry>())
 			for (const ItemStackPtr &stack: recipe->output)

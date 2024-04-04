@@ -25,6 +25,8 @@ namespace Game3 {
 		vte_terminal_set_input_enabled(vte, false);
 		vte_terminal_set_cursor_shape(vte, VteCursorShape::VTE_CURSOR_SHAPE_IBEAM);
 
+		entry.add_css_class("no-radius");
+
 		vbox.set_expand(true);
 		vbox.append(*terminal);
 		vbox.append(entry);
@@ -32,6 +34,8 @@ namespace Game3 {
 		entry.signal_activate().connect([&] {
 			if (computer) {
 				Glib::ustring text = entry.get_text();
+				if (text.empty())
+					return;
 				const std::string &script = text.raw();
 				vte_terminal_feed(vte, "\e[2m>\e[22m ", 11);
 				vte_terminal_feed(vte, script.data(), script.size());
@@ -40,6 +44,8 @@ namespace Game3 {
 				entry.set_text("");
 			}
 		});
+
+		game->getWindow().addYield(entry);
 	}
 
 	Gtk::Widget & ComputerModule::getWidget() {
@@ -62,10 +68,10 @@ namespace Game3 {
 				window.queue([&window] { window.removeModule(); });
 			}
 
-		} else if (name == "ScriptResult" || name == "ScriptError") {
+		} else if (name == "ScriptResult" || name == "ScriptError" || name == "ScriptPrint") {
 
 			auto *buffer = std::any_cast<Buffer>(&data);
-			Token token = buffer->take<Token>();
+			buffer->take<Token>();
 			std::string result = buffer->take<std::string>();
 
 			if (name == "ScriptError") {

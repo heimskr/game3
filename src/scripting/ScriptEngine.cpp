@@ -5,6 +5,7 @@
 #include <libplatform/libplatform.h>
 
 #include <cassert>
+#include <sstream>
 
 namespace Game3 {
 	std::atomic_bool ScriptEngine::initialized = false;
@@ -145,6 +146,11 @@ namespace Game3 {
 		globalContext = makeContext(std::move(savedMutator));
 	}
 
+	void ScriptEngine::print(std::string_view text) {
+		if (onPrint)
+			onPrint(text);
+	}
+
 	void ScriptEngine::init(const char *argv0) {
 		if (initialized.exchange(true))
 			return;
@@ -199,16 +205,18 @@ namespace Game3 {
 
 		global->Set(isolate, "print", v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
 			bool first = true;
+			std::stringstream ss;
 			for (int i = 0; i < info.Length(); ++i) {
 				v8::HandleScope handle_scope(info.GetIsolate());
 				if (first)
 					first = false;
 				else
-					std::cout << ' ';
-				std::cout << toCString(v8::String::Utf8Value(info.GetIsolate(), info[i]));
+					ss << ' ';
+				ss << toCString(v8::String::Utf8Value(info.GetIsolate(), info[i]));
 			}
-			std::cout << std::endl;
-		}));
+			auto &engine = *reinterpret_cast<ScriptEngine *>(info.Data().As<v8::Value>().As<v8::External>()->Value());
+			engine.print(ss.str());
+		}, v8::External::New(isolate, this)));
 
 		if (global_mutator)
 			global_mutator(global);

@@ -26,19 +26,24 @@ namespace Game3 {
 			Token token = buffer->take<Token>();
 			std::string javascript = buffer->take<std::string>();
 
+			std::function<void(std::string_view)> print = [&](std::string_view text) {
+				sendMessage(source, "ModuleMessage", ComputerModule::ID(), "ScriptPrint", token, text);
+			};
+
+			std::swap(print, engine.onPrint);
+
 			try {
 				auto result = engine.execute(javascript, true, [&](v8::Local<v8::Context>) {
 
 				});
 
-				if (result) {
+				if (result)
 					sendMessage(source, "ModuleMessage", ComputerModule::ID(), "ScriptResult", token, engine.string(result.value()));
-				} else {
-					INFO_("No result???");
-				}
 			} catch (const ScriptError &err) {
 				sendMessage(source, "ModuleMessage", ComputerModule::ID(), "ScriptError", token, err.what(), err.line, err.column);
 			}
+
+			std::swap(print, engine.onPrint);
 
 		} else {
 

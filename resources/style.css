@@ -69,3 +69,7 @@ progressbar.item-durability.horizontal > trough {
 .red-bg {
 	background: red;
 }
+
+.no-radius {
+	border-radius: 0;
+}

@@ -19,6 +19,7 @@ namespace Game3 {
 			GlobalMutator savedMutator{};
 
 		public:
+			std::function<void(std::string_view)> onPrint = [](std::string_view text) { std::cout << text; };
 
 			struct Value;
 			using FunctionValue = v8::FunctionCallback;
@@ -49,6 +50,7 @@ namespace Game3 {
 			v8::Local<v8::Value> makeValue(const Value &);
 
 			void clearContext();
+			void print(std::string_view);
 
 			inline v8::Isolate * getIsolate() const { return isolate; }
 			inline v8::Local<v8::Context> getContext() const { return globalContext.Get(isolate); }

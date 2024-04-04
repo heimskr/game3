@@ -81,6 +81,12 @@ namespace Game3 {
 
 			bool activateContext();
 
+			/** Focuses the GL area. */
+			void yieldFocus();
+
+			/** Sets up a widget to yield focus to the GL area when it receives an esc press. */
+			void addYield(Gtk::Widget &);
+
 			void saveSettings();
 
 			void showExternalInventory(const std::shared_ptr<ClientInventory> &);

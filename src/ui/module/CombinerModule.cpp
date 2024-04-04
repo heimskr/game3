@@ -57,6 +57,8 @@ namespace Game3 {
 		completion->set_text_column(columns.itemName);
 		entry.set_completion(completion);
 
+		game->getWindow().addYield(entry);
+
 		entry.signal_activate().connect([this] { setTarget(entry.get_text().raw()); });
 		completion->signal_match_selected().connect([this](const Gtk::TreeIter<Gtk::TreeRow> &iter) {
 			setTarget(Glib::ustring((*iter)[columns.itemName]).raw());
