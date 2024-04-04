@@ -66,7 +66,7 @@ namespace Game3 {
 			images.emplace(name, stbi_load(png_path.c_str(), &width, &height, &channels, 4));
 
 			if (channels != 3 && channels != 4)
-				throw std::runtime_error("Invalid channel count for " + name + " at " + png_path.c_str() + ": " + std::to_string(channels) + " (expected 3 or 4)");
+				throw std::runtime_error(std::format("Invalid channel count for {} at {}: {} (expected 3 or 4)", name, png_path.c_str(), channels));
 
 			if (width == 16 && height == 16) {
 				++count_1x1;
@@ -75,7 +75,7 @@ namespace Game3 {
 				++count_2x2;
 				names_2x2.insert(std::move(name));
 			} else
-				throw std::runtime_error("Invalid dimensions for " + name + ": " + std::to_string(width) + "x" + std::to_string(height) + " (expected 16x16 or 32x32)");
+				throw std::runtime_error(std::format("Invalid dimensions for item {}: {}x{} (expected 16x16 or 32x32)", name, width, height));
 		}
 
 		const size_t effective_2x2s = count_2x2 + updiv(count_1x1, 4);

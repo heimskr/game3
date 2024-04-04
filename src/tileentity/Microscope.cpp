@@ -1,10 +1,6 @@
-#include <iostream>
-
 #include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/ServerInventory.h"
-#include "graphics/SpriteRenderer.h"
-#include "graphics/Tileset.h"
 #include "packet/OpenModuleForAgentPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Microscope.h"

@@ -8,9 +8,7 @@
 #include <vector>
 
 namespace Game3 {
-	class Agent;
 	class HasEnergy;
-	class InventoryTab;
 
 	class EnergyLevelModule: public Module {
 		public:

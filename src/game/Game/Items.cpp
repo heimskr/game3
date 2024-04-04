@@ -11,6 +11,7 @@
 #include "item/ChemicalItem.h"
 #include "item/ChemicalReactorItem.h"
 #include "item/CombinerItem.h"
+#include "item/ComputerItem.h"
 #include "item/ContainmentOrb.h"
 #include "item/Copier.h"
 #include "item/CreativeGeneratorItem.h"
@@ -94,6 +95,8 @@ namespace Game3 {
 		add(std::make_shared<ChemicalReactorItem>("base:item/chemical_reactor", "Chemical Reactor", 999, 64)); // TODO: cost
 
 		add(std::make_shared<CombinerItem>("base:item/combiner", "Combiner", 999, 64)); // TODO: cost
+
+		add(std::make_shared<ComputerItem>("base:item/computer", "Computer", 999, 64)); // TODO: cost
 
 		add(std::make_shared<ContainmentOrb>("base:item/contorb", "Containment Orb", 64, 1)); // TODO: cost
 

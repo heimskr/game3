@@ -88,17 +88,18 @@ namespace Game3 {
 							client->send(packet);
 			}
 
+			static Token generateRandomToken();
+
 		private:
 			MTQueue<std::pair<std::weak_ptr<RemoteClient>, std::shared_ptr<Packet>>> packetQueue;
 			MTQueue<std::weak_ptr<ServerPlayer>> playerRemovalQueue;
 			double timeSinceTimeUpdate = 0;
 			ThreadPool pool;
 			std::unique_ptr<GameDB> database;
-			Token omnitoken = generateToken();
+			Token omnitoken = generateRandomToken();
 
 			void handlePacket(RemoteClient &, Packet &);
 			std::tuple<bool, std::string> commandHelper(RemoteClient &, const std::string &);
-			static Token generateToken();
 	};
 
 	using ServerGamePtr = std::shared_ptr<ServerGame>;

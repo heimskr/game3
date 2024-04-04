@@ -56,6 +56,10 @@ namespace Game3 {
 			if (source)
 				sendMessage(source, "ModuleMessage", ChemicalReactorModule::ID(), "EquationSet", success);
 
+		} else {
+
+			TileEntity::handleMessage(source, name, data);
+
 		}
 	}
 

@@ -9,6 +9,7 @@
 #include "ui/module/AutocrafterModule.h"
 #include "ui/module/ChemicalReactorModule.h"
 #include "ui/module/CombinerModule.h"
+#include "ui/module/ComputerModule.h"
 #include "ui/module/InventoryModule.h"
 #include "ui/module/EnergyLevelModule.h"
 #include "ui/module/FluidLevelsModule.h"
@@ -57,6 +58,7 @@ namespace Game3 {
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Energy, Substance::Fluid>>());
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Fluid>>());
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Energy>>());
+		add(ModuleFactory::create<ComputerModule>());
 	}
 
 	void Game::initialSetup(const std::filesystem::path &dir) {

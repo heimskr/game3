@@ -335,7 +335,7 @@ namespace Game3 {
 
 	bool ServerGame::compareToken(Token check) {
 		if (check == omnitoken) {
-			omnitoken = generateToken();
+			omnitoken = generateRandomToken();
 			return true;
 		}
 
@@ -808,7 +808,7 @@ namespace Game3 {
 		return {false, "Unknown command."};
 	}
 
-	Token ServerGame::generateToken() {
+	Token ServerGame::generateRandomToken() {
 		std::random_device rng;
 		return (Token(rng()) << 32) | rng();
 	}
