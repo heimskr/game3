@@ -125,6 +125,8 @@ namespace Game3 {
 			void autopipe(Substance);
 	};
 
+	using PipePtr = std::shared_ptr<Pipe>;
+
 	template <typename T>
 	Buffer & operator+=(Buffer &buffer, const PipeTuple<T> &tuple) {
 		return (((buffer += tuple.item) += tuple.fluid) += tuple.energy) += tuple.data;

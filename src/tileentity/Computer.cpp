@@ -1,8 +1,10 @@
 #include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "packet/OpenModuleForAgentPacket.h"
+#include "pipes/DataNetwork.h"
 #include "realm/Realm.h"
 #include "scripting/ScriptError.h"
+#include "scripting/ScriptUtil.h"
 #include "tileentity/Computer.h"
 #include "ui/module/ComputerModule.h"
 
@@ -15,6 +17,22 @@ namespace Game3 {
 
 	void Computer::init(Game &game) {
 		TileEntity::init(game);
+	}
+
+	namespace {
+		template <typename Fn>
+		void visitNetworks(const Place &place, Fn &&visitor) {
+			std::unordered_set<DataNetworkPtr> visited_networks;
+
+			for (const Direction direction: ALL_DIRECTIONS) {
+				auto network = std::static_pointer_cast<DataNetwork>(PipeNetwork::findAt(place + direction, Substance::Data));
+				if (!network || visited_networks.contains(network))
+					continue;
+
+				visited_networks.insert(network);
+				visitor(network);
+			}
+		}
 	}
 
 	void Computer::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
@@ -33,8 +51,49 @@ namespace Game3 {
 			std::swap(print, engine.onPrint);
 
 			try {
-				auto result = engine.execute(javascript, true, [&](v8::Local<v8::Context>) {
+				using Context = struct {
+					ComputerPtr computer;
+					ScriptEngine *engine;
+				};
 
+				Context context{std::static_pointer_cast<Computer>(getSelf()), &engine};
+
+				auto result = engine.execute(javascript, true, [&](v8::Local<v8::Context> script_context) {
+					v8::Local<v8::Object> foo = engine.object({
+						{"findAll", engine.makeValue(+[](const v8::FunctionCallbackInfo<v8::Value> &info) {
+							auto &context = getExternal<Context>(info);
+							ComputerPtr computer = context.computer;
+							ScriptEngine &engine = *context.engine;
+
+							v8::Local<v8::Array> found = v8::Array::New(engine.getIsolate());
+
+							std::unordered_set<TileEntityPtr> tile_entities;
+
+							RealmPtr realm = computer->getRealm();
+
+							uint32_t index = 0;
+
+							auto visit = [&](const auto &set) {
+								auto lock = set.sharedLock();
+								for (const auto &[position, direction]: set) {
+									TileEntityPtr member = realm->tileEntityAt(position);
+									if (!member || tile_entities.contains(member))
+										continue;
+									tile_entities.insert(member);
+									found->Set(engine.getContext(), index++, v8::BigInt::New(engine.getIsolate(), static_cast<int64_t>(member->getGID()))).Check();
+								}
+							};
+
+							visitNetworks(computer->getPlace(), [&](DataNetworkPtr network) {
+								visit(network->getInsertions());
+								visit(network->getExtractions());
+							});
+
+							info.GetReturnValue().Set(found);
+						}, engine.wrap(&context))},
+					});
+
+					script_context->Global()->Set(script_context, engine.string("g3"), foo).Check();
 				});
 
 				if (result)

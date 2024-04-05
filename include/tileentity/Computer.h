@@ -28,4 +28,6 @@ namespace Game3 {
 
 		friend class TileEntity;
 	};
+
+	using ComputerPtr = std::shared_ptr<Computer>;
 }

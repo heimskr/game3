@@ -63,5 +63,9 @@ namespace Game3 {
 			virtual Substance getType() const = 0;
 			virtual void tick(const std::shared_ptr<Game> &, Tick);
 			bool canTick(Tick);
+
+			static std::shared_ptr<PipeNetwork> findAt(const Place &, Substance);
 	};
+
+	using PipeNetworkPtr = std::shared_ptr<PipeNetwork>;
 }

@@ -142,6 +142,10 @@ namespace Game3 {
 		throw std::invalid_argument("Invalid variant");
 	}
 
+	v8::Local<v8::External> ScriptEngine::wrap(void *item) {
+		return v8::External::New(isolate, item);
+	}
+
 	void ScriptEngine::clearContext() {
 		globalContext = makeContext(std::move(savedMutator));
 	}

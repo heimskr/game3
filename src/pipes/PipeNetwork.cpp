@@ -259,4 +259,10 @@ namespace Game3 {
 	bool PipeNetwork::canTick(Tick tick) {
 		return lastTick < tick;
 	}
+
+	std::shared_ptr<PipeNetwork> PipeNetwork::findAt(const Place &place, Substance type) {
+		if (PipePtr pipe = std::dynamic_pointer_cast<Pipe>(place.getTileEntity()))
+			return pipe->getNetwork(type);
+		return nullptr;
+	}
 }

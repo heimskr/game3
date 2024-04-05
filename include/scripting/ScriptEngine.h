@@ -49,11 +49,14 @@ namespace Game3 {
 			v8::Local<v8::Number> makeValue(double);
 			v8::Local<v8::Value> makeValue(const Value &);
 
+			v8::Local<v8::External> wrap(void *);
+
 			void clearContext();
 			void print(std::string_view);
 
 			inline v8::Isolate * getIsolate() const { return isolate; }
 			inline v8::Local<v8::Context> getContext() const { return globalContext.Get(isolate); }
+
 
 			static void init(const char *argv0);
 			static void deinit();

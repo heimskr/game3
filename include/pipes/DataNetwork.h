@@ -11,4 +11,6 @@ namespace Game3 {
 
 			bool canWorkWith(const std::shared_ptr<TileEntity> &) const final;
 	};
+
+	using DataNetworkPtr = std::shared_ptr<DataNetwork>;
 }
