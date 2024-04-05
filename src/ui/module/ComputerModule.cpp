@@ -23,9 +23,11 @@ namespace Game3 {
 
 		vte_terminal_reset(vte, true, true);
 		vte_terminal_set_input_enabled(vte, false);
-		vte_terminal_set_cursor_shape(vte, VteCursorShape::VTE_CURSOR_SHAPE_IBEAM);
+		GdkRGBA color{0, 0, 0, 0};
+		vte_terminal_set_color_cursor_foreground(vte, &color);
 
 		entry.add_css_class("no-radius");
+		entry.add_css_class("monospace");
 
 		vbox.set_expand(true);
 		vbox.append(*terminal);
@@ -46,6 +48,9 @@ namespace Game3 {
 		});
 
 		game->getWindow().addYield(entry);
+		entry.signal_realize().connect([this] {
+			entry.grab_focus();
+		});
 	}
 
 	Gtk::Widget & ComputerModule::getWidget() {

@@ -73,3 +73,7 @@ progressbar.item-durability.horizontal > trough {
 .no-radius {
 	border-radius: 0;
 }
+
+.monospace {
+	font-family: "Fira Code", monospace;
+}
