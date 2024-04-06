@@ -49,8 +49,8 @@ namespace Game3 {
 
 			static inline ObjectWrap<T> & unwrap(v8::Handle<v8::Object> handle) {
 				assert(!handle.IsEmpty());
-				assert(handle->InternalFieldCount() > 0);
-				void *ptr = handle->GetAlignedPointerFromInternalField(0);
+				assert(handle->InternalFieldCount() > 1);
+				void *ptr = handle->GetAlignedPointerFromInternalField(1);
 				return *static_cast<ObjectWrap<T> *>(ptr);
 			}
 
@@ -76,10 +76,11 @@ namespace Game3 {
 				return persistent;
 			}
 
-			inline void wrap(v8::Isolate *isolate, v8::Handle<v8::Object> handle) {
+			inline void wrap(v8::Isolate *isolate, const char *internal_name, v8::Handle<v8::Object> handle) {
 				assert(persistent.IsEmpty());
-				assert(handle->InternalFieldCount() > 0);
-				handle->SetAlignedPointerInInternalField(0, this);
+				assert(handle->InternalFieldCount() > 1);
+				handle->SetAlignedPointerInInternalField(0, const_cast<void *>(reinterpret_cast<const void *>(internal_name)));
+				handle->SetAlignedPointerInInternalField(1, this);
 				persistent.Reset(isolate, handle);
 				makeWeak();
 			}

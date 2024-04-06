@@ -299,12 +299,12 @@ namespace Game3 {
 		v8::Local<v8::FunctionTemplate> templ = v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
 			auto &engine = getExternal<ScriptEngine>(info);
 			v8::Local<v8::Object> this_obj = info.This();
-			ObjectWrap<Buffer>::make()->wrap(engine.getIsolate(), this_obj);
+			ObjectWrap<Buffer>::make()->wrap(engine.getIsolate(), "Buffer", this_obj);
 		}, wrap(this));
 
 		v8::Local<v8::ObjectTemplate> instance = templ->InstanceTemplate();
 
-		instance->SetInternalFieldCount(1);
+		instance->SetInternalFieldCount(2);
 
 		instance->Set(isolate, "add", v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
 			auto &wrapper = ObjectWrap<Buffer>::unwrap(info.This());

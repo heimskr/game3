@@ -154,20 +154,20 @@ namespace Game3 {
 							auto &context = getExternal<Context>(info);
 							ScriptEngine &engine = *context.engine;
 
-							if (info.Length() < 2) {
-								info.GetReturnValue().Set(engine.string("Invalid arguments"));
+							if (info.Length() != 2 && info.Length() != 3) {
+								info.GetReturnValue().Set(engine.string("Invalid number of arguments"));
 								return;
 							}
 
-							auto arg0 = info[0];
-							auto message_name = info[1];
+							v8::Local<v8::Value> target = info[0];
+							v8::Local<v8::Value> message_name = info[1];
 
-							if (!arg0->IsBigInt() && !arg0->IsBigIntObject()) {
+							if (!target->IsBigInt() && !target->IsBigIntObject()) {
 								info.GetIsolate()->ThrowError("Expected a BigInt as the first argument");
 								return;
 							}
 
-							GlobalID gid = info[0].As<v8::BigInt>()->Uint64Value();
+							GlobalID gid = target.As<v8::BigInt>()->Uint64Value();
 
 							TileEntityPtr tile_entity = context.computer->searchFor(gid);
 							if (!tile_entity) {
@@ -175,25 +175,35 @@ namespace Game3 {
 								return;
 							}
 
+							v8::Local<v8::Context> script_context = engine.getContext();
 							Buffer buffer;
 
-							// try {
-							// 	engine.addToBuffer(buffer, arg1, values);
-							// } catch (const std::exception &err) {
-							// 	std::string message = std::format("Couldn't add values to buffer: {}", err.what());
-							// 	ERRORX_(2, message);
-							// 	info.GetIsolate()->ThrowError(engine.string(message));
-							// 	return;
-							// }
+							if (info.Length() == 3) {
+								v8::MaybeLocal<v8::Object> maybe_object = info[2]->ToObject(script_context);
+								if (maybe_object.IsEmpty()) {
+									engine.getIsolate()->ThrowError("Third argument isn't a Buffer object");
+									return;
+								}
+
+								v8::Local<v8::Object> object = maybe_object.ToLocalChecked();
+
+								const bool is_buffer = object->InternalFieldCount() == 2 && std::string_view(reinterpret_cast<const char *>(object->GetAlignedPointerFromInternalField(0))) == "Buffer";
+
+								if (!is_buffer) {
+									engine.getIsolate()->ThrowError("Third argument isn't a Buffer object");
+									return;
+								}
+
+								buffer = *ObjectWrap<Buffer>::unwrap(object).object;
+							}
 
 							std::any any(std::move(buffer));
 							context.computer->sendMessage(tile_entity, engine.string(message_name), any);
 
 							if (Buffer *new_buffer = std::any_cast<Buffer>(&any)) {
-								v8::Local<v8::Context> script_context = engine.getContext();
 								v8::Local<v8::Object> retval;
 								if (engine.getBufferTemplate()->GetFunction(script_context).ToLocalChecked()->NewInstance(script_context).ToLocal(&retval)) {
-									ObjectWrap<Buffer>::make(std::move(*new_buffer))->wrap(engine.getIsolate(), retval);
+									ObjectWrap<Buffer>::make(std::move(*new_buffer))->wrap(engine.getIsolate(), "Buffer", retval);
 									info.GetReturnValue().Set(retval);
 								} else {
 									info.GetReturnValue().SetNull();
@@ -212,6 +222,10 @@ namespace Game3 {
 			}
 
 			std::swap(print, engine.onPrint);
+
+		} else if (name == "Echo") {
+
+			return;
 
 		} else {
 			TileEntity::handleMessage(source, name, data);
