@@ -95,9 +95,14 @@ namespace Game3 {
 		}
 	}
 
-	void Mutator::handleMessage(const std::shared_ptr<Agent> &, const std::string &name, std::any &) {
-		if (name == "Mutate")
+	void Mutator::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
+		if (name == "Mutate") {
+
 			mutate(.4f);
+
+		} else {
+			TileEntity::handleMessage(source, name, data);
+		}
 	}
 
 	void Mutator::init(Game &game) {

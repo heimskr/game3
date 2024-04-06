@@ -72,9 +72,11 @@ namespace Game3 {
 			void clearContext();
 			void print(std::string_view);
 
+			void addToBuffer(Buffer &, v8::Local<v8::Value> type_value, std::span<v8::Local<v8::Value>> values, bool in_container = false);
 
 			inline v8::Isolate * getIsolate() const { return isolate; }
 			inline v8::Local<v8::Context> getContext() const { return globalContext.Get(isolate); }
+			inline v8::Local<v8::ObjectTemplate> getBufferTemplate() const { return bufferTemplate.Get(isolate); }
 
 			static void init(const char *argv0);
 			static void deinit();
@@ -95,7 +97,6 @@ namespace Game3 {
 			v8::Global<v8::Context> makeContext(FunctionAdder);
 
 			v8::Local<v8::ObjectTemplate> makeBufferTemplate();
-			void addToBuffer(Buffer &, v8::Local<v8::Value> type_value, std::span<v8::Local<v8::Value>> values, bool in_container = false);
 			void addToBuffer(Buffer &, const TypeDescription &, std::span<v8::Local<v8::Value>> values, bool in_container = false);
 			TypeDescription describeType(v8::Local<v8::Value>);
 			std::string getBufferType(const TypeDescription &, v8::Local<v8::Value> value, bool is_subtype = false);

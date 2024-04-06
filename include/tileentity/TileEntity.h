@@ -95,6 +95,8 @@ namespace Game3 {
 			std::weak_ptr<TileEntity> getWeakSelf();
 			void queueDestruction();
 
+			void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &) override;
+
 			virtual void encode(Game &, Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */
 			virtual void decode(Game &, Buffer &);

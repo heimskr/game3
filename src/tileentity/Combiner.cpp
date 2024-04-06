@@ -66,6 +66,8 @@ namespace Game3 {
 			if (source)
 				sendMessage(source, "ModuleMessage", CombinerModule::ID(), "TargetSet", success, new_target);
 
+		} else {
+			TileEntity::handleMessage(source, name, data);
 		}
 	}
 

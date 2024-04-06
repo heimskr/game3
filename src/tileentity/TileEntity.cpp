@@ -205,6 +205,12 @@ namespace Game3 {
 		getRealm()->queueDestruction(getSelf());
 	}
 
+	void TileEntity::handleMessage(const std::shared_ptr<Agent> &, const std::string &name, std::any &data) {
+		if (name == "GetName") {
+			data = Buffer{getName()};
+		}
+	}
+
 	void TileEntity::encode(Game &, Buffer &buffer) {
 		buffer << tileEntityID;
 		buffer << tileID;

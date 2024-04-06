@@ -3,6 +3,7 @@
 #include "packet/OpenModuleForAgentPacket.h"
 #include "pipes/DataNetwork.h"
 #include "realm/Realm.h"
+#include "scripting/ObjectWrap.h"
 #include "scripting/ScriptError.h"
 #include "scripting/ScriptUtil.h"
 #include "tileentity/Computer.h"
@@ -166,11 +167,6 @@ namespace Game3 {
 								return;
 							}
 
-							if (!arg1->IsString() && !arg1->IsStringObject()) {
-								info.GetIsolate()->ThrowError("Expected a string as the second argument");
-								return;
-							}
-
 							GlobalID gid = info[0].As<v8::BigInt>()->Uint64Value();
 
 							TileEntityPtr tile_entity = context.computer->searchFor(gid);
@@ -181,19 +177,32 @@ namespace Game3 {
 
 							Buffer buffer;
 
-							for (int i = 2; i < info.Length(); ++i) {
-								try {
-									// engine.addToBuffer(info[i]);
-								} catch (const std::exception &err) {
-									std::string message = std::format("Couldn't add argument {} to buffer: {}", i, err.what());
-									ERRORX_(2, message);
-									info.GetIsolate()->ThrowError(engine.string(message));
-									return;
-								}
+							std::vector<v8::Local<v8::Value>> values;
+							values.reserve(info.Length() - 2);
+							for (int i = 2; i < info.Length(); ++i)
+								values.push_back(info[i]);
+
+							try {
+								engine.addToBuffer(buffer, arg1, values);
+							} catch (const std::exception &err) {
+								std::string message = std::format("Couldn't add values to buffer: {}", err.what());
+								ERRORX_(2, message);
+								info.GetIsolate()->ThrowError(engine.string(message));
+								return;
 							}
 
 							std::any any(std::move(buffer));
-							context.computer->sendMessage(tile_entity, "Script:" + engine.string(arg1), any);
+							context.computer->sendMessage(tile_entity, engine.string(arg1), any);
+
+							if (Buffer *new_buffer = std::any_cast<Buffer>(&any)) {
+								v8::Local<v8::Object> retval;
+								if (engine.getBufferTemplate()->NewInstance(engine.getContext()).ToLocal(&retval)) {
+									ObjectWrap<Buffer>::make(std::move(*new_buffer))->wrap(engine.getIsolate(), retval);
+									info.GetReturnValue().Set(retval);
+								} else {
+									info.GetReturnValue().SetNull();
+								}
+							}
 						}, engine.wrap(&context))},
 					});
 
@@ -209,9 +218,7 @@ namespace Game3 {
 			std::swap(print, engine.onPrint);
 
 		} else {
-
 			TileEntity::handleMessage(source, name, data);
-
 		}
 	}
 
