@@ -360,7 +360,7 @@ namespace Game3 {
 				throw std::invalid_argument("Expected optional type to have at most one corresponding value");
 
 			buffer.append(getBufferType(description, values[0], false));
-			addToBuffer(buffer, describeType(primary), values);
+			addToBuffer(buffer, describeType(primary), values, true);
 			return;
 		}
 
