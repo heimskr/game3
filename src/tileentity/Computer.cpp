@@ -7,6 +7,7 @@
 #include "scripting/ScriptUtil.h"
 #include "tileentity/Computer.h"
 #include "ui/module/ComputerModule.h"
+#include "util/Concepts.h"
 
 namespace Game3 {
 	Computer::Computer(Identifier tile_id, Position position_):
@@ -20,7 +21,9 @@ namespace Game3 {
 	}
 
 	namespace {
+		/** Iterates all unique adjacent data networks. */
 		template <typename Fn>
+		requires Returns<Fn, void, DataNetworkPtr>
 		void visitNetworks(const Place &place, Fn &&visitor) {
 			std::unordered_set<DataNetworkPtr> visited_networks;
 
@@ -32,6 +35,74 @@ namespace Game3 {
 				visited_networks.insert(network);
 				visitor(network);
 			}
+		}
+
+		/** Iterates all unique adjacent data networks until the given function returns true. */
+		template <typename Fn>
+		requires Returns<Fn, bool, DataNetworkPtr>
+		void visitNetworks(const Place &place, Fn &&visitor) {
+			std::unordered_set<DataNetworkPtr> visited_networks;
+
+			for (const Direction direction: ALL_DIRECTIONS) {
+				auto network = std::static_pointer_cast<DataNetwork>(PipeNetwork::findAt(place + direction, Substance::Data));
+				if (!network || visited_networks.contains(network))
+					continue;
+
+				visited_networks.insert(network);
+				if (visitor(network))
+					return;
+			}
+		}
+
+		template <typename Fn>
+		requires Returns<Fn, void, TileEntityPtr>
+		void visitNetwork(const DataNetworkPtr &network, Fn &&visitor) {
+			RealmPtr realm = network->getRealm();
+			assert(realm);
+
+			std::unordered_set<TileEntityPtr> visited;
+
+			auto visit = [&](const auto &set) {
+				auto lock = set.sharedLock();
+				for (const auto &[position, direction]: set) {
+					TileEntityPtr member = realm->tileEntityAt(position);
+					if (!member || visited.contains(member))
+						continue;
+					visited.insert(member);
+					visitor(member);
+				}
+			};
+
+			visit(network->getInsertions());
+			visit(network->getExtractions());
+		}
+
+		template <typename Fn>
+		requires Returns<Fn, bool, TileEntityPtr>
+		bool visitNetwork(const DataNetworkPtr &network, Fn &&visitor) {
+			RealmPtr realm = network->getRealm();
+			assert(realm);
+
+			std::unordered_set<TileEntityPtr> visited;
+
+			auto visit = [&](const auto &set) {
+				auto lock = set.sharedLock();
+				for (const auto &[position, direction]: set) {
+					TileEntityPtr member = realm->tileEntityAt(position);
+					if (!member || visited.contains(member))
+						continue;
+					visited.insert(member);
+					if (visitor(member))
+						return true;
+				}
+
+				return false;
+			};
+
+			if (visit(network->getInsertions()))
+				return true;
+
+			return visit(network->getExtractions());
 		}
 	}
 
@@ -64,32 +135,64 @@ namespace Game3 {
 							auto &context = getExternal<Context>(info);
 							ComputerPtr computer = context.computer;
 							ScriptEngine &engine = *context.engine;
-
 							v8::Local<v8::Array> found = v8::Array::New(engine.getIsolate());
-
 							std::unordered_set<TileEntityPtr> tile_entities;
-
 							RealmPtr realm = computer->getRealm();
-
 							uint32_t index = 0;
 
-							auto visit = [&](const auto &set) {
-								auto lock = set.sharedLock();
-								for (const auto &[position, direction]: set) {
-									TileEntityPtr member = realm->tileEntityAt(position);
-									if (!member || tile_entities.contains(member))
-										continue;
-									tile_entities.insert(member);
-									found->Set(engine.getContext(), index++, v8::BigInt::New(engine.getIsolate(), static_cast<int64_t>(member->getGID()))).Check();
-								}
-							};
-
 							visitNetworks(computer->getPlace(), [&](DataNetworkPtr network) {
-								visit(network->getInsertions());
-								visit(network->getExtractions());
+								visitNetwork(network, [&](const TileEntityPtr &member)  {
+									found->Set(engine.getContext(), index++, v8::BigInt::New(engine.getIsolate(), static_cast<int64_t>(member->getGID()))).Check();
+								});
 							});
 
 							info.GetReturnValue().Set(found);
+						}, engine.wrap(&context))},
+
+						{"tell", engine.makeValue(+[](const v8::FunctionCallbackInfo<v8::Value> &info) {
+							auto &context = getExternal<Context>(info);
+							ScriptEngine &engine = *context.engine;
+
+							if (info.Length() < 2) {
+								info.GetReturnValue().Set(engine.string("Invalid arguments"));
+								return;
+							}
+
+							auto arg0 = info[0];
+							auto arg1 = info[1];
+
+							if (!arg0->IsBigInt() && !arg0->IsBigIntObject()) {
+								info.GetIsolate()->ThrowError("Expected a BigInt as the first argument");
+								return;
+							}
+
+							if (!arg1->IsString() && !arg1->IsStringObject()) {
+								info.GetIsolate()->ThrowError("Expected a string as the second argument");
+								return;
+							}
+
+							GlobalID gid = info[0].As<v8::BigInt>()->Uint64Value();
+
+							TileEntityPtr tile_entity = context.computer->searchFor(gid);
+							if (!tile_entity) {
+								info.GetIsolate()->ThrowError(engine.string("Couldn't find connected tile entity with GID " + std::to_string(gid)));
+								return;
+							}
+
+							Buffer buffer;
+
+							for (int i = 2; i < info.Length(); ++i) {
+								try {
+									engine.addToBuffer(info[i]);
+								} catch (const std::exception &err) {
+									std::string message = std::format("Couldn't add argument {} to buffer: {}", i, err.what());
+									ERRORX_(2, message);
+									info.GetIsolate()->ThrowError(engine.string(message));
+									return;
+								}
+							}
+
+							context.computer->sendMessage(tile_entity, "Script:" + engine.string(arg1), std::any(std::move(buffer)));
 						}, engine.wrap(&context))},
 					});
 
@@ -144,4 +247,21 @@ namespace Game3 {
 	// GamePtr Computer::getGame() const {
 	// 	return TileEntity::getGame();
 	// }
+
+	TileEntityPtr Computer::searchFor(GlobalID gid) {
+		TileEntityPtr out;
+
+		visitNetworks(getPlace(), [&](const DataNetworkPtr &network) {
+			return visitNetwork(network, [&](const TileEntityPtr &member) {
+				if (member->getGID() == gid) {
+					out = member;
+					return true;
+				}
+
+				return false;
+			});
+		});
+
+		return out;
+	}
 }

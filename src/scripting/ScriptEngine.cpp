@@ -1,6 +1,8 @@
 #include "Log.h"
+#include "net/Buffer.h"
 #include "scripting/ScriptEngine.h"
 #include "scripting/ScriptError.h"
+#include "util/Util.h"
 
 #include <libplatform/libplatform.h>
 
@@ -144,6 +146,144 @@ namespace Game3 {
 
 	v8::Local<v8::External> ScriptEngine::wrap(void *item) {
 		return v8::External::New(isolate, item);
+	}
+
+	void ScriptEngine::addToBuffer(Buffer &buffer, v8::Local<v8::Value> value) {
+		v8::Local<v8::Context> context = getContext();
+
+		if (value->IsNumber()) {
+			buffer << value->NumberValue(context).ToChecked();
+			return;
+		}
+
+		if (value->IsString() || value->IsStringObject()) {
+			buffer << string(value);
+			return;
+		}
+
+		if (value->IsArray()) {
+			v8::Local<v8::Array> array = value.As<v8::Array>();
+
+			if (array->Length() < 2)
+				throw std::invalid_argument("Invalid number of items in array");
+
+			if (array->Length() == 2) {
+				std::string first = string(array->Get(context, 0).ToLocalChecked());
+				v8::Local<v8::Value> second = array->Get(context, 1).ToLocalChecked();
+
+				if (first == "string") {
+					buffer << string(second);
+					return;
+				}
+
+				if (first == "optional") {
+					if (!second->IsArray())
+						throw std::invalid_argument("Expected second item of an optional to be an array");
+
+					v8::Local<v8::Array> subarray = second.As<v8::Array>();
+
+					if (subarray->Length() != 2)
+						throw std::invalid_argument("Expected second item of an optional to have a length of 2");
+
+					std::string type = string(subarray->Get(context, 0).ToLocalChecked());
+
+					if (type == "optional")
+						throw std::invalid_argument("Nested optionals are not supported");
+
+					v8::Local<v8::Value> subsecond = subarray->Get(context, 1).ToLocalChecked();
+
+					if (subsecond->IsNullOrUndefined()) {
+
+					}
+
+				}
+
+				if (first == "i8" || first == "i16" || first == "i32" || first == "i64" || first == "u8" || first == "u16" || first == "u32" || first == "u64" || first == "f32" || first == "f64") {
+					v8::MaybeLocal<v8::String> maybe_second_string = second->ToString(context);
+					if (!maybe_second_string.IsEmpty()) {
+						std::string second_string = string(maybe_second_string.ToLocalChecked());
+						if (first == "i8") {
+							buffer << parseNumber<int8_t>(second_string);
+						} else if (first == "i16") {
+							buffer << parseNumber<int16_t>(second_string);
+						} else if (first == "i32") {
+							buffer << parseNumber<int32_t>(second_string);
+						} else if (first == "i64") {
+							buffer << parseNumber<int64_t>(second_string);
+						} else if (first == "u8") {
+							buffer << parseNumber<uint8_t>(second_string);
+						} else if (first == "u16") {
+							buffer << parseNumber<uint16_t>(second_string);
+						} else if (first == "u32") {
+							buffer << parseNumber<uint32_t>(second_string);
+						} else if (first == "u64") {
+							buffer << parseNumber<uint64_t>(second_string);
+						} else if (first == "f32") {
+							buffer << parseNumber<float>(second_string);
+						} else if (first == "f64") {
+							buffer << parseNumber<double>(second_string);
+						}
+						return;
+					}
+
+					v8::MaybeLocal<v8::BigInt> maybe_bigint = second->ToBigInt(context);
+					if (!maybe_bigint.IsEmpty()) {
+						v8::Local<v8::BigInt> bigint = maybe_bigint.ToLocalChecked();
+						if (first == "i8") {
+							buffer << int8_t(bigint->Int64Value());
+						} else if (first == "i16") {
+							buffer << int16_t(bigint->Int64Value());
+						} else if (first == "i32") {
+							buffer << int32_t(bigint->Int64Value());
+						} else if (first == "i64") {
+							buffer << int64_t(bigint->Int64Value());
+						} else if (first == "u8") {
+							buffer << uint8_t(bigint->Uint64Value());
+						} else if (first == "u16") {
+							buffer << uint16_t(bigint->Uint64Value());
+						} else if (first == "u32") {
+							buffer << uint32_t(bigint->Uint64Value());
+						} else if (first == "u64") {
+							buffer << uint64_t(bigint->Uint64Value());
+						} else if (first == "f32") {
+							buffer << float(bigint->Uint64Value());
+						} else if (first == "f64") {
+							buffer << double(bigint->Uint64Value());
+						}
+						return;
+					}
+
+					v8::MaybeLocal<v8::Number> maybe_number = second->ToNumber(context);
+					if (maybe_number.IsEmpty())
+						throw std::runtime_error("Invalid " + first);
+					v8::Local<v8::Number> number = maybe_number.ToLocalChecked();
+
+					if (first == "i8") {
+						buffer << int8_t(number->Value());
+					} else if (first == "i16") {
+						buffer << int16_t(number->Value());
+					} else if (first == "i32") {
+						buffer << int32_t(number->Value());
+					} else if (first == "i64") {
+						buffer << int64_t(number->Value());
+					} else if (first == "u8") {
+						buffer << uint8_t(number->Value());
+					} else if (first == "u16") {
+						buffer << uint16_t(number->Value());
+					} else if (first == "u32") {
+						buffer << uint32_t(number->Value());
+					} else if (first == "u64") {
+						buffer << uint64_t(number->Value());
+					} else if (first == "f32") {
+						buffer << float(number->Value());
+					} else if (first == "f64") {
+						buffer << double(number->Value());
+					}
+
+					return;
+				}
+			}
+		}
 	}
 
 	void ScriptEngine::clearContext() {

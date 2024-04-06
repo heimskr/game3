@@ -10,10 +10,22 @@
 #include <variant>
 
 namespace Game3 {
+	class Buffer;
+
 	class ScriptEngine {
 		public:
 			using FunctionAdder = std::function<void(std::function<void(const std::string &, v8::FunctionCallback)>)>;
 			using GlobalMutator = std::function<void(v8::Local<v8::ObjectTemplate>)>;
+
+			struct Type {
+				virtual ~Type() = default;
+				virtual void encode(Buffer &, v8::Local<v8::Value>) = 0;
+			};
+
+			struct MapType: Type {
+
+				void encode(Buffer &, v8::Local<v8::Value>) final;
+			};
 
 		private:
 			GlobalMutator savedMutator{};
@@ -39,6 +51,7 @@ namespace Game3 {
 
 			std::optional<v8::Local<v8::Value>> execute(const std::string &javascript, bool can_throw = true, const std::function<void(v8::Local<v8::Context>)> &context_mutator = {});
 			std::string string(v8::Local<v8::Value>);
+
 			v8::Local<v8::String> string(const std::string &, bool internalized = false);
 			v8::Local<v8::Object> object(const ObjectValue &);
 			v8::Local<v8::Function> makeValue(const FunctionValue &);
@@ -50,13 +63,14 @@ namespace Game3 {
 			v8::Local<v8::Value> makeValue(const Value &);
 
 			v8::Local<v8::External> wrap(void *);
+			void addToBuffer(Buffer &, v8::Local<v8::Value>);
 
 			void clearContext();
 			void print(std::string_view);
 
+
 			inline v8::Isolate * getIsolate() const { return isolate; }
 			inline v8::Local<v8::Context> getContext() const { return globalContext.Get(isolate); }
-
 
 			static void init(const char *argv0);
 			static void deinit();

@@ -60,6 +60,8 @@ namespace Game3 {
 
 			inline auto getID() const { return id; }
 
+			inline RealmPtr getRealm() const { return weakRealm.lock(); }
+
 			virtual Substance getType() const = 0;
 			virtual void tick(const std::shared_ptr<Game> &, Tick);
 			bool canTick(Tick);

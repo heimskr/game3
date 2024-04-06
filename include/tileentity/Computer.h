@@ -26,6 +26,9 @@ namespace Game3 {
 
 			ScriptEngine engine;
 
+			/** Attempts to find a tile entity connected to the computer via a data cable. */
+			TileEntityPtr searchFor(GlobalID);
+
 		friend class TileEntity;
 	};
 
