@@ -396,6 +396,7 @@ namespace Game3 {
 				throw std::invalid_argument("Expected one string");
 
 			buffer << string(values[0]);
+			return;
 		}
 
 		if (values.size() != 1)
