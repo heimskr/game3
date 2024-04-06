@@ -329,8 +329,24 @@ namespace Game3 {
 			auto &wrapper = ObjectWrap<Buffer>::unwrap(info.This());
 			assert(wrapper.object);
 			wrapper->debug();
-			info.GetReturnValue().Set(double(wrapper->size()));
+			info.GetReturnValue().Set(info.This());
 		}));
+
+		instance->Set(isolate, "clear", v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
+			auto &wrapper = ObjectWrap<Buffer>::unwrap(info.This());
+			assert(wrapper.object);
+			wrapper->clear();
+			info.GetReturnValue().Set(info.This());
+		}));
+
+		instance->SetAccessor(string("length"), [](v8::Local<v8::Name>, const v8::PropertyCallbackInfo<v8::Value> &info) {
+			auto &wrapper = ObjectWrap<Buffer>::unwrap(info.This());
+			size_t size = wrapper->size();
+			if (size <= UINT32_MAX)
+				info.GetReturnValue().Set(uint32_t(size));
+			else
+				info.GetReturnValue().Set(double(size));
+		});
 
 		return v8::Global<v8::FunctionTemplate>(isolate, templ);
 	}
@@ -356,7 +372,8 @@ namespace Game3 {
 			throw std::invalid_argument("Can't add JS value(s) to buffer: invalid type");
 
 		if (type == "list") {
-			buffer.append(getBufferType(description, v8::Undefined(isolate)));
+			if (!in_container)
+				buffer.append(getBufferType(description, v8::Undefined(isolate)));
 			buffer += uint32_t(values.size());
 
 			TypeDescription subtype = describeType(primary);
@@ -373,9 +390,6 @@ namespace Game3 {
 				return;
 			}
 
-			if (values.size() != 1)
-				throw std::invalid_argument("Expected optional type to have at most one corresponding value");
-
 			buffer.append(getBufferType(description, values[0], false));
 			addToBuffer(buffer, describeType(primary), values, true);
 			return;
@@ -386,7 +400,6 @@ namespace Game3 {
 				throw std::invalid_argument("Expected one object");
 
 			buffer.append(getBufferType(description, v8::Undefined(isolate), false));
-			buffer += uint32_t(values.size());
 
 			v8::Local<v8::Context> context = getContext();
 			v8::Local<v8::Object> obj = values[0].As<v8::Object>();
@@ -398,11 +411,13 @@ namespace Game3 {
 			TypeDescription key_description = describeType(primary);
 			TypeDescription value_description = describeType(secondary);
 
+			buffer += uint32_t(array->Length());
+
 			for (uint32_t i = 0, length = array->Length(); i < length; ++i) {
 				v8::Local<v8::Value> key = array->Get(context, i).ToLocalChecked();
 				v8::Local<v8::Value> value = obj->Get(context, key).ToLocalChecked();
 				addToBuffer(buffer, key_description, std::span<v8::Local<v8::Value>>(&key, 1), true);
-				addToBuffer(buffer, key_description, std::span<v8::Local<v8::Value>>(&value, 1), true);
+				addToBuffer(buffer, value_description, std::span<v8::Local<v8::Value>>(&value, 1), true);
 			}
 
 			return;

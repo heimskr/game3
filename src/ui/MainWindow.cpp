@@ -187,7 +187,7 @@ namespace Game3 {
 		auto key_controller = Gtk::EventControllerKey::create();
 		key_controller->signal_key_pressed().connect(sigc::mem_fun(*this, &MainWindow::onKeyPressed), false);
 		key_controller->signal_key_released().connect(sigc::mem_fun(*this, &MainWindow::onKeyReleased));
-		add_controller(key_controller);
+		glArea.add_controller(key_controller);
 
 		auto drag = Gtk::GestureDrag::create();
 		drag->set_button(2);
