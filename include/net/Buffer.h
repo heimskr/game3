@@ -186,6 +186,11 @@ namespace Game3 {
 				bytes.insert(bytes.end(), first, last);
 			}
 
+			template <typename T>
+			void append(const T &range) {
+				bytes.insert(bytes.end(), range.begin(), range.end());
+			}
+
 			void popMany(size_t);
 			void limitTo(size_t);
 			void debug() const;

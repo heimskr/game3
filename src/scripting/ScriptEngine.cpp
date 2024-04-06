@@ -318,73 +318,231 @@ namespace Game3 {
 		return templ;
 	}
 
-	void ScriptEngine::addToBuffer(Buffer &buffer, v8::Local<v8::Value> type_value, std::span<v8::Local<v8::Value>> values) {
-
+	void ScriptEngine::addToBuffer(Buffer &buffer, v8::Local<v8::Value> type_value, std::span<v8::Local<v8::Value>> values, bool in_container) {
+		addToBuffer(buffer, describeType(type_value), values, in_container);
 	}
 
-	std::string ScriptEngine::getBufferType(v8::Local<v8::Value> type_value, v8::Local<v8::Value> value, bool in_map) {
-		if (type_value->IsString() || type_value->IsStringObject()) {
-			std::string type = string(type_value);
-			if (type == "string")
-				return in_map? "\x1f" : Buffer{}.getType(string(value));
-			if (type == "i8")
-				return Buffer{}.getType(int8_t{});
-			if (type == "i16")
-				return Buffer{}.getType(int16_t{});
-			if (type == "i32")
-				return Buffer{}.getType(int32_t{});
-			if (type == "i64")
-				return Buffer{}.getType(int64_t{});
-			if (type == "u8")
-				return Buffer{}.getType(uint8_t{});
-			if (type == "u16")
-				return Buffer{}.getType(uint16_t{});
-			if (type == "u32")
-				return Buffer{}.getType(uint32_t{});
-			if (type == "u64")
-				return Buffer{}.getType(uint64_t{});
-			if (type == "f32")
-				return Buffer{}.getType(float{});
-			if (type == "f64")
-				return Buffer{}.getType(double{});
-			throw std::invalid_argument("Invalid type: " + type);
+	void ScriptEngine::addToBuffer(Buffer &buffer, const TypeDescription &description, std::span<v8::Local<v8::Value>> values, bool in_container) {
+		const auto &[type, primary, secondary] = description;
+
+		if (type == "invalid")
+			throw std::invalid_argument("Can't add JS value(s) to buffer: invalid type");
+
+		if (type == "list") {
+			buffer.append(getBufferType(description, v8::Undefined(isolate), in_container));
+			buffer += uint32_t(values.size());
+
+			TypeDescription subtype = describeType(primary);
+
+			for (auto &value: values)
+				addToBuffer(buffer, subtype, std::span<v8::Local<v8::Value>>(&value, 1), true);
+
+			return;
 		}
 
-		if (type_value->IsArray()) {
-			v8::Local<v8::Array> array = type_value.As<v8::Array>();
-			if (array->Length() < 1)
-				throw std::invalid_argument("Invalid type array length: " + std::to_string(array->Length()));
+		if (type == "optional") {
+			if (values.empty() || (values.size() == 1 && values[0]->IsNullOrUndefined())) {
+				buffer.appendType(std::nullopt);
+				return;
+			}
+
+			if (values.size() != 1)
+				throw std::invalid_argument("Expected optional type to have at most one corresponding value");
+
+			buffer.append(getBufferType(description, values[0], in_container));
+			addToBuffer(buffer, describeType(primary), values, true); // TODO!: `true` or `in_container` here?
+			return;
+		}
+
+		if (type == "map") {
+			if (values.size() != 1)
+				throw std::invalid_argument("Expected one object");
+
+			buffer.append(getBufferType(description, v8::Undefined(isolate), /*in_container*/ false));
+			buffer += uint32_t(values.size());
 
 			v8::Local<v8::Context> context = getContext();
-			std::string base = string(array->Get(context, 0).ToLocalChecked());
+			v8::Local<v8::Object> obj = values[0].As<v8::Object>();
+			v8::MaybeLocal<v8::Array> maybe_array = obj->GetOwnPropertyNames(context);
+			if (maybe_array.IsEmpty())
+				throw std::runtime_error("Couldn't get object properties");
+			v8::Local<v8::Array> array = maybe_array.ToLocalChecked();
 
-			if (base == "optional") {
-				if (array->Length() != 2)
-					throw std::invalid_argument("Invalid optional type array length: " + std::to_string(array->Length()));
+			TypeDescription key_description = describeType(primary);
+			TypeDescription value_description = describeType(secondary);
 
-				if (!in_map && value->IsNullOrUndefined())
-					return Buffer{}.getType(std::nullopt);
-
-				return '\x0b' + getBufferType(array->Get(context, 1).ToLocalChecked(), value);
+			for (uint32_t i = 0, length = array->Length(); i < length; ++i) {
+				v8::Local<v8::Value> key = array->Get(context, i).ToLocalChecked();
+				v8::Local<v8::Value> value = obj->Get(context, key).ToLocalChecked();
+				addToBuffer(buffer, key_description, std::span<v8::Local<v8::Value>>(&key, 1), true);
+				addToBuffer(buffer, key_description, std::span<v8::Local<v8::Value>>(&value, 1), true);
 			}
 
-			if (base == "list") {
-				if (array->Length() != 2)
-					throw std::invalid_argument("Invalid list type array length: " + std::to_string(array->Length()));
-				return '\x20' + getBufferType(array->Get(context, 1).ToLocalChecked(), value);
-			}
-
-			if (base == "map") {
-				if (array->Length() != 3)
-					throw std::invalid_argument("Invalid map type array length: " + std::to_string(array->Length()));
-
-				return '\x21' + getBufferType(array->Get(context, 1).ToLocalChecked(), value, true) + getBufferType(array->Get(context, 2).ToLocalChecked(), value, true);
-			}
-
-			throw std::invalid_argument(std::format("Invalid type array base: \"{}\"", base));
+			return;
 		}
 
-		throw std::invalid_argument("Invalid type object");
+		if (type == "string") {
+			if (values.size() != 1)
+				throw std::invalid_argument("Expected one string");
+
+			buffer << string(values[0]);
+		}
+
+		if (values.size() != 1)
+			throw std::invalid_argument("Expected one number");
+
+		if (values[0]->IsString() || values[0]->IsStringObject()) {
+			std::string str = string(values[0]);
+			if (type == "i8")
+				buffer << parseNumber<int8_t>(str);
+			else if (type == "i16")
+				buffer << parseNumber<int16_t>(str);
+			else if (type == "i32")
+				buffer << parseNumber<int32_t>(str);
+			else if (type == "i64")
+				buffer << parseNumber<int64_t>(str);
+			else if (type == "u8")
+				buffer << parseNumber<uint8_t>(str);
+			else if (type == "u16")
+				buffer << parseNumber<uint16_t>(str);
+			else if (type == "u32")
+				buffer << parseNumber<uint32_t>(str);
+			else if (type == "u64")
+				buffer << parseNumber<uint64_t>(str);
+			else if (type == "f32")
+				buffer << parseNumber<float>(str);
+			else if (type == "f64")
+				buffer << parseNumber<double>(str);
+			else
+				throw std::invalid_argument(std::format("Unknown type: \"{}\"", type));
+			return;
+		}
+
+		if (values[0]->IsBigInt() || values[0]->IsBigIntObject()) {
+			v8::Local<v8::BigInt> bigint = values[0]->ToBigInt(getContext()).ToLocalChecked();
+			if (type == "i8")
+				buffer << int8_t(bigint->Int64Value());
+			else if (type == "i16")
+				buffer << int16_t(bigint->Int64Value());
+			else if (type == "i32")
+				buffer << int32_t(bigint->Int64Value());
+			else if (type == "i64")
+				buffer << bigint->Int64Value();
+			else if (type == "u8")
+				buffer << uint8_t(bigint->Uint64Value());
+			else if (type == "u16")
+				buffer << uint16_t(bigint->Uint64Value());
+			else if (type == "u32")
+				buffer << uint32_t(bigint->Uint64Value());
+			else if (type == "u64")
+				buffer << bigint->Uint64Value();
+			else if (type == "f32")
+				buffer << float(bigint->Int64Value());
+			else if (type == "f64")
+				buffer << double(bigint->Int64Value());
+			else
+				throw std::invalid_argument(std::format("Unknown type: \"{}\"", type));
+			return;
+		}
+
+		v8::MaybeLocal<v8::Number> maybe_number = values[0]->ToNumber(getContext());
+		if (maybe_number.IsEmpty())
+			throw std::invalid_argument("Invalid number");
+
+		const double number = maybe_number.ToLocalChecked()->Value();
+
+		if (type == "i8")
+			buffer << int8_t(number);
+		else if (type == "i16")
+			buffer << int16_t(number);
+		else if (type == "i32")
+			buffer << int32_t(number);
+		else if (type == "i64")
+			buffer << int64_t(number);
+		else if (type == "u8")
+			buffer << uint8_t(number);
+		else if (type == "u16")
+			buffer << uint16_t(number);
+		else if (type == "u32")
+			buffer << uint32_t(number);
+		else if (type == "u64")
+			buffer << uint64_t(number);
+		else if (type == "f32")
+			buffer << float(number);
+		else if (type == "f64")
+			buffer << number;
+		else
+			throw std::invalid_argument(std::format("Unknown type: \"{}\"", type));
+	}
+
+	auto ScriptEngine::describeType(v8::Local<v8::Value> value) -> TypeDescription {
+		if (value->IsString()) {
+			return {string(value), {}, {}};
+		}
+
+		if (value->IsArray()) {
+			v8::Local<v8::Array> array = value.As<v8::Array>();
+			if (array->Length() < 1)
+				return {"invalid", {}, {}};
+
+			v8::Local<v8::Context> context = getContext();
+			std::string first = string(array->Get(context, 0).ToLocalChecked());
+
+			if (first == "list" || first == "optional") {
+				if (array->Length() == 2)
+					return {std::move(first), array->Get(context, 1).ToLocalChecked(), {}};
+			} else if (first == "map") {
+				if (array->Length() == 3)
+					return {"map", array->Get(context, 1).ToLocalChecked(), array->Get(context, 2).ToLocalChecked()};
+			}
+		}
+
+		return {"invalid", {}, {}};
+	}
+
+	std::string ScriptEngine::getBufferType(const TypeDescription &description, v8::Local<v8::Value> value, bool in_container) {
+		const auto &[type, primary, secondary] = description;
+
+		if (type == "invalid")
+			throw std::invalid_argument("Can't stringify invalid type");
+
+		if (type == "i8")
+			return Buffer{}.getType(int8_t{});
+		if (type == "i16")
+			return Buffer{}.getType(int16_t{});
+		if (type == "i32")
+			return Buffer{}.getType(int32_t{});
+		if (type == "i64")
+			return Buffer{}.getType(int64_t{});
+		if (type == "u8")
+			return Buffer{}.getType(uint8_t{});
+		if (type == "u16")
+			return Buffer{}.getType(uint16_t{});
+		if (type == "u32")
+			return Buffer{}.getType(uint32_t{});
+		if (type == "u64")
+			return Buffer{}.getType(uint64_t{});
+		if (type == "f32")
+			return Buffer{}.getType(float{});
+		if (type == "f64")
+			return Buffer{}.getType(double{});
+
+		if (type == "string")
+			return in_container? "\x1f" : Buffer{}.getType(string(value));
+
+		if (type == "list")
+			return '\x20' + getBufferType(describeType(primary), value, true); // TODO!: check whether using `value` is valid here
+
+		if (type == "optional") {
+			if (!in_container && value->IsNullOrUndefined())
+				return Buffer{}.getType(std::nullopt);
+			return '\x0b' + getBufferType(describeType(primary), value, true); // TODO!: check whether using `value` is valid here
+		}
+
+		if (type == "map")
+			return '\x21' + getBufferType(describeType(primary), value, true) + getBufferType(describeType(secondary), value, true); // TODO!: *definitely* check whether using `value` is valid here
+
+		assert(!"Type is anything returned by ScriptEngine::describeType");
 	}
 
 	const char * ScriptEngine::toCString(const v8::String::Utf8Value &value) {

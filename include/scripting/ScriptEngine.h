@@ -9,6 +9,7 @@
 #include <optional>
 #include <span>
 #include <stdexcept>
+#include <tuple>
 #include <variant>
 
 namespace Game3 {
@@ -79,6 +80,12 @@ namespace Game3 {
 			static void deinit();
 
 		private:
+			struct TypeDescription {
+				std::string name;
+				v8::Local<v8::Value> primary;
+				v8::Local<v8::Value> secondary;
+			};
+
 			v8::Isolate *isolate = nullptr;
 			v8::Global<v8::Context> globalContext;
 			v8::Global<v8::ObjectTemplate> bufferTemplate;
@@ -88,8 +95,10 @@ namespace Game3 {
 			v8::Global<v8::Context> makeContext(FunctionAdder);
 
 			v8::Local<v8::ObjectTemplate> makeBufferTemplate();
-			void addToBuffer(Buffer &, v8::Local<v8::Value> type_value, std::span<v8::Local<v8::Value>> values);
-			std::string getBufferType(v8::Local<v8::Value> type_value, v8::Local<v8::Value> value, bool in_map = false);
+			void addToBuffer(Buffer &, v8::Local<v8::Value> type_value, std::span<v8::Local<v8::Value>> values, bool in_container = false);
+			void addToBuffer(Buffer &, const TypeDescription &, std::span<v8::Local<v8::Value>> values, bool in_container = false);
+			TypeDescription describeType(v8::Local<v8::Value>);
+			std::string getBufferType(const TypeDescription &, v8::Local<v8::Value> value, bool in_container = false);
 
 			static std::atomic_bool initialized;
 			static std::unique_ptr<v8::Platform> platform;
