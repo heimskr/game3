@@ -1,11 +1,13 @@
 #pragma once
 
+#include <nlohmann/json_fwd.hpp>
 #include <v8.h>
 
 #include <atomic>
 #include <functional>
 #include <map>
 #include <optional>
+#include <span>
 #include <stdexcept>
 #include <variant>
 
@@ -63,7 +65,8 @@ namespace Game3 {
 			v8::Local<v8::Value> makeValue(const Value &);
 
 			v8::Local<v8::External> wrap(void *);
-			void addToBuffer(Buffer &, v8::Local<v8::Value>);
+
+			nlohmann::json getJSON(v8::Local<v8::Value>);
 
 			void clearContext();
 			void print(std::string_view);
@@ -78,16 +81,21 @@ namespace Game3 {
 		private:
 			v8::Isolate *isolate = nullptr;
 			v8::Global<v8::Context> globalContext;
+			v8::Global<v8::ObjectTemplate> bufferTemplate;
 
 			void throwException(v8::Isolate *isolate, v8::TryCatch *handler);
+			v8::Global<v8::Context> makeContext(GlobalMutator = {});
+			v8::Global<v8::Context> makeContext(FunctionAdder);
+
+			v8::Local<v8::ObjectTemplate> makeBufferTemplate();
+			void addToBuffer(Buffer &, v8::Local<v8::Value> type_value, std::span<v8::Local<v8::Value>> values);
+			std::string getBufferType(v8::Local<v8::Value> type_value, v8::Local<v8::Value> value, bool in_map = false);
 
 			static std::atomic_bool initialized;
 			static std::unique_ptr<v8::Platform> platform;
 			static v8::Isolate::CreateParams createParams;
 
 			static v8::Isolate * makeIsolate();
-			v8::Global<v8::Context> makeContext(GlobalMutator = {});
-			v8::Global<v8::Context> makeContext(FunctionAdder);
 			static const char * toCString(const v8::String::Utf8Value &);
 	};
 }

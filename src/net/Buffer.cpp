@@ -34,6 +34,7 @@ namespace Game3 {
 	template <> std::string Buffer::getType<int64_t> (const int64_t &)  { return {'\x08'}; }
 	template <> std::string Buffer::getType<float>   (const float &)    { return {'\x09'}; }
 	template <> std::string Buffer::getType<double>  (const double &)   { return {'\x0a'}; }
+	template <> std::string Buffer::getType<std::nullopt_t>(const std::nullopt_t &) { return {'\x0c'}; }
 
 	template <> Buffer & Buffer::appendType<bool>    (const bool     &) { return *this += '\x01'; }
 	template <> Buffer & Buffer::appendType<uint8_t> (const uint8_t  &) { return *this += '\x01'; }
@@ -47,6 +48,7 @@ namespace Game3 {
 	template <> Buffer & Buffer::appendType<int64_t> (const int64_t  &) { return *this += '\x08'; }
 	template <> Buffer & Buffer::appendType<float>   (const float    &) { return *this += '\x09'; }
 	template <> Buffer & Buffer::appendType<double>  (const double   &) { return *this += '\x0a'; }
+	template <> Buffer & Buffer::appendType<std::nullopt_t>(const std::nullopt_t &) { return *this += '\x0c'; }
 
 	template <>
 	std::string Buffer::getType<std::string_view>(const std::string_view &string) {

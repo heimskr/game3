@@ -183,7 +183,7 @@ namespace Game3 {
 
 							for (int i = 2; i < info.Length(); ++i) {
 								try {
-									engine.addToBuffer(info[i]);
+									// engine.addToBuffer(info[i]);
 								} catch (const std::exception &err) {
 									std::string message = std::format("Couldn't add argument {} to buffer: {}", i, err.what());
 									ERRORX_(2, message);
@@ -192,7 +192,8 @@ namespace Game3 {
 								}
 							}
 
-							context.computer->sendMessage(tile_entity, "Script:" + engine.string(arg1), std::any(std::move(buffer)));
+							std::any any(std::move(buffer));
+							context.computer->sendMessage(tile_entity, "Script:" + engine.string(arg1), any);
 						}, engine.wrap(&context))},
 					});
 

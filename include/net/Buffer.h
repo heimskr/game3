@@ -322,6 +322,8 @@ namespace Game3 {
 			friend T popBuffer(Buffer &);
 	};
 
+	using BufferPtr = std::shared_ptr<Buffer>;
+
 	template <std::integral T>
 	T popBuffer(Buffer &buffer) {
 		std::span span = buffer.getSpan();
