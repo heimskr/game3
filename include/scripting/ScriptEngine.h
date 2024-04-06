@@ -98,7 +98,7 @@ namespace Game3 {
 			void addToBuffer(Buffer &, v8::Local<v8::Value> type_value, std::span<v8::Local<v8::Value>> values, bool in_container = false);
 			void addToBuffer(Buffer &, const TypeDescription &, std::span<v8::Local<v8::Value>> values, bool in_container = false);
 			TypeDescription describeType(v8::Local<v8::Value>);
-			std::string getBufferType(const TypeDescription &, v8::Local<v8::Value> value, bool in_container = false);
+			std::string getBufferType(const TypeDescription &, v8::Local<v8::Value> value, bool is_subtype = false);
 
 			static std::atomic_bool initialized;
 			static std::unique_ptr<v8::Platform> platform;

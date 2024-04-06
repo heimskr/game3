@@ -322,6 +322,16 @@ namespace Game3 {
 		addToBuffer(buffer, describeType(type_value), values, in_container);
 	}
 
+	namespace {
+		template <typename T>
+		void addPrimitive(Buffer &buffer, T value, bool in_container) {
+			if (in_container)
+				buffer += value;
+			else
+				buffer << value;
+		}
+	}
+
 	void ScriptEngine::addToBuffer(Buffer &buffer, const TypeDescription &description, std::span<v8::Local<v8::Value>> values, bool in_container) {
 		const auto &[type, primary, secondary] = description;
 
@@ -329,7 +339,7 @@ namespace Game3 {
 			throw std::invalid_argument("Can't add JS value(s) to buffer: invalid type");
 
 		if (type == "list") {
-			buffer.append(getBufferType(description, v8::Undefined(isolate), in_container));
+			buffer.append(getBufferType(description, v8::Undefined(isolate)));
 			buffer += uint32_t(values.size());
 
 			TypeDescription subtype = describeType(primary);
@@ -349,8 +359,8 @@ namespace Game3 {
 			if (values.size() != 1)
 				throw std::invalid_argument("Expected optional type to have at most one corresponding value");
 
-			buffer.append(getBufferType(description, values[0], in_container));
-			addToBuffer(buffer, describeType(primary), values, true); // TODO!: `true` or `in_container` here?
+			buffer.append(getBufferType(description, values[0], false));
+			addToBuffer(buffer, describeType(primary), values);
 			return;
 		}
 
@@ -358,7 +368,7 @@ namespace Game3 {
 			if (values.size() != 1)
 				throw std::invalid_argument("Expected one object");
 
-			buffer.append(getBufferType(description, v8::Undefined(isolate), /*in_container*/ false));
+			buffer.append(getBufferType(description, v8::Undefined(isolate), false));
 			buffer += uint32_t(values.size());
 
 			v8::Local<v8::Context> context = getContext();
@@ -394,25 +404,25 @@ namespace Game3 {
 		if (values[0]->IsString() || values[0]->IsStringObject()) {
 			std::string str = string(values[0]);
 			if (type == "i8")
-				buffer << parseNumber<int8_t>(str);
+				addPrimitive(buffer, parseNumber<int8_t>(str), in_container);
 			else if (type == "i16")
-				buffer << parseNumber<int16_t>(str);
+				addPrimitive(buffer, parseNumber<int16_t>(str), in_container);
 			else if (type == "i32")
-				buffer << parseNumber<int32_t>(str);
+				addPrimitive(buffer, parseNumber<int32_t>(str), in_container);
 			else if (type == "i64")
-				buffer << parseNumber<int64_t>(str);
+				addPrimitive(buffer, parseNumber<int64_t>(str), in_container);
 			else if (type == "u8")
-				buffer << parseNumber<uint8_t>(str);
+				addPrimitive(buffer, parseNumber<uint8_t>(str), in_container);
 			else if (type == "u16")
-				buffer << parseNumber<uint16_t>(str);
+				addPrimitive(buffer, parseNumber<uint16_t>(str), in_container);
 			else if (type == "u32")
-				buffer << parseNumber<uint32_t>(str);
+				addPrimitive(buffer, parseNumber<uint32_t>(str), in_container);
 			else if (type == "u64")
-				buffer << parseNumber<uint64_t>(str);
+				addPrimitive(buffer, parseNumber<uint64_t>(str), in_container);
 			else if (type == "f32")
-				buffer << parseNumber<float>(str);
+				addPrimitive(buffer, parseNumber<float>(str), in_container);
 			else if (type == "f64")
-				buffer << parseNumber<double>(str);
+				addPrimitive(buffer, parseNumber<double>(str), in_container);
 			else
 				throw std::invalid_argument(std::format("Unknown type: \"{}\"", type));
 			return;
@@ -421,25 +431,25 @@ namespace Game3 {
 		if (values[0]->IsBigInt() || values[0]->IsBigIntObject()) {
 			v8::Local<v8::BigInt> bigint = values[0]->ToBigInt(getContext()).ToLocalChecked();
 			if (type == "i8")
-				buffer << int8_t(bigint->Int64Value());
+				addPrimitive(buffer, int8_t(bigint->Int64Value()), in_container);
 			else if (type == "i16")
-				buffer << int16_t(bigint->Int64Value());
+				addPrimitive(buffer, int16_t(bigint->Int64Value()), in_container);
 			else if (type == "i32")
-				buffer << int32_t(bigint->Int64Value());
+				addPrimitive(buffer, int32_t(bigint->Int64Value()), in_container);
 			else if (type == "i64")
-				buffer << bigint->Int64Value();
+				addPrimitive(buffer, bigint->Int64Value(), in_container);
 			else if (type == "u8")
-				buffer << uint8_t(bigint->Uint64Value());
+				addPrimitive(buffer, uint8_t(bigint->Uint64Value()), in_container);
 			else if (type == "u16")
-				buffer << uint16_t(bigint->Uint64Value());
+				addPrimitive(buffer, uint16_t(bigint->Uint64Value()), in_container);
 			else if (type == "u32")
-				buffer << uint32_t(bigint->Uint64Value());
+				addPrimitive(buffer, uint32_t(bigint->Uint64Value()), in_container);
 			else if (type == "u64")
-				buffer << bigint->Uint64Value();
+				addPrimitive(buffer, bigint->Uint64Value(), in_container);
 			else if (type == "f32")
-				buffer << float(bigint->Int64Value());
+				addPrimitive(buffer, float(bigint->Int64Value()), in_container);
 			else if (type == "f64")
-				buffer << double(bigint->Int64Value());
+				addPrimitive(buffer, double(bigint->Int64Value()), in_container);
 			else
 				throw std::invalid_argument(std::format("Unknown type: \"{}\"", type));
 			return;
@@ -452,25 +462,25 @@ namespace Game3 {
 		const double number = maybe_number.ToLocalChecked()->Value();
 
 		if (type == "i8")
-			buffer << int8_t(number);
+			addPrimitive(buffer, int8_t(number), in_container);
 		else if (type == "i16")
-			buffer << int16_t(number);
+			addPrimitive(buffer, int16_t(number), in_container);
 		else if (type == "i32")
-			buffer << int32_t(number);
+			addPrimitive(buffer, int32_t(number), in_container);
 		else if (type == "i64")
-			buffer << int64_t(number);
+			addPrimitive(buffer, int64_t(number), in_container);
 		else if (type == "u8")
-			buffer << uint8_t(number);
+			addPrimitive(buffer, uint8_t(number), in_container);
 		else if (type == "u16")
-			buffer << uint16_t(number);
+			addPrimitive(buffer, uint16_t(number), in_container);
 		else if (type == "u32")
-			buffer << uint32_t(number);
+			addPrimitive(buffer, uint32_t(number), in_container);
 		else if (type == "u64")
-			buffer << uint64_t(number);
+			addPrimitive(buffer, uint64_t(number), in_container);
 		else if (type == "f32")
-			buffer << float(number);
+			addPrimitive(buffer, float(number), in_container);
 		else if (type == "f64")
-			buffer << number;
+			addPrimitive(buffer, number, in_container);
 		else
 			throw std::invalid_argument(std::format("Unknown type: \"{}\"", type));
 	}
@@ -500,7 +510,7 @@ namespace Game3 {
 		return {"invalid", {}, {}};
 	}
 
-	std::string ScriptEngine::getBufferType(const TypeDescription &description, v8::Local<v8::Value> value, bool in_container) {
+	std::string ScriptEngine::getBufferType(const TypeDescription &description, v8::Local<v8::Value> value, bool is_subtype) {
 		const auto &[type, primary, secondary] = description;
 
 		if (type == "invalid")
@@ -528,13 +538,13 @@ namespace Game3 {
 			return Buffer{}.getType(double{});
 
 		if (type == "string")
-			return in_container? "\x1f" : Buffer{}.getType(string(value));
+			return is_subtype? "\x1f" : Buffer{}.getType(string(value));
 
 		if (type == "list")
 			return '\x20' + getBufferType(describeType(primary), value, true); // TODO!: check whether using `value` is valid here
 
 		if (type == "optional") {
-			if (!in_container && value->IsNullOrUndefined())
+			if (!is_subtype && value->IsNullOrUndefined())
 				return Buffer{}.getType(std::nullopt);
 			return '\x0b' + getBufferType(describeType(primary), value, true); // TODO!: check whether using `value` is valid here
 		}
