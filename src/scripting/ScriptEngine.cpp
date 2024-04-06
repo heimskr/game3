@@ -19,14 +19,17 @@ namespace Game3 {
 
 	ScriptEngine::ScriptEngine():
 		isolate(makeIsolate()),
+		bufferTemplate(makeBufferTemplate()),
 		globalContext(makeContext()) {}
 
 	ScriptEngine::ScriptEngine(FunctionAdder function_adder):
 		isolate(makeIsolate()),
+		bufferTemplate(makeBufferTemplate()),
 		globalContext(makeContext(std::move(function_adder))) {}
 
 	ScriptEngine::ScriptEngine(GlobalMutator global_mutator):
 		isolate(makeIsolate()),
+		bufferTemplate(makeBufferTemplate()),
 		globalContext(makeContext(std::move(global_mutator))) {}
 
 	std::optional<v8::Local<v8::Value>> ScriptEngine::execute(const std::string &javascript, bool can_throw, const std::function<void(v8::Local<v8::Context>)> &context_mutator) {
@@ -249,6 +252,7 @@ namespace Game3 {
 		v8::Locker locker(isolate);
 		v8::Isolate::Scope isolate_scope(isolate);
 		v8::HandleScope handle_scope(isolate);
+
 		v8::Local<v8::ObjectTemplate> global = v8::ObjectTemplate::New(isolate);
 
 		global->Set(isolate, "print", v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
@@ -266,7 +270,7 @@ namespace Game3 {
 			engine.print(ss.str());
 		}, v8::External::New(isolate, this)));
 
-		global->Set(isolate, "Buffer", makeBufferTemplate());
+		global->Set(isolate, "Buffer", getBufferTemplate());
 
 		if (global_mutator)
 			global_mutator(global);
@@ -287,16 +291,22 @@ namespace Game3 {
 		}));
 	}
 
-	v8::Local<v8::ObjectTemplate> ScriptEngine::makeBufferTemplate() {
-		v8::Local<v8::ObjectTemplate> templ = v8::ObjectTemplate::New(isolate, v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
+	v8::Global<v8::FunctionTemplate> ScriptEngine::makeBufferTemplate() {
+		v8::Locker locker(isolate);
+		v8::Isolate::Scope isolate_scope(isolate);
+		v8::HandleScope handle_scope(isolate);
+
+		v8::Local<v8::FunctionTemplate> templ = v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
 			auto &engine = getExternal<ScriptEngine>(info);
 			v8::Local<v8::Object> this_obj = info.This();
 			ObjectWrap<Buffer>::make()->wrap(engine.getIsolate(), this_obj);
-		}, wrap(this)));
+		}, wrap(this));
 
-		templ->SetInternalFieldCount(1);
+		v8::Local<v8::ObjectTemplate> instance = templ->InstanceTemplate();
 
-		templ->Set(isolate, "add", v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
+		instance->SetInternalFieldCount(1);
+
+		instance->Set(isolate, "add", v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
 			auto &wrapper = ObjectWrap<Buffer>::unwrap(info.This());
 
 			if (info.Length() < 1) {
@@ -315,7 +325,14 @@ namespace Game3 {
 			info.GetReturnValue().Set(info.This());
 		}, wrap(this)));
 
-		return templ;
+		instance->Set(isolate, "debug", v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
+			auto &wrapper = ObjectWrap<Buffer>::unwrap(info.This());
+			assert(wrapper.object);
+			wrapper->debug();
+			info.GetReturnValue().Set(double(wrapper->size()));
+		}));
+
+		return v8::Global<v8::FunctionTemplate>(isolate, templ);
 	}
 
 	void ScriptEngine::addToBuffer(Buffer &buffer, v8::Local<v8::Value> type_value, std::span<v8::Local<v8::Value>> values, bool in_container) {

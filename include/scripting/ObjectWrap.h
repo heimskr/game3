@@ -58,6 +58,16 @@ namespace Game3 {
 				return unwrap(handle).object;
 			}
 
+			inline T & operator*() const {
+				assert(object);
+				return *object;
+			}
+
+			inline T * operator->() const {
+				assert(object);
+				return object.get();
+			}
+
 			inline v8::Local<v8::Object> handle(v8::Isolate *isolate) {
 				return v8::Local<v8::Object>::New(isolate, persistent);
 			}

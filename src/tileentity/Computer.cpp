@@ -160,7 +160,7 @@ namespace Game3 {
 							}
 
 							auto arg0 = info[0];
-							auto arg1 = info[1];
+							auto message_name = info[1];
 
 							if (!arg0->IsBigInt() && !arg0->IsBigIntObject()) {
 								info.GetIsolate()->ThrowError("Expected a BigInt as the first argument");
@@ -177,26 +177,22 @@ namespace Game3 {
 
 							Buffer buffer;
 
-							std::vector<v8::Local<v8::Value>> values;
-							values.reserve(info.Length() - 2);
-							for (int i = 2; i < info.Length(); ++i)
-								values.push_back(info[i]);
-
-							try {
-								engine.addToBuffer(buffer, arg1, values);
-							} catch (const std::exception &err) {
-								std::string message = std::format("Couldn't add values to buffer: {}", err.what());
-								ERRORX_(2, message);
-								info.GetIsolate()->ThrowError(engine.string(message));
-								return;
-							}
+							// try {
+							// 	engine.addToBuffer(buffer, arg1, values);
+							// } catch (const std::exception &err) {
+							// 	std::string message = std::format("Couldn't add values to buffer: {}", err.what());
+							// 	ERRORX_(2, message);
+							// 	info.GetIsolate()->ThrowError(engine.string(message));
+							// 	return;
+							// }
 
 							std::any any(std::move(buffer));
-							context.computer->sendMessage(tile_entity, engine.string(arg1), any);
+							context.computer->sendMessage(tile_entity, engine.string(message_name), any);
 
 							if (Buffer *new_buffer = std::any_cast<Buffer>(&any)) {
+								v8::Local<v8::Context> script_context = engine.getContext();
 								v8::Local<v8::Object> retval;
-								if (engine.getBufferTemplate()->NewInstance(engine.getContext()).ToLocal(&retval)) {
+								if (engine.getBufferTemplate()->GetFunction(script_context).ToLocalChecked()->NewInstance(script_context).ToLocal(&retval)) {
 									ObjectWrap<Buffer>::make(std::move(*new_buffer))->wrap(engine.getIsolate(), retval);
 									info.GetReturnValue().Set(retval);
 								} else {
