@@ -339,6 +339,25 @@ namespace Game3 {
 			info.GetReturnValue().Set(info.This());
 		}));
 
+		instance->Set(isolate, "toJSON", v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
+			auto &wrapper = ObjectWrap<Buffer>::unwrap(info.This());
+			assert(wrapper.object);
+
+			nlohmann::json json = wrapper.object->popAllJSON();
+
+			auto &engine = getExternal<ScriptEngine>(info);
+
+			try {
+				if (auto result = engine.execute(json.dump()))
+					info.GetReturnValue().Set(result.value());
+				else
+					info.GetReturnValue().SetUndefined();
+				return;
+			} catch (const std::exception &err) {
+				info.GetReturnValue().SetUndefined();
+			}
+		}, wrap(this)));
+
 		instance->SetAccessor(string("length"), [](v8::Local<v8::Name>, const v8::PropertyCallbackInfo<v8::Value> &info) {
 			auto &wrapper = ObjectWrap<Buffer>::unwrap(info.This());
 			size_t size = wrapper->size();

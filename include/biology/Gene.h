@@ -26,6 +26,11 @@ namespace Game3 {
 
 		protected:
 			std::string name;
+
+			Gene() = default;
+
+		template <typename T>
+		friend T makeForBuffer(Buffer &);
 	};
 
 	using GenePtr = std::shared_ptr<Gene>;

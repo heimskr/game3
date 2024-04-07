@@ -1,5 +1,11 @@
 #include "Log.h"
+#include "biology/Gene.h"
+#include "game/Fluids.h"
+#include "game/ServerInventory.h"
+#include "item/Item.h"
 #include "net/Buffer.h"
+#include "pipes/ItemFilter.h"
+#include "types/Position.h"
 #include "util/Util.h"
 
 #include <cassert>
@@ -284,24 +290,46 @@ namespace Game3 {
 	}
 
 	namespace {
-		nlohmann::json popJSON(Buffer &buffer, const std::string &type, bool in_container) {
+		std::string_view extractType(std::string_view type);
+
+		std::pair<std::string_view, std::string_view> extractMapTypes(std::string_view type) {
 			assert(!type.empty());
 
-			if (in_container) {
-				switch (type[0]) {
-					case '\x01': return popBuffer<uint8_t>(buffer);
-					case '\x02': return popBuffer<uint16_t>(buffer);
-					case '\x03': return popBuffer<uint32_t>(buffer);
-					case '\x04': return popBuffer<uint64_t>(buffer);
-					case '\x05': return popBuffer<int8_t>(buffer);
-					case '\x06': return popBuffer<int16_t>(buffer);
-					case '\x07': return popBuffer<int32_t>(buffer);
-					case '\x08': return popBuffer<int64_t>(buffer);
-					case '\x09': return popBuffer<float>(buffer);
-					case '\x0a': return popBuffer<double>(buffer);
-					// case '\x0b': return popJSON(
-				}
-			} else {
+			assert(type[0] == '\x21');
+			type.remove_prefix(1);
+
+			std::string_view key, value;
+
+			key = extractType(type);
+			type.remove_prefix(key.size());
+
+			value = extractType(type);
+
+			return {key, value};
+		}
+
+		std::string_view extractType(std::string_view type) {
+			assert(!type.empty());
+
+			char first = type[0];
+			if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first <= '\x1f') || ('\xe0' <= first && first <= '\xe9'))
+				return type.substr(0, 1);
+
+			if (first == '\x20' || ('\x30' <= first && first <= '\x3f'))
+				return type.substr(0, 1 + extractType(type.substr(1)).size());
+
+			if (first == '\x21') {
+				auto [key, value] = extractMapTypes(type);
+				return type.substr(0, 1 + key.size() + value.size());
+			}
+
+			throw std::invalid_argument("Invalid type byte: " + hexString(type.substr(0, 1), true));
+		}
+
+		nlohmann::json popJSON(Buffer &buffer, std::string_view type, bool in_container) {
+			assert(!type.empty());
+
+			if (!in_container) {
 				switch (type[0]) {
 					case '\x01': return buffer.take<uint8_t>();
 					case '\x02': return buffer.take<uint16_t>();
@@ -346,7 +374,102 @@ namespace Game3 {
 						}
 						return out;
 					}
+
+					case '\x30': case '\x31': case '\x32': case '\x33': case '\x34': case '\x35': case '\x36': case '\x37':
+					case '\x38': case '\x39': case '\x3a': case '\x3b': case '\x3c': case '\x3d': case '\x3e': case '\x3f': {
+						const uint32_t length(type[0] - '\x30');
+						++buffer.skip;
+						std::string type = buffer.peekType(0);
+						buffer.skip += type.size();
+						nlohmann::json out;
+						for (uint32_t i = 0; i < length; ++i)
+							out.push_back(popJSON(buffer, type, true));
+						return true;
+					}
 				}
+			}
+
+			switch (type[0]) {
+				case '\x01': return popBuffer<uint8_t>(buffer);
+				case '\x02': return popBuffer<uint16_t>(buffer);
+				case '\x03': return popBuffer<uint32_t>(buffer);
+				case '\x04': return popBuffer<uint64_t>(buffer);
+				case '\x05': return popBuffer<int8_t>(buffer);
+				case '\x06': return popBuffer<int16_t>(buffer);
+				case '\x07': return popBuffer<int32_t>(buffer);
+				case '\x08': return popBuffer<int64_t>(buffer);
+				case '\x09': return popBuffer<float>(buffer);
+				case '\x0a': return popBuffer<double>(buffer);
+				case '\x0b': return popJSON(buffer, type.substr(1), true);
+				case '\x0c': assert(!"Empty optional in container subtype"); return {};
+
+				case '\x10': case '\x11': case '\x12': case '\x13': case '\x14': case '\x15': case '\x16': case '\x17':
+				case '\x18': case '\x19': case '\x1a': case '\x1b': case '\x1c': case '\x1d': case '\x1e':
+					assert(!"Short string in container subtype");
+					return {};
+
+				case '\x1f':
+					return popBuffer<std::string>(buffer);
+
+				case '\x20':
+				case '\x30': case '\x31': case '\x32': case '\x33': case '\x34': case '\x35': case '\x36': case '\x37':
+				case '\x38': case '\x39': case '\x3a': case '\x3b': case '\x3c': case '\x3d': case '\x3e': case '\x3f': {
+					const uint32_t length = type[0] == '\x20'? popBuffer<uint32_t>(buffer) : type[0] - '\x30';
+					nlohmann::json out;
+					std::string_view subtype = type.substr(1);
+					for (uint32_t i = 0; i < length; ++i)
+						out.push_back(popJSON(buffer, subtype, true));
+					return true;
+				}
+
+				case '\x21': {
+					auto [key_type, value_type] = extractMapTypes(type);
+					const uint32_t length = popBuffer<uint32_t>(buffer);
+					nlohmann::json out;
+					for (uint32_t i = 0; i < length; ++i) {
+						nlohmann::json key = popJSON(buffer, key_type, true);
+						nlohmann::json value = popJSON(buffer, value_type, true);
+						out[std::move(key)] = std::move(value);
+					}
+					return out;
+				}
+
+				case '\xe0': {
+					return std::format("ItemStack<{}>", std::string(*buffer.take<ItemStackPtr>()));
+				}
+
+				case '\xe1': {
+					buffer.take<ServerInventory>();
+					return "<Inventory>";
+				}
+
+				case '\xe2':
+					return std::format("FluidStack<{}>", std::string(buffer.take<FluidStack>()));
+
+				case '\xe3': {
+					buffer.take<ItemFilter>();
+					return "<ItemFilter>";
+				}
+
+				case '\xe4': {
+					buffer.take<ItemFilter::Config>();
+					return "<ItemFilter::Config>";
+				}
+
+				case '\xe5':
+					return std::format("FloatGene<{}>", float(buffer.take<FloatGene>()));
+
+				case '\xe6':
+					return std::format("LongGene<{}>", int64_t(buffer.take<LongGene>()));
+
+				case '\xe7':
+					return std::format("CircularGene<{}>", float(buffer.take<CircularGene>()));
+
+				case '\xe8':
+					return std::format("StringGene<{}>", std::string(buffer.take<StringGene>()));
+
+				case '\xe9':
+					return std::string(buffer.take<Position>());
 			}
 
 			return {};

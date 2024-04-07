@@ -15,7 +15,6 @@
 
 namespace Game3 {
 	class Agent;
-	class Buffer;
 	struct CraftingRecipe;
 
 	/** Inventories should be locked appropriately (see HasMutex) when something is calling Inventory methods. The Inventory will not lock itself. */

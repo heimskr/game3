@@ -208,6 +208,8 @@ namespace Game3 {
 	void TileEntity::handleMessage(const std::shared_ptr<Agent> &, const std::string &name, std::any &data) {
 		if (name == "GetName") {
 			data = Buffer{getName()};
+		} else if (name == "GetGID") {
+			data = Buffer{getGID()};
 		}
 	}
 
