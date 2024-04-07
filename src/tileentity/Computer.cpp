@@ -245,7 +245,6 @@ namespace Game3 {
 		}
 
 		player->send(OpenModuleForAgentPacket(ComputerModule::ID(), getGID()));
-		// addObserver(player, true);
 
 		return false;
 	}

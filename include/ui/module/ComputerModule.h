@@ -33,5 +33,7 @@ namespace Game3 {
 			VteTerminal *vte = nullptr;
 			Gtk::Entry entry;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
+
+			void runScript(const std::string &);
 	};
 }

@@ -9,6 +9,7 @@
 #include "ui/module/ComputerModule.h"
 #include "ui/tab/InventoryTab.h"
 #include "ui/MainWindow.h"
+#include "util/FS.h"
 
 namespace Game3 {
 	ComputerModule::ComputerModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
@@ -29,6 +30,36 @@ namespace Game3 {
 		entry.add_css_class("no-radius");
 		entry.add_css_class("monospace");
 
+		auto target = Gtk::DropTarget::create(G_TYPE_FILE, Gdk::DragAction::COPY);
+
+		target->signal_drop().connect([this](const Glib::ValueBase &base, double, double) {
+			if (base.gobj()->g_type != G_TYPE_FILE)
+				return false;
+
+			auto file = Glib::wrap(G_FILE(g_value_get_object(base.gobj())), true);
+			std::string path = file->get_path();
+			std::string javascript;
+
+			try {
+				javascript = readFile(path);
+			} catch (const std::exception &err) {
+				std::string message = std::format("Reading from {} failed: {}", path.c_str(), err.what());
+				ERROR_(message);
+				vte_terminal_feed(vte, "\e[31m", 5);
+				vte_terminal_feed(vte, message.data(), message.size());
+				vte_terminal_feed(vte, "\e[39m\r\n", 7);
+				return false;
+			}
+
+			vte_terminal_feed(vte, "\e[2m>\e[22m [", 12);
+			vte_terminal_feed(vte, path.data(), path.size());
+			vte_terminal_feed(vte, "]\r\n", 3);
+			runScript(javascript);
+			return true;
+		}, true);
+
+		terminal->add_controller(target);
+
 		vbox.set_expand(true);
 		vbox.append(*terminal);
 		vbox.append(entry);
@@ -42,7 +73,7 @@ namespace Game3 {
 				vte_terminal_feed(vte, "\e[2m>\e[22m ", 11);
 				vte_terminal_feed(vte, script.data(), script.size());
 				vte_terminal_feed(vte, "\r\n", 2);
-				game->getPlayer()->sendMessage(computer, "RunScript", ServerGame::generateRandomToken(), script);
+				runScript(script);
 				entry.set_text("");
 			}
 		});
@@ -96,5 +127,9 @@ namespace Game3 {
 		}
 
 		return {};
+	}
+
+	void ComputerModule::runScript(const std::string &script) {
+		game->getPlayer()->sendMessage(computer, "RunScript", ServerGame::generateRandomToken(), script);
 	}
 }
