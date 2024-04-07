@@ -24,7 +24,7 @@ namespace Game3 {
 			Computer(Identifier tile_id, Position);
 			Computer(Position);
 
-			ScriptEngine engine;
+			std::unique_ptr<ScriptEngine> engine;
 
 			/** Attempts to find a tile entity connected to the computer via a data cable. */
 			TileEntityPtr searchFor(GlobalID);

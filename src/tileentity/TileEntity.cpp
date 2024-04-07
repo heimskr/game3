@@ -210,6 +210,10 @@ namespace Game3 {
 			data = Buffer{getName()};
 		} else if (name == "GetGID") {
 			data = Buffer{getGID()};
+		} else if (name == "Encode") {
+			Buffer buffer;
+			encode(*getGame(), buffer);
+			data = std::move(buffer);
 		}
 	}
 

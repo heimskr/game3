@@ -12,22 +12,26 @@
 #include <cassert>
 #include <sstream>
 
+
 namespace Game3 {
 	std::atomic_bool ScriptEngine::initialized = false;
 	std::unique_ptr<v8::Platform> ScriptEngine::platform;
 	v8::Isolate::CreateParams ScriptEngine::createParams;
 
-	ScriptEngine::ScriptEngine():
+	ScriptEngine::ScriptEngine(std::shared_ptr<BufferContext> buffer_context):
+		bufferContext(std::move(buffer_context)),
 		isolate(makeIsolate()),
 		bufferTemplate(makeBufferTemplate()),
 		globalContext(makeContext()) {}
 
-	ScriptEngine::ScriptEngine(FunctionAdder function_adder):
+	ScriptEngine::ScriptEngine(std::shared_ptr<BufferContext> buffer_context, FunctionAdder function_adder):
+		bufferContext(std::move(buffer_context)),
 		isolate(makeIsolate()),
 		bufferTemplate(makeBufferTemplate()),
 		globalContext(makeContext(std::move(function_adder))) {}
 
-	ScriptEngine::ScriptEngine(GlobalMutator global_mutator):
+	ScriptEngine::ScriptEngine(std::shared_ptr<BufferContext> buffer_context, GlobalMutator global_mutator):
+		bufferContext(std::move(buffer_context)),
 		isolate(makeIsolate()),
 		bufferTemplate(makeBufferTemplate()),
 		globalContext(makeContext(std::move(global_mutator))) {}
@@ -270,6 +274,16 @@ namespace Game3 {
 			engine.print(ss.str());
 		}, v8::External::New(isolate, this)));
 
+		global->Set(isolate, "gc", v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
+			auto &engine = *reinterpret_cast<ScriptEngine *>(info.Data().As<v8::Value>().As<v8::External>()->Value());
+			auto *isolate = engine.getIsolate();
+			int64_t bytes = 100'000'000;
+			if (info.Length() == 1 && info[0]->IsNumber())
+				bytes = int64_t(info[0].As<v8::Number>()->Value());
+			isolate->AdjustAmountOfExternalAllocatedMemory(bytes);
+			info.GetReturnValue().Set(v8::BigInt::New(isolate, bytes));
+		}, v8::External::New(isolate, this)));
+
 		global->Set(isolate, "Buffer", getBufferTemplate());
 
 		if (global_mutator)
@@ -299,7 +313,9 @@ namespace Game3 {
 		v8::Local<v8::FunctionTemplate> templ = v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
 			auto &engine = getExternal<ScriptEngine>(info);
 			v8::Local<v8::Object> this_obj = info.This();
-			ObjectWrap<Buffer>::make()->wrap(engine.getIsolate(), "Buffer", this_obj);
+			auto *wrapper = ObjectWrap<Buffer>::make();
+			wrapper->wrap(engine.getIsolate(), "Buffer", this_obj);
+			wrapper->object->context = engine.bufferContext;
 		}, wrap(this));
 
 		v8::Local<v8::ObjectTemplate> instance = templ->InstanceTemplate();
@@ -307,7 +323,7 @@ namespace Game3 {
 		instance->SetInternalFieldCount(2);
 
 		instance->Set(isolate, "add", v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
-			auto &wrapper = ObjectWrap<Buffer>::unwrap(info.This());
+			auto &wrapper = ObjectWrap<Buffer>::unwrap("Buffer", info.This());
 
 			if (info.Length() < 1) {
 				info.GetIsolate()->ThrowError("No type specified");
@@ -326,21 +342,21 @@ namespace Game3 {
 		}, wrap(this)));
 
 		instance->Set(isolate, "debug", v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
-			auto &wrapper = ObjectWrap<Buffer>::unwrap(info.This());
+			auto &wrapper = ObjectWrap<Buffer>::unwrap("Buffer", info.This());
 			assert(wrapper.object);
 			wrapper->debug();
 			info.GetReturnValue().Set(info.This());
 		}));
 
 		instance->Set(isolate, "clear", v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
-			auto &wrapper = ObjectWrap<Buffer>::unwrap(info.This());
+			auto &wrapper = ObjectWrap<Buffer>::unwrap("Buffer", info.This());
 			assert(wrapper.object);
 			wrapper->clear();
 			info.GetReturnValue().Set(info.This());
 		}));
 
 		instance->Set(isolate, "toJSON", v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
-			auto &wrapper = ObjectWrap<Buffer>::unwrap(info.This());
+			auto &wrapper = ObjectWrap<Buffer>::unwrap("Buffer", info.This());
 			assert(wrapper.object);
 
 			nlohmann::json json = wrapper.object->popAllJSON();
@@ -359,7 +375,7 @@ namespace Game3 {
 		}, wrap(this)));
 
 		instance->SetAccessor(string("length"), [](v8::Local<v8::Name>, const v8::PropertyCallbackInfo<v8::Value> &info) {
-			auto &wrapper = ObjectWrap<Buffer>::unwrap(info.This());
+			auto &wrapper = ObjectWrap<Buffer>::unwrap("Buffer", info.This());
 			size_t size = wrapper->size();
 			if (size <= UINT32_MAX)
 				info.GetReturnValue().Set(uint32_t(size));

@@ -21,9 +21,12 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#include "Log.h"
+
 #include <v8.h>
 
 #include <cassert>
+#include <csignal>
 #include <memory>
 
 namespace Game3 {
@@ -47,9 +50,10 @@ namespace Game3 {
 				return new ObjectWrap<T>(std::make_shared<T>(std::forward<Args>(args)...));
 			}
 
-			static inline ObjectWrap<T> & unwrap(v8::Handle<v8::Object> handle) {
+			static inline ObjectWrap<T> & unwrap(const char *internal_name, v8::Handle<v8::Object> handle) {
 				assert(!handle.IsEmpty());
 				assert(handle->InternalFieldCount() > 1);
+				assert(0 == strcmp(internal_name, *v8::String::Utf8Value(handle->GetIsolate(), handle->GetInternalField(0).As<v8::Value>())));
 				void *ptr = handle->GetAlignedPointerFromInternalField(1);
 				return *static_cast<ObjectWrap<T> *>(ptr);
 			}
@@ -68,10 +72,6 @@ namespace Game3 {
 				return object.get();
 			}
 
-			inline v8::Local<v8::Object> handle(v8::Isolate *isolate) {
-				return v8::Local<v8::Object>::New(isolate, persistent);
-			}
-
 			inline v8::Persistent<v8::Object> & getPersistent() {
 				return persistent;
 			}
@@ -88,7 +88,7 @@ namespace Game3 {
 		protected:
 			int refs = 0;
 
-			inline void makeWeak(void) {
+			inline void makeWeak() {
 				persistent.SetWeak(this, weakCallback, v8::WeakCallbackType::kParameter);
 			}
 

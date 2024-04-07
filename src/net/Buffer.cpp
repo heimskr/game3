@@ -434,14 +434,11 @@ namespace Game3 {
 					return out;
 				}
 
-				case '\xe0': {
-					return std::format("ItemStack<{}>", std::string(*buffer.take<ItemStackPtr>()));
-				}
+				case '\xe0':
+					return *buffer.take<ItemStackPtr>();
 
-				case '\xe1': {
-					buffer.take<ServerInventory>();
-					return "<Inventory>";
-				}
+				case '\xe1':
+					return buffer.take<ServerInventory>();
 
 				case '\xe2':
 					return std::format("FluidStack<{}>", std::string(buffer.take<FluidStack>()));
@@ -457,19 +454,19 @@ namespace Game3 {
 				}
 
 				case '\xe5':
-					return std::format("FloatGene<{}>", float(buffer.take<FloatGene>()));
+					return buffer.take<FloatGene>();
 
 				case '\xe6':
-					return std::format("LongGene<{}>", int64_t(buffer.take<LongGene>()));
+					return buffer.take<LongGene>();
 
 				case '\xe7':
-					return std::format("CircularGene<{}>", float(buffer.take<CircularGene>()));
+					return buffer.take<CircularGene>();
 
 				case '\xe8':
-					return std::format("StringGene<{}>", std::string(buffer.take<StringGene>()));
+					return buffer.take<StringGene>();
 
 				case '\xe9':
-					return std::string(buffer.take<Position>());
+					return buffer.take<Position>();
 			}
 
 			return {};

@@ -7,7 +7,7 @@
 
 namespace Game3 {
 	void scriptEngineTest1() {
-		ScriptEngine engine;
+		ScriptEngine engine(nullptr);
 
 		auto result = engine.execute(R"(
 			print(foo.count(1, 2, 3));
@@ -55,7 +55,7 @@ namespace Game3 {
 
 	/** A demonstration of how not to use V8. */
 	void scriptEngineTest2() {
-		ScriptEngine engine;
+		ScriptEngine engine(nullptr);
 
 		std::vector<std::thread> threads;
 

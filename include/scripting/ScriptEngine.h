@@ -14,6 +14,7 @@
 
 namespace Game3 {
 	class Buffer;
+	class BufferContext;
 
 	class ScriptEngine {
 		public:
@@ -34,6 +35,7 @@ namespace Game3 {
 			GlobalMutator savedMutator{};
 
 		public:
+			std::weak_ptr<BufferContext> bufferContext;
 			std::function<void(std::string_view)> onPrint = [](std::string_view text) { std::cout << text; };
 
 			struct Value;
@@ -48,9 +50,9 @@ namespace Game3 {
 					value(std::forward<T>(v)) {}
 			};
 
-			ScriptEngine();
-			ScriptEngine(FunctionAdder);
-			ScriptEngine(GlobalMutator);
+			ScriptEngine(std::shared_ptr<BufferContext>);
+			ScriptEngine(std::shared_ptr<BufferContext>, FunctionAdder);
+			ScriptEngine(std::shared_ptr<BufferContext>, GlobalMutator);
 
 			std::optional<v8::Local<v8::Value>> execute(const std::string &javascript, bool can_throw = true, const std::function<void(v8::Local<v8::Context>)> &context_mutator = {});
 			std::string string(v8::Local<v8::Value>);

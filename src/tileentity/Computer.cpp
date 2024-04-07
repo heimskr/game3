@@ -19,6 +19,8 @@ namespace Game3 {
 
 	void Computer::init(Game &game) {
 		TileEntity::init(game);
+
+		engine = std::make_unique<ScriptEngine>(game.shared_from_this());
 	}
 
 	namespace {
@@ -120,7 +122,9 @@ namespace Game3 {
 				sendMessage(source, "ModuleMessage", ComputerModule::ID(), "ScriptPrint", token, text);
 			};
 
-			std::swap(print, engine.onPrint);
+			assert(engine);
+
+			std::swap(print, engine->onPrint);
 
 			try {
 				using Context = struct {
@@ -128,11 +132,11 @@ namespace Game3 {
 					ScriptEngine *engine;
 				};
 
-				Context context{std::static_pointer_cast<Computer>(getSelf()), &engine};
+				Context context{std::static_pointer_cast<Computer>(getSelf()), engine.get()};
 
-				auto result = engine.execute(javascript, true, [&](v8::Local<v8::Context> script_context) {
-					v8::Local<v8::Object> foo = engine.object({
-						{"findAll", engine.makeValue(+[](const v8::FunctionCallbackInfo<v8::Value> &info) {
+				auto result = engine->execute(javascript, true, [&](v8::Local<v8::Context> script_context) {
+					v8::Local<v8::Object> foo = engine->object({
+						{"findAll", engine->makeValue(+[](const v8::FunctionCallbackInfo<v8::Value> &info) {
 							auto &context = getExternal<Context>(info);
 							ComputerPtr computer = context.computer;
 							ScriptEngine &engine = *context.engine;
@@ -154,9 +158,9 @@ namespace Game3 {
 							});
 
 							info.GetReturnValue().Set(found);
-						}, engine.wrap(&context))},
+						}, engine->wrap(&context))},
 
-						{"tell", engine.makeValue(+[](const v8::FunctionCallbackInfo<v8::Value> &info) {
+						{"tell", engine->makeValue(+[](const v8::FunctionCallbackInfo<v8::Value> &info) {
 							auto &context = getExternal<Context>(info);
 							ScriptEngine &engine = *context.engine;
 
@@ -205,7 +209,7 @@ namespace Game3 {
 									return;
 								}
 
-								buffer = *ObjectWrap<Buffer>::unwrap(object).object;
+								buffer = *ObjectWrap<Buffer>::unwrap("Buffer", object).object;
 							}
 
 							std::any any(std::move(buffer));
@@ -214,25 +218,27 @@ namespace Game3 {
 							if (Buffer *new_buffer = std::any_cast<Buffer>(&any)) {
 								v8::Local<v8::Object> retval;
 								if (engine.getBufferTemplate()->GetFunction(script_context).ToLocalChecked()->NewInstance(script_context).ToLocal(&retval)) {
-									ObjectWrap<Buffer>::make(std::move(*new_buffer))->wrap(engine.getIsolate(), "Buffer", retval);
+									auto *wrapper = ObjectWrap<Buffer>::make(std::move(*new_buffer));
+									wrapper->object->context = context.computer->getGame();
+									wrapper->wrap(engine.getIsolate(), "Buffer", retval);
 									info.GetReturnValue().Set(retval);
 								} else {
 									info.GetReturnValue().SetNull();
 								}
 							}
-						}, engine.wrap(&context))},
+						}, engine->wrap(&context))},
 					});
 
-					script_context->Global()->Set(script_context, engine.string("g3"), foo).Check();
+					script_context->Global()->Set(script_context, engine->string("g3"), foo).Check();
 				});
 
 				if (result)
-					sendMessage(source, "ModuleMessage", ComputerModule::ID(), "ScriptResult", token, engine.string(result.value()));
+					sendMessage(source, "ModuleMessage", ComputerModule::ID(), "ScriptResult", token, engine->string(result.value()));
 			} catch (const ScriptError &err) {
 				sendMessage(source, "ModuleMessage", ComputerModule::ID(), "ScriptError", token, err.what(), err.line, err.column);
 			}
 
-			std::swap(print, engine.onPrint);
+			std::swap(print, engine->onPrint);
 
 		} else if (name == "Echo") {
 
