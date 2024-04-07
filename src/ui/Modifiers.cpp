@@ -55,8 +55,8 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const Modifiers &) {
-		return getType(uint8_t{});
+	std::string Buffer::getType(const Modifiers &, bool) {
+		return getType(uint8_t{}, false);
 	}
 
 	template <>
@@ -69,12 +69,12 @@ namespace Game3 {
 	}
 
 	Buffer & operator<<(Buffer &buffer, const Modifiers &modifiers) {
-		return buffer.appendType(modifiers) += modifiers;
+		return buffer.appendType(modifiers, false) += modifiers;
 	}
 
 	Buffer & operator>>(Buffer &buffer, Modifiers &modifiers) {
 		const auto type = buffer.popType();
-		if (!buffer.typesMatch(type, buffer.getType(modifiers))) {
+		if (!buffer.typesMatch(type, buffer.getType(modifiers, false))) {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected Modifiers = u8)");
 		}

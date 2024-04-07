@@ -141,9 +141,15 @@ namespace Game3 {
 							RealmPtr realm = computer->getRealm();
 							uint32_t index = 0;
 
+							std::unordered_set<GlobalID> gids;
+
 							visitNetworks(computer->getPlace(), [&](DataNetworkPtr network) {
 								visitNetwork(network, [&](const TileEntityPtr &member)  {
-									found->Set(engine.getContext(), index++, v8::BigInt::New(engine.getIsolate(), static_cast<int64_t>(member->getGID()))).Check();
+									GlobalID gid = member->getGID();
+									if (!gids.contains(gid)) {
+										found->Set(engine.getContext(), index++, v8::BigInt::New(engine.getIsolate(), static_cast<int64_t>(gid))).Check();
+										gids.insert(gid);
+									}
 								});
 							});
 
@@ -187,7 +193,12 @@ namespace Game3 {
 
 								v8::Local<v8::Object> object = maybe_object.ToLocalChecked();
 
-								const bool is_buffer = object->InternalFieldCount() == 2 && std::string_view(reinterpret_cast<const char *>(object->GetAlignedPointerFromInternalField(0))) == "Buffer";
+								bool is_buffer = false;
+
+								if (object->InternalFieldCount() == 2) {
+									v8::Local<v8::Data> internal = object->GetInternalField(0);
+									is_buffer = internal->IsValue() && engine.string(internal.As<v8::Value>()) == "Buffer";
+								}
 
 								if (!is_buffer) {
 									engine.getIsolate()->ThrowError("Third argument isn't a Buffer object");

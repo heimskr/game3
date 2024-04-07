@@ -22,56 +22,59 @@ namespace Game3 {
 		return *this;
 	}
 
-	template <> std::string Buffer::getType<bool>    (const bool &)     { return {'\x01'}; }
-	template <> std::string Buffer::getType<uint8_t> (const uint8_t &)  { return {'\x01'}; }
-	template <> std::string Buffer::getType<uint16_t>(const uint16_t &) { return {'\x02'}; }
-	template <> std::string Buffer::getType<uint32_t>(const uint32_t &) { return {'\x03'}; }
-	template <> std::string Buffer::getType<uint64_t>(const uint64_t &) { return {'\x04'}; }
-	template <> std::string Buffer::getType<char>    (const char &)     { return {'\x05'}; }
-	template <> std::string Buffer::getType<int8_t>  (const int8_t &)   { return {'\x05'}; }
-	template <> std::string Buffer::getType<int16_t> (const int16_t &)  { return {'\x06'}; }
-	template <> std::string Buffer::getType<int32_t> (const int32_t &)  { return {'\x07'}; }
-	template <> std::string Buffer::getType<int64_t> (const int64_t &)  { return {'\x08'}; }
-	template <> std::string Buffer::getType<float>   (const float &)    { return {'\x09'}; }
-	template <> std::string Buffer::getType<double>  (const double &)   { return {'\x0a'}; }
-	template <> std::string Buffer::getType<std::nullopt_t>(const std::nullopt_t &) { return {'\x0c'}; }
+	template <> std::string Buffer::getType<bool>    (const bool     &, bool) { return {'\x01'}; }
+	template <> std::string Buffer::getType<uint8_t> (const uint8_t  &, bool) { return {'\x01'}; }
+	template <> std::string Buffer::getType<uint16_t>(const uint16_t &, bool) { return {'\x02'}; }
+	template <> std::string Buffer::getType<uint32_t>(const uint32_t &, bool) { return {'\x03'}; }
+	template <> std::string Buffer::getType<uint64_t>(const uint64_t &, bool) { return {'\x04'}; }
+	template <> std::string Buffer::getType<char>    (const char     &, bool) { return {'\x05'}; }
+	template <> std::string Buffer::getType<int8_t>  (const int8_t   &, bool) { return {'\x05'}; }
+	template <> std::string Buffer::getType<int16_t> (const int16_t  &, bool) { return {'\x06'}; }
+	template <> std::string Buffer::getType<int32_t> (const int32_t  &, bool) { return {'\x07'}; }
+	template <> std::string Buffer::getType<int64_t> (const int64_t  &, bool) { return {'\x08'}; }
+	template <> std::string Buffer::getType<float>   (const float    &, bool) { return {'\x09'}; }
+	template <> std::string Buffer::getType<double>  (const double   &, bool) { return {'\x0a'}; }
+	template <> std::string Buffer::getType<std::nullopt_t>(const std::nullopt_t &, bool in_container) { assert(!in_container); return {'\x0c'}; }
 
-	template <> Buffer & Buffer::appendType<bool>    (const bool     &) { return *this += '\x01'; }
-	template <> Buffer & Buffer::appendType<uint8_t> (const uint8_t  &) { return *this += '\x01'; }
-	template <> Buffer & Buffer::appendType<uint16_t>(const uint16_t &) { return *this += '\x02'; }
-	template <> Buffer & Buffer::appendType<uint32_t>(const uint32_t &) { return *this += '\x03'; }
-	template <> Buffer & Buffer::appendType<uint64_t>(const uint64_t &) { return *this += '\x04'; }
-	template <> Buffer & Buffer::appendType<char>    (const char     &) { return *this += '\x05'; }
-	template <> Buffer & Buffer::appendType<int8_t>  (const int8_t   &) { return *this += '\x05'; }
-	template <> Buffer & Buffer::appendType<int16_t> (const int16_t  &) { return *this += '\x06'; }
-	template <> Buffer & Buffer::appendType<int32_t> (const int32_t  &) { return *this += '\x07'; }
-	template <> Buffer & Buffer::appendType<int64_t> (const int64_t  &) { return *this += '\x08'; }
-	template <> Buffer & Buffer::appendType<float>   (const float    &) { return *this += '\x09'; }
-	template <> Buffer & Buffer::appendType<double>  (const double   &) { return *this += '\x0a'; }
-	template <> Buffer & Buffer::appendType<std::nullopt_t>(const std::nullopt_t &) { return *this += '\x0c'; }
+	template <> Buffer & Buffer::appendType<bool>    (const bool     &, bool) { return *this += '\x01'; }
+	template <> Buffer & Buffer::appendType<uint8_t> (const uint8_t  &, bool) { return *this += '\x01'; }
+	template <> Buffer & Buffer::appendType<uint16_t>(const uint16_t &, bool) { return *this += '\x02'; }
+	template <> Buffer & Buffer::appendType<uint32_t>(const uint32_t &, bool) { return *this += '\x03'; }
+	template <> Buffer & Buffer::appendType<uint64_t>(const uint64_t &, bool) { return *this += '\x04'; }
+	template <> Buffer & Buffer::appendType<char>    (const char     &, bool) { return *this += '\x05'; }
+	template <> Buffer & Buffer::appendType<int8_t>  (const int8_t   &, bool) { return *this += '\x05'; }
+	template <> Buffer & Buffer::appendType<int16_t> (const int16_t  &, bool) { return *this += '\x06'; }
+	template <> Buffer & Buffer::appendType<int32_t> (const int32_t  &, bool) { return *this += '\x07'; }
+	template <> Buffer & Buffer::appendType<int64_t> (const int64_t  &, bool) { return *this += '\x08'; }
+	template <> Buffer & Buffer::appendType<float>   (const float    &, bool) { return *this += '\x09'; }
+	template <> Buffer & Buffer::appendType<double>  (const double   &, bool) { return *this += '\x0a'; }
+	template <> Buffer & Buffer::appendType<std::nullopt_t>(const std::nullopt_t &, bool in_container) { assert(!in_container); return *this += '\x0c'; }
 
 	template <>
-	std::string Buffer::getType<std::string_view>(const std::string_view &string) {
-		const auto size = string.size();
+	std::string Buffer::getType<std::string_view>(const std::string_view &string, bool in_container) {
+		if (!in_container) {
+			const auto size = string.size();
 
-		if (size == 0)
-			return {'\x10'};
+			if (size == 0)
+				return {'\x10'};
 
-		if (size < 0xf)
-			return {static_cast<char>('\x10' + size)};
+			if (size < 0xf)
+				return {static_cast<char>('\x10' + size)};
 
-		assert(size <= UINT32_MAX);
+			assert(size <= UINT32_MAX);
+		}
+
 		return {'\x1f'};
 	}
 
 	template <>
-	std::string Buffer::getType<std::string>(const std::string &string) {
-		return getType(std::string_view(string));
+	std::string Buffer::getType<std::string>(const std::string &string, bool in_container) {
+		return getType(std::string_view(string), in_container);
 	}
 
 	template <>
-	std::string Buffer::getType<nlohmann::json>(const nlohmann::json &) {
-		return getType(std::string());
+	std::string Buffer::getType<nlohmann::json>(const nlohmann::json &, bool in_container) {
+		return getType(std::string{}, in_container);
 	}
 
 	template<>
@@ -144,7 +147,7 @@ namespace Game3 {
 
 	template<>
 	Buffer & Buffer::operator+=(std::string_view string) {
-		const auto type = getType(string);
+		const auto type = getType(string, false);
 		bytes.insert(bytes.end(), type.begin(), type.end());
 		const auto first = type[0];
 
@@ -223,13 +226,28 @@ namespace Game3 {
 
 	std::string Buffer::popType() {
 		const char first = popBuffer<char>(*this);
-		if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first <= '\x1f') || ('\xe0' <= first && first <= '\xe8'))
+		if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first <= '\x1f') || ('\xe0' <= first && first <= '\xe9'))
 			return {first};
 		if (first == '\x20' || ('\x30' <= first && first <= '\x3f'))
 			return first + popType();
 		if (first == '\x21') {
 			std::string key_type = popType();
 			std::string value_type = popType();
+			return first + std::move(key_type) + std::move(value_type);
+		}
+		debug();
+		throw std::invalid_argument("Invalid type byte: " + hexString(std::string_view(&first, 1), true));
+	}
+
+	std::string Buffer::peekType(size_t to_skip) {
+		const char first = peek<char>(to_skip);
+		if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first <= '\x1f') || ('\xe0' <= first && first <= '\xe9'))
+			return {first};
+		if (first == '\x20' || ('\x30' <= first && first <= '\x3f'))
+			return first + peekType(to_skip + 1);
+		if (first == '\x21') {
+			std::string key_type = peekType(to_skip + 1);
+			std::string value_type = peekType(to_skip + 1 + key_type.size());
 			return first + std::move(key_type) + std::move(value_type);
 		}
 		debug();
@@ -265,48 +283,152 @@ namespace Game3 {
 			INFO("Buffer: \e[2m{}\e[22m {}", hexString(std::span(bytes.begin(), bytes.begin() + skip), true), hexString(std::span(bytes.begin() + skip, bytes.end()), true));
 	}
 
+	namespace {
+		nlohmann::json popJSON(Buffer &buffer, const std::string &type, bool in_container) {
+			assert(!type.empty());
+
+			if (in_container) {
+				switch (type[0]) {
+					case '\x01': return popBuffer<uint8_t>(buffer);
+					case '\x02': return popBuffer<uint16_t>(buffer);
+					case '\x03': return popBuffer<uint32_t>(buffer);
+					case '\x04': return popBuffer<uint64_t>(buffer);
+					case '\x05': return popBuffer<int8_t>(buffer);
+					case '\x06': return popBuffer<int16_t>(buffer);
+					case '\x07': return popBuffer<int32_t>(buffer);
+					case '\x08': return popBuffer<int64_t>(buffer);
+					case '\x09': return popBuffer<float>(buffer);
+					case '\x0a': return popBuffer<double>(buffer);
+					// case '\x0b': return popJSON(
+				}
+			} else {
+				switch (type[0]) {
+					case '\x01': return buffer.take<uint8_t>();
+					case '\x02': return buffer.take<uint16_t>();
+					case '\x03': return buffer.take<uint32_t>();
+					case '\x04': return buffer.take<uint64_t>();
+					case '\x05': return buffer.take<int8_t>();
+					case '\x06': return buffer.take<int16_t>();
+					case '\x07': return buffer.take<int32_t>();
+					case '\x08': return buffer.take<int64_t>();
+					case '\x09': return buffer.take<float>();
+					case '\x0a': return buffer.take<double>();
+					case '\x0b': ++buffer.skip; return buffer.popJSON();
+					case '\x0c': return nullptr;
+
+					case '\x10': case '\x11': case '\x12': case '\x13': case '\x14': case '\x15': case '\x16': case '\x17':
+					case '\x18': case '\x19': case '\x1a': case '\x1b': case '\x1c': case '\x1d': case '\x1e': case '\x1f':
+						return buffer.take<std::string>();
+
+					case '\x20': {
+						++buffer.skip;
+						std::string type = buffer.peekType(0);
+						buffer.skip += type.size();
+						const uint32_t length = popBuffer<uint32_t>(buffer);
+						nlohmann::json out;
+						for (uint32_t i = 0; i < length; ++i)
+							out.push_back(popJSON(buffer, type, true));
+						return true;
+					}
+
+					case '\x21': {
+						++buffer.skip;
+						std::string key_type = buffer.peekType(0);
+						buffer.skip += key_type.size();
+						std::string value_type = buffer.peekType(0);
+						buffer.skip += value_type.size();
+						const uint32_t length = popBuffer<uint32_t>(buffer);
+						nlohmann::json out;
+						for (uint32_t i = 0; i < length; ++i) {
+							nlohmann::json key = popJSON(buffer, key_type, true);
+							nlohmann::json value = popJSON(buffer, value_type, true);
+							out[std::move(key)] = std::move(value);
+						}
+						return out;
+					}
+				}
+			}
+
+			return {};
+		}
+	}
+
+	nlohmann::json Buffer::popJSON() {
+		return Game3::popJSON(*this, peekType(0), false);
+	}
+
+	nlohmann::json Buffer::popAllJSON() {
+		nlohmann::json out;
+		while (!empty())
+			out.push_back(popJSON());
+		return out;
+	}
+
+	template <>
+	bool Buffer::peek<bool>(size_t to_skip) const {
+		return static_cast<bool>(peek<char>(to_skip));
+	}
+
+	template <>
+	float Buffer::peek<float>(size_t to_skip) const {
+		static_assert(sizeof(float) == sizeof(uint32_t));
+		const auto raw = peek<uint32_t>(to_skip);
+		float out{};
+		std::memcpy(&out, &raw, sizeof(out));
+		return out;
+	}
+
+	template <>
+	double Buffer::peek<double>(size_t to_skip) const {
+		static_assert(sizeof(double) == sizeof(uint64_t));
+		const auto raw = peek<uint64_t>(to_skip);
+		double out{};
+		std::memcpy(&out, &raw, sizeof(out));
+		return out;
+	}
+
 	Buffer & Buffer::operator<<(bool item) {
-		return appendType(item) += item;
+		return appendType(item, false) += item;
 	}
 
 	Buffer & Buffer::operator<<(uint8_t item) {
-		return appendType(item) += item;
+		return appendType(item, false) += item;
 	}
 
 	Buffer & Buffer::operator<<(uint16_t item) {
-		return appendType(item) += item;
+		return appendType(item, false) += item;
 	}
 
 	Buffer & Buffer::operator<<(uint32_t item) {
-		return appendType(item) += item;
+		return appendType(item, false) += item;
 	}
 
 	Buffer & Buffer::operator<<(uint64_t item) {
-		return appendType(item) += item;
+		return appendType(item, false) += item;
 	}
 
 	Buffer & Buffer::operator<<(int8_t item) {
-		return appendType(item) += static_cast<uint8_t>(item);
+		return appendType(item, false) += static_cast<uint8_t>(item);
 	}
 
 	Buffer & Buffer::operator<<(int16_t item) {
-		return appendType(item) += static_cast<uint16_t>(item);
+		return appendType(item, false) += static_cast<uint16_t>(item);
 	}
 
 	Buffer & Buffer::operator<<(int32_t item) {
-		return appendType(item) += static_cast<uint32_t>(item);
+		return appendType(item, false) += static_cast<uint32_t>(item);
 	}
 
 	Buffer & Buffer::operator<<(int64_t item) {
-		return appendType(item) += static_cast<uint64_t>(item);
+		return appendType(item, false) += static_cast<uint64_t>(item);
 	}
 
 	Buffer & Buffer::operator<<(float item) {
-		return appendType(item) += item;
+		return appendType(item, false) += item;
 	}
 
 	Buffer & Buffer::operator<<(double item) {
-		return appendType(item) += item;
+		return appendType(item, false) += item;
 	}
 
 	Buffer & Buffer::operator<<(std::string_view string) {

@@ -386,7 +386,7 @@ namespace Game3 {
 
 		if (type == "optional") {
 			if (values.empty() || (values.size() == 1 && values[0]->IsNullOrUndefined())) {
-				buffer.appendType(std::nullopt);
+				buffer.appendType(std::nullopt, false);
 				return;
 			}
 
@@ -550,35 +550,35 @@ namespace Game3 {
 			throw std::invalid_argument("Can't stringify invalid type");
 
 		if (type == "i8")
-			return Buffer{}.getType(int8_t{});
+			return Buffer{}.getType(int8_t{}, false);
 		if (type == "i16")
-			return Buffer{}.getType(int16_t{});
+			return Buffer{}.getType(int16_t{}, false);
 		if (type == "i32")
-			return Buffer{}.getType(int32_t{});
+			return Buffer{}.getType(int32_t{}, false);
 		if (type == "i64")
-			return Buffer{}.getType(int64_t{});
+			return Buffer{}.getType(int64_t{}, false);
 		if (type == "u8")
-			return Buffer{}.getType(uint8_t{});
+			return Buffer{}.getType(uint8_t{}, false);
 		if (type == "u16")
-			return Buffer{}.getType(uint16_t{});
+			return Buffer{}.getType(uint16_t{}, false);
 		if (type == "u32")
-			return Buffer{}.getType(uint32_t{});
+			return Buffer{}.getType(uint32_t{}, false);
 		if (type == "u64")
-			return Buffer{}.getType(uint64_t{});
+			return Buffer{}.getType(uint64_t{}, false);
 		if (type == "f32")
-			return Buffer{}.getType(float{});
+			return Buffer{}.getType(float{}, false);
 		if (type == "f64")
-			return Buffer{}.getType(double{});
+			return Buffer{}.getType(double{}, false);
 
 		if (type == "string")
-			return is_subtype? "\x1f" : Buffer{}.getType(string(value));
+			return is_subtype? "\x1f" : Buffer{}.getType(string(value), false);
 
 		if (type == "list")
 			return '\x20' + getBufferType(describeType(primary), value, true); // TODO!: check whether using `value` is valid here
 
 		if (type == "optional") {
 			if (!is_subtype && value->IsNullOrUndefined())
-				return Buffer{}.getType(std::nullopt);
+				return Buffer{}.getType(std::nullopt, false);
 			return '\x0b' + getBufferType(describeType(primary), value, true); // TODO!: check whether using `value` is valid here
 		}
 

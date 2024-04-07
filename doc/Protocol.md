@@ -463,6 +463,7 @@ All values are little endian. Strings are not null-terminated.
 | `0xe6`                           | LongGene                     |
 | `0xe7`                           | CircularGene                 |
 | `0xe8`                           | StringGene                   |
+| `0xe9`                           | Position                     |
 
 Note that string types are always encoded as `0x1f` when used as a subtype of a list or a map, and optional types are always encoded as `0x0b` followed by the subtype in the same scenario.
 

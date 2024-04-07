@@ -131,6 +131,16 @@ namespace Game3 {
 		std::cout << popped32i << '\n';
 	}
 
+	void testBuffer2() {
+		std::vector<std::optional<uint16_t>> u16{100, std::nullopt, 1000, std::nullopt, std::nullopt, 65535, std::nullopt};
+		INFO_("list<optional<u16>>:");
+		Buffer{u16}.debug();
+
+		std::vector<std::optional<Position>> pos{Position{10, 20}, std::nullopt};
+		INFO_("list<optional<Position>>:");
+		Buffer{pos}.debug();
+	}
+
 	void testIteration() {
 		Timer::clear();
 

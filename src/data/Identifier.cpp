@@ -86,8 +86,10 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType<Identifier>(const Identifier &) {
-		return getType(std::string{});
+	std::string Buffer::getType<Identifier>(const Identifier &identifier, bool in_container) {
+		if (in_container)
+			return getType(std::string{}, true);
+		return getType(identifier.str(), false);
 	}
 
 	Buffer & operator+=(Buffer &buffer, const Identifier &identifier) {

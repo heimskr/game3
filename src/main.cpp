@@ -31,6 +31,7 @@
 
 namespace Game3 {
 	void test();
+	void testBuffer2();
 	void splitter();
 	void omniOptOut();
 	void filterTest();
@@ -211,6 +212,11 @@ int main(int argc, char **argv) {
 
 		if (arg1 == "--script-test") {
 			Game3::scriptEngineTest();
+			return 0;
+		}
+
+		if (arg1 == "--buffer-test-2") {
+			Game3::testBuffer2();
 			return 0;
 		}
 

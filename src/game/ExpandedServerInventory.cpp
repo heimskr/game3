@@ -78,7 +78,7 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const ExpandedServerInventory &) {
+	std::string Buffer::getType(const ExpandedServerInventory &, bool) {
 		return "\xe1";
 	}
 

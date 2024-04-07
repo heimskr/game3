@@ -62,12 +62,12 @@ namespace Game3 {
 // Buffer specializations
 
 	template <>
-	std::string Buffer::getType(const FluidTile &) {
-		return getType(FluidInt{});
+	std::string Buffer::getType(const FluidTile &, bool) {
+		return getType(FluidInt{}, false);
 	}
 
 	template <>
-	std::string Buffer::getType(const FluidStack &) {
+	std::string Buffer::getType(const FluidStack &, bool) {
 		return {'\xe2'};
 	}
 
@@ -97,7 +97,7 @@ namespace Game3 {
 	}
 
 	Buffer & operator+=(Buffer &buffer, const FluidStack &fluid_stack) {
-		buffer.appendType(fluid_stack);
+		buffer.appendType(fluid_stack, false);
 		buffer << fluid_stack.id;
 		buffer << fluid_stack.amount;
 		return buffer;
@@ -109,7 +109,7 @@ namespace Game3 {
 
 	Buffer & operator>>(Buffer &buffer, FluidStack &fluid_stack) {
 		const auto type = buffer.popType();
-		if (!Buffer::typesMatch(type, buffer.getType(fluid_stack))) {
+		if (!Buffer::typesMatch(type, buffer.getType(fluid_stack, false))) {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected FluidStack)");
 		}

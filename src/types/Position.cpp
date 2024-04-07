@@ -199,16 +199,29 @@ namespace Game3 {
 		position.column = json.at(1);
 	}
 
+	template <>
+	std::string Buffer::getType(const Position &, bool) {
+		return std::string{'\xe9'};
+	}
+
 	Buffer & operator+=(Buffer &buffer, const Position &position) {
+		buffer.appendType(position, false);
 		return (buffer += position.row) += position.column;
 	}
 
 	Buffer & operator<<(Buffer &buffer, const Position &position) {
-		return buffer << position.row << position.column;
+		return buffer += position;
 	}
 
 	Buffer & operator>>(Buffer &buffer, Position &position) {
-		return buffer >> position.row >> position.column;
+		const auto type = buffer.popType();
+		if (!Buffer::typesMatch(type, buffer.getType(position, false))) {
+			buffer.debug();
+			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected e9 for Position)");
+		}
+		position.row = popBuffer<Position::IntType>(buffer);
+		position.column = popBuffer<Position::IntType>(buffer);
+		return buffer;
 	}
 
 	double Vector3::magnitude() const {
@@ -246,12 +259,12 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const Vector3 &) {
-		return std::string{'\x32'} + getType(float{});
+	std::string Buffer::getType(const Vector3 &, bool) {
+		return std::string{'\x32'} + getType(float{}, false);
 	}
 
 	Buffer & operator+=(Buffer &buffer, const Vector3 &vector) {
-		return ((buffer.appendType(vector) += vector.x) += vector.y) += vector.z;
+		return ((buffer.appendType(vector, false) += vector.x) += vector.y) += vector.z;
 	}
 
 	Buffer & operator<<(Buffer &buffer, const Vector3 &vector) {
@@ -260,7 +273,7 @@ namespace Game3 {
 
 	Buffer & operator>>(Buffer &buffer, Vector3 &vector) {
 		const auto type = buffer.popType();
-		if (!Buffer::typesMatch(type, buffer.getType(vector))) {
+		if (!Buffer::typesMatch(type, buffer.getType(vector, false))) {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected shortlist<f32, 3> for Vector3)");
 		}
@@ -271,12 +284,12 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const Vector2f &) {
-		return std::string{'\x31'} + getType(float{});
+	std::string Buffer::getType(const Vector2f &, bool) {
+		return std::string{'\x31'} + getType(float{}, false);
 	}
 
 	Buffer & operator+=(Buffer &buffer, const Vector2f &vector) {
-		return (buffer.appendType(vector) += vector.x) += vector.y;
+		return (buffer.appendType(vector, false) += vector.x) += vector.y;
 	}
 
 	Buffer & operator<<(Buffer &buffer, const Vector2f &vector) {
@@ -285,7 +298,7 @@ namespace Game3 {
 
 	Buffer & operator>>(Buffer &buffer, Vector2f &vector) {
 		const auto type = buffer.popType();
-		if (!Buffer::typesMatch(type, buffer.getType(vector))) {
+		if (!Buffer::typesMatch(type, buffer.getType(vector, false))) {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected shortlist<f32, 2> for Vector2f)");
 		}
@@ -295,12 +308,12 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const Vector2i &) {
-		return std::string{'\x31'} + getType(int32_t{});
+	std::string Buffer::getType(const Vector2i &, bool) {
+		return std::string{'\x31'} + getType(int32_t{}, false);
 	}
 
 	Buffer & operator+=(Buffer &buffer, const Vector2i &vector) {
-		return (buffer.appendType(vector) += vector.x) += vector.y;
+		return (buffer.appendType(vector, false) += vector.x) += vector.y;
 	}
 
 	Buffer & operator<<(Buffer &buffer, const Vector2i &vector) {
@@ -309,7 +322,7 @@ namespace Game3 {
 
 	Buffer & operator>>(Buffer &buffer, Vector2i &vector) {
 		const auto type = buffer.popType();
-		if (!Buffer::typesMatch(type, buffer.getType(vector))) {
+		if (!Buffer::typesMatch(type, buffer.getType(vector, false))) {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected shortlist<i32, 2> for Vector2i)");
 		}

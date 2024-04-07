@@ -9,6 +9,7 @@ namespace Game3 {
 			case Substance::Item:   return registry[ItemPipeItem::ID()];
 			case Substance::Fluid:  return registry[FluidPipeItem::ID()];
 			case Substance::Energy: return registry[EnergyPipeItem::ID()];
+			case Substance::Data:   return registry[DataPipeItem::ID()];
 			default:
 				throw std::invalid_argument("Unknown Substance: " + std::to_string(int(pipe_type)));
 		}

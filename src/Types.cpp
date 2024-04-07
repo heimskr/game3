@@ -13,12 +13,12 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const Color &) {
-		return std::string{'\x33'} + getType(float{});
+	std::string Buffer::getType(const Color &, bool) {
+		return std::string{'\x33'} + getType(float{}, false);
 	}
 
 	Buffer & operator+=(Buffer &buffer, const Color &color) {
-		return (((buffer.appendType(color) += color.red) += color.green) += color.blue) += color.alpha;
+		return (((buffer.appendType(color, false) += color.red) += color.green) += color.blue) += color.alpha;
 	}
 
 	Buffer & operator<<(Buffer &buffer, const Color &color) {
@@ -27,7 +27,7 @@ namespace Game3 {
 
 	Buffer & operator>>(Buffer &buffer, Color &color) {
 		const auto type = buffer.popType();
-		if (!Buffer::typesMatch(type, buffer.getType(color))) {
+		if (!Buffer::typesMatch(type, buffer.getType(color, false))) {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected shortlist<f32, 4> for Color)");
 		}

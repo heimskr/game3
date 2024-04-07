@@ -66,6 +66,12 @@ namespace Game3 {
 			if (source)
 				sendMessage(source, "ModuleMessage", CombinerModule::ID(), "TargetSet", success, new_target);
 
+		} else if (name == "GetInventory") {
+
+			Buffer buffer;
+			HasInventory::encode(buffer, 0);
+			data = std::any(std::move(buffer));
+
 		} else {
 			TileEntity::handleMessage(source, name, data);
 		}

@@ -54,37 +54,48 @@ namespace Game3 {
 			}
 
 			template <typename T>
-			Buffer & appendType(const T &t) {
-				const auto type = getType(t);
+			Buffer & appendType(const T &t, bool in_container) {
+				const auto type = getType(t, in_container);
 				bytes.insert(bytes.end(), type.begin(), type.end());
 				return *this;
 			}
 
 			/* See doc/Protocol.md for a list of standard types. */
 			template <typename T>
-			std::string getType(const T &);
+			std::string getType(const T &, bool in_container);
 
 			template <Map M>
-			std::string getType(const M &) {
+			std::string getType(const M &, bool in_container) {
+				(void) in_container;
 				// Inelegant how it requires an instance of the type as an argument.
-				return '\x21' + getType(typename M::key_type()) + getType(typename M::mapped_type());
+				return '\x21' + getType(typename M::key_type(), true) + getType(typename M::mapped_type(), true);
 			}
 
 			template <LinearOrSet T>
-			std::string getType(const T &) {
+			std::string getType(const T &, bool in_container) {
+				(void) in_container;
 				// Same here.
-				return '\x20' + getType(typename T::value_type());
+				return '\x20' + getType(typename T::value_type(), true);
 			}
 
 			template <typename T>
 			requires std::is_enum_v<T>
-			std::string getType(const T &) {
-				return getType(std::underlying_type_t<T>());
+			std::string getType(const T &, bool in_container) {
+				return getType(std::underlying_type_t<T>(), in_container);
 			}
 
 			template <typename T>
-			std::string getType(const std::optional<T> &item) {
+			std::string getType(const std::optional<T> &item, bool in_container) {
+				if (in_container)
+					return "\x0b" + getType(T(), true);
 				return item.has_value()? "\x0b" : "\x0c";
+			}
+
+			template <typename T>
+			std::string getType(const std::shared_ptr<T> &item, bool in_container) {
+				if (!item)
+					return getType(T(), in_container);
+				return getType(*item, in_container);
 			}
 
 			Buffer & operator+=(std::same_as<bool> auto);
@@ -142,10 +153,35 @@ namespace Game3 {
 			}
 
 			std::string popType();
+			std::string peekType(size_t to_skip = 0);
 
 			template <typename T1, typename T2>
 			inline T2 popConv() {
 				return static_cast<T2>(popBuffer<T1>(*this));
+			}
+
+			template <typename T>
+			T peek(size_t to_skip) const;
+
+			template <std::integral T>
+			T peek(size_t to_skip) const {
+				std::span span = getSpan().subspan(to_skip);
+
+				if (span.size_bytes() < sizeof(T)) {
+					ERROR("Buffer size: {:L}", bytes.size());
+					ERROR("Skip: {:L}", skip);
+					ERROR("Span size: {:L}", span.size());
+					ERROR("Span size_bytes: {:L}", span.size_bytes());
+					ERROR("sizeof({}): {}", DEMANGLE(T), sizeof(T));
+					throw std::out_of_range("Buffer is too empty");
+				}
+
+				T out{};
+				std::memmove(reinterpret_cast<char *>(&out), span.data(), sizeof(T));
+
+				if constexpr (std::endian::native == std::endian::big)
+					return swapBytes(out);
+				return out;
 			}
 
 			static bool typesMatch(std::string_view, std::string_view);
@@ -195,6 +231,9 @@ namespace Game3 {
 			void limitTo(size_t);
 			void debug() const;
 
+			nlohmann::json popJSON();
+			nlohmann::json popAllJSON();
+
 			Buffer & operator<<(bool);
 			Buffer & operator<<(uint8_t);
 			Buffer & operator<<(uint16_t);
@@ -213,19 +252,19 @@ namespace Game3 {
 
 			template <LinearOrSet T>
 			Buffer & operator<<(const T &container) {
-				return appendType(container) += container;
+				return appendType(container, false) += container;
 			}
 
 			template <Map M>
 			Buffer & operator<<(const M &map) {
-				return appendType(map) += map;
+				return appendType(map, false) += map;
 			}
 
 			template <typename T>
 			requires std::is_enum_v<T>
 			Buffer & operator<<(T item) {
 				using underlying = std::underlying_type_t<T>;
-				return appendType(underlying{}) += static_cast<underlying>(item);
+				return appendType(underlying{}, false) += static_cast<underlying>(item);
 			}
 
 			template <typename T>
@@ -246,9 +285,9 @@ namespace Game3 {
 			template <LinearOrSet T>
 			Buffer & operator>>(T &out) {
 				const auto type = popType();
-				if (!typesMatch(type, getType(T()))) {
+				if (!typesMatch(type, getType(T(), false))) {
 					debug();
-					throw std::invalid_argument("Invalid type in buffer (expected list: " + hexString(getType(T()), true) + "): " + hexString(type, true));
+					throw std::invalid_argument("Invalid type in buffer (expected list: " + hexString(getType(T(), false), true) + "): " + hexString(type, true));
 				}
 				out = popBuffer<T>(*this);
 				return *this;
@@ -257,9 +296,9 @@ namespace Game3 {
 			template <Map M>
 			Buffer & operator>>(M &out) {
 				const auto type = popType();
-				if (!typesMatch(type, getType(M()))) {
+				if (!typesMatch(type, getType(M(), false))) {
 					debug();
-					throw std::invalid_argument("Invalid type in buffer (expected map: " + hexString(getType(M()), true) + "): " + hexString(type, true));
+					throw std::invalid_argument("Invalid type in buffer (expected map: " + hexString(getType(M(), false), true) + "): " + hexString(type, true));
 				}
 				out = popBuffer<M>(*this);
 				return *this;
@@ -268,9 +307,9 @@ namespace Game3 {
 			template <Numeric T>
 			Buffer & operator>>(T &out) {
 				const auto type = popType();
-				if (!typesMatch(type, getType(T()))) {
+				if (!typesMatch(type, getType(T(), false))) {
 					debug();
-					throw std::invalid_argument("Invalid type in buffer (expected integral: " + hexString(getType(T()), true) + "): " + hexString(type, true));
+					throw std::invalid_argument("Invalid type in buffer (expected integral: " + hexString(getType(T(), false), true) + "): " + hexString(type, true));
 				}
 				out = popBuffer<T>(*this);
 				return *this;
@@ -288,8 +327,8 @@ namespace Game3 {
 			template <typename T>
 			Buffer & operator>>(std::optional<T> &out) {
 				const auto type = popType();
-				if (!typesMatch(type, getType(std::optional<T>())))
-					throw std::invalid_argument("Invalid type in buffer (expected optional<" + DEMANGLE(T) + ">: " + hexString(getType(std::make_optional<T>()), true) + "): " + hexString(type, true));
+				if (!typesMatch(type, getType(std::optional<T>(), false)))
+					throw std::invalid_argument("Invalid type in buffer (expected optional<" + DEMANGLE(T) + ">: " + hexString(getType(std::make_optional<T>(), false), true) + "): " + hexString(type, true));
 				if (type == "\x0c")
 					out = std::nullopt;
 				else
@@ -300,8 +339,8 @@ namespace Game3 {
 			template <typename T>
 			Buffer & operator>>(std::shared_ptr<T> &out) {
 				const auto type = popType();
-				if (!typesMatch(type, getType(std::optional<T>())))
-					throw std::invalid_argument("Invalid type in buffer (expected optional<" + DEMANGLE(T) + ">: " + hexString(getType(std::make_optional<T>()), true) + "): " + hexString(type, true));
+				if (!typesMatch(type, getType(std::optional<T>(), false)))
+					throw std::invalid_argument("Invalid type in buffer (expected optional<" + DEMANGLE(T) + ">: " + hexString(getType(std::optional<T>(), true), true) + "): " + hexString(type, true));
 				if (type == "\x0c") {
 					out = {};
 				} else {

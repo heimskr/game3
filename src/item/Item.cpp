@@ -291,7 +291,12 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const ItemStackPtr &) {
+	std::string Buffer::getType(const ItemStack &, bool) {
+		return {'\xe0'};
+	}
+
+	template <>
+	std::string Buffer::getType(const ItemStackPtr &, bool) {
 		return {'\xe0'};
 	}
 
@@ -307,7 +312,7 @@ namespace Game3 {
 
 	Buffer & operator+=(Buffer &buffer, const ItemStackPtr &stack) {
 		assert(stack->item);
-		buffer.appendType(stack);
+		buffer.appendType(stack, false);
 		buffer << stack->item->identifier;
 		buffer << stack->count;
 		buffer << stack->data.dump(); // TODO: Buffer::operator+= for json
@@ -326,7 +331,7 @@ namespace Game3 {
 		}
 
 		const auto type = buffer.popType();
-		if (!Buffer::typesMatch(type, buffer.getType(stack))) {
+		if (!Buffer::typesMatch(type, buffer.getType(stack, false))) {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected ItemStack)");
 		}

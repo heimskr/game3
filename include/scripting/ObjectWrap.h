@@ -79,7 +79,7 @@ namespace Game3 {
 			inline void wrap(v8::Isolate *isolate, const char *internal_name, v8::Handle<v8::Object> handle) {
 				assert(persistent.IsEmpty());
 				assert(handle->InternalFieldCount() > 1);
-				handle->SetAlignedPointerInInternalField(0, const_cast<void *>(reinterpret_cast<const void *>(internal_name)));
+				handle->SetInternalField(0, v8::String::NewFromUtf8(isolate, internal_name).ToLocalChecked());
 				handle->SetAlignedPointerInInternalField(1, this);
 				persistent.Reset(isolate, handle);
 				makeWeak();

@@ -248,12 +248,12 @@ namespace Game3 {
 // Buffer methods
 
 	template <>
-	std::string Buffer::getType(const FloatGene &) {
+	std::string Buffer::getType(const FloatGene &, bool) {
 		return std::string{'\xe5'};
 	}
 
 	Buffer & operator+=(Buffer &buffer, const FloatGene &gene) {
-		buffer.appendType(gene);
+		buffer.appendType(gene, false);
 		gene.encode(buffer);
 		return buffer;
 	}
@@ -264,7 +264,7 @@ namespace Game3 {
 
 	Buffer & operator>>(Buffer &buffer, FloatGene &gene) {
 		const auto type = buffer.popType();
-		if (!Buffer::typesMatch(type, buffer.getType(gene))) {
+		if (!Buffer::typesMatch(type, buffer.getType(gene, false))) {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected e5 for FloatGene)");
 		}
@@ -273,12 +273,12 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const LongGene &) {
+	std::string Buffer::getType(const LongGene &, bool) {
 		return std::string{'\xe6'};
 	}
 
 	Buffer & operator+=(Buffer &buffer, const LongGene &gene) {
-		buffer.appendType(gene);
+		buffer.appendType(gene, false);
 		gene.encode(buffer);
 		return buffer;
 	}
@@ -289,7 +289,7 @@ namespace Game3 {
 
 	Buffer & operator>>(Buffer &buffer, LongGene &gene) {
 		const auto type = buffer.popType();
-		if (!Buffer::typesMatch(type, buffer.getType(gene))) {
+		if (!Buffer::typesMatch(type, buffer.getType(gene, false))) {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected e6 for LongGene)");
 		}
@@ -298,12 +298,12 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const CircularGene &) {
+	std::string Buffer::getType(const CircularGene &, bool) {
 		return std::string{'\xe7'};
 	}
 
 	Buffer & operator+=(Buffer &buffer, const CircularGene &gene) {
-		buffer.appendType(gene);
+		buffer.appendType(gene, false);
 		gene.encode(buffer);
 		return buffer;
 	}
@@ -314,7 +314,7 @@ namespace Game3 {
 
 	Buffer & operator>>(Buffer &buffer, CircularGene &gene) {
 		const auto type = buffer.popType();
-		if (!Buffer::typesMatch(type, buffer.getType(gene))) {
+		if (!Buffer::typesMatch(type, buffer.getType(gene, false))) {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected e7 for CircularGene)");
 		}
@@ -323,12 +323,12 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const StringGene &) {
+	std::string Buffer::getType(const StringGene &, bool) {
 		return std::string{'\xe8'};
 	}
 
 	Buffer & operator+=(Buffer &buffer, const StringGene &gene) {
-		buffer.appendType(gene);
+		buffer.appendType(gene, false);
 		gene.encode(buffer);
 		return buffer;
 	}
@@ -339,7 +339,7 @@ namespace Game3 {
 
 	Buffer & operator>>(Buffer &buffer, StringGene &gene) {
 		const auto type = buffer.popType();
-		if (!Buffer::typesMatch(type, buffer.getType(gene))) {
+		if (!Buffer::typesMatch(type, buffer.getType(gene, false))) {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected e8 for StringGene)");
 		}

@@ -131,12 +131,12 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const ClientInventory &) {
+	std::string Buffer::getType(const ClientInventory &, bool) {
 		return "\xe1";
 	}
 
 	Buffer & operator+=(Buffer &buffer, const ClientInventory &inventory) {
-		buffer.appendType(inventory);
+		buffer.appendType(inventory, false);
 		if (auto locked = inventory.weakOwner.lock())
 			buffer += locked->getGID();
 		else
@@ -158,7 +158,7 @@ namespace Game3 {
 
 	Buffer & operator>>(Buffer &buffer, ClientInventory &inventory) {
 		const auto type = buffer.popType();
-		if (!buffer.typesMatch(type, buffer.getType(inventory))) {
+		if (!buffer.typesMatch(type, buffer.getType(inventory, false))) {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected inventory)");
 		}

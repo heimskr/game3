@@ -96,7 +96,7 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const ItemFilter::Config &) {
+	std::string Buffer::getType(const ItemFilter::Config &, bool) {
 		return {'\xe4'};
 	}
 
@@ -112,13 +112,13 @@ namespace Game3 {
 	}
 
 	Buffer & operator<<(Buffer &buffer, const ItemFilter::Config &config) {
-		buffer.appendType(config);
+		buffer.appendType(config, false);
 		return buffer << config.data << config.comparator << config.count;
 	}
 
 	Buffer & operator>>(Buffer &buffer, ItemFilter::Config &config) {
 		const auto type = buffer.popType();
-		if (!Buffer::typesMatch(type, buffer.getType(config))) {
+		if (!Buffer::typesMatch(type, buffer.getType(config, false))) {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected ItemFilter::Config)");
 		}
@@ -126,7 +126,7 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const ItemFilter &) {
+	std::string Buffer::getType(const ItemFilter &, bool) {
 		return {'\xe3'};
 	}
 
@@ -135,13 +135,13 @@ namespace Game3 {
 	}
 
 	Buffer & operator<<(Buffer &buffer, const ItemFilter &filter) {
-		buffer.appendType(filter);
+		buffer.appendType(filter, false);
 		return buffer << filter.allowMode << filter.strict << filter.items << filter.configsByItem;
 	}
 
 	Buffer & operator>>(Buffer &buffer, ItemFilter &filter) {
 		const auto type = buffer.popType();
-		if (!Buffer::typesMatch(type, buffer.getType(filter))) {
+		if (!Buffer::typesMatch(type, buffer.getType(filter, false))) {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected ItemFilter)");
 		}

@@ -126,7 +126,7 @@ namespace Game3 {
 
 		}
 
-		return {};
+		return std::nullopt;
 	}
 
 	void ComputerModule::runScript(const std::string &script) {

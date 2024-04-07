@@ -170,6 +170,8 @@ namespace Game3 {
 			ItemStack(const std::shared_ptr<Game> &, const ItemID &, ItemCount, nlohmann::json data_);
 
 			void absorbGame(Game &);
+
+		friend class Buffer;
 	};
 
 	using ItemStackPtr = std::shared_ptr<ItemStack>;
