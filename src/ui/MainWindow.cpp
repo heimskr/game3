@@ -185,9 +185,9 @@ namespace Game3 {
 		glArea.set_focusable(true);
 
 		auto key_controller = Gtk::EventControllerKey::create();
-		key_controller->signal_key_pressed().connect(sigc::mem_fun(*this, &MainWindow::onKeyPressed), false);
+		key_controller->signal_key_pressed().connect(sigc::mem_fun(*this, &MainWindow::onKeyPressed), true);
 		key_controller->signal_key_released().connect(sigc::mem_fun(*this, &MainWindow::onKeyReleased));
-		glArea.add_controller(key_controller);
+		add_controller(key_controller);
 
 		auto drag = Gtk::GestureDrag::create();
 		drag->set_button(2);
@@ -660,10 +660,14 @@ namespace Game3 {
 
 	void MainWindow::addYield(Gtk::Widget &widget) {
 		auto controller = Gtk::EventControllerKey::create();
-		controller->signal_key_released().connect([this](guint keyval, guint, Gdk::ModifierType) {
-			if (keyval == GDK_KEY_Escape)
+		controller->signal_key_pressed().connect([this](guint keyval, guint, Gdk::ModifierType) {
+			if (keyval == GDK_KEY_Escape) {
 				game->getWindow().yieldFocus();
-		});
+				return true;
+			}
+
+			return false;
+		}, false);
 		widget.add_controller(controller);
 	}
 
@@ -730,12 +734,16 @@ namespace Game3 {
 	}
 
 	bool MainWindow::onKeyPressed(guint keyval, guint keycode, Gdk::ModifierType modifiers) {
+		if (dynamic_cast<Gtk::Text *>(get_focus()))
+			return false;
+
 		if (!keyTimes.contains(keyval)) {
 			handleKey(keyval, keycode, modifiers);
 			if (unsigned(modifiers & Gdk::ModifierType::CONTROL_MASK) == 0)
 				keyTimes.emplace(keyval, KeyInfo{keycode, modifiers, getTime()});
 		} else
 			keyTimes.at(keyval).modifiers = modifiers;
+
 		return true;
 	}
 
