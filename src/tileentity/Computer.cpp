@@ -51,6 +51,17 @@ namespace Game3 {
 				info.GetReturnValue().Set(v8::BigInt::New(info.GetIsolate(), locked->getRealm()->getID()));
 			}
 		});
+
+		instance->SetAccessor(engine->string("name"), [](v8::Local<v8::Name>, const v8::PropertyCallbackInfo<v8::Value> &info) {
+			auto &wrapper = WeakObjectWrap<TileEntity>::unwrap("TileEntity", info.This());
+			auto locked = wrapper.object.lock();
+			if (!locked) {
+				info.GetReturnValue().SetNull();
+			} else {
+				std::string name = locked->getName();
+				info.GetReturnValue().Set(v8::String::NewFromUtf8(info.GetIsolate(), name.c_str(), v8::NewStringType::kNormal, name.size()).ToLocalChecked());
+			}
+		});
 	}
 
 	namespace {
