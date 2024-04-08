@@ -306,6 +306,34 @@ namespace Game3 {
 		}));
 	}
 
+	namespace {
+		void toObject(Buffer &buffer, const v8::FunctionCallbackInfo<v8::Value> &info) {
+			try {
+				nlohmann::json json;
+
+				if (info.Length() >= 1 && info[0]->IsString() && 0 == strcmp("all", *v8::String::Utf8Value(info.GetIsolate(), info[0]))) {
+					json = buffer.popAllJSON();
+				} else {
+					json = buffer.popJSON();
+				}
+
+				auto &engine = getExternal<ScriptEngine>(info);
+
+				try {
+					if (auto result = engine.execute(json.dump()))
+						info.GetReturnValue().Set(result.value());
+					else
+						info.GetReturnValue().SetUndefined();
+					return;
+				} catch (const std::exception &err) {
+					info.GetReturnValue().SetUndefined();
+				}
+			} catch (const std::exception &err) {
+				info.GetIsolate()->ThrowError(v8::String::NewFromUtf8(info.GetIsolate(), err.what()).ToLocalChecked());
+			}
+		}
+	}
+
 	v8::Global<v8::FunctionTemplate> ScriptEngine::makeBufferTemplate() {
 		v8::Locker locker(isolate);
 		v8::Isolate::Scope isolate_scope(isolate);
@@ -356,23 +384,31 @@ namespace Game3 {
 			info.GetReturnValue().Set(info.This());
 		}));
 
-		instance->Set(isolate, "toJSON", v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
+		instance->Set(isolate, "copy", v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
 			auto &wrapper = ObjectWrap<Buffer>::unwrap("Buffer", info.This());
 			assert(wrapper.object);
 
-			nlohmann::json json = wrapper.object->popAllJSON();
-
 			auto &engine = getExternal<ScriptEngine>(info);
+			v8::Local<v8::Context> context = engine.getContext();
+			v8::Local<v8::Object> new_buffer = engine.getBufferTemplate()->GetFunction(context).ToLocalChecked()->CallAsConstructor(context, 0, nullptr).ToLocalChecked().As<v8::Object>();
 
-			try {
-				if (auto result = engine.execute(json.dump()))
-					info.GetReturnValue().Set(result.value());
-				else
-					info.GetReturnValue().SetUndefined();
-				return;
-			} catch (const std::exception &err) {
-				info.GetReturnValue().SetUndefined();
-			}
+			auto &new_wrapper = ObjectWrap<Buffer>::unwrap("Buffer", new_buffer);
+			*new_wrapper.object = *wrapper.object;
+
+			info.GetReturnValue().Set(new_buffer);
+		}, wrap(this)));
+
+		instance->Set(isolate, "getObject", v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
+			auto &wrapper = ObjectWrap<Buffer>::unwrap("Buffer", info.This());
+			assert(wrapper.object);
+			toObject(*wrapper.object, info);
+		}, wrap(this)));
+
+		instance->Set(isolate, "toObject", v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
+			auto &wrapper = ObjectWrap<Buffer>::unwrap("Buffer", info.This());
+			assert(wrapper.object);
+			Buffer copy(*wrapper.object);
+			toObject(copy, info);
 		}, wrap(this)));
 
 		instance->SetAccessor(string("length"), [](v8::Local<v8::Name>, const v8::PropertyCallbackInfo<v8::Value> &info) {
