@@ -3,9 +3,17 @@
 #include "scripting/ScriptEngine.h"
 #include "tileentity/TileEntity.h"
 
+#include <v8.h>
+
 namespace Game3 {
 	class Computer: public TileEntity {
 		public:
+			struct Context {
+				std::weak_ptr<Computer> computer;
+			};
+
+			std::shared_ptr<Context> context;
+
 			static Identifier ID() { return {"base", "te/computer"}; }
 
 			std::string getName() const override { return "Computer"; }
@@ -20,14 +28,17 @@ namespace Game3 {
 			void decode(Game &, Buffer &) override;
 
 		private:
+			std::unique_ptr<ScriptEngine> engine;
+			v8::Global<v8::FunctionTemplate> tileEntityTemplate;
+
 			Computer() = default;
 			Computer(Identifier tile_id, Position);
 			Computer(Position);
 
-			std::unique_ptr<ScriptEngine> engine;
-
 			/** Attempts to find a tile entity connected to the computer via a data cable. */
 			TileEntityPtr searchFor(GlobalID);
+
+			v8::Global<v8::FunctionTemplate> makeTileEntityTemplate(v8::Isolate *);
 
 		friend class TileEntity;
 	};

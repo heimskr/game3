@@ -14,12 +14,12 @@
 
 namespace Game3 {
 	class Buffer;
-	class BufferContext;
+	class Game;
 
 	class ScriptEngine {
 		public:
 			using FunctionAdder = std::function<void(std::function<void(const std::string &, v8::FunctionCallback)>)>;
-			using GlobalMutator = std::function<void(v8::Local<v8::ObjectTemplate>)>;
+			using GlobalMutator = std::function<void(v8::Isolate *, v8::Local<v8::ObjectTemplate>)>;
 
 			struct Type {
 				virtual ~Type() = default;
@@ -35,7 +35,7 @@ namespace Game3 {
 			GlobalMutator savedMutator{};
 
 		public:
-			std::weak_ptr<BufferContext> bufferContext;
+			std::weak_ptr<Game> game;
 			std::function<void(std::string_view)> onPrint = [](std::string_view text) { std::cout << text; };
 
 			struct Value;
@@ -50,9 +50,9 @@ namespace Game3 {
 					value(std::forward<T>(v)) {}
 			};
 
-			ScriptEngine(std::shared_ptr<BufferContext>);
-			ScriptEngine(std::shared_ptr<BufferContext>, FunctionAdder);
-			ScriptEngine(std::shared_ptr<BufferContext>, GlobalMutator);
+			ScriptEngine(std::shared_ptr<Game>);
+			ScriptEngine(std::shared_ptr<Game>, FunctionAdder);
+			ScriptEngine(std::shared_ptr<Game>, GlobalMutator);
 
 			std::optional<v8::Local<v8::Value>> execute(const std::string &javascript, bool can_throw = true, const std::function<void(v8::Local<v8::Context>)> &context_mutator = {});
 			std::string string(v8::Local<v8::Value>);
@@ -99,6 +99,7 @@ namespace Game3 {
 			v8::Global<v8::Context> makeContext(FunctionAdder);
 
 			v8::Global<v8::FunctionTemplate> makeBufferTemplate();
+
 			void addToBuffer(Buffer &, const TypeDescription &, std::span<v8::Local<v8::Value>> values, bool in_container = false);
 			TypeDescription describeType(v8::Local<v8::Value>);
 			std::string getBufferType(const TypeDescription &, v8::Local<v8::Value> value, bool is_subtype = false);

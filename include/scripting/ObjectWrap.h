@@ -123,10 +123,107 @@ namespace Game3 {
 		private:
 			v8::Persistent<v8::Object> persistent;
 
-			static void weakCallback(const v8::WeakCallbackInfo<ObjectWrap> &data) {
+			static void weakCallback(const v8::WeakCallbackInfo<ObjectWrap<T>> &data) {
 				v8::Isolate *isolate = data.GetIsolate();
 				v8::HandleScope scope(isolate);
-				ObjectWrap *wrap = data.GetParameter();
+				ObjectWrap<T> *wrap = data.GetParameter();
+				assert(wrap->refs == 0);
+				wrap->persistent.Reset();
+				delete wrap;
+			}
+	};
+
+	template <typename T>
+	class WeakObjectWrap {
+		public:
+			std::weak_ptr<T> object;
+
+			WeakObjectWrap(std::shared_ptr<T> object_ = {}):
+				object(std::move(object_)) {}
+
+			virtual ~WeakObjectWrap() {
+				if (persistent.IsEmpty())
+					return;
+				persistent.ClearWeak();
+				persistent.Reset();
+			}
+
+			template <typename... Args>
+			static WeakObjectWrap<T> * make(std::weak_ptr<T> object_) {
+				return new WeakObjectWrap<T>(std::move(object_));
+			}
+
+			static inline WeakObjectWrap<T> & unwrap(const char *internal_name, v8::Handle<v8::Object> handle) {
+				assert(!handle.IsEmpty());
+				assert(handle->InternalFieldCount() > 1);
+				assert(0 == strcmp(internal_name, *v8::String::Utf8Value(handle->GetIsolate(), handle->GetInternalField(0).As<v8::Value>())));
+				void *ptr = handle->GetAlignedPointerFromInternalField(1);
+				return *static_cast<WeakObjectWrap<T> *>(ptr);
+			}
+
+			static inline std::weak_ptr<T> get(v8::Handle<v8::Object> handle) {
+				return unwrap(handle).object;
+			}
+
+			inline std::shared_ptr<T> lock() const {
+				return object.lock();
+			}
+
+			inline v8::Persistent<v8::Object> & getPersistent() {
+				return persistent;
+			}
+
+			inline void wrap(v8::Isolate *isolate, const char *internal_name, v8::Handle<v8::Object> handle) {
+				assert(persistent.IsEmpty());
+				assert(handle->InternalFieldCount() > 1);
+				handle->SetInternalField(0, v8::String::NewFromUtf8(isolate, internal_name).ToLocalChecked());
+				handle->SetAlignedPointerInInternalField(1, this);
+				persistent.Reset(isolate, handle);
+				makeWeak();
+			}
+
+		protected:
+			int refs = 0;
+
+			inline void makeWeak() {
+				persistent.SetWeak(this, weakCallback, v8::WeakCallbackType::kParameter);
+			}
+
+			/* Ref() marks the object as being attached to an event loop.
+			 * Refed objects will not be garbage collected, even if
+			 * all references are lost.
+			 */
+			void ref() {
+				assert(!persistent.IsEmpty());
+				persistent.ClearWeak();
+				++refs;
+			}
+
+			/* Unref() marks an object as detached from the event loop.  This is its
+			 * default state.  When an object with a "weak" reference changes from
+			 * attached to detached state it will be freed. Be careful not to access
+			 * the object after making this call as it might be gone!
+			 * (A "weak reference" means an object that only has a
+			 * persistent handle.)
+			 *
+			 * DO NOT CALL THIS FROM DESTRUCTOR
+			 */
+			void unref() {
+				assert(!persistent.IsEmpty());
+				assert(!persistent.IsWeak());
+				assert(refs > 0);
+
+				if (--refs == 0)
+					makeWeak();
+			}
+
+		private:
+			v8::Persistent<v8::Object> persistent;
+
+			static void weakCallback(const v8::WeakCallbackInfo<WeakObjectWrap<T>> &data) {
+				v8::Isolate *isolate = data.GetIsolate();
+				v8::HandleScope scope(isolate);
+				WeakObjectWrap<T> *wrap = data.GetParameter();
 				assert(wrap->refs == 0);
 				wrap->persistent.Reset();
 				delete wrap;

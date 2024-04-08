@@ -1,4 +1,5 @@
 #include "Log.h"
+#include "game/Game.h"
 #include "net/Buffer.h"
 #include "scripting/ObjectWrap.h"
 #include "scripting/ScriptEngine.h"
@@ -18,20 +19,20 @@ namespace Game3 {
 	std::unique_ptr<v8::Platform> ScriptEngine::platform;
 	v8::Isolate::CreateParams ScriptEngine::createParams;
 
-	ScriptEngine::ScriptEngine(std::shared_ptr<BufferContext> buffer_context):
-		bufferContext(std::move(buffer_context)),
+	ScriptEngine::ScriptEngine(std::shared_ptr<Game> game_):
+		game(std::move(game_)),
 		isolate(makeIsolate()),
 		bufferTemplate(makeBufferTemplate()),
 		globalContext(makeContext()) {}
 
-	ScriptEngine::ScriptEngine(std::shared_ptr<BufferContext> buffer_context, FunctionAdder function_adder):
-		bufferContext(std::move(buffer_context)),
+	ScriptEngine::ScriptEngine(std::shared_ptr<Game> game_, FunctionAdder function_adder):
+		game(std::move(game_)),
 		isolate(makeIsolate()),
 		bufferTemplate(makeBufferTemplate()),
 		globalContext(makeContext(std::move(function_adder))) {}
 
-	ScriptEngine::ScriptEngine(std::shared_ptr<BufferContext> buffer_context, GlobalMutator global_mutator):
-		bufferContext(std::move(buffer_context)),
+	ScriptEngine::ScriptEngine(std::shared_ptr<Game> game_, GlobalMutator global_mutator):
+		game(std::move(game_)),
 		isolate(makeIsolate()),
 		bufferTemplate(makeBufferTemplate()),
 		globalContext(makeContext(std::move(global_mutator))) {}
@@ -287,7 +288,7 @@ namespace Game3 {
 		global->Set(isolate, "Buffer", getBufferTemplate());
 
 		if (global_mutator)
-			global_mutator(global);
+			global_mutator(isolate, global);
 
 		savedMutator = std::move(global_mutator);
 
@@ -296,7 +297,7 @@ namespace Game3 {
 	}
 
 	v8::Global<v8::Context> ScriptEngine::makeContext(FunctionAdder function_adder) {
-		return makeContext(GlobalMutator([this, function_adder = std::move(function_adder)](v8::Local<v8::ObjectTemplate> global) {
+		return makeContext(GlobalMutator([this, function_adder = std::move(function_adder)](v8::Isolate *, v8::Local<v8::ObjectTemplate> global) {
 			if (function_adder) {
 				function_adder([&](const std::string &name, v8::FunctionCallback function) {
 					global->Set(isolate, name.c_str(), v8::FunctionTemplate::New(isolate, function));
@@ -315,7 +316,7 @@ namespace Game3 {
 			v8::Local<v8::Object> this_obj = info.This();
 			auto *wrapper = ObjectWrap<Buffer>::make();
 			wrapper->wrap(engine.getIsolate(), "Buffer", this_obj);
-			wrapper->object->context = engine.bufferContext;
+			wrapper->object->context = engine.game;
 		}, wrap(this));
 
 		v8::Local<v8::ObjectTemplate> instance = templ->InstanceTemplate();
