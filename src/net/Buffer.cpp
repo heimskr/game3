@@ -290,6 +290,28 @@ namespace Game3 {
 	}
 
 	namespace {
+		std::string stringifyKey(const nlohmann::json &json) {
+			if (json.is_string())
+				return json;
+
+			if (json.is_number_float())
+				return std::to_string(json.get<double>());
+
+			if (json.is_number_integer())
+				return std::to_string(json.get<int64_t>());
+
+			if (json.is_number_unsigned())
+				return std::to_string(json.get<uint64_t>());
+
+			if (json.is_null())
+				return "null";
+
+			if (json.is_boolean())
+				return json.get<bool>()? "true" : "false";
+
+			return json.dump();
+		}
+
 		std::string_view extractType(std::string_view type);
 
 		std::pair<std::string_view, std::string_view> extractMapTypes(std::string_view type) {
@@ -356,7 +378,7 @@ namespace Game3 {
 						nlohmann::json out;
 						for (uint32_t i = 0; i < length; ++i)
 							out.push_back(popJSON(buffer, type, true));
-						return true;
+						return out;
 					}
 
 					case '\x21': {
@@ -370,7 +392,10 @@ namespace Game3 {
 						for (uint32_t i = 0; i < length; ++i) {
 							nlohmann::json key = popJSON(buffer, key_type, true);
 							nlohmann::json value = popJSON(buffer, value_type, true);
-							out[std::move(key)] = std::move(value);
+							if (key.is_string())
+								out[std::move(key)] = std::move(value);
+							else
+								out[stringifyKey(key)] = std::move(value);
 						}
 						return out;
 					}
@@ -384,7 +409,7 @@ namespace Game3 {
 						nlohmann::json out;
 						for (uint32_t i = 0; i < length; ++i)
 							out.push_back(popJSON(buffer, type, true));
-						return true;
+						return out;
 					}
 				}
 			}
@@ -419,17 +444,21 @@ namespace Game3 {
 					std::string_view subtype = type.substr(1);
 					for (uint32_t i = 0; i < length; ++i)
 						out.push_back(popJSON(buffer, subtype, true));
-					return true;
+					return out;
 				}
 
 				case '\x21': {
 					auto [key_type, value_type] = extractMapTypes(type);
+					buffer.skip += type.size();
 					const uint32_t length = popBuffer<uint32_t>(buffer);
 					nlohmann::json out;
 					for (uint32_t i = 0; i < length; ++i) {
 						nlohmann::json key = popJSON(buffer, key_type, true);
 						nlohmann::json value = popJSON(buffer, value_type, true);
-						out[std::move(key)] = std::move(value);
+						if (key.is_string())
+							out[std::move(key)] = std::move(value);
+						else
+							out[stringifyKey(key)] = std::move(value);
 					}
 					return out;
 				}
