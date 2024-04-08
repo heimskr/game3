@@ -335,27 +335,27 @@ namespace Game3 {
 			Buffer buffer;
 
 			if (info.Length() == 2) {
-				v8::MaybeLocal<v8::Object> maybe_object = info[1]->ToObject(script_context);
-				if (maybe_object.IsEmpty()) {
-					engine.getIsolate()->ThrowError("Third argument isn't a Buffer object");
-					return;
+				if (info[1]->IsString()) {
+					buffer << engine.string(info[1]);
+				} else {
+					v8::MaybeLocal<v8::Object> maybe_object = info[1]->ToObject(script_context);
+					if (maybe_object.IsEmpty()) {
+						engine.getIsolate()->ThrowError("Third argument isn't a Buffer object");
+						return;
+					}
+
+					v8::Local<v8::Object> object = maybe_object.ToLocalChecked();
+
+					if (object->InternalFieldCount() == 2) {
+						v8::Local<v8::Data> internal = object->GetInternalField(0);
+						if (!internal->IsValue() || engine.string(internal.As<v8::Value>()) != "Buffer") {
+							engine.getIsolate()->ThrowError("Third argument isn't a Buffer object");
+							return;
+						}
+					}
+
+					buffer = *ObjectWrap<Buffer>::unwrap("Buffer", object).object;
 				}
-
-				v8::Local<v8::Object> object = maybe_object.ToLocalChecked();
-
-				bool is_buffer = false;
-
-				if (object->InternalFieldCount() == 2) {
-					v8::Local<v8::Data> internal = object->GetInternalField(0);
-					is_buffer = internal->IsValue() && engine.string(internal.As<v8::Value>()) == "Buffer";
-				}
-
-				if (!is_buffer) {
-					engine.getIsolate()->ThrowError("Third argument isn't a Buffer object");
-					return;
-				}
-
-				buffer = *ObjectWrap<Buffer>::unwrap("Buffer", object).object;
 			}
 
 			std::any any(std::move(buffer));
