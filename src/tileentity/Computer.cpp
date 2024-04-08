@@ -180,10 +180,19 @@ namespace Game3 {
 							v8::Local<v8::Context> engine_context = engine.getContext();
 							v8::Local<v8::Function> function = templ->GetFunction(engine_context).ToLocalChecked();
 
+							std::function<bool(const TileEntityPtr &)> filter;
+							if (info.Length() == 1 && info[0]->IsString()) {
+								filter = [name = engine.string(info[0])](const TileEntityPtr &tile_entity) {
+									return tile_entity->getName() == name;
+								};
+							} else {
+								filter = [](const TileEntityPtr &) { return true; };
+							}
+
 							visitNetworks(computer->getPlace(), [&](DataNetworkPtr network) {
 								visitNetwork(network, [&](const TileEntityPtr &member)  {
 									GlobalID gid = member->getGID();
-									if (!gids.contains(gid)) {
+									if (!gids.contains(gid) && filter(member)) {
 										v8::Local<v8::BigInt> gid_bigint = v8::BigInt::New(engine.getIsolate(), static_cast<int64_t>(gid));
 										v8::Local<v8::Value> argv[] {gid_bigint};
 										found->Set(engine.getContext(), index++, function->CallAsConstructor(engine_context, 1, argv).ToLocalChecked()).Check();
