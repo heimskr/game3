@@ -407,8 +407,9 @@ namespace Game3 {
 		instance->Set(isolate, "toObject", v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
 			auto &wrapper = ObjectWrap<Buffer>::unwrap("Buffer", info.This());
 			assert(wrapper.object);
-			Buffer copy(*wrapper.object);
-			toObject(copy, info);
+			const auto old_skip = wrapper.object->skip;
+			toObject(*wrapper.object, info);
+			wrapper.object->skip = old_skip;
 		}, wrap(this)));
 
 		instance->SetAccessor(string("length"), [](v8::Local<v8::Name>, const v8::PropertyCallbackInfo<v8::Value> &info) {
