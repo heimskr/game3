@@ -1,5 +1,6 @@
 #include "entity/Player.h"
 #include "game/ClientGame.h"
+#include "net/LocalClient.h"
 #include "packet/OpenModuleForAgentPacket.h"
 #include "pipes/DataNetwork.h"
 #include "realm/Realm.h"
@@ -219,8 +220,17 @@ namespace Game3 {
 					script_context->Global()->Set(script_context, engine->string("g3"), g3).Check();
 				});
 
-				if (result)
-					sendMessage(source, "ModuleMessage", ComputerModule::ID(), "ScriptResult", token, engine->string(result.value()));
+				if (result) {
+					std::string result_string = engine->string(result.value());
+
+					constexpr static size_t MAX_LENGTH = LocalClient::MAX_PACKET_SIZE - 512;
+					if (MAX_LENGTH < result_string.size()) {
+						result_string.erase(result_string.begin() + MAX_LENGTH, result_string.end());
+						result_string += "... (truncated)";
+					}
+
+					sendMessage(source, "ModuleMessage", ComputerModule::ID(), "ScriptResult", token, result_string);
+				}
 			} catch (const ScriptError &err) {
 				sendMessage(source, "ModuleMessage", ComputerModule::ID(), "ScriptError", token, err.what(), err.line, err.column);
 			}

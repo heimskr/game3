@@ -77,6 +77,18 @@ namespace Game3 {
 		v8::Isolate::Scope isolate_scope(isolate);
 		v8::HandleScope handle_scope(isolate);
 		v8::Context::Scope scope(getContext());
+
+		if (value->IsBigInt()) {
+			v8::Local<v8::BigInt> bigint = value.As<v8::BigInt>();
+			if (bigint->WordCount() > 20'000) {
+				// Somewhere around this point (2n ** 2000000n will sometimes do it, 2n ** 1500000n won't, but maybe not?),
+				// BigInt stringification segfaults on my setup.
+				// Something about v8::internal::GetDigits.
+				// Let's just return some fake value.
+				return "<comically large BigInt>";
+			}
+		}
+
 		return toCString(v8::String::Utf8Value(isolate, value));
 	}
 

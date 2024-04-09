@@ -22,7 +22,7 @@ namespace Game3 {
 
 	class LocalClient: public std::enable_shared_from_this<LocalClient> {
 		public:
-			constexpr static size_t MAX_PACKET_SIZE = 1 << 24;
+			constexpr static size_t MAX_PACKET_SIZE = 1 << 20;
 			constexpr static size_t HEADER_SIZE = 6;
 
 			std::weak_ptr<ClientGame> weakGame;
