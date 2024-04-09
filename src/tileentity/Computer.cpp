@@ -192,6 +192,49 @@ namespace Game3 {
 							auto lock = computer->listeners.uniqueLock();
 							computer->listeners.emplace(engine.string(info[0]), v8::Global<v8::Function>(info.GetIsolate(), info[1].As<v8::Function>()));
 						}, engine->wrap(&context))},
+
+						{"unlisten", engine->makeValue(+[](const v8::FunctionCallbackInfo<v8::Value> &info) {
+							auto &context = getExternal<Context>(info);
+							ComputerPtr computer = context.computer.lock();
+							if (!computer) {
+								info.GetIsolate()->ThrowError("Computer pointer expired");
+								return;
+							}
+							ScriptEngine &engine = *computer->engine;
+
+							if (info.Length() < 1 || !info[0]->IsString()) {
+								info.GetIsolate()->ThrowError("Expected a string as the first argument");
+								return;
+							}
+
+							std::string name = engine.string(info[0]);
+
+							auto &listeners = computer->listeners;
+							auto lock = listeners.uniqueLock();
+
+							if (info.Length() == 1) {
+								listeners.erase(name);
+								return;
+							}
+
+							if (!info[1]->IsFunction()) {
+								info.GetIsolate()->ThrowError("Expected a function as the second argument");
+								return;
+							}
+
+							v8::Local<v8::Function> function = info[1].As<v8::Function>();
+							std::vector<std::decay_t<decltype(listeners)>::iterator> to_erase;
+
+							auto [iter, end] = listeners.equal_range(name);
+
+							for (; iter != end; ++iter) {
+								if (iter->second == function)
+									to_erase.push_back(iter);
+							}
+
+							for (const auto &iterator: to_erase)
+								listeners.erase(iterator);
+						}, engine->wrap(&context))},
 					});
 
 					script_context->Global()->Set(script_context, engine->string("g3"), g3).Check();
