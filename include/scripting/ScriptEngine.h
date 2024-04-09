@@ -36,7 +36,7 @@ namespace Game3 {
 
 		public:
 			std::weak_ptr<Game> game;
-			std::function<void(std::string_view)> onPrint = [](std::string_view text) { std::cout << text; };
+			std::function<void(std::string_view)> onPrint = [](std::string_view text) { std::cout << text << '\n'; };
 
 			struct Value;
 			using FunctionValue = v8::FunctionCallback;

@@ -283,12 +283,12 @@ namespace Game3 {
 					ss << ' ';
 				ss << toCString(v8::String::Utf8Value(info.GetIsolate(), info[i]));
 			}
-			auto &engine = *reinterpret_cast<ScriptEngine *>(info.Data().As<v8::Value>().As<v8::External>()->Value());
+			auto &engine = *reinterpret_cast<ScriptEngine *>(info.Data().As<v8::External>()->Value());
 			engine.print(ss.str());
 		}, v8::External::New(isolate, this)));
 
 		global->Set(isolate, "gc", v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
-			auto &engine = *reinterpret_cast<ScriptEngine *>(info.Data().As<v8::Value>().As<v8::External>()->Value());
+			auto &engine = *reinterpret_cast<ScriptEngine *>(info.Data().As<v8::External>()->Value());
 			auto *isolate = engine.getIsolate();
 			int64_t bytes = 100'000'000;
 			if (info.Length() == 1 && info[0]->IsNumber())
