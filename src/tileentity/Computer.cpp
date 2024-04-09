@@ -66,10 +66,45 @@ namespace Game3 {
 	}
 
 	void Computer::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
+		if (Buffer *buffer = std::any_cast<Buffer>(&data)) {
+			auto lock = listeners.sharedLock();
+			auto [iter, end] = listeners.equal_range(name);
+
+			if (iter != end) {
+				v8::Isolate *isolate = engine->getIsolate();
+				v8::Locker locker(isolate);
+				v8::Isolate::Scope isolate_scope(isolate);
+				v8::HandleScope handle_scope(isolate);
+				v8::Local<v8::Context> context = engine->getContext();
+
+				v8::Local<v8::Object> agent_object;
+				v8::Local<v8::Value> argument;
+
+				if (auto tile_entity = std::dynamic_pointer_cast<TileEntity>(source)) {
+					v8::Local<v8::Value> tile_entity_args[] {v8::BigInt::New(isolate, int64_t(tile_entity->getGID()))};
+					agent_object = tileEntityTemplate.Get(isolate)->GetFunction(context).ToLocalChecked()->CallAsConstructor(context, 1, tile_entity_args).ToLocalChecked().As<v8::Object>();
+					auto *wrapper = new ObjectWrap<TileEntity>(tile_entity);
+					wrapper->wrap(isolate, "TileEntity", agent_object);
+					argument = agent_object;
+				} else {
+					argument = v8::Null(isolate);
+				}
+
+				for (; iter != end; ++iter) {
+					v8::Local<v8::Object> new_buffer = engine->getBufferTemplate()->GetFunction(context).ToLocalChecked()->CallAsConstructor(context, 0, nullptr).ToLocalChecked().As<v8::Object>();
+					auto &new_wrapper = ObjectWrap<Buffer>::unwrap("Buffer", new_buffer);
+					*new_wrapper.object = *buffer;
+					v8::Local<v8::Value> args[] {argument, new_buffer};
+					std::ignore = iter->second.Get(isolate)->Call(context, v8::Null(isolate), 2, args);
+				}
+			}
+		}
+
 		if (name == "RunScript") {
 
-			auto *buffer = std::any_cast<Buffer>(&data);
-			assert(buffer);
+			Buffer *buffer = std::any_cast<Buffer>(&data);
+			if (!buffer)
+				return;
 
 			Token token = buffer->take<Token>();
 			std::string javascript = buffer->take<std::string>();
@@ -128,6 +163,34 @@ namespace Game3 {
 							});
 
 							info.GetReturnValue().Set(found);
+						}, engine->wrap(&context))},
+
+						{"listen", engine->makeValue(+[](const v8::FunctionCallbackInfo<v8::Value> &info) {
+							if (info.Length() < 2) {
+								info.GetIsolate()->ThrowError("Expected two arguments");
+								return;
+							}
+
+							if (!info[0]->IsString()) {
+								info.GetIsolate()->ThrowError("Expected a string as the first argument");
+								return;
+							}
+
+							if (!info[1]->IsFunction()) {
+								info.GetIsolate()->ThrowError("Expected a function as the second argument");
+								return;
+							}
+
+							auto &context = getExternal<Context>(info);
+							ComputerPtr computer = context.computer.lock();
+							if (!computer) {
+								info.GetIsolate()->ThrowError("Computer pointer expired");
+								return;
+							}
+							ScriptEngine &engine = *computer->engine;
+
+							auto lock = computer->listeners.uniqueLock();
+							computer->listeners.emplace(engine.string(info[0]), v8::Global<v8::Function>(info.GetIsolate(), info[1].As<v8::Function>()));
 						}, engine->wrap(&context))},
 					});
 

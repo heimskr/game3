@@ -1,9 +1,12 @@
 #pragma once
 
 #include "scripting/ScriptEngine.h"
+#include "threading/Lockable.h"
 #include "tileentity/TileEntity.h"
 
 #include <v8.h>
+
+#include <map>
 
 namespace Game3 {
 	class Computer: public TileEntity {
@@ -30,6 +33,7 @@ namespace Game3 {
 		private:
 			std::unique_ptr<ScriptEngine> engine;
 			v8::Global<v8::FunctionTemplate> tileEntityTemplate;
+			Lockable<std::multimap<std::string, v8::Global<v8::Function>>> listeners;
 
 			Computer() = default;
 			Computer(Identifier tile_id, Position);

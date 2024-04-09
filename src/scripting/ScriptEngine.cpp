@@ -410,7 +410,7 @@ namespace Game3 {
 			info.GetReturnValue().Set(new_buffer);
 		}, wrap(this)));
 
-		instance->Set(isolate, "getObject", v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
+		instance->Set(isolate, "takeObject", v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
 			auto &wrapper = ObjectWrap<Buffer>::unwrap("Buffer", info.This());
 			assert(wrapper.object);
 			toObject(*wrapper.object, info);
