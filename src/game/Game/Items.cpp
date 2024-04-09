@@ -40,6 +40,7 @@
 #include "item/Mushroom.h"
 #include "item/Pickaxe.h"
 #include "item/PipeItem.h"
+#include "item/PressurePlateItem.h"
 #include "item/PumpItem.h"
 #include "item/RecombinatorItem.h"
 #include "item/Sapling.h"
@@ -257,6 +258,8 @@ namespace Game3 {
 		add(std::make_shared<Pickaxe>("base:item/iron_pickaxe",    "Iron Pickaxe",      40,  3.f,  64));
 		add(std::make_shared<Pickaxe>("base:item/gold_pickaxe",    "Gold Pickaxe",     100, .75f,  64));
 		add(std::make_shared<Pickaxe>("base:item/diamond_pickaxe", "Diamond Pickaxe",  210,  1.f, 512));
+
+		add(std::make_shared<PressurePlateItem>("base:item/pressure_plate", "Pressure Plate", 999, 64)); // TODO: cost
 
 		add(std::make_shared<PumpItem>("base:item/pump", "Pump", 999, 64)); // TODO: cost
 

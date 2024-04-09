@@ -65,92 +65,6 @@ namespace Game3 {
 		});
 	}
 
-	namespace {
-		/** Iterates all unique adjacent data networks. */
-		template <typename Fn>
-		requires Returns<Fn, void, DataNetworkPtr>
-		void visitNetworks(const Place &place, Fn &&visitor) {
-			std::unordered_set<DataNetworkPtr> visited_networks;
-
-			for (const Direction direction: ALL_DIRECTIONS) {
-				auto network = std::static_pointer_cast<DataNetwork>(PipeNetwork::findAt(place + direction, Substance::Data));
-				if (!network || visited_networks.contains(network))
-					continue;
-
-				visited_networks.insert(network);
-				visitor(network);
-			}
-		}
-
-		/** Iterates all unique adjacent data networks until the given function returns true. */
-		template <typename Fn>
-		requires Returns<Fn, bool, DataNetworkPtr>
-		void visitNetworks(const Place &place, Fn &&visitor) {
-			std::unordered_set<DataNetworkPtr> visited_networks;
-
-			for (const Direction direction: ALL_DIRECTIONS) {
-				auto network = std::static_pointer_cast<DataNetwork>(PipeNetwork::findAt(place + direction, Substance::Data));
-				if (!network || visited_networks.contains(network))
-					continue;
-
-				visited_networks.insert(network);
-				if (visitor(network))
-					return;
-			}
-		}
-
-		template <typename Fn>
-		requires Returns<Fn, void, TileEntityPtr>
-		void visitNetwork(const DataNetworkPtr &network, Fn &&visitor) {
-			RealmPtr realm = network->getRealm();
-			assert(realm);
-
-			std::unordered_set<TileEntityPtr> visited;
-
-			auto visit = [&](const auto &set) {
-				auto lock = set.sharedLock();
-				for (const auto &[position, direction]: set) {
-					TileEntityPtr member = realm->tileEntityAt(position);
-					if (!member || visited.contains(member))
-						continue;
-					visited.insert(member);
-					visitor(member);
-				}
-			};
-
-			visit(network->getInsertions());
-			visit(network->getExtractions());
-		}
-
-		template <typename Fn>
-		requires Returns<Fn, bool, TileEntityPtr>
-		bool visitNetwork(const DataNetworkPtr &network, Fn &&visitor) {
-			RealmPtr realm = network->getRealm();
-			assert(realm);
-
-			std::unordered_set<TileEntityPtr> visited;
-
-			auto visit = [&](const auto &set) {
-				auto lock = set.sharedLock();
-				for (const auto &[position, direction]: set) {
-					TileEntityPtr member = realm->tileEntityAt(position);
-					if (!member || visited.contains(member))
-						continue;
-					visited.insert(member);
-					if (visitor(member))
-						return true;
-				}
-
-				return false;
-			};
-
-			if (visit(network->getInsertions()))
-				return true;
-
-			return visit(network->getExtractions());
-		}
-	}
-
 	void Computer::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
 		if (name == "RunScript") {
 
@@ -201,8 +115,8 @@ namespace Game3 {
 								filter = [](const TileEntityPtr &) { return true; };
 							}
 
-							visitNetworks(computer->getPlace(), [&](DataNetworkPtr network) {
-								visitNetwork(network, [&](const TileEntityPtr &member)  {
+							DataNetwork::visitNetworks(computer->getPlace(), [&](DataNetworkPtr network) {
+								DataNetwork::visitNetwork(network, [&](const TileEntityPtr &member)  {
 									GlobalID gid = member->getGID();
 									if (!gids.contains(gid) && filter(member)) {
 										v8::Local<v8::BigInt> gid_bigint = v8::BigInt::New(engine.getIsolate(), static_cast<int64_t>(gid));
@@ -390,8 +304,8 @@ namespace Game3 {
 	TileEntityPtr Computer::searchFor(GlobalID gid) {
 		TileEntityPtr out;
 
-		visitNetworks(getPlace(), [&](const DataNetworkPtr &network) {
-			return visitNetwork(network, [&](const TileEntityPtr &member) {
+		DataNetwork::visitNetworks(getPlace(), [&](const DataNetworkPtr &network) {
+			return DataNetwork::visitNetwork(network, [&](const TileEntityPtr &member) {
 				if (member->getGID() == gid) {
 					out = member;
 					return true;

@@ -24,6 +24,7 @@
 #include "tileentity/Mutator.h"
 #include "tileentity/OreDeposit.h"
 #include "tileentity/Pipe.h"
+#include "tileentity/PressurePlate.h"
 #include "tileentity/Pump.h"
 #include "tileentity/Recombinator.h"
 #include "tileentity/Sequencer.h"
@@ -66,6 +67,7 @@ namespace Game3 {
 		add(TileEntityFactory::create<Mutator>());
 		add(TileEntityFactory::create<OreDeposit>());
 		add(TileEntityFactory::create<Pipe>());
+		add(TileEntityFactory::create<PressurePlate>());
 		add(TileEntityFactory::create<Pump>());
 		add(TileEntityFactory::create<Recombinator>());
 		add(TileEntityFactory::create<Sequencer>());

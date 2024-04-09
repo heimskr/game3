@@ -11,6 +11,7 @@ namespace Game3 {
 	class TileEntityItem: public Item {
 		public:
 			using Item::Item;
+
 			bool use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float>) override {
 				Realm &realm = *place.realm;
 				GamePtr game = realm.getGame();
