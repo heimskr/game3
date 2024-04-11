@@ -110,4 +110,26 @@ namespace Game3 {
 			throw std::invalid_argument("Not an integer: \"" + std::string(view) + "\"");
 		return out;
 	}
+
+	std::string escape(std::string_view input) {
+		std::string out;
+		out.reserve(input.size());
+		for (char ch: input) {
+			switch (ch) {
+				case '\n': out += "\\n"; break;
+				case '\r': out += "\\r"; break;
+				case '\t': out += "\\t"; break;
+				case '\a': out += "\\a"; break;
+				case '\b': out += "\\b"; break;
+				case '\e': out += "\\e"; break;
+				case '\f': out += "\\f"; break;
+				case '\v': out += "\\v"; break;
+				case '\\': out += "\\\\"; break;
+				case '"':  out += "\\\""; break;
+				default:
+					out += ch;
+			}
+		}
+		return out;
+	}
 }

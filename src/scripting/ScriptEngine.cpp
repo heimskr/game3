@@ -5,6 +5,7 @@
 #include "scripting/ScriptEngine.h"
 #include "scripting/ScriptError.h"
 #include "scripting/ScriptUtil.h"
+#include "util/JSON.h"
 #include "util/Util.h"
 
 #include <libplatform/libplatform.h>
@@ -332,7 +333,7 @@ namespace Game3 {
 				auto &engine = getExternal<ScriptEngine>(info);
 
 				try {
-					if (auto result = engine.execute(json.dump()))
+					if (auto result = engine.execute(stringifyWithBigInt(json)))
 						info.GetReturnValue().Set(result.value());
 					else
 						info.GetReturnValue().SetUndefined();

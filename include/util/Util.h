@@ -142,6 +142,8 @@ namespace Game3 {
 	unsigned long parseUlong(const char *, int base = 10);
 	unsigned long parseUlong(std::string_view, int base = 10);
 
+	std::string escape(std::string_view);
+
 	template <std::integral I>
 	I parseNumber(std::string_view view, int base = 10) {
 		I out{};
