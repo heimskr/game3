@@ -1,1 +1,1 @@
-{"land":true,"solid":false,"tilename":"base:tile/snow"}
+{"categories":["base:category/tillable","base:category/plant_soil"],"land":true,"solid":false,"tilename":"base:tile/snow"}
