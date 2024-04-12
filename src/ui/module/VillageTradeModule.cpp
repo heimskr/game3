@@ -174,7 +174,7 @@ namespace Game3 {
 		if (!village)
 			return;
 
-		ItemStackPtr &stack = sellSlot.getStack();
+		ItemStackPtr stack = sellSlot.getStack();
 		if (!stack)
 			return;
 
@@ -194,6 +194,7 @@ namespace Game3 {
 			}
 		}
 
+		assert(stack);
 		game->getPlayer()->send(DoVillageTradePacket(village->getID(), stack->getID(), sell_count, true));
 	}
 
