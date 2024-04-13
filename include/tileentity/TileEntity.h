@@ -76,7 +76,10 @@ namespace Game3 {
 			virtual void renderUpper(SpriteRenderer &);
 			virtual void renderLighting(const RendererContext &);
 			/** Handles when an entity steps on this tile entity's position. */
-			virtual void onOverlap(const std::shared_ptr<Entity> &) {}
+			virtual void onOverlap(const EntityPtr &);
+			/** Handles when an entity stops being on this tile entity's position.
+			 *  Note that this will be called even if there are other entities still standing on the tile entity's position. */
+			virtual void onOverlapEnd(const EntityPtr &);
 			void setRealm(const std::shared_ptr<Realm> &);
 			std::shared_ptr<Realm> getRealm() const override;
 			Position getPosition() const override { return position.copyBase(); }
@@ -89,7 +92,7 @@ namespace Game3 {
 			/** Called when the TileEntity is destroyed violently, e.g. by a bomb. Returns false if the TileEntity should survive the destruction. */
 			virtual bool kill() { return false; }
 			inline bool is(const Identifier &check) const { return getID() == check; }
-			std::string getName() const override { return "Unknown TileEntity (" + std::string(tileEntityID) + ')'; }
+			std::string getName() const override;
 			std::shared_ptr<Game> getGame() const override;
 			std::shared_ptr<TileEntity> getSelf();
 			std::weak_ptr<TileEntity> getWeakSelf();

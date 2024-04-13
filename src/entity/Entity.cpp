@@ -197,7 +197,14 @@ namespace Game3 {
 
 			auto velocity_lock = velocity.uniqueLock();
 
+			bool old_grounded = offset.isGrounded();
+
 			z = std::max(z + delta * velocity.z, 0.);
+
+			if (!old_grounded && offset.isGrounded()) {
+				if (TileEntityPtr tile_entity = getRealm()->tileEntityAt(getPosition()))
+					tile_entity->onOverlap(getSelf());
+			}
 
 			if (z == 0.)
 				velocity.z = 0;
@@ -628,6 +635,10 @@ namespace Game3 {
 		return canMoveTo(place);
 	}
 
+	bool Entity::isGrounded() const {
+		return getOffset().isGrounded();
+	}
+
 	void Entity::focus(Canvas &canvas, bool is_autofocus) {
 		if (EntityPtr ridden = getRidden()) {
 			ridden->focus(canvas, is_autofocus);
@@ -661,7 +672,13 @@ namespace Game3 {
 		if (2 < position.taxiDistance(new_position))
 			context.isTeleport = true;
 
+		EntityPtr shared = getSelf();
+		RealmPtr realm = getRealm();
+
+		Position old_position = position;
 		position = new_position;
+
+		const Vector3 old_offset = getOffset();
 
 		if (context.forcedOffset)
 			offset = *context.forcedOffset;
@@ -676,8 +693,7 @@ namespace Game3 {
 		if (is_server)
 			increaseUpdateCounter();
 
-		auto shared = getSelf();
-		getRealm()->onMoved(shared, new_position);
+		realm->onMoved(shared, old_position, old_offset, new_position, getOffset());
 
 		if (in_different_chunk)
 			movedToNewChunk(old_chunk_position);
@@ -690,7 +706,7 @@ namespace Game3 {
 		}
 
 		if (is_server && !context.fromPath && !context.suppressPackets) {
-			GamePtr game = getGame();
+			GamePtr game = realm->getGame();
 			game->toServer().entityTeleported(*this, context);
 		}
 
@@ -1229,22 +1245,29 @@ namespace Game3 {
 	}
 
 	void Entity::jump() {
-		GamePtr game = getGame();
+		RealmPtr realm = getRealm();
+		GamePtr game = realm->getGame();
 		if (game->getSide() != Side::Server || getRidden())
 			return;
 
-		auto velocity_lock = velocity.uniqueLock();
-		if (velocity.z != 0.)
-			return;
-
 		{
-			auto offset_lock = offset.sharedLock();
-			if (offset.z != 0.)
+			auto velocity_lock = velocity.uniqueLock();
+			if (velocity.z != 0.)
 				return;
-		}
 
-		velocity.z = getJumpSpeed();
+			{
+				auto offset_lock = offset.sharedLock();
+				if (offset.z != 0.)
+					return;
+			}
+
+			velocity.z = getJumpSpeed();
+		}
 		increaseUpdateCounter();
+
+		if (TileEntityPtr tile_entity = realm->tileEntityAt(getPosition()))
+			tile_entity->onOverlapEnd(getSelf());
+
 		game->toServer().entityTeleported(*this, MovementContext{.excludePlayer = getGID()});
 	}
 

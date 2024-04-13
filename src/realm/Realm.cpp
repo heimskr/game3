@@ -683,7 +683,6 @@ namespace Game3 {
 
 	std::vector<EntityPtr> Realm::findEntities(const Position &position) const {
 		EntitySet entity_set = getEntities(position.getChunk());
-
 		if (!entity_set)
 			return {};
 
@@ -693,6 +692,64 @@ namespace Game3 {
 		for (const EntityPtr &entity: *entity_set)
 			if (entity->occupies(position))
 				out.push_back(entity);
+
+		return out;
+	}
+
+	bool Realm::hasEntities(const Position &position) const {
+		EntitySet entity_set = getEntities(position.getChunk());
+		if (!entity_set)
+			return {};
+
+		auto lock = entity_set->sharedLock();
+
+		for (const EntityPtr &entity: *entity_set)
+			if (entity->occupies(position))
+				return true;
+
+		return false;
+	}
+
+	bool Realm::hasEntities(const Position &position, const std::function<bool(const EntityPtr &)> &predicate) const {
+		EntitySet entity_set = getEntities(position.getChunk());
+		if (!entity_set)
+			return {};
+
+		auto lock = entity_set->sharedLock();
+
+		for (const EntityPtr &entity: *entity_set)
+			if (entity->occupies(position) && predicate(entity))
+				return true;
+
+		return false;
+	}
+
+	size_t Realm::countEntities(const Position &position) const {
+		EntitySet entity_set = getEntities(position.getChunk());
+		if (!entity_set)
+			return {};
+
+		auto lock = entity_set->sharedLock();
+		size_t out = 0;
+
+		for (const EntityPtr &entity: *entity_set)
+			if (entity->occupies(position))
+				++out;
+
+		return out;
+	}
+
+	size_t Realm::countEntities(const Position &position, const std::function<bool(const EntityPtr &)> &predicate) const {
+		EntitySet entity_set = getEntities(position.getChunk());
+		if (!entity_set)
+			return {};
+
+		auto lock = entity_set->sharedLock();
+		size_t out = 0;
+
+		for (const EntityPtr &entity: *entity_set)
+			if (entity->occupies(position) && predicate(entity))
+				++out;
 
 		return out;
 	}
@@ -890,9 +947,24 @@ namespace Game3 {
 		remove(tile_entity, true);
 	}
 
-	void Realm::onMoved(const EntityPtr &entity, const Position &position) {
-		if (auto tile_entity = tileEntityAt(position))
-			tile_entity->onOverlap(entity);
+	void Realm::onMoved(const EntityPtr &entity, const Position &old_position, const Vector3 &old_offset, const Position &new_position, const Vector3 &new_offset) {
+		if (old_position != new_position) {
+			if (TileEntityPtr tile_entity = tileEntityAt(old_position))
+				tile_entity->onOverlapEnd(entity);
+
+			if (TileEntityPtr tile_entity = tileEntityAt(new_position))
+				tile_entity->onOverlap(entity);
+		} else if (TileEntityPtr tile_entity = tileEntityAt(new_position)) {
+			const bool old_grounded = old_offset.isGrounded();
+			const bool new_grounded = new_offset.isGrounded();
+
+			if (old_grounded != new_grounded) {
+				if (old_grounded)
+					tile_entity->onOverlapEnd(entity);
+				else
+					tile_entity->onOverlap(entity);
+			}
+		}
 	}
 
 	GamePtr Realm::getGame() const {

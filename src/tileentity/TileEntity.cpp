@@ -128,6 +128,10 @@ namespace Game3 {
 
 	void TileEntity::renderLighting(const RendererContext &) {}
 
+	void TileEntity::onOverlap(const EntityPtr &) {}
+
+	void TileEntity::onOverlapEnd(const EntityPtr &) {}
+
 	void TileEntity::onSpawn() {
 		GamePtr game = getRealm()->getGame();
 		if (game->getSide() == Side::Server)
@@ -185,6 +189,10 @@ namespace Game3 {
 
 	ChunkPosition TileEntity::getChunk() const {
 		return getPosition().getChunk();
+	}
+
+	std::string TileEntity::getName() const {
+		return std::format("Unknown TileEntity ({})", tileEntityID);
 	}
 
 	GamePtr TileEntity::getGame() const {

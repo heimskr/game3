@@ -94,6 +94,7 @@ namespace Game3 {
 
 		double magnitude() const;
 		double magnitude2D() const;
+		inline bool isGrounded() const { return z < 0.01; }
 
 		bool operator==(const Vector3 &) const;
 

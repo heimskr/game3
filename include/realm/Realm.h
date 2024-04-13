@@ -131,6 +131,10 @@ namespace Game3 {
 			void initEntities();
 			void tick(float delta);
 			std::vector<EntityPtr> findEntities(const Position &) const;
+			bool hasEntities(const Position &) const;
+			bool hasEntities(const Position &, const std::function<bool(const EntityPtr &)> &) const;
+			size_t countEntities(const Position &) const;
+			size_t countEntities(const Position &, const std::function<bool(const EntityPtr &)> &) const;
 			/** The side length of the square is equal to 2*radius-1; i.e., a radius of 1 corresponds to a single tile. */
 			std::vector<EntityPtr> findEntitiesSquare(const Position &, uint64_t radius) const;
 			std::vector<EntityPtr> findEntitiesSquare(const Position &, uint64_t radius, const std::function<bool(const EntityPtr &)> &filter) const;
@@ -144,7 +148,7 @@ namespace Game3 {
 			void eviscerate(const EntityPtr &, bool can_warn = false);
 			void remove(const TileEntityPtr &, bool run_helper = true);
 			void removeSafe(const TileEntityPtr &);
-			void onMoved(const EntityPtr &, const Position &);
+			void onMoved(const EntityPtr &, const Position &old_position, const Vector3 &old_offset, const Position &new_position, const Vector3 &new_offset);
 			std::shared_ptr<Game> getGame() const;
 			void queueRemoval(const EntityPtr &);
 			void queueRemoval(const TileEntityPtr &);

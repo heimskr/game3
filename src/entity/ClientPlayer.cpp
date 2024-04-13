@@ -161,6 +161,8 @@ namespace Game3 {
 			GamePtr game = getGame();
 			constexpr static float variance = .9f;
 			game->toClient().playSound("base:sound/jump", std::uniform_real_distribution(variance, 1.f / variance)(threadContext.rng));
+			if (TileEntityPtr tile_entity = getRealm()->tileEntityAt(getPosition()))
+				tile_entity->onOverlapEnd(getSelf());
 			send(JumpPacket());
 		}
 	}
