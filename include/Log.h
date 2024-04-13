@@ -20,40 +20,41 @@ namespace Game3::Logger {
 #define SPAMX_(message)    do {} while (false)
 #define SUCCESSX_(message) do {} while (false)
 #else
+#define LOG_START "\e[2m[\e[1m"
+#define LOG_INFO_MIDDLE "\e[22;2m]\e[22m (\e[22;1;34mi\e[22;39m)\e[2m ::\e[22m "
+#define LOG_WARN_MIDDLE "\e[22;2m]\e[22m (\e[22;1;33m!\e[22;39m)\e[2m ::\e[22m "
+#define LOG_ERROR_MIDDLE "\e[22;2m]\e[22m (\e[22;1;31m!\e[22;39m)\e[2m ::\e[22m "
+#define LOG_SPAM_MIDDLE "\e[22;2m]\e[22m (\e[22;1;35m_\e[22;39m)\e[2m :: "
+#define LOG_SUCCESS_MIDDLE "\e[22;2m]\e[22m (\e[22;1;32m🗸\e[22;39m)\e[2m :: \e[22;32m"
 #define INFOX_(lvl, message) \
 	do { if (Game3::Logger::level < (lvl)) break; \
 	     std::unique_lock lock(Game3::Logger::mutex); \
-	     std::cerr << "\e[2m[\e[1m" << ::Game3::Logger::getTimestamp() \
-	               << "\e[22;2m]\e[22m (\e[22;1;34mi\e[22;39m)\e[2m ::\e[22m " \
-	               << message << '\n'; } while (false)
+	     std::cerr << LOG_START << ::Game3::Logger::getTimestamp() \
+	               << LOG_INFO_MIDDLE << message << '\n'; } while (false)
 
 #define WARNX_(lvl, message) \
 	do { if (Game3::Logger::level < (lvl)) break; \
 	     std::unique_lock lock(Game3::Logger::mutex); \
-	     std::cerr << "\e[2m[\e[1m" << ::Game3::Logger::getTimestamp() \
-	               << "\e[22;2m]\e[22m (\e[22;1;33m!\e[22;39m)\e[2m ::\e[22m " \
-	               << message << '\n'; } while (false)
+	     std::cerr << LOG_START << ::Game3::Logger::getTimestamp() \
+	               << LOG_WARN_MIDDLE << message << '\n'; } while (false)
 
 #define ERRORX_(lvl, message) \
 	do { if (Game3::Logger::level < (lvl)) break; \
 	     std::unique_lock lock(Game3::Logger::mutex); \
-	     std::cerr << "\e[2m[\e[1m" << ::Game3::Logger::getTimestamp() \
-	               << "\e[22;2m]\e[22m (\e[22;1;31m!\e[22;39m)\e[2m ::\e[22m " \
-	               << message << '\n'; } while (false)
+	     std::cerr << LOG_START << ::Game3::Logger::getTimestamp() \
+	               << LOG_ERROR_MIDDLE << message << '\n'; } while (false)
 
 #define SPAMX_(lvl, message) \
 	do { if (Game3::Logger::level < (lvl)) break; \
 	     std::unique_lock lock(Game3::Logger::mutex); \
-	     std::cerr << "\e[2m[\e[1m" << ::Game3::Logger::getTimestamp() \
-	               << "\e[22;2m]\e[22m (\e[22;1;35m_\e[22;39m)\e[2m :: " \
-	               << message << "\e[22m\n"; } while (false)
+	     std::cerr << LOG_START << ::Game3::Logger::getTimestamp() \
+	               << LOG_SPAM_MIDDLE << message << "\e[22m\n"; } while (false)
 
 #define SUCCESSX_(lvl, message) \
 	do { if (Game3::Logger::level < (lvl)) break; \
 	     std::unique_lock lock(Game3::Logger::mutex); \
-	     std::cerr << "\e[2m[\e[1m" << ::Game3::Logger::getTimestamp() \
-	               << "\e[22;2m]\e[22m (\e[22;1;32m🗸\e[22;39m)\e[2m :: \e[22;32m" \
-	               << message << "\e[39m\n"; } while (false)
+	     std::cerr << LOG_START << ::Game3::Logger::getTimestamp() \
+	               << LOG_SUCCESS_MIDDLE << message << "\e[39m\n"; } while (false)
 #endif
 
 #ifdef NO_LOGS
@@ -66,36 +67,31 @@ namespace Game3::Logger {
 #define INFOX(lvl, fmt, ...) \
 	do { if (Game3::Logger::level < (lvl)) break; \
 	     std::unique_lock lock(Game3::Logger::mutex); \
-	     std::cerr << "\e[2m[\e[1m" << ::Game3::Logger::getTimestamp() \
-	               << "\e[22;2m]\e[22m (\e[22;1;34mi\e[22;39m)\e[2m ::\e[22m " \
+	     std::cerr << LOG_START << ::Game3::Logger::getTimestamp() << LOG_INFO_MIDDLE \
 	               << std::format(fmt, __VA_ARGS__) << '\n'; } while (false)
 
 #define WARNX(lvl, fmt, ...) \
 	do { if (Game3::Logger::level < (lvl)) break; \
 	     std::unique_lock lock(Game3::Logger::mutex); \
-	     std::cerr << "\e[2m[\e[1m" << ::Game3::Logger::getTimestamp() \
-	               << "\e[22;2m]\e[22m (\e[22;1;33m!\e[22;39m)\e[2m ::\e[22m " \
+	     std::cerr << LOG_START << ::Game3::Logger::getTimestamp() << LOG_WARN_MIDDLE \
 	               << std::format(fmt, __VA_ARGS__) << '\n'; } while (false)
 
 #define ERRORX(lvl, fmt, ...) \
 	do { if (Game3::Logger::level < (lvl)) break; \
 	     std::unique_lock lock(Game3::Logger::mutex); \
-	     std::cerr << "\e[2m[\e[1m" << ::Game3::Logger::getTimestamp() \
-	               << "\e[22;2m]\e[22m (\e[22;1;31m!\e[22;39m)\e[2m ::\e[22m " \
+	     std::cerr << LOG_START << ::Game3::Logger::getTimestamp() << LOG_ERROR_MIDDLE \
 	               << std::format(fmt, __VA_ARGS__) << '\n'; } while (false)
 
 #define SPAMX(lvl, fmt, ...) \
 	do { if (Game3::Logger::level < (lvl)) break; \
 	     std::unique_lock lock(Game3::Logger::mutex); \
-	     std::cerr << "\e[2m[\e[1m" << ::Game3::Logger::getTimestamp() \
-	               << "\e[22;2m]\e[22m (\e[22;1;35m_\e[22;39m)\e[2m :: " \
+	     std::cerr << LOG_START << ::Game3::Logger::getTimestamp() << LOG_SPAM_MIDDLE \
 	               << std::format(fmt, __VA_ARGS__) << "\e[22m\n"; } while (false)
 
 #define SUCCESSX(lvl, fmt, ...) \
 	do { if (Game3::Logger::level < (lvl)) break; \
 	     std::unique_lock lock(Game3::Logger::mutex); \
-	     std::cerr << "\e[2m[\e[1m" << ::Game3::Logger::getTimestamp() \
-	               << "\e[22;2m]\e[22m (\e[22;1;32m🗸\e[22;39m)\e[2m :: \e[22;32m" \
+	     std::cerr << LOG_START << ::Game3::Logger::getTimestamp() << LOG_SUCCESS_MIDDLE \
 	               << std::format(fmt, __VA_ARGS__) << "\e[39m\n"; } while (false)
 #endif
 
