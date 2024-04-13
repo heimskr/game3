@@ -266,10 +266,6 @@ namespace Game3 {
 		}
 	}
 
-	// void Computer::toJSON(nlohmann::json &json) const {
-	// 	TileEntity::toJSON(json);
-	// }
-
 	bool Computer::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
 		if (modifiers.onlyAlt()) {
 			RealmPtr realm = getRealm();
@@ -282,22 +278,6 @@ namespace Game3 {
 
 		return false;
 	}
-
-	// void Computer::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
-	// 	TileEntity::absorbJSON(game, json);
-	// }
-
-	void Computer::encode(Game &game, Buffer &buffer) {
-		TileEntity::encode(game, buffer);
-	}
-
-	void Computer::decode(Game &game, Buffer &buffer) {
-		TileEntity::decode(game, buffer);
-	}
-
-	// GamePtr Computer::getGame() const {
-	// 	return TileEntity::getGame();
-	// }
 
 	v8::Global<v8::FunctionTemplate> Computer::makeTileEntityTemplate(v8::Isolate *isolate) {
 		v8::Locker locker(isolate);

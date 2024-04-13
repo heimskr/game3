@@ -5,8 +5,6 @@
 namespace Game3 {
 	class PressurePlate: public TileEntity {
 		public:
-			bool down = false;
-
 			static Identifier ID() { return {"base", "te/pressure_plate"}; }
 
 			std::string getName() const override { return "Pressure Plate"; }
@@ -21,6 +19,8 @@ namespace Game3 {
 			void decode(Game &, Buffer &) override;
 
 		protected:
+			bool down = false;
+
 			PressurePlate() = default;
 			PressurePlate(Identifier tilename, Position);
 			PressurePlate(Position);

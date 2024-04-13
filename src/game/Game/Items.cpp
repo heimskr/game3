@@ -30,6 +30,7 @@
 #include "item/IncineratorItem.h"
 #include "item/IncubatorItem.h"
 #include "item/Item.h"
+#include "item/LampItem.h"
 #include "item/Landfill.h"
 #include "item/LiquefierItem.h"
 #include "item/Mead.h"
@@ -233,6 +234,8 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/teleportation_focus", "Teleportation Focus", 999, 64)); // TODO: cost
 
 		add(std::make_shared<ItemPipeItem>(4));
+
+		add(std::make_shared<LampItem>("base:item/lamp", "Lamp", 999, 64)); // TODO: cost
 
 		add(std::make_shared<Landfill>("base:item/sand",          "Sand",          1, 64, "base:tile/sand"));
 		add(std::make_shared<Landfill>("base:item/volcanic_sand", "Volcanic Sand", 3, 64, "base:tile/volcanic_sand"));

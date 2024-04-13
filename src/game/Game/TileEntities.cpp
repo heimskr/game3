@@ -19,6 +19,7 @@
 #include "tileentity/Incinerator.h"
 #include "tileentity/Incubator.h"
 #include "tileentity/ItemSpawner.h"
+#include "tileentity/Lamp.h"
 #include "tileentity/Liquefier.h"
 #include "tileentity/Microscope.h"
 #include "tileentity/Mutator.h"
@@ -62,6 +63,7 @@ namespace Game3 {
 		add(TileEntityFactory::create<Incinerator>());
 		add(TileEntityFactory::create<Incubator>());
 		add(TileEntityFactory::create<ItemSpawner>());
+		add(TileEntityFactory::create<Lamp>());
 		add(TileEntityFactory::create<Liquefier>());
 		add(TileEntityFactory::create<Microscope>());
 		add(TileEntityFactory::create<Mutator>());

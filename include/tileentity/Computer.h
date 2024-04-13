@@ -23,12 +23,7 @@ namespace Game3 {
 			void init(Game &) override;
 
 			void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) override;
-			// void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
-			// void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
-
-			void encode(Game &, Buffer &) override;
-			void decode(Game &, Buffer &) override;
 
 		private:
 			std::unique_ptr<ScriptEngine> engine;

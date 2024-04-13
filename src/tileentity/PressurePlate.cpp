@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/Game.h"
@@ -40,9 +38,11 @@ namespace Game3 {
 		DataNetwork::broadcast(getSelf(), "PressurePlateOverlap", gid);
 	}
 
-	void PressurePlate::onOverlapEnd(const EntityPtr &) {
+	void PressurePlate::onOverlapEnd(const EntityPtr &entity) {
 		if (getSide() == Side::Client) {
 			setDown(isDown());
+		} else {
+			DataNetwork::broadcast(getSelf(), "PressurePlateOverlapEnd", entity? entity->getGID() : GlobalID(0), isDown());
 		}
 	}
 
