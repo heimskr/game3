@@ -1,7 +1,7 @@
 {
 	"$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
-	"name": "my-application",
-	"version": "0.15.2",
+	"name": "game3",
+	"version": "0.40.0",
 	"dependencies": [
 		"glm",
 		"glfw3",
