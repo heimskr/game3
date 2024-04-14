@@ -1056,7 +1056,17 @@ namespace Game3 {
 			logOverlay.print(text);
 		};
 
-		serverWrapper.runInThread();
+		size_t seed = 1621;
+		if (std::filesystem::exists(".seed")) {
+			try {
+				seed = parseNumber<size_t>(trim(readFile(".seed")));
+				INFO("Using custom seed \e[1m{}\e[22m", seed);
+			} catch (const std::exception &err) {
+				ERROR("Failed to load seed from .seed: {}", err.what());
+			}
+		}
+
+		serverWrapper.runInThread(seed);
 
 		if (!serverWrapper.waitUntilRunning(std::chrono::milliseconds(10'000))) {
 			error("Server failed to start within 10 seconds.");
