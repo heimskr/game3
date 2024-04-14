@@ -122,17 +122,16 @@ namespace Game3 {
 			std::swap(print, engine->onPrint);
 
 			try {
-				Context context{std::static_pointer_cast<Computer>(getSelf())};
-
 				auto result = engine->execute(javascript, true, [&](v8::Local<v8::Context> script_context) {
 					v8::Local<v8::Object> g3 = engine->object({
 						{"findAll", engine->makeValue(+[](const v8::FunctionCallbackInfo<v8::Value> &info) {
-							auto &context = getExternal<Context>(info);
-							ComputerPtr computer = context.computer.lock();
+							auto &context = getExternal<std::shared_ptr<Context>>(info);
+							ComputerPtr computer = context->computer.lock();
 							if (!computer) {
 								info.GetIsolate()->ThrowError("Computer pointer expired");
 								return;
 							}
+							assert(computer->engine);
 							ScriptEngine &engine = *computer->engine;
 							v8::Local<v8::Array> found = v8::Array::New(engine.getIsolate());
 							std::unordered_set<TileEntityPtr> tile_entities;
@@ -185,12 +184,13 @@ namespace Game3 {
 								return;
 							}
 
-							auto &context = getExternal<Context>(info);
-							ComputerPtr computer = context.computer.lock();
+							auto &context = getExternal<std::shared_ptr<Context>>(info);
+							ComputerPtr computer = context->computer.lock();
 							if (!computer) {
 								info.GetIsolate()->ThrowError("Computer pointer expired");
 								return;
 							}
+							assert(computer->engine);
 							ScriptEngine &engine = *computer->engine;
 
 							auto lock = computer->listeners.uniqueLock();
@@ -198,12 +198,13 @@ namespace Game3 {
 						}, engine->wrap(&context))},
 
 						{"unlisten", engine->makeValue(+[](const v8::FunctionCallbackInfo<v8::Value> &info) {
-							auto &context = getExternal<Context>(info);
-							ComputerPtr computer = context.computer.lock();
+							auto &context = getExternal<std::shared_ptr<Context>>(info);
+							ComputerPtr computer = context->computer.lock();
 							if (!computer) {
 								info.GetIsolate()->ThrowError("Computer pointer expired");
 								return;
 							}
+							assert(computer->engine);
 							ScriptEngine &engine = *computer->engine;
 
 							if (info.Length() < 1 || !info[0]->IsString()) {
