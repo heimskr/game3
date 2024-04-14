@@ -15,6 +15,7 @@ namespace Game3 {
 			void setOn(bool);
 
 			void handleMessage(const AgentPtr &source, const std::string &name, std::any &data) override;
+			bool onInteractNextTo(const PlayerPtr &, Modifiers, const ItemStackPtr &, Hand) override;
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
 

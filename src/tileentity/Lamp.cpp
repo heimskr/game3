@@ -13,7 +13,7 @@ namespace Game3 {
 	}
 
 	Lamp::Lamp(Identifier tilename, Position position_):
-		TileEntity(std::move(tilename), ID(), position_, false) {}
+		TileEntity(std::move(tilename), ID(), position_, true) {}
 
 	Lamp::Lamp(Position position_):
 		Lamp(TILE_ID_OFF, position_) {}
@@ -68,6 +68,16 @@ namespace Game3 {
 		}
 
 		TileEntity::handleMessage(source, name, data);
+	}
+
+	bool Lamp::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
+		if (modifiers.onlyAlt()) {
+			RealmPtr realm = getRealm();
+			realm->queueDestruction(getSelf());
+			player->give(ItemStack::create(realm->getGame(), "base:item/lamp"_id));
+		}
+
+		return true;
 	}
 
 	void Lamp::encode(Game &game, Buffer &buffer) {
