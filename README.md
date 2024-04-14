@@ -23,15 +23,13 @@ which features heavily in this project, and for creating custom anvil and furnac
 
 Thanks to Tilation for their [indoor tileset](https://tilation.itch.io/16x16-small-indoor-tileset).
 
-Thanks to [Vadim](https://github.com/Vadimuh), [Fayabella](https://github.com/Fayabella) and [Bamboozle.jpg](https://github.com/Bamboozle-jpg) for their flower sprites. Fayabella has also contributed many ideas over the course of the game's development.
+Thanks to [Vadim](https://github.com/Vadimuh), [Fayabella](https://github.com/Fayabella) and [Bamboozle.jpg](https://github.com/Bamboozle-jpg) for their flower sprites.
 
-Thanks to Fayabella again for her farmland and cotton tiles as well as the fabric sprite in `/resources/items/custom.png`, in addition to a lot of other spritework.
+Thanks to Fayabella again for her work on many other sprites and for her many ideas and feedback over the course of the game's development.
 
 Thanks to [190n](https://github.com/190n) for their work on the resource embedding system (since removed).
 
-Sprites in `/resources/items/franuka.png` were made by [Franuka](https://twitter.com/franuka_art) and are not governed by this project's license.
-
-See `/resources/CREDIT.txt` for more credits.
+Sprites credited to [Franuka](https://twitter.com/franuka_art) are not governed by this project's license.
 
 ## Contribution Ideas
 If you'd like to contribute, here are some ideas, ordered roughly from easiest to hardest.
