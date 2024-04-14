@@ -73,15 +73,15 @@ namespace Game3::WorldGen {
 
 		for (Index row = range_row_min; row <= range_row_max; ++row) {
 			for (Index column = range_column_min; column <= range_column_max; ++column) {
-				const double noise = std::min(1., std::max(-1., biome_noise[biome_noise_index++] * 5.));
+				const double noise = std::min(1., std::max(-1., double(biome_noise[biome_noise_index++])));
 				std::unique_lock<std::shared_mutex> lock;
 				BiomeType &type = provider.findBiomeType(Position(row, column), &lock);
 
-				if (noise < -0.8)
+				if (noise < -0.9)
 					type = Biome::VOLCANIC;
-				else if (noise < -0.5)
+				else if (noise < -0.6)
 					type = Biome::DESERT;
-				else if (0.7 < noise)
+				else if (0.9 < noise)
 					type = Biome::SNOWY;
 				else
 					type = Biome::GRASSLAND;
