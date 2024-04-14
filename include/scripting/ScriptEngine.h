@@ -54,6 +54,8 @@ namespace Game3 {
 			ScriptEngine(std::shared_ptr<Game>, FunctionAdder);
 			ScriptEngine(std::shared_ptr<Game>, GlobalMutator);
 
+			~ScriptEngine();
+
 			std::optional<v8::Local<v8::Value>> execute(const std::string &javascript, bool can_throw = true, const std::function<void(v8::Local<v8::Context>)> &context_mutator = {});
 			std::string string(v8::Local<v8::Value>);
 

@@ -14,7 +14,6 @@
 #include <cassert>
 #include <sstream>
 
-
 namespace Game3 {
 	std::atomic_bool ScriptEngine::initialized = false;
 	std::unique_ptr<v8::Platform> ScriptEngine::platform;
@@ -37,6 +36,12 @@ namespace Game3 {
 		isolate(makeIsolate()),
 		bufferTemplate(makeBufferTemplate()),
 		globalContext(makeContext(std::move(global_mutator))) {}
+
+	ScriptEngine::~ScriptEngine() {
+		globalContext.Reset();
+		bufferTemplate.Reset();
+		isolate->Dispose();
+	}
 
 	std::optional<v8::Local<v8::Value>> ScriptEngine::execute(const std::string &javascript, bool can_throw, const std::function<void(v8::Local<v8::Context>)> &context_mutator) {
 		v8::Locker locker(isolate);

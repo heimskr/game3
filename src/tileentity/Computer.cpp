@@ -18,6 +18,10 @@ namespace Game3 {
 	Computer::Computer(Position position_):
 		Computer("base:tile/computer"_id, position_) {}
 
+	Computer::~Computer() {
+		listeners.clear();
+	}
+
 	void Computer::init(Game &game) {
 		TileEntity::init(game);
 		context = std::make_shared<Context>(std::static_pointer_cast<Computer>(getSelf()));

@@ -15,9 +15,11 @@ namespace Game3 {
 				std::weak_ptr<Computer> computer;
 			};
 
+			static Identifier ID() { return {"base", "te/computer"}; }
+
 			std::shared_ptr<Context> context;
 
-			static Identifier ID() { return {"base", "te/computer"}; }
+			~Computer() override;
 
 			std::string getName() const override { return "Computer"; }
 			void init(Game &) override;
