@@ -228,5 +228,71 @@ namespace Game3 {
 			void initBiomeChunk(Chunk<BiomeType> &, ChunkPosition);
 			void initPathChunk(Chunk<uint8_t> &, ChunkPosition);
 			void initFluidChunk(Chunk<FluidTile> &, ChunkPosition);
+
+			template <typename M>
+			auto & findItem(Position position, bool &created, std::shared_lock<std::shared_mutex> *lock_out, M mode, std::shared_mutex &mutex, auto &map, const auto &init) {
+				created = false;
+				const ChunkPosition chunk_position = position.getChunk();
+
+				std::shared_lock shared_lock(mutex);
+
+				if (auto iter = map.find(chunk_position); iter != map.end()) {
+					if (lock_out != nullptr)
+						*lock_out = std::move(shared_lock);
+					return access(iter->second, remainder(position.row), remainder(position.column));
+				}
+
+				if (mode == M::Create) {
+					created = true;
+					shared_lock.unlock();
+					std::unique_lock unique_lock(mutex);
+					auto &chunk = map[chunk_position];
+					init(chunk, chunk_position);
+					auto &accessed = access(chunk, remainder(position.row), remainder(position.column)) = {};
+
+					// Transfer the lock sketchily.
+					if (lock_out != nullptr) {
+						unique_lock.unlock();
+						// Yikes.
+						shared_lock.lock();
+						*lock_out = std::move(shared_lock);
+					}
+
+					return accessed;
+				}
+
+				throw std::out_of_range("Couldn't find item at " + std::string(position));
+			}
+
+			template <typename M>
+			auto & findItem(Position position, bool &created, std::unique_lock<std::shared_mutex> *lock_out, M mode, std::shared_mutex &mutex, auto &map, const auto &init) {
+				created = false;
+				const ChunkPosition chunk_position = position.getChunk();
+
+				std::shared_lock shared_lock(mutex);
+
+				if (auto iter = map.find(chunk_position); iter != map.end()) {
+					if (lock_out != nullptr) {
+						shared_lock.unlock();
+						*lock_out = std::unique_lock(pathMutex);
+					}
+
+					return access(iter->second, remainder(position.row), remainder(position.column));
+				}
+
+				if (mode == M::Create) {
+					created = true;
+					shared_lock.unlock();
+					std::unique_lock unique_lock(mutex);
+					auto &chunk = map[chunk_position];
+					init(chunk, chunk_position);
+					auto &accessed = access(chunk, remainder(position.row), remainder(position.column)) = {};
+					if (lock_out != nullptr)
+						*lock_out = std::move(unique_lock);
+					return accessed;
+				}
+
+				throw std::out_of_range("Couldn't find item at " + std::string(position));
+			}
 	};
 }

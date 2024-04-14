@@ -363,190 +363,41 @@ namespace Game3 {
 	}
 
 	BiomeType & TileProvider::findBiomeType(Position position, bool &created, std::shared_lock<std::shared_mutex> *lock_out, BiomeMode mode) {
-		created = false;
-
-		const ChunkPosition chunk_position {divide(position.column), divide(position.row)};
-
-		std::shared_lock shared_lock(biomeMutex);
-
-		if (auto iter = biomeMap.find(chunk_position); iter != biomeMap.end()) {
-			if (lock_out != nullptr)
-				*lock_out = std::move(shared_lock);
-			return access(iter->second, remainder(position.row), remainder(position.column));
-		}
-
-		if (mode == BiomeMode::Create) {
-			created = true;
-			shared_lock.unlock();
-			std::unique_lock unique_lock(biomeMutex);
-			BiomeChunk &chunk = biomeMap[chunk_position];
+		return findItem(position, created, lock_out, mode, biomeMutex, biomeMap, [this](auto &chunk, ChunkPosition chunk_position) {
 			initBiomeChunk(chunk, chunk_position);
-			BiomeType &accessed = access(chunk, remainder(position.row), remainder(position.column)) = 0;
-
-			// Transfer the lock sketchily.
-			if (lock_out != nullptr) {
-				unique_lock.unlock();
-				// Yikes.
-				shared_lock.lock();
-				*lock_out = std::move(shared_lock);
-			}
-
-			return accessed;
-		}
-
-		throw std::out_of_range("Couldn't find biome type at " + std::string(position));
+		});
 	}
 
 	BiomeType & TileProvider::findBiomeType(Position position, bool &created, std::unique_lock<std::shared_mutex> *lock_out, BiomeMode mode) {
-		created = false;
-
-		const ChunkPosition chunk_position {divide(position.column), divide(position.row)};
-
-		std::shared_lock shared_lock(biomeMutex);
-
-		if (auto iter = biomeMap.find(chunk_position); iter != biomeMap.end()) {
-			if (lock_out != nullptr) {
-				shared_lock.unlock();
-				*lock_out = std::unique_lock(pathMutex);
-			}
-
-			return access(iter->second, remainder(position.row), remainder(position.column));
-		}
-
-		if (mode == BiomeMode::Create) {
-			created = true;
-			shared_lock.unlock();
-			std::unique_lock unique_lock(biomeMutex);
-			BiomeChunk &chunk = biomeMap[chunk_position];
+		return findItem(position, created, lock_out, mode, biomeMutex, biomeMap, [this](auto &chunk, ChunkPosition chunk_position) {
 			initBiomeChunk(chunk, chunk_position);
-			BiomeType &accessed = access(chunk, remainder(position.row), remainder(position.column)) = 0;
-			if (lock_out != nullptr)
-				*lock_out = std::move(unique_lock);
-			return accessed;
-		}
-
-		throw std::out_of_range("Couldn't find biome type at " + std::string(position));
+		});
 	}
 
 	uint8_t & TileProvider::findPathState(Position position, bool &created, std::shared_lock<std::shared_mutex> *lock_out, PathMode mode) {
-		created = false;
-
-		const ChunkPosition chunk_position {divide(position.column), divide(position.row)};
-
-		std::shared_lock shared_lock(pathMutex);
-
-		if (auto iter = pathMap.find(chunk_position); iter != pathMap.end()) {
-			if (lock_out != nullptr)
-				*lock_out = std::move(shared_lock);
-			return access(iter->second, remainder(position.row), remainder(position.column));
-		}
-
-		if (mode == PathMode::Create) {
-			created = true;
-			shared_lock.unlock();
-			std::unique_lock unique_lock(pathMutex);
-			PathChunk &chunk = pathMap[chunk_position];
+		return findItem(position, created, lock_out, mode, pathMutex, pathMap, [this](auto &chunk, ChunkPosition chunk_position) {
 			initPathChunk(chunk, chunk_position);
-			uint8_t &accessed = access(chunk, remainder(position.row), remainder(position.column)) = 0;
-
-			// Transfer the lock sketchily.
-			if (lock_out != nullptr) {
-				unique_lock.unlock();
-				// Yikes.
-				shared_lock.lock();
-				*lock_out = std::move(shared_lock);
-			}
-
-			return accessed;
-		}
-
-		throw std::out_of_range("Couldn't find path state at " + std::string(position));
+		});
 	}
 
 	uint8_t & TileProvider::findPathState(Position position, bool &created, std::unique_lock<std::shared_mutex> *lock_out, PathMode mode) {
-		created = false;
-
-		const ChunkPosition chunk_position {divide(position.column), divide(position.row)};
-
-		std::shared_lock shared_lock(pathMutex);
-
-		if (auto iter = pathMap.find(chunk_position); iter != pathMap.end()) {
-			if (lock_out != nullptr) {
-				shared_lock.unlock();
-				*lock_out = std::unique_lock(pathMutex);
-			}
-
-			return access(iter->second, remainder(position.row), remainder(position.column));
-		}
-
-		if (mode == PathMode::Create) {
-			created = true;
-			shared_lock.unlock();
-			std::unique_lock unique_lock(pathMutex);
-			PathChunk &chunk = pathMap[chunk_position];
+		return findItem(position, created, lock_out, mode, pathMutex, pathMap, [this](auto &chunk, ChunkPosition chunk_position) {
 			initPathChunk(chunk, chunk_position);
-			uint8_t &accessed = access(chunk, remainder(position.row), remainder(position.column));
-			if (lock_out != nullptr)
-				*lock_out = std::move(unique_lock);
-			return accessed = 0;
-		}
-
-		throw std::out_of_range("Couldn't find path state at " + std::string(position));
+		});
 	}
 
 	FluidTile & TileProvider::findFluid(Position position, std::shared_lock<std::shared_mutex> *lock_out, FluidMode mode) {
-		const auto chunk_position = position.getChunk();
-		std::shared_lock shared_lock(fluidMutex);
-
-		if (auto iter = fluidMap.find(chunk_position); iter != fluidMap.end()) {
-			if (lock_out != nullptr)
-				*lock_out = std::move(shared_lock);
-			return access(iter->second, remainder(position.row), remainder(position.column));
-		}
-
-		if (mode == FluidMode::Create) {
-			shared_lock.unlock();
-			std::unique_lock unique_lock(fluidMutex);
-			auto &chunk = fluidMap[chunk_position];
+		bool created{};
+		return findItem(position, created, lock_out, mode, fluidMutex, fluidMap, [this](auto &chunk, ChunkPosition chunk_position) {
 			initFluidChunk(chunk, chunk_position);
-			FluidTile &accessed = access(chunk, remainder(position.row), remainder(position.column)) = {0, 0};
-
-			if (lock_out != nullptr) {
-				unique_lock.unlock();
-				shared_lock.lock();
-				*lock_out = std::move(shared_lock);
-			}
-
-			return accessed;
-		}
-
-		throw std::out_of_range("Couldn't find fluid tile at " + static_cast<std::string>(position));
+		});
 	}
 
 	FluidTile & TileProvider::findFluid(Position position, std::unique_lock<std::shared_mutex> *lock_out, FluidMode mode) {
-		const auto chunk_position = position.getChunk();
-		std::shared_lock shared_lock(fluidMutex);
-
-		if (auto iter = fluidMap.find(chunk_position); iter != fluidMap.end()) {
-			if (lock_out != nullptr) {
-				shared_lock.unlock();
-				*lock_out = std::unique_lock(fluidMutex);
-			}
-			return access(iter->second, remainder(position.row), remainder(position.column));
-		}
-
-		if (mode == FluidMode::Create) {
-			shared_lock.unlock();
-			std::unique_lock unique_lock(fluidMutex);
-			auto &chunk = fluidMap[chunk_position];
+		bool created{};
+		return findItem(position, created, lock_out, mode, fluidMutex, fluidMap, [this](auto &chunk, ChunkPosition chunk_position) {
 			initFluidChunk(chunk, chunk_position);
-			FluidTile &accessed = access(chunk, remainder(position.row), remainder(position.column)) = {0, 0};
-			if (lock_out != nullptr)
-				*lock_out = std::move(unique_lock);
-			return accessed;
-		}
-
-		throw std::out_of_range("Couldn't find fluid tile at " + static_cast<std::string>(position));
+		});
 	}
 
 	const TileChunk & TileProvider::getTileChunk(Layer layer, ChunkPosition chunk_position) const {
