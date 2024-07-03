@@ -53,7 +53,12 @@ namespace Game3 {
 			static inline ObjectWrap<T> & unwrap(const char *internal_name, v8::Handle<v8::Object> handle) {
 				assert(!handle.IsEmpty());
 				assert(handle->InternalFieldCount() > 1);
-				assert(0 == strcmp(internal_name, *v8::String::Utf8Value(handle->GetIsolate(), handle->GetInternalField(0).As<v8::Value>())));
+
+				v8::Isolate *isolate = handle->GetIsolate();
+				v8::String::Utf8Value value(isolate, handle->GetInternalField(0).As<v8::Value>());
+				assert(*value);
+				assert(0 == strcmp(internal_name, *value));
+
 				void *ptr = handle->GetAlignedPointerFromInternalField(1);
 				return *static_cast<ObjectWrap<T> *>(ptr);
 			}
