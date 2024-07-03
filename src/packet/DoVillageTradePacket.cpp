@@ -70,7 +70,8 @@ namespace Game3 {
 
 		if (std::optional<MoneyCount> buy_price = totalBuyPrice(resource_count, -1, item->basePrice, amount)) {
 			if (!player->removeMoney(*buy_price)) {
-				client.sendError("Village trade failed: insufficient funds (have {}, need {})", player->getMoney(), *buy_price);
+				auto money = player->getMoney();
+				client.sendError("Village trade failed: insufficient funds (have {}, need {})", money, *buy_price);
 				return;
 			}
 
