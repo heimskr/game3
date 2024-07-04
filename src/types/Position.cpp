@@ -64,6 +64,14 @@ namespace Game3 {
 		return {row / divisor, column / divisor};
 	}
 
+	Position Position::operator*(double factor) const {
+		return {IntType(row * factor), IntType(column * factor)};
+	}
+
+	Position Position::operator/(double divisor) const {
+		return {IntType(row / divisor), IntType(column / divisor)};
+	}
+
 	Position & Position::operator+=(Direction direction) {
 		switch (direction) {
 			case Direction::Up:    return *this += Position(-1,  0);
@@ -93,6 +101,18 @@ namespace Game3 {
 	}
 
 	Position & Position::operator/=(Index divisor) {
+		row /= divisor;
+		column /= divisor;
+		return *this;
+	}
+
+	Position & Position::operator*=(double factor) {
+		row *= factor;
+		column *= factor;
+		return *this;
+	}
+
+	Position & Position::operator/=(double divisor) {
 		row /= divisor;
 		column /= divisor;
 		return *this;

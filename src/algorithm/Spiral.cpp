@@ -35,7 +35,7 @@ namespace Game3 {
 
 		// Credit: https://gamedev.stackexchange.com/q/157291
 		const double k = std::ceil((std::sqrt(index + 1) - 1) / 2);
-		double t = 2 * k;
+		const double t = 2 * k;
 		double m = (t + 1) * (t + 1);
 
 		if (index + 1 >= m - t)

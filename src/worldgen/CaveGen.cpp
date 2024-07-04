@@ -193,8 +193,6 @@ namespace Game3::WorldGen {
 		const Index column_min = CHUNK_SIZE * range.topLeft.x;
 		const Index column_max = CHUNK_SIZE * (range.bottomRight.x + 1) - 1;
 
-		std::vector<Position> inside;
-
 		range.iterate([&](ChunkPosition chunk_position) {
 			realm->tileProvider.ensureAllChunks(chunk_position);
 			realm->tileProvider.updateChunk(chunk_position);
@@ -206,10 +204,10 @@ namespace Game3::WorldGen {
 		for (Index row = row_min; row <= row_max; ++row) {
 			for (Index column = column_min; column <= column_max; ++column) {
 				if (generateCaveTile(realm, row, column, noisegen, rng)) {
-					inside.emplace_back(row, column);
 					layers.push_back(Layer::Terrain);
-				} else
+				} else {
 					layers.push_back(Layer::Objects);
+				}
 			}
 		}
 
@@ -220,10 +218,15 @@ namespace Game3::WorldGen {
 			}
 		}
 
-		if (inside.empty())
-			entrance = {0, 0};
-		else
-			entrance = choose(inside, rng);
+		entrance = exit_position / Cave::SCALE - Position(1, 0);
+
+		for (const Position &position : {entrance, entrance + Position(1, 0)}) {
+			realm->setTile(Layer::Objects, position, 0);
+			realm->setTile(Layer::Highest, position, 0);
+			if (realm->getTile(Layer::Terrain, position) == 0) {
+				realm->setTile(Layer::Terrain, position, "base:tile/dirt");
+			}
+		}
 
 		TileEntity::spawn<Building>(realm, "base:tile/ladder", entrance, parent_realm, exit_position);
 		timer.stop();

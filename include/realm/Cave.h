@@ -11,6 +11,9 @@ namespace Game3 {
 
 	class Cave: public Realm {
 		public:
+			/** An overworld position of (y, x) corresponds to a cave position of (y / SCALE, x / SCALE). */
+			constexpr static double SCALE = 2;
+
 			static Identifier ID() { return {"base", "realm/cave"}; }
 			RealmID parentRealm;
 			std::atomic_size_t entranceCount = 1;
