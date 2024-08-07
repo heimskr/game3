@@ -224,7 +224,7 @@ namespace Game3::WorldGen {
 			realm->setTile(Layer::Objects, position, 0);
 			realm->setTile(Layer::Highest, position, 0);
 			if (realm->getTile(Layer::Terrain, position) == 0) {
-				realm->setTile(Layer::Terrain, position, "base:tile/dirt");
+				realm->setTile(Layer::Terrain, position, "base:tile/cave_dirt");
 			}
 		}
 
