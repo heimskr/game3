@@ -34,7 +34,8 @@
 			"base:texture/sheep_mask":  ["resources/animals/sheep_mask.png"],
 			"base:texture/hellhound":   ["resources/animals/hellhound.png"],
 			"base:texture/crab":        ["resources/animals/crab.png"],
-			"base:texture/crab_blue":   ["resources/animals/crab_blue.png"]
+			"base:texture/crab_blue":   ["resources/animals/crab_blue.png"],
+			"base:texture/duck":        ["resources/animals/duck.png"]
 		}]
 	]
 }
