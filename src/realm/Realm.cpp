@@ -1157,12 +1157,25 @@ namespace Game3 {
 
 		++threadContext.updateNeighborsDepth;
 
+		GamePtr game = getGame();
+		TilesetPtr tileset = tileProvider.getTileset(*game);
+		RealmPtr self = shared_from_this();
+
+		Place place{{}, self, nullptr};
+
 		for (Index row_offset = -1; row_offset <= 1; ++row_offset) {
 			for (Index column_offset = -1; column_offset <= 1; ++column_offset) {
 				if (row_offset != 0 || column_offset != 0) {
 					const Position offset_position = position + Position(row_offset, column_offset);
 					if (auto neighbor = tileEntityAt(offset_position))
 						neighbor->onNeighborUpdated(Position(-row_offset, -column_offset));
+
+					if (auto tile_id = tryTile(layer, offset_position)) {
+						place.position = offset_position;
+						if (game->getTile((*tileset)[*tile_id])->update(place, layer))
+							continue;
+					}
+
 					autotile(offset_position, layer, context);
 				}
 			}

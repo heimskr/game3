@@ -77,6 +77,7 @@ namespace Game3 {
 		const Tileset &tileset = place.realm->getTileset();
 
 		std::shared_ptr<AutotileSet> autotile_set = tileset.getAutotileSet(autotile);
+		assert(autotile_set != nullptr);
 
 		const auto march_result = march4([&](int8_t row_offset, int8_t column_offset) -> bool {
 			const Position offset_position = place.position + Position(row_offset, column_offset);

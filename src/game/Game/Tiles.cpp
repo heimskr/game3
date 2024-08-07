@@ -5,6 +5,7 @@
 #include "tile/CropTile.h"
 #include "tile/DirtTile.h"
 #include "tile/FarmlandTile.h"
+#include "tile/FenceGateTile.h"
 #include "tile/ForestFloorTile.h"
 #include "tile/GrassTile.h"
 #include "tile/Tile.h"
@@ -14,7 +15,7 @@
 
 namespace Game3 {
 	std::shared_ptr<Tile> Game::getTile(const Identifier &identifier) {
-		auto &reg = registry<TileRegistry>();
+		TileRegistry &reg = *tileRegistry;
 		if (auto found = reg.maybe(identifier))
 			return found;
 		static auto default_tile = std::make_shared<Tile>("base:tile/?");
@@ -23,7 +24,7 @@ namespace Game3 {
 
 	void Game::addTiles() {
 		GamePtr self = shared_from_this();
-		auto &reg = registry<TileRegistry>();
+		TileRegistry &reg = *tileRegistry;
 
 		reg.add<DirtTile>();
 		reg.add<FarmlandTile>();
@@ -31,6 +32,9 @@ namespace Game3 {
 		reg.add<TorchTile>();
 		reg.add<VoidTile>();
 		reg.addMineable("base:tile/stone", ItemStack::create(self, "base:item/stone"), true);
+
+		for (Identifier id: {"base:tile/gate_horizontal", "base:tile/gate_horizontal_n", "base:tile/gate_horizontal_s", "base:tile/gate_vertical", "base:tile/gate_vertical_e", "base:tile/gate_vertical_w"})
+			reg.add<FenceGateTile>(std::move(id));
 
 		reg.add("base:tile/cave_coal",     std::make_shared<CaveTile>("base:tile/cave_coal",     ItemStack::create(self, "base:item/coal"),        "base:tile/cave_dirt"));
 		reg.add("base:tile/cave_copper",   std::make_shared<CaveTile>("base:tile/cave_copper",   ItemStack::create(self, "base:item/copper_ore"),  "base:tile/cave_dirt"));

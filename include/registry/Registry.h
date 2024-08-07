@@ -125,8 +125,16 @@ namespace Game3 {
 			}
 
 			template <typename S>
-			inline void add() {
-				add(S::ID(), std::make_shared<S>());
+			inline auto add() {
+				auto ptr = std::make_shared<S>();
+				add(S::ID(), ptr);
+				return ptr;
+			}
+
+			template <typename S>
+			inline auto add(Identifier new_name) {
+				auto ptr = std::make_shared<S>(new_name);
+				return add(std::move(new_name), std::move(ptr));
 			}
 
 			inline std::shared_ptr<T> add(Identifier new_name, std::shared_ptr<T> new_item) {

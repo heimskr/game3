@@ -28,7 +28,7 @@ namespace Game3 {
 		registries.add<PacketFactoryRegistry>();
 		registries.add<LocalCommandFactoryRegistry>();
 		registries.add<FluidRegistry>();
-		registries.add<TileRegistry>();
+		tileRegistry = registries.add<TileRegistry>();
 		registries.add<CropRegistry>();
 		registries.add<CentrifugeRecipeRegistry>();
 		registries.add<GeothermalRecipeRegistry>();

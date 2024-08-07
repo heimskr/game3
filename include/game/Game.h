@@ -165,6 +165,8 @@ namespace Game3 {
 			std::unordered_map<FluidID, TileID> fluidCache;
 
 		public:
+			std::shared_ptr<TileRegistry> tileRegistry;
+
 			template <typename Fn>
 			void iterateRealms(const Fn &function) const {
 				auto lock = realms.sharedLock();

@@ -3,6 +3,7 @@
 #include "net/Buffer.h"
 #include "threading/SharedRecursiveMutex.h"
 
+#include <concepts>
 #include <mutex>
 #include <shared_mutex>
 
@@ -79,15 +80,45 @@ namespace Game3 {
 		inline const T & getBase(std::unique_lock<std::shared_mutex> &lock) const { lock = uniqueLock(); return static_cast<const T &>(*this); }
 
 		template <typename Fn>
-		void withShared(const Fn &function) {
+		requires std::invocable<Fn>
+		void withShared(Fn &&function) const {
 			auto lock = sharedLock();
 			function();
 		}
 
 		template <typename Fn>
-		void withUnique(const Fn &function) {
+		requires std::invocable<Fn, Lockable<T, M> &>
+		void withShared(Fn &&function) {
+			auto lock = sharedLock();
+			function(*this);
+		}
+
+		template <typename Fn>
+		requires std::invocable<Fn, const Lockable<T, M> &>
+		void withShared(Fn &&function) const {
+			auto lock = sharedLock();
+			function(*this);
+		}
+
+		template <typename Fn>
+		requires std::invocable<Fn>
+		void withUnique(Fn &&function) const {
 			auto lock = uniqueLock();
 			function();
+		}
+
+		template <typename Fn>
+		requires std::invocable<Fn, Lockable<T, M> &>
+		void withUnique(Fn &&function) {
+			auto lock = uniqueLock();
+			function(*this);
+		}
+
+		template <typename Fn>
+		requires std::invocable<Fn, const Lockable<T, M> &>
+		void withUnique(Fn &&function) const {
+			auto lock = uniqueLock();
+			function(*this);
 		}
 
 		inline T copyBase() const {

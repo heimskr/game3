@@ -30,7 +30,7 @@ namespace Game3 {
 					inventory->erase(inventory->activeSlot);
 
 				// Make sure tree is fully grown before giving any products
-				if (tilename && tilename->get() == crop->stages.back())
+				if (tilename == crop->stages.back())
 					for (const ItemStackPtr &stack: crop->products.getStacks())
 						if (ItemStackPtr leftover = inventory->add(stack))
 							leftover->spawn(Place{place.position, place.realm});
@@ -41,7 +41,7 @@ namespace Game3 {
 		}
 
 		if (auto honey = crop->customData.find("honey"); honey != crop->customData.end()) {
-			if (auto tilename = place.getName(layer); tilename && tilename->get() == honey->at("full").get<Identifier>()) {
+			if (place.getName(layer) == honey->at("full").get<Identifier>()) {
 				if (!inventory->add(ItemStack::create(game, honey->at("item").get<Identifier>()))) {
 					place.set(layer, honey->at("empty").get<Identifier>());
 					return true;

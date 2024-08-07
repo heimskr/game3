@@ -34,9 +34,14 @@ namespace Game3 {
 			/** Returns true iff renderStaticLighting actually does anything. */
 			virtual bool hasStaticLighting() const { return false; }
 
+			/** Returns true if something meaningful happened, or false if Realm::updateNeighbors should default to autotiling. */
+			virtual bool update(const Place &, Layer) { return false; }
+
 		private:
 			Lockable<std::optional<std::vector<std::shared_ptr<EntityFactory>>>> monsterFactories;
 
 			void makeMonsterFactories(const std::shared_ptr<Game> &);
 	};
+
+	using TilePtr = std::shared_ptr<Tile>;
 }

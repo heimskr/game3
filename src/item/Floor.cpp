@@ -14,7 +14,7 @@ namespace Game3 {
 		auto &realm = *place.realm;
 		const auto &tileset = realm.getTileset();
 
-		if (place.getName(Layer::Terrain) == tileset.getEmpty()) {
+		if (place.get(Layer::Terrain) == tileset.getEmptyID()) {
 			place.set(Layer::Terrain, tilename);
 			InventoryPtr inventory = place.player->getInventory(0);
 			assert(inventory);

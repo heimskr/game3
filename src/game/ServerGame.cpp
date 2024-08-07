@@ -652,11 +652,10 @@ namespace Game3 {
 
 			if (first == "online") {
 				std::set<std::string> display_names;
-				{
-					auto lock = players.sharedLock();
+				players.withShared([&](const auto &players) {
 					for (const auto &iterated_player: players)
 						display_names.insert(iterated_player->displayName);
-				}
+				});
 				return {true, "Online players: " + join(display_names, ", ")};
 			}
 

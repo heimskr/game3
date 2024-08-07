@@ -224,8 +224,7 @@ namespace Game3 {
 			inline bool isServer() const { return getSide() == Side::Server; }
 
 			virtual bool interactGround(const PlayerPtr &, const Position &, Modifiers, const ItemStackPtr &used_item, Hand);
-			virtual void updateNeighbors(const Position &, Layer, TileUpdateContext);
-			void updateNeighbors(const Position &position, Layer layer) { updateNeighbors(position, layer, TileUpdateContext{}); }
+			virtual void updateNeighbors(const Position &, Layer, TileUpdateContext = {});
 			/** Returns true iff something was done with the right click. */
 			virtual bool rightClick(const Position &, double x, double y);
 			/** Generates additional chunks for the infinite map after the initial worldgen of the realm. */
