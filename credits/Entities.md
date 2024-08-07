@@ -1,0 +1,1 @@
+- `/resources/animals/duck.png`: [elvgames](https://elvgames.itch.io/farming-animals-pixelart-asset-pack)

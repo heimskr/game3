@@ -27,6 +27,7 @@
 		"base:entity/slime_blue":    ["base:texture/slime_blue",  1],
 		"base:entity/slime_green":   ["base:texture/slime_green", 1],
 		"base:entity/mushroom":      ["base:texture/mushroom",    1],
-		"base:entity/ship":          ["base:texture/ship",        0]
+		"base:entity/ship":          ["base:texture/ship",        0],
+		"base:entity/duck":          ["base:texture/duck",        3]
 	}]]
 }
