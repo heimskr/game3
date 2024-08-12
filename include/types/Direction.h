@@ -26,11 +26,11 @@ namespace Game3 {
 
 template <>
 struct std::formatter<Game3::Direction> {
-	constexpr auto parse(std::format_parse_context &ctx) {
+	constexpr auto parse(auto &ctx) {
 		return ctx.begin();
 	}
 
-	auto format(auto direction, std::format_context &ctx) const {
+	auto format(auto direction, auto &ctx) const {
 		switch (direction) {
 			case Game3::Direction::Up:      return std::format_to(ctx.out(), "up");
 			case Game3::Direction::Down:    return std::format_to(ctx.out(), "down");

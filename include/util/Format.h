@@ -6,11 +6,11 @@
 
 template <typename T>
 struct std::formatter<std::vector<T>> {
-	constexpr auto parse(std::format_parse_context &ctx) {
+	constexpr auto parse(auto &ctx) {
 		return ctx.begin();
 	}
 
-	auto format(const auto &vector, std::format_context &ctx) const {
+	auto format(const auto &vector, auto &ctx) const {
 		std::stringstream ss;
 		bool first = true;
 		for (const auto &item: vector) {

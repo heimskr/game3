@@ -37,9 +37,10 @@ namespace Game3 {
 
 			virtual bool empty() const;
 
+			using HasInventory::setInventory;
 			virtual void setInventory(Slot slot_count);
 
-			void inventoryUpdated() override;
+			void inventoryUpdated(InventoryID) override;
 			std::shared_ptr<Agent> getSharedAgent() final;
 
 			void addObserver(const std::shared_ptr<Player> &, bool silent) override;

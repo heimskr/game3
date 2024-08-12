@@ -194,33 +194,33 @@ namespace Game3 {
 
 template <>
 struct std::formatter<Game3::Item> {
-	constexpr auto parse(std::format_parse_context &ctx) {
+	constexpr auto parse(auto &ctx) {
 		return ctx.begin();
 	}
 
-	auto format(const Game3::Item &item, std::format_context &ctx) const {
+	auto format(const Game3::Item &item, auto &ctx) const {
 		return std::format_to(ctx.out(), "{}", item.name);
 	}
 };
 
 template <>
 struct std::formatter<Game3::ItemStack> {
-	constexpr auto parse(std::format_parse_context &ctx) {
+	constexpr auto parse(auto &ctx) {
 		return ctx.begin();
 	}
 
-	auto format(const Game3::ItemStack &stack, std::format_context &ctx) const {
+	auto format(const Game3::ItemStack &stack, auto &ctx) const {
 		return std::format_to(ctx.out(), "{} x {}", stack.getTooltip(), stack.count);
 	}
 };
 
 template <>
 struct std::formatter<Game3::ItemStackPtr> {
-	constexpr auto parse(std::format_parse_context &ctx) {
+	constexpr auto parse(auto &ctx) {
 		return ctx.begin();
 	}
 
-	auto format(const Game3::ItemStackPtr &stack, std::format_context &ctx) const {
+	auto format(const Game3::ItemStackPtr &stack, auto &ctx) const {
 		return std::format_to(ctx.out(), "{} x {}", stack->getTooltip(), stack->count);
 	}
 };

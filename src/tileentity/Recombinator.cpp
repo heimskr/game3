@@ -75,8 +75,11 @@ namespace Game3 {
 			return false;
 
 		struct CombinedGene {
-			nlohmann::json data{};
-			bool fromFirst{};
+			nlohmann::json data;
+			bool fromFirst;
+
+			CombinedGene(nlohmann::json data = {}, bool from_first = {}):
+				data(std::move(data)), fromFirst(from_first) {}
 		};
 
 		bool was_empty = !output;

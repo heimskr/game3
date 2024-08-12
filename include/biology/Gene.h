@@ -14,6 +14,8 @@ namespace Game3 {
 
 			Gene(std::string name_);
 
+			virtual ~Gene() = default;
+
 			virtual void toJSON(nlohmann::json &) const = 0;
 			/** strength ∈ [0.0, 1.0] */
 			virtual void mutate(float strength) = 0;

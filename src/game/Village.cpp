@@ -128,7 +128,7 @@ namespace Game3 {
 			resources.at(stack->getID()) -= multiplier * stack->count;
 
 		output_count += add_count;
-		labor -= labor_needed;
+		labor = labor - labor_needed;
 	}
 
 	void Village::produce(BiomeType biome, const ProductionRuleRegistry &rules) {
@@ -155,11 +155,11 @@ namespace Game3 {
 
 		if (rule.getIgnoreLabor()) {
 			if (in_range)
-				labor += rule.getLaborOut() * rate;
+				labor = labor + rule.getLaborOut() * rate;
 		} else {
 			if (!in_range)
 				return false;
-			labor += rule.getLaborOut() * rate;
+			labor = labor + rule.getLaborOut() * rate;
 		}
 
 		amount -= rate;

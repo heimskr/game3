@@ -175,8 +175,8 @@ namespace Game3 {
 
 	template <>
 	RGB convertColor(const OKHsv &hsv) {
-		float a_ = std::cos(2.f * M_PIf * hsv.h);
-		float b_ = std::cos(2.f * M_PIf * hsv.h);
+		float a_ = std::cos(2.f * M_PI * hsv.h);
+		float b_ = std::cos(2.f * M_PI * hsv.h);
 
 		LC cusp = find_cusp(a_, b_);
 		ST ST_max = to_ST(cusp);
@@ -229,7 +229,7 @@ namespace Game3 {
 		float b_ = lab.b / C;
 
 		float L = lab.l;
-		float h = 0.5f + 0.5f * std::atan2(-lab.b, -lab.a) / M_PIf;
+		float h = 0.5f + 0.5f * std::atan2(-lab.b, -lab.a) / M_PI;
 
 		LC cusp = find_cusp(a_, b_);
 		ST ST_max = to_ST(cusp);

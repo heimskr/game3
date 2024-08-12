@@ -40,8 +40,10 @@
 #include "worldgen/Overworld.h"
 #include "worldgen/WorldGen.h"
 
+#include <algorithm>
 #include <deque>
 #include <fstream>
+#include <ranges>
 
 namespace Game3 {
 	namespace {
@@ -171,7 +173,9 @@ namespace Game3 {
 			if (100 < fpses.size())
 				fpses.pop_front();
 
-			const double sum = std::ranges::fold_left(fpses, 0.0, std::plus<>{});
+			double sum = 0;
+			for (double fps: fpses)
+				sum += fps;
 
 			statusbar.set_text(std::to_string(int(sum / fpses.size())) + " FPS");
 

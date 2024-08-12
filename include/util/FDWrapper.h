@@ -31,7 +31,7 @@ namespace Game3 {
 			void init(int descriptor_, const std::vector<int> &to_redirect) {
 				descriptor = descriptor_;
 
-				for (const int redirect: to_redirect) {
+				for (int redirect: to_redirect) {
 					const int clone = dup(redirect);
 
 					if (clone == -1)
@@ -74,6 +74,9 @@ namespace Game3 {
 			struct Redirect {
 				int redirected;
 				int clone;
+
+				Redirect(int redirected, int clone):
+					redirected(redirected), clone(clone) {}
 			};
 
 			bool active = false;

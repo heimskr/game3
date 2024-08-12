@@ -1,7 +1,11 @@
 #pragma once
 
 #include <nlohmann/json_fwd.hpp>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include <v8.h>
+#pragma GCC diagnostic pop
 
 #include <atomic>
 #include <functional>

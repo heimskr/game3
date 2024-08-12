@@ -35,10 +35,6 @@ if get_option('buildtype') != 'plain'
 	test_cpp_args += '-fstack-protector-strong'
 endif
 
-if build_machine.system() == 'darwin'
-	config_h.set('GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED', '1')
-endif
-
 configure_file(output: 'config.h', configuration: config_h)
 
 foreach arg: test_cpp_args

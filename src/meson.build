@@ -35,8 +35,11 @@ game3_deps = [
 	sqlitecpp.get_variable('sqlitecpp_dep'),
 ]
 
+link_args = []
+
 if build_machine.system() == 'linux'
 	game3_deps += dependency('glu')
+	link_args += '-lX11'
 endif
 
 game3_sources += gnome.compile_resources('game3-resources',
@@ -48,8 +51,6 @@ inc_dirs = [
 	include_directories('..' / 'include'),
 	include_directories('..' / 'voronoi' / 'src'),
 ]
-
-link_args = ['-lX11']
 
 if get_option('vcpkg_triplet') != ''
 	vcpkg_root = 'vcpkg_installed' / get_option('vcpkg_triplet')

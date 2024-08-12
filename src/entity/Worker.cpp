@@ -153,11 +153,6 @@ namespace Game3 {
 		setPhase(new_phase);
 	}
 
-	void Worker::setMoney(MoneyCount new_money) {
-		money = new_money;
-		increaseUpdateCounter();
-	}
-
 	void Worker::setPhase(Phase new_phase) {
 		phase = new_phase;
 		increaseUpdateCounter();

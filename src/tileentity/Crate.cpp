@@ -90,6 +90,6 @@ namespace Game3 {
 			HasInventory::setInventory(std::make_shared<ClientInventory>(shared_from_this(), slot_count), 0);
 		else
 			HasInventory::setInventory(std::make_shared<ExpandedServerInventory>(shared_from_this(), slot_count), 0);
-		inventoryUpdated();
+		inventoryUpdated(0);
 	}
 }

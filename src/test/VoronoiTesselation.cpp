@@ -2,8 +2,8 @@
 #include "algorithm/Voronoi.h"
 #include "util/Math.h"
 
-#include <stb/stb_image.h>
-#include <stb/stb_image_write.h>
+#include "lib/stb/stb_image.h"
+#include "lib/stb/stb_image_write.h"
 
 #include <algorithm>
 #include <array>

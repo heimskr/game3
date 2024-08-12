@@ -36,23 +36,23 @@ namespace Game3 {
 		scrolled.add_controller(motion);
 
 		auto use_function = [this](Slot slot, Modifiers) {
-			lastGame.load()->getPlayer()->send(UseItemPacket(slot, Modifiers{}));
+			lastGame->getPlayer()->send(UseItemPacket(slot, Modifiers{}));
 		};
 
 		auto hold_left_function = [this](Slot slot, Modifiers) {
-			lastGame.load()->getPlayer()->send(SetHeldItemPacket(true, slot));
+			lastGame->getPlayer()->send(SetHeldItemPacket(true, slot));
 		};
 
 		auto hold_right_function = [this](Slot slot, Modifiers) {
-			lastGame.load()->getPlayer()->send(SetHeldItemPacket(false, slot));
+			lastGame->getPlayer()->send(SetHeldItemPacket(false, slot));
 		};
 
 		auto drop_function = [this](Slot slot, Modifiers) {
-			lastGame.load()->getPlayer()->getInventory(0)->drop(slot);
+			lastGame->getPlayer()->getInventory(0)->drop(slot);
 		};
 
 		auto discard_function = [this](Slot slot, Modifiers modifiers) {
-			InventoryPtr inventory = lastGame.load()->getPlayer()->getInventory(0);
+			InventoryPtr inventory = lastGame->getPlayer()->getInventory(0);
 			auto lock = inventory->uniqueLock();
 			if (modifiers.onlyShift()) {
 				ItemStackPtr stack = (*inventory)[slot];
@@ -79,35 +79,35 @@ namespace Game3 {
 		group = Gio::SimpleActionGroup::create();
 
 		group->add_action("use", [this, use_function] {
-			if (lastGame.load())
+			if (lastGame)
 				use_function(lastSlot, Modifiers{});
 			else
 				WARN("{}:{}: no lastGame", __FILE__, __LINE__);
 		});
 
 		group->add_action("hold_left", [this, hold_left_function] {
-			if (lastGame.load())
+			if (lastGame)
 				hold_left_function(lastSlot, Modifiers{});
 			else
 				WARN("{}:{}: no lastGame", __FILE__, __LINE__);
 		});
 
 		group->add_action("hold_right", [this, hold_right_function] {
-			if (lastGame.load())
+			if (lastGame)
 				hold_right_function(lastSlot, Modifiers{});
 			else
 				WARN("{}:{}: no lastGame", __FILE__, __LINE__);
 		});
 
 		group->add_action("drop", [this, drop_function] {
-			if (lastGame.load())
+			if (lastGame)
 				drop_function(lastSlot, Modifiers{});
 			else
 				WARN("{}:{}: no lastGame", __FILE__, __LINE__);
 		});
 
 		group->add_action("discard", [this, discard_function] {
-			if (lastGame.load())
+			if (lastGame)
 				discard_function(lastSlot, Modifiers{});
 			else
 				WARN("{}:{}: no lastGame", __FILE__, __LINE__);
@@ -238,9 +238,9 @@ namespace Game3 {
 		InventoryPtr inventory;
 		PlayerPtr player;
 		{
-			if (!lastGame.load())
+			if (!lastGame)
 				return;
-			player = lastGame.load()->getPlayer();
+			player = lastGame->getPlayer();
 			if (player)
 				inventory = player->getInventory(0);
 		}
@@ -265,13 +265,13 @@ namespace Game3 {
 	void InventoryTab::leftClick(Slot slot, Modifiers modifiers) {
 		mainWindow.onBlur();
 
-		if (!lastGame.load())
+		if (!lastGame)
 			return;
 
 		if (modifiers.onlyShift()) {
 			shiftClick(lastGame, slot);
 		} else {
-			lastGame.load()->getPlayer()->getInventory(0)->setActive(slot, false);
+			lastGame->getPlayer()->getInventory(0)->setActive(slot, false);
 		}
 	}
 
@@ -356,7 +356,7 @@ namespace Game3 {
 
 			const auto &value = static_cast<const Glib::Value<DragSource> &>(base);
 			const DragSource source = value.get();
-			if (auto game = lastGame.load(); game && game->getPlayer() && *source.inventory == *game->getPlayer()->getInventory(0))
+			if (lastGame && lastGame->getPlayer() && *source.inventory == *lastGame->getPlayer()->getInventory(0))
 				function(source.slot, lastModifiers);
 			return true;
 		}, false);

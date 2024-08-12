@@ -135,16 +135,18 @@ namespace Game3 {
 
 		} else if (type == "base:texture_map") {
 
-			auto &textures = registry<TextureRegistry>();
-			for (const auto &[key, value]: json.at(1).items()) {
-				if (value.size() == 1)
-					textures.add(Identifier(key), Texture(Identifier(key), value.at(0)))->init();
-				else if (value.size() == 2)
-					textures.add(Identifier(key), Texture(Identifier(key), value.at(0), value.at(1)))->init();
-				else if (value.size() == 3)
-					textures.add(Identifier(key), Texture(Identifier(key), value.at(0), value.at(1), value.at(2)))->init();
-				else
-					throw std::invalid_argument("Expected Texture JSON size to be 1, 2 or 3, not " + std::to_string(value.size()));
+			if (getSide() == Side::Client) {
+				auto &textures = registry<TextureRegistry>();
+				for (const auto &[key, value]: json.at(1).items()) {
+					if (value.size() == 1)
+						textures.add(Identifier(key), Texture(Identifier(key), value.at(0)))->init();
+					else if (value.size() == 2)
+						textures.add(Identifier(key), Texture(Identifier(key), value.at(0), value.at(1)))->init();
+					else if (value.size() == 3)
+						textures.add(Identifier(key), Texture(Identifier(key), value.at(0), value.at(1), value.at(2)))->init();
+					else
+						throw std::invalid_argument("Expected Texture JSON size to be 1, 2 or 3, not " + std::to_string(value.size()));
+				}
 			}
 
 		} else if (type == "base:tileset") {
@@ -152,14 +154,16 @@ namespace Game3 {
 			Identifier identifier = json.at(1);
 			std::filesystem::path base_dir = json.at(2);
 			auto &tilesets = registry<TilesetRegistry>();
-			tilesets.add(identifier, tileStitcher(base_dir, identifier));
+			tilesets.add(identifier, tileStitcher(base_dir, identifier, getSide()));
 
 		} else if (type == "base:itemset") {
 
-			Identifier identifier = json.at(1);
-			std::filesystem::path base_dir = json.at(2);
-			auto &itemsets = registry<ItemSetRegistry>();
-			itemsets.add(identifier, itemStitcher(&registry<ItemTextureRegistry>(), &registry<ResourceRegistry>(), base_dir, identifier));
+			if (getSide() == Side::Client) {
+				Identifier identifier = json.at(1);
+				std::filesystem::path base_dir = json.at(2);
+				auto &itemsets = registry<ItemSetRegistry>();
+				itemsets.add(identifier, itemStitcher(&registry<ItemTextureRegistry>(), &registry<ResourceRegistry>(), base_dir, identifier));
+			}
 
 		} else if (type == "base:soundset") {
 

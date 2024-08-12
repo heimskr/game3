@@ -158,7 +158,7 @@ namespace Game3 {
 
 	void CraftingTab::craftX(const ClientGamePtr &game, size_t registry_id) {
 		auto dialog = std::make_unique<CraftXDialog>(mainWindow);
-		dialog->signal_submit().connect([this, weak_game = std::weak_ptr(game), registry_id](int count) {
+		dialog->signal_submit().connect([weak_game = std::weak_ptr(game), registry_id](int count) {
 			if (0 < count)
 				if (ClientGamePtr game = weak_game.lock())
 					game->getPlayer()->send(CraftPacket(threadContext.rng(), registry_id, static_cast<uint64_t>(count)));

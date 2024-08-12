@@ -294,7 +294,6 @@ namespace Game3 {
 
 			owner->increaseUpdateCounter();
 			if (auto tile_entity = std::dynamic_pointer_cast<InventoriedTileEntity>(owner)) {
-				tile_entity->inventoryUpdated();
 				tile_entity->queueBroadcast();
 			} else if (auto server_player = std::dynamic_pointer_cast<ServerPlayer>(owner)) {
 				server_player->inventoryUpdated = true;

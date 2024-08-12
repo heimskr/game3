@@ -13,6 +13,9 @@ namespace Game3 {
 		public:
 			struct Context {
 				std::weak_ptr<Computer> computer;
+
+				Context(std::weak_ptr<Computer> computer):
+					computer(std::move(computer)) {}
 			};
 
 			static Identifier ID() { return {"base", "te/computer"}; }

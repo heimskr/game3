@@ -6,7 +6,7 @@
 namespace Game3 {
 	class Building;
 	class Recolor;
-	class RenderOptions;
+	struct RenderOptions;
 
 	class Sheep: public Animal {
 		public:

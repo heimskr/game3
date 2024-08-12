@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <thread>
+#include <unistd.h>
 
 namespace Game3 {
 	CommandOutput runCommand(const std::string &path, std::span<const std::string> args) {
@@ -42,9 +43,9 @@ namespace Game3 {
 			close(stdout_pipe[1]);
 			close(stderr_pipe[1]);
 
-			if (execv(path.c_str(), cstrings.data()) == -1) {
+			if (execvp(path.c_str(), cstrings.data()) == -1) {
 				ERROR("Path: {}", path.c_str());
-				throw std::runtime_error("execv failed: " + std::to_string(errno));
+				throw std::runtime_error("execvp failed: " + std::to_string(errno));
 			}
 
 			return {};
@@ -136,9 +137,9 @@ namespace Game3 {
 			close(stdout_pipe[1]);
 			close(stderr_pipe[1]);
 
-			if (execv(path.c_str(), cstrings.data()) == -1) {
+			if (execvp(path.c_str(), cstrings.data()) == -1) {
 				ERROR("Path: {}", path.c_str());
-				throw std::runtime_error("execv failed: " + std::to_string(errno));
+				throw std::runtime_error("execvp failed: " + std::to_string(errno));
 			}
 
 			return {};

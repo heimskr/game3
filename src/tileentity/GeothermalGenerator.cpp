@@ -260,7 +260,7 @@ namespace Game3 {
 		fluidContainer->levels[fluid_stack.id] += flasks_to_insert * fluid_stack.amount;
 
 		inventory_lock.unlock();
-		inventoryUpdated();
+		inventoryUpdated(0);
 		fluidsUpdated();
 	}
 }

@@ -17,7 +17,6 @@ namespace Game3 {
 		Input input;
 		Identifier outputID;
 
-		CombinerRecipe() = default;
 		CombinerRecipe(Identifier);
 		CombinerRecipe(Identifier, const std::shared_ptr<Game> &, const nlohmann::json &);
 

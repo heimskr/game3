@@ -144,11 +144,11 @@ namespace Game3 {
 
 template <>
 struct std::formatter<Game3::Substance> {
-	constexpr auto parse(std::format_parse_context &ctx) {
+	constexpr auto parse(auto &ctx) {
 		return ctx.begin();
 	}
 
-	auto format(auto pipe_type, std::format_context &ctx) const {
+	auto format(auto pipe_type, auto &ctx) const {
 		switch (pipe_type) {
 			case Game3::Substance::Item:   return std::format_to(ctx.out(), "Item");
 			case Game3::Substance::Fluid:  return std::format_to(ctx.out(), "Fluid");
@@ -162,11 +162,11 @@ struct std::formatter<Game3::Substance> {
 
 template <>
 struct std::formatter<Game3::Hand> {
-	constexpr auto parse(std::format_parse_context &ctx) {
+	constexpr auto parse(auto &ctx) {
 		return ctx.begin();
 	}
 
-	auto format(const auto &hand, std::format_context &ctx) const {
+	auto format(const auto &hand, auto &ctx) const {
 		switch (hand) {
 			case Game3::Hand::None:  return std::format_to(ctx.out(), "None");
 			case Game3::Hand::Left:  return std::format_to(ctx.out(), "Left");
@@ -179,11 +179,11 @@ struct std::formatter<Game3::Hand> {
 
 template <>
 struct std::formatter<Game3::Color> {
-	constexpr auto parse(std::format_parse_context &ctx) {
+	constexpr auto parse(auto &ctx) {
 		return ctx.begin();
 	}
 
-	auto format(const auto &color, std::format_context &ctx) const {
+	auto format(const auto &color, auto &ctx) const {
 		return std::format_to(ctx.out(), "({}, {}, {} @ {})", color.red, color.green, color.blue, color.alpha);
 	}
 };

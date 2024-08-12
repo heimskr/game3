@@ -316,13 +316,13 @@ namespace Game3 {
 				};
 			};
 
-			inventory->onMove = [this, weak_inventory = std::weak_ptr(inventory)](Inventory &source, Slot source_slot, Inventory &destination, Slot destination_slot, bool consumed) -> std::function<void()> {
+			inventory->onMove = [this, weak_inventory = std::weak_ptr(inventory)](Inventory &source, Slot source_slot, Inventory &destination, Slot destination_slot, bool) -> std::function<void()> {
 				InventoryPtr inventory = weak_inventory.lock();
 
 				if (!inventory)
 					return [] {};
 
-				return [this, &source, source_slot, &destination, destination_slot, consumed, inventory] {
+				return [this, &source, source_slot, &destination, destination_slot, inventory] {
 					if (source == *inventory && destination == *inventory) {
 						for (Held &held: {std::ref(heldLeft), std::ref(heldRight)}) {
 							if (source_slot == held.slot) {
@@ -883,7 +883,7 @@ namespace Game3 {
 		return game->getSide();
 	}
 
-	void Entity::inventoryUpdated() {
+	void Entity::inventoryUpdated(InventoryID) {
 		increaseUpdateCounter();
 	}
 

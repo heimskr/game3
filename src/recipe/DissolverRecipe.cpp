@@ -91,14 +91,6 @@ namespace Game3 {
 
 		auto copy = output_inventory->copy();
 
-		size_t atom_count = 0;
-
-		for (const ItemStackPtr &stack: output) {
-			if (!output_inventory->canInsert(stack))
-				return false;
-			atom_count += countAtoms(stack);
-		}
-
 		assert(input->count == input_inventory->remove(input));
 
 		for (const ItemStackPtr &stack: output)

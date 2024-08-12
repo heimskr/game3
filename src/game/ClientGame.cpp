@@ -42,7 +42,7 @@ namespace Game3 {
 	}
 
 	void ClientGame::click(int button, int, double pos_x, double pos_y, Modifiers modifiers) {
-		RealmPtr realm = activeRealm.load();
+		RealmPtr realm = activeRealm;
 
 		if (!realm)
 			return;
@@ -97,7 +97,7 @@ namespace Game3 {
 	}
 
 	Position ClientGame::translateCanvasCoordinates(double x, double y, double *x_offset_out, double *y_offset_out) const {
-		RealmPtr realm = activeRealm.load();
+		RealmPtr realm = activeRealm;
 
 		if (!realm)
 			return {};

@@ -129,8 +129,8 @@ namespace Game3 {
 			virtual void updateRiderOffset(const std::shared_ptr<Entity> &rider);
 			virtual void setRider(const std::shared_ptr<Entity> &);
 			virtual void setRidden(const std::shared_ptr<Entity> &);
-			inline std::shared_ptr<Entity> getRider()  const { return weakRider.load().lock();  }
-			inline std::shared_ptr<Entity> getRidden() const { return weakRidden.load().lock(); }
+			inline std::shared_ptr<Entity> getRider()  const { return weakRider.lock();  }
+			inline std::shared_ptr<Entity> getRidden() const { return weakRidden.lock(); }
 			virtual RideType getRideType() const { return RideType::Visible; }
 			inline Position::IntType getRow()    { auto lock = position.sharedLock(); return position.row;    }
 			inline Position::IntType getColumn() { auto lock = position.sharedLock(); return position.column; }
@@ -171,7 +171,7 @@ namespace Game3 {
 			void unhold(Slot);
 			Side getSide() const override final;
 			Type getAgentType() const override final { return Agent::Type::Entity; }
-			void inventoryUpdated() override;
+			void inventoryUpdated(InventoryID) override;
 			ChunkPosition getChunk() const;
 			bool canSee(RealmID, const Position &) const;
 			bool canSee(const Entity &) const;
@@ -249,8 +249,8 @@ namespace Game3 {
 			float renderHeight = 16.f;
 			std::atomic_bool awaitingDestruction = false;
 			Atomic<MoneyCount> money = 0;
-			Atomic<std::weak_ptr<Entity>> weakRider;
-			Atomic<std::weak_ptr<Entity>> weakRidden;
+			std::weak_ptr<Entity> weakRider;
+			std::weak_ptr<Entity> weakRidden;
 			Held heldLeft {true};
 			Held heldRight{false};
 

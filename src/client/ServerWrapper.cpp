@@ -24,6 +24,16 @@
 #define REDIRECT_LOGS
 #endif
 
+namespace {
+	void setCurrentThreadName(const char *name) {
+#ifdef __APPLE__
+		pthread_setname_np(name);
+#else
+		pthread_setname_np(pthread_self(), name);
+#endif
+	}
+}
+
 namespace Game3 {
 	namespace {
 		std::filesystem::path KEY_PATH{"localserver.key"};
@@ -38,7 +48,7 @@ namespace Game3 {
 		stop();
 
 		runThread =	std::thread([this, overworld_seed] {
-			pthread_setname_np(pthread_self(), "RunThread");
+			setCurrentThreadName("RunThread");
 			threadActive = true;
 			run(overworld_seed);
 		});
@@ -119,7 +129,7 @@ namespace Game3 {
 		});
 
 		std::thread stop_thread([this] {
-			pthread_setname_np(pthread_self(), "StopThread");
+			setCurrentThreadName("StopThread");
 			std::unique_lock lock(stopMutex);
 			stopCV.wait(lock, [this] { return !running.load(); });
 			server->stop();
@@ -169,7 +179,7 @@ namespace Game3 {
 		game->initInteractionSets();
 
 		std::thread tick_thread([&] {
-			pthread_setname_np(pthread_self(), "TickThread");
+			setCurrentThreadName("TickThread");
 			while (running) {
 				if (!game->tickingPaused)
 					game->tick();
@@ -181,7 +191,7 @@ namespace Game3 {
 		std::chrono::seconds save_period{120};
 
 		std::thread save_thread([&] {
-			pthread_setname_np(pthread_self(), "SaveThread");
+			setCurrentThreadName("SaveThread");
 			std::chrono::time_point last_save = std::chrono::system_clock::now();
 
 			while (running) {
@@ -259,7 +269,7 @@ namespace Game3 {
 	}
 
 	bool ServerWrapper::generateCertificate(const std::filesystem::path &certificate_path, const std::filesystem::path &key_path) {
-		runCommand("/usr/bin/openssl", {
+		runCommand("openssl", {
 			"req", "-x509", "-newkey", "rsa:4096", "-keyout", key_path.string(), "-out", certificate_path.string(), "-sha256", "-days", "36500", "-nodes", "-subj", "/C=/ST=/L=/O=/OU=/CN=",
 		});
 

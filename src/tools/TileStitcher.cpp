@@ -20,7 +20,7 @@
 #endif
 
 namespace Game3 {
-	Tileset tileStitcher(const std::filesystem::path &base_dir, Identifier tileset_name, std::string *png_out) {
+	Tileset tileStitcher(const std::filesystem::path &base_dir, Identifier tileset_name, Side side, std::string *png_out) {
 		std::set<std::filesystem::path> dirs;
 
 		for (const std::filesystem::directory_entry &entry: std::filesystem::directory_iterator(base_dir))
@@ -295,15 +295,17 @@ namespace Game3 {
 			*png_out = ss.str();
 		}
 
-		auto texture = std::make_shared<Texture>(std::move(tileset_name));
-		texture->alpha = true;
-		texture->filter = GL_NEAREST;
-		texture->format = GL_RGBA;
-		texture->width = dimension;
-		texture->height = dimension;
-		texture->init(std::move(raw));
+		if (side == Side::Client) {
+			auto texture = std::make_shared<Texture>(std::move(tileset_name));
+			texture->alpha = true;
+			texture->filter = GL_NEAREST;
+			texture->format = GL_RGBA;
+			texture->width = dimension;
+			texture->height = dimension;
+			texture->init(std::move(raw));
 
-		out.cachedTexture = std::move(texture);
+			out.cachedTexture = std::move(texture);
+		}
 
 		return out;
 	}

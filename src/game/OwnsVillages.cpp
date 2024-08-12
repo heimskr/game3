@@ -73,7 +73,7 @@ namespace Game3 {
 		lastVillageID = 0;
 
 		while (query.executeStep()) {
-			size_t id(query.getColumn(0).getInt64());
+			VillageID id(query.getColumn(0).getInt64());
 			RealmID realm_id(query.getColumn(1).getInt());
 			ChunkPosition chunk_position(query.getColumn(2).getString());
 			Position position(query.getColumn(3).getString());

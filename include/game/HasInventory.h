@@ -24,9 +24,8 @@ namespace Game3 {
 			void encode(Buffer &, InventoryID);
 			void decode(Buffer &, InventoryID);
 
-			virtual void inventoryUpdated() {}
+			virtual void inventoryUpdated(InventoryID) {}
 			virtual std::shared_ptr<Agent> getSharedAgent() = 0;
-
 
 			template <typename T>
 			void decodeSpecific(Buffer &buffer, InventoryID index) {
@@ -35,7 +34,7 @@ namespace Game3 {
 				std::shared_ptr<T> inventory;
 				if (slot_count == -1) {
 					setInventory(nullptr, index);
-					inventoryUpdated();
+					inventoryUpdated(index);
 					buffer >> inventory;
 					assert(!inventory);
 				} else {
@@ -46,7 +45,7 @@ namespace Game3 {
 						inventory->setSlotCount(slot_count); // Maybe not necessary? Try an assert before.
 						inventory->index = index;
 						setInventory(inventory, index);
-						inventoryUpdated();
+						inventoryUpdated(index);
 					}
 				}
 			}

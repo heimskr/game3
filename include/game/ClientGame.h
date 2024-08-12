@@ -69,9 +69,9 @@ namespace Game3 {
 
 			Side getSide() const final { return Side::Client; }
 
-			inline ClientPlayerPtr getPlayer() const { return player.load(); }
-			inline std::shared_ptr<LocalClient> getClient() const { return client.load(); }
-			inline RealmPtr getActiveRealm() const { return activeRealm.load(); }
+			inline ClientPlayerPtr getPlayer() const { return player; }
+			inline std::shared_ptr<LocalClient> getClient() const { return client; }
+			inline RealmPtr getActiveRealm() const { return activeRealm; }
 
 			void setPlayer(ClientPlayerPtr);
 			void setClient(std::shared_ptr<LocalClient>);
@@ -85,9 +85,9 @@ namespace Game3 {
 			std::shared_ptr<const ClientGame> getSelf() const { return std::static_pointer_cast<const ClientGame>(shared_from_this()); }
 
 		private:
-			Atomic<ClientPlayerPtr> player;
-			Atomic<std::shared_ptr<LocalClient>> client;
-			Atomic<RealmPtr> activeRealm;
+			ClientPlayerPtr player;
+			std::shared_ptr<LocalClient> client;
+			RealmPtr activeRealm;
 			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update;
 			sigc::signal<void(const PlayerPtr &)> signal_player_money_update;
 			sigc::signal<void(const std::shared_ptr<Agent> &, InventoryID)> signal_other_inventory_update;

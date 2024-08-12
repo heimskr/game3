@@ -1,5 +1,7 @@
 #pragma once
 
+#define MA_NO_PTHREAD_INCLUDE
+#include <thread>
 #include <miniaudio/miniaudio.h>
 
 #include <stdexcept>

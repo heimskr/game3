@@ -139,10 +139,10 @@ namespace Game3 {
 		assert(realm);
 		// TODO: support multiple inventories with setInventory
 		HasInventory::setInventory(Inventory::create(realm->getSide(), shared_from_this(), slot_count), 0);
-		inventoryUpdated();
+		inventoryUpdated(0);
 	}
 
-	void InventoriedTileEntity::inventoryUpdated() {
+	void InventoriedTileEntity::inventoryUpdated(InventoryID) {
 		if (getSide() != Side::Server)
 			return;
 		increaseUpdateCounter();

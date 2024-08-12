@@ -58,7 +58,6 @@ namespace Game3 {
 			Gtk::PopoverMenu popoverMenu;
 			Gtk::FlowBox flowBox;
 			Gtk::Label label;
-			Slot lastSlot = -1;
 			Slot lastSlotCount = -1;
 			int tabWidth = 0;
 			ItemSlotParent *parent = nullptr;

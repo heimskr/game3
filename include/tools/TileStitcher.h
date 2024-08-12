@@ -7,5 +7,5 @@
 #include <string>
 
 namespace Game3 {
-	Tileset tileStitcher(const std::filesystem::path &base_dir, Identifier tileset_name, std::string *png_out = nullptr);
+	Tileset tileStitcher(const std::filesystem::path &base_dir, Identifier tileset_name, Side, std::string *png_out = nullptr);
 }

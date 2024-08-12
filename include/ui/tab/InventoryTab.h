@@ -67,7 +67,7 @@ namespace Game3 {
 			Glib::RefPtr<Gtk::EventControllerMotion> motion;
 
 			/** We can't store state in a popover, so we have to store it here. */
-			Atomic<std::shared_ptr<ClientGame>> lastGame;
+			std::shared_ptr<ClientGame> lastGame;
 			Slot lastSlot = -1;
 			int lastWidth = -1;
 			Modifiers lastModifiers;

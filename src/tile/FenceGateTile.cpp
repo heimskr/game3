@@ -10,7 +10,7 @@
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
-	bool FenceGateTile::interact(const Place &place, Layer layer, const ItemStackPtr &held_item, Hand hand) {
+	bool FenceGateTile::interact(const Place &place, Layer layer, const ItemStackPtr &, Hand) {
 		auto id = place.getName(layer);
 		if (!id)
 			return false;

@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <cstring>
 #include <deque>
+#include <iomanip>
 #include <iostream>
 #include <list>
 #include <memory>
@@ -437,11 +438,11 @@ namespace Game3 {
 
 template <>
 struct std::formatter<Game3::Buffer> {
-	constexpr auto parse(std::format_parse_context &ctx) {
+	constexpr auto parse(auto &ctx) {
 		return ctx.begin();
 	}
 
-	auto format(const auto &buffer, std::format_context &ctx) const {
+	auto format(const auto &buffer, auto &ctx) const {
 		std::stringstream ss;
 		ss << "Buffer<";
 

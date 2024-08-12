@@ -16,6 +16,7 @@ namespace Game3 {
 			std::string getName() const override { return "Autocrafter"; }
 
 			const std::shared_ptr<Inventory> & getInventory(InventoryID) const override;
+			using InventoriedTileEntity::setInventory;
 			void setInventory(std::shared_ptr<Inventory>, InventoryID) override;
 			InventoryID getInventoryCount() const override { return 2; }
 

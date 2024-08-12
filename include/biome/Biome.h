@@ -50,7 +50,7 @@ namespace Game3 {
 
 		private:
 			Realm *realm = nullptr;
-			static std::map<BiomeType, std::shared_ptr<const Biome>> map;
+			static const std::map<BiomeType, std::shared_ptr<const Biome>> & getMap();
 	};
 
 	using BiomePtr = std::shared_ptr<Biome>;
