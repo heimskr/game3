@@ -116,9 +116,11 @@ namespace Game3 {
 		// TODO: make a map of handlers for different types instead of if-elsing here
 		if (type == "base:entity_texture_map") {
 
-			auto &textures = registry<EntityTextureRegistry>();
-			for (const auto &[key, value]: json.at(1).items())
-				textures.add(Identifier(key), EntityTexture(Identifier(key), value.at(0), value.at(1)));
+			if (getSide() == Side::Client) {
+				auto &textures = registry<EntityTextureRegistry>();
+				for (const auto &[key, value]: json.at(1).items())
+					textures.add(Identifier(key), EntityTexture(Identifier(key), value.at(0), value.at(1)));
+			}
 
 		} else if (type == "base:ore_map") {
 

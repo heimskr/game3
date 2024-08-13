@@ -67,7 +67,7 @@ namespace Game3 {
 
 		std::weak_ptr weak_client(std::static_pointer_cast<RemoteClient>(client.shared_from_this()));
 
-		client.strand.post([this, weak_client, message = std::move(message)]() mutable {
+		client.strand.post([weak_client, message = std::move(message)]() mutable {
 			if (std::shared_ptr<RemoteClient> client = weak_client.lock())
 				client->queue(std::move(message));
 		});

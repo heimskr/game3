@@ -24,8 +24,7 @@ namespace Game3 {
 		const std::string & blurFrag()     { static auto out = readFile("resources/blur.frag");     return out; }
 		const std::string & bufferedFrag() { static auto out = readFile("resources/buffered.frag"); return out; }
 		const std::string & bufferedVert() { static auto out = readFile("resources/buffered.vert"); return out; }
-		constexpr float TEXTURE_SCALE = 2.f;
-		constexpr float TILE_TEXTURE_PADDING = 1.f / 16384.f;
+		constexpr float TILE_TEXTURE_PADDING = 1. / 16384.;
 	}
 
 	ElementBufferedRenderer::ElementBufferedRenderer():
@@ -219,7 +218,7 @@ namespace Game3 {
 		GamePtr game = realm->getGame();
 
 		Timer timer{"BufferedVBOInit"};
-		vbo.init<float, 11>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, game, &tileset, set_width, divisor, t_size, missing](size_t x, size_t y) {
+		vbo.init<float, 11>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, game, set_width, divisor, t_size, missing](size_t x, size_t y) {
 			const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
 
 			std::array<TileID, LAYER_COUNT> tiles{};
@@ -235,8 +234,9 @@ namespace Game3 {
 				if (!tile_opt) {
 					isMissing = true;
 					tiles[layer_index - 1] = missing;
-				} else
+				} else {
 					tiles[layer_index - 1] = *tile_opt;
+				}
 			}
 
 			const auto fluid_opt = realm->tryFluid({

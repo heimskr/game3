@@ -11,7 +11,7 @@ namespace Game3 {
 
 			std::string getName() const override { return "Autofarmer"; }
 
-			void init(Game &);
+			void init(Game &) override;
 			void tick(const TickArgs &) override;
 			void toJSON(nlohmann::json &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
