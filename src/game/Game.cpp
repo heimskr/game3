@@ -5,7 +5,6 @@
 #include "game/InteractionSet.h"
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
-#include "graphics/ItemTexture.h"
 #include "ui/module/AutocrafterModule.h"
 #include "ui/module/ChemicalReactorModule.h"
 #include "ui/module/CombinerModule.h"

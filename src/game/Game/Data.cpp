@@ -137,8 +137,8 @@ namespace Game3 {
 
 		} else if (type == "base:texture_map") {
 
+			auto &textures = registry<TextureRegistry>();
 			if (getSide() == Side::Client) {
-				auto &textures = registry<TextureRegistry>();
 				for (const auto &[key, value]: json.at(1).items()) {
 					if (value.size() == 1)
 						textures.add(Identifier(key), Texture(Identifier(key), value.at(0)))->init();
@@ -148,6 +148,10 @@ namespace Game3 {
 						textures.add(Identifier(key), Texture(Identifier(key), value.at(0), value.at(1), value.at(2)))->init();
 					else
 						throw std::invalid_argument("Expected Texture JSON size to be 1, 2 or 3, not " + std::to_string(value.size()));
+				}
+			} else {
+				for (const auto &[key, value]: json.at(1).items()) {
+					textures.add(Identifier(key), Texture(Identifier(key)));
 				}
 			}
 
