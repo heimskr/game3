@@ -12,8 +12,8 @@ namespace {
 }
 
 namespace Game3 {
-	Projectile::Projectile(Identifier item_id, const Vector3 &initial_velocity, double linger_time):
-		Entity(ID()), itemID(std::move(item_id)), initialVelocity(initial_velocity), lingerTime(linger_time) {}
+	Projectile::Projectile(Identifier item_id, const Vector3 &initial_velocity, double angular_velocity, double linger_time):
+		Entity(ID()), itemID(std::move(item_id)), initialVelocity(initial_velocity), angularVelocity(angular_velocity), lingerTime(linger_time) {}
 
 	void Projectile::tick(const TickArgs &args) {
 		auto offset_lock = offset.uniqueLock();
@@ -31,6 +31,8 @@ namespace Game3 {
 				queueDestruction();
 				return;
 			}
+		} else {
+			angle += angularVelocity * args.delta;
 		}
 
 		enqueueTick();
@@ -55,23 +57,21 @@ namespace Game3 {
 		const float y = position.row + offset.y - offset.z;
 
 		sprite_renderer(texture, {
-			.x = x + .125f,
-			.y = y + .125f,
+			.x = x + .125f / scale,
+			.y = y + .125f / scale,
 			.offsetX = offsetX,
 			.offsetY = offsetY,
 			.sizeX = sizeX,
 			.sizeY = sizeY,
-			.scaleX = .75f * 16.f / sizeX,
-			.scaleY = .75f * 16.f / sizeY,
+			.scaleX = scale * 16.f / sizeX,
+			.scaleY = scale * 16.f / sizeY,
+			.angle = angle,
 		});
 	}
 
 	void Projectile::onSpawn() {
 		Entity::onSpawn();
 		velocity = initialVelocity;
-
-		if (getSide() == Side::Client) {
-		}
 	}
 
 	int Projectile::getZIndex() const {
@@ -81,11 +81,15 @@ namespace Game3 {
 	void Projectile::encode(Buffer &buffer) {
 		Entity::encode(buffer);
 		buffer << lingerTime;
+		buffer << angularVelocity;
+		buffer << angle;
 	}
 
 	void Projectile::decode(Buffer &buffer) {
 		Entity::decode(buffer);
 		buffer >> lingerTime;
+		buffer >> angularVelocity;
+		buffer >> angle;
 	}
 
 	const Identifier & Projectile::getItemID() const {

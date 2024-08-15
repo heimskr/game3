@@ -31,7 +31,7 @@ namespace Game3 {
 		velocity.z /= scale;
 
 		RealmPtr realm = place.realm;
-		EntityPtr entity = Projectile::create(game, projectileID, velocity, 5);
+		EntityPtr entity = Projectile::create(game, projectileID, velocity, 720 * (relative.column < 0? -1 : 1), 5);
 		entity->spawning = true;
 		entity->setRealm(realm);
 		realm->queueEntityInit(std::move(entity), player->getPosition());

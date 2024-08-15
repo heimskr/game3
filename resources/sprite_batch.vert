@@ -69,9 +69,10 @@ void main() {
 	model = translate(model, vec3(-mapLength * tileSize / 2, -mapLength * tileSize / 2, 0.0));
 	model = translate(model, vec3(center * tileSize, 0.0));
 	model = translate(model, vec3(mapPosition.x * tileSize, mapPosition.y * tileSize, 0.0));
-	model = translate(model, vec3(spriteSize / 2, 0.0));
+	vec2 rotation_translation = spriteSize * textureScale / 2;
+	model = translate(model, vec3(rotation_translation, 0.0));
 	model = rotate(model, radians(spriteDegrees), vec3(0.0, 0.0, 1.0));
-	model = translate(model, vec3(-spriteSize / 2, 0.0));
+	model = translate(model, vec3(-rotation_translation, 0.0));
 	model = translate(model, vec3(-spriteOffset.x * 2.0 * textureScale.x, -spriteOffset.y * 2.0 * textureScale.y, 0.0));
 	model = scale(model, vec3(atlasSize * textureScale, 1.0));
 

@@ -144,8 +144,9 @@ namespace Game3 {
 			} else {
 				atlas_ptr->vbo.update(data, true);
 			}
-		} else
+		} else {
 			atlas_ptr = &(atlases[texture->id] = generateAtlas(texture, options));
+		}
 
 		if (!atlas_ptr)
 			throw std::runtime_error("Couldn't find or initialize Atlas in BatchSpriteRenderer::flush");
