@@ -677,12 +677,14 @@ namespace Game3 {
 
 		const Vector3 old_offset = getOffset();
 
-		if (context.forcedOffset)
+		if (context.forcedOffset) {
 			offset = *context.forcedOffset;
-		else if (firstTeleport)
-			offset = Vector3{0., 0., 0.};
-		else if (context.clearOffset)
-			offset = Vector3{0., 0., offset.z};
+		} else if (context.clearOffset) {
+			if (firstTeleport)
+				offset = Vector3{0., 0., 0.};
+			else
+				offset = Vector3{0., 0., offset.z};
+		}
 
 		if (context.facingDirection)
 			direction = *context.facingDirection;
