@@ -51,7 +51,8 @@ namespace Game3 {
 			void interactNextTo(Modifiers, Hand = Hand::None);
 			void putInLimbo(EntityPtr, RealmID, const Position &);
 			void requestFromLimbo(RealmID);
-			void playSound(const Identifier &, float pitch = 1.f);
+			/** Returns whether a sound was found with the given ID. */
+			bool playSound(const Identifier &, float pitch = 1.f);
 
 			void moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data);
 

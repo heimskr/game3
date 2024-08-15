@@ -61,6 +61,7 @@
 #include "packet/EntityMoneyChangedPacket.h"
 #include "packet/EntityRiddenPacket.h"
 #include "packet/SetCopierConfigurationPacket.h"
+#include "packet/PlaySoundPacket.h"
 
 namespace Game3 {
 	void Game::addPacketFactories() {
@@ -132,5 +133,6 @@ namespace Game3 {
 		add(PacketFactory::create<EntityMoneyChangedPacket>());
 		add(PacketFactory::create<EntityRiddenPacket>());
 		add(PacketFactory::create<SetCopierConfigurationPacket>());
+		add(PacketFactory::create<PlaySoundPacket>());
 	}
 }

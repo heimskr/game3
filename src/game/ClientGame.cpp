@@ -256,9 +256,13 @@ namespace Game3 {
 		}
 	}
 
-	void ClientGame::playSound(const Identifier &identifier, float pitch) {
-		if (const std::filesystem::path *path = getSound(identifier))
+	bool ClientGame::playSound(const Identifier &identifier, float pitch) {
+		if (const std::filesystem::path *path = getSound(identifier)) {
 			sounds.play(*path, pitch);
+			return true;
+		}
+
+		return false;
 	}
 
 	void ClientGame::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data) {

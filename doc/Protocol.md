@@ -386,7 +386,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 56. **Subscribe to Village Updates**: tells the server to start/stop sending village updates to the client.
 
-	- `optional<u64>` Village ID: if false, unsubscribe
+	- `optional<u64>` Village ID: if empty, unsubscribe
 
 57. **Village Update**: informs the client of a village's latest data.
 
@@ -427,6 +427,11 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `i32` Slot
 	- `bool` Include tile entities
+
+63. **Play Sound**: tells a client to play a given sound at a given position.
+
+	- `string` Sound ID
+	- `Position` Sound origin
 
 # Message Format
 
