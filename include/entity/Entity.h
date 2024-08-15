@@ -255,12 +255,12 @@ namespace Game3 {
 			Held heldRight{false};
 
 			Entity() = delete;
-			Entity(EntityType);
+			Entity(EntityType type);
 
 			virtual bool canMoveTo(const Place &) const;
 			/** A list of functions to call the next time the entity moves. Each function returns whether it should be removed from the queue. */
 			Lockable<std::list<std::function<bool(const std::shared_ptr<Entity> &, bool)>>> moveQueue;
-			std::shared_ptr<Texture> getTexture();
+			virtual std::shared_ptr<Texture> getTexture();
 			inline auto getHeldLeftTexture()  const { return heldLeft.texture;  }
 			inline auto getHeldRightTexture() const { return heldRight.texture; }
 
@@ -272,7 +272,7 @@ namespace Game3 {
 
 			Atomic<GlobalID> otherEntityToLock = -1;
 
-			/** The set of all players who have been sent a packet about the entity's current path. Governed by pathSeersMutex */
+			/** The set of all players who have been sent a packet about the entity's current path. */
 			Lockable<WeakSet<Player>> pathSeers;
 
 			bool setHeld(Slot, Held &);

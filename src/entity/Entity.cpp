@@ -595,8 +595,8 @@ namespace Game3 {
 		return *this;
 	}
 
-	Entity::Entity(EntityType type_):
-		type(type_) {}
+	Entity::Entity(EntityType type):
+		type(std::move(type)) {}
 
 	bool Entity::canMoveTo(const Place &place) const {
 		RealmPtr realm = place.realm;
@@ -652,9 +652,6 @@ namespace Game3 {
 		if (!is_autofocus)
 			canvas.scale = 8.;
 
-		Tileset &tileset = realm->getTileset();
-		GamePtr game = getGame();
-		TexturePtr texture = tileset.getTexture(*game);
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
 		{
 			auto lock = offset.sharedLock();
@@ -1172,10 +1169,14 @@ namespace Game3 {
 		}
 
 		held.slot = new_value;
-		auto item_texture = game->registry<ItemTextureRegistry>().at((*inventory)[held.slot]->item->identifier);
-		held.texture = item_texture->getTexture();
-		held.offsetX = item_texture->x / 2.;
-		held.offsetY = item_texture->y / 2.;
+
+		if (is_client) {
+			auto item_texture = game->registry<ItemTextureRegistry>().at((*inventory)[held.slot]->item->identifier);
+			held.texture = item_texture->getTexture();
+			held.offsetX = item_texture->x / 2.;
+			held.offsetY = item_texture->y / 2.;
+		}
+
 		return true;
 	}
 

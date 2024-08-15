@@ -42,6 +42,7 @@
 #include "item/Pickaxe.h"
 #include "item/PipeItem.h"
 #include "item/PressurePlateItem.h"
+#include "item/ProjectileItem.h"
 #include "item/PumpItem.h"
 #include "item/RecombinatorItem.h"
 #include "item/Sapling.h"
@@ -232,6 +233,7 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/vanadium_magnetite_ore", "Vanadium Magnetite Ore", 32, 64));
 		add(std::make_shared<Item>("base:item/niobium_bar",      "Niobium Bar",       128, 64));
 		add(std::make_shared<Item>("base:item/teleportation_focus", "Teleportation Focus", 999, 64)); // TODO: cost
+		add(std::make_shared<ProjectileItem>("base:item/snowball", "Snowball", 999, 64)); // TODO: cost
 
 		add(std::make_shared<ItemPipeItem>(4));
 

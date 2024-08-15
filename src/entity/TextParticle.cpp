@@ -2,20 +2,17 @@
 #include "graphics/RendererContext.h"
 #include "threading/ThreadContext.h"
 
+namespace {
+	constexpr double GRAVITY = 32;
+	constexpr double DEPTH = -1.666;
+}
+
 namespace Game3 {
 	TextParticle::TextParticle():
 		Entity(ID()) {}
 
 	TextParticle::TextParticle(Glib::ustring text_, Color color_, double linger_time, TextAlign align_):
 		Entity(ID()), text(std::move(text_)), color(color_), lingerTime(linger_time), align(align_) {}
-
-	std::shared_ptr<TextParticle> TextParticle::create(const std::shared_ptr<Game> &) {
-		return Entity::create<TextParticle>();
-	}
-
-	std::shared_ptr<TextParticle> TextParticle::create(const std::shared_ptr<Game> &, Glib::ustring text, Color color, double linger_time, TextAlign align) {
-		return Entity::create<TextParticle>(std::move(text), color, linger_time, align);
-	}
 
 	void TextParticle::render(const RendererContext &renderers) {
 		if (!isVisible() || text.empty())
@@ -33,13 +30,12 @@ namespace Game3 {
 	}
 
 	void TextParticle::tick(const TickArgs &args) {
-		constexpr static double depth = -1.666;
 
 		auto offset_lock = offset.uniqueLock();
 
-		offset.z = std::max(offset.z + args.delta * velocity.z, depth);
+		offset.z = std::max(offset.z + args.delta * velocity.z, DEPTH);
 
-		if (offset.z <= depth) {
+		if (offset.z <= DEPTH) {
 			velocity = {};
 			age += args.delta;
 			if (lingerTime <= age)
@@ -50,7 +46,7 @@ namespace Game3 {
 		}
 
 		auto velocity_lock = velocity.uniqueLock();
-		velocity.z -= 32 * args.delta;
+		velocity.z -= GRAVITY * args.delta;
 		offset.x += args.delta * velocity.x;
 
 		enqueueTick();

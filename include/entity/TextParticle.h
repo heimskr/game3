@@ -12,8 +12,10 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "entity/text_particle"}; }
 
-			static std::shared_ptr<TextParticle> create(const std::shared_ptr<Game> &);
-			static std::shared_ptr<TextParticle> create(const std::shared_ptr<Game> &, Glib::ustring text, Color = {1, 1, 1, 1}, double linger_time = DEFAULT_LINGER_TIME, TextAlign = DEFAULT_ALIGN);
+			template <typename... Args>
+			static std::shared_ptr<TextParticle> create(const std::shared_ptr<Game> &, Args &&...args) {
+				return Entity::create<TextParticle>(std::forward<Args>(args)...);
+			}
 
 			void render(const RendererContext &) override;
 			void tick(const TickArgs &) override;
