@@ -215,6 +215,8 @@ namespace Game3 {
 			/** Should be called in the UI thread. */
 			void remakeStaticLightingTexture();
 			void queueStaticLightingTexture();
+			/** Server-side only. */
+			void playSound(const Position &, const Identifier &, float pitch = 1) const;
 
 			inline const auto & getPlayers() const { return players; }
 			inline void markGenerated(auto x, auto y) { generatedChunks.emplace(x, y); }

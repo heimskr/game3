@@ -5,6 +5,7 @@
 #include "graphics/Tileset.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
+#include "threading/ThreadContext.h"
 #include "tile/FenceGateTile.h"
 
 #include <nlohmann/json.hpp>
@@ -37,6 +38,8 @@ namespace Game3 {
 		assert(new_id);
 
 		place.set(layer, Identifier(new_id));
+		constexpr static float variance = .9;
+		place.realm->playSound(place.position, "base:sound/gate", std::uniform_real_distribution(variance, 1.f / variance)(threadContext.rng));
 
 		return true;
 	}

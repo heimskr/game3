@@ -431,7 +431,8 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 63. **Play Sound**: tells a client to play a given sound at a given position.
 
 	- `string` Sound ID
-	- `Position` Sound origin
+	- `Position` Origin
+	- `f32` Pitch
 
 # Message Format
 

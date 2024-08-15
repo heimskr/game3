@@ -7,7 +7,7 @@ namespace Game3 {
 	void PlaySoundPacket::handle(const ClientGamePtr &game) {
 		// TODO: origin
 
-		bool played = game->playSound(soundID);
+		bool played = game->playSound(soundID, pitch);
 
 		if (!played)
 			WARN("Can't play unknown sound: {}", soundID);

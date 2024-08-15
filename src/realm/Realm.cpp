@@ -15,6 +15,7 @@
 #include "net/RemoteClient.h"
 #include "packet/ErrorPacket.h"
 #include "packet/InteractPacket.h"
+#include "packet/PlaySoundPacket.h"
 #include "realm/Realm.h"
 #include "realm/RealmFactory.h"
 #include "threading/ThreadContext.h"
@@ -1677,6 +1678,16 @@ namespace Game3 {
 	void Realm::queueStaticLightingTexture() {
 		if (isClient())
 			staticLightingQueued = true;
+	}
+
+	void Realm::playSound(const Position &position, const Identifier &id, float pitch) const {
+		assert(getSide() == Side::Server);
+		PlaySoundPacket packet(id, position, pitch);
+		getPlayers().withShared([&](const WeakSet<Player> &set) {
+			for (const auto &weak_player: set)
+				if (auto player = weak_player.lock())
+					player->send(packet);
+		});
 	}
 
 	bool Realm::rightClick(const Position &position, double x, double y) {
