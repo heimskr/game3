@@ -31,6 +31,7 @@ namespace Game3 {
 			virtual bool heal(HitPoints);
 			/** Returns whether the entity died. */
 			virtual bool takeDamage(HitPoints);
+			virtual void spawnBlood(size_t count);
 			virtual void kill();
 			virtual void onAttack(const std::shared_ptr<LivingEntity> &attacker);
 			virtual std::vector<ItemStackPtr> getDrops();
