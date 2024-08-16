@@ -913,8 +913,11 @@ namespace Game3 {
 					return;
 				}
 				case GDK_KEY_u:
-					if (activateContext())
+					if (control) {
+						game->runCommand("usage");
+					} else if (activateContext()) {
 						game->getActiveRealm()->reupload();
+					}
 					return;
 				case GDK_KEY_f:
 					if (control)
