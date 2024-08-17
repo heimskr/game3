@@ -4,17 +4,6 @@
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
-	Identifier::Identifier(std::string_view combined) {
-		const size_t colon = combined.find(':');
-		if (colon == std::string_view::npos)
-			throw std::invalid_argument("Not a valid identifier: " + std::string(combined));
-		space = std::string(combined.substr(0, colon));
-		name  = std::string(combined.substr(colon + 1));
-	}
-
-	Identifier::Identifier(const char *combined):
-		Identifier(std::string_view(combined)) {}
-
 	std::string Identifier::getPath() const {
 		const size_t slash = name.find_last_of('/');
 		if (slash == std::string::npos)

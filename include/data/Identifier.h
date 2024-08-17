@@ -14,31 +14,40 @@ namespace Game3 {
 		std::string space;
 		std::string name;
 
-		Identifier() = default;
-		Identifier(const char *space_, const char *name_): space(space_), name(name_) {}
-		Identifier(std::string space_, std::string name_): space(std::move(space_)), name(std::move(name_)) {}
-		Identifier(std::string_view);
-		Identifier(const char *);
+		constexpr Identifier() = default;
+		constexpr Identifier(const char *space_, const char *name_): space(space_), name(name_) {}
+		constexpr Identifier(std::string space_, std::string name_): space(std::move(space_)), name(std::move(name_)) {}
 
-		inline explicit operator bool() const {
+		constexpr Identifier(std::string_view combined) {
+			const size_t colon = combined.find(':');
+			if (colon == std::string_view::npos)
+				throw std::invalid_argument("Not a valid identifier: " + std::string(combined));
+			space = std::string(combined.substr(0, colon));
+			name  = std::string(combined.substr(colon + 1));
+		}
+
+		constexpr Identifier(const char *combined):
+			Identifier(std::string_view(combined)) {}
+
+		inline explicit constexpr operator bool() const {
 			return !empty();
 		}
 
-		inline bool empty() const {
+		inline constexpr bool empty() const {
 			if (space.empty() != name.empty())
 				throw std::runtime_error("Partially empty identifier");
 			return space.empty();
 		}
 
-		inline explicit operator std::string() const {
+		inline explicit constexpr operator std::string() const {
 			return space + ':' + name;
 		}
 
-		inline std::string str() const {
+		inline constexpr std::string str() const {
 			return static_cast<std::string>(*this);
 		}
 
-		inline bool inSpace(std::string_view check) const {
+		inline constexpr bool inSpace(std::string_view check) const {
 			return std::string_view(space) == check;
 		}
 

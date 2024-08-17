@@ -1,5 +1,6 @@
 #include "graphics/Tileset.h"
 #include "realm/Realm.h"
+#include "util/Util.h"
 #include "worldgen/Carpet.h"
 
 namespace Game3::WorldGen {
@@ -7,8 +8,13 @@ namespace Game3::WorldGen {
 		auto guard = realm->guardGeneration();
 		const int carpet_padding = padding < 0? std::uniform_int_distribution(2, 3)(rng) : padding;
 
-		constexpr static std::array<std::string, 3> colors{"blue", "red", "purple"};
-		const Identifier carpet("base:tile/" + colors[std::uniform_int_distribution(0, 2)(rng)] + "_carpet");
+		constexpr static std::array<std::string_view, 3> colors{
+			"base:tile/blue_carpet",
+			"base:tile/red_carpet",
+			"base:tile/purple_carpet"
+		};
+
+		const Identifier carpet(choose(colors));
 
 		for (int row = carpet_padding + 1; row < height - carpet_padding - 1; ++row)
 			for (int column = carpet_padding + 1; column < width - carpet_padding - 1; ++column)
