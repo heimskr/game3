@@ -1,3 +1,4 @@
+#include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/Texture.h"
@@ -5,7 +6,7 @@
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	void Dialog::drawFrame(UIContext &ui, RendererContext &renderers, double scale, bool alpha, const std::array<std::string_view, 8> &pieces) {
+	void Dialog::drawFrame(UIContext &ui, RendererContext &renderers, double scale, bool alpha, const std::array<std::string_view, 8> &pieces, const Color &interior) {
 		Rectangle rectangle = ui.scissorStack.getTop();
 		SingleSpriteRenderer &single = renderers.singleSprite;
 
@@ -101,5 +102,9 @@ namespace Game3 {
 			.scaleY = scale,
 			.invertY = false,
 		});
+
+		if (interior.alpha > 0) {
+			renderers.rectangle.drawOnScreen(interior, left->width * scale, top->height * scale, rectangle.width - (left->width + right->width) * scale, rectangle.height - (top->height + bottom->height) * scale);
+		}
 	}
 }

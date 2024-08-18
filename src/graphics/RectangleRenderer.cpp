@@ -96,7 +96,7 @@ namespace Game3 {
 		glBindVertexArray(0); CHECKGL
 	}
 
-	void RectangleRenderer::drawOnScreen(const Eigen::Vector4f &color, float x, float y, float width, float height, float angle) {
+	void RectangleRenderer::drawOnScreen(const Color &color, float x, float y, float width, float height, float angle) {
 		if (!initialized)
 			return;
 
@@ -122,7 +122,7 @@ namespace Game3 {
 		glBindVertexArray(0); CHECKGL
 	}
 
-	void RectangleRenderer::operator()(const Eigen::Vector4f &color, float x, float y, float width, float height, float angle) {
+	void RectangleRenderer::operator()(const Color &color, float x, float y, float width, float height, float angle) {
 		drawOnScreen(color, x, y, width, height, angle);
 	}
 

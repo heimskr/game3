@@ -17,6 +17,6 @@ namespace Game3 {
 			virtual void render(UIContext &, RendererContext &) = 0;
 
 			/** Order: clockwise starting at top left. */
-			void drawFrame(UIContext &, RendererContext &, double scale, bool alpha, const std::array<std::string_view, 8> &);
+			void drawFrame(UIContext &, RendererContext &, double scale, bool alpha, const std::array<std::string_view, 8> &, const Color &interior = {0, 0, 0, 0});
 	};
 }

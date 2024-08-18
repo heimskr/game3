@@ -7,6 +7,7 @@
 
 namespace Game3 {
 	class Canvas;
+	struct Color;
 	struct RenderOptions;
 
 	class RectangleRenderer: public HasBackbuffer {
@@ -21,9 +22,9 @@ namespace Game3 {
 			void update(int width, int height) override;
 
 			void drawOnMap(const RenderOptions &);
-			void drawOnScreen(const Eigen::Vector4f &color, float x, float y, float width, float height, float angle = 0.f);
+			void drawOnScreen(const Color &color, float x, float y, float width, float height, float angle = 0.f);
 
-			void operator()(const Eigen::Vector4f &color, float x, float y, float width, float height, float angle = 0.f);
+			void operator()(const Color &color, float x, float y, float width, float height, float angle = 0.f);
 
 		private:
 			Canvas &canvas;

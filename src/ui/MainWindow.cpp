@@ -916,7 +916,7 @@ namespace Game3 {
 				}
 				case GDK_KEY_i:
 					if (canvas->uiContext.removeDialogs<InventoryDialog>() == 0) {
-						canvas->uiContext.addDialog<InventoryDialog>();
+						canvas->uiContext.addDialog<InventoryDialog>(player);
 					}
 					return;
 				case GDK_KEY_u:
