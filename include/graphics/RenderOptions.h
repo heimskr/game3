@@ -1,5 +1,6 @@
 #pragma once
 
+#include "graphics/OpenGL.h"
 #include "types/Types.h"
 
 namespace Game3 {
@@ -17,5 +18,6 @@ namespace Game3 {
 		bool invertY = true;
 		double viewportX = -1.;
 		double viewportY = -1.;
+		GLint wrapMode = GL_CLAMP_TO_EDGE;
 	};
 }

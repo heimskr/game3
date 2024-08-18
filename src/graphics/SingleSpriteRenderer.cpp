@@ -79,7 +79,7 @@ namespace Game3 {
 		}
 	}
 
-	void SingleSpriteRenderer::drawOnMap(const std::shared_ptr<Texture> &texture, double x, double y, double scale, double angle, double alpha) {
+	void SingleSpriteRenderer::drawOnMap(const TexturePtr &texture, double x, double y, double scale, double angle, double alpha) {
 		drawOnMap(texture, RenderOptions {
 			.x = x,
 			.y = y,
@@ -92,7 +92,7 @@ namespace Game3 {
 		});
 	}
 
-	void SingleSpriteRenderer::drawOnMap(const std::shared_ptr<Texture> &texture, const RenderOptions &options) {
+	void SingleSpriteRenderer::drawOnMap(const TexturePtr &texture, const RenderOptions &options) {
 		if (!initialized)
 			return;
 
@@ -151,7 +151,7 @@ namespace Game3 {
 		glBindVertexArray(0); CHECKGL
 	}
 
-	// TODO: share the bulk of the code with the `const std::shared_ptr<Texture> &` override.
+	// TODO: share the bulk of the code with the `const TexturePtr &` override.
 	void SingleSpriteRenderer::drawOnMap(GL::Texture &texture, const RenderOptions &options) {
 		if (!initialized)
 			return;
@@ -274,7 +274,35 @@ namespace Game3 {
 		options.y = backbufferHeight - options.y + options.offsetY / 4.f * options.scaleY; // Four?!
 		setupShader(texture_width, texture_height, options);
 
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, options.wrapMode); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, options.wrapMode); CHECKGL
 		texture.bind(0);
+
+		glEnable(GL_BLEND); CHECKGL
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); CHECKGL
+		glBindVertexArray(quadVAO); CHECKGL
+		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
+		glBindVertexArray(0); CHECKGL
+	}
+
+	void SingleSpriteRenderer::drawOnScreen(const TexturePtr &texture, const RenderOptions &options_ref) {
+		assert(texture);
+
+		if (!initialized)
+			return;
+
+		const auto texture_width  = texture->width;
+		const auto texture_height = texture->height;
+
+		RenderOptions options = options_ref;
+		options.sizeX = options.sizeX < 0.f? -options.sizeX * texture_width  : options.sizeX;
+		options.sizeY = options.sizeY < 0.f? -options.sizeY * texture_height : options.sizeY;
+		options.y = backbufferHeight - options.y + options.offsetY / 4.f * options.scaleY; // Four?!
+		setupShader(texture_width, texture_height, options);
+
+		texture->bind(0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, options.wrapMode); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, options.wrapMode); CHECKGL
 
 		glEnable(GL_BLEND); CHECKGL
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); CHECKGL

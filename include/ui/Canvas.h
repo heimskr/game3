@@ -17,6 +17,7 @@
 #include "graphics/Recolor.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/TextRenderer.h"
+#include "ui/gl/UIContext.h"
 
 namespace Game3 {
 	class ClientGame;
@@ -48,6 +49,7 @@ namespace Game3 {
 			Gdk::Rectangle realmBounds;
 			const Realm *lastRealm = nullptr;
 			double sizeDivisor = 1.0;
+			UIContext uiContext{*this};
 
 			Canvas(MainWindow &);
 

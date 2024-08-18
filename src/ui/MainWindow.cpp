@@ -16,6 +16,7 @@
 #include "packet/LoginPacket.h"
 #include "packet/SetHeldItemPacket.h"
 #include "realm/Overworld.h"
+#include "ui/gl/InventoryDialog.h"
 #include "ui/gtk/ConnectDialog.h"
 #include "ui/gtk/ConnectionSuccessDialog.h"
 #include "ui/gtk/EntryDialog.h"
@@ -45,14 +46,15 @@
 #include <fstream>
 #include <ranges>
 
-namespace Game3 {
-	namespace {
-		constexpr std::chrono::milliseconds arrowTime {100};
-		constexpr std::chrono::milliseconds interactTime {250};
-		constexpr std::chrono::milliseconds jumpTime {50};
-		constexpr std::chrono::milliseconds slowTime {1000};
-	}
+namespace {
+	constexpr std::chrono::milliseconds arrowTime {100};
+	constexpr std::chrono::milliseconds interactTime {250};
+	constexpr std::chrono::milliseconds jumpTime {50};
+	constexpr std::chrono::milliseconds slowTime {1'000};
+	constexpr std::chrono::milliseconds forever {1'000'000'000};
+}
 
+namespace Game3 {
 	std::unordered_map<guint, std::chrono::milliseconds> MainWindow::customKeyRepeatTimes {
 		{GDK_KEY_Up,           arrowTime},
 		{GDK_KEY_Down,         arrowTime},
@@ -82,6 +84,7 @@ namespace Game3 {
 		{GDK_KEY_9,            slowTime},
 		{GDK_KEY_braceleft,    slowTime},
 		{GDK_KEY_braceright,   slowTime},
+		{GDK_KEY_i,            forever},
 	};
 
 	MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &builder_):
@@ -98,8 +101,7 @@ namespace Game3 {
 
 		cssProvider = Gtk::CssProvider::create();
 		cssProvider->load_from_resource("/game3/style.css");
-		Gtk::StyleContext::add_provider_for_display(Gdk::Display::get_default(), cssProvider,
-			GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+		Gtk::StyleContext::add_provider_for_display(Gdk::Display::get_default(), cssProvider, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
 		functionQueueDispatcher.connect([this] {
 			for (const auto &fn: functionQueue.steal())
@@ -912,6 +914,11 @@ namespace Game3 {
 					}
 					return;
 				}
+				case GDK_KEY_i:
+					if (canvas->uiContext.removeDialogs<InventoryDialog>() == 0) {
+						canvas->uiContext.addDialog<InventoryDialog>();
+					}
+					return;
 				case GDK_KEY_u:
 					if (control) {
 						game->runCommand("usage");
