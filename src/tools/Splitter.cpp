@@ -1,6 +1,7 @@
 #include "config.h"
 #include "Log.h"
 #include "game/Game.h"
+#include "graphics/ItemTexture.h"
 #include "graphics/Tileset.h"
 #include "item/Item.h"
 #include "tools/Flasker.h"
@@ -112,7 +113,7 @@ namespace Game3 {
 			} else if (credit_override_vadim.contains(end)) {
 				meta["credit"] = "Vadim";
 			} else {
-				const Identifier texture_id = item->getTexture(ItemStack::create(game, item))->identifier;
+				const Identifier texture_id = item->getTexture(ItemStack::create(game, item))->getTexture()->identifier;
 				if (auto iter = credits.find(texture_id); iter != credits.end())
 					meta["credit"] = iter->second;
 				else

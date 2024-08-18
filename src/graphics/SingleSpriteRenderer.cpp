@@ -236,14 +236,12 @@ namespace Game3 {
 		}
 
 		static const float vertices[] {
-			// pos    // tex
-			0., 1., 0., 1.,
-			1., 0., 1., 0.,
-			0., 0., 0., 0.,
-
-			0., 1., 0., 1.,
-			1., 1., 1., 1.,
-			1., 0., 1., 0.
+			0, 1, 0, 1,
+			1, 0, 1, 0,
+			0, 0, 0, 0,
+			0, 1, 0, 1,
+			1, 1, 1, 1,
+			1, 0, 1, 0
 		};
 
 		glGenVertexArrays(1, &quadVAO); CHECKGL
@@ -270,7 +268,6 @@ namespace Game3 {
 		RenderOptions options = options_ref;
 		options.sizeX = options.sizeX < 0.f? -options.sizeX * texture_width  : options.sizeX;
 		options.sizeY = options.sizeY < 0.f? -options.sizeY * texture_height : options.sizeY;
-		options.y = backbufferHeight - options.y + options.offsetY / 4.f * options.scaleY; // Four?!
 		setupShader(texture_width, texture_height, options);
 		allowRepeating(options, texture_width, texture_height);
 
@@ -297,7 +294,6 @@ namespace Game3 {
 		RenderOptions options = options_ref;
 		options.sizeX = options.sizeX < 0.f? -options.sizeX * texture_width  : options.sizeX;
 		options.sizeY = options.sizeY < 0.f? -options.sizeY * texture_height : options.sizeY;
-		options.y = backbufferHeight - options.y + options.offsetY / 4.f * options.scaleY; // Four?!
 		setupShader(texture_width, texture_height, options);
 		allowRepeating(options, texture_width, texture_height);
 
@@ -340,7 +336,7 @@ namespace Game3 {
 	void SingleSpriteRenderer::setupShader(int texture_width, int texture_height, const RenderOptions &options) {
 		glm::mat4 model = glm::mat4(1.);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(options.x - options.offsetX * 2. * options.scaleX, options.y - options.offsetY * 2. * options.scaleY, 0.f));
+		model = glm::translate(model, glm::vec3(options.x - options.offsetX * options.scaleX, options.y - options.offsetY * options.scaleY, 0.f));
 		if (options.invertY)
 			model = glm::scale(model, glm::vec3(1., -1., 1.));
 		if (options.angle != 0)  {
@@ -353,7 +349,7 @@ namespace Game3 {
 		shader.bind();
 		shader.set("model", model);
 		shader.set("spriteColor", options.color.red, options.color.green, options.color.blue, options.color.alpha);
-		const double multiplier = 2.;
+		const double multiplier = 1.;
 		const double multiplier_x = multiplier / texture_width;
 		const double multiplier_y = multiplier / texture_height;
 		shader.set("texturePosition", options.offsetX * multiplier_x, options.offsetY * multiplier_y, options.sizeX / texture_width, options.sizeY / texture_height);

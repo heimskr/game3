@@ -91,12 +91,12 @@ namespace Game3 {
 		return *this;
 	}
 
-	std::shared_ptr<Texture> Item::getTexture(const ConstItemStackPtr &stack) {
+	std::shared_ptr<ItemTexture> Item::getTexture(const ConstItemStackPtr &stack) {
 		if (isTextureCacheable() && cachedTexture)
 			return cachedTexture;
 
 		GamePtr game = stack->getGame();
-		return cachedTexture = game->registry<ItemTextureRegistry>().at(identifier)->getTexture();
+		return cachedTexture = game->registry<ItemTextureRegistry>().at(identifier);
 	}
 
 	std::string Item::getTooltip(const ConstItemStackPtr &) {
@@ -217,7 +217,7 @@ namespace Game3 {
 		place.realm->spawn<ItemEntity>(place.position, copy());
 	}
 
-	std::shared_ptr<Texture> ItemStack::getTexture(Game &) const {
+	std::shared_ptr<ItemTexture> ItemStack::getTexture(Game &) const {
 		return item->getTexture(shared_from_this());
 	}
 

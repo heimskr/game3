@@ -21,7 +21,7 @@ namespace Game3 {
 
 		single.drawOnScreen(top_left, RenderOptions{
 			.x = 0,
-			.y = double(rectangle.height),
+			.y = 0,
 			.sizeX = -1,
 			.sizeY = -1,
 			.scaleX = scale,
@@ -31,7 +31,7 @@ namespace Game3 {
 
 		single.drawOnScreen(top, RenderOptions{
 			.x = top_left->width * scale,
-			.y = double(rectangle.height),
+			.y = 0,
 			.sizeX = rectangle.width - (top_left->width + top_right->width) * scale,
 			.sizeY = -1,
 			.scaleX = scale,
@@ -42,7 +42,7 @@ namespace Game3 {
 
 		single.drawOnScreen(top_right, RenderOptions{
 			.x = rectangle.width - top_right->width * scale,
-			.y = double(rectangle.height),
+			.y = 0,
 			.sizeX = -1,
 			.sizeY = -1,
 			.scaleX = scale,
@@ -52,7 +52,7 @@ namespace Game3 {
 
 		single.drawOnScreen(left, RenderOptions{
 			.x = 0,
-			.y = rectangle.height - top_left->height * scale,
+			.y = top_left->height * scale,
 			.sizeX = -1,
 			.sizeY = rectangle.height - (top_left->height + bottom_left->height) * scale,
 			.scaleX = scale,
@@ -63,7 +63,7 @@ namespace Game3 {
 
 		single.drawOnScreen(right, RenderOptions{
 			.x = rectangle.width - top_right->width * scale,
-			.y = rectangle.height - top_right->height * scale,
+			.y = top_right->height * scale,
 			.sizeX = -1,
 			.sizeY = rectangle.height - (top_right->height + bottom_right->height) * scale,
 			.scaleX = scale,
@@ -74,7 +74,7 @@ namespace Game3 {
 
 		single.drawOnScreen(bottom_left, RenderOptions{
 			.x = 0,
-			.y = bottom_left->height * scale,
+			.y = rectangle.height - bottom_left->height * scale,
 			.sizeX = -1,
 			.sizeY = -1,
 			.scaleX = scale,
@@ -84,7 +84,7 @@ namespace Game3 {
 
 		single.drawOnScreen(bottom, RenderOptions{
 			.x = bottom_left->width * scale,
-			.y = bottom->height * scale,
+			.y = rectangle.height - bottom->height * scale,
 			.sizeX = rectangle.width - (bottom_left->width + bottom_right->width) * scale,
 			.sizeY = -1,
 			.scaleX = scale,
@@ -95,7 +95,7 @@ namespace Game3 {
 
 		single.drawOnScreen(bottom_right, RenderOptions{
 			.x = rectangle.width - bottom_right->width * scale,
-			.y = bottom_right->height * scale,
+			.y = rectangle.height - bottom_right->height * scale,
 			.sizeX = -1,
 			.sizeY = -1,
 			.scaleX = scale,

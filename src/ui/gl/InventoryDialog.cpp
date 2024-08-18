@@ -1,5 +1,6 @@
 #include "entity/Player.h"
 #include "game/Inventory.h"
+#include "graphics/ItemTexture.h"
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
@@ -68,16 +69,31 @@ namespace Game3 {
 
 		int column = 0;
 		double x = x_pad;
-		double y = OUTER_SLOT_SIZE;
+		double y = OUTER_SLOT_SIZE - INNER_SLOT_SIZE;
 
 		InventoryPtr inventory = player->getInventory(0);
 		auto inventory_lock = inventory->sharedLock();
 
+		GamePtr game = player->getGame();
+
+		SpriteRenderer &sprites = renderers.singleSprite;
+
 		for (Slot slot = 0; slot < inventory->getSlotCount(); ++slot) {
-			rectangler.drawOnScreen(Color{0, 0, 0, 0.1}, x * scale, rectangle.height - y * scale, INNER_SLOT_SIZE * scale, INNER_SLOT_SIZE * scale);
+			rectangler.drawOnScreen(Color{0, 0, 0, 0.1}, x * scale, y * scale, INNER_SLOT_SIZE * scale, INNER_SLOT_SIZE * scale);
 
 			if (ItemStackPtr stack = (*inventory)[slot]) {
-				rectangler.drawOnScreen(Color{0, 0, 0, 0.1}, x * scale, rectangle.height - y * scale, INNER_SLOT_SIZE * scale, INNER_SLOT_SIZE * scale);
+				ItemTexturePtr texture = stack->getTexture(*game);
+				sprites.drawOnScreen(texture->getTexture(), RenderOptions{
+					.x = x * scale,
+					.y = y * scale,
+					.offsetX = double(texture->x),
+					.offsetY = double(texture->y),
+					.sizeX = double(texture->width),
+					.sizeY = double(texture->height),
+					.scaleX = scale,
+					.scaleY = scale,
+					.invertY = false,
+				});
 			}
 
 			x += OUTER_SLOT_SIZE;

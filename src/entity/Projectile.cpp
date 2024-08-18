@@ -98,7 +98,7 @@ namespace Game3 {
 
 	std::shared_ptr<Texture> Projectile::getTexture() {
 		GamePtr game = getGame();
-		return ItemStack::create(game, getItemID())->getTexture(*game);
+		return ItemStack::create(game, getItemID())->getTexture(*game)->getTexture();
 	}
 
 	void Projectile::setTexture(const ClientGamePtr &game) {

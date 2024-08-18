@@ -18,6 +18,7 @@
 namespace Game3 {
 	class Game;
 	class ItemStack;
+	class ItemTexture;
 	class Player;
 	class Realm;
 	class Texture;
@@ -49,7 +50,7 @@ namespace Game3 {
 			virtual Identifier getTextureIdentifier(const ConstItemStackPtr &) const;
 			virtual void getOffsets(const Game &, std::shared_ptr<Texture> &, float &x_offset, float &y_offset);
 			Item & addAttribute(Identifier);
-			virtual std::shared_ptr<Texture> getTexture(const ConstItemStackPtr &);
+			virtual std::shared_ptr<ItemTexture> getTexture(const ConstItemStackPtr &);
 			virtual std::string getTooltip(const ConstItemStackPtr &);
 
 			inline bool operator==(const Item &other) const { return identifier == other.identifier; }
@@ -79,7 +80,7 @@ namespace Game3 {
 		protected:
 			mutable std::unique_ptr<uint8_t[]> rawImage;
 			mutable Glib::RefPtr<Gdk::Pixbuf> cachedImage;
-			mutable std::shared_ptr<Texture> cachedTexture;
+			mutable std::shared_ptr<ItemTexture> cachedTexture;
 	};
 
 	using ItemPtr = std::shared_ptr<Item>;
@@ -139,7 +140,7 @@ namespace Game3 {
 
 			void spawn(const Place &) const;
 
-			std::shared_ptr<Texture> getTexture(Game &) const;
+			std::shared_ptr<ItemTexture> getTexture(Game &) const;
 
 			static void fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &, ItemStack &);
 			static ItemStackPtr fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);

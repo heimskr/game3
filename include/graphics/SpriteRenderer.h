@@ -22,7 +22,8 @@ namespace Game3 {
 			virtual void drawOnMap(const std::shared_ptr<Texture> &, const RenderOptions &) = 0;
 			void drawOnMap(const std::shared_ptr<Texture> &, double x, double y);
 			void drawOnMap(const std::shared_ptr<Texture> &);
-			virtual void drawOnScreen(GL::Texture &, const RenderOptions &) = 0;
+			virtual void drawOnScreen(GL::Texture &, const RenderOptions &);
+			virtual void drawOnScreen(const std::shared_ptr<Texture> &, const RenderOptions &);
 
 			virtual void renderNow() {}
 

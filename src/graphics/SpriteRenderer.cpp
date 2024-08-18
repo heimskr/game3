@@ -12,4 +12,12 @@ namespace Game3 {
 	void SpriteRenderer::drawOnMap(const std::shared_ptr<Texture> &texture) {
 		drawOnMap(texture, RenderOptions{});
 	}
+
+	void SpriteRenderer::drawOnScreen(GL::Texture &, const RenderOptions &) {
+		throw std::logic_error("SpriteRenderer::drawOnScreen (GL::Texture overload) unimplemented");
+	}
+
+	void SpriteRenderer::drawOnScreen(const std::shared_ptr<Texture> &, const RenderOptions &) {
+		throw std::logic_error("SpriteRenderer::drawOnScreen (TexturePtr overload) unimplemented");
+	}
 }

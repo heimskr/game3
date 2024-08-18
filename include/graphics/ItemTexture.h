@@ -23,4 +23,6 @@ namespace Game3 {
 
 			explicit operator bool() const;
 	};
+
+	using ItemTexturePtr = std::shared_ptr<ItemTexture>;
 }

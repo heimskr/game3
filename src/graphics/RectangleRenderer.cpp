@@ -100,8 +100,6 @@ namespace Game3 {
 		if (!initialized)
 			return;
 
-		y = backbufferHeight - y - height;
-
 		shader.bind(); CHECKGL
 
 		glm::mat4 model = glm::mat4(1.f);

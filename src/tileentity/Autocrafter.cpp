@@ -373,7 +373,7 @@ namespace Game3 {
 		if (game->getSide() != Side::Client)
 			return;
 		std::shared_ptr<ItemTexture> item_texture = game->registry<ItemTextureRegistry>().at(stack->item->identifier);
-		stationTexture = stack->getTexture(*game);
+		stationTexture = item_texture->getTexture();
 		stationTexture->init();
 		stationXOffset = item_texture->x / 2.f;
 		stationYOffset = item_texture->y / 2.f;
