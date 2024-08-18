@@ -235,7 +235,6 @@ namespace Game3 {
 			glDeleteVertexArrays(1, &quadVAO); CHECKGL
 		}
 
-		unsigned int vbo;
 		static const float vertices[] {
 			// pos    // tex
 			0., 1., 0., 1.,
@@ -273,6 +272,7 @@ namespace Game3 {
 		options.sizeY = options.sizeY < 0.f? -options.sizeY * texture_height : options.sizeY;
 		options.y = backbufferHeight - options.y + options.offsetY / 4.f * options.scaleY; // Four?!
 		setupShader(texture_width, texture_height, options);
+		allowRepeating(options, texture_width, texture_height);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, options.wrapMode); CHECKGL
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, options.wrapMode); CHECKGL
@@ -299,6 +299,7 @@ namespace Game3 {
 		options.sizeY = options.sizeY < 0.f? -options.sizeY * texture_height : options.sizeY;
 		options.y = backbufferHeight - options.y + options.offsetY / 4.f * options.scaleY; // Four?!
 		setupShader(texture_width, texture_height, options);
+		allowRepeating(options, texture_width, texture_height);
 
 		texture->bind(0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, options.wrapMode); CHECKGL
@@ -309,6 +310,31 @@ namespace Game3 {
 		glBindVertexArray(quadVAO); CHECKGL
 		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
 		glBindVertexArray(0); CHECKGL
+	}
+
+	void SingleSpriteRenderer::allowRepeating(const RenderOptions &options, int texture_width, int texture_height) {
+		float x = 1;
+		float y = 1;
+
+		if ((options.wrapMode == GL_REPEAT || options.wrapMode == GL_MIRRORED_REPEAT) && (options.sizeX > texture_width || options.sizeY > texture_height)) {
+			x = std::max(options.sizeX / texture_width,  1.0);
+			y = std::max(options.sizeY / texture_height, 1.0);
+		}
+
+		if (x != lastXCoord || y != lastYCoord) {
+			lastXCoord = x;
+			lastYCoord = y;
+			const float vertices[] {
+				0, y, 0, y,
+				x, 0, x, 0,
+				0, 0, 0, 0,
+				0, y, 0, y,
+				x, y, x, y,
+				x, 0, x, 0,
+			};
+			glBindBuffer(GL_ARRAY_BUFFER, vbo); CHECKGL
+			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); CHECKGL
+		}
 	}
 
 	void SingleSpriteRenderer::setupShader(int texture_width, int texture_height, const RenderOptions &options) {

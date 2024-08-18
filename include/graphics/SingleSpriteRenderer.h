@@ -41,8 +41,12 @@ namespace Game3 {
 		private:
 			GLuint quadVAO = 0;
 			bool initialized = false;
+			unsigned vbo = -1;
+			float lastXCoord = 1;
+			float lastYCoord = 1;
 
 			void initRenderData();
+			void allowRepeating(const RenderOptions &options, int texture_width, int texture_height);
 			void setupShader(int texture_width, int texture_height, const RenderOptions &);
 	};
 }

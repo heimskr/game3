@@ -5,8 +5,8 @@
 #include "ui/gl/UIContext.h"
 
 namespace {
-	constexpr double X_FRACTION = 0.666;
-	constexpr double Y_FRACTION = 0.666;
+	constexpr double X_FRACTION = 0.25;
+	constexpr double Y_FRACTION = 0.25;
 }
 
 namespace Game3 {
@@ -14,27 +14,25 @@ namespace Game3 {
 		ScissorStack &stack = ui.scissorStack;
 
 		Rectangle rectangle = stack.getTop();
-		// INFO("Hello! {}", rectangle);
 		rectangle.x = rectangle.width * X_FRACTION / 2;
 		rectangle.y = rectangle.height * Y_FRACTION / 2;
-		rectangle.width *= X_FRACTION;
-		rectangle.height *= Y_FRACTION;
+		rectangle.width *= (1. - X_FRACTION);
+		rectangle.height *= (1. - Y_FRACTION);
 
-		// stack.pushRelative(rectangle);
-		// INFO("{}", rectangle);
+		stack.pushRelative(rectangle);
 
-		SingleSpriteRenderer &single = renderers.singleSprite;
-		single.drawOnScreen(cacheTexture("resources/gui/gui_top.png", false), RenderOptions{
-			.x = 64.,
-			.y = 96.,
-			.sizeX = 100.,
-			.sizeY = -1.,
-			.scaleX = 16.,
-			.scaleY = 16.,
-			.invertY = false,
-			.wrapMode = GL_REPEAT,
+		auto saver = renderers.getSaver();
+		renderers.updateSize(rectangle.width, rectangle.height);
+
+		drawEight(ui, renderers, 8, false, {
+			"resources/gui/gui_topleft.png",
+			"resources/gui/gui_top.png",
+			"resources/gui/gui_topright.png",
+			"resources/gui/gui_left.png",
+			"resources/gui/gui_right.png",
+			"resources/gui/gui_bottomleft.png",
+			"resources/gui/gui_bottom.png",
+			"resources/gui/gui_bottomright.png",
 		});
-
-		// INFO("{}", std::filesystem::canonical("resources/gui/gui_top.png").string());
 	}
 }

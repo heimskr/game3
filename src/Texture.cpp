@@ -71,10 +71,6 @@ namespace Game3 {
 		return textureCache.try_emplace(canonical, std::make_shared<Texture>(Identifier(), path, alpha, filter == -1? DEFAULT_FILTER : filter)).first->second;
 	}
 
-	std::shared_ptr<Texture> cacheTexture(const char *path, bool alpha, int filter) {
-		return cacheTexture(std::filesystem::path(path), alpha, filter == -1? DEFAULT_FILTER : filter);
-	}
-
 	std::shared_ptr<Texture> cacheTexture(const nlohmann::json &json) {
 		const std::string path = json.at(0);
 		if (auto iter = textureCache.find(path); iter != textureCache.end())
