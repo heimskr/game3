@@ -57,7 +57,9 @@ namespace Game3 {
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Energy, Substance::Fluid>>());
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Fluid>>());
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Energy>>());
+#ifdef GAME3_ENABLE_SCRIPTING
 		add(ModuleFactory::create<ComputerModule>());
+#endif
 	}
 
 	void Game::initialSetup(const std::filesystem::path &dir) {

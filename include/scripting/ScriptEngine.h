@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef GAME3_ENABLE_SCRIPTING
 #include <nlohmann/json_fwd.hpp>
 
 #pragma GCC diagnostic push
@@ -118,3 +119,4 @@ namespace Game3 {
 			static const char * toCString(const v8::String::Utf8Value &);
 	};
 }
+#endif

@@ -31,6 +31,10 @@ if get_option('discord_rich_presence')
 	config_h.set('DISCORD_RICH_PRESENCE', '1')
 endif
 
+if get_option('enable_scripting')
+	config_h.set('GAME3_ENABLE_SCRIPTING', '1')
+endif
+
 if get_option('buildtype') != 'plain'
 	test_cpp_args += '-fstack-protector-strong'
 endif

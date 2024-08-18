@@ -99,7 +99,9 @@ namespace Game3 {
 
 		add(std::make_shared<CombinerItem>("base:item/combiner", "Combiner", 999, 64)); // TODO: cost
 
+#ifdef GAME3_ENABLE_SCRIPTING
 		add(std::make_shared<ComputerItem>("base:item/computer", "Computer", 999, 64)); // TODO: cost
+#endif
 
 		add(std::make_shared<ContainmentOrb>("base:item/contorb", "Containment Orb", 64, 1)); // TODO: cost
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef GAME3_ENABLE_SCRIPTING
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -238,3 +239,4 @@ namespace Game3 {
 			}
 	};
 }
+#endif

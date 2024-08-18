@@ -1,3 +1,4 @@
+#ifdef GAME3_ENABLE_SCRIPTING
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
 #include "game/EnergyContainer.h"
@@ -133,3 +134,4 @@ namespace Game3 {
 		game->getPlayer()->sendMessage(computer, "RunScript", ServerGame::generateRandomToken(), script);
 	}
 }
+#endif

@@ -27,13 +27,18 @@ game3_deps = [
 	dependency('boost'),
 	dependency('FastNoise2', modules: ['FastNoise2::FastNoise']),
 	dependency('vte-2.91-gtk4'),
-	dependency('v8'),
-	dependency('v8_libplatform'),
 	chemskr.get_variable('chemskr'),
 	namegen.get_variable('namegen'),
 	miniaudio.get_variable('miniaudio'),
 	sqlitecpp.get_variable('sqlitecpp_dep'),
 ]
+
+if get_option('enable_scripting')
+	game3_deps += [
+		dependency('v8'),
+		dependency('v8_libplatform'),
+	]
+endif
 
 link_args = []
 

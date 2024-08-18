@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef GAME3_ENABLE_SCRIPTING
 #include "scripting/ScriptEngine.h"
 #include "threading/Lockable.h"
 #include "tileentity/TileEntity.h"
@@ -49,3 +50,4 @@ namespace Game3 {
 
 	using ComputerPtr = std::shared_ptr<Computer>;
 }
+#endif

@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef GAME3_ENABLE_SCRIPTING
 #include <stdexcept>
 #include <string>
 
@@ -17,3 +18,4 @@ namespace Game3 {
 			std::runtime_error(message), line(line_), column(column_) {}
 	};
 }
+#endif

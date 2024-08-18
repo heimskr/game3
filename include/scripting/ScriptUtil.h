@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef GAME3_ENABLE_SCRIPTING
 #include <v8.h>
 
 namespace Game3 {
@@ -8,3 +9,4 @@ namespace Game3 {
 		return *reinterpret_cast<T *>(info.Data().As<v8::Value>().As<v8::External>()->Value());
 	}
 }
+#endif

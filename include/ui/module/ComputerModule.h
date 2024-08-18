@@ -1,3 +1,4 @@
+#ifdef GAME3_ENABLE_SCRIPTING
 #pragma once
 
 #include "types/Types.h"
@@ -37,3 +38,4 @@ namespace Game3 {
 			void runScript(const std::string &);
 	};
 }
+#endif

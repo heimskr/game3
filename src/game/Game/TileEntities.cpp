@@ -51,7 +51,9 @@ namespace Game3 {
 		add(TileEntityFactory::create<ChemicalReactor>());
 		add(TileEntityFactory::create<Chest>());
 		add(TileEntityFactory::create<Combiner>());
+#ifdef GAME3_ENABLE_SCRIPTING
 		add(TileEntityFactory::create<Computer>());
+#endif
 		add(TileEntityFactory::create<CraftingStation>());
 		add(TileEntityFactory::create<Crate>());
 		add(TileEntityFactory::create<CreativeGenerator>());

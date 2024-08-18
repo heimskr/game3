@@ -1,3 +1,4 @@
+#ifdef GAME3_ENABLE_SCRIPTING
 #include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "net/LocalClient.h"
@@ -409,3 +410,4 @@ namespace Game3 {
 		return out;
 	}
 }
+#endif

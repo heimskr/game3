@@ -43,8 +43,10 @@ namespace Game3 {
 }
 
 int main(int argc, char **argv) {
+#ifdef GAME3_ENABLE_SCRIPTING
 	Game3::ScriptEngine::init(argv[0]);
 	Game3::Defer v8_deinit(Game3::ScriptEngine::deinit);
+#endif
 
 #ifdef IS_FLATPAK
 	if (const char *xdg_runtime_dir = std::getenv("XDG_RUNTIME_DIR")) {

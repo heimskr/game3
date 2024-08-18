@@ -1,3 +1,4 @@
 option('is_flatpak', type: 'boolean', value: false, description: 'Whether a Flatpak is being built')
 option('vcpkg_triplet', type: 'string', value: '', description: 'The vcpkg triplet to use (leave blank to disable vcpkg)')
 option('discord_rich_presence', type: 'boolean', value: false, description: 'Whether to enable Discord rich presence support')
+option('enable_scripting', type: 'boolean', value: true, description: 'Whether scripting support is enabled (requires V8)')

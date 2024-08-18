@@ -1,3 +1,4 @@
+#ifdef GAME3_ENABLE_SCRIPTING
 #include "Log.h"
 #include "scripting/ScriptEngine.h"
 
@@ -78,3 +79,8 @@ namespace Game3 {
 		scriptEngineTest1();
 	}
 }
+#else
+namespace Game3 {
+	void scriptEngineTest() {}
+}
+#endif

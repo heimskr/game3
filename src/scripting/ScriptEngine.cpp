@@ -1,3 +1,4 @@
+#ifdef GAME3_ENABLE_SCRIPTING
 #include "Log.h"
 #include "game/Game.h"
 #include "net/Buffer.h"
@@ -683,3 +684,4 @@ namespace Game3 {
 		return *value? *value : "<string conversion failed>";
 	}
 }
+#endif

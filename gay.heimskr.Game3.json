@@ -385,7 +385,8 @@
 				"-Dstrip=true",
 				"-Db_lto=true",
 				"-Doptimization=3",
-				"-Dbuildtype=release"
+				"-Dbuildtype=release",
+				"-Denable_scripting=false"
 			],
 			"build-options": {
 				"strip": true
