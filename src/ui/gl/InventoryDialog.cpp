@@ -5,6 +5,7 @@
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/Texture.h"
+#include "graphics/TextRenderer.h"
 #include "ui/gl/InventoryDialog.h"
 #include "ui/gl/UIContext.h"
 
@@ -93,6 +94,14 @@ namespace Game3 {
 					.scaleX = scale,
 					.scaleY = scale,
 					.invertY = false,
+				});
+
+				renderers.text.drawOnScreen(std::to_string(stack->count), TextRenderOptions{
+					.x = (x + INNER_SLOT_SIZE - 3) * scale,
+					.y = (y + INNER_SLOT_SIZE + 1) * scale,
+					.scaleX = scale / 16,
+					.scaleY = scale / 16,
+					.shadowOffset{.375 * scale, .375 * scale},
 				});
 			}
 

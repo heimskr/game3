@@ -57,11 +57,11 @@ namespace Game3 {
 			void update(const Canvas &) override;
 			void update(int width, int height) override;
 
-			void drawOnMap(Glib::ustring text, float x, float y, TextAlign align, float scale, float angle, float alpha);
-			void drawOnMap(Glib::ustring text, TextRenderOptions = {});
-			void drawOnScreen(Glib::ustring text, const TextRenderOptions & = {});
-			float textWidth(Glib::ustring, float scale = 1.f);
-			float textHeight(Glib::ustring, float scale = 1.f);
+			void drawOnMap(const Glib::ustring &text, float x, float y, TextAlign align, float scale, float angle, float alpha);
+			void drawOnMap(const Glib::ustring &text, TextRenderOptions = {});
+			void drawOnScreen(const Glib::ustring &text, TextRenderOptions = {});
+			float textWidth(const Glib::ustring &text, float scale = 1.f);
+			float textHeight(const Glib::ustring &text, float scale = 1.f);
 
 			template <typename... Args>
 			void operator()(Args &&...args) {

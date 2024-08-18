@@ -108,7 +108,7 @@ namespace Game3 {
 		}
 	}
 
-	void TextRenderer::drawOnMap(Glib::ustring text, float x, float y, TextAlign align, float scale, float angle, float alpha) {
+	void TextRenderer::drawOnMap(const Glib::ustring &text, float x, float y, TextAlign align, float scale, float angle, float alpha) {
 		drawOnMap(text, TextRenderOptions {
 			.x = x,
 			.y = y,
@@ -120,9 +120,7 @@ namespace Game3 {
 		});
 	}
 
-	extern float xHax;
-
-	void TextRenderer::drawOnMap(Glib::ustring text, TextRenderOptions options) {
+	void TextRenderer::drawOnMap(const Glib::ustring &text, TextRenderOptions options) {
 		if (!initialized)
 			initRenderData();
 
@@ -217,14 +215,87 @@ namespace Game3 {
 		glBindTexture(GL_TEXTURE_2D, 0); CHECKGL
 	}
 
-	float TextRenderer::textWidth(Glib::ustring text, float scale) {
+	void TextRenderer::drawOnScreen(const Glib::ustring &text, TextRenderOptions options) {
+		if (!initialized)
+			initRenderData();
+
+		if (0 < options.shadow.alpha) {
+			Color color = options.shadow;
+			Color shadow{0, 0, 0, 0};
+			double x = options.x + options.shadowOffset.x;
+			double y = options.y + options.shadowOffset.y;
+			std::swap(options.color, color);
+			std::swap(options.shadow, shadow);
+			std::swap(options.x, x);
+			std::swap(options.y, y);
+			drawOnScreen(text, options);
+			std::swap(options.color, color);
+			std::swap(options.shadow, shadow);
+			std::swap(options.x, x);
+			std::swap(options.y, y);
+		}
+
+		options.y = backbufferHeight - options.y;
+
+		auto &x = options.x;
+		auto &y = options.y;
+		auto &scale_x = options.scaleX;
+		auto &scale_y = options.scaleY;
+
+		if (options.align == TextAlign::Center)
+			x -= textWidth(text, scale_x) / 2;
+		else if (options.align == TextAlign::Right)
+			x -= textWidth(text, scale_x);
+
+		shader.bind();
+		shader.set("textColor", options.color.red, options.color.green, options.color.blue, options.color.alpha); CHECKGL
+
+		glActiveTexture(GL_TEXTURE0); CHECKGL
+		glBindVertexArray(vao); CHECKGL
+
+		for (const gunichar ch: text) {
+			const Character &character = getCharacter(ch);
+
+			const float xpos = x + character.bearing.x * scale_x;
+			const float ypos = y - (character.size.y - character.bearing.y) * scale_y;
+			const float w = character.size.x * scale_x;
+			const float h = character.size.y * scale_y;
+
+			// Update VBO for each character
+			const float vertices[6][4] = {
+				{xpos,     ypos + h, 0.0f, 0.0f},
+				{xpos,     ypos,     0.0f, 1.0f},
+				{xpos + w, ypos,     1.0f, 1.0f},
+
+				{xpos,     ypos + h, 0.0f, 0.0f},
+				{xpos + w, ypos,     1.0f, 1.0f},
+				{xpos + w, ypos + h, 1.0f, 0.0f}
+			};
+
+			// Render glyph texture over quad
+			glBindTexture(GL_TEXTURE_2D, character.textureID); CHECKGL
+			// Update content of VBO memory
+			glBindBuffer(GL_ARRAY_BUFFER, vbo); CHECKGL
+			glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); CHECKGL
+			glBindBuffer(GL_ARRAY_BUFFER, 0); CHECKGL
+			// Render quad
+			glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
+			// Advance cursors for next glyph (note that advance is number of 1/64 pixels)
+			x += (character.advance >> 6) * scale_x; // Bitshift by 6 to get value in pixels (2^6 = 64)
+		}
+
+		glBindVertexArray(0); CHECKGL
+		glBindTexture(GL_TEXTURE_2D, 0); CHECKGL
+	}
+
+	float TextRenderer::textWidth(const Glib::ustring &text, float scale) {
 		float out = 0.f;
 		for (const char ch: text)
 			out += scale * (getCharacter(ch).advance >> 6);
 		return out;
 	}
 
-	float TextRenderer::textHeight(Glib::ustring text, float scale) {
+	float TextRenderer::textHeight(const Glib::ustring &text, float scale) {
 		float out = 0.f;
 		for (const char ch: text)
 			out = std::max(out, getCharacter(ch).size.y * scale);
