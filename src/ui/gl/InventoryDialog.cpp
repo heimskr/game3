@@ -24,15 +24,15 @@ namespace Game3 {
 		auto saver = renderers.getSaver();
 		renderers.updateSize(rectangle.width, rectangle.height);
 
-		drawEight(ui, renderers, 8, false, {
+		drawFrame(ui, renderers, 8, false, {
 			"resources/gui/gui_topleft.png",
 			"resources/gui/gui_top.png",
 			"resources/gui/gui_topright.png",
-			"resources/gui/gui_left.png",
 			"resources/gui/gui_right.png",
-			"resources/gui/gui_bottomleft.png",
-			"resources/gui/gui_bottom.png",
 			"resources/gui/gui_bottomright.png",
+			"resources/gui/gui_bottom.png",
+			"resources/gui/gui_bottomleft.png",
+			"resources/gui/gui_left.png",
 		});
 	}
 }

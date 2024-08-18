@@ -5,18 +5,18 @@
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	void Dialog::drawEight(UIContext &ui, RendererContext &renderers, double scale, bool alpha, const std::array<std::string_view, 8> &pieces) {
+	void Dialog::drawFrame(UIContext &ui, RendererContext &renderers, double scale, bool alpha, const std::array<std::string_view, 8> &pieces) {
 		Rectangle rectangle = ui.scissorStack.getTop();
 		SingleSpriteRenderer &single = renderers.singleSprite;
 
 		TexturePtr top_left     = cacheTexture(pieces[0], alpha);
 		TexturePtr top          = cacheTexture(pieces[1], alpha);
 		TexturePtr top_right    = cacheTexture(pieces[2], alpha);
-		TexturePtr left         = cacheTexture(pieces[3], alpha);
-		TexturePtr right        = cacheTexture(pieces[4], alpha);
-		TexturePtr bottom_left  = cacheTexture(pieces[5], alpha);
-		TexturePtr bottom       = cacheTexture(pieces[6], alpha);
-		TexturePtr bottom_right = cacheTexture(pieces[7], alpha);
+		TexturePtr right        = cacheTexture(pieces[3], alpha);
+		TexturePtr bottom_right = cacheTexture(pieces[4], alpha);
+		TexturePtr bottom       = cacheTexture(pieces[5], alpha);
+		TexturePtr bottom_left  = cacheTexture(pieces[6], alpha);
+		TexturePtr left         = cacheTexture(pieces[7], alpha);
 
 		single.drawOnScreen(top_left, RenderOptions{
 			.x = 0,
