@@ -7,11 +7,12 @@
 #include "graphics/Texture.h"
 #include "graphics/TextRenderer.h"
 #include "ui/gl/InventoryDialog.h"
+#include "ui/gl/ItemSlotWidget.h"
 #include "ui/gl/UIContext.h"
 
 namespace {
-	constexpr double X_FRACTION = 0.25;
-	constexpr double Y_FRACTION = 0.25;
+	constexpr double X_FRACTION = 0.4;
+	constexpr double Y_FRACTION = 0.4;
 }
 
 namespace Game3 {
@@ -75,35 +76,28 @@ namespace Game3 {
 		InventoryPtr inventory = player->getInventory(0);
 		auto inventory_lock = inventory->sharedLock();
 
-		GamePtr game = player->getGame();
+		const Slot slot_count = inventory->getSlotCount();
+		assert(0 <= slot_count);
 
-		SpriteRenderer &sprites = renderers.singleSprite;
+		const Slot active_slot = inventory->activeSlot;
 
-		for (Slot slot = 0; slot < inventory->getSlotCount(); ++slot) {
-			rectangler.drawOnScreen(Color{0, 0, 0, 0.1}, x * scale, y * scale, INNER_SLOT_SIZE * scale, INNER_SLOT_SIZE * scale);
-
-			if (ItemStackPtr stack = (*inventory)[slot]) {
-				ItemTexturePtr texture = stack->getTexture(*game);
-				sprites.drawOnScreen(texture->getTexture(), RenderOptions{
-					.x = x * scale,
-					.y = y * scale,
-					.offsetX = double(texture->x),
-					.offsetY = double(texture->y),
-					.sizeX = double(texture->width),
-					.sizeY = double(texture->height),
-					.scaleX = scale,
-					.scaleY = scale,
-					.invertY = false,
-				});
-
-				renderers.text.drawOnScreen(std::to_string(stack->count), TextRenderOptions{
-					.x = (x + INNER_SLOT_SIZE - 3) * scale,
-					.y = (y + INNER_SLOT_SIZE + 1) * scale,
-					.scaleX = scale / 16,
-					.scaleY = scale / 16,
-					.shadowOffset{.375 * scale, .375 * scale},
-				});
+		if (slotWidgets.size() != static_cast<size_t>(slot_count)) {
+			slotWidgets.clear();
+			for (Slot slot = 0; slot < slot_count; ++slot)
+				slotWidgets.emplace_back(std::make_shared<ItemSlotWidget>((*inventory)[slot], INNER_SLOT_SIZE, scale, slot == active_slot));
+		} else if (0 <= previousActive) {
+			if (previousActive != active_slot) {
+				slotWidgets.at(previousActive)->setActive(false);
+				slotWidgets.at(active_slot)->setActive(true);
 			}
+		} else {
+			slotWidgets.at(active_slot)->setActive(true);
+		}
+
+		previousActive = active_slot;
+
+		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
+			widget->render(ui, renderers, x, y);
 
 			x += OUTER_SLOT_SIZE;
 

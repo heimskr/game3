@@ -5,6 +5,7 @@
 
 namespace Game3 {
 	class UIContext;
+	struct Color;
 	struct RendererContext;
 
 	class Dialog {

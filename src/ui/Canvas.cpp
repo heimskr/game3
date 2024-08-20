@@ -170,7 +170,7 @@ namespace Game3 {
 
 		realmBounds = game->getVisibleRealmBounds();
 
-		uiContext.renderDialogs();
+		uiContext.render();
 	}
 
 	int Canvas::getWidth() const {

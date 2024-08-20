@@ -11,7 +11,7 @@ namespace Game3 {
 	UIContext::UIContext(Canvas &canvas):
 		canvas(canvas) {}
 
-	void UIContext::renderDialogs() {
+	void UIContext::render() {
 		RendererContext context = canvas.getRendererContext();
 
 		for (const std::unique_ptr<Dialog> &dialog: dialogs) {
@@ -22,5 +22,9 @@ namespace Game3 {
 
 	void UIContext::addDialog(std::unique_ptr<Dialog> &&dialog) {
 		dialogs.emplace_back(std::move(dialog));
+	}
+
+	std::shared_ptr<ClientGame> UIContext::getGame() const {
+		return canvas.game;
 	}
 }
