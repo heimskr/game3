@@ -16,18 +16,13 @@ namespace {
 }
 
 namespace Game3 {
-	InventoryDialog::InventoryDialog(PlayerPtr player):
-		player(std::move(player)) {}
+	InventoryDialog::InventoryDialog(UIContext &ui, PlayerPtr player):
+		Dialog(ui), player(std::move(player)) {}
 
-	void InventoryDialog::render(UIContext &ui, RendererContext &renderers) {
+	void InventoryDialog::render(RendererContext &renderers) {
 		ScissorStack &stack = ui.scissorStack;
 
-		Rectangle rectangle = stack.getTop();
-		rectangle.x = rectangle.width * X_FRACTION / 2;
-		rectangle.y = rectangle.height * Y_FRACTION / 2;
-		rectangle.width *= (1. - X_FRACTION);
-		rectangle.height *= (1. - Y_FRACTION);
-
+		Rectangle rectangle = getPosition();
 		stack.pushRelative(rectangle);
 
 		auto saver = renderers.getSaver();
@@ -35,7 +30,7 @@ namespace Game3 {
 
 		double scale = 8;
 
-		drawFrame(ui, renderers, scale, false, {
+		drawFrame(renderers, scale, false, {
 			"resources/gui/gui_topleft.png",
 			"resources/gui/gui_top.png",
 			"resources/gui/gui_topright.png",
@@ -85,13 +80,18 @@ namespace Game3 {
 			slotWidgets.clear();
 			for (Slot slot = 0; slot < slot_count; ++slot)
 				slotWidgets.emplace_back(std::make_shared<ItemSlotWidget>((*inventory)[slot], INNER_SLOT_SIZE, scale, slot == active_slot));
-		} else if (0 <= previousActive) {
-			if (previousActive != active_slot) {
-				slotWidgets.at(previousActive)->setActive(false);
+		} else {
+			for (Slot slot = 0; slot < slot_count; ++slot)
+				slotWidgets[slot]->setStack((*inventory)[slot]);
+
+			if (0 <= previousActive) {
+				if (previousActive != active_slot) {
+					slotWidgets.at(previousActive)->setActive(false);
+					slotWidgets.at(active_slot)->setActive(true);
+				}
+			} else {
 				slotWidgets.at(active_slot)->setActive(true);
 			}
-		} else {
-			slotWidgets.at(active_slot)->setActive(true);
 		}
 
 		previousActive = active_slot;
@@ -107,5 +107,14 @@ namespace Game3 {
 				y += OUTER_SLOT_SIZE;
 			}
 		}
+	}
+
+	Rectangle InventoryDialog::getPosition() const {
+		Rectangle rectangle = ui.scissorStack.getBase();
+		rectangle.x = rectangle.width * X_FRACTION / 2;
+		rectangle.y = rectangle.height * Y_FRACTION / 2;
+		rectangle.width *= (1. - X_FRACTION);
+		rectangle.height *= (1. - Y_FRACTION);
+		return rectangle;
 	}
 }

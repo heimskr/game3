@@ -7,11 +7,14 @@
 namespace Game3 {
 	class ScissorStack {
 		private:
+			Rectangle base;
 			std::stack<Rectangle> stack;
 
 		public:
-			ScissorStack() = default;
+			ScissorStack();
 
+			inline const Rectangle & getBase() const { return base; }
+			void setBase(const Rectangle &);
 			Rectangle getTop() const;
 			const Rectangle & pushRelative(const Rectangle &);
 	};

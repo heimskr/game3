@@ -9,10 +9,15 @@ namespace Game3 {
 		int width{};
 		int height{};
 
+		Rectangle() = default;
+
 		Rectangle(int x, int y, int width, int height):
 			x(x), y(y), width(width), height(height) {}
 
+		auto operator<=>(const Rectangle &) const = default;
+
 		void scissor() const;
+		bool contains(int x, int y) const;
 	};
 }
 

@@ -185,6 +185,10 @@ namespace Game3 {
 		return 2;
 	}
 
+	void Canvas::onResize() {
+		uiContext.onResize(getWidth() * getFactor(), getHeight() * getFactor());
+	}
+
 	bool Canvas::inBounds(const Position &pos) const {
 		const auto x = realmBounds.get_x();
 		const auto y = realmBounds.get_y();

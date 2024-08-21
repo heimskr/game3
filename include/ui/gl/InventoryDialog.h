@@ -15,8 +15,9 @@ namespace Game3 {
 			Slot previousActive = -1;
 
 		public:
-			InventoryDialog(std::shared_ptr<Player>);
+			InventoryDialog(UIContext &, std::shared_ptr<Player>);
 
-			void render(UIContext &, RendererContext &) final;
+			void render(RendererContext &) final;
+			Rectangle getPosition() const final;
 	};
 }

@@ -32,10 +32,9 @@ namespace Game3 {
 			double getFrequency() const override;
 			void addEntityFactories() override;
 			void click(int button, int n, double pos_x, double pos_y, Modifiers);
-			void dragStart(const Position &, Modifiers);
-			void dragUpdate(const Position &, Modifiers);
-			void dragEnd(const Position &, Modifiers);
-			void drag(const Position &, Modifiers);
+			void dragStart(double x, double y, Modifiers);
+			void dragUpdate(double x, double y, Modifiers);
+			void dragEnd(double x, double y, Modifiers);
 			Gdk::Rectangle getVisibleRealmBounds() const;
 			MainWindow & getWindow() const;
 			/** Translates coordinates relative to the top left corner of the canvas to realm coordinates. */

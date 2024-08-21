@@ -42,6 +42,9 @@ namespace Game3 {
 	}
 
 	void ClientGame::click(int button, int, double pos_x, double pos_y, Modifiers modifiers) {
+		if (canvas.uiContext.click(pos_x * canvas.getFactor(), pos_y * canvas.getFactor()))
+			return;
+
 		RealmPtr realm = activeRealm;
 
 		if (!realm)
@@ -60,25 +63,28 @@ namespace Game3 {
 			client->send(TeleportSelfPacket(realm->id, translated));
 	}
 
-	void ClientGame::dragStart(const Position &position, Modifiers modifiers) {
+	void ClientGame::dragStart(double x, double y, Modifiers modifiers) {
+		if (canvas.uiContext.dragStart(x * 2, y * 2))
+			return;
+		Position position = translateCanvasCoordinates(x, y);
 		lastDragPosition = position;
 		getClient()->send(DragPacket(DragPacket::Action::Start, position, modifiers));
 	}
 
-	void ClientGame::dragUpdate(const Position &position, Modifiers modifiers) {
+	void ClientGame::dragUpdate(double x, double y, Modifiers modifiers) {
+		Position position = translateCanvasCoordinates(x, y);
 		if (lastDragPosition && *lastDragPosition != position) {
 			lastDragPosition = position;
-			drag(position, modifiers);
+			getClient()->send(DragPacket(DragPacket::Action::Update, position, modifiers));
 		}
 	}
 
-	void ClientGame::dragEnd(const Position &position, Modifiers modifiers) {
-		lastDragPosition.reset();
-		getClient()->send(DragPacket(DragPacket::Action::End, position, modifiers));
-	}
-
-	void ClientGame::drag(const Position &position, Modifiers modifiers) {
-		getClient()->send(DragPacket(DragPacket::Action::Update, position, modifiers));
+	void ClientGame::dragEnd(double x, double y, Modifiers modifiers) {
+		if (lastDragPosition) {
+			Position position = translateCanvasCoordinates(x, y);
+			lastDragPosition.reset();
+			getClient()->send(DragPacket(DragPacket::Action::End, position, modifiers));
+		}
 	}
 
 	Gdk::Rectangle ClientGame::getVisibleRealmBounds() const {

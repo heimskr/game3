@@ -9,8 +9,11 @@ namespace Game3 {
 			Widget() = default;
 
 		public:
+			float lastX = -1;
+			float lastY = -1;
+
 			virtual ~Widget() = default;
 
-			virtual void render(UIContext &, RendererContext &, float x, float y) = 0;
+			virtual void render(UIContext &, RendererContext &, float x, float y);
 	};
 }

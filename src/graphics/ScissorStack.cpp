@@ -4,13 +4,14 @@
 #include <algorithm>
 
 namespace Game3 {
-	Rectangle ScissorStack::getTop() const {
-		if (stack.empty()) {
-			GL::Viewport viewport;
-			return {viewport.saved[0], viewport.saved[1], viewport.saved[2], viewport.saved[3]};
-		}
+	ScissorStack::ScissorStack() = default;
 
-		return stack.top();
+	void ScissorStack::setBase(const Rectangle &new_base) {
+		base = new_base;
+	}
+
+	Rectangle ScissorStack::getTop() const {
+		return stack.empty()? getBase() : stack.top();
 	}
 
 	const Rectangle & ScissorStack::pushRelative(const Rectangle &rect) {

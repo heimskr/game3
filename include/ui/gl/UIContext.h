@@ -37,6 +37,10 @@ namespace Game3 {
 			void render();
 			void addDialog(std::unique_ptr<Dialog> &&);
 			std::shared_ptr<ClientGame> getGame() const;
+			void onResize(int x, int y);
+			/** Returns true iff the click accomplished something. */
+			bool click(int x, int y);
+			bool dragStart(int x, int y);
 
 			template <typename T>
 			size_t removeDialogs() {
@@ -50,7 +54,7 @@ namespace Game3 {
 
 			template <typename T, typename... Args>
 			void addDialog(Args &&...args) {
-				dialogs.emplace_back(std::make_unique<T>(std::forward<Args>(args)...));
+				dialogs.emplace_back(std::make_unique<T>(*this, std::forward<Args>(args)...));
 			}
 	};
 }

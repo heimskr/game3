@@ -1,5 +1,7 @@
 #pragma once
 
+#include "graphics/Rectangle.h"
+
 #include <array>
 #include <string_view>
 
@@ -10,14 +12,18 @@ namespace Game3 {
 
 	class Dialog {
 		protected:
-			Dialog() = default;
+			UIContext &ui;
+			Dialog(UIContext &ui);
 
 		public:
 			virtual ~Dialog() = default;
 
-			virtual void render(UIContext &, RendererContext &) = 0;
+			virtual void render(RendererContext &) = 0;
+			virtual Rectangle getPosition() const = 0;
+			virtual bool click(int x, int y);
+			virtual bool dragStart(int x, int y);
 
 			/** Order: clockwise starting at top left. */
-			void drawFrame(UIContext &, RendererContext &, double scale, bool alpha, const std::array<std::string_view, 8> &, const Color &interior = {0, 0, 0, 0});
+			void drawFrame(RendererContext &, double scale, bool alpha, const std::array<std::string_view, 8> &, const Color &interior = {0, 0, 0, 0});
 	};
 }

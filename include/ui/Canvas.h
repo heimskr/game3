@@ -57,6 +57,7 @@ namespace Game3 {
 			int getWidth() const;
 			int getHeight() const;
 			int getFactor() const;
+			void onResize();
 
 			bool inBounds(const Position &) const;
 

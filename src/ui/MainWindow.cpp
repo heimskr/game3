@@ -249,19 +249,19 @@ namespace Game3 {
 			glArea.grab_focus();
 			dragStart.emplace(x, y);
 			if (game)
-				game->dragStart(game->translateCanvasCoordinates(x, y), Modifiers(dragGesture->get_current_event_state()));
+				game->dragStart(x, y, Modifiers(dragGesture->get_current_event_state()));
 		});
 		dragGesture->signal_drag_update().connect([this](double x, double y) {
 			glArea.grab_focus();
 			if (game && autofocus) {
 				assert(dragStart);
-				game->dragUpdate(game->translateCanvasCoordinates(dragStart->first + x, dragStart->second + y), Modifiers(dragGesture->get_current_event_state()));
+				game->dragUpdate(dragStart->first + x, dragStart->second + y, Modifiers(dragGesture->get_current_event_state()));
 			}
 		});
 		dragGesture->signal_drag_end().connect([this](double x, double y) {
 			glArea.grab_focus();
 			if (game)
-				game->dragEnd(game->translateCanvasCoordinates(dragStart->first + x, dragStart->second + y), Modifiers(dragGesture->get_current_event_state()));
+				game->dragEnd(dragStart->first + x, dragStart->second + y, Modifiers(dragGesture->get_current_event_state()));
 			dragStart.reset();
 		});
 		glArea.add_controller(dragGesture);
@@ -350,6 +350,9 @@ namespace Game3 {
 		});
 
 		glArea.set_expand(true);
+		glArea.signal_resize().connect([&](int, int) {
+			canvas->onResize();
+		});
 
 		notebook.set_hexpand(false);
 		notebook.set_vexpand(true);
