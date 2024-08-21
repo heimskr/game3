@@ -14,6 +14,8 @@ namespace Game3 {
 		stack(std::move(stack)), size(size), scale(scale), active(active) {}
 
 	void ItemSlotWidget::render(UIContext &ui, RendererContext &renderers, float x, float y) {
+		Widget::render(ui, renderers, x, y);
+
 		const float alpha = active? 0.4 : 0.1;
 
 		renderers.rectangle.drawOnScreen(Color{0, 0, 0, alpha}, x * scale, y * scale, size * scale, size * scale);
@@ -31,8 +33,8 @@ namespace Game3 {
 			.offsetY = double(texture->y),
 			.sizeX = double(texture->width),
 			.sizeY = double(texture->height),
-			.scaleX = scale,
-			.scaleY = scale,
+			.scaleX = scale * 16. / texture->width,
+			.scaleY = scale * 16. / texture->height,
 			.invertY = false,
 		});
 
