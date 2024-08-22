@@ -10,4 +10,8 @@ namespace Game3 {
 	bool Rectangle::contains(int x, int y) const {
 		return this->x <= x && x < this->x + width && this->y <= y && y < this->y + height;
 	}
+
+	Rectangle Rectangle::operator+(const Rectangle &other) const {
+		return {x + other.x, y + other.y, other.width, other.height};
+	}
 }

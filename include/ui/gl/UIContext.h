@@ -8,6 +8,8 @@
 #include <filesystem>
 #include <map>
 #include <memory>
+#include <optional>
+#include <utility>
 #include <vector>
 
 namespace Game3 {
@@ -22,7 +24,9 @@ namespace Game3 {
 			std::vector<std::unique_ptr<Dialog>> dialogs;
 			ScissorStack internalScissorStack;
 			std::map<std::filesystem::path, std::shared_ptr<Texture>> textureMap;
-			std::shared_ptr<Widget> draggedWidget; // TODO
+			WidgetPtr draggedWidget;
+			bool draggedWidgetActive = false;
+			std::optional<std::pair<int, int>> dragOrigin;
 
 			template <typename T>
 			static bool dialogMatcher(const std::unique_ptr<Dialog> &dialog) {
@@ -31,16 +35,21 @@ namespace Game3 {
 
 		public:
 			ScissorStack scissorStack;
+			bool renderingDraggedWidget = false;
 
 			UIContext(Canvas &);
 
-			void render();
+			void render(float mouse_x, float mouse_y);
 			void addDialog(std::unique_ptr<Dialog> &&);
 			std::shared_ptr<ClientGame> getGame() const;
 			void onResize(int x, int y);
 			/** Returns true iff the click accomplished something. */
 			bool click(int x, int y);
 			bool dragStart(int x, int y);
+			bool dragUpdate(int x, int y);
+			bool dragEnd(int x, int y);
+			void setDraggedWidget(WidgetPtr);
+			WidgetPtr getDraggedWidget() const;
 
 			template <typename T>
 			size_t removeDialogs() {

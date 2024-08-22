@@ -170,7 +170,7 @@ namespace Game3 {
 
 		realmBounds = game->getVisibleRealmBounds();
 
-		uiContext.render();
+		uiContext.render(window.glAreaMouseX, window.glAreaMouseY);
 	}
 
 	int Canvas::getWidth() const {

@@ -40,7 +40,7 @@ namespace Game3 {
 				} else {
 					buffer >> inventory;
 					assert(inventory);
-					if (inventory) { // This is unnecessary but I want PVS-Studio to be happy.
+					if (inventory) {
 						inventory->weakOwner = getSharedAgent();
 						inventory->setSlotCount(slot_count); // Maybe not necessary? Try an assert before.
 						inventory->index = index;

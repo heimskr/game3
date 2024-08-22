@@ -2,13 +2,13 @@
 
 #include "graphics/Rectangle.h"
 
-#include <stack>
+#include <vector>
 
 namespace Game3 {
 	class ScissorStack {
 		private:
 			Rectangle base;
-			std::stack<Rectangle> stack;
+			std::vector<Rectangle> stack;
 
 		public:
 			ScissorStack();
@@ -17,5 +17,6 @@ namespace Game3 {
 			void setBase(const Rectangle &);
 			Rectangle getTop() const;
 			const Rectangle & pushRelative(const Rectangle &);
+			void debug() const;
 	};
 }

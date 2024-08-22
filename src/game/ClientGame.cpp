@@ -72,6 +72,8 @@ namespace Game3 {
 	}
 
 	void ClientGame::dragUpdate(double x, double y, Modifiers modifiers) {
+		if (canvas.uiContext.dragUpdate(x * 2, y * 2))
+			return;
 		Position position = translateCanvasCoordinates(x, y);
 		if (lastDragPosition && *lastDragPosition != position) {
 			lastDragPosition = position;
@@ -80,6 +82,8 @@ namespace Game3 {
 	}
 
 	void ClientGame::dragEnd(double x, double y, Modifiers modifiers) {
+		if (canvas.uiContext.dragEnd(x * 2, y * 2))
+			return;
 		if (lastDragPosition) {
 			Position position = translateCanvasCoordinates(x, y);
 			lastDragPosition.reset();

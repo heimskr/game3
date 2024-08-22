@@ -1,4 +1,5 @@
-#include "entity/Player.h"
+#include "entity/ClientPlayer.h"
+#include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "graphics/ItemTexture.h"
 #include "graphics/RectangleRenderer.h"
@@ -6,6 +7,7 @@
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/Texture.h"
 #include "graphics/TextRenderer.h"
+#include "packet/SwapSlotsPacket.h"
 #include "ui/gl/InventoryDialog.h"
 #include "ui/gl/ItemSlotWidget.h"
 #include "ui/gl/UIContext.h"
@@ -22,10 +24,11 @@ namespace Game3 {
 	void InventoryDialog::render(RendererContext &renderers) {
 		ScissorStack &stack = ui.scissorStack;
 
+		auto saver = renderers.getSaver();
+
 		Rectangle rectangle = getPosition();
 		stack.pushRelative(rectangle);
 
-		auto saver = renderers.getSaver();
 		renderers.updateSize(rectangle.width, rectangle.height);
 
 		double scale = 8;
@@ -50,7 +53,7 @@ namespace Game3 {
 			return;
 		}
 
-		stack.pushRelative(rectangle);
+		innerRectangle = stack.pushRelative(rectangle);
 
 		renderers.updateSize(rectangle.width, rectangle.height);
 
@@ -62,11 +65,11 @@ namespace Game3 {
 		constexpr static int OUTER_SLOT_SIZE = INNER_SLOT_SIZE * 5 / 4;
 
 		const int column_count = std::max(1, int(rectangle.width / (OUTER_SLOT_SIZE * scale)));
-		const double x_pad = (rectangle.width - column_count * (OUTER_SLOT_SIZE * scale) + (OUTER_SLOT_SIZE - INNER_SLOT_SIZE) * scale) / scale / 2;
+		const double x_pad = (rectangle.width - column_count * (OUTER_SLOT_SIZE * scale) + (OUTER_SLOT_SIZE - INNER_SLOT_SIZE) * scale) / 2;
 
 		int column = 0;
 		double x = x_pad;
-		double y = OUTER_SLOT_SIZE - INNER_SLOT_SIZE;
+		double y = (OUTER_SLOT_SIZE - INNER_SLOT_SIZE) * scale;
 
 		InventoryPtr inventory = player->getInventory(0);
 		auto inventory_lock = inventory->sharedLock();
@@ -79,7 +82,7 @@ namespace Game3 {
 		if (slotWidgets.size() != static_cast<size_t>(slot_count)) {
 			slotWidgets.clear();
 			for (Slot slot = 0; slot < slot_count; ++slot)
-				slotWidgets.emplace_back(std::make_shared<ItemSlotWidget>((*inventory)[slot], INNER_SLOT_SIZE, scale, slot == active_slot));
+				slotWidgets.emplace_back(std::make_shared<ItemSlotWidget>((*inventory)[slot], slot, INNER_SLOT_SIZE, scale, slot == active_slot));
 		} else {
 			for (Slot slot = 0; slot < slot_count; ++slot)
 				slotWidgets[slot]->setStack((*inventory)[slot]);
@@ -99,12 +102,12 @@ namespace Game3 {
 		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
 			widget->render(ui, renderers, x, y);
 
-			x += OUTER_SLOT_SIZE;
+			x += OUTER_SLOT_SIZE * scale;
 
 			if (++column == column_count) {
 				column = 0;
 				x = x_pad;
-				y += OUTER_SLOT_SIZE;
+				y += OUTER_SLOT_SIZE * scale;
 			}
 		}
 	}
@@ -116,5 +119,43 @@ namespace Game3 {
 		rectangle.width *= (1. - X_FRACTION);
 		rectangle.height *= (1. - Y_FRACTION);
 		return rectangle;
+	}
+
+	bool InventoryDialog::dragStart(int x, int y) {
+		if (!Dialog::dragStart(x, y))
+			return false;
+
+		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
+			Rectangle rectangle = innerRectangle + widget->getLastRectangle();
+			if (rectangle.contains(x, y)) {
+				ui.setDraggedWidget(widget->getDragStartWidget());
+				break;
+			}
+		}
+
+		return true;
+	}
+
+	bool InventoryDialog::dragEnd(int x, int y) {
+		if (!Dialog::dragEnd(x, y))
+			return false;
+
+		auto dragged = std::dynamic_pointer_cast<ItemSlotWidget>(ui.getDraggedWidget());
+
+		if (!dragged)
+			return true;
+
+		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
+			Rectangle rectangle = innerRectangle + widget->getLastRectangle();
+			if (rectangle.contains(x, y)) {
+				ClientPlayerPtr player = ui.getGame()->getPlayer();
+				const InventoryID inventory_id = player->getInventory(0)->index;
+				player->send(SwapSlotsPacket(player->getGID(), player->getGID(), dragged->getSlot(), widget->getSlot(), inventory_id, inventory_id));
+				ui.setDraggedWidget(nullptr);
+				break;
+			}
+		}
+
+		return true;
 	}
 }

@@ -17,6 +17,14 @@ namespace Game3 {
 		return getPosition().contains(x, y);
 	}
 
+	bool Dialog::dragUpdate(int x, int y) {
+		return getPosition().contains(x, y);
+	}
+
+	bool Dialog::dragEnd(int x, int y) {
+		return getPosition().contains(x, y);
+	}
+
 	void Dialog::drawFrame(RendererContext &renderers, double scale, bool alpha, const std::array<std::string_view, 8> &pieces, const Color &interior) {
 		Rectangle rectangle = ui.scissorStack.getTop();
 		SingleSpriteRenderer &single = renderers.singleSprite;
