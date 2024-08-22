@@ -84,7 +84,7 @@ namespace Game3 {
 		{GDK_KEY_9,            slowTime},
 		{GDK_KEY_braceleft,    slowTime},
 		{GDK_KEY_braceright,   slowTime},
-		{GDK_KEY_i,            forever},
+		{GDK_KEY_Escape,       forever},
 	};
 
 	MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &builder_):
@@ -917,7 +917,7 @@ namespace Game3 {
 					}
 					return;
 				}
-				case GDK_KEY_i:
+				case GDK_KEY_Escape:
 					if (canvas->uiContext.removeDialogs<InventoryDialog>() == 0) {
 						canvas->uiContext.addDialog<InventoryDialog>(player);
 					}
