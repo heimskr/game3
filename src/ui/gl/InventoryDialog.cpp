@@ -121,6 +121,19 @@ namespace Game3 {
 		return rectangle;
 	}
 
+	bool InventoryDialog::click(int x, int y) {
+		if (!Dialog::click(x, y))
+			return false;
+
+		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
+			Rectangle rectangle = innerRectangle + widget->getLastRectangle();
+			if (rectangle.contains(x, y) && widget->click(ui))
+				break;
+		}
+
+		return true;
+	}
+
 	bool InventoryDialog::dragStart(int x, int y) {
 		if (!Dialog::dragStart(x, y))
 			return false;

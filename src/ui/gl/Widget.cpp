@@ -14,4 +14,8 @@ namespace Game3 {
 	std::shared_ptr<Widget> Widget::getDragStartWidget() {
 		return nullptr;
 	}
+
+	bool Widget::click(UIContext &) {
+		return false;
+	}
 }

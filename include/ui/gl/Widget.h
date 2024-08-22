@@ -23,6 +23,7 @@ namespace Game3 {
 			virtual void render(UIContext &, RendererContext &, float x, float y);
 			/** Can return a pointer to nothing, itself or a new widget. */
 			virtual std::shared_ptr<Widget> getDragStartWidget();
+			virtual bool click(UIContext &);
 	};
 
 	using WidgetPtr = std::shared_ptr<Widget>;

@@ -1,3 +1,4 @@
+#include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
 #include "graphics/ItemTexture.h"
 #include "graphics/RectangleRenderer.h"
@@ -6,6 +7,7 @@
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/TextRenderer.h"
 #include "item/Item.h"
+#include "packet/SetActiveSlotPacket.h"
 #include "ui/gl/ItemSlotWidget.h"
 #include "ui/gl/UIContext.h"
 
@@ -53,6 +55,11 @@ namespace Game3 {
 
 	std::shared_ptr<Widget> ItemSlotWidget::getDragStartWidget() {
 		return stack? shared_from_this() : nullptr;
+	}
+
+	bool ItemSlotWidget::click(UIContext &ui) {
+		ui.getGame()->getPlayer()->send(SetActiveSlotPacket(slot));
+		return true;
 	}
 
 	void ItemSlotWidget::setStack(std::shared_ptr<ItemStack> new_stack) {

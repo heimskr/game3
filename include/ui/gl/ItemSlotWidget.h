@@ -21,7 +21,8 @@ namespace Game3 {
 			ItemSlotWidget(std::shared_ptr<ItemStack>, Slot, double size, double scale, bool active = false);
 
 			void render(UIContext &, RendererContext &, float x, float y) final;
-			std::shared_ptr<Widget> getDragStartWidget() override;
+			std::shared_ptr<Widget> getDragStartWidget() final;
+			bool click(UIContext &) final;
 			void setStack(std::shared_ptr<ItemStack>);
 			void setActive(bool);
 			Slot getSlot() const;
