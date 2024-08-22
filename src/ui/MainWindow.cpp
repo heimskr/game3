@@ -253,7 +253,7 @@ namespace Game3 {
 		});
 		dragGesture->signal_drag_update().connect([this](double x, double y) {
 			glArea.grab_focus();
-			if (game && autofocus) {
+			if (game) {
 				assert(dragStart);
 				game->dragUpdate(dragStart->first + x, dragStart->second + y, Modifiers(dragGesture->get_current_event_state()));
 			}

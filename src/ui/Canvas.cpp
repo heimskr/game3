@@ -150,7 +150,6 @@ namespace Game3 {
 			context.updateSize(getWidth(), getHeight());
 			glViewport(0, 0, width, height); CHECKGL
 			multiplier(mainTexture, scratchTexture);
-
 		} else {
 			RendererContext context = getRendererContext();
 			glViewport(0, 0, width, height); CHECKGL
