@@ -89,10 +89,6 @@ namespace Game3 {
 			server_game.getDatabase().deleteEntity(shared);
 			server_game.entityDestroyed(*this);
 		}
-
-		if (getName() == "Snowball") {
-			INFO("Use count on side {} for snowball {} is {}", getSide(), getGID(), shared.use_count());
-		}
 	}
 
 	void Entity::toJSON(nlohmann::json &json) const {

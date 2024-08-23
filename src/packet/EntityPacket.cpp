@@ -49,10 +49,6 @@ namespace Game3 {
 			entity->decode(storedBuffer);
 		}
 
-		if (identifier == "base:entity/snowball") {
-			INFO("Received entity packet on client with GID {}. Was found: {}", globalID, wasFound);
-		}
-
 		{
 			auto lock = entityUpdates.uniqueLock();
 			++entityUpdates[entity->getName()];
