@@ -1,3 +1,4 @@
+#include "entity/Snowball.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
@@ -235,7 +236,7 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/vanadium_magnetite_ore", "Vanadium Magnetite Ore", 32, 64));
 		add(std::make_shared<Item>("base:item/niobium_bar",      "Niobium Bar",       128, 64));
 		add(std::make_shared<Item>("base:item/teleportation_focus", "Teleportation Focus", 999, 64)); // TODO: cost
-		add(std::make_shared<ProjectileItem>("base:item/snowball", "Snowball", 999, 64)); // TODO: cost
+		add(std::make_shared<ProjectileItem<Snowball>>("base:item/snowball", "Snowball", 999, 64)); // TODO: cost
 
 		add(std::make_shared<ItemPipeItem>(4));
 

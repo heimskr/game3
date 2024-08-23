@@ -16,8 +16,9 @@ namespace Game3 {
 		for (const auto chunk_position: positions) {
 			if (auto entities = realm.getEntities(chunk_position)) {
 				auto lock = entities->sharedLock();
-				for (const auto &entity: *entities)
-					requests.emplace_back(entity->getGID(), entity->getUpdateCounter() + 1);
+				for (const WeakEntityPtr &weak_entity: *entities)
+					if (EntityPtr entity = weak_entity.lock())
+						requests.emplace_back(entity->getGID(), entity->getUpdateCounter() + 1);
 			}
 		}
 	}

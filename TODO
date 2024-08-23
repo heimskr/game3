@@ -12,3 +12,4 @@
 [2023/05/30 11:01:00] Update Entity/TileEntity documentation: add encode/decode.
 [2023/07/22 02:06:50] Lock inventories as appropriate.
 [2024/01/27 00:35:48] Investigate buy/sell prices. Broken?
+[2024/08/23 11:33:22] "Garbage collection" for entitiesByChunk

@@ -27,11 +27,10 @@ namespace Game3 {
 			void decode(Buffer &) override;
 
 			const Identifier & getItemID() const;
+			virtual void onHit(const EntityPtr &target);
+			void setThrower(const EntityPtr &);
 
 		protected:
-			std::shared_ptr<Texture> getTexture() override;
-
-		private:
 			Identifier itemID;
 			Vector3 initialVelocity;
 			double angularVelocity = 0;
@@ -44,9 +43,12 @@ namespace Game3 {
 			float scale = .5;
 			double angle = 0;
 			bool needsTexture = true;
+			bool hasHit = false;
+			GlobalID thrower = -1;
 
-			Projectile(Identifier item_id = "base:item/snowball", const Vector3 &initial_velocity = {}, double angular_velocity = 0, double linger_time = DEFAULT_LINGER_TIME);
+			Projectile(EntityType type, Identifier item_id, const Vector3 &initial_velocity = {}, double angular_velocity = 0, double linger_time = DEFAULT_LINGER_TIME);
 
+			std::shared_ptr<Texture> getTexture() override;
 			void setTexture(const ClientGamePtr &);
 
 		friend class Entity;

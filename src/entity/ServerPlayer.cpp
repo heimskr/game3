@@ -160,8 +160,8 @@ namespace Game3 {
 
 				if (auto entities = realm->getEntities(chunk)) {
 					auto lock = entities->sharedLock();
-					for (const auto &entity: *entities)
-						if (!entity->hasBeenSentTo(shared))
+					for (const WeakEntityPtr &weak_entity: *entities)
+						if (EntityPtr entity = weak_entity.lock(); entity && !entity->hasBeenSentTo(shared))
 							entity->sendTo(client);
 				}
 			}

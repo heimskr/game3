@@ -7,5 +7,6 @@ namespace Game3 {
 
 	struct EntityZCompare {
 		bool operator()(const std::shared_ptr<Entity> &, const std::shared_ptr<Entity> &) const;
+		bool operator()(const std::weak_ptr<Entity> &, const std::weak_ptr<Entity> &) const;
 	};
 }

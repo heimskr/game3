@@ -89,6 +89,10 @@ namespace Game3 {
 			server_game.getDatabase().deleteEntity(shared);
 			server_game.entityDestroyed(*this);
 		}
+
+		if (getName() == "Snowball") {
+			INFO("Use count on side {} for snowball {} is {}", getSide(), getGID(), shared.use_count());
+		}
 	}
 
 	void Entity::toJSON(nlohmann::json &json) const {
@@ -972,8 +976,9 @@ namespace Game3 {
 			ChunkRange(getChunk()).iterate([this, realm, shared, this_player](ChunkPosition chunk_position) {
 				if (auto visible_at_chunk = realm->getEntities(chunk_position)) {
 					auto chunk_lock = visible_at_chunk->sharedLock();
-					for (const auto &visible: *visible_at_chunk) {
-						if (visible.get() == this)
+					for (const WeakEntityPtr &weak_visible: *visible_at_chunk) {
+						EntityPtr visible = weak_visible.lock();
+						if (!visible || visible.get() == this)
 							continue;
 						assert(visible->getGID() != getGID());
 						visibleEntities.insert(visible);

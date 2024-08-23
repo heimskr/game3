@@ -261,8 +261,9 @@ namespace Game3 {
 		ChunkRange(player->getChunk()).iterate([&](ChunkPosition chunk_position) {
 			if (auto entities_in_chunk = getEntities(chunk_position)) {
 				auto lock = entities_in_chunk->sharedLock();
-				for (const EntityPtr &entity: *entities_in_chunk) {
-					if (entity != player) {
+				for (const WeakEntityPtr &weak_entity: *entities_in_chunk) {
+					EntityPtr entity = weak_entity.lock();
+					if (entity && entity != player) {
 						rendered_entities.insert(entity);
 						entity->render(renderers); CHECKGL
 					}
@@ -317,9 +318,11 @@ namespace Game3 {
 		ChunkRange(player->getChunk()).iterate([&](ChunkPosition chunk_position) {
 			if (auto entities_in_chunk = getEntities(chunk_position)) {
 				auto lock = entities_in_chunk->sharedLock();
-				for (const EntityPtr &entity: *entities_in_chunk)
-					if (entity != player)
+				for (const WeakEntityPtr &weak_entity: *entities_in_chunk) {
+					EntityPtr entity = weak_entity.lock();
+					if (entity && entity != player)
 						entity->renderLighting(renderers);
+				}
 			}
 		});
 
@@ -500,8 +503,9 @@ namespace Game3 {
 						if (auto iter = entitiesByChunk.find(chunk); iter != entitiesByChunk.end() && iter->second) {
 							auto set_lock = iter->second->sharedLock();
 							by_chunk_lock.unlock();
-							for (const auto &entity: *iter->second) {
-								if (!entity->isPlayer() && entity->tryInitialTick()) {
+							for (const WeakEntityPtr &weak_entity: *iter->second) {
+								EntityPtr entity = weak_entity.lock();
+								if (entity && !entity->isPlayer() && entity->tryInitialTick()) {
 #ifdef PROFILE_TICKS
 									Timer timer{"TickEntity"};
 #endif
@@ -683,74 +687,84 @@ namespace Game3 {
 	}
 
 	std::vector<EntityPtr> Realm::findEntities(const Position &position) const {
-		EntitySet entity_set = getEntities(position.getChunk());
+		WeakEntitySet entity_set = getEntities(position.getChunk());
 		if (!entity_set)
 			return {};
 
 		std::vector<EntityPtr> out;
 		auto lock = entity_set->sharedLock();
 
-		for (const EntityPtr &entity: *entity_set)
-			if (entity->occupies(position))
+		for (const WeakEntityPtr &weak_entity: *entity_set) {
+			EntityPtr entity = weak_entity.lock();
+			if (entity && entity->occupies(position))
 				out.push_back(entity);
+		}
 
 		return out;
 	}
 
 	bool Realm::hasEntities(const Position &position) const {
-		EntitySet entity_set = getEntities(position.getChunk());
+		WeakEntitySet entity_set = getEntities(position.getChunk());
 		if (!entity_set)
 			return {};
 
 		auto lock = entity_set->sharedLock();
 
-		for (const EntityPtr &entity: *entity_set)
-			if (entity->occupies(position))
+		for (const WeakEntityPtr &weak_entity: *entity_set) {
+			EntityPtr entity = weak_entity.lock();
+			if (entity && entity->occupies(position))
 				return true;
+		}
 
 		return false;
 	}
 
 	bool Realm::hasEntities(const Position &position, const std::function<bool(const EntityPtr &)> &predicate) const {
-		EntitySet entity_set = getEntities(position.getChunk());
+		WeakEntitySet entity_set = getEntities(position.getChunk());
 		if (!entity_set)
 			return {};
 
 		auto lock = entity_set->sharedLock();
 
-		for (const EntityPtr &entity: *entity_set)
-			if (entity->occupies(position) && predicate(entity))
+		for (const WeakEntityPtr &weak_entity: *entity_set) {
+			EntityPtr entity = weak_entity.lock();
+			if (entity && entity->occupies(position) && predicate(entity))
 				return true;
+		}
 
 		return false;
 	}
 
 	size_t Realm::countEntities(const Position &position) const {
-		EntitySet entity_set = getEntities(position.getChunk());
+		WeakEntitySet entity_set = getEntities(position.getChunk());
 		if (!entity_set)
 			return {};
 
 		auto lock = entity_set->sharedLock();
 		size_t out = 0;
 
-		for (const EntityPtr &entity: *entity_set)
-			if (entity->occupies(position))
+		for (const WeakEntityPtr &weak_entity: *entity_set) {
+			EntityPtr entity = weak_entity.lock();
+			if (entity && entity->occupies(position))
 				++out;
+		}
 
 		return out;
 	}
 
 	size_t Realm::countEntities(const Position &position, const std::function<bool(const EntityPtr &)> &predicate) const {
-		EntitySet entity_set = getEntities(position.getChunk());
+		WeakEntitySet entity_set = getEntities(position.getChunk());
 		if (!entity_set)
 			return {};
 
 		auto lock = entity_set->sharedLock();
 		size_t out = 0;
 
-		for (const EntityPtr &entity: *entity_set)
-			if (entity->occupies(position) && predicate(entity))
+		for (const WeakEntityPtr &weak_entity: *entity_set) {
+			EntityPtr entity = weak_entity.lock();
+			if (entity && entity->occupies(position) && predicate(entity))
 				++out;
+		}
 
 		return out;
 	}
@@ -766,14 +780,16 @@ namespace Game3 {
 
 		const Position offset(radius - 1, radius - 1);
 		ChunkRange((position - offset).getChunk(), (position + offset).getChunk()).iterate([this, &out, position, radius](ChunkPosition chunk_position) {
-			EntitySet entity_set = getEntities(chunk_position);
+			WeakEntitySet entity_set = getEntities(chunk_position);
 			if (!entity_set)
 				return;
 
 			auto lock = entity_set->sharedLock();
-			for (const EntityPtr &entity: *entity_set)
-				if (entity->position.copyBase().maximumAxisDistance(position) < radius)
+			for (const WeakEntityPtr &weak_entity: *entity_set) {
+				EntityPtr entity = weak_entity.lock();
+				if (entity && entity->position.copyBase().maximumAxisDistance(position) < radius)
 					out.push_back(entity);
+			}
 		});
 
 		return out;
@@ -790,14 +806,16 @@ namespace Game3 {
 
 		const Position offset(radius - 1, radius - 1);
 		ChunkRange((position - offset).getChunk(), (position + offset).getChunk()).iterate([this, &out, &filter, position, radius](ChunkPosition chunk_position) {
-			EntitySet entity_set = getEntities(chunk_position);
+			WeakEntitySet entity_set = getEntities(chunk_position);
 			if (!entity_set)
 				return;
 
 			auto lock = entity_set->sharedLock();
-			for (const EntityPtr &entity: *entity_set)
-				if (entity->position.copyBase().maximumAxisDistance(position) < radius && filter(entity))
+			for (const WeakEntityPtr &weak_entity: *entity_set) {
+				EntityPtr entity = weak_entity.lock();
+				if (entity && entity->position.copyBase().maximumAxisDistance(position) < radius && filter(entity))
 					out.push_back(entity);
+			}
 		});
 
 		return out;
@@ -811,13 +829,14 @@ namespace Game3 {
 
 		const Position offset(radius - 1, radius - 1);
 		ChunkRange((position - offset).getChunk(), (position + offset).getChunk()).iterate([this, &out, &predicate, position, radius](ChunkPosition chunk_position) {
-			EntitySet entity_set = getEntities(chunk_position);
+			WeakEntitySet entity_set = getEntities(chunk_position);
 			if (!entity_set)
 				return false;
 
 			auto lock = entity_set->sharedLock();
-			for (const EntityPtr &entity: *entity_set) {
-				if (entity->position.copyBase().maximumAxisDistance(position) < radius && predicate(entity)) {
+			for (const WeakEntityPtr &weak_entity: *entity_set) {
+				EntityPtr entity = weak_entity.lock();
+				if (entity && entity->position.copyBase().maximumAxisDistance(position) < radius && predicate(entity)) {
 					out = true;
 					return true;
 				}
@@ -857,9 +876,11 @@ namespace Game3 {
 		by_chunk_lock.unlock();
 
 		auto found_lock = found_entities->sharedLock();
-		for (const EntityPtr &entity: *found_entities)
-			if (entity->occupies(position) && entity != except)
+		for (const WeakEntityPtr &weak_entity: *found_entities) {
+			EntityPtr entity = weak_entity.lock();
+			if (entity && entity->occupies(position) && entity != except)
 				return entity;
+		}
 		return {};
 	}
 
@@ -913,6 +934,24 @@ namespace Game3 {
 					if (can_warn)
 						WARN("Still present in Realm {}'s entitiesByChunk at chunk position {}", id, chunk_position);
 					set->erase(iter);
+				}
+			}
+		}
+
+		{
+			auto lock = entityInitializationQueue.sharedLock();
+			for (const auto &[to_init, position]: entityInitializationQueue.get()) {
+				if (to_init == entity) {
+					ERROR("{} {} inexplicably found in realm {}'s initialization queue", entity->getName(), entity->getGID(), id);
+				}
+			}
+		}
+
+		{
+			auto lock = entityAdditionQueue.sharedLock();
+			for (const auto &[to_add, position]: entityAdditionQueue.get()) {
+				if (to_add == entity) {
+					ERROR("{} {} inexplicably found in realm {}'s addition queue", entity->getName(), entity->getGID(), id);
 				}
 			}
 		}
@@ -1274,8 +1313,9 @@ namespace Game3 {
 
 		if (auto entities_ptr = getEntities(chunk_position)) {
 			entity_packets.reserve(entities_ptr->size());
-			for (const auto &entity: *entities_ptr)
-				entity_packets.emplace_back(entity);
+			for (const WeakEntityPtr &weak_entity: *entities_ptr)
+				if (EntityPtr entity = weak_entity.lock())
+					entity_packets.emplace_back(entity);
 		}
 
 		if (auto tile_entities_ptr = getTileEntities(chunk_position)) {
@@ -1481,13 +1521,13 @@ namespace Game3 {
 			auto set_lock = set.uniqueLock();
 			set.insert(entity);
 		} else {
-			auto set = std::make_shared<EntitySet::element_type>();
+			auto set = std::make_shared<WeakEntitySet::element_type>();
 			set->insert(entity);
 			entitiesByChunk.emplace(chunk_position, std::move(set));
 		}
 	}
 
-	Realm::EntitySet Realm::getEntities(ChunkPosition chunk_position) const {
+	Realm::WeakEntitySet Realm::getEntities(ChunkPosition chunk_position) const {
 		auto lock = entitiesByChunk.sharedLock();
 		if (auto iter = entitiesByChunk.find(chunk_position); iter != entitiesByChunk.end())
 			return iter->second;

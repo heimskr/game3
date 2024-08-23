@@ -12,8 +12,8 @@ namespace {
 }
 
 namespace Game3 {
-	Projectile::Projectile(Identifier item_id, const Vector3 &initial_velocity, double angular_velocity, double linger_time):
-		Entity(ID()), itemID(std::move(item_id)), initialVelocity(initial_velocity), angularVelocity(angular_velocity), lingerTime(linger_time) {}
+	Projectile::Projectile(EntityType type, Identifier item_id, const Vector3 &initial_velocity, double angular_velocity, double linger_time):
+		Entity(std::move(type)), itemID(std::move(item_id)), initialVelocity(initial_velocity), angularVelocity(angular_velocity), lingerTime(linger_time) {}
 
 	void Projectile::tick(const TickArgs &args) {
 		auto offset_lock = offset.uniqueLock();
@@ -33,6 +33,21 @@ namespace Game3 {
 			}
 		} else {
 			angle += angularVelocity * args.delta;
+
+			if (!hasHit) {
+				Position position = getPosition();
+				position.row += offset.y;
+				position.column += offset.x;
+				std::vector<EntityPtr> targets = getRealm()->findEntities(position, getSelf());
+				for (const EntityPtr &target: targets) {
+					if (target->getGID() != thrower
+						 && !target->is("base:entity/snowball")
+					) {
+						onHit(target);
+						return;
+					}
+				}
+			}
 		}
 
 		enqueueTick();
@@ -83,6 +98,8 @@ namespace Game3 {
 		buffer << lingerTime;
 		buffer << angularVelocity;
 		buffer << angle;
+		buffer << hasHit;
+		buffer << thrower;
 	}
 
 	void Projectile::decode(Buffer &buffer) {
@@ -90,10 +107,22 @@ namespace Game3 {
 		buffer >> lingerTime;
 		buffer >> angularVelocity;
 		buffer >> angle;
+		buffer >> hasHit;
+		buffer >> thrower;
 	}
 
 	const Identifier & Projectile::getItemID() const {
 		return itemID;
+	}
+
+	void Projectile::onHit(const EntityPtr &) {
+		hasHit = true;
+		velocity.x = 0;
+		velocity.y = 0;
+	}
+
+	void Projectile::setThrower(const EntityPtr &entity) {
+		thrower = entity->getGID();
 	}
 
 	std::shared_ptr<Texture> Projectile::getTexture() {

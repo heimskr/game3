@@ -141,7 +141,7 @@ namespace Game3 {
 			/** Called whenever the riding entity tries to move. Returns whether the move request was accepted. */
 			virtual bool moveFromRider(const std::shared_ptr<Entity> &rider, Direction, MovementContext);
 			bool moveFromRider(const std::shared_ptr<Entity> &rider, Direction);
-			std::shared_ptr<Realm> getRealm() const override final;
+			std::shared_ptr<Realm> getRealm() const final;
 			Position getPosition() const override { return position.copyBase(); }
 			inline Direction getDirection() const { return direction.load(); }
 			Entity & setRealm(const Game &, RealmID);
@@ -169,8 +169,8 @@ namespace Game3 {
 			inline Slot getHeldLeft()  const { return heldLeft.slot;  }
 			inline Slot getHeldRight() const { return heldRight.slot; }
 			void unhold(Slot);
-			Side getSide() const override final;
-			Type getAgentType() const override final { return Agent::Type::Entity; }
+			Side getSide() const final;
+			Type getAgentType() const final { return Agent::Type::Entity; }
 			void inventoryUpdated(InventoryID) override;
 			ChunkPosition getChunk() const;
 			bool canSee(RealmID, const Position &) const;
@@ -281,4 +281,5 @@ namespace Game3 {
 	void to_json(nlohmann::json &, const Entity &);
 
 	using EntityPtr = std::shared_ptr<Entity>;
+	using WeakEntityPtr = std::weak_ptr<Entity>;
 }

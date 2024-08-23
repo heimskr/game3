@@ -13,4 +13,14 @@ namespace Game3 {
 			return false;
 		return left < right;
 	}
+
+	bool EntityZCompare::operator()(const std::weak_ptr<Entity> &left, const std::weak_ptr<Entity> &right) const {
+		auto left_locked = left.lock();
+		auto right_locked = right.lock();
+
+		if (!left_locked || !right_locked)
+			return bool(left_locked);
+
+		return (*this)(left_locked, right_locked);
+	}
 }

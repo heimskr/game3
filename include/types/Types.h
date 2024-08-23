@@ -187,3 +187,20 @@ struct std::formatter<Game3::Color> {
 		return std::format_to(ctx.out(), "({}, {}, {} @ {})", color.red, color.green, color.blue, color.alpha);
 	}
 };
+
+template <>
+struct std::formatter<Game3::Side> {
+	constexpr auto parse(auto &ctx) {
+		return ctx.begin();
+	}
+
+	auto format(const auto &side, auto &ctx) const {
+		switch (side) {
+			case Game3::Side::Client:  return std::format_to(ctx.out(), "Client");
+			case Game3::Side::Server:  return std::format_to(ctx.out(), "Server");
+			case Game3::Side::Invalid: return std::format_to(ctx.out(), "Invalid");
+			default:
+				return std::format_to(ctx.out(), "Side={}?", static_cast<int>(side));
+		}
+	}
+};

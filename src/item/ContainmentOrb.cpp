@@ -30,8 +30,8 @@ namespace Game3 {
 
 			{
 				auto lock = entities->sharedLock();
-				for (const EntityPtr &entity: *entities) {
-					if (entity->getPosition() == place.position && entity != player) {
+				for (const WeakEntityPtr &weak_entity: *entities) {
+					if (EntityPtr entity = weak_entity.lock(); entity && entity->getPosition() == place.position && entity != player) {
 						selected = entity;
 						break;
 					}

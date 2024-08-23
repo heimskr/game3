@@ -214,8 +214,9 @@ namespace Game3 {
 
 				if (auto entities = realm->getEntities(chunk_position)) {
 					auto lock = entities->sharedLock();
-					for (const auto &entity: *entities)
-						entity_requests.emplace_back(*entity);
+					for (const WeakEntityPtr &weak_entity: *entities)
+						if (EntityPtr entity = weak_entity.lock())
+							entity_requests.emplace_back(*entity);
 				}
 
 				if (auto tile_entities = realm->getTileEntities(chunk_position)) {

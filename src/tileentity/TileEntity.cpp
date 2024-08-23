@@ -275,9 +275,11 @@ namespace Game3 {
 		ChunkRange(getChunk()).iterate([&](ChunkPosition chunk_position) {
 			if (auto entities = realm->getEntities(chunk_position)) {
 				auto lock = entities->sharedLock();
-				for (const auto &entity: *entities)
-					if (entity->isPlayer())
+				for (const WeakEntityPtr &weak_entity: *entities) {
+					EntityPtr entity = weak_entity.lock();
+					if (entity && entity->isPlayer())
 						safeDynamicCast<Player>(entity)->send(packet);
+				}
 			}
 		});
 	}

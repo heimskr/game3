@@ -344,14 +344,14 @@ namespace Game3 {
 			std::atomic_bool ticking = false;
 			MTQueue<std::weak_ptr<Entity>> entityRemovalQueue;
 			MTQueue<std::weak_ptr<Entity>> entityDestructionQueue;
-			MTQueue<std::pair<std::shared_ptr<Entity>, Position>> entityAdditionQueue;
+			MTQueue<std::pair<EntityPtr, Position>> entityAdditionQueue;
 			MTQueue<std::pair<EntityPtr, Position>> entityInitializationQueue;
 			MTQueue<std::weak_ptr<TileEntity>> tileEntityRemovalQueue;
 			MTQueue<std::weak_ptr<TileEntity>> tileEntityDestructionQueue;
 			MTQueue<std::weak_ptr<TileEntity>> tileEntityAdditionQueue;
 			MTQueue<std::weak_ptr<Player>> playerRemovalQueue;
 			MTQueue<std::function<void()>> generalQueue;
-			Lockable<std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::set<EntityPtr, EntityZCompare>>>>> entitiesByChunk;
+			Lockable<std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::set<std::weak_ptr<Entity>, EntityZCompare>>>>> entitiesByChunk;
 			Lockable<std::unordered_map<ChunkPosition, std::shared_ptr<Lockable<std::unordered_set<TileEntityPtr>>>>> tileEntitiesByChunk;
 			Lockable<std::unordered_set<VillagePtr>> villages;
 			ChunkPosition lastPlayerChunk{INT32_MIN, INT32_MIN};
@@ -372,8 +372,8 @@ namespace Game3 {
 
 
 		public:
-			using EntitySet = decltype(entitiesByChunk)::Base::mapped_type;
-			EntitySet getEntities(ChunkPosition) const;
+			using WeakEntitySet = decltype(entitiesByChunk)::Base::mapped_type;
+			WeakEntitySet getEntities(ChunkPosition) const;
 
 		friend class Game;
 	};
