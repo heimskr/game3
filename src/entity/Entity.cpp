@@ -201,6 +201,14 @@ namespace Game3 {
 
 			z = std::max(z + delta * velocity.z, 0.);
 
+			if (z > 0) {
+				x += delta * velocity.x;
+				y += delta * velocity.y;
+			} else {
+				velocity.x = 0;
+				velocity.y = 0;
+			}
+
 			if (!old_grounded && offset.isGrounded()) {
 				if (TileEntityPtr tile_entity = getRealm()->tileEntityAt(getPosition()))
 					tile_entity->onOverlap(getSelf());
@@ -210,6 +218,16 @@ namespace Game3 {
 				velocity.z = 0;
 			else
 				velocity.z -= 32 * delta;
+
+			position.withUnique([&offset = offset](Position &position) {
+				using I = Position::IntType;
+				position.column += offset.x < 0? -I(-offset.x) : I(offset.x);
+				position.row    += offset.y < 0? -I(-offset.y) : I(offset.y);
+			});
+
+			double dummy;
+			offset.x = std::modf(offset.x, &dummy);
+			offset.y = std::modf(offset.y, &dummy);
 		}
 
 		// Not all platforms support std::atomic<float>::operator+=.
