@@ -95,7 +95,7 @@ namespace Game3 {
 			void add(TileEntityFactory &&);
 			void add(RealmFactory &&);
 			void add(LocalCommandFactory &&);
-			void add(ModuleFactory &&);
+			void add(GTKModuleFactory &&);
 			void traverseData(const std::filesystem::path &);
 			void loadData(const nlohmann::json &);
 			void addRecipe(const nlohmann::json &);

@@ -11,17 +11,17 @@
 namespace Game3 {
 	class Game;
 
-	class ModuleFactory: public NamedRegisterable {
+	class GTKModuleFactory: public NamedRegisterable {
 		private:
 			std::function<std::shared_ptr<GTKModule>(const std::shared_ptr<ClientGame> &, const std::any &)> function;
 
 		public:
-			ModuleFactory(Identifier, decltype(function));
+			GTKModuleFactory(Identifier, decltype(function));
 
 			std::shared_ptr<GTKModule> operator()(const std::shared_ptr<ClientGame> &, const std::any &) const;
 
 			template <typename T>
-			static ModuleFactory create(const Identifier &id = T::ID()) {
+			static GTKModuleFactory create(const Identifier &id = T::ID()) {
 				return {id, [](const std::shared_ptr<ClientGame> &game, const std::any &argument) {
 					return std::make_shared<T>(game, argument);
 				}};

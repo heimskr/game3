@@ -25,7 +25,7 @@
 #include "ui/gtk/Util.h"
 #include "ui/module/InventoryModule.h"
 #include "ui/module/FluidLevelsModule.h"
-#include "ui/module/ModuleFactory.h"
+#include "ui/module/GTKModuleFactory.h"
 #include "ui/module/VillageTradeModule.h"
 #include "ui/tab/CraftingTab.h"
 #include "ui/tab/InventoryTab.h"
@@ -720,7 +720,7 @@ namespace Game3 {
 		} else {
 			if (current_module != nullptr)
 				module_lock.unlock();
-			auto &registry = game->registry<ModuleFactoryRegistry>();
+			auto &registry = game->registry<GTKModuleFactoryRegistry>();
 			inventoryTab->setModule((*registry[module_id])(game, argument));
 		}
 	}

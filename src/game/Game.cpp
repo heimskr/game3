@@ -14,7 +14,7 @@
 #include "ui/module/FluidLevelsModule.h"
 #include "ui/module/ItemFilterModule.h"
 #include "ui/module/MicroscopeModule.h"
-#include "ui/module/ModuleFactory.h"
+#include "ui/module/GTKModuleFactory.h"
 #include "ui/module/MultiModule.h"
 #include "ui/module/MutatorModule.h"
 #include "ui/module/VillageTradeModule.h"
@@ -41,24 +41,24 @@ namespace Game3 {
 	}
 
 	void Game::addModuleFactories() {
-		add(ModuleFactory::create<InventoryModule>());
-		add(ModuleFactory::create<FluidLevelsModule>());
-		add(ModuleFactory::create<ChemicalReactorModule>());
-		add(ModuleFactory::create<EnergyLevelModule>());
-		add(ModuleFactory::create<ItemFilterModule>());
-		add(ModuleFactory::create<CombinerModule>());
-		add(ModuleFactory::create<AutocrafterModule>());
-		add(ModuleFactory::create<VillageTradeModule>());
-		add(ModuleFactory::create<MicroscopeModule<0>>());
-		add(ModuleFactory::create<MicroscopeModule<1, Substance::Energy>>());
-		add(ModuleFactory::create<MicroscopeModule<1, Substance::Energy, Substance::Fluid>>());
-		add(ModuleFactory::create<MicroscopeModule<2, Substance::Energy>>());
-		add(ModuleFactory::create<MutatorModule>());
-		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Energy, Substance::Fluid>>());
-		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Fluid>>());
-		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Energy>>());
+		add(GTKModuleFactory::create<InventoryModule>());
+		add(GTKModuleFactory::create<FluidLevelsModule>());
+		add(GTKModuleFactory::create<ChemicalReactorModule>());
+		add(GTKModuleFactory::create<EnergyLevelModule>());
+		add(GTKModuleFactory::create<ItemFilterModule>());
+		add(GTKModuleFactory::create<CombinerModule>());
+		add(GTKModuleFactory::create<AutocrafterModule>());
+		add(GTKModuleFactory::create<VillageTradeModule>());
+		add(GTKModuleFactory::create<MicroscopeModule<0>>());
+		add(GTKModuleFactory::create<MicroscopeModule<1, Substance::Energy>>());
+		add(GTKModuleFactory::create<MicroscopeModule<1, Substance::Energy, Substance::Fluid>>());
+		add(GTKModuleFactory::create<MicroscopeModule<2, Substance::Energy>>());
+		add(GTKModuleFactory::create<MutatorModule>());
+		add(GTKModuleFactory::create<MultiModule<Substance::Item, Substance::Energy, Substance::Fluid>>());
+		add(GTKModuleFactory::create<MultiModule<Substance::Item, Substance::Fluid>>());
+		add(GTKModuleFactory::create<MultiModule<Substance::Item, Substance::Energy>>());
 #ifdef GAME3_ENABLE_SCRIPTING
-		add(ModuleFactory::create<ComputerModule>());
+		add(GTKModuleFactory::create<ComputerModule>());
 #endif
 	}
 
@@ -93,9 +93,9 @@ namespace Game3 {
 			itemsByAttribute[attribute].insert(item);
 	}
 
-	void Game::add(ModuleFactory &&factory) {
-		auto shared = std::make_shared<ModuleFactory>(std::move(factory));
-		registry<ModuleFactoryRegistry>().add(shared->identifier, shared);
+	void Game::add(GTKModuleFactory &&factory) {
+		auto shared = std::make_shared<GTKModuleFactory>(std::move(factory));
+		registry<GTKModuleFactoryRegistry>().add(shared->identifier, shared);
 	}
 
 	void Game::addRecipe(const nlohmann::json &json) {

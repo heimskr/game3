@@ -11,7 +11,7 @@ namespace Game3 {
 	class ItemStack;
 	class ItemTexture;
 	class LocalCommandFactory;
-	class ModuleFactory;
+	class GTKModuleFactory;
 	class PacketFactory;
 	class RealmFactory;
 	class Resource;
@@ -111,9 +111,9 @@ namespace Game3 {
 		CropRegistry(): NamedRegistry(ID()) {}
 	};
 
-	struct ModuleFactoryRegistry: NamedRegistry<ModuleFactory> {
-		static Identifier ID() { return {"base", "registry/module_factory"}; }
-		ModuleFactoryRegistry(): NamedRegistry(ID()) {}
+	struct GTKModuleFactoryRegistry: NamedRegistry<GTKModuleFactory> {
+		static Identifier ID() { return {"base", "registry/gtk_module_factory"}; }
+		GTKModuleFactoryRegistry(): NamedRegistry(ID()) {}
 	};
 
 	struct ItemSetRegistry: NamedRegistry<ItemSet> {
