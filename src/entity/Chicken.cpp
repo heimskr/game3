@@ -1,16 +1,19 @@
 #include "entity/Chicken.h"
 #include "game/Game.h"
 
+namespace {
+	constexpr std::chrono::seconds EGG_PERIOD{150};
+}
+
 namespace Game3 {
-	namespace {
-		constexpr std::chrono::seconds EGG_PERIOD{150};
-	}
 
 	void Chicken::tick(const TickArgs &args) {
 		if (args.game->getSide() == Side::Server) {
+			const Tick current_tick = args.game->getCurrentTick();
 			if (firstEgg) {
 				firstEgg = false;
-			} else if (eggTick <= args.game->getCurrentTick()) {
+				eggTick = current_tick + args.game->getDelayTicks(EGG_PERIOD);
+			} else if (eggTick <= current_tick) {
 				layEgg();
 				eggTick = enqueueTick(EGG_PERIOD);
 			}

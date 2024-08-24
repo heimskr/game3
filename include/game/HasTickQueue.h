@@ -65,6 +65,11 @@ namespace Game3 {
 				return currentTick + 1;
 			}
 
+			template <Duration D>
+			Tick getDelayTicks(D delay) {
+				return Tick(std::max(1.0, std::chrono::duration_cast<std::chrono::microseconds>(delay).count() * getFrequency() / 1e6));
+			}
+
 		private:
 			Atomic<Tick> currentTick = 0;
 			Lockable<std::multimap<Tick, std::function<void(FunctionArgs...)>>> tickQueue;
@@ -78,11 +83,6 @@ namespace Game3 {
 					iter->second(std::forward<Args>(args)...);
 					iter = tickQueue.erase(iter);
 				}
-			}
-
-			template <Duration D>
-			Tick getDelayTicks(D delay) {
-				return Tick(std::max(1.0, std::chrono::duration_cast<std::chrono::microseconds>(delay).count() * getFrequency() / 1e6));
 			}
 	};
 }
