@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types/Types.h"
-#include "ui/module/Module.h"
+#include "ui/module/GTKModule.h"
 #include "registry/Registerable.h"
 
 #include <any>
@@ -13,12 +13,12 @@ namespace Game3 {
 
 	class ModuleFactory: public NamedRegisterable {
 		private:
-			std::function<std::shared_ptr<Module>(const std::shared_ptr<ClientGame> &, const std::any &)> function;
+			std::function<std::shared_ptr<GTKModule>(const std::shared_ptr<ClientGame> &, const std::any &)> function;
 
 		public:
 			ModuleFactory(Identifier, decltype(function));
 
-			std::shared_ptr<Module> operator()(const std::shared_ptr<ClientGame> &, const std::any &) const;
+			std::shared_ptr<GTKModule> operator()(const std::shared_ptr<ClientGame> &, const std::any &) const;
 
 			template <typename T>
 			static ModuleFactory create(const Identifier &id = T::ID()) {

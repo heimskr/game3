@@ -2,7 +2,7 @@
 #pragma once
 
 #include "types/Types.h"
-#include "ui/module/Module.h"
+#include "ui/module/GTKModule.h"
 
 #include <vte/vte.h>
 
@@ -13,7 +13,7 @@
 namespace Game3 {
 	class Computer;
 
-	class ComputerModule: public Module {
+	class ComputerModule: public GTKModule {
 		public:
 			static Identifier ID() { return {"base", "module/computer"}; }
 

@@ -4,7 +4,7 @@
 #include "types/DirectedPlace.h"
 #include "types/Types.h"
 #include "ui/gtk/Util.h"
-#include "ui/module/Module.h"
+#include "ui/module/GTKModule.h"
 
 #include <any>
 #include <memory>
@@ -18,7 +18,7 @@ namespace Game3 {
 	class ItemFilter;
 	class Pipe;
 
-	class ItemFilterModule: public Module {
+	class ItemFilterModule: public GTKModule {
 		public:
 			static Identifier ID() { return {"base", "module/item_filters"}; }
 

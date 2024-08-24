@@ -1,14 +1,14 @@
 #pragma once
 
 #include "types/Types.h"
-#include "ui/module/Module.h"
+#include "ui/module/GTKModule.h"
 
 #include <any>
 #include <memory>
 #include <vector>
 
 namespace Game3 {
-	class GeneticAnalysisModule: public Module {
+	class GeneticAnalysisModule: public GTKModule {
 		public:
 			static Identifier ID() { return {"base", "module/genetic_analysis"}; }
 

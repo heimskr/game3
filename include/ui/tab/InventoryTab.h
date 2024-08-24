@@ -19,8 +19,8 @@ namespace Game3 {
 	class Agent;
 	class ClientGame;
 	class ClientInventory;
+	class GTKModule;
 	class MainWindow;
-	class Module;
 	class TileEntity;
 
 	class InventoryTab: public Tab, public ItemSlotParent {
@@ -41,10 +41,10 @@ namespace Game3 {
 			void onResize(const std::shared_ptr<ClientGame> &) override;
 			void update(const std::shared_ptr<ClientGame> &) override;
 			void reset(const std::shared_ptr<ClientGame> &) override;
-			void setModule(std::shared_ptr<Module>);
-			Module & getModule() const;
-			Module * getModule(std::shared_lock<DefaultMutex> &);
-			Module * getModule(std::unique_lock<DefaultMutex> &);
+			void setModule(std::shared_ptr<GTKModule>);
+			GTKModule & getModule() const;
+			GTKModule * getModule(std::shared_lock<DefaultMutex> &);
+			GTKModule * getModule(std::unique_lock<DefaultMutex> &);
 			void removeModule();
 			GlobalID getExternalGID() const;
 
@@ -56,7 +56,7 @@ namespace Game3 {
 		private:
 			Gtk::ScrolledWindow scrolled;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
-			Lockable<std::shared_ptr<Module>> currentModule;
+			Lockable<std::shared_ptr<GTKModule>> currentModule;
 			std::optional<InventoryModule> inventoryModule;
 			Gtk::Box actionBox{Gtk::Orientation::HORIZONTAL};
 			Gtk::Image holdLeftAction;

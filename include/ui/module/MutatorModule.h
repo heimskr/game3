@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types/Types.h"
-#include "ui/module/Module.h"
+#include "ui/module/GTKModule.h"
 #include "ui/module/GeneInfoModule.h"
 
 #include <any>
@@ -15,7 +15,7 @@ namespace Game3 {
 	class InventoryModule;
 	class Mutator;
 
-	class MutatorModule: public Module {
+	class MutatorModule: public GTKModule {
 		public:
 			static Identifier ID() { return {"base", "module/mutator"}; }
 

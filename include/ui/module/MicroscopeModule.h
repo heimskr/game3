@@ -2,7 +2,7 @@
 
 #include "types/Types.h"
 #include "ui/module/GeneticAnalysisModule.h"
-#include "ui/module/Module.h"
+#include "ui/module/GTKModule.h"
 #include "ui/module/MultiModule.h"
 #include "ui/MainWindow.h"
 
@@ -15,7 +15,7 @@ namespace Game3 {
 	class InventoryModule;
 
 	template <Slot S, Substance... ExtraSubstances>
-	class MicroscopeModule: public Module {
+	class MicroscopeModule: public GTKModule {
 		private:
 			using Submodule = MultiModule<Substance::Item, ExtraSubstances...>;
 

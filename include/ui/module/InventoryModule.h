@@ -5,7 +5,7 @@
 #include "types/Types.h"
 #include "ui/Modifiers.h"
 #include "ui/gtk/ItemSlot.h"
-#include "ui/module/Module.h"
+#include "ui/module/GTKModule.h"
 
 #include <any>
 #include <functional>
@@ -17,7 +17,7 @@ namespace Game3 {
 	class ClientInventory;
 	class InventoryTab;
 
-	class InventoryModule: public Module, public ItemSlotParent, public std::enable_shared_from_this<InventoryModule> {
+	class InventoryModule: public GTKModule, public ItemSlotParent, public std::enable_shared_from_this<InventoryModule> {
 		public:
 			struct Argument {
 				std::shared_ptr<Agent> agent;

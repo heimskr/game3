@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types/Types.h"
-#include "ui/module/Module.h"
+#include "ui/module/GTKModule.h"
 
 #include <any>
 #include <memory>
@@ -12,7 +12,7 @@ namespace Game3 {
 	class HasFluids;
 	class InventoryTab;
 
-	class FluidLevelsModule: public Module {
+	class FluidLevelsModule: public GTKModule {
 		public:
 			static Identifier ID() { return {"base", "module/fluid_levels"}; }
 

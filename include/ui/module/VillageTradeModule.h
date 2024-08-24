@@ -2,7 +2,7 @@
 
 #include "types/Types.h"
 #include "ui/gtk/ItemSlot.h"
-#include "ui/module/Module.h"
+#include "ui/module/GTKModule.h"
 
 #include <any>
 #include <map>
@@ -13,7 +13,7 @@ namespace Game3 {
 	class Agent;
 	class Village;
 
-	class VillageTradeModule: public Module {
+	class VillageTradeModule: public GTKModule {
 		public:
 			static Identifier ID() { return {"base", "module/village_trade"}; }
 

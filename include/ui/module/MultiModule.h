@@ -5,7 +5,7 @@
 #include "tileentity/FluidHoldingTileEntity.h"
 #include "tileentity/InventoriedTileEntity.h"
 #include "types/Types.h"
-#include "ui/module/Module.h"
+#include "ui/module/GTKModule.h"
 #include "ui/module/EnergyLevelModule.h"
 #include "ui/module/FluidLevelsModule.h"
 #include "ui/module/InventoryModule.h"
@@ -22,7 +22,7 @@ namespace Game3 {
 	class InventoryTab;
 
 	template <Substance... S>
-	class MultiModule: public Module {
+	class MultiModule: public GTKModule {
 		public:
 			static Identifier ID() {
 				return {"base", "module/multi_" + getSuffix()};
@@ -93,22 +93,22 @@ namespace Game3 {
 			}
 
 			void reset() final {
-				for (const std::shared_ptr<Module> &submodule: submodules)
+				for (const std::shared_ptr<GTKModule> &submodule: submodules)
 					submodule->reset();
 			}
 
 			void update() final {
-				for (const std::shared_ptr<Module> &submodule: submodules)
+				for (const std::shared_ptr<GTKModule> &submodule: submodules)
 					submodule->update();
 			}
 
 			void onResize(int size) final {
-				for (const std::shared_ptr<Module> &submodule: submodules)
+				for (const std::shared_ptr<GTKModule> &submodule: submodules)
 					submodule->onResize(size);
 			}
 
 			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final {
-				for (const std::shared_ptr<Module> &submodule: submodules)
+				for (const std::shared_ptr<GTKModule> &submodule: submodules)
 					if (std::optional<Buffer> buffer = submodule->handleMessage(source, name, data))
 						return buffer;
 				return std::nullopt;
@@ -120,7 +120,7 @@ namespace Game3 {
 			}
 
 			std::shared_ptr<InventoryModule> getPrimaryInventoryModule() final {
-				for (const std::shared_ptr<Module> &submodule: submodules)
+				for (const std::shared_ptr<GTKModule> &submodule: submodules)
 					if (auto inventory_module = std::dynamic_pointer_cast<InventoryModule>(submodule))
 						return inventory_module;
 				return nullptr;
@@ -128,7 +128,7 @@ namespace Game3 {
 
 		private:
 			Gtk::Label header;
-			std::array<std::shared_ptr<Module>, sizeof...(S)> submodules;
+			std::array<std::shared_ptr<GTKModule>, sizeof...(S)> submodules;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
 
 			void populate();

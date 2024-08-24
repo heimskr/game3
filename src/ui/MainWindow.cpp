@@ -466,7 +466,7 @@ namespace Game3 {
 		game->signalFluidUpdate().connect([this](const std::shared_ptr<HasFluids> &has_fluids) {
 			queue([this, has_fluids] {
 				std::unique_lock<DefaultMutex> lock;
-				if (Module *module_ = inventoryTab->getModule(lock)) {
+				if (GTKModule *module_ = inventoryTab->getModule(lock)) {
 					std::any data(has_fluids);
 					module_->handleMessage({}, "UpdateFluids", data);
 				}
@@ -476,7 +476,7 @@ namespace Game3 {
 		game->signalEnergyUpdate().connect([this](const std::shared_ptr<HasEnergy> &has_energy) {
 			queue([this, has_energy] {
 				std::unique_lock<DefaultMutex> lock;
-				if (Module *module_ = inventoryTab->getModule(lock)) {
+				if (GTKModule *module_ = inventoryTab->getModule(lock)) {
 					std::any data(has_energy);
 					module_->handleMessage({}, "UpdateEnergy", data);
 				}
@@ -486,7 +486,7 @@ namespace Game3 {
 		game->signalVillageUpdate().connect([this](const VillagePtr &village) {
 			queue([this, village] {
 				std::unique_lock<DefaultMutex> lock;
-				if (Module *module_ = inventoryTab->getModule(lock)) {
+				if (GTKModule *module_ = inventoryTab->getModule(lock)) {
 					std::any data(village);
 					module_->handleMessage({}, "VillageUpdate", data);
 				}
@@ -698,7 +698,7 @@ namespace Game3 {
 	GlobalID MainWindow::getExternalGID() const {
 		std::unique_lock<DefaultMutex> lock;
 
-		if (Module *module_ = inventoryTab->getModule(lock)) {
+		if (GTKModule *module_ = inventoryTab->getModule(lock)) {
 			std::any empty;
 			if (std::optional<Buffer> response = module_->handleMessage({}, "GetAgentGID", empty))
 				return response->take<GlobalID>();
@@ -714,7 +714,7 @@ namespace Game3 {
 
 	void MainWindow::openModule(const Identifier &module_id, const std::any &argument) {
 		std::unique_lock<DefaultMutex> module_lock;
-		Module *current_module = inventoryTab->getModule(module_lock);
+		GTKModule *current_module = inventoryTab->getModule(module_lock);
 		if (current_module != nullptr && current_module->getID() == module_id) {
 			current_module->update();
 		} else {
@@ -731,7 +731,7 @@ namespace Game3 {
 
 	void MainWindow::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&buffer) {
 		std::unique_lock<DefaultMutex> module_lock;
-		Module *current_module = inventoryTab->getModule(module_lock);
+		GTKModule *current_module = inventoryTab->getModule(module_lock);
 		if (current_module != nullptr && (module_id.empty() || current_module->getID() == module_id)) {
 			std::any data{std::move(buffer)};
 			current_module->handleMessage(source, name, data);

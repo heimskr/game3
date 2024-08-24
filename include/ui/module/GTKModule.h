@@ -2,12 +2,13 @@
 
 #include "data/Identifier.h"
 #include "net/Buffer.h"
+#include "types/Types.h"
+
+#include <gtkmm.h>
 
 #include <any>
 #include <memory>
 #include <optional>
-
-#include <gtkmm.h>
 
 namespace Game3 {
 	class Agent;
@@ -19,12 +20,12 @@ namespace Game3 {
 	class InventoryTab;
 
 	/** Displayed below the inventory in the inventory tab. */
-	class Module {
+	class GTKModule {
 		protected:
-			Module() = default;
+			GTKModule() = default;
 
 		public:
-			virtual ~Module() = default;
+			virtual ~GTKModule() = default;
 
 			virtual Identifier getID() const = 0;
 			virtual Gtk::Widget & getWidget() = 0;

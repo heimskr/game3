@@ -14,7 +14,7 @@
 #include "ui/gtk/Util.h"
 #include "ui/tab/InventoryTab.h"
 #include "ui/module/InventoryModule.h"
-#include "ui/module/Module.h"
+#include "ui/module/GTKModule.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -187,28 +187,28 @@ namespace Game3 {
 		updatePlayerClasses(lastGame);
 	}
 
-	void InventoryTab::setModule(std::shared_ptr<Module> module_) {
+	void InventoryTab::setModule(std::shared_ptr<GTKModule> module_) {
 		assert(module_);
 		removeModule();
 		auto lock = currentModule.uniqueLock();
-		currentModule.std::shared_ptr<Module>::operator=(std::move(module_));
+		currentModule.std::shared_ptr<GTKModule>::operator=(std::move(module_));
 		vbox.append(currentModule->getWidget());
 		currentModule->onResize(vbox.get_width());
 		currentModule->reset();
 	}
 
-	Module & InventoryTab::getModule() const {
+	GTKModule & InventoryTab::getModule() const {
 		assert(currentModule);
 		return *currentModule;
 	}
 
-	Module * InventoryTab::getModule(std::shared_lock<DefaultMutex> &lock) {
+	GTKModule * InventoryTab::getModule(std::shared_lock<DefaultMutex> &lock) {
 		if (currentModule)
 			lock = currentModule.sharedLock();
 		return currentModule.get();
 	}
 
-	Module * InventoryTab::getModule(std::unique_lock<DefaultMutex> &lock) {
+	GTKModule * InventoryTab::getModule(std::unique_lock<DefaultMutex> &lock) {
 		if (currentModule)
 			lock = currentModule.uniqueLock();
 		return currentModule.get();
@@ -284,7 +284,7 @@ namespace Game3 {
 			return;
 
 		std::unique_lock<DefaultMutex> lock;
-		Module *module_ = getModule(lock);
+		GTKModule *module_ = getModule(lock);
 		if (!module_)
 			return;
 
