@@ -1,3 +1,4 @@
+#include "entity/Egg.h"
 #include "entity/Snowball.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
@@ -200,7 +201,6 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/knife",            "Knife",              20, 64));
 		add(std::make_shared<Item>("base:item/yeast",            "Yeast",               4, 64));
 		add(std::make_shared<Item>("base:item/clay",             "Clay",                2, 64));
-		add(std::make_shared<Item>("base:item/egg",              "Egg",                16, 64));
 		add(std::make_shared<Item>("base:item/glass",            "Glass",               2, 64));
 		add(std::make_shared<Item>("base:item/salt",             "Salt",                4, 64));
 		add(std::make_shared<Item>("base:item/sugar",            "Sugar",               5, 64));
@@ -236,7 +236,6 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/vanadium_magnetite_ore", "Vanadium Magnetite Ore", 32, 64));
 		add(std::make_shared<Item>("base:item/niobium_bar",      "Niobium Bar",       128, 64));
 		add(std::make_shared<Item>("base:item/teleportation_focus", "Teleportation Focus", 999, 64)); // TODO: cost
-		add(std::make_shared<ProjectileItem<Snowball>>("base:item/snowball", "Snowball", 999, 64)); // TODO: cost
 
 		add(std::make_shared<ItemPipeItem>(4));
 
@@ -268,6 +267,9 @@ namespace Game3 {
 		add(std::make_shared<Pickaxe>("base:item/diamond_pickaxe", "Diamond Pickaxe",  210,  1.f, 512));
 
 		add(std::make_shared<PressurePlateItem>("base:item/pressure_plate", "Pressure Plate", 999, 64)); // TODO: cost
+
+		add(std::make_shared<ProjectileItem<Egg>>("base:item/egg", "Egg", 16, 64));
+		add(std::make_shared<ProjectileItem<Snowball>>("base:item/snowball", "Snowball", 999, 64)); // TODO: cost
 
 		add(std::make_shared<PumpItem>("base:item/pump", "Pump", 999, 64)); // TODO: cost
 

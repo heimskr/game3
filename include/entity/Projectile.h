@@ -28,6 +28,7 @@ namespace Game3 {
 
 			const Identifier & getItemID() const;
 			virtual void onHit(const EntityPtr &target);
+			virtual void onExpire();
 			void setThrower(const EntityPtr &);
 
 		protected:
@@ -50,6 +51,7 @@ namespace Game3 {
 
 			std::shared_ptr<Texture> getTexture() override;
 			void setTexture(const ClientGamePtr &);
+			void applyKnockback(const EntityPtr &, float factor);
 
 		friend class Entity;
 	};

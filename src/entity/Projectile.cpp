@@ -28,7 +28,7 @@ namespace Game3 {
 			velocity.getBase() = {};
 			age += args.delta;
 			if (lingerTime <= age) {
-				queueDestruction();
+				onExpire();
 				return;
 			}
 		} else {
@@ -119,6 +119,10 @@ namespace Game3 {
 		velocity.y = 0;
 	}
 
+	void Projectile::onExpire() {
+		queueDestruction();
+	}
+
 	void Projectile::setThrower(const EntityPtr &entity) {
 		thrower = entity->getGID();
 	}
@@ -136,5 +140,27 @@ namespace Game3 {
 		offsetY = item_texture->y / 2.f;
 		sizeX = float(item_texture->width);
 		sizeY = float(item_texture->height);
+	}
+
+	void Projectile::applyKnockback(const EntityPtr &target, float factor) {
+		target->velocity.withUnique([this, factor](Vector3 &target_velocity) {
+			auto lock = velocity.uniqueLock();
+			target_velocity.x += velocity.x;
+			target_velocity.y += velocity.y;
+			target_velocity.z = std::max(target_velocity.z, std::abs(velocity.z) * factor);
+			velocity.x = 0;
+			velocity.y = 0;
+			velocity.z = 0;
+		});
+
+		target->offset.withUnique([](Vector3 &offset) {
+			offset.z += 1;
+		});
+
+		target->increaseUpdateCounter();
+		target->sendToVisible();
+
+		increaseUpdateCounter();
+		sendToVisible();
 	}
 }

@@ -3,15 +3,18 @@
 #include "entity/Animal.h"
 
 namespace Game3 {
-	class Chicken: public Animal {
+	class Quarter: public Animal {
 		public:
-			static Identifier ID() { return {"base", "entity/chicken"}; }
+			static Identifier ID() { return {"base", "entity/quarter"}; }
 
-			static std::shared_ptr<Chicken> create(const std::shared_ptr<Game> &) {
-				return Entity::create<Chicken>();
+			static std::shared_ptr<Quarter> create(const std::shared_ptr<Game> &) {
+				return Entity::create<Quarter>();
 			}
 
-			std::string getName() const override { return "Chicken"; }
+			std::string getName() const override { return "Chicken"; } // gottem
+
+			void onSpawn() override;
+			HitPoints getMaxHealth() const override { return 1000; }
 
 			std::vector<ItemStackPtr> getDrops() override {
 				std::vector<ItemStackPtr> out = Animal::getDrops();
@@ -22,14 +25,8 @@ namespace Game3 {
 			void tick(const TickArgs &) override;
 
 		protected:
-			Chicken():
+			Quarter():
 				Entity(ID()), Animal() {}
-
-		private:
-			bool firstEgg = true;
-			Tick eggTick{};
-
-			void layEgg();
 
 		friend class Entity;
 	};

@@ -4,6 +4,7 @@
 #include "entity/Crab.h"
 #include "entity/Cyclops.h"
 #include "entity/Dog.h"
+#include "entity/Egg.h"
 #include "entity/EntityFactory.h"
 #include "entity/Eye.h"
 #include "entity/ItemEntity.h"
@@ -11,6 +12,7 @@
 #include "entity/Miner.h"
 #include "entity/Pig.h"
 #include "entity/Player.h"
+#include "entity/Quarter.h"
 #include "entity/Snowball.h"
 #include "entity/Sheep.h"
 #include "entity/Ship.h"
@@ -38,11 +40,13 @@ namespace Game3 {
 		add(EntityFactory::create<Crab>());
 		add(EntityFactory::create<Cyclops>());
 		add(EntityFactory::create<Dog>());
+		add(EntityFactory::create<Egg>());
 		add(EntityFactory::create<Eye>());
 		add(EntityFactory::create<ItemEntity>());
 		add(EntityFactory::create<Merchant>());
 		add(EntityFactory::create<Miner>());
 		add(EntityFactory::create<Pig>());
+		add(EntityFactory::create<Quarter>());
 		add(EntityFactory::create<Sheep>());
 		add(EntityFactory::create<Ship>());
 		add(EntityFactory::create<Snowball>());
