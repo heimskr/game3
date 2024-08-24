@@ -96,6 +96,10 @@ namespace Game3 {
 		buffer >> luckStat;
 	}
 
+	bool LivingEntity::isAffectedByKnockback() const {
+		return true;
+	}
+
 	bool LivingEntity::canShowHealthBar() const {
 		const auto max = getMaxHealth();
 		return !isInvincible() && max != 0 && health != max;

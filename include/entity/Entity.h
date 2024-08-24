@@ -204,6 +204,7 @@ namespace Game3 {
 			virtual bool canSpawnAt(const Place &) const;
 			/** Returns whether the entity is on the ground and not in the air. */
 			virtual bool isGrounded() const;
+			virtual bool isAffectedByKnockback() const;
 
 			virtual void encode(Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */

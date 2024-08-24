@@ -40,7 +40,7 @@ namespace Game3 {
 				position.column += offset.x;
 				std::vector<EntityPtr> targets = getRealm()->findEntities(position, getSelf());
 				for (const EntityPtr &target: targets) {
-					if (target->getGID() != thrower && !std::dynamic_pointer_cast<Projectile>(target) && !target->is("base:entity/item")) {
+					if (target->getGID() != thrower && target->isAffectedByKnockback()) {
 						onHit(target);
 						break;
 					}

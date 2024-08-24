@@ -20,6 +20,7 @@ namespace Game3 {
 			void renderUpper(const RendererContext &) override;
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;
+			bool isAffectedByKnockback() const override;
 
 			virtual bool canShowHealthBar() const;
 			virtual int getDefense() const;

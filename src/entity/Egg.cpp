@@ -29,6 +29,12 @@ namespace Game3 {
 
 		int count{};
 
+		// You see, the joke is (spoiler alert):
+		// 1/128 chance of four chickens
+		// 1/32 chance of at least 2 chickens
+		// 1/4 chance of at least 1 chicken
+		// 1/1 chance of at least a quarter of a chicken.
+
 		if (random < 1 / 128.f) {
 			count = 4;
 		} else if (random < 1 / 32.f) {

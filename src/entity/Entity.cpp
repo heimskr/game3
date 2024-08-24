@@ -657,6 +657,10 @@ namespace Game3 {
 		return getOffset().isGrounded();
 	}
 
+	bool Entity::isAffectedByKnockback() const {
+		return false;
+	}
+
 	void Entity::focus(Canvas &canvas, bool is_autofocus) {
 		if (EntityPtr ridden = getRidden()) {
 			ridden->focus(canvas, is_autofocus);

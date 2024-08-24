@@ -707,6 +707,8 @@ namespace Game3 {
 					return left->getGID() < right->getGID();
 				});
 
+				INFO("Entity count: {}", entities.size());
+
 				for (const EntityPtr &entity: entities) {
 					Entity &entity_ref = *entity;
 
