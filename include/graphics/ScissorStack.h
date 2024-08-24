@@ -17,6 +17,7 @@ namespace Game3 {
 			void setBase(const Rectangle &);
 			Rectangle getTop() const;
 			const Rectangle & pushRelative(const Rectangle &);
+			void pop();
 			void debug() const;
 	};
 }

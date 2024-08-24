@@ -16,7 +16,7 @@
 #include "tileentity/Teleporter.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
-#include "ui/tab/InventoryTab.h"
+#include "ui/tab/GTKInventoryTab.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -62,7 +62,7 @@ namespace Game3 {
 		if (getSide() == Side::Client) {
 			GamePtr game = getGame();
 			MainWindow &window = game->toClient().getWindow();
-			std::shared_ptr<InventoryTab> tab = window.inventoryTab;
+			std::shared_ptr<GTKInventoryTab> tab = window.inventoryTab;
 			std::cout << "Woodcutter: money = " << money << ", phase = " << int(phase) << ", stuck = " << stuck << '\n';
 			player->queueForMove([tab](const auto &, bool) {
 				tab->removeModule();

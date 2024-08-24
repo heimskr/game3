@@ -5,9 +5,9 @@
 #include "net/Buffer.h"
 #include "tileentity/Microscope.h"
 #include "ui/gtk/Util.h"
-#include "ui/module/InventoryModule.h"
+#include "ui/module/GTKInventoryModule.h"
 #include "ui/module/GeneticAnalysisModule.h"
-#include "ui/tab/InventoryTab.h"
+#include "ui/tab/GTKInventoryTab.h"
 #include "ui/MainWindow.h"
 
 namespace Game3 {

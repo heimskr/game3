@@ -6,8 +6,8 @@
 #include "ui/gtk/DragSource.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/ChemicalReactorModule.h"
-#include "ui/module/InventoryModule.h"
-#include "ui/tab/InventoryTab.h"
+#include "ui/module/GTKInventoryModule.h"
+#include "ui/tab/GTKInventoryTab.h"
 #include "ui/MainWindow.h"
 
 namespace Game3 {
@@ -17,7 +17,7 @@ namespace Game3 {
 	ChemicalReactorModule::ChemicalReactorModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<ChemicalReactor> reactor_):
 	game(std::move(game_)),
 	reactor(std::move(reactor_)),
-	inventoryModule(std::make_shared<InventoryModule>(game, std::static_pointer_cast<ClientInventory>(reactor->getInventory(0)))) {
+	inventoryModule(std::make_shared<GTKInventoryModule>(game, std::static_pointer_cast<ClientInventory>(reactor->getInventory(0)))) {
 		assert(reactor);
 		vbox.set_hexpand();
 

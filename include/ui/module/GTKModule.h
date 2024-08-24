@@ -15,9 +15,8 @@ namespace Game3 {
 	class Buffer;
 	class ClientGame;
 	class ClientInventory;
-	class InventoryModule;
 	class Inventory;
-	class InventoryTab;
+	class GTKInventoryModule;
 
 	/** Displayed below the inventory in the inventory tab. */
 	class GTKModule {
@@ -34,7 +33,7 @@ namespace Game3 {
 			virtual void onResize(int /* width */) {}
 			virtual std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &, const std::string &, std::any &) { return {}; }
 			virtual void setInventory(std::shared_ptr<ClientInventory>) {}
-			virtual std::shared_ptr<InventoryModule> getPrimaryInventoryModule() { return nullptr; }
+			virtual std::shared_ptr<GTKInventoryModule> getPrimaryInventoryModule() { return nullptr; }
 			/** Returns false if the default shift click behavior should occur, or true otherwise. */
 			virtual bool handleShiftClick(std::shared_ptr<Inventory> /* source_inventory */, Slot) { return false; }
 	};

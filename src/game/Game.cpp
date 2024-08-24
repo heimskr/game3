@@ -5,11 +5,12 @@
 #include "game/InteractionSet.h"
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
+#include "ui/gl/module/ModuleFactory.h"
 #include "ui/module/AutocrafterModule.h"
 #include "ui/module/ChemicalReactorModule.h"
 #include "ui/module/CombinerModule.h"
 #include "ui/module/ComputerModule.h"
-#include "ui/module/InventoryModule.h"
+#include "ui/module/GTKInventoryModule.h"
 #include "ui/module/EnergyLevelModule.h"
 #include "ui/module/FluidLevelsModule.h"
 #include "ui/module/ItemFilterModule.h"
@@ -41,7 +42,7 @@ namespace Game3 {
 	}
 
 	void Game::addModuleFactories() {
-		add(GTKModuleFactory::create<InventoryModule>());
+		add(GTKModuleFactory::create<GTKInventoryModule>());
 		add(GTKModuleFactory::create<FluidLevelsModule>());
 		add(GTKModuleFactory::create<ChemicalReactorModule>());
 		add(GTKModuleFactory::create<EnergyLevelModule>());
@@ -96,6 +97,11 @@ namespace Game3 {
 	void Game::add(GTKModuleFactory &&factory) {
 		auto shared = std::make_shared<GTKModuleFactory>(std::move(factory));
 		registry<GTKModuleFactoryRegistry>().add(shared->identifier, shared);
+	}
+
+	void Game::add(ModuleFactory &&factory) {
+		auto shared = std::make_shared<ModuleFactory>(std::move(factory));
+		registry<ModuleFactoryRegistry>().add(shared->identifier, shared);
 	}
 
 	void Game::addRecipe(const nlohmann::json &json) {

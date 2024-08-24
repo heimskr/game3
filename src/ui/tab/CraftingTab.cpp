@@ -11,11 +11,11 @@
 #include "ui/gtk/CraftXDialog.h"
 #include "ui/gtk/Util.h"
 #include "ui/tab/CraftingTab.h"
-#include "ui/tab/InventoryTab.h"
+#include "ui/tab/GTKInventoryTab.h"
 #include "util/Util.h"
 
 namespace Game3 {
-	CraftingTab::CraftingTab(MainWindow &main_window): Tab(main_window.notebook), mainWindow(main_window) {
+	CraftingTab::CraftingTab(MainWindow &main_window): GTKTab(main_window.notebook), mainWindow(main_window) {
 		scrolled.set_vexpand(true);
 		scrolled.add_css_class("crafting-tab");
 		scrolled.set_child(vbox);
@@ -92,8 +92,8 @@ namespace Game3 {
 					label->set_tooltip_text(tooltip);
 					label->set_xalign(1.f);
 					label->set_yalign(1.f);
-					image->set_size_request(InventoryTab::TILE_SIZE - InventoryTab::TILE_MAGIC, InventoryTab::TILE_SIZE - InventoryTab::TILE_MAGIC);
-					label->set_size_request(InventoryTab::TILE_SIZE - InventoryTab::TILE_MAGIC, InventoryTab::TILE_SIZE - InventoryTab::TILE_MAGIC);
+					image->set_size_request(GTKInventoryTab::TILE_SIZE - GTKInventoryTab::TILE_MAGIC, GTKInventoryTab::TILE_SIZE - GTKInventoryTab::TILE_MAGIC);
+					label->set_size_request(GTKInventoryTab::TILE_SIZE - GTKInventoryTab::TILE_MAGIC, GTKInventoryTab::TILE_SIZE - GTKInventoryTab::TILE_MAGIC);
 					fixed->put(*image, 0, 0);
 					fixed->put(*label, 0, 0);
 					left_vbox->append(*fixed);

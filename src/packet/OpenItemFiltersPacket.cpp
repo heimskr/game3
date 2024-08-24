@@ -6,7 +6,7 @@
 #include "types/DirectedPlace.h"
 #include "ui/MainWindow.h"
 #include "ui/module/ItemFilterModule.h"
-#include "ui/tab/InventoryTab.h"
+#include "ui/tab/GTKInventoryTab.h"
 
 namespace Game3 {
 	void OpenItemFiltersPacket::handle(const ClientGamePtr &game) {

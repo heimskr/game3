@@ -10,7 +10,7 @@
 #include "graphics/SpriteRenderer.h"
 #include "realm/Realm.h"
 #include "tileentity/Crate.h"
-#include "ui/tab/InventoryTab.h"
+#include "ui/tab/GTKInventoryTab.h"
 
 namespace Game3 {
 	Crate::Crate(Identifier tile_id, const Position &position_, Identifier item_name, std::string name_):

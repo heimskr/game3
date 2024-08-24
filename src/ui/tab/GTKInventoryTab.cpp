@@ -12,13 +12,13 @@
 #include "ui/gtk/NumericEntry.h"
 #include "ui/gtk/DragSource.h"
 #include "ui/gtk/Util.h"
-#include "ui/tab/InventoryTab.h"
-#include "ui/module/InventoryModule.h"
+#include "ui/tab/GTKInventoryTab.h"
 #include "ui/module/GTKModule.h"
+#include "ui/module/GTKInventoryModule.h"
 #include "util/Util.h"
 
 namespace Game3 {
-	InventoryTab::InventoryTab(MainWindow &main_window): Tab(main_window.notebook), mainWindow(main_window) {
+	GTKInventoryTab::GTKInventoryTab(MainWindow &main_window): GTKTab(main_window.notebook), mainWindow(main_window) {
 		scrolled.set_child(vbox);
 		scrolled.set_hexpand();
 		scrolled.set_vexpand();
@@ -119,9 +119,9 @@ namespace Game3 {
 		vbox.set_vexpand();
 	}
 
-	InventoryTab::~InventoryTab() = default;
+	GTKInventoryTab::~GTKInventoryTab() = default;
 
-	void InventoryTab::onResize(const std::shared_ptr<ClientGame> &) {
+	void GTKInventoryTab::onResize(const std::shared_ptr<ClientGame> &) {
 		const int new_width = scrolled.get_width();
 		if (new_width != lastWidth && currentModule) {
 			lastWidth = new_width;
@@ -129,7 +129,7 @@ namespace Game3 {
 		}
 	}
 
-	void InventoryTab::update(const std::shared_ptr<ClientGame> &game) {
+	void GTKInventoryTab::update(const std::shared_ptr<ClientGame> &game) {
 		if (!game || !game->getPlayer())
 			return;
 
@@ -143,7 +143,7 @@ namespace Game3 {
 		});
 	}
 
-	void InventoryTab::reset(const std::shared_ptr<ClientGame> &game) {
+	void GTKInventoryTab::reset(const std::shared_ptr<ClientGame> &game) {
 		if (!game) {
 			clear();
 			lastGame = nullptr;
@@ -169,12 +169,12 @@ namespace Game3 {
 		});
 	}
 
-	void InventoryTab::clear() {
+	void GTKInventoryTab::clear() {
 		if (inventoryModule)
 			inventoryModule->reset();
 	}
 
-	void InventoryTab::populate(std::shared_ptr<ClientInventory> inventory) {
+	void GTKInventoryTab::populate(std::shared_ptr<ClientInventory> inventory) {
 		if (!inventoryModule)
 			return;
 
@@ -187,7 +187,7 @@ namespace Game3 {
 		updatePlayerClasses(lastGame);
 	}
 
-	void InventoryTab::setModule(std::shared_ptr<GTKModule> module_) {
+	void GTKInventoryTab::setModule(std::shared_ptr<GTKModule> module_) {
 		assert(module_);
 		removeModule();
 		auto lock = currentModule.uniqueLock();
@@ -197,24 +197,24 @@ namespace Game3 {
 		currentModule->reset();
 	}
 
-	GTKModule & InventoryTab::getModule() const {
+	GTKModule & GTKInventoryTab::getModule() const {
 		assert(currentModule);
 		return *currentModule;
 	}
 
-	GTKModule * InventoryTab::getModule(std::shared_lock<DefaultMutex> &lock) {
+	GTKModule * GTKInventoryTab::getModule(std::shared_lock<DefaultMutex> &lock) {
 		if (currentModule)
 			lock = currentModule.sharedLock();
 		return currentModule.get();
 	}
 
-	GTKModule * InventoryTab::getModule(std::unique_lock<DefaultMutex> &lock) {
+	GTKModule * GTKInventoryTab::getModule(std::unique_lock<DefaultMutex> &lock) {
 		if (currentModule)
 			lock = currentModule.uniqueLock();
 		return currentModule.get();
 	}
 
-	void InventoryTab::removeModule() {
+	void GTKInventoryTab::removeModule() {
 		auto lock = currentModule.uniqueLock();
 		if (currentModule) {
 			vbox.remove(currentModule->getWidget());
@@ -222,11 +222,11 @@ namespace Game3 {
 		}
 	}
 
-	GlobalID InventoryTab::getExternalGID() const {
+	GlobalID GTKInventoryTab::getExternalGID() const {
 		throw std::logic_error("InventoryTab::getExternalGID() needs to be replaced");
 	}
 
-	void InventoryTab::slotClicked(Slot slot, bool is_right_click, Modifiers modifiers) {
+	void GTKInventoryTab::slotClicked(Slot slot, bool is_right_click, Modifiers modifiers) {
 		if (is_right_click) {
 			lastSlot = slot;
 		} else {
@@ -234,7 +234,7 @@ namespace Game3 {
 		}
 	}
 
-	void InventoryTab::slotDoubleClicked(Slot slot) {
+	void GTKInventoryTab::slotDoubleClicked(Slot slot) {
 		InventoryPtr inventory;
 		PlayerPtr player;
 		{
@@ -254,15 +254,15 @@ namespace Game3 {
 		player->send(UseItemPacket(slot, Modifiers{}));
 	}
 
-	void InventoryTab::activeSlotSet() {
+	void GTKInventoryTab::activeSlotSet() {
 		updatePlayerClasses(lastGame);
 	}
 
-	int InventoryTab::gridWidth() const {
+	int GTKInventoryTab::gridWidth() const {
 		return scrolled.get_width() / (TILE_SIZE + 2 * TILE_MARGIN);
 	}
 
-	void InventoryTab::leftClick(Slot slot, Modifiers modifiers) {
+	void GTKInventoryTab::leftClick(Slot slot, Modifiers modifiers) {
 		mainWindow.onBlur();
 
 		if (!lastGame)
@@ -275,7 +275,7 @@ namespace Game3 {
 		}
 	}
 
-	void InventoryTab::shiftClick(const std::shared_ptr<ClientGame> &game, Slot slot) {
+	void GTKInventoryTab::shiftClick(const std::shared_ptr<ClientGame> &game, Slot slot) {
 		if (!game)
 			return;
 
@@ -291,7 +291,7 @@ namespace Game3 {
 		if (module_->handleShiftClick(inventory, slot))
 			return;
 
-		std::shared_ptr<InventoryModule> external_module = module_->getPrimaryInventoryModule();
+		std::shared_ptr<GTKInventoryModule> external_module = module_->getPrimaryInventoryModule();
 		if (!external_module)
 			return;
 
@@ -306,7 +306,7 @@ namespace Game3 {
 		game->getPlayer()->send(MoveSlotsPacket(game->getPlayer()->getGID(), owner->getGID(), slot, -1, 0, external_inventory->index));
 	}
 
-	void InventoryTab::updatePlayerClasses(const std::shared_ptr<ClientGame> &game) {
+	void GTKInventoryTab::updatePlayerClasses(const std::shared_ptr<ClientGame> &game) {
 		if (!inventoryModule)
 			return;
 
@@ -316,7 +316,7 @@ namespace Game3 {
 		inventoryModule->addCSSClass("active-slot", active_slot);
 	}
 
-	void InventoryTab::gmenuSetup(InventoryModule &module_, Glib::RefPtr<Gio::Menu> gmenu, Slot slot, const ItemStackPtr &stack) {
+	void GTKInventoryTab::gmenuSetup(GTKInventoryModule &module_, Glib::RefPtr<Gio::Menu> gmenu, Slot slot, const ItemStackPtr &stack) {
 		if (!stack || !stack->item->populateMenu(module_.getInventory(), slot, stack, gmenu, group))
 			gmenu->append("_Use", "inventory_popup.use");
 		gmenu->append("Hold (_Left)", "inventory_popup.hold_left");
@@ -325,12 +325,12 @@ namespace Game3 {
 		gmenu->append("D_iscard", "inventory_popup.discard");
 	}
 
-	void InventoryTab::updateInventory(const ClientGamePtr &game) {
+	void GTKInventoryTab::updateInventory(const ClientGamePtr &game) {
 		if (const InventoryPtr inventory = game->getPlayer()->getInventory(0)) {
 			auto client_inventory = std::static_pointer_cast<ClientInventory>(inventory);
 
 			if (!inventoryModule) {
-				inventoryModule.emplace(game, client_inventory, this, sigc::mem_fun(*this, &InventoryTab::gmenuSetup));
+				inventoryModule.emplace(game, client_inventory, this, sigc::mem_fun(*this, &GTKInventoryTab::gmenuSetup));
 				inventoryModule->setShowLabel(false);
 				vbox.prepend(inventoryModule->getWidget());
 				vbox.prepend(actionBox);
@@ -342,7 +342,7 @@ namespace Game3 {
 		}
 	}
 
-	void InventoryTab::initAction(Gtk::Image &action, const Glib::ustring &icon, const Glib::ustring &tooltip, std::function<void(Slot, Modifiers)> function) {
+	void GTKInventoryTab::initAction(Gtk::Image &action, const Glib::ustring &icon, const Glib::ustring &tooltip, std::function<void(Slot, Modifiers)> function) {
 		action.set_margin_start(5);
 		action.set_margin_end(5);
 		action.set_from_icon_name(icon);

@@ -3,7 +3,7 @@
 #include "game/ClientGame.h"
 #include "packet/OpenTextTabPacket.h"
 #include "ui/MainWindow.h"
-#include "ui/tab/InventoryTab.h"
+#include "ui/tab/GTKInventoryTab.h"
 #include "ui/tab/TextTab.h"
 
 namespace Game3 {

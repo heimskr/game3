@@ -4,7 +4,7 @@
 #include "ui/tab/TextTab.h"
 
 namespace Game3 {
-	TextTab::TextTab(Gtk::Notebook &notebook_, const Glib::ustring &text_, const Glib::ustring &name_): Tab(notebook_), text(text_), name(name_) {
+	TextTab::TextTab(Gtk::Notebook &notebook_, const Glib::ustring &text_, const Glib::ustring &name_): GTKTab(notebook_), text(text_), name(name_) {
 		textTagTable = Gtk::TextTagTable::create();
 		textBuffer = Gtk::TextBuffer::create(textTagTable);
 		textView.set_buffer(textBuffer);
@@ -21,7 +21,7 @@ namespace Game3 {
 	}
 
 	void TextTab::update(const std::shared_ptr<ClientGame> &game) {
-		Tab::update(game);
+		GTKTab::update(game);
 	}
 
 	void TextTab::reset(const std::shared_ptr<ClientGame> &game) {

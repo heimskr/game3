@@ -22,6 +22,13 @@ namespace Game3 {
 		return out;
 	}
 
+	void ScissorStack::pop() {
+		if (!stack.empty())
+			stack.pop_back();
+
+		getTop().scissor();
+	}
+
 	void ScissorStack::debug() const {
 		INFO("{}", getBase());
 		for (const Rectangle &rectangle: stack)

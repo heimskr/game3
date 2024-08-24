@@ -6,7 +6,7 @@
 #include "packet/TileEntityPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/InventoriedTileEntity.h"
-#include "ui/module/InventoryModule.h"
+#include "ui/module/GTKInventoryModule.h"
 #include "util/Cast.h"
 
 namespace Game3 {
@@ -158,7 +158,7 @@ namespace Game3 {
 		player->send(TileEntityPacket(getSelf()));
 
 		if (!silent)
-			player->send(OpenModuleForAgentPacket(InventoryModule::ID(), getGID()));
+			player->send(OpenModuleForAgentPacket(GTKInventoryModule::ID(), getGID()));
 
 		player->queueForMove([weak_self = getWeakSelf()](const EntityPtr &entity, bool) {
 			if (auto self = weak_self.lock())

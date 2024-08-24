@@ -1,0 +1,1 @@
+- `/resources/gui/inventory.png`: [Kazzter](https://kazzresources.itch.io/kazzter-16-rpg-icon-pack)

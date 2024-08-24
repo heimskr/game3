@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ui/tab/Tab.h"
+#include "ui/tab/GTKTab.h"
 
 #include <memory>
 #include <string>
@@ -11,7 +11,7 @@
 namespace Game3 {
 	class MainWindow;
 
-	class CraftingTab: public Tab {
+	class CraftingTab: public GTKTab {
 		public:
 			MainWindow &mainWindow;
 

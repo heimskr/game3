@@ -8,32 +8,31 @@
 #include "graphics/Texture.h"
 #include "graphics/TextRenderer.h"
 #include "packet/SwapSlotsPacket.h"
-#include "ui/gl/InventoryDialog.h"
 #include "ui/gl/ItemSlotWidget.h"
+#include "ui/gl/OmniDialog.h"
 #include "ui/gl/UIContext.h"
 
 namespace {
 	constexpr double X_FRACTION = 0.4;
 	constexpr double Y_FRACTION = 0.4;
+	constexpr double SCALE = 8;
+	constexpr double UNSCALE = 1.5;
+	constexpr int TOP_OFFSET = 20 * SCALE;
 }
 
 namespace Game3 {
-	InventoryDialog::InventoryDialog(UIContext &ui, PlayerPtr player):
+	OmniDialog::OmniDialog(UIContext &ui, PlayerPtr player):
 		Dialog(ui), player(std::move(player)) {}
 
-	void InventoryDialog::render(RendererContext &renderers) {
+	void OmniDialog::render(RendererContext &renderers) {
 		ScissorStack &stack = ui.scissorStack;
 
 		auto saver = renderers.getSaver();
 
 		Rectangle rectangle = getPosition();
-		stack.pushRelative(rectangle);
 
-		renderers.updateSize(rectangle.width, rectangle.height);
-
-		double scale = 8;
-
-		drawFrame(renderers, scale, false, {
+		const Color inner_color{0.88, 0.77, 0.55};
+		const std::array<std::string_view, 8> pieces{
 			"resources/gui/gui_topleft.png",
 			"resources/gui/gui_top.png",
 			"resources/gui/gui_topright.png",
@@ -42,12 +41,23 @@ namespace Game3 {
 			"resources/gui/gui_bottom.png",
 			"resources/gui/gui_bottomleft.png",
 			"resources/gui/gui_left.png",
-		}, Color{0.88, 0.77, 0.55});
+		};
 
-		rectangle.x = 9 * scale;
-		rectangle.y = 9 * scale;
-		rectangle.width -= 18 * scale;
-		rectangle.height -= 18 * scale;
+
+		Rectangle tab_rectangle = rectangle + Rectangle{0, int(rectangle.height - 6 * SCALE / UNSCALE), TOP_OFFSET, TOP_OFFSET};
+		stack.pushRelative(tab_rectangle);
+		renderers.updateSize(tab_rectangle.width, tab_rectangle.height);
+		drawFrame(renderers, SCALE / UNSCALE, false, pieces, inner_color);
+		stack.pop();
+
+		stack.pushRelative(rectangle);
+		renderers.updateSize(rectangle.width, rectangle.height);
+		drawFrame(renderers, SCALE, false, pieces, inner_color);
+
+		rectangle.x = 9 * SCALE;
+		rectangle.y = 9 * SCALE;
+		rectangle.width -= 18 * SCALE;
+		rectangle.height -= 18 * SCALE;
 
 		if (rectangle.height <= 0 || rectangle.width <= 0 || !player) {
 			return;
@@ -64,12 +74,12 @@ namespace Game3 {
 		constexpr static int INNER_SLOT_SIZE = 16;
 		constexpr static int OUTER_SLOT_SIZE = INNER_SLOT_SIZE * 5 / 4;
 
-		const int column_count = std::max(1, int(rectangle.width / (OUTER_SLOT_SIZE * scale)));
-		const double x_pad = (rectangle.width - column_count * (OUTER_SLOT_SIZE * scale) + (OUTER_SLOT_SIZE - INNER_SLOT_SIZE) * scale) / 2;
+		const int column_count = std::max(1, int(rectangle.width / (OUTER_SLOT_SIZE * SCALE)));
+		const double x_pad = (rectangle.width - column_count * (OUTER_SLOT_SIZE * SCALE) + (OUTER_SLOT_SIZE - INNER_SLOT_SIZE) * SCALE) / 2;
 
 		int column = 0;
 		double x = x_pad;
-		double y = (OUTER_SLOT_SIZE - INNER_SLOT_SIZE) * scale;
+		double y = (OUTER_SLOT_SIZE - INNER_SLOT_SIZE) * SCALE;
 
 		InventoryPtr inventory = player->getInventory(0);
 		auto inventory_lock = inventory->sharedLock();
@@ -82,7 +92,7 @@ namespace Game3 {
 		if (slotWidgets.size() != static_cast<size_t>(slot_count)) {
 			slotWidgets.clear();
 			for (Slot slot = 0; slot < slot_count; ++slot)
-				slotWidgets.emplace_back(std::make_shared<ItemSlotWidget>((*inventory)[slot], slot, INNER_SLOT_SIZE, scale, slot == active_slot));
+				slotWidgets.emplace_back(std::make_shared<ItemSlotWidget>((*inventory)[slot], slot, INNER_SLOT_SIZE, SCALE, slot == active_slot));
 		} else {
 			for (Slot slot = 0; slot < slot_count; ++slot)
 				slotWidgets[slot]->setStack((*inventory)[slot]);
@@ -102,26 +112,27 @@ namespace Game3 {
 		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
 			widget->render(ui, renderers, x, y);
 
-			x += OUTER_SLOT_SIZE * scale;
+			x += OUTER_SLOT_SIZE * SCALE;
 
 			if (++column == column_count) {
 				column = 0;
 				x = x_pad;
-				y += OUTER_SLOT_SIZE * scale;
+				y += OUTER_SLOT_SIZE * SCALE;
 			}
 		}
 	}
 
-	Rectangle InventoryDialog::getPosition() const {
+	Rectangle OmniDialog::getPosition() const {
 		Rectangle rectangle = ui.scissorStack.getBase();
 		rectangle.x = rectangle.width * X_FRACTION / 2;
 		rectangle.y = rectangle.height * Y_FRACTION / 2;
 		rectangle.width *= (1. - X_FRACTION);
 		rectangle.height *= (1. - Y_FRACTION);
+		rectangle.height -= TOP_OFFSET;
 		return rectangle;
 	}
 
-	bool InventoryDialog::click(int x, int y) {
+	bool OmniDialog::click(int x, int y) {
 		if (!Dialog::click(x, y))
 			return false;
 
@@ -134,7 +145,7 @@ namespace Game3 {
 		return true;
 	}
 
-	bool InventoryDialog::dragStart(int x, int y) {
+	bool OmniDialog::dragStart(int x, int y) {
 		if (!Dialog::dragStart(x, y))
 			return false;
 
@@ -149,7 +160,7 @@ namespace Game3 {
 		return true;
 	}
 
-	bool InventoryDialog::dragEnd(int x, int y) {
+	bool OmniDialog::dragEnd(int x, int y) {
 		if (!Dialog::dragEnd(x, y))
 			return false;
 

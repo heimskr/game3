@@ -29,9 +29,10 @@ namespace Game3 {
 	class ClientGame;
 	class ClientInventory;
 	class CraftingTab;
+	class GTKInventoryTab;
+	class GTKTab;
 	class HasFluids;
-	class InventoryTab;
-	class Tab;
+	class OmniDialog;
 	class TextTab;
 	struct Position;
 	struct WorldGenParams;
@@ -43,8 +44,9 @@ namespace Game3 {
 			Gtk::Notebook notebook;
 			std::shared_ptr<ClientGame> game;
 			std::shared_ptr<TextTab> textTab;
-			std::shared_ptr<InventoryTab> inventoryTab;
+			std::shared_ptr<GTKInventoryTab> inventoryTab;
 			std::shared_ptr<CraftingTab> craftingTab;
+			std::shared_ptr<OmniDialog> omniDialog;
 			Lockable<ClientSettings> settings;
 
 			MainWindow(BaseObjectType *, const Glib::RefPtr<Gtk::Builder> &);
@@ -132,8 +134,8 @@ namespace Game3 {
 			Gtk::Label timeLabel;
 			Glib::RefPtr<Gio::SimpleAction> debugAction;
 			std::unique_ptr<Canvas> canvas;
-			std::unordered_map<const Gtk::Widget *, std::shared_ptr<Tab>> tabMap;
-			std::shared_ptr<Tab> activeTab;
+			std::unordered_map<const Gtk::Widget *, std::shared_ptr<GTKTab>> tabMap;
+			std::shared_ptr<GTKTab> activeTab;
 			double lastDragX = 0.;
 			double lastDragY = 0.;
 			double glAreaMouseX = 0.;
@@ -189,7 +191,7 @@ namespace Game3 {
 			void autoConnect();
 			void playLocally();
 			void onGameLoaded();
-			bool isFocused(const std::shared_ptr<Tab> &) const;
+			bool isFocused(const std::shared_ptr<GTKTab> &) const;
 			void connectClose(Gtk::Dialog &);
 			void updateMoneyLabel(MoneyCount);
 			void continueLocalConnection();

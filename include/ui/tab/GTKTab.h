@@ -7,13 +7,13 @@
 namespace Game3 {
 	class ClientGame;
 
-	class Tab {
+	class GTKTab {
 		public:
 			Gtk::Notebook &notebook;
 
-			Tab(Gtk::Notebook &notebook_): notebook(notebook_) {}
+			GTKTab(Gtk::Notebook &notebook_): notebook(notebook_) {}
 
-			virtual ~Tab() = default;
+			virtual ~GTKTab() = default;
 
 			virtual Gtk::Widget & getWidget() = 0;
 			virtual std::string getName() = 0;

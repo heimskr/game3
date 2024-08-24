@@ -15,9 +15,8 @@
 namespace Game3 {
 	class Agent;
 	class ClientInventory;
-	class InventoryTab;
 
-	class InventoryModule: public GTKModule, public ItemSlotParent, public std::enable_shared_from_this<InventoryModule> {
+	class GTKInventoryModule: public GTKModule, public ItemSlotParent, public std::enable_shared_from_this<GTKInventoryModule> {
 		public:
 			struct Argument {
 				std::shared_ptr<Agent> agent;
@@ -26,12 +25,12 @@ namespace Game3 {
 
 			static Identifier ID() { return {"base", "module/inventory"}; }
 
-			using GmenuFn = std::function<void(InventoryModule &, Glib::RefPtr<Gio::Menu>, Slot, const ItemStackPtr &)>;
+			using GmenuFn = std::function<void(GTKInventoryModule &, Glib::RefPtr<Gio::Menu>, Slot, const ItemStackPtr &)>;
 
-			InventoryModule(std::shared_ptr<ClientGame>, const std::any &, ItemSlotParent * = nullptr, GmenuFn = {});
-			InventoryModule(std::shared_ptr<ClientGame>, std::shared_ptr<ClientInventory>, ItemSlotParent * = nullptr, GmenuFn = {});
+			GTKInventoryModule(std::shared_ptr<ClientGame>, const std::any &, ItemSlotParent * = nullptr, GmenuFn = {});
+			GTKInventoryModule(std::shared_ptr<ClientGame>, std::shared_ptr<ClientInventory>, ItemSlotParent * = nullptr, GmenuFn = {});
 
-			~InventoryModule() override;
+			~GTKInventoryModule() override;
 
 			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;
@@ -39,7 +38,7 @@ namespace Game3 {
 			void update() final;
 			void onResize(int) final;
 			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
-			std::shared_ptr<InventoryModule> getPrimaryInventoryModule() final { return shared_from_this(); }
+			std::shared_ptr<GTKInventoryModule> getPrimaryInventoryModule() final { return shared_from_this(); }
 
 			bool addCSSClass(const Glib::ustring &, Slot);
 			void removeCSSClass(const Glib::ustring &, Slot = -1);

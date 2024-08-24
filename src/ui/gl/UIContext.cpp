@@ -15,7 +15,7 @@ namespace Game3 {
 	void UIContext::render(float mouse_x, float mouse_y) {
 		RendererContext context = canvas.getRendererContext();
 
-		for (const std::unique_ptr<Dialog> &dialog: dialogs) {
+		for (const std::shared_ptr<Dialog> &dialog: dialogs) {
 			scissorStack = internalScissorStack;
 			dialog->render(context);
 		}
@@ -33,7 +33,7 @@ namespace Game3 {
 		}
 	}
 
-	void UIContext::addDialog(std::unique_ptr<Dialog> &&dialog) {
+	void UIContext::addDialog(std::shared_ptr<Dialog> dialog) {
 		dialogs.emplace_back(std::move(dialog));
 	}
 
@@ -46,7 +46,7 @@ namespace Game3 {
 	}
 
 	bool UIContext::click(int x, int y) {
-		for (const std::unique_ptr<Dialog> &dialog: reverse(dialogs))
+		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
 			if (dialog->click(x, y))
 				return true;
 
@@ -56,7 +56,7 @@ namespace Game3 {
 	bool UIContext::dragStart(int x, int y) {
 		dragOrigin.emplace(x, y);
 
-		for (const std::unique_ptr<Dialog> &dialog: reverse(dialogs))
+		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
 			if (dialog->dragStart(x, y))
 				return true;
 
@@ -67,7 +67,7 @@ namespace Game3 {
 		if (draggedWidget && dragOrigin != std::pair{x, y})
 			draggedWidgetActive = true;
 
-		for (const std::unique_ptr<Dialog> &dialog: reverse(dialogs))
+		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
 			if (dialog->dragUpdate(x, y))
 				return true;
 
@@ -77,7 +77,7 @@ namespace Game3 {
 	bool UIContext::dragEnd(int x, int y) {
 		bool out = false;
 
-		for (const std::unique_ptr<Dialog> &dialog: reverse(dialogs)) {
+		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs)) {
 			if (dialog->dragEnd(x, y)) {
 				out = true;
 				break;

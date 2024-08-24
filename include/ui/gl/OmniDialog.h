@@ -1,14 +1,16 @@
 #pragma once
 
-#include <memory>
-
+#include "types/Types.h"
 #include "ui/gl/Dialog.h"
 #include "ui/gl/ItemSlotWidget.h"
+
+#include <memory>
+#include <vector>
 
 namespace Game3 {
 	class Player;
 
-	class InventoryDialog: public Dialog {
+	class OmniDialog: public Dialog {
 		private:
 			std::shared_ptr<Player> player;
 			std::vector<std::shared_ptr<ItemSlotWidget>> slotWidgets;
@@ -16,7 +18,7 @@ namespace Game3 {
 			Rectangle innerRectangle;
 
 		public:
-			InventoryDialog(UIContext &, std::shared_ptr<Player>);
+			OmniDialog(UIContext &, std::shared_ptr<Player>);
 
 			void render(RendererContext &) final;
 			Rectangle getPosition() const final;

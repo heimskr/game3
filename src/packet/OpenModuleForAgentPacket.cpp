@@ -4,7 +4,7 @@
 #include "game/ClientInventory.h"
 #include "packet/OpenModuleForAgentPacket.h"
 #include "ui/MainWindow.h"
-#include "ui/tab/InventoryTab.h"
+#include "ui/tab/GTKInventoryTab.h"
 
 namespace Game3 {
 	void OpenModuleForAgentPacket::handle(const ClientGamePtr &game) {

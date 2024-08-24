@@ -5,16 +5,16 @@
 #include "packet/MoveSlotsPacket.h"
 #include "ui/gtk/ItemSlot.h"
 #include "ui/gtk/Util.h"
-#include "ui/module/InventoryModule.h"
-#include "ui/tab/InventoryTab.h"
+#include "ui/module/GTKInventoryModule.h"
+#include "ui/tab/GTKInventoryTab.h"
 #include "ui/MainWindow.h"
 #include "util/Demangle.h"
 
 namespace Game3 {
-	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game_, const std::any &argument, ItemSlotParent *parent_, const GmenuFn gmenu_fn):
-		InventoryModule(std::move(game_), getInventory(argument), parent_, gmenu_fn) {}
+	GTKInventoryModule::GTKInventoryModule(std::shared_ptr<ClientGame> game_, const std::any &argument, ItemSlotParent *parent_, const GmenuFn gmenu_fn):
+		GTKInventoryModule(std::move(game_), getInventory(argument), parent_, gmenu_fn) {}
 
-	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<ClientInventory> inventory_, ItemSlotParent *parent_, const GmenuFn gmenu_fn):
+	GTKInventoryModule::GTKInventoryModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<ClientInventory> inventory_, ItemSlotParent *parent_, const GmenuFn gmenu_fn):
 	game(std::move(game_)),
 	inventory(std::move(inventory_)),
 	parent(parent_) {
@@ -36,11 +36,11 @@ namespace Game3 {
 		popoverMenu.set_parent(vbox);
 	}
 
-	InventoryModule::~InventoryModule() {
+	GTKInventoryModule::~GTKInventoryModule() {
 		popoverMenu.unparent();
 	}
 
-	ClientInventoryPtr InventoryModule::getInventory(const std::any &any) {
+	ClientInventoryPtr GTKInventoryModule::getInventory(const std::any &any) {
 		const Argument *argument = std::any_cast<Argument>(&any);
 		if (!argument) {
 			const AgentPtr *agent = std::any_cast<AgentPtr>(&any);
@@ -55,25 +55,25 @@ namespace Game3 {
 		return std::dynamic_pointer_cast<ClientInventory>(std::dynamic_pointer_cast<HasInventory>(agent)->getInventory(index));
 	}
 
-	InventoryID InventoryModule::getInventoryIndex(const std::any &any) {
+	InventoryID GTKInventoryModule::getInventoryIndex(const std::any &any) {
 		const Argument *argument = std::any_cast<Argument>(&any);
 		if (!argument)
 			throw std::invalid_argument("Invalid std::any argument given to InventoryModule: " + demangle(any.type().name()));
 		return argument->index;
 	}
 
-	Gtk::Widget & InventoryModule::getWidget() {
+	Gtk::Widget & GTKInventoryModule::getWidget() {
 		return vbox;
 	}
 
-	void InventoryModule::reset() {
+	void GTKInventoryModule::reset() {
 		removeChildren(flowBox);
 		itemSlots.clear();
 		lastSlotCount = -1;
 		update();
 	}
 
-	void InventoryModule::update() {
+	void GTKInventoryModule::update() {
 		if (!name.empty()) {
 			label.set_text(name);
 			label.show();
@@ -82,12 +82,12 @@ namespace Game3 {
 		repopulate();
 	}
 
-	void InventoryModule::onResize(int width) {
+	void GTKInventoryModule::onResize(int width) {
 		tabWidth = width;
 		update();
 	}
 
-	void InventoryModule::setInventory(std::shared_ptr<ClientInventory> new_inventory) {
+	void GTKInventoryModule::setInventory(std::shared_ptr<ClientInventory> new_inventory) {
 		inventory = std::move(new_inventory);
 
 		for (const auto &slot: itemSlots)
@@ -96,16 +96,16 @@ namespace Game3 {
 		update();
 	}
 
-	void InventoryModule::slotClicked(Slot slot, bool is_right_click, Modifiers modifiers) {
+	void GTKInventoryModule::slotClicked(Slot slot, bool is_right_click, Modifiers modifiers) {
 		if (parent)
 			parent->slotClicked(slot, is_right_click, modifiers);
 	}
 
-	void InventoryModule::setShowLabel(bool show) {
+	void GTKInventoryModule::setShowLabel(bool show) {
 		label.set_visible(show);
 	}
 
-	std::optional<Buffer> InventoryModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &) {
+	std::optional<Buffer> GTKInventoryModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &) {
 		if (name == "TileEntityRemoved") {
 
 			if (source && source->getGID() == inventory->getOwner()->getGID()) {
@@ -124,7 +124,7 @@ namespace Game3 {
 		return std::nullopt;
 	}
 
-	bool InventoryModule::addCSSClass(const Glib::ustring &css_class, Slot slot) {
+	bool GTKInventoryModule::addCSSClass(const Glib::ustring &css_class, Slot slot) {
 		if (0 <= slot && slot < std::ssize(itemSlots)) {
 			itemSlots.at(slot)->add_css_class(css_class);
 			return true;
@@ -133,7 +133,7 @@ namespace Game3 {
 		return false;
 	}
 
-	void InventoryModule::removeCSSClass(const Glib::ustring &css_class, Slot slot) {
+	void GTKInventoryModule::removeCSSClass(const Glib::ustring &css_class, Slot slot) {
 		if (slot == -1) {
 			for (const auto &item_slot: itemSlots)
 				item_slot->remove_css_class(css_class);
@@ -142,11 +142,11 @@ namespace Game3 {
 		}
 	}
 
-	int InventoryModule::gridWidth() const {
-		return tabWidth / (InventoryTab::TILE_SIZE + 2 * InventoryTab::TILE_MARGIN);
+	int GTKInventoryModule::gridWidth() const {
+		return tabWidth / (GTKInventoryTab::TILE_SIZE + 2 * GTKInventoryTab::TILE_MARGIN);
 	}
 
-	void InventoryModule::populate() {
+	void GTKInventoryModule::populate() {
 		auto lock = inventory.sharedLock();
 		assert(inventory);
 		auto inventory_lock = inventory->sharedLock();
@@ -177,7 +177,7 @@ namespace Game3 {
 		}
 	}
 
-	void InventoryModule::repopulate() {
+	void GTKInventoryModule::repopulate() {
 		auto lock = inventory.sharedLock();
 		assert(inventory);
 		Inventory &inventory_ref = *inventory;
@@ -207,7 +207,7 @@ namespace Game3 {
 		}
 	}
 
-	void InventoryModule::leftClick(Slot slot, Modifiers modifiers, int count) {
+	void GTKInventoryModule::leftClick(Slot slot, Modifiers modifiers, int count) {
 		auto lock = inventory.sharedLock();
 		assert(inventory);
 		Inventory &inventory_ref = *inventory;

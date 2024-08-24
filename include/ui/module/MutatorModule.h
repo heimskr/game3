@@ -12,7 +12,7 @@
 namespace Game3 {
 	class Agent;
 	class FluidLevelsModule;
-	class InventoryModule;
+	class GTKInventoryModule;
 	class Mutator;
 
 	class MutatorModule: public GTKModule {
@@ -29,12 +29,12 @@ namespace Game3 {
 			void onResize(int) final;
 			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
 			void setInventory(std::shared_ptr<ClientInventory>) final;
-			std::shared_ptr<InventoryModule> getPrimaryInventoryModule() final { return inventoryModule; }
+			std::shared_ptr<GTKInventoryModule> getPrimaryInventoryModule() final { return inventoryModule; }
 
 		private:
 			std::shared_ptr<ClientGame> game;
 			std::shared_ptr<Mutator> mutator;
-			std::shared_ptr<InventoryModule> inventoryModule;
+			std::shared_ptr<GTKInventoryModule> inventoryModule;
 			std::shared_ptr<FluidLevelsModule> fluidsModule;
 			GeneInfoModule geneInfoModule;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};

@@ -14,7 +14,6 @@
 namespace Game3 {
 	class Agent;
 	class HasFluids;
-	class InventoryTab;
 	class ItemFilter;
 	class Pipe;
 

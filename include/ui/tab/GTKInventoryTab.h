@@ -12,8 +12,8 @@
 #include "types/Types.h"
 #include "threading/LockableSharedPtr.h"
 #include "ui/Modifiers.h"
-#include "ui/module/InventoryModule.h"
-#include "ui/tab/Tab.h"
+#include "ui/module/GTKInventoryModule.h"
+#include "ui/tab/GTKTab.h"
 
 namespace Game3 {
 	class Agent;
@@ -23,7 +23,7 @@ namespace Game3 {
 	class MainWindow;
 	class TileEntity;
 
-	class InventoryTab: public Tab, public ItemSlotParent {
+	class GTKInventoryTab: public GTKTab, public ItemSlotParent {
 		public:
 			constexpr static int TILE_MARGIN = 2;
 			constexpr static int TILE_SIZE = 64;
@@ -31,10 +31,10 @@ namespace Game3 {
 
 			MainWindow &mainWindow;
 
-			InventoryTab() = delete;
-			InventoryTab(MainWindow &);
+			GTKInventoryTab() = delete;
+			GTKInventoryTab(MainWindow &);
 
-			~InventoryTab() override;
+			~GTKInventoryTab() override;
 
 			Gtk::Widget & getWidget() override { return scrolled; }
 			std::string getName() override { return "Inventory"; }
@@ -57,7 +57,7 @@ namespace Game3 {
 			Gtk::ScrolledWindow scrolled;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
 			Lockable<std::shared_ptr<GTKModule>> currentModule;
-			std::optional<InventoryModule> inventoryModule;
+			std::optional<GTKInventoryModule> inventoryModule;
 			Gtk::Box actionBox{Gtk::Orientation::HORIZONTAL};
 			Gtk::Image holdLeftAction;
 			Gtk::Image holdRightAction;
@@ -78,7 +78,7 @@ namespace Game3 {
 			void updatePlayerClasses(const std::shared_ptr<ClientGame> &);
 			void populate(std::shared_ptr<ClientInventory>);
 			void clear();
-			void gmenuSetup(InventoryModule &, Glib::RefPtr<Gio::Menu>, Slot, const ItemStackPtr &);
+			void gmenuSetup(GTKInventoryModule &, Glib::RefPtr<Gio::Menu>, Slot, const ItemStackPtr &);
 			void updateInventory(const std::shared_ptr<ClientGame> &);
 			void initAction(Gtk::Image &, const Glib::ustring &icon, const Glib::ustring &tooltip, std::function<void(Slot, Modifiers)>);
 	};

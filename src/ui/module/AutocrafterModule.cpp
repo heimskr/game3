@@ -9,8 +9,8 @@
 #include "ui/gtk/Util.h"
 #include "ui/module/AutocrafterModule.h"
 #include "ui/module/EnergyLevelModule.h"
-#include "ui/module/InventoryModule.h"
-#include "ui/tab/InventoryTab.h"
+#include "ui/module/GTKInventoryModule.h"
+#include "ui/tab/GTKInventoryTab.h"
 #include "ui/MainWindow.h"
 
 namespace Game3 {
@@ -20,8 +20,8 @@ namespace Game3 {
 	AutocrafterModule::AutocrafterModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<Autocrafter> autocrafter_):
 	game(std::move(game_)),
 	autocrafter(std::move(autocrafter_)),
-	inventoryModule(std::make_shared<InventoryModule>(game, std::static_pointer_cast<ClientInventory>(autocrafter->getInventory(0)))),
-	stationInventoryModule(std::make_shared<InventoryModule>(game, std::static_pointer_cast<ClientInventory>(autocrafter->getInventory(1)))),
+	inventoryModule(std::make_shared<GTKInventoryModule>(game, std::static_pointer_cast<ClientInventory>(autocrafter->getInventory(0)))),
+	stationInventoryModule(std::make_shared<GTKInventoryModule>(game, std::static_pointer_cast<ClientInventory>(autocrafter->getInventory(1)))),
 	energyModule(std::make_shared<EnergyLevelModule>(game, std::static_pointer_cast<Agent>(autocrafter), false)) {
 		assert(autocrafter);
 		vbox.set_hexpand();

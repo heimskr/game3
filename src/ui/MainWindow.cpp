@@ -16,19 +16,19 @@
 #include "packet/LoginPacket.h"
 #include "packet/SetHeldItemPacket.h"
 #include "realm/Overworld.h"
-#include "ui/gl/InventoryDialog.h"
+#include "ui/gl/OmniDialog.h"
 #include "ui/gtk/ConnectDialog.h"
 #include "ui/gtk/ConnectionSuccessDialog.h"
 #include "ui/gtk/EntryDialog.h"
 #include "ui/gtk/JSONDialog.h"
 #include "ui/gtk/LoginDialog.h"
 #include "ui/gtk/Util.h"
-#include "ui/module/InventoryModule.h"
+#include "ui/module/GTKInventoryModule.h"
 #include "ui/module/FluidLevelsModule.h"
 #include "ui/module/GTKModuleFactory.h"
 #include "ui/module/VillageTradeModule.h"
 #include "ui/tab/CraftingTab.h"
-#include "ui/tab/InventoryTab.h"
+#include "ui/tab/GTKInventoryTab.h"
 #include "ui/tab/TextTab.h"
 #include "ui/App.h"
 #include "ui/Canvas.h"
@@ -439,6 +439,8 @@ namespace Game3 {
 		for (auto &[widget, tab]: tabMap)
 			tab->reset(game);
 
+		INFO("Player: {}", (void*)game->getPlayer().get());
+
 		game->signalPlayerInventoryUpdate().connect([this](const PlayerPtr &player) {
 			if (player != game->getPlayer())
 				return;
@@ -692,7 +694,7 @@ namespace Game3 {
 
 	void MainWindow::showExternalInventory(const std::shared_ptr<ClientInventory> &inventory) {
 		assert(inventory);
-		inventoryTab->setModule(std::make_shared<InventoryModule>(game, inventory));
+		inventoryTab->setModule(std::make_shared<GTKInventoryModule>(game, inventory));
 	}
 
 	GlobalID MainWindow::getExternalGID() const {
@@ -720,8 +722,20 @@ namespace Game3 {
 		} else {
 			if (current_module != nullptr)
 				module_lock.unlock();
-			auto &registry = game->registry<GTKModuleFactoryRegistry>();
-			inventoryTab->setModule((*registry[module_id])(game, argument));
+
+			auto &registry = game->registry<ModuleFactoryRegistry>();
+			if (auto factory = registry[module_id]) {
+				INFO("TODO: open {} GL module", module_id);
+				return;
+			}
+
+			auto &gtk_registry = game->registry<GTKModuleFactoryRegistry>();
+			if (auto gtk_factory = gtk_registry[module_id]) {
+				inventoryTab->setModule((*gtk_factory)(game, argument));
+				return;
+			}
+
+			WARN("Couldn't find module {}", module_id);
 		}
 	}
 
@@ -918,8 +932,10 @@ namespace Game3 {
 					return;
 				}
 				case GDK_KEY_Escape:
-					if (canvas->uiContext.removeDialogs<InventoryDialog>() == 0) {
-						canvas->uiContext.addDialog<InventoryDialog>(player);
+					if (canvas->uiContext.removeDialogs<OmniDialog>() == 0 && player) {
+						if (!omniDialog)
+							omniDialog = std::make_shared<OmniDialog>(canvas->uiContext, player);
+						canvas->uiContext.addDialog(omniDialog);
 					}
 					return;
 				case GDK_KEY_u:
@@ -1129,7 +1145,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool MainWindow::isFocused(const std::shared_ptr<Tab> &tab) const {
+	bool MainWindow::isFocused(const std::shared_ptr<GTKTab> &tab) const {
 		return tab == tabMap.at(notebook.get_nth_page(notebook.get_current_page()));
 	}
 }

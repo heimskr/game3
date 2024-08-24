@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ui/tab/Tab.h"
+#include "ui/tab/GTKTab.h"
 
 namespace Game3 {
-	class TextTab: public Tab {
+	class TextTab: public GTKTab {
 		public:
 			Glib::ustring text;
 			Glib::ustring name;

@@ -4,7 +4,7 @@
 #include "packet/SetPlayerStationTypesPacket.h"
 #include "ui/MainWindow.h"
 #include "ui/tab/CraftingTab.h"
-#include "ui/tab/InventoryTab.h"
+#include "ui/tab/GTKInventoryTab.h"
 
 namespace Game3 {
 	void SetPlayerStationTypesPacket::handle(const ClientGamePtr &game) {

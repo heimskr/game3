@@ -8,7 +8,7 @@
 #include "ui/gtk/DragSource.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/VillageTradeModule.h"
-#include "ui/tab/InventoryTab.h"
+#include "ui/tab/GTKInventoryTab.h"
 #include "ui/MainWindow.h"
 #include "util/Util.h"
 

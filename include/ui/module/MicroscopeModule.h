@@ -12,7 +12,7 @@
 
 namespace Game3 {
 	class InventoriedTileEntity;
-	class InventoryModule;
+	class GTKInventoryModule;
 
 	template <Slot S, Substance... ExtraSubstances>
 	class MicroscopeModule: public GTKModule {
@@ -96,7 +96,7 @@ namespace Game3 {
 				updateResults();
 			}
 
-			std::shared_ptr<InventoryModule> getPrimaryInventoryModule() final {
+			std::shared_ptr<GTKInventoryModule> getPrimaryInventoryModule() final {
 				return multiModule->getPrimaryInventoryModule();
 			}
 

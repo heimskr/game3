@@ -6,9 +6,9 @@
 #include "tileentity/Mutator.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/FluidLevelsModule.h"
-#include "ui/module/InventoryModule.h"
+#include "ui/module/GTKInventoryModule.h"
 #include "ui/module/MutatorModule.h"
-#include "ui/tab/InventoryTab.h"
+#include "ui/tab/GTKInventoryTab.h"
 #include "ui/MainWindow.h"
 
 namespace Game3 {
@@ -18,7 +18,7 @@ namespace Game3 {
 	MutatorModule::MutatorModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<Mutator> mutator_):
 	game(std::move(game_)),
 	mutator(std::move(mutator_)),
-	inventoryModule(std::make_shared<InventoryModule>(game, std::static_pointer_cast<ClientInventory>(mutator->getInventory(0)))),
+	inventoryModule(std::make_shared<GTKInventoryModule>(game, std::static_pointer_cast<ClientInventory>(mutator->getInventory(0)))),
 	fluidsModule(std::make_shared<FluidLevelsModule>(game, std::make_any<AgentPtr>(mutator), false)),
 	geneInfoModule(nullptr) {
 		vbox.set_hexpand(true);

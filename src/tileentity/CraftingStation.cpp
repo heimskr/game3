@@ -9,7 +9,7 @@
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 #include "ui/tab/CraftingTab.h"
-#include "ui/tab/InventoryTab.h"
+#include "ui/tab/GTKInventoryTab.h"
 #include "util/Cast.h"
 
 namespace Game3 {

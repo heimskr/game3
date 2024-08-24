@@ -11,8 +11,7 @@ namespace Game3 {
 	class Agent;
 	class Autocrafter;
 	class EnergyLevelModule;
-	class InventoryModule;
-	class InventoryTab;
+	class GTKInventoryModule;
 
 	class AutocrafterModule: public GTKModule {
 		public:
@@ -28,15 +27,15 @@ namespace Game3 {
 			void onResize(int) final;
 			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
 			void setInventory(std::shared_ptr<ClientInventory>) final;
-			std::shared_ptr<InventoryModule> getPrimaryInventoryModule() final { return inventoryModule; }
+			std::shared_ptr<GTKInventoryModule> getPrimaryInventoryModule() final { return inventoryModule; }
 
 			void updateEntry();
 
 		private:
 			std::shared_ptr<ClientGame> game;
 			std::shared_ptr<Autocrafter> autocrafter;
-			std::shared_ptr<InventoryModule> inventoryModule;
-			std::shared_ptr<InventoryModule> stationInventoryModule;
+			std::shared_ptr<GTKInventoryModule> inventoryModule;
+			std::shared_ptr<GTKInventoryModule> stationInventoryModule;
 			std::shared_ptr<EnergyLevelModule> energyModule;
 			Gtk::Label header;
 			Gtk::Entry entry;

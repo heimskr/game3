@@ -8,7 +8,7 @@
 #include "ui/module/GTKModule.h"
 #include "ui/module/EnergyLevelModule.h"
 #include "ui/module/FluidLevelsModule.h"
-#include "ui/module/InventoryModule.h"
+#include "ui/module/GTKInventoryModule.h"
 #include "util/Cast.h"
 
 #include <any>
@@ -18,8 +18,7 @@
 namespace Game3 {
 	class Agent;
 	class Microscope;
-	class InventoryModule;
-	class InventoryTab;
+	class GTKInventoryModule;
 
 	template <Substance... S>
 	class MultiModule: public GTKModule {
@@ -41,10 +40,10 @@ namespace Game3 {
 				return suffix;
 			}
 
-			MultiModule(std::shared_ptr<ClientGame> game, const std::any &argument, ItemSlotParent *item_slot_parent = nullptr, InventoryModule::GmenuFn gmenu_fn = {}):
+			MultiModule(std::shared_ptr<ClientGame> game, const std::any &argument, ItemSlotParent *item_slot_parent = nullptr, GTKInventoryModule::GmenuFn gmenu_fn = {}):
 				MultiModule(std::move(game), std::any_cast<AgentPtr>(argument), item_slot_parent, std::move(gmenu_fn)) {}
 
-			MultiModule(std::shared_ptr<ClientGame> game, const AgentPtr &agent, ItemSlotParent *item_slot_parent = nullptr, InventoryModule::GmenuFn gmenu_fn = {}) {
+			MultiModule(std::shared_ptr<ClientGame> game, const AgentPtr &agent, ItemSlotParent *item_slot_parent = nullptr, GTKInventoryModule::GmenuFn gmenu_fn = {}) {
 				header.set_margin(10);
 				header.set_xalign(0.5);
 				header.set_text(agent->getName());
@@ -59,7 +58,7 @@ namespace Game3 {
 							assert(inventoried);
 							for (size_t i = 0; i < inventoried->getInventoryCount(); ++i) {
 								auto inventory = safeDynamicCast<ClientInventory>(inventoried->getInventory(i));
-								submodules[index] = std::make_shared<InventoryModule>(game, std::move(inventory), item_slot_parent, gmenu_fn);
+								submodules[index] = std::make_shared<GTKInventoryModule>(game, std::move(inventory), item_slot_parent, gmenu_fn);
 							}
 							break;
 						}
@@ -119,9 +118,9 @@ namespace Game3 {
 					submodule->setInventory(std::move(inventory));
 			}
 
-			std::shared_ptr<InventoryModule> getPrimaryInventoryModule() final {
+			std::shared_ptr<GTKInventoryModule> getPrimaryInventoryModule() final {
 				for (const std::shared_ptr<GTKModule> &submodule: submodules)
-					if (auto inventory_module = std::dynamic_pointer_cast<InventoryModule>(submodule))
+					if (auto inventory_module = std::dynamic_pointer_cast<GTKInventoryModule>(submodule))
 						return inventory_module;
 				return nullptr;
 			}

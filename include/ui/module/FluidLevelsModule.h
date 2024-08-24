@@ -10,7 +10,6 @@
 namespace Game3 {
 	class Agent;
 	class HasFluids;
-	class InventoryTab;
 
 	class FluidLevelsModule: public GTKModule {
 		public:

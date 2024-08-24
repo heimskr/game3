@@ -4,7 +4,7 @@
 #include "ui/gtk/DragSource.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/FluidLevelsModule.h"
-#include "ui/tab/InventoryTab.h"
+#include "ui/tab/GTKInventoryTab.h"
 #include "ui/MainWindow.h"
 
 namespace Game3 {
