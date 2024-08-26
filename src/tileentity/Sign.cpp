@@ -9,7 +9,7 @@
 #include "tileentity/Sign.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
-#include "ui/tab/TextTab.h"
+#include "ui/tab/GTKTextTab.h"
 
 namespace Game3 {
 	Sign::Sign(Identifier tilename, Position position_, std::string text_, std::string name_):

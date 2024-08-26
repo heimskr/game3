@@ -11,13 +11,13 @@
 namespace Game3 {
 	class MainWindow;
 
-	class CraftingTab: public GTKTab {
+	class GTKCraftingTab: public GTKTab {
 		public:
 			MainWindow &mainWindow;
 
-			CraftingTab(MainWindow &);
+			GTKCraftingTab(MainWindow &);
 
-			~CraftingTab() override;
+			~GTKCraftingTab() override;
 
 			Gtk::Widget & getWidget() override { return scrolled; }
 			std::string getName() override { return "Crafting"; }

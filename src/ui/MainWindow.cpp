@@ -27,9 +27,9 @@
 #include "ui/module/FluidLevelsModule.h"
 #include "ui/module/GTKModuleFactory.h"
 #include "ui/module/VillageTradeModule.h"
-#include "ui/tab/CraftingTab.h"
+#include "ui/tab/GTKCraftingTab.h"
 #include "ui/tab/GTKInventoryTab.h"
-#include "ui/tab/TextTab.h"
+#include "ui/tab/GTKTextTab.h"
 #include "ui/App.h"
 #include "ui/Canvas.h"
 #include "ui/LogOverlay.h"
@@ -930,9 +930,9 @@ namespace Game3 {
 					return;
 				}
 				case GDK_KEY_Escape:
-					if (canvas->uiContext.removeDialogs<OmniDialog>() == 0 && player) {
+					if (canvas->uiContext.removeDialogs<OmniDialog>() == 0) {
 						if (!omniDialog)
-							omniDialog = std::make_shared<OmniDialog>(canvas->uiContext, player);
+							omniDialog = std::make_shared<OmniDialog>(canvas->uiContext);
 						canvas->uiContext.addDialog(omniDialog);
 					}
 					return;

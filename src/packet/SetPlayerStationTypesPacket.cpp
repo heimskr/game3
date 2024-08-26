@@ -3,7 +3,7 @@
 #include "entity/ClientPlayer.h"
 #include "packet/SetPlayerStationTypesPacket.h"
 #include "ui/MainWindow.h"
-#include "ui/tab/CraftingTab.h"
+#include "ui/tab/GTKCraftingTab.h"
 #include "ui/tab/GTKInventoryTab.h"
 
 namespace Game3 {

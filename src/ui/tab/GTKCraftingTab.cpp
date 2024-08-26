@@ -10,12 +10,12 @@
 #include "ui/MainWindow.h"
 #include "ui/gtk/CraftXDialog.h"
 #include "ui/gtk/Util.h"
-#include "ui/tab/CraftingTab.h"
+#include "ui/tab/GTKCraftingTab.h"
 #include "ui/tab/GTKInventoryTab.h"
 #include "util/Util.h"
 
 namespace Game3 {
-	CraftingTab::CraftingTab(MainWindow &main_window): GTKTab(main_window.notebook), mainWindow(main_window) {
+	GTKCraftingTab::GTKCraftingTab(MainWindow &main_window): GTKTab(main_window.notebook), mainWindow(main_window) {
 		scrolled.set_vexpand(true);
 		scrolled.add_css_class("crafting-tab");
 		scrolled.set_child(vbox);
@@ -35,15 +35,15 @@ namespace Game3 {
 		popoverMenu.set_parent(mainWindow);
 	}
 
-	CraftingTab::~CraftingTab() {
+	GTKCraftingTab::~GTKCraftingTab() {
 		popoverMenu.unparent();
 	}
 
-	void CraftingTab::update(const ClientGamePtr &game) {
+	void GTKCraftingTab::update(const ClientGamePtr &game) {
 		reset(game);
 	}
 
-	void CraftingTab::reset(const ClientGamePtr &game) {
+	void GTKCraftingTab::reset(const ClientGamePtr &game) {
 		if (!game) {
 			lastGame.reset();
 			removeChildren(vbox);
@@ -152,11 +152,11 @@ namespace Game3 {
 		}
 	}
 
-	void CraftingTab::craftOne(const ClientGamePtr &game, size_t registry_id) {
+	void GTKCraftingTab::craftOne(const ClientGamePtr &game, size_t registry_id) {
 		game->getPlayer()->send(CraftPacket(threadContext.rng(), registry_id, 1));
 	}
 
-	void CraftingTab::craftX(const ClientGamePtr &game, size_t registry_id) {
+	void GTKCraftingTab::craftX(const ClientGamePtr &game, size_t registry_id) {
 		auto dialog = std::make_unique<CraftXDialog>(mainWindow);
 		dialog->signal_submit().connect([weak_game = std::weak_ptr(game), registry_id](int count) {
 			if (0 < count)
@@ -166,17 +166,17 @@ namespace Game3 {
 		mainWindow.queueDialog(std::move(dialog));
 	}
 
-	void CraftingTab::craftAll(const ClientGamePtr &game, size_t registry_id) {
+	void GTKCraftingTab::craftAll(const ClientGamePtr &game, size_t registry_id) {
 		game->getPlayer()->send(CraftPacket(threadContext.rng(), registry_id, -1));
 	}
 
-	void CraftingTab::leftClick(const ClientGamePtr &game, Gtk::Widget *, size_t registry_id, int n, double, double) {
+	void GTKCraftingTab::leftClick(const ClientGamePtr &game, Gtk::Widget *, size_t registry_id, int n, double, double) {
 		mainWindow.onBlur();
 		if (n % 2 == 0)
 			craftOne(game, registry_id);
 	}
 
-	void CraftingTab::rightClick(const ClientGamePtr &game, Gtk::Widget *widget, size_t registry_id, double x, double y) {
+	void GTKCraftingTab::rightClick(const ClientGamePtr &game, Gtk::Widget *widget, size_t registry_id, double x, double y) {
 		mainWindow.onBlur();
 
 		do {

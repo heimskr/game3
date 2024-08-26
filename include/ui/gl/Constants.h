@@ -1,0 +1,11 @@
+#pragma once
+
+namespace {
+	constexpr double X_FRACTION = 0.2;
+	constexpr double Y_FRACTION = 0.2;
+	constexpr double SCALE = 8;
+	constexpr double SLOT_SCALE = 8;
+	constexpr double UNSCALE = 1.6;
+	constexpr int TOP_OFFSET = 20 * SCALE;
+	constexpr int UNSCALED = 6 * SCALE / UNSCALE;
+}

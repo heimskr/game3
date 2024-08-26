@@ -20,7 +20,7 @@
 #include "threading/ThreadContext.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
-#include "ui/tab/TextTab.h"
+#include "ui/tab/GTKTextTab.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -158,7 +158,7 @@ namespace Game3 {
 	const Glib::ustring & ClientGame::getText() const {
 		if (canvas.window.textTab)
 			return canvas.window.textTab->text;
-		throw std::runtime_error("Can't get text: TextTab is null");
+		throw std::runtime_error("Can't get text: GTKTextTab is null");
 	}
 
 	void ClientGame::runCommand(const std::string &command) {

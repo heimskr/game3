@@ -1,10 +1,10 @@
 #include <iostream>
 
 #include "game/Game.h"
-#include "ui/tab/TextTab.h"
+#include "ui/tab/GTKTextTab.h"
 
 namespace Game3 {
-	TextTab::TextTab(Gtk::Notebook &notebook_, const Glib::ustring &text_, const Glib::ustring &name_): GTKTab(notebook_), text(text_), name(name_) {
+	GTKTextTab::GTKTextTab(Gtk::Notebook &notebook_, const Glib::ustring &text_, const Glib::ustring &name_): GTKTab(notebook_), text(text_), name(name_) {
 		textTagTable = Gtk::TextTagTable::create();
 		textBuffer = Gtk::TextBuffer::create(textTagTable);
 		textView.set_buffer(textBuffer);
@@ -15,16 +15,16 @@ namespace Game3 {
 		scrolled.set_vexpand(true);
 	}
 
-	void TextTab::onBlur() {
+	void GTKTextTab::onBlur() {
 		if (ephemeral)
 			hide();
 	}
 
-	void TextTab::update(const std::shared_ptr<ClientGame> &game) {
+	void GTKTextTab::update(const std::shared_ptr<ClientGame> &game) {
 		GTKTab::update(game);
 	}
 
-	void TextTab::reset(const std::shared_ptr<ClientGame> &game) {
+	void GTKTextTab::reset(const std::shared_ptr<ClientGame> &game) {
 		if (!game) {
 			textBuffer->set_text("");
 			setName("Text");
@@ -35,11 +35,11 @@ namespace Game3 {
 		setName(name);
 	}
 
-	Glib::ustring TextTab::getText() const {
+	Glib::ustring GTKTextTab::getText() const {
 		return textBuffer->get_text();
 	}
 
-	void TextTab::setEditable(bool editable) {
+	void GTKTextTab::setEditable(bool editable) {
 		textView.set_editable(editable);
 		textView.set_cursor_visible(editable);
 	}

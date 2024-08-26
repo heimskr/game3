@@ -28,12 +28,12 @@ namespace Game3 {
 	class Canvas;
 	class ClientGame;
 	class ClientInventory;
-	class CraftingTab;
+	class GTKCraftingTab;
 	class GTKInventoryTab;
 	class GTKTab;
 	class HasFluids;
 	class OmniDialog;
-	class TextTab;
+	class GTKTextTab;
 	struct Position;
 	struct WorldGenParams;
 
@@ -43,9 +43,9 @@ namespace Game3 {
 			Gtk::HeaderBar *header = nullptr;
 			Gtk::Notebook notebook;
 			std::shared_ptr<ClientGame> game;
-			std::shared_ptr<TextTab> textTab;
+			std::shared_ptr<GTKTextTab> textTab;
 			std::shared_ptr<GTKInventoryTab> inventoryTab;
-			std::shared_ptr<CraftingTab> craftingTab;
+			std::shared_ptr<GTKCraftingTab> craftingTab;
 			std::shared_ptr<OmniDialog> omniDialog;
 			Lockable<ClientSettings> settings;
 

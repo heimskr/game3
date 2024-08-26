@@ -18,7 +18,7 @@
 #include "realm/Realm.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
-#include "ui/tab/TextTab.h"
+#include "ui/tab/GTKTextTab.h"
 #include "util/Cast.h"
 
 namespace Game3 {

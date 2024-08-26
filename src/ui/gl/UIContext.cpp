@@ -1,3 +1,4 @@
+#include "game/ClientGame.h"
 #include "graphics/RendererContext.h"
 #include "graphics/Texture.h"
 #include "ui/gl/Dialog.h"
@@ -96,5 +97,9 @@ namespace Game3 {
 
 	WidgetPtr UIContext::getDraggedWidget() const {
 		return draggedWidget;
+	}
+
+	std::shared_ptr<ClientPlayer> UIContext::getPlayer() const {
+		return canvas.game->getPlayer();
 	}
 }

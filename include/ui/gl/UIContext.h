@@ -15,6 +15,7 @@
 namespace Game3 {
 	class Canvas;
 	class ClientGame;
+	class ClientPlayer;
 	class Texture;
 	struct RendererContext;
 
@@ -50,6 +51,7 @@ namespace Game3 {
 			bool dragEnd(int x, int y);
 			void setDraggedWidget(WidgetPtr);
 			WidgetPtr getDraggedWidget() const;
+			std::shared_ptr<ClientPlayer> getPlayer() const;
 
 			template <typename T>
 			size_t removeDialogs() {

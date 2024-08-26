@@ -4,7 +4,7 @@
 #include "packet/OpenTextTabPacket.h"
 #include "ui/MainWindow.h"
 #include "ui/tab/GTKInventoryTab.h"
-#include "ui/tab/TextTab.h"
+#include "ui/tab/GTKTextTab.h"
 
 namespace Game3 {
 	void OpenTextTabPacket::handle(const ClientGamePtr &game) {
@@ -20,7 +20,7 @@ namespace Game3 {
 		}
 
 		window.queue([&game, &window, name = std::move(name), message = std::move(message), ephemeral = ephemeral] {
-			TextTab &tab = *window.textTab;
+			GTKTextTab &tab = *window.textTab;
 			tab.name = std::move(name);
 			tab.text = std::move(message);
 			tab.ephemeral = ephemeral;
