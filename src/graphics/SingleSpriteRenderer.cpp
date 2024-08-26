@@ -313,8 +313,8 @@ namespace Game3 {
 		float y = 1;
 
 		if ((options.wrapMode == GL_REPEAT || options.wrapMode == GL_MIRRORED_REPEAT) && (options.sizeX > texture_width || options.sizeY > texture_height)) {
-			x = std::max(options.sizeX / texture_width,  1.0);
-			y = std::max(options.sizeY / texture_height, 1.0);
+			x = std::max(options.sizeX / texture_width / options.scaleX,  1.0);
+			y = std::max(options.sizeY / texture_height / options.scaleY, 1.0);
 		}
 
 		if (x != lastXCoord || y != lastYCoord) {
