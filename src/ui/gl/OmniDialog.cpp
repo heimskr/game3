@@ -16,8 +16,19 @@ namespace {
 	constexpr double X_FRACTION = 0.4;
 	constexpr double Y_FRACTION = 0.4;
 	constexpr double SCALE = 8;
-	constexpr double UNSCALE = 1.5;
+	constexpr double UNSCALE = 1.6;
 	constexpr int TOP_OFFSET = 20 * SCALE;
+	constexpr int UNSCALED = 6 * SCALE / UNSCALE;
+
+	constexpr std::array<std::string_view, 8> PIECES{
+		"resources/gui/gui_topleft.png", "resources/gui/gui_top.png", "resources/gui/gui_topright.png", "resources/gui/gui_right.png",
+		"resources/gui/gui_bottomright.png", "resources/gui/gui_bottom.png", "resources/gui/gui_bottomleft.png", "resources/gui/gui_left.png",
+	};
+
+	constexpr std::array<std::string_view, 8> TAB_PIECES{
+		"resources/gui/gui_topleft.png", "resources/gui/gui_top.png", "resources/gui/gui_topright.png", "resources/gui/gui_right.png",
+		"resources/gui/gui_bottomright_empty.png", "resources/gui/gui_bottom_empty.png", "resources/gui/gui_bottomleft_empty.png", "resources/gui/gui_left.png",
+	};
 }
 
 namespace Game3 {
@@ -32,27 +43,14 @@ namespace Game3 {
 		Rectangle rectangle = getPosition();
 
 		const Color inner_color{0.88, 0.77, 0.55};
-		const std::array<std::string_view, 8> pieces{
-			"resources/gui/gui_topleft.png",
-			"resources/gui/gui_top.png",
-			"resources/gui/gui_topright.png",
-			"resources/gui/gui_right.png",
-			"resources/gui/gui_bottomright.png",
-			"resources/gui/gui_bottom.png",
-			"resources/gui/gui_bottomleft.png",
-			"resources/gui/gui_left.png",
-		};
 
-
-		Rectangle tab_rectangle = rectangle + Rectangle{0, int(rectangle.height - 6 * SCALE / UNSCALE), TOP_OFFSET, TOP_OFFSET};
-		stack.pushRelative(tab_rectangle);
-		renderers.updateSize(tab_rectangle.width, tab_rectangle.height);
-		drawFrame(renderers, SCALE / UNSCALE, false, pieces, inner_color);
-		stack.pop();
+		const Rectangle original_rectangle = rectangle;
 
 		stack.pushRelative(rectangle);
 		renderers.updateSize(rectangle.width, rectangle.height);
-		drawFrame(renderers, SCALE, false, pieces, inner_color);
+		drawFrame(renderers, SCALE, false, PIECES, inner_color);
+
+		RectangleRenderer &rectangler = renderers.rectangle;
 
 		rectangle.x = 9 * SCALE;
 		rectangle.y = 9 * SCALE;
@@ -64,12 +62,9 @@ namespace Game3 {
 		}
 
 		innerRectangle = stack.pushRelative(rectangle);
-
 		renderers.updateSize(rectangle.width, rectangle.height);
 
-		RectangleRenderer &rectangler = renderers.rectangle;
-
-		rectangler.drawOnScreen(Color{0, 0, 0, 0.1}, 0, 0, 10000, 10000);
+		rectangler.drawOnScreen(Color{0.6, 0.3, 0, 0.1}, 0, 0, 10000, 10000);
 
 		constexpr static int INNER_SLOT_SIZE = 16;
 		constexpr static int OUTER_SLOT_SIZE = INNER_SLOT_SIZE * 5 / 4;
@@ -120,12 +115,56 @@ namespace Game3 {
 				y += OUTER_SLOT_SIZE * SCALE;
 			}
 		}
+
+		stack.pop();
+		stack.pop();
+
+		auto draw = [&](int i, bool active) {
+			const int x_offset = (TOP_OFFSET + UNSCALED / 4) * i + 40;
+			{
+				auto saver = renderers.getSaver();
+				Rectangle tab_rectangle = original_rectangle + Rectangle{x_offset, UNSCALED * 5 / 4 - TOP_OFFSET, TOP_OFFSET, TOP_OFFSET};
+				stack.pushRelative(tab_rectangle);
+				renderers.updateSize(tab_rectangle.width, tab_rectangle.height);
+				drawFrame(renderers, SCALE / UNSCALE, true, TAB_PIECES, inner_color);
+				stack.pop();
+			}
+
+			if (active) {
+				stack.pushRelative(original_rectangle);
+				renderers.updateSize(original_rectangle.width, original_rectangle.height);
+				rectangler.drawOnScreen(inner_color, x_offset + UNSCALED, 0, TOP_OFFSET - UNSCALED * 2, 6 * SCALE);
+				renderers.singleSprite.drawOnScreen(cacheTexture("resources/gui/gui_merge_left.png", true), RenderOptions{
+					.x = double(x_offset + SCALE / UNSCALE),
+					.y = 0,
+					.sizeX = -1,
+					.sizeY = -1,
+					.scaleX = 1,
+					.scaleY = 1,
+					.invertY = false,
+				});
+				renderers.singleSprite.drawOnScreen(cacheTexture("resources/gui/gui_merge_right.png", true), RenderOptions{
+					.x = double(x_offset - UNSCALED + TOP_OFFSET),
+					.y = 0,
+					.sizeX = -1,
+					.sizeY = -1,
+					.scaleX = 1,
+					.scaleY = 1,
+					.invertY = false,
+				});
+				stack.pop();
+			}
+		};
+
+		for (int i = 0; i < 4; ++i) {
+			draw(i, i == 0);
+		}
 	}
 
 	Rectangle OmniDialog::getPosition() const {
 		Rectangle rectangle = ui.scissorStack.getBase();
 		rectangle.x = rectangle.width * X_FRACTION / 2;
-		rectangle.y = rectangle.height * Y_FRACTION / 2;
+		rectangle.y = rectangle.height * Y_FRACTION / 2 + TOP_OFFSET;
 		rectangle.width *= (1. - X_FRACTION);
 		rectangle.height *= (1. - Y_FRACTION);
 		rectangle.height -= TOP_OFFSET;

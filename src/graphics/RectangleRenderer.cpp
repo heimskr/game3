@@ -40,8 +40,7 @@ namespace Game3 {
 
 	void RectangleRenderer::update(int width, int height) {
 		if (width != backbufferWidth || height != backbufferHeight) {
-			backbufferWidth = width;
-			backbufferHeight = height;
+			HasBackbuffer::update(width, height);
 			projection = glm::ortho(0.f, float(width), float(height), 0.f, -1.f, 1.f);
 			shader.bind(); CHECKGL
 			shader.set("projection", projection); CHECKGL
@@ -82,9 +81,9 @@ namespace Game3 {
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
 		model = glm::translate(model, glm::vec3(x, y, 0.f));
 		if (angle != 0) {
-			model = glm::translate(model, glm::vec3(0.5f * width, 0.5f * height, 0.f)); // move origin of rotation to center of quad
-			model = glm::rotate(model, float(glm::radians(angle)), glm::vec3(0.f, 0.f, 1.f)); // then rotate
-			model = glm::translate(model, glm::vec3(-0.5f * width, -0.5f * height, 0.f)); // move origin back
+			model = glm::translate(model, glm::vec3(width / 2, height / 2, 0)); // move origin of rotation to center of quad
+			model = glm::rotate(model, float(glm::radians(angle)), glm::vec3(0, 0, 1)); // then rotate
+			model = glm::translate(model, glm::vec3(-width / 2, -height / 2, 0)); // move origin back
 		}
 		model = glm::scale(model, glm::vec3(width * canvas.scale / 2., height * canvas.scale / 2., 1.f)); // last scale
 
@@ -125,16 +124,16 @@ namespace Game3 {
 	}
 
 	void RectangleRenderer::initRenderData() {
-		GLuint vbo;
+		GLuint vbo{};
 
 		static const float vertices[] {
-			0.f, 1.f, 0.f, 1.f,
-			1.f, 0.f, 1.f, 0.f,
-			0.f, 0.f, 0.f, 0.f,
+			0, 1, 0, 1,
+			1, 0, 1, 0,
+			0, 0, 0, 0,
 
-			0.f, 1.f, 0.f, 1.f,
-			1.f, 1.f, 1.f, 1.f,
-			1.f, 0.f, 1.f, 0.f,
+			0, 1, 0, 1,
+			1, 1, 1, 1,
+			1, 0, 1, 0,
 		};
 
 		glGenVertexArrays(1, &quadVAO); CHECKGL

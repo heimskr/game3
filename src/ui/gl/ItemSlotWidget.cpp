@@ -22,8 +22,8 @@ namespace Game3 {
 		lastHeight = 16 * scale;
 
 		if (!ui.renderingDraggedWidget) {
-			const float alpha = active? 0.4 : 0.1;
-			renderers.rectangle.drawOnScreen(Color{0, 0, 0, alpha}, x, y, size * scale, size * scale);
+			const float alpha = active? 0.4 : 0.15;
+			renderers.rectangle.drawOnScreen(Color{0.6, 0.3, 0, alpha}, x, y, size * scale, size * scale);
 		}
 
 		if (!stack)

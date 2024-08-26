@@ -18,7 +18,7 @@ namespace Game3 {
 	const Rectangle & ScissorStack::pushRelative(const Rectangle &rect) {
 		const Rectangle old = getTop();
 		const Rectangle &out = stack.emplace_back(old.x + rect.x, old.y + rect.y, std::min(rect.width, old.width - rect.x), std::min(rect.height, old.height - rect.y));
-		out.scissor();
+		out.scissor(base.height);
 		return out;
 	}
 
@@ -26,7 +26,7 @@ namespace Game3 {
 		if (!stack.empty())
 			stack.pop_back();
 
-		getTop().scissor();
+		getTop().scissor(base.height);
 	}
 
 	void ScissorStack::debug() const {

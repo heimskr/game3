@@ -439,8 +439,6 @@ namespace Game3 {
 		for (auto &[widget, tab]: tabMap)
 			tab->reset(game);
 
-		INFO("Player: {}", (void*)game->getPlayer().get());
-
 		game->signalPlayerInventoryUpdate().connect([this](const PlayerPtr &player) {
 			if (player != game->getPlayer())
 				return;

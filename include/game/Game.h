@@ -47,7 +47,7 @@ namespace Game3 {
 			/** Seconds since the last tick */
 			float delta = 0.f;
 			std::chrono::system_clock::time_point startTime = std::chrono::system_clock::now();
-			bool debugMode = true;
+			bool debugMode = false;
 			/** 12 because the game starts at noon */
 			float hourOffset = 12.;
 			std::atomic<double> time = 0.f;
@@ -158,7 +158,7 @@ namespace Game3 {
 			std::chrono::system_clock::time_point lastTime = startTime;
 			Lockable<std::unordered_map<RealmID, RealmPtr>> realms;
 
-			Game() = default;
+			Game();
 
 			void associateWithRealm(const VillagePtr &, RealmID) override;
 

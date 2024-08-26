@@ -15,7 +15,7 @@ namespace Game3 {
 			x(x), y(y), width(width), height(height) {}
 
 
-		void scissor() const;
+		void scissor(int outer_height) const;
 		bool contains(int x, int y) const;
 
 		auto operator<=>(const Rectangle &) const = default;

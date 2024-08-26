@@ -27,6 +27,9 @@
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
+	Game::Game():
+		debugMode(false) {}
+
 	Game::~Game() {
 		dying = true;
 	}

@@ -1,4 +1,5 @@
 #include "graphics/HasBackbuffer.h"
+#include "graphics/RectangleRenderer.h"
 #include "ui/Canvas.h"
 
 #include <stdexcept>
@@ -23,7 +24,6 @@ namespace Game3 {
 
 		const auto [width, height] = sizeQueue.back();
 		sizeQueue.pop_back();
-		backbufferWidth  = width;
-		backbufferHeight = height;
+		update(width, height);
 	}
 }
