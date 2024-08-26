@@ -1,8 +1,10 @@
+#include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/Texture.h"
 #include "ui/gl/tab/Tab.h"
 #include "ui/gl/Constants.h"
+#include "ui/gl/UIContext.h"
 
 namespace Game3 {
 	Tab::Tab(UIContext &ui):
@@ -10,12 +12,13 @@ namespace Game3 {
 
 	void Tab::renderIconTexture(RendererContext &renderers, const std::shared_ptr<Texture> &texture) {
 		renderers.singleSprite.drawOnScreen(texture, RenderOptions{
-			.x = 0,
-			.y = 0,
+			.x = 5 * SCALE,
+			.y = 5 * SCALE,
 			.sizeX = -1,
 			.sizeY = -1,
-			.scaleX = SCALE,
-			.scaleY = SCALE,
+			.scaleX = 5,
+			.scaleY = 5,
+			.invertY = false,
 		});
 	}
 

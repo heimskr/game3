@@ -6,6 +6,7 @@
 #include "graphics/Texture.h"
 #include "graphics/TextRenderer.h"
 #include "ui/gl/module/Module.h"
+#include "ui/gl/tab/CraftingTab.h"
 #include "ui/gl/tab/InventoryTab.h"
 #include "ui/gl/tab/Tab.h"
 #include "ui/gl/Constants.h"
@@ -27,8 +28,10 @@ namespace {
 namespace Game3 {
 	OmniDialog::OmniDialog(UIContext &ui): Dialog(ui) {
 		inventoryTab = std::make_shared<InventoryTab>(ui);
-		tabs = {inventoryTab};
+		craftingTab = std::make_shared<CraftingTab>(ui);
+		tabs = {inventoryTab, craftingTab};
 		activeTab = inventoryTab;
+		tabRectangles.resize(tabs.size());
 	}
 
 	void OmniDialog::render(RendererContext &renderers) {
@@ -68,7 +71,7 @@ namespace Game3 {
 		stack.pop();
 
 		for (int i = 0; const std::shared_ptr<Tab> &tab: tabs) {
-			const int x_offset = (TOP_OFFSET + UNSCALED / 4) * i++ + 40;
+			const int x_offset = (TOP_OFFSET + UNSCALED / 4) * i + 40;
 
 			{
 				auto saver = renderers.getSaver();
@@ -76,6 +79,7 @@ namespace Game3 {
 				stack.pushRelative(tab_rectangle);
 				renderers.updateSize(tab_rectangle.width, tab_rectangle.height);
 				drawFrame(renderers, SCALE / UNSCALE, true, TAB_PIECES, inner_color);
+				tabRectangles.at(i) = tab_rectangle;
 				stack.pop();
 			}
 
@@ -103,8 +107,18 @@ namespace Game3 {
 					.scaleY = 1,
 					.invertY = false,
 				});
+
 				stack.pop();
 			}
+
+			auto saver = renderers.getSaver();
+			Rectangle tab_rectangle = original_rectangle + Rectangle{x_offset, UNSCALED * 5 / 4 - TOP_OFFSET, TOP_OFFSET, TOP_OFFSET};
+			stack.pushRelative(tab_rectangle);
+			renderers.updateSize(tab_rectangle.width, tab_rectangle.height);
+			tab->renderIcon(renderers);
+			stack.pop();
+
+			++i;
 		};
 	}
 
@@ -119,6 +133,13 @@ namespace Game3 {
 	}
 
 	bool OmniDialog::click(int x, int y) {
+		for (size_t i = 0; i < tabRectangles.size(); ++i) {
+			if (tabRectangles[i].contains(x, y)) {
+				activeTab = tabs.at(i);
+				return true;
+			}
+		}
+
 		if (!Dialog::click(x, y))
 			return false;
 

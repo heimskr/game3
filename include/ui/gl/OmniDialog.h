@@ -1,5 +1,6 @@
 #pragma once
 
+#include "graphics/Rectangle.h"
 #include "threading/LockableSharedPtr.h"
 #include "types/Types.h"
 #include "ui/gl/Dialog.h"
@@ -8,13 +9,16 @@
 #include <vector>
 
 namespace Game3 {
+	class CraftingTab;
 	class InventoryTab;
 	class Tab;
 
 	class OmniDialog: public Dialog {
 		public:
 			std::shared_ptr<InventoryTab> inventoryTab;
+			std::shared_ptr<CraftingTab> craftingTab;
 			std::vector<std::shared_ptr<Tab>> tabs;
+			std::vector<Rectangle> tabRectangles;
 			std::shared_ptr<Tab> activeTab;
 
 			OmniDialog(UIContext &);
