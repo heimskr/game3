@@ -56,7 +56,10 @@ CLOC_OPTIONS := . --exclude-dir=voronoi,pvs-report,discord,subprojects,*build*,_
 
 .PHONY: all clean flags test
 
-all: $(NOISE_OBJ) $(OUTPUT)
+all:
+	@ cd builddir && ninja
+
+old_all: $(NOISE_OBJ) $(OUTPUT)
 
 vcpkg_install:
 	vcpkg install
