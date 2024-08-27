@@ -1,3 +1,5 @@
+#include "config.h"
+
 #ifdef GAME3_ENABLE_SCRIPTING
 #include "Log.h"
 #include "game/Game.h"

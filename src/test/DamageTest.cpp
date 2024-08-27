@@ -3,6 +3,7 @@
 #include "types/Types.h"
 #include "util/Histogram.h"
 
+#include <cstddef>
 #include <iomanip>
 #include <iostream>
 #include <map>

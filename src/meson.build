@@ -10,6 +10,7 @@ sqlitecpp = subproject('sqlitecpp', default_options: 'default_library=static')
 miniaudio = subproject('miniaudio')
 
 game3_deps = [
+	cxx.find_library('m'),
 	dependency('gtk4'),
 	dependency('gtkmm-4.0'),
 	dependency('threads'),

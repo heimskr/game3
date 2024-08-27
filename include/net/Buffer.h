@@ -7,6 +7,7 @@
 #include <bit>
 #include <cassert>
 #include <concepts>
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <deque>
@@ -281,78 +282,6 @@ namespace Game3 {
 			}
 
 			template <typename T>
-			Buffer & operator>>(T &);
-
-			template <LinearOrSet T>
-			Buffer & operator>>(T &out) {
-				const auto type = popType();
-				if (!typesMatch(type, getType(T(), false))) {
-					debug();
-					throw std::invalid_argument("Invalid type in buffer (expected list: " + hexString(getType(T(), false), true) + "): " + hexString(type, true));
-				}
-				out = popBuffer<T>(*this);
-				return *this;
-			}
-
-			template <Map M>
-			Buffer & operator>>(M &out) {
-				const auto type = popType();
-				if (!typesMatch(type, getType(M(), false))) {
-					debug();
-					throw std::invalid_argument("Invalid type in buffer (expected map: " + hexString(getType(M(), false), true) + "): " + hexString(type, true));
-				}
-				out = popBuffer<M>(*this);
-				return *this;
-			}
-
-			template <Numeric T>
-			Buffer & operator>>(T &out) {
-				const auto type = popType();
-				if (!typesMatch(type, getType(T(), false))) {
-					debug();
-					throw std::invalid_argument("Invalid type in buffer (expected integral: " + hexString(getType(T(), false), true) + "): " + hexString(type, true));
-				}
-				out = popBuffer<T>(*this);
-				return *this;
-			}
-
-			template <typename T>
-			requires std::is_enum_v<T>
-			Buffer & operator>>(T &out) {
-				std::underlying_type_t<T> raw;
-				*this >> raw;
-				out = static_cast<T>(raw);
-				return *this;
-			}
-
-			template <typename T>
-			Buffer & operator>>(std::optional<T> &out) {
-				const auto type = popType();
-				if (!typesMatch(type, getType(std::optional<T>(), false)))
-					throw std::invalid_argument("Invalid type in buffer (expected optional<" + DEMANGLE(T) + ">: " + hexString(getType(std::make_optional<T>(), false), true) + "): " + hexString(type, true));
-				if (type == "\x0c")
-					out = std::nullopt;
-				else
-					out = take<T>();
-				return *this;
-			}
-
-			template <typename T>
-			Buffer & operator>>(std::shared_ptr<T> &out) {
-				const auto type = popType();
-				if (!typesMatch(type, getType(std::optional<T>(), false)))
-					throw std::invalid_argument("Invalid type in buffer (expected optional<" + DEMANGLE(T) + ">: " + hexString(getType(std::optional<T>(), true), true) + "): " + hexString(type, true));
-				if (type == "\x0c") {
-					out = {};
-				} else {
-					if (!out)
-						out = std::make_shared<T>();
-					*this >> *out;
-				}
-				return *this;
-			}
-
-			template <typename T>
 			T take() {
 				T out = makeForBuffer<T>(*this);
 				*this >> out;
@@ -366,6 +295,78 @@ namespace Game3 {
 			template <typename T>
 			friend T popBuffer(Buffer &);
 	};
+
+	template <typename T>
+	Buffer & operator>>(Buffer &, T &);
+
+	template <LinearOrSet T>
+	Buffer & operator>>(Buffer &buffer, T &out) {
+		const auto type = buffer.popType();
+		if (!buffer.typesMatch(type, buffer.getType(T(), false))) {
+			buffer.debug();
+			throw std::invalid_argument("Invalid type in buffer (expected list: " + hexString(buffer.getType(T(), false), true) + "): " + hexString(type, true));
+		}
+		out = popBuffer<T>(buffer);
+		return buffer;
+	}
+
+	template <Map M>
+	Buffer & operator>>(Buffer &buffer, M &out) {
+		const auto type = buffer.popType();
+		if (!buffer.typesMatch(type, buffer.getType(M(), false))) {
+			buffer.debug();
+			throw std::invalid_argument("Invalid type in buffer (expected map: " + hexString(buffer.getType(M(), false), true) + "): " + hexString(type, true));
+		}
+		out = popBuffer<M>(buffer);
+		return buffer;
+	}
+
+	template <Numeric T>
+	Buffer & operator>>(Buffer &buffer, T &out) {
+		const auto type = buffer.popType();
+		if (!buffer.typesMatch(type, buffer.getType(T(), false))) {
+			buffer.debug();
+			throw std::invalid_argument("Invalid type in buffer (expected integral: " + hexString(buffer.getType(T(), false), true) + "): " + hexString(type, true));
+		}
+		out = popBuffer<T>(buffer);
+		return buffer;
+	}
+
+	template <typename T>
+	requires std::is_enum_v<T>
+	Buffer & operator>>(Buffer &buffer, T &out) {
+		std::underlying_type_t<T> raw;
+		buffer >> raw;
+		out = static_cast<T>(raw);
+		return buffer;
+	}
+
+	template <typename T>
+	Buffer & operator>>(Buffer &buffer, std::optional<T> &out) {
+		const auto type = buffer.popType();
+		if (!buffer.typesMatch(type, buffer.getType(std::optional<T>(), false)))
+			throw std::invalid_argument("Invalid type in buffer (expected optional<" + DEMANGLE(T) + ">: " + hexString(buffer.getType(std::make_optional<T>(), false), true) + "): " + hexString(type, true));
+		if (type == "\x0c")
+			out = std::nullopt;
+		else
+			out = buffer.take<T>();
+		return buffer;
+	}
+
+	template <typename T>
+	Buffer & operator>>(Buffer &buffer, std::shared_ptr<T> &out) {
+		const auto type = buffer.popType();
+		if (!buffer.typesMatch(type, buffer.getType(std::optional<T>(), false)))
+			throw std::invalid_argument("Invalid type in buffer (expected optional<" + DEMANGLE(T) + ">: " + hexString(buffer.getType(std::optional<T>(), true), true) + "): " + hexString(type, true));
+		if (type == "\x0c") {
+			out = {};
+		} else {
+			if (!out)
+				out = std::make_shared<T>();
+			buffer >> *out;
+		}
+		return buffer;
+	}
 
 	using BufferPtr = std::shared_ptr<Buffer>;
 
@@ -433,7 +434,9 @@ namespace Game3 {
 	}
 
 	Buffer & operator<<(Buffer &, std::same_as<nlohmann::json> auto const &);
-	Buffer & operator>>(Buffer &, std::same_as<nlohmann::json> auto &);
+
+	template <>
+	Buffer & operator>>(Buffer &, nlohmann::json &);
 }
 
 template <>

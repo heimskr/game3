@@ -686,8 +686,10 @@ namespace Game3 {
 				}
 
 				std::sort(entities.begin(), entities.end(), [](const EntityPtr &left, const EntityPtr &right) {
-					const std::string left_demangled  = DEMANGLE(*left);
-					const std::string right_demangled = DEMANGLE(*right);
+					Entity &left_ref = *left;
+					Entity &right_ref = *right;
+					const std::string left_demangled  = DEMANGLE(left_ref);
+					const std::string right_demangled = DEMANGLE(right_ref);
 
 					if (left_demangled < right_demangled)
 						return true;

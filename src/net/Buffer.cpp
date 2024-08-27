@@ -598,32 +598,32 @@ namespace Game3 {
 	}
 
 	template <>
-	Buffer & Buffer::operator>><std::string>(std::string &out) {
-		const std::string type = popType();
+	Buffer & operator>>(Buffer &buffer, std::string &out) {
+		const std::string type = buffer.popType();
 		const char front = type.front();
 		uint32_t size{};
 		if (front == '\x1f') {
-			size = popBuffer<uint32_t>(*this);
+			size = popBuffer<uint32_t>(buffer);
 		} else if ('\x10' <= front && front < '\x1f') {
 			size = front - '\x10';
 		} else {
-			debug();
+			buffer.debug();
 			throw std::invalid_argument("Invalid type in buffer (expected string): " + hexString(std::string_view(&front, 1), true));
 		}
 		out.clear();
 		out.reserve(size);
 		for (uint32_t i = 0; i < size; ++i)
-			out.push_back(popBuffer<char>(*this));
-		return *this;
+			out.push_back(popBuffer<char>(buffer));
+		return buffer;
 	}
 
 	template <>
-	Buffer & Buffer::operator>>(Buffer &other) {
-		const std::span<const uint8_t> span = getSpan();
+	Buffer & operator>>(Buffer &buffer, Buffer &other) {
+		const std::span<const uint8_t> span = buffer.getSpan();
 		other.append(span.begin(), span.end());
-		bytes.clear();
-		skip = 0;
-		return *this;
+		buffer.bytes.clear();
+		buffer.skip = 0;
+		return buffer;
 	}
 
 	template<>

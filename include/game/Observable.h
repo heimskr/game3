@@ -15,11 +15,12 @@ namespace Game3 {
 			virtual void addObserver(const std::shared_ptr<Player> &, bool silent);
 			virtual void removeObserver(const std::shared_ptr<Player> &);
 
+			virtual ~Observable() = default;
+
 		protected:
 			Lockable<WeakSet<Player>> observers;
 
 			Observable() = default;
-			virtual ~Observable() = default;
 
 			void cleanObservers();
 	};
