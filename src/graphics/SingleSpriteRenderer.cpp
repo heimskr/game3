@@ -23,7 +23,7 @@ namespace Game3 {
 		initRenderData();
 	}
 
-	SingleSpriteRenderer::SingleSpriteRenderer(SingleSpriteRenderer &&other): SingleSpriteRenderer(*other.canvas) {
+	SingleSpriteRenderer::SingleSpriteRenderer(SingleSpriteRenderer &&other) noexcept: SingleSpriteRenderer(*other.canvas) {
 		other.canvas = nullptr;
 		shader = std::move(other.shader);
 		quadVAO = other.quadVAO;
@@ -48,7 +48,7 @@ namespace Game3 {
 		}
 	}
 
-	SingleSpriteRenderer & SingleSpriteRenderer::operator=(SingleSpriteRenderer &&other) {
+	SingleSpriteRenderer & SingleSpriteRenderer::operator=(SingleSpriteRenderer &&other) noexcept {
 		canvas = other.canvas;
 		other.canvas = nullptr;
 		shader.reset();

@@ -51,7 +51,7 @@ namespace Game3 {
 	}
 
 	std::string ChemicalItem::getTooltip(const ConstItemStackPtr &stack) {
-		const std::string formula = getFormula(*stack);
+		std::string formula = getFormula(*stack);
 		if (formula.empty())
 			return "Unknown Chemical";
 		if (auto iter = moleculeNames.find(formula); iter != moleculeNames.end())

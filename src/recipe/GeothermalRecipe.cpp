@@ -7,8 +7,8 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	GeothermalRecipe::GeothermalRecipe(Input input_, Output output_):
-		input(std::move(input_)), output(output_) {}
+	GeothermalRecipe::GeothermalRecipe(Input input, Output output):
+		input(input), output(output) {}
 
 	GeothermalRecipe::Input GeothermalRecipe::getInput(const GamePtr &) {
 		return input;

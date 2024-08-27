@@ -48,7 +48,7 @@ namespace Game3 {
 	}
 
 	bool Autocrafter::mayInsertItem(const ItemStackPtr &, Direction, Slot slot) {
-		return slot == Slot(-1) || slot < Slot(INPUT_CAPACITY);
+		return slot < Slot(INPUT_CAPACITY);
 	}
 
 	bool Autocrafter::mayExtractItem(Direction, Slot slot) {

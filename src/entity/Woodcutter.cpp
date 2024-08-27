@@ -26,14 +26,14 @@ namespace Game3 {
 
 	Woodcutter::Woodcutter(RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_):
 		Entity(ID()),
-		Worker(ID(), overworld_realm, house_realm, std::move(house_position), std::move(keep_)) {}
+		Worker(ID(), overworld_realm, house_realm, house_position, std::move(keep_)) {}
 
 	std::shared_ptr<Woodcutter> Woodcutter::create(const std::shared_ptr<Game> &) {
 		return Entity::create<Woodcutter>();
 	}
 
 	std::shared_ptr<Woodcutter> Woodcutter::create(const std::shared_ptr<Game> &, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_) {
-		return Entity::create<Woodcutter>(overworld_realm, house_realm, std::move(house_position), std::move(keep_));
+		return Entity::create<Woodcutter>(overworld_realm, house_realm, house_position, std::move(keep_));
 	}
 
 	std::shared_ptr<Woodcutter> Woodcutter::fromJSON(const GamePtr &game, const nlohmann::json &json) {

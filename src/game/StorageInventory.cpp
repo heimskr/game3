@@ -18,7 +18,7 @@ namespace Game3 {
 		storage = other.storage;
 	}
 
-	StorageInventory::StorageInventory(StorageInventory &&other): Inventory() {
+	StorageInventory::StorageInventory(StorageInventory &&other) noexcept: Inventory() {
 		auto lock = other.uniqueLock();
 		weakOwner = std::move(other.weakOwner);
 		slotCount = other.slotCount.exchange(0);
@@ -34,21 +34,19 @@ namespace Game3 {
 		if (this == &other)
 			return *this;
 
-		static_cast<Inventory &>(*this) = other;
 		auto this_lock = uniqueLock();
 		auto other_lock = other.sharedLock();
-		storage = other.storage;
+		Inventory::operator=(other);
 		return *this;
 	}
 
-	StorageInventory & StorageInventory::operator=(StorageInventory &&other) {
+	StorageInventory & StorageInventory::operator=(StorageInventory &&other) noexcept {
 		if (this == &other)
 			return *this;
 
-		static_cast<Inventory &>(*this) = std::move(other);
 		auto this_lock = uniqueLock();
 		auto other_lock = other.uniqueLock();
-		storage = std::move(other.storage);
+		Inventory::operator=(std::move(other));
 		return *this;
 	}
 

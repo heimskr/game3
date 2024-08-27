@@ -13,10 +13,10 @@ namespace Game3 {
 			ClientInventory() = default;
 			ClientInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot = 0, InventoryID = 0, Storage = {});
 			ClientInventory(const ClientInventory &);
-			ClientInventory(ClientInventory &&);
+			ClientInventory(ClientInventory &&) noexcept;
 
 			ClientInventory & operator=(const ClientInventory &);
-			ClientInventory & operator=(ClientInventory &&);
+			ClientInventory & operator=(ClientInventory &&) noexcept;
 
 			std::unique_ptr<Inventory> copy() const override;
 

@@ -7,8 +7,8 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	BiomassLiquefierRecipe::BiomassLiquefierRecipe(Input input_, Output output_):
-		Recipe(input_->getID()), input(std::move(input_)), output(std::move(output_)) {}
+	BiomassLiquefierRecipe::BiomassLiquefierRecipe(Input input, Output output):
+		Recipe(input->getID()), input(std::move(input)), output(output) {}
 
 	BiomassLiquefierRecipe::Input BiomassLiquefierRecipe::getInput(const GamePtr &) {
 		return input;

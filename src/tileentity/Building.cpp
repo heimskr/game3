@@ -6,10 +6,10 @@
 #include "tileentity/Building.h"
 
 namespace Game3 {
-	Building::Building(Identifier id_, Position position_, RealmID inner_realm_id, Position entrance_):
-		TileEntity(std::move(id_), ID(), std::move(position_), true),
+	Building::Building(Identifier id_, Position position, RealmID inner_realm_id, Position entrance):
+		TileEntity(std::move(id_), ID(), position, true),
 		innerRealmID(inner_realm_id),
-		entrance(std::move(entrance_)) {}
+		entrance(entrance) {}
 
 	void Building::toJSON(nlohmann::json &json) const {
 		TileEntity::toJSON(json);

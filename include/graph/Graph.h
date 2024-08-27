@@ -325,7 +325,7 @@ namespace Game3 {
 				}
 			}
 
-			Graph(Graph &&other) {
+			Graph(Graph &&other) noexcept {
 				nodes = std::move(other.nodes);
 				labelMap = std::move(other.labelMap);
 				name = std::move(other.name);
@@ -347,7 +347,7 @@ namespace Game3 {
 				return *this;
 			}
 
-			Graph & operator=(Graph &&other) {
+			Graph & operator=(Graph &&other) noexcept {
 				clear();
 				nodes = std::move(other.nodes);
 				labelMap = std::move(other.labelMap);

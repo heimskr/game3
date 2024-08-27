@@ -19,7 +19,7 @@ namespace Game3 {
 			});
 		}
 
-		window.queue([&game, &window, name = std::move(name), message = std::move(message), ephemeral = ephemeral] {
+		window.queue([&game, &window, name = std::move(name), message = std::move(message), ephemeral = ephemeral] mutable {
 			GTKTextTab &tab = *window.textTab;
 			tab.name = std::move(name);
 			tab.text = std::move(message);

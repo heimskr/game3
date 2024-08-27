@@ -295,12 +295,12 @@ namespace Game3 {
 			const auto old_scale = canvas->scale;
 
 			if (y == -1)
-				canvas->scale *= 1.08f;
+				canvas->scale *= 1.08;
 			else if (y == 1)
-				canvas->scale /= 1.08f;
+				canvas->scale /= 1.08;
 
-			const auto w = glArea.get_width();
-			const auto h = glArea.get_height();
+			const float w(glArea.get_width());
+			const float h(glArea.get_height());
 
 			const auto difference_x = w / old_scale - w / canvas->scale;
 			const auto side_ratio_x = (glAreaMouseX - w / 2.f) / w;

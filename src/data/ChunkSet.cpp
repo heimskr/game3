@@ -47,7 +47,7 @@ namespace Game3 {
 				layer.reserve(CHUNK_SIZE * CHUNK_SIZE);
 				static_assert(sizeof(TileID) == 2);
 				for (size_t i = 0; i < LAYER_BYTE_COUNT; i += sizeof(TileID))
-					layer.push_back(terrain_[i] | (TileID(terrain_[i + 1]) << 8));
+					layer.emplace_back(terrain_[i] | (TileID(terrain_[i + 1]) << 8));
 			}
 
 			terrain_ = terrain_.subspan(LAYER_BYTE_COUNT);
@@ -68,7 +68,7 @@ namespace Game3 {
 			biomes.reserve(CHUNK_SIZE * CHUNK_SIZE);
 			static_assert(sizeof(BiomeType) == 2);
 			for (size_t i = 0; i < BIOMES_BYTE_COUNT; i += sizeof(BiomeType))
-				biomes.push_back(biomes_[i] | (BiomeType(biomes_[i + 1]) << 8));
+				biomes.emplace_back(biomes_[i] | (BiomeType(biomes_[i + 1]) << 8));
 
 			fluids.reserve(CHUNK_SIZE * CHUNK_SIZE);
 			static_assert(sizeof(FluidInt) == 8);

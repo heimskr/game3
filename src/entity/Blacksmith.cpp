@@ -24,14 +24,14 @@ namespace Game3 {
 		Entity(ID()), Worker(ID()), Merchant(ID()) {}
 
 	Blacksmith::Blacksmith(RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_):
-		Entity(ID()), Worker(ID(), overworld_realm, house_realm, std::move(house_position), std::move(keep_)), Merchant(ID()) {}
+		Entity(ID()), Worker(ID(), overworld_realm, house_realm, house_position, std::move(keep_)), Merchant(ID()) {}
 
 	std::shared_ptr<Blacksmith> Blacksmith::create(const std::shared_ptr<Game> &) {
 		return Entity::create<Blacksmith>();
 	}
 
 	std::shared_ptr<Blacksmith> Blacksmith::create(const std::shared_ptr<Game> &, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_) {
-		return Entity::create<Blacksmith>(overworld_realm, house_realm, std::move(house_position), std::move(keep_));
+		return Entity::create<Blacksmith>(overworld_realm, house_realm, house_position, std::move(keep_));
 	}
 
 	std::shared_ptr<Blacksmith> Blacksmith::fromJSON(const GamePtr &game, const nlohmann::json &json) {

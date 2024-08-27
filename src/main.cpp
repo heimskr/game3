@@ -20,7 +20,6 @@
 
 #define JC_VORONOI_IMPLEMENTATION
 #include "jc_voronoi.h"
-#include <GLFW/glfw3.h>
 
 #include <cstdlib>
 #include <ctime>

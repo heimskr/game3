@@ -7,8 +7,8 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	LiquefierRecipe::LiquefierRecipe(Input input_, Output output_):
-		input(std::move(input_)), output(std::move(output_)) {}
+	LiquefierRecipe::LiquefierRecipe(Input input, Output output):
+		input(std::move(input)), output(output) {}
 
 	LiquefierRecipe::Input LiquefierRecipe::getInput(const GamePtr &) {
 		return input;

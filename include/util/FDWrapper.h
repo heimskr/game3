@@ -25,7 +25,7 @@ namespace Game3 {
 			CloningFDWrapper() = default;
 
 			CloningFDWrapper(int descriptor_, const std::vector<int> &to_redirect) {
-				init(descriptor_, std::move(to_redirect));
+				init(descriptor_, to_redirect);
 			}
 
 			void init(int descriptor_, const std::vector<int> &to_redirect) {

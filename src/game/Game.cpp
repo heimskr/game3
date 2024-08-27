@@ -146,7 +146,7 @@ namespace Game3 {
 			if (auto tileset = registry<TilesetRegistry>().maybe(fluid->tilesetName)) {
 				if (auto fluid_tileid = tileset->maybe(fluid->tilename)) {
 					fluidCache.emplace(fluid_id, *fluid_tileid);
-					return *fluid_tileid;
+					return fluid_tileid;
 				}
 			}
 		}

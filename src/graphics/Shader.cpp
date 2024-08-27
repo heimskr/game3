@@ -41,7 +41,7 @@ namespace Game3 {
 		reset();
 	}
 
-	Shader & Shader::operator=(Shader &&other) {
+	Shader & Shader::operator=(Shader &&other) noexcept {
 		reset();
 		name = std::move(other.name);
 		handle = other.handle;

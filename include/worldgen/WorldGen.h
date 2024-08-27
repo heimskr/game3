@@ -28,7 +28,7 @@ namespace Game3 {
 		double noiseZoom = 150.;
 
 		/** noise ∈ [-1, 1] */
-		FluidAmount getFluidLevel(double noise, double threshold = 0.3) const {
+		FluidLevel getFluidLevel(double noise, double threshold = 0.3) const {
 			const double level = (1. + noise) / ((1. + threshold) + wetness);
 			return FluidTile::FULL * std::max(0., std::cos(level * M_PI / 4.));
 		}

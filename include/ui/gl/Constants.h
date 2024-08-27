@@ -1,6 +1,6 @@
 #pragma once
 
-namespace {
+namespace Game3 {
 	constexpr double X_FRACTION = 0.2;
 	constexpr double Y_FRACTION = 0.2;
 	constexpr double SCALE = 8;

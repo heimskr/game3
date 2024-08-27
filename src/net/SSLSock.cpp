@@ -92,7 +92,6 @@ namespace Game3 {
 			bool read_blocked = false;
 			size_t bytes_read = 0;
 			size_t total_bytes_read = 0;
-			int ssl_error = 0;
 			do {
 				read_blocked = false;
 				status = SSL_read_ex(ssl, data, bytes, &bytes_read);
@@ -104,7 +103,7 @@ namespace Game3 {
 					bytes -= bytes_read;
 
 				if (status == 0) {
-					switch (ssl_error = SSL_get_error(ssl, status)) {
+					switch (SSL_get_error(ssl, status)) {
 						case SSL_ERROR_NONE:
 							ERROR_("SSL_ERROR_NONE");
 							break;

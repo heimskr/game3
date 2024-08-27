@@ -33,7 +33,7 @@ namespace Game3 {
 		Combiner("base:tile/combiner"_id, position_) {}
 
 	bool Combiner::mayInsertItem(const ItemStackPtr &, Direction, Slot slot) {
-		if (slot != Slot(-1) && slot >= Slot(INPUT_CAPACITY))
+		if (slot >= Slot(INPUT_CAPACITY))
 			return false;
 
 		return true;

@@ -48,4 +48,4 @@ vgcore.*
 /.localsecret
 /game3.log
 /old
-
+/.codechecker

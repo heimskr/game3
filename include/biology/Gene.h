@@ -14,7 +14,13 @@ namespace Game3 {
 
 			Gene(std::string name_);
 
+			Gene(const Gene &) = default;
+			Gene(Gene &&) noexcept = default;
+
 			virtual ~Gene() = default;
+
+			Gene & operator=(const Gene &) = default;
+			Gene & operator=(Gene &&) noexcept = default;
 
 			virtual void toJSON(nlohmann::json &) const = 0;
 			/** strength ∈ [0.0, 1.0] */

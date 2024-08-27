@@ -68,7 +68,7 @@ namespace Game3 {
 		auto &reg = registry<PacketFactoryRegistry>();
 
 		auto add = [&reg](auto &&factory) {
-			auto shared = std::make_shared<PacketFactory>(std::move(factory));
+			auto shared = std::make_shared<PacketFactory>(std::forward<decltype(factory)>(factory));
 			reg.add(shared->number, shared);
 		};
 

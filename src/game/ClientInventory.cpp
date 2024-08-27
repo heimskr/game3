@@ -29,7 +29,7 @@ namespace Game3 {
 	ClientInventory::ClientInventory(const ClientInventory &other):
 		StorageInventory(other) {}
 
-	ClientInventory::ClientInventory(ClientInventory &&other):
+	ClientInventory::ClientInventory(ClientInventory &&other) noexcept:
 		StorageInventory(std::move(other)) {}
 
 	ClientInventory & ClientInventory::operator=(const ClientInventory &other) {
@@ -37,7 +37,7 @@ namespace Game3 {
 		return *this;
 	}
 
-	ClientInventory & ClientInventory::operator=(ClientInventory &&other) {
+	ClientInventory & ClientInventory::operator=(ClientInventory &&other) noexcept {
 		StorageInventory::operator=(std::move(other));
 		return *this;
 	}

@@ -17,7 +17,7 @@ namespace Game3 {
 
 			~Shader();
 
-			Shader & operator=(Shader &&);
+			Shader & operator=(Shader &&) noexcept;
 
 			void init(std::string_view vertex, std::string_view fragment, std::string_view geometry = {});
 			void bind();

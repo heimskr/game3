@@ -14,7 +14,7 @@ namespace Game3 {
 		Entity(std::move(type_)),
 		overworldRealm(overworld_realm),
 		houseRealm(house_realm),
-		housePosition(std::move(house_position)),
+		housePosition(house_position),
 		keep(std::move(keep_)),
 		keepPosition(keep->position) {}
 

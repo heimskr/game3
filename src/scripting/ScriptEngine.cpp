@@ -22,20 +22,20 @@ namespace Game3 {
 	std::unique_ptr<v8::Platform> ScriptEngine::platform;
 	v8::Isolate::CreateParams ScriptEngine::createParams;
 
-	ScriptEngine::ScriptEngine(std::shared_ptr<Game> game_):
-		game(std::move(game_)),
+	ScriptEngine::ScriptEngine(std::shared_ptr<Game> game):
+		game(game),
 		isolate(makeIsolate()),
 		bufferTemplate(makeBufferTemplate()),
 		globalContext(makeContext()) {}
 
-	ScriptEngine::ScriptEngine(std::shared_ptr<Game> game_, FunctionAdder function_adder):
-		game(std::move(game_)),
+	ScriptEngine::ScriptEngine(std::shared_ptr<Game> game, FunctionAdder function_adder):
+		game(game),
 		isolate(makeIsolate()),
 		bufferTemplate(makeBufferTemplate()),
 		globalContext(makeContext(std::move(function_adder))) {}
 
-	ScriptEngine::ScriptEngine(std::shared_ptr<Game> game_, GlobalMutator global_mutator):
-		game(std::move(game_)),
+	ScriptEngine::ScriptEngine(std::shared_ptr<Game> game, GlobalMutator global_mutator):
+		game(game),
 		isolate(makeIsolate()),
 		bufferTemplate(makeBufferTemplate()),
 		globalContext(makeContext(std::move(global_mutator))) {}

@@ -23,7 +23,7 @@ namespace Game3 {
 		initRenderData();
 	}
 
-	Recolor::Recolor(Recolor &&other): Recolor(*other.canvas) {
+	Recolor::Recolor(Recolor &&other) noexcept: Recolor(*other.canvas) {
 		other.canvas = nullptr;
 		shader = std::move(other.shader);
 		quadVAO = other.quadVAO;
@@ -48,7 +48,7 @@ namespace Game3 {
 		}
 	}
 
-	Recolor & Recolor::operator=(Recolor &&other) {
+	Recolor & Recolor::operator=(Recolor &&other) noexcept {
 		canvas = other.canvas;
 		other.canvas = nullptr;
 		shader.reset();

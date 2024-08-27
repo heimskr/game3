@@ -124,9 +124,11 @@ namespace Game3 {
 			return false;
 
 		client->setClosed();
+		std::string ip = client->ip;
 
 		try {
-			client->socket.async_shutdown([client = std::move(client)](const asio::error_code &errc) {
+			asio::ssl::stream<asio::ip::tcp::socket> &socket = client->socket;
+			socket.async_shutdown([client = std::move(client)](const asio::error_code &errc) {
 				if (errc) {
 					if (errc.value() == 1) // 1 corresponds to stream truncated, a very common error that I don't really consider an error
 						SUCCESS("Mostly managed to shut down client {}.", client->id);
@@ -140,7 +142,7 @@ namespace Game3 {
 		} catch (const asio::system_error &err) {
 			// Who really cares if SSL doesn't shut down properly?
 			// Who decided that the client is worthy of a proper shutdown?
-			ERROR("Shutdown ({}): {} ({})", client->ip, err.what(), err.code().value());
+			ERROR("Shutdown ({}): {} ({})", ip, err.what(), err.code().value());
 		}
 
 		return true;

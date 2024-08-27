@@ -194,10 +194,10 @@ namespace Game3 {
 			Buffer() = default;
 
 			Buffer(const Buffer &) = default;
-			Buffer(Buffer &&);
+			Buffer(Buffer &&) noexcept;
 
 			Buffer & operator=(const Buffer &) = default;
-			Buffer & operator=(Buffer &&);
+			Buffer & operator=(Buffer &&) noexcept;
 
 			explicit Buffer(std::weak_ptr<BufferContext> context_):
 				context(std::move(context_)) {}

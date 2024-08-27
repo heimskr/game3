@@ -122,10 +122,10 @@ namespace Game3 {
 				throw std::runtime_error("Invalid channel count for " + name + ": " + std::to_string(channels) + " (expected 3 or 4)");
 
 			if (desired_dimension == 16 && width == 16 && height == 32) {
-				is_tall.insert(std::move(name));
+				is_tall.insert(name);
 			} else if (desired_dimension == 64 && width == 64 && height == 128) {
 				short_autotiles.erase(name); // lazy tbh
-				tall_autotiles.insert(std::move(name));
+				tall_autotiles.insert(name);
 				out.marchableMap[tilename].tall = true;
 			} else {
 				if (width != desired_dimension)

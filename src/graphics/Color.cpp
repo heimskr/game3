@@ -251,11 +251,7 @@ namespace Game3 {
 		RGB rgb_scale = oklab_to_linear_srgb({L_vt, a_ * C_vt, b_ * C_vt});
 		float scale_L = cbrtf(1.f / fmax(fmax(rgb_scale.r, rgb_scale.g), fmax(rgb_scale.b, 0.f)));
 
-		L = L / scale_L;
-		C = C / scale_L;
-
-		C = C * toe(L) / L;
-		L = toe(L);
+		L = toe(L / scale_L);
 
 		// we can now compute v and s:
 

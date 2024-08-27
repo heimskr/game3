@@ -18,12 +18,12 @@ namespace Game3 {
 
 			SingleSpriteRenderer(Canvas &);
 			SingleSpriteRenderer(const SingleSpriteRenderer &) = delete;
-			SingleSpriteRenderer(SingleSpriteRenderer &&);
+			SingleSpriteRenderer(SingleSpriteRenderer &&) noexcept;
 
 			~SingleSpriteRenderer();
 
 			SingleSpriteRenderer & operator=(const SingleSpriteRenderer &) = delete;
-			SingleSpriteRenderer & operator=(SingleSpriteRenderer &&);
+			SingleSpriteRenderer & operator=(SingleSpriteRenderer &&) noexcept;
 
 			void remove();
 			void update(const Canvas &) override;

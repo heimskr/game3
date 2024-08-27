@@ -17,7 +17,13 @@ namespace Game3 {
 			Widget() = default;
 
 		public:
+			Widget(const Widget &) = default;
+			Widget(Widget &&) noexcept = default;
+
 			virtual ~Widget() = default;
+
+			Widget & operator=(const Widget &) = default;
+			Widget & operator=(Widget &&) noexcept = default;
 
 			virtual Rectangle getLastRectangle() const;
 			/** The implementation is free to ignore the `width` and `height` parameters. */

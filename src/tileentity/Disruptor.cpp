@@ -34,7 +34,7 @@ namespace Game3 {
 		Disruptor("base:tile/disruptor"_id, position_) {}
 
 	bool Disruptor::mayInsertItem(const ItemStackPtr &stack, Direction, Slot slot) {
-		if (slot != Slot(-1) && INPUT_CAPACITY <= slot)
+		if (slot >= INPUT_CAPACITY)
 			return false;
 
 		if (std::dynamic_pointer_cast<ChemicalItem>(stack->item))

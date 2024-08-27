@@ -53,7 +53,7 @@ namespace Game3 {
 
 		private:
 			enum class State {Begin, Data};
-			std::array<char, 16'384> array;
+			std::array<char, 16'384> array{};
 			State state = State::Begin;
 			Buffer buffer;
 			uint16_t packetType = 0;

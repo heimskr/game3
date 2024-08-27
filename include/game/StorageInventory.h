@@ -18,11 +18,11 @@ namespace Game3 {
 			StorageInventory() = default;
 			StorageInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, InventoryID, Storage);
 			StorageInventory(const StorageInventory &);
-			StorageInventory(StorageInventory &&);
+			StorageInventory(StorageInventory &&) noexcept;
 
 		public:
 			StorageInventory & operator=(const StorageInventory &);
-			StorageInventory & operator=(StorageInventory &&);
+			StorageInventory & operator=(StorageInventory &&) noexcept;
 
 			ItemStackPtr operator[](Slot) const override;
 

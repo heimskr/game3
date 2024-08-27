@@ -6,7 +6,18 @@ namespace Game3 {
 	class Realm;
 
 	class HasDimensions {
+		protected:
+			HasDimensions() = default;
+
 		public:
+			HasDimensions(const HasDimensions &) = default;
+			HasDimensions(HasDimensions &&) noexcept = default;
+
+			virtual ~HasDimensions() = default;
+
+			HasDimensions & operator=(const HasDimensions &) = default;
+			HasDimensions & operator=(HasDimensions &&) noexcept = default;
+
 			virtual Vector2i getDimensions() const;
 			virtual Vector2i getAnchor() const;
 			virtual Position getPosition() const = 0;

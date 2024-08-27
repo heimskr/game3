@@ -18,7 +18,13 @@ namespace Game3 {
 
 		using R::R;
 
+		Recipe(const Recipe &) = default;
+		Recipe(Recipe &&) noexcept = default;
+
 		virtual ~Recipe() = default;
+
+		Recipe & operator=(const Recipe &) = default;
+		Recipe & operator=(Recipe &&) noexcept = default;
 
 		/** Returns a copy of the ingredient of the recipe. */
 		virtual Input getInput(const std::shared_ptr<Game> &) = 0;

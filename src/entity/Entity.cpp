@@ -409,6 +409,8 @@ namespace Game3 {
 			case 2:
 				texture_y_offset = 16. * (static_cast<int>(remapDirection(direction, 0x1324)) - 1);
 				break;
+			default:
+				break;
 		}
 
 		const auto [row, column] = position.copyBase();
@@ -1198,8 +1200,8 @@ namespace Game3 {
 		if (is_client) {
 			auto item_texture = game->registry<ItemTextureRegistry>().at((*inventory)[held.slot]->item->identifier);
 			held.texture = item_texture->getTexture();
-			held.offsetX = item_texture->x / 2.;
-			held.offsetY = item_texture->y / 2.;
+			held.offsetX = item_texture->x / 2.f;
+			held.offsetY = item_texture->y / 2.f;
 		}
 
 		return true;

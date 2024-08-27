@@ -27,7 +27,7 @@ namespace Game3 {
 		ChemicalReactor("base:tile/chemical_reactor"_id, position_) {}
 
 	bool ChemicalReactor::mayInsertItem(const ItemStackPtr &stack, Direction, Slot slot) {
-		if (slot != Slot(-1) && Slot(INPUT_CAPACITY) <= slot)
+		if (slot >= Slot(INPUT_CAPACITY))
 			return false;
 
 		if (auto chemical = std::dynamic_pointer_cast<ChemicalItem>(stack->item))

@@ -39,9 +39,9 @@ namespace Game3 {
 		auto click = Gtk::GestureClick::create();
 
 		if (press) {
-			click->signal_pressed().connect(std::move(fn));
+			click->signal_pressed().connect(std::forward<Fn>(fn));
 		} else {
-			click->signal_released().connect(std::move(fn));
+			click->signal_released().connect(std::forward<Fn>(fn));
 		}
 
 		if (0 <= button)
@@ -55,7 +55,7 @@ namespace Game3 {
 	Glib::RefPtr<Gtk::GestureClick> createClick(Fn &&fn, int button = -1, bool press = false) {
 		auto click = Gtk::GestureClick::create();
 
-		auto wrapped = [fn = std::move(fn)](int, double, double) {
+		auto wrapped = [fn = std::forward<Fn>(fn)](int, double, double) {
 			fn();
 		};
 

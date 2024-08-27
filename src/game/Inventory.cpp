@@ -39,7 +39,7 @@ namespace Game3 {
 		return *this;
 	}
 
-	Inventory & Inventory::operator=(Inventory &&other) {
+	Inventory & Inventory::operator=(Inventory &&other) noexcept {
 		if (this == &other)
 			return *this;
 
@@ -132,6 +132,6 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Inventory> Inventory::create(std::shared_ptr<Agent> owner, Slot slot_count, InventoryID index, Slot active_slot, std::map<Slot, ItemStackPtr> storage) {
-		return create(owner->getSide(), owner, slot_count, active_slot, index, std::move(storage));
+		return create(owner->getSide(), owner, slot_count, index, active_slot, std::move(storage));
 	}
 }

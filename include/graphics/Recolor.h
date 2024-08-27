@@ -4,10 +4,14 @@
 
 #include "graphics/HasBackbuffer.h"
 #include "graphics/OpenGL.h"
+#include "graphics/Shader.h"
+
+#include <memory>
 
 namespace Game3 {
 	class Canvas;
 	class Texture;
+	struct RenderOptions;
 
 	class Recolor: public HasBackbuffer {
 		public:
@@ -18,12 +22,12 @@ namespace Game3 {
 
 			Recolor(Canvas &);
 			Recolor(const Recolor &) = delete;
-			Recolor(Recolor &&);
+			Recolor(Recolor &&) noexcept;
 
 			~Recolor();
 
 			Recolor & operator=(const Recolor &) = delete;
-			Recolor & operator=(Recolor &&);
+			Recolor & operator=(Recolor &&) noexcept;
 
 			void remove();
 			void update(const Canvas &);

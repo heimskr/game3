@@ -12,7 +12,14 @@ namespace Game3 {
 	class Packet {
 		public:
 			Packet() = default;
+
+			Packet(const Packet &) = default;
+			Packet(Packet &&) noexcept = default;
+
 			virtual ~Packet() = default;
+
+			Packet & operator=(const Packet &) = default;
+			Packet & operator=(Packet &&) noexcept = default;
 
 			bool valid = true;
 

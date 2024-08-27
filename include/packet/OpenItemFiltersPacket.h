@@ -15,8 +15,8 @@ namespace Game3 {
 		bool removeOnMove = true;
 
 		OpenItemFiltersPacket() = default;
-		OpenItemFiltersPacket(RealmID realm_id, const Position &position_, Direction direction_, bool remove_on_move = true):
-			realmID(std::move(realm_id)), position(position_), direction(direction_), removeOnMove(remove_on_move) {}
+		OpenItemFiltersPacket(RealmID realm_id, const Position &position, Direction direction, bool remove_on_move = true):
+			realmID(realm_id), position(position), direction(direction), removeOnMove(remove_on_move) {}
 
 		PacketID getID() const override { return ID(); }
 

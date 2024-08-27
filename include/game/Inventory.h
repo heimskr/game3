@@ -40,7 +40,7 @@ namespace Game3 {
 			std::function<std::function<void()>(Slot)> onRemove;
 
 			Inventory & operator=(const Inventory &);
-			Inventory & operator=(Inventory &&);
+			Inventory & operator=(Inventory &&) noexcept;
 
 			virtual std::unique_ptr<Inventory> copy() const = 0;
 

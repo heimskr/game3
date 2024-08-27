@@ -6,8 +6,8 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	CentrifugeRecipe::CentrifugeRecipe(Input input_, std::map<nlohmann::json, double> weight_map):
-		input(std::move(input_)), weightMap(std::move(weight_map)) {}
+	CentrifugeRecipe::CentrifugeRecipe(Input input, std::map<nlohmann::json, double> weight_map):
+		input(input), weightMap(std::move(weight_map)) {}
 
 	CentrifugeRecipe::Input CentrifugeRecipe::getInput(const GamePtr &) {
 		return input;
@@ -37,7 +37,9 @@ namespace Game3 {
 		if (!inventory->canInsert(output))
 			return false;
 
-		assert(0. <= (fluids->levels.at(input.id) -= input.amount));
+		auto remaining = fluids->levels.at(input.id) -= input.amount;
+
+		assert(0. <= remaining);
 		leftovers = inventory->add(output);
 		assert(!*leftovers);
 		leftovers.reset();

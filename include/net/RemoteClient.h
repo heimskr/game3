@@ -25,10 +25,16 @@ namespace Game3 {
 					parent_->startBuffering();
 				}
 
+				BufferGuard(const BufferGuard &) = delete;
+				BufferGuard(BufferGuard &&) noexcept = default;
+
 				~BufferGuard() {
 					if (auto locked = parent.lock())
 						locked->stopBuffering();
 				}
+
+				BufferGuard & operator=(const BufferGuard &) = delete;
+				BufferGuard & operator=(BufferGuard &&) noexcept = default;
 			};
 
 			constexpr static size_t MAX_PACKET_SIZE = 1 << 24;
@@ -36,8 +42,6 @@ namespace Game3 {
 			RemoteClient() = delete;
 
 			using GenericClient::GenericClient;
-
-			~RemoteClient() override = default;
 
 			void handleInput(std::string_view) override;
 			bool send(const Packet &);

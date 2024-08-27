@@ -24,8 +24,8 @@ namespace Game3 {
 		Lockable(const T &other): T(other) {}
 
 		/** Likely data race issue. */
-		Lockable(Lockable<T, M> &&other): T(other.getBase()) {}
-		Lockable(T &&other): T(other) {}
+		Lockable(Lockable<T, M> &&other) noexcept: T(std::move(other.getBase())) {}
+		Lockable(T &&other) noexcept: T(std::move(other)) {}
 
 		Lockable<T, M> & operator=(const Lockable<T, M> &other) {
 			if (this == &other)
@@ -36,7 +36,7 @@ namespace Game3 {
 			return *this;
 		}
 
-		Lockable<T, M> & operator=(Lockable<T, M> &&other) {
+		Lockable<T, M> & operator=(Lockable<T, M> &&other) noexcept {
 			if (this == &other)
 				return *this;
 			auto this_lock = uniqueLock();
@@ -53,7 +53,7 @@ namespace Game3 {
 		}
 
 		template <typename U>
-		Lockable<T, M> & operator=(U &&other) {
+		Lockable<T, M> & operator=(U &&other) noexcept {
 			auto lock = uniqueLock();
 			T::operator=(std::forward<U>(other));
 			return *this;

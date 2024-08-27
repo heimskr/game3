@@ -15,11 +15,11 @@ namespace Game3 {
 
 		LoginPacket() = default;
 
-		LoginPacket(std::string_view username_, Token token_):
-			username(username_), token(token_) {}
+		LoginPacket(std::string_view username, Token token):
+			username(username), token(token) {}
 
-		LoginPacket(std::string_view username_, Token token_, std::string display_name):
-			username(std::move(username_)), token(token_), displayName(std::move(display_name)) {}
+		LoginPacket(std::string_view username, Token token, std::string display_name):
+			username(username), token(token), displayName(std::move(display_name)) {}
 
 		PacketID getID() const override { return ID(); }
 

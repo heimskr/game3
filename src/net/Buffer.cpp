@@ -15,12 +15,12 @@
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
-	Buffer::Buffer(Buffer &&other):
+	Buffer::Buffer(Buffer &&other) noexcept:
 	bytes(std::move(other.bytes)), skip(other.skip), context(std::move(other.context)) {
 		other.skip = 0;
 	}
 
-	Buffer & Buffer::operator=(Buffer &&other) {
+	Buffer & Buffer::operator=(Buffer &&other) noexcept {
 		bytes = std::move(other.bytes);
 		skip = other.skip;
 		context = std::move(other.context);

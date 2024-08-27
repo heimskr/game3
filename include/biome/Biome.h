@@ -23,11 +23,18 @@ namespace Game3 {
 			constexpr static BiomeType SHIP      = 7;
 			constexpr static BiomeType COUNT     = SHIP + 1;
 
-			const BiomeType type;
+			BiomeType type;
 
 			Biome() = delete;
 			Biome(BiomeType type_): type(type_) {}
+
+			Biome(const Biome &) = default;
+			Biome(Biome &&) noexcept = default;
+
 			virtual ~Biome() = default;
+
+			Biome & operator=(const Biome &) = default;
+			Biome & operator=(Biome &&) noexcept = default;
 
 			virtual void init(Realm &realm_, int noise_seed);
 

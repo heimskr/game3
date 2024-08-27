@@ -31,7 +31,7 @@ namespace Game3 {
 		auto &reg = registry<EntityFactoryRegistry>();
 
 		auto add = [&](auto &&factory) {
-			auto shared = std::make_shared<EntityFactory>(std::move(factory));
+			auto shared = std::make_shared<EntityFactory>(std::forward<decltype(factory)>(factory));
 			reg.add(shared->identifier, shared);
 		};
 

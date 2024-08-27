@@ -18,7 +18,14 @@ namespace Game3 {
 			NoiseGenerator(int seed_):
 				seed(seed_) {}
 
+			NoiseGenerator(const NoiseGenerator &) = default;
+			NoiseGenerator(NoiseGenerator &&) noexcept = default;
+
 			virtual ~NoiseGenerator() = default;
+
+			NoiseGenerator & operator=(const NoiseGenerator &) = default;
+			NoiseGenerator & operator=(NoiseGenerator &&) noexcept = default;
+
 			virtual double operator()(double x, double y) const = 0;
 			virtual double operator()(double x, double y, double z) const = 0;
 			// virtual void fill(std::vector<float> &, double x, double y,
@@ -65,19 +72,19 @@ namespace Game3 {
 				perlin.SetSeed(seed);
 			}
 
-			LibnoiseGenerator(LibnoiseGenerator &&other):
-				LibnoiseGenerator(other.seed) {}
-
 			LibnoiseGenerator(const LibnoiseGenerator &other):
 				LibnoiseGenerator(other.seed) {}
 
-			LibnoiseGenerator & operator=(LibnoiseGenerator &&other) {
+			LibnoiseGenerator(LibnoiseGenerator &&other) noexcept:
+				LibnoiseGenerator(other.seed) {}
+
+			LibnoiseGenerator & operator=(const LibnoiseGenerator &other) {
 				perlin.SetSeed(other.seed);
 				seed = other.seed;
 				return *this;
 			}
 
-			LibnoiseGenerator & operator=(const LibnoiseGenerator &other) {
+			LibnoiseGenerator & operator=(LibnoiseGenerator &&other) noexcept{
 				perlin.SetSeed(other.seed);
 				seed = other.seed;
 				return *this;
