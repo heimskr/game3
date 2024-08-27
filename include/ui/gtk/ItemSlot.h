@@ -38,7 +38,6 @@ namespace Game3 {
 			std::weak_ptr<ClientGame> weakGame;
 			Slot slot;
 			std::shared_ptr<ClientInventory> inventory;
-			bool isEmpty = true;
 			bool durabilityVisible = false;
 			ItemSlotParent *parent = nullptr;
 			ItemStackPtr storedStack;

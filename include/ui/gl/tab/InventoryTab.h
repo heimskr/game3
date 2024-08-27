@@ -3,7 +3,7 @@
 #include "graphics/Rectangle.h"
 #include "threading/LockableSharedPtr.h"
 #include "ui/gl/tab/Tab.h"
-#include "ui/gl/ItemSlotWidget.h"
+#include "ui/gl/widget/ItemSlotWidget.h"
 
 namespace Game3 {
 	class Module;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ui/gl/Widget.h"
+#include "ui/gl/widget/Widget.h"
 
 #include <memory>
 
@@ -19,10 +19,11 @@ namespace Game3 {
 
 		public:
 			ItemSlotWidget(std::shared_ptr<ItemStack>, Slot, double size, double scale, bool active = false);
+			ItemSlotWidget(Slot, double size, double scale, bool active = false);
 
-			void render(UIContext &, RendererContext &, float x, float y) final;
+			void render(UIContext &, RendererContext &, float x, float y, float width, float height) final;
 			std::shared_ptr<Widget> getDragStartWidget() final;
-			bool click(UIContext &) final;
+			bool click(UIContext &, int x, int y) final;
 			void setStack(std::shared_ptr<ItemStack>);
 			void setActive(bool);
 			Slot getSlot() const;

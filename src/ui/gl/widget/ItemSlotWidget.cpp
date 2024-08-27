@@ -8,15 +8,18 @@
 #include "graphics/TextRenderer.h"
 #include "item/Item.h"
 #include "packet/SetActiveSlotPacket.h"
-#include "ui/gl/ItemSlotWidget.h"
+#include "ui/gl/widget/ItemSlotWidget.h"
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
 	ItemSlotWidget::ItemSlotWidget(ItemStackPtr stack, Slot slot, double size, double scale, bool active):
 		stack(std::move(stack)), slot(slot), size(size), scale(scale), active(active) {}
 
-	void ItemSlotWidget::render(UIContext &ui, RendererContext &renderers, float x, float y) {
-		Widget::render(ui, renderers, x, y);
+	ItemSlotWidget::ItemSlotWidget(Slot slot, double size, double scale, bool active):
+		ItemSlotWidget(nullptr, slot, size, scale, active) {}
+
+	void ItemSlotWidget::render(UIContext &ui, RendererContext &renderers, float x, float y, float width, float height) {
+		Widget::render(ui, renderers, x, y, width, height);
 
 		lastWidth = 16 * scale;
 		lastHeight = 16 * scale;
@@ -57,7 +60,7 @@ namespace Game3 {
 		return stack? shared_from_this() : nullptr;
 	}
 
-	bool ItemSlotWidget::click(UIContext &ui) {
+	bool ItemSlotWidget::click(UIContext &ui, int, int) {
 		ui.getGame()->getPlayer()->send(SetActiveSlotPacket(slot));
 		return true;
 	}

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ui/gl/Widget.h"
+#include "ui/gl/widget/Widget.h"
 
 namespace Game3 {
 	class Module: public Widget {

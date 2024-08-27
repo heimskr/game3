@@ -9,11 +9,6 @@
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 
-namespace {
-	constexpr int INNER_SLOT_SIZE = 16;
-	constexpr int OUTER_SLOT_SIZE = INNER_SLOT_SIZE * 5 / 4;
-}
-
 namespace Game3 {
 	void InventoryTab::render(UIContext &ui, RendererContext &renderers) {
 		innerRectangle = ui.scissorStack.getTop();
@@ -59,7 +54,7 @@ namespace Game3 {
 		double y = (OUTER_SLOT_SIZE - INNER_SLOT_SIZE) * SLOT_SCALE;
 
 		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
-			widget->render(ui, renderers, x, y);
+			widget->render(ui, renderers, x, y, -1, -1);
 
 			x += OUTER_SLOT_SIZE * SLOT_SCALE;
 
@@ -78,7 +73,7 @@ namespace Game3 {
 	void InventoryTab::click(int x, int y) {
 		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
 			Rectangle rectangle = innerRectangle + widget->getLastRectangle();
-			if (rectangle.contains(x, y) && widget->click(ui))
+			if (rectangle.contains(x, y) && widget->click(ui, x, y))
 				break;
 		}
 	}

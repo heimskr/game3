@@ -8,4 +8,7 @@ namespace {
 	constexpr double UNSCALE = 1.6;
 	constexpr int TOP_OFFSET = 20 * SCALE;
 	constexpr int UNSCALED = 6 * SCALE / UNSCALE;
+	constexpr int INNER_SLOT_SIZE = 16;
+	constexpr int OUTER_SLOT_SIZE = INNER_SLOT_SIZE * 5 / 4;
+	constexpr int SLOT_PADDING = OUTER_SLOT_SIZE - INNER_SLOT_SIZE;
 }

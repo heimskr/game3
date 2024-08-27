@@ -29,7 +29,7 @@ namespace Game3 {
 		private:
 			class Row: public Gtk::Box {
 				public:
-					Row(const std::shared_ptr<ClientGame> &, VillageID, const Item &item, double amount_, double greed_);
+					Row(const std::shared_ptr<ClientGame> &, VillageID, const Item &item, double amount_);
 
 					void setAmount(double);
 					void updateLabel();
@@ -41,7 +41,6 @@ namespace Game3 {
 					ItemSlot itemSlot;
 					double basePrice{};
 					double amount{};
-					double greed{};
 					Gtk::Label quantityLabel;
 					Gtk::SpinButton transferAmount;
 					Gtk::Button buyButton{"Buy"};

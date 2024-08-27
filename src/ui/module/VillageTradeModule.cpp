@@ -235,21 +235,20 @@ namespace Game3 {
 				iter->second->setAmount(amount);
 				iter->second->updateLabel();
 			} else if (1.0 <= amount) {
-				auto row = std::make_unique<Row>(game, village->getID(), *game->getItem(resource), amount, village->getGreed());
+				auto row = std::make_unique<Row>(game, village->getID(), *game->getItem(resource), amount);
 				vbox.append(*row);
 				rows[resource] = std::move(row);
 			}
 		}
 	}
 
-	VillageTradeModule::Row::Row(const ClientGamePtr &game, VillageID village_id, const Item &item, double amount_, double greed_):
+	VillageTradeModule::Row::Row(const ClientGamePtr &game, VillageID village_id, const Item &item, double amount_):
 	Gtk::Box(Gtk::Orientation::HORIZONTAL),
 	villageID(village_id),
 	resource(item.identifier),
 	itemSlot(game, -1, nullptr),
 	basePrice(item.basePrice),
-	amount(amount_),
-	greed(greed_) {
+	amount(amount_) {
 		itemSlot.setStack(ItemStack::create(game, resource, ItemCount(-1)));
 		updateLabel();
 		updateTooltips(1);

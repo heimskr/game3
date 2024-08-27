@@ -1,6 +1,9 @@
 #include "game/ClientGame.h"
 #include "graphics/RendererContext.h"
 #include "graphics/Texture.h"
+#include "types/Types.h"
+#include "ui/gl/widget/HotbarWidget.h"
+#include "ui/gl/Constants.h"
 #include "ui/gl/Dialog.h"
 #include "ui/gl/UIContext.h"
 #include "ui/Canvas.h"
@@ -9,27 +12,40 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+namespace {
+	constexpr ::Game3::Slot SLOT_COUNT = 10;
+	constexpr float HOTBAR_SCALE = 6;
+}
+
 namespace Game3 {
 	UIContext::UIContext(Canvas &canvas):
-		canvas(canvas) {}
+		canvas(canvas), hotbarWidget(std::make_unique<HotbarWidget>(SLOT_COUNT, HOTBAR_SCALE)) {}
 
 	void UIContext::render(float mouse_x, float mouse_y) {
 		RendererContext context = canvas.getRendererContext();
 
-		for (const std::shared_ptr<Dialog> &dialog: dialogs) {
+		const int factor = canvas.getFactor();
+
+		if (dialogs.empty()) {
 			scissorStack = internalScissorStack;
-			dialog->render(context);
+			constexpr static float width = (OUTER_SLOT_SIZE * 10 + SLOT_PADDING) * HOTBAR_SCALE;
+			constexpr static float height = (OUTER_SLOT_SIZE + SLOT_PADDING) * HOTBAR_SCALE;
+			hotbarWidget->render(*this, context, (canvas.getWidth() * factor - width) / 2, canvas.getHeight() * factor - (OUTER_SLOT_SIZE * 2 - INNER_SLOT_SIZE / 2) * HOTBAR_SCALE, width, height);
+		} else {
+			for (const std::shared_ptr<Dialog> &dialog: dialogs) {
+				scissorStack = internalScissorStack;
+				dialog->render(context);
+			}
 		}
 
 		if (draggedWidget && draggedWidgetActive) {
 			scissorStack = internalScissorStack;
-			const int factor = canvas.getFactor();
 			const int width = canvas.getWidth() * factor * factor;
 			const int height = canvas.getHeight() * factor * factor;
 			GL::Viewport(0, 0, width, height);
 			context.updateSize(width, height);
 			renderingDraggedWidget = true;
-			draggedWidget->render(*this, context, mouse_x * factor, mouse_y * factor + height / factor);
+			draggedWidget->render(*this, context, mouse_x * factor, mouse_y * factor + height / factor, -1, -1);
 			renderingDraggedWidget = false;
 		}
 	}

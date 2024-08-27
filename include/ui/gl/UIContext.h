@@ -2,7 +2,8 @@
 
 #include "graphics/ScissorStack.h"
 #include "ui/gl/Dialog.h"
-#include "ui/gl/Widget.h"
+#include "ui/gl/widget/HotbarWidget.h"
+#include "ui/gl/widget/Widget.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -16,6 +17,7 @@ namespace Game3 {
 	class Canvas;
 	class ClientGame;
 	class ClientPlayer;
+	class HotbarWidget;
 	class Texture;
 	struct RendererContext;
 
@@ -23,11 +25,12 @@ namespace Game3 {
 		private:
 			Canvas &canvas;
 			std::vector<std::shared_ptr<Dialog>> dialogs;
-			ScissorStack internalScissorStack;
+			ScissorStack internalScissorStack; // TODO: remove this
 			std::map<std::filesystem::path, std::shared_ptr<Texture>> textureMap;
 			WidgetPtr draggedWidget;
 			bool draggedWidgetActive = false;
 			std::optional<std::pair<int, int>> dragOrigin;
+			std::unique_ptr<HotbarWidget> hotbarWidget;
 
 			template <typename T>
 			static bool dialogMatcher(const std::shared_ptr<Dialog> &dialog) {
