@@ -1,3 +1,4 @@
+#include "Options.h"
 #include "game/ClientGame.h"
 #include "graphics/RendererContext.h"
 #include "graphics/Texture.h"
@@ -13,13 +14,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace {
-	constexpr ::Game3::Slot SLOT_COUNT = 10;
 	constexpr float HOTBAR_SCALE = 6;
 }
 
 namespace Game3 {
 	UIContext::UIContext(Canvas &canvas):
-		canvas(canvas), hotbarWidget(std::make_unique<HotbarWidget>(SLOT_COUNT, HOTBAR_SCALE)) {}
+		canvas(canvas), hotbarWidget(std::make_unique<HotbarWidget>(HOTBAR_SCALE)) {}
 
 	void UIContext::render(float mouse_x, float mouse_y) {
 		RendererContext context = canvas.getRendererContext();
@@ -28,7 +28,7 @@ namespace Game3 {
 
 		if (dialogs.empty()) {
 			scissorStack = internalScissorStack;
-			constexpr static float width = (OUTER_SLOT_SIZE * 10 + SLOT_PADDING) * HOTBAR_SCALE;
+			constexpr static float width = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING) * HOTBAR_SCALE;
 			constexpr static float height = (OUTER_SLOT_SIZE + SLOT_PADDING) * HOTBAR_SCALE;
 			hotbarWidget->render(*this, context, (canvas.getWidth() * factor - width) / 2, canvas.getHeight() * factor - (OUTER_SLOT_SIZE * 2 - INNER_SLOT_SIZE / 2) * HOTBAR_SCALE, width, height);
 		} else {
@@ -67,7 +67,7 @@ namespace Game3 {
 			if (dialog->click(x, y))
 				return true;
 
-		return false;
+		return hotbarWidget->click(*this, x, y);
 	}
 
 	bool UIContext::dragStart(int x, int y) {

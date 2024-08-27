@@ -46,7 +46,7 @@ namespace Game3 {
 
 		previousActive = active_slot;
 
-		const int column_count = std::max<int>(1, innerRectangle.width / (OUTER_SLOT_SIZE * SLOT_SCALE));
+		const int column_count = std::min(10, std::max<int>(1, innerRectangle.width / (OUTER_SLOT_SIZE * SLOT_SCALE)));
 		const double x_pad = (innerRectangle.width - column_count * (OUTER_SLOT_SIZE * SLOT_SCALE) + (OUTER_SLOT_SIZE - INNER_SLOT_SIZE) * SLOT_SCALE) / 2;
 
 		int column = 0;

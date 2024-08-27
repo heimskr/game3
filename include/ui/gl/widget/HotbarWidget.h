@@ -1,5 +1,6 @@
 #pragma once
 
+#include "graphics/Rectangle.h"
 #include "types/Types.h"
 #include "ui/gl/widget/ItemSlotWidget.h"
 #include "ui/gl/widget/Widget.h"
@@ -9,12 +10,11 @@
 namespace Game3 {
 	class HotbarWidget: public Widget {
 		private:
-			Slot slotCount{};
 			double scale{};
-			std::vector<ItemSlotWidget> slotWidgets;
+			std::vector<std::shared_ptr<ItemSlotWidget>> slotWidgets;
 
 		public:
-			HotbarWidget(Slot slot_count, double scale);
+			HotbarWidget(double scale);
 
 			void render(UIContext &, RendererContext &, float x, float y, float width, float height) final;
 			bool click(UIContext &, int x, int y) final;

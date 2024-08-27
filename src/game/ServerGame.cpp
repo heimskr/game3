@@ -401,10 +401,10 @@ namespace Game3 {
 				if (words.size() < 2)
 					return {false, "Not enough arguments."};
 
-				long count = 1;
+				ItemCount count = 1;
 				if (3 <= words.size()) {
 					try {
-						count = parseLong(words.at(2));
+						count = parseNumber<ItemCount>(words.at(2));
 					} catch (const std::invalid_argument &) {
 						return {false, "Invalid count."};
 					}

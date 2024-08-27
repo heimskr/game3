@@ -1,5 +1,7 @@
 #pragma once
 
+#include "types/Types.h"
+
 namespace Game3 {
 	constexpr double X_FRACTION = 0.2;
 	constexpr double Y_FRACTION = 0.2;
@@ -11,4 +13,5 @@ namespace Game3 {
 	constexpr int INNER_SLOT_SIZE = 16;
 	constexpr int OUTER_SLOT_SIZE = INNER_SLOT_SIZE * 5 / 4;
 	constexpr int SLOT_PADDING = OUTER_SLOT_SIZE - INNER_SLOT_SIZE;
+	constexpr Slot HOTBAR_SIZE = 10;
 }
