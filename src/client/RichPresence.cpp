@@ -32,7 +32,7 @@ namespace Game3 {
 		return [callback = std::move(callback)](discord::Result result) {
 			if (result != discord::Result::Ok) {
 				if (result == discord::Result::TransactionAborted)
-					ERRORX_(3, "Couldn't set activity: transaction aborted");
+					ERROR(3, "Couldn't set activity: transaction aborted");
 				else
 					ERROR("Couldn't set activity: {}", int(result));
 			}

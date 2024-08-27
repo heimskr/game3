@@ -215,9 +215,9 @@ namespace Game3 {
 			if (auto network = networks[pipe_type]) {
 				if (first) {
 					first = false;
-					INFO_("================================");
+					INFO("================================");
 				} else {
-					INFO_("--------------------------------");
+					INFO("--------------------------------");
 				}
 
 				INFO("{} network ID: {}, loaded: {}", pipe_type, network->getID(), loaded[pipe_type]);

@@ -62,7 +62,7 @@ namespace Game3 {
 			if (stack)
 				setSellStack(stack);
 			else
-				WARN_("No stack in sellSlot.onDrop");
+				WARN("No stack in sellSlot.onDrop");
 			return true;
 		};
 
@@ -150,7 +150,7 @@ namespace Game3 {
 
 	void VillageTradeModule::updateSell(const ItemStackPtr &stack) {
 		if (!village) {
-			WARN_("No village in VillageTradeModule::setSellStack");
+			WARN("No village in VillageTradeModule::setSellStack");
 			return;
 		}
 

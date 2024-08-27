@@ -37,11 +37,11 @@ namespace Game3 {
 		auto fluid_lock = fluidContainer->levels.sharedLock();
 
 		if (fluidContainer->levels.empty()) {
-			WARNX_(2, "No fluids.");
+			WARN(2, "No fluids.");
 		} else {
 			GamePtr game = realm->getGame();
 			for (const auto &[id, amount]: fluidContainer->levels)
-				INFOX(2, "{} = {}", game->getFluid(id)->identifier, amount);
+				INFO(2, "{} = {}", game->getFluid(id)->identifier, amount);
 		}
 
 		return false;

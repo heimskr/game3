@@ -20,7 +20,7 @@ namespace Game3 {
 		if (connected || force) {
 			ControlMessage message = ControlMessage::Close;
 			if (-1 == ::write(controlWrite, &message, sizeof(message)))
-				WARN_("Couldn't write to control pipe");
+				WARN("Couldn't write to control pipe");
 
 			if (force) {
 				if (ssl != nullptr)
@@ -33,7 +33,7 @@ namespace Game3 {
 				connected = false;
 			}
 		} else
-			WARN_("Can't close: not connected");
+			WARN("Can't close: not connected");
 	}
 
 	ssize_t SSLSock::send(const void *data, size_t bytes, bool force) {
@@ -50,19 +50,19 @@ namespace Game3 {
 
 		if (status == 1) {
 #ifdef SPAM
-			SPAM_("SSLSock::send(status == 1): bytes[" << bytes << "], written[" << written << "]");
+			SPAM("SSLSock::send(status == 1): bytes[{}], written[{}]", bytes, written);
 			std::stringstream ss;
 			std::string str(static_cast<const char *>(data), written);
 			for (const uint8_t byte: str)
 				ss << ' ' << std::hex << std::setfill('0') << std::setw(2) << std::right << static_cast<uint16_t>(byte) << std::dec;
 			while (!str.empty() && (str.back() == '\r' || str.back() == '\n'))
 				str.pop_back();
-			SPAM_("    \"" << str << "\":" << ss.str());
+			SPAM("    \"{}\":{}", str, ss.str());
 #endif
 			return static_cast<ssize_t>(written);
 		}
 
-		SPAM_("SSLSock::send(status == " << status << "): bytes[" << bytes << "], written[" << written << "], error[" << SSL_get_error(ssl, status) << "], errno[" << errno << "]");
+		SPAM("SSLSock::send(status == {}): bytes[{}], written[{}], error[{}], errno[{}]", status, bytes, written, SSL_get_error(ssl, status), errno);
 		return -SSL_get_error(ssl, status);
 	}
 
@@ -105,11 +105,11 @@ namespace Game3 {
 				if (status == 0) {
 					switch (SSL_get_error(ssl, status)) {
 						case SSL_ERROR_NONE:
-							ERROR_("SSL_ERROR_NONE");
+							ERROR("SSL_ERROR_NONE");
 							break;
 
 						case SSL_ERROR_ZERO_RETURN:
-							ERROR_("SSL_ERROR_ZERO_RETURN");
+							ERROR("SSL_ERROR_ZERO_RETURN");
 							close(false);
 							break;
 
@@ -118,16 +118,16 @@ namespace Game3 {
 							break;
 
 						case SSL_ERROR_WANT_WRITE:
-							ERROR_("SSL_ERROR_WANT_WRITE");
+							ERROR("SSL_ERROR_WANT_WRITE");
 							break;
 
 						case SSL_ERROR_SYSCALL:
-							ERROR_("SSL_ERROR_SYSCALL");
+							ERROR("SSL_ERROR_SYSCALL");
 							close(false);
 							break;
 
 						default:
-							ERROR_("default SSL error");
+							ERROR("default SSL error");
 							close(false);
 							break;
 					}
@@ -136,7 +136,7 @@ namespace Game3 {
 					std::string read_str(reinterpret_cast<const char *>(data), bytes_read);
 					while (!read_str.empty() && (read_str.back() == '\r' || read_str.back() == '\n'))
 						read_str.pop_back();
-					SPAM_("SSLSock::recv(status == 1): \"" << read_str << "\"");
+					SPAM("SSLSock::recv(status == 1): \"{}\"", read_str);
 #endif
 				}
 			} while (SSL_pending(ssl) && !read_blocked && 0 < bytes);
@@ -209,20 +209,20 @@ namespace Game3 {
 		if (status < 0)
 			throw std::runtime_error("fcntl(F_SETFL) returned " + std::to_string(status));
 
-		SPAM_("Connected with " << SSL_get_cipher(ssl));
+		SPAM("Connected with {}", SSL_get_cipher(ssl));
 
 		X509 *cert = SSL_get_peer_certificate(ssl);
 		if (cert != nullptr) {
-			SPAM_("Server");
+			SPAM("Server");
 			char *line = X509_NAME_oneline(X509_get_subject_name(cert), 0, 0);
-			SPAM_("Subject: " << line);
+			SPAM("Subject: {}", line);
 			free(line);
 			line = X509_NAME_oneline(X509_get_issuer_name(cert), 0, 0);
-			SPAM_("Issuer: " << line);
+			SPAM("Issuer: {}", line);
 			free(line);
 			X509_free(cert);
 		} else {
-			SPAM_("No client certificates configured.");
+			SPAM("No client certificates configured.");
 		}
 	}
 }

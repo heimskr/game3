@@ -21,7 +21,7 @@ namespace Game3 {
 			player->setInventory(inventory, 0);
 			player->getInventory(0)->notifyOwner();
 		} else {
-			ERROR_("InventoryPacket::handle: player is missing");
+			ERROR("InventoryPacket::handle: player is missing");
 			assert(player);
 		}
 	}

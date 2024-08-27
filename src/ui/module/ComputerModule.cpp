@@ -45,7 +45,7 @@ namespace Game3 {
 				javascript = readFile(path);
 			} catch (const std::exception &err) {
 				std::string message = std::format("Reading from {} failed: {}", path.c_str(), err.what());
-				ERROR_(message);
+				ERROR(message);
 				vte_terminal_feed(vte, "\e[31m", 5);
 				vte_terminal_feed(vte, message.data(), message.size());
 				vte_terminal_feed(vte, "\e[39m\r\n", 7);

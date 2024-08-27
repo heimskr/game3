@@ -3,6 +3,7 @@
 #include <format>
 #include <iostream>
 #include <mutex>
+#include <print>
 #include <string>
 
 // #define NO_LOGS
@@ -13,100 +14,89 @@ namespace Game3::Logger {
 	std::string getTimestamp();
 }
 
+namespace Game3 {
 #ifdef NO_LOGS
-#define INFOX_(message)    do {} while (false)
-#define WARNX_(message)    do {} while (false)
-#define ERRORX_(message)   do {} while (false)
-#define SPAMX_(message)    do {} while (false)
-#define SUCCESSX_(message) do {} while (false)
+	template <typename... Args>
+	void INFO(Args &&...) {}
+	template <typename... Args>
+	void WARN(Args &&...) {}
+	template <typename... Args>
+	void ERROR(Args &&...) {}
+	template <typename... Args>
+	void SPAM(Args &&...) {}
+	template <typename... Args>
+	void SUCCESS(Args &&...) {}
 #else
-#define LOG_START "\e[2m[\e[1m"
-#define LOG_INFO_MIDDLE "\e[22;2m]\e[22m (\e[22;1;34mi\e[22;39m)\e[2m ::\e[22m "
-#define LOG_WARN_MIDDLE "\e[22;2m]\e[22m (\e[22;1;33m!\e[22;39m)\e[2m ::\e[22m "
-#define LOG_ERROR_MIDDLE "\e[22;2m]\e[22m (\e[22;1;31m!\e[22;39m)\e[2m ::\e[22m "
-#define LOG_SPAM_MIDDLE "\e[22;2m]\e[22m (\e[22;1;35m_\e[22;39m)\e[2m :: "
-#define LOG_SUCCESS_MIDDLE "\e[22;2m]\e[22m (\e[22;1;32m🗸\e[22;39m)\e[2m :: \e[22;32m"
-#define INFOX_(lvl, message) \
-	do { if (Game3::Logger::level < (lvl)) break; \
-	     std::unique_lock lock(Game3::Logger::mutex); \
-	     std::cerr << LOG_START << ::Game3::Logger::getTimestamp() \
-	               << LOG_INFO_MIDDLE << message << '\n'; } while (false)
+#define LOG_START "\x1b[2m[\x1b[1m"
+#define LOG_INFO_MIDDLE "\x1b[22;2m]\x1b[22m (\x1b[22;1;34mi\x1b[22;39m)\x1b[2m ::\x1b[22m "
+#define LOG_WARN_MIDDLE "\x1b[22;2m]\x1b[22m (\x1b[22;1;33m!\x1b[22;39m)\x1b[2m ::\x1b[22m "
+#define LOG_ERROR_MIDDLE "\x1b[22;2m]\x1b[22m (\x1b[22;1;31m!\x1b[22;39m)\x1b[2m ::\x1b[22m "
+#define LOG_SPAM_MIDDLE "\x1b[22;2m]\x1b[22m (\x1b[22;1;35m_\x1b[22;39m)\x1b[2m :: "
+#define LOG_SUCCESS_MIDDLE "\x1b[22;2m]\x1b[22m (\x1b[22;1;32m🗸\x1b[22;39m)\x1b[2m :: \x1b[22;32m"
+	template <typename... Args>
+	void INFO(std::format_string<Args...> format, Args &&...args) {
+		std::unique_lock lock(Game3::Logger::mutex);
+		std::print(std::cerr, "{}{}{}", LOG_START, Logger::getTimestamp(), LOG_INFO_MIDDLE);
+		std::println(std::cerr, format, std::forward<Args>(args)...);
+	}
 
-#define WARNX_(lvl, message) \
-	do { if (Game3::Logger::level < (lvl)) break; \
-	     std::unique_lock lock(Game3::Logger::mutex); \
-	     std::cerr << LOG_START << ::Game3::Logger::getTimestamp() \
-	               << LOG_WARN_MIDDLE << message << '\n'; } while (false)
+	template <typename... Args>
+	void INFO(int level, std::format_string<Args...> format, Args &&...args) {
+		if (level <= Logger::level)
+			INFO(format, std::forward<Args>(args)...);
+	}
 
-#define ERRORX_(lvl, message) \
-	do { if (Game3::Logger::level < (lvl)) break; \
-	     std::unique_lock lock(Game3::Logger::mutex); \
-	     std::cerr << LOG_START << ::Game3::Logger::getTimestamp() \
-	               << LOG_ERROR_MIDDLE << message << '\n'; } while (false)
+	template <typename... Args>
+	void WARN(std::format_string<Args...> format, Args &&...args) {
+		std::unique_lock lock(Game3::Logger::mutex);
+		std::print(std::cerr, "{}{}{}", LOG_START, Logger::getTimestamp(), LOG_WARN_MIDDLE);
+		std::println(std::cerr, format, std::forward<Args>(args)...);
+	}
 
-#define SPAMX_(lvl, message) \
-	do { if (Game3::Logger::level < (lvl)) break; \
-	     std::unique_lock lock(Game3::Logger::mutex); \
-	     std::cerr << LOG_START << ::Game3::Logger::getTimestamp() \
-	               << LOG_SPAM_MIDDLE << message << "\e[22m\n"; } while (false)
+	template <typename... Args>
+	void WARN(int level, std::format_string<Args...> format, Args &&...args) {
+		if (level <= Logger::level)
+			WARN(format, std::forward<Args>(args)...);
+	}
 
-#define SUCCESSX_(lvl, message) \
-	do { if (Game3::Logger::level < (lvl)) break; \
-	     std::unique_lock lock(Game3::Logger::mutex); \
-	     std::cerr << LOG_START << ::Game3::Logger::getTimestamp() \
-	               << LOG_SUCCESS_MIDDLE << message << "\e[39m\n"; } while (false)
+	template <typename... Args>
+	void ERROR(std::format_string<Args...> format, Args &&...args) {
+		std::unique_lock lock(Game3::Logger::mutex);
+		std::print(std::cerr, "{}{}{}", LOG_START, Logger::getTimestamp(), LOG_ERROR_MIDDLE);
+		std::println(std::cerr, format, std::forward<Args>(args)...);
+	}
+
+	template <typename... Args>
+	void ERROR(int level, std::format_string<Args...> format, Args &&...args) {
+		if (level <= Logger::level)
+			ERROR(format, std::forward<Args>(args)...);
+	}
+
+	template <typename... Args>
+	void SPAM(std::format_string<Args...> format, Args &&...args) {
+		std::unique_lock lock(Game3::Logger::mutex);
+		std::print(std::cerr, "{}{}{}", LOG_START, Logger::getTimestamp(), LOG_SPAM_MIDDLE);
+		std::println(std::cerr, format, std::forward<Args>(args)...);
+	}
+
+	template <typename... Args>
+	void SPAM(int level, std::format_string<Args...> format, Args &&...args) {
+		if (level <= Logger::level)
+			SPAM(format, std::forward<Args>(args)...);
+	}
+
+	template <typename... Args>
+	void SUCCESS(std::format_string<Args...> format, Args &&...args) {
+		std::unique_lock lock(Game3::Logger::mutex);
+		std::print(std::cerr, "{}{}{}", LOG_START, Logger::getTimestamp(), LOG_SUCCESS_MIDDLE);
+		std::print(std::cerr, format, std::forward<Args>(args)...);
+		std::println(std::cerr, "\x1b[39m");
+	}
+
+	template <typename... Args>
+	void SUCCESS(int level, std::format_string<Args...> format, Args &&...args) {
+		if (level <= Logger::level)
+			SUCCESS(format, std::forward<Args>(args)...);
+	}
 #endif
-
-#ifdef NO_LOGS
-#define INFOX(fmt, ...)    do {} while (false)
-#define WARNX(fmt, ...)    do {} while (false)
-#define ERRORX(fmt, ...)   do {} while (false)
-#define SPAMX(fmt, ...)    do {} while (false)
-#define SUCCESSX(fmt, ...) do {} while (false)
-#else
-#define INFOX(lvl, fmt, ...) \
-	do { if (Game3::Logger::level < (lvl)) break; \
-	     std::unique_lock lock(Game3::Logger::mutex); \
-	     std::cerr << LOG_START << ::Game3::Logger::getTimestamp() << LOG_INFO_MIDDLE \
-	               << std::format(fmt, __VA_ARGS__) << '\n'; } while (false)
-
-#define WARNX(lvl, fmt, ...) \
-	do { if (Game3::Logger::level < (lvl)) break; \
-	     std::unique_lock lock(Game3::Logger::mutex); \
-	     std::cerr << LOG_START << ::Game3::Logger::getTimestamp() << LOG_WARN_MIDDLE \
-	               << std::format(fmt, __VA_ARGS__) << '\n'; } while (false)
-
-#define ERRORX(lvl, fmt, ...) \
-	do { if (Game3::Logger::level < (lvl)) break; \
-	     std::unique_lock lock(Game3::Logger::mutex); \
-	     std::cerr << LOG_START << ::Game3::Logger::getTimestamp() << LOG_ERROR_MIDDLE \
-	               << std::format(fmt, __VA_ARGS__) << '\n'; } while (false)
-
-#define SPAMX(lvl, fmt, ...) \
-	do { if (Game3::Logger::level < (lvl)) break; \
-	     std::unique_lock lock(Game3::Logger::mutex); \
-	     std::cerr << LOG_START << ::Game3::Logger::getTimestamp() << LOG_SPAM_MIDDLE \
-	               << std::format(fmt, __VA_ARGS__) << "\e[22m\n"; } while (false)
-
-#define SUCCESSX(lvl, fmt, ...) \
-	do { if (Game3::Logger::level < (lvl)) break; \
-	     std::unique_lock lock(Game3::Logger::mutex); \
-	     std::cerr << LOG_START << ::Game3::Logger::getTimestamp() << LOG_SUCCESS_MIDDLE \
-	               << std::format(fmt, __VA_ARGS__) << "\e[39m\n"; } while (false)
-#endif
-
-#define INFO(fmt, ...)    INFOX(1, fmt, __VA_ARGS__)
-#define WARN(fmt, ...)    WARNX(1, fmt, __VA_ARGS__)
-#define ERROR(fmt, ...)   ERRORX(1, fmt, __VA_ARGS__)
-#define SPAM(fmt, ...)    SPAMX(1, fmt, __VA_ARGS__)
-#define SUCCESS(fmt, ...) SUCCESSX(1, fmt, __VA_ARGS__)
-#define INFO_(message)    INFOX_(1, message)
-#define WARN_(message)    WARNX_(1, message)
-#define ERROR_(message)   ERRORX_(1, message)
-#define SPAM_(message)    SPAMX_(1, message)
-#define SUCCESS_(message) SUCCESSX_(1, message)
-
-#undef SPAM
-#undef SPAM_
-#define SPAM(fmt, ...)
-#define SPAM_(message)
+}

@@ -56,7 +56,7 @@ namespace Game3 {
 		topBox.append(pasteButton);
 
 		copyButton.signal_clicked().connect([this] {
-			INFO_("Clicked Copy");
+			INFO("Clicked Copy");
 			if (filter) {
 				game->getPlayer()->copyItemFilter(*filter);
 				pasteButton.set_sensitive(true);
@@ -170,7 +170,7 @@ namespace Game3 {
 			return;
 
 		if (!pipe) {
-			WARN_("Pipe is missing in ItemFilterModule::upload");
+			WARN("Pipe is missing in ItemFilterModule::upload");
 			return;
 		}
 

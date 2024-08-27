@@ -69,9 +69,9 @@ namespace Game3 {
 			INFO("  Visible to player? {:s}", player->visibleEntities.contains(getSelf()));
 		}
 		if (auto ptr = realm->getEntities(getChunk()); ptr && ptr->contains(getSelf()))
-			SUCCESS_("  In chunk.");
+			SUCCESS("  In chunk.");
 		else
-			ERROR_("  Not in chunk.");
+			ERROR("  Not in chunk.");
 		INFO("  First wander: {}", firstWander);
 		INFO("  Attempting wander: {:s}", attemptingWander.load());
 		return true;

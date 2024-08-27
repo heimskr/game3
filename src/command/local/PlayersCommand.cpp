@@ -10,7 +10,7 @@ namespace Game3 {
 	void PlayersCommand::operator()(LocalClient &client) {
 		auto game = client.weakGame.lock();
 		if (!game) {
-			WARN_("No game.");
+			WARN("No game.");
 			return;
 		}
 
@@ -24,7 +24,7 @@ namespace Game3 {
 		}
 
 		if (players.empty()) {
-			WARN_("No players.");
+			WARN("No players.");
 		}
 
 		INFO("{} player{}", players.size(), players.size() == 1? ":" : "s:");
@@ -33,9 +33,9 @@ namespace Game3 {
 				INFO("- GID[\e[1m{}\e[22m], Position[\e[1m{}\e[22m], RealmID[\e[1m{}\e[22m], Offsets[\e[1m{}\e[22m], Realm->ID[\e[3{}m{}\e[39m]",
 					player->getGID(), player->getPosition(), player->realmID, player->offset, player->realmID == realm->id? '2' : '3', realm->id);
 				if (!realm->hasEntity(player->getGID()))
-					WARN_("  \e[33mSeemingly not present in realm!\e[39m");
+					WARN("  \e[33mSeemingly not present in realm!\e[39m");
 				else
-					SUCCESS_("  Present in realm.");
+					SUCCESS("  Present in realm.");
 			} else
 				WARN("- GID[\e[1m{}\e[22m], Position[\e[1m{}\e[22m], RealmID[\e[1m{}\e[22m], Offsets[\e[1m{}\e[22m], no realm pointer", player->getGID(), player->getPosition(), player->realmID, player->offset);
 		}
@@ -43,6 +43,6 @@ namespace Game3 {
 		if (auto player = game->getPlayer())
 			INFO("Self ID: {}", player->getGID());
 		else
-			WARN_("Couldn't find self.");
+			WARN("Couldn't find self.");
 	}
 }

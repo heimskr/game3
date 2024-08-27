@@ -18,7 +18,7 @@ namespace Game3 {
 			outbox.clear();
 		}
 
-		INFOX(3, "\e[31m~GenericClient\e[39m({})", reinterpret_cast<void *>(this));
+		INFO(3, "\e[31m~GenericClient\e[39m({})", reinterpret_cast<void *>(this));
 	}
 
 	void GenericClient::start() {

@@ -81,7 +81,7 @@ namespace Game3 {
 			std::ofstream ofs(path / "tile.json");
 			ofs << json.dump();
 
-			SUCCESS_("Patched " << path.filename());
+			SUCCESS("Patched {}", path.filename().string());
 		}
 	}
 }

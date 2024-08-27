@@ -60,7 +60,7 @@ namespace Game3 {
 
 		std::vector<std::thread> threads;
 
-		INFO_("Starting threads. Yikes.");
+		INFO("Starting threads. Yikes.");
 
 		for (int i = 0; i < 8; ++i) {
 			threads.emplace_back([&] {
@@ -72,7 +72,7 @@ namespace Game3 {
 		for (std::thread &thread: threads)
 			thread.join();
 
-		INFO_("Done.");
+		INFO("Done.");
 	}
 
 	void scriptEngineTest() {

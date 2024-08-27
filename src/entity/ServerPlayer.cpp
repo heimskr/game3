@@ -49,7 +49,7 @@ namespace Game3 {
 				const auto &players = game->toServer().players;
 				auto lock = players.sharedLock();
 				if (players.empty()) {
-					INFO_("No remaining players.");
+					INFO("No remaining players.");
 					return;
 				}
 
@@ -131,7 +131,7 @@ namespace Game3 {
 			for (const auto &weak_visible: visibleEntities) {
 				if (auto visible = weak_visible.lock()) {
 					if (!visible->path.empty() && visible->hasSeenPath(shared)) {
-						// INFO_("Late sending EntitySetPathPacket (Player)");
+						// INFO("Late sending EntitySetPathPacket (Player)");
 						toServer()->ensureEntity(visible);
 						send(EntitySetPathPacket(*visible));
 						visible->setSeenPath(shared);

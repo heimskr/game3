@@ -65,7 +65,7 @@ namespace Game3 {
 						Agent &agent = *agent_ptr;
 						INFO("Agent typeid: {}", DEMANGLE(agent));
 					} else {
-						INFO_("Agent is expired.");
+						INFO("Agent is expired.");
 					}
 				}
 

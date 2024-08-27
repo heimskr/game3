@@ -58,7 +58,7 @@ namespace Game3 {
 		const EnergyAmount consumed_energy = ENERGY_PER_ACTION;
 		auto energy_lock = energyContainer->uniqueLock();
 		if (consumed_energy > energyContainer->energy) {
-			ERRORX(3, "Not enough energy ({} < {}).", energyContainer->energy, consumed_energy);
+			ERROR(3, "Not enough energy ({} < {}).", energyContainer->energy, consumed_energy);
 			return;
 		}
 
@@ -67,19 +67,19 @@ namespace Game3 {
 
 		ItemStackPtr orb = (*inventory)[0];
 		if (!ContainmentOrb::validate(orb) || !ContainmentOrb::isEmpty(orb)) {
-			ERRORX_(3, "No empty containment orb.");
+			ERROR(3, "No empty containment orb.");
 			return;
 		}
 
 		ItemStackPtr genetic_template = (*inventory)[1];
 		if (!genetic_template || genetic_template->getID() != "base:item/genetic_template") {
-			ERRORX_(3, "No template.");
+			ERROR(3, "No template.");
 			return;
 		}
 
 		auto genes_iter = genetic_template->data.find("genes");
 		if (genes_iter == genetic_template->data.end()) {
-			ERRORX_(3, "No genes.");
+			ERROR(3, "No genes.");
 			return;
 		}
 
@@ -89,13 +89,13 @@ namespace Game3 {
 		auto fluids_lock = fluidContainer->levels.uniqueLock();
 		auto fluid_iter = fluidContainer->levels.find(*biomassID);
 		if (fluid_iter == fluidContainer->levels.end() || fluid_iter->second < FLUID_PER_ACTION) {
-			ERRORX(3, "Insufficient liquid biomass ({} < {}).", fluid_iter->second, FLUID_PER_ACTION);
+			ERROR(3, "Insufficient liquid biomass ({} < {}).", fluid_iter->second, FLUID_PER_ACTION);
 			return;
 		}
 
 		LivingEntityPtr entity = makeEntity(args.game, *genes_iter);
 		if (!entity) {
-			ERRORX_(3, "Couldn't make entity.");
+			ERROR(3, "Couldn't make entity.");
 			return;
 		}
 
@@ -206,36 +206,36 @@ namespace Game3 {
 	LivingEntityPtr Incubator::makeEntity(const GamePtr &game, const nlohmann::json &genes) {
 		auto species_iter = genes.find("species");
 		if (species_iter == genes.end()) {
-			ERRORX_(3, "No species.");
+			ERROR(3, "No species.");
 			return nullptr;
 		}
 
 		Identifier species = species_iter->at("value");
 		if (species.empty()) {
-			ERRORX_(3, "Empty species.");
+			ERROR(3, "Empty species.");
 			return nullptr;
 		}
 
 		auto factory = game->registry<EntityFactoryRegistry>().maybe(species);
 		if (!factory) {
-			ERRORX_(3, "No factory.");
+			ERROR(3, "No factory.");
 			return nullptr;
 		}
 
 		EntityPtr entity = (*factory)(game);
 		if (!entity) {
-			ERRORX_(3, "No entity.");
+			ERROR(3, "No entity.");
 			return nullptr;
 		}
 
 		auto living = std::dynamic_pointer_cast<LivingEntity>(entity);
 		if (!living) {
-			ERRORX_(3, "No living entity.");
+			ERROR(3, "No living entity.");
 			return nullptr;
 		}
 
 		if (!living->canAbsorbGenes(genes)) {
-			ERRORX_(3, "Can't absorb genes.");
+			ERROR(3, "Can't absorb genes.");
 			return nullptr;
 		}
 

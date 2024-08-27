@@ -33,7 +33,7 @@ namespace Game3 {
 		if (connected) {
 			ControlMessage message = ControlMessage::Close;
 			if (-1 == ::write(controlWrite, &message, sizeof(message)))
-				WARN_("Couldn't write control message to Sock pipe");
+				WARN("Couldn't write control message to Sock pipe");
 			::close(netFD);
 			connected = false;
 		}
@@ -84,12 +84,12 @@ namespace Game3 {
 			ControlMessage message = ControlMessage::Close;
 
 			if (-1 == ::write(controlWrite, &message, sizeof(message)))
-				WARN_("Couldn't write to control pipe");
+				WARN("Couldn't write to control pipe");
 
 			if (force)
 				::close(netFD);
 		} else
-			WARN_("Can't close: not connected");
+			WARN("Can't close: not connected");
 	}
 
 	ssize_t Sock::send(const void *data, size_t bytes, bool force) {
@@ -137,7 +137,7 @@ namespace Game3 {
 			return 0;
 		}
 
-		SPAM_("No file descriptor is ready.");
+		SPAM("No file descriptor is ready.");
 		return -1;
 	}
 

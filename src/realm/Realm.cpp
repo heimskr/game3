@@ -961,7 +961,7 @@ namespace Game3 {
 		const Position position = tile_entity->getPosition();
 		auto iter = tileEntities.find(position);
 		if (iter == tileEntities.end()) {
-			WARN_("Can't remove tile entity: not found");
+			WARN("Can't remove tile entity: not found");
 			return; // Probably already destroyed. Could happen if the tile entity was queued for removal multiple times in the same tick.
 		}
 		iter->second->onRemove();

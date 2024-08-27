@@ -189,7 +189,7 @@ namespace Game3 {
 			ERROR("Skip: {:L}", buffer.skip);
 			ERROR("Span size: {:L}", span.size());
 			ERROR("Span size_bytes: {:L}", span.size_bytes());
-			INFO_(hexString(buffer.bytes, true));
+			INFO("{}", hexString(buffer.bytes, true));
 			throw std::out_of_range("Buffer is empty");
 		}
 		const char out = span[0];

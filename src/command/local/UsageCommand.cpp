@@ -8,17 +8,17 @@ namespace Game3 {
 	extern Lockable<std::unordered_map<std::string, size_t>> entityUpdates;
 
 	void UsageCommand::operator()(LocalClient &client) {
-		INFO_("");
+		INFO("");
 		INFO("Header bytes: \e[3{}m{:L}\e[39m", client.headerBytes.empty()? '2' : '1', client.headerBytes.size());
 		INFO("Payload size: \e[33m{:L}\e[39m", client.payloadSize);
 		{
-			INFO_("Packets received:");
+			INFO("Packets received:");
 			auto lock = client.receivedPacketCounts.sharedLock();
 			for (const auto &[packet_id, count]: client.receivedPacketCounts)
 				INFO("    {:3}\e[2m:\e[22m {:L}", packet_id, count);
 		}
 		{
-			INFO_("Packets sent:");
+			INFO("Packets sent:");
 			auto lock = client.sentPacketCounts.sharedLock();
 			for (const auto &[packet_id, count]: client.sentPacketCounts)
 				INFO("    {:3}\e[2m:\e[22m {:L}", packet_id, count);
@@ -30,7 +30,7 @@ namespace Game3 {
 		{
 			auto lock = entityUpdates.sharedLock();
 			if (!entityUpdates.empty()) {
-				INFO_("Entity updates:");
+				INFO("Entity updates:");
 				size_t total = 0;
 				for (const auto &[name, updates]: entityUpdates) {
 					INFO("- {}: \e[32m{:L}\e[39m", name, updates);

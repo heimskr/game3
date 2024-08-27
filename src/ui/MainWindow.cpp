@@ -151,7 +151,7 @@ namespace Game3 {
 		glArea.set_use_es(false);
 		glArea.signal_realize().connect([this] {
 			glArea.make_current();
-			INFOX(3, "Using ES: {}", glArea.get_context()->get_use_es());
+			INFO(3, "Using ES: {}", glArea.get_context()->get_use_es());
 			glArea.throw_if_error();
 			canvas = std::make_unique<Canvas>(*this);
 		});

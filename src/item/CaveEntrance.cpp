@@ -57,7 +57,7 @@ namespace Game3 {
 			// Attempt to place a ladder in the existing cave realm.
 			auto cave = std::dynamic_pointer_cast<Cave>(game->getRealm(*realm_id));
 			if (!cave) {
-				WARN_("Can't place ladder in cave: cave is null");
+				WARN("Can't place ladder in cave: cave is null");
 			} else {
 				const Position position_in_cave = position / Cave::SCALE;
 				for (size_t i = 0; i < LADDER_ATTEMPTS; ++i) {

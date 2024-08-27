@@ -13,7 +13,7 @@ namespace Game3 {
 			return;
 		}
 
-		SUCCESS_("Registration succeeded: token = " << token);
+		SUCCESS("Registration succeeded: token = {}", token);
 
 		LocalClientPtr client = game->getClient();
 		client->setToken(client->getHostname(), username, token);

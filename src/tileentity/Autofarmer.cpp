@@ -199,7 +199,7 @@ namespace Game3 {
 
 				if (!warned) {
 					warned = true;
-					WARN_("No tiles found in category base:category/farmland");
+					WARN("No tiles found in category base:category/farmland");
 				}
 
 				return false;

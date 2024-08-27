@@ -34,7 +34,7 @@ namespace Game3 {
 	}
 
 	ServerGame::~ServerGame() {
-		INFOX(3, "\e[31m~ServerGame\e[39m({})", reinterpret_cast<void *>(this));
+		INFO(3, "\e[31m~ServerGame\e[39m({})", reinterpret_cast<void *>(this));
 	}
 
 	void ServerGame::init() {
@@ -43,11 +43,11 @@ namespace Game3 {
 
 	void ServerGame::stop() {
 		pool.join();
-		INFO_("Saving realms and users...");
+		INFO("Saving realms and users...");
 		assert(database);
 		database->writeAllRealms();
 		database->writeUsers(players);
-		SUCCESSX_(2, "Saved realms and users.");
+		SUCCESS(2, "Saved realms and users.");
 		Timer::summary();
 		Timer::clear();
 	}
@@ -415,7 +415,7 @@ namespace Game3 {
 					try {
 						data = nlohmann::json::parse(join(std::span(words.begin() + 3, words.end()), " "));
 					} catch (const std::exception &err) {
-						ERROR_(err.what());
+						ERROR("{}", err.what());
 						return {false, "Couldn't parse data as JSON."};
 					}
 				}
@@ -517,12 +517,12 @@ namespace Game3 {
 			}
 
 			if (first == "saveall") {
-				INFO_("Writing...");
+				INFO("Writing...");
 				assert(database);
 				tickingPaused = true;
 				database->writeAll();
 				tickingPaused = false;
-				INFO_("Writing done.");
+				INFO("Writing done.");
 				return {true, "Wrote all data."};
 			}
 

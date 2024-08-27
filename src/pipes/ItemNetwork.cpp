@@ -169,7 +169,7 @@ namespace Game3 {
 
 		RealmPtr realm = weakRealm.lock();
 		if (!realm) {
-			WARN_("Item network destroyed while unable to drop overflow");
+			WARN("Item network destroyed while unable to drop overflow");
 			return;
 		}
 

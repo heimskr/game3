@@ -29,7 +29,7 @@ namespace Game3 {
 	}
 
 	ClientGame::~ClientGame() {
-		INFOX(3, "\e[31m~ClientGame\e[39m({})", reinterpret_cast<void *>(this));
+		INFO(3, "\e[31m~ClientGame\e[39m({})", reinterpret_cast<void *>(this));
 	}
 
 	double ClientGame::getFrequency() const {
@@ -151,7 +151,7 @@ namespace Game3 {
 				tab.show();
 			tab.reset(toClientPointer());
 		} else {
-			WARN_("Text tab not found");
+			WARN("Text tab not found");
 		}
 	}
 
@@ -216,7 +216,7 @@ namespace Game3 {
 					getClient()->send(ChunkRequestPacket(*realm, missingChunks, true));
 			}
 		} else {
-			WARN_("No realm");
+			WARN("No realm");
 		}
 
 		return true;
@@ -325,7 +325,7 @@ namespace Game3 {
 			active = false;
 			tickThread.join();
 		} else
-			WARN_("Trying to stop an unjoinable ClientGame");
+			WARN("Trying to stop an unjoinable ClientGame");
 	}
 
 	void ClientGame::garbageCollect() {
