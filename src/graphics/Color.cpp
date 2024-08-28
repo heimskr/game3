@@ -1,6 +1,8 @@
 // Credit: https://bottosson.github.io/posts/colorpicker/
 // Credit: https://bottosson.github.io/posts/gamutclipping/
 
+// Maybe don't use, my "cleanup" seems to have broken this code horribly
+
 #include "graphics/Color.h"
 
 #include <algorithm>
