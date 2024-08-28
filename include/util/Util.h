@@ -93,29 +93,23 @@ namespace Game3 {
 		return ss.str();
 	}
 
+	uint8_t fromHex(char);
+	uint8_t fromHex(std::string_view);
+
 	template <typename T>
 	T unhex(std::string_view str) {
 		T out;
 		uint8_t buffer = 0;
 		bool buffered = false;
-		static auto from_hex = [](const uint8_t ch) -> uint8_t {
-			if (std::isdigit(ch))
-				return ch - '0';
-			if ('a' < ch && ch <= 'f')
-				return ch - 'a' + 10;
-			if ('A' < ch && ch <= 'F')
-				return ch - 'A' + 10;
-			throw std::invalid_argument("Invalid hex string");
-		};
 
 		for (const char ch: str) {
 			if (ch == ' ')
 				continue;
 			if (buffered) {
-				out.emplace_back((buffer << 4) | from_hex(ch));
+				out.emplace_back((buffer << 4) | fromHex(ch));
 				buffered = false;
 			} else {
-				buffered = from_hex(ch);
+				buffered = fromHex(ch);
 				buffered = true;
 			}
 		}

@@ -47,11 +47,11 @@ namespace Game3 {
 		previousActive = active_slot;
 
 		const int column_count = std::min(10, std::max<int>(1, innerRectangle.width / (OUTER_SLOT_SIZE * SLOT_SCALE)));
-		const double x_pad = (innerRectangle.width - column_count * (OUTER_SLOT_SIZE * SLOT_SCALE) + (OUTER_SLOT_SIZE - INNER_SLOT_SIZE) * SLOT_SCALE) / 2;
+		const double x_pad = (innerRectangle.width - column_count * (OUTER_SLOT_SIZE * SLOT_SCALE) + SLOT_PADDING * SLOT_SCALE) / 2;
 
 		int column = 0;
 		double x = x_pad;
-		double y = (OUTER_SLOT_SIZE - INNER_SLOT_SIZE) * SLOT_SCALE;
+		double y = SLOT_PADDING * SLOT_SCALE;
 
 		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
 			widget->render(ui, renderers, x, y, -1, -1);

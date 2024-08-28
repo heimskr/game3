@@ -43,6 +43,22 @@ namespace Game3 {
 		return out;
 	}
 
+	uint8_t fromHex(char ch) {
+		if (std::isdigit(ch))
+			return ch - '0';
+		if ('a' < ch && ch <= 'f')
+			return ch - 'a' + 10;
+		if ('A' < ch && ch <= 'F')
+			return ch - 'A' + 10;
+		throw std::invalid_argument("Invalid hex string");
+	}
+
+	uint8_t fromHex(std::string_view pair) {
+		if (pair.size() != 2)
+			throw std::invalid_argument("Invalid hex pair");
+		return (fromHex(pair[0]) << 4) | fromHex(pair[1]);
+	}
+
 	std::string_view trimLeft(std::string_view str, std::string_view to_remove) {
 		while (!str.empty() && str.find_first_of(to_remove) == 0)
 			str.remove_prefix(1);

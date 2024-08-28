@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string_view>
+
 namespace Game3 {
 	template <typename Src, typename Dest>
 	Dest convertColor(const Src &);
@@ -7,7 +9,7 @@ namespace Game3 {
 	template <typename T>
 	struct BaseColor {
 		template <typename U>
-		U convert() {
+		U convert() const {
 			return convertColor<T, U>(static_cast<const T &>(*this));
 		}
 	};
@@ -17,8 +19,10 @@ namespace Game3 {
 		float s{};
 		float v{};
 
-		OKHsv(float h_, float s_, float v_):
-			h(h_), s(s_), v(v_) {}
+		OKHsv(float h, float s, float v):
+			h(h), s(s), v(v) {}
+
+		OKHsv darken() const;
 	};
 
 	struct RGB: BaseColor<RGB> {
@@ -26,7 +30,11 @@ namespace Game3 {
 		float g{};
 		float b{};
 
-		RGB(float r_, float g_, float b_):
-			r(r_), g(g_), b(b_) {}
+		RGB(float r, float g, float b):
+			r(r), g(g), b(b) {}
+
+		explicit RGB(std::string_view);
+
+		RGB darken() const;
 	};
 }
