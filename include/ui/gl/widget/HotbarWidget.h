@@ -10,11 +10,11 @@
 namespace Game3 {
 	class HotbarWidget: public Widget {
 		private:
-			double scale{};
+			float scale{};
 			std::vector<std::shared_ptr<ItemSlotWidget>> slotWidgets;
 
 		public:
-			HotbarWidget(double scale);
+			HotbarWidget(float scale);
 
 			void render(UIContext &, RendererContext &, float x, float y, float width, float height) final;
 			bool click(UIContext &, int x, int y) final;
