@@ -67,7 +67,7 @@ namespace Game3 {
 	}
 
 	bool ItemSlotWidget::click(UIContext &ui, int, int) {
-		if (inventory->getOwner() == ui.getPlayer())
+		if (inventory && inventory->getOwner() == ui.getPlayer())
 			ui.getGame()->getPlayer()->send(SetActiveSlotPacket(slot));
 		return true;
 	}
@@ -87,6 +87,10 @@ namespace Game3 {
 
 	std::shared_ptr<Inventory> ItemSlotWidget::getInventory() const {
 		return inventory;
+	}
+
+	void ItemSlotWidget::setInventory(std::shared_ptr<Inventory> new_inventory) {
+		inventory = std::move(new_inventory);
 	}
 
 	GlobalID ItemSlotWidget::getOwnerGID() const {

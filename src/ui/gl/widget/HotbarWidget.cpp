@@ -32,6 +32,7 @@ namespace Game3 {
 
 			for (Slot slot = 0; slot < HOTBAR_SIZE; ++slot) {
 				const std::shared_ptr<ItemSlotWidget> &widget = slotWidgets.at(slot);
+				widget->setInventory(inventory);
 				widget->setStack((*inventory)[slot]);
 				widget->setActive(slot == active_slot);
 				widget->render(ui, renderers, x + scale * (SLOT_PADDING + OUTER_SLOT_SIZE * slot), y + scale * SLOT_PADDING, INNER_SLOT_SIZE * scale, INNER_SLOT_SIZE * scale);

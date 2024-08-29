@@ -30,6 +30,7 @@ namespace Game3 {
 			void setActive(bool);
 			Slot getSlot() const;
 			std::shared_ptr<Inventory> getInventory() const;
+			void setInventory(std::shared_ptr<Inventory>);
 			GlobalID getOwnerGID() const;
 	};
 }

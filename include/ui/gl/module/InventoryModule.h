@@ -6,6 +6,8 @@
 #include "ui/gl/module/Module.h"
 #include "ui/gl/widget/ItemSlotWidget.h"
 
+#include <any>
+
 namespace Game3 {
 	class ClientGame;
 	class ClientInventory;
