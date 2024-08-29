@@ -47,7 +47,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool Widget::keyPressed(UIContext &, uint32_t) {
+	bool Widget::keyPressed(UIContext &, uint32_t, Modifiers) {
 		return false;
 	}
 }

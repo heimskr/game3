@@ -15,7 +15,7 @@ namespace Game3 {
 
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
 			bool click(UIContext &, int button, int x, int y) final;
-			bool keyPressed(UIContext &, uint32_t character) final;
+			bool keyPressed(UIContext &, uint32_t character, Modifiers) final;
 			float calculateHeight(const RendererContext &, float available_width, float available_height) final;
 
 			void setText(Glib::ustring);
@@ -28,5 +28,9 @@ namespace Game3 {
 			Color interiorColor;
 			Color textColor;
 			Glib::ustring text; // TODO: replace with non-Glib alternative
+			decltype(text)::iterator cursor;
+
+			void eraseWord();
+			void eraseCharacter();
 	};
 }

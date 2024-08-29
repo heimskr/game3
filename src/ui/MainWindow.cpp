@@ -789,7 +789,7 @@ namespace Game3 {
 		if (dynamic_cast<Gtk::Text *>(get_focus()))
 			return false;
 
-		if (canvas && canvas->uiContext.keyPressed(keyval))
+		if (canvas && canvas->uiContext.keyPressed(keyval, Modifiers(modifiers)))
 			return true;
 
 		if (!keyTimes.contains(keyval)) {

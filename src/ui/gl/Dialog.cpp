@@ -31,7 +31,7 @@ namespace Game3 {
 		return getPosition().contains(x, y);
 	}
 
-	bool Dialog::keyPressed(uint32_t) {
+	bool Dialog::keyPressed(uint32_t, Modifiers) {
 		return false;
 	}
 

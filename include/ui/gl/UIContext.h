@@ -4,6 +4,7 @@
 #include "ui/gl/Dialog.h"
 #include "ui/gl/widget/HotbarWidget.h"
 #include "ui/gl/widget/Widget.h"
+#include "ui/Modifiers.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -39,13 +40,14 @@ namespace Game3 {
 			bool dragUpdate(int x, int y);
 			bool dragEnd(int x, int y);
 			bool scroll(float x_delta, float y_delta, int x, int y);
-			bool keyPressed(uint32_t character);
+			bool keyPressed(uint32_t character, Modifiers);
 			void setDraggedWidget(WidgetPtr);
 			WidgetPtr getDraggedWidget() const;
 			std::shared_ptr<ClientPlayer> getPlayer() const;
 			RendererContext getRenderers() const;
 			void focusWidget(std::weak_ptr<Widget>);
 			WidgetPtr getFocusedWidget() const;
+			void unfocus();
 
 			template <typename T>
 			size_t removeDialogs() {

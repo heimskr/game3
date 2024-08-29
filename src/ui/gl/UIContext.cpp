@@ -8,6 +8,7 @@
 #include "ui/gl/Dialog.h"
 #include "ui/gl/UIContext.h"
 #include "ui/Canvas.h"
+#include "ui/Modifiers.h"
 #include "util/Util.h"
 
 #include <glm/glm.hpp>
@@ -119,16 +120,16 @@ namespace Game3 {
 		return dialogs.empty() && hotbarWidget->getLastRectangle().contains(x, y) && hotbarWidget->scroll(*this, x_delta, y_delta, x, y);
 	}
 
-	bool UIContext::keyPressed(uint32_t character) {
+	bool UIContext::keyPressed(uint32_t character, Modifiers modifiers) {
 		if (auto focused = getFocusedWidget())
-			if (focused->keyPressed(*this, character))
+			if (focused->keyPressed(*this, character, modifiers))
 				return true;
 
 		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
-			if (dialog->keyPressed(character))
+			if (dialog->keyPressed(character, modifiers))
 				return true;
 
-		return dialogs.empty() && hotbarWidget->keyPressed(*this, character);
+		return dialogs.empty() && hotbarWidget->keyPressed(*this, character, modifiers);
 	}
 
 	void UIContext::setDraggedWidget(WidgetPtr new_dragged_widget) {
@@ -153,5 +154,9 @@ namespace Game3 {
 
 	WidgetPtr UIContext::getFocusedWidget() const {
 		return focusedWidget.lock();
+	}
+
+	void UIContext::unfocus() {
+		focusedWidget.reset();
 	}
 }
