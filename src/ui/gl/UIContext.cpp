@@ -68,7 +68,7 @@ namespace Game3 {
 			if (dialog->click(button, x, y))
 				return true;
 
-		return dialogs.empty() && hotbarWidget->click(*this, button, x, y);
+		return dialogs.empty() && hotbarWidget->getLastRectangle().contains(x, y) && hotbarWidget->click(*this, button, x, y);
 	}
 
 	bool UIContext::dragStart(int x, int y) {
@@ -78,7 +78,7 @@ namespace Game3 {
 			if (dialog->dragStart(x, y))
 				return true;
 
-		return dialogs.empty() && hotbarWidget->dragStart(*this, x, y);
+		return dialogs.empty() && hotbarWidget->getLastRectangle().contains(x, y) && hotbarWidget->dragStart(*this, x, y);
 	}
 
 	bool UIContext::dragUpdate(int x, int y) {
@@ -89,7 +89,7 @@ namespace Game3 {
 			if (dialog->dragUpdate(x, y))
 				return true;
 
-		return dialogs.empty() && hotbarWidget->dragUpdate(*this, x, y);
+		return dialogs.empty() && hotbarWidget->getLastRectangle().contains(x, y) && hotbarWidget->dragUpdate(*this, x, y);
 	}
 
 	bool UIContext::dragEnd(int x, int y) {
@@ -106,7 +106,7 @@ namespace Game3 {
 		setDraggedWidget(nullptr);
 
 		if (!out)
-			return dialogs.empty() && hotbarWidget->dragEnd(*this, x, y);
+			return dialogs.empty() && hotbarWidget->getLastRectangle().contains(x, y) && hotbarWidget->dragEnd(*this, x, y);
 
 		return true;
 	}
@@ -116,7 +116,7 @@ namespace Game3 {
 			if (dialog->scroll(x_delta, y_delta, x, y))
 				return true;
 
-		return dialogs.empty() && hotbarWidget->scroll(*this, x_delta, y_delta, x, y);
+		return dialogs.empty() && hotbarWidget->getLastRectangle().contains(x, y) && hotbarWidget->scroll(*this, x_delta, y_delta, x, y);
 	}
 
 	void UIContext::setDraggedWidget(WidgetPtr new_dragged_widget) {
