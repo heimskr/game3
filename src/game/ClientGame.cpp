@@ -41,7 +41,7 @@ namespace Game3 {
 	}
 
 	void ClientGame::click(int button, int, double pos_x, double pos_y, Modifiers modifiers) {
-		if (canvas.uiContext.click(pos_x * canvas.getFactor(), pos_y * canvas.getFactor()))
+		if (canvas.uiContext.click(button, pos_x * canvas.getFactor(), pos_y * canvas.getFactor()))
 			return;
 
 		RealmPtr realm = activeRealm;

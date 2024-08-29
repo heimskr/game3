@@ -66,7 +66,7 @@ namespace Game3 {
 		return stack? shared_from_this() : nullptr;
 	}
 
-	bool ItemSlotWidget::click(UIContext &ui, int, int) {
+	bool ItemSlotWidget::click(UIContext &ui, int, int, int) {
 		if (inventory && inventory->getOwner() == ui.getPlayer())
 			ui.getGame()->getPlayer()->send(SetActiveSlotPacket(slot));
 		return true;

@@ -50,14 +50,14 @@ namespace Game3 {
 		renderIconTexture(renderers, cacheTexture("resources/gui/inventory.png"));
 	}
 
-	void InventoryTab::click(int x, int y) {
-		if (playerInventoryModule->getLastRectangle().contains(x, y) && playerInventoryModule->click(ui, x, y))
+	void InventoryTab::click(int button, int x, int y) {
+		if (playerInventoryModule->getLastRectangle().contains(x, y) && playerInventoryModule->click(ui, button, x, y))
 			return;
 
 		std::unique_lock<DefaultMutex> lock;
 		if (Module *active_module = getModule(lock))
 			if (active_module->getLastRectangle().contains(x, y))
-				active_module->click(ui, x, y);
+				active_module->click(ui, button, x, y);
 	}
 
 	void InventoryTab::dragStart(int x, int y) {

@@ -16,7 +16,7 @@ namespace Game3 {
 
 			virtual void render(UIContext &, RendererContext &) = 0;
 			virtual void renderIcon(RendererContext &);
-			virtual void click(int x, int y);
+			virtual void click(int button, int x, int y);
 			virtual void dragStart(int x, int y);
 			virtual void dragEnd(int x, int y);
 

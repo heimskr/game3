@@ -25,7 +25,7 @@ namespace Game3 {
 			void render(RendererContext &) final;
 			Rectangle getPosition() const final;
 			void onClose() final;
-			bool click(int x, int y) final;
+			bool click(int button, int x, int y) final;
 			bool dragStart(int x, int y) final;
 			bool dragEnd(int x, int y) final;
 

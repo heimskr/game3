@@ -44,14 +44,18 @@ namespace Game3 {
 		}
 	}
 
-	bool HotbarWidget::click(UIContext &ui, int x, int y) {
+	bool HotbarWidget::click(UIContext &ui, int button, int x, int y) {
 		if (!getLastRectangle().contains(x, y))
 			return false;
 
 		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets)
-			if (widget->getLastRectangle().contains(x, y) && widget->click(ui, x, y))
+			if (widget->getLastRectangle().contains(x, y) && widget->click(ui, button, x, y))
 				break;
 
+		return true;
+	}
+
+	bool HotbarWidget::dragStart(UIContext &, int, int) {
 		return true;
 	}
 

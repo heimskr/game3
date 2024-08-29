@@ -17,7 +17,7 @@ namespace Game3 {
 		renderIconTexture(renderers, cacheTexture("resources/gui/crafting.png"));
 	}
 
-	void CraftingTab::click(int x, int y) {
+	void CraftingTab::click(int button, int x, int y) {
 
 	}
 }

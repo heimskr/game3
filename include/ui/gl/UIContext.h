@@ -33,7 +33,7 @@ namespace Game3 {
 			std::shared_ptr<ClientGame> getGame() const;
 			void onResize(int x, int y);
 			/** Returns true iff the click accomplished something. */
-			bool click(int x, int y);
+			bool click(int button, int x, int y);
 			bool dragStart(int x, int y);
 			bool dragUpdate(int x, int y);
 			bool dragEnd(int x, int y);

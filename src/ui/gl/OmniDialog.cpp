@@ -136,7 +136,7 @@ namespace Game3 {
 		inventoryTab->removeModule();
 	}
 
-	bool OmniDialog::click(int x, int y) {
+	bool OmniDialog::click(int button, int x, int y) {
 		for (size_t i = 0; i < tabRectangles.size(); ++i) {
 			if (tabRectangles[i].contains(x, y)) {
 				activeTab = tabs.at(i);
@@ -144,11 +144,11 @@ namespace Game3 {
 			}
 		}
 
-		if (!Dialog::click(x, y))
+		if (!Dialog::click(button, x, y))
 			return false;
 
 		if (activeTab)
-			activeTab->click(x, y);
+			activeTab->click(button, x, y);
 
 		return true;
 	}

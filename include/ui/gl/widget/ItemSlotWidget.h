@@ -25,7 +25,7 @@ namespace Game3 {
 
 			void render(UIContext &, RendererContext &, float x, float y, float width, float height) final;
 			std::shared_ptr<Widget> getDragStartWidget() final;
-			bool click(UIContext &, int x, int y) final;
+			bool click(UIContext &, int button, int x, int y) final;
 			float calculateHeight(RendererContext &, float available_width, float available_height) final;
 
 			void setStack(std::shared_ptr<ItemStack>);

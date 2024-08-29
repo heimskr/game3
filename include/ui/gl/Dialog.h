@@ -21,7 +21,7 @@ namespace Game3 {
 			virtual void render(RendererContext &) = 0;
 			virtual Rectangle getPosition() const = 0;
 			virtual void onClose();
-			virtual bool click(int x, int y);
+			virtual bool click(int button, int x, int y);
 			virtual bool dragStart(int x, int y);
 			virtual bool dragUpdate(int x, int y);
 			virtual bool dragEnd(int x, int y);

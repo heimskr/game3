@@ -80,13 +80,13 @@ namespace Game3 {
 		}
 	}
 
-	bool InventoryModule::click(UIContext &ui, int x, int y) {
+	bool InventoryModule::click(UIContext &ui, int button, int x, int y) {
 		if (!getLastRectangle().contains(x, y))
 			return false;
 
 		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
 			Rectangle rectangle = innerRectangle + widget->getLastRectangle();
-			if (rectangle.contains(x, y) && widget->click(ui, x, y))
+			if (rectangle.contains(x, y) && widget->click(ui, button, x, y))
 				return true;
 		}
 

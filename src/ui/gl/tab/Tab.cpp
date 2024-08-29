@@ -24,7 +24,7 @@ namespace Game3 {
 
 	void Tab::renderIcon(RendererContext &) {}
 
-	void Tab::click(int, int) {}
+	void Tab::click(int, int, int) {}
 
 	void Tab::dragStart(int, int) {}
 

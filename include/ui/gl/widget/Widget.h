@@ -32,9 +32,9 @@ namespace Game3 {
 			/** Can return a pointer to nothing, itself or a new widget. */
 			virtual std::shared_ptr<Widget> getDragStartWidget();
 			/** `x` and `y` are absolute, not relative to the top left corner of the widget. */
-			virtual bool click(UIContext &, int x, int y);
+			virtual bool click(UIContext &, int button, int x, int y);
 			virtual bool dragStart(UIContext &, int x, int y);
-			virtual void dragUpdate(UIContext &, int x, int y);
+			virtual bool dragUpdate(UIContext &, int x, int y);
 			virtual bool dragEnd(UIContext &, int x, int y);
 			virtual float calculateHeight(RendererContext &, float available_width, float available_height) = 0;
 	};

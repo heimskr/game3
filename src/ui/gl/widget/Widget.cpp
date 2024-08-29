@@ -25,7 +25,7 @@ namespace Game3 {
 		return nullptr;
 	}
 
-	bool Widget::click(UIContext &, int, int) {
+	bool Widget::click(UIContext &, int, int, int) {
 		return false;
 	}
 
@@ -33,7 +33,9 @@ namespace Game3 {
 		return false;
 	}
 
-	void Widget::dragUpdate(UIContext &, int, int) {}
+	bool Widget::dragUpdate(UIContext &, int, int) {
+		return false;
+	}
 
 	bool Widget::dragEnd(UIContext &, int, int) {
 		return false;

@@ -63,12 +63,12 @@ namespace Game3 {
 		internalScissorStack.setBase(Rectangle{0, 0, x, y});
 	}
 
-	bool UIContext::click(int x, int y) {
+	bool UIContext::click(int button, int x, int y) {
 		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
-			if (dialog->click(x, y))
+			if (dialog->click(button, x, y))
 				return true;
 
-		return hotbarWidget->click(*this, x, y);
+		return dialogs.empty() && hotbarWidget->click(*this, button, x, y);
 	}
 
 	bool UIContext::dragStart(int x, int y) {
@@ -78,7 +78,7 @@ namespace Game3 {
 			if (dialog->dragStart(x, y))
 				return true;
 
-		return false;
+		return dialogs.empty() && hotbarWidget->dragStart(*this, x, y);
 	}
 
 	bool UIContext::dragUpdate(int x, int y) {
@@ -89,7 +89,7 @@ namespace Game3 {
 			if (dialog->dragUpdate(x, y))
 				return true;
 
-		return false;
+		return dialogs.empty() && hotbarWidget->dragUpdate(*this, x, y);
 	}
 
 	bool UIContext::dragEnd(int x, int y) {
@@ -105,7 +105,10 @@ namespace Game3 {
 		draggedWidgetActive = false;
 		setDraggedWidget(nullptr);
 
-		return out;
+		if (!out)
+			return dialogs.empty() && hotbarWidget->dragEnd(*this, x, y);
+
+		return true;
 	}
 
 	void UIContext::setDraggedWidget(WidgetPtr new_dragged_widget) {
