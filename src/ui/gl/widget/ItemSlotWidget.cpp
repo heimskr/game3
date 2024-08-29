@@ -72,6 +72,10 @@ namespace Game3 {
 		return true;
 	}
 
+	float ItemSlotWidget::calculateHeight(RendererContext &, float, float) {
+		return 16 * scale;
+	}
+
 	void ItemSlotWidget::setStack(std::shared_ptr<ItemStack> new_stack) {
 		stack = std::move(new_stack);
 		texture = {};

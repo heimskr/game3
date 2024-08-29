@@ -6,8 +6,15 @@
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 #include "util/Defer.h"
+#include "util/Math.h"
 
 namespace Game3 {
+	namespace {
+		constexpr int getColumnCount(float width) {
+			return std::min(10, std::max<int>(1, width / (OUTER_SLOT_SIZE * SLOT_SCALE)));
+		}
+	}
+
 	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game, const std::any &argument):
 		InventoryModule(std::move(game), getInventory(argument)) {}
 
@@ -53,7 +60,7 @@ namespace Game3 {
 
 		previousActive = active_slot;
 
-		const int column_count = std::min(10, std::max<int>(1, innerRectangle.width / (OUTER_SLOT_SIZE * SLOT_SCALE)));
+		const int column_count = getColumnCount(innerRectangle.width);
 		const float x_pad = (innerRectangle.width - column_count * (OUTER_SLOT_SIZE * SLOT_SCALE) + SLOT_PADDING * SLOT_SCALE) / 2;
 
 		int column = 0;
@@ -121,6 +128,10 @@ namespace Game3 {
 		}
 
 		return true;
+	}
+
+	float InventoryModule::calculateHeight(RendererContext &, float available_width, float) {
+		return updiv(slotWidgets.size(), getColumnCount(available_width)) * OUTER_SLOT_SIZE * SLOT_SCALE;
 	}
 
 	ClientInventoryPtr InventoryModule::getInventory(const std::any &any) {

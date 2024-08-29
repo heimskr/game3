@@ -18,8 +18,12 @@ namespace Game3 {
 
 	void HotbarWidget::render(UIContext &ui, RendererContext &renderers, float x, float y, float width, float height) {
 		const float offset = SLOT_PADDING * scale / 3;
-		Widget::render(ui, renderers, x - offset, y - offset, width + offset * 2, height + offset * 2);
-		renderers.rectangle.drawOnScreen(Color{0.7, 0.5, 0, 1}, x - offset, y - offset, width + offset * 2, height + offset * 2);
+		Widget::render(ui, renderers, x, y, width, height);
+		renderers.rectangle.drawOnScreen(Color{0.7, 0.5, 0, 1}, x, y, width, height);
+		x += offset;
+		y += offset;
+		width -= offset * 2;
+		height -= offset * 2;
 		renderers.rectangle.drawOnScreen(Color{0.88, 0.77, 0.55, 1}, x, y, width, height);
 
 		PlayerPtr player = ui.getPlayer();
@@ -49,5 +53,9 @@ namespace Game3 {
 				break;
 
 		return true;
+	}
+
+	float HotbarWidget::calculateHeight(RendererContext &, float, float available_height) {
+		return available_height;
 	}
 }

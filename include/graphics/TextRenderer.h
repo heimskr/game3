@@ -34,6 +34,7 @@ namespace Game3 {
 		TextAlign align = TextAlign::Left;
 		Color shadow{0, 0, 0, 1};
 		Vector2f shadowOffset{.025f, .025f};
+		float *heightOut = nullptr;
 	};
 
 	class TextRenderer: public HasBackbuffer {
@@ -65,6 +66,7 @@ namespace Game3 {
 			void drawOnScreen(const Glib::ustring &text, TextRenderOptions = {});
 			float textWidth(const Glib::ustring &text, float scale = 1.f);
 			float textHeight(const Glib::ustring &text, float scale = 1.f);
+			float textHeight(const Glib::ustring &text, float scale, float wrap_width);
 
 			template <typename... Args>
 			void operator()(Args &&...args) {

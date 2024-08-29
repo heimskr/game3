@@ -7,8 +7,7 @@
 #include <type_traits>
 
 namespace Game3 {
-	template <typename T>
-	inline T updiv(T n, std::type_identity_t<T> d) {
+	inline auto updiv(auto n, auto d) {
 		return n / d + (n % d? 1 : 0);
 	}
 

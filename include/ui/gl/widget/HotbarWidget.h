@@ -18,5 +18,6 @@ namespace Game3 {
 
 			void render(UIContext &, RendererContext &, float x, float y, float width, float height) final;
 			bool click(UIContext &, int x, int y) final;
+			float calculateHeight(RendererContext &, float available_width, float available_height) final;
 	};
 }

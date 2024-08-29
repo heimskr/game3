@@ -6,6 +6,7 @@
 namespace Game3 {
 	class ProgressBarWidget: public Widget {
 		private:
+			float fixedHeight{};
 			float scale{};
 			Color topInteriorColor;
 			Color bottomInteriorColor;
@@ -15,10 +16,11 @@ namespace Game3 {
 			float progress{};
 
 		public:
-			ProgressBarWidget(float scale, Color interior_color, Color background_color, Color exterior_color, float progress = 0);
-			ProgressBarWidget(float scale, Color interior_color, float progress = 0);
+			ProgressBarWidget(float fixed_height, float scale, Color interior_color, Color background_color, Color exterior_color, float progress = 0);
+			ProgressBarWidget(float fixed_height, float scale, Color interior_color, float progress = 0);
 
 			void render(UIContext &, RendererContext &, float x, float y, float width, float height) final;
+			float calculateHeight(RendererContext &, float available_width, float available_height) final;
 
 			void setProgress(float);
 	};

@@ -12,7 +12,6 @@
 
 namespace Game3 {
 	class Agent;
-	class Buffer;
 	class ClientGame;
 	class ClientInventory;
 	class Inventory;

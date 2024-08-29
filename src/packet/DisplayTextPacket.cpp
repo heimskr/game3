@@ -13,6 +13,7 @@ namespace Game3 {
 			game->getPlayer()->queueForMove([&window](const auto &, bool) {
 				window.queue([&window] {
 					window.removeModule();
+					window.closeOmniDialog();
 				});
 				return true;
 			});

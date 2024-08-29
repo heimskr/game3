@@ -32,6 +32,7 @@ namespace Game3 {
 			bool click(UIContext &, int x, int y) final;
 			bool dragStart(UIContext &, int x, int y) final;
 			bool dragEnd(UIContext &, int x, int y) final;
+			float calculateHeight(RendererContext &, float available_width, float available_height) final;
 
 		private:
 			Rectangle innerRectangle;

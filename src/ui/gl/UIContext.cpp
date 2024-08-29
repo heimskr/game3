@@ -28,8 +28,9 @@ namespace Game3 {
 
 		if (dialogs.empty()) {
 			scissorStack = internalScissorStack;
-			constexpr static float width = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING) * HOTBAR_SCALE;
-			constexpr static float height = (OUTER_SLOT_SIZE + SLOT_PADDING) * HOTBAR_SCALE;
+			constexpr static float HOTBAR_BORDER = SLOT_PADDING * HOTBAR_SCALE / 3;
+			constexpr static float width = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING) * HOTBAR_SCALE + HOTBAR_BORDER * 2;
+			constexpr static float height = (OUTER_SLOT_SIZE + SLOT_PADDING) * HOTBAR_SCALE + HOTBAR_BORDER * 2;
 			hotbarWidget->render(*this, context, (canvas.getWidth() * factor - width) / 2, canvas.getHeight() * factor - (OUTER_SLOT_SIZE * 2 - INNER_SLOT_SIZE / 2) * HOTBAR_SCALE, width, height);
 		} else {
 			for (const std::shared_ptr<Dialog> &dialog: dialogs) {

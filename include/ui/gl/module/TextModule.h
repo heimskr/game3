@@ -22,8 +22,10 @@ namespace Game3 {
 			Identifier getID() const final { return ID(); }
 
 			void render(UIContext &, RendererContext &, float x, float y, float width, float height) final;
+			float calculateHeight(RendererContext &, float available_width, float available_height) final;
 
 		private:
 			Glib::ustring text;
+			float lastTextHeight = -1;
 	};
 }

@@ -36,6 +36,7 @@ namespace Game3 {
 			virtual bool dragStart(UIContext &, int x, int y);
 			virtual void dragUpdate(UIContext &, int x, int y);
 			virtual bool dragEnd(UIContext &, int x, int y);
+			virtual float calculateHeight(RendererContext &, float available_width, float available_height) = 0;
 	};
 
 	using WidgetPtr = std::shared_ptr<Widget>;

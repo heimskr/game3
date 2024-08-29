@@ -15,6 +15,10 @@
 #include "util/FS.h"
 
 namespace Game3 {
+	constexpr float LINE_HEIGHT = 1.5;
+}
+
+namespace Game3 {
 	namespace {
 		const std::string & textFrag() { static auto out = readFile("resources/text.frag"); return out; }
 		const std::string & textVert() { static auto out = readFile("resources/text.vert"); return out; }
@@ -256,11 +260,14 @@ namespace Game3 {
 		const auto i_height = getCharacter('I').size.y * scale_y;
 		const auto wrap_width = options.wrapWidth;
 		const auto x_start = x;
+		const auto y_start = y;
 
 		auto next_line = [&] {
 			x = x_start;
-			y -= i_height * 1.5;
+			y -= i_height * LINE_HEIGHT;
 		};
+
+		float highest_on_first_line = 0;
 
 		for (const gunichar ch: text) {
 			if (ch == '\n') {
@@ -270,15 +277,19 @@ namespace Game3 {
 
 			const Character &character = getCharacter(ch);
 
-			float xpos = x + character.bearing.x * scale_x;
-			float ypos = y - (character.size.y - character.bearing.y) * scale_y;
 			const float w = character.size.x * scale_x;
 			const float h = character.size.y * scale_y;
+			float xpos = x + character.bearing.x * scale_x;
+			float ypos = y - h + character.bearing.y * scale_y;
+
+			if (y == y_start && h > highest_on_first_line) {
+				highest_on_first_line = h;
+			}
 
 			if (wrap_width > 0 && wrap_width < xpos - x_start + w) {
 				next_line();
 				xpos = x + character.bearing.x * scale_x;
-				ypos = y - (character.size.y - character.bearing.y) * scale_y;
+				ypos = y - h + character.bearing.y * scale_y;
 			}
 
 			// Update VBO for each character
@@ -306,6 +317,10 @@ namespace Game3 {
 
 		glBindVertexArray(0); CHECKGL
 		glBindTexture(GL_TEXTURE_2D, 0); CHECKGL
+
+		if (options.heightOut) {
+			*options.heightOut = y_start - y + highest_on_first_line;
+		}
 	}
 
 	float TextRenderer::textWidth(const Glib::ustring &text, float scale) {
@@ -320,6 +335,41 @@ namespace Game3 {
 		for (const char ch: text)
 			out = std::max(out, getCharacter(ch).size.y * scale);
 		return out;
+	}
+
+	float TextRenderer::textHeight(const Glib::ustring &text, float scale, float wrap_width) {
+		const auto i_height = getCharacter('I').size.y * scale;
+		float x = 0;
+		float y = 0;
+
+		auto next_line = [&] {
+			x = 0;
+			y -= i_height * LINE_HEIGHT;
+		};
+
+		float highest_on_first_line = 0;
+
+		for (const gunichar ch: text) {
+			if (ch == '\n') {
+				next_line();
+				continue;
+			}
+
+			const Character &character = getCharacter(ch);
+
+			const float w = character.size.x * scale;
+			const float h = character.size.y * scale;
+
+			if (y == 0 && h > highest_on_first_line)
+				highest_on_first_line = h;
+
+			if (wrap_width > 0 && wrap_width < x + character.bearing.x * scale + w)
+				next_line();
+
+			x += (character.advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64)
+		}
+
+		return -y + highest_on_first_line;
 	}
 
 	const TextRenderer::Character & TextRenderer::getCharacter(gunichar ch) const {

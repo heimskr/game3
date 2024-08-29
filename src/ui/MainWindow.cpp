@@ -464,30 +464,42 @@ namespace Game3 {
 		});
 
 		game->signalFluidUpdate().connect([this](const std::shared_ptr<HasFluids> &has_fluids) {
-			queue([this, has_fluids] {
+			queue([this, has_fluids] mutable {
 				std::unique_lock<DefaultMutex> lock;
-				if (GTKModule *module_ = inventoryTab->getModule(lock)) {
-					std::any data(has_fluids);
+
+				if (Module *module_ = omniDialog->inventoryTab->getModule(lock)) {
+					std::any data(std::move(has_fluids));
+					module_->handleMessage({}, "UpdateFluids", data);
+				} else if (GTKModule *module_ = inventoryTab->getModule(lock)) {
+					std::any data(std::move(has_fluids));
 					module_->handleMessage({}, "UpdateFluids", data);
 				}
 			});
 		});
 
 		game->signalEnergyUpdate().connect([this](const std::shared_ptr<HasEnergy> &has_energy) {
-			queue([this, has_energy] {
+			queue([this, has_energy] mutable {
 				std::unique_lock<DefaultMutex> lock;
-				if (GTKModule *module_ = inventoryTab->getModule(lock)) {
-					std::any data(has_energy);
+
+				if (Module *module_ = omniDialog->inventoryTab->getModule(lock)) {
+					std::any data(std::move(has_energy));
+					module_->handleMessage({}, "UpdateEnergy", data);
+				} else if (GTKModule *module_ = inventoryTab->getModule(lock)) {
+					std::any data(std::move(has_energy));
 					module_->handleMessage({}, "UpdateEnergy", data);
 				}
 			});
 		});
 
 		game->signalVillageUpdate().connect([this](const VillagePtr &village) {
-			queue([this, village] {
+			queue([this, village] mutable {
 				std::unique_lock<DefaultMutex> lock;
-				if (GTKModule *module_ = inventoryTab->getModule(lock)) {
-					std::any data(village);
+
+				if (Module *module_ = omniDialog->inventoryTab->getModule(lock)) {
+					std::any data(std::move(village));
+					module_->handleMessage({}, "VillageUpdate", data);
+				} else if (GTKModule *module_ = inventoryTab->getModule(lock)) {
+					std::any data(std::move(village));
 					module_->handleMessage({}, "VillageUpdate", data);
 				}
 			});
@@ -758,6 +770,10 @@ namespace Game3 {
 		UIContext &ui = canvas->uiContext;
 		if (!ui.hasDialog<OmniDialog>())
 			ui.addDialog(getOmniDialog());
+	}
+
+	void MainWindow::closeOmniDialog() {
+		canvas->uiContext.removeDialogs<OmniDialog>();
 	}
 
 	void MainWindow::showFluids(const std::shared_ptr<HasFluids> &has_fluids) {

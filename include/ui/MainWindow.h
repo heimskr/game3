@@ -105,6 +105,7 @@ namespace Game3 {
 			void moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data);
 
 			void showOmniDialog();
+			void closeOmniDialog();
 
 			template <typename... Args>
 			void moduleMessage(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Args &&...args) {
