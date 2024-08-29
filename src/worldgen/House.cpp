@@ -41,7 +41,7 @@ namespace Game3::WorldGen {
 
 		switch(std::uniform_int_distribution(0, 1)(rng)) {
 			case 0: {
-				std::array<const char *, 15> texts {
+				std::array texts{
 					"Express ideas directly in code.",
 					"Write in ISO Standard C++.",
 					"Express intent.",
@@ -55,11 +55,15 @@ namespace Game3::WorldGen {
 					"Encapsulate messy constructs, rather than spreading through the code.",
 					"Use supporting tools as appropriate.",
 					"Use support libraries as appropriate.",
-					"haha!\ntrapped in my furniture hellscape\nit's all so wrong and I made it just for you!\ngood luck!", // Credit: Louie Zong
+					"haha!\ntrapped in my furniture hellscape\nit's all so wrong and I made it just for you!\ngood luck!\n\n-- Louie Zong",
 					"This is a work of nonfiction and any resemblance to actual events, locales or persons, living or dead, is entirely intentional. We are in your walls.",
+					"Gangblanc, Gangblanc, give me your answer, do\nI'm half forswonk all for the code of you\nIt won't be a stylish shader\nI can't code up a trader\nBut you'll look cool without the tools\nOf a game engine built for three",
+					"U18446744073709551615 is totally a valid molecule.",
+					"Gangblanc is 1 cubic meter but a lot of it is hidden inside pocket dimensions so he appears to have a normal human volume.",
+					"I've heard whispers of a vending machine deep beneath the surface that takes quarters... but what kind?",
 				};
 
-				std::shuffle(texts.begin(), texts.end(), rng);
+				std::ranges::shuffle(texts, rng);
 
 				for (Index column = 2; column < width - 2; ++column) {
 					realm->setTile(Layer::Objects, {1, column}, "base:tile/bookshelf"_id, false);
