@@ -1,5 +1,6 @@
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
+#include "game/Inventory.h"
 #include "graphics/ItemTexture.h"
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
@@ -12,11 +13,16 @@
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	ItemSlotWidget::ItemSlotWidget(ItemStackPtr stack, Slot slot, double size, double scale, bool active):
-		stack(std::move(stack)), slot(slot), size(size), scale(scale), active(active) {}
+	ItemSlotWidget::ItemSlotWidget(InventoryPtr inventory, ItemStackPtr stack, Slot slot, double size, double scale, bool active):
+		inventory(std::move(inventory)),
+		stack(std::move(stack)),
+		slot(slot),
+		size(size),
+		scale(scale),
+		active(active) {}
 
 	ItemSlotWidget::ItemSlotWidget(Slot slot, double size, double scale, bool active):
-		ItemSlotWidget(nullptr, slot, size, scale, active) {}
+		ItemSlotWidget(nullptr, nullptr, slot, size, scale, active) {}
 
 	void ItemSlotWidget::render(UIContext &ui, RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(ui, renderers, x, y, width, height);
@@ -76,5 +82,16 @@ namespace Game3 {
 
 	Slot ItemSlotWidget::getSlot() const {
 		return slot;
+	}
+
+	std::shared_ptr<Inventory> ItemSlotWidget::getInventory() const {
+		return inventory;
+	}
+
+	GlobalID ItemSlotWidget::getOwnerGID() const {
+		assert(inventory);
+		AgentPtr owner = inventory->getOwner();
+		assert(owner);
+		return owner->getGID();
 	}
 }

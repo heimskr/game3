@@ -1,5 +1,5 @@
 #include "entity/ClientPlayer.h"
-#include "game/Inventory.h"
+#include "game/ClientInventory.h"
 #include "packet/SwapSlotsPacket.h"
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/Constants.h"
@@ -7,16 +7,17 @@
 #include "util/Defer.h"
 
 namespace Game3 {
+	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game, const std::any &argument):
+		InventoryModule(std::move(game), std::any_cast<std::shared_ptr<ClientInventory>>(argument)) {}
+
+	InventoryModule::InventoryModule(std::shared_ptr<ClientGame>, const std::shared_ptr<ClientInventory> &inventory):
+		inventoryGetter(inventory->getGetter()) {}
+
 	void InventoryModule::render(UIContext &ui, RendererContext &renderers, float x, float y, float width, float height) {
 		innerRectangle = ui.scissorStack.pushRelative(Rectangle(x, y, width, height));
 		Defer pop([&ui] { ui.scissorStack.pop(); });
 
-		PlayerPtr player = ui.getPlayer();
-
-		if (!player)
-			return;
-
-		InventoryPtr inventory = player->getInventory(0);
+		InventoryPtr inventory = inventoryGetter->get();
 		auto inventory_lock = inventory->sharedLock();
 
 		const Slot slot_count = inventory->getSlotCount();
@@ -27,7 +28,7 @@ namespace Game3 {
 		if (slotWidgets.size() != static_cast<size_t>(slot_count)) {
 			slotWidgets.clear();
 			for (Slot slot = 0; slot < slot_count; ++slot)
-				slotWidgets.emplace_back(std::make_shared<ItemSlotWidget>((*inventory)[slot], slot, INNER_SLOT_SIZE, SLOT_SCALE, slot == active_slot));
+				slotWidgets.emplace_back(std::make_shared<ItemSlotWidget>(inventory, (*inventory)[slot], slot, INNER_SLOT_SIZE, SLOT_SCALE, slot == active_slot));
 		} else {
 			for (Slot slot = 0; slot < slot_count; ++slot)
 				slotWidgets[slot]->setStack((*inventory)[slot]);
@@ -96,8 +97,7 @@ namespace Game3 {
 			Rectangle rectangle = innerRectangle + widget->getLastRectangle();
 			if (rectangle.contains(x, y)) {
 				ClientPlayerPtr player = ui.getPlayer();
-				const InventoryID inventory_id = player->getInventory(0)->index;
-				player->send(SwapSlotsPacket(player->getGID(), player->getGID(), dragged->getSlot(), widget->getSlot(), inventory_id, inventory_id));
+				player->send(SwapSlotsPacket(dragged->getOwnerGID(), widget->getOwnerGID(), dragged->getSlot(), widget->getSlot(), dragged->getInventory()->index, widget->getInventory()->index));
 				ui.setDraggedWidget(nullptr);
 				break;
 			}

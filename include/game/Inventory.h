@@ -15,6 +15,7 @@
 
 namespace Game3 {
 	class Agent;
+	class InventoryGetter;
 	struct CraftingRecipe;
 
 	/** Inventories should be locked appropriately (see HasMutex) when something is calling Inventory methods. The Inventory will not lock itself. */
@@ -174,6 +175,8 @@ namespace Game3 {
 
 			virtual void replace(const Inventory &) = 0;
 			virtual void replace(Inventory &&) = 0;
+
+			virtual std::unique_ptr<InventoryGetter> getGetter() const;
 
 			static std::shared_ptr<Inventory> create(Side side, std::shared_ptr<Agent> owner, Slot slot_count, InventoryID index = 0, Slot active_slot = 0, std::map<Slot, ItemStackPtr> storage = {});
 			static std::shared_ptr<Inventory> create(std::shared_ptr<Agent> owner, Slot slot_count, InventoryID index = 0, Slot active_slot = 0, std::map<Slot, ItemStackPtr> storage = {});

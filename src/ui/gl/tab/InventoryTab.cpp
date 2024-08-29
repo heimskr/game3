@@ -1,6 +1,6 @@
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
-#include "game/Inventory.h"
+#include "game/ClientInventory.h"
 #include "graphics/RendererContext.h"
 #include "graphics/Texture.h"
 #include "ui/gl/module/InventoryModule.h"
@@ -10,9 +10,18 @@
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
+	namespace {
+		std::shared_ptr<InventoryModule> makePlayerInventoryModule(UIContext &ui) {
+			if (ClientPlayerPtr player = ui.getPlayer())
+				return std::make_shared<InventoryModule>(ui.getGame(), std::static_pointer_cast<ClientInventory>(player->getInventory(0)));
+
+			return std::make_shared<InventoryModule>(ui.getGame(), std::shared_ptr<ClientInventory>{});
+		}
+	}
+
 	InventoryTab::InventoryTab(UIContext &ui):
 		Tab(ui),
-		playerInventoryModule(std::make_shared<InventoryModule>()) {}
+		playerInventoryModule(makePlayerInventoryModule(ui)) {}
 
 	void InventoryTab::render(UIContext &ui, RendererContext &renderers) {
 		Rectangle rectangle = ui.scissorStack.getTop().reposition(0, 0);
@@ -25,7 +34,6 @@ namespace Game3 {
 		}
 
 		playerInventoryModule->render(ui, renderers, rectangle);
-		return;
 	}
 
 	void InventoryTab::renderIcon(RendererContext &renderers) {

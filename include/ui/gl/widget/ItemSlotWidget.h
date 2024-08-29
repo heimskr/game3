@@ -5,11 +5,13 @@
 #include <memory>
 
 namespace Game3 {
+	class Inventory;
 	class ItemStack;
 	class ItemTexture;
 
 	class ItemSlotWidget: public Widget {
 		private:
+			std::shared_ptr<Inventory> inventory;
 			std::shared_ptr<ItemStack> stack;
 			Slot slot = -1;
 			double size{};
@@ -18,7 +20,7 @@ namespace Game3 {
 			std::shared_ptr<ItemTexture> texture;
 
 		public:
-			ItemSlotWidget(std::shared_ptr<ItemStack>, Slot, double size, double scale, bool active = false);
+			ItemSlotWidget(std::shared_ptr<Inventory>, std::shared_ptr<ItemStack>, Slot, double size, double scale, bool active = false);
 			ItemSlotWidget(Slot, double size, double scale, bool active = false);
 
 			void render(UIContext &, RendererContext &, float x, float y, float width, float height) final;
@@ -27,5 +29,7 @@ namespace Game3 {
 			void setStack(std::shared_ptr<ItemStack>);
 			void setActive(bool);
 			Slot getSlot() const;
+			std::shared_ptr<Inventory> getInventory() const;
+			GlobalID getOwnerGID() const;
 	};
 }

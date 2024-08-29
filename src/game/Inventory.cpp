@@ -9,6 +9,7 @@
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
 #include "game/Inventory.h"
+#include "game/InventoryGetter.h"
 #include "game/ServerInventory.h"
 #include "packet/InventoryPacket.h"
 #include "packet/SetActiveSlotPacket.h"
@@ -121,6 +122,10 @@ namespace Game3 {
 		}
 
 		return out;
+	}
+
+	std::unique_ptr<InventoryGetter> Inventory::getGetter() const {
+		return std::make_unique<InventoryGetter>(*this);
 	}
 
 	std::shared_ptr<Inventory> Inventory::create(Side side, std::shared_ptr<Agent> owner, Slot slot_count, InventoryID index, Slot active_slot, std::map<Slot, ItemStackPtr> storage) {
