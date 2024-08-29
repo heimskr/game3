@@ -42,15 +42,12 @@ OUTPUT       := game3
 COMPILER     ?= g++
 DEBUGGER     ?= gdb
 CPPFLAGS     += -Wall -Wextra $(BUILDFLAGS) -std=c++23 -Iinclude -Isubprojects/chemskr/include -Ibuilddir -Ibuilddir/subprojects/chemskr -Idiscord $(LTO) $(PROFILING)
-ZIG          ?= zig
-# --main-pkg-path is needed as otherwise it wouldn't let you embed any file outside of src/
-ZIGFLAGS     := -O ReleaseSmall --main-pkg-path .
 INCLUDES     := $(shell pkg-config --cflags $(DEPS))
 LIBS         := $(shell pkg-config --libs   $(DEPS))
 GLIB_COMPILE_RESOURCES = $(shell pkg-config --variable=glib_compile_resources gio-2.0)
 LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread $(LTO) $(PROFILING)
 SOURCES      := $(shell find -L src -name \*.cpp) src/gtk_resources.cpp
-OBJECTS      := $(SOURCES:.cpp=.o) src/resources.o
+OBJECTS      := $(SOURCES:.cpp=.o)
 RESXML       := src/$(OUTPUT).gresource.xml
 CLOC_OPTIONS := . --exclude-dir=voronoi,pvs-report,discord,subprojects,*build*,.codechecker,_build,po,vscode,stb,eigen,json,data,.github,.idea,vcpkg_installed,build,builddir,.flatpak-builder,libnoise --fullpath --not-match-f='^\.\/((src\/(gtk_)?resources\.cpp|include\/resources\.h|analysis\.txt|include\/lib\/.*|.*\.(json|txt|md|xml))|(chemskr\/src\/chemskr/(NuclideMasses|yylex|yyparse)\.cpp|chemskr\/(include|src)\/chemskr\/yyparse\.h))$$'
 
@@ -103,10 +100,6 @@ src/gtk_resources.cpp: $(RESXML) $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=r
 %.o: %.cpp
 	@ printf "\e[2m[\e[22;32mc++\e[39;2m]\e[22m $< \e[2m$(strip $(BUILDFLAGS) $(LTO))\e[22m\n"
 	@ $(COMPILER) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
-
-src/resources.o: src/resources.zig
-	@ printf "\e[2m[\e[22;32mzig\e[39;2m]\e[22m $< \e[2m$(ZIGFLAGS)\e[22m\n"
-	@ $(ZIG) build-obj $(ZIGFLAGS) $<  -femit-bin=$@
 
 $(OUTPUT): $(OBJECTS) chemskr/libchemskr.a $(NOISE_OBJ)
 	@ printf "\e[2m[\e[22;36mld\e[39;2m]\e[22m $@ \e[2m$(LTO)\e[22m\n"

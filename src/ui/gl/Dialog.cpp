@@ -11,7 +11,7 @@ namespace Game3 {
 
 	void Dialog::onClose() {}
 
-	bool Dialog::click(int button, int x, int y) {
+	bool Dialog::click(int, int x, int y) {
 		return getPosition().contains(x, y);
 	}
 
