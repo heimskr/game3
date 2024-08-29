@@ -24,7 +24,7 @@ namespace Game3 {
 	ItemSlotWidget::ItemSlotWidget(Slot slot, double size, double scale, bool active):
 		ItemSlotWidget(nullptr, nullptr, slot, size, scale, active) {}
 
-	void ItemSlotWidget::render(UIContext &ui, RendererContext &renderers, float x, float y, float width, float height) {
+	void ItemSlotWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(ui, renderers, x, y, width, height);
 
 		lastWidth = 16 * scale;
@@ -72,7 +72,7 @@ namespace Game3 {
 		return true;
 	}
 
-	float ItemSlotWidget::calculateHeight(RendererContext &, float, float) {
+	float ItemSlotWidget::calculateHeight(const RendererContext &, float, float) {
 		return 16 * scale;
 	}
 

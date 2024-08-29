@@ -19,7 +19,7 @@ namespace Game3 {
 		public:
 			virtual ~Dialog() = default;
 
-			virtual void render(RendererContext &) = 0;
+			virtual void render(const RendererContext &) = 0;
 			virtual Rectangle getPosition() const = 0;
 			virtual void onClose();
 			virtual bool click(int button, int x, int y);
@@ -29,6 +29,6 @@ namespace Game3 {
 			virtual bool scroll(float x_delta, float y_delta, int x, int y);
 
 			/** Order: clockwise starting at top left. */
-			void drawFrame(RendererContext &, double scale, bool alpha, const std::array<std::string_view, 8> &, const Color &interior = {0, 0, 0, 0});
+			void drawFrame(const RendererContext &, double scale, bool alpha, const std::array<std::string_view, 8> &, const Color &interior = {0, 0, 0, 0});
 	};
 }

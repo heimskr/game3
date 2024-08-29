@@ -9,8 +9,8 @@ namespace Game3 {
 		public:
 			using Tab::Tab;
 
-			void render(UIContext &, RendererContext &) final;
-			void renderIcon(RendererContext &) final;
+			void render(UIContext &, const RendererContext &) final;
+			void renderIcon(const RendererContext &) final;
 			void click(int button, int x, int y) final;
 	};
 }

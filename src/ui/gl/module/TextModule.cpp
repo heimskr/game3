@@ -7,6 +7,7 @@
 
 namespace {
 	constexpr float TEXT_SCALE = Game3::SCALE / 20;
+	constexpr float Y_ADDITION = TEXT_SCALE * 80 + 16;
 }
 
 namespace Game3 {
@@ -16,14 +17,12 @@ namespace Game3 {
 	TextModule::TextModule(std::shared_ptr<ClientGame>, std::string text):
 		text(std::move(text)) {}
 
-	void TextModule::render(UIContext &ui, RendererContext &renderers, float x, float y, float width, float height) {
-		auto saver = renderers.getSaver();
-		ui.scissorStack.pushRelative(Rectangle(x, y, width, height));
-		renderers.updateSize(width, height);
-		Defer pop([&] { ui.scissorStack.pop(); });
+	void TextModule::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+		Widget::render(ui, renderers, x, y, width, height);
 
 		renderers.text.drawOnScreen(text, TextRenderOptions{
-			.y = SCALE * 4 + 16,
+			.x = x,
+			.y = y + Y_ADDITION,
 			.scaleX = TEXT_SCALE,
 			.scaleY = TEXT_SCALE,
 			.wrapWidth = width - SCALE * 4,
@@ -33,9 +32,9 @@ namespace Game3 {
 		});
 	}
 
-	float TextModule::calculateHeight(RendererContext &renderers, float available_width, float) {
+	float TextModule::calculateHeight(const RendererContext &renderers, float available_width, float) {
 		if (lastTextHeight > 0 && available_width == lastWidth)
-			return lastTextHeight;
+			return lastTextHeight + Y_ADDITION;
 
 		return renderers.text.textHeight(text, TEXT_SCALE, available_width);
 	}

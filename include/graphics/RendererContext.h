@@ -25,13 +25,13 @@ namespace Game3 {
 		RendererContext(RectangleRenderer &rectangle_, SingleSpriteRenderer &single_sprite, BatchSpriteRenderer &batch_sprite, TextRenderer &text_, CircleRenderer &circle_, Recolor &recolor_, const Lockable<ClientSettings> &settings_, int factor_):
 			rectangle(rectangle_), singleSprite(single_sprite), batchSprite(batch_sprite), text(text_), circle(circle_), recolor(recolor_), settings(settings_), factor(factor_) {}
 
-		void pushSize();
-		void popSize();
-		void updateSize(int width, int height);
+		void pushSize() const;
+		void popSize() const;
+		void updateSize(int width, int height) const;
 
 		class Saver {
 			public:
-				explicit Saver(RendererContext &context_): context(context_) {
+				explicit Saver(const RendererContext &context_): context(context_) {
 					context.pushSize();
 				}
 
@@ -40,9 +40,9 @@ namespace Game3 {
 				}
 
 			private:
-				RendererContext &context;
+				const RendererContext &context;
 		};
 
-		Saver getSaver() { return Saver(*this); }
+		Saver getSaver() const { return Saver(*this); }
 	};
 }

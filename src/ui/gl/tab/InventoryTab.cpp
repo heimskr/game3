@@ -33,7 +33,7 @@ namespace Game3 {
 		playerScroller(makePlayerScroller()),
 		moduleScroller(makeModuleScroller()) {}
 
-	void InventoryTab::render(UIContext &ui, RendererContext &renderers) {
+	void InventoryTab::render(UIContext &ui, const RendererContext &renderers) {
 		Rectangle rectangle = ui.scissorStack.getTop();
 		rectangle.x = 0;
 		rectangle.y = 0;
@@ -48,7 +48,7 @@ namespace Game3 {
 			{
 				ui.scissorStack.pushRelative(Rectangle(rectangle.width + SEPARATION, 0) + rectangle, true);
 				Defer pop([&] { ui.scissorStack.pop(); });
-				active_module->render(ui, renderers, rectangle);
+				moduleScroller->render(ui, renderers, rectangle);
 				module_lock.unlock();
 			}
 
@@ -60,7 +60,7 @@ namespace Game3 {
 		}
 	}
 
-	void InventoryTab::renderIcon(RendererContext &renderers) {
+	void InventoryTab::renderIcon(const RendererContext &renderers) {
 		renderIconTexture(renderers, cacheTexture("resources/gui/inventory.png"));
 	}
 
@@ -69,9 +69,9 @@ namespace Game3 {
 			return;
 
 		std::unique_lock<DefaultMutex> lock;
-		if (Module *active_module = getModule(lock))
-			if (active_module->getLastRectangle().contains(x, y))
-				active_module->click(ui, button, x, y);
+		if (getModule(lock))
+			if (moduleScroller->getLastRectangle().contains(x, y))
+				moduleScroller->click(ui, button, x, y);
 	}
 
 	void InventoryTab::dragStart(int x, int y) {
@@ -79,9 +79,9 @@ namespace Game3 {
 			return;
 
 		std::unique_lock<DefaultMutex> lock;
-		if (Module *active_module = getModule(lock))
-			if (active_module->getLastRectangle().contains(x, y))
-				active_module->dragStart(ui, x, y);
+		if (getModule(lock))
+			if (moduleScroller->getLastRectangle().contains(x, y))
+				moduleScroller->dragStart(ui, x, y);
 	}
 
 	void InventoryTab::dragEnd(int x, int y) {
@@ -89,9 +89,9 @@ namespace Game3 {
 			return;
 
 		std::unique_lock<DefaultMutex> lock;
-		if (Module *active_module = getModule(lock))
-			if (active_module->getLastRectangle().contains(x, y))
-				active_module->dragEnd(ui, x, y);
+		if (getModule(lock))
+			if (moduleScroller->getLastRectangle().contains(x, y))
+				moduleScroller->dragEnd(ui, x, y);
 	}
 
 	void InventoryTab::scroll(float x_delta, float y_delta, int x, int y) {
@@ -99,15 +99,16 @@ namespace Game3 {
 			return;
 
 		std::unique_lock<DefaultMutex> lock;
-		if (Module *active_module = getModule(lock))
-			if (active_module->getLastRectangle().contains(x, y))
-				active_module->scroll(ui, x_delta, y_delta, x, y);
+		if (getModule(lock))
+			if (moduleScroller->getLastRectangle().contains(x, y))
+				moduleScroller->scroll(ui, x_delta, y_delta, x, y);
 	}
 
 	void InventoryTab::setModule(std::shared_ptr<Module> new_module) {
 		assert(new_module);
 		auto lock = activeModule.uniqueLock();
 		(activeModule.getBase() = std::move(new_module))->reset();
+		moduleScroller->setChild(activeModule);
 	}
 
 	Module * InventoryTab::getModule(std::shared_lock<DefaultMutex> &lock) {
@@ -123,6 +124,7 @@ namespace Game3 {
 	}
 
 	void InventoryTab::removeModule() {
+		moduleScroller->setChild(nullptr);
 		activeModule.reset();
 	}
 
@@ -133,6 +135,8 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<ScrollerWidget> InventoryTab::makeModuleScroller() {
-		return std::make_shared<ScrollerWidget>();
+		auto scroller = std::make_shared<ScrollerWidget>();
+		scroller->setChild(activeModule.copyBase());
+		return scroller;
 	}
 }

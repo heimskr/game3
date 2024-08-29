@@ -21,7 +21,7 @@ namespace Game3 {
 	InventoryModule::InventoryModule(std::shared_ptr<ClientGame>, const std::shared_ptr<ClientInventory> &inventory):
 		inventoryGetter(inventory->getGetter()) {}
 
-	void InventoryModule::render(UIContext &ui, RendererContext &renderers, float x, float y, float width, float height) {
+	void InventoryModule::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(ui, renderers, x, y, width, height);
 
 		InventoryPtr inventory = inventoryGetter->get();
@@ -112,7 +112,7 @@ namespace Game3 {
 		return true;
 	}
 
-	float InventoryModule::calculateHeight(RendererContext &, float available_width, float) {
+	float InventoryModule::calculateHeight(const RendererContext &, float available_width, float) {
 		return updiv(slotWidgets.size(), getColumnCount(available_width)) * OUTER_SLOT_SIZE * SLOT_SCALE;
 	}
 

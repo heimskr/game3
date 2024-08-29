@@ -16,8 +16,8 @@ namespace Game3 {
 			inline const Rectangle & getBase() const { return base; }
 			void setBase(const Rectangle &);
 			Rectangle getTop() const;
-			const Rectangle & pushRelative(const Rectangle &, bool do_viewport = false);
-			const Rectangle & pushAbsolute(const Rectangle &, bool do_viewport = false);
+			const Rectangle & pushRelative(const Rectangle &, bool do_viewport = false, bool do_scissor = true);
+			const Rectangle & pushAbsolute(const Rectangle &, bool do_viewport = false, bool do_scissor = true);
 			void pop();
 			void debug() const;
 	};

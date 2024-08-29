@@ -19,8 +19,8 @@ namespace Game3 {
 			ProgressBarWidget(float fixed_height, float scale, Color interior_color, Color background_color, Color exterior_color, float progress = 0);
 			ProgressBarWidget(float fixed_height, float scale, Color interior_color, float progress = 0);
 
-			void render(UIContext &, RendererContext &, float x, float y, float width, float height) final;
-			float calculateHeight(RendererContext &, float available_width, float available_height) final;
+			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
+			float calculateHeight(const RendererContext &, float available_width, float available_height) final;
 
 			void setProgress(float);
 	};

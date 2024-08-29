@@ -10,7 +10,7 @@ namespace Game3 {
 	Tab::Tab(UIContext &ui):
 		ui(ui) {}
 
-	void Tab::renderIconTexture(RendererContext &renderers, const std::shared_ptr<Texture> &texture) {
+	void Tab::renderIconTexture(const RendererContext &renderers, const std::shared_ptr<Texture> &texture) {
 		renderers.singleSprite.drawOnScreen(texture, RenderOptions{
 			.x = 5 * SCALE,
 			.y = 5 * SCALE,
@@ -22,7 +22,7 @@ namespace Game3 {
 		});
 	}
 
-	void Tab::renderIcon(RendererContext &) {}
+	void Tab::renderIcon(const RendererContext &) {}
 
 	void Tab::click(int, int, int) {}
 

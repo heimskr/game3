@@ -16,9 +16,9 @@ namespace Game3 {
 		public:
 			HotbarWidget(float scale);
 
-			void render(UIContext &, RendererContext &, float x, float y, float width, float height) final;
+			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
 			bool click(UIContext &, int button, int x, int y) final;
 			bool dragStart(UIContext &, int x, int y) final;
-			float calculateHeight(RendererContext &, float available_width, float available_height) final;
+			float calculateHeight(const RendererContext &, float available_width, float available_height) final;
 	};
 }

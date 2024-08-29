@@ -34,7 +34,7 @@ namespace Game3 {
 		tabRectangles.resize(tabs.size());
 	}
 
-	void OmniDialog::render(RendererContext &renderers) {
+	void OmniDialog::render(const RendererContext &renderers) {
 		ScissorStack &stack = ui.scissorStack;
 
 		Rectangle rectangle = getPosition();

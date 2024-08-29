@@ -130,4 +130,8 @@ namespace Game3 {
 	std::shared_ptr<ClientPlayer> UIContext::getPlayer() const {
 		return canvas.game->getPlayer();
 	}
+
+	RendererContext UIContext::getRenderers() const {
+		return canvas.getRendererContext();
+	}
 }

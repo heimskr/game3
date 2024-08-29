@@ -6,11 +6,11 @@
 #include "util/Defer.h"
 
 namespace {
-	constexpr float SCROLL_SPEED = 32;
+	constexpr float SCROLL_SPEED = 48;
 }
 
 namespace Game3 {
-	void ScrollerWidget::render(UIContext &ui, RendererContext &renderers, float x, float y, float width, float height) {
+	void ScrollerWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(ui, renderers, x, y, width, height);
 
 		if (!child)
@@ -38,18 +38,24 @@ namespace Game3 {
 		return child && child->dragEnd(ui, x, y);
 	}
 
-	bool ScrollerWidget::scroll(UIContext &, float x_delta, float y_delta, int, int) {
-		(void) x_delta; // TODO
+	bool ScrollerWidget::scroll(UIContext &ui, float x_delta, float y_delta, int, int) {
+		xOffset += (getNatural()? x_delta : -x_delta) * SCROLL_SPEED;
 		yOffset += (getNatural()? y_delta : -y_delta) * SCROLL_SPEED;
+		xOffset = std::min(0.f, xOffset);
+		yOffset = std::min(0.f, yOffset);
+		if (child)
+			yOffset = std::max(yOffset, -child->calculateHeight(ui.getRenderers(), lastWidth, lastHeight));
 		return true;
 	}
 
-	float ScrollerWidget::calculateHeight(RendererContext &, float, float available_height) {
+	float ScrollerWidget::calculateHeight(const RendererContext &, float, float available_height) {
 		return available_height;
 	}
 
 	void ScrollerWidget::setChild(WidgetPtr new_child) {
 		child = std::move(new_child);
+		xOffset = 0;
+		yOffset = 0;
 	}
 
 	bool ScrollerWidget::getNatural() const {

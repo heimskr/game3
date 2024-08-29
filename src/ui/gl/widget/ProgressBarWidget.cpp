@@ -31,7 +31,7 @@ namespace Game3 {
 	ProgressBarWidget::ProgressBarWidget(float fixed_height, float scale, Color interior_color, float progress):
 		ProgressBarWidget(fixed_height, scale, interior_color, DEFAULT_BACKGROUND_COLOR, DEFAULT_EXTERIOR_COLOR, progress) {}
 
-	void ProgressBarWidget::render(UIContext &ui, RendererContext &renderers, float x, float y, float width, float height) {
+	void ProgressBarWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		RectangleRenderer &rectangle = renderers.rectangle;
 
 		if (fixedHeight > 0)
@@ -67,7 +67,7 @@ namespace Game3 {
 		rectangle.drawOnScreen(bottomExteriorColor, x + width - scale, y + scale  + top_height, scale, bottom_height);
 	}
 
-	float ProgressBarWidget::calculateHeight(RendererContext &, float, float available_height) {
+	float ProgressBarWidget::calculateHeight(const RendererContext &, float, float available_height) {
 		return fixedHeight > 0? fixedHeight : available_height;
 	}
 }

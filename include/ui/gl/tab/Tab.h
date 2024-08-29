@@ -14,8 +14,8 @@ namespace Game3 {
 
 			virtual ~Tab() = default;
 
-			virtual void render(UIContext &, RendererContext &) = 0;
-			virtual void renderIcon(RendererContext &);
+			virtual void render(UIContext &, const RendererContext &) = 0;
+			virtual void renderIcon(const RendererContext &);
 			virtual void click(int button, int x, int y);
 			virtual void dragStart(int x, int y);
 			virtual void dragEnd(int x, int y);
@@ -24,6 +24,6 @@ namespace Game3 {
 		protected:
 			UIContext &ui;
 
-			void renderIconTexture(RendererContext &, const std::shared_ptr<Texture> &);
+			void renderIconTexture(const RendererContext &, const std::shared_ptr<Texture> &);
 	};
 }

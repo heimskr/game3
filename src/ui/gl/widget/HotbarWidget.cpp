@@ -16,7 +16,7 @@ namespace Game3 {
 		}
 	}
 
-	void HotbarWidget::render(UIContext &ui, RendererContext &renderers, float x, float y, float width, float height) {
+	void HotbarWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(ui, renderers, x, y, width, height);
 
 		const float offset = SLOT_PADDING * scale / 3;
@@ -57,7 +57,7 @@ namespace Game3 {
 		return true;
 	}
 
-	float HotbarWidget::calculateHeight(RendererContext &, float, float available_height) {
+	float HotbarWidget::calculateHeight(const RendererContext &, float, float available_height) {
 		return available_height;
 	}
 }

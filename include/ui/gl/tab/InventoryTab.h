@@ -12,8 +12,8 @@ namespace Game3 {
 		public:
 			InventoryTab(UIContext &);
 
-			void render(UIContext &, RendererContext &) final;
-			void renderIcon(RendererContext &) final;
+			void render(UIContext &, const RendererContext &) final;
+			void renderIcon(const RendererContext &) final;
 			void click(int button, int x, int y) final;
 			void dragStart(int x, int y) final;
 			void dragEnd(int x, int y) final;
@@ -25,11 +25,10 @@ namespace Game3 {
 			void removeModule();
 
 		private:
-			Rectangle innerRectangle;
+			LockableSharedPtr<Module> activeModule;
 			std::shared_ptr<Module> playerInventoryModule;
 			std::shared_ptr<ScrollerWidget> playerScroller;
 			std::shared_ptr<ScrollerWidget> moduleScroller;
-			LockableSharedPtr<Module> activeModule;
 
 			std::shared_ptr<ScrollerWidget> makePlayerScroller();
 			std::shared_ptr<ScrollerWidget> makeModuleScroller();

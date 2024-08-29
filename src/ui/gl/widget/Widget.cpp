@@ -7,7 +7,7 @@ namespace Game3 {
 		return {lastX, lastY, lastWidth, lastHeight};
 	}
 
-	void Widget::render(UIContext &ui, RendererContext &, float x, float y, float width, float height) {
+	void Widget::render(UIContext &ui, const RendererContext &, float x, float y, float width, float height) {
 		const Rectangle top = ui.scissorStack.getTop();
 		lastX = top.x + x;
 		lastY = top.y + y;
@@ -15,7 +15,7 @@ namespace Game3 {
 		lastHeight = height;
 	}
 
-	void Widget::render(UIContext &ui, RendererContext &renderers, const Rectangle &rectangle) {
+	void Widget::render(UIContext &ui, const RendererContext &renderers, const Rectangle &rectangle) {
 		render(ui, renderers,
 		       static_cast<float>(rectangle.x),
 		       static_cast<float>(rectangle.y),

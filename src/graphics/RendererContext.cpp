@@ -7,7 +7,7 @@
 #include "graphics/TextRenderer.h"
 
 namespace Game3 {
-	void RendererContext::pushSize() {
+	void RendererContext::pushSize() const {
 		rectangle.pushBackbuffer();
 		singleSprite.pushBackbuffer();
 		batchSprite.pushBackbuffer();
@@ -16,7 +16,7 @@ namespace Game3 {
 		recolor.pushBackbuffer();
 	}
 
-	void RendererContext::popSize() {
+	void RendererContext::popSize() const {
 		rectangle.popBackbuffer();
 		singleSprite.popBackbuffer();
 		batchSprite.popBackbuffer();
@@ -25,7 +25,7 @@ namespace Game3 {
 		recolor.popBackbuffer();
 	}
 
-	void RendererContext::updateSize(int width, int height) {
+	void RendererContext::updateSize(int width, int height) const {
 		rectangle.update(width, height);
 		singleSprite.update(width, height);
 		batchSprite.update(width, height);

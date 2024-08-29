@@ -42,6 +42,7 @@ namespace Game3 {
 			void setDraggedWidget(WidgetPtr);
 			WidgetPtr getDraggedWidget() const;
 			std::shared_ptr<ClientPlayer> getPlayer() const;
+			RendererContext getRenderers() const;
 
 			template <typename T>
 			size_t removeDialogs() {

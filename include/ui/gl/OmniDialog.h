@@ -22,7 +22,7 @@ namespace Game3 {
 
 			OmniDialog(UIContext &);
 
-			void render(RendererContext &) final;
+			void render(const RendererContext &) final;
 			Rectangle getPosition() const final;
 			void onClose() final;
 			bool click(int button, int x, int y) final;
