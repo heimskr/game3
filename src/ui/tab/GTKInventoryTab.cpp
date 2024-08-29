@@ -332,8 +332,8 @@ namespace Game3 {
 			if (!inventoryModule) {
 				inventoryModule.emplace(game, client_inventory, this, sigc::mem_fun(*this, &GTKInventoryTab::gmenuSetup));
 				inventoryModule->setShowLabel(false);
-				vbox.prepend(inventoryModule->getWidget());
-				vbox.prepend(actionBox);
+				// vbox.prepend(inventoryModule->getWidget());
+				// vbox.prepend(actionBox);
 			} else {
 				inventoryModule->setInventory(client_inventory);
 			}

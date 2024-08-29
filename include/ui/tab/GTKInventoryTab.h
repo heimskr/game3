@@ -37,7 +37,7 @@ namespace Game3 {
 			~GTKInventoryTab() override;
 
 			Gtk::Widget & getWidget() override { return scrolled; }
-			std::string getName() override { return "Inventory"; }
+			std::string getName() override { return "Modules"; }
 			void onResize(const std::shared_ptr<ClientGame> &) override;
 			void update(const std::shared_ptr<ClientGame> &) override;
 			void reset(const std::shared_ptr<ClientGame> &) override;
