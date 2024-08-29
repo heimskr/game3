@@ -6,7 +6,7 @@
 #include "util/Defer.h"
 
 namespace {
-	constexpr float TEXT_SCALE = Game3::SCALE / 20;
+	constexpr float TEXT_SCALE = Game3::SCALE / 16;
 	constexpr float Y_ADDITION = TEXT_SCALE * 80 + 16;
 }
 
