@@ -9,6 +9,11 @@
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 
+namespace {
+	constexpr int SEPARATION = 32;
+	constexpr int SEPARATOR_WIDTH = 8;
+}
+
 namespace Game3 {
 	namespace {
 		std::shared_ptr<InventoryModule> makePlayerInventoryModule(UIContext &ui) {
@@ -28,10 +33,13 @@ namespace Game3 {
 
 		std::unique_lock<DefaultMutex> module_lock;
 		if (Module *active_module = getModule(module_lock)) {
-			rectangle.width /= 2;
-			rectangle.x += rectangle.width;
+			renderers.rectangle.drawOnScreen(Color{0.6, 0.3, 0, 0.2}, (rectangle.width - SEPARATOR_WIDTH) / 2, 0, SEPARATOR_WIDTH, rectangle.height);
+			rectangle.width = (rectangle.width - SEPARATION) / 2;
+
+			rectangle.x += rectangle.width + SEPARATION;
 			active_module->render(ui, renderers, rectangle);
-			rectangle.x -= rectangle.width;
+
+			rectangle.x -= rectangle.width + SEPARATION;
 			module_lock.unlock();
 		}
 
