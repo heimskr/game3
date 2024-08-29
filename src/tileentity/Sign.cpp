@@ -22,7 +22,7 @@ namespace Game3 {
 	}
 
 	bool Sign::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, const ItemStackPtr &, Hand) {
-		player->send(OpenTextTabPacket(name, text, true, true));
+		player->showText(text, name);
 		return true;
 	}
 

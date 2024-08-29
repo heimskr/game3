@@ -29,5 +29,26 @@ namespace Game3 {
 			bool click(int x, int y) final;
 			bool dragStart(int x, int y) final;
 			bool dragEnd(int x, int y) final;
+
+			template <typename T>
+			size_t removeTab() {
+				return std::erase_if(tabs, &tabMatcher<T>);
+			}
+
+			template <typename T>
+			bool hasTab() const {
+				return std::ranges::any_of(tabs, &tabMatcher<T>);
+			}
+
+			template <typename T, typename... Args>
+			void addTab(Args &&...args) {
+				tabs.emplace_back(std::make_shared<T>(ui, std::forward<Args>(args)...));
+			}
+
+		private:
+			template <typename T>
+			static bool tabMatcher(const std::shared_ptr<Tab> &tab) {
+				return dynamic_cast<const T *>(tab.get()) != nullptr;
+			}
 	};
 }

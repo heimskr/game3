@@ -22,26 +22,6 @@ namespace Game3 {
 	struct RendererContext;
 
 	class UIContext {
-		private:
-			Canvas &canvas;
-			std::vector<std::shared_ptr<Dialog>> dialogs;
-			ScissorStack internalScissorStack; // TODO: remove this
-			std::map<std::filesystem::path, std::shared_ptr<Texture>> textureMap;
-			WidgetPtr draggedWidget;
-			bool draggedWidgetActive = false;
-			std::optional<std::pair<int, int>> dragOrigin;
-			std::unique_ptr<HotbarWidget> hotbarWidget;
-
-			template <typename T>
-			static bool dialogMatcher(const std::shared_ptr<Dialog> &dialog) {
-				if (T *cast = dynamic_cast<T *>(dialog.get())) {
-					cast->onClose();
-					return true;
-				}
-
-				return false;
-			}
-
 		public:
 			ScissorStack scissorStack;
 			bool renderingDraggedWidget = false;
@@ -74,6 +54,25 @@ namespace Game3 {
 			template <typename T, typename... Args>
 			void addDialog(Args &&...args) {
 				dialogs.emplace_back(std::make_shared<T>(*this, std::forward<Args>(args)...));
+			}
+
+		private:
+			Canvas &canvas;
+			std::vector<std::shared_ptr<Dialog>> dialogs;
+			ScissorStack internalScissorStack; // TODO: remove this
+			WidgetPtr draggedWidget;
+			bool draggedWidgetActive = false;
+			std::optional<std::pair<int, int>> dragOrigin;
+			std::unique_ptr<HotbarWidget> hotbarWidget;
+
+			template <typename T>
+			static bool dialogMatcher(const std::shared_ptr<Dialog> &dialog) {
+				if (T *cast = dynamic_cast<T *>(dialog.get())) {
+					cast->onClose();
+					return true;
+				}
+
+				return false;
 			}
 	};
 }
