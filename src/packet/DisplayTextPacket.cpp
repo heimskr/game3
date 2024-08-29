@@ -1,20 +1,18 @@
 #include "Log.h"
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
-#include "packet/OpenTextTabPacket.h"
+#include "packet/DisplayTextPacket.h"
 #include "ui/MainWindow.h"
 #include "ui/gl/module/TextModule.h"
-#include "ui/tab/GTKInventoryTab.h"
-#include "ui/tab/GTKTextTab.h"
 
 namespace Game3 {
-	void OpenTextTabPacket::handle(const ClientGamePtr &game) {
+	void DisplayTextPacket::handle(const ClientGamePtr &game) {
 		MainWindow &window = game->getWindow();
 
 		if (removeOnMove) {
 			game->getPlayer()->queueForMove([&window](const auto &, bool) {
 				window.queue([&window] {
-					window.inventoryTab->show();
+					window.removeModule();
 				});
 				return true;
 			});

@@ -31,7 +31,6 @@
 #include "ui/module/VillageTradeModule.h"
 #include "ui/tab/GTKCraftingTab.h"
 #include "ui/tab/GTKInventoryTab.h"
-#include "ui/tab/GTKTextTab.h"
 #include "ui/App.h"
 #include "ui/Canvas.h"
 #include "ui/LogOverlay.h"
@@ -367,7 +366,6 @@ namespace Game3 {
 
 		initTab(inventoryTab, *this).add();
 		initTab(craftingTab, *this).add();
-		initTab(textTab, notebook, "", "");
 		activeTab = inventoryTab;
 
 		stack.add(paned);
@@ -753,6 +751,13 @@ namespace Game3 {
 			std::any data{std::move(buffer)};
 			current_module->handleMessage(source, name, data);
 		}
+	}
+
+	void MainWindow::showOmniDialog() {
+		assert(canvas);
+		UIContext &ui = canvas->uiContext;
+		if (!ui.hasDialog<OmniDialog>())
+			ui.addDialog(getOmniDialog());
 	}
 
 	void MainWindow::showFluids(const std::shared_ptr<HasFluids> &has_fluids) {

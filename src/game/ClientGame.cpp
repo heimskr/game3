@@ -20,7 +20,6 @@
 #include "threading/ThreadContext.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
-#include "ui/tab/GTKTextTab.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -142,23 +141,9 @@ namespace Game3 {
 	}
 
 	void ClientGame::setText(const Glib::ustring &text, const Glib::ustring &name, bool focus, bool ephemeral) {
-		if (canvas.window.textTab) {
-			auto &tab = *canvas.window.textTab;
-			tab.text = text;
-			tab.name = name;
-			tab.ephemeral = ephemeral;
-			if (focus)
-				tab.show();
-			tab.reset(toClientPointer());
-		} else {
-			WARN("Text tab not found");
-		}
-	}
-
-	const Glib::ustring & ClientGame::getText() const {
-		if (canvas.window.textTab)
-			return canvas.window.textTab->text;
-		throw std::runtime_error("Can't get text: GTKTextTab is null");
+		MainWindow &window = getWindow();
+		window.showOmniDialog();
+		window.openModule("base:module/text", std::any(text.raw()));
 	}
 
 	void ClientGame::runCommand(const std::string &command) {

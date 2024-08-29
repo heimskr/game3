@@ -33,7 +33,6 @@ namespace Game3 {
 	class GTKTab;
 	class HasFluids;
 	class OmniDialog;
-	class GTKTextTab;
 	struct Position;
 	struct WorldGenParams;
 
@@ -43,7 +42,6 @@ namespace Game3 {
 			Gtk::HeaderBar *header = nullptr;
 			Gtk::Notebook notebook;
 			std::shared_ptr<ClientGame> game;
-			std::shared_ptr<GTKTextTab> textTab;
 			std::shared_ptr<GTKInventoryTab> inventoryTab;
 			std::shared_ptr<GTKCraftingTab> craftingTab;
 			std::shared_ptr<OmniDialog> omniDialog;
@@ -105,6 +103,8 @@ namespace Game3 {
 			void showFluids(const std::shared_ptr<HasFluids> &);
 
 			void moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data);
+
+			void showOmniDialog();
 
 			template <typename... Args>
 			void moduleMessage(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Args &&...args) {

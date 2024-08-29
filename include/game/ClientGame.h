@@ -41,7 +41,6 @@ namespace Game3 {
 			Position translateCanvasCoordinates(double x, double y, double *x_offset_out = nullptr, double *y_offset_out = nullptr) const;
 			void activateContext();
 			void setText(const Glib::ustring &text, const Glib::ustring &name = "", bool focus = true, bool ephemeral = false);
-			const Glib::ustring & getText() const;
 			void runCommand(const std::string &);
 			bool tick() final;
 			void queuePacket(std::shared_ptr<Packet>);

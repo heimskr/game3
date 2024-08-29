@@ -6,7 +6,7 @@
 #include "packet/EntityMoneyChangedPacket.h"
 #include "packet/EntityPacket.h"
 #include "packet/EntitySetPathPacket.h"
-#include "packet/OpenTextTabPacket.h"
+#include "packet/DisplayTextPacket.h"
 #include "util/Cast.h"
 #include "util/Util.h"
 
@@ -239,6 +239,6 @@ namespace Game3 {
 	}
 
 	void ServerPlayer::showText(const Glib::ustring &text, const Glib::ustring &name) {
-		send(OpenTextTabPacket(name.raw(), text.raw(), true, true));
+		send(DisplayTextPacket(name.raw(), text.raw(), true));
 	}
 }
