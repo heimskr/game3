@@ -7,6 +7,7 @@
 #include "game/ServerGame.h"
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/module/ModuleFactory.h"
+#include "ui/gl/module/TextModule.h"
 #include "ui/module/AutocrafterModule.h"
 #include "ui/module/ChemicalReactorModule.h"
 #include "ui/module/CombinerModule.h"
@@ -63,6 +64,7 @@ namespace Game3 {
 		add(GTKModuleFactory::create<MultiModule<Substance::Item, Substance::Fluid>>());
 		add(GTKModuleFactory::create<MultiModule<Substance::Item, Substance::Energy>>());
 		add(ModuleFactory::create<InventoryModule>());
+		add(ModuleFactory::create<TextModule>());
 #ifdef GAME3_ENABLE_SCRIPTING
 		add(GTKModuleFactory::create<ComputerModule>());
 #endif

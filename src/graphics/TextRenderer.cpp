@@ -253,13 +253,33 @@ namespace Game3 {
 		glActiveTexture(GL_TEXTURE0); CHECKGL
 		glBindVertexArray(vao); CHECKGL
 
+		const auto i_height = getCharacter('I').size.y * scale_y;
+		const auto wrap_width = options.wrapWidth;
+		const auto x_start = x;
+
+		auto next_line = [&] {
+			x = x_start;
+			y -= i_height * 1.5;
+		};
+
 		for (const gunichar ch: text) {
+			if (ch == '\n') {
+				next_line();
+				continue;
+			}
+
 			const Character &character = getCharacter(ch);
 
-			const float xpos = x + character.bearing.x * scale_x;
-			const float ypos = y - (character.size.y - character.bearing.y) * scale_y;
+			float xpos = x + character.bearing.x * scale_x;
+			float ypos = y - (character.size.y - character.bearing.y) * scale_y;
 			const float w = character.size.x * scale_x;
 			const float h = character.size.y * scale_y;
+
+			if (wrap_width > 0 && wrap_width < xpos - x_start + w) {
+				next_line();
+				xpos = x + character.bearing.x * scale_x;
+				ypos = y - (character.size.y - character.bearing.y) * scale_y;
+			}
 
 			// Update VBO for each character
 			const float vertices[6][4] = {

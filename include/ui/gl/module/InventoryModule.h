@@ -7,6 +7,8 @@
 #include "ui/gl/widget/ItemSlotWidget.h"
 
 #include <any>
+#include <memory>
+#include <vector>
 
 namespace Game3 {
 	class ClientGame;

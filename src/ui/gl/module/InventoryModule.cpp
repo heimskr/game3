@@ -20,7 +20,7 @@ namespace Game3 {
 		auto saver = renderers.getSaver();
 		innerRectangle = ui.scissorStack.pushAbsolute(Rectangle(x, y, width, height));
 		renderers.updateSize(innerRectangle.width, innerRectangle.height);
-		Defer pop([&ui] { ui.scissorStack.pop(); });
+		Defer pop([&] { ui.scissorStack.pop(); });
 
 		InventoryPtr inventory = inventoryGetter->get();
 		auto inventory_lock = inventory->sharedLock();

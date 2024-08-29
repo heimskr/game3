@@ -3,6 +3,7 @@
 #include "game/ClientGame.h"
 #include "packet/OpenTextTabPacket.h"
 #include "ui/MainWindow.h"
+#include "ui/gl/module/TextModule.h"
 #include "ui/tab/GTKInventoryTab.h"
 #include "ui/tab/GTKTextTab.h"
 
@@ -19,13 +20,8 @@ namespace Game3 {
 			});
 		}
 
-		window.queue([&game, &window, name = std::move(name), message = std::move(message), ephemeral = ephemeral] mutable {
-			GTKTextTab &tab = *window.textTab;
-			tab.name = std::move(name);
-			tab.text = std::move(message);
-			tab.ephemeral = ephemeral;
-			tab.reset(game);
-			tab.show();
+		window.queue([&window, message = std::move(message)] mutable {
+			window.openModule("base:module/text", std::any(std::move(message)));
 		});
 	}
 }

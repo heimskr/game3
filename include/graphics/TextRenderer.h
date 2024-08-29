@@ -16,6 +16,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <gtkmm.h>
 
+// TODO!: replace Glib::ustring
+
 namespace Game3 {
 	class Canvas;
 
@@ -27,6 +29,7 @@ namespace Game3 {
 		double scaleX = 1;
 		double scaleY = 1;
 		double angle  = 0;
+		double wrapWidth = 0;
 		Color color{1, 1, 1, 1};
 		TextAlign align = TextAlign::Left;
 		Color shadow{0, 0, 0, 1};
