@@ -12,6 +12,7 @@
 #include "ui/gl/Constants.h"
 #include "ui/gl/OmniDialog.h"
 #include "ui/gl/UIContext.h"
+#include "util/Defer.h"
 
 namespace {
 	constexpr std::array<std::string_view, 8> PIECES{
@@ -43,10 +44,8 @@ namespace Game3 {
 		RectangleRenderer &rectangler = renderers.rectangle;
 
 		{
-			auto saver = renderers.getSaver();
+			auto saver = stack.pushRelative(rectangle, renderers);
 
-			stack.pushRelative({rectangle, true});
-			renderers.updateSize(rectangle.width, rectangle.height);
 			drawFrame(renderers, SCALE, false, PIECES, inner_color);
 
 			rectangle.x = 9 * SCALE;
@@ -59,14 +58,12 @@ namespace Game3 {
 
 			stack.pushRelative({rectangle, true});
 			renderers.updateSize(rectangle.width, rectangle.height);
+			Defer pop([&] { stack.pop(); });
 
 			rectangler.drawOnScreen(Color{0.6, 0.3, 0, 0.1}, 0, 0, 10000, 10000);
 
 			if (activeTab)
 				activeTab->render(ui, renderers);
-
-			stack.pop();
-			stack.pop();
 		}
 
 		auto saver = renderers.getSaver();

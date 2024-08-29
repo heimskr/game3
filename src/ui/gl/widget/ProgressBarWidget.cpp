@@ -32,7 +32,7 @@ namespace Game3 {
 		ProgressBarWidget(fixed_height, scale, interior_color, DEFAULT_BACKGROUND_COLOR, DEFAULT_EXTERIOR_COLOR, progress) {}
 
 	void ProgressBarWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
-		RectangleRenderer &rectangle = renderers.rectangle;
+		RectangleRenderer &rectangler = renderers.rectangle;
 
 		if (fixedHeight > 0)
 			height = fixedHeight;
@@ -44,27 +44,27 @@ namespace Game3 {
 		const float bottom_height = .4f * (height - 2 * scale);
 
 		// Bar fill
-		rectangle.drawOnScreen(topInteriorColor, x + scale, y + scale, bar_width, top_height);
-		rectangle.drawOnScreen(bottomInteriorColor, x + scale, y + scale + top_height, bar_width, bottom_height);
+		rectangler(topInteriorColor, x + scale, y + scale, bar_width, top_height);
+		rectangler(bottomInteriorColor, x + scale, y + scale + top_height, bar_width, bottom_height);
 
 		// Background
-		rectangle.drawOnScreen(backgroundColor, x + scale + bar_width, y + scale, width - 2 * scale - bar_width, height - 2 * scale);
+		rectangler(backgroundColor, x + scale + bar_width, y + scale, width - 2 * scale - bar_width, height - 2 * scale);
 
 		// Top and bottom horizontal rectangles
-		rectangle.drawOnScreen(topExteriorColor, x + scale, y, width - 2 * scale, scale);
-		rectangle.drawOnScreen(bottomExteriorColor, x + scale, y + height - scale, width - 2 * scale, scale);
+		rectangler(topExteriorColor, x + scale, y, width - 2 * scale, scale);
+		rectangler(bottomExteriorColor, x + scale, y + height - scale, width - 2 * scale, scale);
 
 		// Corner rectangles
-		rectangle.drawOnScreen(topExteriorColor, x + scale, y + scale, scale, scale);
-		rectangle.drawOnScreen(topExteriorColor, x + width - scale * 2, y + scale, scale, scale);
-		rectangle.drawOnScreen(bottomExteriorColor, x + scale, y + height - scale * 2, scale, scale);
-		rectangle.drawOnScreen(bottomExteriorColor, x + width - scale * 2, y + height - scale * 2, scale, scale);
+		rectangler(topExteriorColor, x + scale, y + scale, scale, scale);
+		rectangler(topExteriorColor, x + width - scale * 2, y + scale, scale, scale);
+		rectangler(bottomExteriorColor, x + scale, y + height - scale * 2, scale, scale);
+		rectangler(bottomExteriorColor, x + width - scale * 2, y + height - scale * 2, scale, scale);
 
 		// Side rectangles
-		rectangle.drawOnScreen(topExteriorColor, x, y + scale, scale, top_height);
-		rectangle.drawOnScreen(topExteriorColor, x + width - scale, y + scale, scale, top_height);
-		rectangle.drawOnScreen(bottomExteriorColor, x, y + scale + top_height, scale, bottom_height);
-		rectangle.drawOnScreen(bottomExteriorColor, x + width - scale, y + scale  + top_height, scale, bottom_height);
+		rectangler(topExteriorColor, x, y + scale, scale, top_height);
+		rectangler(topExteriorColor, x + width - scale, y + scale, scale, top_height);
+		rectangler(bottomExteriorColor, x, y + scale + top_height, scale, bottom_height);
+		rectangler(bottomExteriorColor, x + width - scale, y + scale  + top_height, scale, bottom_height);
 	}
 
 	float ProgressBarWidget::calculateHeight(const RendererContext &, float, float available_height) {

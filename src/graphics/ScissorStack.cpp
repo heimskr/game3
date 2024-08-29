@@ -1,10 +1,30 @@
 #include "Log.h"
 #include "graphics/GL.h"
+#include "graphics/RendererContext.h"
 #include "graphics/ScissorStack.h"
 
 #include <algorithm>
 
 namespace Game3 {
+
+	ScissorSaver::ScissorSaver(ScissorStack &scissor_stack, SizeSaver &&size_saver):
+		scissorStack(&scissor_stack), sizeSaver(std::move(size_saver)) {}
+
+	ScissorSaver::ScissorSaver(ScissorSaver &&other) noexcept:
+		scissorStack(std::exchange(other.scissorStack, nullptr)), sizeSaver(std::move(other.sizeSaver)) {}
+
+	ScissorSaver::~ScissorSaver() {
+		if (scissorStack)
+			scissorStack->pop();
+		// SizeSaver will apply automatically on destruction
+	}
+
+	ScissorSaver & ScissorSaver::operator=(ScissorSaver &&other) noexcept {
+		scissorStack = std::exchange(other.scissorStack, nullptr);
+		sizeSaver = std::move(other.sizeSaver);
+		return *this;
+	}
+
 	void ScissorStack::Item::apply(int base_height) const {
 		if (doViewport)
 			rectangle.viewport(base_height);
@@ -34,6 +54,20 @@ namespace Game3 {
 		const Item &out = stack.emplace_back(item);
 		out.apply(base.height);
 		return out.rectangle;
+	}
+
+	ScissorSaver ScissorStack::pushRelative(const Rectangle &rectangle, const RendererContext &context) {
+		SizeSaver size_saver = context.getSaver();
+		const Rectangle &result = pushRelative({rectangle, true, true});
+		context.updateSize(result.width, result.height);
+		return {*this, std::move(size_saver)};
+	}
+
+	ScissorSaver ScissorStack::pushAbsolute(const Rectangle &rectangle, const RendererContext &context) {
+		SizeSaver size_saver = context.getSaver();
+		const Rectangle &result = pushAbsolute({rectangle, true, true});
+		context.updateSize(result.width, result.height);
+		return {*this, std::move(size_saver)};
 	}
 
 	void ScissorStack::pop() {

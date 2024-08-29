@@ -239,6 +239,13 @@ namespace Game3 {
 			std::swap(options.y, y);
 		}
 
+		float y_addition = 0;
+
+		if (options.alignTop) {
+			y_addition = options.scaleY * 80 + 16;
+			options.y += y_addition;
+		}
+
 		options.y = backbufferHeight - options.y;
 
 		auto &x = options.x;
@@ -270,7 +277,7 @@ namespace Game3 {
 		float highest_on_first_line = 0;
 
 		for (const gunichar ch: text) {
-			if (ch == '\n') {
+			if (!options.ignoreNewline && ch == '\n') {
 				next_line();
 				continue;
 			}
@@ -319,8 +326,12 @@ namespace Game3 {
 		glBindTexture(GL_TEXTURE_2D, 0); CHECKGL
 
 		if (options.heightOut) {
-			*options.heightOut = y_start - y + highest_on_first_line;
+			*options.heightOut = y_start - y + highest_on_first_line + y_addition;
 		}
+	}
+
+	void TextRenderer::operator()(const Glib::ustring &text, const TextRenderOptions &options) {
+		drawOnScreen(text, options);
 	}
 
 	float TextRenderer::textWidth(const Glib::ustring &text, float scale) {

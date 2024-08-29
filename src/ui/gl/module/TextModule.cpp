@@ -7,7 +7,6 @@
 
 namespace {
 	constexpr float TEXT_SCALE = Game3::SCALE / 16;
-	constexpr float Y_ADDITION = TEXT_SCALE * 80 + 16;
 }
 
 namespace Game3 {
@@ -22,11 +21,12 @@ namespace Game3 {
 
 		renderers.text.drawOnScreen(text, TextRenderOptions{
 			.x = x,
-			.y = y + Y_ADDITION,
+			.y = y,
 			.scaleX = TEXT_SCALE,
 			.scaleY = TEXT_SCALE,
 			.wrapWidth = width - SCALE * 4,
 			.color{0, 0, 0, 1},
+			.alignTop = true,
 			.shadow{0, 0, 0, 0},
 			.heightOut = &lastTextHeight,
 		});
@@ -34,7 +34,7 @@ namespace Game3 {
 
 	float TextModule::calculateHeight(const RendererContext &renderers, float available_width, float) {
 		if (lastTextHeight > 0 && available_width == lastWidth)
-			return lastTextHeight + Y_ADDITION;
+			return lastTextHeight;
 
 		return renderers.text.textHeight(text, TEXT_SCALE, available_width);
 	}

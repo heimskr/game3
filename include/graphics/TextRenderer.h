@@ -32,9 +32,11 @@ namespace Game3 {
 		double wrapWidth = 0;
 		Color color{1, 1, 1, 1};
 		TextAlign align = TextAlign::Left;
+		bool alignTop = false;
 		Color shadow{0, 0, 0, 1};
 		Vector2f shadowOffset{.025f, .025f};
 		float *heightOut = nullptr;
+		bool ignoreNewline = false;
 	};
 
 	class TextRenderer: public HasBackbuffer {
@@ -64,14 +66,10 @@ namespace Game3 {
 			void drawOnMap(const Glib::ustring &text, float x, float y, TextAlign align, float scale, float angle, float alpha);
 			void drawOnMap(const Glib::ustring &text, TextRenderOptions = {});
 			void drawOnScreen(const Glib::ustring &text, TextRenderOptions = {});
+			void operator()(const Glib::ustring &text, const TextRenderOptions & = {});
 			float textWidth(const Glib::ustring &text, float scale = 1.f);
 			float textHeight(const Glib::ustring &text, float scale = 1.f);
 			float textHeight(const Glib::ustring &text, float scale, float wrap_width);
-
-			template <typename... Args>
-			void operator()(Args &&...args) {
-				drawOnMap(std::forward<Args>(args)...);
-			}
 
 			void reset();
 

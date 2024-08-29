@@ -7,6 +7,7 @@
 #include "graphics/TextRenderer.h"
 
 namespace Game3 {
+
 	void RendererContext::pushSize() const {
 		rectangle.pushBackbuffer();
 		singleSprite.pushBackbuffer();

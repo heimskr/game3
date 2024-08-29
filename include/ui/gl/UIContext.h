@@ -39,10 +39,13 @@ namespace Game3 {
 			bool dragUpdate(int x, int y);
 			bool dragEnd(int x, int y);
 			bool scroll(float x_delta, float y_delta, int x, int y);
+			bool keyPressed(uint32_t character);
 			void setDraggedWidget(WidgetPtr);
 			WidgetPtr getDraggedWidget() const;
 			std::shared_ptr<ClientPlayer> getPlayer() const;
 			RendererContext getRenderers() const;
+			void focusWidget(std::weak_ptr<Widget>);
+			WidgetPtr getFocusedWidget() const;
 
 			template <typename T>
 			size_t removeDialogs() {
@@ -66,6 +69,7 @@ namespace Game3 {
 			bool draggedWidgetActive = false;
 			std::optional<std::pair<int, int>> dragOrigin;
 			std::unique_ptr<HotbarWidget> hotbarWidget;
+			std::weak_ptr<Widget> focusedWidget;
 
 			template <typename T>
 			static bool dialogMatcher(const std::shared_ptr<Dialog> &dialog) {

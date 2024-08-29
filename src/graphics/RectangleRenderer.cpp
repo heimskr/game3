@@ -119,8 +119,16 @@ namespace Game3 {
 		glBindVertexArray(0); CHECKGL
 	}
 
+	void RectangleRenderer::drawOnScreen(const Color &color, const Rectangle &rectangle, float angle) {
+		drawOnScreen(color, rectangle.x, rectangle.y, rectangle.width, rectangle.height, angle);
+	}
+
 	void RectangleRenderer::operator()(const Color &color, float x, float y, float width, float height, float angle) {
 		drawOnScreen(color, x, y, width, height, angle);
+	}
+
+	void RectangleRenderer::operator()(const Color &color, const Rectangle &rectangle, float angle) {
+		(*this)(color, rectangle.x, rectangle.y, rectangle.width, rectangle.height, angle);
 	}
 
 	void RectangleRenderer::initRenderData() {

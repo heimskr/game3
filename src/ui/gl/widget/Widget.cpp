@@ -46,4 +46,8 @@ namespace Game3 {
 	bool Widget::scroll(UIContext &, float, float, int, int) {
 		return false;
 	}
+
+	bool Widget::keyPressed(UIContext &, uint32_t) {
+		return false;
+	}
 }

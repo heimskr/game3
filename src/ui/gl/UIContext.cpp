@@ -119,6 +119,18 @@ namespace Game3 {
 		return dialogs.empty() && hotbarWidget->getLastRectangle().contains(x, y) && hotbarWidget->scroll(*this, x_delta, y_delta, x, y);
 	}
 
+	bool UIContext::keyPressed(uint32_t character) {
+		if (auto focused = getFocusedWidget())
+			if (focused->keyPressed(*this, character))
+				return true;
+
+		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
+			if (dialog->keyPressed(character))
+				return true;
+
+		return dialogs.empty() && hotbarWidget->keyPressed(*this, character);
+	}
+
 	void UIContext::setDraggedWidget(WidgetPtr new_dragged_widget) {
 		draggedWidget = std::move(new_dragged_widget);
 	}
@@ -133,5 +145,13 @@ namespace Game3 {
 
 	RendererContext UIContext::getRenderers() const {
 		return canvas.getRendererContext();
+	}
+
+	void UIContext::focusWidget(std::weak_ptr<Widget> to_focus) {
+		focusedWidget = std::move(to_focus);
+	}
+
+	WidgetPtr UIContext::getFocusedWidget() const {
+		return focusedWidget.lock();
 	}
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "client/ClientSettings.h"
+#include "graphics/SizeSaver.h"
 #include "threading/Lockable.h"
 
 namespace Game3 {
@@ -29,20 +30,6 @@ namespace Game3 {
 		void popSize() const;
 		void updateSize(int width, int height) const;
 
-		class Saver {
-			public:
-				explicit Saver(const RendererContext &context_): context(context_) {
-					context.pushSize();
-				}
-
-				~Saver() {
-					context.popSize();
-				}
-
-			private:
-				const RendererContext &context;
-		};
-
-		Saver getSaver() const { return Saver(*this); }
+		SizeSaver getSaver() const { return SizeSaver(*this); }
 	};
 }

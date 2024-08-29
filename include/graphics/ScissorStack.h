@@ -1,10 +1,28 @@
 #pragma once
 
 #include "graphics/Rectangle.h"
+#include "graphics/SizeSaver.h"
 
 #include <vector>
 
 namespace Game3 {
+	class ScissorStack;
+	struct RendererContext;
+
+	class ScissorSaver {
+		public:
+			ScissorSaver(ScissorStack &, SizeSaver &&);
+			ScissorSaver(ScissorSaver &) = delete;
+			ScissorSaver(ScissorSaver &&) noexcept;
+			~ScissorSaver();
+			ScissorSaver & operator=(const ScissorSaver &) = delete;
+			ScissorSaver & operator=(ScissorSaver &&) noexcept;
+
+		private:
+			ScissorStack *scissorStack;
+			SizeSaver sizeSaver;
+	};
+
 	class ScissorStack {
 		public:
 			struct Item {
@@ -25,6 +43,8 @@ namespace Game3 {
 			Item getTop() const;
 			const Rectangle & pushRelative(const Item &);
 			const Rectangle & pushAbsolute(const Item &);
+			[[nodiscard]] ScissorSaver pushRelative(const Rectangle &, const RendererContext &);
+			[[nodiscard]] ScissorSaver pushAbsolute(const Rectangle &, const RendererContext &);
 			void pop();
 			void debug() const;
 

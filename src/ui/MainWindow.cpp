@@ -789,6 +789,9 @@ namespace Game3 {
 		if (dynamic_cast<Gtk::Text *>(get_focus()))
 			return false;
 
+		if (canvas && canvas->uiContext.keyPressed(keyval))
+			return true;
+
 		if (!keyTimes.contains(keyval)) {
 			handleKey(keyval, keycode, modifiers);
 			if (unsigned(modifiers & Gdk::ModifierType::CONTROL_MASK) == 0)

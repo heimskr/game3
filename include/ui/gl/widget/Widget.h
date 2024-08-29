@@ -40,6 +40,7 @@ namespace Game3 {
 			virtual bool dragUpdate(UIContext &, int x, int y);
 			virtual bool dragEnd(UIContext &, int x, int y);
 			virtual bool scroll(UIContext &, float x_delta, float y_delta, int x, int y);
+			virtual bool keyPressed(UIContext &, uint32_t character);
 			virtual float calculateHeight(const RendererContext &, float available_width, float available_height) = 0;
 	};
 
