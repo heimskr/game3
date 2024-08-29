@@ -132,6 +132,10 @@ namespace Game3 {
 		return rectangle;
 	}
 
+	void OmniDialog::onClose() {
+		inventoryTab->removeModule();
+	}
+
 	bool OmniDialog::click(int x, int y) {
 		for (size_t i = 0; i < tabRectangles.size(); ++i) {
 			if (tabRectangles[i].contains(x, y)) {

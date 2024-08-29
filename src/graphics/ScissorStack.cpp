@@ -22,6 +22,12 @@ namespace Game3 {
 		return out;
 	}
 
+	const Rectangle & ScissorStack::pushAbsolute(const Rectangle &rect) {
+		const Rectangle &out = stack.emplace_back(rect.x, rect.y, rect.width, rect.height);
+		out.scissor(base.height);
+		return out;
+	}
+
 	void ScissorStack::pop() {
 		if (!stack.empty())
 			stack.pop_back();

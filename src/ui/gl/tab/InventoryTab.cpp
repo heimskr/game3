@@ -24,12 +24,14 @@ namespace Game3 {
 		playerInventoryModule(makePlayerInventoryModule(ui)) {}
 
 	void InventoryTab::render(UIContext &ui, RendererContext &renderers) {
-		Rectangle rectangle = ui.scissorStack.getTop().reposition(0, 0);
+		Rectangle rectangle = ui.scissorStack.getTop();
 
 		std::unique_lock<DefaultMutex> module_lock;
 		if (Module *active_module = getModule(module_lock)) {
 			rectangle.width /= 2;
-			active_module->render(ui, renderers, Rectangle(0, 0, rectangle.width / 2, 0) + rectangle);
+			rectangle.x += rectangle.width;
+			active_module->render(ui, renderers, rectangle);
+			rectangle.x -= rectangle.width;
 			module_lock.unlock();
 		}
 
@@ -41,31 +43,34 @@ namespace Game3 {
 	}
 
 	void InventoryTab::click(int x, int y) {
-		if (playerInventoryModule->click(ui, x, y))
+		if (playerInventoryModule->getLastRectangle().contains(x, y) && playerInventoryModule->click(ui, x, y))
 			return;
 
 		std::unique_lock<DefaultMutex> lock;
 		if (Module *active_module = getModule(lock))
-			active_module->click(ui, x, y);
+			if (active_module->getLastRectangle().contains(x, y))
+				active_module->click(ui, x, y);
 	}
 
 	void InventoryTab::dragStart(int x, int y) {
-		if (playerInventoryModule->dragStart(ui, x, y))
+		if (playerInventoryModule->getLastRectangle().contains(x, y) && playerInventoryModule->dragStart(ui, x, y))
 			return;
 
 		std::unique_lock<DefaultMutex> lock;
 		if (Module *active_module = getModule(lock))
-			active_module->dragStart(ui, x, y);
+			if (active_module->getLastRectangle().contains(x, y))
+				active_module->dragStart(ui, x, y);
 
 	}
 
 	void InventoryTab::dragEnd(int x, int y) {
-		if (playerInventoryModule->dragEnd(ui, x, y))
+		if (playerInventoryModule->getLastRectangle().contains(x, y) && playerInventoryModule->dragEnd(ui, x, y))
 			return;
 
 		std::unique_lock<DefaultMutex> lock;
 		if (Module *active_module = getModule(lock))
-			active_module->dragEnd(ui, x, y);
+			if (active_module->getLastRectangle().contains(x, y))
+				active_module->dragEnd(ui, x, y);
 	}
 
 	void InventoryTab::setModule(std::shared_ptr<Module> new_module) {

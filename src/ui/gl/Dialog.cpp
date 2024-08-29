@@ -9,6 +9,8 @@ namespace Game3 {
 	Dialog::Dialog(UIContext &ui):
 		ui(ui) {}
 
+	void Dialog::onClose() {}
+
 	bool Dialog::click(int x, int y) {
 		return getPosition().contains(x, y);
 	}

@@ -1,5 +1,6 @@
 #include "entity/ClientPlayer.h"
 #include "game/ClientInventory.h"
+#include "graphics/RendererContext.h"
 #include "packet/SwapSlotsPacket.h"
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/Constants.h"
@@ -8,13 +9,17 @@
 
 namespace Game3 {
 	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game, const std::any &argument):
-		InventoryModule(std::move(game), std::any_cast<std::shared_ptr<ClientInventory>>(argument)) {}
+		InventoryModule(std::move(game), getInventory(argument)) {}
 
 	InventoryModule::InventoryModule(std::shared_ptr<ClientGame>, const std::shared_ptr<ClientInventory> &inventory):
 		inventoryGetter(inventory->getGetter()) {}
 
 	void InventoryModule::render(UIContext &ui, RendererContext &renderers, float x, float y, float width, float height) {
-		innerRectangle = ui.scissorStack.pushRelative(Rectangle(x, y, width, height));
+		Widget::render(ui, renderers, x, y, width, height);
+
+		auto saver = renderers.getSaver();
+		innerRectangle = ui.scissorStack.pushAbsolute(Rectangle(x, y, width, height));
+		renderers.updateSize(innerRectangle.width, innerRectangle.height);
 		Defer pop([&ui] { ui.scissorStack.pop(); });
 
 		InventoryPtr inventory = inventoryGetter->get();
@@ -23,23 +28,26 @@ namespace Game3 {
 		const Slot slot_count = inventory->getSlotCount();
 		assert(0 <= slot_count);
 
+		const bool is_player = inventory->getOwner() == ui.getPlayer();
 		const Slot active_slot = inventory->activeSlot;
 
 		if (slotWidgets.size() != static_cast<size_t>(slot_count)) {
 			slotWidgets.clear();
 			for (Slot slot = 0; slot < slot_count; ++slot)
-				slotWidgets.emplace_back(std::make_shared<ItemSlotWidget>(inventory, (*inventory)[slot], slot, INNER_SLOT_SIZE, SLOT_SCALE, slot == active_slot));
+				slotWidgets.emplace_back(std::make_shared<ItemSlotWidget>(inventory, (*inventory)[slot], slot, INNER_SLOT_SIZE, SLOT_SCALE, is_player && slot == active_slot));
 		} else {
 			for (Slot slot = 0; slot < slot_count; ++slot)
 				slotWidgets[slot]->setStack((*inventory)[slot]);
 
-			if (0 <= previousActive) {
-				if (previousActive != active_slot) {
-					slotWidgets.at(previousActive)->setActive(false);
+			if (is_player) {
+				if (0 <= previousActive) {
+					if (previousActive != active_slot) {
+						slotWidgets.at(previousActive)->setActive(false);
+						slotWidgets.at(active_slot)->setActive(true);
+					}
+				} else {
 					slotWidgets.at(active_slot)->setActive(true);
 				}
-			} else {
-				slotWidgets.at(active_slot)->setActive(true);
 			}
 		}
 
@@ -66,6 +74,9 @@ namespace Game3 {
 	}
 
 	bool InventoryModule::click(UIContext &ui, int x, int y) {
+		if (!getLastRectangle().contains(x, y))
+			return false;
+
 		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
 			Rectangle rectangle = innerRectangle + widget->getLastRectangle();
 			if (rectangle.contains(x, y) && widget->click(ui, x, y))
@@ -76,6 +87,9 @@ namespace Game3 {
 	}
 
 	bool InventoryModule::dragStart(UIContext &ui, int x, int y) {
+		if (!getLastRectangle().contains(x, y))
+			return false;
+
 		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
 			Rectangle rectangle = innerRectangle + widget->getLastRectangle();
 			if (rectangle.contains(x, y)) {
@@ -88,6 +102,9 @@ namespace Game3 {
 	}
 
 	bool InventoryModule::dragEnd(UIContext &ui, int x, int y) {
+		if (!getLastRectangle().contains(x, y))
+			return false;
+
 		auto dragged = std::dynamic_pointer_cast<ItemSlotWidget>(ui.getDraggedWidget());
 
 		if (!dragged)
@@ -104,5 +121,20 @@ namespace Game3 {
 		}
 
 		return true;
+	}
+
+	ClientInventoryPtr InventoryModule::getInventory(const std::any &any) {
+		const Argument *argument = std::any_cast<Argument>(&any);
+		if (!argument) {
+			const AgentPtr *agent = std::any_cast<AgentPtr>(&any);
+			if (!agent)
+				throw std::invalid_argument("Invalid std::any argument given to InventoryModule: " + demangle(any.type().name()));
+			auto has_inventory = std::dynamic_pointer_cast<HasInventory>(*agent);
+			if (!has_inventory)
+				throw std::invalid_argument("Agent supplied to InventoryModule isn't castable to HasInventory");
+			return std::dynamic_pointer_cast<ClientInventory>(has_inventory->getInventory(0));
+		}
+		const auto [agent, index] = *argument;
+		return std::dynamic_pointer_cast<ClientInventory>(std::dynamic_pointer_cast<HasInventory>(agent)->getInventory(index));
 	}
 }

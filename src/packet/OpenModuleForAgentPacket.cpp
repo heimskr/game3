@@ -17,9 +17,9 @@ namespace Game3 {
 		MainWindow &window = game->getWindow();
 
 		if (removeOnMove) {
-			game->getPlayer()->queueForMove([&window, tab = window.inventoryTab](const auto &, bool) {
-				window.queue([tab] {
-					tab->removeModule();
+			game->getPlayer()->queueForMove([&window](const auto &, bool) {
+				window.queue([&window] {
+					window.removeModule();
 				});
 				return true;
 			});

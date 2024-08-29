@@ -67,7 +67,8 @@ namespace Game3 {
 	}
 
 	bool ItemSlotWidget::click(UIContext &ui, int, int) {
-		ui.getGame()->getPlayer()->send(SetActiveSlotPacket(slot));
+		if (inventory->getOwner() == ui.getPlayer())
+			ui.getGame()->getPlayer()->send(SetActiveSlotPacket(slot));
 		return true;
 	}
 

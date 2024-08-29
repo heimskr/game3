@@ -11,13 +11,12 @@ namespace Game3 {
 	class ClientInventory;
 
 	class InventoryModule: public Module {
-		private:
-			Rectangle innerRectangle;
-			std::vector<std::shared_ptr<ItemSlotWidget>> slotWidgets;
-			std::unique_ptr<InventoryGetter> inventoryGetter;
-			Slot previousActive = -1;
-
 		public:
+			struct Argument {
+				std::shared_ptr<Agent> agent;
+				InventoryID index;
+			};
+
 			InventoryModule(std::shared_ptr<ClientGame>, const std::any &);
 			InventoryModule(std::shared_ptr<ClientGame>, const std::shared_ptr<ClientInventory> &);
 
@@ -29,5 +28,13 @@ namespace Game3 {
 			bool click(UIContext &, int x, int y) final;
 			bool dragStart(UIContext &, int x, int y) final;
 			bool dragEnd(UIContext &, int x, int y) final;
+
+		private:
+			Rectangle innerRectangle;
+			std::vector<std::shared_ptr<ItemSlotWidget>> slotWidgets;
+			std::unique_ptr<InventoryGetter> inventoryGetter;
+			Slot previousActive = -1;
+
+			static std::shared_ptr<ClientInventory> getInventory(const std::any &);
 	};
 }

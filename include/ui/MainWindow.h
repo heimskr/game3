@@ -196,6 +196,7 @@ namespace Game3 {
 			void updateMoneyLabel(MoneyCount);
 			void continueLocalConnection();
 			bool toggleLog();
+			const std::shared_ptr<OmniDialog> & getOmniDialog();
 
 			template <typename T>
 			T & initTab(std::shared_ptr<T> &tab) {

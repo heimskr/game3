@@ -34,7 +34,12 @@ namespace Game3 {
 
 			template <typename T>
 			static bool dialogMatcher(const std::shared_ptr<Dialog> &dialog) {
-				return dynamic_cast<const T *>(dialog.get()) != nullptr;
+				if (T *cast = dynamic_cast<T *>(dialog.get())) {
+					cast->onClose();
+					return true;
+				}
+
+				return false;
 			}
 
 		public:

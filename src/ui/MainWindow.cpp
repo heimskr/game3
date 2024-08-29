@@ -17,6 +17,8 @@
 #include "packet/SetHeldItemPacket.h"
 #include "realm/Overworld.h"
 #include "ui/gl/OmniDialog.h"
+#include "ui/gl/module/ModuleFactory.h"
+#include "ui/gl/tab/InventoryTab.h"
 #include "ui/gtk/ConnectDialog.h"
 #include "ui/gtk/ConnectionSuccessDialog.h"
 #include "ui/gtk/EntryDialog.h"
@@ -723,7 +725,9 @@ namespace Game3 {
 
 			auto &registry = game->registry<ModuleFactoryRegistry>();
 			if (auto factory = registry[module_id]) {
-				INFO("TODO: open {} GL module", module_id);
+				getOmniDialog();
+				omniDialog->inventoryTab->setModule((*factory)(game, argument));
+				canvas->uiContext.addDialog(omniDialog);
 				return;
 			}
 
@@ -738,6 +742,7 @@ namespace Game3 {
 	}
 
 	void MainWindow::removeModule() {
+		getOmniDialog()->inventoryTab->removeModule();
 		inventoryTab->removeModule();
 	}
 
@@ -931,9 +936,7 @@ namespace Game3 {
 				}
 				case GDK_KEY_Escape:
 					if (canvas->uiContext.removeDialogs<OmniDialog>() == 0) {
-						if (!omniDialog)
-							omniDialog = std::make_shared<OmniDialog>(canvas->uiContext);
-						canvas->uiContext.addDialog(omniDialog);
+						canvas->uiContext.addDialog(getOmniDialog());
 					}
 					return;
 				case GDK_KEY_u:
@@ -1145,5 +1148,11 @@ namespace Game3 {
 
 	bool MainWindow::isFocused(const std::shared_ptr<GTKTab> &tab) const {
 		return tab == tabMap.at(notebook.get_nth_page(notebook.get_current_page()));
+	}
+
+	const std::shared_ptr<OmniDialog> & MainWindow::getOmniDialog() {
+		if (!omniDialog)
+			omniDialog = std::make_shared<OmniDialog>(canvas->uiContext);
+		return omniDialog;
 	}
 }
