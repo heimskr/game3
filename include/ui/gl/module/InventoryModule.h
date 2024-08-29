@@ -35,7 +35,6 @@ namespace Game3 {
 			float calculateHeight(RendererContext &, float available_width, float available_height) final;
 
 		private:
-			Rectangle innerRectangle;
 			std::vector<std::shared_ptr<ItemSlotWidget>> slotWidgets;
 			std::unique_ptr<InventoryGetter> inventoryGetter;
 			Slot previousActive = -1;

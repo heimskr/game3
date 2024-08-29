@@ -17,8 +17,9 @@ namespace Game3 {
 	}
 
 	void HotbarWidget::render(UIContext &ui, RendererContext &renderers, float x, float y, float width, float height) {
-		const float offset = SLOT_PADDING * scale / 3;
 		Widget::render(ui, renderers, x, y, width, height);
+
+		const float offset = SLOT_PADDING * scale / 3;
 		renderers.rectangle.drawOnScreen(Color{0.7, 0.5, 0, 1}, x, y, width, height);
 		x += offset;
 		y += offset;
@@ -45,9 +46,6 @@ namespace Game3 {
 	}
 
 	bool HotbarWidget::click(UIContext &ui, int button, int x, int y) {
-		if (!getLastRectangle().contains(x, y))
-			return false;
-
 		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets)
 			if (widget->getLastRectangle().contains(x, y) && widget->click(ui, button, x, y))
 				break;

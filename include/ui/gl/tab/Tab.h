@@ -19,6 +19,7 @@ namespace Game3 {
 			virtual void click(int button, int x, int y);
 			virtual void dragStart(int x, int y);
 			virtual void dragEnd(int x, int y);
+			virtual void scroll(float x_delta, float y_delta, int x, int y);
 
 		protected:
 			UIContext &ui;

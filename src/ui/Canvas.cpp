@@ -188,6 +188,10 @@ namespace Game3 {
 		uiContext.onResize(getWidth() * getFactor(), getHeight() * getFactor());
 	}
 
+	std::pair<double, double> Canvas::getMouseCoordinates() const {
+		return {window.glAreaMouseX, window.glAreaMouseY};
+	}
+
 	bool Canvas::inBounds(const Position &pos) const {
 		const auto x = realmBounds.get_x();
 		const auto y = realmBounds.get_y();

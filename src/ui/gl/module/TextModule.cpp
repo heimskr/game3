@@ -18,7 +18,7 @@ namespace Game3 {
 
 	void TextModule::render(UIContext &ui, RendererContext &renderers, float x, float y, float width, float height) {
 		auto saver = renderers.getSaver();
-		ui.scissorStack.pushAbsolute(Rectangle(x, y, width, height));
+		ui.scissorStack.pushRelative(Rectangle(x, y, width, height));
 		renderers.updateSize(width, height);
 		Defer pop([&] { ui.scissorStack.pop(); });
 

@@ -23,6 +23,7 @@ namespace Game3 {
 
 	class UIContext {
 		public:
+			Canvas &canvas;
 			ScissorStack scissorStack;
 			bool renderingDraggedWidget = false;
 
@@ -37,6 +38,7 @@ namespace Game3 {
 			bool dragStart(int x, int y);
 			bool dragUpdate(int x, int y);
 			bool dragEnd(int x, int y);
+			bool scroll(float x_delta, float y_delta, int x, int y);
 			void setDraggedWidget(WidgetPtr);
 			WidgetPtr getDraggedWidget() const;
 			std::shared_ptr<ClientPlayer> getPlayer() const;
@@ -57,7 +59,6 @@ namespace Game3 {
 			}
 
 		private:
-			Canvas &canvas;
 			std::vector<std::shared_ptr<Dialog>> dialogs;
 			ScissorStack internalScissorStack; // TODO: remove this
 			WidgetPtr draggedWidget;

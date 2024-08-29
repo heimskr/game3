@@ -29,4 +29,6 @@ namespace Game3 {
 	void Tab::dragStart(int, int) {}
 
 	void Tab::dragEnd(int, int) {}
+
+	void Tab::scroll(float, float, int, int) {}
 }

@@ -58,6 +58,7 @@ namespace Game3 {
 			int getHeight() const;
 			int getFactor() const;
 			void onResize();
+			std::pair<double, double> getMouseCoordinates() const;
 
 			bool inBounds(const Position &) const;
 

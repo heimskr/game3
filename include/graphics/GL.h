@@ -600,4 +600,14 @@ namespace GL {
 			glViewport(saved[0], saved[1], static_cast<GLsizei>(saved[2]), static_cast<GLsizei>(saved[3])); CHECKGL
 		}
 	};
+
+	struct Scissor {
+		GLint saved[4];
+
+		Scissor();
+		Scissor(GLint x, GLint y, GLsizei width, GLsizei height);
+
+		void reframe(GLint x, GLint y, GLsizei width, GLsizei height);
+		void reset();
+	};
 }

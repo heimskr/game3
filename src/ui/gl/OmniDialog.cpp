@@ -37,38 +37,39 @@ namespace Game3 {
 	void OmniDialog::render(RendererContext &renderers) {
 		ScissorStack &stack = ui.scissorStack;
 
-		auto saver = renderers.getSaver();
-
 		Rectangle rectangle = getPosition();
-
-		const Color inner_color{0.88, 0.77, 0.55};
-
+		constexpr Color inner_color{0.88, 0.77, 0.55};
 		const Rectangle original_rectangle = rectangle;
-
-		stack.pushRelative(rectangle);
-		renderers.updateSize(rectangle.width, rectangle.height);
-		drawFrame(renderers, SCALE, false, PIECES, inner_color);
-
 		RectangleRenderer &rectangler = renderers.rectangle;
 
-		rectangle.x = 9 * SCALE;
-		rectangle.y = 9 * SCALE;
-		rectangle.width -= 18 * SCALE;
-		rectangle.height -= 18 * SCALE;
+		{
+			auto saver = renderers.getSaver();
 
-		if (rectangle.height <= 0 || rectangle.width <= 0)
-			return;
+			stack.pushRelative(rectangle, true);
+			renderers.updateSize(rectangle.width, rectangle.height);
+			drawFrame(renderers, SCALE, false, PIECES, inner_color);
 
-		stack.pushRelative(rectangle);
-		renderers.updateSize(rectangle.width, rectangle.height);
+			rectangle.x = 9 * SCALE;
+			rectangle.y = 9 * SCALE;
+			rectangle.width -= 18 * SCALE;
+			rectangle.height -= 18 * SCALE;
 
-		rectangler.drawOnScreen(Color{0.6, 0.3, 0, 0.1}, 0, 0, 10000, 10000);
+			if (rectangle.height <= 0 || rectangle.width <= 0)
+				return;
 
-		if (activeTab)
-			activeTab->render(ui, renderers);
+			stack.pushRelative(rectangle, true);
+			renderers.updateSize(rectangle.width, rectangle.height);
 
-		stack.pop();
-		stack.pop();
+			rectangler.drawOnScreen(Color{0.6, 0.3, 0, 0.1}, 0, 0, 10000, 10000);
+
+			if (activeTab)
+				activeTab->render(ui, renderers);
+
+			stack.pop();
+			stack.pop();
+		}
+
+		auto saver = renderers.getSaver();
 
 		for (int i = 0; const std::shared_ptr<Tab> &tab: tabs) {
 			const int x_offset = (TOP_OFFSET + UNSCALED / 4) * i + 40;
@@ -76,7 +77,7 @@ namespace Game3 {
 			{
 				auto saver = renderers.getSaver();
 				Rectangle tab_rectangle = original_rectangle + Rectangle{x_offset, UNSCALED * 5 / 4 - TOP_OFFSET, TOP_OFFSET, TOP_OFFSET};
-				stack.pushRelative(tab_rectangle);
+				stack.pushRelative(tab_rectangle, true);
 				renderers.updateSize(tab_rectangle.width, tab_rectangle.height);
 				drawFrame(renderers, SCALE / UNSCALE, true, TAB_PIECES, inner_color);
 				tabRectangles.at(i) = tab_rectangle;
@@ -84,7 +85,7 @@ namespace Game3 {
 			}
 
 			if (tab == activeTab) {
-				stack.pushRelative(original_rectangle);
+				stack.pushRelative(original_rectangle, true);
 				renderers.updateSize(original_rectangle.width, original_rectangle.height);
 				rectangler.drawOnScreen(inner_color, x_offset + UNSCALED, 0, TOP_OFFSET - UNSCALED * 2, 6 * SCALE);
 
@@ -111,9 +112,8 @@ namespace Game3 {
 				stack.pop();
 			}
 
-			auto saver = renderers.getSaver();
 			Rectangle tab_rectangle = original_rectangle + Rectangle{x_offset, UNSCALED * 5 / 4 - TOP_OFFSET, TOP_OFFSET, TOP_OFFSET};
-			stack.pushRelative(tab_rectangle);
+			stack.pushRelative(tab_rectangle, true);
 			renderers.updateSize(tab_rectangle.width, tab_rectangle.height);
 			tab->renderIcon(renderers);
 			stack.pop();
@@ -169,6 +169,16 @@ namespace Game3 {
 
 		if (activeTab)
 			activeTab->dragEnd(x, y);
+
+		return true;
+	}
+
+	bool OmniDialog::scroll(float x_delta, float y_delta, int x, int y) {
+		if (!Dialog::scroll(x_delta, y_delta, x, y))
+			return false;
+
+		if (activeTab)
+			activeTab->scroll(x_delta, y_delta, x, y);
 
 		return true;
 	}

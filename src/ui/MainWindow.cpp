@@ -289,8 +289,13 @@ namespace Game3 {
 
 		auto scroll = Gtk::EventControllerScroll::create();
 		scroll->set_flags(Gtk::EventControllerScroll::Flags::VERTICAL);
-		scroll->signal_scroll().connect([this](double, double y) {
+		scroll->signal_scroll().connect([this](double x, double y) {
 			if (!canvas)
+				return true;
+
+			const auto factor = canvas->getFactor();
+
+			if (canvas->uiContext.scroll(x, y, glAreaMouseX * factor, glAreaMouseY * factor))
 				return true;
 
 			const auto old_scale = canvas->scale;
@@ -305,11 +310,11 @@ namespace Game3 {
 
 			const auto difference_x = w / old_scale - w / canvas->scale;
 			const auto side_ratio_x = (glAreaMouseX - w / 2.f) / w;
-			canvas->center.first -= difference_x * side_ratio_x / 8.f * canvas->getFactor();
+			canvas->center.first -= difference_x * side_ratio_x / 8.f * factor;
 
 			const auto difference_y = h / old_scale - h / canvas->scale;
 			const auto side_ratio_y = (glAreaMouseY - h / 2.f) / h;
-			canvas->center.second -= difference_y * side_ratio_y / 8.f * canvas->getFactor();
+			canvas->center.second -= difference_y * side_ratio_y / 8.f * factor;
 
 			return true;
 		}, false);

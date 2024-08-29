@@ -24,11 +24,6 @@ namespace Game3 {
 	void InventoryModule::render(UIContext &ui, RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(ui, renderers, x, y, width, height);
 
-		auto saver = renderers.getSaver();
-		innerRectangle = ui.scissorStack.pushAbsolute(Rectangle(x, y, width, height));
-		renderers.updateSize(innerRectangle.width, innerRectangle.height);
-		Defer pop([&] { ui.scissorStack.pop(); });
-
 		InventoryPtr inventory = inventoryGetter->get();
 		auto inventory_lock = inventory->sharedLock();
 
@@ -60,15 +55,15 @@ namespace Game3 {
 
 		previousActive = active_slot;
 
-		const int column_count = getColumnCount(innerRectangle.width);
-		const float x_pad = (innerRectangle.width - column_count * (OUTER_SLOT_SIZE * SLOT_SCALE) + SLOT_PADDING * SLOT_SCALE) / 2;
+		const int column_count = getColumnCount(width);
+		const float x_pad = (width - column_count * (OUTER_SLOT_SIZE * SLOT_SCALE) + SLOT_PADDING * SLOT_SCALE) / 2;
 
 		int column = 0;
 		float slot_x = x_pad;
 		float slot_y = SLOT_PADDING * SLOT_SCALE;
 
 		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
-			widget->render(ui, renderers, slot_x, slot_y, -1, -1);
+			widget->render(ui, renderers, x + slot_x, y + slot_y, -1, -1);
 
 			slot_x += OUTER_SLOT_SIZE * SLOT_SCALE;
 
@@ -81,25 +76,16 @@ namespace Game3 {
 	}
 
 	bool InventoryModule::click(UIContext &ui, int button, int x, int y) {
-		if (!getLastRectangle().contains(x, y))
-			return false;
-
-		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
-			Rectangle rectangle = innerRectangle + widget->getLastRectangle();
-			if (rectangle.contains(x, y) && widget->click(ui, button, x, y))
+		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets)
+			if (widget->getLastRectangle().contains(x, y) && widget->click(ui, button, x, y))
 				return true;
-		}
 
 		return false;
 	}
 
 	bool InventoryModule::dragStart(UIContext &ui, int x, int y) {
-		if (!getLastRectangle().contains(x, y))
-			return false;
-
 		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
-			Rectangle rectangle = innerRectangle + widget->getLastRectangle();
-			if (rectangle.contains(x, y)) {
+			if (widget->getLastRectangle().contains(x, y)) {
 				ui.setDraggedWidget(widget->getDragStartWidget());
 				return true;
 			}
@@ -109,17 +95,13 @@ namespace Game3 {
 	}
 
 	bool InventoryModule::dragEnd(UIContext &ui, int x, int y) {
-		if (!getLastRectangle().contains(x, y))
-			return false;
-
 		auto dragged = std::dynamic_pointer_cast<ItemSlotWidget>(ui.getDraggedWidget());
 
 		if (!dragged)
 			return false;
 
 		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
-			Rectangle rectangle = innerRectangle + widget->getLastRectangle();
-			if (rectangle.contains(x, y)) {
+			if (widget->getLastRectangle().contains(x, y)) {
 				ClientPlayerPtr player = ui.getPlayer();
 				player->send(SwapSlotsPacket(dragged->getOwnerGID(), widget->getOwnerGID(), dragged->getSlot(), widget->getSlot(), dragged->getInventory()->index, widget->getInventory()->index));
 				ui.setDraggedWidget(nullptr);

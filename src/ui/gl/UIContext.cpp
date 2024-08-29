@@ -111,6 +111,14 @@ namespace Game3 {
 		return true;
 	}
 
+	bool UIContext::scroll(float x_delta, float y_delta, int x, int y) {
+		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
+			if (dialog->scroll(x_delta, y_delta, x, y))
+				return true;
+
+		return dialogs.empty() && hotbarWidget->scroll(*this, x_delta, y_delta, x, y);
+	}
+
 	void UIContext::setDraggedWidget(WidgetPtr new_dragged_widget) {
 		draggedWidget = std::move(new_dragged_widget);
 	}

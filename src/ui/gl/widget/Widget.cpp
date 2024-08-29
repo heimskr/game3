@@ -1,14 +1,16 @@
 #include "graphics/Rectangle.h"
 #include "ui/gl/widget/Widget.h"
+#include "ui/gl/UIContext.h"
 
 namespace Game3 {
 	Rectangle Widget::getLastRectangle() const {
 		return {lastX, lastY, lastWidth, lastHeight};
 	}
 
-	void Widget::render(UIContext &, RendererContext &, float x, float y, float width, float height) {
-		lastX = x;
-		lastY = y;
+	void Widget::render(UIContext &ui, RendererContext &, float x, float y, float width, float height) {
+		const Rectangle top = ui.scissorStack.getTop();
+		lastX = top.x + x;
+		lastY = top.y + y;
 		lastWidth = width;
 		lastHeight = height;
 	}
@@ -38,6 +40,10 @@ namespace Game3 {
 	}
 
 	bool Widget::dragEnd(UIContext &, int, int) {
+		return false;
+	}
+
+	bool Widget::scroll(UIContext &, float, float, int, int) {
 		return false;
 	}
 }

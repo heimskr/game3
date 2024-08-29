@@ -15,16 +15,20 @@ namespace Game3 {
 		return stack.empty()? getBase() : stack.back();
 	}
 
-	const Rectangle & ScissorStack::pushRelative(const Rectangle &rect) {
+	const Rectangle & ScissorStack::pushRelative(const Rectangle &rect, bool do_viewport) {
 		const Rectangle old = getTop();
 		const Rectangle &out = stack.emplace_back(old.x + rect.x, old.y + rect.y, std::min(rect.width, old.width - rect.x), std::min(rect.height, old.height - rect.y));
 		out.scissor(base.height);
+		if (do_viewport)
+			out.viewport(base.height);
 		return out;
 	}
 
-	const Rectangle & ScissorStack::pushAbsolute(const Rectangle &rect) {
+	const Rectangle & ScissorStack::pushAbsolute(const Rectangle &rect, bool do_viewport) {
 		const Rectangle &out = stack.emplace_back(rect.x, rect.y, rect.width, rect.height);
 		out.scissor(base.height);
+		if (do_viewport)
+			out.viewport(base.height);
 		return out;
 	}
 
@@ -33,6 +37,7 @@ namespace Game3 {
 			stack.pop_back();
 
 		getTop().scissor(base.height);
+		getTop().viewport(base.height);
 	}
 
 	void ScissorStack::debug() const {

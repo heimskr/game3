@@ -59,4 +59,22 @@ namespace GL {
 		else
 			useTextureInFB(handle);
 	}
+
+	Scissor::Scissor() {
+		glGetIntegerv(GL_SCISSOR_BOX, saved); CHECKGL
+	}
+
+	Scissor::Scissor(GLint x, GLint y, GLsizei width, GLsizei height) {
+		glGetIntegerv(GL_SCISSOR_BOX, saved); CHECKGL
+		reframe(x, y, width, height);
+	}
+
+	void Scissor::reframe(GLint x, GLint y, GLsizei width, GLsizei height) {
+		Game3::INFO("Scissoring to {}, {}, {}, {}", x, y, width, height);
+		glScissor(x, y, width, height); CHECKGL
+	}
+
+	void Scissor::reset() {
+		glScissor(saved[0], saved[1], static_cast<GLsizei>(saved[2]), static_cast<GLsizei>(saved[3])); CHECKGL
+	}
 }

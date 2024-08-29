@@ -1,5 +1,7 @@
 #pragma once
 
+#include "types/Types.h"
+
 #include <memory>
 
 namespace Game3 {
@@ -25,8 +27,9 @@ namespace Game3 {
 			Widget & operator=(const Widget &) = default;
 			Widget & operator=(Widget &&) noexcept = default;
 
+			/** Returns absolute coordinates. */
 			virtual Rectangle getLastRectangle() const;
-			/** The implementation is free to ignore the `width` and `height` parameters. */
+			/** `x` and `y` are relative to the top of the scissor stack. The implementation is free to ignore the `width` and `height` parameters. */
 			virtual void render(UIContext &, RendererContext &, float x, float y, float width, float height);
 			virtual void render(UIContext &, RendererContext &, const Rectangle &);
 			/** Can return a pointer to nothing, itself or a new widget. */
@@ -36,6 +39,7 @@ namespace Game3 {
 			virtual bool dragStart(UIContext &, int x, int y);
 			virtual bool dragUpdate(UIContext &, int x, int y);
 			virtual bool dragEnd(UIContext &, int x, int y);
+			virtual bool scroll(UIContext &, float x_delta, float y_delta, int x, int y);
 			virtual float calculateHeight(RendererContext &, float available_width, float available_height) = 0;
 	};
 

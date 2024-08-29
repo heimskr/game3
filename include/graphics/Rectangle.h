@@ -15,6 +15,7 @@ namespace Game3 {
 			x(x), y(y), width(width), height(height) {}
 
 		void scissor(int outer_height) const;
+		void viewport(int outer_height) const;
 		bool contains(int x, int y) const;
 		void reposition(int x, int y) &;
 		Rectangle && reposition(int x, int y) &&;

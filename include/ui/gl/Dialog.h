@@ -1,6 +1,7 @@
 #pragma once
 
 #include "graphics/Rectangle.h"
+#include "types/Types.h"
 
 #include <array>
 #include <string_view>
@@ -25,6 +26,7 @@ namespace Game3 {
 			virtual bool dragStart(int x, int y);
 			virtual bool dragUpdate(int x, int y);
 			virtual bool dragEnd(int x, int y);
+			virtual bool scroll(float x_delta, float y_delta, int x, int y);
 
 			/** Order: clockwise starting at top left. */
 			void drawFrame(RendererContext &, double scale, bool alpha, const std::array<std::string_view, 8> &, const Color &interior = {0, 0, 0, 0});
