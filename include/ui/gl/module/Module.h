@@ -1,5 +1,6 @@
 #pragma once
 
+#include "data/Identifier.h"
 #include "ui/gl/widget/Widget.h"
 
 namespace Game3 {
@@ -10,7 +11,7 @@ namespace Game3 {
 			virtual ~Module() = default;
 
 			virtual Identifier getID() const = 0;
-			virtual void reset() = 0;
-			virtual void update() = 0;
+			virtual void reset();
+			virtual void update();
 	};
 }

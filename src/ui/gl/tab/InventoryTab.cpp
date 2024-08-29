@@ -3,67 +3,29 @@
 #include "game/Inventory.h"
 #include "graphics/RendererContext.h"
 #include "graphics/Texture.h"
-#include "packet/SwapSlotsPacket.h"
+#include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/module/Module.h"
 #include "ui/gl/tab/InventoryTab.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
+	InventoryTab::InventoryTab(UIContext &ui):
+		Tab(ui),
+		playerInventoryModule(std::make_shared<InventoryModule>()) {}
+
 	void InventoryTab::render(UIContext &ui, RendererContext &renderers) {
-		innerRectangle = ui.scissorStack.getTop();
+		Rectangle rectangle = ui.scissorStack.getTop().reposition(0, 0);
 
-		PlayerPtr player = ui.getPlayer();
-
-		if (!player)
-			return;
-
-		InventoryPtr inventory = player->getInventory(0);
-		auto inventory_lock = inventory->sharedLock();
-
-		const Slot slot_count = inventory->getSlotCount();
-		assert(0 <= slot_count);
-
-		const Slot active_slot = inventory->activeSlot;
-
-		if (slotWidgets.size() != static_cast<size_t>(slot_count)) {
-			slotWidgets.clear();
-			for (Slot slot = 0; slot < slot_count; ++slot)
-				slotWidgets.emplace_back(std::make_shared<ItemSlotWidget>((*inventory)[slot], slot, INNER_SLOT_SIZE, SLOT_SCALE, slot == active_slot));
-		} else {
-			for (Slot slot = 0; slot < slot_count; ++slot)
-				slotWidgets[slot]->setStack((*inventory)[slot]);
-
-			if (0 <= previousActive) {
-				if (previousActive != active_slot) {
-					slotWidgets.at(previousActive)->setActive(false);
-					slotWidgets.at(active_slot)->setActive(true);
-				}
-			} else {
-				slotWidgets.at(active_slot)->setActive(true);
-			}
+		std::unique_lock<DefaultMutex> module_lock;
+		if (Module *active_module = getModule(module_lock)) {
+			rectangle.width /= 2;
+			active_module->render(ui, renderers, Rectangle(0, 0, rectangle.width / 2, 0) + rectangle);
+			module_lock.unlock();
 		}
 
-		previousActive = active_slot;
-
-		const int column_count = std::min(10, std::max<int>(1, innerRectangle.width / (OUTER_SLOT_SIZE * SLOT_SCALE)));
-		const double x_pad = (innerRectangle.width - column_count * (OUTER_SLOT_SIZE * SLOT_SCALE) + SLOT_PADDING * SLOT_SCALE) / 2;
-
-		int column = 0;
-		double x = x_pad;
-		double y = SLOT_PADDING * SLOT_SCALE;
-
-		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
-			widget->render(ui, renderers, x, y, -1, -1);
-
-			x += OUTER_SLOT_SIZE * SLOT_SCALE;
-
-			if (++column == column_count) {
-				column = 0;
-				x = x_pad;
-				y += OUTER_SLOT_SIZE * SLOT_SCALE;
-			}
-		}
+		playerInventoryModule->render(ui, renderers, rectangle);
+		return;
 	}
 
 	void InventoryTab::renderIcon(RendererContext &renderers) {
@@ -71,39 +33,31 @@ namespace Game3 {
 	}
 
 	void InventoryTab::click(int x, int y) {
-		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
-			Rectangle rectangle = innerRectangle + widget->getLastRectangle();
-			if (rectangle.contains(x, y) && widget->click(ui, x, y))
-				break;
-		}
+		if (playerInventoryModule->click(ui, x, y))
+			return;
+
+		std::unique_lock<DefaultMutex> lock;
+		if (Module *active_module = getModule(lock))
+			active_module->click(ui, x, y);
 	}
 
 	void InventoryTab::dragStart(int x, int y) {
-		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
-			Rectangle rectangle = innerRectangle + widget->getLastRectangle();
-			if (rectangle.contains(x, y)) {
-				ui.setDraggedWidget(widget->getDragStartWidget());
-				break;
-			}
-		}
+		if (playerInventoryModule->dragStart(ui, x, y))
+			return;
+
+		std::unique_lock<DefaultMutex> lock;
+		if (Module *active_module = getModule(lock))
+			active_module->dragStart(ui, x, y);
+
 	}
 
 	void InventoryTab::dragEnd(int x, int y) {
-		auto dragged = std::dynamic_pointer_cast<ItemSlotWidget>(ui.getDraggedWidget());
-
-		if (!dragged)
+		if (playerInventoryModule->dragEnd(ui, x, y))
 			return;
 
-		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
-			Rectangle rectangle = innerRectangle + widget->getLastRectangle();
-			if (rectangle.contains(x, y)) {
-				ClientPlayerPtr player = ui.getGame()->getPlayer();
-				const InventoryID inventory_id = player->getInventory(0)->index;
-				player->send(SwapSlotsPacket(player->getGID(), player->getGID(), dragged->getSlot(), widget->getSlot(), inventory_id, inventory_id));
-				ui.setDraggedWidget(nullptr);
-				return;
-			}
-		}
+		std::unique_lock<DefaultMutex> lock;
+		if (Module *active_module = getModule(lock))
+			active_module->dragEnd(ui, x, y);
 	}
 
 	void InventoryTab::setModule(std::shared_ptr<Module> new_module) {

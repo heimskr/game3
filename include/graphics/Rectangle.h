@@ -14,9 +14,10 @@ namespace Game3 {
 		Rectangle(int x, int y, int width, int height):
 			x(x), y(y), width(width), height(height) {}
 
-
 		void scissor(int outer_height) const;
 		bool contains(int x, int y) const;
+		void reposition(int x, int y) &;
+		Rectangle && reposition(int x, int y) &&;
 
 		auto operator<=>(const Rectangle &) const = default;
 		/** Ignores the width/height of the LHS and uses the width/height of the RHS. */

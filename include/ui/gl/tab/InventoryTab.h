@@ -3,14 +3,13 @@
 #include "graphics/Rectangle.h"
 #include "threading/LockableSharedPtr.h"
 #include "ui/gl/tab/Tab.h"
-#include "ui/gl/widget/ItemSlotWidget.h"
 
 namespace Game3 {
 	class Module;
 
 	class InventoryTab: public Tab {
 		public:
-			using Tab::Tab;
+			InventoryTab(UIContext &);
 
 			void render(UIContext &, RendererContext &) final;
 			void renderIcon(RendererContext &) final;
@@ -25,8 +24,7 @@ namespace Game3 {
 
 		private:
 			Rectangle innerRectangle;
-			std::vector<std::shared_ptr<ItemSlotWidget>> slotWidgets;
-			Slot previousActive = -1;
+			std::shared_ptr<Module> playerInventoryModule;
 			LockableSharedPtr<Module> activeModule;
 	};
 }

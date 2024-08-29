@@ -12,6 +12,18 @@ namespace Game3 {
 		return this->x <= x && x < this->x + width && this->y <= y && y < this->y + height;
 	}
 
+
+	void Rectangle::reposition(int x, int y) & {
+		this->x = x;
+		this->y = y;
+	}
+
+	Rectangle && Rectangle::reposition(int x, int y) && {
+		this->x = x;
+		this->y = y;
+		return std::move(*this);
+	}
+
 	Rectangle Rectangle::operator+(const Rectangle &other) const {
 		return {x + other.x, y + other.y, other.width, other.height};
 	}
