@@ -14,6 +14,9 @@ namespace Game3 {
 		Rectangle(int x, int y, int width, int height):
 			x(x), y(y), width(width), height(height) {}
 
+		Rectangle(int x, int y):
+			Rectangle(x, y, 0, 0) {}
+
 		void scissor(int outer_height) const;
 		void viewport(int outer_height) const;
 		bool contains(int x, int y) const;

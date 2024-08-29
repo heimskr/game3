@@ -42,19 +42,17 @@ namespace Game3 {
 		if (Module *active_module = getModule(module_lock)) {
 			auto saver = renderers.getSaver();
 			renderers.rectangle.drawOnScreen(Color{0.6, 0.3, 0, 0.2}, (rectangle.width - SEPARATOR_WIDTH) / 2, 0, SEPARATOR_WIDTH, rectangle.height);
-
 			rectangle.width = (rectangle.width - SEPARATION) / 2;
-			rectangle.x += rectangle.width + SEPARATION;
+			renderers.updateSize(rectangle.width, rectangle.height);
 
 			{
-				ui.scissorStack.pushRelative(rectangle);
+				ui.scissorStack.pushRelative(Rectangle(rectangle.width + SEPARATION, 0) + rectangle, true);
 				Defer pop([&] { ui.scissorStack.pop(); });
 				active_module->render(ui, renderers, rectangle);
 				module_lock.unlock();
 			}
 
-			rectangle.x -= rectangle.width + SEPARATION;
-			ui.scissorStack.pushRelative(rectangle);
+			ui.scissorStack.pushRelative(rectangle, true);
 			Defer pop([&] { ui.scissorStack.pop(); });
 			playerScroller->render(ui, renderers, rectangle);
 		} else {
@@ -84,7 +82,6 @@ namespace Game3 {
 		if (Module *active_module = getModule(lock))
 			if (active_module->getLastRectangle().contains(x, y))
 				active_module->dragStart(ui, x, y);
-
 	}
 
 	void InventoryTab::dragEnd(int x, int y) {
