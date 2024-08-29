@@ -16,7 +16,7 @@ namespace Game3 {
 		if (!child)
 			return;
 
-		ui.scissorStack.pushRelative(Rectangle(x, y, width, height), false);
+		ui.scissorStack.pushRelative({Rectangle(x, y, width, height), false});
 		Defer pop([&] { ui.scissorStack.pop(); });
 
 		child->render(ui, renderers, xOffset, yOffset, width, height);

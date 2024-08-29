@@ -32,7 +32,7 @@ namespace Game3 {
 	}
 
 	void Dialog::drawFrame(const RendererContext &renderers, double scale, bool alpha, const std::array<std::string_view, 8> &pieces, const Color &interior) {
-		Rectangle rectangle = ui.scissorStack.getTop();
+		const Rectangle rectangle = ui.scissorStack.getTop().rectangle;
 		SingleSpriteRenderer &single = renderers.singleSprite;
 
 		TexturePtr top_left     = cacheTexture(pieces[0], alpha);

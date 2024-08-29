@@ -34,7 +34,7 @@ namespace Game3 {
 		moduleScroller(makeModuleScroller()) {}
 
 	void InventoryTab::render(UIContext &ui, const RendererContext &renderers) {
-		Rectangle rectangle = ui.scissorStack.getTop();
+		Rectangle rectangle = ui.scissorStack.getTop().rectangle;
 		rectangle.x = 0;
 		rectangle.y = 0;
 
@@ -46,13 +46,13 @@ namespace Game3 {
 			renderers.updateSize(rectangle.width, rectangle.height);
 
 			{
-				ui.scissorStack.pushRelative(Rectangle(rectangle.width + SEPARATION, 0) + rectangle, true);
+				ui.scissorStack.pushRelative({Rectangle(rectangle.width + SEPARATION, 0) + rectangle, true});
 				Defer pop([&] { ui.scissorStack.pop(); });
 				moduleScroller->render(ui, renderers, rectangle);
 				module_lock.unlock();
 			}
 
-			ui.scissorStack.pushRelative(rectangle, true);
+			ui.scissorStack.pushRelative({rectangle, true});
 			Defer pop([&] { ui.scissorStack.pop(); });
 			playerScroller->render(ui, renderers, rectangle);
 		} else {

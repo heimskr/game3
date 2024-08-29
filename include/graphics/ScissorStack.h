@@ -6,19 +6,30 @@
 
 namespace Game3 {
 	class ScissorStack {
-		private:
-			Rectangle base;
-			std::vector<Rectangle> stack;
-
 		public:
+			struct Item {
+				Rectangle rectangle;
+				bool doViewport;
+				bool doScissor;
+
+				Item(const Rectangle &rectangle, bool do_viewport = false, bool do_scissor = true):
+					rectangle(rectangle), doViewport(do_viewport), doScissor(do_scissor) {}
+
+				void apply(int base_height) const;
+			};
+
 			ScissorStack();
 
 			inline const Rectangle & getBase() const { return base; }
 			void setBase(const Rectangle &);
-			Rectangle getTop() const;
-			const Rectangle & pushRelative(const Rectangle &, bool do_viewport = false, bool do_scissor = true);
-			const Rectangle & pushAbsolute(const Rectangle &, bool do_viewport = false, bool do_scissor = true);
+			Item getTop() const;
+			const Rectangle & pushRelative(const Item &);
+			const Rectangle & pushAbsolute(const Item &);
 			void pop();
 			void debug() const;
+
+		private:
+			Rectangle base;
+			std::vector<Item> stack;
 	};
 }

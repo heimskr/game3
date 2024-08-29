@@ -45,7 +45,7 @@ namespace Game3 {
 		{
 			auto saver = renderers.getSaver();
 
-			stack.pushRelative(rectangle, true);
+			stack.pushRelative({rectangle, true});
 			renderers.updateSize(rectangle.width, rectangle.height);
 			drawFrame(renderers, SCALE, false, PIECES, inner_color);
 
@@ -57,7 +57,7 @@ namespace Game3 {
 			if (rectangle.height <= 0 || rectangle.width <= 0)
 				return;
 
-			stack.pushRelative(rectangle, true);
+			stack.pushRelative({rectangle, true});
 			renderers.updateSize(rectangle.width, rectangle.height);
 
 			rectangler.drawOnScreen(Color{0.6, 0.3, 0, 0.1}, 0, 0, 10000, 10000);
@@ -77,7 +77,7 @@ namespace Game3 {
 			{
 				auto saver = renderers.getSaver();
 				Rectangle tab_rectangle = original_rectangle + Rectangle{x_offset, UNSCALED * 5 / 4 - TOP_OFFSET, TOP_OFFSET, TOP_OFFSET};
-				stack.pushRelative(tab_rectangle, true);
+				stack.pushRelative({tab_rectangle, true});
 				renderers.updateSize(tab_rectangle.width, tab_rectangle.height);
 				drawFrame(renderers, SCALE / UNSCALE, true, TAB_PIECES, inner_color);
 				tabRectangles.at(i) = tab_rectangle;
@@ -85,7 +85,7 @@ namespace Game3 {
 			}
 
 			if (tab == activeTab) {
-				stack.pushRelative(original_rectangle, true);
+				stack.pushRelative({original_rectangle, true});
 				renderers.updateSize(original_rectangle.width, original_rectangle.height);
 				rectangler.drawOnScreen(inner_color, x_offset + UNSCALED, 0, TOP_OFFSET - UNSCALED * 2, 6 * SCALE);
 
@@ -113,7 +113,7 @@ namespace Game3 {
 			}
 
 			Rectangle tab_rectangle = original_rectangle + Rectangle{x_offset, UNSCALED * 5 / 4 - TOP_OFFSET, TOP_OFFSET, TOP_OFFSET};
-			stack.pushRelative(tab_rectangle, true);
+			stack.pushRelative({tab_rectangle, true});
 			renderers.updateSize(tab_rectangle.width, tab_rectangle.height);
 			tab->renderIcon(renderers);
 			stack.pop();

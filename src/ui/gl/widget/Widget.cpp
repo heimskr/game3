@@ -8,7 +8,7 @@ namespace Game3 {
 	}
 
 	void Widget::render(UIContext &ui, const RendererContext &, float x, float y, float width, float height) {
-		const Rectangle top = ui.scissorStack.getTop();
+		const Rectangle top = ui.scissorStack.getTop().rectangle;
 		lastX = top.x + x;
 		lastY = top.y + y;
 		lastWidth = width;

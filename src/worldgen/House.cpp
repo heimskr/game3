@@ -55,7 +55,7 @@ namespace Game3::WorldGen {
 					"Encapsulate messy constructs, rather than spreading through the code.",
 					"Use supporting tools as appropriate.",
 					"Use support libraries as appropriate.",
-					"haha!\ntrapped in my furniture hellscape\nit's all so wrong and I made it just for you!\ngood luck!\n\n-- Louie Zong",
+					"ha HA!\ntrapped in my furniture hellscape\nit's all so wrong and I made it just for you!\ngood luck!\n\n-- Louie Zong",
 					"This is a work of nonfiction and any resemblance to actual events, locales or persons, living or dead, is entirely intentional. We are in your walls.",
 					"Gangblanc, Gangblanc, give me your answer, do\nI'm half forswonk all for the code of you\nIt won't be a stylish shader\nI can't code up a trader\nBut you'll look cool without the tools\nOf a game engine built for three",
 					"U18446744073709551615 is totally a valid molecule.",
