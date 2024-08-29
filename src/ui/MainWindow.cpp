@@ -906,9 +906,17 @@ namespace Game3 {
 						player->send(ContinuousInteractionPacket(player->continuousInteractionModifiers));
 					return;
 				case GDK_KEY_E:
-					game->interactNextTo(Modifiers(modifiers) | Modifiers(true, false, false, false), Hand::Right);
+					if (canvas->uiContext.hasDialog<OmniDialog>())
+						canvas->uiContext.removeDialogs<OmniDialog>();
+					else
+						game->interactNextTo(Modifiers(modifiers) | Modifiers(true, false, false, false), Hand::Right);
 					return;
 				case GDK_KEY_e:
+					if (canvas->uiContext.hasDialog<OmniDialog>())
+						canvas->uiContext.removeDialogs<OmniDialog>();
+					else
+						game->interactNextTo(Modifiers(modifiers), Hand::Right);
+					return;
 				case GDK_KEY_Return:
 					game->interactNextTo(Modifiers(modifiers), Hand::Right);
 					return;
