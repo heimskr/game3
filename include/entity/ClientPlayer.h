@@ -43,6 +43,8 @@ namespace Game3 {
 
 			void face(Direction);
 
+			void showText(const Glib::ustring &text, const Glib::ustring &name) final;
+
 			inline void copyItemFilter(ItemFilter filter) { copiedItemFilter = std::move(filter); }
 			inline const auto & pasteItemFilter() const { return copiedItemFilter; }
 

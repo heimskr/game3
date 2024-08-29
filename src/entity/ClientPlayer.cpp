@@ -13,6 +13,7 @@
 #include "packet/MovePlayerPacket.h"
 #include "packet/TileEntityRequestPacket.h"
 #include "threading/ThreadContext.h"
+#include "ui/tab/GTKTextTab.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
 
@@ -279,5 +280,13 @@ namespace Game3 {
 			return;
 
 		send(MovePlayerPacket(position, new_direction, new_direction));
+	}
+
+	void ClientPlayer::showText(const Glib::ustring &text, const Glib::ustring &name) {
+		getGame()->toClient().setText(text, name, true, true);
+		queueForMove([](const EntityPtr &player, bool) {
+			player->getGame()->toClient().canvas.window.textTab->hide();
+			return true;
+		});
 	}
 }

@@ -6,6 +6,7 @@
 #include "packet/EntityMoneyChangedPacket.h"
 #include "packet/EntityPacket.h"
 #include "packet/EntitySetPathPacket.h"
+#include "packet/OpenTextTabPacket.h"
 #include "util/Cast.h"
 #include "util/Util.h"
 
@@ -235,5 +236,9 @@ namespace Game3 {
 		assert(village);
 		village->addSubscriber(safeDynamicCast<ServerPlayer>(shared_from_this()));
 		subscribedVillage = village;
+	}
+
+	void ServerPlayer::showText(const Glib::ustring &text, const Glib::ustring &name) {
+		send(OpenTextTabPacket(name.raw(), text.raw(), true, true));
 	}
 }

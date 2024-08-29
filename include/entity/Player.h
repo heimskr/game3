@@ -59,7 +59,7 @@ namespace Game3 {
 			float getMovementSpeed() const override;
 			bool setTooldown(float multiplier);
 			inline bool hasTooldown() const { return 0.f < tooldown; }
-			void showText(const Glib::ustring &text, const Glib::ustring &name);
+			virtual void showText(const Glib::ustring &text, const Glib::ustring &name) = 0;
 			std::string getName() const override { return "Player"; }
 			void give(const ItemStackPtr &, Slot start = -1);
 			Place getPlace() override;

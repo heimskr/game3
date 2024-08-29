@@ -18,7 +18,6 @@
 #include "realm/Realm.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
-#include "ui/tab/GTKTextTab.h"
 #include "util/Cast.h"
 
 namespace Game3 {
@@ -205,16 +204,6 @@ namespace Game3 {
 
 	float Player::getMovementSpeed() const {
 		return isInFluid()? movementSpeed * .5f : movementSpeed;
-	}
-
-	void Player::showText(const Glib::ustring &text, const Glib::ustring &name) {
-		if (getSide() == Side::Client) {
-			getGame()->toClient().setText(text, name, true, true);
-			queueForMove([](const EntityPtr &player, bool) {
-				player->getGame()->toClient().canvas.window.textTab->hide();
-				return true;
-			});
-		}
 	}
 
 	void Player::give(const ItemStackPtr &stack, Slot start) {
