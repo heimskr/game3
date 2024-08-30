@@ -28,12 +28,21 @@ namespace Game3 {
 	}
 
 	InventoryTab::InventoryTab(UIContext &ui):
-		Tab(ui),
-		playerInventoryModule(makePlayerInventoryModule(ui)),
-		playerScroller(makePlayerScroller()),
-		moduleScroller(makeModuleScroller()) {}
+		Tab(ui)  {}
 
-	void InventoryTab::render(const RendererContext &renderers) {
+	void InventoryTab::init() {
+		assert(!playerInventoryModule);
+		playerInventoryModule = makePlayerInventoryModule(ui);
+
+		assert(!playerScroller);
+		playerScroller = makePlayerScroller();
+
+		assert(!moduleScroller);
+		moduleScroller = makeModuleScroller();
+	}
+
+	void InventoryTab::render(UIContext &ui, const RendererContext &renderers, float, float, float, float) {
+
 		Rectangle rectangle = ui.scissorStack.getTop().rectangle;
 		rectangle.x = 0;
 		rectangle.y = 0;
@@ -46,14 +55,12 @@ namespace Game3 {
 			renderers.updateSize(rectangle.width, rectangle.height);
 
 			{
-				ui.scissorStack.pushRelative({Rectangle(rectangle.width + SEPARATION, 0) + rectangle, true});
-				Defer pop([&] { ui.scissorStack.pop(); });
+				auto saver = ui.scissorStack.pushRelative(Rectangle(rectangle.width + SEPARATION, 0) + rectangle, renderers);
 				moduleScroller->render(ui, renderers, rectangle);
 				module_lock.unlock();
 			}
 
-			ui.scissorStack.pushRelative({rectangle, true});
-			Defer pop([&] { ui.scissorStack.pop(); });
+			auto subsaver = ui.scissorStack.pushRelative(rectangle, renderers);
 			playerScroller->render(ui, renderers, rectangle);
 		} else {
 			playerScroller->render(ui, renderers, rectangle);
@@ -64,44 +71,52 @@ namespace Game3 {
 		renderIconTexture(renderers, cacheTexture("resources/gui/inventory.png"));
 	}
 
-	void InventoryTab::click(int button, int x, int y) {
+	bool InventoryTab::click(UIContext &ui, int button, int x, int y) {
 		if (playerScroller->getLastRectangle().contains(x, y) && playerScroller->click(ui, button, x, y))
-			return;
+			return true;
 
 		std::unique_lock<DefaultMutex> lock;
 		if (getModule(lock))
 			if (moduleScroller->getLastRectangle().contains(x, y))
-				moduleScroller->click(ui, button, x, y);
+				return moduleScroller->click(ui, button, x, y);
+
+		return false;
 	}
 
-	void InventoryTab::dragStart(int x, int y) {
+	bool InventoryTab::dragStart(UIContext &ui, int x, int y) {
 		if (playerScroller->getLastRectangle().contains(x, y) && playerScroller->dragStart(ui, x, y))
-			return;
+			return true;
 
 		std::unique_lock<DefaultMutex> lock;
 		if (getModule(lock))
 			if (moduleScroller->getLastRectangle().contains(x, y))
-				moduleScroller->dragStart(ui, x, y);
+				return moduleScroller->dragStart(ui, x, y);
+
+		return false;
 	}
 
-	void InventoryTab::dragEnd(int x, int y) {
+	bool InventoryTab::dragEnd(UIContext &ui, int x, int y) {
 		if (playerScroller->getLastRectangle().contains(x, y) && playerScroller->dragEnd(ui, x, y))
-			return;
+			return true;
 
 		std::unique_lock<DefaultMutex> lock;
 		if (getModule(lock))
 			if (moduleScroller->getLastRectangle().contains(x, y))
-				moduleScroller->dragEnd(ui, x, y);
+				return moduleScroller->dragEnd(ui, x, y);
+
+		return false;
 	}
 
-	void InventoryTab::scroll(float x_delta, float y_delta, int x, int y) {
+	bool InventoryTab::scroll(UIContext &ui, float x_delta, float y_delta, int x, int y) {
 		if (playerScroller->getLastRectangle().contains(x, y) && playerScroller->scroll(ui, x_delta, y_delta, x, y))
-			return;
+			return true;
 
 		std::unique_lock<DefaultMutex> lock;
 		if (getModule(lock))
 			if (moduleScroller->getLastRectangle().contains(x, y))
-				moduleScroller->scroll(ui, x_delta, y_delta, x, y);
+				return moduleScroller->scroll(ui, x_delta, y_delta, x, y);
+
+		return false;
 	}
 
 	void InventoryTab::setModule(std::shared_ptr<Module> new_module) {
@@ -131,12 +146,14 @@ namespace Game3 {
 	std::shared_ptr<ScrollerWidget> InventoryTab::makePlayerScroller() {
 		auto scroller = std::make_shared<ScrollerWidget>();
 		scroller->setChild(playerInventoryModule);
+		scroller->insertAtEnd(shared_from_this());
 		return scroller;
 	}
 
 	std::shared_ptr<ScrollerWidget> InventoryTab::makeModuleScroller() {
 		auto scroller = std::make_shared<ScrollerWidget>();
 		scroller->setChild(activeModule.copyBase());
+		scroller->insertAtEnd(shared_from_this());
 		return scroller;
 	}
 }

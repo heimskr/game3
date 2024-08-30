@@ -3,17 +3,11 @@
 #include "ui/gl/tab/Tab.h"
 
 namespace Game3 {
-	class Module;
-
 	class CraftingTab: public Tab {
 		public:
 			using Tab::Tab;
 
-			void render(const RendererContext &) final;
+			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
 			void renderIcon(const RendererContext &) final;
-			void click(int button, int x, int y) final;
-			void dragStart(int x, int y) final;
-			void dragUpdate(int x, int y) final;
-			void dragEnd(int x, int y) final;
 	};
 }

@@ -12,12 +12,13 @@ namespace Game3 {
 		public:
 			InventoryTab(UIContext &);
 
-			void render(const RendererContext &) final;
+			void init() final;
+			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
 			void renderIcon(const RendererContext &) final;
-			void click(int button, int x, int y) final;
-			void dragStart(int x, int y) final;
-			void dragEnd(int x, int y) final;
-			void scroll(float x_delta, float y_delta, int x, int y) final;
+			bool click(UIContext &, int button, int x, int y) final;
+			bool dragStart(UIContext &, int x, int y) final;
+			bool dragEnd(UIContext &, int x, int y) final;
+			bool scroll(UIContext &, float x_delta, float y_delta, int x, int y) final;
 
 			void setModule(std::shared_ptr<Module>);
 			Module * getModule(std::shared_lock<DefaultMutex> &);

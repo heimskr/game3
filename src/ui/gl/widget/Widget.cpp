@@ -4,6 +4,8 @@
 #include "ui/gl/UIContext.h"
 #include "util/Demangle.h"
 
+#include <cassert>
+
 namespace Game3 {
 	Widget::Widget(float scale):
 		scale(scale) {}
@@ -32,10 +34,18 @@ namespace Game3 {
 		if (onClick)
 			return onClick(*this, ui, button, x - lastRectangle.x, y - lastRectangle.y);
 
+		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
+			if (child->getLastRectangle().contains(x, y) && child->click(ui, button, x, y))
+				return true;
+
 		return false;
 	}
 
-	bool Widget::dragStart(UIContext &, int, int) {
+	bool Widget::dragStart(UIContext &ui, int x, int y) {
+		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
+			if (child->getLastRectangle().contains(x, y) && child->dragStart(ui, x, y))
+				return true;
+
 		return false;
 	}
 
@@ -43,14 +53,26 @@ namespace Game3 {
 		if (onDrag)
 			return onDrag(*this, ui, x - lastRectangle.x, y - lastRectangle.y);
 
+		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
+			if (child->getLastRectangle().contains(x, y) && child->dragUpdate(ui, x, y))
+				return true;
+
 		return false;
 	}
 
-	bool Widget::dragEnd(UIContext &, int, int) {
+	bool Widget::dragEnd(UIContext &ui, int x, int y) {
+		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
+			if (child->getLastRectangle().contains(x, y) && child->dragEnd(ui, x, y))
+				return true;
+
 		return false;
 	}
 
-	bool Widget::scroll(UIContext &, float, float, int, int) {
+	bool Widget::scroll(UIContext &ui, float x_delta, float y_delta, int x, int y) {
+		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
+			if (child->getLastRectangle().contains(x, y) && child->scroll(ui, x_delta, y_delta, x, y))
+				return true;
+
 		return false;
 	}
 
@@ -60,6 +82,105 @@ namespace Game3 {
 
 	float Widget::getScale() const {
 		return scale;
+	}
+
+	WidgetPtr Widget::getParent() const {
+		if (WidgetPtr parent = weakParent.lock())
+			return parent;
+		throw std::runtime_error("Widget parent is expired or null");
+	}
+
+	void Widget::insertAfter(WidgetPtr parent, WidgetPtr sibling) {
+		assert(parent);
+		assert(sibling);
+
+		WidgetPtr self = shared_from_this();
+
+		if (WidgetPtr old_parent = weakParent.lock(); old_parent == parent)
+			old_parent->remove(self);
+		else
+			weakParent = parent;
+
+		auto next = sibling->nextSibling;
+		previousSibling = sibling;
+		nextSibling = next;
+		if (next)
+			next->previousSibling = self;
+		sibling->nextSibling = self;
+
+		if (parent->lastChild == sibling)
+			parent->lastChild = self;
+	}
+
+	void Widget::insertBefore(WidgetPtr parent, WidgetPtr sibling) {
+		assert(parent);
+		assert(sibling);
+
+		WidgetPtr self = shared_from_this();
+
+		if (WidgetPtr old_parent = weakParent.lock(); old_parent == parent)
+			old_parent->remove(self);
+		else
+			weakParent = parent;
+
+		auto previous = sibling->previousSibling.lock();
+		previousSibling = previous;
+		nextSibling = sibling;
+		if (previous)
+			previous->nextSibling = self;
+		sibling->previousSibling = self;
+
+		if (parent->firstChild == sibling)
+			parent->firstChild = self;
+	}
+
+	void Widget::insertAtStart(WidgetPtr parent) {
+		assert(parent);
+
+		WidgetPtr self = shared_from_this();
+
+		if (WidgetPtr old_parent = weakParent.lock(); old_parent == parent)
+			old_parent->remove(self);
+		else
+			weakParent = parent;
+
+		nextSibling = parent->firstChild;
+		if (nextSibling)
+			nextSibling->previousSibling = self;
+
+		parent->firstChild = self;
+	}
+
+	void Widget::insertAtEnd(WidgetPtr parent) {
+		assert(parent);
+
+		WidgetPtr self = shared_from_this();
+
+		if (WidgetPtr old_parent = weakParent.lock(); old_parent == parent)
+			old_parent->remove(self);
+		else
+			weakParent = parent;
+
+		previousSibling = parent->lastChild;
+		if (auto previous = previousSibling.lock())
+			previous->nextSibling = self;
+
+		parent->lastChild = self;
+	}
+
+	void Widget::remove(WidgetPtr child) {
+		assert(child);
+		assert(child->getParent().get() == this);
+
+		if (firstChild == child)
+			firstChild = child->nextSibling;
+
+		if (auto previous = child->previousSibling.lock())
+			previous->nextSibling = child->nextSibling;
+
+		child->nextSibling->previousSibling = child->previousSibling;
+
+		child->weakParent.reset();
 	}
 
 	void Widget::setOnClick(decltype(onClick) new_onclick) {

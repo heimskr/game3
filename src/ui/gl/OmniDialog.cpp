@@ -33,6 +33,9 @@ namespace Game3 {
 		tabs = {inventoryTab, craftingTab};
 		activeTab = inventoryTab;
 		tabRectangles.resize(tabs.size());
+
+		for (const TabPtr &tab: tabs)
+			tab->init();
 	}
 
 	void OmniDialog::render(const RendererContext &renderers) {
@@ -56,14 +59,12 @@ namespace Game3 {
 			if (rectangle.height <= 0 || rectangle.width <= 0)
 				return;
 
-			stack.pushRelative({rectangle, true});
-			renderers.updateSize(rectangle.width, rectangle.height);
-			Defer pop([&] { stack.pop(); });
+			rectangler.drawOnScreen(Color{0.6, 0.3, 0, 0.1}, rectangle);
 
-			rectangler.drawOnScreen(Color{0.6, 0.3, 0, 0.1}, 0, 0, 10000, 10000);
+			auto subsaver = stack.pushRelative(rectangle, renderers);
 
 			if (activeTab)
-				activeTab->render(renderers);
+				activeTab->render(ui, renderers, rectangle);
 		}
 
 		auto saver = renderers.getSaver();
@@ -82,8 +83,7 @@ namespace Game3 {
 			}
 
 			if (tab == activeTab) {
-				stack.pushRelative({original_rectangle, true});
-				renderers.updateSize(original_rectangle.width, original_rectangle.height);
+				auto saver = stack.pushRelative(original_rectangle, renderers);
 				rectangler.drawOnScreen(inner_color, x_offset + UNSCALED, 0, TOP_OFFSET - UNSCALED * 2, 6 * UI_SCALE);
 
 				renderers.singleSprite.drawOnScreen(cacheTexture("resources/gui/gui_merge_left.png", true), RenderOptions{
@@ -105,15 +105,11 @@ namespace Game3 {
 					.scaleY = 1,
 					.invertY = false,
 				});
-
-				stack.pop();
 			}
 
 			Rectangle tab_rectangle = original_rectangle + Rectangle{x_offset, UNSCALED * 5 / 4 - TOP_OFFSET, TOP_OFFSET, TOP_OFFSET};
-			stack.pushRelative({tab_rectangle, true});
-			renderers.updateSize(tab_rectangle.width, tab_rectangle.height);
+			auto saver = stack.pushRelative(tab_rectangle, renderers);
 			tab->renderIcon(renderers);
-			stack.pop();
 
 			++i;
 		};
@@ -145,7 +141,7 @@ namespace Game3 {
 			return false;
 
 		if (activeTab)
-			activeTab->click(button, x, y);
+			activeTab->click(ui, button, x, y);
 
 		return true;
 	}
@@ -155,7 +151,7 @@ namespace Game3 {
 			return false;
 
 		if (activeTab)
-			activeTab->dragStart(x, y);
+			activeTab->dragStart(ui, x, y);
 
 		return true;
 	}
@@ -165,7 +161,7 @@ namespace Game3 {
 			return false;
 
 		if (activeTab)
-			activeTab->dragUpdate(x, y);
+			activeTab->dragUpdate(ui, x, y);
 
 		return true;
 	}
@@ -175,7 +171,7 @@ namespace Game3 {
 			return false;
 
 		if (activeTab)
-			activeTab->dragEnd(x, y);
+			activeTab->dragEnd(ui, x, y);
 
 		return true;
 	}
@@ -185,7 +181,7 @@ namespace Game3 {
 			return false;
 
 		if (activeTab)
-			activeTab->scroll(x_delta, y_delta, x, y);
+			activeTab->scroll(ui, x_delta, y_delta, x, y);
 
 		return true;
 	}

@@ -25,8 +25,8 @@ namespace Game3 {
 		bottomExteriorColor(topExteriorColor.darken()),
 		progress(progress) {}
 
-	ProgressBarWidget::ProgressBarWidget(float fixed_height, float scale, Color interior_color, float progress):
-		ProgressBarWidget(fixed_height, scale, interior_color, DEFAULT_BACKGROUND_COLOR, DEFAULT_EXTERIOR_COLOR, progress) {}
+	ProgressBarWidget::ProgressBarWidget(float scale, float fixed_height, Color interior_color, float progress):
+		ProgressBarWidget(scale, fixed_height, interior_color, DEFAULT_BACKGROUND_COLOR, DEFAULT_EXTERIOR_COLOR, progress) {}
 
 	void ProgressBarWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		if (fixedHeight > 0)

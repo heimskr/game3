@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ui/gl/widget/Widget.h"
+
 #include <memory>
 
 namespace Game3 {
@@ -8,23 +10,19 @@ namespace Game3 {
 	class UIContext;
 	struct RendererContext;
 
-	class Tab {
+	class Tab: public Widget {
 		public:
 			Tab(UIContext &);
 
-			virtual ~Tab() = default;
-
-			virtual void render(const RendererContext &) = 0;
+			virtual void init();
 			virtual void renderIcon(const RendererContext &);
-			virtual void click(int button, int x, int y);
-			virtual void dragStart(int x, int y);
-			virtual void dragUpdate(int x, int y);
-			virtual void dragEnd(int x, int y);
-			virtual void scroll(float x_delta, float y_delta, int x, int y);
+			float calculateHeight(const RendererContext &, float available_width, float available_height) override;
 
 		protected:
 			UIContext &ui;
 
 			void renderIconTexture(const RendererContext &, const std::shared_ptr<Texture> &);
 	};
+
+	using TabPtr = std::shared_ptr<Tab>;
 }

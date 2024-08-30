@@ -8,7 +8,11 @@
 
 namespace Game3 {
 	Tab::Tab(UIContext &ui):
-		ui(ui) {}
+		Widget(UI_SCALE), ui(ui) {}
+
+	void Tab::init() {}
+
+	void Tab::renderIcon(const RendererContext &) {}
 
 	void Tab::renderIconTexture(const RendererContext &renderers, const std::shared_ptr<Texture> &texture) {
 		renderers.singleSprite.drawOnScreen(texture, RenderOptions{
@@ -22,15 +26,7 @@ namespace Game3 {
 		});
 	}
 
-	void Tab::renderIcon(const RendererContext &) {}
-
-	void Tab::click(int, int, int) {}
-
-	void Tab::dragStart(int, int) {}
-
-	void Tab::dragUpdate(int, int) {}
-
-	void Tab::dragEnd(int, int) {}
-
-	void Tab::scroll(float, float, int, int) {}
+	float Tab::calculateHeight(const RendererContext &, float, float available_height) {
+		return available_height;
+	}
 }

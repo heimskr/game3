@@ -24,8 +24,12 @@ namespace Game3 {
 		Rectangle && reposition(int x, int y) &&;
 
 		auto operator<=>(const Rectangle &) const = default;
+
 		/** Ignores the width/height of the LHS and uses the width/height of the RHS. */
 		Rectangle operator+(const Rectangle &) const;
+
+		/** Ignores the width/height of the RHS and uses the width/height of the LHS. */
+		Rectangle operator-(const Rectangle &) const;
 	};
 }
 

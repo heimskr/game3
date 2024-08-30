@@ -31,4 +31,8 @@ namespace Game3 {
 	Rectangle Rectangle::operator+(const Rectangle &other) const {
 		return {x + other.x, y + other.y, other.width, other.height};
 	}
+
+	Rectangle Rectangle::operator-(const Rectangle &other) const {
+		return {x - other.x, y - other.y, width, height};
+	}
 }

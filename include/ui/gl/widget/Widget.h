@@ -12,6 +12,10 @@ namespace Game3 {
 	struct Rectangle;
 	struct RendererContext;
 
+	class Widget;
+	using WidgetPtr = std::shared_ptr<Widget>;
+	using WeakWidgetPtr = std::weak_ptr<Widget>;
+
 	class Widget: public std::enable_shared_from_this<Widget> {
 		public:
 			Widget(const Widget &) = default;
@@ -28,7 +32,7 @@ namespace Game3 {
 			virtual void render(UIContext &, const RendererContext &, float x, float y, float width, float height);
 			virtual void render(UIContext &, const RendererContext &, const Rectangle &);
 			/** Can return a pointer to nothing, itself or a new widget. */
-			virtual std::shared_ptr<Widget> getDragStartWidget();
+			virtual WidgetPtr getDragStartWidget();
 			/** `x` and `y` are absolute, not relative to the top left corner of the widget. */
 			virtual bool click(UIContext &, int button, int x, int y);
 			virtual bool dragStart(UIContext &, int x, int y);
@@ -39,9 +43,21 @@ namespace Game3 {
 			virtual float calculateHeight(const RendererContext &, float available_width, float available_height) = 0;
 			virtual float getScale() const;
 
+			WidgetPtr getParent() const;
+			void insertAfter(WidgetPtr parent, WidgetPtr sibling);
+			void insertBefore(WidgetPtr parent, WidgetPtr sibling);
+			void insertAtStart(WidgetPtr parent);
+			void insertAtEnd(WidgetPtr parent);
+			void remove(WidgetPtr child);
+
 		protected:
 			float scale{};
 			Rectangle lastRectangle{-1, -1, -1, -1};
+			WidgetPtr firstChild;
+			WidgetPtr lastChild;
+			WeakWidgetPtr weakParent;
+			WeakWidgetPtr previousSibling;
+			WidgetPtr nextSibling;
 
 			/** Mouse X and Y coordinates are relative to the top left corner of the widget. Return value indicates whether to stop propagation. */
 			std::function<bool(Widget &, UIContext &, int button, int mouse_x, int mouse_y)> onClick;
@@ -55,6 +71,4 @@ namespace Game3 {
 			virtual void setOnClick(decltype(onClick));
 			virtual void setOnDrag(decltype(onDrag));
 	};
-
-	using WidgetPtr = std::shared_ptr<Widget>;
 }
