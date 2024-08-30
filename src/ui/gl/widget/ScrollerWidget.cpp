@@ -8,6 +8,7 @@
 
 namespace {
 	constexpr float SCROLL_SPEED = 64;
+	constexpr bool ALLOW_OVERSCROLL = true;
 }
 
 namespace Game3 {
@@ -29,7 +30,7 @@ namespace Game3 {
 		const float bar_thickness = 2 * scale;
 
 		if (child_height > 0) {
-			const float vertical_fraction = height / child_height;
+			const float vertical_fraction = height / (ALLOW_OVERSCROLL? height + child_height : child_height);
 			const float vertical_height = vertical_fraction * height;
 			if (vertical_height < height) {
 				const float vertical_offset = yOffset / child_height * (vertical_height - height);
@@ -61,6 +62,7 @@ namespace Game3 {
 		yOffset = std::min(0.f, yOffset);
 		if (child)
 			yOffset = std::max(yOffset, -child->calculateHeight(ui.getRenderers(), lastRectangle.width, lastRectangle.height));
+		static_assert(ALLOW_OVERSCROLL); // TODO
 		return true;
 	}
 

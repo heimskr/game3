@@ -13,7 +13,6 @@
 
 namespace Game3 {
 	void CraftingTab::init() {
-		INFO("CraftingTab::init()");
 		assert(!bar);
 
 		auto tab = shared_from_this();
