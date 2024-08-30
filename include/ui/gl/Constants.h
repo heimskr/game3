@@ -8,6 +8,7 @@ namespace Game3 {
 	constexpr double SCALE = 8;
 	constexpr double SLOT_SCALE = 8;
 	constexpr double UNSCALE = 1.6;
+	constexpr float TEXT_INPUT_HEIGHT_FACTOR = 11;
 	constexpr int TOP_OFFSET = 20 * SCALE;
 	constexpr int UNSCALED = 6 * SCALE / UNSCALE;
 	constexpr int INNER_SLOT_SIZE = 16;

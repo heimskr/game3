@@ -15,7 +15,10 @@ namespace {
 
 		if (!input) {
 			input = std::make_shared<Game3::TextInputWidget>(scale);
-			input->goEnd(ui);
+			input->setText(ui, "Hello from the crafting tab! This is some example text.");
+			input->onSubmit = [](Game3::TextInputWidget &input) {
+				input.clear();
+			};
 		}
 
 		return input;
@@ -24,11 +27,10 @@ namespace {
 
 namespace Game3 {
 	void CraftingTab::render(const RendererContext &renderers) {
-
 		// auto bar = std::make_shared<ProgressBarWidget>(scale * 10, scale, Color(1, 0, 0, 1), 0.5);
 		// bar->render(ui, renderers, 0, 0, scale * 100, scale * 10);
 
-		getTextInput(ui)->render(ui, renderers, 0, 0, scale * 100, scale * 10);
+		getTextInput(ui)->render(ui, renderers, 0, 0, scale * 100, scale * TEXT_INPUT_HEIGHT_FACTOR);
 	}
 
 	void CraftingTab::renderIcon(const RendererContext &renderers) {

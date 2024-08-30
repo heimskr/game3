@@ -19,7 +19,7 @@ namespace {
 		if (unicharacter > std::numeric_limits<char>::max())
 			return false;
 
-		static const std::string_view stops = "_. \t\n";
+		static const std::string_view stops = "_.,/-=+ \t\n";
 		return stops.find(static_cast<char>(unicharacter)) != std::string_view::npos;
 	}
 
@@ -36,12 +36,7 @@ namespace {
 
 namespace Game3 {
 	TextInputWidget::TextInputWidget(float scale, Color exterior_color, Color interior_color, Color text_color, Color cursor_color, float thickness):
-		scale(scale), thickness(thickness), exteriorColor(exterior_color), interiorColor(interior_color), textColor(text_color), cursorColor(cursor_color) {
-			text = "This is a test";
-			cursorIterator = text.end();
-			cursor = text.length();
-			xOffset = 0;
-		}
+		scale(scale), thickness(thickness), exteriorColor(exterior_color), interiorColor(interior_color), textColor(text_color), cursorColor(cursor_color) {}
 
 	TextInputWidget::TextInputWidget(float scale, Color exterior_color, Color interior_color, Color text_color, Color cursor_color):
 		TextInputWidget(scale, exterior_color, interior_color, text_color, cursor_color, DEFAULT_THICKNESS) {}
@@ -55,6 +50,9 @@ namespace Game3 {
 	void TextInputWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(ui, renderers, x, y, width, height);
 
+		if (cursorFixQueued)
+			fixCursorOffset();
+
 		RectangleRenderer &rectangler = renderers.rectangle;
 		TextRenderer &texter = renderers.text;
 
@@ -67,7 +65,7 @@ namespace Game3 {
 
 		auto saver = ui.scissorStack.pushRelative(interior, renderers);
 
-		rectangler(cursorColor, x - xOffset * scale + scale + start / 2 + cursorXOffset * getTextScale(), y + start, start / 2, interior.height - 1.5 * start);
+		rectangler(cursorColor, x + getCursorPosition(), y + start, start / 2, interior.height - 1.5 * start);
 
 		texter(text, TextRenderOptions{
 			.x = x - xOffset * scale + start,
@@ -92,10 +90,6 @@ namespace Game3 {
 
 	bool TextInputWidget::keyPressed(UIContext &ui, uint32_t character, Modifiers modifiers) {
 		switch (character) {
-			case GDK_KEY_Return:
-				character = '\n';
-				break;
-
 			case GDK_KEY_BackSpace:
 				if (modifiers.onlyCtrl())
 					eraseWord(ui);
@@ -116,10 +110,12 @@ namespace Game3 {
 				return true;
 
 			case GDK_KEY_Home:
+			case GDK_KEY_Up:
 				goStart(ui);
 				return true;
 
 			case GDK_KEY_End:
+			case GDK_KEY_Down:
 				goEnd(ui);
 				return true;
 
@@ -138,6 +134,12 @@ namespace Game3 {
 				ui.unfocus();
 				return true;
 
+			case GDK_KEY_Return:
+			case GDK_KEY_KP_Enter:
+				if (onSubmit)
+					onSubmit(*this);
+				return true;
+
 			default:
 				break;
 		}
@@ -150,11 +152,28 @@ namespace Game3 {
 		return available_height;
 	}
 
+	const Glib::ustring & TextInputWidget::getText() const {
+		return text;
+	}
+
+	void TextInputWidget::setText(UIContext &ui, Glib::ustring new_text) {
+		text = std::move(new_text);
+		goEnd(ui);
+	}
+
+	void TextInputWidget::clear() {
+		text.clear();
+		cursor = 0;
+		cursorIterator = text.begin();
+		xOffset = 0;
+		cursorXOffset = 0;
+	}
+
 	void TextInputWidget::insert(UIContext &ui, gunichar character) {
 		cursorIterator = text.insert(cursorIterator, static_cast<gunichar>(character));
 		++cursorIterator;
 		++cursor;
-		cursorXOffset += ui.getRenderers().text.textWidth(Glib::ustring(1, character));
+		adjustCursorOffset(ui.getRenderers().text.textWidth(Glib::ustring(1, character)));
 	}
 
 	void TextInputWidget::eraseWord(UIContext &ui) {
@@ -162,25 +181,39 @@ namespace Game3 {
 			return;
 
 		// TODO: instead of erasing multiple times, search the string for how much to erase and erase it all in one go.
+
+		if (isWhitespace(cursorIterator)) {
+			do {
+				eraseCharacter(ui);
+			} while (cursorIterator != text.begin() && isWhitespace(cursorIterator));
+
+			while (cursorIterator != text.begin() && !isStopChar(cursorIterator))
+				eraseCharacter(ui);
+
+			return;
+		}
+
 		if (isStopChar(cursorIterator)) {
 			do {
 				eraseCharacter(ui);
 			} while (cursorIterator != text.begin() && isStopChar(cursorIterator));
-		} else {
-			do {
-				eraseCharacter(ui);
-			} while (cursorIterator != text.begin() && !isStopChar(cursorIterator));
-			while (cursorIterator != text.begin() && isWhitespace(cursorIterator)) {
-				eraseCharacter(ui);
-			}
+
+			return;
 		}
+
+		do {
+			eraseCharacter(ui);
+		} while (cursorIterator != text.begin() && !isStopChar(cursorIterator));
+
+		while (cursorIterator != text.begin() && isWhitespace(cursorIterator))
+			eraseCharacter(ui);
 	}
 
 	void TextInputWidget::eraseCharacter(UIContext &ui) {
 		if (cursor == 0)
 			return;
 
-		cursorXOffset -= ui.getRenderers().text.textWidth(text.substr(--cursor, 1));
+		adjustCursorOffset(-ui.getRenderers().text.textWidth(text.substr(--cursor, 1)));
 		cursorIterator = text.erase(--cursorIterator);
 	}
 
@@ -195,7 +228,7 @@ namespace Game3 {
 
 		for (size_t i = 0; i < count && cursorIterator != text.begin(); ++i) {
 			piece = text.substr(--cursor, 1);
-			cursorXOffset -= renderers.text.textWidth(piece);
+			adjustCursorOffset(-renderers.text.textWidth(piece));
 			--cursorIterator;
 		}
 	}
@@ -206,7 +239,7 @@ namespace Game3 {
 
 		for (size_t i = 0; i < count && cursorIterator != text.end(); ++i) {
 			piece = text.substr(cursor++, 1);
-			cursorXOffset += renderers.text.textWidth(piece);
+			adjustCursorOffset(renderers.text.textWidth(piece));
 			++cursorIterator;
 		}
 	}
@@ -214,16 +247,57 @@ namespace Game3 {
 	void TextInputWidget::goStart(UIContext &) {
 		cursor = 0;
 		cursorIterator = text.begin();
-		cursorXOffset = 0;
+		xOffset = 0;
+		setCursorOffset(0);
 	}
 
 	void TextInputWidget::goEnd(UIContext &ui) {
 		cursor = text.length();
 		cursorIterator = text.end();
-		cursorXOffset = ui.getRenderers().text.textWidth(text);
+		xOffset = 0;
+		setCursorOffset(ui.getRenderers().text.textWidth(text));
 	}
 
 	float TextInputWidget::getTextScale() const {
 		return scale / 16;
+	}
+
+	float TextInputWidget::getXPadding() const {
+		return thickness * scale;
+	}
+
+	float TextInputWidget::getBoundary() const {
+		return lastWidth - getXPadding();
+	}
+
+	float TextInputWidget::getCursorPosition() const {
+		return getXPadding() - xOffset * scale + cursorXOffset * getTextScale();
+	}
+
+	void TextInputWidget::adjustCursorOffset(float offset) {
+		cursorXOffset += offset;
+		fixCursorOffset();
+	}
+
+	void TextInputWidget::setCursorOffset(float new_offset) {
+		cursorXOffset = new_offset;
+		fixCursorOffset();
+	}
+
+	void TextInputWidget::fixCursorOffset() {
+		if (lastWidth < 0) {
+			cursorFixQueued = true;
+			return;
+		}
+
+		const float visual = getCursorPosition();
+		const float boundary = getBoundary();
+
+		if (visual > boundary)
+			xOffset += (visual - boundary + getXPadding() * 2) / scale;
+		else if (visual < getXPadding())
+			xOffset -= (getXPadding() - visual) / scale;
+
+		cursorFixQueued = false;
 	}
 }
