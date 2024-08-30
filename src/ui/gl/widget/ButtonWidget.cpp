@@ -57,6 +57,8 @@ namespace Game3 {
 		// Right
 		rectangler(top_color, x + width - scale, adjusted_y + 2 * scale, scale, height - 6 * scale);
 
+		const float value = pressed? 1.1 : 1;
+
 		assert(texture);
 		renderers.singleSprite.drawOnScreen(texture, RenderOptions{
 			.x = x + scale,
@@ -65,6 +67,7 @@ namespace Game3 {
 			.sizeY = height - 4 * scale,
 			.scaleX = scale,
 			.scaleY = scale,
+			.color{value, value, value, 1},
 			.invertY = false,
 			.wrapMode = GL_REPEAT,
 		});
@@ -107,16 +110,20 @@ namespace Game3 {
 		rectangler(bottom_color, x + 2 * scale, adjusted_y + height - 2 * scale, width - 4 * scale, bottom_height);
 	}
 
-	bool ButtonWidget::dragStart(UIContext &, int, int) {
+	bool ButtonWidget::dragStart(UIContext &ui, int, int) {
 		pressed = true;
+		ui.setPressedWidget(weak_from_this());
 		return true;
 	}
 
-	bool ButtonWidget::dragEnd(UIContext &, int, int) {
+	bool ButtonWidget::dragEnd(UIContext &ui, int x, int y) {
 		if (pressed) {
 			pressed = false;
-			if (onClick)
-				onClick(*this);
+			ui.unpress();
+			if (getLastRectangle().contains(x, y)) {
+				if (onClick)
+					onClick(*this);
+			}
 		}
 
 		return true;

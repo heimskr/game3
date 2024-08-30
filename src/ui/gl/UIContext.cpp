@@ -99,6 +99,10 @@ namespace Game3 {
 	}
 
 	bool UIContext::dragEnd(int x, int y) {
+		if (auto pressed = getPressedWidget()) {
+			return pressed->dragEnd(*this, x, y);
+		}
+
 		bool out = false;
 
 		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs)) {
@@ -163,6 +167,18 @@ namespace Game3 {
 
 	void UIContext::unfocus() {
 		focusedWidget.reset();
+	}
+
+	void UIContext::setPressedWidget(std::weak_ptr<Widget> new_pressed) {
+		pressedWidget = std::move(new_pressed);
+	}
+
+	WidgetPtr UIContext::getPressedWidget() const {
+		return pressedWidget.lock();
+	}
+
+	void UIContext::unpress() {
+		pressedWidget.reset();
 	}
 
 	std::pair<double, double> UIContext::getAbsoluteMouseCoordinates() const {

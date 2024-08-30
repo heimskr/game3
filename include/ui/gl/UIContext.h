@@ -48,6 +48,9 @@ namespace Game3 {
 			void focusWidget(std::weak_ptr<Widget>);
 			WidgetPtr getFocusedWidget() const;
 			void unfocus();
+			void setPressedWidget(std::weak_ptr<Widget>);
+			WidgetPtr getPressedWidget() const;
+			void unpress();
 			std::pair<double, double> getAbsoluteMouseCoordinates() const;
 			std::pair<double, double> getRelativeMouseCoordinates() const;
 			bool checkMouseRelative(const Rectangle &) const;
@@ -78,6 +81,7 @@ namespace Game3 {
 			std::shared_ptr<HotbarWidget> hotbar;
 			std::shared_ptr<TooltipWidget> tooltip;
 			std::weak_ptr<Widget> focusedWidget;
+			std::weak_ptr<Widget> pressedWidget;
 
 			template <typename T>
 			static bool dialogMatcher(const std::shared_ptr<Dialog> &dialog) {
