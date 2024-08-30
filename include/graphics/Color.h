@@ -66,6 +66,7 @@ namespace Game3 {
 		Color darken(float value_divisor = 3.f / 2.f) const;
 		Color multiplyValue(float multiplier) const;
 		Color invertValue() const;
+		Color desaturate() const;
 
 		static Color fromBytes(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha = 255);
 	};

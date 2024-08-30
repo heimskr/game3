@@ -16,6 +16,7 @@ namespace Game3 {
 
 	template <>
 	OKHsv convertColor(const Color &rgb) {
+		// Horrible NaN nonsense abounds.
 		if (rgb.red < 0.001 && rgb.green < 0.001 && rgb.blue < 0.001)
 			return {0, 0, 0, rgb.alpha};
 
@@ -56,8 +57,13 @@ namespace Game3 {
 
 	Color Color::invertValue() const {
 		OKHsv ok = convert<OKHsv>();
-		INFO("ok.value = {}", ok.value);
 		ok.value = 1.f - ok.value;
+		return ok.convert<Color>();
+	}
+
+	Color Color::desaturate() const {
+		OKHsv ok = convert<OKHsv>();
+		ok.saturation = 0;
 		return ok.convert<Color>();
 	}
 
