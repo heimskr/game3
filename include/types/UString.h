@@ -2,6 +2,7 @@
 
 #include <glibmm/ustring.h>
 
+#include <format>
 #include <vector>
 
 namespace Game3 {
