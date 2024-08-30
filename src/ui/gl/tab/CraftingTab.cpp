@@ -42,6 +42,9 @@ namespace {
 		if (!button) {
 			button = std::make_shared<Game3::ButtonWidget>(scale, scale * 10);
 			button->setText("Button");
+			button->setOnClick([&](auto &) {
+				Game3::INFO("Clicked");
+			});
 		}
 
 		return button;

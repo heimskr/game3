@@ -6,6 +6,8 @@
 
 #include <glibmm/ustring.h>
 
+#include <functional>
+
 namespace Game3 {
 	class ButtonWidget: public Widget {
 		public:
@@ -20,17 +22,23 @@ namespace Game3 {
 
 			void setText(Glib::ustring);
 			void setFixedHeight(float);
+			void setOnClick(std::function<void(ButtonWidget &)>);
 
 		private:
+			std::function<void(ButtonWidget &)> onClick;
 			float fixedHeight{};
 			Color topBorderColor;
 			Color bottomBorderColor;
 			Color textColor;
+			Color topBorderColorPressed;
+			Color bottomBorderColorPressed;
+			Color textColorPressed;
 			Glib::ustring text;
 			bool pressed = false;
 			TexturePtr texture;
 
 			float getTextScale(const RendererContext &, float height) const;
+			void setColors(Color top, Color bottom, Color text_color);
 
 			static TexturePtr getDefaultTexture();
 	};

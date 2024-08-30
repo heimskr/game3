@@ -17,10 +17,9 @@ namespace Game3 {
 	ButtonWidget::ButtonWidget(float scale, float fixed_height, Color top_border_color, Color bottom_border_color, Color text_color, TexturePtr texture):
 		Widget(scale),
 		fixedHeight(fixed_height),
-		topBorderColor(top_border_color),
-		bottomBorderColor(bottom_border_color),
-		textColor(text_color),
-		texture(std::move(texture)) {}
+		texture(std::move(texture)) {
+			setColors(top_border_color, bottom_border_color, text_color);
+		}
 
 	ButtonWidget::ButtonWidget(float scale, float fixed_height, Color border_color, Color text_color, TexturePtr texture):
 		ButtonWidget(scale, fixed_height, border_color, border_color.darken(), text_color, std::move(texture)) {}
@@ -43,17 +42,20 @@ namespace Game3 {
 
 		Widget::render(ui, renderers, x, y, width, height);
 
+		const Color &top_color = pressed? topBorderColorPressed : topBorderColor;
+		const Color &bottom_color = pressed? bottomBorderColorPressed : bottomBorderColor;
+
 		// Top
-		rectangler(topBorderColor, x + 2 * scale, adjusted_y, width - 4 * scale, scale);
+		rectangler(top_color, x + 2 * scale, adjusted_y, width - 4 * scale, scale);
 
 		// Bottom
-		rectangler(topBorderColor, x + 2 * scale, adjusted_y + height - 3 * scale, width - 4 * scale, scale);
+		rectangler(top_color, x + 2 * scale, adjusted_y + height - 3 * scale, width - 4 * scale, scale);
 
 		// Left
-		rectangler(topBorderColor, x, adjusted_y + 2 * scale, scale, height - 6 * scale);
+		rectangler(top_color, x, adjusted_y + 2 * scale, scale, height - 6 * scale);
 
 		// Right
-		rectangler(topBorderColor, x + width - scale, adjusted_y + 2 * scale, scale, height - 6 * scale);
+		rectangler(top_color, x + width - scale, adjusted_y + 2 * scale, scale, height - 6 * scale);
 
 		assert(texture);
 		renderers.singleSprite.drawOnScreen(texture, RenderOptions{
@@ -74,35 +76,35 @@ namespace Game3 {
 				.y = height - 5 * scale,
 				.scaleX = text_scale,
 				.scaleY = text_scale,
-				.color = textColor,
+				.color = pressed? textColorPressed : textColor,
 				.alignTop = false,
 			});
 		}
 
 		// Top left
-		rectangler(topBorderColor, x + scale, adjusted_y + scale, scale, scale);
+		rectangler(top_color, x + scale, adjusted_y + scale, scale, scale);
 
 		// Top right
-		rectangler(topBorderColor, x + width - 2 * scale, adjusted_y + scale, scale, scale);
+		rectangler(top_color, x + width - 2 * scale, adjusted_y + scale, scale, scale);
 
 		// Bottom left
-		rectangler(topBorderColor, x + scale, adjusted_y + height - 4 * scale, scale, scale);
+		rectangler(top_color, x + scale, adjusted_y + height - 4 * scale, scale, scale);
 
 		// Bottom right
-		rectangler(topBorderColor, x + width - 2 * scale, adjusted_y + height - 4 * scale, scale, scale);
+		rectangler(top_color, x + width - 2 * scale, adjusted_y + height - 4 * scale, scale, scale);
 
 		const float bottom_height = pressed? scale : 2 * scale;
 
 		// Left
-		rectangler(bottomBorderColor, x, adjusted_y + height - 4 * scale, scale, bottom_height);
-		rectangler(bottomBorderColor, x + scale, adjusted_y + height - 3 * scale, scale, bottom_height);
+		rectangler(bottom_color, x, adjusted_y + height - 4 * scale, scale, bottom_height);
+		rectangler(bottom_color, x + scale, adjusted_y + height - 3 * scale, scale, bottom_height);
 
 		// Right
-		rectangler(bottomBorderColor, x + width - scale, adjusted_y + height - 4 * scale, scale, bottom_height);
-		rectangler(bottomBorderColor, x + width - 2 * scale, adjusted_y + height - 3 * scale, scale, bottom_height);
+		rectangler(bottom_color, x + width - scale, adjusted_y + height - 4 * scale, scale, bottom_height);
+		rectangler(bottom_color, x + width - 2 * scale, adjusted_y + height - 3 * scale, scale, bottom_height);
 
 		// Bottom
-		rectangler(bottomBorderColor, x + 2 * scale, adjusted_y + height - 2 * scale, width - 4 * scale, bottom_height);
+		rectangler(bottom_color, x + 2 * scale, adjusted_y + height - 2 * scale, width - 4 * scale, bottom_height);
 	}
 
 	bool ButtonWidget::dragStart(UIContext &, int, int) {
@@ -111,7 +113,12 @@ namespace Game3 {
 	}
 
 	bool ButtonWidget::dragEnd(UIContext &, int, int) {
-		pressed = false;
+		if (pressed) {
+			pressed = false;
+			if (onClick)
+				onClick(*this);
+		}
+
 		return true;
 	}
 
@@ -127,8 +134,21 @@ namespace Game3 {
 		fixedHeight = new_fixed_height;
 	}
 
+	void ButtonWidget::setOnClick(std::function<void(ButtonWidget &)> new_on_click) {
+		onClick = std::move(new_on_click);
+	}
+
 	float ButtonWidget::getTextScale(const RendererContext &renderers, float height) const {
 		return (height - 5 * scale) / renderers.text.getIHeight(scale / 8);
+	}
+
+	void ButtonWidget::setColors(Color top, Color bottom, Color text_color) {
+		topBorderColor = top;
+		bottomBorderColor = bottom;
+		textColor = text_color;
+		topBorderColorPressed = top.multiplyValue(1.5);
+		bottomBorderColorPressed = bottom.multiplyValue(1.5);
+		textColorPressed = text_color;
 	}
 
 	TexturePtr ButtonWidget::getDefaultTexture() {

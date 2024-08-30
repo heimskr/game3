@@ -16,11 +16,17 @@ namespace Game3 {
 
 	template <>
 	OKHsv convertColor(const Color &rgb) {
+		if (rgb.red < 0.001 && rgb.green < 0.001 && rgb.blue < 0.001)
+			return {0, 0, 0, rgb.alpha};
+
+		if (rgb.red > 0.999 && rgb.green > 0.999 && rgb.blue > 0.999)
+			return {1, 1, 1, rgb.alpha};
+
 		ok_color::HSV hsv = ok_color::srgb_to_okhsv({rgb.red, rgb.green, rgb.blue});
 		return {hsv.h, hsv.s, hsv.v, rgb.alpha};
 	}
 
-	OKHsv OKHsv::darken(float value_factor) const {
+	OKHsv OKHsv::darken(float value_divisor) const {
 		auto [hue, saturation, value, alpha] = *this;
 
 		if (60.f / 360.f <= hue && hue < 270.f / 360.f) {
@@ -33,13 +39,26 @@ namespace Game3 {
 
 		saturation = std::min(1.f, saturation + .1f);
 
-		value *= value_factor;
+		value /= value_divisor;
 
 		return OKHsv{hue, saturation, value, alpha};
 	}
 
-	Color Color::darken(float value_factor) const {
-		return convert<OKHsv>().darken(value_factor).convert<Color>();
+	Color Color::darken(float value_divisor) const {
+		return convert<OKHsv>().darken(value_divisor).convert<Color>();
+	}
+
+	Color Color::multiplyValue(float multiplier) const {
+		OKHsv ok = convert<OKHsv>();
+		ok.value = std::min(ok.value * multiplier, 1.f);
+		return ok.convert<Color>();
+	}
+
+	Color Color::invertValue() const {
+		OKHsv ok = convert<OKHsv>();
+		INFO("ok.value = {}", ok.value);
+		ok.value = 1.f - ok.value;
+		return ok.convert<Color>();
 	}
 
 	Color Color::fromBytes(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha) {

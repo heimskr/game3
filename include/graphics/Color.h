@@ -27,7 +27,7 @@ namespace Game3 {
 		OKHsv(float hue, float saturation, float value, float alpha):
 			hue(hue), saturation(saturation), value(value), alpha(alpha) {}
 
-		OKHsv darken(float value_factor) const;
+		OKHsv darken(float value_divisor) const;
 	};
 
 	struct Color: BaseColor<Color> {
@@ -63,7 +63,9 @@ namespace Game3 {
 			alpha = str.empty()? 1.f : fromHex(str) / 255.f;
 		}
 
-		Color darken(float value_factor = 2.f / 3.f) const;
+		Color darken(float value_divisor = 3.f / 2.f) const;
+		Color multiplyValue(float multiplier) const;
+		Color invertValue() const;
 
 		static Color fromBytes(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha = 255);
 	};
