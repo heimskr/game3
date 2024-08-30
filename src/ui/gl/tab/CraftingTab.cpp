@@ -27,10 +27,13 @@ namespace {
 
 namespace Game3 {
 	void CraftingTab::render(const RendererContext &renderers) {
-		// auto bar = std::make_shared<ProgressBarWidget>(scale * 10, scale, Color(1, 0, 0, 1), 0.5);
-		// bar->render(ui, renderers, 0, 0, scale * 100, scale * 10);
+		float y = 0;
+		auto bar = std::make_shared<ProgressBarWidget>(scale * 10, scale, Color(1, 0, 0, 1), 0.5);
+		bar->render(ui, renderers, 0, y, scale * 100, scale * 10);
 
-		getTextInput(ui)->render(ui, renderers, 0, 0, scale * 150, scale * TEXT_INPUT_HEIGHT_FACTOR);
+		y += scale * 15;
+
+		getTextInput(ui)->render(ui, renderers, 0, y, scale * 150, scale * TEXT_INPUT_HEIGHT_FACTOR);
 	}
 
 	void CraftingTab::renderIcon(const RendererContext &renderers) {

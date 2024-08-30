@@ -996,7 +996,7 @@ namespace Game3 {
 						auto lock = chunk.sharedLock();
 						for (size_t row = 0; row < CHUNK_SIZE; ++row) {
 							for (size_t column = 0; column < CHUNK_SIZE; ++column)
-								std::cout << std::setw(4) << std::right << chunk.at(row * CHUNK_SIZE + column);
+								std::cout << std::setw(5) << std::right << chunk.at(row * CHUNK_SIZE + column);
 							std::cout << '\n';
 						}
 					} else {

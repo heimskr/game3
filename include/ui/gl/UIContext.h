@@ -48,6 +48,8 @@ namespace Game3 {
 			void focusWidget(std::weak_ptr<Widget>);
 			WidgetPtr getFocusedWidget() const;
 			void unfocus();
+			std::pair<double, double> getAbsoluteMouseCoordinates() const;
+			std::pair<double, double> getRelativeMouseCoordinates() const;
 
 			template <typename T>
 			size_t removeDialogs() {

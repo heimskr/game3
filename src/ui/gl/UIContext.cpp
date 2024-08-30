@@ -159,4 +159,16 @@ namespace Game3 {
 	void UIContext::unfocus() {
 		focusedWidget.reset();
 	}
+
+	std::pair<double, double> UIContext::getAbsoluteMouseCoordinates() const {
+		const auto [x, y] = canvas.getMouseCoordinates();
+		const auto factor = canvas.getFactor();
+		return {x * factor, y * factor};
+	}
+
+	std::pair<double, double> UIContext::getRelativeMouseCoordinates() const {
+		const auto [x, y] = getAbsoluteMouseCoordinates();
+		const Rectangle top = scissorStack.getTop().rectangle;
+		return {x - top.x, y - top.y};
+	}
 }
