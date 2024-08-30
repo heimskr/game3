@@ -7,10 +7,10 @@
 #include "util/Defer.h"
 
 namespace {
-	constexpr Game3::Color DEFAULT_BORDER_COLOR{0.6, 0.4, 0.2, 1};
-	constexpr Game3::Color DEFAULT_INTERIOR_COLOR{1, 0.9, 0.8, 1};
-	constexpr Game3::Color DEFAULT_TEXT_COLOR{0, 0, 0, 1};
-	constexpr Game3::Color DEFAULT_CURSOR_COLOR{0.6, 0.4, 0.2, 0.8};
+	constexpr Game3::Color DEFAULT_BORDER_COLOR{"#926641"};
+	constexpr Game3::Color DEFAULT_INTERIOR_COLOR{"#fdeed3"};
+	constexpr Game3::Color DEFAULT_TEXT_COLOR{"#341903"};
+	constexpr Game3::Color DEFAULT_CURSOR_COLOR{"#927a66"};
 	constexpr float DEFAULT_THICKNESS = 1;
 
 	bool isStopChar(Glib::ustring::iterator cursor) {
@@ -89,12 +89,23 @@ namespace Game3 {
 	}
 
 	bool TextInputWidget::keyPressed(UIContext &ui, uint32_t character, Modifiers modifiers) {
+		if (modifiers.ctrl) {
+			switch (character) {
+				case GDK_KEY_BackSpace:
+					eraseWord(ui);
+					break;
+
+				default:
+					break;
+			}
+
+			// Ignore other ctrl sequences.
+			return true;
+		}
+
 		switch (character) {
 			case GDK_KEY_BackSpace:
-				if (modifiers.onlyCtrl())
-					eraseWord(ui);
-				else
-					eraseCharacter(ui);
+				eraseCharacter(ui);
 				return true;
 
 			case GDK_KEY_Delete:
