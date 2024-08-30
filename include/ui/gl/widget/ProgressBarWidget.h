@@ -1,5 +1,6 @@
 #pragma once
 
+#include "graphics/Color.h"
 #include "types/Types.h"
 #include "ui/gl/widget/Widget.h"
 

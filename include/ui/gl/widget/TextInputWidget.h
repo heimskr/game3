@@ -1,6 +1,7 @@
 #pragma once
 
 #include "types/Types.h"
+#include "graphics/Color.h"
 #include "ui/gl/widget/Widget.h"
 
 #include <glibmm/ustring.h>
@@ -12,8 +13,8 @@ namespace Game3 {
 		public:
 			std::function<void(TextInputWidget &)> onSubmit;
 
-			TextInputWidget(float scale, Color exterior_color, Color interior_color, Color text_color, Color cursor_color, float thickness);
-			TextInputWidget(float scale, Color exterior_color, Color interior_color, Color text_color, Color cursor_color);
+			TextInputWidget(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness);
+			TextInputWidget(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color);
 			TextInputWidget(float scale, float thickness);
 			TextInputWidget(float scale);
 
@@ -39,7 +40,7 @@ namespace Game3 {
 			float scale{};
 			float thickness{};
 			float cursorXOffset;
-			Color exteriorColor;
+			Color borderColor;
 			Color interiorColor;
 			Color textColor;
 			Color cursorColor;

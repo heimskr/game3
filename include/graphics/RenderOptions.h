@@ -1,5 +1,6 @@
 #pragma once
 
+#include "graphics/Color.h"
 #include "graphics/OpenGL.h"
 #include "types/Types.h"
 

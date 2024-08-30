@@ -2,6 +2,7 @@
 
 // Credit: https://learnopengl.com/In-Practice/Text-Rendering
 
+#include "graphics/Color.h"
 #include "graphics/GL.h"
 #include "graphics/HasBackbuffer.h"
 #include "graphics/Shader.h"
@@ -14,9 +15,9 @@
 #include FT_FREETYPE_H
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <gtkmm.h>
 
 // TODO!: replace Glib::ustring
+#include <glibmm/ustring.h>
 
 namespace Game3 {
 	class Canvas;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "graphics/Color.h"
 #include "graphics/Rectangle.h"
 #include "types/Types.h"
 #include "ui/Modifiers.h"

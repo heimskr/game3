@@ -100,44 +100,11 @@ namespace Game3 {
 		using NamedNumeric::NamedNumeric;
 	};
 
-	Index operator""_idx(unsigned long long);
-
-	enum class PathResult: uint8_t {Invalid, Trivial, Unpathable, Success};
-
-	struct Color {
-		float red   = 0.f;
-		float green = 0.f;
-		float blue  = 0.f;
-		float alpha = 1.f;
-
-		constexpr Color() = default;
-		constexpr Color(float red_, float green_, float blue_, float alpha_ = 1.f):
-			red(red_), green(green_), blue(blue_), alpha(alpha_) {}
-
-		explicit constexpr Color(uint32_t packed):
-			red((packed >> 24) / 255.f),
-			green(((packed >> 16) & 0xff) / 255.f),
-			blue(((packed >> 8) & 0xff) / 255.f),
-			alpha((packed & 0xff) / 255.f) {}
-
-		static Color fromBytes(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha = 255);
-	};
-
-	constexpr Color lerp(const Color &from, const Color &to, float progress) {
-		return Color{
-			lerp(from.red,   to.red,   progress),
-			lerp(from.green, to.green, progress),
-			lerp(from.blue,  to.blue,  progress),
-			lerp(from.alpha, to.alpha, progress),
-		};
+	constexpr Index operator""_idx(unsigned long long value) {
+		return static_cast<Index>(value);
 	}
 
-	class Buffer;
-
-	Buffer & operator+=(Buffer &, const Color &);
-	Buffer & operator<<(Buffer &, const Color &);
-	Buffer & operator>>(Buffer &, Color &);
-
+	enum class PathResult: uint8_t {Invalid, Trivial, Unpathable, Success};
 	enum class Substance: uint8_t {Invalid = 0, Item, Fluid, Energy, Data};
 	enum class Hand: uint8_t {None = 0, Left, Right};
 }
@@ -174,17 +141,6 @@ struct std::formatter<Game3::Hand> {
 			default:
 				return std::format_to(ctx.out(), "Invalid");
 		}
-	}
-};
-
-template <>
-struct std::formatter<Game3::Color> {
-	constexpr auto parse(auto &ctx) {
-		return ctx.begin();
-	}
-
-	auto format(const auto &color, auto &ctx) const {
-		return std::format_to(ctx.out(), "({}, {}, {} @ {})", color.red, color.green, color.blue, color.alpha);
 	}
 };
 

@@ -7,10 +7,10 @@
 #include "util/Defer.h"
 
 namespace {
-	constexpr Game3::Color DEFAULT_EXTERIOR_COLOR{0, 0, 0, 1};
-	constexpr Game3::Color DEFAULT_INTERIOR_COLOR{1, 1, 1, 1};
+	constexpr Game3::Color DEFAULT_BORDER_COLOR{0.6, 0.4, 0.2, 1};
+	constexpr Game3::Color DEFAULT_INTERIOR_COLOR{1, 0.9, 0.8, 1};
 	constexpr Game3::Color DEFAULT_TEXT_COLOR{0, 0, 0, 1};
-	constexpr Game3::Color DEFAULT_CURSOR_COLOR{0, 0, 0, 0.5};
+	constexpr Game3::Color DEFAULT_CURSOR_COLOR{0.6, 0.4, 0.2, 0.8};
 	constexpr float DEFAULT_THICKNESS = 1;
 
 	bool isStopChar(Glib::ustring::iterator cursor) {
@@ -35,14 +35,14 @@ namespace {
 }
 
 namespace Game3 {
-	TextInputWidget::TextInputWidget(float scale, Color exterior_color, Color interior_color, Color text_color, Color cursor_color, float thickness):
-		scale(scale), thickness(thickness), exteriorColor(exterior_color), interiorColor(interior_color), textColor(text_color), cursorColor(cursor_color) {}
+	TextInputWidget::TextInputWidget(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness):
+		scale(scale), thickness(thickness), borderColor(border_color), interiorColor(interior_color), textColor(text_color), cursorColor(cursor_color) {}
 
-	TextInputWidget::TextInputWidget(float scale, Color exterior_color, Color interior_color, Color text_color, Color cursor_color):
-		TextInputWidget(scale, exterior_color, interior_color, text_color, cursor_color, DEFAULT_THICKNESS) {}
+	TextInputWidget::TextInputWidget(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color):
+		TextInputWidget(scale, border_color, interior_color, text_color, cursor_color, DEFAULT_THICKNESS) {}
 
 	TextInputWidget::TextInputWidget(float scale, float thickness):
-		TextInputWidget(scale, DEFAULT_EXTERIOR_COLOR, DEFAULT_INTERIOR_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_CURSOR_COLOR, thickness) {}
+		TextInputWidget(scale, DEFAULT_BORDER_COLOR, DEFAULT_INTERIOR_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_CURSOR_COLOR, thickness) {}
 
 	TextInputWidget::TextInputWidget(float scale):
 		TextInputWidget(scale, DEFAULT_THICKNESS) {}
@@ -60,7 +60,7 @@ namespace Game3 {
 		// TODO: check for negative sizes
 		const Rectangle interior(x + start, y + start, width - 2 * start, height - 2 * start);
 
-		rectangler(exteriorColor, x, y, width, height);
+		rectangler(borderColor, x, y, width, height);
 		rectangler(interiorColor, interior);
 
 		auto saver = ui.scissorStack.pushRelative(interior, renderers);

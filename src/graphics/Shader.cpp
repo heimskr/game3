@@ -3,6 +3,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Log.h"
+#include "graphics/Color.h"
 #include "graphics/GL.h"
 #include "graphics/Shader.h"
 #include "types/Types.h"
@@ -29,10 +30,11 @@ namespace Game3 {
 					glGetShaderInfoLog(handle, 2048, &len, info.data()); CHECKGL
 				}
 
-				if (is_link)
+				if (is_link) {
 					ERROR("Shader.cpp: error with handle {} (name = \"{}\", linking): {}", handle, name, info.data());
-				else
+				} else {
 					ERROR("Shader.cpp: error with handle {} (name = \"{}\"): {}", handle, name, info.data());
+				}
 			}
 		}
 	}
