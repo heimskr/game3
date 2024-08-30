@@ -10,25 +10,48 @@
 #include "util/Util.h"
 
 namespace {
+	using namespace Game3;
+
 	constexpr float scale = Game3::UI_SCALE;
 
-	auto & getProgressBar(Game3::UIContext &) {
-		static std::shared_ptr<Game3::ProgressBarWidget> bar = nullptr;
+	std::shared_ptr<TextInputWidget> & getTextInput(UIContext &);
+
+	auto & getProgressBar(UIContext &ui) {
+		static std::shared_ptr<ProgressBarWidget> bar = nullptr;
 
 		if (!bar) {
-			bar = std::make_shared<Game3::ProgressBarWidget>(scale, scale * 10, Game3::Color(1, 0, 0, 1), 0.5);
+			bar = std::make_shared<ProgressBarWidget>(scale, scale * 10, Color(1, 0, 0, 1), 0.5);
+
+			auto drag = [&](Widget &widget, int x, int y) {
+				const float scale = widget.getScale();
+				const Rectangle &last = widget.getLastRectangle();
+				const int width = last.width;
+				const int height = last.height;
+
+				if (!(width <= 2 * scale || x < scale || y < scale || x > width - scale || y > height - scale)) {
+					const float progress = static_cast<float>(x - scale) / static_cast<float>(width - 2 * scale);
+					bar->setProgress(progress);
+					getTextInput(ui)->setText(ui, std::format("{:.1f}%", progress * 100));
+				}
+
+				return true;
+			};
+
+			bar->setOnDrag([drag](Widget &widget, UIContext &, int x, int y) {
+				return drag(widget, x, y);
+			});
 		}
 
 		return bar;
 	}
 
-	auto & getTextInput(Game3::UIContext &ui) {
-		static std::shared_ptr<Game3::TextInputWidget> input = nullptr;
+	std::shared_ptr<TextInputWidget> & getTextInput(UIContext &ui) {
+		static std::shared_ptr<TextInputWidget> input = nullptr;
 
 		if (!input) {
-			input = std::make_shared<Game3::TextInputWidget>(scale);
+			input = std::make_shared<TextInputWidget>(scale);
 			input->setText(ui, "Hello from the crafting tab! This is some example text.");
-			input->onSubmit = [&ui](Game3::TextInputWidget &input) {
+			input->onSubmit = [&ui](TextInputWidget &input) {
 				Glib::ustring text = input.clear();
 
 				if (text.empty())
@@ -42,7 +65,7 @@ namespace {
 
 				float number{};
 				try {
-					number = Game3::parseNumber<float>(text.raw()) / divisor;
+					number = parseNumber<float>(text.raw()) / divisor;
 				} catch (...) {
 					input.setText(ui, "Invalid number.");
 					return;
@@ -55,18 +78,19 @@ namespace {
 		return input;
 	}
 
-	auto & getButton(Game3::UIContext &ui) {
-		static std::shared_ptr<Game3::ButtonWidget> button = nullptr;
+	auto & getButton(UIContext &ui) {
+		static std::shared_ptr<ButtonWidget> button = nullptr;
 
 		if (!button) {
-			button = std::make_shared<Game3::ButtonWidget>(scale, scale * 10);
+			button = std::make_shared<ButtonWidget>(scale, scale * 10);
 			button->setText("Randomize");
-			button->setOnClick([&, i = 0](auto &) mutable {
+			button->setOnClick([&, i = 0](Widget &, UIContext &, int, int, int) mutable {
 				auto &input = getTextInput(ui);
-				Game3::INFO("Clicked {} time(s). Text = \"{}\"", ++i, input->getText().raw());
-				const float progress = Game3::threadContext.random(0.f, 1.f);
+				INFO("Clicked {} time(s). Text = \"{}\"", ++i, input->getText().raw());
+				const float progress = threadContext.random(0.f, 1.f);
 				getProgressBar(ui)->setProgress(progress);
 				input->setText(ui, std::format("{:.1f}%", progress * 100));
+				return true;
 			});
 		}
 
@@ -103,6 +127,10 @@ namespace Game3 {
 		auto &button = getButton(ui);
 		if (button->getLastRectangle().contains(x, y))
 			button->click(ui, mouse_button, x, y);
+
+		auto &bar = getProgressBar(ui);
+		if (bar->getLastRectangle().contains(x, y))
+			bar->click(ui, mouse_button, x, y);
 	}
 
 	void CraftingTab::dragStart(int x, int y) {
@@ -113,6 +141,24 @@ namespace Game3 {
 		auto &button = getButton(ui);
 		if (button->getLastRectangle().contains(x, y))
 			button->dragStart(ui, x, y);
+
+		auto &bar = getProgressBar(ui);
+		if (bar->getLastRectangle().contains(x, y))
+			bar->dragStart(ui, x, y);
+	}
+
+	void CraftingTab::dragUpdate(int x, int y) {
+		auto &input = getTextInput(ui);
+		if (input->getLastRectangle().contains(x, y))
+			input->dragUpdate(ui, x, y);
+
+		auto &button = getButton(ui);
+		if (button->getLastRectangle().contains(x, y))
+			button->dragUpdate(ui, x, y);
+
+		auto &bar = getProgressBar(ui);
+		if (bar->getLastRectangle().contains(x, y))
+			bar->dragUpdate(ui, x, y);
 	}
 
 	void CraftingTab::dragEnd(int x, int y) {

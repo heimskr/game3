@@ -160,6 +160,16 @@ namespace Game3 {
 		return true;
 	}
 
+	bool OmniDialog::dragUpdate(int x, int y) {
+		if (!Dialog::dragUpdate(x, y))
+			return false;
+
+		if (activeTab)
+			activeTab->dragUpdate(x, y);
+
+		return true;
+	}
+
 	bool OmniDialog::dragEnd(int x, int y) {
 		if (!Dialog::dragEnd(x, y))
 			return false;

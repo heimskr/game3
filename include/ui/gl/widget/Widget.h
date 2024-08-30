@@ -4,6 +4,7 @@
 #include "types/Types.h"
 #include "ui/Modifiers.h"
 
+#include <functional>
 #include <memory>
 
 namespace Game3 {
@@ -12,12 +13,6 @@ namespace Game3 {
 	struct RendererContext;
 
 	class Widget: public std::enable_shared_from_this<Widget> {
-		protected:
-			float scale{};
-			Rectangle lastRectangle{-1, -1, -1, -1};
-
-			Widget(float scale);
-
 		public:
 			Widget(const Widget &) = default;
 			Widget(Widget &&) noexcept = default;
@@ -42,6 +37,23 @@ namespace Game3 {
 			virtual bool scroll(UIContext &, float x_delta, float y_delta, int x, int y);
 			virtual bool keyPressed(UIContext &, uint32_t character, Modifiers);
 			virtual float calculateHeight(const RendererContext &, float available_width, float available_height) = 0;
+			virtual float getScale() const;
+
+		protected:
+			float scale{};
+			Rectangle lastRectangle{-1, -1, -1, -1};
+
+			/** Mouse X and Y coordinates are relative to the top left corner of the widget. Return value indicates whether to stop propagation. */
+			std::function<bool(Widget &, UIContext &, int button, int mouse_x, int mouse_y)> onClick;
+
+			/** Mouse X and Y coordinates are relative to the top left corner of the widget. Return value indicates whether to stop propagation. */
+			std::function<bool(Widget &, UIContext &, int mouse_x, int mouse_y)> onDrag;
+
+			Widget(float scale);
+
+		public:
+			virtual void setOnClick(decltype(onClick));
+			virtual void setOnDrag(decltype(onDrag));
 	};
 
 	using WidgetPtr = std::shared_ptr<Widget>;

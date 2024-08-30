@@ -1,6 +1,8 @@
+#include "Log.h"
 #include "graphics/Rectangle.h"
 #include "ui/gl/widget/Widget.h"
 #include "ui/gl/UIContext.h"
+#include "util/Demangle.h"
 
 namespace Game3 {
 	Widget::Widget(float scale):
@@ -26,7 +28,10 @@ namespace Game3 {
 		return nullptr;
 	}
 
-	bool Widget::click(UIContext &, int, int, int) {
+	bool Widget::click(UIContext &ui, int button, int x, int y) {
+		if (onClick)
+			return onClick(*this, ui, button, x - lastRectangle.x, y - lastRectangle.y);
+
 		return false;
 	}
 
@@ -34,7 +39,10 @@ namespace Game3 {
 		return false;
 	}
 
-	bool Widget::dragUpdate(UIContext &, int, int) {
+	bool Widget::dragUpdate(UIContext &ui, int x, int y) {
+		if (onDrag)
+			return onDrag(*this, ui, x - lastRectangle.x, y - lastRectangle.y);
+
 		return false;
 	}
 
@@ -48,5 +56,17 @@ namespace Game3 {
 
 	bool Widget::keyPressed(UIContext &, uint32_t, Modifiers) {
 		return false;
+	}
+
+	float Widget::getScale() const {
+		return scale;
+	}
+
+	void Widget::setOnClick(decltype(onClick) new_onclick) {
+		onClick = std::move(new_onclick);
+	}
+
+	void Widget::setOnDrag(decltype(onDrag) new_ondrag) {
+		onDrag = std::move(new_ondrag);
 	}
 }

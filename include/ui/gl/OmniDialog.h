@@ -27,6 +27,7 @@ namespace Game3 {
 			void onClose() final;
 			bool click(int button, int x, int y) final;
 			bool dragStart(int x, int y) final;
+			bool dragUpdate(int x, int y) final;
 			bool dragEnd(int x, int y) final;
 			bool scroll(float x_delta, float y_delta, int x, int y) final;
 

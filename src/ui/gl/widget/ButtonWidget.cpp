@@ -112,6 +112,10 @@ namespace Game3 {
 		rectangler(bottom_color, x + 2 * scale, adjusted_y + height - 2 * scale, width - 4 * scale, bottom_height);
 	}
 
+	bool ButtonWidget::click(UIContext &, int, int, int) {
+		return false;
+	}
+
 	bool ButtonWidget::dragStart(UIContext &ui, int, int) {
 		pressed = true;
 		ui.getGame()->playSound("base:sound/click", threadContext.getPitch(1.25));
@@ -123,9 +127,9 @@ namespace Game3 {
 		if (pressed) {
 			pressed = false;
 			ui.unpress();
-			if (getLastRectangle().contains(x, y)) {
+			if (lastRectangle.contains(x, y)) {
 				if (onClick)
-					onClick(*this);
+					onClick(*this, ui, 1, x - lastRectangle.x, y - lastRectangle.y);
 			}
 		}
 
@@ -150,10 +154,6 @@ namespace Game3 {
 
 	void ButtonWidget::setFixedHeight(float new_fixed_height) {
 		fixedHeight = new_fixed_height;
-	}
-
-	void ButtonWidget::setOnClick(std::function<void(ButtonWidget &)> new_on_click) {
-		onClick = std::move(new_on_click);
 	}
 
 	float ButtonWidget::getTextScale(const RendererContext &renderers, float height) const {

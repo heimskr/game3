@@ -16,6 +16,7 @@ namespace Game3 {
 			ButtonWidget(float scale, float fixed_height, TexturePtr texture = getDefaultTexture());
 
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
+			bool click(UIContext &, int button, int x, int y) final;
 			bool dragStart(UIContext &, int x, int y) final;
 			bool dragEnd(UIContext &, int x, int y) final;
 			float calculateHeight(const RendererContext &, float available_width, float available_height) final;
@@ -25,10 +26,8 @@ namespace Game3 {
 
 			void setText(Glib::ustring);
 			void setFixedHeight(float);
-			void setOnClick(std::function<void(ButtonWidget &)>);
 
 		private:
-			std::function<void(ButtonWidget &)> onClick;
 			float fixedHeight{};
 			Color topBorderColor;
 			Color bottomBorderColor;
