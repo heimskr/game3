@@ -10,6 +10,7 @@
 #include "util/Util.h"
 
 #include <cassert>
+
 namespace Game3 {
 	void CraftingTab::init() {
 		INFO("CraftingTab::init()");

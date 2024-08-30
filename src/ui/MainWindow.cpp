@@ -742,6 +742,7 @@ namespace Game3 {
 			if (auto factory = registry[module_id]) {
 				getOmniDialog();
 				omniDialog->inventoryTab->setModule((*factory)(game, argument));
+				omniDialog->activeTab = omniDialog->inventoryTab;
 				canvas->uiContext.addDialog(omniDialog);
 				return;
 			}
