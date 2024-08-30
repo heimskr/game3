@@ -11,7 +11,7 @@
 namespace Game3 {
 	class TextInputWidget: public Widget {
 		public:
-			std::function<void(TextInputWidget &)> onSubmit;
+			std::function<void(TextInputWidget &, UIContext &)> onSubmit;
 
 			TextInputWidget(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness);
 			TextInputWidget(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color);

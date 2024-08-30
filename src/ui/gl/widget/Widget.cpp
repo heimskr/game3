@@ -90,6 +90,14 @@ namespace Game3 {
 		throw std::runtime_error("Widget parent is expired or null");
 	}
 
+	WidgetPtr Widget::getPreviousSibling() const {
+		return previousSibling.lock();
+	}
+
+	WidgetPtr Widget::getNextSibling() const {
+		return nextSibling;
+	}
+
 	void Widget::insertAfter(WidgetPtr parent, WidgetPtr sibling) {
 		assert(parent);
 		assert(sibling);
@@ -149,6 +157,9 @@ namespace Game3 {
 			nextSibling->previousSibling = self;
 
 		parent->firstChild = self;
+
+		if (!parent->lastChild)
+			parent->lastChild = self;
 	}
 
 	void Widget::insertAtEnd(WidgetPtr parent) {
@@ -166,6 +177,9 @@ namespace Game3 {
 			previous->nextSibling = self;
 
 		parent->lastChild = self;
+
+		if (!parent->firstChild)
+			parent->firstChild = self;
 	}
 
 	void Widget::remove(WidgetPtr child) {

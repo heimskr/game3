@@ -44,6 +44,8 @@ namespace Game3 {
 			virtual float getScale() const;
 
 			WidgetPtr getParent() const;
+			WidgetPtr getPreviousSibling() const;
+			WidgetPtr getNextSibling() const;
 			void insertAfter(WidgetPtr parent, WidgetPtr sibling);
 			void insertBefore(WidgetPtr parent, WidgetPtr sibling);
 			void insertAtStart(WidgetPtr parent);

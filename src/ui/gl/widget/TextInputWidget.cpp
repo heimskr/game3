@@ -150,7 +150,7 @@ namespace Game3 {
 			case GDK_KEY_Return:
 			case GDK_KEY_KP_Enter:
 				if (onSubmit)
-					onSubmit(*this);
+					onSubmit(*this, ui);
 				return true;
 
 			default:

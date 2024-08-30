@@ -64,7 +64,7 @@ namespace Game3 {
 			auto subsaver = stack.pushRelative(rectangle, renderers);
 
 			if (activeTab)
-				activeTab->render(ui, renderers, rectangle);
+				activeTab->render(ui, renderers, 0, 0, rectangle.width, rectangle.height);
 		}
 
 		auto saver = renderers.getSaver();

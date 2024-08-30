@@ -42,7 +42,6 @@ namespace Game3 {
 	}
 
 	void InventoryTab::render(UIContext &ui, const RendererContext &renderers, float, float, float, float) {
-
 		Rectangle rectangle = ui.scissorStack.getTop().rectangle;
 		rectangle.x = 0;
 		rectangle.y = 0;
