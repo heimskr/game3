@@ -173,12 +173,13 @@ namespace Game3 {
 		goEnd(ui);
 	}
 
-	void TextInputWidget::clear() {
-		text.clear();
+	Glib::ustring TextInputWidget::clear() {
+		Glib::ustring out = std::move(text);
 		cursor = 0;
 		cursorIterator = text.begin();
 		xOffset = 0;
 		cursorXOffset = 0;
+		return out;
 	}
 
 	void TextInputWidget::insert(UIContext &ui, gunichar character) {

@@ -25,7 +25,7 @@ namespace Game3 {
 
 			const Glib::ustring & getText() const;
 			void setText(UIContext &, Glib::ustring);
-			void clear();
+			Glib::ustring clear();
 			void insert(UIContext &, gunichar);
 			void eraseWord(UIContext &);
 			void eraseCharacter(UIContext &);

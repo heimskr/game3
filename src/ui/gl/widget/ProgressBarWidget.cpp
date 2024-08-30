@@ -96,7 +96,7 @@ namespace Game3 {
 
 	void ProgressBarWidget::setProgress(float new_progress) {
 		oldProgress = progress;
-		progress = new_progress;
+		progress = std::min(1.f, std::max(0.f, new_progress));
 		progressUpdatePoint.emplace(std::chrono::system_clock::now());
 	}
 }

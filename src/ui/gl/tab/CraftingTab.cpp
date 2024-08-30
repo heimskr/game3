@@ -7,23 +7,10 @@
 #include "ui/gl/widget/TextInputWidget.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
+#include "util/Util.h"
 
 namespace {
 	constexpr float scale = Game3::UI_SCALE;
-
-	auto & getTextInput(Game3::UIContext &ui) {
-		static std::shared_ptr<Game3::TextInputWidget> input = nullptr;
-
-		if (!input) {
-			input = std::make_shared<Game3::TextInputWidget>(scale);
-			input->setText(ui, "Hello from the crafting tab! This is some example text.");
-			input->onSubmit = [](Game3::TextInputWidget &input) {
-				input.clear();
-			};
-		}
-
-		return input;
-	}
 
 	auto & getProgressBar(Game3::UIContext &) {
 		static std::shared_ptr<Game3::ProgressBarWidget> bar = nullptr;
@@ -35,15 +22,51 @@ namespace {
 		return bar;
 	}
 
+	auto & getTextInput(Game3::UIContext &ui) {
+		static std::shared_ptr<Game3::TextInputWidget> input = nullptr;
+
+		if (!input) {
+			input = std::make_shared<Game3::TextInputWidget>(scale);
+			input->setText(ui, "Hello from the crafting tab! This is some example text.");
+			input->onSubmit = [&ui](Game3::TextInputWidget &input) {
+				Glib::ustring text = input.clear();
+
+				if (text.empty())
+					return;
+
+				float divisor = 1;
+				if (text.substr(text.length() - 1, 1) == "%") {
+					text.erase(text.length() - 1, 1);
+					divisor = 100;
+				}
+
+				float number{};
+				try {
+					number = Game3::parseNumber<float>(text.raw()) / divisor;
+				} catch (...) {
+					input.setText(ui, "Invalid number.");
+					return;
+				}
+
+				getProgressBar(ui)->setProgress(number);
+			};
+		}
+
+		return input;
+	}
+
 	auto & getButton(Game3::UIContext &ui) {
 		static std::shared_ptr<Game3::ButtonWidget> button = nullptr;
 
 		if (!button) {
 			button = std::make_shared<Game3::ButtonWidget>(scale, scale * 10);
-			button->setText("Button");
+			button->setText("Randomize");
 			button->setOnClick([&, i = 0](auto &) mutable {
-				Game3::INFO("Clicked {} time(s). Text = \"{}\"", ++i, getTextInput(ui)->getText().raw());
-				getProgressBar(ui)->setProgress(Game3::threadContext.random(0.f, 1.f));
+				auto &input = getTextInput(ui);
+				Game3::INFO("Clicked {} time(s). Text = \"{}\"", ++i, input->getText().raw());
+				const float progress = Game3::threadContext.random(0.f, 1.f);
+				getProgressBar(ui)->setProgress(progress);
+				input->setText(ui, std::format("{:.1f}%", progress * 100));
 			});
 		}
 
@@ -55,15 +78,17 @@ namespace Game3 {
 	void CraftingTab::render(const RendererContext &renderers) {
 		float y = 0;
 
-		getTextInput(ui)->render(ui, renderers, 0, y, scale * 150, scale * TEXT_INPUT_HEIGHT_FACTOR);
+		const float width = ui.scissorStack.getTop().rectangle.width;
 
-		y += scale * (TEXT_INPUT_HEIGHT_FACTOR + 4);
+		getTextInput(ui)->render(ui, renderers, 0, y, width, scale * TEXT_INPUT_HEIGHT_FACTOR);
 
-		getProgressBar(ui)->render(ui, renderers, 0, y, scale * 100, scale * 10);
+		y += scale * (TEXT_INPUT_HEIGHT_FACTOR + 2);
 
-		y += scale * 15;
+		getProgressBar(ui)->render(ui, renderers, width / 4, y, width / 2, scale * 10);
 
-		getButton(ui)->render(ui, renderers, 0, y, -1, -1);
+		y += scale * 12;
+
+		getButton(ui)->render(ui, renderers, scale * 2, y, -1, -1);
 	}
 
 	void CraftingTab::renderIcon(const RendererContext &renderers) {
