@@ -260,6 +260,10 @@ namespace Game3 {
 		return false;
 	}
 
+	UIContext & ClientGame::getUIContext() const {
+		return canvas.uiContext;
+	}
+
 	void ClientGame::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data) {
 		getWindow().moduleMessageBuffer(module_id, source, name, std::move(data));
 	}

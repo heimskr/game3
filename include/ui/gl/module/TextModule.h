@@ -1,16 +1,16 @@
 #pragma once
 
-// #include "graphics/Rectangle.h"
 #include "types/Types.h"
+#include "types/UString.h"
 #include "ui/gl/module/Module.h"
-
-#include <glibmm/ustring.h> // TODO: remove
 
 #include <any>
 #include <memory>
+#include <optional>
 
 namespace Game3 {
 	class ClientGame;
+	class TextRenderer;
 
 	class TextModule: public Module {
 		public:
@@ -24,8 +24,19 @@ namespace Game3 {
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
 			float calculateHeight(const RendererContext &, float available_width, float available_height) final;
 
+			void setText(UIContext &, UString);
+
 		private:
-			Glib::ustring text;
+			std::weak_ptr<ClientGame> weakGame;
+			UString text;
+			std::optional<UString> wrapped;
 			float lastTextHeight = -1;
+
+			float getTextScale() const;
+			float getPadding() const;
+			float getWrapWidth(float width) const;
+			void tryWrap(const TextRenderer &);
+			void tryWrap();
+			ClientGame & getGame() const;
 	};
 }

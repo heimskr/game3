@@ -17,6 +17,7 @@ namespace Game3 {
 	class HasInventory;
 	class LocalClient;
 	class Packet;
+	class UIContext;
 
 	class ClientGame: public Game {
 		public:
@@ -51,6 +52,7 @@ namespace Game3 {
 			void requestFromLimbo(RealmID);
 			/** Returns whether a sound was found with the given ID. */
 			bool playSound(const Identifier &, float pitch = 1.f);
+			UIContext & getUIContext() const;
 
 			void moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data);
 

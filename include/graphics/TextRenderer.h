@@ -68,9 +68,10 @@ namespace Game3 {
 			void drawOnMap(const Glib::ustring &text, TextRenderOptions = {});
 			void drawOnScreen(const Glib::ustring &text, TextRenderOptions = {});
 			void operator()(const Glib::ustring &text, const TextRenderOptions & = {});
-			float textWidth(const Glib::ustring &text, float scale = 1.f);
-			float textHeight(const Glib::ustring &text, float scale = 1.f);
-			float textHeight(const Glib::ustring &text, float scale, float wrap_width);
+			float textWidth(gunichar character, float scale = 1.f) const;
+			float textWidth(const Glib::ustring &text, float scale = 1.f) const;
+			float textHeight(const Glib::ustring &text, float scale = 1.f) const;
+			float textHeight(const Glib::ustring &text, float scale, float wrap_width) const;
 			float getIHeight(float scale) const;
 
 			void reset();

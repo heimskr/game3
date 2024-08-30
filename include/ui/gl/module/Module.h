@@ -12,6 +12,7 @@ namespace Game3 {
 
 	class Module: public Widget {
 		public:
+			Module(float scale);
 			Module();
 
 			virtual ~Module() = default;

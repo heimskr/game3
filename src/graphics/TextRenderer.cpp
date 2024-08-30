@@ -334,21 +334,25 @@ namespace Game3 {
 		drawOnScreen(text, options);
 	}
 
-	float TextRenderer::textWidth(const Glib::ustring &text, float scale) {
+	float TextRenderer::textWidth(gunichar character, float scale) const {
+		return scale * (getCharacter(character).advance >> 6);
+	}
+
+	float TextRenderer::textWidth(const Glib::ustring &text, float scale) const {
 		float out = 0.f;
 		for (const char ch: text)
 			out += scale * (getCharacter(ch).advance >> 6);
 		return out;
 	}
 
-	float TextRenderer::textHeight(const Glib::ustring &text, float scale) {
+	float TextRenderer::textHeight(const Glib::ustring &text, float scale) const {
 		float out = 0.f;
 		for (const char ch: text)
 			out = std::max(out, getCharacter(ch).size.y * scale);
 		return out;
 	}
 
-	float TextRenderer::textHeight(const Glib::ustring &text, float scale, float wrap_width) {
+	float TextRenderer::textHeight(const Glib::ustring &text, float scale, float wrap_width) const {
 		const auto i_height = getCharacter('I').size.y * scale;
 		float x = 0;
 		float y = 0;
