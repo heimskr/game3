@@ -51,6 +51,11 @@ namespace Game3 {
 				return std::uniform_real_distribution(min, max)(rng);
 			}
 
+			template <typename T>
+			T getPitch(T variance) {
+				return std::uniform_real_distribution<T>(1.0 / variance, variance)(rng);
+			}
+
 			Game & getGame() {
 				if (auto locked = game.lock())
 					return *locked;

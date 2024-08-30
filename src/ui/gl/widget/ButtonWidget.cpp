@@ -114,8 +114,7 @@ namespace Game3 {
 
 	bool ButtonWidget::dragStart(UIContext &ui, int, int) {
 		pressed = true;
-		constexpr float variance = 0.8;
-		ui.getGame()->playSound("base:sound/click", threadContext.random(variance, 1.f / variance));
+		ui.getGame()->playSound("base:sound/click", threadContext.getPitch(1.25));
 		ui.setPressedWidget(weak_from_this());
 		return true;
 	}
