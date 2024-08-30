@@ -20,6 +20,9 @@ namespace Game3 {
 			bool dragEnd(UIContext &, int x, int y) final;
 			float calculateHeight(const RendererContext &, float available_width, float available_height) final;
 
+			const Glib::ustring & getText() const;
+			float getFixedHeight() const;
+
 			void setText(Glib::ustring);
 			void setFixedHeight(float);
 			void setOnClick(std::function<void(ButtonWidget &)>);

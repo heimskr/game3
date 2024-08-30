@@ -36,14 +36,14 @@ namespace {
 		return bar;
 	}
 
-	auto & getButton(Game3::UIContext &) {
+	auto & getButton(Game3::UIContext &ui) {
 		static std::shared_ptr<Game3::ButtonWidget> button = nullptr;
 
 		if (!button) {
 			button = std::make_shared<Game3::ButtonWidget>(scale, scale * 10);
 			button->setText("Button");
-			button->setOnClick([&](auto &) {
-				Game3::INFO("Clicked");
+			button->setOnClick([&, i = 0](auto &) mutable {
+				Game3::INFO("Clicked {} time(s). Text = \"{}\"", ++i, getTextInput(ui)->getText().raw());
 			});
 		}
 
@@ -62,13 +62,6 @@ namespace Game3 {
 		getProgressBar(ui)->render(ui, renderers, 0, y, scale * 100, scale * 10);
 
 		y += scale * 15;
-
-		// for (int sc : {8, 10, 12, 16, 20, 40}) {
-		// 	auto button = std::make_shared<ButtonWidget>(scale, scale * sc);
-		// 	button->setText("Button");
-		// 	button->render(ui, renderers, 0, y, -1, -1);
-		// 	y += scale * (sc + 5);
-		// }
 
 		getButton(ui)->render(ui, renderers, 0, y, -1, -1);
 	}

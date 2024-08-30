@@ -57,7 +57,7 @@ namespace Game3 {
 		// Right
 		rectangler(top_color, x + width - scale, adjusted_y + 2 * scale, scale, height - 6 * scale);
 
-		const float value = pressed? 1.1 : 1;
+		const float value = pressed? 1.25 : 1;
 
 		assert(texture);
 		renderers.singleSprite.drawOnScreen(texture, RenderOptions{
@@ -133,6 +133,14 @@ namespace Game3 {
 		return fixedHeight > 0? fixedHeight : available_height;
 	}
 
+	const Glib::ustring & ButtonWidget::getText() const {
+		return text;
+	}
+
+	float ButtonWidget::getFixedHeight() const {
+		return fixedHeight;
+	}
+
 	void ButtonWidget::setText(Glib::ustring new_text) {
 		text = std::move(new_text);
 	}
@@ -153,8 +161,8 @@ namespace Game3 {
 		topBorderColor = top;
 		bottomBorderColor = bottom;
 		textColor = text_color;
-		topBorderColorPressed = top.multiplyValue(1.5);
-		bottomBorderColorPressed = bottom.multiplyValue(1.5);
+		topBorderColorPressed = top.multiplyValue(2);
+		bottomBorderColorPressed = bottom.multiplyValue(2);
 		textColorPressed = text_color;
 	}
 
