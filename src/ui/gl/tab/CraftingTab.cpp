@@ -7,8 +7,6 @@
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 
-#include "threading/ThreadContext.h"
-
 namespace {
 	constexpr float scale = Game3::UI_SCALE;
 

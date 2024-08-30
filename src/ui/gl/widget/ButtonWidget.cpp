@@ -1,8 +1,10 @@
+#include "game/ClientGame.h"
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/Texture.h"
 #include "graphics/TextRenderer.h"
+#include "threading/ThreadContext.h"
 #include "ui/gl/widget/ButtonWidget.h"
 #include "ui/gl/UIContext.h"
 
@@ -112,6 +114,8 @@ namespace Game3 {
 
 	bool ButtonWidget::dragStart(UIContext &ui, int, int) {
 		pressed = true;
+		constexpr float variance = 0.8;
+		ui.getGame()->playSound("base:sound/click", threadContext.random(variance, 1.f / variance));
 		ui.setPressedWidget(weak_from_this());
 		return true;
 	}
