@@ -134,6 +134,6 @@ namespace Game3 {
 	}
 
 	float TooltipWidget::getPadding() const {
-		return scale * 4;
+		return scale * 2;
 	}
 }
