@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "util/Concepts.h"
+#include "util/Hex.h"
 #include "util/Math.h"
 
 namespace Game3 {
@@ -92,9 +93,6 @@ namespace Game3 {
 		}
 		return ss.str();
 	}
-
-	uint8_t fromHex(char);
-	uint8_t fromHex(std::string_view);
 
 	template <typename T>
 	T unhex(std::string_view str) {

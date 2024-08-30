@@ -1,5 +1,6 @@
 #pragma once
 
+#include "util/Hex.h"
 #include "util/Math.h"
 
 #include <format>
@@ -56,6 +57,23 @@ namespace Game3 {
 			green(((packed >> 16) & 0xff) / 255.f),
 			blue(((packed >> 8) & 0xff) / 255.f),
 			alpha((packed & 0xff) / 255.f) {}
+
+		explicit constexpr Color(std::string_view str) {
+			if (str.empty())
+				throw std::invalid_argument("Color string must not be empty");
+
+			if (str[0] == '#')
+				str.remove_prefix(1);
+
+			if (str.size() != 6 && str.size() != 8)
+				throw std::invalid_argument("Invalid size for color string");
+
+			red = fromHex(str.substr(0, 2)) / 255.f;
+			green = fromHex(str.substr(2, 2)) / 255.f;
+			blue = fromHex(str.substr(4, 2)) / 255.f;
+			str.remove_prefix(6);
+			alpha = str.empty()? 1.f : fromHex(str) / 255.f;
+		}
 
 		static Color fromBytes(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha = 255);
 	};
