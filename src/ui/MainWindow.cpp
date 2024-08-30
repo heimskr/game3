@@ -743,7 +743,8 @@ namespace Game3 {
 				getOmniDialog();
 				omniDialog->inventoryTab->setModule((*factory)(game, argument));
 				omniDialog->activeTab = omniDialog->inventoryTab;
-				canvas->uiContext.addDialog(omniDialog);
+				if (!canvas->uiContext.hasDialog<OmniDialog>())
+					canvas->uiContext.addDialog(omniDialog);
 				return;
 			}
 
