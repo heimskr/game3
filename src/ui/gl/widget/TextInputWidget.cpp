@@ -65,11 +65,11 @@ namespace Game3 {
 
 		auto saver = ui.scissorStack.pushRelative(interior, renderers);
 
-		rectangler(cursorColor, x + getCursorPosition(), y + start, start / 2, interior.height - 1.5 * start);
+		rectangler(cursorColor, getCursorPosition(), start, start / 2, interior.height - 1.5 * start);
 
 		texter(text, TextRenderOptions{
-			.x = x - xOffset * scale + start,
-			.y = y,
+			.x = start - xOffset * scale,
+			.y = 0,
 			.scaleX = getTextScale(),
 			.scaleY = getTextScale(),
 			.color = textColor,

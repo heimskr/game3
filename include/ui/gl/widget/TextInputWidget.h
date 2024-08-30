@@ -1,7 +1,7 @@
 #pragma once
 
-#include "types/Types.h"
 #include "graphics/Color.h"
+#include "types/Types.h"
 #include "ui/gl/widget/Widget.h"
 
 #include <glibmm/ustring.h>
