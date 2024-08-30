@@ -143,14 +143,14 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<ScrollerWidget> InventoryTab::makePlayerScroller() {
-		auto scroller = std::make_shared<ScrollerWidget>();
+		auto scroller = std::make_shared<ScrollerWidget>(scale);
 		scroller->setChild(playerInventoryModule);
 		scroller->insertAtEnd(shared_from_this());
 		return scroller;
 	}
 
 	std::shared_ptr<ScrollerWidget> InventoryTab::makeModuleScroller() {
-		auto scroller = std::make_shared<ScrollerWidget>();
+		auto scroller = std::make_shared<ScrollerWidget>(scale);
 		scroller->setChild(activeModule.copyBase());
 		scroller->insertAtEnd(shared_from_this());
 		return scroller;

@@ -1,17 +1,18 @@
 #include "graphics/GL.h"
 #include "graphics/Rectangle.h"
+#include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "ui/gl/widget/ScrollerWidget.h"
 #include "ui/gl/UIContext.h"
 #include "util/Defer.h"
 
 namespace {
-	constexpr float SCROLL_SPEED = 48;
+	constexpr float SCROLL_SPEED = 64;
 }
 
 namespace Game3 {
-	ScrollerWidget::ScrollerWidget():
-		Widget(-1) {}
+	ScrollerWidget::ScrollerWidget(float scale):
+		Widget(scale) {}
 
 	void ScrollerWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(ui, renderers, x, y, width, height);
@@ -19,10 +20,22 @@ namespace Game3 {
 		if (!child)
 			return;
 
-		ui.scissorStack.pushRelative({Rectangle(x, y, width, height), false});
-		Defer pop([&] { ui.scissorStack.pop(); });
+		auto saver = ui.scissorStack.pushRelative(Rectangle(x, y, width, height), renderers);
 
+		// TODO: make Widget::render return a pair of width and height so we don't have to call calculateHeight
 		child->render(ui, renderers, xOffset, yOffset, width, height);
+
+		const float child_height = child->calculateHeight(renderers, width, height);
+		const float bar_thickness = 2 * scale;
+
+		if (child_height > 0) {
+			const float vertical_fraction = height / child_height;
+			const float vertical_height = vertical_fraction * height;
+			if (vertical_height < height) {
+				const float vertical_offset = yOffset / child_height * (vertical_height - height);
+				renderers.rectangle.drawOnScreen(Color("#00000066"), width - bar_thickness, vertical_offset, bar_thickness, vertical_height);
+			}
+		}
 	}
 
 	bool ScrollerWidget::click(UIContext &ui, int button, int x, int y) {

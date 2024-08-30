@@ -5,7 +5,7 @@
 namespace Game3 {
 	class ScrollerWidget: public Widget {
 		public:
-			ScrollerWidget();
+			ScrollerWidget(float scale);
 
 			using Widget::render;
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
