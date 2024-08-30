@@ -12,8 +12,8 @@ namespace Game3 {
 
 	void Tab::renderIconTexture(const RendererContext &renderers, const std::shared_ptr<Texture> &texture) {
 		renderers.singleSprite.drawOnScreen(texture, RenderOptions{
-			.x = 5 * SCALE,
-			.y = 5 * SCALE,
+			.x = 5 * UI_SCALE,
+			.y = 5 * UI_SCALE,
 			.sizeX = -1,
 			.sizeY = -1,
 			.scaleX = 5,

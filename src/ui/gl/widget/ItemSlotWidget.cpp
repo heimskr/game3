@@ -13,22 +13,22 @@
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	ItemSlotWidget::ItemSlotWidget(InventoryPtr inventory, ItemStackPtr stack, Slot slot, double size, double scale, bool active):
+	ItemSlotWidget::ItemSlotWidget(InventoryPtr inventory, ItemStackPtr stack, Slot slot, float size, float scale, bool active):
+		Widget(scale),
 		inventory(std::move(inventory)),
 		stack(std::move(stack)),
 		slot(slot),
 		size(size),
-		scale(scale),
 		active(active) {}
 
-	ItemSlotWidget::ItemSlotWidget(Slot slot, double size, double scale, bool active):
+	ItemSlotWidget::ItemSlotWidget(Slot slot, float size, float scale, bool active):
 		ItemSlotWidget(nullptr, nullptr, slot, size, scale, active) {}
 
 	void ItemSlotWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(ui, renderers, x, y, width, height);
 
-		lastWidth = 16 * scale;
-		lastHeight = 16 * scale;
+		lastRectangle.width = 16 * scale;
+		lastRectangle.height = 16 * scale;
 
 		if (!ui.renderingDraggedWidget) {
 			const float alpha = active? 0.4 : 0.15;

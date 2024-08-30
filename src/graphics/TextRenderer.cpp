@@ -131,8 +131,8 @@ namespace Game3 {
 		if (0 < options.shadow.alpha) {
 			Color color = options.shadow;
 			Color shadow{0, 0, 0, 0};
-			double x = options.x + options.shadowOffset.x;
-			double y = options.y + options.shadowOffset.y;
+			double x = options.x + options.shadowOffset.x * options.scaleX;
+			double y = options.y + options.shadowOffset.y * options.scaleY;
 			std::swap(options.color, color);
 			std::swap(options.shadow, shadow);
 			std::swap(options.x, x);
@@ -226,8 +226,8 @@ namespace Game3 {
 		if (0 < options.shadow.alpha) {
 			Color color = options.shadow;
 			Color shadow{0, 0, 0, 0};
-			double x = options.x + options.shadowOffset.x;
-			double y = options.y + options.shadowOffset.y;
+			double x = options.x + options.shadowOffset.x * options.scaleX;
+			double y = options.y + options.shadowOffset.y * options.scaleY;
 			std::swap(options.color, color);
 			std::swap(options.shadow, shadow);
 			std::swap(options.x, x);
@@ -239,19 +239,20 @@ namespace Game3 {
 			std::swap(options.y, y);
 		}
 
-		float y_addition = 0;
-
-		if (options.alignTop) {
-			y_addition = options.scaleY * 80 + 16;
-			options.y += y_addition;
-		}
-
-		options.y = backbufferHeight - options.y;
-
 		auto &x = options.x;
 		auto &y = options.y;
 		auto &scale_x = options.scaleX;
 		auto &scale_y = options.scaleY;
+
+		const auto i_height = getCharacter('I').size.y * scale_y;
+		float y_addition = 0;
+
+		if (options.alignTop) {
+			y_addition = i_height;
+			y += y_addition;
+		}
+
+		y = backbufferHeight - y;
 
 		if (options.align == TextAlign::Center)
 			x -= textWidth(text, scale_x) / 2;
@@ -264,7 +265,6 @@ namespace Game3 {
 		glActiveTexture(GL_TEXTURE0); CHECKGL
 		glBindVertexArray(vao); CHECKGL
 
-		const auto i_height = getCharacter('I').size.y * scale_y;
 		const auto wrap_width = options.wrapWidth;
 		const auto x_start = x;
 		const auto y_start = y;
@@ -318,7 +318,7 @@ namespace Game3 {
 			glBindBuffer(GL_ARRAY_BUFFER, 0); CHECKGL
 			// Render quad
 			glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
-			// Advance cursors for next glyph (note that advance is number of 1/64 pixels)
+			// Advance cursor for next glyph (note that advance is number of 1/64 pixels)
 			x += (character.advance >> 6) * scale_x; // Bitshift by 6 to get value in pixels (2^6 = 64)
 		}
 
@@ -326,7 +326,7 @@ namespace Game3 {
 		glBindTexture(GL_TEXTURE_2D, 0); CHECKGL
 
 		if (options.heightOut) {
-			*options.heightOut = y_start - y + highest_on_first_line + y_addition;
+			*options.heightOut = y_start - y + highest_on_first_line;
 		}
 	}
 

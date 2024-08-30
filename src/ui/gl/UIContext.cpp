@@ -4,6 +4,7 @@
 #include "graphics/Texture.h"
 #include "types/Types.h"
 #include "ui/gl/widget/HotbarWidget.h"
+#include "ui/gl/widget/TooltipWidget.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/Dialog.h"
 #include "ui/gl/UIContext.h"
@@ -20,7 +21,9 @@ namespace {
 
 namespace Game3 {
 	UIContext::UIContext(Canvas &canvas):
-		canvas(canvas), hotbarWidget(std::make_unique<HotbarWidget>(HOTBAR_SCALE)) {}
+		canvas(canvas),
+		hotbar(std::make_shared<HotbarWidget>(HOTBAR_SCALE)),
+		tooltip(std::make_shared<TooltipWidget>(UI_SCALE)) {}
 
 	void UIContext::render(float mouse_x, float mouse_y) {
 		RendererContext context = canvas.getRendererContext();
@@ -32,13 +35,15 @@ namespace Game3 {
 			constexpr static float HOTBAR_BORDER = SLOT_PADDING * HOTBAR_SCALE / 3;
 			constexpr static float width = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING) * HOTBAR_SCALE + HOTBAR_BORDER * 2;
 			constexpr static float height = (OUTER_SLOT_SIZE + SLOT_PADDING) * HOTBAR_SCALE + HOTBAR_BORDER * 2;
-			hotbarWidget->render(*this, context, (canvas.getWidth() * factor - width) / 2, canvas.getHeight() * factor - (OUTER_SLOT_SIZE * 2 - INNER_SLOT_SIZE / 2) * HOTBAR_SCALE, width, height);
+			hotbar->render(*this, context, (canvas.getWidth() * factor - width) / 2, canvas.getHeight() * factor - (OUTER_SLOT_SIZE * 2 - INNER_SLOT_SIZE / 2) * HOTBAR_SCALE, width, height);
 		} else {
 			for (const std::shared_ptr<Dialog> &dialog: dialogs) {
 				scissorStack = internalScissorStack;
 				dialog->render(context);
 			}
 		}
+
+		tooltip->render(*this, context, mouse_x * factor, mouse_y * factor, -1, -1);
 
 		if (draggedWidget && draggedWidgetActive) {
 			scissorStack = internalScissorStack;
@@ -69,7 +74,7 @@ namespace Game3 {
 			if (dialog->click(button, x, y))
 				return true;
 
-		return dialogs.empty() && hotbarWidget->getLastRectangle().contains(x, y) && hotbarWidget->click(*this, button, x, y);
+		return dialogs.empty() && hotbar->getLastRectangle().contains(x, y) && hotbar->click(*this, button, x, y);
 	}
 
 	bool UIContext::dragStart(int x, int y) {
@@ -79,7 +84,7 @@ namespace Game3 {
 			if (dialog->dragStart(x, y))
 				return true;
 
-		return dialogs.empty() && hotbarWidget->getLastRectangle().contains(x, y) && hotbarWidget->dragStart(*this, x, y);
+		return dialogs.empty() && hotbar->getLastRectangle().contains(x, y) && hotbar->dragStart(*this, x, y);
 	}
 
 	bool UIContext::dragUpdate(int x, int y) {
@@ -90,7 +95,7 @@ namespace Game3 {
 			if (dialog->dragUpdate(x, y))
 				return true;
 
-		return dialogs.empty() && hotbarWidget->getLastRectangle().contains(x, y) && hotbarWidget->dragUpdate(*this, x, y);
+		return dialogs.empty() && hotbar->getLastRectangle().contains(x, y) && hotbar->dragUpdate(*this, x, y);
 	}
 
 	bool UIContext::dragEnd(int x, int y) {
@@ -107,7 +112,7 @@ namespace Game3 {
 		setDraggedWidget(nullptr);
 
 		if (!out)
-			return dialogs.empty() && hotbarWidget->getLastRectangle().contains(x, y) && hotbarWidget->dragEnd(*this, x, y);
+			return dialogs.empty() && hotbar->getLastRectangle().contains(x, y) && hotbar->dragEnd(*this, x, y);
 
 		return true;
 	}
@@ -117,7 +122,7 @@ namespace Game3 {
 			if (dialog->scroll(x_delta, y_delta, x, y))
 				return true;
 
-		return dialogs.empty() && hotbarWidget->getLastRectangle().contains(x, y) && hotbarWidget->scroll(*this, x_delta, y_delta, x, y);
+		return dialogs.empty() && hotbar->getLastRectangle().contains(x, y) && hotbar->scroll(*this, x_delta, y_delta, x, y);
 	}
 
 	bool UIContext::keyPressed(uint32_t character, Modifiers modifiers) {
@@ -129,7 +134,7 @@ namespace Game3 {
 			if (dialog->keyPressed(character, modifiers))
 				return true;
 
-		return dialogs.empty() && hotbarWidget->keyPressed(*this, character, modifiers);
+		return dialogs.empty() && hotbar->keyPressed(*this, character, modifiers);
 	}
 
 	void UIContext::setDraggedWidget(WidgetPtr new_dragged_widget) {
@@ -170,5 +175,19 @@ namespace Game3 {
 		const auto [x, y] = getAbsoluteMouseCoordinates();
 		const Rectangle top = scissorStack.getTop().rectangle;
 		return {x - top.x, y - top.y};
+	}
+
+	bool UIContext::checkMouseRelative(const Rectangle &rectangle) const {
+		const auto [x, y] = getRelativeMouseCoordinates();
+		return rectangle.contains(static_cast<int>(x), static_cast<int>(y));
+	}
+
+	bool UIContext::checkMouseAbsolute(const Rectangle &rectangle) const {
+		const auto [x, y] = getAbsoluteMouseCoordinates();
+		return rectangle.contains(static_cast<int>(x), static_cast<int>(y));
+	}
+
+	std::shared_ptr<TooltipWidget> UIContext::getTooltip() const {
+		return tooltip;
 	}
 }

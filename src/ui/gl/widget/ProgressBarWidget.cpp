@@ -2,6 +2,7 @@
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "ui/gl/widget/ProgressBarWidget.h"
+#include "ui/gl/widget/TooltipWidget.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 
@@ -19,8 +20,8 @@ namespace {
 
 namespace Game3 {
 	ProgressBarWidget::ProgressBarWidget(float fixed_height, float scale, Color interior_color, Color background_color, Color exterior_color, float progress):
+		Widget(scale),
 		fixedHeight(fixed_height),
-		scale(scale),
 		topInteriorColor(interior_color),
 		bottomInteriorColor(darken(topInteriorColor)),
 		backgroundColor(background_color),
@@ -38,6 +39,20 @@ namespace Game3 {
 			height = fixedHeight;
 
 		Widget::render(ui, renderers, x, y, width, height);
+
+		std::shared_ptr<TooltipWidget> tooltip = ui.getTooltip();
+
+		if (ui.checkMouseAbsolute(lastRectangle)) {
+			if (progress != lastReportedProgress || !tooltip->wasUpdatedBy(*this)) {
+				lastReportedProgress = progress;
+				tooltip->setText(std::format("{:.1f}%", progress * 100));
+				tooltip->setRegion(lastRectangle);
+				tooltip->show(*this);
+			}
+		} else {
+			tooltip->hide(*this);
+			lastReportedProgress = -1;
+		}
 
 		const float bar_width = progress * (width - 2 * scale);
 		const float top_height = .6f * (height - 2 * scale);

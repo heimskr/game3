@@ -8,7 +8,7 @@
 #include "ui/gl/UIContext.h"
 
 namespace {
-	constexpr float scale = Game3::SCALE;
+	constexpr float scale = Game3::UI_SCALE;
 
 	auto & getTextInput(Game3::UIContext &ui) {
 		static std::shared_ptr<Game3::TextInputWidget> input = nullptr;
@@ -23,17 +23,28 @@ namespace {
 
 		return input;
 	}
+
+	auto & getProgressBar(Game3::UIContext &) {
+		static std::shared_ptr<Game3::ProgressBarWidget> bar = nullptr;
+
+		if (!bar) {
+			bar = std::make_shared<Game3::ProgressBarWidget>(scale * 10, scale, Game3::Color(1, 0, 0, 1), 0.5);
+		}
+
+		return bar;
+	}
 }
 
 namespace Game3 {
 	void CraftingTab::render(const RendererContext &renderers) {
 		float y = 0;
-		auto bar = std::make_shared<ProgressBarWidget>(scale * 10, scale, Color(1, 0, 0, 1), 0.5);
-		bar->render(ui, renderers, 0, y, scale * 100, scale * 10);
+
+		getTextInput(ui)->render(ui, renderers, 0, y, scale * 150, scale * TEXT_INPUT_HEIGHT_FACTOR);
 
 		y += scale * 15;
 
-		getTextInput(ui)->render(ui, renderers, 0, y, scale * 150, scale * TEXT_INPUT_HEIGHT_FACTOR);
+		getProgressBar(ui)->render(ui, renderers, 0, y, scale * 100, scale * 10);
+
 	}
 
 	void CraftingTab::renderIcon(const RendererContext &renderers) {

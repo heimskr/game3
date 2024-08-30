@@ -1,5 +1,6 @@
 #pragma once
 
+#include "graphics/Rectangle.h"
 #include "types/Types.h"
 #include "ui/Modifiers.h"
 
@@ -12,12 +13,10 @@ namespace Game3 {
 
 	class Widget: public std::enable_shared_from_this<Widget> {
 		protected:
-			int lastX = -1;
-			int lastY = -1;
-			int lastWidth = -1;
-			int lastHeight = -1;
+			float scale{};
+			Rectangle lastRectangle{-1, -1, -1, -1};
 
-			Widget() = default;
+			Widget(float scale);
 
 		public:
 			Widget(const Widget &) = default;
@@ -29,7 +28,7 @@ namespace Game3 {
 			Widget & operator=(Widget &&) noexcept = default;
 
 			/** Returns absolute coordinates. */
-			virtual Rectangle getLastRectangle() const;
+			virtual const Rectangle & getLastRectangle() const;
 			/** `x` and `y` are relative to the top of the scissor stack. The implementation is free to ignore the `width` and `height` parameters. */
 			virtual void render(UIContext &, const RendererContext &, float x, float y, float width, float height);
 			virtual void render(UIContext &, const RendererContext &, const Rectangle &);

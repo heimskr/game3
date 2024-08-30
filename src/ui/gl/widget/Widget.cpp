@@ -3,16 +3,15 @@
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	Rectangle Widget::getLastRectangle() const {
-		return {lastX, lastY, lastWidth, lastHeight};
+	Widget::Widget(float scale):
+		scale(scale) {}
+
+	const Rectangle & Widget::getLastRectangle() const {
+		return lastRectangle;
 	}
 
 	void Widget::render(UIContext &ui, const RendererContext &, float x, float y, float width, float height) {
-		const Rectangle top = ui.scissorStack.getTop().rectangle;
-		lastX = top.x + x;
-		lastY = top.y + y;
-		lastWidth = width;
-		lastHeight = height;
+		lastRectangle = ui.scissorStack.getTop().rectangle + Rectangle(x, y, width, height);
 	}
 
 	void Widget::render(UIContext &ui, const RendererContext &renderers, const Rectangle &rectangle) {

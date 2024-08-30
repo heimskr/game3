@@ -37,7 +37,6 @@ namespace Game3 {
 
 		private:
 			float xOffset = 0;
-			float scale{};
 			float thickness{};
 			float cursorXOffset;
 			Color borderColor;

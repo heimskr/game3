@@ -46,12 +46,12 @@ namespace Game3 {
 		{
 			auto saver = stack.pushRelative(rectangle, renderers);
 
-			drawFrame(renderers, SCALE, false, PIECES, inner_color);
+			drawFrame(renderers, UI_SCALE, false, PIECES, inner_color);
 
-			rectangle.x = 9 * SCALE;
-			rectangle.y = 9 * SCALE;
-			rectangle.width -= 18 * SCALE;
-			rectangle.height -= 18 * SCALE;
+			rectangle.x = 9 * UI_SCALE;
+			rectangle.y = 9 * UI_SCALE;
+			rectangle.width -= 18 * UI_SCALE;
+			rectangle.height -= 18 * UI_SCALE;
 
 			if (rectangle.height <= 0 || rectangle.width <= 0)
 				return;
@@ -76,7 +76,7 @@ namespace Game3 {
 				Rectangle tab_rectangle = original_rectangle + Rectangle{x_offset, UNSCALED * 5 / 4 - TOP_OFFSET, TOP_OFFSET, TOP_OFFSET};
 				stack.pushRelative({tab_rectangle, true});
 				renderers.updateSize(tab_rectangle.width, tab_rectangle.height);
-				drawFrame(renderers, SCALE / UNSCALE, true, TAB_PIECES, inner_color);
+				drawFrame(renderers, UI_SCALE / UNSCALE, true, TAB_PIECES, inner_color);
 				tabRectangles.at(i) = tab_rectangle;
 				stack.pop();
 			}
@@ -84,10 +84,10 @@ namespace Game3 {
 			if (tab == activeTab) {
 				stack.pushRelative({original_rectangle, true});
 				renderers.updateSize(original_rectangle.width, original_rectangle.height);
-				rectangler.drawOnScreen(inner_color, x_offset + UNSCALED, 0, TOP_OFFSET - UNSCALED * 2, 6 * SCALE);
+				rectangler.drawOnScreen(inner_color, x_offset + UNSCALED, 0, TOP_OFFSET - UNSCALED * 2, 6 * UI_SCALE);
 
 				renderers.singleSprite.drawOnScreen(cacheTexture("resources/gui/gui_merge_left.png", true), RenderOptions{
-					.x = double(x_offset + SCALE / UNSCALE),
+					.x = double(x_offset + UI_SCALE / UNSCALE),
 					.y = 0,
 					.sizeX = -1,
 					.sizeY = -1,

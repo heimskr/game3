@@ -10,7 +10,7 @@
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	HotbarWidget::HotbarWidget(float scale): scale(scale) {
+	HotbarWidget::HotbarWidget(float scale): Widget(scale) {
 		for (Slot slot = 0; slot < HOTBAR_SIZE; ++slot) {
 			slotWidgets.emplace_back(std::make_shared<ItemSlotWidget>(slot, INNER_SLOT_SIZE, scale, false));
 		}

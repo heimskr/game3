@@ -10,6 +10,9 @@ namespace {
 }
 
 namespace Game3 {
+	ScrollerWidget::ScrollerWidget():
+		Widget(-1) {}
+
 	void ScrollerWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(ui, renderers, x, y, width, height);
 
@@ -44,7 +47,7 @@ namespace Game3 {
 		xOffset = std::min(0.f, xOffset);
 		yOffset = std::min(0.f, yOffset);
 		if (child)
-			yOffset = std::max(yOffset, -child->calculateHeight(ui.getRenderers(), lastWidth, lastHeight));
+			yOffset = std::max(yOffset, -child->calculateHeight(ui.getRenderers(), lastRectangle.width, lastRectangle.height));
 		return true;
 	}
 

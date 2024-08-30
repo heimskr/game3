@@ -2,7 +2,6 @@
 
 #include "graphics/ScissorStack.h"
 #include "ui/gl/Dialog.h"
-#include "ui/gl/widget/HotbarWidget.h"
 #include "ui/gl/widget/Widget.h"
 #include "ui/Modifiers.h"
 
@@ -20,6 +19,7 @@ namespace Game3 {
 	class ClientPlayer;
 	class HotbarWidget;
 	class Texture;
+	class TooltipWidget;
 	struct RendererContext;
 
 	class UIContext {
@@ -50,6 +50,9 @@ namespace Game3 {
 			void unfocus();
 			std::pair<double, double> getAbsoluteMouseCoordinates() const;
 			std::pair<double, double> getRelativeMouseCoordinates() const;
+			bool checkMouseRelative(const Rectangle &) const;
+			bool checkMouseAbsolute(const Rectangle &) const;
+			std::shared_ptr<TooltipWidget> getTooltip() const;
 
 			template <typename T>
 			size_t removeDialogs() {
@@ -72,7 +75,8 @@ namespace Game3 {
 			WidgetPtr draggedWidget;
 			bool draggedWidgetActive = false;
 			std::optional<std::pair<int, int>> dragOrigin;
-			std::unique_ptr<HotbarWidget> hotbarWidget;
+			std::shared_ptr<HotbarWidget> hotbar;
+			std::shared_ptr<TooltipWidget> tooltip;
 			std::weak_ptr<Widget> focusedWidget;
 
 			template <typename T>

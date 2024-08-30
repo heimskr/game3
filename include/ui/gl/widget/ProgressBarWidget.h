@@ -17,12 +17,12 @@ namespace Game3 {
 
 		private:
 			float fixedHeight{};
-			float scale{};
 			Color topInteriorColor;
 			Color bottomInteriorColor;
 			Color backgroundColor;
 			Color topExteriorColor;
 			Color bottomExteriorColor;
 			float progress{};
+			float lastReportedProgress = -1;
 	};
 }

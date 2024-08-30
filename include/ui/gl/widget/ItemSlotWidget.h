@@ -14,14 +14,13 @@ namespace Game3 {
 			std::shared_ptr<Inventory> inventory;
 			std::shared_ptr<ItemStack> stack;
 			Slot slot = -1;
-			double size{};
-			double scale{};
+			float size{};
 			bool active = false;
 			std::shared_ptr<ItemTexture> texture;
 
 		public:
-			ItemSlotWidget(std::shared_ptr<Inventory>, std::shared_ptr<ItemStack>, Slot, double size, double scale, bool active = false);
-			ItemSlotWidget(Slot, double size, double scale, bool active = false);
+			ItemSlotWidget(std::shared_ptr<Inventory>, std::shared_ptr<ItemStack>, Slot, float size, float scale, bool active = false);
+			ItemSlotWidget(Slot, float size, float scale, bool active = false);
 
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
 			std::shared_ptr<Widget> getDragStartWidget() final;

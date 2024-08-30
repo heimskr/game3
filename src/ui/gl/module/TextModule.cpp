@@ -6,7 +6,7 @@
 #include "util/Defer.h"
 
 namespace {
-	constexpr float TEXT_SCALE = Game3::SCALE / 16;
+	constexpr float TEXT_SCALE = Game3::UI_SCALE / 16;
 }
 
 namespace Game3 {
@@ -24,7 +24,7 @@ namespace Game3 {
 			.y = y,
 			.scaleX = TEXT_SCALE,
 			.scaleY = TEXT_SCALE,
-			.wrapWidth = width - SCALE * 4,
+			.wrapWidth = width - UI_SCALE * 4,
 			.color{0, 0, 0, 1},
 			.alignTop = true,
 			.shadow{0, 0, 0, 0},
@@ -33,7 +33,7 @@ namespace Game3 {
 	}
 
 	float TextModule::calculateHeight(const RendererContext &renderers, float available_width, float) {
-		if (lastTextHeight > 0 && available_width == lastWidth)
+		if (lastTextHeight > 0 && available_width == lastRectangle.width)
 			return lastTextHeight;
 
 		return renderers.text.textHeight(text, TEXT_SCALE, available_width);

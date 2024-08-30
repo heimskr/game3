@@ -3,6 +3,7 @@
 #include "graphics/RendererContext.h"
 #include "graphics/TextRenderer.h"
 #include "ui/gl/widget/TextInputWidget.h"
+#include "ui/gl/widget/TooltipWidget.h"
 #include "ui/gl/UIContext.h"
 #include "util/Defer.h"
 
@@ -36,7 +37,7 @@ namespace {
 
 namespace Game3 {
 	TextInputWidget::TextInputWidget(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness):
-		scale(scale), thickness(thickness), borderColor(border_color), interiorColor(interior_color), textColor(text_color), cursorColor(cursor_color) {}
+		Widget(scale), thickness(thickness), borderColor(border_color), interiorColor(interior_color), textColor(text_color), cursorColor(cursor_color) {}
 
 	TextInputWidget::TextInputWidget(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color):
 		TextInputWidget(scale, border_color, interior_color, text_color, cursor_color, DEFAULT_THICKNESS) {}
@@ -65,11 +66,11 @@ namespace Game3 {
 
 		auto saver = ui.scissorStack.pushRelative(interior, renderers);
 
-		rectangler(cursorColor, getCursorPosition(), start, start / 2, interior.height - 1.5 * start);
+		rectangler(cursorColor, getCursorPosition(), start, start / 2, interior.height - 2 * start);
 
 		texter(text, TextRenderOptions{
 			.x = start - xOffset * scale,
-			.y = 0,
+			.y = scale * 2,
 			.scaleX = getTextScale(),
 			.scaleY = getTextScale(),
 			.color = textColor,
@@ -278,7 +279,7 @@ namespace Game3 {
 	}
 
 	float TextInputWidget::getBoundary() const {
-		return lastWidth - getXPadding();
+		return lastRectangle.width - getXPadding();
 	}
 
 	float TextInputWidget::getCursorPosition() const {
@@ -296,7 +297,7 @@ namespace Game3 {
 	}
 
 	void TextInputWidget::fixCursorOffset() {
-		if (lastWidth < 0) {
+		if (lastRectangle.width < 0) {
 			cursorFixQueued = true;
 			return;
 		}
