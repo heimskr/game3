@@ -11,6 +11,7 @@ namespace {
 
 	constexpr Color DEFAULT_EXTERIOR_COLOR{0.6, 0.3, 0.0, 1.0};
 	constexpr Color DEFAULT_BACKGROUND_COLOR{0.25, 0.0, 0.0, 1.0};
+	constexpr std::chrono::milliseconds PROGRESS_UPDATE_TIME{100};
 }
 
 namespace Game3 {
@@ -48,7 +49,20 @@ namespace Game3 {
 			lastReportedProgress = -1;
 		}
 
-		const float bar_width = progress * (width - 2 * scale);
+		float shown_progress = progress;
+
+		if (progressUpdatePoint) {
+			const auto time_difference = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - *progressUpdatePoint);
+			const float lerp_progress = std::min(1.0, static_cast<double>(time_difference.count()) / static_cast<double>(PROGRESS_UPDATE_TIME.count()));
+
+			if (lerp_progress == 1) {
+				progressUpdatePoint.reset();
+			} else if (oldProgress != progress) {
+				shown_progress = lerp(oldProgress, progress, lerp_progress);
+			}
+		}
+
+		const float bar_width = shown_progress * (width - 2 * scale);
 		const float top_height = .6f * (height - 2 * scale);
 		const float bottom_height = .4f * (height - 2 * scale);
 
@@ -81,6 +95,8 @@ namespace Game3 {
 	}
 
 	void ProgressBarWidget::setProgress(float new_progress) {
+		oldProgress = progress;
 		progress = new_progress;
+		progressUpdatePoint.emplace(std::chrono::system_clock::now());
 	}
 }

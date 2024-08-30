@@ -4,6 +4,9 @@
 #include "types/Types.h"
 #include "ui/gl/widget/Widget.h"
 
+#include <chrono>
+#include <optional>
+
 namespace Game3 {
 	class ProgressBarWidget: public Widget {
 		public:
@@ -23,6 +26,8 @@ namespace Game3 {
 			Color topExteriorColor;
 			Color bottomExteriorColor;
 			float progress{};
+			float oldProgress{};
 			float lastReportedProgress = -1;
+			std::optional<std::chrono::system_clock::time_point> progressUpdatePoint;
 	};
 }
