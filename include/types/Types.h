@@ -73,6 +73,9 @@ namespace Game3 {
 	class Inventory;
 	using InventoryPtr = std::shared_ptr<Inventory>;
 
+	class Texture;
+	using TexturePtr = std::shared_ptr<Texture>;
+
 	class ItemStack;
 	using ItemStackPtr = std::shared_ptr<ItemStack>;
 	using ConstItemStackPtr = std::shared_ptr<const ItemStack>;

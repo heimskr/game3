@@ -12,5 +12,7 @@ namespace Game3 {
 			void render(const RendererContext &) final;
 			void renderIcon(const RendererContext &) final;
 			void click(int button, int x, int y) final;
+			void dragStart(int x, int y) final;
+			void dragEnd(int x, int y) final;
 	};
 }

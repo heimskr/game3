@@ -71,6 +71,7 @@ namespace Game3 {
 			float textWidth(const Glib::ustring &text, float scale = 1.f);
 			float textHeight(const Glib::ustring &text, float scale = 1.f);
 			float textHeight(const Glib::ustring &text, float scale, float wrap_width);
+			float getIHeight(float scale) const;
 
 			void reset();
 

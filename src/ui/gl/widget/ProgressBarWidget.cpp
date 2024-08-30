@@ -11,33 +11,27 @@ namespace {
 
 	constexpr Color DEFAULT_EXTERIOR_COLOR{0.6, 0.3, 0.0, 1.0};
 	constexpr Color DEFAULT_BACKGROUND_COLOR{0.25, 0.0, 0.0, 1.0};
-
-	inline Color darken(Color color) {
-		RGB dark = RGB{color.red, color.green, color.blue}.darken();
-		return Color{dark.r, dark.g, dark.b, color.alpha};
-	}
 }
 
 namespace Game3 {
-	ProgressBarWidget::ProgressBarWidget(float fixed_height, float scale, Color interior_color, Color background_color, Color exterior_color, float progress):
+	ProgressBarWidget::ProgressBarWidget(float scale, float fixed_height, Color interior_color, Color background_color, Color exterior_color, float progress):
 		Widget(scale),
 		fixedHeight(fixed_height),
 		topInteriorColor(interior_color),
-		bottomInteriorColor(darken(topInteriorColor)),
+		bottomInteriorColor(topInteriorColor.darken()),
 		backgroundColor(background_color),
 		topExteriorColor(exterior_color),
-		bottomExteriorColor(darken(topExteriorColor)),
+		bottomExteriorColor(topExteriorColor.darken()),
 		progress(progress) {}
 
 	ProgressBarWidget::ProgressBarWidget(float fixed_height, float scale, Color interior_color, float progress):
 		ProgressBarWidget(fixed_height, scale, interior_color, DEFAULT_BACKGROUND_COLOR, DEFAULT_EXTERIOR_COLOR, progress) {}
 
 	void ProgressBarWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
-		RectangleRenderer &rectangler = renderers.rectangle;
-
 		if (fixedHeight > 0)
 			height = fixedHeight;
 
+		RectangleRenderer &rectangler = renderers.rectangle;
 		Widget::render(ui, renderers, x, y, width, height);
 
 		std::shared_ptr<TooltipWidget> tooltip = ui.getTooltip();

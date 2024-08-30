@@ -383,6 +383,10 @@ namespace Game3 {
 		return -y + highest_on_first_line;
 	}
 
+	float TextRenderer::getIHeight(float scale) const {
+		return getCharacter('I').size.y * scale;
+	}
+
 	const TextRenderer::Character & TextRenderer::getCharacter(gunichar ch) const {
 		if (auto iter = characters.find(ch); iter != characters.end())
 			return iter->second;

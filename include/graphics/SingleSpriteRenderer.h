@@ -46,7 +46,7 @@ namespace Game3 {
 			float lastYCoord = 1;
 
 			void initRenderData();
-			void allowRepeating(const RenderOptions &options, int texture_width, int texture_height);
+			void allowRepeating(int texture_width, int texture_height, const RenderOptions &);
 			void setupShader(int texture_width, int texture_height, const RenderOptions &);
 	};
 }

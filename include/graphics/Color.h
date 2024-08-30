@@ -19,34 +19,22 @@ namespace Game3 {
 	};
 
 	struct OKHsv: BaseColor<OKHsv> {
-		float h{};
-		float s{};
-		float v{};
+		float hue = 0;
+		float saturation = 0;
+		float value = 0;
+		float alpha = 1;
 
-		OKHsv(float h, float s, float v):
-			h(h), s(s), v(v) {}
+		OKHsv(float hue, float saturation, float value, float alpha):
+			hue(hue), saturation(saturation), value(value), alpha(alpha) {}
 
-		OKHsv darken() const;
+		OKHsv darken(float value_factor) const;
 	};
 
-	struct RGB: BaseColor<RGB> {
-		float r{};
-		float g{};
-		float b{};
-
-		RGB(float r, float g, float b):
-			r(r), g(g), b(b) {}
-
-		explicit RGB(std::string_view);
-
-		RGB darken() const;
-	};
-
-	struct Color {
-		float red   = 0.f;
-		float green = 0.f;
-		float blue  = 0.f;
-		float alpha = 1.f;
+	struct Color: BaseColor<Color> {
+		float red   = 0;
+		float green = 0;
+		float blue  = 0;
+		float alpha = 1;
 
 		constexpr Color() = default;
 		constexpr Color(float red_, float green_, float blue_, float alpha_ = 1.f):
@@ -74,6 +62,8 @@ namespace Game3 {
 			str.remove_prefix(6);
 			alpha = str.empty()? 1.f : fromHex(str) / 255.f;
 		}
+
+		Color darken(float value_factor = 2.f / 3.f) const;
 
 		static Color fromBytes(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha = 255);
 	};

@@ -88,7 +88,7 @@ namespace Game3 {
 			.scaleX = scale,
 			.scaleY = scale,
 			.angle = angle,
-			.color = {1.f, 1.f, 1.f, float(alpha)},
+			.color{1.f, 1.f, 1.f, float(alpha)},
 		});
 	}
 
@@ -269,7 +269,7 @@ namespace Game3 {
 		options.sizeX = options.sizeX < 0.f? -options.sizeX * texture_width  : options.sizeX;
 		options.sizeY = options.sizeY < 0.f? -options.sizeY * texture_height : options.sizeY;
 		setupShader(texture_width, texture_height, options);
-		allowRepeating(options, texture_width, texture_height);
+		allowRepeating(texture_width, texture_height, options);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, options.wrapMode); CHECKGL
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, options.wrapMode); CHECKGL
@@ -292,10 +292,10 @@ namespace Game3 {
 		const auto texture_height = texture->height;
 
 		RenderOptions options = options_ref;
-		options.sizeX = options.sizeX < 0.f? -options.sizeX * texture_width  : options.sizeX;
-		options.sizeY = options.sizeY < 0.f? -options.sizeY * texture_height : options.sizeY;
+		options.sizeX = options.sizeX < 0.f? -options.sizeX * texture_width  * options.scaleX : options.sizeX;
+		options.sizeY = options.sizeY < 0.f? -options.sizeY * texture_height * options.scaleY : options.sizeY;
 		setupShader(texture_width, texture_height, options);
-		allowRepeating(options, texture_width, texture_height);
+		allowRepeating(texture_width, texture_height, options);
 
 		texture->bind(0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, options.wrapMode); CHECKGL
@@ -308,13 +308,13 @@ namespace Game3 {
 		glBindVertexArray(0); CHECKGL
 	}
 
-	void SingleSpriteRenderer::allowRepeating(const RenderOptions &options, int texture_width, int texture_height) {
+	void SingleSpriteRenderer::allowRepeating(int texture_width, int texture_height, const RenderOptions &options) {
 		float x = 1;
 		float y = 1;
 
 		if ((options.wrapMode == GL_REPEAT || options.wrapMode == GL_MIRRORED_REPEAT) && (options.sizeX > texture_width || options.sizeY > texture_height)) {
-			x = std::max(options.sizeX / texture_width / options.scaleX,  1.0);
-			y = std::max(options.sizeY / texture_height / options.scaleY, 1.0);
+			x = options.sizeX / texture_width  / options.scaleX;
+			y = options.sizeY / texture_height / options.scaleY;
 		}
 
 		if (x != lastXCoord || y != lastYCoord) {

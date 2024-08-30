@@ -8,32 +8,20 @@
 #include <stdexcept>
 
 namespace Game3 {
-	RGB::RGB(std::string_view str) {
-		if (!str.empty() && str[0] == '#')
-			str.remove_prefix(1);
-
-		if (str.size() != 6)
-			throw std::invalid_argument("Invalid RGB string length: expected 6");
-
-		r = fromHex(str.substr(0, 2)) / 255.f;
-		g = fromHex(str.substr(2, 2)) / 255.f;
-		b = fromHex(str.substr(4, 2)) / 255.f;
+	template <>
+	Color convertColor(const OKHsv &hsv) {
+		ok_color::RGB rgb = ok_color::okhsv_to_srgb({hsv.hue, hsv.saturation, hsv.value});
+		return {rgb.r, rgb.g, rgb.b, hsv.alpha};
 	}
 
 	template <>
-	RGB convertColor(const OKHsv &hsv) {
-		ok_color::RGB rgb = ok_color::okhsv_to_srgb({hsv.h, hsv.s, hsv.v});
-		return {rgb.r, rgb.g, rgb.b};
+	OKHsv convertColor(const Color &rgb) {
+		ok_color::HSV hsv = ok_color::srgb_to_okhsv({rgb.red, rgb.green, rgb.blue});
+		return {hsv.h, hsv.s, hsv.v, rgb.alpha};
 	}
 
-	template <>
-	OKHsv convertColor(const RGB &rgb) {
-		ok_color::HSV hsv = ok_color::srgb_to_okhsv({rgb.r, rgb.g, rgb.b});
-		return {hsv.h, hsv.s, hsv.v};
-	}
-
-	OKHsv OKHsv::darken() const {
-		auto [hue, saturation, value] = *this;
+	OKHsv OKHsv::darken(float value_factor) const {
+		auto [hue, saturation, value, alpha] = *this;
 
 		if (60.f / 360.f <= hue && hue < 270.f / 360.f) {
 			hue += 15.f / 360.f;
@@ -45,13 +33,13 @@ namespace Game3 {
 
 		saturation = std::min(1.f, saturation + .1f);
 
-		value *= 2.f / 3.f;
+		value *= value_factor;
 
-		return OKHsv{hue, saturation, value};
+		return OKHsv{hue, saturation, value, alpha};
 	}
 
-	RGB RGB::darken() const {
-		return convert<OKHsv>().darken().convert<RGB>();
+	Color Color::darken(float value_factor) const {
+		return convert<OKHsv>().darken(value_factor).convert<Color>();
 	}
 
 	Color Color::fromBytes(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha) {

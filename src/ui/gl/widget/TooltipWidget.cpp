@@ -5,8 +5,6 @@
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 
-#include "threading/ThreadContext.h"
-
 namespace {
 	constexpr float DEFAULT_MAX_WIDTH = 800 * Game3::UI_SCALE / 8;
 	constexpr Game3::Color DEFAULT_BACKGROUND_COLOR{"#000000af"};
