@@ -1,5 +1,6 @@
 #include "graphics/RendererContext.h"
 #include "graphics/Texture.h"
+#include "threading/ThreadContext.h"
 #include "ui/gl/tab/CraftingTab.h"
 #include "ui/gl/widget/ButtonWidget.h"
 #include "ui/gl/widget/ProgressBarWidget.h"
@@ -42,6 +43,7 @@ namespace {
 			button->setText("Button");
 			button->setOnClick([&, i = 0](auto &) mutable {
 				Game3::INFO("Clicked {} time(s). Text = \"{}\"", ++i, getTextInput(ui)->getText().raw());
+				getProgressBar(ui)->setProgress(Game3::threadContext.random(0.f, 1.f));
 			});
 		}
 

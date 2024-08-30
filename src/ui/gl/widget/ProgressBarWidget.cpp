@@ -79,4 +79,8 @@ namespace Game3 {
 	float ProgressBarWidget::calculateHeight(const RendererContext &, float, float available_height) {
 		return fixedHeight > 0? fixedHeight : available_height;
 	}
+
+	void ProgressBarWidget::setProgress(float new_progress) {
+		progress = new_progress;
+	}
 }

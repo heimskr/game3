@@ -35,7 +35,7 @@ namespace Game3 {
 		const float padding = getPadding();
 		const float text_scale = getTextScale();
 
-		const float text_width = texter.textWidth(text, text_scale) + 2 * padding;
+		const float text_width = texter.textWidth(text, text_scale) + 2 * padding + 1;
 		const float effective_width = std::min(maxWidth, width < 0? text_width : std::min(width, text_width));
 
 		const float text_height = texter.textHeight(text, text_scale, effective_width - 2 * padding) + 2 * padding;
