@@ -12,7 +12,7 @@ namespace Game3 {
 		public:
 			InventoryTab(UIContext &);
 
-			void render(UIContext &, const RendererContext &) final;
+			void render(const RendererContext &) final;
 			void renderIcon(const RendererContext &) final;
 			void click(int button, int x, int y) final;
 			void dragStart(int x, int y) final;

@@ -10,6 +10,7 @@ namespace {
 	constexpr Game3::Color DEFAULT_EXTERIOR_COLOR{0, 0, 0, 1};
 	constexpr Game3::Color DEFAULT_INTERIOR_COLOR{1, 1, 1, 1};
 	constexpr Game3::Color DEFAULT_TEXT_COLOR{0, 0, 0, 1};
+	constexpr Game3::Color DEFAULT_CURSOR_COLOR{0, 0, 0, 0.5};
 	constexpr float DEFAULT_THICKNESS = 1;
 
 	bool isStopChar(Glib::ustring::iterator cursor) {
@@ -34,18 +35,19 @@ namespace {
 }
 
 namespace Game3 {
-	TextInputWidget::TextInputWidget(float scale, Color exterior_color, Color interior_color, Color text_color, float thickness):
-		scale(scale), thickness(thickness), exteriorColor(exterior_color), interiorColor(interior_color), textColor(text_color) {
+	TextInputWidget::TextInputWidget(float scale, Color exterior_color, Color interior_color, Color text_color, Color cursor_color, float thickness):
+		scale(scale), thickness(thickness), exteriorColor(exterior_color), interiorColor(interior_color), textColor(text_color), cursorColor(cursor_color) {
 			text = "This is a test";
-			cursor = text.end();
+			cursorIterator = text.end();
+			cursor = text.length();
 			xOffset = 0;
 		}
 
-	TextInputWidget::TextInputWidget(float scale, Color exterior_color, Color interior_color, Color text_color):
-		TextInputWidget(scale, exterior_color, interior_color, text_color, DEFAULT_THICKNESS) {}
+	TextInputWidget::TextInputWidget(float scale, Color exterior_color, Color interior_color, Color text_color, Color cursor_color):
+		TextInputWidget(scale, exterior_color, interior_color, text_color, cursor_color, DEFAULT_THICKNESS) {}
 
 	TextInputWidget::TextInputWidget(float scale, float thickness):
-		TextInputWidget(scale, DEFAULT_EXTERIOR_COLOR, DEFAULT_INTERIOR_COLOR, DEFAULT_TEXT_COLOR, thickness) {}
+		TextInputWidget(scale, DEFAULT_EXTERIOR_COLOR, DEFAULT_INTERIOR_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_CURSOR_COLOR, thickness) {}
 
 	TextInputWidget::TextInputWidget(float scale):
 		TextInputWidget(scale, DEFAULT_THICKNESS) {}
@@ -56,20 +58,22 @@ namespace Game3 {
 		RectangleRenderer &rectangler = renderers.rectangle;
 		TextRenderer &texter = renderers.text;
 
-		const float offset = thickness * scale;
+		const float start = thickness * scale;
 		// TODO: check for negative sizes
-		const Rectangle interior(x + offset, y + offset, width - 2 * offset, height - 2 * offset);
+		const Rectangle interior(x + start, y + start, width - 2 * start, height - 2 * start);
 
 		rectangler(exteriorColor, x, y, width, height);
 		rectangler(interiorColor, interior);
 
 		auto saver = ui.scissorStack.pushRelative(interior, renderers);
 
+		rectangler(cursorColor, x - xOffset * scale + scale + start / 2 + cursorXOffset * getTextScale(), y + start, start / 2, interior.height - 1.5 * start);
+
 		texter(text, TextRenderOptions{
-			.x = x - xOffset * scale + offset,
+			.x = x - xOffset * scale + start,
 			.y = y,
-			.scaleX = scale / 16,
-			.scaleY = scale / 16,
+			.scaleX = getTextScale(),
+			.scaleY = getTextScale(),
 			.color = textColor,
 			.alignTop = true,
 			.shadow{0, 0, 0, 0},
@@ -93,38 +97,30 @@ namespace Game3 {
 				break;
 
 			case GDK_KEY_BackSpace:
-				if (text.empty() || cursor == text.begin())
-					return true;
-
-				if (modifiers.onlyCtrl()) {
-					eraseWord();
-				} else {
-					eraseCharacter();
-				}
-
+				if (modifiers.onlyCtrl())
+					eraseWord(ui);
+				else
+					eraseCharacter(ui);
 				return true;
 
 			case GDK_KEY_Delete:
-				if (!text.empty() && cursor != text.end())
-					cursor = text.erase(cursor);
+				eraseForward(ui);
 				return true;
 
 			case GDK_KEY_Left:
-				if (cursor != text.begin())
-					--cursor;
+				goLeft(ui);
 				return true;
 
 			case GDK_KEY_Right:
-				if (cursor != text.end())
-					++cursor;
+				goRight(ui);
 				return true;
 
 			case GDK_KEY_Home:
-				cursor = text.begin();
+				goStart(ui);
 				return true;
 
 			case GDK_KEY_End:
-				cursor = text.end();
+				goEnd(ui);
 				return true;
 
 			case GDK_KEY_Shift_L:
@@ -146,8 +142,7 @@ namespace Game3 {
 				break;
 		}
 
-		cursor = text.insert(cursor, static_cast<gunichar>(character));
-		++cursor;
+		insert(ui, static_cast<gunichar>(character));
 		return true;
 	}
 
@@ -155,23 +150,80 @@ namespace Game3 {
 		return available_height;
 	}
 
-	void TextInputWidget::eraseWord() {
+	void TextInputWidget::insert(UIContext &ui, gunichar character) {
+		cursorIterator = text.insert(cursorIterator, static_cast<gunichar>(character));
+		++cursorIterator;
+		++cursor;
+		cursorXOffset += ui.getRenderers().text.textWidth(Glib::ustring(1, character));
+	}
+
+	void TextInputWidget::eraseWord(UIContext &ui) {
+		if (cursor == 0)
+			return;
+
 		// TODO: instead of erasing multiple times, search the string for how much to erase and erase it all in one go.
-		if (isStopChar(cursor)) {
+		if (isStopChar(cursorIterator)) {
 			do {
-				eraseCharacter();
-			} while (cursor != text.begin() && isStopChar(cursor));
+				eraseCharacter(ui);
+			} while (cursorIterator != text.begin() && isStopChar(cursorIterator));
 		} else {
 			do {
-				eraseCharacter();
-			} while (cursor != text.begin() && !isStopChar(cursor));
-			while (cursor != text.begin() && isWhitespace(cursor)) {
-				eraseCharacter();
+				eraseCharacter(ui);
+			} while (cursorIterator != text.begin() && !isStopChar(cursorIterator));
+			while (cursorIterator != text.begin() && isWhitespace(cursorIterator)) {
+				eraseCharacter(ui);
 			}
 		}
 	}
 
-	void TextInputWidget::eraseCharacter() {
-		cursor = text.erase(--cursor);
+	void TextInputWidget::eraseCharacter(UIContext &ui) {
+		if (cursor == 0)
+			return;
+
+		cursorXOffset -= ui.getRenderers().text.textWidth(text.substr(--cursor, 1));
+		cursorIterator = text.erase(--cursorIterator);
+	}
+
+	void TextInputWidget::eraseForward(UIContext &) {
+		if (!text.empty() && cursorIterator != text.end())
+			cursorIterator = text.erase(cursorIterator);
+	}
+
+	void TextInputWidget::goLeft(UIContext &ui, size_t count) {
+		RendererContext renderers = ui.getRenderers();
+		Glib::ustring piece;
+
+		for (size_t i = 0; i < count && cursorIterator != text.begin(); ++i) {
+			piece = text.substr(--cursor, 1);
+			cursorXOffset -= renderers.text.textWidth(piece);
+			--cursorIterator;
+		}
+	}
+
+	void TextInputWidget::goRight(UIContext &ui, size_t count) {
+		RendererContext renderers = ui.getRenderers();
+		Glib::ustring piece;
+
+		for (size_t i = 0; i < count && cursorIterator != text.end(); ++i) {
+			piece = text.substr(cursor++, 1);
+			cursorXOffset += renderers.text.textWidth(piece);
+			++cursorIterator;
+		}
+	}
+
+	void TextInputWidget::goStart(UIContext &) {
+		cursor = 0;
+		cursorIterator = text.begin();
+		cursorXOffset = 0;
+	}
+
+	void TextInputWidget::goEnd(UIContext &ui) {
+		cursor = text.length();
+		cursorIterator = text.end();
+		cursorXOffset = ui.getRenderers().text.textWidth(text);
+	}
+
+	float TextInputWidget::getTextScale() const {
+		return scale / 16;
 	}
 }

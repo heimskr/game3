@@ -33,7 +33,7 @@ namespace Game3 {
 		playerScroller(makePlayerScroller()),
 		moduleScroller(makeModuleScroller()) {}
 
-	void InventoryTab::render(UIContext &ui, const RendererContext &renderers) {
+	void InventoryTab::render(const RendererContext &renderers) {
 		Rectangle rectangle = ui.scissorStack.getTop().rectangle;
 		rectangle.x = 0;
 		rectangle.y = 0;

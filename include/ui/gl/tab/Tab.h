@@ -14,7 +14,7 @@ namespace Game3 {
 
 			virtual ~Tab() = default;
 
-			virtual void render(UIContext &, const RendererContext &) = 0;
+			virtual void render(const RendererContext &) = 0;
 			virtual void renderIcon(const RendererContext &);
 			virtual void click(int button, int x, int y);
 			virtual void dragStart(int x, int y);

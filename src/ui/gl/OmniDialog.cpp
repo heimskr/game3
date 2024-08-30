@@ -63,7 +63,7 @@ namespace Game3 {
 			rectangler.drawOnScreen(Color{0.6, 0.3, 0, 0.1}, 0, 0, 10000, 10000);
 
 			if (activeTab)
-				activeTab->render(ui, renderers);
+				activeTab->render(renderers);
 		}
 
 		auto saver = renderers.getSaver();
