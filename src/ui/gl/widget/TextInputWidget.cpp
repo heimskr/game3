@@ -61,7 +61,8 @@ namespace Game3 {
 		// TODO: check for negative sizes
 		const Rectangle interior(x + start, y + start, width - 2 * start, height - 2 * start);
 
-		rectangler(borderColor, x, y, width, height);
+		rectangler(borderColor, x, y, width, height * 0.6);
+		rectangler(borderColor.darken(), x, y + height * 0.6, width, height * 0.4);
 		rectangler(interiorColor, interior);
 
 		auto saver = ui.scissorStack.pushRelative(interior, renderers);
