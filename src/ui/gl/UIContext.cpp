@@ -91,6 +91,10 @@ namespace Game3 {
 		if (draggedWidget && dragOrigin != std::pair{x, y})
 			draggedWidgetActive = true;
 
+		for (const WidgetPtr &widget: extraDragUpdaters)
+			if (widget->dragUpdate(*this, x, y))
+				return true;
+
 		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
 			if (dialog->dragUpdate(x, y))
 				return true;
@@ -102,6 +106,8 @@ namespace Game3 {
 		if (auto pressed = getPressedWidget()) {
 			return pressed->dragEnd(*this, x, y);
 		}
+
+		extraDragUpdaters.clear();
 
 		bool out = false;
 
@@ -205,5 +211,9 @@ namespace Game3 {
 
 	std::shared_ptr<TooltipWidget> UIContext::getTooltip() const {
 		return tooltip;
+	}
+
+	void UIContext::addDragUpdater(WidgetPtr widget) {
+		extraDragUpdaters.emplace(std::move(widget));
 	}
 }

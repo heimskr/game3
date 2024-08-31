@@ -54,6 +54,7 @@ namespace Game3 {
 			if (lastVerticalScrollbarRectangle->contains(x, y)) {
 				// Grab bar
 				lastVerticalScrollMouse = y - last_y;
+				ui.addDragUpdater(shared_from_this());
 				return true;
 			}
 
@@ -64,6 +65,7 @@ namespace Game3 {
 				yOffset = fixYOffset(recalculateYOffset(new_vertical_offset));
 				lastVerticalScrollMouse = y - last_y;
 				updateVerticalRectangle();
+				ui.addDragUpdater(shared_from_this());
 				return true;
 			}
 		}

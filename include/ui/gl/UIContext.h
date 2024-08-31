@@ -6,10 +6,9 @@
 #include "ui/Modifiers.h"
 
 #include <algorithm>
-#include <filesystem>
-#include <map>
 #include <memory>
 #include <optional>
+#include <set>
 #include <utility>
 #include <vector>
 
@@ -45,10 +44,10 @@ namespace Game3 {
 			WidgetPtr getDraggedWidget() const;
 			std::shared_ptr<ClientPlayer> getPlayer() const;
 			RendererContext getRenderers() const;
-			void focusWidget(std::weak_ptr<Widget>);
+			void focusWidget(WeakWidgetPtr);
 			WidgetPtr getFocusedWidget() const;
 			void unfocus();
-			void setPressedWidget(std::weak_ptr<Widget>);
+			void setPressedWidget(WeakWidgetPtr);
 			WidgetPtr getPressedWidget() const;
 			void unpress();
 			std::pair<double, double> getAbsoluteMouseCoordinates() const;
@@ -56,6 +55,7 @@ namespace Game3 {
 			bool checkMouseRelative(const Rectangle &) const;
 			bool checkMouseAbsolute(const Rectangle &) const;
 			std::shared_ptr<TooltipWidget> getTooltip() const;
+			void addDragUpdater(WidgetPtr);
 
 			template <typename T>
 			size_t removeDialogs() {
@@ -80,8 +80,9 @@ namespace Game3 {
 			std::optional<std::pair<int, int>> dragOrigin;
 			std::shared_ptr<HotbarWidget> hotbar;
 			std::shared_ptr<TooltipWidget> tooltip;
-			std::weak_ptr<Widget> focusedWidget;
-			std::weak_ptr<Widget> pressedWidget;
+			WeakWidgetPtr focusedWidget;
+			WeakWidgetPtr pressedWidget;
+			std::set<WidgetPtr> extraDragUpdaters;
 
 			template <typename T>
 			static bool dialogMatcher(const std::shared_ptr<Dialog> &dialog) {
