@@ -107,6 +107,8 @@ namespace Game3 {
 			return pressed->dragEnd(*this, x, y);
 		}
 
+		for (const WidgetPtr &widget: extraDragUpdaters)
+			widget->dragging = false;
 		extraDragUpdaters.clear();
 
 		bool out = false;

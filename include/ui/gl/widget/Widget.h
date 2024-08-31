@@ -78,5 +78,7 @@ namespace Game3 {
 			virtual void setOnClick(decltype(onClick));
 			virtual void setOnDragStart(decltype(onDragStart));
 			virtual void setOnDragUpdate(decltype(onDragUpdate));
+
+		friend class UIContext;
 	};
 }
