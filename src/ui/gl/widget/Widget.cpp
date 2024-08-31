@@ -129,6 +129,8 @@ namespace Game3 {
 
 		if (parent->lastChild == sibling)
 			parent->lastChild = self;
+
+		++childCount;
 	}
 
 	void Widget::insertBefore(WidgetPtr parent, WidgetPtr sibling) {
@@ -151,6 +153,8 @@ namespace Game3 {
 
 		if (parent->firstChild == sibling)
 			parent->firstChild = self;
+
+		++childCount;
 	}
 
 	void Widget::insertAtStart(WidgetPtr parent) {
@@ -171,6 +175,8 @@ namespace Game3 {
 
 		if (!parent->lastChild)
 			parent->lastChild = self;
+
+		++childCount;
 	}
 
 	void Widget::insertAtEnd(WidgetPtr parent) {
@@ -191,6 +197,8 @@ namespace Game3 {
 
 		if (!parent->firstChild)
 			parent->firstChild = self;
+
+		++childCount;
 	}
 
 	void Widget::remove(WidgetPtr child) {
@@ -203,9 +211,11 @@ namespace Game3 {
 		if (auto previous = child->previousSibling.lock())
 			previous->nextSibling = child->nextSibling;
 
-		child->nextSibling->previousSibling = child->previousSibling;
+		if (child->nextSibling)
+			child->nextSibling->previousSibling = child->previousSibling;
 
 		child->weakParent.reset();
+		--childCount;
 	}
 
 	void Widget::setOnClick(decltype(onClick) new_onclick) {

@@ -33,16 +33,13 @@ namespace Game3 {
 		if (fixedHeight > 0)
 			height = fixedHeight;
 
-		RectangleRenderer &rectangler = renderers.rectangle;
-
-		const float adjusted_y = pressed? y + scale : y;
-
 		adjustWidth(renderers, width, height);
-
 		Widget::render(ui, renderers, x, y, width, height);
 
+		RectangleRenderer &rectangler = renderers.rectangle;
 		const Color &top_color = pressed? topBorderColorPressed : topBorderColor;
 		const Color &bottom_color = pressed? bottomBorderColorPressed : bottomBorderColor;
+		const float adjusted_y = pressed? y + scale : y;
 
 		// Top
 		rectangler(top_color, x + 2 * scale, adjusted_y, width - 4 * scale, scale);
@@ -163,7 +160,7 @@ namespace Game3 {
 	}
 
 	void ButtonWidget::adjustWidth(const RendererContext &renderers, float &width, float height) const {
-		if (!text.empty() && width < 0) {
+		if (!text.empty()) {
 			const float text_scale = getTextScale(renderers, height - 6 * scale);
 			width = scale * 6 + renderers.text.textWidth(text, text_scale);
 		}

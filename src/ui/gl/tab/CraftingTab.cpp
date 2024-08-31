@@ -2,6 +2,7 @@
 #include "graphics/Texture.h"
 #include "threading/ThreadContext.h"
 #include "ui/gl/tab/CraftingTab.h"
+#include "ui/gl/widget/BoxWidget.h"
 #include "ui/gl/widget/ButtonWidget.h"
 #include "ui/gl/widget/IconButtonWidget.h"
 #include "ui/gl/widget/ProgressBarWidget.h"
@@ -18,32 +19,8 @@ namespace Game3 {
 
 		auto tab = shared_from_this();
 
-		bar = std::make_shared<ProgressBarWidget>(scale, scale * 10, Color(1, 0, 0, 1), 0.5);
-
-		bar->setOnDragStart([this](Widget &, UIContext &ui, int, int) {
-			ui.addDragUpdater(bar);
-			return true;
-		});
-
-		bar->setOnDragUpdate([this](Widget &widget, UIContext &, int x, int) {
-			if (!widget.isDragging())
-				return false;
-
-			const Rectangle &last = widget.getLastRectangle();
-			const float scale = widget.getScale();
-
-			if (last.width > 2 * scale) {
-				x = std::min<int>(last.width - scale, std::max<int>(x, scale));
-				const float progress = static_cast<float>(x - scale) / static_cast<float>(last.width - 2 * scale);
-				bar->setProgress(progress);
-				button->setFixedHeight(scale * lerp(6.f, 32.f, progress));
-				input->setText(ui, std::format("{:.1f}%", progress * 100));
-			}
-
-			return true;
-		});
-
-		bar->insertAtEnd(tab);
+		box = std::make_shared<BoxWidget>(scale);
+		box->insertAtEnd(tab);
 
 		input = std::make_shared<TextInputWidget>(scale);
 		input->setText(ui, "Hello from the crafting tab! This is some example text.");
@@ -68,8 +45,32 @@ namespace Game3 {
 
 			bar->setProgress(number);
 		};
+		input->setFixedHeight(scale * TEXT_INPUT_HEIGHT_FACTOR);
+		input->insertAtEnd(box);
 
-		input->insertAtEnd(tab);
+		bar = std::make_shared<ProgressBarWidget>(scale, scale * 10, Color(1, 0, 0, 1), 0.5);
+		bar->setOnDragStart([this](Widget &, UIContext &ui, int, int) {
+			ui.addDragUpdater(bar);
+			return true;
+		});
+		bar->setOnDragUpdate([this](Widget &widget, UIContext &, int x, int) {
+			if (!widget.isDragging())
+				return false;
+
+			const Rectangle &last = widget.getLastRectangle();
+			const float scale = widget.getScale();
+
+			if (last.width > 2 * scale) {
+				x = std::min<int>(last.width - scale, std::max<int>(x, scale));
+				const float progress = static_cast<float>(x - scale) / static_cast<float>(last.width - 2 * scale);
+				bar->setProgress(progress);
+				button->setFixedHeight(scale * lerp(6.f, 32.f, progress));
+				input->setText(ui, std::format("{:.1f}%", progress * 100));
+			}
+
+			return true;
+		});
+		bar->insertAtEnd(box);
 
 		button = std::make_shared<ButtonWidget>(scale, scale * 10);
 		button->setText("Randomize");
@@ -79,7 +80,7 @@ namespace Game3 {
 			input->setText(ui, std::format("{:.1f}%", progress * 100));
 			return true;
 		});
-		button->insertAtEnd(tab);
+		button->insertAtEnd(box);
 
 		iconButton = std::make_shared<IconButtonWidget>(scale, scale * 14);
 		iconButton->setIconTexture(cacheTexture("resources/gui/settings.png"));
@@ -89,23 +90,11 @@ namespace Game3 {
 			input->setText(ui, std::format("{} * {} = {}", scale, height, scale * height));
 			return true;
 		});
-		iconButton->insertAtEnd(tab);
+		iconButton->insertAtEnd(box);
 	}
 
-	void CraftingTab::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float) {
-		input->render(ui, renderers, x, y, width, scale * TEXT_INPUT_HEIGHT_FACTOR);
-
-		y += scale * (TEXT_INPUT_HEIGHT_FACTOR + 2);
-
-		bar->render(ui, renderers, x + width / 4, y, width / 2, scale * 10);
-
-		y += scale * 12;
-
-		iconButton->render(ui, renderers, x + scale * 2, y, -1, -1);
-
-		x += scale * 2 + iconButton->getLastRectangle().width;
-
-		button->render(ui, renderers, x + scale * 2, y, -1, -1);
+	void CraftingTab::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+		box->render(ui, renderers, x, y, width, height);
 	}
 
 	void CraftingTab::renderIcon(const RendererContext &renderers) {

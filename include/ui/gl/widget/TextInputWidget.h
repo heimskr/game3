@@ -3,13 +3,14 @@
 #include "graphics/Color.h"
 #include "types/Types.h"
 #include "ui/gl/widget/Widget.h"
+#include "ui/gl/HasFixedHeight.h"
 
 #include <glibmm/ustring.h>
 
 #include <functional>
 
 namespace Game3 {
-	class TextInputWidget: public Widget {
+	class TextInputWidget: public Widget, public HasFixedHeight {
 		public:
 			std::function<void(TextInputWidget &, UIContext &)> onSubmit;
 

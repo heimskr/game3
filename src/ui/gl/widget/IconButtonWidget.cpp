@@ -29,7 +29,7 @@ namespace Game3 {
 	}
 
 	void IconButtonWidget::adjustWidth(const RendererContext &, float &width, float height) const {
-		if (!iconTexture || 0 < width)
+		if (!iconTexture)
 			return;
 
 		height -= 2 * scale;

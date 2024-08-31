@@ -62,6 +62,7 @@ namespace Game3 {
 			WeakWidgetPtr weakParent;
 			WeakWidgetPtr previousSibling;
 			WidgetPtr nextSibling;
+			size_t childCount = 0;
 
 			/** Mouse X and Y coordinates are relative to the top left corner of the widget. Return value indicates whether to stop propagation. */
 			std::function<bool(Widget &, UIContext &, int button, int mouse_x, int mouse_y)> onClick;

@@ -49,6 +49,9 @@ namespace Game3 {
 		TextInputWidget(scale, DEFAULT_THICKNESS) {}
 
 	void TextInputWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+		if (0 < fixedHeight)
+			height = fixedHeight;
+
 		Widget::render(ui, renderers, x, y, width, height);
 
 		if (cursorFixQueued)
@@ -162,7 +165,7 @@ namespace Game3 {
 	}
 
 	float TextInputWidget::calculateHeight(const RendererContext &, float, float available_height) {
-		return available_height;
+		return 0 < fixedHeight? fixedHeight : available_height;
 	}
 
 	const Glib::ustring & TextInputWidget::getText() const {
