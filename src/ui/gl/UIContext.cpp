@@ -78,6 +78,7 @@ namespace Game3 {
 	}
 
 	bool UIContext::dragStart(int x, int y) {
+		unfocus();
 		dragOrigin.emplace(x, y);
 
 		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
@@ -103,9 +104,8 @@ namespace Game3 {
 	}
 
 	bool UIContext::dragEnd(int x, int y) {
-		if (auto pressed = getPressedWidget()) {
+		if (auto pressed = getPressedWidget())
 			return pressed->dragEnd(*this, x, y);
-		}
 
 		for (const WidgetPtr &widget: extraDragUpdaters)
 			widget->dragging = false;
