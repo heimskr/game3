@@ -10,6 +10,7 @@
 #include "item/Item.h"
 #include "packet/SetActiveSlotPacket.h"
 #include "ui/gl/widget/ItemSlotWidget.h"
+#include "ui/gl/widget/TooltipWidget.h"
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
@@ -37,6 +38,18 @@ namespace Game3 {
 
 		if (!stack)
 			return;
+
+		std::shared_ptr<TooltipWidget> tooltip = ui.getTooltip();
+
+		if (ui.checkMouseAbsolute(lastRectangle)) {
+			if (!tooltip->wasUpdatedBy(*this)) {
+				tooltip->setText(stack->getTooltip());
+				tooltip->setRegion(lastRectangle);
+				tooltip->show(*this);
+			}
+		} else {
+			tooltip->hide(*this);
+		}
 
 		if (!texture)
 			texture = stack->getTexture(*ui.getGame());
