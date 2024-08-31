@@ -8,6 +8,7 @@
 #include "ui/gl/module/Module.h"
 #include "ui/gl/tab/CraftingTab.h"
 #include "ui/gl/tab/InventoryTab.h"
+#include "ui/gl/tab/SettingsTab.h"
 #include "ui/gl/tab/Tab.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/OmniDialog.h"
@@ -30,7 +31,8 @@ namespace Game3 {
 	OmniDialog::OmniDialog(UIContext &ui): Dialog(ui) {
 		inventoryTab = std::make_shared<InventoryTab>(ui);
 		craftingTab = std::make_shared<CraftingTab>(ui);
-		tabs = {inventoryTab, craftingTab};
+		settingsTab = std::make_shared<SettingsTab>(ui);
+		tabs = {inventoryTab, craftingTab, settingsTab};
 		activeTab = inventoryTab;
 		tabRectangles.resize(tabs.size());
 
@@ -71,15 +73,14 @@ namespace Game3 {
 
 		for (int i = 0; const std::shared_ptr<Tab> &tab: tabs) {
 			const int x_offset = (TOP_OFFSET + UNSCALED / 4) * i + 40;
+			const int y_offset = tab == activeTab? 2 * UI_SCALE : 0;
+
+			Rectangle tab_rectangle = original_rectangle + Rectangle(x_offset, UNSCALED * 5 / 4 - TOP_OFFSET + y_offset, TOP_OFFSET, TOP_OFFSET);
 
 			{
-				auto saver = renderers.getSaver();
-				Rectangle tab_rectangle = original_rectangle + Rectangle{x_offset, UNSCALED * 5 / 4 - TOP_OFFSET, TOP_OFFSET, TOP_OFFSET};
-				stack.pushRelative({tab_rectangle, true});
-				renderers.updateSize(tab_rectangle.width, tab_rectangle.height);
+				auto saver = stack.pushRelative(tab_rectangle, renderers);
 				drawFrame(renderers, UI_SCALE / UNSCALE, true, TAB_PIECES, inner_color);
 				tabRectangles.at(i) = tab_rectangle;
-				stack.pop();
 			}
 
 			if (tab == activeTab) {
@@ -107,7 +108,6 @@ namespace Game3 {
 				});
 			}
 
-			Rectangle tab_rectangle = original_rectangle + Rectangle{x_offset, UNSCALED * 5 / 4 - TOP_OFFSET, TOP_OFFSET, TOP_OFFSET};
 			auto saver = stack.pushRelative(tab_rectangle, renderers);
 			tab->renderIcon(renderers);
 

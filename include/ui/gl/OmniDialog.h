@@ -9,15 +9,14 @@
 #include <vector>
 
 namespace Game3 {
-	class CraftingTab;
 	class InventoryTab;
 	class Tab;
 
 	class OmniDialog: public Dialog {
 		public:
 			std::shared_ptr<InventoryTab> inventoryTab;
-			std::shared_ptr<CraftingTab> craftingTab;
-			std::vector<Rectangle> tabRectangles;
+			std::shared_ptr<Tab> craftingTab;
+			std::shared_ptr<Tab> settingsTab;
 			std::shared_ptr<Tab> activeTab;
 
 			OmniDialog(UIContext &);
@@ -51,6 +50,7 @@ namespace Game3 {
 
 		private:
 			Lockable<std::vector<std::shared_ptr<Tab>>> tabs;
+			std::vector<Rectangle> tabRectangles;
 
 			template <typename T>
 			static bool tabMatcher(const std::shared_ptr<Tab> &tab) {
