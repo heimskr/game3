@@ -27,7 +27,7 @@ namespace Game3 {
 
 		RectangleRenderer &rectangler = renderers.rectangle;
 
-		lastRenderedHeight = 0;
+		lastRenderedSize = {0, 0};
 		float original_y = y;
 
 		for (WidgetPtr child = firstChild; child; child = child->getNextSibling()) {
@@ -35,28 +35,39 @@ namespace Game3 {
 				y += padding * scale;
 				rectangler(separatorColor, x, y, width, separatorThickness * scale);
 				y += (padding + separatorThickness) * scale;
-				lastRenderedHeight += (2 * padding + separatorThickness) * scale;
+				lastRenderedSize.second += (2 * padding + separatorThickness) * scale;
 				height -= (2 * padding + separatorThickness) * scale;
 			}
 
 			child->render(ui, renderers, x, y, width, height - (y - original_y));
-			const float child_height = child->calculateHeight(renderers, width, height);
+			const float child_height = child->calculateSize(renderers, width, height).second;
 			y += child_height;
-			lastRenderedHeight += child_height;
+			lastRenderedSize.second += child_height;
 			height -= child_height;
 		}
 	}
 
-	float BoxWidget::calculateHeight(const RendererContext &renderers, float available_width, float available_height) {
+	std::pair<float, float> BoxWidget::calculateSize(const RendererContext &renderers, float available_width, float available_height) {
 		if (childCount == 0)
-			return 0;
+			return {0, 0};
 
-		if (0 <= lastRenderedHeight)
-			return lastRenderedHeight;
+		const auto [last_width, last_height] = lastRenderedSize;
 
-		float out = (childCount - 1) * scale * (2 * padding + separatorThickness);
-		for (WidgetPtr child = firstChild; child; child = child->getNextSibling())
-			out += child->calculateHeight(renderers, available_width, available_height);
+		if (0 <= last_width && 0 <= last_height)
+			return lastRenderedSize;
+
+		assert(orientation == Orientation::Vertical);
+
+		std::pair<float, float> out{
+			0,
+			(childCount - 1) * scale * (2 * padding + separatorThickness),
+		};
+
+		for (WidgetPtr child = firstChild; child; child = child->getNextSibling()) {
+			auto [child_width, child_height] = child->calculateSize(renderers, available_width, available_height);
+			out.second += child_height;
+		}
+
 		return out;
 	}
 }

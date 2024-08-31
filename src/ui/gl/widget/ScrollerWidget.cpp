@@ -27,10 +27,10 @@ namespace Game3 {
 
 		auto saver = ui.scissorStack.pushRelative(Rectangle(x, y, width, height), renderers);
 
-		// TODO: make Widget::render return a pair of width and height so we don't have to call calculateHeight
+		// TODO: make Widget::render return a pair of width and height so we don't have to call calculateSize
 		firstChild->render(ui, renderers, xOffset, yOffset, width, height);
 
-		lastChildHeight = firstChild->calculateHeight(renderers, width, height);
+		lastChildHeight = firstChild->calculateSize(renderers, width, height).second;
 
 		if (lastChildHeight > 0) {
 			updateVerticalRectangle();
@@ -120,8 +120,8 @@ namespace Game3 {
 		return true;
 	}
 
-	float ScrollerWidget::calculateHeight(const RendererContext &, float, float available_height) {
-		return available_height;
+	std::pair<float, float> ScrollerWidget::calculateSize(const RendererContext &, float available_width, float available_height) {
+		return {available_width, available_height};
 	}
 
 	void ScrollerWidget::setChild(WidgetPtr new_child) {

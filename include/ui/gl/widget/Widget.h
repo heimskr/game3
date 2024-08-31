@@ -40,7 +40,7 @@ namespace Game3 {
 			virtual bool dragEnd(UIContext &, int x, int y);
 			virtual bool scroll(UIContext &, float x_delta, float y_delta, int x, int y);
 			virtual bool keyPressed(UIContext &, uint32_t character, Modifiers);
-			virtual float calculateHeight(const RendererContext &, float available_width, float available_height) = 0;
+			virtual std::pair<float, float> calculateSize(const RendererContext &, float available_width, float available_height) = 0;
 			virtual float getScale() const;
 			virtual bool isDragging() const;
 

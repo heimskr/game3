@@ -22,7 +22,7 @@ namespace Game3 {
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
 			bool click(UIContext &, int button, int x, int y) final;
 			bool keyPressed(UIContext &, uint32_t character, Modifiers) final;
-			float calculateHeight(const RendererContext &, float available_width, float available_height) final;
+			std::pair<float, float> calculateSize(const RendererContext &, float available_width, float available_height) final;
 
 			const Glib::ustring & getText() const;
 			void setText(UIContext &, Glib::ustring);

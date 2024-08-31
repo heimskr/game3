@@ -124,8 +124,10 @@ namespace Game3 {
 		return true;
 	}
 
-	float ButtonWidget::calculateHeight(const RendererContext &, float, float available_height) {
-		return fixedHeight > 0? fixedHeight : available_height;
+	std::pair<float, float> ButtonWidget::calculateSize(const RendererContext &renderers, float available_width, float available_height) {
+		float height = fixedHeight > 0? fixedHeight : available_height;
+		adjustWidth(renderers, available_width, height);
+		return {available_width, height};
 	}
 
 	const Glib::ustring & ButtonWidget::getText() const {

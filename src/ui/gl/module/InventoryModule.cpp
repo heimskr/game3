@@ -8,12 +8,13 @@
 #include "util/Defer.h"
 #include "util/Math.h"
 
-namespace Game3 {
-	namespace {
-		constexpr int getColumnCount(float width) {
-			return std::min(10, std::max<int>(1, width / (OUTER_SLOT_SIZE * SLOT_SCALE)));
-		}
+namespace {
+	constexpr int getColumnCount(float width) {
+		return std::min(10, std::max<int>(1, width / (Game3::OUTER_SLOT_SIZE * Game3::SLOT_SCALE)));
 	}
+}
+
+namespace Game3 {
 
 	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game, const std::any &argument):
 		InventoryModule(std::move(game), getInventory(argument)) {}
@@ -114,8 +115,8 @@ namespace Game3 {
 		return true;
 	}
 
-	float InventoryModule::calculateHeight(const RendererContext &, float available_width, float) {
-		return updiv(slotWidgets.size(), getColumnCount(available_width)) * OUTER_SLOT_SIZE * SLOT_SCALE;
+	std::pair<float, float> InventoryModule::calculateSize(const RendererContext &, float available_width, float) {
+		return {available_width, updiv(slotWidgets.size(), getColumnCount(available_width)) * OUTER_SLOT_SIZE * SLOT_SCALE};
 	}
 
 	ClientInventoryPtr InventoryModule::getInventory(const std::any &any) {

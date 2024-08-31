@@ -17,7 +17,7 @@ namespace Game3 {
 			bool click(UIContext &, int button, int x, int y) final;
 			bool dragStart(UIContext &, int x, int y) final;
 			bool dragEnd(UIContext &, int x, int y) final;
-			float calculateHeight(const RendererContext &, float available_width, float available_height) final;
+			std::pair<float, float> calculateSize(const RendererContext &, float available_width, float available_height) final;
 
 			const Glib::ustring & getText() const;
 			float getFixedHeight() const;

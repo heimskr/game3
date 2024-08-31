@@ -90,8 +90,8 @@ namespace Game3 {
 		rectangler(bottomExteriorColor, x + width - scale, y + scale  + top_height, scale, bottom_height);
 	}
 
-	float ProgressBarWidget::calculateHeight(const RendererContext &, float, float available_height) {
-		return fixedHeight > 0? fixedHeight : available_height;
+	std::pair<float, float> ProgressBarWidget::calculateSize(const RendererContext &, float available_width, float available_height) {
+		return {available_width, fixedHeight > 0? fixedHeight : available_height};
 	}
 
 	void ProgressBarWidget::setProgress(float new_progress) {

@@ -26,7 +26,7 @@ namespace Game3 {
 		});
 	}
 
-	float Tab::calculateHeight(const RendererContext &, float, float available_height) {
-		return available_height;
+	std::pair<float, float> Tab::calculateSize(const RendererContext &, float available_width, float available_height) {
+		return {available_width, available_height};
 	}
 }

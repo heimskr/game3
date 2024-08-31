@@ -18,7 +18,7 @@ namespace Game3 {
 			bool dragUpdate(UIContext &, int x, int y) final;
 			bool dragEnd(UIContext &, int x, int y) final;
 			bool scroll(UIContext &, float x_delta, float y_delta, int x, int y) final;
-			float calculateHeight(const RendererContext &, float available_width, float available_height) final;
+			std::pair<float, float> calculateSize(const RendererContext &, float available_width, float available_height) final;
 
 			void setChild(WidgetPtr);
 

@@ -164,8 +164,8 @@ namespace Game3 {
 		return true;
 	}
 
-	float TextInputWidget::calculateHeight(const RendererContext &, float, float available_height) {
-		return 0 < fixedHeight? fixedHeight : available_height;
+	std::pair<float, float> TextInputWidget::calculateSize(const RendererContext &, float available_width, float available_height) {
+		return {available_width, 0 < fixedHeight? fixedHeight : available_height};
 	}
 
 	const Glib::ustring & TextInputWidget::getText() const {

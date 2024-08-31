@@ -41,16 +41,16 @@ namespace Game3 {
 		lastTextHeight += padding;
 	}
 
-	float TextModule::calculateHeight(const RendererContext &renderers, float available_width, float available_height) {
+	std::pair<float, float> TextModule::calculateSize(const RendererContext &renderers, float available_width, float available_height) {
 		if (lastTextHeight > 0 && available_width == lastRectangle.width)
-			return lastTextHeight;
+			return {available_width, lastTextHeight};
 
 		tryWrap();
 
 		if (!wrapped)
-			return available_height;
+			return {available_width, available_height};
 
-		return renderers.text.textHeight(wrapped.value(), getTextScale(), available_width);
+		return {available_width, renderers.text.textHeight(wrapped.value(), getTextScale(), available_width)};
 	}
 
 	void TextModule::setText(UIContext &ui, UString new_text) {

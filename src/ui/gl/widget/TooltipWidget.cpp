@@ -61,8 +61,8 @@ namespace Game3 {
 		});
 	}
 
-	float TooltipWidget::calculateHeight(const RendererContext &, float, float available_height) {
-		return available_height;
+	std::pair<float, float> TooltipWidget::calculateSize(const RendererContext &, float available_width, float available_height) {
+		return {available_width, available_height};
 	}
 
 	void TooltipWidget::hide() {

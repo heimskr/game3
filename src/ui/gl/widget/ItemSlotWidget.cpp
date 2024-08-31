@@ -72,8 +72,8 @@ namespace Game3 {
 		return true;
 	}
 
-	float ItemSlotWidget::calculateHeight(const RendererContext &, float, float) {
-		return 16 * scale;
+	std::pair<float, float> ItemSlotWidget::calculateSize(const RendererContext &, float, float) {
+		return {16 * scale, 16 * scale};
 	}
 
 	void ItemSlotWidget::setStack(std::shared_ptr<ItemStack> new_stack) {

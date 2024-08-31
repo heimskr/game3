@@ -22,7 +22,7 @@ namespace Game3 {
 			Identifier getID() const final { return ID(); }
 
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
-			float calculateHeight(const RendererContext &, float available_width, float available_height) final;
+			std::pair<float, float> calculateSize(const RendererContext &, float available_width, float available_height) final;
 
 			void setText(UIContext &, UString);
 
