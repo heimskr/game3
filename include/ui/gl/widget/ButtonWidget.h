@@ -37,6 +37,7 @@ namespace Game3 {
 			Color topBorderColorPressed;
 			Color bottomBorderColorPressed;
 			Color textColorPressed;
+			Color textureMultiplierPressed{1, 1, 1, 1};
 			Glib::ustring text;
 			bool pressed = false;
 			TexturePtr texture;

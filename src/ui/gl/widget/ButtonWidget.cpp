@@ -53,8 +53,6 @@ namespace Game3 {
 		// Right
 		rectangler(top_color, x + width - scale, adjusted_y + 2 * scale, scale, height - 6 * scale);
 
-		const float value = pressed? 1.5 : 1;
-
 		assert(texture);
 		renderers.singleSprite.drawOnScreen(texture, RenderOptions{
 			.x = x + scale,
@@ -63,7 +61,7 @@ namespace Game3 {
 			.sizeY = height - 4 * scale,
 			.scaleX = scale,
 			.scaleY = scale,
-			.color{value, value, value, 1},
+			.color = textureMultiplierPressed,
 			.invertY = false,
 			.wrapMode = GL_REPEAT,
 		});
@@ -176,9 +174,12 @@ namespace Game3 {
 		topBorderColor = top;
 		bottomBorderColor = bottom;
 		textColor = text_color;
-		topBorderColorPressed = top.multiplyValue(3).desaturate();
-		bottomBorderColorPressed = bottom.multiplyValue(3).desaturate();
 		textColorPressed = text_color;
+		topBorderColorPressed = top;
+		bottomBorderColorPressed = bottom;
+		// topBorderColorPressed = top.multiplyValue(3).desaturate();
+		// bottomBorderColorPressed = bottom.multiplyValue(3).desaturate();
+		// textureMultiplierPressed = {1.5, 1.5, 1.5, 1};
 	}
 
 	TexturePtr ButtonWidget::getDefaultTexture() {
