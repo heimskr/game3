@@ -49,8 +49,9 @@ namespace Game3 {
 	}
 
 	bool ScrollerWidget::dragStart(UIContext &ui, int x, int y) {
+		const auto [last_x, last_y, width, height] = lastRectangle;
+
 		if (lastVerticalScrollbarRectangle) {
-			const auto [last_x, last_y, width, height] = lastRectangle;
 			if (lastVerticalScrollbarRectangle->contains(x, y)) {
 				// Grab bar
 				lastVerticalScrollMouse = y - last_y;
@@ -70,14 +71,20 @@ namespace Game3 {
 			}
 		}
 
-		return child && child->dragStart(ui, x, y);
+		if (child && child->dragStart(ui, x, y))
+			return true;
+
+		lastVerticalScrollMouse = y - last_y;
+		ui.addDragUpdater(shared_from_this());
+		reverseScroll = true;
+		return true;
 	}
 
 	bool ScrollerWidget::dragUpdate(UIContext &ui, int x, int y) {
 		if (lastVerticalScrollMouse) {
 			const auto start_y = *lastVerticalScrollMouse;
 			const float last_y = lastRectangle.y;
-			const float new_vertical_offset = getVerticalOffset() + y - last_y - start_y;
+			const float new_vertical_offset = getVerticalOffset() + (y - last_y - start_y) * (reverseScroll? -0.5 : 1.0);
 			yOffset = fixYOffset(recalculateYOffset(new_vertical_offset));
 			lastVerticalScrollMouse = y - last_y;
 			updateVerticalRectangle();
@@ -88,6 +95,8 @@ namespace Game3 {
 	}
 
 	bool ScrollerWidget::dragEnd(UIContext &ui, int x, int y) {
+		reverseScroll = false;
+
 		if (lastVerticalScrollMouse) {
 			lastVerticalScrollMouse.reset();
 			return true;

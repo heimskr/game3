@@ -42,6 +42,11 @@ namespace Game3 {
 	}
 
 	bool Widget::dragStart(UIContext &ui, int x, int y) {
+		dragging = true;
+
+		if (onDragStart && onDragStart(*this, ui, x - lastRectangle.x, y - lastRectangle.y))
+			return true;
+
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
 			if (child->getLastRectangle().contains(x, y) && child->dragStart(ui, x, y))
 				return true;
@@ -50,8 +55,8 @@ namespace Game3 {
 	}
 
 	bool Widget::dragUpdate(UIContext &ui, int x, int y) {
-		if (onDrag)
-			return onDrag(*this, ui, x - lastRectangle.x, y - lastRectangle.y);
+		if (onDragUpdate && onDragUpdate(*this, ui, x - lastRectangle.x, y - lastRectangle.y))
+			return true;
 
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
 			if (child->getLastRectangle().contains(x, y) && child->dragUpdate(ui, x, y))
@@ -61,6 +66,8 @@ namespace Game3 {
 	}
 
 	bool Widget::dragEnd(UIContext &ui, int x, int y) {
+		dragging = false;
+
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
 			if (child->getLastRectangle().contains(x, y) && child->dragEnd(ui, x, y))
 				return true;
@@ -82,6 +89,10 @@ namespace Game3 {
 
 	float Widget::getScale() const {
 		return scale;
+	}
+
+	bool Widget::isDragging() const {
+		return dragging;
 	}
 
 	WidgetPtr Widget::getParent() const {
@@ -201,7 +212,11 @@ namespace Game3 {
 		onClick = std::move(new_onclick);
 	}
 
-	void Widget::setOnDrag(decltype(onDrag) new_ondrag) {
-		onDrag = std::move(new_ondrag);
+	void Widget::setOnDragStart(decltype(onDragStart) new_ondragstart) {
+		onDragStart = std::move(new_ondragstart);
+	}
+
+	void Widget::setOnDragUpdate(decltype(onDragUpdate) new_ondragupdate) {
+		onDragUpdate = std::move(new_ondragupdate);
 	}
 }

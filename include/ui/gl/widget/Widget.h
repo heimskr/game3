@@ -42,6 +42,7 @@ namespace Game3 {
 			virtual bool keyPressed(UIContext &, uint32_t character, Modifiers);
 			virtual float calculateHeight(const RendererContext &, float available_width, float available_height) = 0;
 			virtual float getScale() const;
+			virtual bool isDragging() const;
 
 			WidgetPtr getParent() const;
 			WidgetPtr getPreviousSibling() const;
@@ -54,6 +55,7 @@ namespace Game3 {
 
 		protected:
 			float scale{};
+			bool dragging = false;
 			Rectangle lastRectangle{-1, -1, -1, -1};
 			WidgetPtr firstChild;
 			WidgetPtr lastChild;
@@ -65,12 +67,16 @@ namespace Game3 {
 			std::function<bool(Widget &, UIContext &, int button, int mouse_x, int mouse_y)> onClick;
 
 			/** Mouse X and Y coordinates are relative to the top left corner of the widget. Return value indicates whether to stop propagation. */
-			std::function<bool(Widget &, UIContext &, int mouse_x, int mouse_y)> onDrag;
+			std::function<bool(Widget &, UIContext &, int mouse_x, int mouse_y)> onDragStart;
+
+			/** Mouse X and Y coordinates are relative to the top left corner of the widget. Return value indicates whether to stop propagation. */
+			std::function<bool(Widget &, UIContext &, int mouse_x, int mouse_y)> onDragUpdate;
 
 			Widget(float scale);
 
 		public:
 			virtual void setOnClick(decltype(onClick));
-			virtual void setOnDrag(decltype(onDrag));
+			virtual void setOnDragStart(decltype(onDragStart));
+			virtual void setOnDragUpdate(decltype(onDragUpdate));
 	};
 }

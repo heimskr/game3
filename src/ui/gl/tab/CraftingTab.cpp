@@ -19,23 +19,26 @@ namespace Game3 {
 
 		bar = std::make_shared<ProgressBarWidget>(scale, scale * 10, Color(1, 0, 0, 1), 0.5);
 
-		auto bar_drag = [&](Widget &widget, int x, int y) {
-			const float scale = widget.getScale();
-			const Rectangle &last = widget.getLastRectangle();
-			const int width = last.width;
-			const int height = last.height;
+		bar->setOnDragStart([this](Widget &, UIContext &ui, int, int) {
+			ui.addDragUpdater(bar);
+			return true;
+		});
 
-			if (!(width <= 2 * scale || x < scale || y < scale || x > width - scale || y > height - scale)) {
-				const float progress = static_cast<float>(x - scale) / static_cast<float>(width - 2 * scale);
+		bar->setOnDragUpdate([this](Widget &widget, UIContext &, int x, int) {
+			if (!widget.isDragging())
+				return false;
+
+			const Rectangle &last = widget.getLastRectangle();
+			const float scale = widget.getScale();
+
+			if (last.width > 2 * scale) {
+				x = std::min<int>(last.width - scale, std::max<int>(x, scale));
+				const float progress = static_cast<float>(x - scale) / static_cast<float>(last.width - 2 * scale);
 				bar->setProgress(progress);
 				input->setText(ui, std::format("{:.1f}%", progress * 100));
 			}
 
 			return true;
-		};
-
-		bar->setOnDrag([bar_drag](Widget &widget, UIContext &, int x, int y) {
-			return bar_drag(widget, x, y);
 		});
 
 		bar->insertAtEnd(tab);
@@ -44,7 +47,6 @@ namespace Game3 {
 		input->setText(ui, "Hello from the crafting tab! This is some example text.");
 		input->onSubmit = [&](TextInputWidget &input, UIContext &ui) {
 			Glib::ustring text = input.clear();
-
 			if (text.empty())
 				return;
 
@@ -69,8 +71,7 @@ namespace Game3 {
 
 		button = std::make_shared<ButtonWidget>(scale, scale * 10);
 		button->setText("Randomize");
-		button->setOnClick([&, i = 0](Widget &, UIContext &, int, int, int) mutable {;
-			INFO("Clicked {} time(s). Text = \"{}\"", ++i, input->getText().raw());
+		button->setOnClick([&](Widget &, UIContext &, int, int, int) {
 			const float progress = threadContext.random(0.f, 1.f);
 			bar->setProgress(progress);
 			input->setText(ui, std::format("{:.1f}%", progress * 100));

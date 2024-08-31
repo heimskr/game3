@@ -86,8 +86,10 @@ namespace Game3 {
 	bool InventoryModule::dragStart(UIContext &ui, int x, int y) {
 		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
 			if (widget->getLastRectangle().contains(x, y)) {
-				ui.setDraggedWidget(widget->getDragStartWidget());
-				return true;
+				WidgetPtr dragged_widget = widget->getDragStartWidget();
+				const bool out = dragged_widget != nullptr;
+				ui.setDraggedWidget(std::move(dragged_widget));
+				return out;
 			}
 		}
 
