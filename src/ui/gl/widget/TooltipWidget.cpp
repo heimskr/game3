@@ -9,6 +9,8 @@ namespace {
 	constexpr float DEFAULT_MAX_WIDTH = 800 * Game3::UI_SCALE / 8;
 	constexpr Game3::Color DEFAULT_BACKGROUND_COLOR{"#000000af"};
 	constexpr Game3::Color DEFAULT_TEXT_COLOR{"#ffffff"};
+	constexpr float CURSOR_WIDTH = 10;
+	constexpr float CURSOR_HEIGHT = 20;
 }
 
 namespace Game3 {
@@ -26,6 +28,9 @@ namespace Game3 {
 			hide();
 			return;
 		}
+
+		x += CURSOR_WIDTH;
+		y += CURSOR_HEIGHT;
 
 		Widget::render(ui, renderers, x, y, width, height);
 
