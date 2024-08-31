@@ -31,6 +31,7 @@ namespace Game3 {
 
 		private:
 			float fixedHeight{};
+			bool pressed = false;
 			Color topBorderColor;
 			Color bottomBorderColor;
 			Color textColor;
@@ -39,7 +40,6 @@ namespace Game3 {
 			Color textColorPressed;
 			Color textureMultiplierPressed{1, 1, 1, 1};
 			Glib::ustring text;
-			bool pressed = false;
 			TexturePtr texture;
 
 			float getTextScale(const RendererContext &, float height) const;

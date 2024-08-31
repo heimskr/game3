@@ -70,8 +70,8 @@ namespace Game3 {
 			return true;
 		});
 
-		iconButton = std::make_shared<IconButtonWidget>(scale, scale * 14);
-		iconButton->setIconTexture(cacheTexture("resources/gui/settings.png"));
+		iconButton = std::make_shared<IconButtonWidget>(scale, scale * 12);
+		iconButton->setIconTexture(cacheTexture("resources/gui/randomize.png"));
 		iconButton->setOnClick([this](Widget &, UIContext &ui, int, int, int) {
 			const float height = threadContext.random(6.f, 32.f);
 			button->setFixedHeight(scale * height);
