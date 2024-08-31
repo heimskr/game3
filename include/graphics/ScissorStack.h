@@ -11,6 +11,8 @@ namespace Game3 {
 
 	class ScissorSaver {
 		public:
+			Rectangle rectangle;
+
 			ScissorSaver(ScissorStack &, SizeSaver &&);
 			ScissorSaver(ScissorSaver &) = delete;
 			ScissorSaver(ScissorSaver &&) noexcept;

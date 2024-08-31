@@ -41,10 +41,8 @@ namespace Game3 {
 		moduleScroller = makeModuleScroller();
 	}
 
-	void InventoryTab::render(UIContext &ui, const RendererContext &renderers, float, float, float, float) {
-		Rectangle rectangle = ui.scissorStack.getTop().rectangle;
-		rectangle.x = 0;
-		rectangle.y = 0;
+	void InventoryTab::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+		Rectangle rectangle(0, 0, width, height);
 
 		std::unique_lock<DefaultMutex> module_lock;
 		if (Module *active_module = getModule(module_lock)) {

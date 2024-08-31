@@ -2,6 +2,8 @@
 
 #include "ui/gl/widget/Widget.h"
 
+#include <optional>
+
 namespace Game3 {
 	class ScrollerWidget: public Widget {
 		public:
@@ -19,10 +21,22 @@ namespace Game3 {
 			void setChild(WidgetPtr);
 
 		private:
+			float lastChildHeight = -1;
 			float xOffset = 0;
 			float yOffset = 0;
 			WidgetPtr child;
+			std::optional<int> lastVerticalScrollMouse;
+			std::optional<int> lastHorizontalScrollMouse;
+			std::optional<Rectangle> lastVerticalScrollbarRectangle;
+			std::optional<Rectangle> lastHorizontalScrollbarRectangle;
 
 			bool getNatural() const;
+			float getBarThickness() const;
+			float getVerticalOffset() const;
+			float getHorizontalOffset() const;
+			float recalculateYOffset(float vertical_offset) const;
+			float recalculateXOffset(float horizontal_offset) const;
+			float fixYOffset(float) const;
+			void updateVerticalRectangle();
 	};
 }

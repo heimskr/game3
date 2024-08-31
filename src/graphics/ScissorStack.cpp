@@ -8,7 +8,7 @@
 namespace Game3 {
 
 	ScissorSaver::ScissorSaver(ScissorStack &scissor_stack, SizeSaver &&size_saver):
-		scissorStack(&scissor_stack), sizeSaver(std::move(size_saver)) {}
+		rectangle(scissor_stack.getTop().rectangle), scissorStack(&scissor_stack), sizeSaver(std::move(size_saver)) {}
 
 	ScissorSaver::ScissorSaver(ScissorSaver &&other) noexcept:
 		scissorStack(std::exchange(other.scissorStack, nullptr)), sizeSaver(std::move(other.sizeSaver)) {}
