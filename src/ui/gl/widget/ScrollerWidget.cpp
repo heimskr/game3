@@ -22,15 +22,15 @@ namespace Game3 {
 	void ScrollerWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(ui, renderers, x, y, width, height);
 
-		if (!child)
+		if (!firstChild)
 			return;
 
 		auto saver = ui.scissorStack.pushRelative(Rectangle(x, y, width, height), renderers);
 
 		// TODO: make Widget::render return a pair of width and height so we don't have to call calculateHeight
-		child->render(ui, renderers, xOffset, yOffset, width, height);
+		firstChild->render(ui, renderers, xOffset, yOffset, width, height);
 
-		lastChildHeight = child->calculateHeight(renderers, width, height);
+		lastChildHeight = firstChild->calculateHeight(renderers, width, height);
 
 		if (lastChildHeight > 0) {
 			updateVerticalRectangle();
@@ -45,7 +45,7 @@ namespace Game3 {
 		if (lastVerticalScrollMouse || lastHorizontalScrollMouse)
 			return false;
 
-		return child && child->click(ui, button, x, y);
+		return firstChild && firstChild->click(ui, button, x, y);
 	}
 
 	bool ScrollerWidget::dragStart(UIContext &ui, int x, int y) {
@@ -71,7 +71,7 @@ namespace Game3 {
 			}
 		}
 
-		if (child && child->dragStart(ui, x, y))
+		if (firstChild && firstChild->dragStart(ui, x, y))
 			return true;
 
 		lastVerticalScrollMouse = y - last_y;
@@ -91,7 +91,7 @@ namespace Game3 {
 			return true;
 		}
 
-		return child && child->dragUpdate(ui, x, y);
+		return firstChild && firstChild->dragUpdate(ui, x, y);
 	}
 
 	bool ScrollerWidget::dragEnd(UIContext &ui, int x, int y) {
@@ -107,7 +107,7 @@ namespace Game3 {
 			return true;
 		}
 
-		return child && child->dragEnd(ui, x, y);
+		return firstChild && firstChild->dragEnd(ui, x, y);
 	}
 
 	bool ScrollerWidget::scroll(UIContext &, float x_delta, float y_delta, int, int) {
@@ -125,7 +125,10 @@ namespace Game3 {
 	}
 
 	void ScrollerWidget::setChild(WidgetPtr new_child) {
-		child = std::move(new_child);
+		if (new_child)
+			new_child->insertAtStart(shared_from_this());
+		else if (firstChild)
+			remove(firstChild);
 		xOffset = 0;
 		yOffset = 0;
 	}

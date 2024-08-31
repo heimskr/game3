@@ -28,7 +28,6 @@ namespace Game3 {
 			float xOffset = 0;
 			float yOffset = 0;
 			bool reverseScroll = false;
-			WidgetPtr child;
 			std::optional<int> lastVerticalScrollMouse;
 			std::optional<int> lastHorizontalScrollMouse;
 			std::optional<Rectangle> lastVerticalScrollbarRectangle;
