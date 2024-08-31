@@ -6,6 +6,7 @@
 
 namespace Game3 {
 	class ButtonWidget;
+	class IconButtonWidget;
 	class ProgressBarWidget;
 	class TextInputWidget;
 
@@ -21,5 +22,6 @@ namespace Game3 {
 			std::shared_ptr<ProgressBarWidget> bar;
 			std::shared_ptr<TextInputWidget> input;
 			std::shared_ptr<ButtonWidget> button;
+			std::shared_ptr<IconButtonWidget> iconButton;
 	};
 }

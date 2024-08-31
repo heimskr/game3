@@ -6,8 +6,6 @@
 
 #include <glibmm/ustring.h>
 
-#include <functional>
-
 namespace Game3 {
 	class ButtonWidget: public Widget {
 		public:
@@ -26,6 +24,10 @@ namespace Game3 {
 
 			void setText(Glib::ustring);
 			void setFixedHeight(float);
+
+		protected:
+			virtual void renderLabel(UIContext &, const RendererContext &, float width, float height);
+			virtual void adjustWidth(const RendererContext &, float &width, float height) const;
 
 		private:
 			float fixedHeight{};

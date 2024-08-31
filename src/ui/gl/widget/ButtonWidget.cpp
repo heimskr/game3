@@ -36,11 +36,8 @@ namespace Game3 {
 		RectangleRenderer &rectangler = renderers.rectangle;
 
 		const float adjusted_y = pressed? y + scale : y;
-		const float text_scale = getTextScale(renderers, height);
 
-		if (!text.empty() && width < 0) {
-			width = scale * 6 + renderers.text.textWidth(text, text_scale);
-		}
+		adjustWidth(renderers, width, height);
 
 		Widget::render(ui, renderers, x, y, width, height);
 
@@ -74,16 +71,10 @@ namespace Game3 {
 			.wrapMode = GL_REPEAT,
 		});
 
-		if (!text.empty()) {
-			auto saver = ui.scissorStack.pushRelative(Rectangle(x + scale, adjusted_y + scale, width - 2 * scale, height - 4 * scale), renderers);
-			renderers.text.drawOnScreen(text, TextRenderOptions{
-				.x = 2 * scale,
-				.y = height - 5 * scale,
-				.scaleX = text_scale,
-				.scaleY = text_scale,
-				.color = pressed? textColorPressed : textColor,
-				.alignTop = false,
-			});
+		{
+			const Rectangle rectangle(x + scale, adjusted_y + scale, width - 2 * scale, height - 4 * scale);
+			auto saver = ui.scissorStack.pushRelative(rectangle, renderers);
+			renderLabel(ui, renderers, rectangle.width, rectangle.height);
 		}
 
 		// Top left
@@ -156,8 +147,30 @@ namespace Game3 {
 		fixedHeight = new_fixed_height;
 	}
 
+	void ButtonWidget::renderLabel(UIContext &, const RendererContext &renderers, float, float height) {
+		if (text.empty())
+			return;
+
+		const float text_scale = getTextScale(renderers, height - 2 * scale);
+		renderers.text.drawOnScreen(text, TextRenderOptions{
+			.x = 2 * scale,
+			.y = height - scale,
+			.scaleX = text_scale,
+			.scaleY = text_scale,
+			.color = pressed? textColorPressed : textColor,
+			.alignTop = false,
+		});
+	}
+
+	void ButtonWidget::adjustWidth(const RendererContext &renderers, float &width, float height) const {
+		if (!text.empty() && width < 0) {
+			const float text_scale = getTextScale(renderers, height - 6 * scale);
+			width = scale * 6 + renderers.text.textWidth(text, text_scale);
+		}
+	}
+
 	float ButtonWidget::getTextScale(const RendererContext &renderers, float height) const {
-		return (height - 5 * scale) / renderers.text.getIHeight(scale / 8);
+		return height / renderers.text.getIHeight(scale / 8);
 	}
 
 	void ButtonWidget::setColors(Color top, Color bottom, Color text_color) {
