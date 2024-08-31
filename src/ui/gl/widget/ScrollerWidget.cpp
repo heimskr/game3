@@ -9,11 +9,15 @@
 namespace {
 	constexpr float SCROLL_SPEED = 64;
 	constexpr bool ALLOW_VERTICAL_OVERSCROLL = true;
+	constexpr Game3::Color DEFAULT_SCROLLBAR_COLOR{"#49120080"};
 }
 
 namespace Game3 {
+	ScrollerWidget::ScrollerWidget(float scale, Color scrollbar_color):
+		Widget(scale), scrollbarColor(scrollbar_color) {}
+
 	ScrollerWidget::ScrollerWidget(float scale):
-		Widget(scale) {}
+		ScrollerWidget(scale, DEFAULT_SCROLLBAR_COLOR) {}
 
 	void ScrollerWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(ui, renderers, x, y, width, height);
@@ -29,11 +33,10 @@ namespace Game3 {
 		lastChildHeight = child->calculateHeight(renderers, width, height);
 
 		if (lastChildHeight > 0) {
+			updateVerticalRectangle();
 			const float vertical_fraction = height / (ALLOW_VERTICAL_OVERSCROLL? height + lastChildHeight : lastChildHeight);
 			if (vertical_fraction < 1) {
-				if (!lastVerticalScrollbarRectangle)
-					updateVerticalRectangle();
-				renderers.rectangle.drawOnScreen(Color("#00000066"), *lastVerticalScrollbarRectangle - saver.rectangle);
+				renderers.rectangle.drawOnScreen(scrollbarColor, *lastVerticalScrollbarRectangle - saver.rectangle);
 			}
 		}
 	}
@@ -57,7 +60,7 @@ namespace Game3 {
 			const float bar_thickness = getBarThickness();
 			if (Rectangle(last_x + width - bar_thickness, last_y, bar_thickness, height).contains(x, y)) {
 				// Jump to clicked position
-				float new_vertical_offset = y - last_y - lastVerticalScrollbarRectangle->height / 2;
+				const float new_vertical_offset = y - last_y - lastVerticalScrollbarRectangle->height / 2;
 				yOffset = fixYOffset(recalculateYOffset(new_vertical_offset));
 				lastVerticalScrollMouse = y - last_y;
 				updateVerticalRectangle();
@@ -72,7 +75,7 @@ namespace Game3 {
 		if (lastVerticalScrollMouse) {
 			const auto start_y = *lastVerticalScrollMouse;
 			const float last_y = lastRectangle.y;
-			float new_vertical_offset = getVerticalOffset() + y - last_y - start_y;
+			const float new_vertical_offset = getVerticalOffset() + y - last_y - start_y;
 			yOffset = fixYOffset(recalculateYOffset(new_vertical_offset));
 			lastVerticalScrollMouse = y - last_y;
 			updateVerticalRectangle();
@@ -96,7 +99,7 @@ namespace Game3 {
 		return child && child->dragEnd(ui, x, y);
 	}
 
-	bool ScrollerWidget::scroll(UIContext &ui, float x_delta, float y_delta, int, int) {
+	bool ScrollerWidget::scroll(UIContext &, float x_delta, float y_delta, int, int) {
 		xOffset += (getNatural()? x_delta : -x_delta) * SCROLL_SPEED;
 		yOffset += (getNatural()? y_delta : -y_delta) * SCROLL_SPEED;
 		xOffset = std::min(0.f, xOffset);
@@ -143,7 +146,7 @@ namespace Game3 {
 		return vertical_offset * lastChildHeight / (vertical_height - height);
 	}
 
-	float ScrollerWidget::recalculateXOffset(float horizontal_offset) const {
+	float ScrollerWidget::recalculateXOffset(float) const {
 		assert(false);
 		return -1;
 	}

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "graphics/Color.h"
 #include "ui/gl/widget/Widget.h"
 
 #include <optional>
@@ -7,6 +8,7 @@
 namespace Game3 {
 	class ScrollerWidget: public Widget {
 		public:
+			ScrollerWidget(float scale, Color scrollbar_color);
 			ScrollerWidget(float scale);
 
 			using Widget::render;
@@ -21,6 +23,7 @@ namespace Game3 {
 			void setChild(WidgetPtr);
 
 		private:
+			Color scrollbarColor;
 			float lastChildHeight = -1;
 			float xOffset = 0;
 			float yOffset = 0;
