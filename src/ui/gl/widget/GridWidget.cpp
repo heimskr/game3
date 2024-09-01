@@ -198,6 +198,16 @@ namespace Game3 {
 		setSpacing(spacing, spacing);
 	}
 
+	WidgetPtr GridWidget::operator[](std::size_t row, std::size_t column) const {
+		if (widgetContainer.rows() <= row || widgetContainer.columns() < column)
+			return {};
+
+		if (Widget *widget = widgetContainer.at(row, column))
+			return widget->shared_from_this();
+
+		return {};
+	}
+
 	void GridWidget::markDirty() {
 		sizesDirty = true;
 		lastMode.reset();

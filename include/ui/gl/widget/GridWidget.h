@@ -30,6 +30,8 @@ namespace Game3 {
 			void setSpacing(float row_spacing, float column_spacing);
 			void setSpacing(float spacing);
 
+			WidgetPtr operator[](std::size_t row, std::size_t column) const;
+
 		private:
 			float rowSpacing = 0;
 			float columnSpacing = 0;

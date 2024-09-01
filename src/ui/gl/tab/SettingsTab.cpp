@@ -35,10 +35,16 @@ namespace Game3 {
 
 		for (std::size_t row = 0; row < labels.size(); ++row) {
 			for (std::size_t column = 0; column < labels[row].size(); ++column) {
-				const auto &label = labels[row][column];
-				if (label) {
+				if (const auto &label = labels[row][column]) {
 					auto button = std::make_shared<ButtonWidget>(scale);
 					button->setText(label);
+					button->setOnClick([this, row, column](Game3::Widget &, Game3::UIContext &, int, int, int) {
+						auto icon = std::make_shared<IconWidget>(scale);
+						icon->setIconTexture(cacheTexture("resources/gui/randomize.png"));
+						icon->setFixedSize(8 * scale);
+						grid->attach(icon, row, column);
+						return true;
+					});
 					grid->attach(button, row, column);
 				}
 			}
