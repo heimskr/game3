@@ -500,6 +500,8 @@ namespace Game3 {
 			queue([this, village] mutable {
 				std::unique_lock<DefaultMutex> lock;
 
+				getOmniDialog();
+
 				if (Module *module_ = omniDialog->inventoryTab->getModule(lock)) {
 					std::any data(std::move(village));
 					module_->handleMessage({}, "VillageUpdate", data);
