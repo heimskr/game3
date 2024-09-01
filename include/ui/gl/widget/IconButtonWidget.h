@@ -13,6 +13,6 @@ namespace Game3 {
 			TexturePtr iconTexture;
 
 			void renderLabel(UIContext &, const RendererContext &, float width, float height) override;
-			void adjustWidth(const RendererContext &, float &width, float height) const override;
+			float getWidth(const RendererContext &, float height) const override;
 	};
 }

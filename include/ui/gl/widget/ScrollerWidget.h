@@ -13,12 +13,15 @@ namespace Game3 {
 
 			using Widget::render;
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
+
 			bool click(UIContext &, int button, int x, int y) final;
 			bool dragStart(UIContext &, int x, int y) final;
 			bool dragUpdate(UIContext &, int x, int y) final;
 			bool dragEnd(UIContext &, int x, int y) final;
 			bool scroll(UIContext &, float x_delta, float y_delta, int x, int y) final;
-			std::pair<float, float> calculateSize(const RendererContext &, float available_width, float available_height) final;
+
+			SizeRequestMode getRequestMode() const final;
+			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
 			void setChild(WidgetPtr);
 

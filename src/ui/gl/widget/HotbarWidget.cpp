@@ -17,6 +17,12 @@ namespace Game3 {
 	}
 
 	void HotbarWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+		const float original_width = width;
+		const float original_height = height;
+		float dummy{};
+
+		measure(renderers, Orientation::Horizontal, original_width, original_height, dummy, width);
+		measure(renderers, Orientation::Horizontal, original_width, original_height, dummy, height);
 		Widget::render(ui, renderers, x, y, width, height);
 
 		const float offset = SLOT_PADDING * scale / 3;
@@ -57,7 +63,15 @@ namespace Game3 {
 		return true;
 	}
 
-	std::pair<float, float> HotbarWidget::calculateSize(const RendererContext &, float available_width, float available_height) {
-		return {available_width, available_height};
+	SizeRequestMode HotbarWidget::getRequestMode() const {
+		return SizeRequestMode::ConstantSize;
+	}
+
+	void HotbarWidget::measure(const RendererContext &, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+		if (orientation == Orientation::Horizontal) {
+			minimum = natural = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING) * scale + HOTBAR_BORDER * 2;
+		} else {
+			minimum = natural = (OUTER_SLOT_SIZE + SLOT_PADDING) * scale + HOTBAR_BORDER * 2;
+		}
 	}
 }

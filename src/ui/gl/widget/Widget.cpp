@@ -96,9 +96,7 @@ namespace Game3 {
 	}
 
 	WidgetPtr Widget::getParent() const {
-		if (WidgetPtr parent = weakParent.lock())
-			return parent;
-		throw std::runtime_error("Widget parent is expired or null");
+		return weakParent.lock();
 	}
 
 	WidgetPtr Widget::getPreviousSibling() const {

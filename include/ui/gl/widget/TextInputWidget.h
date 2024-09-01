@@ -3,14 +3,14 @@
 #include "graphics/Color.h"
 #include "types/Types.h"
 #include "ui/gl/widget/Widget.h"
-#include "ui/gl/HasFixedHeight.h"
+#include "ui/gl/HasFixedSize.h"
 
 #include <glibmm/ustring.h>
 
 #include <functional>
 
 namespace Game3 {
-	class TextInputWidget: public Widget, public HasFixedHeight {
+	class TextInputWidget: public Widget, public HasFixedSize {
 		public:
 			std::function<void(TextInputWidget &, UIContext &)> onSubmit;
 
@@ -22,7 +22,8 @@ namespace Game3 {
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
 			bool click(UIContext &, int button, int x, int y) final;
 			bool keyPressed(UIContext &, uint32_t character, Modifiers) final;
-			std::pair<float, float> calculateSize(const RendererContext &, float available_width, float available_height) final;
+			SizeRequestMode getRequestMode() const final;
+			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
 			const Glib::ustring & getText() const;
 			void setText(UIContext &, Glib::ustring);

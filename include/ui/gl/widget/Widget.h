@@ -2,6 +2,7 @@
 
 #include "graphics/Rectangle.h"
 #include "types/Types.h"
+#include "ui/gl/Types.h"
 #include "ui/Modifiers.h"
 
 #include <functional>
@@ -40,7 +41,8 @@ namespace Game3 {
 			virtual bool dragEnd(UIContext &, int x, int y);
 			virtual bool scroll(UIContext &, float x_delta, float y_delta, int x, int y);
 			virtual bool keyPressed(UIContext &, uint32_t character, Modifiers);
-			virtual std::pair<float, float> calculateSize(const RendererContext &, float available_width, float available_height) = 0;
+			virtual SizeRequestMode getRequestMode() const = 0;
+			virtual void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) = 0;
 			virtual float getScale() const;
 			virtual bool isDragging() const;
 

@@ -22,10 +22,14 @@ namespace Game3 {
 			ItemSlotWidget(std::shared_ptr<Inventory>, std::shared_ptr<ItemStack>, Slot, float size, float scale, bool active = false);
 			ItemSlotWidget(Slot, float size, float scale, bool active = false);
 
+			using Widget::render;
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
+
 			std::shared_ptr<Widget> getDragStartWidget() final;
 			bool click(UIContext &, int button, int x, int y) final;
-			std::pair<float, float> calculateSize(const RendererContext &, float available_width, float available_height) final;
+
+			SizeRequestMode getRequestMode() const final;
+			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
 			void setStack(std::shared_ptr<ItemStack>);
 			void setActive(bool);

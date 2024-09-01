@@ -26,7 +26,11 @@ namespace Game3 {
 		});
 	}
 
-	std::pair<float, float> Tab::calculateSize(const RendererContext &, float available_width, float available_height) {
-		return {available_width, available_height};
+	SizeRequestMode Tab::getRequestMode() const {
+		return SizeRequestMode::Expansive;
+	}
+
+	void Tab::measure(const RendererContext &, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+		minimum = natural = orientation == Orientation::Vertical? for_height : for_width;
 	}
 }

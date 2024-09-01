@@ -20,7 +20,7 @@ namespace Game3 {
 		InventoryModule(std::move(game), getInventory(argument)) {}
 
 	InventoryModule::InventoryModule(std::shared_ptr<ClientGame>, const std::shared_ptr<ClientInventory> &inventory):
-		inventoryGetter(inventory->getGetter()) {}
+		Module(SLOT_SCALE), inventoryGetter(inventory->getGetter()) {}
 
 	void InventoryModule::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(ui, renderers, x, y, width, height);
@@ -115,8 +115,17 @@ namespace Game3 {
 		return true;
 	}
 
-	std::pair<float, float> InventoryModule::calculateSize(const RendererContext &, float available_width, float) {
-		return {available_width, updiv(slotWidgets.size(), getColumnCount(available_width)) * OUTER_SLOT_SIZE * SLOT_SCALE};
+	SizeRequestMode InventoryModule::getRequestMode() const {
+		return SizeRequestMode::HeightForWidth;
+	}
+
+	void InventoryModule::measure(const RendererContext &, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+		if (orientation == Orientation::Horizontal) {
+			minimum = getColumnCount(for_width) * OUTER_SLOT_SIZE * scale;
+			natural = for_width;
+		} else {
+			minimum = natural = updiv(slotWidgets.size(), getColumnCount(for_width)) * OUTER_SLOT_SIZE * scale;
+		}
 	}
 
 	ClientInventoryPtr InventoryModule::getInventory(const std::any &any) {

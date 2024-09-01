@@ -11,7 +11,11 @@ namespace Game3 {
 		if (fixedHeight > 0)
 			height = fixedHeight;
 
-		width = adjustWidth(width, height);
+		const float original_width = width;
+		const float original_height = height;
+		float dummy{};
+		measure(renderers, Orientation::Horizontal, original_width, original_height, dummy, width);
+		measure(renderers, Orientation::Vertical,   original_width, original_height, dummy, height);
 
 		Widget::render(ui, renderers, x, y, width, height);
 
@@ -29,9 +33,30 @@ namespace Game3 {
 		});
 	}
 
-	std::pair<float, float> IconWidget::calculateSize(const RendererContext &, float available_width, float available_height) {
-		const float height = fixedHeight > 0? fixedHeight : available_height;
-		return {adjustWidth(available_width, height), height};
+	SizeRequestMode IconWidget::getRequestMode() const {
+		return SizeRequestMode::ConstantSize;
+	}
+
+	void IconWidget::measure(const RendererContext &, Orientation orientation, float, float, float &minimum, float &natural) {
+		float size{};
+
+		if (orientation == Orientation::Horizontal) {
+			if (fixedWidth)
+				size = fixedWidth;
+			else if (iconTexture)
+				size = scale * iconTexture->width;
+			else
+				size = scale * 16;
+		} else {
+			if (fixedHeight)
+				size = fixedHeight;
+			else if (iconTexture)
+				size = scale * iconTexture->height;
+			else
+				size = scale * 16;
+		}
+
+		minimum = natural = size;
 	}
 
 	void IconWidget::setIconTexture(TexturePtr new_icon_texture) {
@@ -39,11 +64,4 @@ namespace Game3 {
 		if (iconTexture)
 			iconTexture->init();
 	}
-
-	float IconWidget::adjustWidth(float width, float height) {
-		if (width >= 0 || !iconTexture)
-			return width;
-		return height * iconTexture->width / iconTexture->height;
-	}
-
 }

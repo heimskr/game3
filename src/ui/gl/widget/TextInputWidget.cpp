@@ -4,6 +4,7 @@
 #include "graphics/TextRenderer.h"
 #include "ui/gl/widget/TextInputWidget.h"
 #include "ui/gl/widget/TooltipWidget.h"
+#include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 #include "util/Defer.h"
 
@@ -37,7 +38,13 @@ namespace {
 
 namespace Game3 {
 	TextInputWidget::TextInputWidget(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness):
-		Widget(scale), thickness(thickness), borderColor(border_color), interiorColor(interior_color), textColor(text_color), cursorColor(cursor_color) {}
+		Widget(scale),
+		HasFixedSize(-1, scale * TEXT_INPUT_HEIGHT_FACTOR),
+		thickness(thickness),
+		borderColor(border_color),
+		interiorColor(interior_color),
+		textColor(text_color),
+		cursorColor(cursor_color) {}
 
 	TextInputWidget::TextInputWidget(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color):
 		TextInputWidget(scale, border_color, interior_color, text_color, cursor_color, DEFAULT_THICKNESS) {}
@@ -164,8 +171,28 @@ namespace Game3 {
 		return true;
 	}
 
-	std::pair<float, float> TextInputWidget::calculateSize(const RendererContext &, float available_width, float available_height) {
-		return {available_width, 0 < fixedHeight? fixedHeight : available_height};
+	SizeRequestMode TextInputWidget::getRequestMode() const {
+		return SizeRequestMode::HeightForWidth;
+	}
+
+	void TextInputWidget::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+		const float border = 2 * thickness * scale;
+
+		if (orientation == Orientation::Horizontal) {
+			if (0 < fixedWidth) {
+				minimum = natural = fixedWidth;
+			} else {
+				minimum = 0;
+				natural = border + renderers.text.textWidth(text, getTextScale());
+			}
+		} else {
+			if (0 < fixedHeight) {
+				minimum = natural = fixedHeight;
+			} else {
+				minimum = 0;
+				natural = border + renderers.text.textHeight(text, getTextScale(), for_width - border);
+			}
+		}
 	}
 
 	const Glib::ustring & TextInputWidget::getText() const {

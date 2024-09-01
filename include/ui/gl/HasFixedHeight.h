@@ -12,6 +12,6 @@ namespace Game3 {
 			float fixedHeight = -1;
 
 			HasFixedHeight(float);
-			HasFixedHeight() = default;
+			HasFixedHeight();
 	};
 }

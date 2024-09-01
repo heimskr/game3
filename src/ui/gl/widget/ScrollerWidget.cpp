@@ -30,7 +30,8 @@ namespace Game3 {
 		// TODO: make Widget::render return a pair of width and height so we don't have to call calculateSize
 		firstChild->render(ui, renderers, xOffset, yOffset, width, height);
 
-		lastChildHeight = firstChild->calculateSize(renderers, width, height).second;
+		float dummy{};
+		firstChild->measure(renderers, Orientation::Vertical, width, height, dummy, lastChildHeight);
 
 		if (lastChildHeight > 0) {
 			updateVerticalRectangle();
@@ -120,8 +121,23 @@ namespace Game3 {
 		return true;
 	}
 
-	std::pair<float, float> ScrollerWidget::calculateSize(const RendererContext &, float available_width, float available_height) {
-		return {available_width, available_height};
+	SizeRequestMode ScrollerWidget::getRequestMode() const {
+		return SizeRequestMode::Expansive;
+	}
+
+	void ScrollerWidget::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+		WidgetPtr child = firstChild;
+
+		natural = orientation == Orientation::Horizontal? for_width : for_height;
+
+		if (!child) {
+			minimum = natural;
+			return;
+		}
+
+		float dummy{};
+		child->measure(renderers, orientation, for_width, for_height, minimum, dummy);
+		minimum = std::min(minimum, natural);
 	}
 
 	void ScrollerWidget::setChild(WidgetPtr new_child) {

@@ -12,7 +12,9 @@ namespace Game3 {
 
 			using Widget::render;
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
-			std::pair<float, float> calculateSize(const RendererContext &, float available_width, float available_height) final;
+
+			SizeRequestMode getRequestMode() const final;
+			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
 		private:
 			Orientation orientation{};

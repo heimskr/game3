@@ -15,9 +15,8 @@ namespace {
 }
 
 namespace Game3 {
-	ProgressBarWidget::ProgressBarWidget(float scale, float fixed_height, Color interior_color, Color background_color, Color exterior_color, float progress):
+	ProgressBarWidget::ProgressBarWidget(float scale, Color interior_color, Color background_color, Color exterior_color, float progress):
 		Widget(scale),
-		fixedHeight(fixed_height),
 		topInteriorColor(interior_color),
 		bottomInteriorColor(topInteriorColor.darken()),
 		backgroundColor(background_color),
@@ -25,8 +24,8 @@ namespace Game3 {
 		bottomExteriorColor(topExteriorColor.darken()),
 		progress(progress) {}
 
-	ProgressBarWidget::ProgressBarWidget(float scale, float fixed_height, Color interior_color, float progress):
-		ProgressBarWidget(scale, fixed_height, interior_color, DEFAULT_BACKGROUND_COLOR, DEFAULT_EXTERIOR_COLOR, progress) {}
+	ProgressBarWidget::ProgressBarWidget(float scale, Color interior_color, float progress):
+		ProgressBarWidget(scale, interior_color, DEFAULT_BACKGROUND_COLOR, DEFAULT_EXTERIOR_COLOR, progress) {}
 
 	void ProgressBarWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		if (fixedHeight > 0)
@@ -90,8 +89,22 @@ namespace Game3 {
 		rectangler(bottomExteriorColor, x + width - scale, y + scale  + top_height, scale, bottom_height);
 	}
 
-	std::pair<float, float> ProgressBarWidget::calculateSize(const RendererContext &, float available_width, float available_height) {
-		return {available_width, fixedHeight > 0? fixedHeight : available_height};
+	SizeRequestMode ProgressBarWidget::getRequestMode() const {
+		return SizeRequestMode::ConstantSize;
+	}
+
+	void ProgressBarWidget::measure(const RendererContext &, Orientation measure_orientation, float for_width, float for_height, float &minimum, float &natural) {
+		if (measure_orientation == Orientation::Horizontal) {
+			if (0 < fixedWidth)
+				minimum = natural = fixedWidth;
+			else
+				minimum = natural = getDefaultWidth();
+		} else {
+			if (0 < fixedHeight)
+				minimum = natural = fixedHeight;
+			else
+				minimum = natural = getDefaultHeight();
+		}
 	}
 
 	void ProgressBarWidget::setProgress(float new_progress) {
@@ -101,5 +114,13 @@ namespace Game3 {
 		oldProgress = progress;
 		progress = std::min(1.f, std::max(0.f, new_progress));
 		progressUpdatePoint.emplace(std::chrono::system_clock::now());
+	}
+
+	float ProgressBarWidget::getDefaultWidth() const {
+		return 30 * scale;
+	}
+
+	float ProgressBarWidget::getDefaultHeight() const {
+		return 10 * scale;
 	}
 }

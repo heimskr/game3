@@ -40,34 +40,51 @@ namespace Game3 {
 			}
 
 			child->render(ui, renderers, x, y, width, height - (y - original_y));
-			const float child_height = child->calculateSize(renderers, width, height).second;
-			y += child_height;
-			lastRenderedSize.second += child_height;
-			height -= child_height;
+
+			float child_minimum{};
+			float child_natural{};
+			child->measure(renderers, Orientation::Vertical, width, height, child_minimum, child_natural);
+
+			y += child_natural;
+			lastRenderedSize.second += child_natural;
+			height -= child_natural;
 		}
 	}
 
-	std::pair<float, float> BoxWidget::calculateSize(const RendererContext &renderers, float available_width, float available_height) {
-		if (childCount == 0)
-			return {0, 0};
+	SizeRequestMode BoxWidget::getRequestMode() const {
+		return orientation == Orientation::Horizontal? SizeRequestMode::WidthForHeight : SizeRequestMode::HeightForWidth;
+	}
 
-		const auto [last_width, last_height] = lastRenderedSize;
-
-		if (0 <= last_width && 0 <= last_height)
-			return lastRenderedSize;
-
-		assert(orientation == Orientation::Vertical);
-
-		std::pair<float, float> out{
-			0,
-			(childCount - 1) * scale * (2 * padding + separatorThickness),
-		};
-
-		for (WidgetPtr child = firstChild; child; child = child->getNextSibling()) {
-			auto [child_width, child_height] = child->calculateSize(renderers, available_width, available_height);
-			out.second += child_height;
+	void BoxWidget::measure(const RendererContext &renderers, Orientation measure_orientation, float for_width, float for_height, float &minimum, float &natural) {
+		if (childCount == 0) {
+			minimum = natural = 0;
+			return;
 		}
 
-		return out;
+		assert(orientation == Orientation::Vertical); // TODO
+
+		if (measure_orientation == orientation) {
+			minimum = (childCount - 1) * scale * (2 * padding + separatorThickness);
+			natural = minimum;
+
+			for (WidgetPtr child = firstChild; child; child = child->getNextSibling()) {
+				float child_minimum{};
+				float child_natural{};
+				child->measure(renderers, measure_orientation, for_width, for_height, child_minimum, child_natural);
+				minimum += child_minimum;
+				natural += child_natural;
+			}
+		} else {
+			minimum = 0;
+			natural = 0;
+
+			for (WidgetPtr child = firstChild; child; child = child->getNextSibling()) {
+				float child_minimum{};
+				float child_natural{};
+				child->measure(renderers, measure_orientation, for_width, for_height, child_minimum, child_natural);
+				minimum = std::max(minimum, child_minimum);
+				natural = std::max(natural, child_natural);
+			}
+		}
 	}
 }

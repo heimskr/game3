@@ -16,7 +16,9 @@ namespace Game3 {
 
 			virtual void init();
 			virtual void renderIcon(const RendererContext &);
-			std::pair<float, float> calculateSize(const RendererContext &, float available_width, float available_height) override;
+
+			SizeRequestMode getRequestMode() const final;
+			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
 		protected:
 			UIContext &ui;

@@ -66,8 +66,18 @@ namespace Game3 {
 		});
 	}
 
-	std::pair<float, float> TooltipWidget::calculateSize(const RendererContext &, float available_width, float available_height) {
-		return {available_width, available_height};
+	SizeRequestMode TooltipWidget::getRequestMode() const {
+		return SizeRequestMode::HeightForWidth;
+	}
+
+	void TooltipWidget::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+		minimum = getPadding() * 2;
+
+		if (orientation == Orientation::Horizontal) {
+			natural = std::max(minimum, for_height);
+		} else {
+			natural = minimum + renderers.text.textHeight(text, getTextScale(), for_width - minimum);
+		}
 	}
 
 	void TooltipWidget::hide() {

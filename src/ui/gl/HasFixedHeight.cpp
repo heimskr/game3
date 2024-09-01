@@ -4,6 +4,8 @@ namespace Game3 {
 	HasFixedHeight::HasFixedHeight(float fixed_height):
 		fixedHeight(fixed_height) {}
 
+	HasFixedHeight::HasFixedHeight() = default;
+
 	float HasFixedHeight::getFixedHeight() const {
 		return fixedHeight;
 	}

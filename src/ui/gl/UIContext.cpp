@@ -12,13 +12,6 @@
 #include "ui/Modifiers.h"
 #include "util/Util.h"
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-namespace {
-	constexpr float HOTBAR_SCALE = 6;
-}
-
 namespace Game3 {
 	UIContext::UIContext(Canvas &canvas):
 		canvas(canvas),
@@ -32,10 +25,8 @@ namespace Game3 {
 
 		if (dialogs.empty()) {
 			scissorStack = internalScissorStack;
-			constexpr static float HOTBAR_BORDER = SLOT_PADDING * HOTBAR_SCALE / 3;
 			constexpr static float width = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING) * HOTBAR_SCALE + HOTBAR_BORDER * 2;
-			constexpr static float height = (OUTER_SLOT_SIZE + SLOT_PADDING) * HOTBAR_SCALE + HOTBAR_BORDER * 2;
-			hotbar->render(*this, context, (canvas.getWidth() * factor - width) / 2, canvas.getHeight() * factor - (OUTER_SLOT_SIZE * 2 - INNER_SLOT_SIZE / 2) * HOTBAR_SCALE, width, height);
+			hotbar->render(*this, context, (canvas.getWidth() * factor - width) / 2, canvas.getHeight() * factor - (OUTER_SLOT_SIZE * 2 - INNER_SLOT_SIZE / 2) * HOTBAR_SCALE, -1, -1);
 		} else {
 			for (const std::shared_ptr<Dialog> &dialog: dialogs) {
 				scissorStack = internalScissorStack;

@@ -6,6 +6,7 @@
 
 namespace Game3 {
 	class BoxWidget;
+	class ScrollerWidget;
 
 	class SettingsTab: public Tab {
 		public:
@@ -16,6 +17,7 @@ namespace Game3 {
 			void renderIcon(const RendererContext &) final;
 
 		private:
+			std::shared_ptr<ScrollerWidget> scroller;
 			std::shared_ptr<BoxWidget> box;
 	};
 }

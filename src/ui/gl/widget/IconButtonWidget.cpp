@@ -28,11 +28,11 @@ namespace Game3 {
 		});
 	}
 
-	void IconButtonWidget::adjustWidth(const RendererContext &, float &width, float height) const {
+	float IconButtonWidget::getWidth(const RendererContext &, float height) const {
 		if (!iconTexture)
-			return;
+			return -1;
 
 		height -= 2 * scale;
-		width = static_cast<float>(iconTexture->width) / static_cast<float>(iconTexture->height) * height;
+		return static_cast<float>(iconTexture->width) / static_cast<float>(iconTexture->height) * height;
 	}
 }

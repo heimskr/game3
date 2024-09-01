@@ -47,7 +47,8 @@ namespace Game3 {
 			bar->setProgress(number);
 		};
 
-		bar = std::make_shared<ProgressBarWidget>(scale, scale * 10, Color(1, 0, 0, 1), 0.5);
+		bar = std::make_shared<ProgressBarWidget>(scale, Color(1, 0, 0, 1), 0.5);
+		bar->setFixedHeight(10 * scale);
 		bar->setOnDragStart([this](Widget &, UIContext &ui, int, int) {
 			ui.addDragUpdater(bar);
 			return true;
@@ -70,7 +71,8 @@ namespace Game3 {
 			return true;
 		});
 
-		iconButton = std::make_shared<IconButtonWidget>(scale, scale * 12);
+		iconButton = std::make_shared<IconButtonWidget>(scale);
+		iconButton->setFixedHeight(scale * 12);
 		iconButton->setIconTexture(cacheTexture("resources/gui/randomize.png"));
 		iconButton->setOnClick([this](Widget &, UIContext &ui, int, int, int) {
 			const float height = threadContext.random(6.f, 32.f);
@@ -79,7 +81,8 @@ namespace Game3 {
 			return true;
 		});
 
-		button = std::make_shared<ButtonWidget>(scale, scale * 10);
+		button = std::make_shared<ButtonWidget>(scale);
+		button->setFixedHeight(scale * 10);
 		button->setText("Randomize");
 		button->setOnClick([&](Widget &, UIContext &, int, int, int) {
 			const float progress = threadContext.random(0.f, 1.f);
@@ -90,7 +93,7 @@ namespace Game3 {
 
 		icon = std::make_shared<IconWidget>(scale);
 		icon->setIconTexture(cacheTexture("resources/gui/settings.png"));
-		icon->setFixedHeight(scale * 6);
+		icon->setFixedSize(scale * 6);
 		icon->setOnClick([](Widget &, UIContext &, int, int, int) {
 			INFO("Icon clicked");
 			return true;

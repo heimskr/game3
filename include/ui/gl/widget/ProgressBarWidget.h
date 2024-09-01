@@ -3,23 +3,28 @@
 #include "graphics/Color.h"
 #include "types/Types.h"
 #include "ui/gl/widget/Widget.h"
+#include "ui/gl/HasFixedSize.h"
 
 #include <chrono>
 #include <optional>
 
 namespace Game3 {
-	class ProgressBarWidget: public Widget {
-		public:
-			ProgressBarWidget(float scale, float fixed_height, Color interior_color, Color background_color, Color exterior_color, float progress = 0);
-			ProgressBarWidget(float scale, float fixed_height, Color interior_color, float progress = 0);
+	// TODO: vertical progress bars
 
+	class ProgressBarWidget: public Widget, public HasFixedSize {
+		public:
+			ProgressBarWidget(float scale, Color interior_color, Color background_color, Color exterior_color, float progress = 0);
+			ProgressBarWidget(float scale, Color interior_color, float progress = 0);
+
+			using Widget::render;
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
-			std::pair<float, float> calculateSize(const RendererContext &, float available_width, float available_height) final;
+
+			SizeRequestMode getRequestMode() const final;
+			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
 			void setProgress(float);
 
 		private:
-			float fixedHeight{};
 			Color topInteriorColor;
 			Color bottomInteriorColor;
 			Color backgroundColor;
@@ -29,5 +34,8 @@ namespace Game3 {
 			float oldProgress{};
 			float lastReportedProgress = -1;
 			std::optional<std::chrono::system_clock::time_point> progressUpdatePoint;
+
+			float getDefaultWidth() const;
+			float getDefaultHeight() const;
 	};
 }

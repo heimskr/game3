@@ -15,4 +15,6 @@ namespace Game3 {
 	constexpr int OUTER_SLOT_SIZE = INNER_SLOT_SIZE * 5 / 4;
 	constexpr int SLOT_PADDING = OUTER_SLOT_SIZE - INNER_SLOT_SIZE;
 	constexpr Slot HOTBAR_SIZE = 10;
+	constexpr float HOTBAR_SCALE = 6;
+	constexpr float HOTBAR_BORDER = SLOT_PADDING * HOTBAR_SCALE / 3;
 }

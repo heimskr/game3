@@ -16,24 +16,28 @@ namespace {
 }
 
 namespace Game3 {
-	ButtonWidget::ButtonWidget(float scale, float fixed_height, Color top_border_color, Color bottom_border_color, Color text_color, TexturePtr texture):
+	ButtonWidget::ButtonWidget(float scale, Color top_border_color, Color bottom_border_color, Color text_color, TexturePtr texture):
 		Widget(scale),
-		fixedHeight(fixed_height),
 		texture(std::move(texture)) {
 			setColors(top_border_color, bottom_border_color, text_color);
 		}
 
-	ButtonWidget::ButtonWidget(float scale, float fixed_height, Color border_color, Color text_color, TexturePtr texture):
-		ButtonWidget(scale, fixed_height, border_color, border_color.darken(), text_color, std::move(texture)) {}
+	ButtonWidget::ButtonWidget(float scale, Color border_color, Color text_color, TexturePtr texture):
+		ButtonWidget(scale, border_color, border_color.darken(), text_color, std::move(texture)) {}
 
-	ButtonWidget::ButtonWidget(float scale, float fixed_height, TexturePtr texture):
-		ButtonWidget(scale, fixed_height, DEFAULT_BORDER_COLOR, DEFAULT_TEXT_COLOR, std::move(texture)) {}
+	ButtonWidget::ButtonWidget(float scale, TexturePtr texture):
+		ButtonWidget(scale, DEFAULT_BORDER_COLOR, DEFAULT_TEXT_COLOR, std::move(texture)) {}
 
 	void ButtonWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
-		if (fixedHeight > 0)
-			height = fixedHeight;
+		float dummy{};
 
-		adjustWidth(renderers, width, height);
+		if (fixedHeight > 0) {
+			height = fixedHeight;
+		} else if (height < 0) {
+			measure(renderers, Orientation::Vertical, width, height, dummy, height);
+		}
+
+		measure(renderers, Orientation::Horizontal, width, height, dummy, width);
 		Widget::render(ui, renderers, x, y, width, height);
 
 		RectangleRenderer &rectangler = renderers.rectangle;
@@ -122,26 +126,25 @@ namespace Game3 {
 		return true;
 	}
 
-	std::pair<float, float> ButtonWidget::calculateSize(const RendererContext &renderers, float available_width, float available_height) {
-		float height = fixedHeight > 0? fixedHeight : available_height;
-		adjustWidth(renderers, available_width, height);
-		return {available_width, height};
+	SizeRequestMode ButtonWidget::getRequestMode() const {
+		return SizeRequestMode::WidthForHeight;
+	}
+
+	void ButtonWidget::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+		if (orientation == Orientation::Horizontal) {
+			minimum = natural = getWidth(renderers, for_height);
+		} else {
+			minimum = scale * 6;
+			natural = std::max(minimum, fixedHeight);
+		}
 	}
 
 	const Glib::ustring & ButtonWidget::getText() const {
 		return text;
 	}
 
-	float ButtonWidget::getFixedHeight() const {
-		return fixedHeight;
-	}
-
 	void ButtonWidget::setText(Glib::ustring new_text) {
 		text = std::move(new_text);
-	}
-
-	void ButtonWidget::setFixedHeight(float new_fixed_height) {
-		fixedHeight = new_fixed_height;
 	}
 
 	void ButtonWidget::renderLabel(UIContext &, const RendererContext &renderers, float, float height) {
@@ -159,11 +162,13 @@ namespace Game3 {
 		});
 	}
 
-	void ButtonWidget::adjustWidth(const RendererContext &renderers, float &width, float height) const {
+	float ButtonWidget::getWidth(const RendererContext &renderers, float height) const {
 		if (!text.empty()) {
 			const float text_scale = getTextScale(renderers, height - 6 * scale);
-			width = scale * 6 + renderers.text.textWidth(text, text_scale);
+			return scale * 6 + renderers.text.textWidth(text, text_scale);
 		}
+
+		return -1;
 	}
 
 	float ButtonWidget::getTextScale(const RendererContext &renderers, float height) const {
