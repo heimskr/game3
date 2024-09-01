@@ -22,7 +22,7 @@ namespace Game3 {
 		float dummy{};
 
 		measure(renderers, Orientation::Horizontal, original_width, original_height, dummy, width);
-		measure(renderers, Orientation::Horizontal, original_width, original_height, dummy, height);
+		measure(renderers, Orientation::Vertical,   original_width, original_height, dummy, height);
 		Widget::render(ui, renderers, x, y, width, height);
 
 		const float offset = SLOT_PADDING * scale / 3;
