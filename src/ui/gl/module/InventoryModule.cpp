@@ -119,7 +119,7 @@ namespace Game3 {
 		return SizeRequestMode::HeightForWidth;
 	}
 
-	void InventoryModule::measure(const RendererContext &, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+	void InventoryModule::measure(const RendererContext &, Orientation orientation, float for_width, float, float &minimum, float &natural) {
 		if (orientation == Orientation::Horizontal) {
 			minimum = getColumnCount(for_width) * OUTER_SLOT_SIZE * scale;
 			natural = for_width;

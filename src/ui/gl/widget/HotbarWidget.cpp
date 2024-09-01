@@ -67,7 +67,7 @@ namespace Game3 {
 		return SizeRequestMode::ConstantSize;
 	}
 
-	void HotbarWidget::measure(const RendererContext &, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+	void HotbarWidget::measure(const RendererContext &, Orientation orientation, float, float, float &minimum, float &natural) {
 		if (orientation == Orientation::Horizontal) {
 			minimum = natural = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING) * scale + HOTBAR_BORDER * 2;
 		} else {

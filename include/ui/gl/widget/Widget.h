@@ -19,6 +19,8 @@ namespace Game3 {
 
 	class Widget: public std::enable_shared_from_this<Widget> {
 		public:
+			Widget(float scale);
+
 			Widget(const Widget &) = default;
 			Widget(Widget &&) noexcept = default;
 
@@ -53,7 +55,7 @@ namespace Game3 {
 			void insertBefore(WidgetPtr parent, WidgetPtr sibling);
 			void insertAtStart(WidgetPtr parent);
 			void insertAtEnd(WidgetPtr parent);
-			void remove(WidgetPtr child);
+			virtual void remove(WidgetPtr child);
 
 		protected:
 			float scale{};
@@ -74,8 +76,6 @@ namespace Game3 {
 
 			/** Mouse X and Y coordinates are relative to the top left corner of the widget. Return value indicates whether to stop propagation. */
 			std::function<bool(Widget &, UIContext &, int mouse_x, int mouse_y)> onDragUpdate;
-
-			Widget(float scale);
 
 		public:
 			virtual void setOnClick(decltype(onClick));

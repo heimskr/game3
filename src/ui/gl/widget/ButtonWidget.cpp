@@ -130,11 +130,13 @@ namespace Game3 {
 		return SizeRequestMode::WidthForHeight;
 	}
 
-	void ButtonWidget::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+	void ButtonWidget::measure(const RendererContext &renderers, Orientation orientation, float, float for_height, float &minimum, float &natural) {
 		if (orientation == Orientation::Horizontal) {
+			if (for_height < 0)
+				for_height = std::max(fixedHeight, getMinimumPreferredHeight());
 			minimum = natural = getWidth(renderers, for_height);
 		} else {
-			minimum = scale * 6;
+			minimum = getMinimumPreferredHeight();
 			natural = std::max(minimum, fixedHeight);
 		}
 	}
@@ -189,5 +191,9 @@ namespace Game3 {
 
 	TexturePtr ButtonWidget::getDefaultTexture() {
 		return cacheTexture("resources/gui/stone.png");
+	}
+
+	float ButtonWidget::getMinimumPreferredHeight() const {
+		return scale * 12;
 	}
 }

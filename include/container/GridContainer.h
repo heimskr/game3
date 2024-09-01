@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <concepts>
 #include <deque>
 
@@ -47,6 +48,7 @@ namespace Game3 {
 			}
 
 			inline T & operator[](std::size_t row, std::size_t column) {
+				ensureSize(row + 1, column + 1);
 				return _rows[row][column];
 			}
 
@@ -77,6 +79,59 @@ namespace Game3 {
 			inline const C<C<T>> & data() const {
 				return _rows;
 			}
+
+			void clear() {
+				_rows.clear();
+				rowCount = 0;
+				columnCount = 0;
+			}
+
+			void resizeWidth(std::size_t new_width) {
+				if (new_width == columnCount)
+					return;
+				for (C<T> &row: _rows)
+					row.resize(new_width);
+				columnCount = new_width;
+			}
+
+			void resizeHeight(std::size_t new_height) {
+				if (new_height == rowCount)
+					return;
+
+				_rows.resize(new_height);
+
+				if (rowCount < new_height) {
+					for (std::size_t row = 0; row < new_height; ++row)
+						_rows[row].resize(columnCount);
+				}
+
+				rowCount = new_height;
+			}
+
+			void resize(std::size_t new_height, std::size_t new_width) {
+				resizeHeight(new_height);
+				resizeWidth(new_width);
+			}
+
+			void ensureWidth(std::size_t min) {
+				if (columnCount < min)
+					resizeWidth(min);
+			}
+
+			void ensureHeight(std::size_t min) {
+				if (rowCount < min)
+					resizeHeight(min);
+			}
+
+			void ensureSize(std::size_t min_height, std::size_t min_width) {
+				ensureHeight(min_height);
+				ensureWidth(min_width);
+			}
+
+			inline auto begin() { return _rows.begin(); }
+			inline auto end() { return _rows.end(); }
+			inline auto begin() const { return _rows.begin(); }
+			inline auto end() const { return _rows.end(); }
 
 		private:
 			C<C<T>> _rows;

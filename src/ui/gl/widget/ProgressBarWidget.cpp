@@ -93,7 +93,7 @@ namespace Game3 {
 		return SizeRequestMode::ConstantSize;
 	}
 
-	void ProgressBarWidget::measure(const RendererContext &, Orientation measure_orientation, float for_width, float for_height, float &minimum, float &natural) {
+	void ProgressBarWidget::measure(const RendererContext &, Orientation measure_orientation, float, float, float &minimum, float &natural) {
 		if (measure_orientation == Orientation::Horizontal) {
 			if (0 < fixedWidth)
 				minimum = natural = fixedWidth;

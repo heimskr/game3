@@ -175,7 +175,7 @@ namespace Game3 {
 		return SizeRequestMode::HeightForWidth;
 	}
 
-	void TextInputWidget::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+	void TextInputWidget::measure(const RendererContext &renderers, Orientation orientation, float for_width, float, float &minimum, float &natural) {
 		const float border = 2 * thickness * scale;
 
 		if (orientation == Orientation::Horizontal) {

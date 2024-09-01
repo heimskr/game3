@@ -47,5 +47,6 @@ namespace Game3 {
 			void setColors(Color top, Color bottom, Color text_color);
 
 			static TexturePtr getDefaultTexture();
+			virtual float getMinimumPreferredHeight() const;
 	};
 }

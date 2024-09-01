@@ -5,7 +5,7 @@
 #include <memory>
 
 namespace Game3 {
-	class BoxWidget;
+	class GridWidget;
 	class ScrollerWidget;
 
 	class SettingsTab: public Tab {
@@ -18,6 +18,6 @@ namespace Game3 {
 
 		private:
 			std::shared_ptr<ScrollerWidget> scroller;
-			std::shared_ptr<BoxWidget> box;
+			std::shared_ptr<GridWidget> grid;
 	};
 }

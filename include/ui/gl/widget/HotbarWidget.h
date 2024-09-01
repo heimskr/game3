@@ -12,9 +12,12 @@ namespace Game3 {
 		public:
 			HotbarWidget(float scale);
 
+			using Widget::render;
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
+
 			bool click(UIContext &, int button, int x, int y) final;
 			bool dragStart(UIContext &, int x, int y) final;
+
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
