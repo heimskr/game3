@@ -70,11 +70,7 @@ namespace Game3 {
 			.wrapMode = GL_REPEAT,
 		});
 
-		{
-			const Rectangle rectangle(x + scale, adjusted_y + scale, width - 2 * scale, height - 4 * scale);
-			auto saver = ui.scissorStack.pushRelative(rectangle, renderers);
-			renderLabel(ui, renderers, rectangle.width, rectangle.height);
-		}
+		renderLabel(ui, renderers, Rectangle(x + scale, adjusted_y + scale, width - 2 * scale, height - 4 * scale));
 
 		// Top left
 		rectangler(top_color, x + scale, adjusted_y + scale, scale, scale);
@@ -149,14 +145,14 @@ namespace Game3 {
 		text = std::move(new_text);
 	}
 
-	void ButtonWidget::renderLabel(UIContext &, const RendererContext &renderers, float, float height) {
+	void ButtonWidget::renderLabel(UIContext &ui, const RendererContext &renderers, const Rectangle &rectangle) {
 		if (text.empty())
 			return;
 
-		const float text_scale = getTextScale(renderers, height - 2 * scale);
+		const float text_scale = getTextScale(renderers, rectangle.height - 2 * scale);
 		renderers.text.drawOnScreen(text, TextRenderOptions{
-			.x = 2 * scale,
-			.y = height - scale,
+			.x = rectangle.x + 2 * scale,
+			.y = rectangle.y + rectangle.height - scale,
 			.scaleX = text_scale,
 			.scaleY = text_scale,
 			.color = pressed? textColorPressed : textColor,

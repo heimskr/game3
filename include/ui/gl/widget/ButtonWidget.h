@@ -28,7 +28,7 @@ namespace Game3 {
 			void setText(Glib::ustring);
 
 		protected:
-			virtual void renderLabel(UIContext &, const RendererContext &, float width, float height);
+			virtual void renderLabel(UIContext &, const RendererContext &, const Rectangle &);
 			virtual float getWidth(const RendererContext &, float height) const;
 
 		private:

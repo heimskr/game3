@@ -10,16 +10,16 @@ namespace Game3 {
 			iconTexture->init();
 	}
 
-	void IconButtonWidget::renderLabel(UIContext &, const RendererContext &renderers, float width, float height) {
+	void IconButtonWidget::renderLabel(UIContext &, const RendererContext &renderers, const Rectangle &rectangle) {
 		if (!iconTexture)
 			return;
 
-		width -= scale;
-		height -= scale;
+		const float width  = rectangle.width  - scale;
+		const float height = rectangle.height - scale;
 
 		renderers.singleSprite.drawOnScreen(iconTexture, RenderOptions{
-			.x = scale / 2,
-			.y = scale / 2,
+			.x = rectangle.x + scale / 2,
+			.y = rectangle.y + scale / 2,
 			.sizeX = -1,
 			.sizeY = -1,
 			.scaleX = width  / iconTexture->width,

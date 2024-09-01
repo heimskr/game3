@@ -29,8 +29,8 @@ namespace Game3 {
 		grid->insertAtEnd(scroller);
 
 		std::array labels{
-			std::array{"Hello", "World", "!"},
-			std::array{"Foo", "Bar and Baz", "Quux"},
+			std::array{"Hello", "World",       "!"   },
+			std::array{"Foo",   "Bar and Baz", "Quux"},
 		};
 
 		for (std::size_t row = 0; row < labels.size(); ++row) {
