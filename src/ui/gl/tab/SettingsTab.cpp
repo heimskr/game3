@@ -4,6 +4,7 @@
 #include "ui/gl/tab/SettingsTab.h"
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/Button.h"
+#include "ui/gl/widget/Checkbox.h"
 #include "ui/gl/widget/Grid.h"
 #include "ui/gl/widget/IconButton.h"
 #include "ui/gl/widget/Icon.h"
@@ -61,6 +62,42 @@ namespace Game3 {
 		auto username_input = std::make_shared<TextInput>(scale);
 		username_input->setFixedSize(100 * scale, scale * TEXT_INPUT_HEIGHT_FACTOR);
 		grid->attach(username_input, row, 1);
+
+		++row;
+
+		auto alert_label = std::make_shared<Label>(scale);
+		alert_label->setText(ui, "Alert on Connect");
+		alert_label->setVerticalAlignment(Alignment::Middle);
+		grid->attach(alert_label, row, 0);
+
+		auto alert_checkbox = std::make_shared<Checkbox>(scale);
+		alert_checkbox->setChecked(true);
+		alert_checkbox->setFixedSize(scale * 8);
+		grid->attach(alert_checkbox, row, 1);
+
+		++row;
+
+		auto lighting_label = std::make_shared<Label>(scale);
+		lighting_label->setText(ui, "Render Lighting");
+		lighting_label->setVerticalAlignment(Alignment::Middle);
+		grid->attach(lighting_label, row, 0);
+
+		auto lighting_checkbox = std::make_shared<Checkbox>(scale);
+		lighting_checkbox->setChecked(true);
+		lighting_checkbox->setFixedSize(scale * 8);
+		grid->attach(lighting_checkbox, row, 1);
+
+		++row;
+
+		auto timer_label = std::make_shared<Label>(scale);
+		timer_label->setText(ui, "Timer Summaries");
+		timer_label->setVerticalAlignment(Alignment::Middle);
+		grid->attach(timer_label, row, 0);
+
+		auto timer_checkbox = std::make_shared<Checkbox>(scale);
+		timer_checkbox->setChecked(true);
+		timer_checkbox->setFixedSize(scale * 8);
+		grid->attach(timer_checkbox, row, 1);
 
 		++row;
 	}

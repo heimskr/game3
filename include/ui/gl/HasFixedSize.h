@@ -11,6 +11,7 @@ namespace Game3 {
 			virtual std::pair<float, float> getFixedSize() const;
 			virtual void setFixedSize(float, float);
 			virtual void setFixedSize(float);
+			virtual void fixSizes(float &width, float &height);
 
 		protected:
 			HasFixedSize(float fixed_width, float fixed_height);

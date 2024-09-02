@@ -21,4 +21,12 @@ namespace Game3 {
 	void HasFixedSize::setFixedSize(float fixed_size) {
 		setFixedSize(fixed_size, fixed_size);
 	}
+
+	void HasFixedSize::fixSizes(float &width, float &height) {
+		if (width < 0 || 0 < fixedWidth)
+			width = fixedWidth;
+
+		if (height < 0 || 0 < fixedHeight)
+			height = fixedHeight;
+	}
 }
