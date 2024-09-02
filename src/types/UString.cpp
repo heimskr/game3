@@ -75,7 +75,7 @@ namespace Game3 {
 
 		for (auto iter = pieces.begin(); iter != pieces.end();) {
 			if (!word)
-				word = pieces.front();
+				word = *iter;
 
 			if (get_line_width() + text_width(*word) + space_width <= max_width) {
 				line += *word;

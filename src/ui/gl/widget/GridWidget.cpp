@@ -81,7 +81,7 @@ namespace Game3 {
 		std::size_t *row{}, *column{};
 		float for_size{};
 
-		if (orientation == Orientation::Vertical) {
+		if (orientation == Orientation::Horizontal) {
 			outer_size = &decltype(widgetContainer)::columns;
 			inner_size = &decltype(widgetContainer)::rows;
 			column = &outer;
